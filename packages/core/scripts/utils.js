@@ -500,7 +500,7 @@ export const log = {
 /**
  * Format a shadow property value as a var() reference or literal.
  * References are resolved through the primitive map so the var name matches
- * the actual primitive cssName (e.g. `{color.default}` → `var(--nx-focus-color-default)`
+ * the actual primitive cssName (e.g. `{color.error}` → `var(--nx-focus-color-error)`
  * when the focus primitive provides it). This means shadow property references
  * can point to any primitive category, not just `--nx-shadow-*`.
  */
@@ -1756,6 +1756,8 @@ export function collectSemanticColorTokensVarRef(
           const primitiveInfo = primitiveMap.get(refPath);
           if (primitiveInfo) {
             resolvedValue = `var(--${primitiveInfo.cssName})`;
+          } else {
+            resolvedValue = `var(--color-${refPath.replace(/\./g, '-')})`;
           }
         } else {
           resolvedValue = formatTokenValue(resolvedValue, 'color', currentPath);
@@ -2038,6 +2040,263 @@ export function generateRootDimensionsCSS(dimensionTokens = []) {
   }
   css += `}\n`;
   return css;
+}
+
+const DEFAULT_FOCUS_RING_SELECTORS = [
+  "[class~='nx:focus-visible:outline-focus-default']:focus-visible",
+  "[class~='nx:data-[active=true]:outline-focus-default'][data-active='true']",
+  "[data-focused='true'] [class~='nx:group-data-[focused=true]/day:outline-focus-default']",
+  "[class~='nx:has-[[data-slot=input-group-control]:focus-visible]:outline-focus-default']:has([data-slot='input-group-control']:focus-visible)",
+];
+
+const ERROR_FOCUS_RING_SELECTORS = [
+  "[class~='nx:aria-invalid:focus-visible:outline-focus-error'][aria-invalid='true']:focus-visible",
+  "[class~='nx:has-[[data-slot=input-group-control][aria-invalid=true]:focus-visible]:outline-focus-error']:has([data-slot='input-group-control'][aria-invalid='true']:focus-visible)",
+];
+
+const FIELD_BOUNDARY_SELECTORS = [
+  "[data-slot='input'][data-variant='default']",
+  "[data-slot='sidebar-input'][data-variant='default']",
+  "[data-slot='textarea'][data-variant='default']",
+  "[data-slot='native-select'][data-variant='default']",
+  "[data-slot='select-trigger'][data-variant='default']",
+  "[data-slot='input-group'][data-variant='default']",
+];
+
+const FIELD_ERROR_BOUNDARY_SELECTORS = [
+  "[data-slot='input'][aria-invalid='true']",
+  "[data-slot='sidebar-input'][aria-invalid='true']",
+  "[data-slot='textarea'][aria-invalid='true']",
+  "[data-slot='native-select'][aria-invalid='true']",
+  "[data-slot='select-trigger'][aria-invalid='true']",
+  "[data-slot='input-group']:has([data-slot][aria-invalid='true'])",
+];
+
+const FIELD_DISABLED_BOUNDARY_SELECTORS = [
+  "[data-slot='input'][data-variant='default']:disabled",
+  "[data-slot='sidebar-input'][data-variant='default']:disabled",
+  "[data-slot='textarea'][data-variant='default']:disabled",
+  "[data-slot='native-select'][data-variant='default']:disabled",
+  "[data-slot='select-trigger'][data-variant='default']:disabled",
+  "[data-slot='input-group'][data-variant='default'][data-disabled='true']",
+];
+
+const OTP_SLOT_BOUNDARY_SELECTOR = "[data-slot='input-otp-slot']";
+const OTP_SLOT_GROUP_DISABLED_SELECTOR =
+  "[class~='nx:group/input-otp']:has([data-slot='input-otp']:disabled) [data-slot='input-otp-slot']";
+
+const FIELD_FOCUS_RING_SELECTORS = [
+  "[data-slot='input'][class~='nx:focus-visible:outline-focus-default']:focus-visible",
+  "[data-slot='sidebar-input'][class~='nx:focus-visible:outline-focus-default']:focus-visible",
+  "[data-slot='textarea'][class~='nx:focus-visible:outline-focus-default']:focus-visible",
+  "[data-slot='native-select'][class~='nx:focus-visible:outline-focus-default']:focus-visible",
+  "[data-slot='select-trigger'][class~='nx:focus-visible:outline-focus-default']:focus-visible",
+  "[data-slot='input-otp-slot'][class~='nx:data-[active=true]:outline-focus-default'][data-active='true']",
+  "[data-slot='input-group'][class~='nx:has-[[data-slot=input-group-control]:focus-visible]:outline-focus-default']:has([data-slot='input-group-control']:focus-visible)",
+];
+
+const FIELD_ERROR_FOCUS_RING_SELECTORS = [
+  "[data-slot='input'][class~='nx:aria-invalid:focus-visible:outline-focus-error'][aria-invalid='true']:focus-visible",
+  "[data-slot='sidebar-input'][class~='nx:aria-invalid:focus-visible:outline-focus-error'][aria-invalid='true']:focus-visible",
+  "[data-slot='textarea'][class~='nx:aria-invalid:focus-visible:outline-focus-error'][aria-invalid='true']:focus-visible",
+  "[data-slot='native-select'][class~='nx:aria-invalid:focus-visible:outline-focus-error'][aria-invalid='true']:focus-visible",
+  "[data-slot='select-trigger'][class~='nx:aria-invalid:focus-visible:outline-focus-error'][aria-invalid='true']:focus-visible",
+  "[data-slot='input-group'][class~='nx:has-[[data-slot=input-group-control][aria-invalid=true]:focus-visible]:outline-focus-error']:has([data-slot='input-group-control'][aria-invalid='true']:focus-visible)",
+];
+
+const INPUT_GROUP_CONTROL_FOCUS_SUPPRESSION_SELECTORS = [
+  "[data-slot='input-group-control'][class~='nx:focus-visible:outline-focus-default']:focus-visible",
+  "[data-slot='input-group-control'][class~='nx:aria-invalid:focus-visible:outline-focus-error'][aria-invalid='true']:focus-visible",
+];
+
+const BUTTON_FOCUS_RING_SELECTORS = [
+  "[data-slot='button'][class~='nx:focus-visible:outline-focus-default']:focus-visible",
+];
+
+const BUTTON_ERROR_FOCUS_RING_SELECTORS = [
+  "[data-slot='button'][class~='nx:aria-invalid:focus-visible:outline-focus-error'][aria-invalid='true']:focus-visible",
+];
+
+/**
+ * Turn the canonical focus outline utilities into the shipped hard focus
+ * treatment while preserving a real outline in forced-colors mode.
+ *
+ * The component classes intentionally stay outline-based: Tailwind owns the
+ * outline width/offset, this layer owns the normal-mode ring paint.
+ *
+ * @returns {string} CSS focus ring rules
+ */
+export function generateFocusRingCSS() {
+  const defaultSelectors = DEFAULT_FOCUS_RING_SELECTORS.join(',\n');
+  const errorSelectors = ERROR_FOCUS_RING_SELECTORS.join(',\n');
+  const fieldBoundarySelectors = FIELD_BOUNDARY_SELECTORS.join(',\n');
+  const fieldErrorBoundarySelectors =
+    FIELD_ERROR_BOUNDARY_SELECTORS.join(',\n');
+  const fieldDisabledBoundarySelectors =
+    FIELD_DISABLED_BOUNDARY_SELECTORS.join(',\n');
+  const fieldSelectors = FIELD_FOCUS_RING_SELECTORS.join(',\n');
+  const fieldErrorSelectors = FIELD_ERROR_FOCUS_RING_SELECTORS.join(',\n');
+  const inputGroupControlSuppressionSelectors =
+    INPUT_GROUP_CONTROL_FOCUS_SUPPRESSION_SELECTORS.join(',\n');
+  const buttonSelectors = BUTTON_FOCUS_RING_SELECTORS.join(',\n');
+  const buttonErrorSelectors = BUTTON_ERROR_FOCUS_RING_SELECTORS.join(',\n');
+  const allSelectors = [
+    ...DEFAULT_FOCUS_RING_SELECTORS,
+    ...ERROR_FOCUS_RING_SELECTORS,
+    ...FIELD_FOCUS_RING_SELECTORS,
+    ...FIELD_ERROR_FOCUS_RING_SELECTORS,
+    ...BUTTON_FOCUS_RING_SELECTORS,
+    ...BUTTON_ERROR_FOCUS_RING_SELECTORS,
+  ].join(',\n');
+
+  return `
+/* ===== FOCUS RING ===== */
+${fieldBoundarySelectors} {
+  border-color: transparent !important;
+  border-width: 0;
+  box-shadow: inset 0 0 0 1px var(--color-border-default);
+}
+
+${fieldErrorBoundarySelectors} {
+  border-color: transparent !important;
+  border-width: 0;
+  box-shadow: inset 0 0 0 1px var(--color-border-error);
+}
+
+${fieldDisabledBoundarySelectors} {
+  border-color: transparent !important;
+  border-width: 0;
+  box-shadow: inset 0 0 0 1px var(--color-border-disabled);
+}
+
+${OTP_SLOT_BOUNDARY_SELECTOR} {
+  border-color: transparent !important;
+  border-width: 0;
+  box-shadow:
+    inset 0 1px 0 var(--color-border-default),
+    inset -1px 0 0 var(--color-border-default),
+    inset 0 -1px 0 var(--color-border-default);
+}
+
+${OTP_SLOT_BOUNDARY_SELECTOR}:first-child {
+  box-shadow:
+    inset 0 1px 0 var(--color-border-default),
+    inset 1px 0 0 var(--color-border-default),
+    inset -1px 0 0 var(--color-border-default),
+    inset 0 -1px 0 var(--color-border-default);
+}
+
+${OTP_SLOT_GROUP_DISABLED_SELECTOR} {
+  border-color: transparent !important;
+  border-width: 0;
+  box-shadow:
+    inset 0 1px 0 var(--color-border-disabled),
+    inset -1px 0 0 var(--color-border-disabled),
+    inset 0 -1px 0 var(--color-border-disabled);
+}
+
+${OTP_SLOT_GROUP_DISABLED_SELECTOR}:first-child {
+  box-shadow:
+    inset 0 1px 0 var(--color-border-disabled),
+    inset 1px 0 0 var(--color-border-disabled),
+    inset -1px 0 0 var(--color-border-disabled),
+    inset 0 -1px 0 var(--color-border-disabled);
+}
+
+${defaultSelectors} {
+  --tw-outline-style: none !important;
+  outline-color: transparent !important;
+  outline-style: none !important;
+  box-shadow: 0 0 0 2px var(--color-focus-default);
+}
+
+${errorSelectors} {
+  --tw-outline-style: none !important;
+  outline-color: transparent !important;
+  outline-style: none !important;
+  box-shadow: 0 0 0 2px var(--color-focus-error);
+}
+
+${fieldSelectors} {
+  --tw-outline-style: none !important;
+  outline-color: transparent !important;
+  outline-style: none !important;
+  border-color: transparent !important;
+  border-width: 0;
+  box-shadow:
+    inset 0 0 0 1px var(--color-focus-default),
+    0 0 0 1px var(--color-focus-default);
+}
+
+${fieldErrorSelectors} {
+  --tw-outline-style: none !important;
+  outline-color: transparent !important;
+  outline-style: none !important;
+  border-color: transparent !important;
+  border-width: 0;
+  box-shadow:
+    inset 0 0 0 1px var(--color-focus-error),
+    0 0 0 1px var(--color-focus-error);
+}
+
+${inputGroupControlSuppressionSelectors} {
+  --tw-outline-style: none !important;
+  outline-color: transparent !important;
+  outline-style: none !important;
+  box-shadow: none;
+}
+
+${buttonSelectors} {
+  --tw-outline-style: none !important;
+  outline-color: transparent !important;
+  outline-style: none !important;
+  box-shadow:
+    0 0 0 2px var(--color-background),
+    0 0 0 4px var(--color-focus-default);
+}
+
+${buttonErrorSelectors} {
+  --tw-outline-style: none !important;
+  outline-color: transparent !important;
+  outline-style: none !important;
+  box-shadow:
+    0 0 0 2px var(--color-background),
+    0 0 0 4px var(--color-focus-error);
+}
+
+@media (forced-colors: active) {
+  ${fieldBoundarySelectors},
+  ${fieldErrorBoundarySelectors},
+  ${OTP_SLOT_BOUNDARY_SELECTOR} {
+    border-color: CanvasText !important;
+    border-width: 1px;
+    box-shadow: none !important;
+  }
+
+  ${fieldDisabledBoundarySelectors},
+  ${OTP_SLOT_GROUP_DISABLED_SELECTOR} {
+    border-color: GrayText !important;
+    border-width: 1px;
+    box-shadow: none !important;
+  }
+
+  ${allSelectors} {
+    --tw-outline-style: solid !important;
+    outline-color: Highlight !important;
+    outline-offset: var(--focus-offset) !important;
+    outline-style: solid !important;
+    outline-width: 2px !important;
+    box-shadow: none !important;
+  }
+
+  ${inputGroupControlSuppressionSelectors} {
+    --tw-outline-style: none !important;
+    outline-color: transparent !important;
+    outline-style: none !important;
+    box-shadow: none !important;
+  }
+}
+`;
 }
 
 export function generateNativeBrowserUIThemeCSS() {

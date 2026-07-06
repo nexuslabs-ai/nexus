@@ -129,7 +129,7 @@ No shipped component needs this yet — it's the rule for the first one that doe
 
 ## Focus States
 
-Use the design-system focus token with a real `outline` and the tokenised offset (`--focus-offset`, currently `2px`), not Tailwind `ring-*` utilities and not box-shadow:
+Use the design-system focus token with the canonical outline utilities and the tokenised offset (`--focus-offset`, currently `2px`). The generated theme turns those utilities into a hard focus treatment in normal rendering and keeps the real outline as the forced-colors fallback:
 
 ```
 nx:focus-visible:outline-2 nx:focus-visible:outline-focus-default nx:focus-visible:outline-offset-(--focus-offset)
@@ -137,7 +137,7 @@ nx:focus-visible:outline-2 nx:focus-visible:outline-focus-default nx:focus-visib
 
 Not every component takes this ring — see [§ Surface exception map](#surface-exception-map) for which component types use the ring, a background-tint `:focus`, or no focus treatment at all.
 
-For invalid fields, wire both an always-on error border and an error-coloured focus ring:
+For invalid fields, wire both an always-on error border and an error-coloured focus treatment:
 
 ```
 nx:aria-invalid:border-border-error nx:aria-invalid:focus-visible:outline-focus-error
@@ -145,18 +145,19 @@ nx:aria-invalid:border-border-error nx:aria-invalid:focus-visible:outline-focus-
 
 Live consumer: `packages/react/src/components/input/input.tsx`.
 
-### Why outline, not box-shadow
+### Why outline utilities plus focus CSS
 
-The ring is a real `outline` (not `box-shadow`) for two reasons:
+The component API stays outline-based even though normal rendering uses box-shadow paint:
 
-- **WCAG 2.4.7 + technique C40 compliance.** A 2px offset puts the ring on the surface _next to_ the control, so even on a same-coloured fill (primary button on a near-blue canvas) the ring stays legible against the background — without the system needing to detect the surrounding fill.
-- **Windows High Contrast Mode survives.** `forced-colors: active` strips backgrounds and box-shadows but preserves outlines. A box-shadow ring disappears entirely under WHCM; an outline ring renders in the user's system focus colour.
+- **One component contract.** Components keep using `outline-focus-default` / `outline-focus-error`, so the design-system CSS can change the look globally without per-component rewrites.
+- **Windows High Contrast Mode survives.** `forced-colors: active` strips box-shadows, so the generated CSS restores the outline in the user's system focus colour.
+- **Notion-style focus.** Inputs, textareas, selects, OTP slots, and input groups set their real border to `0` on focus and paint the visible focus edge with two 1px shadows: one inset and one outside. Buttons get a 2px surface gap plus a 2px outer primary ring. Other keyboard-focusable controls get a hard 2px primary ring.
 
-### Uniform brand-blue across variants
+### Uniform primary focus across variants
 
-Every focusable control — primary / secondary / outline / ghost / destructive, Input, Switch, Tabs, Accordion, Select, Dialog close — uses the **same** `focus-default` colour. There is no per-variant focus colour and no destructive→grey swap. Reason: focus is a system signal ("you are here"), not a brand or status signal. One colour reduces the cognitive load and matches the practice of Linear, Stripe, Geist, and Tailwind's own focus convention.
+Every focusable control — primary / secondary / outline / ghost / destructive, Input, Switch, Tabs, Accordion, Select, Dialog close — uses the **same** `focus-default` colour. There is no per-variant focus colour and no destructive→grey swap. Reason: focus is a system signal ("you are here"), not a per-control variant or status signal. One colour reduces the cognitive load and matches the practice of Linear, Stripe, Geist, and Tailwind's own focus convention.
 
-The focus colour is a **dedicated, theme-split blue** (`#1e3a8a` light / `#9dc1ee` dark; canonical values in `focus-default-{light,dark}.json`), tuned to clear APCA Lc ≥ 45 on every shipped surface (background / container / popover) and on nav chrome (nav-background / nav-item-{hover,active} / nav-border) in both themes — even when the surrounding fill is the primary brand colour or a tinted sidebar row. It is not derived from `primary.*`, so swapping the brand palette does not move the focus colour.
+The default focus colour is the active `primary.subtle-foreground` token. It follows the selected brand / runtime appearance while staying behind the stable `focus-default` utility, so component code does not need brand-specific focus classes. Error-state focus remains separate and uses `focus-error`.
 
 ### Surface exception map
 

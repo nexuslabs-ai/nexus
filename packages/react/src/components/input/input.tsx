@@ -6,7 +6,7 @@ import { cn } from '../../lib/utils';
 
 const inputVariants = cva(
   [
-    'nx:flex nx:w-full nx:rounded-md nx:border-width-default',
+    'nx:flex nx:box-border nx:w-full nx:rounded-md nx:border-0',
     'nx:text-foreground nx:transition-colors',
     'nx:file:border-0 nx:file:bg-transparent nx:file:typography-label-default nx:file:text-foreground nx:disabled:file:text-disabled-foreground',
     'nx:placeholder:text-muted-foreground',
@@ -50,7 +50,7 @@ interface InputProps
  *
  * A text input field for collecting user data.
  * Supports different sizes and all native input attributes. Use
- * `variant="borderless"` to remove the visible border while keeping a tonal
+ * `variant="borderless"` to remove the resting field stroke while keeping a tonal
  * control fill for resting affordance.
  *
  * @example

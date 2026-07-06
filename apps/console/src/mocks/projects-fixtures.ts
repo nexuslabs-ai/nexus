@@ -126,7 +126,7 @@ export const ISSUES: (Issue & { description: string })[] = [
     createdAt: '2026-05-25',
     updatedAt: '2026-06-01',
     description:
-      'The focus outline blends into the primary fill on a near-blue dark canvas. Use the dedicated theme-split focus token at a 2px offset.',
+      'The focus ring should follow the active primary accent token, use border-only field focus plus hard button/control treatments, and keep a high-contrast outline fallback for forced-colors users.',
   },
   {
     id: 'i-11',

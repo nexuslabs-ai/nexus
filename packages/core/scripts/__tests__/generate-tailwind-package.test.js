@@ -15,6 +15,7 @@ import {
 } from '../utils.js';
 
 const TEST_DIR = path.dirname(fileURLToPath(import.meta.url));
+const WORKSPACE_ROOT = path.resolve(TEST_DIR, '..', '..', '..', '..');
 const SEMANTIC_DIR = path.resolve(TEST_DIR, '..', '..', 'tokens', 'semantic');
 const require = createRequire(import.meta.url);
 const TAILWIND_ENTRY = require.resolve('tailwindcss/index.css');
@@ -209,26 +210,30 @@ describe('generateTailwindPackage', () => {
     expect(variablesCSS).toMatch(/^:root \{/m);
   });
 
-  it('emits focus colour primitives but no geometry in :root (light values)', () => {
+  it('emits focus error primitive but no default focus primitive or geometry in :root', () => {
     const rootBlock = extractBlock(variablesCSS, ':root');
     expect(rootBlock).toMatch(/--nx-shadow-2xs-layer-1-x: 0px;/);
-    expect(rootBlock).toMatch(/--nx-focus-color-default:/);
-    expect(rootBlock).toMatch(/--nx-focus-color-error:/);
-    // Focus is an outline ring; the geometry primitives were dropped.
+    expect(rootBlock).not.toMatch(/--nx-focus-color-default:/);
+    expect(rootBlock).toMatch(
+      /--nx-focus-color-error:\s*var\(--nx-color-red-600\);/
+    );
+    // Focus is an outline ring; default focus follows primary accent, and the old
+    // geometry primitives were dropped.
     expect(rootBlock).not.toMatch(/--nx-focus-geometry-/);
   });
 
   // Focus colours are promoted to the --color-* namespace so Tailwind emits
-  // outline-focus-* utilities. The ring is outline-only — no focus box-shadow
-  // tokens of any kind (the geometry-composed --shadow-focus-* are gone).
-  // The 2px C40 offset is also tokenised so components share one tune-point.
+  // outline-focus-* utilities. Default focus falls through to primary accent; error
+  // focus keeps its primitive-backed token. The focus paint is shared CSS, while
+  // the outline remains the forced-colors fallback.
+  // The outline offset is also tokenised so components share one tune-point.
   // --focus-offset emits once at :root (not @theme: Tailwind tree-shakes @theme
   // vars referenced only via arbitrary utilities, #506). The count guard also
   // catches duplicate emission via the dimension scan (the --breakpoint-* trap).
-  it('promotes focus colours to --color-* and emits --focus-offset once at :root; no focus box-shadow', () => {
+  it('promotes focus colours to --color-* and emits --focus-offset plus focus ring CSS', () => {
     const themeBlock = compactCss(extractBlock(nexusCSS, '@theme inline'));
     expect(themeBlock).toMatch(
-      /--color-focus-default: var\(\s*--nx-color-focus-default,\s*var\(--nx-focus-color-default\)\s*\);/
+      /--color-focus-default: var\(\s*--nx-color-focus-default,\s*var\(--color-primary-subtle-foreground\)\s*\);/
     );
     expect(themeBlock).toMatch(
       /--color-focus-error: var\(\s*--nx-color-focus-error,\s*var\(--nx-focus-color-error\)\s*\);/
@@ -236,7 +241,106 @@ describe('generateTailwindPackage', () => {
     expect(nexusCSS.match(/--focus-offset:/g)).toHaveLength(1);
     expect(themeBlock).not.toMatch(/--focus-offset/);
     expect(nexusCSS).toMatch(/:root\s*\{[^}]*--focus-offset: 2px;[^}]*\}/);
+    expect(nexusCSS).toMatch(/\/\* ===== FOCUS RING ===== \*\//);
+    expect(nexusCSS).toMatch(
+      /\[class~='nx:focus-visible:outline-focus-default'\]:focus-visible/
+    );
+    expect(nexusCSS).toMatch(
+      /\[data-slot='input'\]\[class~='nx:focus-visible:outline-focus-default'\]:focus-visible/
+    );
+    expect(nexusCSS).toMatch(/\[data-slot='input'\]\[data-variant='default'\]/);
+    expect(nexusCSS).toMatch(
+      /box-shadow:\s*inset 0 0 0 1px var\(--color-border-default\);/
+    );
+    expect(nexusCSS).toMatch(/\[data-slot='input'\]\[aria-invalid='true'\]/);
+    expect(nexusCSS).toMatch(
+      /box-shadow:\s*inset 0 0 0 1px var\(--color-border-error\);/
+    );
+    expect(nexusCSS).toMatch(/\[data-slot='input-otp-slot'\]/);
+    expect(nexusCSS).toMatch(/inset -1px 0 0 var\(--color-border-default\)/);
+    expect(nexusCSS).toMatch(
+      /\[data-slot='sidebar-input'\]\[class~='nx:focus-visible:outline-focus-default'\]:focus-visible[\s\S]*?\{[\s\S]*?border-color:\s*transparent\s*!important;[\s\S]*?border-width:\s*0;[\s\S]*?box-shadow:\s*[\s\S]*?inset 0 0 0 1px var\(--color-focus-default\),[\s\S]*?0 0 0 1px var\(--color-focus-default\);[\s\S]*?\}/
+    );
+    expect(nexusCSS).toMatch(
+      /\[data-slot='button'\]\[class~='nx:focus-visible:outline-focus-default'\]:focus-visible/
+    );
+    expect(nexusCSS).toMatch(/border-color:\s*transparent\s*!important;/);
+    expect(nexusCSS).toMatch(
+      /\[data-slot='sidebar-input'\]\[class~='nx:aria-invalid:focus-visible:outline-focus-error'\]\[aria-invalid='true'\]:focus-visible[\s\S]*?\{[\s\S]*?border-color:\s*transparent\s*!important;[\s\S]*?border-width:\s*0;[\s\S]*?box-shadow:\s*[\s\S]*?inset 0 0 0 1px var\(--color-focus-error\),[\s\S]*?0 0 0 1px var\(--color-focus-error\);[\s\S]*?\}/
+    );
+    expect(nexusCSS).toMatch(
+      /\[data-slot='input-group-control'\]\[class~='nx:focus-visible:outline-focus-default'\]:focus-visible[\s\S]*?\{[\s\S]*?outline-style:\s*none\s*!important;[\s\S]*?box-shadow:\s*none;[\s\S]*?\}/
+    );
+    expect(nexusCSS).toMatch(/outline-style:\s*none\s*!important;/);
+    expect(nexusCSS).toMatch(/0 0 0 2px var\(--color-focus-default\);/);
+    expect(nexusCSS).toMatch(/inset 0 0 0 1px var\(--color-focus-default\),/);
+    expect(nexusCSS).toMatch(/0 0 0 1px var\(--color-focus-default\);/);
+    expect(nexusCSS).toMatch(/inset 0 0 0 1px var\(--color-focus-error\),/);
+    expect(nexusCSS).toMatch(/0 0 0 1px var\(--color-focus-error\);/);
+    expect(nexusCSS).toMatch(/border-width:\s*0;/);
+    expect(nexusCSS).not.toMatch(/border-width:\s*2px;/);
+    expect(nexusCSS).toMatch(/0 0 0 2px var\(--color-background\),/);
+    expect(nexusCSS).toMatch(/0 0 0 4px var\(--color-focus-default\);/);
+    expect(nexusCSS).not.toMatch(/0 0 0 8px var\(--color-focus-default\);/);
+    expect(nexusCSS).toMatch(/@media \(forced-colors: active\)/);
+    expect(nexusCSS).toMatch(/border-color:\s*CanvasText\s*!important;/);
+    expect(nexusCSS).toMatch(/outline-style:\s*solid\s*!important;/);
     expect(nexusCSS).not.toMatch(/--shadow-focus-/);
+  });
+
+  it('emits no orphaned focus selectors — every targeted slot and class lives on a component', () => {
+    // Derive the contract from the emitted FOCUS RING block (single source):
+    // every data-slot and focus class the generated CSS targets must exist in a
+    // component, so a generator-side rename or a dropped field fails here and new
+    // fields are covered with no hand list. Per-component class co-location is not
+    // checked here: composed controls (SidebarInput, InputGroup's control) inherit
+    // their focus classes from Input at runtime, so a source grep would false-fail
+    // — runtime co-location is a component-story concern.
+    const start = nexusCSS.indexOf('/* ===== FOCUS RING ===== */');
+    expect(start, 'FOCUS RING block is emitted').toBeGreaterThanOrEqual(0);
+    const end = nexusCSS.indexOf('/* ===== ', start + 10);
+    const focusRingBlock = nexusCSS.slice(start, end === -1 ? undefined : end);
+
+    const targetedSlots = new Set();
+    for (const m of focusRingBlock.matchAll(
+      /data-slot=(?:'([a-z-]+)'|([a-z-]+))/g
+    )) {
+      targetedSlots.add(m[1] ?? m[2]);
+    }
+    const targetedClasses = new Set();
+    for (const m of focusRingBlock.matchAll(/\[class~='([^']+)'\]/g)) {
+      targetedClasses.add(m[1]);
+    }
+    expect(targetedSlots.size).toBeGreaterThan(0);
+    expect(targetedClasses.size).toBeGreaterThan(0);
+
+    const readComponentSources = (dir) =>
+      fs.readdirSync(dir, { withFileTypes: true }).flatMap((entry) => {
+        const full = path.join(dir, entry.name);
+        if (entry.isDirectory()) return readComponentSources(full);
+        if (entry.name.endsWith('.tsx') && !entry.name.endsWith('.stories.tsx'))
+          return [fs.readFileSync(full, 'utf8')];
+        return [];
+      });
+    const componentSource = readComponentSources(
+      path.join(WORKSPACE_ROOT, 'packages', 'react', 'src', 'components')
+    ).join('\n');
+
+    for (const slot of targetedSlots) {
+      // Matches `data-slot="x"` (JSX attr) and `'data-slot': 'x'` (spread form).
+      expect(
+        new RegExp(`data-slot["']?\\s*[:=]\\s*["']${slot}["']`).test(
+          componentSource
+        ),
+        `no component emits the data-slot "${slot}" targeted by the focus CSS`
+      ).toBe(true);
+    }
+    for (const className of targetedClasses) {
+      expect(
+        componentSource.includes(className),
+        `no component emits the class "${className}" targeted by the focus CSS`
+      ).toBe(true);
+    }
   });
 
   it('bridges every semantic color utility to its runtime override with a static fallback', () => {
@@ -257,7 +361,7 @@ describe('generateTailwindPackage', () => {
       /:root\s*\{[\s\S]*--color-background:\s*var\(--nx-color-background,\s*var\(--nx-color-white-base\)\);[\s\S]*\}/
     );
     expect(nexusCSS).toMatch(
-      /:root\s*\{[\s\S]*--color-focus-default:\s*var\(\s*--nx-color-focus-default,\s*var\(--nx-focus-color-default\)\s*\);[\s\S]*\}/
+      /:root\s*\{[\s\S]*--color-focus-default:\s*var\(\s*--nx-color-focus-default,\s*var\(--color-primary-subtle-foreground\)\s*\);[\s\S]*\}/
     );
   });
 
@@ -273,18 +377,17 @@ describe('generateTailwindPackage', () => {
       /background-color:\s*var\(--nx-color-background,\s*var\(--nx-color-white-base\)\);/
     );
     expect(css).toMatch(
-      /outline-color:\s*var\(\s*--nx-color-focus-default,\s*var\(--nx-focus-color-default\)\s*\);/
+      /outline-color:\s*var\(\s*--nx-color-focus-default,\s*var\(--color-primary-subtle-foreground\)\s*\);/
     );
   });
 
-  // Every var(--nx-shadow-*) or var(--nx-focus-*) ref in nexus.css must have a
-  // matching decl in :root of variables.css; missing decls render the utility
-  // flat. Focus refs are covered because shadow composites built from
-  // styles/shadows.json now point at --nx-focus-* primitives directly.
-  it('every var(--nx-(shadow|focus)-*) ref in nexus.css has a matching decl in :root', () => {
-    const rootBlock = extractBlock(variablesCSS, ':root');
+  // Every generated focus/shadow primitive ref and every --color-* fallback ref
+  // in nexus.css must have a matching emitted declaration. Runtime override vars
+  // like --nx-color-focus-default are intentionally optional and excluded.
+  it('every generated focus/shadow and color fallback ref in nexus.css has a matching declaration', () => {
+    const declarationCSS = `${variablesCSS}\n${nexusCSS}`;
 
-    const refPattern = /var\(--(nx-(?:shadow|focus)-[a-z0-9-]+)\)/g;
+    const refPattern = /var\(--((?:nx-(?:shadow|focus)-|color-)[a-z0-9-]+)\b/g;
     const refs = new Set();
     let match;
     while ((match = refPattern.exec(nexusCSS)) !== null) {
@@ -295,7 +398,7 @@ describe('generateTailwindPackage', () => {
 
     const missing = [];
     for (const varName of refs) {
-      if (!new RegExp(`--${varName}:`).test(rootBlock)) {
+      if (!declarationCSS.includes(`--${varName}:`)) {
         missing.push(varName);
       }
     }
@@ -304,15 +407,17 @@ describe('generateTailwindPackage', () => {
   });
 
   // The .dark block must contain only dark tokens whose value diverges from
-  // their `:root` counterpart by cssName. Focus colors live in their own
-  // primitive category (primitives/focus/) and supply the focus divergence.
+  // their `:root` counterpart by cssName. Error focus lives in the focus
+  // primitive category and supplies the focus divergence.
   // Default elevation shadows now also carry dark-only color tuning; geometry
   // stays shared, so only the diverging shadow colour leaves should appear.
   it('.dark block contains only tokens that diverge from :root by value', () => {
     const darkBlock = extractBlock(variablesCSS, '.dark');
 
-    expect(darkBlock).toMatch(/--nx-focus-color-default:/);
-    expect(darkBlock).toMatch(/--nx-focus-color-error:/);
+    expect(darkBlock).not.toMatch(/--nx-focus-color-default:/);
+    expect(darkBlock).toMatch(
+      /--nx-focus-color-error:\s*var\(--nx-color-red-300\);/
+    );
     expect(darkBlock).toMatch(/--nx-shadow-2xs-layer-1-color:/);
     expect(darkBlock).toMatch(/--nx-shadow-sm-layer-1-color:/);
 

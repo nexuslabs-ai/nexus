@@ -28,6 +28,7 @@ import {
   generateBaseLayerCSS,
   generateBorderColorAliasUtilitiesCSS,
   generateBorderWidthUtilitiesCSS,
+  generateFocusRingCSS,
   generateMotionUtilitiesCSS,
   generateNativeBrowserUIThemeCSS,
   generateRootDimensionsCSS,
@@ -538,6 +539,7 @@ function generateNexusCSS(
 
   // Fixed dimension primitives at :root (e.g. --focus-offset) — see #506.
   css += generateRootDimensionsCSS(dimensionTokens);
+  css += generateFocusRingCSS();
 
   // Per-mode spacing override blocks (`:root, [data-density="<default>"]` for
   // the consumer-chosen default + plain `[data-density="X"]` for the others).

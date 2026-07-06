@@ -139,6 +139,68 @@ export const WithTextarea: Story = {
   ),
 };
 
+export const FocusBorderOwnership: Story = {
+  render: () => (
+    <div className="nx:flex nx:w-80 nx:flex-col nx:gap-3">
+      <InputGroup data-testid="ig-focus-with-button">
+        <InputGroupInput aria-label="Email" placeholder="you@example.com" />
+        <InputGroupAddon align="inline-end">
+          <InputGroupButton>Subscribe</InputGroupButton>
+        </InputGroupAddon>
+      </InputGroup>
+      <InputGroup data-testid="ig-focus-block-start">
+        <InputGroupAddon align="block-start">
+          <InputGroupText>Bio</InputGroupText>
+        </InputGroupAddon>
+        <InputGroupInput aria-label="Bio" placeholder="block-start" />
+      </InputGroup>
+      <InputGroup data-testid="ig-focus-textarea">
+        <InputGroupTextarea aria-label="Message" placeholder="Your message…" />
+        <InputGroupAddon align="block-end">
+          <InputGroupText>Markdown supported</InputGroupText>
+        </InputGroupAddon>
+      </InputGroup>
+    </div>
+  ),
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+
+    async function focusAsKeyboard(element: HTMLElement) {
+      element.focus({ focusVisible: true } as FocusOptions);
+      await new Promise((resolve) => {
+        requestAnimationFrame(() => setTimeout(resolve, 300));
+      });
+    }
+
+    async function expectGroupOwnsFocusBorder(
+      testId: string,
+      controlName: string
+    ) {
+      const group = canvas.getByTestId(testId);
+      const control = canvas.getByRole('textbox', { name: controlName });
+
+      await focusAsKeyboard(control);
+
+      const groupStyles = getComputedStyle(group);
+      const controlStyles = getComputedStyle(control);
+
+      await expect(groupStyles.borderTopWidth).toBe('0px');
+      await expect(groupStyles.borderTopColor).toBe('rgba(0, 0, 0, 0)');
+      await expect(groupStyles.boxShadow).not.toBe('none');
+      await expect(groupStyles.boxShadow).toContain('inset');
+      await expect(controlStyles.borderTopWidth).toBe('0px');
+      await expect(controlStyles.boxShadow).toBe('none');
+    }
+
+    await expectGroupOwnsFocusBorder('ig-focus-with-button', 'Email');
+    const subscribeButton = canvas.getByRole('button', { name: 'Subscribe' });
+    await expect(document.activeElement).not.toBe(subscribeButton);
+    await expect(subscribeButton.matches(':focus-visible')).toBe(false);
+    await expectGroupOwnsFocusBorder('ig-focus-block-start', 'Bio');
+    await expectGroupOwnsFocusBorder('ig-focus-textarea', 'Message');
+  },
+};
+
 // The group is a role=group field; control, addon, text, and button carry
 // data-slot hooks, and the control mirrors Input's data-size.
 export const WithDataAttributes: Story = {
@@ -305,9 +367,8 @@ export const BorderlessStates: Story = {
     await expect(invalid).toHaveClass(
       'nx:has-[[data-slot][aria-invalid=true]]:border-border-error'
     );
-    await expect(window.getComputedStyle(invalid).borderTopColor).not.toBe(
-      'rgba(0, 0, 0, 0)'
-    );
+    await expect(window.getComputedStyle(invalid).borderTopWidth).toBe('0px');
+    await expect(window.getComputedStyle(invalid).boxShadow).not.toBe('none');
 
     await expect(
       canvas.getByRole('textbox', { name: 'Disabled borderless email' })
@@ -606,11 +667,11 @@ export const Invalid: Story = {
       canvas.getByRole('textbox', { name: 'Invalid email' })
     ).toHaveAttribute('aria-invalid', 'true');
 
-    // Error border fires: the invalid group's border colour differs from valid.
+    // Error boundary fires: the invalid group's visual stroke differs from valid.
     const valid = canvas.getByTestId('ig-valid');
     const invalid = canvas.getByTestId('ig-invalid');
-    await expect(window.getComputedStyle(invalid).borderTopColor).not.toBe(
-      window.getComputedStyle(valid).borderTopColor
+    await expect(window.getComputedStyle(invalid).boxShadow).not.toBe(
+      window.getComputedStyle(valid).boxShadow
     );
   },
 };

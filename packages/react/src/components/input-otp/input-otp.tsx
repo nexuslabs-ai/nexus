@@ -106,7 +106,7 @@ interface InputOTPSlotProps extends React.ComponentProps<'div'> {
  * InputOTPSlot
  *
  * Renders one character cell — its character, a blinking fake caret when the
- * cursor sits in it, and a focus ring while it is the active slot.
+ * cursor sits in it, and a visual focus boundary while it is the active slot.
  */
 function InputOTPSlot({ index, className, ...props }: InputOTPSlotProps) {
   const inputOTPContext = React.useContext(OTPInputContext);
@@ -117,11 +117,11 @@ function InputOTPSlot({ index, className, ...props }: InputOTPSlotProps) {
       data-slot="input-otp-slot"
       data-active={isActive}
       className={cn(
-        'nx:relative nx:flex nx:size-10 nx:items-center nx:justify-center',
-        'nx:border-y-default nx:border-r-default nx:border-border-default',
-        'nx:group-has-[:disabled]/input-otp:border-border-disabled nx:group-has-[:disabled]/input-otp:bg-disabled nx:group-has-[:disabled]/input-otp:text-disabled-foreground',
-        'nx:bg-background nx:text-foreground nx:typography-body-small nx:transition-[color,background-color,border-color] nx:duration-fast nx:motion-reduce:transition-none',
-        'nx:first:rounded-l-md nx:first:border-l-default nx:last:rounded-r-md',
+        'nx:relative nx:flex nx:box-border nx:size-10 nx:items-center nx:justify-center',
+        'nx:border-0',
+        'nx:group-has-[:disabled]/input-otp:bg-disabled nx:group-has-[:disabled]/input-otp:text-disabled-foreground',
+        'nx:bg-background nx:text-foreground nx:typography-body-small nx:transition-[color,background-color,box-shadow] nx:duration-fast nx:motion-reduce:transition-none',
+        'nx:first:rounded-l-md nx:last:rounded-r-md',
         'nx:data-[active=true]:z-10 nx:data-[active=true]:outline-2 nx:data-[active=true]:outline-focus-default nx:data-[active=true]:outline-offset-(--focus-offset)',
         className
       )}

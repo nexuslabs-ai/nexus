@@ -19,6 +19,7 @@ import {
   deriveText,
   deriveTheme,
   type NexusSurfaceTone,
+  STATUS_RAMP,
   type ThemeDerivationInput,
   themeToCss,
 } from './derive-theme';
@@ -315,8 +316,15 @@ describe('deriveTheme', () => {
     }
   });
 
+  it('keeps runtime error focus aligned with the shipped red primitives', () => {
+    const d = deriveTheme(createNexusThemeContract(DEFAULT_NEXUS_APPEARANCE));
+
+    expect(d.light['--nx-color-focus-error']).toBe(STATUS_RAMP.error['600']);
+    expect(d.dark['--nx-color-focus-error']).toBe(STATUS_RAMP.error['300']);
+  });
+
   it.each(['light', 'dark'] as const)(
-    'keeps focus tokens APCA-safe on key surfaces in %s mode',
+    'uses primary accent for shipped default focus and keeps focus colors APCA-safe in %s mode',
     (mode) => {
       const map = deriveTheme(
         createNexusThemeContract(DEFAULT_NEXUS_APPEARANCE)
@@ -329,16 +337,19 @@ describe('deriveTheme', () => {
         '--nx-color-muted',
       ];
 
-      for (const focusToken of [
-        '--nx-color-focus-default',
-        '--nx-color-focus-error',
-      ]) {
-        for (const surface of surfaces) {
-          expect(
-            apcaLc(map[focusToken]!, map[surface]!),
-            `${mode}: ${focusToken} on ${surface}`
-          ).toBeGreaterThanOrEqual(TIER_THRESHOLDS.incidental);
-        }
+      expect(map['--nx-color-focus-default']).toBe(
+        map['--nx-color-primary-subtle-foreground']
+      );
+
+      for (const surface of surfaces) {
+        expect(
+          apcaLc(map['--nx-color-focus-default']!, map[surface]!),
+          `${mode}: --nx-color-focus-default on ${surface}`
+        ).toBeGreaterThanOrEqual(TIER_THRESHOLDS.incidental);
+        expect(
+          apcaLc(map['--nx-color-focus-error']!, map[surface]!),
+          `${mode}: --nx-color-focus-error on ${surface}`
+        ).toBeGreaterThanOrEqual(TIER_THRESHOLDS.incidental);
       }
     }
   );

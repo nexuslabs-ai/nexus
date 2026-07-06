@@ -418,4 +418,42 @@ describe('engine color tables match ground color.json primitives', () => {
       expect(NEUTRAL[shade], `neutral.${shade}`).toBe(grind('neutral', shade));
     }
   });
+
+  // Runtime error focus is a fixed red primitive. Pin the derived value to the
+  // static focus-default-{mode}.json shade ref so re-selecting the shade there
+  // (e.g. {red.600} -> {red.500}) without updating deriveFocus fails here.
+  it('runtime error focus tracks the static focus primitive shade', () => {
+    const focusErrorRef = (mode: Mode) =>
+      (
+        readJson(
+          path.join(
+            ROOT_DIR,
+            'tokens',
+            'primitives',
+            'focus',
+            `focus-default-${mode}.json`
+          )
+        ) as { color: { error: { $value: string } } }
+      ).color.error.$value;
+    const theme = deriveTheme({
+      surfaceTone: 'slate',
+      light: {
+        accent: '#2563eb',
+        background: '#ffffff',
+        foreground: '#181818',
+      },
+      dark: {
+        accent: '#2563eb',
+        background: primitiveHex('slate', '950'),
+        foreground: '#ffffff',
+      },
+      contrast: TONE_CONTRAST,
+    });
+    expect(theme.light['--nx-color-focus-error']).toBe(
+      primitiveOklch(focusErrorRef('light'))
+    );
+    expect(theme.dark['--nx-color-focus-error']).toBe(
+      primitiveOklch(focusErrorRef('dark'))
+    );
+  });
 });

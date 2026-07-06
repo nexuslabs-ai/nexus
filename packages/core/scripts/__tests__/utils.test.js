@@ -5,6 +5,7 @@ import { describe, expect, it, vi } from 'vitest';
 
 import {
   collectBreakpointsTokens,
+  collectSemanticColorTokensVarRef,
   collectSpacingTokens,
   collectZIndexTokens,
   DEFAULT_CONFIG,
@@ -12,6 +13,7 @@ import {
   extractRefPath,
   extractTokens,
   formatTokenValue,
+  generateFocusRingCSS,
   generateSpacingModesCSS,
   generateSpacingRoleUtilitiesCSS,
   isReference,
@@ -226,6 +228,68 @@ describe('utils', () => {
       expect(resolveValue('#ff0000', primitiveMap, 'color')).toBe(
         'oklch(0.628 0.2577 29.234)'
       );
+    });
+  });
+
+  describe('generateFocusRingCSS', () => {
+    it('emits Notion-style field and 2px-gap button focus rules with a forced-colors outline fallback', () => {
+      const css = generateFocusRingCSS();
+
+      expect(css).toMatch(/\/\* ===== FOCUS RING ===== \*\//);
+      expect(css).toMatch(
+        /\[class~='nx:focus-visible:outline-focus-default'\]:focus-visible/
+      );
+      expect(css).toMatch(
+        /\[data-slot='input'\]\[class~='nx:focus-visible:outline-focus-default'\]:focus-visible/
+      );
+      expect(css).toMatch(/\[data-slot='input'\]\[data-variant='default'\]/);
+      expect(css).toMatch(
+        /box-shadow:\s*inset 0 0 0 1px var\(--color-border-default\);/
+      );
+      expect(css).toMatch(/\[data-slot='input'\]\[aria-invalid='true'\]/);
+      expect(css).toMatch(
+        /box-shadow:\s*inset 0 0 0 1px var\(--color-border-error\);/
+      );
+      expect(css).toMatch(/\[data-slot='input-otp-slot'\]/);
+      expect(css).toMatch(/inset -1px 0 0 var\(--color-border-default\)/);
+      expect(css).toMatch(
+        /\[data-slot='sidebar-input'\]\[class~='nx:focus-visible:outline-focus-default'\]:focus-visible[\s\S]*?\{[\s\S]*?border-color:\s*transparent\s*!important;[\s\S]*?border-width:\s*0;[\s\S]*?box-shadow:\s*[\s\S]*?inset 0 0 0 1px var\(--color-focus-default\),[\s\S]*?0 0 0 1px var\(--color-focus-default\);[\s\S]*?\}/
+      );
+      expect(css).toMatch(
+        /\[data-slot='button'\]\[class~='nx:focus-visible:outline-focus-default'\]:focus-visible/
+      );
+      expect(css).toMatch(
+        /\[class~='nx:data-\[active=true\]:outline-focus-default'\]\[data-active='true'\]/
+      );
+      expect(css).toMatch(
+        /\[class~='nx:aria-invalid:focus-visible:outline-focus-error'\]\[aria-invalid='true'\]:focus-visible/
+      );
+      expect(css).toMatch(/border-color:\s*transparent\s*!important;/);
+      expect(css).toMatch(
+        /\[data-slot='sidebar-input'\]\[class~='nx:aria-invalid:focus-visible:outline-focus-error'\]\[aria-invalid='true'\]:focus-visible[\s\S]*?\{[\s\S]*?border-color:\s*transparent\s*!important;[\s\S]*?border-width:\s*0;[\s\S]*?box-shadow:\s*[\s\S]*?inset 0 0 0 1px var\(--color-focus-error\),[\s\S]*?0 0 0 1px var\(--color-focus-error\);[\s\S]*?\}/
+      );
+      expect(css).toMatch(
+        /\[data-slot='input-group-control'\]\[class~='nx:focus-visible:outline-focus-default'\]:focus-visible[\s\S]*?\{[\s\S]*?outline-style:\s*none\s*!important;[\s\S]*?box-shadow:\s*none;[\s\S]*?\}/
+      );
+      expect(css).toMatch(/--tw-outline-style:\s*none\s*!important;/);
+      expect(css).toMatch(/outline-style:\s*none\s*!important;/);
+      expect(css).toMatch(/0 0 0 2px var\(--color-focus-default\);/);
+      expect(css).toMatch(/inset 0 0 0 1px var\(--color-focus-default\),/);
+      expect(css).toMatch(/0 0 0 1px var\(--color-focus-default\);/);
+      expect(css).toMatch(/inset 0 0 0 1px var\(--color-focus-error\),/);
+      expect(css).toMatch(/0 0 0 1px var\(--color-focus-error\);/);
+      expect(css).toMatch(/border-width:\s*0;/);
+      expect(css).not.toMatch(/border-width:\s*2px;/);
+      expect(css).toMatch(/0 0 0 2px var\(--color-background\),/);
+      expect(css).toMatch(/0 0 0 4px var\(--color-focus-default\);/);
+      expect(css).not.toMatch(/0 0 0 8px var\(--color-focus-default\);/);
+      expect(css).not.toMatch(/color-mix\(/);
+      expect(css).toMatch(/@media \(forced-colors: active\)/);
+      expect(css).toMatch(/border-color:\s*CanvasText\s*!important;/);
+      expect(css).toMatch(/outline-color:\s*Highlight\s*!important;/);
+      expect(css).toMatch(/outline-style:\s*solid\s*!important;/);
+      expect(css).toMatch(/outline-width:\s*2px\s*!important;/);
+      expect(css).toMatch(/box-shadow:\s*none\s*!important;/);
     });
   });
 
@@ -642,6 +706,45 @@ describe('utils', () => {
         fs.writeFileSync(path.join(dir, 'focus.json'), JSON.stringify({}));
         const result = discoverSemantics(dir);
         expect(result.perModeFiles).toEqual({});
+      } finally {
+        fs.rmSync(dir, { recursive: true, force: true });
+      }
+    });
+  });
+
+  describe('collectSemanticColorTokensVarRef', () => {
+    it('preserves primitive references and maps semantic references to color aliases', () => {
+      const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'nexus-sem-test-'));
+      try {
+        fs.writeFileSync(
+          path.join(dir, 'focus.json'),
+          JSON.stringify({
+            focus: {
+              default: {
+                $value: '{primary.subtle-foreground}',
+                $type: 'color',
+              },
+              error: { $value: '{focus.color.error}', $type: 'color' },
+            },
+          })
+        );
+
+        const primitiveMap = new Map([
+          ['focus.color.error', { cssName: 'nx-focus-color-error' }],
+        ]);
+
+        expect(
+          collectSemanticColorTokensVarRef(dir, 'focus.json', primitiveMap)
+        ).toEqual([
+          {
+            cssName: 'color-focus-default',
+            value: 'var(--color-primary-subtle-foreground)',
+          },
+          {
+            cssName: 'color-focus-error',
+            value: 'var(--nx-focus-color-error)',
+          },
+        ]);
       } finally {
         fs.rmSync(dir, { recursive: true, force: true });
       }

@@ -515,7 +515,7 @@
   );
   --color-focus-default: var(
     --nx-color-focus-default,
-    var(--nx-focus-color-default)
+    var(--color-primary-subtle-foreground)
   );
   --color-focus-error: var(--nx-color-focus-error, var(--nx-focus-color-error));
 }
@@ -890,7 +890,7 @@
   );
   --color-focus-default: var(
     --nx-color-focus-default,
-    var(--nx-focus-color-default)
+    var(--color-primary-subtle-foreground)
   );
   --color-focus-error: var(--nx-color-focus-error, var(--nx-focus-color-error));
 }
@@ -898,6 +898,241 @@
 /* ===== RUNTIME DIMENSION TOKENS ===== */
 :root {
   --focus-offset: 2px;
+}
+
+/* ===== FOCUS RING ===== */
+[data-slot='input'][data-variant='default'],
+[data-slot='sidebar-input'][data-variant='default'],
+[data-slot='textarea'][data-variant='default'],
+[data-slot='native-select'][data-variant='default'],
+[data-slot='select-trigger'][data-variant='default'],
+[data-slot='input-group'][data-variant='default'] {
+  border-color: transparent !important;
+  border-width: 0;
+  box-shadow: inset 0 0 0 1px var(--color-border-default);
+}
+
+[data-slot='input'][aria-invalid='true'],
+[data-slot='sidebar-input'][aria-invalid='true'],
+[data-slot='textarea'][aria-invalid='true'],
+[data-slot='native-select'][aria-invalid='true'],
+[data-slot='select-trigger'][aria-invalid='true'],
+[data-slot='input-group']:has([data-slot][aria-invalid='true']) {
+  border-color: transparent !important;
+  border-width: 0;
+  box-shadow: inset 0 0 0 1px var(--color-border-error);
+}
+
+[data-slot='input'][data-variant='default']:disabled,
+[data-slot='sidebar-input'][data-variant='default']:disabled,
+[data-slot='textarea'][data-variant='default']:disabled,
+[data-slot='native-select'][data-variant='default']:disabled,
+[data-slot='select-trigger'][data-variant='default']:disabled,
+[data-slot='input-group'][data-variant='default'][data-disabled='true'] {
+  border-color: transparent !important;
+  border-width: 0;
+  box-shadow: inset 0 0 0 1px var(--color-border-disabled);
+}
+
+[data-slot='input-otp-slot'] {
+  border-color: transparent !important;
+  border-width: 0;
+  box-shadow:
+    inset 0 1px 0 var(--color-border-default),
+    inset -1px 0 0 var(--color-border-default),
+    inset 0 -1px 0 var(--color-border-default);
+}
+
+[data-slot='input-otp-slot']:first-child {
+  box-shadow:
+    inset 0 1px 0 var(--color-border-default),
+    inset 1px 0 0 var(--color-border-default),
+    inset -1px 0 0 var(--color-border-default),
+    inset 0 -1px 0 var(--color-border-default);
+}
+
+[class~='nx:group/input-otp']:has([data-slot='input-otp']:disabled)
+  [data-slot='input-otp-slot'] {
+  border-color: transparent !important;
+  border-width: 0;
+  box-shadow:
+    inset 0 1px 0 var(--color-border-disabled),
+    inset -1px 0 0 var(--color-border-disabled),
+    inset 0 -1px 0 var(--color-border-disabled);
+}
+
+[class~='nx:group/input-otp']:has([data-slot='input-otp']:disabled)
+  [data-slot='input-otp-slot']:first-child {
+  box-shadow:
+    inset 0 1px 0 var(--color-border-disabled),
+    inset 1px 0 0 var(--color-border-disabled),
+    inset -1px 0 0 var(--color-border-disabled),
+    inset 0 -1px 0 var(--color-border-disabled);
+}
+
+[class~='nx:focus-visible:outline-focus-default']:focus-visible,
+[class~='nx:data-[active=true]:outline-focus-default'][data-active='true'],
+[data-focused='true']
+  [class~='nx:group-data-[focused=true]/day:outline-focus-default'],
+[class~='nx:has-[[data-slot=input-group-control]:focus-visible]:outline-focus-default']:has(
+  [data-slot='input-group-control']:focus-visible
+) {
+  --tw-outline-style: none !important;
+  outline-color: transparent !important;
+  outline-style: none !important;
+  box-shadow: 0 0 0 2px var(--color-focus-default);
+}
+
+[class~='nx:aria-invalid:focus-visible:outline-focus-error'][aria-invalid='true']:focus-visible,
+[class~='nx:has-[[data-slot=input-group-control][aria-invalid=true]:focus-visible]:outline-focus-error']:has(
+  [data-slot='input-group-control'][aria-invalid='true']:focus-visible
+) {
+  --tw-outline-style: none !important;
+  outline-color: transparent !important;
+  outline-style: none !important;
+  box-shadow: 0 0 0 2px var(--color-focus-error);
+}
+
+[data-slot='input'][class~='nx:focus-visible:outline-focus-default']:focus-visible,
+[data-slot='sidebar-input'][class~='nx:focus-visible:outline-focus-default']:focus-visible,
+[data-slot='textarea'][class~='nx:focus-visible:outline-focus-default']:focus-visible,
+[data-slot='native-select'][class~='nx:focus-visible:outline-focus-default']:focus-visible,
+[data-slot='select-trigger'][class~='nx:focus-visible:outline-focus-default']:focus-visible,
+[data-slot='input-otp-slot'][class~='nx:data-[active=true]:outline-focus-default'][data-active='true'],
+[data-slot='input-group'][class~='nx:has-[[data-slot=input-group-control]:focus-visible]:outline-focus-default']:has(
+    [data-slot='input-group-control']:focus-visible
+  ) {
+  --tw-outline-style: none !important;
+  outline-color: transparent !important;
+  outline-style: none !important;
+  border-color: transparent !important;
+  border-width: 0;
+  box-shadow:
+    inset 0 0 0 1px var(--color-focus-default),
+    0 0 0 1px var(--color-focus-default);
+}
+
+[data-slot='input'][class~='nx:aria-invalid:focus-visible:outline-focus-error'][aria-invalid='true']:focus-visible,
+[data-slot='sidebar-input'][class~='nx:aria-invalid:focus-visible:outline-focus-error'][aria-invalid='true']:focus-visible,
+[data-slot='textarea'][class~='nx:aria-invalid:focus-visible:outline-focus-error'][aria-invalid='true']:focus-visible,
+[data-slot='native-select'][class~='nx:aria-invalid:focus-visible:outline-focus-error'][aria-invalid='true']:focus-visible,
+[data-slot='select-trigger'][class~='nx:aria-invalid:focus-visible:outline-focus-error'][aria-invalid='true']:focus-visible,
+[data-slot='input-group'][class~='nx:has-[[data-slot=input-group-control][aria-invalid=true]:focus-visible]:outline-focus-error']:has(
+    [data-slot='input-group-control'][aria-invalid='true']:focus-visible
+  ) {
+  --tw-outline-style: none !important;
+  outline-color: transparent !important;
+  outline-style: none !important;
+  border-color: transparent !important;
+  border-width: 0;
+  box-shadow:
+    inset 0 0 0 1px var(--color-focus-error),
+    0 0 0 1px var(--color-focus-error);
+}
+
+[data-slot='input-group-control'][class~='nx:focus-visible:outline-focus-default']:focus-visible,
+[data-slot='input-group-control'][class~='nx:aria-invalid:focus-visible:outline-focus-error'][aria-invalid='true']:focus-visible {
+  --tw-outline-style: none !important;
+  outline-color: transparent !important;
+  outline-style: none !important;
+  box-shadow: none;
+}
+
+[data-slot='button'][class~='nx:focus-visible:outline-focus-default']:focus-visible {
+  --tw-outline-style: none !important;
+  outline-color: transparent !important;
+  outline-style: none !important;
+  box-shadow:
+    0 0 0 2px var(--color-background),
+    0 0 0 4px var(--color-focus-default);
+}
+
+[data-slot='button'][class~='nx:aria-invalid:focus-visible:outline-focus-error'][aria-invalid='true']:focus-visible {
+  --tw-outline-style: none !important;
+  outline-color: transparent !important;
+  outline-style: none !important;
+  box-shadow:
+    0 0 0 2px var(--color-background),
+    0 0 0 4px var(--color-focus-error);
+}
+
+@media (forced-colors: active) {
+  [data-slot='input'][data-variant='default'],
+  [data-slot='sidebar-input'][data-variant='default'],
+  [data-slot='textarea'][data-variant='default'],
+  [data-slot='native-select'][data-variant='default'],
+  [data-slot='select-trigger'][data-variant='default'],
+  [data-slot='input-group'][data-variant='default'],
+  [data-slot='input'][aria-invalid='true'],
+  [data-slot='sidebar-input'][aria-invalid='true'],
+  [data-slot='textarea'][aria-invalid='true'],
+  [data-slot='native-select'][aria-invalid='true'],
+  [data-slot='select-trigger'][aria-invalid='true'],
+  [data-slot='input-group']:has([data-slot][aria-invalid='true']),
+  [data-slot='input-otp-slot'] {
+    border-color: CanvasText !important;
+    border-width: 1px;
+    box-shadow: none !important;
+  }
+
+  [data-slot='input'][data-variant='default']:disabled,
+  [data-slot='sidebar-input'][data-variant='default']:disabled,
+  [data-slot='textarea'][data-variant='default']:disabled,
+  [data-slot='native-select'][data-variant='default']:disabled,
+  [data-slot='select-trigger'][data-variant='default']:disabled,
+  [data-slot='input-group'][data-variant='default'][data-disabled='true'],
+  [class~='nx:group/input-otp']:has([data-slot='input-otp']:disabled)
+    [data-slot='input-otp-slot'] {
+    border-color: GrayText !important;
+    border-width: 1px;
+    box-shadow: none !important;
+  }
+
+  [class~='nx:focus-visible:outline-focus-default']:focus-visible,
+  [class~='nx:data-[active=true]:outline-focus-default'][data-active='true'],
+  [data-focused='true']
+    [class~='nx:group-data-[focused=true]/day:outline-focus-default'],
+  [class~='nx:has-[[data-slot=input-group-control]:focus-visible]:outline-focus-default']:has(
+    [data-slot='input-group-control']:focus-visible
+  ),
+  [class~='nx:aria-invalid:focus-visible:outline-focus-error'][aria-invalid='true']:focus-visible,
+  [class~='nx:has-[[data-slot=input-group-control][aria-invalid=true]:focus-visible]:outline-focus-error']:has(
+    [data-slot='input-group-control'][aria-invalid='true']:focus-visible
+  ),
+  [data-slot='input'][class~='nx:focus-visible:outline-focus-default']:focus-visible,
+  [data-slot='sidebar-input'][class~='nx:focus-visible:outline-focus-default']:focus-visible,
+  [data-slot='textarea'][class~='nx:focus-visible:outline-focus-default']:focus-visible,
+  [data-slot='native-select'][class~='nx:focus-visible:outline-focus-default']:focus-visible,
+  [data-slot='select-trigger'][class~='nx:focus-visible:outline-focus-default']:focus-visible,
+  [data-slot='input-otp-slot'][class~='nx:data-[active=true]:outline-focus-default'][data-active='true'],
+  [data-slot='input-group'][class~='nx:has-[[data-slot=input-group-control]:focus-visible]:outline-focus-default']:has(
+      [data-slot='input-group-control']:focus-visible
+    ),
+  [data-slot='input'][class~='nx:aria-invalid:focus-visible:outline-focus-error'][aria-invalid='true']:focus-visible,
+  [data-slot='sidebar-input'][class~='nx:aria-invalid:focus-visible:outline-focus-error'][aria-invalid='true']:focus-visible,
+  [data-slot='textarea'][class~='nx:aria-invalid:focus-visible:outline-focus-error'][aria-invalid='true']:focus-visible,
+  [data-slot='native-select'][class~='nx:aria-invalid:focus-visible:outline-focus-error'][aria-invalid='true']:focus-visible,
+  [data-slot='select-trigger'][class~='nx:aria-invalid:focus-visible:outline-focus-error'][aria-invalid='true']:focus-visible,
+  [data-slot='input-group'][class~='nx:has-[[data-slot=input-group-control][aria-invalid=true]:focus-visible]:outline-focus-error']:has(
+      [data-slot='input-group-control'][aria-invalid='true']:focus-visible
+    ),
+  [data-slot='button'][class~='nx:focus-visible:outline-focus-default']:focus-visible,
+  [data-slot='button'][class~='nx:aria-invalid:focus-visible:outline-focus-error'][aria-invalid='true']:focus-visible {
+    --tw-outline-style: solid !important;
+    outline-color: Highlight !important;
+    outline-offset: var(--focus-offset) !important;
+    outline-style: solid !important;
+    outline-width: 2px !important;
+    box-shadow: none !important;
+  }
+
+  [data-slot='input-group-control'][class~='nx:focus-visible:outline-focus-default']:focus-visible,
+  [data-slot='input-group-control'][class~='nx:aria-invalid:focus-visible:outline-focus-error'][aria-invalid='true']:focus-visible {
+    --tw-outline-style: none !important;
+    outline-color: transparent !important;
+    outline-style: none !important;
+    box-shadow: none !important;
+  }
 }
 
 /* ===== PER-MODE SPACING (mode swap via [data-density="X"] on any ancestor) ===== */
