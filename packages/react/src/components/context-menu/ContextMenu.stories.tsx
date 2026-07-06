@@ -147,6 +147,116 @@ export const WithRadioItems: Story = {
   },
 };
 
+export const IndicatorCrossFade: Story = {
+  render: (_args) => (
+    <ContextMenu>
+      <ContextMenuTrigger className={triggerClass}>
+        Indicator Motion
+      </ContextMenuTrigger>
+      <ContextMenuContent className="nx:w-56">
+        <ContextMenuCheckboxItem checked>Status Bar</ContextMenuCheckboxItem>
+        <ContextMenuCheckboxItem checked={false}>
+          Activity Bar
+        </ContextMenuCheckboxItem>
+        <ContextMenuCheckboxItem checked="indeterminate">
+          Bookmarks Bar
+        </ContextMenuCheckboxItem>
+        <ContextMenuSeparator />
+        <ContextMenuRadioGroup value="bottom">
+          <ContextMenuRadioItem value="top">Top</ContextMenuRadioItem>
+          <ContextMenuRadioItem value="bottom">Bottom</ContextMenuRadioItem>
+        </ContextMenuRadioGroup>
+      </ContextMenuContent>
+    </ContextMenu>
+  ),
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+    const trigger = canvas.getByText('Indicator Motion');
+
+    try {
+      await fireEvent.contextMenu(trigger, { clientX: 20, clientY: 20 });
+
+      const menu = await within(document.body).findByRole('menu');
+      const checkedItem = within(menu).getByRole('menuitemcheckbox', {
+        name: 'Status Bar',
+      });
+      const uncheckedItem = within(menu).getByRole('menuitemcheckbox', {
+        name: 'Activity Bar',
+      });
+      const indeterminateItem = within(menu).getByRole('menuitemcheckbox', {
+        name: 'Bookmarks Bar',
+      });
+      const selectedRadio = within(menu).getByRole('menuitemradio', {
+        name: 'Bottom',
+      });
+      const unselectedRadio = within(menu).getByRole('menuitemradio', {
+        name: 'Top',
+      });
+
+      const checkedIndicator = checkedItem.querySelector(
+        '[data-slot="context-menu-checkbox-indicator"]'
+      );
+      const checkedIcon = checkedItem.querySelector(
+        '[data-slot="context-menu-checkbox-indicator-icon"]'
+      );
+      const uncheckedIcon = uncheckedItem.querySelector(
+        '[data-slot="context-menu-checkbox-indicator-icon"]'
+      );
+      const indeterminateIcon = indeterminateItem.querySelector(
+        '[data-slot="context-menu-checkbox-indicator-icon"]'
+      );
+      const selectedIndicator = selectedRadio.querySelector(
+        '[data-slot="context-menu-radio-indicator"]'
+      );
+      const selectedDot = selectedRadio.querySelector(
+        '[data-slot="context-menu-radio-indicator-icon"]'
+      );
+      const unselectedDot = unselectedRadio.querySelector(
+        '[data-slot="context-menu-radio-indicator-icon"]'
+      );
+
+      await expect(checkedIndicator).toBeInTheDocument();
+      await expect(checkedIcon).toBeInTheDocument();
+      await expect(uncheckedIcon).toBeInTheDocument();
+      await expect(indeterminateIcon).toBeInTheDocument();
+      await expect(selectedIndicator).toBeInTheDocument();
+      await expect(selectedDot).toBeInTheDocument();
+      await expect(unselectedDot).toBeInTheDocument();
+      await expect(checkedItem).toHaveAttribute('data-state', 'checked');
+      await expect(uncheckedItem).toHaveAttribute('data-state', 'unchecked');
+      await expect(indeterminateItem).toHaveAttribute(
+        'data-state',
+        'indeterminate'
+      );
+      await expect(checkedItem).toHaveClass('nx:group');
+      await expect(selectedRadio).toHaveClass('nx:group');
+      await expect(checkedIcon).toHaveAttribute('aria-hidden', 'true');
+      await expect(selectedDot).toHaveAttribute('aria-hidden', 'true');
+      await expect(checkedIcon).toHaveClass('nx:transition-[opacity,scale]');
+      await expect(uncheckedIcon).toHaveClass('nx:scale-50');
+      await expect(uncheckedIcon).toHaveClass('nx:opacity-0');
+      await expect(checkedIcon).toHaveClass(
+        'nx:group-data-[state=checked]:opacity-100'
+      );
+      await expect(indeterminateIcon).toHaveClass(
+        'nx:group-data-[state=indeterminate]:opacity-100'
+      );
+      await expect(checkedIcon).toHaveClass('nx:motion-reduce:transition-none');
+      await expect(unselectedDot).toHaveClass('nx:scale-50');
+      await expect(unselectedDot).toHaveClass('nx:opacity-0');
+      await expect(selectedDot).toHaveClass(
+        'nx:group-data-[state=checked]:opacity-100'
+      );
+    } finally {
+      await userEvent.keyboard('{Escape}');
+      await waitFor(() => {
+        expect(document.querySelector('[role="menu"]')).toBeNull();
+        expect(document.querySelector('[data-aria-hidden="true"]')).toBeNull();
+      });
+    }
+  },
+};
+
 export const WithSubMenu: Story = {
   render: (_args) => (
     <ContextMenu>
