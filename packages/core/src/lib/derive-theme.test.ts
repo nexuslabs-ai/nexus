@@ -159,7 +159,7 @@ describe('deriveSurfaces', () => {
     const s = deriveSurfaces('#ffffff', 'stone', 'light', 0.056);
     const lift =
       lOf(s['--nx-color-container']) - lOf(s['--nx-color-background']);
-    expect(lift).toBeGreaterThan(0.015);
+    expect(lift).toBeGreaterThan(0.01);
   });
 
   it('widens the ladder as contrast (delta) grows', () => {
@@ -373,19 +373,20 @@ describe('deriveTheme', () => {
       const soft = at(0);
       const strong = at(100);
 
-      const contrastSteppedTokens = [
+      const sharedContrastSteppedTokens = [
         '--nx-color-control-background',
         '--nx-color-muted',
-        '--nx-color-container-hover',
       ];
       const modeSteppedTokens =
         mode === 'light'
           ? [
+              '--nx-color-background-hover',
               '--nx-color-nav-border',
               '--nx-color-nav-item-active',
-              ...contrastSteppedTokens,
+              '--nx-color-popover-hover',
+              ...sharedContrastSteppedTokens,
             ]
-          : contrastSteppedTokens;
+          : [...sharedContrastSteppedTokens, '--nx-color-container-hover'];
 
       for (const token of modeSteppedTokens) {
         expect(strong[token], `${mode} ${token}`).not.toBe(soft[token]);
@@ -398,6 +399,13 @@ describe('deriveTheme', () => {
         ]) {
           expect(strong[token], `${mode} ${token}`).toBe(soft[token]);
         }
+      } else {
+        expect(strong['--nx-color-container-hover']).toBe(
+          strong['--nx-color-background']
+        );
+        expect(strong['--nx-color-popover-hover']).toBe(
+          strong['--nx-color-background-hover']
+        );
       }
     }
   );
@@ -551,8 +559,8 @@ describe('surfaceTone surfaces', () => {
     expect(slate['--nx-color-background']).not.toBe(
       neutral['--nx-color-background']
     );
-    expect(lOf(slate['--nx-color-background'])).toBeCloseTo(0.97, 3);
-    expect(lOf(neutral['--nx-color-background'])).toBeCloseTo(0.97, 3);
+    expect(lOf(slate['--nx-color-background'])).toBeCloseTo(0.985, 3);
+    expect(lOf(neutral['--nx-color-background'])).toBeCloseTo(0.985, 3);
     expect(lOf(slate['--nx-color-muted'])).toBeLessThan(
       lOf(slate['--nx-color-background'])
     );

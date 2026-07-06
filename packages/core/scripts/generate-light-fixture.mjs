@@ -59,7 +59,7 @@ const fixture = {
   schemaVersion: 1,
   source:
     'Generated from deriveTheme canonical light seeds after Model 2 surface hierarchy calibration; review diffs when surface tone constants or light steps change.',
-  pageL: 0.97,
+  pageL: 0.985,
   lightDepthMultiplier: 1.4,
   toneContrast: 60,
   tones: {},

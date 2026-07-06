@@ -1,7 +1,7 @@
 /* base: zinc */
 
 html {
-  --nx-color-background: var(--nx-color-zinc-75);
+  --nx-color-background: var(--nx-color-zinc-50);
   --nx-color-foreground: var(--nx-color-black-a900);
   --nx-color-background-hover: var(--nx-color-zinc-100);
   --nx-color-background-hover-alpha: var(--nx-color-zinc-a100);
@@ -17,7 +17,7 @@ html {
   --nx-color-container-active: var(--nx-color-zinc-100);
   --nx-color-popover: var(--nx-color-white-base);
   --nx-color-popover-foreground: var(--nx-color-zinc-950);
-  --nx-color-popover-hover: var(--nx-color-zinc-50);
+  --nx-color-popover-hover: var(--nx-color-zinc-100);
   --nx-color-popover-active: var(--nx-color-zinc-100);
   --nx-color-popover-alpha: var(--nx-color-white-a700);
   --nx-color-popover-backdrop: var(--nx-color-zinc-a900);
