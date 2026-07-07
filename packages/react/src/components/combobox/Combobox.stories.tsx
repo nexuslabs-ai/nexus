@@ -24,8 +24,9 @@ type ComboboxItemData = {
   group?: string;
 };
 
-// cmdk lowercases the value passed to onSelect, so keep option values lowercase
-// and compare against them directly.
+// cmdk filters on each item's `value` + `keywords`, not its rendered children,
+// so pass the label as a keyword to make it searchable. `onSelect` receives the
+// trimmed `value` (case preserved) — compare against `option.value` directly.
 const frameworks: ComboboxItemData[] = [
   { value: 'next', label: 'Next.js' },
   { value: 'sveltekit', label: 'SvelteKit' },
@@ -121,6 +122,7 @@ function ComboboxExample({
                 <ComboboxItem
                   key={option.value}
                   value={option.value}
+                  keywords={[option.label]}
                   disabled={option.disabled}
                   selected={value === option.value}
                   onSelect={handleSelect}
@@ -185,6 +187,7 @@ export const Controlled: Story = {
                   <ComboboxItem
                     key={framework.value}
                     value={framework.value}
+                    keywords={[framework.label]}
                     selected={value === framework.value}
                     onSelect={handleSelect}
                   >
@@ -276,7 +279,7 @@ export const InvalidField: Story = {
         Choose the framework used by this project.
       </FieldDescription>
       <FieldError id="framework-invalid-error">
-        Framework is required.
+        Select a supported framework.
       </FieldError>
     </Field>
   ),

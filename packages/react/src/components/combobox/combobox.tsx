@@ -32,8 +32,9 @@ interface ComboboxProps extends React.ComponentProps<typeof Popover> {}
  *
  * A searchable single-select field: a Popover trigger paired with the cmdk-powered
  * Command list. cmdk owns filtering, keyboard navigation, active-descendant
- * tracking, and ARIA — the combobox only composes the pieces. Hold the selected
- * `value` and the popover `open` state at the call site.
+ * tracking, and ARIA — the combobox only composes the pieces. The selected
+ * `value` and the popover `open` state are controlled at the call site; the
+ * root owns no internal value, matching the composition (shadcn) model.
  *
  * @example
  * ```tsx
@@ -52,6 +53,7 @@ interface ComboboxProps extends React.ComponentProps<typeof Popover> {}
  *         <ComboboxItem
  *           key={framework.value}
  *           value={framework.value}
+ *           keywords={[framework.label]}
  *           selected={value === framework.value}
  *           onSelect={(next) => {
  *             setValue(next === value ? '' : next);
@@ -157,9 +159,7 @@ function ComboboxContent({
       )}
       {...props}
     >
-      {/* PopoverContent already paints the translucent popover surface — keep the
-          Command transparent so it shows through instead of a solid fill. */}
-      <Command label={label} className="nx:bg-transparent">
+      <Command data-slot="combobox" label={label} className="nx:bg-transparent">
         {children}
       </Command>
     </PopoverContent>
@@ -281,8 +281,6 @@ function ComboboxSeparator({ className, ...props }: ComboboxSeparatorProps) {
 interface ComboboxItemProps extends React.ComponentProps<typeof CommandItem> {
   /**
    * Marks this option as the current selection, showing the check indicator.
-   * cmdk lowercases the value passed to `onSelect`, so compare against
-   * lowercase `value`s at the call site.
    * @default false
    */
   selected?: boolean;
@@ -293,6 +291,11 @@ interface ComboboxItemProps extends React.ComponentProps<typeof CommandItem> {
  *
  * A selectable option. cmdk marks the pointer/keyboard-active item with
  * `data-selected`; `selected` marks the chosen value with a trailing check.
+ *
+ * cmdk filters on each item's `value` + `keywords`, never its rendered children
+ * — pass the visible label as a `keyword` so typing it matches. `onSelect`
+ * receives the trimmed `value` (case preserved); compare it against the
+ * option's `value` directly at the call site.
  */
 function ComboboxItem({
   children,
