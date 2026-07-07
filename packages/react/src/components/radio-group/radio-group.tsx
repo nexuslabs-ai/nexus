@@ -29,10 +29,12 @@ interface RadioGroupItemProps extends React.ComponentProps<
  *
  * A set of mutually exclusive options where exactly one can be selected. Render
  * one `RadioGroupItem` per option; Radix handles roving focus and arrow-key
- * navigation between them. Wrap each item in `ChoiceRow` for compact row-owned
- * choices, or pair it with `Label` for simple inline labels. Control the
- * selection with `value` / `onValueChange`, or set an initial selection with
- * `defaultValue`.
+ * navigation between them. Pair each item with `Label` for simple inline
+ * labels, wrap each item in `ChoiceRow` for compact row-owned choices, or wrap
+ * each item in `ChoiceCard` for rich option cards with title and description.
+ * Use `FieldLabel + Field` when you need lower-level field layout composition.
+ * Control the selection with `value` / `onValueChange`, or set an initial
+ * selection with `defaultValue`.
  *
  * @example
  * ```tsx
@@ -62,7 +64,8 @@ function RadioGroup({ className, ...props }: RadioGroupProps) {
  * RadioGroupItem
  *
  * A single selectable option within a `RadioGroup`. Pair it with a `Label`
- * (via matching `id` / `htmlFor`) so the option's text toggles it.
+ * (via matching `id` / `htmlFor`) for simple inline labels, or compose it in
+ * `ChoiceRow` / `ChoiceCard` for row-owned or card-owned option surfaces.
  */
 function RadioGroupItem({ className, ...props }: RadioGroupItemProps) {
   return (

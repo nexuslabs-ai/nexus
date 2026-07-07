@@ -15,6 +15,12 @@ const meta: Meta<typeof RadioGroup> = {
   },
   parameters: {
     layout: 'padded',
+    docs: {
+      description: {
+        component:
+          'RadioGroup and RadioGroupItem provide primitive single-select behavior. Pair items with Label for simple inline labels, ChoiceRow for compact option rows, and ChoiceCard for rich title/description option cards.',
+      },
+    },
   },
 };
 

@@ -25,12 +25,12 @@ interface CheckboxProps extends React.ComponentProps<
  * the mixed state — e.g. a "select all" control whose children are only
  * partially selected.
  *
- * For a compact checkbox choice, wrap this atom in `ChoiceRow`. For a roomy
- * selectable card / row with helper copy, compose this atom inside `Field` — a
- * `FieldLabel` wrapping a `Field` becomes a card that highlights when the
- * checkbox is checked (see the Field "CheckboxCard" story). Each pattern stays
- * driven by this real control, so clicking the label surface toggles via native
- * `htmlFor` association — no duplicated indicator.
+ * Pair it with `Label` for a simple inline label, wrap it in `ChoiceRow` for a
+ * compact option row, or wrap it in `ChoiceCard` for a rich option card with
+ * title and description. Use `FieldLabel + Field` when you need lower-level
+ * field layout composition. Each pattern stays driven by this real control, so
+ * clicking the label surface toggles via native `htmlFor` association — no
+ * duplicated indicator.
  *
  * @example
  * ```tsx
