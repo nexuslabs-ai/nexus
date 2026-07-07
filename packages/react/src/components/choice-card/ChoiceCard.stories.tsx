@@ -806,7 +806,7 @@ export const AllVariants: Story = {
     await expect(getBorderColor(checkboxBorderless)).not.toBe(
       getBorderColor(checkboxBordered)
     );
-    await expect(getBorderColor(radioBorderless)).not.toBe(
+    await expect(getBorderColor(radioBorderless)).toBe(
       getBorderColor(radioBordered)
     );
     await expect(getComputedStyle(trailingRadio).marginTop).toBe('2px');
