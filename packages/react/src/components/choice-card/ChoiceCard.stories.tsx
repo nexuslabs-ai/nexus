@@ -62,7 +62,7 @@ function getBackgroundColor(element: HTMLElement) {
   return getComputedStyle(element).backgroundColor;
 }
 
-type ChoiceCardVariant = NonNullable<ChoiceCardProps['variant']>;
+type ChoiceCardVariant = ChoiceCardProps['variant'];
 
 interface PlanRadioCardsProps {
   idPrefix?: string;
@@ -266,7 +266,7 @@ export const WithRadioGroup: Story = {
   args: {
     variant: 'bordered',
   },
-  render: ({ variant }) => <PlanRadioCards variant={variant ?? undefined} />,
+  render: ({ variant }) => <PlanRadioCards variant={variant} />,
   play: async ({ canvasElement }) => {
     const canvas = within(canvasElement);
     const group = canvas.getByRole('radiogroup', { name: 'Plan' });
@@ -298,7 +298,7 @@ export const TrailingControl: Story = {
         id="choice-card-trailing"
         defaultChecked
         trailing
-        variant={variant ?? undefined}
+        variant={variant}
         title="Billing notices"
         description="Invoices, receipts, and payment updates for every workspace seat in this account."
       />
@@ -753,7 +753,7 @@ export const AllVariants: Story = {
           id="choice-card-checkbox-borderless"
           variant="borderless"
           title="Checkbox borderless"
-          description="Quiet option card that still shows selected state."
+          description="Quiet option card with no resting frame."
         />
       </div>
       <div className="nx:grid nx:gap-3">
