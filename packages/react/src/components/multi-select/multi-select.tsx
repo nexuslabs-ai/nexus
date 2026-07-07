@@ -825,11 +825,7 @@ function MultiSelectItem({
       value={value}
       disabled={disabled}
       keywords={keywords ?? (textLabel ? [textLabel] : undefined)}
-      className={cn(
-        'nx:items-start nx:gap-3',
-        'nx:data-[selected=true]:bg-popover-hover',
-        className
-      )}
+      className={cn('nx:data-[selected=true]:bg-popover-hover', className)}
       onSelect={(selectedValue) => {
         onSelect?.(selectedValue);
         if (!disabled) toggleValue(value);
@@ -840,7 +836,7 @@ function MultiSelectItem({
         data-slot="multi-select-item-indicator"
         aria-hidden="true"
         className={cn(
-          'nx:flex nx:size-4 nx:shrink-0 nx:items-center nx:justify-center nx:rounded-sm nx:border-default nx:border-border-default nx:pt-0.5',
+          'nx:flex nx:size-4 nx:shrink-0 nx:items-center nx:justify-center nx:rounded-sm nx:border-default nx:border-border-default',
           isSelected &&
             'nx:border-primary-background nx:bg-primary-background nx:text-primary-foreground'
         )}
