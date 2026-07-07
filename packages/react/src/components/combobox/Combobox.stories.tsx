@@ -3,19 +3,30 @@ import * as React from 'react';
 import type { Meta, StoryObj } from '@storybook/react';
 import { expect, userEvent, waitFor, within } from 'storybook/test';
 
-import { Button } from '../button';
+import { cn } from '../../lib/utils';
 import { Field, FieldDescription, FieldError, FieldLabel } from '../field';
 
 import {
   Combobox,
   ComboboxContent,
   ComboboxEmpty,
+  ComboboxGroup,
   ComboboxInput,
+  ComboboxItem,
   ComboboxList,
-  type ComboboxOption,
+  ComboboxTrigger,
 } from './combobox';
 
-const frameworks: ComboboxOption[] = [
+type ComboboxItemData = {
+  value: string;
+  label: string;
+  disabled?: boolean;
+  group?: string;
+};
+
+// cmdk lowercases the value passed to onSelect, so keep option values lowercase
+// and compare against them directly.
+const frameworks: ComboboxItemData[] = [
   { value: 'next', label: 'Next.js' },
   { value: 'sveltekit', label: 'SvelteKit' },
   { value: 'nuxt', label: 'Nuxt.js' },
@@ -23,50 +34,105 @@ const frameworks: ComboboxOption[] = [
   { value: 'astro', label: 'Astro' },
 ];
 
-const groupedFrameworks: ComboboxOption[] = [
+const groupedFrameworks: ComboboxItemData[] = [
   { value: 'next', label: 'Next.js', group: 'React' },
   { value: 'remix', label: 'Remix', group: 'React' },
   { value: 'sveltekit', label: 'SvelteKit', group: 'Svelte' },
   { value: 'nuxt', label: 'Nuxt.js', group: 'Vue' },
-  { value: 'astro', label: 'Astro', group: 'Meta frameworks' },
+  { value: 'astro', label: 'Astro', group: 'Other' },
 ];
 
-function FrameworkCombobox({
-  inputClassName = 'nx:w-64',
-  items = frameworks,
-  placeholder = 'Select a framework',
-  ...props
-}: Omit<React.ComponentProps<typeof Combobox>, 'items'> & {
-  inputClassName?: string;
-  items?: ComboboxOption[];
-  placeholder?: string;
-}) {
-  return (
-    <Combobox items={items} {...props}>
-      <ComboboxInput
-        aria-label="Framework"
-        className={inputClassName}
-        placeholder={placeholder}
-        showClear
-      />
-      <ComboboxContent>
-        <ComboboxEmpty>No frameworks found.</ComboboxEmpty>
-        <ComboboxList />
-      </ComboboxContent>
-    </Combobox>
-  );
+const longFrameworks: ComboboxItemData[] = [
+  { value: 'next', label: 'Next.js — the React framework for the web' },
+  {
+    value: 'sveltekit',
+    label: 'SvelteKit — the fastest way to build Svelte apps',
+  },
+  {
+    value: 'astro',
+    label: 'Astro — the web framework for content-driven sites',
+  },
+];
+
+function toGroups(items: ComboboxItemData[]) {
+  if (!items.some((item) => item.group))
+    return [{ heading: undefined, options: items }];
+
+  const groups = new Map<string, ComboboxItemData[]>();
+
+  for (const item of items) {
+    const heading = item.group ?? 'Other';
+    groups.set(heading, [...(groups.get(heading) ?? []), item]);
+  }
+
+  return [...groups.entries()].map(([heading, options]) => ({
+    heading,
+    options,
+  }));
 }
 
-function ControlledComboboxExample() {
-  const [value, setValue] = React.useState('astro');
+function ComboboxExample({
+  defaultValue = '',
+  emptyText = 'No framework found.',
+  items = frameworks,
+  placeholder = 'Select framework',
+  searchPlaceholder = 'Search framework...',
+  triggerClassName = 'nx:w-64',
+  ...triggerProps
+}: {
+  defaultValue?: string;
+  emptyText?: string;
+  items?: ComboboxItemData[];
+  placeholder?: string;
+  searchPlaceholder?: string;
+  triggerClassName?: string;
+} & Omit<
+  React.ComponentProps<typeof ComboboxTrigger>,
+  'children' | 'className'
+>) {
+  const [open, setOpen] = React.useState(false);
+  const [value, setValue] = React.useState(defaultValue);
+  const selectedLabel = items.find((item) => item.value === value)?.label;
+
+  const handleSelect = (next: string) => {
+    setValue(next === value ? '' : next);
+    setOpen(false);
+  };
 
   return (
-    <div className="nx:flex nx:flex-col nx:gap-3">
-      <FrameworkCombobox value={value} onValueChange={setValue} />
-      <output className="nx:typography-body-small nx:text-muted-foreground">
-        Selected: {value || 'none'}
-      </output>
-    </div>
+    <Combobox open={open} onOpenChange={setOpen}>
+      <ComboboxTrigger className={triggerClassName} {...triggerProps}>
+        <span
+          className={cn(
+            'nx:min-w-0 nx:flex-1 nx:truncate nx:text-left',
+            selectedLabel ? undefined : 'nx:text-muted-foreground'
+          )}
+        >
+          {selectedLabel ?? placeholder}
+        </span>
+      </ComboboxTrigger>
+      <ComboboxContent label="Framework">
+        <ComboboxInput placeholder={searchPlaceholder} />
+        <ComboboxList>
+          <ComboboxEmpty>{emptyText}</ComboboxEmpty>
+          {toGroups(items).map(({ heading, options }) => (
+            <ComboboxGroup key={heading ?? '_root'} heading={heading}>
+              {options.map((option) => (
+                <ComboboxItem
+                  key={option.value}
+                  value={option.value}
+                  disabled={option.disabled}
+                  selected={value === option.value}
+                  onSelect={handleSelect}
+                >
+                  {option.label}
+                </ComboboxItem>
+              ))}
+            </ComboboxGroup>
+          ))}
+        </ComboboxList>
+      </ComboboxContent>
+    </Combobox>
   );
 }
 
@@ -82,105 +148,86 @@ export default meta;
 type Story = StoryObj<typeof Combobox>;
 
 export const Default: Story = {
-  render: () => <FrameworkCombobox />,
+  render: () => <ComboboxExample />,
 };
 
-export const WithDefaultValue: Story = {
-  render: () => <FrameworkCombobox defaultValue="next" />,
+export const WithSelection: Story = {
+  render: () => <ComboboxExample defaultValue="next" />,
 };
 
-export const ReopenShowsFullList: Story = {
-  render: () => <FrameworkCombobox defaultValue="next" />,
-  play: async ({ canvasElement }) => {
-    const canvas = within(canvasElement);
-    const input = canvas.getByRole('combobox', { name: 'Framework' });
-
-    await expect(input).toHaveValue('Next.js');
-    await userEvent.click(input);
-
-    const listbox = await within(document.body).findByRole('listbox');
-
-    await expect(
-      within(listbox).getByRole('option', { name: 'Next.js' })
-    ).toBeInTheDocument();
-    await expect(
-      within(listbox).getByRole('option', { name: 'SvelteKit' })
-    ).toBeInTheDocument();
-    await expect(
-      within(listbox).getByRole('option', { name: 'Astro' })
-    ).toBeInTheDocument();
-
-    await userEvent.keyboard('{Escape}');
-    await waitFor(() => {
-      expect(document.body.querySelector('[role="listbox"]')).toBeNull();
-    });
-
-    await userEvent.click(input);
-    const reopenedListbox = await within(document.body).findByRole('listbox');
-
-    await expect(
-      within(reopenedListbox).getByRole('option', { name: 'Next.js' })
-    ).toBeInTheDocument();
-
-    await userEvent.keyboard('{Escape}');
-  },
-};
-
+// Raw composition holding open + value state at the call site — the canonical
+// controlled usage, and the composition example the pattern is built around.
 export const Controlled: Story = {
-  render: () => <ControlledComboboxExample />,
+  render: function ControlledStory() {
+    const [open, setOpen] = React.useState(false);
+    const [value, setValue] = React.useState('astro');
+    const selectedLabel = frameworks.find((f) => f.value === value)?.label;
+
+    const handleSelect = (next: string) => {
+      setValue(next === value ? '' : next);
+      setOpen(false);
+    };
+
+    return (
+      <div className="nx:flex nx:flex-col nx:gap-3">
+        <Combobox open={open} onOpenChange={setOpen}>
+          <ComboboxTrigger className="nx:w-64">
+            <span className="nx:min-w-0 nx:flex-1 nx:truncate nx:text-left">
+              {selectedLabel ?? 'Select framework'}
+            </span>
+          </ComboboxTrigger>
+          <ComboboxContent label="Framework">
+            <ComboboxInput placeholder="Search framework..." />
+            <ComboboxList>
+              <ComboboxEmpty>No framework found.</ComboboxEmpty>
+              <ComboboxGroup>
+                {frameworks.map((framework) => (
+                  <ComboboxItem
+                    key={framework.value}
+                    value={framework.value}
+                    selected={value === framework.value}
+                    onSelect={handleSelect}
+                  >
+                    {framework.label}
+                  </ComboboxItem>
+                ))}
+              </ComboboxGroup>
+            </ComboboxList>
+          </ComboboxContent>
+        </Combobox>
+        <output className="nx:typography-body-small nx:text-muted-foreground">
+          Selected: {value || 'none'}
+        </output>
+      </div>
+    );
+  },
 };
 
 export const Sizes: Story = {
   render: () => (
     <div className="nx:flex nx:w-64 nx:flex-col nx:gap-3">
-      <FrameworkCombobox placeholder="Default" inputClassName="" />
-      <Combobox items={frameworks}>
-        <ComboboxInput
-          aria-label="Small framework"
-          size="sm"
-          placeholder="Sm"
-        />
-        <ComboboxContent>
-          <ComboboxEmpty>No frameworks found.</ComboboxEmpty>
-          <ComboboxList />
-        </ComboboxContent>
-      </Combobox>
-      <Combobox items={frameworks}>
-        <ComboboxInput
-          aria-label="Large framework"
-          size="lg"
-          placeholder="Lg"
-        />
-        <ComboboxContent>
-          <ComboboxEmpty>No frameworks found.</ComboboxEmpty>
-          <ComboboxList />
-        </ComboboxContent>
-      </Combobox>
+      <ComboboxExample
+        size="sm"
+        placeholder="Small"
+        triggerClassName="nx:w-full"
+      />
+      <ComboboxExample placeholder="Default" triggerClassName="nx:w-full" />
+      <ComboboxExample
+        size="lg"
+        placeholder="Large"
+        triggerClassName="nx:w-full"
+      />
     </div>
   ),
 };
 
 export const Grouped: Story = {
-  render: () => <FrameworkCombobox items={groupedFrameworks} />,
-};
-
-export const Disabled: Story = {
-  render: () => <FrameworkCombobox disabled defaultValue="next" />,
-  play: async ({ canvasElement }) => {
-    const canvas = within(canvasElement);
-    const input = canvas.getByRole('combobox', { name: 'Framework' });
-
-    await expect(input).toBeDisabled();
-    await userEvent.click(input);
-    await waitFor(() => {
-      expect(document.body.querySelector('[role="listbox"]')).toBeNull();
-    });
-  },
+  render: () => <ComboboxExample items={groupedFrameworks} />,
 };
 
 export const WithDisabledOption: Story = {
   render: () => (
-    <FrameworkCombobox
+    <ComboboxExample
       items={[
         { value: 'next', label: 'Next.js' },
         { value: 'sveltekit', label: 'SvelteKit', disabled: true },
@@ -190,176 +237,185 @@ export const WithDisabledOption: Story = {
   ),
 };
 
-export const InvalidRequiredField: Story = {
+export const LongLabelsNarrowField: Story = {
+  render: () => (
+    <ComboboxExample
+      items={longFrameworks}
+      triggerClassName="nx:w-56"
+      defaultValue="sveltekit"
+    />
+  ),
+};
+
+export const Disabled: Story = {
+  render: () => <ComboboxExample disabled defaultValue="next" />,
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+    const trigger = canvas.getByRole('button', { name: 'Next.js' });
+
+    await expect(trigger).toBeDisabled();
+    // The disabled trigger sets pointer-events: none; bypass the guard to prove
+    // the click is a no-op and the popover stays closed.
+    await userEvent.click(trigger, { pointerEventsCheck: 0 });
+    await waitFor(() => {
+      expect(document.body.querySelector('[role="listbox"]')).toBeNull();
+    });
+  },
+};
+
+export const InvalidField: Story = {
   render: () => (
     <Field data-invalid>
-      <FieldLabel htmlFor="framework-required">Framework</FieldLabel>
-      <Combobox items={frameworks} required invalid>
-        <ComboboxInput
-          id="framework-required"
-          aria-describedby="framework-required-description framework-required-error"
-          aria-label="Framework"
-          className="nx:w-64"
-          placeholder="Select a framework"
-        />
-        <ComboboxContent>
-          <ComboboxEmpty>No frameworks found.</ComboboxEmpty>
-          <ComboboxList />
-        </ComboboxContent>
-      </Combobox>
-      <FieldDescription id="framework-required-description">
+      <FieldLabel htmlFor="framework-invalid">Framework</FieldLabel>
+      <ComboboxExample
+        id="framework-invalid"
+        aria-invalid
+        aria-describedby="framework-invalid-description framework-invalid-error"
+      />
+      <FieldDescription id="framework-invalid-description">
         Choose the framework used by this project.
       </FieldDescription>
-      <FieldError id="framework-required-error">
+      <FieldError id="framework-invalid-error">
         Framework is required.
       </FieldError>
     </Field>
   ),
   play: async ({ canvasElement }) => {
     const canvas = within(canvasElement);
-    const input = canvas.getByRole('combobox', { name: 'Framework' });
+    const trigger = canvas.getByRole('button');
 
-    await expect(input).toBeRequired();
-    await expect(input).toHaveAttribute('aria-invalid', 'true');
-    await expect(input).toHaveAttribute('aria-required', 'true');
-  },
-};
-
-export const KeyboardInteraction: Story = {
-  render: () => <FrameworkCombobox />,
-  play: async ({ canvasElement }) => {
-    const canvas = within(canvasElement);
-    const input = canvas.getByRole('combobox', { name: 'Framework' });
-
-    await userEvent.click(input);
-    await userEvent.keyboard('rem');
-
-    const listbox = await within(document.body).findByRole('listbox');
-
-    await expect(
-      within(listbox).getByRole('option', { name: 'Remix' })
-    ).toBeInTheDocument();
-    await userEvent.keyboard('{ArrowDown}{Enter}');
-
-    await waitFor(() => {
-      expect(input).toHaveValue('Remix');
-    });
+    await expect(trigger).toHaveAttribute('aria-invalid', 'true');
   },
 };
 
 export const ClickInteraction: Story = {
-  render: () => <FrameworkCombobox />,
+  render: () => <ComboboxExample />,
   play: async ({ canvasElement }) => {
     const canvas = within(canvasElement);
-    const input = canvas.getByRole('combobox', { name: 'Framework' });
-    const trigger = canvas.getByRole('button', { name: 'Open options' });
+    const trigger = canvas.getByRole('button', { name: 'Select framework' });
 
     await userEvent.click(trigger);
     const listbox = await within(document.body).findByRole('listbox');
-
     await userEvent.click(
       within(listbox).getByRole('option', { name: 'Astro' })
     );
 
-    await expect(input).toHaveValue('Astro');
-  },
-};
-
-export const ClearButton: Story = {
-  render: () => <FrameworkCombobox defaultValue="next" />,
-  play: async ({ canvasElement }) => {
-    const canvas = within(canvasElement);
-    const input = canvas.getByRole('combobox', { name: 'Framework' });
-    const clearButton = canvas.getByRole('button', { name: 'Clear selection' });
-
-    await expect(input).toHaveValue('Next.js');
-    await userEvent.click(clearButton);
     await waitFor(() => {
-      expect(input).toHaveValue('');
+      expect(canvas.getByRole('button', { name: 'Astro' })).toBeInTheDocument();
     });
   },
 };
 
-export const FormReset: Story = {
-  render: () => (
-    <form className="nx:flex nx:flex-col nx:items-start nx:gap-3">
-      <FrameworkCombobox name="framework" defaultValue="next" />
-      <Button type="reset" variant="outline">
-        Reset
-      </Button>
-    </form>
-  ),
+export const KeyboardInteraction: Story = {
+  render: () => <ComboboxExample />,
   play: async ({ canvasElement }) => {
     const canvas = within(canvasElement);
-    const input = canvas.getByRole('combobox', { name: 'Framework' });
-    const hiddenInput = canvasElement.querySelector('input[type="hidden"]');
+    const trigger = canvas.getByRole('button', { name: 'Select framework' });
 
-    await userEvent.click(input);
+    await userEvent.click(trigger);
+    const input = await within(document.body).findByRole('combobox', {
+      name: 'Framework',
+    });
+
+    await userEvent.type(input, 'rem');
+    const listbox = within(document.body).getByRole('listbox');
+    await expect(
+      within(listbox).getByRole('option', { name: 'Remix' })
+    ).toBeInTheDocument();
+
+    await userEvent.keyboard('{Enter}');
+    await waitFor(() => {
+      expect(canvas.getByRole('button', { name: 'Remix' })).toBeInTheDocument();
+    });
+  },
+};
+
+export const ClearOnReselect: Story = {
+  render: () => <ComboboxExample defaultValue="next" />,
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+    const trigger = canvas.getByRole('button', { name: 'Next.js' });
+
+    await userEvent.click(trigger);
     const listbox = await within(document.body).findByRole('listbox');
     await userEvent.click(
-      within(listbox).getByRole('option', { name: 'Astro' })
+      within(listbox).getByRole('option', { name: 'Next.js' })
     );
 
-    await expect(input).toHaveValue('Astro');
-    await expect(hiddenInput).toHaveValue('astro');
-
-    await userEvent.click(canvas.getByRole('button', { name: 'Reset' }));
-
     await waitFor(() => {
-      expect(input).toHaveValue('Next.js');
-      expect(hiddenInput).toHaveValue('next');
+      expect(
+        canvas.getByRole('button', { name: 'Select framework' })
+      ).toBeInTheDocument();
     });
+  },
+};
+
+export const EmptyResults: Story = {
+  render: () => <ComboboxExample />,
+  parameters: {
+    a11y: {
+      // aria-required-children flags the transient absence of option children
+      // while the query matches nothing, which is expected here. All other a11y
+      // rules stay enabled. Mirrors the Command Empty story.
+      config: { rules: [{ id: 'aria-required-children', enabled: false }] },
+    },
+  },
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+    const trigger = canvas.getByRole('button', { name: 'Select framework' });
+
+    await userEvent.click(trigger);
+    const input = await within(document.body).findByRole('combobox', {
+      name: 'Framework',
+    });
+
+    await userEvent.type(input, 'zzz');
+    await expect(
+      await within(document.body).findByText('No framework found.')
+    ).toBeInTheDocument();
+
+    await userEvent.keyboard('{Escape}');
   },
 };
 
 export const WithDataAttributes: Story = {
-  render: () => <FrameworkCombobox />,
+  render: () => <ComboboxExample />,
   play: async ({ canvasElement }) => {
     const canvas = within(canvasElement);
-    const input = canvas.getByRole('combobox', { name: 'Framework' });
-    const trigger = canvas.getByRole('button', { name: 'Open options' });
-    const field = canvasElement.querySelector('[data-slot="combobox-field"]');
+    const trigger = canvas.getByRole('button', { name: 'Select framework' });
 
-    await expect(field).toHaveAttribute('data-size', 'default');
-    await expect(field).toHaveAttribute('data-variant', 'default');
-    await expect(field).toHaveClass('nx:border-default');
-    await expect(field).toHaveClass('nx:border-border-default');
     await expect(trigger).toHaveAttribute('data-slot', 'combobox-trigger');
-    await expect(input).toHaveAttribute('data-slot', 'combobox-input');
+
+    await userEvent.click(trigger);
+    const listbox = await within(document.body).findByRole('listbox');
+    await expect(listbox).toHaveAttribute('data-slot', 'combobox-list');
+    await expect(
+      within(listbox).getByRole('option', { name: 'Next.js' })
+    ).toHaveAttribute('data-slot', 'combobox-item');
+
+    await userEvent.keyboard('{Escape}');
   },
 };
 
 export const AllVariants: Story = {
   render: () => (
     <div className="nx:grid nx:w-[520px] nx:grid-cols-2 nx:gap-4">
-      <FrameworkCombobox placeholder="Default empty" inputClassName="" />
-      <FrameworkCombobox
+      <ComboboxExample placeholder="Empty" triggerClassName="nx:w-full" />
+      <ComboboxExample
         defaultValue="next"
-        placeholder="Default filled"
-        inputClassName=""
+        placeholder="Filled"
+        triggerClassName="nx:w-full"
       />
-      <Combobox items={frameworks}>
-        <ComboboxInput
-          variant="borderless"
-          aria-label="Borderless empty"
-          placeholder="Borderless empty"
-        />
-        <ComboboxContent>
-          <ComboboxEmpty>No frameworks found.</ComboboxEmpty>
-          <ComboboxList />
-        </ComboboxContent>
-      </Combobox>
-      <Combobox items={frameworks} defaultValue="astro">
-        <ComboboxInput
-          variant="borderless"
-          aria-label="Borderless filled"
-          placeholder="Borderless filled"
-        />
-        <ComboboxContent>
-          <ComboboxEmpty>No frameworks found.</ComboboxEmpty>
-          <ComboboxList />
-        </ComboboxContent>
-      </Combobox>
+      <ComboboxExample
+        disabled
+        defaultValue="astro"
+        triggerClassName="nx:w-full"
+      />
+      <ComboboxExample
+        aria-invalid
+        placeholder="Invalid"
+        triggerClassName="nx:w-full"
+      />
     </div>
   ),
 };
