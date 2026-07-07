@@ -5,7 +5,12 @@ import { expect, fn, userEvent, waitFor, within } from 'storybook/test';
 
 import { Field, FieldDescription, FieldGroup, FieldLabel } from '../field';
 
-import { Combobox, type ComboboxOptionInput } from './combobox';
+import {
+  Combobox,
+  ComboboxGroup,
+  ComboboxItem,
+  type ComboboxOptionInput,
+} from './combobox';
 
 const frameworkOptions: ComboboxOptionInput[] = [
   { value: 'next', label: 'Next.js' },
@@ -164,6 +169,39 @@ export const Grouped: Story = {
   },
 };
 
+export const Compositional: Story = {
+  render: () => (
+    <Combobox aria-label="Composed framework" placeholder="Select a stack">
+      <ComboboxGroup label="Frontend">
+        <ComboboxItem value="next">Next.js</ComboboxItem>
+        <ComboboxItem value="sveltekit">SvelteKit</ComboboxItem>
+        <ComboboxItem value="remix">Remix</ComboboxItem>
+      </ComboboxGroup>
+      <ComboboxGroup label="Backend">
+        <ComboboxItem
+          value="rails"
+          description="Convention-first full-stack framework."
+        >
+          Ruby on Rails
+        </ComboboxItem>
+        <ComboboxItem value="laravel">Laravel</ComboboxItem>
+      </ComboboxGroup>
+    </Combobox>
+  ),
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+    const input = canvas.getByRole('combobox', {
+      name: 'Composed framework',
+    });
+
+    await userEvent.click(input);
+    await userEvent.type(input, 'lar');
+    await userEvent.keyboard('{Enter}');
+
+    await expect(input).toHaveValue('Laravel');
+  },
+};
+
 export const DisabledOption: Story = {
   args: {
     'aria-label': 'Framework with disabled option',
@@ -277,6 +315,38 @@ export const NarrowWidth: Story = {
         options={frameworkOptions}
         placeholder="Framework"
       />
+    </div>
+  ),
+};
+
+export const AllVariants: Story = {
+  render: () => (
+    <div className="nx:grid nx:gap-4">
+      {(['default', 'borderless'] as const).map((variant) => (
+        <div key={variant} className="nx:grid nx:gap-2">
+          <Combobox
+            aria-label={`${variant} small framework`}
+            size="sm"
+            variant={variant}
+            options={frameworkOptions}
+            placeholder={`${variant} small`}
+          />
+          <Combobox
+            aria-label={`${variant} default framework`}
+            size="default"
+            variant={variant}
+            options={frameworkOptions}
+            placeholder={`${variant} default`}
+          />
+          <Combobox
+            aria-label={`${variant} large framework`}
+            size="lg"
+            variant={variant}
+            options={frameworkOptions}
+            placeholder={`${variant} large`}
+          />
+        </div>
+      ))}
     </div>
   ),
 };

@@ -115,6 +115,14 @@ function getFirstEnabledValue(
   return getEnabledSelectionOptions(groups)[0]?.value;
 }
 
+function getLastEnabledValue(
+  groups: readonly SelectionOptionGroup[]
+): string | undefined {
+  const enabledOptions = getEnabledSelectionOptions(groups);
+
+  return enabledOptions[enabledOptions.length - 1]?.value;
+}
+
 function getNextEnabledValue(
   groups: readonly SelectionOptionGroup[],
   activeValue: string | undefined,
@@ -136,22 +144,6 @@ function getNextEnabledValue(
   return enabledOptions[nextIndex]?.value;
 }
 
-function includesSelectionValue(values: readonly string[], value: string) {
-  return values.includes(value);
-}
-
-function toggleSelectionValue(values: readonly string[], value: string) {
-  if (includesSelectionValue(values, value)) {
-    return values.filter((item) => item !== value);
-  }
-
-  return [...values, value];
-}
-
-function removeSelectionValue(values: readonly string[], value: string) {
-  return values.filter((item) => item !== value);
-}
-
 function getSelectionOptionDomId(baseId: string, value: string) {
   return `${baseId}-option-${encodeURIComponent(value)}`;
 }
@@ -161,14 +153,12 @@ export {
   findSelectionOption,
   flattenSelectionOptions,
   getFirstEnabledValue,
+  getLastEnabledValue,
   getNextEnabledValue,
   getSelectionOptionDomId,
-  includesSelectionValue,
   isSelectionOptionGroup,
   normalizeSelectionGroups,
-  removeSelectionValue,
   type SelectionOption,
   type SelectionOptionGroup,
   type SelectionOptionInput,
-  toggleSelectionValue,
 };

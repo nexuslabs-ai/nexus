@@ -2,22 +2,13 @@ import * as React from 'react';
 
 import { cva, type VariantProps } from 'class-variance-authority';
 
-import { IconCheck, IconChevronDown, IconX } from '../../lib/icons';
+import { IconCheck, IconChevronDown, IconSearch, IconX } from '../../lib/icons';
 import type {
   SelectionOption,
   SelectionOptionGroup,
   SelectionOptionInput,
 } from '../../lib/selection';
 import { cn } from '../../lib/utils';
-import {
-  Command,
-  CommandEmpty,
-  CommandGroup,
-  CommandInput,
-  CommandItem,
-  CommandList,
-  CommandSeparator,
-} from '../command';
 import {
   Popover,
   PopoverContent,
@@ -103,17 +94,34 @@ type MultiSelectContextValue = {
   selectedValues: readonly string[];
   selectedValueSet: Set<string>;
   toggleValue: (value: string) => void;
-  items: Map<string, React.ReactNode>;
+  items: Map<string, MultiSelectItemRecord>;
   single: boolean;
   disabled: boolean;
   readOnly: boolean;
-  onItemAdded: (value: string, label: React.ReactNode) => void;
+  required: boolean;
+  invalid: React.AriaAttributes['aria-invalid'] | undefined;
+  onItemAdded: (value: string, item: MultiSelectItemRecord) => void;
 };
 
 const MultiSelectContext = React.createContext<MultiSelectContextValue | null>(
   null
 );
 const MultiSelectRegistrationContext = React.createContext(false);
+type MultiSelectContentContextValue = {
+  activeValue: string | undefined;
+  listboxId: string;
+  searchValue: string;
+  setActiveValue: (value: string | undefined) => void;
+};
+
+const MultiSelectContentContext =
+  React.createContext<MultiSelectContentContextValue | null>(null);
+
+type MultiSelectItemRecord = {
+  label: React.ReactNode;
+  searchText: string;
+  disabled?: boolean;
+};
 
 function useMultiSelectContext(component: string) {
   const context = React.useContext(MultiSelectContext);
@@ -123,6 +131,79 @@ function useMultiSelectContext(component: string) {
   }
 
   return context;
+}
+
+function getMultiSelectItemDomId(baseId: string, value: string) {
+  return `${baseId}-option-${encodeURIComponent(value)}`;
+}
+
+function normalizeSearchText(value: string) {
+  return value.trim().toLocaleLowerCase();
+}
+
+function getNodeText(node: React.ReactNode): string {
+  return React.Children.toArray(node)
+    .map((child) => {
+      if (typeof child === 'string' || typeof child === 'number') {
+        return String(child);
+      }
+
+      if (React.isValidElement(child)) {
+        return getNodeText(
+          (child.props as { children?: React.ReactNode }).children
+        );
+      }
+
+      return '';
+    })
+    .join('');
+}
+
+function getMultiSelectSearchText({
+  value,
+  children,
+  badgeLabel,
+  keywords,
+}: {
+  value: string;
+  children: React.ReactNode;
+  badgeLabel?: React.ReactNode;
+  keywords?: readonly string[];
+}) {
+  return normalizeSearchText(
+    [value, getNodeText(children), getNodeText(badgeLabel), ...(keywords ?? [])]
+      .filter(Boolean)
+      .join(' ')
+  );
+}
+
+function getVisibleItems(
+  items: Map<string, MultiSelectItemRecord>,
+  searchValue: string
+) {
+  const normalizedSearchValue = normalizeSearchText(searchValue);
+
+  return [...items.entries()].filter(
+    ([, item]) =>
+      !normalizedSearchValue || item.searchText.includes(normalizedSearchValue)
+  );
+}
+
+function getEnabledItems(items: Array<[string, MultiSelectItemRecord]>) {
+  return items.filter(([, item]) => !item.disabled);
+}
+
+function isAriaStateTruthy(
+  value:
+    | React.AriaAttributes['aria-invalid']
+    | React.AriaAttributes['aria-required']
+) {
+  return (
+    value === true ||
+    value === 'true' ||
+    value === 'grammar' ||
+    value === 'spelling'
+  );
 }
 
 function useControllableArrayState({
@@ -242,14 +323,22 @@ interface MultiSelectProps {
    * Form field name. Each selected value is mirrored into a hidden input.
    */
   name?: string;
+  /**
+   * Whether at least one value is required.
+   */
+  required?: boolean;
+  /**
+   * Marks the field invalid for assistive technology and styling.
+   */
+  'aria-invalid'?: React.AriaAttributes['aria-invalid'];
 }
 
 /**
  * MultiSelect
  *
  * Searchable multi-value selection primitive adapted from the WDS shadcn
- * registry pattern. It composes a Popover trigger/content with Command-powered
- * filtering and chip-style selected values.
+ * registry pattern. It composes a Popover trigger/content with Nexus-owned
+ * listbox semantics, search filtering, and chip-style selected values.
  *
  * @example
  * ```tsx
@@ -281,6 +370,8 @@ function MultiSelect({
   disabled = false,
   readOnly = false,
   name,
+  required = false,
+  'aria-invalid': ariaInvalid,
 }: MultiSelectProps) {
   const [selectedValues, setSelectedValues] = useControllableArrayState({
     prop: values ?? value,
@@ -296,7 +387,7 @@ function MultiSelect({
     () => new Set(selectedValues),
     [selectedValues]
   );
-  const [items, setItems] = React.useState<Map<string, React.ReactNode>>(
+  const [items, setItems] = React.useState<Map<string, MultiSelectItemRecord>>(
     () => new Map()
   );
 
@@ -327,12 +418,20 @@ function MultiSelect({
   );
 
   const onItemAdded = React.useCallback(
-    (itemValue: string, label: React.ReactNode) => {
+    (itemValue: string, item: MultiSelectItemRecord) => {
       setItems((currentItems) => {
-        if (currentItems.get(itemValue) === label) return currentItems;
+        const currentItem = currentItems.get(itemValue);
+        if (
+          currentItem &&
+          currentItem.label === item.label &&
+          currentItem.searchText === item.searchText &&
+          currentItem.disabled === item.disabled
+        ) {
+          return currentItems;
+        }
 
         const nextItems = new Map(currentItems);
-        nextItems.set(itemValue, label);
+        nextItems.set(itemValue, item);
         return nextItems;
       });
     },
@@ -350,14 +449,18 @@ function MultiSelect({
       single,
       disabled,
       readOnly,
+      required,
+      invalid: ariaInvalid,
       onItemAdded,
     }),
     [
+      ariaInvalid,
       disabled,
       items,
       onItemAdded,
       open,
       readOnly,
+      required,
       selectedValueSet,
       selectedValues,
       setOpen,
@@ -373,9 +476,27 @@ function MultiSelect({
       </Popover>
       {name
         ? selectedValues.map((item) => (
-            <input key={item} type="hidden" name={name} value={item} />
+            <input
+              key={item}
+              type="hidden"
+              name={name}
+              value={item}
+              disabled={disabled}
+            />
           ))
         : null}
+      {required ? (
+        <input
+          data-slot="multi-select-required-input"
+          aria-hidden="true"
+          className="nx:sr-only"
+          tabIndex={-1}
+          value={selectedValues.length > 0 ? 'selected' : ''}
+          required
+          disabled={disabled}
+          readOnly
+        />
+      ) : null}
     </MultiSelectContext.Provider>
   );
 }
@@ -402,17 +523,43 @@ function MultiSelectTrigger({
   variant,
   size,
   disabled,
+  onKeyDown,
   type = 'button',
   role = 'combobox',
+  'aria-invalid': ariaInvalid,
+  'aria-required': ariaRequired,
   ...props
 }: MultiSelectTriggerProps) {
   const {
     open,
     selectedValues,
     disabled: contextDisabled,
+    readOnly,
+    required,
+    invalid,
+    toggleValue,
   } = useMultiSelectContext('MultiSelectTrigger');
   const semanticSize = size ?? 'default';
   const isDisabled = contextDisabled || disabled;
+  const resolvedAriaInvalid = invalid ?? ariaInvalid;
+  const resolvedAriaRequired =
+    required || ariaRequired === true || ariaRequired === 'true';
+
+  const handleKeyDown = React.useCallback(
+    (event: React.KeyboardEvent<HTMLButtonElement>) => {
+      onKeyDown?.(event);
+      if (event.defaultPrevented || isDisabled || readOnly) return;
+
+      if (
+        selectedValues.length > 0 &&
+        (event.key === 'Backspace' || event.key === 'Delete')
+      ) {
+        event.preventDefault();
+        toggleValue(selectedValues[selectedValues.length - 1] ?? '');
+      }
+    },
+    [isDisabled, onKeyDown, readOnly, selectedValues, toggleValue]
+  );
 
   return (
     <PopoverTrigger asChild>
@@ -420,12 +567,18 @@ function MultiSelectTrigger({
         data-slot="multi-select-trigger"
         data-state={open ? 'open' : 'closed'}
         data-empty={selectedValues.length === 0 ? 'true' : undefined}
+        data-invalid={
+          isAriaStateTruthy(resolvedAriaInvalid) ? 'true' : undefined
+        }
         data-placeholder={selectedValues.length === 0 ? 'true' : undefined}
+        data-required={resolvedAriaRequired ? 'true' : undefined}
         data-size={semanticSize}
         data-variant={variant ?? 'default'}
         type={type}
         role={role}
         aria-expanded={open}
+        aria-invalid={resolvedAriaInvalid}
+        aria-required={resolvedAriaRequired || undefined}
         disabled={isDisabled}
         className={cn(
           multiSelectTriggerVariants({
@@ -434,6 +587,7 @@ function MultiSelectTrigger({
             className,
           })
         )}
+        onKeyDown={handleKeyDown}
         {...props}
       >
         {children}
@@ -587,7 +741,7 @@ function MultiSelectValue({
       {...props}
     >
       {selectedValues.map((selectedValue) => {
-        const label = items.get(selectedValue) ?? selectedValue;
+        const label = items.get(selectedValue)?.label ?? selectedValue;
 
         return (
           <span
@@ -636,7 +790,7 @@ interface MultiSelectContentProps extends Omit<
   'children'
 > {
   /**
-   * Whether to render the Command search input, or search copy overrides.
+   * Whether to render the search input, or search copy overrides.
    * @default true
    */
   search?: boolean | { placeholder?: string; emptyMessage?: React.ReactNode };
@@ -649,7 +803,7 @@ interface MultiSelectContentProps extends Omit<
 /**
  * MultiSelectContent
  *
- * Popover content with a Command-powered searchable list.
+ * Popover content with a searchable listbox.
  */
 function MultiSelectContent({
   search = true,
@@ -665,6 +819,107 @@ function MultiSelectContent({
     typeof search === 'object' ? search.placeholder : undefined;
   const emptyMessage =
     typeof search === 'object' ? search.emptyMessage : 'No options found.';
+  const listboxId = React.useId();
+  const { items, setOpen, single, toggleValue } =
+    useMultiSelectContext('MultiSelectContent');
+  const [searchValue, setSearchValue] = React.useState('');
+  const [activeValue, setActiveValue] = React.useState<string | undefined>();
+  const visibleItems = React.useMemo(
+    () => getVisibleItems(items, searchValue),
+    [items, searchValue]
+  );
+  const enabledVisibleItems = React.useMemo(
+    () => getEnabledItems(visibleItems),
+    [visibleItems]
+  );
+  const activeValueForRender = enabledVisibleItems.some(
+    ([itemValue]) => itemValue === activeValue
+  )
+    ? activeValue
+    : enabledVisibleItems[0]?.[0];
+  const activeId = activeValueForRender
+    ? getMultiSelectItemDomId(listboxId, activeValueForRender)
+    : undefined;
+
+  const moveActiveItem = React.useCallback(
+    (direction: 1 | -1) => {
+      if (enabledVisibleItems.length === 0) {
+        setActiveValue(undefined);
+        return;
+      }
+
+      const activeIndex = enabledVisibleItems.findIndex(
+        ([itemValue]) => itemValue === activeValueForRender
+      );
+      const fallbackIndex =
+        direction === 1 ? 0 : enabledVisibleItems.length - 1;
+      const nextIndex =
+        activeIndex === -1
+          ? fallbackIndex
+          : (activeIndex + direction + enabledVisibleItems.length) %
+            enabledVisibleItems.length;
+
+      setActiveValue(enabledVisibleItems[nextIndex]?.[0]);
+    },
+    [activeValueForRender, enabledVisibleItems]
+  );
+
+  const handleSearchChange = React.useCallback(
+    (event: React.ChangeEvent<HTMLInputElement>) => {
+      const nextSearchValue = event.currentTarget.value;
+      const nextEnabledItems = getEnabledItems(
+        getVisibleItems(items, nextSearchValue)
+      );
+
+      setSearchValue(nextSearchValue);
+      setActiveValue(nextEnabledItems[0]?.[0]);
+    },
+    [items]
+  );
+
+  const handleListKeyDown = React.useCallback(
+    (event: React.KeyboardEvent<HTMLElement>) => {
+      if (event.defaultPrevented) return;
+
+      if (event.key === 'ArrowDown') {
+        event.preventDefault();
+        moveActiveItem(1);
+      } else if (event.key === 'ArrowUp') {
+        event.preventDefault();
+        moveActiveItem(-1);
+      } else if (event.key === 'Home') {
+        event.preventDefault();
+        setActiveValue(enabledVisibleItems[0]?.[0]);
+      } else if (event.key === 'End') {
+        event.preventDefault();
+        setActiveValue(
+          enabledVisibleItems[enabledVisibleItems.length - 1]?.[0]
+        );
+      } else if (event.key === 'Enter' || event.key === ' ') {
+        event.preventDefault();
+        if (activeValueForRender) toggleValue(activeValueForRender);
+      } else if (event.key === 'Escape') {
+        event.preventDefault();
+        setOpen(false);
+      }
+    },
+    [
+      activeValueForRender,
+      enabledVisibleItems,
+      moveActiveItem,
+      setOpen,
+      toggleValue,
+    ]
+  );
+  const contentContextValue = React.useMemo<MultiSelectContentContextValue>(
+    () => ({
+      activeValue: activeValueForRender,
+      listboxId,
+      searchValue: normalizeSearchText(searchValue),
+      setActiveValue,
+    }),
+    [activeValueForRender, listboxId, searchValue]
+  );
 
   return (
     <>
@@ -682,26 +937,57 @@ function MultiSelectContent({
         )}
         {...props}
       >
-        <Command label={searchPlaceholder ?? 'Multi-select options'}>
+        <div
+          data-slot="multi-select-command"
+          className="nx:flex nx:min-h-0 nx:flex-col"
+        >
           {canSearch ? (
-            <CommandInput
-              data-slot="multi-select-search"
-              placeholder={searchPlaceholder}
-            />
+            <div
+              data-slot="multi-select-search-wrapper"
+              className="nx:flex nx:h-10 nx:items-center nx:gap-2 nx:border-border-default nx:border-b nx:px-3"
+            >
+              <IconSearch
+                aria-hidden="true"
+                className="nx:size-4 nx:shrink-0 nx:text-muted-foreground"
+              />
+              <input
+                data-slot="multi-select-search"
+                aria-activedescendant={activeId}
+                aria-controls={listboxId}
+                aria-label={searchPlaceholder ?? 'Search options'}
+                autoComplete="off"
+                className="nx:min-w-0 nx:flex-1 nx:bg-transparent nx:typography-body-default nx:outline-none nx:placeholder:text-muted-foreground nx:disabled:cursor-not-allowed nx:disabled:opacity-50"
+                placeholder={searchPlaceholder}
+                value={searchValue}
+                onChange={handleSearchChange}
+                onKeyDown={handleListKeyDown}
+              />
+            </div>
           ) : null}
-          <CommandList data-slot="multi-select-list">
-            {canSearch ? (
-              <CommandEmpty
+          <div
+            id={listboxId}
+            data-slot="multi-select-list"
+            role="listbox"
+            aria-label={ariaLabel ?? 'Multi-select options'}
+            aria-multiselectable={single ? undefined : true}
+            tabIndex={canSearch ? -1 : 0}
+            className="nx:max-h-72 nx:overflow-y-auto nx:overflow-x-hidden nx:p-1 nx:scroll-py-2 nx:outline-none"
+            onKeyDown={handleListKeyDown}
+          >
+            {canSearch && visibleItems.length === 0 ? (
+              <div
                 data-slot="multi-select-empty"
-                role="option"
-                aria-disabled="true"
+                className="nx:px-3 nx:py-6 nx:text-center nx:typography-body-default nx:text-muted-foreground"
               >
                 {emptyMessage}
-              </CommandEmpty>
-            ) : null}
-            {children}
-          </CommandList>
-        </Command>
+              </div>
+            ) : (
+              <MultiSelectContentContext.Provider value={contentContextValue}>
+                {children}
+              </MultiSelectContentContext.Provider>
+            )}
+          </div>
+        </div>
       </PopoverContent>
     </>
   );
@@ -712,27 +998,47 @@ function MultiSelectContent({
  *
  * Props for a group of related MultiSelect items.
  */
-interface MultiSelectGroupProps extends React.ComponentProps<
-  typeof CommandGroup
-> {}
+interface MultiSelectGroupProps extends React.ComponentProps<'div'> {
+  /**
+   * Optional label for this group of options.
+   */
+  heading?: React.ReactNode;
+}
 
 /**
  * MultiSelectGroup
  *
  * Groups related MultiSelect items. Items should be wrapped in a group for
- * consistent Command list spacing.
+ * consistent list spacing.
  */
-function MultiSelectGroup({ className, ...props }: MultiSelectGroupProps) {
+function MultiSelectGroup({
+  className,
+  heading,
+  children,
+  ...props
+}: MultiSelectGroupProps) {
   const registrationOnly = React.useContext(MultiSelectRegistrationContext);
 
-  if (registrationOnly) return <>{props.children}</>;
+  if (registrationOnly) return <>{children}</>;
 
   return (
-    <CommandGroup
+    <div
       data-slot="multi-select-group"
+      role={heading ? 'group' : undefined}
+      aria-label={typeof heading === 'string' ? heading : undefined}
       className={cn('nx:p-1', className)}
       {...props}
-    />
+    >
+      {heading ? (
+        <div
+          data-slot="multi-select-group-label"
+          className="nx:px-2 nx:py-1.5 nx:typography-label-small nx:text-muted-foreground"
+        >
+          {heading}
+        </div>
+      ) : null}
+      {children}
+    </div>
   );
 }
 
@@ -741,9 +1047,7 @@ function MultiSelectGroup({ className, ...props }: MultiSelectGroupProps) {
  *
  * Props for the decorative separator between groups.
  */
-interface MultiSelectSeparatorProps extends React.ComponentProps<
-  typeof CommandSeparator
-> {}
+interface MultiSelectSeparatorProps extends React.ComponentProps<'div'> {}
 
 /**
  * MultiSelectSeparator
@@ -759,9 +1063,10 @@ function MultiSelectSeparator({
   if (registrationOnly) return null;
 
   return (
-    <CommandSeparator
+    <div
       data-slot="multi-select-separator"
-      className={className}
+      aria-hidden="true"
+      className={cn('nx:-mx-1 nx:my-1 nx:h-px nx:bg-border-default', className)}
       {...props}
     />
   );
@@ -773,8 +1078,8 @@ function MultiSelectSeparator({
  * Props for a selectable MultiSelect option.
  */
 interface MultiSelectItemProps extends Omit<
-  React.ComponentProps<typeof CommandItem>,
-  'value' | 'onSelect'
+  React.ComponentProps<'div'>,
+  'onSelect'
 > {
   /**
    * Submitted value for this option.
@@ -785,6 +1090,14 @@ interface MultiSelectItemProps extends Omit<
    */
   badgeLabel?: React.ReactNode;
   /**
+   * Additional search terms for this option.
+   */
+  keywords?: readonly string[];
+  /**
+   * Whether this option can be selected.
+   */
+  disabled?: boolean;
+  /**
    * Called after the item is selected.
    */
   onSelect?: (value: string) => void;
@@ -793,7 +1106,7 @@ interface MultiSelectItemProps extends Omit<
 /**
  * MultiSelectItem
  *
- * Selectable Command item with a persistent check indicator.
+ * Selectable listbox item with a persistent check indicator.
  */
 function MultiSelectItem({
   value,
@@ -803,33 +1116,94 @@ function MultiSelectItem({
   onSelect,
   disabled,
   keywords,
+  onKeyDown,
+  onPointerDown,
+  onPointerMove,
   ...props
 }: MultiSelectItemProps) {
   const { selectedValueSet, toggleValue, onItemAdded } =
     useMultiSelectContext('MultiSelectItem');
   const registrationOnly = React.useContext(MultiSelectRegistrationContext);
+  const contentContext = React.useContext(MultiSelectContentContext);
   const isSelected = selectedValueSet.has(value);
-  const textLabel = typeof children === 'string' ? children : undefined;
+  const searchText = getMultiSelectSearchText({
+    value,
+    children,
+    badgeLabel,
+    keywords,
+  });
+  const isHighlighted = contentContext?.activeValue === value;
+  const isVisible =
+    !contentContext?.searchValue ||
+    searchText.includes(contentContext.searchValue);
 
   React.useEffect(() => {
-    onItemAdded(value, badgeLabel ?? children);
-  }, [badgeLabel, children, onItemAdded, value]);
+    onItemAdded(value, {
+      label: badgeLabel ?? children,
+      searchText,
+      disabled,
+    });
+  }, [badgeLabel, children, disabled, onItemAdded, searchText, value]);
 
   if (registrationOnly) return null;
+  if (!isVisible) return null;
+
+  const handleSelect = () => {
+    if (disabled) return;
+
+    onSelect?.(value);
+    toggleValue(value);
+  };
+
+  const handleItemKeyDown = (event: React.KeyboardEvent<HTMLDivElement>) => {
+    onKeyDown?.(event);
+    if (event.defaultPrevented) return;
+
+    if (event.key === 'Enter' || event.key === ' ') {
+      event.preventDefault();
+      handleSelect();
+    }
+  };
+
+  const handleItemPointerDown = (event: React.PointerEvent<HTMLDivElement>) => {
+    onPointerDown?.(event);
+    if (event.defaultPrevented) return;
+
+    event.preventDefault();
+    handleSelect();
+  };
+
+  const handleItemPointerMove = (event: React.PointerEvent<HTMLDivElement>) => {
+    onPointerMove?.(event);
+    if (!disabled) contentContext?.setActiveValue(value);
+  };
 
   return (
-    <CommandItem
+    <div
+      id={
+        contentContext
+          ? getMultiSelectItemDomId(contentContext.listboxId, value)
+          : undefined
+      }
       data-slot="multi-select-item"
       data-selected={isSelected ? 'true' : undefined}
+      data-highlighted={isHighlighted ? 'true' : undefined}
+      data-disabled={disabled ? 'true' : undefined}
       aria-selected={isSelected}
-      value={value}
-      disabled={disabled}
-      keywords={keywords ?? (textLabel ? [textLabel] : undefined)}
-      className={cn('nx:data-[selected=true]:bg-popover-hover', className)}
-      onSelect={(selectedValue) => {
-        onSelect?.(selectedValue);
-        if (!disabled) toggleValue(value);
-      }}
+      aria-disabled={disabled || undefined}
+      role="option"
+      tabIndex={-1}
+      className={cn(
+        'nx:relative nx:flex nx:cursor-default nx:select-none nx:items-center nx:rounded-sm nx:typography-body-default nx:outline-none',
+        'nx:gap-3 nx:px-3 nx:py-2.5',
+        'nx:data-[highlighted=true]:bg-popover-hover nx:data-[highlighted=true]:text-popover-foreground',
+        'nx:data-[disabled=true]:pointer-events-none nx:data-[disabled=true]:text-disabled-foreground',
+        'nx:[&_svg]:pointer-events-none nx:[&_svg]:size-4 nx:[&_svg]:shrink-0',
+        className
+      )}
+      onKeyDown={handleItemKeyDown}
+      onPointerDown={handleItemPointerDown}
+      onPointerMove={handleItemPointerMove}
       {...props}
     >
       <span
@@ -854,7 +1228,7 @@ function MultiSelectItem({
       >
         {children}
       </span>
-    </CommandItem>
+    </div>
   );
 }
 

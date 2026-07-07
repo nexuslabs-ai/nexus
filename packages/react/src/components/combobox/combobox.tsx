@@ -8,6 +8,7 @@ import {
   findSelectionOption,
   flattenSelectionOptions,
   getFirstEnabledValue,
+  getLastEnabledValue,
   getNextEnabledValue,
   getSelectionOptionDomId,
   normalizeSelectionGroups,
@@ -73,9 +74,14 @@ interface ComboboxProps extends Omit<
    */
   id?: string;
   /**
-   * Options rendered in the popup. Pass grouped entries to create list sections.
+   * Options rendered in the popup. Pass grouped entries to create list sections,
+   * or use `ComboboxItem` / `ComboboxGroup` children for a compositional API.
    */
-  options: readonly SelectionOptionInput[];
+  options?: readonly SelectionOptionInput[];
+  /**
+   * Optional compositional option API.
+   */
+  children?: React.ReactNode;
   /**
    * Controlled selected value. An empty string represents no selection.
    */
@@ -135,7 +141,7 @@ interface ComboboxProps extends Omit<
    */
   name?: string;
   /**
-   * Whether the hidden form input is required.
+   * Whether the field is required.
    */
   required?: boolean;
   /**
@@ -183,6 +189,140 @@ function useControllableState<T>({
 }
 
 /**
+ * ComboboxItemProps
+ *
+ * Props for declaring an option through the compositional Combobox API.
+ */
+interface ComboboxItemProps {
+  /**
+   * Stable submitted value.
+   */
+  value: string;
+  /**
+   * Human-readable option label.
+   */
+  children: React.ReactNode;
+  /**
+   * Optional secondary copy rendered below the label.
+   */
+  description?: React.ReactNode;
+  /**
+   * Whether this option can be selected.
+   */
+  disabled?: boolean;
+}
+
+/**
+ * ComboboxGroupProps
+ *
+ * Props for declaring grouped options through the compositional Combobox API.
+ */
+interface ComboboxGroupProps {
+  /**
+   * Group label announced by the listbox.
+   */
+  label?: string;
+  /**
+   * Options in the group.
+   */
+  children: React.ReactNode;
+}
+
+function getNodeText(node: React.ReactNode): string {
+  return React.Children.toArray(node)
+    .map((child) => {
+      if (typeof child === 'string' || typeof child === 'number') {
+        return String(child);
+      }
+
+      if (React.isValidElement(child)) {
+        return getNodeText(
+          (child.props as { children?: React.ReactNode }).children
+        );
+      }
+
+      return '';
+    })
+    .join('');
+}
+
+function collectComboboxItems(children: React.ReactNode): SelectionOption[] {
+  const items: SelectionOption[] = [];
+
+  React.Children.forEach(children, (child) => {
+    if (!React.isValidElement(child)) return;
+
+    if (child.type === ComboboxItem) {
+      const itemProps = child.props as ComboboxItemProps;
+      items.push({
+        value: itemProps.value,
+        label: getNodeText(itemProps.children) || itemProps.value,
+        description: itemProps.description,
+        disabled: itemProps.disabled,
+      });
+      return;
+    }
+
+    const childProps = child.props as { children?: React.ReactNode };
+    if (childProps.children)
+      items.push(...collectComboboxItems(childProps.children));
+  });
+
+  return items;
+}
+
+function collectComboboxOptions(
+  children: React.ReactNode
+): SelectionOptionInput[] {
+  const options: SelectionOptionInput[] = [];
+  let ungroupedOptions: SelectionOption[] = [];
+
+  const flushUngroupedOptions = () => {
+    if (ungroupedOptions.length === 0) return;
+
+    options.push(...ungroupedOptions);
+    ungroupedOptions = [];
+  };
+
+  React.Children.forEach(children, (child) => {
+    if (!React.isValidElement(child)) return;
+
+    if (child.type === ComboboxItem) {
+      const itemProps = child.props as ComboboxItemProps;
+      ungroupedOptions.push({
+        value: itemProps.value,
+        label: getNodeText(itemProps.children) || itemProps.value,
+        description: itemProps.description,
+        disabled: itemProps.disabled,
+      });
+      return;
+    }
+
+    if (child.type === ComboboxGroup) {
+      const groupProps = child.props as ComboboxGroupProps;
+      flushUngroupedOptions();
+      options.push({
+        label: groupProps.label ?? '',
+        options: collectComboboxItems(groupProps.children),
+      });
+      return;
+    }
+
+    const childProps = child.props as { children?: React.ReactNode };
+    if (childProps.children) {
+      const nestedOptions = collectComboboxOptions(childProps.children);
+      if (nestedOptions.length > 0) {
+        flushUngroupedOptions();
+        options.push(...nestedOptions);
+      }
+    }
+  });
+
+  flushUngroupedOptions();
+  return options;
+}
+
+/**
  * Combobox
  *
  * Editable single-value selection field. It uses Radix Popover for the floating
@@ -203,6 +343,7 @@ function Combobox({
   id,
   className,
   options,
+  children,
   value: valueProp,
   defaultValue = '',
   onValueChange,
@@ -235,9 +376,13 @@ function Combobox({
   const popupId = `${generatedId}-popup`;
   const listboxId = `${generatedId}-listbox`;
   const rootRef = React.useRef<HTMLDivElement>(null);
+  const optionInputs = React.useMemo(
+    () => options ?? collectComboboxOptions(children),
+    [children, options]
+  );
   const groups = React.useMemo(
-    () => normalizeSelectionGroups(options),
-    [options]
+    () => normalizeSelectionGroups(optionInputs),
+    [optionInputs]
   );
   const [value, setValue] = useControllableState({
     prop: valueProp,
@@ -366,9 +511,15 @@ function Combobox({
         event.preventDefault();
         if (!open) setOpenState(true);
         moveActiveOption(-1);
-      } else if (event.key === 'Enter' && open && activeValue) {
+      } else if (event.key === 'Home' && open) {
         event.preventDefault();
-        selectActiveOption();
+        setActiveValue(getFirstEnabledValue(visibleGroups));
+      } else if (event.key === 'End' && open) {
+        event.preventDefault();
+        setActiveValue(getLastEnabledValue(visibleGroups));
+      } else if (event.key === 'Enter' && open) {
+        event.preventDefault();
+        if (activeValue) selectActiveOption();
       } else if (event.key === 'Escape' && open) {
         event.preventDefault();
         setOpen(false);
@@ -385,6 +536,7 @@ function Combobox({
       selectActiveOption,
       setOpen,
       setOpenState,
+      visibleGroups,
     ]
   );
 
@@ -526,13 +678,7 @@ function Combobox({
           </InputGroup>
         </PopoverPrimitive.Anchor>
         {name ? (
-          <input
-            type="hidden"
-            name={name}
-            value={value}
-            required={required}
-            disabled={disabled}
-          />
+          <input type="hidden" name={name} value={value} disabled={disabled} />
         ) : null}
       </div>
       <PopoverPrimitive.Portal>
@@ -669,8 +815,30 @@ function ComboboxOptionGroup({
   );
 }
 
+/**
+ * ComboboxItem
+ *
+ * Declarative option used as a child of `Combobox` or `ComboboxGroup`.
+ */
+function ComboboxItem(_props: ComboboxItemProps) {
+  return null;
+}
+
+/**
+ * ComboboxGroup
+ *
+ * Declarative option group used as a child of `Combobox`.
+ */
+function ComboboxGroup(_props: ComboboxGroupProps) {
+  return null;
+}
+
 export {
   Combobox,
+  ComboboxGroup,
+  type ComboboxGroupProps,
+  ComboboxItem,
+  type ComboboxItemProps,
   type SelectionOption as ComboboxOption,
   type SelectionOptionGroup as ComboboxOptionGroup,
   type SelectionOptionInput as ComboboxOptionInput,

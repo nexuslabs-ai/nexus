@@ -77,6 +77,9 @@ function FrameworkMultiSelect({
   valueProps,
   contentProps,
   single,
+  disabled,
+  required,
+  ariaInvalid,
 }: {
   label: string;
   placeholder?: string;
@@ -90,6 +93,9 @@ function FrameworkMultiSelect({
     'children'
   >;
   single?: boolean;
+  disabled?: boolean;
+  required?: boolean;
+  ariaInvalid?: React.AriaAttributes['aria-invalid'];
 }) {
   return (
     <MultiSelect
@@ -97,6 +103,9 @@ function FrameworkMultiSelect({
       values={values}
       onValuesChange={onValuesChange}
       single={single}
+      disabled={disabled}
+      required={required}
+      aria-invalid={ariaInvalid}
     >
       <MultiSelectTrigger aria-label={label} {...triggerProps}>
         <MultiSelectValue placeholder={placeholder} {...valueProps} />
@@ -240,7 +249,7 @@ export const Disabled: Story = {
   render: () => (
     <FrameworkMultiSelect
       label="Disabled multi select"
-      triggerProps={{ disabled: true }}
+      disabled
       placeholder="Disabled"
     />
   ),
@@ -271,10 +280,9 @@ export const InvalidField: Story = {
     <FieldGroup>
       <Field data-invalid>
         <FieldLabel htmlFor="frameworks-invalid">Frameworks</FieldLabel>
-        <MultiSelect>
+        <MultiSelect required aria-invalid>
           <MultiSelectTrigger
             id="frameworks-invalid"
-            aria-invalid
             aria-describedby="frameworks-invalid-description"
           >
             <MultiSelectValue placeholder="Select frameworks..." />
@@ -294,6 +302,7 @@ export const InvalidField: Story = {
     const trigger = canvas.getByRole('combobox', { name: 'Frameworks' });
 
     await expect(trigger).toHaveAttribute('aria-invalid', 'true');
+    await expect(trigger).toHaveAttribute('aria-required', 'true');
   },
 };
 
@@ -390,6 +399,35 @@ export const NarrowWidth: Story = {
   },
 };
 
+export const AllVariants: Story = {
+  render: () => (
+    <div className="nx:grid nx:gap-4">
+      {(['default', 'borderless'] as const).map((variant) => (
+        <div key={variant} className="nx:grid nx:gap-2">
+          <FrameworkMultiSelect
+            label={`${variant} small frameworks`}
+            defaultValues={['next']}
+            triggerProps={{ size: 'sm', variant }}
+            placeholder={`${variant} small`}
+          />
+          <FrameworkMultiSelect
+            label={`${variant} default frameworks`}
+            defaultValues={['next']}
+            triggerProps={{ size: 'default', variant }}
+            placeholder={`${variant} default`}
+          />
+          <FrameworkMultiSelect
+            label={`${variant} large frameworks`}
+            defaultValues={['next']}
+            triggerProps={{ size: 'lg', variant }}
+            placeholder={`${variant} large`}
+          />
+        </div>
+      ))}
+    </div>
+  ),
+};
+
 export const SingleSelect: Story = {
   render: () => (
     <FrameworkMultiSelect
@@ -430,6 +468,9 @@ export const ClickInteraction: Story = {
     await expect(
       document.body.querySelector('[data-slot="multi-select-content"]')
     ).toHaveAttribute('data-state', 'open');
+    await expect(
+      await within(document.body).findByRole('listbox')
+    ).toHaveAttribute('aria-multiselectable', 'true');
 
     await userEvent.click(
       await within(document.body).findByRole('option', { name: 'Next.js' })
@@ -480,6 +521,10 @@ export const RemoveSelection: Story = {
     const trigger = canvas.getByRole('combobox', { name: 'Remove frameworks' });
 
     await expect(within(trigger).getByText('Next.js')).toBeVisible();
+    trigger.focus();
+    await userEvent.keyboard('{Backspace}');
+    await expect(within(trigger).queryByText('Astro')).toBeNull();
+
     await userEvent.click(within(trigger).getByText('Next.js'));
     await expect(within(trigger).queryByText('Next.js')).toBeNull();
   },
