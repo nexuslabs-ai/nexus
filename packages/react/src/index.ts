@@ -43,6 +43,7 @@ export * from './components/item';
 export * from './components/kbd';
 export * from './components/label';
 export * from './components/menubar';
+export * from './components/multi-select';
 export * from './components/native-select';
 export * from './components/navigation-menu';
 export * from './components/pagination';
