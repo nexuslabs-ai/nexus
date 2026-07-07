@@ -247,7 +247,7 @@ describe('utils', () => {
         /\[data-slot='combobox-control'\]\[data-variant='default'\]/
       );
       expect(css).toMatch(
-        /\[data-slot='multi-select-control'\]\[data-variant='default'\]/
+        /\[data-slot='multi-select-trigger'\]\[data-variant='default'\]/
       );
       expect(css).toMatch(
         /box-shadow:\s*inset 0 0 0 1px var\(--color-border-default\);/
@@ -268,7 +268,7 @@ describe('utils', () => {
         /\[data-slot='combobox-control'\]\[class~='nx:has-\[\[data-slot=input-group-control\]:focus-visible\]:outline-focus-default'\]:has\([\s\S]*?\[data-slot='input-group-control'\]:focus-visible[\s\S]*?\)/
       );
       expect(css).toMatch(
-        /\[data-slot='multi-select-control'\]\[class~='nx:focus-within:outline-focus-default'\]:focus-within/
+        /\[data-slot='multi-select-trigger'\]\[class~='nx:focus-visible:outline-focus-default'\]:focus-visible/
       );
       expect(css).toMatch(
         /\[class~='nx:data-\[active=true\]:outline-focus-default'\]\[data-active='true'\]/

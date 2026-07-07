@@ -1,63 +1,67 @@
 import * as React from 'react';
 
-import * as PopoverPrimitive from '@radix-ui/react-popover';
 import { cva, type VariantProps } from 'class-variance-authority';
 
-import { IconCheck, IconChevronDown, IconSearch, IconX } from '../../lib/icons';
-import {
-  filterSelectionGroups,
-  findSelectionOption,
-  flattenSelectionOptions,
-  getFirstEnabledValue,
-  getNextEnabledValue,
-  getSelectionOptionDomId,
-  includesSelectionValue,
-  normalizeSelectionGroups,
-  removeSelectionValue,
-  type SelectionOption,
-  type SelectionOptionGroup,
-  type SelectionOptionInput,
-  toggleSelectionValue,
+import { IconCheck, IconChevronDown, IconX } from '../../lib/icons';
+import type {
+  SelectionOption,
+  SelectionOptionGroup,
+  SelectionOptionInput,
 } from '../../lib/selection';
 import { cn } from '../../lib/utils';
 import {
-  overlayFloatingTransitionClassName,
-  popoverSurfaceClassName,
-} from '../overlay-layout/overlay-layout';
+  Command,
+  CommandEmpty,
+  CommandGroup,
+  CommandInput,
+  CommandItem,
+  CommandList,
+  CommandSeparator,
+} from '../command';
+import {
+  Popover,
+  PopoverContent,
+  type PopoverContentProps,
+  PopoverTrigger,
+} from '../popover';
 
-const multiSelectControlVariants = cva(
+const multiSelectTriggerVariants = cva(
   [
-    'nx:group/multi-select-control',
+    'nx:group/multi-select-trigger',
     'nx:flex',
+    'nx:box-border',
     'nx:w-full',
     'nx:min-w-0',
-    'nx:flex-wrap',
     'nx:items-center',
+    'nx:justify-between',
+    'nx:gap-2',
+    'nx:overflow-hidden',
     'nx:rounded-md',
     'nx:border-0',
     'nx:transition-colors',
     'nx:outline-none',
-    'nx:focus-within:outline-2',
-    'nx:focus-within:outline-focus-default',
-    'nx:focus-within:outline-offset-(--focus-offset)',
-    'nx:has-[[aria-invalid=true]:focus-visible]:outline-focus-error',
-    'nx:data-[invalid=true]:border-border-error',
-    'nx:data-[disabled=true]:cursor-not-allowed',
-    'nx:data-[disabled=true]:bg-disabled',
-    'nx:data-[disabled=true]:text-disabled-foreground',
+    'nx:focus-visible:outline-2',
+    'nx:focus-visible:outline-focus-default',
+    'nx:focus-visible:outline-offset-(--focus-offset)',
+    'nx:aria-invalid:border-border-error',
+    'nx:aria-invalid:focus-visible:outline-focus-error',
+    'nx:disabled:cursor-not-allowed',
+    'nx:disabled:bg-disabled',
+    'nx:disabled:text-disabled-foreground',
+    'nx:data-[placeholder=true]:text-muted-foreground',
   ],
   {
     variants: {
       size: {
-        sm: 'nx:min-h-8 nx:gap-1 nx:px-1.5 nx:py-1',
-        default: 'nx:min-h-10 nx:gap-1.5 nx:px-2 nx:py-1.5',
-        lg: 'nx:min-h-12 nx:gap-1.5 nx:px-2.5 nx:py-2',
+        sm: 'nx:min-h-8 nx:px-2 nx:py-1 nx:typography-body-small',
+        default: 'nx:min-h-10 nx:px-2.5 nx:py-1.5 nx:typography-body-default',
+        lg: 'nx:min-h-12 nx:px-3 nx:py-2 nx:typography-body-default',
       },
       variant: {
         default:
-          'nx:border-border-default nx:bg-background nx:not-data-[disabled=true]:hover:bg-background-hover nx:data-[disabled=true]:border-border-disabled',
+          'nx:border-border-default nx:bg-background nx:enabled:hover:bg-background-hover nx:disabled:border-border-disabled',
         borderless:
-          'nx:border-transparent nx:bg-control-background nx:not-data-[disabled=true]:hover:bg-control-background-hover',
+          'nx:border-transparent nx:bg-control-background nx:enabled:hover:bg-control-background-hover',
       },
     },
     defaultVariants: {
@@ -67,235 +71,58 @@ const multiSelectControlVariants = cva(
   }
 );
 
-const multiSelectInputVariants = cva(
-  [
-    'nx:flex-1',
-    'nx:bg-transparent',
-    'nx:text-foreground',
-    'nx:outline-none',
-    'nx:placeholder:text-muted-foreground',
-    'nx:disabled:cursor-not-allowed',
-    'nx:disabled:text-disabled-foreground',
-    'nx:disabled:placeholder:text-disabled-foreground',
-  ],
-  {
-    variants: {
-      size: {
-        sm: 'nx:min-w-20 nx:py-0.5 nx:typography-body-small',
-        default: 'nx:min-w-28 nx:py-1 nx:typography-body-default',
-        lg: 'nx:min-w-32 nx:py-1.5 nx:typography-body-default',
-      },
-    },
-    defaultVariants: {
-      size: 'default',
-    },
-  }
-);
-
-const multiSelectChipVariants = cva(
-  [
-    'nx:inline-flex',
-    'nx:min-w-0',
-    'nx:items-center',
-    'nx:rounded-sm',
-    'nx:bg-secondary-subtle',
-    'nx:text-secondary-subtle-foreground',
-  ],
-  {
-    variants: {
-      size: {
-        sm: 'nx:max-w-36 nx:gap-1 nx:px-1.5 nx:py-0.5 nx:typography-label-small',
-        default:
-          'nx:max-w-40 nx:gap-1 nx:px-2 nx:py-1 nx:typography-label-default',
-        lg: 'nx:max-w-48 nx:gap-1.5 nx:px-2.5 nx:py-1 nx:typography-label-default',
-      },
-    },
-    defaultVariants: {
-      size: 'default',
-    },
-  }
-);
-
-const multiSelectChipRemoveVariants = cva(
-  [
-    'nx:-mr-1',
-    'nx:inline-flex',
-    'nx:items-center',
-    'nx:justify-center',
-    'nx:rounded-sm',
-    'nx:text-muted-foreground',
-    'nx:hover:bg-background-hover',
-    'nx:hover:text-foreground',
-    'nx:focus-visible:outline-2',
-    'nx:focus-visible:outline-focus-default',
-    'nx:focus-visible:outline-offset-(--focus-offset)',
-    'nx:disabled:pointer-events-none',
-    'nx:disabled:text-disabled-foreground',
-  ],
-  {
-    variants: {
-      size: {
-        sm: 'nx:size-4 nx:[&>svg]:size-3',
-        default: 'nx:size-5 nx:[&>svg]:size-3.5',
-        lg: 'nx:size-5 nx:[&>svg]:size-3.5',
-      },
-    },
-    defaultVariants: {
-      size: 'default',
-    },
-  }
-);
-
-const multiSelectInlineButtonVariants = cva(
-  [
-    'nx:inline-flex',
-    'nx:shrink-0',
-    'nx:items-center',
-    'nx:justify-center',
-    'nx:rounded-sm',
-    'nx:text-muted-foreground',
-    'nx:hover:bg-background-hover',
-    'nx:hover:text-foreground',
-    'nx:focus-visible:outline-2',
-    'nx:focus-visible:outline-focus-default',
-    'nx:focus-visible:outline-offset-(--focus-offset)',
-    'nx:disabled:pointer-events-none',
-    'nx:disabled:text-disabled-foreground',
-  ],
-  {
-    variants: {
-      size: {
-        sm: 'nx:size-6 nx:[&>svg]:size-4',
-        default: 'nx:size-6 nx:[&>svg]:size-4',
-        lg: 'nx:size-8 nx:[&>svg]:size-4',
-      },
-    },
-    defaultVariants: {
-      size: 'default',
-    },
-  }
-);
-
-const multiSelectContentClassName = [
-  'nx:z-popover',
-  'nx:max-h-80',
-  'nx:w-(--radix-popover-trigger-width)',
-  'nx:min-w-(--radix-popover-trigger-width)',
-  'nx:overflow-hidden',
-  'nx:p-1',
-  'nx:outline-none',
-  popoverSurfaceClassName,
-  overlayFloatingTransitionClassName,
-].join(' ');
-
-const multiSelectOptionClassName = [
-  'nx:group/multi-select-option',
-  'nx:relative',
-  'nx:flex',
-  'nx:w-full',
-  'nx:cursor-default',
-  'nx:select-none',
-  'nx:items-start',
-  'nx:gap-3',
+const multiSelectValueChipClassName = [
+  'nx:inline-flex',
+  'nx:min-w-0',
+  'nx:shrink-0',
+  'nx:items-center',
   'nx:rounded-sm',
-  'nx:px-3',
-  'nx:py-2.5',
-  'nx:typography-body-default',
-  'nx:outline-none',
-  'nx:data-[highlighted=true]:bg-popover-hover',
-  'nx:data-[highlighted=true]:text-popover-foreground',
-  'nx:data-[disabled=true]:pointer-events-none',
-  'nx:data-[disabled=true]:text-disabled-foreground',
+  'nx:bg-secondary-subtle',
+  'nx:text-secondary-subtle-foreground',
+  'nx:transition-colors',
+  'nx:group-data-[size=sm]/multi-select-trigger:max-w-36',
+  'nx:group-data-[size=sm]/multi-select-trigger:gap-1',
+  'nx:group-data-[size=sm]/multi-select-trigger:px-1.5',
+  'nx:group-data-[size=sm]/multi-select-trigger:py-0.5',
+  'nx:group-data-[size=sm]/multi-select-trigger:typography-label-small',
+  'nx:group-data-[size=default]/multi-select-trigger:max-w-40',
+  'nx:group-data-[size=default]/multi-select-trigger:gap-1',
+  'nx:group-data-[size=default]/multi-select-trigger:px-2',
+  'nx:group-data-[size=default]/multi-select-trigger:py-1',
+  'nx:group-data-[size=default]/multi-select-trigger:typography-label-default',
+  'nx:group-data-[size=lg]/multi-select-trigger:max-w-48',
+  'nx:group-data-[size=lg]/multi-select-trigger:gap-1.5',
+  'nx:group-data-[size=lg]/multi-select-trigger:px-2.5',
+  'nx:group-data-[size=lg]/multi-select-trigger:py-1',
+  'nx:group-data-[size=lg]/multi-select-trigger:typography-label-default',
 ].join(' ');
 
-/**
- * MultiSelectProps
- *
- * Props for a searchable multiple-value selection field.
- */
-interface MultiSelectProps
-  extends
-    Omit<
-      React.ComponentProps<'div'>,
-      'defaultValue' | 'id' | 'onChange' | 'onSelect'
-    >,
-    VariantProps<typeof multiSelectControlVariants> {
-  /**
-   * Input id used by labels and form libraries.
-   */
-  id?: string;
-  /**
-   * Options rendered in the popup. Pass grouped entries to create list sections.
-   */
-  options: readonly SelectionOptionInput[];
-  /**
-   * Controlled selected values.
-   */
-  value?: readonly string[];
-  /**
-   * Initial selected values for uncontrolled usage.
-   */
-  defaultValue?: readonly string[];
-  /**
-   * Called when selected values change.
-   */
-  onValueChange?: (value: string[]) => void;
-  /**
-   * Controlled popup state.
-   */
-  open?: boolean;
-  /**
-   * Initial popup state for uncontrolled usage.
-   */
-  defaultOpen?: boolean;
-  /**
-   * Called when the popup opens or closes.
-   */
-  onOpenChange?: (open: boolean) => void;
-  /**
-   * Placeholder shown when no values are selected and the search input is empty.
-   */
-  placeholder?: string;
-  /**
-   * Text rendered while async options are loading.
-   */
-  loadingText?: React.ReactNode;
-  /**
-   * Text rendered when filtering returns no options.
-   */
-  emptyText?: React.ReactNode;
-  /**
-   * Whether async options are loading.
-   */
-  loading?: boolean;
-  /**
-   * Whether the field ignores interaction and is omitted from tab order.
-   */
-  disabled?: boolean;
-  /**
-   * Whether the field can receive focus but ignores edits.
-   */
-  readOnly?: boolean;
-  /**
-   * Form field name. Each selected value is mirrored into a hidden input.
-   */
-  name?: string;
-  /**
-   * Whether at least one value is required.
-   */
-  required?: boolean;
-  /**
-   * Maximum number of chips shown before the rest collapse into a count.
-   *
-   * @default 3
-   */
-  maxVisibleValues?: number;
-  /**
-   * Highlight the first enabled option whenever the filter changes.
-   *
-   * @default true
-   */
-  autoHighlight?: boolean;
+type MultiSelectContextValue = {
+  open: boolean;
+  setOpen: (open: boolean) => void;
+  selectedValues: readonly string[];
+  selectedValueSet: Set<string>;
+  toggleValue: (value: string) => void;
+  items: Map<string, React.ReactNode>;
+  single: boolean;
+  disabled: boolean;
+  readOnly: boolean;
+  onItemAdded: (value: string, label: React.ReactNode) => void;
+};
+
+const MultiSelectContext = React.createContext<MultiSelectContextValue | null>(
+  null
+);
+const MultiSelectRegistrationContext = React.createContext(false);
+
+function useMultiSelectContext(component: string) {
+  const context = React.useContext(MultiSelectContext);
+
+  if (!context) {
+    throw new Error(`${component} must be used inside <MultiSelect>.`);
+  }
+
+  return context;
 }
 
 function useControllableArrayState({
@@ -349,531 +176,708 @@ function useControllableBooleanState({
 }
 
 /**
+ * MultiSelectProps
+ *
+ * Props for the WDS-style MultiSelect root. Prefer the compositional API:
+ * render `MultiSelectTrigger`, `MultiSelectValue`, `MultiSelectContent`,
+ * `MultiSelectGroup`, and `MultiSelectItem` as children.
+ */
+interface MultiSelectProps {
+  /**
+   * MultiSelect subcomponents.
+   */
+  children: React.ReactNode;
+  /**
+   * Controlled selected values.
+   */
+  values?: readonly string[];
+  /**
+   * Controlled selected values. Alias kept for parity with Combobox.
+   */
+  value?: readonly string[];
+  /**
+   * Initial selected values for uncontrolled usage.
+   */
+  defaultValues?: readonly string[];
+  /**
+   * Initial selected values for uncontrolled usage. Alias kept for parity with
+   * Combobox.
+   */
+  defaultValue?: readonly string[];
+  /**
+   * Called when selected values change.
+   */
+  onValuesChange?: (values: string[]) => void;
+  /**
+   * Called when selected values change. Alias kept for parity with Combobox.
+   */
+  onValueChange?: (values: string[]) => void;
+  /**
+   * Controlled popup state.
+   */
+  open?: boolean;
+  /**
+   * Initial popup state for uncontrolled usage.
+   */
+  defaultOpen?: boolean;
+  /**
+   * Called when the popup opens or closes.
+   */
+  onOpenChange?: (open: boolean) => void;
+  /**
+   * Whether selecting an item should replace the current value and close the
+   * popup, matching single-select behavior.
+   * @default false
+   */
+  single?: boolean;
+  /**
+   * Disables value changes and trigger interaction for the whole component.
+   */
+  disabled?: boolean;
+  /**
+   * Allows focus and reading selected values while preventing edits.
+   */
+  readOnly?: boolean;
+  /**
+   * Form field name. Each selected value is mirrored into a hidden input.
+   */
+  name?: string;
+}
+
+/**
  * MultiSelect
  *
- * Searchable multi-value field with removable chips and listbox-style option
- * toggling. It keeps selection and focus distinct so keyboard users can move
- * through options without replacing the current selection.
+ * Searchable multi-value selection primitive adapted from the WDS shadcn
+ * registry pattern. It composes a Popover trigger/content with Command-powered
+ * filtering and chip-style selected values.
+ *
+ * @example
+ * ```tsx
+ * <MultiSelect defaultValues={['next']}>
+ *   <MultiSelectTrigger aria-label="Frameworks">
+ *     <MultiSelectValue placeholder="Select frameworks..." />
+ *   </MultiSelectTrigger>
+ *   <MultiSelectContent>
+ *     <MultiSelectGroup>
+ *       <MultiSelectItem value="next">Next.js</MultiSelectItem>
+ *       <MultiSelectItem value="remix">Remix</MultiSelectItem>
+ *     </MultiSelectGroup>
+ *   </MultiSelectContent>
+ * </MultiSelect>
+ * ```
  */
 function MultiSelect({
-  id,
-  className,
-  options,
-  value: valueProp,
-  defaultValue = [],
+  children,
+  values,
+  value,
+  defaultValues,
+  defaultValue,
+  onValuesChange,
   onValueChange,
   open: openProp,
   defaultOpen = false,
   onOpenChange,
-  placeholder = 'Select options',
-  loadingText = 'Loading options...',
-  emptyText = 'No options found.',
-  loading = false,
+  single = false,
   disabled = false,
   readOnly = false,
   name,
-  required,
-  maxVisibleValues = 3,
-  autoHighlight = true,
-  size = 'default',
-  variant,
-  onKeyDown,
-  onFocus,
-  onBlur,
-  'aria-label': ariaLabel,
-  'aria-labelledby': ariaLabelledBy,
-  'aria-describedby': ariaDescribedBy,
-  'aria-invalid': ariaInvalid,
-  ...props
 }: MultiSelectProps) {
-  const generatedId = React.useId();
-  const inputId = id ?? `${generatedId}-input`;
-  const popupId = `${generatedId}-popup`;
-  const listboxId = `${generatedId}-listbox`;
-  const rootRef = React.useRef<HTMLDivElement>(null);
-  const inputRef = React.useRef<HTMLInputElement>(null);
-  const groups = React.useMemo(
-    () => normalizeSelectionGroups(options),
-    [options]
-  );
-  const [value, setValue] = useControllableArrayState({
-    prop: valueProp,
-    defaultProp: defaultValue,
-    onChange: onValueChange,
+  const [selectedValues, setSelectedValues] = useControllableArrayState({
+    prop: values ?? value,
+    defaultProp: defaultValues ?? defaultValue ?? [],
+    onChange: onValuesChange ?? onValueChange,
   });
-  const [open, setOpenState] = useControllableBooleanState({
+  const [open, setOpen] = useControllableBooleanState({
     prop: openProp,
     defaultProp: defaultOpen,
     onChange: onOpenChange,
   });
-  const [inputValue, setInputValue] = React.useState('');
-  const visibleGroups = React.useMemo(
-    () => filterSelectionGroups(groups, inputValue),
-    [groups, inputValue]
+  const selectedValueSet = React.useMemo(
+    () => new Set(selectedValues),
+    [selectedValues]
   );
-  const visibleOptions = React.useMemo(
-    () => flattenSelectionOptions(visibleGroups),
-    [visibleGroups]
-  );
-  const [activeValue, setActiveValue] = React.useState<string | undefined>(() =>
-    getFirstEnabledValue(visibleGroups)
-  );
-  const selectedOptions = value
-    .map((item) => findSelectionOption(groups, item))
-    .filter((option): option is SelectionOption => Boolean(option));
-  const visibleSelectedOptions = selectedOptions.slice(0, maxVisibleValues);
-  const overflowCount = Math.max(0, selectedOptions.length - maxVisibleValues);
-  const activeId = activeValue
-    ? getSelectionOptionDomId(listboxId, activeValue)
-    : undefined;
-  const hasListbox = !loading && visibleOptions.length > 0;
-  const interactionDisabled = disabled || readOnly;
-
-  const updateActiveValue = React.useCallback(
-    (nextGroups = visibleGroups) => {
-      const firstValue = getFirstEnabledValue(nextGroups);
-      setActiveValue(autoHighlight ? firstValue : undefined);
-    },
-    [autoHighlight, visibleGroups]
+  const [items, setItems] = React.useState<Map<string, React.ReactNode>>(
+    () => new Map()
   );
 
-  const setOpen = React.useCallback(
-    (nextOpen: boolean) => {
-      setOpenState(nextOpen);
-      if (!nextOpen) setInputValue('');
-    },
-    [setOpenState]
-  );
+  const toggleValue = React.useCallback(
+    (nextValue: string) => {
+      if (disabled || readOnly) return;
 
-  const handleInputChange = React.useCallback(
-    (event: React.ChangeEvent<HTMLInputElement>) => {
-      const nextInputValue = event.currentTarget.value;
-      const nextGroups = filterSelectionGroups(groups, nextInputValue);
+      const nextValues = single
+        ? selectedValueSet.has(nextValue)
+          ? []
+          : [nextValue]
+        : selectedValueSet.has(nextValue)
+          ? selectedValues.filter((item) => item !== nextValue)
+          : [...selectedValues, nextValue];
 
-      setInputValue(nextInputValue);
-      if (!interactionDisabled) setOpenState(true);
-      updateActiveValue(nextGroups);
-    },
-    [groups, interactionDisabled, setOpenState, updateActiveValue]
-  );
-
-  const toggleOption = React.useCallback(
-    (option: SelectionOption) => {
-      if (option.disabled || interactionDisabled) return;
-
-      setValue(toggleSelectionValue(value, option.value));
-      setInputValue('');
-      setOpenState(true);
-      updateActiveValue(groups);
+      setSelectedValues(nextValues);
+      if (single) setOpen(false);
     },
     [
-      groups,
-      interactionDisabled,
-      setOpenState,
-      setValue,
-      updateActiveValue,
-      value,
-    ]
-  );
-
-  const removeOption = React.useCallback(
-    (optionValue: string) => {
-      if (interactionDisabled) return;
-      setValue(removeSelectionValue(value, optionValue));
-    },
-    [interactionDisabled, setValue, value]
-  );
-
-  const clearValues = React.useCallback(() => {
-    if (interactionDisabled) return;
-    setValue([]);
-    setInputValue('');
-    setOpenState(true);
-    updateActiveValue(groups);
-  }, [groups, interactionDisabled, setOpenState, setValue, updateActiveValue]);
-
-  const toggleActiveOption = React.useCallback(() => {
-    const option = visibleOptions.find((item) => item.value === activeValue);
-    if (option) toggleOption(option);
-  }, [activeValue, toggleOption, visibleOptions]);
-
-  const moveActiveOption = React.useCallback(
-    (direction: 1 | -1) => {
-      const nextValue = getNextEnabledValue(
-        visibleGroups,
-        activeValue,
-        direction
-      );
-      setActiveValue(nextValue);
-    },
-    [activeValue, visibleGroups]
-  );
-
-  const removeLastValue = React.useCallback(() => {
-    if (value.length === 0 || inputValue !== '') return;
-    setValue(value.slice(0, -1));
-  }, [inputValue, setValue, value]);
-
-  const handleInputKeyDown = React.useCallback(
-    (event: React.KeyboardEvent<HTMLInputElement>) => {
-      onKeyDown?.(event);
-      if (event.defaultPrevented || interactionDisabled) return;
-
-      if (event.key === 'ArrowDown') {
-        event.preventDefault();
-        if (!open) setOpenState(true);
-        moveActiveOption(1);
-      } else if (event.key === 'ArrowUp') {
-        event.preventDefault();
-        if (!open) setOpenState(true);
-        moveActiveOption(-1);
-      } else if (event.key === 'Enter' && open && activeValue) {
-        event.preventDefault();
-        toggleActiveOption();
-      } else if (event.key === 'Backspace') {
-        removeLastValue();
-      } else if (event.key === 'Escape' && open) {
-        event.preventDefault();
-        setOpen(false);
-      } else if (event.key === 'Tab' && open) {
-        setOpen(false);
-      }
-    },
-    [
-      activeValue,
-      interactionDisabled,
-      moveActiveOption,
-      onKeyDown,
-      open,
-      removeLastValue,
+      disabled,
+      readOnly,
+      selectedValueSet,
+      selectedValues,
       setOpen,
-      setOpenState,
-      toggleActiveOption,
+      setSelectedValues,
+      single,
     ]
   );
 
-  const handleInputFocus = React.useCallback(
-    (event: React.FocusEvent<HTMLInputElement>) => {
-      onFocus?.(event);
-      if (!event.defaultPrevented && !interactionDisabled) {
-        setOpenState(true);
-        updateActiveValue();
-      }
+  const onItemAdded = React.useCallback(
+    (itemValue: string, label: React.ReactNode) => {
+      setItems((currentItems) => {
+        if (currentItems.get(itemValue) === label) return currentItems;
+
+        const nextItems = new Map(currentItems);
+        nextItems.set(itemValue, label);
+        return nextItems;
+      });
     },
-    [interactionDisabled, onFocus, setOpenState, updateActiveValue]
+    []
   );
 
-  const handleInputBlur = React.useCallback(
-    (event: React.FocusEvent<HTMLInputElement>) => {
-      onBlur?.(event);
-    },
-    [onBlur]
+  const contextValue = React.useMemo<MultiSelectContextValue>(
+    () => ({
+      open,
+      setOpen,
+      selectedValues,
+      selectedValueSet,
+      toggleValue,
+      items,
+      single,
+      disabled,
+      readOnly,
+      onItemAdded,
+    }),
+    [
+      disabled,
+      items,
+      onItemAdded,
+      open,
+      readOnly,
+      selectedValueSet,
+      selectedValues,
+      setOpen,
+      single,
+      toggleValue,
+    ]
   );
-
-  const handleControlPointerDown = React.useCallback(
-    (event: React.PointerEvent<HTMLDivElement>) => {
-      if (event.button !== 0 || interactionDisabled) return;
-
-      const target = event.target;
-      if (!(target instanceof Element)) return;
-      if (target.closest('button,input')) return;
-
-      event.preventDefault();
-      inputRef.current?.focus();
-      setOpenState(true);
-      updateActiveValue();
-    },
-    [interactionDisabled, setOpenState, updateActiveValue]
-  );
-
-  const handleContentInteractOutside = React.useCallback<
-    NonNullable<
-      React.ComponentProps<typeof PopoverPrimitive.Content>['onInteractOutside']
-    >
-  >((event) => {
-    const target = event.target;
-
-    if (target instanceof Node && rootRef.current?.contains(target)) {
-      event.preventDefault();
-    }
-  }, []);
-
-  React.useEffect(() => {
-    if (!activeId) return;
-    document.getElementById(activeId)?.scrollIntoView({ block: 'nearest' });
-  }, [activeId]);
 
   return (
-    <PopoverPrimitive.Root open={open} onOpenChange={setOpen}>
-      <div
-        data-slot="multi-select"
-        data-disabled={disabled ? 'true' : undefined}
-        data-readonly={readOnly ? 'true' : undefined}
-        data-empty={value.length === 0 ? 'true' : undefined}
-        data-size={size}
-        className={cn('nx:w-full', className)}
-        {...props}
-        ref={rootRef}
-      >
-        <PopoverPrimitive.Anchor asChild>
-          <div
-            data-slot="multi-select-control"
-            data-disabled={disabled ? 'true' : undefined}
-            data-invalid={ariaInvalid ? 'true' : undefined}
-            data-size={size}
-            data-variant={variant ?? 'default'}
-            className={cn(multiSelectControlVariants({ size, variant }))}
-            onPointerDown={handleControlPointerDown}
-          >
-            <IconSearch
-              data-slot="multi-select-search-icon"
-              aria-hidden="true"
-              className="nx:size-4 nx:shrink-0 nx:text-muted-foreground nx:group-data-[disabled=true]/multi-select-control:text-disabled-foreground"
-            />
-            {visibleSelectedOptions.map((option) => (
-              <span
-                key={option.value}
-                data-slot="multi-select-chip"
-                className={cn(multiSelectChipVariants({ size }))}
-              >
-                <span className="nx:truncate">{option.label}</span>
-                <button
-                  type="button"
-                  data-slot="multi-select-chip-remove"
-                  aria-label={`Remove ${option.label}`}
-                  disabled={interactionDisabled}
-                  className={cn(multiSelectChipRemoveVariants({ size }))}
-                  onClick={(event) => {
-                    event.stopPropagation();
-                    removeOption(option.value);
-                  }}
-                >
-                  <IconX aria-hidden="true" />
-                </button>
-              </span>
-            ))}
-            {overflowCount > 0 ? (
-              <span
-                data-slot="multi-select-overflow"
-                className="nx:inline-flex nx:items-center nx:rounded-sm nx:bg-container nx:px-2 nx:py-1 nx:typography-label-default nx:text-muted-foreground"
-              >
-                +{overflowCount}
-              </span>
-            ) : null}
-            <input
-              ref={inputRef}
-              id={inputId}
-              data-slot="multi-select-input"
-              role="combobox"
-              type="text"
-              autoComplete="off"
-              aria-autocomplete="list"
-              aria-activedescendant={open && hasListbox ? activeId : undefined}
-              aria-controls={open ? popupId : undefined}
-              aria-expanded={open}
-              aria-haspopup="listbox"
-              aria-invalid={ariaInvalid}
-              aria-label={ariaLabel}
-              aria-labelledby={ariaLabelledBy}
-              aria-describedby={ariaDescribedBy}
-              disabled={disabled}
-              readOnly={readOnly}
-              required={required && value.length === 0}
-              placeholder={value.length === 0 ? placeholder : undefined}
-              value={inputValue}
-              className={cn(multiSelectInputVariants({ size }))}
-              onBlur={handleInputBlur}
-              onChange={handleInputChange}
-              onFocus={handleInputFocus}
-              onKeyDown={handleInputKeyDown}
-            />
-            {value.length > 0 ? (
-              <button
-                type="button"
-                data-slot="multi-select-clear"
-                aria-label="Clear selections"
-                disabled={interactionDisabled}
-                className={cn(multiSelectInlineButtonVariants({ size }))}
-                onClick={(event) => {
-                  event.stopPropagation();
-                  clearValues();
-                }}
-              >
-                <IconX aria-hidden="true" />
-              </button>
-            ) : (
-              <button
-                type="button"
-                data-slot="multi-select-toggle"
-                aria-label={open ? 'Close options' : 'Open options'}
-                aria-expanded={open}
-                disabled={interactionDisabled}
-                className={cn(multiSelectInlineButtonVariants({ size }))}
-                onClick={(event) => {
-                  event.stopPropagation();
-                  setOpen(!open);
-                }}
-              >
-                <IconChevronDown aria-hidden="true" />
-              </button>
-            )}
-          </div>
-        </PopoverPrimitive.Anchor>
-        {name
-          ? value.map((item) => (
-              <input
-                key={item}
-                type="hidden"
-                name={name}
-                value={item}
-                disabled={disabled}
-              />
-            ))
-          : null}
-      </div>
-      <PopoverPrimitive.Portal>
-        <PopoverPrimitive.Content
-          id={popupId}
-          data-slot="multi-select-content"
-          aria-label={`${ariaLabel ?? placeholder} options`}
-          align="start"
-          sideOffset={4}
-          className={multiSelectContentClassName}
-          onCloseAutoFocus={(event) => event.preventDefault()}
-          onInteractOutside={handleContentInteractOutside}
-          onOpenAutoFocus={(event) => event.preventDefault()}
-        >
-          {loading ? (
-            <div
-              data-slot="multi-select-loading"
-              role="status"
-              className="nx:px-3 nx:py-6 nx:text-center nx:typography-body-default nx:text-muted-foreground"
-            >
-              {loadingText}
-            </div>
-          ) : visibleOptions.length === 0 ? (
-            <div
-              data-slot="multi-select-empty"
-              className="nx:px-3 nx:py-6 nx:text-center nx:typography-body-default nx:text-muted-foreground"
-            >
-              {emptyText}
-            </div>
-          ) : (
-            <div
-              id={listboxId}
-              data-slot="multi-select-list"
-              role="listbox"
-              aria-label={ariaLabel ?? placeholder}
-              aria-multiselectable="true"
-              className="nx:max-h-72 nx:overflow-y-auto nx:overflow-x-hidden nx:scroll-py-2"
-            >
-              {visibleGroups.map((group) => (
-                <MultiSelectOptionGroup
-                  key={group.label || 'ungrouped'}
-                  group={group}
-                  listboxId={listboxId}
-                  activeValue={activeValue}
-                  selectedValues={value}
-                  onActiveValueChange={setActiveValue}
-                  onToggleOption={toggleOption}
-                />
-              ))}
-            </div>
-          )}
-        </PopoverPrimitive.Content>
-      </PopoverPrimitive.Portal>
-    </PopoverPrimitive.Root>
+    <MultiSelectContext.Provider value={contextValue}>
+      <Popover open={open} onOpenChange={setOpen} modal>
+        {children}
+      </Popover>
+      {name
+        ? selectedValues.map((item) => (
+            <input key={item} type="hidden" name={name} value={item} />
+          ))
+        : null}
+    </MultiSelectContext.Provider>
   );
 }
 
-function MultiSelectOptionGroup({
-  group,
-  listboxId,
-  activeValue,
-  selectedValues,
-  onActiveValueChange,
-  onToggleOption,
-}: {
-  group: ReturnType<typeof normalizeSelectionGroups>[number];
-  listboxId: string;
-  activeValue: string | undefined;
-  selectedValues: readonly string[];
-  onActiveValueChange: (value: string) => void;
-  onToggleOption: (option: SelectionOption) => void;
-}) {
+/**
+ * MultiSelectTriggerProps
+ *
+ * Props for the MultiSelect trigger button.
+ */
+interface MultiSelectTriggerProps
+  extends
+    React.ComponentProps<'button'>,
+    VariantProps<typeof multiSelectTriggerVariants> {}
+
+/**
+ * MultiSelectTrigger
+ *
+ * Button-like field surface that opens the multi-select popover. It mirrors the
+ * Select trigger's default and borderless field treatments.
+ */
+function MultiSelectTrigger({
+  className,
+  children,
+  variant,
+  size,
+  disabled,
+  type = 'button',
+  role = 'combobox',
+  ...props
+}: MultiSelectTriggerProps) {
+  const {
+    open,
+    selectedValues,
+    disabled: contextDisabled,
+  } = useMultiSelectContext('MultiSelectTrigger');
+  const semanticSize = size ?? 'default';
+  const isDisabled = contextDisabled || disabled;
+
   return (
-    <div
-      data-slot="multi-select-group"
-      role={group.label ? 'group' : undefined}
-      aria-label={group.label || undefined}
-      className="nx:p-1"
+    <PopoverTrigger asChild>
+      <button
+        data-slot="multi-select-trigger"
+        data-state={open ? 'open' : 'closed'}
+        data-empty={selectedValues.length === 0 ? 'true' : undefined}
+        data-placeholder={selectedValues.length === 0 ? 'true' : undefined}
+        data-size={semanticSize}
+        data-variant={variant ?? 'default'}
+        type={type}
+        role={role}
+        aria-expanded={open}
+        disabled={isDisabled}
+        className={cn(
+          multiSelectTriggerVariants({
+            size: semanticSize,
+            variant,
+            className,
+          })
+        )}
+        {...props}
+      >
+        {children}
+        <IconChevronDown
+          data-slot="multi-select-trigger-icon"
+          aria-hidden="true"
+          className="nx:size-4 nx:shrink-0 nx:text-muted-foreground nx:transition-transform nx:group-data-[state=open]/multi-select-trigger:rotate-180 nx:group-disabled/multi-select-trigger:text-disabled-foreground"
+        />
+      </button>
+    </PopoverTrigger>
+  );
+}
+
+/**
+ * MultiSelectValueProps
+ *
+ * Props for the selected-value renderer.
+ */
+interface MultiSelectValueProps extends Omit<
+  React.ComponentProps<'span'>,
+  'children'
+> {
+  /**
+   * Placeholder shown when no values are selected.
+   */
+  placeholder?: React.ReactNode;
+  /**
+   * Whether clicking a selected chip removes it.
+   * @default true
+   */
+  clickToRemove?: boolean;
+  /**
+   * How selected chips behave when they exceed the trigger width.
+   * @default 'wrap-when-open'
+   */
+  overflowBehavior?: 'wrap' | 'wrap-when-open' | 'cutoff';
+}
+
+/**
+ * MultiSelectValue
+ *
+ * Displays selected values as chips. In the default `wrap-when-open` mode,
+ * chips collapse into a `+N` counter while closed and wrap when the popup opens.
+ */
+function MultiSelectValue({
+  placeholder,
+  clickToRemove = true,
+  overflowBehavior = 'wrap-when-open',
+  className,
+  ...props
+}: MultiSelectValueProps) {
+  const {
+    open,
+    selectedValues,
+    items,
+    toggleValue,
+    disabled,
+    readOnly,
+    selectedValueSet,
+  } = useMultiSelectContext('MultiSelectValue');
+  const [overflowAmount, setOverflowAmount] = React.useState(0);
+  const valueRef = React.useRef<HTMLSpanElement>(null);
+  const overflowRef = React.useRef<HTMLSpanElement>(null);
+  const shouldWrap =
+    overflowBehavior === 'wrap' ||
+    (overflowBehavior === 'wrap-when-open' && open);
+
+  const checkOverflow = React.useCallback(() => {
+    const containerElement = valueRef.current;
+    if (!containerElement) return;
+
+    const overflowElement = overflowRef.current;
+    const selectedItems = containerElement.querySelectorAll<HTMLElement>(
+      '[data-selected-item]'
+    );
+
+    selectedItems.forEach((item) => item.style.removeProperty('display'));
+    overflowElement?.style.setProperty('display', 'none');
+
+    if (shouldWrap) {
+      setOverflowAmount(0);
+      return;
+    }
+
+    let nextOverflowAmount = 0;
+
+    for (let index = selectedItems.length - 1; index >= 0; index -= 1) {
+      if (containerElement.scrollWidth <= containerElement.clientWidth) break;
+
+      selectedItems[index]?.style.setProperty('display', 'none');
+      overflowElement?.style.removeProperty('display');
+      nextOverflowAmount = selectedItems.length - index;
+    }
+
+    setOverflowAmount(nextOverflowAmount);
+  }, [shouldWrap]);
+
+  React.useLayoutEffect(() => {
+    checkOverflow();
+  }, [checkOverflow, items, open, selectedValueSet, selectedValues]);
+
+  React.useLayoutEffect(() => {
+    const containerElement = valueRef.current;
+    if (!containerElement) return;
+
+    const observer = new ResizeObserver(checkOverflow);
+    observer.observe(containerElement);
+
+    return () => observer.disconnect();
+  }, [checkOverflow]);
+
+  const handleChipPointerDown = React.useCallback(
+    (event: React.PointerEvent<HTMLSpanElement>, selectedValue: string) => {
+      if (!clickToRemove || disabled || readOnly) return;
+
+      event.preventDefault();
+      event.stopPropagation();
+      toggleValue(selectedValue);
+    },
+    [clickToRemove, disabled, readOnly, toggleValue]
+  );
+
+  if (selectedValues.length === 0) {
+    return (
+      <span
+        data-slot="multi-select-value"
+        data-placeholder="true"
+        className={cn(
+          'nx:min-w-0 nx:flex-1 nx:truncate nx:text-left nx:text-muted-foreground',
+          className
+        )}
+        {...props}
+      >
+        {placeholder}
+      </span>
+    );
+  }
+
+  return (
+    <span
+      ref={valueRef}
+      data-slot="multi-select-value"
+      data-overflow-behavior={overflowBehavior}
+      className={cn(
+        'nx:flex nx:min-w-0 nx:flex-1 nx:items-center nx:gap-1 nx:text-left',
+        shouldWrap
+          ? 'nx:flex-wrap nx:overflow-visible'
+          : 'nx:flex-nowrap nx:overflow-hidden',
+        className
+      )}
+      {...props}
     >
-      {group.label ? (
-        <div
-          data-slot="multi-select-group-label"
-          className="nx:px-2 nx:py-1.5 nx:typography-label-small nx:text-muted-foreground"
-        >
-          {group.label}
-        </div>
-      ) : null}
-      {group.options.map((option) => {
-        const selected = includesSelectionValue(selectedValues, option.value);
-        const highlighted = activeValue === option.value;
+      {selectedValues.map((selectedValue) => {
+        const label = items.get(selectedValue) ?? selectedValue;
 
         return (
-          <div
-            key={option.value}
-            id={getSelectionOptionDomId(listboxId, option.value)}
-            data-slot="multi-select-option"
-            data-highlighted={highlighted ? 'true' : undefined}
-            data-selected={selected ? 'true' : undefined}
-            data-disabled={option.disabled ? 'true' : undefined}
-            role="option"
-            aria-disabled={option.disabled || undefined}
-            aria-selected={selected}
-            tabIndex={-1}
-            className={multiSelectOptionClassName}
-            onPointerDown={(event) => {
-              event.preventDefault();
-              onToggleOption(option);
-            }}
-            onPointerMove={() => {
-              if (!option.disabled) onActiveValueChange(option.value);
-            }}
+          <span
+            key={selectedValue}
+            data-slot="multi-select-value-chip"
+            data-selected-item=""
+            className={multiSelectValueChipClassName}
+            onPointerDown={(event) =>
+              handleChipPointerDown(event, selectedValue)
+            }
           >
             <span
-              data-slot="multi-select-option-indicator"
-              aria-hidden="true"
-              className={cn(
-                'nx:flex nx:size-4 nx:shrink-0 nx:items-center nx:justify-center nx:rounded-sm nx:border-default nx:border-border-default nx:pt-0.5',
-                selected &&
-                  'nx:border-primary-background nx:bg-primary-background nx:text-primary-foreground'
-              )}
+              data-slot="multi-select-value-chip-label"
+              className="nx:min-w-0 nx:truncate"
             >
-              {selected ? <IconCheck className="nx:size-3.5" /> : null}
+              {label}
             </span>
-            <span className="nx:flex nx:min-w-0 nx:flex-1 nx:flex-col nx:gap-0.5">
-              <span data-slot="multi-select-option-label">{option.label}</span>
-              {option.description ? (
-                <span
-                  data-slot="multi-select-option-description"
-                  className="nx:typography-body-small nx:text-muted-foreground nx:group-data-[highlighted=true]/multi-select-option:text-popover-foreground"
-                >
-                  {option.description}
-                </span>
-              ) : null}
-            </span>
-          </div>
+            {clickToRemove ? (
+              <IconX
+                data-slot="multi-select-value-chip-remove-icon"
+                aria-hidden="true"
+                className="nx:size-3 nx:shrink-0 nx:text-muted-foreground"
+              />
+            ) : null}
+          </span>
         );
       })}
-    </div>
+      <span
+        ref={overflowRef}
+        data-slot="multi-select-value-overflow"
+        className={cn(multiSelectValueChipClassName, 'nx:hidden')}
+      >
+        +{overflowAmount}
+      </span>
+    </span>
+  );
+}
+
+/**
+ * MultiSelectContentProps
+ *
+ * Props for the MultiSelect popover content.
+ */
+interface MultiSelectContentProps extends Omit<
+  PopoverContentProps,
+  'children'
+> {
+  /**
+   * Whether to render the Command search input, or search copy overrides.
+   * @default true
+   */
+  search?: boolean | { placeholder?: string; emptyMessage?: React.ReactNode };
+  /**
+   * MultiSelect groups and items.
+   */
+  children: React.ReactNode;
+}
+
+/**
+ * MultiSelectContent
+ *
+ * Popover content with a Command-powered searchable list.
+ */
+function MultiSelectContent({
+  search = true,
+  children,
+  className,
+  align = 'start',
+  sideOffset = 4,
+  'aria-label': ariaLabel,
+  ...props
+}: MultiSelectContentProps) {
+  const canSearch = typeof search === 'object' ? true : search;
+  const searchPlaceholder =
+    typeof search === 'object' ? search.placeholder : undefined;
+  const emptyMessage =
+    typeof search === 'object' ? search.emptyMessage : 'No options found.';
+
+  return (
+    <>
+      <MultiSelectRegistrationContext.Provider value>
+        {children}
+      </MultiSelectRegistrationContext.Provider>
+      <PopoverContent
+        data-slot="multi-select-content"
+        aria-label={ariaLabel ?? 'Multi-select options'}
+        align={align}
+        sideOffset={sideOffset}
+        className={cn(
+          'nx:w-(--radix-popover-trigger-width) nx:min-w-(--radix-popover-trigger-width) nx:overflow-hidden nx:p-0',
+          className
+        )}
+        {...props}
+      >
+        <Command label={searchPlaceholder ?? 'Multi-select options'}>
+          {canSearch ? (
+            <CommandInput
+              data-slot="multi-select-search"
+              placeholder={searchPlaceholder}
+            />
+          ) : null}
+          <CommandList data-slot="multi-select-list">
+            {canSearch ? (
+              <CommandEmpty
+                data-slot="multi-select-empty"
+                role="option"
+                aria-disabled="true"
+              >
+                {emptyMessage}
+              </CommandEmpty>
+            ) : null}
+            {children}
+          </CommandList>
+        </Command>
+      </PopoverContent>
+    </>
+  );
+}
+
+/**
+ * MultiSelectGroupProps
+ *
+ * Props for a group of related MultiSelect items.
+ */
+interface MultiSelectGroupProps extends React.ComponentProps<
+  typeof CommandGroup
+> {}
+
+/**
+ * MultiSelectGroup
+ *
+ * Groups related MultiSelect items. Items should be wrapped in a group for
+ * consistent Command list spacing.
+ */
+function MultiSelectGroup({ className, ...props }: MultiSelectGroupProps) {
+  const registrationOnly = React.useContext(MultiSelectRegistrationContext);
+
+  if (registrationOnly) return <>{props.children}</>;
+
+  return (
+    <CommandGroup
+      data-slot="multi-select-group"
+      className={cn('nx:p-1', className)}
+      {...props}
+    />
+  );
+}
+
+/**
+ * MultiSelectSeparatorProps
+ *
+ * Props for the decorative separator between groups.
+ */
+interface MultiSelectSeparatorProps extends React.ComponentProps<
+  typeof CommandSeparator
+> {}
+
+/**
+ * MultiSelectSeparator
+ *
+ * Decorative separator between MultiSelect groups.
+ */
+function MultiSelectSeparator({
+  className,
+  ...props
+}: MultiSelectSeparatorProps) {
+  const registrationOnly = React.useContext(MultiSelectRegistrationContext);
+
+  if (registrationOnly) return null;
+
+  return (
+    <CommandSeparator
+      data-slot="multi-select-separator"
+      className={className}
+      {...props}
+    />
+  );
+}
+
+/**
+ * MultiSelectItemProps
+ *
+ * Props for a selectable MultiSelect option.
+ */
+interface MultiSelectItemProps extends Omit<
+  React.ComponentProps<typeof CommandItem>,
+  'value' | 'onSelect'
+> {
+  /**
+   * Submitted value for this option.
+   */
+  value: string;
+  /**
+   * Optional label rendered in the selected-value chip. Defaults to children.
+   */
+  badgeLabel?: React.ReactNode;
+  /**
+   * Called after the item is selected.
+   */
+  onSelect?: (value: string) => void;
+}
+
+/**
+ * MultiSelectItem
+ *
+ * Selectable Command item with a persistent check indicator.
+ */
+function MultiSelectItem({
+  value,
+  children,
+  badgeLabel,
+  className,
+  onSelect,
+  disabled,
+  keywords,
+  ...props
+}: MultiSelectItemProps) {
+  const { selectedValueSet, toggleValue, onItemAdded } =
+    useMultiSelectContext('MultiSelectItem');
+  const registrationOnly = React.useContext(MultiSelectRegistrationContext);
+  const isSelected = selectedValueSet.has(value);
+  const textLabel = typeof children === 'string' ? children : undefined;
+
+  React.useEffect(() => {
+    onItemAdded(value, badgeLabel ?? children);
+  }, [badgeLabel, children, onItemAdded, value]);
+
+  if (registrationOnly) return null;
+
+  return (
+    <CommandItem
+      data-slot="multi-select-item"
+      data-selected={isSelected ? 'true' : undefined}
+      aria-selected={isSelected}
+      value={value}
+      disabled={disabled}
+      keywords={keywords ?? (textLabel ? [textLabel] : undefined)}
+      className={cn(
+        'nx:items-start nx:gap-3',
+        'nx:data-[selected=true]:bg-popover-hover',
+        className
+      )}
+      onSelect={(selectedValue) => {
+        onSelect?.(selectedValue);
+        if (!disabled) toggleValue(value);
+      }}
+      {...props}
+    >
+      <span
+        data-slot="multi-select-item-indicator"
+        aria-hidden="true"
+        className={cn(
+          'nx:flex nx:size-4 nx:shrink-0 nx:items-center nx:justify-center nx:rounded-sm nx:border-default nx:border-border-default nx:pt-0.5',
+          isSelected &&
+            'nx:border-primary-background nx:bg-primary-background nx:text-primary-foreground'
+        )}
+      >
+        {isSelected ? (
+          <IconCheck
+            data-slot="multi-select-item-indicator-icon"
+            className="nx:size-3.5"
+          />
+        ) : null}
+      </span>
+      <span
+        data-slot="multi-select-item-label"
+        className="nx:flex nx:min-w-0 nx:flex-1 nx:flex-col nx:gap-0.5"
+      >
+        {children}
+      </span>
+    </CommandItem>
   );
 }
 
 export {
   MultiSelect,
+  MultiSelectContent,
+  type MultiSelectContentProps,
+  MultiSelectGroup,
+  type MultiSelectGroupProps,
+  MultiSelectItem,
+  type MultiSelectItemProps,
   type SelectionOption as MultiSelectOption,
   type SelectionOptionGroup as MultiSelectOptionGroup,
   type SelectionOptionInput as MultiSelectOptionInput,
   type MultiSelectProps,
+  MultiSelectSeparator,
+  type MultiSelectSeparatorProps,
+  MultiSelectTrigger,
+  type MultiSelectTriggerProps,
+  MultiSelectValue,
+  type MultiSelectValueProps,
 };

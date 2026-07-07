@@ -5,9 +5,17 @@ import { expect, fn, userEvent, waitFor, within } from 'storybook/test';
 
 import { Field, FieldDescription, FieldGroup, FieldLabel } from '../field';
 
-import { MultiSelect, type MultiSelectOptionInput } from './multi-select';
+import {
+  MultiSelect,
+  MultiSelectContent,
+  MultiSelectGroup,
+  MultiSelectItem,
+  MultiSelectSeparator,
+  MultiSelectTrigger,
+  MultiSelectValue,
+} from './multi-select';
 
-const frameworkOptions: MultiSelectOptionInput[] = [
+const frameworkOptions = [
   { value: 'next', label: 'Next.js' },
   { value: 'sveltekit', label: 'SvelteKit' },
   { value: 'nuxt', label: 'Nuxt' },
@@ -15,57 +23,11 @@ const frameworkOptions: MultiSelectOptionInput[] = [
   { value: 'astro', label: 'Astro' },
 ];
 
-const groupedOptions: MultiSelectOptionInput[] = [
-  {
-    label: 'Frontend',
-    options: [
-      { value: 'next', label: 'Next.js' },
-      { value: 'sveltekit', label: 'SvelteKit' },
-      { value: 'remix', label: 'Remix' },
-    ],
-  },
-  {
-    label: 'Backend',
-    options: [
-      {
-        value: 'rails',
-        label: 'Ruby on Rails',
-        description: 'Convention-first full-stack framework.',
-      },
-      {
-        value: 'laravel',
-        label: 'Laravel',
-        description: 'PHP application framework with batteries included.',
-      },
-    ],
-  },
-];
-
-async function waitForPopoverSettle() {
-  await new Promise<void>((resolve) => {
-    window.setTimeout(resolve, 350);
-  });
-}
-
 const meta: Meta<typeof MultiSelect> = {
   title: 'Components/MultiSelect',
   component: MultiSelect,
   parameters: {
     layout: 'padded',
-  },
-  args: {
-    onValueChange: fn(),
-    onOpenChange: fn(),
-  },
-  argTypes: {
-    size: {
-      control: 'select',
-      options: ['sm', 'default', 'lg'],
-    },
-    variant: {
-      control: 'select',
-      options: ['default', 'borderless'],
-    },
   },
   decorators: [
     (Story) => (
@@ -79,63 +41,130 @@ const meta: Meta<typeof MultiSelect> = {
 export default meta;
 type Story = StoryObj<typeof MultiSelect>;
 
-function ControlledMultiSelectExample(
-  args: React.ComponentProps<typeof MultiSelect>
-) {
-  const [value, setValue] = React.useState<string[]>(['next']);
+async function waitForPopoverSettle() {
+  await new Promise<void>((resolve) => {
+    window.setTimeout(resolve, 350);
+  });
+}
 
+async function waitForPopoverToClose() {
+  await waitFor(() =>
+    expect(
+      document.body.querySelector('[data-slot="multi-select-content"]')
+    ).toBeNull()
+  );
+}
+
+function FrameworkItems() {
+  return (
+    <MultiSelectGroup>
+      {frameworkOptions.map((option) => (
+        <MultiSelectItem key={option.value} value={option.value}>
+          {option.label}
+        </MultiSelectItem>
+      ))}
+    </MultiSelectGroup>
+  );
+}
+
+function FrameworkMultiSelect({
+  label,
+  placeholder = 'Select frameworks...',
+  defaultValues,
+  values,
+  onValuesChange,
+  triggerProps,
+  valueProps,
+  contentProps,
+  single,
+}: {
+  label: string;
+  placeholder?: string;
+  defaultValues?: string[];
+  values?: string[];
+  onValuesChange?: (values: string[]) => void;
+  triggerProps?: React.ComponentProps<typeof MultiSelectTrigger>;
+  valueProps?: React.ComponentProps<typeof MultiSelectValue>;
+  contentProps?: Omit<
+    React.ComponentProps<typeof MultiSelectContent>,
+    'children'
+  >;
+  single?: boolean;
+}) {
   return (
     <MultiSelect
-      {...args}
-      aria-label="Controlled frameworks"
-      options={frameworkOptions}
-      value={value}
-      onValueChange={(nextValue) => {
-        setValue(nextValue);
-        args.onValueChange?.(nextValue);
+      defaultValues={defaultValues}
+      values={values}
+      onValuesChange={onValuesChange}
+      single={single}
+    >
+      <MultiSelectTrigger aria-label={label} {...triggerProps}>
+        <MultiSelectValue placeholder={placeholder} {...valueProps} />
+      </MultiSelectTrigger>
+      <MultiSelectContent
+        search={{
+          placeholder: 'Search frameworks...',
+          emptyMessage: 'No matching frameworks.',
+        }}
+        {...contentProps}
+      >
+        <FrameworkItems />
+      </MultiSelectContent>
+    </MultiSelect>
+  );
+}
+
+function ControlledMultiSelectExample({
+  onValuesChange,
+}: {
+  onValuesChange: (values: string[]) => void;
+}) {
+  const [values, setValues] = React.useState<string[]>(['next']);
+
+  return (
+    <FrameworkMultiSelect
+      label="Controlled frameworks"
+      values={values}
+      onValuesChange={(nextValues) => {
+        setValues(nextValues);
+        onValuesChange(nextValues);
       }}
     />
   );
 }
 
 export const Default: Story = {
-  args: {
-    'aria-label': 'Frameworks',
-    options: frameworkOptions,
-    placeholder: 'Select frameworks',
-  },
+  render: () => <FrameworkMultiSelect label="Frameworks" />,
 };
 
 export const WithDefaultValues: Story = {
-  args: {
-    'aria-label': 'Selected frameworks',
-    defaultValue: ['next', 'astro'],
-    options: frameworkOptions,
-  },
+  render: () => (
+    <FrameworkMultiSelect
+      label="Selected frameworks"
+      defaultValues={['next', 'astro']}
+    />
+  ),
 };
 
 export const Sizes: Story = {
   render: () => (
     <div className="nx:grid nx:gap-3">
-      <MultiSelect
-        aria-label="Small frameworks"
-        size="sm"
-        defaultValue={['next']}
-        options={frameworkOptions}
+      <FrameworkMultiSelect
+        label="Small frameworks"
+        defaultValues={['next']}
+        triggerProps={{ size: 'sm' }}
         placeholder="Small"
       />
-      <MultiSelect
-        aria-label="Default frameworks"
-        size="default"
-        defaultValue={['next']}
-        options={frameworkOptions}
+      <FrameworkMultiSelect
+        label="Default frameworks"
+        defaultValues={['next']}
+        triggerProps={{ size: 'default' }}
         placeholder="Default"
       />
-      <MultiSelect
-        aria-label="Large frameworks"
-        size="lg"
-        defaultValue={['next']}
-        options={frameworkOptions}
+      <FrameworkMultiSelect
+        label="Large frameworks"
+        defaultValues={['next']}
+        triggerProps={{ size: 'lg' }}
         placeholder="Large"
       />
     </div>
@@ -145,64 +174,96 @@ export const Sizes: Story = {
 
     await expect(
       canvas.getByRole('combobox', { name: 'Small frameworks' })
-    ).toBeVisible();
-    await expect(
-      canvas
-        .getByRole('combobox', { name: 'Small frameworks' })
-        .closest('[data-slot="multi-select"]')
     ).toHaveAttribute('data-size', 'sm');
     await expect(
-      canvas
-        .getByRole('combobox', { name: 'Default frameworks' })
-        .closest('[data-slot="multi-select"]')
+      canvas.getByRole('combobox', { name: 'Default frameworks' })
     ).toHaveAttribute('data-size', 'default');
     await expect(
-      canvas
-        .getByRole('combobox', { name: 'Large frameworks' })
-        .closest('[data-slot="multi-select"]')
+      canvas.getByRole('combobox', { name: 'Large frameworks' })
     ).toHaveAttribute('data-size', 'lg');
   },
 };
 
 export const Controlled: Story = {
-  render: (args) => <ControlledMultiSelectExample {...args} />,
+  args: {
+    onValuesChange: fn(),
+  },
+  render: (args) => (
+    <ControlledMultiSelectExample
+      onValuesChange={args.onValuesChange ?? (() => {})}
+    />
+  ),
 };
 
 export const Grouped: Story = {
-  args: {
-    'aria-label': 'Grouped frameworks',
-    options: groupedOptions,
-    placeholder: 'Select stack',
-  },
+  render: () => (
+    <MultiSelect>
+      <MultiSelectTrigger aria-label="Grouped frameworks">
+        <MultiSelectValue placeholder="Select stack..." />
+      </MultiSelectTrigger>
+      <MultiSelectContent>
+        <MultiSelectGroup heading="Frontend">
+          <MultiSelectItem value="next">Next.js</MultiSelectItem>
+          <MultiSelectItem value="sveltekit">SvelteKit</MultiSelectItem>
+          <MultiSelectItem value="remix">Remix</MultiSelectItem>
+        </MultiSelectGroup>
+        <MultiSelectSeparator />
+        <MultiSelectGroup heading="Backend">
+          <MultiSelectItem value="rails">Ruby on Rails</MultiSelectItem>
+          <MultiSelectItem value="laravel">Laravel</MultiSelectItem>
+        </MultiSelectGroup>
+      </MultiSelectContent>
+    </MultiSelect>
+  ),
 };
 
 export const DisabledOption: Story = {
-  args: {
-    'aria-label': 'Frameworks with disabled option',
-    options: [
-      { value: 'next', label: 'Next.js' },
-      { value: 'remix', label: 'Remix', disabled: true },
-      { value: 'astro', label: 'Astro' },
-    ],
-  },
+  render: () => (
+    <MultiSelect>
+      <MultiSelectTrigger aria-label="Frameworks with disabled option">
+        <MultiSelectValue placeholder="Select frameworks..." />
+      </MultiSelectTrigger>
+      <MultiSelectContent>
+        <MultiSelectGroup>
+          <MultiSelectItem value="next">Next.js</MultiSelectItem>
+          <MultiSelectItem value="remix" disabled>
+            Remix
+          </MultiSelectItem>
+          <MultiSelectItem value="astro">Astro</MultiSelectItem>
+        </MultiSelectGroup>
+      </MultiSelectContent>
+    </MultiSelect>
+  ),
 };
 
 export const Disabled: Story = {
-  args: {
-    'aria-label': 'Disabled multi select',
-    disabled: true,
-    options: frameworkOptions,
-    placeholder: 'Disabled',
+  render: () => (
+    <FrameworkMultiSelect
+      label="Disabled multi select"
+      triggerProps={{ disabled: true }}
+      placeholder="Disabled"
+    />
+  ),
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+
+    await expect(
+      canvas.getByRole('combobox', { name: 'Disabled multi select' })
+    ).toBeDisabled();
   },
 };
 
 export const ReadOnly: Story = {
-  args: {
-    'aria-label': 'Read only multi select',
-    readOnly: true,
-    defaultValue: ['next', 'astro'],
-    options: frameworkOptions,
-  },
+  render: () => (
+    <MultiSelect readOnly defaultValues={['next', 'astro']}>
+      <MultiSelectTrigger aria-label="Read only multi select">
+        <MultiSelectValue placeholder="Select frameworks..." />
+      </MultiSelectTrigger>
+      <MultiSelectContent>
+        <FrameworkItems />
+      </MultiSelectContent>
+    </MultiSelect>
+  ),
 };
 
 export const InvalidField: Story = {
@@ -210,13 +271,18 @@ export const InvalidField: Story = {
     <FieldGroup>
       <Field data-invalid>
         <FieldLabel htmlFor="frameworks-invalid">Frameworks</FieldLabel>
-        <MultiSelect
-          id="frameworks-invalid"
-          aria-invalid
-          aria-describedby="frameworks-invalid-description"
-          options={frameworkOptions}
-          placeholder="Select frameworks"
-        />
+        <MultiSelect>
+          <MultiSelectTrigger
+            id="frameworks-invalid"
+            aria-invalid
+            aria-describedby="frameworks-invalid-description"
+          >
+            <MultiSelectValue placeholder="Select frameworks..." />
+          </MultiSelectTrigger>
+          <MultiSelectContent>
+            <FrameworkItems />
+          </MultiSelectContent>
+        </MultiSelect>
         <FieldDescription id="frameworks-invalid-description">
           Choose at least one framework.
         </FieldDescription>
@@ -225,179 +291,234 @@ export const InvalidField: Story = {
   ),
   play: async ({ canvasElement }) => {
     const canvas = within(canvasElement);
-    const input = canvas.getByRole('combobox', { name: 'Frameworks' });
+    const trigger = canvas.getByRole('combobox', { name: 'Frameworks' });
 
-    await expect(input).toHaveAttribute('aria-invalid', 'true');
+    await expect(trigger).toHaveAttribute('aria-invalid', 'true');
   },
 };
 
-export const Loading: Story = {
-  args: {
-    'aria-label': 'Loading frameworks',
-    loading: true,
-    options: [],
-    loadingText: 'Loading frameworks...',
-  },
-  play: async ({ canvasElement }) => {
-    const canvas = within(canvasElement);
-    const input = canvas.getByRole('combobox', { name: 'Loading frameworks' });
-
-    await userEvent.click(input);
-    await expect(
-      await within(document.body).findByRole('status')
-    ).toHaveTextContent('Loading frameworks...');
-  },
+export const WithoutSearch: Story = {
+  render: () => (
+    <FrameworkMultiSelect
+      label="Frameworks without search"
+      contentProps={{ search: false }}
+    />
+  ),
 };
 
 export const EmptyResults: Story = {
-  args: {
-    'aria-label': 'Empty frameworks',
-    options: frameworkOptions,
-    emptyText: 'No matching frameworks.',
-  },
+  render: () => <FrameworkMultiSelect label="Empty frameworks" />,
   play: async ({ canvasElement }) => {
     const canvas = within(canvasElement);
-    const input = canvas.getByRole('combobox', { name: 'Empty frameworks' });
+    const trigger = canvas.getByRole('combobox', { name: 'Empty frameworks' });
 
-    await userEvent.click(input);
-    await userEvent.type(input, 'zzz');
+    await userEvent.click(trigger);
+    await userEvent.type(
+      await within(document.body).findByPlaceholderText('Search frameworks...'),
+      'zzz'
+    );
     await expect(
       await within(document.body).findByText('No matching frameworks.')
     ).toBeVisible();
+
+    await userEvent.keyboard('{Escape}');
+    await waitFor(() =>
+      expect(trigger).toHaveAttribute('aria-expanded', 'false')
+    );
+    await waitForPopoverToClose();
   },
 };
 
+export const CustomBadges: Story = {
+  render: () => (
+    <MultiSelect defaultValues={['apple', 'banana']}>
+      <MultiSelectTrigger aria-label="Fruit">
+        <MultiSelectValue placeholder="Select fruit..." clickToRemove={false} />
+      </MultiSelectTrigger>
+      <MultiSelectContent>
+        <MultiSelectGroup>
+          <MultiSelectItem value="apple" badgeLabel="Apple">
+            Apple
+          </MultiSelectItem>
+          <MultiSelectItem value="banana" badgeLabel="Banana">
+            Banana
+          </MultiSelectItem>
+          <MultiSelectItem value="cherry" badgeLabel="Cherry">
+            Cherry
+          </MultiSelectItem>
+        </MultiSelectGroup>
+      </MultiSelectContent>
+    </MultiSelect>
+  ),
+};
+
 export const OverflowChips: Story = {
-  args: {
-    'aria-label': 'Overflow frameworks',
-    defaultValue: ['next', 'sveltekit', 'nuxt', 'remix', 'astro'],
-    maxVisibleValues: 2,
-    options: frameworkOptions,
-  },
+  render: () => (
+    <FrameworkMultiSelect
+      label="Overflow frameworks"
+      defaultValues={['next', 'sveltekit', 'nuxt', 'remix', 'astro']}
+      valueProps={{ overflowBehavior: 'cutoff' }}
+    />
+  ),
 };
 
 export const NarrowWidth: Story = {
   render: () => (
     <div className="nx:w-52">
-      <MultiSelect
-        aria-label="Narrow frameworks"
-        defaultValue={['next', 'sveltekit']}
-        options={frameworkOptions}
+      <FrameworkMultiSelect
+        label="Narrow frameworks"
+        defaultValues={['next', 'sveltekit']}
         placeholder="Frameworks"
       />
     </div>
   ),
   play: async ({ canvasElement }) => {
     const canvas = within(canvasElement);
-    const input = canvas.getByRole('combobox', { name: 'Narrow frameworks' });
+    const trigger = canvas.getByRole('combobox', {
+      name: 'Narrow frameworks',
+    });
 
-    await userEvent.click(canvas.getByText('Next.js'));
-    await waitFor(() => expect(input).toHaveAttribute('aria-expanded', 'true'));
+    await userEvent.click(trigger);
+    await waitFor(() =>
+      expect(trigger).toHaveAttribute('aria-expanded', 'true')
+    );
     await waitForPopoverSettle();
-    await expect(input).toHaveAttribute('aria-expanded', 'true');
+    await expect(trigger).toHaveAttribute('aria-expanded', 'true');
     await expect(
       document.body.querySelector('[data-slot="multi-select-content"]')
     ).toHaveAttribute('data-state', 'open');
+  },
+};
+
+export const SingleSelect: Story = {
+  render: () => (
+    <FrameworkMultiSelect
+      label="Single framework"
+      placeholder="Select one framework..."
+      single
+    />
+  ),
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+    const trigger = canvas.getByRole('combobox', { name: 'Single framework' });
+
+    await userEvent.click(trigger);
+    await userEvent.click(
+      await within(document.body).findByRole('option', { name: 'Next.js' })
+    );
+
+    await expect(within(trigger).getByText('Next.js')).toBeVisible();
+    await waitFor(() =>
+      expect(trigger).toHaveAttribute('aria-expanded', 'false')
+    );
+    await waitForPopoverToClose();
   },
 };
 
 export const ClickInteraction: Story = {
-  args: {
-    'aria-label': 'Click frameworks',
-    options: frameworkOptions,
-  },
+  render: () => <FrameworkMultiSelect label="Click frameworks" />,
   play: async ({ canvasElement }) => {
     const canvas = within(canvasElement);
-    const input = canvas.getByRole('combobox', { name: 'Click frameworks' });
+    const trigger = canvas.getByRole('combobox', { name: 'Click frameworks' });
 
-    await userEvent.click(input);
-    await waitFor(() => expect(input).toHaveAttribute('aria-expanded', 'true'));
+    await userEvent.click(trigger);
+    await waitFor(() =>
+      expect(trigger).toHaveAttribute('aria-expanded', 'true')
+    );
     await waitForPopoverSettle();
-    await expect(input).toHaveAttribute('aria-expanded', 'true');
+    await expect(trigger).toHaveAttribute('aria-expanded', 'true');
     await expect(
       document.body.querySelector('[data-slot="multi-select-content"]')
     ).toHaveAttribute('data-state', 'open');
 
-    const listbox = await within(document.body).findByRole('listbox');
     await userEvent.click(
-      within(listbox).getByRole('option', { name: 'Next.js' })
+      await within(document.body).findByRole('option', { name: 'Next.js' })
     );
     await userEvent.click(
-      within(listbox).getByRole('option', { name: 'Astro' })
+      await within(document.body).findByRole('option', { name: 'Astro' })
     );
 
-    await expect(canvas.getByText('Next.js')).toBeVisible();
-    await expect(canvas.getByText('Astro')).toBeVisible();
-    await expect(input).toHaveAttribute('aria-expanded', 'true');
+    await expect(within(trigger).getByText('Next.js')).toBeVisible();
+    await expect(within(trigger).getByText('Astro')).toBeVisible();
+    await expect(trigger).toHaveAttribute('aria-expanded', 'true');
   },
 };
 
 export const KeyboardInteraction: Story = {
-  args: {
-    'aria-label': 'Keyboard frameworks',
-    options: frameworkOptions,
-  },
+  render: () => <FrameworkMultiSelect label="Keyboard frameworks" />,
   play: async ({ canvasElement }) => {
     const canvas = within(canvasElement);
-    const input = canvas.getByRole('combobox', {
+    const trigger = canvas.getByRole('combobox', {
       name: 'Keyboard frameworks',
     });
 
-    await userEvent.click(input);
-    await userEvent.type(input, 'sv');
+    await userEvent.click(trigger);
+    await userEvent.type(
+      await within(document.body).findByPlaceholderText('Search frameworks...'),
+      'sv'
+    );
     await userEvent.keyboard('{Enter}');
 
-    await expect(canvas.getByText('SvelteKit')).toBeVisible();
+    await expect(within(trigger).getByText('SvelteKit')).toBeVisible();
+    await userEvent.keyboard('{Escape}');
+    await waitFor(() =>
+      expect(trigger).toHaveAttribute('aria-expanded', 'false')
+    );
+    await waitForPopoverToClose();
   },
 };
 
 export const RemoveSelection: Story = {
-  args: {
-    'aria-label': 'Remove frameworks',
-    defaultValue: ['next', 'astro'],
-    options: frameworkOptions,
-  },
+  render: () => (
+    <FrameworkMultiSelect
+      label="Remove frameworks"
+      defaultValues={['next', 'astro']}
+    />
+  ),
   play: async ({ canvasElement }) => {
     const canvas = within(canvasElement);
+    const trigger = canvas.getByRole('combobox', { name: 'Remove frameworks' });
 
-    await expect(canvas.getByText('Next.js')).toBeVisible();
-    await userEvent.click(
-      canvas.getByRole('button', { name: 'Remove Next.js' })
-    );
-    await expect(canvas.queryByText('Next.js')).toBeNull();
+    await expect(within(trigger).getByText('Next.js')).toBeVisible();
+    await userEvent.click(within(trigger).getByText('Next.js'));
+    await expect(within(trigger).queryByText('Next.js')).toBeNull();
   },
 };
 
 export const WithDataAttributes: Story = {
-  args: {
-    'aria-label': 'Data attribute frameworks',
-    defaultValue: ['next'],
-    options: frameworkOptions,
-  },
+  render: () => (
+    <FrameworkMultiSelect
+      label="Data attribute frameworks"
+      defaultValues={['next']}
+    />
+  ),
   play: async ({ canvasElement }) => {
     const canvas = within(canvasElement);
-    const root = canvas
-      .getByRole('combobox', {
-        name: 'Data attribute frameworks',
-      })
-      .closest('[data-slot="multi-select"]');
+    const trigger = canvas.getByRole('combobox', {
+      name: 'Data attribute frameworks',
+    });
 
-    await expect(root).toHaveAttribute('data-slot', 'multi-select');
-    await expect(root).toHaveAttribute('data-size', 'default');
-    await expect(root).not.toHaveAttribute('data-empty');
+    await expect(trigger).toHaveAttribute('data-slot', 'multi-select-trigger');
+    await expect(trigger).toHaveAttribute('data-size', 'default');
+    await expect(trigger).toHaveAttribute('data-variant', 'default');
+    await expect(trigger).not.toHaveAttribute('data-empty');
+    await expect(trigger).toHaveClass('nx:border-0');
+    await expect(trigger).toHaveClass('nx:border-border-default');
 
-    const control = canvasElement.querySelector<HTMLElement>(
-      '[data-slot="multi-select-control"]'
+    const triggerStyle = window.getComputedStyle(trigger);
+    await expect(triggerStyle.borderTopWidth).toBe('0px');
+    await expect(triggerStyle.boxShadow).toContain('inset');
+
+    await userEvent.click(trigger);
+    const content = document.body.querySelector<HTMLElement>(
+      '[data-slot="multi-select-content"]'
     );
-    if (!control) throw new Error('MultiSelect control was not rendered');
+    const item = await within(document.body).findByRole('option', {
+      name: 'Next.js',
+    });
 
-    await expect(control).toHaveAttribute('data-size', 'default');
-    await expect(control).toHaveAttribute('data-variant', 'default');
-    await expect(control).toHaveClass('nx:border-0');
-    await expect(control).toHaveClass('nx:border-border-default');
-
-    const controlStyle = window.getComputedStyle(control);
-    await expect(controlStyle.borderTopWidth).toBe('0px');
-    await expect(controlStyle.boxShadow).toContain('inset');
+    await expect(content).toHaveAttribute('data-state', 'open');
+    await expect(item).toHaveAttribute('data-slot', 'multi-select-item');
+    await expect(item).toHaveAttribute('data-selected', 'true');
   },
 };

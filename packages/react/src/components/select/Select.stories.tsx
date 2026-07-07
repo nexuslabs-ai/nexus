@@ -5,7 +5,14 @@ import { expectStaggeredItemMotion } from '../../stories/support/motion-test-uti
 import { expectInterruptibleOverlayMotion } from '../../stories/support/overlay-motion-test-utils';
 import { expectHeightPinned } from '../../stories/support/story-height-test-utils';
 import { Combobox } from '../combobox';
-import { MultiSelect } from '../multi-select';
+import {
+  MultiSelect,
+  MultiSelectContent,
+  MultiSelectGroup,
+  MultiSelectItem,
+  MultiSelectTrigger,
+  MultiSelectValue,
+} from '../multi-select';
 import { NativeSelect, NativeSelectOption } from '../native-select';
 
 import {
@@ -322,15 +329,18 @@ export const CapabilityLadder: Story = {
         <p className="nx:typography-body-small nx:text-muted-foreground">
           Searchable multiple selection with removable chips.
         </p>
-        <MultiSelect
-          aria-label="Searchable frameworks"
-          defaultValue={['next', 'remix']}
-          options={[
-            { value: 'next', label: 'Next.js' },
-            { value: 'sveltekit', label: 'SvelteKit' },
-            { value: 'remix', label: 'Remix' },
-          ]}
-        />
+        <MultiSelect defaultValues={['next', 'remix']}>
+          <MultiSelectTrigger aria-label="Searchable frameworks">
+            <MultiSelectValue placeholder="Frameworks" />
+          </MultiSelectTrigger>
+          <MultiSelectContent>
+            <MultiSelectGroup>
+              <MultiSelectItem value="next">Next.js</MultiSelectItem>
+              <MultiSelectItem value="sveltekit">SvelteKit</MultiSelectItem>
+              <MultiSelectItem value="remix">Remix</MultiSelectItem>
+            </MultiSelectGroup>
+          </MultiSelectContent>
+        </MultiSelect>
       </section>
     </div>
   ),
