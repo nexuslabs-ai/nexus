@@ -187,7 +187,7 @@ function MultiSelectTrigger({
 
     const values = [...selectedValues];
     const last = values[values.length - 1];
-    if (last) toggle(last);
+    if (last !== undefined) toggle(last);
   };
 
   return (
@@ -247,7 +247,7 @@ interface MultiSelectValueProps extends Omit<
  *
  * Renders the selected values inside the trigger as removable chips. When chips
  * exceed the field width they collapse into a measured `+N` badge (unless
- * wrapping). A selected value with no registered label falls back to its raw
+ * wrapping). A selected value with no collected label falls back to its raw
  * value so a non-empty selection never shows the placeholder.
  */
 function MultiSelectValue({
