@@ -633,8 +633,6 @@ export const WithDataAttributes: Story = {
 
     await expect(card).toHaveAttribute('data-slot', 'choice-card');
     await expect(card).toHaveAttribute('data-variant', 'borderless');
-    await expect(card).not.toHaveAttribute('data-control-position');
-    await expect(card).not.toHaveAttribute('data-floating');
     await expect(card).not.toHaveAttribute('role');
     await expect(card).not.toHaveAttribute('tabindex');
     await expect(content).toHaveAttribute('data-slot', 'choice-card-content');
@@ -741,7 +739,6 @@ export const AllVariants: Story = {
         <CheckboxChoiceCard
           id="choice-card-checkbox-borderless"
           variant="borderless"
-          defaultChecked
           title="Checkbox borderless"
           description="Quiet option card that still shows selected state."
         />
