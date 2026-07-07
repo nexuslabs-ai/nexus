@@ -84,40 +84,6 @@ export const Controlled: Story = {
   },
 };
 
-export const SingleSelect: Story = {
-  render: () => (
-    <MultiSelect single>
-      <MultiSelectTrigger aria-label="Framework" className="nx:w-80">
-        <MultiSelectValue placeholder="Select a framework" />
-      </MultiSelectTrigger>
-      <MultiSelectContent
-        searchPlaceholder="Search frameworks…"
-        emptyMessage="No frameworks found."
-      >
-        {FRAMEWORKS.map((option) => (
-          <MultiSelectItem key={option.value} value={option.value}>
-            {option.label}
-          </MultiSelectItem>
-        ))}
-      </MultiSelectContent>
-    </MultiSelect>
-  ),
-  play: async ({ canvasElement }) => {
-    const canvas = within(canvasElement);
-    const body = within(document.body);
-    const trigger = canvas.getByRole('button', { name: 'Framework' });
-
-    await userEvent.click(trigger);
-    await userEvent.click(await body.findByRole('option', { name: 'Vue' }));
-
-    // Single mode collapses to a plain label and closes the popover.
-    await expect(within(trigger).getByText('Vue')).toBeInTheDocument();
-    await waitFor(() =>
-      expect(body.queryByPlaceholderText('Search frameworks…')).toBeNull()
-    );
-  },
-};
-
 export const Grouped: Story = {
   render: () => (
     <MultiSelect defaultValues={['react']}>
@@ -341,6 +307,23 @@ export const ChipRemoval: Story = {
   },
 };
 
+export const ChipKeyboardRemoval: Story = {
+  render: () => <Frameworks defaultValues={['react', 'vue']} />,
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+    const trigger = canvas.getByRole('button', { name: 'Frameworks' });
+
+    // Backspace on the focused field removes the last selected value without
+    // reopening the list — the keyboard equivalent of clicking a chip's X.
+    trigger.focus();
+    await expect(trigger).toHaveFocus();
+    await userEvent.keyboard('{Backspace}');
+
+    await waitFor(() => expect(within(trigger).queryByText('Vue')).toBeNull());
+    await expect(within(trigger).getByText('React')).toBeInTheDocument();
+  },
+};
+
 export const SearchEmpty: Story = {
   render: () => <Frameworks />,
   parameters: {
@@ -420,21 +403,11 @@ export const AllVariants: Story = {
         placeholder="Overflow"
         triggerClassName=""
       />
-      <MultiSelect single>
-        <MultiSelectTrigger aria-label="Single" className="">
-          <MultiSelectValue placeholder="Single" />
-        </MultiSelectTrigger>
-        <MultiSelectContent
-          searchPlaceholder="Search frameworks…"
-          emptyMessage="No frameworks found."
-        >
-          {FRAMEWORKS.map((option) => (
-            <MultiSelectItem key={option.value} value={option.value}>
-              {option.label}
-            </MultiSelectItem>
-          ))}
-        </MultiSelectContent>
-      </MultiSelect>
+      <Frameworks
+        defaultValues={['react', 'svelte']}
+        placeholder="Grouped"
+        triggerClassName=""
+      />
     </div>
   ),
 };

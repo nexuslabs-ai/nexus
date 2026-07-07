@@ -16,11 +16,13 @@ import { Popover, PopoverContent, PopoverTrigger } from '../popover';
 
 interface MultiSelectContextValue {
   open: boolean;
-  single: boolean;
   selectedValues: Set<string>;
   labels: Map<string, React.ReactNode>;
+  search: string;
+  setSearch: (search: string) => void;
   toggle: (value: string) => void;
   registerLabel: (value: string, label: React.ReactNode) => void;
+  unregisterLabel: (value: string) => void;
 }
 
 const MultiSelectContext = React.createContext<MultiSelectContextValue | null>(
@@ -36,9 +38,7 @@ function useMultiSelect() {
   return context;
 }
 
-function nextSelection(values: Set<string>, value: string, single: boolean) {
-  if (single) return values.has(value) ? new Set<string>() : new Set([value]);
-
+function toggleValue(values: Set<string>, value: string) {
   const next = new Set(values);
 
   // Set.delete returns true when the value was present (and removes it), so a
@@ -71,12 +71,6 @@ interface MultiSelectProps {
    * Called with the next selected values whenever selection changes.
    */
   onValuesChange?: (values: string[]) => void;
-  /**
-   * Collapse to single selection: picking a value replaces the current one and
-   * closes the popover, turning the field into a searchable combobox.
-   * @default false
-   */
-  single?: boolean;
 }
 
 /**
@@ -85,7 +79,7 @@ interface MultiSelectProps {
  * A searchable multiple-selection field. cmdk (via `Command`) owns filtering and
  * keyboard navigation; this component adds the selected-value model, the chip
  * trigger, and a label registry so the trigger can render chips for values whose
- * options are not currently mounted.
+ * options are not on screen. For searchable single selection, use `Combobox`.
  *
  * @example
  * ```tsx
@@ -105,9 +99,9 @@ function MultiSelect({
   values,
   defaultValues,
   onValuesChange,
-  single = false,
 }: MultiSelectProps) {
   const [open, setOpen] = React.useState(false);
+  const [search, setSearch] = React.useState('');
   const [uncontrolled, setUncontrolled] = React.useState(
     () => new Set(values ?? defaultValues)
   );
@@ -120,15 +114,21 @@ function MultiSelect({
     [values, uncontrolled]
   );
 
+  const handleOpenChange = React.useCallback((next: boolean) => {
+    setOpen(next);
+    // The list stays mounted (forceMount), so reset the query on close instead
+    // of relying on unmount to clear cmdk's internal search state.
+    if (!next) setSearch('');
+  }, []);
+
   const toggle = React.useCallback(
     (next: string) => {
-      const nextValues = nextSelection(selectedValues, next, single);
+      const nextValues = toggleValue(selectedValues, next);
 
       if (values === undefined) setUncontrolled(nextValues);
       onValuesChange?.([...nextValues]);
-      if (single) setOpen(false);
     },
-    [selectedValues, single, values, onValuesChange]
+    [selectedValues, values, onValuesChange]
   );
 
   const registerLabel = React.useCallback(
@@ -140,14 +140,42 @@ function MultiSelect({
     []
   );
 
+  const unregisterLabel = React.useCallback((key: string) => {
+    setLabels((prev) => {
+      if (!prev.has(key)) return prev;
+
+      const next = new Map(prev);
+      next.delete(key);
+
+      return next;
+    });
+  }, []);
+
   const context = React.useMemo<MultiSelectContextValue>(
-    () => ({ open, single, selectedValues, labels, toggle, registerLabel }),
-    [open, single, selectedValues, labels, toggle, registerLabel]
+    () => ({
+      open,
+      selectedValues,
+      labels,
+      search,
+      setSearch,
+      toggle,
+      registerLabel,
+      unregisterLabel,
+    }),
+    [
+      open,
+      selectedValues,
+      labels,
+      search,
+      toggle,
+      registerLabel,
+      unregisterLabel,
+    ]
   );
 
   return (
     <MultiSelectContext.Provider value={context}>
-      <Popover open={open} onOpenChange={setOpen}>
+      <Popover open={open} onOpenChange={handleOpenChange}>
         {children}
       </Popover>
     </MultiSelectContext.Provider>
@@ -161,14 +189,23 @@ interface MultiSelectTriggerProps extends React.ComponentProps<'button'> {}
  *
  * The field surface. Renders the selected value(s) plus a chevron and toggles
  * the popover. Pass an `aria-label` (or a visible label via `Field`) so the
- * combobox has an accessible name.
+ * combobox has an accessible name. Backspace / Delete removes the last selected
+ * value, so keyboard users can clear chips without reopening the list.
  */
 function MultiSelectTrigger({
   className,
   children,
   ...props
 }: MultiSelectTriggerProps) {
-  const { open } = useMultiSelect();
+  const { open, selectedValues, toggle } = useMultiSelect();
+
+  const handleKeyDown = (event: React.KeyboardEvent<HTMLButtonElement>) => {
+    if (event.key !== 'Backspace' && event.key !== 'Delete') return;
+    if (selectedValues.size === 0) return;
+
+    const values = [...selectedValues];
+    toggle(values[values.length - 1] as string);
+  };
 
   return (
     <PopoverTrigger asChild>
@@ -185,6 +222,7 @@ function MultiSelectTrigger({
           'nx:disabled:cursor-not-allowed nx:disabled:border-border-disabled nx:disabled:bg-disabled nx:disabled:text-disabled-foreground',
           className
         )}
+        onKeyDown={handleKeyDown}
         {...props}
       >
         {children}
@@ -224,9 +262,10 @@ interface MultiSelectValueProps extends Omit<
 /**
  * MultiSelectValue
  *
- * Renders selected values inside the trigger — a plain label in `single` mode,
- * otherwise removable chips. When chips exceed the field width they collapse
- * into a measured `+N` badge (unless wrapping).
+ * Renders the selected values inside the trigger as removable chips. When chips
+ * exceed the field width they collapse into a measured `+N` badge (unless
+ * wrapping). A selected value with no registered label falls back to its raw
+ * value so a non-empty selection never shows the placeholder.
  */
 function MultiSelectValue({
   className,
@@ -235,10 +274,9 @@ function MultiSelectValue({
   overflowBehavior = 'wrap-when-open',
   ...props
 }: MultiSelectValueProps) {
-  const { selectedValues, labels, single, open, toggle } = useMultiSelect();
+  const { selectedValues, labels, open, toggle } = useMultiSelect();
   const [overflowAmount, setOverflowAmount] = React.useState(0);
   const valueRef = React.useRef<HTMLDivElement>(null);
-  const overflowRef = React.useRef<HTMLDivElement>(null);
 
   const shouldWrap =
     overflowBehavior === 'wrap' ||
@@ -249,14 +287,13 @@ function MultiSelectValue({
 
     if (!container) return;
 
-    const overflowBadge = overflowRef.current;
     const chips = container.querySelectorAll<HTMLElement>(
       '[data-selected-item]'
     );
 
     // Reset to the fully-expanded state, then hide chips from the end until the
-    // row stops overflowing — the count of hidden chips becomes the `+N` badge.
-    if (overflowBadge) overflowBadge.style.display = 'none';
+    // row stops overflowing — the count of hidden chips becomes the `+N` badge,
+    // whose visibility is driven from that count in render (single source).
     chips.forEach((chip) => chip.style.removeProperty('display'));
 
     let amount = 0;
@@ -269,7 +306,6 @@ function MultiSelectValue({
 
       amount = chips.length - i;
       chip.style.display = 'none';
-      overflowBadge?.style.removeProperty('display');
     }
 
     setOverflowAmount(amount);
@@ -298,9 +334,7 @@ function MultiSelectValue({
     [checkOverflow]
   );
 
-  const selected = [...selectedValues].filter((value) => labels.has(value));
-
-  if (selected.length === 0)
+  if (selectedValues.size === 0)
     return (
       <span
         data-slot="multi-select-placeholder"
@@ -309,16 +343,6 @@ function MultiSelectValue({
         {placeholder}
       </span>
     );
-
-  if (single) {
-    const [first] = selected;
-
-    return (
-      <span data-slot="multi-select-value" className="nx:truncate">
-        {first ? labels.get(first) : null}
-      </span>
-    );
-  }
 
   const removeChip = (event: React.MouseEvent, value: string) => {
     event.stopPropagation();
@@ -336,7 +360,7 @@ function MultiSelectValue({
       )}
       {...props}
     >
-      {selected.map((value) => (
+      {[...selectedValues].map((value) => (
         <Badge
           key={value}
           data-slot="multi-select-chip"
@@ -352,7 +376,7 @@ function MultiSelectValue({
             clickToRemove ? (event) => removeChip(event, value) : undefined
           }
         >
-          <span className="nx:truncate">{labels.get(value)}</span>
+          <span className="nx:truncate">{labels.get(value) ?? value}</span>
           {clickToRemove && (
             <IconX
               aria-hidden="true"
@@ -362,7 +386,6 @@ function MultiSelectValue({
         </Badge>
       ))}
       <Badge
-        ref={overflowRef}
         data-slot="multi-select-overflow"
         variant="secondary"
         fill="light"
@@ -397,9 +420,9 @@ interface MultiSelectContentProps extends Omit<
 /**
  * MultiSelectContent
  *
- * The searchable option list. Also renders an always-mounted, hidden copy of the
- * options so their labels stay registered for the trigger chips while the
- * popover is closed.
+ * The searchable option list. The popover content stays mounted (`forceMount`)
+ * and is hidden with CSS while closed, so each option's label-registration
+ * effect keeps preselected chips labeled without a second, shadow option tree.
  */
 function MultiSelectContent({
   children,
@@ -410,36 +433,34 @@ function MultiSelectContent({
   emptyMessage = 'No results found.',
   ...props
 }: MultiSelectContentProps) {
+  const { search, setSearch } = useMultiSelect();
+
   return (
-    <>
-      {/* Options only mount inside the popover, which unmounts when closed. This
-          hidden copy keeps each MultiSelectItem's label-registration effect
-          alive so preselected chips stay labeled while the popover is closed. */}
-      <div hidden>
-        <Command>
-          <CommandList>{children}</CommandList>
-        </Command>
-      </div>
-      <PopoverContent
-        data-slot="multi-select-content"
-        aria-label="Options"
-        align={align}
-        sideOffset={sideOffset}
-        className={cn(
-          'nx:w-(--radix-popover-trigger-width) nx:min-w-56 nx:p-0',
-          className
-        )}
-        {...props}
-      >
-        <Command>
-          <CommandInput placeholder={searchPlaceholder} />
-          <CommandList>
-            <CommandEmpty>{emptyMessage}</CommandEmpty>
-            {children}
-          </CommandList>
-        </Command>
-      </PopoverContent>
-    </>
+    <PopoverContent
+      forceMount
+      data-slot="multi-select-content"
+      aria-label="Options"
+      align={align}
+      sideOffset={sideOffset}
+      className={cn(
+        'nx:w-(--radix-popover-trigger-width) nx:min-w-56 nx:p-0',
+        'nx:data-[state=closed]:hidden',
+        className
+      )}
+      {...props}
+    >
+      <Command>
+        <CommandInput
+          placeholder={searchPlaceholder}
+          value={search}
+          onValueChange={setSearch}
+        />
+        <CommandList>
+          <CommandEmpty>{emptyMessage}</CommandEmpty>
+          {children}
+        </CommandList>
+      </Command>
+    </PopoverContent>
   );
 }
 
@@ -462,65 +483,63 @@ interface MultiSelectItemProps extends Omit<
 /**
  * MultiSelectItem
  *
- * A selectable option. Shows a checkbox indicator in multi mode and a trailing
- * check in `single` mode.
+ * A selectable option with a checkbox indicator. cmdk filters on `value` +
+ * `keywords`, so `value` is forwarded to disambiguate duplicate labels and
+ * icon-only content, and string children seed `keywords` so typing the label
+ * matches. cmdk owns `aria-selected` for the active descendant; a visually
+ * hidden "selected" note gives assistive tech the checked-state signal.
  */
 function MultiSelectItem({
   value,
   children,
   badgeLabel,
+  keywords,
   onSelect,
   className,
   ...props
 }: MultiSelectItemProps) {
-  const { selectedValues, single, toggle, registerLabel } = useMultiSelect();
+  const { selectedValues, toggle, registerLabel, unregisterLabel } =
+    useMultiSelect();
   const selected = selectedValues.has(value);
 
   React.useEffect(() => {
     registerLabel(value, badgeLabel ?? children);
-  }, [value, badgeLabel, children, registerLabel]);
+
+    return () => unregisterLabel(value);
+  }, [value, badgeLabel, children, registerLabel, unregisterLabel]);
 
   const handleSelect = () => {
     toggle(value);
     onSelect?.(value);
   };
 
+  const searchKeywords =
+    keywords ?? (typeof children === 'string' ? [children] : undefined);
+
   return (
     <CommandItem
       data-slot="multi-select-item"
       data-checked={selected || undefined}
+      value={value}
+      keywords={searchKeywords}
       className={cn('nx:gap-2', className)}
       onSelect={handleSelect}
       {...props}
     >
-      {single ? (
-        <>
-          <span className="nx:min-w-0 nx:flex-1">{children}</span>
-          <IconCheck
-            aria-hidden="true"
-            className={cn(
-              'nx:size-4 nx:shrink-0',
-              selected ? 'nx:opacity-100' : 'nx:opacity-0'
-            )}
-          />
-        </>
-      ) : (
-        <>
-          <span
-            aria-hidden="true"
-            data-slot="multi-select-indicator"
-            className={cn(
-              'nx:flex nx:size-4 nx:shrink-0 nx:items-center nx:justify-center nx:rounded-sm nx:border-default nx:transition-colors',
-              selected
-                ? 'nx:border-transparent nx:bg-primary-background nx:text-primary-foreground'
-                : 'nx:border-border-default nx:bg-background'
-            )}
-          >
-            {selected && <IconCheck className="nx:size-3" />}
-          </span>
-          <span className="nx:min-w-0 nx:flex-1">{children}</span>
-        </>
-      )}
+      <span
+        aria-hidden="true"
+        data-slot="multi-select-indicator"
+        className={cn(
+          'nx:flex nx:size-4 nx:shrink-0 nx:items-center nx:justify-center nx:rounded-sm nx:border-default nx:transition-colors',
+          selected
+            ? 'nx:border-transparent nx:bg-primary-background nx:text-primary-foreground'
+            : 'nx:border-border-default nx:bg-background'
+        )}
+      >
+        {selected && <IconCheck className="nx:size-3" />}
+      </span>
+      <span className="nx:min-w-0 nx:flex-1">{children}</span>
+      {selected && <span className="nx:sr-only">selected</span>}
     </CommandItem>
   );
 }

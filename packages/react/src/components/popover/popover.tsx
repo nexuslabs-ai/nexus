@@ -66,14 +66,16 @@ function PopoverContent({
   className,
   align = 'center',
   sideOffset = 4,
+  forceMount,
   ...props
 }: PopoverContentProps) {
   return (
-    <PopoverPrimitive.Portal>
+    <PopoverPrimitive.Portal forceMount={forceMount}>
       <PopoverPrimitive.Content
         data-slot="popover-content"
         align={align}
         sideOffset={sideOffset}
+        forceMount={forceMount}
         className={cn(
           'nx:z-popover nx:w-72 nx:p-container nx:outline-none',
           popoverSurfaceClassName,
