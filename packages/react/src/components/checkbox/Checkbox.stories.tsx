@@ -155,6 +155,13 @@ export const TouchTarget: Story = {
 
     await expect(box).toHaveClass('nx:relative');
     await expect(box).toHaveClass('nx:pointer-coarse:after:-inset-3.5');
+    await expect(box).toHaveClass('nx:bg-container');
+    await expect(box).toHaveClass(
+      'nx:enabled:data-[state=unchecked]:hover:bg-container-hover'
+    );
+    await expect(box).toHaveClass(
+      'nx:enabled:data-[state=unchecked]:active:bg-container-active'
+    );
   },
 };
 
