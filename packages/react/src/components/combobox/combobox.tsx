@@ -24,9 +24,9 @@ interface ComboboxContextValue {
   disabled: boolean;
   inputValue: string;
   invalid: boolean;
+  items: ComboboxOption[];
   listId: string;
   open: boolean;
-  options: ComboboxOption[];
   readOnly: boolean;
   required: boolean;
   selectedLabel: string;
@@ -185,9 +185,9 @@ interface ComboboxProps extends Omit<
   'defaultValue' | 'onChange'
 > {
   /**
-   * Options rendered by `ComboboxList` when its children are a render function.
+   * Items rendered by `ComboboxList` when its children are omitted.
    */
-  options: ComboboxOption[];
+  items: ComboboxOption[];
   /**
    * Controlled selected option value.
    */
@@ -247,11 +247,11 @@ function Combobox({
   defaultValue,
   disabled = false,
   invalid = false,
+  items,
   name,
   onOpenChange,
   onValueChange,
   open: openProp,
-  options,
   readOnly = false,
   required = false,
   value: valueProp,
@@ -278,13 +278,13 @@ function Combobox({
   const hiddenInputRef = React.useRef<HTMLInputElement>(null);
 
   const selectedOption = React.useMemo(
-    () => options.find((option) => option.value === selectedValue),
-    [options, selectedValue]
+    () => items.find((option) => option.value === selectedValue),
+    [items, selectedValue]
   );
   const selectedLabel = selectedOption?.label ?? '';
   const visibleOptions = React.useMemo(
-    () => filterOptions(options, filterValue),
-    [filterValue, options]
+    () => filterOptions(items, filterValue),
+    [filterValue, items]
   );
 
   const setOpenState = React.useCallback(
@@ -296,14 +296,14 @@ function Combobox({
       if (nextOpen) {
         setInputValue(selectedLabel);
         setFilterValue('');
-        setActiveValue(selectedValue || getFirstEnabledValue(options));
+        setActiveValue(selectedValue || getFirstEnabledValue(items));
       } else {
         setInputValue('');
         setFilterValue('');
         setActiveValue('');
       }
     },
-    [disabled, options, readOnly, selectedLabel, selectedValue, setOpen]
+    [disabled, items, readOnly, selectedLabel, selectedValue, setOpen]
   );
 
   const setOpenFromField = React.useCallback(() => {
@@ -314,7 +314,7 @@ function Combobox({
     (nextValue: string) => {
       if (disabled || readOnly) return;
 
-      const nextVisibleOptions = filterOptions(options, nextValue);
+      const nextVisibleOptions = filterOptions(items, nextValue);
 
       setInputValue(nextValue);
       setFilterValue(nextValue);
@@ -327,7 +327,7 @@ function Combobox({
     },
     [
       disabled,
-      options,
+      items,
       readOnly,
       selectedLabel,
       selectedValue,
@@ -342,11 +342,11 @@ function Combobox({
         setSelectedValue('');
         setInputValue('');
         setFilterValue('');
-        setActiveValue(getFirstEnabledValue(options));
+        setActiveValue(getFirstEnabledValue(items));
         return;
       }
 
-      const option = options.find((item) => item.value === nextValue);
+      const option = items.find((item) => item.value === nextValue);
 
       if (!option || option.disabled || disabled || readOnly) return;
 
@@ -356,7 +356,7 @@ function Combobox({
       setActiveValue(nextValue);
       setOpen(false);
     },
-    [disabled, options, readOnly, setOpen, setSelectedValue]
+    [disabled, items, readOnly, setOpen, setSelectedValue]
   );
 
   const stepActiveValue = React.useCallback(
@@ -405,9 +405,9 @@ function Combobox({
       disabled,
       inputValue,
       invalid,
+      items,
       listId,
       open,
-      options,
       readOnly,
       required,
       selectedLabel,
@@ -428,9 +428,9 @@ function Combobox({
       handleSelectedValueChange,
       inputValue,
       invalid,
+      items,
       listId,
       open,
-      options,
       readOnly,
       required,
       selectedLabel,

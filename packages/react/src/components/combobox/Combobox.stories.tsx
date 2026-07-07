@@ -33,16 +33,16 @@ const groupedFrameworks: ComboboxOption[] = [
 
 function FrameworkCombobox({
   inputClassName = 'nx:w-64',
-  options = frameworks,
+  items = frameworks,
   placeholder = 'Select a framework',
   ...props
-}: Omit<React.ComponentProps<typeof Combobox>, 'options'> & {
+}: Omit<React.ComponentProps<typeof Combobox>, 'items'> & {
   inputClassName?: string;
-  options?: ComboboxOption[];
+  items?: ComboboxOption[];
   placeholder?: string;
 }) {
   return (
-    <Combobox options={options} {...props}>
+    <Combobox items={items} {...props}>
       <ComboboxInput
         aria-label="Framework"
         className={inputClassName}
@@ -122,7 +122,7 @@ export const Sizes: Story = {
   render: () => (
     <div className="nx:flex nx:w-64 nx:flex-col nx:gap-3">
       <FrameworkCombobox placeholder="Default" inputClassName="" />
-      <Combobox options={frameworks}>
+      <Combobox items={frameworks}>
         <ComboboxInput
           aria-label="Small framework"
           size="sm"
@@ -133,7 +133,7 @@ export const Sizes: Story = {
           <ComboboxList />
         </ComboboxContent>
       </Combobox>
-      <Combobox options={frameworks}>
+      <Combobox items={frameworks}>
         <ComboboxInput
           aria-label="Large framework"
           size="lg"
@@ -149,7 +149,7 @@ export const Sizes: Story = {
 };
 
 export const Grouped: Story = {
-  render: () => <FrameworkCombobox options={groupedFrameworks} />,
+  render: () => <FrameworkCombobox items={groupedFrameworks} />,
 };
 
 export const Disabled: Story = {
@@ -169,7 +169,7 @@ export const Disabled: Story = {
 export const WithDisabledOption: Story = {
   render: () => (
     <FrameworkCombobox
-      options={[
+      items={[
         { value: 'next', label: 'Next.js' },
         { value: 'sveltekit', label: 'SvelteKit', disabled: true },
         { value: 'astro', label: 'Astro' },
@@ -182,7 +182,7 @@ export const InvalidRequiredField: Story = {
   render: () => (
     <Field data-invalid>
       <FieldLabel htmlFor="framework-required">Framework</FieldLabel>
-      <Combobox options={frameworks} required invalid>
+      <Combobox items={frameworks} required invalid>
         <ComboboxInput
           id="framework-required"
           aria-describedby="framework-required-description framework-required-error"
@@ -321,7 +321,7 @@ export const AllVariants: Story = {
         placeholder="Default filled"
         inputClassName=""
       />
-      <Combobox options={frameworks}>
+      <Combobox items={frameworks}>
         <ComboboxInput
           variant="borderless"
           aria-label="Borderless empty"
@@ -332,7 +332,7 @@ export const AllVariants: Story = {
           <ComboboxList />
         </ComboboxContent>
       </Combobox>
-      <Combobox options={frameworks} defaultValue="astro">
+      <Combobox items={frameworks} defaultValue="astro">
         <ComboboxInput
           variant="borderless"
           aria-label="Borderless filled"
