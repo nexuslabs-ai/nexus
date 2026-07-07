@@ -18,11 +18,7 @@ interface MultiSelectContextValue {
   open: boolean;
   selectedValues: Set<string>;
   labels: Map<string, React.ReactNode>;
-  search: string;
-  setSearch: (search: string) => void;
   toggle: (value: string) => void;
-  registerLabel: (value: string, label: React.ReactNode) => void;
-  unregisterLabel: (value: string) => void;
 }
 
 const MultiSelectContext = React.createContext<MultiSelectContextValue | null>(
@@ -46,6 +42,45 @@ function toggleValue(values: Set<string>, value: string) {
   if (!next.delete(value)) next.add(value);
 
   return next;
+}
+
+/**
+ * Walk the composed children and map each option's `value` to the label the
+ * trigger chip should show (`badgeLabel`, falling back to the option content).
+ * Reading it straight from the JSX means preselected chips stay labeled even
+ * while the list is closed — no always-mounted option tree required.
+ */
+function collectLabels(
+  children: React.ReactNode,
+  labels: Map<string, React.ReactNode> = new Map()
+) {
+  React.Children.forEach(children, (child) => {
+    if (!React.isValidElement(child)) return;
+
+    if (child.type === MultiSelectItem) {
+      const {
+        value,
+        badgeLabel,
+        children: content,
+      } = child.props as MultiSelectItemProps;
+      labels.set(value, badgeLabel ?? content);
+
+      return;
+    }
+
+    // Recurse through groups, fragments, and any wrapper that carries options
+    // as children (e.g. MultiSelectGroup).
+    const { children: nested } = child.props as {
+      children?: React.ReactNode;
+    };
+    if (nested) collectLabels(nested, labels);
+  });
+
+  return labels;
+}
+
+function labelText(label: React.ReactNode, fallback: string) {
+  return typeof label === 'string' ? label : fallback;
 }
 
 function debounce<T extends (...args: never[]) => void>(func: T, wait: number) {
@@ -77,9 +112,9 @@ interface MultiSelectProps {
  * MultiSelect
  *
  * A searchable multiple-selection field. cmdk (via `Command`) owns filtering and
- * keyboard navigation; this component adds the selected-value model, the chip
- * trigger, and a label registry so the trigger can render chips for values whose
- * options are not on screen. For searchable single selection, use `Combobox`.
+ * keyboard navigation; this component adds the selected-value model and the chip
+ * trigger, reading option labels from its own children so chips stay labeled
+ * while the list is closed. For searchable single selection, use `Combobox`.
  *
  * @example
  * ```tsx
@@ -101,83 +136,47 @@ function MultiSelect({
   onValuesChange,
 }: MultiSelectProps) {
   const [open, setOpen] = React.useState(false);
-  const [search, setSearch] = React.useState('');
   const [uncontrolled, setUncontrolled] = React.useState(
     () => new Set(values ?? defaultValues)
   );
-  const [labels, setLabels] = React.useState<Map<string, React.ReactNode>>(
-    () => new Map()
-  );
+  const [announcement, setAnnouncement] = React.useState('');
 
   const selectedValues = React.useMemo(
     () => (values ? new Set(values) : uncontrolled),
     [values, uncontrolled]
   );
 
-  const handleOpenChange = React.useCallback((next: boolean) => {
-    setOpen(next);
-    // The list stays mounted (forceMount), so reset the query on close instead
-    // of relying on unmount to clear cmdk's internal search state.
-    if (!next) setSearch('');
-  }, []);
+  const labels = React.useMemo(() => collectLabels(children), [children]);
 
   const toggle = React.useCallback(
-    (next: string) => {
-      const nextValues = toggleValue(selectedValues, next);
+    (value: string) => {
+      const wasSelected = selectedValues.has(value);
+      const nextValues = toggleValue(selectedValues, value);
 
       if (values === undefined) setUncontrolled(nextValues);
       onValuesChange?.([...nextValues]);
+
+      // cmdk binds aria-selected to the active option, not the checked ones, so
+      // announce each toggle through a live region for assistive tech.
+      const text = labelText(labels.get(value), value);
+      setAnnouncement(`${text} ${wasSelected ? 'removed' : 'selected'}`);
     },
-    [selectedValues, values, onValuesChange]
+    [selectedValues, values, onValuesChange, labels]
   );
-
-  const registerLabel = React.useCallback(
-    (key: string, label: React.ReactNode) => {
-      setLabels((prev) =>
-        prev.get(key) === label ? prev : new Map(prev).set(key, label)
-      );
-    },
-    []
-  );
-
-  const unregisterLabel = React.useCallback((key: string) => {
-    setLabels((prev) => {
-      if (!prev.has(key)) return prev;
-
-      const next = new Map(prev);
-      next.delete(key);
-
-      return next;
-    });
-  }, []);
 
   const context = React.useMemo<MultiSelectContextValue>(
-    () => ({
-      open,
-      selectedValues,
-      labels,
-      search,
-      setSearch,
-      toggle,
-      registerLabel,
-      unregisterLabel,
-    }),
-    [
-      open,
-      selectedValues,
-      labels,
-      search,
-      toggle,
-      registerLabel,
-      unregisterLabel,
-    ]
+    () => ({ open, selectedValues, labels, toggle }),
+    [open, selectedValues, labels, toggle]
   );
 
   return (
     <MultiSelectContext.Provider value={context}>
-      <Popover open={open} onOpenChange={handleOpenChange}>
+      <Popover open={open} onOpenChange={setOpen}>
         {children}
       </Popover>
+      <span role="status" aria-live="polite" className="nx:sr-only">
+        {announcement}
+      </span>
     </MultiSelectContext.Provider>
   );
 }
@@ -201,10 +200,10 @@ function MultiSelectTrigger({
 
   const handleKeyDown = (event: React.KeyboardEvent<HTMLButtonElement>) => {
     if (event.key !== 'Backspace' && event.key !== 'Delete') return;
-    if (selectedValues.size === 0) return;
 
     const values = [...selectedValues];
-    toggle(values[values.length - 1] as string);
+    const last = values[values.length - 1];
+    if (last) toggle(last);
   };
 
   return (
@@ -420,9 +419,9 @@ interface MultiSelectContentProps extends Omit<
 /**
  * MultiSelectContent
  *
- * The searchable option list. The popover content stays mounted (`forceMount`)
- * and is hidden with CSS while closed, so each option's label-registration
- * effect keeps preselected chips labeled without a second, shadow option tree.
+ * The searchable option list, rendered in a Popover so Radix owns focus,
+ * dismissal, and open/close motion. The list unmounts while closed; chip labels
+ * come from `MultiSelect`'s reading of these same children, not a shadow tree.
  */
 function MultiSelectContent({
   children,
@@ -433,28 +432,20 @@ function MultiSelectContent({
   emptyMessage = 'No results found.',
   ...props
 }: MultiSelectContentProps) {
-  const { search, setSearch } = useMultiSelect();
-
   return (
     <PopoverContent
-      forceMount
       data-slot="multi-select-content"
       aria-label="Options"
       align={align}
       sideOffset={sideOffset}
       className={cn(
         'nx:w-(--radix-popover-trigger-width) nx:min-w-56 nx:p-0',
-        'nx:data-[state=closed]:hidden',
         className
       )}
       {...props}
     >
       <Command>
-        <CommandInput
-          placeholder={searchPlaceholder}
-          value={search}
-          onValueChange={setSearch}
-        />
+        <CommandInput placeholder={searchPlaceholder} />
         <CommandList>
           <CommandEmpty>{emptyMessage}</CommandEmpty>
           {children}
@@ -486,27 +477,20 @@ interface MultiSelectItemProps extends Omit<
  * A selectable option with a checkbox indicator. cmdk filters on `value` +
  * `keywords`, so `value` is forwarded to disambiguate duplicate labels and
  * icon-only content, and string children seed `keywords` so typing the label
- * matches. cmdk owns `aria-selected` for the active descendant; a visually
- * hidden "selected" note gives assistive tech the checked-state signal.
+ * matches. Selection toggles are announced via `MultiSelect`'s live region,
+ * since cmdk owns `aria-selected` for the active descendant.
  */
 function MultiSelectItem({
   value,
   children,
-  badgeLabel,
+  badgeLabel: _badgeLabel,
   keywords,
   onSelect,
   className,
   ...props
 }: MultiSelectItemProps) {
-  const { selectedValues, toggle, registerLabel, unregisterLabel } =
-    useMultiSelect();
+  const { selectedValues, toggle } = useMultiSelect();
   const selected = selectedValues.has(value);
-
-  React.useEffect(() => {
-    registerLabel(value, badgeLabel ?? children);
-
-    return () => unregisterLabel(value);
-  }, [value, badgeLabel, children, registerLabel, unregisterLabel]);
 
   const handleSelect = () => {
     toggle(value);
@@ -539,7 +523,6 @@ function MultiSelectItem({
         {selected && <IconCheck className="nx:size-3" />}
       </span>
       <span className="nx:min-w-0 nx:flex-1">{children}</span>
-      {selected && <span className="nx:sr-only">selected</span>}
     </CommandItem>
   );
 }

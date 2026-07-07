@@ -284,7 +284,11 @@ export const KeyboardInteraction: Story = {
     await userEvent.click(trigger);
     const search = await body.findByPlaceholderText('Search frameworks…');
 
-    await userEvent.type(search, 'sve');
+    // Radix moves focus into the list on open, so cmdk's arrow/type nav is live
+    // immediately — no manual click into the search box required.
+    await waitFor(() => expect(search).toHaveFocus());
+
+    await userEvent.keyboard('sve');
     await userEvent.keyboard('{Enter}');
 
     await expect(within(trigger).getByText('Svelte')).toBeInTheDocument();
