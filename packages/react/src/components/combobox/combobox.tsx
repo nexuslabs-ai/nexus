@@ -253,9 +253,10 @@ function Combobox({
   const [inputValue, setInputValue] = React.useState(
     selectedOption?.label ?? ''
   );
+  const [filterValue, setFilterValue] = React.useState('');
   const visibleGroups = React.useMemo(
-    () => filterSelectionGroups(groups, inputValue),
-    [groups, inputValue]
+    () => filterSelectionGroups(groups, filterValue),
+    [filterValue, groups]
   );
   const visibleOptions = React.useMemo(
     () => flattenSelectionOptions(visibleGroups),
@@ -274,6 +275,7 @@ function Combobox({
   const resetInputValue = React.useCallback(() => {
     const option = findSelectionOption(groups, value);
     setInputValue(option?.label ?? '');
+    setFilterValue('');
   }, [groups, value]);
 
   const setOpen = React.useCallback(
@@ -285,9 +287,16 @@ function Combobox({
   );
 
   const updateActiveValue = React.useCallback(
-    (nextGroups = visibleGroups) => {
-      const firstValue = getFirstEnabledValue(nextGroups);
-      setActiveValue(autoHighlight ? firstValue : undefined);
+    (nextGroups = visibleGroups, preferredValue?: string) => {
+      const preferredOption = preferredValue
+        ? findSelectionOption(nextGroups, preferredValue)
+        : undefined;
+      const nextActiveValue =
+        preferredOption && !preferredOption.disabled
+          ? preferredOption.value
+          : getFirstEnabledValue(nextGroups);
+
+      setActiveValue(autoHighlight ? nextActiveValue : undefined);
     },
     [autoHighlight, visibleGroups]
   );
@@ -298,6 +307,7 @@ function Combobox({
       const nextGroups = filterSelectionGroups(groups, nextInputValue);
 
       setInputValue(nextInputValue);
+      setFilterValue(nextInputValue);
       if (!interactionDisabled) setOpenState(true);
       updateActiveValue(nextGroups);
     },
@@ -310,6 +320,7 @@ function Combobox({
 
       setValue(option.value);
       setInputValue(option.label);
+      setFilterValue('');
       setOpenState(false);
     },
     [interactionDisabled, setOpenState, setValue]
@@ -337,6 +348,7 @@ function Combobox({
 
     setValue('');
     setInputValue('');
+    setFilterValue('');
     setOpenState(true);
     updateActiveValue(groups);
   }, [groups, interactionDisabled, setOpenState, setValue, updateActiveValue]);
@@ -380,19 +392,35 @@ function Combobox({
     (event: React.FocusEvent<HTMLInputElement>) => {
       onFocus?.(event);
       if (!event.defaultPrevented && !interactionDisabled) {
+        setFilterValue('');
         setOpenState(true);
-        updateActiveValue();
+        updateActiveValue(groups, value);
       }
     },
-    [interactionDisabled, onFocus, setOpenState, updateActiveValue]
+    [
+      groups,
+      interactionDisabled,
+      onFocus,
+      setOpenState,
+      updateActiveValue,
+      value,
+    ]
   );
 
   const handleInputClick = React.useCallback(() => {
     if (interactionDisabled || open) return;
 
+    setFilterValue('');
     setOpenState(true);
-    updateActiveValue();
-  }, [interactionDisabled, open, setOpenState, updateActiveValue]);
+    updateActiveValue(groups, value);
+  }, [
+    groups,
+    interactionDisabled,
+    open,
+    setOpenState,
+    updateActiveValue,
+    value,
+  ]);
 
   const handleInputBlur = React.useCallback(
     (event: React.FocusEvent<HTMLInputElement>) => {

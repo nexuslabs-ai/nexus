@@ -311,6 +311,14 @@ export const ClickInteraction: Story = {
     await expect(
       document.body.querySelector('[data-slot="combobox-content"]')
     ).toHaveAttribute('data-state', 'open');
+
+    const reopenedListbox = await within(document.body).findByRole('listbox');
+    await expect(within(reopenedListbox).getAllByRole('option')).toHaveLength(
+      frameworkOptions.length
+    );
+    await expect(
+      within(reopenedListbox).getByRole('option', { name: 'Remix' })
+    ).toHaveAttribute('aria-selected', 'true');
   },
 };
 
