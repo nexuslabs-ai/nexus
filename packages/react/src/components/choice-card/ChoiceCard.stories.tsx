@@ -28,16 +28,9 @@ const meta: Meta<typeof ChoiceCard> = {
     },
   },
   argTypes: {
-    controlPosition: {
-      control: 'radio',
-      options: ['before', 'after'],
-    },
-    floating: {
-      control: 'boolean',
-    },
     variant: {
       control: 'radio',
-      options: ['default', 'outline'],
+      options: ['bordered', 'borderless'],
     },
   },
 };
@@ -70,20 +63,13 @@ function getBackgroundColor(element: HTMLElement) {
 }
 
 type ChoiceCardVariant = NonNullable<ChoiceCardProps['variant']>;
-type ChoiceCardControlPosition = NonNullable<
-  ChoiceCardProps['controlPosition']
->;
 
 interface PlanRadioCardsProps {
-  controlPosition?: ChoiceCardControlPosition;
-  floating?: boolean;
   idPrefix?: string;
   variant?: ChoiceCardVariant;
 }
 
 function PlanRadioCards({
-  controlPosition,
-  floating,
   idPrefix = 'choice-card-radio',
   variant,
 }: PlanRadioCardsProps = {}) {
@@ -95,12 +81,7 @@ function PlanRadioCards({
     <FieldSet className="nx:w-96 nx:max-w-full">
       <FieldLegend id={legendId}>Plan</FieldLegend>
       <RadioGroup aria-labelledby={legendId}>
-        <ChoiceCard
-          htmlFor={standardId}
-          controlPosition={controlPosition}
-          floating={floating}
-          variant={variant}
-        >
+        <ChoiceCard htmlFor={standardId} variant={variant}>
           <RadioGroupItem
             id={standardId}
             value="standard"
@@ -116,12 +97,7 @@ function PlanRadioCards({
             </ChoiceCardDescription>
           </ChoiceCardContent>
         </ChoiceCard>
-        <ChoiceCard
-          htmlFor={priorityId}
-          controlPosition={controlPosition}
-          floating={floating}
-          variant={variant}
-        >
+        <ChoiceCard htmlFor={priorityId} variant={variant}>
           <RadioGroupItem
             id={priorityId}
             value="priority"
@@ -143,100 +119,98 @@ function PlanRadioCards({
 }
 
 interface CheckboxChoiceCardProps {
-  checked?: React.ComponentProps<typeof Checkbox>['checked'];
-  controlPosition?: ChoiceCardControlPosition;
   defaultChecked?: boolean;
   description: string;
   disabled?: boolean;
-  floating?: boolean;
   id: string;
   invalid?: boolean;
   title: string;
+  trailing?: boolean;
   variant?: ChoiceCardVariant;
 }
 
 function CheckboxChoiceCard({
-  checked,
-  controlPosition,
   defaultChecked,
   description,
   disabled,
-  floating,
   id,
   invalid,
   title,
+  trailing,
   variant,
 }: CheckboxChoiceCardProps) {
-  const stateProps = checked === undefined ? { defaultChecked } : { checked };
+  const checkbox = (
+    <Checkbox
+      id={id}
+      defaultChecked={defaultChecked}
+      disabled={disabled}
+      aria-invalid={invalid || undefined}
+      aria-labelledby={`${id}-title`}
+      aria-describedby={`${id}-description`}
+    />
+  );
+  const content = (
+    <ChoiceCardContent>
+      <ChoiceCardTitle id={`${id}-title`}>{title}</ChoiceCardTitle>
+      <ChoiceCardDescription id={`${id}-description`}>
+        {description}
+      </ChoiceCardDescription>
+    </ChoiceCardContent>
+  );
 
   return (
-    <ChoiceCard
-      htmlFor={id}
-      controlPosition={controlPosition}
-      floating={floating}
-      variant={variant}
-    >
-      <Checkbox
-        id={id}
-        disabled={disabled}
-        aria-invalid={invalid || undefined}
-        aria-labelledby={`${id}-title`}
-        aria-describedby={`${id}-description`}
-        {...stateProps}
-      />
-      <ChoiceCardContent>
-        <ChoiceCardTitle id={`${id}-title`}>{title}</ChoiceCardTitle>
-        <ChoiceCardDescription id={`${id}-description`}>
-          {description}
-        </ChoiceCardDescription>
-      </ChoiceCardContent>
+    <ChoiceCard htmlFor={id} variant={variant}>
+      {trailing ? content : checkbox}
+      {trailing ? checkbox : content}
     </ChoiceCard>
   );
 }
 
 interface RadioChoiceCardProps {
-  controlPosition?: ChoiceCardControlPosition;
+  defaultValue?: string;
   description: string;
   disabled?: boolean;
-  floating?: boolean;
   id: string;
   invalid?: boolean;
   title: string;
+  trailing?: boolean;
   variant?: ChoiceCardVariant;
 }
 
 function RadioChoiceCard({
-  controlPosition,
+  defaultValue,
   description,
   disabled,
-  floating,
   id,
   invalid,
   title,
+  trailing,
   variant,
 }: RadioChoiceCardProps) {
+  const item = (
+    <RadioGroupItem
+      id={id}
+      value={id}
+      disabled={disabled}
+      aria-invalid={invalid || undefined}
+      aria-labelledby={`${id}-title`}
+      aria-describedby={`${id}-description`}
+    />
+  );
+  const content = (
+    <ChoiceCardContent>
+      <ChoiceCardTitle id={`${id}-title`}>{title}</ChoiceCardTitle>
+      <ChoiceCardDescription id={`${id}-description`}>
+        {description}
+      </ChoiceCardDescription>
+    </ChoiceCardContent>
+  );
+
   return (
-    <RadioGroup aria-label={title} defaultValue={id}>
-      <ChoiceCard
-        htmlFor={id}
-        controlPosition={controlPosition}
-        floating={floating}
-        variant={variant}
-      >
-        <RadioGroupItem
-          id={id}
-          value={id}
-          disabled={disabled}
-          aria-invalid={invalid || undefined}
-          aria-labelledby={`${id}-title`}
-          aria-describedby={`${id}-description`}
-        />
-        <ChoiceCardContent>
-          <ChoiceCardTitle id={`${id}-title`}>{title}</ChoiceCardTitle>
-          <ChoiceCardDescription id={`${id}-description`}>
-            {description}
-          </ChoiceCardDescription>
-        </ChoiceCardContent>
+    <RadioGroup aria-label={title} defaultValue={defaultValue ?? id}>
+      <ChoiceCard htmlFor={id} variant={variant}>
+        {trailing ? content : item}
+        {trailing ? item : content}
       </ChoiceCard>
     </RadioGroup>
   );
@@ -267,7 +241,9 @@ export const Default: Story = {
     const checkbox = canvas.getByRole('checkbox', {
       name: 'Product updates',
     });
+    const card = getCardFor(canvasElement, 'choice-card-default');
 
+    await expect(card).toHaveAttribute('data-variant', 'bordered');
     await expect(checkbox).not.toBeChecked();
     await expect(checkbox).toHaveAccessibleName('Product updates');
     await expect(checkbox).toHaveAccessibleDescription(
@@ -276,6 +252,7 @@ export const Default: Story = {
     await expect(checkbox).not.toHaveAccessibleName(
       /News about features and improvements/i
     );
+    await expect(getComputedStyle(checkbox).marginTop).toBe('2px');
   },
 };
 
@@ -292,6 +269,7 @@ export const WithRadioGroup: Story = {
     await expect(priority).toHaveAccessibleDescription(
       'Faster response routing for urgent teams.'
     );
+    await expect(getComputedStyle(standard).marginTop).toBe('2px');
 
     await userEvent.click(
       canvas.getByText('Faster response routing for urgent teams.')
@@ -301,227 +279,64 @@ export const WithRadioGroup: Story = {
   },
 };
 
-export const VisualVariants: Story = {
-  render: function VisualVariantsStory() {
-    const variants = ['default', 'outline'] as const;
-    const controlPositions = ['before', 'after'] as const;
-    const floatingStates = [true, false] as const;
-
-    return (
-      <div className="nx:grid nx:w-[min(100%,64rem)] nx:grid-cols-1 nx:gap-6 nx:md:grid-cols-2">
-        <div className="nx:grid nx:gap-3">
-          {variants.flatMap((variant) =>
-            controlPositions.flatMap((controlPosition) =>
-              floatingStates.map((floating) => {
-                const id = `choice-card-checkbox-${variant}-${controlPosition}-${floating ? 'floating' : 'attached'}`;
-
-                return (
-                  <CheckboxChoiceCard
-                    key={id}
-                    id={id}
-                    variant={variant}
-                    controlPosition={controlPosition}
-                    floating={floating}
-                    defaultChecked={variant === 'outline'}
-                    title={`Checkbox ${variant} ${controlPosition} ${floating ? 'floating' : 'attached'}`}
-                    description="Checkbox cards share the same visual variants."
-                  />
-                );
-              })
-            )
-          )}
-        </div>
-        <div className="nx:grid nx:gap-3">
-          {variants.flatMap((variant) =>
-            controlPositions.flatMap((controlPosition) =>
-              floatingStates.map((floating) => {
-                const id = `choice-card-radio-${variant}-${controlPosition}-${floating ? 'floating' : 'attached'}`;
-
-                return (
-                  <RadioChoiceCard
-                    key={id}
-                    id={id}
-                    variant={variant}
-                    controlPosition={controlPosition}
-                    floating={floating}
-                    title={`Radio ${variant} ${controlPosition} ${floating ? 'floating' : 'attached'}`}
-                    description="Radio cards use the same card shell."
-                  />
-                );
-              })
-            )
-          )}
-        </div>
-      </div>
-    );
-  },
-  play: async ({ canvasElement }) => {
-    const cards = canvasElement.querySelectorAll('[data-slot="choice-card"]');
-    const checkboxDefaultBefore = getCardFor(
-      canvasElement,
-      'choice-card-checkbox-default-before-floating'
-    );
-    const checkboxOutlineAfter = getCardFor(
-      canvasElement,
-      'choice-card-checkbox-outline-after-attached'
-    );
-    const radioDefaultAfter = getCardFor(
-      canvasElement,
-      'choice-card-radio-default-after-floating'
-    );
-    const radioOutlineBefore = getCardFor(
-      canvasElement,
-      'choice-card-radio-outline-before-attached'
-    );
-    const checkboxBeforeControl = getRequiredElement<HTMLElement>(
-      canvasElement,
-      '#choice-card-checkbox-default-before-floating'
-    );
-    const checkboxAfterControl = getRequiredElement<HTMLElement>(
-      canvasElement,
-      '#choice-card-checkbox-outline-after-attached'
-    );
-    const radioBeforeControl = getRequiredElement<HTMLElement>(
-      canvasElement,
-      '#choice-card-radio-outline-before-attached'
-    );
-    const radioAfterControl = getRequiredElement<HTMLElement>(
-      canvasElement,
-      '#choice-card-radio-default-after-floating'
-    );
-
-    await expect(cards).toHaveLength(16);
-    await expect(checkboxDefaultBefore).toHaveAttribute(
-      'data-variant',
-      'default'
-    );
-    await expect(checkboxDefaultBefore).toHaveAttribute(
-      'data-control-position',
-      'before'
-    );
-    await expect(checkboxDefaultBefore).toHaveAttribute(
-      'data-floating',
-      'true'
-    );
-    await expect(checkboxOutlineAfter).toHaveAttribute(
-      'data-variant',
-      'outline'
-    );
-    await expect(checkboxOutlineAfter).toHaveAttribute(
-      'data-control-position',
-      'after'
-    );
-    await expect(checkboxOutlineAfter).toHaveAttribute(
-      'data-floating',
-      'false'
-    );
-    await expect(radioDefaultAfter).toHaveAttribute(
-      'data-control-position',
-      'after'
-    );
-    await expect(radioOutlineBefore).toHaveAttribute('data-variant', 'outline');
-    await expect(getComputedStyle(checkboxBeforeControl).marginTop).toBe('2px');
-    await expect(getComputedStyle(radioBeforeControl).marginTop).toBe('2px');
-    await expect(getComputedStyle(checkboxAfterControl).marginTop).toBe('0px');
-    await expect(getComputedStyle(radioAfterControl).marginTop).toBe('0px');
-  },
-};
-
 export const TrailingControl: Story = {
   render: () => (
     <div className="nx:w-96 nx:max-w-full">
-      <ChoiceCard htmlFor="choice-card-trailing" controlPosition="after">
-        <Checkbox
-          id="choice-card-trailing"
-          defaultChecked
-          aria-labelledby="choice-card-trailing-title"
-          aria-describedby="choice-card-trailing-description"
-        />
-        <ChoiceCardContent>
-          <ChoiceCardTitle id="choice-card-trailing-title">
-            Billing notices
-          </ChoiceCardTitle>
-          <ChoiceCardDescription id="choice-card-trailing-description">
-            Invoices, receipts, and payment updates.
-          </ChoiceCardDescription>
-        </ChoiceCardContent>
-      </ChoiceCard>
+      <CheckboxChoiceCard
+        id="choice-card-trailing"
+        defaultChecked
+        trailing
+        title="Billing notices"
+        description="Invoices, receipts, and payment updates for every workspace seat in this account."
+      />
     </div>
   ),
+  play: async ({ canvasElement }) => {
+    const card = getCardFor(canvasElement, 'choice-card-trailing');
+    const content = getRequiredElement(
+      canvasElement,
+      '[data-slot="choice-card-content"]'
+    );
+    const checkbox = getRequiredElement<HTMLInputElement>(
+      canvasElement,
+      '#choice-card-trailing'
+    );
+
+    await expect(card.children[0]).toBe(content);
+    await expect(card.children[1]).toBe(checkbox);
+    await expect(getComputedStyle(checkbox).marginTop).toBe('2px');
+  },
 };
 
 export const Disabled: Story = {
   render: () => (
     <div className="nx:grid nx:w-96 nx:max-w-full nx:gap-3">
-      <ChoiceCard htmlFor="choice-card-disabled">
-        <Checkbox
-          id="choice-card-disabled"
-          disabled
-          aria-labelledby="choice-card-disabled-title"
-          aria-describedby="choice-card-disabled-description"
-        />
-        <ChoiceCardContent>
-          <ChoiceCardTitle id="choice-card-disabled-title">
-            Locked notifications
-          </ChoiceCardTitle>
-          <ChoiceCardDescription id="choice-card-disabled-description">
-            This setting is managed by your workspace.
-          </ChoiceCardDescription>
-        </ChoiceCardContent>
-      </ChoiceCard>
-      <ChoiceCard htmlFor="choice-card-disabled-checked">
-        <Checkbox
-          id="choice-card-disabled-checked"
-          disabled
-          defaultChecked
-          aria-labelledby="choice-card-disabled-checked-title"
-          aria-describedby="choice-card-disabled-checked-description"
-        />
-        <ChoiceCardContent>
-          <ChoiceCardTitle id="choice-card-disabled-checked-title">
-            Disabled selected
-          </ChoiceCardTitle>
-          <ChoiceCardDescription id="choice-card-disabled-checked-description">
-            Selected state does not override disabled styling.
-          </ChoiceCardDescription>
-        </ChoiceCardContent>
-      </ChoiceCard>
-      <ChoiceCard htmlFor="choice-card-disabled-invalid">
-        <Checkbox
-          id="choice-card-disabled-invalid"
-          disabled
-          aria-invalid
-          aria-labelledby="choice-card-disabled-invalid-title"
-          aria-describedby="choice-card-disabled-invalid-description"
-        />
-        <ChoiceCardContent>
-          <ChoiceCardTitle id="choice-card-disabled-invalid-title">
-            Disabled invalid
-          </ChoiceCardTitle>
-          <ChoiceCardDescription id="choice-card-disabled-invalid-description">
-            Invalid state does not override disabled styling.
-          </ChoiceCardDescription>
-        </ChoiceCardContent>
-      </ChoiceCard>
-      <RadioGroup aria-label="Disabled radio cards" defaultValue="radio-locked">
-        <ChoiceCard htmlFor="choice-card-disabled-radio" variant="outline">
-          <RadioGroupItem
-            id="choice-card-disabled-radio"
-            value="radio-locked"
-            disabled
-            aria-labelledby="choice-card-disabled-radio-title"
-            aria-describedby="choice-card-disabled-radio-description"
-          />
-          <ChoiceCardContent>
-            <ChoiceCardTitle id="choice-card-disabled-radio-title">
-              Disabled radio
-            </ChoiceCardTitle>
-            <ChoiceCardDescription id="choice-card-disabled-radio-description">
-              Radio disabled state styles the card shell.
-            </ChoiceCardDescription>
-          </ChoiceCardContent>
-        </ChoiceCard>
-      </RadioGroup>
+      <CheckboxChoiceCard
+        id="choice-card-disabled"
+        disabled
+        title="Locked notifications"
+        description="This setting is managed by your workspace."
+      />
+      <CheckboxChoiceCard
+        id="choice-card-disabled-checked"
+        disabled
+        defaultChecked
+        title="Disabled selected"
+        description="Selected state does not override disabled styling."
+      />
+      <CheckboxChoiceCard
+        id="choice-card-disabled-invalid"
+        disabled
+        invalid
+        title="Disabled invalid"
+        description="Invalid state does not override disabled styling."
+      />
+      <RadioChoiceCard
+        id="choice-card-disabled-radio"
+        disabled
+        title="Disabled radio"
+        description="Radio disabled state styles the card shell."
+      />
     </div>
   ),
   play: async ({ canvasElement }) => {
@@ -589,73 +404,30 @@ export const Disabled: Story = {
 export const Invalid: Story = {
   render: () => (
     <div className="nx:grid nx:w-96 nx:max-w-full nx:gap-3">
-      <ChoiceCard htmlFor="choice-card-invalid-unselected">
-        <Checkbox
-          id="choice-card-invalid-unselected"
-          aria-labelledby="choice-card-invalid-unselected-title"
-          aria-describedby="choice-card-invalid-unselected-description"
-        />
-        <ChoiceCardContent>
-          <ChoiceCardTitle id="choice-card-invalid-unselected-title">
-            Optional alerts
-          </ChoiceCardTitle>
-          <ChoiceCardDescription id="choice-card-invalid-unselected-description">
-            Unselected reference card.
-          </ChoiceCardDescription>
-        </ChoiceCardContent>
-      </ChoiceCard>
-      <ChoiceCard htmlFor="choice-card-invalid-selected">
-        <Checkbox
-          id="choice-card-invalid-selected"
-          defaultChecked
-          aria-labelledby="choice-card-invalid-selected-title"
-          aria-describedby="choice-card-invalid-selected-description"
-        />
-        <ChoiceCardContent>
-          <ChoiceCardTitle id="choice-card-invalid-selected-title">
-            Selected alerts
-          </ChoiceCardTitle>
-          <ChoiceCardDescription id="choice-card-invalid-selected-description">
-            Selected reference card.
-          </ChoiceCardDescription>
-        </ChoiceCardContent>
-      </ChoiceCard>
-      <ChoiceCard htmlFor="choice-card-invalid">
-        <Checkbox
-          id="choice-card-invalid"
-          defaultChecked
-          aria-invalid
-          aria-labelledby="choice-card-invalid-title"
-          aria-describedby="choice-card-invalid-description"
-        />
-        <ChoiceCardContent>
-          <ChoiceCardTitle id="choice-card-invalid-title">
-            Required policy
-          </ChoiceCardTitle>
-          <ChoiceCardDescription id="choice-card-invalid-description">
-            Resolve this selection before continuing.
-          </ChoiceCardDescription>
-        </ChoiceCardContent>
-      </ChoiceCard>
-      <RadioGroup aria-label="Invalid radio cards" defaultValue="invalid-radio">
-        <ChoiceCard htmlFor="choice-card-invalid-radio" variant="outline">
-          <RadioGroupItem
-            id="choice-card-invalid-radio"
-            value="invalid-radio"
-            aria-invalid
-            aria-labelledby="choice-card-invalid-radio-title"
-            aria-describedby="choice-card-invalid-radio-description"
-          />
-          <ChoiceCardContent>
-            <ChoiceCardTitle id="choice-card-invalid-radio-title">
-              Invalid radio
-            </ChoiceCardTitle>
-            <ChoiceCardDescription id="choice-card-invalid-radio-description">
-              Radio invalid state uses the error border.
-            </ChoiceCardDescription>
-          </ChoiceCardContent>
-        </ChoiceCard>
-      </RadioGroup>
+      <CheckboxChoiceCard
+        id="choice-card-invalid-unselected"
+        title="Optional alerts"
+        description="Unselected reference card."
+      />
+      <CheckboxChoiceCard
+        id="choice-card-invalid-selected"
+        defaultChecked
+        title="Selected alerts"
+        description="Selected reference card."
+      />
+      <CheckboxChoiceCard
+        id="choice-card-invalid"
+        defaultChecked
+        invalid
+        title="Required policy"
+        description="Resolve this selection before continuing."
+      />
+      <RadioChoiceCard
+        id="choice-card-invalid-radio"
+        invalid
+        title="Invalid radio"
+        description="Radio invalid state uses the error border."
+      />
     </div>
   ),
   play: async ({ canvasElement }) => {
@@ -698,37 +470,17 @@ export const Invalid: Story = {
 export const Indeterminate: Story = {
   render: () => (
     <div className="nx:grid nx:w-96 nx:max-w-full nx:gap-3">
-      <ChoiceCard htmlFor="choice-card-indeterminate-unselected">
-        <Checkbox
-          id="choice-card-indeterminate-unselected"
-          aria-labelledby="choice-card-indeterminate-unselected-title"
-          aria-describedby="choice-card-indeterminate-unselected-description"
-        />
-        <ChoiceCardContent>
-          <ChoiceCardTitle id="choice-card-indeterminate-unselected-title">
-            Unselected group
-          </ChoiceCardTitle>
-          <ChoiceCardDescription id="choice-card-indeterminate-unselected-description">
-            Reference card with no selection.
-          </ChoiceCardDescription>
-        </ChoiceCardContent>
-      </ChoiceCard>
-      <ChoiceCard htmlFor="choice-card-indeterminate-checked">
-        <Checkbox
-          id="choice-card-indeterminate-checked"
-          defaultChecked
-          aria-labelledby="choice-card-indeterminate-checked-title"
-          aria-describedby="choice-card-indeterminate-checked-description"
-        />
-        <ChoiceCardContent>
-          <ChoiceCardTitle id="choice-card-indeterminate-checked-title">
-            Selected group
-          </ChoiceCardTitle>
-          <ChoiceCardDescription id="choice-card-indeterminate-checked-description">
-            Reference card with selected styling.
-          </ChoiceCardDescription>
-        </ChoiceCardContent>
-      </ChoiceCard>
+      <CheckboxChoiceCard
+        id="choice-card-indeterminate-unselected"
+        title="Unselected group"
+        description="Reference card with no selection."
+      />
+      <CheckboxChoiceCard
+        id="choice-card-indeterminate-checked"
+        defaultChecked
+        title="Selected group"
+        description="Reference card with selected styling."
+      />
       <ChoiceCard htmlFor="choice-card-indeterminate">
         <Checkbox
           id="choice-card-indeterminate"
@@ -781,21 +533,11 @@ export const Indeterminate: Story = {
 export const ClickInteraction: Story = {
   render: () => (
     <div className="nx:w-96 nx:max-w-full">
-      <ChoiceCard htmlFor="choice-card-click">
-        <Checkbox
-          id="choice-card-click"
-          aria-labelledby="choice-card-click-title"
-          aria-describedby="choice-card-click-description"
-        />
-        <ChoiceCardContent>
-          <ChoiceCardTitle id="choice-card-click-title">
-            Security alerts
-          </ChoiceCardTitle>
-          <ChoiceCardDescription id="choice-card-click-description">
-            Critical notices about your account.
-          </ChoiceCardDescription>
-        </ChoiceCardContent>
-      </ChoiceCard>
+      <CheckboxChoiceCard
+        id="choice-card-click"
+        title="Security alerts"
+        description="Critical notices about your account."
+      />
     </div>
   ),
   play: async ({ canvasElement }) => {
@@ -821,21 +563,11 @@ export const ClickInteraction: Story = {
 export const KeyboardInteraction: Story = {
   render: () => (
     <div className="nx:grid nx:w-96 nx:max-w-full nx:gap-6">
-      <ChoiceCard htmlFor="choice-card-keyboard-checkbox">
-        <Checkbox
-          id="choice-card-keyboard-checkbox"
-          aria-labelledby="choice-card-keyboard-checkbox-title"
-          aria-describedby="choice-card-keyboard-checkbox-description"
-        />
-        <ChoiceCardContent>
-          <ChoiceCardTitle id="choice-card-keyboard-checkbox-title">
-            Keyboard checkbox
-          </ChoiceCardTitle>
-          <ChoiceCardDescription id="choice-card-keyboard-checkbox-description">
-            Tab lands on the checkbox, not the card.
-          </ChoiceCardDescription>
-        </ChoiceCardContent>
-      </ChoiceCard>
+      <CheckboxChoiceCard
+        id="choice-card-keyboard-checkbox"
+        title="Keyboard checkbox"
+        description="Tab lands on the checkbox, not the card."
+      />
       <PlanRadioCards />
     </div>
   ),
@@ -875,25 +607,13 @@ export const KeyboardInteraction: Story = {
 export const WithDataAttributes: Story = {
   render: () => (
     <div className="nx:w-96 nx:max-w-full">
-      <ChoiceCard
-        htmlFor="choice-card-data"
-        controlPosition="after"
-        floating={false}
-        variant="outline"
-      >
-        <Checkbox
-          id="choice-card-data"
-          defaultChecked
-          aria-labelledby="choice-card-data-title"
-          aria-describedby="choice-card-data-description"
-        />
-        <ChoiceCardContent>
-          <ChoiceCardTitle id="choice-card-data-title">Billing</ChoiceCardTitle>
-          <ChoiceCardDescription id="choice-card-data-description">
-            Invoices and payment receipts.
-          </ChoiceCardDescription>
-        </ChoiceCardContent>
-      </ChoiceCard>
+      <CheckboxChoiceCard
+        id="choice-card-data"
+        defaultChecked
+        variant="borderless"
+        title="Billing"
+        description="Invoices and payment receipts."
+      />
     </div>
   ),
   play: async ({ canvasElement }) => {
@@ -912,9 +632,9 @@ export const WithDataAttributes: Story = {
     );
 
     await expect(card).toHaveAttribute('data-slot', 'choice-card');
-    await expect(card).toHaveAttribute('data-control-position', 'after');
-    await expect(card).toHaveAttribute('data-floating', 'false');
-    await expect(card).toHaveAttribute('data-variant', 'outline');
+    await expect(card).toHaveAttribute('data-variant', 'borderless');
+    await expect(card).not.toHaveAttribute('data-control-position');
+    await expect(card).not.toHaveAttribute('data-floating');
     await expect(card).not.toHaveAttribute('role');
     await expect(card).not.toHaveAttribute('tabindex');
     await expect(content).toHaveAttribute('data-slot', 'choice-card-content');
@@ -932,21 +652,11 @@ export const WithDataAttributes: Story = {
 export const EdgeCases: Story = {
   render: () => (
     <div className="nx:grid nx:w-52 nx:gap-3">
-      <ChoiceCard htmlFor="choice-card-edge-reference">
-        <Checkbox
-          id="choice-card-edge-reference"
-          aria-labelledby="choice-card-edge-reference-title"
-          aria-describedby="choice-card-edge-reference-description"
-        />
-        <ChoiceCardContent>
-          <ChoiceCardTitle id="choice-card-edge-reference-title">
-            Reference
-          </ChoiceCardTitle>
-          <ChoiceCardDescription id="choice-card-edge-reference-description">
-            Plain unselected card.
-          </ChoiceCardDescription>
-        </ChoiceCardContent>
-      </ChoiceCard>
+      <CheckboxChoiceCard
+        id="choice-card-edge-reference"
+        title="Reference"
+        description="Plain unselected card."
+      />
       <ChoiceCard htmlFor="choice-card-edge-decoy">
         <Checkbox
           id="choice-card-edge-decoy"
@@ -962,21 +672,11 @@ export const EdgeCases: Story = {
           </ChoiceCardDescription>
         </ChoiceCardContent>
       </ChoiceCard>
-      <ChoiceCard htmlFor="choice-card-edge-long">
-        <Checkbox
-          id="choice-card-edge-long"
-          aria-labelledby="choice-card-edge-long-title"
-          aria-describedby="choice-card-edge-long-description"
-        />
-        <ChoiceCardContent>
-          <ChoiceCardTitle id="choice-card-edge-long-title">
-            SupercalifragilisticexpialidociousNotificationPreferenceTitleThatShouldWrap
-          </ChoiceCardTitle>
-          <ChoiceCardDescription id="choice-card-edge-long-description">
-            PneumonoultramicroscopicsilicovolcanoconiosisDescriptionThatShouldStayInsideTheCard
-          </ChoiceCardDescription>
-        </ChoiceCardContent>
-      </ChoiceCard>
+      <CheckboxChoiceCard
+        id="choice-card-edge-long"
+        title="SupercalifragilisticexpialidociousNotificationPreferenceTitleThatShouldWrap"
+        description="PneumonoultramicroscopicsilicovolcanoconiosisDescriptionThatShouldStayInsideTheCard"
+      />
     </div>
   ),
   play: async ({ canvasElement }) => {
@@ -1012,139 +712,90 @@ export const EdgeCases: Story = {
 export const Dark: Story = {
   render: () => (
     <div className="dark nx:grid nx:w-96 nx:max-w-full nx:gap-3 nx:rounded-md nx:bg-background nx:p-4 nx:text-foreground">
-      <ChoiceCard htmlFor="choice-card-dark" variant="outline">
-        <Checkbox
-          id="choice-card-dark"
-          defaultChecked
-          aria-labelledby="choice-card-dark-title"
-          aria-describedby="choice-card-dark-description"
-        />
-        <ChoiceCardContent>
-          <ChoiceCardTitle id="choice-card-dark-title">
-            Dark mode card
-          </ChoiceCardTitle>
-          <ChoiceCardDescription id="choice-card-dark-description">
-            Semantic tokens adapt across themes.
-          </ChoiceCardDescription>
-        </ChoiceCardContent>
-      </ChoiceCard>
-      <RadioGroup aria-label="Dark radio card" defaultValue="dark-radio">
-        <ChoiceCard
-          htmlFor="choice-card-dark-radio"
-          controlPosition="after"
-          variant="outline"
-        >
-          <RadioGroupItem
-            id="choice-card-dark-radio"
-            value="dark-radio"
-            aria-labelledby="choice-card-dark-radio-title"
-            aria-describedby="choice-card-dark-radio-description"
-          />
-          <ChoiceCardContent>
-            <ChoiceCardTitle id="choice-card-dark-radio-title">
-              Dark radio card
-            </ChoiceCardTitle>
-            <ChoiceCardDescription id="choice-card-dark-radio-description">
-              Radio card states use the same semantic tokens.
-            </ChoiceCardDescription>
-          </ChoiceCardContent>
-        </ChoiceCard>
-      </RadioGroup>
+      <CheckboxChoiceCard
+        id="choice-card-dark"
+        defaultChecked
+        title="Dark mode card"
+        description="Semantic tokens adapt across themes."
+      />
+      <RadioChoiceCard
+        id="choice-card-dark-radio"
+        trailing
+        variant="borderless"
+        title="Dark radio card"
+        description="Radio card states use the same semantic tokens."
+      />
     </div>
   ),
 };
 
 export const AllVariants: Story = {
-  render: function AllVariantsShowcase() {
-    const uid = React.useId();
-
-    return (
-      <div className="nx:flex nx:w-96 nx:max-w-full nx:flex-col nx:gap-6">
-        <div className="nx:grid nx:gap-3">
-          <ChoiceCard htmlFor={`${uid}-unchecked`}>
-            <Checkbox
-              id={`${uid}-unchecked`}
-              aria-labelledby={`${uid}-unchecked-title`}
-              aria-describedby={`${uid}-unchecked-description`}
-            />
-            <ChoiceCardContent>
-              <ChoiceCardTitle id={`${uid}-unchecked-title`}>
-                Unchecked
-              </ChoiceCardTitle>
-              <ChoiceCardDescription id={`${uid}-unchecked-description`}>
-                Default rich checkbox card.
-              </ChoiceCardDescription>
-            </ChoiceCardContent>
-          </ChoiceCard>
-          <ChoiceCard htmlFor={`${uid}-checked`}>
-            <Checkbox
-              id={`${uid}-checked`}
-              defaultChecked
-              aria-labelledby={`${uid}-checked-title`}
-              aria-describedby={`${uid}-checked-description`}
-            />
-            <ChoiceCardContent>
-              <ChoiceCardTitle id={`${uid}-checked-title`}>
-                Checked
-              </ChoiceCardTitle>
-              <ChoiceCardDescription id={`${uid}-checked-description`}>
-                Selected card shell is decorative.
-              </ChoiceCardDescription>
-            </ChoiceCardContent>
-          </ChoiceCard>
-          <ChoiceCard htmlFor={`${uid}-indeterminate`}>
-            <Checkbox
-              id={`${uid}-indeterminate`}
-              checked="indeterminate"
-              aria-labelledby={`${uid}-indeterminate-title`}
-              aria-describedby={`${uid}-indeterminate-description`}
-            />
-            <ChoiceCardContent>
-              <ChoiceCardTitle id={`${uid}-indeterminate-title`}>
-                Indeterminate
-              </ChoiceCardTitle>
-              <ChoiceCardDescription id={`${uid}-indeterminate-description`}>
-                Mixed state uses selected-like card styling.
-              </ChoiceCardDescription>
-            </ChoiceCardContent>
-          </ChoiceCard>
-          <ChoiceCard htmlFor={`${uid}-invalid`}>
-            <Checkbox
-              id={`${uid}-invalid`}
-              defaultChecked
-              aria-invalid
-              aria-labelledby={`${uid}-invalid-title`}
-              aria-describedby={`${uid}-invalid-description`}
-            />
-            <ChoiceCardContent>
-              <ChoiceCardTitle id={`${uid}-invalid-title`}>
-                Invalid checked
-              </ChoiceCardTitle>
-              <ChoiceCardDescription id={`${uid}-invalid-description`}>
-                Invalid border wins over selected styling.
-              </ChoiceCardDescription>
-            </ChoiceCardContent>
-          </ChoiceCard>
-          <ChoiceCard htmlFor={`${uid}-disabled`}>
-            <Checkbox
-              id={`${uid}-disabled`}
-              disabled
-              defaultChecked
-              aria-labelledby={`${uid}-disabled-title`}
-              aria-describedby={`${uid}-disabled-description`}
-            />
-            <ChoiceCardContent>
-              <ChoiceCardTitle id={`${uid}-disabled-title`}>
-                Disabled checked
-              </ChoiceCardTitle>
-              <ChoiceCardDescription id={`${uid}-disabled-description`}>
-                Disabled styling wins over other states.
-              </ChoiceCardDescription>
-            </ChoiceCardContent>
-          </ChoiceCard>
-        </div>
-        <PlanRadioCards />
+  render: () => (
+    <div className="nx:grid nx:w-[min(100%,56rem)] nx:grid-cols-1 nx:gap-6 nx:md:grid-cols-2">
+      <div className="nx:grid nx:gap-3">
+        <CheckboxChoiceCard
+          id="choice-card-checkbox-bordered"
+          title="Checkbox bordered"
+          description="Default rich option card with a visible frame."
+        />
+        <CheckboxChoiceCard
+          id="choice-card-checkbox-borderless"
+          variant="borderless"
+          defaultChecked
+          title="Checkbox borderless"
+          description="Quiet option card that still shows selected state."
+        />
       </div>
+      <div className="nx:grid nx:gap-3">
+        <RadioChoiceCard
+          id="choice-card-radio-bordered"
+          title="Radio bordered"
+          description="Radio choices use the same card shell."
+        />
+        <RadioChoiceCard
+          id="choice-card-radio-borderless"
+          variant="borderless"
+          trailing
+          title="Radio borderless"
+          description="Trailing controls use child order and top alignment."
+        />
+      </div>
+    </div>
+  ),
+  play: async ({ canvasElement }) => {
+    const cards = canvasElement.querySelectorAll('[data-slot="choice-card"]');
+    const checkboxBordered = getCardFor(
+      canvasElement,
+      'choice-card-checkbox-bordered'
     );
+    const checkboxBorderless = getCardFor(
+      canvasElement,
+      'choice-card-checkbox-borderless'
+    );
+    const radioBordered = getCardFor(
+      canvasElement,
+      'choice-card-radio-bordered'
+    );
+    const radioBorderless = getCardFor(
+      canvasElement,
+      'choice-card-radio-borderless'
+    );
+    const trailingRadio = getRequiredElement<HTMLElement>(
+      canvasElement,
+      '#choice-card-radio-borderless'
+    );
+
+    await expect(cards).toHaveLength(4);
+    await expect(checkboxBordered).toHaveAttribute('data-variant', 'bordered');
+    await expect(checkboxBorderless).toHaveAttribute(
+      'data-variant',
+      'borderless'
+    );
+    await expect(radioBordered).toHaveAttribute('data-variant', 'bordered');
+    await expect(radioBorderless).toHaveAttribute('data-variant', 'borderless');
+    await expect(getBorderColor(checkboxBorderless)).not.toBe(
+      getBorderColor(checkboxBordered)
+    );
+    await expect(getComputedStyle(trailingRadio).marginTop).toBe('2px');
   },
 };

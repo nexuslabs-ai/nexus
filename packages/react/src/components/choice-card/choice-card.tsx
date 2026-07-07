@@ -7,16 +7,14 @@ import { Label } from '../label';
 
 const choiceCardVariants = cva(
   [
-    'nx:group/choice-card nx:box-border nx:flex nx:min-w-0 nx:w-full nx:cursor-pointer nx:gap-3 nx:bg-background nx:p-4 nx:transition-colors',
-    'nx:focus-within:outline-2 nx:focus-within:outline-focus-default nx:focus-within:outline-offset-(--focus-offset)',
+    'nx:group/choice-card nx:box-border nx:flex nx:min-w-0 nx:w-full nx:cursor-pointer nx:items-start nx:gap-3 nx:rounded-md nx:bg-background nx:p-4 nx:transition-colors',
+    'nx:[&>[data-slot=checkbox]]:mt-0.5 nx:[&>[data-slot=radio-group-item]]:mt-0.5',
     'nx:not-has-[>[data-slot=checkbox]:disabled]:not-has-[>[data-slot=radio-group-item]:disabled]:hover:bg-background-hover',
     'nx:not-has-[>[data-slot=checkbox]:disabled]:not-has-[>[data-slot=radio-group-item]:disabled]:active:bg-background-active',
     'nx:has-[>[data-slot=checkbox]:disabled]:cursor-not-allowed nx:has-[>[data-slot=checkbox]:disabled]:border-border-disabled nx:has-[>[data-slot=checkbox]:disabled]:bg-disabled',
     'nx:has-[>[data-slot=radio-group-item]:disabled]:cursor-not-allowed nx:has-[>[data-slot=radio-group-item]:disabled]:border-border-disabled nx:has-[>[data-slot=radio-group-item]:disabled]:bg-disabled',
     'nx:not-has-[>[data-slot=checkbox]:disabled]:not-has-[>[data-slot=radio-group-item]:disabled]:has-[>[data-slot=checkbox][aria-invalid=true]]:border-border-error',
-    'nx:not-has-[>[data-slot=checkbox]:disabled]:not-has-[>[data-slot=radio-group-item]:disabled]:has-[>[data-slot=checkbox][aria-invalid=true]]:focus-within:outline-focus-error',
     'nx:not-has-[>[data-slot=checkbox]:disabled]:not-has-[>[data-slot=radio-group-item]:disabled]:has-[>[data-slot=radio-group-item][aria-invalid=true]]:border-border-error',
-    'nx:not-has-[>[data-slot=checkbox]:disabled]:not-has-[>[data-slot=radio-group-item]:disabled]:has-[>[data-slot=radio-group-item][aria-invalid=true]]:focus-within:outline-focus-error',
     'nx:not-has-[>[data-slot=checkbox]:disabled]:not-has-[>[data-slot=radio-group-item]:disabled]:not-has-[>[data-slot=checkbox][aria-invalid=true]]:not-has-[>[data-slot=radio-group-item][aria-invalid=true]]:has-[>[data-slot=checkbox][data-state=checked]]:border-border-primary',
     'nx:not-has-[>[data-slot=checkbox]:disabled]:not-has-[>[data-slot=radio-group-item]:disabled]:not-has-[>[data-slot=checkbox][aria-invalid=true]]:not-has-[>[data-slot=radio-group-item][aria-invalid=true]]:has-[>[data-slot=checkbox][data-state=checked]]:bg-primary-subtle',
     'nx:not-has-[>[data-slot=checkbox]:disabled]:not-has-[>[data-slot=radio-group-item]:disabled]:not-has-[>[data-slot=checkbox][aria-invalid=true]]:not-has-[>[data-slot=radio-group-item][aria-invalid=true]]:has-[>[data-slot=checkbox][data-state=indeterminate]]:border-border-primary',
@@ -27,36 +25,12 @@ const choiceCardVariants = cva(
   {
     variants: {
       variant: {
-        default: 'nx:border-default nx:border-transparent',
-        outline: 'nx:border-default nx:border-border-default',
-      },
-      controlPosition: {
-        before:
-          'nx:flex-row nx:items-start nx:[&>[data-slot=checkbox]]:mt-0.5 nx:[&>[data-slot=radio-group-item]]:mt-0.5',
-        after:
-          'nx:flex-row-reverse nx:items-center nx:[&>[data-slot=checkbox]]:mt-0 nx:[&>[data-slot=radio-group-item]]:mt-0',
-      },
-      floating: {
-        true: 'nx:rounded-md',
-        false: 'nx:rounded-none',
+        bordered: 'nx:border-default nx:border-border-default',
+        borderless: 'nx:border-default nx:border-transparent',
       },
     },
-    compoundVariants: [
-      {
-        variant: 'outline',
-        floating: false,
-        className: 'nx:border-x-0 nx:border-t-0',
-      },
-      {
-        variant: 'default',
-        floating: false,
-        className: 'nx:border-x-0 nx:border-t-0',
-      },
-    ],
     defaultVariants: {
-      variant: 'default',
-      controlPosition: 'before',
-      floating: true,
+      variant: 'bordered',
     },
   }
 );
@@ -101,11 +75,10 @@ type ChoiceCardDescriptionProps = React.ComponentProps<'p'>;
  * Checkbox or RadioGroupItem remains the only interactive control and source of
  * selected/focus/disabled/invalid semantics.
  *
- * Use `variant="default"` for a simpler borderless option surface and
- * `variant="outline"` for a bordered rich card. Use `controlPosition="after"`
- * to visually place the nested Checkbox or RadioGroupItem at the trailing edge.
- * Set `floating={false}` when the card is part of an attached list where
- * divider-style edges are preferred over rounded floating cards.
+ * The default `variant="bordered"` gives the card a visible frame.
+ * Use `variant="borderless"` for a quieter surface that keeps the same box
+ * dimensions. Place `ChoiceCardContent` before the nested Checkbox or
+ * RadioGroupItem when the control should appear at the trailing edge.
  *
  * When the card includes a description, wire the child control with
  * `aria-labelledby` pointing to `ChoiceCardTitle` and `aria-describedby`
@@ -129,31 +102,12 @@ type ChoiceCardDescriptionProps = React.ComponentProps<'p'>;
  * </ChoiceCard>
  * ```
  */
-function ChoiceCard({
-  className,
-  controlPosition,
-  floating,
-  variant,
-  ...props
-}: ChoiceCardProps) {
-  const resolvedControlPosition = controlPosition ?? 'before';
-  const resolvedFloating = floating ?? true;
-  const resolvedVariant = variant ?? 'default';
-
+function ChoiceCard({ className, variant, ...props }: ChoiceCardProps) {
   return (
     <Label
       data-slot="choice-card"
-      data-control-position={resolvedControlPosition}
-      data-floating={resolvedFloating ? 'true' : 'false'}
-      data-variant={resolvedVariant}
-      className={cn(
-        choiceCardVariants({
-          controlPosition: resolvedControlPosition,
-          floating: resolvedFloating,
-          variant: resolvedVariant,
-        }),
-        className
-      )}
+      data-variant={variant ?? 'bordered'}
+      className={cn(choiceCardVariants({ variant }), className)}
       {...props}
     />
   );
@@ -231,4 +185,5 @@ export {
   type ChoiceCardProps,
   ChoiceCardTitle,
   type ChoiceCardTitleProps,
+  choiceCardVariants,
 };
