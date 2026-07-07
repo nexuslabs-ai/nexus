@@ -159,7 +159,7 @@ describe('deriveSurfaces', () => {
     const s = deriveSurfaces('#ffffff', 'stone', 'light', 0.056);
     const lift =
       lOf(s['--nx-color-container']) - lOf(s['--nx-color-background']);
-    expect(lift).toBeGreaterThan(0.01);
+    expect(lift).toBeGreaterThanOrEqual(0.025);
   });
 
   it('widens the ladder as contrast (delta) grows', () => {
@@ -381,6 +381,7 @@ describe('deriveTheme', () => {
         mode === 'light'
           ? [
               '--nx-color-background-hover',
+              '--nx-color-container-hover',
               '--nx-color-nav-border',
               '--nx-color-nav-item-active',
               '--nx-color-popover-hover',
@@ -400,8 +401,8 @@ describe('deriveTheme', () => {
           expect(strong[token], `${mode} ${token}`).toBe(soft[token]);
         }
       } else {
-        expect(strong['--nx-color-container-hover']).toBe(
-          strong['--nx-color-background']
+        expect(lOf(strong['--nx-color-container-hover'])).toBeGreaterThan(
+          lOf(strong['--nx-color-background'])
         );
         expect(strong['--nx-color-popover-hover']).toBe(
           strong['--nx-color-background-hover']
@@ -559,13 +560,16 @@ describe('surfaceTone surfaces', () => {
     expect(slate['--nx-color-background']).not.toBe(
       neutral['--nx-color-background']
     );
-    expect(lOf(slate['--nx-color-background'])).toBeCloseTo(0.985, 3);
-    expect(lOf(neutral['--nx-color-background'])).toBeCloseTo(0.985, 3);
+    expect(lOf(slate['--nx-color-background'])).toBeCloseTo(0.97, 3);
+    expect(lOf(neutral['--nx-color-background'])).toBeCloseTo(0.97, 3);
     expect(lOf(slate['--nx-color-muted'])).toBeLessThan(
       lOf(slate['--nx-color-background'])
     );
     expect(lOf(slate['--nx-color-container-hover'])).toBeLessThan(
       lOf(slate['--nx-color-container'])
+    );
+    expect(lOf(slate['--nx-color-container-hover'])).toBeGreaterThan(
+      lOf(slate['--nx-color-background'])
     );
     expect(slate['--nx-color-muted']).not.toBe(neutral['--nx-color-muted']);
   });

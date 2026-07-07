@@ -1,6 +1,6 @@
 {
   "background": {
-    "$value": "{gray.50}",
+    "$value": "{gray.75}",
     "$type": "color"
   },
   "foreground": {

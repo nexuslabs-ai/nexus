@@ -147,7 +147,7 @@
 
 @theme inline {
   /* Semantic tokens */
-  --color-background: var(--nx-color-background, var(--nx-color-slate-50));
+  --color-background: var(--nx-color-background, var(--nx-color-slate-75));
   --color-foreground: var(--nx-color-foreground, var(--nx-color-black-a900));
   --color-background-hover: var(
     --nx-color-background-hover,
@@ -522,7 +522,7 @@
 
 /* ===== RUNTIME COLOR ALIASES ===== */
 :root {
-  --color-background: var(--nx-color-background, var(--nx-color-slate-50));
+  --color-background: var(--nx-color-background, var(--nx-color-slate-75));
   --color-foreground: var(--nx-color-foreground, var(--nx-color-black-a900));
   --color-background-hover: var(
     --nx-color-background-hover,

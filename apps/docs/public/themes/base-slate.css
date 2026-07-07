@@ -1,7 +1,7 @@
 /* base: slate */
 
 html {
-  --nx-color-background: var(--nx-color-slate-50);
+  --nx-color-background: var(--nx-color-slate-75);
   --nx-color-foreground: var(--nx-color-black-a900);
   --nx-color-background-hover: var(--nx-color-slate-100);
   --nx-color-background-hover-alpha: var(--nx-color-slate-a100);

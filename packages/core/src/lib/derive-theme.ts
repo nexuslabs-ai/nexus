@@ -63,7 +63,7 @@ const SURFACE_TONE: Record<
   stone: { h: 70, lightC: 0.008, darkC: 0.006 },
 };
 
-const PAGE_L_LIGHT = 0.985;
+const PAGE_L_LIGHT = 0.97;
 const LIGHT_CHROMA_DEPTH_MULTIPLIER = 1.4;
 const FOCUS_APCA_FLOOR = 45;
 
@@ -146,23 +146,23 @@ const DARK_SURFACE_STEPS: Partial<Record<string, number>> = {
 
 const LIGHT_M2_SURFACE_STEPS: Partial<Record<string, number>> = {
   background: 0,
-  'background-hover': -0.7,
-  'background-active': -1.11,
-  muted: -0.7,
-  container: 0.27,
-  'container-hover': 0,
-  'container-active': -0.7,
-  popover: 0.27,
-  'popover-hover': -0.7,
-  'popover-active': -0.7,
-  'control-background': -1.11,
-  'control-background-hover': -2.05,
-  'nav-background': -1.11,
-  'nav-item-hover': -2.05,
-  'nav-item-active': -2.05,
-  'nav-border': -2.05,
-  disabled: -0.7,
-  'border-active': -5.8,
+  'background-hover': -0.45,
+  'background-active': -0.84,
+  muted: -0.45,
+  container: 0.54,
+  'container-hover': 0.27,
+  'container-active': -0.45,
+  popover: 0.54,
+  'popover-hover': -0.45,
+  'popover-active': -0.45,
+  'control-background': -0.84,
+  'control-background-hover': -1.79,
+  'nav-background': -0.84,
+  'nav-item-hover': -1.79,
+  'nav-item-active': -1.79,
+  'nav-border': -1.79,
+  disabled: -0.45,
+  'border-active': -5.54,
 };
 
 type DarkNavSurfaceToken =

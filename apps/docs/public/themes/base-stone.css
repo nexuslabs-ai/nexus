@@ -1,7 +1,7 @@
 /* base: stone */
 
 html {
-  --nx-color-background: var(--nx-color-stone-50);
+  --nx-color-background: var(--nx-color-stone-75);
   --nx-color-foreground: var(--nx-color-black-a900);
   --nx-color-background-hover: var(--nx-color-stone-100);
   --nx-color-background-hover-alpha: var(--nx-color-stone-a100);

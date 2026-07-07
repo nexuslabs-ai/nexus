@@ -1,6 +1,6 @@
 {
   "background": {
-    "$value": "{stone.50}",
+    "$value": "{stone.75}",
     "$type": "color"
   },
   "foreground": {

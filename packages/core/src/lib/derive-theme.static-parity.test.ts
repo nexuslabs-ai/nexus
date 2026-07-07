@@ -45,6 +45,8 @@ const PRIMITIVE_COLOR_FILE = path.join(
 const STANDARD_SHADE_L = perceptualGrid as Record<string, number>;
 const STATIC_TOLERANCE_L = 0.006;
 const SIGN_EPSILON = 0.0001;
+const MIN_CARD_PAGE_SEPARATION_L = 0.025;
+const MIN_CONTAINER_HOVER_PAGE_SEPARATION_L = 0.01;
 
 const primitiveColors = JSON.parse(
   readFileSync(PRIMITIVE_COLOR_FILE, 'utf8')
@@ -131,6 +133,30 @@ describe('deriveSurfaces static light parity', () => {
       );
       const staticBackground = staticLightness(staticLeaves, 'background');
       const engineBackground = lOf(engine['--nx-color-background']!);
+      const staticContainer = staticLightness(staticLeaves, 'container');
+      const staticContainerHover = staticLightness(
+        staticLeaves,
+        'container-hover'
+      );
+      const engineContainer = lOf(engine['--nx-color-container']!);
+      const engineContainerHover = lOf(engine['--nx-color-container-hover']!);
+
+      expect(
+        staticContainer - staticBackground,
+        `${tone}.static card/page separation`
+      ).toBeGreaterThanOrEqual(MIN_CARD_PAGE_SEPARATION_L);
+      expect(
+        engineContainer - engineBackground,
+        `${tone}.engine card/page separation`
+      ).toBeGreaterThanOrEqual(MIN_CARD_PAGE_SEPARATION_L);
+      expect(
+        staticContainerHover - staticBackground,
+        `${tone}.static container-hover/page separation`
+      ).toBeGreaterThanOrEqual(MIN_CONTAINER_HOVER_PAGE_SEPARATION_L);
+      expect(
+        engineContainerHover - engineBackground,
+        `${tone}.engine container-hover/page separation`
+      ).toBeGreaterThanOrEqual(MIN_CONTAINER_HOVER_PAGE_SEPARATION_L);
 
       for (const token of SURFACE_TOKENS) {
         const engineL = lOf(engine[`--nx-color-${token}`]!);
