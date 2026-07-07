@@ -365,6 +365,19 @@ describe('generateTailwindPackage', () => {
     );
   });
 
+  it('emits the off-grid Model 2 surface primitives as concrete variables', () => {
+    const rootBlock = extractBlock(variablesCSS, ':root');
+
+    for (const tone of ['stone', 'neutral', 'slate', 'zinc', 'gray']) {
+      for (const shade of ['75', '150']) {
+        const varName = `--nx-color-${tone}-${shade}`;
+        expect(rootBlock, varName).toMatch(
+          new RegExp(`${varName}:\\s*oklch\\(`)
+        );
+      }
+    }
+  });
+
   it('compiles semantic color utilities through the bridged theme variables', async () => {
     const css = compactCss(
       await compileGeneratedTailwind(distDir, [

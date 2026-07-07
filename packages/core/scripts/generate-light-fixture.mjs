@@ -53,14 +53,15 @@ execFileSync('pnpm', ['--filter', '@nexus_ds/core', 'build'], {
   stdio: 'inherit',
 });
 
-const { deriveTheme } = await import(pathToFileURL(distEntry).href);
+const { deriveTheme, LIGHT_CHROMA_DEPTH_MULTIPLIER, PAGE_L_LIGHT } =
+  await import(pathToFileURL(distEntry).href);
 
 const fixture = {
   schemaVersion: 1,
   source:
     'Generated from deriveTheme canonical light seeds after Model 2 surface hierarchy calibration; review diffs when surface tone constants or light steps change.',
-  pageL: 0.97,
-  lightDepthMultiplier: 1.4,
+  pageL: PAGE_L_LIGHT,
+  lightDepthMultiplier: LIGHT_CHROMA_DEPTH_MULTIPLIER,
   toneContrast: 60,
   tones: {},
 };

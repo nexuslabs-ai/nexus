@@ -1,8 +1,8 @@
-# Model 2 Light Surface Hierarchy — Foundation (engine + 5-tone reconciliation)
+# Model 2 Light Surface Hierarchy — Foundation + adoption slice
 
 > **Status:** in progress. Stone static-token slice landed in `104909ee8`. This
-> doc specs the remaining Foundation work. Adoption (components) is a **separate
-> later PR** — do not start it here.
+> doc specs the Foundation work plus the first component-adoption slice now
+> included in PR #626.
 
 ## Why this exists
 
@@ -53,8 +53,11 @@ not fill lightness.
 - ❌ **No shim / tone gate in the engine.** Per `project-stage.md` ("no feature
   flags or shims"), do **not** write `if (tone === 'stone') …`. The engine change
   is global to all tones by design; the static side must move in the same PR.
-- ❌ **No component edits.** Fields / table / menubar / overlay hover / stories
-  are the Adoption PR.
+- ✅ **Component adoption is included, but scoped.** Move component-owned fields
+  and chrome off page-canvas tokens: Input, Textarea, Select trigger,
+  NativeSelect, InputGroup, InputOTP, Accordion, Menubar, Table sticky header,
+  and overlay close affordances. Keep page-level rows/lists/table-row hover on
+  `background` / `background-hover`.
 
 ## Why "stone only" is a checkpoint, not a merge boundary
 
@@ -255,7 +258,10 @@ and `derive-theme.parity` (keys).
 - `derive-theme.static-parity` (direction invariant + magnitude, 5 tones) is green.
 - Fixture regenerated via the committed script.
 - `derive-theme.test` asserts the new light direction.
-- All Foundation gates green; **dark untouched; no component edits.**
+- All Foundation gates green; **dark untouched**.
+- The scoped component-adoption slice uses `container` / `container-hover` for
+  component-owned surfaces and leaves page-level row/list/table hover on
+  `background-hover`.
 
 ## Follow-ups (tracked, out of scope here)
 

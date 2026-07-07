@@ -182,8 +182,9 @@ const BRAND_PAIRS = [
 // they render on. Under the Model 2 surface hierarchy the page `background`
 // is a tinted canvas that sits behind content — charts live inside Card/Panel
 // `container` surfaces, not on the raw page — so series are validated on
-// `container` only. UI tier (Lc 60) treats chart marks like labels rather
-// than fluent reading text.
+// `container` only. That is the permanent Model 2 placement contract unless
+// charts are deliberately allowed to render directly on the page canvas again.
+// UI tier (Lc 60) treats chart marks like labels rather than fluent reading text.
 const CHART_SURFACES = ['container'];
 
 // Focus indicators target WCAG 2.2 SC 1.4.11 (3:1 non-text contrast),

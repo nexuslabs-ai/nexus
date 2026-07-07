@@ -63,8 +63,8 @@ const SURFACE_TONE: Record<
   stone: { h: 70, lightC: 0.008, darkC: 0.006 },
 };
 
-const PAGE_L_LIGHT = 0.97;
-const LIGHT_CHROMA_DEPTH_MULTIPLIER = 1.4;
+export const PAGE_L_LIGHT = 0.97;
+export const LIGHT_CHROMA_DEPTH_MULTIPLIER = 1.4;
 const FOCUS_APCA_FLOOR = 45;
 
 function anchoredContrastLerp(
