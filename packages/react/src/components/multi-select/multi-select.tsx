@@ -3,10 +3,12 @@ import * as React from 'react';
 import { cva, type VariantProps } from 'class-variance-authority';
 
 import { IconCheck, IconChevronDown, IconSearch, IconX } from '../../lib/icons';
-import type {
-  SelectionOption,
-  SelectionOptionGroup,
-  SelectionOptionInput,
+import {
+  getNodeText,
+  normalizeSelectionGroups,
+  type SelectionOption,
+  type SelectionOptionGroup,
+  type SelectionOptionInput,
 } from '../../lib/selection';
 import { cn } from '../../lib/utils';
 import {
@@ -101,6 +103,7 @@ type MultiSelectContextValue = {
   required: boolean;
   invalid: React.AriaAttributes['aria-invalid'] | undefined;
   onItemAdded: (value: string, item: MultiSelectItemRecord) => void;
+  onItemRemoved: (value: string) => void;
 };
 
 const MultiSelectContext = React.createContext<MultiSelectContextValue | null>(
@@ -123,6 +126,10 @@ type MultiSelectItemRecord = {
   disabled?: boolean;
 };
 
+type MultiSelectSearchConfig =
+  | boolean
+  | { placeholder?: string; emptyMessage?: React.ReactNode };
+
 function useMultiSelectContext(component: string) {
   const context = React.useContext(MultiSelectContext);
 
@@ -139,24 +146,6 @@ function getMultiSelectItemDomId(baseId: string, value: string) {
 
 function normalizeSearchText(value: string) {
   return value.trim().toLocaleLowerCase();
-}
-
-function getNodeText(node: React.ReactNode): string {
-  return React.Children.toArray(node)
-    .map((child) => {
-      if (typeof child === 'string' || typeof child === 'number') {
-        return String(child);
-      }
-
-      if (React.isValidElement(child)) {
-        return getNodeText(
-          (child.props as { children?: React.ReactNode }).children
-        );
-      }
-
-      return '';
-    })
-    .join('');
 }
 
 function getMultiSelectSearchText({
@@ -256,6 +245,25 @@ function useControllableBooleanState({
   return [value, setValue] as const;
 }
 
+function renderMultiSelectOptions(options: readonly SelectionOptionInput[]) {
+  return normalizeSelectionGroups(options).map((group, groupIndex) => (
+    <MultiSelectGroup
+      key={group.label || `group-${groupIndex}`}
+      heading={group.label || undefined}
+    >
+      {group.options.map((option) => (
+        <MultiSelectItem
+          key={option.value}
+          value={option.value}
+          disabled={option.disabled}
+        >
+          {option.label}
+        </MultiSelectItem>
+      ))}
+    </MultiSelectGroup>
+  ));
+}
+
 /**
  * MultiSelectProps
  *
@@ -265,34 +273,46 @@ function useControllableBooleanState({
  */
 interface MultiSelectProps {
   /**
-   * MultiSelect subcomponents.
+   * MultiSelect subcomponents. When omitted, pass `options` to render the
+   * default trigger/content structure.
    */
-  children: React.ReactNode;
+  children?: React.ReactNode;
+  /**
+   * Options rendered by the default trigger/content structure.
+   */
+  options?: readonly SelectionOptionInput[];
+  /**
+   * Accessible label for the default trigger when using `options`.
+   */
+  'aria-label'?: string;
+  /**
+   * Placeholder shown by the default selected-value renderer.
+   */
+  placeholder?: React.ReactNode;
+  /**
+   * Search configuration for the default content when using `options`.
+   */
+  search?: MultiSelectSearchConfig;
+  /**
+   * Field size for the default trigger when using `options`.
+   */
+  size?: VariantProps<typeof multiSelectTriggerVariants>['size'];
+  /**
+   * Visual treatment for the default trigger when using `options`.
+   */
+  variant?: VariantProps<typeof multiSelectTriggerVariants>['variant'];
   /**
    * Controlled selected values.
    */
   values?: readonly string[];
   /**
-   * Controlled selected values. Alias kept for parity with Combobox.
-   */
-  value?: readonly string[];
-  /**
    * Initial selected values for uncontrolled usage.
    */
   defaultValues?: readonly string[];
   /**
-   * Initial selected values for uncontrolled usage. Alias kept for parity with
-   * Combobox.
-   */
-  defaultValue?: readonly string[];
-  /**
    * Called when selected values change.
    */
   onValuesChange?: (values: string[]) => void;
-  /**
-   * Called when selected values change. Alias kept for parity with Combobox.
-   */
-  onValueChange?: (values: string[]) => void;
   /**
    * Controlled popup state.
    */
@@ -357,12 +377,14 @@ interface MultiSelectProps {
  */
 function MultiSelect({
   children,
+  options,
+  placeholder = 'Select options...',
+  search = true,
+  size,
+  variant,
   values,
-  value,
   defaultValues,
-  defaultValue,
   onValuesChange,
-  onValueChange,
   open: openProp,
   defaultOpen = false,
   onOpenChange,
@@ -371,12 +393,13 @@ function MultiSelect({
   readOnly = false,
   name,
   required = false,
+  'aria-label': ariaLabel,
   'aria-invalid': ariaInvalid,
 }: MultiSelectProps) {
   const [selectedValues, setSelectedValues] = useControllableArrayState({
-    prop: values ?? value,
-    defaultProp: defaultValues ?? defaultValue ?? [],
-    onChange: onValuesChange ?? onValueChange,
+    prop: values,
+    defaultProp: defaultValues ?? [],
+    onChange: onValuesChange,
   });
   const [open, setOpen] = useControllableBooleanState({
     prop: openProp,
@@ -438,6 +461,33 @@ function MultiSelect({
     []
   );
 
+  const onItemRemoved = React.useCallback((itemValue: string) => {
+    setItems((currentItems) => {
+      if (!currentItems.has(itemValue)) return currentItems;
+
+      const nextItems = new Map(currentItems);
+      nextItems.delete(itemValue);
+      return nextItems;
+    });
+  }, []);
+
+  const renderedChildren =
+    children ??
+    (options ? (
+      <>
+        <MultiSelectTrigger
+          aria-label={ariaLabel ?? 'Options'}
+          size={size}
+          variant={variant}
+        >
+          <MultiSelectValue placeholder={placeholder} />
+        </MultiSelectTrigger>
+        <MultiSelectContent search={search}>
+          {renderMultiSelectOptions(options)}
+        </MultiSelectContent>
+      </>
+    ) : null);
+
   const contextValue = React.useMemo<MultiSelectContextValue>(
     () => ({
       open,
@@ -452,12 +502,14 @@ function MultiSelect({
       required,
       invalid: ariaInvalid,
       onItemAdded,
+      onItemRemoved,
     }),
     [
       ariaInvalid,
       disabled,
       items,
       onItemAdded,
+      onItemRemoved,
       open,
       readOnly,
       required,
@@ -472,7 +524,7 @@ function MultiSelect({
   return (
     <MultiSelectContext.Provider value={contextValue}>
       <Popover open={open} onOpenChange={setOpen} modal>
-        {children}
+        {renderedChildren}
       </Popover>
       {name
         ? selectedValues.map((item) => (
@@ -487,14 +539,14 @@ function MultiSelect({
         : null}
       {required ? (
         <input
+          key={selectedValues.length > 0 ? 'selected' : 'empty'}
           data-slot="multi-select-required-input"
           aria-hidden="true"
           className="nx:sr-only"
           tabIndex={-1}
-          value={selectedValues.length > 0 ? 'selected' : ''}
+          defaultValue={selectedValues.length > 0 ? 'selected' : ''}
           required
           disabled={disabled}
-          readOnly
         />
       ) : null}
     </MultiSelectContext.Provider>
@@ -793,7 +845,7 @@ interface MultiSelectContentProps extends Omit<
    * Whether to render the search input, or search copy overrides.
    * @default true
    */
-  search?: boolean | { placeholder?: string; emptyMessage?: React.ReactNode };
+  search?: MultiSelectSearchConfig;
   /**
    * MultiSelect groups and items.
    */
@@ -969,6 +1021,7 @@ function MultiSelectContent({
             data-slot="multi-select-list"
             role="listbox"
             aria-label={ariaLabel ?? 'Multi-select options'}
+            aria-activedescendant={canSearch ? undefined : activeId}
             aria-multiselectable={single ? undefined : true}
             tabIndex={canSearch ? -1 : 0}
             className="nx:max-h-72 nx:overflow-y-auto nx:overflow-x-hidden nx:p-1 nx:scroll-py-2 nx:outline-none"
@@ -1121,7 +1174,7 @@ function MultiSelectItem({
   onPointerMove,
   ...props
 }: MultiSelectItemProps) {
-  const { selectedValueSet, toggleValue, onItemAdded } =
+  const { selectedValueSet, toggleValue, onItemAdded, onItemRemoved } =
     useMultiSelectContext('MultiSelectItem');
   const registrationOnly = React.useContext(MultiSelectRegistrationContext);
   const contentContext = React.useContext(MultiSelectContentContext);
@@ -1143,7 +1196,17 @@ function MultiSelectItem({
       searchText,
       disabled,
     });
-  }, [badgeLabel, children, disabled, onItemAdded, searchText, value]);
+
+    return () => onItemRemoved(value);
+  }, [
+    badgeLabel,
+    children,
+    disabled,
+    onItemAdded,
+    onItemRemoved,
+    searchText,
+    value,
+  ]);
 
   if (registrationOnly) return null;
   if (!isVisible) return null;

@@ -220,6 +220,14 @@ export const Disabled: Story = {
     options: frameworkOptions,
     placeholder: 'Disabled',
   },
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+    const input = canvas.getByRole('combobox', { name: 'Disabled combobox' });
+
+    await expect(input).toBeDisabled();
+    await userEvent.click(input);
+    await expect(input).toHaveAttribute('aria-expanded', 'false');
+  },
 };
 
 export const ReadOnly: Story = {
@@ -424,6 +432,34 @@ export const ClearSelection: Story = {
       canvas.getByRole('button', { name: 'Clear selection' })
     );
     await expect(input).toHaveValue('');
+  },
+};
+
+export const FormReset: Story = {
+  render: () => (
+    <form className="nx:grid nx:gap-3">
+      <Combobox
+        aria-label="Resettable framework"
+        defaultValue="next"
+        name="framework"
+        options={frameworkOptions}
+      />
+      <button type="reset">Reset</button>
+    </form>
+  ),
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+    const input = canvas.getByRole('combobox', {
+      name: 'Resettable framework',
+    });
+
+    await expect(input).toHaveValue('Next.js');
+    await userEvent.click(
+      canvas.getByRole('button', { name: 'Clear selection' })
+    );
+    await expect(input).toHaveValue('');
+    await userEvent.click(canvas.getByRole('button', { name: 'Reset' }));
+    await expect(input).toHaveValue('Next.js');
   },
 };
 

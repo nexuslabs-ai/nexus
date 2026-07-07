@@ -10,6 +10,7 @@ import {
   getFirstEnabledValue,
   getLastEnabledValue,
   getNextEnabledValue,
+  getNodeText,
   getSelectionOptionDomId,
   normalizeSelectionGroups,
   type SelectionOption,
@@ -228,24 +229,6 @@ interface ComboboxGroupProps {
   children: React.ReactNode;
 }
 
-function getNodeText(node: React.ReactNode): string {
-  return React.Children.toArray(node)
-    .map((child) => {
-      if (typeof child === 'string' || typeof child === 'number') {
-        return String(child);
-      }
-
-      if (React.isValidElement(child)) {
-        return getNodeText(
-          (child.props as { children?: React.ReactNode }).children
-        );
-      }
-
-      return '';
-    })
-    .join('');
-}
-
 function collectComboboxItems(children: React.ReactNode): SelectionOption[] {
   const items: SelectionOption[] = [];
 
@@ -416,6 +399,7 @@ function Combobox({
   const hasValue = value !== '';
   const hasListbox = !loading && visibleOptions.length > 0;
   const interactionDisabled = disabled || readOnly;
+  const displayInputValue = open ? inputValue : (selectedOption?.label ?? '');
 
   const resetInputValue = React.useCallback(() => {
     const option = findSelectionOption(groups, value);
@@ -544,6 +528,7 @@ function Combobox({
     (event: React.FocusEvent<HTMLInputElement>) => {
       onFocus?.(event);
       if (!event.defaultPrevented && !interactionDisabled) {
+        setInputValue(selectedOption?.label ?? '');
         setFilterValue('');
         setOpenState(true);
         updateActiveValue(groups, value);
@@ -553,6 +538,7 @@ function Combobox({
       groups,
       interactionDisabled,
       onFocus,
+      selectedOption,
       setOpenState,
       updateActiveValue,
       value,
@@ -562,6 +548,7 @@ function Combobox({
   const handleInputClick = React.useCallback(() => {
     if (interactionDisabled || open) return;
 
+    setInputValue(selectedOption?.label ?? '');
     setFilterValue('');
     setOpenState(true);
     updateActiveValue(groups, value);
@@ -569,6 +556,7 @@ function Combobox({
     groups,
     interactionDisabled,
     open,
+    selectedOption,
     setOpenState,
     updateActiveValue,
     value,
@@ -593,9 +581,31 @@ function Combobox({
     }
   }, []);
 
+  const handleFormReset = React.useCallback(() => {
+    const option = findSelectionOption(groups, defaultValue);
+
+    setValue(defaultValue);
+    setInputValue(option?.label ?? '');
+    setFilterValue('');
+    setOpenState(defaultOpen);
+    updateActiveValue(groups, defaultValue);
+  }, [
+    defaultOpen,
+    defaultValue,
+    groups,
+    setOpenState,
+    setValue,
+    updateActiveValue,
+  ]);
+
   React.useEffect(() => {
-    if (!open) resetInputValue();
-  }, [open, resetInputValue, value]);
+    const form = rootRef.current?.closest('form');
+    if (!form) return;
+
+    form.addEventListener('reset', handleFormReset);
+
+    return () => form.removeEventListener('reset', handleFormReset);
+  }, [handleFormReset]);
 
   React.useEffect(() => {
     if (!activeId) return;
@@ -644,7 +654,7 @@ function Combobox({
               required={required}
               size={size}
               placeholder={placeholder}
-              value={inputValue}
+              value={displayInputValue}
               onBlur={handleInputBlur}
               onChange={handleInputChange}
               onClick={handleInputClick}

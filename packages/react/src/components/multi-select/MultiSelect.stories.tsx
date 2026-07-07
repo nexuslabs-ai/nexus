@@ -226,6 +226,33 @@ export const Grouped: Story = {
   ),
 };
 
+export const OptionsArray: Story = {
+  render: () => (
+    <MultiSelect
+      aria-label="Options array frameworks"
+      defaultValues={['next']}
+      options={frameworkOptions}
+      placeholder="Select frameworks..."
+      search={{
+        placeholder: 'Search frameworks...',
+        emptyMessage: 'No matching frameworks.',
+      }}
+    />
+  ),
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+    const trigger = canvas.getByRole('combobox', {
+      name: 'Options array frameworks',
+    });
+
+    await expect(within(trigger).getByText('Next.js')).toBeVisible();
+    await userEvent.click(trigger);
+    await expect(
+      await within(document.body).findByRole('option', { name: 'Next.js' })
+    ).toHaveAttribute('aria-selected', 'true');
+  },
+};
+
 export const DisabledOption: Story = {
   render: () => (
     <MultiSelect>
@@ -303,6 +330,14 @@ export const InvalidField: Story = {
 
     await expect(trigger).toHaveAttribute('aria-invalid', 'true');
     await expect(trigger).toHaveAttribute('aria-required', 'true');
+
+    const requiredInput = canvasElement.querySelector<HTMLInputElement>(
+      '[data-slot="multi-select-required-input"]'
+    );
+
+    await expect(requiredInput).toBeRequired();
+    await expect(requiredInput).not.toHaveAttribute('readonly');
+    await expect(requiredInput?.validity.valueMissing).toBe(true);
   },
 };
 
@@ -313,6 +348,18 @@ export const WithoutSearch: Story = {
       contentProps={{ search: false }}
     />
   ),
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+    const trigger = canvas.getByRole('combobox', {
+      name: 'Frameworks without search',
+    });
+
+    await userEvent.click(trigger);
+
+    const listbox = await within(document.body).findByRole('listbox');
+
+    await expect(listbox).toHaveAttribute('aria-activedescendant');
+  },
 };
 
 export const EmptyResults: Story = {

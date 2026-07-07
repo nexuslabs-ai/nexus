@@ -1,4 +1,4 @@
-import type * as React from 'react';
+import * as React from 'react';
 
 /**
  * SelectionOption
@@ -148,6 +148,24 @@ function getSelectionOptionDomId(baseId: string, value: string) {
   return `${baseId}-option-${encodeURIComponent(value)}`;
 }
 
+function getNodeText(node: React.ReactNode): string {
+  return React.Children.toArray(node)
+    .map((child) => {
+      if (typeof child === 'string' || typeof child === 'number') {
+        return String(child);
+      }
+
+      if (React.isValidElement(child)) {
+        return getNodeText(
+          (child.props as { children?: React.ReactNode }).children
+        );
+      }
+
+      return '';
+    })
+    .join('');
+}
+
 export {
   filterSelectionGroups,
   findSelectionOption,
@@ -155,6 +173,7 @@ export {
   getFirstEnabledValue,
   getLastEnabledValue,
   getNextEnabledValue,
+  getNodeText,
   getSelectionOptionDomId,
   isSelectionOptionGroup,
   normalizeSelectionGroups,
