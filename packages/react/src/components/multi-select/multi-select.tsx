@@ -933,6 +933,9 @@ function MultiSelectContent({
     (event: React.KeyboardEvent<HTMLElement>) => {
       if (event.defaultPrevented) return;
 
+      const isSearchInputEvent =
+        event.currentTarget instanceof HTMLInputElement;
+
       if (event.key === 'ArrowDown') {
         event.preventDefault();
         moveActiveItem(1);
@@ -947,7 +950,10 @@ function MultiSelectContent({
         setActiveValue(
           enabledVisibleItems[enabledVisibleItems.length - 1]?.[0]
         );
-      } else if (event.key === 'Enter' || event.key === ' ') {
+      } else if (
+        event.key === 'Enter' ||
+        (event.key === ' ' && !isSearchInputEvent)
+      ) {
         event.preventDefault();
         if (activeValueForRender) toggleValue(activeValueForRender);
       } else if (event.key === 'Escape') {
@@ -1191,6 +1197,8 @@ function MultiSelectItem({
     searchText.includes(contentContext.searchValue);
 
   React.useEffect(() => {
+    if (!registrationOnly) return;
+
     onItemAdded(value, {
       label: badgeLabel ?? children,
       searchText,
@@ -1204,6 +1212,7 @@ function MultiSelectItem({
     disabled,
     onItemAdded,
     onItemRemoved,
+    registrationOnly,
     searchText,
     value,
   ]);

@@ -385,6 +385,47 @@ export const EmptyResults: Story = {
   },
 };
 
+export const SearchInputAllowsSpaces: Story = {
+  render: () => (
+    <MultiSelect>
+      <MultiSelectTrigger aria-label="Spaced search frameworks">
+        <MultiSelectValue placeholder="Select frameworks..." />
+      </MultiSelectTrigger>
+      <MultiSelectContent
+        search={{
+          placeholder: 'Search frameworks...',
+          emptyMessage: 'No matching frameworks.',
+        }}
+      >
+        <MultiSelectGroup>
+          <MultiSelectItem value="ruby-on-rails">Ruby on Rails</MultiSelectItem>
+          <MultiSelectItem value="next">Next.js</MultiSelectItem>
+        </MultiSelectGroup>
+      </MultiSelectContent>
+    </MultiSelect>
+  ),
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+    const trigger = canvas.getByRole('combobox', {
+      name: 'Spaced search frameworks',
+    });
+
+    await userEvent.click(trigger);
+
+    const searchInput = await within(document.body).findByPlaceholderText(
+      'Search frameworks...'
+    );
+
+    await userEvent.type(searchInput, 'ruby on');
+    await expect(searchInput).toHaveValue('ruby on');
+    await expect(
+      await within(document.body).findByRole('option', {
+        name: 'Ruby on Rails',
+      })
+    ).toBeVisible();
+  },
+};
+
 export const CustomBadges: Story = {
   render: () => (
     <MultiSelect defaultValues={['apple', 'banana']}>
@@ -529,6 +570,26 @@ export const ClickInteraction: Story = {
     await expect(within(trigger).getByText('Next.js')).toBeVisible();
     await expect(within(trigger).getByText('Astro')).toBeVisible();
     await expect(trigger).toHaveAttribute('aria-expanded', 'true');
+  },
+};
+
+export const ReopenKeepsOptions: Story = {
+  render: () => <FrameworkMultiSelect label="Reopen frameworks" />,
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+    const trigger = canvas.getByRole('combobox', { name: 'Reopen frameworks' });
+
+    await userEvent.click(trigger);
+    await expect(
+      await within(document.body).findByRole('option', { name: 'Next.js' })
+    ).toBeVisible();
+    await userEvent.keyboard('{Escape}');
+    await waitForPopoverToClose();
+
+    await userEvent.click(trigger);
+    await expect(
+      await within(document.body).findByRole('option', { name: 'Next.js' })
+    ).toBeVisible();
   },
 };
 
