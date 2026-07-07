@@ -217,9 +217,12 @@ function RadioChoiceCard({
 }
 
 export const Default: Story = {
-  render: () => (
+  args: {
+    variant: 'bordered',
+  },
+  render: ({ variant }) => (
     <div className="nx:w-96 nx:max-w-full">
-      <ChoiceCard htmlFor="choice-card-default">
+      <ChoiceCard htmlFor="choice-card-default" variant={variant}>
         <Checkbox
           id="choice-card-default"
           aria-labelledby="choice-card-default-title"
@@ -236,14 +239,17 @@ export const Default: Story = {
       </ChoiceCard>
     </div>
   ),
-  play: async ({ canvasElement }) => {
+  play: async ({ args, canvasElement }) => {
     const canvas = within(canvasElement);
     const checkbox = canvas.getByRole('checkbox', {
       name: 'Product updates',
     });
     const card = getCardFor(canvasElement, 'choice-card-default');
 
-    await expect(card).toHaveAttribute('data-variant', 'bordered');
+    await expect(card).toHaveAttribute(
+      'data-variant',
+      args.variant ?? 'bordered'
+    );
     await expect(checkbox).not.toBeChecked();
     await expect(checkbox).toHaveAccessibleName('Product updates');
     await expect(checkbox).toHaveAccessibleDescription(
@@ -257,7 +263,10 @@ export const Default: Story = {
 };
 
 export const WithRadioGroup: Story = {
-  render: () => <PlanRadioCards />,
+  args: {
+    variant: 'bordered',
+  },
+  render: ({ variant }) => <PlanRadioCards variant={variant ?? undefined} />,
   play: async ({ canvasElement }) => {
     const canvas = within(canvasElement);
     const group = canvas.getByRole('radiogroup', { name: 'Plan' });
@@ -280,12 +289,16 @@ export const WithRadioGroup: Story = {
 };
 
 export const TrailingControl: Story = {
-  render: () => (
+  args: {
+    variant: 'bordered',
+  },
+  render: ({ variant }) => (
     <div className="nx:w-96 nx:max-w-full">
       <CheckboxChoiceCard
         id="choice-card-trailing"
         defaultChecked
         trailing
+        variant={variant ?? undefined}
         title="Billing notices"
         description="Invoices, receipts, and payment updates for every workspace seat in this account."
       />
@@ -792,6 +805,9 @@ export const AllVariants: Story = {
     await expect(radioBorderless).toHaveAttribute('data-variant', 'borderless');
     await expect(getBorderColor(checkboxBorderless)).not.toBe(
       getBorderColor(checkboxBordered)
+    );
+    await expect(getBorderColor(radioBorderless)).not.toBe(
+      getBorderColor(radioBordered)
     );
     await expect(getComputedStyle(trailingRadio).marginTop).toBe('2px');
   },
