@@ -167,7 +167,7 @@ function labelsForValues(options: MultiSelectOption[], values: string[]) {
 
 const multiSelectFieldVariants = cva(
   [
-    'nx:group/multi-select nx:flex nx:box-border nx:w-full nx:min-w-0 nx:items-center nx:gap-1.5 nx:rounded-md nx:border-0 nx:transition-colors nx:outline-none',
+    'nx:group/multi-select nx:relative nx:flex nx:box-border nx:w-full nx:min-w-0 nx:items-center nx:gap-1.5 nx:rounded-md nx:border-default nx:transition-colors nx:outline-none',
     'nx:has-[[data-slot=multi-select-trigger]:focus-visible]:outline-2 nx:has-[[data-slot=multi-select-trigger]:focus-visible]:outline-focus-default nx:has-[[data-slot=multi-select-trigger]:focus-visible]:outline-offset-(--focus-offset)',
     'nx:data-[invalid=true]:border-border-error nx:has-[[data-slot=multi-select-trigger][aria-invalid=true]:focus-visible]:outline-focus-error',
     'nx:data-[disabled=true]:cursor-not-allowed nx:data-[disabled=true]:bg-disabled nx:data-[disabled=true]:text-disabled-foreground',
@@ -502,7 +502,7 @@ function MultiSelectTrigger({
           aria-haspopup="listbox"
           aria-label={ariaLabel}
           disabled={context.disabled}
-          className="nx:-mr-1 nx:flex nx:size-7 nx:shrink-0 nx:items-center nx:justify-center nx:rounded-sm nx:text-muted-foreground nx:hover:bg-background-hover nx:hover:text-foreground nx:focus-visible:outline-2 nx:focus-visible:outline-focus-default nx:focus-visible:outline-offset-(--focus-offset) nx:disabled:cursor-not-allowed nx:disabled:text-disabled-foreground"
+          className="nx:absolute nx:inset-0 nx:z-0 nx:flex nx:items-center nx:justify-end nx:rounded-md nx:px-2.5 nx:text-muted-foreground nx:hover:text-foreground nx:focus-visible:outline-2 nx:focus-visible:outline-focus-default nx:focus-visible:outline-offset-(--focus-offset) nx:disabled:cursor-not-allowed nx:disabled:text-disabled-foreground"
           onClick={handleTriggerClick}
         >
           <span className="nx:sr-only">
@@ -555,7 +555,7 @@ function MultiSelectValue({
     <div
       data-slot="multi-select-value"
       className={cn(
-        'nx:flex nx:min-w-0 nx:flex-1 nx:flex-wrap nx:items-center nx:gap-1.5',
+        'nx:pointer-events-none nx:relative nx:z-10 nx:flex nx:min-w-0 nx:flex-1 nx:flex-wrap nx:items-center nx:gap-1.5 nx:pr-8',
         className
       )}
       {...props}
@@ -575,7 +575,7 @@ function MultiSelectValue({
               type="button"
               aria-label={`Remove ${item.label}`}
               data-slot="multi-select-value-remove"
-              className="nx:-mr-0.5 nx:flex nx:size-4 nx:items-center nx:justify-center nx:rounded-sm nx:text-muted-foreground nx:hover:text-foreground nx:focus-visible:outline-2 nx:focus-visible:outline-focus-default nx:focus-visible:outline-offset-(--focus-offset)"
+              className="nx:pointer-events-auto nx:-mr-0.5 nx:flex nx:size-4 nx:items-center nx:justify-center nx:rounded-sm nx:text-muted-foreground nx:hover:text-foreground nx:focus-visible:outline-2 nx:focus-visible:outline-focus-default nx:focus-visible:outline-offset-(--focus-offset)"
               onClick={(event) => handleRemoveValue(event, item.value)}
             >
               <IconX aria-hidden="true" className="nx:size-3" />

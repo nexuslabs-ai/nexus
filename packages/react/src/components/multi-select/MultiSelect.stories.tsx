@@ -310,7 +310,11 @@ export const WithDataAttributes: Story = {
 
     await expect(field).toHaveAttribute('data-size', 'default');
     await expect(field).toHaveAttribute('data-variant', 'default');
+    await expect(field).toHaveClass('nx:border-default');
+    await expect(field).toHaveClass('nx:border-border-default');
     await expect(trigger).toHaveAttribute('data-slot', 'multi-select-trigger');
+    await expect(trigger).toHaveClass('nx:absolute');
+    await expect(trigger).toHaveClass('nx:inset-0');
     await expect(value).toHaveAttribute('data-slot', 'multi-select-value');
   },
 };
