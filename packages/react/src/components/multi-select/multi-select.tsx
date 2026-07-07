@@ -46,9 +46,7 @@ function toggleValue(values: Set<string>, value: string) {
 
 /**
  * Walk the composed children and map each option's `value` to the label the
- * trigger chip should show (`badgeLabel`, falling back to the option content).
- * Reading it straight from the JSX means preselected chips stay labeled even
- * while the list is closed — no always-mounted option tree required.
+ * trigger chip should show — `badgeLabel`, falling back to the option content.
  */
 function collectLabels(
   children: React.ReactNode,
@@ -77,10 +75,6 @@ function collectLabels(
   });
 
   return labels;
-}
-
-function labelText(label: React.ReactNode, fallback: string) {
-  return typeof label === 'string' ? label : fallback;
 }
 
 function debounce<T extends (...args: never[]) => void>(func: T, wait: number) {
@@ -139,7 +133,6 @@ function MultiSelect({
   const [uncontrolled, setUncontrolled] = React.useState(
     () => new Set(values ?? defaultValues)
   );
-  const [announcement, setAnnouncement] = React.useState('');
 
   const selectedValues = React.useMemo(
     () => (values ? new Set(values) : uncontrolled),
@@ -150,18 +143,12 @@ function MultiSelect({
 
   const toggle = React.useCallback(
     (value: string) => {
-      const wasSelected = selectedValues.has(value);
       const nextValues = toggleValue(selectedValues, value);
 
       if (values === undefined) setUncontrolled(nextValues);
       onValuesChange?.([...nextValues]);
-
-      // cmdk binds aria-selected to the active option, not the checked ones, so
-      // announce each toggle through a live region for assistive tech.
-      const text = labelText(labels.get(value), value);
-      setAnnouncement(`${text} ${wasSelected ? 'removed' : 'selected'}`);
     },
-    [selectedValues, values, onValuesChange, labels]
+    [selectedValues, values, onValuesChange]
   );
 
   const context = React.useMemo<MultiSelectContextValue>(
@@ -174,9 +161,6 @@ function MultiSelect({
       <Popover open={open} onOpenChange={setOpen}>
         {children}
       </Popover>
-      <span role="status" aria-live="polite" className="nx:sr-only">
-        {announcement}
-      </span>
     </MultiSelectContext.Provider>
   );
 }
@@ -420,8 +404,7 @@ interface MultiSelectContentProps extends Omit<
  * MultiSelectContent
  *
  * The searchable option list, rendered in a Popover so Radix owns focus,
- * dismissal, and open/close motion. The list unmounts while closed; chip labels
- * come from `MultiSelect`'s reading of these same children, not a shadow tree.
+ * dismissal, and open/close motion.
  */
 function MultiSelectContent({
   children,
@@ -477,8 +460,7 @@ interface MultiSelectItemProps extends Omit<
  * A selectable option with a checkbox indicator. cmdk filters on `value` +
  * `keywords`, so `value` is forwarded to disambiguate duplicate labels and
  * icon-only content, and string children seed `keywords` so typing the label
- * matches. Selection toggles are announced via `MultiSelect`'s live region,
- * since cmdk owns `aria-selected` for the active descendant.
+ * matches.
  */
 function MultiSelectItem({
   value,
