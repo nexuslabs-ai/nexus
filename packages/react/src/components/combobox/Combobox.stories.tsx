@@ -111,6 +111,18 @@ export const ReopenShowsFullList: Story = {
     ).toBeInTheDocument();
 
     await userEvent.keyboard('{Escape}');
+    await waitFor(() => {
+      expect(document.body.querySelector('[role="listbox"]')).toBeNull();
+    });
+
+    await userEvent.click(input);
+    const reopenedListbox = await within(document.body).findByRole('listbox');
+
+    await expect(
+      within(reopenedListbox).getByRole('option', { name: 'Next.js' })
+    ).toBeInTheDocument();
+
+    await userEvent.keyboard('{Escape}');
   },
 };
 
@@ -240,8 +252,9 @@ export const ClickInteraction: Story = {
   play: async ({ canvasElement }) => {
     const canvas = within(canvasElement);
     const input = canvas.getByRole('combobox', { name: 'Framework' });
+    const trigger = canvas.getByRole('button', { name: 'Open options' });
 
-    await userEvent.click(input);
+    await userEvent.click(trigger);
     const listbox = await within(document.body).findByRole('listbox');
 
     await userEvent.click(
@@ -304,10 +317,14 @@ export const WithDataAttributes: Story = {
   play: async ({ canvasElement }) => {
     const canvas = within(canvasElement);
     const input = canvas.getByRole('combobox', { name: 'Framework' });
+    const trigger = canvas.getByRole('button', { name: 'Open options' });
     const field = canvasElement.querySelector('[data-slot="combobox-field"]');
 
     await expect(field).toHaveAttribute('data-size', 'default');
     await expect(field).toHaveAttribute('data-variant', 'default');
+    await expect(field).toHaveClass('nx:border-default');
+    await expect(field).toHaveClass('nx:border-border-default');
+    await expect(trigger).toHaveAttribute('data-slot', 'combobox-trigger');
     await expect(input).toHaveAttribute('data-slot', 'combobox-input');
   },
 };

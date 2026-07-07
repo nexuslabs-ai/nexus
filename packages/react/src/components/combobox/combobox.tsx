@@ -154,7 +154,7 @@ function getOptionId(listId: string, value: string) {
 
 const comboboxFieldVariants = cva(
   [
-    'nx:group/combobox nx:relative nx:flex nx:box-border nx:w-full nx:min-w-0 nx:items-center nx:rounded-md nx:border-0 nx:transition-colors nx:outline-none',
+    'nx:group/combobox nx:relative nx:flex nx:box-border nx:w-full nx:min-w-0 nx:items-center nx:rounded-md nx:border-default nx:transition-colors nx:outline-none',
     'nx:has-[[data-slot=combobox-input]:focus-visible]:outline-2 nx:has-[[data-slot=combobox-input]:focus-visible]:outline-focus-default nx:has-[[data-slot=combobox-input]:focus-visible]:outline-offset-(--focus-offset)',
     'nx:data-[invalid=true]:border-border-error nx:has-[[data-slot=combobox-input][aria-invalid=true]:focus-visible]:outline-focus-error',
     'nx:data-[disabled=true]:cursor-not-allowed nx:data-[disabled=true]:bg-disabled nx:data-[disabled=true]:text-disabled-foreground',
@@ -499,7 +499,10 @@ function ComboboxInput({
     ? context.inputValue
     : context.selectedLabel;
   const showClearButton =
-    showClear && Boolean(context.selectedValue) && !context.disabled;
+    showClear &&
+    Boolean(context.selectedValue) &&
+    !context.disabled &&
+    !context.readOnly;
   const activeOptionId =
     context.open && context.activeValue
       ? getOptionId(context.listId, context.activeValue)
@@ -516,6 +519,11 @@ function ComboboxInput({
   const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     context.setInputValue(event.target.value);
     onChange?.(event);
+  };
+
+  const handleInputClick = (event: React.MouseEvent<HTMLInputElement>) => {
+    context.setOpenFromField();
+    onClick?.(event);
   };
 
   const handleFocus = (event: React.FocusEvent<HTMLInputElement>) => {
@@ -569,6 +577,20 @@ function ComboboxInput({
     event.stopPropagation();
   };
 
+  const handleTriggerMouseDown = (
+    event: React.MouseEvent<HTMLButtonElement>
+  ) => {
+    event.preventDefault();
+    event.stopPropagation();
+    inputRef.current?.focus();
+    context.setOpenFromField();
+  };
+
+  const stopTriggerClick = (event: React.MouseEvent<HTMLButtonElement>) => {
+    event.preventDefault();
+    event.stopPropagation();
+  };
+
   return (
     <PopoverAnchor asChild>
       <div
@@ -584,7 +606,7 @@ function ComboboxInput({
           data-slot="combobox-input"
           value={displayValue}
           onChange={handleChange}
-          onClick={onClick}
+          onClick={handleInputClick}
           onFocus={handleFocus}
           onKeyDown={handleKeyDown}
           disabled={context.disabled}
@@ -616,11 +638,21 @@ function ComboboxInput({
             <IconX aria-hidden="true" className="nx:size-4" />
           </button>
         ) : null}
-        <IconChevronDown
-          aria-hidden="true"
-          data-slot="combobox-chevron"
-          className="nx:size-4 nx:shrink-0 nx:text-muted-foreground nx:group-data-[disabled=true]/combobox:text-disabled-foreground"
-        />
+        <button
+          type="button"
+          data-slot="combobox-trigger"
+          aria-label="Open options"
+          disabled={context.disabled || context.readOnly}
+          className="nx:-mr-1 nx:flex nx:size-6 nx:shrink-0 nx:items-center nx:justify-center nx:rounded-sm nx:text-muted-foreground nx:hover:bg-background-hover nx:hover:text-foreground nx:focus-visible:outline-2 nx:focus-visible:outline-focus-default nx:focus-visible:outline-offset-(--focus-offset) nx:disabled:cursor-not-allowed nx:disabled:text-disabled-foreground"
+          onClick={stopTriggerClick}
+          onMouseDown={handleTriggerMouseDown}
+        >
+          <IconChevronDown
+            aria-hidden="true"
+            data-slot="combobox-chevron"
+            className="nx:size-4"
+          />
+        </button>
       </div>
     </PopoverAnchor>
   );
