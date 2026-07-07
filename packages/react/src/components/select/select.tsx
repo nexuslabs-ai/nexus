@@ -65,7 +65,7 @@ const selectTriggerVariants = cva(
     variants: {
       variant: {
         default:
-          'nx:border-border-default nx:bg-background nx:enabled:hover:bg-background-hover nx:disabled:border-border-disabled',
+          'nx:border-border-default nx:bg-container nx:enabled:hover:bg-container-hover nx:disabled:border-border-disabled',
         borderless:
           'nx:border-transparent nx:bg-control-background nx:enabled:hover:bg-control-background-hover',
       },

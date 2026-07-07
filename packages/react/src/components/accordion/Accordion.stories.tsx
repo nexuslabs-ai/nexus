@@ -491,6 +491,7 @@ export const WithDataAttributes: Story = {
     await expect(accordion).toHaveAttribute('data-variant', 'stacked');
     await expect(item).toBeInTheDocument();
     await expect(item).toHaveClass('nx:duration-fast');
+    await expect(item).toHaveClass('nx:hover:bg-container-hover');
     await expect(trigger).toHaveAttribute('data-slot', 'accordion-trigger');
     await expect(trigger).toHaveClass('nx:transition-colors');
     await expect(trigger).toHaveClass('nx:duration-fast');

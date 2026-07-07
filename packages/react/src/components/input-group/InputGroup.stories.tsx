@@ -220,6 +220,10 @@ export const WithDataAttributes: Story = {
     await expect(group).toBeInTheDocument();
     await expect(group).toHaveAttribute('role', 'group');
     await expect(group).toHaveAttribute('data-variant', 'default');
+    await expect(group).toHaveClass('nx:bg-container');
+    await expect(group).toHaveClass(
+      'nx:not-data-[disabled=true]:hover:bg-container-hover'
+    );
     await expect(
       canvasElement.querySelector('[data-slot="input-group-addon"]')
     ).toBeInTheDocument();
@@ -620,7 +624,7 @@ export const VisualStateTokens: Story = {
 
     // Token-name sentinel: synthetic userEvent can't toggle CSS :hover.
     await expect(hover).toHaveClass(
-      'nx:not-data-[disabled=true]:hover:bg-background-hover'
+      'nx:not-data-[disabled=true]:hover:bg-container-hover'
     );
 
     // Disabled = semantic tokens, not opacity (opacity stays 1). No computed

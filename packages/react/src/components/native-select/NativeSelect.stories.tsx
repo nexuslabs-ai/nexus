@@ -264,6 +264,8 @@ export const WithDataAttributes: Story = {
     await expect(select).toBeInTheDocument();
     await expect(select).toHaveAttribute('data-size', 'default');
     await expect(select).toHaveAttribute('data-variant', 'default');
+    await expect(select).toHaveClass('nx:bg-container');
+    await expect(select).toHaveClass('nx:enabled:hover:bg-container-hover');
     await expect(
       canvasElement.querySelector('[data-slot="native-select-wrapper"]')
     ).toBeInTheDocument();

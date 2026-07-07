@@ -507,8 +507,9 @@ export const VisualStateTokens: Story = {
     const disabledEmpty = canvas.getByTestId('input-disabled-empty');
 
     await expect(hoverTokenInput).toHaveClass(
-      'nx:enabled:hover:bg-background-hover'
+      'nx:enabled:hover:bg-container-hover'
     );
+    await expect(hoverTokenInput).toHaveClass('nx:bg-container');
 
     await expect(disabledEmpty).toBeDisabled();
     await expect(disabledEmpty).toHaveClass('nx:disabled:bg-disabled');
@@ -538,6 +539,8 @@ export const WithDataAttributes: Story = {
     await expect(input).toHaveAttribute('data-slot', 'input');
     await expect(input).toHaveAttribute('data-size', 'lg');
     await expect(input).toHaveAttribute('data-variant', 'default');
+    await expect(input).toHaveClass('nx:bg-container');
+    await expect(input).toHaveClass('nx:enabled:hover:bg-container-hover');
   },
 };
 
