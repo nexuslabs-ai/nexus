@@ -304,6 +304,13 @@ export const ClickInteraction: Story = {
     );
 
     await expect(input).toHaveValue('Remix');
+
+    await userEvent.click(input);
+    await waitFor(() => expect(input).toHaveAttribute('aria-expanded', 'true'));
+    await waitForPopoverSettle();
+    await expect(
+      document.body.querySelector('[data-slot="combobox-content"]')
+    ).toHaveAttribute('data-state', 'open');
   },
 };
 

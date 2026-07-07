@@ -387,6 +387,13 @@ function Combobox({
     [interactionDisabled, onFocus, setOpenState, updateActiveValue]
   );
 
+  const handleInputClick = React.useCallback(() => {
+    if (interactionDisabled || open) return;
+
+    setOpenState(true);
+    updateActiveValue();
+  }, [interactionDisabled, open, setOpenState, updateActiveValue]);
+
   const handleInputBlur = React.useCallback(
     (event: React.FocusEvent<HTMLInputElement>) => {
       onBlur?.(event);
@@ -460,6 +467,7 @@ function Combobox({
               value={inputValue}
               onBlur={handleInputBlur}
               onChange={handleInputChange}
+              onClick={handleInputClick}
               onFocus={handleInputFocus}
               onKeyDown={handleInputKeyDown}
             />
