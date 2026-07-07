@@ -461,35 +461,17 @@ function MultiSelect({
 interface MultiSelectTriggerProps
   extends
     Omit<React.ComponentProps<'div'>, 'defaultValue'>,
-    VariantProps<typeof multiSelectFieldVariants> {
-  /**
-   * Placeholder shown when nothing is selected.
-   * @default 'Select options'
-   */
-  placeholder?: string;
-  /**
-   * Maximum number of selected value chips to show before collapsing the rest.
-   * @default 3
-   */
-  maxVisibleValues?: number;
-}
+    VariantProps<typeof multiSelectFieldVariants> {}
 
 function MultiSelectTrigger({
   'aria-label': ariaLabel = 'Select options',
+  children,
   className,
-  maxVisibleValues = 3,
-  placeholder = 'Select options',
   size,
   variant,
   ...props
 }: MultiSelectTriggerProps) {
   const context = useMultiSelectContext('MultiSelectTrigger');
-  const selectedItems = labelsForValues(
-    context.options,
-    context.selectedValues
-  );
-  const visibleSelectedItems = selectedItems.slice(0, maxVisibleValues);
-  const overflowCount = Math.max(0, selectedItems.length - maxVisibleValues);
 
   const handleTriggerClick = () => {
     if (context.open) {
@@ -498,15 +480,6 @@ function MultiSelectTrigger({
     }
 
     context.setOpenFromTrigger();
-  };
-
-  const handleRemoveValue = (
-    event: React.MouseEvent<HTMLButtonElement>,
-    value: string
-  ) => {
-    event.preventDefault();
-    event.stopPropagation();
-    context.toggleValue(value);
   };
 
   return (
@@ -520,52 +493,7 @@ function MultiSelectTrigger({
         className={cn(multiSelectFieldVariants({ size, variant }), className)}
         {...props}
       >
-        <div
-          data-slot="multi-select-values"
-          className="nx:flex nx:min-w-0 nx:flex-1 nx:flex-wrap nx:items-center nx:gap-1.5"
-        >
-          {visibleSelectedItems.map((item) => (
-            <Badge
-              key={item.value}
-              data-slot="multi-select-value"
-              variant="secondary"
-              fill="outline"
-              isCaps={false}
-              className="nx:max-w-40 nx:pr-1"
-            >
-              <span className="nx:truncate">{item.label}</span>
-              {!context.disabled && !context.readOnly ? (
-                <button
-                  type="button"
-                  aria-label={`Remove ${item.label}`}
-                  data-slot="multi-select-value-remove"
-                  className="nx:-mr-0.5 nx:flex nx:size-4 nx:items-center nx:justify-center nx:rounded-sm nx:text-muted-foreground nx:hover:text-foreground nx:focus-visible:outline-2 nx:focus-visible:outline-focus-default nx:focus-visible:outline-offset-(--focus-offset)"
-                  onClick={(event) => handleRemoveValue(event, item.value)}
-                >
-                  <IconX aria-hidden="true" className="nx:size-3" />
-                </button>
-              ) : null}
-            </Badge>
-          ))}
-          {overflowCount > 0 ? (
-            <Badge
-              data-slot="multi-select-overflow"
-              variant="secondary"
-              fill="light"
-              isCaps={false}
-            >
-              +{overflowCount}
-            </Badge>
-          ) : null}
-          {selectedItems.length === 0 ? (
-            <span
-              data-slot="multi-select-placeholder"
-              className="nx:text-muted-foreground"
-            >
-              {placeholder}
-            </span>
-          ) : null}
-        </div>
+        {children ?? <MultiSelectValue />}
         <button
           type="button"
           data-slot="multi-select-trigger"
@@ -584,6 +512,96 @@ function MultiSelectTrigger({
         </button>
       </div>
     </PopoverAnchor>
+  );
+}
+
+interface MultiSelectValueProps extends React.ComponentProps<'div'> {
+  /**
+   * Placeholder shown when nothing is selected.
+   * @default 'Select options'
+   */
+  placeholder?: React.ReactNode;
+  /**
+   * Maximum number of selected value chips to show before collapsing the rest.
+   * @default 3
+   */
+  maxVisibleValues?: number;
+}
+
+function MultiSelectValue({
+  className,
+  maxVisibleValues = 3,
+  placeholder = 'Select options',
+  ...props
+}: MultiSelectValueProps) {
+  const context = useMultiSelectContext('MultiSelectValue');
+  const selectedItems = labelsForValues(
+    context.options,
+    context.selectedValues
+  );
+  const visibleSelectedItems = selectedItems.slice(0, maxVisibleValues);
+  const overflowCount = Math.max(0, selectedItems.length - maxVisibleValues);
+
+  const handleRemoveValue = (
+    event: React.MouseEvent<HTMLButtonElement>,
+    value: string
+  ) => {
+    event.preventDefault();
+    event.stopPropagation();
+    context.toggleValue(value);
+  };
+
+  return (
+    <div
+      data-slot="multi-select-value"
+      className={cn(
+        'nx:flex nx:min-w-0 nx:flex-1 nx:flex-wrap nx:items-center nx:gap-1.5',
+        className
+      )}
+      {...props}
+    >
+      {visibleSelectedItems.map((item) => (
+        <Badge
+          key={item.value}
+          data-slot="multi-select-value-chip"
+          variant="secondary"
+          fill="outline"
+          isCaps={false}
+          className="nx:max-w-40 nx:pr-1"
+        >
+          <span className="nx:truncate">{item.label}</span>
+          {!context.disabled && !context.readOnly ? (
+            <button
+              type="button"
+              aria-label={`Remove ${item.label}`}
+              data-slot="multi-select-value-remove"
+              className="nx:-mr-0.5 nx:flex nx:size-4 nx:items-center nx:justify-center nx:rounded-sm nx:text-muted-foreground nx:hover:text-foreground nx:focus-visible:outline-2 nx:focus-visible:outline-focus-default nx:focus-visible:outline-offset-(--focus-offset)"
+              onClick={(event) => handleRemoveValue(event, item.value)}
+            >
+              <IconX aria-hidden="true" className="nx:size-3" />
+            </button>
+          ) : null}
+        </Badge>
+      ))}
+      {overflowCount > 0 ? (
+        <Badge
+          data-slot="multi-select-overflow"
+          variant="secondary"
+          fill="light"
+          isCaps={false}
+        >
+          +{overflowCount}
+        </Badge>
+      ) : null}
+      {selectedItems.length === 0 ? (
+        <span
+          data-slot="multi-select-placeholder"
+          className="nx:text-muted-foreground"
+        >
+          {placeholder}
+        </span>
+      ) : null}
+    </div>
   );
 }
 
@@ -952,4 +970,6 @@ export {
   type MultiSelectSeparatorProps,
   MultiSelectTrigger,
   type MultiSelectTriggerProps,
+  MultiSelectValue,
+  type MultiSelectValueProps,
 };

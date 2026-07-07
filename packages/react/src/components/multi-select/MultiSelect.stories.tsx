@@ -14,6 +14,7 @@ import {
   type MultiSelectOption,
   MultiSelectSearch,
   MultiSelectTrigger,
+  MultiSelectValue,
 } from './multi-select';
 
 const technologies: MultiSelectOption[] = [
@@ -50,8 +51,9 @@ function TechnologyMultiSelect({
       <MultiSelectTrigger
         aria-label="Technologies"
         className={triggerClassName}
-        placeholder={placeholder}
-      />
+      >
+        <MultiSelectValue placeholder={placeholder} />
+      </MultiSelectTrigger>
       <MultiSelectContent>
         <MultiSelectSearch aria-label="Search technologies" />
         <MultiSelectEmpty>No technologies found.</MultiSelectEmpty>
@@ -102,11 +104,9 @@ export const Sizes: Story = {
     <div className="nx:flex nx:w-80 nx:flex-col nx:gap-3">
       <TechnologyMultiSelect placeholder="Default" triggerClassName="" />
       <MultiSelect options={technologies}>
-        <MultiSelectTrigger
-          aria-label="Small technologies"
-          size="sm"
-          placeholder="Small"
-        />
+        <MultiSelectTrigger aria-label="Small technologies" size="sm">
+          <MultiSelectValue placeholder="Small" />
+        </MultiSelectTrigger>
         <MultiSelectContent>
           <MultiSelectSearch aria-label="Search small technologies" />
           <MultiSelectEmpty>No technologies found.</MultiSelectEmpty>
@@ -114,11 +114,9 @@ export const Sizes: Story = {
         </MultiSelectContent>
       </MultiSelect>
       <MultiSelect options={technologies}>
-        <MultiSelectTrigger
-          aria-label="Large technologies"
-          size="lg"
-          placeholder="Large"
-        />
+        <MultiSelectTrigger aria-label="Large technologies" size="lg">
+          <MultiSelectValue placeholder="Large" />
+        </MultiSelectTrigger>
         <MultiSelectContent>
           <MultiSelectSearch aria-label="Search large technologies" />
           <MultiSelectEmpty>No technologies found.</MultiSelectEmpty>
@@ -306,10 +304,14 @@ export const WithDataAttributes: Story = {
     const field = canvasElement.querySelector(
       '[data-slot="multi-select-field"]'
     );
+    const value = canvasElement.querySelector(
+      '[data-slot="multi-select-value"]'
+    );
 
     await expect(field).toHaveAttribute('data-size', 'default');
     await expect(field).toHaveAttribute('data-variant', 'default');
     await expect(trigger).toHaveAttribute('data-slot', 'multi-select-trigger');
+    await expect(value).toHaveAttribute('data-slot', 'multi-select-value');
   },
 };
 
@@ -323,11 +325,9 @@ export const AllVariants: Story = {
         triggerClassName=""
       />
       <MultiSelect options={technologies}>
-        <MultiSelectTrigger
-          aria-label="Borderless empty"
-          variant="borderless"
-          placeholder="Borderless empty"
-        />
+        <MultiSelectTrigger aria-label="Borderless empty" variant="borderless">
+          <MultiSelectValue placeholder="Borderless empty" />
+        </MultiSelectTrigger>
         <MultiSelectContent>
           <MultiSelectSearch aria-label="Search borderless empty" />
           <MultiSelectEmpty>No technologies found.</MultiSelectEmpty>
@@ -335,11 +335,9 @@ export const AllVariants: Story = {
         </MultiSelectContent>
       </MultiSelect>
       <MultiSelect options={technologies} defaultValue={['astro']}>
-        <MultiSelectTrigger
-          aria-label="Borderless filled"
-          variant="borderless"
-          placeholder="Borderless filled"
-        />
+        <MultiSelectTrigger aria-label="Borderless filled" variant="borderless">
+          <MultiSelectValue placeholder="Borderless filled" />
+        </MultiSelectTrigger>
         <MultiSelectContent>
           <MultiSelectSearch aria-label="Search borderless filled" />
           <MultiSelectEmpty>No technologies found.</MultiSelectEmpty>
