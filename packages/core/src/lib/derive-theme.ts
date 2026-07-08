@@ -101,29 +101,38 @@ function contrastProfile(mode: Mode, contrast: number): ContrastProfile {
   };
 }
 
-/** Steps (in Δ units) each opaque surface sits from the page background. */
-const SURFACE_STEPS: Record<string, number> = {
-  background: 0,
-  'background-hover': 1,
-  'background-active': 1.4,
-  muted: 1,
-  container: 1,
-  'container-hover': 1.8,
-  'container-active': 1.4,
-  popover: 1.8,
-  'popover-hover': 2.6,
-  'popover-active': 1.8,
-  'control-background': 1.4,
-  'control-background-hover': 2.2,
-  'nav-background': 0.6,
-  'nav-item-hover': 1.6,
-  'nav-item-active': 1.6,
-  'nav-border': 2.4,
-  disabled: 0.8,
-  'border-active': 3.2,
-};
+/**
+ * Canonical opaque-surface token set. Both regime step tables are typed against
+ * these keys, so a surface added here must be given a light and dark step — a
+ * missing or stray entry fails typecheck instead of silently falling back.
+ */
+const SURFACE_TOKENS = [
+  'background',
+  'background-hover',
+  'background-active',
+  'muted',
+  'container',
+  'container-hover',
+  'container-active',
+  'popover',
+  'popover-hover',
+  'popover-active',
+  'control-background',
+  'control-background-hover',
+  'nav-background',
+  'nav-item-hover',
+  'nav-item-active',
+  'nav-border',
+  'disabled',
+  'border-active',
+] as const;
 
-const DARK_SURFACE_STEPS: Partial<Record<string, number>> = {
+type SurfaceToken = (typeof SURFACE_TOKENS)[number];
+
+/** Steps (in Δ units) each opaque surface sits from the page background. */
+type SurfaceSteps = Record<SurfaceToken, number>;
+
+const DARK_SURFACE_STEPS: SurfaceSteps = {
   background: 0,
   'background-hover': 1.6,
   'background-active': 1.6,
@@ -144,7 +153,7 @@ const DARK_SURFACE_STEPS: Partial<Record<string, number>> = {
   'border-active': 9.68,
 };
 
-const LIGHT_M2_SURFACE_STEPS: Partial<Record<string, number>> = {
+const LIGHT_SURFACE_STEPS: SurfaceSteps = {
   background: 0,
   'background-hover': -0.45,
   'background-active': -0.84,
@@ -220,16 +229,14 @@ export function deriveSurfaces(
   const anchorL = dark ? (bg.l ?? 0) : PAGE_L_LIGHT;
   const baseC = dark ? tone.darkC : tone.lightC;
   const out: TokenMap = {};
-  for (const [token, rawStep] of Object.entries(SURFACE_STEPS)) {
+  for (const token of SURFACE_TOKENS) {
     if (dark && token in DARK_NAV_SURFACES[surfaceTone]) {
       out[`--nx-color-${token}`] =
         DARK_NAV_SURFACES[surfaceTone][token as DarkNavSurfaceToken];
       continue;
     }
 
-    const step = dark
-      ? (DARK_SURFACE_STEPS[token] ?? rawStep)
-      : (LIGHT_M2_SURFACE_STEPS[token] ?? -rawStep);
+    const step = dark ? DARK_SURFACE_STEPS[token] : LIGHT_SURFACE_STEPS[token];
     const l = clamp01(anchorL + step * delta);
     const c = dark
       ? baseC
