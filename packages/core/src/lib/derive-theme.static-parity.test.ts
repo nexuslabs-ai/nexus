@@ -1,11 +1,13 @@
-import { oklch, parse } from 'culori';
-import { readFileSync } from 'node:fs';
-import path from 'node:path';
-import { fileURLToPath } from 'node:url';
 import { describe, expect, it } from 'vitest';
 
 import { deriveSurfaces, type NexusSurfaceTone } from './derive-theme';
 import perceptualGrid from './perceptual-grid.json';
+import {
+  baseLeaves,
+  parseToOklch,
+  primitiveColors,
+  type TokenRecord,
+} from './token-parity-utils';
 
 const TONES = ['slate', 'neutral', 'zinc', 'gray', 'stone'] as const;
 const SURFACE_TOKENS = [
@@ -29,67 +31,13 @@ const SURFACE_TOKENS = [
   'border-active',
 ] as const;
 
-type Tone = (typeof TONES)[number];
 type SurfaceToken = (typeof SURFACE_TOKENS)[number];
-type TokenRecord = Record<string, string>;
 
-const TEST_DIR = path.dirname(fileURLToPath(import.meta.url));
-const ROOT_DIR = path.resolve(TEST_DIR, '..', '..');
-const SEMANTIC_DIR = path.join(ROOT_DIR, 'tokens', 'semantic');
-const PRIMITIVE_COLOR_FILE = path.join(
-  ROOT_DIR,
-  'tokens',
-  'primitives',
-  'color.json'
-);
 const STANDARD_SHADE_L = perceptualGrid as Record<string, number>;
 const STATIC_TOLERANCE_L = 0.006;
 const SIGN_EPSILON = 0.0001;
 const MIN_CARD_PAGE_SEPARATION_L = 0.025;
 const MIN_CONTAINER_HOVER_PAGE_SEPARATION_L = 0.01;
-
-const primitiveColors = JSON.parse(
-  readFileSync(PRIMITIVE_COLOR_FILE, 'utf8')
-) as Record<string, Record<string, { $value: string; $type: string }>>;
-
-function readJson(file: string): unknown {
-  return JSON.parse(readFileSync(file, 'utf8'));
-}
-
-function collectColorLeaves(
-  obj: unknown,
-  leaves: TokenRecord,
-  tokenPath: string[] = []
-): void {
-  if (!obj || typeof obj !== 'object' || Array.isArray(obj)) return;
-  const record = obj as Record<string, unknown>;
-  if (record.$type === 'color' && typeof record.$value === 'string') {
-    leaves[tokenPath.join('-')] = record.$value;
-    return;
-  }
-
-  for (const [key, value] of Object.entries(record)) {
-    if (key.startsWith('$')) continue;
-    collectColorLeaves(value, leaves, [...tokenPath, key]);
-  }
-}
-
-function baseLeaves(tone: Tone): TokenRecord {
-  const leaves: TokenRecord = {};
-  collectColorLeaves(
-    readJson(path.join(SEMANTIC_DIR, `base-${tone}-light.json`)),
-    leaves
-  );
-  return leaves;
-}
-
-function parseToOklch(input: string): { l?: number } {
-  const parsed = parse(input);
-  if (!parsed) throw new Error(`Cannot parse color "${input}"`);
-  const color = oklch(parsed);
-  if (!color) throw new Error(`Cannot convert color "${input}" to OKLCH`);
-  return color;
-}
 
 function lOf(input: string): number {
   const color = parseToOklch(input);
@@ -99,6 +47,10 @@ function lOf(input: string): number {
   return color.l;
 }
 
+// Standard shades resolve to their grid-pinned L (the emitted CSS grinds them
+// through perceptual-grid.json); off-grid near-whites (75/150) are emitted
+// as-is, so their effective L is the raw hex L. The `stay off the perceptual
+// grid` test below guards that this branch keeps its meaning.
 function primitiveLightness(ref: string): number {
   const [palette, shade] = ref.slice(1, -1).split('.');
   const value =
@@ -121,10 +73,21 @@ function sign(value: number): number {
 }
 
 describe('deriveSurfaces static light parity', () => {
+  // primitiveLightness() only reads raw-hex L for the near-white 75/150 shades
+  // because they are absent from the perceptual grid. If they were ever grid-
+  // pinned, the resolver would silently switch to grid L and this suite's
+  // meaning would change with no failing signal — so pin the invariant here.
+  it('75/150 near-white primitives stay off the perceptual grid', () => {
+    expect('75' in STANDARD_SHADE_L, '75 must not be grid-pinned').toBe(false);
+    expect('150' in STANDARD_SHADE_L, '150 must not be grid-pinned').toBe(
+      false
+    );
+  });
+
   it.each(TONES)(
     '%s light runtime surfaces match static token ladder',
     (tone) => {
-      const staticLeaves = baseLeaves(tone);
+      const staticLeaves = baseLeaves(tone, 'light');
       const engine = deriveSurfaces(
         '#ffffff',
         tone as NexusSurfaceTone,

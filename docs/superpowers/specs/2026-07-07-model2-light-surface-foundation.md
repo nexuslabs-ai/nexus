@@ -31,15 +31,15 @@ Do not invent new numbers. These L values were validated against
 `audit:contrast` (828/828) and `audit:colorblind` (0 findings) in the stone
 static slice:
 
-| Token(s)                                                                      | Target L | Static primitive  |
-| ----------------------------------------------------------------------------- | -------- | ----------------- |
-| `container`, `popover`                                                        | 1.000    | `white.base`      |
-| `container-hover`, `popover-hover`                                            | 0.985    | `stone.50`        |
-| `background` (page anchor)                                                    | 0.970    | `stone.75` (new)  |
-| `muted`, `background-hover`, `container-active`, `popover-active`, `disabled` | 0.946    | `stone.100`       |
-| `background-active`, `control-background`, `nav-background`                   | 0.923    | `stone.150` (new) |
-| `control-background-hover`, `nav-item-hover`, `nav-item-active`, `nav-border` | 0.871    | `stone.200`       |
-| `border-active`                                                               | 0.662    | `stone.400`       |
+| Token(s)                                                                                       | Target L | Static primitive  |
+| ---------------------------------------------------------------------------------------------- | -------- | ----------------- |
+| `container`, `popover`                                                                         | 1.000    | `white.base`      |
+| `container-hover`                                                                              | 0.985    | `stone.50`        |
+| `background` (page anchor)                                                                     | 0.970    | `stone.75` (new)  |
+| `muted`, `background-hover`, `popover-hover`, `container-active`, `popover-active`, `disabled` | 0.946    | `stone.100`       |
+| `background-active`, `control-background`, `nav-background`                                    | 0.923    | `stone.150` (new) |
+| `control-background-hover`, `nav-item-hover`, `nav-item-active`, `nav-border`                  | 0.871    | `stone.200`       |
+| `border-active`                                                                                | 0.662    | `stone.400`       |
 
 Three collapsed elevation anchors now separate: **card 1.000 → page 0.970 (ΔL
 0.030) → recessed 0.946 → inset 0.923**. Card and popover are intentionally
@@ -55,9 +55,10 @@ not fill lightness.
   is global to all tones by design; the static side must move in the same PR.
 - ✅ **Component adoption is included, but scoped.** Move component-owned fields
   and chrome off page-canvas tokens: Input, Textarea, Select trigger,
-  NativeSelect, InputGroup, InputOTP, Accordion, Menubar, Table sticky header,
-  and overlay close affordances. Keep page-level rows/lists/table-row hover on
-  `background` / `background-hover`.
+  NativeSelect, InputGroup, InputOTP, Checkbox, RadioGroup, DatePicker preview,
+  Accordion, Menubar, Table sticky header, Alert close, and overlay close
+  affordances. Keep page-level rows/lists/table-row hover on `background` /
+  `background-hover`.
 
 ## Why "stone only" is a checkpoint, not a merge boundary
 
@@ -89,20 +90,20 @@ const LIGHT_M2_STEPS = {
   container: 0.54, // clamps to white at contrast 60 — tune to hit 1.0
   popover: 0.54,
   'container-hover': 0.27,
-  'popover-hover': 0.27,
-  muted: -0.43,
-  'background-hover': -0.43,
-  'container-active': -0.43,
-  'popover-active': -0.43,
-  disabled: -0.43,
+  muted: -0.45,
+  'background-hover': -0.45,
+  'popover-hover': -0.45, // deliberately equal to background-hover (stone.100)
+  'container-active': -0.45,
+  'popover-active': -0.45,
+  disabled: -0.45,
   'background-active': -0.84,
   'control-background': -0.84,
   'nav-background': -0.84,
-  'control-background-hover': -1.77,
-  'nav-item-hover': -1.77,
-  'nav-item-active': -1.77,
-  'nav-border': -1.77,
-  'border-active': -5.5, // matches static stone.400 (0.66) at contrast 60
+  'control-background-hover': -1.79,
+  'nav-item-hover': -1.79,
+  'nav-item-active': -1.79,
+  'nav-border': -1.79,
+  'border-active': -5.54, // matches static stone.400 (0.66) at contrast 60
 };
 ```
 
