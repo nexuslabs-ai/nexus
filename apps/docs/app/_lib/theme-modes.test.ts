@@ -23,7 +23,6 @@ describe('docs theme modes', () => {
   it('keeps valid theme state values', () => {
     const state = sanitizeThemeState({
       base: 'slate',
-      brand: 'teal',
       spacing: 'spacious',
       shadow: 'standard',
       radius: 'smooth',
@@ -32,7 +31,6 @@ describe('docs theme modes', () => {
 
     expect(state).toMatchObject({
       base: 'slate',
-      brand: 'teal',
       spacing: 'spacious',
       shadow: 'standard',
       radius: 'smooth',
@@ -43,7 +41,6 @@ describe('docs theme modes', () => {
   it('falls back safely for invalid or legacy values', () => {
     const state = sanitizeThemeState({
       base: '../base-slate',
-      brand: 'blue.css',
       spacing: 'nova',
       shadow: 'nova',
       radius: 'smooth',
@@ -57,12 +54,12 @@ describe('docs theme modes', () => {
   });
 
   it('sanitizes interactive updates before building stylesheet hrefs', () => {
-    expect(sanitizeMode('brand', 'pink')).toBe('pink');
-    expect(sanitizeMode('brand', '/themes/brands-pink.css')).toBe(
-      DEFAULT_THEME_STATE.brand
+    expect(sanitizeMode('base', 'zinc')).toBe('zinc');
+    expect(sanitizeMode('base', '/themes/base-zinc.css')).toBe(
+      DEFAULT_THEME_STATE.base
     );
-    expect(getThemeStylesheetHref('brand', '/themes/brands-pink.css')).toBe(
-      '/themes/brands-black.css'
+    expect(getThemeStylesheetHref('base', '/themes/base-zinc.css')).toBe(
+      '/themes/base-stone.css'
     );
   });
 
@@ -138,7 +135,6 @@ describe('docs theme modes', () => {
       JSON.stringify({
         state: {
           base: '../base-slate',
-          brand: '/themes/brands-pink.css',
           spacing: 'sera);document.body.innerHTML=""',
           shadow: 'javascript:alert(1)',
           radius: 'smooth',
@@ -150,11 +146,15 @@ describe('docs theme modes', () => {
 
     window.eval(DOCS_THEME_BOOTSTRAP_SCRIPT);
 
+    // focus-default and theme-default load unconditionally (no data-theme):
+    // they are the always-on default layer, not swappable dimensions.
     expect(
-      document.head
-        .querySelector<HTMLLinkElement>('link:not([data-theme])')
-        ?.getAttribute('href')
-    ).toBe('/themes/focus-default.css');
+      Array.from(
+        document.head.querySelectorAll<HTMLLinkElement>(
+          'link:not([data-theme])'
+        )
+      ).map((link) => link.getAttribute('href'))
+    ).toEqual(['/themes/focus-default.css', '/themes/theme-default.css']);
     expect(document.documentElement.getAttribute('data-density')).toBe(
       DEFAULT_THEME_STATE.spacing
     );
@@ -168,7 +168,6 @@ describe('docs theme modes', () => {
       themeLinks.map((link) => [link.dataset.theme, link.getAttribute('href')])
     ).toEqual([
       ['base', THEME_STYLESHEET_HREFS.base[DEFAULT_THEME_STATE.base]],
-      ['brand', THEME_STYLESHEET_HREFS.brand[DEFAULT_THEME_STATE.brand]],
       ['shadow', THEME_STYLESHEET_HREFS.shadow[DEFAULT_THEME_STATE.shadow]],
       ['radius', THEME_STYLESHEET_HREFS.radius.smooth],
       [

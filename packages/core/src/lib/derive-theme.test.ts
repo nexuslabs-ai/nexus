@@ -268,6 +268,32 @@ describe('derivePrimary', () => {
     ).toBeGreaterThanOrEqual(TIER_THRESHOLDS.ui);
   });
 
+  it('keeps the shared label legible on the hover and active fills, not only the base', () => {
+    // Honoring the seed lightness can land the fill near mid-grey, where the
+    // toward-mid hover/active nudge erodes contrast against the single shared
+    // foreground. Every state fill must clear the ui tier against that label —
+    // e.g. deep navy in dark mode lifts to a mid fill and used to drop hover
+    // (~53) and active (~46) below the 60 floor.
+    const seeds = ['#1b2a4a', '#0a0a0a', '#2563eb', '#339cff', '#7c3aed'];
+    const states = [
+      '--nx-color-primary-background',
+      '--nx-color-primary-background-hover',
+      '--nx-color-primary-background-active',
+    ] as const;
+    for (const seed of seeds) {
+      for (const mode of ['light', 'dark'] as const) {
+        const p = derivePrimary(seed, mode);
+        const label = p['--nx-color-primary-foreground']!;
+        for (const state of states) {
+          expect(
+            apcaLc(label, p[state]!),
+            `${seed} ${mode} ${state}`
+          ).toBeGreaterThanOrEqual(TIER_THRESHOLDS.ui);
+        }
+      }
+    }
+  });
+
   it('keeps a black brand black in light mode and flips it to white in dark mode', () => {
     const light = derivePrimary('#0a0a0a', 'light');
     expect(lOf(light['--nx-color-primary-background'])).toBeLessThan(0.2);

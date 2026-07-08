@@ -12,15 +12,14 @@ import { Button } from './nexus';
 
 /**
  * Landing-page "Highlights" demo. Reuses the global theme store + the same
- * <link data-theme> swap the corner ThemePicker uses, so picking a base or
- * brand re-themes the entire page live (every surface is token-driven) and
- * stays in sync with the picker.
+ * <link data-theme> swap the corner ThemePicker uses, so picking a base
+ * re-themes the entire page live (every surface is token-driven) and stays in
+ * sync with the picker.
  */
 
-type LiveThemeMode = Extract<ThemeStylesheetMode, 'base' | 'brand'>;
+type LiveThemeMode = Extract<ThemeStylesheetMode, 'base'>;
 
 const BASES = THEME_MODE_OPTIONS.base.map((option) => option.value);
-const BRANDS = THEME_MODE_OPTIONS.brand.map((option) => option.value);
 
 function applyTheme(mode: LiveThemeMode, value: string) {
   const safeValue = sanitizeMode(mode, value);
@@ -32,7 +31,6 @@ function applyTheme(mode: LiveThemeMode, value: string) {
 
 export function LiveThemeSwapper() {
   const base = useThemeStore((s) => s.base);
-  const brand = useThemeStore((s) => s.brand);
   const update = useThemeStore((s) => s.update);
 
   const pick = (mode: LiveThemeMode, value: string) => {
@@ -58,12 +56,6 @@ export function LiveThemeSwapper() {
         values={BASES}
         active={base}
         onPick={(v) => pick('base', v)}
-      />
-      <ChipRow
-        label="Brand"
-        values={BRANDS}
-        active={brand}
-        onPick={(v) => pick('brand', v)}
       />
 
       <div className="nx:mt-auto nx:flex nx:flex-wrap nx:items-center nx:gap-2 nx:border-t nx:border-border-default nx:pt-4">

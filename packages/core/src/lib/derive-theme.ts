@@ -621,6 +621,31 @@ function legibleFillLightness(l: number, c: number, h: number): number {
   return l;
 }
 
+// The base, hover, and active fills share one `-foreground` label, so nudging
+// hover/active toward mid can erode that fixed label below the ui tier even
+// though the base fill cleared it. Nudge toward mid for the state cue, but stop
+// at the furthest point where the shared label still clears — legibility of the
+// label outranks the size of the state cue in the rare mid-band. The base fill
+// clears by construction, so it is always a legible fallback.
+function stateFillLightness(
+  baseL: number,
+  step: number,
+  label: string,
+  c: number,
+  h: number
+): number {
+  const target = towardMid(baseL, step);
+  const dir = target >= baseL ? 1 : -1;
+  const span = Math.round(Math.abs(target - baseL) * 100);
+  for (let s = span; s >= 1; s -= 1) {
+    const candidate = clamp01(baseL + dir * s * 0.01);
+    if (apcaLc(label, seedFill(candidate, c, h)) >= TIER_THRESHOLDS.ui) {
+      return candidate;
+    }
+  }
+  return baseL;
+}
+
 /**
  * The 11-token primary family from one accent seed. Supporting shades (subtle,
  * borders, disabled) come from the seed ramp via {@link deriveFamily}; the solid
@@ -636,20 +661,21 @@ export function derivePrimary(accentHex: string, mode: Mode): TokenMap {
     h
   );
   const background = seedFill(fillL, c, h);
+  const label = readableOn(background);
   return {
     ...deriveFamily('primary', rampFromSeed(accentHex), mode),
     '--nx-color-primary-background': background,
     '--nx-color-primary-background-hover': seedFill(
-      towardMid(fillL, PRIMARY_HOVER_STEP),
+      stateFillLightness(fillL, PRIMARY_HOVER_STEP, label, c, h),
       c,
       h
     ),
     '--nx-color-primary-background-active': seedFill(
-      towardMid(fillL, PRIMARY_ACTIVE_STEP),
+      stateFillLightness(fillL, PRIMARY_ACTIVE_STEP, label, c, h),
       c,
       h
     ),
-    '--nx-color-primary-foreground': readableOn(background),
+    '--nx-color-primary-foreground': label,
   };
 }
 
