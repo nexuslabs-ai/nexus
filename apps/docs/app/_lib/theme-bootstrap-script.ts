@@ -50,10 +50,14 @@ export const DOCS_THEME_BOOTSTRAP_SCRIPT = `(function () {
           }
         } catch (e) {}
       }
-      var focusLink = document.createElement('link');
-      focusLink.rel = 'stylesheet';
-      focusLink.href = '/themes/focus-default.css';
-      document.head.appendChild(focusLink);
+      ['/themes/focus-default.css', '/themes/theme-default.css'].forEach(
+        function (href) {
+          var link = document.createElement('link');
+          link.rel = 'stylesheet';
+          link.href = href;
+          document.head.appendChild(link);
+        }
+      );
       STYLESHEET_MODE_KEYS.forEach(function (key) {
         var link = document.createElement('link');
         link.rel = 'stylesheet';

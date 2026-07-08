@@ -466,7 +466,6 @@ describe('utils', () => {
   describe('DEFAULT_CONFIG', () => {
     it('has all required configuration keys', () => {
       expect(DEFAULT_CONFIG).toHaveProperty('base');
-      expect(DEFAULT_CONFIG).toHaveProperty('brand');
       expect(DEFAULT_CONFIG).toHaveProperty('shadow');
       expect(DEFAULT_CONFIG).toHaveProperty('radius');
       expect(DEFAULT_CONFIG).toHaveProperty('borderwidth');
@@ -481,7 +480,6 @@ describe('utils', () => {
 
     it('has expected default values', () => {
       expect(DEFAULT_CONFIG.base).toBe('stone');
-      expect(DEFAULT_CONFIG.brand).toBe('black');
       expect(DEFAULT_CONFIG.shadow).toBe('quiet');
       expect(DEFAULT_CONFIG.radius).toBe('square');
       expect(DEFAULT_CONFIG.borderwidth).toBe('normal');
@@ -495,10 +493,9 @@ describe('utils', () => {
   describe('parseArgs', () => {
     it('parses default generator flags', () => {
       expect(
-        parseArgs(['--base=zinc', '--brand=blue', '--spacingDefault=relaxed'])
+        parseArgs(['--base=zinc', '--spacingDefault=relaxed'])
       ).toMatchObject({
         base: 'zinc',
-        brand: 'blue',
         spacingDefault: 'relaxed',
       });
     });

@@ -199,14 +199,14 @@ describe('deriveText', () => {
 });
 
 describe('deriveFamily / derivePrimary snapshot', () => {
-  it('primary token values are unchanged by the deriveFamily refactor', () => {
+  it('primary fill follows the seed lightness; supporting shades come from the ramp', () => {
     expect(derivePrimary('#2563eb', 'light')).toMatchInlineSnapshot(`
       {
         "--nx-color-border-primary": "oklch(0.87 0.066 262.881)",
         "--nx-color-border-primary-active": "oklch(0.66 0.1849 262.881)",
-        "--nx-color-primary-background": "oklch(0.46 0.2152 262.881)",
-        "--nx-color-primary-background-active": "oklch(0.297 0.173 262.881)",
-        "--nx-color-primary-background-hover": "oklch(0.385 0.2152 262.881)",
+        "--nx-color-primary-background": "oklch(0.5461 0.2152 262.881)",
+        "--nx-color-primary-background-active": "oklch(0.4461 0.2152 262.881)",
+        "--nx-color-primary-background-hover": "oklch(0.4961 0.2152 262.881)",
         "--nx-color-primary-disabled": "oklch(0.765 0.1236 262.881)",
         "--nx-color-primary-foreground": "oklch(1 0 0)",
         "--nx-color-primary-subtle": "oklch(0.985 0.0073 262.881)",
@@ -219,9 +219,9 @@ describe('deriveFamily / derivePrimary snapshot', () => {
       {
         "--nx-color-border-primary": "oklch(0.385 0.2152 262.881)",
         "--nx-color-border-primary-active": "oklch(0.553 0.2152 262.881)",
-        "--nx-color-primary-background": "oklch(0.46 0.2152 262.881)",
-        "--nx-color-primary-background-active": "oklch(0.297 0.173 262.881)",
-        "--nx-color-primary-background-hover": "oklch(0.385 0.2152 262.881)",
+        "--nx-color-primary-background": "oklch(0.5461 0.2152 262.881)",
+        "--nx-color-primary-background-active": "oklch(0.4461 0.2152 262.881)",
+        "--nx-color-primary-background-hover": "oklch(0.4961 0.2152 262.881)",
         "--nx-color-primary-disabled": "oklch(0.118 0.0687 262.881)",
         "--nx-color-primary-foreground": "oklch(1 0 0)",
         "--nx-color-primary-subtle": "oklch(0.118 0.0687 262.881)",
@@ -234,12 +234,27 @@ describe('deriveFamily / derivePrimary snapshot', () => {
 });
 
 describe('derivePrimary', () => {
-  it('maps primary-background to the 600 shade of the accent ramp', () => {
-    const p = derivePrimary('#339cff', 'light');
-    expect(p['--nx-color-primary-background']).toBeDefined();
-    // hover is darker (700) than background (600)
-    expect(lOf(p['--nx-color-primary-background-hover'])).toBeLessThan(
-      lOf(p['--nx-color-primary-background'])
+  it('follows the seed lightness — a dark seed yields a dark fill, a light seed a light fill', () => {
+    const nearBlack = derivePrimary('#0a0a0a', 'light');
+    const lightBlue = derivePrimary('#339cff', 'light');
+    expect(lOf(nearBlack['--nx-color-primary-background'])).toBeLessThan(0.25);
+    expect(lOf(lightBlue['--nx-color-primary-background'])).toBeGreaterThan(
+      0.6
+    );
+  });
+
+  it('deep navy stays deep navy in light mode and lifts to stay legible in dark mode', () => {
+    const light = derivePrimary('#1b2a4a', 'light');
+    const dark = derivePrimary('#1b2a4a', 'dark');
+    // Light mode honors the deep, dark seed.
+    expect(lOf(light['--nx-color-primary-background'])).toBeLessThan(0.4);
+    // Dark mode lifts it so it reads on a dark surface, keeping the hue.
+    expect(lOf(dark['--nx-color-primary-background'])).toBeGreaterThan(
+      lOf(light['--nx-color-primary-background'])
+    );
+    expect(hOf(dark['--nx-color-primary-background'])).toBeCloseTo(
+      hOf(light['--nx-color-primary-background']),
+      0
     );
   });
 
@@ -251,6 +266,42 @@ describe('derivePrimary', () => {
         p['--nx-color-primary-background']!
       )
     ).toBeGreaterThanOrEqual(TIER_THRESHOLDS.ui);
+  });
+
+  it('keeps the shared label legible on the hover and active fills, not only the base', () => {
+    // Honoring the seed lightness can land the fill near mid-grey, where the
+    // toward-mid hover/active nudge erodes contrast against the single shared
+    // foreground. Every state fill must clear the ui tier against that label —
+    // e.g. deep navy in dark mode lifts to a mid fill and used to drop hover
+    // (~53) and active (~46) below the 60 floor.
+    const seeds = ['#1b2a4a', '#0a0a0a', '#2563eb', '#339cff', '#7c3aed'];
+    const states = [
+      '--nx-color-primary-background',
+      '--nx-color-primary-background-hover',
+      '--nx-color-primary-background-active',
+    ] as const;
+    for (const seed of seeds) {
+      for (const mode of ['light', 'dark'] as const) {
+        const p = derivePrimary(seed, mode);
+        const label = p['--nx-color-primary-foreground']!;
+        for (const state of states) {
+          expect(
+            apcaLc(label, p[state]!),
+            `${seed} ${mode} ${state}`
+          ).toBeGreaterThanOrEqual(TIER_THRESHOLDS.ui);
+        }
+      }
+    }
+  });
+
+  it('keeps a black brand black in light mode and flips it to white in dark mode', () => {
+    const light = derivePrimary('#0a0a0a', 'light');
+    expect(lOf(light['--nx-color-primary-background'])).toBeLessThan(0.2);
+    expect(lOf(light['--nx-color-primary-foreground'])).toBeGreaterThan(0.9);
+
+    const dark = derivePrimary('#000000', 'dark');
+    expect(lOf(dark['--nx-color-primary-background'])).toBeGreaterThan(0.9);
+    expect(lOf(dark['--nx-color-primary-foreground'])).toBeLessThan(0.2);
   });
 });
 

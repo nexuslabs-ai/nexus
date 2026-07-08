@@ -3,7 +3,6 @@ export const DOCS_DARK_MODE_STORAGE_KEY = 'nexus-docs-theme';
 
 export const THEME_MODE_KEYS = [
   'base',
-  'brand',
   'spacing',
   'shadow',
   'radius',
@@ -16,7 +15,6 @@ export type StoredColorScheme = 'light' | 'dark';
 
 export const THEME_STYLESHEET_MODE_KEYS = [
   'base',
-  'brand',
   'shadow',
   'radius',
   'borderwidth',
@@ -24,7 +22,6 @@ export const THEME_STYLESHEET_MODE_KEYS = [
 
 export const THEME_MODE_VALUES = {
   base: ['slate', 'stone', 'neutral', 'gray', 'zinc'],
-  brand: ['blue', 'purple', 'pink', 'teal', 'orange', 'black'],
   spacing: [
     'tight',
     'relaxed',
@@ -51,7 +48,6 @@ export type ThemeModeOption<K extends ThemeMode = ThemeMode> = {
 
 export const DEFAULT_THEME_STATE = {
   base: 'stone',
-  brand: 'black',
   spacing: 'default',
   shadow: 'quiet',
   radius: 'square',
@@ -65,14 +61,6 @@ export const THEME_MODE_OPTIONS = {
     { value: 'neutral', label: 'Neutral' },
     { value: 'gray', label: 'Gray' },
     { value: 'zinc', label: 'Zinc' },
-  ],
-  brand: [
-    { value: 'blue', label: 'Blue' },
-    { value: 'purple', label: 'Purple' },
-    { value: 'pink', label: 'Pink' },
-    { value: 'teal', label: 'Teal' },
-    { value: 'orange', label: 'Orange' },
-    { value: 'black', label: 'Black' },
   ],
   spacing: [
     { value: 'tight', label: 'Tight' },
@@ -112,14 +100,6 @@ export const THEME_STYLESHEET_HREFS = {
     neutral: '/themes/base-neutral.css',
     gray: '/themes/base-gray.css',
     zinc: '/themes/base-zinc.css',
-  },
-  brand: {
-    blue: '/themes/brands-blue.css',
-    purple: '/themes/brands-purple.css',
-    pink: '/themes/brands-pink.css',
-    teal: '/themes/brands-teal.css',
-    orange: '/themes/brands-orange.css',
-    black: '/themes/brands-black.css',
   },
   shadow: {
     flat: '/themes/shadow-flat.css',
@@ -169,7 +149,6 @@ export function sanitizeThemeState(raw: unknown): ThemeState {
 
   return {
     base: sanitizeMode('base', state.base),
-    brand: sanitizeMode('brand', state.brand),
     spacing: sanitizeMode('spacing', state.spacing),
     shadow: sanitizeMode('shadow', state.shadow),
     radius: sanitizeMode('radius', state.radius),
@@ -184,8 +163,6 @@ export function getThemeStylesheetHref(
   switch (mode) {
     case 'base':
       return THEME_STYLESHEET_HREFS.base[sanitizeMode('base', value)];
-    case 'brand':
-      return THEME_STYLESHEET_HREFS.brand[sanitizeMode('brand', value)];
     case 'shadow':
       return THEME_STYLESHEET_HREFS.shadow[sanitizeMode('shadow', value)];
     case 'radius':

@@ -1,4 +1,4 @@
-import type { Oklch } from 'culori';
+import { clampChroma, type Oklch } from 'culori';
 
 import { apcaLc } from './apca';
 import { formatOklch } from './oklch-format';
@@ -400,10 +400,6 @@ export function deriveFamily(
   };
 }
 
-/** The 11-token primary family, from one accent seed. */
-export const derivePrimary = (accentHex: string, mode: Mode): TokenMap =>
-  deriveFamily('primary', rampFromSeed(accentHex), mode);
-
 const STATUS_FAMILIES = ['success', 'warning', 'error', 'information'] as const;
 
 type StatusFamily = (typeof STATUS_FAMILIES)[number];
@@ -568,6 +564,120 @@ export const NEUTRAL = {
   '900': 'oklch(0.207 0 0)',
   '950': 'oklch(0.118 0 0)',
 } satisfies Record<Exclude<Shade, '400' | '500'>, string>;
+
+// P3 cusp gamut for the solid fill, matching the perceptual ramp's emit target.
+const FILL_GAMUT = 'p3';
+// The primary fill follows the brand seed's own lightness rather than a fixed
+// mid-tone shade, so the button *is* the chosen color: a deep navy stays deep
+// navy, and #000 stays black. Light mode honors the seed directly, capped so a
+// near-white brand still reads as a filled button. Dark mode honors light/mid
+// seeds but lifts dark ones toward light — so a black brand becomes a white
+// button that stays legible on a dark surface.
+const PRIMARY_FILL_LIGHT_CAP = 0.85;
+const PRIMARY_DARK_HONOR_FLOOR = 0.45;
+const PRIMARY_DARK_LIFT_EXPONENT = 1.6;
+const PRIMARY_HOVER_STEP = 0.05;
+const PRIMARY_ACTIVE_STEP = 0.1;
+
+function primaryFillLightness(seedL: number, mode: Mode): number {
+  if (mode === 'light') return clamp01(Math.min(seedL, PRIMARY_FILL_LIGHT_CAP));
+  if (seedL >= PRIMARY_DARK_HONOR_FLOOR) return clamp01(seedL);
+  // Below the floor, lift toward white so a dark seed stays legible on a dark
+  // surface. The coefficient is `1 - floor` so the curve meets the honor branch
+  // exactly at the floor (continuous, no jump); the exponent shapes how hard
+  // near-black seeds push toward white.
+  const t = seedL / PRIMARY_DARK_HONOR_FLOOR;
+  return clamp01(
+    1 - (1 - PRIMARY_DARK_HONOR_FLOOR) * Math.pow(t, PRIMARY_DARK_LIFT_EXPONENT)
+  );
+}
+
+// Hover/active nudge the fill toward mid-grey so the state change reads at any
+// fill lightness: dark fills lighten, light fills darken.
+const towardMid = (l: number, step: number): number =>
+  clamp01(l < 0.5 ? l + step : l - step);
+
+const seedFill = (l: number, c: number, h: number): string =>
+  formatOklch(clampChroma({ mode: 'oklch', l, c, h }, 'oklch', FILL_GAMUT));
+
+const bestOnColorLc = (fill: string): number =>
+  Math.max(apcaLc('oklch(1 0 0)', fill), apcaLc('oklch(0 0 0)', fill));
+
+// Honoring the seed's lightness can land the fill in a mid band where neither a
+// black nor white label clears the ui tier. Nudge the fill toward whichever
+// extreme its better on-color already prefers until a pure label passes — a
+// no-op for dark or saturated seeds, active only in that band.
+function legibleFillLightness(l: number, c: number, h: number): number {
+  const fill = seedFill(l, c, h);
+  if (bestOnColorLc(fill) >= TIER_THRESHOLDS.ui) return l;
+  const dir =
+    apcaLc('oklch(1 0 0)', fill) >= apcaLc('oklch(0 0 0)', fill) ? -1 : 1;
+  for (let step = 1; step <= 100; step += 1) {
+    const candidate = clamp01(l + dir * step * 0.01);
+    if (bestOnColorLc(seedFill(candidate, c, h)) >= TIER_THRESHOLDS.ui) {
+      return candidate;
+    }
+  }
+  return l;
+}
+
+// The base, hover, and active fills share one `-foreground` label, so nudging
+// hover/active toward mid can erode that fixed label below the ui tier even
+// though the base fill cleared it. Nudge toward mid for the state cue, but stop
+// at the furthest point where the shared label still clears — legibility of the
+// label outranks the size of the state cue in the rare mid-band. The base fill
+// clears by construction, so it is always a legible fallback.
+function stateFillLightness(
+  baseL: number,
+  step: number,
+  label: string,
+  c: number,
+  h: number
+): number {
+  const target = towardMid(baseL, step);
+  const dir = target >= baseL ? 1 : -1;
+  const span = Math.round(Math.abs(target - baseL) * 100);
+  for (let s = span; s >= 1; s -= 1) {
+    const candidate = clamp01(baseL + dir * s * 0.01);
+    if (apcaLc(label, seedFill(candidate, c, h)) >= TIER_THRESHOLDS.ui) {
+      return candidate;
+    }
+  }
+  return baseL;
+}
+
+/**
+ * The 11-token primary family from one accent seed. Supporting shades (subtle,
+ * borders, disabled) come from the seed ramp via {@link deriveFamily}; the solid
+ * fill and its on-color follow the seed's own lightness.
+ */
+export function derivePrimary(accentHex: string, mode: Mode): TokenMap {
+  const seed = seedOklch(accentHex);
+  const h = seed.h ?? 0;
+  const c = seed.c ?? 0;
+  const fillL = legibleFillLightness(
+    primaryFillLightness(seed.l ?? 0, mode),
+    c,
+    h
+  );
+  const background = seedFill(fillL, c, h);
+  const label = readableOn(background);
+  return {
+    ...deriveFamily('primary', rampFromSeed(accentHex), mode),
+    '--nx-color-primary-background': background,
+    '--nx-color-primary-background-hover': seedFill(
+      stateFillLightness(fillL, PRIMARY_HOVER_STEP, label, c, h),
+      c,
+      h
+    ),
+    '--nx-color-primary-background-active': seedFill(
+      stateFillLightness(fillL, PRIMARY_ACTIVE_STEP, label, c, h),
+      c,
+      h
+    ),
+    '--nx-color-primary-foreground': label,
+  };
+}
 
 export function deriveSecondary(mode: Mode): TokenMap {
   const d = mode === 'dark';

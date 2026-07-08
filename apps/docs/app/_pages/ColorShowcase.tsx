@@ -187,8 +187,8 @@ export function ColorShowcase() {
         <h2 className="nx:typography-heading-small nx:mb-1">Live tokens</h2>
         <p className="nx:typography-body-default nx:text-muted-foreground nx:mb-4 nx:max-w-[64ch]">
           Semantic surface/text pairs — the real tokens components use. Open the
-          theme picker (bottom-right) and swap base, brand, or dark mode: every
-          pair re-resolves live, and each clears the APCA gate by construction.
+          theme picker (bottom-right) and swap the base or dark mode: every pair
+          re-resolves live, and each clears the APCA gate by construction.
         </p>
         <div className="nx:grid nx:grid-cols-2 nx:md:grid-cols-5 nx:gap-3">
           {SEMANTIC_PAIRS.map((pair) => (

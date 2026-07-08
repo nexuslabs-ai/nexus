@@ -141,7 +141,7 @@ function getSemanticFiles(discovered, config) {
   };
 
   for (const [type, modes] of Object.entries(discovered.themed)) {
-    const configKey = type === 'brands' ? 'brand' : type;
+    const configKey = type;
     let selectedMode = config[configKey];
 
     if (!selectedMode) {
@@ -716,7 +716,6 @@ if (process.argv[1] === fileURLToPath(import.meta.url)) {
   const cliConfig = parseArgs(undefined, {
     allowedKeys: [
       'base',
-      'brand',
       'typography',
       'shadow',
       'radius',

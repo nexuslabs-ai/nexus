@@ -193,7 +193,7 @@ function generateThemedCSS(distDir, type, mode, primitiveMap) {
 
 /**
  * Generate themed primitive CSS file (light/dark pair → one file with html / html.dark blocks).
- * Mirrors generateThemedCSS so themed primitives load the same way as base/brands semantics.
+ * Mirrors generateThemedCSS so themed primitives load the same way as base/theme semantics.
  * Dark tokens identical to their light counterpart are filtered out so the
  * `html.dark` block contains only genuine divergences (matches the bundled
  * variables.css behaviour).
@@ -262,9 +262,9 @@ function generateModularGlobalsCSS(
     'base-slate-light.json',
     primitiveMap
   );
-  const brandTokens = collectSemanticColorTokensVarRef(
+  const themeTokens = collectSemanticColorTokensVarRef(
     SEMANTIC_DIR,
-    'brands-blue-light.json',
+    'theme-default-light.json',
     primitiveMap
   );
   // Standalone semantic files (e.g. focus.json) contribute color tokens
@@ -287,7 +287,7 @@ function generateModularGlobalsCSS(
     }
     return tokens;
   });
-  const semanticTokens = [...baseTokens, ...brandTokens, ...standaloneTokens];
+  const semanticTokens = [...baseTokens, ...themeTokens, ...standaloneTokens];
 
   // Collect other tokens using shared functions
   const spacingModes = collectSpacingTokens(SEMANTIC_DIR);
@@ -455,7 +455,7 @@ export async function generateModular({
     }
   }
 
-  // Generate themed semantic files (base, brands)
+  // Generate themed semantic files (base, theme)
   for (const [type, modes] of Object.entries(semantics.themed)) {
     console.log(`\n${type} themes:`);
     for (const mode of Object.keys(modes)) {
@@ -518,7 +518,7 @@ export async function generateModular({
 
 if (process.argv[1] === fileURLToPath(import.meta.url)) {
   // Surface `--spacingDefault=X` symmetric with `generate-tailwind-package.js`.
-  // Other CLI flags consumed by `parseArgs` (base/brand/typography/...) don't
+  // Other CLI flags consumed by `parseArgs` (base/typography/...) don't
   // apply here — the modular build emits every mode of every category — so
   // this generator only accepts the one knob it honours.
   const cliConfig = parseArgs(undefined, { allowedKeys: ['spacingDefault'] });

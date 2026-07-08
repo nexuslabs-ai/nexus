@@ -18,11 +18,6 @@ const DIMENSIONS: { dim: string; options: string; swap: string }[] = [
     swap: '<link> swap',
   },
   {
-    dim: 'Brand',
-    options: 'blue · purple · pink · teal · orange · black',
-    swap: '<link> swap',
-  },
-  {
     dim: 'Spacing (density)',
     options: '6 modes — compact · default · comfortable · …',
     swap: 'data-density attr',
@@ -71,8 +66,10 @@ export function MultiBrand() {
       <section className="nx:mb-12">
         <h2 className="nx:typography-heading-small nx:mb-1">The dimensions</h2>
         <p className="nx:typography-body-default nx:text-muted-foreground nx:mb-4 nx:max-w-[64ch]">
-          Two color axes plus five design-token axes and dark mode. Each is
-          orthogonal — base × brand × density × … combine freely.
+          One base color axis plus five design-token axes and dark mode, each an
+          orthogonal runtime mode that combines freely. Brand color is a
+          separate runtime seed — any hex, resolved by the appearance engine —
+          not a fixed stylesheet; re-theme it via a consumer override (below).
         </p>
         <div className="nx:overflow-x-auto">
           <table className="nx:w-full nx:min-w-[560px] nx:border-collapse nx:typography-label-default">
@@ -133,7 +130,7 @@ export function MultiBrand() {
       <section className="nx:mb-12">
         <h2 className="nx:typography-heading-small nx:mb-1">See it live</h2>
         <p className="nx:typography-body-default nx:text-muted-foreground nx:mb-4 nx:max-w-[64ch]">
-          Open the theme picker (bottom-right) and swap Base or Brand — these
+          Open the theme picker (bottom-right) and swap the Base — these
           components and swatches re-resolve instantly.
         </p>
         <div className="nx:flex nx:flex-wrap nx:items-center nx:gap-3 nx:rounded-xl nx:border nx:border-border-default nx:bg-container nx:p-5">

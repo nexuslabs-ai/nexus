@@ -1227,15 +1227,15 @@ describe('generateTailwindPackage', () => {
     }
   });
 
-  it('throws when the selected brand mode is unavailable', async () => {
+  it('throws when the selected base mode is unavailable', async () => {
     const dir = makeTmpDir();
     await expect(
       generateTailwindPackage(
-        { ...DEFAULT_CONFIG, brand: 'neutral' },
+        { ...DEFAULT_CONFIG, base: 'nonexistent' },
         { distDir: dir }
       )
     ).rejects.toThrow(
-      'getSemanticFiles: themed type "brands" has no mode "neutral"'
+      'getSemanticFiles: themed type "base" has no mode "nonexistent"'
     );
   });
 

@@ -36,7 +36,7 @@
     "typecheck:dist": "node scripts/typecheck-runtime-dist.mjs",
     "typecheck:dist-core": "node scripts/typecheck-runtime-dist.mjs",
     "build:tokens:modular": "node scripts/generate-modular.js --spacingDefault=default",
-    "build:tailwind": "node scripts/generate-tailwind-package.js --base=stone --brand=black --borderwidth=normal --radius=square --shadow=quiet --motion=snappy --spacingDefault=default",
+    "build:tailwind": "node scripts/generate-tailwind-package.js --base=stone --borderwidth=normal --radius=square --shadow=quiet --motion=snappy --spacingDefault=default",
     "audit:runtime-exports": "node scripts/audit-runtime-exports.mjs",
     "audit:contrast": "node scripts/audit-contrast.js",
     "audit:class-refs": "node scripts/audit-class-refs.js",
