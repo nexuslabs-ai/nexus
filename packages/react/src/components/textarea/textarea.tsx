@@ -17,14 +17,14 @@ const textareaVariants = cva(
   {
     variants: {
       variant: {
-        default:
+        bordered:
           'nx:border-border-default nx:bg-background nx:enabled:hover:bg-background-hover nx:disabled:border-border-disabled',
         borderless:
           'nx:border-transparent nx:bg-control-background nx:enabled:hover:bg-control-background-hover',
       },
     },
     defaultVariants: {
-      variant: 'default',
+      variant: 'bordered',
     },
   }
 );
@@ -44,9 +44,10 @@ interface TextareaProps
  *
  * A multi-line text input. Mirrors Input's surface, focus, and `aria-invalid`
  * treatment and accepts all native textarea attributes. Use `rows` (or a
- * `min-height` override via `className`) to set the initial height. Use
- * `variant="borderless"` to remove the resting field stroke while keeping a tonal
- * control fill for resting affordance.
+ * `min-height` override via `className`) to set the initial height. The
+ * `variant="bordered"` treatment is the default; use `variant="borderless"` to
+ * remove the resting field stroke while keeping a tonal control fill for
+ * resting affordance.
  *
  * @example
  * ```tsx
@@ -63,7 +64,7 @@ function Textarea({ className, variant, ...props }: TextareaProps) {
   return (
     <textarea
       data-slot="textarea"
-      data-variant={variant ?? 'default'}
+      data-variant={variant ?? 'bordered'}
       className={cn(textareaVariants({ variant, className }))}
       {...props}
     />

@@ -58,7 +58,7 @@ function SignUpForm({
             <FormItem>
               <FormLabel>Username</FormLabel>
               <FormControl>
-                <Input variant="default" placeholder="janedoe" {...field} />
+                <Input variant="bordered" placeholder="janedoe" {...field} />
               </FormControl>
               <FormDescription>Your public display name.</FormDescription>
               <FormMessage />
@@ -74,7 +74,7 @@ function SignUpForm({
               <FormControl>
                 <Input
                   type="email"
-                  variant="default"
+                  variant="bordered"
                   placeholder="jane@example.com"
                   {...field}
                 />
@@ -108,7 +108,7 @@ function UsernameForm({ extraDescriptionId }: { extraDescriptionId?: string }) {
             <FormItem>
               <FormLabel>Username</FormLabel>
               <FormControl aria-describedby={extraDescriptionId}>
-                <Input variant="default" placeholder="janedoe" {...field} />
+                <Input variant="bordered" placeholder="janedoe" {...field} />
               </FormControl>
               <FormDescription>Your public display name.</FormDescription>
               <FormMessage />
@@ -139,7 +139,7 @@ function MessageLessErrorForm() {
             <FormItem>
               <FormLabel>Invite code</FormLabel>
               <FormControl>
-                <Input variant="default" placeholder="NX-123" {...field} />
+                <Input variant="bordered" placeholder="NX-123" {...field} />
               </FormControl>
               <FormMessage />
             </FormItem>
@@ -178,7 +178,7 @@ function AnatomyForm() {
               <FormLabel>Label, control, description</FormLabel>
               <FormControl>
                 <Input
-                  variant="default"
+                  variant="bordered"
                   placeholder="Standard field"
                   {...field}
                 />
@@ -195,7 +195,7 @@ function AnatomyForm() {
               <FormLabel>Label and control</FormLabel>
               <FormControl>
                 <Input
-                  variant="default"
+                  variant="bordered"
                   placeholder="Compact field"
                   {...field}
                 />
@@ -211,7 +211,7 @@ function AnatomyForm() {
             <FormItem>
               <FormLabel>Disabled control</FormLabel>
               <FormControl>
-                <Input disabled variant="default" {...field} />
+                <Input disabled variant="bordered" {...field} />
               </FormControl>
               <FormDescription>The control can be disabled.</FormDescription>
             </FormItem>
@@ -266,7 +266,7 @@ function FieldVsFormErgonomicsExample() {
                   <FormControl>
                     <Input
                       type="email"
-                      variant="default"
+                      variant="bordered"
                       placeholder="jane@example.com"
                       {...field}
                     />
@@ -545,7 +545,7 @@ export const WithDataAttributes: Story = {
     // FormControl wires the control's id + helper description to the FormItem.
     const input = canvas.getByLabelText('Username');
     await expect(input).toHaveAttribute('id', label.getAttribute('for'));
-    await expect(input).toHaveAttribute('data-variant', 'default');
+    await expect(input).toHaveAttribute('data-variant', 'bordered');
     await expect(input).not.toHaveAttribute('data-variant', 'borderless');
     await expect(input).toHaveAttribute(
       'aria-describedby',

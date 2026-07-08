@@ -29,7 +29,7 @@ const meta: Meta<typeof Input> = {
     },
     variant: {
       control: 'select',
-      options: ['default', 'borderless'],
+      options: ['bordered', 'borderless'],
       description: 'The visual treatment of the input',
     },
     type: {
@@ -537,7 +537,7 @@ export const WithDataAttributes: Story = {
 
     await expect(input).toHaveAttribute('data-slot', 'input');
     await expect(input).toHaveAttribute('data-size', 'lg');
-    await expect(input).toHaveAttribute('data-variant', 'default');
+    await expect(input).toHaveAttribute('data-variant', 'bordered');
   },
 };
 
@@ -581,9 +581,9 @@ export const AllVariants: Story = {
         <div className="nx:flex nx:flex-col nx:gap-3">
           <div className="nx:flex nx:items-center nx:gap-4">
             <span className="nx:typography-label-small nx:text-muted-foreground nx:w-20">
-              default
+              bordered
             </span>
-            <Input placeholder="Default input" />
+            <Input placeholder="Bordered input" />
           </div>
           <div className="nx:flex nx:items-center nx:gap-4">
             <span className="nx:typography-label-small nx:text-muted-foreground nx:w-20">

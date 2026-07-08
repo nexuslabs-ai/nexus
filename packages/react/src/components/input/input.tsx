@@ -22,7 +22,7 @@ const inputVariants = cva(
         lg: 'nx:h-12 nx:px-3.5 nx:py-0 nx:typography-body-default',
       },
       variant: {
-        default:
+        bordered:
           'nx:border-color-default nx:bg-background nx:enabled:hover:bg-background-hover nx:disabled:border-color-disabled',
         borderless:
           'nx:border-transparent nx:bg-control-background nx:enabled:hover:bg-control-background-hover',
@@ -30,7 +30,7 @@ const inputVariants = cva(
     },
     defaultVariants: {
       size: 'default',
-      variant: 'default',
+      variant: 'bordered',
     },
   }
 );
@@ -49,9 +49,10 @@ interface InputProps
  * Input
  *
  * A text input field for collecting user data.
- * Supports different sizes and all native input attributes. Use
- * `variant="borderless"` to remove the resting field stroke while keeping a tonal
- * control fill for resting affordance.
+ * Supports different sizes and all native input attributes. The
+ * `variant="bordered"` treatment is the default; use `variant="borderless"` to
+ * remove the resting field stroke while keeping a tonal control fill for
+ * resting affordance.
  *
  * @example
  * ```tsx
@@ -76,7 +77,7 @@ function Input({ className, type, size, variant, ...props }: InputProps) {
       type={type}
       data-slot="input"
       data-size={size ?? 'default'}
-      data-variant={variant ?? 'default'}
+      data-variant={variant ?? 'bordered'}
       className={cn(inputVariants({ size, variant, className }))}
       {...props}
     />
