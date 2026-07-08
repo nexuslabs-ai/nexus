@@ -400,10 +400,6 @@ export function deriveFamily(
   };
 }
 
-/** The 11-token primary family, from one accent seed. */
-export const derivePrimary = (accentHex: string, mode: Mode): TokenMap =>
-  deriveFamily('primary', rampFromSeed(accentHex), mode);
-
 const STATUS_FAMILIES = ['success', 'warning', 'error', 'information'] as const;
 
 type StatusFamily = (typeof STATUS_FAMILIES)[number];
@@ -562,12 +558,46 @@ export const NEUTRAL = {
   '100': 'oklch(0.945 0 0)',
   '200': 'oklch(0.87 0 0)',
   '300': 'oklch(0.765 0 0)',
+  '400': 'oklch(0.66 0 0)',
+  '500': 'oklch(0.553 0 0)',
   '600': 'oklch(0.46 0 0)',
   '700': 'oklch(0.385 0 0)',
   '800': 'oklch(0.297 0 0)',
   '900': 'oklch(0.207 0 0)',
   '950': 'oklch(0.118 0 0)',
-} satisfies Record<Exclude<Shade, '400' | '500'>, string>;
+} satisfies Record<Shade, string>;
+
+const BLACK_BASE = 'oklch(0.1448 0 0)';
+const WHITE_BASE = 'oklch(1 0 0)';
+
+function isBlackBrandSeed(accentHex: string): boolean {
+  const seed = seedOklch(accentHex);
+  return (seed.l ?? 1) <= 0.22 && (seed.c ?? 0) <= 0.002;
+}
+
+function deriveBlackPrimary(mode: Mode): TokenMap {
+  const d = mode === 'dark';
+  const n = NEUTRAL;
+  return {
+    '--nx-color-primary-background': d ? WHITE_BASE : BLACK_BASE,
+    '--nx-color-primary-background-active': d ? n['200'] : n['950'],
+    '--nx-color-primary-foreground': d ? BLACK_BASE : WHITE_BASE,
+    '--nx-color-primary-background-hover': d ? n['100'] : n['900'],
+    '--nx-color-primary-disabled': d ? n['800'] : n['300'],
+    '--nx-color-primary-subtle': d ? n['950'] : n['50'],
+    '--nx-color-primary-subtle-foreground': d ? WHITE_BASE : BLACK_BASE,
+    '--nx-color-primary-subtle-hover': d ? n['900'] : n['100'],
+    '--nx-color-primary-subtle-active': d ? n['800'] : n['200'],
+    '--nx-color-border-primary': d ? n['700'] : n['200'],
+    '--nx-color-border-primary-active': d ? n['500'] : n['400'],
+  };
+}
+
+/** The 11-token primary family, from one accent seed. */
+export function derivePrimary(accentHex: string, mode: Mode): TokenMap {
+  if (isBlackBrandSeed(accentHex)) return deriveBlackPrimary(mode);
+  return deriveFamily('primary', rampFromSeed(accentHex), mode);
+}
 
 export function deriveSecondary(mode: Mode): TokenMap {
   const d = mode === 'dark';

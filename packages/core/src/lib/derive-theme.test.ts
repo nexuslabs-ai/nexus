@@ -252,6 +252,25 @@ describe('derivePrimary', () => {
       )
     ).toBeGreaterThanOrEqual(TIER_THRESHOLDS.ui);
   });
+
+  it('maps black brand seeds to the black/white primary pair', () => {
+    expect(derivePrimary('#0a0a0a', 'light')).toMatchObject({
+      '--nx-color-primary-background': 'oklch(0.1448 0 0)',
+      '--nx-color-primary-background-hover': 'oklch(0.207 0 0)',
+      '--nx-color-primary-foreground': 'oklch(1 0 0)',
+      '--nx-color-primary-subtle': 'oklch(0.985 0 0)',
+      '--nx-color-primary-subtle-foreground': 'oklch(0.1448 0 0)',
+      '--nx-color-border-primary': 'oklch(0.87 0 0)',
+    });
+    expect(derivePrimary('#000000', 'dark')).toMatchObject({
+      '--nx-color-primary-background': 'oklch(1 0 0)',
+      '--nx-color-primary-background-hover': 'oklch(0.945 0 0)',
+      '--nx-color-primary-foreground': 'oklch(0.1448 0 0)',
+      '--nx-color-primary-subtle': 'oklch(0.118 0 0)',
+      '--nx-color-primary-subtle-foreground': 'oklch(1 0 0)',
+      '--nx-color-border-primary': 'oklch(0.385 0 0)',
+    });
+  });
 });
 
 const CONTRACT: ThemeDerivationInput = {

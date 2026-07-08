@@ -35,7 +35,7 @@ export interface NexusAppearanceState {
   prefs: NexusAppearancePrefs;
 }
 
-export const DEFAULT_BRAND_COLOR = '#339cff';
+export const DEFAULT_BRAND_COLOR = '#0a0a0a';
 
 export const BASE_TONE_OPTIONS = [
   { value: 'stone', label: 'Stone', color: '#78716c' },
