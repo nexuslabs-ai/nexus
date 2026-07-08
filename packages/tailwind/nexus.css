@@ -428,6 +428,26 @@
     --nx-color-warning-subtle-active,
     var(--nx-color-orange-200)
   );
+  --color-chart-categorical-1: var(
+    --nx-color-chart-categorical-1,
+    var(--nx-color-teal-600)
+  );
+  --color-chart-categorical-2: var(
+    --nx-color-chart-categorical-2,
+    var(--nx-color-lime-700)
+  );
+  --color-chart-categorical-3: var(
+    --nx-color-chart-categorical-3,
+    var(--nx-color-orange-600)
+  );
+  --color-chart-categorical-4: var(
+    --nx-color-chart-categorical-4,
+    var(--nx-color-rose-600)
+  );
+  --color-chart-categorical-5: var(
+    --nx-color-chart-categorical-5,
+    var(--nx-color-indigo-600)
+  );
   --color-primary-background: var(
     --nx-color-primary-background,
     var(--nx-color-black-base)
@@ -507,26 +527,6 @@
   --color-border-primary-active: var(
     --nx-color-border-primary-active,
     var(--nx-color-neutral-400)
-  );
-  --color-chart-categorical-1: var(
-    --nx-color-chart-categorical-1,
-    var(--nx-color-teal-600)
-  );
-  --color-chart-categorical-2: var(
-    --nx-color-chart-categorical-2,
-    var(--nx-color-lime-700)
-  );
-  --color-chart-categorical-3: var(
-    --nx-color-chart-categorical-3,
-    var(--nx-color-orange-600)
-  );
-  --color-chart-categorical-4: var(
-    --nx-color-chart-categorical-4,
-    var(--nx-color-rose-600)
-  );
-  --color-chart-categorical-5: var(
-    --nx-color-chart-categorical-5,
-    var(--nx-color-indigo-600)
   );
   --color-focus-default: var(
     --nx-color-focus-default,
@@ -823,6 +823,26 @@
     --nx-color-warning-subtle-active,
     var(--nx-color-orange-200)
   );
+  --color-chart-categorical-1: var(
+    --nx-color-chart-categorical-1,
+    var(--nx-color-teal-600)
+  );
+  --color-chart-categorical-2: var(
+    --nx-color-chart-categorical-2,
+    var(--nx-color-lime-700)
+  );
+  --color-chart-categorical-3: var(
+    --nx-color-chart-categorical-3,
+    var(--nx-color-orange-600)
+  );
+  --color-chart-categorical-4: var(
+    --nx-color-chart-categorical-4,
+    var(--nx-color-rose-600)
+  );
+  --color-chart-categorical-5: var(
+    --nx-color-chart-categorical-5,
+    var(--nx-color-indigo-600)
+  );
   --color-primary-background: var(
     --nx-color-primary-background,
     var(--nx-color-black-base)
@@ -902,26 +922,6 @@
   --color-border-primary-active: var(
     --nx-color-border-primary-active,
     var(--nx-color-neutral-400)
-  );
-  --color-chart-categorical-1: var(
-    --nx-color-chart-categorical-1,
-    var(--nx-color-teal-600)
-  );
-  --color-chart-categorical-2: var(
-    --nx-color-chart-categorical-2,
-    var(--nx-color-lime-700)
-  );
-  --color-chart-categorical-3: var(
-    --nx-color-chart-categorical-3,
-    var(--nx-color-orange-600)
-  );
-  --color-chart-categorical-4: var(
-    --nx-color-chart-categorical-4,
-    var(--nx-color-rose-600)
-  );
-  --color-chart-categorical-5: var(
-    --nx-color-chart-categorical-5,
-    var(--nx-color-indigo-600)
   );
   --color-focus-default: var(
     --nx-color-focus-default,
@@ -1011,6 +1011,11 @@
   --nx-color-warning-subtle-foreground: var(--nx-color-orange-200);
   --nx-color-warning-subtle-hover: var(--nx-color-orange-900);
   --nx-color-warning-subtle-active: var(--nx-color-orange-800);
+  --nx-color-chart-categorical-1: var(--nx-color-teal-200);
+  --nx-color-chart-categorical-2: var(--nx-color-lime-200);
+  --nx-color-chart-categorical-3: var(--nx-color-orange-200);
+  --nx-color-chart-categorical-4: var(--nx-color-rose-200);
+  --nx-color-chart-categorical-5: var(--nx-color-indigo-200);
   --nx-color-primary-background: var(--nx-color-white-base);
   --nx-color-primary-background-active: var(--nx-color-neutral-200);
   --nx-color-primary-foreground: var(--nx-color-black-base);
@@ -1031,11 +1036,6 @@
   --nx-color-secondary-subtle-active: var(--nx-color-neutral-600);
   --nx-color-border-primary: var(--nx-color-neutral-700);
   --nx-color-border-primary-active: var(--nx-color-neutral-500);
-  --nx-color-chart-categorical-1: var(--nx-color-teal-200);
-  --nx-color-chart-categorical-2: var(--nx-color-lime-200);
-  --nx-color-chart-categorical-3: var(--nx-color-orange-200);
-  --nx-color-chart-categorical-4: var(--nx-color-rose-200);
-  --nx-color-chart-categorical-5: var(--nx-color-indigo-200);
 }
 
 /* ===== RUNTIME DIMENSION TOKENS ===== */

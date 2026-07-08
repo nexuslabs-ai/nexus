@@ -4,7 +4,7 @@ import fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 
-import { BASE_PALETTES, BRAND_PALETTES } from './lib/palettes.js';
+import { BASE_PALETTES } from './lib/palettes.js';
 import { hexToSrgbInts, isPaletteShadeKey } from './lib/perceptual-grid.js';
 import { extractTokens, readTokenFile } from './utils.js';
 
@@ -421,42 +421,40 @@ function main() {
     }
   }
 
-  for (const brand of BRAND_PALETTES) {
-    for (const theme of THEMES) {
-      const filePath = path.join(SEMANTIC_DIR, `brands-${brand}-${theme}.json`);
-      if (!fs.existsSync(filePath)) {
-        throw new Error(
-          `audit-contrast: expected brand semantic file missing: ${path.basename(filePath)}`
-        );
-      }
-      const fileData = readTokenFile(filePath);
+  for (const theme of THEMES) {
+    const filePath = path.join(SEMANTIC_DIR, `theme-default-${theme}.json`);
+    if (!fs.existsSync(filePath)) {
+      throw new Error(
+        `audit-contrast: expected default semantic file missing: ${path.basename(filePath)}`
+      );
+    }
+    const fileData = readTokenFile(filePath);
+    sections.push(
+      auditPairs(
+        fileData,
+        fileData,
+        path.basename(filePath),
+        BRAND_PAIRS,
+        primitiveMap
+      )
+    );
+
+    for (const palette of BASE_PALETTES) {
+      const bgFilePath = path.join(
+        SEMANTIC_DIR,
+        `base-${palette}-${theme}.json`
+      );
+      if (!fs.existsSync(bgFilePath)) continue;
+
       sections.push(
         auditPairs(
           fileData,
-          fileData,
-          path.basename(filePath),
-          BRAND_PAIRS,
+          readTokenFile(bgFilePath),
+          `${path.basename(bgFilePath)} ↔ ${path.basename(filePath)} focus`,
+          FOCUS_PRIMARY_PAIRS,
           primitiveMap
         )
       );
-
-      for (const palette of BASE_PALETTES) {
-        const bgFilePath = path.join(
-          SEMANTIC_DIR,
-          `base-${palette}-${theme}.json`
-        );
-        if (!fs.existsSync(bgFilePath)) continue;
-
-        sections.push(
-          auditPairs(
-            fileData,
-            readTokenFile(bgFilePath),
-            `${path.basename(bgFilePath)} ↔ ${path.basename(filePath)} focus`,
-            FOCUS_PRIMARY_PAIRS,
-            primitiveMap
-          )
-        );
-      }
     }
   }
 

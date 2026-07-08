@@ -232,7 +232,6 @@ export function resolveValue(value, primitiveMap, type = 'unknown', tokenPath) {
  */
 export const DEFAULT_CONFIG = {
   base: 'stone',
-  brand: 'black',
   shadow: 'quiet',
   radius: 'square',
   borderwidth: 'normal',

@@ -264,7 +264,7 @@ function generateModularGlobalsCSS(
   );
   const brandTokens = collectSemanticColorTokensVarRef(
     SEMANTIC_DIR,
-    'brands-blue-light.json',
+    'theme-default-light.json',
     primitiveMap
   );
   // Standalone semantic files (e.g. focus.json) contribute color tokens

@@ -31,7 +31,7 @@ function collectColorLeaves(
 function curatedKeys(mode: Mode): Set<string> {
   const files = [
     `base-slate-${mode}.json`,
-    `brands-blue-${mode}.json`,
+    `theme-default-${mode}.json`,
     `chart-categorical-default-${mode}.json`,
     'focus.json',
   ];
