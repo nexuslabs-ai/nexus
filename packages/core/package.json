@@ -1,6 +1,6 @@
 {
   "name": "@nexus_ds/core",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "type": "module",
   "description": "Framework-agnostic Nexus design-token engine: appearance model, runtime theme derivation, and first-paint snapshots.",
   "license": "MIT",
