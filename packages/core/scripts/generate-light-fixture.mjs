@@ -41,28 +41,7 @@ const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const coreDir = path.resolve(__dirname, '..');
 const repoRoot = path.resolve(coreDir, '..', '..');
 const distEntry = path.join(coreDir, 'dist', 'runtime', 'index.js');
-const deriveThemeSourcePath = path.join(coreDir, 'src', 'lib', 'derive-theme.ts');
-const fixturePath = path.join(
-  coreDir,
-  'src',
-  'lib',
-  'light-tone.fixture.json'
-);
-
-function readNumericConstant(source, name) {
-  const match = source.match(
-    new RegExp(`\\bconst\\s+${name}\\s*=\\s*([0-9.]+);`)
-  );
-  if (!match) throw new Error(`Missing numeric constant ${name}`);
-  return Number(match[1]);
-}
-
-const deriveThemeSource = fs.readFileSync(deriveThemeSourcePath, 'utf8');
-const pageL = readNumericConstant(deriveThemeSource, 'PAGE_L_LIGHT');
-const lightDepthMultiplier = readNumericConstant(
-  deriveThemeSource,
-  'LIGHT_CHROMA_DEPTH_MULTIPLIER'
-);
+const fixturePath = path.join(coreDir, 'src', 'lib', 'light-tone.fixture.json');
 
 execFileSync('pnpm', ['--filter', '@nexus_ds/core', 'build'], {
   cwd: repoRoot,
@@ -75,8 +54,6 @@ const fixture = {
   schemaVersion: 1,
   source:
     'Generated from deriveTheme canonical light seeds after Model 2 surface hierarchy calibration; review diffs when surface tone constants or light steps change.',
-  pageL,
-  lightDepthMultiplier,
   toneContrast: 60,
   tones: {},
 };
