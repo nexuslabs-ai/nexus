@@ -410,19 +410,7 @@ export const SECTIONS = {
         slug: 'multi-brand',
         label: 'Multi-brand',
         lede: '[ Five bases × light / dark · the brand thesis ]',
-        blocks: [
-          {
-            type: 'placeholder',
-            variant: 'tall',
-            label:
-              '[ Live brand swapper — render a Card across base and brand modes ]',
-          },
-          {
-            type: 'placeholder',
-            variant: 'code',
-            label: '[ Code — base + brand selection ]',
-          },
-        ],
+        blocks: [],
       },
       {
         slug: 'density-modes',
