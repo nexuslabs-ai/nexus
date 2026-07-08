@@ -3,6 +3,8 @@ import { readFileSync } from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 
+import type { NexusSurfaceTone } from './derive-theme';
+
 // Shared resolvers for the token parity tests (`tone-parity.test.ts`,
 // `derive-theme.static-parity.test.ts`). Kept in one place so the two suites
 // resolve static token JSON identically and cannot drift.
@@ -11,8 +13,8 @@ export type TokenRecord = Record<string, string>;
 
 const HERE = path.dirname(fileURLToPath(import.meta.url));
 export const ROOT_DIR = path.resolve(HERE, '..', '..');
-export const SEMANTIC_DIR = path.join(ROOT_DIR, 'tokens', 'semantic');
-export const PRIMITIVE_COLOR_FILE = path.join(
+const SEMANTIC_DIR = path.join(ROOT_DIR, 'tokens', 'semantic');
+const PRIMITIVE_COLOR_FILE = path.join(
   ROOT_DIR,
   'tokens',
   'primitives',
@@ -27,7 +29,7 @@ export function readJson(file: string): unknown {
   return JSON.parse(readFileSync(file, 'utf8'));
 }
 
-export function collectColorLeaves(
+function collectColorLeaves(
   obj: unknown,
   leaves: TokenRecord,
   tokenPath: string[] = []
@@ -45,7 +47,10 @@ export function collectColorLeaves(
   }
 }
 
-export function baseLeaves(tone: string, mode: 'light' | 'dark'): TokenRecord {
+export function baseLeaves(
+  tone: NexusSurfaceTone,
+  mode: 'light' | 'dark'
+): TokenRecord {
   const leaves: TokenRecord = {};
   collectColorLeaves(
     readJson(path.join(SEMANTIC_DIR, `base-${tone}-${mode}.json`)),
