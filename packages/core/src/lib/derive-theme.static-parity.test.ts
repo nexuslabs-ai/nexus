@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest';
 
-import { deriveSurfaces, type NexusSurfaceTone } from './derive-theme';
+import { deriveSurfaces } from './derive-theme';
+import type { NexusSurfaceTone } from './palette';
 import perceptualGrid from './perceptual-grid.json';
 import {
   baseLeaves,
