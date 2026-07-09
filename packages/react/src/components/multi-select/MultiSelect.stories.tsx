@@ -383,6 +383,8 @@ export const WithDataAttributes: Story = {
     const trigger = canvas.getByRole('button', { name: 'Frameworks' });
 
     await expect(trigger).toHaveAttribute('data-slot', 'multi-select-trigger');
+    await expect(trigger).toHaveClass('nx:bg-container');
+    await expect(trigger).toHaveClass('nx:enabled:hover:bg-container-hover');
 
     await userEvent.click(trigger);
     const option = await body.findByRole('option', { name: 'React' });

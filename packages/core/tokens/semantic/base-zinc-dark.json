@@ -34,7 +34,7 @@
     "$description": "Tertiary text tier below muted-foreground — helper text, captions, divider labels."
   },
   "disabled": {
-    "$value": "{zinc.950}",
+    "$value": "{zinc.900}",
     "$type": "color"
   },
   "disabled-foreground": {

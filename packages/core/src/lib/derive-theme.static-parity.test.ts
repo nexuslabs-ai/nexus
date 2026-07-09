@@ -36,8 +36,8 @@ type SurfaceToken = (typeof SURFACE_TOKENS)[number];
 const STANDARD_SHADE_L = perceptualGrid as Record<string, number>;
 const STATIC_TOLERANCE_L = 0.006;
 const SIGN_EPSILON = 0.0001;
-const MIN_CARD_PAGE_SEPARATION_L = 0.025;
-const MIN_CONTAINER_HOVER_PAGE_SEPARATION_L = 0.01;
+const MAX_CARD_PAGE_SEPARATION_L = 0.006;
+const MIN_CONTAINER_HOVER_PAGE_DROP_L = 0.025;
 
 function lOf(input: string): number {
   const color = parseToOklch(input);
@@ -105,21 +105,21 @@ describe('deriveSurfaces static light parity', () => {
       const engineContainerHover = lOf(engine['--nx-color-container-hover']!);
 
       expect(
-        staticContainer - staticBackground,
-        `${tone}.static card/page separation`
-      ).toBeGreaterThanOrEqual(MIN_CARD_PAGE_SEPARATION_L);
+        Math.abs(staticContainer - staticBackground),
+        `${tone}.static card/page same-fill`
+      ).toBeLessThanOrEqual(MAX_CARD_PAGE_SEPARATION_L);
       expect(
-        engineContainer - engineBackground,
-        `${tone}.engine card/page separation`
-      ).toBeGreaterThanOrEqual(MIN_CARD_PAGE_SEPARATION_L);
+        Math.abs(engineContainer - engineBackground),
+        `${tone}.engine card/page same-fill`
+      ).toBeLessThanOrEqual(MAX_CARD_PAGE_SEPARATION_L);
       expect(
-        staticContainerHover - staticBackground,
-        `${tone}.static container-hover/page separation`
-      ).toBeGreaterThanOrEqual(MIN_CONTAINER_HOVER_PAGE_SEPARATION_L);
+        staticBackground - staticContainerHover,
+        `${tone}.static container-hover below page`
+      ).toBeGreaterThanOrEqual(MIN_CONTAINER_HOVER_PAGE_DROP_L);
       expect(
-        engineContainerHover - engineBackground,
-        `${tone}.engine container-hover/page separation`
-      ).toBeGreaterThanOrEqual(MIN_CONTAINER_HOVER_PAGE_SEPARATION_L);
+        engineBackground - engineContainerHover,
+        `${tone}.engine container-hover below page`
+      ).toBeGreaterThanOrEqual(MIN_CONTAINER_HOVER_PAGE_DROP_L);
 
       for (const token of SURFACE_TOKENS) {
         const engineL = lOf(engine[`--nx-color-${token}`]!);

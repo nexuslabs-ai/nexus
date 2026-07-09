@@ -65,7 +65,15 @@ function parseToOklch(hex) {
   return oklch(parsed);
 }
 
+function shouldPreserveAuthoredShade(shade, palette) {
+  return palette === 'stone' && shade === '950';
+}
+
 function computePinnedOklch(hex, shade, palette) {
+  if (shouldPreserveAuthoredShade(shade, palette)) {
+    return parseToOklch(hex);
+  }
+
   const hueCurve = palette ? PERCEPTUAL_L_GRID_HUE[palette] : undefined;
   const pinnedL = (hueCurve ?? PERCEPTUAL_L_GRID)[shade];
   if (pinnedL === undefined) {

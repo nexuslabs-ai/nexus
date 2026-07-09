@@ -1,4 +1,4 @@
-import { useForm } from 'react-hook-form';
+import { FormProvider, useForm } from 'react-hook-form';
 
 import { zodResolver } from '@hookform/resolvers/zod';
 import {
@@ -11,12 +11,6 @@ import {
   CardFooter,
   CardHeader,
   CardTitle,
-  Form,
-  FormControl,
-  FormField,
-  FormItem,
-  FormLabel,
-  FormMessage,
   Input,
 } from '@nexus_ds/react';
 import { useMutation } from '@tanstack/react-query';
@@ -24,6 +18,13 @@ import { Link, useNavigate } from '@tanstack/react-router';
 import { z } from 'zod';
 
 import { signup } from '../../lib/auth-api';
+import {
+  RhfField,
+  RhfFieldControl,
+  RhfFieldItem,
+  RhfFieldLabel,
+  RhfFieldMessage,
+} from '../../lib/rhf-field';
 
 const signupSchema = z.object({
   name: z.string().min(1, 'Enter your name'),
@@ -52,7 +53,7 @@ export function SignupRoute() {
 
   return (
     <Card>
-      <Form {...form}>
+      <FormProvider {...form}>
         <form noValidate onSubmit={form.handleSubmit(onSubmit)}>
           <CardHeader>
             <CardTitle>Create your account</CardTitle>
@@ -67,13 +68,13 @@ export function SignupRoute() {
                 <AlertDescription>{rootError}</AlertDescription>
               </Alert>
             )}
-            <FormField
+            <RhfField
               control={form.control}
               name="name"
               render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Name</FormLabel>
-                  <FormControl>
+                <RhfFieldItem>
+                  <RhfFieldLabel>Name</RhfFieldLabel>
+                  <RhfFieldControl>
                     <Input
                       type="text"
                       autoComplete="name"
@@ -82,18 +83,18 @@ export function SignupRoute() {
                       required
                       {...field}
                     />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
+                  </RhfFieldControl>
+                  <RhfFieldMessage />
+                </RhfFieldItem>
               )}
             />
-            <FormField
+            <RhfField
               control={form.control}
               name="email"
               render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Email</FormLabel>
-                  <FormControl>
+                <RhfFieldItem>
+                  <RhfFieldLabel>Email</RhfFieldLabel>
+                  <RhfFieldControl>
                     <Input
                       type="email"
                       autoComplete="username"
@@ -102,18 +103,18 @@ export function SignupRoute() {
                       required
                       {...field}
                     />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
+                  </RhfFieldControl>
+                  <RhfFieldMessage />
+                </RhfFieldItem>
               )}
             />
-            <FormField
+            <RhfField
               control={form.control}
               name="password"
               render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Password</FormLabel>
-                  <FormControl>
+                <RhfFieldItem>
+                  <RhfFieldLabel>Password</RhfFieldLabel>
+                  <RhfFieldControl>
                     <Input
                       type="password"
                       autoComplete="new-password"
@@ -122,9 +123,9 @@ export function SignupRoute() {
                       required
                       {...field}
                     />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
+                  </RhfFieldControl>
+                  <RhfFieldMessage />
+                </RhfFieldItem>
               )}
             />
           </CardContent>
@@ -147,7 +148,7 @@ export function SignupRoute() {
             </p>
           </CardFooter>
         </form>
-      </Form>
+      </FormProvider>
     </Card>
   );
 }

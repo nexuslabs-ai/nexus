@@ -796,7 +796,7 @@ const sidebarMenuButtonVariants = cva(
       variant: {
         default: 'nx:hover:bg-nav-item-hover',
         outline:
-          'nx:border-default nx:border-nav-border nx:bg-background nx:hover:bg-nav-item-hover',
+          'nx:border-default nx:border-nav-border nx:bg-nav-background nx:hover:bg-nav-item-hover',
       },
       size: {
         default:

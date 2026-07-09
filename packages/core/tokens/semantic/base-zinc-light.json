@@ -1,6 +1,6 @@
 {
   "background": {
-    "$value": "{zinc.75}",
+    "$value": "{white.base}",
     "$type": "color"
   },
   "foreground": {
@@ -8,7 +8,7 @@
     "$type": "color"
   },
   "background-hover": {
-    "$value": "{zinc.100}",
+    "$value": "{zinc.50}",
     "$type": "color"
   },
   "background-hover-alpha": {
@@ -20,7 +20,7 @@
     "$type": "color"
   },
   "muted": {
-    "$value": "{zinc.100}",
+    "$value": "{zinc.75}",
     "$type": "color"
   },
   "muted-foreground": {
@@ -50,7 +50,7 @@
     "$type": "color"
   },
   "container-hover": {
-    "$value": "{zinc.50}",
+    "$value": "{zinc.75}",
     "$type": "color"
   },
   "container-active": {
@@ -94,7 +94,7 @@
     "$type": "color"
   },
   "nav-background": {
-    "$value": "{zinc.150}",
+    "$value": "{zinc.75}",
     "$type": "color"
   },
   "nav-foreground": {
@@ -106,15 +106,15 @@
     "$type": "color"
   },
   "nav-item-hover": {
-    "$value": "{zinc.200}",
+    "$value": "{zinc.150}",
     "$type": "color"
   },
   "nav-item-active": {
-    "$value": "{zinc.200}",
+    "$value": "{zinc.150}",
     "$type": "color"
   },
   "nav-border": {
-    "$value": "{zinc.200}",
+    "$value": "{zinc.150}",
     "$type": "color"
   },
   "overlay": {

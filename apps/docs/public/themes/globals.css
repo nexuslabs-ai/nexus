@@ -147,11 +147,11 @@
 
 @theme inline {
   /* Semantic tokens */
-  --color-background: var(--nx-color-background, var(--nx-color-slate-75));
+  --color-background: var(--nx-color-background, var(--nx-color-white-base));
   --color-foreground: var(--nx-color-foreground, var(--nx-color-black-a900));
   --color-background-hover: var(
     --nx-color-background-hover,
-    var(--nx-color-slate-100)
+    var(--nx-color-slate-50)
   );
   --color-background-hover-alpha: var(
     --nx-color-background-hover-alpha,
@@ -161,7 +161,7 @@
     --nx-color-background-active,
     var(--nx-color-slate-150)
   );
-  --color-muted: var(--nx-color-muted, var(--nx-color-slate-100));
+  --color-muted: var(--nx-color-muted, var(--nx-color-slate-75));
   --color-muted-foreground: var(
     --nx-color-muted-foreground,
     var(--nx-color-black-a600)
@@ -182,7 +182,7 @@
   );
   --color-container-hover: var(
     --nx-color-container-hover,
-    var(--nx-color-slate-50)
+    var(--nx-color-slate-75)
   );
   --color-container-active: var(
     --nx-color-container-active,
@@ -223,7 +223,7 @@
   );
   --color-nav-background: var(
     --nx-color-nav-background,
-    var(--nx-color-slate-150)
+    var(--nx-color-slate-75)
   );
   --color-nav-foreground: var(
     --nx-color-nav-foreground,
@@ -235,13 +235,13 @@
   );
   --color-nav-item-hover: var(
     --nx-color-nav-item-hover,
-    var(--nx-color-slate-200)
+    var(--nx-color-slate-150)
   );
   --color-nav-item-active: var(
     --nx-color-nav-item-active,
-    var(--nx-color-slate-200)
+    var(--nx-color-slate-150)
   );
-  --color-nav-border: var(--nx-color-nav-border, var(--nx-color-slate-200));
+  --color-nav-border: var(--nx-color-nav-border, var(--nx-color-slate-150));
   --color-overlay: var(--nx-color-overlay, var(--nx-color-slate-a700));
   --color-border-default: var(
     --nx-color-border-default,
@@ -522,11 +522,11 @@
 
 /* ===== RUNTIME COLOR ALIASES ===== */
 :root {
-  --color-background: var(--nx-color-background, var(--nx-color-slate-75));
+  --color-background: var(--nx-color-background, var(--nx-color-white-base));
   --color-foreground: var(--nx-color-foreground, var(--nx-color-black-a900));
   --color-background-hover: var(
     --nx-color-background-hover,
-    var(--nx-color-slate-100)
+    var(--nx-color-slate-50)
   );
   --color-background-hover-alpha: var(
     --nx-color-background-hover-alpha,
@@ -536,7 +536,7 @@
     --nx-color-background-active,
     var(--nx-color-slate-150)
   );
-  --color-muted: var(--nx-color-muted, var(--nx-color-slate-100));
+  --color-muted: var(--nx-color-muted, var(--nx-color-slate-75));
   --color-muted-foreground: var(
     --nx-color-muted-foreground,
     var(--nx-color-black-a600)
@@ -557,7 +557,7 @@
   );
   --color-container-hover: var(
     --nx-color-container-hover,
-    var(--nx-color-slate-50)
+    var(--nx-color-slate-75)
   );
   --color-container-active: var(
     --nx-color-container-active,
@@ -598,7 +598,7 @@
   );
   --color-nav-background: var(
     --nx-color-nav-background,
-    var(--nx-color-slate-150)
+    var(--nx-color-slate-75)
   );
   --color-nav-foreground: var(
     --nx-color-nav-foreground,
@@ -610,13 +610,13 @@
   );
   --color-nav-item-hover: var(
     --nx-color-nav-item-hover,
-    var(--nx-color-slate-200)
+    var(--nx-color-slate-150)
   );
   --color-nav-item-active: var(
     --nx-color-nav-item-active,
-    var(--nx-color-slate-200)
+    var(--nx-color-slate-150)
   );
-  --color-nav-border: var(--nx-color-nav-border, var(--nx-color-slate-200));
+  --color-nav-border: var(--nx-color-nav-border, var(--nx-color-slate-150));
   --color-overlay: var(--nx-color-overlay, var(--nx-color-slate-a700));
   --color-border-default: var(
     --nx-color-border-default,

@@ -112,8 +112,7 @@ interface FieldProps
  * Field
  *
  * The labeled-field layout primitive — composes a label, control, description,
- * and error with their a11y wiring, decoupled from any form library. For the
- * react-hook-form binding layer, use `Form`, which builds on this structure.
+ * and error with their a11y wiring, decoupled from any form library.
  *
  * @example
  * ```tsx

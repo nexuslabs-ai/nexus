@@ -43,7 +43,7 @@ const repoRoot = path.resolve(coreDir, '..', '..');
 const distEntry = path.join(coreDir, 'dist', 'runtime', 'index.js');
 const fixturePath = path.join(coreDir, 'src', 'lib', 'light-tone.fixture.json');
 
-execFileSync('pnpm', ['--filter', '@nexus_ds/core', 'build'], {
+execFileSync('corepack', ['pnpm', '--filter', '@nexus_ds/core', 'build'], {
   cwd: repoRoot,
   stdio: 'inherit',
 });

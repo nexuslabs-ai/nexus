@@ -1,4 +1,4 @@
-import { useForm } from 'react-hook-form';
+import { FormProvider, useForm } from 'react-hook-form';
 
 import { zodResolver } from '@hookform/resolvers/zod';
 import {
@@ -9,18 +9,20 @@ import {
   CardFooter,
   CardHeader,
   CardTitle,
-  Form,
-  FormControl,
-  FormDescription,
-  FormField,
-  FormItem,
-  FormLabel,
-  FormMessage,
   Input,
   Textarea,
   toast,
 } from '@nexus_ds/react';
 import { z } from 'zod';
+
+import {
+  RhfField,
+  RhfFieldControl,
+  RhfFieldDescription,
+  RhfFieldItem,
+  RhfFieldLabel,
+  RhfFieldMessage,
+} from '../../../lib/rhf-field';
 
 const profileSchema = z.object({
   firstName: z.string().min(1, 'First name is required'),
@@ -54,8 +56,8 @@ export function ProfileTab() {
 
   return (
     <Card>
-      <Form {...form}>
-        {/* noValidate: let zod + FormMessage own validation, not the native bubble */}
+      <FormProvider {...form}>
+        {/* noValidate: let zod + RhfFieldMessage own validation, not the native bubble */}
         <form noValidate onSubmit={form.handleSubmit(onSubmit)}>
           <CardHeader>
             <CardTitle>Profile</CardTitle>
@@ -65,85 +67,89 @@ export function ProfileTab() {
           </CardHeader>
           <CardContent className="nx:space-y-5">
             <div className="nx:grid nx:gap-5 nx:sm:grid-cols-2">
-              <FormField
+              <RhfField
                 control={form.control}
                 name="firstName"
                 render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>First name</FormLabel>
-                    <FormControl>
+                  <RhfFieldItem>
+                    <RhfFieldLabel>First name</RhfFieldLabel>
+                    <RhfFieldControl>
                       <Input placeholder="Ada" {...field} />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
+                    </RhfFieldControl>
+                    <RhfFieldMessage />
+                  </RhfFieldItem>
                 )}
               />
-              <FormField
+              <RhfField
                 control={form.control}
                 name="lastName"
                 render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Last name</FormLabel>
-                    <FormControl>
+                  <RhfFieldItem>
+                    <RhfFieldLabel>Last name</RhfFieldLabel>
+                    <RhfFieldControl>
                       <Input placeholder="Lovelace" {...field} />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
+                    </RhfFieldControl>
+                    <RhfFieldMessage />
+                  </RhfFieldItem>
                 )}
               />
             </div>
 
-            <FormField
+            <RhfField
               control={form.control}
               name="email"
               render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Email</FormLabel>
-                  <FormControl>
+                <RhfFieldItem>
+                  <RhfFieldLabel>Email</RhfFieldLabel>
+                  <RhfFieldControl>
                     <Input
                       type="email"
                       placeholder="you@example.com"
                       {...field}
                     />
-                  </FormControl>
-                  <FormDescription>
+                  </RhfFieldControl>
+                  <RhfFieldDescription>
                     We&apos;ll use this for account notifications.
-                  </FormDescription>
-                  <FormMessage />
-                </FormItem>
+                  </RhfFieldDescription>
+                  <RhfFieldMessage />
+                </RhfFieldItem>
               )}
             />
 
-            <FormField
+            <RhfField
               control={form.control}
               name="username"
               render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Username</FormLabel>
-                  <FormControl>
+                <RhfFieldItem>
+                  <RhfFieldLabel>Username</RhfFieldLabel>
+                  <RhfFieldControl>
                     <Input placeholder="ada" {...field} />
-                  </FormControl>
-                  <FormDescription>Your public display name.</FormDescription>
-                  <FormMessage />
-                </FormItem>
+                  </RhfFieldControl>
+                  <RhfFieldDescription>
+                    Your public display name.
+                  </RhfFieldDescription>
+                  <RhfFieldMessage />
+                </RhfFieldItem>
               )}
             />
 
-            <FormField
+            <RhfField
               control={form.control}
               name="bio"
               render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Bio</FormLabel>
-                  <FormControl>
+                <RhfFieldItem>
+                  <RhfFieldLabel>Bio</RhfFieldLabel>
+                  <RhfFieldControl>
                     <Textarea
                       placeholder="Tell us a little about yourself"
                       {...field}
                     />
-                  </FormControl>
-                  <FormDescription>Maximum 160 characters.</FormDescription>
-                  <FormMessage />
-                </FormItem>
+                  </RhfFieldControl>
+                  <RhfFieldDescription>
+                    Maximum 160 characters.
+                  </RhfFieldDescription>
+                  <RhfFieldMessage />
+                </RhfFieldItem>
               )}
             />
           </CardContent>
@@ -158,7 +164,7 @@ export function ProfileTab() {
             <Button type="submit">Save profile</Button>
           </CardFooter>
         </form>
-      </Form>
+      </FormProvider>
     </Card>
   );
 }

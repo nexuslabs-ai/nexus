@@ -1,17 +1,11 @@
 import { useEffect } from 'react';
-import { useForm } from 'react-hook-form';
+import { FormProvider, useForm } from 'react-hook-form';
 
 import { zodResolver } from '@hookform/resolvers/zod';
 import {
   Alert,
   AlertDescription,
   Button,
-  Form,
-  FormControl,
-  FormField,
-  FormItem,
-  FormLabel,
-  FormMessage,
   Input,
   Select,
   SelectContent,
@@ -40,6 +34,13 @@ import {
   peopleKeys,
   updateMember,
 } from '../../lib/people-api';
+import {
+  RhfField,
+  RhfFieldControl,
+  RhfFieldItem,
+  RhfFieldLabel,
+  RhfFieldMessage,
+} from '../../lib/rhf-field';
 
 import { DEPARTMENT_OPTIONS, ROLE_OPTIONS, STATUS_OPTIONS } from './people-ui';
 
@@ -123,7 +124,7 @@ export function MemberFormSheet({
         side="right"
         className="nx:flex nx:w-full nx:flex-col nx:sm:max-w-md"
       >
-        <Form {...form}>
+        <FormProvider {...form}>
           <form
             noValidate
             onSubmit={form.handleSubmit(onSubmit)}
@@ -147,64 +148,64 @@ export function MemberFormSheet({
                 </Alert>
               )}
 
-              <FormField
+              <RhfField
                 control={form.control}
                 name="name"
                 render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Name</FormLabel>
-                    <FormControl>
+                  <RhfFieldItem>
+                    <RhfFieldLabel>Name</RhfFieldLabel>
+                    <RhfFieldControl>
                       <Input placeholder="Ada Lovelace" {...field} />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
+                    </RhfFieldControl>
+                    <RhfFieldMessage />
+                  </RhfFieldItem>
                 )}
               />
 
-              <FormField
+              <RhfField
                 control={form.control}
                 name="email"
                 render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Email</FormLabel>
-                    <FormControl>
+                  <RhfFieldItem>
+                    <RhfFieldLabel>Email</RhfFieldLabel>
+                    <RhfFieldControl>
                       <Input
                         type="email"
                         placeholder="ada@atlas.app"
                         {...field}
                       />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
+                    </RhfFieldControl>
+                    <RhfFieldMessage />
+                  </RhfFieldItem>
                 )}
               />
 
-              <FormField
+              <RhfField
                 control={form.control}
                 name="title"
                 render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Title</FormLabel>
-                    <FormControl>
+                  <RhfFieldItem>
+                    <RhfFieldLabel>Title</RhfFieldLabel>
+                    <RhfFieldControl>
                       <Input placeholder="Staff Engineer" {...field} />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
+                    </RhfFieldControl>
+                    <RhfFieldMessage />
+                  </RhfFieldItem>
                 )}
               />
 
-              <FormField
+              <RhfField
                 control={form.control}
                 name="role"
                 render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Role</FormLabel>
+                  <RhfFieldItem>
+                    <RhfFieldLabel>Role</RhfFieldLabel>
                     <Select value={field.value} onValueChange={field.onChange}>
-                      <FormControl>
+                      <RhfFieldControl>
                         <SelectTrigger>
                           <SelectValue />
                         </SelectTrigger>
-                      </FormControl>
+                      </RhfFieldControl>
                       <SelectContent>
                         {ROLE_OPTIONS.map((option) => (
                           <SelectItem key={option.value} value={option.value}>
@@ -213,23 +214,23 @@ export function MemberFormSheet({
                         ))}
                       </SelectContent>
                     </Select>
-                    <FormMessage />
-                  </FormItem>
+                    <RhfFieldMessage />
+                  </RhfFieldItem>
                 )}
               />
 
-              <FormField
+              <RhfField
                 control={form.control}
                 name="department"
                 render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Department</FormLabel>
+                  <RhfFieldItem>
+                    <RhfFieldLabel>Department</RhfFieldLabel>
                     <Select value={field.value} onValueChange={field.onChange}>
-                      <FormControl>
+                      <RhfFieldControl>
                         <SelectTrigger>
                           <SelectValue />
                         </SelectTrigger>
-                      </FormControl>
+                      </RhfFieldControl>
                       <SelectContent>
                         {DEPARTMENT_OPTIONS.map((option) => (
                           <SelectItem key={option.value} value={option.value}>
@@ -238,29 +239,29 @@ export function MemberFormSheet({
                         ))}
                       </SelectContent>
                     </Select>
-                    <FormMessage />
-                  </FormItem>
+                    <RhfFieldMessage />
+                  </RhfFieldItem>
                 )}
               />
 
               {/* Status is server-set to `invited` on create — only editable
                   when updating (to suspend / reactivate a member). */}
               {isEdit && (
-                <FormField
+                <RhfField
                   control={form.control}
                   name="status"
                   render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Status</FormLabel>
+                    <RhfFieldItem>
+                      <RhfFieldLabel>Status</RhfFieldLabel>
                       <Select
                         value={field.value}
                         onValueChange={field.onChange}
                       >
-                        <FormControl>
+                        <RhfFieldControl>
                           <SelectTrigger>
                             <SelectValue />
                           </SelectTrigger>
-                        </FormControl>
+                        </RhfFieldControl>
                         <SelectContent>
                           {STATUS_OPTIONS.map((option) => (
                             <SelectItem key={option.value} value={option.value}>
@@ -269,27 +270,27 @@ export function MemberFormSheet({
                           ))}
                         </SelectContent>
                       </Select>
-                      <FormMessage />
-                    </FormItem>
+                      <RhfFieldMessage />
+                    </RhfFieldItem>
                   )}
                 />
               )}
 
-              <FormField
+              <RhfField
                 control={form.control}
                 name="bio"
                 render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Bio</FormLabel>
-                    <FormControl>
+                  <RhfFieldItem>
+                    <RhfFieldLabel>Bio</RhfFieldLabel>
+                    <RhfFieldControl>
                       <Textarea
                         rows={3}
                         placeholder="A short blurb about this teammate…"
                         {...field}
                       />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
+                    </RhfFieldControl>
+                    <RhfFieldMessage />
+                  </RhfFieldItem>
                 )}
               />
             </div>
@@ -305,7 +306,7 @@ export function MemberFormSheet({
               </SheetClose>
             </SheetFooter>
           </form>
-        </Form>
+        </FormProvider>
       </SheetContent>
     </Sheet>
   );
