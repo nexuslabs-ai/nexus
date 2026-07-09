@@ -42,8 +42,8 @@ function mockSystemPrefersDark(matches: boolean): void {
 }
 
 describe('NexusAppearanceSnapshot', () => {
-  it('uses snapshot version 3 for friendly token-mode ids', () => {
-    expect(SNAPSHOT_VERSION).toBe(3);
+  it('uses snapshot version 4 for split light/dark contrast', () => {
+    expect(SNAPSHOT_VERSION).toBe(4);
   });
 
   it('stores pre-derived CSS verbatim', () => {
@@ -151,7 +151,8 @@ describe('NexusAppearanceSnapshot', () => {
       ...DEFAULT_NEXUS_APPEARANCE,
       mode: 'dark' as const,
       surfaceTone: 'gray' as const,
-      contrast: 85,
+      lightContrast: 85,
+      darkContrast: 85,
     };
     const raw = serializeNexusAppearanceStateCookie(state);
 

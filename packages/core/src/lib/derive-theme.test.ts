@@ -332,13 +332,13 @@ describe('derivePrimary', () => {
 const CONTRACT: ThemeDerivationInput = {
   light: { accent: '#2563eb', background: '#ffffff', foreground: '#0a0a0a' },
   dark: { accent: '#339cff', background: '#181818', foreground: '#ffffff' },
-  contrast: 60,
+  contrast: { light: 60, dark: 60 },
 };
 
 const SURFACE_TONE_SEEDS = {
   light: { accent: '#2563eb', background: '#ffffff', foreground: '#181818' },
   dark: { accent: '#2563eb', background: '#181818', foreground: '#ffffff' },
-  contrast: 60,
+  contrast: { light: 60, dark: 60 },
 } as const;
 
 describe('deriveTheme', () => {
@@ -364,7 +364,7 @@ describe('deriveTheme', () => {
         foreground: '#181818',
       },
       dark: { accent: '#2563eb', background: '#181818', foreground: '#ffffff' },
-      contrast: 60,
+      contrast: { light: 60, dark: 60 },
     };
     const { light, dark } = deriveTheme(seedsOnly);
     expect(light['--nx-color-background']).toBeDefined();
@@ -436,7 +436,7 @@ describe('deriveTheme', () => {
         deriveTheme({
           surfaceTone: 'stone',
           ...SURFACE_TONE_SEEDS,
-          contrast,
+          contrast: { light: contrast, dark: contrast },
         })[mode];
       const soft = at(0);
       const strong = at(100);
@@ -500,7 +500,7 @@ describe('deriveTheme', () => {
         deriveTheme({
           surfaceTone: 'slate',
           ...SURFACE_TONE_SEEDS,
-          contrast,
+          contrast: { light: contrast, dark: contrast },
         })[mode];
       const soft = at(0);
       const defaultContrast = at(60);
@@ -545,7 +545,7 @@ describe('deriveSecondary', () => {
         foreground: '#181818',
       },
       dark: { accent: '#2563eb', background: '#181818', foreground: '#ffffff' },
-      contrast: 60,
+      contrast: { light: 60, dark: 60 },
     });
 
     expect(secondaryTokens(light)).toEqual({
@@ -597,7 +597,7 @@ describe('status families', () => {
           background: '#181818',
           foreground: '#ffffff',
         },
-        contrast: 60,
+        contrast: { light: 60, dark: 60 },
       })[mode];
 
       for (const [status, hue] of Object.entries(STATUS_HUES)) {
@@ -766,7 +766,7 @@ describe('alpha and translucent colors', () => {
       deriveTheme({
         surfaceTone: 'slate',
         ...SURFACE_TONE_SEEDS,
-        contrast,
+        contrast: { light: contrast, dark: contrast },
       });
 
     expect(at(0).light['--nx-color-border-default']).toBe(
@@ -821,7 +821,7 @@ describe('alpha and translucent colors', () => {
       deriveTheme({
         surfaceTone: 'slate',
         ...SURFACE_TONE_SEEDS,
-        contrast,
+        contrast: { light: contrast, dark: contrast },
       });
 
     expect(at(0).light['--nx-color-background-hover-alpha']).toBe(
@@ -991,7 +991,7 @@ describe('legibility invariant: every text tier clears its APCA floor', () => {
         surfaceTone,
         light: seeds,
         dark: seeds,
-        contrast,
+        contrast: { light: contrast, dark: contrast },
       };
       const map = deriveTheme(contract)[mode];
 
@@ -1028,4 +1028,46 @@ describe('legibility invariant: every text tier clears its APCA floor', () => {
       }
     }
   );
+});
+
+describe('per-mode contrast isolation', () => {
+  const seeds = {
+    surfaceTone: 'slate' as const,
+    light: { accent: '#2563eb', background: '#ffffff', foreground: '#181818' },
+    dark: { accent: '#2563eb', background: '#181818', foreground: '#ffffff' },
+  };
+
+  it('light contrast drives light tokens and leaves the whole dark map identical', () => {
+    const baseline = deriveTheme({
+      ...seeds,
+      contrast: { light: 60, dark: 60 },
+    });
+    const lightLowered = deriveTheme({
+      ...seeds,
+      contrast: { light: 0, dark: 60 },
+    });
+
+    // control-background is contrast-stepped in both modes (see the
+    // 'moves structure tokens as contrast changes' test above).
+    expect(lightLowered.light['--nx-color-control-background']).not.toBe(
+      baseline.light['--nx-color-control-background']
+    );
+    expect(lightLowered.dark).toEqual(baseline.dark); // whole dark map byte-identical
+  });
+
+  it('dark contrast drives dark tokens and leaves the whole light map identical', () => {
+    const baseline = deriveTheme({
+      ...seeds,
+      contrast: { light: 60, dark: 60 },
+    });
+    const darkLowered = deriveTheme({
+      ...seeds,
+      contrast: { light: 60, dark: 0 },
+    });
+
+    expect(darkLowered.dark['--nx-color-control-background']).not.toBe(
+      baseline.dark['--nx-color-control-background']
+    );
+    expect(darkLowered.light).toEqual(baseline.light);
+  });
 });

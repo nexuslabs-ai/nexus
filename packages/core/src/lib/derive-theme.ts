@@ -21,8 +21,11 @@ export interface ThemeDerivationInput {
   surfaceTone?: NexusSurfaceTone;
   light: ThemeSeeds;
   dark: ThemeSeeds;
-  /** 0–100. Separation between background↔surfaces and foreground↔text. */
-  contrast: number;
+  /** 0–100 per mode. Separation between background↔surfaces and foreground↔text. */
+  contrast: {
+    light: number;
+    dark: number;
+  };
 }
 
 export interface NexusThemeContract extends ThemeDerivationInput {
@@ -714,8 +717,8 @@ function deriveMode(
 export function deriveTheme(input: ThemeDerivationInput): DerivedTheme {
   const surfaceTone = input.surfaceTone ?? 'neutral';
   return {
-    light: deriveMode(input.light, surfaceTone, 'light', input.contrast),
-    dark: deriveMode(input.dark, surfaceTone, 'dark', input.contrast),
+    light: deriveMode(input.light, surfaceTone, 'light', input.contrast.light),
+    dark: deriveMode(input.dark, surfaceTone, 'dark', input.contrast.dark),
   };
 }
 
