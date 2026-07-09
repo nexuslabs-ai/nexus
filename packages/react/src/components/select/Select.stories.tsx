@@ -766,7 +766,7 @@ export const WithDataAttributes: Story = {
     // Check trigger data-slot
     const trigger = canvas.getByRole('combobox');
     await expect(trigger).toHaveAttribute('data-slot', 'select-trigger');
-    await expect(trigger).toHaveAttribute('data-variant', 'default');
+    await expect(trigger).toHaveAttribute('data-variant', 'bordered');
     await expect(trigger).toHaveClass('nx:bg-container');
     await expect(trigger).toHaveClass('nx:enabled:hover:bg-container-hover');
 
@@ -808,12 +808,12 @@ export const AllVariants: Story = {
         <div className="nx:flex nx:flex-col nx:gap-4">
           <div className="nx:flex nx:items-center nx:gap-4">
             <span className="nx:typography-label-small nx:text-muted-foreground nx:w-24">
-              Default
+              Bordered
             </span>
             <Select>
               <SelectTrigger
                 className="nx:w-[180px]"
-                aria-label="Default variant select"
+                aria-label="Bordered variant select"
               >
                 <SelectValue placeholder="Select option" />
               </SelectTrigger>

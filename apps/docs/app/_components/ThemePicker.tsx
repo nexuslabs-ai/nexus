@@ -37,7 +37,6 @@ function applyMode(mode: ThemeMode, value: string) {
 
 export function ThemePicker() {
   const base = useThemeStore((s) => s.base);
-  const brand = useThemeStore((s) => s.brand);
   const spacing = useThemeStore((s) => s.spacing);
   const shadow = useThemeStore((s) => s.shadow);
   const radius = useThemeStore((s) => s.radius);
@@ -83,13 +82,6 @@ export function ThemePicker() {
                 mode="base"
                 value={base}
                 onChange={onChange('base')}
-              />
-            </Row>
-            <Row label="Brand">
-              <ModeSelect
-                mode="brand"
-                value={brand}
-                onChange={onChange('brand')}
               />
             </Row>
           </Section>

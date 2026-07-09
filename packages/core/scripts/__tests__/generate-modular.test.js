@@ -115,7 +115,7 @@ describe('generateModular', () => {
     expect(globals).toMatch(
       /\[data-slot='input'\]\[class~='nx:focus-visible:outline-focus-default'\]:focus-visible/
     );
-    expect(globals).toMatch(/\[data-slot='input'\]\[data-variant='default'\]/);
+    expect(globals).toMatch(/\[data-slot='input'\]\[data-variant='bordered'\]/);
     expect(globals).toMatch(
       /box-shadow:\s*inset 0 0 0 1px var\(--color-border-default\);/
     );

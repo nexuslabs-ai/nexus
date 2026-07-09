@@ -1,6 +1,6 @@
 {
   "name": "@nexus_ds/core",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "type": "module",
   "description": "Framework-agnostic Nexus design-token engine: appearance model, runtime theme derivation, and first-paint snapshots.",
   "license": "MIT",
@@ -36,7 +36,7 @@
     "typecheck:dist": "node scripts/typecheck-runtime-dist.mjs",
     "typecheck:dist-core": "node scripts/typecheck-runtime-dist.mjs",
     "build:tokens:modular": "node scripts/generate-modular.js --spacingDefault=default",
-    "build:tailwind": "node scripts/generate-tailwind-package.js --base=stone --brand=black --borderwidth=normal --radius=square --shadow=quiet --motion=snappy --spacingDefault=default",
+    "build:tailwind": "node scripts/generate-tailwind-package.js --base=stone --borderwidth=normal --radius=square --shadow=quiet --motion=snappy --spacingDefault=default",
     "audit:runtime-exports": "node scripts/audit-runtime-exports.mjs",
     "audit:contrast": "node scripts/audit-contrast.js",
     "audit:class-refs": "node scripts/audit-class-refs.js",

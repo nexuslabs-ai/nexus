@@ -143,7 +143,7 @@ describe('sanitizeNexusAppearance', () => {
         ...DEFAULT_NEXUS_APPEARANCE,
         brandColor: 'not-a-color',
       }).brandColor
-    ).toBe('#339cff');
+    ).toBe(DEFAULT_BRAND_COLOR);
     expect(
       sanitizeNexusAppearance({
         ...DEFAULT_NEXUS_APPEARANCE,

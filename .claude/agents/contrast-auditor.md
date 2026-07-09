@@ -105,12 +105,12 @@ L; D may swap palettes for hue rotation).
 
 From the active header, resolve which JSON file holds the fg token:
 
-| Filename pattern                                                | Path                                                                                                           |
-| --------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------- |
-| `base-{slate,neutral,gray,stone,zinc}-{light,dark}.json`        | `packages/core/tokens/semantic/`                                                                               |
-| `brands-{blue,purple,pink,teal,orange,black}-{light,dark}.json` | `packages/core/tokens/semantic/`                                                                               |
-| `chart-categorical-default-{light,dark}.json`                   | `packages/core/tokens/semantic/`                                                                               |
-| `focus-default-{light,dark}.json`                               | `packages/core/tokens/primitives/focus/` (error focus only; default focus follows `primary.subtle-foreground`) |
+| Filename pattern                                         | Path                                                                                                           |
+| -------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------- |
+| `base-{slate,neutral,gray,stone,zinc}-{light,dark}.json` | `packages/core/tokens/semantic/`                                                                               |
+| `theme-default-{light,dark}.json`                        | `packages/core/tokens/semantic/`                                                                               |
+| `chart-categorical-default-{light,dark}.json`            | `packages/core/tokens/semantic/`                                                                               |
+| `focus-default-{light,dark}.json`                        | `packages/core/tokens/primitives/focus/` (error focus only; default focus follows `primary.subtle-foreground`) |
 
 For cross-file headers, the **fg-file** (second filename, after `↔`) is what
 gets resolved here. The script opens the bg-file itself
@@ -223,11 +223,11 @@ Use this exact column schema:
 | File                                                         | Pair                                    | Lc    | Threshold       | Current (fg)          | Proposed reroute                                    | Notes                                       |
 | ------------------------------------------------------------ | --------------------------------------- | ----- | --------------- | --------------------- | --------------------------------------------------- | ------------------------------------------- |
 | base-slate-light.json                                        | foreground ↔ background                 | 42.1  | 75 (body)       | {slate.900} (L 0.207) | {slate.950} (L 0.118)                               | role collision (light): reserved for chrome |
-| brands-blue-dark.json                                        | primary.foreground ↔ primary.background | -52.0 | 60 (ui)         | {white.base}          | (case B) move bg or tint fg                         | fg is leaf primitive — no shade-step        |
-| base-slate-light.json ↔ brands-blue-light.json focus         | primary.subtle-foreground ↔ background  | 45+   | 45 (incidental) | brand primary accent  | choose a primary accent shade that clears the floor | edit the brand semantic primary mapping     |
+| theme-default-dark.json                                      | primary.foreground ↔ primary.background | -52.0 | 60 (ui)         | {white.base}          | (case B) move bg or tint fg                         | fg is leaf primitive — no shade-step        |
+| base-slate-light.json ↔ theme-default-light.json focus       | primary.subtle-foreground ↔ background  | 45+   | 45 (incidental) | brand primary accent  | choose a primary accent shade that clears the floor | edit the brand semantic primary mapping     |
 | base-slate-light.json ↔ chart-categorical-default-light.json | chart.categorical.3 ↔ container         | 56.0  | 60 (ui)         | {orange.700}          | (i) step to {orange.800} or (ii) swap palette       | case D — verify hue rotation                |
 
-Light-mode failures may have dark-mode counterparts — verify `base-{palette}-dark.json` and `brands-{brand}-dark.json` after applying any fix.
+Light-mode failures may have dark-mode counterparts — verify `base-{palette}-dark.json` and `theme-default-dark.json` after applying any fix.
 ```
 
 If a light-mode pair fails, include the dark-counterpart hint in the footer.

@@ -232,7 +232,6 @@ export function resolveValue(value, primitiveMap, type = 'unknown', tokenPath) {
  */
 export const DEFAULT_CONFIG = {
   base: 'stone',
-  brand: 'black',
   shadow: 'quiet',
   radius: 'square',
   borderwidth: 'normal',
@@ -2055,12 +2054,12 @@ const ERROR_FOCUS_RING_SELECTORS = [
 ];
 
 const FIELD_BOUNDARY_SELECTORS = [
-  "[data-slot='input'][data-variant='default']",
-  "[data-slot='sidebar-input'][data-variant='default']",
-  "[data-slot='textarea'][data-variant='default']",
-  "[data-slot='native-select'][data-variant='default']",
-  "[data-slot='select-trigger'][data-variant='default']",
-  "[data-slot='input-group'][data-variant='default']",
+  "[data-slot='input'][data-variant='bordered']",
+  "[data-slot='sidebar-input'][data-variant='bordered']",
+  "[data-slot='textarea'][data-variant='bordered']",
+  "[data-slot='native-select'][data-variant='bordered']",
+  "[data-slot='select-trigger'][data-variant='bordered']",
+  "[data-slot='input-group'][data-variant='bordered']",
 ];
 
 const FIELD_ERROR_BOUNDARY_SELECTORS = [
@@ -2073,12 +2072,12 @@ const FIELD_ERROR_BOUNDARY_SELECTORS = [
 ];
 
 const FIELD_DISABLED_BOUNDARY_SELECTORS = [
-  "[data-slot='input'][data-variant='default']:disabled",
-  "[data-slot='sidebar-input'][data-variant='default']:disabled",
-  "[data-slot='textarea'][data-variant='default']:disabled",
-  "[data-slot='native-select'][data-variant='default']:disabled",
-  "[data-slot='select-trigger'][data-variant='default']:disabled",
-  "[data-slot='input-group'][data-variant='default'][data-disabled='true']",
+  "[data-slot='input'][data-variant='bordered']:disabled",
+  "[data-slot='sidebar-input'][data-variant='bordered']:disabled",
+  "[data-slot='textarea'][data-variant='bordered']:disabled",
+  "[data-slot='native-select'][data-variant='bordered']:disabled",
+  "[data-slot='select-trigger'][data-variant='bordered']:disabled",
+  "[data-slot='input-group'][data-variant='bordered'][data-disabled='true']",
 ];
 
 const OTP_SLOT_BOUNDARY_SELECTOR = "[data-slot='input-otp-slot']";

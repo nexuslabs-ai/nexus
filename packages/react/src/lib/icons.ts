@@ -25,6 +25,7 @@ export {
   IconChevronUp,
   IconDots,
   IconLayoutSidebar,
+  IconSelector,
 } from '@tabler/icons-react';
 
 // Actions

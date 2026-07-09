@@ -20,7 +20,7 @@ const nativeSelectVariants = cva(
         sm: 'nx:px-2.5 nx:py-1.5 nx:pr-9 nx:typography-body-small',
       },
       variant: {
-        default:
+        bordered:
           'nx:border-border-default nx:bg-container nx:enabled:hover:bg-container-hover nx:disabled:border-border-disabled',
         borderless:
           'nx:border-transparent nx:bg-control-background nx:enabled:hover:bg-control-background-hover',
@@ -28,7 +28,7 @@ const nativeSelectVariants = cva(
     },
     defaultVariants: {
       size: 'default',
-      variant: 'default',
+      variant: 'bordered',
     },
   }
 );
@@ -49,8 +49,9 @@ interface NativeSelectProps
  * A styled wrapper over the native `<select>` — on mobile it opens the OS
  * picker (iOS wheel / Android sheet), the preferred dense-form UX there. The
  * open list is OS-rendered. For rich options (icons, descriptions, grouping)
- * on desktop, use `Select`. Use `variant="borderless"` to remove the resting
- * field stroke while keeping a tonal control fill for resting affordance.
+ * on desktop, use `Select`. The `variant="bordered"` treatment is the default;
+ * use `variant="borderless"` to remove the resting field stroke while keeping a
+ * tonal control fill for resting affordance.
  *
  * @example
  * ```tsx
@@ -74,7 +75,7 @@ function NativeSelect({
       <select
         data-slot="native-select"
         data-size={size}
-        data-variant={variant ?? 'default'}
+        data-variant={variant ?? 'bordered'}
         className={cn(nativeSelectVariants({ size, variant, className }))}
         {...props}
       />

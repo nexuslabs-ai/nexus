@@ -29,7 +29,7 @@ const meta: Meta<typeof Input> = {
     },
     variant: {
       control: 'select',
-      options: ['default', 'borderless'],
+      options: ['bordered', 'borderless'],
       description: 'The visual treatment of the input',
     },
     type: {
@@ -158,13 +158,15 @@ export const BorderlessStates: Story = {
     await expect(readOnly).not.toBeDisabled();
 
     await expect(invalid).toHaveAttribute('aria-invalid', 'true');
-    await expect(invalid).toHaveClass('nx:aria-invalid:border-color-error');
+    await expect(invalid).toHaveClass('nx:aria-invalid:border-border-error');
     await expect(window.getComputedStyle(invalid).borderTopWidth).toBe('0px');
     await expect(window.getComputedStyle(invalid).boxShadow).not.toBe('none');
 
     await expect(disabled).toBeDisabled();
     await expect(disabled).toHaveClass('nx:disabled:bg-disabled');
-    await expect(disabled).not.toHaveClass('nx:disabled:border-color-disabled');
+    await expect(disabled).not.toHaveClass(
+      'nx:disabled:border-border-disabled'
+    );
   },
 };
 
@@ -520,7 +522,7 @@ export const VisualStateTokens: Story = {
       'nx:disabled:placeholder:text-disabled-foreground'
     );
     await expect(disabledEmpty).toHaveClass(
-      'nx:disabled:border-color-disabled'
+      'nx:disabled:border-border-disabled'
     );
     // Disabled uses a token color, not opacity-50 — opacity stays 1.
     await expect(window.getComputedStyle(disabledEmpty).opacity).toBe('1');
@@ -538,7 +540,7 @@ export const WithDataAttributes: Story = {
 
     await expect(input).toHaveAttribute('data-slot', 'input');
     await expect(input).toHaveAttribute('data-size', 'lg');
-    await expect(input).toHaveAttribute('data-variant', 'default');
+    await expect(input).toHaveAttribute('data-variant', 'bordered');
     await expect(input).toHaveClass('nx:bg-container');
     await expect(input).toHaveClass('nx:enabled:hover:bg-container-hover');
   },
@@ -584,9 +586,9 @@ export const AllVariants: Story = {
         <div className="nx:flex nx:flex-col nx:gap-3">
           <div className="nx:flex nx:items-center nx:gap-4">
             <span className="nx:typography-label-small nx:text-muted-foreground nx:w-20">
-              default
+              bordered
             </span>
-            <Input placeholder="Default input" />
+            <Input placeholder="Bordered input" />
           </div>
           <div className="nx:flex nx:items-center nx:gap-4">
             <span className="nx:typography-label-small nx:text-muted-foreground nx:w-20">

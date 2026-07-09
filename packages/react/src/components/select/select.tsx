@@ -64,14 +64,14 @@ const selectTriggerVariants = cva(
   {
     variants: {
       variant: {
-        default:
+        bordered:
           'nx:border-border-default nx:bg-container nx:enabled:hover:bg-container-hover nx:disabled:border-border-disabled',
         borderless:
           'nx:border-transparent nx:bg-control-background nx:enabled:hover:bg-control-background-hover',
       },
     },
     defaultVariants: {
-      variant: 'default',
+      variant: 'bordered',
     },
   }
 );
@@ -89,8 +89,9 @@ interface SelectTriggerProps
 /**
  * SelectTrigger
  *
- * Button that opens the select dropdown. Use `variant="borderless"` to remove
- * the resting field stroke while keeping a tonal control fill for resting affordance.
+ * Button that opens the select dropdown. The `variant="bordered"` treatment is
+ * the default; use `variant="borderless"` to remove the resting field stroke
+ * while keeping a tonal control fill for resting affordance.
  *
  * @example
  * ```tsx
@@ -108,7 +109,7 @@ function SelectTrigger({
   return (
     <SelectPrimitive.Trigger
       data-slot="select-trigger"
-      data-variant={variant ?? 'default'}
+      data-variant={variant ?? 'bordered'}
       className={cn(selectTriggerVariants({ variant, className }))}
       {...props}
     >

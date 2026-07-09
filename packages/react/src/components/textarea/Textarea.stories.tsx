@@ -28,7 +28,7 @@ const meta: Meta<typeof Textarea> = {
   argTypes: {
     variant: {
       control: 'select',
-      options: ['default', 'borderless'],
+      options: ['bordered', 'borderless'],
       description: 'The visual treatment of the textarea',
     },
     disabled: {
@@ -379,7 +379,7 @@ export const WithDataAttributes: Story = {
     const textarea = canvas.getByRole('textbox');
 
     await expect(textarea).toHaveAttribute('data-slot', 'textarea');
-    await expect(textarea).toHaveAttribute('data-variant', 'default');
+    await expect(textarea).toHaveAttribute('data-variant', 'bordered');
     await expect(textarea).toHaveClass('nx:bg-container');
     await expect(textarea).toHaveClass('nx:enabled:hover:bg-container-hover');
   },
@@ -399,9 +399,9 @@ export const AllVariants: Story = {
         <div className="nx:flex nx:flex-col nx:gap-3">
           <div className="nx:flex nx:items-start nx:gap-4">
             <span className="nx:typography-label-small nx:text-muted-foreground nx:w-20 nx:pt-2">
-              default
+              bordered
             </span>
-            <Textarea placeholder="Default textarea" />
+            <Textarea placeholder="Bordered textarea" />
           </div>
           <div className="nx:flex nx:items-start nx:gap-4">
             <span className="nx:typography-label-small nx:text-muted-foreground nx:w-20 nx:pt-2">

@@ -3,8 +3,6 @@ import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { describe, expect, it } from 'vitest';
 
-import { BRAND_PALETTES } from '../lib/palettes.js';
-
 const TEST_DIR = path.dirname(fileURLToPath(import.meta.url));
 const SEMANTIC_DIR = path.resolve(TEST_DIR, '..', '..', 'tokens', 'semantic');
 const THEMES = ['light', 'dark'];
@@ -22,7 +20,7 @@ const REQUIRED_KEYS = [
 ];
 
 const BASE_ROLES = ['error', 'success', 'warning', 'information'];
-const BRAND_ROLES = ['primary', 'secondary'];
+const THEME_ROLES = ['primary', 'secondary'];
 
 function semanticFiles(prefix) {
   return fs
@@ -36,21 +34,21 @@ function readJson(filePath) {
 }
 
 describe('semantic token shape', () => {
-  it('exposes exactly the supported brand mode files', () => {
-    const expected = BRAND_PALETTES.flatMap((brand) =>
-      THEMES.map((theme) => `brands-${brand}-${theme}.json`)
+  it('exposes exactly the default theme mode files', () => {
+    const expected = THEMES.map(
+      (theme) => `theme-default-${theme}.json`
     ).sort();
-    const actual = semanticFiles('brands')
+    const actual = semanticFiles('theme')
       .map((filePath) => path.basename(filePath))
       .sort();
 
     expect(actual).toEqual(expected);
   });
 
-  // Each brand/status role exposes a fixed nine-key shape. Without a test,
-  // the JSON could drift from that contract (see #54: badge.tsx referenced
-  // `*-surface` / `*-text` keys that never existed). Walk every semantic
-  // file and prove the shape end-to-end.
+  // Each primary/secondary/status role exposes a fixed nine-key shape. Without
+  // a test, the JSON could drift from that contract (see #54: badge.tsx
+  // referenced `*-surface` / `*-text` keys that never existed). Walk every
+  // semantic file and prove the shape end-to-end.
   it.each(semanticFiles('base'))(
     'base file %s exposes the 9-key shape for status roles',
     (filePath) => {
@@ -67,11 +65,11 @@ describe('semantic token shape', () => {
     }
   );
 
-  it.each(semanticFiles('brands'))(
-    'brand file %s exposes the 9-key shape for brand roles',
+  it.each(semanticFiles('theme'))(
+    'default theme file %s exposes the 9-key shape for primary/secondary roles',
     (filePath) => {
       const data = readJson(filePath);
-      for (const role of BRAND_ROLES) {
+      for (const role of THEME_ROLES) {
         expect(data[role], `${role} role missing`).toBeDefined();
         for (const key of REQUIRED_KEYS) {
           expect(

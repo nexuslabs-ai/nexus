@@ -531,6 +531,7 @@ export const WithDataAttributes: Story = {
     // FormControl wires the control's id + helper description to the FormItem.
     const input = canvas.getByLabelText('Username');
     await expect(input).toHaveAttribute('id', label.getAttribute('for'));
+    await expect(input).toHaveAttribute('data-variant', 'bordered');
     await expect(input).toHaveAttribute(
       'aria-describedby',
       description.getAttribute('id')
