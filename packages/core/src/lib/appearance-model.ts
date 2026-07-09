@@ -27,7 +27,8 @@ export interface NexusAppearanceState {
   mode: NexusAppearanceMode;
   brandColor: string;
   surfaceTone: NexusSurfaceTone;
-  contrast: number;
+  lightContrast: number;
+  darkContrast: number;
   density: NexusDensity;
   corners: NexusCorners;
   elevation: NexusElevation;
@@ -105,7 +106,8 @@ export const DEFAULT_NEXUS_APPEARANCE: NexusAppearanceState = {
   mode: 'light',
   brandColor: DEFAULT_BRAND_COLOR,
   surfaceTone: 'stone',
-  contrast: 60,
+  lightContrast: 60,
+  darkContrast: 60,
   density: 'default',
   corners: 'square',
   elevation: 'quiet',
@@ -208,6 +210,9 @@ const clampFontSize = (value: unknown, fallback: number): number =>
     ? Math.min(FONT_PX_MAX, Math.max(FONT_PX_MIN, value))
     : fallback;
 
+const contrastOr = (value: unknown, fallback: number): number =>
+  typeof value === 'number' && value >= 0 && value <= 100 ? value : fallback;
+
 function formatPx(value: number): string {
   return `${Number(value.toFixed(4))}px`;
 }
@@ -298,12 +303,8 @@ export function sanitizeNexusAppearance(
         ? raw.brandColor
         : d.brandColor,
     surfaceTone: enumOr(raw.surfaceTone, SURFACE_TONES, d.surfaceTone),
-    contrast:
-      typeof raw.contrast === 'number' &&
-      raw.contrast >= 0 &&
-      raw.contrast <= 100
-        ? raw.contrast
-        : d.contrast,
+    lightContrast: contrastOr(raw.lightContrast, d.lightContrast),
+    darkContrast: contrastOr(raw.darkContrast, d.darkContrast),
     density: enumOr(raw.density, DENSITIES, d.density),
     corners: enumOr(raw.corners, CORNERS, d.corners),
     elevation: enumOr(raw.elevation, ELEVATIONS, d.elevation),
@@ -318,7 +319,7 @@ export function createNexusThemeContract(
   const tone = BASE_TONE_SEEDS[state.surfaceTone];
   return {
     surfaceTone: state.surfaceTone,
-    contrast: state.contrast,
+    contrast: { light: state.lightContrast, dark: state.darkContrast },
     light: { accent: state.brandColor, ...tone.light },
     dark: { accent: state.brandColor, ...tone.dark },
   };

@@ -71,7 +71,7 @@ for (const tone of TONES) {
       background: '#181818',
       foreground: '#ffffff',
     },
-    contrast: 60,
+    contrast: { light: 60, dark: 60 },
   }).light;
 
   fixture.tones[tone] = Object.fromEntries(

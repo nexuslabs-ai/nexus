@@ -61,7 +61,7 @@ describe('deriveTheme key parity', () => {
           background: '#181818',
           foreground: '#ffffff',
         },
-        contrast: 60,
+        contrast: { light: 60, dark: 60 },
       })[mode];
       const derived = new Set(Object.keys(theme));
       const want = curatedKeys(mode);

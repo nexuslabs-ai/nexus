@@ -248,7 +248,7 @@ describe('tone parity', () => {
           background: primitiveHex(tone, '950'),
           foreground: '#ffffff',
         },
-        contrast: TONE_CONTRAST,
+        contrast: { light: TONE_CONTRAST, dark: TONE_CONTRAST },
       })[mode];
 
       for (const token of TONE_TOKENS) {
@@ -291,7 +291,7 @@ describe('tone parity', () => {
             background: '#181818',
             foreground: '#ffffff',
           },
-          contrast: TONE_CONTRAST,
+          contrast: { light: TONE_CONTRAST, dark: TONE_CONTRAST },
         }).light;
         return [tone, comps(light['--nx-color-muted']!)];
       })
@@ -397,7 +397,7 @@ describe('engine color tables match ground color.json primitives', () => {
         background: primitiveHex('slate', '950'),
         foreground: '#ffffff',
       },
-      contrast: TONE_CONTRAST,
+      contrast: { light: TONE_CONTRAST, dark: TONE_CONTRAST },
     });
     expect(theme.light['--nx-color-focus-error']).toBe(
       primitiveOklch(focusErrorRef('light'))

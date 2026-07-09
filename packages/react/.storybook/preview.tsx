@@ -26,7 +26,8 @@ type AppearanceGlobalKey =
   | 'mode'
   | 'brandColor'
   | 'surfaceTone'
-  | 'contrast'
+  | 'lightContrast'
+  | 'darkContrast'
   | 'density'
   | 'corners'
   | 'elevation'
@@ -43,7 +44,8 @@ const APPEARANCE_GLOBAL_KEYS: AppearanceGlobalKey[] = [
   'mode',
   'brandColor',
   'surfaceTone',
-  'contrast',
+  'lightContrast',
+  'darkContrast',
   'density',
   'corners',
   'elevation',
@@ -96,10 +98,14 @@ function appearanceStateFromGlobals(
       BASE_TONE_OPTIONS,
       defaults.surfaceTone
     ),
-    contrast:
-      typeof globals.contrast === 'number'
-        ? globals.contrast
-        : defaults.contrast,
+    lightContrast:
+      typeof globals.lightContrast === 'number'
+        ? globals.lightContrast
+        : defaults.lightContrast,
+    darkContrast:
+      typeof globals.darkContrast === 'number'
+        ? globals.darkContrast
+        : defaults.darkContrast,
     density: pickOption(globals.density, DENSITY_OPTIONS, defaults.density),
     corners: pickOption(globals.corners, CORNER_OPTIONS, defaults.corners),
     elevation: pickOption(
@@ -147,7 +153,8 @@ function globalsFromAppearanceState(
     mode: state.mode,
     brandColor: state.brandColor,
     surfaceTone: state.surfaceTone,
-    contrast: state.contrast,
+    lightContrast: state.lightContrast,
+    darkContrast: state.darkContrast,
     density: state.density,
     corners: state.corners,
     elevation: state.elevation,
@@ -290,7 +297,8 @@ const preview: Preview = {
     mode: DEFAULT_NEXUS_APPEARANCE.mode,
     brandColor: DEFAULT_NEXUS_APPEARANCE.brandColor,
     surfaceTone: DEFAULT_NEXUS_APPEARANCE.surfaceTone,
-    contrast: DEFAULT_NEXUS_APPEARANCE.contrast,
+    lightContrast: DEFAULT_NEXUS_APPEARANCE.lightContrast,
+    darkContrast: DEFAULT_NEXUS_APPEARANCE.darkContrast,
     density: DEFAULT_NEXUS_APPEARANCE.density,
     corners: DEFAULT_NEXUS_APPEARANCE.corners,
     elevation: DEFAULT_NEXUS_APPEARANCE.elevation,
