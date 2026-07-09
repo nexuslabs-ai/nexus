@@ -1,7 +1,5 @@
-import { clampChroma, type Oklch, oklch, parse } from 'culori';
-import { readFileSync } from 'node:fs';
+import { clampChroma, type Oklch } from 'culori';
 import path from 'node:path';
-import { fileURLToPath } from 'node:url';
 import { describe, expect, it } from 'vitest';
 
 import {
@@ -15,6 +13,13 @@ import {
 import lightFixture from './light-tone.fixture.json';
 import perceptualGrid from './perceptual-grid.json';
 import perceptualGridHue from './perceptual-grid-hue.json';
+import {
+  baseLeaves,
+  parseToOklch,
+  primitiveColors,
+  readJson,
+  ROOT_DIR,
+} from './token-parity-utils';
 
 const TONE_CONTRAST = 60;
 const LIGHT_TOL = { l: 0.005, c: 0.002, h: 2, a: 0.002 };
@@ -48,24 +53,12 @@ const TONE_TOKENS = [
 
 type Tone = (typeof TONES)[number];
 type ToneToken = (typeof TONE_TOKENS)[number];
-type TokenRecord = Record<string, string>;
 type Fixture = {
   schemaVersion: number;
-  paperL: number;
-  lightDepthMultiplier: number;
   toneContrast: number;
   tones: Record<Tone, Record<ToneToken, string>>;
 };
 
-const TEST_DIR = path.dirname(fileURLToPath(import.meta.url));
-const ROOT_DIR = path.resolve(TEST_DIR, '..', '..');
-const SEMANTIC_DIR = path.join(ROOT_DIR, 'tokens', 'semantic');
-const PRIMITIVE_COLOR_FILE = path.join(
-  ROOT_DIR,
-  'tokens',
-  'primitives',
-  'color.json'
-);
 // Light tone parity is a frozen CHANGE-DETECTOR, not an independent oracle: the
 // fixture was generated from the engine's own first run and human-reviewed (light
 // intentionally diverges from curated near-white, so there is no external value to
@@ -92,41 +85,6 @@ const CONTRAST_INK_TOKENS = new Set([
 const FIXED_WHITE_TOKENS = new Set(['control-thumb']);
 const STATUS_FAMILIES = ['success', 'warning', 'error', 'information'] as const;
 
-const primitiveColors = JSON.parse(
-  readFileSync(PRIMITIVE_COLOR_FILE, 'utf8')
-) as Record<string, Record<string, { $value: string; $type: string }>>;
-
-function readJson(file: string): unknown {
-  return JSON.parse(readFileSync(file, 'utf8'));
-}
-
-function collectColorLeaves(
-  obj: unknown,
-  leaves: TokenRecord,
-  tokenPath: string[] = []
-): void {
-  if (!obj || typeof obj !== 'object' || Array.isArray(obj)) return;
-  const record = obj as Record<string, unknown>;
-  if (record.$type === 'color' && typeof record.$value === 'string') {
-    leaves[tokenPath.join('-')] = record.$value;
-    return;
-  }
-
-  for (const [key, value] of Object.entries(record)) {
-    if (key.startsWith('$')) continue;
-    collectColorLeaves(value, leaves, [...tokenPath, key]);
-  }
-}
-
-function baseLeaves(tone: Tone, mode: Mode): TokenRecord {
-  const leaves: TokenRecord = {};
-  collectColorLeaves(
-    readJson(path.join(SEMANTIC_DIR, `base-${tone}-${mode}.json`)),
-    leaves
-  );
-  return leaves;
-}
-
 function round(value: number, decimals: number): number {
   const factor = 10 ** decimals;
   return Math.round(value * factor) / factor;
@@ -142,14 +100,6 @@ function formatOklchWithAlpha(color: Oklch): string {
   const base = `oklch(${l} ${c} ${h}`;
   if (alpha < 1) return `${base} / ${round(alpha, 4)})`;
   return `${base})`;
-}
-
-function parseToOklch(input: string): Oklch {
-  const parsed = parse(input);
-  if (!parsed) throw new Error(`Cannot parse color "${input}"`);
-  const color = oklch(parsed);
-  if (!color) throw new Error(`Cannot convert color "${input}" to OKLCH`);
-  return color;
 }
 
 // Reproduces the build-time curated-primitive grinder (`scripts/lib/

@@ -119,7 +119,9 @@
   --nx-color-pink-900: oklch(0.34 0.1468 2.432);
   --nx-color-pink-950: oklch(0.25 0.1077 3.907);
   --nx-color-slate-50: oklch(0.985 0.0034 247.858);
+  --nx-color-slate-75: oklch(0.9713 0.0068 247.895);
   --nx-color-slate-100: oklch(0.945 0.0069 247.896);
+  --nx-color-slate-150: oklch(0.9227 0.0126 255.508);
   --nx-color-slate-200: oklch(0.87 0.0126 255.508);
   --nx-color-slate-300: oklch(0.765 0.0198 252.894);
   --nx-color-slate-400: oklch(0.66 0.0402 256.993);
@@ -185,7 +187,9 @@
   --nx-color-blue-900: oklch(0.33 0.1316 254.902);
   --nx-color-blue-950: oklch(0.25 0.1042 256.214);
   --nx-color-gray-50: oklch(0.985 0.0017 247.839);
+  --nx-color-gray-75: oklch(0.97 0.0029 264.542);
   --nx-color-gray-100: oklch(0.945 0.0029 264.542);
+  --nx-color-gray-150: oklch(0.9215 0.0058 264.531);
   --nx-color-gray-200: oklch(0.87 0.0058 264.531);
   --nx-color-gray-300: oklch(0.765 0.0093 258.338);
   --nx-color-gray-400: oklch(0.66 0.0224 261.749);
@@ -207,7 +211,9 @@
   --nx-color-gray-a900: oklch(0.1296 0.0274 261.692 / 0.9098);
   --nx-color-gray-a950: oklch(0.1296 0.0274 261.692 / 0.9569);
   --nx-color-zinc-50: oklch(0.985 0 0);
+  --nx-color-zinc-75: oklch(0.9704 0.0013 286.375);
   --nx-color-zinc-100: oklch(0.945 0.0013 286.375);
+  --nx-color-zinc-150: oklch(0.924 0.0035 247.861);
   --nx-color-zinc-200: oklch(0.87 0.0035 247.861);
   --nx-color-zinc-300: oklch(0.765 0.0053 247.885);
   --nx-color-zinc-400: oklch(0.66 0.0144 286.025);
@@ -229,7 +235,9 @@
   --nx-color-zinc-a900: oklch(0.1395 0.0048 262.802 / 0.9098);
   --nx-color-zinc-a950: oklch(0.1395 0.0048 262.802 / 0.9569);
   --nx-color-neutral-50: oklch(0.985 0 0);
+  --nx-color-neutral-75: oklch(0.9702 0 0);
   --nx-color-neutral-100: oklch(0.945 0 0);
+  --nx-color-neutral-150: oklch(0.9219 0 0);
   --nx-color-neutral-200: oklch(0.87 0 0);
   --nx-color-neutral-300: oklch(0.765 0 0);
   --nx-color-neutral-400: oklch(0.66 0 0);
@@ -251,7 +259,9 @@
   --nx-color-neutral-a900: oklch(0.1448 0 0 / 0.9098);
   --nx-color-neutral-a950: oklch(0.1448 0 0 / 0.9569);
   --nx-color-stone-50: oklch(0.985 0.0029 84.559);
+  --nx-color-stone-75: oklch(0.9701 0.0041 91.446);
   --nx-color-stone-100: oklch(0.945 0.0029 84.559);
+  --nx-color-stone-150: oklch(0.9226 0.0046 78.297);
   --nx-color-stone-200: oklch(0.87 0.0047 78.296);
   --nx-color-stone-300: oklch(0.765 0.0084 73.724);
   --nx-color-stone-400: oklch(0.66 0.0094 84.582);

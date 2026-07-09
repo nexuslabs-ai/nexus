@@ -63,9 +63,8 @@ const SURFACE_TONE: Record<
   stone: { h: 70, lightC: 0.008, darkC: 0.006 },
 };
 
-const PAPER_L = 0.987;
+const PAGE_L_LIGHT = 0.97;
 const LIGHT_CHROMA_DEPTH_MULTIPLIER = 1.4;
-const FLAT_IN_LIGHT = new Set(['container', 'popover']);
 const FOCUS_APCA_FLOOR = 45;
 
 function anchoredContrastLerp(
@@ -102,29 +101,38 @@ function contrastProfile(mode: Mode, contrast: number): ContrastProfile {
   };
 }
 
-/** Steps (in Δ units) each opaque surface sits from the page background. */
-const SURFACE_STEPS: Record<string, number> = {
-  background: 0,
-  'background-hover': 1,
-  'background-active': 1.4,
-  muted: 1,
-  container: 1,
-  'container-hover': 1.8,
-  'container-active': 1.4,
-  popover: 1.8,
-  'popover-hover': 2.6,
-  'popover-active': 1.8,
-  'control-background': 1.4,
-  'control-background-hover': 2.2,
-  'nav-background': 0.6,
-  'nav-item-hover': 1.6,
-  'nav-item-active': 1.6,
-  'nav-border': 2.4,
-  disabled: 0.8,
-  'border-active': 3.2,
-};
+/**
+ * Canonical opaque-surface token set. Both regime step tables are typed against
+ * these keys, so a surface added here must be given a light and dark step — a
+ * missing or stray entry fails typecheck instead of silently falling back.
+ */
+const SURFACE_TOKENS = [
+  'background',
+  'background-hover',
+  'background-active',
+  'muted',
+  'container',
+  'container-hover',
+  'container-active',
+  'popover',
+  'popover-hover',
+  'popover-active',
+  'control-background',
+  'control-background-hover',
+  'nav-background',
+  'nav-item-hover',
+  'nav-item-active',
+  'nav-border',
+  'disabled',
+  'border-active',
+] as const;
 
-const DARK_SURFACE_STEPS: Partial<Record<string, number>> = {
+type SurfaceToken = (typeof SURFACE_TOKENS)[number];
+
+/** Steps (in Δ units) each opaque surface sits from the page background. */
+type SurfaceSteps = Record<SurfaceToken, number>;
+
+const DARK_SURFACE_STEPS: SurfaceSteps = {
   background: 0,
   'background-hover': 1.6,
   'background-active': 1.6,
@@ -143,6 +151,27 @@ const DARK_SURFACE_STEPS: Partial<Record<string, number>> = {
   'nav-border': 3.2,
   disabled: 0,
   'border-active': 9.68,
+};
+
+const LIGHT_SURFACE_STEPS: SurfaceSteps = {
+  background: 0,
+  'background-hover': -0.45,
+  'background-active': -0.84,
+  muted: -0.45,
+  container: 0.54,
+  'container-hover': 0.27,
+  'container-active': -0.45,
+  popover: 0.54,
+  'popover-hover': -0.45,
+  'popover-active': -0.45,
+  'control-background': -0.84,
+  'control-background-hover': -1.79,
+  'nav-background': -0.84,
+  'nav-item-hover': -1.79,
+  'nav-item-active': -1.79,
+  'nav-border': -1.79,
+  disabled: -0.45,
+  'border-active': -5.54,
 };
 
 type DarkNavSurfaceToken =
@@ -197,26 +226,23 @@ export function deriveSurfaces(
   const bg = seedOklch(backgroundHex);
   const tone = SURFACE_TONE[surfaceTone];
   const dark = mode === 'dark';
-  const dir = dark ? 1 : -1;
-  const anchorL = dark ? (bg.l ?? 0) : tone.lightC > 0 ? PAPER_L : (bg.l ?? 1);
+  const anchorL = dark ? (bg.l ?? 0) : PAGE_L_LIGHT;
   const baseC = dark ? tone.darkC : tone.lightC;
   const out: TokenMap = {};
-  for (const [token, rawStep] of Object.entries(SURFACE_STEPS)) {
+  for (const token of SURFACE_TOKENS) {
     if (dark && token in DARK_NAV_SURFACES[surfaceTone]) {
       out[`--nx-color-${token}`] =
         DARK_NAV_SURFACES[surfaceTone][token as DarkNavSurfaceToken];
       continue;
     }
 
-    const step = dark
-      ? (DARK_SURFACE_STEPS[token] ?? rawStep)
-      : FLAT_IN_LIGHT.has(token)
-        ? 0
-        : rawStep;
-    const l = clamp01(anchorL + dir * step * delta);
+    const step = dark ? DARK_SURFACE_STEPS[token] : LIGHT_SURFACE_STEPS[token];
+    const l = clamp01(anchorL + step * delta);
     const c = dark
       ? baseC
-      : baseC * (1 + (1 - l) * LIGHT_CHROMA_DEPTH_MULTIPLIER);
+      : l >= 1
+        ? 0
+        : baseC * (1 + (1 - l) * LIGHT_CHROMA_DEPTH_MULTIPLIER);
     const color: Oklch = {
       mode: 'oklch',
       l,

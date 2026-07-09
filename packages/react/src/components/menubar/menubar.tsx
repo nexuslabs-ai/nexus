@@ -46,7 +46,7 @@ function Menubar({ className, ...props }: MenubarProps) {
     <MenubarPrimitive.Root
       data-slot="menubar"
       className={cn(
-        'nx:flex nx:items-center nx:gap-1 nx:rounded-md nx:border-default nx:border-border-default nx:bg-background nx:p-1 nx:shadow-xs',
+        'nx:flex nx:items-center nx:gap-1 nx:rounded-md nx:border-default nx:border-border-default nx:bg-container nx:p-1 nx:shadow-xs',
         className
       )}
       {...props}
@@ -110,8 +110,8 @@ function MenubarTrigger({ className, ...props }: MenubarTriggerProps) {
       className={cn(
         'nx:flex nx:select-none nx:items-center nx:rounded-sm nx:px-2 nx:py-1',
         'nx:typography-label-default nx:outline-none',
-        'nx:focus:bg-background-hover nx:focus:text-foreground',
-        'nx:data-[state=open]:bg-background-hover nx:data-[state=open]:text-foreground',
+        'nx:focus:bg-container-hover nx:focus:text-foreground',
+        'nx:data-[state=open]:bg-container-hover nx:data-[state=open]:text-foreground',
         className
       )}
       {...props}

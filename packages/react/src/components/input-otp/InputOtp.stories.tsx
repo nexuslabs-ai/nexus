@@ -210,9 +210,11 @@ export const WithDataAttributes: Story = {
     const group = canvasElement.querySelector('[data-slot="input-otp-group"]');
     await expect(group).toBeInTheDocument();
 
-    await expect(
-      canvasElement.querySelectorAll('[data-slot="input-otp-slot"]').length
-    ).toBe(6);
+    const slots = canvasElement.querySelectorAll(
+      '[data-slot="input-otp-slot"]'
+    );
+    await expect(slots.length).toBe(6);
+    await expect(slots[0]).toHaveClass('nx:bg-container');
   },
 };
 

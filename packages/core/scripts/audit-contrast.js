@@ -178,11 +178,14 @@ const BRAND_PAIRS = [
   },
 ];
 
-// Categorical chart series must be readable as filled marks on every surface
-// they render on — both the page canvas (`background`) and raised containers
-// (`container`, since charts often live inside cards). UI tier (Lc 60) treats
-// chart marks like labels rather than fluent reading text.
-const CHART_SURFACES = ['background', 'container'];
+// Categorical chart series must be readable as filled marks on the surfaces
+// they render on. Under the Model 2 surface hierarchy the page `background`
+// is a tinted canvas that sits behind content — charts live inside Card/Panel
+// `container` surfaces, not on the raw page — so series are validated on
+// `container` only. That is the permanent Model 2 placement contract unless
+// charts are deliberately allowed to render directly on the page canvas again.
+// UI tier (Lc 60) treats chart marks like labels rather than fluent reading text.
+const CHART_SURFACES = ['container'];
 
 // Focus indicators target WCAG 2.2 SC 1.4.11 (3:1 non-text contrast),
 // which APCA encodes as the incidental tier (Lc 45). Pair against every

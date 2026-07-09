@@ -726,6 +726,10 @@ export const CloseButtonFocus: Story = {
       'nx:pointer-coarse:after:absolute',
       'nx:pointer-coarse:after:-inset-2.5'
     );
+    await expect(closeButton).toHaveClass(
+      'nx:hover:bg-container-hover',
+      'nx:focus-visible:bg-container-hover'
+    );
 
     await userEvent.keyboard('{Escape}');
     await waitFor(() => {

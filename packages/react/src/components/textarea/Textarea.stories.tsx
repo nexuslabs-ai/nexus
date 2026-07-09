@@ -380,7 +380,8 @@ export const WithDataAttributes: Story = {
 
     await expect(textarea).toHaveAttribute('data-slot', 'textarea');
     await expect(textarea).toHaveAttribute('data-variant', 'bordered');
-    await expect(textarea).toHaveClass('nx:enabled:hover:bg-background-hover');
+    await expect(textarea).toHaveClass('nx:bg-container');
+    await expect(textarea).toHaveClass('nx:enabled:hover:bg-container-hover');
   },
 };
 

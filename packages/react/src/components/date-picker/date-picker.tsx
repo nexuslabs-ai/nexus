@@ -189,7 +189,7 @@ function DatePicker({
         // range rail while a range is half-selected (wire via onDayMouseEnter).
         modifiersClassNames={{
           unavailable: 'nx:text-muted-foreground nx:line-through',
-          preview: 'nx:bg-background-hover',
+          preview: 'nx:bg-container-hover',
           ...modifiersClassNames,
         }}
         classNames={{

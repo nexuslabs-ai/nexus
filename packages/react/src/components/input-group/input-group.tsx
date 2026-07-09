@@ -40,7 +40,7 @@ const inputGroupVariants = cva(
     variants: {
       variant: {
         bordered:
-          'nx:border-border-default nx:bg-background nx:not-data-[disabled=true]:hover:bg-background-hover nx:data-[disabled=true]:border-border-disabled',
+          'nx:border-border-default nx:bg-container nx:not-data-[disabled=true]:hover:bg-container-hover nx:data-[disabled=true]:border-border-disabled',
         borderless:
           'nx:border-transparent nx:bg-control-background nx:not-data-[disabled=true]:hover:bg-control-background-hover',
       },
