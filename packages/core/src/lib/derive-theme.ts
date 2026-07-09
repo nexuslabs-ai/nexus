@@ -69,6 +69,13 @@ interface ContrastProfile {
 }
 
 const FOCUS_APCA_FLOOR = 45;
+const BLACK_BASE = 'oklch(0.1448 0 0)';
+const BLACK_A500 = 'oklch(0.1448 0 0 / 0.502)';
+const BLACK_A600 = 'oklch(0.1448 0 0 / 0.6275)';
+const BLACK_A900 = 'oklch(0.1448 0 0 / 0.9098)';
+const WHITE_BASE = 'oklch(1 0 0)';
+const WHITE_A600 = 'oklch(1 0 0 / 0.6275)';
+const WHITE_A900 = 'oklch(1 0 0 / 0.9098)';
 
 function anchoredContrastLerp(
   contrast: number,
@@ -217,7 +224,8 @@ const TEXT_ON: Record<string, { surface: string; tier: Tier; quiet: number }> =
 /** Text tiers, each guaranteed to clear its APCA floor on its surface. */
 export function deriveText(
   foregroundHex: string,
-  surfaces: TokenMap
+  surfaces: TokenMap,
+  mode: Mode
 ): TokenMap {
   const fg = seedOklch(foregroundHex);
   const out: TokenMap = {};
@@ -230,7 +238,13 @@ export function deriveText(
       quiet
     );
   }
-  return out;
+  return {
+    ...out,
+    '--nx-color-foreground': mode === 'dark' ? WHITE_A900 : BLACK_A900,
+    '--nx-color-muted-foreground': mode === 'dark' ? WHITE_A600 : BLACK_A600,
+    '--nx-color-muted-foreground-subtle':
+      mode === 'dark' ? WHITE_A600 : BLACK_A500,
+  };
 }
 
 /** Pick the on-color (black or white) with the higher APCA contrast against `bg`. */
@@ -314,11 +328,7 @@ const STATUS_FAMILIES = ['success', 'warning', 'error', 'information'] as const;
 function deriveStatus(mode: Mode): TokenMap {
   const out: TokenMap = {};
   for (const family of STATUS_FAMILIES) {
-    const solid: SolidShades =
-      family === 'warning'
-        ? { background: '700', hover: '800', active: '900' }
-        : {};
-    Object.assign(out, deriveFamily(family, STATUS_RAMP[family], mode, solid));
+    Object.assign(out, deriveFamily(family, STATUS_RAMP[family], mode));
   }
   return out;
 }
@@ -365,15 +375,25 @@ function deriveAlpha(
   };
 }
 
-function deriveFocus(mode: Mode, surfaces: TokenMap): TokenMap {
+function deriveFocus(
+  mode: Mode,
+  surfaces: TokenMap,
+  primary: TokenMap
+): TokenMap {
   const errorSeed = STATUS_RAMP.error[mode === 'dark' ? '300' : '600'];
   const background =
     surfaces['--nx-color-background'] ??
     (mode === 'dark' ? 'oklch(0 0 0)' : 'oklch(1 0 0)');
+  const primaryFocus = primary['--nx-color-primary-subtle-foreground'];
+
+  if (primaryFocus === undefined) {
+    throw new Error(
+      'deriveFocus: missing --nx-color-primary-subtle-foreground'
+    );
+  }
 
   return {
-    '--nx-color-focus-default':
-      mode === 'dark' ? 'oklch(1 0 0)' : 'oklch(0.1448 0 0)',
+    '--nx-color-focus-default': primaryFocus,
     '--nx-color-focus-error': apcaSafeAgainst(errorSeed, background, mode),
   };
 }
@@ -454,6 +474,9 @@ function stateFillLightness(
   c: number,
   h: number
 ): number {
+  if (apcaLc(label, seedFill(target, c, h)) >= TIER_THRESHOLDS.ui) {
+    return target;
+  }
   const dir = target >= baseL ? 1 : -1;
   const span = Math.round(Math.abs(target - baseL) * 100);
   for (let s = span; s >= 1; s -= 1) {
@@ -501,8 +524,18 @@ export function derivePrimary(accentHex: string, mode: Mode): TokenMap {
   );
   const background = seedFill(fillL, c, h);
   const label = readableOn(background);
+  const endpointBrand =
+    c <= 0.005 && (seed.l ?? 0) <= PRIMARY_DARK_ENDPOINT_LIFT_FLOOR;
   return {
     ...deriveFamily('primary', rampFromSeed(accentHex), mode),
+    ...(endpointBrand
+      ? {
+          '--nx-color-primary-subtle-foreground':
+            mode === 'dark' ? WHITE_BASE : BLACK_BASE,
+          '--nx-color-primary-foreground':
+            mode === 'dark' ? BLACK_BASE : WHITE_BASE,
+        }
+      : {}),
     '--nx-color-primary-background': background,
     '--nx-color-primary-background-hover': seedFill(
       stateFillLightness(fillL, hoverFillTarget(fillL), label, c, h),
@@ -514,7 +547,8 @@ export function derivePrimary(accentHex: string, mode: Mode): TokenMap {
       c,
       h
     ),
-    '--nx-color-primary-foreground': label,
+    '--nx-color-primary-foreground':
+      endpointBrand && mode === 'dark' ? BLACK_BASE : label,
   };
 }
 
@@ -547,13 +581,13 @@ function deriveMode(
     mode,
     profile.surfaceDelta
   );
-  const text = deriveText(seeds.foreground, surfaces);
+  const text = deriveText(seeds.foreground, surfaces, mode);
   const primary = derivePrimary(seeds.accent, mode);
   const secondary = deriveSecondary(mode);
   const status = deriveStatus(mode);
   const chart = deriveChart(mode);
   const alpha = deriveAlpha(surfaceTone, mode, profile);
-  const focus = deriveFocus(mode, surfaces);
+  const focus = deriveFocus(mode, surfaces, primary);
   return {
     ...surfaces,
     ...text,

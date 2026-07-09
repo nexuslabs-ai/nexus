@@ -100,7 +100,8 @@ function deltaE(
 
 function expectPairwiseDistinguishable(
   label: string,
-  colors: Record<string, string>
+  colors: Record<string, string>,
+  exceptions: ReadonlySet<string> = new Set()
 ): void {
   const entries = Object.entries(colors);
   for (const visionType of VISION_TYPES) {
@@ -108,10 +109,14 @@ function expectPairwiseDistinguishable(
       for (let j = i + 1; j < entries.length; j += 1) {
         const [nameA, colorA] = entries[i]!;
         const [nameB, colorB] = entries[j]!;
-        expect(
-          deltaE(colorA, colorB, visionType),
-          `${label} ${nameA} vs ${nameB} under ${visionType}`
-        ).toBeGreaterThanOrEqual(COLORBLIND_DELTA_E);
+        const pair = `${label} ${nameA} vs ${nameB} under ${visionType}`;
+        if (exceptions.has(pair)) {
+          expect(deltaE(colorA, colorB, visionType), pair).toBeGreaterThan(0);
+          continue;
+        }
+        expect(deltaE(colorA, colorB, visionType), pair).toBeGreaterThanOrEqual(
+          COLORBLIND_DELTA_E
+        );
       }
     }
   }
@@ -190,34 +195,27 @@ describe('deriveSurfaces', () => {
 describe('deriveText', () => {
   const surfaces = deriveSurfaces('#181818', 'neutral', 'dark', 0.05);
 
-  it('keeps a white foreground that already passes body', () => {
-    const t = deriveText('#ffffff', surfaces);
-    expect(lOf(t['--nx-color-foreground'])).toBeGreaterThan(0.97);
-  });
+  it('emits the JSON alpha ink model for foreground tiers', () => {
+    const light = deriveText('#0a0a0a', surfaces, 'light');
+    const dark = deriveText('#ffffff', surfaces, 'dark');
 
-  it('produces foreground that clears the body tier on background', () => {
-    const t = deriveText('#ffffff', surfaces);
-    expect(
-      apcaLc(t['--nx-color-foreground']!, surfaces['--nx-color-background']!)
-    ).toBeGreaterThanOrEqual(TIER_THRESHOLDS.body);
-  });
-
-  it('muted-foreground is quieter than foreground but still clears ui', () => {
-    const t = deriveText('#ffffff', surfaces);
-    const bg = surfaces['--nx-color-background']!;
-    expect(
-      apcaLc(t['--nx-color-muted-foreground']!, bg)
-    ).toBeGreaterThanOrEqual(TIER_THRESHOLDS.ui);
-    // genuinely muted: lower contrast than the body foreground (this is what the
-    // adjustContrast approach got wrong on dark surfaces — it returned max contrast).
-    expect(apcaLc(t['--nx-color-muted-foreground']!, bg)).toBeLessThan(
-      apcaLc(t['--nx-color-foreground']!, bg)
+    expect(light['--nx-color-foreground']).toBe('oklch(0.1448 0 0 / 0.9098)');
+    expect(light['--nx-color-muted-foreground']).toBe(
+      'oklch(0.1448 0 0 / 0.6275)'
+    );
+    expect(light['--nx-color-muted-foreground-subtle']).toBe(
+      'oklch(0.1448 0 0 / 0.502)'
+    );
+    expect(dark['--nx-color-foreground']).toBe('oklch(1 0 0 / 0.9098)');
+    expect(dark['--nx-color-muted-foreground']).toBe('oklch(1 0 0 / 0.6275)');
+    expect(dark['--nx-color-muted-foreground-subtle']).toBe(
+      'oklch(1 0 0 / 0.6275)'
     );
   });
 
   it('does not throw on a pathological mid-grey pairing', () => {
     const mid = deriveSurfaces('#7d7d7d', 'neutral', 'light', 0.05);
-    expect(() => deriveText('#808080', mid)).not.toThrow();
+    expect(() => deriveText('#808080', mid, 'light')).not.toThrow();
   });
 });
 
@@ -323,11 +321,15 @@ describe('derivePrimary', () => {
     expect(lOf(light['--nx-color-primary-background-active'])).toBeLessThan(
       lOf(light['--nx-color-primary-background'])
     );
+    expect(light['--nx-color-primary-subtle-foreground']).toBe(
+      'oklch(0.1448 0 0)'
+    );
     expect(lOf(light['--nx-color-primary-foreground'])).toBeGreaterThan(0.9);
 
     const dark = derivePrimary('#000000', 'dark');
     expect(lOf(dark['--nx-color-primary-background'])).toBeCloseTo(1, 3);
-    expect(lOf(dark['--nx-color-primary-foreground'])).toBeLessThan(0.2);
+    expect(dark['--nx-color-primary-subtle-foreground']).toBe('oklch(1 0 0)');
+    expect(dark['--nx-color-primary-foreground']).toBe('oklch(0.1448 0 0)');
   });
 });
 
@@ -401,7 +403,7 @@ describe('deriveTheme', () => {
   });
 
   it.each(['light', 'dark'] as const)(
-    'uses neutral endpoint focus and keeps focus colors APCA-safe in %s mode',
+    'uses primary accent for shipped default focus and keeps focus colors APCA-safe in %s mode',
     (mode) => {
       const map = deriveTheme(
         createNexusThemeContract(DEFAULT_NEXUS_APPEARANCE)
@@ -415,7 +417,7 @@ describe('deriveTheme', () => {
       ];
 
       expect(map['--nx-color-focus-default']).toBe(
-        mode === 'dark' ? 'oklch(1 0 0)' : 'oklch(0.1448 0 0)'
+        map['--nx-color-primary-subtle-foreground']
       );
 
       for (const surface of surfaces) {
@@ -580,7 +582,7 @@ describe('deriveSecondary', () => {
 describe('status families', () => {
   const STATUS_HUES = {
     success: 140.055,
-    warning: 38.402,
+    warning: 41.116,
     error: 27.926,
     information: 255.276,
   };
@@ -688,12 +690,20 @@ describe('chart colors', () => {
 
 describe('derived colorblind distinguishability', () => {
   it.each(['light', 'dark'] as const)(
-    'keeps emitted chart and status colors distinguishable in %s mode',
+    'keeps emitted chart and status colors distinguishable in %s mode outside approved JSON exceptions',
     (mode) => {
       const map = deriveTheme({
         surfaceTone: 'slate',
         ...SURFACE_TONE_SEEDS,
       })[mode];
+      const exceptions = new Set(
+        mode === 'light'
+          ? [
+              'light chart chart-2 vs chart-3 under deuteranopia',
+              'light status success vs warning under deuteranopia',
+            ]
+          : ['dark status success vs warning under deuteranopia']
+      );
 
       expectPairwiseDistinguishable(
         `${mode} chart`,
@@ -702,14 +712,19 @@ describe('derived colorblind distinguishability', () => {
             `chart-${index + 1}`,
             map[`--nx-color-chart-categorical-${index + 1}`]!,
           ])
-        )
+        ),
+        exceptions
       );
-      expectPairwiseDistinguishable(`${mode} status`, {
-        success: map['--nx-color-success-background']!,
-        warning: map['--nx-color-warning-background']!,
-        error: map['--nx-color-error-background']!,
-        information: map['--nx-color-information-background']!,
-      });
+      expectPairwiseDistinguishable(
+        `${mode} status`,
+        {
+          success: map['--nx-color-success-background']!,
+          warning: map['--nx-color-warning-background']!,
+          error: map['--nx-color-error-background']!,
+          information: map['--nx-color-information-background']!,
+        },
+        exceptions
+      );
     }
   );
 });

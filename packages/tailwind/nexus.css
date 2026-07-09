@@ -394,7 +394,7 @@
   );
   --color-warning-background: var(
     --nx-color-warning-background,
-    var(--nx-color-orange-700)
+    var(--nx-color-orange-600)
   );
   --color-warning-foreground: var(
     --nx-color-warning-foreground,
@@ -402,11 +402,11 @@
   );
   --color-warning-background-hover: var(
     --nx-color-warning-background-hover,
-    var(--nx-color-orange-800)
+    var(--nx-color-orange-700)
   );
   --color-warning-background-active: var(
     --nx-color-warning-background-active,
-    var(--nx-color-orange-900)
+    var(--nx-color-orange-800)
   );
   --color-warning-disabled: var(
     --nx-color-warning-disabled,
@@ -434,7 +434,7 @@
   );
   --color-chart-categorical-2: var(
     --nx-color-chart-categorical-2,
-    var(--nx-color-lime-900)
+    var(--nx-color-lime-700)
   );
   --color-chart-categorical-3: var(
     --nx-color-chart-categorical-3,
@@ -789,7 +789,7 @@
   );
   --color-warning-background: var(
     --nx-color-warning-background,
-    var(--nx-color-orange-700)
+    var(--nx-color-orange-600)
   );
   --color-warning-foreground: var(
     --nx-color-warning-foreground,
@@ -797,11 +797,11 @@
   );
   --color-warning-background-hover: var(
     --nx-color-warning-background-hover,
-    var(--nx-color-orange-800)
+    var(--nx-color-orange-700)
   );
   --color-warning-background-active: var(
     --nx-color-warning-background-active,
-    var(--nx-color-orange-900)
+    var(--nx-color-orange-800)
   );
   --color-warning-disabled: var(
     --nx-color-warning-disabled,
@@ -829,7 +829,7 @@
   );
   --color-chart-categorical-2: var(
     --nx-color-chart-categorical-2,
-    var(--nx-color-lime-900)
+    var(--nx-color-lime-700)
   );
   --color-chart-categorical-3: var(
     --nx-color-chart-categorical-3,
@@ -1002,10 +1002,10 @@
   --nx-color-information-subtle-foreground: var(--nx-color-blue-300);
   --nx-color-information-subtle-hover: var(--nx-color-blue-900);
   --nx-color-information-subtle-active: var(--nx-color-blue-800);
-  --nx-color-warning-background: var(--nx-color-orange-700);
+  --nx-color-warning-background: var(--nx-color-orange-600);
   --nx-color-warning-foreground: var(--nx-color-white-base);
-  --nx-color-warning-background-hover: var(--nx-color-orange-800);
-  --nx-color-warning-background-active: var(--nx-color-orange-900);
+  --nx-color-warning-background-hover: var(--nx-color-orange-700);
+  --nx-color-warning-background-active: var(--nx-color-orange-800);
   --nx-color-warning-disabled: var(--nx-color-orange-900);
   --nx-color-warning-subtle: var(--nx-color-orange-950);
   --nx-color-warning-subtle-foreground: var(--nx-color-orange-200);

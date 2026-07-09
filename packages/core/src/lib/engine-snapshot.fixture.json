@@ -89,15 +89,15 @@
         "alpha": 1
       },
       "chart-categorical-1": {
-        "l": 0.62,
-        "c": 0.1405,
-        "h": 184.704,
+        "l": 0.52,
+        "c": 0.1168,
+        "h": 186.391,
         "alpha": 1
       },
       "chart-categorical-2": {
-        "l": 0.37,
-        "c": 0.1125,
-        "h": 131.063,
+        "l": 0.61,
+        "c": 0.1871,
+        "h": 131.589,
         "alpha": 1
       },
       "chart-categorical-3": {
@@ -196,6 +196,12 @@
         "h": 27.926,
         "alpha": 1
       },
+      "foreground": {
+        "l": 0.1448,
+        "c": 0,
+        "h": 0,
+        "alpha": 0.9098
+      },
       "information-background": {
         "l": 0.546,
         "c": 0.2205,
@@ -250,6 +256,18 @@
         "h": 257.472,
         "alpha": 1
       },
+      "muted-foreground": {
+        "l": 0.1448,
+        "c": 0,
+        "h": 0,
+        "alpha": 0.6275
+      },
+      "muted-foreground-subtle": {
+        "l": 0.1448,
+        "c": 0,
+        "h": 0,
+        "alpha": 0.502
+      },
       "popover": {
         "l": 1,
         "c": 0,
@@ -269,13 +287,13 @@
         "alpha": 1
       },
       "primary-background-active": {
-        "l": 0.1148,
+        "l": 0.118,
         "c": 0,
         "h": 0,
         "alpha": 1
       },
       "primary-background-hover": {
-        "l": 0.2048,
+        "l": 0.207,
         "c": 0,
         "h": 0,
         "alpha": 1
@@ -305,7 +323,7 @@
         "alpha": 1
       },
       "primary-subtle-foreground": {
-        "l": 0.46,
+        "l": 0.1448,
         "c": 0,
         "h": 0,
         "alpha": 1
@@ -425,21 +443,21 @@
         "alpha": 1
       },
       "warning-background": {
-        "l": 0.52,
-        "c": 0.1809,
-        "h": 38.402,
+        "l": 0.62,
+        "c": 0.2044,
+        "h": 41.116,
         "alpha": 1
       },
       "warning-background-active": {
-        "l": 0.34,
-        "c": 0.1188,
-        "h": 38.172,
-        "alpha": 1
-      },
-      "warning-background-hover": {
         "l": 0.43,
         "c": 0.153,
         "h": 37.304,
+        "alpha": 1
+      },
+      "warning-background-hover": {
+        "l": 0.52,
+        "c": 0.1809,
+        "h": 38.402,
         "alpha": 1
       },
       "warning-disabled": {
@@ -660,6 +678,12 @@
         "h": 28.058,
         "alpha": 1
       },
+      "foreground": {
+        "l": 1,
+        "c": 0,
+        "h": 0,
+        "alpha": 0.9098
+      },
       "information-background": {
         "l": 0.546,
         "c": 0.2205,
@@ -714,6 +738,18 @@
         "h": 254.902,
         "alpha": 1
       },
+      "muted-foreground": {
+        "l": 1,
+        "c": 0,
+        "h": 0,
+        "alpha": 0.6275
+      },
+      "muted-foreground-subtle": {
+        "l": 1,
+        "c": 0,
+        "h": 0,
+        "alpha": 0.6275
+      },
       "primary-background": {
         "l": 1,
         "c": 0,
@@ -727,7 +763,7 @@
         "alpha": 1
       },
       "primary-background-hover": {
-        "l": 0.94,
+        "l": 0.945,
         "c": 0,
         "h": 0,
         "alpha": 1
@@ -739,7 +775,7 @@
         "alpha": 1
       },
       "primary-foreground": {
-        "l": 0,
+        "l": 0.1448,
         "c": 0,
         "h": 0,
         "alpha": 1
@@ -757,7 +793,7 @@
         "alpha": 1
       },
       "primary-subtle-foreground": {
-        "l": 0.765,
+        "l": 1,
         "c": 0,
         "h": 0,
         "alpha": 1
@@ -877,21 +913,21 @@
         "alpha": 1
       },
       "warning-background": {
-        "l": 0.52,
-        "c": 0.1809,
-        "h": 38.402,
+        "l": 0.62,
+        "c": 0.2044,
+        "h": 41.116,
         "alpha": 1
       },
       "warning-background-active": {
-        "l": 0.34,
-        "c": 0.1188,
-        "h": 38.172,
-        "alpha": 1
-      },
-      "warning-background-hover": {
         "l": 0.43,
         "c": 0.153,
         "h": 37.304,
+        "alpha": 1
+      },
+      "warning-background-hover": {
+        "l": 0.52,
+        "c": 0.1809,
+        "h": 38.402,
         "alpha": 1
       },
       "warning-disabled": {
@@ -1007,28 +1043,10 @@
           "h": 56.043,
           "alpha": 1
         },
-        "foreground": {
-          "l": 0.2161,
-          "c": 0.0061,
-          "h": 56.043,
-          "alpha": 1
-        },
         "muted": {
           "l": 0.9698,
           "c": 0.0083,
           "h": 70,
-          "alpha": 1
-        },
-        "muted-foreground": {
-          "l": 0.5297,
-          "c": 0.0061,
-          "h": 56.043,
-          "alpha": 1
-        },
-        "muted-foreground-subtle": {
-          "l": 0.6306,
-          "c": 0.0061,
-          "h": 56.043,
           "alpha": 1
         },
         "nav-background": {
@@ -1183,28 +1201,10 @@
           "h": 106.424,
           "alpha": 1
         },
-        "foreground": {
-          "l": 0.9848,
-          "c": 0.0013,
-          "h": 106.424,
-          "alpha": 1
-        },
         "muted": {
           "l": 0.3057,
           "c": 0.006,
           "h": 70,
-          "alpha": 1
-        },
-        "muted-foreground": {
-          "l": 0.8311,
-          "c": 0.0013,
-          "h": 106.424,
-          "alpha": 1
-        },
-        "muted-foreground-subtle": {
-          "l": 0.7471,
-          "c": 0.0013,
-          "h": 106.424,
           "alpha": 1
         },
         "nav-background": {
@@ -1361,26 +1361,8 @@
           "h": 0,
           "alpha": 1
         },
-        "foreground": {
-          "l": 0.2046,
-          "c": 0,
-          "h": 0,
-          "alpha": 1
-        },
         "muted": {
           "l": 0.9698,
-          "c": 0,
-          "h": 0,
-          "alpha": 1
-        },
-        "muted-foreground": {
-          "l": 0.5228,
-          "c": 0,
-          "h": 0,
-          "alpha": 1
-        },
-        "muted-foreground-subtle": {
-          "l": 0.6255,
           "c": 0,
           "h": 0,
           "alpha": 1
@@ -1537,26 +1519,8 @@
           "h": 0,
           "alpha": 1
         },
-        "foreground": {
-          "l": 0.9851,
-          "c": 0,
-          "h": 0,
-          "alpha": 1
-        },
         "muted": {
           "l": 0.2942,
-          "c": 0,
-          "h": 0,
-          "alpha": 1
-        },
-        "muted-foreground": {
-          "l": 0.829,
-          "c": 0,
-          "h": 0,
-          "alpha": 1
-        },
-        "muted-foreground-subtle": {
-          "l": 0.7433,
           "c": 0,
           "h": 0,
           "alpha": 1
@@ -1715,28 +1679,10 @@
           "h": 285.885,
           "alpha": 1
         },
-        "foreground": {
-          "l": 0.2103,
-          "c": 0.0059,
-          "h": 285.885,
-          "alpha": 1
-        },
         "muted": {
           "l": 0.9698,
           "c": 0.0052,
           "h": 262.8,
-          "alpha": 1
-        },
-        "muted-foreground": {
-          "l": 0.5262,
-          "c": 0.0059,
-          "h": 285.885,
-          "alpha": 1
-        },
-        "muted-foreground-subtle": {
-          "l": 0.628,
-          "c": 0.0059,
-          "h": 285.885,
           "alpha": 1
         },
         "nav-background": {
@@ -1891,28 +1837,10 @@
           "h": 0,
           "alpha": 1
         },
-        "foreground": {
-          "l": 0.9851,
-          "c": 0,
-          "h": 0,
-          "alpha": 1
-        },
         "muted": {
           "l": 0.2999,
           "c": 0.005,
           "h": 262.8,
-          "alpha": 1
-        },
-        "muted-foreground": {
-          "l": 0.8301,
-          "c": 0,
-          "h": 0,
-          "alpha": 1
-        },
-        "muted-foreground-subtle": {
-          "l": 0.7453,
-          "c": 0,
-          "h": 0,
           "alpha": 1
         },
         "nav-background": {
@@ -2069,28 +1997,10 @@
           "h": 265.755,
           "alpha": 1
         },
-        "foreground": {
-          "l": 0.2077,
-          "c": 0.0398,
-          "h": 265.755,
-          "alpha": 1
-        },
         "muted": {
           "l": 0.9698,
           "c": 0.0115,
           "h": 264.7,
-          "alpha": 1
-        },
-        "muted-foreground": {
-          "l": 0.5246,
-          "c": 0.0398,
-          "h": 265.755,
-          "alpha": 1
-        },
-        "muted-foreground-subtle": {
-          "l": 0.6268,
-          "c": 0.0398,
-          "h": 265.755,
           "alpha": 1
         },
         "nav-background": {
@@ -2245,28 +2155,10 @@
           "h": 247.858,
           "alpha": 1
         },
-        "foreground": {
-          "l": 0.9842,
-          "c": 0.0034,
-          "h": 247.858,
-          "alpha": 1
-        },
         "muted": {
           "l": 0.2973,
           "c": 0.04,
           "h": 264.7,
-          "alpha": 1
-        },
-        "muted-foreground": {
-          "l": 0.8289,
-          "c": 0.0034,
-          "h": 247.858,
-          "alpha": 1
-        },
-        "muted-foreground-subtle": {
-          "l": 0.7438,
-          "c": 0.0034,
-          "h": 247.858,
           "alpha": 1
         },
         "nav-background": {
@@ -2423,28 +2315,10 @@
           "h": 264.665,
           "alpha": 1
         },
-        "foreground": {
-          "l": 0.2101,
-          "c": 0.0318,
-          "h": 264.665,
-          "alpha": 1
-        },
         "muted": {
           "l": 0.9698,
           "c": 0.0083,
           "h": 261.7,
-          "alpha": 1
-        },
-        "muted-foreground": {
-          "l": 0.5261,
-          "c": 0.0318,
-          "h": 264.665,
-          "alpha": 1
-        },
-        "muted-foreground-subtle": {
-          "l": 0.6279,
-          "c": 0.0318,
-          "h": 264.665,
           "alpha": 1
         },
         "nav-background": {
@@ -2599,28 +2473,10 @@
           "h": 247.839,
           "alpha": 1
         },
-        "foreground": {
-          "l": 0.9846,
-          "c": 0.0017,
-          "h": 247.839,
-          "alpha": 1
-        },
         "muted": {
           "l": 0.2997,
           "c": 0.027,
           "h": 261.7,
-          "alpha": 1
-        },
-        "muted-foreground": {
-          "l": 0.8297,
-          "c": 0.0017,
-          "h": 247.839,
-          "alpha": 1
-        },
-        "muted-foreground-subtle": {
-          "l": 0.7449,
-          "c": 0.0017,
-          "h": 247.839,
           "alpha": 1
         },
         "nav-background": {

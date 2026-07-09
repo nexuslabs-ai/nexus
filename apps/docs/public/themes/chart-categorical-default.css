@@ -2,7 +2,7 @@
 
 html {
   --nx-color-chart-categorical-1: var(--nx-color-teal-600);
-  --nx-color-chart-categorical-2: var(--nx-color-lime-900);
+  --nx-color-chart-categorical-2: var(--nx-color-lime-700);
   --nx-color-chart-categorical-3: var(--nx-color-orange-600);
   --nx-color-chart-categorical-4: var(--nx-color-rose-600);
   --nx-color-chart-categorical-5: var(--nx-color-indigo-600);

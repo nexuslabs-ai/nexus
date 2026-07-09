@@ -333,8 +333,8 @@ describe('engine color tables match ground color.json primitives', () => {
 
   it('chart-light/dark sets equal their ground primitives', () => {
     const lightPrimitives = [
-      ['teal', '600'],
-      ['lime', '900'],
+      ['teal', '700'],
+      ['lime', '700'],
       ['orange', '600'],
       ['rose', '600'],
       ['indigo', '600'],
