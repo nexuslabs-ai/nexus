@@ -23,7 +23,7 @@ const inputVariants = cva(
       },
       variant: {
         bordered:
-          'nx:border-color-default nx:bg-background nx:enabled:hover:bg-background-hover nx:disabled:border-color-disabled',
+          'nx:border-border-default nx:bg-background nx:enabled:hover:bg-background-hover nx:disabled:border-border-disabled',
         borderless:
           'nx:border-transparent nx:bg-control-background nx:enabled:hover:bg-control-background-hover',
       },

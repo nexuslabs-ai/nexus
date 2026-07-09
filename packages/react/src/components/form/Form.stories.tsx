@@ -58,7 +58,7 @@ function SignUpForm({
             <FormItem>
               <FormLabel>Username</FormLabel>
               <FormControl>
-                <Input variant="bordered" placeholder="janedoe" {...field} />
+                <Input placeholder="janedoe" {...field} />
               </FormControl>
               <FormDescription>Your public display name.</FormDescription>
               <FormMessage />
@@ -72,12 +72,7 @@ function SignUpForm({
             <FormItem>
               <FormLabel>Email</FormLabel>
               <FormControl>
-                <Input
-                  type="email"
-                  variant="bordered"
-                  placeholder="jane@example.com"
-                  {...field}
-                />
+                <Input type="email" placeholder="jane@example.com" {...field} />
               </FormControl>
               <FormDescription>Used for sign-in and receipts.</FormDescription>
               <FormMessage />
@@ -108,7 +103,7 @@ function UsernameForm({ extraDescriptionId }: { extraDescriptionId?: string }) {
             <FormItem>
               <FormLabel>Username</FormLabel>
               <FormControl aria-describedby={extraDescriptionId}>
-                <Input variant="bordered" placeholder="janedoe" {...field} />
+                <Input placeholder="janedoe" {...field} />
               </FormControl>
               <FormDescription>Your public display name.</FormDescription>
               <FormMessage />
@@ -139,7 +134,7 @@ function MessageLessErrorForm() {
             <FormItem>
               <FormLabel>Invite code</FormLabel>
               <FormControl>
-                <Input variant="bordered" placeholder="NX-123" {...field} />
+                <Input placeholder="NX-123" {...field} />
               </FormControl>
               <FormMessage />
             </FormItem>
@@ -177,11 +172,7 @@ function AnatomyForm() {
             <FormItem>
               <FormLabel>Label, control, description</FormLabel>
               <FormControl>
-                <Input
-                  variant="bordered"
-                  placeholder="Standard field"
-                  {...field}
-                />
+                <Input placeholder="Standard field" {...field} />
               </FormControl>
               <FormDescription>Helper text under the control.</FormDescription>
             </FormItem>
@@ -194,11 +185,7 @@ function AnatomyForm() {
             <FormItem>
               <FormLabel>Label and control</FormLabel>
               <FormControl>
-                <Input
-                  variant="bordered"
-                  placeholder="Compact field"
-                  {...field}
-                />
+                <Input placeholder="Compact field" {...field} />
               </FormControl>
               <FormDescription>Descriptions remain optional.</FormDescription>
             </FormItem>
@@ -211,7 +198,7 @@ function AnatomyForm() {
             <FormItem>
               <FormLabel>Disabled control</FormLabel>
               <FormControl>
-                <Input disabled variant="bordered" {...field} />
+                <Input disabled {...field} />
               </FormControl>
               <FormDescription>The control can be disabled.</FormDescription>
             </FormItem>
@@ -266,7 +253,6 @@ function FieldVsFormErgonomicsExample() {
                   <FormControl>
                     <Input
                       type="email"
-                      variant="bordered"
                       placeholder="jane@example.com"
                       {...field}
                     />
@@ -546,15 +532,11 @@ export const WithDataAttributes: Story = {
     const input = canvas.getByLabelText('Username');
     await expect(input).toHaveAttribute('id', label.getAttribute('for'));
     await expect(input).toHaveAttribute('data-variant', 'bordered');
-    await expect(input).not.toHaveAttribute('data-variant', 'borderless');
     await expect(input).toHaveAttribute(
       'aria-describedby',
       description.getAttribute('id')
     );
     await expect(input).not.toHaveAttribute('aria-errormessage');
-    await expect(
-      canvasElement.querySelector('[data-variant="borderless"]')
-    ).not.toBeInTheDocument();
 
     await expect(
       canvasElement.querySelector('[data-slot="form-item"]')

@@ -72,7 +72,7 @@ export function ProfileTab() {
                   <FormItem>
                     <FormLabel>First name</FormLabel>
                     <FormControl>
-                      <Input variant="bordered" placeholder="Ada" {...field} />
+                      <Input placeholder="Ada" {...field} />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -85,11 +85,7 @@ export function ProfileTab() {
                   <FormItem>
                     <FormLabel>Last name</FormLabel>
                     <FormControl>
-                      <Input
-                        variant="bordered"
-                        placeholder="Lovelace"
-                        {...field}
-                      />
+                      <Input placeholder="Lovelace" {...field} />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -106,7 +102,6 @@ export function ProfileTab() {
                   <FormControl>
                     <Input
                       type="email"
-                      variant="bordered"
                       placeholder="you@example.com"
                       {...field}
                     />
@@ -126,7 +121,7 @@ export function ProfileTab() {
                 <FormItem>
                   <FormLabel>Username</FormLabel>
                   <FormControl>
-                    <Input variant="bordered" placeholder="ada" {...field} />
+                    <Input placeholder="ada" {...field} />
                   </FormControl>
                   <FormDescription>Your public display name.</FormDescription>
                   <FormMessage />
@@ -142,7 +137,6 @@ export function ProfileTab() {
                   <FormLabel>Bio</FormLabel>
                   <FormControl>
                     <Textarea
-                      variant="bordered"
                       placeholder="Tell us a little about yourself"
                       {...field}
                     />

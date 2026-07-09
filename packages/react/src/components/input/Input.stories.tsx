@@ -164,7 +164,9 @@ export const BorderlessStates: Story = {
 
     await expect(disabled).toBeDisabled();
     await expect(disabled).toHaveClass('nx:disabled:bg-disabled');
-    await expect(disabled).not.toHaveClass('nx:disabled:border-color-disabled');
+    await expect(disabled).not.toHaveClass(
+      'nx:disabled:border-border-disabled'
+    );
   },
 };
 
@@ -519,7 +521,7 @@ export const VisualStateTokens: Story = {
       'nx:disabled:placeholder:text-disabled-foreground'
     );
     await expect(disabledEmpty).toHaveClass(
-      'nx:disabled:border-color-disabled'
+      'nx:disabled:border-border-disabled'
     );
     // Disabled uses a token color, not opacity-50 — opacity stays 1.
     await expect(window.getComputedStyle(disabledEmpty).opacity).toBe('1');
