@@ -291,7 +291,7 @@
   },
   "warning": {
     "background": {
-      "$value": "{orange.600}",
+      "$value": "{orange.700}",
       "$type": "color"
     },
     "foreground": {
@@ -299,11 +299,11 @@
       "$type": "color"
     },
     "background-hover": {
-      "$value": "{orange.700}",
+      "$value": "{orange.800}",
       "$type": "color"
     },
     "background-active": {
-      "$value": "{orange.800}",
+      "$value": "{orange.900}",
       "$type": "color"
     },
     "disabled": {

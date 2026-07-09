@@ -7,7 +7,7 @@
         "$description": "Categorical chart series 1 — teal (light theme)"
       },
       "2": {
-        "$value": "{lime.700}",
+        "$value": "{lime.900}",
         "$type": "color",
         "$description": "Categorical chart series 2 — lime (light theme)"
       },

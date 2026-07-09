@@ -42,8 +42,8 @@ function mockSystemPrefersDark(matches: boolean): void {
 }
 
 describe('NexusAppearanceSnapshot', () => {
-  it('uses snapshot version 4 for split light/dark contrast', () => {
-    expect(SNAPSHOT_VERSION).toBe(4);
+  it('uses snapshot version 5 for token value adjudication', () => {
+    expect(SNAPSHOT_VERSION).toBe(5);
   });
 
   it('stores pre-derived CSS verbatim', () => {

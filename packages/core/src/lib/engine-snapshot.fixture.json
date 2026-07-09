@@ -89,15 +89,15 @@
         "alpha": 1
       },
       "chart-categorical-1": {
-        "l": 0.52,
-        "c": 0.1168,
-        "h": 186.391,
+        "l": 0.62,
+        "c": 0.1405,
+        "h": 184.704,
         "alpha": 1
       },
       "chart-categorical-2": {
-        "l": 0.52,
-        "c": 0.1871,
-        "h": 140.022,
+        "l": 0.37,
+        "c": 0.1125,
+        "h": 131.063,
         "alpha": 1
       },
       "chart-categorical-3": {
@@ -185,7 +185,7 @@
         "alpha": 1
       },
       "focus-default": {
-        "l": 0.46,
+        "l": 0.1448,
         "c": 0,
         "h": 0,
         "alpha": 1
@@ -269,13 +269,13 @@
         "alpha": 1
       },
       "primary-background-active": {
-        "l": 0.2448,
+        "l": 0.1148,
         "c": 0,
         "h": 0,
         "alpha": 1
       },
       "primary-background-hover": {
-        "l": 0.1948,
+        "l": 0.2048,
         "c": 0,
         "h": 0,
         "alpha": 1
@@ -649,7 +649,7 @@
         "alpha": 1
       },
       "focus-default": {
-        "l": 0.765,
+        "l": 1,
         "c": 0,
         "h": 0,
         "alpha": 1
@@ -715,19 +715,19 @@
         "alpha": 1
       },
       "primary-background": {
-        "l": 0.9104,
+        "l": 1,
         "c": 0,
         "h": 0,
         "alpha": 1
       },
       "primary-background-active": {
-        "l": 0.8104,
+        "l": 0.87,
         "c": 0,
         "h": 0,
         "alpha": 1
       },
       "primary-background-hover": {
-        "l": 0.8604,
+        "l": 0.94,
         "c": 0,
         "h": 0,
         "alpha": 1

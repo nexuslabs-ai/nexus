@@ -320,10 +320,13 @@ describe('derivePrimary', () => {
   it('keeps a black brand black in light mode and flips it to white in dark mode', () => {
     const light = derivePrimary('#0a0a0a', 'light');
     expect(lOf(light['--nx-color-primary-background'])).toBeLessThan(0.2);
+    expect(lOf(light['--nx-color-primary-background-active'])).toBeLessThan(
+      lOf(light['--nx-color-primary-background'])
+    );
     expect(lOf(light['--nx-color-primary-foreground'])).toBeGreaterThan(0.9);
 
     const dark = derivePrimary('#000000', 'dark');
-    expect(lOf(dark['--nx-color-primary-background'])).toBeGreaterThan(0.9);
+    expect(lOf(dark['--nx-color-primary-background'])).toBeCloseTo(1, 3);
     expect(lOf(dark['--nx-color-primary-foreground'])).toBeLessThan(0.2);
   });
 });
@@ -398,7 +401,7 @@ describe('deriveTheme', () => {
   });
 
   it.each(['light', 'dark'] as const)(
-    'uses primary accent for shipped default focus and keeps focus colors APCA-safe in %s mode',
+    'uses neutral endpoint focus and keeps focus colors APCA-safe in %s mode',
     (mode) => {
       const map = deriveTheme(
         createNexusThemeContract(DEFAULT_NEXUS_APPEARANCE)
@@ -412,7 +415,7 @@ describe('deriveTheme', () => {
       ];
 
       expect(map['--nx-color-focus-default']).toBe(
-        map['--nx-color-primary-subtle-foreground']
+        mode === 'dark' ? 'oklch(1 0 0)' : 'oklch(0.1448 0 0)'
       );
 
       for (const surface of surfaces) {

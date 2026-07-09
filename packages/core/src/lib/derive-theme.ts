@@ -365,25 +365,15 @@ function deriveAlpha(
   };
 }
 
-function deriveFocus(
-  mode: Mode,
-  surfaces: TokenMap,
-  primary: TokenMap
-): TokenMap {
+function deriveFocus(mode: Mode, surfaces: TokenMap): TokenMap {
   const errorSeed = STATUS_RAMP.error[mode === 'dark' ? '300' : '600'];
   const background =
     surfaces['--nx-color-background'] ??
     (mode === 'dark' ? 'oklch(0 0 0)' : 'oklch(1 0 0)');
-  const primaryFocus = primary['--nx-color-primary-subtle-foreground'];
-
-  if (primaryFocus === undefined) {
-    throw new Error(
-      'deriveFocus: missing --nx-color-primary-subtle-foreground'
-    );
-  }
 
   return {
-    '--nx-color-focus-default': apcaSafeAgainst(primaryFocus, background, mode),
+    '--nx-color-focus-default':
+      mode === 'dark' ? 'oklch(1 0 0)' : 'oklch(0.1448 0 0)',
     '--nx-color-focus-error': apcaSafeAgainst(errorSeed, background, mode),
   };
 }
@@ -397,13 +387,20 @@ const FILL_GAMUT = 'p3';
 // seeds but lifts dark ones toward light — so a black brand becomes a white
 // button that stays legible on a dark surface.
 const PRIMARY_FILL_LIGHT_CAP = 0.85;
+const PRIMARY_DARK_ENDPOINT_LIFT_FLOOR = 0.16;
 const PRIMARY_DARK_HONOR_FLOOR = 0.45;
 const PRIMARY_DARK_LIFT_EXPONENT = 1.6;
 const PRIMARY_HOVER_STEP = 0.05;
 const PRIMARY_ACTIVE_STEP = 0.1;
+const PRIMARY_ACTIVE_DARK_FILL_STEP = 0.03;
+const PRIMARY_DARK_ENDPOINT_HOVER_L = 0.207;
+const PRIMARY_DARK_ENDPOINT_ACTIVE_L = 0.118;
+const PRIMARY_LIGHT_ENDPOINT_HOVER_L = 0.945;
+const PRIMARY_LIGHT_ENDPOINT_ACTIVE_L = 0.87;
 
 function primaryFillLightness(seedL: number, mode: Mode): number {
   if (mode === 'light') return clamp01(Math.min(seedL, PRIMARY_FILL_LIGHT_CAP));
+  if (seedL <= PRIMARY_DARK_ENDPOINT_LIFT_FLOOR) return 1;
   if (seedL >= PRIMARY_DARK_HONOR_FLOOR) return clamp01(seedL);
   // Below the floor, lift toward white so a dark seed stays legible on a dark
   // surface. The coefficient is `1 - floor` so the curve meets the honor branch
@@ -452,12 +449,11 @@ function legibleFillLightness(l: number, c: number, h: number): number {
 // clears by construction, so it is always a legible fallback.
 function stateFillLightness(
   baseL: number,
-  step: number,
+  target: number,
   label: string,
   c: number,
   h: number
 ): number {
-  const target = towardMid(baseL, step);
   const dir = target >= baseL ? 1 : -1;
   const span = Math.round(Math.abs(target - baseL) * 100);
   for (let s = span; s >= 1; s -= 1) {
@@ -467,6 +463,26 @@ function stateFillLightness(
     }
   }
   return baseL;
+}
+
+function hoverFillTarget(baseL: number): number {
+  if (baseL <= PRIMARY_DARK_ENDPOINT_LIFT_FLOOR) {
+    return PRIMARY_DARK_ENDPOINT_HOVER_L;
+  }
+  if (baseL >= 0.99) return PRIMARY_LIGHT_ENDPOINT_HOVER_L;
+  return towardMid(baseL, PRIMARY_HOVER_STEP);
+}
+
+function activeFillTarget(baseL: number): number {
+  if (baseL <= PRIMARY_DARK_ENDPOINT_LIFT_FLOOR) {
+    return PRIMARY_DARK_ENDPOINT_ACTIVE_L;
+  }
+  if (baseL >= 0.99) return PRIMARY_LIGHT_ENDPOINT_ACTIVE_L;
+  return clamp01(
+    baseL < 0.5
+      ? baseL - PRIMARY_ACTIVE_DARK_FILL_STEP
+      : baseL - PRIMARY_ACTIVE_STEP
+  );
 }
 
 /**
@@ -489,12 +505,12 @@ export function derivePrimary(accentHex: string, mode: Mode): TokenMap {
     ...deriveFamily('primary', rampFromSeed(accentHex), mode),
     '--nx-color-primary-background': background,
     '--nx-color-primary-background-hover': seedFill(
-      stateFillLightness(fillL, PRIMARY_HOVER_STEP, label, c, h),
+      stateFillLightness(fillL, hoverFillTarget(fillL), label, c, h),
       c,
       h
     ),
     '--nx-color-primary-background-active': seedFill(
-      stateFillLightness(fillL, PRIMARY_ACTIVE_STEP, label, c, h),
+      stateFillLightness(fillL, activeFillTarget(fillL), label, c, h),
       c,
       h
     ),
@@ -537,7 +553,7 @@ function deriveMode(
   const status = deriveStatus(mode);
   const chart = deriveChart(mode);
   const alpha = deriveAlpha(surfaceTone, mode, profile);
-  const focus = deriveFocus(mode, surfaces, primary);
+  const focus = deriveFocus(mode, surfaces);
   return {
     ...surfaces,
     ...text,
