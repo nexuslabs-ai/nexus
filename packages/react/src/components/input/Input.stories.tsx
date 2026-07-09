@@ -158,7 +158,7 @@ export const BorderlessStates: Story = {
     await expect(readOnly).not.toBeDisabled();
 
     await expect(invalid).toHaveAttribute('aria-invalid', 'true');
-    await expect(invalid).toHaveClass('nx:aria-invalid:border-color-error');
+    await expect(invalid).toHaveClass('nx:aria-invalid:border-border-error');
     await expect(window.getComputedStyle(invalid).borderTopWidth).toBe('0px');
     await expect(window.getComputedStyle(invalid).boxShadow).not.toBe('none');
 
