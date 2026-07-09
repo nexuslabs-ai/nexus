@@ -4,6 +4,26 @@ import { apcaLc } from './apca';
 import { formatOklch } from './oklch-format';
 import { type Shade, type Tier, TIER_THRESHOLDS } from './palette';
 import { rampFromSeed, seedOklch } from './perceptual-ramp';
+import {
+  anchorToStep,
+  CHART_DARK,
+  CHART_LIGHT,
+  DARK_SURFACE_LADDER,
+  LIGHT_CHROMA_DEPTH_MULTIPLIER,
+  LIGHT_SURFACE_LADDER,
+  NEUTRAL,
+  PAGE_L_LIGHT,
+  STATUS_RAMP,
+  SURFACE_TOKENS,
+  SURFACE_TONE,
+} from './surface-ladder';
+
+export {
+  CHART_DARK,
+  CHART_LIGHT,
+  NEUTRAL,
+  STATUS_RAMP,
+} from './surface-ladder';
 
 export interface ThemeSeeds {
   /** Drives the primary family ramp. */
@@ -55,19 +75,6 @@ interface ContrastProfile {
   hoverAlpha: number;
 }
 
-const SURFACE_TONE: Record<
-  NexusSurfaceTone,
-  { h: number; lightC: number; darkC: number }
-> = {
-  slate: { h: 264.7, lightC: 0.011, darkC: 0.04 },
-  gray: { h: 261.7, lightC: 0.008, darkC: 0.027 },
-  zinc: { h: 262.8, lightC: 0.005, darkC: 0.005 },
-  neutral: { h: 0, lightC: 0, darkC: 0 },
-  stone: { h: 70, lightC: 0.008, darkC: 0.006 },
-};
-
-const PAGE_L_LIGHT = 1;
-const LIGHT_CHROMA_DEPTH_MULTIPLIER = 1.4;
 const FOCUS_APCA_FLOOR = 45;
 
 function anchoredContrastLerp(
@@ -104,79 +111,6 @@ function contrastProfile(mode: Mode, contrast: number): ContrastProfile {
   };
 }
 
-/**
- * Canonical opaque-surface token set. Both regime step tables are typed against
- * these keys, so a surface added here must be given a light and dark step — a
- * missing or stray entry fails typecheck instead of silently falling back.
- */
-const SURFACE_TOKENS = [
-  'background',
-  'background-hover',
-  'background-active',
-  'muted',
-  'container',
-  'container-hover',
-  'container-active',
-  'popover',
-  'popover-hover',
-  'popover-active',
-  'control-background',
-  'control-background-hover',
-  'nav-background',
-  'nav-item-hover',
-  'nav-item-active',
-  'nav-border',
-  'disabled',
-  'border-active',
-] as const;
-
-type SurfaceToken = (typeof SURFACE_TOKENS)[number];
-
-/** Steps (in Δ units) each opaque surface sits from the page background. */
-type SurfaceSteps = Record<SurfaceToken, number>;
-
-const DARK_SURFACE_STEPS: SurfaceSteps = {
-  background: 0,
-  'background-hover': 1.6,
-  'background-active': 1.6,
-  muted: 1.6,
-  container: 1.6,
-  'container-hover': 3.2,
-  'container-active': 1.6,
-  popover: 3.2,
-  'popover-hover': 4.8,
-  'popover-active': 3.2,
-  'control-background': 3.2,
-  'control-background-hover': 4.8,
-  'nav-background': 1.6,
-  'nav-item-hover': 3.2,
-  'nav-item-active': 3.2,
-  'nav-border': 3.2,
-  disabled: 1.6,
-  'border-active': 9.68,
-};
-
-const LIGHT_SURFACE_STEPS: SurfaceSteps = {
-  background: 0,
-  'background-hover': -0.27,
-  'background-active': -1.38,
-  muted: -0.54,
-  container: 0,
-  'container-hover': -0.54,
-  'container-active': -0.98,
-  popover: 0,
-  'popover-hover': -0.98,
-  'popover-active': -0.98,
-  'control-background': -1.38,
-  'control-background-hover': -2.32,
-  'nav-background': -0.54,
-  'nav-item-hover': -1.38,
-  'nav-item-active': -1.38,
-  'nav-border': -1.38,
-  disabled: -0.98,
-  'border-active': -6.07,
-};
-
 /** Opaque surface tiers derived from the background seed + contrast Δ. */
 export function deriveSurfaces(
   backgroundHex: string,
@@ -190,8 +124,9 @@ export function deriveSurfaces(
   const anchorL = dark ? (bg.l ?? 0) : PAGE_L_LIGHT;
   const baseC = dark ? tone.darkC : tone.lightC;
   const out: TokenMap = {};
+  const ladder = dark ? DARK_SURFACE_LADDER : LIGHT_SURFACE_LADDER;
   for (const token of SURFACE_TOKENS) {
-    const step = dark ? DARK_SURFACE_STEPS[token] : LIGHT_SURFACE_STEPS[token];
+    const step = anchorToStep(ladder[token], mode, surfaceTone);
     const l = clamp01(anchorL + step * delta);
     const c = dark
       ? baseC
@@ -383,63 +318,6 @@ export function deriveFamily(
 
 const STATUS_FAMILIES = ['success', 'warning', 'error', 'information'] as const;
 
-type StatusFamily = (typeof STATUS_FAMILIES)[number];
-
-export const STATUS_RAMP = {
-  success: {
-    '50': 'oklch(0.982 0.035 137.785)',
-    '100': 'oklch(0.96 0.0789 139.835)',
-    '200': 'oklch(0.925 0.1596 139.892)',
-    '300': 'oklch(0.87 0.3119 139.843)',
-    '400': 'oklch(0.79 0.2864 140.349)',
-    '500': 'oklch(0.72 0.2591 140.014)',
-    '600': 'oklch(0.62 0.2233 140.055)',
-    '700': 'oklch(0.52 0.1871 140.022)',
-    '800': 'oklch(0.43 0.1534 139.623)',
-    '900': 'oklch(0.34 0.1216 139.757)',
-    '950': 'oklch(0.25 0.0887 139.4)',
-  },
-  warning: {
-    '50': 'oklch(0.98 0.0185 73.684)',
-    '100': 'oklch(0.955 0.0435 75.164)',
-    '200': 'oklch(0.91 0.0819 70.697)',
-    '300': 'oklch(0.84 0.142 66.29)',
-    '400': 'oklch(0.78 0.1803 55.934)',
-    '500': 'oklch(0.71 0.2099 47.604)',
-    '600': 'oklch(0.62 0.2044 41.116)',
-    '700': 'oklch(0.52 0.1809 38.402)',
-    '800': 'oklch(0.43 0.153 37.304)',
-    '900': 'oklch(0.34 0.1188 38.172)',
-    '950': 'oklch(0.25 0.091 36.259)',
-  },
-  error: {
-    '50': 'oklch(0.971 0.0176 28.865)',
-    '100': 'oklch(0.936 0.0399 27.342)',
-    '200': 'oklch(0.885 0.0747 27.394)',
-    '300': 'oklch(0.808 0.1333 28.058)',
-    '400': 'oklch(0.704 0.2267 27.842)',
-    '500': 'oklch(0.637 0.2786 27.978)',
-    '600': 'oklch(0.577 0.2523 27.926)',
-    '700': 'oklch(0.505 0.2209 27.946)',
-    '800': 'oklch(0.42 0.1838 28.144)',
-    '900': 'oklch(0.34 0.1487 28.057)',
-    '950': 'oklch(0.25 0.1094 28.309)',
-  },
-  information: {
-    '50': 'oklch(0.97 0.0152 252.81)',
-    '100': 'oklch(0.932 0.0342 257.472)',
-    '200': 'oklch(0.882 0.0612 253.613)',
-    '300': 'oklch(0.809 0.1012 254.248)',
-    '400': 'oklch(0.707 0.1599 255.225)',
-    '500': 'oklch(0.623 0.2112 255.145)',
-    '600': 'oklch(0.546 0.2205 255.276)',
-    '700': 'oklch(0.488 0.197 255.267)',
-    '800': 'oklch(0.41 0.1633 254.871)',
-    '900': 'oklch(0.33 0.1316 254.902)',
-    '950': 'oklch(0.25 0.1042 256.214)',
-  },
-} satisfies Record<StatusFamily, Record<Shade, string>>;
-
 function deriveStatus(mode: Mode): TokenMap {
   const out: TokenMap = {};
   for (const family of STATUS_FAMILIES) {
@@ -451,22 +329,6 @@ function deriveStatus(mode: Mode): TokenMap {
   }
   return out;
 }
-
-export const CHART_LIGHT = [
-  'oklch(0.52 0.1168 186.391)',
-  'oklch(0.52 0.1871 140.022)',
-  'oklch(0.62 0.2044 41.116)',
-  'oklch(0.58 0.2489 17.585)',
-  'oklch(0.49 0.2912 276.966)',
-] as const;
-
-export const CHART_DARK = [
-  'oklch(0.9 0.1682 180.426)',
-  'oklch(0.93 0.2278 124.321)',
-  'oklch(0.91 0.0819 70.697)',
-  'oklch(0.885 0.0771 10.001)',
-  'oklch(0.865 0.069 274.039)',
-] as const;
 
 function deriveChart(mode: Mode): TokenMap {
   const set = mode === 'dark' ? CHART_DARK : CHART_LIGHT;
@@ -532,19 +394,6 @@ function deriveFocus(
     '--nx-color-focus-error': apcaSafeAgainst(errorSeed, background, mode),
   };
 }
-
-/** Tone-independent neutral surface family (9 tokens, no borders). */
-export const NEUTRAL = {
-  '50': 'oklch(0.985 0 0)',
-  '100': 'oklch(0.945 0 0)',
-  '200': 'oklch(0.87 0 0)',
-  '300': 'oklch(0.765 0 0)',
-  '600': 'oklch(0.46 0 0)',
-  '700': 'oklch(0.385 0 0)',
-  '800': 'oklch(0.297 0 0)',
-  '900': 'oklch(0.207 0 0)',
-  '950': 'oklch(0.118 0 0)',
-} satisfies Record<Exclude<Shade, '400' | '500'>, string>;
 
 // P3 cusp gamut for the solid fill, matching the perceptual ramp's emit target.
 const FILL_GAMUT = 'p3';
