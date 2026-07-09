@@ -11,7 +11,7 @@ const inputVariants = cva(
     'nx:file:border-0 nx:file:bg-transparent nx:file:typography-label-default nx:file:text-foreground nx:disabled:file:text-disabled-foreground',
     'nx:placeholder:text-muted-foreground',
     'nx:focus-visible:outline-2 nx:focus-visible:outline-focus-default nx:focus-visible:outline-offset-(--focus-offset)',
-    'nx:aria-invalid:border-color-error nx:aria-invalid:focus-visible:outline-focus-error',
+    'nx:aria-invalid:border-border-error nx:aria-invalid:focus-visible:outline-focus-error',
     'nx:disabled:cursor-not-allowed nx:disabled:bg-disabled nx:disabled:text-disabled-foreground nx:disabled:placeholder:text-disabled-foreground',
   ],
   {
@@ -22,15 +22,15 @@ const inputVariants = cva(
         lg: 'nx:h-12 nx:px-3.5 nx:py-0 nx:typography-body-default',
       },
       variant: {
-        default:
-          'nx:border-color-default nx:bg-background nx:enabled:hover:bg-background-hover nx:disabled:border-color-disabled',
+        bordered:
+          'nx:border-border-default nx:bg-background nx:enabled:hover:bg-background-hover nx:disabled:border-border-disabled',
         borderless:
           'nx:border-transparent nx:bg-control-background nx:enabled:hover:bg-control-background-hover',
       },
     },
     defaultVariants: {
       size: 'default',
-      variant: 'default',
+      variant: 'bordered',
     },
   }
 );
@@ -49,9 +49,10 @@ interface InputProps
  * Input
  *
  * A text input field for collecting user data.
- * Supports different sizes and all native input attributes. Use
- * `variant="borderless"` to remove the resting field stroke while keeping a tonal
- * control fill for resting affordance.
+ * Supports different sizes and all native input attributes. The
+ * `variant="bordered"` treatment is the default; use `variant="borderless"` to
+ * remove the resting field stroke while keeping a tonal control fill for
+ * resting affordance.
  *
  * @example
  * ```tsx
@@ -76,7 +77,7 @@ function Input({ className, type, size, variant, ...props }: InputProps) {
       type={type}
       data-slot="input"
       data-size={size ?? 'default'}
-      data-variant={variant ?? 'default'}
+      data-variant={variant ?? 'bordered'}
       className={cn(inputVariants({ size, variant, className }))}
       {...props}
     />

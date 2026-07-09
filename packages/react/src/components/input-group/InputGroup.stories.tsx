@@ -219,7 +219,7 @@ export const WithDataAttributes: Story = {
     const group = canvasElement.querySelector('[data-slot="input-group"]');
     await expect(group).toBeInTheDocument();
     await expect(group).toHaveAttribute('role', 'group');
-    await expect(group).toHaveAttribute('data-variant', 'default');
+    await expect(group).toHaveAttribute('data-variant', 'bordered');
     await expect(
       canvasElement.querySelector('[data-slot="input-group-addon"]')
     ).toBeInTheDocument();

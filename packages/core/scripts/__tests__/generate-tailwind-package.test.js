@@ -248,7 +248,9 @@ describe('generateTailwindPackage', () => {
     expect(nexusCSS).toMatch(
       /\[data-slot='input'\]\[class~='nx:focus-visible:outline-focus-default'\]:focus-visible/
     );
-    expect(nexusCSS).toMatch(/\[data-slot='input'\]\[data-variant='default'\]/);
+    expect(nexusCSS).toMatch(
+      /\[data-slot='input'\]\[data-variant='bordered'\]/
+    );
     expect(nexusCSS).toMatch(
       /box-shadow:\s*inset 0 0 0 1px var\(--color-border-default\);/
     );

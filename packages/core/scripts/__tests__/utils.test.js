@@ -242,7 +242,7 @@ describe('utils', () => {
       expect(css).toMatch(
         /\[data-slot='input'\]\[class~='nx:focus-visible:outline-focus-default'\]:focus-visible/
       );
-      expect(css).toMatch(/\[data-slot='input'\]\[data-variant='default'\]/);
+      expect(css).toMatch(/\[data-slot='input'\]\[data-variant='bordered'\]/);
       expect(css).toMatch(
         /box-shadow:\s*inset 0 0 0 1px var\(--color-border-default\);/
       );
