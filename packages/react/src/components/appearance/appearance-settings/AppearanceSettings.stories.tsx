@@ -36,7 +36,9 @@ export const ContrastIsolation: Story = {
 
     // Distinct accessible names (else getByRole is ambiguous / axe flags duplicates).
     const lightSlider = canvas.getByRole('slider', { name: 'Light contrast' });
-    canvas.getByRole('slider', { name: 'Dark contrast' });
+    await expect(
+      canvas.getByRole('slider', { name: 'Dark contrast' })
+    ).toBeInTheDocument();
 
     // Drive the light slider down deterministically (Radix Slider handles arrows).
     lightSlider.focus();
