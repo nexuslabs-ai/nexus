@@ -198,8 +198,8 @@ function MultiSelectTrigger({
         aria-expanded={open}
         data-slot="multi-select-trigger"
         className={cn(
-          'nx:group/multi-select nx:flex nx:h-auto nx:min-h-10 nx:w-full nx:items-center nx:justify-between nx:gap-2 nx:rounded-md nx:border-default nx:border-border-default nx:bg-background nx:px-3 nx:py-1.5 nx:typography-body-default nx:whitespace-nowrap nx:transition-colors',
-          'nx:enabled:hover:bg-background-hover',
+          'nx:group/multi-select nx:flex nx:h-auto nx:min-h-10 nx:w-full nx:items-center nx:justify-between nx:gap-2 nx:rounded-md nx:border-default nx:border-border-default nx:bg-container nx:px-3 nx:py-1.5 nx:typography-body-default nx:whitespace-nowrap nx:transition-colors',
+          'nx:enabled:hover:bg-container-hover',
           'nx:focus-visible:outline-2 nx:focus-visible:outline-focus-default nx:focus-visible:outline-offset-(--focus-offset)',
           'nx:aria-invalid:border-border-error nx:aria-invalid:focus-visible:outline-focus-error',
           'nx:disabled:cursor-not-allowed nx:disabled:border-border-disabled nx:disabled:bg-disabled nx:disabled:text-disabled-foreground',

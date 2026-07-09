@@ -1,4 +1,4 @@
-import { useForm } from 'react-hook-form';
+import { FormProvider, useForm } from 'react-hook-form';
 
 import { zodResolver } from '@hookform/resolvers/zod';
 import {
@@ -9,12 +9,6 @@ import {
   CardFooter,
   CardHeader,
   CardTitle,
-  Form,
-  FormControl,
-  FormField,
-  FormItem,
-  FormLabel,
-  FormMessage,
   Input,
 } from '@nexus_ds/react';
 import { useMutation } from '@tanstack/react-query';
@@ -22,6 +16,13 @@ import { Link } from '@tanstack/react-router';
 import { z } from 'zod';
 
 import { requestPasswordReset } from '../../lib/auth-api';
+import {
+  RhfField,
+  RhfFieldControl,
+  RhfFieldItem,
+  RhfFieldLabel,
+  RhfFieldMessage,
+} from '../../lib/rhf-field';
 
 const forgotSchema = z.object({
   email: z.email('Enter a valid email address'),
@@ -62,7 +63,7 @@ export function ForgotRoute() {
 
   return (
     <Card>
-      <Form {...form}>
+      <FormProvider {...form}>
         <form noValidate onSubmit={form.handleSubmit(onSubmit)}>
           <CardHeader>
             <CardTitle>Reset your password</CardTitle>
@@ -71,13 +72,13 @@ export function ForgotRoute() {
             </CardDescription>
           </CardHeader>
           <CardContent>
-            <FormField
+            <RhfField
               control={form.control}
               name="email"
               render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Email</FormLabel>
-                  <FormControl>
+                <RhfFieldItem>
+                  <RhfFieldLabel>Email</RhfFieldLabel>
+                  <RhfFieldControl>
                     <Input
                       type="email"
                       autoComplete="username"
@@ -86,9 +87,9 @@ export function ForgotRoute() {
                       required
                       {...field}
                     />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
+                  </RhfFieldControl>
+                  <RhfFieldMessage />
+                </RhfFieldItem>
               )}
             />
           </CardContent>
@@ -108,7 +109,7 @@ export function ForgotRoute() {
             </Link>
           </CardFooter>
         </form>
-      </Form>
+      </FormProvider>
     </Card>
   );
 }

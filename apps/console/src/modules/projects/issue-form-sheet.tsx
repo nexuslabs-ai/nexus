@@ -1,17 +1,11 @@
 import { useEffect } from 'react';
-import { useForm } from 'react-hook-form';
+import { FormProvider, useForm } from 'react-hook-form';
 
 import { zodResolver } from '@hookform/resolvers/zod';
 import {
   Alert,
   AlertDescription,
   Button,
-  Form,
-  FormControl,
-  FormField,
-  FormItem,
-  FormLabel,
-  FormMessage,
   Input,
   Select,
   SelectContent,
@@ -39,6 +33,13 @@ import {
   projectKeys,
   updateIssue,
 } from '../../lib/projects-api';
+import {
+  RhfField,
+  RhfFieldControl,
+  RhfFieldItem,
+  RhfFieldLabel,
+  RhfFieldMessage,
+} from '../../lib/rhf-field';
 
 import { PRIORITY_OPTIONS, STATUS_OPTIONS } from './issue-ui';
 
@@ -127,7 +128,7 @@ export function IssueFormSheet({
         side="right"
         className="nx:flex nx:w-full nx:flex-col nx:sm:max-w-md"
       >
-        <Form {...form}>
+        <FormProvider {...form}>
           <form
             noValidate
             onSubmit={form.handleSubmit(onSubmit)}
@@ -149,53 +150,53 @@ export function IssueFormSheet({
                 </Alert>
               )}
 
-              <FormField
+              <RhfField
                 control={form.control}
                 name="title"
                 render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Title</FormLabel>
-                    <FormControl>
+                  <RhfFieldItem>
+                    <RhfFieldLabel>Title</RhfFieldLabel>
+                    <RhfFieldControl>
                       <Input
                         placeholder="Short, action-oriented summary"
                         {...field}
                       />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
+                    </RhfFieldControl>
+                    <RhfFieldMessage />
+                  </RhfFieldItem>
                 )}
               />
 
-              <FormField
+              <RhfField
                 control={form.control}
                 name="description"
                 render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Description</FormLabel>
-                    <FormControl>
+                  <RhfFieldItem>
+                    <RhfFieldLabel>Description</RhfFieldLabel>
+                    <RhfFieldControl>
                       <Textarea
                         rows={4}
                         placeholder="Context, acceptance criteria, links…"
                         {...field}
                       />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
+                    </RhfFieldControl>
+                    <RhfFieldMessage />
+                  </RhfFieldItem>
                 )}
               />
 
-              <FormField
+              <RhfField
                 control={form.control}
                 name="status"
                 render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Status</FormLabel>
+                  <RhfFieldItem>
+                    <RhfFieldLabel>Status</RhfFieldLabel>
                     <Select value={field.value} onValueChange={field.onChange}>
-                      <FormControl>
+                      <RhfFieldControl>
                         <SelectTrigger>
                           <SelectValue />
                         </SelectTrigger>
-                      </FormControl>
+                      </RhfFieldControl>
                       <SelectContent>
                         {STATUS_OPTIONS.map((option) => (
                           <SelectItem key={option.value} value={option.value}>
@@ -204,23 +205,23 @@ export function IssueFormSheet({
                         ))}
                       </SelectContent>
                     </Select>
-                    <FormMessage />
-                  </FormItem>
+                    <RhfFieldMessage />
+                  </RhfFieldItem>
                 )}
               />
 
-              <FormField
+              <RhfField
                 control={form.control}
                 name="priority"
                 render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Priority</FormLabel>
+                  <RhfFieldItem>
+                    <RhfFieldLabel>Priority</RhfFieldLabel>
                     <Select value={field.value} onValueChange={field.onChange}>
-                      <FormControl>
+                      <RhfFieldControl>
                         <SelectTrigger>
                           <SelectValue />
                         </SelectTrigger>
-                      </FormControl>
+                      </RhfFieldControl>
                       <SelectContent>
                         {PRIORITY_OPTIONS.map((option) => (
                           <SelectItem key={option.value} value={option.value}>
@@ -229,23 +230,23 @@ export function IssueFormSheet({
                         ))}
                       </SelectContent>
                     </Select>
-                    <FormMessage />
-                  </FormItem>
+                    <RhfFieldMessage />
+                  </RhfFieldItem>
                 )}
               />
 
-              <FormField
+              <RhfField
                 control={form.control}
                 name="assignee"
                 render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Assignee</FormLabel>
+                  <RhfFieldItem>
+                    <RhfFieldLabel>Assignee</RhfFieldLabel>
                     <Select value={field.value} onValueChange={field.onChange}>
-                      <FormControl>
+                      <RhfFieldControl>
                         <SelectTrigger>
                           <SelectValue />
                         </SelectTrigger>
-                      </FormControl>
+                      </RhfFieldControl>
                       <SelectContent>
                         {ASSIGNEES.map((assignee) => (
                           <SelectItem key={assignee} value={assignee}>
@@ -254,8 +255,8 @@ export function IssueFormSheet({
                         ))}
                       </SelectContent>
                     </Select>
-                    <FormMessage />
-                  </FormItem>
+                    <RhfFieldMessage />
+                  </RhfFieldItem>
                 )}
               />
             </div>
@@ -271,7 +272,7 @@ export function IssueFormSheet({
               </SheetClose>
             </SheetFooter>
           </form>
-        </Form>
+        </FormProvider>
       </SheetContent>
     </Sheet>
   );

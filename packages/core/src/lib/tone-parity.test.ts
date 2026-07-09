@@ -276,8 +276,8 @@ describe('tone parity', () => {
     expect(unclassified).toEqual([]);
   });
 
-  it('keeps non-neutral light paper visibly distinct from neutral', () => {
-    const paper = Object.fromEntries(
+  it('keeps non-neutral light support tiers visibly distinct from neutral', () => {
+    const supportTier = Object.fromEntries(
       TONES.map((tone) => {
         const light = deriveTheme({
           surfaceTone: tone,
@@ -293,13 +293,13 @@ describe('tone parity', () => {
           },
           contrast: TONE_CONTRAST,
         }).light;
-        return [tone, comps(light['--nx-color-background']!)];
+        return [tone, comps(light['--nx-color-muted']!)];
       })
     );
-    expect(paper.slate!.c).toBeGreaterThan(paper.gray!.c);
-    expect(paper.gray!.c).toBeGreaterThan(paper.zinc!.c);
-    expect(paper.zinc!.c).toBeGreaterThan(paper.neutral!.c);
-    expect(paper.stone!.c).toBeGreaterThan(paper.neutral!.c);
+    expect(supportTier.slate!.c).toBeGreaterThan(supportTier.gray!.c);
+    expect(supportTier.gray!.c).toBeGreaterThan(supportTier.zinc!.c);
+    expect(supportTier.zinc!.c).toBeGreaterThan(supportTier.neutral!.c);
+    expect(supportTier.stone!.c).toBeGreaterThan(supportTier.neutral!.c);
   });
 });
 

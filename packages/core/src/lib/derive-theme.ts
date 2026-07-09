@@ -63,7 +63,7 @@ const SURFACE_TONE: Record<
   stone: { h: 70, lightC: 0.008, darkC: 0.006 },
 };
 
-const PAGE_L_LIGHT = 0.97;
+const PAGE_L_LIGHT = 1;
 const LIGHT_CHROMA_DEPTH_MULTIPLIER = 1.4;
 const FOCUS_APCA_FLOOR = 45;
 
@@ -145,75 +145,33 @@ const DARK_SURFACE_STEPS: SurfaceSteps = {
   'popover-active': 3.2,
   'control-background': 3.2,
   'control-background-hover': 4.8,
-  'nav-background': 0.6,
-  'nav-item-hover': 1.6,
-  'nav-item-active': 1.6,
+  'nav-background': 1.6,
+  'nav-item-hover': 3.2,
+  'nav-item-active': 3.2,
   'nav-border': 3.2,
-  disabled: 0,
+  disabled: 1.6,
   'border-active': 9.68,
 };
 
 const LIGHT_SURFACE_STEPS: SurfaceSteps = {
   background: 0,
-  'background-hover': -0.45,
-  'background-active': -0.84,
-  muted: -0.45,
-  container: 0.54,
-  'container-hover': 0.27,
-  'container-active': -0.45,
-  popover: 0.54,
-  'popover-hover': -0.45,
-  'popover-active': -0.45,
-  'control-background': -0.84,
-  'control-background-hover': -1.79,
-  'nav-background': -0.84,
-  'nav-item-hover': -1.79,
-  'nav-item-active': -1.79,
-  'nav-border': -1.79,
-  disabled: -0.45,
-  'border-active': -5.54,
-};
-
-type DarkNavSurfaceToken =
-  | 'nav-background'
-  | 'nav-item-hover'
-  | 'nav-item-active'
-  | 'nav-border';
-
-const DARK_NAV_SURFACES: Record<
-  NexusSurfaceTone,
-  Record<DarkNavSurfaceToken, string>
-> = {
-  slate: {
-    'nav-background': 'oklch(0.207 0.0398 265.755)',
-    'nav-item-hover': 'oklch(0.297 0.0368 260.031)',
-    'nav-item-active': 'oklch(0.297 0.0368 260.031)',
-    'nav-border': 'oklch(0.297 0.0368 260.031)',
-  },
-  gray: {
-    'nav-background': 'oklch(0.207 0.0318 264.665)',
-    'nav-item-hover': 'oklch(0.297 0.0296 256.848)',
-    'nav-item-active': 'oklch(0.297 0.0296 256.848)',
-    'nav-border': 'oklch(0.297 0.0296 256.848)',
-  },
-  zinc: {
-    'nav-background': 'oklch(0.207 0.0061 271.116)',
-    'nav-item-hover': 'oklch(0.297 0.0057 271.205)',
-    'nav-item-active': 'oklch(0.297 0.0057 271.205)',
-    'nav-border': 'oklch(0.297 0.0057 271.205)',
-  },
-  neutral: {
-    'nav-background': 'oklch(0.207 0 0)',
-    'nav-item-hover': 'oklch(0.297 0 0)',
-    'nav-item-active': 'oklch(0.297 0 0)',
-    'nav-border': 'oklch(0.297 0 0)',
-  },
-  stone: {
-    'nav-background': 'oklch(0.207 0 0)',
-    'nav-item-hover': 'oklch(0.297 0 0)',
-    'nav-item-active': 'oklch(0.297 0 0)',
-    'nav-border': 'oklch(0.297 0 0)',
-  },
+  'background-hover': -0.27,
+  'background-active': -1.38,
+  muted: -0.54,
+  container: 0,
+  'container-hover': -0.54,
+  'container-active': -0.98,
+  popover: 0,
+  'popover-hover': -0.98,
+  'popover-active': -0.98,
+  'control-background': -1.38,
+  'control-background-hover': -2.32,
+  'nav-background': -0.54,
+  'nav-item-hover': -1.38,
+  'nav-item-active': -1.38,
+  'nav-border': -1.38,
+  disabled: -0.98,
+  'border-active': -6.07,
 };
 
 /** Opaque surface tiers derived from the background seed + contrast Δ. */
@@ -230,12 +188,6 @@ export function deriveSurfaces(
   const baseC = dark ? tone.darkC : tone.lightC;
   const out: TokenMap = {};
   for (const token of SURFACE_TOKENS) {
-    if (dark && token in DARK_NAV_SURFACES[surfaceTone]) {
-      out[`--nx-color-${token}`] =
-        DARK_NAV_SURFACES[surfaceTone][token as DarkNavSurfaceToken];
-      continue;
-    }
-
     const step = dark ? DARK_SURFACE_STEPS[token] : LIGHT_SURFACE_STEPS[token];
     const l = clamp01(anchorL + step * delta);
     const c = dark

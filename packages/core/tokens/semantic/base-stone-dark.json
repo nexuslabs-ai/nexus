@@ -34,7 +34,7 @@
     "$description": "Tertiary text tier below muted-foreground — helper text, captions, divider labels."
   },
   "disabled": {
-    "$value": "{stone.950}",
+    "$value": "{stone.900}",
     "$type": "color"
   },
   "disabled-foreground": {

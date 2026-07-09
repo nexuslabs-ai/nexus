@@ -1,4 +1,4 @@
-import { useForm } from 'react-hook-form';
+import { FormProvider, useForm } from 'react-hook-form';
 
 import { zodResolver } from '@hookform/resolvers/zod';
 import {
@@ -11,12 +11,6 @@ import {
   CardFooter,
   CardHeader,
   CardTitle,
-  Form,
-  FormControl,
-  FormField,
-  FormItem,
-  FormLabel,
-  FormMessage,
   Input,
 } from '@nexus_ds/react';
 import { useMutation } from '@tanstack/react-query';
@@ -24,6 +18,13 @@ import { Link, useNavigate } from '@tanstack/react-router';
 import { z } from 'zod';
 
 import { login } from '../../lib/auth-api';
+import {
+  RhfField,
+  RhfFieldControl,
+  RhfFieldItem,
+  RhfFieldLabel,
+  RhfFieldMessage,
+} from '../../lib/rhf-field';
 
 const loginSchema = z.object({
   email: z.email('Enter a valid email address'),
@@ -51,7 +52,7 @@ export function LoginRoute() {
 
   return (
     <Card>
-      <Form {...form}>
+      <FormProvider {...form}>
         <form noValidate onSubmit={form.handleSubmit(onSubmit)}>
           <CardHeader>
             <CardTitle>Sign in to Atlas</CardTitle>
@@ -66,13 +67,13 @@ export function LoginRoute() {
                 <AlertDescription>{rootError}</AlertDescription>
               </Alert>
             )}
-            <FormField
+            <RhfField
               control={form.control}
               name="email"
               render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Email</FormLabel>
-                  <FormControl>
+                <RhfFieldItem>
+                  <RhfFieldLabel>Email</RhfFieldLabel>
+                  <RhfFieldControl>
                     <Input
                       type="email"
                       autoComplete="username"
@@ -81,18 +82,18 @@ export function LoginRoute() {
                       required
                       {...field}
                     />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
+                  </RhfFieldControl>
+                  <RhfFieldMessage />
+                </RhfFieldItem>
               )}
             />
-            <FormField
+            <RhfField
               control={form.control}
               name="password"
               render={({ field }) => (
-                <FormItem>
+                <RhfFieldItem>
                   <div className="nx:flex nx:items-center nx:justify-between">
-                    <FormLabel>Password</FormLabel>
+                    <RhfFieldLabel>Password</RhfFieldLabel>
                     <Link
                       to="/forgot"
                       className="nx:text-primary-subtle-foreground nx:typography-label-default nx:hover:underline"
@@ -100,7 +101,7 @@ export function LoginRoute() {
                       Forgot password?
                     </Link>
                   </div>
-                  <FormControl>
+                  <RhfFieldControl>
                     <Input
                       type="password"
                       autoComplete="current-password"
@@ -109,9 +110,9 @@ export function LoginRoute() {
                       required
                       {...field}
                     />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
+                  </RhfFieldControl>
+                  <RhfFieldMessage />
+                </RhfFieldItem>
               )}
             />
           </CardContent>
@@ -134,7 +135,7 @@ export function LoginRoute() {
             </p>
           </CardFooter>
         </form>
-      </Form>
+      </FormProvider>
     </Card>
   );
 }

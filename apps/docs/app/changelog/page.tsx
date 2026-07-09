@@ -65,7 +65,7 @@ const RELEASES: Release[] = [
       { type: 'Added', text: 'Sidebar — collapsible app navigation', pr: 273 },
       {
         type: 'Added',
-        text: 'Form — field, label, and validation primitives',
+        text: 'Field — field, label, and validation primitives',
         pr: 272,
       },
     ],

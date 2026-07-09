@@ -4,12 +4,12 @@ Nexus has two delivery models. The **runtime engine** and **lint rules** publish
 to npm; the **components** and **Tailwind theme** are copy/own — you vendor their
 source into your app and own it from there.
 
-| Package                        | How you get it                                                                                       |
-| ------------------------------ | ---------------------------------------------------------------------------------------------------- |
-| `@nexus_ds/core`               | `npm install` — framework-agnostic appearance / theme engine                                         |
-| `@nexus_ds/eslint-plugin`      | `npm install -D` — lint guardrails for the conventions                                               |
-| `@nexus_ds/react` (components) | copy/own — vendored via the export tool ([#541](https://github.com/nexuslabs-ai/nexus/issues/541))   |
-| `@nexus_ds/tailwind` (theme)   | copy/own — regenerated with your own token choices                                                   |
+| Package                        | How you get it                                                                                     |
+| ------------------------------ | -------------------------------------------------------------------------------------------------- |
+| `@nexus_ds/core`               | `npm install` — framework-agnostic appearance / theme engine                                       |
+| `@nexus_ds/eslint-plugin`      | `npm install -D` — lint guardrails for the conventions                                             |
+| `@nexus_ds/react` (components) | copy/own — vendored via the export tool ([#541](https://github.com/nexuslabs-ai/nexus/issues/541)) |
+| `@nexus_ds/tailwind` (theme)   | copy/own — regenerated with your own token choices                                                 |
 
 > **Copy/own is still landing.** The standalone export tool that copies the
 > components and token CSS into a consumer app is tracked in
@@ -38,11 +38,11 @@ npm install -D @nexus_ds/eslint-plugin
 `@nexus_ds/react` (the components) and `@nexus_ds/tailwind` (the `nx:`-prefixed
 utility theme) are copy/own — you take their source into your app rather than
 installing them from npm. The export tool ([#541](https://github.com/nexuslabs-ai/nexus/issues/541))
-automates this. The copied React entrypoint needs `react-hook-form` and `sonner`
-as peers, which back the Form and Toaster components:
+automates this. The copied React entrypoint needs `sonner` as a peer, which
+backs the Toaster component:
 
 ```bash
-npm install react-hook-form sonner
+npm install sonner
 ```
 
 The sections below show how the vendored packages are wired and consumed under

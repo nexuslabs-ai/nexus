@@ -317,8 +317,8 @@ export const AsChild: Story = {
     await expect(link).toHaveClass('nx:transition-colors');
     await expect(link).toHaveClass('nx:duration-fast');
     await expect(link).toHaveClass('nx:motion-reduce:transition-none');
-    await expect(link).toHaveClass('nx:hover:bg-control-background-hover');
-    await expect(link).toHaveClass('nx:active:bg-background-active');
+    await expect(link).toHaveClass('nx:hover:bg-container-hover');
+    await expect(link).toHaveClass('nx:active:bg-container-active');
   },
 };
 
@@ -442,8 +442,8 @@ export const TierAPolishEvidence: Story = {
     await expect(link).toHaveClass('nx:duration-fast');
     await expect(link).toHaveClass('nx:motion-reduce:transition-none');
     await expect(link).toHaveClass('nx:focus-visible:outline-2');
-    await expect(link).toHaveClass('nx:hover:bg-control-background-hover');
-    await expect(link).toHaveClass('nx:active:bg-background-active');
+    await expect(link).toHaveClass('nx:hover:bg-container-hover');
+    await expect(link).toHaveClass('nx:active:bg-container-active');
 
     await expect(loadingButton).toHaveAttribute('data-loading', 'true');
     await expect(loadingButton).toHaveAttribute('aria-busy', 'true');

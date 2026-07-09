@@ -133,17 +133,35 @@ describe('deriveSurfaces', () => {
     );
   });
 
-  it('uses the fixed palette ramp for dark nav surfaces', () => {
+  it('derives dark nav and disabled surfaces from the contrast ladder', () => {
     const soft = deriveSurfaces('#181818', surfaceTone, 'dark', 0.02);
     const strong = deriveSurfaces('#181818', surfaceTone, 'dark', 0.08);
 
+    for (const token of [
+      '--nx-color-disabled',
+      '--nx-color-nav-background',
+      '--nx-color-nav-item-hover',
+      '--nx-color-nav-item-active',
+      '--nx-color-nav-border',
+    ]) {
+      expect(strong[token], token).not.toBe(soft[token]);
+    }
+
     for (const s of [soft, strong]) {
-      expect(s['--nx-color-nav-background']).toBe('oklch(0.207 0 0)');
-      expect(s['--nx-color-nav-item-hover']).toBe('oklch(0.297 0 0)');
-      expect(s['--nx-color-nav-item-active']).toBe('oklch(0.297 0 0)');
-      expect(s['--nx-color-nav-border']).toBe('oklch(0.297 0 0)');
-      expect(lOf(s['--nx-color-nav-background'])).toBeLessThan(
-        lOf(s['--nx-color-container'])
+      expect(s['--nx-color-disabled']).toBe(s['--nx-color-container']);
+      expect(s['--nx-color-nav-background']).toBe(s['--nx-color-container']);
+      expect(s['--nx-color-nav-item-hover']).toBe(
+        s['--nx-color-container-hover']
+      );
+      expect(s['--nx-color-nav-item-active']).toBe(
+        s['--nx-color-container-hover']
+      );
+      expect(s['--nx-color-nav-border']).toBe(s['--nx-color-container-hover']);
+      expect(lOf(s['--nx-color-nav-background'])).toBeGreaterThan(
+        lOf(s['--nx-color-background'])
+      );
+      expect(lOf(s['--nx-color-nav-item-hover'])).toBeGreaterThan(
+        lOf(s['--nx-color-nav-background'])
       );
     }
   });
@@ -155,11 +173,10 @@ describe('deriveSurfaces', () => {
     );
   });
 
-  it('elevates container lighter than the tinted page in light mode', () => {
+  it('keeps light container on the same white plane as the page', () => {
     const s = deriveSurfaces('#ffffff', 'stone', 'light', 0.056);
-    const lift =
-      lOf(s['--nx-color-container']) - lOf(s['--nx-color-background']);
-    expect(lift).toBeGreaterThanOrEqual(0.025);
+    expect(s['--nx-color-container']).toBe(s['--nx-color-background']);
+    expect(lOf(s['--nx-color-background'])).toBeCloseTo(1, 3);
   });
 
   it('widens the ladder as contrast (delta) grows', () => {
@@ -438,25 +455,39 @@ describe('deriveTheme', () => {
               '--nx-color-popover-hover',
               ...sharedContrastSteppedTokens,
             ]
-          : [...sharedContrastSteppedTokens, '--nx-color-container-hover'];
+          : [
+              '--nx-color-container-hover',
+              '--nx-color-disabled',
+              '--nx-color-nav-background',
+              '--nx-color-nav-border',
+              '--nx-color-nav-item-active',
+              '--nx-color-nav-item-hover',
+              ...sharedContrastSteppedTokens,
+            ];
 
       for (const token of modeSteppedTokens) {
         expect(strong[token], `${mode} ${token}`).not.toBe(soft[token]);
       }
 
       if (mode === 'dark') {
-        for (const token of [
-          '--nx-color-nav-border',
-          '--nx-color-nav-item-active',
-        ]) {
-          expect(strong[token], `${mode} ${token}`).toBe(soft[token]);
-        }
+        expect(strong['--nx-color-disabled']).toBe(
+          strong['--nx-color-container']
+        );
+        expect(strong['--nx-color-nav-background']).toBe(
+          strong['--nx-color-container']
+        );
+        expect(strong['--nx-color-nav-item-active']).toBe(
+          strong['--nx-color-container-hover']
+        );
+        expect(strong['--nx-color-nav-border']).toBe(
+          strong['--nx-color-container-hover']
+        );
       } else {
-        expect(lOf(strong['--nx-color-container-hover'])).toBeGreaterThan(
+        expect(lOf(strong['--nx-color-container-hover'])).toBeLessThan(
           lOf(strong['--nx-color-background'])
         );
-        expect(strong['--nx-color-popover-hover']).toBe(
-          strong['--nx-color-background-hover']
+        expect(lOf(strong['--nx-color-popover-hover'])).toBeLessThan(
+          lOf(strong['--nx-color-background-hover'])
         );
       }
     }
@@ -594,7 +625,7 @@ describe('status families', () => {
 });
 
 describe('surfaceTone surfaces', () => {
-  it('lifts light containers above the tinted page while recessed surfaces step down', () => {
+  it('keeps light page and cards white while supporting softer surface tiers', () => {
     const slate = deriveTheme({
       surfaceTone: 'slate',
       ...SURFACE_TONE_SEEDS,
@@ -604,24 +635,20 @@ describe('surfaceTone surfaces', () => {
       ...SURFACE_TONE_SEEDS,
     }).light;
 
-    expect(lOf(slate['--nx-color-container'])).toBeGreaterThan(
-      lOf(slate['--nx-color-background'])
-    );
+    expect(slate['--nx-color-container']).toBe(slate['--nx-color-background']);
     expect(slate['--nx-color-popover']).toBe(slate['--nx-color-container']);
-    expect(slate['--nx-color-background']).not.toBe(
+    expect(slate['--nx-color-background']).toBe(
       neutral['--nx-color-background']
     );
-    expect(lOf(slate['--nx-color-background'])).toBeCloseTo(0.97, 3);
-    expect(lOf(neutral['--nx-color-background'])).toBeCloseTo(0.97, 3);
+    expect(lOf(slate['--nx-color-background'])).toBeCloseTo(1, 3);
+    expect(lOf(neutral['--nx-color-background'])).toBeCloseTo(1, 3);
     expect(lOf(slate['--nx-color-muted'])).toBeLessThan(
       lOf(slate['--nx-color-background'])
     );
     expect(lOf(slate['--nx-color-container-hover'])).toBeLessThan(
       lOf(slate['--nx-color-container'])
     );
-    expect(lOf(slate['--nx-color-container-hover'])).toBeGreaterThan(
-      lOf(slate['--nx-color-background'])
-    );
+    expect(slate['--nx-color-container-hover']).toBe(slate['--nx-color-muted']);
     expect(slate['--nx-color-muted']).not.toBe(neutral['--nx-color-muted']);
   });
 });

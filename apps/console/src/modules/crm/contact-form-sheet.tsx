@@ -1,17 +1,11 @@
 import { useEffect } from 'react';
-import { useForm } from 'react-hook-form';
+import { FormProvider, useForm } from 'react-hook-form';
 
 import { zodResolver } from '@hookform/resolvers/zod';
 import {
   Alert,
   AlertDescription,
   Button,
-  Form,
-  FormControl,
-  FormField,
-  FormItem,
-  FormLabel,
-  FormMessage,
   Input,
   Select,
   SelectContent,
@@ -38,6 +32,13 @@ import {
   crmKeys,
   updateContact,
 } from '../../lib/crm-api';
+import {
+  RhfField,
+  RhfFieldControl,
+  RhfFieldItem,
+  RhfFieldLabel,
+  RhfFieldMessage,
+} from '../../lib/rhf-field';
 
 const OWNERS = [
   'Ada Lovelace',
@@ -126,7 +127,7 @@ export function ContactFormSheet({
         side="right"
         className="nx:flex nx:w-full nx:flex-col nx:sm:max-w-md"
       >
-        <Form {...form}>
+        <FormProvider {...form}>
           <form
             noValidate
             onSubmit={form.handleSubmit(onSubmit)}
@@ -148,64 +149,64 @@ export function ContactFormSheet({
                 </Alert>
               )}
 
-              <FormField
+              <RhfField
                 control={form.control}
                 name="name"
                 render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Name</FormLabel>
-                    <FormControl>
+                  <RhfFieldItem>
+                    <RhfFieldLabel>Name</RhfFieldLabel>
+                    <RhfFieldControl>
                       <Input placeholder="Ada Lovelace" {...field} />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
+                    </RhfFieldControl>
+                    <RhfFieldMessage />
+                  </RhfFieldItem>
                 )}
               />
 
-              <FormField
+              <RhfField
                 control={form.control}
                 name="email"
                 render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Email</FormLabel>
-                    <FormControl>
+                  <RhfFieldItem>
+                    <RhfFieldLabel>Email</RhfFieldLabel>
+                    <RhfFieldControl>
                       <Input
                         type="email"
                         placeholder="ada@example.com"
                         {...field}
                       />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
+                    </RhfFieldControl>
+                    <RhfFieldMessage />
+                  </RhfFieldItem>
                 )}
               />
 
-              <FormField
+              <RhfField
                 control={form.control}
                 name="company"
                 render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Company</FormLabel>
-                    <FormControl>
+                  <RhfFieldItem>
+                    <RhfFieldLabel>Company</RhfFieldLabel>
+                    <RhfFieldControl>
                       <Input placeholder="Northwind Traders" {...field} />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
+                    </RhfFieldControl>
+                    <RhfFieldMessage />
+                  </RhfFieldItem>
                 )}
               />
 
-              <FormField
+              <RhfField
                 control={form.control}
                 name="status"
                 render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Status</FormLabel>
+                  <RhfFieldItem>
+                    <RhfFieldLabel>Status</RhfFieldLabel>
                     <Select value={field.value} onValueChange={field.onChange}>
-                      <FormControl>
+                      <RhfFieldControl>
                         <SelectTrigger>
                           <SelectValue />
                         </SelectTrigger>
-                      </FormControl>
+                      </RhfFieldControl>
                       <SelectContent>
                         {STATUS_OPTIONS.map((option) => (
                           <SelectItem key={option.value} value={option.value}>
@@ -214,23 +215,23 @@ export function ContactFormSheet({
                         ))}
                       </SelectContent>
                     </Select>
-                    <FormMessage />
-                  </FormItem>
+                    <RhfFieldMessage />
+                  </RhfFieldItem>
                 )}
               />
 
-              <FormField
+              <RhfField
                 control={form.control}
                 name="owner"
                 render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Owner</FormLabel>
+                  <RhfFieldItem>
+                    <RhfFieldLabel>Owner</RhfFieldLabel>
                     <Select value={field.value} onValueChange={field.onChange}>
-                      <FormControl>
+                      <RhfFieldControl>
                         <SelectTrigger>
                           <SelectValue />
                         </SelectTrigger>
-                      </FormControl>
+                      </RhfFieldControl>
                       <SelectContent>
                         {OWNERS.map((owner) => (
                           <SelectItem key={owner} value={owner}>
@@ -239,18 +240,18 @@ export function ContactFormSheet({
                         ))}
                       </SelectContent>
                     </Select>
-                    <FormMessage />
-                  </FormItem>
+                    <RhfFieldMessage />
+                  </RhfFieldItem>
                 )}
               />
 
-              <FormField
+              <RhfField
                 control={form.control}
                 name="value"
                 render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Open value (USD)</FormLabel>
-                    <FormControl>
+                  <RhfFieldItem>
+                    <RhfFieldLabel>Open value (USD)</RhfFieldLabel>
+                    <RhfFieldControl>
                       {/* type=number gives a string; keep the field value a
                           number so it matches the schema (empty → 0). */}
                       <Input
@@ -260,9 +261,9 @@ export function ContactFormSheet({
                         {...field}
                         onChange={(e) => field.onChange(Number(e.target.value))}
                       />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
+                    </RhfFieldControl>
+                    <RhfFieldMessage />
+                  </RhfFieldItem>
                 )}
               />
             </div>
@@ -278,7 +279,7 @@ export function ContactFormSheet({
               </SheetClose>
             </SheetFooter>
           </form>
-        </Form>
+        </FormProvider>
       </SheetContent>
     </Sheet>
   );
