@@ -15,8 +15,6 @@ const meta: Meta<typeof NexusAppearanceSettings> = {
         storageKey={false}
         defaultState={{
           ...DEFAULT_NEXUS_APPEARANCE,
-          lightContrast: 60,
-          darkContrast: 60,
         }}
       >
         <Story />
@@ -46,6 +44,6 @@ export const ContrastIsolation: Story = {
 
     // Config preview proves light moved and dark held — and renders numbers, not [object Object].
     await expect(canvas.getByText('lightContrast: 58,')).toBeInTheDocument();
-    await expect(canvas.getByText('darkContrast: 60,')).toBeInTheDocument();
+    await expect(canvas.getByText('darkContrast: 0,')).toBeInTheDocument();
   },
 };
