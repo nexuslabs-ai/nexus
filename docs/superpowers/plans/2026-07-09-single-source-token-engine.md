@@ -338,10 +338,7 @@ The generator stops reading semantic color JSON and bakes the engine floor inste
 
 - Modify: `turbo.json`
 
-- [ ] ```jsonc
-      "build:tailwind": { "dependsOn": ["build"], "outputs": ["dist/tailwind/**"] }
-      ```
-  Generator stays **out of** core's `build` script — `release.yml` runs `turbo build && changeset publish` and `@nexus_ds/core` ships only `dist/runtime`; token generation must not enter the publish path. Closes the standing note in `packages/react/package.json:8` (issue #66).
+- [ ] Set turbo config: `"build:tailwind": { "dependsOn": ["build"], "outputs": ["dist/tailwind/**"] }`. Generator stays **out of** core's `build` script — `release.yml` runs `turbo build && changeset publish` and `@nexus_ds/core` ships only `dist/runtime`; token generation must not enter the publish path. Closes the standing note in `packages/react/package.json:8` (issue #66).
 
 ### Task 3.6 — CI `audit-tokens`: build the engine before regenerating
 
