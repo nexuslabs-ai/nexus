@@ -168,10 +168,16 @@ export function NexusAppearanceSettings() {
     setState((current) => ({ ...current, mode: value }));
   };
 
-  const setContrast = (values: number[]) => {
-    const contrast = values[0];
-    if (contrast === undefined) return;
-    setState((current) => ({ ...current, contrast }));
+  const setLightContrast = (values: number[]) => {
+    const lightContrast = values[0];
+    if (lightContrast === undefined) return;
+    setState((current) => ({ ...current, lightContrast }));
+  };
+
+  const setDarkContrast = (values: number[]) => {
+    const darkContrast = values[0];
+    if (darkContrast === undefined) return;
+    setState((current) => ({ ...current, darkContrast }));
   };
 
   const setFontSize = (key: 'uiFontSize' | 'codeFontSize', value: number) => {
@@ -243,16 +249,31 @@ export function NexusAppearanceSettings() {
           </NexusAppearanceSettingRow>
 
           <NexusAppearanceSettingRow
-            label="Contrast"
-            description={`${state.contrast}`}
+            label="Light contrast"
+            description={`${state.lightContrast}`}
           >
             <Slider
-              value={[state.contrast]}
-              onValueChange={setContrast}
+              value={[state.lightContrast]}
+              onValueChange={setLightContrast}
               min={0}
               max={100}
               step={1}
-              aria-label="Contrast"
+              aria-label="Light contrast"
+              className="nx:w-48"
+            />
+          </NexusAppearanceSettingRow>
+
+          <NexusAppearanceSettingRow
+            label="Dark contrast"
+            description={`${state.darkContrast}`}
+          >
+            <Slider
+              value={[state.darkContrast]}
+              onValueChange={setDarkContrast}
+              min={0}
+              max={100}
+              step={1}
+              aria-label="Dark contrast"
               className="nx:w-48"
             />
           </NexusAppearanceSettingRow>
