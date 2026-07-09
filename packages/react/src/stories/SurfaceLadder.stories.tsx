@@ -197,7 +197,15 @@ export const Explorer: Story = {
   render: () => <SurfaceLadderStory />,
   play: async ({ canvasElement }) => {
     const canvas = within(canvasElement);
+    const backgroundSwatch = canvas.getByTestId('surface-ladder-background');
+    await expect(backgroundSwatch).toBeVisible();
 
-    await expect(canvas.getByTestId('surface-ladder-background')).toBeVisible();
+    const swatch = within(backgroundSwatch);
+    // The live runtime OKLCH value resolves and renders.
+    await expect(await swatch.findByText(/^oklch\(/)).toBeVisible();
+    // An APCA contrast badge renders for the swatch.
+    const badges = await swatch.findAllByText(/^Lc /);
+    await expect(badges.length).toBeGreaterThan(0);
+    await expect(badges[0]).toBeVisible();
   },
 };

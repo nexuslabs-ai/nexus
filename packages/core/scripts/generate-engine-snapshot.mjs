@@ -2,6 +2,7 @@ import { execFileSync } from 'node:child_process';
 import fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath, pathToFileURL } from 'node:url';
+import prettier from 'prettier';
 
 import { compactSnapshot, deriveMatrix } from './engine-snapshot-matrix.mjs';
 
@@ -36,6 +37,10 @@ const matrix = deriveMatrix({
   tones,
 });
 const snapshot = compactSnapshot(matrix, tones);
+const formatted = await prettier.format(JSON.stringify(snapshot, null, 2), {
+  ...(await prettier.resolveConfig(fixturePath)),
+  filepath: fixturePath,
+});
 
-fs.writeFileSync(fixturePath, `${JSON.stringify(snapshot, null, 2)}\n`);
+fs.writeFileSync(fixturePath, formatted);
 console.log(`Wrote ${path.relative(repoRoot, fixturePath)}`);

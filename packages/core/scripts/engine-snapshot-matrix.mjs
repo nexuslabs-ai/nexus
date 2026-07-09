@@ -32,6 +32,14 @@ export function sameValue(a, b) {
   return JSON.stringify(a) === JSON.stringify(b);
 }
 
+function snapshotValue(matrix, tone, mode, token) {
+  const value = matrix[tone][mode][token];
+  if (value === undefined) {
+    throw new Error(`Missing engine snapshot value ${tone}.${mode}.${token}`);
+  }
+  return value;
+}
+
 export function deriveMatrix({
   deriveTheme,
   createNexusThemeContract,
@@ -75,9 +83,9 @@ export function compactSnapshot(matrix, tones) {
 
   for (const mode of MODES) {
     for (const token of tokenNames) {
-      const firstValue = matrix[firstTone][mode][token];
+      const firstValue = snapshotValue(matrix, firstTone, mode, token);
       const invariant = tones.every((tone) =>
-        sameValue(matrix[tone][mode][token], firstValue)
+        sameValue(snapshotValue(matrix, tone, mode, token), firstValue)
       );
 
       if (invariant) {
@@ -86,7 +94,12 @@ export function compactSnapshot(matrix, tones) {
       }
 
       for (const tone of tones) {
-        snapshot.toneVarying[tone][mode][token] = matrix[tone][mode][token];
+        snapshot.toneVarying[tone][mode][token] = snapshotValue(
+          matrix,
+          tone,
+          mode,
+          token
+        );
       }
     }
   }
