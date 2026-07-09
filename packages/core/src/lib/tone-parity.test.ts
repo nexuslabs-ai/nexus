@@ -2,17 +2,12 @@ import { clampChroma, type Oklch } from 'culori';
 import path from 'node:path';
 import { describe, expect, it } from 'vitest';
 
-import {
-  CHART_DARK,
-  CHART_LIGHT,
-  deriveTheme,
-  type Mode,
-  NEUTRAL,
-  STATUS_RAMP,
-} from './derive-theme';
+import { deriveTheme } from './derive-theme';
 import lightFixture from './light-tone.fixture.json';
+import type { Mode } from './palette';
 import perceptualGrid from './perceptual-grid.json';
 import perceptualGridHue from './perceptual-grid-hue.json';
+import { CHART_DARK, CHART_LIGHT, NEUTRAL, STATUS_RAMP } from './static-ramps';
 import {
   baseLeaves,
   parseToOklch,

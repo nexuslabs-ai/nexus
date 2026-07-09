@@ -18,12 +18,11 @@ import {
   deriveSurfaces,
   deriveText,
   deriveTheme,
-  type NexusSurfaceTone,
-  STATUS_RAMP,
   type ThemeDerivationInput,
   themeToCss,
 } from './derive-theme';
-import { TIER_THRESHOLDS } from './palette';
+import { type NexusSurfaceTone, TIER_THRESHOLDS } from './palette';
+import { STATUS_RAMP } from './static-ramps';
 
 function lOf(oklchStr: string | undefined): number {
   return oklch(parse(oklchStr!)!)!.l!;

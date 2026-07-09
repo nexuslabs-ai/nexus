@@ -1,8 +1,5 @@
-import type {
-  NexusSurfaceTone,
-  ThemeDerivationInput,
-  ThemeSeeds,
-} from './derive-theme';
+import type { ThemeDerivationInput, ThemeSeeds } from './derive-theme';
+import type { NexusSurfaceTone } from './palette';
 import { isColor } from './perceptual-ramp';
 
 type ModeSeeds = Pick<ThemeSeeds, 'background' | 'foreground'>;

@@ -3,7 +3,7 @@ import { readFileSync } from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 
-import type { NexusSurfaceTone } from './derive-theme';
+import type { NexusSurfaceTone } from './palette';
 
 // Shared resolvers for the token parity tests (`tone-parity.test.ts`,
 // `derive-theme.static-parity.test.ts`). Kept in one place so the two suites

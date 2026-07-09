@@ -9,20 +9,16 @@ export * from './lib/appearance-model';
 export * from './lib/appearance-snapshot';
 export type {
   DerivedTheme,
-  NexusSurfaceTone,
   NexusThemeContract,
   ThemeDerivationInput,
   ThemeSeeds,
   TokenMap,
 } from './lib/derive-theme';
 export { deriveTheme, themeToCss } from './lib/derive-theme';
+export type { NexusSurfaceTone } from './lib/palette';
 export { PALETTE_KEYS, TIER_THRESHOLDS } from './lib/palette';
 export { isColor } from './lib/perceptual-ramp';
-export type {
-  ShadeAnchor,
-  SurfaceSteps,
-  SurfaceToken,
-} from './lib/surface-ladder';
+export type { SurfaceToken } from './lib/surface-ladder';
 export {
   SEMANTIC_TOKEN_REGISTRY,
   type SemanticTokenMeta,

@@ -2,27 +2,23 @@ import { clampChroma, type Oklch } from 'culori';
 
 import { apcaLc } from './apca';
 import { formatOklch } from './oklch-format';
-import { type Shade, type Tier, TIER_THRESHOLDS } from './palette';
+import {
+  type Mode,
+  type NexusSurfaceTone,
+  type Shade,
+  type Tier,
+  TIER_THRESHOLDS,
+} from './palette';
 import { rampFromSeed, seedOklch } from './perceptual-ramp';
+import { CHART_DARK, CHART_LIGHT, NEUTRAL, STATUS_RAMP } from './static-ramps';
 import {
   anchorToStep,
-  CHART_DARK,
-  CHART_LIGHT,
   DARK_SURFACE_LADDER,
   LIGHT_CHROMA_DEPTH_MULTIPLIER,
   LIGHT_SURFACE_LADDER,
-  NEUTRAL,
   PAGE_L_LIGHT,
-  STATUS_RAMP,
   SURFACE_TOKENS,
   SURFACE_TONE,
-} from './surface-ladder';
-
-export {
-  CHART_DARK,
-  CHART_LIGHT,
-  NEUTRAL,
-  STATUS_RAMP,
 } from './surface-ladder';
 
 export interface ThemeSeeds {
@@ -33,8 +29,6 @@ export interface ThemeSeeds {
   /** Drives the text tiers. */
   foreground: string;
 }
-
-export type NexusSurfaceTone = 'stone' | 'neutral' | 'zinc' | 'slate' | 'gray';
 
 /** The derivation seeds `deriveTheme` consumes — no display preference. */
 export interface ThemeDerivationInput {
@@ -53,7 +47,6 @@ export interface NexusThemeContract extends ThemeDerivationInput {
   appearance: 'light' | 'dark' | 'system';
 }
 
-export type Mode = 'light' | 'dark';
 export type TokenMap = Record<string, string>;
 export interface DerivedTheme {
   light: TokenMap;

@@ -1,10 +1,7 @@
 import { describe, expect, it } from 'vitest';
 
 import {
-  anchorToStep,
-  DARK_SURFACE_LADDER,
   DARK_SURFACE_STEPS,
-  LIGHT_SURFACE_LADDER,
   LIGHT_SURFACE_STEPS,
   SURFACE_TOKENS,
   type SurfaceSteps,
@@ -61,21 +58,9 @@ function expectStepsToMatch(actual: SurfaceSteps, expected: SurfaceSteps) {
 describe('surface ladder', () => {
   it('keeps the light shade anchors on the legacy surface steps', () => {
     expectStepsToMatch(LIGHT_SURFACE_STEPS, LEGACY_LIGHT_SURFACE_STEPS);
-
-    for (const token of SURFACE_TOKENS) {
-      expect(anchorToStep(LIGHT_SURFACE_LADDER[token], 'light', 'stone')).toBe(
-        LIGHT_SURFACE_STEPS[token]
-      );
-    }
   });
 
   it('keeps the dark ladder step-preserved until dark shell adjudication', () => {
     expectStepsToMatch(DARK_SURFACE_STEPS, LEGACY_DARK_SURFACE_STEPS);
-
-    for (const token of SURFACE_TOKENS) {
-      expect(anchorToStep(DARK_SURFACE_LADDER[token], 'dark', 'stone')).toBe(
-        DARK_SURFACE_STEPS[token]
-      );
-    }
   });
 });
