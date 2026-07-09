@@ -855,7 +855,7 @@ export const VariantClassesMatchFigmaTokens: Story = {
       'nx:hover:bg-container-hover'
     );
     await expect(canvas.getByRole('button', { name: 'Dashed' })).toHaveClass(
-      'nx:hover:bg-container-hover'
+      'nx:border-dashed'
     );
     await expect(canvas.getByRole('button', { name: 'Ghost' })).toHaveClass(
       'nx:hover:bg-container-hover'

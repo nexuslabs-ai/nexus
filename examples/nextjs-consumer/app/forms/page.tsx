@@ -7,13 +7,6 @@ import {
   CardDescription,
   CardHeader,
   CardTitle,
-  Form,
-  FormControl,
-  FormDescription,
-  FormField,
-  FormItem,
-  FormLabel,
-  FormMessage,
   Input,
   Select,
   SelectContent,
@@ -24,7 +17,16 @@ import {
   Textarea,
   toast,
 } from '@acme/react';
-import { useForm } from 'react-hook-form';
+import { FormProvider, useForm } from 'react-hook-form';
+
+import {
+  RhfField,
+  RhfFieldControl,
+  RhfFieldDescription,
+  RhfFieldItem,
+  RhfFieldLabel,
+  RhfFieldMessage,
+} from '../lib/rhf-field';
 
 type Values = {
   name: string;
@@ -54,24 +56,24 @@ export default function FormsPage() {
         </CardDescription>
       </CardHeader>
       <CardContent>
-        <Form {...form}>
+        <FormProvider {...form}>
           <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-5">
-            <FormField
+            <RhfField
               control={form.control}
               name="name"
               rules={{ required: 'Name is required' }}
               render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Name</FormLabel>
-                  <FormControl>
+                <RhfFieldItem>
+                  <RhfFieldLabel>Name</RhfFieldLabel>
+                  <RhfFieldControl>
                     <Input placeholder="Ada Lovelace" {...field} />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
+                  </RhfFieldControl>
+                  <RhfFieldMessage />
+                </RhfFieldItem>
               )}
             />
 
-            <FormField
+            <RhfField
               control={form.control}
               name="email"
               rules={{
@@ -79,29 +81,29 @@ export default function FormsPage() {
                 pattern: { value: /^[^@\s]+@[^@\s]+$/, message: 'Enter a valid email' },
               }}
               render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Email</FormLabel>
-                  <FormControl>
+                <RhfFieldItem>
+                  <RhfFieldLabel>Email</RhfFieldLabel>
+                  <RhfFieldControl>
                     <Input type="email" placeholder="ada@example.com" {...field} />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
+                  </RhfFieldControl>
+                  <RhfFieldMessage />
+                </RhfFieldItem>
               )}
             />
 
-            <FormField
+            <RhfField
               control={form.control}
               name="role"
               rules={{ required: 'Pick a role' }}
               render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Role</FormLabel>
+                <RhfFieldItem>
+                  <RhfFieldLabel>Role</RhfFieldLabel>
                   <Select onValueChange={field.onChange} value={field.value}>
-                    <FormControl>
+                    <RhfFieldControl>
                       <SelectTrigger>
                         <SelectValue placeholder="Select a role" />
                       </SelectTrigger>
-                    </FormControl>
+                    </RhfFieldControl>
                     <SelectContent>
                       <SelectItem value="owner">Owner</SelectItem>
                       <SelectItem value="admin">Admin</SelectItem>
@@ -109,39 +111,39 @@ export default function FormsPage() {
                       <SelectItem value="viewer">Viewer</SelectItem>
                     </SelectContent>
                   </Select>
-                  <FormMessage />
-                </FormItem>
+                  <RhfFieldMessage />
+                </RhfFieldItem>
               )}
             />
 
-            <FormField
+            <RhfField
               control={form.control}
               name="bio"
               render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Bio</FormLabel>
-                  <FormControl>
+                <RhfFieldItem>
+                  <RhfFieldLabel>Bio</RhfFieldLabel>
+                  <RhfFieldControl>
                     <Textarea rows={3} placeholder="A short bio…" {...field} />
-                  </FormControl>
-                  <FormDescription>Shown on your public profile.</FormDescription>
-                  <FormMessage />
-                </FormItem>
+                  </RhfFieldControl>
+                  <RhfFieldDescription>Shown on your public profile.</RhfFieldDescription>
+                  <RhfFieldMessage />
+                </RhfFieldItem>
               )}
             />
 
-            <FormField
+            <RhfField
               control={form.control}
               name="notifications"
               render={({ field }) => (
-                <FormItem className="flex items-center justify-between rounded-lg border border-slate-200 p-4">
-                  <div className="space-y-0.5">
-                    <FormLabel>Notifications</FormLabel>
-                    <FormDescription>Email me about account activity.</FormDescription>
+                <RhfFieldItem className="rounded-lg border border-slate-200 p-4">
+                  <div className="flex items-center justify-between gap-4">
+                    <RhfFieldLabel>Notifications</RhfFieldLabel>
+                    <RhfFieldControl>
+                      <Switch checked={field.value} onCheckedChange={field.onChange} />
+                    </RhfFieldControl>
                   </div>
-                  <FormControl>
-                    <Switch checked={field.value} onCheckedChange={field.onChange} />
-                  </FormControl>
-                </FormItem>
+                  <RhfFieldDescription>Email me about account activity.</RhfFieldDescription>
+                </RhfFieldItem>
               )}
             />
 
@@ -152,7 +154,7 @@ export default function FormsPage() {
               <Button type="submit">Save changes</Button>
             </div>
           </form>
-        </Form>
+        </FormProvider>
       </CardContent>
     </Card>
   );

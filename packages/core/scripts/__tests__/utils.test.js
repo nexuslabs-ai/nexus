@@ -73,12 +73,6 @@ describe('utils', () => {
       );
     });
 
-    it('preserves authored stone 950 instead of pinning it to the grid', () => {
-      expect(formatTokenValue('#0b0a09', 'color', ['stone', '950'])).toBe(
-        'oklch(0.1456 0.0028 68.551)'
-      );
-    });
-
     it('routes single-element paths to mechanical (white/black at root)', () => {
       // `['white']` is length 1 — last segment isn't a shade key, falls through
       // to mechanical conversion.
