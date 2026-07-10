@@ -284,17 +284,15 @@ export function discoverPrimitives(primitivesDir) {
 }
 
 /**
- * Discover all semantic token themes and standalone files from file system.
- * Detects:
- * - Themed files: {type}-{mode}-{light|dark}.json pattern
- * - Standalone files: {name}.json (no light/dark suffix)
+ * Discover semantic token files from the file system, partitioning
+ * spacing-mode files (spacing-{mode}.json) into perModeFiles from plain
+ * standalone files ({name}.json).
  *
  * @param {string} semanticDir - Path to semantic directory
- * @returns {object} { themed: { type: { mode: { light, dark } } }, standalone: string[], perModeFiles: { category: { mode: filename } } }
+ * @returns {object} { standalone: string[], perModeFiles: { category: { mode: filename } } }
  */
 export function discoverSemantics(semanticDir) {
   const result = {
-    themed: {},
     standalone: [],
     // Bucket for per-mode semantic categories. Keyed by category so a future
     // per-mode category (e.g. per-mode color shading) lands as a sibling key
@@ -309,8 +307,6 @@ export function discoverSemantics(semanticDir) {
 
   const files = fs.readdirSync(semanticDir).filter((f) => f.endsWith('.json'));
 
-  // Pattern for themed files: {type}-{mode}-{light|dark}.json
-  const themedPattern = /^(.+)-(.+)-(light|dark)\.json$/;
   // Pattern for spacing-mode files: spacing-{mode}.json. Their values are
   // direct px (no `{N}` refs) and emit per-mode `[data-density="X"]` blocks via
   // `collectSpacingTokens` — they intentionally bypass the generic
@@ -329,21 +325,8 @@ export function discoverSemantics(semanticDir) {
       continue;
     }
 
-    const match = file.match(themedPattern);
-    if (match) {
-      const [, type, mode, variant] = match;
-
-      if (!result.themed[type]) {
-        result.themed[type] = {};
-      }
-      if (!result.themed[type][mode]) {
-        result.themed[type][mode] = {};
-      }
-      result.themed[type][mode][variant] = file;
-    } else {
-      // Standalone file (no light/dark suffix, not a spacing mode)
-      result.standalone.push(file);
-    }
+    // Standalone file (not a spacing mode)
+    result.standalone.push(file);
   }
 
   return result;
@@ -351,7 +334,7 @@ export function discoverSemantics(semanticDir) {
 
 /**
  * Group {base}-light / {base}-dark mode names into pairs; pass others through unchanged.
- * Used by both bundled and modular generators to recognize themed primitive categories.
+ * Used by the generator to recognize themed primitive categories.
  *
  * @param {string[]} modes - List of mode names (e.g., ['vega-light', 'vega-dark', 'lyra'])
  * @returns {{ themed: Record<string, { light: string, dark: string }>, plain: string[] }}
@@ -810,10 +793,7 @@ function getBorderColorAliasName(cssName) {
  * @param {object[]} tokens - Array of semantic color tokens with cssName property (e.g., "color-border-default")
  * @returns {{ css: string, count: number }} Generated CSS and utility count
  */
-export function generateBorderColorAliasUtilitiesCSS(
-  tokens,
-  { runtimeFallback = false } = {}
-) {
+export function generateBorderColorAliasUtilitiesCSS(tokens) {
   const borderColorTokens = (tokens ?? [])
     .map((token) => ({ token, name: getBorderColorAliasName(token.cssName) }))
     .filter(({ name }) => name !== null)
@@ -831,9 +811,7 @@ export function generateBorderColorAliasUtilitiesCSS(
 
   for (const { token, name } of borderColorTokens) {
     css += `@utility border-color-${name} {\n`;
-    const value = runtimeFallback
-      ? `var(--nx-${token.cssName}, ${token.value})`
-      : `var(--${token.cssName})`;
+    const value = `var(--nx-${token.cssName}, ${token.value})`;
     css += `  border-color: ${value};\n`;
     css += `}\n\n`;
   }

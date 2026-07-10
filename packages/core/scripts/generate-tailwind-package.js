@@ -650,10 +650,8 @@ export async function generateTailwindPackage(
     log.success(`Generated ${borderWidth.count} border width utilities`);
   }
 
-  const borderColorAliases = generateBorderColorAliasUtilitiesCSS(
-    lightSemanticTokens,
-    { runtimeFallback: true }
-  );
+  const borderColorAliases =
+    generateBorderColorAliasUtilitiesCSS(lightSemanticTokens);
   if (borderColorAliases.css) {
     writeDistFile('border-color-aliases.css', borderColorAliases.css);
     log.success(
