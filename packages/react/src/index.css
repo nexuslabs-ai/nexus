@@ -11,7 +11,6 @@
 @custom-variant reduce-transparency (@media (prefers-reduced-transparency: reduce));
 @reference '@nexus_ds/tailwind';
 @import 'tw-animate-css';
-@import './components/motion/motion.css';
 @import './components/progress/progress.css';
 
 @media (prefers-reduced-motion: reduce) {
