@@ -396,7 +396,7 @@ export const WithDataAttributes: Story = {
     const items = Array.from(
       listbox.querySelectorAll('[data-slot="combobox-item"]')
     );
-    await expectImmediateItemMotion(listbox, items);
+    await expectImmediateItemMotion(items);
     await expect(
       within(listbox).getByRole('option', { name: 'Next.js' })
     ).toHaveAttribute('data-slot', 'combobox-item');

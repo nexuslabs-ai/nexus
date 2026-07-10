@@ -392,7 +392,7 @@ export const WithDataAttributes: Story = {
     const options = Array.from(
       listbox.querySelectorAll('[data-slot="multi-select-item"]')
     );
-    await expectImmediateItemMotion(listbox, options);
+    await expectImmediateItemMotion(options);
     const option = await body.findByRole('option', { name: 'React' });
 
     await expect(option).toHaveAttribute('data-slot', 'multi-select-item');

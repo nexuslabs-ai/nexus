@@ -417,7 +417,7 @@ export const ImmediateItems: Story = {
     const items = Array.from(
       menu.querySelectorAll('[data-slot="dropdown-menu-item"]')
     );
-    await expectImmediateItemMotion(menu, items);
+    await expectImmediateItemMotion(items);
 
     await userEvent.keyboard('{Escape}');
     await waitFor(() => {
@@ -474,8 +474,8 @@ export const ImmediateGroupedItems: Story = {
       editGroup.querySelectorAll('[data-slot="dropdown-menu-item"]')
     );
 
-    await expectImmediateItemMotion(fileGroup, fileItems);
-    await expectImmediateItemMotion(editGroup, editItems);
+    await expectImmediateItemMotion(fileItems);
+    await expectImmediateItemMotion(editItems);
 
     await userEvent.keyboard('{Escape}');
     await waitFor(() => {

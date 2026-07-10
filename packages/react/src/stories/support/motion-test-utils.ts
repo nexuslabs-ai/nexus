@@ -10,8 +10,7 @@ function animationDelayMs(element: Element) {
   return Number.parseFloat(delay) || 0;
 }
 
-async function expectImmediateItemMotion(container: Element, items: Element[]) {
-  await expect(container).toBeInTheDocument();
+async function expectImmediateItemMotion(items: Element[]) {
   expect(items.length).toBeGreaterThan(1);
 
   for (const item of items) {

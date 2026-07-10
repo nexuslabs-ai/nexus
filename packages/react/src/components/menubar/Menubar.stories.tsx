@@ -307,7 +307,7 @@ export const ImmediateItems: Story = {
     const items = Array.from(
       menu.querySelectorAll('[data-slot="menubar-item"]')
     );
-    await expectImmediateItemMotion(menu, items);
+    await expectImmediateItemMotion(items);
 
     await userEvent.keyboard('{Escape}');
     await waitFor(() => {

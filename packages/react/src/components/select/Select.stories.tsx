@@ -569,7 +569,7 @@ export const ImmediateItems: Story = {
     const items = Array.from(
       listbox.querySelectorAll('[data-slot="select-item"]')
     );
-    await expectImmediateItemMotion(listbox, items);
+    await expectImmediateItemMotion(items);
 
     await userEvent.keyboard('{Escape}');
     await waitFor(() => {
