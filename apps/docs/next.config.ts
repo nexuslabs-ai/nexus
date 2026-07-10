@@ -3,11 +3,11 @@ import type { NextConfig } from 'next';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 
-import { DOCS_THEME_BOOTSTRAP_CSP_HASH } from './theme-csp';
+import { DOCS_APPEARANCE_BOOTSTRAP_CSP_HASH } from './theme-csp';
 
 const SCRIPT_SRC = [
   "'self'",
-  DOCS_THEME_BOOTSTRAP_CSP_HASH,
+  DOCS_APPEARANCE_BOOTSTRAP_CSP_HASH,
   "'report-sample'",
   process.env.NODE_ENV === 'development' ? "'unsafe-eval'" : null,
 ]
