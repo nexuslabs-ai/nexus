@@ -6,21 +6,22 @@ from a single `NexusAppearanceState`.
 
 ## The model
 
-| Field         | Type                                                    | Meaning                                                                                |
-| ------------- | ------------------------------------------------------- | -------------------------------------------------------------------------------------- |
-| `mode`        | `'light' \| 'dark' \| 'system'`                         | Color scheme; `system` follows the OS.                                                 |
-| `brandColor`  | `string`                                                | Brand color seed, default `#339cff`.                                                   |
-| `surfaceTone` | `'stone' \| 'neutral' \| 'zinc' \| 'slate' \| 'gray'`   | Neutral surface family.                                                                |
-| `contrast`    | `number`                                                | Structural separation for surfaces, borders, dividers, nav, controls, and cards.       |
-| `density`     | `'compact' \| 'default' \| 'comfortable' \| 'spacious'` | Spacing rhythm.                                                                        |
-| `corners`     | `'square' \| 'subtle' \| 'smooth' \| 'round'`           | Radius scale.                                                                          |
-| `elevation`   | `'quiet' \| 'standard' \| 'strong'`                     | Shadow scale.                                                                          |
-| `stroke`      | `'fine' \| 'normal' \| 'strong'`                        | Border-width scale.                                                                    |
-| `prefs`       | `NexusAppearancePrefs`                                  | UI/code font family, UI/code size, reduce motion, pointer cursors, and font smoothing. |
+| Field           | Type                                                    | Meaning                                                                                        |
+| --------------- | ------------------------------------------------------- | ---------------------------------------------------------------------------------------------- |
+| `mode`          | `'light' \| 'dark' \| 'system'`                         | Color scheme; `system` follows the OS.                                                         |
+| `brandColor`    | `string`                                                | Brand color seed, default `#0a0a0a`.                                                           |
+| `surfaceTone`   | `'stone' \| 'neutral' \| 'zinc' \| 'slate' \| 'gray'`   | Neutral surface family.                                                                        |
+| `lightContrast` | `number`                                                | Structural separation (light theme) for surfaces, borders, dividers, nav, controls, and cards. |
+| `darkContrast`  | `number`                                                | Structural separation (dark theme) for surfaces, borders, dividers, nav, controls, and cards.  |
+| `density`       | `'compact' \| 'default' \| 'comfortable' \| 'spacious'` | Spacing rhythm.                                                                                |
+| `corners`       | `'square' \| 'subtle' \| 'smooth' \| 'round'`           | Radius scale.                                                                                  |
+| `elevation`     | `'quiet' \| 'standard' \| 'strong'`                     | Shadow scale.                                                                                  |
+| `stroke`        | `'fine' \| 'normal' \| 'strong'`                        | Border-width scale.                                                                            |
+| `prefs`         | `NexusAppearancePrefs`                                  | UI/code font family, UI/code size, reduce motion, pointer cursors, and font smoothing.         |
 
-`contrast` is a structure control, not a text hierarchy knob. Text may track a
-moving surface enough to stay APCA-readable, but the hierarchy itself stays
-fixed.
+`lightContrast` and `darkContrast` are structure controls, not text hierarchy
+knobs — each tunes its own theme independently. Text may track a moving surface
+enough to stay APCA-readable, but the hierarchy itself stays fixed.
 
 ## Brand and surface tone
 

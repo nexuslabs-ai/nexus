@@ -337,6 +337,7 @@ export const RangeHoverPreview: Story = {
         'rgba(0, 0, 0, 0)'
       )
     );
+    await expect(cell).toHaveClass('nx:bg-container-hover');
   },
 };
 

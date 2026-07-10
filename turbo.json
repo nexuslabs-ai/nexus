@@ -12,11 +12,8 @@
       ],
       "outputs": ["dist/runtime/**"]
     },
-    "build:tokens:modular": {
-      "inputs": ["scripts/**", "tokens/**", "src/lib/perceptual-grid.json"],
-      "outputs": ["dist/modular/**"]
-    },
     "build:tailwind": {
+      "dependsOn": ["build"],
       "inputs": ["scripts/**", "tokens/**", "src/lib/perceptual-grid.json"],
       "outputs": ["dist/tailwind/**"]
     },

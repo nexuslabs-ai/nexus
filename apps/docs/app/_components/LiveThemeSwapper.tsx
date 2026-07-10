@@ -1,44 +1,29 @@
 'use client';
 
+import { useNexusAppearance } from '@nexus_ds/react/appearance';
+
 import {
-  getThemeStylesheetHref,
-  sanitizeMode,
-  THEME_MODE_OPTIONS,
-  type ThemeStylesheetMode,
-} from '../_lib/theme-modes';
-import { useThemeStore } from '../_stores/use-theme-store';
+  getThemeModeOptions,
+  getThemeModeValue,
+  updateThemeMode,
+} from '../_lib/appearance-controls';
 
 import { Button } from './nexus';
 
 /**
- * Landing-page "Highlights" demo. Reuses the global theme store + the same
- * <link data-theme> swap the corner ThemePicker uses, so picking a base or
- * brand re-themes the entire page live (every surface is token-driven) and
- * stays in sync with the picker.
+ * Landing-page "Highlights" demo. Reuses the root appearance provider, so
+ * picking a base re-themes the entire page live and stays in sync with the
+ * corner picker.
  */
 
-type LiveThemeMode = Extract<ThemeStylesheetMode, 'base' | 'brand'>;
-
-const BASES = THEME_MODE_OPTIONS.base.map((option) => option.value);
-const BRANDS = THEME_MODE_OPTIONS.brand.map((option) => option.value);
-
-function applyTheme(mode: LiveThemeMode, value: string) {
-  const safeValue = sanitizeMode(mode, value);
-  const link = document.querySelector<HTMLLinkElement>(
-    `link[data-theme="${mode}"]`
-  );
-  if (link) link.href = getThemeStylesheetHref(mode, safeValue);
-}
+const BASES = getThemeModeOptions('base').map((option) => option.value);
 
 export function LiveThemeSwapper() {
-  const base = useThemeStore((s) => s.base);
-  const brand = useThemeStore((s) => s.brand);
-  const update = useThemeStore((s) => s.update);
+  const { state, setState } = useNexusAppearance();
+  const base = getThemeModeValue(state, 'base');
 
-  const pick = (mode: LiveThemeMode, value: string) => {
-    const safeValue = sanitizeMode(mode, value);
-    update(mode, safeValue);
-    applyTheme(mode, safeValue);
+  const pick = (value: string) => {
+    setState((current) => updateThemeMode(current, 'base', value));
   };
 
   return (
@@ -53,18 +38,7 @@ export function LiveThemeSwapper() {
         </span>
       </div>
 
-      <ChipRow
-        label="Base"
-        values={BASES}
-        active={base}
-        onPick={(v) => pick('base', v)}
-      />
-      <ChipRow
-        label="Brand"
-        values={BRANDS}
-        active={brand}
-        onPick={(v) => pick('brand', v)}
-      />
+      <ChipRow label="Base" values={BASES} active={base} onPick={pick} />
 
       <div className="nx:mt-auto nx:flex nx:flex-wrap nx:items-center nx:gap-2 nx:border-t nx:border-border-default nx:pt-4">
         <Button size="sm">Primary</Button>

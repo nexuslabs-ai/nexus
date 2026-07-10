@@ -168,17 +168,19 @@ export const MultipleErrors: Story = {
 // A divider between groups of fields, with centered content.
 export const WithSeparator: Story = {
   render: () => (
-    <FieldGroup className="nx:w-80">
-      <Field>
-        <FieldLabel htmlFor="field-sep-email">Email</FieldLabel>
-        <Input id="field-sep-email" type="email" />
-      </Field>
-      <FieldSeparator>OR</FieldSeparator>
-      <Field>
-        <FieldLabel htmlFor="field-sep-phone">Phone</FieldLabel>
-        <Input id="field-sep-phone" type="tel" />
-      </Field>
-    </FieldGroup>
+    <div className="nx:w-80 nx:rounded-lg nx:border nx:border-border-default nx:bg-container nx:p-6">
+      <FieldGroup>
+        <Field>
+          <FieldLabel htmlFor="field-sep-email">Email</FieldLabel>
+          <Input id="field-sep-email" type="email" />
+        </Field>
+        <FieldSeparator>OR</FieldSeparator>
+        <Field>
+          <FieldLabel htmlFor="field-sep-phone">Phone</FieldLabel>
+          <Input id="field-sep-phone" type="tel" />
+        </Field>
+      </FieldGroup>
+    </div>
   ),
 };
 
@@ -359,19 +361,25 @@ export const Disabled: Story = {
 // collisions across the generated cells.
 export const AllVariants: Story = {
   render: () => (
-    <FieldSet className="nx:w-80">
-      <FieldLegend variant="legend">Account</FieldLegend>
-      <Field>
-        <FieldLabel>Email</FieldLabel>
-        <Input type="email" aria-label="Email" placeholder="you@example.com" />
-        <FieldDescription>We never share it.</FieldDescription>
-      </Field>
-      <FieldSeparator>OR</FieldSeparator>
-      <Field data-invalid="true">
-        <FieldLabel>Username</FieldLabel>
-        <Input aria-label="Username" aria-invalid />
-        <FieldError errors={[{ message: 'That username is taken.' }]} />
-      </Field>
-    </FieldSet>
+    <div className="nx:w-80 nx:rounded-lg nx:border nx:border-border-default nx:bg-container nx:p-6">
+      <FieldSet>
+        <FieldLegend variant="legend">Account</FieldLegend>
+        <Field>
+          <FieldLabel>Email</FieldLabel>
+          <Input
+            type="email"
+            aria-label="Email"
+            placeholder="you@example.com"
+          />
+          <FieldDescription>We never share it.</FieldDescription>
+        </Field>
+        <FieldSeparator>OR</FieldSeparator>
+        <Field data-invalid="true">
+          <FieldLabel>Username</FieldLabel>
+          <Input aria-label="Username" aria-invalid />
+          <FieldError errors={[{ message: 'That username is taken.' }]} />
+        </Field>
+      </FieldSet>
+    </div>
   ),
 };

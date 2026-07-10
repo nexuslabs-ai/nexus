@@ -232,13 +232,11 @@ export function resolveValue(value, primitiveMap, type = 'unknown', tokenPath) {
  */
 export const DEFAULT_CONFIG = {
   base: 'stone',
-  brand: 'black',
   shadow: 'quiet',
   radius: 'square',
   borderwidth: 'normal',
   motion: 'snappy',
   focus: 'default',
-  'chart-categorical': 'default',
   // see CANONICAL_SPACING_DEFAULT_MODE — controls :root cascade only (all 6 modes ship)
   spacingDefault: 'default',
 };
@@ -818,7 +816,7 @@ export function generateBorderWidthUtilitiesCSS(tokens) {
   return { css, count: tokens.length * BORDER_WIDTH_UTILITIES_PER_TOKEN };
 }
 
-const BORDER_COLOR_ALIAS_NAMES = new Set([
+const BORDER_COLOR_ALIAS_NAMES = [
   'default',
   'default-alpha',
   'active',
@@ -833,7 +831,9 @@ const BORDER_COLOR_ALIAS_NAMES = new Set([
   'information-active',
   'primary',
   'primary-active',
-]);
+];
+
+const BORDER_COLOR_ALIAS_NAME_SET = new Set(BORDER_COLOR_ALIAS_NAMES);
 
 function getBorderColorAliasName(cssName) {
   const prefix = 'color-border-';
@@ -842,7 +842,7 @@ function getBorderColorAliasName(cssName) {
   }
 
   const name = cssName.slice(prefix.length);
-  return BORDER_COLOR_ALIAS_NAMES.has(name) ? name : null;
+  return BORDER_COLOR_ALIAS_NAME_SET.has(name) ? name : null;
 }
 
 /**
@@ -853,10 +853,18 @@ function getBorderColorAliasName(cssName) {
  * @param {object[]} tokens - Array of semantic color tokens with cssName property (e.g., "color-border-default")
  * @returns {{ css: string, count: number }} Generated CSS and utility count
  */
-export function generateBorderColorAliasUtilitiesCSS(tokens) {
+export function generateBorderColorAliasUtilitiesCSS(
+  tokens,
+  { runtimeFallback = false } = {}
+) {
   const borderColorTokens = (tokens ?? [])
     .map((token) => ({ token, name: getBorderColorAliasName(token.cssName) }))
-    .filter(({ name }) => name !== null);
+    .filter(({ name }) => name !== null)
+    .sort(
+      (a, b) =>
+        BORDER_COLOR_ALIAS_NAMES.indexOf(a.name) -
+        BORDER_COLOR_ALIAS_NAMES.indexOf(b.name)
+    );
 
   if (borderColorTokens.length === 0) {
     return { css: '', count: 0 };
@@ -866,7 +874,10 @@ export function generateBorderColorAliasUtilitiesCSS(tokens) {
 
   for (const { token, name } of borderColorTokens) {
     css += `@utility border-color-${name} {\n`;
-    css += `  border-color: var(--${token.cssName});\n`;
+    const value = runtimeFallback
+      ? `var(--nx-${token.cssName}, ${token.value})`
+      : `var(--${token.cssName})`;
+    css += `  border-color: ${value};\n`;
     css += `}\n\n`;
   }
 
@@ -1856,7 +1867,7 @@ export function collectSemanticDimensionTokens(semanticDir, fileName) {
 
 /**
  * Generate @theme CSS block for Tailwind
- * This is the shared function used by both generate-modular.js and generate-tailwind-package.js
+ * This is the shared function used by generate-tailwind-package.js
  *
  * @param {object} config - Configuration object
  * @param {string} config.header - File header comment
@@ -2055,12 +2066,12 @@ const ERROR_FOCUS_RING_SELECTORS = [
 ];
 
 const FIELD_BOUNDARY_SELECTORS = [
-  "[data-slot='input'][data-variant='default']",
-  "[data-slot='sidebar-input'][data-variant='default']",
-  "[data-slot='textarea'][data-variant='default']",
-  "[data-slot='native-select'][data-variant='default']",
-  "[data-slot='select-trigger'][data-variant='default']",
-  "[data-slot='input-group'][data-variant='default']",
+  "[data-slot='input'][data-variant='bordered']",
+  "[data-slot='sidebar-input'][data-variant='bordered']",
+  "[data-slot='textarea'][data-variant='bordered']",
+  "[data-slot='native-select'][data-variant='bordered']",
+  "[data-slot='select-trigger'][data-variant='bordered']",
+  "[data-slot='input-group'][data-variant='bordered']",
 ];
 
 const FIELD_ERROR_BOUNDARY_SELECTORS = [
@@ -2073,12 +2084,12 @@ const FIELD_ERROR_BOUNDARY_SELECTORS = [
 ];
 
 const FIELD_DISABLED_BOUNDARY_SELECTORS = [
-  "[data-slot='input'][data-variant='default']:disabled",
-  "[data-slot='sidebar-input'][data-variant='default']:disabled",
-  "[data-slot='textarea'][data-variant='default']:disabled",
-  "[data-slot='native-select'][data-variant='default']:disabled",
-  "[data-slot='select-trigger'][data-variant='default']:disabled",
-  "[data-slot='input-group'][data-variant='default'][data-disabled='true']",
+  "[data-slot='input'][data-variant='bordered']:disabled",
+  "[data-slot='sidebar-input'][data-variant='bordered']:disabled",
+  "[data-slot='textarea'][data-variant='bordered']:disabled",
+  "[data-slot='native-select'][data-variant='bordered']:disabled",
+  "[data-slot='select-trigger'][data-variant='bordered']:disabled",
+  "[data-slot='input-group'][data-variant='bordered'][data-disabled='true']",
 ];
 
 const OTP_SLOT_BOUNDARY_SELECTOR = "[data-slot='input-otp-slot']";
@@ -2353,9 +2364,8 @@ const SCRIPTS_DIR = path.dirname(fileURLToPath(import.meta.url));
  * location so callers can write to a temporary dist (e.g. tests) without
  * losing config resolution.
  *
- * Only walks the top level — both dist layouts (`dist/tailwind`,
- * `dist/modular`) are flat today. Throws if a subdirectory appears so a
- * future nested layout cannot silently skip files.
+ * Only walks the top level. Throws if a subdirectory appears so a future nested
+ * layout cannot silently skip files.
  */
 export async function formatDistCssFiles(distDir) {
   const config = await prettier.resolveConfig(SCRIPTS_DIR);

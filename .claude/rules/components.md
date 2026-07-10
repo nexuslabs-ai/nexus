@@ -52,7 +52,29 @@ All Tailwind utilities use the `nx:` prefix, and it comes BEFORE every modifier 
 
 ### Semantic Token Paths
 
-Use full semantic token paths, never incomplete or primitive ones: `nx:bg-primary-background` (not `nx:bg-primary`, not the primitive `nx:bg-blue-500`). There is no `accent` token in Nexus. See `packages/tailwind/nexus.css` for the available tokens.
+Use full semantic token paths, never incomplete or primitive ones: `nx:bg-primary-background` (not `nx:bg-primary`, not the primitive `nx:bg-blue-500`). There is no `accent` token in Nexus. See `SEMANTIC_TOKEN_REGISTRY` in `packages/core/src/lib/token-registry.ts` for the available semantic color tokens; `packages/tailwind/nexus.css` is generated from that surface.
+
+### Component Token Ownership
+
+Treat color family choice as part of the component contract. The class-ref
+audit enforces registry membership and bans direct primitive runtime color vars
+in component code; this ownership table is still a review-time rule because the
+script cannot know whether a `div` is acting as a card, a field surface, a
+popover, or app chrome.
+
+| Surface or role                                      | Owns these token families                                                                                     | Notes                                                                                                                              |
+| ---------------------------------------------------- | ------------------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------- |
+| Page and app root                                    | `background`, `foreground`                                                                                    | Use for the document canvas and full-page app shells.                                                                              |
+| Cards, panels, field groups, raised content surfaces | `container`, `container-foreground`, `border-default`                                                         | Field separators and field-card surfaces mask or rest on `container`, not page `background`.                                       |
+| Native form controls and control internals           | `control-background`, `control-background-hover`, `control-thumb`                                             | Inputs, switches, and control wells use `control-*`; surrounding field layout uses `container` when it needs a surface.            |
+| Floating content and menu rows                       | `popover`, `popover-alpha`, `popover-hover`, `popover-active`, `popover-foreground`                           | Popover, DropdownMenu, ContextMenu, Select content, HoverCard, Menubar content, and NavigationMenu flyouts use the popover family. |
+| Modal scrims                                         | `overlay`                                                                                                     | Scrims/backdrops use `overlay`; the panel above them uses its own surface family.                                                  |
+| Sidebar and navigation rails                         | `nav-background`, `nav-foreground`, `nav-muted-foreground`, `nav-item-hover`, `nav-item-active`, `nav-border` | Use `nav-*` for persistent navigation chrome rather than borrowing page or container tokens.                                       |
+| Secondary or quiet page content                      | `muted`, `muted-foreground`, `muted-foreground-subtle`                                                        | Use for subdued inline areas, helper text, captions, and incidental fills.                                                         |
+| Brand and action states                              | `primary-*`, `secondary-*`                                                                                    | Use full paths such as `primary-background` or `secondary-subtle-foreground`; never stop at the family name.                       |
+| Status states                                        | `success-*`, `warning-*`, `error-*`, `information-*`, `border-*` status tokens                                | Match the status family to the user-facing state and pair fill/foreground/border roles deliberately.                               |
+| Keyboard focus                                       | `focus-default`, `focus-error`                                                                                | Keep focus color behind the stable focus token utilities.                                                                          |
+| Data visualization                                   | `chart-categorical-*`                                                                                         | Use only for chart marks, legends, and chart-specific swatches.                                                                    |
 
 ### Adaptive-by-Default Semantic Tokens
 
@@ -178,7 +200,7 @@ The dividing line is modality and surface: anything a keyboard user reaches with
 
 ### Popover / menu surface policy
 
-Popover-layer containers — Popover, DropdownMenu, ContextMenu, HoverCard, Menubar floating content, NavigationMenu flyouts, Select content, and equivalent first-party floating surfaces — use the shared translucent + blurred recipe by default: `popoverSurfaceClassName` (`nx:bg-popover-alpha` at `a700`, `nx:backdrop-blur-lg`, `nx:text-popover-foreground`, `nx:border-border-default`, `nx:shadow-lg`, rounded radius). The conservative alpha is guarded by the worst-case APCA test in `packages/core/src/lib/derive-theme.test.ts`, and `tone-parity.test.ts` keeps the static token JSON and runtime `deriveTheme` value in step.
+Popover-layer containers — Popover, DropdownMenu, ContextMenu, HoverCard, Menubar floating content, NavigationMenu flyouts, Select content, and equivalent first-party floating surfaces — use the shared translucent + blurred recipe by default: `popoverSurfaceClassName` (`nx:bg-popover-alpha` at `a700`, `nx:backdrop-blur-lg`, `nx:text-popover-foreground`, `nx:border-border-default`, `nx:shadow-lg`, rounded radius). The conservative alpha is guarded by the worst-case APCA test in `packages/core/src/lib/derive-theme.test.ts`; the frozen engine matrix snapshot plus the APCA pair sweep guard runtime semantic color output.
 
 Tooltip is the exception: it uses `tooltipSurfaceClassName` (`nx:bg-popover`, no blur) because its small, brief text appears over arbitrary page content. Under `prefers-reduced-transparency: reduce`, translucent popover-family surfaces revert to the solid `nx:bg-popover` fill. Row hover/active states stay solid `popover-hover` / `popover-active`; `audit:contrast` remains a solid-surface regression check, while translucent readability is proven by the APCA gate and the Storybook comparison story.
 

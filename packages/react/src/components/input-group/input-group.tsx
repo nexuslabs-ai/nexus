@@ -39,14 +39,14 @@ const inputGroupVariants = cva(
   {
     variants: {
       variant: {
-        default:
-          'nx:border-border-default nx:bg-background nx:not-data-[disabled=true]:hover:bg-background-hover nx:data-[disabled=true]:border-border-disabled',
+        bordered:
+          'nx:border-border-default nx:bg-container nx:not-data-[disabled=true]:hover:bg-container-hover nx:data-[disabled=true]:border-border-disabled',
         borderless:
           'nx:border-transparent nx:bg-control-background nx:not-data-[disabled=true]:hover:bg-control-background-hover',
       },
     },
     defaultVariants: {
-      variant: 'default',
+      variant: 'bordered',
     },
   }
 );
@@ -73,8 +73,9 @@ interface InputGroupProps
  *
  * The visible frame matches a standalone `Input`: an inline group takes the
  * control's `size` height. Stacked (block-aligned) groups stay auto-height.
- * Use `variant="borderless"` to remove the resting field stroke while keeping a
- * tonal control fill for resting affordance.
+ * The `variant="bordered"` treatment is the default; use `variant="borderless"`
+ * to remove the resting field stroke while keeping a tonal control fill for
+ * resting affordance.
  *
  * @example
  * ```tsx
@@ -90,7 +91,7 @@ function InputGroup({ className, variant, ...props }: InputGroupProps) {
   return (
     <div
       data-slot="input-group"
-      data-variant={variant ?? 'default'}
+      data-variant={variant ?? 'bordered'}
       role="group"
       className={cn(inputGroupVariants({ variant, className }))}
       {...props}

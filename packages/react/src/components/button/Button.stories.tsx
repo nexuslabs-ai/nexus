@@ -852,7 +852,7 @@ export const VariantClassesMatchFigmaTokens: Story = {
       canvas.getByRole('button', { name: 'Destructive' })
     ).toHaveClass('nx:active:bg-error-background-active');
     await expect(canvas.getByRole('button', { name: 'Outline' })).toHaveClass(
-      'nx:active:bg-container-active'
+      'nx:hover:bg-container-hover'
     );
     await expect(canvas.getByRole('button', { name: 'Dashed' })).toHaveClass(
       'nx:border-dashed'

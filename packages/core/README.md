@@ -127,14 +127,12 @@ This resolves to CSS:
 
 ```bash
 pnpm build:tailwind       # Generate @nexus_ds/tailwind package CSS
-pnpm build:tokens:modular # Generate modular CSS (console + docs apps)
 ```
 
 ### Output Files
 
 - `../tailwind/nexus.css` - Main Tailwind theme with `nx:` prefix
 - `../tailwind/variables.css` - Primitive CSS variables with `--nx-*` prefix
-- `dist/modular/` - Individual theme CSS files for the console & docs apps
 
 ## Future Platform Support
 

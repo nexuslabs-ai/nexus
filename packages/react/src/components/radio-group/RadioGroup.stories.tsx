@@ -127,6 +127,7 @@ export const TouchTarget: Story = {
     const item = canvasElement.querySelector('[data-slot="radio-group-item"]');
 
     await expect(item).toHaveClass('nx:relative');
+    await expect(item).toHaveClass('nx:bg-container');
     await expect(item).toHaveClass('nx:pointer-coarse:after:-inset-3.5');
   },
 };

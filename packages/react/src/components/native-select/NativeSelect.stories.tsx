@@ -263,7 +263,9 @@ export const WithDataAttributes: Story = {
     const select = canvasElement.querySelector('[data-slot="native-select"]');
     await expect(select).toBeInTheDocument();
     await expect(select).toHaveAttribute('data-size', 'default');
-    await expect(select).toHaveAttribute('data-variant', 'default');
+    await expect(select).toHaveAttribute('data-variant', 'bordered');
+    await expect(select).toHaveClass('nx:bg-container');
+    await expect(select).toHaveClass('nx:enabled:hover:bg-container-hover');
     await expect(
       canvasElement.querySelector('[data-slot="native-select-wrapper"]')
     ).toBeInTheDocument();
@@ -277,12 +279,12 @@ export const WithDataAttributes: Story = {
 // ALL VARIANTS GRID
 // ============================================
 
-// Default, small, invalid, and disabled side by side. Reused by the per-base
+// Bordered, small, invalid, and disabled side by side. Reused by the per-base
 // variant generator.
 export const AllVariants: Story = {
   render: () => (
     <div className="nx:flex nx:flex-col nx:gap-3">
-      <NativeSelect size="default" aria-label="Default" defaultValue="pro">
+      <NativeSelect size="default" aria-label="Bordered" defaultValue="pro">
         <NativeSelectOption value="free">Free</NativeSelectOption>
         <NativeSelectOption value="pro">Pro</NativeSelectOption>
       </NativeSelect>

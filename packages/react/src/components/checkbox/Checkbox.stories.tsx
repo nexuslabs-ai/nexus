@@ -105,7 +105,6 @@ export const Disabled: Story = {
 
     await expect(checkbox).toBeDisabled();
 
-    // Disabled state uses a semantic border token at full opacity (not a fade).
     await expect(checkbox).toHaveClass('nx:disabled:border-border-disabled');
     await expect(getComputedStyle(checkbox).opacity).toBe('1');
 
@@ -123,6 +122,13 @@ export const TouchTarget: Story = {
 
     await expect(box).toHaveClass('nx:relative');
     await expect(box).toHaveClass('nx:pointer-coarse:after:-inset-3.5');
+    await expect(box).toHaveClass('nx:bg-container');
+    await expect(box).toHaveClass(
+      'nx:enabled:data-[state=unchecked]:hover:bg-container-hover'
+    );
+    await expect(box).toHaveClass(
+      'nx:enabled:data-[state=unchecked]:active:bg-container-active'
+    );
   },
 };
 

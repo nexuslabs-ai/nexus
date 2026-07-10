@@ -7,7 +7,7 @@ import {
 } from './appearance-model';
 import { deriveTheme, themeToCss } from './derive-theme';
 
-export const SNAPSHOT_VERSION = 3;
+export const SNAPSHOT_VERSION = 5;
 const SNAPSHOT_CACHE_LIMIT = 50;
 
 export const NEXUS_APPEARANCE_DATA_ATTRS = [

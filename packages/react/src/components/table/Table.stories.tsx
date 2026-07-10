@@ -692,7 +692,7 @@ export const Density: Story = {
 export const StickyHeader: Story = {
   render: () => (
     <Table stickyHeader containerClassName="nx:max-h-64">
-      <TableHeader className="nx:[&_th]:bg-container">
+      <TableHeader>
         <TableRow>
           <TableHead>Invoice</TableHead>
           <TableHead>Status</TableHead>
@@ -719,9 +719,8 @@ export const StickyHeader: Story = {
 
     await expect(table).toHaveAttribute('data-sticky-header', 'true');
     await expect(header).toBeInTheDocument();
-    await expect(header).toHaveClass('nx:[&_th]:bg-container');
     await expect(head).toBeInTheDocument();
-    await expect(head).toHaveClass('nx:sticky', 'nx:top-0');
+    await expect(head).toHaveClass('nx:sticky', 'nx:top-0', 'nx:bg-container');
     await expect(getComputedStyle(head as Element).position).toBe('sticky');
   },
 };

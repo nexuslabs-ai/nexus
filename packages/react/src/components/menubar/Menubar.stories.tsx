@@ -511,10 +511,16 @@ export const WithDataAttributes: Story = {
     );
     await expect(destructiveItem).toBeInTheDocument();
 
-    // The bar root carries its data-slot
-    await expect(
-      canvas.getByRole('menubar').closest('[data-slot="menubar"]')
-    ).toBeInTheDocument();
+    // The bar root owns a raised component surface; triggers hover/open within it.
+    const menubar = canvas
+      .getByRole('menubar')
+      .closest('[data-slot="menubar"]');
+    await expect(menubar).toBeInTheDocument();
+    await expect(menubar).toHaveClass('nx:bg-container');
+    await expect(trigger).toHaveClass(
+      'nx:focus:bg-container-hover',
+      'nx:data-[state=open]:bg-container-hover'
+    );
 
     // Close the menu and wait for complete cleanup
     await userEvent.keyboard('{Escape}');

@@ -1,16 +1,24 @@
-import type {
-  NexusSurfaceTone,
-  ThemeDerivationInput,
-  ThemeSeeds,
-} from './derive-theme';
+import type { ThemeDerivationInput, ThemeSeeds } from './derive-theme';
+import type { NexusSurfaceTone } from './palette';
 import { isColor } from './perceptual-ramp';
 
 type ModeSeeds = Pick<ThemeSeeds, 'background' | 'foreground'>;
 
 export type NexusAppearanceMode = 'light' | 'dark' | 'system';
-export type NexusDensity = 'compact' | 'default' | 'comfortable' | 'spacious';
-export type NexusCorners = 'square' | 'subtle' | 'smooth' | 'round';
-export type NexusElevation = 'quiet' | 'standard' | 'strong';
+export type NexusDensity =
+  | 'tight'
+  | 'compact'
+  | 'default'
+  | 'comfortable'
+  | 'relaxed'
+  | 'spacious';
+export type NexusCorners =
+  | 'square'
+  | 'subtle'
+  | 'smooth'
+  | 'round'
+  | 'extra-round';
+export type NexusElevation = 'flat' | 'quiet' | 'soft' | 'standard' | 'strong';
 export type NexusStroke = 'fine' | 'normal' | 'strong';
 
 export interface NexusAppearancePrefs {
@@ -27,7 +35,8 @@ export interface NexusAppearanceState {
   mode: NexusAppearanceMode;
   brandColor: string;
   surfaceTone: NexusSurfaceTone;
-  contrast: number;
+  lightContrast: number;
+  darkContrast: number;
   density: NexusDensity;
   corners: NexusCorners;
   elevation: NexusElevation;
@@ -35,7 +44,7 @@ export interface NexusAppearanceState {
   prefs: NexusAppearancePrefs;
 }
 
-export const DEFAULT_BRAND_COLOR = '#339cff';
+export const DEFAULT_BRAND_COLOR = '#0a0a0a';
 
 export const BASE_TONE_OPTIONS = [
   { value: 'stone', label: 'Stone', color: '#78716c' },
@@ -76,9 +85,11 @@ export const BASE_TONE_SEEDS: Record<
 };
 
 export const DENSITY_OPTIONS = [
+  { value: 'tight', label: 'Tight' },
   { value: 'compact', label: 'Compact' },
   { value: 'default', label: 'Default' },
   { value: 'comfortable', label: 'Comfortable' },
+  { value: 'relaxed', label: 'Relaxed' },
   { value: 'spacious', label: 'Spacious' },
 ] as const satisfies readonly { value: NexusDensity; label: string }[];
 
@@ -87,10 +98,13 @@ export const CORNER_OPTIONS = [
   { value: 'subtle', label: 'Subtle' },
   { value: 'smooth', label: 'Smooth' },
   { value: 'round', label: 'Round' },
+  { value: 'extra-round', label: 'Extra Round' },
 ] as const satisfies readonly { value: NexusCorners; label: string }[];
 
 export const ELEVATION_OPTIONS = [
+  { value: 'flat', label: 'Flat' },
   { value: 'quiet', label: 'Quiet' },
+  { value: 'soft', label: 'Soft' },
   { value: 'standard', label: 'Standard' },
   { value: 'strong', label: 'Strong' },
 ] as const satisfies readonly { value: NexusElevation; label: string }[];
@@ -105,7 +119,8 @@ export const DEFAULT_NEXUS_APPEARANCE: NexusAppearanceState = {
   mode: 'light',
   brandColor: DEFAULT_BRAND_COLOR,
   surfaceTone: 'stone',
-  contrast: 60,
+  lightContrast: 60,
+  darkContrast: 0,
   density: 'default',
   corners: 'square',
   elevation: 'quiet',
@@ -208,6 +223,9 @@ const clampFontSize = (value: unknown, fallback: number): number =>
     ? Math.min(FONT_PX_MAX, Math.max(FONT_PX_MIN, value))
     : fallback;
 
+const contrastOr = (value: unknown, fallback: number): number =>
+  typeof value === 'number' && value >= 0 && value <= 100 ? value : fallback;
+
 function formatPx(value: number): string {
   return `${Number(value.toFixed(4))}px`;
 }
@@ -298,12 +316,8 @@ export function sanitizeNexusAppearance(
         ? raw.brandColor
         : d.brandColor,
     surfaceTone: enumOr(raw.surfaceTone, SURFACE_TONES, d.surfaceTone),
-    contrast:
-      typeof raw.contrast === 'number' &&
-      raw.contrast >= 0 &&
-      raw.contrast <= 100
-        ? raw.contrast
-        : d.contrast,
+    lightContrast: contrastOr(raw.lightContrast, d.lightContrast),
+    darkContrast: contrastOr(raw.darkContrast, d.darkContrast),
     density: enumOr(raw.density, DENSITIES, d.density),
     corners: enumOr(raw.corners, CORNERS, d.corners),
     elevation: enumOr(raw.elevation, ELEVATIONS, d.elevation),
@@ -318,7 +332,7 @@ export function createNexusThemeContract(
   const tone = BASE_TONE_SEEDS[state.surfaceTone];
   return {
     surfaceTone: state.surfaceTone,
-    contrast: state.contrast,
+    contrast: { light: state.lightContrast, dark: state.darkContrast },
     light: { accent: state.brandColor, ...tone.light },
     dark: { accent: state.brandColor, ...tone.dark },
   };

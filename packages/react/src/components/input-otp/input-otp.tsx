@@ -120,7 +120,7 @@ function InputOTPSlot({ index, className, ...props }: InputOTPSlotProps) {
         'nx:relative nx:flex nx:box-border nx:size-10 nx:items-center nx:justify-center',
         'nx:border-0',
         'nx:group-has-[:disabled]/input-otp:bg-disabled nx:group-has-[:disabled]/input-otp:text-disabled-foreground',
-        'nx:bg-background nx:text-foreground nx:typography-body-small nx:transition-[color,background-color,box-shadow] nx:duration-fast nx:motion-reduce:transition-none',
+        'nx:bg-container nx:text-foreground nx:typography-body-small nx:transition-[color,background-color,box-shadow] nx:duration-fast nx:motion-reduce:transition-none',
         'nx:first:rounded-l-md nx:last:rounded-r-md',
         'nx:data-[active=true]:z-10 nx:data-[active=true]:outline-2 nx:data-[active=true]:outline-focus-default nx:data-[active=true]:outline-offset-(--focus-offset)',
         className

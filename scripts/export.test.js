@@ -29,7 +29,7 @@ afterEach(() => {
 
 const VALID_CHOICES = {
   base: ['gray', 'neutral', 'slate', 'stone', 'zinc'],
-  brand: ['black', 'blue', 'orange', 'pink', 'purple', 'teal'],
+  brandColor: [],
   radius: ['extra-round', 'round', 'smooth', 'square', 'subtle'],
   borderwidth: ['fine', 'normal', 'strong'],
   shadow: ['flat', 'quiet', 'soft', 'standard', 'strong'],
@@ -46,7 +46,7 @@ const VALID_CHOICES = {
 
 const DEFAULTS = {
   base: 'stone',
-  brand: 'black',
+  brandColor: '#0a0a0a',
   radius: 'square',
   borderwidth: 'normal',
   shadow: 'quiet',
@@ -75,7 +75,7 @@ describe('validateTokenConfig', () => {
       validateTokenConfig(
         {
           base: 'slate',
-          brand: 'blue',
+          brandColor: '#2563eb',
           radius: 'square',
           borderwidth: 'normal',
           shadow: 'quiet',
@@ -118,7 +118,7 @@ describe('parseExportArgs', () => {
       force: false,
     });
     expect(config.tokenConfig.base).toBe('slate');
-    expect(config.tokenConfig.brand).toBe('black'); // default
+    expect(config.tokenConfig.brandColor).toBe('#0a0a0a'); // default
   });
 
   it('requires --name', () => {
@@ -403,21 +403,24 @@ describe('renderAppAppearanceExample', () => {
 });
 
 describe('discoverTokenChoices', () => {
-  it('discovers base/brand from semantic files and modes from primitive dirs', () => {
+  it('discovers base from appearance options and modes from primitive dirs', () => {
     const root = fs.mkdtempSync(path.join(os.tmpdir(), 'nexus-export-'));
     tempDirs.push(root);
-    const semantic = path.join(root, 'semantic');
-    const radiusDir = path.join(root, 'primitives', 'radius');
+    const tokensDir = path.join(root, 'packages', 'core', 'tokens');
+    const semantic = path.join(tokensDir, 'semantic');
+    const radiusDir = path.join(tokensDir, 'primitives', 'radius');
+    const srcDir = path.join(root, 'packages', 'core', 'src', 'lib');
     fs.mkdirSync(semantic, { recursive: true });
     fs.mkdirSync(radiusDir, { recursive: true });
-    for (const f of [
-      'base-slate-light.json',
-      'base-slate-dark.json',
-      'base-stone-light.json',
-      'brands-blue-light.json',
-    ]) {
-      fs.writeFileSync(path.join(semantic, f), '{}');
-    }
+    fs.mkdirSync(srcDir, { recursive: true });
+    fs.writeFileSync(
+      path.join(srcDir, 'appearance-model.ts'),
+      `export const BASE_TONE_OPTIONS = [
+        { value: 'stone', label: 'Stone', color: '#78716c' },
+        { value: 'slate', label: 'Slate', color: '#64748b' },
+      ] as const;
+`
+    );
     for (const f of ['radius-square.json', 'radius-round.json']) {
       fs.writeFileSync(path.join(radiusDir, f), '{}');
     }
@@ -425,9 +428,9 @@ describe('discoverTokenChoices', () => {
       fs.writeFileSync(path.join(semantic, f), '{}');
     }
 
-    const choices = discoverTokenChoices(root);
+    const choices = discoverTokenChoices(tokensDir);
     expect(choices.base).toEqual(['slate', 'stone']);
-    expect(choices.brand).toEqual(['blue']);
+    expect(choices.brandColor).toEqual([]);
     expect(choices.radius).toEqual(['round', 'square']);
     expect(choices.spacingDefault).toEqual(['compact', 'default']);
   });

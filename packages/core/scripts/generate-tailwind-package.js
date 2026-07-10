@@ -1,6 +1,6 @@
 import fs from 'fs';
 import path from 'path';
-import { fileURLToPath } from 'url';
+import { fileURLToPath, pathToFileURL } from 'url';
 
 import {
   CANONICAL_SPACING_DEFAULT_MODE,
@@ -10,7 +10,6 @@ import {
   collectMotionTokens,
   collectRadiusModes,
   collectRadiusTokens,
-  collectSemanticColorTokensVarRef,
   collectSemanticDimensionTokens,
   collectShadowModes,
   collectShadowTokens,
@@ -53,6 +52,11 @@ const TOKENS_DIR = path.join(__dirname, '../tokens');
 const DEFAULT_DIST_DIR = path.join(__dirname, '../dist/tailwind');
 const PRIMITIVES_DIR = path.join(TOKENS_DIR, 'primitives');
 const SEMANTIC_DIR = path.join(TOKENS_DIR, 'semantic');
+const RUNTIME_DIST_ENTRY = path.join(__dirname, '../dist/runtime/index.js');
+
+async function loadDistRuntimeEngine() {
+  return import(pathToFileURL(RUNTIME_DIST_ENTRY).href);
+}
 
 /**
  * Get primitive file paths based on discovered structure and config.
@@ -131,54 +135,96 @@ function assertPrimitiveFilesExist(primitiveFiles) {
   }
 }
 
-/**
- * Get semantic file names based on discovered structure and config
- */
-function getSemanticFiles(discovered, config) {
-  const result = {
-    themed: [],
-    standalone: [],
+function getSemanticSupportFiles(discovered) {
+  return {
+    standalone: discovered.standalone,
   };
+}
 
-  for (const [type, modes] of Object.entries(discovered.themed)) {
-    const configKey = type === 'brands' ? 'brand' : type;
-    let selectedMode = config[configKey];
-
-    if (!selectedMode) {
-      const modeKeys = Object.keys(modes);
-      if (modeKeys.length > 1) {
-        throw new Error(
-          `getSemanticFiles: themed type "${type}" has ${modeKeys.length} modes [${modeKeys.join(', ')}] but no config["${configKey}"] selector. Add '${configKey}': '<mode>' to DEFAULT_CONFIG.`
-        );
-      }
-      selectedMode = modeKeys[0];
-    }
-
-    const selectedFiles = modes[selectedMode];
-    if (!selectedFiles) {
-      throw new Error(
-        `getSemanticFiles: themed type "${type}" has no mode "${selectedMode}". Available modes: ${Object.keys(
-          modes
-        ).join(', ')}.`
-      );
-    }
-
-    if (!selectedFiles.light || !selectedFiles.dark) {
-      throw new Error(
-        `getSemanticFiles: themed type "${type}" mode "${selectedMode}" must provide both light and dark files.`
-      );
-    }
-
-    result.themed.push({
-      type,
-      mode: selectedMode,
-      light: selectedFiles.light,
-      dark: selectedFiles.dark,
-    });
+function assertTokenEngine(engine) {
+  if (
+    !engine ||
+    typeof engine.deriveTheme !== 'function' ||
+    typeof engine.createNexusThemeContract !== 'function' ||
+    typeof engine.isColor !== 'function' ||
+    !engine.DEFAULT_NEXUS_APPEARANCE ||
+    !Array.isArray(engine.BASE_TONE_OPTIONS) ||
+    !Array.isArray(engine.SEMANTIC_TOKEN_REGISTRY)
+  ) {
+    throw new Error(
+      'generateTailwindPackage: token engine must provide deriveTheme, createNexusThemeContract, isColor, DEFAULT_NEXUS_APPEARANCE, BASE_TONE_OPTIONS, and SEMANTIC_TOKEN_REGISTRY.'
+    );
   }
 
-  result.standalone = discovered.standalone;
-  return result;
+  return engine;
+}
+
+function validateBaseTone(config, engine) {
+  const baseTone = config.base ?? DEFAULT_CONFIG.base;
+  const allowedTones = engine.BASE_TONE_OPTIONS.map((option) => option.value);
+
+  if (!allowedTones.includes(baseTone)) {
+    throw new Error(
+      `generateTailwindPackage: config.base "${baseTone}" must be one of: ${allowedTones.join(', ')}.`
+    );
+  }
+
+  return baseTone;
+}
+
+function validateBrandColor(config, engine) {
+  const brandColor =
+    config.brandColor ?? engine.DEFAULT_NEXUS_APPEARANCE.brandColor;
+
+  if (typeof brandColor !== 'string' || !engine.isColor(brandColor)) {
+    throw new Error(
+      `generateTailwindPackage: config.brandColor "${brandColor}" must be a valid CSS color.`
+    );
+  }
+
+  return brandColor;
+}
+
+function semanticTokensFromEngineMap(tokenMap, registry) {
+  return registry.map(({ name }) => {
+    const runtimeName = `--nx-color-${name}`;
+    const value = tokenMap[runtimeName];
+
+    if (typeof value !== 'string') {
+      throw new Error(
+        `generateTailwindPackage: token engine did not emit ${runtimeName}.`
+      );
+    }
+
+    return {
+      cssName: `color-${name}`,
+      value,
+    };
+  });
+}
+
+function deriveEngineSemanticTokens(config, engine) {
+  const baseTone = validateBaseTone(config, engine);
+  const brandColor = validateBrandColor(config, engine);
+  const theme = engine.deriveTheme(
+    engine.createNexusThemeContract({
+      ...engine.DEFAULT_NEXUS_APPEARANCE,
+      surfaceTone: baseTone,
+      brandColor,
+    })
+  );
+
+  return {
+    baseTone,
+    lightSemanticTokens: semanticTokensFromEngineMap(
+      theme.light,
+      engine.SEMANTIC_TOKEN_REGISTRY
+    ),
+    darkSemanticTokens: semanticTokensFromEngineMap(
+      theme.dark,
+      engine.SEMANTIC_TOKEN_REGISTRY
+    ),
+  };
 }
 
 /**
@@ -399,36 +445,11 @@ function generateVariablesCSS(primitiveTokens, divergentDark, usedModes) {
  * canonical default baseline because @theme drives Tailwind's utility codegen
  * (build-time); the cascade flip happens at runtime via the per-mode blocks.
  */
-function collectLightSemanticTokens(semanticFiles, primitiveMap) {
-  const lightSemanticTokens = [];
-
-  for (const themed of semanticFiles.themed) {
-    lightSemanticTokens.push(
-      ...collectSemanticColorTokensVarRef(
-        SEMANTIC_DIR,
-        themed.light,
-        primitiveMap
-      )
-    );
-  }
-
-  for (const standaloneFile of semanticFiles.standalone) {
-    lightSemanticTokens.push(
-      ...collectSemanticColorTokensVarRef(
-        SEMANTIC_DIR,
-        standaloneFile,
-        primitiveMap
-      )
-    );
-  }
-
-  return lightSemanticTokens;
-}
-
 function generateNexusCSS(
   semanticFiles,
   primitiveMap,
   lightSemanticTokens,
+  darkSemanticTokens,
   usedModes,
   spacingModes,
   spacingDefault,
@@ -448,24 +469,13 @@ function generateNexusCSS(
     );
   }
 
-  // Light + dark semantic color accumulators. Dimension tokens (e.g.
-  // focus.offset) are collected separately into `dimensionTokens` so they emit
-  // at :root, not @theme (see generateRootDimensionsCSS / #506).
-  const darkSemanticTokens = [];
+  // Semantic colors are engine-owned in the Tailwind bundle. Dimension tokens
+  // (e.g. focus.offset) still come from semantic JSON and emit at :root, not
+  // @theme (see generateRootDimensionsCSS / #506).
   const dimensionTokens = [];
 
-  for (const themed of semanticFiles.themed) {
-    const darkTokens = collectSemanticColorTokensVarRef(
-      SEMANTIC_DIR,
-      themed.dark,
-      primitiveMap
-    );
-    darkSemanticTokens.push(...darkTokens);
-  }
-
-  // Process standalone semantic files (like focus.json). Color leaves promote to
-  // --color-focus-* utilities in @theme; dimension leaves (focus.offset) go to
-  // dimensionTokens for the :root block, not @theme (see generateRootDimensionsCSS).
+  // Process standalone semantic files for non-color dimensions. Color leaves are
+  // ignored here because the engine registry now owns the Tailwind color surface.
   for (const standaloneFile of semanticFiles.standalone) {
     if (!FILES_WITH_DEDICATED_DIMENSION_COLLECTORS.has(standaloneFile)) {
       dimensionTokens.push(
@@ -578,8 +588,11 @@ function generateNexusCSS(
  */
 export async function generateTailwindPackage(
   config,
-  { distDir = DEFAULT_DIST_DIR } = {}
+  { distDir = DEFAULT_DIST_DIR, engine } = {}
 ) {
+  const tokenEngine = assertTokenEngine(
+    engine ?? (await loadDistRuntimeEngine())
+  );
   ensureDir(distDir);
 
   const writeDistFile = (fileName, content) => {
@@ -590,7 +603,9 @@ export async function generateTailwindPackage(
 
   const discoveredPrimitives = discoverPrimitives(PRIMITIVES_DIR);
   const discoveredSemantics = discoverSemantics(SEMANTIC_DIR);
-  const semanticFiles = getSemanticFiles(discoveredSemantics, config);
+  const semanticFiles = getSemanticSupportFiles(discoveredSemantics);
+  const { baseTone, lightSemanticTokens, darkSemanticTokens } =
+    deriveEngineSemanticTokens(config, tokenEngine);
 
   const {
     tokens: primitiveTokens,
@@ -606,20 +621,13 @@ export async function generateTailwindPackage(
       console.log(`   ${category}: ${mode}`);
     }
   }
-  for (const themed of semanticFiles.themed) {
-    console.log(`   ${themed.type}: ${themed.mode}`);
-  }
+  console.log(`   base: ${baseTone}`);
   console.log('');
 
   const divergentDark = filterDivergentDark(
     primitiveTokens,
     darkPrimitiveTokens
   );
-  const lightSemanticTokens = collectLightSemanticTokens(
-    semanticFiles,
-    primitiveMap
-  );
-
   const variablesCSS = generateVariablesCSS(
     primitiveTokens,
     divergentDark,
@@ -642,8 +650,10 @@ export async function generateTailwindPackage(
     log.success(`Generated ${borderWidth.count} border width utilities`);
   }
 
-  const borderColorAliases =
-    generateBorderColorAliasUtilitiesCSS(lightSemanticTokens);
+  const borderColorAliases = generateBorderColorAliasUtilitiesCSS(
+    lightSemanticTokens,
+    { runtimeFallback: true }
+  );
   if (borderColorAliases.css) {
     writeDistFile('border-color-aliases.css', borderColorAliases.css);
     log.success(
@@ -687,6 +697,7 @@ export async function generateTailwindPackage(
     semanticFiles,
     primitiveMap,
     lightSemanticTokens,
+    darkSemanticTokens,
     usedModes,
     spacingModes,
     spacingDefault,
@@ -696,7 +707,6 @@ export async function generateTailwindPackage(
 
   await formatDistCssFiles(distDir);
 
-  const themeCount = semanticFiles.themed.length;
   console.log('');
   console.log(`📊 Summary:`);
   console.log(
@@ -705,7 +715,7 @@ export async function generateTailwindPackage(
   if (divergentDark.length > 0) {
     console.log(`   Dark overrides: ${divergentDark.length} tokens`);
   }
-  console.log(`   Semantic themes: ${themeCount} (light + dark)`);
+  console.log(`   Engine semantic colors: ${lightSemanticTokens.length}`);
   console.log(`   Typography utilities: ${typography.count}`);
   console.log(`   Border width utilities: ${borderWidth.count}`);
   console.log(`   Output: ${distDir}`);
@@ -713,21 +723,21 @@ export async function generateTailwindPackage(
 
 if (process.argv[1] === fileURLToPath(import.meta.url)) {
   console.log('🎨 Generating @nexus_ds/tailwind package from DTCG tokens...');
+  const engine = await loadDistRuntimeEngine();
   const cliConfig = parseArgs(undefined, {
     allowedKeys: [
       'base',
-      'brand',
       'typography',
       'shadow',
       'radius',
       'borderwidth',
       'motion',
       'focus',
-      'chart-categorical',
+      'brandColor',
       'spacingDefault',
     ],
   });
-  await generateTailwindPackage(cliConfig);
+  await generateTailwindPackage(cliConfig, { engine });
   console.log('');
   console.log('✨ @nexus_ds/tailwind package generation complete!');
 }

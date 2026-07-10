@@ -1,9 +1,0 @@
-/* focus: default */
-
-html {
-  --nx-focus-color-error: var(--nx-color-red-600);
-}
-
-html.dark {
-  --nx-focus-color-error: var(--nx-color-red-300);
-}

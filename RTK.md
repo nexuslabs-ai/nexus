@@ -53,7 +53,6 @@ pnpm audit:contrast
 For token output changes:
 
 ```bash
-pnpm tokens:modular
 pnpm tokens:tailwind
 ```
 

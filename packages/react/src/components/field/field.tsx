@@ -112,8 +112,7 @@ interface FieldProps
  * Field
  *
  * The labeled-field layout primitive — composes a label, control, description,
- * and error with their a11y wiring, decoupled from any form library. For the
- * react-hook-form binding layer, use `Form`, which builds on this structure.
+ * and error with their a11y wiring, decoupled from any form library.
  *
  * @example
  * ```tsx
@@ -304,7 +303,7 @@ function FieldSeparator({
       {children && (
         <span
           data-slot="field-separator-content"
-          className="nx:relative nx:mx-auto nx:block nx:w-fit nx:bg-background nx:px-2 nx:text-muted-foreground"
+          className="nx:relative nx:mx-auto nx:block nx:w-fit nx:bg-container nx:px-2 nx:text-muted-foreground"
         >
           {children}
         </span>

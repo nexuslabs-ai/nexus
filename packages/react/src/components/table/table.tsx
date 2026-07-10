@@ -56,9 +56,9 @@ interface TableProps extends React.ComponentProps<'table'> {
    * Pin the header row while the body scrolls vertically.
    *
    * Requires a height-bounded scroll container — set one via `containerClassName`
-   * (e.g. `"nx:max-h-96"`), or there is nothing to scroll. The header paints on
-   * `background`; on a `Card` / `container` surface, override the cells with
-   * `<TableHeader className="nx:[&_th]:bg-container">`.
+   * (e.g. `"nx:max-h-96"`), or there is nothing to scroll. The sticky header
+   * paints on the component `container` surface so it stays raised above the page
+   * canvas in Model 2.
    *
    * @default false
    */
@@ -304,7 +304,7 @@ function TableHead({ className, ...props }: TableHeadProps) {
       data-slot="table-head"
       className={cn(
         tableHeadVariants({ variant, density }),
-        stickyHeader && 'nx:sticky nx:top-0 nx:z-sticky nx:bg-background',
+        stickyHeader && 'nx:sticky nx:top-0 nx:z-sticky nx:bg-container',
         className
       )}
       {...props}

@@ -7,7 +7,6 @@ import {
   auditAgentDrift,
   auditCodexAgentMirrors,
   auditSharedSkills,
-  auditTokenFilenamePatterns,
 } from './audit-agent-drift.js';
 
 const tempDirs = [];
@@ -31,35 +30,20 @@ function makeRepo(files) {
   return dir;
 }
 
-function makeTokenFiles(names, prefix) {
-  return Object.fromEntries(
-    names.flatMap((name) => [
-      [`packages/core/tokens/semantic/${prefix}-${name}-light.json`, '{}'],
-      [`packages/core/tokens/semantic/${prefix}-${name}-dark.json`, '{}'],
-    ])
-  );
-}
-
 function makeMinimalRepo(overrides = {}) {
-  const brandPattern =
-    overrides.brandPattern ?? 'blue,purple,pink,teal,orange,black';
+  const codexExtraLine = overrides.codexExtraLine ?? '';
   const claudeAgentBody = [
     '# Contrast Auditor',
     '',
-    '| Filename pattern                                                | Path |',
-    '| --------------------------------------------------------------- | ---- |',
-    '| `base-{slate,neutral,gray,stone,zinc}-{light,dark}.json`        | x    |',
-    '| `brands-{blue,purple,pink,teal,orange,black}-{light,dark}.json` | x    |',
+    'Run the APCA vitest sweep.',
     '',
     'The project PermissionRequest hook at `.claude/settings.json` blocks sensitive shell commands.',
   ].join('\n');
   const codexAgentBody = [
     '# Contrast Auditor',
     '',
-    '| Filename pattern                                                | Path |',
-    '| --------------------------------------------------------------- | ---- |',
-    '| `base-{slate,neutral,gray,stone,zinc}-{light,dark}.json`        | x    |',
-    `| \`brands-{${brandPattern}}-{light,dark}.json\` | x    |`,
+    'Run the APCA vitest sweep.',
+    ...(codexExtraLine ? [codexExtraLine] : []),
     '',
     'The project PermissionRequest hook at `.codex/hooks.json` blocks sensitive shell commands.',
   ].join('\n');
@@ -85,11 +69,6 @@ function makeMinimalRepo(overrides = {}) {
       codexAgentBody,
       '"""',
     ].join('\n'),
-    ...makeTokenFiles(['slate', 'neutral', 'gray', 'stone', 'zinc'], 'base'),
-    ...makeTokenFiles(
-      ['blue', 'purple', 'pink', 'teal', 'orange', 'black'],
-      'brands'
-    ),
   });
 }
 
@@ -110,16 +89,16 @@ describe('audit-agent-drift', () => {
     expect(auditCodexAgentMirrors(repoRoot)).toEqual([]);
   });
 
-  it('detects stale token filename patterns in mirrored agent docs', () => {
+  it('detects Codex agent body drift', () => {
     const repoRoot = makeMinimalRepo({
-      brandPattern: 'blue,gray,neutral,slate,stone',
+      codexExtraLine: 'Unexpected extra agent instruction.',
     });
 
-    expect(auditTokenFilenamePatterns(repoRoot)).toEqual([
+    expect(auditCodexAgentMirrors(repoRoot)).toEqual([
       {
-        code: 'brand-pattern-drift',
-        file: '.codex/agents/contrast-auditor.toml',
-        message: 'Brand token filename pattern differs from token files',
+        code: 'agent-body-drift',
+        file: 'contrast-auditor.toml',
+        message: 'Codex agent instructions differ from .claude agent',
       },
     ]);
   });

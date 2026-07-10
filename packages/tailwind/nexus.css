@@ -142,900 +142,836 @@
 
 @theme inline {
   /* Semantic tokens */
-  --color-background: var(--nx-color-background, var(--nx-color-white-base));
-  --color-foreground: var(--nx-color-foreground, var(--nx-color-black-a900));
+  --color-background: var(--nx-color-background, oklch(1 0 0));
   --color-background-hover: var(
     --nx-color-background-hover,
-    var(--nx-color-stone-50)
-  );
-  --color-background-hover-alpha: var(
-    --nx-color-background-hover-alpha,
-    var(--nx-color-stone-a100)
+    oklch(0.9849 0.0082 70)
   );
   --color-background-active: var(
     --nx-color-background-active,
-    var(--nx-color-stone-100)
+    oklch(0.9227 0.0089 70)
   );
-  --color-muted: var(--nx-color-muted, var(--nx-color-stone-50));
-  --color-muted-foreground: var(
-    --nx-color-muted-foreground,
-    var(--nx-color-black-a600)
-  );
-  --color-muted-foreground-subtle: var(
-    --nx-color-muted-foreground-subtle,
-    var(--nx-color-black-a500)
-  );
-  --color-disabled: var(--nx-color-disabled, var(--nx-color-stone-50));
-  --color-disabled-foreground: var(
-    --nx-color-disabled-foreground,
-    var(--nx-color-stone-400)
-  );
-  --color-container: var(--nx-color-container, var(--nx-color-white-base));
-  --color-container-foreground: var(
-    --nx-color-container-foreground,
-    var(--nx-color-stone-950)
-  );
+  --color-muted: var(--nx-color-muted, oklch(0.9698 0.0083 70));
+  --color-container: var(--nx-color-container, oklch(1 0 0));
   --color-container-hover: var(
     --nx-color-container-hover,
-    var(--nx-color-stone-50)
+    oklch(0.9698 0.0083 70)
   );
   --color-container-active: var(
     --nx-color-container-active,
-    var(--nx-color-stone-100)
+    oklch(0.9451 0.0086 70)
   );
-  --color-popover: var(--nx-color-popover, var(--nx-color-white-base));
-  --color-popover-foreground: var(
-    --nx-color-popover-foreground,
-    var(--nx-color-stone-950)
-  );
-  --color-popover-hover: var(
-    --nx-color-popover-hover,
-    var(--nx-color-stone-50)
-  );
+  --color-popover: var(--nx-color-popover, oklch(1 0 0));
+  --color-popover-hover: var(--nx-color-popover-hover, oklch(0.9451 0.0086 70));
   --color-popover-active: var(
     --nx-color-popover-active,
-    var(--nx-color-stone-50)
-  );
-  --color-popover-alpha: var(
-    --nx-color-popover-alpha,
-    var(--nx-color-white-a700)
-  );
-  --color-popover-backdrop: var(
-    --nx-color-popover-backdrop,
-    var(--nx-color-stone-a900)
+    oklch(0.9451 0.0086 70)
   );
   --color-control-background: var(
     --nx-color-control-background,
-    var(--nx-color-stone-100)
+    oklch(0.9227 0.0089 70)
   );
   --color-control-background-hover: var(
     --nx-color-control-background-hover,
-    var(--nx-color-stone-200)
+    oklch(0.8701 0.0095 70)
   );
-  --color-control-thumb: var(
-    --nx-color-control-thumb,
-    var(--nx-color-white-base)
-  );
+  --color-control-thumb: var(--nx-color-control-thumb, oklch(1 0 0));
   --color-nav-background: var(
     --nx-color-nav-background,
-    var(--nx-color-stone-100)
-  );
-  --color-nav-foreground: var(
-    --nx-color-nav-foreground,
-    var(--nx-color-stone-900)
-  );
-  --color-nav-muted-foreground: var(
-    --nx-color-nav-muted-foreground,
-    var(--nx-color-stone-600)
+    oklch(0.9698 0.0083 70)
   );
   --color-nav-item-hover: var(
     --nx-color-nav-item-hover,
-    var(--nx-color-stone-200)
+    oklch(0.9227 0.0089 70)
   );
   --color-nav-item-active: var(
     --nx-color-nav-item-active,
-    var(--nx-color-stone-200)
+    oklch(0.9227 0.0089 70)
   );
-  --color-nav-border: var(--nx-color-nav-border, var(--nx-color-stone-200));
-  --color-overlay: var(--nx-color-overlay, var(--nx-color-stone-a700));
+  --color-nav-border: var(--nx-color-nav-border, oklch(0.9227 0.0089 70));
+  --color-disabled: var(--nx-color-disabled, oklch(0.9451 0.0086 70));
+  --color-border-active: var(--nx-color-border-active, oklch(0.6601 0.0118 70));
+  --color-foreground: var(--nx-color-foreground, oklch(0.1448 0 0 / 0.9098));
+  --color-container-foreground: var(
+    --nx-color-container-foreground,
+    oklch(0.2161 0.0061 56.043)
+  );
+  --color-popover-foreground: var(
+    --nx-color-popover-foreground,
+    oklch(0.2161 0.0061 56.043)
+  );
+  --color-nav-foreground: var(
+    --nx-color-nav-foreground,
+    oklch(0.2161 0.0061 56.043)
+  );
+  --color-muted-foreground: var(
+    --nx-color-muted-foreground,
+    oklch(0.1448 0 0 / 0.6275)
+  );
+  --color-nav-muted-foreground: var(
+    --nx-color-nav-muted-foreground,
+    oklch(0.5176 0.0061 56.043)
+  );
+  --color-muted-foreground-subtle: var(
+    --nx-color-muted-foreground-subtle,
+    oklch(0.1448 0 0 / 0.502)
+  );
+  --color-disabled-foreground: var(
+    --nx-color-disabled-foreground,
+    oklch(0.5806 0.0061 56.043)
+  );
   --color-border-default: var(
     --nx-color-border-default,
-    var(--nx-color-black-a200)
-  );
-  --color-border-hairline: var(
-    --nx-color-border-hairline,
-    var(--nx-color-black-a200)
-  );
-  --color-border-default-alpha: var(
-    --nx-color-border-default-alpha,
-    var(--nx-color-stone-a200)
-  );
-  --color-border-active: var(
-    --nx-color-border-active,
-    var(--nx-color-stone-400)
+    oklch(0.1448 0 0 / 0.0941)
   );
   --color-border-disabled: var(
     --nx-color-border-disabled,
-    var(--nx-color-black-a200)
+    oklch(0.1448 0 0 / 0.0941)
   );
-  --color-border-warning: var(
-    --nx-color-border-warning,
-    var(--nx-color-orange-200)
-  );
-  --color-border-warning-active: var(
-    --nx-color-border-warning-active,
-    var(--nx-color-orange-400)
-  );
-  --color-border-success: var(
-    --nx-color-border-success,
-    var(--nx-color-green-200)
-  );
-  --color-border-success-active: var(
-    --nx-color-border-success-active,
-    var(--nx-color-green-400)
-  );
-  --color-border-error: var(--nx-color-border-error, var(--nx-color-red-200));
-  --color-border-error-active: var(
-    --nx-color-border-error-active,
-    var(--nx-color-red-400)
-  );
-  --color-border-information: var(
-    --nx-color-border-information,
-    var(--nx-color-blue-200)
-  );
-  --color-border-information-active: var(
-    --nx-color-border-information-active,
-    var(--nx-color-blue-400)
-  );
-  --color-error-background: var(
-    --nx-color-error-background,
-    var(--nx-color-red-600)
-  );
-  --color-error-foreground: var(
-    --nx-color-error-foreground,
-    var(--nx-color-white-base)
-  );
-  --color-error-background-hover: var(
-    --nx-color-error-background-hover,
-    var(--nx-color-red-700)
-  );
-  --color-error-background-active: var(
-    --nx-color-error-background-active,
-    var(--nx-color-red-800)
-  );
-  --color-error-disabled: var(
-    --nx-color-error-disabled,
-    var(--nx-color-red-300)
-  );
-  --color-error-subtle: var(--nx-color-error-subtle, var(--nx-color-red-50));
-  --color-error-subtle-foreground: var(
-    --nx-color-error-subtle-foreground,
-    var(--nx-color-red-600)
-  );
-  --color-error-subtle-hover: var(
-    --nx-color-error-subtle-hover,
-    var(--nx-color-red-100)
-  );
-  --color-error-subtle-active: var(
-    --nx-color-error-subtle-active,
-    var(--nx-color-red-200)
-  );
-  --color-success-background: var(
-    --nx-color-success-background,
-    var(--nx-color-green-600)
-  );
-  --color-success-foreground: var(
-    --nx-color-success-foreground,
-    var(--nx-color-white-base)
-  );
-  --color-success-background-hover: var(
-    --nx-color-success-background-hover,
-    var(--nx-color-green-700)
-  );
-  --color-success-background-active: var(
-    --nx-color-success-background-active,
-    var(--nx-color-green-800)
-  );
-  --color-success-disabled: var(
-    --nx-color-success-disabled,
-    var(--nx-color-green-300)
-  );
-  --color-success-subtle: var(
-    --nx-color-success-subtle,
-    var(--nx-color-green-50)
-  );
-  --color-success-subtle-foreground: var(
-    --nx-color-success-subtle-foreground,
-    var(--nx-color-green-700)
-  );
-  --color-success-subtle-hover: var(
-    --nx-color-success-subtle-hover,
-    var(--nx-color-green-100)
-  );
-  --color-success-subtle-active: var(
-    --nx-color-success-subtle-active,
-    var(--nx-color-green-200)
-  );
-  --color-information-background: var(
-    --nx-color-information-background,
-    var(--nx-color-blue-600)
-  );
-  --color-information-foreground: var(
-    --nx-color-information-foreground,
-    var(--nx-color-white-base)
-  );
-  --color-information-background-hover: var(
-    --nx-color-information-background-hover,
-    var(--nx-color-blue-700)
-  );
-  --color-information-background-active: var(
-    --nx-color-information-background-active,
-    var(--nx-color-blue-800)
-  );
-  --color-information-disabled: var(
-    --nx-color-information-disabled,
-    var(--nx-color-blue-300)
-  );
-  --color-information-subtle: var(
-    --nx-color-information-subtle,
-    var(--nx-color-blue-50)
-  );
-  --color-information-subtle-foreground: var(
-    --nx-color-information-subtle-foreground,
-    var(--nx-color-blue-600)
-  );
-  --color-information-subtle-hover: var(
-    --nx-color-information-subtle-hover,
-    var(--nx-color-blue-100)
-  );
-  --color-information-subtle-active: var(
-    --nx-color-information-subtle-active,
-    var(--nx-color-blue-200)
-  );
-  --color-warning-background: var(
-    --nx-color-warning-background,
-    var(--nx-color-orange-600)
-  );
-  --color-warning-foreground: var(
-    --nx-color-warning-foreground,
-    var(--nx-color-white-base)
-  );
-  --color-warning-background-hover: var(
-    --nx-color-warning-background-hover,
-    var(--nx-color-orange-700)
-  );
-  --color-warning-background-active: var(
-    --nx-color-warning-background-active,
-    var(--nx-color-orange-800)
-  );
-  --color-warning-disabled: var(
-    --nx-color-warning-disabled,
-    var(--nx-color-orange-300)
-  );
-  --color-warning-subtle: var(
-    --nx-color-warning-subtle,
-    var(--nx-color-orange-50)
-  );
-  --color-warning-subtle-foreground: var(
-    --nx-color-warning-subtle-foreground,
-    var(--nx-color-orange-600)
-  );
-  --color-warning-subtle-hover: var(
-    --nx-color-warning-subtle-hover,
-    var(--nx-color-orange-100)
-  );
-  --color-warning-subtle-active: var(
-    --nx-color-warning-subtle-active,
-    var(--nx-color-orange-200)
+  --color-border-hairline: var(
+    --nx-color-border-hairline,
+    oklch(0.1448 0 0 / 0.0941)
   );
   --color-primary-background: var(
     --nx-color-primary-background,
-    var(--nx-color-black-base)
-  );
-  --color-primary-background-active: var(
-    --nx-color-primary-background-active,
-    var(--nx-color-neutral-950)
-  );
-  --color-primary-foreground: var(
-    --nx-color-primary-foreground,
-    var(--nx-color-white-base)
+    oklch(0.1448 0 0)
   );
   --color-primary-background-hover: var(
     --nx-color-primary-background-hover,
-    var(--nx-color-neutral-900)
+    oklch(0.207 0 0)
   );
-  --color-primary-disabled: var(
-    --nx-color-primary-disabled,
-    var(--nx-color-neutral-300)
+  --color-primary-background-active: var(
+    --nx-color-primary-background-active,
+    oklch(0.118 0 0)
   );
-  --color-primary-subtle: var(
-    --nx-color-primary-subtle,
-    var(--nx-color-neutral-50)
-  );
+  --color-primary-foreground: var(--nx-color-primary-foreground, oklch(1 0 0));
+  --color-primary-disabled: var(--nx-color-primary-disabled, oklch(0.765 0 0));
+  --color-primary-subtle: var(--nx-color-primary-subtle, oklch(0.985 0 0));
   --color-primary-subtle-foreground: var(
     --nx-color-primary-subtle-foreground,
-    var(--nx-color-black-base)
+    oklch(0.1448 0 0)
   );
   --color-primary-subtle-hover: var(
     --nx-color-primary-subtle-hover,
-    var(--nx-color-neutral-100)
+    oklch(0.945 0 0)
   );
   --color-primary-subtle-active: var(
     --nx-color-primary-subtle-active,
-    var(--nx-color-neutral-200)
+    oklch(0.87 0 0)
+  );
+  --color-border-primary: var(--nx-color-border-primary, oklch(0.87 0 0));
+  --color-border-primary-active: var(
+    --nx-color-border-primary-active,
+    oklch(0.66 0 0)
   );
   --color-secondary-background: var(
     --nx-color-secondary-background,
-    var(--nx-color-neutral-100)
-  );
-  --color-secondary-foreground: var(
-    --nx-color-secondary-foreground,
-    var(--nx-color-neutral-900)
+    oklch(0.945 0 0)
   );
   --color-secondary-background-hover: var(
     --nx-color-secondary-background-hover,
-    var(--nx-color-neutral-200)
+    oklch(0.87 0 0)
   );
   --color-secondary-background-active: var(
     --nx-color-secondary-background-active,
-    var(--nx-color-neutral-300)
+    oklch(0.765 0 0)
+  );
+  --color-secondary-foreground: var(
+    --nx-color-secondary-foreground,
+    oklch(0.207 0 0)
   );
   --color-secondary-disabled: var(
     --nx-color-secondary-disabled,
-    var(--nx-color-neutral-50)
+    oklch(0.985 0 0)
   );
-  --color-secondary-subtle: var(
-    --nx-color-secondary-subtle,
-    var(--nx-color-neutral-100)
-  );
+  --color-secondary-subtle: var(--nx-color-secondary-subtle, oklch(0.945 0 0));
   --color-secondary-subtle-foreground: var(
     --nx-color-secondary-subtle-foreground,
-    var(--nx-color-neutral-600)
+    oklch(0.46 0 0)
   );
   --color-secondary-subtle-hover: var(
     --nx-color-secondary-subtle-hover,
-    var(--nx-color-neutral-200)
+    oklch(0.87 0 0)
   );
   --color-secondary-subtle-active: var(
     --nx-color-secondary-subtle-active,
-    var(--nx-color-neutral-300)
+    oklch(0.765 0 0)
   );
-  --color-border-primary: var(
-    --nx-color-border-primary,
-    var(--nx-color-neutral-200)
+  --color-success-background: var(
+    --nx-color-success-background,
+    oklch(0.62 0.2233 140.055)
   );
-  --color-border-primary-active: var(
-    --nx-color-border-primary-active,
-    var(--nx-color-neutral-400)
+  --color-success-background-hover: var(
+    --nx-color-success-background-hover,
+    oklch(0.52 0.1871 140.022)
+  );
+  --color-success-background-active: var(
+    --nx-color-success-background-active,
+    oklch(0.43 0.1534 139.623)
+  );
+  --color-success-foreground: var(--nx-color-success-foreground, oklch(1 0 0));
+  --color-success-disabled: var(
+    --nx-color-success-disabled,
+    oklch(0.87 0.3119 139.843)
+  );
+  --color-success-subtle: var(
+    --nx-color-success-subtle,
+    oklch(0.982 0.035 137.785)
+  );
+  --color-success-subtle-foreground: var(
+    --nx-color-success-subtle-foreground,
+    oklch(0.52 0.1871 140.022)
+  );
+  --color-success-subtle-hover: var(
+    --nx-color-success-subtle-hover,
+    oklch(0.96 0.0789 139.835)
+  );
+  --color-success-subtle-active: var(
+    --nx-color-success-subtle-active,
+    oklch(0.925 0.1596 139.892)
+  );
+  --color-border-success: var(
+    --nx-color-border-success,
+    oklch(0.925 0.1596 139.892)
+  );
+  --color-border-success-active: var(
+    --nx-color-border-success-active,
+    oklch(0.79 0.2864 140.349)
+  );
+  --color-warning-background: var(
+    --nx-color-warning-background,
+    oklch(0.62 0.2044 41.116)
+  );
+  --color-warning-background-hover: var(
+    --nx-color-warning-background-hover,
+    oklch(0.52 0.1809 38.402)
+  );
+  --color-warning-background-active: var(
+    --nx-color-warning-background-active,
+    oklch(0.43 0.153 37.304)
+  );
+  --color-warning-foreground: var(--nx-color-warning-foreground, oklch(1 0 0));
+  --color-warning-disabled: var(
+    --nx-color-warning-disabled,
+    oklch(0.84 0.142 66.29)
+  );
+  --color-warning-subtle: var(
+    --nx-color-warning-subtle,
+    oklch(0.98 0.0185 73.684)
+  );
+  --color-warning-subtle-foreground: var(
+    --nx-color-warning-subtle-foreground,
+    oklch(0.62 0.2044 41.116)
+  );
+  --color-warning-subtle-hover: var(
+    --nx-color-warning-subtle-hover,
+    oklch(0.955 0.0435 75.164)
+  );
+  --color-warning-subtle-active: var(
+    --nx-color-warning-subtle-active,
+    oklch(0.91 0.0819 70.697)
+  );
+  --color-border-warning: var(
+    --nx-color-border-warning,
+    oklch(0.91 0.0819 70.697)
+  );
+  --color-border-warning-active: var(
+    --nx-color-border-warning-active,
+    oklch(0.78 0.1803 55.934)
+  );
+  --color-error-background: var(
+    --nx-color-error-background,
+    oklch(0.577 0.2523 27.926)
+  );
+  --color-error-background-hover: var(
+    --nx-color-error-background-hover,
+    oklch(0.505 0.2209 27.946)
+  );
+  --color-error-background-active: var(
+    --nx-color-error-background-active,
+    oklch(0.42 0.1838 28.144)
+  );
+  --color-error-foreground: var(--nx-color-error-foreground, oklch(1 0 0));
+  --color-error-disabled: var(
+    --nx-color-error-disabled,
+    oklch(0.808 0.1333 28.058)
+  );
+  --color-error-subtle: var(
+    --nx-color-error-subtle,
+    oklch(0.971 0.0176 28.865)
+  );
+  --color-error-subtle-foreground: var(
+    --nx-color-error-subtle-foreground,
+    oklch(0.577 0.2523 27.926)
+  );
+  --color-error-subtle-hover: var(
+    --nx-color-error-subtle-hover,
+    oklch(0.936 0.0399 27.342)
+  );
+  --color-error-subtle-active: var(
+    --nx-color-error-subtle-active,
+    oklch(0.885 0.0747 27.394)
+  );
+  --color-border-error: var(
+    --nx-color-border-error,
+    oklch(0.885 0.0747 27.394)
+  );
+  --color-border-error-active: var(
+    --nx-color-border-error-active,
+    oklch(0.704 0.2267 27.842)
+  );
+  --color-information-background: var(
+    --nx-color-information-background,
+    oklch(0.546 0.2205 255.276)
+  );
+  --color-information-background-hover: var(
+    --nx-color-information-background-hover,
+    oklch(0.488 0.197 255.267)
+  );
+  --color-information-background-active: var(
+    --nx-color-information-background-active,
+    oklch(0.41 0.1633 254.871)
+  );
+  --color-information-foreground: var(
+    --nx-color-information-foreground,
+    oklch(1 0 0)
+  );
+  --color-information-disabled: var(
+    --nx-color-information-disabled,
+    oklch(0.809 0.1012 254.248)
+  );
+  --color-information-subtle: var(
+    --nx-color-information-subtle,
+    oklch(0.97 0.0152 252.81)
+  );
+  --color-information-subtle-foreground: var(
+    --nx-color-information-subtle-foreground,
+    oklch(0.546 0.2205 255.276)
+  );
+  --color-information-subtle-hover: var(
+    --nx-color-information-subtle-hover,
+    oklch(0.932 0.0342 257.472)
+  );
+  --color-information-subtle-active: var(
+    --nx-color-information-subtle-active,
+    oklch(0.882 0.0612 253.613)
+  );
+  --color-border-information: var(
+    --nx-color-border-information,
+    oklch(0.882 0.0612 253.613)
+  );
+  --color-border-information-active: var(
+    --nx-color-border-information-active,
+    oklch(0.707 0.1599 255.225)
   );
   --color-chart-categorical-1: var(
     --nx-color-chart-categorical-1,
-    var(--nx-color-teal-600)
+    oklch(0.52 0.1168 186.391)
   );
   --color-chart-categorical-2: var(
     --nx-color-chart-categorical-2,
-    var(--nx-color-lime-700)
+    oklch(0.61 0.1871 131.589)
   );
   --color-chart-categorical-3: var(
     --nx-color-chart-categorical-3,
-    var(--nx-color-orange-600)
+    oklch(0.62 0.2044 41.116)
   );
   --color-chart-categorical-4: var(
     --nx-color-chart-categorical-4,
-    var(--nx-color-rose-600)
+    oklch(0.58 0.2489 17.585)
   );
   --color-chart-categorical-5: var(
     --nx-color-chart-categorical-5,
-    var(--nx-color-indigo-600)
+    oklch(0.49 0.2912 276.966)
   );
-  --color-focus-default: var(
-    --nx-color-focus-default,
-    var(--color-primary-subtle-foreground)
+  --color-focus-default: var(--nx-color-focus-default, oklch(0.1448 0 0));
+  --color-focus-error: var(--nx-color-focus-error, oklch(0.577 0.2523 27.926));
+  --color-background-hover-alpha: var(
+    --nx-color-background-hover-alpha,
+    oklch(0.13 0.006 70 / 0.0627)
   );
-  --color-focus-error: var(--nx-color-focus-error, var(--nx-focus-color-error));
+  --color-border-default-alpha: var(
+    --nx-color-border-default-alpha,
+    oklch(0.13 0.006 70 / 0.0941)
+  );
+  --color-overlay: var(--nx-color-overlay, oklch(0.13 0.006 70 / 0.7529));
+  --color-popover-alpha: var(--nx-color-popover-alpha, oklch(1 0 0 / 0.7529));
+  --color-popover-backdrop: var(
+    --nx-color-popover-backdrop,
+    oklch(0.13 0.006 70 / 0.9098)
+  );
 }
 
 /* ===== RUNTIME COLOR ALIASES ===== */
 :root {
-  --color-background: var(--nx-color-background, var(--nx-color-white-base));
-  --color-foreground: var(--nx-color-foreground, var(--nx-color-black-a900));
+  --color-background: var(--nx-color-background, oklch(1 0 0));
   --color-background-hover: var(
     --nx-color-background-hover,
-    var(--nx-color-stone-50)
-  );
-  --color-background-hover-alpha: var(
-    --nx-color-background-hover-alpha,
-    var(--nx-color-stone-a100)
+    oklch(0.9849 0.0082 70)
   );
   --color-background-active: var(
     --nx-color-background-active,
-    var(--nx-color-stone-100)
+    oklch(0.9227 0.0089 70)
   );
-  --color-muted: var(--nx-color-muted, var(--nx-color-stone-50));
-  --color-muted-foreground: var(
-    --nx-color-muted-foreground,
-    var(--nx-color-black-a600)
-  );
-  --color-muted-foreground-subtle: var(
-    --nx-color-muted-foreground-subtle,
-    var(--nx-color-black-a500)
-  );
-  --color-disabled: var(--nx-color-disabled, var(--nx-color-stone-50));
-  --color-disabled-foreground: var(
-    --nx-color-disabled-foreground,
-    var(--nx-color-stone-400)
-  );
-  --color-container: var(--nx-color-container, var(--nx-color-white-base));
-  --color-container-foreground: var(
-    --nx-color-container-foreground,
-    var(--nx-color-stone-950)
-  );
+  --color-muted: var(--nx-color-muted, oklch(0.9698 0.0083 70));
+  --color-container: var(--nx-color-container, oklch(1 0 0));
   --color-container-hover: var(
     --nx-color-container-hover,
-    var(--nx-color-stone-50)
+    oklch(0.9698 0.0083 70)
   );
   --color-container-active: var(
     --nx-color-container-active,
-    var(--nx-color-stone-100)
+    oklch(0.9451 0.0086 70)
   );
-  --color-popover: var(--nx-color-popover, var(--nx-color-white-base));
-  --color-popover-foreground: var(
-    --nx-color-popover-foreground,
-    var(--nx-color-stone-950)
-  );
-  --color-popover-hover: var(
-    --nx-color-popover-hover,
-    var(--nx-color-stone-50)
-  );
+  --color-popover: var(--nx-color-popover, oklch(1 0 0));
+  --color-popover-hover: var(--nx-color-popover-hover, oklch(0.9451 0.0086 70));
   --color-popover-active: var(
     --nx-color-popover-active,
-    var(--nx-color-stone-50)
-  );
-  --color-popover-alpha: var(
-    --nx-color-popover-alpha,
-    var(--nx-color-white-a700)
-  );
-  --color-popover-backdrop: var(
-    --nx-color-popover-backdrop,
-    var(--nx-color-stone-a900)
+    oklch(0.9451 0.0086 70)
   );
   --color-control-background: var(
     --nx-color-control-background,
-    var(--nx-color-stone-100)
+    oklch(0.9227 0.0089 70)
   );
   --color-control-background-hover: var(
     --nx-color-control-background-hover,
-    var(--nx-color-stone-200)
+    oklch(0.8701 0.0095 70)
   );
-  --color-control-thumb: var(
-    --nx-color-control-thumb,
-    var(--nx-color-white-base)
-  );
+  --color-control-thumb: var(--nx-color-control-thumb, oklch(1 0 0));
   --color-nav-background: var(
     --nx-color-nav-background,
-    var(--nx-color-stone-100)
-  );
-  --color-nav-foreground: var(
-    --nx-color-nav-foreground,
-    var(--nx-color-stone-900)
-  );
-  --color-nav-muted-foreground: var(
-    --nx-color-nav-muted-foreground,
-    var(--nx-color-stone-600)
+    oklch(0.9698 0.0083 70)
   );
   --color-nav-item-hover: var(
     --nx-color-nav-item-hover,
-    var(--nx-color-stone-200)
+    oklch(0.9227 0.0089 70)
   );
   --color-nav-item-active: var(
     --nx-color-nav-item-active,
-    var(--nx-color-stone-200)
+    oklch(0.9227 0.0089 70)
   );
-  --color-nav-border: var(--nx-color-nav-border, var(--nx-color-stone-200));
-  --color-overlay: var(--nx-color-overlay, var(--nx-color-stone-a700));
+  --color-nav-border: var(--nx-color-nav-border, oklch(0.9227 0.0089 70));
+  --color-disabled: var(--nx-color-disabled, oklch(0.9451 0.0086 70));
+  --color-border-active: var(--nx-color-border-active, oklch(0.6601 0.0118 70));
+  --color-foreground: var(--nx-color-foreground, oklch(0.1448 0 0 / 0.9098));
+  --color-container-foreground: var(
+    --nx-color-container-foreground,
+    oklch(0.2161 0.0061 56.043)
+  );
+  --color-popover-foreground: var(
+    --nx-color-popover-foreground,
+    oklch(0.2161 0.0061 56.043)
+  );
+  --color-nav-foreground: var(
+    --nx-color-nav-foreground,
+    oklch(0.2161 0.0061 56.043)
+  );
+  --color-muted-foreground: var(
+    --nx-color-muted-foreground,
+    oklch(0.1448 0 0 / 0.6275)
+  );
+  --color-nav-muted-foreground: var(
+    --nx-color-nav-muted-foreground,
+    oklch(0.5176 0.0061 56.043)
+  );
+  --color-muted-foreground-subtle: var(
+    --nx-color-muted-foreground-subtle,
+    oklch(0.1448 0 0 / 0.502)
+  );
+  --color-disabled-foreground: var(
+    --nx-color-disabled-foreground,
+    oklch(0.5806 0.0061 56.043)
+  );
   --color-border-default: var(
     --nx-color-border-default,
-    var(--nx-color-black-a200)
-  );
-  --color-border-hairline: var(
-    --nx-color-border-hairline,
-    var(--nx-color-black-a200)
-  );
-  --color-border-default-alpha: var(
-    --nx-color-border-default-alpha,
-    var(--nx-color-stone-a200)
-  );
-  --color-border-active: var(
-    --nx-color-border-active,
-    var(--nx-color-stone-400)
+    oklch(0.1448 0 0 / 0.0941)
   );
   --color-border-disabled: var(
     --nx-color-border-disabled,
-    var(--nx-color-black-a200)
+    oklch(0.1448 0 0 / 0.0941)
   );
-  --color-border-warning: var(
-    --nx-color-border-warning,
-    var(--nx-color-orange-200)
-  );
-  --color-border-warning-active: var(
-    --nx-color-border-warning-active,
-    var(--nx-color-orange-400)
-  );
-  --color-border-success: var(
-    --nx-color-border-success,
-    var(--nx-color-green-200)
-  );
-  --color-border-success-active: var(
-    --nx-color-border-success-active,
-    var(--nx-color-green-400)
-  );
-  --color-border-error: var(--nx-color-border-error, var(--nx-color-red-200));
-  --color-border-error-active: var(
-    --nx-color-border-error-active,
-    var(--nx-color-red-400)
-  );
-  --color-border-information: var(
-    --nx-color-border-information,
-    var(--nx-color-blue-200)
-  );
-  --color-border-information-active: var(
-    --nx-color-border-information-active,
-    var(--nx-color-blue-400)
-  );
-  --color-error-background: var(
-    --nx-color-error-background,
-    var(--nx-color-red-600)
-  );
-  --color-error-foreground: var(
-    --nx-color-error-foreground,
-    var(--nx-color-white-base)
-  );
-  --color-error-background-hover: var(
-    --nx-color-error-background-hover,
-    var(--nx-color-red-700)
-  );
-  --color-error-background-active: var(
-    --nx-color-error-background-active,
-    var(--nx-color-red-800)
-  );
-  --color-error-disabled: var(
-    --nx-color-error-disabled,
-    var(--nx-color-red-300)
-  );
-  --color-error-subtle: var(--nx-color-error-subtle, var(--nx-color-red-50));
-  --color-error-subtle-foreground: var(
-    --nx-color-error-subtle-foreground,
-    var(--nx-color-red-600)
-  );
-  --color-error-subtle-hover: var(
-    --nx-color-error-subtle-hover,
-    var(--nx-color-red-100)
-  );
-  --color-error-subtle-active: var(
-    --nx-color-error-subtle-active,
-    var(--nx-color-red-200)
-  );
-  --color-success-background: var(
-    --nx-color-success-background,
-    var(--nx-color-green-600)
-  );
-  --color-success-foreground: var(
-    --nx-color-success-foreground,
-    var(--nx-color-white-base)
-  );
-  --color-success-background-hover: var(
-    --nx-color-success-background-hover,
-    var(--nx-color-green-700)
-  );
-  --color-success-background-active: var(
-    --nx-color-success-background-active,
-    var(--nx-color-green-800)
-  );
-  --color-success-disabled: var(
-    --nx-color-success-disabled,
-    var(--nx-color-green-300)
-  );
-  --color-success-subtle: var(
-    --nx-color-success-subtle,
-    var(--nx-color-green-50)
-  );
-  --color-success-subtle-foreground: var(
-    --nx-color-success-subtle-foreground,
-    var(--nx-color-green-700)
-  );
-  --color-success-subtle-hover: var(
-    --nx-color-success-subtle-hover,
-    var(--nx-color-green-100)
-  );
-  --color-success-subtle-active: var(
-    --nx-color-success-subtle-active,
-    var(--nx-color-green-200)
-  );
-  --color-information-background: var(
-    --nx-color-information-background,
-    var(--nx-color-blue-600)
-  );
-  --color-information-foreground: var(
-    --nx-color-information-foreground,
-    var(--nx-color-white-base)
-  );
-  --color-information-background-hover: var(
-    --nx-color-information-background-hover,
-    var(--nx-color-blue-700)
-  );
-  --color-information-background-active: var(
-    --nx-color-information-background-active,
-    var(--nx-color-blue-800)
-  );
-  --color-information-disabled: var(
-    --nx-color-information-disabled,
-    var(--nx-color-blue-300)
-  );
-  --color-information-subtle: var(
-    --nx-color-information-subtle,
-    var(--nx-color-blue-50)
-  );
-  --color-information-subtle-foreground: var(
-    --nx-color-information-subtle-foreground,
-    var(--nx-color-blue-600)
-  );
-  --color-information-subtle-hover: var(
-    --nx-color-information-subtle-hover,
-    var(--nx-color-blue-100)
-  );
-  --color-information-subtle-active: var(
-    --nx-color-information-subtle-active,
-    var(--nx-color-blue-200)
-  );
-  --color-warning-background: var(
-    --nx-color-warning-background,
-    var(--nx-color-orange-600)
-  );
-  --color-warning-foreground: var(
-    --nx-color-warning-foreground,
-    var(--nx-color-white-base)
-  );
-  --color-warning-background-hover: var(
-    --nx-color-warning-background-hover,
-    var(--nx-color-orange-700)
-  );
-  --color-warning-background-active: var(
-    --nx-color-warning-background-active,
-    var(--nx-color-orange-800)
-  );
-  --color-warning-disabled: var(
-    --nx-color-warning-disabled,
-    var(--nx-color-orange-300)
-  );
-  --color-warning-subtle: var(
-    --nx-color-warning-subtle,
-    var(--nx-color-orange-50)
-  );
-  --color-warning-subtle-foreground: var(
-    --nx-color-warning-subtle-foreground,
-    var(--nx-color-orange-600)
-  );
-  --color-warning-subtle-hover: var(
-    --nx-color-warning-subtle-hover,
-    var(--nx-color-orange-100)
-  );
-  --color-warning-subtle-active: var(
-    --nx-color-warning-subtle-active,
-    var(--nx-color-orange-200)
+  --color-border-hairline: var(
+    --nx-color-border-hairline,
+    oklch(0.1448 0 0 / 0.0941)
   );
   --color-primary-background: var(
     --nx-color-primary-background,
-    var(--nx-color-black-base)
-  );
-  --color-primary-background-active: var(
-    --nx-color-primary-background-active,
-    var(--nx-color-neutral-950)
-  );
-  --color-primary-foreground: var(
-    --nx-color-primary-foreground,
-    var(--nx-color-white-base)
+    oklch(0.1448 0 0)
   );
   --color-primary-background-hover: var(
     --nx-color-primary-background-hover,
-    var(--nx-color-neutral-900)
+    oklch(0.207 0 0)
   );
-  --color-primary-disabled: var(
-    --nx-color-primary-disabled,
-    var(--nx-color-neutral-300)
+  --color-primary-background-active: var(
+    --nx-color-primary-background-active,
+    oklch(0.118 0 0)
   );
-  --color-primary-subtle: var(
-    --nx-color-primary-subtle,
-    var(--nx-color-neutral-50)
-  );
+  --color-primary-foreground: var(--nx-color-primary-foreground, oklch(1 0 0));
+  --color-primary-disabled: var(--nx-color-primary-disabled, oklch(0.765 0 0));
+  --color-primary-subtle: var(--nx-color-primary-subtle, oklch(0.985 0 0));
   --color-primary-subtle-foreground: var(
     --nx-color-primary-subtle-foreground,
-    var(--nx-color-black-base)
+    oklch(0.1448 0 0)
   );
   --color-primary-subtle-hover: var(
     --nx-color-primary-subtle-hover,
-    var(--nx-color-neutral-100)
+    oklch(0.945 0 0)
   );
   --color-primary-subtle-active: var(
     --nx-color-primary-subtle-active,
-    var(--nx-color-neutral-200)
+    oklch(0.87 0 0)
+  );
+  --color-border-primary: var(--nx-color-border-primary, oklch(0.87 0 0));
+  --color-border-primary-active: var(
+    --nx-color-border-primary-active,
+    oklch(0.66 0 0)
   );
   --color-secondary-background: var(
     --nx-color-secondary-background,
-    var(--nx-color-neutral-100)
-  );
-  --color-secondary-foreground: var(
-    --nx-color-secondary-foreground,
-    var(--nx-color-neutral-900)
+    oklch(0.945 0 0)
   );
   --color-secondary-background-hover: var(
     --nx-color-secondary-background-hover,
-    var(--nx-color-neutral-200)
+    oklch(0.87 0 0)
   );
   --color-secondary-background-active: var(
     --nx-color-secondary-background-active,
-    var(--nx-color-neutral-300)
+    oklch(0.765 0 0)
+  );
+  --color-secondary-foreground: var(
+    --nx-color-secondary-foreground,
+    oklch(0.207 0 0)
   );
   --color-secondary-disabled: var(
     --nx-color-secondary-disabled,
-    var(--nx-color-neutral-50)
+    oklch(0.985 0 0)
   );
-  --color-secondary-subtle: var(
-    --nx-color-secondary-subtle,
-    var(--nx-color-neutral-100)
-  );
+  --color-secondary-subtle: var(--nx-color-secondary-subtle, oklch(0.945 0 0));
   --color-secondary-subtle-foreground: var(
     --nx-color-secondary-subtle-foreground,
-    var(--nx-color-neutral-600)
+    oklch(0.46 0 0)
   );
   --color-secondary-subtle-hover: var(
     --nx-color-secondary-subtle-hover,
-    var(--nx-color-neutral-200)
+    oklch(0.87 0 0)
   );
   --color-secondary-subtle-active: var(
     --nx-color-secondary-subtle-active,
-    var(--nx-color-neutral-300)
+    oklch(0.765 0 0)
   );
-  --color-border-primary: var(
-    --nx-color-border-primary,
-    var(--nx-color-neutral-200)
+  --color-success-background: var(
+    --nx-color-success-background,
+    oklch(0.62 0.2233 140.055)
   );
-  --color-border-primary-active: var(
-    --nx-color-border-primary-active,
-    var(--nx-color-neutral-400)
+  --color-success-background-hover: var(
+    --nx-color-success-background-hover,
+    oklch(0.52 0.1871 140.022)
+  );
+  --color-success-background-active: var(
+    --nx-color-success-background-active,
+    oklch(0.43 0.1534 139.623)
+  );
+  --color-success-foreground: var(--nx-color-success-foreground, oklch(1 0 0));
+  --color-success-disabled: var(
+    --nx-color-success-disabled,
+    oklch(0.87 0.3119 139.843)
+  );
+  --color-success-subtle: var(
+    --nx-color-success-subtle,
+    oklch(0.982 0.035 137.785)
+  );
+  --color-success-subtle-foreground: var(
+    --nx-color-success-subtle-foreground,
+    oklch(0.52 0.1871 140.022)
+  );
+  --color-success-subtle-hover: var(
+    --nx-color-success-subtle-hover,
+    oklch(0.96 0.0789 139.835)
+  );
+  --color-success-subtle-active: var(
+    --nx-color-success-subtle-active,
+    oklch(0.925 0.1596 139.892)
+  );
+  --color-border-success: var(
+    --nx-color-border-success,
+    oklch(0.925 0.1596 139.892)
+  );
+  --color-border-success-active: var(
+    --nx-color-border-success-active,
+    oklch(0.79 0.2864 140.349)
+  );
+  --color-warning-background: var(
+    --nx-color-warning-background,
+    oklch(0.62 0.2044 41.116)
+  );
+  --color-warning-background-hover: var(
+    --nx-color-warning-background-hover,
+    oklch(0.52 0.1809 38.402)
+  );
+  --color-warning-background-active: var(
+    --nx-color-warning-background-active,
+    oklch(0.43 0.153 37.304)
+  );
+  --color-warning-foreground: var(--nx-color-warning-foreground, oklch(1 0 0));
+  --color-warning-disabled: var(
+    --nx-color-warning-disabled,
+    oklch(0.84 0.142 66.29)
+  );
+  --color-warning-subtle: var(
+    --nx-color-warning-subtle,
+    oklch(0.98 0.0185 73.684)
+  );
+  --color-warning-subtle-foreground: var(
+    --nx-color-warning-subtle-foreground,
+    oklch(0.62 0.2044 41.116)
+  );
+  --color-warning-subtle-hover: var(
+    --nx-color-warning-subtle-hover,
+    oklch(0.955 0.0435 75.164)
+  );
+  --color-warning-subtle-active: var(
+    --nx-color-warning-subtle-active,
+    oklch(0.91 0.0819 70.697)
+  );
+  --color-border-warning: var(
+    --nx-color-border-warning,
+    oklch(0.91 0.0819 70.697)
+  );
+  --color-border-warning-active: var(
+    --nx-color-border-warning-active,
+    oklch(0.78 0.1803 55.934)
+  );
+  --color-error-background: var(
+    --nx-color-error-background,
+    oklch(0.577 0.2523 27.926)
+  );
+  --color-error-background-hover: var(
+    --nx-color-error-background-hover,
+    oklch(0.505 0.2209 27.946)
+  );
+  --color-error-background-active: var(
+    --nx-color-error-background-active,
+    oklch(0.42 0.1838 28.144)
+  );
+  --color-error-foreground: var(--nx-color-error-foreground, oklch(1 0 0));
+  --color-error-disabled: var(
+    --nx-color-error-disabled,
+    oklch(0.808 0.1333 28.058)
+  );
+  --color-error-subtle: var(
+    --nx-color-error-subtle,
+    oklch(0.971 0.0176 28.865)
+  );
+  --color-error-subtle-foreground: var(
+    --nx-color-error-subtle-foreground,
+    oklch(0.577 0.2523 27.926)
+  );
+  --color-error-subtle-hover: var(
+    --nx-color-error-subtle-hover,
+    oklch(0.936 0.0399 27.342)
+  );
+  --color-error-subtle-active: var(
+    --nx-color-error-subtle-active,
+    oklch(0.885 0.0747 27.394)
+  );
+  --color-border-error: var(
+    --nx-color-border-error,
+    oklch(0.885 0.0747 27.394)
+  );
+  --color-border-error-active: var(
+    --nx-color-border-error-active,
+    oklch(0.704 0.2267 27.842)
+  );
+  --color-information-background: var(
+    --nx-color-information-background,
+    oklch(0.546 0.2205 255.276)
+  );
+  --color-information-background-hover: var(
+    --nx-color-information-background-hover,
+    oklch(0.488 0.197 255.267)
+  );
+  --color-information-background-active: var(
+    --nx-color-information-background-active,
+    oklch(0.41 0.1633 254.871)
+  );
+  --color-information-foreground: var(
+    --nx-color-information-foreground,
+    oklch(1 0 0)
+  );
+  --color-information-disabled: var(
+    --nx-color-information-disabled,
+    oklch(0.809 0.1012 254.248)
+  );
+  --color-information-subtle: var(
+    --nx-color-information-subtle,
+    oklch(0.97 0.0152 252.81)
+  );
+  --color-information-subtle-foreground: var(
+    --nx-color-information-subtle-foreground,
+    oklch(0.546 0.2205 255.276)
+  );
+  --color-information-subtle-hover: var(
+    --nx-color-information-subtle-hover,
+    oklch(0.932 0.0342 257.472)
+  );
+  --color-information-subtle-active: var(
+    --nx-color-information-subtle-active,
+    oklch(0.882 0.0612 253.613)
+  );
+  --color-border-information: var(
+    --nx-color-border-information,
+    oklch(0.882 0.0612 253.613)
+  );
+  --color-border-information-active: var(
+    --nx-color-border-information-active,
+    oklch(0.707 0.1599 255.225)
   );
   --color-chart-categorical-1: var(
     --nx-color-chart-categorical-1,
-    var(--nx-color-teal-600)
+    oklch(0.52 0.1168 186.391)
   );
   --color-chart-categorical-2: var(
     --nx-color-chart-categorical-2,
-    var(--nx-color-lime-700)
+    oklch(0.61 0.1871 131.589)
   );
   --color-chart-categorical-3: var(
     --nx-color-chart-categorical-3,
-    var(--nx-color-orange-600)
+    oklch(0.62 0.2044 41.116)
   );
   --color-chart-categorical-4: var(
     --nx-color-chart-categorical-4,
-    var(--nx-color-rose-600)
+    oklch(0.58 0.2489 17.585)
   );
   --color-chart-categorical-5: var(
     --nx-color-chart-categorical-5,
-    var(--nx-color-indigo-600)
+    oklch(0.49 0.2912 276.966)
   );
-  --color-focus-default: var(
-    --nx-color-focus-default,
-    var(--color-primary-subtle-foreground)
+  --color-focus-default: var(--nx-color-focus-default, oklch(0.1448 0 0));
+  --color-focus-error: var(--nx-color-focus-error, oklch(0.577 0.2523 27.926));
+  --color-background-hover-alpha: var(
+    --nx-color-background-hover-alpha,
+    oklch(0.13 0.006 70 / 0.0627)
   );
-  --color-focus-error: var(--nx-color-focus-error, var(--nx-focus-color-error));
+  --color-border-default-alpha: var(
+    --nx-color-border-default-alpha,
+    oklch(0.13 0.006 70 / 0.0941)
+  );
+  --color-overlay: var(--nx-color-overlay, oklch(0.13 0.006 70 / 0.7529));
+  --color-popover-alpha: var(--nx-color-popover-alpha, oklch(1 0 0 / 0.7529));
+  --color-popover-backdrop: var(
+    --nx-color-popover-backdrop,
+    oklch(0.13 0.006 70 / 0.9098)
+  );
 }
 
 /* ===== DARK MODE ===== */
 .dark {
-  --nx-color-background: var(--nx-color-stone-950);
-  --nx-color-foreground: var(--nx-color-white-a900);
-  --nx-color-background-hover: var(--nx-color-stone-900);
-  --nx-color-background-hover-alpha: var(--nx-color-stone-a100);
-  --nx-color-background-active: var(--nx-color-stone-900);
-  --nx-color-muted: var(--nx-color-stone-900);
-  --nx-color-muted-foreground: var(--nx-color-white-a600);
-  --nx-color-muted-foreground-subtle: var(--nx-color-white-a600);
-  --nx-color-disabled: var(--nx-color-stone-950);
-  --nx-color-disabled-foreground: var(--nx-color-stone-300);
-  --nx-color-container: var(--nx-color-stone-900);
-  --nx-color-container-foreground: var(--nx-color-white-base);
-  --nx-color-container-hover: var(--nx-color-stone-800);
-  --nx-color-container-active: var(--nx-color-stone-900);
-  --nx-color-popover: var(--nx-color-stone-800);
-  --nx-color-popover-foreground: var(--nx-color-white-base);
-  --nx-color-popover-hover: var(--nx-color-stone-700);
-  --nx-color-popover-active: var(--nx-color-stone-800);
-  --nx-color-popover-alpha: var(--nx-color-stone-a700);
-  --nx-color-popover-backdrop: var(--nx-color-stone-a900);
-  --nx-color-control-background: var(--nx-color-stone-800);
-  --nx-color-control-background-hover: var(--nx-color-stone-700);
-  --nx-color-control-thumb: var(--nx-color-white-base);
-  --nx-color-nav-background: var(--nx-color-stone-900);
-  --nx-color-nav-foreground: var(--nx-color-stone-50);
-  --nx-color-nav-muted-foreground: var(--nx-color-stone-300);
-  --nx-color-nav-item-hover: var(--nx-color-stone-800);
-  --nx-color-nav-item-active: var(--nx-color-stone-800);
-  --nx-color-nav-border: var(--nx-color-stone-800);
-  --nx-color-overlay: var(--nx-color-stone-a800);
-  --nx-color-border-default: var(--nx-color-white-a300);
-  --nx-color-border-hairline: var(--nx-color-white-a200);
-  --nx-color-border-default-alpha: var(--nx-color-stone-a300);
-  --nx-color-border-active: var(--nx-color-stone-400);
-  --nx-color-border-disabled: var(--nx-color-white-a300);
-  --nx-color-border-warning: var(--nx-color-orange-700);
-  --nx-color-border-warning-active: var(--nx-color-orange-500);
-  --nx-color-border-success: var(--nx-color-green-700);
-  --nx-color-border-success-active: var(--nx-color-green-500);
-  --nx-color-border-error: var(--nx-color-red-700);
-  --nx-color-border-error-active: var(--nx-color-red-500);
-  --nx-color-border-information: var(--nx-color-blue-700);
-  --nx-color-border-information-active: var(--nx-color-blue-500);
-  --nx-color-error-background: var(--nx-color-red-600);
-  --nx-color-error-foreground: var(--nx-color-white-base);
-  --nx-color-error-background-hover: var(--nx-color-red-700);
-  --nx-color-error-background-active: var(--nx-color-red-800);
-  --nx-color-error-disabled: var(--nx-color-red-900);
-  --nx-color-error-subtle: var(--nx-color-red-950);
-  --nx-color-error-subtle-foreground: var(--nx-color-red-200);
-  --nx-color-error-subtle-hover: var(--nx-color-red-900);
-  --nx-color-error-subtle-active: var(--nx-color-red-800);
-  --nx-color-success-background: var(--nx-color-green-600);
-  --nx-color-success-foreground: var(--nx-color-white-base);
-  --nx-color-success-background-hover: var(--nx-color-green-700);
-  --nx-color-success-background-active: var(--nx-color-green-800);
-  --nx-color-success-disabled: var(--nx-color-green-900);
-  --nx-color-success-subtle: var(--nx-color-green-950);
-  --nx-color-success-subtle-foreground: var(--nx-color-green-300);
-  --nx-color-success-subtle-hover: var(--nx-color-green-900);
-  --nx-color-success-subtle-active: var(--nx-color-green-800);
-  --nx-color-information-background: var(--nx-color-blue-600);
-  --nx-color-information-foreground: var(--nx-color-white-base);
-  --nx-color-information-background-hover: var(--nx-color-blue-700);
-  --nx-color-information-background-active: var(--nx-color-blue-800);
-  --nx-color-information-disabled: var(--nx-color-blue-900);
-  --nx-color-information-subtle: var(--nx-color-blue-950);
-  --nx-color-information-subtle-foreground: var(--nx-color-blue-300);
-  --nx-color-information-subtle-hover: var(--nx-color-blue-900);
-  --nx-color-information-subtle-active: var(--nx-color-blue-800);
-  --nx-color-warning-background: var(--nx-color-orange-600);
-  --nx-color-warning-foreground: var(--nx-color-white-base);
-  --nx-color-warning-background-hover: var(--nx-color-orange-700);
-  --nx-color-warning-background-active: var(--nx-color-orange-800);
-  --nx-color-warning-disabled: var(--nx-color-orange-900);
-  --nx-color-warning-subtle: var(--nx-color-orange-950);
-  --nx-color-warning-subtle-foreground: var(--nx-color-orange-200);
-  --nx-color-warning-subtle-hover: var(--nx-color-orange-900);
-  --nx-color-warning-subtle-active: var(--nx-color-orange-800);
-  --nx-color-primary-background: var(--nx-color-white-base);
-  --nx-color-primary-background-active: var(--nx-color-neutral-200);
-  --nx-color-primary-foreground: var(--nx-color-black-base);
-  --nx-color-primary-background-hover: var(--nx-color-neutral-100);
-  --nx-color-primary-disabled: var(--nx-color-neutral-800);
-  --nx-color-primary-subtle: var(--nx-color-neutral-950);
-  --nx-color-primary-subtle-foreground: var(--nx-color-white-base);
-  --nx-color-primary-subtle-hover: var(--nx-color-neutral-900);
-  --nx-color-primary-subtle-active: var(--nx-color-neutral-800);
-  --nx-color-secondary-background: var(--nx-color-neutral-900);
-  --nx-color-secondary-foreground: var(--nx-color-neutral-100);
-  --nx-color-secondary-background-hover: var(--nx-color-neutral-700);
-  --nx-color-secondary-background-active: var(--nx-color-neutral-600);
-  --nx-color-secondary-disabled: var(--nx-color-neutral-950);
-  --nx-color-secondary-subtle: var(--nx-color-neutral-800);
-  --nx-color-secondary-subtle-foreground: var(--nx-color-neutral-200);
-  --nx-color-secondary-subtle-hover: var(--nx-color-neutral-700);
-  --nx-color-secondary-subtle-active: var(--nx-color-neutral-600);
-  --nx-color-border-primary: var(--nx-color-neutral-700);
-  --nx-color-border-primary-active: var(--nx-color-neutral-500);
-  --nx-color-chart-categorical-1: var(--nx-color-teal-200);
-  --nx-color-chart-categorical-2: var(--nx-color-lime-200);
-  --nx-color-chart-categorical-3: var(--nx-color-orange-200);
-  --nx-color-chart-categorical-4: var(--nx-color-rose-200);
-  --nx-color-chart-categorical-5: var(--nx-color-indigo-200);
+  --nx-color-background: oklch(0.2161 0.006 70);
+  --nx-color-background-hover: oklch(0.2481 0.006 70);
+  --nx-color-background-active: oklch(0.2481 0.006 70);
+  --nx-color-muted: oklch(0.2481 0.006 70);
+  --nx-color-container: oklch(0.2481 0.006 70);
+  --nx-color-container-hover: oklch(0.2801 0.006 70);
+  --nx-color-container-active: oklch(0.2481 0.006 70);
+  --nx-color-popover: oklch(0.2801 0.006 70);
+  --nx-color-popover-hover: oklch(0.3121 0.006 70);
+  --nx-color-popover-active: oklch(0.2801 0.006 70);
+  --nx-color-control-background: oklch(0.2801 0.006 70);
+  --nx-color-control-background-hover: oklch(0.3121 0.006 70);
+  --nx-color-control-thumb: oklch(1 0 0);
+  --nx-color-nav-background: oklch(0.2481 0.006 70);
+  --nx-color-nav-item-hover: oklch(0.2801 0.006 70);
+  --nx-color-nav-item-active: oklch(0.2801 0.006 70);
+  --nx-color-nav-border: oklch(0.2801 0.006 70);
+  --nx-color-disabled: oklch(0.2481 0.006 70);
+  --nx-color-border-active: oklch(0.4097 0.006 70);
+  --nx-color-foreground: oklch(1 0 0 / 0.9098);
+  --nx-color-container-foreground: oklch(0.9848 0.0013 106.424);
+  --nx-color-popover-foreground: oklch(0.9848 0.0013 106.424);
+  --nx-color-nav-foreground: oklch(0.9848 0.0013 106.424);
+  --nx-color-muted-foreground: oklch(1 0 0 / 0.6275);
+  --nx-color-nav-muted-foreground: oklch(0.8375 0.0013 106.424);
+  --nx-color-muted-foreground-subtle: oklch(1 0 0 / 0.6275);
+  --nx-color-disabled-foreground: oklch(0.6901 0.0013 106.424);
+  --nx-color-border-default: oklch(1 0 0 / 0.12);
+  --nx-color-border-disabled: oklch(1 0 0 / 0.12);
+  --nx-color-border-hairline: oklch(1 0 0 / 0.0941);
+  --nx-color-primary-background: oklch(1 0 0);
+  --nx-color-primary-background-hover: oklch(0.945 0 0);
+  --nx-color-primary-background-active: oklch(0.87 0 0);
+  --nx-color-primary-foreground: oklch(0.1448 0 0);
+  --nx-color-primary-disabled: oklch(0.118 0 0);
+  --nx-color-primary-subtle: oklch(0.118 0 0);
+  --nx-color-primary-subtle-foreground: oklch(1 0 0);
+  --nx-color-primary-subtle-hover: oklch(0.207 0 0);
+  --nx-color-primary-subtle-active: oklch(0.297 0 0);
+  --nx-color-border-primary: oklch(0.385 0 0);
+  --nx-color-border-primary-active: oklch(0.553 0 0);
+  --nx-color-secondary-background: oklch(0.207 0 0);
+  --nx-color-secondary-background-hover: oklch(0.385 0 0);
+  --nx-color-secondary-background-active: oklch(0.46 0 0);
+  --nx-color-secondary-foreground: oklch(0.945 0 0);
+  --nx-color-secondary-disabled: oklch(0.118 0 0);
+  --nx-color-secondary-subtle: oklch(0.297 0 0);
+  --nx-color-secondary-subtle-foreground: oklch(0.87 0 0);
+  --nx-color-secondary-subtle-hover: oklch(0.385 0 0);
+  --nx-color-secondary-subtle-active: oklch(0.46 0 0);
+  --nx-color-success-background: oklch(0.62 0.2233 140.055);
+  --nx-color-success-background-hover: oklch(0.52 0.1871 140.022);
+  --nx-color-success-background-active: oklch(0.43 0.1534 139.623);
+  --nx-color-success-foreground: oklch(1 0 0);
+  --nx-color-success-disabled: oklch(0.25 0.0887 139.4);
+  --nx-color-success-subtle: oklch(0.25 0.0887 139.4);
+  --nx-color-success-subtle-foreground: oklch(0.87 0.3119 139.843);
+  --nx-color-success-subtle-hover: oklch(0.34 0.1216 139.757);
+  --nx-color-success-subtle-active: oklch(0.43 0.1534 139.623);
+  --nx-color-border-success: oklch(0.52 0.1871 140.022);
+  --nx-color-border-success-active: oklch(0.72 0.2591 140.014);
+  --nx-color-warning-background: oklch(0.62 0.2044 41.116);
+  --nx-color-warning-background-hover: oklch(0.52 0.1809 38.402);
+  --nx-color-warning-background-active: oklch(0.43 0.153 37.304);
+  --nx-color-warning-foreground: oklch(1 0 0);
+  --nx-color-warning-disabled: oklch(0.25 0.091 36.259);
+  --nx-color-warning-subtle: oklch(0.25 0.091 36.259);
+  --nx-color-warning-subtle-foreground: oklch(0.84 0.142 66.29);
+  --nx-color-warning-subtle-hover: oklch(0.34 0.1188 38.172);
+  --nx-color-warning-subtle-active: oklch(0.43 0.153 37.304);
+  --nx-color-border-warning: oklch(0.52 0.1809 38.402);
+  --nx-color-border-warning-active: oklch(0.71 0.2099 47.604);
+  --nx-color-error-background: oklch(0.577 0.2523 27.926);
+  --nx-color-error-background-hover: oklch(0.505 0.2209 27.946);
+  --nx-color-error-background-active: oklch(0.42 0.1838 28.144);
+  --nx-color-error-foreground: oklch(1 0 0);
+  --nx-color-error-disabled: oklch(0.25 0.1094 28.309);
+  --nx-color-error-subtle: oklch(0.25 0.1094 28.309);
+  --nx-color-error-subtle-foreground: oklch(0.808 0.1333 28.058);
+  --nx-color-error-subtle-hover: oklch(0.34 0.1487 28.057);
+  --nx-color-error-subtle-active: oklch(0.42 0.1838 28.144);
+  --nx-color-border-error: oklch(0.505 0.2209 27.946);
+  --nx-color-border-error-active: oklch(0.637 0.2786 27.978);
+  --nx-color-information-background: oklch(0.546 0.2205 255.276);
+  --nx-color-information-background-hover: oklch(0.488 0.197 255.267);
+  --nx-color-information-background-active: oklch(0.41 0.1633 254.871);
+  --nx-color-information-foreground: oklch(1 0 0);
+  --nx-color-information-disabled: oklch(0.25 0.1042 256.214);
+  --nx-color-information-subtle: oklch(0.25 0.1042 256.214);
+  --nx-color-information-subtle-foreground: oklch(0.809 0.1012 254.248);
+  --nx-color-information-subtle-hover: oklch(0.33 0.1316 254.902);
+  --nx-color-information-subtle-active: oklch(0.41 0.1633 254.871);
+  --nx-color-border-information: oklch(0.488 0.197 255.267);
+  --nx-color-border-information-active: oklch(0.623 0.2112 255.145);
+  --nx-color-chart-categorical-1: oklch(0.9 0.1682 180.426);
+  --nx-color-chart-categorical-2: oklch(0.93 0.2278 124.321);
+  --nx-color-chart-categorical-3: oklch(0.91 0.0819 70.697);
+  --nx-color-chart-categorical-4: oklch(0.885 0.0771 10.001);
+  --nx-color-chart-categorical-5: oklch(0.865 0.069 274.039);
+  --nx-color-focus-default: oklch(1 0 0);
+  --nx-color-focus-error: oklch(0.808 0.1333 28.058);
+  --nx-color-background-hover-alpha: oklch(0.13 0.006 70 / 0.04);
+  --nx-color-border-default-alpha: oklch(0.13 0.006 70 / 0.12);
+  --nx-color-overlay: oklch(0.13 0.006 70 / 0.8471);
+  --nx-color-popover-alpha: oklch(0.13 0.006 70 / 0.7529);
+  --nx-color-popover-backdrop: oklch(0.13 0.006 70 / 0.9098);
 }
 
 /* ===== RUNTIME DIMENSION TOKENS ===== */
@@ -1044,12 +980,12 @@
 }
 
 /* ===== FOCUS RING ===== */
-[data-slot='input'][data-variant='default'],
-[data-slot='sidebar-input'][data-variant='default'],
-[data-slot='textarea'][data-variant='default'],
-[data-slot='native-select'][data-variant='default'],
-[data-slot='select-trigger'][data-variant='default'],
-[data-slot='input-group'][data-variant='default'] {
+[data-slot='input'][data-variant='bordered'],
+[data-slot='sidebar-input'][data-variant='bordered'],
+[data-slot='textarea'][data-variant='bordered'],
+[data-slot='native-select'][data-variant='bordered'],
+[data-slot='select-trigger'][data-variant='bordered'],
+[data-slot='input-group'][data-variant='bordered'] {
   border-color: transparent !important;
   border-width: 0;
   box-shadow: inset 0 0 0 1px var(--color-border-default);
@@ -1066,12 +1002,12 @@
   box-shadow: inset 0 0 0 1px var(--color-border-error);
 }
 
-[data-slot='input'][data-variant='default']:disabled,
-[data-slot='sidebar-input'][data-variant='default']:disabled,
-[data-slot='textarea'][data-variant='default']:disabled,
-[data-slot='native-select'][data-variant='default']:disabled,
-[data-slot='select-trigger'][data-variant='default']:disabled,
-[data-slot='input-group'][data-variant='default'][data-disabled='true'] {
+[data-slot='input'][data-variant='bordered']:disabled,
+[data-slot='sidebar-input'][data-variant='bordered']:disabled,
+[data-slot='textarea'][data-variant='bordered']:disabled,
+[data-slot='native-select'][data-variant='bordered']:disabled,
+[data-slot='select-trigger'][data-variant='bordered']:disabled,
+[data-slot='input-group'][data-variant='bordered'][data-disabled='true'] {
   border-color: transparent !important;
   border-width: 0;
   box-shadow: inset 0 0 0 1px var(--color-border-disabled);
@@ -1200,12 +1136,12 @@
 }
 
 @media (forced-colors: active) {
-  [data-slot='input'][data-variant='default'],
-  [data-slot='sidebar-input'][data-variant='default'],
-  [data-slot='textarea'][data-variant='default'],
-  [data-slot='native-select'][data-variant='default'],
-  [data-slot='select-trigger'][data-variant='default'],
-  [data-slot='input-group'][data-variant='default'],
+  [data-slot='input'][data-variant='bordered'],
+  [data-slot='sidebar-input'][data-variant='bordered'],
+  [data-slot='textarea'][data-variant='bordered'],
+  [data-slot='native-select'][data-variant='bordered'],
+  [data-slot='select-trigger'][data-variant='bordered'],
+  [data-slot='input-group'][data-variant='bordered'],
   [data-slot='input'][aria-invalid='true'],
   [data-slot='sidebar-input'][aria-invalid='true'],
   [data-slot='textarea'][aria-invalid='true'],
@@ -1218,12 +1154,12 @@
     box-shadow: none !important;
   }
 
-  [data-slot='input'][data-variant='default']:disabled,
-  [data-slot='sidebar-input'][data-variant='default']:disabled,
-  [data-slot='textarea'][data-variant='default']:disabled,
-  [data-slot='native-select'][data-variant='default']:disabled,
-  [data-slot='select-trigger'][data-variant='default']:disabled,
-  [data-slot='input-group'][data-variant='default'][data-disabled='true'],
+  [data-slot='input'][data-variant='bordered']:disabled,
+  [data-slot='sidebar-input'][data-variant='bordered']:disabled,
+  [data-slot='textarea'][data-variant='bordered']:disabled,
+  [data-slot='native-select'][data-variant='bordered']:disabled,
+  [data-slot='select-trigger'][data-variant='bordered']:disabled,
+  [data-slot='input-group'][data-variant='bordered'][data-disabled='true'],
   [class~='nx:group/input-otp']:has([data-slot='input-otp']:disabled)
     [data-slot='input-otp-slot'] {
     border-color: GrayText !important;

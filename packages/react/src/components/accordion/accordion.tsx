@@ -68,7 +68,7 @@ function AccordionItem({ className, ...props }: AccordionItemProps) {
     <AccordionPrimitive.Item
       data-slot="accordion-item"
       className={cn(
-        'nx:border-color-default nx:px-4 nx:transition-colors nx:duration-fast nx:hover:bg-background-hover nx:data-disabled:border-color-disabled nx:data-disabled:text-disabled-foreground nx:data-disabled:hover:bg-transparent nx:data-[state=open]:pb-4',
+        'nx:border-color-default nx:bg-container nx:px-4 nx:transition-colors nx:duration-fast nx:hover:bg-container-hover nx:data-disabled:border-color-disabled nx:data-disabled:text-disabled-foreground nx:data-disabled:hover:bg-container nx:data-[state=open]:pb-4',
         'nx:group-data-[variant=stacked]/accordion:border-b-default nx:group-data-[variant=stacked]/accordion:last:border-b-0',
         'nx:group-data-[variant=floating]/accordion:rounded-md nx:group-data-[variant=floating]/accordion:border-width-default',
         className

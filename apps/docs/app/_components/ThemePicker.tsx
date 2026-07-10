@@ -2,15 +2,15 @@
 
 import { useState } from 'react';
 
+import { useNexusAppearance } from '@nexus_ds/react/appearance';
 import { usePathname } from 'next/navigation';
 
 import {
   getThemeModeOptions,
-  getThemeStylesheetHref,
-  sanitizeMode,
+  getThemeModeValue,
   type ThemeMode,
-} from '../_lib/theme-modes';
-import { useThemeStore } from '../_stores/use-theme-store';
+  updateThemeMode,
+} from '../_lib/appearance-controls';
 
 import {
   Button,
@@ -21,28 +21,8 @@ import {
   SelectValue,
 } from './nexus';
 
-function applyMode(mode: ThemeMode, value: string) {
-  const safeValue = sanitizeMode(mode, value);
-
-  if (mode === 'spacing') {
-    document.documentElement.setAttribute('data-density', safeValue);
-    return;
-  }
-
-  const link = document.querySelector<HTMLLinkElement>(
-    `link[data-theme="${mode}"]`
-  );
-  if (link) link.href = getThemeStylesheetHref(mode, safeValue);
-}
-
 export function ThemePicker() {
-  const base = useThemeStore((s) => s.base);
-  const brand = useThemeStore((s) => s.brand);
-  const spacing = useThemeStore((s) => s.spacing);
-  const shadow = useThemeStore((s) => s.shadow);
-  const radius = useThemeStore((s) => s.radius);
-  const borderwidth = useThemeStore((s) => s.borderwidth);
-  const update = useThemeStore((s) => s.update);
+  const { state, setState } = useNexusAppearance();
   const [collapsed, setCollapsed] = useState(false);
   const pathname = usePathname();
 
@@ -51,9 +31,7 @@ export function ThemePicker() {
   if (pathname === '/') return null;
 
   const onChange = (mode: ThemeMode) => (value: string) => {
-    const safeValue = sanitizeMode(mode, value);
-    update(mode, safeValue);
-    applyMode(mode, safeValue);
+    setState((current) => updateThemeMode(current, mode, value));
   };
 
   return (
@@ -78,18 +56,18 @@ export function ThemePicker() {
       {!collapsed && (
         <div className="nx:px-4 nx:pb-4 nx:border-t nx:border-border-default">
           <Section title="Colors">
+            <Row label="Scheme">
+              <ModeSelect
+                mode="mode"
+                value={getThemeModeValue(state, 'mode')}
+                onChange={onChange('mode')}
+              />
+            </Row>
             <Row label="Base">
               <ModeSelect
                 mode="base"
-                value={base}
+                value={getThemeModeValue(state, 'base')}
                 onChange={onChange('base')}
-              />
-            </Row>
-            <Row label="Brand">
-              <ModeSelect
-                mode="brand"
-                value={brand}
-                onChange={onChange('brand')}
               />
             </Row>
           </Section>
@@ -97,28 +75,28 @@ export function ThemePicker() {
             <Row label="Size">
               <ModeSelect
                 mode="spacing"
-                value={spacing}
+                value={getThemeModeValue(state, 'spacing')}
                 onChange={onChange('spacing')}
               />
             </Row>
             <Row label="Shadow">
               <ModeSelect
                 mode="shadow"
-                value={shadow}
+                value={getThemeModeValue(state, 'shadow')}
                 onChange={onChange('shadow')}
               />
             </Row>
             <Row label="Radius">
               <ModeSelect
                 mode="radius"
-                value={radius}
+                value={getThemeModeValue(state, 'radius')}
                 onChange={onChange('radius')}
               />
             </Row>
             <Row label="Border Width">
               <ModeSelect
                 mode="borderwidth"
-                value={borderwidth}
+                value={getThemeModeValue(state, 'borderwidth')}
                 onChange={onChange('borderwidth')}
               />
             </Row>

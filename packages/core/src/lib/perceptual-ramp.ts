@@ -45,7 +45,10 @@ export function pinnedOklch(
     clampChroma({ mode: 'oklch', l, c: 0.5, h: hue }, 'oklch', EMIT_GAMUT).c ??
     0;
   let chroma = cuspC * CUSP_FRACTION;
-  if (capAtSeedChroma && seedC > 0) chroma = Math.min(chroma, seedC);
+  // Cap at the seed's own chroma so a muted accent stays muted — and an
+  // achromatic seed (seedC === 0) stays fully neutral instead of picking up the
+  // fallback hue at full cusp chroma.
+  if (capAtSeedChroma) chroma = Math.min(chroma, seedC);
 
   const target: Oklch = { mode: 'oklch', l, c: chroma, h: hue };
   return formatOklch(clampChroma(target, 'oklch', EMIT_GAMUT));

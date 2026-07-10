@@ -12,7 +12,6 @@ export function auditAgentDrift(options = {}) {
   const problems = [
     ...auditSharedSkills(repoRoot),
     ...auditCodexAgentMirrors(repoRoot),
-    ...auditTokenFilenamePatterns(repoRoot),
   ];
 
   return {
@@ -135,46 +134,6 @@ export function auditCodexAgentMirrors(repoRoot = REPO_ROOT) {
     if (!expectedCodexFiles.has(file)) {
       problems.push(
         problem('extra-codex-agent', file, 'Unexpected .codex-only agent')
-      );
-    }
-  }
-
-  return problems;
-}
-
-export function auditTokenFilenamePatterns(repoRoot = REPO_ROOT) {
-  const problems = [];
-  const semanticRoot = path.join(repoRoot, 'packages/core/tokens/semantic');
-  const actualBaseNames = getTokenNames(semanticRoot, 'base');
-  const actualBrandNames = getTokenNames(semanticRoot, 'brands');
-  const filesToCheck = [
-    path.join(repoRoot, '.claude/agents/contrast-auditor.md'),
-    path.join(repoRoot, '.codex/agents/contrast-auditor.toml'),
-  ];
-
-  for (const filePath of filesToCheck) {
-    const relPath = path.relative(repoRoot, filePath);
-    const text = readText(filePath);
-    const documentedBaseNames = getDocumentedTokenPattern(text, 'base');
-    const documentedBrandNames = getDocumentedTokenPattern(text, 'brands');
-
-    if (!sameSet(documentedBaseNames, actualBaseNames)) {
-      problems.push(
-        problem(
-          'base-pattern-drift',
-          relPath,
-          'Base token filename pattern differs from token files'
-        )
-      );
-    }
-
-    if (!sameSet(documentedBrandNames, actualBrandNames)) {
-      problems.push(
-        problem(
-          'brand-pattern-drift',
-          relPath,
-          'Brand token filename pattern differs from token files'
-        )
       );
     }
   }
@@ -309,52 +268,6 @@ function normalizeLine(line) {
   }
 
   return line.trimEnd();
-}
-
-function getTokenNames(root, prefix) {
-  if (!fs.existsSync(root)) {
-    return [];
-  }
-
-  const names = new Set();
-  const tokenFileRe = new RegExp(`^${prefix}-(.+)-(?:light|dark)\\.json$`);
-
-  for (const entry of fs.readdirSync(root, { withFileTypes: true })) {
-    if (!entry.isFile()) {
-      continue;
-    }
-
-    const match = entry.name.match(tokenFileRe);
-
-    if (match) {
-      names.add(match[1]);
-    }
-  }
-
-  return [...names].sort();
-}
-
-function getDocumentedTokenPattern(text, prefix) {
-  const match = text.match(
-    new RegExp(`${prefix}-\\{([^}]+)\\}-\\{light,dark\\}\\.json`)
-  );
-
-  if (!match) {
-    return [];
-  }
-
-  return match[1]
-    .split(',')
-    .map((name) => name.trim())
-    .filter(Boolean)
-    .sort();
-}
-
-function sameSet(left, right) {
-  return (
-    left.length === right.length &&
-    left.every((value, index) => value === right[index])
-  );
 }
 
 function problem(code, file, message) {
