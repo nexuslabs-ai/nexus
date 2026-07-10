@@ -70,9 +70,11 @@ describe('appearance model', () => {
 
   it('maps friendly layout labels to token axes', () => {
     expect(DENSITY_OPTIONS).toEqual([
+      { value: 'tight', label: 'Tight' },
       { value: 'compact', label: 'Compact' },
       { value: 'default', label: 'Default' },
       { value: 'comfortable', label: 'Comfortable' },
+      { value: 'relaxed', label: 'Relaxed' },
       { value: 'spacious', label: 'Spacious' },
     ]);
     expect(CORNER_OPTIONS).toEqual([
@@ -80,9 +82,12 @@ describe('appearance model', () => {
       { value: 'subtle', label: 'Subtle' },
       { value: 'smooth', label: 'Smooth' },
       { value: 'round', label: 'Round' },
+      { value: 'extra-round', label: 'Extra Round' },
     ]);
     expect(ELEVATION_OPTIONS).toEqual([
+      { value: 'flat', label: 'Flat' },
       { value: 'quiet', label: 'Quiet' },
+      { value: 'soft', label: 'Soft' },
       { value: 'standard', label: 'Standard' },
       { value: 'strong', label: 'Strong' },
     ]);
@@ -108,9 +113,9 @@ describe('sanitizeNexusAppearance', () => {
       surfaceTone: 'slate' as const,
       lightContrast: 42,
       darkContrast: 42,
-      density: 'spacious' as const,
-      corners: 'round' as const,
-      elevation: 'strong' as const,
+      density: 'tight' as const,
+      corners: 'extra-round' as const,
+      elevation: 'flat' as const,
       stroke: 'fine' as const,
       prefs: {
         ...DEFAULT_NEXUS_APPEARANCE.prefs,
@@ -122,6 +127,26 @@ describe('sanitizeNexusAppearance', () => {
     };
 
     expect(sanitizeNexusAppearance(valid)).toEqual(valid);
+  });
+
+  it('accepts every shipped layout mode', () => {
+    for (const option of DENSITY_OPTIONS) {
+      expect(sanitizeNexusAppearance({ density: option.value }).density).toBe(
+        option.value
+      );
+    }
+
+    for (const option of CORNER_OPTIONS) {
+      expect(sanitizeNexusAppearance({ corners: option.value }).corners).toBe(
+        option.value
+      );
+    }
+
+    for (const option of ELEVATION_OPTIONS) {
+      expect(
+        sanitizeNexusAppearance({ elevation: option.value }).elevation
+      ).toBe(option.value);
+    }
   });
 
   it('rejects prototype-chain keys as tones', () => {
@@ -158,6 +183,18 @@ describe('sanitizeNexusAppearance', () => {
         density: 'wat',
       }).density
     ).toBe('default');
+    expect(
+      sanitizeNexusAppearance({
+        ...DEFAULT_NEXUS_APPEARANCE,
+        corners: 'pill',
+      }).corners
+    ).toBe('square');
+    expect(
+      sanitizeNexusAppearance({
+        ...DEFAULT_NEXUS_APPEARANCE,
+        elevation: 'dramatic',
+      }).elevation
+    ).toBe('quiet');
   });
 
   it('normalizes a persisted density codename to its friendly value', () => {
