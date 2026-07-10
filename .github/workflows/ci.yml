@@ -31,8 +31,10 @@ jobs:
       react: ${{ steps.filter.outputs.react }}
       browser: ${{ steps.filter.outputs.browser }}
       browser_source: ${{ steps.filter.outputs.browser_source }}
+      docs: ${{ steps.filter.outputs.docs }}
+      docs_dependencies: ${{ steps.filter.outputs.docs_dependencies }}
       # `packages` is true if `packages/**` changed OR if `apps/**` changed
-      # outside `apps/docs/**`. See the two paths-filter steps below.
+      # outside `apps/docs/**`. Docs changes are handled by the docs job.
       packages: ${{ steps.filter.outputs.packages == 'true' || steps.filter-apps.outputs.apps == 'true' }}
       ci: ${{ steps.filter.outputs.ci }}
     steps:
@@ -44,15 +46,19 @@ jobs:
         id: filter
         with:
           filters: |
-            # `react` intentionally excludes `apps/**` — no app currently
-            # consumes @nexus_ds/react at runtime, so apps/ changes can't break
-            # the react test/build/bundle-size jobs. Revisit if an app starts
-            # importing from @nexus_ds/react.
+            # `react` tracks package-library sources. App consumers such as
+            # docs are covered by app-specific jobs below.
             react:
               - 'packages/react/**'
               - 'packages/tailwind/**'
               - 'packages/core/**'
               - 'packages/test-utils/**'
+            docs:
+              - 'apps/docs/**'
+            docs_dependencies:
+              - 'packages/react/**'
+              - 'packages/tailwind/**'
+              - 'packages/core/**'
             packages:
               - 'packages/**'
             # Mirrors the source roots scanned by `pnpm audit:browser-support`.
@@ -73,8 +79,8 @@ jobs:
       # `predicate-quantifier: every` — required for `!apps/docs/**` to
       # actually negate (under the default `some`, the `apps/**` inclusion
       # wins and the negation is silently a no-op). Combined with `packages`
-      # via the job-level output expression below. Drop `!apps/docs/**` when
-      # @nexus_ds/docs becomes a real package.
+      # via the job-level output expression above; docs changes route to the
+      # dedicated docs job instead.
       - name: Detect non-docs app changes
         uses: dorny/paths-filter@v4
         id: filter-apps
@@ -294,6 +300,46 @@ jobs:
 
       - name: Tailwind and CSS export contract
         run: node scripts/typecheck-tailwind-dist.mjs
+
+  # ============================================
+  # Docs App Jobs
+  # ============================================
+
+  docs:
+    name: Docs
+    runs-on: ubuntu-latest
+    needs: changes
+    if: >-
+      needs.changes.outputs.docs == 'true' ||
+      needs.changes.outputs.docs_dependencies == 'true' ||
+      needs.changes.outputs.ci == 'true'
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Install pnpm
+        uses: pnpm/action-setup@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version-file: '.nvmrc'
+          cache: 'pnpm'
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Build @nexus_ds/core
+        run: pnpm --filter @nexus_ds/core build
+
+      - name: Build @nexus_ds/react
+        run: pnpm --filter @nexus_ds/react build
+
+      - name: Typecheck docs
+        run: pnpm --filter @nexus_ds/docs typecheck
+
+      - name: Build docs
+        run: pnpm --filter @nexus_ds/docs build
 
   # ============================================
   # React Package Jobs
@@ -547,6 +593,7 @@ jobs:
       - audit-browser-support
       - build
       - typecheck
+      - docs
       - test-unit
       - audit-tokens
       - test-react
