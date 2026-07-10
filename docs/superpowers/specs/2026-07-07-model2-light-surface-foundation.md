@@ -1,8 +1,10 @@
 # Model 2 Light Surface Hierarchy — Foundation + adoption slice
 
-> **Status:** in progress. Stone static-token slice landed in `104909ee8`. This
-> doc specs the Foundation work plus the first component-adoption slice now
-> included in PR #626.
+> **Historical — superseded.** Preserved as the design/rationale record. The
+> static-token slice this spec builds on was removed by the single-source token
+> engine migration (#641–#649), and the Model 2 light-surface direction was
+> subsequently revised. Read it as a decision record, not as current
+> infrastructure or the shipped surface model.
 
 ## Why this exists
 
