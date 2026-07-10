@@ -340,9 +340,6 @@
   --nx-color-black-a900: oklch(0.1448 0 0 / 0.9098);
   --nx-color-black-a950: oklch(0.1448 0 0 / 0.9569);
 
-  /* focus (default) */
-  --nx-focus-color-error: var(--nx-color-red-600);
-
   /* motion (snappy) */
   --nx-motion-duration-0: 0ms;
   --nx-motion-duration-faster: 100ms;
@@ -490,9 +487,6 @@
 }
 
 .dark {
-  /* focus (default dark) */
-  --nx-focus-color-error: var(--nx-color-red-300);
-
   /* shadow (quiet dark) */
   --nx-shadow-2xs-layer-1-color: oklch(0 0 0 / 0.051);
   --nx-shadow-xs-layer-1-color: oklch(0 0 0 / 0.051);

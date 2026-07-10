@@ -225,7 +225,6 @@ export const DEFAULT_CONFIG = {
   radius: 'square',
   borderwidth: 'normal',
   motion: 'snappy',
-  focus: 'default',
   // see CANONICAL_SPACING_DEFAULT_MODE — controls :root cascade only (all 6 modes ship)
   spacingDefault: 'default',
 };
@@ -438,9 +437,8 @@ export const log = {
 /**
  * Format a shadow property value as a var() reference or literal.
  * References are resolved through the primitive map so the var name matches
- * the actual primitive cssName (e.g. `{color.error}` → `var(--nx-focus-color-error)`
- * when the focus primitive provides it). This means shadow property references
- * can point to any primitive category, not just `--nx-shadow-*`.
+ * the actual primitive cssName. This means shadow property references can
+ * point to any primitive category, not just `--nx-shadow-*`.
  */
 function formatShadowPropertyAsVar(value, primitiveMap) {
   if (isReference(value)) {

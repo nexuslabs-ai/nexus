@@ -276,15 +276,12 @@ describe('generateTailwindPackage', () => {
     expect(variablesCSS).toMatch(/^:root \{/m);
   });
 
-  it('emits focus error primitive but no default focus primitive or geometry in :root', () => {
+  it('emits no focus color primitive in :root (focus is engine-derived)', () => {
     const rootBlock = extractBlock(variablesCSS, ':root');
     expect(rootBlock).toMatch(/--nx-shadow-2xs-layer-1-x: 0px;/);
-    expect(rootBlock).not.toMatch(/--nx-focus-color-default:/);
-    expect(rootBlock).toMatch(
-      /--nx-focus-color-error:\s*var\(--nx-color-red-600\);/
-    );
-    // Focus is an outline ring; default focus follows primary accent, and the old
-    // geometry primitives were dropped.
+    // Focus is an outline ring driven entirely by the engine (--color-focus-*);
+    // no --nx-focus-color-* or geometry primitives are emitted.
+    expect(rootBlock).not.toMatch(/--nx-focus-color-/);
     expect(rootBlock).not.toMatch(/--nx-focus-geometry-/);
   });
 
@@ -507,17 +504,14 @@ describe('generateTailwindPackage', () => {
   });
 
   // The .dark block must contain only dark tokens whose value diverges from
-  // their `:root` counterpart by cssName. Error focus lives in the focus
-  // primitive category and supplies the focus divergence.
+  // their `:root` counterpart by cssName.
   // Default elevation shadows now also carry dark-only color tuning; geometry
   // stays shared, so only the diverging shadow colour leaves should appear.
   it('.dark block contains only tokens that diverge from :root by value', () => {
     const darkBlock = extractBlock(variablesCSS, '.dark');
 
-    expect(darkBlock).not.toMatch(/--nx-focus-color-default:/);
-    expect(darkBlock).toMatch(
-      /--nx-focus-color-error:\s*var\(--nx-color-red-300\);/
-    );
+    // Focus color is engine-derived (no --nx-focus-color-* primitive emitted).
+    expect(darkBlock).not.toMatch(/--nx-focus-color-/);
     expect(darkBlock).toMatch(/--nx-shadow-2xs-layer-1-color:/);
     expect(darkBlock).toMatch(/--nx-shadow-sm-layer-1-color:/);
 
