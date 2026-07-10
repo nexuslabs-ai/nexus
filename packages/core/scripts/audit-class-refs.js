@@ -1,25 +1,25 @@
 import fs from 'node:fs';
 import path from 'node:path';
-import { fileURLToPath } from 'node:url';
-import ts from 'typescript';
+import { fileURLToPath, pathToFileURL } from 'node:url';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const REPO_ROOT = path.resolve(__dirname, '..', '..', '..');
-const TOKEN_REGISTRY = path.join(
-  REPO_ROOT,
-  'packages',
-  'core',
-  'src',
-  'lib',
-  'token-registry.ts'
-);
+const PACKAGE_ROOT = path.resolve(__dirname, '..');
+const RUNTIME_ENTRY = path.join(PACKAGE_ROOT, 'dist', 'runtime', 'index.js');
 const CLASS_SOURCE_DIRS = [
   path.join(REPO_ROOT, 'packages', 'react', 'src'),
   path.join(REPO_ROOT, 'apps'),
 ];
-const COMPONENT_SOURCE_DIRS = [
-  path.join(REPO_ROOT, 'packages', 'react', 'src', 'components'),
-];
+// The primitive/unknown `--nx-color-*` ban applies only to component code:
+// apps are consumers (free to reach for primitives) and non-component
+// `react/src` is internal plumbing. Components are the public surface.
+const COMPONENTS_DIR = path.join(
+  REPO_ROOT,
+  'packages',
+  'react',
+  'src',
+  'components'
+);
 
 // Deleted/foreign shadcn-style families are not in the registry, but a class
 // using one is still trying to reach the semantic-token layer.
@@ -38,99 +38,15 @@ const UTILITY_PREFIXES = [
   'divide',
 ];
 
-function unwrapExpression(node) {
-  let current = node;
-  while (ts.isAsExpression(current)) {
-    current = current.expression;
-  }
-  return current;
-}
-
-function readStringArray(node) {
-  const array = unwrapExpression(node);
-  if (!ts.isArrayLiteralExpression(array)) return null;
-
-  const values = [];
-  for (const element of array.elements) {
-    if (!ts.isStringLiteral(element)) return null;
-    values.push(element.text);
-  }
-  return values;
-}
-
-function loadSemanticRegistryNames() {
-  const content = fs.readFileSync(TOKEN_REGISTRY, 'utf8');
-  const source = ts.createSourceFile(
-    TOKEN_REGISTRY,
-    content,
-    ts.ScriptTarget.Latest,
-    true,
-    ts.ScriptKind.TS
-  );
-  const namedArrays = new Map();
-  let registryInitializer = null;
-
-  for (const statement of source.statements) {
-    if (!ts.isVariableStatement(statement)) continue;
-
-    for (const declaration of statement.declarationList.declarations) {
-      if (!ts.isIdentifier(declaration.name) || !declaration.initializer) {
-        continue;
-      }
-
-      const name = declaration.name.text;
-      if (name === 'SEMANTIC_TOKEN_REGISTRY') {
-        registryInitializer = unwrapExpression(declaration.initializer);
-        continue;
-      }
-
-      const values = readStringArray(declaration.initializer);
-      if (values) {
-        namedArrays.set(name, values);
-      }
-    }
-  }
-
-  if (
-    !registryInitializer ||
-    !ts.isArrayLiteralExpression(registryInitializer)
-  ) {
+async function loadSemanticRegistryNames() {
+  const runtime = await import(pathToFileURL(RUNTIME_ENTRY).href);
+  const registry = runtime.SEMANTIC_TOKEN_REGISTRY;
+  if (!Array.isArray(registry)) {
     throw new Error(
-      'audit-class-refs: could not find SEMANTIC_TOKEN_REGISTRY array.'
+      'audit-class-refs: @nexus_ds/core dist is missing SEMANTIC_TOKEN_REGISTRY — run `pnpm --filter @nexus_ds/core build` first.'
     );
   }
-
-  const names = [];
-  for (const element of registryInitializer.elements) {
-    if (!ts.isSpreadElement(element)) {
-      throw new Error(
-        'audit-class-refs: SEMANTIC_TOKEN_REGISTRY must be composed from metas(...) spreads.'
-      );
-    }
-
-    const expression = element.expression;
-    if (
-      !ts.isCallExpression(expression) ||
-      !ts.isIdentifier(expression.expression) ||
-      expression.expression.text !== 'metas' ||
-      expression.arguments.length < 2
-    ) {
-      throw new Error(
-        'audit-class-refs: registry spreads must call metas(category, TOKEN_NAMES).'
-      );
-    }
-
-    const namesArg = expression.arguments[1];
-    if (!ts.isIdentifier(namesArg) || !namedArrays.has(namesArg.text)) {
-      throw new Error(
-        `audit-class-refs: could not resolve registry token array ${namesArg.getText(source)}.`
-      );
-    }
-
-    names.push(...namedArrays.get(namesArg.text));
-  }
-
-  return new Set(names);
+  return new Set(registry.map((token) => token.name));
 }
 
 function semanticFamily(name) {
@@ -204,8 +120,8 @@ function lineOf(content, offset) {
   return content.slice(0, offset).split('\n').length;
 }
 
-function main() {
-  const known = loadSemanticRegistryNames();
+async function main() {
+  const known = await loadSemanticRegistryNames();
   const semanticFamilies = semanticFamiliesFromRegistry(known);
   const unresolvedClassRefs = [];
   const primitiveVarRefs = [];
@@ -215,7 +131,8 @@ function main() {
     for (const file of walkSources(dir)) {
       scanned += 1;
       const content = fs.readFileSync(file, 'utf8');
-      const seen = new Set();
+
+      const seenClassRefs = new Set();
       for (const hit of findClassRefs(content)) {
         // Documentation placeholders like `nx:bg-chart-categorical-N` are not
         // real class refs; the regex stops before the uppercase placeholder.
@@ -223,29 +140,24 @@ function main() {
         if (!isSemanticName(hit.name, semanticFamilies)) continue;
         if (known.has(hit.name)) continue;
         const key = `${file}:${hit.name}`;
-        if (seen.has(key)) continue;
-        seen.add(key);
+        if (seenClassRefs.has(key)) continue;
+        seenClassRefs.add(key);
         unresolvedClassRefs.push({
           file: path.relative(REPO_ROOT, file),
           line: lineOf(content, hit.offset),
           name: hit.name,
         });
       }
-    }
-  }
 
-  for (const dir of COMPONENT_SOURCE_DIRS) {
-    for (const file of walkSources(dir)) {
-      const content = fs.readFileSync(file, 'utf8');
-      const seen = new Set();
+      // Component code must reach color only through semantic runtime vars.
+      if (!file.startsWith(`${COMPONENTS_DIR}${path.sep}`)) continue;
+
+      const seenVarRefs = new Set();
       for (const hit of findRuntimeColorVarRefs(content)) {
-        if (isAllowedRuntimeColorVar(hit.name, known)) {
-          continue;
-        }
-
+        if (isAllowedRuntimeColorVar(hit.name, known)) continue;
         const key = `${file}:${hit.name}`;
-        if (seen.has(key)) continue;
-        seen.add(key);
+        if (seenVarRefs.has(key)) continue;
+        seenVarRefs.add(key);
         primitiveVarRefs.push({
           file: path.relative(REPO_ROOT, file),
           line: lineOf(content, hit.offset),
@@ -286,4 +198,9 @@ function main() {
   process.exit(1);
 }
 
-main();
+main().catch((error) => {
+  process.stderr.write(
+    `${error instanceof Error ? error.message : String(error)}\n`
+  );
+  process.exit(1);
+});
