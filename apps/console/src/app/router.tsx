@@ -18,6 +18,7 @@ import { ContactDetailRoute } from '../modules/crm/contact-detail-route';
 import { ContactsRoute } from '../modules/crm/contacts-route';
 import { contactsSearchSchema } from '../modules/crm/contacts-search';
 import { AppearanceRoute } from '../modules/design-system/appearance-route';
+import { ColorAtlasRoute } from '../modules/design-system/color-atlas-route';
 import { FlowsRoute } from '../modules/design-system/flows-route';
 import { ReferenceRoute } from '../modules/design-system/reference-route';
 import { ScenesRoute } from '../modules/design-system/scenes-route';
@@ -76,6 +77,12 @@ const referenceRoute = createRoute({
   getParentRoute: () => appRoute,
   path: '/design/reference',
   component: ReferenceRoute,
+});
+
+const colorAtlasRoute = createRoute({
+  getParentRoute: () => appRoute,
+  path: '/design/color-atlas',
+  component: ColorAtlasRoute,
 });
 
 const scenesRoute = createRoute({
@@ -212,6 +219,7 @@ const routeTree = rootRoute.addChildren([
   appRoute.addChildren([
     indexRoute,
     referenceRoute,
+    colorAtlasRoute,
     scenesRoute,
     appearanceRoute,
     flowsRoute,

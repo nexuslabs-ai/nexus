@@ -19,6 +19,7 @@ import {
   SidebarSeparator,
 } from '@nexus_ds/react';
 import {
+  IconColorSwatch,
   IconComponents,
   IconLayoutGrid,
   IconLogout,
@@ -40,6 +41,7 @@ import { MODULE_ITEMS } from './modules';
 
 const DESIGN_ITEMS = [
   { label: 'Reference', to: '/design/reference', icon: IconComponents },
+  { label: 'Color Atlas', to: '/design/color-atlas', icon: IconColorSwatch },
   { label: 'Scenes', to: '/design/scenes', icon: IconLayoutGrid },
   { label: 'Appearance', to: '/design/appearance', icon: IconPalette },
   { label: 'Flows', to: '/design/flows', icon: IconRoute },
