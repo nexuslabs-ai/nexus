@@ -34,7 +34,6 @@
     "build": "tsup",
     "typecheck": "tsc --noEmit",
     "typecheck:dist": "node scripts/typecheck-runtime-dist.mjs",
-    "typecheck:dist-core": "node scripts/typecheck-runtime-dist.mjs",
     "build:tailwind": "node scripts/generate-tailwind-package.js --base=stone --borderwidth=normal --radius=square --shadow=quiet --motion=snappy --spacingDefault=default",
     "audit:runtime-exports": "node scripts/audit-runtime-exports.mjs",
     "audit:contrast": "cd ../.. && vitest run --project=unit packages/core/src/lib/derive-theme.test.ts -t \"legibility invariant\"",
