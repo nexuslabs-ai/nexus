@@ -183,7 +183,6 @@ function quietText(
 /** Each text token: the surface it sits on, its APCA floor, and how quiet to aim. */
 const TEXT_ON: Record<string, { surface: string; tier: Tier; quiet: number }> =
   {
-    foreground: { surface: '--nx-color-background', tier: 'body', quiet: 0 },
     'container-foreground': {
       surface: '--nx-color-container',
       tier: 'body',
@@ -199,20 +198,10 @@ const TEXT_ON: Record<string, { surface: string; tier: Tier; quiet: number }> =
       tier: 'body',
       quiet: 0,
     },
-    'muted-foreground': {
-      surface: '--nx-color-background',
-      tier: 'ui',
-      quiet: 0.4,
-    },
     'nav-muted-foreground': {
       surface: '--nx-color-nav-background',
       tier: 'ui',
       quiet: 0.4,
-    },
-    'muted-foreground-subtle': {
-      surface: '--nx-color-muted',
-      tier: 'incidental',
-      quiet: 0.55,
     },
     'disabled-foreground': {
       surface: '--nx-color-disabled',
@@ -221,7 +210,10 @@ const TEXT_ON: Record<string, { surface: string; tier: Tier; quiet: number }> =
     },
   };
 
-/** Text tiers, each guaranteed to clear its APCA floor on its surface. */
+/**
+ * Text tiers. The surface-relative tiers are walked to their APCA floor on their
+ * surface; foreground, muted, and subtle are fixed per-mode alpha inks.
+ */
 export function deriveText(
   foregroundHex: string,
   surfaces: TokenMap,
@@ -283,31 +275,20 @@ function legibleShade(
   return readableOn(bg);
 }
 
-/** Which ramp shades back a family's solid background/hover/active fills. */
-interface SolidShades {
-  background?: Shade;
-  hover?: Shade;
-  active?: Shade;
-}
-
 /** 11 tokens for a named color family (background, foreground, subtle, borders). */
 export function deriveFamily(
   name: string,
   ramp: Record<Shade, string>,
-  mode: Mode,
-  solid: SolidShades = {}
+  mode: Mode
 ): TokenMap {
   const dark = mode === 'dark';
   const p = `--nx-color-${name}`;
   const subtle = dark ? ramp['950'] : ramp['50'];
-  const background = solid.background ?? '600';
-  const hover = solid.hover ?? '700';
-  const active = solid.active ?? '800';
   return {
-    [`${p}-background`]: ramp[background],
-    [`${p}-background-hover`]: ramp[hover],
-    [`${p}-background-active`]: ramp[active],
-    [`${p}-foreground`]: readableOn(ramp[background]),
+    [`${p}-background`]: ramp['600'],
+    [`${p}-background-hover`]: ramp['700'],
+    [`${p}-background-active`]: ramp['800'],
+    [`${p}-foreground`]: readableOn(ramp['600']),
     [`${p}-disabled`]: dark ? ramp['950'] : ramp['300'],
     [`${p}-subtle`]: subtle,
     [`${p}-subtle-foreground`]: legibleShade(
@@ -408,15 +389,20 @@ const FILL_GAMUT = 'p3';
 // button that stays legible on a dark surface.
 const PRIMARY_FILL_LIGHT_CAP = 0.85;
 const PRIMARY_DARK_ENDPOINT_LIFT_FLOOR = 0.16;
+const PRIMARY_LIGHT_ENDPOINT_CEIL = 0.99;
 const PRIMARY_DARK_HONOR_FLOOR = 0.45;
 const PRIMARY_DARK_LIFT_EXPONENT = 1.6;
 const PRIMARY_HOVER_STEP = 0.05;
 const PRIMARY_ACTIVE_STEP = 0.1;
 const PRIMARY_ACTIVE_DARK_FILL_STEP = 0.03;
-const PRIMARY_DARK_ENDPOINT_HOVER_L = 0.207;
-const PRIMARY_DARK_ENDPOINT_ACTIVE_L = 0.118;
-const PRIMARY_LIGHT_ENDPOINT_HOVER_L = 0.945;
-const PRIMARY_LIGHT_ENDPOINT_ACTIVE_L = 0.87;
+// Endpoint (achromatic near-black / near-white) brand state fills track the
+// NEUTRAL ramp (single source of truth), so a ramp retune stays in sync.
+const endpointL = (shade: keyof typeof NEUTRAL): number =>
+  seedOklch(NEUTRAL[shade]).l ?? 0;
+const PRIMARY_DARK_ENDPOINT_HOVER_L = endpointL('900');
+const PRIMARY_DARK_ENDPOINT_ACTIVE_L = endpointL('950');
+const PRIMARY_LIGHT_ENDPOINT_HOVER_L = endpointL('100');
+const PRIMARY_LIGHT_ENDPOINT_ACTIVE_L = endpointL('200');
 
 function primaryFillLightness(seedL: number, mode: Mode): number {
   if (mode === 'light') return clamp01(Math.min(seedL, PRIMARY_FILL_LIGHT_CAP));
@@ -492,7 +478,8 @@ function hoverFillTarget(baseL: number): number {
   if (baseL <= PRIMARY_DARK_ENDPOINT_LIFT_FLOOR) {
     return PRIMARY_DARK_ENDPOINT_HOVER_L;
   }
-  if (baseL >= 0.99) return PRIMARY_LIGHT_ENDPOINT_HOVER_L;
+  if (baseL >= PRIMARY_LIGHT_ENDPOINT_CEIL)
+    return PRIMARY_LIGHT_ENDPOINT_HOVER_L;
   return towardMid(baseL, PRIMARY_HOVER_STEP);
 }
 
@@ -500,7 +487,8 @@ function activeFillTarget(baseL: number): number {
   if (baseL <= PRIMARY_DARK_ENDPOINT_LIFT_FLOOR) {
     return PRIMARY_DARK_ENDPOINT_ACTIVE_L;
   }
-  if (baseL >= 0.99) return PRIMARY_LIGHT_ENDPOINT_ACTIVE_L;
+  if (baseL >= PRIMARY_LIGHT_ENDPOINT_CEIL)
+    return PRIMARY_LIGHT_ENDPOINT_ACTIVE_L;
   return clamp01(
     baseL < 0.5
       ? baseL - PRIMARY_ACTIVE_DARK_FILL_STEP
@@ -532,8 +520,6 @@ export function derivePrimary(accentHex: string, mode: Mode): TokenMap {
       ? {
           '--nx-color-primary-subtle-foreground':
             mode === 'dark' ? WHITE_BASE : BLACK_BASE,
-          '--nx-color-primary-foreground':
-            mode === 'dark' ? BLACK_BASE : WHITE_BASE,
         }
       : {}),
     '--nx-color-primary-background': background,

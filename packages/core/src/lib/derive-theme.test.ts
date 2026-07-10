@@ -434,6 +434,46 @@ describe('deriveTheme', () => {
   );
 
   it.each(['light', 'dark'] as const)(
+    'keeps a colored brand focus ring legible on page surfaces in %s mode',
+    (mode) => {
+      // The default brand is achromatic, so focus-default resolves to near-black
+      // or white and clears the page by a wide margin. A colored brand takes the
+      // general deriver path: focus-default follows primary-subtle-foreground,
+      // guaranteed only against primary-subtle — this locks that it also clears
+      // the page surfaces the ring actually paints on.
+      const map = deriveTheme({
+        light: {
+          accent: '#2563eb',
+          background: '#ffffff',
+          foreground: '#181818',
+        },
+        dark: {
+          accent: '#2563eb',
+          background: '#181818',
+          foreground: '#ffffff',
+        },
+        contrast: { light: 60, dark: 60 },
+      })[mode];
+
+      expect(map['--nx-color-focus-default']).toBe(
+        map['--nx-color-primary-subtle-foreground']
+      );
+
+      for (const surface of [
+        '--nx-color-background',
+        '--nx-color-container',
+        '--nx-color-popover',
+        '--nx-color-nav-background',
+      ]) {
+        expect(
+          apcaLc(map['--nx-color-focus-default']!, map[surface]!),
+          `${mode}: colored focus-default on ${surface}`
+        ).toBeGreaterThanOrEqual(TIER_THRESHOLDS.incidental);
+      }
+    }
+  );
+
+  it.each(['light', 'dark'] as const)(
     'moves structure tokens as contrast changes in %s mode',
     (mode) => {
       const at = (contrast: number) =>
@@ -696,6 +736,10 @@ describe('derived colorblind distinguishability', () => {
         surfaceTone: 'slate',
         ...SURFACE_TONE_SEEDS,
       })[mode];
+      // Accepted (not deferred): these deuteranopia-ambiguous pairs stay in
+      // canon because charts and status never rely on hue alone — each carries
+      // an icon + label, so the pair stays distinguishable in product. The
+      // exception still asserts ΔE > 0 (never identical), only relaxing the floor.
       const exceptions = new Set(
         mode === 'light'
           ? [
@@ -961,6 +1005,57 @@ describe('popover-alpha worst-case readability', () => {
 
       expect(lightLc, `${surfaceTone} light`).toBeGreaterThanOrEqual(60);
       expect(darkLc, `${surfaceTone} dark`).toBeGreaterThanOrEqual(60);
+    }
+  );
+});
+
+describe('fixed alpha text inks stay legible composited over their surface', () => {
+  // foreground/muted/subtle are emitted as fixed translucent inks, no longer
+  // walked to an APCA floor by construction — and apcaLc scores colors as opaque
+  // (audit:contrast composites them, but only at the shipped contrast). Composite
+  // each ink over its surface (the real rendered pixel) and assert it clears its
+  // floor across every tone and both contrast extremes; light `muted` recedes
+  // furthest at high contrast, the worst case.
+  const INK_CHECKS: ReadonlyArray<
+    [string, string, keyof typeof TIER_THRESHOLDS]
+  > = [
+    ['--nx-color-foreground', '--nx-color-background', 'body'],
+    ['--nx-color-muted-foreground', '--nx-color-muted', 'incidental'],
+    ['--nx-color-muted-foreground-subtle', '--nx-color-muted', 'incidental'],
+  ];
+
+  it.each(
+    SURFACE_TONES.flatMap((surfaceTone) =>
+      [0, 100].flatMap((contrast) =>
+        (['light', 'dark'] as const).map((mode) => ({
+          surfaceTone,
+          contrast,
+          mode,
+        }))
+      )
+    )
+  )(
+    '$surfaceTone @ contrast $contrast ($mode)',
+    ({ surfaceTone, contrast, mode }) => {
+      const map = deriveTheme({
+        surfaceTone,
+        ...SURFACE_TONE_SEEDS,
+        contrast: { light: contrast, dark: contrast },
+      })[mode];
+
+      for (const [ink, surface, tier] of INK_CHECKS) {
+        const inkColor = map[ink]!;
+        const surfaceColor = map[surface]!;
+        const composited = compositeOver(
+          toSrgbInts(inkColor),
+          alphaOf(inkColor),
+          toSrgbInts(surfaceColor)
+        );
+        expect(
+          Math.abs(apcaLc(rgbString(composited), surfaceColor)),
+          `${mode} ${surfaceTone}@${contrast}: ${ink} on ${surface}`
+        ).toBeGreaterThanOrEqual(TIER_THRESHOLDS[tier]);
+      }
     }
   );
 });
