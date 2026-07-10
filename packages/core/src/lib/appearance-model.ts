@@ -5,9 +5,20 @@ import { isColor } from './perceptual-ramp';
 type ModeSeeds = Pick<ThemeSeeds, 'background' | 'foreground'>;
 
 export type NexusAppearanceMode = 'light' | 'dark' | 'system';
-export type NexusDensity = 'compact' | 'default' | 'comfortable' | 'spacious';
-export type NexusCorners = 'square' | 'subtle' | 'smooth' | 'round';
-export type NexusElevation = 'quiet' | 'standard' | 'strong';
+export type NexusDensity =
+  | 'tight'
+  | 'compact'
+  | 'default'
+  | 'comfortable'
+  | 'relaxed'
+  | 'spacious';
+export type NexusCorners =
+  | 'square'
+  | 'subtle'
+  | 'smooth'
+  | 'round'
+  | 'extra-round';
+export type NexusElevation = 'flat' | 'quiet' | 'soft' | 'standard' | 'strong';
 export type NexusStroke = 'fine' | 'normal' | 'strong';
 
 export interface NexusAppearancePrefs {
@@ -74,9 +85,11 @@ export const BASE_TONE_SEEDS: Record<
 };
 
 export const DENSITY_OPTIONS = [
+  { value: 'tight', label: 'Tight' },
   { value: 'compact', label: 'Compact' },
   { value: 'default', label: 'Default' },
   { value: 'comfortable', label: 'Comfortable' },
+  { value: 'relaxed', label: 'Relaxed' },
   { value: 'spacious', label: 'Spacious' },
 ] as const satisfies readonly { value: NexusDensity; label: string }[];
 
@@ -85,10 +98,13 @@ export const CORNER_OPTIONS = [
   { value: 'subtle', label: 'Subtle' },
   { value: 'smooth', label: 'Smooth' },
   { value: 'round', label: 'Round' },
+  { value: 'extra-round', label: 'Extra Round' },
 ] as const satisfies readonly { value: NexusCorners; label: string }[];
 
 export const ELEVATION_OPTIONS = [
+  { value: 'flat', label: 'Flat' },
   { value: 'quiet', label: 'Quiet' },
+  { value: 'soft', label: 'Soft' },
   { value: 'standard', label: 'Standard' },
   { value: 'strong', label: 'Strong' },
 ] as const satisfies readonly { value: NexusElevation; label: string }[];

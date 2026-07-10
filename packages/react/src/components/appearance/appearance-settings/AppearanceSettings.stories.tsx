@@ -1,6 +1,11 @@
-import { DEFAULT_NEXUS_APPEARANCE } from '@nexus_ds/core';
+import {
+  CORNER_OPTIONS,
+  DEFAULT_NEXUS_APPEARANCE,
+  DENSITY_OPTIONS,
+  ELEVATION_OPTIONS,
+} from '@nexus_ds/core';
 import type { Meta, StoryObj } from '@storybook/react';
-import { expect, userEvent, within } from 'storybook/test';
+import { expect, userEvent, waitFor, within } from 'storybook/test';
 
 import { NexusAppearanceProvider } from '../provider';
 
@@ -27,6 +32,51 @@ export default meta;
 type Story = StoryObj<typeof NexusAppearanceSettings>;
 
 export const Default: Story = {};
+
+async function expectSelectOptions(
+  canvasElement: HTMLElement,
+  name: string,
+  labels: readonly string[]
+) {
+  const canvas = within(canvasElement);
+  const trigger = canvas.getByRole('combobox', { name });
+
+  try {
+    await userEvent.click(trigger);
+
+    const listbox = await within(document.body).findByRole('listbox');
+    for (const label of labels) {
+      await expect(
+        within(listbox).getByRole('option', { name: label })
+      ).toBeInTheDocument();
+    }
+  } finally {
+    await userEvent.keyboard('{Escape}');
+    await waitFor(() => {
+      expect(document.querySelector('[role="listbox"]')).toBeNull();
+    });
+  }
+}
+
+export const LayoutModeOptions: Story = {
+  play: async ({ canvasElement }) => {
+    await expectSelectOptions(
+      canvasElement,
+      'Density',
+      DENSITY_OPTIONS.map((option) => option.label)
+    );
+    await expectSelectOptions(
+      canvasElement,
+      'Corners',
+      CORNER_OPTIONS.map((option) => option.label)
+    );
+    await expectSelectOptions(
+      canvasElement,
+      'Elevation',
+      ELEVATION_OPTIONS.map((option) => option.label)
+    );
+  },
+};
 
 export const ContrastIsolation: Story = {
   play: async ({ canvasElement }) => {
