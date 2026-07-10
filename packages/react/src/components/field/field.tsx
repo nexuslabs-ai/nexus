@@ -157,9 +157,10 @@ function FieldContent({ className, ...props }: React.ComponentProps<'div'>) {
 /**
  * FieldLabel
  *
- * A field's label (wraps `Label`). When it wraps a nested `Field` it becomes a
- * selectable card (checkbox / radio card) that highlights when its control is
- * checked.
+ * A field's label (wraps `Label`). Use `Label` for simple inline labels,
+ * `ChoiceRow` for compact checkbox/radio options, and `ChoiceCard` for rich
+ * checkbox/radio option cards. `FieldLabel + Field` remains the lower-level
+ * field layout composition when a field needs custom structure.
  */
 function FieldLabel({
   className,

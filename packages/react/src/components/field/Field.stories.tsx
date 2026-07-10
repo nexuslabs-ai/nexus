@@ -234,8 +234,10 @@ export const RequiredAndOptionalIndicators: Story = {
   },
 };
 
-// The checkbox-card pattern: a FieldLabel wrapping a Field becomes a selectable card.
-export const CheckboxCard: Story = {
+// Lower-level field composition: ChoiceCard is the preferred rich checkbox/radio
+// option-card API, while FieldLabel + Field remains available when a field needs
+// custom structure.
+export const LowerLevelCheckboxCard: Story = {
   render: () => (
     <div className="nx:w-80">
       <FieldLabel htmlFor="field-card">

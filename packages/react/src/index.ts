@@ -22,6 +22,7 @@ export * from './components/card';
 export * from './components/carousel';
 export * from './components/chart';
 export * from './components/checkbox';
+export * from './components/choice-card';
 export * from './components/choice-row';
 export * from './components/collapsible';
 export * from './components/combobox';
