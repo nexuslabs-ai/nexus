@@ -3,10 +3,7 @@ import * as React from 'react';
 import type { Meta, StoryObj } from '@storybook/react';
 import { expect, userEvent, waitFor, within } from 'storybook/test';
 
-import {
-  animationDelayMs,
-  expectStaggeredItemMotion,
-} from '../../stories/support/motion-test-utils';
+import { expectImmediateItemMotion } from '../../stories/support/motion-test-utils';
 import {
   expectExitBeforeUnmount,
   expectInterruptibleOverlayMotion,
@@ -393,11 +390,11 @@ export const WithInsetItems: Story = {
   ),
 };
 
-export const StaggeredItems: Story = {
+export const ImmediateItems: Story = {
   render: (_args) => (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
-        <Button variant="outline">Open staggered menu</Button>
+        <Button variant="outline">Open immediate menu</Button>
       </DropdownMenuTrigger>
       <DropdownMenuContent>
         <DropdownMenuItem>New File</DropdownMenuItem>
@@ -411,7 +408,7 @@ export const StaggeredItems: Story = {
   play: async ({ canvasElement }) => {
     const canvas = within(canvasElement);
     const trigger = canvas.getByRole('button', {
-      name: 'Open staggered menu',
+      name: 'Open immediate menu',
     });
 
     await userEvent.click(trigger);
@@ -420,7 +417,7 @@ export const StaggeredItems: Story = {
     const items = Array.from(
       menu.querySelectorAll('[data-slot="dropdown-menu-item"]')
     );
-    await expectStaggeredItemMotion(menu, items);
+    await expectImmediateItemMotion(menu, items);
 
     await userEvent.keyboard('{Escape}');
     await waitFor(() => {
@@ -429,11 +426,11 @@ export const StaggeredItems: Story = {
   },
 };
 
-export const StaggeredGroupedItems: Story = {
+export const ImmediateGroupedItems: Story = {
   render: (_args) => (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
-        <Button variant="outline">Open grouped staggered menu</Button>
+        <Button variant="outline">Open grouped immediate menu</Button>
       </DropdownMenuTrigger>
       <DropdownMenuContent>
         <DropdownMenuLabel>Files</DropdownMenuLabel>
@@ -455,7 +452,7 @@ export const StaggeredGroupedItems: Story = {
   play: async ({ canvasElement }) => {
     const canvas = within(canvasElement);
     const trigger = canvas.getByRole('button', {
-      name: 'Open grouped staggered menu',
+      name: 'Open grouped immediate menu',
     });
 
     await userEvent.click(trigger);
@@ -467,7 +464,7 @@ export const StaggeredGroupedItems: Story = {
     const [fileGroup, editGroup] = groups;
 
     if (!fileGroup || !editGroup) {
-      throw new Error('Expected two grouped stagger sections.');
+      throw new Error('Expected two grouped item sections.');
     }
 
     const fileItems = Array.from(
@@ -477,29 +474,8 @@ export const StaggeredGroupedItems: Story = {
       editGroup.querySelectorAll('[data-slot="dropdown-menu-item"]')
     );
 
-    await expectStaggeredItemMotion(menu, fileItems);
-    await expectStaggeredItemMotion(menu, editItems);
-
-    const firstFileItem = fileItems[0];
-    const secondFileItem = fileItems[1];
-    const firstEditItem = editItems[0];
-    const secondEditItem = editItems[1];
-
-    if (
-      !firstFileItem ||
-      !secondFileItem ||
-      !firstEditItem ||
-      !secondEditItem
-    ) {
-      throw new Error('Expected at least two items in each staggered group.');
-    }
-
-    expect(animationDelayMs(firstEditItem)).toBe(
-      animationDelayMs(firstFileItem)
-    );
-    expect(animationDelayMs(secondEditItem)).toBe(
-      animationDelayMs(secondFileItem)
-    );
+    await expectImmediateItemMotion(fileGroup, fileItems);
+    await expectImmediateItemMotion(editGroup, editItems);
 
     await userEvent.keyboard('{Escape}');
     await waitFor(() => {

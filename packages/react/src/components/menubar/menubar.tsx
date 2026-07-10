@@ -7,10 +7,6 @@ import { IconCheck, IconChevronRight, IconCircleFilled } from '../../lib/icons';
 import { selectionIndicatorMotionClassName } from '../../lib/motion';
 import { cn } from '../../lib/utils';
 import {
-  staggeredItemClassName,
-  staggeredItemContainerClassName,
-} from '../motion/motion';
-import {
   overlayFloatingTransitionClassName,
   popoverSurfaceClassName,
 } from '../overlay-layout/overlay-layout';
@@ -155,7 +151,6 @@ function MenubarSubTrigger({
         'nx:focus:bg-popover-hover nx:focus:text-popover-foreground',
         'nx:data-[state=open]:bg-popover-hover nx:data-[state=open]:text-popover-foreground',
         'nx:[&_svg]:pointer-events-none nx:[&_svg]:size-4 nx:[&_svg]:shrink-0',
-        staggeredItemClassName,
         inset && 'nx:pl-8',
         className
       )}
@@ -190,7 +185,6 @@ function MenubarSubContent({ className, ...props }: MenubarSubContentProps) {
         popoverSurfaceClassName,
         'nx:p-1',
         overlayFloatingTransitionClassName,
-        staggeredItemContainerClassName,
         className
       )}
       {...props}
@@ -239,7 +233,6 @@ function MenubarContent({
           popoverSurfaceClassName,
           'nx:p-1',
           overlayFloatingTransitionClassName,
-          staggeredItemContainerClassName,
           className
         )}
         {...props}
@@ -249,7 +242,7 @@ function MenubarContent({
 }
 
 const menubarItemVariants = cva(
-  `nx:relative nx:flex nx:cursor-default nx:select-none nx:items-center nx:gap-2 nx:rounded-sm nx:px-2 nx:py-1.5 nx:typography-body-default nx:outline-none nx:transition-colors nx:focus:bg-popover-hover nx:focus:text-popover-foreground nx:data-disabled:pointer-events-none nx:data-disabled:text-disabled-foreground nx:[&_svg]:pointer-events-none nx:[&_svg]:size-4 nx:[&_svg]:shrink-0 ${staggeredItemClassName}`,
+  'nx:relative nx:flex nx:cursor-default nx:select-none nx:items-center nx:gap-2 nx:rounded-sm nx:px-2 nx:py-1.5 nx:typography-body-default nx:outline-none nx:transition-colors nx:focus:bg-popover-hover nx:focus:text-popover-foreground nx:data-disabled:pointer-events-none nx:data-disabled:text-disabled-foreground nx:[&_svg]:pointer-events-none nx:[&_svg]:size-4 nx:[&_svg]:shrink-0',
   {
     variants: {
       variant: {
@@ -348,7 +341,6 @@ function MenubarCheckboxItem({
         'nx:transition-colors',
         'nx:focus:bg-popover-hover nx:focus:text-popover-foreground',
         'nx:data-disabled:pointer-events-none nx:data-disabled:text-disabled-foreground',
-        staggeredItemClassName,
         className
       )}
       checked={checked}
@@ -412,7 +404,6 @@ function MenubarRadioItem({
         'nx:transition-colors',
         'nx:focus:bg-popover-hover nx:focus:text-popover-foreground',
         'nx:data-disabled:pointer-events-none nx:data-disabled:text-disabled-foreground',
-        staggeredItemClassName,
         className
       )}
       {...props}

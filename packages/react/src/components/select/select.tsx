@@ -7,10 +7,6 @@ import { IconCheck, IconChevronDown, IconChevronUp } from '../../lib/icons';
 import { selectionIndicatorMotionClassName } from '../../lib/motion';
 import { cn } from '../../lib/utils';
 import {
-  staggeredItemClassName,
-  staggeredItemContainerClassName,
-} from '../motion/motion';
-import {
   overlayFloatingTransitionClassName,
   popoverSurfaceClassName,
 } from '../overlay-layout/overlay-layout';
@@ -206,7 +202,6 @@ function SelectContent({
           // `data-[state=closed]` exit + presence bridge inside this shared class are inert
           // here — only the open-state transition applies.
           overlayFloatingTransitionClassName,
-          staggeredItemContainerClassName,
           position === 'popper' &&
             'nx:data-[side=bottom]:translate-y-1 nx:data-[side=left]:-translate-x-1 nx:data-[side=right]:translate-x-1 nx:data-[side=top]:-translate-y-1',
           className
@@ -290,7 +285,6 @@ function SelectItem({ className, children, ...props }: SelectItemProps) {
         'nx:rounded-sm nx:py-1.5 nx:pl-8 nx:pr-2 nx:typography-body-default nx:outline-none',
         'nx:focus:bg-popover-hover nx:focus:text-popover-foreground',
         'nx:data-disabled:pointer-events-none nx:data-disabled:text-disabled-foreground',
-        staggeredItemClassName,
         className
       )}
       {...props}

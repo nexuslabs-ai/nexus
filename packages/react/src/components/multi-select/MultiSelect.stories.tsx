@@ -3,6 +3,7 @@ import * as React from 'react';
 import type { Meta, StoryObj } from '@storybook/react';
 import { expect, userEvent, waitFor, within } from 'storybook/test';
 
+import { expectImmediateItemMotion } from '../../stories/support/motion-test-utils';
 import { Field, FieldDescription, FieldError, FieldLabel } from '../field';
 
 import {
@@ -387,6 +388,11 @@ export const WithDataAttributes: Story = {
     await expect(trigger).toHaveClass('nx:enabled:hover:bg-container-hover');
 
     await userEvent.click(trigger);
+    const listbox = await body.findByRole('listbox');
+    const options = Array.from(
+      listbox.querySelectorAll('[data-slot="multi-select-item"]')
+    );
+    await expectImmediateItemMotion(listbox, options);
     const option = await body.findByRole('option', { name: 'React' });
 
     await expect(option).toHaveAttribute('data-slot', 'multi-select-item');

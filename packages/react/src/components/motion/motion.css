@@ -1,9 +1,14 @@
-/* Shared item-enter stagger for menu/listbox rows. Imported by src/index.css. */
+/* Decorative item-enter stagger for opt-in card/showcase layouts.
+ *
+ * Dense controls intentionally do not consume these utilities. Apply the
+ * container utility to a decorative surface, then mark animated children with
+ * `data-motion-stagger-item` and `nx:animate-decorative-stagger-item-enter`.
+ */
 @theme inline {
-  --animate-stagger-item-enter: stagger-item-enter
+  --animate-decorative-stagger-item-enter: decorative-stagger-item-enter
     var(--nx-motion-duration-fast) var(--nx-motion-ease-enter) both;
 
-  @keyframes stagger-item-enter {
+  @keyframes decorative-stagger-item-enter {
     from {
       opacity: 0;
       transform: translateY(-2px);
@@ -15,23 +20,20 @@
   }
 }
 
-@utility motion-stagger-items {
-  & :nth-child(2 of :where([data-slot$='-item'], [data-slot$='-sub-trigger'])) {
+@utility motion-stagger-decorative-items {
+  & > :nth-child(2 of :where([data-motion-stagger-item])) {
     animation-delay: calc(var(--nx-motion-duration-fast) * 0.2);
   }
 
-  & :nth-child(3 of :where([data-slot$='-item'], [data-slot$='-sub-trigger'])) {
+  & > :nth-child(3 of :where([data-motion-stagger-item])) {
     animation-delay: calc(var(--nx-motion-duration-fast) * 0.4);
   }
 
-  & :nth-child(4 of :where([data-slot$='-item'], [data-slot$='-sub-trigger'])) {
+  & > :nth-child(4 of :where([data-motion-stagger-item])) {
     animation-delay: calc(var(--nx-motion-duration-fast) * 0.6);
   }
 
-  &
-    :nth-child(
-      n + 5 of :where([data-slot$='-item'], [data-slot$='-sub-trigger'])
-    ) {
+  & > :nth-child(n + 5 of :where([data-motion-stagger-item])) {
     animation-delay: calc(var(--nx-motion-duration-fast) * 0.8);
   }
 }
