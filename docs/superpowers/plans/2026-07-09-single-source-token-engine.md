@@ -371,7 +371,7 @@ The generator stops reading semantic color JSON and bakes the engine floor inste
 **Restructured after Codex review (Finding 5) — split into FOUR PRs, in this order:**
 
 1. **PR B0 — enums** (Task B0). Precursor; no deletions.
-2. **PR B-ci — docs CI job** (Task 5.1, pulled forward). Adds a docs `next build`+typecheck job so the standalone docs PR is actually validated — a docs-only PR otherwise skips build/typecheck (`ci.yml:36,78-86`).
+2. **PR B-ci — docs CI coverage** (Task 5.1) — **SHIPPED #646**. Review rejected the planned dedicated docs job as over-built; shipped the simpler design instead: dropped the `!apps/docs/**` exclusion so `apps/docs` rides the `packages` filter into the shared turbo `build`/`typecheck` jobs (like `apps/console`), plus a `root_config` trigger routing root TS-config changes to the unfiltered run. Docs-only PRs previously skipped build/typecheck.
 3. **PR B-docs — docs migration** (Task 4.6). Docs adopts the provider; link-swap components deleted. `public/themes/*` + `generate-modular.js` still exist but are now unreferenced.
 4. **PR B-del — deletions** (Tasks 4.1–4.5, 4.7); touches `packages/` so the CI filter fires. The "same commit" rule (Task 4.3) applies inside this PR.
 
@@ -478,16 +478,17 @@ The generator stops reading semantic color JSON and bakes the engine floor inste
 
 ## Phase 5 — Post-cutover hardening
 
-### Task 5.1 — Docs build/typecheck CI job
+### Task 5.1 — Docs build/typecheck CI coverage — SHIPPED (PR #646)
 
-> **Scheduled in Phase 4 as PR B-ci** (must land before the docs migration). Listed here for topical grouping.
+> Shipped in Phase 4 as PR B-ci, before the docs migration.
 
-**Files:**
+**Files:** `.github/workflows/ci.yml`
 
-- Modify: `.github/workflows/ci.yml`
+Review (#646) rejected the originally-planned dedicated docs job as over-built and shipped the simpler design:
 
-- [ ] Add a docs `next build` + typecheck job. Today a docs-only PR skips build/typecheck entirely (`packages` filter `:36,78-86`), and the filter's justifying comment (`:47-50` — "no app consumes @nexus_ds/react at runtime") is already false. This closes the blind spot the Phase 4 PR had to work around.
-- [ ] **Wire it into enforcement (Codex finding):** branch protection requires only the `CI Status` aggregator (`ci.yml:17-20`), and the aggregator's own contract comment says every required job must appear in its `needs:` list (`:534-549`). Add the docs job to `ci-status.needs`, and if the job is path-filtered, add a docs path output to the `changes` job. Without this, the docs job can fail while the PR stays green.
+- [x] Fold `apps/docs` into the shared turbo `build`/`typecheck` jobs: add `apps/**` to the `packages` filter and **delete** the `!apps/docs/**` exclusion (and the second `filter-apps` step that existed only for that negation). `apps/docs` is a package dir, so turbo's `--filter=...[origin/BASE]` selects it on docs-only changes — no dedicated job needed, and `apps/console` already worked this way.
+- [x] Root TS config (`tsconfig.base.json` / `tsconfig.json`) sits outside every package, so the filtered turbo run selects **zero tasks** for it. Added a `root_config` change-detection output routed to the **unfiltered** `build`/`typecheck` run (a bare `packages`-filter add would run the job but typecheck nothing — a false green).
+- [x] Enforcement: docs is covered by the already-required `Build` / `TypeScript Check` aggregator jobs, so no new `ci-status.needs` entry was needed — the dedicated-job wiring the original plan called for is moot.
 
 ### Task 5.2 — Component token-ownership lint + audit-and-fix
 
