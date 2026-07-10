@@ -1,13 +1,5 @@
 {
   "focus": {
-    "default": {
-      "$value": "{primary.subtle-foreground}",
-      "$type": "color"
-    },
-    "error": {
-      "$value": "{focus.color.error}",
-      "$type": "color"
-    },
     "offset": {
       "$value": { "value": 2, "unit": "px" },
       "$type": "dimension"

@@ -16,7 +16,6 @@ examples
 
 # Auto-generated CSS — produced by @nexus_ds/core token pipeline; do not reformat
 packages/tailwind/*.css
-apps/console/public/themes/*.css
 apps/console/src/styles/*.css
 
 # Generated Storybook base-variant stories — produced by generate-base-variants.mjs

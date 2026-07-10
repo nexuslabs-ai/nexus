@@ -8,7 +8,8 @@ import {
 } from 'culori';
 import { describe, expect, it } from 'vitest';
 
-import { apcaLc } from './apca';
+import { apcaLc, resolveToSrgbInts, type SrgbInts } from './apca';
+import { APCA_PAIRS, type ApcaPair } from './apca-pairs';
 import {
   createNexusThemeContract,
   DEFAULT_NEXUS_APPEARANCE,
@@ -71,6 +72,21 @@ function alphaOf(color: string): number {
 
 function rgbString([r, g, b]: [number, number, number]): string {
   return `rgb(${r}, ${g}, ${b})`;
+}
+
+function semanticColor(map: Record<string, string>, name: string): string {
+  const token = `--nx-color-${name}`;
+  const value = map[token];
+  if (typeof value !== 'string') {
+    throw new Error(`Missing semantic color ${token}.`);
+  }
+  return value;
+}
+
+function apcaLcForPair(map: Record<string, string>, pair: ApcaPair): number {
+  const bgInts: SrgbInts = resolveToSrgbInts(semanticColor(map, pair.bg));
+  const fgInts = resolveToSrgbInts(semanticColor(map, pair.fg), bgInts);
+  return Math.abs(apcaLc(rgbString(fgInts), rgbString(bgInts)));
 }
 
 function simulatedRgb(
@@ -701,8 +717,8 @@ describe('surfaceTone surfaces', () => {
 });
 
 describe('chart colors', () => {
-  // Exact chart values are ground-truthed against color.json in
-  // tone-parity.test.ts (value parity); here we assert structure, not a copy.
+  // Exact chart values are ground-truthed by the engine matrix snapshot; here
+  // we assert structure, not a copy.
   const OKLCH_RE = /^oklch\([\d.]+ [\d.]+ [\d.]+\)$/;
 
   const chartTokens = (map: Record<string, string>) =>
@@ -960,15 +976,6 @@ const SWEEP_SEEDS: ReadonlyArray<{
   },
 ];
 
-const DERIVED_FAMILIES = [
-  'primary',
-  'secondary',
-  'success',
-  'warning',
-  'error',
-  'information',
-] as const;
-
 const SURFACE_TONES: readonly NexusSurfaceTone[] = [
   'stone',
   'neutral',
@@ -1063,31 +1070,7 @@ describe('fixed alpha text inks stay legible composited over their surface', () 
   );
 });
 
-const BASE_CONTRAST_CHECKS: ReadonlyArray<
-  [string, string, keyof typeof TIER_THRESHOLDS]
-> = [
-  ['--nx-color-foreground', '--nx-color-background', 'body'],
-  ['--nx-color-foreground', '--nx-color-background-hover', 'ui'],
-  ['--nx-color-foreground', '--nx-color-muted', 'ui'],
-  ['--nx-color-muted-foreground', '--nx-color-muted', 'incidental'],
-  ['--nx-color-muted-foreground-subtle', '--nx-color-muted', 'incidental'],
-  ['--nx-color-disabled-foreground', '--nx-color-disabled', 'incidental'],
-  ['--nx-color-container-foreground', '--nx-color-container', 'body'],
-  ['--nx-color-popover-foreground', '--nx-color-popover', 'body'],
-  ['--nx-color-popover-foreground', '--nx-color-popover-hover', 'ui'],
-  ['--nx-color-foreground', '--nx-color-control-background', 'ui'],
-  ['--nx-color-foreground', '--nx-color-control-background-hover', 'ui'],
-  ['--nx-color-nav-foreground', '--nx-color-nav-background', 'ui'],
-  [
-    '--nx-color-nav-muted-foreground',
-    '--nx-color-nav-background',
-    'incidental',
-  ],
-  ['--nx-color-nav-foreground', '--nx-color-nav-item-hover', 'ui'],
-  ['--nx-color-nav-foreground', '--nx-color-nav-item-active', 'ui'],
-];
-
-describe('legibility invariant: every text tier clears its APCA floor', () => {
+describe('legibility invariant: every APCA pair clears its floor', () => {
   it.each(
     SWEEP_SEEDS.flatMap((seed) =>
       SURFACE_TONES.flatMap((surfaceTone) =>
@@ -1110,36 +1093,11 @@ describe('legibility invariant: every text tier clears its APCA floor', () => {
       };
       const map = deriveTheme(contract)[mode];
 
-      const checks: Array<[string, string, keyof typeof TIER_THRESHOLDS]> = [
-        ...BASE_CONTRAST_CHECKS,
-      ];
-      for (const family of DERIVED_FAMILIES) {
-        checks.push(
-          [
-            `--nx-color-${family}-foreground`,
-            `--nx-color-${family}-background`,
-            'ui',
-          ],
-          [
-            `--nx-color-${family}-subtle-foreground`,
-            `--nx-color-${family}-subtle`,
-            'ui',
-          ]
-        );
-      }
-      for (let index = 1; index <= 5; index += 1) {
-        checks.push([
-          `--nx-color-chart-categorical-${index}`,
-          '--nx-color-container',
-          'ui',
-        ]);
-      }
-
-      for (const [fg, bg, tier] of checks) {
+      for (const pair of APCA_PAIRS) {
         expect(
-          apcaLc(map[fg]!, map[bg]!),
-          `${surfaceTone} ${mode}: ${fg} on ${bg}`
-        ).toBeGreaterThanOrEqual(TIER_THRESHOLDS[tier]);
+          apcaLcForPair(map, pair),
+          `${surfaceTone} ${mode}: ${pair.fg} on ${pair.bg}`
+        ).toBeGreaterThanOrEqual(TIER_THRESHOLDS[pair.tier]);
       }
     }
   );

@@ -252,8 +252,8 @@ const preview: Preview = {
       },
     },
     // A11y violations will fail tests automatically.
-    // Color-contrast is APCA-gated via `pnpm --filter @nexus_ds/core audit:contrast`
-    // (see `packages/core/scripts/audit-contrast.js`), not WCAG 2 — disable
+    // Color-contrast is APCA-gated via `pnpm audit:contrast`
+    // (see `packages/core/src/lib/apca-pairs.ts`), not WCAG 2 — disable
     // axe-core's WCAG-based contrast rules so the two gates don't conflict.
     a11y: {
       test: 'error',
