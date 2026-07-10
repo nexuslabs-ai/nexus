@@ -119,7 +119,7 @@ describe('NexusAppearanceSnapshot', () => {
     expect(snapshot.prefsCss).toBe(prefsCss());
   });
 
-  it('does not treat a raw Phase B state object as a snapshot payload', () => {
+  it('does not treat a raw (unversioned) state object as a snapshot payload', () => {
     const snapshot = sanitizeNexusAppearanceSnapshot({
       ...DEFAULT_NEXUS_APPEARANCE,
       mode: 'dark',

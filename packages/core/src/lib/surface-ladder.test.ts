@@ -7,7 +7,7 @@ import {
   type SurfaceSteps,
 } from './surface-ladder';
 
-const LEGACY_LIGHT_SURFACE_STEPS = {
+const EXPECTED_LIGHT_SURFACE_STEPS = {
   background: 0,
   'background-hover': -0.27,
   'background-active': -1.38,
@@ -28,7 +28,7 @@ const LEGACY_LIGHT_SURFACE_STEPS = {
   'border-active': -6.07,
 } satisfies SurfaceSteps;
 
-const LEGACY_DARK_SURFACE_STEPS = {
+const EXPECTED_DARK_SURFACE_STEPS = {
   background: 0,
   'background-hover': 1.6,
   'background-active': 1.6,
@@ -56,11 +56,11 @@ function expectStepsToMatch(actual: SurfaceSteps, expected: SurfaceSteps) {
 }
 
 describe('surface ladder', () => {
-  it('keeps the light shade anchors on the legacy surface steps', () => {
-    expectStepsToMatch(LIGHT_SURFACE_STEPS, LEGACY_LIGHT_SURFACE_STEPS);
+  it('keeps the light surface steps at their expected shade anchors', () => {
+    expectStepsToMatch(LIGHT_SURFACE_STEPS, EXPECTED_LIGHT_SURFACE_STEPS);
   });
 
-  it('keeps the dark ladder step-preserved until dark shell adjudication', () => {
-    expectStepsToMatch(DARK_SURFACE_STEPS, LEGACY_DARK_SURFACE_STEPS);
+  it('keeps the dark ladder at its expected raw steps', () => {
+    expectStepsToMatch(DARK_SURFACE_STEPS, EXPECTED_DARK_SURFACE_STEPS);
   });
 });
