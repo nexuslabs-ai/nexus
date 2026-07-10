@@ -464,6 +464,9 @@ describe('deriveTheme', () => {
         '--nx-color-container',
         '--nx-color-popover',
         '--nx-color-nav-background',
+        '--nx-color-nav-item-hover',
+        '--nx-color-nav-item-active',
+        '--nx-color-nav-border',
       ]) {
         expect(
           apcaLc(map['--nx-color-focus-default']!, map[surface]!),
