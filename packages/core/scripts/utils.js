@@ -874,12 +874,6 @@ export function generateBorderColorAliasUtilitiesCSS(
   let css = `/* Border Color Alias Utilities */\n\n`;
 
   for (const { token, name } of borderColorTokens) {
-    if (runtimeFallback && typeof token.value !== 'string') {
-      throw new Error(
-        `generateBorderColorAliasUtilitiesCSS: ${token.cssName} is missing an engine fallback value.`
-      );
-    }
-
     css += `@utility border-color-${name} {\n`;
     const value = runtimeFallback
       ? `var(--nx-${token.cssName}, ${token.value})`

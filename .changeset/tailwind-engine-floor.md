@@ -1,5 +1,4 @@
 ---
-'@nexus_ds/core': minor
 '@nexus_ds/tailwind': minor
 ---
 
