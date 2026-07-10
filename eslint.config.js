@@ -225,8 +225,8 @@ export default tseslint.config(
   // Nexus: enforce documented component rules as lint — nx: class conventions
   // (ported from the former lint-nx-prefix Claude hook), composition over
   // render props, and handler extraction. Scoped to component-bearing source
-  // (React package + apps). Hand-written stories are linted too; only the
-  // gitignored __generated__ base-variant stories are excluded (global ignore).
+  // (React package + apps). Hand-written stories are linted too; any
+  // `__generated__` output stays excluded via the global ignore.
   {
     files: ['packages/react/src/**/*.{ts,tsx}', 'apps/**/*.{ts,tsx}'],
     ...nexusComponentConfig(),
