@@ -2,6 +2,7 @@ import fs from 'fs';
 import { createRequire } from 'module';
 import os from 'os';
 import path from 'path';
+import * as engine from '@nexus_ds/core';
 import * as prettier from 'prettier';
 import { compile } from 'tailwindcss';
 import { fileURLToPath } from 'url';
@@ -31,6 +32,9 @@ const SPACING_MODES = [
 const RADIUS_MODES = ['extra-round', 'round', 'smooth', 'square', 'subtle'];
 const SHADOW_MODES = ['flat', 'quiet', 'soft', 'standard', 'strong'];
 const BORDERWIDTH_MODES = ['fine', 'normal', 'strong'];
+const DEFAULT_ENGINE_THEME = engine.deriveTheme(
+  engine.createNexusThemeContract(engine.DEFAULT_NEXUS_APPEARANCE)
+);
 
 function readSpacingModeJson(mode) {
   return JSON.parse(
@@ -48,6 +52,59 @@ function makeTmpDir() {
 
 function read(distDir, fileName) {
   return fs.readFileSync(path.join(distDir, fileName), 'utf8');
+}
+
+function generatorOptions(distDir) {
+  return { distDir, engine };
+}
+
+function engineColor(name, mode = 'light') {
+  const value = DEFAULT_ENGINE_THEME[mode][`--nx-color-${name}`];
+  if (!value) {
+    throw new Error(`Missing engine color ${mode}.${name}`);
+  }
+  return value;
+}
+
+function escapeRegExp(value) {
+  return value.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+}
+
+function colorFallbackPattern(name, mode = 'light') {
+  return new RegExp(
+    `${escapeRegExp(`--color-${name}:`)}\\s*var\\(\\s*${escapeRegExp(
+      `--nx-color-${name}`
+    )},\\s*${escapeRegExp(engineColor(name, mode))}\\s*\\);`
+  );
+}
+
+function colorPropertyFallbackPattern(property, name, mode = 'light') {
+  return new RegExp(
+    `${escapeRegExp(`${property}:`)}\\s*var\\(\\s*${escapeRegExp(
+      `--nx-color-${name}`
+    )},\\s*${escapeRegExp(engineColor(name, mode))}\\s*\\);`
+  );
+}
+
+function colorDeclarationPattern(name, mode = 'light') {
+  return new RegExp(
+    `${escapeRegExp(`--nx-color-${name}:`)}\\s*${escapeRegExp(
+      engineColor(name, mode)
+    )};`
+  );
+}
+
+function extractCompiledClassBlock(css, className) {
+  const cssSelector = `.${className.replace(/:/g, '\\:')}`;
+  const pattern = new RegExp(
+    `${escapeRegExp(cssSelector)}\\s*\\{([\\s\\S]*?)\\}`,
+    'm'
+  );
+  const match = css.match(pattern);
+  if (!match) {
+    throw new Error(`Compiled class "${className}" not found in CSS`);
+  }
+  return match[1];
 }
 
 function extractBlock(css, openSelector) {
@@ -119,6 +176,15 @@ function compactCss(value) {
   return value.replace(/\s+/g, ' ').trim();
 }
 
+function normalizeCssValue(value) {
+  return compactCss(value)
+    .replace(/(-?\d+\.\d+)/g, (number) => String(Number(number)))
+    .replace(/var\(\s+/g, 'var(')
+    .replace(/oklch\(\s+/g, 'oklch(')
+    .replace(/,\s*/g, ', ')
+    .replace(/\s+\)/g, ')');
+}
+
 async function compileGeneratedTailwind(distDir, candidates) {
   const source = [
     `@import './nexus.css';`,
@@ -162,7 +228,7 @@ describe('border alias utility generators', () => {
 
   it('emits color aliases only for approved semantic border names', () => {
     const result = generateBorderColorAliasUtilitiesCSS([
-      { cssName: 'color-border-default' },
+      { cssName: 'color-border-default', value: engineColor('border-default') },
       { cssName: 'color-border-radius-sm' },
       { cssName: 'color-nav-border' },
     ]);
@@ -192,7 +258,7 @@ describe('generateTailwindPackage', () => {
 
     try {
       distDir = makeTmpDir();
-      await generateTailwindPackage(DEFAULT_CONFIG, { distDir });
+      await generateTailwindPackage(DEFAULT_CONFIG, generatorOptions(distDir));
     } finally {
       console.warn = originalWarn;
     }
@@ -232,12 +298,8 @@ describe('generateTailwindPackage', () => {
   // catches duplicate emission via the dimension scan (the --breakpoint-* trap).
   it('promotes focus colours to --color-* and emits --focus-offset plus focus ring CSS', () => {
     const themeBlock = compactCss(extractBlock(nexusCSS, '@theme inline'));
-    expect(themeBlock).toMatch(
-      /--color-focus-default: var\(\s*--nx-color-focus-default,\s*var\(--color-primary-subtle-foreground\)\s*\);/
-    );
-    expect(themeBlock).toMatch(
-      /--color-focus-error: var\(\s*--nx-color-focus-error,\s*var\(--nx-focus-color-error\)\s*\);/
-    );
+    expect(themeBlock).toMatch(colorFallbackPattern('focus-default'));
+    expect(themeBlock).toMatch(colorFallbackPattern('focus-error'));
     expect(nexusCSS.match(/--focus-offset:/g)).toHaveLength(1);
     expect(themeBlock).not.toMatch(/--focus-offset/);
     expect(nexusCSS).toMatch(/:root\s*\{[^}]*--focus-offset: 2px;[^}]*\}/);
@@ -358,13 +420,36 @@ describe('generateTailwindPackage', () => {
     }
   });
 
+  it('emits the engine floor at every semantic color emission site', () => {
+    const themeDeclarations = cssDeclarations(
+      extractBlock(nexusCSS, '@theme inline')
+    );
+    const rootDeclarations = cssDeclarations(extractBlock(nexusCSS, ':root'));
+    const darkDeclarations = cssDeclarations(extractBlock(nexusCSS, '.dark'));
+
+    for (const { name } of engine.SEMANTIC_TOKEN_REGISTRY) {
+      const lightFallback = normalizeCssValue(
+        `var(--nx-color-${name}, ${engineColor(name)})`
+      );
+      expect(
+        normalizeCssValue(themeDeclarations[`--color-${name}`]),
+        `@theme inline ${name}`
+      ).toBe(lightFallback);
+      expect(
+        normalizeCssValue(rootDeclarations[`--color-${name}`]),
+        `:root ${name}`
+      ).toBe(lightFallback);
+      expect(
+        normalizeCssValue(darkDeclarations[`--nx-color-${name}`]),
+        `.dark ${name}`
+      ).toBe(normalizeCssValue(engineColor(name, 'dark')));
+    }
+  });
+
   it('aliases semantic colors at :root for non-utility CSS consumers', () => {
-    expect(nexusCSS).toMatch(
-      /:root\s*\{[\s\S]*--color-background:\s*var\(--nx-color-background,\s*var\(--nx-color-white-base\)\);[\s\S]*\}/
-    );
-    expect(nexusCSS).toMatch(
-      /:root\s*\{[\s\S]*--color-focus-default:\s*var\(\s*--nx-color-focus-default,\s*var\(--color-primary-subtle-foreground\)\s*\);[\s\S]*\}/
-    );
+    const rootBlock = compactCss(extractBlock(nexusCSS, ':root'));
+    expect(rootBlock).toMatch(colorFallbackPattern('background'));
+    expect(rootBlock).toMatch(colorFallbackPattern('focus-default'));
   });
 
   it('emits the off-grid Model 2 surface primitives as concrete variables', () => {
@@ -389,10 +474,10 @@ describe('generateTailwindPackage', () => {
     );
 
     expect(css).toMatch(
-      /background-color:\s*var\(--nx-color-background,\s*var\(--nx-color-white-base\)\);/
+      colorPropertyFallbackPattern('background-color', 'background')
     );
     expect(css).toMatch(
-      /outline-color:\s*var\(\s*--nx-color-focus-default,\s*var\(--color-primary-subtle-foreground\)\s*\);/
+      colorPropertyFallbackPattern('outline-color', 'focus-default')
     );
   });
 
@@ -444,19 +529,15 @@ describe('generateTailwindPackage', () => {
 
   it('emits chart.categorical tokens in @theme (light) and .dark (dark override)', () => {
     const themeBlock = compactCss(extractBlock(nexusCSS, '@theme inline'));
-    expect(themeBlock).toMatch(
-      /--color-chart-categorical-1: var\(\s*--nx-color-chart-categorical-1,\s*var\(--nx-color-teal-600\)\s*\);/
-    );
-    expect(themeBlock).toMatch(
-      /--color-chart-categorical-5: var\(\s*--nx-color-chart-categorical-5,\s*var\(--nx-color-indigo-600\)\s*\);/
-    );
+    expect(themeBlock).toMatch(colorFallbackPattern('chart-categorical-1'));
+    expect(themeBlock).toMatch(colorFallbackPattern('chart-categorical-5'));
 
-    const darkBlock = extractBlock(nexusCSS, '.dark');
+    const darkBlock = compactCss(extractBlock(nexusCSS, '.dark'));
     expect(darkBlock).toMatch(
-      /--nx-color-chart-categorical-1: var\(--nx-color-teal-200\);/
+      colorDeclarationPattern('chart-categorical-1', 'dark')
     );
     expect(darkBlock).toMatch(
-      /--nx-color-chart-categorical-5: var\(--nx-color-indigo-200\);/
+      colorDeclarationPattern('chart-categorical-5', 'dark')
     );
   });
 
@@ -1062,22 +1143,24 @@ describe('generateTailwindPackage', () => {
       borderColorAliasesCSS,
       '@utility border-color-default'
     );
-    expect(defaultBlock).toMatch(
-      /border-color:\s*var\(--color-border-default\);/
+    expect(compactCss(defaultBlock)).toMatch(
+      colorPropertyFallbackPattern('border-color', 'border-default')
     );
 
     const errorBlock = extractBlock(
       borderColorAliasesCSS,
       '@utility border-color-error'
     );
-    expect(errorBlock).toMatch(/border-color:\s*var\(--color-border-error\);/);
+    expect(compactCss(errorBlock)).toMatch(
+      colorPropertyFallbackPattern('border-color', 'border-error')
+    );
 
     const informationActiveBlock = extractBlock(
       borderColorAliasesCSS,
       '@utility border-color-information-active'
     );
-    expect(informationActiveBlock).toMatch(
-      /border-color:\s*var\(--color-border-information-active\);/
+    expect(compactCss(informationActiveBlock)).toMatch(
+      colorPropertyFallbackPattern('border-color', 'border-information-active')
     );
   });
 
@@ -1102,8 +1185,32 @@ describe('generateTailwindPackage', () => {
     expect(css).toMatch(
       /border-inline-width:\s*var\(--nx-borderwidth-thick\);/
     );
-    expect(css).toMatch(/border-color:\s*var\(--color-border-default\);/);
-    expect(css).toMatch(/border-color:\s*var\(--color-border-error\);/);
+    expect(css).toMatch(
+      colorPropertyFallbackPattern('border-color', 'border-default')
+    );
+    expect(css).toMatch(
+      colorPropertyFallbackPattern('border-color', 'border-error')
+    );
+  });
+
+  it('emits no dangling --color-* references in compiled border color utilities', async () => {
+    const css = await compileGeneratedTailwind(distDir, [
+      'nx:border-color-default',
+      'nx:border-color-error',
+    ]);
+
+    expect(
+      extractCompiledClassBlock(css, 'nx:border-color-default')
+    ).not.toMatch(/var\(\s*--color-/);
+    expect(extractCompiledClassBlock(css, 'nx:border-color-error')).not.toMatch(
+      /var\(\s*--color-/
+    );
+    expect(extractCompiledClassBlock(css, 'nx:border-color-default')).toMatch(
+      colorPropertyFallbackPattern('border-color', 'border-default')
+    );
+    expect(extractCompiledClassBlock(css, 'nx:border-color-error')).toMatch(
+      colorPropertyFallbackPattern('border-color', 'border-error')
+    );
   });
 
   it('spacing-utilities.css declares all 4 role utilities with correct property bindings', () => {
@@ -1227,8 +1334,8 @@ describe('generateTailwindPackage', () => {
     // spacing-touched files.
     const dirA = makeTmpDir();
     const dirB = makeTmpDir();
-    await generateTailwindPackage(DEFAULT_CONFIG, { distDir: dirA });
-    await generateTailwindPackage(DEFAULT_CONFIG, { distDir: dirB });
+    await generateTailwindPackage(DEFAULT_CONFIG, generatorOptions(dirA));
+    await generateTailwindPackage(DEFAULT_CONFIG, generatorOptions(dirB));
 
     for (const file of [
       'variables.css',
@@ -1247,10 +1354,10 @@ describe('generateTailwindPackage', () => {
     await expect(
       generateTailwindPackage(
         { ...DEFAULT_CONFIG, base: 'nonexistent' },
-        { distDir: dir }
+        generatorOptions(dir)
       )
     ).rejects.toThrow(
-      'getSemanticFiles: themed type "base" has no mode "nonexistent"'
+      'generateTailwindPackage: config.base "nonexistent" must be one of: stone, neutral, zinc, slate, gray.'
     );
   });
 
@@ -1260,7 +1367,7 @@ describe('generateTailwindPackage', () => {
     const dir = makeTmpDir();
     await generateTailwindPackage(
       { ...DEFAULT_CONFIG, spacingDefault: 'relaxed' },
-      { distDir: dir }
+      generatorOptions(dir)
     );
     const css = read(dir, 'nexus.css');
 

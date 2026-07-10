@@ -817,7 +817,7 @@ export function generateBorderWidthUtilitiesCSS(tokens) {
   return { css, count: tokens.length * BORDER_WIDTH_UTILITIES_PER_TOKEN };
 }
 
-const BORDER_COLOR_ALIAS_NAMES = new Set([
+const BORDER_COLOR_ALIAS_NAMES = [
   'default',
   'default-alpha',
   'active',
@@ -832,7 +832,9 @@ const BORDER_COLOR_ALIAS_NAMES = new Set([
   'information-active',
   'primary',
   'primary-active',
-]);
+];
+
+const BORDER_COLOR_ALIAS_NAME_SET = new Set(BORDER_COLOR_ALIAS_NAMES);
 
 function getBorderColorAliasName(cssName) {
   const prefix = 'color-border-';
@@ -841,7 +843,7 @@ function getBorderColorAliasName(cssName) {
   }
 
   const name = cssName.slice(prefix.length);
-  return BORDER_COLOR_ALIAS_NAMES.has(name) ? name : null;
+  return BORDER_COLOR_ALIAS_NAME_SET.has(name) ? name : null;
 }
 
 /**
@@ -852,10 +854,18 @@ function getBorderColorAliasName(cssName) {
  * @param {object[]} tokens - Array of semantic color tokens with cssName property (e.g., "color-border-default")
  * @returns {{ css: string, count: number }} Generated CSS and utility count
  */
-export function generateBorderColorAliasUtilitiesCSS(tokens) {
+export function generateBorderColorAliasUtilitiesCSS(
+  tokens,
+  { runtimeFallback = false } = {}
+) {
   const borderColorTokens = (tokens ?? [])
     .map((token) => ({ token, name: getBorderColorAliasName(token.cssName) }))
-    .filter(({ name }) => name !== null);
+    .filter(({ name }) => name !== null)
+    .sort(
+      (a, b) =>
+        BORDER_COLOR_ALIAS_NAMES.indexOf(a.name) -
+        BORDER_COLOR_ALIAS_NAMES.indexOf(b.name)
+    );
 
   if (borderColorTokens.length === 0) {
     return { css: '', count: 0 };
@@ -864,8 +874,17 @@ export function generateBorderColorAliasUtilitiesCSS(tokens) {
   let css = `/* Border Color Alias Utilities */\n\n`;
 
   for (const { token, name } of borderColorTokens) {
+    if (runtimeFallback && typeof token.value !== 'string') {
+      throw new Error(
+        `generateBorderColorAliasUtilitiesCSS: ${token.cssName} is missing an engine fallback value.`
+      );
+    }
+
     css += `@utility border-color-${name} {\n`;
-    css += `  border-color: var(--${token.cssName});\n`;
+    const value = runtimeFallback
+      ? `var(--nx-${token.cssName}, ${token.value})`
+      : `var(--${token.cssName})`;
+    css += `  border-color: ${value};\n`;
     css += `}\n\n`;
   }
 
