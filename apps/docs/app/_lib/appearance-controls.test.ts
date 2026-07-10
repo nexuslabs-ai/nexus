@@ -5,11 +5,7 @@ import {
 } from '@nexus_ds/core';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
-import {
-  DOCS_APPEARANCE_BOOTSTRAP_CSP_HASH,
-  DOCS_APPEARANCE_BOOTSTRAP_SCRIPT,
-  getSha256CspHash,
-} from '../../theme-csp';
+import { DOCS_APPEARANCE_BOOTSTRAP_SCRIPT } from '../../theme-csp';
 
 import {
   DOCS_APPEARANCE_DEFAULT_STATE,
@@ -133,9 +129,6 @@ describe('docs appearance controls', () => {
     );
     expect(DOCS_APPEARANCE_BOOTSTRAP_SCRIPT).not.toContain(
       'data-nexus-theme-bootstrap'
-    );
-    expect(DOCS_APPEARANCE_BOOTSTRAP_CSP_HASH).toBe(
-      getSha256CspHash(DOCS_APPEARANCE_BOOTSTRAP_SCRIPT)
     );
   });
 

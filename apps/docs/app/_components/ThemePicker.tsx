@@ -8,7 +8,6 @@ import { usePathname } from 'next/navigation';
 import {
   getThemeModeOptions,
   getThemeModeValue,
-  sanitizeMode,
   type ThemeMode,
   updateThemeMode,
 } from '../_lib/appearance-controls';
@@ -32,8 +31,7 @@ export function ThemePicker() {
   if (pathname === '/') return null;
 
   const onChange = (mode: ThemeMode) => (value: string) => {
-    const safeValue = sanitizeMode(mode, value);
-    setState((current) => updateThemeMode(current, mode, safeValue));
+    setState((current) => updateThemeMode(current, mode, value));
   };
 
   return (

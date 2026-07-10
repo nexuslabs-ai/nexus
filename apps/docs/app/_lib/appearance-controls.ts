@@ -4,13 +4,7 @@ import {
   DEFAULT_NEXUS_APPEARANCE,
   DENSITY_OPTIONS,
   ELEVATION_OPTIONS,
-  type NexusAppearanceMode,
   type NexusAppearanceState,
-  type NexusCorners,
-  type NexusDensity,
-  type NexusElevation,
-  type NexusStroke,
-  type NexusSurfaceTone,
   STROKE_OPTIONS,
 } from '@nexus_ds/core';
 
@@ -37,13 +31,17 @@ export const THEME_MODE_KEYS = [
 
 export type ThemeMode = (typeof THEME_MODE_KEYS)[number];
 
+const MODE_TO_FIELD = {
+  mode: 'mode',
+  base: 'surfaceTone',
+  spacing: 'density',
+  shadow: 'elevation',
+  radius: 'corners',
+  borderwidth: 'stroke',
+} as const satisfies Record<ThemeMode, keyof NexusAppearanceState>;
+
 type ThemeModeValueMap = {
-  mode: NexusAppearanceMode;
-  base: NexusSurfaceTone;
-  spacing: NexusDensity;
-  shadow: NexusElevation;
-  radius: NexusCorners;
-  borderwidth: NexusStroke;
+  [K in ThemeMode]: NexusAppearanceState[(typeof MODE_TO_FIELD)[K]];
 };
 
 export type ThemeModeOption<K extends ThemeMode = ThemeMode> = {
@@ -95,20 +93,7 @@ export function getThemeModeValue<K extends ThemeMode>(
   state: NexusAppearanceState,
   mode: K
 ): ThemeModeValueMap[K] {
-  switch (mode) {
-    case 'mode':
-      return state.mode as ThemeModeValueMap[K];
-    case 'base':
-      return state.surfaceTone as ThemeModeValueMap[K];
-    case 'spacing':
-      return state.density as ThemeModeValueMap[K];
-    case 'shadow':
-      return state.elevation as ThemeModeValueMap[K];
-    case 'radius':
-      return state.corners as ThemeModeValueMap[K];
-    case 'borderwidth':
-      return state.stroke as ThemeModeValueMap[K];
-  }
+  return state[MODE_TO_FIELD[mode]] as unknown as ThemeModeValueMap[K];
 }
 
 export function sanitizeMode<K extends ThemeMode>(
@@ -126,20 +111,6 @@ export function updateThemeMode<K extends ThemeMode>(
   mode: K,
   value: unknown
 ): NexusAppearanceState {
-  const safeValue = sanitizeMode(mode, value);
-
-  switch (mode) {
-    case 'mode':
-      return { ...state, mode: safeValue as NexusAppearanceMode };
-    case 'base':
-      return { ...state, surfaceTone: safeValue as NexusSurfaceTone };
-    case 'spacing':
-      return { ...state, density: safeValue as NexusDensity };
-    case 'shadow':
-      return { ...state, elevation: safeValue as NexusElevation };
-    case 'radius':
-      return { ...state, corners: safeValue as NexusCorners };
-    case 'borderwidth':
-      return { ...state, stroke: safeValue as NexusStroke };
-  }
+  const next = { ...state, [MODE_TO_FIELD[mode]]: sanitizeMode(mode, value) };
+  return next as NexusAppearanceState;
 }
