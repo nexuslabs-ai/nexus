@@ -280,7 +280,7 @@ _Components and styling_
 _Tests_
 
 - _Adding or changing a component, hook, or utility?_
-  -> **Components: stories are the tests** — no `*.test.tsx`; write play functions in `*.stories.tsx`, importing from `storybook/test` (never `@storybook/test` or `@testing-library/react`). Cover the required-story matrix (Default, each variant + size, Disabled, Click + Keyboard interaction, WithDataAttributes, `asChild` if applicable, edge cases, and the `AllVariants` showcase). a11y is automatic via addon-a11y — don't add manual `axe()` calls; colour contrast is APCA-gated, not axe-gated (`pnpm --filter @nexus_ds/core audit:contrast`). **Hooks / utilities** use `*.test.ts` with `@nexus_ds/test-utils`. Assert input → output with partial matching on real fixtures; never commit `skip` / `only`. (`testing-react.md`, `testing.md`)
+  -> **Components: stories are the tests** — no `*.test.tsx`; write play functions in `*.stories.tsx`, importing from `storybook/test` (never `@storybook/test` or `@testing-library/react`). Cover the required-story matrix (Default, each variant + size, Disabled, Click + Keyboard interaction, WithDataAttributes, `asChild` if applicable, edge cases, and the `AllVariants` showcase). a11y is automatic via addon-a11y — don't add manual `axe()` calls; colour contrast is APCA-gated, not axe-gated (`pnpm audit:contrast`). **Hooks / utilities** use `*.test.ts` with `@nexus_ds/test-utils`. Assert input → output with partial matching on real fixtures; never commit `skip` / `only`. (`testing-react.md`, `testing.md`)
 
 _Diagnostic noise_
 

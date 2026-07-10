@@ -12,8 +12,8 @@ import { ColorScales } from './ColorScales';
  * Swatches reference --nx-color-* variables inline; the semantic strip
  * reacts live to the theme picker via the CSS cascade (zero JS).
  *
- * Sources: packages/core/tokens/ + audit-contrast.js (pipeline + APCA gate),
- * color-shades.md (the 11-step shade→role grid).
+ * Sources: packages/core/tokens/ + derive-theme APCA sweep (pipeline + APCA
+ * gate), color-shades.md (the 11-step shade→role grid).
  */
 
 // Surface ↔ text pairs — APCA-gated pairings that react to the picker.
@@ -106,7 +106,7 @@ const SHADE_ROLES: {
   },
 ];
 
-// APCA contrast tiers (see packages/core/scripts/audit-contrast.js).
+// APCA contrast tiers (see packages/core/src/lib/apca-pairs.ts).
 const APCA_TIERS: { pair: string; lc: string; covers: string }[] = [
   { pair: 'foreground ↔ background', lc: '≥ 75', covers: 'Body text' },
   {
@@ -125,7 +125,7 @@ const APCA_TIERS: { pair: string; lc: string; covers: string }[] = [
     covers: 'Nav label text',
   },
   {
-    pair: 'chart.categorical ↔ background / container',
+    pair: 'chart.categorical ↔ container',
     lc: '≥ 60',
     covers: 'Chart marks',
   },

@@ -246,7 +246,19 @@ function readableOn(bg: string): string {
     : 'oklch(0 0 0)';
 }
 
-function apcaSafeAgainst(color: string, bg: string, mode: Mode): string {
+function firstBackground(backgrounds: string[]): string {
+  const bg = backgrounds[0];
+  if (bg === undefined) {
+    throw new Error('Expected at least one APCA background.');
+  }
+  return bg;
+}
+
+function apcaSafeAgainstAll(
+  color: string,
+  backgrounds: string[],
+  mode: Mode
+): string {
   const seed = seedOklch(color);
   const c = seed.c ?? 0;
   const h = seed.h ?? 0;
@@ -259,9 +271,11 @@ function apcaSafeAgainst(color: string, bg: string, mode: Mode): string {
       c,
       h,
     });
-    if (apcaLc(candidate, bg) >= FOCUS_APCA_FLOOR) return candidate;
+    if (backgrounds.every((bg) => apcaLc(candidate, bg) >= FOCUS_APCA_FLOOR)) {
+      return candidate;
+    }
   }
-  return readableOn(bg);
+  return readableOn(firstBackground(backgrounds));
 }
 
 /** First shade (in `order`) that clears `floor` against `bg`; else the black/white endpoint. */
@@ -273,6 +287,20 @@ function legibleShade(
 ): string {
   for (const k of order) if (apcaLc(ramp[k], bg) >= floor) return ramp[k];
   return readableOn(bg);
+}
+
+function legibleShadeAcross(
+  ramp: Record<Shade, string>,
+  backgrounds: string[],
+  floor: number,
+  order: Shade[]
+): string {
+  for (const k of order) {
+    if (backgrounds.every((bg) => apcaLc(ramp[k], bg) >= floor)) {
+      return ramp[k];
+    }
+  }
+  return readableOn(firstBackground(backgrounds));
 }
 
 /** 11 tokens for a named color family (background, foreground, subtle, borders). */
@@ -306,10 +334,32 @@ export function deriveFamily(
 
 const STATUS_FAMILIES = ['success', 'warning', 'error', 'information'] as const;
 
-function deriveStatus(mode: Mode): TokenMap {
+function deriveStatus(mode: Mode, surfaces: TokenMap): TokenMap {
   const out: TokenMap = {};
   for (const family of STATUS_FAMILIES) {
-    Object.assign(out, deriveFamily(family, STATUS_RAMP[family], mode));
+    const tokens = deriveFamily(family, STATUS_RAMP[family], mode);
+
+    if (family === 'error') {
+      const subtle = tokens['--nx-color-error-subtle'];
+      const background = surfaces['--nx-color-background'];
+      const container = surfaces['--nx-color-container'];
+      if (!subtle || !background || !container) {
+        throw new Error(
+          'Expected error subtle, background, and container colors.'
+        );
+      }
+
+      tokens['--nx-color-error-subtle-foreground'] = legibleShadeAcross(
+        STATUS_RAMP.error,
+        [subtle, background, container],
+        TIER_THRESHOLDS.ui,
+        mode === 'dark'
+          ? ['300', '200', '100', '50']
+          : ['600', '700', '800', '900']
+      );
+    }
+
+    Object.assign(out, tokens);
   }
   return out;
 }
@@ -365,6 +415,15 @@ function deriveFocus(
   const background =
     surfaces['--nx-color-background'] ??
     (mode === 'dark' ? 'oklch(0 0 0)' : 'oklch(1 0 0)');
+  const focusBackgrounds = [
+    background,
+    surfaces['--nx-color-container'],
+    surfaces['--nx-color-popover'],
+    surfaces['--nx-color-nav-background'],
+    surfaces['--nx-color-nav-item-hover'],
+    surfaces['--nx-color-nav-item-active'],
+    surfaces['--nx-color-nav-border'],
+  ].filter((value): value is string => typeof value === 'string');
   const primaryFocus = primary['--nx-color-primary-subtle-foreground'];
 
   if (primaryFocus === undefined) {
@@ -374,8 +433,16 @@ function deriveFocus(
   }
 
   return {
-    '--nx-color-focus-default': primaryFocus,
-    '--nx-color-focus-error': apcaSafeAgainst(errorSeed, background, mode),
+    '--nx-color-focus-default': apcaSafeAgainstAll(
+      primaryFocus,
+      focusBackgrounds,
+      mode
+    ),
+    '--nx-color-focus-error': apcaSafeAgainstAll(
+      errorSeed,
+      focusBackgrounds,
+      mode
+    ),
   };
 }
 
@@ -570,7 +637,7 @@ function deriveMode(
   const text = deriveText(seeds.foreground, surfaces, mode);
   const primary = derivePrimary(seeds.accent, mode);
   const secondary = deriveSecondary(mode);
-  const status = deriveStatus(mode);
+  const status = deriveStatus(mode, surfaces);
   const chart = deriveChart(mode);
   const alpha = deriveAlpha(surfaceTone, mode, profile);
   const focus = deriveFocus(mode, surfaces, primary);

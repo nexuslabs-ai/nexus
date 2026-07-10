@@ -237,7 +237,6 @@ export const DEFAULT_CONFIG = {
   borderwidth: 'normal',
   motion: 'snappy',
   focus: 'default',
-  'chart-categorical': 'default',
   // see CANONICAL_SPACING_DEFAULT_MODE — controls :root cascade only (all 6 modes ship)
   spacingDefault: 'default',
 };
@@ -1868,7 +1867,7 @@ export function collectSemanticDimensionTokens(semanticDir, fileName) {
 
 /**
  * Generate @theme CSS block for Tailwind
- * This is the shared function used by both generate-modular.js and generate-tailwind-package.js
+ * This is the shared function used by generate-tailwind-package.js
  *
  * @param {object} config - Configuration object
  * @param {string} config.header - File header comment
@@ -2365,9 +2364,8 @@ const SCRIPTS_DIR = path.dirname(fileURLToPath(import.meta.url));
  * location so callers can write to a temporary dist (e.g. tests) without
  * losing config resolution.
  *
- * Only walks the top level — both dist layouts (`dist/tailwind`,
- * `dist/modular`) are flat today. Throws if a subdirectory appears so a
- * future nested layout cannot silently skip files.
+ * Only walks the top level. Throws if a subdirectory appears so a future nested
+ * layout cannot silently skip files.
  */
 export async function formatDistCssFiles(distDir) {
   const config = await prettier.resolveConfig(SCRIPTS_DIR);

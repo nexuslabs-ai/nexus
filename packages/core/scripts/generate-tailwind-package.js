@@ -146,12 +146,13 @@ function assertTokenEngine(engine) {
     !engine ||
     typeof engine.deriveTheme !== 'function' ||
     typeof engine.createNexusThemeContract !== 'function' ||
+    typeof engine.isColor !== 'function' ||
     !engine.DEFAULT_NEXUS_APPEARANCE ||
     !Array.isArray(engine.BASE_TONE_OPTIONS) ||
     !Array.isArray(engine.SEMANTIC_TOKEN_REGISTRY)
   ) {
     throw new Error(
-      'generateTailwindPackage: token engine must provide deriveTheme, createNexusThemeContract, DEFAULT_NEXUS_APPEARANCE, BASE_TONE_OPTIONS, and SEMANTIC_TOKEN_REGISTRY.'
+      'generateTailwindPackage: token engine must provide deriveTheme, createNexusThemeContract, isColor, DEFAULT_NEXUS_APPEARANCE, BASE_TONE_OPTIONS, and SEMANTIC_TOKEN_REGISTRY.'
     );
   }
 
@@ -169,6 +170,19 @@ function validateBaseTone(config, engine) {
   }
 
   return baseTone;
+}
+
+function validateBrandColor(config, engine) {
+  const brandColor =
+    config.brandColor ?? engine.DEFAULT_NEXUS_APPEARANCE.brandColor;
+
+  if (typeof brandColor !== 'string' || !engine.isColor(brandColor)) {
+    throw new Error(
+      `generateTailwindPackage: config.brandColor "${brandColor}" must be a valid CSS color.`
+    );
+  }
+
+  return brandColor;
 }
 
 function semanticTokensFromEngineMap(tokenMap, registry) {
@@ -191,10 +205,12 @@ function semanticTokensFromEngineMap(tokenMap, registry) {
 
 function deriveEngineSemanticTokens(config, engine) {
   const baseTone = validateBaseTone(config, engine);
+  const brandColor = validateBrandColor(config, engine);
   const theme = engine.deriveTheme(
     engine.createNexusThemeContract({
       ...engine.DEFAULT_NEXUS_APPEARANCE,
       surfaceTone: baseTone,
+      brandColor,
     })
   );
 
@@ -717,7 +733,7 @@ if (process.argv[1] === fileURLToPath(import.meta.url)) {
       'borderwidth',
       'motion',
       'focus',
-      'chart-categorical',
+      'brandColor',
       'spacingDefault',
     ],
   });

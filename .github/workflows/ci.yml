@@ -362,12 +362,11 @@ jobs:
       - name: Build @nexus_ds/core
         run: pnpm --filter @nexus_ds/core build
 
-      - name: Regenerate token outputs (tailwind + modular)
+      - name: Regenerate token outputs (tailwind)
         id: regen
         run: |
           set -euo pipefail
           pnpm tokens:tailwind
-          pnpm tokens:modular
 
       - name: Check token output freshness
         if: ${{ !cancelled() && steps.regen.conclusion == 'success' }}
@@ -375,16 +374,15 @@ jobs:
         run: |
           set -euo pipefail
           DIRTY=$(git status --porcelain -- \
-            packages/tailwind \
-            apps/docs/public/themes)
+            packages/tailwind)
           if [ -n "$DIRTY" ]; then
             echo "::error::Token output is stale. Affected paths:"
             echo "$DIRTY"
-            echo "::error::Run 'pnpm tokens:tailwind && pnpm tokens:modular' and commit the result."
+            echo "::error::Run 'pnpm tokens:tailwind' and commit the result."
             exit 1
           fi
 
-      - name: APCA contrast audit
+      - name: APCA contrast vitest sweep
         if: ${{ !cancelled() && steps.regen.conclusion == 'success' }}
         run: pnpm --filter @nexus_ds/core audit:contrast
 

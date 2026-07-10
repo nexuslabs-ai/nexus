@@ -1361,6 +1361,18 @@ describe('generateTailwindPackage', () => {
     );
   });
 
+  it('throws when the selected brand color is invalid', async () => {
+    const dir = makeTmpDir();
+    await expect(
+      generateTailwindPackage(
+        { ...DEFAULT_CONFIG, brandColor: 'not-a-color' },
+        generatorOptions(dir)
+      )
+    ).rejects.toThrow(
+      'generateTailwindPackage: config.brandColor "not-a-color" must be a valid CSS color.'
+    );
+  });
+
   it('config.spacingDefault shifts which mode lands under :root, [data-density="X"]', async () => {
     // Build with a non-default spacing mode. All 6 mode blocks still emit;
     // only the `:root` half of the dual selector moves from Default to Relaxed.

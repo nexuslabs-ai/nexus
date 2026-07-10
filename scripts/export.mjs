@@ -11,7 +11,7 @@
  * `import.meta.url` guard so importing this module runs nothing.
  */
 
-import { spawnSync } from 'node:child_process';
+import { execFileSync, spawnSync } from 'node:child_process';
 import fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath, pathToFileURL } from 'node:url';
@@ -25,7 +25,7 @@ export const REBRAND_PACKAGES = ['@nexus_ds/react', '@nexus_ds/tailwind'];
 // Token-shaping config axes fed to the `@nexus_ds/core` tailwind generator.
 export const TOKEN_CONFIG_KEYS = [
   'base',
-  'brand',
+  'brandColor',
   'radius',
   'borderwidth',
   'shadow',
@@ -36,7 +36,7 @@ export const TOKEN_CONFIG_KEYS = [
 // Defaults mirror `DEFAULT_CONFIG` in packages/core/scripts/utils.js.
 export const DEFAULT_TOKEN_CONFIG = {
   base: 'stone',
-  brand: 'black',
+  brandColor: '#0a0a0a',
   radius: 'square',
   borderwidth: 'normal',
   shadow: 'quiet',
@@ -82,25 +82,33 @@ export function deriveScope(name, explicitScope) {
 }
 
 /**
- * Enumerate valid token-config values from the committed token files, the same
- * way the generator discovers them: base/brand from
- * `tokens/semantic/{base,brands}-{value}-{light|dark}.json`,
- * radius/borderwidth/shadow/motion from `tokens/primitives/{category}/`, and
- * spacingDefault from `tokens/semantic/spacing-{mode}.json`.
+ * Enumerate valid token-config values from the committed token sources:
+ * base from `BASE_TONE_OPTIONS`, primitive-backed axes from
+ * `tokens/primitives/{category}/`, and spacingDefault from
+ * `tokens/semantic/spacing-{mode}.json`. brandColor is an unconstrained CSS
+ * color string validated by the core generator.
  */
 export function discoverTokenChoices(tokensDir) {
   const semanticDir = path.join(tokensDir, 'semantic');
   const primitivesDir = path.join(tokensDir, 'primitives');
+  const appearanceModel = path.join(
+    path.dirname(tokensDir),
+    'src/lib/appearance-model.ts'
+  );
 
-  const semanticModes = (prefix) => {
-    const seen = new Set();
-    for (const file of fs.readdirSync(semanticDir)) {
-      const match = file.match(new RegExp(`^${prefix}-(.+)-(?:light|dark)\\.json$`));
-      if (match) {
-        seen.add(match[1]);
-      }
+  const baseModes = () => {
+    const text = fs.readFileSync(appearanceModel, 'utf8');
+    const blockMatch = text.match(
+      /export const BASE_TONE_OPTIONS = \[([\s\S]*?)\] as const/
+    );
+    if (!blockMatch) {
+      throw new Error(
+        `Cannot discover base tones: BASE_TONE_OPTIONS not found in ${appearanceModel}.`
+      );
     }
-    return [...seen].sort();
+    return [...blockMatch[1].matchAll(/value:\s*'([^']+)'/g)]
+      .map((match) => match[1])
+      .sort();
   };
 
   const primitiveModes = (category) => {
@@ -110,7 +118,9 @@ export function discoverTokenChoices(tokensDir) {
     }
     const seen = new Set();
     for (const file of fs.readdirSync(dir)) {
-      const match = file.match(new RegExp(`^${category}-(.+?)(?:-(?:light|dark))?\\.json$`));
+      const match = file.match(
+        new RegExp(`^${category}-(.+?)(?:-(?:light|dark))?\\.json$`)
+      );
       if (match) {
         seen.add(match[1]);
       }
@@ -132,8 +142,8 @@ export function discoverTokenChoices(tokensDir) {
   };
 
   return {
-    base: semanticModes('base'),
-    brand: semanticModes('brands'),
+    base: baseModes(),
+    brandColor: [],
     radius: primitiveModes('radius'),
     borderwidth: primitiveModes('borderwidth'),
     shadow: primitiveModes('shadow'),
@@ -179,7 +189,9 @@ export function parseExportArgs(argv, { validChoices } = {}) {
   }
 
   if (!flags.name) {
-    throw new Error('Missing required --name (e.g. --name=examlly-design-system).');
+    throw new Error(
+      'Missing required --name (e.g. --name=examlly-design-system).'
+    );
   }
 
   const name = flags.name;
@@ -262,7 +274,10 @@ function assertNoUnhandledNexusDeps(pkg) {
  * dep to a published range, and make it publishable. Structural fields (Radix
  * pins, peers, exports) are preserved so the fork can't drift from upstream.
  */
-export function transformReactPackageJson(pkg, { scope, coreVersion, version }) {
+export function transformReactPackageJson(
+  pkg,
+  { scope, coreVersion, version }
+) {
   const next = structuredClone(pkg);
   next.name = `${scope}/react`;
   next.version = version;
@@ -372,7 +387,8 @@ export function renderAppAppearanceExample(scope, policy) {
     .map(([key, value]) => `  ${key}: ${JSON.stringify(value)},`)
     .join('\n');
   const notes = {
-    locked: 'the product owner sets the appearance; end-users cannot change it.',
+    locked:
+      'the product owner sets the appearance; end-users cannot change it.',
     user: 'end-users pick their appearance; the choice persists to localStorage.',
     tenant: 'appearance is seeded per request via cookie (multi-tenant SSR).',
   };
@@ -655,7 +671,10 @@ export default tseslint.config(
 // CLI ORCHESTRATION
 // ============================================================================
 
-const REPO_ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
+const REPO_ROOT = path.resolve(
+  path.dirname(fileURLToPath(import.meta.url)),
+  '..'
+);
 
 // Files rebranded on copy; anything else is copied byte-for-byte.
 const TEXT_EXTENSIONS = new Set([
@@ -757,8 +776,13 @@ function collectComponentEntries(componentsDir) {
         }
         files.push(path.relative(componentsDir, childPath));
         if (child.name.endsWith('.tsx') || child.name.endsWith('.ts')) {
-          const fileDir = path.relative(srcDir, current).split(path.sep).join('/');
-          fileDeps.push(scanInternalDeps(fs.readFileSync(childPath, 'utf8'), fileDir));
+          const fileDir = path
+            .relative(srcDir, current)
+            .split(path.sep)
+            .join('/');
+          fileDeps.push(
+            scanInternalDeps(fs.readFileSync(childPath, 'utf8'), fileDir)
+          );
         }
       }
     };
@@ -776,7 +800,9 @@ function collectComponentEntries(componentsDir) {
 
   // Fail loud if a scan produced a component dep that isn't a real component dir.
   for (const entry of entries) {
-    const unknown = entry.deps.components.filter((dep) => !componentNames.has(dep));
+    const unknown = entry.deps.components.filter(
+      (dep) => !componentNames.has(dep)
+    );
     if (unknown.length > 0) {
       throw new Error(
         `Component "${entry.name}" references unknown component dep(s): ${unknown.join(', ')}. ` +
@@ -791,35 +817,66 @@ function collectComponentEntries(componentsDir) {
 function forkReactPackage(destReactDir, scope, coreVersion, version) {
   const srcReactDir = path.join(REPO_ROOT, 'packages', 'react');
 
-  copyTree(path.join(srcReactDir, 'src'), path.join(destReactDir, 'src'), { scope });
-  copyTree(path.join(srcReactDir, '.storybook'), path.join(destReactDir, '.storybook'), {
+  copyTree(path.join(srcReactDir, 'src'), path.join(destReactDir, 'src'), {
     scope,
-    skip: (srcPath) => srcPath.endsWith('vitest.setup.ts'),
-    transform: (srcPath, text) =>
-      srcPath.endsWith('main.ts') ? trimStorybookVitestAddon(text) : text,
   });
+  copyTree(
+    path.join(srcReactDir, '.storybook'),
+    path.join(destReactDir, '.storybook'),
+    {
+      scope,
+      skip: (srcPath) => srcPath.endsWith('vitest.setup.ts'),
+      transform: (srcPath, text) =>
+        srcPath.endsWith('main.ts') ? trimStorybookVitestAddon(text) : text,
+    }
+  );
   for (const file of ['vite.config.ts', 'tsconfig.json', 'components.json']) {
     const src = path.join(srcReactDir, file);
-    writeFile(path.join(destReactDir, file), rebrandContent(fs.readFileSync(src, 'utf8'), scope));
+    writeFile(
+      path.join(destReactDir, file),
+      rebrandContent(fs.readFileSync(src, 'utf8'), scope)
+    );
   }
 
-  const reactPkg = transformReactPackageJson(readJson(path.join(srcReactDir, 'package.json')), {
-    scope,
-    coreVersion,
-    version,
-  });
+  const reactPkg = transformReactPackageJson(
+    readJson(path.join(srcReactDir, 'package.json')),
+    {
+      scope,
+      coreVersion,
+      version,
+    }
+  );
   writeJson(path.join(destReactDir, 'package.json'), reactPkg);
 }
 
 /** Generate the rebranded tailwind package (CSS via the core generator + manifest). */
-async function writeTailwindPackage(destTailwindDir, tokenConfig, scope, version) {
+async function writeTailwindPackage(
+  destTailwindDir,
+  tokenConfig,
+  scope,
+  version
+) {
+  execFileSync('pnpm', ['--filter', '@nexus_ds/core', 'build'], {
+    cwd: REPO_ROOT,
+    stdio: 'inherit',
+  });
   const { generateTailwindPackage } = await import(
-    pathToFileURL(path.join(REPO_ROOT, 'packages', 'core', 'scripts', 'generate-tailwind-package.js')).href
+    pathToFileURL(
+      path.join(
+        REPO_ROOT,
+        'packages',
+        'core',
+        'scripts',
+        'generate-tailwind-package.js'
+      )
+    ).href
   );
   fs.mkdirSync(destTailwindDir, { recursive: true });
   await generateTailwindPackage(tokenConfig, { distDir: destTailwindDir });
 
-  const srcTailwindPkg = readJson(path.join(REPO_ROOT, 'packages', 'tailwind', 'package.json'));
+  const srcTailwindPkg = readJson(
+    path.join(REPO_ROOT, 'packages', 'tailwind', 'package.json')
+  );
   writeJson(
     path.join(destTailwindDir, 'package.json'),
     transformTailwindPackageJson(srcTailwindPkg, { scope, version })
@@ -838,7 +895,9 @@ function writeRootScaffold(outDir, config, manifest) {
   for (const dep of TOOLCHAIN_PACKAGES) {
     const spec = rootPkg.devDependencies?.[dep];
     if (!spec) {
-      throw new Error(`Toolchain dep "${dep}" not found in root devDependencies.`);
+      throw new Error(
+        `Toolchain dep "${dep}" not found in root devDependencies.`
+      );
     }
     toolchain[dep] = spec;
   }
@@ -856,7 +915,10 @@ function writeRootScaffold(outDir, config, manifest) {
   writeFile(path.join(outDir, 'pnpm-workspace.yaml'), WORKSPACE_YAML);
   writeFile(path.join(outDir, '.npmrc'), NPMRC_CONTENT);
   writeFile(path.join(outDir, 'eslint.config.js'), ROOT_ESLINT_CONFIG);
-  writeFile(path.join(outDir, 'README.md'), renderReadme({ name, scope, tokenConfig }));
+  writeFile(
+    path.join(outDir, 'README.md'),
+    renderReadme({ name, scope, tokenConfig })
+  );
   writeJson(path.join(outDir, 'registry.json'), manifest);
   writeFile(
     path.join(outDir, 'examples', 'app-appearance.tsx'),
@@ -888,17 +950,27 @@ export function containsGitDir(dir) {
 
 /** True if `dir` matches a gitignore pattern in `repoRoot`. */
 export function isGitIgnored(repoRoot, dir) {
-  return spawnSync('git', ['check-ignore', '-q', dir], { cwd: repoRoot }).status === 0;
+  return (
+    spawnSync('git', ['check-ignore', '-q', dir], { cwd: repoRoot }).status ===
+    0
+  );
 }
 
 /** True if git tracks any file under `dir`. */
 export function hasTrackedFiles(repoRoot, dir) {
-  const res = spawnSync('git', ['ls-files', '--', dir], { cwd: repoRoot, encoding: 'utf8' });
+  const res = spawnSync('git', ['ls-files', '--', dir], {
+    cwd: repoRoot,
+    encoding: 'utf8',
+  });
   return res.stdout.trim().length > 0;
 }
 
 /** Resolve + prepare the output directory (refuse a non-empty target unless --force). */
-export function prepareOutDir(out, force, { repoRoot = REPO_ROOT, cwd = process.cwd() } = {}) {
+export function prepareOutDir(
+  out,
+  force,
+  { repoRoot = REPO_ROOT, cwd = process.cwd() } = {}
+) {
   const outDir = path.resolve(cwd, out);
   // `--force` does an rmSync, so never allow a target that *contains* this repo
   // or the cwd — `--out=..` would wipe the repo's parent.
@@ -925,10 +997,14 @@ export function prepareOutDir(out, force, { repoRoot = REPO_ROOT, cwd = process.
   }
   if (fs.existsSync(outDir) && fs.readdirSync(outDir).length > 0) {
     if (!force) {
-      throw new Error(`Output dir "${outDir}" is not empty. Pass --force to overwrite.`);
+      throw new Error(
+        `Output dir "${outDir}" is not empty. Pass --force to overwrite.`
+      );
     }
     if (containsGitDir(outDir)) {
-      throw new Error(`Refusing to overwrite "${outDir}": it contains a git repository.`);
+      throw new Error(
+        `Refusing to overwrite "${outDir}": it contains a git repository.`
+      );
     }
     fs.rmSync(outDir, { recursive: true, force: true });
   }
@@ -937,9 +1013,13 @@ export function prepareOutDir(out, force, { repoRoot = REPO_ROOT, cwd = process.
 }
 
 async function main(argv) {
-  const validChoices = discoverTokenChoices(path.join(REPO_ROOT, 'packages', 'core', 'tokens'));
+  const validChoices = discoverTokenChoices(
+    path.join(REPO_ROOT, 'packages', 'core', 'tokens')
+  );
   const config = parseExportArgs(argv, { validChoices });
-  const coreVersion = readJson(path.join(REPO_ROOT, 'packages', 'core', 'package.json')).version;
+  const coreVersion = readJson(
+    path.join(REPO_ROOT, 'packages', 'core', 'package.json')
+  ).version;
 
   const outDir = prepareOutDir(config.out, config.force);
   console.log(`\n📦 Exporting "${config.name}" (${config.scope}) → ${outDir}`);
@@ -947,8 +1027,15 @@ async function main(argv) {
     `   tokens: ${TOKEN_CONFIG_KEYS.map((k) => `${k}=${config.tokenConfig[k]}`).join(' ')}`
   );
 
-  forkReactPackage(path.join(outDir, 'packages', 'react'), config.scope, coreVersion, config.version);
-  console.log(`   ✓ forked ${config.scope}/react (Storybook showcase, rebranded)`);
+  forkReactPackage(
+    path.join(outDir, 'packages', 'react'),
+    config.scope,
+    coreVersion,
+    config.version
+  );
+  console.log(
+    `   ✓ forked ${config.scope}/react (Storybook showcase, rebranded)`
+  );
 
   await writeTailwindPackage(
     path.join(outDir, 'packages', 'tailwind'),
@@ -961,10 +1048,18 @@ async function main(argv) {
   const entries = collectComponentEntries(
     path.join(REPO_ROOT, 'packages', 'react', 'src', 'components')
   );
-  writeRootScaffold(outDir, config, buildManifest(entries, { version: config.version }));
-  console.log(`   ✓ wrote root scaffold + registry (${entries.length} components)`);
+  writeRootScaffold(
+    outDir,
+    config,
+    buildManifest(entries, { version: config.version })
+  );
+  console.log(
+    `   ✓ wrote root scaffold + registry (${entries.length} components)`
+  );
 
-  console.log(`\n✨ Done. Next:\n   cd ${outDir} && pnpm install && pnpm build\n`);
+  console.log(
+    `\n✨ Done. Next:\n   cd ${outDir} && pnpm install && pnpm build\n`
+  );
 }
 
 if (process.argv[1] === fileURLToPath(import.meta.url)) {

@@ -48,9 +48,8 @@ dev-all: ## Everything: console + docs + storybook + package watchers (turbo)
 build: ## Build all packages (turbo)
 	pnpm build
 
-tokens: ## Regenerate token outputs (tailwind + modular CSS)
+tokens: ## Regenerate token outputs (tailwind CSS)
 	pnpm tokens:tailwind
-	pnpm tokens:modular
 
 # ── Test & quality ─────────────────────────────────────────────────────────────
 
@@ -87,4 +86,3 @@ serve: ## Run a local docs-mcp server for indexing (maintainer)
 publish: ## Login + export + build + push the docs-mcp image to GHCR (maintainer)
 	pnpm docs:login
 	pnpm docs:publish
-

@@ -97,7 +97,7 @@ describe('docs appearance controls', () => {
         surfaceTone: 'slate',
       },
       'base',
-      '/themes/base-zinc.css'
+      'not-a-tone'
     );
 
     expect(state.surfaceTone).toBe(DOCS_APPEARANCE_DEFAULT_STATE.surfaceTone);
