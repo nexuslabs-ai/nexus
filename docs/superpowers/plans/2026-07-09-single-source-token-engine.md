@@ -1,5 +1,8 @@
 # Single-Source Token Engine — Execution Plan
 
+> **Completed — merged via #641–#649.** This plan executed as written; it is the
+> architecture record for the single-source engine, not pending work.
+
 > **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.
 >
 > **Design rationale + council review:** `.claude/plans/issue-a-review-council-encapsulated-peacock.md` (v3). This document is the executable companion — how, in what order, with what gates.

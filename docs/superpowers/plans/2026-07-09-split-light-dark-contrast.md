@@ -1,5 +1,11 @@
 # Split Light & Dark Contrast Controls — Implementation Plan
 
+> **Historical — superseded.** Preserved as the design/rationale record. This
+> plan shipped as Phase 0 of the single-source token engine migration (#641);
+> the parity oracles and `tokens:modular` step it references were later deleted
+> in that migration (#641–#649). Read it as the decision record for the
+> light/dark contrast split, not as current infrastructure.
+
 > **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.
 
 **Goal:** Replace the single global `contrast: number` appearance knob with two independent scalars — `lightContrast` and `darkContrast` — so the dark theme's surface separation can be tuned without moving the light theme.

@@ -16,10 +16,6 @@ examples
 
 # Auto-generated CSS — produced by @nexus_ds/core token pipeline; do not reformat
 packages/tailwind/*.css
-apps/console/src/styles/*.css
-
-# Generated Storybook base-variant stories — produced by generate-base-variants.mjs
-packages/react/src/components/__generated__/
 
 # Untracked git worktree copies under .claude (full-repo clones, not part of the tree)
 .claude/worktrees/

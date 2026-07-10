@@ -77,7 +77,7 @@ All tokens follow the [Design Tokens Community Group](https://tr.designtokens.or
 **Primitives** (`tokens/primitives/`)
 
 - Context-independent base values
-- Color, radius, border-width, shadow, typography, focus, motion
+- Color, radius, border-width, shadow, typography, motion
 - Output: CSS variables with the `--nx-*` prefix
 - Example: `--nx-color-gray-950`, `--nx-radius-md`
 - Motion primitives also promote named Tailwind utilities such as `nx:duration-fast` and `nx:ease-enter`: durations are emitted as explicit `@utility` rules, while easing uses Tailwind's `@theme` namespace. Existing Tailwind numeric duration/ease defaults remain available until the repo-wide migration lands.
@@ -85,9 +85,9 @@ All tokens follow the [Design Tokens Community Group](https://tr.designtokens.or
 **Semantic** (`tokens/semantic/`)
 
 - Contextual meanings that reference primitives (and per-mode direct values for spacing)
-- Light and dark theme variants for color; per-mode files for spacing
-- Output: Tailwind v4 `@theme` block + per-mode `[data-density="X"]` blocks
-- Example: `--color-background: var(--nx-color-white-base)`, `--nx-spacing-4: 16px`
+- Semantic **color** is engine-derived (`deriveTheme`), not authored here; `tokens/semantic/` now holds only spacing, breakpoints, focus offset, and z-index
+- Output: Tailwind v4 `@theme` block (semantic color via `@theme inline`, accepting runtime `--nx-color-*` overrides) + per-mode `[data-density="X"]` blocks
+- Example: `--color-background: var(--nx-color-background, oklch(1 0 0))` (engine color floor), `--nx-spacing-4: 16px`
 
 > **Spacing is two-tier, not three.** Unlike color/radius/shadow/typography, spacing has no `--nx-size-*` primitive layer — `semantic/spacing-{mode}.json` files carry direct px values, and the build emits per-mode `[data-density="X"]` blocks plus role utilities (`nx:p-container`, `nx:gap-layout-section`, …). Mode swap is runtime via the `data-density` attribute on `<html>`.
 
@@ -104,22 +104,19 @@ Generated global CSS sets the native browser UI policy alongside the tokens: `:r
 
 ## Reference Resolution
 
-Semantic tokens use DTCG reference syntax:
-
-```json
-{
-  "background": {
-    "$value": "{white.base}",
-    "$type": "color"
-  }
-}
-```
-
-This resolves to CSS:
+Semantic **color** is produced by the engine (`deriveTheme`), not authored as
+JSON. The build bakes each derived value into `nexus.css` as a `@theme inline`
+fallback that still accepts a runtime override:
 
 ```css
---color-background: var(--nx-color-white-base);
+--color-background: var(--nx-color-background, oklch(1 0 0));
 ```
+
+The `--color-*` name is the Tailwind v4 `@theme` key that generates the utility
+(`nx:bg-background`); the `--nx-color-*` fallback is the runtime override the
+appearance provider injects. Non-color families (spacing, radius, shadow,
+borderwidth, …) still use DTCG `{reference}` syntax, resolved to `var(--nx-*)`
+at build time.
 
 ## Build Process
 
@@ -147,7 +144,7 @@ When multi-platform support is needed, tools like Style Dictionary can be added 
 
 ## Adding New Tokens
 
-1. Edit token files in `tokens/`
-2. Follow DTCG format with `$value`, `$type`, `$description`
-3. Run `make tokens` to regenerate CSS
-4. Tokens automatically copied to React package
+- **Color** is engine-owned: edit the derivation in `src/lib/surface-ladder.ts` / `src/lib/derive-theme.ts` (color primitives live in `tokens/primitives/color.json`).
+- **Non-color** (spacing, radius, shadow, borderwidth, motion, typography): edit the DTCG token files in `tokens/` (`$value`, `$type`, `$description`).
+
+Then run `make tokens` (or `pnpm build:tailwind`) to regenerate CSS; the output is copied into the `@nexus_ds/tailwind` package.

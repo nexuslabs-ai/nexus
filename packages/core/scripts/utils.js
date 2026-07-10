@@ -134,17 +134,6 @@ export function extractTokens(obj, currentPath = [], result = []) {
 }
 
 /**
- * Convert token path to CSS variable name
- * @param {string[]} tokenPath - Token path array
- * @param {string|null} prefix - Optional prefix (e.g., 'color' for semantic colors)
- * @returns {string} CSS variable name (without --)
- */
-export function pathToCssVar(tokenPath, prefix = null) {
-  const cssName = tokenPath.join('-');
-  return prefix ? `${prefix}-${cssName}` : cssName;
-}
-
-/**
  * Convert token path to CSS variable name with optional nx- prefix
  * Used for generating prefixed CSS variables for @nexus_ds/tailwind package
  * @param {string[]} tokenPath - Token path array
@@ -236,7 +225,6 @@ export const DEFAULT_CONFIG = {
   radius: 'square',
   borderwidth: 'normal',
   motion: 'snappy',
-  focus: 'default',
   // see CANONICAL_SPACING_DEFAULT_MODE — controls :root cascade only (all 6 modes ship)
   spacingDefault: 'default',
 };
@@ -295,17 +283,15 @@ export function discoverPrimitives(primitivesDir) {
 }
 
 /**
- * Discover all semantic token themes and standalone files from file system.
- * Detects:
- * - Themed files: {type}-{mode}-{light|dark}.json pattern
- * - Standalone files: {name}.json (no light/dark suffix)
+ * Discover semantic token files from the file system, partitioning
+ * spacing-mode files (spacing-{mode}.json) into perModeFiles from plain
+ * standalone files ({name}.json).
  *
  * @param {string} semanticDir - Path to semantic directory
- * @returns {object} { themed: { type: { mode: { light, dark } } }, standalone: string[], perModeFiles: { category: { mode: filename } } }
+ * @returns {object} { standalone: string[], perModeFiles: { category: { mode: filename } } }
  */
 export function discoverSemantics(semanticDir) {
   const result = {
-    themed: {},
     standalone: [],
     // Bucket for per-mode semantic categories. Keyed by category so a future
     // per-mode category (e.g. per-mode color shading) lands as a sibling key
@@ -320,8 +306,6 @@ export function discoverSemantics(semanticDir) {
 
   const files = fs.readdirSync(semanticDir).filter((f) => f.endsWith('.json'));
 
-  // Pattern for themed files: {type}-{mode}-{light|dark}.json
-  const themedPattern = /^(.+)-(.+)-(light|dark)\.json$/;
   // Pattern for spacing-mode files: spacing-{mode}.json. Their values are
   // direct px (no `{N}` refs) and emit per-mode `[data-density="X"]` blocks via
   // `collectSpacingTokens` — they intentionally bypass the generic
@@ -340,21 +324,8 @@ export function discoverSemantics(semanticDir) {
       continue;
     }
 
-    const match = file.match(themedPattern);
-    if (match) {
-      const [, type, mode, variant] = match;
-
-      if (!result.themed[type]) {
-        result.themed[type] = {};
-      }
-      if (!result.themed[type][mode]) {
-        result.themed[type][mode] = {};
-      }
-      result.themed[type][mode][variant] = file;
-    } else {
-      // Standalone file (no light/dark suffix, not a spacing mode)
-      result.standalone.push(file);
-    }
+    // Standalone file (not a spacing mode)
+    result.standalone.push(file);
   }
 
   return result;
@@ -362,7 +333,7 @@ export function discoverSemantics(semanticDir) {
 
 /**
  * Group {base}-light / {base}-dark mode names into pairs; pass others through unchanged.
- * Used by both bundled and modular generators to recognize themed primitive categories.
+ * Used by the generator to recognize themed primitive categories.
  *
  * @param {string[]} modes - List of mode names (e.g., ['vega-light', 'vega-dark', 'lyra'])
  * @returns {{ themed: Record<string, { light: string, dark: string }>, plain: string[] }}
@@ -408,38 +379,6 @@ export function partitionThemedModes(modes) {
 export function filterDivergentDark(lightTokens, darkTokens) {
   const lightByName = new Map(lightTokens.map((t) => [t.cssName, t.value]));
   return darkTokens.filter((t) => lightByName.get(t.cssName) !== t.value);
-}
-
-/**
- * Process a semantic token file and resolve references
- * @param {string} filePath - Full path to semantic file
- * @param {Map} primitiveMap - Primitive map for reference resolution
- * @returns {object[]} Array of { cssName, value, type }
- */
-export function processSemanticTokens(filePath, primitiveMap) {
-  if (!fs.existsSync(filePath)) {
-    throw new Error(`Semantic file missing: ${filePath}`);
-  }
-
-  const tokenData = readTokenFile(filePath);
-  const extracted = extractTokens(tokenData);
-  const tokens = [];
-
-  for (const token of extracted) {
-    // Add 'nx-color' prefix for color tokens (to match Tailwind prefix(nx) output)
-    // No prefix for dimensions (spacing)
-    const prefix = token.type === 'color' ? 'nx-color' : null;
-    const cssName = pathToCssVar(token.path, prefix);
-    const cssValue = resolveValue(
-      token.value,
-      primitiveMap,
-      token.type,
-      token.path
-    );
-    tokens.push({ cssName, value: cssValue, type: token.type });
-  }
-
-  return tokens;
 }
 
 /**
@@ -498,9 +437,8 @@ export const log = {
 /**
  * Format a shadow property value as a var() reference or literal.
  * References are resolved through the primitive map so the var name matches
- * the actual primitive cssName (e.g. `{color.error}` → `var(--nx-focus-color-error)`
- * when the focus primitive provides it). This means shadow property references
- * can point to any primitive category, not just `--nx-shadow-*`.
+ * the actual primitive cssName. This means shadow property references can
+ * point to any primitive category, not just `--nx-shadow-*`.
  */
 function formatShadowPropertyAsVar(value, primitiveMap) {
   if (isReference(value)) {
@@ -853,10 +791,7 @@ function getBorderColorAliasName(cssName) {
  * @param {object[]} tokens - Array of semantic color tokens with cssName property (e.g., "color-border-default")
  * @returns {{ css: string, count: number }} Generated CSS and utility count
  */
-export function generateBorderColorAliasUtilitiesCSS(
-  tokens,
-  { runtimeFallback = false } = {}
-) {
+export function generateBorderColorAliasUtilitiesCSS(tokens) {
   const borderColorTokens = (tokens ?? [])
     .map((token) => ({ token, name: getBorderColorAliasName(token.cssName) }))
     .filter(({ name }) => name !== null)
@@ -874,9 +809,7 @@ export function generateBorderColorAliasUtilitiesCSS(
 
   for (const { token, name } of borderColorTokens) {
     css += `@utility border-color-${name} {\n`;
-    const value = runtimeFallback
-      ? `var(--nx-${token.cssName}, ${token.value})`
-      : `var(--${token.cssName})`;
+    const value = `var(--nx-${token.cssName}, ${token.value})`;
     css += `  border-color: ${value};\n`;
     css += `}\n\n`;
   }
@@ -1731,61 +1664,6 @@ export function collectShadowTokens(tokensDir, primitiveMap) {
 }
 
 /**
- * Collect semantic color tokens from a file with var() references
- * Used for static theming where colors reference --nx-* primitives
- *
- * @param {string} semanticDir - Path to semantic directory
- * @param {string} fileName - Semantic token file name
- * @param {Map} primitiveMap - Map of primitive token values (used for var reference generation)
- * @returns {object[]} Array of { cssName, value }
- */
-export function collectSemanticColorTokensVarRef(
-  semanticDir,
-  fileName,
-  primitiveMap
-) {
-  const filePath = path.join(semanticDir, fileName);
-  if (!fs.existsSync(filePath)) {
-    throw new Error(`Semantic color file missing: ${filePath}`);
-  }
-
-  const tokenData = readTokenFile(filePath);
-  const tokens = [];
-
-  function extractPaths(obj, pathParts = []) {
-    for (const [key, value] of Object.entries(obj)) {
-      if (key.startsWith('$')) continue;
-
-      const currentPath = [...pathParts, key];
-
-      if (value.$value !== undefined && value.$type === 'color') {
-        const cssName = `color-${currentPath.join('-')}`;
-        let resolvedValue = value.$value;
-
-        if (isReference(resolvedValue)) {
-          const refPath = resolvedValue.slice(1, -1);
-          const primitiveInfo = primitiveMap.get(refPath);
-          if (primitiveInfo) {
-            resolvedValue = `var(--${primitiveInfo.cssName})`;
-          } else {
-            resolvedValue = `var(--color-${refPath.replace(/\./g, '-')})`;
-          }
-        } else {
-          resolvedValue = formatTokenValue(resolvedValue, 'color', currentPath);
-        }
-
-        tokens.push({ cssName, value: resolvedValue });
-      } else if (typeof value === 'object' && !Array.isArray(value)) {
-        extractPaths(value, currentPath);
-      }
-    }
-  }
-
-  extractPaths(tokenData);
-  return tokens;
-}
-
-/**
  * Files in `semanticFiles.standalone` that own a dedicated dimension collector.
  * Callers iterating standalone files for the generic `collectSemanticDimensionTokens`
  * scan MUST skip these to avoid duplicate emission of the same `--*` variable
@@ -1806,8 +1684,7 @@ export const FILES_WITH_DEDICATED_DIMENSION_COLLECTORS = new Set([
 /**
  * Collect literal-valued `$type: dimension` leaves from a token file and
  * emit them with the path as the CSS-variable name — e.g. `focus.offset` →
- * `--focus-offset`. Mirrors `collectSemanticColorTokensVarRef` but for
- * dimensions, and skips the `color-` prefix so the path drives the variable
+ * `--focus-offset`. Skips the `color-` prefix so the path drives the variable
  * name directly.
  *
  * Filter behavior:

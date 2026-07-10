@@ -355,7 +355,7 @@ describe('createNexusThemeContract', () => {
       });
     });
 
-    it('does NOT migrate the legacy scalar `contrast` key — resets to defaults', () => {
+    it('does NOT migrate a pre-split scalar `contrast` key — resets to defaults', () => {
       const result = sanitizeNexusAppearance({
         mode: 'light',
         brandColor: '#0a0a0a',

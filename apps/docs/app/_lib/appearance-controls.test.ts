@@ -47,7 +47,7 @@ describe('docs appearance controls', () => {
       .forEach((node) => node.remove());
   });
 
-  it('defaults docs to provider system mode with the previous static mode values', () => {
+  it('defaults docs to provider system mode with the documented default values', () => {
     expect(DOCS_APPEARANCE_DEFAULT_STATE).toMatchObject({
       ...DEFAULT_NEXUS_APPEARANCE,
       mode: 'system',
@@ -59,7 +59,7 @@ describe('docs appearance controls', () => {
     });
   });
 
-  it('maps the old docs controls onto provider state fields', () => {
+  it('maps the docs controls onto provider state fields', () => {
     const state: NexusAppearanceState = {
       ...DOCS_APPEARANCE_DEFAULT_STATE,
       mode: 'light',

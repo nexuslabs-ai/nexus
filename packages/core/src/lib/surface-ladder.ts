@@ -130,7 +130,7 @@ export const LIGHT_SURFACE_LADDER = {
 } as const satisfies Record<SurfaceToken, ShadeAnchor>;
 
 // Current dark surfaces are bg-seed-relative and do not sit on shared shade
-// gridlines across tones, so Phase 1 preserves them as raw steps.
+// gridlines across tones, so the dark ladder keeps them as raw steps.
 export const DARK_SURFACE_LADDER = {
   background: 'base',
   'background-hover': { step: 1.6 },
