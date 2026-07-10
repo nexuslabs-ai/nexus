@@ -1,9 +1,8 @@
 'use client';
 
+import { useNexusAppearance } from '@nexus_ds/react/appearance';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-
-import { toggleDarkMode, useDarkMode } from '../_hooks/use-dark-mode';
 
 import { Button } from './nexus';
 import { SearchPalette } from './SearchPalette';
@@ -31,7 +30,13 @@ function isActive(pathname: string, match: string) {
 
 export function TopNav() {
   const pathname = usePathname();
-  const isDark = useDarkMode();
+  const { resolvedMode, setState } = useNexusAppearance();
+  const isDark = resolvedMode === 'dark';
+
+  const toggleMode = () => {
+    const nextMode = isDark ? 'light' : 'dark';
+    setState((current) => ({ ...current, mode: nextMode }));
+  };
 
   return (
     <header className="nx:sticky nx:top-0 nx:z-30 nx:flex nx:items-center nx:gap-6 nx:px-6 nx:py-3 nx:bg-nav-background nx:text-nav-foreground nx:border-b nx:border-nav-border">
@@ -63,8 +68,8 @@ export function TopNav() {
       <Button
         variant="ghost"
         size="sm"
-        onClick={toggleDarkMode}
-        aria-label="Toggle dark mode"
+        onClick={toggleMode}
+        aria-label={isDark ? 'Switch to light mode' : 'Switch to dark mode'}
       >
         {isDark ? '☀' : '◐'}
       </Button>

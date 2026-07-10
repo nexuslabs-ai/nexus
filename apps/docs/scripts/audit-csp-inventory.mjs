@@ -38,12 +38,11 @@ if (htmlFiles.length === 0) {
   process.exit(1);
 }
 
-let bootstrapScripts = 0;
 let appearanceScripts = 0;
 let inlineScripts = 0;
 let inlineStyleAttributes = 0;
-let serializedBootstrapReferences = 0;
 let serializedAppearanceReferences = 0;
+let serializedDocsStorageReferences = 0;
 let fixtureOrderChecks = 0;
 
 for (const file of htmlFiles) {
@@ -52,17 +51,14 @@ for (const file of htmlFiles) {
 
   inlineScripts += scripts.length;
   inlineStyleAttributes += html.match(/\sstyle="/g)?.length ?? 0;
-  bootstrapScripts += scripts.filter(([, attrs]) =>
-    attrs.includes('data-nexus-theme-bootstrap')
-  ).length;
   appearanceScripts += scripts.filter(([, attrs]) =>
     attrs.includes('data-nexus-appearance-script')
   ).length;
-  serializedBootstrapReferences += scripts.filter(([, , body]) =>
-    body.includes('nexus-docs-tokens')
-  ).length;
   serializedAppearanceReferences += scripts.filter(([, attrs, body]) =>
     `${attrs}\n${body}`.includes('data-nexus-appearance-script')
+  ).length;
+  serializedDocsStorageReferences += scripts.filter(([, , body]) =>
+    body.includes('nexus-docs-appearance')
   ).length;
 
   const scriptIndex = html.indexOf('data-nexus-appearance-script');
@@ -90,11 +86,10 @@ console.log(
     {
       htmlFiles: htmlFiles.length,
       inlineScripts,
-      bootstrapScripts,
       appearanceScripts,
-      nextInlineScripts: inlineScripts - bootstrapScripts - appearanceScripts,
-      serializedBootstrapReferences,
+      nextInlineScripts: inlineScripts - appearanceScripts,
       serializedAppearanceReferences,
+      serializedDocsStorageReferences,
       fixtureOrderChecks,
       inlineStyleAttributes,
     },
@@ -103,9 +98,9 @@ console.log(
   )
 );
 
-if (bootstrapScripts === 0) {
+if (appearanceScripts === 0) {
   console.error(
-    'Expected the docs theme bootstrap script in prerendered HTML.'
+    'Expected the docs appearance provider bootstrap script in prerendered HTML.'
   );
   process.exit(1);
 }
@@ -113,6 +108,13 @@ if (bootstrapScripts === 0) {
 if (serializedAppearanceReferences === 0) {
   console.error(
     'Expected the package appearance bootstrap script in the built fixture.'
+  );
+  process.exit(1);
+}
+
+if (serializedDocsStorageReferences === 0) {
+  console.error(
+    'Expected the docs appearance provider bootstrap script to use the docs storage key.'
   );
   process.exit(1);
 }
