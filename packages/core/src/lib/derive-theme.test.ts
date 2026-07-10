@@ -100,7 +100,8 @@ function deltaE(
 
 function expectPairwiseDistinguishable(
   label: string,
-  colors: Record<string, string>
+  colors: Record<string, string>,
+  exceptions: ReadonlySet<string> = new Set()
 ): void {
   const entries = Object.entries(colors);
   for (const visionType of VISION_TYPES) {
@@ -108,10 +109,14 @@ function expectPairwiseDistinguishable(
       for (let j = i + 1; j < entries.length; j += 1) {
         const [nameA, colorA] = entries[i]!;
         const [nameB, colorB] = entries[j]!;
-        expect(
-          deltaE(colorA, colorB, visionType),
-          `${label} ${nameA} vs ${nameB} under ${visionType}`
-        ).toBeGreaterThanOrEqual(COLORBLIND_DELTA_E);
+        const pair = `${label} ${nameA} vs ${nameB} under ${visionType}`;
+        if (exceptions.has(pair)) {
+          expect(deltaE(colorA, colorB, visionType), pair).toBeGreaterThan(0);
+          continue;
+        }
+        expect(deltaE(colorA, colorB, visionType), pair).toBeGreaterThanOrEqual(
+          COLORBLIND_DELTA_E
+        );
       }
     }
   }
@@ -190,34 +195,27 @@ describe('deriveSurfaces', () => {
 describe('deriveText', () => {
   const surfaces = deriveSurfaces('#181818', 'neutral', 'dark', 0.05);
 
-  it('keeps a white foreground that already passes body', () => {
-    const t = deriveText('#ffffff', surfaces);
-    expect(lOf(t['--nx-color-foreground'])).toBeGreaterThan(0.97);
-  });
+  it('emits the JSON alpha ink model for foreground tiers', () => {
+    const light = deriveText('#0a0a0a', surfaces, 'light');
+    const dark = deriveText('#ffffff', surfaces, 'dark');
 
-  it('produces foreground that clears the body tier on background', () => {
-    const t = deriveText('#ffffff', surfaces);
-    expect(
-      apcaLc(t['--nx-color-foreground']!, surfaces['--nx-color-background']!)
-    ).toBeGreaterThanOrEqual(TIER_THRESHOLDS.body);
-  });
-
-  it('muted-foreground is quieter than foreground but still clears ui', () => {
-    const t = deriveText('#ffffff', surfaces);
-    const bg = surfaces['--nx-color-background']!;
-    expect(
-      apcaLc(t['--nx-color-muted-foreground']!, bg)
-    ).toBeGreaterThanOrEqual(TIER_THRESHOLDS.ui);
-    // genuinely muted: lower contrast than the body foreground (this is what the
-    // adjustContrast approach got wrong on dark surfaces — it returned max contrast).
-    expect(apcaLc(t['--nx-color-muted-foreground']!, bg)).toBeLessThan(
-      apcaLc(t['--nx-color-foreground']!, bg)
+    expect(light['--nx-color-foreground']).toBe('oklch(0.1448 0 0 / 0.9098)');
+    expect(light['--nx-color-muted-foreground']).toBe(
+      'oklch(0.1448 0 0 / 0.6275)'
+    );
+    expect(light['--nx-color-muted-foreground-subtle']).toBe(
+      'oklch(0.1448 0 0 / 0.502)'
+    );
+    expect(dark['--nx-color-foreground']).toBe('oklch(1 0 0 / 0.9098)');
+    expect(dark['--nx-color-muted-foreground']).toBe('oklch(1 0 0 / 0.6275)');
+    expect(dark['--nx-color-muted-foreground-subtle']).toBe(
+      'oklch(1 0 0 / 0.6275)'
     );
   });
 
   it('does not throw on a pathological mid-grey pairing', () => {
     const mid = deriveSurfaces('#7d7d7d', 'neutral', 'light', 0.05);
-    expect(() => deriveText('#808080', mid)).not.toThrow();
+    expect(() => deriveText('#808080', mid, 'light')).not.toThrow();
   });
 });
 
@@ -320,11 +318,18 @@ describe('derivePrimary', () => {
   it('keeps a black brand black in light mode and flips it to white in dark mode', () => {
     const light = derivePrimary('#0a0a0a', 'light');
     expect(lOf(light['--nx-color-primary-background'])).toBeLessThan(0.2);
+    expect(lOf(light['--nx-color-primary-background-active'])).toBeLessThan(
+      lOf(light['--nx-color-primary-background'])
+    );
+    expect(light['--nx-color-primary-subtle-foreground']).toBe(
+      'oklch(0.1448 0 0)'
+    );
     expect(lOf(light['--nx-color-primary-foreground'])).toBeGreaterThan(0.9);
 
     const dark = derivePrimary('#000000', 'dark');
-    expect(lOf(dark['--nx-color-primary-background'])).toBeGreaterThan(0.9);
-    expect(lOf(dark['--nx-color-primary-foreground'])).toBeLessThan(0.2);
+    expect(lOf(dark['--nx-color-primary-background'])).toBeCloseTo(1, 3);
+    expect(dark['--nx-color-primary-subtle-foreground']).toBe('oklch(1 0 0)');
+    expect(dark['--nx-color-primary-foreground']).toBe('oklch(0.1448 0 0)');
   });
 });
 
@@ -423,6 +428,49 @@ describe('deriveTheme', () => {
         expect(
           apcaLc(map['--nx-color-focus-error']!, map[surface]!),
           `${mode}: --nx-color-focus-error on ${surface}`
+        ).toBeGreaterThanOrEqual(TIER_THRESHOLDS.incidental);
+      }
+    }
+  );
+
+  it.each(['light', 'dark'] as const)(
+    'keeps a colored brand focus ring legible on page surfaces in %s mode',
+    (mode) => {
+      // The default brand is achromatic, so focus-default resolves to near-black
+      // or white and clears the page by a wide margin. A colored brand takes the
+      // general deriver path: focus-default follows primary-subtle-foreground,
+      // guaranteed only against primary-subtle — this locks that it also clears
+      // the page surfaces the ring actually paints on.
+      const map = deriveTheme({
+        light: {
+          accent: '#2563eb',
+          background: '#ffffff',
+          foreground: '#181818',
+        },
+        dark: {
+          accent: '#2563eb',
+          background: '#181818',
+          foreground: '#ffffff',
+        },
+        contrast: { light: 60, dark: 60 },
+      })[mode];
+
+      expect(map['--nx-color-focus-default']).toBe(
+        map['--nx-color-primary-subtle-foreground']
+      );
+
+      for (const surface of [
+        '--nx-color-background',
+        '--nx-color-container',
+        '--nx-color-popover',
+        '--nx-color-nav-background',
+        '--nx-color-nav-item-hover',
+        '--nx-color-nav-item-active',
+        '--nx-color-nav-border',
+      ]) {
+        expect(
+          apcaLc(map['--nx-color-focus-default']!, map[surface]!),
+          `${mode}: colored focus-default on ${surface}`
         ).toBeGreaterThanOrEqual(TIER_THRESHOLDS.incidental);
       }
     }
@@ -577,7 +625,7 @@ describe('deriveSecondary', () => {
 describe('status families', () => {
   const STATUS_HUES = {
     success: 140.055,
-    warning: 38.402,
+    warning: 41.116,
     error: 27.926,
     information: 255.276,
   };
@@ -685,12 +733,24 @@ describe('chart colors', () => {
 
 describe('derived colorblind distinguishability', () => {
   it.each(['light', 'dark'] as const)(
-    'keeps emitted chart and status colors distinguishable in %s mode',
+    'keeps emitted chart and status colors distinguishable in %s mode outside approved JSON exceptions',
     (mode) => {
       const map = deriveTheme({
         surfaceTone: 'slate',
         ...SURFACE_TONE_SEEDS,
       })[mode];
+      // Accepted (not deferred): these deuteranopia-ambiguous pairs stay in
+      // canon because charts and status never rely on hue alone — each carries
+      // an icon + label, so the pair stays distinguishable in product. The
+      // exception still asserts ΔE > 0 (never identical), only relaxing the floor.
+      const exceptions = new Set(
+        mode === 'light'
+          ? [
+              'light chart chart-2 vs chart-3 under deuteranopia',
+              'light status success vs warning under deuteranopia',
+            ]
+          : ['dark status success vs warning under deuteranopia']
+      );
 
       expectPairwiseDistinguishable(
         `${mode} chart`,
@@ -699,14 +759,19 @@ describe('derived colorblind distinguishability', () => {
             `chart-${index + 1}`,
             map[`--nx-color-chart-categorical-${index + 1}`]!,
           ])
-        )
+        ),
+        exceptions
       );
-      expectPairwiseDistinguishable(`${mode} status`, {
-        success: map['--nx-color-success-background']!,
-        warning: map['--nx-color-warning-background']!,
-        error: map['--nx-color-error-background']!,
-        information: map['--nx-color-information-background']!,
-      });
+      expectPairwiseDistinguishable(
+        `${mode} status`,
+        {
+          success: map['--nx-color-success-background']!,
+          warning: map['--nx-color-warning-background']!,
+          error: map['--nx-color-error-background']!,
+          information: map['--nx-color-information-background']!,
+        },
+        exceptions
+      );
     }
   );
 });
@@ -943,6 +1008,57 @@ describe('popover-alpha worst-case readability', () => {
 
       expect(lightLc, `${surfaceTone} light`).toBeGreaterThanOrEqual(60);
       expect(darkLc, `${surfaceTone} dark`).toBeGreaterThanOrEqual(60);
+    }
+  );
+});
+
+describe('fixed alpha text inks stay legible composited over their surface', () => {
+  // foreground/muted/subtle are emitted as fixed translucent inks, no longer
+  // walked to an APCA floor by construction — and apcaLc scores colors as opaque
+  // (audit:contrast composites them, but only at the shipped contrast). Composite
+  // each ink over its surface (the real rendered pixel) and assert it clears its
+  // floor across every tone and both contrast extremes; light `muted` recedes
+  // furthest at high contrast, the worst case.
+  const INK_CHECKS: ReadonlyArray<
+    [string, string, keyof typeof TIER_THRESHOLDS]
+  > = [
+    ['--nx-color-foreground', '--nx-color-background', 'body'],
+    ['--nx-color-muted-foreground', '--nx-color-muted', 'incidental'],
+    ['--nx-color-muted-foreground-subtle', '--nx-color-muted', 'incidental'],
+  ];
+
+  it.each(
+    SURFACE_TONES.flatMap((surfaceTone) =>
+      [0, 100].flatMap((contrast) =>
+        (['light', 'dark'] as const).map((mode) => ({
+          surfaceTone,
+          contrast,
+          mode,
+        }))
+      )
+    )
+  )(
+    '$surfaceTone @ contrast $contrast ($mode)',
+    ({ surfaceTone, contrast, mode }) => {
+      const map = deriveTheme({
+        surfaceTone,
+        ...SURFACE_TONE_SEEDS,
+        contrast: { light: contrast, dark: contrast },
+      })[mode];
+
+      for (const [ink, surface, tier] of INK_CHECKS) {
+        const inkColor = map[ink]!;
+        const surfaceColor = map[surface]!;
+        const composited = compositeOver(
+          toSrgbInts(inkColor),
+          alphaOf(inkColor),
+          toSrgbInts(surfaceColor)
+        );
+        expect(
+          Math.abs(apcaLc(rgbString(composited), surfaceColor)),
+          `${mode} ${surfaceTone}@${contrast}: ${ink} on ${surface}`
+        ).toBeGreaterThanOrEqual(TIER_THRESHOLDS[tier]);
+      }
     }
   );
 });

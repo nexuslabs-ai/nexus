@@ -17,7 +17,8 @@ function toSrgbInts(input: string): [number, number, number] {
 /**
  * Absolute APCA Lc of `foreground` on `background`. Both accept any CSS color
  * string culori can parse (hex, rgb, oklch). Inputs must be opaque — alpha is
- * not pre-blended (mirrors the engine, which only emits opaque colors).
+ * dropped, not pre-blended, so a translucent ink (e.g. the text-tier alpha
+ * inks) must be composited over its surface by the caller before scoring.
  */
 export function apcaLc(foreground: string, background: string): number {
   return Math.abs(

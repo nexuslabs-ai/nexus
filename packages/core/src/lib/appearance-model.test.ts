@@ -26,7 +26,7 @@ describe('appearance model', () => {
       brandColor: DEFAULT_BRAND_COLOR,
       surfaceTone: 'stone',
       lightContrast: 60,
-      darkContrast: 60,
+      darkContrast: 0,
       density: 'default',
       corners: 'square',
       elevation: 'quiet',
@@ -271,7 +271,7 @@ describe('createNexusThemeContract', () => {
       BASE_TONE_SEEDS.slate.dark.foreground
     );
     expect(contract.surfaceTone).toBe('slate');
-    expect(contract.contrast).toEqual({ light: 60, dark: 60 });
+    expect(contract.contrast).toEqual({ light: 60, dark: 0 });
   });
 
   it.each(['stone', 'neutral', 'zinc', 'slate', 'gray'] as const)(
@@ -304,7 +304,7 @@ describe('createNexusThemeContract', () => {
     it('falls back per-field on out-of-range, NaN, and wrong type', () => {
       expect(clean({ lightContrast: 999, darkContrast: -5 })).toMatchObject({
         lightContrast: 60,
-        darkContrast: 60,
+        darkContrast: 0,
       });
       expect(
         clean({ lightContrast: Number.NaN, darkContrast: 42 })
@@ -330,7 +330,7 @@ describe('createNexusThemeContract', () => {
         stroke: 'normal',
         prefs: DEFAULT_NEXUS_APPEARANCE.prefs,
       });
-      expect(result).toMatchObject({ lightContrast: 60, darkContrast: 60 });
+      expect(result).toMatchObject({ lightContrast: 60, darkContrast: 0 });
     });
   });
 });

@@ -104,7 +104,7 @@ export const DEFAULT_NEXUS_APPEARANCE: NexusAppearanceState = {
   brandColor: DEFAULT_BRAND_COLOR,
   surfaceTone: 'stone',
   lightContrast: 60,
-  darkContrast: 60,
+  darkContrast: 0,
   density: 'default',
   corners: 'square',
   elevation: 'quiet',

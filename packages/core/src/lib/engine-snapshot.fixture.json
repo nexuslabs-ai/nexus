@@ -95,9 +95,9 @@
         "alpha": 1
       },
       "chart-categorical-2": {
-        "l": 0.52,
+        "l": 0.61,
         "c": 0.1871,
-        "h": 140.022,
+        "h": 131.589,
         "alpha": 1
       },
       "chart-categorical-3": {
@@ -185,7 +185,7 @@
         "alpha": 1
       },
       "focus-default": {
-        "l": 0.46,
+        "l": 0.1448,
         "c": 0,
         "h": 0,
         "alpha": 1
@@ -195,6 +195,12 @@
         "c": 0.2523,
         "h": 27.926,
         "alpha": 1
+      },
+      "foreground": {
+        "l": 0.1448,
+        "c": 0,
+        "h": 0,
+        "alpha": 0.9098
       },
       "information-background": {
         "l": 0.546,
@@ -250,6 +256,18 @@
         "h": 257.472,
         "alpha": 1
       },
+      "muted-foreground": {
+        "l": 0.1448,
+        "c": 0,
+        "h": 0,
+        "alpha": 0.6275
+      },
+      "muted-foreground-subtle": {
+        "l": 0.1448,
+        "c": 0,
+        "h": 0,
+        "alpha": 0.502
+      },
       "popover": {
         "l": 1,
         "c": 0,
@@ -269,13 +287,13 @@
         "alpha": 1
       },
       "primary-background-active": {
-        "l": 0.2448,
+        "l": 0.118,
         "c": 0,
         "h": 0,
         "alpha": 1
       },
       "primary-background-hover": {
-        "l": 0.1948,
+        "l": 0.207,
         "c": 0,
         "h": 0,
         "alpha": 1
@@ -305,7 +323,7 @@
         "alpha": 1
       },
       "primary-subtle-foreground": {
-        "l": 0.46,
+        "l": 0.1448,
         "c": 0,
         "h": 0,
         "alpha": 1
@@ -425,21 +443,21 @@
         "alpha": 1
       },
       "warning-background": {
-        "l": 0.52,
-        "c": 0.1809,
-        "h": 38.402,
+        "l": 0.62,
+        "c": 0.2044,
+        "h": 41.116,
         "alpha": 1
       },
       "warning-background-active": {
-        "l": 0.34,
-        "c": 0.1188,
-        "h": 38.172,
-        "alpha": 1
-      },
-      "warning-background-hover": {
         "l": 0.43,
         "c": 0.153,
         "h": 37.304,
+        "alpha": 1
+      },
+      "warning-background-hover": {
+        "l": 0.52,
+        "c": 0.1809,
+        "h": 38.402,
         "alpha": 1
       },
       "warning-disabled": {
@@ -484,13 +502,13 @@
         "l": 1,
         "c": 0,
         "h": 0,
-        "alpha": 0.1882
+        "alpha": 0.12
       },
       "border-disabled": {
         "l": 1,
         "c": 0,
         "h": 0,
-        "alpha": 0.1882
+        "alpha": 0.12
       },
       "border-error": {
         "l": 0.505,
@@ -649,7 +667,7 @@
         "alpha": 1
       },
       "focus-default": {
-        "l": 0.765,
+        "l": 1,
         "c": 0,
         "h": 0,
         "alpha": 1
@@ -659,6 +677,12 @@
         "c": 0.1333,
         "h": 28.058,
         "alpha": 1
+      },
+      "foreground": {
+        "l": 1,
+        "c": 0,
+        "h": 0,
+        "alpha": 0.9098
       },
       "information-background": {
         "l": 0.546,
@@ -714,20 +738,32 @@
         "h": 254.902,
         "alpha": 1
       },
+      "muted-foreground": {
+        "l": 1,
+        "c": 0,
+        "h": 0,
+        "alpha": 0.6275
+      },
+      "muted-foreground-subtle": {
+        "l": 1,
+        "c": 0,
+        "h": 0,
+        "alpha": 0.6275
+      },
       "primary-background": {
-        "l": 0.9104,
+        "l": 1,
         "c": 0,
         "h": 0,
         "alpha": 1
       },
       "primary-background-active": {
-        "l": 0.8104,
+        "l": 0.87,
         "c": 0,
         "h": 0,
         "alpha": 1
       },
       "primary-background-hover": {
-        "l": 0.8604,
+        "l": 0.945,
         "c": 0,
         "h": 0,
         "alpha": 1
@@ -739,7 +775,7 @@
         "alpha": 1
       },
       "primary-foreground": {
-        "l": 0,
+        "l": 0.1448,
         "c": 0,
         "h": 0,
         "alpha": 1
@@ -757,7 +793,7 @@
         "alpha": 1
       },
       "primary-subtle-foreground": {
-        "l": 0.765,
+        "l": 1,
         "c": 0,
         "h": 0,
         "alpha": 1
@@ -877,21 +913,21 @@
         "alpha": 1
       },
       "warning-background": {
-        "l": 0.52,
-        "c": 0.1809,
-        "h": 38.402,
+        "l": 0.62,
+        "c": 0.2044,
+        "h": 41.116,
         "alpha": 1
       },
       "warning-background-active": {
-        "l": 0.34,
-        "c": 0.1188,
-        "h": 38.172,
-        "alpha": 1
-      },
-      "warning-background-hover": {
         "l": 0.43,
         "c": 0.153,
         "h": 37.304,
+        "alpha": 1
+      },
+      "warning-background-hover": {
+        "l": 0.52,
+        "c": 0.1809,
+        "h": 38.402,
         "alpha": 1
       },
       "warning-disabled": {
@@ -1007,28 +1043,10 @@
           "h": 56.043,
           "alpha": 1
         },
-        "foreground": {
-          "l": 0.2161,
-          "c": 0.0061,
-          "h": 56.043,
-          "alpha": 1
-        },
         "muted": {
           "l": 0.9698,
           "c": 0.0083,
           "h": 70,
-          "alpha": 1
-        },
-        "muted-foreground": {
-          "l": 0.5297,
-          "c": 0.0061,
-          "h": 56.043,
-          "alpha": 1
-        },
-        "muted-foreground-subtle": {
-          "l": 0.6306,
-          "c": 0.0061,
-          "h": 56.043,
           "alpha": 1
         },
         "nav-background": {
@@ -1106,13 +1124,13 @@
           "alpha": 1
         },
         "background-active": {
-          "l": 0.3057,
+          "l": 0.2481,
           "c": 0.006,
           "h": 70,
           "alpha": 1
         },
         "background-hover": {
-          "l": 0.3057,
+          "l": 0.2481,
           "c": 0.006,
           "h": 70,
           "alpha": 1
@@ -1121,10 +1139,10 @@
           "l": 0.13,
           "c": 0.006,
           "h": 70,
-          "alpha": 0.0627
+          "alpha": 0.04
         },
         "border-active": {
-          "l": 0.7582,
+          "l": 0.4097,
           "c": 0.006,
           "h": 70,
           "alpha": 1
@@ -1133,16 +1151,16 @@
           "l": 0.13,
           "c": 0.006,
           "h": 70,
-          "alpha": 0.1882
+          "alpha": 0.12
         },
         "container": {
-          "l": 0.3057,
+          "l": 0.2481,
           "c": 0.006,
           "h": 70,
           "alpha": 1
         },
         "container-active": {
-          "l": 0.3057,
+          "l": 0.2481,
           "c": 0.006,
           "h": 70,
           "alpha": 1
@@ -1154,67 +1172,49 @@
           "alpha": 1
         },
         "container-hover": {
-          "l": 0.3953,
+          "l": 0.2801,
           "c": 0.006,
           "h": 70,
           "alpha": 1
         },
         "control-background": {
-          "l": 0.3953,
+          "l": 0.2801,
           "c": 0.006,
           "h": 70,
           "alpha": 1
         },
         "control-background-hover": {
-          "l": 0.4849,
+          "l": 0.3121,
           "c": 0.006,
           "h": 70,
           "alpha": 1
         },
         "disabled": {
-          "l": 0.3057,
+          "l": 0.2481,
           "c": 0.006,
           "h": 70,
           "alpha": 1
         },
         "disabled-foreground": {
-          "l": 0.7132,
-          "c": 0.0013,
-          "h": 106.424,
-          "alpha": 1
-        },
-        "foreground": {
-          "l": 0.9848,
+          "l": 0.6901,
           "c": 0.0013,
           "h": 106.424,
           "alpha": 1
         },
         "muted": {
-          "l": 0.3057,
+          "l": 0.2481,
           "c": 0.006,
           "h": 70,
           "alpha": 1
         },
-        "muted-foreground": {
-          "l": 0.8311,
-          "c": 0.0013,
-          "h": 106.424,
-          "alpha": 1
-        },
-        "muted-foreground-subtle": {
-          "l": 0.7471,
-          "c": 0.0013,
-          "h": 106.424,
-          "alpha": 1
-        },
         "nav-background": {
-          "l": 0.3057,
+          "l": 0.2481,
           "c": 0.006,
           "h": 70,
           "alpha": 1
         },
         "nav-border": {
-          "l": 0.3953,
+          "l": 0.2801,
           "c": 0.006,
           "h": 70,
           "alpha": 1
@@ -1226,19 +1226,19 @@
           "alpha": 1
         },
         "nav-item-active": {
-          "l": 0.3953,
+          "l": 0.2801,
           "c": 0.006,
           "h": 70,
           "alpha": 1
         },
         "nav-item-hover": {
-          "l": 0.3953,
+          "l": 0.2801,
           "c": 0.006,
           "h": 70,
           "alpha": 1
         },
         "nav-muted-foreground": {
-          "l": 0.849,
+          "l": 0.8375,
           "c": 0.0013,
           "h": 106.424,
           "alpha": 1
@@ -1250,13 +1250,13 @@
           "alpha": 0.8471
         },
         "popover": {
-          "l": 0.3953,
+          "l": 0.2801,
           "c": 0.006,
           "h": 70,
           "alpha": 1
         },
         "popover-active": {
-          "l": 0.3953,
+          "l": 0.2801,
           "c": 0.006,
           "h": 70,
           "alpha": 1
@@ -1280,7 +1280,7 @@
           "alpha": 1
         },
         "popover-hover": {
-          "l": 0.4849,
+          "l": 0.3121,
           "c": 0.006,
           "h": 70,
           "alpha": 1
@@ -1361,26 +1361,8 @@
           "h": 0,
           "alpha": 1
         },
-        "foreground": {
-          "l": 0.2046,
-          "c": 0,
-          "h": 0,
-          "alpha": 1
-        },
         "muted": {
           "l": 0.9698,
-          "c": 0,
-          "h": 0,
-          "alpha": 1
-        },
-        "muted-foreground": {
-          "l": 0.5228,
-          "c": 0,
-          "h": 0,
-          "alpha": 1
-        },
-        "muted-foreground-subtle": {
-          "l": 0.6255,
           "c": 0,
           "h": 0,
           "alpha": 1
@@ -1460,13 +1442,13 @@
           "alpha": 1
         },
         "background-active": {
-          "l": 0.2942,
+          "l": 0.2366,
           "c": 0,
           "h": 0,
           "alpha": 1
         },
         "background-hover": {
-          "l": 0.2942,
+          "l": 0.2366,
           "c": 0,
           "h": 0,
           "alpha": 1
@@ -1475,10 +1457,10 @@
           "l": 0.13,
           "c": 0,
           "h": 0,
-          "alpha": 0.0627
+          "alpha": 0.04
         },
         "border-active": {
-          "l": 0.7467,
+          "l": 0.3982,
           "c": 0,
           "h": 0,
           "alpha": 1
@@ -1487,16 +1469,16 @@
           "l": 0.13,
           "c": 0,
           "h": 0,
-          "alpha": 0.1882
+          "alpha": 0.12
         },
         "container": {
-          "l": 0.2942,
+          "l": 0.2366,
           "c": 0,
           "h": 0,
           "alpha": 1
         },
         "container-active": {
-          "l": 0.2942,
+          "l": 0.2366,
           "c": 0,
           "h": 0,
           "alpha": 1
@@ -1508,67 +1490,49 @@
           "alpha": 1
         },
         "container-hover": {
-          "l": 0.3838,
+          "l": 0.2686,
           "c": 0,
           "h": 0,
           "alpha": 1
         },
         "control-background": {
-          "l": 0.3838,
+          "l": 0.2686,
           "c": 0,
           "h": 0,
           "alpha": 1
         },
         "control-background-hover": {
-          "l": 0.4734,
+          "l": 0.3006,
           "c": 0,
           "h": 0,
           "alpha": 1
         },
         "disabled": {
-          "l": 0.2942,
+          "l": 0.2366,
           "c": 0,
           "h": 0,
           "alpha": 1
         },
         "disabled-foreground": {
-          "l": 0.7087,
-          "c": 0,
-          "h": 0,
-          "alpha": 1
-        },
-        "foreground": {
-          "l": 0.9851,
+          "l": 0.6857,
           "c": 0,
           "h": 0,
           "alpha": 1
         },
         "muted": {
-          "l": 0.2942,
-          "c": 0,
-          "h": 0,
-          "alpha": 1
-        },
-        "muted-foreground": {
-          "l": 0.829,
-          "c": 0,
-          "h": 0,
-          "alpha": 1
-        },
-        "muted-foreground-subtle": {
-          "l": 0.7433,
+          "l": 0.2366,
           "c": 0,
           "h": 0,
           "alpha": 1
         },
         "nav-background": {
-          "l": 0.2942,
+          "l": 0.2366,
           "c": 0,
           "h": 0,
           "alpha": 1
         },
         "nav-border": {
-          "l": 0.3838,
+          "l": 0.2686,
           "c": 0,
           "h": 0,
           "alpha": 1
@@ -1580,19 +1544,19 @@
           "alpha": 1
         },
         "nav-item-active": {
-          "l": 0.3838,
+          "l": 0.2686,
           "c": 0,
           "h": 0,
           "alpha": 1
         },
         "nav-item-hover": {
-          "l": 0.3838,
+          "l": 0.2686,
           "c": 0,
           "h": 0,
           "alpha": 1
         },
         "nav-muted-foreground": {
-          "l": 0.8469,
+          "l": 0.8354,
           "c": 0,
           "h": 0,
           "alpha": 1
@@ -1604,13 +1568,13 @@
           "alpha": 0.8471
         },
         "popover": {
-          "l": 0.3838,
+          "l": 0.2686,
           "c": 0,
           "h": 0,
           "alpha": 1
         },
         "popover-active": {
-          "l": 0.3838,
+          "l": 0.2686,
           "c": 0,
           "h": 0,
           "alpha": 1
@@ -1634,7 +1598,7 @@
           "alpha": 1
         },
         "popover-hover": {
-          "l": 0.4734,
+          "l": 0.3006,
           "c": 0,
           "h": 0,
           "alpha": 1
@@ -1715,28 +1679,10 @@
           "h": 285.885,
           "alpha": 1
         },
-        "foreground": {
-          "l": 0.2103,
-          "c": 0.0059,
-          "h": 285.885,
-          "alpha": 1
-        },
         "muted": {
           "l": 0.9698,
           "c": 0.0052,
           "h": 262.8,
-          "alpha": 1
-        },
-        "muted-foreground": {
-          "l": 0.5262,
-          "c": 0.0059,
-          "h": 285.885,
-          "alpha": 1
-        },
-        "muted-foreground-subtle": {
-          "l": 0.628,
-          "c": 0.0059,
-          "h": 285.885,
           "alpha": 1
         },
         "nav-background": {
@@ -1814,13 +1760,13 @@
           "alpha": 1
         },
         "background-active": {
-          "l": 0.2999,
+          "l": 0.2423,
           "c": 0.005,
           "h": 262.8,
           "alpha": 1
         },
         "background-hover": {
-          "l": 0.2999,
+          "l": 0.2423,
           "c": 0.005,
           "h": 262.8,
           "alpha": 1
@@ -1829,10 +1775,10 @@
           "l": 0.13,
           "c": 0.005,
           "h": 262.8,
-          "alpha": 0.0627
+          "alpha": 0.04
         },
         "border-active": {
-          "l": 0.7524,
+          "l": 0.4039,
           "c": 0.005,
           "h": 262.8,
           "alpha": 1
@@ -1841,16 +1787,16 @@
           "l": 0.13,
           "c": 0.005,
           "h": 262.8,
-          "alpha": 0.1882
+          "alpha": 0.12
         },
         "container": {
-          "l": 0.2999,
+          "l": 0.2423,
           "c": 0.005,
           "h": 262.8,
           "alpha": 1
         },
         "container-active": {
-          "l": 0.2999,
+          "l": 0.2423,
           "c": 0.005,
           "h": 262.8,
           "alpha": 1
@@ -1862,67 +1808,49 @@
           "alpha": 1
         },
         "container-hover": {
-          "l": 0.3895,
+          "l": 0.2743,
           "c": 0.005,
           "h": 262.8,
           "alpha": 1
         },
         "control-background": {
-          "l": 0.3895,
+          "l": 0.2743,
           "c": 0.005,
           "h": 262.8,
           "alpha": 1
         },
         "control-background-hover": {
-          "l": 0.4791,
+          "l": 0.3063,
           "c": 0.005,
           "h": 262.8,
           "alpha": 1
         },
         "disabled": {
-          "l": 0.2999,
+          "l": 0.2423,
           "c": 0.005,
           "h": 262.8,
           "alpha": 1
         },
         "disabled-foreground": {
-          "l": 0.711,
-          "c": 0,
-          "h": 0,
-          "alpha": 1
-        },
-        "foreground": {
-          "l": 0.9851,
+          "l": 0.688,
           "c": 0,
           "h": 0,
           "alpha": 1
         },
         "muted": {
-          "l": 0.2999,
+          "l": 0.2423,
           "c": 0.005,
           "h": 262.8,
           "alpha": 1
         },
-        "muted-foreground": {
-          "l": 0.8301,
-          "c": 0,
-          "h": 0,
-          "alpha": 1
-        },
-        "muted-foreground-subtle": {
-          "l": 0.7453,
-          "c": 0,
-          "h": 0,
-          "alpha": 1
-        },
         "nav-background": {
-          "l": 0.2999,
+          "l": 0.2423,
           "c": 0.005,
           "h": 262.8,
           "alpha": 1
         },
         "nav-border": {
-          "l": 0.3895,
+          "l": 0.2743,
           "c": 0.005,
           "h": 262.8,
           "alpha": 1
@@ -1934,19 +1862,19 @@
           "alpha": 1
         },
         "nav-item-active": {
-          "l": 0.3895,
+          "l": 0.2743,
           "c": 0.005,
           "h": 262.8,
           "alpha": 1
         },
         "nav-item-hover": {
-          "l": 0.3895,
+          "l": 0.2743,
           "c": 0.005,
           "h": 262.8,
           "alpha": 1
         },
         "nav-muted-foreground": {
-          "l": 0.8481,
+          "l": 0.8365,
           "c": 0,
           "h": 0,
           "alpha": 1
@@ -1958,13 +1886,13 @@
           "alpha": 0.8471
         },
         "popover": {
-          "l": 0.3895,
+          "l": 0.2743,
           "c": 0.005,
           "h": 262.8,
           "alpha": 1
         },
         "popover-active": {
-          "l": 0.3895,
+          "l": 0.2743,
           "c": 0.005,
           "h": 262.8,
           "alpha": 1
@@ -1988,7 +1916,7 @@
           "alpha": 1
         },
         "popover-hover": {
-          "l": 0.4791,
+          "l": 0.3063,
           "c": 0.005,
           "h": 262.8,
           "alpha": 1
@@ -2069,28 +1997,10 @@
           "h": 265.755,
           "alpha": 1
         },
-        "foreground": {
-          "l": 0.2077,
-          "c": 0.0398,
-          "h": 265.755,
-          "alpha": 1
-        },
         "muted": {
           "l": 0.9698,
           "c": 0.0115,
           "h": 264.7,
-          "alpha": 1
-        },
-        "muted-foreground": {
-          "l": 0.5246,
-          "c": 0.0398,
-          "h": 265.755,
-          "alpha": 1
-        },
-        "muted-foreground-subtle": {
-          "l": 0.6268,
-          "c": 0.0398,
-          "h": 265.755,
           "alpha": 1
         },
         "nav-background": {
@@ -2168,13 +2078,13 @@
           "alpha": 1
         },
         "background-active": {
-          "l": 0.2973,
+          "l": 0.2397,
           "c": 0.04,
           "h": 264.7,
           "alpha": 1
         },
         "background-hover": {
-          "l": 0.2973,
+          "l": 0.2397,
           "c": 0.04,
           "h": 264.7,
           "alpha": 1
@@ -2183,10 +2093,10 @@
           "l": 0.13,
           "c": 0.04,
           "h": 264.7,
-          "alpha": 0.0627
+          "alpha": 0.04
         },
         "border-active": {
-          "l": 0.7498,
+          "l": 0.4013,
           "c": 0.04,
           "h": 264.7,
           "alpha": 1
@@ -2195,16 +2105,16 @@
           "l": 0.13,
           "c": 0.04,
           "h": 264.7,
-          "alpha": 0.1882
+          "alpha": 0.12
         },
         "container": {
-          "l": 0.2973,
+          "l": 0.2397,
           "c": 0.04,
           "h": 264.7,
           "alpha": 1
         },
         "container-active": {
-          "l": 0.2973,
+          "l": 0.2397,
           "c": 0.04,
           "h": 264.7,
           "alpha": 1
@@ -2216,67 +2126,49 @@
           "alpha": 1
         },
         "container-hover": {
-          "l": 0.3869,
+          "l": 0.2717,
           "c": 0.04,
           "h": 264.7,
           "alpha": 1
         },
         "control-background": {
-          "l": 0.3869,
+          "l": 0.2717,
           "c": 0.04,
           "h": 264.7,
           "alpha": 1
         },
         "control-background-hover": {
-          "l": 0.4765,
+          "l": 0.3037,
           "c": 0.04,
           "h": 264.7,
           "alpha": 1
         },
         "disabled": {
-          "l": 0.2973,
+          "l": 0.2397,
           "c": 0.04,
           "h": 264.7,
           "alpha": 1
         },
         "disabled-foreground": {
-          "l": 0.7094,
-          "c": 0.0034,
-          "h": 247.858,
-          "alpha": 1
-        },
-        "foreground": {
-          "l": 0.9842,
+          "l": 0.6864,
           "c": 0.0034,
           "h": 247.858,
           "alpha": 1
         },
         "muted": {
-          "l": 0.2973,
+          "l": 0.2397,
           "c": 0.04,
           "h": 264.7,
           "alpha": 1
         },
-        "muted-foreground": {
-          "l": 0.8289,
-          "c": 0.0034,
-          "h": 247.858,
-          "alpha": 1
-        },
-        "muted-foreground-subtle": {
-          "l": 0.7438,
-          "c": 0.0034,
-          "h": 247.858,
-          "alpha": 1
-        },
         "nav-background": {
-          "l": 0.2973,
+          "l": 0.2397,
           "c": 0.04,
           "h": 264.7,
           "alpha": 1
         },
         "nav-border": {
-          "l": 0.3869,
+          "l": 0.2717,
           "c": 0.04,
           "h": 264.7,
           "alpha": 1
@@ -2288,19 +2180,19 @@
           "alpha": 1
         },
         "nav-item-active": {
-          "l": 0.3869,
+          "l": 0.2717,
           "c": 0.04,
           "h": 264.7,
           "alpha": 1
         },
         "nav-item-hover": {
-          "l": 0.3869,
+          "l": 0.2717,
           "c": 0.04,
           "h": 264.7,
           "alpha": 1
         },
         "nav-muted-foreground": {
-          "l": 0.8468,
+          "l": 0.8353,
           "c": 0.0034,
           "h": 247.858,
           "alpha": 1
@@ -2312,13 +2204,13 @@
           "alpha": 0.8471
         },
         "popover": {
-          "l": 0.3869,
+          "l": 0.2717,
           "c": 0.04,
           "h": 264.7,
           "alpha": 1
         },
         "popover-active": {
-          "l": 0.3869,
+          "l": 0.2717,
           "c": 0.04,
           "h": 264.7,
           "alpha": 1
@@ -2342,7 +2234,7 @@
           "alpha": 1
         },
         "popover-hover": {
-          "l": 0.4765,
+          "l": 0.3037,
           "c": 0.04,
           "h": 264.7,
           "alpha": 1
@@ -2423,28 +2315,10 @@
           "h": 264.665,
           "alpha": 1
         },
-        "foreground": {
-          "l": 0.2101,
-          "c": 0.0318,
-          "h": 264.665,
-          "alpha": 1
-        },
         "muted": {
           "l": 0.9698,
           "c": 0.0083,
           "h": 261.7,
-          "alpha": 1
-        },
-        "muted-foreground": {
-          "l": 0.5261,
-          "c": 0.0318,
-          "h": 264.665,
-          "alpha": 1
-        },
-        "muted-foreground-subtle": {
-          "l": 0.6279,
-          "c": 0.0318,
-          "h": 264.665,
           "alpha": 1
         },
         "nav-background": {
@@ -2522,13 +2396,13 @@
           "alpha": 1
         },
         "background-active": {
-          "l": 0.2997,
+          "l": 0.2421,
           "c": 0.027,
           "h": 261.7,
           "alpha": 1
         },
         "background-hover": {
-          "l": 0.2997,
+          "l": 0.2421,
           "c": 0.027,
           "h": 261.7,
           "alpha": 1
@@ -2537,10 +2411,10 @@
           "l": 0.13,
           "c": 0.027,
           "h": 261.7,
-          "alpha": 0.0627
+          "alpha": 0.04
         },
         "border-active": {
-          "l": 0.7522,
+          "l": 0.4037,
           "c": 0.027,
           "h": 261.7,
           "alpha": 1
@@ -2549,16 +2423,16 @@
           "l": 0.13,
           "c": 0.027,
           "h": 261.7,
-          "alpha": 0.1882
+          "alpha": 0.12
         },
         "container": {
-          "l": 0.2997,
+          "l": 0.2421,
           "c": 0.027,
           "h": 261.7,
           "alpha": 1
         },
         "container-active": {
-          "l": 0.2997,
+          "l": 0.2421,
           "c": 0.027,
           "h": 261.7,
           "alpha": 1
@@ -2570,67 +2444,49 @@
           "alpha": 1
         },
         "container-hover": {
-          "l": 0.3893,
+          "l": 0.2741,
           "c": 0.027,
           "h": 261.7,
           "alpha": 1
         },
         "control-background": {
-          "l": 0.3893,
+          "l": 0.2741,
           "c": 0.027,
           "h": 261.7,
           "alpha": 1
         },
         "control-background-hover": {
-          "l": 0.4789,
+          "l": 0.3061,
           "c": 0.027,
           "h": 261.7,
           "alpha": 1
         },
         "disabled": {
-          "l": 0.2997,
+          "l": 0.2421,
           "c": 0.027,
           "h": 261.7,
           "alpha": 1
         },
         "disabled-foreground": {
-          "l": 0.7107,
-          "c": 0.0017,
-          "h": 247.839,
-          "alpha": 1
-        },
-        "foreground": {
-          "l": 0.9846,
+          "l": 0.6876,
           "c": 0.0017,
           "h": 247.839,
           "alpha": 1
         },
         "muted": {
-          "l": 0.2997,
+          "l": 0.2421,
           "c": 0.027,
           "h": 261.7,
           "alpha": 1
         },
-        "muted-foreground": {
-          "l": 0.8297,
-          "c": 0.0017,
-          "h": 247.839,
-          "alpha": 1
-        },
-        "muted-foreground-subtle": {
-          "l": 0.7449,
-          "c": 0.0017,
-          "h": 247.839,
-          "alpha": 1
-        },
         "nav-background": {
-          "l": 0.2997,
+          "l": 0.2421,
           "c": 0.027,
           "h": 261.7,
           "alpha": 1
         },
         "nav-border": {
-          "l": 0.3893,
+          "l": 0.2741,
           "c": 0.027,
           "h": 261.7,
           "alpha": 1
@@ -2642,19 +2498,19 @@
           "alpha": 1
         },
         "nav-item-active": {
-          "l": 0.3893,
+          "l": 0.2741,
           "c": 0.027,
           "h": 261.7,
           "alpha": 1
         },
         "nav-item-hover": {
-          "l": 0.3893,
+          "l": 0.2741,
           "c": 0.027,
           "h": 261.7,
           "alpha": 1
         },
         "nav-muted-foreground": {
-          "l": 0.8476,
+          "l": 0.8361,
           "c": 0.0017,
           "h": 247.839,
           "alpha": 1
@@ -2666,13 +2522,13 @@
           "alpha": 0.8471
         },
         "popover": {
-          "l": 0.3893,
+          "l": 0.2741,
           "c": 0.027,
           "h": 261.7,
           "alpha": 1
         },
         "popover-active": {
-          "l": 0.3893,
+          "l": 0.2741,
           "c": 0.027,
           "h": 261.7,
           "alpha": 1
@@ -2696,7 +2552,7 @@
           "alpha": 1
         },
         "popover-hover": {
-          "l": 0.4789,
+          "l": 0.3061,
           "c": 0.027,
           "h": 261.7,
           "alpha": 1

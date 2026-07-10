@@ -69,6 +69,13 @@ interface ContrastProfile {
 }
 
 const FOCUS_APCA_FLOOR = 45;
+const BLACK_BASE = 'oklch(0.1448 0 0)';
+const BLACK_A500 = 'oklch(0.1448 0 0 / 0.502)';
+const BLACK_A600 = 'oklch(0.1448 0 0 / 0.6275)';
+const BLACK_A900 = 'oklch(0.1448 0 0 / 0.9098)';
+const WHITE_BASE = 'oklch(1 0 0)';
+const WHITE_A600 = 'oklch(1 0 0 / 0.6275)';
+const WHITE_A900 = 'oklch(1 0 0 / 0.9098)';
 
 function anchoredContrastLerp(
   contrast: number,
@@ -176,7 +183,6 @@ function quietText(
 /** Each text token: the surface it sits on, its APCA floor, and how quiet to aim. */
 const TEXT_ON: Record<string, { surface: string; tier: Tier; quiet: number }> =
   {
-    foreground: { surface: '--nx-color-background', tier: 'body', quiet: 0 },
     'container-foreground': {
       surface: '--nx-color-container',
       tier: 'body',
@@ -192,20 +198,10 @@ const TEXT_ON: Record<string, { surface: string; tier: Tier; quiet: number }> =
       tier: 'body',
       quiet: 0,
     },
-    'muted-foreground': {
-      surface: '--nx-color-background',
-      tier: 'ui',
-      quiet: 0.4,
-    },
     'nav-muted-foreground': {
       surface: '--nx-color-nav-background',
       tier: 'ui',
       quiet: 0.4,
-    },
-    'muted-foreground-subtle': {
-      surface: '--nx-color-muted',
-      tier: 'incidental',
-      quiet: 0.55,
     },
     'disabled-foreground': {
       surface: '--nx-color-disabled',
@@ -214,10 +210,14 @@ const TEXT_ON: Record<string, { surface: string; tier: Tier; quiet: number }> =
     },
   };
 
-/** Text tiers, each guaranteed to clear its APCA floor on its surface. */
+/**
+ * Text tiers. The surface-relative tiers are walked to their APCA floor on their
+ * surface; foreground, muted, and subtle are fixed per-mode alpha inks.
+ */
 export function deriveText(
   foregroundHex: string,
-  surfaces: TokenMap
+  surfaces: TokenMap,
+  mode: Mode
 ): TokenMap {
   const fg = seedOklch(foregroundHex);
   const out: TokenMap = {};
@@ -230,7 +230,13 @@ export function deriveText(
       quiet
     );
   }
-  return out;
+  return {
+    ...out,
+    '--nx-color-foreground': mode === 'dark' ? WHITE_A900 : BLACK_A900,
+    '--nx-color-muted-foreground': mode === 'dark' ? WHITE_A600 : BLACK_A600,
+    '--nx-color-muted-foreground-subtle':
+      mode === 'dark' ? WHITE_A600 : BLACK_A500,
+  };
 }
 
 /** Pick the on-color (black or white) with the higher APCA contrast against `bg`. */
@@ -269,31 +275,20 @@ function legibleShade(
   return readableOn(bg);
 }
 
-/** Which ramp shades back a family's solid background/hover/active fills. */
-interface SolidShades {
-  background?: Shade;
-  hover?: Shade;
-  active?: Shade;
-}
-
 /** 11 tokens for a named color family (background, foreground, subtle, borders). */
 export function deriveFamily(
   name: string,
   ramp: Record<Shade, string>,
-  mode: Mode,
-  solid: SolidShades = {}
+  mode: Mode
 ): TokenMap {
   const dark = mode === 'dark';
   const p = `--nx-color-${name}`;
   const subtle = dark ? ramp['950'] : ramp['50'];
-  const background = solid.background ?? '600';
-  const hover = solid.hover ?? '700';
-  const active = solid.active ?? '800';
   return {
-    [`${p}-background`]: ramp[background],
-    [`${p}-background-hover`]: ramp[hover],
-    [`${p}-background-active`]: ramp[active],
-    [`${p}-foreground`]: readableOn(ramp[background]),
+    [`${p}-background`]: ramp['600'],
+    [`${p}-background-hover`]: ramp['700'],
+    [`${p}-background-active`]: ramp['800'],
+    [`${p}-foreground`]: readableOn(ramp['600']),
     [`${p}-disabled`]: dark ? ramp['950'] : ramp['300'],
     [`${p}-subtle`]: subtle,
     [`${p}-subtle-foreground`]: legibleShade(
@@ -314,11 +309,7 @@ const STATUS_FAMILIES = ['success', 'warning', 'error', 'information'] as const;
 function deriveStatus(mode: Mode): TokenMap {
   const out: TokenMap = {};
   for (const family of STATUS_FAMILIES) {
-    const solid: SolidShades =
-      family === 'warning'
-        ? { background: '700', hover: '800', active: '900' }
-        : {};
-    Object.assign(out, deriveFamily(family, STATUS_RAMP[family], mode, solid));
+    Object.assign(out, deriveFamily(family, STATUS_RAMP[family], mode));
   }
   return out;
 }
@@ -383,7 +374,7 @@ function deriveFocus(
   }
 
   return {
-    '--nx-color-focus-default': apcaSafeAgainst(primaryFocus, background, mode),
+    '--nx-color-focus-default': primaryFocus,
     '--nx-color-focus-error': apcaSafeAgainst(errorSeed, background, mode),
   };
 }
@@ -397,13 +388,25 @@ const FILL_GAMUT = 'p3';
 // seeds but lifts dark ones toward light — so a black brand becomes a white
 // button that stays legible on a dark surface.
 const PRIMARY_FILL_LIGHT_CAP = 0.85;
+const PRIMARY_DARK_ENDPOINT_LIFT_FLOOR = 0.16;
+const PRIMARY_LIGHT_ENDPOINT_CEIL = 0.99;
 const PRIMARY_DARK_HONOR_FLOOR = 0.45;
 const PRIMARY_DARK_LIFT_EXPONENT = 1.6;
 const PRIMARY_HOVER_STEP = 0.05;
 const PRIMARY_ACTIVE_STEP = 0.1;
+const PRIMARY_ACTIVE_DARK_FILL_STEP = 0.03;
+// Endpoint (achromatic near-black / near-white) brand state fills track the
+// NEUTRAL ramp (single source of truth), so a ramp retune stays in sync.
+const endpointL = (shade: keyof typeof NEUTRAL): number =>
+  seedOklch(NEUTRAL[shade]).l ?? 0;
+const PRIMARY_DARK_ENDPOINT_HOVER_L = endpointL('900');
+const PRIMARY_DARK_ENDPOINT_ACTIVE_L = endpointL('950');
+const PRIMARY_LIGHT_ENDPOINT_HOVER_L = endpointL('100');
+const PRIMARY_LIGHT_ENDPOINT_ACTIVE_L = endpointL('200');
 
 function primaryFillLightness(seedL: number, mode: Mode): number {
   if (mode === 'light') return clamp01(Math.min(seedL, PRIMARY_FILL_LIGHT_CAP));
+  if (seedL <= PRIMARY_DARK_ENDPOINT_LIFT_FLOOR) return 1;
   if (seedL >= PRIMARY_DARK_HONOR_FLOOR) return clamp01(seedL);
   // Below the floor, lift toward white so a dark seed stays legible on a dark
   // surface. The coefficient is `1 - floor` so the curve meets the honor branch
@@ -452,12 +455,14 @@ function legibleFillLightness(l: number, c: number, h: number): number {
 // clears by construction, so it is always a legible fallback.
 function stateFillLightness(
   baseL: number,
-  step: number,
+  target: number,
   label: string,
   c: number,
   h: number
 ): number {
-  const target = towardMid(baseL, step);
+  if (apcaLc(label, seedFill(target, c, h)) >= TIER_THRESHOLDS.ui) {
+    return target;
+  }
   const dir = target >= baseL ? 1 : -1;
   const span = Math.round(Math.abs(target - baseL) * 100);
   for (let s = span; s >= 1; s -= 1) {
@@ -467,6 +472,28 @@ function stateFillLightness(
     }
   }
   return baseL;
+}
+
+function hoverFillTarget(baseL: number): number {
+  if (baseL <= PRIMARY_DARK_ENDPOINT_LIFT_FLOOR) {
+    return PRIMARY_DARK_ENDPOINT_HOVER_L;
+  }
+  if (baseL >= PRIMARY_LIGHT_ENDPOINT_CEIL)
+    return PRIMARY_LIGHT_ENDPOINT_HOVER_L;
+  return towardMid(baseL, PRIMARY_HOVER_STEP);
+}
+
+function activeFillTarget(baseL: number): number {
+  if (baseL <= PRIMARY_DARK_ENDPOINT_LIFT_FLOOR) {
+    return PRIMARY_DARK_ENDPOINT_ACTIVE_L;
+  }
+  if (baseL >= PRIMARY_LIGHT_ENDPOINT_CEIL)
+    return PRIMARY_LIGHT_ENDPOINT_ACTIVE_L;
+  return clamp01(
+    baseL < 0.5
+      ? baseL - PRIMARY_ACTIVE_DARK_FILL_STEP
+      : baseL - PRIMARY_ACTIVE_STEP
+  );
 }
 
 /**
@@ -485,20 +512,29 @@ export function derivePrimary(accentHex: string, mode: Mode): TokenMap {
   );
   const background = seedFill(fillL, c, h);
   const label = readableOn(background);
+  const endpointBrand =
+    c <= 0.005 && (seed.l ?? 0) <= PRIMARY_DARK_ENDPOINT_LIFT_FLOOR;
   return {
     ...deriveFamily('primary', rampFromSeed(accentHex), mode),
+    ...(endpointBrand
+      ? {
+          '--nx-color-primary-subtle-foreground':
+            mode === 'dark' ? WHITE_BASE : BLACK_BASE,
+        }
+      : {}),
     '--nx-color-primary-background': background,
     '--nx-color-primary-background-hover': seedFill(
-      stateFillLightness(fillL, PRIMARY_HOVER_STEP, label, c, h),
+      stateFillLightness(fillL, hoverFillTarget(fillL), label, c, h),
       c,
       h
     ),
     '--nx-color-primary-background-active': seedFill(
-      stateFillLightness(fillL, PRIMARY_ACTIVE_STEP, label, c, h),
+      stateFillLightness(fillL, activeFillTarget(fillL), label, c, h),
       c,
       h
     ),
-    '--nx-color-primary-foreground': label,
+    '--nx-color-primary-foreground':
+      endpointBrand && mode === 'dark' ? BLACK_BASE : label,
   };
 }
 
@@ -531,7 +567,7 @@ function deriveMode(
     mode,
     profile.surfaceDelta
   );
-  const text = deriveText(seeds.foreground, surfaces);
+  const text = deriveText(seeds.foreground, surfaces, mode);
   const primary = derivePrimary(seeds.accent, mode);
   const secondary = deriveSecondary(mode);
   const status = deriveStatus(mode);
