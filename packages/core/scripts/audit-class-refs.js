@@ -1,41 +1,29 @@
 import fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
+import ts from 'typescript';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const REPO_ROOT = path.resolve(__dirname, '..', '..', '..');
-const NEXUS_CSS = path.join(REPO_ROOT, 'packages', 'tailwind', 'nexus.css');
-const SOURCE_DIRS = [
+const TOKEN_REGISTRY = path.join(
+  REPO_ROOT,
+  'packages',
+  'core',
+  'src',
+  'lib',
+  'token-registry.ts'
+);
+const CLASS_SOURCE_DIRS = [
   path.join(REPO_ROOT, 'packages', 'react', 'src'),
   path.join(REPO_ROOT, 'apps'),
 ];
-
-// Prefixes whose value-slot we own as semantic tokens. Anything that starts
-// with one of these (after the utility prefix) must resolve to a --color-*
-// variable in the emitted CSS. Other class names — including Tailwind
-// built-ins like text-sm, border-2, bg-transparent — fall through this
-// allowlist and are not validated.
-const SEMANTIC_PREFIXES = [
-  'background',
-  'foreground',
-  'container',
-  'control',
-  'popover',
-  'muted',
-  'nav',
-  'primary',
-  'secondary',
-  'error',
-  'success',
-  'warning',
-  'information',
-  'border',
-  'overlay',
-  'disabled',
-  'focus',
-  'chart',
-  'accent', // not a real token in Nexus — surfaces the migration bug
+const COMPONENT_SOURCE_DIRS = [
+  path.join(REPO_ROOT, 'packages', 'react', 'src', 'components'),
 ];
+
+// Deleted/foreign shadcn-style families are not in the registry, but a class
+// using one is still trying to reach the semantic-token layer.
+const RETIRED_SEMANTIC_FAMILIES = ['accent'];
 
 // Utility prefixes that consume a color-like value (e.g., `nx:bg-X`, `nx:text-X`).
 const UTILITY_PREFIXES = [
@@ -50,20 +38,125 @@ const UTILITY_PREFIXES = [
   'divide',
 ];
 
-function loadEmittedColorNames() {
-  const css = fs.readFileSync(NEXUS_CSS, 'utf8');
-  const set = new Set();
-  for (const match of css.matchAll(/--color-([a-z0-9-]+):/g)) {
-    set.add(match[1]);
+function unwrapExpression(node) {
+  let current = node;
+  while (ts.isAsExpression(current)) {
+    current = current.expression;
   }
-  return set;
+  return current;
 }
 
-function isSemanticName(name) {
-  for (const prefix of SEMANTIC_PREFIXES) {
-    if (name === prefix || name.startsWith(`${prefix}-`)) return true;
+function readStringArray(node) {
+  const array = unwrapExpression(node);
+  if (!ts.isArrayLiteralExpression(array)) return null;
+
+  const values = [];
+  for (const element of array.elements) {
+    if (!ts.isStringLiteral(element)) return null;
+    values.push(element.text);
   }
-  return false;
+  return values;
+}
+
+function loadSemanticRegistryNames() {
+  const content = fs.readFileSync(TOKEN_REGISTRY, 'utf8');
+  const source = ts.createSourceFile(
+    TOKEN_REGISTRY,
+    content,
+    ts.ScriptTarget.Latest,
+    true,
+    ts.ScriptKind.TS
+  );
+  const namedArrays = new Map();
+  let registryInitializer = null;
+
+  for (const statement of source.statements) {
+    if (!ts.isVariableStatement(statement)) continue;
+
+    for (const declaration of statement.declarationList.declarations) {
+      if (!ts.isIdentifier(declaration.name) || !declaration.initializer) {
+        continue;
+      }
+
+      const name = declaration.name.text;
+      if (name === 'SEMANTIC_TOKEN_REGISTRY') {
+        registryInitializer = unwrapExpression(declaration.initializer);
+        continue;
+      }
+
+      const values = readStringArray(declaration.initializer);
+      if (values) {
+        namedArrays.set(name, values);
+      }
+    }
+  }
+
+  if (
+    !registryInitializer ||
+    !ts.isArrayLiteralExpression(registryInitializer)
+  ) {
+    throw new Error(
+      'audit-class-refs: could not find SEMANTIC_TOKEN_REGISTRY array.'
+    );
+  }
+
+  const names = [];
+  for (const element of registryInitializer.elements) {
+    if (!ts.isSpreadElement(element)) {
+      throw new Error(
+        'audit-class-refs: SEMANTIC_TOKEN_REGISTRY must be composed from metas(...) spreads.'
+      );
+    }
+
+    const expression = element.expression;
+    if (
+      !ts.isCallExpression(expression) ||
+      !ts.isIdentifier(expression.expression) ||
+      expression.expression.text !== 'metas' ||
+      expression.arguments.length < 2
+    ) {
+      throw new Error(
+        'audit-class-refs: registry spreads must call metas(category, TOKEN_NAMES).'
+      );
+    }
+
+    const namesArg = expression.arguments[1];
+    if (!ts.isIdentifier(namesArg) || !namedArrays.has(namesArg.text)) {
+      throw new Error(
+        `audit-class-refs: could not resolve registry token array ${namesArg.getText(source)}.`
+      );
+    }
+
+    names.push(...namedArrays.get(namesArg.text));
+  }
+
+  return new Set(names);
+}
+
+function semanticFamily(name) {
+  return name.split('-')[0];
+}
+
+function semanticFamiliesFromRegistry(registryNames) {
+  const families = new Set(RETIRED_SEMANTIC_FAMILIES);
+  for (const name of registryNames) {
+    families.add(semanticFamily(name));
+  }
+  return families;
+}
+
+function isSemanticName(name, semanticFamilies) {
+  return semanticFamilies.has(semanticFamily(name));
+}
+
+function isAllowedRuntimeColorVar(name, registryNames) {
+  if (name.endsWith('-')) {
+    for (const registryName of registryNames) {
+      if (registryName.startsWith(name)) return true;
+    }
+  }
+
+  return registryNames.has(name);
 }
 
 function* walkSources(dir) {
@@ -99,16 +192,26 @@ function findClassRefs(content) {
   return hits;
 }
 
+function findRuntimeColorVarRefs(content) {
+  const hits = [];
+  for (const match of content.matchAll(/--nx-color-([a-z][a-z0-9-]*)/g)) {
+    hits.push({ name: match[1], offset: match.index });
+  }
+  return hits;
+}
+
 function lineOf(content, offset) {
   return content.slice(0, offset).split('\n').length;
 }
 
 function main() {
-  const known = loadEmittedColorNames();
-  const failures = [];
+  const known = loadSemanticRegistryNames();
+  const semanticFamilies = semanticFamiliesFromRegistry(known);
+  const unresolvedClassRefs = [];
+  const primitiveVarRefs = [];
   let scanned = 0;
 
-  for (const dir of SOURCE_DIRS) {
+  for (const dir of CLASS_SOURCE_DIRS) {
     for (const file of walkSources(dir)) {
       scanned += 1;
       const content = fs.readFileSync(file, 'utf8');
@@ -117,12 +220,12 @@ function main() {
         // Documentation placeholders like `nx:bg-chart-categorical-N` are not
         // real class refs; the regex stops before the uppercase placeholder.
         if (hit.name.endsWith('-')) continue;
-        if (!isSemanticName(hit.name)) continue;
+        if (!isSemanticName(hit.name, semanticFamilies)) continue;
         if (known.has(hit.name)) continue;
         const key = `${file}:${hit.name}`;
         if (seen.has(key)) continue;
         seen.add(key);
-        failures.push({
+        unresolvedClassRefs.push({
           file: path.relative(REPO_ROOT, file),
           line: lineOf(content, hit.offset),
           name: hit.name,
@@ -131,20 +234,54 @@ function main() {
     }
   }
 
-  if (failures.length === 0) {
+  for (const dir of COMPONENT_SOURCE_DIRS) {
+    for (const file of walkSources(dir)) {
+      const content = fs.readFileSync(file, 'utf8');
+      const seen = new Set();
+      for (const hit of findRuntimeColorVarRefs(content)) {
+        if (isAllowedRuntimeColorVar(hit.name, known)) {
+          continue;
+        }
+
+        const key = `${file}:${hit.name}`;
+        if (seen.has(key)) continue;
+        seen.add(key);
+        primitiveVarRefs.push({
+          file: path.relative(REPO_ROOT, file),
+          line: lineOf(content, hit.offset),
+          name: hit.name,
+        });
+      }
+    }
+  }
+
+  if (unresolvedClassRefs.length === 0 && primitiveVarRefs.length === 0) {
     process.stdout.write(
-      `audit-class-refs: scanned ${scanned} files — all semantic color refs resolve.\n`
+      `audit-class-refs: scanned ${scanned} files — all semantic color refs resolve and component color vars are semantic.\n`
     );
     process.exit(0);
   }
 
-  process.stdout.write(
-    `audit-class-refs: scanned ${scanned} files — ${failures.length} unresolved semantic color ref(s):\n`
-  );
-  for (const f of failures) {
+  if (unresolvedClassRefs.length > 0) {
     process.stdout.write(
-      `  ${f.file}:${f.line}  nx:…-${f.name}  (no --color-${f.name} in nexus.css)\n`
+      `audit-class-refs: scanned ${scanned} files — ${unresolvedClassRefs.length} unresolved semantic color class ref(s):\n`
     );
+    for (const f of unresolvedClassRefs) {
+      process.stdout.write(
+        `  ${f.file}:${f.line}  nx:...-${f.name}  (not in SEMANTIC_TOKEN_REGISTRY)\n`
+      );
+    }
+  }
+
+  if (primitiveVarRefs.length > 0) {
+    process.stdout.write(
+      `audit-class-refs: found ${primitiveVarRefs.length} primitive/unknown component color var ref(s):\n`
+    );
+    for (const f of primitiveVarRefs) {
+      process.stdout.write(
+        `  ${f.file}:${f.line}  --nx-color-${f.name}  (component code must use semantic color vars)\n`
+      );
+    }
   }
   process.exit(1);
 }

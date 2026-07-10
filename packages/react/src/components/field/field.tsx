@@ -302,7 +302,7 @@ function FieldSeparator({
       {children && (
         <span
           data-slot="field-separator-content"
-          className="nx:relative nx:mx-auto nx:block nx:w-fit nx:bg-background nx:px-2 nx:text-muted-foreground"
+          className="nx:relative nx:mx-auto nx:block nx:w-fit nx:bg-container nx:px-2 nx:text-muted-foreground"
         >
           {children}
         </span>
