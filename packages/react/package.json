@@ -1,6 +1,6 @@
 {
   "name": "@nexus_ds/react",
-  "version": "0.0.3",
+  "version": "0.1.0",
   "private": true,
   "description": "React components built with Radix UI and Tailwind CSS",
   "//": [
