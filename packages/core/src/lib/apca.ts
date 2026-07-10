@@ -2,7 +2,6 @@ import { APCAcontrast, sRGBtoY } from 'apca-w3';
 import { clampChroma, converter, oklch, parse } from 'culori';
 
 const toRgb = converter('rgb');
-const REF_RE = /^\{([^}]+)\}$/;
 
 export type SrgbInts = [number, number, number];
 
@@ -23,57 +22,33 @@ function toSrgbInts(input: string): SrgbInts {
 export function blendAlphaOver(hex8: string, bgInts: SrgbInts): SrgbInts {
   const h = hex8.slice(1);
   const a = parseInt(h.slice(6, 8), 16) / 255;
-  const mix = (i: number) =>
-    Math.round(
-      parseInt(h.slice(i * 2, i * 2 + 2), 16) * a +
-        (i === 0 ? bgInts[0] : i === 1 ? bgInts[1] : bgInts[2]) * (1 - a)
-    );
-  return [mix(0), mix(1), mix(2)];
+  const [bgR, bgG, bgB] = bgInts;
+  const mix = (fg: number, bg: number) => Math.round(fg * a + bg * (1 - a));
+  return [
+    mix(parseInt(h.slice(0, 2), 16), bgR),
+    mix(parseInt(h.slice(2, 4), 16), bgG),
+    mix(parseInt(h.slice(4, 6), 16), bgB),
+  ];
 }
 
-function resolveReferenceValue(
-  value: string,
-  primitiveMap?: ReadonlyMap<string, string | { value: string }>
-): string {
-  const refMatch = value.match(REF_RE);
-  if (!refMatch) return value;
-
-  const refName = refMatch[1];
-  if (!refName) {
-    throw new Error(`apca: invalid reference "${value}"`);
-  }
-
-  const primitive = primitiveMap?.get(refName);
-  const resolved = typeof primitive === 'string' ? primitive : primitive?.value;
-  if (!resolved) {
-    throw new Error(`apca: unresolved reference "${value}"`);
-  }
-  return resolved;
-}
-
-export function resolveToSrgbInts(
-  value: string,
-  primitiveMap?: ReadonlyMap<string, string | { value: string }>,
-  bgInts?: SrgbInts
-): SrgbInts {
+export function resolveToSrgbInts(value: string, bgInts?: SrgbInts): SrgbInts {
   if (typeof value !== 'string') {
     throw new Error(`apca: expected string color value, got ${typeof value}`);
   }
 
-  const resolved = resolveReferenceValue(value, primitiveMap);
-  if (/^#[0-9a-fA-F]{8}$/.test(resolved)) {
+  if (/^#[0-9a-fA-F]{8}$/.test(value)) {
     if (!bgInts) {
       throw new Error(
-        `apca: alpha color "${resolved}" needs a backdrop to composite against`
+        `apca: alpha color "${value}" needs a backdrop to composite against`
       );
     }
-    return blendAlphaOver(resolved, bgInts);
+    return blendAlphaOver(value, bgInts);
   }
 
-  const parsed = parse(resolved);
-  if (!parsed) throw new Error(`apca: cannot parse color '${resolved}'`);
+  const parsed = parse(value);
+  if (!parsed) throw new Error(`apca: cannot parse color '${value}'`);
   const converted = oklch(parsed);
-  if (!converted) throw new Error(`apca: cannot convert '${resolved}'`);
+  if (!converted) throw new Error(`apca: cannot convert '${value}'`);
   const rgb = toRgb(clampChroma(converted, 'oklch', 'rgb'));
   const alpha = rgb.alpha ?? 1;
   const ints: SrgbInts = [channel(rgb.r), channel(rgb.g), channel(rgb.b)];
@@ -81,7 +56,7 @@ export function resolveToSrgbInts(
   if (alpha < 1) {
     if (!bgInts) {
       throw new Error(
-        `apca: alpha color "${resolved}" needs a backdrop to composite against`
+        `apca: alpha color "${value}" needs a backdrop to composite against`
       );
     }
     return [

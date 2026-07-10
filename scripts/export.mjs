@@ -33,7 +33,8 @@ export const TOKEN_CONFIG_KEYS = [
   'spacingDefault',
 ];
 
-// Defaults mirror `DEFAULT_CONFIG` in packages/core/scripts/utils.js.
+// Defaults mirror `DEFAULT_CONFIG` in packages/core/scripts/utils.js, except
+// `brandColor` which mirrors `DEFAULT_BRAND_COLOR` in appearance-model.ts.
 export const DEFAULT_TOKEN_CONFIG = {
   base: 'stone',
   brandColor: '#0a0a0a',
@@ -106,9 +107,15 @@ export function discoverTokenChoices(tokensDir) {
         `Cannot discover base tones: BASE_TONE_OPTIONS not found in ${appearanceModel}.`
       );
     }
-    return [...blockMatch[1].matchAll(/value:\s*'([^']+)'/g)]
-      .map((match) => match[1])
-      .sort();
+    const values = [...blockMatch[1].matchAll(/value:\s*'([^']+)'/g)].map(
+      (match) => match[1]
+    );
+    if (values.length === 0) {
+      throw new Error(
+        `Cannot discover base tones: BASE_TONE_OPTIONS at ${appearanceModel} matched but yielded no \`value: '...'\` entries (format drift?).`
+      );
+    }
+    return values.sort();
   };
 
   const primitiveModes = (category) => {

@@ -41,8 +41,8 @@ describe('resolveToSrgbInts', () => {
     expect(() => resolveToSrgbInts('oklch(1 0 0 / 0.5)')).toThrow(
       'needs a backdrop to composite against'
     );
-    expect(
-      resolveToSrgbInts('oklch(1 0 0 / 0.5)', undefined, [0, 0, 0])
-    ).toEqual([128, 128, 128]);
+    expect(resolveToSrgbInts('oklch(1 0 0 / 0.5)', [0, 0, 0])).toEqual([
+      128, 128, 128,
+    ]);
   });
 });

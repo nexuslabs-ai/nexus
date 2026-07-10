@@ -85,11 +85,7 @@ function semanticColor(map: Record<string, string>, name: string): string {
 
 function apcaLcForPair(map: Record<string, string>, pair: ApcaPair): number {
   const bgInts: SrgbInts = resolveToSrgbInts(semanticColor(map, pair.bg));
-  const fgInts = resolveToSrgbInts(
-    semanticColor(map, pair.fg),
-    undefined,
-    bgInts
-  );
+  const fgInts = resolveToSrgbInts(semanticColor(map, pair.fg), bgInts);
   return Math.abs(apcaLc(rgbString(fgInts), rgbString(bgInts)));
 }
 
