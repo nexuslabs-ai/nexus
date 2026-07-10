@@ -367,6 +367,9 @@ jobs:
       - name: Check canonical step set freshness
         run: pnpm --filter @nexus_ds/eslint-plugin refresh:canonical-set --check
 
+      - name: Build @nexus_ds/core
+        run: pnpm --filter @nexus_ds/core build
+
       - name: Regenerate token outputs (tailwind + modular)
         id: regen
         run: |
@@ -381,8 +384,6 @@ jobs:
           set -euo pipefail
           DIRTY=$(git status --porcelain -- \
             packages/tailwind \
-            apps/console/public/themes \
-            apps/console/src/styles \
             apps/docs/public/themes)
           if [ -n "$DIRTY" ]; then
             echo "::error::Token output is stale. Affected paths:"

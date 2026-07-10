@@ -1,57 +1,69 @@
 /* Border Color Alias Utilities */
 
 @utility border-color-default {
-  border-color: var(--color-border-default);
+  border-color: var(--nx-color-border-default, oklch(0.1448 0 0 / 0.0941));
 }
 
 @utility border-color-default-alpha {
-  border-color: var(--color-border-default-alpha);
+  border-color: var(
+    --nx-color-border-default-alpha,
+    oklch(0.13 0.006 70 / 0.0941)
+  );
 }
 
 @utility border-color-active {
-  border-color: var(--color-border-active);
+  border-color: var(--nx-color-border-active, oklch(0.6601 0.0118 70));
 }
 
 @utility border-color-disabled {
-  border-color: var(--color-border-disabled);
+  border-color: var(--nx-color-border-disabled, oklch(0.1448 0 0 / 0.0941));
 }
 
 @utility border-color-warning {
-  border-color: var(--color-border-warning);
+  border-color: var(--nx-color-border-warning, oklch(0.91 0.0819 70.697));
 }
 
 @utility border-color-warning-active {
-  border-color: var(--color-border-warning-active);
+  border-color: var(
+    --nx-color-border-warning-active,
+    oklch(0.78 0.1803 55.934)
+  );
 }
 
 @utility border-color-success {
-  border-color: var(--color-border-success);
+  border-color: var(--nx-color-border-success, oklch(0.925 0.1596 139.892));
 }
 
 @utility border-color-success-active {
-  border-color: var(--color-border-success-active);
+  border-color: var(
+    --nx-color-border-success-active,
+    oklch(0.79 0.2864 140.349)
+  );
 }
 
 @utility border-color-error {
-  border-color: var(--color-border-error);
+  border-color: var(--nx-color-border-error, oklch(0.885 0.0747 27.394));
 }
 
 @utility border-color-error-active {
-  border-color: var(--color-border-error-active);
+  border-color: var(--nx-color-border-error-active, oklch(0.704 0.2267 27.842));
 }
 
 @utility border-color-information {
-  border-color: var(--color-border-information);
+  border-color: var(--nx-color-border-information, oklch(0.882 0.0612 253.613));
 }
 
 @utility border-color-information-active {
-  border-color: var(--color-border-information-active);
+  border-color: var(
+    --nx-color-border-information-active,
+    oklch(0.707 0.1599 255.225)
+  );
 }
 
 @utility border-color-primary {
-  border-color: var(--color-border-primary);
+  border-color: var(--nx-color-border-primary, oklch(0.87 0 0));
 }
 
 @utility border-color-primary-active {
-  border-color: var(--color-border-primary-active);
+  border-color: var(--nx-color-border-primary-active, oklch(0.66 0 0));
 }
