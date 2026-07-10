@@ -3,7 +3,7 @@ import * as React from 'react';
 import type { Meta, StoryObj } from '@storybook/react';
 import { expect, userEvent, waitFor, within } from 'storybook/test';
 
-import { expectStaggeredItemMotion } from '../../stories/support/motion-test-utils';
+import { expectImmediateItemMotion } from '../../stories/support/motion-test-utils';
 import {
   expectExitBeforeUnmount,
   expectInterruptibleOverlayMotion,
@@ -282,7 +282,7 @@ export const WithInsetItems: Story = {
   ),
 };
 
-export const StaggeredItems: Story = {
+export const ImmediateItems: Story = {
   render: (_args) => (
     <Menubar>
       <MenubarMenu>
@@ -307,7 +307,7 @@ export const StaggeredItems: Story = {
     const items = Array.from(
       menu.querySelectorAll('[data-slot="menubar-item"]')
     );
-    await expectStaggeredItemMotion(menu, items);
+    await expectImmediateItemMotion(items);
 
     await userEvent.keyboard('{Escape}');
     await waitFor(() => {

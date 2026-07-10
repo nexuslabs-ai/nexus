@@ -1,7 +1,7 @@
 import type { Meta, StoryObj } from '@storybook/react';
 import { expect, userEvent, waitFor, within } from 'storybook/test';
 
-import { expectStaggeredItemMotion } from '../../stories/support/motion-test-utils';
+import { expectImmediateItemMotion } from '../../stories/support/motion-test-utils';
 import { expectInterruptibleOverlayMotion } from '../../stories/support/overlay-motion-test-utils';
 import { expectHeightPinned } from '../../stories/support/story-height-test-utils';
 import { NativeSelect, NativeSelectOption } from '../native-select';
@@ -542,7 +542,7 @@ export const Scrollable: Story = {
   ),
 };
 
-export const StaggeredItems: Story = {
+export const ImmediateItems: Story = {
   render: (_args) => (
     <Select>
       <SelectTrigger className="nx:w-[180px]" aria-label="Select motion item">
@@ -569,7 +569,7 @@ export const StaggeredItems: Story = {
     const items = Array.from(
       listbox.querySelectorAll('[data-slot="select-item"]')
     );
-    await expectStaggeredItemMotion(listbox, items);
+    await expectImmediateItemMotion(items);
 
     await userEvent.keyboard('{Escape}');
     await waitFor(() => {

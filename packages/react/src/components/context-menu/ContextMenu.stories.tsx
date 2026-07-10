@@ -3,7 +3,7 @@ import * as React from 'react';
 import type { Meta, StoryObj } from '@storybook/react';
 import { expect, fireEvent, userEvent, waitFor, within } from 'storybook/test';
 
-import { expectStaggeredItemMotion } from '../../stories/support/motion-test-utils';
+import { expectImmediateItemMotion } from '../../stories/support/motion-test-utils';
 import {
   expectExitBeforeUnmount,
   expectInterruptibleOverlayMotion,
@@ -326,11 +326,11 @@ export const WithInsetItems: Story = {
   ),
 };
 
-export const StaggeredItems: Story = {
+export const ImmediateItems: Story = {
   render: (_args) => (
     <ContextMenu>
       <ContextMenuTrigger className={triggerClass}>
-        Right click for staggered items
+        Right click for immediate items
       </ContextMenuTrigger>
       <ContextMenuContent>
         <ContextMenuItem>Back</ContextMenuItem>
@@ -343,7 +343,7 @@ export const StaggeredItems: Story = {
   ),
   play: async ({ canvasElement }) => {
     const canvas = within(canvasElement);
-    const trigger = canvas.getByText('Right click for staggered items');
+    const trigger = canvas.getByText('Right click for immediate items');
 
     await fireEvent.contextMenu(trigger, { clientX: 20, clientY: 20 });
 
@@ -351,7 +351,7 @@ export const StaggeredItems: Story = {
     const items = Array.from(
       menu.querySelectorAll('[data-slot="context-menu-item"]')
     );
-    await expectStaggeredItemMotion(menu, items);
+    await expectImmediateItemMotion(items);
 
     await userEvent.keyboard('{Escape}');
     await waitFor(() => {

@@ -4,6 +4,7 @@ import type { Meta, StoryObj } from '@storybook/react';
 import { expect, userEvent, waitFor, within } from 'storybook/test';
 
 import { cn } from '../../lib/utils';
+import { expectImmediateItemMotion } from '../../stories/support/motion-test-utils';
 import { Field, FieldDescription, FieldError, FieldLabel } from '../field';
 
 import {
@@ -392,6 +393,10 @@ export const WithDataAttributes: Story = {
     await userEvent.click(trigger);
     const listbox = await within(document.body).findByRole('listbox');
     await expect(listbox).toHaveAttribute('data-slot', 'combobox-list');
+    const items = Array.from(
+      listbox.querySelectorAll('[data-slot="combobox-item"]')
+    );
+    await expectImmediateItemMotion(items);
     await expect(
       within(listbox).getByRole('option', { name: 'Next.js' })
     ).toHaveAttribute('data-slot', 'combobox-item');
