@@ -5,7 +5,6 @@ import { describe, expect, it, vi } from 'vitest';
 
 import {
   collectBreakpointsTokens,
-  collectSemanticColorTokensVarRef,
   collectSpacingTokens,
   collectZIndexTokens,
   DEFAULT_CONFIG,
@@ -19,7 +18,6 @@ import {
   isReference,
   parseArgs,
   partitionThemedModes,
-  pathToCssVar,
   resolveReference,
   resolveValue,
   splitSpacingTokens,
@@ -146,30 +144,6 @@ describe('utils', () => {
       expect(extractRefPath('{2xs.layer-1.x}')).toBe('2xs.layer-1.x');
       expect(extractRefPath('{focus.default.color}')).toBe(
         'focus.default.color'
-      );
-    });
-  });
-
-  describe('pathToCssVar', () => {
-    it('joins path array with hyphens', () => {
-      expect(pathToCssVar(['blue', '500'])).toBe('blue-500');
-      expect(pathToCssVar(['size', '6xl'])).toBe('size-6xl');
-    });
-
-    it('adds prefix when provided', () => {
-      expect(pathToCssVar(['background'], 'color')).toBe('color-background');
-      expect(pathToCssVar(['primary', 'background-hover'], 'color')).toBe(
-        'color-primary-background-hover'
-      );
-    });
-
-    it('handles single-element paths', () => {
-      expect(pathToCssVar(['background'])).toBe('background');
-    });
-
-    it('handles deeply nested paths', () => {
-      expect(pathToCssVar(['focus', 'default', 'color'])).toBe(
-        'focus-default-color'
       );
     });
   });
@@ -703,45 +677,6 @@ describe('utils', () => {
         fs.writeFileSync(path.join(dir, 'focus.json'), JSON.stringify({}));
         const result = discoverSemantics(dir);
         expect(result.perModeFiles).toEqual({});
-      } finally {
-        fs.rmSync(dir, { recursive: true, force: true });
-      }
-    });
-  });
-
-  describe('collectSemanticColorTokensVarRef', () => {
-    it('preserves primitive references and maps semantic references to color aliases', () => {
-      const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'nexus-sem-test-'));
-      try {
-        fs.writeFileSync(
-          path.join(dir, 'focus.json'),
-          JSON.stringify({
-            focus: {
-              default: {
-                $value: '{primary.subtle-foreground}',
-                $type: 'color',
-              },
-              error: { $value: '{focus.color.error}', $type: 'color' },
-            },
-          })
-        );
-
-        const primitiveMap = new Map([
-          ['focus.color.error', { cssName: 'nx-focus-color-error' }],
-        ]);
-
-        expect(
-          collectSemanticColorTokensVarRef(dir, 'focus.json', primitiveMap)
-        ).toEqual([
-          {
-            cssName: 'color-focus-default',
-            value: 'var(--color-primary-subtle-foreground)',
-          },
-          {
-            cssName: 'color-focus-error',
-            value: 'var(--nx-focus-color-error)',
-          },
-        ]);
       } finally {
         fs.rmSync(dir, { recursive: true, force: true });
       }
