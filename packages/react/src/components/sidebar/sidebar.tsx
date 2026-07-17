@@ -244,8 +244,8 @@ interface SidebarProps extends React.ComponentProps<'div'> {
 /**
  * Sidebar
  *
- * The sidebar panel. In the Narrow tier (below `lg`) it renders as a Sheet
- * drawer; at or above `lg` it docks to the chosen `side` and collapses per the
+ * The sidebar panel. In the Narrow tier (below `md`) it renders as a Sheet
+ * drawer; at or above `md` it docks to the chosen `side` and collapses per the
  * `collapsible` mode.
  *
  * @example
@@ -289,9 +289,11 @@ function Sidebar({
           data-slot="sidebar"
           data-narrow="true"
           side={side}
-          showCloseButton={false}
           className={cn(
-            'nx:w-(--sidebar-width) nx:bg-nav-background nx:p-0 nx:text-nav-foreground',
+            'nx:inset-y-2 nx:h-auto nx:w-(--sidebar-width) nx:max-w-[calc(100vw-1rem)] nx:rounded-lg nx:border-default nx:border-nav-border nx:bg-nav-background nx:p-0 nx:text-nav-foreground',
+            side === 'left'
+              ? 'nx:left-2 nx:data-[state=closed]:-translate-x-[calc(100%+0.5rem)]'
+              : 'nx:right-2 nx:data-[state=closed]:translate-x-[calc(100%+0.5rem)]',
             className
           )}
           style={
@@ -318,7 +320,7 @@ function Sidebar({
 
   return (
     <div
-      className="nx:group nx:peer nx:hidden nx:text-nav-foreground nx:lg:block"
+      className="nx:group nx:peer nx:hidden nx:text-nav-foreground nx:md:block"
       data-state={state}
       data-collapsible={state === 'collapsed' ? collapsible : ''}
       data-variant={variant}
@@ -340,7 +342,7 @@ function Sidebar({
       <div
         data-slot="sidebar-container"
         className={cn(
-          'nx:fixed nx:inset-y-0 nx:z-sticky nx:hidden nx:h-svh nx:w-(--sidebar-width) nx:transition-[left,right,width] nx:duration-default nx:ease-linear nx:motion-reduce:transition-none nx:lg:flex',
+          'nx:fixed nx:inset-y-0 nx:z-sticky nx:hidden nx:h-svh nx:w-(--sidebar-width) nx:transition-[left,right,width] nx:duration-default nx:ease-linear nx:motion-reduce:transition-none nx:md:flex',
           side === 'left'
             ? 'nx:left-0 nx:group-data-[collapsible=offcanvas]:-left-(--sidebar-width)'
             : 'nx:right-0 nx:group-data-[collapsible=offcanvas]:-right-(--sidebar-width)',
@@ -426,7 +428,7 @@ function SidebarRail({ className, ...props }: SidebarRailProps) {
       onClick={toggleSidebar}
       title="Toggle Sidebar"
       className={cn(
-        'nx:absolute nx:inset-y-0 nx:z-sticky nx:hidden nx:w-4 nx:-translate-x-1/2 nx:transition-[left,right,translate,background-color] nx:duration-fast nx:ease-linear nx:motion-reduce:transition-none nx:group-data-[side=left]:-right-4 nx:group-data-[side=right]:left-0 nx:after:absolute nx:after:inset-y-0 nx:after:left-1/2 nx:after:w-0.5 nx:hover:after:bg-nav-border nx:lg:flex',
+        'nx:absolute nx:inset-y-0 nx:z-sticky nx:hidden nx:w-4 nx:-translate-x-1/2 nx:transition-[left,right,translate,background-color] nx:duration-fast nx:ease-linear nx:motion-reduce:transition-none nx:group-data-[side=left]:-right-4 nx:group-data-[side=right]:left-0 nx:after:absolute nx:after:inset-y-0 nx:after:left-1/2 nx:after:w-0.5 nx:hover:after:bg-nav-border nx:md:flex',
         'nx:in-data-[side=left]:cursor-w-resize nx:in-data-[side=right]:cursor-e-resize',
         'nx:[[data-side=left][data-state=collapsed]_&]:cursor-e-resize nx:[[data-side=right][data-state=collapsed]_&]:cursor-w-resize',
         'nx:group-data-[collapsible=offcanvas]:translate-x-0 nx:group-data-[collapsible=offcanvas]:after:left-full nx:hover:group-data-[collapsible=offcanvas]:bg-nav-background',
@@ -460,7 +462,7 @@ function SidebarInset({ className, ...props }: SidebarInsetProps) {
       data-slot="sidebar-inset"
       className={cn(
         'nx:relative nx:flex nx:w-full nx:min-w-0 nx:flex-1 nx:flex-col nx:bg-background',
-        'nx:lg:peer-data-[variant=inset]:m-2 nx:lg:peer-data-[variant=inset]:ml-0 nx:lg:peer-data-[variant=inset]:rounded-xl nx:lg:peer-data-[variant=inset]:shadow-sm nx:lg:peer-data-[variant=inset]:peer-data-[state=collapsed]:ml-2',
+        'nx:md:peer-data-[variant=inset]:m-2 nx:md:peer-data-[variant=inset]:ml-0 nx:md:peer-data-[variant=inset]:rounded-xl nx:md:peer-data-[variant=inset]:shadow-sm nx:md:peer-data-[variant=inset]:peer-data-[state=collapsed]:ml-2',
         className
       )}
       {...props}
@@ -869,6 +871,7 @@ function SidebarMenuButton({
       data-variant={variant}
       data-size={size}
       data-active={isActive}
+      aria-current={isActive ? 'page' : undefined}
       className={cn(sidebarMenuButtonVariants({ variant, size }), className)}
       {...props}
     />
@@ -937,7 +940,7 @@ function SidebarMenuAction({
         'nx:peer-data-[size=lg]/menu-button:top-2.5',
         'nx:group-data-[collapsible=icon]:hidden',
         showOnHover &&
-          'nx:group-focus-within/menu-item:opacity-100 nx:group-hover/menu-item:opacity-100 nx:data-[state=open]:opacity-100 nx:lg:opacity-0',
+          'nx:group-focus-within/menu-item:opacity-100 nx:group-hover/menu-item:opacity-100 nx:data-[state=open]:opacity-100 nx:md:opacity-0',
         className
       )}
       {...props}
@@ -1123,6 +1126,7 @@ function SidebarMenuSubButton({
       data-slot="sidebar-menu-sub-button"
       data-size={size}
       data-active={isActive}
+      aria-current={isActive ? 'page' : undefined}
       className={cn(
         'nx:flex nx:h-7 nx:min-w-0 nx:-translate-x-px nx:items-center nx:gap-2 nx:overflow-hidden nx:rounded-md nx:px-2 nx:text-nav-muted-foreground nx:outline-hidden nx:hover:bg-nav-item-hover nx:focus-visible:outline-2 nx:focus-visible:outline-focus-default nx:focus-visible:outline-offset-(--focus-offset) nx:active:bg-nav-item-active nx:disabled:pointer-events-none nx:disabled:text-disabled-foreground nx:aria-disabled:pointer-events-none nx:aria-disabled:text-disabled-foreground nx:[&>span:last-child]:truncate nx:[&>svg]:size-4 nx:[&>svg]:shrink-0',
         'nx:data-[active=true]:bg-nav-item-active nx:data-[active=true]:text-nav-foreground',

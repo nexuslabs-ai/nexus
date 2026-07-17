@@ -2,6 +2,7 @@
 import './index.css';
 
 // Utilities
+export { popoverSurfaceClassName } from './components/overlay-layout/overlay-layout';
 export {
   CHART_CATEGORICAL_SERIES,
   type ChartCategoricalIndex,

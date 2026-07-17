@@ -1,7 +1,14 @@
 {
+  "thin": {
+    "$value": {
+      "value": 0.5,
+      "unit": "px"
+    },
+    "$type": "dimension"
+  },
   "default": {
     "$value": {
-      "value": 1,
+      "value": 0.5,
       "unit": "px"
     },
     "$type": "dimension"
