@@ -1,5 +1,12 @@
 # @nexus_ds/react
 
+## 0.1.1
+
+### Patch Changes
+
+- Updated dependencies [1d27496]
+  - @nexus_ds/core@0.4.0
+
 ## 0.1.0
 
 ### Minor Changes
