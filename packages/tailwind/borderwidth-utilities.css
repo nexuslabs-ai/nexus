@@ -1,5 +1,40 @@
 /* Border Width Utilities */
 
+@utility border-thin {
+  border-style: var(--tw-border-style, solid);
+  border-width: var(--nx-borderwidth-thin);
+}
+
+@utility border-x-thin {
+  border-inline-style: var(--tw-border-style, solid);
+  border-inline-width: var(--nx-borderwidth-thin);
+}
+
+@utility border-y-thin {
+  border-block-style: var(--tw-border-style, solid);
+  border-block-width: var(--nx-borderwidth-thin);
+}
+
+@utility border-t-thin {
+  border-top-style: var(--tw-border-style, solid);
+  border-top-width: var(--nx-borderwidth-thin);
+}
+
+@utility border-r-thin {
+  border-right-style: var(--tw-border-style, solid);
+  border-right-width: var(--nx-borderwidth-thin);
+}
+
+@utility border-b-thin {
+  border-bottom-style: var(--tw-border-style, solid);
+  border-bottom-width: var(--nx-borderwidth-thin);
+}
+
+@utility border-l-thin {
+  border-left-style: var(--tw-border-style, solid);
+  border-left-width: var(--nx-borderwidth-thin);
+}
+
 @utility border-default {
   border-style: var(--tw-border-style, solid);
   border-width: var(--nx-borderwidth-default);
@@ -71,6 +106,41 @@
 }
 
 /* Border Width Alias Utilities */
+
+@utility border-width-thin {
+  border-style: var(--tw-border-style, solid);
+  border-width: var(--nx-borderwidth-thin);
+}
+
+@utility border-width-x-thin {
+  border-inline-style: var(--tw-border-style, solid);
+  border-inline-width: var(--nx-borderwidth-thin);
+}
+
+@utility border-width-y-thin {
+  border-block-style: var(--tw-border-style, solid);
+  border-block-width: var(--nx-borderwidth-thin);
+}
+
+@utility border-width-t-thin {
+  border-top-style: var(--tw-border-style, solid);
+  border-top-width: var(--nx-borderwidth-thin);
+}
+
+@utility border-width-r-thin {
+  border-right-style: var(--tw-border-style, solid);
+  border-right-width: var(--nx-borderwidth-thin);
+}
+
+@utility border-width-b-thin {
+  border-bottom-style: var(--tw-border-style, solid);
+  border-bottom-width: var(--nx-borderwidth-thin);
+}
+
+@utility border-width-l-thin {
+  border-left-style: var(--tw-border-style, solid);
+  border-left-width: var(--nx-borderwidth-thin);
+}
 
 @utility border-width-default {
   border-style: var(--tw-border-style, solid);

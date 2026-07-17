@@ -73,6 +73,7 @@
   --radius-full: var(--nx-radius-full);
 
   /* Border width tokens */
+  --border-thin: var(--nx-borderwidth-thin);
   --border-default: var(--nx-borderwidth-default);
   --border-thick: var(--nx-borderwidth-thick);
 
@@ -152,6 +153,10 @@
     oklch(0.9227 0.0089 70)
   );
   --color-muted: var(--nx-color-muted, oklch(0.9698 0.0083 70));
+  --color-muted-extralight: var(
+    --nx-color-muted-extralight,
+    oklch(0.9879 0.0081 70)
+  );
   --color-container: var(--nx-color-container, oklch(1 0 0));
   --color-container-hover: var(
     --nx-color-container-hover,
@@ -514,6 +519,10 @@
     oklch(0.9227 0.0089 70)
   );
   --color-muted: var(--nx-color-muted, oklch(0.9698 0.0083 70));
+  --color-muted-extralight: var(
+    --nx-color-muted-extralight,
+    oklch(0.9879 0.0081 70)
+  );
   --color-container: var(--nx-color-container, oklch(1 0 0));
   --color-container-hover: var(
     --nx-color-container-hover,
@@ -870,6 +879,7 @@
   --nx-color-background-hover: oklch(0.2481 0.006 70);
   --nx-color-background-active: oklch(0.2481 0.006 70);
   --nx-color-muted: oklch(0.2481 0.006 70);
+  --nx-color-muted-extralight: oklch(0.2289 0.006 70);
   --nx-color-container: oklch(0.2481 0.006 70);
   --nx-color-container-hover: oklch(0.2801 0.006 70);
   --nx-color-container-active: oklch(0.2481 0.006 70);
@@ -2264,16 +2274,19 @@
 
 :root,
 [data-borderwidth='normal'] {
+  --nx-borderwidth-thin: 0.5px;
   --nx-borderwidth-default: 1px;
   --nx-borderwidth-thick: 2px;
 }
 
 [data-borderwidth='fine'] {
-  --nx-borderwidth-default: 1px;
+  --nx-borderwidth-thin: 0.5px;
+  --nx-borderwidth-default: 0.5px;
   --nx-borderwidth-thick: 1px;
 }
 
 [data-borderwidth='strong'] {
+  --nx-borderwidth-thin: 1px;
   --nx-borderwidth-default: 2px;
   --nx-borderwidth-thick: 3px;
 }

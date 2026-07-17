@@ -58,7 +58,7 @@ function EmptyState({
       data-slot="empty-state"
       data-bordered={bordered || undefined}
       className={cn(
-        'nx:flex nx:min-w-0 nx:flex-1 nx:flex-col nx:items-center nx:justify-center nx:gap-6 nx:rounded-lg nx:p-6 nx:text-center nx:text-balance',
+        'nx:flex nx:min-w-0 nx:flex-1 nx:flex-col nx:items-center nx:justify-center nx:gap-6 nx:rounded-lg nx:bg-muted-extralight nx:p-6 nx:text-center nx:text-balance',
         bordered &&
           'nx:border-default nx:border-dashed nx:border-border-default',
         className
@@ -178,7 +178,7 @@ function EmptyStateTitle({
   return (
     <Comp
       data-slot="empty-state-title"
-      className={cn('nx:typography-heading-xsmall', className)}
+      className={cn('nx:typography-heading-xxsmall', className)}
       {...props}
     />
   );

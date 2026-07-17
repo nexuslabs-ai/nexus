@@ -8,6 +8,7 @@ import {
 import { COMPOSITE_UTILITIES } from './support/typography-utilities';
 
 const SIZE_KEYS = [
+  'xxs',
   'xs',
   'sm',
   'base',
@@ -52,7 +53,7 @@ const WEIGHT_TOKEN_NAMES = WEIGHT_KEYS.map(
 const FAMILY_TOKEN_NAMES = FAMILY_KEYS.map(
   (key) => `--nx-typography-family-${key}`
 );
-const LINE_HEIGHT_TOKEN_NAMES = SIZE_KEYS.map(
+const LINE_HEIGHT_TOKEN_NAMES = LINE_HEIGHT_DISPLAY_KEYS.map(
   (key) => `--nx-typography-line-height-${key}`
 );
 const LINE_HEIGHT_RUNTIME_TOKEN_NAMES = [

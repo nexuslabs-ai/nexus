@@ -38,6 +38,11 @@ const SCALE: {
         name: 'heading-xsmall',
         sample: 'Tokens, not guesswork',
       },
+      {
+        cls: 'nx:typography-heading-xxsmall',
+        name: 'heading-xxsmall',
+        sample: 'The smallest heading tier',
+      },
     ],
   },
   {

@@ -20,6 +20,7 @@ const SURFACE_TOKEN_NAMES = [
   'background-hover',
   'background-active',
   'muted',
+  'muted-extralight',
   'container',
   'container-hover',
   'container-active',
@@ -143,6 +144,8 @@ const ALPHA_TOKEN_NAMES = [
 ] as const;
 
 const DESCRIPTIONS: Partial<Record<string, string>> = {
+  'muted-extralight':
+    'Quietest muted surface — sits between background and muted for barely-there fills (empty states, subtle panels).',
   'muted-foreground':
     "It's a gray that softens contrast so primary content stands forward.",
   'muted-foreground-subtle':

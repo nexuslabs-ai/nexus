@@ -139,6 +139,7 @@ export const DEFAULT_NEXUS_APPEARANCE: NexusAppearanceState = {
 const FONT_PX_MIN = 8;
 const FONT_PX_MAX = 32;
 const TYPOGRAPHY_SIZE_PX = {
+  xxs: 11,
   xs: 12,
   sm: 14,
   base: 16,

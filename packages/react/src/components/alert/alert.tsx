@@ -6,7 +6,7 @@ import { cva, type VariantProps } from 'class-variance-authority';
 import { IconX } from '../../lib/icons';
 import { cn } from '../../lib/utils';
 
-const alertVariants = cva('nx:group/alert nx:grid nx:w-full nx:p-4', {
+const alertVariants = cva('nx:group/alert nx:grid nx:w-full nx:px-6 nx:py-4', {
   variants: {
     variant: {
       default: 'nx:border-border-default nx:bg-container nx:text-foreground',
@@ -25,7 +25,7 @@ const alertVariants = cva('nx:group/alert nx:grid nx:w-full nx:p-4', {
     },
     layout: {
       stack:
-        'nx:grid-cols-[auto_minmax(0,1fr)] nx:items-start nx:has-[>[data-slot=alert-icon]]:gap-x-2 nx:*:data-[slot=alert-title]:col-start-2 nx:*:data-[slot=alert-description]:col-start-2 nx:*:data-[slot=alert-content]:col-start-2 nx:*:data-[slot=alert-actions]:col-start-2',
+        'nx:grid-cols-[auto_minmax(0,1fr)] nx:items-start nx:has-[>[data-slot=alert-icon]]:gap-x-4 nx:*:data-[slot=alert-title]:col-start-2 nx:*:data-[slot=alert-description]:col-start-2 nx:*:data-[slot=alert-content]:col-start-2 nx:*:data-[slot=alert-actions]:col-start-2',
       inline:
         'nx:grid-cols-[minmax(0,1fr)_auto] nx:items-center nx:gap-x-4 nx:gap-y-1 nx:has-[>[data-slot=alert-icon]]:grid-cols-[auto_minmax(0,1fr)_auto]',
     },

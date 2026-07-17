@@ -9,6 +9,15 @@
         }
       }
     },
+    "font-heading": {
+      "$value": "ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif",
+      "$type": "fontFamily",
+      "$extensions": {
+        "nx-font-source": {
+          "type": "system"
+        }
+      }
+    },
     "font-serif": {
       "$value": "Georgia",
       "$type": "fontFamily",
@@ -29,6 +38,13 @@
     }
   },
   "size": {
+    "xxs": {
+      "$value": {
+        "value": 11,
+        "unit": "px"
+      },
+      "$type": "dimension"
+    },
     "xs": {
       "$value": {
         "value": 12,

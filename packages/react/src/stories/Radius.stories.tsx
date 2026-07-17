@@ -15,7 +15,7 @@ const RADIUS_KEYS = [
   '3xl',
   'full',
 ] as const;
-const BORDERWIDTH_KEYS = ['default', 'thick'] as const;
+const BORDERWIDTH_KEYS = ['thin', 'default', 'thick'] as const;
 
 const RADIUS_TOKEN_NAMES = RADIUS_KEYS.map((key) => `--nx-radius-${key}`);
 const BORDERWIDTH_TOKEN_NAMES = BORDERWIDTH_KEYS.map(
@@ -104,8 +104,8 @@ function BorderWidthsStory() {
         </h2>
         <p className="nx:text-muted-foreground nx:typography-body-default nx:max-w-2xl">
           Live `--nx-borderwidth-*` variables from the active Stroke toolbar.
-          The Tailwind utilities `nx:border-default` and `nx:border-thick`
-          consume these values.
+          The Tailwind utilities `nx:border-thin`, `nx:border-default`, and
+          `nx:border-thick` consume these values.
         </p>
       </div>
       <section className="nx:flex nx:flex-wrap nx:items-start nx:gap-4">

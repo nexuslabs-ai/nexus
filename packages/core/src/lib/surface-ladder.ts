@@ -24,6 +24,7 @@ export const SURFACE_TOKENS = [
   'background-hover',
   'background-active',
   'muted',
+  'muted-extralight',
   'container',
   'container-hover',
   'container-active',
@@ -113,6 +114,10 @@ export const LIGHT_SURFACE_LADDER = {
   'background-hover': 50,
   'background-active': 150,
   muted: 75,
+  // The only light rung off the shade grid: a 40% background→muted blend lands
+  // between gridlines, so it is expressed as a raw fractional step (mirrors the
+  // dark ladder's raw-step rationale below).
+  'muted-extralight': { step: -0.216 },
   container: 'base',
   'container-hover': 75,
   'container-active': 100,
@@ -136,6 +141,7 @@ export const DARK_SURFACE_LADDER = {
   'background-hover': { step: 1.6 },
   'background-active': { step: 1.6 },
   muted: { step: 1.6 },
+  'muted-extralight': { step: 0.64 },
   container: { step: 1.6 },
   'container-hover': { step: 3.2 },
   'container-active': { step: 1.6 },

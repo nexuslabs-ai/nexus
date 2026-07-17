@@ -3,46 +3,57 @@
     "large": {
       "$type": "typography",
       "$value": {
-        "fontFamily": "{family.font-sans}",
+        "fontFamily": "{family.font-heading}",
         "fontSize": "{size.3xl}",
-        "fontWeight": "{weight.semibold}",
+        "fontWeight": "{weight.bold}",
         "lineHeight": "{line-height.3xl}",
-        "letterSpacing": "{letterspacing.normal}"
+        "letterSpacing": "{letterspacing.tighter}"
       },
       "$description": "Major section heading, dialog titles, card group headers"
     },
     "medium": {
       "$type": "typography",
       "$value": {
-        "fontFamily": "{family.font-sans}",
+        "fontFamily": "{family.font-heading}",
         "fontSize": "{size.2xl}",
-        "fontWeight": "{weight.semibold}",
+        "fontWeight": "{weight.bold}",
         "lineHeight": "{line-height.2xl}",
-        "letterSpacing": "{letterspacing.normal}"
+        "letterSpacing": "{letterspacing.tight}"
       },
       "$description": "Susbsection heading, card titles, modal headers"
     },
     "small": {
       "$type": "typography",
       "$value": {
-        "fontFamily": "{family.font-sans}",
+        "fontFamily": "{family.font-heading}",
         "fontSize": "{size.xl}",
-        "fontWeight": "{weight.semibold}",
+        "fontWeight": "{weight.bold}",
         "lineHeight": "{line-height.xl}",
-        "letterSpacing": "{letterspacing.normal}"
+        "letterSpacing": "{letterspacing.tight}"
       },
       "$description": "Card Titles, list section headers, minor heading"
     },
     "xsmall": {
       "$type": "typography",
       "$value": {
-        "fontFamily": "{family.font-sans}",
+        "fontFamily": "{family.font-heading}",
         "fontSize": "{size.lg}",
-        "fontWeight": "{weight.semibold}",
+        "fontWeight": "{weight.bold}",
         "lineHeight": "{line-height.lg}",
-        "letterSpacing": "{letterspacing.normal}"
+        "letterSpacing": "{letterspacing.tight}"
       },
       "$description": "Table Section headers, accordian titles, minor seciton lables"
+    },
+    "xxsmall": {
+      "$type": "typography",
+      "$value": {
+        "fontFamily": "{family.font-heading}",
+        "fontSize": "{size.base}",
+        "fontWeight": "{weight.semibold}",
+        "lineHeight": "{line-height.base}",
+        "letterSpacing": "{letterspacing.tight}"
+      },
+      "$description": "Smallest heading tier — empty-state titles, compact card headers"
     }
   },
   "body": {
@@ -107,10 +118,10 @@
       "$type": "typography",
       "$value": {
         "fontFamily": "{family.font-sans}",
-        "fontSize": "{size.xs}",
+        "fontSize": "{size.xxs}",
         "fontWeight": "{weight.semibold}",
         "lineHeight": "{line-height.xs}",
-        "letterSpacing": "{letterspacing.wider}"
+        "letterSpacing": "{letterspacing.wide}"
       },
       "$description": "12"
     }

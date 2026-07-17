@@ -36,7 +36,7 @@ function hOf(oklchStr: string | undefined): number {
 const toRgb = converter('rgb');
 const oklabDelta = differenceEuclidean('oklab');
 const COLORBLIND_DELTA_E = 0.02;
-const RUNTIME_SEMANTIC_COLOR_COUNT = 106;
+const RUNTIME_SEMANTIC_COLOR_COUNT = 107;
 const VISION_TYPES = [
   'normal',
   'deuteranopia',

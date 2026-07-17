@@ -28,10 +28,15 @@ const RADIUS_MODES: { mode: string; md: number }[] = [
   { mode: 'extra-round', md: 16 },
 ];
 
-const BORDER_DESIGNS: { mode: string; def: string; thick: string }[] = [
-  { mode: 'normal', def: '1', thick: '2' },
-  { mode: 'fine', def: '1', thick: '1' },
-  { mode: 'strong', def: '1.5', thick: '3' },
+const BORDER_DESIGNS: {
+  mode: string;
+  thin: string;
+  def: string;
+  thick: string;
+}[] = [
+  { mode: 'normal', thin: '0.5', def: '1', thick: '2' },
+  { mode: 'fine', thin: '0.5', def: '0.5', thick: '1' },
+  { mode: 'strong', thin: '1', def: '2', thick: '3' },
 ];
 
 const SHADOWS: { cls: string; label: string }[] = [
@@ -126,6 +131,7 @@ export function Radius() {
             <thead>
               <tr className="nx:border-b nx:border-border-default nx:text-left">
                 <th className="nx:py-2 nx:pr-3 nx:font-semibold">Mode</th>
+                <th className="nx:py-2 nx:pr-3 nx:font-semibold">thin (px)</th>
                 <th className="nx:py-2 nx:pr-3 nx:font-semibold">
                   default (px)
                 </th>
@@ -140,6 +146,9 @@ export function Radius() {
                 >
                   <td className="nx:py-2 nx:pr-3 nx:font-mono nx:typography-label-small">
                     {b.mode}
+                  </td>
+                  <td className="nx:py-2 nx:pr-3 nx:text-muted-foreground nx:typography-label-small">
+                    {b.thin}
                   </td>
                   <td className="nx:py-2 nx:pr-3 nx:text-muted-foreground nx:typography-label-small">
                     {b.def}

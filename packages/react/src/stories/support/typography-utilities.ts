@@ -9,6 +9,7 @@ export const COMPOSITE_UTILITIES: {
       { cls: 'nx:typography-heading-medium', sample: 'Heading Medium' },
       { cls: 'nx:typography-heading-small', sample: 'Heading Small' },
       { cls: 'nx:typography-heading-xsmall', sample: 'Heading XSmall' },
+      { cls: 'nx:typography-heading-xxsmall', sample: 'Heading XXSmall' },
     ],
   },
   {
