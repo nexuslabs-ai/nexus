@@ -32,6 +32,7 @@ export * from './components/dialog';
 export * from './components/drawer';
 export * from './components/dropdown-menu';
 export * from './components/empty-state';
+export * from './components/event-calendar';
 export * from './components/field';
 export * from './components/hide';
 export * from './components/hover-card';
