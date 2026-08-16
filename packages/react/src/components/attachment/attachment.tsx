@@ -28,8 +28,7 @@ const attachmentVariants = cva(
     'nx:group/attachment nx:relative nx:min-w-0',
     // Lift the trailing controls above AttachmentTrigger's full-card overlay.
     'nx:[&_[data-slot=item-actions]]:relative nx:[&_[data-slot=item-actions]]:z-20',
-    // The title is a file name, so it ellipses rather than widening the card —
-    // Item's own title is w-fit, which sizes to content and cannot truncate.
+    // Item's title is w-fit, so it needs a full-width block to truncate.
     'nx:[&_[data-slot=item-title]]:block nx:[&_[data-slot=item-title]]:w-full nx:[&_[data-slot=item-title]]:truncate',
     'nx:data-[state=idle]:border-dashed',
     'nx:data-[state=error]:border-border-error',
@@ -38,8 +37,6 @@ const attachmentVariants = cva(
   ],
   {
     variants: {
-      // A file chip reads denser than the generic Item list row it is built on,
-      // so it overrides Item's padding and gap rather than inheriting them.
       size: {
         default: 'nx:gap-2.5 nx:p-2.5',
         sm: 'nx:gap-2 nx:p-2',
@@ -49,7 +46,6 @@ const attachmentVariants = cva(
         vertical: [
           'nx:w-32 nx:flex-col nx:items-stretch',
           'nx:[&_[data-slot=item-media]]:size-auto nx:[&_[data-slot=item-media]]:aspect-square nx:[&_[data-slot=item-media]]:w-full nx:[&_[data-slot=item-media]]:self-auto',
-          // The media well fills the tile, so its glyph scales up with it.
           'nx:[&_[data-slot=item-media]_svg]:size-8',
         ],
       },
@@ -101,9 +97,7 @@ interface AttachmentProps
  * media fills the card width. Group several with `AttachmentGroup`.
  *
  * The current `state` is announced through a visually hidden `role="status"`
- * region, so progress is never conveyed by animation alone. A `done` attachment
- * mounted with the page is not re-announced, because the region enters the DOM
- * with its text already in place.
+ * region, so progress is never conveyed by animation alone.
  *
  * @example
  * ```tsx
@@ -171,9 +165,8 @@ function AttachmentGroup({ className, ...props }: AttachmentGroupProps) {
   return (
     <div
       data-slot="attachment-group"
-      // A strip of plain preview cards overflows horizontally with no focusable
-      // children, so the container itself must be keyboard-focusable to scroll
-      // (axe scrollable-region-focusable / WCAG 2.1.1).
+      // A scrollable region with no focusable children must itself be
+      // keyboard-focusable to scroll (WCAG 2.1.1).
       // eslint-disable-next-line jsx-a11y/no-noninteractive-tabindex
       tabIndex={0}
       className={cn(

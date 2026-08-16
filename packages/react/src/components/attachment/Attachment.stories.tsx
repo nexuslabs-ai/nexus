@@ -71,9 +71,7 @@ export const Default: Story = {
   ),
 };
 
-// Every lifecycle state, top to bottom. Each carries leading media — a state
-// glyph for idle/processing/error, the file-type icon otherwise — and a
-// trailing dismiss cross whose label says what dismissing means in that state.
+// Every lifecycle state, top to bottom.
 export const States: Story = {
   render: () => (
     <div className="nx:flex nx:w-80 nx:flex-col nx:gap-3">
@@ -265,8 +263,7 @@ export const VerticalOrientation: Story = {
   ),
 };
 
-// A composer strip — mixed file types scrolling horizontally. Images preview
-// their own thumbnail; everything else falls back to its file-type glyph.
+// A composer strip — mixed file types scrolling horizontally.
 export const Grouped: Story = {
   render: () => (
     <AttachmentGroup className="nx:w-80">
@@ -297,10 +294,8 @@ export const Grouped: Story = {
 
 const LONG_NAME = 'quarterly-financial-report-with-appendices-final-v12.pdf';
 
-// Long names truncate rather than widening the card — but the name stays
-// recoverable. The complete string is in the DOM, so assistive tech reads it in
-// full, and a tooltip on the card trigger reveals it to sighted users on hover
-// and on keyboard focus.
+// Long names truncate rather than widening the card, with a tooltip on the
+// card trigger revealing the full name.
 export const LongFileName: Story = {
   render: () => (
     <TooltipProvider>
@@ -336,7 +331,6 @@ export const LongFileName: Story = {
     const canvas = within(canvasElement);
     const title = canvas.getByText(LONG_NAME);
 
-    // Clipped on screen, complete in the accessibility tree.
     await expect(title.scrollWidth).toBeGreaterThan(title.clientWidth);
   },
 };
@@ -377,8 +371,6 @@ export const ClickInteraction: StoryObj<
     await userEvent.click(trigger);
     await expect(args.onOpen).toHaveBeenCalledTimes(1);
 
-    // The remove button sits above the overlay, so it takes its own click
-    // rather than the trigger swallowing it.
     const remove = canvas.getByRole('button', { name: 'Remove report.pdf' });
     await userEvent.click(remove);
     await expect(args.onRemove).toHaveBeenCalledTimes(1);
@@ -439,8 +431,6 @@ export const Disabled: StoryObj<AttachmentProps & { onRemove: () => void }> = {
     const canvas = within(canvasElement);
     const remove = canvas.getByRole('button', { name: 'Remove report.pdf' });
 
-    // A disabled Button carries pointer-events: none, so a click cannot be
-    // dispatched at it — the disabled state and the unfired spy are the proof.
     await expect(remove).toBeDisabled();
     await expect(remove).toHaveAttribute('disabled');
     await expect(args.onRemove).not.toHaveBeenCalled();
@@ -486,7 +476,6 @@ export const WithDataAttributes: Story = {
     await expect(root).toHaveAttribute('data-state', 'uploading');
     await expect(root).toHaveAttribute('data-orientation', 'vertical');
 
-    // Progress must not be conveyed by the visual treatment alone.
     await expect(canvas.getByRole('status')).toHaveTextContent('Uploading');
   },
 };

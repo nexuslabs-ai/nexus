@@ -180,8 +180,7 @@ function ItemContent({ className, ...props }: React.ComponentProps<'div'>) {
     <div
       data-slot="item-content"
       className={cn(
-        // min-w-0 lets the column shrink past its content, so a long title can
-        // truncate instead of pushing the row wider than its container.
+        // min-w-0 lets the column shrink past its content so a title can truncate.
         'nx:flex nx:min-w-0 nx:flex-1 nx:flex-col nx:gap-1 nx:[&+[data-slot=item-content]]:flex-none',
         className
       )}
