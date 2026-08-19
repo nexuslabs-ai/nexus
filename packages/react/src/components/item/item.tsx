@@ -124,7 +124,7 @@ function Item({
 }
 
 const itemMediaVariants = cva(
-  'nx:flex nx:shrink-0 nx:items-center nx:justify-center nx:gap-2 nx:group-has-data-[slot=item-description]/item:translate-y-0.5 nx:group-has-data-[slot=item-description]/item:self-start nx:[&_svg]:pointer-events-none',
+  'nx:flex nx:shrink-0 nx:items-center nx:justify-center nx:gap-2 nx:group-has-[[data-slot$=description]]/item:translate-y-0.5 nx:group-has-[[data-slot$=description]]/item:self-start nx:[&_svg]:pointer-events-none',
   {
     variants: {
       variant: {
@@ -175,7 +175,14 @@ function ItemMedia({
  *
  * The middle column — title and description — that grows to fill the row.
  */
-function ItemContent({ className, ...props }: React.ComponentProps<'div'>) {
+/**
+ * ItemContentProps
+ *
+ * Props for the ItemContent component.
+ */
+interface ItemContentProps extends React.ComponentProps<'div'> {}
+
+function ItemContent({ className, ...props }: ItemContentProps) {
   return (
     <div
       data-slot="item-content"
@@ -194,7 +201,14 @@ function ItemContent({ className, ...props }: React.ComponentProps<'div'>) {
  *
  * The item's primary label.
  */
-function ItemTitle({ className, ...props }: React.ComponentProps<'div'>) {
+/**
+ * ItemTitleProps
+ *
+ * Props for the ItemTitle component.
+ */
+interface ItemTitleProps extends React.ComponentProps<'div'> {}
+
+function ItemTitle({ className, ...props }: ItemTitleProps) {
   return (
     <div
       data-slot="item-title"
@@ -212,7 +226,14 @@ function ItemTitle({ className, ...props }: React.ComponentProps<'div'>) {
  *
  * Supporting copy beneath the title; clamps to two lines, anchors underlined.
  */
-function ItemDescription({ className, ...props }: React.ComponentProps<'p'>) {
+/**
+ * ItemDescriptionProps
+ *
+ * Props for the ItemDescription component.
+ */
+interface ItemDescriptionProps extends React.ComponentProps<'p'> {}
+
+function ItemDescription({ className, ...props }: ItemDescriptionProps) {
   return (
     <p
       data-slot="item-description"
@@ -230,7 +251,14 @@ function ItemDescription({ className, ...props }: React.ComponentProps<'p'>) {
  *
  * The trailing controls of a row — typically one or two buttons.
  */
-function ItemActions({ className, ...props }: React.ComponentProps<'div'>) {
+/**
+ * ItemActionsProps
+ *
+ * Props for the ItemActions component.
+ */
+interface ItemActionsProps extends React.ComponentProps<'div'> {}
+
+function ItemActions({ className, ...props }: ItemActionsProps) {
   return (
     <div
       data-slot="item-actions"
@@ -279,8 +307,11 @@ function ItemFooter({ className, ...props }: React.ComponentProps<'div'>) {
 export {
   Item,
   ItemActions,
+  type ItemActionsProps,
   ItemContent,
+  type ItemContentProps,
   ItemDescription,
+  type ItemDescriptionProps,
   ItemFooter,
   ItemGroup,
   ItemHeader,
@@ -290,5 +321,6 @@ export {
   type ItemProps,
   ItemSeparator,
   ItemTitle,
+  type ItemTitleProps,
   itemVariants,
 };

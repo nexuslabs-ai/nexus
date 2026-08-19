@@ -7,10 +7,16 @@ import { cn } from '../../lib/utils';
 import {
   Item,
   ItemActions,
+  type ItemActionsProps,
+  ItemContent,
+  type ItemContentProps,
+  ItemDescription,
+  type ItemDescriptionProps,
   ItemMedia,
   type ItemMediaProps,
   type ItemProps,
   ItemTitle,
+  type ItemTitleProps,
 } from '../item';
 import { Progress, type ProgressProps } from '../progress';
 
@@ -22,20 +28,15 @@ import { Progress, type ProgressProps } from '../progress';
  */
 type AttachmentState = 'idle' | 'uploading' | 'processing' | 'error' | 'done';
 
-const ATTACHMENT_STATUS_TEXT: Record<AttachmentState, string> = {
-  idle: '',
+/**
+ * Announced states only — a settled card (`idle` / `done`) stays silent, so it
+ * has no entry here and the live region renders empty.
+ */
+const ATTACHMENT_STATUS_TEXT: Partial<Record<AttachmentState, string>> = {
   uploading: 'Uploading',
   processing: 'Processing',
   error: 'Upload failed',
-  done: 'Attached',
 };
-
-/** States whose progress is worth announcing; settled cards stay silent. */
-const ANNOUNCED_STATES: ReadonlySet<AttachmentState> = new Set([
-  'uploading',
-  'processing',
-  'error',
-]);
 
 const attachmentVariants = cva(
   [
@@ -44,7 +45,6 @@ const attachmentVariants = cva(
     'nx:group/attachment nx:relative nx:isolate nx:min-w-0',
     'nx:data-[state=idle]:border-dashed',
     'nx:data-[state=error]:border-border-error',
-    'nx:data-[state=error]:[&_[data-slot=item-description]]:text-error-subtle-foreground',
   ],
   {
     variants: {
@@ -148,19 +148,22 @@ function Attachment({
       data-state={state}
       data-orientation={orientation}
       variant="outline"
+      // Item sets data-variant from its own prop; Attachment pins the variant
+      // and exposes none, so the hook would advertise an API that isn't there.
+      data-variant={undefined}
       size={size}
       className={cn(attachmentVariants({ size, orientation }), className)}
       {...props}
     >
-      {ANNOUNCED_STATES.has(state) && (
-        <span
-          data-slot="attachment-status"
-          role="status"
-          className="nx:sr-only"
-        >
-          {statusLabel ?? ATTACHMENT_STATUS_TEXT[state]}
-        </span>
-      )}
+      {/*
+        The region stays mounted and empty while settled: a live region
+        inserted together with its text is not reliably announced.
+      */}
+      <span data-slot="attachment-status" role="status" className="nx:sr-only">
+        {ATTACHMENT_STATUS_TEXT[state]
+          ? (statusLabel ?? ATTACHMENT_STATUS_TEXT[state])
+          : ''}
+      </span>
       {children}
     </Item>
   );
@@ -202,7 +205,7 @@ function AttachmentMedia({ className, ...props }: AttachmentMediaProps) {
  *
  * Props for the AttachmentTitle component.
  */
-interface AttachmentTitleProps extends React.ComponentProps<typeof ItemTitle> {
+interface AttachmentTitleProps extends ItemTitleProps {
   /**
    * A badge or status icon pinned after the file name. It keeps `ItemTitle`'s
    * `gap-2` spacing and its own width while the name truncates beside it.
@@ -236,8 +239,59 @@ function AttachmentTitle({
       {...props}
     >
       <span className="nx:min-w-0 nx:truncate">{children}</span>
-      {trailing}
+      {trailing ? <span className="nx:shrink-0">{trailing}</span> : null}
     </ItemTitle>
+  );
+}
+
+/**
+ * AttachmentContentProps
+ *
+ * Props for the AttachmentContent component.
+ */
+interface AttachmentContentProps extends ItemContentProps {}
+
+/**
+ * AttachmentContent
+ *
+ * The middle column of an attachment — title, description, and progress.
+ */
+function AttachmentContent({ className, ...props }: AttachmentContentProps) {
+  return (
+    <ItemContent
+      data-slot="attachment-content"
+      className={className}
+      {...props}
+    />
+  );
+}
+
+/**
+ * AttachmentDescriptionProps
+ *
+ * Props for the AttachmentDescription component.
+ */
+interface AttachmentDescriptionProps extends ItemDescriptionProps {}
+
+/**
+ * AttachmentDescription
+ *
+ * The supporting line under the file name — size, progress, or the reason an
+ * upload failed. Picks up the error tint when the card has failed.
+ */
+function AttachmentDescription({
+  className,
+  ...props
+}: AttachmentDescriptionProps) {
+  return (
+    <ItemDescription
+      data-slot="attachment-description"
+      className={cn(
+        'nx:group-data-[state=error]/attachment:text-error-subtle-foreground',
+        className
+      )}
+      {...props}
+    />
   );
 }
 
@@ -246,7 +300,7 @@ function AttachmentTitle({
  *
  * Props for the AttachmentActions component.
  */
-type AttachmentActionsProps = React.ComponentProps<typeof ItemActions>;
+interface AttachmentActionsProps extends ItemActionsProps {}
 
 /**
  * AttachmentActions
@@ -270,29 +324,34 @@ function AttachmentActions({ className, ...props }: AttachmentActionsProps) {
  *
  * Props for the AttachmentGroup component.
  */
-interface AttachmentGroupProps extends Omit<
+/**
+ * The strip is a tab stop, so it must carry an accessible name — exactly one of
+ * `aria-label` or `aria-labelledby`. Reach for `aria-labelledby` when a visible
+ * heading already names the strip.
+ *
+ * @example
+ * ```tsx
+ * <AttachmentGroup aria-label="Attached files" />
+ * <AttachmentGroup aria-labelledby="composer-files-heading" />
+ * ```
+ */
+type AttachmentGroupLabel =
+  | { 'aria-label': string; 'aria-labelledby'?: never }
+  | { 'aria-labelledby': string; 'aria-label'?: never };
+
+type AttachmentGroupProps = Omit<
   React.ComponentProps<'div'>,
-  'aria-label'
-> {
-  /**
-   * Names the strip for assistive tech. Required: the strip is a tab stop, and
-   * a focusable region with no accessible name announces nothing.
-   *
-   * @example
-   * ```tsx
-   * <AttachmentGroup aria-label="Attached files" />
-   * ```
-   */
-  'aria-label': string;
-}
+  'aria-label' | 'aria-labelledby'
+> &
+  AttachmentGroupLabel;
 
 /**
  * AttachmentGroup
  *
  * A horizontally scrolling strip of attachments, snapping each card to the
- * start edge. Like `ItemGroup`, it imposes no `list` role — add
- * `role="list"` plus `role="listitem"` on the children when the grouping is
- * genuinely a list rather than a composer strip.
+ * start edge. Defaults to `role="group"`, which stays overridable through
+ * props — pass `role="list"`, plus `role="listitem"` on the children, when the
+ * grouping is genuinely a list rather than a composer strip.
  *
  * The strip is itself keyboard-focusable so it can be scrolled by keyboard, and
  * it takes a required `aria-label`.
@@ -322,7 +381,7 @@ function AttachmentGroup({ className, ...props }: AttachmentGroupProps) {
  *
  * Props for the AttachmentProgress component.
  */
-type AttachmentProgressProps = ProgressProps;
+interface AttachmentProgressProps extends ProgressProps {}
 
 /**
  * AttachmentProgress
@@ -406,6 +465,10 @@ export {
   Attachment,
   AttachmentActions,
   type AttachmentActionsProps,
+  AttachmentContent,
+  type AttachmentContentProps,
+  AttachmentDescription,
+  type AttachmentDescriptionProps,
   AttachmentGroup,
   type AttachmentGroupProps,
   AttachmentMedia,

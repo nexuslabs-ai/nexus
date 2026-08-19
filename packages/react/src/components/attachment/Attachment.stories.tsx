@@ -16,7 +16,6 @@ import {
 import { expect, fn, userEvent, within } from 'storybook/test';
 
 import { Button } from '../button';
-import { ItemContent, ItemDescription } from '../item';
 import { Spinner } from '../spinner';
 import {
   Tooltip,
@@ -28,6 +27,8 @@ import {
 import {
   Attachment,
   AttachmentActions,
+  AttachmentContent,
+  AttachmentDescription,
   AttachmentGroup,
   AttachmentMedia,
   AttachmentProgress,
@@ -55,10 +56,10 @@ export const Default: Story = {
       <AttachmentMedia variant="icon">
         <IconFileTypePdf />
       </AttachmentMedia>
-      <ItemContent>
+      <AttachmentContent>
         <AttachmentTitle>report.pdf</AttachmentTitle>
-        <ItemDescription>2.4 MB</ItemDescription>
-      </ItemContent>
+        <AttachmentDescription>2.4 MB</AttachmentDescription>
+      </AttachmentContent>
       <AttachmentActions>
         <Button variant="ghost" size="icon-sm" aria-label="Remove report.pdf">
           <IconX />
@@ -76,10 +77,10 @@ export const States: Story = {
         <AttachmentMedia variant="icon">
           <IconUpload />
         </AttachmentMedia>
-        <ItemContent>
+        <AttachmentContent>
           <AttachmentTitle>Drop a file here</AttachmentTitle>
-          <ItemDescription>PDF or PNG, up to 10 MB</ItemDescription>
-        </ItemContent>
+          <AttachmentDescription>PDF or PNG, up to 10 MB</AttachmentDescription>
+        </AttachmentContent>
         <AttachmentActions>
           <Button variant="ghost" size="icon-sm" aria-label="Dismiss">
             <IconX />
@@ -90,11 +91,11 @@ export const States: Story = {
         <AttachmentMedia variant="icon">
           <IconFileTypePdf />
         </AttachmentMedia>
-        <ItemContent>
+        <AttachmentContent>
           <AttachmentTitle>report.pdf</AttachmentTitle>
-          <ItemDescription>62% of 2.4 MB</ItemDescription>
+          <AttachmentDescription>62% of 2.4 MB</AttachmentDescription>
           <AttachmentProgress value={62} aria-label="Uploading report.pdf" />
-        </ItemContent>
+        </AttachmentContent>
         <AttachmentActions>
           <Button
             variant="ghost"
@@ -109,10 +110,10 @@ export const States: Story = {
         <AttachmentMedia variant="icon">
           <Spinner />
         </AttachmentMedia>
-        <ItemContent>
+        <AttachmentContent>
           <AttachmentTitle>scan.png</AttachmentTitle>
-          <ItemDescription>Processing…</ItemDescription>
-        </ItemContent>
+          <AttachmentDescription>Processing…</AttachmentDescription>
+        </AttachmentContent>
         <AttachmentActions>
           <Button
             variant="ghost"
@@ -127,10 +128,12 @@ export const States: Story = {
         <AttachmentMedia variant="icon">
           <IconAlertTriangle />
         </AttachmentMedia>
-        <ItemContent>
+        <AttachmentContent>
           <AttachmentTitle>archive.zip</AttachmentTitle>
-          <ItemDescription>Upload failed — file too large</ItemDescription>
-        </ItemContent>
+          <AttachmentDescription>
+            Upload failed — file too large
+          </AttachmentDescription>
+        </AttachmentContent>
         <AttachmentActions>
           <Button
             variant="ghost"
@@ -152,7 +155,7 @@ export const States: Story = {
         <AttachmentMedia variant="icon">
           <IconFileTypeTxt />
         </AttachmentMedia>
-        <ItemContent>
+        <AttachmentContent>
           <AttachmentTitle
             trailing={
               <IconCircleCheckFilled className="nx:size-4 nx:text-success-subtle-foreground" />
@@ -160,8 +163,10 @@ export const States: Story = {
           >
             notes.txt
           </AttachmentTitle>
-          <ItemDescription>8 KB · Uploaded just now</ItemDescription>
-        </ItemContent>
+          <AttachmentDescription>
+            8 KB · Uploaded just now
+          </AttachmentDescription>
+        </AttachmentContent>
         <AttachmentActions>
           <Button
             variant="ghost"
@@ -187,10 +192,10 @@ export const Sizes: Story = {
         <AttachmentMedia variant="icon">
           <IconFileTypePdf />
         </AttachmentMedia>
-        <ItemContent>
+        <AttachmentContent>
           <AttachmentTitle>report.pdf</AttachmentTitle>
-          <ItemDescription>2.4 MB</ItemDescription>
-        </ItemContent>
+          <AttachmentDescription>2.4 MB</AttachmentDescription>
+        </AttachmentContent>
         <AttachmentActions>
           <Button variant="ghost" size="icon-sm" aria-label="Remove report.pdf">
             <IconX />
@@ -201,10 +206,10 @@ export const Sizes: Story = {
         <AttachmentMedia variant="icon">
           <IconFileTypeTxt />
         </AttachmentMedia>
-        <ItemContent>
+        <AttachmentContent>
           <AttachmentTitle>notes.txt</AttachmentTitle>
-          <ItemDescription>8 KB</ItemDescription>
-        </ItemContent>
+          <AttachmentDescription>8 KB</AttachmentDescription>
+        </AttachmentContent>
         <AttachmentActions>
           <Button variant="ghost" size="icon-sm" aria-label="Remove notes.txt">
             <IconX />
@@ -229,10 +234,10 @@ export const FileTypes: Story = {
       ].map((file) => (
         <Attachment key={file.name}>
           <AttachmentMedia variant="icon">{file.icon}</AttachmentMedia>
-          <ItemContent>
+          <AttachmentContent>
             <AttachmentTitle>{file.name}</AttachmentTitle>
-            <ItemDescription>{file.size}</ItemDescription>
-          </ItemContent>
+            <AttachmentDescription>{file.size}</AttachmentDescription>
+          </AttachmentContent>
           <AttachmentActions>
             <Button
               variant="ghost"
@@ -255,10 +260,10 @@ export const VerticalOrientation: Story = {
       <AttachmentMedia variant="image">
         <img src={THUMB} alt="" />
       </AttachmentMedia>
-      <ItemContent>
+      <AttachmentContent>
         <AttachmentTitle>cover.png</AttachmentTitle>
-        <ItemDescription>412 KB</ItemDescription>
-      </ItemContent>
+        <AttachmentDescription>412 KB</AttachmentDescription>
+      </AttachmentContent>
     </Attachment>
   ),
 };
@@ -284,10 +289,10 @@ export const Grouped: Story = {
           >
             {file.media}
           </AttachmentMedia>
-          <ItemContent>
+          <AttachmentContent>
             <AttachmentTitle>{file.name}</AttachmentTitle>
-            <ItemDescription>{file.size}</ItemDescription>
-          </ItemContent>
+            <AttachmentDescription>{file.size}</AttachmentDescription>
+          </AttachmentContent>
         </Attachment>
       ))}
     </AttachmentGroup>
@@ -304,9 +309,9 @@ export const GroupKeyboardInteraction: Story = {
           <AttachmentMedia variant="icon">
             <IconFile />
           </AttachmentMedia>
-          <ItemContent>
+          <AttachmentContent>
             <AttachmentTitle>{name}</AttachmentTitle>
-          </ItemContent>
+          </AttachmentContent>
         </Attachment>
       ))}
     </AttachmentGroup>
@@ -343,10 +348,10 @@ export const LongFileName: Story = {
         <AttachmentMedia variant="icon">
           <IconFileTypePdf />
         </AttachmentMedia>
-        <ItemContent>
+        <AttachmentContent>
           <AttachmentTitle>{LONG_NAME}</AttachmentTitle>
-          <ItemDescription>2.4 MB</ItemDescription>
-        </ItemContent>
+          <AttachmentDescription>2.4 MB</AttachmentDescription>
+        </AttachmentContent>
         <AttachmentActions>
           <Button
             variant="ghost"
@@ -380,10 +385,10 @@ export const ClickInteraction: StoryObj<
       <AttachmentMedia variant="icon">
         <IconFileTypePdf />
       </AttachmentMedia>
-      <ItemContent>
+      <AttachmentContent>
         <AttachmentTitle>report.pdf</AttachmentTitle>
-        <ItemDescription>2.4 MB</ItemDescription>
-      </ItemContent>
+        <AttachmentDescription>2.4 MB</AttachmentDescription>
+      </AttachmentContent>
       <AttachmentActions>
         <Button
           variant="ghost"
@@ -420,9 +425,9 @@ export const KeyboardInteraction: StoryObj<
       <AttachmentTrigger onClick={args.onOpen}>
         <span className="nx:sr-only">Open report.pdf</span>
       </AttachmentTrigger>
-      <ItemContent>
+      <AttachmentContent>
         <AttachmentTitle>report.pdf</AttachmentTitle>
-      </ItemContent>
+      </AttachmentContent>
     </Attachment>
   ),
   play: async ({ canvasElement, args }) => {
@@ -442,10 +447,10 @@ export const Disabled: StoryObj<AttachmentProps & { onRemove: () => void }> = {
   args: { onRemove: fn() },
   render: (args) => (
     <Attachment state="uploading" className="nx:w-80">
-      <ItemContent>
+      <AttachmentContent>
         <AttachmentTitle>report.pdf</AttachmentTitle>
-        <ItemDescription>Uploading…</ItemDescription>
-      </ItemContent>
+        <AttachmentDescription>Uploading…</AttachmentDescription>
+      </AttachmentContent>
       <AttachmentActions>
         <Button
           variant="ghost"
@@ -481,9 +486,9 @@ export const AsChild: Story = {
           <span className="nx:sr-only">Open report.pdf</span>
         </a>
       </AttachmentTrigger>
-      <ItemContent>
+      <AttachmentContent>
         <AttachmentTitle>report.pdf</AttachmentTitle>
-      </ItemContent>
+      </AttachmentContent>
     </Attachment>
   ),
   play: async ({ canvasElement }) => {
@@ -496,12 +501,48 @@ export const AsChild: Story = {
 };
 
 // State reaches the DOM as data attributes, and is announced via role=status.
+// The live region is mounted even when nothing is being announced, so a later
+// state change lands in a region screen readers were already observing.
+export const SettledStatusRegion: Story = {
+  render: () => (
+    <Attachment state="done" className="nx:w-80">
+      <AttachmentMedia variant="icon">
+        <IconFileTypeTxt />
+      </AttachmentMedia>
+      <AttachmentContent>
+        <AttachmentTitle>notes.txt</AttachmentTitle>
+        <AttachmentDescription>8 KB</AttachmentDescription>
+      </AttachmentContent>
+    </Attachment>
+  ),
+  play: async ({ canvasElement }) => {
+    const status = canvasElement.querySelector(
+      '[data-slot="attachment-status"]'
+    );
+
+    // Present, so it is observed before any transition writes into it...
+    await expect(status).toBeInTheDocument();
+    await expect(status).toHaveAttribute('role', 'status');
+    // ...but silent, so a settled card announces nothing.
+    await expect(status).toHaveTextContent('');
+  },
+};
+
 export const WithDataAttributes: Story = {
   render: () => (
     <Attachment state="uploading" orientation="vertical">
-      <ItemContent>
+      <AttachmentMedia variant="icon">
+        <IconFileTypePdf />
+      </AttachmentMedia>
+      <AttachmentContent>
         <AttachmentTitle>report.pdf</AttachmentTitle>
-      </ItemContent>
+        <AttachmentDescription>2.4 MB</AttachmentDescription>
+      </AttachmentContent>
+      <AttachmentActions>
+        <Button variant="ghost" size="icon-sm" aria-label="Remove report.pdf">
+          <IconX />
+        </Button>
+      </AttachmentActions>
     </Attachment>
   ),
   play: async ({ canvasElement }) => {
@@ -510,6 +551,21 @@ export const WithDataAttributes: Story = {
 
     await expect(root).toHaveAttribute('data-state', 'uploading');
     await expect(root).toHaveAttribute('data-orientation', 'vertical');
+    // Attachment pins Item's variant, so it must not advertise a variant API.
+    await expect(root).not.toHaveAttribute('data-variant');
+
+    // Each part replaces the underlying item-* slot rather than adding one.
+    for (const slot of [
+      'attachment-media',
+      'attachment-content',
+      'attachment-title',
+      'attachment-description',
+      'attachment-actions',
+    ]) {
+      await expect(
+        canvasElement.querySelector(`[data-slot="${slot}"]`)
+      ).toBeInTheDocument();
+    }
 
     await expect(canvas.getByRole('status')).toHaveTextContent('Uploading');
   },
@@ -526,10 +582,10 @@ export const AllVariants: Story = {
               <AttachmentMedia variant="icon">
                 <IconFile />
               </AttachmentMedia>
-              <ItemContent>
+              <AttachmentContent>
                 <AttachmentTitle>{state}</AttachmentTitle>
-                <ItemDescription>2.4 MB</ItemDescription>
-              </ItemContent>
+                <AttachmentDescription>2.4 MB</AttachmentDescription>
+              </AttachmentContent>
             </Attachment>
           )
         )}
@@ -540,9 +596,9 @@ export const AllVariants: Story = {
             <AttachmentMedia variant="image">
               <img src={THUMB} alt="" />
             </AttachmentMedia>
-            <ItemContent>
+            <AttachmentContent>
               <AttachmentTitle>{name}</AttachmentTitle>
-            </ItemContent>
+            </AttachmentContent>
           </Attachment>
         ))}
       </AttachmentGroup>
