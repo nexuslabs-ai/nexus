@@ -16,13 +16,7 @@ import {
 import { expect, fn, userEvent, within } from 'storybook/test';
 
 import { Button } from '../button';
-import {
-  ItemActions,
-  ItemContent,
-  ItemDescription,
-  ItemMedia,
-  ItemTitle,
-} from '../item';
+import { ItemContent, ItemDescription } from '../item';
 import { Spinner } from '../spinner';
 import {
   Tooltip,
@@ -33,9 +27,12 @@ import {
 
 import {
   Attachment,
+  AttachmentActions,
   AttachmentGroup,
+  AttachmentMedia,
   AttachmentProgress,
   type AttachmentProps,
+  AttachmentTitle,
   AttachmentTrigger,
 } from './attachment';
 
@@ -55,18 +52,18 @@ const THUMB =
 export const Default: Story = {
   render: () => (
     <Attachment className="nx:w-80">
-      <ItemMedia variant="icon">
+      <AttachmentMedia variant="icon">
         <IconFileTypePdf />
-      </ItemMedia>
+      </AttachmentMedia>
       <ItemContent>
-        <ItemTitle>report.pdf</ItemTitle>
+        <AttachmentTitle>report.pdf</AttachmentTitle>
         <ItemDescription>2.4 MB</ItemDescription>
       </ItemContent>
-      <ItemActions>
+      <AttachmentActions>
         <Button variant="ghost" size="icon-sm" aria-label="Remove report.pdf">
           <IconX />
         </Button>
-      </ItemActions>
+      </AttachmentActions>
     </Attachment>
   ),
 };
@@ -76,29 +73,29 @@ export const States: Story = {
   render: () => (
     <div className="nx:flex nx:w-80 nx:flex-col nx:gap-3">
       <Attachment state="idle">
-        <ItemMedia variant="icon">
+        <AttachmentMedia variant="icon">
           <IconUpload />
-        </ItemMedia>
+        </AttachmentMedia>
         <ItemContent>
-          <ItemTitle>Drop a file here</ItemTitle>
+          <AttachmentTitle>Drop a file here</AttachmentTitle>
           <ItemDescription>PDF or PNG, up to 10 MB</ItemDescription>
         </ItemContent>
-        <ItemActions>
+        <AttachmentActions>
           <Button variant="ghost" size="icon-sm" aria-label="Dismiss">
             <IconX />
           </Button>
-        </ItemActions>
+        </AttachmentActions>
       </Attachment>
       <Attachment state="uploading">
-        <ItemMedia variant="icon">
+        <AttachmentMedia variant="icon">
           <IconFileTypePdf />
-        </ItemMedia>
+        </AttachmentMedia>
         <ItemContent>
-          <ItemTitle>report.pdf</ItemTitle>
+          <AttachmentTitle>report.pdf</AttachmentTitle>
           <ItemDescription>62% of 2.4 MB</ItemDescription>
           <AttachmentProgress value={62} aria-label="Uploading report.pdf" />
         </ItemContent>
-        <ItemActions>
+        <AttachmentActions>
           <Button
             variant="ghost"
             size="icon-sm"
@@ -106,17 +103,17 @@ export const States: Story = {
           >
             <IconX />
           </Button>
-        </ItemActions>
+        </AttachmentActions>
       </Attachment>
       <Attachment state="processing">
-        <ItemMedia variant="icon">
+        <AttachmentMedia variant="icon">
           <Spinner />
-        </ItemMedia>
+        </AttachmentMedia>
         <ItemContent>
-          <ItemTitle>scan.png</ItemTitle>
+          <AttachmentTitle>scan.png</AttachmentTitle>
           <ItemDescription>Processing…</ItemDescription>
         </ItemContent>
-        <ItemActions>
+        <AttachmentActions>
           <Button
             variant="ghost"
             size="icon-sm"
@@ -124,17 +121,17 @@ export const States: Story = {
           >
             <IconX />
           </Button>
-        </ItemActions>
+        </AttachmentActions>
       </Attachment>
       <Attachment state="error">
-        <ItemMedia variant="icon">
+        <AttachmentMedia variant="icon">
           <IconAlertTriangle />
-        </ItemMedia>
+        </AttachmentMedia>
         <ItemContent>
-          <ItemTitle>archive.zip</ItemTitle>
+          <AttachmentTitle>archive.zip</AttachmentTitle>
           <ItemDescription>Upload failed — file too large</ItemDescription>
         </ItemContent>
-        <ItemActions>
+        <AttachmentActions>
           <Button
             variant="ghost"
             size="icon-sm"
@@ -149,20 +146,23 @@ export const States: Story = {
           >
             <IconX />
           </Button>
-        </ItemActions>
+        </AttachmentActions>
       </Attachment>
       <Attachment state="done">
-        <ItemMedia variant="icon">
+        <AttachmentMedia variant="icon">
           <IconFileTypeTxt />
-        </ItemMedia>
+        </AttachmentMedia>
         <ItemContent>
-          <ItemTitle>
+          <AttachmentTitle
+            trailing={
+              <IconCircleCheckFilled className="nx:size-4 nx:text-success-subtle-foreground" />
+            }
+          >
             notes.txt
-            <IconCircleCheckFilled className="nx:ml-1 nx:inline nx:size-4 nx:align-text-bottom nx:text-success-subtle-foreground" />
-          </ItemTitle>
+          </AttachmentTitle>
           <ItemDescription>8 KB · Uploaded just now</ItemDescription>
         </ItemContent>
-        <ItemActions>
+        <AttachmentActions>
           <Button
             variant="ghost"
             size="icon-sm"
@@ -173,7 +173,7 @@ export const States: Story = {
           <Button variant="ghost" size="icon-sm" aria-label="Remove notes.txt">
             <IconX />
           </Button>
-        </ItemActions>
+        </AttachmentActions>
       </Attachment>
     </div>
   ),
@@ -184,32 +184,32 @@ export const Sizes: Story = {
   render: () => (
     <div className="nx:flex nx:w-80 nx:flex-col nx:gap-3">
       <Attachment size="default">
-        <ItemMedia variant="icon">
+        <AttachmentMedia variant="icon">
           <IconFileTypePdf />
-        </ItemMedia>
+        </AttachmentMedia>
         <ItemContent>
-          <ItemTitle>report.pdf</ItemTitle>
+          <AttachmentTitle>report.pdf</AttachmentTitle>
           <ItemDescription>2.4 MB</ItemDescription>
         </ItemContent>
-        <ItemActions>
+        <AttachmentActions>
           <Button variant="ghost" size="icon-sm" aria-label="Remove report.pdf">
             <IconX />
           </Button>
-        </ItemActions>
+        </AttachmentActions>
       </Attachment>
       <Attachment size="sm">
-        <ItemMedia variant="icon">
+        <AttachmentMedia variant="icon">
           <IconFileTypeTxt />
-        </ItemMedia>
+        </AttachmentMedia>
         <ItemContent>
-          <ItemTitle>notes.txt</ItemTitle>
+          <AttachmentTitle>notes.txt</AttachmentTitle>
           <ItemDescription>8 KB</ItemDescription>
         </ItemContent>
-        <ItemActions>
+        <AttachmentActions>
           <Button variant="ghost" size="icon-sm" aria-label="Remove notes.txt">
             <IconX />
           </Button>
-        </ItemActions>
+        </AttachmentActions>
       </Attachment>
     </div>
   ),
@@ -228,12 +228,12 @@ export const FileTypes: Story = {
         { name: 'data.bin', size: '1.1 MB', icon: <IconFile /> },
       ].map((file) => (
         <Attachment key={file.name}>
-          <ItemMedia variant="icon">{file.icon}</ItemMedia>
+          <AttachmentMedia variant="icon">{file.icon}</AttachmentMedia>
           <ItemContent>
-            <ItemTitle>{file.name}</ItemTitle>
+            <AttachmentTitle>{file.name}</AttachmentTitle>
             <ItemDescription>{file.size}</ItemDescription>
           </ItemContent>
-          <ItemActions>
+          <AttachmentActions>
             <Button
               variant="ghost"
               size="icon-sm"
@@ -241,7 +241,7 @@ export const FileTypes: Story = {
             >
               <IconX />
             </Button>
-          </ItemActions>
+          </AttachmentActions>
         </Attachment>
       ))}
     </div>
@@ -252,11 +252,11 @@ export const FileTypes: Story = {
 export const VerticalOrientation: Story = {
   render: () => (
     <Attachment orientation="vertical">
-      <ItemMedia variant="image">
+      <AttachmentMedia variant="image">
         <img src={THUMB} alt="" />
-      </ItemMedia>
+      </AttachmentMedia>
       <ItemContent>
-        <ItemTitle>cover.png</ItemTitle>
+        <AttachmentTitle>cover.png</AttachmentTitle>
         <ItemDescription>412 KB</ItemDescription>
       </ItemContent>
     </Attachment>
@@ -266,7 +266,7 @@ export const VerticalOrientation: Story = {
 // A composer strip — mixed file types scrolling horizontally.
 export const Grouped: Story = {
   render: () => (
-    <AttachmentGroup className="nx:w-80">
+    <AttachmentGroup aria-label="Attached files" className="nx:w-80">
       {[
         {
           name: 'cover.png',
@@ -279,17 +279,49 @@ export const Grouped: Story = {
         { name: 'brief.docx', size: '96 KB', media: <IconFileTypeDocx /> },
       ].map((file) => (
         <Attachment key={file.name} orientation="vertical">
-          <ItemMedia variant={file.name.endsWith('.png') ? 'image' : 'icon'}>
+          <AttachmentMedia
+            variant={file.name.endsWith('.png') ? 'image' : 'icon'}
+          >
             {file.media}
-          </ItemMedia>
+          </AttachmentMedia>
           <ItemContent>
-            <ItemTitle>{file.name}</ItemTitle>
+            <AttachmentTitle>{file.name}</AttachmentTitle>
             <ItemDescription>{file.size}</ItemDescription>
           </ItemContent>
         </Attachment>
       ))}
     </AttachmentGroup>
   ),
+};
+
+// The strip is its own tab stop, so it can be scrolled by keyboard even when
+// no card inside it is focusable.
+export const GroupKeyboardInteraction: Story = {
+  render: () => (
+    <AttachmentGroup aria-label="Attached files" className="nx:w-80">
+      {['cover.png', 'report.pdf', 'notes.txt', 'archive.zip'].map((name) => (
+        <Attachment key={name} orientation="vertical">
+          <AttachmentMedia variant="icon">
+            <IconFile />
+          </AttachmentMedia>
+          <ItemContent>
+            <AttachmentTitle>{name}</AttachmentTitle>
+          </ItemContent>
+        </Attachment>
+      ))}
+    </AttachmentGroup>
+  ),
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+    const group = canvas.getByRole('group', { name: 'Attached files' });
+
+    await userEvent.tab();
+    await expect(group).toHaveFocus();
+    await expect(group).toHaveAttribute('data-slot', 'attachment-group');
+
+    // A tab stop that cannot scroll would make the focus pointless.
+    await expect(group.scrollWidth).toBeGreaterThan(group.clientWidth);
+  },
 };
 
 const LONG_NAME = 'quarterly-financial-report-with-appendices-final-v12.pdf';
@@ -308,14 +340,14 @@ export const LongFileName: Story = {
           </TooltipTrigger>
           <TooltipContent>{LONG_NAME}</TooltipContent>
         </Tooltip>
-        <ItemMedia variant="icon">
+        <AttachmentMedia variant="icon">
           <IconFileTypePdf />
-        </ItemMedia>
+        </AttachmentMedia>
         <ItemContent>
-          <ItemTitle>{LONG_NAME}</ItemTitle>
+          <AttachmentTitle>{LONG_NAME}</AttachmentTitle>
           <ItemDescription>2.4 MB</ItemDescription>
         </ItemContent>
-        <ItemActions>
+        <AttachmentActions>
           <Button
             variant="ghost"
             size="icon-sm"
@@ -323,7 +355,7 @@ export const LongFileName: Story = {
           >
             <IconX />
           </Button>
-        </ItemActions>
+        </AttachmentActions>
       </Attachment>
     </TooltipProvider>
   ),
@@ -345,14 +377,14 @@ export const ClickInteraction: StoryObj<
       <AttachmentTrigger onClick={args.onOpen}>
         <span className="nx:sr-only">Open report.pdf</span>
       </AttachmentTrigger>
-      <ItemMedia variant="icon">
+      <AttachmentMedia variant="icon">
         <IconFileTypePdf />
-      </ItemMedia>
+      </AttachmentMedia>
       <ItemContent>
-        <ItemTitle>report.pdf</ItemTitle>
+        <AttachmentTitle>report.pdf</AttachmentTitle>
         <ItemDescription>2.4 MB</ItemDescription>
       </ItemContent>
-      <ItemActions>
+      <AttachmentActions>
         <Button
           variant="ghost"
           size="icon-sm"
@@ -361,7 +393,7 @@ export const ClickInteraction: StoryObj<
         >
           <IconX />
         </Button>
-      </ItemActions>
+      </AttachmentActions>
     </Attachment>
   ),
   play: async ({ canvasElement, args }) => {
@@ -389,7 +421,7 @@ export const KeyboardInteraction: StoryObj<
         <span className="nx:sr-only">Open report.pdf</span>
       </AttachmentTrigger>
       <ItemContent>
-        <ItemTitle>report.pdf</ItemTitle>
+        <AttachmentTitle>report.pdf</AttachmentTitle>
       </ItemContent>
     </Attachment>
   ),
@@ -411,10 +443,10 @@ export const Disabled: StoryObj<AttachmentProps & { onRemove: () => void }> = {
   render: (args) => (
     <Attachment state="uploading" className="nx:w-80">
       <ItemContent>
-        <ItemTitle>report.pdf</ItemTitle>
+        <AttachmentTitle>report.pdf</AttachmentTitle>
         <ItemDescription>Uploading…</ItemDescription>
       </ItemContent>
-      <ItemActions>
+      <AttachmentActions>
         <Button
           variant="ghost"
           size="icon-sm"
@@ -424,7 +456,7 @@ export const Disabled: StoryObj<AttachmentProps & { onRemove: () => void }> = {
         >
           <IconX />
         </Button>
-      </ItemActions>
+      </AttachmentActions>
     </Attachment>
   ),
   play: async ({ canvasElement, args }) => {
@@ -432,7 +464,10 @@ export const Disabled: StoryObj<AttachmentProps & { onRemove: () => void }> = {
     const remove = canvas.getByRole('button', { name: 'Remove report.pdf' });
 
     await expect(remove).toBeDisabled();
-    await expect(remove).toHaveAttribute('disabled');
+
+    // pointerEventsCheck: 0 dispatches the click at a disabled control that
+    // would otherwise be unclickable, so the assertion can actually fail.
+    await userEvent.click(remove, { pointerEventsCheck: 0 });
     await expect(args.onRemove).not.toHaveBeenCalled();
   },
 };
@@ -447,7 +482,7 @@ export const AsChild: Story = {
         </a>
       </AttachmentTrigger>
       <ItemContent>
-        <ItemTitle>report.pdf</ItemTitle>
+        <AttachmentTitle>report.pdf</AttachmentTitle>
       </ItemContent>
     </Attachment>
   ),
@@ -465,7 +500,7 @@ export const WithDataAttributes: Story = {
   render: () => (
     <Attachment state="uploading" orientation="vertical">
       <ItemContent>
-        <ItemTitle>report.pdf</ItemTitle>
+        <AttachmentTitle>report.pdf</AttachmentTitle>
       </ItemContent>
     </Attachment>
   ),
@@ -488,25 +523,25 @@ export const AllVariants: Story = {
         {(['idle', 'uploading', 'processing', 'error', 'done'] as const).map(
           (state) => (
             <Attachment key={state} state={state}>
-              <ItemMedia variant="icon">
+              <AttachmentMedia variant="icon">
                 <IconFile />
-              </ItemMedia>
+              </AttachmentMedia>
               <ItemContent>
-                <ItemTitle>{state}</ItemTitle>
+                <AttachmentTitle>{state}</AttachmentTitle>
                 <ItemDescription>2.4 MB</ItemDescription>
               </ItemContent>
             </Attachment>
           )
         )}
       </div>
-      <AttachmentGroup className="nx:w-80">
+      <AttachmentGroup aria-label="Attached files" className="nx:w-80">
         {['one.png', 'two.png', 'three.png'].map((name) => (
           <Attachment key={name} orientation="vertical">
-            <ItemMedia variant="image">
+            <AttachmentMedia variant="image">
               <img src={THUMB} alt="" />
-            </ItemMedia>
+            </AttachmentMedia>
             <ItemContent>
-              <ItemTitle>{name}</ItemTitle>
+              <AttachmentTitle>{name}</AttachmentTitle>
             </ItemContent>
           </Attachment>
         ))}

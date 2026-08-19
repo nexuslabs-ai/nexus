@@ -4,7 +4,14 @@ import { Slot } from '@radix-ui/react-slot';
 import { cva, type VariantProps } from 'class-variance-authority';
 
 import { cn } from '../../lib/utils';
-import { Item, type ItemProps } from '../item';
+import {
+  Item,
+  ItemActions,
+  ItemMedia,
+  type ItemMediaProps,
+  type ItemProps,
+  ItemTitle,
+} from '../item';
 import { Progress, type ProgressProps } from '../progress';
 
 /**
@@ -23,17 +30,21 @@ const ATTACHMENT_STATUS_TEXT: Record<AttachmentState, string> = {
   done: 'Attached',
 };
 
+/** States whose progress is worth announcing; settled cards stay silent. */
+const ANNOUNCED_STATES: ReadonlySet<AttachmentState> = new Set([
+  'uploading',
+  'processing',
+  'error',
+]);
+
 const attachmentVariants = cva(
   [
-    'nx:group/attachment nx:relative nx:min-w-0',
-    // Lift the trailing controls above AttachmentTrigger's full-card overlay.
-    'nx:[&_[data-slot=item-actions]]:relative nx:[&_[data-slot=item-actions]]:z-20',
-    // Item's title is w-fit, so it needs a full-width block to truncate.
-    'nx:[&_[data-slot=item-title]]:block nx:[&_[data-slot=item-title]]:w-full nx:[&_[data-slot=item-title]]:truncate',
+    // isolate: AttachmentTrigger and AttachmentActions stack inside the card,
+    // so the card must be their stacking context rather than the page.
+    'nx:group/attachment nx:relative nx:isolate nx:min-w-0',
     'nx:data-[state=idle]:border-dashed',
     'nx:data-[state=error]:border-border-error',
     'nx:data-[state=error]:[&_[data-slot=item-description]]:text-error-subtle-foreground',
-    'nx:data-[state=error]:[&_[data-slot=item-media]]:border-border-error nx:data-[state=error]:[&_[data-slot=item-media]]:bg-error-subtle nx:data-[state=error]:[&_[data-slot=item-media]]:text-error-subtle-foreground',
   ],
   {
     variants: {
@@ -43,11 +54,7 @@ const attachmentVariants = cva(
       },
       orientation: {
         horizontal: 'nx:flex-nowrap nx:items-center',
-        vertical: [
-          'nx:w-32 nx:flex-col nx:items-stretch',
-          'nx:[&_[data-slot=item-media]]:size-auto nx:[&_[data-slot=item-media]]:aspect-square nx:[&_[data-slot=item-media]]:w-full nx:[&_[data-slot=item-media]]:self-auto',
-          'nx:[&_[data-slot=item-media]_svg]:size-8',
-        ],
+        vertical: 'nx:w-32 nx:flex-col nx:items-stretch',
       },
     },
     defaultVariants: {
@@ -63,7 +70,9 @@ const attachmentVariants = cva(
  * Props for the Attachment component.
  */
 interface AttachmentProps
-  extends Omit<ItemProps, 'asChild'>, VariantProps<typeof attachmentVariants> {
+  extends
+    Omit<ItemProps, 'asChild' | 'variant'>,
+    VariantProps<typeof attachmentVariants> {
   /**
    * The attachment's lifecycle state. Drives the border treatment (dashed while
    * `idle`, error-coloured while `error`) and the text announced to assistive
@@ -74,7 +83,8 @@ interface AttachmentProps
 
   /**
    * Overrides the assistive-tech status text for the current `state` — pass a
-   * localised string, or one that names the file.
+   * localised string, or one that names the file. Ignored while the attachment
+   * is settled (`idle` / `done`), which announces nothing.
    * @default a built-in phrase per state, e.g. 'Uploading'
    * @example
    * ```tsx
@@ -88,33 +98,38 @@ interface AttachmentProps
  * Attachment
  *
  * A single file's preview — thumbnail or icon, name, size, and trailing
- * actions — with an upload lifecycle on top. Built on `Item`, so it composes
- * with `ItemMedia`, `ItemContent`, `ItemTitle`, `ItemDescription`, and
- * `ItemActions` rather than introducing a second set of row parts.
+ * actions — with an upload lifecycle on top. Built on `Item`, and composed with
+ * `AttachmentMedia`, `ItemContent`, `AttachmentTitle`, `ItemDescription`, and
+ * `AttachmentActions`.
+ *
+ * The card is pinned to `Item`'s `outline` variant: the `idle` dashed border and
+ * the `error` border are the state signal, and both need a visible border to
+ * paint on.
  *
  * `orientation="horizontal"` is a row for lists and upload queues;
  * `orientation="vertical"` is a fixed-width tile for composer strips, where the
  * media fills the card width. Group several with `AttachmentGroup`.
  *
- * The current `state` is announced through a visually hidden `role="status"`
- * region, so progress is never conveyed by animation alone.
+ * While uploading, processing, or failed, the current `state` is announced
+ * through a visually hidden `role="status"` region, so progress is never
+ * conveyed by animation alone.
  *
  * @example
  * ```tsx
  * <Attachment state="uploading">
- *   <ItemMedia variant="icon">
+ *   <AttachmentMedia variant="icon">
  *     <IconFile />
- *   </ItemMedia>
+ *   </AttachmentMedia>
  *   <ItemContent>
- *     <ItemTitle>report.pdf</ItemTitle>
+ *     <AttachmentTitle>report.pdf</AttachmentTitle>
  *     <ItemDescription>2.4 MB</ItemDescription>
  *     <AttachmentProgress value={62} aria-label="Uploading report.pdf" />
  *   </ItemContent>
- *   <ItemActions>
+ *   <AttachmentActions>
  *     <Button variant="ghost" size="icon-sm" aria-label="Remove report.pdf">
  *       <IconX />
  *     </Button>
- *   </ItemActions>
+ *   </AttachmentActions>
  * </Attachment>
  * ```
  */
@@ -124,7 +139,6 @@ function Attachment({
   state = 'done',
   statusLabel,
   orientation = 'horizontal',
-  variant = 'outline',
   size = 'default',
   ...props
 }: AttachmentProps) {
@@ -133,16 +147,121 @@ function Attachment({
       data-slot="attachment"
       data-state={state}
       data-orientation={orientation}
-      variant={variant}
+      variant="outline"
       size={size}
       className={cn(attachmentVariants({ size, orientation }), className)}
       {...props}
     >
-      <span data-slot="attachment-status" role="status" className="nx:sr-only">
-        {statusLabel ?? ATTACHMENT_STATUS_TEXT[state]}
-      </span>
+      {ANNOUNCED_STATES.has(state) && (
+        <span
+          data-slot="attachment-status"
+          role="status"
+          className="nx:sr-only"
+        >
+          {statusLabel ?? ATTACHMENT_STATUS_TEXT[state]}
+        </span>
+      )}
       {children}
     </Item>
+  );
+}
+
+/**
+ * AttachmentMediaProps
+ *
+ * Props for the AttachmentMedia component.
+ */
+interface AttachmentMediaProps extends ItemMediaProps {}
+
+/**
+ * AttachmentMedia
+ *
+ * The attachment's thumbnail or file-type icon. Adds the Attachment-specific
+ * behaviour on top of `ItemMedia`: in a vertical tile it fills the card width
+ * as a square, and it picks up the error tint when the card has failed.
+ */
+function AttachmentMedia({ className, ...props }: AttachmentMediaProps) {
+  return (
+    <ItemMedia
+      data-slot="attachment-media"
+      className={cn(
+        // translate-y-0 cancels ItemMedia's row nudge, which is meant for a
+        // media atom beside a description, not a full-width thumbnail.
+        'nx:group-data-[orientation=vertical]/attachment:size-auto nx:group-data-[orientation=vertical]/attachment:aspect-square nx:group-data-[orientation=vertical]/attachment:w-full nx:group-data-[orientation=vertical]/attachment:translate-y-0 nx:group-data-[orientation=vertical]/attachment:self-auto',
+        'nx:group-data-[orientation=vertical]/attachment:[&_svg]:size-8',
+        'nx:group-data-[state=error]/attachment:border-border-error nx:group-data-[state=error]/attachment:bg-error-subtle nx:group-data-[state=error]/attachment:text-error-subtle-foreground',
+        className
+      )}
+      {...props}
+    />
+  );
+}
+
+/**
+ * AttachmentTitleProps
+ *
+ * Props for the AttachmentTitle component.
+ */
+interface AttachmentTitleProps extends React.ComponentProps<typeof ItemTitle> {
+  /**
+   * A badge or status icon pinned after the file name. It keeps `ItemTitle`'s
+   * `gap-2` spacing and its own width while the name truncates beside it.
+   *
+   * @example
+   * ```tsx
+   * <AttachmentTitle trailing={<IconCircleCheckFilled />}>
+   *   report.pdf
+   * </AttachmentTitle>
+   * ```
+   */
+  trailing?: React.ReactNode;
+}
+
+/**
+ * AttachmentTitle
+ *
+ * The file name. Truncates to one line — file names are long and the card is
+ * narrow — while `trailing` content keeps its full width beside it.
+ */
+function AttachmentTitle({
+  className,
+  children,
+  trailing,
+  ...props
+}: AttachmentTitleProps) {
+  return (
+    <ItemTitle
+      data-slot="attachment-title"
+      className={cn('nx:w-full nx:min-w-0', className)}
+      {...props}
+    >
+      <span className="nx:min-w-0 nx:truncate">{children}</span>
+      {trailing}
+    </ItemTitle>
+  );
+}
+
+/**
+ * AttachmentActionsProps
+ *
+ * Props for the AttachmentActions component.
+ */
+type AttachmentActionsProps = React.ComponentProps<typeof ItemActions>;
+
+/**
+ * AttachmentActions
+ *
+ * The trailing controls of an attachment — typically a remove or retry button.
+ * Lifts itself above `AttachmentTrigger`'s full-card overlay so its buttons stay
+ * independently clickable.
+ */
+function AttachmentActions({ className, ...props }: AttachmentActionsProps) {
+  return (
+    <ItemActions
+      data-slot="attachment-actions"
+      className={cn('nx:relative nx:z-20', className)}
+      {...props}
+    />
   );
 }
 
@@ -151,7 +270,21 @@ function Attachment({
  *
  * Props for the AttachmentGroup component.
  */
-type AttachmentGroupProps = React.ComponentProps<'div'>;
+interface AttachmentGroupProps extends Omit<
+  React.ComponentProps<'div'>,
+  'aria-label'
+> {
+  /**
+   * Names the strip for assistive tech. Required: the strip is a tab stop, and
+   * a focusable region with no accessible name announces nothing.
+   *
+   * @example
+   * ```tsx
+   * <AttachmentGroup aria-label="Attached files" />
+   * ```
+   */
+  'aria-label': string;
+}
 
 /**
  * AttachmentGroup
@@ -160,11 +293,15 @@ type AttachmentGroupProps = React.ComponentProps<'div'>;
  * start edge. Like `ItemGroup`, it imposes no `list` role — add
  * `role="list"` plus `role="listitem"` on the children when the grouping is
  * genuinely a list rather than a composer strip.
+ *
+ * The strip is itself keyboard-focusable so it can be scrolled by keyboard, and
+ * it takes a required `aria-label`.
  */
 function AttachmentGroup({ className, ...props }: AttachmentGroupProps) {
   return (
     <div
       data-slot="attachment-group"
+      role="group"
       // A scrollable region with no focusable children must itself be
       // keyboard-focusable to scroll (WCAG 2.1.1).
       // eslint-disable-next-line jsx-a11y/no-noninteractive-tabindex
@@ -230,9 +367,9 @@ interface AttachmentTriggerProps extends React.ComponentProps<'button'> {
  *
  * Makes the whole card activate one action — opening or previewing the file —
  * by stretching an invisible control across it. Use this instead of rendering
- * the card itself as a link, so that buttons inside `ItemActions` stay valid
- * and independently clickable. Needs a text label, visually hidden if the card
- * already shows the file name.
+ * the card itself as a link, so that buttons inside `AttachmentActions` stay
+ * valid and independently clickable. Needs a text label, visually hidden if the
+ * card already shows the file name.
  *
  * @example
  * ```tsx
@@ -267,12 +404,18 @@ function AttachmentTrigger({
 
 export {
   Attachment,
+  AttachmentActions,
+  type AttachmentActionsProps,
   AttachmentGroup,
   type AttachmentGroupProps,
+  AttachmentMedia,
+  type AttachmentMediaProps,
   AttachmentProgress,
   type AttachmentProgressProps,
   type AttachmentProps,
   type AttachmentState,
+  AttachmentTitle,
+  type AttachmentTitleProps,
   AttachmentTrigger,
   type AttachmentTriggerProps,
   attachmentVariants,
