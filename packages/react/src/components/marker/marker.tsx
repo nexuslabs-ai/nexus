@@ -6,13 +6,13 @@ import { cva, type VariantProps } from 'class-variance-authority';
 import { cn } from '../../lib/utils';
 
 const markerVariants = cva(
-  "nx:group/marker nx:flex nx:min-h-4 nx:items-center nx:gap-2 nx:text-left nx:typography-body-small nx:text-muted-foreground nx:transition-colors nx:duration-faster nx:focus-visible:outline-2 nx:focus-visible:outline-focus-default nx:focus-visible:outline-offset-(--focus-offset) nx:[&_svg:not([class*='size-'])]:size-4 nx:[&_svg]:shrink-0 nx:[&_a]:underline nx:[&_a]:underline-offset-4 nx:[&_a:hover]:text-primary-subtle-foreground nx:[a]:hover:text-foreground nx:[button]:hover:text-foreground",
+  "nx:group/marker nx:flex nx:min-h-4 nx:items-center nx:gap-2 nx:text-left nx:typography-body-small nx:text-muted-foreground nx:transition-colors nx:duration-faster nx:focus-visible:outline-2 nx:focus-visible:outline-focus-default nx:focus-visible:outline-offset-(--focus-offset) nx:[&_svg:not([class*='size-'])]:size-4 nx:[&_svg]:shrink-0 nx:[a]:pointer-coarse:min-h-11 nx:[a]:hover:text-foreground nx:[button]:pointer-coarse:min-h-11 nx:[button:not(:disabled)]:hover:text-foreground",
   {
     variants: {
       variant: {
         default: '',
         separator:
-          'nx:w-full nx:before:mr-1 nx:before:h-px nx:before:min-w-0 nx:before:flex-1 nx:before:bg-border-default nx:after:ml-1 nx:after:h-px nx:after:min-w-0 nx:after:flex-1 nx:after:bg-border-default',
+          'nx:w-full nx:before:mr-1 nx:before:h-px nx:before:flex-1 nx:before:bg-border-default nx:after:ml-1 nx:after:h-px nx:after:flex-1 nx:after:bg-border-default',
         border: 'nx:border-b-default nx:border-border-default nx:pb-2',
       },
     },
@@ -34,9 +34,9 @@ interface MarkerProps
    * onto it. Use when the annotation needs different semantics — a heading for
    * a labelled section, or a link / button for an actionable row.
    *
-   * An `a` or `button` child is answered by the row itself — it picks up the
-   * hover treatment and the design-system focus ring, so an interactive row
-   * needs no extra classes at the call site.
+   * An `a` or `button` child is answered by the row itself — hover, the
+   * design-system focus ring, and a coarse-pointer tap floor apply only when
+   * the child is interactive, so the call site needs no extra classes.
    *
    * @default false
    * @example
@@ -139,7 +139,7 @@ function MarkerContent({ className, ...props }: MarkerContentProps) {
     <span
       data-slot="marker-content"
       className={cn(
-        'nx:min-w-0 nx:wrap-break-word nx:group-data-[variant=separator]/marker:text-center',
+        'nx:min-w-0 nx:wrap-break-word nx:[&>a]:underline nx:[&>a]:underline-offset-4 nx:[&>a:hover]:text-primary-subtle-foreground nx:group-data-[variant=separator]/marker:text-center',
         className
       )}
       {...props}
