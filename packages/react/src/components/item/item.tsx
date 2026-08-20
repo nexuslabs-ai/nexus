@@ -124,7 +124,7 @@ function Item({
 }
 
 const itemMediaVariants = cva(
-  'nx:flex nx:shrink-0 nx:items-center nx:justify-center nx:gap-2 nx:group-has-data-[slot=item-description]/item:translate-y-0.5 nx:group-has-data-[slot=item-description]/item:self-start nx:[&_svg]:pointer-events-none',
+  'nx:flex nx:shrink-0 nx:items-center nx:justify-center nx:gap-2 nx:group-has-[[data-item-part=description]]/item:translate-y-0.5 nx:group-has-[[data-item-part=description]]/item:self-start nx:[&_svg]:pointer-events-none',
   {
     variants: {
       variant: {
@@ -171,16 +171,26 @@ function ItemMedia({
 }
 
 /**
+ * ItemContentProps
+ *
+ * Props for the ItemContent component.
+ */
+interface ItemContentProps extends React.ComponentProps<'div'> {}
+
+/**
  * ItemContent
  *
  * The middle column — title and description — that grows to fill the row.
  */
-function ItemContent({ className, ...props }: React.ComponentProps<'div'>) {
+function ItemContent({ className, ...props }: ItemContentProps) {
   return (
     <div
       data-slot="item-content"
+      // Structural hook: wrappers rename data-slot, so Item's CSS keys off this.
+      data-item-part="content"
       className={cn(
-        'nx:flex nx:flex-1 nx:flex-col nx:gap-1 nx:[&+[data-slot=item-content]]:flex-none',
+        // min-w-0 lets the column shrink past its content so a title can truncate.
+        'nx:flex nx:min-w-0 nx:flex-1 nx:flex-col nx:gap-1 nx:[&+[data-item-part=content]]:flex-none',
         className
       )}
       {...props}
@@ -189,11 +199,18 @@ function ItemContent({ className, ...props }: React.ComponentProps<'div'>) {
 }
 
 /**
+ * ItemTitleProps
+ *
+ * Props for the ItemTitle component.
+ */
+interface ItemTitleProps extends React.ComponentProps<'div'> {}
+
+/**
  * ItemTitle
  *
  * The item's primary label.
  */
-function ItemTitle({ className, ...props }: React.ComponentProps<'div'>) {
+function ItemTitle({ className, ...props }: ItemTitleProps) {
   return (
     <div
       data-slot="item-title"
@@ -207,14 +224,23 @@ function ItemTitle({ className, ...props }: React.ComponentProps<'div'>) {
 }
 
 /**
+ * ItemDescriptionProps
+ *
+ * Props for the ItemDescription component.
+ */
+interface ItemDescriptionProps extends React.ComponentProps<'p'> {}
+
+/**
  * ItemDescription
  *
  * Supporting copy beneath the title; clamps to two lines, anchors underlined.
  */
-function ItemDescription({ className, ...props }: React.ComponentProps<'p'>) {
+function ItemDescription({ className, ...props }: ItemDescriptionProps) {
   return (
     <p
       data-slot="item-description"
+      // Structural hook — see ItemContent.
+      data-item-part="description"
       className={cn(
         'nx:line-clamp-2 nx:typography-body-default nx:text-balance nx:text-muted-foreground nx:[&>a]:underline nx:[&>a]:underline-offset-4 nx:[&>a:hover]:text-primary-subtle-foreground',
         className
@@ -225,11 +251,18 @@ function ItemDescription({ className, ...props }: React.ComponentProps<'p'>) {
 }
 
 /**
+ * ItemActionsProps
+ *
+ * Props for the ItemActions component.
+ */
+interface ItemActionsProps extends React.ComponentProps<'div'> {}
+
+/**
  * ItemActions
  *
  * The trailing controls of a row — typically one or two buttons.
  */
-function ItemActions({ className, ...props }: React.ComponentProps<'div'>) {
+function ItemActions({ className, ...props }: ItemActionsProps) {
   return (
     <div
       data-slot="item-actions"
@@ -278,8 +311,11 @@ function ItemFooter({ className, ...props }: React.ComponentProps<'div'>) {
 export {
   Item,
   ItemActions,
+  type ItemActionsProps,
   ItemContent,
+  type ItemContentProps,
   ItemDescription,
+  type ItemDescriptionProps,
   ItemFooter,
   ItemGroup,
   ItemHeader,
@@ -289,5 +325,6 @@ export {
   type ItemProps,
   ItemSeparator,
   ItemTitle,
+  type ItemTitleProps,
   itemVariants,
 };
