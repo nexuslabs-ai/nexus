@@ -124,7 +124,7 @@ function Item({
 }
 
 const itemMediaVariants = cva(
-  'nx:flex nx:shrink-0 nx:items-center nx:justify-center nx:gap-2 nx:group-has-[[data-slot$=description]]/item:translate-y-0.5 nx:group-has-[[data-slot$=description]]/item:self-start nx:[&_svg]:pointer-events-none',
+  'nx:flex nx:shrink-0 nx:items-center nx:justify-center nx:gap-2 nx:group-has-[[data-item-part=description]]/item:translate-y-0.5 nx:group-has-[[data-item-part=description]]/item:self-start nx:[&_svg]:pointer-events-none',
   {
     variants: {
       variant: {
@@ -171,24 +171,25 @@ function ItemMedia({
 }
 
 /**
- * ItemContent
- *
- * The middle column — title and description — that grows to fill the row.
- */
-/**
  * ItemContentProps
  *
  * Props for the ItemContent component.
  */
 interface ItemContentProps extends React.ComponentProps<'div'> {}
 
+/**
+ * ItemContent
+ *
+ * The middle column — title and description — that grows to fill the row.
+ */
 function ItemContent({ className, ...props }: ItemContentProps) {
   return (
     <div
       data-slot="item-content"
+      data-item-part="content"
       className={cn(
         // min-w-0 lets the column shrink past its content so a title can truncate.
-        'nx:flex nx:min-w-0 nx:flex-1 nx:flex-col nx:gap-1 nx:[&+[data-slot=item-content]]:flex-none',
+        'nx:flex nx:min-w-0 nx:flex-1 nx:flex-col nx:gap-1 nx:[&+[data-item-part=content]]:flex-none',
         className
       )}
       {...props}
@@ -197,17 +198,17 @@ function ItemContent({ className, ...props }: ItemContentProps) {
 }
 
 /**
- * ItemTitle
- *
- * The item's primary label.
- */
-/**
  * ItemTitleProps
  *
  * Props for the ItemTitle component.
  */
 interface ItemTitleProps extends React.ComponentProps<'div'> {}
 
+/**
+ * ItemTitle
+ *
+ * The item's primary label.
+ */
 function ItemTitle({ className, ...props }: ItemTitleProps) {
   return (
     <div
@@ -222,21 +223,22 @@ function ItemTitle({ className, ...props }: ItemTitleProps) {
 }
 
 /**
- * ItemDescription
- *
- * Supporting copy beneath the title; clamps to two lines, anchors underlined.
- */
-/**
  * ItemDescriptionProps
  *
  * Props for the ItemDescription component.
  */
 interface ItemDescriptionProps extends React.ComponentProps<'p'> {}
 
+/**
+ * ItemDescription
+ *
+ * Supporting copy beneath the title; clamps to two lines, anchors underlined.
+ */
 function ItemDescription({ className, ...props }: ItemDescriptionProps) {
   return (
     <p
       data-slot="item-description"
+      data-item-part="description"
       className={cn(
         'nx:line-clamp-2 nx:typography-body-default nx:text-balance nx:text-muted-foreground nx:[&>a]:underline nx:[&>a]:underline-offset-4 nx:[&>a:hover]:text-primary-subtle-foreground',
         className
@@ -247,17 +249,17 @@ function ItemDescription({ className, ...props }: ItemDescriptionProps) {
 }
 
 /**
- * ItemActions
- *
- * The trailing controls of a row — typically one or two buttons.
- */
-/**
  * ItemActionsProps
  *
  * Props for the ItemActions component.
  */
 interface ItemActionsProps extends React.ComponentProps<'div'> {}
 
+/**
+ * ItemActions
+ *
+ * The trailing controls of a row — typically one or two buttons.
+ */
 function ItemActions({ className, ...props }: ItemActionsProps) {
   return (
     <div

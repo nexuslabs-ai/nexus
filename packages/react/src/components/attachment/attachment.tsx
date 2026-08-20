@@ -99,8 +99,8 @@ interface AttachmentProps
  *
  * A single file's preview — thumbnail or icon, name, size, and trailing
  * actions — with an upload lifecycle on top. Built on `Item`, and composed with
- * `AttachmentMedia`, `ItemContent`, `AttachmentTitle`, `ItemDescription`, and
- * `AttachmentActions`.
+ * `AttachmentMedia`, `AttachmentContent`, `AttachmentTitle`,
+ * `AttachmentDescription`, and `AttachmentActions`.
  *
  * The card is pinned to `Item`'s `outline` variant: the `idle` dashed border and
  * the `error` border are the state signal, and both need a visible border to
@@ -120,11 +120,11 @@ interface AttachmentProps
  *   <AttachmentMedia variant="icon">
  *     <IconFile />
  *   </AttachmentMedia>
- *   <ItemContent>
+ *   <AttachmentContent>
  *     <AttachmentTitle>report.pdf</AttachmentTitle>
- *     <ItemDescription>2.4 MB</ItemDescription>
+ *     <AttachmentDescription>2.4 MB</AttachmentDescription>
  *     <AttachmentProgress value={62} aria-label="Uploading report.pdf" />
- *   </ItemContent>
+ *   </AttachmentContent>
  *   <AttachmentActions>
  *     <Button variant="ghost" size="icon-sm" aria-label="Remove report.pdf">
  *       <IconX />
@@ -142,6 +142,8 @@ function Attachment({
   size = 'default',
   ...props
 }: AttachmentProps) {
+  const statusText = ATTACHMENT_STATUS_TEXT[state];
+
   return (
     <Item
       data-slot="attachment"
@@ -160,9 +162,7 @@ function Attachment({
         inserted together with its text is not reliably announced.
       */}
       <span data-slot="attachment-status" role="status" className="nx:sr-only">
-        {ATTACHMENT_STATUS_TEXT[state]
-          ? (statusLabel ?? ATTACHMENT_STATUS_TEXT[state])
-          : ''}
+        {statusText ? (statusLabel ?? statusText) : ''}
       </span>
       {children}
     </Item>
@@ -256,14 +256,8 @@ interface AttachmentContentProps extends ItemContentProps {}
  *
  * The middle column of an attachment — title, description, and progress.
  */
-function AttachmentContent({ className, ...props }: AttachmentContentProps) {
-  return (
-    <ItemContent
-      data-slot="attachment-content"
-      className={className}
-      {...props}
-    />
-  );
+function AttachmentContent(props: AttachmentContentProps) {
+  return <ItemContent data-slot="attachment-content" {...props} />;
 }
 
 /**
@@ -319,15 +313,16 @@ function AttachmentActions({ className, ...props }: AttachmentActionsProps) {
   );
 }
 
+type AttachmentGroupLabel =
+  | { 'aria-label': string; 'aria-labelledby'?: never }
+  | { 'aria-labelledby': string; 'aria-label'?: never };
+
 /**
  * AttachmentGroupProps
  *
- * Props for the AttachmentGroup component.
- */
-/**
- * The strip is a tab stop, so it must carry an accessible name — exactly one of
- * `aria-label` or `aria-labelledby`. Reach for `aria-labelledby` when a visible
- * heading already names the strip.
+ * Props for the AttachmentGroup component. The strip is a tab stop, so it must
+ * carry an accessible name — exactly one of `aria-label` or `aria-labelledby`.
+ * Reach for `aria-labelledby` when a visible heading already names the strip.
  *
  * @example
  * ```tsx
@@ -335,10 +330,6 @@ function AttachmentActions({ className, ...props }: AttachmentActionsProps) {
  * <AttachmentGroup aria-labelledby="composer-files-heading" />
  * ```
  */
-type AttachmentGroupLabel =
-  | { 'aria-label': string; 'aria-labelledby'?: never }
-  | { 'aria-labelledby': string; 'aria-label'?: never };
-
 type AttachmentGroupProps = Omit<
   React.ComponentProps<'div'>,
   'aria-label' | 'aria-labelledby'
@@ -354,7 +345,7 @@ type AttachmentGroupProps = Omit<
  * grouping is genuinely a list rather than a composer strip.
  *
  * The strip is itself keyboard-focusable so it can be scrolled by keyboard, and
- * it takes a required `aria-label`.
+ * it takes a required accessible name — `aria-label` or `aria-labelledby`.
  */
 function AttachmentGroup({ className, ...props }: AttachmentGroupProps) {
   return (
@@ -367,7 +358,7 @@ function AttachmentGroup({ className, ...props }: AttachmentGroupProps) {
       tabIndex={0}
       className={cn(
         'nx:flex nx:min-w-0 nx:snap-x nx:gap-3 nx:overflow-x-auto nx:overscroll-x-contain nx:py-1',
-        'nx:focus-visible:outline-2 nx:focus-visible:outline-focus-default nx:focus-visible:[outline-offset:-2px]',
+        'nx:focus-visible:outline-2 nx:focus-visible:outline-focus-default nx:focus-visible:-outline-offset-2',
         'nx:*:data-[slot=attachment]:flex-none nx:*:data-[slot=attachment]:snap-start',
         className
       )}
@@ -387,7 +378,7 @@ interface AttachmentProgressProps extends ProgressProps {}
  * AttachmentProgress
  *
  * The upload progress bar for an in-flight attachment, sized to sit inside
- * `ItemContent` beneath the description. Pass `value` for a determinate upload
+ * `AttachmentContent` beneath the description. Pass `value` for a determinate upload
  * and omit it while the total is unknown. Give it an `aria-label` that names
  * the file — several attachments uploading at once are otherwise
  * indistinguishable to a screen reader.

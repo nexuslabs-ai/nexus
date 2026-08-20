@@ -566,6 +566,9 @@ export const WithDataAttributes: Story = {
         canvasElement.querySelector(`[data-slot="${slot}"]`)
       ).toBeInTheDocument();
     }
+    await expect(
+      canvasElement.querySelector('[data-slot^="item-"]')
+    ).toBeNull();
 
     await expect(canvas.getByRole('status')).toHaveTextContent('Uploading');
   },
