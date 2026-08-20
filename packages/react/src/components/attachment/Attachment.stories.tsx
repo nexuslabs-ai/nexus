@@ -570,6 +570,15 @@ export const WithDataAttributes: Story = {
       canvasElement.querySelector('[data-slot^="item-"]')
     ).toBeNull();
 
+    // ...but the structural hook Item's own CSS keys off must survive the
+    // rename, or ItemMedia silently loses its alignment nudge.
+    await expect(
+      canvasElement.querySelector('[data-slot="attachment-content"]')
+    ).toHaveAttribute('data-item-part', 'content');
+    await expect(
+      canvasElement.querySelector('[data-slot="attachment-description"]')
+    ).toHaveAttribute('data-item-part', 'description');
+
     await expect(canvas.getByRole('status')).toHaveTextContent('Uploading');
   },
 };

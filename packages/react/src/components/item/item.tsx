@@ -186,6 +186,7 @@ function ItemContent({ className, ...props }: ItemContentProps) {
   return (
     <div
       data-slot="item-content"
+      // Structural hook: wrappers rename data-slot, so Item's CSS keys off this.
       data-item-part="content"
       className={cn(
         // min-w-0 lets the column shrink past its content so a title can truncate.
@@ -238,6 +239,7 @@ function ItemDescription({ className, ...props }: ItemDescriptionProps) {
   return (
     <p
       data-slot="item-description"
+      // Structural hook — see ItemContent.
       data-item-part="description"
       className={cn(
         'nx:line-clamp-2 nx:typography-body-default nx:text-balance nx:text-muted-foreground nx:[&>a]:underline nx:[&>a]:underline-offset-4 nx:[&>a:hover]:text-primary-subtle-foreground',

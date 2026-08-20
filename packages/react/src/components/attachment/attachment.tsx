@@ -358,7 +358,7 @@ function AttachmentGroup({ className, ...props }: AttachmentGroupProps) {
       tabIndex={0}
       className={cn(
         'nx:flex nx:min-w-0 nx:snap-x nx:gap-3 nx:overflow-x-auto nx:overscroll-x-contain nx:py-1',
-        'nx:focus-visible:outline-2 nx:focus-visible:outline-focus-default nx:focus-visible:-outline-offset-2',
+        'nx:focus-visible:outline-2 nx:focus-visible:outline-focus-default nx:focus-visible:outline-offset-(--focus-offset)',
         'nx:*:data-[slot=attachment]:flex-none nx:*:data-[slot=attachment]:snap-start',
         className
       )}
@@ -378,9 +378,9 @@ interface AttachmentProgressProps extends ProgressProps {}
  * AttachmentProgress
  *
  * The upload progress bar for an in-flight attachment, sized to sit inside
- * `AttachmentContent` beneath the description. Pass `value` for a determinate upload
- * and omit it while the total is unknown. Give it an `aria-label` that names
- * the file — several attachments uploading at once are otherwise
+ * `AttachmentContent` beneath the description. Pass `value` for a determinate
+ * upload and omit it while the total is unknown. Give it an `aria-label` that
+ * names the file — several attachments uploading at once are otherwise
  * indistinguishable to a screen reader.
  */
 function AttachmentProgress({

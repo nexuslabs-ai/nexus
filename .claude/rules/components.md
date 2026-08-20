@@ -40,6 +40,25 @@ Structure: `cva()` for enum variants; a named `ComponentProps` interface extendi
 
 `data-slot` is always set (component identification); `data-variant` / `data-size` are set when the component has those props. Additional `data-*` (e.g. `data-loading`, `data-fill`) are fine for component-specific state. These are the CSS / test / state-inspection hooks.
 
+### Structural hooks vs. identity hooks
+
+`data-slot` is an **identity** hook: it names the part, and a wrapper component is free to rename it. `Attachment` does exactly that — `AttachmentContent` renders `ItemContent` but re-labels it `attachment-content`, so the part is identified by its own name rather than the one it is built on.
+
+That makes `data-slot` unsafe for a component's **own internal structural CSS**. A rule like "nudge the media when a description is present" must still fire after a wrapper renames the part, and must _not_ fire for an unrelated nested component that happens to share the name.
+
+When a component's internal CSS needs to find its own parts, give those parts a second attribute the component owns, and key the rule off that:
+
+| Owner  | Attribute        | Values used by internal CSS |
+| ------ | ---------------- | --------------------------- |
+| `Item` | `data-item-part` | `content`, `description`    |
+
+**Rules for these hooks:**
+
+- A wrapper may override `data-slot`; it must **never** strip or rewrite the owning component's structural attribute. Wrappers that render a part (`AttachmentContent` → `ItemContent`) inherit it automatically by rendering the part rather than re-implementing it.
+- Internal structural rules key off the structural attribute (`[data-item-part=description]`), never off `data-slot` and never off a suffix match like `[data-slot$=description]` — the latter also matches `card-description`, `field-description`, `alert-description`, and every other component's description part.
+- Add the attribute to a part when the first internal rule needs it, not pre-emptively. An attribute nothing reads is dead weight.
+- `data-slot` remains the hook for tests, consumer CSS, and state inspection. The structural attribute is an implementation detail of the owning component.
+
 ## Props Pattern
 
 Define props as a named interface above the function, extending `React.ComponentProps<'element'>` and/or `VariantProps<typeof componentVariants>`. Custom (non-inherited) props get JSDoc with a description, `@default`, and an `@example` for non-obvious usage. Handle boolean props with ternaries in the component body, **not** CVA variants — keeps CVA focused on enum-style variants and makes the boolean logic explicit.
