@@ -12,7 +12,7 @@ import { expect, fn, userEvent, within } from 'storybook/test';
 
 import { Spinner } from '../spinner';
 
-import { Marker, MarkerContent, MarkerIcon } from './marker';
+import { Marker, MarkerContent, MarkerIcon, type MarkerProps } from './marker';
 
 const meta: Meta<typeof Marker> = {
   title: 'Components/Marker',
@@ -143,7 +143,7 @@ export const Status: Story = {
 
 export const LongContent: Story = {
   render: () => (
-    <div className="nx:max-w-65">
+    <div className="nx:max-w-64">
       <Marker variant="separator">
         <MarkerContent>
           Everything below this point was synced from a device that has been
@@ -162,10 +162,6 @@ export const WithLink: Story = {
       </MarkerContent>
     </Marker>
   ),
-};
-
-export const EmptySeparator: Story = {
-  render: () => <Marker variant="separator" />,
 };
 
 // ============================================
@@ -210,7 +206,7 @@ export const AsChild: Story = {
 
 export const AsChildLink: Story = {
   render: () => (
-    <Marker asChild className="nx:hover:text-foreground">
+    <Marker asChild>
       <a href="#pull-request">
         <MarkerIcon>
           <GitBranchIcon />
@@ -227,12 +223,13 @@ export const AsChildLink: Story = {
   },
 };
 
-const onRevertClick = fn();
-
-export const ClickInteraction: Story = {
-  render: () => (
-    <Marker asChild className="nx:hover:text-foreground">
-      <button type="button" onClick={onRevertClick}>
+export const ClickInteraction: StoryObj<
+  MarkerProps & { onRevert: () => void }
+> = {
+  args: { onRevert: fn() },
+  render: (args) => (
+    <Marker asChild>
+      <button type="button" onClick={args.onRevert}>
         <MarkerIcon>
           <RotateCcwIcon />
         </MarkerIcon>
@@ -240,30 +237,27 @@ export const ClickInteraction: Story = {
       </button>
     </Marker>
   ),
-  play: async ({ canvasElement }) => {
-    onRevertClick.mockClear();
-
+  play: async ({ canvasElement, args }) => {
     const canvas = within(canvasElement);
     const button = canvas.getByRole('button', { name: 'Revert this change' });
 
     await userEvent.click(button);
-    await expect(onRevertClick).toHaveBeenCalledTimes(1);
+    await expect(args.onRevert).toHaveBeenCalledTimes(1);
   },
 };
 
-const onRevertKeyboard = fn();
-
-export const KeyboardInteraction: Story = {
-  render: () => (
-    <Marker asChild className="nx:hover:text-foreground">
-      <button type="button" onClick={onRevertKeyboard}>
+export const KeyboardInteraction: StoryObj<
+  MarkerProps & { onRevert: () => void }
+> = {
+  args: { onRevert: fn() },
+  render: (args) => (
+    <Marker asChild>
+      <button type="button" onClick={args.onRevert}>
         <MarkerContent>Revert this change</MarkerContent>
       </button>
     </Marker>
   ),
-  play: async ({ canvasElement }) => {
-    onRevertKeyboard.mockClear();
-
+  play: async ({ canvasElement, args }) => {
     const canvas = within(canvasElement);
     const button = canvas.getByRole('button', { name: 'Revert this change' });
 
@@ -271,7 +265,7 @@ export const KeyboardInteraction: Story = {
     await expect(button).toHaveFocus();
 
     await userEvent.keyboard('{Enter}');
-    await expect(onRevertKeyboard).toHaveBeenCalledTimes(1);
+    await expect(args.onRevert).toHaveBeenCalledTimes(1);
   },
 };
 
