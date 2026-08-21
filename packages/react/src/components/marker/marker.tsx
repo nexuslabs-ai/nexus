@@ -6,7 +6,7 @@ import { cva, type VariantProps } from 'class-variance-authority';
 import { cn } from '../../lib/utils';
 
 const markerVariants = cva(
-  "nx:group/marker nx:flex nx:min-h-4 nx:items-center nx:gap-2 nx:text-left nx:typography-body-small nx:text-muted-foreground nx:transition-colors nx:duration-faster nx:focus-visible:outline-2 nx:focus-visible:outline-focus-default nx:focus-visible:outline-offset-(--focus-offset) nx:[&_svg:not([class*='size-'])]:size-4 nx:[&_svg]:shrink-0 nx:[a]:pointer-coarse:min-h-11 nx:[a]:hover:text-foreground nx:[button]:pointer-coarse:min-h-11 nx:[button:not(:disabled)]:hover:text-foreground",
+  "nx:group/marker nx:flex nx:min-h-4 nx:items-center nx:gap-2 nx:text-left nx:typography-body-small nx:text-muted-foreground nx:transition-colors nx:duration-faster nx:focus-visible:outline-2 nx:focus-visible:outline-focus-default nx:focus-visible:outline-offset-(--focus-offset) nx:disabled:pointer-events-none nx:aria-disabled:pointer-events-none nx:[&_svg:not([class*='size-'])]:size-4 nx:[&_svg]:shrink-0 nx:[a]:pointer-coarse:min-h-11 nx:[a]:hover:text-foreground nx:[button]:cursor-pointer nx:[button]:pointer-coarse:min-h-11 nx:[button]:hover:text-foreground",
   {
     variants: {
       variant: {
@@ -35,8 +35,10 @@ interface MarkerProps
    * a labelled section, or a link / button for an actionable row.
    *
    * An `a` or `button` child is answered by the row itself — hover, the
-   * design-system focus ring, and a coarse-pointer tap floor apply only when
-   * the child is interactive, so the call site needs no extra classes.
+   * pointer cursor, the design-system focus ring, and a coarse-pointer tap
+   * floor apply only when the child is interactive, so the call site needs no
+   * extra classes. A `disabled` or `aria-disabled` child is inert: the row
+   * drops pointer events, so neither the hover nor the cursor fires.
    *
    * @default false
    * @example

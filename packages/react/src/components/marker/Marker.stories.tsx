@@ -220,6 +220,55 @@ export const AsChildLink: Story = {
     const link = canvas.getByRole('link', { name: 'View the pull request' });
 
     await expect(link).toHaveAttribute('data-slot', 'marker');
+    await expect(link).toHaveClass('nx:[a]:pointer-coarse:min-h-11');
+  },
+};
+
+/**
+ * A `disabled` or `aria-disabled` `asChild` child is inert — the row drops
+ * pointer events, so neither the hover recolour nor the pointer cursor fires.
+ */
+export const Disabled: StoryObj<MarkerProps & { onRevert: () => void }> = {
+  args: { onRevert: fn() },
+  render: (args) => (
+    <div className={stack}>
+      <Marker asChild>
+        <button type="button" disabled onClick={args.onRevert}>
+          <MarkerIcon>
+            <RotateCcwIcon />
+          </MarkerIcon>
+          <MarkerContent>Revert this change</MarkerContent>
+        </button>
+      </Marker>
+      <Marker asChild>
+        <a href="#pull-request" aria-disabled="true" tabIndex={-1}>
+          <MarkerIcon>
+            <GitBranchIcon />
+          </MarkerIcon>
+          <MarkerContent>View the pull request</MarkerContent>
+        </a>
+      </Marker>
+    </div>
+  ),
+  play: async ({ canvasElement, args }) => {
+    const canvas = within(canvasElement);
+    const button = canvas.getByRole('button', { name: 'Revert this change' });
+    const link = canvas.getByRole('link', { name: 'View the pull request' });
+
+    await expect(button).toBeDisabled();
+    await expect(button).toHaveStyle({ pointerEvents: 'none' });
+
+    // user-event refuses to click through `pointer-events: none`, so the check
+    // is bypassed to prove the handler stays silent on the native path too.
+    await userEvent.click(button, { pointerEventsCheck: 0 });
+    await expect(args.onRevert).not.toHaveBeenCalled();
+
+    // An `a` ignores native `disabled`, so the row's inertness rests on
+    // aria-disabled plus aria-disabled:pointer-events-none.
+    await expect(link).not.toHaveAttribute('disabled');
+    await expect(link).toHaveAttribute('aria-disabled', 'true');
+    await expect(link).toHaveAttribute('tabindex', '-1');
+    await expect(link).toHaveStyle({ pointerEvents: 'none' });
   },
 };
 
