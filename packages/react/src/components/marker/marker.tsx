@@ -38,7 +38,8 @@ interface MarkerProps
    * pointer cursor, the design-system focus ring, and a coarse-pointer tap
    * floor apply only when the child is interactive, so the call site needs no
    * extra classes. A `disabled` or `aria-disabled` child is inert: the row
-   * drops pointer events, so neither the hover nor the cursor fires.
+   * drops pointer events, so neither the hover nor the cursor fires, and its
+   * foreground mutes to `text-disabled-foreground`.
    *
    * @default false
    * @example
@@ -60,6 +61,10 @@ interface MarkerProps
  *
  * The label stays real text in reading order, so it is announced where it
  * appears. For a purely decorative rule with no label, use `Separator`.
+ *
+ * The `separator` rules are `background-color` hairlines, which the forced-color
+ * adjustment flattens to `Canvas`, so both carry a `CanvasText` fallback and
+ * survive Windows High Contrast Mode. `Separator` carries the same fallback.
  *
  * @example
  * ```tsx
