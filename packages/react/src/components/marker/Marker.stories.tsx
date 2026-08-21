@@ -269,6 +269,27 @@ export const Disabled: StoryObj<MarkerProps & { onRevert: () => void }> = {
     await expect(link).toHaveAttribute('aria-disabled', 'true');
     await expect(link).toHaveAttribute('tabindex', '-1');
     await expect(link).toHaveStyle({ pointerEvents: 'none' });
+    await expect(link).toHaveClass('nx:aria-disabled:text-disabled-foreground');
+  },
+};
+
+/**
+ * Under `forced-colors: active` the two `variant="separator"` rules are painted
+ * with `background-color`, which the forced-color adjustment flattens to
+ * `Canvas`. Both rules carry a `CanvasText` fallback so the divider survives
+ * Windows High Contrast Mode; `Separator` carries the same fallback.
+ */
+export const ForcedColors: Story = {
+  render: () => (
+    <Marker variant="separator">
+      <MarkerContent>Today</MarkerContent>
+    </Marker>
+  ),
+  play: async ({ canvasElement }) => {
+    const marker = canvasElement.querySelector('[data-slot="marker"]');
+
+    await expect(marker).toHaveClass('nx:forced-colors:before:bg-[CanvasText]');
+    await expect(marker).toHaveClass('nx:forced-colors:after:bg-[CanvasText]');
   },
 };
 

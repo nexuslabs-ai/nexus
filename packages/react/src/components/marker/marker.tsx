@@ -6,13 +6,13 @@ import { cva, type VariantProps } from 'class-variance-authority';
 import { cn } from '../../lib/utils';
 
 const markerVariants = cva(
-  "nx:group/marker nx:flex nx:min-h-4 nx:items-center nx:gap-2 nx:text-left nx:typography-body-small nx:text-muted-foreground nx:transition-colors nx:duration-faster nx:focus-visible:outline-2 nx:focus-visible:outline-focus-default nx:focus-visible:outline-offset-(--focus-offset) nx:disabled:pointer-events-none nx:aria-disabled:pointer-events-none nx:[&_svg:not([class*='size-'])]:size-4 nx:[&_svg]:shrink-0 nx:[a]:pointer-coarse:min-h-11 nx:[a]:hover:text-foreground nx:[button]:cursor-pointer nx:[button]:pointer-coarse:min-h-11 nx:[button]:hover:text-foreground",
+  "nx:group/marker nx:flex nx:min-h-4 nx:items-center nx:gap-2 nx:text-left nx:typography-body-small nx:text-muted-foreground nx:transition-colors nx:duration-faster nx:focus-visible:outline-2 nx:focus-visible:outline-focus-default nx:focus-visible:outline-offset-(--focus-offset) nx:disabled:pointer-events-none nx:disabled:text-disabled-foreground nx:aria-disabled:pointer-events-none nx:aria-disabled:text-disabled-foreground nx:[&_svg:not([class*='size-'])]:size-4 nx:[&_svg]:shrink-0 nx:[a]:pointer-coarse:min-h-11 nx:[a]:hover:text-foreground nx:[button]:cursor-pointer nx:[button]:pointer-coarse:min-h-11 nx:[button]:hover:text-foreground",
   {
     variants: {
       variant: {
         default: '',
         separator:
-          'nx:w-full nx:before:mr-1 nx:before:h-px nx:before:flex-1 nx:before:bg-border-default nx:after:ml-1 nx:after:h-px nx:after:flex-1 nx:after:bg-border-default',
+          'nx:w-full nx:before:mr-1 nx:before:h-px nx:before:flex-1 nx:before:bg-border-default nx:after:ml-1 nx:after:h-px nx:after:flex-1 nx:after:bg-border-default nx:forced-colors:before:bg-[CanvasText] nx:forced-colors:after:bg-[CanvasText]',
         border: 'nx:border-b-default nx:border-border-default nx:pb-2',
       },
     },

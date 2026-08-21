@@ -49,7 +49,7 @@ function Separator({
       decorative={decorative}
       orientation={orientation}
       className={cn(
-        'nx:shrink-0 nx:bg-border-default',
+        'nx:shrink-0 nx:bg-border-default nx:forced-colors:bg-[CanvasText]',
         'nx:data-[orientation=horizontal]:h-px nx:data-[orientation=horizontal]:w-full',
         'nx:data-[orientation=vertical]:h-full nx:data-[orientation=vertical]:w-px',
         className
