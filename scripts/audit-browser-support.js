@@ -210,6 +210,20 @@ export const FEATURE_POLICIES = Object.freeze([
     note: 'Use as progressive enhancement only; fixed-size fields remain the fallback.',
   },
   {
+    id: 'mask-image',
+    name: 'CSS masking (mask-image)',
+    policy: 'fallback',
+    support: {
+      chrome: 120,
+      edge: 120,
+      firefox: 53,
+      safari: 15.4,
+      samsung: 25,
+    },
+    guide: 'soft-edge-content-fade',
+    note: 'MessageScroller fades its scroll edges; component code pairs the standard property with -webkit-mask-image so Chrome and Edge below 120 still get the fade, and an unsupported browser degrades to sharp edges.',
+  },
+  {
     id: 'scrollbar-color',
     name: 'scrollbar-color / scrollbar-width',
     policy: 'intentional-divergence',
