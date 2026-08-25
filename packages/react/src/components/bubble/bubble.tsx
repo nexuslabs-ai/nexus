@@ -34,21 +34,21 @@ const bubbleVariants = cva(
     'nx:relative nx:w-fit nx:max-w-[min(80%,45rem)] nx:rounded-xl nx:border-default nx:border-transparent nx:typography-body-default nx:transition-colors nx:duration-faster',
     // The pill overhangs 12px, so the bubble reserves that 12px itself rather
     // than borrowing whatever gap an ancestor happens to set.
-    'nx:has-[>[data-slot=bubble-reactions][data-side=top]]:mt-3 nx:has-[>[data-slot=bubble-reactions][data-side=bottom]]:mb-3',
+    'nx:has-[>[data-bubble-part=reactions][data-side=top]]:mt-3 nx:has-[>[data-bubble-part=reactions][data-side=bottom]]:mb-3',
   ],
   {
     variants: {
       variant: {
         primary:
-          'nx:bg-primary-background nx:text-primary-foreground nx:has-[>a[data-slot=bubble-content]]:hover:bg-primary-background-hover nx:has-[>button[data-slot=bubble-content]:not(:disabled)]:hover:bg-primary-background-hover',
+          'nx:bg-primary-background nx:text-primary-foreground nx:has-[>[data-bubble-part=content]:is(a[href],button:not(:disabled)):not([aria-disabled=true])]:hover:bg-primary-background-hover',
         muted:
-          'nx:bg-muted nx:text-foreground nx:has-[>a[data-slot=bubble-content]]:hover:bg-muted-hover nx:has-[>button[data-slot=bubble-content]:not(:disabled)]:hover:bg-muted-hover',
+          'nx:bg-muted nx:text-foreground nx:has-[>[data-bubble-part=content]:is(a[href],button:not(:disabled)):not([aria-disabled=true])]:hover:bg-muted-hover',
         outline:
-          'nx:border-border-default nx:text-foreground nx:has-[>a[data-slot=bubble-content]]:hover:bg-background-hover nx:has-[>button[data-slot=bubble-content]:not(:disabled)]:hover:bg-background-hover',
+          'nx:border-border-default nx:text-foreground nx:has-[>[data-bubble-part=content]:is(a[href],button:not(:disabled)):not([aria-disabled=true])]:hover:bg-background-hover',
         ghost:
-          'nx:text-foreground nx:has-[>a[data-slot=bubble-content]]:hover:bg-background-hover nx:has-[>button[data-slot=bubble-content]:not(:disabled)]:hover:bg-background-hover',
+          'nx:text-foreground nx:has-[>[data-bubble-part=content]:is(a[href],button:not(:disabled)):not([aria-disabled=true])]:hover:bg-background-hover',
         destructive:
-          'nx:bg-error-subtle nx:text-error-subtle-foreground nx:has-[>a[data-slot=bubble-content]]:hover:bg-error-subtle-hover nx:has-[>button[data-slot=bubble-content]:not(:disabled)]:hover:bg-error-subtle-hover',
+          'nx:bg-error-subtle nx:text-error-subtle-foreground nx:has-[>[data-bubble-part=content]:is(a[href],button:not(:disabled)):not([aria-disabled=true])]:hover:bg-error-subtle-hover',
       },
       align: {
         start: 'nx:me-auto',
@@ -124,8 +124,10 @@ interface BubbleContentProps extends React.ComponentProps<'div'> {
    * `p` for prose, or an `a` / `button` when the whole turn is actionable.
    *
    * An interactive child takes the design-system focus ring, the pointer
-   * cursor, and the surrounding `Bubble`'s hover tint. It still owns its own
-   * accessible name.
+   * cursor, and the surrounding `Bubble`'s hover tint. The tint is the turn
+   * advertising itself as actionable, so it is withheld from a body that
+   * cannot be actioned — an `a` with no `href`, a disabled `button`, or
+   * anything carrying `aria-disabled`. It still owns its own accessible name.
    *
    * @default false
    * @example
@@ -159,8 +161,9 @@ function BubbleContent({
   return (
     <Comp
       data-slot="bubble-content"
+      data-bubble-part="content"
       className={cn(
-        'nx:block nx:min-w-0 nx:rounded-[inherit] nx:px-4 nx:py-3 nx:text-start nx:wrap-break-word nx:focus-visible:outline-2 nx:focus-visible:outline-focus-default nx:focus-visible:outline-offset-(--focus-offset) nx:[&:is(a,button)]:cursor-pointer nx:[&:is(a)]:underline nx:[&:is(a)]:underline-offset-4 nx:[&_a]:underline nx:[&_a]:underline-offset-4 nx:[&_pre]:whitespace-pre-wrap nx:[&_pre]:wrap-break-word',
+        'nx:block nx:min-w-0 nx:rounded-[inherit] nx:px-4 nx:py-3 nx:text-start nx:wrap-break-word nx:focus-visible:outline-2 nx:focus-visible:outline-focus-default nx:focus-visible:outline-offset-(--focus-offset) nx:[&:is(a[href],button:not(:disabled)):not([aria-disabled=true])]:cursor-pointer nx:[&:is(a)]:underline nx:[&:is(a)]:underline-offset-4 nx:[&_a]:underline nx:[&_a]:underline-offset-4 nx:[&_pre]:whitespace-pre-wrap nx:[&_pre]:wrap-break-word',
         className
       )}
       {...props}
@@ -222,6 +225,7 @@ function BubbleReactions({
   return (
     <div
       data-slot="bubble-reactions"
+      data-bubble-part="reactions"
       data-side={side}
       data-align={align}
       className={cn(bubbleReactionsVariants({ side, align }), className)}

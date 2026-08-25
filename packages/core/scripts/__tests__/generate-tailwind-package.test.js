@@ -408,7 +408,7 @@ describe('generateTailwindPackage', () => {
     const themeBlock = extractBlock(nexusCSS, '@theme inline');
     const colorLines = themeColorLines(themeBlock);
 
-    expect(colorLines).toHaveLength(107);
+    expect(colorLines).toHaveLength(engine.SEMANTIC_TOKEN_REGISTRY.length);
 
     for (const [, name, value] of colorLines) {
       expect(compactCss(value), `--color-${name}`).toMatch(

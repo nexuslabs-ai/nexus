@@ -39,6 +39,29 @@ type Story = StoryObj<typeof Bubble>;
 
 const column = 'nx:w-full nx:max-w-md';
 
+/**
+ * The hover tint is a `:has()` variant, and synthetic pointer events never
+ * activate `:hover` — so these stories assert which turns the tint *selects*
+ * rather than the painted colour. Reading the selector back off the class the
+ * component actually emitted is what keeps that honest: widen the scope in
+ * `bubble.tsx` and the over-fire assertions below start matching and fail.
+ */
+function hoverTintSelector(bubble: Element): string {
+  const emitted = [...bubble.classList].find(
+    (name) => name.startsWith('nx:has-[') && name.includes(']:hover:bg-')
+  );
+
+  if (!emitted) {
+    throw new Error(`no hover-tint class on "${bubble.className}"`);
+  }
+
+  return `:has(${emitted.slice('nx:has-['.length, emitted.lastIndexOf(']:hover:bg-'))})`;
+}
+
+function bubbleOf(element: Element): Element {
+  return element.closest('[data-slot="bubble"]')!;
+}
+
 const VARIANTS: NonNullable<BubbleProps['variant']>[] = [
   'muted',
   'primary',
@@ -361,21 +384,14 @@ export const LinksAndButtons: Story = {
     await expect(link).toHaveAttribute('data-slot', 'bubble-content');
     await expect(button).toHaveAttribute('data-slot', 'bubble-content');
 
-    // The hover tint is scoped to a direct interactive content child, so an
-    // unrelated nested control does not tint the whole turn. Assert the
-    // selector rather than the painted colour: synthetic pointer events do not
-    // activate :hover, so a computed-style check would fail even when correct.
-    const actionable = ':has(>a[data-slot=bubble-content])';
-    const inertProse = ':has(>[data-slot=bubble-content]:not(a, button))';
+    // Both live turns are actionable, so each selects its own tint.
+    const linkBubble = bubbleOf(link);
+    const buttonBubble = bubbleOf(button);
 
-    await expect(
-      link.closest('[data-slot="bubble"]')!.matches(actionable)
-    ).toBe(true);
-    await expect(
-      button
-        .closest('[data-slot="bubble"]')!
-        .matches(':has(>button[data-slot=bubble-content]:not(:disabled))')
-    ).toBe(true);
+    await expect(linkBubble.matches(hoverTintSelector(linkBubble))).toBe(true);
+    await expect(buttonBubble.matches(hoverTintSelector(buttonBubble))).toBe(
+      true
+    );
 
     // Links read as links on every surface, whether the body is the anchor or
     // merely contains one.
@@ -384,10 +400,11 @@ export const LinksAndButtons: Story = {
     });
 
     // A link buried in prose is not a whole-turn action, so it must not tint.
-    const proseBubble = inlineLink.closest('[data-slot="bubble"]')!;
+    const proseBubble = bubbleOf(inlineLink);
 
-    await expect(proseBubble.matches(actionable)).toBe(false);
-    await expect(proseBubble.matches(inertProse)).toBe(true);
+    await expect(proseBubble.matches(hoverTintSelector(proseBubble))).toBe(
+      false
+    );
 
     for (const anchor of [link, inlineLink]) {
       await expect(getComputedStyle(anchor).textDecorationLine).toBe(
@@ -416,11 +433,10 @@ export const LinksAndButtons: Story = {
     }
 
     // A whole-bubble link is identified by its underline, not by a surface.
-    const linkBubble = getComputedStyle(
-      link.closest<HTMLElement>('[data-slot="bubble"]')!
-    );
-    await expect(linkBubble.backgroundColor).toBe('rgba(0, 0, 0, 0)');
-    await expect(linkBubble.borderTopColor).toBe('rgba(0, 0, 0, 0)');
+    const linkBubbleStyle = getComputedStyle(linkBubble as HTMLElement);
+
+    await expect(linkBubbleStyle.backgroundColor).toBe('rgba(0, 0, 0, 0)');
+    await expect(linkBubbleStyle.borderTopColor).toBe('rgba(0, 0, 0, 0)');
 
     // The prose bubble around an inline link keeps its surface.
     await expect(
@@ -502,6 +518,19 @@ export const Disabled: StoryObj<BubbleProps & { onRetry: () => void }> = {
           </button>
         </BubbleContent>
       </Bubble>
+      <Bubble variant="outline">
+        <BubbleContent asChild>
+          <button type="button" aria-disabled="true">
+            Resending this message
+          </button>
+        </BubbleContent>
+      </Bubble>
+      <Bubble variant="ghost">
+        <BubbleContent asChild>
+          {/* eslint-disable-next-line jsx-a11y/anchor-is-valid -- the hrefless anchor is the case under test: an unnavigable body must not read as actionable */}
+          <a>Thread unavailable</a>
+        </BubbleContent>
+      </Bubble>
     </div>
   ),
   play: async ({ canvasElement, args }) => {
@@ -514,12 +543,20 @@ export const Disabled: StoryObj<BubbleProps & { onRetry: () => void }> = {
     await userEvent.click(button);
     await expect(args.onRetry).not.toHaveBeenCalled();
 
-    // A dead control must not advertise itself with the actionable hover tint.
-    await expect(
-      button
-        .closest('[data-slot="bubble"]')!
-        .matches(':has(>button[data-slot=bubble-content]:not(:disabled))')
-    ).toBe(false);
+    // A dead body must not advertise itself with the actionable hover tint,
+    // however it is deadened — `disabled`, `aria-disabled` (which Nexus
+    // `Button` sets while loading), or an anchor with nowhere to go.
+    const inert = [
+      button,
+      canvas.getByRole('button', { name: 'Resending this message' }),
+      canvasElement.querySelector('a[data-bubble-part="content"]')!,
+    ];
+
+    for (const body of inert) {
+      const bubble = bubbleOf(body);
+
+      await expect(bubble.matches(hoverTintSelector(bubble))).toBe(false);
+    }
   },
 };
 

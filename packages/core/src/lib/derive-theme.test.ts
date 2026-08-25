@@ -24,6 +24,7 @@ import {
 } from './derive-theme';
 import { type NexusSurfaceTone, TIER_THRESHOLDS } from './palette';
 import { STATUS_RAMP } from './static-ramps';
+import { SEMANTIC_TOKEN_REGISTRY } from './token-registry';
 
 function lOf(oklchStr: string | undefined): number {
   return oklch(parse(oklchStr!)!)!.l!;
@@ -36,7 +37,7 @@ function hOf(oklchStr: string | undefined): number {
 const toRgb = converter('rgb');
 const oklabDelta = differenceEuclidean('oklab');
 const COLORBLIND_DELTA_E = 0.02;
-const RUNTIME_SEMANTIC_COLOR_COUNT = 108;
+const RUNTIME_SEMANTIC_COLOR_COUNT = SEMANTIC_TOKEN_REGISTRY.length;
 const VISION_TYPES = [
   'normal',
   'deuteranopia',
