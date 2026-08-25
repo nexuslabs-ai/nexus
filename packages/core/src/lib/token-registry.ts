@@ -20,6 +20,7 @@ const SURFACE_TOKEN_NAMES = [
   'background-hover',
   'background-active',
   'muted',
+  'muted-hover',
   'muted-extralight',
   'container',
   'container-hover',
@@ -144,6 +145,8 @@ const ALPHA_TOKEN_NAMES = [
 ] as const;
 
 const DESCRIPTIONS: Partial<Record<string, string>> = {
+  'muted-hover':
+    'Hover step for the muted surface — one rung above muted in both light and dark, so a muted fill has a hover state without borrowing the container family.',
   'muted-extralight':
     'Quietest muted surface — sits between background and muted for barely-there fills (empty states, subtle panels).',
   'muted-foreground':

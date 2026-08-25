@@ -242,18 +242,28 @@ export const ReactionSideAndAlign: Story = {
 
       // Guards against a silently-undefined utility: an unresolved inset would
       // leave the pill at its static position instead of the named corner.
-      const inset = getComputedStyle(pill);
-      await expect(inset.position).toBe('absolute');
+      const pillStyle = getComputedStyle(pill);
+      await expect(pillStyle.position).toBe('absolute');
       await expect(
         pill.dataset.align === 'start'
-          ? inset.insetInlineStart
-          : inset.insetInlineEnd
+          ? pillStyle.insetInlineStart
+          : pillStyle.insetInlineEnd
       ).not.toBe('auto');
+
+      // The overhang is reserved by the bubble itself, so the pill stays clear
+      // of its neighbour whatever gap the surrounding stack happens to set.
+      const bubbleStyle = getComputedStyle(bubble);
 
       if (pill.dataset.side === 'top') {
         await expect(pillBox.top).toBeLessThan(bubbleBox.top);
+        await expect(bubbleBox.top - pillBox.top).toBeLessThanOrEqual(
+          parseFloat(bubbleStyle.marginTop)
+        );
       } else {
         await expect(pillBox.bottom).toBeGreaterThan(bubbleBox.bottom);
+        await expect(pillBox.bottom - bubbleBox.bottom).toBeLessThanOrEqual(
+          parseFloat(bubbleStyle.marginBottom)
+        );
       }
 
       const inlineGap =
@@ -351,15 +361,20 @@ export const LinksAndButtons: Story = {
     await expect(link).toHaveAttribute('data-slot', 'bubble-content');
     await expect(button).toHaveAttribute('data-slot', 'bubble-content');
 
-    // The variant's hover tint is keyed off `:has(a)` / `:has(button)`. Assert
-    // the selector resolves rather than the painted colour: synthetic pointer
-    // events do not activate the CSS :hover pseudo-class, so a computed-style
-    // check would fail even when the rule is correct.
-    await expect(link.closest('[data-slot="bubble"]')!.matches(':has(a)')).toBe(
-      true
-    );
+    // The hover tint is scoped to a direct interactive content child, so an
+    // unrelated nested control does not tint the whole turn. Assert the
+    // selector rather than the painted colour: synthetic pointer events do not
+    // activate :hover, so a computed-style check would fail even when correct.
+    const actionable = ':has(>a[data-slot=bubble-content])';
+    const inertProse = ':has(>[data-slot=bubble-content]:not(a, button))';
+
     await expect(
-      button.closest('[data-slot="bubble"]')!.matches(':has(button)')
+      link.closest('[data-slot="bubble"]')!.matches(actionable)
+    ).toBe(true);
+    await expect(
+      button
+        .closest('[data-slot="bubble"]')!
+        .matches(':has(>button[data-slot=bubble-content]:not(:disabled))')
     ).toBe(true);
 
     // Links read as links on every surface, whether the body is the anchor or
@@ -367,6 +382,12 @@ export const LinksAndButtons: Story = {
     const inlineLink = canvas.getByRole('link', {
       name: 'link inside prose',
     });
+
+    // A link buried in prose is not a whole-turn action, so it must not tint.
+    const proseBubble = inlineLink.closest('[data-slot="bubble"]')!;
+
+    await expect(proseBubble.matches(actionable)).toBe(false);
+    await expect(proseBubble.matches(inertProse)).toBe(true);
 
     for (const anchor of [link, inlineLink]) {
       await expect(getComputedStyle(anchor).textDecorationLine).toBe(
@@ -376,6 +397,23 @@ export const LinksAndButtons: Story = {
 
     await expect(getComputedStyle(link).cursor).toBe('pointer');
     await expect(getComputedStyle(button).cursor).toBe('pointer');
+
+    // The padding lives on the content, so the hit target — and the focus ring
+    // that traces it — covers the whole surface, not a box inset within it.
+    for (const control of [link, button]) {
+      const controlBox = control.getBoundingClientRect();
+      const surfaceBox = control
+        .closest<HTMLElement>('[data-slot="bubble"]')!
+        .getBoundingClientRect();
+
+      // 1px on every side: the border the surface reserves for `outline`.
+      await expect(controlBox.left - surfaceBox.left).toBeLessThanOrEqual(1);
+      await expect(surfaceBox.right - controlBox.right).toBeLessThanOrEqual(1);
+      await expect(controlBox.top - surfaceBox.top).toBeLessThanOrEqual(1);
+      await expect(surfaceBox.bottom - controlBox.bottom).toBeLessThanOrEqual(
+        1
+      );
+    }
 
     // A whole-bubble link is identified by its underline, not by a surface.
     const linkBubble = getComputedStyle(
@@ -475,6 +513,13 @@ export const Disabled: StoryObj<BubbleProps & { onRetry: () => void }> = {
     await expect(button).toBeDisabled();
     await userEvent.click(button);
     await expect(args.onRetry).not.toHaveBeenCalled();
+
+    // A dead control must not advertise itself with the actionable hover tint.
+    await expect(
+      button
+        .closest('[data-slot="bubble"]')!
+        .matches(':has(>button[data-slot=bubble-content]:not(:disabled))')
+    ).toBe(false);
   },
 };
 
@@ -527,9 +572,11 @@ export const WithDataAttributes: Story = {
     await expect(
       bubble.querySelector('[data-slot="bubble-content"]')
     ).not.toBeNull();
-    await expect(
-      bubble.querySelector('[data-slot="bubble-reactions"]')
-    ).not.toBeNull();
+    const pill = bubble.querySelector('[data-slot="bubble-reactions"]')!;
+
+    await expect(pill).not.toBeNull();
+    await expect(pill).toHaveAttribute('data-side', 'bottom');
+    await expect(pill).toHaveAttribute('data-align', 'end');
   },
 };
 
