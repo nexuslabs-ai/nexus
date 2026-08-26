@@ -39,15 +39,6 @@ type Story = StoryObj<typeof Bubble>;
 
 const column = 'nx:w-full nx:max-w-md';
 
-/**
- * The hover tint is a `:has()` variant, and synthetic pointer events never
- * activate `:hover` — so these stories assert which turns the tint *selects*
- * rather than the painted colour. The scope is read back off the compiled
- * stylesheet, not off the class attribute, so a variant Tailwind never emitted
- * fails loudly instead of passing on a class string that styles nothing.
- * Widen the scope in `bubble.tsx` and the over-fire assertions below start
- * matching and fail.
- */
 function* eachStyleRule(rules: CSSRuleList): Generator<CSSStyleRule> {
   for (const rule of rules) {
     if (rule instanceof CSSStyleRule) {
@@ -57,14 +48,21 @@ function* eachStyleRule(rules: CSSRuleList): Generator<CSSStyleRule> {
     // Tailwind nests the variant chain inside the class rule, and a
     // `CSSStyleRule` is itself a grouping rule — so recurse into every rule,
     // including the ones just yielded.
-    const nested: CSSRuleList | undefined = (rule as CSSGroupingRule).cssRules;
-
-    if (nested) {
-      yield* eachStyleRule(nested);
+    if (rule instanceof CSSGroupingRule) {
+      yield* eachStyleRule(rule.cssRules);
     }
   }
 }
 
+/**
+ * The hover tint is a `:has()` variant, and synthetic pointer events never
+ * activate `:hover` — so these stories assert which turns the tint *selects*
+ * rather than the painted colour. The scope is read back off the compiled
+ * stylesheet, not off the class attribute, so a variant Tailwind never emitted
+ * fails loudly instead of passing on a class string that styles nothing.
+ * Widen the scope in `bubble.tsx` and the over-fire assertions below start
+ * matching and fail.
+ */
 function hoverTintSelector(bubble: Element): string {
   const emitted = [...bubble.classList].find(
     (name) => name.startsWith('nx:has-[') && name.includes(']:hover:bg-')
@@ -83,13 +81,13 @@ function hoverTintSelector(bubble: Element): string {
       }
 
       // `.cls { &:has(…) { &:hover { … } } }` — the scope lives on the nested
-      // rule, so strip the nesting `&` and the trailing `:hover` off it.
+      // rule, so strip the nesting `&` off it.
       const scope = [...eachStyleRule(rule.cssRules)]
         .map((nested) => nested.selectorText)
         .find((selector) => selector.includes(':has('));
 
       if (scope) {
-        return scope.replace(/^&/, '').replace(/:hover$/, '');
+        return scope.replace(/^&/, '');
       }
     }
   }
@@ -97,8 +95,8 @@ function hoverTintSelector(bubble: Element): string {
   throw new Error(`"${emitted}" compiled to no :has() rule`);
 }
 
-function bubbleOf(element: Element): Element {
-  return element.closest('[data-slot="bubble"]')!;
+function bubbleOf(element: Element): HTMLElement {
+  return element.closest<HTMLElement>('[data-slot="bubble"]')!;
 }
 
 const VARIANTS: NonNullable<BubbleProps['variant']>[] = [
@@ -134,6 +132,20 @@ export const Muted: Story = {
       </Bubble>
     </div>
   ),
+  play: async ({ canvasElement }) => {
+    const bubble = canvasElement.querySelector('[data-slot="bubble"]')!;
+    const theme = getComputedStyle(bubble);
+    const read = (token: string) => theme.getPropertyValue(token).trim();
+
+    // `muted` has no hover rung, so this variant borrows `popover-active` for
+    // one. That is a value borrow: it only reads as a hover while the two
+    // tokens differ, and nothing in `packages/core` pins the relation. Re-rung
+    // `popover-active` onto `muted` and the default variant's hover silently
+    // flattens — this fails instead.
+    await expect(read('--nx-color-popover-active')).not.toBe(
+      read('--nx-color-muted')
+    );
+  },
 };
 
 export const Primary: Story = {
@@ -472,7 +484,7 @@ export const LinksAndButtons: Story = {
     }
 
     // A whole-bubble link is identified by its underline, not by a surface.
-    const linkBubbleStyle = getComputedStyle(linkBubble as HTMLElement);
+    const linkBubbleStyle = getComputedStyle(linkBubble);
 
     await expect(linkBubbleStyle.backgroundColor).toBe('rgba(0, 0, 0, 0)');
     await expect(linkBubbleStyle.borderTopColor).toBe('rgba(0, 0, 0, 0)');
@@ -585,10 +597,13 @@ export const Disabled: StoryObj<BubbleProps & { onRetry: () => void }> = {
     // A dead body must not advertise itself with the actionable hover tint,
     // however it is deadened — `disabled`, `aria-disabled` (which Nexus
     // `Button` sets while loading), or an anchor with nowhere to go.
+    const deadAnchor = canvasElement.querySelector<HTMLElement>(
+      'a[data-bubble-part="content"]:not([href])'
+    )!;
     const inert = [
       button,
       canvas.getByRole('button', { name: 'Resending this message' }),
-      canvasElement.querySelector('a[data-bubble-part="content"]')!,
+      deadAnchor,
     ];
 
     for (const body of inert) {
@@ -596,6 +611,11 @@ export const Disabled: StoryObj<BubbleProps & { onRetry: () => void }> = {
 
       await expect(bubble.matches(hoverTintSelector(bubble))).toBe(false);
     }
+
+    // The underline is the whole-bubble link affordance, so an anchor with
+    // nowhere to go must not wear it. Widening `a[href]` to `a` in
+    // `bubble.tsx` fails here.
+    await expect(getComputedStyle(deadAnchor).textDecorationLine).toBe('none');
   },
 };
 
@@ -772,15 +792,13 @@ export const StackedConversation: Story = {
   },
 };
 
-/* eslint-disable jsx-a11y/no-noninteractive-tabindex -- axe requires a
-   scrollable region to be keyboard-reachable (scrollable-region-focusable),
-   which is the behaviour this story exists to prove. */
 export const InScrollContainer: Story = {
   render: () => (
     <div
       data-testid="scroller"
       role="region"
       aria-label="Conversation"
+      // eslint-disable-next-line jsx-a11y/no-noninteractive-tabindex -- axe requires a scrollable region to be keyboard-reachable (scrollable-region-focusable), which is the behaviour this story exists to prove
       tabIndex={0}
       className="nx:h-56 nx:w-full nx:max-w-md nx:overflow-y-auto nx:rounded-md nx:border-default nx:border-border-default nx:px-3 nx:py-4 nx:focus-visible:outline-2 nx:focus-visible:outline-focus-default nx:focus-visible:outline-offset-(--focus-offset)"
     >
@@ -816,6 +834,10 @@ export const InScrollContainer: Story = {
 
     await expect(pills).toHaveLength(2);
 
+    // Everything below only means something while the column overflows, so
+    // trimmed copy must fail here rather than silently stop testing scroll.
+    await expect(scroller.scrollHeight).toBeGreaterThan(scroller.clientHeight);
+
     // A pill overhangs the bubble, so the scroller must not gain a horizontal
     // scroll region — that would mean the inline edge is being cropped.
     await expect(scroller.scrollWidth).toBeLessThanOrEqual(
@@ -845,7 +867,6 @@ export const InScrollContainer: Story = {
     );
   },
 };
-/* eslint-enable jsx-a11y/no-noninteractive-tabindex */
 
 // ============================================
 // COMPOSITION

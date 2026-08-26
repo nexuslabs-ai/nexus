@@ -32,8 +32,13 @@ function BubbleGroup({ className, ...props }: BubbleGroupProps) {
 const bubbleVariants = cva(
   [
     'nx:relative nx:w-fit nx:max-w-[min(80%,45rem)] nx:rounded-xl nx:border-default nx:border-transparent nx:typography-body-default nx:transition-colors nx:duration-faster',
-    // The pill overhangs 12px, so the bubble reserves that 12px itself.
+    // The pill overhangs 12px, so the bubble reserves that 12px itself. These
+    // are margins, so the reservation holds in a flex or grid stack and
+    // collapses in a block one; `BubbleGroup` is flex.
     'nx:has-[>[data-bubble-part=reactions][data-side=top]]:mt-3 nx:has-[>[data-bubble-part=reactions][data-side=bottom]]:mb-3',
+    // Press cue for an actionable turn. `*-active` fills collapse to the rest
+    // shade in dark, so the cue is an inset shadow on top of the variant fill.
+    'nx:has-[>[data-bubble-part=content]:is(a[href],button:not(:disabled)):not([aria-disabled=true])]:active:shadow-inner',
   ],
   {
     variants: {

@@ -56,6 +56,20 @@ export const FEATURE_POLICIES = Object.freeze([
     note: 'Nexus uses OKLCH as the browser-floor feature and does not emit hex fallbacks.',
   },
   {
+    id: 'has-selector',
+    name: ':has() relational selector',
+    policy: 'progressive-enhancement',
+    support: {
+      chrome: 105,
+      edge: 105,
+      firefox: 121,
+      safari: 15.4,
+      samsung: 20,
+    },
+    guide: 'css',
+    note: 'Firefox 113-120 sits below support: rules keyed off :has() do not apply there. Keep the unenhanced state usable — Bubble loses its hover tint, its press cue, and the reaction-pill margin reservation, while focus, activation, and the keyboard path are unaffected.',
+  },
+  {
     id: 'color-scheme',
     name: 'color-scheme',
     policy: 'adopt',
