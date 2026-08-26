@@ -36,23 +36,20 @@ const bubbleVariants = cva(
     // are margins, so the reservation holds in a flex or grid stack and
     // collapses in a block one; `BubbleGroup` is flex.
     'nx:has-[>[data-bubble-part=reactions][data-side=top]]:mt-3 nx:has-[>[data-bubble-part=reactions][data-side=bottom]]:mb-3',
-    // Press cue for an actionable turn. `*-active` fills collapse to the rest
-    // shade in dark, so the cue is an inset shadow on top of the variant fill.
-    'nx:has-[>[data-bubble-part=content]:is(a[href],button:not(:disabled)):not([aria-disabled=true])]:active:shadow-inner',
   ],
   {
     variants: {
       variant: {
         primary:
-          'nx:bg-primary-background nx:text-primary-foreground nx:has-[>[data-bubble-part=content]:is(a[href],button:not(:disabled)):not([aria-disabled=true])]:hover:bg-primary-background-hover',
+          'nx:bg-primary-background nx:text-primary-foreground nx:has-[>[data-bubble-part=content]:is(a[href],button:not(:disabled)):not([aria-disabled=true])]:hover:bg-primary-background-hover nx:has-[>[data-bubble-part=content]:is(a[href],button:not(:disabled)):not([aria-disabled=true]):active]:bg-primary-background-active',
         muted:
-          'nx:bg-muted nx:text-foreground nx:has-[>[data-bubble-part=content]:is(a[href],button:not(:disabled)):not([aria-disabled=true])]:hover:bg-popover-active',
+          'nx:bg-muted nx:text-foreground nx:has-[>[data-bubble-part=content]:is(a[href],button:not(:disabled)):not([aria-disabled=true])]:hover:bg-popover-active nx:has-[>[data-bubble-part=content]:is(a[href],button:not(:disabled)):not([aria-disabled=true]):active]:border-border-active',
         outline:
-          'nx:border-border-default nx:text-foreground nx:has-[>[data-bubble-part=content]:is(a[href],button:not(:disabled)):not([aria-disabled=true])]:hover:bg-background-hover',
+          'nx:border-border-default nx:text-foreground nx:has-[>[data-bubble-part=content]:is(a[href],button:not(:disabled)):not([aria-disabled=true])]:hover:bg-background-hover nx:has-[>[data-bubble-part=content]:is(a[href],button:not(:disabled)):not([aria-disabled=true]):active]:bg-background-active',
         ghost:
-          'nx:text-foreground nx:has-[>[data-bubble-part=content]:is(a[href],button:not(:disabled)):not([aria-disabled=true])]:hover:bg-background-hover',
+          'nx:text-foreground nx:has-[>[data-bubble-part=content]:is(a[href],button:not(:disabled)):not([aria-disabled=true])]:hover:bg-background-hover nx:has-[>[data-bubble-part=content]:is(a[href],button:not(:disabled)):not([aria-disabled=true]):active]:bg-background-active',
         destructive:
-          'nx:bg-error-subtle nx:text-error-subtle-foreground nx:has-[>[data-bubble-part=content]:is(a[href],button:not(:disabled)):not([aria-disabled=true])]:hover:bg-error-subtle-hover',
+          'nx:bg-error-subtle nx:text-error-subtle-foreground nx:has-[>[data-bubble-part=content]:is(a[href],button:not(:disabled)):not([aria-disabled=true])]:hover:bg-error-subtle-hover nx:has-[>[data-bubble-part=content]:is(a[href],button:not(:disabled)):not([aria-disabled=true]):active]:bg-error-subtle-active',
       },
       align: {
         start: 'nx:me-auto',
@@ -80,6 +77,11 @@ interface BubbleProps
  * Presentational only: it holds no chat state, no speaker identity, and no
  * timestamp logic. Compose it with `BubbleContent` for the message body and
  * `BubbleReactions` for a reaction pill; stack turns with `BubbleGroup`.
+ *
+ * A `BubbleReactions` pill overhangs the surface, and the bubble reserves that
+ * overhang with a margin — so pill clearance holds in a flex or grid parent
+ * (`BubbleGroup` is flex) and collapses against a sibling's margin in a block
+ * one.
  *
  * `align` has no default, so a bubble sits wherever its parent puts it — the
  * natural start edge of a `BubbleGroup`, or an inline-end column that aligns

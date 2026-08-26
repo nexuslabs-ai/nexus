@@ -65,4 +65,17 @@ describe('surface ladder', () => {
   it('keeps the dark ladder at its expected raw steps', () => {
     expectStepsToMatch(DARK_SURFACE_STEPS, EXPECTED_DARK_SURFACE_STEPS);
   });
+
+  // `Bubble`'s muted variant borrows `popover-active` as its hover, because
+  // `muted` has no `-hover` rung. That borrow only reads as a hover while the
+  // two rungs differ, and the frozen tables above would still pass if a
+  // re-anchor happened to land them on the same step.
+  it('keeps popover-active off muted in both regimes', () => {
+    for (const [regime, steps] of [
+      ['light', LIGHT_SURFACE_STEPS],
+      ['dark', DARK_SURFACE_STEPS],
+    ] as const) {
+      expect(steps['popover-active'], regime).not.toBeCloseTo(steps.muted, 4);
+    }
+  });
 });

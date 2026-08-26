@@ -67,7 +67,7 @@ export const FEATURE_POLICIES = Object.freeze([
       samsung: 20,
     },
     guide: 'css',
-    note: 'Firefox 113-120 sits below support: rules keyed off :has() do not apply there. Keep the unenhanced state usable — Bubble loses its hover tint, its press cue, and the reaction-pill margin reservation, while focus, activation, and the keyboard path are unaffected.',
+    note: 'Firefox 113-120 sits below support: rules keyed off :has() do not apply there, across every consumer (alert, field, item, input-group, table, choice-card, choice-row, native-select, input-otp, bubble). Keep interaction and semantics independent of it. Not all degradation is cosmetic: Bubble loses its hover tint and press cue, and also the reaction-pill margin reservation, so a bottom pill and the next top pill overlap by ~8px at BubbleGroup gap-4 (12+12 overhang vs 16px gap).',
   },
   {
     id: 'color-scheme',

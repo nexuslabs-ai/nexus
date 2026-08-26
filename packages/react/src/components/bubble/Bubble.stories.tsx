@@ -63,13 +63,13 @@ function* eachStyleRule(rules: CSSRuleList): Generator<CSSStyleRule> {
  * Widen the scope in `bubble.tsx` and the over-fire assertions below start
  * matching and fail.
  */
-function hoverTintSelector(bubble: Element): string {
+function compiledScope(bubble: Element, marker: string): string {
   const emitted = [...bubble.classList].find(
-    (name) => name.startsWith('nx:has-[') && name.includes(']:hover:bg-')
+    (name) => name.startsWith('nx:has-[') && name.includes(marker)
   );
 
   if (!emitted) {
-    throw new Error(`no hover-tint class on "${bubble.className}"`);
+    throw new Error(`no "${marker}" class on "${bubble.className}"`);
   }
 
   const escaped = `.${CSS.escape(emitted)}`;
@@ -94,6 +94,18 @@ function hoverTintSelector(bubble: Element): string {
 
   throw new Error(`"${emitted}" compiled to no :has() rule`);
 }
+
+const hoverTintSelector = (bubble: Element) =>
+  compiledScope(bubble, ']:hover:bg-');
+
+/**
+ * The press cue must keep `:active` *inside* the `:has()`, on the content
+ * element. `:active` matches ancestors, so a cue on the bubble itself would
+ * fire when a `BubbleReactions` button is pressed. Moving it back out compiles
+ * the scope without `:active`, which fails the assertion below.
+ */
+const pressCueSelector = (bubble: Element) =>
+  compiledScope(bubble, ':active]:');
 
 function bubbleOf(element: Element): HTMLElement {
   return element.closest<HTMLElement>('[data-slot="bubble"]')!;
@@ -132,20 +144,6 @@ export const Muted: Story = {
       </Bubble>
     </div>
   ),
-  play: async ({ canvasElement }) => {
-    const bubble = canvasElement.querySelector('[data-slot="bubble"]')!;
-    const theme = getComputedStyle(bubble);
-    const read = (token: string) => theme.getPropertyValue(token).trim();
-
-    // `muted` has no hover rung, so this variant borrows `popover-active` for
-    // one. That is a value borrow: it only reads as a hover while the two
-    // tokens differ, and nothing in `packages/core` pins the relation. Re-rung
-    // `popover-active` onto `muted` and the default variant's hover silently
-    // flattens — this fails instead.
-    await expect(read('--nx-color-popover-active')).not.toBe(
-      read('--nx-color-muted')
-    );
-  },
 };
 
 export const Primary: Story = {
@@ -310,7 +308,7 @@ export const ReactionSideAndAlign: Story = {
     await expect(pills).toHaveLength(4);
 
     for (const pill of pills) {
-      const bubble = pill.closest<HTMLElement>('[data-slot="bubble"]')!;
+      const bubble = bubbleOf(pill);
       const bubbleBox = bubble.getBoundingClientRect();
       const pillBox = pill.getBoundingClientRect();
 
@@ -373,9 +371,7 @@ export const ReactionsInRtl: Story = {
     await expect(pills).toHaveLength(2);
 
     for (const pill of pills) {
-      const bubbleBox = pill
-        .closest<HTMLElement>('[data-slot="bubble"]')!
-        .getBoundingClientRect();
+      const bubbleBox = bubbleOf(pill).getBoundingClientRect();
       const pillBox = pill.getBoundingClientRect();
 
       // Under RTL, inline-start is the right edge.
@@ -444,6 +440,17 @@ export const LinksAndButtons: Story = {
       true
     );
 
+    // The press cue rides the same scope, with `:active` on the content
+    // element rather than on the turn — so pressing a reaction pill inside an
+    // actionable turn does not press the turn.
+    for (const bubble of [linkBubble, buttonBubble]) {
+      const scope = pressCueSelector(bubble);
+
+      // CSSOM normalises the attribute selector, so match its quoted form.
+      await expect(scope).toContain('[data-bubble-part="content"]');
+      await expect(scope).toContain(':active)');
+    }
+
     // Links read as links on every surface, whether the body is the anchor or
     // merely contains one.
     const inlineLink = canvas.getByRole('link', {
@@ -470,9 +477,7 @@ export const LinksAndButtons: Story = {
     // that traces it — covers the whole surface, not a box inset within it.
     for (const control of [link, button]) {
       const controlBox = control.getBoundingClientRect();
-      const surfaceBox = control
-        .closest<HTMLElement>('[data-slot="bubble"]')!
-        .getBoundingClientRect();
+      const surfaceBox = bubbleOf(control).getBoundingClientRect();
 
       // 1px on every side: the border the surface reserves for `outline`.
       await expect(controlBox.left - surfaceBox.left).toBeLessThanOrEqual(1);
@@ -491,8 +496,7 @@ export const LinksAndButtons: Story = {
 
     // The prose bubble around an inline link keeps its surface.
     await expect(
-      getComputedStyle(inlineLink.closest<HTMLElement>('[data-slot="bubble"]')!)
-        .backgroundColor
+      getComputedStyle(bubbleOf(inlineLink)).backgroundColor
     ).not.toBe('rgba(0, 0, 0, 0)');
 
     // Every interactive turn is reachable in document order.
@@ -783,7 +787,7 @@ export const StackedConversation: Story = {
     const pill = canvasElement.querySelector<HTMLElement>(
       '[data-slot="bubble-reactions"]'
     )!;
-    const bubbleWithPill = pill.closest<HTMLElement>('[data-slot="bubble"]')!;
+    const bubbleWithPill = bubbleOf(pill);
     const next = bubbles[bubbles.indexOf(bubbleWithPill) + 1]!;
 
     await expect(pill.getBoundingClientRect().bottom).toBeLessThanOrEqual(
@@ -857,7 +861,7 @@ export const InScrollContainer: Story = {
     // The top pill hangs above its own bubble yet still clears the scroller's
     // top edge, because the bubble reserved the 12px rather than the stack.
     const topPill = [...pills].find((pill) => pill.dataset.side === 'top')!;
-    const topBubble = topPill.closest<HTMLElement>('[data-slot="bubble"]')!;
+    const topBubble = bubbleOf(topPill);
 
     await expect(topPill.getBoundingClientRect().top).toBeLessThan(
       topBubble.getBoundingClientRect().top
@@ -1076,4 +1080,20 @@ export const AllVariants: Story = {
       ))}
     </div>
   ),
+  play: async ({ canvasElement }) => {
+    const bubbles = canvasElement.querySelectorAll('[data-slot="bubble"]');
+
+    await expect(bubbles).toHaveLength(VARIANTS.length * 2);
+
+    // Every variant authors its own press cue, so every variant has to keep
+    // `:active` inside the `:has()` — one variant drifting back onto the turn
+    // would otherwise go unnoticed by the two bodies `LinksAndButtons` covers.
+    for (const bubble of bubbles) {
+      const scope = pressCueSelector(bubble);
+
+      await expect(scope, bubble.getAttribute('data-variant')!).toContain(
+        ':active)'
+      );
+    }
+  },
 };
