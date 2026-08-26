@@ -32,8 +32,7 @@ function BubbleGroup({ className, ...props }: BubbleGroupProps) {
 const bubbleVariants = cva(
   [
     'nx:relative nx:w-fit nx:max-w-[min(80%,45rem)] nx:rounded-xl nx:border-default nx:border-transparent nx:typography-body-default nx:transition-colors nx:duration-faster',
-    // The pill overhangs 12px, so the bubble reserves that 12px itself rather
-    // than borrowing whatever gap an ancestor happens to set.
+    // The pill overhangs 12px, so the bubble reserves that 12px itself.
     'nx:has-[>[data-bubble-part=reactions][data-side=top]]:mt-3 nx:has-[>[data-bubble-part=reactions][data-side=bottom]]:mb-3',
   ],
   {
@@ -42,7 +41,7 @@ const bubbleVariants = cva(
         primary:
           'nx:bg-primary-background nx:text-primary-foreground nx:has-[>[data-bubble-part=content]:is(a[href],button:not(:disabled)):not([aria-disabled=true])]:hover:bg-primary-background-hover',
         muted:
-          'nx:bg-muted nx:text-foreground nx:has-[>[data-bubble-part=content]:is(a[href],button:not(:disabled)):not([aria-disabled=true])]:hover:bg-muted-hover',
+          'nx:bg-muted nx:text-foreground nx:has-[>[data-bubble-part=content]:is(a[href],button:not(:disabled)):not([aria-disabled=true])]:hover:bg-popover-active',
         outline:
           'nx:border-border-default nx:text-foreground nx:has-[>[data-bubble-part=content]:is(a[href],button:not(:disabled)):not([aria-disabled=true])]:hover:bg-background-hover',
         ghost:
@@ -148,8 +147,8 @@ interface BubbleContentProps extends React.ComponentProps<'div'> {
  * the focus ring all trace the whole surface instead of a box inset within it.
  *
  * Long words, URLs, and nested `pre` blocks wrap rather than widen the bubble.
- * Anchors are underlined whether the body itself is the link or the link sits
- * inside its text.
+ * Anchors that can navigate are underlined, whether the body itself is the
+ * link or the link sits inside its text; an `a` with no `href` is not.
  */
 function BubbleContent({
   className,
@@ -163,7 +162,7 @@ function BubbleContent({
       data-slot="bubble-content"
       data-bubble-part="content"
       className={cn(
-        'nx:block nx:min-w-0 nx:rounded-[inherit] nx:px-4 nx:py-3 nx:text-start nx:wrap-break-word nx:focus-visible:outline-2 nx:focus-visible:outline-focus-default nx:focus-visible:outline-offset-(--focus-offset) nx:[&:is(a[href],button:not(:disabled)):not([aria-disabled=true])]:cursor-pointer nx:[&:is(a)]:underline nx:[&:is(a)]:underline-offset-4 nx:[&_a]:underline nx:[&_a]:underline-offset-4 nx:[&_pre]:whitespace-pre-wrap nx:[&_pre]:wrap-break-word',
+        'nx:block nx:min-w-0 nx:rounded-[inherit] nx:px-4 nx:py-3 nx:text-start nx:wrap-break-word nx:focus-visible:outline-2 nx:focus-visible:outline-focus-default nx:focus-visible:outline-offset-(--focus-offset) nx:[&:is(a[href],button:not(:disabled)):not([aria-disabled=true])]:cursor-pointer nx:[&:is(a[href])]:underline nx:[&:is(a[href])]:underline-offset-4 nx:[&_a[href]]:underline nx:[&_a[href]]:underline-offset-4 nx:[&_pre]:whitespace-pre-wrap nx:[&_pre]:wrap-break-word',
         className
       )}
       {...props}

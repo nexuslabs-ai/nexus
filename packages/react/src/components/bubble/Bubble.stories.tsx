@@ -42,10 +42,29 @@ const column = 'nx:w-full nx:max-w-md';
 /**
  * The hover tint is a `:has()` variant, and synthetic pointer events never
  * activate `:hover` — so these stories assert which turns the tint *selects*
- * rather than the painted colour. Reading the selector back off the class the
- * component actually emitted is what keeps that honest: widen the scope in
- * `bubble.tsx` and the over-fire assertions below start matching and fail.
+ * rather than the painted colour. The scope is read back off the compiled
+ * stylesheet, not off the class attribute, so a variant Tailwind never emitted
+ * fails loudly instead of passing on a class string that styles nothing.
+ * Widen the scope in `bubble.tsx` and the over-fire assertions below start
+ * matching and fail.
  */
+function* eachStyleRule(rules: CSSRuleList): Generator<CSSStyleRule> {
+  for (const rule of rules) {
+    if (rule instanceof CSSStyleRule) {
+      yield rule;
+    }
+
+    // Tailwind nests the variant chain inside the class rule, and a
+    // `CSSStyleRule` is itself a grouping rule — so recurse into every rule,
+    // including the ones just yielded.
+    const nested: CSSRuleList | undefined = (rule as CSSGroupingRule).cssRules;
+
+    if (nested) {
+      yield* eachStyleRule(nested);
+    }
+  }
+}
+
 function hoverTintSelector(bubble: Element): string {
   const emitted = [...bubble.classList].find(
     (name) => name.startsWith('nx:has-[') && name.includes(']:hover:bg-')
@@ -55,7 +74,27 @@ function hoverTintSelector(bubble: Element): string {
     throw new Error(`no hover-tint class on "${bubble.className}"`);
   }
 
-  return `:has(${emitted.slice('nx:has-['.length, emitted.lastIndexOf(']:hover:bg-'))})`;
+  const escaped = `.${CSS.escape(emitted)}`;
+
+  for (const sheet of document.styleSheets) {
+    for (const rule of eachStyleRule(sheet.cssRules)) {
+      if (rule.selectorText !== escaped) {
+        continue;
+      }
+
+      // `.cls { &:has(…) { &:hover { … } } }` — the scope lives on the nested
+      // rule, so strip the nesting `&` and the trailing `:hover` off it.
+      const scope = [...eachStyleRule(rule.cssRules)]
+        .map((nested) => nested.selectorText)
+        .find((selector) => selector.includes(':has('));
+
+      if (scope) {
+        return scope.replace(/^&/, '').replace(/:hover$/, '');
+      }
+    }
+  }
+
+  throw new Error(`"${emitted}" compiled to no :has() rule`);
 }
 
 function bubbleOf(element: Element): Element {
@@ -732,6 +771,81 @@ export const StackedConversation: Story = {
     );
   },
 };
+
+/* eslint-disable jsx-a11y/no-noninteractive-tabindex -- axe requires a
+   scrollable region to be keyboard-reachable (scrollable-region-focusable),
+   which is the behaviour this story exists to prove. */
+export const InScrollContainer: Story = {
+  render: () => (
+    <div
+      data-testid="scroller"
+      role="region"
+      aria-label="Conversation"
+      tabIndex={0}
+      className="nx:h-56 nx:w-full nx:max-w-md nx:overflow-y-auto nx:rounded-md nx:border-default nx:border-border-default nx:px-3 nx:py-4 nx:focus-visible:outline-2 nx:focus-visible:outline-focus-default nx:focus-visible:outline-offset-(--focus-offset)"
+    >
+      <BubbleGroup>
+        <Bubble align="start">
+          <BubbleContent>
+            First turn, pinned to the top of the scroller.
+          </BubbleContent>
+          <BubbleReactions side="top" align="start">
+            👍 4
+          </BubbleReactions>
+        </Bubble>
+        <Bubble align="end" variant="primary">
+          <BubbleContent>Scrolling must not clip either pill.</BubbleContent>
+        </Bubble>
+        <Bubble align="start">
+          <BubbleContent>
+            The overhang is reserved by the bubble, so a scroll container crops
+            nothing that a non-scrolling stack would show.
+          </BubbleContent>
+          <BubbleReactions side="bottom" align="end">
+            🎉 2
+          </BubbleReactions>
+        </Bubble>
+      </BubbleGroup>
+    </div>
+  ),
+  play: async ({ canvasElement }) => {
+    const scroller = within(canvasElement).getByTestId('scroller');
+    const pills = canvasElement.querySelectorAll<HTMLElement>(
+      '[data-slot="bubble-reactions"]'
+    );
+
+    await expect(pills).toHaveLength(2);
+
+    // A pill overhangs the bubble, so the scroller must not gain a horizontal
+    // scroll region — that would mean the inline edge is being cropped.
+    await expect(scroller.scrollWidth).toBeLessThanOrEqual(
+      scroller.clientWidth + 1
+    );
+
+    const scrollerBox = scroller.getBoundingClientRect();
+
+    for (const pill of pills) {
+      const pillBox = pill.getBoundingClientRect();
+
+      // Inline edges stay inside the padding box on both sides.
+      await expect(pillBox.left).toBeGreaterThanOrEqual(scrollerBox.left);
+      await expect(pillBox.right).toBeLessThanOrEqual(scrollerBox.right);
+    }
+
+    // The top pill hangs above its own bubble yet still clears the scroller's
+    // top edge, because the bubble reserved the 12px rather than the stack.
+    const topPill = [...pills].find((pill) => pill.dataset.side === 'top')!;
+    const topBubble = topPill.closest<HTMLElement>('[data-slot="bubble"]')!;
+
+    await expect(topPill.getBoundingClientRect().top).toBeLessThan(
+      topBubble.getBoundingClientRect().top
+    );
+    await expect(topPill.getBoundingClientRect().top).toBeGreaterThanOrEqual(
+      scrollerBox.top
+    );
+  },
+};
+/* eslint-enable jsx-a11y/no-noninteractive-tabindex */
 
 // ============================================
 // COMPOSITION

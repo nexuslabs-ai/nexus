@@ -37,7 +37,6 @@ export const APCA_PAIRS = [
   pair('foreground', 'background', 'body'),
   pair('foreground', 'background-hover', 'ui'),
   pair('foreground', 'muted', 'ui'),
-  pair('foreground', 'muted-hover', 'ui'),
   pair('muted-foreground', 'muted', 'incidental'),
   pair('muted-foreground-subtle', 'muted', 'incidental'),
   pair('foreground', 'muted-extralight', 'ui'),

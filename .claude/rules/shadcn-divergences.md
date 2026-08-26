@@ -114,9 +114,7 @@ shadcn uses `destructive`, Nexus uses `error`:
 
 Use `nx:bg-control-background` / `nx:hover:bg-control-background-hover`
 instead of `muted` for interactive neutral rails, tracks, and selected toggle
-fills. Keep `muted` for low-emphasis _content_ surfaces; when such a surface is
-actionable as a whole — a `Bubble` whose entire body is a link — its hover step
-is `muted-hover`, not the control family.
+fills. Keep `muted` for passive low-emphasis surfaces.
 
 ### Layout Colors
 

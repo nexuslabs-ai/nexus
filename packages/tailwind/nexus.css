@@ -153,7 +153,6 @@
     oklch(0.9227 0.0089 70)
   );
   --color-muted: var(--nx-color-muted, oklch(0.9698 0.0083 70));
-  --color-muted-hover: var(--nx-color-muted-hover, oklch(0.9451 0.0086 70));
   --color-muted-extralight: var(
     --nx-color-muted-extralight,
     oklch(0.9879 0.0081 70)
@@ -520,7 +519,6 @@
     oklch(0.9227 0.0089 70)
   );
   --color-muted: var(--nx-color-muted, oklch(0.9698 0.0083 70));
-  --color-muted-hover: var(--nx-color-muted-hover, oklch(0.9451 0.0086 70));
   --color-muted-extralight: var(
     --nx-color-muted-extralight,
     oklch(0.9879 0.0081 70)
@@ -881,7 +879,6 @@
   --nx-color-background-hover: oklch(0.2481 0.006 70);
   --nx-color-background-active: oklch(0.2481 0.006 70);
   --nx-color-muted: oklch(0.2481 0.006 70);
-  --nx-color-muted-hover: oklch(0.2801 0.006 70);
   --nx-color-muted-extralight: oklch(0.2289 0.006 70);
   --nx-color-container: oklch(0.2481 0.006 70);
   --nx-color-container-hover: oklch(0.2801 0.006 70);
