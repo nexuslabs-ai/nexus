@@ -72,6 +72,27 @@ export function useMDXComponents(components: MDXComponents): MDXComponents {
         {...props}
       />
     ),
+    table: (props) => (
+      <div className="nx:mb-4 nx:overflow-x-auto nx:rounded-md nx:border nx:border-border-default">
+        <table className="nx:w-full nx:border-collapse" {...props} />
+      </div>
+    ),
+    thead: (props) => <thead className="nx:bg-muted" {...props} />,
+    tbody: (props) => (
+      <tbody className="nx:[&>tr:last-child>td]:border-b-0" {...props} />
+    ),
+    th: (props) => (
+      <th
+        className="nx:typography-label-default nx:text-foreground nx:font-semibold nx:text-left nx:px-3 nx:py-2 nx:border-b nx:border-border-default"
+        {...props}
+      />
+    ),
+    td: (props) => (
+      <td
+        className="nx:typography-body-default nx:text-muted-foreground nx:align-top nx:px-3 nx:py-2 nx:border-b nx:border-border-default"
+        {...props}
+      />
+    ),
     // live @nexus_ds/react components, usable in MDX without an import
     ...Nexus,
     // caller-provided overrides win

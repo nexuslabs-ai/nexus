@@ -84,8 +84,12 @@ const nextConfig: NextConfig = {
   },
 };
 
-// No remark/rehype plugins yet — keeps dev (Turbopack) happy. When GFM tables
-// or heading anchors are needed, add them as string-named plugins.
-const withMDX = createMDX({});
+// String-named, not imported: Turbopack serialises the MDX loader options and
+// cannot carry a plugin function across that boundary.
+const withMDX = createMDX({
+  options: {
+    remarkPlugins: [['remark-gfm']],
+  },
+});
 
 export default withMDX(nextConfig);
