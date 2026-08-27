@@ -23,7 +23,14 @@ function BubbleGroup({ className, ...props }: BubbleGroupProps) {
   return (
     <div
       data-slot="bubble-group"
-      className={cn('nx:flex nx:w-full nx:flex-col nx:gap-4', className)}
+      className={cn(
+        'nx:flex nx:w-full nx:flex-col nx:gap-4',
+        // Without `:has()` a `Bubble` cannot reserve its pill's overhang, and
+        // two facing pills would collide across the 16px gap. Widen the gap to
+        // the 40px that clears both overhangs.
+        'nx:no-has-support:gap-10',
+        className
+      )}
       {...props}
     />
   );
@@ -33,23 +40,24 @@ const bubbleVariants = cva(
   [
     'nx:relative nx:w-fit nx:max-w-[min(80%,45rem)] nx:rounded-xl nx:border-default nx:border-transparent nx:typography-body-default nx:transition-colors nx:duration-faster',
     // The pill overhangs 12px, so the bubble reserves that 12px itself. These
-    // are margins, so the reservation holds in a flex or grid stack and
-    // collapses in a block one; `BubbleGroup` is flex.
+    // are margins, so the reservation needs a parent that does not collapse
+    // them — a flex or grid stack, or a block parent that establishes a block
+    // formatting context; `BubbleGroup` is flex.
     'nx:has-[>[data-bubble-part=reactions][data-side=top]]:mt-3 nx:has-[>[data-bubble-part=reactions][data-side=bottom]]:mb-3',
   ],
   {
     variants: {
       variant: {
         primary:
-          'nx:bg-primary-background nx:text-primary-foreground nx:has-[>[data-bubble-part=content]:is(a[href],button:not(:disabled)):not([aria-disabled=true])]:hover:bg-primary-background-hover nx:has-[>[data-bubble-part=content]:is(a[href],button:not(:disabled)):not([aria-disabled=true]):active]:bg-primary-background-active',
+          'nx:bg-primary-background nx:text-primary-foreground nx:bubble-hovered:bg-primary-background-hover nx:bubble-pressed:bg-primary-background-active',
         muted:
-          'nx:bg-muted nx:text-foreground nx:has-[>[data-bubble-part=content]:is(a[href],button:not(:disabled)):not([aria-disabled=true])]:hover:bg-popover-active nx:has-[>[data-bubble-part=content]:is(a[href],button:not(:disabled)):not([aria-disabled=true]):active]:border-border-active',
+          'nx:bg-muted nx:text-foreground nx:bubble-hovered:bg-popover-active nx:bubble-pressed:border-border-active',
         outline:
-          'nx:border-border-default nx:text-foreground nx:has-[>[data-bubble-part=content]:is(a[href],button:not(:disabled)):not([aria-disabled=true])]:hover:bg-background-hover nx:has-[>[data-bubble-part=content]:is(a[href],button:not(:disabled)):not([aria-disabled=true]):active]:bg-background-active',
+          'nx:border-border-default nx:text-foreground nx:bubble-hovered:bg-container-hover nx:bubble-pressed:bg-container-active',
         ghost:
-          'nx:text-foreground nx:has-[>[data-bubble-part=content]:is(a[href],button:not(:disabled)):not([aria-disabled=true])]:hover:bg-background-hover nx:has-[>[data-bubble-part=content]:is(a[href],button:not(:disabled)):not([aria-disabled=true]):active]:bg-background-active',
+          'nx:text-foreground nx:bubble-hovered:bg-container-hover nx:bubble-pressed:bg-container-active',
         destructive:
-          'nx:bg-error-subtle nx:text-error-subtle-foreground nx:has-[>[data-bubble-part=content]:is(a[href],button:not(:disabled)):not([aria-disabled=true])]:hover:bg-error-subtle-hover nx:has-[>[data-bubble-part=content]:is(a[href],button:not(:disabled)):not([aria-disabled=true]):active]:bg-error-subtle-active',
+          'nx:bg-error-subtle nx:text-error-subtle-foreground nx:bubble-hovered:bg-error-subtle-hover nx:bubble-pressed:bg-error-subtle-active',
       },
       align: {
         start: 'nx:me-auto',
@@ -79,9 +87,10 @@ interface BubbleProps
  * `BubbleReactions` for a reaction pill; stack turns with `BubbleGroup`.
  *
  * A `BubbleReactions` pill overhangs the surface, and the bubble reserves that
- * overhang with a margin — so pill clearance holds in a flex or grid parent
- * (`BubbleGroup` is flex) and collapses against a sibling's margin in a block
- * one.
+ * overhang with a margin — so give it a parent that does not collapse margins.
+ * A flex or grid stack does (`BubbleGroup` is flex); a plain block parent
+ * collapses the reservation against the parent's own edge and against the
+ * neighbouring turn, which drops two facing pills back on top of each other.
  *
  * `align` has no default, so a bubble sits wherever its parent puts it — the
  * natural start edge of a `BubbleGroup`, or an inline-end column that aligns
@@ -130,10 +139,12 @@ interface BubbleContentProps extends React.ComponentProps<'div'> {
    * `p` for prose, or an `a` / `button` when the whole turn is actionable.
    *
    * An interactive child takes the design-system focus ring, the pointer
-   * cursor, and the surrounding `Bubble`'s hover tint. The tint is the turn
-   * advertising itself as actionable, so it is withheld from a body that
-   * cannot be actioned — an `a` with no `href`, a disabled `button`, or
-   * anything carrying `aria-disabled`. It still owns its own accessible name.
+   * cursor, and the surrounding `Bubble`'s hover tint and press cue. Both are
+   * the turn advertising itself as actionable, so both are withheld from a
+   * body that cannot be actioned — an `a` with no `href`, a disabled
+   * `button`, or anything carrying `aria-disabled`. Both also key off this
+   * element rather than the turn, so hovering or pressing a `BubbleReactions`
+   * pill leaves the surface alone. It still owns its own accessible name.
    *
    * @default false
    * @example
@@ -150,8 +161,9 @@ interface BubbleContentProps extends React.ComponentProps<'div'> {
  * BubbleContent
  *
  * The message body, and the part that carries the bubble's padding — so when
- * `asChild` makes it an `a` or a `button`, the hit target, the hover tint, and
- * the focus ring all trace the whole surface instead of a box inset within it.
+ * `asChild` makes it an `a` or a `button`, the hit target, the hover tint, the
+ * press cue, and the focus ring all trace the whole surface instead of a box
+ * inset within it.
  *
  * Long words, URLs, and nested `pre` blocks wrap rather than widen the bubble.
  * Anchors that can navigate are underlined, whether the body itself is the

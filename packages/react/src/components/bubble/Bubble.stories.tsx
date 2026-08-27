@@ -55,21 +55,21 @@ function* eachStyleRule(rules: CSSRuleList): Generator<CSSStyleRule> {
 }
 
 /**
- * The hover tint is a `:has()` variant, and synthetic pointer events never
- * activate `:hover` — so these stories assert which turns the tint *selects*
- * rather than the painted colour. The scope is read back off the compiled
- * stylesheet, not off the class attribute, so a variant Tailwind never emitted
- * fails loudly instead of passing on a class string that styles nothing.
- * Widen the scope in `bubble.tsx` and the over-fire assertions below start
- * matching and fail.
+ * The hover tint and press cue are `:has()` variants, and synthetic pointer
+ * events never activate `:hover` or `:active` — so these stories assert which
+ * turns each cue *selects* rather than the painted colour. The scope is read
+ * back off the compiled stylesheet, not off the class attribute, so a variant
+ * Tailwind never emitted fails loudly instead of passing on a class string
+ * that styles nothing. Widen the scope in `index.css` and the over-fire
+ * assertions below start matching and fail.
  */
-function compiledScope(bubble: Element, marker: string): string {
-  const emitted = [...bubble.classList].find(
-    (name) => name.startsWith('nx:has-[') && name.includes(marker)
+function compiledScope(bubble: Element, variant: string): string {
+  const emitted = [...bubble.classList].find((name) =>
+    name.startsWith(`nx:${variant}:`)
   );
 
   if (!emitted) {
-    throw new Error(`no "${marker}" class on "${bubble.className}"`);
+    throw new Error(`no "${variant}" class on "${bubble.className}"`);
   }
 
   const escaped = `.${CSS.escape(emitted)}`;
@@ -96,16 +96,36 @@ function compiledScope(bubble: Element, marker: string): string {
 }
 
 const hoverTintSelector = (bubble: Element) =>
-  compiledScope(bubble, ']:hover:bg-');
+  compiledScope(bubble, 'bubble-hovered');
+
+const pressCueSelector = (bubble: Element) =>
+  compiledScope(bubble, 'bubble-pressed');
 
 /**
- * The press cue must keep `:active` *inside* the `:has()`, on the content
- * element. `:active` matches ancestors, so a cue on the bubble itself would
- * fire when a `BubbleReactions` button is pressed. Moving it back out compiles
- * the scope without `:active`, which fails the assertion below.
+ * Both cues must keep their state pseudo-class *inside* the `:has()`, on the
+ * content element — `:hover` and `:active` both match ancestors, so a cue
+ * written on the turn would fire when a `BubbleReactions` pill is hovered or
+ * pressed. Inside, the state is the last thing before the `:has()` closes; a
+ * cue moved back onto the turn trails it after the close instead. Stripping it
+ * off leaves the structural scope, which is what `.matches()` can be asserted
+ * against without a real pointer.
  */
-const pressCueSelector = (bubble: Element) =>
-  compiledScope(bubble, ':active]:');
+function structuralScope(
+  selector: string,
+  state: ':hover' | ':active'
+): string {
+  if (!selector.endsWith(`${state})`)) {
+    throw new Error(`"${selector}" does not scope ${state} to the content`);
+  }
+
+  return selector.replace(state, '');
+}
+
+const hoverScopeOf = (bubble: Element) =>
+  structuralScope(hoverTintSelector(bubble), ':hover');
+
+const pressScopeOf = (bubble: Element) =>
+  structuralScope(pressCueSelector(bubble), ':active');
 
 function bubbleOf(element: Element): HTMLElement {
   return element.closest<HTMLElement>('[data-slot="bubble"]')!;
@@ -435,20 +455,27 @@ export const LinksAndButtons: Story = {
     const linkBubble = bubbleOf(link);
     const buttonBubble = bubbleOf(button);
 
-    await expect(linkBubble.matches(hoverTintSelector(linkBubble))).toBe(true);
-    await expect(buttonBubble.matches(hoverTintSelector(buttonBubble))).toBe(
-      true
-    );
+    await expect(linkBubble.matches(hoverScopeOf(linkBubble))).toBe(true);
+    await expect(buttonBubble.matches(hoverScopeOf(buttonBubble))).toBe(true);
 
-    // The press cue rides the same scope, with `:active` on the content
-    // element rather than on the turn — so pressing a reaction pill inside an
-    // actionable turn does not press the turn.
+    // The press cue rides the *same* scope, differing only in the state
+    // pseudo-class — so it inherits every over-fire proof below, and neither
+    // cue can be widened without the other.
     for (const bubble of [linkBubble, buttonBubble]) {
-      const scope = pressCueSelector(bubble);
+      await expect(pressScopeOf(bubble), 'press scope').toBe(
+        hoverScopeOf(bubble)
+      );
 
-      // CSSOM normalises the attribute selector, so match its quoted form.
-      await expect(scope).toContain('[data-bubble-part="content"]');
-      await expect(scope).toContain(':active)');
+      // CSSOM normalises the attribute selector, so match its quoted form. The
+      // direct-child combinator and the dead-body guards live here; dropping
+      // any of them widens both cues and fails the over-fire checks below.
+      await expect(pressScopeOf(bubble)).toContain(
+        '> [data-bubble-part="content"]'
+      );
+      await expect(pressScopeOf(bubble)).toContain('button:not(:disabled)');
+      await expect(pressScopeOf(bubble)).toContain(
+        ':not([aria-disabled="true"])'
+      );
     }
 
     // Links read as links on every surface, whether the body is the anchor or
@@ -460,9 +487,8 @@ export const LinksAndButtons: Story = {
     // A link buried in prose is not a whole-turn action, so it must not tint.
     const proseBubble = bubbleOf(inlineLink);
 
-    await expect(proseBubble.matches(hoverTintSelector(proseBubble))).toBe(
-      false
-    );
+    await expect(proseBubble.matches(hoverScopeOf(proseBubble))).toBe(false);
+    await expect(proseBubble.matches(pressScopeOf(proseBubble))).toBe(false);
 
     for (const anchor of [link, inlineLink]) {
       await expect(getComputedStyle(anchor).textDecorationLine).toBe(
@@ -613,7 +639,8 @@ export const Disabled: StoryObj<BubbleProps & { onRetry: () => void }> = {
     for (const body of inert) {
       const bubble = bubbleOf(body);
 
-      await expect(bubble.matches(hoverTintSelector(bubble))).toBe(false);
+      await expect(bubble.matches(hoverScopeOf(bubble))).toBe(false);
+      await expect(bubble.matches(pressScopeOf(bubble))).toBe(false);
     }
 
     // The underline is the whole-bubble link affordance, so an anchor with
@@ -1085,15 +1112,14 @@ export const AllVariants: Story = {
 
     await expect(bubbles).toHaveLength(VARIANTS.length * 2);
 
-    // Every variant authors its own press cue, so every variant has to keep
-    // `:active` inside the `:has()` — one variant drifting back onto the turn
-    // would otherwise go unnoticed by the two bodies `LinksAndButtons` covers.
+    // Every variant authors both cues, so every variant has to keep its state
+    // pseudo-class inside the `:has()` — one variant drifting back onto the
+    // turn would otherwise go unnoticed by the two bodies `LinksAndButtons`
+    // covers.
     for (const bubble of bubbles) {
-      const scope = pressCueSelector(bubble);
+      const variant = bubble.getAttribute('data-variant')!;
 
-      await expect(scope, bubble.getAttribute('data-variant')!).toContain(
-        ':active)'
-      );
+      await expect(pressScopeOf(bubble), variant).toBe(hoverScopeOf(bubble));
     }
   },
 };

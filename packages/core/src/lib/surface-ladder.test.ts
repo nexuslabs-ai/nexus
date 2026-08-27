@@ -67,15 +67,30 @@ describe('surface ladder', () => {
   });
 
   // `Bubble`'s muted variant borrows `popover-active` as its hover, because
-  // `muted` has no `-hover` rung. That borrow only reads as a hover while the
-  // two rungs differ, and the frozen tables above would still pass if a
-  // re-anchor happened to land them on the same step.
-  it('keeps popover-active off muted in both regimes', () => {
+  // `muted` has no `-hover` rung. `components.md` justifies that borrow by it
+  // being exactly *one* rung above `muted` in both regimes — a two-rung jump
+  // would over-strengthen the hover. The tables above pin today's numbers, so
+  // they move with any re-baseline; this pins the relation instead.
+  it('keeps popover-active exactly one rung above muted in both regimes', () => {
     for (const [regime, steps] of [
       ['light', LIGHT_SURFACE_STEPS],
       ['dark', DARK_SURFACE_STEPS],
     ] as const) {
-      expect(steps['popover-active'], regime).not.toBeCloseTo(steps.muted, 4);
+      const low = Math.min(steps.muted, steps['popover-active']);
+      const high = Math.max(steps.muted, steps['popover-active']);
+
+      expect(high, `${regime}: popover-active must differ from muted`).not.toBe(
+        low
+      );
+
+      const between = SURFACE_TOKENS.filter(
+        (token) => steps[token] > low && steps[token] < high
+      );
+
+      expect(
+        between,
+        `${regime}: rungs between muted and popover-active`
+      ).toEqual([]);
     }
   });
 });

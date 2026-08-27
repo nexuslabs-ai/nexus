@@ -9,6 +9,12 @@
  */
 @import 'tailwindcss' prefix(nx);
 @custom-variant reduce-transparency (@media (prefers-reduced-transparency: reduce));
+
+/* `Bubble`'s actionable-turn scope: a direct content child that can genuinely
+ * be actioned. Defined once so the hover and press cues cannot drift apart. */
+@custom-variant bubble-hovered (&:has(> [data-bubble-part='content']:is(a[href], button:not(:disabled)):not([aria-disabled='true']):hover));
+@custom-variant bubble-pressed (&:has(> [data-bubble-part='content']:is(a[href], button:not(:disabled)):not([aria-disabled='true']):active));
+@custom-variant no-has-support (@supports not (selector(:has(*))));
 @reference '@nexus_ds/tailwind';
 @import 'tw-animate-css';
 @import './components/progress/progress.css';
