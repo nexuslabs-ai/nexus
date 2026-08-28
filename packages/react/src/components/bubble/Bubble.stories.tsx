@@ -130,29 +130,21 @@ const pressScopeOf = (bubble: Element) =>
   structuralScope(pressCueSelector(bubble), ':active');
 
 /**
- * The pill overhangs the surface, and the turn pays for that overhang on the
- * outer box that wraps it — as padding, so the reservation cannot collapse the
- * way a margin would.
- */
-function reservationOf(element: Element): HTMLElement {
-  return bubbleOf(element).parentElement!;
-}
-
-/**
- * The `:has()` reservation cannot fire in Firefox 113-120, so the outer box
- * also carries an unconditional fallback for that band. The `@supports`
- * condition is false in the test browser, so the rule never applies — read it
- * back off the compiled stylesheet instead, which fails both when the class is
- * dropped and when it compiles to nothing. `pnpm audit:browser-support` owns
+ * The `:has()` reservation cannot fire in Firefox 113-120, so the turn also
+ * carries an unconditional fallback for that band. The `@supports` condition
+ * is false in the test browser, so the rule never applies — read the reserved
+ * length straight off the compiled rule instead, and hold it to the same 12px
+ * the `:has()` rules reserve. A fallback that stops compiling, or that
+ * compiles to a smaller step, fails here. `pnpm audit:browser-support` owns
  * the policy side.
  */
-function expectHasFallback(element: Element) {
-  const emitted = [...reservationOf(element).classList].find((name) =>
+function expectHasFallback(bubble: HTMLElement, reserved: number) {
+  const emitted = [...bubble.classList].find((name) =>
     name.startsWith('nx:no-has-support:')
   );
 
   if (!emitted) {
-    throw new Error('the reservation carries no :has() fallback class');
+    throw new Error('the turn carries no :has() fallback class');
   }
 
   const escaped = `.${CSS.escape(emitted)}`;
@@ -163,13 +155,28 @@ function expectHasFallback(element: Element) {
         continue;
       }
 
-      const guarded = [...rule.cssRules].some(
-        (nested) =>
-          nested instanceof CSSSupportsRule &&
-          nested.conditionText.includes(':has(')
-      );
+      for (const nested of rule.cssRules) {
+        if (
+          !(nested instanceof CSSSupportsRule) ||
+          !nested.conditionText.includes(':has(')
+        ) {
+          continue;
+        }
 
-      if (guarded) {
+        // The guarded declarations are unreachable through `getComputedStyle`,
+        // so resolve them by replaying the block on a throwaway element.
+        const probe = document.createElement('div');
+
+        probe.style.cssText = [...nested.cssRules]
+          .map((declaration) => declaration.cssText)
+          .join('');
+        document.body.append(probe);
+
+        const declared = parseFloat(getComputedStyle(probe).marginTop);
+
+        probe.remove();
+        expect(declared, `${emitted} reserves`).toBe(reserved);
+
         return;
       }
     }
@@ -404,17 +411,17 @@ export const ReactionSideAndAlign: Story = {
 
       // The overhang is reserved by the turn itself, so the pill stays clear of
       // its neighbour whatever gap the surrounding stack happens to set.
-      const reserved = getComputedStyle(reservationOf(pill));
+      const bubbleStyle = getComputedStyle(bubble);
 
       if (pill.dataset.side === 'top') {
         await expect(pillBox.top).toBeLessThan(bubbleBox.top);
         await expect(bubbleBox.top - pillBox.top).toBeLessThanOrEqual(
-          parseFloat(reserved.paddingTop)
+          parseFloat(bubbleStyle.marginTop)
         );
       } else {
         await expect(pillBox.bottom).toBeGreaterThan(bubbleBox.bottom);
         await expect(pillBox.bottom - bubbleBox.bottom).toBeLessThanOrEqual(
-          parseFloat(reserved.paddingBottom)
+          parseFloat(bubbleStyle.marginBottom)
         );
       }
 
@@ -903,64 +910,17 @@ export const StackedConversation: Story = {
       bubbleWithPill.getBoundingClientRect().bottom;
 
     // `gap-4` alone would clear a 12px overhang, so non-overlap proves nothing.
-    // The turn has to pay for its own pill: assert the reserved padding covers
+    // The turn has to pay for its own pill: assert the reserved margin covers
     // the overhang, and that the gap is still there on top of it.
+    const reserved = parseFloat(getComputedStyle(bubbleWithPill).marginBottom);
+
     await expect(overhang).toBeGreaterThan(0);
-    await expect(
-      parseFloat(getComputedStyle(reservationOf(pill)).paddingBottom)
-    ).toBeGreaterThanOrEqual(overhang);
+    await expect(reserved).toBeGreaterThanOrEqual(overhang);
     await expect(pill.getBoundingClientRect().bottom).toBeLessThanOrEqual(
       next.getBoundingClientRect().top + 1
     );
 
-    expectHasFallback(bubbleWithPill);
-  },
-};
-
-export const InBlockStack: Story = {
-  render: () => (
-    <div className={column}>
-      <Bubble align="start">
-        <BubbleContent>A plain block parent, no flex and no gap.</BubbleContent>
-        <BubbleReactions side="bottom" align="start">
-          🎉 3
-        </BubbleReactions>
-      </Bubble>
-      <Bubble align="end" variant="primary">
-        <BubbleContent>The turn below faces it.</BubbleContent>
-        <BubbleReactions side="top" align="end">
-          👀 1
-        </BubbleReactions>
-      </Bubble>
-    </div>
-  ),
-  play: async ({ canvasElement }) => {
-    const pills = canvasElement.querySelectorAll<HTMLElement>(
-      '[data-slot="bubble-reactions"]'
-    );
-
-    await expect(pills).toHaveLength(2);
-
-    const [above, below] = [...pills];
-
-    // Two facing pills in a block container is the case a margin reservation
-    // cannot hold: adjacent margins collapse, so 12px + 12px would come back
-    // as 12px and the pills would meet. Padding does not collapse, so the
-    // lower pill still starts below the upper one.
-    await expect(above!.getBoundingClientRect().bottom).toBeLessThanOrEqual(
-      below!.getBoundingClientRect().top
-    );
-
-    // And the reservation is genuinely paid on both turns, not borrowed from
-    // whatever the block parent happens to leave between them.
-    await expect(
-      parseFloat(getComputedStyle(reservationOf(above!)).paddingBottom)
-    ).toBeGreaterThan(0);
-    await expect(
-      parseFloat(getComputedStyle(reservationOf(below!)).paddingTop)
-    ).toBeGreaterThan(0);
-
-    expectHasFallback(above!);
+    expectHasFallback(bubbleWithPill, reserved);
   },
 };
 

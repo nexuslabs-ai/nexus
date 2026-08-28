@@ -29,24 +29,12 @@ function BubbleGroup({ className, ...props }: BubbleGroupProps) {
   );
 }
 
-const bubbleLayoutVariants = cva(
-  [
-    'nx:w-fit nx:max-w-[min(80%,45rem)]',
-    'nx:has-[>[data-bubble-part=surface]>[data-bubble-part=reactions][data-side=top]]:pt-3 nx:has-[>[data-bubble-part=surface]>[data-bubble-part=reactions][data-side=bottom]]:pb-3',
-    'nx:no-has-support:py-3',
-  ],
-  {
-    variants: {
-      align: {
-        start: 'nx:me-auto',
-        end: 'nx:ms-auto',
-      },
-    },
-  }
-);
-
 const bubbleVariants = cva(
-  'nx:relative nx:rounded-xl nx:border-default nx:border-transparent nx:typography-body-default nx:transition-colors nx:duration-faster',
+  [
+    'nx:relative nx:w-fit nx:max-w-[min(80%,45rem)] nx:rounded-xl nx:border-default nx:border-transparent nx:typography-body-default nx:transition-colors nx:duration-faster',
+    'nx:has-[>[data-bubble-part=reactions][data-side=top]]:mt-3 nx:has-[>[data-bubble-part=reactions][data-side=bottom]]:mb-3',
+    'nx:no-has-support:my-3',
+  ],
   {
     variants: {
       variant: {
@@ -61,6 +49,10 @@ const bubbleVariants = cva(
         destructive:
           'nx:bg-error-subtle nx:text-error-subtle-foreground nx:bubble-hovered:bg-error-subtle-hover nx:bubble-pressed:bg-error-subtle-active',
       },
+      align: {
+        start: 'nx:me-auto',
+        end: 'nx:ms-auto',
+      },
     },
     defaultVariants: {
       variant: 'muted',
@@ -74,10 +66,7 @@ const bubbleVariants = cva(
  * Props for the Bubble component.
  */
 interface BubbleProps
-  extends
-    React.ComponentProps<'div'>,
-    VariantProps<typeof bubbleVariants>,
-    VariantProps<typeof bubbleLayoutVariants> {}
+  extends React.ComponentProps<'div'>, VariantProps<typeof bubbleVariants> {}
 
 /**
  * Bubble
@@ -87,11 +76,11 @@ interface BubbleProps
  * timestamp logic. Compose it with `BubbleContent` for the message body and
  * `BubbleReactions` for a reaction pill; stack turns with `BubbleGroup`.
  *
- * A `BubbleReactions` pill overhangs the surface, and the turn reserves that
- * overhang itself: the surface is painted on an inner element, and the outer
- * box holds the band as padding. Padding never collapses, so the reservation
- * survives a plain block parent as well as a flex or grid stack, and two
- * facing pills stay clear of each other whatever gap the stack sets.
+ * A `BubbleReactions` pill overhangs the surface, and the bubble reserves that
+ * overhang with a margin — so give it a parent that does not collapse margins.
+ * A flex or grid stack does (`BubbleGroup` is flex); a plain block parent
+ * collapses the reservation against the parent's own edge and against the
+ * neighbouring turn, which drops two facing pills back on top of each other.
  *
  * `align` has no default, so a bubble sits wherever its parent puts it — the
  * natural start edge of a `BubbleGroup`, or an inline-end column that aligns
@@ -118,16 +107,13 @@ function Bubble({
   ...props
 }: BubbleProps) {
   return (
-    <div className={bubbleLayoutVariants({ align })}>
-      <div
-        data-slot="bubble"
-        data-bubble-part="surface"
-        data-variant={variant}
-        data-align={align}
-        className={cn(bubbleVariants({ variant }), className)}
-        {...props}
-      />
-    </div>
+    <div
+      data-slot="bubble"
+      data-variant={variant}
+      data-align={align}
+      className={cn(bubbleVariants({ variant, align }), className)}
+      {...props}
+    />
   );
 }
 
