@@ -3,6 +3,14 @@ import type { MDXComponents } from 'mdx/types';
 import * as Nexus from './app/_components/nexus';
 
 /**
+ * remark-gfm labels some elements itself (`task-list-item`, `sr-only` on the
+ * footnote label), so every override appends that class rather than letting a
+ * trailing `{...props}` spread drop its own.
+ */
+const join = (base: string, incoming?: string) =>
+  incoming ? `${base} ${incoming}` : base;
+
+/**
  * Required by @next/mdx in the App Router. Maps Markdown-rendered HTML to
  * Nexus-styled elements (typography utilities, semantic tokens) and exposes
  * the @nexus_ds/react components so MDX authors can drop a live <Button> etc.
@@ -15,81 +23,149 @@ export function useMDXComponents(components: MDXComponents): MDXComponents {
   return {
     // children rendered explicitly (not via {...props}) so jsx-a11y can see
     // the heading/anchor has content.
-    h1: ({ children, ...props }) => (
-      <h1 className="nx:typography-heading-large nx:mb-2" {...props}>
+    h1: ({ children, className, ...props }) => (
+      <h1
+        className={join('nx:typography-heading-large nx:mb-2', className)}
+        {...props}
+      >
         {children}
       </h1>
     ),
-    h2: ({ children, ...props }) => (
-      <h2 className="nx:typography-heading-small nx:mt-8 nx:mb-3" {...props}>
+    h2: ({ children, className, ...props }) => (
+      <h2
+        className={join(
+          'nx:typography-heading-small nx:mt-8 nx:mb-3',
+          className
+        )}
+        {...props}
+      >
         {children}
       </h2>
     ),
-    h3: ({ children, ...props }) => (
+    h3: ({ children, className, ...props }) => (
       <h3
-        className="nx:typography-label-default nx:font-semibold nx:mt-6 nx:mb-2"
+        className={join(
+          'nx:typography-label-default nx:font-semibold nx:mt-6 nx:mb-2',
+          className
+        )}
         {...props}
       >
         {children}
       </h3>
     ),
-    p: (props) => (
+    p: ({ className, ...props }) => (
       <p
-        className="nx:typography-body-default nx:text-muted-foreground nx:mb-4 nx:max-w-[64ch]"
+        className={join(
+          'nx:typography-body-default nx:text-muted-foreground nx:mb-4 nx:max-w-[64ch]',
+          className
+        )}
         {...props}
       />
     ),
-    ul: (props) => (
+    ul: ({ className, ...props }) => (
       <ul
-        className="nx:list-disc nx:pl-6 nx:mb-4 nx:flex nx:flex-col nx:gap-1 nx:text-muted-foreground"
+        className={join(
+          'nx:list-disc nx:pl-6 nx:mb-4 nx:flex nx:flex-col nx:gap-1 nx:text-muted-foreground',
+          className
+        )}
         {...props}
       />
     ),
-    ol: (props) => (
+    ol: ({ className, ...props }) => (
       <ol
-        className="nx:list-decimal nx:pl-6 nx:mb-4 nx:flex nx:flex-col nx:gap-1 nx:text-muted-foreground"
+        className={join(
+          'nx:list-decimal nx:pl-6 nx:mb-4 nx:flex nx:flex-col nx:gap-1 nx:text-muted-foreground',
+          className
+        )}
         {...props}
       />
     ),
-    li: (props) => <li className="nx:typography-body-default" {...props} />,
-    a: ({ children, ...props }) => (
+    li: ({ className, ...props }) => (
+      <li
+        className={join(
+          'nx:typography-body-default nx:[&.task-list-item]:list-none',
+          className
+        )}
+        {...props}
+      />
+    ),
+    // GFM task lists render a disabled checkbox ahead of the item text.
+    input: ({ className, ...props }) => (
+      <input
+        className={join('nx:me-2 nx:align-middle', className)}
+        {...props}
+      />
+    ),
+    a: ({ children, className, ...props }) => (
       <a
-        className="nx:text-primary-subtle-foreground nx:underline nx:underline-offset-2"
+        className={join(
+          'nx:text-primary-subtle-foreground nx:underline nx:underline-offset-2',
+          className
+        )}
         {...props}
       >
         {children}
       </a>
     ),
-    code: (props) => (
+    code: ({ className, ...props }) => (
       <code
-        className="nx:font-mono nx:typography-code-inline nx:bg-muted nx:px-1 nx:py-0.5 nx:rounded-sm"
+        className={join(
+          'nx:font-mono nx:typography-code-inline nx:bg-muted nx:px-1 nx:py-0.5 nx:rounded-sm',
+          className
+        )}
         {...props}
       />
     ),
-    pre: (props) => (
+    pre: ({ className, ...props }) => (
       <pre
-        className="nx:bg-muted nx:border nx:border-border-default nx:rounded-md nx:p-4 nx:mb-4 nx:overflow-x-auto nx:typography-code-block nx:[&_code]:bg-transparent nx:[&_code]:p-0 nx:[&_code]:typography-code-block"
+        className={join(
+          'nx:bg-muted nx:border nx:border-border-default nx:rounded-md nx:p-4 nx:mb-4 nx:overflow-x-auto nx:typography-code-block nx:[&_code]:bg-transparent nx:[&_code]:p-0 nx:[&_code]:typography-code-block',
+          className
+        )}
         {...props}
       />
     ),
-    table: (props) => (
-      <div className="nx:mb-4 nx:overflow-x-auto nx:rounded-md nx:border nx:border-border-default">
-        <table className="nx:w-full nx:border-collapse" {...props} />
+    // tabIndex makes the overflow container reachable, so a wide table can be
+    // scrolled without a pointer.
+    table: ({ className, ...props }) => (
+      <div
+        className="nx:mb-4 nx:overflow-x-auto"
+        tabIndex={0}
+        role="region"
+        aria-label="Table"
+      >
+        <table
+          className={join(
+            'nx:w-full nx:border-collapse nx:typography-label-default',
+            className
+          )}
+          {...props}
+        />
       </div>
     ),
-    thead: (props) => <thead className="nx:bg-muted" {...props} />,
-    tbody: (props) => (
-      <tbody className="nx:[&>tr:last-child>td]:border-b-0" {...props} />
-    ),
-    th: (props) => (
-      <th
-        className="nx:typography-label-default nx:text-foreground nx:font-semibold nx:text-left nx:px-3 nx:py-2 nx:border-b nx:border-border-default"
+    tr: ({ className, ...props }) => (
+      <tr
+        className={join('nx:border-b nx:border-border-default', className)}
         {...props}
       />
     ),
-    td: (props) => (
+    // props stay after className so a `:---:` alignment row, which arrives as
+    // an inline style, still wins.
+    th: ({ className, ...props }) => (
+      <th
+        className={join(
+          'nx:py-2 nx:pr-3 nx:text-left nx:font-semibold nx:text-foreground',
+          className
+        )}
+        {...props}
+      />
+    ),
+    td: ({ className, ...props }) => (
       <td
-        className="nx:typography-body-default nx:text-muted-foreground nx:align-top nx:px-3 nx:py-2 nx:border-b nx:border-border-default"
+        className={join(
+          'nx:py-2 nx:pr-3 nx:align-top nx:text-muted-foreground',
+          className
+        )}
         {...props}
       />
     ),

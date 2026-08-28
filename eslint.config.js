@@ -97,6 +97,11 @@ export default tseslint.config(
       'jsx-a11y/anchor-is-valid': 'warn',
       'jsx-a11y/click-events-have-key-events': 'warn',
       'jsx-a11y/no-static-element-interactions': 'warn',
+      // A scrollable region needs tabIndex to be reachable without a pointer.
+      'jsx-a11y/no-noninteractive-tabindex': [
+        'error',
+        { roles: ['tabpanel', 'region'] },
+      ],
     },
   },
 

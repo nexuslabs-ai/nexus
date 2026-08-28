@@ -88,7 +88,7 @@ const nextConfig: NextConfig = {
 // cannot carry a plugin function across that boundary.
 const withMDX = createMDX({
   options: {
-    remarkPlugins: [['remark-gfm']],
+    remarkPlugins: ['remark-gfm'],
   },
 });
 
