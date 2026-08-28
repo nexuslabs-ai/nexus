@@ -3,4 +3,3 @@
  * Imported by src/index.css. */
 @custom-variant bubble-hovered (&:has(> [data-bubble-part='content']:is(a[href], button:not(:disabled)):not([aria-disabled='true']):hover));
 @custom-variant bubble-pressed (&:has(> [data-bubble-part='content']:is(a[href], button:not(:disabled)):not([aria-disabled='true']):active));
-@custom-variant no-has-support (@supports not (selector(:has(*))));

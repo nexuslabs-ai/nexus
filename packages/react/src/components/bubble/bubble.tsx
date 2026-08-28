@@ -78,9 +78,10 @@ interface BubbleProps
  *
  * A `BubbleReactions` pill overhangs the surface, and the bubble reserves that
  * overhang with a margin — so give it a parent that does not collapse margins.
- * A flex or grid stack does (`BubbleGroup` is flex); a plain block parent
- * collapses the reservation against the parent's own edge and against the
- * neighbouring turn, which drops two facing pills back on top of each other.
+ * A flex or grid stack does (`BubbleGroup` is flex). In a plain block parent
+ * the reservation collapses against the parent's own edge and against the
+ * neighbouring turn's, so two facing pills get one 12px band between them
+ * instead of two and end up meeting.
  *
  * `align` has no default, so a bubble sits wherever its parent puts it — the
  * natural start edge of a `BubbleGroup`, or an inline-end column that aligns
@@ -159,10 +160,12 @@ interface BubbleContentProps extends React.ComponentProps<'div'> {
  * Anchors that can navigate are underlined, whether the body itself is the
  * link or the link sits inside its text; an `a` with no `href` is not.
  *
- * The rules reaching nested `a` / `pre` sit behind `:where()`, so they carry no
- * more specificity than a utility class. They still win on source order, so a
- * consumer restyling one of those descendants needs the `!` modifier —
- * `<a href="…" className="nx:no-underline!">`.
+ * Restyling any of this needs the `!` modifier —
+ * `<a href="…" className="nx:no-underline!">` — whether the target is the
+ * body's own anchor, a nested one, or a nested `pre`. The rules reaching
+ * nested `a` / `pre` are `:where()`-ed, so they tie a utility class on
+ * specificity and win on source order; the rule for the body's own anchor is
+ * not, so it outranks one outright.
  */
 function BubbleContent({
   className,

@@ -55,44 +55,53 @@ function* eachStyleRule(rules: CSSRuleList): Generator<CSSStyleRule> {
 }
 
 /**
- * The hover tint and press cue are `:has()` variants, and synthetic pointer
- * events never activate `:hover` or `:active` — so these stories assert which
- * turns each cue *selects* rather than the painted colour. The scope is read
- * back off the compiled stylesheet, not off the class attribute, so a variant
- * Tailwind never emitted fails loudly instead of passing on a class string
- * that styles nothing. Widen the scope in `index.css` and the over-fire
- * assertions below start matching and fail.
+ * Reads back the rule that `element`'s class starting with `prefix` compiled to.
+ * Going through the stylesheet rather than the class attribute is what makes a
+ * utility Tailwind never emitted fail loudly, instead of passing on a class
+ * string that styles nothing.
  */
-function compiledScope(bubble: Element, variant: string): string {
-  const emitted = [...bubble.classList].find((name) =>
-    name.startsWith(`nx:${variant}:`)
+function emittedRule(element: Element, prefix: string): CSSStyleRule {
+  const emitted = [...element.classList].find((name) =>
+    name.startsWith(prefix)
   );
 
   if (!emitted) {
-    throw new Error(`no "${variant}" class on "${bubble.className}"`);
+    throw new Error(`no "${prefix}" class on "${element.className}"`);
   }
 
   const escaped = `.${CSS.escape(emitted)}`;
 
   for (const sheet of document.styleSheets) {
     for (const rule of eachStyleRule(sheet.cssRules)) {
-      if (rule.selectorText !== escaped) {
-        continue;
-      }
-
-      // `.cls { &:has(…) { &:hover { … } } }` — the scope lives on the nested
-      // rule, so strip the nesting `&` off it.
-      const scope = [...eachStyleRule(rule.cssRules)]
-        .map((nested) => nested.selectorText)
-        .find((selector) => selector.includes(':has('));
-
-      if (scope) {
-        return scope.replace(/^&/, '');
+      if (rule.selectorText === escaped) {
+        return rule;
       }
     }
   }
 
-  throw new Error(`"${emitted}" compiled to no :has() rule`);
+  throw new Error(`"${emitted}" compiled to no rule`);
+}
+
+/**
+ * The hover tint and press cue are `:has()` variants, and synthetic pointer
+ * events never activate `:hover` or `:active` — so these stories assert which
+ * turns each cue *selects* rather than the painted colour. Widen the scope in
+ * `bubble.css` and the over-fire assertions below start matching and fail.
+ */
+function compiledScope(bubble: Element, variant: string): string {
+  const rule = emittedRule(bubble, `nx:${variant}:`);
+
+  // `.cls { &:has(…) { &:hover { … } } }` — the scope lives on the nested
+  // rule, so strip the nesting `&` off it.
+  const scope = [...eachStyleRule(rule.cssRules)]
+    .map((nested) => nested.selectorText)
+    .find((selector) => selector.includes(':has('));
+
+  if (!scope) {
+    throw new Error(`"${rule.selectorText}" compiled to no :has() rule`);
+  }
+
+  return scope.replace(/^&/, '');
 }
 
 const hoverTintSelector = (bubble: Element) =>
@@ -133,56 +142,42 @@ const pressScopeOf = (bubble: Element) =>
  * The `:has()` reservation cannot fire in Firefox 113-120, so the turn also
  * carries an unconditional fallback for that band. The `@supports` condition
  * is false in the test browser, so the rule never applies — read the reserved
- * length straight off the compiled rule instead, and hold it to the same 12px
- * the `:has()` rules reserve. A fallback that stops compiling, or that
- * compiles to a smaller step, fails here. `pnpm audit:browser-support` owns
- * the policy side.
+ * lengths straight off the compiled rule instead, and hold both of them to the
+ * same 12px the `:has()` rules reserve. A fallback that stops compiling, that
+ * shrinks, or that covers only one edge fails here. `pnpm audit:browser-support`
+ * owns the policy side.
  */
 function expectHasFallback(bubble: HTMLElement, reserved: number) {
-  const emitted = [...bubble.classList].find((name) =>
-    name.startsWith('nx:no-has-support:')
+  const rule = emittedRule(bubble, 'nx:no-has-support:');
+  const guarded = [...rule.cssRules].find(
+    (nested): nested is CSSSupportsRule =>
+      nested instanceof CSSSupportsRule &&
+      nested.conditionText.includes(':has(')
   );
 
-  if (!emitted) {
-    throw new Error('the turn carries no :has() fallback class');
+  if (!guarded) {
+    throw new Error(`"${rule.selectorText}" compiled to no @supports fallback`);
   }
 
-  const escaped = `.${CSS.escape(emitted)}`;
+  // The guarded declarations are unreachable through `getComputedStyle`, so
+  // resolve them by replaying the block on a throwaway element.
+  const probe = document.createElement('div');
 
-  for (const sheet of document.styleSheets) {
-    for (const rule of eachStyleRule(sheet.cssRules)) {
-      if (rule.selectorText !== escaped) {
-        continue;
-      }
+  probe.style.cssText = [...guarded.cssRules]
+    .map((declaration) => declaration.cssText)
+    .join('');
+  document.body.append(probe);
 
-      for (const nested of rule.cssRules) {
-        if (
-          !(nested instanceof CSSSupportsRule) ||
-          !nested.conditionText.includes(':has(')
-        ) {
-          continue;
-        }
+  const declared = getComputedStyle(probe);
+  const reservedAbove = parseFloat(declared.marginTop);
+  const reservedBelow = parseFloat(declared.marginBottom);
 
-        // The guarded declarations are unreachable through `getComputedStyle`,
-        // so resolve them by replaying the block on a throwaway element.
-        const probe = document.createElement('div');
+  probe.remove();
 
-        probe.style.cssText = [...nested.cssRules]
-          .map((declaration) => declaration.cssText)
-          .join('');
-        document.body.append(probe);
-
-        const declared = parseFloat(getComputedStyle(probe).marginTop);
-
-        probe.remove();
-        expect(declared, `${emitted} reserves`).toBe(reserved);
-
-        return;
-      }
-    }
-  }
-
-  throw new Error(`"${emitted}" compiled to no @supports fallback`);
+  // Both edges: a `side="top"` pill and a `side="bottom"` one each need their
+  // own band, so a fallback narrowed to one axis is a regression.
+  expect(reservedAbove, `${rule.selectorText} reserves above`).toBe(reserved);
+  expect(reservedBelow, `${rule.selectorText} reserves below`).toBe(reserved);
 }
 
 function bubbleOf(element: Element): HTMLElement {
@@ -510,6 +505,13 @@ export const LinksAndButtons: Story = {
           .
         </BubbleContent>
       </Bubble>
+      <Bubble align="start" variant="ghost">
+        <BubbleContent asChild>
+          <a href="#quiet" className="nx:no-underline!">
+            Opt a whole-bubble link out too
+          </a>
+        </BubbleContent>
+      </Bubble>
     </BubbleGroup>
   ),
   play: async ({ canvasElement }) => {
@@ -567,14 +569,18 @@ export const LinksAndButtons: Story = {
       );
     }
 
-    // A bare utility on a nested anchor ties the `:where()`-ed rule on
-    // specificity and loses on source order, so `!` is the documented way out.
-    // This pins that escape hatch, not the `:where()` itself.
-    await expect(
-      getComputedStyle(
-        canvas.getByRole('link', { name: 'consumer can opt out' })
-      ).textDecorationLine
-    ).toBe('none');
+    // `!` is the documented way out for both halves of the underline rule —
+    // the body's own anchor and a nested one. `!important` wins outright, so
+    // this pins the escape hatch, not the specificity either rule carries.
+    for (const name of [
+      'consumer can opt out',
+      'Opt a whole-bubble link out too',
+    ]) {
+      await expect(
+        getComputedStyle(canvas.getByRole('link', { name })).textDecorationLine,
+        name
+      ).toBe('none');
+    }
 
     await expect(getComputedStyle(link).cursor).toBe('pointer');
     await expect(getComputedStyle(button).cursor).toBe('pointer');
