@@ -68,21 +68,25 @@ describe('surface ladder', () => {
 
   // `Bubble`'s muted variant borrows `popover-active` as its hover, because
   // `muted` has no `-hover` rung. `components.md` justifies that borrow by it
-  // being exactly *one* rung above `muted` in both regimes — a two-rung jump
-  // would over-strengthen the hover. The tables above pin today's numbers, so
-  // they move with any re-baseline; this pins the relation instead.
+  // being exactly *one* rung above `muted` in both regimes. The tables above
+  // pin today's numbers, so they move with any re-baseline; this pins the
+  // relation instead.
   it('keeps popover-active exactly one rung above muted in both regimes', () => {
-    for (const [regime, steps] of [
-      ['light', LIGHT_SURFACE_STEPS],
-      ['dark', DARK_SURFACE_STEPS],
+    // Elevation runs in opposite directions: light surfaces rise by darkening,
+    // dark surfaces by lightening.
+    for (const [regime, steps, towardsElevated] of [
+      ['light', LIGHT_SURFACE_STEPS, -1],
+      ['dark', DARK_SURFACE_STEPS, 1],
     ] as const) {
+      const rise = (steps['popover-active'] - steps.muted) * towardsElevated;
+
+      expect(
+        rise,
+        `${regime}: popover-active must sit one rung above muted`
+      ).toBeGreaterThan(0.1);
+
       const low = Math.min(steps.muted, steps['popover-active']);
       const high = Math.max(steps.muted, steps['popover-active']);
-
-      expect(high, `${regime}: popover-active must differ from muted`).not.toBe(
-        low
-      );
-
       const between = SURFACE_TOKENS.filter(
         (token) => steps[token] > low && steps[token] < high
       );
@@ -92,5 +96,11 @@ describe('surface ladder', () => {
         `${regime}: rungs between muted and popover-active`
       ).toEqual([]);
     }
+  });
+
+  // The borrow only holds while `muted` has no hover rung of its own; a real
+  // `muted-hover` token must repoint `Bubble` rather than sit unused.
+  it('has no muted-hover rung for the borrow to shadow', () => {
+    expect(SURFACE_TOKENS as readonly string[]).not.toContain('muted-hover');
   });
 });

@@ -23,28 +23,30 @@ function BubbleGroup({ className, ...props }: BubbleGroupProps) {
   return (
     <div
       data-slot="bubble-group"
-      className={cn(
-        'nx:flex nx:w-full nx:flex-col nx:gap-4',
-        // Without `:has()` a `Bubble` cannot reserve its pill's overhang, and
-        // two facing pills would collide across the 16px gap. Widen the gap to
-        // the 40px that clears both overhangs.
-        'nx:no-has-support:gap-10',
-        className
-      )}
+      className={cn('nx:flex nx:w-full nx:flex-col nx:gap-4', className)}
       {...props}
     />
   );
 }
 
-const bubbleVariants = cva(
+const bubbleLayoutVariants = cva(
   [
-    'nx:relative nx:w-fit nx:max-w-[min(80%,45rem)] nx:rounded-xl nx:border-default nx:border-transparent nx:typography-body-default nx:transition-colors nx:duration-faster',
-    // The pill overhangs 12px, so the bubble reserves that 12px itself. These
-    // are margins, so the reservation needs a parent that does not collapse
-    // them — a flex or grid stack, or a block parent that establishes a block
-    // formatting context; `BubbleGroup` is flex.
-    'nx:has-[>[data-bubble-part=reactions][data-side=top]]:mt-3 nx:has-[>[data-bubble-part=reactions][data-side=bottom]]:mb-3',
+    'nx:w-fit nx:max-w-[min(80%,45rem)]',
+    'nx:has-[>[data-bubble-part=surface]>[data-bubble-part=reactions][data-side=top]]:pt-3 nx:has-[>[data-bubble-part=surface]>[data-bubble-part=reactions][data-side=bottom]]:pb-3',
+    'nx:no-has-support:py-3',
   ],
+  {
+    variants: {
+      align: {
+        start: 'nx:me-auto',
+        end: 'nx:ms-auto',
+      },
+    },
+  }
+);
+
+const bubbleVariants = cva(
+  'nx:relative nx:rounded-xl nx:border-default nx:border-transparent nx:typography-body-default nx:transition-colors nx:duration-faster',
   {
     variants: {
       variant: {
@@ -59,10 +61,6 @@ const bubbleVariants = cva(
         destructive:
           'nx:bg-error-subtle nx:text-error-subtle-foreground nx:bubble-hovered:bg-error-subtle-hover nx:bubble-pressed:bg-error-subtle-active',
       },
-      align: {
-        start: 'nx:me-auto',
-        end: 'nx:ms-auto',
-      },
     },
     defaultVariants: {
       variant: 'muted',
@@ -76,7 +74,10 @@ const bubbleVariants = cva(
  * Props for the Bubble component.
  */
 interface BubbleProps
-  extends React.ComponentProps<'div'>, VariantProps<typeof bubbleVariants> {}
+  extends
+    React.ComponentProps<'div'>,
+    VariantProps<typeof bubbleVariants>,
+    VariantProps<typeof bubbleLayoutVariants> {}
 
 /**
  * Bubble
@@ -86,11 +87,11 @@ interface BubbleProps
  * timestamp logic. Compose it with `BubbleContent` for the message body and
  * `BubbleReactions` for a reaction pill; stack turns with `BubbleGroup`.
  *
- * A `BubbleReactions` pill overhangs the surface, and the bubble reserves that
- * overhang with a margin — so give it a parent that does not collapse margins.
- * A flex or grid stack does (`BubbleGroup` is flex); a plain block parent
- * collapses the reservation against the parent's own edge and against the
- * neighbouring turn, which drops two facing pills back on top of each other.
+ * A `BubbleReactions` pill overhangs the surface, and the turn reserves that
+ * overhang itself: the surface is painted on an inner element, and the outer
+ * box holds the band as padding. Padding never collapses, so the reservation
+ * survives a plain block parent as well as a flex or grid stack, and two
+ * facing pills stay clear of each other whatever gap the stack sets.
  *
  * `align` has no default, so a bubble sits wherever its parent puts it — the
  * natural start edge of a `BubbleGroup`, or an inline-end column that aligns
@@ -117,13 +118,16 @@ function Bubble({
   ...props
 }: BubbleProps) {
   return (
-    <div
-      data-slot="bubble"
-      data-variant={variant}
-      data-align={align}
-      className={cn(bubbleVariants({ variant, align }), className)}
-      {...props}
-    />
+    <div className={bubbleLayoutVariants({ align })}>
+      <div
+        data-slot="bubble"
+        data-bubble-part="surface"
+        data-variant={variant}
+        data-align={align}
+        className={cn(bubbleVariants({ variant }), className)}
+        {...props}
+      />
+    </div>
   );
 }
 
@@ -168,6 +172,11 @@ interface BubbleContentProps extends React.ComponentProps<'div'> {
  * Long words, URLs, and nested `pre` blocks wrap rather than widen the bubble.
  * Anchors that can navigate are underlined, whether the body itself is the
  * link or the link sits inside its text; an `a` with no `href` is not.
+ *
+ * The rules reaching nested `a` / `pre` sit behind `:where()`, so they carry no
+ * more specificity than a utility class. They still win on source order, so a
+ * consumer restyling one of those descendants needs the `!` modifier —
+ * `<a href="…" className="nx:no-underline!">`.
  */
 function BubbleContent({
   className,
@@ -181,7 +190,7 @@ function BubbleContent({
       data-slot="bubble-content"
       data-bubble-part="content"
       className={cn(
-        'nx:block nx:min-w-0 nx:rounded-[inherit] nx:px-4 nx:py-3 nx:text-start nx:wrap-break-word nx:focus-visible:outline-2 nx:focus-visible:outline-focus-default nx:focus-visible:outline-offset-(--focus-offset) nx:[&:is(a[href],button:not(:disabled)):not([aria-disabled=true])]:cursor-pointer nx:[&:is(a[href])]:underline nx:[&:is(a[href])]:underline-offset-4 nx:[&_a[href]]:underline nx:[&_a[href]]:underline-offset-4 nx:[&_pre]:whitespace-pre-wrap nx:[&_pre]:wrap-break-word',
+        'nx:block nx:min-w-0 nx:rounded-[inherit] nx:px-4 nx:py-3 nx:text-start nx:wrap-break-word nx:focus-visible:outline-2 nx:focus-visible:outline-focus-default nx:focus-visible:outline-offset-(--focus-offset) nx:[&:is(a[href],button:not(:disabled)):not([aria-disabled=true])]:cursor-pointer nx:[&:is(a[href]),&_:where(a[href])]:underline nx:[&:is(a[href]),&_:where(a[href])]:underline-offset-4 nx:[&_:where(pre)]:whitespace-pre-wrap nx:[&_:where(pre)]:wrap-break-word',
         className
       )}
       {...props}

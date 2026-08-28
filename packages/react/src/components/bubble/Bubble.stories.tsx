@@ -118,7 +118,9 @@ function structuralScope(
     throw new Error(`"${selector}" does not scope ${state} to the content`);
   }
 
-  return selector.replace(state, '');
+  // `endsWith` proved the state closes the selector; slicing it off keeps a
+  // predicate that happens to contain `:hover` / `:active` earlier intact.
+  return `${selector.slice(0, -(state.length + 1))})`;
 }
 
 const hoverScopeOf = (bubble: Element) =>
@@ -126,6 +128,55 @@ const hoverScopeOf = (bubble: Element) =>
 
 const pressScopeOf = (bubble: Element) =>
   structuralScope(pressCueSelector(bubble), ':active');
+
+/**
+ * The pill overhangs the surface, and the turn pays for that overhang on the
+ * outer box that wraps it — as padding, so the reservation cannot collapse the
+ * way a margin would.
+ */
+function reservationOf(element: Element): HTMLElement {
+  return bubbleOf(element).parentElement!;
+}
+
+/**
+ * The `:has()` reservation cannot fire in Firefox 113-120, so the outer box
+ * also carries an unconditional fallback for that band. The `@supports`
+ * condition is false in the test browser, so the rule never applies — read it
+ * back off the compiled stylesheet instead, which fails both when the class is
+ * dropped and when it compiles to nothing. `pnpm audit:browser-support` owns
+ * the policy side.
+ */
+function expectHasFallback(element: Element) {
+  const emitted = [...reservationOf(element).classList].find((name) =>
+    name.startsWith('nx:no-has-support:')
+  );
+
+  if (!emitted) {
+    throw new Error('the reservation carries no :has() fallback class');
+  }
+
+  const escaped = `.${CSS.escape(emitted)}`;
+
+  for (const sheet of document.styleSheets) {
+    for (const rule of eachStyleRule(sheet.cssRules)) {
+      if (rule.selectorText !== escaped) {
+        continue;
+      }
+
+      const guarded = [...rule.cssRules].some(
+        (nested) =>
+          nested instanceof CSSSupportsRule &&
+          nested.conditionText.includes(':has(')
+      );
+
+      if (guarded) {
+        return;
+      }
+    }
+  }
+
+  throw new Error(`"${emitted}" compiled to no @supports fallback`);
+}
 
 function bubbleOf(element: Element): HTMLElement {
   return element.closest<HTMLElement>('[data-slot="bubble"]')!;
@@ -151,6 +202,15 @@ export const Default: Story = {
       </Bubble>
     </div>
   ),
+  play: async ({ canvasElement }) => {
+    const bubble = canvasElement.querySelector('[data-slot="bubble"]')!;
+
+    // The JS default and the cva `defaultVariants` have to agree, and an unset
+    // `align` must emit no attribute at all — a turn that defaulted to `start`
+    // could not be positioned by its parent.
+    await expect(bubble).toHaveAttribute('data-variant', 'muted');
+    await expect(bubble).not.toHaveAttribute('data-align');
+  },
 };
 
 export const Muted: Story = {
@@ -342,19 +402,19 @@ export const ReactionSideAndAlign: Story = {
           : pillStyle.insetInlineEnd
       ).not.toBe('auto');
 
-      // The overhang is reserved by the bubble itself, so the pill stays clear
-      // of its neighbour whatever gap the surrounding stack happens to set.
-      const bubbleStyle = getComputedStyle(bubble);
+      // The overhang is reserved by the turn itself, so the pill stays clear of
+      // its neighbour whatever gap the surrounding stack happens to set.
+      const reserved = getComputedStyle(reservationOf(pill));
 
       if (pill.dataset.side === 'top') {
         await expect(pillBox.top).toBeLessThan(bubbleBox.top);
         await expect(bubbleBox.top - pillBox.top).toBeLessThanOrEqual(
-          parseFloat(bubbleStyle.marginTop)
+          parseFloat(reserved.paddingTop)
         );
       } else {
         await expect(pillBox.bottom).toBeGreaterThan(bubbleBox.bottom);
         await expect(pillBox.bottom - bubbleBox.bottom).toBeLessThanOrEqual(
-          parseFloat(bubbleStyle.marginBottom)
+          parseFloat(reserved.paddingBottom)
         );
       }
 
@@ -436,7 +496,11 @@ export const LinksAndButtons: Story = {
       <Bubble align="start" variant="muted">
         <BubbleContent>
           An inline <a href="#docs">link inside prose</a> is underlined the same
-          way as a whole-bubble link.
+          way as a whole-bubble link, and a{' '}
+          <a href="#opt-out" className="nx:no-underline!">
+            consumer can opt out
+          </a>
+          .
         </BubbleContent>
       </Bubble>
     </BubbleGroup>
@@ -495,6 +559,15 @@ export const LinksAndButtons: Story = {
         'underline'
       );
     }
+
+    // A bare utility on a nested anchor ties the `:where()`-ed rule on
+    // specificity and loses on source order, so `!` is the documented way out.
+    // This pins that escape hatch, not the `:where()` itself.
+    await expect(
+      getComputedStyle(
+        canvas.getByRole('link', { name: 'consumer can opt out' })
+      ).textDecorationLine
+    ).toBe('none');
 
     await expect(getComputedStyle(link).cursor).toBe('pointer');
     await expect(getComputedStyle(button).cursor).toBe('pointer');
@@ -641,6 +714,11 @@ export const Disabled: StoryObj<BubbleProps & { onRetry: () => void }> = {
 
       await expect(bubble.matches(hoverScopeOf(bubble))).toBe(false);
       await expect(bubble.matches(pressScopeOf(bubble))).toBe(false);
+
+      // `cursor-pointer` carries the same predicate as the two cues but in its
+      // own selector, so it has to be held to the same line — `LinksAndButtons`
+      // asserts the live bodies do get it.
+      await expect(getComputedStyle(body).cursor).not.toBe('pointer');
     }
 
     // The underline is the whole-bubble link affordance, so an anchor with
@@ -734,9 +812,13 @@ export const LongUnbrokenContent: Story = {
       '[data-slot="bubble"]'
     );
 
+    // `max-w-[min(80%,45rem)]` against a 28rem column, so the 80% binds. The
+    // container width alone would pass a bubble that had lost its cap.
+    const cap = 0.8 * group.getBoundingClientRect().width;
+
     for (const bubble of bubbles) {
       await expect(bubble.getBoundingClientRect().width).toBeLessThanOrEqual(
-        group.getBoundingClientRect().width + 1
+        cap + 1
       );
       await expect(bubble.scrollWidth).toBeLessThanOrEqual(
         bubble.clientWidth + 1
@@ -816,10 +898,69 @@ export const StackedConversation: Story = {
     )!;
     const bubbleWithPill = bubbleOf(pill);
     const next = bubbles[bubbles.indexOf(bubbleWithPill) + 1]!;
+    const overhang =
+      pill.getBoundingClientRect().bottom -
+      bubbleWithPill.getBoundingClientRect().bottom;
 
+    // `gap-4` alone would clear a 12px overhang, so non-overlap proves nothing.
+    // The turn has to pay for its own pill: assert the reserved padding covers
+    // the overhang, and that the gap is still there on top of it.
+    await expect(overhang).toBeGreaterThan(0);
+    await expect(
+      parseFloat(getComputedStyle(reservationOf(pill)).paddingBottom)
+    ).toBeGreaterThanOrEqual(overhang);
     await expect(pill.getBoundingClientRect().bottom).toBeLessThanOrEqual(
       next.getBoundingClientRect().top + 1
     );
+
+    expectHasFallback(bubbleWithPill);
+  },
+};
+
+export const InBlockStack: Story = {
+  render: () => (
+    <div className={column}>
+      <Bubble align="start">
+        <BubbleContent>A plain block parent, no flex and no gap.</BubbleContent>
+        <BubbleReactions side="bottom" align="start">
+          🎉 3
+        </BubbleReactions>
+      </Bubble>
+      <Bubble align="end" variant="primary">
+        <BubbleContent>The turn below faces it.</BubbleContent>
+        <BubbleReactions side="top" align="end">
+          👀 1
+        </BubbleReactions>
+      </Bubble>
+    </div>
+  ),
+  play: async ({ canvasElement }) => {
+    const pills = canvasElement.querySelectorAll<HTMLElement>(
+      '[data-slot="bubble-reactions"]'
+    );
+
+    await expect(pills).toHaveLength(2);
+
+    const [above, below] = [...pills];
+
+    // Two facing pills in a block container is the case a margin reservation
+    // cannot hold: adjacent margins collapse, so 12px + 12px would come back
+    // as 12px and the pills would meet. Padding does not collapse, so the
+    // lower pill still starts below the upper one.
+    await expect(above!.getBoundingClientRect().bottom).toBeLessThanOrEqual(
+      below!.getBoundingClientRect().top
+    );
+
+    // And the reservation is genuinely paid on both turns, not borrowed from
+    // whatever the block parent happens to leave between them.
+    await expect(
+      parseFloat(getComputedStyle(reservationOf(above!)).paddingBottom)
+    ).toBeGreaterThan(0);
+    await expect(
+      parseFloat(getComputedStyle(reservationOf(below!)).paddingTop)
+    ).toBeGreaterThan(0);
+
+    expectHasFallback(above!);
   },
 };
 
@@ -956,32 +1097,23 @@ export const WithTooltip: Story = {
   },
 };
 
-function MessageDetailsExample() {
-  const [open, setOpen] = React.useState(false);
-
-  return (
+export const WithPopover: Story = {
+  render: () => (
     <BubbleGroup className={column}>
       <Bubble align="start" className="nx:flex nx:items-end nx:gap-2">
         <BubbleContent>Merged #666 into main.</BubbleContent>
-        {/* Popover is click-driven by default, so hover intent is wired
-            explicitly on both the trigger and the panel it opens. */}
-        <Popover open={open} onOpenChange={setOpen}>
+        <Popover>
           <PopoverTrigger asChild>
             <button
               type="button"
               aria-label="Message details"
               className={receiptIconClassName}
-              onMouseEnter={() => setOpen(true)}
-              onMouseLeave={() => setOpen(false)}
             >
               <InfoIcon />
             </button>
           </PopoverTrigger>
           <PopoverContent
             aria-labelledby="bubble-popover-heading"
-            onOpenAutoFocus={(event) => event.preventDefault()}
-            onMouseEnter={() => setOpen(true)}
-            onMouseLeave={() => setOpen(false)}
             className="nx:flex nx:flex-col nx:gap-1"
           >
             <p
@@ -997,11 +1129,7 @@ function MessageDetailsExample() {
         </Popover>
       </Bubble>
     </BubbleGroup>
-  );
-}
-
-export const WithPopover: Story = {
-  render: () => <MessageDetailsExample />,
+  ),
   play: async ({ canvasElement }) => {
     const canvas = within(canvasElement);
     const icon = canvas.getByRole('button', { name: 'Message details' });
@@ -1009,15 +1137,22 @@ export const WithPopover: Story = {
 
     await expect(icon).toHaveAttribute('aria-expanded', 'false');
 
-    await userEvent.hover(icon);
+    await userEvent.click(icon);
     await waitFor(async () => {
       await expect(body.getByText('Message details')).toBeVisible();
     });
+    await expect(icon).toHaveAttribute('aria-expanded', 'true');
 
-    await userEvent.unhover(icon);
+    // The panel is a `role="dialog"`, so it owns an accessible name of its own.
+    await expect(
+      body.getByRole('dialog', { name: 'Message details' })
+    ).toBeVisible();
+
+    await userEvent.keyboard('{Escape}');
     await waitFor(async () => {
       await expect(body.queryByText('Message details')).toBeNull();
     });
+    await expect(icon).toHaveFocus();
   },
 };
 
