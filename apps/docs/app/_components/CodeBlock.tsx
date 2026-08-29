@@ -1,7 +1,12 @@
 'use client';
 
-import type { ComponentProps } from 'react';
-import { useCallback, useEffect, useRef, useState } from 'react';
+import React, {
+  type ComponentProps,
+  useCallback,
+  useEffect,
+  useRef,
+  useState,
+} from 'react';
 
 import { Button } from '@nexus_ds/react';
 
@@ -74,7 +79,7 @@ export function CodeBlock({
         {children}
       </pre>
       <Button
-        className="nx:absolute nx:right-2 nx:top-2"
+        className="nx:absolute nx:left-2 nx:top-2"
         onClick={handleCopy}
         size="sm"
         variant="outline"

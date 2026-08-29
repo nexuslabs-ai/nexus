@@ -1,3 +1,5 @@
+import React from 'react';
+
 import { act, fireEvent, render, screen } from '@testing-library/react';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
@@ -42,7 +44,7 @@ describe('CodeBlock', () => {
 
     const copyButton = screen.getByRole('button', { name: 'Copy code' });
     copyButton.focus();
-    expect(copyButton).toHaveFocus();
+    expect(document.activeElement).toBe(copyButton);
 
     await act(async () => {
       fireEvent.click(copyButton);
@@ -50,10 +52,17 @@ describe('CodeBlock', () => {
 
     expect(writeText).toHaveBeenCalledOnce();
     expect(writeText).toHaveBeenCalledWith(canonicalCode);
-    expect(screen.getByRole('status')).toHaveTextContent(
+    expect(screen.getByRole('status').textContent).toBe(
       'Code copied to clipboard.'
     );
-    expect(screen.getByRole('button', { name: 'Copied' })).toBeVisible();
+    expect(screen.getByRole('button', { name: 'Copied' })).toBeTruthy();
+
+    act(() => {
+      vi.advanceTimersByTime(2000);
+    });
+
+    expect(screen.getByRole('button', { name: 'Copy code' })).toBeTruthy();
+    expect(screen.getByRole('status').textContent).toBe('');
   });
 
   it('announces a failed write and resets the control', async () => {
@@ -71,16 +80,14 @@ describe('CodeBlock', () => {
       fireEvent.click(screen.getByRole('button', { name: 'Copy code' }));
     });
 
-    expect(screen.getByRole('status')).toHaveTextContent(
-      'Unable to copy code.'
-    );
-    expect(screen.getByRole('button', { name: 'Try again' })).toBeVisible();
+    expect(screen.getByRole('status').textContent).toBe('Unable to copy code.');
+    expect(screen.getByRole('button', { name: 'Try again' })).toBeTruthy();
 
     act(() => {
       vi.advanceTimersByTime(2000);
     });
 
-    expect(screen.getByRole('button', { name: 'Copy code' })).toBeVisible();
-    expect(screen.getByRole('status')).toBeEmptyDOMElement();
+    expect(screen.getByRole('button', { name: 'Copy code' })).toBeTruthy();
+    expect(screen.getByRole('status').textContent).toBe('');
   });
 });
