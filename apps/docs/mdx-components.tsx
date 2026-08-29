@@ -1,5 +1,6 @@
 import type { MDXComponents } from 'mdx/types';
 
+import { CodeBlock } from './app/_components/CodeBlock';
 import * as Nexus from './app/_components/nexus';
 
 /**
@@ -66,12 +67,7 @@ export function useMDXComponents(components: MDXComponents): MDXComponents {
         {...props}
       />
     ),
-    pre: (props) => (
-      <pre
-        className="nx:bg-muted nx:border nx:border-border-default nx:rounded-md nx:p-4 nx:mb-4 nx:overflow-x-auto nx:typography-code-block nx:[&_code]:bg-transparent nx:[&_code]:p-0 nx:[&_code]:typography-code-block"
-        {...props}
-      />
-    ),
+    pre: CodeBlock,
     // live @nexus_ds/react components, usable in MDX without an import
     ...Nexus,
     // caller-provided overrides win
