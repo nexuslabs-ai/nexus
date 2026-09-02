@@ -165,8 +165,9 @@ Load the app and confirm each of these before moving on:
 - [ ] `@nexus_ds/tailwind` and `@nexus_ds/react/styles.css` are both imported
 - [ ] The provider wraps your tree, and the script runs in `<head>`
 - [ ] Reloading in dark mode produces no flash of the light theme[^flash]
-- [ ] With `storageKey` or `cookieWriteKey` set, toggling the mode persists across
-      a full page reload
+- [ ] Toggling the mode persists across a full page reload — `storageKey` does
+      this on its own; `cookieWriteKey` needs a server that re-seeds
+      `defaultState` from the cookie
 
 [^flash]:
     If the script is already in `<head>` and the flash persists, check that
