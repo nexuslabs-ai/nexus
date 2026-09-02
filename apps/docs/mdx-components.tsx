@@ -122,9 +122,6 @@ export function useMDXComponents(components: MDXComponents): MDXComponents {
         {...props}
       />
     ),
-    // The last-row border reset is scoped to `tbody` on the table rather than
-    // set on `tr`: a header row is the only child of its `thead`, so a bare
-    // `:last-child` would strip the header underline too.
     table: ({ className, ...props }) => (
       <div
         // A wide table overflows horizontally and holds no focusable children,
@@ -136,7 +133,7 @@ export function useMDXComponents(components: MDXComponents): MDXComponents {
       >
         <table
           className={join(
-            'nx:w-full nx:border-collapse nx:typography-label-default nx:[&_tbody_tr:last-child]:border-0',
+            'nx:w-full nx:border-collapse nx:typography-label-default',
             className
           )}
           {...props}
@@ -146,7 +143,7 @@ export function useMDXComponents(components: MDXComponents): MDXComponents {
     tr: ({ className, ...props }) => (
       <tr
         className={join(
-          'nx:border-b-default nx:border-border-default-alpha',
+          'nx:border-b-default nx:border-border-default-alpha nx:[tbody_&:last-child]:border-b-0',
           className
         )}
         {...props}
