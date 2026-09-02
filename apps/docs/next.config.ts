@@ -84,13 +84,9 @@ const nextConfig: NextConfig = {
   },
 };
 
-// String-named, not imported: Turbopack serialises the MDX loader options and
-// cannot carry a plugin function across that boundary.
 const withMDX = createMDX({
   options: {
     remarkPlugins: ['remark-gfm'],
-    // The footnote label is labelled `sr-only` by default, a bare name the
-    // nx:-prefixed build emits no rule for, so it would render visible.
     remarkRehypeOptions: {
       footnoteLabelProperties: { className: ['nx:sr-only'] },
     },

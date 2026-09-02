@@ -2,11 +2,6 @@ import type { MDXComponents } from 'mdx/types';
 
 import * as Nexus from './app/_components/nexus';
 
-/**
- * remark-gfm labels some elements itself (`task-list-item`, `sr-only` on the
- * footnote label), so every override appends that class rather than letting a
- * trailing `{...props}` spread drop its own.
- */
 const join = (base: string, incoming?: string) =>
   incoming ? `${base} ${incoming}` : base;
 
@@ -80,10 +75,6 @@ export function useMDXComponents(components: MDXComponents): MDXComponents {
         {...props}
       />
     ),
-    // A GFM task list marks its items `task-list-item` and prepends a checkbox
-    // that is always disabled, which is what separates it from an input an MDX
-    // page embeds. A tight list holds that checkbox directly; a loose one wraps
-    // it in a `p`, so it is matched as a descendant rather than a child.
     li: ({ className, ...props }) => (
       <li
         className={join(
@@ -124,9 +115,7 @@ export function useMDXComponents(components: MDXComponents): MDXComponents {
     ),
     table: ({ className, ...props }) => (
       <div
-        // A wide table overflows horizontally and holds no focusable children,
-        // so the container itself must be keyboard-focusable to scroll into
-        // view (axe scrollable-region-focusable / WCAG 2.1.1).
+        // A scroll container with no focusable children needs its own tab stop.
         // eslint-disable-next-line jsx-a11y/no-noninteractive-tabindex
         tabIndex={0}
         className="nx:mb-4 nx:overflow-x-auto nx:focus-visible:outline-2 nx:focus-visible:outline-focus-default nx:focus-visible:outline-offset-(--focus-offset)"
@@ -149,9 +138,8 @@ export function useMDXComponents(components: MDXComponents): MDXComponents {
         {...props}
       />
     ),
-    // props stay after className so a `:---:` alignment row still wins:
-    // hast-util-to-estree's tableCellAlignToStyle turns the cell's `align`
-    // into style={{textAlign}}, and an inline style outranks `nx:text-start`.
+    // `{...props}` stays last: a `:---:` row arrives as an inline textAlign
+    // style, which must outrank `nx:text-start`.
     th: ({ className, ...props }) => (
       <th
         scope="col"
