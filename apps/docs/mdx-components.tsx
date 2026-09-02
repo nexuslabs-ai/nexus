@@ -80,13 +80,14 @@ export function useMDXComponents(components: MDXComponents): MDXComponents {
         {...props}
       />
     ),
-    // A GFM task list marks its items `task-list-item` and prepends a disabled
-    // checkbox. A tight list holds that input directly; a loose one wraps it in
-    // a `p`, so the checkbox is matched as a descendant rather than a child.
+    // A GFM task list marks its items `task-list-item` and prepends a checkbox
+    // that is always disabled, which is what separates it from an input an MDX
+    // page embeds. A tight list holds that checkbox directly; a loose one wraps
+    // it in a `p`, so it is matched as a descendant rather than a child.
     li: ({ className, ...props }) => (
       <li
         className={join(
-          'nx:typography-body-default nx:[&.task-list-item]:list-none nx:[&.task-list-item_input]:me-2 nx:[&.task-list-item_input]:align-middle',
+          'nx:typography-body-default nx:[&.task-list-item]:list-none nx:[&.task-list-item_input:disabled]:me-2 nx:[&.task-list-item_input:disabled]:align-middle',
           className
         )}
         {...props}
@@ -128,11 +129,11 @@ export function useMDXComponents(components: MDXComponents): MDXComponents {
         // view (axe scrollable-region-focusable / WCAG 2.1.1).
         // eslint-disable-next-line jsx-a11y/no-noninteractive-tabindex
         tabIndex={0}
-        className="nx:mb-4 nx:overflow-x-auto nx:focus-visible:outline-2 nx:focus-visible:outline-focus-default nx:focus-visible:[outline-offset:-2px]"
+        className="nx:mb-4 nx:overflow-x-auto nx:focus-visible:outline-2 nx:focus-visible:outline-focus-default nx:focus-visible:outline-offset-(--focus-offset)"
       >
         <table
           className={join(
-            'nx:w-full nx:min-w-[480px] nx:border-collapse nx:typography-label-default',
+            'nx:w-full nx:border-collapse nx:typography-label-default',
             className
           )}
           {...props}
@@ -141,17 +142,21 @@ export function useMDXComponents(components: MDXComponents): MDXComponents {
     ),
     tr: ({ className, ...props }) => (
       <tr
-        className={join('nx:border-b nx:border-border-default', className)}
+        className={join(
+          'nx:border-b-default nx:border-border-default-alpha nx:[&:last-child]:border-0',
+          className
+        )}
         {...props}
       />
     ),
     // props stay after className so a `:---:` alignment row still wins:
     // hast-util-to-estree's tableCellAlignToStyle turns the cell's `align`
-    // into style={{textAlign}}, and an inline style outranks `nx:text-left`.
+    // into style={{textAlign}}, and an inline style outranks `nx:text-start`.
     th: ({ className, ...props }) => (
       <th
+        scope="col"
         className={join(
-          'nx:py-2 nx:pr-3 nx:text-left nx:font-semibold nx:text-foreground',
+          'nx:py-2 nx:pe-3 nx:text-start nx:font-semibold nx:text-foreground',
           className
         )}
         {...props}
@@ -160,7 +165,7 @@ export function useMDXComponents(components: MDXComponents): MDXComponents {
     td: ({ className, ...props }) => (
       <td
         className={join(
-          'nx:py-2 nx:pr-3 nx:align-top nx:text-muted-foreground',
+          'nx:py-2 nx:pe-3 nx:align-top nx:text-muted-foreground',
           className
         )}
         {...props}

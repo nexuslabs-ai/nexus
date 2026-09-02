@@ -157,3 +157,15 @@ createRoot(document.getElementById('root')!).render(
 Do not wait for a client effect to apply Appearance. The script needs to run
 before the first frame: in SSR `<head>` for Next, or in `transformIndexHtml` for
 Vite.
+
+## Check your setup
+
+Load the app and confirm each of these before moving on:
+
+- [x] `@nexus_ds/tailwind` and `@nexus_ds/react/styles.css` are both imported
+- [x] The provider wraps your tree, and the script runs in `<head>`
+- [ ] Reloading in dark mode produces no flash of the light theme[^flash]
+- [ ] Toggling the mode persists across a full page reload
+
+[^flash]: A flash means the script ran too late — it has to paint before the
+first frame, not from a client effect.
