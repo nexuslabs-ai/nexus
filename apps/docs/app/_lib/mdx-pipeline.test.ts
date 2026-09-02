@@ -1,9 +1,9 @@
 import { compile } from '@mdx-js/mdx';
-import { readFile } from 'node:fs/promises';
+import { readdir, readFile } from 'node:fs/promises';
 import { createRequire } from 'node:module';
 import path from 'node:path';
 import { fileURLToPath, pathToFileURL } from 'node:url';
-import { describe, expect, it } from 'vitest';
+import { describe, expect, it, vi } from 'vitest';
 
 import { MDX_OPTIONS } from '../../mdx-options';
 
@@ -11,8 +11,7 @@ const CONTENT_DIR = path.join(
   path.dirname(fileURLToPath(import.meta.url)),
   '..',
   '..',
-  'content',
-  path.sep
+  'content'
 );
 
 /**
@@ -31,8 +30,8 @@ const EXPECTED_HEADING_IDS: Record<string, string[]> = {
   ],
   'getting-started/theme-setup.mdx': [
     'theme-setup',
-    '1-import-the-styles',
-    '2-pick-a-default-appearance',
+    'import-the-styles',
+    'pick-a-default-appearance',
     'nextjs-app-router',
     'vite',
     'check-your-setup',
@@ -67,7 +66,23 @@ interface HastNode {
 
 // Mirrors @next/mdx's loader, which resolves plugin strings with
 // require.resolve from the directory of the .mdx file being compiled.
-const requireFromContent = createRequire(CONTENT_DIR);
+// createRequire takes the *file*, not the directory, and resolves from its parent.
+const requireFromContent = createRequire(path.join(CONTENT_DIR, 'page.mdx'));
+
+async function contentFiles() {
+  const entries = await readdir(CONTENT_DIR, {
+    withFileTypes: true,
+    recursive: true,
+  });
+  return entries
+    .filter((entry) => entry.isFile() && entry.name.endsWith('.mdx'))
+    .map((entry) =>
+      path
+        .relative(CONTENT_DIR, path.join(entry.parentPath, entry.name))
+        .split(path.sep)
+        .join('/')
+    );
+}
 
 async function loadPlugin(name: string) {
   const resolved = pathToFileURL(requireFromContent.resolve(name)).href;
@@ -96,7 +111,9 @@ async function compileMdx(source: string) {
     remarkRehypeOptions: MDX_OPTIONS.remarkRehypeOptions,
   });
 
-  const elements = collectElements(tree as HastNode);
+  if (!tree) throw new Error('capture plugin did not run');
+
+  const elements = collectElements(tree);
   return {
     headings: elements.filter((el) => /^h[1-6]$/.test(el.tagName ?? '')),
     ids: elements
@@ -115,6 +132,29 @@ describe('MDX heading ids', () => {
     ]) {
       expect(() => requireFromContent.resolve(name)).not.toThrow();
     }
+  });
+
+  it('ships MDX_OPTIONS to the loader through next.config', async () => {
+    // @next/mdx only emits turbopack.rules when TURBOPACK is set; the webpack
+    // branch buries the same loader object inside a config callback.
+    vi.stubEnv('TURBOPACK', '1');
+    const { default: config } = await import('../../next.config');
+    vi.unstubAllEnvs();
+
+    const rules = config.turbopack?.rules as
+      | Record<string, { loaders: { options: Record<string, unknown> }[] }>
+      | undefined;
+
+    expect(rules?.['#next-mdx']?.loaders[0]?.options).toMatchObject(
+      MDX_OPTIONS
+    );
+  });
+
+  it('pins every .mdx under content/', async () => {
+    const files = await contentFiles();
+
+    expect(files.length).toBeGreaterThan(0);
+    expect(files.sort()).toEqual(Object.keys(EXPECTED_HEADING_IDS).sort());
   });
 
   it.each(Object.entries(EXPECTED_HEADING_IDS))(
