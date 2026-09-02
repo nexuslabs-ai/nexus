@@ -5,12 +5,10 @@ import path from 'node:path';
 import { fileURLToPath, pathToFileURL } from 'node:url';
 import { describe, expect, it, vi } from 'vitest';
 
-import { MDX_OPTIONS } from '../../mdx-options';
+import { MDX_OPTIONS } from './mdx-options';
 
 const CONTENT_DIR = path.join(
   path.dirname(fileURLToPath(import.meta.url)),
-  '..',
-  '..',
   'content'
 );
 
@@ -138,8 +136,7 @@ describe('MDX heading ids', () => {
     // @next/mdx only emits turbopack.rules when TURBOPACK is set; the webpack
     // branch buries the same loader object inside a config callback.
     vi.stubEnv('TURBOPACK', '1');
-    const { default: config } = await import('../../next.config');
-    vi.unstubAllEnvs();
+    const { default: config } = await import('./next.config');
 
     const rules = config.turbopack?.rules as
       | Record<string, { loaders: { options: Record<string, unknown> }[] }>
@@ -168,6 +165,13 @@ describe('MDX heading ids', () => {
 
       expect(headings.map((h) => h.properties?.id)).toEqual(expected);
       expect(new Set(ids).size).toBe(ids.length);
+
+      for (const id of ids) {
+        expect(id).not.toBe('');
+        // A heading like "## 1. Foo" slugs to an id that native #hash
+        // navigation accepts but querySelector cannot parse.
+        expect(() => document.querySelector(`#${id}`)).not.toThrow();
+      }
     }
   );
 

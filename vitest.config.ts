@@ -53,7 +53,9 @@ export default defineConfig({
           name: 'unit',
           environment: 'jsdom',
           globals: true,
+          unstubEnvs: true,
           include: [
+            'apps/*/*.test.{ts,tsx}',
             'apps/**/app/**/*.test.{ts,tsx}',
             'apps/**/src/**/*.test.{ts,tsx}',
             'packages/**/src/**/*.test.{ts,tsx}',

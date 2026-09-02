@@ -6,7 +6,13 @@ import { useNexusAppearance } from '@nexus_ds/react/appearance';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 
-import { Button } from './nexus';
+import {
+  Button,
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from './nexus';
 import { SearchPalette } from './SearchPalette';
 
 const SECTIONS = [
@@ -38,6 +44,7 @@ export function TopNav() {
   const navRef = useRef<HTMLElement>(null);
   const { resolvedMode, setState } = useNexusAppearance();
   const isDark = resolvedMode === 'dark';
+  const currentSection = SECTIONS.find((s) => isActive(pathname, s.match));
 
   // Centre the current section in the horizontally scrolling link strip.
   useEffect(() => {
@@ -64,9 +71,34 @@ export function TopNav() {
           docs
         </span>
       </div>
+      <DropdownMenu>
+        <DropdownMenuTrigger asChild>
+          <Button
+            variant="ghost"
+            size="sm"
+            className="nx:lg:hidden"
+            aria-label="Browse sections"
+          >
+            ☰ {currentSection?.label ?? 'Sections'}
+          </Button>
+        </DropdownMenuTrigger>
+        <DropdownMenuContent align="start">
+          {SECTIONS.map((s) => (
+            <DropdownMenuItem key={s.href} asChild>
+              <Link
+                href={s.href}
+                aria-current={isActive(pathname, s.match) ? 'true' : undefined}
+              >
+                {s.label}
+              </Link>
+            </DropdownMenuItem>
+          ))}
+        </DropdownMenuContent>
+      </DropdownMenu>
       <nav
         ref={navRef}
-        className="nx:flex nx:gap-0.5 nx:flex-1 nx:min-w-0 nx:overflow-x-auto nx:py-1.5"
+        aria-label="Sections"
+        className="nx:hidden nx:lg:flex nx:gap-0.5 nx:flex-1 nx:min-w-0 nx:overflow-x-auto nx:py-1.5"
       >
         {SECTIONS.map((s) => {
           const active = isActive(pathname, s.match);
@@ -75,7 +107,7 @@ export function TopNav() {
               key={s.href}
               href={s.href}
               data-active={active}
-              aria-current={active ? 'page' : undefined}
+              aria-current={active ? 'true' : undefined}
               className={
                 active
                   ? `${NAV_LINK_BASE} nx:bg-nav-item-active nx:text-primary-subtle-foreground`
@@ -87,6 +119,7 @@ export function TopNav() {
           );
         })}
       </nav>
+      <div className="nx:flex-1 nx:lg:hidden" />
       <SearchPalette />
       <Button
         variant="ghost"

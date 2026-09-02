@@ -5,6 +5,9 @@ import { usePathname } from 'next/navigation';
 
 import type { Section } from '../_lib/sections';
 
+const RAIL_LINK_BASE =
+  'nx:block nx:px-2 nx:py-1 nx:typography-label-default nx:rounded-sm nx:border-l-2 nx:no-underline nx:focus-visible:outline-2 nx:focus-visible:outline-focus-default nx:focus-visible:outline-offset-(--focus-offset)';
+
 export function LeftRail({ section }: { section: Section }) {
   const pathname = usePathname();
   return (
@@ -20,10 +23,11 @@ export function LeftRail({ section }: { section: Section }) {
             <li key={sub.slug}>
               <Link
                 href={href}
+                aria-current={active ? 'page' : undefined}
                 className={
                   active
-                    ? 'nx:block nx:px-2 nx:py-1 nx:typography-label-default nx:rounded-sm nx:bg-primary-subtle nx:text-primary-subtle-foreground nx:border-l-2 nx:border-focus-default nx:no-underline'
-                    : 'nx:block nx:px-2 nx:py-1 nx:typography-label-default nx:rounded-sm nx:text-muted-foreground nx:border-l-2 nx:border-transparent nx:no-underline nx:hover:text-foreground nx:hover:bg-container-hover'
+                    ? `${RAIL_LINK_BASE} nx:bg-primary-subtle nx:text-primary-subtle-foreground nx:border-focus-default`
+                    : `${RAIL_LINK_BASE} nx:text-muted-foreground nx:border-transparent nx:hover:text-foreground nx:hover:bg-container-hover`
                 }
               >
                 {sub.label}
