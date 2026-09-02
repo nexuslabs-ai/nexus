@@ -80,19 +80,15 @@ export function useMDXComponents(components: MDXComponents): MDXComponents {
         {...props}
       />
     ),
+    // A GFM task list marks its items `task-list-item` and prepends a disabled
+    // checkbox. A tight list holds that input directly; a loose one wraps it in
+    // a `p`, so the checkbox is matched as a descendant rather than a child.
     li: ({ className, ...props }) => (
       <li
         className={join(
-          'nx:typography-body-default nx:[&.task-list-item]:list-none',
+          'nx:typography-body-default nx:[&.task-list-item]:list-none nx:[&.task-list-item_input]:me-2 nx:[&.task-list-item_input]:align-middle',
           className
         )}
-        {...props}
-      />
-    ),
-    // GFM task lists render a disabled checkbox ahead of the item text.
-    input: ({ className, ...props }) => (
-      <input
-        className={join('nx:me-2 nx:align-middle', className)}
         {...props}
       />
     ),
@@ -125,18 +121,18 @@ export function useMDXComponents(components: MDXComponents): MDXComponents {
         {...props}
       />
     ),
-    // tabIndex makes the overflow container reachable, so a wide table can be
-    // scrolled without a pointer.
     table: ({ className, ...props }) => (
       <div
-        className="nx:mb-4 nx:overflow-x-auto"
+        // A wide table overflows horizontally and holds no focusable children,
+        // so the container itself must be keyboard-focusable to scroll into
+        // view (axe scrollable-region-focusable / WCAG 2.1.1).
+        // eslint-disable-next-line jsx-a11y/no-noninteractive-tabindex
         tabIndex={0}
-        role="region"
-        aria-label="Table"
+        className="nx:mb-4 nx:overflow-x-auto nx:focus-visible:outline-2 nx:focus-visible:outline-focus-default nx:focus-visible:[outline-offset:-2px]"
       >
         <table
           className={join(
-            'nx:w-full nx:border-collapse nx:typography-label-default',
+            'nx:w-full nx:min-w-[480px] nx:border-collapse nx:typography-label-default',
             className
           )}
           {...props}
@@ -149,8 +145,9 @@ export function useMDXComponents(components: MDXComponents): MDXComponents {
         {...props}
       />
     ),
-    // props stay after className so a `:---:` alignment row, which arrives as
-    // an inline style, still wins.
+    // props stay after className so a `:---:` alignment row still wins:
+    // hast-util-to-estree's tableCellAlignToStyle turns the cell's `align`
+    // into style={{textAlign}}, and an inline style outranks `nx:text-left`.
     th: ({ className, ...props }) => (
       <th
         className={join(

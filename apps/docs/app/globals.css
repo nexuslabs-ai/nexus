@@ -13,9 +13,3 @@
    explicitly. Paths are relative to this file. */
 @source '../content';
 @source '../../../packages/react/src';
-
-/* remark-gfm labels its footnote section with an unprefixed `sr-only`; the
-   nx:-prefixed build emits no rule for that name, so define it here. */
-.sr-only {
-  @apply nx:sr-only;
-}

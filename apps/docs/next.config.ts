@@ -89,6 +89,11 @@ const nextConfig: NextConfig = {
 const withMDX = createMDX({
   options: {
     remarkPlugins: ['remark-gfm'],
+    // The footnote label is labelled `sr-only` by default, a bare name the
+    // nx:-prefixed build emits no rule for, so it would render visible.
+    remarkRehypeOptions: {
+      footnoteLabelProperties: { className: ['nx:sr-only'] },
+    },
   },
 });
 
