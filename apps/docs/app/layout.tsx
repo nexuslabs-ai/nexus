@@ -30,6 +30,7 @@ export default function RootLayout({
   return (
     <html
       lang="en"
+      className="nx:scroll-pt-20"
       data-density={DOCS_APPEARANCE_DEFAULT_STATE.density}
       data-radius={DOCS_APPEARANCE_DEFAULT_STATE.corners}
       data-shadow={DOCS_APPEARANCE_DEFAULT_STATE.elevation}

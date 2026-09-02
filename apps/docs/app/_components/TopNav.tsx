@@ -46,7 +46,7 @@ export function TopNav() {
           docs
         </span>
       </div>
-      <nav className="nx:flex nx:gap-0.5 nx:flex-1 nx:flex-wrap">
+      <nav className="nx:flex nx:gap-0.5 nx:flex-1 nx:min-w-0 nx:overflow-x-auto">
         {SECTIONS.map((s) => {
           const active = isActive(pathname, s.match);
           return (
@@ -55,8 +55,8 @@ export function TopNav() {
               href={s.href}
               className={
                 active
-                  ? 'nx:px-3 nx:py-1 nx:typography-label-default nx:rounded-sm nx:bg-nav-item-active nx:text-primary-subtle-foreground'
-                  : 'nx:px-3 nx:py-1 nx:typography-label-default nx:rounded-sm nx:text-nav-muted-foreground nx:hover:text-nav-foreground nx:hover:bg-nav-item-hover'
+                  ? 'nx:px-3 nx:py-1 nx:shrink-0 nx:typography-label-default nx:rounded-sm nx:bg-nav-item-active nx:text-primary-subtle-foreground'
+                  : 'nx:px-3 nx:py-1 nx:shrink-0 nx:typography-label-default nx:rounded-sm nx:text-nav-muted-foreground nx:hover:text-nav-foreground nx:hover:bg-nav-item-hover'
               }
             >
               {s.label}
