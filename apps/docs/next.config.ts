@@ -3,6 +3,7 @@ import type { NextConfig } from 'next';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 
+import { MDX_OPTIONS } from './mdx-options';
 import { DOCS_APPEARANCE_BOOTSTRAP_CSP_HASH } from './theme-csp';
 
 const SCRIPT_SRC = [
@@ -84,13 +85,6 @@ const nextConfig: NextConfig = {
   },
 };
 
-const withMDX = createMDX({
-  options: {
-    remarkPlugins: ['remark-gfm'],
-    remarkRehypeOptions: {
-      footnoteLabelProperties: { className: ['nx:sr-only'] },
-    },
-  },
-});
+const withMDX = createMDX({ options: MDX_OPTIONS });
 
 export default withMDX(nextConfig);
