@@ -33,10 +33,17 @@ export function TopNav() {
   const pathname = usePathname();
   const navRef = useRef<HTMLElement>(null);
   const menuRef = useRef<HTMLElement>(null);
+  const triggerRef = useRef<HTMLButtonElement>(null);
   const [menuOpen, setMenuOpen] = useState(false);
   const { resolvedMode, setState } = useNexusAppearance();
   const isDark = resolvedMode === 'dark';
-  const currentLink = NAV_LINKS.find((s) => isActive(pathname, s.match));
+  const currentLink = NAV_LINKS.find((link) => isActive(pathname, link.match));
+
+  // Tabbing off the last row leaves the panel open over the page otherwise.
+  const closeOnFocusLeave = (event: React.FocusEvent<HTMLElement>) => {
+    if (event.currentTarget.contains(event.relatedTarget)) return;
+    setMenuOpen(false);
+  };
 
   useEffect(() => {
     if (!menuOpen) return;
@@ -47,7 +54,9 @@ export function TopNav() {
     };
 
     const closeOnEscape = (event: KeyboardEvent) => {
-      if (event.key === 'Escape') setMenuOpen(false);
+      if (event.key !== 'Escape') return;
+      triggerRef.current?.focus();
+      setMenuOpen(false);
     };
 
     document.addEventListener('pointerdown', closeOnOutsidePointer);
@@ -86,9 +95,11 @@ export function TopNav() {
       <nav
         ref={menuRef}
         aria-label="Sections"
+        onBlur={closeOnFocusLeave}
         className="nx:relative nx:flex-1 nx:xl:hidden"
       >
         <Button
+          ref={triggerRef}
           variant="ghost"
           size="sm"
           aria-expanded={menuOpen}
@@ -99,22 +110,22 @@ export function TopNav() {
           {currentLink?.label ?? 'Sections'}
         </Button>
         {menuOpen && (
-          <ul className="nx:absolute nx:top-full nx:left-0 nx:mt-1 nx:z-popover nx:min-w-48 nx:list-none nx:m-0 nx:flex nx:flex-col nx:gap-0.5 nx:p-1 nx:rounded-md nx:border nx:border-nav-border nx:bg-nav-background nx:shadow-lg">
-            {NAV_LINKS.map((s) => {
-              const active = isActive(pathname, s.match);
+          <ul className="nx:absolute nx:top-full nx:left-0 nx:mt-1 nx:z-popover nx:min-w-48 nx:max-h-[70svh] nx:overflow-y-auto nx:list-none nx:m-0 nx:flex nx:flex-col nx:gap-0.5 nx:p-1 nx:rounded-md nx:border nx:border-border-default nx:bg-popover nx:text-popover-foreground nx:shadow-lg">
+            {NAV_LINKS.map((link) => {
+              const active = isActive(pathname, link.match);
               return (
-                <li key={s.href}>
+                <li key={link.href}>
                   <Link
-                    href={s.href}
+                    href={link.href}
                     onClick={() => setMenuOpen(false)}
                     aria-current={active ? 'true' : undefined}
                     className={
                       active
-                        ? `${NAV_LINK_BASE} nx:block nx:font-semibold nx:bg-nav-item-active nx:text-primary-subtle-foreground`
-                        : `${NAV_LINK_BASE} nx:block nx:text-nav-muted-foreground nx:hover:text-nav-foreground nx:hover:bg-nav-item-hover`
+                        ? `${NAV_LINK_BASE} nx:block nx:border-l-2 nx:border-focus-default nx:font-semibold nx:bg-primary-subtle nx:text-primary-subtle-foreground`
+                        : `${NAV_LINK_BASE} nx:block nx:border-l-2 nx:border-transparent nx:hover:bg-popover-hover`
                     }
                   >
-                    {s.label}
+                    {link.label}
                   </Link>
                 </li>
               );
@@ -127,12 +138,12 @@ export function TopNav() {
         aria-label="Sections"
         className="nx:hidden nx:xl:flex nx:gap-0.5 nx:flex-1 nx:min-w-0 nx:overflow-x-auto nx:py-1.5"
       >
-        {NAV_LINKS.map((s) => {
-          const active = isActive(pathname, s.match);
+        {NAV_LINKS.map((link) => {
+          const active = isActive(pathname, link.match);
           return (
             <Link
-              key={s.href}
-              href={s.href}
+              key={link.href}
+              href={link.href}
               data-active={active}
               aria-current={active ? 'true' : undefined}
               className={
@@ -141,7 +152,7 @@ export function TopNav() {
                   : `${NAV_LINK_BASE} nx:text-nav-muted-foreground nx:hover:text-nav-foreground nx:hover:bg-nav-item-hover`
               }
             >
-              {s.label}
+              {link.label}
             </Link>
           );
         })}
