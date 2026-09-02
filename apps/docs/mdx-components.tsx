@@ -65,7 +65,7 @@ export function useMDXComponents(components: MDXComponents): MDXComponents {
     ul: ({ className, ...props }) => (
       <ul
         className={join(
-          'nx:list-disc nx:pl-6 nx:mb-4 nx:flex nx:flex-col nx:gap-1 nx:text-muted-foreground',
+          'nx:list-disc nx:ps-6 nx:mb-4 nx:flex nx:flex-col nx:gap-1 nx:text-muted-foreground',
           className
         )}
         {...props}
@@ -74,7 +74,7 @@ export function useMDXComponents(components: MDXComponents): MDXComponents {
     ol: ({ className, ...props }) => (
       <ol
         className={join(
-          'nx:list-decimal nx:pl-6 nx:mb-4 nx:flex nx:flex-col nx:gap-1 nx:text-muted-foreground',
+          'nx:list-decimal nx:ps-6 nx:mb-4 nx:flex nx:flex-col nx:gap-1 nx:text-muted-foreground',
           className
         )}
         {...props}
@@ -122,6 +122,9 @@ export function useMDXComponents(components: MDXComponents): MDXComponents {
         {...props}
       />
     ),
+    // The last-row border reset is scoped to `tbody` on the table rather than
+    // set on `tr`: a header row is the only child of its `thead`, so a bare
+    // `:last-child` would strip the header underline too.
     table: ({ className, ...props }) => (
       <div
         // A wide table overflows horizontally and holds no focusable children,
@@ -133,7 +136,7 @@ export function useMDXComponents(components: MDXComponents): MDXComponents {
       >
         <table
           className={join(
-            'nx:w-full nx:border-collapse nx:typography-label-default',
+            'nx:w-full nx:border-collapse nx:typography-label-default nx:[&_tbody_tr:last-child]:border-0',
             className
           )}
           {...props}
@@ -143,7 +146,7 @@ export function useMDXComponents(components: MDXComponents): MDXComponents {
     tr: ({ className, ...props }) => (
       <tr
         className={join(
-          'nx:border-b-default nx:border-border-default-alpha nx:[&:last-child]:border-0',
+          'nx:border-b-default nx:border-border-default-alpha',
           className
         )}
         {...props}
