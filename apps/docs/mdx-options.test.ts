@@ -120,6 +120,8 @@ async function compileMdx(source: string) {
   };
 }
 
+const CONTENT_FILES = await contentFiles();
+
 describe('MDX heading ids', () => {
   it('registers rehype-slug where the loader can resolve it', () => {
     expect(MDX_OPTIONS.rehypePlugins).toContain('rehype-slug');
@@ -161,9 +163,22 @@ describe('MDX heading ids', () => {
         path.join(CONTENT_DIR, contentPath),
         'utf8'
       );
-      const { headings, ids } = await compileMdx(source);
+      const { headings } = await compileMdx(source);
 
       expect(headings.map((h) => h.properties?.id)).toEqual(expected);
+    }
+  );
+
+  it.each(CONTENT_FILES)(
+    'gives %s unique, addressable heading ids',
+    async (contentPath) => {
+      const source = await readFile(
+        path.join(CONTENT_DIR, contentPath),
+        'utf8'
+      );
+      const { headings, ids } = await compileMdx(source);
+
+      expect(headings.length).toBeGreaterThan(0);
       expect(new Set(ids).size).toBe(ids.length);
 
       for (const id of ids) {

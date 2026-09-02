@@ -2,32 +2,28 @@
 
 import { useEffect, useRef } from 'react';
 
-import { useNexusAppearance } from '@nexus_ds/react/appearance';
-import Link from 'next/link';
-import { usePathname } from 'next/navigation';
-
 import {
-  Button,
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
-} from './nexus';
+} from '@nexus_ds/react';
+import { useNexusAppearance } from '@nexus_ds/react/appearance';
+import Link from 'next/link';
+import { usePathname } from 'next/navigation';
+
+import { SECTIONS } from '../_lib/sections';
+
+import { Button } from './nexus';
 import { SearchPalette } from './SearchPalette';
 
-const SECTIONS = [
+const NAV_LINKS = [
   { href: '/', label: 'Home', match: '/' },
-  {
-    href: '/getting-started',
-    label: 'Getting Started',
-    match: '/getting-started',
-  },
-  { href: '/foundations', label: 'Foundations', match: '/foundations' },
-  { href: '/components', label: 'Components', match: '/components' },
-  { href: '/theming', label: 'Theming', match: '/theming' },
-  { href: '/tools', label: 'Tools', match: '/tools' },
-  { href: '/guidance', label: 'Guidance', match: '/guidance' },
-  { href: '/agents', label: 'For AI agents', match: '/agents' },
+  ...Object.values(SECTIONS).map((section) => ({
+    href: section.href,
+    label: section.title,
+    match: section.href,
+  })),
   { href: '/changelog', label: 'Changelog', match: '/changelog' },
 ];
 
@@ -44,7 +40,7 @@ export function TopNav() {
   const navRef = useRef<HTMLElement>(null);
   const { resolvedMode, setState } = useNexusAppearance();
   const isDark = resolvedMode === 'dark';
-  const currentSection = SECTIONS.find((s) => isActive(pathname, s.match));
+  const currentSection = NAV_LINKS.find((s) => isActive(pathname, s.match));
 
   // Centre the current section in the horizontally scrolling link strip.
   useEffect(() => {
@@ -71,36 +67,44 @@ export function TopNav() {
           docs
         </span>
       </div>
-      <DropdownMenu>
-        <DropdownMenuTrigger asChild>
-          <Button
-            variant="ghost"
-            size="sm"
-            className="nx:lg:hidden"
-            aria-label="Browse sections"
-          >
-            ☰ {currentSection?.label ?? 'Sections'}
-          </Button>
-        </DropdownMenuTrigger>
-        <DropdownMenuContent align="start">
-          {SECTIONS.map((s) => (
-            <DropdownMenuItem key={s.href} asChild>
-              <Link
-                href={s.href}
-                aria-current={isActive(pathname, s.match) ? 'true' : undefined}
-              >
-                {s.label}
-              </Link>
-            </DropdownMenuItem>
-          ))}
-        </DropdownMenuContent>
-      </DropdownMenu>
+      <nav aria-label="Sections" className="nx:flex-1 nx:xl:hidden">
+        <DropdownMenu>
+          <DropdownMenuTrigger asChild>
+            <Button
+              variant="ghost"
+              size="sm"
+              className="nx:relative nx:pointer-coarse:after:absolute nx:pointer-coarse:after:-inset-2"
+            >
+              <span aria-hidden="true">☰</span>
+              {currentSection?.label ?? 'Sections'}
+            </Button>
+          </DropdownMenuTrigger>
+          <DropdownMenuContent align="start">
+            {NAV_LINKS.map((s) => {
+              const active = isActive(pathname, s.match);
+              return (
+                <DropdownMenuItem key={s.href} asChild>
+                  <Link
+                    href={s.href}
+                    aria-current={active ? 'true' : undefined}
+                    className={
+                      active ? 'nx:text-primary-subtle-foreground' : undefined
+                    }
+                  >
+                    {s.label}
+                  </Link>
+                </DropdownMenuItem>
+              );
+            })}
+          </DropdownMenuContent>
+        </DropdownMenu>
+      </nav>
       <nav
         ref={navRef}
         aria-label="Sections"
-        className="nx:hidden nx:lg:flex nx:gap-0.5 nx:flex-1 nx:min-w-0 nx:overflow-x-auto nx:py-1.5"
+        className="nx:hidden nx:xl:flex nx:gap-0.5 nx:flex-1 nx:min-w-0 nx:overflow-x-auto nx:py-1.5"
       >
-        {SECTIONS.map((s) => {
+        {NAV_LINKS.map((s) => {
           const active = isActive(pathname, s.match);
           return (
             <Link
@@ -119,7 +123,6 @@ export function TopNav() {
           );
         })}
       </nav>
-      <div className="nx:flex-1 nx:lg:hidden" />
       <SearchPalette />
       <Button
         variant="ghost"
