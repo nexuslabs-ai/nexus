@@ -1,13 +1,7 @@
 'use client';
 
-import { useEffect, useRef } from 'react';
+import { useEffect, useRef, useState } from 'react';
 
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from '@nexus_ds/react';
 import { useNexusAppearance } from '@nexus_ds/react/appearance';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
@@ -38,9 +32,31 @@ function isActive(pathname: string, match: string) {
 export function TopNav() {
   const pathname = usePathname();
   const navRef = useRef<HTMLElement>(null);
+  const menuRef = useRef<HTMLElement>(null);
+  const [menuOpen, setMenuOpen] = useState(false);
   const { resolvedMode, setState } = useNexusAppearance();
   const isDark = resolvedMode === 'dark';
-  const currentSection = NAV_LINKS.find((s) => isActive(pathname, s.match));
+  const currentLink = NAV_LINKS.find((s) => isActive(pathname, s.match));
+
+  useEffect(() => {
+    if (!menuOpen) return;
+
+    const closeOnOutsidePointer = (event: PointerEvent) => {
+      if (menuRef.current?.contains(event.target as Node)) return;
+      setMenuOpen(false);
+    };
+
+    const closeOnEscape = (event: KeyboardEvent) => {
+      if (event.key === 'Escape') setMenuOpen(false);
+    };
+
+    document.addEventListener('pointerdown', closeOnOutsidePointer);
+    document.addEventListener('keydown', closeOnEscape);
+    return () => {
+      document.removeEventListener('pointerdown', closeOnOutsidePointer);
+      document.removeEventListener('keydown', closeOnEscape);
+    };
+  }, [menuOpen]);
 
   // Centre the current section in the horizontally scrolling link strip.
   useEffect(() => {
@@ -67,37 +83,44 @@ export function TopNav() {
           docs
         </span>
       </div>
-      <nav aria-label="Sections" className="nx:flex-1 nx:xl:hidden">
-        <DropdownMenu>
-          <DropdownMenuTrigger asChild>
-            <Button
-              variant="ghost"
-              size="sm"
-              className="nx:relative nx:pointer-coarse:after:absolute nx:pointer-coarse:after:-inset-2"
-            >
-              <span aria-hidden="true">☰</span>
-              {currentSection?.label ?? 'Sections'}
-            </Button>
-          </DropdownMenuTrigger>
-          <DropdownMenuContent align="start">
+      <nav
+        ref={menuRef}
+        aria-label="Sections"
+        className="nx:relative nx:flex-1 nx:xl:hidden"
+      >
+        <Button
+          variant="ghost"
+          size="sm"
+          aria-expanded={menuOpen}
+          onClick={() => setMenuOpen((open) => !open)}
+          className="nx:relative nx:pointer-coarse:after:absolute nx:pointer-coarse:after:-inset-2"
+        >
+          <span aria-hidden="true">☰</span>
+          {currentLink?.label ?? 'Sections'}
+        </Button>
+        {menuOpen && (
+          <ul className="nx:absolute nx:top-full nx:left-0 nx:mt-1 nx:z-popover nx:min-w-48 nx:list-none nx:m-0 nx:flex nx:flex-col nx:gap-0.5 nx:p-1 nx:rounded-md nx:border nx:border-nav-border nx:bg-nav-background nx:shadow-lg">
             {NAV_LINKS.map((s) => {
               const active = isActive(pathname, s.match);
               return (
-                <DropdownMenuItem key={s.href} asChild>
+                <li key={s.href}>
                   <Link
                     href={s.href}
+                    onClick={() => setMenuOpen(false)}
                     aria-current={active ? 'true' : undefined}
                     className={
-                      active ? 'nx:text-primary-subtle-foreground' : undefined
+                      active
+                        ? `${NAV_LINK_BASE} nx:block nx:font-semibold nx:bg-nav-item-active nx:text-primary-subtle-foreground`
+                        : `${NAV_LINK_BASE} nx:block nx:text-nav-muted-foreground nx:hover:text-nav-foreground nx:hover:bg-nav-item-hover`
                     }
                   >
                     {s.label}
                   </Link>
-                </DropdownMenuItem>
+                </li>
               );
             })}
-          </DropdownMenuContent>
-        </DropdownMenu>
+          </ul>
+        )}
       </nav>
       <nav
         ref={navRef}
@@ -129,6 +152,7 @@ export function TopNav() {
         size="sm"
         onClick={toggleMode}
         aria-label={isDark ? 'Switch to light mode' : 'Switch to dark mode'}
+        className="nx:relative nx:pointer-coarse:after:absolute nx:pointer-coarse:after:-inset-2"
       >
         {isDark ? '☀' : '◐'}
       </Button>

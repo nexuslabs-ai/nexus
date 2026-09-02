@@ -149,11 +149,11 @@ describe('MDX heading ids', () => {
     );
   });
 
-  it('pins every .mdx under content/', async () => {
-    const files = await contentFiles();
-
-    expect(files.length).toBeGreaterThan(0);
-    expect(files.sort()).toEqual(Object.keys(EXPECTED_HEADING_IDS).sort());
+  it('pins every .mdx under content/', () => {
+    expect(CONTENT_FILES.length).toBeGreaterThan(0);
+    expect([...CONTENT_FILES].sort()).toEqual(
+      Object.keys(EXPECTED_HEADING_IDS).sort()
+    );
   });
 
   it.each(Object.entries(EXPECTED_HEADING_IDS))(
