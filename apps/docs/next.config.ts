@@ -84,8 +84,13 @@ const nextConfig: NextConfig = {
   },
 };
 
-// No remark/rehype plugins yet — keeps dev (Turbopack) happy. When GFM tables
-// or heading anchors are needed, add them as string-named plugins.
-const withMDX = createMDX({});
+const withMDX = createMDX({
+  options: {
+    remarkPlugins: ['remark-gfm'],
+    remarkRehypeOptions: {
+      footnoteLabelProperties: { className: ['nx:sr-only'] },
+    },
+  },
+});
 
 export default withMDX(nextConfig);
