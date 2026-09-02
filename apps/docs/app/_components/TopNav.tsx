@@ -40,7 +40,10 @@ export function TopNav() {
   const currentLink = NAV_LINKS.find((link) => isActive(pathname, link.match));
 
   // Tabbing off the last row leaves the panel open over the page otherwise.
+  // A null relatedTarget is focus leaving the document rather than moving on,
+  // which closeOnOutsidePointer already covers.
   const closeOnFocusLeave = (event: React.FocusEvent<HTMLElement>) => {
+    if (!event.relatedTarget) return;
     if (event.currentTarget.contains(event.relatedTarget)) return;
     setMenuOpen(false);
   };
