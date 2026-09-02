@@ -1,0 +1,1589 @@
+<title>Nexus Design System</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap">
+<style>
+  /* ── Nexus's own shipped tokens. Values copied verbatim from
+     packages/tailwind/nexus.css (surfaceTone: stone, brand #0a0a0a). ── */
+  :root {
+    --bg:            oklch(1 0 0);
+    --surface:       oklch(0.9879 0.0081 70);
+    --surface-2:     oklch(0.9698 0.0083 70);
+    --surface-3:     oklch(0.9451 0.0086 70);
+    --ink:           oklch(0.1448 0 0 / 0.9098);
+    --ink-muted:     oklch(0.1448 0 0 / 0.6275);
+    --ink-subtle:    oklch(0.1448 0 0 / 0.502);
+    --rule:          oklch(0.1448 0 0 / 0.0941);
+    --rule-strong:   oklch(0.1448 0 0 / 0.2);
+    --accent:        oklch(0.1448 0 0);
+    --accent-ink:    oklch(1 0 0);
+
+    --sig-1: oklch(0.52 0.1168 186.391);
+    --sig-2: oklch(0.61 0.1871 131.589);
+    --sig-3: oklch(0.62 0.2044 41.116);
+    --sig-4: oklch(0.58 0.2489 17.585);
+    --sig-5: oklch(0.49 0.2912 276.966);
+
+    --font-ui: 'Archivo', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    --font-mono: 'IBM Plex Mono', ui-monospace, 'SF Mono', Menlo, monospace;
+
+    --frame: 1180px;
+    --prose: 68ch;
+  }
+
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --bg:          oklch(0.2161 0.006 70);
+      --surface:     oklch(0.2481 0.006 70);
+      --surface-2:   oklch(0.2801 0.006 70);
+      --surface-3:   oklch(0.3121 0.006 70);
+      --ink:         oklch(1 0 0 / 0.9098);
+      --ink-muted:   oklch(1 0 0 / 0.6275);
+      --ink-subtle:  oklch(1 0 0 / 0.502);
+      --rule:        oklch(1 0 0 / 0.12);
+      --rule-strong: oklch(1 0 0 / 0.24);
+      --accent:      oklch(1 0 0);
+      --accent-ink:  oklch(0.1448 0 0);
+
+      --sig-1: oklch(0.9 0.1682 180.426);
+      --sig-2: oklch(0.93 0.2278 124.321);
+      --sig-3: oklch(0.91 0.0819 70.697);
+      --sig-4: oklch(0.885 0.0771 10.001);
+      --sig-5: oklch(0.865 0.069 274.039);
+    }
+  }
+
+  :root[data-theme="dark"] {
+    --bg:          oklch(0.2161 0.006 70);
+    --surface:     oklch(0.2481 0.006 70);
+    --surface-2:   oklch(0.2801 0.006 70);
+    --surface-3:   oklch(0.3121 0.006 70);
+    --ink:         oklch(1 0 0 / 0.9098);
+    --ink-muted:   oklch(1 0 0 / 0.6275);
+    --ink-subtle:  oklch(1 0 0 / 0.502);
+    --rule:        oklch(1 0 0 / 0.12);
+    --rule-strong: oklch(1 0 0 / 0.24);
+    --accent:      oklch(1 0 0);
+    --accent-ink:  oklch(0.1448 0 0);
+
+    --sig-1: oklch(0.9 0.1682 180.426);
+    --sig-2: oklch(0.93 0.2278 124.321);
+    --sig-3: oklch(0.91 0.0819 70.697);
+    --sig-4: oklch(0.885 0.0771 10.001);
+    --sig-5: oklch(0.865 0.069 274.039);
+  }
+
+  * { box-sizing: border-box; }
+
+  body {
+    background: var(--bg);
+    color: var(--ink);
+    font-family: var(--font-ui);
+    font-size: 16px;
+    line-height: 1.6;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+
+  ::selection { background: var(--accent); color: var(--accent-ink); }
+
+  a { color: inherit; }
+  a:focus-visible, button:focus-visible {
+    outline: 2px solid var(--accent);
+    outline-offset: 2px;
+  }
+
+  /* ── Frame ─────────────────────────────────────────────── */
+  .frame { max-width: var(--frame); margin: 0 auto; padding: 0 28px; }
+  .prose { max-width: var(--prose); }
+
+  /* ── Sticky rail ───────────────────────────────────────── */
+  .rail {
+    position: sticky; top: 0; z-index: 30;
+    background: var(--bg);
+    background: color-mix(in oklab, var(--bg) 88%, transparent);
+    backdrop-filter: blur(12px);
+    border-bottom: 1px solid var(--rule);
+  }
+  .rail-in {
+    max-width: var(--frame); margin: 0 auto; padding: 0 28px;
+    height: 52px; display: flex; align-items: center; gap: 24px;
+  }
+  .rail-mark {
+    font-weight: 700; letter-spacing: -0.02em; font-size: 15px;
+    display: flex; align-items: center; gap: 9px; flex: none;
+  }
+  .rail-dot { width: 9px; height: 9px; background: var(--accent); flex: none; }
+  .rail-nav {
+    display: flex; gap: 18px; overflow-x: auto; scrollbar-width: none;
+    font-family: var(--font-mono); font-size: 11.5px; letter-spacing: 0.06em;
+    text-transform: uppercase; color: var(--ink-muted);
+  }
+  .rail-nav::-webkit-scrollbar { display: none; }
+  .rail-nav a { text-decoration: none; white-space: nowrap; padding: 4px 0; border-bottom: 1px solid transparent; }
+  .rail-nav a:hover { color: var(--ink); border-bottom-color: var(--accent); }
+
+  /* ── Hero ──────────────────────────────────────────────── */
+  .hero { padding: 76px 0 56px; border-bottom: 1px solid var(--rule); }
+  .eyebrow {
+    font-family: var(--font-mono); font-size: 11.5px; font-weight: 500;
+    letter-spacing: 0.14em; text-transform: uppercase; color: var(--ink-subtle);
+  }
+  h1 {
+    font-size: clamp(38px, 6.4vw, 68px); line-height: 1.02; font-weight: 700;
+    letter-spacing: -0.035em; margin: 22px 0 0; text-wrap: balance; max-width: 15ch;
+  }
+  h1 em { font-style: normal; color: var(--ink-subtle); }
+  .lede {
+    margin: 26px 0 0; font-size: 19px; line-height: 1.55; max-width: 60ch;
+    color: var(--ink-muted); text-wrap: pretty;
+  }
+  .lede strong { color: var(--ink); font-weight: 600; }
+
+  /* ── Stat strip ────────────────────────────────────────── */
+  .stats {
+    display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+    border-top: 1px solid var(--rule); margin-top: 48px;
+  }
+  .stat { padding: 20px 20px 20px 0; border-right: 1px solid var(--rule); }
+  .stat:last-child { border-right: 0; }
+  .stat-n {
+    font-family: var(--font-mono); font-size: 26px; font-weight: 500;
+    letter-spacing: -0.03em; font-variant-numeric: tabular-nums; line-height: 1;
+  }
+  .stat-l {
+    margin-top: 8px; font-size: 12.5px; line-height: 1.35; color: var(--ink-muted);
+  }
+
+  /* ── Sections ──────────────────────────────────────────── */
+  section { padding: 72px 0; border-bottom: 1px solid var(--rule); }
+  section:last-of-type { border-bottom: 0; }
+  .sec-head { margin-bottom: 36px; }
+  h2 {
+    font-size: clamp(26px, 3.4vw, 38px); line-height: 1.08; font-weight: 700;
+    letter-spacing: -0.028em; margin: 12px 0 0; text-wrap: balance; max-width: 22ch;
+  }
+  .sec-sub { margin: 16px 0 0; color: var(--ink-muted); font-size: 16.5px; max-width: var(--prose); text-wrap: pretty; }
+  h3 {
+    font-size: 19px; font-weight: 600; letter-spacing: -0.015em;
+    margin: 44px 0 12px; text-wrap: balance;
+  }
+  h4 {
+    font-family: var(--font-mono); font-size: 12px; font-weight: 600;
+    letter-spacing: 0.1em; text-transform: uppercase; color: var(--ink-subtle);
+    margin: 0 0 14px;
+  }
+  p { margin: 0 0 16px; text-wrap: pretty; }
+  p:last-child { margin-bottom: 0; }
+
+  /* ── Failure list ──────────────────────────────────────── */
+  .fails { display: grid; gap: 0; border-top: 1px solid var(--rule); }
+  .fail {
+    display: grid; grid-template-columns: 44px 1fr; gap: 20px;
+    padding: 22px 0; border-bottom: 1px solid var(--rule); align-items: start;
+  }
+  .fail-k {
+    font-family: var(--font-mono); font-size: 12px; color: var(--ink-subtle);
+    padding-top: 3px; font-variant-numeric: tabular-nums;
+  }
+  .fail-t { font-weight: 600; font-size: 16.5px; letter-spacing: -0.01em; }
+  .fail-b { margin-top: 6px; color: var(--ink-muted); font-size: 15px; max-width: 76ch; }
+
+  /* ── Panels ────────────────────────────────────────────── */
+  .panel {
+    border: 1px solid var(--rule); background: var(--surface);
+    padding: 24px; margin: 28px 0;
+  }
+  .panel-flush { padding: 0; overflow-x: auto; }
+  .panel-note {
+    font-size: 13.5px; color: var(--ink-muted); margin: 14px 0 0;
+    padding-top: 14px; border-top: 1px solid var(--rule); max-width: 84ch;
+  }
+
+  /* ── Code ──────────────────────────────────────────────── */
+  pre {
+    font-family: var(--font-mono); font-size: 12.5px; line-height: 1.75;
+    margin: 0; overflow-x: auto; color: var(--ink);
+    padding: 20px; background: var(--surface); border: 1px solid var(--rule);
+    tab-size: 2;
+  }
+  pre.bare { border: 0; background: transparent; padding: 0; }
+  code { font-family: var(--font-mono); font-size: 0.88em; }
+  p code, li code, td code, .fail-b code {
+    background: var(--surface-2); padding: 1px 5px; border: 1px solid var(--rule);
+  }
+  .c-dim { color: var(--ink-subtle); }
+  .c-key { color: var(--sig-5); }
+  .c-val { color: var(--sig-1); }
+  .c-str { color: var(--sig-2); }
+
+  /* ── Tables ────────────────────────────────────────────── */
+  .tbl-wrap { overflow-x: auto; margin: 24px 0; border: 1px solid var(--rule); }
+  table { border-collapse: collapse; width: 100%; font-size: 14px; min-width: 560px; }
+  th {
+    text-align: left; font-family: var(--font-mono); font-size: 11px;
+    font-weight: 600; letter-spacing: 0.1em; text-transform: uppercase;
+    color: var(--ink-subtle); padding: 12px 16px; border-bottom: 1px solid var(--rule-strong);
+    background: var(--surface); white-space: nowrap;
+  }
+  td { padding: 11px 16px; border-bottom: 1px solid var(--rule); vertical-align: top; }
+  tr:last-child td { border-bottom: 0; }
+  td.mono, th.mono { font-family: var(--font-mono); font-size: 12.5px; font-variant-numeric: tabular-nums; white-space: nowrap; }
+  td.dim { color: var(--ink-muted); }
+
+  /* ── Layer stack ───────────────────────────────────────── */
+  .layer { border-top: 1px solid var(--rule-strong); padding: 34px 0 8px; }
+  .layer-head { display: flex; align-items: baseline; gap: 16px; flex-wrap: wrap; }
+  .layer-n {
+    font-family: var(--font-mono); font-size: 12px; font-weight: 600;
+    letter-spacing: 0.1em; color: var(--accent);
+    border: 1px solid var(--rule-strong); padding: 3px 8px;
+  }
+  .layer-t { font-size: 23px; font-weight: 700; letter-spacing: -0.022em; }
+  .layer-meta { font-family: var(--font-mono); font-size: 12px; color: var(--ink-subtle); margin-left: auto; }
+  .layer-b { margin-top: 14px; color: var(--ink-muted); max-width: var(--prose); }
+  .layer-b strong { color: var(--ink); font-weight: 600; }
+
+  /* ── Ramp specimen ─────────────────────────────────────── */
+  .ramp { display: grid; grid-template-columns: 92px 1fr; gap: 14px; align-items: center; margin-bottom: 8px; }
+  .ramp-name { font-family: var(--font-mono); font-size: 12px; color: var(--ink-muted); }
+  .ramp-cells { display: grid; grid-template-columns: repeat(11, 1fr); gap: 2px; }
+  .ramp-cell { height: 40px; border: 1px solid var(--rule); }
+  .ramp-axis {
+    display: grid; grid-template-columns: repeat(11, 1fr); gap: 2px;
+    font-family: var(--font-mono); font-size: 10px; color: var(--ink-subtle);
+    text-align: center; margin-top: 6px; font-variant-numeric: tabular-nums;
+  }
+  .ramp-grid-row {
+    display: grid; grid-template-columns: repeat(11, 1fr); gap: 2px;
+    font-family: var(--font-mono); font-size: 10.5px; color: var(--ink);
+    text-align: center; font-variant-numeric: tabular-nums;
+    padding: 8px 0; border-top: 1px solid var(--rule-strong); margin-top: 8px;
+  }
+
+  /* ── Token specimen grid ───────────────────────────────── */
+  .spec { display: grid; grid-template-columns: repeat(auto-fill, minmax(232px, 1fr)); gap: 0; }
+  .spec-cell { border-right: 1px solid var(--rule); border-bottom: 1px solid var(--rule); padding: 14px 16px; }
+  .spec-chips { display: flex; gap: 0; margin-bottom: 10px; border: 1px solid var(--rule); }
+  .chip { flex: 1; height: 34px; border-right: 1px solid var(--rule); display: flex; align-items: flex-end; justify-content: flex-start; padding: 3px 5px; }
+  .chip span { font-family: var(--font-mono); font-size: 9px; letter-spacing: 0.08em; opacity: 0.65; }
+  .chip:last-child { border-right: 0; }
+  .spec-name { font-family: var(--font-mono); font-size: 12px; font-weight: 500; }
+  .spec-vals { font-family: var(--font-mono); font-size: 10.5px; color: var(--ink-subtle); margin-top: 5px; line-height: 1.6; }
+
+  /* ── Diagram ───────────────────────────────────────────── */
+  .diagram { margin: 8px 0 0; }
+  .diagram svg { display: block; width: 100%; height: auto; }
+
+  /* ── Split ─────────────────────────────────────────────── */
+  .split { display: grid; grid-template-columns: 1fr 1fr; gap: 0; border: 1px solid var(--rule); margin: 28px 0; }
+  .split > div { padding: 22px 24px; }
+  .split > div:first-child { border-right: 1px solid var(--rule); }
+  @media (max-width: 760px) {
+    .split { grid-template-columns: 1fr; }
+    .split > div:first-child { border-right: 0; border-bottom: 1px solid var(--rule); }
+  }
+
+  /* ── Bars (density / radius / stroke demos) ────────────── */
+  .modes { display: grid; grid-template-columns: repeat(auto-fit, minmax(128px, 1fr)); gap: 0; border: 1px solid var(--rule); }
+  .mode { padding: 18px 16px; border-right: 1px solid var(--rule); }
+  .mode:last-child { border-right: 0; }
+  .mode-l { font-family: var(--font-mono); font-size: 11px; letter-spacing: 0.08em; text-transform: uppercase; color: var(--ink-subtle); }
+  .mode-v { font-family: var(--font-mono); font-size: 15px; margin-top: 5px; font-variant-numeric: tabular-nums; }
+  .mode-demo { margin-top: 12px; height: 42px; background: var(--surface-2); border: 1px solid var(--rule-strong); display: flex; align-items: center; }
+  .mode-demo i { display: block; height: 12px; background: var(--accent); flex: 1; }
+
+  /* ── Guardrail cards ───────────────────────────────────── */
+  .guards { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 0; border: 1px solid var(--rule); }
+  .guard { padding: 20px; border-right: 1px solid var(--rule); border-bottom: 1px solid var(--rule); }
+  .guard-t { font-family: var(--font-mono); font-size: 12.5px; font-weight: 600; letter-spacing: -0.01em; }
+  .guard-b { margin-top: 8px; font-size: 14px; color: var(--ink-muted); }
+
+  /* ── Verdict / callout ─────────────────────────────────── */
+  .callout {
+    border-left: 2px solid var(--accent); padding: 4px 0 4px 20px;
+    margin: 26px 0; max-width: 80ch;
+  }
+  .callout p { font-size: 16.5px; }
+
+  /* ── Talk track ────────────────────────────────────────── */
+  .track { border: 1px solid var(--rule-strong); background: var(--surface); }
+  .track-row { display: grid; grid-template-columns: 128px 1fr; gap: 20px; padding: 18px 24px; border-bottom: 1px solid var(--rule); }
+  .track-row:last-child { border-bottom: 0; }
+  .track-k { font-family: var(--font-mono); font-size: 11px; letter-spacing: 0.1em; text-transform: uppercase; color: var(--ink-subtle); padding-top: 3px; }
+  .track-v { font-size: 16px; text-wrap: pretty; }
+
+  @media (max-width: 700px) {
+    .track-row, .fail { grid-template-columns: 1fr; gap: 8px; }
+    .ramp { grid-template-columns: 1fr; }
+    .stat { border-right: 0; border-bottom: 1px solid var(--rule); }
+  }
+
+  footer { padding: 40px 0 60px; color: var(--ink-subtle); font-size: 13px; font-family: var(--font-mono); }
+
+  ul.tight { margin: 0 0 16px; padding-left: 18px; }
+  ul.tight li { margin-bottom: 7px; color: var(--ink-muted); }
+  ul.tight li strong { color: var(--ink); font-weight: 600; }
+
+  @media (prefers-reduced-motion: reduce) {
+    * { animation-duration: 0.01ms !important; transition-duration: 0.01ms !important; scroll-behavior: auto !important; }
+  }
+  html { scroll-behavior: smooth; }
+</style>
+
+<div class="rail">
+  <div class="rail-in">
+    <div class="rail-mark"><span class="rail-dot"></span>Nexus</div>
+    <nav class="rail-nav">
+      <a href="#problem">Problem</a>
+      <a href="#shape">Architecture</a>
+      <a href="#layers">Layers</a>
+      <a href="#engine">Engine</a>
+      <a href="#appearance">Appearance</a>
+      <a href="#portable">Portability</a>
+      <a href="#shadcn">vs shadcn</a>
+      <a href="#contract">Contract</a>
+      <a href="#guardrails">Guardrails</a>
+    </nav>
+  </div>
+</div>
+
+<header class="hero">
+  <div class="frame">
+    <div class="eyebrow">Nexus Design System · @nexus_ds</div>
+    <h1>One token engine.<br><em>Every framework.</em></h1>
+    <p class="lede">
+      Nexus is not a component library with a theme bolted on. It is a
+      <strong>framework-agnostic token engine</strong> — 107 semantic color tokens derived
+      from a single state object, gated on perceptual contrast in CI — that today ships a
+      React binding. The components are the engine's first consumer, not the product.
+    </p>
+
+    <div class="stats">
+      <div class="stat">
+        <div class="stat-n">107</div>
+        <div class="stat-l">semantic color tokens, none hand-authored</div>
+      </div>
+      <div class="stat">
+        <div class="stat-n">63</div>
+        <div class="stat-l">React components across 70 story files</div>
+      </div>
+      <div class="stat">
+        <div class="stat-n">4,500</div>
+        <div class="stat-l">contrast assertions per CI run</div>
+      </div>
+      <div class="stat">
+        <div class="stat-n">1</div>
+        <div class="stat-l">producer of semantic color — build&nbsp;time and runtime</div>
+      </div>
+      <div class="stat">
+        <div class="stat-n">0</div>
+        <div class="stat-l">React imports in the engine package</div>
+      </div>
+    </div>
+  </div>
+</header>
+
+<!-- ═══════════════════════════════════════════════ PROBLEM ═══ -->
+<section id="problem">
+  <div class="frame">
+    <div class="sec-head">
+      <div class="eyebrow">01 — The case</div>
+      <h2>What actually goes wrong without this</h2>
+      <p class="sec-sub">
+        Every one of these is a failure we have watched happen. The architecture is a
+        direct response to each.
+      </p>
+    </div>
+
+    <div class="fails">
+      <div class="fail">
+        <div class="fail-k">A</div>
+        <div>
+          <div class="fail-t">Theming lives inside the component library</div>
+          <div class="fail-b">
+            Contrast rules, hover shades, and dark-mode logic get written into React
+            components. The day you need Vue, Svelte, or React Native, you re-implement all
+            of it — and then maintain two systems that quietly disagree.
+          </div>
+        </div>
+      </div>
+      <div class="fail">
+        <div class="fail-k">B</div>
+        <div>
+          <div class="fail-t">Dark mode is a second theme, maintained by hand</div>
+          <div class="fail-b">
+            Two lists of hex values, edited independently. One is always stale. Nexus
+            treats this as the root cause: two producers of the same tokens will drift,
+            and no amount of reconciliation testing prevents it — it only detects it late.
+          </div>
+        </div>
+      </div>
+      <div class="fail">
+        <div class="fail-k">C</div>
+        <div>
+          <div class="fail-t">Contrast is checked by eye, at review time</div>
+          <div class="fail-b">
+            "Looks fine to me" is the accessibility gate. Nobody re-checks the other 80
+            token pairs after a palette tweak, and nobody checks them at all in the four
+            surface tones the team does not personally use.
+          </div>
+        </div>
+      </div>
+      <div class="fail">
+        <div class="fail-k">D</div>
+        <div>
+          <div class="fail-t">"Change the brand color" is a multi-day task</div>
+          <div class="fail-b">
+            A brand seed touches primary, its hover / active / disabled / subtle variants,
+            focus rings, links, and every surface that sits under them. Done by hand, it is
+            dozens of edits and a fresh round of contrast review.
+          </div>
+        </div>
+      </div>
+      <div class="fail">
+        <div class="fail-k">E</div>
+        <div>
+          <div class="fail-t">Copy-own solves ownership, then forks the token layer</div>
+          <div class="fail-b">
+            shadcn/ui's copy-into-your-repo model is right about component ownership. But
+            when four apps each own their copy of the CSS variables, four themes diverge
+            and no upgrade path exists. Nexus keeps components copy-own and pulls the
+            <em>token layer</em> back into a versioned engine.
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ══════════════════════════════════════════════════ SHAPE ═══ -->
+<section id="shape">
+  <div class="frame">
+    <div class="sec-head">
+      <div class="eyebrow">02 — Architecture</div>
+      <h2>One brain, two invocation times</h2>
+      <p class="sec-sub">
+        <code>deriveTheme()</code> is the only thing in the system that produces a semantic
+        color. It runs once at build time to bake a static floor into CSS, and again at
+        runtime whenever appearance state changes. Same function, same inputs, same output.
+      </p>
+    </div>
+
+    <div class="panel diagram">
+      <svg viewBox="0 0 1000 400" role="img" aria-label="Architecture: DTCG token sources feed the deriveTheme engine, which emits a build-time static floor into nexus.css and runtime CSS variable overrides; both resolve through one Tailwind theme-inline layer into nx-prefixed utilities consumed by framework bindings.">
+        <defs>
+          <marker id="ar" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto">
+            <path d="M0 0 L10 5 L0 10 z" fill="var(--ink-subtle)"/>
+          </marker>
+        </defs>
+
+        <!-- connectors without arrowheads (routing legs) -->
+        <g fill="none" stroke="var(--ink-subtle)" stroke-width="1.25">
+          <path d="M660 122 H702 V172"/>
+          <path d="M660 174 H702"/>
+          <path d="M868 268 V288"/>
+          <path d="M172 288 H868"/>
+        </g>
+        <!-- connectors with arrowheads (terminations) -->
+        <g fill="none" stroke="var(--ink-subtle)" stroke-width="1.25" marker-end="url(#ar)">
+          <path d="M188 96 H230"/>
+          <path d="M188 148 H230"/>
+          <path d="M188 200 H230"/>
+          <path d="M404 122 H446"/>
+          <path d="M404 174 H446"/>
+          <path d="M702 172 H738"/>
+          <path d="M868 206 V218"/>
+          <path d="M172 288 V306"/>
+          <path d="M496 288 V306"/>
+          <path d="M832 288 V306"/>
+        </g>
+
+        <!-- sources -->
+        <rect x="24" y="74" width="164" height="44" fill="var(--surface-2)" stroke="var(--rule-strong)"/>
+        <text x="38" y="93" font-family="IBM Plex Mono, monospace" font-size="11.5" fill="var(--ink)">color.json</text>
+        <text x="38" y="108" font-family="IBM Plex Mono, monospace" font-size="10" fill="var(--ink-subtle)">22 palettes · DTCG</text>
+
+        <rect x="24" y="126" width="164" height="44" fill="var(--surface-2)" stroke="var(--rule-strong)"/>
+        <text x="38" y="145" font-family="IBM Plex Mono, monospace" font-size="11.5" fill="var(--ink)">surface-ladder.ts</text>
+        <text x="38" y="160" font-family="IBM Plex Mono, monospace" font-size="10" fill="var(--ink-subtle)">shade anchors</text>
+
+        <rect x="24" y="178" width="164" height="44" fill="var(--surface-2)" stroke="var(--rule-strong)"/>
+        <text x="38" y="197" font-family="IBM Plex Mono, monospace" font-size="11.5" fill="var(--ink)">appearance state</text>
+        <text x="38" y="212" font-family="IBM Plex Mono, monospace" font-size="10" fill="var(--ink-subtle)">brand · tone · contrast</text>
+
+        <!-- engine -->
+        <rect x="236" y="66" width="168" height="164" fill="var(--surface-3)" stroke="var(--accent)" stroke-width="1.5"/>
+        <text x="252" y="94" font-family="Archivo, sans-serif" font-size="14" font-weight="700" fill="var(--ink)">deriveTheme()</text>
+        <text x="252" y="120" font-family="IBM Plex Mono, monospace" font-size="10.5" fill="var(--ink-muted)">perceptual ramp</text>
+        <text x="252" y="138" font-family="IBM Plex Mono, monospace" font-size="10.5" fill="var(--ink-muted)">surface ladder</text>
+        <text x="252" y="156" font-family="IBM Plex Mono, monospace" font-size="10.5" fill="var(--ink-muted)">text tiers</text>
+        <text x="252" y="174" font-family="IBM Plex Mono, monospace" font-size="10.5" fill="var(--ink-muted)">APCA walk</text>
+        <text x="252" y="202" font-family="IBM Plex Mono, monospace" font-size="9.5" fill="var(--ink-subtle)">pure TS · no DOM</text>
+        <text x="252" y="216" font-family="IBM Plex Mono, monospace" font-size="9.5" fill="var(--ink-subtle)">no framework</text>
+
+        <!-- two invocations -->
+        <rect x="452" y="98" width="208" height="48" fill="var(--surface-2)" stroke="var(--rule-strong)"/>
+        <text x="466" y="118" font-family="Archivo, sans-serif" font-size="12" font-weight="600" fill="var(--ink)">Build time</text>
+        <text x="466" y="134" font-family="IBM Plex Mono, monospace" font-size="10" fill="var(--ink-subtle)">static floor → nexus.css</text>
+
+        <rect x="452" y="150" width="208" height="48" fill="var(--surface-2)" stroke="var(--rule-strong)"/>
+        <text x="466" y="170" font-family="Archivo, sans-serif" font-size="12" font-weight="600" fill="var(--ink)">Runtime</text>
+        <text x="466" y="186" font-family="IBM Plex Mono, monospace" font-size="10" fill="var(--ink-subtle)">--nx-color-* overrides</text>
+
+        <!-- resolution -->
+        <rect x="744" y="138" width="248" height="68" fill="var(--surface-3)" stroke="var(--rule-strong)"/>
+        <text x="758" y="160" font-family="Archivo, sans-serif" font-size="12" font-weight="600" fill="var(--ink)">@theme inline</text>
+        <text x="758" y="179" font-family="IBM Plex Mono, monospace" font-size="9.5" fill="var(--ink-muted)">--color-x: var(--nx-color-x, floor)</text>
+        <text x="758" y="195" font-family="IBM Plex Mono, monospace" font-size="9.5" fill="var(--ink-subtle)">one utility set, either source</text>
+
+        <rect x="744" y="224" width="248" height="44" fill="var(--surface-2)" stroke="var(--rule-strong)"/>
+        <text x="758" y="243" font-family="IBM Plex Mono, monospace" font-size="11.5" fill="var(--ink)">nx: utilities</text>
+        <text x="758" y="258" font-family="IBM Plex Mono, monospace" font-size="10" fill="var(--ink-subtle)">nx:bg-container · nx:text-foreground</text>
+
+        <!-- bindings -->
+        <rect x="24" y="306" width="296" height="46" fill="var(--surface-2)" stroke="var(--accent)" stroke-width="1.25"/>
+        <text x="38" y="326" font-family="IBM Plex Mono, monospace" font-size="11.5" fill="var(--ink)">@nexus_ds/react</text>
+        <text x="38" y="342" font-family="IBM Plex Mono, monospace" font-size="10" fill="var(--ink-subtle)">shipped · 63 components</text>
+
+        <rect x="348" y="306" width="296" height="46" fill="none" stroke="var(--rule-strong)" stroke-dasharray="3 3"/>
+        <text x="362" y="326" font-family="IBM Plex Mono, monospace" font-size="11.5" fill="var(--ink-muted)">vue · svelte · angular</text>
+        <text x="362" y="342" font-family="IBM Plex Mono, monospace" font-size="10" fill="var(--ink-subtle)">binding only — the engine is shared</text>
+
+        <rect x="672" y="306" width="320" height="46" fill="none" stroke="var(--rule-strong)" stroke-dasharray="3 3"/>
+        <text x="686" y="326" font-family="IBM Plex Mono, monospace" font-size="11.5" fill="var(--ink-muted)">react native · native shells</text>
+        <text x="686" y="342" font-family="IBM Plex Mono, monospace" font-size="10" fill="var(--ink-subtle)">DTCG → Style Dictionary, or the token map direct</text>
+
+        <text x="24" y="384" font-family="IBM Plex Mono, monospace" font-size="10" fill="var(--ink-subtle)">Solid outline = shipped today.   Dashed = the port surface: a binding, not a re-implementation.</text>
+      </svg>
+    </div>
+
+    <div class="callout">
+      <p>
+        The load-bearing line is the CSS variable fallback. It is what lets a single set of
+        generated utilities serve both a fully static build and a live-themed runtime, with
+        no rebuild and no duplicate stylesheet.
+      </p>
+    </div>
+
+<pre><span class="c-dim">/* packages/tailwind/nexus.css — generated */</span>
+@theme inline {
+  <span class="c-key">--color-background</span>: var(<span class="c-val">--nx-color-background</span>, <span class="c-str">oklch(1 0 0)</span>);
+  <span class="c-key">--color-container</span>:  var(<span class="c-val">--nx-color-container</span>,  <span class="c-str">oklch(1 0 0)</span>);
+  <span class="c-key">--color-muted</span>:      var(<span class="c-val">--nx-color-muted</span>,      <span class="c-str">oklch(0.9698 0.0083 70)</span>);
+}
+<span class="c-dim">/*  --color-*     the Tailwind v4 key that generates nx:bg-background
+    --nx-color-*  the runtime override the appearance provider injects
+    the third value  the build-time floor: correct with JS disabled  */</span></pre>
+  </div>
+</section>
+
+<!-- ═════════════════════════════════════════════════ LAYERS ═══ -->
+<section id="layers">
+  <div class="frame">
+    <div class="sec-head">
+      <div class="eyebrow">03 — The stack</div>
+      <h2>Three layers, in dependency order</h2>
+      <p class="sec-sub">
+        Numbered because it is a real sequence: each layer may only reference the one below
+        it. A component that reaches past the semantic layer to a primitive fails lint.
+      </p>
+    </div>
+
+    <!-- LAYER 1 -->
+    <div class="layer">
+      <div class="layer-head">
+        <span class="layer-n">01</span>
+        <span class="layer-t">Primitives</span>
+        <span class="layer-meta">--nx-* · DTCG JSON · 22 palettes</span>
+      </div>
+      <p class="layer-b">
+        Context-independent raw values. Authored as W3C
+        <strong>Design Tokens Community Group</strong> JSON — the portable, tool-neutral
+        format that makes iOS, Android, and React Native outputs a build-target question
+        rather than a rewrite. Source files hold hex; the build converts to
+        <strong>OKLCH</strong> and emits P3 chroma.
+      </p>
+
+      <div class="panel">
+        <h4>The perceptual lightness grid</h4>
+        <p style="font-size:15px;color:var(--ink-muted);max-width:78ch;margin-bottom:20px">
+          Eleven fixed OKLCH lightness values. Any brand seed handed to the engine becomes an
+          11-step ramp pinned to exactly these numbers — hue and chroma come from the seed,
+          lightness never does. The five neutral surface tones already sit on the grid, which
+          is why swapping surface tone changes the tint of every surface and never its
+          lightness.
+        </p>
+
+        <div class="ramp">
+          <div class="ramp-name">stone</div>
+          <div>
+            <div class="ramp-cells">
+              <div class="ramp-cell" style="background:oklch(0.985 0.0029 84.559)"></div>
+              <div class="ramp-cell" style="background:oklch(0.945 0.0029 84.559)"></div>
+              <div class="ramp-cell" style="background:oklch(0.87 0.0047 78.296)"></div>
+              <div class="ramp-cell" style="background:oklch(0.765 0.0084 73.724)"></div>
+              <div class="ramp-cell" style="background:oklch(0.66 0.0094 84.582)"></div>
+              <div class="ramp-cell" style="background:oklch(0.553 0.0085 80.708)"></div>
+              <div class="ramp-cell" style="background:oklch(0.46 0.0065 95.196)"></div>
+              <div class="ramp-cell" style="background:oklch(0.385 0.005 106.631)"></div>
+              <div class="ramp-cell" style="background:oklch(0.297 0 0)"></div>
+              <div class="ramp-cell" style="background:oklch(0.207 0 0)"></div>
+              <div class="ramp-cell" style="background:oklch(0.118 0 0)"></div>
+            </div>
+          </div>
+        </div>
+        <div class="ramp">
+          <div class="ramp-name">slate</div>
+          <div>
+            <div class="ramp-cells">
+              <div class="ramp-cell" style="background:oklch(0.985 0.0034 247.858)"></div>
+              <div class="ramp-cell" style="background:oklch(0.945 0.0069 247.896)"></div>
+              <div class="ramp-cell" style="background:oklch(0.87 0.0126 255.508)"></div>
+              <div class="ramp-cell" style="background:oklch(0.765 0.0198 252.894)"></div>
+              <div class="ramp-cell" style="background:oklch(0.66 0.0402 256.993)"></div>
+              <div class="ramp-cell" style="background:oklch(0.553 0.046 257.526)"></div>
+              <div class="ramp-cell" style="background:oklch(0.46 0.043 257.421)"></div>
+              <div class="ramp-cell" style="background:oklch(0.385 0.0449 257.424)"></div>
+              <div class="ramp-cell" style="background:oklch(0.297 0.0408 260.329)"></div>
+              <div class="ramp-cell" style="background:oklch(0.207 0.0398 265.755)"></div>
+              <div class="ramp-cell" style="background:oklch(0.118 0.0406 264.695)"></div>
+            </div>
+          </div>
+        </div>
+        <div class="ramp">
+          <div class="ramp-name">zinc</div>
+          <div>
+            <div class="ramp-cells">
+              <div class="ramp-cell" style="background:oklch(0.985 0 0)"></div>
+              <div class="ramp-cell" style="background:oklch(0.945 0.0013 286.375)"></div>
+              <div class="ramp-cell" style="background:oklch(0.87 0.0035 247.861)"></div>
+              <div class="ramp-cell" style="background:oklch(0.765 0.0053 247.885)"></div>
+              <div class="ramp-cell" style="background:oklch(0.66 0.0144 286.025)"></div>
+              <div class="ramp-cell" style="background:oklch(0.553 0.0153 285.886)"></div>
+              <div class="ramp-cell" style="background:oklch(0.46 0.0162 285.717)"></div>
+              <div class="ramp-cell" style="background:oklch(0.385 0.0119 285.805)"></div>
+              <div class="ramp-cell" style="background:oklch(0.297 0.0057 271.205)"></div>
+              <div class="ramp-cell" style="background:oklch(0.207 0.0061 271.116)"></div>
+              <div class="ramp-cell" style="background:oklch(0.118 0.0048 262.802)"></div>
+            </div>
+          </div>
+        </div>
+
+        <div class="ramp-axis">
+          <div>50</div><div>100</div><div>200</div><div>300</div><div>400</div><div>500</div>
+          <div>600</div><div>700</div><div>800</div><div>900</div><div>950</div>
+        </div>
+        <div class="ramp-grid-row">
+          <div>.985</div><div>.945</div><div>.870</div><div>.765</div><div>.660</div><div>.553</div>
+          <div>.460</div><div>.385</div><div>.297</div><div>.207</div><div>.118</div>
+        </div>
+        <p class="panel-note">
+          Read the bottom row against all three ramps: identical OKLCH <code>L</code> at
+          every step. That is the property the engine relies on — it can move a surface
+          "one rung down the ladder" and know exactly how much darker it just got,
+          regardless of which tone the consumer picked.
+        </p>
+      </div>
+    </div>
+
+    <!-- LAYER 2 -->
+    <div class="layer">
+      <div class="layer-head">
+        <span class="layer-n">02</span>
+        <span class="layer-t">Semantic</span>
+        <span class="layer-meta">--nx-color-* · 107 tokens · engine-produced</span>
+      </div>
+      <p class="layer-b">
+        Roles, not colors. A token names <em>what a thing is for</em> — the surface a popover
+        row sits on, the ink that must stay legible on a nav rail — so light and dark are two
+        evaluations of one decision rather than two lists of hexes.
+        <strong>None of these are hand-authored.</strong> Every value below came out of the
+        engine.
+      </p>
+
+      <div class="tbl-wrap">
+        <table>
+          <thead>
+            <tr><th>Category</th><th class="mono">Count</th><th>Covers</th></tr>
+          </thead>
+          <tbody>
+            <tr><td class="mono">surface</td><td class="mono">20</td><td class="dim">background, container, popover, control, nav, muted — each with hover/active rungs</td></tr>
+            <tr><td class="mono">status</td><td class="mono">44</td><td class="dim">success / warning / error / information × background, foreground, hover, active, disabled, subtle, border</td></tr>
+            <tr><td class="mono">brand</td><td class="mono">20</td><td class="dim">primary and secondary, each with the same seven-state shape</td></tr>
+            <tr><td class="mono">text</td><td class="mono">8</td><td class="dim">foreground plus per-surface and per-tier inks</td></tr>
+            <tr><td class="mono">chart</td><td class="mono">5</td><td class="dim">categorical series, contrast-checked against the container surface</td></tr>
+            <tr><td class="mono">alpha</td><td class="mono">5</td><td class="dim">overlay, popover translucency, hairline borders</td></tr>
+            <tr><td class="mono">border</td><td class="mono">3</td><td class="dim">default, disabled, hairline</td></tr>
+            <tr><td class="mono">focus</td><td class="mono">2</td><td class="dim">default and error focus rings</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="panel panel-flush">
+        <div style="padding:20px 20px 4px">
+          <h4>Specimen — left chip is light, right chip is dark</h4>
+          <p style="font-size:14px;color:var(--ink-muted);margin:0 0 4px">
+            Both themes shown at once, independent of how you are viewing this page.
+          </p>
+        </div>
+        <div class="spec">
+          <div class="spec-cell">
+            <div class="spec-chips">
+              <div class="chip" style="background:oklch(1 0 0)"></div>
+              <div class="chip" style="background:oklch(0.2161 0.006 70)"></div>
+            </div>
+            <div class="spec-name">background</div>
+            <div class="spec-vals">L oklch(1 0 0)<br>D oklch(0.2161 0.006 70)</div>
+          </div>
+          <div class="spec-cell">
+            <div class="spec-chips">
+              <div class="chip" style="background:oklch(0.9879 0.0081 70)"></div>
+              <div class="chip" style="background:oklch(0.2289 0.006 70)"></div>
+            </div>
+            <div class="spec-name">muted-extralight</div>
+            <div class="spec-vals">L oklch(0.9879 0.0081 70)<br>D oklch(0.2289 0.006 70)</div>
+          </div>
+          <div class="spec-cell">
+            <div class="spec-chips">
+              <div class="chip" style="background:oklch(0.9698 0.0083 70)"></div>
+              <div class="chip" style="background:oklch(0.2481 0.006 70)"></div>
+            </div>
+            <div class="spec-name">muted</div>
+            <div class="spec-vals">L oklch(0.9698 0.0083 70)<br>D oklch(0.2481 0.006 70)</div>
+          </div>
+          <div class="spec-cell">
+            <div class="spec-chips">
+              <div class="chip" style="background:oklch(1 0 0)"></div>
+              <div class="chip" style="background:oklch(0.2481 0.006 70)"></div>
+            </div>
+            <div class="spec-name">container</div>
+            <div class="spec-vals">L oklch(1 0 0)<br>D oklch(0.2481 0.006 70)</div>
+          </div>
+          <div class="spec-cell">
+            <div class="spec-chips">
+              <div class="chip" style="background:oklch(1 0 0)"></div>
+              <div class="chip" style="background:oklch(0.2801 0.006 70)"></div>
+            </div>
+            <div class="spec-name">popover</div>
+            <div class="spec-vals">L oklch(1 0 0)<br>D oklch(0.2801 0.006 70)</div>
+          </div>
+          <div class="spec-cell">
+            <div class="spec-chips">
+              <div class="chip" style="background:oklch(0.9451 0.0086 70)"></div>
+              <div class="chip" style="background:oklch(0.3121 0.006 70)"></div>
+            </div>
+            <div class="spec-name">popover-hover</div>
+            <div class="spec-vals">L oklch(0.9451 0.0086 70)<br>D oklch(0.3121 0.006 70)</div>
+          </div>
+          <div class="spec-cell">
+            <div class="spec-chips">
+              <div class="chip" style="background:oklch(0.1448 0 0)"><span style="color:#fff">Aa</span></div>
+              <div class="chip" style="background:oklch(1 0 0)"><span style="color:#000">Aa</span></div>
+            </div>
+            <div class="spec-name">primary-background</div>
+            <div class="spec-vals">L oklch(0.1448 0 0)<br>D oklch(1 0 0)</div>
+          </div>
+          <div class="spec-cell">
+            <div class="spec-chips">
+              <div class="chip" style="background:oklch(0.577 0.2523 27.926)"><span style="color:#fff">Aa</span></div>
+              <div class="chip" style="background:oklch(0.577 0.2523 27.926)"><span style="color:#fff">Aa</span></div>
+            </div>
+            <div class="spec-name">error-background</div>
+            <div class="spec-vals">identical in both modes —<br>the fill already clears its floor</div>
+          </div>
+          <div class="spec-cell">
+            <div class="spec-chips">
+              <div class="chip" style="background:oklch(0.971 0.0176 28.865)"><span style="color:oklch(0.577 0.2523 27.926)">Aa</span></div>
+              <div class="chip" style="background:oklch(0.25 0.1094 28.309)"><span style="color:oklch(0.808 0.1333 28.058)">Aa</span></div>
+            </div>
+            <div class="spec-name">error-subtle</div>
+            <div class="spec-vals">L oklch(0.971 0.0176 28.865)<br>D oklch(0.25 0.1094 28.309)</div>
+          </div>
+          <div class="spec-cell">
+            <div class="spec-chips">
+              <div class="chip" style="background:oklch(0.982 0.035 137.785)"><span style="color:oklch(0.52 0.1871 140.022)">Aa</span></div>
+              <div class="chip" style="background:oklch(0.25 0.0887 139.4)"><span style="color:oklch(0.87 0.3119 139.843)">Aa</span></div>
+            </div>
+            <div class="spec-name">success-subtle</div>
+            <div class="spec-vals">L oklch(0.982 0.035 137.785)<br>D oklch(0.25 0.0887 139.4)</div>
+          </div>
+          <div class="spec-cell">
+            <div class="spec-chips">
+              <div class="chip" style="background:oklch(0.9227 0.0089 70)"></div>
+              <div class="chip" style="background:oklch(0.2801 0.006 70)"></div>
+            </div>
+            <div class="spec-name">control-background</div>
+            <div class="spec-vals">L oklch(0.9227 0.0089 70)<br>D oklch(0.2801 0.006 70)</div>
+          </div>
+          <div class="spec-cell">
+            <div class="spec-chips">
+              <div class="chip" style="background:oklch(0.13 0.006 70 / 0.7529)"></div>
+              <div class="chip" style="background:oklch(0.13 0.006 70 / 0.8471)"></div>
+            </div>
+            <div class="spec-name">overlay</div>
+            <div class="spec-vals">L …/ 0.7529<br>D …/ 0.8471 — denser scrim in dark</div>
+          </div>
+        </div>
+        <p class="panel-note" style="margin:0;padding:16px 20px;border-top:0">
+          Note the ink tokens the page itself is set in:
+          <code>foreground</code> is <code>oklch(0.1448 0 0 / 0.9098)</code> in light and
+          <code>oklch(1 0 0 / 0.9098)</code> in dark — <strong>alpha inks, not solid
+          colors</strong>, so text picks up a trace of whatever surface it lands on and
+          never reads as pure black on a warm ground.
+        </p>
+      </div>
+    </div>
+
+    <!-- LAYER 3 -->
+    <div class="layer">
+      <div class="layer-head">
+        <span class="layer-n">03</span>
+        <span class="layer-t">Utilities</span>
+        <span class="layer-meta">nx: prefix · Tailwind v4 @theme</span>
+      </div>
+      <p class="layer-b">
+        The semantic layer compiled into Tailwind utilities under a namespace. Two decisions
+        here do real work.
+      </p>
+
+      <div class="split">
+        <div>
+          <h4>The nx: prefix</h4>
+          <p style="font-size:15px;color:var(--ink-muted)">
+            Every utility is <code>nx:bg-container</code>, never <code>bg-container</code>.
+            Because components are vendored into a consuming app that has its <em>own</em>
+            Tailwind config, the namespace is what stops the two from colliding. The prefix
+            also comes first, before every modifier —
+            <code>nx:hover:bg-container-hover</code>, never <code>hover:nx:…</code>.
+          </p>
+        </div>
+        <div>
+          <h4>The namespace reset</h4>
+          <p style="font-size:15px;color:var(--ink-muted)">
+            The generated theme opens with <code>--color-*: initial</code>. Tailwind's entire
+            default palette is deleted. <code>nx:bg-blue-500</code> does not exist and cannot
+            be typed by accident — using a semantic token is not a convention you have to
+            remember, it is the only thing that compiles.
+          </p>
+        </div>
+      </div>
+
+<pre><span class="c-dim">/* the reset — this is the whole enforcement mechanism */</span>
+@theme {
+  <span class="c-key">--color-*</span>: initial;
+  <span class="c-key">--spacing-*</span>: initial;
+  <span class="c-key">--text-*</span>: initial;
+  <span class="c-key">--radius-*</span>: initial;
+  <span class="c-key">--shadow-*</span>: initial;
+  <span class="c-key">--breakpoint-*</span>: initial;
+}</pre>
+    </div>
+  </div>
+</section>
+
+<!-- ═════════════════════════════════════════════════ ENGINE ═══ -->
+<section id="engine">
+  <div class="frame">
+    <div class="sec-head">
+      <div class="eyebrow">04 — Derivation</div>
+      <h2>How a brand color becomes 107 tokens</h2>
+      <p class="sec-sub">
+        Three mechanisms, applied in order. Each is a small amount of code doing a job that
+        would otherwise be a design decision repeated a hundred times by hand.
+      </p>
+    </div>
+
+    <h3>The surface ladder</h3>
+    <p class="prose" style="color:var(--ink-muted)">
+      Surfaces are not picked. They are positions on the lightness grid, expressed relative
+      to the page anchor. This table is the entire light-mode surface design — an editable
+      file, not scattered decisions. Moving <code>background-hover</code> from
+      <code>50</code> to <code>100</code> is the whole gesture for "make hover states a
+      touch stronger."
+    </p>
+
+    <div class="tbl-wrap">
+      <table>
+        <thead>
+          <tr><th>Surface token</th><th class="mono">Light anchor</th><th class="mono">Emitted light value</th><th>Reads as</th></tr>
+        </thead>
+        <tbody>
+          <tr><td class="mono">background</td><td class="mono">base</td><td class="mono">oklch(1 0 0)</td><td class="dim">the page itself</td></tr>
+          <tr><td class="mono">background-hover</td><td class="mono">shade 50</td><td class="mono">oklch(0.9849 0.0082 70)</td><td class="dim">one rung down</td></tr>
+          <tr><td class="mono">muted</td><td class="mono">shade 75</td><td class="mono">oklch(0.9698 0.0083 70)</td><td class="dim">quiet fill</td></tr>
+          <tr><td class="mono">container-hover</td><td class="mono">shade 75</td><td class="mono">oklch(0.9698 0.0083 70)</td><td class="dim">card hover</td></tr>
+          <tr><td class="mono">popover-hover</td><td class="mono">shade 100</td><td class="mono">oklch(0.9451 0.0086 70)</td><td class="dim">menu row hover</td></tr>
+          <tr><td class="mono">control-background</td><td class="mono">shade 150</td><td class="mono">oklch(0.9227 0.0089 70)</td><td class="dim">switch track, slider rail</td></tr>
+          <tr><td class="mono">border-active</td><td class="mono">shade 400</td><td class="mono">oklch(0.6601 0.0118 70)</td><td class="dim">emphasised edge</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <p style="font-size:13.5px;color:var(--ink-subtle);margin-top:-8px">
+      Chroma rises slightly as lightness falls (a 1.4× depth multiplier), so a light surface
+      keeps its tone instead of washing out to grey as it darkens.
+    </p>
+
+    <h3>Text tiers: as quiet as legibility allows</h3>
+    <p class="prose" style="color:var(--ink-muted)">
+      Most systems set muted text to a fixed grey and hope. Nexus walks it. Start at the
+      target quietness — 40% of the way from the ink toward its surface for nav-muted text,
+      50% for disabled — then step <em>back</em> toward full contrast until the APCA floor
+      is met, and stop at the first passing value. The result is the quietest legible ink
+      for that specific surface, not the loudest the tier permits.
+    </p>
+
+<pre>function <span class="c-key">quietText</span>(fg, surface, floor, quiet) {
+  for (let q = quiet; q &gt; 0; q -= 0.1) {
+    const candidate = mix(fg, surface, q);
+    if (<span class="c-val">apcaLc</span>(candidate, surface) &gt;= floor) return candidate;   <span class="c-dim">// first pass wins</span>
+  }
+  <span class="c-dim">// never throws — worst case, snap to the black/white endpoint</span>
+}</pre>
+
+    <h3>The APCA gate</h3>
+    <p class="prose" style="color:var(--ink-muted)">
+      Nexus uses <strong>APCA</strong> (the perceptual contrast model behind the WCAG 3
+      drafts) rather than WCAG 2.x ratios, because 2.x ratios misjudge exactly the
+      mid-lightness pairs a token system produces constantly. Three tiers, one job each:
+    </p>
+
+    <div class="modes" style="margin:20px 0 8px">
+      <div class="mode">
+        <div class="mode-l">body · Lc ≥ 75</div>
+        <div class="mode-v">75</div>
+        <div style="margin-top:10px;font-size:13.5px;color:var(--ink-muted)">Fluent reading. Paragraphs, long-form.</div>
+      </div>
+      <div class="mode">
+        <div class="mode-l">ui · Lc ≥ 60</div>
+        <div class="mode-v">60</div>
+        <div style="margin-top:10px;font-size:13.5px;color:var(--ink-muted)">Labels, buttons, badges, nav.</div>
+      </div>
+      <div class="mode">
+        <div class="mode-l">incidental · Lc ≥ 45</div>
+        <div class="mode-v">45</div>
+        <div style="margin-top:10px;font-size:13.5px;color:var(--ink-muted)">Muted text, disabled states, focus rings.</div>
+      </div>
+    </div>
+
+    <div class="callout">
+      <p>
+        <strong>50 token pairs</strong> are declared as an explicit contract — this ink on
+        that surface, at this tier. CI sweeps them across
+        <strong>6 brand seeds × 5 surface tones × 3 contrast settings</strong> = 90 derived
+        themes. That is <strong>4,500 contrast assertions on every run</strong>, and the
+        build fails if one of them drops below its floor.
+      </p>
+    </div>
+
+<pre><span class="c-dim">// packages/core/src/lib/derive-theme.test.ts</span>
+describe(<span class="c-str">'legibility invariant: every APCA pair clears its floor'</span>, () =&gt; {
+  it.each(SWEEP_SEEDS.flatMap(seed =&gt;
+    SURFACE_TONES.flatMap(tone =&gt;
+      [<span class="c-val">0</span>, <span class="c-val">60</span>, <span class="c-val">100</span>].map(contrast =&gt; ({ ...seed, tone, contrast })))))(
+    <span class="c-str">'contract %#'</span>, ({ ... }) =&gt; {
+      const map = <span class="c-key">deriveTheme</span>(contract)[mode];
+      for (const pair of <span class="c-val">APCA_PAIRS</span>)
+        expect(apcaLcForPair(map, pair)).toBeGreaterThanOrEqual(TIER_THRESHOLDS[pair.tier]);
+    });
+});</pre>
+
+    <p class="prose" style="color:var(--ink-muted);margin-top:20px">
+      This is the difference that is hard to overstate. It is not "we checked our palette."
+      It is: <strong>no combination of brand color, surface tone, and contrast setting a
+      consumer can select will produce an illegible pair</strong>, and that property is
+      re-proved on every commit.
+    </p>
+  </div>
+</section>
+
+<!-- ═════════════════════════════════════════════ APPEARANCE ═══ -->
+<section id="appearance">
+  <div class="frame">
+    <div class="sec-head">
+      <div class="eyebrow">05 — Runtime</div>
+      <h2>The whole theme is one state object</h2>
+      <p class="sec-sub">
+        Ten fields. Serialize it to a cookie, put it in a settings panel, ship it per-tenant.
+        Everything downstream — colors, spacing rhythm, corner radius, shadow depth, stroke
+        weight, type scale, motion — is derived from it.
+      </p>
+    </div>
+
+    <div class="tbl-wrap">
+      <table>
+        <thead>
+          <tr><th>Field</th><th>Values</th><th>Drives</th></tr>
+        </thead>
+        <tbody>
+          <tr><td class="mono">mode</td><td class="mono">light · dark · system</td><td class="dim">the <code>.dark</code> class and native <code>color-scheme</code></td></tr>
+          <tr><td class="mono">brandColor</td><td class="mono">any CSS color</td><td class="dim">the entire primary family, links, and focus rings</td></tr>
+          <tr><td class="mono">surfaceTone</td><td class="mono">stone · neutral · zinc · slate · gray</td><td class="dim">hue and chroma of every neutral surface</td></tr>
+          <tr><td class="mono">lightContrast</td><td class="mono">0 – 100</td><td class="dim">surface separation, border alpha, hover alpha — light only</td></tr>
+          <tr><td class="mono">darkContrast</td><td class="mono">0 – 100</td><td class="dim">the same, tuned independently for dark</td></tr>
+          <tr><td class="mono">density</td><td class="mono">tight → spacious (6)</td><td class="dim"><code>data-density</code> — per-mode spacing scale</td></tr>
+          <tr><td class="mono">corners</td><td class="mono">square → extra-round (5)</td><td class="dim"><code>data-radius</code></td></tr>
+          <tr><td class="mono">elevation</td><td class="mono">flat → strong (5)</td><td class="dim"><code>data-shadow</code></td></tr>
+          <tr><td class="mono">stroke</td><td class="mono">fine · normal · strong</td><td class="dim"><code>data-borderwidth</code></td></tr>
+          <tr><td class="mono">prefs</td><td class="mono">7 fields</td><td class="dim">UI/code font + size, reduce motion, pointer cursors, font smoothing</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <p class="prose" style="color:var(--ink-muted)">
+      Note that the non-color axes swap via a <strong>data attribute on any ancestor</strong>,
+      not by re-deriving anything. All six density scales, all five radius scales, all three
+      stroke scales ship in the stylesheet at once. Changing density is an attribute write.
+    </p>
+
+    <h4 style="margin-top:32px">corners — <code>--nx-radius-md</code> across all five scales</h4>
+    <div class="modes">
+      <div class="mode">
+        <div class="mode-l">square</div><div class="mode-v">0px</div>
+        <div class="mode-demo" style="border-radius:0"><i></i></div>
+      </div>
+      <div class="mode">
+        <div class="mode-l">subtle</div><div class="mode-v">4px</div>
+        <div class="mode-demo" style="border-radius:4px"><i></i></div>
+      </div>
+      <div class="mode">
+        <div class="mode-l">smooth</div><div class="mode-v">8px</div>
+        <div class="mode-demo" style="border-radius:8px"><i></i></div>
+      </div>
+      <div class="mode">
+        <div class="mode-l">round</div><div class="mode-v">12px</div>
+        <div class="mode-demo" style="border-radius:12px"><i></i></div>
+      </div>
+      <div class="mode">
+        <div class="mode-l">extra-round</div><div class="mode-v">16px</div>
+        <div class="mode-demo" style="border-radius:16px"><i></i></div>
+      </div>
+    </div>
+    <p style="font-size:13.5px;color:var(--ink-subtle);margin-top:10px">
+      Nexus ships <code>square</code> as the default — the hard-edged look this page is set
+      in is the system's own out-of-the-box appearance, not a choice made for the slides.
+    </p>
+
+    <h4 style="margin-top:32px">density — the role token <code>--nx-container-p</code></h4>
+    <div class="modes">
+      <div class="mode"><div class="mode-l">tight</div><div class="mode-v">24px</div></div>
+      <div class="mode"><div class="mode-l">compact</div><div class="mode-v">20px</div></div>
+      <div class="mode"><div class="mode-l">default</div><div class="mode-v">24px</div></div>
+      <div class="mode"><div class="mode-l">comfortable</div><div class="mode-v">28px</div></div>
+      <div class="mode"><div class="mode-l">relaxed</div><div class="mode-v">28px</div></div>
+      <div class="mode"><div class="mode-l">spacious</div><div class="mode-v">40px</div></div>
+    </div>
+    <p style="font-size:13.5px;color:var(--ink-subtle);margin-top:10px">
+      Spacing is deliberately <strong>two-tier, not three</strong> — there is no
+      <code>--nx-size-*</code> primitive layer. Each mode file carries direct px values,
+      which is what makes non-linear scales possible: the modes differ in rhythm, not by a
+      single multiplier.
+    </p>
+
+    <h3>First paint, without the flash</h3>
+    <p class="prose" style="color:var(--ink-muted)">
+      A runtime-themed system has one classic failure: the default theme paints, then the
+      user's theme replaces it. Nexus closes that window with a snapshot written before the
+      first frame.
+    </p>
+
+<pre><span class="c-dim">// server: read the cookie, build the snapshot, inline it in &lt;head&gt;</span>
+const snapshot = <span class="c-key">createNexusAppearanceSnapshotFromCookie</span>(
+  cookieStore.get(DEFAULT_COOKIE_KEY)?.value,
+  defaultAppearance,
+);
+
+<span class="c-dim">// the script writes, before React exists:
+//   the derived theme CSS      the .dark class
+//   the preference CSS         data-density / -radius / -shadow / -borderwidth
+//   native color-scheme</span></pre>
+
+    <div class="split">
+      <div>
+        <h4>Precedence, stated once</h4>
+        <p style="font-size:15px;color:var(--ink-muted)">
+          The cookie seeds the <em>server</em> render. After hydration,
+          <code>localStorage</code> is the client source of truth and wins. The cookie is
+          written from client state for the <em>next</em> request — it is never read during
+          hydration. That one rule is what keeps SSR output stable.
+        </p>
+      </div>
+      <div>
+        <h4>Versioned snapshots</h4>
+        <p style="font-size:15px;color:var(--ink-muted)">
+          Snapshots carry <code>SNAPSHOT_VERSION</code> (currently 5). A stale persisted
+          snapshot is rejected rather than trusted, and every field passes through
+          <code>sanitizeNexusAppearance</code> — including a rejection filter on font-family
+          strings, since those get interpolated into a live <code>&lt;style&gt;</code> rule.
+        </p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ══════════════════════════════════════════════ PORTABLE ═══ -->
+<section id="portable">
+  <div class="frame">
+    <div class="sec-head">
+      <div class="eyebrow">06 — The point</div>
+      <h2>One token system, many frameworks</h2>
+      <p class="sec-sub">
+        This is the architectural bet. Everything above was built so that adding Vue,
+        Svelte, Angular, or React Native is a <em>binding</em> — not a second design system.
+      </p>
+    </div>
+
+    <h3>Why the engine ports</h3>
+    <p class="prose" style="color:var(--ink-muted)">
+      <code>@nexus_ds/core</code> imports no framework and touches no DOM. It is a pure
+      function from state to values. Two exported calls are the entire port surface:
+    </p>
+
+<pre><span class="c-key">deriveTheme</span>(contract: ThemeDerivationInput) → { light: TokenMap, dark: TokenMap }
+<span class="c-key">themeToCss</span>(derived: DerivedTheme)          → string   <span class="c-dim">// :root { … } :root.dark { … }</span></pre>
+
+    <p class="prose" style="color:var(--ink-muted);margin-top:18px">
+      A host that owns its own styling calls <code>deriveTheme</code> and reads the token map
+      directly — no CSS involved. This is the documented path for Electron shells, native
+      wrappers, and React Native, and it is why the engine ships to npm while the components
+      are copy-own.
+    </p>
+
+<pre><span class="c-dim">// a non-React shell, from the @nexus_ds/core README</span>
+const state    = { ...DEFAULT_NEXUS_APPEARANCE, brandColor: <span class="c-str">'#2563eb'</span>, surfaceTone: <span class="c-str">'slate'</span> };
+const snapshot = <span class="c-key">createNexusAppearanceSnapshotFromState</span>(state);
+const paint    = <span class="c-key">resolveFirstPaint</span>(snapshot, false);
+
+document.documentElement.classList.toggle(<span class="c-str">'dark'</span>, paint.className === <span class="c-str">'dark'</span>);
+themeStyle.textContent = <span class="c-key">themeToCss</span>(deriveTheme(createNexusThemeContract(snapshot.state)));</pre>
+
+    <h3>What a new framework inherits vs. what it builds</h3>
+
+    <div class="tbl-wrap">
+      <table>
+        <thead>
+          <tr><th>Concern</th><th>Shared across every target</th><th>Per-framework work</th></tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>Token values</td>
+            <td class="dim">All 107 semantic colors, every scale, every mode — one engine</td>
+            <td class="dim">none</td>
+          </tr>
+          <tr>
+            <td>Contrast guarantees</td>
+            <td class="dim">The APCA sweep proves the values, not the components</td>
+            <td class="dim">none</td>
+          </tr>
+          <tr>
+            <td>Appearance model</td>
+            <td class="dim">State shape, sanitizer, snapshot versioning, first-paint resolution</td>
+            <td class="dim">none</td>
+          </tr>
+          <tr>
+            <td>Token source</td>
+            <td class="dim">DTCG JSON — portable to Style&nbsp;Dictionary, Swift, Kotlin, RN</td>
+            <td class="dim">a build target</td>
+          </tr>
+          <tr>
+            <td>State binding</td>
+            <td class="dim">—</td>
+            <td class="dim">a provider / store in that framework's idiom, roughly one file</td>
+          </tr>
+          <tr>
+            <td>Components</td>
+            <td class="dim">The variant contract, data attributes, sizing table, focus policy</td>
+            <td class="dim">implementations on that framework's headless primitives</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="callout">
+      <p>
+        The line to hold in a conversation: <strong>a second framework does not get a second
+        theme.</strong> It imports the same npm package, calls the same function, and gets
+        byte-identical token values — so a React app and a Vue app in the same product render
+        the same grey, provably, without anyone coordinating.
+      </p>
+    </div>
+
+    <h3>Honest status</h3>
+    <ul class="tight" style="max-width:78ch">
+      <li><strong>Shipped:</strong> the engine (<code>@nexus_ds/core</code>, on npm) and the React binding — 63 components.</li>
+      <li><strong>Designed for, not yet built:</strong> Vue, Svelte, Angular, and React Native bindings. The engine has no framework coupling to remove first, which is the part that is usually expensive.</li>
+      <li><strong>Native platforms:</strong> tokens are already DTCG, so Swift / Kotlin outputs are a Style&nbsp;Dictionary target rather than a re-authoring exercise. Note that the <em>runtime derivation</em> would need a port to be live on native; the generated value sets travel today.</li>
+      <li><strong>In flight:</strong> the copy-own export tool that vendors components and theme CSS into a consuming app (tracked as issue&nbsp;#541).</li>
+    </ul>
+  </div>
+</section>
+
+<!-- ═══════════════════════════════════════════════ SHADCN ═══ -->
+<section id="shadcn">
+  <div class="frame">
+    <div class="sec-head">
+      <div class="eyebrow">07 — Comparison</div>
+      <h2>How this differs from shadcn/ui</h2>
+      <p class="sec-sub">
+        Nexus adopts shadcn's best idea — you own the component source — and rejects its
+        token model. Every divergence below is written down in
+        <code>shadcn-divergences.md</code> and enforced by lint, so adaptation is mechanical
+        rather than a matter of taste.
+      </p>
+    </div>
+
+    <div class="tbl-wrap">
+      <table>
+        <thead>
+          <tr><th>Concern</th><th>shadcn/ui</th><th>Nexus</th><th>Why</th></tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>Who produces tokens</td>
+            <td class="dim">You do — hand-authored CSS variables per app</td>
+            <td class="dim">A versioned engine, one producer</td>
+            <td class="dim">Four apps stop meaning four themes</td>
+          </tr>
+          <tr>
+            <td>Token naming</td>
+            <td class="mono dim">bg-primary</td>
+            <td class="mono dim">nx:bg-primary-background</td>
+            <td class="dim">A family is not a value; the suffix names the role</td>
+          </tr>
+          <tr>
+            <td>Hover / active</td>
+            <td class="mono dim">hover:bg-primary/90</td>
+            <td class="mono dim">nx:hover:bg-primary-background-hover</td>
+            <td class="dim">An opacity guess is not a theme decision; hover is a token</td>
+          </tr>
+          <tr>
+            <td>Disabled states</td>
+            <td class="dim">Opacity on the element</td>
+            <td class="mono dim">nx:bg-primary-disabled</td>
+            <td class="dim">Opacity compounds unpredictably over a tinted surface</td>
+          </tr>
+          <tr>
+            <td>The accent token</td>
+            <td class="mono dim">bg-accent</td>
+            <td class="dim">Removed — mapped per surface</td>
+            <td class="dim">"Accent" meant three different hovers; now it names which surface</td>
+          </tr>
+          <tr>
+            <td>Status colors</td>
+            <td class="dim">destructive only</td>
+            <td class="dim">error, success, warning, information — 44 tokens</td>
+            <td class="dim">Products need four states, not one</td>
+          </tr>
+          <tr>
+            <td>Soft variants</td>
+            <td class="dim">—</td>
+            <td class="mono dim">*-subtle, *-subtle-foreground, -hover, -active</td>
+            <td class="dim">The tinted-background pattern, tokenised instead of improvised</td>
+          </tr>
+          <tr>
+            <td>Card surface</td>
+            <td class="mono dim">bg-card</td>
+            <td class="mono dim">nx:bg-container</td>
+            <td class="dim">Named by elevation role, so non-card panels use it honestly</td>
+          </tr>
+          <tr>
+            <td>Nav chrome</td>
+            <td class="mono dim">sidebar-*</td>
+            <td class="mono dim">nav-*</td>
+            <td class="dim">Sidebars, topbars, and rails are one namespace</td>
+          </tr>
+          <tr>
+            <td>Color space</td>
+            <td class="dim">Varies; commonly HSL</td>
+            <td class="dim">OKLCH, P3 chroma, perceptual L grid</td>
+            <td class="dim">Equal steps look equal; contrast math becomes tractable</td>
+          </tr>
+          <tr>
+            <td>Contrast checking</td>
+            <td class="dim">Author's responsibility</td>
+            <td class="dim">4,500 APCA assertions in CI</td>
+            <td class="dim">The property is proved, not asserted</td>
+          </tr>
+          <tr>
+            <td>Namespace</td>
+            <td class="dim">Unprefixed</td>
+            <td class="mono dim">nx: on every utility</td>
+            <td class="dim">Vendored code must not collide with the host's Tailwind</td>
+          </tr>
+          <tr>
+            <td>Escape hatch</td>
+            <td class="mono dim">bg-blue-500 available</td>
+            <td class="dim">Deleted via <code>--color-*: initial</code></td>
+            <td class="dim">The convention is compiled in, not remembered</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="split">
+      <div>
+        <h4>What Nexus keeps from shadcn</h4>
+        <ul class="tight">
+          <li><strong>Copy-own components.</strong> You get the source, you can edit it, there is no black box to fight.</li>
+          <li><strong>Radix underneath.</strong> Accessibility semantics, focus management, and portal behaviour come from primitives, not from us re-solving them.</li>
+          <li><strong>CVA for variants.</strong> The variant-to-class map stays a readable table.</li>
+          <li><strong>The <code>asChild</code> pattern.</strong> Composition over a polymorphic <code>as</code> prop.</li>
+        </ul>
+      </div>
+      <div>
+        <h4>Where shadcn is the better choice</h4>
+        <ul class="tight">
+          <li><strong>One app, one framework, one theme.</strong> A derivation engine is overhead you will not recover.</li>
+          <li><strong>You want the ecosystem.</strong> Blocks, registries, and community components target shadcn's token names.</li>
+          <li><strong>Time-to-first-screen.</strong> <code>npx shadcn add button</code> is minutes; Nexus asks you to adopt a token discipline first.</li>
+        </ul>
+        <p style="font-size:14.5px;color:var(--ink-muted);margin-top:14px">
+          Nexus pays off at the point where you have multiple products, multiple frameworks,
+          or a brand that must be re-themeable per tenant — which is precisely the case it
+          was built for.
+        </p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═════════════════════════════════════════════ CONTRACT ═══ -->
+<section id="contract">
+  <div class="frame">
+    <div class="sec-head">
+      <div class="eyebrow">08 — Components</div>
+      <h2>The component contract</h2>
+      <p class="sec-sub">
+        63 components, and every one of them is the same shape. That regularity is what makes
+        the library portable — a Vue binding re-implements rendering, not decisions.
+      </p>
+    </div>
+
+    <div class="guards">
+      <div class="guard">
+        <div class="guard-t">data-slot / data-variant / data-size</div>
+        <div class="guard-b">
+          The stable test and styling surface. Tests never assert on class names, because
+          <code>nx:</code> classes change when variants are restyled. Attributes are part of
+          the contract; classes are an implementation detail.
+        </div>
+      </div>
+      <div class="guard">
+        <div class="guard-t">CVA for enums, ternaries for booleans</div>
+        <div class="guard-b">
+          Variant and size go in the <code>cva()</code> table. <code>loading</code> and
+          <code>disabled</code> stay explicit in the component body, so boolean logic never
+          hides inside a class map.
+        </div>
+      </div>
+      <div class="guard">
+        <div class="guard-t">One focus treatment, system-wide</div>
+        <div class="guard-b">
+          Every keyboard-focusable control uses the same <code>focus-default</code> ring —
+          no per-variant focus color, no destructive swap. Focus is a system signal
+          ("you are here"), not a status.
+        </div>
+      </div>
+      <div class="guard">
+        <div class="guard-t">Menu rows get a tint, not a ring</div>
+        <div class="guard-b">
+          Radix roving focus moves DOM focus on pointer hover, so a ring would flash for
+          mouse users. Overlay rows use a popover-surface tint instead. The rule is written
+          down as a surface exception map.
+        </div>
+      </div>
+      <div class="guard">
+        <div class="guard-t">A published sizing contract</div>
+        <div class="guard-b">
+          Heights, inline padding, and width behaviour are a table in the rules, not
+          per-component improvisation — with a ~44px touch-target floor enforced via
+          coarse-pointer hit-area overlays.
+        </div>
+      </div>
+      <div class="guard">
+        <div class="guard-t">@container over viewport breakpoints</div>
+        <div class="guard-b">
+          Components adapt to their parent's width, so one renders the same in a sidebar
+          and a hero. Viewport prefixes are reserved for page shell and full-viewport
+          overlays.
+        </div>
+      </div>
+    </div>
+
+    <h3>Button, as the worked example</h3>
+<pre>const buttonVariants = <span class="c-key">cva</span>(
+  <span class="c-str">'nx:inline-flex nx:rounded-base nx:border-default nx:transition-[color,background-color,border-color,scale]
+   nx:active:scale-[0.96] nx:motion-reduce:active:scale-100
+   nx:focus-visible:outline-2 nx:focus-visible:outline-focus-default
+   nx:focus-visible:outline-offset-(--focus-offset)'</span>,
+  { variants: {
+      variant: {
+        default: <span class="c-str">'nx:bg-primary-background nx:text-primary-foreground
+                  nx:hover:bg-primary-background-hover
+                  nx:active:bg-primary-background-active
+                  nx:disabled:bg-primary-disabled'</span>,
+        <span class="c-dim">/* destructive, outline, dashed, secondary, ghost, link, error */</span>
+      },
+      size: { sm: <span class="c-str">'nx:h-8 nx:px-2.5'</span>, default: <span class="c-str">'nx:h-10 nx:px-3'</span>, lg: <span class="c-str">'nx:h-12 nx:px-3.5'</span>,
+              <span class="c-str">'icon-sm'</span>: <span class="c-str">'nx:size-8'</span>, icon: <span class="c-str">'nx:size-10'</span>, <span class="c-str">'icon-lg'</span>: <span class="c-str">'nx:size-12'</span> },
+  }});</pre>
+
+    <p class="prose" style="color:var(--ink-muted);margin-top:20px">
+      Four details worth pointing at when you walk through this: every color is a semantic
+      token with a full path; hover / active / disabled are <em>tokens</em>, not opacity;
+      the press animation has an explicit <code>motion-reduce</code> counterpart; and the
+      focus offset is itself tokenised, so the focus treatment can be re-tuned system-wide
+      from one variable.
+    </p>
+  </div>
+</section>
+
+<!-- ═══════════════════════════════════════════ GUARDRAILS ═══ -->
+<section id="guardrails">
+  <div class="frame">
+    <div class="sec-head">
+      <div class="eyebrow">09 — Enforcement</div>
+      <h2>Conventions that fail the build</h2>
+      <p class="sec-sub">
+        A design system is only as good as what it prevents on a Friday afternoon. Nexus
+        converts its written rules into checks — so a contributor who has never read them
+        still cannot violate them.
+      </p>
+    </div>
+
+    <h3>Custom lint rules</h3>
+    <div class="tbl-wrap">
+      <table>
+        <thead><tr><th>Rule</th><th>Catches</th></tr></thead>
+        <tbody>
+          <tr><td class="mono">nx-class-conventions</td><td class="dim">Wrong prefix order (<code>hover:nx:…</code>), the banned <code>accent</code> token, incomplete token paths, raw primitives like <code>nx:bg-blue-500</code></td></tr>
+          <tr><td class="mono">no-render-prop-types</td><td class="dim">Props typed as <code>(…) =&gt; ReactNode</code> or <code>ComponentType</code> — composition via <code>children</code> instead of injected renderers</td></tr>
+          <tr><td class="mono">no-multi-statement-jsx-handler</td><td class="dim">Inline JSX handlers with 3+ statements or a nested callback object — extract and name them</td></tr>
+          <tr><td class="mono">canonical-spacing-steps</td><td class="dim">A px value in a spacing mode file that is off the canonical step set</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <h3>Stories are the tests</h3>
+    <p class="prose" style="color:var(--ink-muted)">
+      There are no <code>*.test.tsx</code> files for components — the config explicitly
+      excludes them. A single <code>*.stories.tsx</code> does four jobs: visual
+      documentation, an interactive prop playground, behaviour assertions via
+      <code>play</code> functions in real Chromium, and an axe-core accessibility pass that
+      fails the run on any violation. 70 story files across 63 components.
+    </p>
+
+    <h3>The audit surface</h3>
+    <div class="guards">
+      <div class="guard">
+        <div class="guard-t">audit:contrast</div>
+        <div class="guard-b">The 4,500-assertion APCA sweep across every seed, tone, and contrast setting.</div>
+      </div>
+      <div class="guard">
+        <div class="guard-t">audit:class-refs</div>
+        <div class="guard-b">Every <code>nx:</code> class in component source resolves to a real registry token.</div>
+      </div>
+      <div class="guard">
+        <div class="guard-t">audit:colorblind</div>
+        <div class="guard-b">Categorical chart colors stay distinguishable under simulated color-vision deficiency.</div>
+      </div>
+      <div class="guard">
+        <div class="guard-t">audit:mode-distinctness</div>
+        <div class="guard-b">Two appearance modes that emit identical values are a bug — a mode nobody can see is dead config.</div>
+      </div>
+      <div class="guard">
+        <div class="guard-t">audit:browser-support</div>
+        <div class="guard-b">New platform features are checked against the floor: Chrome 111, Edge 111, Firefox 113, Safari 15.4, Samsung 22.</div>
+      </div>
+      <div class="guard">
+        <div class="guard-t">audit:runtime-exports</div>
+        <div class="guard-b">The published engine's public surface is an allowlist — accidental exports fail CI.</div>
+      </div>
+      <div class="guard">
+        <div class="guard-t">validate:spacing-modes</div>
+        <div class="guard-b">Every density mode defines the same role keys, so no mode can silently drop one.</div>
+      </div>
+      <div class="guard">
+        <div class="guard-t">size-limit</div>
+        <div class="guard-b">Hard budgets: 95&nbsp;kB for the ESM bundle, 30&nbsp;kB CSS, 45&nbsp;kB for the appearance entry.</div>
+      </div>
+    </div>
+
+    <p class="prose" style="color:var(--ink-muted);margin-top:26px">
+      All of it runs behind one command. <code>make verify</code> is the pre-push gate and is
+      exactly what CI runs: lint, format check, typecheck, the full test suite, then the
+      token, accessibility, and browser audits.
+    </p>
+  </div>
+</section>
+
+<!-- ══════════════════════════════════════════ TALK TRACK ═══ -->
+<section id="track">
+  <div class="frame">
+    <div class="sec-head">
+      <div class="eyebrow">10 — Cheat sheet</div>
+      <h2>Five things to say out loud</h2>
+      <p class="sec-sub">
+        If the room only remembers five sentences, these are the ones that carry the
+        argument.
+      </p>
+    </div>
+
+    <div class="track">
+      <div class="track-row">
+        <div class="track-k">The frame</div>
+        <div class="track-v">
+          "Nexus is a token engine that happens to ship React components — not a component
+          library that happens to have tokens."
+        </div>
+      </div>
+      <div class="track-row">
+        <div class="track-k">The mechanism</div>
+        <div class="track-v">
+          "There is exactly one producer of semantic color. It runs at build time to bake a
+          static floor, and at runtime to override it. Two producers always drift, so we
+          removed the second one."
+        </div>
+      </div>
+      <div class="track-row">
+        <div class="track-k">The proof</div>
+        <div class="track-v">
+          "No combination of brand color, surface tone, and contrast setting a consumer can
+          pick will produce an illegible pair — 4,500 APCA assertions re-prove that on
+          every commit."
+        </div>
+      </div>
+      <div class="track-row">
+        <div class="track-k">The payoff</div>
+        <div class="track-v">
+          "Adding Vue or Svelte means writing a binding, not a design system. The engine has
+          zero framework coupling, so a React app and a Vue app render provably identical
+          tokens."
+        </div>
+      </div>
+      <div class="track-row">
+        <div class="track-k">vs. shadcn</div>
+        <div class="track-v">
+          "We kept copy-own components and Radix. We rejected hand-authored CSS variables per
+          app — that is the part that forks and never converges."
+        </div>
+      </div>
+    </div>
+
+    <div class="callout" style="margin-top:32px">
+      <p>
+        And the honest caveat, if someone asks: React is the only binding shipped today, and
+        the copy-own export tool is still landing. The claim is that the
+        <em>expensive</em> part — decoupling theming from the framework — is already done.
+      </p>
+    </div>
+  </div>
+</section>
+
+<footer>
+  <div class="frame">
+    Sourced from the nexuslabs-ai/nexus monorepo — @nexus_ds/core v0.4.0, @nexus_ds/react v0.1.1.<br>
+    Every token value on this page is copied verbatim from the generated packages/tailwind/nexus.css.<br>
+    This page is set in the system's own default appearance: stone surface tone, square corners, 1px strokes.
+  </div>
+</footer>
