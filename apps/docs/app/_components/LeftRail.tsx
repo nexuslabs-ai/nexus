@@ -1,11 +1,10 @@
 'use client';
 
+import { cn } from '@nexus_ds/react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 
 import type { Section } from '../_lib/sections';
-
-import { cn } from './nexus';
 
 const RAIL_LINK_BASE =
   'nx:block nx:px-2 nx:py-1 nx:typography-label-default nx:rounded-sm nx:border-l-2 nx:no-underline nx:focus-visible:outline-2 nx:focus-visible:outline-focus-default nx:focus-visible:outline-offset-(--focus-offset)';

@@ -2,13 +2,14 @@
 
 import { useEffect, useRef, useState } from 'react';
 
+import { cn } from '@nexus_ds/react';
 import { useNexusAppearance } from '@nexus_ds/react/appearance';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 
 import { SECTIONS } from '../_lib/sections';
 
-import { Button, cn } from './nexus';
+import { Button } from './nexus';
 import { SearchPalette } from './SearchPalette';
 
 const NAV_LINKS = [
