@@ -36,7 +36,12 @@ function isActive(pathname: string, match: string) {
 }
 
 function centerInStrip(link: HTMLAnchorElement | null) {
-  link?.scrollIntoView({ block: 'nearest', inline: 'center' });
+  const strip = link?.parentElement;
+  if (!strip) return;
+  const linkRect = link.getBoundingClientRect();
+  const stripRect = strip.getBoundingClientRect();
+  strip.scrollLeft +=
+    linkRect.left - stripRect.left - (stripRect.width - linkRect.width) / 2;
 }
 
 export function TopNav() {
