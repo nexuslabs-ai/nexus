@@ -8,7 +8,7 @@ import { usePathname } from 'next/navigation';
 
 import { SECTIONS } from '../_lib/sections';
 
-import { Button } from './nexus';
+import { Button, cn } from './nexus';
 import { SearchPalette } from './SearchPalette';
 
 const NAV_LINKS = [
@@ -24,14 +24,22 @@ const NAV_LINKS = [
 const NAV_LINK_BASE =
   'nx:px-3 nx:py-1 nx:shrink-0 nx:typography-label-default nx:rounded-sm nx:focus-visible:outline-2 nx:focus-visible:outline-focus-default nx:focus-visible:outline-offset-(--focus-offset)';
 
+const PANEL_LINK_BASE = cn(NAV_LINK_BASE, 'nx:block nx:border-l-2');
+
+const COARSE_HIT_AREA =
+  'nx:relative nx:pointer-coarse:after:absolute nx:pointer-coarse:after:-inset-2';
+
 function isActive(pathname: string, match: string) {
   if (match === '/') return pathname === '/';
   return pathname === match || pathname.startsWith(match + '/');
 }
 
+function centerInStrip(link: HTMLAnchorElement | null) {
+  link?.scrollIntoView({ block: 'nearest', inline: 'center' });
+}
+
 export function TopNav() {
   const pathname = usePathname();
-  const navRef = useRef<HTMLElement>(null);
   const menuRef = useRef<HTMLElement>(null);
   const triggerRef = useRef<HTMLButtonElement>(null);
   const [menuOpen, setMenuOpen] = useState(false);
@@ -39,7 +47,6 @@ export function TopNav() {
   const isDark = resolvedMode === 'dark';
   const currentLink = NAV_LINKS.find((link) => isActive(pathname, link.match));
 
-  // Tabbing off the last row leaves the panel open over the page otherwise.
   // relatedTarget is null when focus goes nowhere, not when it leaves the nav.
   const closeOnFocusLeave = (event: React.FocusEvent<HTMLElement>) => {
     if (!event.relatedTarget) return;
@@ -69,18 +76,6 @@ export function TopNav() {
     };
   }, [menuOpen]);
 
-  // Centre the current section in the horizontally scrolling link strip.
-  useEffect(() => {
-    const nav = navRef.current;
-    const active = nav?.querySelector<HTMLElement>('[data-active="true"]');
-    if (!nav || !active) return;
-
-    const navBox = nav.getBoundingClientRect();
-    const linkBox = active.getBoundingClientRect();
-    nav.scrollLeft +=
-      linkBox.left - navBox.left - (navBox.width - linkBox.width) / 2;
-  }, [pathname]);
-
   const toggleMode = () => {
     const nextMode = isDark ? 'light' : 'dark';
     setState((current) => ({ ...current, mode: nextMode }));
@@ -106,7 +101,7 @@ export function TopNav() {
           size="sm"
           aria-expanded={menuOpen}
           onClick={() => setMenuOpen((open) => !open)}
-          className="nx:relative nx:pointer-coarse:after:absolute nx:pointer-coarse:after:-inset-2"
+          className={COARSE_HIT_AREA}
         >
           <span aria-hidden="true">☰</span>
           {currentLink?.label ?? 'Sections'}
@@ -121,11 +116,12 @@ export function TopNav() {
                     href={link.href}
                     onClick={() => setMenuOpen(false)}
                     aria-current={active ? 'true' : undefined}
-                    className={
+                    className={cn(
+                      PANEL_LINK_BASE,
                       active
-                        ? `${NAV_LINK_BASE} nx:block nx:border-l-2 nx:border-focus-default nx:font-semibold nx:bg-primary-subtle nx:text-primary-subtle-foreground`
-                        : `${NAV_LINK_BASE} nx:block nx:border-l-2 nx:border-transparent nx:hover:bg-popover-hover`
-                    }
+                        ? 'nx:border-focus-default nx:font-semibold nx:bg-primary-subtle nx:text-primary-subtle-foreground'
+                        : 'nx:border-transparent nx:hover:bg-popover-hover'
+                    )}
                   >
                     {link.label}
                   </Link>
@@ -136,7 +132,6 @@ export function TopNav() {
         )}
       </nav>
       <nav
-        ref={navRef}
         aria-label="Sections"
         className="nx:hidden nx:xl:flex nx:gap-0.5 nx:flex-1 nx:min-w-0 nx:overflow-x-auto nx:py-1.5"
       >
@@ -146,13 +141,14 @@ export function TopNav() {
             <Link
               key={link.href}
               href={link.href}
-              data-active={active}
+              ref={active ? centerInStrip : undefined}
               aria-current={active ? 'true' : undefined}
-              className={
+              className={cn(
+                NAV_LINK_BASE,
                 active
-                  ? `${NAV_LINK_BASE} nx:bg-nav-item-active nx:text-primary-subtle-foreground`
-                  : `${NAV_LINK_BASE} nx:text-nav-muted-foreground nx:hover:text-nav-foreground nx:hover:bg-nav-item-hover`
-              }
+                  ? 'nx:bg-nav-item-active nx:text-primary-subtle-foreground'
+                  : 'nx:text-nav-muted-foreground nx:hover:text-nav-foreground nx:hover:bg-nav-item-hover'
+              )}
             >
               {link.label}
             </Link>
@@ -165,7 +161,7 @@ export function TopNav() {
         size="sm"
         onClick={toggleMode}
         aria-label={isDark ? 'Switch to light mode' : 'Switch to dark mode'}
-        className="nx:relative nx:pointer-coarse:after:absolute nx:pointer-coarse:after:-inset-2"
+        className={COARSE_HIT_AREA}
       >
         {isDark ? '☀' : '◐'}
       </Button>

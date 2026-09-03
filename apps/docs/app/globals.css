@@ -15,10 +15,6 @@
 @source '../../../packages/react/src';
 
 :root {
-  /* Height of the sticky TopNav. Both rails pin to it and the scroll port
-     clears it, so the header's height is declared here rather than emerging
-     from its padding. */
   --docs-header-h: 3.5rem;
-  /* Where a #hash link lands: below the header, with room to breathe. */
   --docs-scroll-offset: calc(var(--docs-header-h) + 1.5rem);
 }

@@ -30,3 +30,4 @@ export {
   SelectTrigger,
   SelectValue,
 } from '@nexus_ds/react';
+export { cn } from '@nexus_ds/react';

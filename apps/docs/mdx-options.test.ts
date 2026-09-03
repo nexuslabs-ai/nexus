@@ -12,10 +12,8 @@ const CONTENT_DIR = path.join(
   'content'
 );
 
-/**
- * `footnote-label` on theme-setup comes from remark-rehype, not rehype-slug —
- * rehype-slug skips headings that already carry an id.
- */
+// `footnote-label` comes from remark-rehype: rehype-slug skips headings that
+// already carry an id.
 const EXPECTED_HEADING_IDS: Record<string, string[]> = {
   'getting-started/install.mdx': [
     'install',
@@ -62,9 +60,8 @@ interface HastNode {
   children?: HastNode[];
 }
 
-// Mirrors @next/mdx's loader, which resolves plugin strings with
-// require.resolve from the directory of the .mdx file being compiled.
-// createRequire takes the *file*, not the directory, and resolves from its parent.
+// Resolves plugin strings from content/, the way @next/mdx's loader does.
+// createRequire takes a file, not a directory, and resolves from its parent.
 const requireFromContent = createRequire(path.join(CONTENT_DIR, 'page.mdx'));
 
 async function contentFiles() {
@@ -135,8 +132,7 @@ describe('MDX heading ids', () => {
   });
 
   it('ships MDX_OPTIONS to the loader through next.config', async () => {
-    // @next/mdx only emits turbopack.rules when TURBOPACK is set; the webpack
-    // branch buries the same loader object inside a config callback.
+    // @next/mdx only emits turbopack.rules when TURBOPACK is set.
     vi.stubEnv('TURBOPACK', '1');
     const { default: config } = await import('./next.config');
 
@@ -183,8 +179,7 @@ describe('MDX heading ids', () => {
 
       for (const id of ids) {
         expect(id).not.toBe('');
-        // A heading like "## 1. Foo" slugs to an id that native #hash
-        // navigation accepts but querySelector cannot parse.
+        // Guards ids querySelector cannot parse, e.g. a leading digit.
         expect(() => document.querySelector(`#${id}`)).not.toThrow();
       }
     }

@@ -5,6 +5,8 @@ import { usePathname } from 'next/navigation';
 
 import type { Section } from '../_lib/sections';
 
+import { cn } from './nexus';
+
 const RAIL_LINK_BASE =
   'nx:block nx:px-2 nx:py-1 nx:typography-label-default nx:rounded-sm nx:border-l-2 nx:no-underline nx:focus-visible:outline-2 nx:focus-visible:outline-focus-default nx:focus-visible:outline-offset-(--focus-offset)';
 
@@ -24,11 +26,12 @@ export function LeftRail({ section }: { section: Section }) {
               <Link
                 href={href}
                 aria-current={active ? 'page' : undefined}
-                className={
+                className={cn(
+                  RAIL_LINK_BASE,
                   active
-                    ? `${RAIL_LINK_BASE} nx:bg-primary-subtle nx:text-primary-subtle-foreground nx:border-focus-default`
-                    : `${RAIL_LINK_BASE} nx:text-muted-foreground nx:border-transparent nx:hover:text-foreground nx:hover:bg-container-hover`
-                }
+                    ? 'nx:bg-primary-subtle nx:text-primary-subtle-foreground nx:border-focus-default'
+                    : 'nx:text-muted-foreground nx:border-transparent nx:hover:text-foreground nx:hover:bg-container-hover'
+                )}
               >
                 {sub.label}
               </Link>
