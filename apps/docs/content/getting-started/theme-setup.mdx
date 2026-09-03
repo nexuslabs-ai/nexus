@@ -4,7 +4,7 @@ Nexus Appearance derives a full runtime theme from one state object, paints it
 before React hydrates, and persists the user's choices. Setup has three pieces:
 CSS imports, a provider, and a first-paint script.
 
-## 1. Import the styles
+## Import the styles
 
 At your app's CSS entry point:
 
@@ -17,7 +17,7 @@ At your app's CSS entry point:
 contains the utilities used inside compiled Nexus components, because Tailwind
 does not scan `node_modules`.
 
-## 2. Pick a default appearance
+## Pick a default appearance
 
 Customize the shipped default by changing state fields. Brand and surface tone
 are state fields, not factory arguments.
