@@ -8,7 +8,7 @@
       "command": "npx",
       "args": [
         "chrome-devtools-mcp@latest",
-        "--executable-path=/Applications/Brave Browser.app/Contents/MacOS/Brave Browser"
+        "--executable-path=${NEXUS_BROWSER_PATH:-/Applications/Brave Browser.app/Contents/MacOS/Brave Browser}"
       ]
     },
     "nexus-docs-mcp": {
