@@ -65,4 +65,42 @@ describe('surface ladder', () => {
   it('keeps the dark ladder at its expected raw steps', () => {
     expectStepsToMatch(DARK_SURFACE_STEPS, EXPECTED_DARK_SURFACE_STEPS);
   });
+
+  // `Bubble`'s muted variant borrows `popover-active` as its hover, because
+  // `muted` has no `-hover` rung. `components.md` justifies that borrow by it
+  // being exactly *one* rung above `muted` in both regimes. The tables above
+  // pin today's numbers, so they move with any re-baseline; this pins the
+  // relation instead.
+  it('keeps popover-active exactly one rung above muted in both regimes', () => {
+    // Elevation runs in opposite directions: light surfaces rise by darkening,
+    // dark surfaces by lightening.
+    for (const [regime, steps, towardsElevated] of [
+      ['light', LIGHT_SURFACE_STEPS, -1],
+      ['dark', DARK_SURFACE_STEPS, 1],
+    ] as const) {
+      const rise = (steps['popover-active'] - steps.muted) * towardsElevated;
+
+      expect(
+        rise,
+        `${regime}: popover-active must sit one rung above muted`
+      ).toBeGreaterThan(0.1);
+
+      const low = Math.min(steps.muted, steps['popover-active']);
+      const high = Math.max(steps.muted, steps['popover-active']);
+      const between = SURFACE_TOKENS.filter(
+        (token) => steps[token] > low && steps[token] < high
+      );
+
+      expect(
+        between,
+        `${regime}: rungs between muted and popover-active`
+      ).toEqual([]);
+    }
+  });
+
+  // The borrow only holds while `muted` has no hover rung of its own; a real
+  // `muted-hover` token must repoint `Bubble` rather than sit unused.
+  it('has no muted-hover rung for the borrow to shadow', () => {
+    expect(SURFACE_TOKENS as readonly string[]).not.toContain('muted-hover');
+  });
 });

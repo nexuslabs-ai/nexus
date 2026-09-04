@@ -1,0 +1,5 @@
+/* `Bubble`'s actionable-turn scope: a direct content child that can genuinely
+ * be actioned. Defined once so the hover and press cues cannot drift apart.
+ * Imported by src/index.css. */
+@custom-variant bubble-hovered (&:has(> [data-bubble-part='content']:is(a[href], button:not(:disabled)):not([aria-disabled='true']):hover));
+@custom-variant bubble-pressed (&:has(> [data-bubble-part='content']:is(a[href], button:not(:disabled)):not([aria-disabled='true']):active));

@@ -9,8 +9,10 @@
  */
 @import 'tailwindcss' prefix(nx);
 @custom-variant reduce-transparency (@media (prefers-reduced-transparency: reduce));
+@custom-variant no-has-support (@supports not (selector(:has(*))));
 @reference '@nexus_ds/tailwind';
 @import 'tw-animate-css';
+@import './components/bubble/bubble.css';
 @import './components/progress/progress.css';
 
 @media (prefers-reduced-motion: reduce) {

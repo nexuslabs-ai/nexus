@@ -17,6 +17,7 @@ export * from './components/attachment';
 export * from './components/avatar';
 export * from './components/badge';
 export * from './components/breadcrumb';
+export * from './components/bubble';
 export * from './components/button';
 export * from './components/button-group';
 export * from './components/card';
