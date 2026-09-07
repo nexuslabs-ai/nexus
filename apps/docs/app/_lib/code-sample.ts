@@ -7,6 +7,8 @@ import { NEXUS_CODE_THEME } from '../../code-theme';
 
 import { CODE_BLOCK_SURFACE } from './code-block';
 
+import 'server-only';
+
 const LANGS = { css, tsx };
 
 export type CodeSampleLanguage = keyof typeof LANGS;

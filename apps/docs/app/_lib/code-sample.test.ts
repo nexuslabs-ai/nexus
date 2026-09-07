@@ -11,7 +11,7 @@ const TSX_SOURCE = `export function Hello({ name }: { name: string }) {
   return <Button variant="primary">{name}</Button>;
 }`;
 
-describe('CodeSample', () => {
+describe('highlightSample', () => {
   it('tokenises with the same theme the MDX fences use', async () => {
     const html = await highlightSample('tsx', TSX_SOURCE);
 

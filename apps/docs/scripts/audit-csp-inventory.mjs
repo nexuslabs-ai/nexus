@@ -1,5 +1,4 @@
 import { existsSync, readdirSync, readFileSync } from 'node:fs';
-import { createRequire } from 'node:module';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 
@@ -9,15 +8,16 @@ const docsRoot = path.resolve(
 );
 const appOutputDir = path.join(docsRoot, '.next', 'server', 'app');
 const clientOutputDir = path.join(docsRoot, '.next', 'static');
-// String literals and JSON keys inside them, which minifiers leave intact; a
-// bare identifier would be mangled away. One marker per entry point the docs
-// import — the highlighter core, the grammars, and the regex engine each ship
-// independently. Each is checked against the module that emits it below, so an
+// String literals only — a bare identifier or property name would be mangled
+// away, and a generic one collides with unrelated client code. The core, the
+// grammars, and the regex engine ship independently, so each needs its own.
+// Every marker is checked against the module that emits it below, so an
 // upstream rename fails here rather than silently disarming the client scan.
 const highlighterMarkers = [
   { source: '__shiki_resolved', module: '@shikijs/primitive' },
   { source: 'Shiki instance has been disposed', module: '@shikijs/primitive' },
-  { source: 'scopeName', module: '@shikijs/langs/tsx' },
+  { source: 'source.tsx', module: '@shikijs/langs/tsx' },
+  { source: 'source.css', module: '@shikijs/langs/css' },
   { source: 'Invalid recursionLimit; use 2-20', module: 'oniguruma-to-es' },
 ];
 const appearanceFixtureSource = path.join(
@@ -53,10 +53,10 @@ if (htmlFiles.length === 0) {
   process.exit(1);
 }
 
-const requireFromDocs = createRequire(path.join(docsRoot, 'package.json'));
-
 for (const { source, module } of highlighterMarkers) {
-  const dist = readFileSync(requireFromDocs.resolve(module), 'utf8');
+  // `import.meta.resolve` applies the `import` condition, so this reads the
+  // same build a bundler would pull into a client chunk.
+  const dist = readFileSync(fileURLToPath(import.meta.resolve(module)), 'utf8');
   if (!dist.includes(source)) {
     console.error(
       `Highlighter marker "${source}" is gone from ${module}; the client-bundle scan can no longer detect a highlighter.`

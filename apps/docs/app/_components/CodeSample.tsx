@@ -1,7 +1,5 @@
 import { type CodeSampleLanguage, highlightSample } from '../_lib/code-sample';
 
-import 'server-only';
-
 /**
  * Hand-written code sample on a `_pages` route, tokenised by the same theme
  * the MDX fences use.
