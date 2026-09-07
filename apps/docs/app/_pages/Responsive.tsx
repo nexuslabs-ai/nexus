@@ -1,4 +1,5 @@
 import { Breadcrumb } from '../_components/Breadcrumb';
+import { CODE_BLOCK_SURFACE } from '../_lib/code-block';
 
 /**
  * Foundations → Responsive. Server component — the breakpoint scale, the
@@ -156,7 +157,7 @@ export function Responsive() {
           <code>containerAbove=&quot;md&quot;</code> do not fire at the same
           width.
         </p>
-        <pre className="nx:typography-code-block nx:rounded-lg nx:border nx:border-border-default nx:bg-container nx:p-4 nx:overflow-x-auto">
+        <pre className={CODE_BLOCK_SURFACE}>
           {`// Viewport axis — page-shell decision
 <Show above="lg">
   <Sidebar />

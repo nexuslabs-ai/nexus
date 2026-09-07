@@ -1,3 +1,5 @@
+import { CHART_LIGHT } from './static-ramps';
+
 export type ApcaTier = 'body' | 'ui' | 'incidental';
 
 export interface ApcaPair {
@@ -17,7 +19,7 @@ const FAMILY_PAIRS = [
   'information',
 ] as const;
 
-const CATEGORICAL_INDICES = [1, 2, 3, 4, 5] as const;
+const CATEGORICAL_INDICES = CHART_LIGHT.map((_, index) => index + 1);
 
 const FOCUS_SURFACES = [
   'background',
@@ -47,6 +49,7 @@ export const APCA_PAIRS = [
   pair('muted-foreground', 'muted-extralight', 'incidental'),
   pair('disabled-foreground', 'disabled', 'incidental'),
   pair('container-foreground', 'container', 'body'),
+  pair('foreground', 'container', 'body'),
   pair('popover-foreground', 'popover', 'body'),
   pair('popover-foreground', 'popover-hover', 'ui'),
   pair('foreground', 'control-background', 'ui'),

@@ -1,4 +1,5 @@
 import { Breadcrumb } from '../_components/Breadcrumb';
+import { CODE_BLOCK_SURFACE } from '../_lib/code-block';
 
 /**
  * Foundations → Typography. Server component — a live specimen of the type
@@ -181,7 +182,7 @@ export function Typography() {
           </code>{' '}
           in running prose.
         </p>
-        <pre className="nx:typography-code-block nx:rounded-lg nx:border nx:border-border-default nx:bg-container nx:p-4 nx:overflow-x-auto">
+        <pre className={CODE_BLOCK_SURFACE}>
           {`import { Button } from '@nexus_ds/react';
 
 <Button variant="secondary">Ship it</Button>`}

@@ -8,10 +8,10 @@ const docsRoot = path.resolve(
 );
 const appOutputDir = path.join(docsRoot, '.next', 'server', 'app');
 const clientOutputDir = path.join(docsRoot, '.next', 'static');
-// The first two are string literals Shiki emits verbatim, so they survive
-// minification even when every surrounding identifier is mangled.
+// String literals and property names, which minifiers leave intact; a bare
+// identifier would be mangled away.
 const highlighterPattern =
-  /__shiki_resolved|Shiki instance has been disposed|OnigScanner|createJavaScriptRegexEngine/;
+  /__shiki_resolved|Shiki instance has been disposed|OnigScanner/;
 const appearanceFixtureSource = path.join(
   docsRoot,
   'app',

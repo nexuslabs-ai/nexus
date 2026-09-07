@@ -1,5 +1,6 @@
 import { Breadcrumb } from '../_components/Breadcrumb';
 import { Button } from '../_components/nexus';
+import { CODE_BLOCK_SURFACE } from '../_lib/code-block';
 
 /**
  * Theming → Multi-brand. The theming-model explainer (this is where
@@ -161,7 +162,7 @@ export function MultiBrand() {
           does the rest. See <strong>Consumer overrides</strong> for the full
           surface.
         </p>
-        <pre className="nx:typography-code-block nx:rounded-lg nx:border nx:border-border-default nx:bg-container nx:p-4 nx:overflow-x-auto">
+        <pre className={CODE_BLOCK_SURFACE}>
           {`/* loaded after @nexus_ds/tailwind */
 :root {
   --nx-color-primary-background: oklch(0.55 0.2 145); /* your brand */

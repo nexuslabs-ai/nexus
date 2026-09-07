@@ -36,7 +36,6 @@ jobs:
       # and typechecked by the shared turbo `build` / `typecheck` jobs.
       packages: ${{ steps.filter.outputs.packages }}
       ci: ${{ steps.filter.outputs.ci }}
-      docs: ${{ steps.filter.outputs.docs }}
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -58,6 +57,9 @@ jobs:
             packages:
               - 'packages/**'
               - 'apps/**'
+              # A dependency bump can change what ships in a bundle without
+              # touching a source file.
+              - 'pnpm-lock.yaml'
             # Mirrors the source roots scanned by `pnpm audit:browser-support`.
             browser_source:
               - 'apps/**'
