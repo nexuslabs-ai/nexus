@@ -8,7 +8,10 @@ const docsRoot = path.resolve(
 );
 const appOutputDir = path.join(docsRoot, '.next', 'server', 'app');
 const clientOutputDir = path.join(docsRoot, '.next', 'static');
-const highlighterPattern = /shiki|rehype-pretty|oniguruma|textmate/i;
+// Runtime API identifiers, not the library name: a docs page whose prose
+// mentions Shiki must not trip the guard.
+const highlighterPattern =
+  /createHighlighterCore|getSingletonHighlighter|createJavaScriptRegexEngine|OnigScanner/;
 const appearanceFixtureSource = path.join(
   docsRoot,
   'app',

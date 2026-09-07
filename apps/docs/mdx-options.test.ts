@@ -1,4 +1,5 @@
 import { compile } from '@mdx-js/mdx';
+import { SEMANTIC_TOKEN_REGISTRY } from '@nexus_ds/core';
 import { readdir, readFile } from 'node:fs/promises';
 import { createRequire } from 'node:module';
 import path from 'node:path';
@@ -127,6 +128,13 @@ async function compileMdx(source: string) {
       .filter((id): id is string => typeof id === 'string'),
   };
 }
+
+// Shiki's `normalizeTheme` mutates the theme in place on first compile: it
+// appends a settings entry and rewrites `editor.foreground`. Snapshot the
+// foregrounds at import so the assertions below see what this file declares.
+const THEME_FOREGROUNDS = NEXUS_CODE_THEME.settings.map(
+  (entry) => entry.settings.foreground
+);
 
 const CONTENT_FILES = await contentFiles();
 
@@ -290,14 +298,22 @@ describe('MDX code blocks', () => {
     ]);
   });
 
-  it('colours every scope with a Nexus syntax token', () => {
-    const foregrounds = NEXUS_CODE_THEME.settings.map(
-      (entry) => entry.settings.foreground
+  it('colours every scope with a token the registry actually ships', () => {
+    const registered = new Set(
+      SEMANTIC_TOKEN_REGISTRY.map((token) => token.name)
     );
 
-    expect(foregrounds.length).toBeGreaterThan(0);
-    for (const foreground of foregrounds) {
-      expect(foreground).toMatch(/^var\(--nx-color-[a-z0-9-]+\)$/);
+    expect(THEME_FOREGROUNDS.length).toBeGreaterThan(0);
+    for (const foreground of THEME_FOREGROUNDS) {
+      const name = /^var\(--nx-color-([a-z0-9-]+)\)$/.exec(foreground)?.[1];
+
+      expect(
+        name,
+        `${foreground} is not a --nx-color- reference`
+      ).toBeDefined();
+      expect(registered, `${name} is not in SEMANTIC_TOKEN_REGISTRY`).toContain(
+        name
+      );
     }
   });
 

@@ -12,7 +12,7 @@ import { NEXUS_CODE_THEME } from './code-theme';
 const SHIKI_OPTIONS = {
   theme: NEXUS_CODE_THEME,
   // Shiki's own surface would sit beside the page; the block keeps the Nexus
-  // `muted` fill and border from mdx-components.tsx instead.
+  // `container` fill and border from mdx-components.tsx instead.
   keepBackground: false,
   // No line numbers or line highlighting, so the grid wrapper buys nothing.
   grid: false,

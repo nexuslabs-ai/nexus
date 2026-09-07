@@ -10,8 +10,10 @@ import type { ThemeRegistrationRaw } from 'shiki';
  * The five hue-bearing roles use `chart-categorical-*` because it is the only
  * shipped family whose members are guaranteed to be distinguishable from each
  * other: the semantic foreground tokens are achromatic under a neutral brand,
- * so keywords would render as plain text. The quiet roles stay on the text
- * tiers, which is what they are for.
+ * so keywords would render as plain text. That family is APCA-gated against
+ * `container`, which is why the block paints `container` rather than `muted` —
+ * on `muted` the green and orange fall under the Lc 60 floor in light mode.
+ * The quiet roles stay on the text tiers, which is what they are for.
  */
 const SCOPES = {
   // Red — keywords carry the most structural weight, so they lead.
@@ -61,7 +63,6 @@ const TOKEN_COLORS = Object.entries(SCOPES).map(([token, scope]) => ({
 
 export const NEXUS_CODE_THEME = {
   name: 'nexus',
-  type: 'light',
   colors: { 'editor.foreground': 'var(--nx-color-foreground)' },
   settings: TOKEN_COLORS,
   // Same list under both keys: Shiki reads `settings`, while rehype-pretty-code
