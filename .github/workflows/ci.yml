@@ -77,10 +77,6 @@ jobs:
               - 'tsconfig.json'
             ci:
               - '.github/workflows/**'
-            # Gates the docs CSP inventory, which asserts no syntax
-            # highlighter reaches the client bundle.
-            docs:
-              - 'apps/docs/**'
 
   # format-check and lint run full-tree to mirror local `pnpm lint` /
   # `pnpm format:check`.
@@ -223,9 +219,8 @@ jobs:
           fi
 
       - name: Docs CSP inventory
-        if: needs.changes.outputs.docs == 'true'
         run: |
-          pnpm --filter @nexus_ds/docs build
+          pnpm turbo build --filter=@nexus_ds/docs
           pnpm --filter @nexus_ds/docs audit:csp
 
       - name: Upload build artifacts

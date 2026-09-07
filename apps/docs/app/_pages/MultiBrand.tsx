@@ -161,7 +161,7 @@ export function MultiBrand() {
           does the rest. See <strong>Consumer overrides</strong> for the full
           surface.
         </p>
-        <pre className="nx:typography-code-block nx:rounded-lg nx:border nx:border-border-default nx:bg-muted nx:p-4 nx:overflow-x-auto">
+        <pre className="nx:typography-code-block nx:rounded-lg nx:border nx:border-border-default nx:bg-container nx:p-4 nx:overflow-x-auto">
           {`/* loaded after @nexus_ds/tailwind */
 :root {
   --nx-color-primary-background: oklch(0.55 0.2 145); /* your brand */

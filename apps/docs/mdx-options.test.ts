@@ -353,6 +353,7 @@ describe('MDX code blocks', () => {
   });
 
   it('covers every language content fences', () => {
+    expect(CONTENT_FENCE_LANGUAGES.length).toBeGreaterThan(0);
     expect(Object.keys(FENCE_SNIPPETS)).toEqual(
       expect.arrayContaining(CONTENT_FENCE_LANGUAGES)
     );

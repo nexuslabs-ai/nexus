@@ -8,9 +8,10 @@ const docsRoot = path.resolve(
 );
 const appOutputDir = path.join(docsRoot, '.next', 'server', 'app');
 const clientOutputDir = path.join(docsRoot, '.next', 'static');
-// Runtime API identifiers, so docs prose mentioning Shiki cannot trip this.
+// The first two are string literals Shiki emits verbatim, so they survive
+// minification even when every surrounding identifier is mangled.
 const highlighterPattern =
-  /createHighlighterCore|getSingletonHighlighter|createJavaScriptRegexEngine|OnigScanner/;
+  /__shiki_resolved|Shiki instance has been disposed|OnigScanner|createJavaScriptRegexEngine/;
 const appearanceFixtureSource = path.join(
   docsRoot,
   'app',

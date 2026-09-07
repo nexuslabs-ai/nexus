@@ -181,7 +181,7 @@ export function Typography() {
           </code>{' '}
           in running prose.
         </p>
-        <pre className="nx:typography-code-block nx:rounded-lg nx:border nx:border-border-default nx:bg-muted nx:p-4 nx:overflow-x-auto">
+        <pre className="nx:typography-code-block nx:rounded-lg nx:border nx:border-border-default nx:bg-container nx:p-4 nx:overflow-x-auto">
           {`import { Button } from '@nexus_ds/react';
 
 <Button variant="secondary">Ship it</Button>`}

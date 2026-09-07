@@ -156,7 +156,7 @@ export function Responsive() {
           <code>containerAbove=&quot;md&quot;</code> do not fire at the same
           width.
         </p>
-        <pre className="nx:typography-code-block nx:rounded-lg nx:border nx:border-border-default nx:bg-muted nx:p-4 nx:overflow-x-auto">
+        <pre className="nx:typography-code-block nx:rounded-lg nx:border nx:border-border-default nx:bg-container nx:p-4 nx:overflow-x-auto">
           {`// Viewport axis — page-shell decision
 <Show above="lg">
   <Sidebar />

@@ -17,6 +17,8 @@ const FAMILY_PAIRS = [
   'information',
 ] as const;
 
+const CATEGORICAL_INDICES = [1, 2, 3, 4, 5] as const;
+
 const FOCUS_SURFACES = [
   'background',
   'container',
@@ -39,6 +41,8 @@ export const APCA_PAIRS = [
   pair('foreground', 'muted', 'ui'),
   pair('muted-foreground', 'muted', 'incidental'),
   pair('muted-foreground-subtle', 'muted', 'incidental'),
+  pair('muted-foreground', 'container', 'incidental'),
+  pair('muted-foreground-subtle', 'container', 'incidental'),
   pair('foreground', 'muted-extralight', 'ui'),
   pair('muted-foreground', 'muted-extralight', 'incidental'),
   pair('disabled-foreground', 'disabled', 'incidental'),
@@ -57,9 +61,10 @@ export const APCA_PAIRS = [
     pair(`${family}-foreground`, `${family}-background`, 'ui'),
     pair(`${family}-subtle-foreground`, `${family}-subtle`, 'ui'),
   ]),
-  ...Array.from({ length: 5 }, (_, index) =>
-    pair(`chart-categorical-${index + 1}`, 'container', 'ui')
-  ),
+  ...CATEGORICAL_INDICES.flatMap((index) => [
+    pair(`chart-categorical-${index}`, 'container', 'ui'),
+    pair(`chart-categorical-${index}`, 'background', 'ui'),
+  ]),
   ...FOCUS_SURFACES.flatMap((surface) => [
     pair('focus-default', surface, 'incidental'),
     pair('focus-error', surface, 'incidental'),
