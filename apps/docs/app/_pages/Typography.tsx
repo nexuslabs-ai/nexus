@@ -1,5 +1,5 @@
 import { Breadcrumb } from '../_components/Breadcrumb';
-import { CODE_BLOCK_SURFACE } from '../_lib/code-block';
+import { CodeSample } from '../_components/CodeSample';
 
 /**
  * Foundations → Typography. Server component — a live specimen of the type
@@ -182,11 +182,11 @@ export function Typography() {
           </code>{' '}
           in running prose.
         </p>
-        <pre className={CODE_BLOCK_SURFACE}>
+        <CodeSample lang="tsx">
           {`import { Button } from '@nexus_ds/react';
 
 <Button variant="secondary">Ship it</Button>`}
-        </pre>
+        </CodeSample>
       </section>
 
       {/* ── Families ────────────────────────────────────────── */}

@@ -1,5 +1,5 @@
 import { Breadcrumb } from '../_components/Breadcrumb';
-import { CODE_BLOCK_SURFACE } from '../_lib/code-block';
+import { CodeSample } from '../_components/CodeSample';
 
 /**
  * Foundations → Responsive. Server component — the breakpoint scale, the
@@ -157,7 +157,7 @@ export function Responsive() {
           <code>containerAbove=&quot;md&quot;</code> do not fire at the same
           width.
         </p>
-        <pre className={CODE_BLOCK_SURFACE}>
+        <CodeSample lang="tsx">
           {`// Viewport axis — page-shell decision
 <Show above="lg">
   <Sidebar />
@@ -167,7 +167,7 @@ export function Responsive() {
 <Hide containerBelow="md">
   <Actions />
 </Hide>`}
-        </pre>
+        </CodeSample>
       </section>
 
       {/* ── Which mechanism ─────────────────────────────────── */}

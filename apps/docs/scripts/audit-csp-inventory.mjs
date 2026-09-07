@@ -1,4 +1,5 @@
 import { existsSync, readdirSync, readFileSync } from 'node:fs';
+import { createRequire } from 'node:module';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 
@@ -8,10 +9,14 @@ const docsRoot = path.resolve(
 );
 const appOutputDir = path.join(docsRoot, '.next', 'server', 'app');
 const clientOutputDir = path.join(docsRoot, '.next', 'static');
-// String literals and property names, which minifiers leave intact; a bare
-// identifier would be mangled away.
-const highlighterPattern =
-  /__shiki_resolved|Shiki instance has been disposed|OnigScanner/;
+// Quoted string literals, which minifiers leave intact; a bare identifier
+// would be mangled away. Each is checked against the module that emits it
+// below, so an upstream rename fails here rather than silently disarming the
+// client-bundle scan.
+const highlighterMarkers = [
+  { source: '__shiki_resolved', module: '@shikijs/primitive' },
+  { source: 'Shiki instance has been disposed', module: '@shikijs/primitive' },
+];
 const appearanceFixtureSource = path.join(
   docsRoot,
   'app',
@@ -45,11 +50,25 @@ if (htmlFiles.length === 0) {
   process.exit(1);
 }
 
-const highlighterChunks = walk(clientOutputDir).filter(
-  (file) =>
-    /\.(?:js|mjs)$/.test(file) &&
-    highlighterPattern.test(readFileSync(file, 'utf8'))
+const requireFromShiki = createRequire(
+  createRequire(path.join(docsRoot, 'package.json')).resolve('shiki')
 );
+
+for (const { source, module } of highlighterMarkers) {
+  const dist = readFileSync(requireFromShiki.resolve(module), 'utf8');
+  if (!dist.includes(JSON.stringify(source))) {
+    console.error(
+      `Highlighter marker "${source}" is gone from ${module}; the client-bundle scan can no longer detect a highlighter.`
+    );
+    process.exit(1);
+  }
+}
+
+const highlighterChunks = walk(clientOutputDir).filter((file) => {
+  if (!/\.(?:js|mjs)$/.test(file)) return false;
+  const contents = readFileSync(file, 'utf8');
+  return highlighterMarkers.some((marker) => contents.includes(marker.source));
+});
 
 if (highlighterChunks.length > 0) {
   console.error(

@@ -105,11 +105,10 @@ export function useMDXComponents(components: MDXComponents): MDXComponents {
         {...props}
       />
     ),
-    // Shiki makes the `pre` a tab stop, so it needs a focus ring.
     pre: ({ className, ...props }) => (
       <pre
         className={join(
-          `${CODE_BLOCK_SURFACE} nx:mb-4 nx:[&_code]:bg-transparent nx:[&_code]:p-0 nx:[&_code]:typography-code-block nx:focus-visible:outline-2 nx:focus-visible:outline-focus-default nx:focus-visible:outline-offset-(--focus-offset)`,
+          `${CODE_BLOCK_SURFACE} nx:mb-4 nx:[&_code]:bg-transparent nx:[&_code]:p-0 nx:[&_code]:typography-code-block`,
           className
         )}
         {...props}
