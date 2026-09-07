@@ -6,6 +6,11 @@ import path from 'node:path';
 import { fileURLToPath, pathToFileURL } from 'node:url';
 import { describe, expect, it, vi } from 'vitest';
 
+import {
+  type CodeSampleLanguage,
+  highlightSample,
+} from './app/_components/CodeSample';
+import { CODE_BLOCK_SURFACE } from './app/_lib/code-block';
 import { NEXUS_CODE_THEME } from './code-theme';
 import { MDX_OPTIONS } from './mdx-options';
 
@@ -247,6 +252,10 @@ const fence = (lang: string, code: string) => `\`\`\`${lang}
 ${code}
 \`\`\``;
 
+const CSS_SOURCE = `:root {
+  --nx-color-primary-background: oklch(0.55 0.2 145);
+}`;
+
 const TSX_SOURCE = `export function Hello({ name }: { name: string }) {
   return <Button variant="primary">{name}</Button>;
 }`;
@@ -392,5 +401,36 @@ describe('MDX code blocks', () => {
         (el) => el.properties?.['data-rehype-pretty-code-figure'] !== undefined
       )
     ).toBe(false);
+  });
+});
+
+describe('CodeSample', () => {
+  const render = (lang: CodeSampleLanguage, code: string) =>
+    highlightSample(lang, code);
+
+  it('tokenises with the same theme the MDX fences use', async () => {
+    const html = await render('tsx', TSX_SOURCE);
+
+    expect(html).toMatch(/var\(--nx-color-/);
+    expect(
+      new Set(html.match(/var\(--nx-color-[a-z0-9-]+\)/g)).size
+    ).toBeGreaterThan(1);
+  });
+
+  it('emits no colour outside the token references', async () => {
+    for (const lang of ['css', 'tsx'] as const) {
+      const html = await render(lang, lang === 'css' ? CSS_SOURCE : TSX_SOURCE);
+
+      expect(html).not.toMatch(/#[0-9a-fA-F]{3,8}\b/);
+    }
+  });
+
+  it('leaves the surface to the Nexus tokens', async () => {
+    const html = await render('tsx', TSX_SOURCE);
+    const pre = html.slice(0, html.indexOf('>') + 1);
+
+    expect(pre).not.toMatch(/style=/);
+    expect(pre).toContain('tabindex="0"');
+    expect(pre).toContain(CODE_BLOCK_SURFACE);
   });
 });
