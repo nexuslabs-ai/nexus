@@ -46,14 +46,16 @@ jobs:
           filters: |
             # `react` tracks package-library source. App consumers (docs,
             # console) ride `packages` into the shared build/typecheck jobs.
-            # `react` and `packages` also match `pnpm-lock.yaml`: a dependency
-            # bump changes what ships without touching a source file.
+            # `react` and `packages` also match `pnpm-lock.yaml` and `.npmrc`:
+            # a dependency bump changes what ships, and `node-linker` changes
+            # which copy resolves, without touching a source file.
             react:
               - 'packages/react/**'
               - 'packages/tailwind/**'
               - 'packages/core/**'
               - 'packages/test-utils/**'
               - 'pnpm-lock.yaml'
+              - '.npmrc'
             # `packages` gates the shared turbo build/typecheck jobs and the
             # source roots scanned by `pnpm audit:browser-support`; any package
             # or app can affect them, so both are matched here.
@@ -61,6 +63,7 @@ jobs:
               - 'packages/**'
               - 'apps/**'
               - 'pnpm-lock.yaml'
+              - '.npmrc'
             browser:
               - 'package.json'
               - 'scripts/audit-browser-support.js'
@@ -131,6 +134,11 @@ jobs:
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
 
+      # Reads two manifests and needs no build, so it runs before the ESLint
+      # cache restore — a lint failure must not hide a grammar skew.
+      - name: Docs grammar pin
+        run: pnpm --filter @nexus_ds/docs audit:grammar-pin
+
       - name: Restore ESLint cache
         uses: actions/cache@v4
         with:
@@ -142,11 +150,6 @@ jobs:
 
       - name: Lint
         run: pnpm lint --cache --cache-location .eslintcache --cache-strategy content
-
-      # Needs no build, so it runs here rather than behind the docs build in
-      # the CSP step.
-      - name: Docs grammar pin
-        run: pnpm --filter @nexus_ds/docs audit:grammar-pin
 
   # ============================================
   # Build (affected packages only)

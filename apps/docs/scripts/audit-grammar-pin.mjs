@@ -3,8 +3,7 @@ import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 
 // `shiki` pins its in-family `@shikijs/*` dependencies to its own exact
-// version, so the grammars the docs import must resolve to that same version —
-// otherwise a one-sided bump pairs stale grammars with a new core.
+// version, so the grammars the docs import must resolve to that same version.
 const EXACT_VERSION = /^\d+\.\d+\.\d+(?:-[\w.-]+)?(?:\+[\w.-]+)?$/;
 
 // `@shikijs/langs` does not export `./package.json`, so climb from the resolved
@@ -25,7 +24,7 @@ function packageJsonFor(specifier) {
   throw new Error(`No package manifest above the resolved ${specifier}.`);
 }
 
-const langsPin = packageJsonFor('shiki').dependencies['@shikijs/langs'];
+const langsPin = packageJsonFor('shiki').dependencies?.['@shikijs/langs'];
 
 if (langsPin === undefined) {
   console.error(
