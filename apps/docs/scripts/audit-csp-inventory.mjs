@@ -9,13 +9,16 @@ const docsRoot = path.resolve(
 );
 const appOutputDir = path.join(docsRoot, '.next', 'server', 'app');
 const clientOutputDir = path.join(docsRoot, '.next', 'static');
-// Quoted string literals, which minifiers leave intact; a bare identifier
-// would be mangled away. Each is checked against the module that emits it
-// below, so an upstream rename fails here rather than silently disarming the
-// client-bundle scan.
+// String literals and JSON keys inside them, which minifiers leave intact; a
+// bare identifier would be mangled away. One marker per entry point the docs
+// import — the highlighter core, the grammars, and the regex engine each ship
+// independently. Each is checked against the module that emits it below, so an
+// upstream rename fails here rather than silently disarming the client scan.
 const highlighterMarkers = [
   { source: '__shiki_resolved', module: '@shikijs/primitive' },
   { source: 'Shiki instance has been disposed', module: '@shikijs/primitive' },
+  { source: 'scopeName', module: '@shikijs/langs/tsx' },
+  { source: 'Invalid recursionLimit; use 2-20', module: 'oniguruma-to-es' },
 ];
 const appearanceFixtureSource = path.join(
   docsRoot,
@@ -50,13 +53,11 @@ if (htmlFiles.length === 0) {
   process.exit(1);
 }
 
-const requireFromShiki = createRequire(
-  createRequire(path.join(docsRoot, 'package.json')).resolve('shiki')
-);
+const requireFromDocs = createRequire(path.join(docsRoot, 'package.json'));
 
 for (const { source, module } of highlighterMarkers) {
-  const dist = readFileSync(requireFromShiki.resolve(module), 'utf8');
-  if (!dist.includes(JSON.stringify(source))) {
+  const dist = readFileSync(requireFromDocs.resolve(module), 'utf8');
+  if (!dist.includes(source)) {
     console.error(
       `Highlighter marker "${source}" is gone from ${module}; the client-bundle scan can no longer detect a highlighter.`
     );
