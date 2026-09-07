@@ -30,8 +30,6 @@ jobs:
     outputs:
       react: ${{ steps.filter.outputs.react }}
       root_config: ${{ steps.filter.outputs.root_config }}
-      # `packages` is true if any package OR any app changed — both are built
-      # and typechecked by the shared turbo `build` / `typecheck` jobs.
       packages: ${{ steps.filter.outputs.packages }}
       ci: ${{ steps.filter.outputs.ci }}
     steps:
@@ -59,10 +57,12 @@ jobs:
               - 'pnpm-workspace.yaml'
               - '.nvmrc'
               - 'turbo.json'
+              - 'tsconfig.base.json'
+              - 'tsconfig.json'
               - 'vitest.config.ts'
-            # `packages` gates the shared turbo build/typecheck jobs, the unit
-            # tests, and the browserslist audit; any package, app, or root
-            # script can affect them.
+            # `packages` gates build, typecheck, test-unit, audit-tokens, and
+            # audit-browser-support. Any package, app, or root script can
+            # affect them.
             packages:
               - 'packages/**'
               - 'apps/**'
@@ -73,15 +73,13 @@ jobs:
               - 'pnpm-workspace.yaml'
               - '.nvmrc'
               - 'turbo.json'
-              - 'vitest.config.ts'
-            # Root files no package path can express. Membership runs build and
-            # typecheck at all for the tsconfigs, which match no other filter,
-            # and flips both jobs to an unfiltered run for the files that
-            # turbo's `--filter=...[base]` selects zero tasks for and would
-            # otherwise pass vacuously.
-            root_config:
               - 'tsconfig.base.json'
               - 'tsconfig.json'
+              - 'vitest.config.ts'
+            # Root files that build and typecheck read and that turbo's
+            # `--filter=...[base]` selects zero tasks for; both jobs would pass
+            # them vacuously, so membership flips them to an unfiltered run.
+            root_config:
               - 'pnpm-workspace.yaml'
               - '.nvmrc'
               - '.npmrc'
