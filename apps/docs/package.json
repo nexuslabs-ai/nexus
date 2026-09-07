@@ -9,6 +9,7 @@
     "build": "next build",
     "start": "next start",
     "audit:csp": "node scripts/audit-csp-inventory.mjs",
+    "audit:grammar-pin": "node scripts/audit-grammar-pin.mjs",
     "typecheck": "tsc --noEmit",
     "clean": "rm -rf .next dist"
   },

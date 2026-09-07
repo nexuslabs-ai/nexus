@@ -143,6 +143,11 @@ jobs:
       - name: Lint
         run: pnpm lint --cache --cache-location .eslintcache --cache-strategy content
 
+      # Needs no build, so it runs here rather than behind the docs build in
+      # the CSP step.
+      - name: Docs grammar pin
+        run: pnpm --filter @nexus_ds/docs audit:grammar-pin
+
   # ============================================
   # Build (affected packages only)
   # ============================================

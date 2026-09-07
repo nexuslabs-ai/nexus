@@ -33,41 +33,6 @@ function walk(dir) {
   });
 }
 
-// `@shikijs/langs` does not export `./package.json`, so climb from the resolved
-// entry. A `dist/` directory can hold a bare `{"type":"module"}` manifest, so
-// only one that names a package counts as the package root.
-function packageJsonFor(specifier) {
-  let dir = path.dirname(fileURLToPath(import.meta.resolve(specifier)));
-
-  while (dir !== path.dirname(dir)) {
-    const manifest = path.join(dir, 'package.json');
-    if (existsSync(manifest)) {
-      const parsed = JSON.parse(readFileSync(manifest, 'utf8'));
-      if (parsed.name) return parsed;
-    }
-    dir = path.dirname(dir);
-  }
-
-  throw new Error(`No package manifest above the resolved ${specifier}.`);
-}
-
-const langsPin = packageJsonFor('shiki').dependencies['@shikijs/langs'];
-const langsVersion = packageJsonFor('@shikijs/langs/tsx').version;
-
-if (!/^\d+\.\d+\.\d+$/.test(langsPin)) {
-  console.error(
-    `shiki declares @shikijs/langs as "${langsPin}" rather than an exact version, so the resolved grammars can no longer be checked against it.`
-  );
-  process.exit(1);
-}
-
-if (langsVersion !== langsPin) {
-  console.error(
-    `Grammar/core skew: shiki pins @shikijs/langs@${langsPin}, but @shikijs/langs@${langsVersion} resolves. Pin both to the same version in apps/docs/package.json.`
-  );
-  process.exit(1);
-}
-
 for (const { source, module } of highlighterMarkers) {
   const dist = readFileSync(fileURLToPath(import.meta.resolve(module)), 'utf8');
   if (!dist.includes(source)) {
