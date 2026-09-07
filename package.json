@@ -107,7 +107,8 @@
     "turbo": "^2.7.1",
     "typescript": "^5.9.3",
     "typescript-eslint": "^8.50.0",
-    "vitest": "4.0.18"
+    "vitest": "4.0.18",
+    "yaml": "^2.9.0"
   },
   "packageManager": "pnpm@10.12.1",
   "engines": {

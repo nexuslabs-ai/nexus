@@ -76,11 +76,9 @@ jobs:
               - 'tsconfig.base.json'
               - 'tsconfig.json'
               - 'vitest.config.ts'
-            # Root files build and typecheck read that `--filter=...[base]`
-            # does not reliably select tasks for: it selects none for most of
-            # them, and selects any at all for the tsconfigs only because
-            # `turbo.json` names them in `globalDependencies`. Membership flips
-            # both jobs to an unfiltered run so neither passes vacuously.
+            # Every root file build and typecheck read. No package path
+            # expresses them, so membership forces both jobs to an
+            # unfiltered run.
             root_config:
               - 'pnpm-workspace.yaml'
               - '.nvmrc'
@@ -89,6 +87,7 @@ jobs:
               - 'pnpm-lock.yaml'
               - 'tsconfig.base.json'
               - 'tsconfig.json'
+              - 'turbo.json'
             ci:
               - '.github/workflows/**'
 
