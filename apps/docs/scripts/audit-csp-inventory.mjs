@@ -8,11 +8,8 @@ const docsRoot = path.resolve(
 );
 const appOutputDir = path.join(docsRoot, '.next', 'server', 'app');
 const clientOutputDir = path.join(docsRoot, '.next', 'static');
-// String literals only — a bare identifier or property name would be mangled
-// away, and a generic one collides with unrelated client code. The core, the
-// grammars, and the regex engine ship independently, so each needs its own.
-// Every marker is checked against the module that emits it below, so an
-// upstream rename fails here rather than silently disarming the client scan.
+// String literals only — identifiers and property names are mangled away, and
+// a generic marker collides with unrelated client code.
 const highlighterMarkers = [
   { source: '__shiki_resolved', module: '@shikijs/primitive' },
   { source: 'Shiki instance has been disposed', module: '@shikijs/primitive' },
@@ -36,6 +33,21 @@ function walk(dir) {
   });
 }
 
+// Neither package exports `./package.json`, so climb from the resolved entry.
+function packageJsonFor(specifier) {
+  let dir = path.dirname(fileURLToPath(import.meta.resolve(specifier)));
+
+  while (!existsSync(path.join(dir, 'package.json'))) {
+    const parent = path.dirname(dir);
+    if (parent === dir) {
+      throw new Error(`No package.json above the resolved ${specifier}.`);
+    }
+    dir = parent;
+  }
+
+  return JSON.parse(readFileSync(path.join(dir, 'package.json'), 'utf8'));
+}
+
 if (!existsSync(appOutputDir) || !existsSync(clientOutputDir)) {
   console.error(
     'Missing .next/server/app or .next/static. Run `pnpm build` first.'
@@ -53,9 +65,17 @@ if (htmlFiles.length === 0) {
   process.exit(1);
 }
 
+const pinnedLangs = packageJsonFor('shiki').dependencies['@shikijs/langs'];
+const resolvedLangs = packageJsonFor('@shikijs/langs/tsx').version;
+
+if (resolvedLangs !== pinnedLangs) {
+  console.error(
+    `Grammar/core skew: shiki pins @shikijs/langs@${pinnedLangs}, but @shikijs/langs@${resolvedLangs} resolves. Pin both to the same version in apps/docs/package.json.`
+  );
+  process.exit(1);
+}
+
 for (const { source, module } of highlighterMarkers) {
-  // `import.meta.resolve` applies the `import` condition, so this reads the
-  // same build a bundler would pull into a client chunk.
   const dist = readFileSync(fileURLToPath(import.meta.resolve(module)), 'utf8');
   if (!dist.includes(source)) {
     console.error(
