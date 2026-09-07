@@ -7,6 +7,8 @@ const docsRoot = path.resolve(
   '..'
 );
 const appOutputDir = path.join(docsRoot, '.next', 'server', 'app');
+const clientOutputDir = path.join(docsRoot, '.next', 'static');
+const highlighterPattern = /shiki|rehype-pretty|oniguruma|textmate/i;
 const appearanceFixtureSource = path.join(
   docsRoot,
   'app',
@@ -23,8 +25,10 @@ function walk(dir) {
   });
 }
 
-if (!existsSync(appOutputDir)) {
-  console.error('Missing .next/server/app. Run `pnpm build` first.');
+if (!existsSync(appOutputDir) || !existsSync(clientOutputDir)) {
+  console.error(
+    'Missing .next/server/app or .next/static. Run `pnpm build` first.'
+  );
   process.exit(1);
 }
 
@@ -35,6 +39,21 @@ const serverFiles = walk(appOutputDir).filter((file) =>
 
 if (htmlFiles.length === 0) {
   console.error('No prerendered app HTML files found under .next/server/app.');
+  process.exit(1);
+}
+
+const highlighterChunks = walk(clientOutputDir).filter(
+  (file) =>
+    /\.(?:js|mjs)$/.test(file) &&
+    highlighterPattern.test(readFileSync(file, 'utf8'))
+);
+
+if (highlighterChunks.length > 0) {
+  console.error(
+    `Highlighter reached the client bundle: ${highlighterChunks
+      .map((file) => path.relative(docsRoot, file))
+      .join(', ')}`
+  );
   process.exit(1);
 }
 
@@ -92,6 +111,7 @@ console.log(
       serializedDocsStorageReferences,
       fixtureOrderChecks,
       inlineStyleAttributes,
+      highlighterChunks: highlighterChunks.length,
     },
     null,
     2

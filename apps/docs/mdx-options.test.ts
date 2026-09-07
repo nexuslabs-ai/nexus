@@ -5,6 +5,7 @@ import path from 'node:path';
 import { fileURLToPath, pathToFileURL } from 'node:url';
 import { describe, expect, it, vi } from 'vitest';
 
+import { NEXUS_CODE_THEME } from './code-theme';
 import { MDX_OPTIONS } from './mdx-options';
 
 const CONTENT_DIR = path.join(
@@ -208,25 +209,36 @@ describe('MDX heading ids', () => {
   });
 });
 
-const FENCE_LANGUAGE = /^```[\w-]+/gm;
+const FENCE_LANGUAGE_PATTERN = /^```[\w-]+/gm;
 
-// The languages the docs fence today, plus `json` for the manifest snippets the
-// install guide is heading towards. A grammar that stops resolving fails here
-// rather than silently rendering as plain text.
-const FENCE_LANGUAGES = [
-  ...new Set([
-    // `json` is not fenced in content yet; the ticket pins it alongside the rest.
-    'json',
-    ...(
+// One snippet per grammar the docs fence, each written in that language so the
+// tokeniser has something it can actually resolve. `json` is not fenced in
+// content yet; the ticket pins it alongside the rest.
+const FENCE_SNIPPETS: Record<string, string> = {
+  bash: 'pnpm add @nexus_ds/react',
+  css: "@import '@nexus_ds/tailwind';",
+  html: '<div class="nx:p-4">Nexus</div>',
+  json: '{ "name": "@nexus_ds/react" }',
+  ts: "export const brand: string = 'nexus';",
+  tsx: 'export const App = () => <Button variant="primary" />;',
+};
+
+// The languages content fences today. A new one has to gain a snippet above
+// rather than slipping through untokenised.
+const CONTENT_FENCE_LANGUAGES = [
+  ...new Set(
+    (
       await Promise.all(
         CONTENT_FILES.map((file) =>
           readFile(path.join(CONTENT_DIR, file), 'utf8')
         )
       )
     ).flatMap((source) =>
-      (source.match(FENCE_LANGUAGE) ?? []).map((match) => match.slice(3))
-    ),
-  ]),
+      (source.match(FENCE_LANGUAGE_PATTERN) ?? []).map((match) =>
+        match.slice(3)
+      )
+    )
+  ),
 ].sort();
 
 const fence = (lang: string, code: string) => `\`\`\`${lang}
@@ -249,30 +261,48 @@ async function compileBlock(source: string) {
 
   if (!pre || !code) throw new Error('no code block in compiled output');
 
+  const tokens = collectElements(code).filter((el) => el.tagName === 'span');
+
   return {
     figure: elements.find(
       (el) => el.properties?.['data-rehype-pretty-code-figure'] !== undefined
     ),
     pre,
     code,
-    tokens: collectElements(code).filter((el) => el.tagName === 'span'),
+    tokens,
+    // Only a resolved grammar writes a syntax token; a plaintext fallback still
+    // emits spans, but carries no style at all.
+    coloured: tokens.filter((token) =>
+      String(token.properties?.style ?? '').includes('--nx-color-')
+    ),
     text: textOf(code),
   };
 }
 
 describe('MDX code blocks', () => {
-  it('registers rehype-pretty-code in dual-theme mode', () => {
+  it('registers rehype-pretty-code with the Nexus token theme', () => {
     expect(MDX_OPTIONS.rehypePlugins).toContainEqual([
       'rehype-pretty-code',
       expect.objectContaining({
-        theme: { light: expect.any(String), dark: expect.any(String) },
+        theme: NEXUS_CODE_THEME,
         keepBackground: false,
       }),
     ]);
   });
 
+  it('colours every scope with a Nexus syntax token', () => {
+    const foregrounds = NEXUS_CODE_THEME.settings.map(
+      (entry) => entry.settings.foreground
+    );
+
+    expect(foregrounds.length).toBeGreaterThan(0);
+    for (const foreground of foregrounds) {
+      expect(foreground).toMatch(/^var\(--nx-color-[a-z0-9-]+\)$/);
+    }
+  });
+
   it('tokenises a tsx block into both palettes at build time', async () => {
-    const { figure, pre, code, tokens, text } = await compileBlock(
+    const { figure, pre, code, tokens, coloured, text } = await compileBlock(
       fence('tsx', TSX_SOURCE)
     );
 
@@ -280,29 +310,26 @@ describe('MDX code blocks', () => {
     expect(pre.properties?.['data-language']).toBe('tsx');
     expect(text).toBe(TSX_SOURCE);
 
-    const coloured = tokens.filter((token) =>
-      String(token.properties?.style ?? '').includes('--shiki-light:')
-    );
-
     // More than one colour means the grammar tokenised rather than falling
     // through to a single plaintext run.
-    const lightColours = new Set(
+    const colours = new Set(
       coloured.map(
         (token) =>
-          /--shiki-light:([^;]+)/.exec(String(token.properties?.style))?.[1]
+          /var\(--nx-color-[a-z0-9-]+\)/.exec(
+            String(token.properties?.style)
+          )?.[0]
       )
     );
 
     expect(coloured.length).toBeGreaterThan(1);
-    expect(lightColours.size).toBeGreaterThan(1);
+    expect(colours.size).toBeGreaterThan(1);
 
-    // Every colour is carried as a custom-property pair, never as a resolved
-    // `color`: that is what lets the appearance toggle recolour code from CSS.
-    for (const token of coloured) {
-      expect(String(token.properties?.style)).toMatch(/--shiki-dark:/);
-    }
+    // No token carries a resolved colour: every one defers to a Nexus variable,
+    // which is what lets the appearance toggle recolour code from CSS alone.
     for (const el of [pre, code, ...tokens]) {
-      expect(String(el.properties?.style ?? '')).not.toMatch(/(^|;)\s*color:/);
+      expect(String(el.properties?.style ?? '')).not.toMatch(
+        /(^|;)\s*color:\s*(?!var\()/
+      );
     }
   });
 
@@ -320,20 +347,31 @@ describe('MDX code blocks', () => {
     expect(String(code.properties?.style ?? '')).not.toMatch(/background|grid/);
   });
 
-  it.each(FENCE_LANGUAGES)('tokenises the %s fences docs use', async (lang) => {
-    const { pre, tokens } = await compileBlock(fence(lang, 'const a = 1'));
-
-    expect(pre.properties?.['data-language']).toBe(lang);
-    expect(tokens.length).toBeGreaterThan(0);
+  it('covers every language content fences', () => {
+    expect(Object.keys(FENCE_SNIPPETS)).toEqual(
+      expect.arrayContaining(CONTENT_FENCE_LANGUAGES)
+    );
   });
+
+  it.each(Object.entries(FENCE_SNIPPETS))(
+    'tokenises the %s fences docs use',
+    async (lang, snippet) => {
+      const { pre, coloured } = await compileBlock(fence(lang, snippet));
+
+      expect(pre.properties?.['data-language']).toBe(lang);
+      expect(coloured.length).toBeGreaterThan(0);
+    }
+  );
 
   it('degrades an unknown or missing language to plain text', async () => {
     const nonsense = await compileBlock(fence('not-a-language', 'plain body'));
     expect(nonsense.text).toBe('plain body');
+    expect(nonsense.coloured).toHaveLength(0);
 
     const unlabelled = await compileBlock(fence('', 'plain body'));
     expect(unlabelled.pre.properties?.['data-language']).toBe('plaintext');
     expect(unlabelled.text).toBe('plain body');
+    expect(unlabelled.coloured).toHaveLength(0);
   });
 
   it('leaves inline code to the MDX component styling', async () => {

@@ -93,7 +93,7 @@ popover, or app chrome.
 | Brand and action states                              | `primary-*`, `secondary-*`                                                                                    | Use full paths such as `primary-background` or `secondary-subtle-foreground`; never stop at the family name.                       |
 | Status states                                        | `success-*`, `warning-*`, `error-*`, `information-*`, `border-*` status tokens                                | Match the status family to the user-facing state and pair fill/foreground/border roles deliberately.                               |
 | Keyboard focus                                       | `focus-default`, `focus-error`                                                                                | Keep focus color behind the stable focus token utilities.                                                                          |
-| Data visualization                                   | `chart-categorical-*`                                                                                         | Use only for chart marks, legends, and chart-specific swatches.                                                                    |
+| Categorical encoding                                 | `chart-categorical-*`                                                                                         | Chart marks, legends, chart swatches, and code-block syntax roles — any set that must stay mutually distinguishable.               |
 
 ### Adaptive-by-Default Semantic Tokens
 
