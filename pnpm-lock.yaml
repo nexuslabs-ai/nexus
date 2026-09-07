@@ -67,6 +67,9 @@ importers:
       lint-staged:
         specifier: ^16.2.7
         version: 16.4.0
+      picomatch:
+        specifier: ^4.0.4
+        version: 4.0.4
       playwright:
         specifier: ^1.57.0
         version: 1.60.0
