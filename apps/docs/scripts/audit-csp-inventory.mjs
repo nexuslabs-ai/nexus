@@ -33,19 +33,49 @@ function walk(dir) {
   });
 }
 
-// Neither package exports `./package.json`, so climb from the resolved entry.
+// `@shikijs/langs` does not export `./package.json`, so climb from the resolved
+// entry. A `dist/` directory can hold a bare `{"type":"module"}` manifest, so
+// only one that names a package counts as the package root.
 function packageJsonFor(specifier) {
   let dir = path.dirname(fileURLToPath(import.meta.resolve(specifier)));
 
-  while (!existsSync(path.join(dir, 'package.json'))) {
-    const parent = path.dirname(dir);
-    if (parent === dir) {
-      throw new Error(`No package.json above the resolved ${specifier}.`);
+  while (dir !== path.dirname(dir)) {
+    const manifest = path.join(dir, 'package.json');
+    if (existsSync(manifest)) {
+      const parsed = JSON.parse(readFileSync(manifest, 'utf8'));
+      if (parsed.name) return parsed;
     }
-    dir = parent;
+    dir = path.dirname(dir);
   }
 
-  return JSON.parse(readFileSync(path.join(dir, 'package.json'), 'utf8'));
+  throw new Error(`No package manifest above the resolved ${specifier}.`);
+}
+
+const langsPin = packageJsonFor('shiki').dependencies['@shikijs/langs'];
+const langsVersion = packageJsonFor('@shikijs/langs/tsx').version;
+
+if (!/^\d+\.\d+\.\d+$/.test(langsPin)) {
+  console.error(
+    `shiki declares @shikijs/langs as "${langsPin}" rather than an exact version, so the resolved grammars can no longer be checked against it.`
+  );
+  process.exit(1);
+}
+
+if (langsVersion !== langsPin) {
+  console.error(
+    `Grammar/core skew: shiki pins @shikijs/langs@${langsPin}, but @shikijs/langs@${langsVersion} resolves. Pin both to the same version in apps/docs/package.json.`
+  );
+  process.exit(1);
+}
+
+for (const { source, module } of highlighterMarkers) {
+  const dist = readFileSync(fileURLToPath(import.meta.resolve(module)), 'utf8');
+  if (!dist.includes(source)) {
+    console.error(
+      `Highlighter marker "${source}" is gone from ${module}; the client-bundle scan can no longer detect a highlighter.`
+    );
+    process.exit(1);
+  }
 }
 
 if (!existsSync(appOutputDir) || !existsSync(clientOutputDir)) {
@@ -63,26 +93,6 @@ const serverFiles = walk(appOutputDir).filter((file) =>
 if (htmlFiles.length === 0) {
   console.error('No prerendered app HTML files found under .next/server/app.');
   process.exit(1);
-}
-
-const pinnedLangs = packageJsonFor('shiki').dependencies['@shikijs/langs'];
-const resolvedLangs = packageJsonFor('@shikijs/langs/tsx').version;
-
-if (resolvedLangs !== pinnedLangs) {
-  console.error(
-    `Grammar/core skew: shiki pins @shikijs/langs@${pinnedLangs}, but @shikijs/langs@${resolvedLangs} resolves. Pin both to the same version in apps/docs/package.json.`
-  );
-  process.exit(1);
-}
-
-for (const { source, module } of highlighterMarkers) {
-  const dist = readFileSync(fileURLToPath(import.meta.resolve(module)), 'utf8');
-  if (!dist.includes(source)) {
-    console.error(
-      `Highlighter marker "${source}" is gone from ${module}; the client-bundle scan can no longer detect a highlighter.`
-    );
-    process.exit(1);
-  }
 }
 
 const highlighterChunks = walk(clientOutputDir).filter((file) => {
