@@ -104,8 +104,7 @@ export function useMDXComponents(components: MDXComponents): MDXComponents {
         {...props}
       />
     ),
-    // Shiki makes the scroll container a tab stop, so the `pre` takes the same
-    // focus ring the scrollable table wrapper below does.
+    // Shiki makes the `pre` a tab stop, so it needs a focus ring.
     pre: ({ className, ...props }) => (
       <pre
         className={join(

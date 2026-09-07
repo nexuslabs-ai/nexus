@@ -8,8 +8,7 @@ const docsRoot = path.resolve(
 );
 const appOutputDir = path.join(docsRoot, '.next', 'server', 'app');
 const clientOutputDir = path.join(docsRoot, '.next', 'static');
-// Runtime API identifiers, not the library name: a docs page whose prose
-// mentions Shiki must not trip the guard.
+// Runtime API identifiers, so docs prose mentioning Shiki cannot trip this.
 const highlighterPattern =
   /createHighlighterCore|getSingletonHighlighter|createJavaScriptRegexEngine|OnigScanner/;
 const appearanceFixtureSource = path.join(

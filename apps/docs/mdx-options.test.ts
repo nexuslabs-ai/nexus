@@ -129,9 +129,8 @@ async function compileMdx(source: string) {
   };
 }
 
-// Shiki's `normalizeTheme` mutates the theme in place on first compile: it
-// appends a settings entry and rewrites `editor.foreground`. Snapshot the
-// foregrounds at import so the assertions below see what this file declares.
+// Shiki's `normalizeTheme` mutates the theme in place on first compile, so
+// read the foregrounds before any test compiles MDX.
 const THEME_FOREGROUNDS = NEXUS_CODE_THEME.settings.map(
   (entry) => entry.settings.foreground
 );
@@ -219,9 +218,8 @@ describe('MDX heading ids', () => {
 
 const FENCE_LANGUAGE_PATTERN = /^```[\w-]+/gm;
 
-// One snippet per grammar the docs fence, each written in that language so the
-// tokeniser has something it can actually resolve. `json` is not fenced in
-// content yet; the ticket pins it alongside the rest.
+// One snippet per grammar, written in that language so the tokeniser resolves
+// something.
 const FENCE_SNIPPETS: Record<string, string> = {
   bash: 'pnpm add @nexus_ds/react',
   css: "@import '@nexus_ds/tailwind';",
@@ -231,20 +229,16 @@ const FENCE_SNIPPETS: Record<string, string> = {
   tsx: 'export const App = () => <Button variant="primary" />;',
 };
 
-// The languages content fences today. A new one has to gain a snippet above
-// rather than slipping through untokenised.
+const CONTENT_SOURCES = await Promise.all(
+  CONTENT_FILES.map((file) => readFile(path.join(CONTENT_DIR, file), 'utf8'))
+);
+
 const CONTENT_FENCE_LANGUAGES = [
   ...new Set(
-    (
-      await Promise.all(
-        CONTENT_FILES.map((file) =>
-          readFile(path.join(CONTENT_DIR, file), 'utf8')
-        )
-      )
-    ).flatMap((source) =>
-      (source.match(FENCE_LANGUAGE_PATTERN) ?? []).map((match) =>
-        match.slice(3)
-      )
+    CONTENT_SOURCES.flatMap(
+      (source) =>
+        source.match(FENCE_LANGUAGE_PATTERN)?.map((fence) => fence.slice(3)) ??
+        []
     )
   ),
 ].sort();
@@ -278,8 +272,7 @@ async function compileBlock(source: string) {
     pre,
     code,
     tokens,
-    // Only a resolved grammar writes a syntax token; a plaintext fallback still
-    // emits spans, but carries no style at all.
+    // A plaintext fallback still emits spans, but carries no style at all.
     coloured: tokens.filter((token) =>
       String(token.properties?.style ?? '').includes('--nx-color-')
     ),
@@ -326,8 +319,6 @@ describe('MDX code blocks', () => {
     expect(pre.properties?.['data-language']).toBe('tsx');
     expect(text).toBe(TSX_SOURCE);
 
-    // More than one colour means the grammar tokenised rather than falling
-    // through to a single plaintext run.
     const colours = new Set(
       coloured.map(
         (token) =>
@@ -340,8 +331,6 @@ describe('MDX code blocks', () => {
     expect(coloured.length).toBeGreaterThan(1);
     expect(colours.size).toBeGreaterThan(1);
 
-    // No token carries a resolved colour: every one defers to a Nexus variable,
-    // which is what lets the appearance toggle recolour code from CSS alone.
     for (const el of [pre, code, ...tokens]) {
       expect(String(el.properties?.style ?? '')).not.toMatch(
         /(^|;)\s*color:\s*(?!var\()/
