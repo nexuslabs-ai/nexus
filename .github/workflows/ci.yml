@@ -46,9 +46,9 @@ jobs:
           filters: |
             # `react` tracks package-library source. App consumers (docs,
             # console) ride `packages` into the shared build/typecheck jobs.
-            # `react` and `packages` also match `pnpm-lock.yaml` and `.npmrc`:
-            # a dependency bump changes what ships, and `node-linker` changes
-            # which copy resolves, without touching a source file.
+            # `react` and `packages` also match the root files that decide what
+            # resolves or how tasks run. None of them is source, and a change to
+            # any one can break a build with no source diff.
             react:
               - 'packages/react/**'
               - 'packages/tailwind/**'
@@ -56,6 +56,10 @@ jobs:
               - 'packages/test-utils/**'
               - 'pnpm-lock.yaml'
               - '.npmrc'
+              - 'package.json'
+              - 'pnpm-workspace.yaml'
+              - '.nvmrc'
+              - 'turbo.json'
             # `packages` gates the shared turbo build/typecheck jobs and the
             # source roots scanned by `pnpm audit:browser-support`; any package
             # or app can affect them, so both are matched here.
@@ -64,6 +68,10 @@ jobs:
               - 'apps/**'
               - 'pnpm-lock.yaml'
               - '.npmrc'
+              - 'package.json'
+              - 'pnpm-workspace.yaml'
+              - '.nvmrc'
+              - 'turbo.json'
             browser:
               - 'package.json'
               - 'scripts/audit-browser-support.js'
@@ -71,12 +79,14 @@ jobs:
               - 'README.md'
               - 'AGENTS.md'
               - 'RTK.md'
-            # Root TS config sits outside every package, so turbo's
+            # Root config sits outside every package, so turbo's
             # `--filter=...[base]` selects no tasks for it; the build and
             # typecheck jobs detect it here and run unfiltered instead.
             root_config:
               - 'tsconfig.base.json'
               - 'tsconfig.json'
+              - 'turbo.json'
+              - 'pnpm-workspace.yaml'
             ci:
               - '.github/workflows/**'
 
