@@ -69,8 +69,10 @@ export function parseContentSecurityPolicy(header) {
  */
 export function resolveDirective(directives, fallbackChain) {
   for (const name of fallbackChain) {
-    if (Object.hasOwn(directives, name))
-      return { name, sources: directives[name] };
+    if (!Object.hasOwn(directives, name)) continue;
+
+    const sources = directives[name];
+    if (sources) return { name, sources };
   }
 
   return null;

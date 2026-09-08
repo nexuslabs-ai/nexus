@@ -1,3 +1,4 @@
+import path from 'node:path';
 import { describe, expect, it } from 'vitest';
 
 import {
@@ -11,7 +12,9 @@ import {
   decideAuditVerdict,
   findInlineBlockers,
   findPolicyIntegrityFailures,
+  findUnprerenderedPages,
   findUnscannedRoutes,
+  routeOf,
 } from './csp-audit.mjs';
 
 const APPEARANCE_HASH = "'sha256-eULKAmXI30DXg866kExCNMr8MTRYjZmiqIhnMIw5g7w='";
@@ -314,5 +317,152 @@ describe('findUnscannedRoutes', () => {
 
   it('does not expect HTML from a route handler', () => {
     expect(findUnscannedRoutes(manifest, [])).not.toContain('/icon.svg');
+  });
+});
+
+describe('routeOf', () => {
+  const appOutputDir = path.join('.next', 'server', 'app');
+  const htmlFile = (...segments: string[]) =>
+    path.join(appOutputDir, ...segments);
+
+  it('maps the root page to /', () => {
+    expect(routeOf(appOutputDir, htmlFile('index.html'))).toBe('/');
+  });
+
+  it('maps a nested page to its route', () => {
+    expect(routeOf(appOutputDir, htmlFile('foundations', 'color.html'))).toBe(
+      '/foundations/color'
+    );
+  });
+
+  it("keeps Next's own underscore-prefixed page", () => {
+    expect(routeOf(appOutputDir, htmlFile('_not-found.html'))).toBe(
+      '/_not-found'
+    );
+  });
+
+  it('produces the routes the prerender manifest declares', () => {
+    const scanned = [
+      htmlFile('index.html'),
+      htmlFile('agents', 'llms-txt.html'),
+    ];
+
+    expect(
+      findUnscannedRoutes(
+        {
+          routes: {
+            '/': { dataRoute: '/index.rsc' },
+            '/agents/llms-txt': { dataRoute: '/agents/llms-txt.rsc' },
+          },
+        },
+        scanned.map((file) => routeOf(appOutputDir, file))
+      )
+    ).toEqual([]);
+  });
+});
+
+describe('findUnprerenderedPages', () => {
+  const APP_PATH_ROUTES = {
+    '/icon.svg/route': '/icon.svg',
+    '/page': '/',
+    '/appearance-ssr/page': '/appearance-ssr',
+    '/changelog/page': '/changelog',
+    '/[section]/[sub]/page': '/[section]/[sub]',
+  };
+
+  const DYNAMIC_ROUTES = [
+    { page: '/[section]/[sub]', regex: '^/([^/]+?)/([^/]+?)(?:/)?$' },
+  ];
+
+  const uncovered = (prerenderedRoutes: string[]) =>
+    findUnprerenderedPages({
+      appPathRoutes: APP_PATH_ROUTES,
+      dynamicRoutes: DYNAMIC_ROUTES,
+      prerenderedRoutes,
+      alwaysDynamicPages: ['/appearance-ssr'],
+    });
+
+  it('passes when every declared page prerendered', () => {
+    expect(uncovered(['/', '/changelog', '/foundations/color'])).toEqual([]);
+  });
+
+  it('names a page that stopped prerendering', () => {
+    expect(uncovered(['/', '/foundations/color'])).toEqual(['/changelog']);
+  });
+
+  it('names a dynamic segment whose static params emptied', () => {
+    expect(uncovered(['/', '/changelog'])).toEqual(['/[section]/[sub]']);
+  });
+
+  it('skips a page that renders per request by design', () => {
+    expect(uncovered(['/', '/changelog', '/foundations/color'])).not.toContain(
+      '/appearance-ssr'
+    );
+  });
+
+  it('expects no HTML from a route handler', () => {
+    expect(uncovered(['/', '/changelog', '/foundations/color'])).not.toContain(
+      '/icon.svg'
+    );
+  });
+});
+
+describe('the audit end to end', () => {
+  const manifest = manifestWith({
+    key: CSP_HEADER_NAME,
+    value: SHIPPED_HEADER,
+  });
+
+  it('clears a build whose shipped policy permits what it emits', () => {
+    const [policy] = collectCspPolicies(manifest);
+
+    const integrityFailures = findPolicyIntegrityFailures({
+      policies: [policy!],
+      appearanceScriptHashes: [APPEARANCE_HASH],
+    });
+    const blockers = findInlineBlockers(policy!.directives, {
+      styleAttributes: 1320,
+      styleElements: 1,
+      flightScripts: 658,
+      otherInlineScripts: 0,
+    });
+
+    expect(integrityFailures).toEqual([]);
+    expect(
+      decideAuditVerdict({
+        enforced: policy!.enforced,
+        integrityFailures,
+        blockers,
+      })
+    ).toMatchObject({ failed: false });
+  });
+
+  it('fails a build whose shipped policy blocks the styles it emits', () => {
+    const [policy] = collectCspPolicies(
+      manifestWith({
+        key: CSP_HEADER_NAME,
+        value: SHIPPED_HEADER.replace(" 'unsafe-inline'", ''),
+      })
+    );
+
+    const integrityFailures = findPolicyIntegrityFailures({
+      policies: [policy!],
+      appearanceScriptHashes: [APPEARANCE_HASH],
+    });
+    const blockers = findInlineBlockers(policy!.directives, {
+      styleAttributes: 1320,
+      styleElements: 1,
+      flightScripts: 658,
+      otherInlineScripts: 0,
+    });
+
+    expect(integrityFailures[0]).toContain('stale, or the policy drifted');
+    expect(
+      decideAuditVerdict({
+        enforced: policy!.enforced,
+        integrityFailures,
+        blockers,
+      })
+    ).toMatchObject({ failed: true });
   });
 });

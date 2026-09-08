@@ -8,7 +8,9 @@ import {
   decideAuditVerdict,
   findInlineBlockers,
   findPolicyIntegrityFailures,
+  findUnprerenderedPages,
   findUnscannedRoutes,
+  routeOf,
 } from './csp-audit.mjs';
 
 const docsRoot = path.resolve(
@@ -22,6 +24,13 @@ const prerenderManifest = path.join(
   docsRoot,
   '.next',
   'prerender-manifest.json'
+);
+// Written from the app's file tree, so a page stays listed here even when it
+// stops prerendering.
+const appPathRoutesManifest = path.join(
+  docsRoot,
+  '.next',
+  'app-path-routes-manifest.json'
 );
 // Next streams the RSC payload through inline scripts calling this.
 const flightScriptMarker = 'self.__next_f';
@@ -40,25 +49,21 @@ const appearanceFixtureSource = path.join(
   'appearance-ssr',
   'page.tsx'
 );
+// `export const dynamic = 'force-dynamic'` — the fixture renders per request by
+// design, so it emits no prerendered HTML and the page-coverage check skips it.
+const alwaysDynamicPages = ['/appearance-ssr'];
 const inlineScriptPattern =
   /<script\b(?![^>]*\bsrc=)([^>]*)>([\s\S]*?)<\/script>/gi;
 
+/**
+ * @param {string} dir
+ * @returns {string[]}
+ */
 function walk(dir) {
   return readdirSync(dir, { withFileTypes: true }).flatMap((entry) => {
     const entryPath = path.join(dir, entry.name);
     return entry.isDirectory() ? walk(entryPath) : entryPath;
   });
-}
-
-// `.next/server/app/foundations/color.html` is the prerendered `/foundations/color`.
-function routeOf(htmlFile) {
-  const relative = path
-    .relative(appOutputDir, htmlFile)
-    .split(path.sep)
-    .join('/')
-    .replace(/\.html$/, '');
-
-  return relative === 'index' ? '/' : `/${relative}`;
 }
 
 for (const { source, module } of highlighterMarkers) {
@@ -75,10 +80,11 @@ if (
   !existsSync(appOutputDir) ||
   !existsSync(clientOutputDir) ||
   !existsSync(routesManifest) ||
-  !existsSync(prerenderManifest)
+  !existsSync(prerenderManifest) ||
+  !existsSync(appPathRoutesManifest)
 ) {
   console.error(
-    'Missing .next/server/app, .next/static, .next/routes-manifest.json or .next/prerender-manifest.json. Run `pnpm build` first.'
+    'Missing .next/server/app, .next/static, or one of the .next manifests (routes, prerender, app-path-routes). Run `pnpm build` first.'
   );
   process.exit(1);
 }
@@ -127,7 +133,7 @@ for (const file of htmlFiles) {
   inlineStyleAttributes += html.match(/\sstyle="/g)?.length ?? 0;
   inlineStyleElements += html.match(/<style[\s>]/gi)?.length ?? 0;
 
-  for (const [, attrs, body] of scripts) {
+  for (const [, attrs = '', body = ''] of scripts) {
     if (`${attrs}\n${body}`.includes('data-nexus-appearance-script')) {
       serializedAppearanceReferences++;
     }
@@ -171,29 +177,66 @@ for (const file of serverFiles) {
 
 // The audit checks the header the build actually baked into the routes
 // manifest, not the one the current environment would produce.
-const policies = collectCspPolicies(
-  JSON.parse(readFileSync(routesManifest, 'utf8'))
-);
+const routes = JSON.parse(readFileSync(routesManifest, 'utf8'));
+const policies = collectCspPolicies(routes);
 const shippedCsp = policies[0];
 const appearanceScriptHashes = [...appearanceScriptBodies].map(
   (body) => `'sha256-${createHash('sha256').update(body).digest('base64')}'`
 );
 
-// A failure here means the audit is reading the wrong artifact, so it is not an
-// enforcement finding and does not wait for the header to flip.
-const integrityFailures = findPolicyIntegrityFailures({
-  policies,
-  appearanceScriptHashes,
-});
+// A scan that found none of these proves nothing about them, so the blocker
+// list would come back empty for the wrong reason. There is no floor for inline
+// `<style>` elements: the build emits one, from Next's own `not-found` page,
+// and the app owns nothing that would keep it there.
+const scanFloors = [
+  ['inline style attributes', inlineStyleAttributes],
+  ['inline flight scripts', flightScripts],
+];
 
-const blockers = shippedCsp
-  ? findInlineBlockers(shippedCsp.directives, {
-      styleAttributes: inlineStyleAttributes,
-      styleElements: inlineStyleElements,
-      flightScripts,
-      otherInlineScripts,
-    })
-  : [];
+const scannedRoutes = htmlFiles.map((file) => routeOf(appOutputDir, file));
+
+const scanFailures = [
+  ...scanFloors
+    .filter(([, count]) => count === 0)
+    .map(
+      ([what]) =>
+        `Found no ${what} across ${htmlFiles.length} prerendered pages; the scan cannot show whether the policy permits them.`
+    ),
+  ...findUnscannedRoutes(
+    JSON.parse(readFileSync(prerenderManifest, 'utf8')),
+    scannedRoutes
+  ).map(
+    (route) =>
+      `The build declares ${route} as prerendered but the HTML scan never read it, so the counts cover only part of the site.`
+  ),
+  ...findUnprerenderedPages({
+    appPathRoutes: JSON.parse(readFileSync(appPathRoutesManifest, 'utf8')),
+    dynamicRoutes: routes.dynamicRoutes,
+    prerenderedRoutes: scannedRoutes,
+    alwaysDynamicPages,
+  }).map(
+    (page) =>
+      `The app declares ${page} but it prerendered nothing, so the scan says nothing about the inline content it emits.`
+  ),
+];
+
+// Anything here means the audit's inputs do not support its counts — the wrong
+// artifact, or a scan that proved nothing — so it outranks every enforcement
+// finding and fails whichever header is shipping.
+const integrityFailures = [
+  ...findPolicyIntegrityFailures({ policies, appearanceScriptHashes }),
+  ...scanFailures,
+];
+
+const blockers =
+  integrityFailures.length === 0 && shippedCsp
+    ? findInlineBlockers(shippedCsp.directives, {
+        styleAttributes: inlineStyleAttributes,
+        styleElements: inlineStyleElements,
+        flightScripts,
+        otherInlineScripts,
+      })
+    : [];
 
 console.log(
   JSON.stringify(
@@ -250,34 +293,6 @@ if (fixtureOrderChecks === 0 && existsSync(appearanceFixtureSource)) {
     );
     process.exit(1);
   }
-}
-
-// A scan that found none of these proves nothing about them, so the blocker
-// list would come back empty for the wrong reason.
-const scanFloors = [
-  ['inline style attributes', inlineStyleAttributes],
-  ['inline <style> elements', inlineStyleElements],
-  ['inline flight scripts', flightScripts],
-];
-
-for (const [what, count] of scanFloors) {
-  if (count > 0) continue;
-  console.error(
-    `Found no ${what} across ${htmlFiles.length} prerendered pages; the scan cannot show whether the policy permits them.`
-  );
-  process.exit(1);
-}
-
-const unscannedRoutes = findUnscannedRoutes(
-  JSON.parse(readFileSync(prerenderManifest, 'utf8')),
-  htmlFiles.map(routeOf)
-);
-
-if (unscannedRoutes.length > 0) {
-  console.error(
-    `The build declares prerendered pages the HTML scan never read, so the counts above cover only part of the site: ${unscannedRoutes.join(', ')}.`
-  );
-  process.exit(1);
 }
 
 const verdict = decideAuditVerdict({

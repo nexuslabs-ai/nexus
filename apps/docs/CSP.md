@@ -111,21 +111,38 @@ is pinned by a test rather than only by running the script;
 [`scripts/audit-csp-inventory.mjs`](scripts/audit-csp-inventory.mjs) is the I/O
 around them.
 
-**Integrity failures** mean the audit is reading the wrong artifact: routes carry
-divergent policies, the header name or value is not the one `csp.mjs` builds, or
-the build carries more than one appearance bootstrap. It re-hashes the bootstrap
-out of the prerendered HTML, rebuilds the policy `csp.mjs` would produce from
-that hash, and requires the shipped header to equal it. Every count the audit
-prints is about that artifact, so any failure here **exits 1 regardless of which
-header is shipping**. The `$TURBO_DEFAULT$` `inputs` entry in
+**Integrity failures** mean the audit cannot stand behind its counts, either
+because it read the wrong artifact or because the scan behind them proved
+nothing. They **exit 1 regardless of which header is shipping**, and they are
+reported ahead of any enforcement blocker — a blocker derived from a build the
+audit has already rejected says nothing, so none is computed.
+
+The wrong artifact: routes carry divergent policies, the header name or value is
+not the one `csp.mjs` builds, or the build carries more than one appearance
+bootstrap. The audit re-hashes the bootstrap out of the prerendered HTML,
+rebuilds the policy `csp.mjs` would produce from that hash, and requires the
+shipped header to equal it. The `$TURBO_DEFAULT$` `inputs` entry in
 `apps/docs/turbo.json` is what stops a cached build from reaching the gate in the
 first place.
 
-Before it counts anything the audit checks the scan itself: every page the
-prerender manifest declares must have HTML the scan read, and finding zero
-inline style attributes, zero inline `<style>` elements, or zero flight scripts
-fails. A scan that found nothing would otherwise report no blockers for the
-wrong reason.
+A scan that proved nothing: finding zero inline style attributes or zero flight
+scripts fails, since the blocker list would otherwise come back empty for the
+wrong reason. Coverage is checked from both directions. Every page the prerender
+manifest declares must have HTML the scan read, which catches a partial scan.
+And every page the app declares in `.next/app-path-routes-manifest.json` must
+have prerendered something — a dynamic segment is covered when at least one
+prerendered route matches its pattern. That second direction is the one the
+prerender manifest cannot supply on its own: a page that starts rendering per
+request leaves the manifest and the HTML tree together, so comparing those two to
+each other passes. `app-path-routes-manifest.json` is written from the app's file
+tree, so the page stays on one side of the comparison. `/appearance-ssr` is
+`force-dynamic` by design and is named as such in the script rather than inferred.
+
+There is no floor for inline `<style>` elements. The build emits exactly one, in
+Next's own `not-found` page, and the docs app owns nothing that would keep it
+there — a floor on it would fail this gate for a Next.js change no one here can
+act on. `style-src-elem` is still checked against that element whenever the build
+emits one.
 
 **Enforcement blockers** are inline content the policy would block. For each kind
 the audit resolves the directive a browser would actually consult — the `-elem` /

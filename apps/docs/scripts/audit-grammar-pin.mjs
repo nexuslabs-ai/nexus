@@ -9,6 +9,10 @@ const EXACT_VERSION = /^\d+\.\d+\.\d+(?:-[\w.-]+)?(?:\+[\w.-]+)?$/;
 // `@shikijs/langs` does not export `./package.json`, so climb from the resolved
 // entry. A `dist/` directory can hold a bare `{"type":"module"}` manifest, so
 // only one that names a package counts as the package root.
+/**
+ * @param {string} specifier
+ * @returns {{ name: string, version?: string, dependencies?: Record<string, string> }}
+ */
 function packageJsonFor(specifier) {
   let dir = path.dirname(fileURLToPath(import.meta.resolve(specifier)));
 

@@ -4,6 +4,8 @@
  * and the CSP Level 3 primitives these build on.
  */
 
+import path from 'node:path';
+
 import {
   allowsArbitraryInline,
   createContentSecurityPolicy,
@@ -57,19 +59,21 @@ export function findPolicyIntegrityFailures({
   policies,
   appearanceScriptHashes,
 }) {
-  if (policies.length === 0) {
+  const [policy, ...extraPolicies] = policies;
+
+  if (!policy) {
     return ['No Content-Security-Policy header in .next/routes-manifest.json.'];
   }
 
   // One policy for every route is the arrangement the audit reasons about; a
   // per-route policy would leave the routes it does not sample unaudited.
-  if (policies.length > 1) {
+  if (extraPolicies.length > 0) {
     return [
       `Expected one Content-Security-Policy across all routes, found ${policies.length}.`,
     ];
   }
 
-  const [{ headerName, header }] = policies;
+  const { headerName, header } = policy;
   const failures = [];
 
   if (headerName !== CSP_HEADER_NAME) {
@@ -78,14 +82,15 @@ export function findPolicyIntegrityFailures({
     );
   }
 
-  if (appearanceScriptHashes.length !== 1) {
+  const [appearanceScriptHash, ...extraHashes] = appearanceScriptHashes;
+
+  if (!appearanceScriptHash || extraHashes.length > 0) {
     failures.push(
       `Expected one appearance bootstrap across the build, found ${appearanceScriptHashes.length}.`
     );
     return failures;
   }
 
-  const appearanceScriptHash = appearanceScriptHashes[0];
   const expected = createContentSecurityPolicy({
     appearanceScriptHash,
     isDevelopment: false,
@@ -128,6 +133,7 @@ export function findPolicyIntegrityFailures({
  * @returns {{ tracked: string | null, message: string }[]}
  */
 export function findInlineBlockers(directives, counts) {
+  /** @type {{ label: string, count: number, type: 'script' | 'style', chain: string[], tracked: string | null }[]} */
   const checks = [
     {
       label: `${counts.styleAttributes} inline style attributes`,
@@ -179,7 +185,8 @@ export function findInlineBlockers(directives, counts) {
 
 /**
  * What the audit should say and whether it should fail. Returns null when there
- * is nothing to report.
+ * is nothing to report. An integrity failure means the counts describe the wrong
+ * build or rest on a scan that proved nothing, so it outranks every blocker.
  *
  * @param {{ enforced: boolean, integrityFailures: readonly string[], blockers: readonly { tracked: string | null, message: string }[] }} findings
  * @returns {{ failed: boolean, headline: string, detail: string[] } | null}
@@ -189,7 +196,7 @@ export function decideAuditVerdict({ enforced, integrityFailures, blockers }) {
     return {
       failed: true,
       headline:
-        'The audit is not reading the policy csp.mjs builds, so its counts describe the wrong artifact. Rebuild the docs app, or reconcile csp.mjs',
+        'The audit cannot stand behind its counts — it read the wrong build, or a scan that proved nothing. Rebuild the docs app, or reconcile csp.mjs',
       detail: [...integrityFailures],
     };
   }
@@ -228,6 +235,26 @@ export function decideAuditVerdict({ enforced, integrityFailures, blockers }) {
 }
 
 /**
+ * The route a prerendered HTML file serves:
+ * `.next/server/app/foundations/color.html` is `/foundations/color`. Next
+ * writes this tree by route rather than by source path, so a route group has
+ * already been stripped out of the name.
+ *
+ * @param {string} appOutputDir
+ * @param {string} htmlFile
+ * @returns {string}
+ */
+export function routeOf(appOutputDir, htmlFile) {
+  const relative = path
+    .relative(appOutputDir, htmlFile)
+    .split(path.sep)
+    .join('/')
+    .replace(/\.html$/, '');
+
+  return relative === 'index' ? '/' : `/${relative}`;
+}
+
+/**
  * Prerendered pages the build declared but the HTML scan never read. A page has
  * an `.rsc` data route; a route handler such as `/icon.svg` does not, and emits
  * no HTML.
@@ -243,4 +270,45 @@ export function findUnscannedRoutes(prerenderManifest, scannedRoutes) {
     .filter(([, { dataRoute }]) => dataRoute?.endsWith('.rsc'))
     .map(([route]) => route)
     .filter((route) => !scanned.has(route));
+}
+
+/**
+ * Pages the app declares that produced no prerendered route. The prerender
+ * manifest alone cannot show this: a page that starts rendering per request
+ * leaves the manifest and the HTML tree together, so comparing the two to each
+ * other passes. `app-path-routes-manifest.json` is written from the app's file
+ * tree instead, so the page stays on this side of the comparison. A dynamic
+ * segment is covered when at least one prerendered route matches its pattern —
+ * losing `generateStaticParams` empties it.
+ *
+ * @param {{
+ *   appPathRoutes: Record<string, string>,
+ *   dynamicRoutes: readonly { page: string, regex: string }[],
+ *   prerenderedRoutes: readonly string[],
+ *   alwaysDynamicPages: readonly string[],
+ * }} build
+ * @returns {string[]}
+ */
+export function findUnprerenderedPages({
+  appPathRoutes,
+  dynamicRoutes,
+  prerenderedRoutes,
+  alwaysDynamicPages,
+}) {
+  const patterns = new Map(
+    dynamicRoutes.map(({ page, regex }) => [page, new RegExp(regex)])
+  );
+  const byDesign = new Set(alwaysDynamicPages);
+
+  return Object.entries(appPathRoutes)
+    .filter(([entry]) => entry.endsWith('/page'))
+    .map(([, page]) => page)
+    .filter((page) => !byDesign.has(page))
+    .filter((page) => {
+      const pattern = patterns.get(page);
+
+      return pattern
+        ? !prerenderedRoutes.some((route) => pattern.test(route))
+        : !prerenderedRoutes.includes(page);
+    });
 }
