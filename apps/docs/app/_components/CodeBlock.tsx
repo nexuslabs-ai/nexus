@@ -68,8 +68,8 @@ export function CodeBlock({
         className={cn(PRE_CLASS, className)}
         {...props}
         ref={preRef}
-        // Below the spread: a rehype plugin can set `tabIndex` through
-        // `hProperties`, and the scroll container's own tab stop has to win.
+        // Below the spread: an MDX plugin can set `tabIndex`, and the scroll
+        // container's own tab stop has to win.
         // eslint-disable-next-line jsx-a11y/no-noninteractive-tabindex
         tabIndex={0}
       >
