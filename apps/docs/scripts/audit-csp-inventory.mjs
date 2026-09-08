@@ -25,8 +25,8 @@ const prerenderManifest = path.join(
   '.next',
   'prerender-manifest.json'
 );
-// Written from the app's file tree, so a page stays listed here even when it
-// stops prerendering.
+// The build's app route table, so a page stays listed here even when it stops
+// prerendering.
 const appPathRoutesManifest = path.join(
   docsRoot,
   '.next',
@@ -199,9 +199,7 @@ const appearanceScriptHashes = [...appearanceScriptBodies].map(
 );
 
 // A scan that found none of these proves nothing about them, so the blocker
-// list would come back empty for the wrong reason. There is no floor for inline
-// `<style>` elements: the docs app authors none, so a floor would gate on
-// framework output the app cannot keep emitting.
+// list would come back empty for the wrong reason.
 const scanFloors = [
   ['inline style attributes', inlineStyleAttributes],
   ['inline flight scripts', flightScripts],

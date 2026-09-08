@@ -275,8 +275,8 @@ export function findUnscannedRoutes(prerenderManifest, scannedRoutes) {
  * Pages the app declares that produced no prerendered route. The prerender
  * manifest alone cannot show this: a page that starts rendering per request
  * leaves the manifest and the HTML tree together, so comparing the two to each
- * other passes. `app-path-routes-manifest.json` is written from the app's file
- * tree instead, so the page stays on this side of the comparison. Coverage
+ * other passes. `app-path-routes-manifest.json` is the build's app route table
+ * instead, so the page stays on this side of the comparison. Coverage
  * comes from each prerendered route's `srcRoute`, which records the page that
  * produced it; matching URLs against a dynamic segment's pattern instead would
  * let an unrelated static route stand in for it. `exemptPages` is the whole

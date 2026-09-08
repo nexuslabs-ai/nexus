@@ -129,26 +129,31 @@ A scan that proved nothing: finding zero inline style attributes or zero flight
 scripts fails, since the blocker list would otherwise come back empty for the
 wrong reason. Coverage is checked from both directions. Every page the prerender
 manifest declares must have HTML the scan read, which catches a partial scan.
-And every page the app declares in `.next/app-path-routes-manifest.json` must
-have prerendered something. Coverage comes from each prerendered route's
+And every page `.next/app-path-routes-manifest.json` declares must have
+prerendered something. Coverage comes from each prerendered route's
 `srcRoute`, which records the page that produced it; reading it off a dynamic
 segment's URL pattern instead would let an unrelated static route stand in —
 `/changelog` matches `/[section]`'s pattern. That second direction is the one the
 prerender manifest cannot supply on its own: a page that starts rendering per
 request leaves the manifest and the HTML tree together, so comparing those two to
-each other passes. `app-path-routes-manifest.json` is written from the app's file
-tree, so the page stays on one side of the comparison. One page is exempt, and
-the audit checks the premise behind it rather than trusting it: `/appearance-ssr`
-renders per request by design, so its source must still carry the `force-dynamic`
-declaration. Next's `/_not-found` needs no exemption — it prerenders under its
-own `srcRoute`, so the check covers it like any other page, and it keeps covering
-it if the docs app ever declares `app/not-found.*` of its own.
+each other passes. `app-path-routes-manifest.json` is the build's app route
+table — every page the app declares, plus Next's own built-ins — so the page
+stays on one side of the comparison. One page is exempt, and the audit checks the
+premise behind it rather than trusting it: `/appearance-ssr` renders per request
+by design, so its source must still carry the `force-dynamic` declaration. Next's
+`/_not-found` needs no exemption — it prerenders under its own `srcRoute`, so the
+check covers it like any other page, and it keeps covering it if the docs app
+ever declares `app/not-found.*` of its own.
 
-There is no floor for inline `<style>` elements. The docs app authors none; the
-build's single element comes from Next's built-in `not-found` page, so a floor
-would fail this gate for a Next.js change no one here can act on.
-`style-src-elem` is still checked against that element whenever the build emits
-one.
+That does mean the gate fails if Next ever stops prerendering `/_not-found`. The
+failure is a true one and it has an answer: HTML the route table declares is
+missing, so the scan covers less than it claims, and whoever hits it exempts the
+page behind a checked premise the way `/appearance-ssr` is exempt. A floor on
+inline `<style>` elements would have neither property. The docs app authors none;
+the build's single element comes from Next's built-in `not-found` page, so a zero
+there would be a truthful measurement with nothing to fix, failing this gate for
+a Next.js change no one here can act on. `style-src-elem` is still checked against
+that element whenever the build emits one.
 
 **Enforcement blockers** are inline content the policy would block. For each kind
 the audit resolves the directive a browser would actually consult — the `-elem` /
