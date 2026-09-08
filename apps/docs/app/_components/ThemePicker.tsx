@@ -21,25 +21,46 @@ import {
   SelectValue,
 } from './nexus';
 
-/** Matches the panel's `bottom-6`; reserved once below it and once above. */
-const PANEL_INSET_PX = 24;
+/**
+ * Below `lg` an expanded panel would reserve roughly half the scrollport, so
+ * it opens collapsed there. `63.99rem` stops just below `lg`'s `min-width:
+ * 64rem`, and staying in rem keeps it aligned with the `nx:lg:` utilities as
+ * the user's base font size changes.
+ */
+const COLLAPSE_QUERY = '(max-width: 63.99rem)';
 
 export function ThemePicker() {
-  const { state, setState } = useNexusAppearance();
-  const [collapsed, setCollapsed] = useState(false);
   const pathname = usePathname();
+
+  // The landing page ships its own in-page theme swapper; the global corner
+  // picker would overlap it and duplicate its controls, so hide it there.
+  if (pathname === '/') return null;
+
+  return <ThemePanel />;
+}
+
+function ThemePanel() {
+  const { state, setState } = useNexusAppearance();
+  const collapsedByDefault = useMediaQuery(COLLAPSE_QUERY);
+  const [collapsedOverride, setCollapsedOverride] = useState<boolean | null>(
+    null
+  );
+  const collapsed = collapsedOverride ?? collapsedByDefault;
   const panelRef = useRef<HTMLElement>(null);
 
   // Publish the panel's real height so `scroll-pb` clears it and Tab never
-  // parks a control underneath (WCAG 2.4.11). Re-runs per route, so the
-  // reservation drops to 0 wherever the panel does not render.
+  // parks a control underneath (WCAG 2.4.11). The reservation stays 0 wherever
+  // no panel mounts.
   useEffect(() => {
     const panel = panelRef.current;
     if (!panel) return;
 
     const root = document.documentElement;
     const observer = new ResizeObserver(() => {
-      const clearance = panel.offsetHeight + PANEL_INSET_PX * 2;
+      const rect = panel.getBoundingClientRect();
+      // `bottom-6` is density-scaled, so measure the gap the panel actually
+      // sits in and reserve it twice — once below the panel, once above it.
+      const clearance = rect.height + (window.innerHeight - rect.bottom) * 2;
       root.style.setProperty('--docs-panel-offset', `${clearance}px`);
     });
     observer.observe(panel);
@@ -48,11 +69,7 @@ export function ThemePicker() {
       observer.disconnect();
       root.style.removeProperty('--docs-panel-offset');
     };
-  }, [pathname]);
-
-  // The landing page ships its own in-page theme swapper; the global corner
-  // picker would overlap it and duplicate its controls, so hide it there.
-  if (pathname === '/') return null;
+  }, []);
 
   const onChange = (mode: ThemeMode) => (value: string) => {
     setState((current) => updateThemeMode(current, mode, value));
@@ -61,11 +78,11 @@ export function ThemePicker() {
   return (
     <aside
       ref={panelRef}
-      className="nx:fixed nx:bottom-6 nx:right-6 nx:z-popover nx:w-[300px] nx:max-h-[calc(100svh-3rem)] nx:overflow-y-auto nx:bg-popover nx:text-popover-foreground nx:border nx:border-border-default nx:rounded-lg nx:shadow-lg"
+      className="nx:fixed nx:bottom-6 nx:right-6 nx:z-popover nx:w-[300px] nx:max-h-[calc(100svh_-_2*var(--nx-spacing-6))] nx:overflow-y-auto nx:bg-popover nx:text-popover-foreground nx:border nx:border-border-default nx:rounded-lg nx:shadow-lg"
     >
       <Button
         variant="ghost"
-        onClick={() => setCollapsed((c) => !c)}
+        onClick={() => setCollapsedOverride(!collapsed)}
         aria-expanded={!collapsed}
         className="nx:w-full nx:justify-between nx:rounded-lg"
       >
@@ -189,4 +206,19 @@ function ModeSelect({
       </SelectContent>
     </Select>
   );
+}
+
+/** Subscribes to a `matchMedia` query, staying in sync as the viewport changes. */
+function useMediaQuery(query: string) {
+  const [matches, setMatches] = useState(false);
+
+  useEffect(() => {
+    const mql = window.matchMedia(query);
+    const onChange = () => setMatches(mql.matches);
+    onChange();
+    mql.addEventListener('change', onChange);
+    return () => mql.removeEventListener('change', onChange);
+  }, [query]);
+
+  return matches;
 }

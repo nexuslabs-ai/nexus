@@ -2,6 +2,7 @@ import { NexusAppearanceProvider } from '@nexus_ds/react/appearance';
 import { NexusAppearanceScript } from '@nexus_ds/react/appearance/server';
 import type { Metadata } from 'next';
 
+import { CopyAnnouncerProvider } from './_components/CopyAnnouncer';
 import { ThemePicker } from './_components/ThemePicker';
 import { TopNav } from './_components/TopNav';
 import {
@@ -50,7 +51,9 @@ export default function RootLayout({
           defaultState={DOCS_APPEARANCE_DEFAULT_STATE}
         >
           <TopNav />
-          <main>{children}</main>
+          <CopyAnnouncerProvider>
+            <main>{children}</main>
+          </CopyAnnouncerProvider>
           <ThemePicker />
           <footer className="nx:border-t nx:border-border-default nx:mt-16">
             <div className="nx:max-w-[1280px] nx:mx-auto nx:px-6 nx:py-8 nx:flex nx:flex-col nx:gap-4 nx:sm:flex-row nx:sm:items-center nx:sm:justify-between">

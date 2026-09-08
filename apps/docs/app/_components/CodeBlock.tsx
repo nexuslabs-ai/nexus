@@ -2,10 +2,10 @@
 
 import * as React from 'react';
 
+import { cn } from '@nexus_ds/react/utils';
 import { IconCheck, IconCopy, IconX } from '@tabler/icons-react';
 
-import { join } from '../_lib/class-names';
-
+import { useCopyAnnouncer } from './CopyAnnouncer';
 import { Button } from './nexus';
 
 const RESET_DELAY_MS = 2000;
@@ -32,24 +32,19 @@ export function CodeBlock({
 }: React.ComponentProps<'pre'>) {
   const preRef = React.useRef<HTMLPreElement>(null);
   const timerRef = React.useRef<number | undefined>(undefined);
-  // `seq` advances on every settle so a repeat copy restarts the reset window
-  // and remounts the live-region child — re-rendering the same text would not
-  // announce a second time.
-  const [{ status, seq }, setCopy] = React.useState({
-    status: 'idle' as CopyStatus,
-    seq: 0,
-  });
-  const { icon, message } = COPY_STATUS[status];
+  const [status, setStatus] = React.useState<CopyStatus>('idle');
+  const announce = useCopyAnnouncer();
 
   React.useEffect(() => () => window.clearTimeout(timerRef.current), []);
 
-  const settle = (next: CopyStatus) => {
-    setCopy((c) => ({ status: next, seq: c.seq + 1 }));
+  const settle = (next: Exclude<CopyStatus, 'idle'>) => {
+    setStatus(next);
+    announce(COPY_STATUS[next].message);
     window.clearTimeout(timerRef.current);
-    timerRef.current = window.setTimeout(
-      () => setCopy((c) => ({ status: 'idle', seq: c.seq + 1 })),
-      RESET_DELAY_MS
-    );
+    timerRef.current = window.setTimeout(() => {
+      setStatus('idle');
+      announce(COPY_STATUS.idle.message);
+    }, RESET_DELAY_MS);
   };
 
   const handleCopy = async () => {
@@ -70,12 +65,13 @@ export function CodeBlock({
   return (
     <div className="nx:relative nx:mb-4">
       <pre
+        className={cn(PRE_CLASS, className)}
+        {...props}
+        // Both below the spread: a caller-supplied value must not replace the
+        // ref the copy control reads, nor the scroll container's own tab stop.
         ref={preRef}
-        // A scroll container with no focusable children needs its own tab stop.
         // eslint-disable-next-line jsx-a11y/no-noninteractive-tabindex
         tabIndex={0}
-        className={join(PRE_CLASS, className)}
-        {...props}
       >
         {children}
       </pre>
@@ -87,11 +83,8 @@ export function CodeBlock({
         className={BUTTON_CLASS}
         onClick={handleCopy}
       >
-        {icon}
+        {COPY_STATUS[status].icon}
       </Button>
-      <span role="status" className="nx:sr-only">
-        <span key={seq}>{message}</span>
-      </span>
     </div>
   );
 }

@@ -183,9 +183,9 @@ export function Typography() {
           in running prose.
         </p>
         <CodeBlock>
-          {`import { Button } from '@nexus_ds/react';
+          <code>{`import { Button } from '@nexus_ds/react';
 
-<Button variant="secondary">Ship it</Button>`}
+<Button variant="secondary">Ship it</Button>`}</code>
         </CodeBlock>
       </section>
 

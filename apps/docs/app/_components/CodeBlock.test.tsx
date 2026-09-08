@@ -4,6 +4,7 @@ import { act, fireEvent, render, screen } from '@testing-library/react';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
 import { CodeBlock } from './CodeBlock';
+import { CopyAnnouncerProvider } from './CopyAnnouncer';
 
 // Shaped like a real block from content/getting-started/install.mdx: the import
 // line is what a trimmed excerpt would drop, and the fence leaves a trailing \n.
@@ -16,13 +17,19 @@ export function Example() {
 
 const writeText = vi.fn<(text: string) => Promise<void>>();
 
+// The live region is shared page-wide, so a block is only testable inside the
+// provider that owns it — the same wiring `app/layout.tsx` supplies.
+function renderInDocs(block: React.ReactNode) {
+  render(<CopyAnnouncerProvider>{block}</CopyAnnouncerProvider>);
+  return screen.getByRole('button', { name: 'Copy code' });
+}
+
 function renderBlock() {
-  render(
+  return renderInDocs(
     <CodeBlock>
       <code className="language-tsx">{SNIPPET}</code>
     </CodeBlock>
   );
-  return screen.getByRole('button', { name: 'Copy code' });
 }
 
 describe('CodeBlock', () => {
@@ -137,12 +144,11 @@ describe('CodeBlock', () => {
   });
 
   it('reports a failure rather than a silent no-op for an empty block', async () => {
-    render(
+    const copy = renderInDocs(
       <CodeBlock>
         <code />
       </CodeBlock>
     );
-    const copy = screen.getByRole('button', { name: 'Copy code' });
 
     await act(async () => {
       fireEvent.click(copy);
@@ -151,6 +157,33 @@ describe('CodeBlock', () => {
     expect(writeText).not.toHaveBeenCalled();
     expect(screen.getByRole('status').textContent).toBe('Could not copy code');
     expect(copy.dataset.copyStatus).toBe('failed');
+  });
+
+  it('shares one live region across every block on the page', async () => {
+    render(
+      <CopyAnnouncerProvider>
+        <CodeBlock>
+          <code>{SNIPPET}</code>
+        </CodeBlock>
+        <CodeBlock>
+          <code>{'const x = 1;\n'}</code>
+        </CodeBlock>
+      </CopyAnnouncerProvider>
+    );
+    const controls = screen.getAllByRole('button', { name: 'Copy code' });
+
+    expect(controls).toHaveLength(2);
+    expect(screen.getAllByRole('status')).toHaveLength(1);
+
+    await act(async () => {
+      fireEvent.click(controls[1]!);
+    });
+
+    expect(writeText).toHaveBeenCalledWith('const x = 1;\n');
+    expect(screen.getByRole('status').textContent).toBe(
+      'Code copied to clipboard'
+    );
+    expect(controls[0]!.dataset.copyStatus).toBe('idle');
   });
 
   it('exposes the control as a focusable native button', () => {

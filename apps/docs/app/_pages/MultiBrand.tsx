@@ -163,13 +163,13 @@ export function MultiBrand() {
           surface.
         </p>
         <CodeBlock>
-          {`/* loaded after @nexus_ds/tailwind */
+          <code>{`/* loaded after @nexus_ds/tailwind */
 :root {
   --nx-color-primary-background: oklch(0.55 0.2 145); /* your brand */
 }
 
 /* density on a subtree */
-<section data-density="compact"> … compact … </section>`}
+<section data-density="compact"> … compact … </section>`}</code>
         </CodeBlock>
       </section>
 

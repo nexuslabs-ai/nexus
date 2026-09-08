@@ -158,7 +158,7 @@ export function Responsive() {
           width.
         </p>
         <CodeBlock>
-          {`// Viewport axis — page-shell decision
+          <code>{`// Viewport axis — page-shell decision
 <Show above="lg">
   <Sidebar />
 </Show>
@@ -166,7 +166,7 @@ export function Responsive() {
 // Container axis — component adapts to its parent
 <Hide containerBelow="md">
   <Actions />
-</Hide>`}
+</Hide>`}</code>
         </CodeBlock>
       </section>
 
