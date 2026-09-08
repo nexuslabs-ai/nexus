@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 
 import { useNexusAppearance } from '@nexus_ds/react/appearance';
 import { usePathname } from 'next/navigation';
@@ -21,10 +21,34 @@ import {
   SelectValue,
 } from './nexus';
 
+/** Matches the panel's `bottom-6`; reserved once below it and once above. */
+const PANEL_INSET_PX = 24;
+
 export function ThemePicker() {
   const { state, setState } = useNexusAppearance();
   const [collapsed, setCollapsed] = useState(false);
   const pathname = usePathname();
+  const panelRef = useRef<HTMLElement>(null);
+
+  // Publish the panel's real height so `scroll-pb` clears it and Tab never
+  // parks a control underneath (WCAG 2.4.11). Re-runs per route, so the
+  // reservation drops to 0 wherever the panel does not render.
+  useEffect(() => {
+    const panel = panelRef.current;
+    if (!panel) return;
+
+    const root = document.documentElement;
+    const observer = new ResizeObserver(() => {
+      const clearance = panel.offsetHeight + PANEL_INSET_PX * 2;
+      root.style.setProperty('--docs-panel-offset', `${clearance}px`);
+    });
+    observer.observe(panel);
+
+    return () => {
+      observer.disconnect();
+      root.style.removeProperty('--docs-panel-offset');
+    };
+  }, [pathname]);
 
   // The landing page ships its own in-page theme swapper; the global corner
   // picker would overlap it and duplicate its controls, so hide it there.
@@ -35,7 +59,10 @@ export function ThemePicker() {
   };
 
   return (
-    <aside className="nx:fixed nx:bottom-6 nx:right-6 nx:z-popover nx:w-[300px] nx:max-h-(--docs-panel-h) nx:overflow-y-auto nx:bg-popover nx:text-popover-foreground nx:border nx:border-border-default nx:rounded-lg nx:shadow-lg">
+    <aside
+      ref={panelRef}
+      className="nx:fixed nx:bottom-6 nx:right-6 nx:z-popover nx:w-[300px] nx:max-h-[calc(100svh-3rem)] nx:overflow-y-auto nx:bg-popover nx:text-popover-foreground nx:border nx:border-border-default nx:rounded-lg nx:shadow-lg"
+    >
       <Button
         variant="ghost"
         onClick={() => setCollapsed((c) => !c)}

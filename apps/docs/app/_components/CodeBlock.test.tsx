@@ -90,6 +90,69 @@ describe('CodeBlock', () => {
     expect(copy.dataset.copyStatus).toBe('idle');
   });
 
+  it('restarts the reset window and re-announces on a repeat copy', async () => {
+    const copy = renderBlock();
+    const region = screen.getByRole('status');
+
+    await act(async () => {
+      fireEvent.click(copy);
+    });
+    const firstAnnouncement = region.firstElementChild;
+
+    act(() => {
+      vi.advanceTimersByTime(1900);
+    });
+
+    await act(async () => {
+      fireEvent.click(copy);
+    });
+
+    // The first click's timer would have fired 100ms from here.
+    act(() => {
+      vi.advanceTimersByTime(1900);
+    });
+    expect(copy.dataset.copyStatus).toBe('copied');
+    expect(region.firstElementChild).not.toBe(firstAnnouncement);
+    expect(region.textContent).toBe('Code copied to clipboard');
+
+    act(() => {
+      vi.advanceTimersByTime(100);
+    });
+    expect(copy.dataset.copyStatus).toBe('idle');
+  });
+
+  it('reports a failure when the clipboard API is unavailable', async () => {
+    Object.defineProperty(navigator, 'clipboard', {
+      configurable: true,
+      value: undefined,
+    });
+    const copy = renderBlock();
+
+    await act(async () => {
+      fireEvent.click(copy);
+    });
+
+    expect(screen.getByRole('status').textContent).toBe('Could not copy code');
+    expect(copy.dataset.copyStatus).toBe('failed');
+  });
+
+  it('reports a failure rather than a silent no-op for an empty block', async () => {
+    render(
+      <CodeBlock>
+        <code />
+      </CodeBlock>
+    );
+    const copy = screen.getByRole('button', { name: 'Copy code' });
+
+    await act(async () => {
+      fireEvent.click(copy);
+    });
+
+    expect(writeText).not.toHaveBeenCalled();
+    expect(screen.getByRole('status').textContent).toBe('Could not copy code');
+    expect(copy.dataset.copyStatus).toBe('failed');
+  });
+
   it('exposes the control as a focusable native button', () => {
     const copy = renderBlock();
 
