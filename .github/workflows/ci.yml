@@ -29,11 +29,7 @@ jobs:
     runs-on: ubuntu-latest
     outputs:
       react: ${{ steps.filter.outputs.react }}
-      browser: ${{ steps.filter.outputs.browser }}
-      browser_source: ${{ steps.filter.outputs.browser_source }}
       root_config: ${{ steps.filter.outputs.root_config }}
-      # `packages` is true if any package OR any app changed — both are built
-      # and typechecked by the shared turbo `build` / `typecheck` jobs.
       packages: ${{ steps.filter.outputs.packages }}
       ci: ${{ steps.filter.outputs.ci }}
     steps:
@@ -47,47 +43,61 @@ jobs:
           filters: |
             # `react` tracks package-library source. App consumers (docs,
             # console) ride `packages` into the shared build/typecheck jobs.
+            # `react` and `packages` also match the root files that decide what
+            # resolves or how tasks run. None of them is source, and a change
+            # to any one can break a job with no source diff.
             react:
               - 'packages/react/**'
               - 'packages/tailwind/**'
               - 'packages/core/**'
               - 'packages/test-utils/**'
-            # `packages` gates the shared turbo build/typecheck jobs; any
-            # package or app can affect them, so both are matched here.
+              - 'pnpm-lock.yaml'
+              - '.npmrc'
+              - 'package.json'
+              - 'pnpm-workspace.yaml'
+              - '.nvmrc'
+              - 'turbo.json'
+              - 'tsconfig.base.json'
+              - 'tsconfig.json'
+              - 'vitest.config.ts'
+            # `packages` gates build, typecheck, test-unit, audit-tokens, and
+            # audit-browser-support. Any package, app, or root script can
+            # affect them.
             packages:
               - 'packages/**'
               - 'apps/**'
-            # Mirrors the source roots scanned by `pnpm audit:browser-support`.
-            browser_source:
-              - 'apps/**'
-              - 'packages/**'
-            browser:
+              - 'scripts/**'
+              - 'pnpm-lock.yaml'
+              - '.npmrc'
               - 'package.json'
-              - 'scripts/audit-browser-support.js'
-              - 'scripts/audit-browser-support.test.js'
-              - 'README.md'
-              - 'AGENTS.md'
-              - 'RTK.md'
-            # Root TS config sits outside every package, so turbo's
-            # `--filter=...[base]` selects no tasks for it; the build and
-            # typecheck jobs detect it here and run unfiltered instead.
-            root_config:
+              - 'pnpm-workspace.yaml'
+              - '.nvmrc'
+              - 'turbo.json'
               - 'tsconfig.base.json'
               - 'tsconfig.json'
+              - 'vitest.config.ts'
+            # Every root file build and typecheck read. No package path
+            # expresses them, so membership forces both jobs to an
+            # unfiltered run.
+            root_config:
+              - 'pnpm-workspace.yaml'
+              - '.nvmrc'
+              - '.npmrc'
+              - 'package.json'
+              - 'pnpm-lock.yaml'
+              - 'tsconfig.base.json'
+              - 'tsconfig.json'
+              - 'turbo.json'
             ci:
               - '.github/workflows/**'
 
   # format-check and lint run full-tree to mirror local `pnpm lint` /
-  # `pnpm format:check`.
+  # `pnpm format:check`, so neither is path-filtered: a filter would have to
+  # restate ESLint's and Prettier's file sets and would drift out of them.
 
   format-check:
     name: Format Check
     runs-on: ubuntu-latest
-    needs: changes
-    if: >-
-      needs.changes.outputs.browser_source == 'true' ||
-      needs.changes.outputs.browser == 'true' ||
-      needs.changes.outputs.ci == 'true'
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -110,11 +120,6 @@ jobs:
   lint:
     name: Lint
     runs-on: ubuntu-latest
-    needs: changes
-    if: >-
-      needs.changes.outputs.browser_source == 'true' ||
-      needs.changes.outputs.browser == 'true' ||
-      needs.changes.outputs.ci == 'true'
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -130,6 +135,11 @@ jobs:
 
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
+
+      # Reads two manifests and needs no build, so it runs before the ESLint
+      # cache restore — a lint failure must not hide a grammar skew.
+      - name: Docs grammar pin
+        run: pnpm --filter @nexus_ds/docs audit:grammar-pin
 
       - name: Restore ESLint cache
         uses: actions/cache@v4
@@ -152,8 +162,7 @@ jobs:
     runs-on: ubuntu-latest
     needs: changes
     if: >-
-      needs.changes.outputs.browser == 'true' ||
-      needs.changes.outputs.browser_source == 'true' ||
+      needs.changes.outputs.packages == 'true' ||
       needs.changes.outputs.ci == 'true'
     steps:
       - name: Checkout
@@ -178,7 +187,7 @@ jobs:
     name: Build
     runs-on: ubuntu-latest
     needs: changes
-    if: needs.changes.outputs.packages == 'true' || needs.changes.outputs.ci == 'true' || needs.changes.outputs.root_config == 'true'
+    if: needs.changes.outputs.packages == 'true' || needs.changes.outputs.ci == 'true'
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -217,6 +226,11 @@ jobs:
             pnpm turbo build
           fi
 
+      - name: Docs CSP inventory
+        run: |
+          pnpm turbo build --filter=@nexus_ds/docs
+          pnpm --filter @nexus_ds/docs audit:csp
+
       - name: Upload build artifacts
         uses: actions/upload-artifact@v4
         with:
@@ -233,7 +247,7 @@ jobs:
     name: TypeScript Check
     runs-on: ubuntu-latest
     needs: [changes, build]
-    if: needs.changes.outputs.packages == 'true' || needs.changes.outputs.ci == 'true' || needs.changes.outputs.root_config == 'true'
+    if: needs.changes.outputs.packages == 'true' || needs.changes.outputs.ci == 'true'
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -296,11 +310,10 @@ jobs:
     name: Unit Tests
     runs-on: ubuntu-latest
     needs: changes
-    # Runs the whole unit suite (packages + apps), so gate on `browser_source`
+    # Runs the whole unit suite (packages + apps), so gate on `packages`
     # (apps/** + packages/**), not `react` which intentionally excludes apps/.
     if: >-
-      needs.changes.outputs.browser_source == 'true' ||
-      needs.changes.outputs.browser == 'true' ||
+      needs.changes.outputs.packages == 'true' ||
       needs.changes.outputs.ci == 'true'
     steps:
       - name: Checkout
@@ -325,10 +338,10 @@ jobs:
     name: Audit Tokens
     runs-on: ubuntu-latest
     needs: changes
-    # Gate on `browser_source` (apps/** + packages/**): the freshness check
+    # Gate on `packages` (apps/** + packages/**): the freshness check
     # and the audit:class-refs / audit:mode-codenames steps scan apps/** and
     # packages/** sources, including apps/docs.
-    if: needs.changes.outputs.browser_source == 'true' || needs.changes.outputs.ci == 'true'
+    if: needs.changes.outputs.packages == 'true' || needs.changes.outputs.ci == 'true'
     steps:
       - name: Checkout
         uses: actions/checkout@v4

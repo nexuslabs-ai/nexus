@@ -1,4 +1,5 @@
 import { Breadcrumb } from '../_components/Breadcrumb';
+import { CodeSample } from '../_components/CodeSample';
 import { Button } from '../_components/nexus';
 
 /**
@@ -161,7 +162,7 @@ export function MultiBrand() {
           does the rest. See <strong>Consumer overrides</strong> for the full
           surface.
         </p>
-        <pre className="nx:typography-code-block nx:rounded-lg nx:border nx:border-border-default nx:bg-muted nx:p-4 nx:overflow-x-auto">
+        <CodeSample lang="css">
           {`/* loaded after @nexus_ds/tailwind */
 :root {
   --nx-color-primary-background: oklch(0.55 0.2 145); /* your brand */
@@ -169,7 +170,7 @@ export function MultiBrand() {
 
 /* density on a subtree */
 <section data-density="compact"> … compact … </section>`}
-        </pre>
+        </CodeSample>
       </section>
 
       {/* ── For agents ──────────────────────────────────────── */}

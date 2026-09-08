@@ -1,10 +1,12 @@
 import { compile } from '@mdx-js/mdx';
+import { SEMANTIC_TOKEN_REGISTRY } from '@nexus_ds/core';
 import { readdir, readFile } from 'node:fs/promises';
 import { createRequire } from 'node:module';
 import path from 'node:path';
 import { fileURLToPath, pathToFileURL } from 'node:url';
 import { describe, expect, it, vi } from 'vitest';
 
+import { NEXUS_CODE_THEME } from './code-theme';
 import { MDX_OPTIONS } from './mdx-options';
 
 const CONTENT_DIR = path.join(
@@ -56,6 +58,7 @@ const FIXTURE = `# Title
 interface HastNode {
   type: string;
   tagName?: string;
+  value?: string;
   properties?: Record<string, unknown>;
   children?: HastNode[];
 }
@@ -79,10 +82,18 @@ async function contentFiles() {
     );
 }
 
-async function loadPlugin(name: string) {
-  const resolved = pathToFileURL(requireFromContent.resolve(name)).href;
+// MDX_OPTIONS registers plugins by name, optionally paired with options.
+type PluginEntry = string | readonly [name: string, options: unknown];
+
+const pluginName = (entry: PluginEntry) =>
+  typeof entry === 'string' ? entry : entry[0];
+
+async function loadPlugin(entry: PluginEntry) {
+  const resolved = pathToFileURL(
+    requireFromContent.resolve(pluginName(entry))
+  ).href;
   const mod = await import(/* @vite-ignore */ resolved);
-  return mod.default;
+  return typeof entry === 'string' ? mod.default : [mod.default, entry[1]];
 }
 
 function collectElements(node: HastNode, found: HastNode[] = []) {
@@ -110,6 +121,7 @@ async function compileMdx(source: string) {
 
   const elements = collectElements(tree);
   return {
+    elements,
     headings: elements.filter((el) => /^h[1-6]$/.test(el.tagName ?? '')),
     ids: elements
       .map((el) => el.properties?.id)
@@ -117,17 +129,23 @@ async function compileMdx(source: string) {
   };
 }
 
+// Shiki's `normalizeTheme` mutates the theme in place on first compile, so
+// read the foregrounds before any test compiles MDX.
+const THEME_FOREGROUNDS = NEXUS_CODE_THEME.settings.map(
+  (entry) => entry.settings.foreground
+);
+
 const CONTENT_FILES = await contentFiles();
 
 describe('MDX heading ids', () => {
   it('registers rehype-slug where the loader can resolve it', () => {
     expect(MDX_OPTIONS.rehypePlugins).toContain('rehype-slug');
 
-    for (const name of [
+    for (const entry of [
       ...MDX_OPTIONS.remarkPlugins,
       ...MDX_OPTIONS.rehypePlugins,
     ]) {
-      expect(() => requireFromContent.resolve(name)).not.toThrow();
+      expect(() => requireFromContent.resolve(pluginName(entry))).not.toThrow();
     }
   });
 
@@ -195,5 +213,184 @@ describe('MDX heading ids', () => {
       ['h4', 'deep-heading'],
       ['h2', 'section-1'],
     ]);
+  });
+});
+
+const FENCE_LANGUAGE_PATTERN = /^```[\w-]+/gm;
+
+// One snippet per grammar, written in that language so the tokeniser resolves
+// something.
+const FENCE_SNIPPETS: Record<string, string> = {
+  bash: 'pnpm add @nexus_ds/react',
+  css: "@import '@nexus_ds/tailwind';",
+  html: '<div class="nx:p-4">Nexus</div>',
+  json: '{ "name": "@nexus_ds/react" }',
+  ts: "export const brand: string = 'nexus';",
+  tsx: 'export const App = () => <Button variant="primary" />;',
+};
+
+const CONTENT_SOURCES = await Promise.all(
+  CONTENT_FILES.map((file) => readFile(path.join(CONTENT_DIR, file), 'utf8'))
+);
+
+const CONTENT_FENCE_LANGUAGES = [
+  ...new Set(
+    CONTENT_SOURCES.flatMap(
+      (source) =>
+        source.match(FENCE_LANGUAGE_PATTERN)?.map((fence) => fence.slice(3)) ??
+        []
+    )
+  ),
+].sort();
+
+const fence = (lang: string, code: string) => `\`\`\`${lang}
+${code}
+\`\`\``;
+
+const TSX_SOURCE = `export function Hello({ name }: { name: string }) {
+  return <Button variant="primary">{name}</Button>;
+}`;
+
+function textOf(node: HastNode): string {
+  if (node.type === 'text') return node.value ?? '';
+  return (node.children ?? []).map(textOf).join('');
+}
+
+async function compileBlock(source: string) {
+  const { elements } = await compileMdx(source);
+  const pre = elements.find((el) => el.tagName === 'pre');
+  const code = elements.find((el) => el.tagName === 'code');
+
+  if (!pre || !code) throw new Error('no code block in compiled output');
+
+  const tokens = collectElements(code).filter((el) => el.tagName === 'span');
+
+  return {
+    figure: elements.find(
+      (el) => el.properties?.['data-rehype-pretty-code-figure'] !== undefined
+    ),
+    pre,
+    code,
+    tokens,
+    // A plaintext fallback still emits spans, but carries no style at all.
+    coloured: tokens.filter((token) =>
+      String(token.properties?.style ?? '').includes('--nx-color-')
+    ),
+    text: textOf(code),
+  };
+}
+
+describe('MDX code blocks', () => {
+  it('registers rehype-pretty-code with the Nexus token theme', () => {
+    expect(MDX_OPTIONS.rehypePlugins).toContainEqual([
+      'rehype-pretty-code',
+      expect.objectContaining({
+        theme: NEXUS_CODE_THEME,
+        keepBackground: false,
+      }),
+    ]);
+  });
+
+  it('colours every scope with a token the registry actually ships', () => {
+    const registered = new Set(
+      SEMANTIC_TOKEN_REGISTRY.map((token) => token.name)
+    );
+
+    expect(THEME_FOREGROUNDS.length).toBeGreaterThan(0);
+    for (const foreground of THEME_FOREGROUNDS) {
+      const name = /^var\(--nx-color-([a-z0-9-]+)\)$/.exec(foreground)?.[1];
+
+      expect(
+        name,
+        `${foreground} is not a --nx-color- reference`
+      ).toBeDefined();
+      expect(registered, `${name} is not in SEMANTIC_TOKEN_REGISTRY`).toContain(
+        name
+      );
+    }
+  });
+
+  it('tokenises a tsx block into both palettes at build time', async () => {
+    const { figure, pre, code, tokens, coloured, text } = await compileBlock(
+      fence('tsx', TSX_SOURCE)
+    );
+
+    expect(figure).toBeDefined();
+    expect(pre.properties?.['data-language']).toBe('tsx');
+    expect(text).toBe(TSX_SOURCE);
+
+    const colours = new Set(
+      coloured.map(
+        (token) =>
+          /var\(--nx-color-[a-z0-9-]+\)/.exec(
+            String(token.properties?.style)
+          )?.[0]
+      )
+    );
+
+    expect(coloured.length).toBeGreaterThan(1);
+    expect(colours.size).toBeGreaterThan(1);
+
+    for (const el of [pre, code, ...tokens]) {
+      expect(String(el.properties?.style ?? '')).not.toMatch(
+        /(^|;)\s*color:\s*(?!var\()/
+      );
+    }
+  });
+
+  it('keeps the scroll container reachable by keyboard', async () => {
+    const { pre } = await compileBlock(fence('tsx', TSX_SOURCE));
+
+    // Shiki adds the tab stop; mdx-components.tsx pairs it with a focus ring.
+    expect(pre.properties?.tabIndex).toBe(0);
+  });
+
+  it('leaves the surface to the Nexus tokens', async () => {
+    const { pre, code } = await compileBlock(fence('tsx', TSX_SOURCE));
+
+    expect(pre.properties?.style).toBeUndefined();
+    expect(String(code.properties?.style ?? '')).not.toMatch(/background|grid/);
+  });
+
+  it('covers every language content fences', () => {
+    expect(CONTENT_FENCE_LANGUAGES.length).toBeGreaterThan(0);
+    expect(Object.keys(FENCE_SNIPPETS)).toEqual(
+      expect.arrayContaining(CONTENT_FENCE_LANGUAGES)
+    );
+  });
+
+  it.each(Object.entries(FENCE_SNIPPETS))(
+    'tokenises the %s fences docs use',
+    async (lang, snippet) => {
+      const { pre, coloured } = await compileBlock(fence(lang, snippet));
+
+      expect(pre.properties?.['data-language']).toBe(lang);
+      expect(coloured.length).toBeGreaterThan(0);
+    }
+  );
+
+  it('degrades an unknown or missing language to plain text', async () => {
+    const nonsense = await compileBlock(fence('not-a-language', 'plain body'));
+    expect(nonsense.text).toBe('plain body');
+    expect(nonsense.coloured).toHaveLength(0);
+
+    const unlabelled = await compileBlock(fence('', 'plain body'));
+    expect(unlabelled.pre.properties?.['data-language']).toBe('plaintext');
+    expect(unlabelled.text).toBe('plain body');
+    expect(unlabelled.coloured).toHaveLength(0);
+  });
+
+  it('leaves inline code to the MDX component styling', async () => {
+    const { elements } = await compileMdx('Run `pnpm build` first.');
+    const inline = elements.find((el) => el.tagName === 'code');
+
+    expect(inline?.children?.every((child) => child.type === 'text')).toBe(
+      true
+    );
+    expect(
+      elements.some(
+        (el) => el.properties?.['data-rehype-pretty-code-figure'] !== undefined
+      )
+    ).toBe(false);
   });
 });

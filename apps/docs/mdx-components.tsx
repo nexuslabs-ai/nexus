@@ -1,6 +1,7 @@
 import type { MDXComponents } from 'mdx/types';
 
 import * as Nexus from './app/_components/nexus';
+import { CODE_BLOCK_SURFACE } from './app/_lib/code-block';
 
 const join = (base: string, incoming?: string) =>
   incoming ? `${base} ${incoming}` : base;
@@ -107,7 +108,7 @@ export function useMDXComponents(components: MDXComponents): MDXComponents {
     pre: ({ className, ...props }) => (
       <pre
         className={join(
-          'nx:bg-muted nx:border nx:border-border-default nx:rounded-md nx:p-4 nx:mb-4 nx:overflow-x-auto nx:typography-code-block nx:[&_code]:bg-transparent nx:[&_code]:p-0 nx:[&_code]:typography-code-block',
+          `${CODE_BLOCK_SURFACE} nx:mb-4 nx:[&_code]:bg-transparent nx:[&_code]:p-0 nx:[&_code]:typography-code-block`,
           className
         )}
         {...props}

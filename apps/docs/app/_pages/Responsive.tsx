@@ -1,4 +1,5 @@
 import { Breadcrumb } from '../_components/Breadcrumb';
+import { CodeSample } from '../_components/CodeSample';
 
 /**
  * Foundations → Responsive. Server component — the breakpoint scale, the
@@ -156,7 +157,7 @@ export function Responsive() {
           <code>containerAbove=&quot;md&quot;</code> do not fire at the same
           width.
         </p>
-        <pre className="nx:typography-code-block nx:rounded-lg nx:border nx:border-border-default nx:bg-muted nx:p-4 nx:overflow-x-auto">
+        <CodeSample lang="tsx">
           {`// Viewport axis — page-shell decision
 <Show above="lg">
   <Sidebar />
@@ -166,7 +167,7 @@ export function Responsive() {
 <Hide containerBelow="md">
   <Actions />
 </Hide>`}
-        </pre>
+        </CodeSample>
       </section>
 
       {/* ── Which mechanism ─────────────────────────────────── */}

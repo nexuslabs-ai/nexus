@@ -1,4 +1,5 @@
 import { Breadcrumb } from '../_components/Breadcrumb';
+import { CodeSample } from '../_components/CodeSample';
 
 /**
  * Foundations → Typography. Server component — a live specimen of the type
@@ -181,11 +182,11 @@ export function Typography() {
           </code>{' '}
           in running prose.
         </p>
-        <pre className="nx:typography-code-block nx:rounded-lg nx:border nx:border-border-default nx:bg-muted nx:p-4 nx:overflow-x-auto">
+        <CodeSample lang="tsx">
           {`import { Button } from '@nexus_ds/react';
 
 <Button variant="secondary">Ship it</Button>`}
-        </pre>
+        </CodeSample>
       </section>
 
       {/* ── Families ────────────────────────────────────────── */}
