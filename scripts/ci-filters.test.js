@@ -36,6 +36,8 @@ if (!detectStep) {
 // `filters` is a YAML string embedded in the step input, so it parses twice.
 const filters = parse(detectStep.with.filters);
 
+const exportedFilters = Object.keys(jobNamed('changes').outputs);
+
 // Root files no path filter needs to match: `lint` and `format-check` run
 // unconditionally, and no other job reads these.
 const UNGATED_ROOT_FILES = [
@@ -59,8 +61,9 @@ const GATE_TERM = /^needs\.changes\.outputs\.(\w+) == 'true'$/;
 const GUARD_TERM = /^\[ "([^"]*)" = "([^"]*)" \]$/;
 const EXPRESSION = /\$\{\{\s*([^}]+?)\s*\}\}/g;
 // `-F` is turbo's own alias for `--filter`, so both narrow the task set.
-const FILTER_FLAG = /--filter|(?:^|\s)-F[\s=]/;
-const PR_FILTER = /--filter="\.\.\.\[origin\//;
+const FILTER_FLAG = /--filter|(?:^|\s)-F/;
+// The diff range is what scopes a run to the PR, whichever flag carries it.
+const PR_FILTER = /\[origin\//;
 
 function filtersReadBy(expression) {
   return [...expression.matchAll(OUTPUT_READ)].map(([, filter]) => filter);
@@ -107,77 +110,59 @@ const gatedJobs = jobNames.filter((name) => {
   return typeof gate === 'string' && gate.includes('needs.changes.outputs');
 });
 
-function runScriptOf(name) {
-  return jobNamed(name)
-    .steps.map((step) => step.run ?? '')
-    .join('\n');
+// Only the step that narrows the task set to the PR's diff decides whether a
+// root-config change runs unfiltered; the job's other steps are unrelated.
+function prFilteredStepOf(name) {
+  return jobNamed(name).steps.find((step) => PR_FILTER.test(step.run ?? ''));
 }
 
-// A job that narrows the task set to the PR's diff must leave a branch that
-// does not, or a root file selects nothing and the job passes vacuously.
-const prFilteredJobs = jobNames.filter((name) =>
-  PR_FILTER.test(runScriptOf(name))
-);
+const prFilteredJobs = jobNames.filter((name) => prFilteredStepOf(name));
 
-// Nested `if`s belong to the enclosing branch's body, so only depth-1
-// keywords open, continue, or close a chain.
+// The step is one flat `if` / `elif` / `else` / `fi` chain. A nested or second
+// `if`, or a guard not written `if <test>; then`, is rejected rather than
+// guessed at.
 function branchesOf(script) {
-  const chains = [];
-  let branches = null;
-  let current = null;
-  let depth = 0;
+  const branches = [];
 
   for (const line of script.split('\n')) {
-    const opened = line.match(/^\s*if (.+); then$/);
-    const continued = line.match(/^\s*elif (.+); then$/);
-    const fallback = /^\s*else$/.test(line);
-    const closed = /^\s*fi$/.test(line);
+    const guard = line.match(/^\s*(?:el)?if (.+); then$/);
 
-    if (opened) {
-      depth += 1;
-
-      if (depth === 1) {
-        branches = [];
-        current = { guard: opened[1], body: [] };
-        continue;
-      }
-    } else if (closed) {
-      if (depth === 1) {
-        branches.push(current);
-        chains.push(branches);
-        branches = null;
-        current = null;
-        depth = 0;
-        continue;
+    if (guard) {
+      if (branches.length > 0 && !/^\s*elif /.test(line)) {
+        throw new Error(`run step opens a second \`if\`: ${line.trim()}`);
       }
 
-      depth -= 1;
-    } else if (depth === 1 && (continued || fallback)) {
-      branches.push(current);
-      current = { guard: continued?.[1] ?? null, body: [] };
-      continue;
+      branches.push({ guard: guard[1], body: [] });
+    } else if (/^\s*else\s*$/.test(line)) {
+      branches.push({ guard: null, body: [] });
+    } else if (/^\s*(?:el)?if\b|^\s*then\b/.test(line)) {
+      throw new Error(
+        `run step \`if\` is not \`if <test>; then\`: ${line.trim()}`
+      );
+    } else if (!/^\s*fi\s*$/.test(line)) {
+      branches.at(-1)?.body.push(line);
     }
-
-    current?.body.push(line);
   }
 
-  if (depth !== 0) {
-    throw new Error('unbalanced `if`/`fi` in run script');
-  }
-
-  return chains.map((chain) =>
-    chain.map(({ guard, body }) => ({ guard, body: body.join('\n') }))
-  );
+  return branches.map(({ guard, body }) => ({ guard, body: body.join('\n') }));
 }
 
-function expand(value, env) {
-  return value.replace(EXPRESSION, (_, expression) => {
+// A guard the model cannot resolve must throw. Silently reading it as unequal
+// would send every case to `else` and pass whatever sits there.
+function operand(value, env) {
+  const expanded = value.replace(EXPRESSION, (_, expression) => {
     if (!(expression in env)) {
-      throw new Error(`run-script guard reads unmodelled \`${expression}\``);
+      throw new Error(`run-step guard reads unmodelled \`${expression}\``);
     }
 
     return env[expression];
   });
+
+  if (expanded.includes('$')) {
+    throw new Error(`run-step guard reads a shell variable: ${value}`);
+  }
+
+  return expanded;
 }
 
 // `else` carries no guard and always wins if it is reached.
@@ -189,24 +174,12 @@ function guardHolds(guard, env) {
 
     if (left === undefined) {
       throw new Error(
-        `run-script guard term is not \`[ "X" = "Y" ]\`: ${term.trim()}`
+        `run-step guard term is not \`[ "X" = "Y" ]\`: ${term.trim()}`
       );
     }
 
-    return expand(left, env) === expand(right, env);
+    return operand(left, env) === operand(right, env);
   });
-}
-
-function branchTakenBy(name, env) {
-  const chains = branchesOf(runScriptOf(name));
-
-  if (chains.length !== 1) {
-    throw new Error(
-      `ci.yml \`${name}\` run steps hold ${chains.length} if-chains; expected exactly 1`
-    );
-  }
-
-  return chains[0].find(({ guard }) => guardHolds(guard, env));
 }
 
 // A root-config change on a pull request: the case where filtering by diff
@@ -237,7 +210,9 @@ describe('ci path filters', () => {
   });
 
   it.each(prFilteredJobs)('runs %s unfiltered on a root_config PR', (name) => {
-    const taken = branchTakenBy(name, ROOT_CONFIG_PULL_REQUEST);
+    const taken = branchesOf(prFilteredStepOf(name).run).find(({ guard }) =>
+      guardHolds(guard, ROOT_CONFIG_PULL_REQUEST)
+    );
 
     expect(taken).toBeDefined();
     expect(taken.body).toMatch(/pnpm turbo \w+/);
@@ -252,14 +227,15 @@ describe('ci path filters', () => {
 
   it('declares a filter for every output it exports', () => {
     const declared = new Set(Object.keys(filters));
-    const exported = Object.keys(jobNamed('changes').outputs);
 
-    expect(exported.length).toBeGreaterThan(0);
-    expect(exported.filter((filter) => !declared.has(filter))).toEqual([]);
+    expect(exportedFilters.length).toBeGreaterThan(0);
+    expect(exportedFilters.filter((filter) => !declared.has(filter))).toEqual(
+      []
+    );
   });
 
   it('exports exactly the filters the workflow reads', () => {
-    const exported = new Set(Object.keys(jobNamed('changes').outputs));
+    const exported = new Set(exportedFilters);
     const read = new Set(filtersReadBy(JSON.stringify(workflow)));
 
     expect(read.size).toBeGreaterThan(0);
@@ -274,7 +250,11 @@ describe('ci path filters', () => {
     })
       .split('\n')
       .filter((file) => file !== '' && !file.includes('/'));
-    const isMatched = picomatch(Object.values(filters).flat(), { dot: true });
+    // Only exported filters gate a job, so a declared-but-unexported block
+    // must not count as coverage.
+    const isMatched = picomatch(exportedFilters.flatMap(filterNamed), {
+      dot: true,
+    });
 
     expect(rootFiles.length).toBeGreaterThan(0);
     expect(
