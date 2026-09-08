@@ -22,12 +22,8 @@ import {
 } from './nexus';
 
 /**
- * Below `lg` an expanded panel would reserve roughly half the scrollport, so it
- * opens collapsed there. The query asks for the *expanded* case so its
- * unmatched value — the one the prerendered HTML and the first client render
- * both use — is the collapsed one, and mobile never paints an expanded panel or
- * publishes its oversized reservation. Staying in rem keeps the threshold
- * aligned with the `nx:lg:` utilities as the user's base font size changes.
+ * Asks for the *expanded* case so the unmatched value — the one the prerendered
+ * HTML and the first client render both use — is the collapsed one.
  */
 const EXPAND_QUERY = '(min-width: 64rem)';
 

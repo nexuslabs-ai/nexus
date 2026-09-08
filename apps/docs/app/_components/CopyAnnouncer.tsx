@@ -12,11 +12,6 @@ const CopyAnnouncerContext = React.createContext<
  * The page's single `role="status"` region. Every CodeBlock publishes its copy
  * confirmation here rather than mounting a live region of its own, so a page of
  * twenty fences registers one region with assistive tech instead of twenty.
- *
- * The provider owns how long a message lives. A block that published two
- * seconds ago must not blank the region a sibling has since written to, so the
- * clear timer restarts on every announcement and belongs to the region, not to
- * whichever block spoke last.
  */
 export function CopyAnnouncerProvider({
   children,

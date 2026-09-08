@@ -77,8 +77,6 @@ describe('CodeBlock', () => {
     });
 
     expect(copy.dataset.copyStatus).toBe('idle');
-    // The block restores its own icon; the provider clears the region it owns,
-    // in place, so emptying it is not itself read out.
     expect(screen.getByRole('status').textContent).toBe('');
     expect(screen.getByRole('status').firstElementChild).toBe(announcement);
   });

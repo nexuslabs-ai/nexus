@@ -41,7 +41,6 @@ export function CodeBlock({
     setStatus(next);
     announce(COPY_STATUS[next].message);
     window.clearTimeout(timerRef.current);
-    // Icon only — the provider owns how long the announcement stays up.
     timerRef.current = window.setTimeout(
       () => setStatus('idle'),
       RESET_DELAY_MS
@@ -68,9 +67,9 @@ export function CodeBlock({
       <pre
         className={cn(PRE_CLASS, className)}
         {...props}
-        // Both below the spread: the props type omits them, but MDX plugins
-        // inject props at runtime where the type cannot reach.
         ref={preRef}
+        // Below the spread: a rehype plugin can set `tabIndex` through
+        // `hProperties`, and the scroll container's own tab stop has to win.
         // eslint-disable-next-line jsx-a11y/no-noninteractive-tabindex
         tabIndex={0}
       >
