@@ -49,6 +49,10 @@ export default defineConfig({
       // Unit tests (hooks, utilities) - jsdom
       {
         extends: true,
+        // apps/docs sets `jsx: preserve` for Next, which esbuild reads as the
+        // classic runtime. Components rendered in a unit test would otherwise
+        // need their own `import * as React`.
+        esbuild: { jsx: 'automatic', jsxImportSource: 'react' },
         test: {
           name: 'unit',
           environment: 'jsdom',

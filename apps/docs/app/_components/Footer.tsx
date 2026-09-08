@@ -1,5 +1,3 @@
-import * as React from 'react';
-
 const FOOTER_LINKS: { label: string; href: `https://${string}` }[] = [
   { label: 'Storybook', href: 'https://nexuslabs-ai.github.io/nexus/' },
   { label: 'GitHub', href: 'https://github.com/nexuslabs-ai/nexus' },

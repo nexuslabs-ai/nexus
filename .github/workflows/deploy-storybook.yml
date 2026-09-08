@@ -16,7 +16,7 @@ on:
     paths:
       - 'packages/**'
       - 'pnpm-lock.yaml'
-      - '.github/actions/build-storybook/action.yml'
+      - '.github/actions/build-storybook/**'
       - '.github/workflows/deploy-storybook.yml'
   workflow_dispatch:
 
