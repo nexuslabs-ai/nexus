@@ -1,9 +1,8 @@
 import type { MDXComponents } from 'mdx/types';
 
+import { CodeBlock } from './app/_components/CodeBlock';
 import * as Nexus from './app/_components/nexus';
-
-const join = (base: string, incoming?: string) =>
-  incoming ? `${base} ${incoming}` : base;
+import { join } from './app/_lib/class-names';
 
 /**
  * Required by @next/mdx in the App Router. Maps Markdown-rendered HTML to
@@ -11,8 +10,9 @@ const join = (base: string, incoming?: string) =>
  * the @nexus_ds/react components so MDX authors can drop a live <Button> etc.
  * into prose with no import.
  *
- * The pre/code pairing matters: a fenced ``` block renders as <pre><code>;
- * the inline-code background is reset inside <pre> so blocks don't double up.
+ * The pre/code pairing matters: a fenced ``` block renders as <pre><code>,
+ * which CodeBlock owns — it keeps the <pre> styling, resets the inline-code
+ * background inside it, and adds the copy control.
  */
 export function useMDXComponents(components: MDXComponents): MDXComponents {
   return {
@@ -104,15 +104,7 @@ export function useMDXComponents(components: MDXComponents): MDXComponents {
         {...props}
       />
     ),
-    pre: ({ className, ...props }) => (
-      <pre
-        className={join(
-          'nx:bg-muted nx:border nx:border-border-default nx:rounded-md nx:p-4 nx:mb-4 nx:overflow-x-auto nx:typography-code-block nx:[&_code]:bg-transparent nx:[&_code]:p-0 nx:[&_code]:typography-code-block',
-          className
-        )}
-        {...props}
-      />
-    ),
+    pre: CodeBlock,
     table: ({ className, ...props }) => (
       <div
         // A scroll container with no focusable children needs its own tab stop.

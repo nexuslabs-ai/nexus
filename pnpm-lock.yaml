@@ -212,6 +212,9 @@ importers:
       '@nexus_ds/tailwind':
         specifier: workspace:*
         version: link:../../packages/tailwind
+      '@tabler/icons-react':
+        specifier: ^3.36.1
+        version: 3.44.0(react@19.2.7)
       next:
         specifier: ^15.1.6
         version: 15.5.19(@babel/core@7.29.7)(react-dom@19.2.7(react@19.2.7))(react@19.2.7)

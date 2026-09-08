@@ -35,7 +35,7 @@ export function ThemePicker() {
   };
 
   return (
-    <aside className="nx:fixed nx:bottom-6 nx:right-6 nx:z-popover nx:w-[300px] nx:bg-popover nx:text-popover-foreground nx:border nx:border-border-default nx:rounded-lg nx:shadow-lg">
+    <aside className="nx:fixed nx:bottom-6 nx:right-6 nx:z-popover nx:w-[300px] nx:max-h-(--docs-panel-h) nx:overflow-y-auto nx:bg-popover nx:text-popover-foreground nx:border nx:border-border-default nx:rounded-lg nx:shadow-lg">
       <Button
         variant="ghost"
         onClick={() => setCollapsed((c) => !c)}

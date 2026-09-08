@@ -17,4 +17,9 @@
 :root {
   --docs-header-h: 3.5rem;
   --docs-scroll-offset: calc(var(--docs-header-h) + 1.5rem);
+  /* Caps the floating theme panel and reserves the matching band at the bottom
+     of the scrollport, so sequential focus never parks a control underneath it
+     (WCAG 2.4.11). One token drives both, so the two cannot drift apart. */
+  --docs-panel-h: 30rem;
+  --docs-panel-offset: calc(var(--docs-panel-h) + 1.5rem);
 }
