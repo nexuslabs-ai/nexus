@@ -3,6 +3,7 @@
 import { useEffect, useRef, useState } from 'react';
 
 import { useNexusAppearance } from '@nexus_ds/react/appearance';
+import { cn } from '@nexus_ds/react/utils';
 import { usePathname } from 'next/navigation';
 
 import {
@@ -30,8 +31,7 @@ const EXPAND_QUERY = '(min-width: 64rem)';
 export function ThemePicker() {
   const pathname = usePathname();
 
-  // The landing page ships its own in-page theme swapper; the global corner
-  // picker would overlap it and duplicate its controls, so hide it there.
+  // The landing page ships its own theme swapper, which this would overlap.
   if (pathname === '/') return null;
 
   return <ThemePanel />;
@@ -47,8 +47,7 @@ function ThemePanel() {
   const panelRef = useRef<HTMLElement>(null);
 
   // Publish the panel's real height so `scroll-pb` clears it and Tab never
-  // parks a control underneath (WCAG 2.4.11). The reservation stays 0 wherever
-  // no panel mounts.
+  // parks a control underneath (WCAG 2.4.11).
   useEffect(() => {
     const panel = panelRef.current;
     if (!panel) return;
@@ -56,8 +55,7 @@ function ThemePanel() {
     const root = document.documentElement;
     const observer = new ResizeObserver(() => {
       const rect = panel.getBoundingClientRect();
-      // `bottom-6` is density-scaled, so measure the gap the panel actually
-      // sits in and reserve it twice — once below the panel, once above it.
+      // Reserve the measured bottom gap twice: once below, once above.
       const clearance = rect.height + (window.innerHeight - rect.bottom) * 2;
       root.style.setProperty('--docs-panel-offset', `${clearance}px`);
     });
@@ -86,11 +84,10 @@ function ThemePanel() {
       >
         <span>⚙ Theme</span>
         <span
-          className={
-            expanded
-              ? 'nx:text-muted-foreground nx:transition-transform nx:rotate-180'
-              : 'nx:text-muted-foreground nx:transition-transform'
-          }
+          className={cn(
+            'nx:text-muted-foreground nx:transition-transform',
+            expanded && 'nx:rotate-180'
+          )}
         >
           ▼
         </span>
@@ -206,7 +203,6 @@ function ModeSelect({
   );
 }
 
-/** Subscribes to a `matchMedia` query, staying in sync as the viewport changes. */
 function useMediaQuery(query: string) {
   const [matches, setMatches] = useState(false);
 

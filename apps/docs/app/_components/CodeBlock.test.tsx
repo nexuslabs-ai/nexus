@@ -6,8 +6,7 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { CodeBlock } from './CodeBlock';
 import { CopyAnnouncerProvider } from './CopyAnnouncer';
 
-// Shaped like a real block from content/getting-started/install.mdx: the import
-// line is what a trimmed excerpt would drop, and the fence leaves a trailing \n.
+// A real block shape: an import line, and the fence's trailing newline.
 const SNIPPET = `import { Button } from '@nexus_ds/react';
 
 export function Example() {
@@ -17,8 +16,7 @@ export function Example() {
 
 const writeText = vi.fn<(text: string) => Promise<void>>();
 
-// The live region is shared page-wide, so a block is only testable inside the
-// provider that owns it — the same wiring `app/layout.tsx` supplies.
+// The live region lives in the provider, so a block is only testable inside one.
 function renderInDocs(block: React.ReactNode) {
   render(<CopyAnnouncerProvider>{block}</CopyAnnouncerProvider>);
   return screen.getByRole('button', { name: 'Copy code' });
@@ -211,12 +209,10 @@ describe('CodeBlock', () => {
     await act(async () => {
       fireEvent.click(controls[1]!);
     });
-    // Both blocks announce the same words, so identity — not text — is what
-    // separates "left alone" from "cleared" and from "announced again".
+    // Both blocks announce the same words, so identity separates the cases.
     const announcement = region.firstElementChild;
 
-    // The first block's 2s reset lands here, a second after the other block
-    // announced. It must return only its own icon to idle.
+    // The first block's 2s reset lands here, after the other block announced.
     act(() => {
       vi.advanceTimersByTime(1000);
     });
@@ -228,8 +224,7 @@ describe('CodeBlock', () => {
   });
 
   it('gives the scroll container a tab stop a caller cannot remove', () => {
-    // The props type omits `tabIndex`, but an MDX plugin can still inject one
-    // at runtime — the guard below the spread is what has to hold there.
+    // The props type omits `tabIndex`, but an MDX plugin can still inject one.
     const injected: object = { tabIndex: -1 };
     const { container } = render(
       <CopyAnnouncerProvider>

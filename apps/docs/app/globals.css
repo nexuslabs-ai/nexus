@@ -17,8 +17,6 @@
 :root {
   --docs-header-h: 3.5rem;
   --docs-scroll-offset: calc(var(--docs-header-h) + 1.5rem);
-  /* Reserves a band at the bottom of the scrollport so Tab never parks a
-     control under the floating theme panel. ThemePicker overwrites this with
-     the panel's measured height; it stays 0 wherever no panel renders. */
+  /* ThemePicker overwrites this with the panel's measured height. */
   --docs-panel-offset: 0px;
 }

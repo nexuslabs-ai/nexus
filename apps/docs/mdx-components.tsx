@@ -9,15 +9,10 @@ import * as Nexus from './app/_components/nexus';
  * Nexus-styled elements (typography utilities, semantic tokens) and exposes
  * the @nexus_ds/react components so MDX authors can drop a live <Button> etc.
  * into prose with no import.
- *
- * The pre/code pairing matters: a fenced ``` block renders as <pre><code>,
- * which CodeBlock owns — it keeps the <pre> styling, resets the inline-code
- * background inside it, and adds the copy control.
  */
 export function useMDXComponents(components: MDXComponents): MDXComponents {
   return {
-    // children rendered explicitly (not via {...props}) so jsx-a11y can see
-    // the heading/anchor has content.
+    // children rendered explicitly so jsx-a11y can see the element has content.
     h1: ({ children, className, ...props }) => (
       <h1
         className={cn('nx:typography-heading-large nx:mb-2', className)}

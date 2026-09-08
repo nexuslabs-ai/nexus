@@ -8,18 +8,13 @@ const CopyAnnouncerContext = React.createContext<
   ((message: string) => void) | null
 >(null);
 
-/**
- * The page's single `role="status"` region. Every CodeBlock publishes its copy
- * confirmation here rather than mounting a live region of its own, so a page of
- * twenty fences registers one region with assistive tech instead of twenty.
- */
+/** The page's single `role="status"` region for copy confirmations. */
 export function CopyAnnouncerProvider({
   children,
 }: {
   children: React.ReactNode;
 }) {
-  // `seq` advances on every announcement so the message child remounts —
-  // re-rendering the same text node would not announce a second time.
+  // `seq` remounts the message node so repeating the same text announces again.
   const [{ message, seq }, setAnnouncement] = React.useState({
     message: '',
     seq: 0,
@@ -28,12 +23,10 @@ export function CopyAnnouncerProvider({
 
   React.useEffect(() => () => window.clearTimeout(timerRef.current), []);
 
-  // Stable so publishing does not re-render every CodeBlock reading the context.
   const announce = React.useCallback((next: string) => {
     setAnnouncement((a) => ({ message: next, seq: a.seq + 1 }));
     window.clearTimeout(timerRef.current);
-    // Blanking without advancing `seq` updates the text node in place, so the
-    // region empties without reading a second time.
+    // Blanking without advancing `seq` empties the region without re-announcing.
     timerRef.current = window.setTimeout(
       () => setAnnouncement((a) => ({ ...a, message: '' })),
       CLEAR_DELAY_MS
