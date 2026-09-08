@@ -10,39 +10,26 @@ import { Button } from './nexus';
 
 const RESET_DELAY_MS = 2000;
 
-type CopyStatus = 'idle' | 'copied' | 'failed';
-
-const COPY_STATUS: Record<
-  CopyStatus,
-  { icon: React.ReactNode; message: string; textClass: string }
-> = {
-  idle: { icon: <IconCopy />, message: '', textClass: '' },
+const COPY_STATUS = {
+  idle: { icon: <IconCopy />, message: '', className: '' },
   copied: {
     icon: <IconCheck />,
     message: 'Code copied to clipboard',
-    textClass: 'nx:text-success-subtle-foreground',
+    className: 'nx:text-success-subtle-foreground',
   },
   failed: {
     icon: <IconX />,
     message: 'Could not copy code',
-    textClass: 'nx:text-error-subtle-foreground',
+    className: 'nx:text-error-subtle-foreground',
   },
 };
+
+type CopyStatus = keyof typeof COPY_STATUS;
 
 const PRE_CLASS =
   'nx:bg-muted nx:border nx:border-border-default nx:rounded-md nx:p-4 nx:pe-14 nx:overflow-x-auto nx:typography-code-block nx:[&_code]:bg-transparent nx:[&_code]:p-0 nx:[&_code]:typography-code-block';
 
-/**
- * The MDX `<pre>` override. Copy-paste is how Nexus components are adopted, so
- * every fenced block carries a control that yields the whole snippet — imports
- * included — in one click.
- *
- * The control is a sibling of the `<pre>`, not a child: the copied string is
- * read straight off `<pre>.textContent`, so the button's own label can never
- * leak into it, and a hand-selection of the block does not pick it up either.
- * Reading the DOM rather than the React children also keeps the copy exact once
- * syntax highlighting wraps the source in nested spans.
- */
+/** The MDX `<pre>` override: the code block plus a control that copies it. */
 export function CodeBlock({
   children,
   className,
@@ -50,7 +37,7 @@ export function CodeBlock({
 }: React.ComponentProps<'pre'>) {
   const preRef = React.useRef<HTMLPreElement>(null);
   const [status, setStatus] = React.useState<CopyStatus>('idle');
-  const { icon, message, textClass } = COPY_STATUS[status];
+  const { icon, message, className: statusClass } = COPY_STATUS[status];
 
   React.useEffect(() => {
     if (status === 'idle') return;
@@ -60,8 +47,6 @@ export function CodeBlock({
   }, [status]);
 
   const handleCopy = async () => {
-    // textContent, not innerText: it keeps the source verbatim, including the
-    // fence's trailing newline, where innerText would collapse the whitespace.
     const source = preRef.current?.textContent;
     if (!source) return;
 
@@ -79,12 +64,11 @@ export function CodeBlock({
         {children}
       </pre>
       <Button
-        type="button"
         variant="outline"
         size="icon-sm"
         aria-label="Copy code"
         data-copy-status={status}
-        className={join('nx:absolute nx:top-2 nx:end-2', textClass)}
+        className={join('nx:absolute nx:top-2 nx:end-2', statusClass)}
         onClick={handleCopy}
       >
         {icon}
