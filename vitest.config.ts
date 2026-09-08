@@ -11,6 +11,13 @@ export default defineConfig({
         replacement: path.resolve(__dirname, './packages/core/src/index.ts'),
       },
       {
+        find: '@nexus_ds/react/utils',
+        replacement: path.resolve(
+          __dirname,
+          './packages/react/src/lib/utils.ts'
+        ),
+      },
+      {
         find: '@nexus_ds/react/appearance/server',
         replacement: path.resolve(
           __dirname,
