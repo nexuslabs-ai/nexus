@@ -10,7 +10,7 @@
         "scripts/**",
         "*.ts",
         "*.tsx",
-        "postcss.config.mjs",
+        "*.mjs",
         "tsconfig.json",
         "package.json"
       ],

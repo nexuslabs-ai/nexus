@@ -4,42 +4,81 @@
  * the routes manifest with the helpers here and checks the output against it.
  * `CSP.md` records what the policy allows today and what still has to change
  * before it can be enforced.
- *
- * Next bakes `headers()` into `.next/routes-manifest.json`, so `DOCS_CSP_MODE`
- * is read at build time — setting it for `next start` alone does nothing.
  */
 
-export const CSP_MODE =
-  process.env.DOCS_CSP_MODE === 'enforce' ? 'enforce' : 'report-only';
+// #687 flips this to 'Content-Security-Policy' once Next's inline flight
+// scripts are covered; until then enforcing the policy blanks every page.
+export const CSP_HEADER_NAME = 'Content-Security-Policy-Report-Only';
 
-export const CSP_HEADER_NAME =
-  CSP_MODE === 'enforce'
-    ? 'Content-Security-Policy'
-    : 'Content-Security-Policy-Report-Only';
-
-const HASH_OR_NONCE = /^'(?:sha(?:256|384|512)-|nonce-)/;
+const HASH_OR_NONCE = /^'(?:sha(?:256|384|512)-|nonce-)/i;
 
 /**
- * A hash or nonce anywhere in a directive makes its `'unsafe-inline'` inert, so
- * the keyword on its own does not settle whether inline content runs.
+ * CSP Level 3, "Does a source list allow all inline behavior for type?". A hash
+ * or nonce makes `'unsafe-inline'` inert for either type; `'strict-dynamic'`
+ * does so for scripts only. Source expressions are ASCII case-insensitive.
+ *
+ * @param {readonly string[]} sources
+ * @param {'script' | 'style'} type
+ * @returns {boolean}
  */
-export function allowsArbitraryInline(sources) {
-  return (
-    sources.includes("'unsafe-inline'") &&
-    !sources.some((source) => HASH_OR_NONCE.test(source))
-  );
+export function allowsArbitraryInline(sources, type) {
+  let allowAllInline = false;
+
+  for (const source of sources) {
+    if (HASH_OR_NONCE.test(source)) return false;
+
+    const keyword = source.toLowerCase();
+    if (type === 'script' && keyword === "'strict-dynamic'") return false;
+    if (keyword === "'unsafe-inline'") allowAllInline = true;
+  }
+
+  return allowAllInline;
 }
 
+/**
+ * @param {string} header
+ * @returns {Record<string, string[]>}
+ */
 export function parseContentSecurityPolicy(header) {
-  return Object.fromEntries(
-    header
-      .split(';')
-      .map((directive) => directive.trim().split(/\s+/))
-      .filter(([name]) => name)
-      .map(([name, ...sources]) => [name, sources])
-  );
+  /** @type {Record<string, string[]>} */
+  const directives = {};
+
+  for (const directive of header.split(';')) {
+    const [name, ...sources] = directive.trim().split(/\s+/);
+    if (!name) continue;
+
+    // Directive names are case-insensitive, and a browser honours the first
+    // occurrence of a repeated directive and ignores the rest.
+    const key = name.toLowerCase();
+    if (key in directives) continue;
+    directives[key] = sources;
+  }
+
+  return directives;
 }
 
+/**
+ * The directive a browser consults for one kind of inline content, following
+ * the `-elem` / `-attr` variants and then the `default-src` fallback. Returns
+ * null when the policy names none of them, which permits the content.
+ *
+ * @param {Record<string, string[]>} directives
+ * @param {readonly string[]} fallbackChain
+ * @returns {{ name: string, sources: string[] } | null}
+ */
+export function resolveDirective(directives, fallbackChain) {
+  for (const name of fallbackChain) {
+    const sources = directives[name];
+    if (sources) return { name, sources };
+  }
+
+  return null;
+}
+
+/**
+ * @param {{ appearanceScriptHash: string, isDevelopment: boolean }} options
+ * @returns {string}
+ */
 export function createContentSecurityPolicy({
   appearanceScriptHash,
   isDevelopment,

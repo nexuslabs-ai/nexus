@@ -3,7 +3,12 @@ import { existsSync, readdirSync, readFileSync } from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 
-import { allowsArbitraryInline, parseContentSecurityPolicy } from '../csp.mjs';
+import {
+  allowsArbitraryInline,
+  createContentSecurityPolicy,
+  parseContentSecurityPolicy,
+  resolveDirective,
+} from '../csp.mjs';
 
 const docsRoot = path.resolve(
   path.dirname(fileURLToPath(import.meta.url)),
@@ -41,23 +46,43 @@ function walk(dir) {
 // manifest, not the one the current environment would produce.
 function readShippedCsp() {
   const manifest = JSON.parse(readFileSync(routesManifest, 'utf8'));
+  const policies = new Map();
 
   for (const route of manifest.headers ?? []) {
     for (const { key, value } of route.headers ?? []) {
-      const enforced = key === 'Content-Security-Policy';
-      if (!enforced && key !== 'Content-Security-Policy-Report-Only') continue;
-      return {
+      const name = key.toLowerCase();
+      if (
+        name !== 'content-security-policy' &&
+        name !== 'content-security-policy-report-only'
+      ) {
+        continue;
+      }
+      policies.set(`${name} ${value}`, {
         headerName: key,
-        enforced,
+        enforced: name === 'content-security-policy',
+        header: value,
         directives: parseContentSecurityPolicy(value),
-      };
+      });
     }
   }
 
-  console.error(
-    'No Content-Security-Policy header in .next/routes-manifest.json.'
-  );
-  process.exit(1);
+  if (policies.size === 0) {
+    console.error(
+      'No Content-Security-Policy header in .next/routes-manifest.json.'
+    );
+    process.exit(1);
+  }
+
+  // One policy for every route is the arrangement the audit reasons about; a
+  // per-route policy would leave the routes it does not sample unaudited.
+  if (policies.size > 1) {
+    console.error(
+      `Expected one Content-Security-Policy across all routes, found ${policies.size}.`
+    );
+    process.exit(1);
+  }
+
+  return policies.values().next().value;
 }
 
 for (const { source, module } of highlighterMarkers) {
@@ -70,9 +95,13 @@ for (const { source, module } of highlighterMarkers) {
   }
 }
 
-if (!existsSync(appOutputDir) || !existsSync(clientOutputDir)) {
+if (
+  !existsSync(appOutputDir) ||
+  !existsSync(clientOutputDir) ||
+  !existsSync(routesManifest)
+) {
   console.error(
-    'Missing .next/server/app or .next/static. Run `pnpm build` first.'
+    'Missing .next/server/app, .next/static or .next/routes-manifest.json. Run `pnpm build` first.'
   );
   process.exit(1);
 }
@@ -106,7 +135,7 @@ let appearanceScripts = 0;
 let inlineScripts = 0;
 let inlineStyleAttributes = 0;
 let inlineStyleElements = 0;
-let appearanceScriptBody = null;
+const appearanceScriptBodies = new Set();
 let serializedAppearanceReferences = 0;
 let serializedDocsStorageReferences = 0;
 let fixtureOrderChecks = 0;
@@ -121,10 +150,11 @@ for (const file of htmlFiles) {
   appearanceScripts += scripts.filter(([, attrs]) =>
     attrs.includes('data-nexus-appearance-script')
   ).length;
-  appearanceScriptBody ??=
-    scripts.find(([, attrs]) =>
-      attrs.includes('data-nexus-appearance-script')
-    )?.[2] ?? null;
+  for (const [, attrs, body] of scripts) {
+    if (attrs.includes('data-nexus-appearance-script')) {
+      appearanceScriptBodies.add(body);
+    }
+  }
   serializedAppearanceReferences += scripts.filter(([, attrs, body]) =>
     `${attrs}\n${body}`.includes('data-nexus-appearance-script')
   ).length;
@@ -154,31 +184,62 @@ for (const file of serverFiles) {
 
 const nextInlineScripts = inlineScripts - appearanceScripts;
 const shippedCsp = readShippedCsp();
-const styleSrc = shippedCsp.directives['style-src'] ?? [];
-const scriptSrc = shippedCsp.directives['script-src'] ?? [];
-const appearanceScriptHash = appearanceScriptBody
-  ? `'sha256-${createHash('sha256').update(appearanceScriptBody).digest('base64')}'`
-  : null;
+const appearanceScriptHashes = [...appearanceScriptBodies].map(
+  (body) => `'sha256-${createHash('sha256').update(body).digest('base64')}'`
+);
 const blockers = [];
 
-if (
-  !allowsArbitraryInline(styleSrc) &&
-  inlineStyleAttributes + inlineStyleElements > 0
-) {
+// Comparing the built header against the policy rebuilt from the bootstrap
+// that actually shipped catches both a drifted policy and a stale build.
+if (appearanceScriptHashes.length !== 1) {
   blockers.push(
-    `style-src (${styleSrc.join(' ')}) blocks ${inlineStyleAttributes} inline style attributes and ${inlineStyleElements} inline <style> elements.`
+    `Expected one appearance bootstrap across the build, found ${appearanceScriptHashes.length}.`
   );
+} else {
+  const expected = createContentSecurityPolicy({
+    appearanceScriptHash: appearanceScriptHashes[0],
+    isDevelopment: false,
+  });
+
+  if (shippedCsp.header !== expected) {
+    blockers.push(
+      `The shipped policy is not the one csp.mjs builds — the build is stale, or the policy drifted.
+      shipped:  ${shippedCsp.header}
+      expected: ${expected}`
+    );
+  }
 }
 
-if (appearanceScriptHash && !scriptSrc.includes(appearanceScriptHash)) {
-  blockers.push(
-    `script-src carries no hash for the appearance bootstrap that shipped (${appearanceScriptHash}).`
-  );
-}
+const inlineChecks = [
+  {
+    label: `${inlineStyleAttributes} inline style attributes`,
+    count: inlineStyleAttributes,
+    type: 'style',
+    chain: ['style-src-attr', 'style-src', 'default-src'],
+  },
+  {
+    label: `${inlineStyleElements} inline <style> elements`,
+    count: inlineStyleElements,
+    type: 'style',
+    chain: ['style-src-elem', 'style-src', 'default-src'],
+  },
+  {
+    label: `${nextInlineScripts} inline scripts that carry no hash (Next.js RSC flight data)`,
+    count: nextInlineScripts,
+    type: 'script',
+    chain: ['script-src-elem', 'script-src', 'default-src'],
+  },
+];
 
-if (!allowsArbitraryInline(scriptSrc) && nextInlineScripts > 0) {
+for (const { label, count, type, chain } of inlineChecks) {
+  if (count === 0) continue;
+
+  // No directive in the chain means the policy does not restrict this content.
+  const directive = resolveDirective(shippedCsp.directives, chain);
+  if (!directive || allowsArbitraryInline(directive.sources, type)) continue;
+
   blockers.push(
-    `script-src blocks ${nextInlineScripts} inline scripts that carry no hash (Next.js RSC flight data).`
+    `${directive.name} (${directive.sources.join(' ')}) blocks ${label}.`
   );
 }
 
