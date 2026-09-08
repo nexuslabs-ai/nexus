@@ -341,6 +341,10 @@ describe('routeOf', () => {
     );
   });
 
+  it('normalises Windows separators on any platform', () => {
+    expect(routeOf('', 'foundations\\color.html')).toBe('/foundations/color');
+  });
+
   it('produces the routes the prerender manifest declares', () => {
     const scanned = [
       htmlFile('index.html'),
@@ -364,46 +368,72 @@ describe('routeOf', () => {
 describe('findUnprerenderedPages', () => {
   const APP_PATH_ROUTES = {
     '/icon.svg/route': '/icon.svg',
+    '/_not-found/page': '/_not-found',
     '/page': '/',
     '/appearance-ssr/page': '/appearance-ssr',
     '/changelog/page': '/changelog',
-    '/[section]/[sub]/page': '/[section]/[sub]',
+    '/[section]/page': '/[section]',
   };
 
-  const DYNAMIC_ROUTES = [
-    { page: '/[section]/[sub]', regex: '^/([^/]+?)/([^/]+?)(?:/)?$' },
-  ];
+  // The page each prerendered route came from, as the prerender manifest
+  // records it: `/agents` is one of `/[section]`'s static params.
+  const FULL_COVERAGE = {
+    '/': '/',
+    '/changelog': '/changelog',
+    '/agents': '/[section]',
+  };
 
-  const uncovered = (prerenderedRoutes: string[]) =>
+  const uncovered = (prerenderedBy: Record<string, string>) =>
     findUnprerenderedPages({
       appPathRoutes: APP_PATH_ROUTES,
-      dynamicRoutes: DYNAMIC_ROUTES,
-      prerenderedRoutes,
+      prerenderManifest: {
+        routes: Object.fromEntries(
+          Object.entries(prerenderedBy).map(([route, srcRoute]) => [
+            route,
+            { srcRoute },
+          ])
+        ),
+      },
       alwaysDynamicPages: ['/appearance-ssr'],
     });
 
+  const withoutRoute = (dropped: string) =>
+    Object.fromEntries(
+      Object.entries(FULL_COVERAGE).filter(([route]) => route !== dropped)
+    );
+
+  // Nothing prerendered, so every page the app owns is in the result and the
+  // skips below assert against a non-empty list.
+  const nothingPrerendered = uncovered({});
+
   it('passes when every declared page prerendered', () => {
-    expect(uncovered(['/', '/changelog', '/foundations/color'])).toEqual([]);
+    expect(uncovered(FULL_COVERAGE)).toEqual([]);
   });
 
   it('names a page that stopped prerendering', () => {
-    expect(uncovered(['/', '/foundations/color'])).toEqual(['/changelog']);
+    expect(uncovered(withoutRoute('/changelog'))).toEqual(['/changelog']);
   });
 
   it('names a dynamic segment whose static params emptied', () => {
-    expect(uncovered(['/', '/changelog'])).toEqual(['/[section]/[sub]']);
+    // `/changelog` still matches `/[section]`'s URL pattern, so coverage read
+    // from the route regex rather than from provenance would miss this.
+    expect(uncovered(withoutRoute('/agents'))).toEqual(['/[section]']);
+  });
+
+  it('reports every page the app owns when the build prerendered nothing', () => {
+    expect(nothingPrerendered).toEqual(['/', '/changelog', '/[section]']);
   });
 
   it('skips a page that renders per request by design', () => {
-    expect(uncovered(['/', '/changelog', '/foundations/color'])).not.toContain(
-      '/appearance-ssr'
-    );
+    expect(nothingPrerendered).not.toContain('/appearance-ssr');
+  });
+
+  it('skips the not-found page Next generates rather than the app', () => {
+    expect(nothingPrerendered).not.toContain('/_not-found');
   });
 
   it('expects no HTML from a route handler', () => {
-    expect(uncovered(['/', '/changelog', '/foundations/color'])).not.toContain(
-      '/icon.svg'
-    );
+    expect(nothingPrerendered).not.toContain('/icon.svg');
   });
 });
 
@@ -437,13 +467,8 @@ describe('the audit end to end', () => {
     ).toMatchObject({ failed: false });
   });
 
-  it('fails a build whose shipped policy blocks the styles it emits', () => {
-    const [policy] = collectCspPolicies(
-      manifestWith({
-        key: CSP_HEADER_NAME,
-        value: SHIPPED_HEADER.replace(" 'unsafe-inline'", ''),
-      })
-    );
+  it('fails a build that emits inline content no issue owns', () => {
+    const [policy] = collectCspPolicies(manifest);
 
     const integrityFailures = findPolicyIntegrityFailures({
       policies: [policy!],
@@ -453,10 +478,11 @@ describe('the audit end to end', () => {
       styleAttributes: 1320,
       styleElements: 1,
       flightScripts: 658,
-      otherInlineScripts: 0,
+      otherInlineScripts: 1,
     });
 
-    expect(integrityFailures[0]).toContain('stale, or the policy drifted');
+    expect(integrityFailures).toEqual([]);
+    expect(blockers.filter((blocker) => !blocker.tracked)).toHaveLength(1);
     expect(
       decideAuditVerdict({
         enforced: policy!.enforced,

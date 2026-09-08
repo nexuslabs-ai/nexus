@@ -14,6 +14,10 @@ import {
   resolveDirective,
 } from '../csp.mjs';
 
+// Next generates this page; nothing under `app/` declares it, so whether it
+// prerenders is Next's decision rather than a coverage gap this repo can act on.
+const NEXT_OWNED_PAGES = ['/_not-found'];
+
 /**
  * Every Content-Security-Policy header the build baked into the routes
  * manifest, deduplicated by name and value.
@@ -247,8 +251,7 @@ export function decideAuditVerdict({ enforced, integrityFailures, blockers }) {
 export function routeOf(appOutputDir, htmlFile) {
   const relative = path
     .relative(appOutputDir, htmlFile)
-    .split(path.sep)
-    .join('/')
+    .replaceAll('\\', '/')
     .replace(/\.html$/, '');
 
   return relative === 'index' ? '/' : `/${relative}`;
@@ -277,38 +280,32 @@ export function findUnscannedRoutes(prerenderManifest, scannedRoutes) {
  * manifest alone cannot show this: a page that starts rendering per request
  * leaves the manifest and the HTML tree together, so comparing the two to each
  * other passes. `app-path-routes-manifest.json` is written from the app's file
- * tree instead, so the page stays on this side of the comparison. A dynamic
- * segment is covered when at least one prerendered route matches its pattern —
- * losing `generateStaticParams` empties it.
+ * tree instead, so the page stays on this side of the comparison. Coverage
+ * comes from each prerendered route's `srcRoute`, which records the page that
+ * produced it; matching URLs against a dynamic segment's pattern instead would
+ * let an unrelated static route stand in for it.
  *
  * @param {{
  *   appPathRoutes: Record<string, string>,
- *   dynamicRoutes: readonly { page: string, regex: string }[],
- *   prerenderedRoutes: readonly string[],
+ *   prerenderManifest: { routes?: Record<string, { srcRoute?: string | null }> },
  *   alwaysDynamicPages: readonly string[],
  * }} build
  * @returns {string[]}
  */
 export function findUnprerenderedPages({
   appPathRoutes,
-  dynamicRoutes,
-  prerenderedRoutes,
+  prerenderManifest,
   alwaysDynamicPages,
 }) {
-  const patterns = new Map(
-    dynamicRoutes.map(({ page, regex }) => [page, new RegExp(regex)])
+  const prerenderedBy = new Set(
+    Object.values(prerenderManifest.routes ?? {}).map(
+      ({ srcRoute }) => srcRoute
+    )
   );
-  const byDesign = new Set(alwaysDynamicPages);
+  const exempt = new Set([...alwaysDynamicPages, ...NEXT_OWNED_PAGES]);
 
   return Object.entries(appPathRoutes)
     .filter(([entry]) => entry.endsWith('/page'))
     .map(([, page]) => page)
-    .filter((page) => !byDesign.has(page))
-    .filter((page) => {
-      const pattern = patterns.get(page);
-
-      return pattern
-        ? !prerenderedRoutes.some((route) => pattern.test(route))
-        : !prerenderedRoutes.includes(page);
-    });
+    .filter((page) => !exempt.has(page) && !prerenderedBy.has(page));
 }

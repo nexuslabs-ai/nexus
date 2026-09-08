@@ -49,9 +49,13 @@ const appearanceFixtureSource = path.join(
   'appearance-ssr',
   'page.tsx'
 );
-// `export const dynamic = 'force-dynamic'` — the fixture renders per request by
-// design, so it emits no prerendered HTML and the page-coverage check skips it.
-const alwaysDynamicPages = ['/appearance-ssr'];
+// These render per request by design, so they emit no prerendered HTML and the
+// page-coverage check skips them. Each exemption is checked against its source
+// below rather than trusted.
+const alwaysDynamicPages = [
+  { page: '/appearance-ssr', source: appearanceFixtureSource },
+];
+const forceDynamicDeclaration = "export const dynamic = 'force-dynamic'";
 const inlineScriptPattern =
   /<script\b(?![^>]*\bsrc=)([^>]*)>([\s\S]*?)<\/script>/gi;
 
@@ -64,6 +68,18 @@ function walk(dir) {
     const entryPath = path.join(dir, entry.name);
     return entry.isDirectory() ? walk(entryPath) : entryPath;
   });
+}
+
+for (const { page, source } of alwaysDynamicPages) {
+  if (
+    !existsSync(source) ||
+    !readFileSync(source, 'utf8').includes(forceDynamicDeclaration)
+  ) {
+    console.error(
+      `${page} is exempt from the page-coverage check as always-dynamic, but ${path.relative(docsRoot, source)} does not declare ${forceDynamicDeclaration}.`
+    );
+    process.exit(1);
+  }
 }
 
 for (const { source, module } of highlighterMarkers) {
@@ -194,6 +210,7 @@ const scanFloors = [
 ];
 
 const scannedRoutes = htmlFiles.map((file) => routeOf(appOutputDir, file));
+const prerendered = JSON.parse(readFileSync(prerenderManifest, 'utf8'));
 
 const scanFailures = [
   ...scanFloors
@@ -202,18 +219,14 @@ const scanFailures = [
       ([what]) =>
         `Found no ${what} across ${htmlFiles.length} prerendered pages; the scan cannot show whether the policy permits them.`
     ),
-  ...findUnscannedRoutes(
-    JSON.parse(readFileSync(prerenderManifest, 'utf8')),
-    scannedRoutes
-  ).map(
+  ...findUnscannedRoutes(prerendered, scannedRoutes).map(
     (route) =>
       `The build declares ${route} as prerendered but the HTML scan never read it, so the counts cover only part of the site.`
   ),
   ...findUnprerenderedPages({
     appPathRoutes: JSON.parse(readFileSync(appPathRoutesManifest, 'utf8')),
-    dynamicRoutes: routes.dynamicRoutes,
-    prerenderedRoutes: scannedRoutes,
-    alwaysDynamicPages,
+    prerenderManifest: prerendered,
+    alwaysDynamicPages: alwaysDynamicPages.map(({ page }) => page),
   }).map(
     (page) =>
       `The app declares ${page} but it prerendered nothing, so the scan says nothing about the inline content it emits.`
@@ -282,7 +295,7 @@ if (serializedDocsStorageReferences === 0) {
   process.exit(1);
 }
 
-if (fixtureOrderChecks === 0 && existsSync(appearanceFixtureSource)) {
+if (fixtureOrderChecks === 0) {
   const source = readFileSync(appearanceFixtureSource, 'utf8');
   const scriptIndex = source.indexOf('<NexusAppearanceScript');
   const markerIndex = source.indexOf('data-nexus-appearance-fixture-marker');

@@ -130,13 +130,18 @@ scripts fails, since the blocker list would otherwise come back empty for the
 wrong reason. Coverage is checked from both directions. Every page the prerender
 manifest declares must have HTML the scan read, which catches a partial scan.
 And every page the app declares in `.next/app-path-routes-manifest.json` must
-have prerendered something — a dynamic segment is covered when at least one
-prerendered route matches its pattern. That second direction is the one the
+have prerendered something. Coverage comes from each prerendered route's
+`srcRoute`, which records the page that produced it; reading it off a dynamic
+segment's URL pattern instead would let an unrelated static route stand in —
+`/changelog` matches `/[section]`'s pattern. That second direction is the one the
 prerender manifest cannot supply on its own: a page that starts rendering per
 request leaves the manifest and the HTML tree together, so comparing those two to
 each other passes. `app-path-routes-manifest.json` is written from the app's file
-tree, so the page stays on one side of the comparison. `/appearance-ssr` is
-`force-dynamic` by design and is named as such in the script rather than inferred.
+tree, so the page stays on one side of the comparison. Two pages are exempt:
+`/appearance-ssr`, which renders per request by design and whose source the audit
+reads back for the `force-dynamic` declaration rather than trusting the exemption,
+and `/_not-found`, which Next generates and the docs app does not own — the same
+reason the inline `<style>` floor is gone.
 
 There is no floor for inline `<style>` elements. The build emits exactly one, in
 Next's own `not-found` page, and the docs app owns nothing that would keep it
