@@ -60,9 +60,10 @@ const OUTPUT_READ = /needs\.changes\.outputs\.(\w+)/g;
 const GATE_TERM = /^needs\.changes\.outputs\.(\w+) == 'true'$/;
 const GUARD_TERM = /^\[ "([^"]*)" = "([^"]*)" \]$/;
 const EXPRESSION = /\$\{\{\s*([^}]+?)\s*\}\}/g;
-// `-F` is turbo's alias for `--filter`, and `--affected` scopes to the diff
-// on its own, so any of the three narrows the task set.
-const NARROWS_TASKS = /--filter|(?:^|\s)-F|--affected/;
+// The whole task set, run by name. Asserting this exact shape rather than
+// denying known narrowing flags means every other way to narrow — `--filter`,
+// `-F`, `--affected`, or a `pkg#task` argument — fails without being listed.
+const UNFILTERED_RUN = /^pnpm turbo (?:run )?[a-z-]+$/;
 // The spellings that scope a run to the PR's diff specifically.
 const DIFF_SCOPE = /\[origin\/|--affected/;
 
@@ -119,8 +120,18 @@ const gatingFilters = [...new Set(gatedJobs.flatMap(filtersGating))];
 // drop out of it.
 const DIFF_SCOPED_JOBS = ['build', 'typecheck'];
 
+// A comment is not a command: a step that merely mentions a flag must not be
+// read as running it.
+function commandsOf(script) {
+  return script
+    .split('\n')
+    .filter((line) => line.trim() !== '' && !line.trim().startsWith('#'));
+}
+
 function diffScopedStepsOf(name) {
-  return jobNamed(name).steps.filter((step) => DIFF_SCOPE.test(step.run ?? ''));
+  return jobNamed(name).steps.filter((step) =>
+    commandsOf(step.run ?? '').some((line) => DIFF_SCOPE.test(line))
+  );
 }
 
 // The step's script is exactly one flat `if` / `elif` / `else` / `fi` chain.
@@ -131,11 +142,13 @@ function branchesOf(script) {
   const branches = [];
   let closed = false;
 
-  for (const line of script.split('\n')) {
-    if (line.trim() === '') continue;
+  for (const line of commandsOf(script)) {
+    const text = line.trim();
+    const open = branches.length > 0;
+    const fellBack = open && branches.at(-1).guard === null;
 
     if (closed) {
-      throw new Error(`run step continues after \`fi\`: ${line.trim()}`);
+      throw new Error(`run step continues after \`fi\`: ${text}`);
     }
 
     const opening = line.match(/^\s*(el)?if (.+); then$/);
@@ -143,36 +156,50 @@ function branchesOf(script) {
     if (opening) {
       const [, elif, guard] = opening;
 
-      if (!elif && branches.length > 0) {
-        throw new Error(`run step opens a second \`if\`: ${line.trim()}`);
+      if (!elif && open) {
+        throw new Error(`run step opens a second \`if\`: ${text}`);
       }
 
-      if (elif && branches.length === 0) {
-        throw new Error(`run step \`elif\` opens no \`if\`: ${line.trim()}`);
+      if (elif && !open) {
+        throw new Error(`run step \`elif\` opens no \`if\`: ${text}`);
+      }
+
+      if (elif && fellBack) {
+        throw new Error(`run step \`elif\` follows \`else\`: ${text}`);
       }
 
       branches.push({ guard, body: [] });
       continue;
     }
 
-    if (/^\s*else$/.test(line) && branches.length > 0) {
+    if (/^\s*else$/.test(line)) {
+      if (!open) {
+        throw new Error('run step `else` opens no `if`');
+      }
+
+      if (fellBack) {
+        throw new Error('run step declares a second `else`');
+      }
+
       branches.push({ guard: null, body: [] });
       continue;
     }
 
-    if (/^\s*fi$/.test(line) && branches.length > 0) {
+    if (/^\s*fi$/.test(line)) {
+      if (!open) {
+        throw new Error('run step `fi` closes no `if`');
+      }
+
       closed = true;
       continue;
     }
 
     if (/^\s*(?:el)?if\b|^\s*then\b|^\s*else\b|^\s*fi\b/.test(line)) {
-      throw new Error(`run step control line is malformed: ${line.trim()}`);
+      throw new Error(`run step control line is malformed: ${text}`);
     }
 
-    if (branches.length === 0) {
-      throw new Error(
-        `run step runs a command before its \`if\`: ${line.trim()}`
-      );
+    if (!open) {
+      throw new Error(`run step runs a command before its \`if\`: ${text}`);
     }
 
     branches.at(-1).body.push(line);
@@ -257,19 +284,31 @@ describe('ci path filters', () => {
   it.each(DIFF_SCOPED_JOBS)(
     'runs %s unfiltered on a root_config PR',
     (name) => {
-      for (const step of diffScopedStepsOf(name)) {
+      const steps = diffScopedStepsOf(name);
+
+      expect(steps, `\`${name}\` scopes no step to the diff`).not.toHaveLength(
+        0
+      );
+
+      for (const step of steps) {
         const where = `\`${name}\` step "${step.name}"`;
         const taken = branchesOf(step.run).find(({ guard }) =>
           guardHolds(guard, ROOT_CONFIG_PULL_REQUEST)
         );
 
         expect(taken, `${where} takes no branch`).toBeDefined();
-        expect(taken.body, `${where} runs no turbo task`).toMatch(
-          /pnpm turbo \w+/
+
+        const turbo = commandsOf(taken.body).filter((line) =>
+          line.includes('turbo')
         );
-        expect(taken.body, `${where} narrows the task set`).not.toMatch(
-          NARROWS_TASKS
-        );
+
+        expect(turbo, `${where} runs no turbo task`).not.toHaveLength(0);
+
+        for (const line of turbo) {
+          expect(line.trim(), `${where} narrows the task set`).toMatch(
+            UNFILTERED_RUN
+          );
+        }
       }
     }
   );
