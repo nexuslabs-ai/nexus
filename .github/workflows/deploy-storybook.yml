@@ -1,0 +1,55 @@
+name: Deploy Storybook
+
+# Publishes the static Storybook build to GitHub Pages
+# (https://nexuslabs-ai.github.io/nexus/), the URL the docs footer links to.
+# Standalone from ci.yml: this is a post-merge push:main workflow, not a PR
+# check, so it is not part of the `CI Status` branch-protection aggregator.
+# ci.yml still builds Storybook on PRs, which is where a broken build is caught.
+#
+# One-time repo setup: Settings > Pages > Source: "GitHub Actions". The
+# `actions/configure-pages` `enablement` input cannot do this for us — it
+# requires a token other than GITHUB_TOKEN.
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'packages/**'
+      - 'pnpm-lock.yaml'
+      - '.github/actions/build-storybook/**'
+      - '.github/workflows/deploy-storybook.yml'
+  workflow_dispatch:
+
+concurrency:
+  group: pages
+  cancel-in-progress: false
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+jobs:
+  deploy:
+    name: Build and Deploy
+    runs-on: ubuntu-latest
+    # workflow_dispatch accepts any ref; the published site only ever tracks main.
+    if: github.ref == 'refs/heads/main'
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Build Storybook
+        uses: ./.github/actions/build-storybook
+
+      - name: Upload Pages artifact
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: packages/react/storybook-static
+
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4

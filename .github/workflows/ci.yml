@@ -76,6 +76,7 @@ jobs:
               - 'tsconfig.json'
             ci:
               - '.github/workflows/**'
+              - '.github/actions/**'
 
   # format-check and lint run full-tree to mirror local `pnpm lint` /
   # `pnpm format:check`.
@@ -456,26 +457,8 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Install pnpm
-        uses: pnpm/action-setup@v4
-
-      - name: Setup Node
-        uses: actions/setup-node@v4
-        with:
-          node-version-file: '.nvmrc'
-          cache: 'pnpm'
-
-      - name: Install dependencies
-        run: pnpm install --frozen-lockfile
-
-      # The AdjustContrast story imports @nexus_ds/core, which is consumed via
-      # its built dist/runtime entry (package.json exports). Build it so the
-      # Storybook production build can resolve the package.
-      - name: Build @nexus_ds/core
-        run: pnpm --filter @nexus_ds/core build
-
       - name: Build Storybook
-        run: pnpm build-storybook
+        uses: ./.github/actions/build-storybook
 
       - name: Upload Storybook build
         uses: actions/upload-artifact@v4
