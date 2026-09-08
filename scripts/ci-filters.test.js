@@ -60,10 +60,11 @@ const OUTPUT_READ = /needs\.changes\.outputs\.(\w+)/g;
 const GATE_TERM = /^needs\.changes\.outputs\.(\w+) == 'true'$/;
 const GUARD_TERM = /^\[ "([^"]*)" = "([^"]*)" \]$/;
 const EXPRESSION = /\$\{\{\s*([^}]+?)\s*\}\}/g;
-// `-F` is turbo's own alias for `--filter`, so both narrow the task set.
-const FILTER_FLAG = /--filter|(?:^|\s)-F/;
-// The diff range is what scopes a run to the PR, whichever flag carries it.
-const PR_FILTER = /\[origin\//;
+// `-F` is turbo's alias for `--filter`, and `--affected` scopes to the diff
+// on its own, so any of the three narrows the task set.
+const NARROWS_TASKS = /--filter|(?:^|\s)-F|--affected/;
+// The spellings that scope a run to the PR's diff specifically.
+const DIFF_SCOPE = /\[origin\/|--affected/;
 
 function filtersReadBy(expression) {
   return [...expression.matchAll(OUTPUT_READ)].map(([, filter]) => filter);
@@ -110,38 +111,75 @@ const gatedJobs = jobNames.filter((name) => {
   return typeof gate === 'string' && gate.includes('needs.changes.outputs');
 });
 
-// Only the step that narrows the task set to the PR's diff decides whether a
-// root-config change runs unfiltered; the job's other steps are unrelated.
-function prFilteredStepOf(name) {
-  return jobNamed(name).steps.find((step) => PR_FILTER.test(step.run ?? ''));
+const gatingFilters = [...new Set(gatedJobs.flatMap(filtersGating))];
+
+// The jobs that scope turbo to the PR's diff, and so must fall through to an
+// unfiltered run when a root-config change selects nothing. Declared rather
+// than detected: a job that re-spells its scoping must fail the suite, not
+// drop out of it.
+const DIFF_SCOPED_JOBS = ['build', 'typecheck'];
+
+function diffScopedStepsOf(name) {
+  return jobNamed(name).steps.filter((step) => DIFF_SCOPE.test(step.run ?? ''));
 }
 
-const prFilteredJobs = jobNames.filter((name) => prFilteredStepOf(name));
-
-// The step is one flat `if` / `elif` / `else` / `fi` chain. A nested or second
-// `if`, or a guard not written `if <test>; then`, is rejected rather than
-// guessed at.
+// The step's script is exactly one flat `if` / `elif` / `else` / `fi` chain.
+// A nested or second `if`, a control line not written `if <test>; then`, and
+// any command outside the chain all throw — a step must not be able to narrow
+// the task set somewhere the model does not read.
 function branchesOf(script) {
   const branches = [];
+  let closed = false;
 
   for (const line of script.split('\n')) {
-    const guard = line.match(/^\s*(?:el)?if (.+); then$/);
+    if (line.trim() === '') continue;
 
-    if (guard) {
-      if (branches.length > 0 && !/^\s*elif /.test(line)) {
+    if (closed) {
+      throw new Error(`run step continues after \`fi\`: ${line.trim()}`);
+    }
+
+    const opening = line.match(/^\s*(el)?if (.+); then$/);
+
+    if (opening) {
+      const [, elif, guard] = opening;
+
+      if (!elif && branches.length > 0) {
         throw new Error(`run step opens a second \`if\`: ${line.trim()}`);
       }
 
-      branches.push({ guard: guard[1], body: [] });
-    } else if (/^\s*else\s*$/.test(line)) {
-      branches.push({ guard: null, body: [] });
-    } else if (/^\s*(?:el)?if\b|^\s*then\b/.test(line)) {
-      throw new Error(
-        `run step \`if\` is not \`if <test>; then\`: ${line.trim()}`
-      );
-    } else if (!/^\s*fi\s*$/.test(line)) {
-      branches.at(-1)?.body.push(line);
+      if (elif && branches.length === 0) {
+        throw new Error(`run step \`elif\` opens no \`if\`: ${line.trim()}`);
+      }
+
+      branches.push({ guard, body: [] });
+      continue;
     }
+
+    if (/^\s*else$/.test(line) && branches.length > 0) {
+      branches.push({ guard: null, body: [] });
+      continue;
+    }
+
+    if (/^\s*fi$/.test(line) && branches.length > 0) {
+      closed = true;
+      continue;
+    }
+
+    if (/^\s*(?:el)?if\b|^\s*then\b|^\s*else\b|^\s*fi\b/.test(line)) {
+      throw new Error(`run step control line is malformed: ${line.trim()}`);
+    }
+
+    if (branches.length === 0) {
+      throw new Error(
+        `run step runs a command before its \`if\`: ${line.trim()}`
+      );
+    }
+
+    branches.at(-1).body.push(line);
+  }
+
+  if (!closed) {
+    throw new Error('run step has no closing `fi`');
   }
 
   return branches.map(({ guard, body }) => ({ guard, body: body.join('\n') }));
@@ -197,8 +235,15 @@ describe('ci path filters', () => {
 
   it('gates at least one job on the filters', () => {
     expect(gatedJobs.length).toBeGreaterThan(0);
-    expect(prFilteredJobs.length).toBeGreaterThan(0);
     expect(filters.root_config?.length).toBeGreaterThan(0);
+  });
+
+  it('declares exactly the jobs that scope turbo to the diff', () => {
+    const scoped = jobNames.filter(
+      (name) => diffScopedStepsOf(name).length > 0
+    );
+
+    expect(scoped.sort()).toEqual([...DIFF_SCOPED_JOBS].sort());
   });
 
   it.each(gatedJobs)('runs %s for every root_config path', (name) => {
@@ -209,15 +254,25 @@ describe('ci path filters', () => {
     expect(filters.root_config.filter((file) => !isGated(file))).toEqual([]);
   });
 
-  it.each(prFilteredJobs)('runs %s unfiltered on a root_config PR', (name) => {
-    const taken = branchesOf(prFilteredStepOf(name).run).find(({ guard }) =>
-      guardHolds(guard, ROOT_CONFIG_PULL_REQUEST)
-    );
+  it.each(DIFF_SCOPED_JOBS)(
+    'runs %s unfiltered on a root_config PR',
+    (name) => {
+      for (const step of diffScopedStepsOf(name)) {
+        const where = `\`${name}\` step "${step.name}"`;
+        const taken = branchesOf(step.run).find(({ guard }) =>
+          guardHolds(guard, ROOT_CONFIG_PULL_REQUEST)
+        );
 
-    expect(taken).toBeDefined();
-    expect(taken.body).toMatch(/pnpm turbo \w+/);
-    expect(taken.body).not.toMatch(FILTER_FLAG);
-  });
+        expect(taken, `${where} takes no branch`).toBeDefined();
+        expect(taken.body, `${where} runs no turbo task`).toMatch(
+          /pnpm turbo \w+/
+        );
+        expect(taken.body, `${where} narrows the task set`).not.toMatch(
+          NARROWS_TASKS
+        );
+      }
+    }
+  );
 
   it('forwards every filter output it exports', () => {
     for (const [name, value] of Object.entries(jobNamed('changes').outputs)) {
@@ -250,9 +305,9 @@ describe('ci path filters', () => {
     })
       .split('\n')
       .filter((file) => file !== '' && !file.includes('/'));
-    // Only exported filters gate a job, so a declared-but-unexported block
-    // must not count as coverage.
-    const isMatched = picomatch(exportedFilters.flatMap(filterNamed), {
+    // Coverage means a job actually runs for the file. A filter that is
+    // declared, or even exported, but gates no job does not provide it.
+    const isMatched = picomatch(gatingFilters.flatMap(filterNamed), {
       dot: true,
     });
 
