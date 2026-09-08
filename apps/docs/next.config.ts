@@ -3,37 +3,14 @@ import type { NextConfig } from 'next';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 
+import { createContentSecurityPolicy, CSP_HEADER_NAME } from './csp.mjs';
 import { MDX_OPTIONS } from './mdx-options';
 import { DOCS_APPEARANCE_BOOTSTRAP_CSP_HASH } from './theme-csp';
 
-const SCRIPT_SRC = [
-  "'self'",
-  DOCS_APPEARANCE_BOOTSTRAP_CSP_HASH,
-  "'report-sample'",
-  process.env.NODE_ENV === 'development' ? "'unsafe-eval'" : null,
-]
-  .filter(Boolean)
-  .join(' ');
-
-const CONNECT_SRC = [
-  "'self'",
-  process.env.NODE_ENV === 'development' ? 'ws:' : null,
-]
-  .filter(Boolean)
-  .join(' ');
-
-const CONTENT_SECURITY_POLICY_REPORT_ONLY = [
-  "default-src 'self'",
-  `script-src ${SCRIPT_SRC}`,
-  "style-src 'self' 'unsafe-inline'",
-  "img-src 'self' data: blob:",
-  "font-src 'self'",
-  `connect-src ${CONNECT_SRC}`,
-  "object-src 'none'",
-  "base-uri 'none'",
-  "form-action 'self'",
-  "frame-ancestors 'none'",
-].join('; ');
+const CONTENT_SECURITY_POLICY = createContentSecurityPolicy({
+  appearanceScriptHash: DOCS_APPEARANCE_BOOTSTRAP_CSP_HASH,
+  isDevelopment: process.env.NODE_ENV === 'development',
+});
 
 const PERMISSIONS_POLICY = [
   'camera=()',
@@ -45,8 +22,8 @@ const PERMISSIONS_POLICY = [
 
 const SECURITY_HEADERS = [
   {
-    key: 'Content-Security-Policy-Report-Only',
-    value: CONTENT_SECURITY_POLICY_REPORT_ONLY,
+    key: CSP_HEADER_NAME,
+    value: CONTENT_SECURITY_POLICY,
   },
   {
     key: 'Referrer-Policy',

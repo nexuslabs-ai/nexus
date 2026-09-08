@@ -1,6 +1,9 @@
+import { createHash } from 'node:crypto';
 import { existsSync, readdirSync, readFileSync } from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
+
+import { allowsArbitraryInline, parseContentSecurityPolicy } from '../csp.mjs';
 
 const docsRoot = path.resolve(
   path.dirname(fileURLToPath(import.meta.url)),
@@ -8,6 +11,7 @@ const docsRoot = path.resolve(
 );
 const appOutputDir = path.join(docsRoot, '.next', 'server', 'app');
 const clientOutputDir = path.join(docsRoot, '.next', 'static');
+const routesManifest = path.join(docsRoot, '.next', 'routes-manifest.json');
 // String literals only — identifiers and property names are mangled away, and
 // a generic marker collides with unrelated client code.
 const highlighterMarkers = [
@@ -31,6 +35,29 @@ function walk(dir) {
     const entryPath = path.join(dir, entry.name);
     return entry.isDirectory() ? walk(entryPath) : entryPath;
   });
+}
+
+// The audit checks the header the build actually baked into the routes
+// manifest, not the one the current environment would produce.
+function readShippedCsp() {
+  const manifest = JSON.parse(readFileSync(routesManifest, 'utf8'));
+
+  for (const route of manifest.headers ?? []) {
+    for (const { key, value } of route.headers ?? []) {
+      const enforced = key === 'Content-Security-Policy';
+      if (!enforced && key !== 'Content-Security-Policy-Report-Only') continue;
+      return {
+        headerName: key,
+        enforced,
+        directives: parseContentSecurityPolicy(value),
+      };
+    }
+  }
+
+  console.error(
+    'No Content-Security-Policy header in .next/routes-manifest.json.'
+  );
+  process.exit(1);
 }
 
 for (const { source, module } of highlighterMarkers) {
@@ -78,6 +105,8 @@ if (highlighterChunks.length > 0) {
 let appearanceScripts = 0;
 let inlineScripts = 0;
 let inlineStyleAttributes = 0;
+let inlineStyleElements = 0;
+let appearanceScriptBody = null;
 let serializedAppearanceReferences = 0;
 let serializedDocsStorageReferences = 0;
 let fixtureOrderChecks = 0;
@@ -88,9 +117,14 @@ for (const file of htmlFiles) {
 
   inlineScripts += scripts.length;
   inlineStyleAttributes += html.match(/\sstyle="/g)?.length ?? 0;
+  inlineStyleElements += html.match(/<style[\s>]/gi)?.length ?? 0;
   appearanceScripts += scripts.filter(([, attrs]) =>
     attrs.includes('data-nexus-appearance-script')
   ).length;
+  appearanceScriptBody ??=
+    scripts.find(([, attrs]) =>
+      attrs.includes('data-nexus-appearance-script')
+    )?.[2] ?? null;
   serializedAppearanceReferences += scripts.filter(([, attrs, body]) =>
     `${attrs}\n${body}`.includes('data-nexus-appearance-script')
   ).length;
@@ -118,18 +152,51 @@ for (const file of serverFiles) {
   }
 }
 
+const nextInlineScripts = inlineScripts - appearanceScripts;
+const shippedCsp = readShippedCsp();
+const styleSrc = shippedCsp.directives['style-src'] ?? [];
+const scriptSrc = shippedCsp.directives['script-src'] ?? [];
+const appearanceScriptHash = appearanceScriptBody
+  ? `'sha256-${createHash('sha256').update(appearanceScriptBody).digest('base64')}'`
+  : null;
+const blockers = [];
+
+if (
+  !allowsArbitraryInline(styleSrc) &&
+  inlineStyleAttributes + inlineStyleElements > 0
+) {
+  blockers.push(
+    `style-src (${styleSrc.join(' ')}) blocks ${inlineStyleAttributes} inline style attributes and ${inlineStyleElements} inline <style> elements.`
+  );
+}
+
+if (appearanceScriptHash && !scriptSrc.includes(appearanceScriptHash)) {
+  blockers.push(
+    `script-src carries no hash for the appearance bootstrap that shipped (${appearanceScriptHash}).`
+  );
+}
+
+if (!allowsArbitraryInline(scriptSrc) && nextInlineScripts > 0) {
+  blockers.push(
+    `script-src blocks ${nextInlineScripts} inline scripts that carry no hash (Next.js RSC flight data).`
+  );
+}
+
 console.log(
   JSON.stringify(
     {
       htmlFiles: htmlFiles.length,
       inlineScripts,
       appearanceScripts,
-      nextInlineScripts: inlineScripts - appearanceScripts,
+      nextInlineScripts,
       serializedAppearanceReferences,
       serializedDocsStorageReferences,
       fixtureOrderChecks,
       inlineStyleAttributes,
+      inlineStyleElements,
       highlighterChunks: highlighterChunks.length,
+      cspHeader: shippedCsp.headerName,
+      enforcementBlockers: blockers,
     },
     null,
     2
@@ -168,4 +235,17 @@ if (fixtureOrderChecks === 0 && existsSync(appearanceFixtureSource)) {
     );
     process.exit(1);
   }
+}
+
+if (blockers.length > 0) {
+  const detail = blockers.map((blocker) => `  - ${blocker}`).join('\n');
+  if (shippedCsp.enforced) {
+    console.error(
+      `The policy is set to enforce, but the build violates it:\n${detail}\nSee apps/docs/CSP.md.`
+    );
+    process.exit(1);
+  }
+  console.warn(
+    `Content-Security-Policy is Report-Only; enforcing it today would break:\n${detail}\nSee apps/docs/CSP.md.`
+  );
 }
