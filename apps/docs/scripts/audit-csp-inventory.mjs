@@ -49,12 +49,11 @@ const appearanceFixtureSource = path.join(
   'appearance-ssr',
   'page.tsx'
 );
-// The two pages that owe no prerendered HTML: `/appearance-ssr` renders per
-// request by design, and `/_not-found` is Next's own page. Neither premise is
-// trusted — both are checked against the app tree below.
-const exemptPages = ['/appearance-ssr', '/_not-found'];
+// The only page that owes no prerendered HTML: `/appearance-ssr` renders per
+// request by design. The premise is not trusted — it is checked against the
+// page's source below.
+const exemptPages = ['/appearance-ssr'];
 const forceDynamicDeclaration = "export const dynamic = 'force-dynamic'";
-const notFoundSource = path.join(docsRoot, 'app', 'not-found.tsx');
 const inlineScriptPattern =
   /<script\b(?![^>]*\bsrc=)([^>]*)>([\s\S]*?)<\/script>/gi;
 
@@ -77,15 +76,6 @@ if (
 ) {
   console.error(
     `/appearance-ssr is exempt from the page-coverage check as always-dynamic, but ${path.relative(docsRoot, appearanceFixtureSource)} does not declare ${forceDynamicDeclaration}.`
-  );
-  process.exit(1);
-}
-
-// The exemption holds only while Next owns the page. Declaring the app's own
-// not-found page would keep the same manifest key and inherit the skip.
-if (existsSync(notFoundSource)) {
-  console.error(
-    `/_not-found is exempt from the page-coverage check as a page Next generates, but ${path.relative(docsRoot, notFoundSource)} makes it the docs app’s. Drop the exemption and cover the page.`
   );
   process.exit(1);
 }
@@ -210,8 +200,8 @@ const appearanceScriptHashes = [...appearanceScriptBodies].map(
 
 // A scan that found none of these proves nothing about them, so the blocker
 // list would come back empty for the wrong reason. There is no floor for inline
-// `<style>` elements: the build emits one, from Next's own `not-found` page,
-// and the app owns nothing that would keep it there.
+// `<style>` elements: the docs app authors none, so a floor would gate on
+// framework output the app cannot keep emitting.
 const scanFloors = [
   ['inline style attributes', inlineStyleAttributes],
   ['inline flight scripts', flightScripts],

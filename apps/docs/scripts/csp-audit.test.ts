@@ -379,13 +379,14 @@ describe('findUnprerenderedPages', () => {
   // records it: `/agents` is one of `/[section]`'s static params.
   const FULL_COVERAGE = {
     '/': '/',
+    '/_not-found': '/_not-found',
     '/changelog': '/changelog',
     '/agents': '/[section]',
   };
 
   const uncovered = (
     prerenderedBy: Record<string, string>,
-    exemptPages = ['/appearance-ssr', '/_not-found']
+    exemptPages = ['/appearance-ssr']
   ) =>
     findUnprerenderedPages({
       appPathRoutes: APP_PATH_ROUTES,
@@ -424,19 +425,20 @@ describe('findUnprerenderedPages', () => {
   });
 
   it('reports every page the app owns when the build prerendered nothing', () => {
-    expect(nothingPrerendered).toEqual(['/', '/changelog', '/[section]']);
+    expect(nothingPrerendered).toEqual([
+      '/_not-found',
+      '/',
+      '/changelog',
+      '/[section]',
+    ]);
   });
 
   it('skips a page that renders per request by design', () => {
     expect(nothingPrerendered).not.toContain('/appearance-ssr');
   });
 
-  it('skips the not-found page Next generates rather than the app', () => {
-    expect(nothingPrerendered).not.toContain('/_not-found');
-  });
-
   it('exempts only the pages it is given', () => {
-    expect(uncovered({}, [])).toContain('/_not-found');
+    expect(uncovered({}, [])).toContain('/appearance-ssr');
   });
 
   it('expects no HTML from a route handler', () => {
