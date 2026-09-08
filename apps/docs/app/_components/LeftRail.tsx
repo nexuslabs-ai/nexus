@@ -1,6 +1,6 @@
 'use client';
 
-import { cn } from '@nexus_ds/react';
+import { cn } from '@nexus_ds/react/utils';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 

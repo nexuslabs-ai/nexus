@@ -22,12 +22,14 @@ import {
 } from './nexus';
 
 /**
- * Below `lg` an expanded panel would reserve roughly half the scrollport, so
- * it opens collapsed there. `63.99rem` stops just below `lg`'s `min-width:
- * 64rem`, and staying in rem keeps it aligned with the `nx:lg:` utilities as
- * the user's base font size changes.
+ * Below `lg` an expanded panel would reserve roughly half the scrollport, so it
+ * opens collapsed there. The query asks for the *expanded* case so its
+ * unmatched value — the one the prerendered HTML and the first client render
+ * both use — is the collapsed one, and mobile never paints an expanded panel or
+ * publishes its oversized reservation. Staying in rem keeps the threshold
+ * aligned with the `nx:lg:` utilities as the user's base font size changes.
  */
-const COLLAPSE_QUERY = '(max-width: 63.99rem)';
+const EXPAND_QUERY = '(min-width: 64rem)';
 
 export function ThemePicker() {
   const pathname = usePathname();
@@ -41,11 +43,11 @@ export function ThemePicker() {
 
 function ThemePanel() {
   const { state, setState } = useNexusAppearance();
-  const collapsedByDefault = useMediaQuery(COLLAPSE_QUERY);
-  const [collapsedOverride, setCollapsedOverride] = useState<boolean | null>(
+  const expandedByDefault = useMediaQuery(EXPAND_QUERY);
+  const [expandedOverride, setExpandedOverride] = useState<boolean | null>(
     null
   );
-  const collapsed = collapsedOverride ?? collapsedByDefault;
+  const expanded = expandedOverride ?? expandedByDefault;
   const panelRef = useRef<HTMLElement>(null);
 
   // Publish the panel's real height so `scroll-pb` clears it and Tab never
@@ -82,22 +84,22 @@ function ThemePanel() {
     >
       <Button
         variant="ghost"
-        onClick={() => setCollapsedOverride(!collapsed)}
-        aria-expanded={!collapsed}
+        onClick={() => setExpandedOverride(!expanded)}
+        aria-expanded={expanded}
         className="nx:w-full nx:justify-between nx:rounded-lg"
       >
         <span>⚙ Theme</span>
         <span
           className={
-            collapsed
-              ? 'nx:text-muted-foreground nx:transition-transform'
-              : 'nx:text-muted-foreground nx:transition-transform nx:rotate-180'
+            expanded
+              ? 'nx:text-muted-foreground nx:transition-transform nx:rotate-180'
+              : 'nx:text-muted-foreground nx:transition-transform'
           }
         >
           ▼
         </span>
       </Button>
-      {!collapsed && (
+      {expanded && (
         <div className="nx:px-4 nx:pb-4 nx:border-t nx:border-border-default">
           <Section title="Colors">
             <Row label="Scheme">

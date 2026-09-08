@@ -57,7 +57,7 @@ describe('CodeBlock', () => {
     expect(writeText.mock.calls[0]![0]).not.toMatch(/copy/i);
   });
 
-  it('announces the confirmation, then resets it', async () => {
+  it('announces the confirmation, then returns the control to idle', async () => {
     const copy = renderBlock();
 
     expect(screen.getByRole('status').textContent).toBe('');
@@ -70,13 +70,17 @@ describe('CodeBlock', () => {
       'Code copied to clipboard'
     );
     expect(copy.dataset.copyStatus).toBe('copied');
+    const announcement = screen.getByRole('status').firstElementChild;
 
     act(() => {
       vi.advanceTimersByTime(2000);
     });
 
-    expect(screen.getByRole('status').textContent).toBe('');
     expect(copy.dataset.copyStatus).toBe('idle');
+    // The block restores its own icon; the provider clears the region it owns,
+    // in place, so emptying it is not itself read out.
+    expect(screen.getByRole('status').textContent).toBe('');
+    expect(screen.getByRole('status').firstElementChild).toBe(announcement);
   });
 
   it('announces a failed write instead of leaving a silent no-op', async () => {
@@ -184,6 +188,68 @@ describe('CodeBlock', () => {
       'Code copied to clipboard'
     );
     expect(controls[0]!.dataset.copyStatus).toBe('idle');
+  });
+
+  it("leaves another block's confirmation in the shared region on reset", async () => {
+    render(
+      <CopyAnnouncerProvider>
+        <CodeBlock>
+          <code>{SNIPPET}</code>
+        </CodeBlock>
+        <CodeBlock>
+          <code>{'const x = 1;\n'}</code>
+        </CodeBlock>
+      </CopyAnnouncerProvider>
+    );
+    const controls = screen.getAllByRole('button', { name: 'Copy code' });
+    const region = screen.getByRole('status');
+
+    await act(async () => {
+      fireEvent.click(controls[0]!);
+    });
+    act(() => {
+      vi.advanceTimersByTime(1000);
+    });
+    await act(async () => {
+      fireEvent.click(controls[1]!);
+    });
+    // Both blocks announce the same words, so identity — not text — is what
+    // separates "left alone" from "cleared" and from "announced again".
+    const announcement = region.firstElementChild;
+
+    // The first block's 2s reset lands here, a second after the other block
+    // announced. It must return only its own icon to idle.
+    act(() => {
+      vi.advanceTimersByTime(1000);
+    });
+
+    expect(controls[0]!.dataset.copyStatus).toBe('idle');
+    expect(controls[1]!.dataset.copyStatus).toBe('copied');
+    expect(region.firstElementChild).toBe(announcement);
+    expect(region.textContent).toBe('Code copied to clipboard');
+  });
+
+  it('gives the scroll container a tab stop a caller cannot remove', () => {
+    // The props type omits `tabIndex`, but a rehype plugin can still inject one
+    // at runtime — the guard below the spread is what has to hold there.
+    const injected: object = { tabIndex: -1 };
+    const { container } = render(
+      <CopyAnnouncerProvider>
+        <CodeBlock>
+          <code>{SNIPPET}</code>
+        </CodeBlock>
+        <CodeBlock {...injected}>
+          <code>{SNIPPET}</code>
+        </CodeBlock>
+      </CopyAnnouncerProvider>
+    );
+    const [own, overridden] = Array.from(container.querySelectorAll('pre'));
+
+    expect(own!.tabIndex).toBe(0);
+    expect(overridden!.tabIndex).toBe(0);
+
+    own!.focus();
+    expect(document.activeElement).toBe(own);
   });
 
   it('exposes the control as a focusable native button', () => {

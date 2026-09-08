@@ -11,7 +11,7 @@ import { Button } from './nexus';
 const RESET_DELAY_MS = 2000;
 
 const COPY_STATUS = {
-  idle: { icon: <IconCopy />, message: '' },
+  idle: { icon: <IconCopy /> },
   copied: { icon: <IconCheck />, message: 'Code copied to clipboard' },
   failed: { icon: <IconX />, message: 'Could not copy code' },
 };
@@ -29,7 +29,7 @@ export function CodeBlock({
   children,
   className,
   ...props
-}: React.ComponentProps<'pre'>) {
+}: Omit<React.ComponentProps<'pre'>, 'tabIndex' | 'ref'>) {
   const preRef = React.useRef<HTMLPreElement>(null);
   const timerRef = React.useRef<number | undefined>(undefined);
   const [status, setStatus] = React.useState<CopyStatus>('idle');
@@ -41,10 +41,11 @@ export function CodeBlock({
     setStatus(next);
     announce(COPY_STATUS[next].message);
     window.clearTimeout(timerRef.current);
-    timerRef.current = window.setTimeout(() => {
-      setStatus('idle');
-      announce(COPY_STATUS.idle.message);
-    }, RESET_DELAY_MS);
+    // Icon only — the provider owns how long the announcement stays up.
+    timerRef.current = window.setTimeout(
+      () => setStatus('idle'),
+      RESET_DELAY_MS
+    );
   };
 
   const handleCopy = async () => {
@@ -67,8 +68,8 @@ export function CodeBlock({
       <pre
         className={cn(PRE_CLASS, className)}
         {...props}
-        // Both below the spread: a caller-supplied value must not replace the
-        // ref the copy control reads, nor the scroll container's own tab stop.
+        // Both below the spread: the props type omits them, but MDX plugins
+        // inject props at runtime where the type cannot reach.
         ref={preRef}
         // eslint-disable-next-line jsx-a11y/no-noninteractive-tabindex
         tabIndex={0}
