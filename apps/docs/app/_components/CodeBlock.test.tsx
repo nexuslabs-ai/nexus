@@ -228,7 +228,7 @@ describe('CodeBlock', () => {
   });
 
   it('gives the scroll container a tab stop a caller cannot remove', () => {
-    // The props type omits `tabIndex`, but a rehype plugin can still inject one
+    // The props type omits `tabIndex`, but an MDX plugin can still inject one
     // at runtime — the guard below the spread is what has to hold there.
     const injected: object = { tabIndex: -1 };
     const { container } = render(
