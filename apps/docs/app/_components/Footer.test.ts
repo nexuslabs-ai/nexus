@@ -1,19 +1,32 @@
+import { createElement } from 'react';
+import { renderToStaticMarkup } from 'react-dom/server';
+
 import { describe, expect, it } from 'vitest';
 
-import { FOOTER_LINKS } from './Footer';
+import { Footer } from './Footer';
 
-describe('FOOTER_LINKS', () => {
-  it('points every link at a reachable absolute URL', () => {
-    expect(FOOTER_LINKS.length).toBeGreaterThan(0);
+function renderFooterAnchors(): { href: string; text: string }[] {
+  const html = renderToStaticMarkup(createElement(Footer));
 
-    for (const link of FOOTER_LINKS) {
-      expect(link.href).toMatch(/^https:\/\//);
+  return [...html.matchAll(/<a\b[^>]*href="([^"]*)"[^>]*>(.*?)<\/a>/g)].map(
+    ([, href = '', text = '']) => ({ href, text })
+  );
+}
+
+describe('Footer', () => {
+  it('renders every link as a reachable absolute URL', () => {
+    const anchors = renderFooterAnchors();
+
+    expect(anchors.length).toBeGreaterThan(0);
+
+    for (const anchor of anchors) {
+      expect(anchor.href).toMatch(/^https:\/\//);
     }
   });
 
-  it('links to the published Storybook', () => {
-    const storybook = FOOTER_LINKS.find((link) => link.label === 'Storybook');
-
-    expect(storybook?.href).toBe('https://nexuslabs-ai.github.io/nexus/');
+  it('tells assistive tech that each link opens a new tab', () => {
+    for (const anchor of renderFooterAnchors()) {
+      expect(anchor.text).toContain('(opens in a new tab)');
+    }
   });
 });

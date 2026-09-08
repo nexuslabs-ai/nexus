@@ -1,4 +1,6 @@
-export const FOOTER_LINKS = [
+import * as React from 'react';
+
+const FOOTER_LINKS: { label: string; href: `https://${string}` }[] = [
   { label: 'Storybook', href: 'https://nexuslabs-ai.github.io/nexus/' },
   { label: 'GitHub', href: 'https://github.com/nexuslabs-ai/nexus' },
 ];
@@ -20,9 +22,10 @@ export function Footer() {
               href={link.href}
               target="_blank"
               rel="noreferrer"
-              className="nx:rounded-sm nx:hover:text-foreground nx:transition-colors nx:focus-visible:outline-2 nx:focus-visible:outline-focus-default nx:focus-visible:outline-offset-2"
+              className="nx:rounded-sm nx:hover:text-foreground nx:transition-colors nx:focus-visible:outline-2 nx:focus-visible:outline-focus-default nx:focus-visible:outline-offset-(--focus-offset)"
             >
               {link.label}
+              <span className="nx:sr-only"> (opens in a new tab)</span>
             </a>
           ))}
         </nav>

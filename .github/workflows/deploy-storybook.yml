@@ -5,6 +5,10 @@ name: Deploy Storybook
 # Standalone from ci.yml: this is a post-merge push:main workflow, not a PR
 # check, so it is not part of the `CI Status` branch-protection aggregator.
 # ci.yml still builds Storybook on PRs, which is where a broken build is caught.
+#
+# One-time repo setup: Settings > Pages > Source: "GitHub Actions". The
+# `actions/configure-pages` `enablement` input cannot do this for us — it
+# requires a token other than GITHUB_TOKEN.
 
 on:
   push:
@@ -12,6 +16,7 @@ on:
     paths:
       - 'packages/**'
       - 'pnpm-lock.yaml'
+      - '.github/actions/build-storybook/action.yml'
       - '.github/workflows/deploy-storybook.yml'
   workflow_dispatch:
 
@@ -28,6 +33,8 @@ jobs:
   deploy:
     name: Build and Deploy
     runs-on: ubuntu-latest
+    # workflow_dispatch accepts any ref; the published site only ever tracks main.
+    if: github.ref == 'refs/heads/main'
     environment:
       name: github-pages
       url: ${{ steps.deployment.outputs.page_url }}
@@ -35,33 +42,8 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Install pnpm
-        uses: pnpm/action-setup@v4
-
-      - name: Setup Node
-        uses: actions/setup-node@v4
-        with:
-          node-version-file: '.nvmrc'
-          cache: 'pnpm'
-
-      - name: Install dependencies
-        run: pnpm install --frozen-lockfile
-
-      # The AdjustContrast story imports @nexus_ds/core, which is consumed via
-      # its built dist/runtime entry (package.json exports). Build it so the
-      # Storybook production build can resolve the package.
-      - name: Build @nexus_ds/core
-        run: pnpm --filter @nexus_ds/core build
-
       - name: Build Storybook
-        run: pnpm build-storybook
-
-      # `enablement` creates the Pages site on the first run, so publishing
-      # needs no manual repo-settings step.
-      - name: Configure Pages
-        uses: actions/configure-pages@v5
-        with:
-          enablement: true
+        uses: ./.github/actions/build-storybook
 
       - name: Upload Pages artifact
         uses: actions/upload-pages-artifact@v3
