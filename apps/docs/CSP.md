@@ -105,16 +105,27 @@ endpoint first.
 
 `pnpm audit:csp` parses the header the build baked into
 `.next/routes-manifest.json` — the policy that actually shipped — counts what the
-output emitted, and sorts what it finds into two buckets.
+output emitted, and sorts what it finds into two buckets. The verdicts live in
+[`scripts/csp-audit.mjs`](scripts/csp-audit.mjs) as pure functions, so each one
+is pinned by a test rather than only by running the script;
+[`scripts/audit-csp-inventory.mjs`](scripts/audit-csp-inventory.mjs) is the I/O
+around them.
 
-**Integrity failures** mean the audit is reading the wrong artifact: the header
-name or value is not the one `csp.mjs` builds, or the build carries more than one
-appearance bootstrap. It re-hashes the bootstrap out of the prerendered HTML,
-rebuilds the policy `csp.mjs` would produce from that hash, and requires the
-shipped header to equal it. Every count the audit prints is about that artifact,
-so any failure here **exits 1 regardless of which header is shipping**. The
-`$TURBO_DEFAULT$` `inputs` entry in `apps/docs/turbo.json` is what stops a cached
-build from reaching the gate in the first place.
+**Integrity failures** mean the audit is reading the wrong artifact: routes carry
+divergent policies, the header name or value is not the one `csp.mjs` builds, or
+the build carries more than one appearance bootstrap. It re-hashes the bootstrap
+out of the prerendered HTML, rebuilds the policy `csp.mjs` would produce from
+that hash, and requires the shipped header to equal it. Every count the audit
+prints is about that artifact, so any failure here **exits 1 regardless of which
+header is shipping**. The `$TURBO_DEFAULT$` `inputs` entry in
+`apps/docs/turbo.json` is what stops a cached build from reaching the gate in the
+first place.
+
+Before it counts anything the audit checks the scan itself: every page the
+prerender manifest declares must have HTML the scan read, and finding zero
+inline style attributes, zero inline `<style>` elements, or zero flight scripts
+fails. A scan that found nothing would otherwise report no blockers for the
+wrong reason.
 
 **Enforcement blockers** are inline content the policy would block. For each kind
 the audit resolves the directive a browser would actually consult — the `-elem` /
@@ -123,7 +134,9 @@ one directive name literally.
 
 - A blocker an issue owns — today only Next's flight scripts, tracked in #687 —
   prints as a warning while the header is Report-Only, so the list above cannot
-  go stale without someone seeing it.
+  go stale without someone seeing it. Flight scripts are counted by their
+  `self.__next_f` body, apart from any other inline script, so an inline script
+  the app itself adds cannot inherit that exemption.
 - A blocker no issue owns **fails the build now**. Dropping `'unsafe-inline'`
   from `style-src` while inline styles remain is caught here, not by a colourless
   code block in production.
@@ -131,6 +144,8 @@ one directive name literally.
 
 ```
 $ pnpm --filter @nexus_ds/docs audit:csp
+  "flightScripts": 658,
+  "otherInlineScripts": 0,
   "cspHeader": "Content-Security-Policy-Report-Only",
   "integrityFailures": [],
   "enforcementBlockers": [

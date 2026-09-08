@@ -5,9 +5,11 @@ import { fileURLToPath } from 'node:url';
 
 import {
   collectCspPolicies,
+  decideAuditVerdict,
   findInlineBlockers,
   findPolicyIntegrityFailures,
-} from '../csp.mjs';
+  findUnscannedRoutes,
+} from './csp-audit.mjs';
 
 const docsRoot = path.resolve(
   path.dirname(fileURLToPath(import.meta.url)),
@@ -16,6 +18,13 @@ const docsRoot = path.resolve(
 const appOutputDir = path.join(docsRoot, '.next', 'server', 'app');
 const clientOutputDir = path.join(docsRoot, '.next', 'static');
 const routesManifest = path.join(docsRoot, '.next', 'routes-manifest.json');
+const prerenderManifest = path.join(
+  docsRoot,
+  '.next',
+  'prerender-manifest.json'
+);
+// Next streams the RSC payload through inline scripts calling this.
+const flightScriptMarker = 'self.__next_f';
 // String literals only — identifiers and property names are mangled away, and
 // a generic marker collides with unrelated client code.
 const highlighterMarkers = [
@@ -41,29 +50,15 @@ function walk(dir) {
   });
 }
 
-// The audit checks the header the build actually baked into the routes
-// manifest, not the one the current environment would produce.
-function readShippedCsp() {
-  const manifest = JSON.parse(readFileSync(routesManifest, 'utf8'));
-  const policies = collectCspPolicies(manifest);
+// `.next/server/app/foundations/color.html` is the prerendered `/foundations/color`.
+function routeOf(htmlFile) {
+  const relative = path
+    .relative(appOutputDir, htmlFile)
+    .split(path.sep)
+    .join('/')
+    .replace(/\.html$/, '');
 
-  if (policies.length === 0) {
-    console.error(
-      'No Content-Security-Policy header in .next/routes-manifest.json.'
-    );
-    process.exit(1);
-  }
-
-  // One policy for every route is the arrangement the audit reasons about; a
-  // per-route policy would leave the routes it does not sample unaudited.
-  if (policies.length > 1) {
-    console.error(
-      `Expected one Content-Security-Policy across all routes, found ${policies.length}.`
-    );
-    process.exit(1);
-  }
-
-  return policies[0];
+  return relative === 'index' ? '/' : `/${relative}`;
 }
 
 for (const { source, module } of highlighterMarkers) {
@@ -79,10 +74,11 @@ for (const { source, module } of highlighterMarkers) {
 if (
   !existsSync(appOutputDir) ||
   !existsSync(clientOutputDir) ||
-  !existsSync(routesManifest)
+  !existsSync(routesManifest) ||
+  !existsSync(prerenderManifest)
 ) {
   console.error(
-    'Missing .next/server/app, .next/static or .next/routes-manifest.json. Run `pnpm build` first.'
+    'Missing .next/server/app, .next/static, .next/routes-manifest.json or .next/prerender-manifest.json. Run `pnpm build` first.'
   );
   process.exit(1);
 }
@@ -113,6 +109,8 @@ if (highlighterChunks.length > 0) {
 }
 
 let appearanceScripts = 0;
+let flightScripts = 0;
+let otherInlineScripts = 0;
 let inlineScripts = 0;
 let inlineStyleAttributes = 0;
 let inlineStyleElements = 0;
@@ -128,17 +126,28 @@ for (const file of htmlFiles) {
   inlineScripts += scripts.length;
   inlineStyleAttributes += html.match(/\sstyle="/g)?.length ?? 0;
   inlineStyleElements += html.match(/<style[\s>]/gi)?.length ?? 0;
+
   for (const [, attrs, body] of scripts) {
-    if (!attrs.includes('data-nexus-appearance-script')) continue;
-    appearanceScripts++;
-    appearanceScriptBodies.add(body);
+    if (`${attrs}\n${body}`.includes('data-nexus-appearance-script')) {
+      serializedAppearanceReferences++;
+    }
+    if (body.includes('nexus-docs-appearance')) {
+      serializedDocsStorageReferences++;
+    }
+
+    if (attrs.includes('data-nexus-appearance-script')) {
+      appearanceScripts++;
+      appearanceScriptBodies.add(body);
+      continue;
+    }
+
+    if (body.includes(flightScriptMarker)) {
+      flightScripts++;
+      continue;
+    }
+
+    otherInlineScripts++;
   }
-  serializedAppearanceReferences += scripts.filter(([, attrs, body]) =>
-    `${attrs}\n${body}`.includes('data-nexus-appearance-script')
-  ).length;
-  serializedDocsStorageReferences += scripts.filter(([, , body]) =>
-    body.includes('nexus-docs-appearance')
-  ).length;
 
   const scriptIndex = html.indexOf('data-nexus-appearance-script');
   const markerIndex = html.indexOf('data-nexus-appearance-fixture-marker');
@@ -160,8 +169,12 @@ for (const file of serverFiles) {
   }
 }
 
-const nextInlineScripts = inlineScripts - appearanceScripts;
-const shippedCsp = readShippedCsp();
+// The audit checks the header the build actually baked into the routes
+// manifest, not the one the current environment would produce.
+const policies = collectCspPolicies(
+  JSON.parse(readFileSync(routesManifest, 'utf8'))
+);
+const shippedCsp = policies[0];
 const appearanceScriptHashes = [...appearanceScriptBodies].map(
   (body) => `'sha256-${createHash('sha256').update(body).digest('base64')}'`
 );
@@ -169,16 +182,18 @@ const appearanceScriptHashes = [...appearanceScriptBodies].map(
 // A failure here means the audit is reading the wrong artifact, so it is not an
 // enforcement finding and does not wait for the header to flip.
 const integrityFailures = findPolicyIntegrityFailures({
-  headerName: shippedCsp.headerName,
-  header: shippedCsp.header,
+  policies,
   appearanceScriptHashes,
 });
 
-const blockers = findInlineBlockers(shippedCsp.directives, {
-  styleAttributes: inlineStyleAttributes,
-  styleElements: inlineStyleElements,
-  unhashedScripts: nextInlineScripts,
-});
+const blockers = shippedCsp
+  ? findInlineBlockers(shippedCsp.directives, {
+      styleAttributes: inlineStyleAttributes,
+      styleElements: inlineStyleElements,
+      flightScripts,
+      otherInlineScripts,
+    })
+  : [];
 
 console.log(
   JSON.stringify(
@@ -186,14 +201,15 @@ console.log(
       htmlFiles: htmlFiles.length,
       inlineScripts,
       appearanceScripts,
-      nextInlineScripts,
+      flightScripts,
+      otherInlineScripts,
       serializedAppearanceReferences,
       serializedDocsStorageReferences,
       fixtureOrderChecks,
       inlineStyleAttributes,
       inlineStyleElements,
       highlighterChunks: highlighterChunks.length,
-      cspHeader: shippedCsp.headerName,
+      cspHeader: shippedCsp?.headerName ?? null,
       integrityFailures,
       enforcementBlockers: blockers,
     },
@@ -236,44 +252,48 @@ if (fixtureOrderChecks === 0 && existsSync(appearanceFixtureSource)) {
   }
 }
 
-const indent = (lines) => lines.map((line) => `  - ${line}`).join('\n');
+// A scan that found none of these proves nothing about them, so the blocker
+// list would come back empty for the wrong reason.
+const scanFloors = [
+  ['inline style attributes', inlineStyleAttributes],
+  ['inline <style> elements', inlineStyleElements],
+  ['inline flight scripts', flightScripts],
+];
 
-if (integrityFailures.length > 0) {
+for (const [what, count] of scanFloors) {
+  if (count > 0) continue;
   console.error(
-    `The audit is not reading the policy csp.mjs builds, so its counts describe the wrong artifact:
-${indent(integrityFailures)}
-Rebuild the docs app, or reconcile csp.mjs. See apps/docs/CSP.md.`
+    `Found no ${what} across ${htmlFiles.length} prerendered pages; the scan cannot show whether the policy permits them.`
   );
   process.exit(1);
 }
 
-const blockerMessages = blockers.map((blocker) => blocker.message);
-const untracked = blockers.filter((blocker) => !blocker.tracked);
+const unscannedRoutes = findUnscannedRoutes(
+  JSON.parse(readFileSync(prerenderManifest, 'utf8')),
+  htmlFiles.map(routeOf)
+);
 
-if (shippedCsp.enforced && blockers.length > 0) {
+if (unscannedRoutes.length > 0) {
   console.error(
-    `The policy is set to enforce, but the build violates it:
-${indent(blockerMessages)}
-See apps/docs/CSP.md.`
+    `The build declares prerendered pages the HTML scan never read, so the counts above cover only part of the site: ${unscannedRoutes.join(', ')}.`
   );
   process.exit(1);
 }
 
-// A blocker no issue owns is a regression in the policy or the output, and
-// fails now rather than waiting for the header to flip.
-if (untracked.length > 0) {
-  console.error(
-    `The policy blocks inline content the build emits, and no issue owns it:
-${indent(untracked.map((blocker) => blocker.message))}
-See apps/docs/CSP.md.`
-  );
-  process.exit(1);
-}
+const verdict = decideAuditVerdict({
+  enforced: shippedCsp?.enforced ?? false,
+  integrityFailures,
+  blockers,
+});
 
-if (blockers.length > 0) {
-  console.warn(
-    `Content-Security-Policy is Report-Only; enforcing it today would break:
-${indent(blockerMessages)}
-See apps/docs/CSP.md.`
-  );
+if (verdict) {
+  const detail = verdict.detail.map((line) => `  - ${line}`).join('\n');
+  const report = `${verdict.headline}:\n${detail}\nSee apps/docs/CSP.md.`;
+
+  if (verdict.failed) {
+    console.error(report);
+    process.exit(1);
+  }
+
+  console.warn(report);
 }

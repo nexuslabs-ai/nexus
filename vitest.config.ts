@@ -69,6 +69,7 @@ export default defineConfig({
             'apps/**/app/**/*.test.{ts,tsx}',
             'apps/**/src/**/*.test.{ts,tsx}',
             'packages/**/src/**/*.test.{ts,tsx}',
+            'apps/**/scripts/**/*.test.{js,ts}',
             'packages/**/scripts/**/*.test.{js,ts}',
             'packages/eslint-plugin-nexus/__tests__/**/*.test.js',
             'scripts/**/*.test.js',
