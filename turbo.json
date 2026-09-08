@@ -12,6 +12,10 @@
       ],
       "outputs": ["dist/runtime/**"]
     },
+    "@nexus_ds/docs#build": {
+      "dependsOn": ["^build"],
+      "outputs": [".next/**", "!.next/cache/**", "next-env.d.ts"]
+    },
     "build:tailwind": {
       "dependsOn": ["build"],
       "inputs": ["scripts/**", "tokens/**", "src/lib/perceptual-grid.json"],
