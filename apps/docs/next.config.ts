@@ -35,7 +35,7 @@ const SECURITY_HEADERS = [
   },
   {
     key: 'X-Frame-Options',
-    value: 'SAMEORIGIN',
+    value: 'DENY',
   },
   {
     key: 'Permissions-Policy',

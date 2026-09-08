@@ -4,16 +4,7 @@
   "tasks": {
     "build": {
       "dependsOn": ["^build"],
-      "inputs": [
-        "app/**",
-        "content/**",
-        "scripts/**",
-        "*.ts",
-        "*.tsx",
-        "*.mjs",
-        "tsconfig.json",
-        "package.json"
-      ],
+      "inputs": ["$TURBO_DEFAULT$", "!CHANGELOG.md", "!CSP.md"],
       "outputs": [".next/**", "!.next/cache/**"]
     }
   }

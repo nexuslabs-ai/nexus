@@ -105,32 +105,39 @@ endpoint first.
 
 `pnpm audit:csp` parses the header the build baked into
 `.next/routes-manifest.json` — the policy that actually shipped — counts what the
-output emitted, and reports `enforcementBlockers`.
+output emitted, and sorts what it finds into two buckets.
 
-It re-hashes the appearance bootstrap out of the prerendered HTML, rebuilds the
-policy `csp.mjs` would produce from that hash, and requires the shipped header to
-equal it. That catches a drifted policy and a stale build in one assertion; the
-`*.mjs` entry in `apps/docs/turbo.json` `inputs` is what stops a cached build
-from reaching the gate in the first place.
+**Integrity failures** mean the audit is reading the wrong artifact: the header
+name or value is not the one `csp.mjs` builds, or the build carries more than one
+appearance bootstrap. It re-hashes the bootstrap out of the prerendered HTML,
+rebuilds the policy `csp.mjs` would produce from that hash, and requires the
+shipped header to equal it. Every count the audit prints is about that artifact,
+so any failure here **exits 1 regardless of which header is shipping**. The
+`$TURBO_DEFAULT$` `inputs` entry in `apps/docs/turbo.json` is what stops a cached
+build from reaching the gate in the first place.
 
-For each kind of inline content it resolves the directive a browser would
-actually consult — the `-elem` / `-attr` variant, then the base directive, then
-`default-src` — rather than reading one directive name literally.
+**Enforcement blockers** are inline content the policy would block. For each kind
+the audit resolves the directive a browser would actually consult — the `-elem` /
+`-attr` variant, then the base directive, then `default-src` — rather than reading
+one directive name literally.
 
-- While the header is Report-Only it prints the blockers as a warning and
-  passes, so the list above cannot go stale without someone seeing it.
-- Once `CSP_HEADER_NAME` is the enforcing header, a non-empty list **fails the
-  build**.
-
-So dropping `'unsafe-inline'` from `style-src` while inline styles remain, or
-switching to enforce while Next's flight scripts remain unhashed, is caught by
-the audit rather than by a blank page in production.
+- A blocker an issue owns — today only Next's flight scripts, tracked in #687 —
+  prints as a warning while the header is Report-Only, so the list above cannot
+  go stale without someone seeing it.
+- A blocker no issue owns **fails the build now**. Dropping `'unsafe-inline'`
+  from `style-src` while inline styles remain is caught here, not by a colourless
+  code block in production.
+- Once `CSP_HEADER_NAME` is the enforcing header, _any_ blocker fails the build.
 
 ```
 $ pnpm --filter @nexus_ds/docs audit:csp
   "cspHeader": "Content-Security-Policy-Report-Only",
+  "integrityFailures": [],
   "enforcementBlockers": [
-    "script-src (…) blocks 658 inline scripts that carry no hash (Next.js RSC flight data)."
+    {
+      "tracked": "#687",
+      "message": "script-src (…) blocks 658 inline scripts that carry no hash (Next.js RSC flight data)."
+    }
   ]
 ```
 

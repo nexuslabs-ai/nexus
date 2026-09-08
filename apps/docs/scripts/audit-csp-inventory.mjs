@@ -4,10 +4,9 @@ import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 
 import {
-  allowsArbitraryInline,
-  createContentSecurityPolicy,
-  parseContentSecurityPolicy,
-  resolveDirective,
+  collectCspPolicies,
+  findInlineBlockers,
+  findPolicyIntegrityFailures,
 } from '../csp.mjs';
 
 const docsRoot = path.resolve(
@@ -46,27 +45,9 @@ function walk(dir) {
 // manifest, not the one the current environment would produce.
 function readShippedCsp() {
   const manifest = JSON.parse(readFileSync(routesManifest, 'utf8'));
-  const policies = new Map();
+  const policies = collectCspPolicies(manifest);
 
-  for (const route of manifest.headers ?? []) {
-    for (const { key, value } of route.headers ?? []) {
-      const name = key.toLowerCase();
-      if (
-        name !== 'content-security-policy' &&
-        name !== 'content-security-policy-report-only'
-      ) {
-        continue;
-      }
-      policies.set(`${name} ${value}`, {
-        headerName: key,
-        enforced: name === 'content-security-policy',
-        header: value,
-        directives: parseContentSecurityPolicy(value),
-      });
-    }
-  }
-
-  if (policies.size === 0) {
+  if (policies.length === 0) {
     console.error(
       'No Content-Security-Policy header in .next/routes-manifest.json.'
     );
@@ -75,14 +56,14 @@ function readShippedCsp() {
 
   // One policy for every route is the arrangement the audit reasons about; a
   // per-route policy would leave the routes it does not sample unaudited.
-  if (policies.size > 1) {
+  if (policies.length > 1) {
     console.error(
-      `Expected one Content-Security-Policy across all routes, found ${policies.size}.`
+      `Expected one Content-Security-Policy across all routes, found ${policies.length}.`
     );
     process.exit(1);
   }
 
-  return policies.values().next().value;
+  return policies[0];
 }
 
 for (const { source, module } of highlighterMarkers) {
@@ -147,13 +128,10 @@ for (const file of htmlFiles) {
   inlineScripts += scripts.length;
   inlineStyleAttributes += html.match(/\sstyle="/g)?.length ?? 0;
   inlineStyleElements += html.match(/<style[\s>]/gi)?.length ?? 0;
-  appearanceScripts += scripts.filter(([, attrs]) =>
-    attrs.includes('data-nexus-appearance-script')
-  ).length;
   for (const [, attrs, body] of scripts) {
-    if (attrs.includes('data-nexus-appearance-script')) {
-      appearanceScriptBodies.add(body);
-    }
+    if (!attrs.includes('data-nexus-appearance-script')) continue;
+    appearanceScripts++;
+    appearanceScriptBodies.add(body);
   }
   serializedAppearanceReferences += scripts.filter(([, attrs, body]) =>
     `${attrs}\n${body}`.includes('data-nexus-appearance-script')
@@ -187,61 +165,20 @@ const shippedCsp = readShippedCsp();
 const appearanceScriptHashes = [...appearanceScriptBodies].map(
   (body) => `'sha256-${createHash('sha256').update(body).digest('base64')}'`
 );
-const blockers = [];
 
-// Comparing the built header against the policy rebuilt from the bootstrap
-// that actually shipped catches both a drifted policy and a stale build.
-if (appearanceScriptHashes.length !== 1) {
-  blockers.push(
-    `Expected one appearance bootstrap across the build, found ${appearanceScriptHashes.length}.`
-  );
-} else {
-  const expected = createContentSecurityPolicy({
-    appearanceScriptHash: appearanceScriptHashes[0],
-    isDevelopment: false,
-  });
+// A failure here means the audit is reading the wrong artifact, so it is not an
+// enforcement finding and does not wait for the header to flip.
+const integrityFailures = findPolicyIntegrityFailures({
+  headerName: shippedCsp.headerName,
+  header: shippedCsp.header,
+  appearanceScriptHashes,
+});
 
-  if (shippedCsp.header !== expected) {
-    blockers.push(
-      `The shipped policy is not the one csp.mjs builds — the build is stale, or the policy drifted.
-      shipped:  ${shippedCsp.header}
-      expected: ${expected}`
-    );
-  }
-}
-
-const inlineChecks = [
-  {
-    label: `${inlineStyleAttributes} inline style attributes`,
-    count: inlineStyleAttributes,
-    type: 'style',
-    chain: ['style-src-attr', 'style-src', 'default-src'],
-  },
-  {
-    label: `${inlineStyleElements} inline <style> elements`,
-    count: inlineStyleElements,
-    type: 'style',
-    chain: ['style-src-elem', 'style-src', 'default-src'],
-  },
-  {
-    label: `${nextInlineScripts} inline scripts that carry no hash (Next.js RSC flight data)`,
-    count: nextInlineScripts,
-    type: 'script',
-    chain: ['script-src-elem', 'script-src', 'default-src'],
-  },
-];
-
-for (const { label, count, type, chain } of inlineChecks) {
-  if (count === 0) continue;
-
-  // No directive in the chain means the policy does not restrict this content.
-  const directive = resolveDirective(shippedCsp.directives, chain);
-  if (!directive || allowsArbitraryInline(directive.sources, type)) continue;
-
-  blockers.push(
-    `${directive.name} (${directive.sources.join(' ')}) blocks ${label}.`
-  );
-}
+const blockers = findInlineBlockers(shippedCsp.directives, {
+  styleAttributes: inlineStyleAttributes,
+  styleElements: inlineStyleElements,
+  unhashedScripts: nextInlineScripts,
+});
 
 console.log(
   JSON.stringify(
@@ -257,6 +194,7 @@ console.log(
       inlineStyleElements,
       highlighterChunks: highlighterChunks.length,
       cspHeader: shippedCsp.headerName,
+      integrityFailures,
       enforcementBlockers: blockers,
     },
     null,
@@ -298,15 +236,44 @@ if (fixtureOrderChecks === 0 && existsSync(appearanceFixtureSource)) {
   }
 }
 
+const indent = (lines) => lines.map((line) => `  - ${line}`).join('\n');
+
+if (integrityFailures.length > 0) {
+  console.error(
+    `The audit is not reading the policy csp.mjs builds, so its counts describe the wrong artifact:
+${indent(integrityFailures)}
+Rebuild the docs app, or reconcile csp.mjs. See apps/docs/CSP.md.`
+  );
+  process.exit(1);
+}
+
+const blockerMessages = blockers.map((blocker) => blocker.message);
+const untracked = blockers.filter((blocker) => !blocker.tracked);
+
+if (shippedCsp.enforced && blockers.length > 0) {
+  console.error(
+    `The policy is set to enforce, but the build violates it:
+${indent(blockerMessages)}
+See apps/docs/CSP.md.`
+  );
+  process.exit(1);
+}
+
+// A blocker no issue owns is a regression in the policy or the output, and
+// fails now rather than waiting for the header to flip.
+if (untracked.length > 0) {
+  console.error(
+    `The policy blocks inline content the build emits, and no issue owns it:
+${indent(untracked.map((blocker) => blocker.message))}
+See apps/docs/CSP.md.`
+  );
+  process.exit(1);
+}
+
 if (blockers.length > 0) {
-  const detail = blockers.map((blocker) => `  - ${blocker}`).join('\n');
-  if (shippedCsp.enforced) {
-    console.error(
-      `The policy is set to enforce, but the build violates it:\n${detail}\nSee apps/docs/CSP.md.`
-    );
-    process.exit(1);
-  }
   console.warn(
-    `Content-Security-Policy is Report-Only; enforcing it today would break:\n${detail}\nSee apps/docs/CSP.md.`
+    `Content-Security-Policy is Report-Only; enforcing it today would break:
+${indent(blockerMessages)}
+See apps/docs/CSP.md.`
   );
 }
