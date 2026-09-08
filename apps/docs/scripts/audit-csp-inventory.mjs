@@ -49,13 +49,12 @@ const appearanceFixtureSource = path.join(
   'appearance-ssr',
   'page.tsx'
 );
-// These render per request by design, so they emit no prerendered HTML and the
-// page-coverage check skips them. Each exemption is checked against its source
-// below rather than trusted.
-const alwaysDynamicPages = [
-  { page: '/appearance-ssr', source: appearanceFixtureSource },
-];
+// The two pages that owe no prerendered HTML: `/appearance-ssr` renders per
+// request by design, and `/_not-found` is Next's own page. Neither premise is
+// trusted — both are checked against the app tree below.
+const exemptPages = ['/appearance-ssr', '/_not-found'];
 const forceDynamicDeclaration = "export const dynamic = 'force-dynamic'";
+const notFoundSource = path.join(docsRoot, 'app', 'not-found.tsx');
 const inlineScriptPattern =
   /<script\b(?![^>]*\bsrc=)([^>]*)>([\s\S]*?)<\/script>/gi;
 
@@ -70,16 +69,25 @@ function walk(dir) {
   });
 }
 
-for (const { page, source } of alwaysDynamicPages) {
-  if (
-    !existsSync(source) ||
-    !readFileSync(source, 'utf8').includes(forceDynamicDeclaration)
-  ) {
-    console.error(
-      `${page} is exempt from the page-coverage check as always-dynamic, but ${path.relative(docsRoot, source)} does not declare ${forceDynamicDeclaration}.`
-    );
-    process.exit(1);
-  }
+if (
+  !existsSync(appearanceFixtureSource) ||
+  !readFileSync(appearanceFixtureSource, 'utf8').includes(
+    forceDynamicDeclaration
+  )
+) {
+  console.error(
+    `/appearance-ssr is exempt from the page-coverage check as always-dynamic, but ${path.relative(docsRoot, appearanceFixtureSource)} does not declare ${forceDynamicDeclaration}.`
+  );
+  process.exit(1);
+}
+
+// The exemption holds only while Next owns the page. Declaring the app's own
+// not-found page would keep the same manifest key and inherit the skip.
+if (existsSync(notFoundSource)) {
+  console.error(
+    `/_not-found is exempt from the page-coverage check as a page Next generates, but ${path.relative(docsRoot, notFoundSource)} makes it the docs app’s. Drop the exemption and cover the page.`
+  );
+  process.exit(1);
 }
 
 for (const { source, module } of highlighterMarkers) {
@@ -226,7 +234,7 @@ const scanFailures = [
   ...findUnprerenderedPages({
     appPathRoutes: JSON.parse(readFileSync(appPathRoutesManifest, 'utf8')),
     prerenderManifest: prerendered,
-    alwaysDynamicPages: alwaysDynamicPages.map(({ page }) => page),
+    exemptPages,
   }).map(
     (page) =>
       `The app declares ${page} but it prerendered nothing, so the scan says nothing about the inline content it emits.`

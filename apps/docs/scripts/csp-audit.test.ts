@@ -383,7 +383,10 @@ describe('findUnprerenderedPages', () => {
     '/agents': '/[section]',
   };
 
-  const uncovered = (prerenderedBy: Record<string, string>) =>
+  const uncovered = (
+    prerenderedBy: Record<string, string>,
+    exemptPages = ['/appearance-ssr', '/_not-found']
+  ) =>
     findUnprerenderedPages({
       appPathRoutes: APP_PATH_ROUTES,
       prerenderManifest: {
@@ -394,7 +397,7 @@ describe('findUnprerenderedPages', () => {
           ])
         ),
       },
-      alwaysDynamicPages: ['/appearance-ssr'],
+      exemptPages,
     });
 
   const withoutRoute = (dropped: string) =>
@@ -430,6 +433,10 @@ describe('findUnprerenderedPages', () => {
 
   it('skips the not-found page Next generates rather than the app', () => {
     expect(nothingPrerendered).not.toContain('/_not-found');
+  });
+
+  it('exempts only the pages it is given', () => {
+    expect(uncovered({}, [])).toContain('/_not-found');
   });
 
   it('expects no HTML from a route handler', () => {

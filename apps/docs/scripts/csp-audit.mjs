@@ -14,10 +14,6 @@ import {
   resolveDirective,
 } from '../csp.mjs';
 
-// Next generates this page; nothing under `app/` declares it, so whether it
-// prerenders is Next's decision rather than a coverage gap this repo can act on.
-const NEXT_OWNED_PAGES = ['/_not-found'];
-
 /**
  * Every Content-Security-Policy header the build baked into the routes
  * manifest, deduplicated by name and value.
@@ -283,26 +279,27 @@ export function findUnscannedRoutes(prerenderManifest, scannedRoutes) {
  * tree instead, so the page stays on this side of the comparison. Coverage
  * comes from each prerendered route's `srcRoute`, which records the page that
  * produced it; matching URLs against a dynamic segment's pattern instead would
- * let an unrelated static route stand in for it.
+ * let an unrelated static route stand in for it. `exemptPages` is the whole
+ * set of pages that owe no prerendered HTML; the caller checks each premise.
  *
  * @param {{
  *   appPathRoutes: Record<string, string>,
  *   prerenderManifest: { routes?: Record<string, { srcRoute?: string | null }> },
- *   alwaysDynamicPages: readonly string[],
+ *   exemptPages: readonly string[],
  * }} build
  * @returns {string[]}
  */
 export function findUnprerenderedPages({
   appPathRoutes,
   prerenderManifest,
-  alwaysDynamicPages,
+  exemptPages,
 }) {
   const prerenderedBy = new Set(
     Object.values(prerenderManifest.routes ?? {}).map(
       ({ srcRoute }) => srcRoute
     )
   );
-  const exempt = new Set([...alwaysDynamicPages, ...NEXT_OWNED_PAGES]);
+  const exempt = new Set(exemptPages);
 
   return Object.entries(appPathRoutes)
     .filter(([entry]) => entry.endsWith('/page'))
