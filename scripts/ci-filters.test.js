@@ -63,16 +63,26 @@ const UNGATED_JOBS = ['format-check', 'lint'];
 const OUTPUT_READ = /needs\.changes\.outputs\.(\w+)/g;
 const GATE_TERM = /^needs\.changes\.outputs\.(\w+) == 'true'$/;
 const GUARD_TERM = /^\[ "([^"]*)" = "([^"]*)" \]$/;
+const RESULT_TERM = /^contains\(needs\.\*\.result, '(\w+)'\)$/;
 const EXPRESSION = /\$\{\{\s*([^}]+?)\s*\}\}/g;
+const WRAPPED_EXPRESSION = /^\$\{\{\s*(.+?)\s*\}\}$/;
+// Opens, extends, or closes a branch chain. A script carrying none of these
+// runs everything it lists; one carrying any must parse as a flat chain.
+const CONTROL_LINE = /^\s*(?:(?:el)?if|then|else|fi)\b/;
 // The whole task set, run by name. Asserting this exact shape rather than
 // denying known narrowing flags means every other way to narrow — `--filter`,
 // `-F`, `--affected`, or a `pkg#task` argument — fails without being listed.
 const UNFILTERED_RUN = /^pnpm turbo (?:run )?[a-z-]+$/;
 
-// Narrowed turbo runs that are not diff scoping: each builds one fixed, named
-// target for a check of its own, so a root-config change does not widen them.
-// Declared by step name — a new narrowed run must be listed here or fall
-// through to the whole task set.
+// A narrowed turbo run that is not diff scoping: one fixed, named target for a
+// check of its own, so a root-config change does not widen it. The filter has
+// to be a literal package name, so a `...[ref]` range cannot pass as one.
+const FIXED_TARGET_RUN =
+  /^pnpm turbo (?:run )?[a-z-]+ --filter=@?[\w-]+(?:\/[\w-]+)?$/;
+
+// The steps allowed a fixed target. The name only selects which step may narrow
+// that way; the run must still match `FIXED_TARGET_RUN`, so a diff range
+// written into a listed step falls through to the whole task set.
 const FIXED_TARGET_STEPS = ['build / Docs CSP inventory'];
 
 function filtersReadBy(expression) {
@@ -108,6 +118,32 @@ function filtersGating(name) {
     }
 
     return filter;
+  });
+}
+
+// Only a disjunction of `contains(needs.*.result, 'X')` terms lets one bad
+// result reach the failing step. Matching the terms independently would pass an
+// `&&`, which fires only when one job failed and another was cancelled.
+function resultsPropagatedBy(step) {
+  const condition = typeof step.if === 'string' ? step.if.trim() : '';
+  const [, expression] = condition.match(WRAPPED_EXPRESSION) ?? [];
+
+  if (!expression) {
+    throw new Error(
+      `ci.yml \`ci-status\` failing step \`if:\` is not one expression: ${condition}`
+    );
+  }
+
+  return expression.split('||').map((term) => {
+    const [, result] = term.trim().match(RESULT_TERM) ?? [];
+
+    if (!result) {
+      throw new Error(
+        `ci.yml \`ci-status\` failing step \`if:\` term is not \`contains(needs.*.result, 'X')\`: ${term.trim()}`
+      );
+    }
+
+    return result;
   });
 }
 
@@ -147,8 +183,6 @@ function commandsOf(script) {
 }
 
 function turboLinesIn(branch) {
-  if (!branch) return [];
-
   return commandsOf(branch.body)
     .map((line) => line.trim())
     .filter((line) => line.includes('turbo'));
@@ -161,8 +195,10 @@ function turboLinesIn(branch) {
 function branchesOf(script) {
   const lines = commandsOf(script);
 
-  // A script with no chain is one unguarded branch: whatever it lists, it runs.
-  if (!lines.some((line) => /^\s*if .+; then$/.test(line))) {
+  // A script with no control line is one unguarded branch: whatever it lists,
+  // it runs. Anything that opens, extends, or closes a chain goes through the
+  // parser below, so a malformed chain throws instead of reading as flat.
+  if (!lines.some((line) => CONTROL_LINE.test(line))) {
     return [{ guard: null, body: lines.join('\n') }];
   }
 
@@ -221,7 +257,7 @@ function branchesOf(script) {
       continue;
     }
 
-    if (/^\s*(?:el)?if\b|^\s*then\b|^\s*else\b|^\s*fi\b/.test(line)) {
+    if (CONTROL_LINE.test(line)) {
       throw new Error(`run step control line is malformed: ${text}`);
     }
 
@@ -282,17 +318,12 @@ const ROOT_CONFIG_PULL_REQUEST = {
   'github.event_name': 'pull_request',
 };
 
-// An ordinary pull request, where narrowing to the diff is the point.
-const ORDINARY_PULL_REQUEST = {
-  'needs.changes.outputs.ci': 'false',
-  'needs.changes.outputs.root_config': 'false',
-  'github.event_name': 'pull_request',
-};
-
 // Narrowing is read off the one shape the suite already trusts: a turbo line
-// that is not the whole task set. Detecting it this way rather than by matching
-// known scoping spellings means `--affected`, a `[HEAD^1]` range, `-F`, and a
-// `pkg#task` argument are all caught without being enumerated.
+// that is neither the whole task set nor an exempted fixed target. Detecting it
+// this way rather than by matching known scoping spellings means `--affected`,
+// a `[HEAD^1]` range, `-F`, and a `pkg#task` argument are all caught without
+// being enumerated. Every branch is read, so narrowing on the `push` path is as
+// visible as narrowing on the pull-request one.
 function narrowingStepsOf(name) {
   return jobNamed(name).steps.filter((step) => {
     const script = step.run;
@@ -302,13 +333,16 @@ function narrowingStepsOf(name) {
     // pointed at scripts that never do.
     if (!commandsOf(script).some((line) => line.includes('turbo')))
       return false;
-    if (FIXED_TARGET_STEPS.includes(`${name} / ${step.name}`)) return false;
 
-    return turboLinesIn(
-      branchesOf(script).find(({ guard }) =>
-        guardHolds(guard, ORDINARY_PULL_REQUEST)
-      )
-    ).some((line) => !UNFILTERED_RUN.test(line));
+    const mayFixTarget = FIXED_TARGET_STEPS.includes(`${name} / ${step.name}`);
+
+    return branchesOf(script)
+      .flatMap(turboLinesIn)
+      .some(
+        (line) =>
+          !UNFILTERED_RUN.test(line) &&
+          !(mayFixTarget && FIXED_TARGET_RUN.test(line))
+      );
   });
 }
 
@@ -344,20 +378,34 @@ describe('ci path filters', () => {
 
     expect(aggregator.if).toBe('always()');
 
-    const failing = aggregator.steps.filter(
-      (step) =>
-        /contains\(needs\.\*\.result, 'failure'\)/.test(step.if ?? '') &&
-        /contains\(needs\.\*\.result, 'cancelled'\)/.test(step.if ?? '') &&
-        /\bexit 1\b/.test(step.run ?? '')
+    // A commented-out `exit 1` fails nothing, so the step is found by the
+    // commands it runs rather than by its raw script.
+    const failing = aggregator.steps.filter((step) =>
+      commandsOf(step.run ?? '').some((line) => /\bexit 1\b/.test(line))
     );
 
     expect(failing, '`ci-status` declares no failing step').toHaveLength(1);
+    expect(
+      resultsPropagatedBy(failing[0]).sort(),
+      '`ci-status` failing step does not run on both results'
+    ).toEqual(['cancelled', 'failure']);
   });
 
   it('declares exactly the jobs that narrow turbo', () => {
     const scoped = jobNames.filter((name) => narrowingStepsOf(name).length > 0);
 
     expect(scoped.sort()).toEqual([...DIFF_SCOPED_JOBS].sort());
+  });
+
+  it('names a live step for every fixed-target exemption', () => {
+    const stepNames = jobNames.flatMap((name) =>
+      jobNamed(name).steps.map((step) => `${name} / ${step.name}`)
+    );
+
+    expect(
+      FIXED_TARGET_STEPS.filter((step) => !stepNames.includes(step)),
+      'fixed-target exemptions naming no step'
+    ).toEqual([]);
   });
 
   it.each(gatedJobs)('runs %s for every root_config path', (name) => {
