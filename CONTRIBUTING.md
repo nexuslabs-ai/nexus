@@ -307,11 +307,11 @@ The rule that mandates querying it lives in [`.claude/rules/docs-mcp.md`](.claud
 
 ## Browser MCP (chrome-devtools)
 
+`chrome-devtools-mcp` drives a real Chromium-family browser for screenshots and for checking a change in the running app.
+
 ### Claude Code
 
-`.mcp.json` wires up `chrome-devtools-mcp`, which drives a real Chromium-family browser for screenshots and for checking a change in the running app.
-
-It launches the browser at `$NEXUS_BROWSER_PATH`, defaulting to Brave's macOS location — so a macOS contributor with Brave installed there sets nothing. Everyone else (and macOS contributors who use a different browser) points it at their own binary by adding an `env` block to `~/.claude/settings.json`, alongside whatever keys are already in the file:
+`.mcp.json` launches the browser at `$NEXUS_BROWSER_PATH`, defaulting to Brave's macOS location — so a macOS contributor with Brave installed there sets nothing. Everyone else adds an `env` block to `~/.claude/settings.json`, alongside whatever keys are already in the file:
 
 ```json
 {
@@ -321,19 +321,15 @@ It launches the browser at `$NEXUS_BROWSER_PATH`, defaulting to Brave's macOS lo
 }
 ```
 
-`~/.claude/settings.json` is per-machine, which is what a browser path is — set it once and every checkout picks it up. Use the project-local `.claude/settings.local.json` (gitignored) only to override a single worktree. Restart Claude Code after editing either. Typical Linux paths: `/usr/bin/brave-browser`, `/usr/bin/google-chrome`, `/usr/bin/chromium`.
+Typical Linux paths: `/usr/bin/brave-browser`, `/usr/bin/google-chrome`, `/usr/bin/chromium`. That file is per-machine, so every checkout picks it up; use the gitignored `.claude/settings.local.json` to override a single worktree. Restart Claude Code after editing either.
 
-A wrong or missing path does not fail at startup — the server connects, and the first browser tool call returns `Browser was not found at the configured executablePath (...)`. That call is the only real check: `claude mcp list` reports the server healthy either way, and prints the `${…}` template rather than the value it expanded to.
+A wrong path fails lazily — the server connects and `claude mcp list` reports it healthy, but the first browser tool call returns `Browser was not found at the configured executablePath (...)`. That call is the only real check.
 
 ### Codex
 
-Codex reads `.codex/config.toml`, which has no environment-variable expansion ([openai/codex#2680](https://github.com/openai/codex/issues/2680)), so there is no equivalent of `$NEXUS_BROWSER_PATH` there. It passes no `--executable-path` at all and `chrome-devtools-mcp` falls back to your system Chrome on every platform.
+`.codex/config.toml` has no environment-variable expansion ([openai/codex#2680](https://github.com/openai/codex/issues/2680)), so it passes no `--executable-path` and falls back to system Chrome on every platform. It used to pin Brave, so macOS Codex users now get Chrome — or nothing, if Chrome is not installed.
 
-The two configs therefore default to different browsers — Brave under Claude Code on macOS, Chrome under Codex — and that is deliberate: pinning Brave is what keeps macOS contributors' Claude Code setup unchanged, and Codex cannot express the same default without re-introducing the hardcoded path this section exists to remove.
-
-This is a change for macOS: `.codex/config.toml` used to pin Brave, so Codex now drives system Chrome instead — and nothing at all if Chrome is not installed. Use the override below to put it back on Brave.
-
-To drive a different browser under Codex, add a second server under its own name to `~/.codex/config.toml`. Codex ranks the project's `.codex/config.toml` above your user config, so redefining `chrome-devtools` there would not take effect — a distinct name sidesteps that ordering entirely:
+To pick your own browser, add a second server under its own name to `~/.codex/config.toml`. Codex ranks the project's `.codex/config.toml` above your user config, so redefining `chrome-devtools` there would not take effect:
 
 ```toml
 [mcp_servers.chrome-devtools-local]
@@ -345,9 +341,7 @@ args = [
 ]
 ```
 
-Both servers stay registered and expose the same tool set, so the choice is per-session: point the agent at the `chrome-devtools-local` tools. `--isolated` is what lets it run at all — without it both servers launch into `~/.cache/chrome-devtools-mcp/chrome-profile` and whichever starts second fails with `The browser is already running for …`.
-
-That shared profile is also why only one agent drives the browser at a time: neither `.mcp.json` nor `.codex/config.toml` passes `--isolated`, so Claude Code and Codex cannot hold a browser open at once. To run both, give one of them an isolated server of its own — the Codex block above, or on the Claude Code side `claude mcp add -s local chrome-devtools-local -- npx chrome-devtools-mcp@latest --isolated`, which registers it for you alone rather than in the tracked `.mcp.json`.
+Both servers stay registered with the same tools, so point the agent at the `chrome-devtools-local` ones. `--isolated` is what lets it run: without it every server launches into `~/.cache/chrome-devtools-mcp/chrome-profile` and whichever starts second fails with `The browser is already running for …`. That shared profile is also why Claude Code and Codex cannot hold a browser open at once — to run both, give one an isolated server of its own, either the block above or `claude mcp add -s local chrome-devtools-local -- npx chrome-devtools-mcp@latest --isolated`, which stays out of the tracked `.mcp.json`.
 
 ---
 
