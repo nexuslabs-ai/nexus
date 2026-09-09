@@ -56,8 +56,8 @@ const UNGATED_ROOT_FILES = [
   'skills-lock.json',
 ];
 
-// The jobs that make the exemption above hold. Gating either one on a filter
-// would leave an `eslint.config.js`-only PR running nothing.
+// The jobs that make the exemption above hold. Gating these on a filter would
+// leave an `eslint.config.js`-only PR with no job that reads the file.
 const UNGATED_JOBS = ['format-check', 'lint'];
 
 const OUTPUT_READ = /needs\.changes\.outputs\.(\w+)/g;
@@ -68,10 +68,12 @@ const EXPRESSION = /\$\{\{\s*([^}]+?)\s*\}\}/g;
 // denying known narrowing flags means every other way to narrow — `--filter`,
 // `-F`, `--affected`, or a `pkg#task` argument — fails without being listed.
 const UNFILTERED_RUN = /^pnpm turbo (?:run )?[a-z-]+$/;
-// Scoping a run to the PR's diff means reading the PR's base ref, so a step is
-// detected by the workflow inputs it reads — the surface it cannot avoid —
-// rather than by the turbo flag it happens to spell.
-const DIFF_INPUT = /github\.(?:event_name|base_ref)/;
+
+// Narrowed turbo runs that are not diff scoping: each builds one fixed, named
+// target for a check of its own, so a root-config change does not widen them.
+// Declared by step name — a new narrowed run must be listed here or fall
+// through to the whole task set.
+const FIXED_TARGET_STEPS = ['build / Docs CSP inventory'];
 
 function filtersReadBy(expression) {
   return [...expression.matchAll(OUTPUT_READ)].map(([, filter]) => filter);
@@ -112,8 +114,9 @@ function filtersGating(name) {
 const jobNames = Object.keys(workflow.jobs);
 
 // Branch protection requires only `ci-status`, so a job outside its `needs:`
-// blocks no merge no matter what it runs. Every guarantee below is measured
-// against this list rather than against the jobs the file happens to declare.
+// blocks no merge no matter what it runs. The gated-job and root-file
+// guarantees are measured against this list rather than against every job the
+// file happens to declare.
 const requiredJobs = jobNamed('ci-status').needs;
 
 if (!Array.isArray(requiredJobs) || requiredJobs.length === 0) {
@@ -129,10 +132,10 @@ const gatedJobs = requiredJobs.filter((name) => {
 
 const gatingFilters = [...new Set(gatedJobs.flatMap(filtersGating))];
 
-// The jobs that scope turbo to the PR's diff, and so must fall through to an
-// unfiltered run when a root-config change selects nothing. Declared rather
-// than detected: a job that re-spells its scoping must fail the suite, not
-// drop out of it.
+// The jobs that narrow turbo on an ordinary PR, and so must fall through to an
+// unfiltered run when a root-config change selects nothing. Declared as well as
+// detected: a job that starts or stops narrowing must fail the suite, not drop
+// out of it.
 const DIFF_SCOPED_JOBS = ['build', 'typecheck'];
 
 // A comment is not a command: a step that merely mentions a flag must not be
@@ -143,13 +146,12 @@ function commandsOf(script) {
     .filter((line) => line.trim() !== '' && !line.trim().startsWith('#'));
 }
 
-function diffScopedStepsOf(name) {
-  return jobNamed(name).steps.filter(
-    (step) =>
-      step.run !== undefined &&
-      (commandsOf(step.run).some((line) => DIFF_INPUT.test(line)) ||
-        DIFF_INPUT.test(JSON.stringify(step.env ?? {})))
-  );
+function turboLinesIn(branch) {
+  if (!branch) return [];
+
+  return commandsOf(branch.body)
+    .map((line) => line.trim())
+    .filter((line) => line.includes('turbo'));
 }
 
 // The step's script is exactly one flat `if` / `elif` / `else` / `fi` chain.
@@ -157,10 +159,17 @@ function diffScopedStepsOf(name) {
 // any command outside the chain all throw — a step must not be able to narrow
 // the task set somewhere the model does not read.
 function branchesOf(script) {
+  const lines = commandsOf(script);
+
+  // A script with no chain is one unguarded branch: whatever it lists, it runs.
+  if (!lines.some((line) => /^\s*if .+; then$/.test(line))) {
+    return [{ guard: null, body: lines.join('\n') }];
+  }
+
   const branches = [];
   let closed = false;
 
-  for (const line of commandsOf(script)) {
+  for (const line of lines) {
     const text = line.trim();
     const open = branches.length > 0;
     const fellBack = open && branches.at(-1).guard === null;
@@ -273,6 +282,36 @@ const ROOT_CONFIG_PULL_REQUEST = {
   'github.event_name': 'pull_request',
 };
 
+// An ordinary pull request, where narrowing to the diff is the point.
+const ORDINARY_PULL_REQUEST = {
+  'needs.changes.outputs.ci': 'false',
+  'needs.changes.outputs.root_config': 'false',
+  'github.event_name': 'pull_request',
+};
+
+// Narrowing is read off the one shape the suite already trusts: a turbo line
+// that is not the whole task set. Detecting it this way rather than by matching
+// known scoping spellings means `--affected`, a `[HEAD^1]` range, `-F`, and a
+// `pkg#task` argument are all caught without being enumerated.
+function narrowingStepsOf(name) {
+  return jobNamed(name).steps.filter((step) => {
+    const script = step.run;
+
+    if (script === undefined) return false;
+    // Only turbo runs can narrow the task set, and the branch model must not be
+    // pointed at scripts that never do.
+    if (!commandsOf(script).some((line) => line.includes('turbo')))
+      return false;
+    if (FIXED_TARGET_STEPS.includes(`${name} / ${step.name}`)) return false;
+
+    return turboLinesIn(
+      branchesOf(script).find(({ guard }) =>
+        guardHolds(guard, ORDINARY_PULL_REQUEST)
+      )
+    ).some((line) => !UNFILTERED_RUN.test(line));
+  });
+}
+
 describe('ci path filters', () => {
   it('runs the changes job unconditionally', () => {
     expect(jobNamed('changes').if).toBeUndefined();
@@ -287,18 +326,36 @@ describe('ci path filters', () => {
     expect(jobNamed(name).if).toBeUndefined();
   });
 
-  it('requires every job these guarantees rest on', () => {
+  it('lists every load-bearing job in ci-status needs', () => {
+    // `changes` too: every gated `if:` reads its outputs, so a `changes`
+    // failure empties all of them and skips the jobs rather than failing them.
+    const loadBearing = ['changes', ...UNGATED_JOBS, ...DIFF_SCOPED_JOBS];
+
     expect(
-      [...UNGATED_JOBS, ...DIFF_SCOPED_JOBS].filter(
-        (name) => !requiredJobs.includes(name)
-      )
+      loadBearing.filter((name) => !requiredJobs.includes(name)),
+      'jobs missing from `ci-status` needs'
     ).toEqual([]);
   });
 
-  it('declares exactly the jobs that scope turbo to the diff', () => {
-    const scoped = jobNames.filter(
-      (name) => diffScopedStepsOf(name).length > 0
+  // Membership in `needs:` blocks a merge only if the aggregator runs when an
+  // upstream job failed and then fails itself.
+  it('fails ci-status on a failed or cancelled required job', () => {
+    const aggregator = jobNamed('ci-status');
+
+    expect(aggregator.if).toBe('always()');
+
+    const failing = aggregator.steps.filter(
+      (step) =>
+        /contains\(needs\.\*\.result, 'failure'\)/.test(step.if ?? '') &&
+        /contains\(needs\.\*\.result, 'cancelled'\)/.test(step.if ?? '') &&
+        /\bexit 1\b/.test(step.run ?? '')
     );
+
+    expect(failing, '`ci-status` declares no failing step').toHaveLength(1);
+  });
+
+  it('declares exactly the jobs that narrow turbo', () => {
+    const scoped = jobNames.filter((name) => narrowingStepsOf(name).length > 0);
 
     expect(scoped.sort()).toEqual([...DIFF_SCOPED_JOBS].sort());
   });
@@ -314,11 +371,9 @@ describe('ci path filters', () => {
   it.each(DIFF_SCOPED_JOBS)(
     'runs %s unfiltered on a root_config PR',
     (name) => {
-      const steps = diffScopedStepsOf(name);
+      const steps = narrowingStepsOf(name);
 
-      expect(steps, `\`${name}\` scopes no step to the diff`).not.toHaveLength(
-        0
-      );
+      expect(steps, `\`${name}\` narrows no turbo run`).not.toHaveLength(0);
 
       for (const step of steps) {
         const where = `\`${name}\` step "${step.name}"`;
@@ -328,16 +383,12 @@ describe('ci path filters', () => {
 
         expect(taken, `${where} takes no branch`).toBeDefined();
 
-        const turbo = commandsOf(taken.body).filter((line) =>
-          line.includes('turbo')
-        );
+        const turbo = turboLinesIn(taken);
 
         expect(turbo, `${where} runs no turbo task`).not.toHaveLength(0);
 
         for (const line of turbo) {
-          expect(line.trim(), `${where} narrows the task set`).toMatch(
-            UNFILTERED_RUN
-          );
+          expect(line, `${where} narrows the task set`).toMatch(UNFILTERED_RUN);
         }
       }
     }
