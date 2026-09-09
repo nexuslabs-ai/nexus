@@ -4,7 +4,7 @@ import path from 'node:path';
 import url from 'node:url';
 import picomatch from 'picomatch';
 import { describe, expect, it } from 'vitest';
-import { parse } from 'yaml';
+import { parse as parseYaml } from 'yaml';
 
 const repoRoot = path.resolve(
   path.dirname(url.fileURLToPath(import.meta.url)),
@@ -13,13 +13,21 @@ const repoRoot = path.resolve(
 
 const WORKFLOW_PATH = '.github/workflows/ci.yml';
 
-const workflow = parse(
-  fs.readFileSync(path.join(repoRoot, WORKFLOW_PATH), 'utf8')
-);
+// A parse error here empties the suite, so it names the file it could not read
+// rather than surfacing as a bare `SyntaxError` with no tests collected.
+function parsedFile(file, parseText) {
+  const text = fs.readFileSync(path.join(repoRoot, file), 'utf8');
 
-const turboConfig = JSON.parse(
-  fs.readFileSync(path.join(repoRoot, 'turbo.json'), 'utf8')
-);
+  try {
+    return parseText(text);
+  } catch (cause) {
+    throw new Error(`${file} does not parse`, { cause });
+  }
+}
+
+const workflow = parsedFile(WORKFLOW_PATH, parseYaml);
+
+const turboConfig = parsedFile('turbo.json', JSON.parse);
 
 const rootFiles = execFileSync('git', ['ls-files'], {
   cwd: repoRoot,
@@ -55,7 +63,7 @@ if (!detectStep) {
 }
 
 // `filters` is a YAML string embedded in the step input, so it parses twice.
-const filters = parse(detectStep.with.filters);
+const filters = parseYaml(detectStep.with.filters);
 
 const exportedFilters = Object.keys(jobNamed('changes').outputs);
 
@@ -224,6 +232,25 @@ const REQUIRED_JOBS = [
 // detected: a job that starts or stops narrowing must fail the suite, not drop
 // out of it.
 const DIFF_SCOPED_JOBS = ['build', 'typecheck'];
+
+// `root_config` decides whether a diff-scoped job falls through to an
+// unfiltered run. Its entries are globs like every other filter's, so
+// membership is matched, not looked up.
+const widensRootConfig = picomatch(filterNamed('root_config'), { dot: true });
+
+// Every job sets Node up and installs before it reaches a turbo task, so a
+// change to what either reads changes what every job resolves. Turbo hashes
+// neither, and the Node version file is read from the workflow rather than
+// pinned here — the workflow names the file it reads.
+const INSTALL_INPUTS = ['.npmrc', 'pnpm-workspace.yaml'];
+
+function nodeVersionFiles() {
+  const declared = Object.keys(workflow.jobs).flatMap((name) =>
+    stepsOf(name).map((step) => step.with?.['node-version-file'])
+  );
+
+  return [...new Set(declared.filter((file) => file !== undefined))];
+}
 
 // The files turbo folds into every task's hash, so a change to one invalidates
 // the whole graph and no diff-scoped run may narrow past it: the config
@@ -645,18 +672,37 @@ describe('ci path filters', () => {
     ).toBe(true);
   });
 
+  // The floor turbo cannot hold: these decide what every job resolves before a
+  // turbo task runs, so a change to one must widen the diff-scoped jobs too.
+  it('treats every setup and install input as root config', () => {
+    const nodeFiles = nodeVersionFiles();
+
+    expect(
+      nodeFiles,
+      'no step names a `node-version-file` to set Node up from'
+    ).not.toHaveLength(0);
+    expect(
+      INSTALL_INPUTS.filter((file) => !rootFiles.includes(file)),
+      'install inputs that are not tracked root files'
+    ).toEqual([]);
+    expect(
+      [...nodeFiles, ...INSTALL_INPUTS].filter(
+        (file) => !widensRootConfig(file)
+      ),
+      'setup and install inputs missing from the `root_config` filter'
+    ).toEqual([]);
+  });
+
   // The floor `root_config` cannot fall below, held by `turbo.json` rather than
   // by the workflow — so dropping a file from `root_config` and the filters
   // gating the diff-scoped jobs in one change still fails.
   it('treats every turbo global dependency as root config', () => {
-    const rootConfig = filterNamed('root_config');
-
     expect(
       [...(turboConfig.globalDependencies ?? [])].sort(),
       '`turbo.json` no longer declares the global dependencies pinned here'
     ).toEqual([...TURBO_GLOBAL_DEPENDENCIES].sort());
     expect(
-      TURBO_GLOBALS.filter((file) => !rootConfig.includes(file)),
+      TURBO_GLOBALS.filter((file) => !widensRootConfig(file)),
       "turbo's global hash inputs missing from the `root_config` filter"
     ).toEqual([]);
   });
@@ -669,13 +715,11 @@ describe('ci path filters', () => {
     const opensDiffScoped = picomatch(gates.flatMap(filterNamed), {
       dot: true,
     });
-    const widens = picomatch(filterNamed('root_config'), { dot: true });
-
     expect(
       rootFiles.filter(
         (file) =>
           opensDiffScoped(file) &&
-          !widens(file) &&
+          !widensRootConfig(file) &&
           !ROOT_CONFIG_EXEMPT.includes(file)
       ),
       'root files that open a diff-scoped job without widening it'
