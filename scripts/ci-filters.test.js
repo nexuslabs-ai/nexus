@@ -17,6 +17,10 @@ const workflow = parse(
   fs.readFileSync(path.join(repoRoot, WORKFLOW_PATH), 'utf8')
 );
 
+const turboConfig = JSON.parse(
+  fs.readFileSync(path.join(repoRoot, 'turbo.json'), 'utf8')
+);
+
 const rootFiles = execFileSync('git', ['ls-files'], {
   cwd: repoRoot,
   encoding: 'utf8',
@@ -220,6 +224,20 @@ const REQUIRED_JOBS = [
 // detected: a job that starts or stops narrowing must fail the suite, not drop
 // out of it.
 const DIFF_SCOPED_JOBS = ['build', 'typecheck'];
+
+// The files turbo folds into every task's hash, so a change to one invalidates
+// the whole graph and no diff-scoped run may narrow past it: the config
+// declaring the globals, the two files turbo hashes for every run, and the
+// declared globals themselves. Pinned rather than spread from `turbo.json`, so
+// emptying `globalDependencies` fails the suite instead of shrinking this floor
+// along with it.
+const TURBO_GLOBAL_DEPENDENCIES = ['tsconfig.base.json', 'tsconfig.json'];
+const TURBO_GLOBALS = [
+  'turbo.json',
+  'pnpm-lock.yaml',
+  'package.json',
+  ...TURBO_GLOBAL_DEPENDENCIES,
+];
 
 // The root files a diff-scoped job's gate matches but `root_config` need not
 // carry, because that job does not read them. `vitest.config.ts` configures the
@@ -625,6 +643,22 @@ describe('ci path filters', () => {
       isGated(WORKFLOW_PATH),
       `no gating filter matches \`${WORKFLOW_PATH}\``
     ).toBe(true);
+  });
+
+  // The floor `root_config` cannot fall below, held by `turbo.json` rather than
+  // by the workflow — so dropping a file from `root_config` and the filters
+  // gating the diff-scoped jobs in one change still fails.
+  it('treats every turbo global dependency as root config', () => {
+    const rootConfig = filterNamed('root_config');
+
+    expect(
+      [...(turboConfig.globalDependencies ?? [])].sort(),
+      '`turbo.json` no longer declares the global dependencies pinned here'
+    ).toEqual([...TURBO_GLOBAL_DEPENDENCIES].sort());
+    expect(
+      TURBO_GLOBALS.filter((file) => !rootConfig.includes(file)),
+      "turbo's global hash inputs missing from the `root_config` filter"
+    ).toEqual([]);
   });
 
   // A root file belongs to no package, so a diff filter selects nothing for it.
