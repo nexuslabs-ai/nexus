@@ -23,6 +23,7 @@
     "tokens:tailwind": "cd packages/core && pnpm build:tailwind && cp dist/tailwind/* ../../packages/tailwind/",
     "audit:browser-support": "node scripts/audit-browser-support.js",
     "audit:agent-drift": "node scripts/audit-agent-drift.js",
+    "audit:turbo-outputs": "node scripts/audit-turbo-outputs.js",
     "audit:contrast": "vitest run --project=unit packages/core/src/lib/derive-theme.test.ts -t \"legibility invariant\"",
     "audit:mode-codenames": "pnpm --filter @nexus_ds/core audit:mode-codenames",
     "audit:mode-distinctness": "pnpm --filter @nexus_ds/core audit:mode-distinctness",

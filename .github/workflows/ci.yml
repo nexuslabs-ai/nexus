@@ -68,12 +68,16 @@ jobs:
               - 'README.md'
               - 'AGENTS.md'
               - 'RTK.md'
-            # Root TS config sits outside every package, so turbo's
+            # Root config sits outside every package, so turbo's
             # `--filter=...[base]` selects no tasks for it; the build and
             # typecheck jobs detect it here and run unfiltered instead.
+            # `package.json` carries the `browserslist` that `next build`
+            # resolves upward, and `turbo.json` owns the task graph.
             root_config:
               - 'tsconfig.base.json'
               - 'tsconfig.json'
+              - 'package.json'
+              - 'turbo.json'
             ci:
               - '.github/workflows/**'
 
@@ -204,6 +208,9 @@ jobs:
           key: turbo-${{ runner.os }}-${{ github.sha }}
           restore-keys: |
             turbo-${{ runner.os }}-
+
+      - name: Audit turbo output declarations
+        run: pnpm audit:turbo-outputs
 
       - name: Build affected packages
         env:

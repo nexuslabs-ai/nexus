@@ -3,7 +3,6 @@
   "extends": ["//"],
   "tasks": {
     "build": {
-      "dependsOn": ["^build"],
       "inputs": ["src/**", "tsup.config.ts", "tsconfig.json"],
       "outputs": ["dist/**"]
     }
