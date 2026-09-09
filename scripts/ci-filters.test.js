@@ -55,12 +55,14 @@ const workspaceGlobs = workspace.packages.filter(
   (glob) => !glob.startsWith('!')
 );
 
-const rootFiles = execFileSync('git', ['ls-files'], {
+const trackedFiles = execFileSync('git', ['ls-files'], {
   cwd: repoRoot,
   encoding: 'utf8',
 })
   .split('\n')
-  .filter((file) => file !== '' && !file.includes('/'));
+  .filter((file) => file !== '');
+
+const rootFiles = trackedFiles.filter((file) => !file.includes('/'));
 
 function jobNamed(name) {
   const job = workflow.jobs[name];
@@ -284,7 +286,11 @@ function suiteStep() {
 // Everything a change to which changes what this suite asserts, or whether it
 // runs at all: the files the model parses, the config deciding whether it is
 // collected, and the file itself. The job running it has to open on each.
-const SUITE_INPUTS = [...MODEL_INPUTS, 'vitest.config.ts', SUITE_PATH];
+// Built where it is read, so a `parsedFile` call added below here still joins
+// the list rather than being recorded into a spread that already happened.
+function suiteInputs() {
+  return [...new Set([...MODEL_INPUTS, 'vitest.config.ts', SUITE_PATH])];
+}
 
 // The steps of one job that run a given command outright.
 function stepsRunning(name, command) {
@@ -313,20 +319,26 @@ if (!Array.isArray(requiredJobs) || requiredJobs.length === 0) {
 // it waits on.
 const GATE_JOBS = ['ci-status', ...requiredJobs];
 
-// A step `if:` skips the step while its job still reports success, so a gate
-// job goes green having run nothing. Allowed only where a step is meant to be
-// conditional: the audit guards that keep reporting after an earlier step, the
-// Playwright cache-miss install, and the aggregator's own failing step.
-const CONDITIONAL_STEPS = [
-  'audit-tokens / Check token output freshness',
-  'audit-tokens / APCA contrast vitest sweep',
-  'audit-tokens / Color-blind audit',
-  'audit-tokens / Tailwind class-ref audit',
-  'audit-tokens / Token-mode codename audit',
-  'audit-tokens / Token-mode distinctness audit',
-  'test-react / Install Playwright browsers',
-  'ci-status / Fail on any required-job failure or cancellation',
-];
+// The guard the audit steps share: each keeps its job reporting after an
+// earlier step rather than skipping on an unrelated condition.
+const AUDIT_GUARD =
+  "${{ !cancelled() && steps.regen.conclusion == 'success' }}";
+
+// The steps meant to carry an `if:`, each pinned to the condition it was
+// allowed for. Naming the step alone would let that condition be rewritten to
+// `false`, or to a `push`-only guard, without failing anything.
+const CONDITIONAL_STEPS = {
+  'audit-tokens / Check token output freshness': AUDIT_GUARD,
+  'audit-tokens / APCA contrast vitest sweep': AUDIT_GUARD,
+  'audit-tokens / Color-blind audit': AUDIT_GUARD,
+  'audit-tokens / Tailwind class-ref audit': AUDIT_GUARD,
+  'audit-tokens / Token-mode codename audit': AUDIT_GUARD,
+  'audit-tokens / Token-mode distinctness audit': AUDIT_GUARD,
+  'test-react / Install Playwright browsers':
+    "steps.playwright-cache.outputs.cache-hit != 'true'",
+  'ci-status / Fail on any required-job failure or cancellation':
+    "${{ contains(needs.*.result, 'failure') || contains(needs.*.result, 'cancelled') }}",
+};
 
 // A job whose `if:` reads a changes output is gated on the filters; `always()`
 // and unconditional jobs are not.
@@ -760,20 +772,15 @@ describe('ci path filters', () => {
   // covers, like `continue-on-error`, rather than asserted at the handful of
   // sites this suite happens to model.
   it('runs every step of every gate job unconditionally', () => {
-    const conditional = GATE_JOBS.flatMap((name) =>
-      stepsOf(name)
-        .filter((step) => step.if !== undefined)
-        .map((step) => `${name} / ${step.name}`)
+    const conditional = Object.fromEntries(
+      GATE_JOBS.flatMap((name) =>
+        stepsOf(name)
+          .filter((step) => step.if !== undefined)
+          .map((step) => [`${name} / ${step.name}`, step.if])
+      )
     );
 
-    expect(
-      conditional.filter((step) => !CONDITIONAL_STEPS.includes(step)),
-      'steps declaring an `if:` outside the allow-list'
-    ).toEqual([]);
-    expect(
-      CONDITIONAL_STEPS.filter((step) => !conditional.includes(step)),
-      'allow-list entries naming no conditional step'
-    ).toEqual([]);
+    expect(conditional, 'steps declaring an `if:`').toEqual(CONDITIONAL_STEPS);
   });
 
   it('declares exactly the jobs that narrow turbo', () => {
@@ -862,10 +869,8 @@ describe('ci path filters', () => {
     ).toBe(true);
   });
 
-  // This suite is what holds the workflow to its shape, so the job that runs it
-  // has to sit on the merge gate and open on a change to anything the model
-  // reads — measured against that job's own gate, since a filter gating some
-  // other job leaves this file unrun.
+  // This suite is what holds the workflow to its shape, so the job that runs
+  // it has to sit on the merge gate.
   it('runs this suite inside the merge gate', () => {
     const { name } = suiteStep();
 
@@ -874,7 +879,21 @@ describe('ci path filters', () => {
     );
   });
 
-  it.each(SUITE_INPUTS)('runs this suite on a change to %s', (file) => {
+  // A tracked path for every input, so an entry naming no file — the config
+  // renamed, this file moved — fails here rather than passing below as a path
+  // no filter has to match.
+  it('names a tracked file for every input this suite reads', () => {
+    expect(MODEL_INPUTS.length, 'files the model parses').toBeGreaterThan(0);
+    expect(
+      suiteInputs().filter((file) => !trackedFiles.includes(file)),
+      'suite inputs naming no tracked file'
+    ).toEqual([]);
+  });
+
+  // The job also has to open on a change to anything the model reads —
+  // measured against that job's own gate, since a filter gating some other job
+  // leaves this file unrun.
+  it.each(suiteInputs())('runs this suite on a change to %s', (file) => {
     const { name } = suiteStep();
 
     expect(
