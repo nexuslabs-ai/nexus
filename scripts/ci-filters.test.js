@@ -56,6 +56,10 @@ const UNGATED_ROOT_FILES = [
   'skills-lock.json',
 ];
 
+// The jobs that make the exemption above hold. Gating either one on a filter
+// would leave an `eslint.config.js`-only PR running nothing.
+const UNGATED_JOBS = ['format-check', 'lint'];
+
 const OUTPUT_READ = /needs\.changes\.outputs\.(\w+)/g;
 const GATE_TERM = /^needs\.changes\.outputs\.(\w+) == 'true'$/;
 const GUARD_TERM = /^\[ "([^"]*)" = "([^"]*)" \]$/;
@@ -64,8 +68,10 @@ const EXPRESSION = /\$\{\{\s*([^}]+?)\s*\}\}/g;
 // denying known narrowing flags means every other way to narrow — `--filter`,
 // `-F`, `--affected`, or a `pkg#task` argument — fails without being listed.
 const UNFILTERED_RUN = /^pnpm turbo (?:run )?[a-z-]+$/;
-// The spellings that scope a run to the PR's diff specifically.
-const DIFF_SCOPE = /\[origin\/|--affected/;
+// Scoping a run to the PR's diff means reading the PR's base ref, so a step is
+// detected by the workflow inputs it reads — the surface it cannot avoid —
+// rather than by the turbo flag it happens to spell.
+const DIFF_INPUT = /github\.(?:event_name|base_ref)/;
 
 function filtersReadBy(expression) {
   return [...expression.matchAll(OUTPUT_READ)].map(([, filter]) => filter);
@@ -105,9 +111,18 @@ function filtersGating(name) {
 
 const jobNames = Object.keys(workflow.jobs);
 
+// Branch protection requires only `ci-status`, so a job outside its `needs:`
+// blocks no merge no matter what it runs. Every guarantee below is measured
+// against this list rather than against the jobs the file happens to declare.
+const requiredJobs = jobNamed('ci-status').needs;
+
+if (!Array.isArray(requiredJobs) || requiredJobs.length === 0) {
+  throw new Error('ci.yml `ci-status` job declares no `needs:` list');
+}
+
 // A job whose `if:` reads a changes output is gated on the filters; `always()`
 // and unconditional jobs are not.
-const gatedJobs = jobNames.filter((name) => {
+const gatedJobs = requiredJobs.filter((name) => {
   const gate = jobNamed(name).if;
   return typeof gate === 'string' && gate.includes('needs.changes.outputs');
 });
@@ -129,8 +144,11 @@ function commandsOf(script) {
 }
 
 function diffScopedStepsOf(name) {
-  return jobNamed(name).steps.filter((step) =>
-    commandsOf(step.run ?? '').some((line) => DIFF_SCOPE.test(line))
+  return jobNamed(name).steps.filter(
+    (step) =>
+      step.run !== undefined &&
+      (commandsOf(step.run).some((line) => DIFF_INPUT.test(line)) ||
+        DIFF_INPUT.test(JSON.stringify(step.env ?? {})))
   );
 }
 
@@ -263,6 +281,18 @@ describe('ci path filters', () => {
   it('gates at least one job on the filters', () => {
     expect(gatedJobs.length).toBeGreaterThan(0);
     expect(filters.root_config?.length).toBeGreaterThan(0);
+  });
+
+  it.each(UNGATED_JOBS)('runs %s unconditionally', (name) => {
+    expect(jobNamed(name).if).toBeUndefined();
+  });
+
+  it('requires every job these guarantees rest on', () => {
+    expect(
+      [...UNGATED_JOBS, ...DIFF_SCOPED_JOBS].filter(
+        (name) => !requiredJobs.includes(name)
+      )
+    ).toEqual([]);
   });
 
   it('declares exactly the jobs that scope turbo to the diff', () => {
