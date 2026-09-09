@@ -37,9 +37,11 @@ const PARSED_FILES = [
 ];
 
 // A file read spelled any other way is recorded nowhere and so gated nowhere,
-// which one call site rules out. The pattern's own escapes keep this line from
-// counting as a second.
-const READ_CALL = /readFileSync\(/g;
+// which one way in rules out: one use of the module, reached through a name an
+// alias cannot bypass. The patterns' own escapes keep these lines from
+// counting as uses.
+const FS_USE = /\bfs\./g;
+const FS_IMPORT = /^import .*'node:fs';$/m;
 
 // A parse error here empties the suite, so it names the file it could not read
 // rather than surfacing as a bare `SyntaxError` with no tests collected.
@@ -305,12 +307,13 @@ function suiteStep() {
 }
 
 // Everything a change to which changes what this suite asserts, or whether it
-// runs at all: the files the model parses, the config deciding whether it is
-// collected, and the file itself. The job running it has to open on each.
-// Built where it is read, so a `parsedFile` call added below here still joins
-// the list rather than being recorded into a spread that already happened.
+// runs at all: the files the model parses — this one among them — and the
+// config deciding whether it is collected. The job running it has to open on
+// each. Built where it is read, so a `parsedFile` call added below here still
+// joins the list rather than being recorded into a spread that already
+// happened.
 function suiteInputs() {
-  return [...new Set([...parsedFiles, 'vitest.config.ts', SUITE_PATH])];
+  return [...new Set([...parsedFiles, 'vitest.config.ts'])];
 }
 
 // The steps of one job that run a given command outright.
@@ -367,10 +370,9 @@ const CONDITIONAL_STEPS = {
 // the index spelling wherever it reads the dotted one, so both are matched.
 const STEP_REFERENCE = /\bsteps(?:\.|\[\s*['"])([\w-]+)/g;
 
-// Every string in a job, wherever an expression can sit: a job `if:` or
-// `outputs:` entry, a step `if:`, `run:`, `env:`, or `with:` value. Walking the
-// job rather than naming those fields keeps a new expression site from going
-// unscanned.
+// Every string in a job, so an expression is found wherever it sits — a job
+// `outputs:` entry, a step `env:` or `with:` value — rather than only where a
+// field name was thought to list.
 function stringsIn(value) {
   if (typeof value === 'string') {
     return [value];
@@ -387,8 +389,23 @@ function stringsIn(value) {
   return [];
 }
 
+// Actions evaluates an expression inside `${{ }}` or as an `if:` value, and
+// nowhere else. A step name or a `run:` line mentioning `steps.x` is prose, so
+// reading every string as an expression would resolve an id out of it.
+function expressionsIn(name) {
+  const job = jobNamed(name);
+  const conditions = [job.if, ...stepsOf(name).map((step) => step.if)];
+
+  return [
+    ...conditions.filter((condition) => typeof condition === 'string'),
+    ...stringsIn(job).flatMap((text) =>
+      [...text.matchAll(EXPRESSION)].map(([, body]) => body)
+    ),
+  ];
+}
+
 function stepIdsRead(name) {
-  const ids = stringsIn(jobNamed(name)).flatMap((text) =>
+  const ids = expressionsIn(name).flatMap((text) =>
     [...text.matchAll(STEP_REFERENCE)].map(([, id]) => id)
   );
 
@@ -971,13 +988,15 @@ describe('ci path filters', () => {
   });
 
   // The record is what carries a parse into `suiteInputs`, so a file the model
-  // reads but does not record is gated nowhere. One call site leaves no way to
-  // read outside `parsedFile`; the equality below holds what it recorded.
-  it('routes every file read through `parsedFile`', () => {
-    expect(
-      suiteSource.match(READ_CALL) ?? [],
-      'reads outside `parsedFile`'
-    ).toHaveLength(1);
+  // reads but does not record is gated nowhere. One way into the module leaves
+  // no way to read outside `parsedFile`; the equality below holds what it
+  // recorded. A destructured import would carry a second, so the import shape
+  // is part of the same guarantee.
+  it('reaches the filesystem in one place', () => {
+    expect(suiteSource.match(FS_USE) ?? [], '`fs` uses').toHaveLength(1);
+    expect(suiteSource.match(FS_IMPORT)?.[0], '`node:fs` import').toBe(
+      "import fs from 'node:fs';"
+    );
   });
 
   it('parses every file it declares as a model input', () => {
