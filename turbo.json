@@ -1,10 +1,11 @@
 {
   "$schema": "https://turbo.build/schema.json",
+  "globalDependencies": ["tsconfig.base.json"],
   "tasks": {
     "build": {
       "dependsOn": ["^build"]
     },
-    "build:tailwind": {
+    "@nexus_ds/core#build:tailwind": {
       "dependsOn": ["build"],
       "inputs": ["scripts/**", "tokens/**", "src/lib/perceptual-grid.json"],
       "outputs": ["dist/tailwind/**"]
