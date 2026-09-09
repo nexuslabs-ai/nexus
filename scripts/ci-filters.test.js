@@ -12,6 +12,7 @@ const repoRoot = path.resolve(
 );
 
 const WORKFLOW_PATH = '.github/workflows/ci.yml';
+const VITEST_CONFIG_PATH = 'vitest.config.ts';
 
 // Derived, not declared: renaming this file must not silently drop it from
 // the paths a gating filter has to match.
@@ -34,6 +35,8 @@ function parsedFile(file, parseText) {
 const workflow = parsedFile(WORKFLOW_PATH, parseYaml);
 
 const turboConfig = parsedFile('turbo.json', JSON.parse);
+
+const packageJson = parsedFile('package.json', JSON.parse);
 
 const workspace = parsedFile('pnpm-workspace.yaml', parseYaml);
 
@@ -105,6 +108,10 @@ const UNGATED_ROOT_FILES = [
 // The jobs that make the exemption above hold. Gating these on a filter would
 // leave an `eslint.config.js`-only PR with no job that reads the file.
 const UNGATED_JOBS = ['format-check', 'lint'];
+
+// Every job that must run for every change: the detector each gate reads, and
+// the two jobs whose unconditional runs make the exemption above hold.
+const UNCONDITIONAL_JOBS = ['changes', ...UNGATED_JOBS];
 
 const OUTPUT_READ = /needs\.changes\.outputs\.(\w+)/g;
 const GATE_TERM = /^needs\.changes\.outputs\.(\w+) == 'true'$/;
@@ -208,26 +215,79 @@ function resultsPropagatedBy(step) {
 
 const jobNames = Object.keys(workflow.jobs);
 
-const SUITE_RUN = /^pnpm test:unit$/;
+// The package script that runs this suite. The workflow step that invokes it
+// and the vitest project that collects this file are both resolved from it.
+const SUITE_SCRIPT = 'test:unit';
+// Any invocation of that script, so a run the model rejects is named rather
+// than reported as an absent job.
+const SUITE_COMMAND = new RegExp(`^pnpm ${SUITE_SCRIPT}\\b`);
+// Trailing flags leave the project's file set alone; a positional path argument
+// narrows the run to that path, and this file is no longer among what runs.
+const SUITE_RUN = new RegExp(
+  `^pnpm ${SUITE_SCRIPT}(?: --?[\\w-]+(?:=\\S+)?)*$`
+);
 
-// Derived like `SUITE_PATH`: a step deleted or moved must fail here rather than
-// leave the path assertion passing with no job behind it.
-function suiteJob() {
-  const running = jobNames.filter((name) =>
-    stepsOf(name).some(
-      (step) =>
-        typeof step.run === 'string' &&
-        commandsOf(step.run).some((line) => SUITE_RUN.test(line.trim()))
+// Derived like `SUITE_PATH`: a step deleted, moved, or narrowed to a path must
+// fail here rather than leave the path assertion passing with nothing behind it.
+function suiteStep() {
+  const invocations = jobNames.flatMap((name) =>
+    stepsOf(name).flatMap((step) =>
+      commandsOf(step.run ?? '')
+        .map((line) => line.trim())
+        .filter((line) => SUITE_COMMAND.test(line))
+        .map((line) => ({ name, step, line }))
     )
   );
 
+  const running = invocations.filter(({ line }) => SUITE_RUN.test(line));
+
   if (running.length !== 1) {
+    const found = invocations
+      .map(({ name, step, line }) => `${name} / ${step.name}: ${line}`)
+      .join('; ');
+
     throw new Error(
-      `ci.yml declares ${running.length} jobs running \`pnpm test:unit\`, expected 1`
+      `ci.yml declares ${running.length} steps running \`pnpm ${SUITE_SCRIPT}\` over the whole project, expected 1${found === '' ? '' : ` (found: ${found})`}`
     );
   }
 
   return running[0];
+}
+
+// The globs the project that script selects collects. Read as source: importing
+// the config pulls esbuild into the jsdom environment this suite runs in. Every
+// shape the reader depends on throws when it is absent, so a config rewritten
+// past this parser fails rather than quietly matching nothing.
+function unitIncludeGlobs() {
+  const script = packageJson.scripts?.[SUITE_SCRIPT];
+  const [, project] = script?.match(/--project=([\w-]+)/) ?? [];
+
+  if (!project) {
+    throw new Error(
+      `package.json \`${SUITE_SCRIPT}\` script selects no \`--project\``
+    );
+  }
+
+  const source = fs.readFileSync(
+    path.join(repoRoot, VITEST_CONFIG_PATH),
+    'utf8'
+  );
+  const declared = source.indexOf(`name: '${project}'`);
+
+  if (declared === -1) {
+    throw new Error(`${VITEST_CONFIG_PATH} declares no \`${project}\` project`);
+  }
+
+  const [, list] =
+    source.slice(declared).match(/include:\s*\[([^\]]*)\]/) ?? [];
+
+  if (list === undefined) {
+    throw new Error(
+      `${VITEST_CONFIG_PATH} \`${project}\` project declares no \`include:\``
+    );
+  }
+
+  return [...list.matchAll(/'([^']*)'/g)].map(([, glob]) => glob);
 }
 
 function needsOf(name) {
@@ -251,7 +311,11 @@ const gatedJobs = requiredJobs.filter((name) => {
   return typeof gate === 'string' && gate.includes('needs.changes.outputs');
 });
 
-const gatingFilters = [...new Set(gatedJobs.flatMap(filtersGating))];
+// Derived where they are read, like `matcherFor`: a gate the parser rejects has
+// to fail the tests that read it, not throw at module scope and collect none.
+function gatingFilters() {
+  return [...new Set(gatedJobs.flatMap(filtersGating))];
+}
 
 // Every job the merge gate carries. Declared as well as detected: dropping one
 // from `ci-status`'s `needs:` must fail the suite rather than quietly shrink
@@ -278,7 +342,9 @@ const DIFF_SCOPED_JOBS = ['build', 'typecheck'];
 
 // The filters that turn the diff-scoped jobs on. A tree those jobs skip is a
 // tree nothing builds or typechecks, whatever else an unrelated filter matches.
-const diffScopedFilters = [...new Set(DIFF_SCOPED_JOBS.flatMap(filtersGating))];
+function diffScopedFilters() {
+  return [...new Set(DIFF_SCOPED_JOBS.flatMap(filtersGating))];
+}
 
 // Built where it is read, not at module scope: a gate naming an undeclared
 // filter has to fail the tests that read it, not empty the suite before any of
@@ -288,9 +354,13 @@ function matcherFor(names) {
 }
 
 // A filter entry is a glob and a filter matches paths, so a `*` run stands in
-// for a segment to test one filter's entry against another filter.
-function sampleOf(glob) {
-  return glob.replace(/\*+/g, 'x');
+// for a segment, letting one filter's entry be tested against another filter.
+// `**` spans any depth, so it is sampled at one segment and at three: a filter
+// narrowed to a fixed depth opens on the shallow sample and skips the deep one.
+function samplesOf(glob) {
+  const spanning = (depth) => glob.replaceAll('**', depth).replaceAll('*', 'x');
+
+  return [...new Set([spanning('x'), spanning('x/y/z')])];
 }
 
 // `root_config` decides whether a diff-scoped job falls through to an
@@ -585,7 +655,7 @@ describe('ci path filters', () => {
   it('runs every required job unconditionally or on a filter', () => {
     // `changes` too: every gated `if:` reads its outputs, so a `changes`
     // failure empties all of them and skips the jobs rather than failing them.
-    const modelled = ['changes', ...UNGATED_JOBS, ...gatedJobs];
+    const modelled = [...UNCONDITIONAL_JOBS, ...gatedJobs];
 
     expect(
       requiredJobs.filter((name) => !modelled.includes(name)),
@@ -708,9 +778,7 @@ describe('ci path filters', () => {
   });
 
   it.each(gatedJobs)('runs %s for every root_config path', (name) => {
-    const opensJob = picomatch(filtersGating(name).flatMap(filterNamed), {
-      dot: true,
-    });
+    const opensJob = matcherFor(filtersGating(name));
     const widened = rootFiles.filter(widensRootConfig);
 
     expect(widened.filter((file) => !opensJob(file))).toEqual([]);
@@ -758,14 +826,36 @@ describe('ci path filters', () => {
   // has to open on a change to it — measured against that job's own gate, since
   // a filter gating some other job leaves this file unrun.
   it('runs the job that reads the workflow on a change to this suite', () => {
-    const name = suiteJob();
+    const { name, step } = suiteStep();
 
     expect(requiredJobs, `\`${name}\` is outside the merge gate`).toContain(
       name
     );
+    // The job running is not enough: a step `if:` skips the run while the job
+    // itself reports success, and the gate below is measured against nothing.
+    expect(
+      step.if,
+      `\`${name}\` step "${step.name}" declares an \`if:\``
+    ).toBeUndefined();
     expect(
       matcherFor(filtersGating(name))(SUITE_PATH),
       `\`${name}\` does not gate on \`${SUITE_PATH}\``
+    ).toBe(true);
+  });
+
+  // The step runs the whole project, so this file runs only while that
+  // project's `include` still collects it. Dropping the entry that names it
+  // leaves every test here uncollected with the step and its job green.
+  it('collects this suite in the project that step runs', () => {
+    const globs = unitIncludeGlobs();
+
+    expect(
+      globs.length,
+      `\`${VITEST_CONFIG_PATH}\` lists no include glob`
+    ).toBeGreaterThan(0);
+    expect(
+      picomatch(globs, { dot: true })(SUITE_PATH),
+      `\`${VITEST_CONFIG_PATH}\` does not collect \`${SUITE_PATH}\``
     ).toBe(true);
   });
 
@@ -790,8 +880,22 @@ describe('ci path filters', () => {
       expect(
         filtersGating(name)
           .flatMap(filterNamed)
-          .filter((glob) => !opensNeed(sampleOf(glob))),
+          .flatMap(samplesOf)
+          .filter((sample) => !opensNeed(sample)),
         `filter paths that open \`${name}\` but skip \`${need}\``
+      ).toEqual([]);
+    }
+  });
+
+  // The same veto reaches a job with no gate of its own, and there it is
+  // absolute: one gated `needs:` entry and an `eslint.config.js`-only PR runs
+  // neither `format-check` nor `lint`, which is the whole of that file's
+  // coverage. `changes` is held to it too — everything downstream reads it.
+  it('keeps every unconditional job clear of a gated dependency', () => {
+    for (const name of UNCONDITIONAL_JOBS) {
+      expect(
+        needsOf(name).filter((need) => gatedJobs.includes(need)),
+        `gated jobs \`${name}\` depends on`
       ).toEqual([]);
     }
   });
@@ -802,16 +906,16 @@ describe('ci path filters', () => {
   // filter is a tree nothing builds. The glob names directories, so it is
   // matched as a file inside one: the filter matches paths, not patterns.
   it('gates every workspace root on a diff-scoped job', () => {
-    const opensDiffScoped = matcherFor(diffScopedFilters);
+    const opensDiffScoped = matcherFor(diffScopedFilters());
 
     expect(
       workspaceGlobs.length,
       'workspace roots left after pnpm exclusions'
     ).toBeGreaterThan(0);
     expect(
-      workspaceGlobs.filter(
-        (glob) => !opensDiffScoped(`${sampleOf(glob)}/package.json`)
-      ),
+      workspaceGlobs
+        .flatMap(samplesOf)
+        .filter((sample) => !opensDiffScoped(`${sample}/package.json`)),
       'workspace roots no diff-scoped job gates on'
     ).toEqual([]);
   });
@@ -855,7 +959,7 @@ describe('ci path filters', () => {
   // Any root file that turns a diff-scoped job on must therefore also widen it,
   // or the job runs having narrowed to an empty task set.
   it('carries every root file that gates a diff-scoped job', () => {
-    const opensDiffScoped = matcherFor(diffScopedFilters);
+    const opensDiffScoped = matcherFor(diffScopedFilters());
 
     expect(
       rootFiles.filter(
@@ -901,7 +1005,7 @@ describe('ci path filters', () => {
   it('gates or exempts every tracked root file', () => {
     // Coverage means a job actually runs for the file. A filter that is
     // declared, or even exported, but gates no job does not provide it.
-    const isGated = matcherFor(gatingFilters);
+    const isGated = matcherFor(gatingFilters());
 
     expect(rootFiles.length).toBeGreaterThan(0);
     expect(
