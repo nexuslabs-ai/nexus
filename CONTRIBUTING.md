@@ -321,7 +321,7 @@ The rule that mandates querying it lives in [`.claude/rules/docs-mcp.md`](.claud
 }
 ```
 
-Typical Linux paths: `/usr/bin/brave-browser`, `/usr/bin/google-chrome`, `/usr/bin/chromium`. That file is per-machine, so every checkout picks it up; use the gitignored `.claude/settings.local.json` to override a single worktree. Restart Claude Code after editing either.
+`~/.claude/settings.json` is per-machine, so every checkout picks it up; use the gitignored `.claude/settings.local.json` to override a single worktree. Restart Claude Code after editing either. Typical Linux paths: `/usr/bin/brave-browser`, `/usr/bin/google-chrome`, `/usr/bin/chromium`.
 
 A wrong path fails lazily — the server connects and `claude mcp list` reports it healthy, but the first browser tool call returns `Browser was not found at the configured executablePath (...)`. That call is the only real check.
 
