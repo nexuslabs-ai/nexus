@@ -191,6 +191,26 @@ describe('auditEmittedOutputs', () => {
     expect(result.ok).toBe(false);
   });
 
+  it('flags a glob that starts with a wildcard', () => {
+    const repoRoot = makeRepo({ 'packages/core/package.json': '{}\n' });
+
+    const result = auditEmittedOutputs({
+      repoRoot,
+      tasks: [
+        task('@nexus_ds/core#build', {
+          directory: 'packages/core',
+          outputs: ['*.tsbuildinfo', '**/*.js'],
+        }),
+      ],
+    });
+
+    expect(result.ok).toBe(false);
+    expect(result.problems).toMatchObject([
+      { code: 'unanchored-outputs' },
+      { code: 'unanchored-outputs' },
+    ]);
+  });
+
   it('ignores negated globs', () => {
     const repoRoot = makeRepo({ 'apps/docs/.next/BUILD_ID': 'abc\n' });
 

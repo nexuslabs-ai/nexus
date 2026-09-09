@@ -1,14 +1,15 @@
 import { execFileSync } from 'node:child_process';
 import fs from 'node:fs';
+import { createRequire } from 'node:module';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const REPO_ROOT = path.resolve(__dirname, '..');
 
-// `turbo/bin/turbo` is a node shim that execs the platform binary, so it runs
-// under `process.execPath` without a shell.
-const TURBO_BIN = path.join(REPO_ROOT, 'node_modules', 'turbo', 'bin', 'turbo');
+// turbo's entry is a node shim that execs the platform binary, so it runs under
+// `process.execPath` without a shell.
+const TURBO_BIN = createRequire(import.meta.url).resolve('turbo');
 
 // Turbo reports a task whose package has no matching script with this command
 // string; those packages emit nothing, so they are exempt from the check.
@@ -49,9 +50,21 @@ export function auditEmittedOutputs(options = {}) {
     for (const glob of task.resolvedTaskDefinition?.outputs ?? []) {
       if (glob.startsWith('!')) continue;
 
-      const checked = [directory, literalPrefix(glob)]
-        .filter(Boolean)
-        .join('/');
+      const prefix = literalPrefix(glob);
+
+      if (!prefix) {
+        problems.push({
+          code: 'unanchored-outputs',
+          task: task.taskId,
+          message:
+            `Declared output \`${glob}\` starts with a wildcard, so this audit ` +
+            `cannot resolve a directory to check. Anchor it under a literal ` +
+            `directory in ${directory}/turbo.json.`,
+        });
+        continue;
+      }
+
+      const checked = `${directory}/${prefix}`;
       if (containsFile(path.join(repoRoot, checked))) continue;
 
       problems.push({
