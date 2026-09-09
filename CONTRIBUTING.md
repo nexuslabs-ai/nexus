@@ -319,11 +319,26 @@ It launches the browser at `$NEXUS_BROWSER_PATH`, defaulting to Brave's macOS lo
 }
 ```
 
-`~/.claude/settings.json` is per-machine, which is what a browser path is — set it once and every checkout picks it up. Use the project-local `.claude/settings.local.json` (gitignored) only to override a single worktree. Restart Claude Code after editing either. Typical Linux paths: `/usr/bin/brave-browser`, `/usr/bin/google-chrome`, `/usr/bin/chromium`; Ubuntu snap installs land at `/snap/bin/chromium`.
+`~/.claude/settings.json` is per-machine, which is what a browser path is — set it once and every checkout picks it up. Use the project-local `.claude/settings.local.json` (gitignored) only to override a single worktree. Restart Claude Code after editing either. Typical Linux paths: `/usr/bin/brave-browser`, `/usr/bin/google-chrome`, `/usr/bin/chromium`.
 
-A wrong or missing path does not fail at startup — the server connects, then the first browser tool call returns `Browser was not found at the configured executablePath (...)`. Run `claude mcp list` to confirm the value expanded.
+A wrong or missing path does not fail at startup — the server connects, and the first browser tool call returns `Browser was not found at the configured executablePath (...)`. That call is the only real check: `claude mcp list` reports the server healthy either way, and prints the `${…}` template rather than the value it expanded to.
 
-Codex reads `.codex/config.toml`, which has no environment-variable expansion, so it passes no `--executable-path` at all and `chrome-devtools-mcp` falls back to your system Chrome on every platform.
+### Codex
+
+Codex reads `.codex/config.toml`, which has no environment-variable expansion ([openai/codex#2680](https://github.com/openai/codex/issues/2680)), so there is no equivalent of `$NEXUS_BROWSER_PATH` there. It passes no `--executable-path` at all and `chrome-devtools-mcp` falls back to your system Chrome on every platform.
+
+The two configs therefore default to different browsers — Brave under Claude Code on macOS, Chrome under Codex — and that is deliberate: pinning Brave is what keeps macOS contributors' Claude Code setup unchanged, and Codex cannot express the same default without re-introducing the hardcoded path this section exists to remove.
+
+To drive a different browser under Codex, add a second server under its own name to `~/.codex/config.toml` and use that one — a distinct name avoids depending on how Codex ranks project config against user config:
+
+```toml
+[mcp_servers.chrome-devtools-local]
+command = "npx"
+args = [
+    "chrome-devtools-mcp@latest",
+    "--executable-path=/usr/bin/brave-browser",
+]
+```
 
 ---
 
