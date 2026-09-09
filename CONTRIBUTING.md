@@ -307,6 +307,8 @@ The rule that mandates querying it lives in [`.claude/rules/docs-mcp.md`](.claud
 
 ## Browser MCP (chrome-devtools)
 
+### Claude Code
+
 `.mcp.json` wires up `chrome-devtools-mcp`, which drives a real Chromium-family browser for screenshots and for checking a change in the running app.
 
 It launches the browser at `$NEXUS_BROWSER_PATH`, defaulting to Brave's macOS location — so a macOS contributor with Brave installed there sets nothing. Everyone else (and macOS contributors who use a different browser) points it at their own binary by adding an `env` block to `~/.claude/settings.json`, alongside whatever keys are already in the file:
@@ -329,7 +331,9 @@ Codex reads `.codex/config.toml`, which has no environment-variable expansion ([
 
 The two configs therefore default to different browsers — Brave under Claude Code on macOS, Chrome under Codex — and that is deliberate: pinning Brave is what keeps macOS contributors' Claude Code setup unchanged, and Codex cannot express the same default without re-introducing the hardcoded path this section exists to remove.
 
-To drive a different browser under Codex, add a second server under its own name to `~/.codex/config.toml` and use that one — a distinct name avoids depending on how Codex ranks project config against user config:
+This is a change for macOS: `.codex/config.toml` used to pin Brave, so Codex now drives system Chrome instead — and nothing at all if Chrome is not installed. Use the override below to put it back on Brave.
+
+To drive a different browser under Codex, add a second server under its own name to `~/.codex/config.toml` — a distinct name avoids depending on how Codex ranks project config against user config:
 
 ```toml
 [mcp_servers.chrome-devtools-local]
@@ -338,6 +342,13 @@ args = [
     "chrome-devtools-mcp@latest",
     "--executable-path=/usr/bin/brave-browser",
 ]
+```
+
+Both servers then load and expose the same tool set, so picking the right one is a per-session choice rather than something the config settles. To take the project server out of the running, park it with the documented `enabled` key — subject to the same untested precedence question as everything else in this section:
+
+```toml
+[mcp_servers.chrome-devtools]
+enabled = false
 ```
 
 ---
