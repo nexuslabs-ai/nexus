@@ -29,6 +29,15 @@ const workflow = parsedFile(WORKFLOW_PATH, parseYaml);
 
 const turboConfig = parsedFile('turbo.json', JSON.parse);
 
+const { packages: workspaceGlobs } = parsedFile(
+  'pnpm-workspace.yaml',
+  parseYaml
+);
+
+if (!Array.isArray(workspaceGlobs)) {
+  throw new Error('pnpm-workspace.yaml declares no `packages:` globs');
+}
+
 const rootFiles = execFileSync('git', ['ls-files'], {
   cwd: repoRoot,
   encoding: 'utf8',
@@ -240,12 +249,13 @@ const widensRootConfig = picomatch(filterNamed('root_config'), { dot: true });
 
 // Every job sets Node up and installs before it reaches a turbo task, so a
 // change to what either reads changes what every job resolves. Turbo hashes
-// neither, and the Node version file is read from the workflow rather than
-// pinned here — the workflow names the file it reads.
+// neither. Nothing in the repo enumerates what the install reads, so these are
+// declared; the Node version file is detected instead, because the workflow
+// names the file it reads.
 const INSTALL_INPUTS = ['.npmrc', 'pnpm-workspace.yaml'];
 
 function nodeVersionFiles() {
-  const declared = Object.keys(workflow.jobs).flatMap((name) =>
+  const declared = jobNames.flatMap((name) =>
     stepsOf(name).map((step) => step.with?.['node-version-file'])
   );
 
@@ -628,8 +638,10 @@ describe('ci path filters', () => {
     const gated = filtersGating(name).flatMap(filterNamed);
     // `dorny/paths-filter` matches with `dot: true`.
     const isGated = picomatch(gated, { dot: true });
+    const widened = rootFiles.filter(widensRootConfig);
 
-    expect(filters.root_config.filter((file) => !isGated(file))).toEqual([]);
+    expect(widened.length).toBeGreaterThan(0);
+    expect(widened.filter((file) => !isGated(file))).toEqual([]);
   });
 
   it.each(DIFF_SCOPED_JOBS)(
@@ -672,9 +684,25 @@ describe('ci path filters', () => {
     ).toBe(true);
   });
 
+  // A workspace root is where packages live, so `packages` must gate it — a
+  // root pnpm declares but no filter matches puts a whole tree in the turbo
+  // graph with no job running for it. The glob names directories, so it is
+  // matched as a file inside one: the filter matches paths, not patterns.
+  it('gates every workspace root pnpm declares', () => {
+    const gatesPackages = picomatch(filterNamed('packages'), { dot: true });
+
+    expect(workspaceGlobs.length).toBeGreaterThan(0);
+    expect(
+      workspaceGlobs.filter(
+        (glob) => !gatesPackages(`${glob.replace(/\*+/g, 'pkg')}/package.json`)
+      ),
+      'workspace roots the `packages` filter does not gate'
+    ).toEqual([]);
+  });
+
   // The floor turbo cannot hold: these decide what every job resolves before a
   // turbo task runs, so a change to one must widen the diff-scoped jobs too.
-  it('treats every setup and install input as root config', () => {
+  it('treats every declared setup and install input as root config', () => {
     const nodeFiles = nodeVersionFiles();
 
     expect(
