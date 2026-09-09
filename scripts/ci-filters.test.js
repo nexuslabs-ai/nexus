@@ -80,10 +80,13 @@ const CONTROL_LINE = /^\s*(?:(?:el)?if|then|else|fi)\b/;
 // A whole command, not a fragment: `echo "..." # exit 1` mentions one and runs
 // none.
 const EXIT_FAILURE = /^exit [1-9]\d*$/;
-// Everything a failing step is allowed to run before that exit, and each as a
-// whole command: a `;`, `&&`, or `||` would let a terminator ride an allowed
-// prefix — `echo "skip" && exit 0` leaves the gate green.
-const FAIL_STEP_COMMAND = /^(?:echo |set -)[^;&|]*$/;
+// Everything a failing step is allowed to run before that exit, each as one
+// whole command. A `;`, `&&`, or `||` would let a terminator ride an allowed
+// prefix, and a trailing `\` would fold the exit into the line above it — both
+// leave the gate green. The prelude is pinned rather than prefixed, so `set -n`
+// and `set -o noexec`, which parse the exit without running it, are not spellings
+// of an allowed command.
+const FAIL_STEP_COMMAND = /^(?:echo [^;&|\\]*|set -euo pipefail)$/;
 // The whole task set, run by name. Asserting this exact shape rather than
 // denying known narrowing flags means every other way to narrow — `--filter`,
 // `-F`, `--affected`, or a `pkg#task` argument — fails without being listed.
@@ -411,6 +414,19 @@ describe('ci path filters', () => {
     expect(jobNamed('changes').if).toBeUndefined();
   });
 
+  // Every gate reads an output of this one step, so the job running is not
+  // enough: a step that is skipped, or pointed at a diff of nothing, empties
+  // all four outputs and skips every gated job with the aggregator still green.
+  it('detects changed paths against the pull request diff', () => {
+    expect(detectStep.if, '`filter` step declares an `if:`').toBeUndefined();
+    // `filters` is the only input the model reads. `base`, `ref`, and
+    // `working-directory` each redirect what the filters are matched against.
+    expect(
+      Object.keys(detectStep.with),
+      '`filter` step inputs beyond `filters`'
+    ).toEqual(['filters']);
+  });
+
   it('gates at least one job on the filters', () => {
     expect(gatedJobs.length).toBeGreaterThan(0);
     expect(filters.root_config?.length).toBeGreaterThan(0);
@@ -428,31 +444,33 @@ describe('ci path filters', () => {
 
     expect([...requiredJobs].sort()).toEqual([...REQUIRED_JOBS].sort());
     expect(
-      declared.sort(),
+      declared.filter((name) => !requiredJobs.includes(name)),
       'jobs declared in `ci.yml` but not on the merge gate'
-    ).toEqual([...requiredJobs].sort());
+    ).toEqual([]);
   });
 
   // Membership blocks a merge only if the job also runs. A required job whose
   // `if:` is neither absent nor a changes-outputs gate is outside the filter
   // model entirely, so it can sit in `needs:` and never run on a pull request.
   it('runs every required job unconditionally or on a filter', () => {
+    // `changes` too: every gated `if:` reads its outputs, so a `changes`
+    // failure empties all of them and skips the jobs rather than failing them.
     const modelled = ['changes', ...UNGATED_JOBS, ...gatedJobs];
 
     expect(
-      modelled.sort(),
-      'required jobs whose `if:` is not a changes-outputs gate'
-    ).toEqual([...requiredJobs].sort());
+      requiredJobs.filter((name) => !modelled.includes(name)),
+      'required jobs declaring neither a changes-outputs gate nor a place in `UNGATED_JOBS`'
+    ).toEqual([]);
+    expect(
+      modelled.filter((name) => !requiredJobs.includes(name)),
+      'jobs the filter model covers but the merge gate does not carry'
+    ).toEqual([]);
   });
 
-  it('lists every load-bearing job in ci-status needs', () => {
-    // `changes` too: every gated `if:` reads its outputs, so a `changes`
-    // failure empties all of them and skips the jobs rather than failing them.
-    const loadBearing = ['changes', ...UNGATED_JOBS, ...DIFF_SCOPED_JOBS];
-
+  it('lists every diff-scoped job in ci-status needs', () => {
     expect(
-      loadBearing.filter((name) => !requiredJobs.includes(name)),
-      'jobs missing from `ci-status` needs'
+      DIFF_SCOPED_JOBS.filter((name) => !requiredJobs.includes(name)),
+      'diff-scoped jobs missing from `ci-status` needs'
     ).toEqual([]);
   });
 
@@ -597,7 +615,14 @@ describe('ci path filters', () => {
       )
     ).toEqual([]);
     expect(
-      UNGATED_ROOT_FILES.filter((file) => !rootFiles.includes(file))
+      UNGATED_ROOT_FILES.filter((file) => !rootFiles.includes(file)),
+      'exempted files that are not tracked root files'
+    ).toEqual([]);
+    // An entry a filter already matches is covered, not exempt. Accepting it
+    // hides the day that filter drops the path and the coverage goes with it.
+    expect(
+      UNGATED_ROOT_FILES.filter(isMatched),
+      'exempted files a gating filter already matches'
     ).toEqual([]);
   });
 });
