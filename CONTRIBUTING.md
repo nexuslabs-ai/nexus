@@ -347,6 +347,8 @@ args = [
 
 Both servers stay registered and expose the same tool set, so the choice is per-session: point the agent at the `chrome-devtools-local` tools. `--isolated` is what lets it run at all — without it both servers launch into `~/.cache/chrome-devtools-mcp/chrome-profile` and whichever starts second fails with `The browser is already running for …`.
 
+That shared profile is also why only one agent drives the browser at a time: neither `.mcp.json` nor `.codex/config.toml` passes `--isolated`, so Claude Code and Codex cannot hold a browser open at once. If you need both, add `--isolated` to whichever you reach for second.
+
 ---
 
 ## Releasing
