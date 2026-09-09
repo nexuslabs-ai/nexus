@@ -305,6 +305,24 @@ The rule that mandates querying it lives in [`.claude/rules/docs-mcp.md`](.claud
 
 ---
 
+## Browser MCP (chrome-devtools)
+
+`.mcp.json` also wires up `chrome-devtools-mcp`, which drives a real Chromium-family browser for screenshots, [`ui-audit`](.agents/skills/ui-audit-guide/SKILL.md), and checking a change in the running app.
+
+It launches the browser at `$NEXUS_BROWSER_PATH`, which defaults to Brave's macOS location — so on macOS there is nothing to set. Elsewhere, point it at your own Chromium-family binary in `.claude/settings.local.json`. That file is gitignored, so `.mcp.json` stays untouched:
+
+```json
+{
+  "env": {
+    "NEXUS_BROWSER_PATH": "C:/Program Files/BraveSoftware/Brave-Browser/Application/brave.exe"
+  }
+}
+```
+
+Restart Claude Code after editing it. Typical Linux paths: `/usr/bin/brave-browser`, `/usr/bin/google-chrome`, `/usr/bin/chromium`.
+
+---
+
 ## Releasing
 
 Releases are driven by [changesets](https://github.com/changesets/changesets) and the [`Release`](.github/workflows/release.yml) workflow. Only the two runtime packages publish to npm; everything else is either internal or copy/own.
