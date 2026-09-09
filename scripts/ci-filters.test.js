@@ -13,6 +13,12 @@ const repoRoot = path.resolve(
 
 const WORKFLOW_PATH = '.github/workflows/ci.yml';
 
+// Derived, not declared: renaming this file must not silently drop it from
+// the paths a gating filter has to match.
+const SUITE_PATH = path
+  .relative(repoRoot, url.fileURLToPath(import.meta.url))
+  .replaceAll(path.sep, '/');
+
 // A parse error here empties the suite, so it names the file it could not read
 // rather than surfacing as a bare `SyntaxError` with no tests collected.
 function parsedFile(file, parseText) {
@@ -243,6 +249,19 @@ const REQUIRED_JOBS = [
 // detected: a job that starts or stops narrowing must fail the suite, not drop
 // out of it.
 const DIFF_SCOPED_JOBS = ['build', 'typecheck'];
+
+// A path is covered when some job runs for it. `dorny/paths-filter` matches
+// with `dot: true`, so every matcher built from a filter does too.
+const matchesGatingFilter = picomatch(gatingFilters.flatMap(filterNamed), {
+  dot: true,
+});
+
+// The filters that turn the diff-scoped jobs on. A tree those jobs skip is a
+// tree nothing builds or typechecks, whatever else an unrelated filter matches.
+const matchesDiffScopedFilter = picomatch(
+  [...new Set(DIFF_SCOPED_JOBS.flatMap(filtersGating))].flatMap(filterNamed),
+  { dot: true }
+);
 
 // `root_config` decides whether a diff-scoped job falls through to an
 // unfiltered run. Its entries are globs like every other filter's, so
@@ -636,28 +655,35 @@ describe('ci path filters', () => {
     ).toEqual([]);
   });
 
-  // `root_config` forces an unfiltered run, so an entry matching no tracked root
-  // file widens nothing and its job keeps narrowing on a change it cannot see.
-  it('selects a tracked root file for every root_config entry', () => {
+  // `root_config` forces an unfiltered run, so an entry matching no tracked
+  // root-level file widens nothing and its job keeps narrowing on a change it
+  // cannot see. An exclusion is not an entry that widens: picomatch reads a
+  // lone `!glob` as matching everything else, which passes the check below
+  // while naming no file at all.
+  it('selects a tracked root-level file for every root_config entry', () => {
     const entries = filterNamed('root_config');
 
     expect(entries.length).toBeGreaterThan(0);
+    expect(
+      entries.filter((entry) => entry.startsWith('!')),
+      '`root_config` entries excluding rather than selecting'
+    ).toEqual([]);
     expect(
       entries.filter((entry) => {
         const selects = picomatch(entry, { dot: true });
         return !rootFiles.some((file) => selects(file));
       }),
-      '`root_config` entries selecting no tracked root file'
+      '`root_config` entries selecting no tracked root-level file'
     ).toEqual([]);
   });
 
   it.each(gatedJobs)('runs %s for every root_config path', (name) => {
-    const gated = filtersGating(name).flatMap(filterNamed);
-    // `dorny/paths-filter` matches with `dot: true`.
-    const isGated = picomatch(gated, { dot: true });
+    const opensJob = picomatch(filtersGating(name).flatMap(filterNamed), {
+      dot: true,
+    });
     const widened = rootFiles.filter(widensRootConfig);
 
-    expect(widened.filter((file) => !isGated(file))).toEqual([]);
+    expect(widened.filter((file) => !opensJob(file))).toEqual([]);
   });
 
   it.each(DIFF_SCOPED_JOBS)(
@@ -689,34 +715,33 @@ describe('ci path filters', () => {
     }
   );
 
-  it('gates on a change to the workflow this suite reads', () => {
-    const isGated = picomatch(gatingFilters.flatMap(filterNamed), {
-      dot: true,
-    });
-
+  // Neither path belongs to a package, and both decide what CI does: the
+  // workflow declares every job, and this suite is what holds it to its shape.
+  it.each([WORKFLOW_PATH, SUITE_PATH])('gates on a change to %s', (file) => {
     expect(
-      isGated(WORKFLOW_PATH),
-      `no gating filter matches \`${WORKFLOW_PATH}\``
+      matchesGatingFilter(file),
+      `no gating filter matches \`${file}\``
     ).toBe(true);
   });
 
-  // A workspace root is where packages live, so a gating filter must match it —
-  // a root pnpm declares but no gating filter matches puts a whole tree in the
-  // turbo graph with no job running for it. A filter that gates nothing is no
-  // coverage, so this measures against `gatingFilters`, not a named filter. The
-  // glob names directories, so it is matched as a file inside one: the filter
-  // matches paths, not patterns.
+  // A workspace root is where packages live, so the jobs that build and
+  // typecheck it must open on a change to one. Measured against those jobs'
+  // own gates rather than the union: a root matched only by an unrelated job's
+  // filter is a tree nothing builds. The glob names directories, so it is
+  // matched as a file inside one: the filter matches paths, not patterns.
   it('gates every workspace root pnpm declares', () => {
-    const isGated = picomatch(gatingFilters.flatMap(filterNamed), {
-      dot: true,
-    });
-
-    expect(workspaceGlobs.length).toBeGreaterThan(0);
+    expect(
+      workspaceGlobs.length,
+      'workspace roots left after pnpm exclusions'
+    ).toBeGreaterThan(0);
     expect(
       workspaceGlobs.filter(
-        (glob) => !isGated(`${glob.replace(/\*+/g, 'pkg')}/package.json`)
+        (glob) =>
+          !matchesDiffScopedFilter(
+            `${glob.replace(/\*+/g, 'pkg')}/package.json`
+          )
       ),
-      'workspace roots no gating filter matches'
+      'workspace roots no diff-scoped job gates on'
     ).toEqual([]);
   });
 
@@ -759,14 +784,10 @@ describe('ci path filters', () => {
   // Any root file that turns a diff-scoped job on must therefore also widen it,
   // or the job runs having narrowed to an empty task set.
   it('carries every root file that gates a diff-scoped job', () => {
-    const gates = [...new Set(DIFF_SCOPED_JOBS.flatMap(filtersGating))];
-    const opensDiffScoped = picomatch(gates.flatMap(filterNamed), {
-      dot: true,
-    });
     expect(
       rootFiles.filter(
         (file) =>
-          opensDiffScoped(file) &&
+          matchesDiffScopedFilter(file) &&
           !widensRootConfig(file) &&
           !ROOT_CONFIG_EXEMPT.includes(file)
       ),
@@ -774,7 +795,7 @@ describe('ci path filters', () => {
     ).toEqual([]);
     expect(
       ROOT_CONFIG_EXEMPT.filter(
-        (file) => !rootFiles.includes(file) || !opensDiffScoped(file)
+        (file) => !rootFiles.includes(file) || !matchesDiffScopedFilter(file)
       ),
       'exemptions naming no root file that opens a diff-scoped job'
     ).toEqual([]);
@@ -805,16 +826,11 @@ describe('ci path filters', () => {
   });
 
   it('gates or exempts every tracked root file', () => {
-    // Coverage means a job actually runs for the file. A filter that is
-    // declared, or even exported, but gates no job does not provide it.
-    const isMatched = picomatch(gatingFilters.flatMap(filterNamed), {
-      dot: true,
-    });
-
     expect(rootFiles.length).toBeGreaterThan(0);
     expect(
       rootFiles.filter(
-        (file) => !isMatched(file) && !UNGATED_ROOT_FILES.includes(file)
+        (file) =>
+          !matchesGatingFilter(file) && !UNGATED_ROOT_FILES.includes(file)
       )
     ).toEqual([]);
     expect(
@@ -824,7 +840,7 @@ describe('ci path filters', () => {
     // An entry a filter already matches is covered, not exempt. Accepting it
     // hides the day that filter drops the path and the coverage goes with it.
     expect(
-      UNGATED_ROOT_FILES.filter(isMatched),
+      UNGATED_ROOT_FILES.filter((file) => matchesGatingFilter(file)),
       'exempted files a gating filter already matches'
     ).toEqual([]);
   });
