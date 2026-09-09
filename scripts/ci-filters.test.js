@@ -26,13 +26,20 @@ const parsedFiles = [];
 // Declared as well as detected, like `REQUIRED_JOBS`: a read routed around
 // `parsedFile` drops its file from the gate the job running this suite is held
 // to, and a record that only grows cannot tell that from a file the model
-// stopped reading.
+// stopped reading. The call-site count below holds the other half — that a
+// read has no way to go unrecorded.
 const PARSED_FILES = [
   WORKFLOW_PATH,
+  SUITE_PATH,
   'package.json',
   'pnpm-workspace.yaml',
   'turbo.json',
 ];
+
+// A file read spelled any other way is recorded nowhere and so gated nowhere,
+// which one call site rules out. The pattern's own escapes keep this line from
+// counting as a second.
+const READ_CALL = /readFileSync\(/g;
 
 // A parse error here empties the suite, so it names the file it could not read
 // rather than surfacing as a bare `SyntaxError` with no tests collected.
@@ -55,6 +62,10 @@ const turboConfig = parsedFile('turbo.json', JSON.parse);
 const packageJson = parsedFile('package.json', JSON.parse);
 
 const workspace = parsedFile('pnpm-workspace.yaml', parseYaml);
+
+// Read through `parsedFile` like every other input, so this file's own source
+// leaves exactly one read call site for `READ_CALL` to count.
+const suiteSource = parsedFile(SUITE_PATH, (text) => text);
 
 if (!Array.isArray(workspace?.packages)) {
   throw new Error('pnpm-workspace.yaml declares no `packages:` globs');
@@ -350,10 +361,48 @@ const CONDITIONAL_STEPS = {
     "${{ contains(needs.*.result, 'failure') || contains(needs.*.result, 'cancelled') }}",
 };
 
-// A pinned condition resolves against a step id declared in the same job, so
-// the id is part of the guard: dropping `id: regen` makes every audit guard
-// false with the job still green and every pin here still matching.
-const STEP_REFERENCE = /\bsteps\.([\w-]+)\./g;
+// A reference resolves against a step id declared in the same job, so the id is
+// part of whatever reads it: dropping `id: regen` makes every audit guard false
+// with the job still green and every pin above still matching. Actions reads
+// the index spelling wherever it reads the dotted one, so both are matched.
+const STEP_REFERENCE = /\bsteps(?:\.|\[\s*['"])([\w-]+)/g;
+
+// Every string in a job, wherever an expression can sit: a job `if:` or
+// `outputs:` entry, a step `if:`, `run:`, `env:`, or `with:` value. Walking the
+// job rather than naming those fields keeps a new expression site from going
+// unscanned.
+function stringsIn(value) {
+  if (typeof value === 'string') {
+    return [value];
+  }
+
+  if (Array.isArray(value)) {
+    return value.flatMap(stringsIn);
+  }
+
+  if (value && typeof value === 'object') {
+    return Object.values(value).flatMap(stringsIn);
+  }
+
+  return [];
+}
+
+function stepIdsRead(name) {
+  const ids = stringsIn(jobNamed(name)).flatMap((text) =>
+    [...text.matchAll(STEP_REFERENCE)].map(([, id]) => id)
+  );
+
+  return [...new Set(ids)].sort();
+}
+
+// The step ids each gate job reads. Declared as well as detected, like
+// `REQUIRED_JOBS`: a scan that resolves nothing reports the same empty set of
+// dangling ids as one where every id resolves.
+const STEP_REFERENCES = {
+  'audit-tokens': ['regen'],
+  changes: ['filter'],
+  'test-react': ['playwright-cache'],
+};
 
 // A job whose `if:` reads a changes output is gated on the filters; `always()`
 // and unconditional jobs are not.
@@ -788,7 +837,7 @@ describe('ci path filters', () => {
   // sites this suite happens to model.
   it('runs every step of every gate job unconditionally', () => {
     // Flat rather than keyed by step: `ci.yml` does not make a step name
-    // unique within a job, and a map drops the duplicate that sorts first.
+    // unique within a job, and a map drops the duplicate declared first.
     const conditional = GATE_JOBS.flatMap((name) =>
       stepsOf(name)
         .filter((step) => step.if !== undefined)
@@ -803,20 +852,26 @@ describe('ci path filters', () => {
     );
   });
 
-  it('declares every step id a pinned condition reads', () => {
-    const dangling = Object.entries(CONDITIONAL_STEPS).flatMap(
-      ([step, condition]) => {
-        const [name] = step.split(' / ');
-        const ids = stepsOf(name).map((declared) => declared.id);
-
-        return [...condition.matchAll(STEP_REFERENCE)]
-          .map(([, id]) => id)
-          .filter((id) => !ids.includes(id))
-          .map((id) => `${step}: steps.${id}`);
-      }
+  it('reads exactly the step ids it declares', () => {
+    const read = Object.fromEntries(
+      GATE_JOBS.map((name) => [name, stepIdsRead(name)]).filter(
+        ([, ids]) => ids.length > 0
+      )
     );
 
-    expect(dangling, 'conditions reading an undeclared step id').toEqual([]);
+    expect(read, 'step ids the gate jobs read').toEqual(STEP_REFERENCES);
+  });
+
+  it('declares every step id a gate job reads', () => {
+    const dangling = GATE_JOBS.flatMap((name) => {
+      const declared = stepsOf(name).map((step) => step.id);
+
+      return stepIdsRead(name)
+        .filter((id) => !declared.includes(id))
+        .map((id) => `${name}: steps.${id}`);
+    });
+
+    expect(dangling, 'references to an undeclared step id').toEqual([]);
   });
 
   it('declares exactly the jobs that narrow turbo', () => {
@@ -915,8 +970,16 @@ describe('ci path filters', () => {
     );
   });
 
-  // The record is what carries a parse into `suiteInputs`, so a read routed
-  // around `parsedFile` leaves its file ungated with everything below green.
+  // The record is what carries a parse into `suiteInputs`, so a file the model
+  // reads but does not record is gated nowhere. One call site leaves no way to
+  // read outside `parsedFile`; the equality below holds what it recorded.
+  it('routes every file read through `parsedFile`', () => {
+    expect(
+      suiteSource.match(READ_CALL) ?? [],
+      'reads outside `parsedFile`'
+    ).toHaveLength(1);
+  });
+
   it('parses every file it declares as a model input', () => {
     expect([...parsedFiles].sort(), 'files the model parses').toEqual(
       [...PARSED_FILES].sort()
