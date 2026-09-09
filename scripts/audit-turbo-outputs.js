@@ -6,6 +6,10 @@ import { fileURLToPath } from 'node:url';
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const REPO_ROOT = path.resolve(__dirname, '..');
 
+// `turbo/bin/turbo` is a node shim that execs the platform binary, so it runs
+// under `process.execPath` without a shell.
+const TURBO_BIN = path.join(REPO_ROOT, 'node_modules', 'turbo', 'bin', 'turbo');
+
 // Turbo reports a task whose package has no matching script with this command
 // string; those packages emit nothing, so they are exempt from the check.
 const NO_SCRIPT_COMMAND = '<NONEXISTENT>';
@@ -40,19 +44,23 @@ export function auditEmittedOutputs(options = {}) {
   for (const task of tasks) {
     if (task.command === NO_SCRIPT_COMMAND) continue;
 
+    const directory = task.directory.split(path.sep).join('/');
+
     for (const glob of task.resolvedTaskDefinition?.outputs ?? []) {
       if (glob.startsWith('!')) continue;
 
-      const target = path.join(repoRoot, task.directory, literalPrefix(glob));
-      if (isPopulated(target)) continue;
+      const checked = [directory, literalPrefix(glob)]
+        .filter(Boolean)
+        .join('/');
+      if (containsFile(path.join(repoRoot, checked))) continue;
 
       problems.push({
         code: 'unmatched-outputs',
         task: task.taskId,
         message:
-          `Declared output \`${glob}\` matched nothing after the build. A cache ` +
-          `hit would restore an empty artifact. Fix the glob in ` +
-          `${task.directory.split(path.sep).join('/')}/turbo.json.`,
+          `Declared output \`${glob}\` emitted no files under \`${checked}\`. ` +
+          `A cache hit would restore an empty artifact. Fix the glob in ` +
+          `${directory}/turbo.json.`,
       });
     }
   }
@@ -69,22 +77,27 @@ function literalPrefix(glob) {
   return (wildcard === -1 ? segments : segments.slice(0, wildcard)).join('/');
 }
 
-function isPopulated(target) {
+function containsFile(target) {
   const stat = fs.statSync(target, { throwIfNoEntry: false });
 
   if (!stat) return false;
   if (!stat.isDirectory()) return true;
 
-  return fs.readdirSync(target).length > 0;
+  return fs
+    .readdirSync(target, { recursive: true, withFileTypes: true })
+    .some((entry) => entry.isFile());
 }
 
 function resolveTasks(options) {
+  const repoRoot = options.repoRoot ?? REPO_ROOT;
   const turboArgs = options.turboArgs ?? [];
-  const tasks = options.tasks ?? readBuildTasks(turboArgs);
+  const tasks = options.tasks ?? readBuildTasks(repoRoot, turboArgs);
 
-  // A filter can legitimately select nothing; an unfiltered run cannot, so an
-  // empty list there means the payload shape moved and the audit checked nothing.
-  if (!Array.isArray(tasks) || (tasks.length === 0 && turboArgs.length === 0)) {
+  // A `--filter` can legitimately select nothing; an unfiltered run cannot, so
+  // an empty list there means the payload shape moved and nothing was checked.
+  const filtered = turboArgs.some((arg) => arg.startsWith('--filter'));
+
+  if (!Array.isArray(tasks) || (tasks.length === 0 && !filtered)) {
     throw new Error(
       'turbo reported no `build` tasks. The `--dry=json` payload shape has ' +
         'changed, so the audit cannot verify any output declaration.'
@@ -94,15 +107,14 @@ function resolveTasks(options) {
   return tasks;
 }
 
-function readBuildTasks(turboArgs = []) {
+function readBuildTasks(repoRoot, turboArgs) {
   const stdout = execFileSync(
-    'pnpm',
-    ['exec', 'turbo', 'run', 'build', '--dry=json', ...turboArgs],
+    process.execPath,
+    [TURBO_BIN, 'run', 'build', '--dry=json', ...turboArgs],
     {
-      cwd: REPO_ROOT,
+      cwd: repoRoot,
       encoding: 'utf8',
       maxBuffer: 64 * 1024 * 1024,
-      shell: true,
     }
   );
 

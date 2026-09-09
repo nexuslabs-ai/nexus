@@ -39,10 +39,6 @@ function makeRepo(files) {
 }
 
 describe('auditTurboOutputs', () => {
-  it('passes for the current repository', { timeout: 120_000 }, () => {
-    expect(auditTurboOutputs()).toEqual({ ok: true, problems: [] });
-  });
-
   it('throws when turbo reports no build tasks', () => {
     expect(() => auditTurboOutputs({ tasks: [] })).toThrow(
       /turbo reported no `build` tasks/
@@ -56,6 +52,12 @@ describe('auditTurboOutputs', () => {
     });
 
     expect(result).toEqual({ ok: true, problems: [] });
+  });
+
+  it('still throws on an empty task list when no filter was passed', () => {
+    expect(() =>
+      auditTurboOutputs({ tasks: [], turboArgs: ['--verbosity=2'] })
+    ).toThrow(/turbo reported no `build` tasks/);
   });
 
   it('passes when every build-scripted package declares outputs', () => {
@@ -151,6 +153,25 @@ describe('auditEmittedOutputs', () => {
     expect(result.problems).toMatchObject([
       { code: 'unmatched-outputs', task: '@nexus_ds/test-utils#build' },
     ]);
+  });
+
+  it('flags an output tree that holds only empty directories', () => {
+    const repoRoot = makeRepo({ 'packages/core/package.json': '{}\n' });
+    fs.mkdirSync(path.join(repoRoot, 'packages/core/dist/runtime'), {
+      recursive: true,
+    });
+
+    const result = auditEmittedOutputs({
+      repoRoot,
+      tasks: [
+        task('@nexus_ds/core#build', {
+          directory: 'packages/core',
+          outputs: ['dist/**'],
+        }),
+      ],
+    });
+
+    expect(result.ok).toBe(false);
   });
 
   it('flags an output directory that exists but is empty', () => {

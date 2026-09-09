@@ -250,7 +250,9 @@ jobs:
           name: build-artifacts
           path: packages/**/dist
           retention-days: 1
-          if-no-files-found: warn
+          # Every path into this job builds at least one emitting package, so
+          # an empty upload means the build silently produced nothing.
+          if-no-files-found: error
 
   # ============================================
   # TypeScript Check (affected packages)
@@ -296,14 +298,17 @@ jobs:
       - name: TypeScript check (affected packages)
         env:
           BASE_REF: ${{ github.base_ref }}
+          # Mirrors the build job: root-level changes affect every package, so
+          # they typecheck unfiltered rather than resolving to zero tasks.
+          CHECK_ALL: ${{ needs.changes.outputs.ci == 'true' || needs.changes.outputs.root_config == 'true' || needs.changes.outputs.build_scripts == 'true' }}
         run: |
-          if [ "${{ needs.changes.outputs.ci }}" = "true" ] || [ "${{ needs.changes.outputs.root_config }}" = "true" ]; then
-            pnpm turbo typecheck
-          elif [ "${{ github.event_name }}" = "pull_request" ]; then
-            pnpm turbo typecheck --filter="...[origin/$BASE_REF]"
-          else
-            pnpm turbo typecheck
+          set -euo pipefail
+          filter=()
+          if [ "$CHECK_ALL" != "true" ] && [ "${{ github.event_name }}" = "pull_request" ]; then
+            filter=(--filter="...[origin/$BASE_REF]")
           fi
+
+          pnpm turbo typecheck "${filter[@]}"
 
       - name: Core runtime export contract
         run: pnpm --filter @nexus_ds/core audit:runtime-exports
