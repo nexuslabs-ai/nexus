@@ -307,9 +307,9 @@ The rule that mandates querying it lives in [`.claude/rules/docs-mcp.md`](.claud
 
 ## Browser MCP (chrome-devtools)
 
-`.mcp.json` also wires up `chrome-devtools-mcp`, which drives a real Chromium-family browser for screenshots, [`ui-audit`](.agents/skills/ui-audit-guide/SKILL.md), and checking a change in the running app.
+`.mcp.json` wires up `chrome-devtools-mcp`, which drives a real Chromium-family browser for screenshots and for checking a change in the running app.
 
-It launches the browser at `$NEXUS_BROWSER_PATH`, which defaults to Brave's macOS location — so on macOS there is nothing to set. Elsewhere, point it at your own Chromium-family binary in `.claude/settings.local.json`. That file is gitignored, so `.mcp.json` stays untouched:
+It launches the browser at `$NEXUS_BROWSER_PATH`, defaulting to Brave's macOS location — so a macOS contributor with Brave installed there sets nothing. Everyone else (and macOS contributors who use a different browser) points it at their own binary by adding an `env` block to `~/.claude/settings.json`, alongside whatever keys are already in the file:
 
 ```json
 {
@@ -319,7 +319,11 @@ It launches the browser at `$NEXUS_BROWSER_PATH`, which defaults to Brave's macO
 }
 ```
 
-Restart Claude Code after editing it. Typical Linux paths: `/usr/bin/brave-browser`, `/usr/bin/google-chrome`, `/usr/bin/chromium`.
+`~/.claude/settings.json` is per-machine, which is what a browser path is — set it once and every checkout picks it up. Use the project-local `.claude/settings.local.json` (gitignored) only to override a single worktree. Restart Claude Code after editing either. Typical Linux paths: `/usr/bin/brave-browser`, `/usr/bin/google-chrome`, `/usr/bin/chromium`; Ubuntu snap installs land at `/snap/bin/chromium`.
+
+A wrong or missing path does not fail at startup — the server connects, then the first browser tool call returns `Browser was not found at the configured executablePath (...)`. Run `claude mcp list` to confirm the value expanded.
+
+Codex reads `.codex/config.toml`, which has no environment-variable expansion, so it passes no `--executable-path` at all and `chrome-devtools-mcp` falls back to your system Chrome on every platform.
 
 ---
 
