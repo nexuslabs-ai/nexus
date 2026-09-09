@@ -334,6 +334,14 @@ jobs:
       - name: Run unit tests
         run: pnpm test:unit
 
+      # `scripts/ci-filters.test.js` is what holds this workflow to its shape,
+      # and it can only do that while the unit project collects it. Naming the
+      # path here fails the job when it stops being collected: vitest exits 1 on
+      # a path argument that matches nothing. No assertion inside that file can
+      # cover this — once it is uncollected, none of them runs.
+      - name: Run the CI filter suite by path
+        run: pnpm vitest run --project=unit scripts/ci-filters.test.js
+
   audit-tokens:
     name: Audit Tokens
     runs-on: ubuntu-latest

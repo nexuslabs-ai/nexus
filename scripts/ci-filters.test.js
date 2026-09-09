@@ -12,7 +12,6 @@ const repoRoot = path.resolve(
 );
 
 const WORKFLOW_PATH = '.github/workflows/ci.yml';
-const VITEST_CONFIG_PATH = 'vitest.config.ts';
 
 // Derived, not declared: renaming this file must not silently drop it from
 // the paths a gating filter has to match.
@@ -215,17 +214,38 @@ function resultsPropagatedBy(step) {
 
 const jobNames = Object.keys(workflow.jobs);
 
-// The package script that runs this suite. The workflow step that invokes it
-// and the vitest project that collects this file are both resolved from it.
+// The package script that runs this suite, and the vitest project it selects.
+// Asserted as a whole command: `--dir`, `--exclude`, `--shard`, `--changed`, and
+// a positional path each narrow what the script covers, and matching the shape
+// rejects all of them without enumerating any.
 const SUITE_SCRIPT = 'test:unit';
+const SUITE_SCRIPT_RUN = /^vitest run --project=([\w-]+)$/;
+
+function suiteProject() {
+  const script = packageJson.scripts?.[SUITE_SCRIPT];
+
+  if (script === undefined) {
+    throw new Error(`package.json declares no \`${SUITE_SCRIPT}\` script`);
+  }
+
+  const [, project] = script.match(SUITE_SCRIPT_RUN) ?? [];
+
+  if (!project) {
+    throw new Error(
+      `package.json \`${SUITE_SCRIPT}\` script is not \`vitest run --project=<name>\`: ${script}`
+    );
+  }
+
+  return project;
+}
+
 // Any invocation of that script, so a run the model rejects is named rather
 // than reported as an absent job.
 const SUITE_COMMAND = new RegExp(`^pnpm ${SUITE_SCRIPT}\\b`);
-// Trailing flags leave the project's file set alone; a positional path argument
-// narrows the run to that path, and this file is no longer among what runs.
-const SUITE_RUN = new RegExp(
-  `^pnpm ${SUITE_SCRIPT}(?: --?[\\w-]+(?:=\\S+)?)*$`
-);
+// The script and nothing else. Every vitest flag that narrows would drop this
+// file from the run, so the whole command is matched rather than known flags
+// denied.
+const SUITE_RUN = new RegExp(`^pnpm ${SUITE_SCRIPT}$`);
 
 // Derived like `SUITE_PATH`: a step deleted, moved, or narrowed to a path must
 // fail here rather than leave the path assertion passing with nothing behind it.
@@ -254,40 +274,13 @@ function suiteStep() {
   return running[0];
 }
 
-// The globs the project that script selects collects. Read as source: importing
-// the config pulls esbuild into the jsdom environment this suite runs in. Every
-// shape the reader depends on throws when it is absent, so a config rewritten
-// past this parser fails rather than quietly matching nothing.
-function unitIncludeGlobs() {
-  const script = packageJson.scripts?.[SUITE_SCRIPT];
-  const [, project] = script?.match(/--project=([\w-]+)/) ?? [];
-
-  if (!project) {
-    throw new Error(
-      `package.json \`${SUITE_SCRIPT}\` script selects no \`--project\``
-    );
-  }
-
-  const source = fs.readFileSync(
-    path.join(repoRoot, VITEST_CONFIG_PATH),
-    'utf8'
+// The steps of one job that run a given command outright.
+function stepsRunning(name, command) {
+  return stepsOf(name).filter((step) =>
+    commandsOf(step.run ?? '')
+      .map((line) => line.trim())
+      .includes(command)
   );
-  const declared = source.indexOf(`name: '${project}'`);
-
-  if (declared === -1) {
-    throw new Error(`${VITEST_CONFIG_PATH} declares no \`${project}\` project`);
-  }
-
-  const [, list] =
-    source.slice(declared).match(/include:\s*\[([^\]]*)\]/) ?? [];
-
-  if (list === undefined) {
-    throw new Error(
-      `${VITEST_CONFIG_PATH} \`${project}\` project declares no \`include:\``
-    );
-  }
-
-  return [...list.matchAll(/'([^']*)'/g)].map(([, glob]) => glob);
 }
 
 function needsOf(name) {
@@ -843,20 +836,25 @@ describe('ci path filters', () => {
     ).toBe(true);
   });
 
-  // The step runs the whole project, so this file runs only while that
-  // project's `include` still collects it. Dropping the entry that names it
-  // leaves every test here uncollected with the step and its job green.
-  it('collects this suite in the project that step runs', () => {
-    const globs = unitIncludeGlobs();
+  // The gate proves the job runs; the whole-project run above does not prove it
+  // reaches this file. A second step names the path, and vitest exits 1 on a
+  // path argument matching no collected file — so the job fails however the file
+  // leaves the project: an `include` entry dropped, an `exclude` added, the
+  // project renamed. Nothing inside this file can cover that; once it is
+  // uncollected, none of these tests runs.
+  it('runs this suite by path in the job that reads the workflow', () => {
+    const { name } = suiteStep();
+    const command = `pnpm vitest run --project=${suiteProject()} ${SUITE_PATH}`;
+    const steps = stepsRunning(name, command);
 
     expect(
-      globs.length,
-      `\`${VITEST_CONFIG_PATH}\` lists no include glob`
-    ).toBeGreaterThan(0);
+      steps,
+      `\`${name}\` declares no step running \`${command}\``
+    ).toHaveLength(1);
     expect(
-      picomatch(globs, { dot: true })(SUITE_PATH),
-      `\`${VITEST_CONFIG_PATH}\` does not collect \`${SUITE_PATH}\``
-    ).toBe(true);
+      steps[0].if,
+      `\`${name}\` step "${steps[0].name}" declares an \`if:\``
+    ).toBeUndefined();
   });
 
   // GitHub skips a job when any `needs:` entry skips, so a gated predecessor
