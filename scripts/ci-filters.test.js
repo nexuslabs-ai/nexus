@@ -19,17 +19,27 @@ const SUITE_PATH = path
   .relative(repoRoot, url.fileURLToPath(import.meta.url))
   .replaceAll(path.sep, '/');
 
-// Every file the model parses, recorded as it is read: a new input joins the
-// paths the job running this suite has to open on, without being declared
-// twice.
-const MODEL_INPUTS = [];
+// Every file the model parses, recorded as it is read, so a new input joins
+// the paths the job running this suite has to open on.
+const parsedFiles = [];
+
+// Declared as well as detected, like `REQUIRED_JOBS`: a read routed around
+// `parsedFile` drops its file from the gate the job running this suite is held
+// to, and a record that only grows cannot tell that from a file the model
+// stopped reading.
+const PARSED_FILES = [
+  WORKFLOW_PATH,
+  'package.json',
+  'pnpm-workspace.yaml',
+  'turbo.json',
+];
 
 // A parse error here empties the suite, so it names the file it could not read
 // rather than surfacing as a bare `SyntaxError` with no tests collected.
 function parsedFile(file, parseText) {
   const text = fs.readFileSync(path.join(repoRoot, file), 'utf8');
 
-  MODEL_INPUTS.push(file);
+  parsedFiles.push(file);
 
   try {
     return parseText(text);
@@ -289,7 +299,7 @@ function suiteStep() {
 // Built where it is read, so a `parsedFile` call added below here still joins
 // the list rather than being recorded into a spread that already happened.
 function suiteInputs() {
-  return [...new Set([...MODEL_INPUTS, 'vitest.config.ts', SUITE_PATH])];
+  return [...new Set([...parsedFiles, 'vitest.config.ts', SUITE_PATH])];
 }
 
 // The steps of one job that run a given command outright.
@@ -339,6 +349,11 @@ const CONDITIONAL_STEPS = {
   'ci-status / Fail on any required-job failure or cancellation':
     "${{ contains(needs.*.result, 'failure') || contains(needs.*.result, 'cancelled') }}",
 };
+
+// A pinned condition resolves against a step id declared in the same job, so
+// the id is part of the guard: dropping `id: regen` makes every audit guard
+// false with the job still green and every pin here still matching.
+const STEP_REFERENCE = /\bsteps\.([\w-]+)\./g;
 
 // A job whose `if:` reads a changes output is gated on the filters; `always()`
 // and unconditional jobs are not.
@@ -772,15 +787,36 @@ describe('ci path filters', () => {
   // covers, like `continue-on-error`, rather than asserted at the handful of
   // sites this suite happens to model.
   it('runs every step of every gate job unconditionally', () => {
-    const conditional = Object.fromEntries(
-      GATE_JOBS.flatMap((name) =>
-        stepsOf(name)
-          .filter((step) => step.if !== undefined)
-          .map((step) => [`${name} / ${step.name}`, step.if])
-      )
+    // Flat rather than keyed by step: `ci.yml` does not make a step name
+    // unique within a job, and a map drops the duplicate that sorts first.
+    const conditional = GATE_JOBS.flatMap((name) =>
+      stepsOf(name)
+        .filter((step) => step.if !== undefined)
+        .map((step) => `${name} / ${step.name}: ${step.if}`)
+    );
+    const allowed = Object.entries(CONDITIONAL_STEPS).map(
+      ([step, condition]) => `${step}: ${condition}`
     );
 
-    expect(conditional, 'steps declaring an `if:`').toEqual(CONDITIONAL_STEPS);
+    expect(conditional.sort(), 'steps declaring an `if:`').toEqual(
+      allowed.sort()
+    );
+  });
+
+  it('declares every step id a pinned condition reads', () => {
+    const dangling = Object.entries(CONDITIONAL_STEPS).flatMap(
+      ([step, condition]) => {
+        const [name] = step.split(' / ');
+        const ids = stepsOf(name).map((declared) => declared.id);
+
+        return [...condition.matchAll(STEP_REFERENCE)]
+          .map(([, id]) => id)
+          .filter((id) => !ids.includes(id))
+          .map((id) => `${step}: steps.${id}`);
+      }
+    );
+
+    expect(dangling, 'conditions reading an undeclared step id').toEqual([]);
   });
 
   it('declares exactly the jobs that narrow turbo', () => {
@@ -879,11 +915,18 @@ describe('ci path filters', () => {
     );
   });
 
+  // The record is what carries a parse into `suiteInputs`, so a read routed
+  // around `parsedFile` leaves its file ungated with everything below green.
+  it('parses every file it declares as a model input', () => {
+    expect([...parsedFiles].sort(), 'files the model parses').toEqual(
+      [...PARSED_FILES].sort()
+    );
+  });
+
   // A tracked path for every input, so an entry naming no file — the config
   // renamed, this file moved — fails here rather than passing below as a path
   // no filter has to match.
   it('names a tracked file for every input this suite reads', () => {
-    expect(MODEL_INPUTS.length, 'files the model parses').toBeGreaterThan(0);
     expect(
       suiteInputs().filter((file) => !trackedFiles.includes(file)),
       'suite inputs naming no tracked file'
