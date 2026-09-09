@@ -8,14 +8,13 @@
         "src/**",
         "tokens/primitives/color.json",
         "tsup.config.ts",
-        "tsconfig.json",
-        "package.json"
+        "tsconfig.json"
       ],
       "outputs": ["dist/runtime/**"]
     },
     "build:tailwind": {
       "dependsOn": ["build"],
-      "inputs": ["scripts/**", "tokens/**", "src/lib/perceptual-grid.json"],
+      "inputs": ["scripts/**", "tokens/**"],
       "outputs": ["dist/tailwind/**"]
     }
   }
