@@ -333,7 +333,7 @@ The two configs therefore default to different browsers — Brave under Claude C
 
 This is a change for macOS: `.codex/config.toml` used to pin Brave, so Codex now drives system Chrome instead — and nothing at all if Chrome is not installed. Use the override below to put it back on Brave.
 
-To drive a different browser under Codex, add a second server under its own name to `~/.codex/config.toml` — a distinct name avoids depending on how Codex ranks project config against user config:
+To drive a different browser under Codex, add a second server under its own name to `~/.codex/config.toml`. Codex ranks the project's `.codex/config.toml` above your user config, so redefining `chrome-devtools` there would not take effect — a distinct name sidesteps that ordering entirely:
 
 ```toml
 [mcp_servers.chrome-devtools-local]
@@ -341,15 +341,11 @@ command = "npx"
 args = [
     "chrome-devtools-mcp@latest",
     "--executable-path=/usr/bin/brave-browser",
+    "--isolated",
 ]
 ```
 
-Both servers then load and expose the same tool set, so picking the right one is a per-session choice rather than something the config settles. To take the project server out of the running, park it with the documented `enabled` key — subject to the same untested precedence question as everything else in this section:
-
-```toml
-[mcp_servers.chrome-devtools]
-enabled = false
-```
+Both servers stay registered and expose the same tool set, so the choice is per-session: point the agent at the `chrome-devtools-local` tools. `--isolated` is what lets it run at all — without it both servers launch into `~/.cache/chrome-devtools-mcp/chrome-profile` and whichever starts second fails with `The browser is already running for …`.
 
 ---
 
