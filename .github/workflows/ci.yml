@@ -334,6 +334,10 @@ jobs:
       - name: Run unit tests
         run: pnpm test:unit
 
+      # Fails the job when `scripts/ci-filters.test.js` stops being collected.
+      - name: Run the CI filter suite by path
+        run: pnpm exec vitest run --project=unit --no-passWithNoTests scripts/ci-filters.test.js
+
   audit-tokens:
     name: Audit Tokens
     runs-on: ubuntu-latest
