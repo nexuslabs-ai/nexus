@@ -63,12 +63,15 @@ const UNGATED_JOBS = ['format-check', 'lint'];
 const OUTPUT_READ = /needs\.changes\.outputs\.(\w+)/g;
 const GATE_TERM = /^needs\.changes\.outputs\.(\w+) == 'true'$/;
 const GUARD_TERM = /^\[ "([^"]*)" = "([^"]*)" \]$/;
-const RESULT_TERM = /^contains\(needs\.\*\.result, '(\w+)'\)$/;
+const RESULT_TERM = /^contains\(needs\.\*\.result,\s*'(\w+)'\)$/;
 const EXPRESSION = /\$\{\{\s*([^}]+?)\s*\}\}/g;
 const WRAPPED_EXPRESSION = /^\$\{\{\s*(.+?)\s*\}\}$/;
 // Opens, extends, or closes a branch chain. A script carrying none of these
 // runs everything it lists; one carrying any must parse as a flat chain.
 const CONTROL_LINE = /^\s*(?:(?:el)?if|then|else|fi)\b/;
+// A whole command, not a fragment: `echo "..." # exit 1` mentions one and runs
+// none.
+const EXIT_FAILURE = /^exit [1-9]\d*$/;
 // The whole task set, run by name. Asserting this exact shape rather than
 // denying known narrowing flags means every other way to narrow — `--filter`,
 // `-F`, `--affected`, or a `pkg#task` argument — fails without being listed.
@@ -126,15 +129,16 @@ function filtersGating(name) {
 // `&&`, which fires only when one job failed and another was cancelled.
 function resultsPropagatedBy(step) {
   const condition = typeof step.if === 'string' ? step.if.trim() : '';
-  const [, expression] = condition.match(WRAPPED_EXPRESSION) ?? [];
 
-  if (!expression) {
-    throw new Error(
-      `ci.yml \`ci-status\` failing step \`if:\` is not one expression: ${condition}`
-    );
+  if (!condition) {
+    throw new Error('ci.yml `ci-status` failing step declares no `if:`');
   }
 
-  return expression.split('||').map((term) => {
+  // `${{ }}` around a step `if:` is optional, and both spellings are the same
+  // expression.
+  const [, unwrapped] = condition.match(WRAPPED_EXPRESSION) ?? [];
+
+  return (unwrapped ?? condition).split('||').map((term) => {
     const [, result] = term.trim().match(RESULT_TERM) ?? [];
 
     if (!result) {
@@ -275,6 +279,16 @@ function branchesOf(script) {
   return branches.map(({ guard, body }) => ({ guard, body: body.join('\n') }));
 }
 
+// A step fails its job only where nothing can route around the exit, so the
+// exit has to sit in a branch that carries no guard.
+function failsUnconditionally(script) {
+  return branchesOf(script).some(
+    ({ guard, body }) =>
+      guard === null &&
+      body.split('\n').some((line) => EXIT_FAILURE.test(line.trim()))
+  );
+}
+
 // A guard the model cannot resolve must throw. Silently reading it as unequal
 // would send every case to `else` and pass whatever sits there.
 function operand(value, env) {
@@ -318,31 +332,35 @@ const ROOT_CONFIG_PULL_REQUEST = {
   'github.event_name': 'pull_request',
 };
 
+// Only turbo runs can narrow the task set, and the branch model must not be
+// pointed at scripts that never do.
+function turboStepsOf(name) {
+  return jobNamed(name).steps.filter(
+    (step) =>
+      step.run !== undefined &&
+      commandsOf(step.run).some((line) => line.includes('turbo'))
+  );
+}
+
+// Every branch, so a run narrowed on the `push` path is as visible as one
+// narrowed on the pull-request path.
+function turboLinesOf(step) {
+  return branchesOf(step.run).flatMap(turboLinesIn);
+}
+
 // Narrowing is read off the one shape the suite already trusts: a turbo line
 // that is neither the whole task set nor an exempted fixed target. Detecting it
 // this way rather than by matching known scoping spellings means `--affected`,
 // a `[HEAD^1]` range, `-F`, and a `pkg#task` argument are all caught without
-// being enumerated. Every branch is read, so narrowing on the `push` path is as
-// visible as narrowing on the pull-request one.
+// being enumerated.
 function narrowingStepsOf(name) {
-  return jobNamed(name).steps.filter((step) => {
-    const script = step.run;
-
-    if (script === undefined) return false;
-    // Only turbo runs can narrow the task set, and the branch model must not be
-    // pointed at scripts that never do.
-    if (!commandsOf(script).some((line) => line.includes('turbo')))
-      return false;
-
+  return turboStepsOf(name).filter((step) => {
     const mayFixTarget = FIXED_TARGET_STEPS.includes(`${name} / ${step.name}`);
+    const allowed = (line) =>
+      UNFILTERED_RUN.test(line) ||
+      (mayFixTarget && FIXED_TARGET_RUN.test(line));
 
-    return branchesOf(script)
-      .flatMap(turboLinesIn)
-      .some(
-        (line) =>
-          !UNFILTERED_RUN.test(line) &&
-          !(mayFixTarget && FIXED_TARGET_RUN.test(line))
-      );
+    return turboLinesOf(step).some((line) => !allowed(line));
   });
 }
 
@@ -378,10 +396,8 @@ describe('ci path filters', () => {
 
     expect(aggregator.if).toBe('always()');
 
-    // A commented-out `exit 1` fails nothing, so the step is found by the
-    // commands it runs rather than by its raw script.
-    const failing = aggregator.steps.filter((step) =>
-      commandsOf(step.run ?? '').some((line) => /\bexit 1\b/.test(line))
+    const failing = aggregator.steps.filter(
+      (step) => step.run !== undefined && failsUnconditionally(step.run)
     );
 
     expect(failing, '`ci-status` declares no failing step').toHaveLength(1);
@@ -391,20 +407,45 @@ describe('ci path filters', () => {
     ).toEqual(['cancelled', 'failure']);
   });
 
+  // A failure reaches the gate only if it is allowed to stand.
+  // `continue-on-error` turns one into a success at either level: on a required
+  // job it reports `success` to `needs.*.result`, and on the aggregator it lets
+  // the required check pass while its own step exits non-zero.
+  it('lets a failure stand in every required job', () => {
+    const gateJobs = ['ci-status', ...requiredJobs];
+
+    const tolerated = [
+      ...gateJobs.filter(
+        (name) => jobNamed(name)['continue-on-error'] !== undefined
+      ),
+      ...gateJobs.flatMap((name) =>
+        jobNamed(name)
+          .steps.filter((step) => step['continue-on-error'] !== undefined)
+          .map((step) => `${name} / ${step.name}`)
+      ),
+    ];
+
+    expect(tolerated, 'places declaring `continue-on-error`').toEqual([]);
+  });
+
   it('declares exactly the jobs that narrow turbo', () => {
     const scoped = jobNames.filter((name) => narrowingStepsOf(name).length > 0);
 
     expect(scoped.sort()).toEqual([...DIFF_SCOPED_JOBS].sort());
   });
 
-  it('names a live step for every fixed-target exemption', () => {
-    const stepNames = jobNames.flatMap((name) =>
-      jobNamed(name).steps.map((step) => `${name} / ${step.name}`)
+  it('exempts a live fixed-target run for every entry', () => {
+    const fixing = jobNames.flatMap((name) =>
+      turboStepsOf(name)
+        .filter((step) =>
+          turboLinesOf(step).some((line) => FIXED_TARGET_RUN.test(line))
+        )
+        .map((step) => `${name} / ${step.name}`)
     );
 
     expect(
-      FIXED_TARGET_STEPS.filter((step) => !stepNames.includes(step)),
-      'fixed-target exemptions naming no step'
+      FIXED_TARGET_STEPS.filter((step) => !fixing.includes(step)),
+      'fixed-target exemptions naming no fixed-target run'
     ).toEqual([]);
   });
 
