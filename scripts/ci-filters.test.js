@@ -11,8 +11,14 @@ const repoRoot = path.resolve(
   '..'
 );
 
+const WORKFLOW_PATH = '.github/workflows/ci.yml';
+
 const workflow = parse(
-  fs.readFileSync(path.join(repoRoot, '.github/workflows/ci.yml'), 'utf8')
+  fs.readFileSync(path.join(repoRoot, WORKFLOW_PATH), 'utf8')
+);
+
+const turboConfig = JSON.parse(
+  fs.readFileSync(path.join(repoRoot, 'turbo.json'), 'utf8')
 );
 
 function jobNamed(name) {
@@ -80,13 +86,14 @@ const CONTROL_LINE = /^\s*(?:(?:el)?if|then|else|fi)\b/;
 // A whole command, not a fragment: `echo "..." # exit 1` mentions one and runs
 // none.
 const EXIT_FAILURE = /^exit [1-9]\d*$/;
-// Everything a failing step is allowed to run before that exit, each as one
-// whole command. A `;`, `&&`, or `||` would let a terminator ride an allowed
-// prefix, and a trailing `\` would fold the exit into the line above it — both
-// leave the gate green. The prelude is pinned rather than prefixed, so `set -n`
-// and `set -o noexec`, which parse the exit without running it, are not spellings
-// of an allowed command.
-const FAIL_STEP_COMMAND = /^(?:echo [^;&|\\]*|set -euo pipefail)$/;
+// A message the failing step may print before the exit. `;`, `&&`, and `||`
+// would let a terminator ride the echo; `<` would read the exit as heredoc
+// body; a trailing `\` would fold it into this line.
+const FAIL_STEP_ECHO = /^echo [^;&|<]*[^;&|<\\]$/;
+// The shell options it may set. `-o` takes `pipefail` and nothing else, and the
+// letters exclude `n`, so neither spelling of noexec — which parses the exit
+// without running it — is an allowed command.
+const FAIL_STEP_PRELUDE = /^set -[eux]*(?:o pipefail)?$/;
 // The whole task set, run by name. Asserting this exact shape rather than
 // denying known narrowing flags means every other way to narrow — `--filter`,
 // `-F`, `--affected`, or a `pkg#task` argument — fails without being listed.
@@ -210,6 +217,16 @@ const REQUIRED_JOBS = [
 // out of it.
 const DIFF_SCOPED_JOBS = ['build', 'typecheck'];
 
+// A diff-scoped run is sound only while nothing in turbo's global hash changed.
+// Read from `turbo.json` rather than restated, plus the config declaring them
+// and the two files turbo hashes for every run.
+const TURBO_GLOBALS = [
+  'turbo.json',
+  'pnpm-lock.yaml',
+  'package.json',
+  ...(turboConfig.globalDependencies ?? []),
+];
+
 // `continue-on-error: false` is the default and lets a failure stand. `true`
 // swallows it, and an expression is a value the model cannot resolve — both are
 // rejected.
@@ -331,7 +348,9 @@ function failsUnconditionally(script) {
 
   if (!EXIT_FAILURE.test(commands.at(-1) ?? '')) return false;
 
-  return commands.slice(0, -1).every((line) => FAIL_STEP_COMMAND.test(line));
+  return commands
+    .slice(0, -1)
+    .every((line) => FAIL_STEP_ECHO.test(line) || FAIL_STEP_PRELUDE.test(line));
 }
 
 // A guard the model cannot resolve must throw. Silently reading it as unequal
@@ -418,6 +437,11 @@ describe('ci path filters', () => {
   // enough: a step that is skipped, or pointed at a diff of nothing, empties
   // all four outputs and skips every gated job with the aggregator still green.
   it('detects changed paths against the pull request diff', () => {
+    // The outputs, and the `dot: true` matching model the coverage tests use,
+    // are this action's behaviour. Any other action reports no outputs at all.
+    expect(detectStep.uses, '`filter` step action').toBe(
+      'dorny/paths-filter@v4'
+    );
     expect(detectStep.if, '`filter` step declares an `if:`').toBeUndefined();
     // `filters` is the only input the model reads. `base`, `ref`, and
     // `working-directory` each redirect what the filters are matched against.
@@ -472,6 +496,24 @@ describe('ci path filters', () => {
       DIFF_SCOPED_JOBS.filter((name) => !requiredJobs.includes(name)),
       'diff-scoped jobs missing from `ci-status` needs'
     ).toEqual([]);
+  });
+
+  // The run-step model reads `run:` as a script bash executes. A `shell:`
+  // override such as `bash -n {0}` parses that script without running it, so
+  // every command the model reads — the aggregator's exit, the turbo lines —
+  // becomes inert while the suite still sees them.
+  it('runs every step under the default shell', () => {
+    const overrides = [
+      ...(workflow.defaults === undefined ? [] : [WORKFLOW_PATH]),
+      ...jobNames.filter((name) => jobNamed(name).defaults !== undefined),
+      ...jobNames.flatMap((name) =>
+        stepsOf(name)
+          .filter((step) => step.shell !== undefined)
+          .map((step) => `${name} / ${step.name}`)
+      ),
+    ];
+
+    expect(overrides, 'places overriding the shell').toEqual([]);
   });
 
   // Membership in `needs:` blocks a merge only if the aggregator runs when an
@@ -554,6 +596,9 @@ describe('ci path filters', () => {
 
       for (const step of steps) {
         const where = `\`${name}\` step "${step.name}"`;
+
+        expect(step.if, `${where} declares an \`if:\``).toBeUndefined();
+
         const taken = branchesOf(step.run).find(({ guard }) =>
           guardHolds(guard, ROOT_CONFIG_PULL_REQUEST)
         );
@@ -570,6 +615,26 @@ describe('ci path filters', () => {
       }
     }
   );
+
+  it('gates on a change to the workflow this suite reads', () => {
+    const isGated = picomatch(gatingFilters.flatMap(filterNamed), {
+      dot: true,
+    });
+
+    expect(
+      isGated(WORKFLOW_PATH),
+      `no gating filter matches \`${WORKFLOW_PATH}\``
+    ).toBe(true);
+  });
+
+  it('treats every turbo global dependency as root config', () => {
+    const rootConfig = filterNamed('root_config');
+
+    expect(
+      TURBO_GLOBALS.filter((file) => !rootConfig.includes(file)),
+      "turbo's global hash inputs missing from the `root_config` filter"
+    ).toEqual([]);
+  });
 
   it('forwards every filter output it exports', () => {
     for (const [name, value] of Object.entries(jobNamed('changes').outputs)) {
