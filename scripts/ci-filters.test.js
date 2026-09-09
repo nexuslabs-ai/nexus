@@ -25,9 +25,17 @@ function jobNamed(name) {
   return job;
 }
 
-const detectStep = jobNamed('changes').steps.find(
-  (step) => step.id === 'filter'
-);
+function stepsOf(name) {
+  const { steps } = jobNamed(name);
+
+  if (!Array.isArray(steps)) {
+    throw new Error(`ci.yml \`${name}\` job declares no \`steps:\``);
+  }
+
+  return steps;
+}
+
+const detectStep = stepsOf('changes').find((step) => step.id === 'filter');
 
 if (!detectStep) {
   throw new Error('ci.yml `changes` job declares no step with `id: filter`');
@@ -72,6 +80,9 @@ const CONTROL_LINE = /^\s*(?:(?:el)?if|then|else|fi)\b/;
 // A whole command, not a fragment: `echo "..." # exit 1` mentions one and runs
 // none.
 const EXIT_FAILURE = /^exit [1-9]\d*$/;
+// Everything a failing step is allowed to run before that exit. An unlisted
+// command is not read past — `[ … ] && exit 0` would leave the gate green.
+const FAIL_STEP_COMMAND = /^echo /;
 // The whole task set, run by name. Asserting this exact shape rather than
 // denying known narrowing flags means every other way to narrow — `--filter`,
 // `-F`, `--affected`, or a `pkg#task` argument — fails without being listed.
@@ -172,11 +183,35 @@ const gatedJobs = requiredJobs.filter((name) => {
 
 const gatingFilters = [...new Set(gatedJobs.flatMap(filtersGating))];
 
+// Every job the merge gate carries. Declared as well as detected: dropping one
+// from `ci-status`'s `needs:` must fail the suite rather than quietly shrink
+// both the gate and the coverage measured against it.
+const REQUIRED_JOBS = [
+  'audit-browser-support',
+  'audit-tokens',
+  'build',
+  'build-storybook',
+  'bundle-size',
+  'changes',
+  'format-check',
+  'lint',
+  'test-react',
+  'test-unit',
+  'typecheck',
+];
+
 // The jobs that narrow turbo on an ordinary PR, and so must fall through to an
 // unfiltered run when a root-config change selects nothing. Declared as well as
 // detected: a job that starts or stops narrowing must fail the suite, not drop
 // out of it.
 const DIFF_SCOPED_JOBS = ['build', 'typecheck'];
+
+// `continue-on-error: false` is the default and lets a failure stand. `true`
+// swallows it, and an expression is a value the model cannot resolve — both are
+// rejected.
+function toleratesFailure(declaration) {
+  return declaration !== undefined && declaration !== false;
+}
 
 // A comment is not a command: a step that merely mentions a flag must not be
 // read as running it.
@@ -279,14 +314,20 @@ function branchesOf(script) {
   return branches.map(({ guard, body }) => ({ guard, body: body.join('\n') }));
 }
 
-// A step fails its job only where nothing can route around the exit, so the
-// exit has to sit in a branch that carries no guard.
+// A step fails its job only where nothing can route around the exit: one
+// chain-free branch — an `else` arm carries no guard either, so a null guard
+// alone is not enough — ending in a non-zero `exit`, with nothing before it
+// that could exit first.
 function failsUnconditionally(script) {
-  return branchesOf(script).some(
-    ({ guard, body }) =>
-      guard === null &&
-      body.split('\n').some((line) => EXIT_FAILURE.test(line.trim()))
-  );
+  const branches = branchesOf(script);
+
+  if (branches.length !== 1 || branches[0].guard !== null) return false;
+
+  const commands = commandsOf(branches[0].body).map((line) => line.trim());
+
+  if (!EXIT_FAILURE.test(commands.at(-1) ?? '')) return false;
+
+  return commands.slice(0, -1).every((line) => FAIL_STEP_COMMAND.test(line));
 }
 
 // A guard the model cannot resolve must throw. Silently reading it as unequal
@@ -335,7 +376,7 @@ const ROOT_CONFIG_PULL_REQUEST = {
 // Only turbo runs can narrow the task set, and the branch model must not be
 // pointed at scripts that never do.
 function turboStepsOf(name) {
-  return jobNamed(name).steps.filter(
+  return stepsOf(name).filter(
     (step) =>
       step.run !== undefined &&
       commandsOf(step.run).some((line) => line.includes('turbo'))
@@ -378,6 +419,10 @@ describe('ci path filters', () => {
     expect(jobNamed(name).if).toBeUndefined();
   });
 
+  it('carries exactly the declared jobs on the merge gate', () => {
+    expect([...requiredJobs].sort()).toEqual([...REQUIRED_JOBS].sort());
+  });
+
   it('lists every load-bearing job in ci-status needs', () => {
     // `changes` too: every gated `if:` reads its outputs, so a `changes`
     // failure empties all of them and skips the jobs rather than failing them.
@@ -396,11 +441,14 @@ describe('ci path filters', () => {
 
     expect(aggregator.if).toBe('always()');
 
-    const failing = aggregator.steps.filter(
+    const failing = stepsOf('ci-status').filter(
       (step) => step.run !== undefined && failsUnconditionally(step.run)
     );
 
-    expect(failing, '`ci-status` declares no failing step').toHaveLength(1);
+    expect(
+      failing,
+      '`ci-status` declares no step that fails unconditionally'
+    ).toHaveLength(1);
     expect(
       resultsPropagatedBy(failing[0]).sort(),
       '`ci-status` failing step does not run on both results'
@@ -415,12 +463,12 @@ describe('ci path filters', () => {
     const gateJobs = ['ci-status', ...requiredJobs];
 
     const tolerated = [
-      ...gateJobs.filter(
-        (name) => jobNamed(name)['continue-on-error'] !== undefined
+      ...gateJobs.filter((name) =>
+        toleratesFailure(jobNamed(name)['continue-on-error'])
       ),
       ...gateJobs.flatMap((name) =>
-        jobNamed(name)
-          .steps.filter((step) => step['continue-on-error'] !== undefined)
+        stepsOf(name)
+          .filter((step) => toleratesFailure(step['continue-on-error']))
           .map((step) => `${name} / ${step.name}`)
       ),
     ];
