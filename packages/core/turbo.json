@@ -1,0 +1,20 @@
+{
+  "$schema": "https://turbo.build/schema.json",
+  "extends": ["//"],
+  "tasks": {
+    "build": {
+      "inputs": [
+        "src/**",
+        "tokens/primitives/color.json",
+        "tsup.config.ts",
+        "tsconfig.json"
+      ],
+      "outputs": ["dist/runtime/**"]
+    },
+    "build:tailwind": {
+      "dependsOn": ["build"],
+      "inputs": ["scripts/**", "tokens/**"],
+      "outputs": ["dist/tailwind/**"]
+    }
+  }
+}
