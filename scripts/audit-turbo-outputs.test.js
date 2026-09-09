@@ -7,6 +7,16 @@ function task(taskId, { command = 'build', outputs = [] } = {}) {
 }
 
 describe('auditTurboOutputs', () => {
+  it('passes for the current repository', { timeout: 120_000 }, () => {
+    expect(auditTurboOutputs()).toEqual({ ok: true, problems: [] });
+  });
+
+  it('throws when turbo reports no build tasks', () => {
+    expect(() => auditTurboOutputs({ tasks: [] })).toThrow(
+      /turbo reported no `build` tasks/
+    );
+  });
+
   it('passes when every build-scripted package declares outputs', () => {
     const result = auditTurboOutputs({
       tasks: [

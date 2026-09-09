@@ -10,8 +10,15 @@ const REPO_ROOT = path.resolve(__dirname, '..');
 const NO_SCRIPT_COMMAND = '<NONEXISTENT>';
 
 export function auditTurboOutputs(options = {}) {
-  const repoRoot = options.repoRoot ?? REPO_ROOT;
-  const tasks = options.tasks ?? readBuildTasks(repoRoot);
+  const tasks = options.tasks ?? readBuildTasks();
+
+  if (!Array.isArray(tasks) || tasks.length === 0) {
+    throw new Error(
+      'turbo reported no `build` tasks. The `--dry=json` payload shape has ' +
+        'changed, so the audit cannot verify any output declaration.'
+    );
+  }
+
   const problems = [];
 
   for (const task of tasks) {
@@ -30,15 +37,19 @@ export function auditTurboOutputs(options = {}) {
   return { ok: problems.length === 0, problems };
 }
 
-function readBuildTasks(repoRoot) {
-  const stdout = execFileSync('npx', ['turbo', 'run', 'build', '--dry=json'], {
-    cwd: repoRoot,
-    encoding: 'utf8',
-    maxBuffer: 64 * 1024 * 1024,
-    shell: true,
-  });
+function readBuildTasks() {
+  const stdout = execFileSync(
+    'pnpm',
+    ['exec', 'turbo', 'run', 'build', '--dry=json'],
+    {
+      cwd: REPO_ROOT,
+      encoding: 'utf8',
+      maxBuffer: 64 * 1024 * 1024,
+      shell: true,
+    }
+  );
 
-  return JSON.parse(stdout).tasks ?? [];
+  return JSON.parse(stdout).tasks;
 }
 
 function printResult(result) {

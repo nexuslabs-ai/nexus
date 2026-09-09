@@ -32,6 +32,7 @@ jobs:
       browser: ${{ steps.filter.outputs.browser }}
       browser_source: ${{ steps.filter.outputs.browser_source }}
       root_config: ${{ steps.filter.outputs.root_config }}
+      scripts: ${{ steps.filter.outputs.scripts }}
       # `packages` is true if any package OR any app changed — both are built
       # and typechecked by the shared turbo `build` / `typecheck` jobs.
       packages: ${{ steps.filter.outputs.packages }}
@@ -78,6 +79,13 @@ jobs:
               - 'tsconfig.json'
               - 'package.json'
               - 'turbo.json'
+              - 'pnpm-workspace.yaml'
+              - 'pnpm-lock.yaml'
+            # Repo-level scripts sit outside every workspace, so no package
+            # filter matches them. They are linted, unit-tested, and run by
+            # the build and typecheck jobs, so gate all four here.
+            scripts:
+              - 'scripts/**'
             ci:
               - '.github/workflows/**'
 
@@ -91,6 +99,7 @@ jobs:
     if: >-
       needs.changes.outputs.browser_source == 'true' ||
       needs.changes.outputs.browser == 'true' ||
+      needs.changes.outputs.scripts == 'true' ||
       needs.changes.outputs.ci == 'true'
     steps:
       - name: Checkout
@@ -118,6 +127,7 @@ jobs:
     if: >-
       needs.changes.outputs.browser_source == 'true' ||
       needs.changes.outputs.browser == 'true' ||
+      needs.changes.outputs.scripts == 'true' ||
       needs.changes.outputs.ci == 'true'
     steps:
       - name: Checkout
@@ -182,7 +192,7 @@ jobs:
     name: Build
     runs-on: ubuntu-latest
     needs: changes
-    if: needs.changes.outputs.packages == 'true' || needs.changes.outputs.ci == 'true' || needs.changes.outputs.root_config == 'true'
+    if: needs.changes.outputs.packages == 'true' || needs.changes.outputs.ci == 'true' || needs.changes.outputs.root_config == 'true' || needs.changes.outputs.scripts == 'true'
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -215,13 +225,22 @@ jobs:
       - name: Build affected packages
         env:
           BASE_REF: ${{ github.base_ref }}
+          BUILD_LOG: ${{ runner.temp }}/turbo-build.log
         run: |
+          set -euo pipefail
           if [ "${{ needs.changes.outputs.ci }}" = "true" ] || [ "${{ needs.changes.outputs.root_config }}" = "true" ]; then
-            pnpm turbo build
+            pnpm turbo build 2>&1 | tee "$BUILD_LOG"
           elif [ "${{ github.event_name }}" = "pull_request" ]; then
-            pnpm turbo build --filter="...[origin/$BASE_REF]"
+            pnpm turbo build --filter="...[origin/$BASE_REF]" 2>&1 | tee "$BUILD_LOG"
           else
-            pnpm turbo build
+            pnpm turbo build 2>&1 | tee "$BUILD_LOG"
+          fi
+
+          # Turbo only warns when a task's declared outputs match nothing, so a
+          # wrong glob caches an empty artifact and the audit above still passes.
+          if grep -q 'no output files found for task' "$BUILD_LOG"; then
+            echo '::error::A build task declared outputs that matched no emitted files. Fix the outputs glob in that package turbo.json.'
+            exit 1
           fi
 
       - name: Upload build artifacts
@@ -240,7 +259,7 @@ jobs:
     name: TypeScript Check
     runs-on: ubuntu-latest
     needs: [changes, build]
-    if: needs.changes.outputs.packages == 'true' || needs.changes.outputs.ci == 'true' || needs.changes.outputs.root_config == 'true'
+    if: needs.changes.outputs.packages == 'true' || needs.changes.outputs.ci == 'true' || needs.changes.outputs.root_config == 'true' || needs.changes.outputs.scripts == 'true'
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -308,6 +327,7 @@ jobs:
     if: >-
       needs.changes.outputs.browser_source == 'true' ||
       needs.changes.outputs.browser == 'true' ||
+      needs.changes.outputs.scripts == 'true' ||
       needs.changes.outputs.ci == 'true'
     steps:
       - name: Checkout
