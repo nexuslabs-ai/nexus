@@ -32,9 +32,8 @@ jobs:
       browser: ${{ steps.filter.outputs.browser }}
       browser_source: ${{ steps.filter.outputs.browser_source }}
       scripts: ${{ steps.filter.outputs.scripts }}
-      # Root-level changes affect every package, so the build and typecheck
-      # jobs run unfiltered rather than resolving to zero tasks. Both read this
-      # single expression so their gates cannot drift apart.
+      # True when the change is root-level, so build and typecheck run
+      # unfiltered instead of resolving to zero tasks.
       build_all: ${{ steps.filter.outputs.ci == 'true' || steps.filter.outputs.root_config == 'true' || steps.filter.outputs.build_scripts == 'true' }}
       # `packages` is true if any package OR any app changed — both are built
       # and typechecked by the shared turbo `build` / `typecheck` jobs.
@@ -73,10 +72,7 @@ jobs:
               - 'AGENTS.md'
               - 'RTK.md'
             # Root config sits outside every package, so turbo's
-            # `--filter=...[base]` selects no tasks for it; the build and
-            # typecheck jobs detect it here and run unfiltered instead.
-            # `package.json` carries the `browserslist` that `next build`
-            # resolves upward, and `turbo.json` owns the task graph.
+            # `--filter=...[base]` selects no tasks for it.
             root_config:
               - 'tsconfig.base.json'
               - 'tsconfig.json'
@@ -85,12 +81,10 @@ jobs:
               - 'pnpm-workspace.yaml'
               - 'pnpm-lock.yaml'
             # Repo-level scripts sit outside every workspace, so no package
-            # filter matches them. `scripts` gates the jobs that lint and
-            # unit-test the whole tree.
+            # filter matches them.
             scripts:
               - 'scripts/**'
-            # The subset the build and typecheck jobs actually execute. These
-            # build unfiltered, so the artifacts typecheck downloads exist.
+            # The subset the build and typecheck jobs execute.
             build_scripts:
               - 'scripts/audit-turbo-outputs.js'
               - 'scripts/typecheck-tailwind-dist.mjs'
@@ -250,8 +244,6 @@ jobs:
           name: build-artifacts
           path: packages/**/dist
           retention-days: 1
-          # Every path into this job builds at least one emitting package, so
-          # an empty upload means the build silently produced nothing.
           if-no-files-found: error
 
   # ============================================

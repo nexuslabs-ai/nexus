@@ -7,12 +7,8 @@ import { fileURLToPath } from 'node:url';
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const REPO_ROOT = path.resolve(__dirname, '..');
 
-// turbo's entry is a node shim that execs the platform binary, so it runs under
-// `process.execPath` without a shell.
 const TURBO_BIN = createRequire(import.meta.url).resolve('turbo');
 
-// Turbo reports a task whose package has no matching script with this command
-// string; those packages emit nothing, so they are exempt from the check.
 const NO_SCRIPT_COMMAND = '<NONEXISTENT>';
 
 const WILDCARD = /[*?[\]{}]/;
@@ -81,8 +77,6 @@ export function auditEmittedOutputs(options = {}) {
   return { ok: problems.length === 0, problems };
 }
 
-// The leading path segments before the first wildcard — the shallowest
-// directory a glob can possibly match under.
 function literalPrefix(glob) {
   const segments = glob.split('/');
   const wildcard = segments.findIndex((segment) => WILDCARD.test(segment));
@@ -106,8 +100,6 @@ function resolveTasks(options) {
   const turboArgs = options.turboArgs ?? [];
   const tasks = options.tasks ?? readBuildTasks(repoRoot, turboArgs);
 
-  // A `--filter` can legitimately select nothing; an unfiltered run cannot, so
-  // an empty list there means the payload shape moved and nothing was checked.
   const filtered = turboArgs.some((arg) => arg.startsWith('--filter'));
 
   if (!Array.isArray(tasks) || (tasks.length === 0 && !filtered)) {
