@@ -80,9 +80,10 @@ const CONTROL_LINE = /^\s*(?:(?:el)?if|then|else|fi)\b/;
 // A whole command, not a fragment: `echo "..." # exit 1` mentions one and runs
 // none.
 const EXIT_FAILURE = /^exit [1-9]\d*$/;
-// Everything a failing step is allowed to run before that exit. An unlisted
-// command is not read past — `[ … ] && exit 0` would leave the gate green.
-const FAIL_STEP_COMMAND = /^echo /;
+// Everything a failing step is allowed to run before that exit, and each as a
+// whole command: a `;`, `&&`, or `||` would let a terminator ride an allowed
+// prefix — `echo "skip" && exit 0` leaves the gate green.
+const FAIL_STEP_COMMAND = /^(?:echo |set -)[^;&|]*$/;
 // The whole task set, run by name. Asserting this exact shape rather than
 // denying known narrowing flags means every other way to narrow — `--filter`,
 // `-F`, `--affected`, or a `pkg#task` argument — fails without being listed.
@@ -420,7 +421,28 @@ describe('ci path filters', () => {
   });
 
   it('carries exactly the declared jobs on the merge gate', () => {
+    // Anchored on the workflow as well as on the declared list: comparing
+    // `needs:` only against `REQUIRED_JOBS` leaves a job added to `ci.yml` and
+    // to neither list off the gate and blocking nothing.
+    const declared = jobNames.filter((name) => name !== 'ci-status');
+
     expect([...requiredJobs].sort()).toEqual([...REQUIRED_JOBS].sort());
+    expect(
+      declared.sort(),
+      'jobs declared in `ci.yml` but not on the merge gate'
+    ).toEqual([...requiredJobs].sort());
+  });
+
+  // Membership blocks a merge only if the job also runs. A required job whose
+  // `if:` is neither absent nor a changes-outputs gate is outside the filter
+  // model entirely, so it can sit in `needs:` and never run on a pull request.
+  it('runs every required job unconditionally or on a filter', () => {
+    const modelled = ['changes', ...UNGATED_JOBS, ...gatedJobs];
+
+    expect(
+      modelled.sort(),
+      'required jobs whose `if:` is not a changes-outputs gate'
+    ).toEqual([...requiredJobs].sort());
   });
 
   it('lists every load-bearing job in ci-status needs', () => {
