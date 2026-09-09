@@ -29,14 +29,16 @@ const workflow = parsedFile(WORKFLOW_PATH, parseYaml);
 
 const turboConfig = parsedFile('turbo.json', JSON.parse);
 
-const { packages: workspaceGlobs } = parsedFile(
-  'pnpm-workspace.yaml',
-  parseYaml
-);
+const workspace = parsedFile('pnpm-workspace.yaml', parseYaml);
 
-if (!Array.isArray(workspaceGlobs)) {
+if (!Array.isArray(workspace?.packages)) {
   throw new Error('pnpm-workspace.yaml declares no `packages:` globs');
 }
+
+// pnpm reads `!`-prefixed entries as exclusions, so they name no root.
+const workspaceGlobs = workspace.packages.filter(
+  (glob) => !glob.startsWith('!')
+);
 
 const rootFiles = execFileSync('git', ['ls-files'], {
   cwd: repoRoot,
@@ -634,13 +636,27 @@ describe('ci path filters', () => {
     ).toEqual([]);
   });
 
+  // `root_config` forces an unfiltered run, so an entry matching no tracked root
+  // file widens nothing and its job keeps narrowing on a change it cannot see.
+  it('selects a tracked root file for every root_config entry', () => {
+    const entries = filterNamed('root_config');
+
+    expect(entries.length).toBeGreaterThan(0);
+    expect(
+      entries.filter((entry) => {
+        const selects = picomatch(entry, { dot: true });
+        return !rootFiles.some((file) => selects(file));
+      }),
+      '`root_config` entries selecting no tracked root file'
+    ).toEqual([]);
+  });
+
   it.each(gatedJobs)('runs %s for every root_config path', (name) => {
     const gated = filtersGating(name).flatMap(filterNamed);
     // `dorny/paths-filter` matches with `dot: true`.
     const isGated = picomatch(gated, { dot: true });
     const widened = rootFiles.filter(widensRootConfig);
 
-    expect(widened.length).toBeGreaterThan(0);
     expect(widened.filter((file) => !isGated(file))).toEqual([]);
   });
 
@@ -684,19 +700,23 @@ describe('ci path filters', () => {
     ).toBe(true);
   });
 
-  // A workspace root is where packages live, so `packages` must gate it — a
-  // root pnpm declares but no filter matches puts a whole tree in the turbo
-  // graph with no job running for it. The glob names directories, so it is
-  // matched as a file inside one: the filter matches paths, not patterns.
+  // A workspace root is where packages live, so a gating filter must match it —
+  // a root pnpm declares but no gating filter matches puts a whole tree in the
+  // turbo graph with no job running for it. A filter that gates nothing is no
+  // coverage, so this measures against `gatingFilters`, not a named filter. The
+  // glob names directories, so it is matched as a file inside one: the filter
+  // matches paths, not patterns.
   it('gates every workspace root pnpm declares', () => {
-    const gatesPackages = picomatch(filterNamed('packages'), { dot: true });
+    const isGated = picomatch(gatingFilters.flatMap(filterNamed), {
+      dot: true,
+    });
 
     expect(workspaceGlobs.length).toBeGreaterThan(0);
     expect(
       workspaceGlobs.filter(
-        (glob) => !gatesPackages(`${glob.replace(/\*+/g, 'pkg')}/package.json`)
+        (glob) => !isGated(`${glob.replace(/\*+/g, 'pkg')}/package.json`)
       ),
-      'workspace roots the `packages` filter does not gate'
+      'workspace roots no gating filter matches'
     ).toEqual([]);
   });
 
