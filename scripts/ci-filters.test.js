@@ -17,9 +17,12 @@ const workflow = parse(
   fs.readFileSync(path.join(repoRoot, WORKFLOW_PATH), 'utf8')
 );
 
-const turboConfig = JSON.parse(
-  fs.readFileSync(path.join(repoRoot, 'turbo.json'), 'utf8')
-);
+const rootFiles = execFileSync('git', ['ls-files'], {
+  cwd: repoRoot,
+  encoding: 'utf8',
+})
+  .split('\n')
+  .filter((file) => file !== '' && !file.includes('/'));
 
 function jobNamed(name) {
   const job = workflow.jobs[name];
@@ -86,9 +89,10 @@ const CONTROL_LINE = /^\s*(?:(?:el)?if|then|else|fi)\b/;
 // A whole command, not a fragment: `echo "..." # exit 1` mentions one and runs
 // none.
 const EXIT_FAILURE = /^exit [1-9]\d*$/;
-// A message the failing step may print before the exit. `;`, `&&`, and `||`
-// would let a terminator ride the echo; `<` would read the exit as heredoc
-// body; a trailing `\` would fold it into this line.
+// A message the failing step may print before the exit. Any of `;`, `&`, `|`,
+// or `<` is rejected: each can chain, background, or redirect a terminator into
+// the line, and none is needed to print. A trailing `\` folds the exit into
+// this line.
 const FAIL_STEP_ECHO = /^echo [^;&|<]*[^;&|<\\]$/;
 // The shell options it may set. `-o` takes `pipefail` and nothing else, and the
 // letters exclude `n`, so neither spelling of noexec — which parses the exit
@@ -217,15 +221,11 @@ const REQUIRED_JOBS = [
 // out of it.
 const DIFF_SCOPED_JOBS = ['build', 'typecheck'];
 
-// A diff-scoped run is sound only while nothing in turbo's global hash changed.
-// Read from `turbo.json` rather than restated, plus the config declaring them
-// and the two files turbo hashes for every run.
-const TURBO_GLOBALS = [
-  'turbo.json',
-  'pnpm-lock.yaml',
-  'package.json',
-  ...(turboConfig.globalDependencies ?? []),
-];
+// The root files a diff-scoped job's gate matches but `root_config` need not
+// carry, because that job does not read them. `vitest.config.ts` configures the
+// suites `test-unit` and `test-react` run whole; neither `build` nor
+// `typecheck` reads it, so a change to it need not widen either.
+const ROOT_CONFIG_EXEMPT = ['vitest.config.ts'];
 
 // `continue-on-error: false` is the default and lets a failure stand. `true`
 // swallows it, and an expression is a value the model cannot resolve — both are
@@ -627,12 +627,30 @@ describe('ci path filters', () => {
     ).toBe(true);
   });
 
-  it('treats every turbo global dependency as root config', () => {
-    const rootConfig = filterNamed('root_config');
+  // A root file belongs to no package, so a diff filter selects nothing for it.
+  // Any root file that turns a diff-scoped job on must therefore also widen it,
+  // or the job runs having narrowed to an empty task set.
+  it('carries every root file that gates a diff-scoped job', () => {
+    const gates = [...new Set(DIFF_SCOPED_JOBS.flatMap(filtersGating))];
+    const opensDiffScoped = picomatch(gates.flatMap(filterNamed), {
+      dot: true,
+    });
+    const widens = picomatch(filterNamed('root_config'), { dot: true });
 
     expect(
-      TURBO_GLOBALS.filter((file) => !rootConfig.includes(file)),
-      "turbo's global hash inputs missing from the `root_config` filter"
+      rootFiles.filter(
+        (file) =>
+          opensDiffScoped(file) &&
+          !widens(file) &&
+          !ROOT_CONFIG_EXEMPT.includes(file)
+      ),
+      'root files that open a diff-scoped job without widening it'
+    ).toEqual([]);
+    expect(
+      ROOT_CONFIG_EXEMPT.filter(
+        (file) => !rootFiles.includes(file) || !opensDiffScoped(file)
+      ),
+      'exemptions naming no root file that opens a diff-scoped job'
     ).toEqual([]);
   });
 
@@ -661,12 +679,6 @@ describe('ci path filters', () => {
   });
 
   it('gates or exempts every tracked root file', () => {
-    const rootFiles = execFileSync('git', ['ls-files'], {
-      cwd: repoRoot,
-      encoding: 'utf8',
-    })
-      .split('\n')
-      .filter((file) => file !== '' && !file.includes('/'));
     // Coverage means a job actually runs for the file. A filter that is
     // declared, or even exported, but gates no job does not provide it.
     const isMatched = picomatch(gatingFilters.flatMap(filterNamed), {
