@@ -19,10 +19,17 @@ const SUITE_PATH = path
   .relative(repoRoot, url.fileURLToPath(import.meta.url))
   .replaceAll(path.sep, '/');
 
+// Every file the model parses, recorded as it is read: a new input joins the
+// paths the job running this suite has to open on, without being declared
+// twice.
+const MODEL_INPUTS = [];
+
 // A parse error here empties the suite, so it names the file it could not read
 // rather than surfacing as a bare `SyntaxError` with no tests collected.
 function parsedFile(file, parseText) {
   const text = fs.readFileSync(path.join(repoRoot, file), 'utf8');
+
+  MODEL_INPUTS.push(file);
 
   try {
     return parseText(text);
@@ -274,6 +281,11 @@ function suiteStep() {
   return running[0];
 }
 
+// Everything a change to which changes what this suite asserts, or whether it
+// runs at all: the files the model parses, the config deciding whether it is
+// collected, and the file itself. The job running it has to open on each.
+const SUITE_INPUTS = [...MODEL_INPUTS, 'vitest.config.ts', SUITE_PATH];
+
 // The steps of one job that run a given command outright.
 function stepsRunning(name, command) {
   return stepsOf(name).filter((step) =>
@@ -296,6 +308,25 @@ const requiredJobs = jobNamed('ci-status').needs;
 if (!Array.isArray(requiredJobs) || requiredJobs.length === 0) {
   throw new Error('ci.yml `ci-status` job declares no `needs:` list');
 }
+
+// Every job the required check is measured over: the aggregator, and the jobs
+// it waits on.
+const GATE_JOBS = ['ci-status', ...requiredJobs];
+
+// A step `if:` skips the step while its job still reports success, so a gate
+// job goes green having run nothing. Allowed only where a step is meant to be
+// conditional: the audit guards that keep reporting after an earlier step, the
+// Playwright cache-miss install, and the aggregator's own failing step.
+const CONDITIONAL_STEPS = [
+  'audit-tokens / Check token output freshness',
+  'audit-tokens / APCA contrast vitest sweep',
+  'audit-tokens / Color-blind audit',
+  'audit-tokens / Tailwind class-ref audit',
+  'audit-tokens / Token-mode codename audit',
+  'audit-tokens / Token-mode distinctness audit',
+  'test-react / Install Playwright browsers',
+  'ci-status / Fail on any required-job failure or cancellation',
+];
 
 // A job whose `if:` reads a changes output is gated on the filters; `always()`
 // and unconditional jobs are not.
@@ -351,15 +382,19 @@ function matcherFor(names) {
 // `**` spans any depth, so it is sampled at one segment and at three: a filter
 // narrowed to a fixed depth opens on the shallow sample and skips the deep one.
 function samplesOf(glob) {
-  const spanning = (depth) => glob.replaceAll('**', depth).replaceAll('*', 'x');
+  const spanning = (span) => glob.replaceAll('**', span).replaceAll('*', 'x');
 
   return [...new Set([spanning('x'), spanning('x/y/z')])];
 }
 
 // `root_config` decides whether a diff-scoped job falls through to an
 // unfiltered run. Its entries are globs like every other filter's, so
-// membership is matched, not looked up.
-const widensRootConfig = picomatch(filterNamed('root_config'), { dot: true });
+// membership is matched, not looked up. Built where it is read, like
+// `matcherFor`: renaming the filter has to fail the tests that read it, not
+// empty the suite before any of them collect.
+function widensRootConfig(file) {
+  return matcherFor(['root_config'])(file);
+}
 
 // Every job sets Node up and installs before it reaches a turbo task, so a
 // change to what either reads changes what every job resolves. Turbo hashes
@@ -598,8 +633,8 @@ function narrowingStepsOf(name) {
 }
 
 describe('ci path filters', () => {
-  it('runs the changes job unconditionally', () => {
-    expect(jobNamed('changes').if).toBeUndefined();
+  it.each(UNCONDITIONAL_JOBS)('runs %s unconditionally', (name) => {
+    expect(jobNamed(name).if).toBeUndefined();
   });
 
   // Every gate reads an output of this one step, so the job running is not
@@ -611,7 +646,6 @@ describe('ci path filters', () => {
     expect(detectStep.uses, '`filter` step action').toBe(
       'dorny/paths-filter@v4'
     );
-    expect(detectStep.if, '`filter` step declares an `if:`').toBeUndefined();
     // `filters` is the only input the model reads. `base`, `ref`, and
     // `working-directory` each redirect what the filters are matched against.
     expect(
@@ -623,10 +657,6 @@ describe('ci path filters', () => {
   it('gates at least one job on the filters', () => {
     expect(gatedJobs.length).toBeGreaterThan(0);
     expect(filters.root_config?.length).toBeGreaterThan(0);
-  });
-
-  it.each(UNGATED_JOBS)('runs %s unconditionally', (name) => {
-    expect(jobNamed(name).if).toBeUndefined();
   });
 
   it('carries exactly the declared jobs on the merge gate', () => {
@@ -711,13 +741,11 @@ describe('ci path filters', () => {
   // job it reports `success` to `needs.*.result`, and on the aggregator it lets
   // the required check pass while its own step exits non-zero.
   it('lets a failure stand in every required job', () => {
-    const gateJobs = ['ci-status', ...requiredJobs];
-
     const tolerated = [
-      ...gateJobs.filter((name) =>
+      ...GATE_JOBS.filter((name) =>
         toleratesFailure(jobNamed(name)['continue-on-error'])
       ),
-      ...gateJobs.flatMap((name) =>
+      ...GATE_JOBS.flatMap((name) =>
         stepsOf(name)
           .filter((step) => toleratesFailure(step['continue-on-error']))
           .map((step) => `${name} / ${step.name}`)
@@ -725,6 +753,27 @@ describe('ci path filters', () => {
     ];
 
     expect(tolerated, 'places declaring `continue-on-error`').toEqual([]);
+  });
+
+  // A step `if:` skips the step while its job still reports success, so a gate
+  // job goes green having run nothing. Enumerated across every step the gate
+  // covers, like `continue-on-error`, rather than asserted at the handful of
+  // sites this suite happens to model.
+  it('runs every step of every gate job unconditionally', () => {
+    const conditional = GATE_JOBS.flatMap((name) =>
+      stepsOf(name)
+        .filter((step) => step.if !== undefined)
+        .map((step) => `${name} / ${step.name}`)
+    );
+
+    expect(
+      conditional.filter((step) => !CONDITIONAL_STEPS.includes(step)),
+      'steps declaring an `if:` outside the allow-list'
+    ).toEqual([]);
+    expect(
+      CONDITIONAL_STEPS.filter((step) => !conditional.includes(step)),
+      'allow-list entries naming no conditional step'
+    ).toEqual([]);
   });
 
   it('declares exactly the jobs that narrow turbo', () => {
@@ -787,8 +836,6 @@ describe('ci path filters', () => {
       for (const step of steps) {
         const where = `\`${name}\` step "${step.name}"`;
 
-        expect(step.if, `${where} declares an \`if:\``).toBeUndefined();
-
         const taken = branchesOf(step.run).find(({ guard }) =>
           guardHolds(guard, ROOT_CONFIG_PULL_REQUEST)
         );
@@ -816,45 +863,41 @@ describe('ci path filters', () => {
   });
 
   // This suite is what holds the workflow to its shape, so the job that runs it
-  // has to open on a change to it — measured against that job's own gate, since
-  // a filter gating some other job leaves this file unrun.
-  it('runs the job that reads the workflow on a change to this suite', () => {
-    const { name, step } = suiteStep();
+  // has to sit on the merge gate and open on a change to anything the model
+  // reads — measured against that job's own gate, since a filter gating some
+  // other job leaves this file unrun.
+  it('runs this suite inside the merge gate', () => {
+    const { name } = suiteStep();
 
     expect(requiredJobs, `\`${name}\` is outside the merge gate`).toContain(
       name
     );
-    // The job running is not enough: a step `if:` skips the run while the job
-    // itself reports success, and the gate below is measured against nothing.
+  });
+
+  it.each(SUITE_INPUTS)('runs this suite on a change to %s', (file) => {
+    const { name } = suiteStep();
+
     expect(
-      step.if,
-      `\`${name}\` step "${step.name}" declares an \`if:\``
-    ).toBeUndefined();
-    expect(
-      matcherFor(filtersGating(name))(SUITE_PATH),
-      `\`${name}\` does not gate on \`${SUITE_PATH}\``
+      matcherFor(filtersGating(name))(file),
+      `\`${name}\` does not gate on \`${file}\``
     ).toBe(true);
   });
 
   // The gate proves the job runs; the whole-project run above does not prove it
-  // reaches this file. A second step names the path, and vitest exits 1 on a
-  // path argument matching no collected file — so the job fails however the file
-  // leaves the project: an `include` entry dropped, an `exclude` added, the
-  // project renamed. Nothing inside this file can cover that; once it is
-  // uncollected, none of these tests runs.
+  // reaches this file. A second step names the path, so the job fails however
+  // the file leaves the project: an `include` entry dropped, an `exclude`
+  // added, the project renamed. `--no-passWithNoTests` is what makes that
+  // failure this step's own rather than a config value's to withdraw. Nothing
+  // inside this file can cover it — once uncollected, none of it runs.
   it('runs this suite by path in the job that reads the workflow', () => {
     const { name } = suiteStep();
-    const command = `pnpm vitest run --project=${suiteProject()} ${SUITE_PATH}`;
+    const command = `pnpm exec vitest run --project=${suiteProject()} --no-passWithNoTests ${SUITE_PATH}`;
     const steps = stepsRunning(name, command);
 
     expect(
       steps,
       `\`${name}\` declares no step running \`${command}\``
     ).toHaveLength(1);
-    expect(
-      steps[0].if,
-      `\`${name}\` step "${steps[0].name}" declares an \`if:\``
-    ).toBeUndefined();
   });
 
   // GitHub skips a job when any `needs:` entry skips, so a gated predecessor
