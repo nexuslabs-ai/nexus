@@ -1,4 +1,3 @@
-import { Breadcrumb } from '../../_components/Breadcrumb';
 import { ColorScales } from '../../_components/ColorScales';
 
 /**
@@ -148,13 +147,6 @@ const APCA_TIERS: { pair: string; lc: string; covers: string }[] = [
 export default function ColorShowcase() {
   return (
     <>
-      <Breadcrumb
-        items={[
-          { label: 'Home', href: '/' },
-          { label: 'Foundations', href: '/foundations' },
-          { label: 'Color' },
-        ]}
-      />
       <h1 className="nx:typography-heading-large">Color</h1>
       <p className="nx:typography-body-default nx:text-muted-foreground nx:mt-2 nx:mb-8 nx:max-w-[64ch]">
         Engineered, not picked. Every color is stored as hex, converted to OKLCH

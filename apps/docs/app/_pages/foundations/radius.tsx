@@ -1,5 +1,3 @@
-import { Breadcrumb } from '../../_components/Breadcrumb';
-
 /**
  * Foundations → Radius, borders & shadows. Server component — three
  * independent appearance axes, each a runtime mode swapped via the theme
@@ -52,13 +50,6 @@ const SHADOWS: { cls: string; label: string }[] = [
 export default function Radius() {
   return (
     <>
-      <Breadcrumb
-        items={[
-          { label: 'Home', href: '/' },
-          { label: 'Foundations', href: '/foundations' },
-          { label: 'Radius, borders & shadows' },
-        ]}
-      />
       <h1 className="nx:typography-heading-large">Radius, borders & shadows</h1>
       <p className="nx:typography-body-default nx:text-muted-foreground nx:mt-2 nx:mb-8 nx:max-w-[64ch]">
         Three independent appearance axes, each a runtime mode swapped through

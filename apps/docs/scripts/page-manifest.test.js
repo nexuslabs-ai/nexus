@@ -312,4 +312,24 @@ describe('page manifest', () => {
       'foundations/color lists components, but foundations is not counted in components'
     );
   });
+
+  it('rejects a label carrying the separator the home card joins with', async () => {
+    const root = writeFixture({
+      [REGISTRY_FILE]: `export const PAGE_REGISTRY = {
+  foundations: {
+    slug: 'foundations',
+    title: 'Foundations',
+    href: '/foundations',
+    pages: [
+      { slug: 'radius', label: 'Radius · Borders', wireframe: { lede: '', blocks: [] } },
+    ],
+  },
+} satisfies Record<string, unknown>;
+`,
+    });
+
+    await expect(buildPageManifest(root)).rejects.toThrow(
+      'foundations/radius has " · " inside its label'
+    );
+  });
 });

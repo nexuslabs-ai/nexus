@@ -123,6 +123,19 @@ function railLabelsOf(page) {
   return [...(page.components ?? []), ...(page.nested ?? [])];
 }
 
+/** The home page's section cards join a section's page labels with this. */
+const CARD_JOINER = ' \u00b7 ';
+
+function assertLabelsAvoidTheCardJoiner(section) {
+  for (const page of section.pages) {
+    if (page.label.includes(CARD_JOINER)) {
+      throw new Error(
+        `${section.slug}/${page.slug} has "${CARD_JOINER}" inside its label, which is what the home page's ${section.slug} card joins page labels with — the card would read the label as several pages. Name the page without it.`
+      );
+    }
+  }
+}
+
 function assertComponentsDeclareTheirUnit(section) {
   if (section.unit === 'components') {
     return;
@@ -375,6 +388,7 @@ export async function buildPageManifest(docsRoot, formatOptions) {
     unit: section.unit,
     pages: section.entries.map((entry) => entry.page),
   }));
+  manifest.forEach(assertLabelsAvoidTheCardJoiner);
   manifest.forEach(assertComponentsDeclareTheirUnit);
   manifest.forEach(assertRailLabelsHaveNoPage);
 

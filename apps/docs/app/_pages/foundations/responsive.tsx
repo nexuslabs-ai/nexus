@@ -1,5 +1,3 @@
-import { Breadcrumb } from '../../_components/Breadcrumb';
-
 /**
  * Foundations → Responsive. Server component — the breakpoint scale, the
  * declarative `<Show>` / `<Hide>` primitives, and the decision tree for which
@@ -72,13 +70,6 @@ const MECHANISMS: { mechanism: string; use: string }[] = [
 export default function Responsive() {
   return (
     <>
-      <Breadcrumb
-        items={[
-          { label: 'Home', href: '/' },
-          { label: 'Foundations', href: '/foundations' },
-          { label: 'Responsive' },
-        ]}
-      />
       <h1 className="nx:typography-heading-large">Responsive</h1>
       <p className="nx:typography-body-default nx:text-muted-foreground nx:mt-2 nx:mb-8 nx:max-w-[64ch]">
         Nexus is designed mobile-first and desktop-first — Narrow (mobile) and
