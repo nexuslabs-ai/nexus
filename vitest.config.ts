@@ -32,6 +32,15 @@ export default defineConfig({
         find: /^@\//,
         replacement: `${path.resolve(__dirname, './packages/react/src')}/`,
       },
+      // `server-only` throws unless resolved under the `react-server`
+      // condition, which no test runs under; point it at its own RSC build.
+      {
+        find: /^server-only$/,
+        replacement: path.resolve(
+          __dirname,
+          './node_modules/server-only/empty.js'
+        ),
+      },
     ],
   },
   optimizeDeps: {

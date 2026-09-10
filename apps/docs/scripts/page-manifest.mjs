@@ -2,7 +2,9 @@
  * Builds the docs page manifest from the filesystem.
  *
  * Sources:
- *   - `app/_lib/sections.ts` — section order, titles, sub-page order and labels
+ *   - `app/_lib/sections.ts` — section order, titles, sub-page order and
+ *     labels, and the wireframe content (`lede` / `blocks`) placeholder pages
+ *     render until a real page file lands
  *   - `content/{section}/{slug}.mdx` — MDX content pages
  *   - `app/_pages/{section}/{slug}.tsx` — hand-built React pages
  *
@@ -10,7 +12,22 @@
  * needed to add a page. Pages the registry does not list are appended to their
  * section in slug order with a label derived from the slug.
  *
- * `generate-page-manifest.mjs` is the CLI that writes the result.
+ * Routes are exactly two levels deep and a slug is a single path segment — a
+ * file at any other depth, or one whose name carries a second dot, fails the
+ * generator rather than silently dropping out of the manifest or inventing a
+ * route. So the component pages behind the registry's `nested` labels land
+ * flat, at `components/{name}`. Entries prefixed with `_` are skipped, which is
+ * how a page-local island co-locates with the page that uses it instead of
+ * moving to `app/_components/`.
+ *
+ * Two modules come out, split by which side of the client boundary each half
+ * belongs on:
+ *   - `MANIFEST_FILE` — the IA: routes, labels, nav order. Serializable, and
+ *     imported at module scope by `'use client'` nav components.
+ *   - `CONTENT_FILE` — where a route's body comes from, either a dynamic import
+ *     or the registry wireframe. Server-only.
+ *
+ * `generate-page-manifest.mjs` is the CLI that writes both.
  */
 import fs from 'node:fs';
 import path from 'node:path';
@@ -19,10 +36,11 @@ import { pathToFileURL } from 'node:url';
 import { createJiti } from 'jiti';
 import prettier from 'prettier';
 
-/** Output path, relative to the docs app root. */
+/** Output paths, relative to the docs app root. */
 export const MANIFEST_FILE = 'app/_lib/page-manifest.generated.ts';
+export const CONTENT_FILE = 'app/_lib/page-content.generated.ts';
 
-/** Page sources, highest precedence first — mirrors the `[section]/[sub]` route. */
+/** Page sources — each mirrors one arm of the `[section]/[sub]` route. */
 const SOURCES = [
   { kind: 'mdx', dir: 'content', ext: '.mdx', keepExtension: true },
   { kind: 'component', dir: 'app/_pages', ext: '.tsx', keepExtension: false },
@@ -38,13 +56,12 @@ function toPosix(relative) {
   return relative.split(path.sep).join('/');
 }
 
-function readDirSorted(dir) {
+function readDirEntries(dir) {
   return fs
     .readdirSync(dir, { withFileTypes: true })
     .filter(
       (entry) => !entry.name.startsWith('_') && !entry.name.startsWith('.')
-    )
-    .sort((a, b) => a.name.localeCompare(b.name, 'en'));
+    );
 }
 
 /**
@@ -59,43 +76,84 @@ function collectPages(docsRoot, { dir, ext }) {
     return found;
   }
 
-  for (const entry of readDirSorted(root)) {
+  for (const entry of readDirEntries(root)) {
     if (!entry.isDirectory()) {
       throw new Error(
         `${dir}/${entry.name} is not inside a section folder — docs pages live at {section}/{slug}${ext}.`
       );
     }
 
-    for (const file of readDirSorted(path.join(root, entry.name))) {
-      if (!file.isFile() || !file.name.endsWith(ext)) {
+    for (const file of readDirEntries(path.join(root, entry.name))) {
+      const where = `${dir}/${entry.name}/${file.name}`;
+      if (!file.isFile()) {
         throw new Error(
-          `${dir}/${entry.name}/${file.name} is not a ${ext} page — docs pages live at {section}/{slug}${ext}.`
+          `${where} is a directory — docs pages live at {section}/{slug}${ext}, two levels deep.`
+        );
+      }
+      if (!file.name.endsWith(ext)) {
+        throw new Error(
+          `${where} is not a ${ext} page — docs pages live at {section}/{slug}${ext}.`
         );
       }
       const slug = file.name.slice(0, -ext.length);
-      found.set(`${entry.name}/${slug}`, `${dir}/${entry.name}/${file.name}`);
+      if (slug.includes('.')) {
+        throw new Error(
+          `${where} would route to /${entry.name}/${slug} — a page slug is one segment, so prefix a non-page sibling with \`_\`.`
+        );
+      }
+      found.set(`${entry.name}/${slug}`, where);
     }
   }
 
   return found;
 }
 
-/** Import specifier for a docs-root-relative file, resolved from `app/_lib/`. */
+/** A route resolving in two sources means one of them never renders. */
+function assertOneSourcePerRoute(sources) {
+  const seen = new Map();
+  for (const source of sources) {
+    for (const [key, file] of source.pages) {
+      const existing = seen.get(key);
+      if (existing) {
+        throw new Error(
+          `${key} resolves to both ${existing} and ${file} — a route has one source file.`
+        );
+      }
+      seen.set(key, file);
+    }
+  }
+}
+
+/**
+ * The registry's `nested` labels stand in for pages that do not exist yet. Once
+ * one does, the label and the page would both show in the left rail.
+ */
+function assertNestedLabelsHaveNoPage(section) {
+  const labels = new Set(section.pages.map((page) => page.label));
+  for (const page of section.pages) {
+    for (const label of page.nested ?? []) {
+      if (labels.has(label)) {
+        throw new Error(
+          `${section.slug} lists "${label}" both as a page and as a nested label under ${page.slug} — drop the nested label now the page exists.`
+        );
+      }
+    }
+  }
+}
+
+/** Import specifier for a docs-root-relative file, resolved from the content module. */
 function specifierFor(file, keepExtension) {
-  const relative = toPosix(path.relative('app/_lib', file));
+  const relative = toPosix(path.relative(path.dirname(CONTENT_FILE), file));
   return keepExtension
     ? relative
     : relative.slice(0, relative.lastIndexOf('.'));
 }
 
-function renderPage({ page, specifier }) {
+function renderPage(page) {
   const fields = Object.entries(page).map(
     ([key, value]) => `${key}: ${JSON.stringify(value)},`
   );
-  const load = specifier
-    ? `load: () => import('${specifier}'),`
-    : 'load: null,';
-  return `{ ${fields.join(' ')} ${load} },`;
+  return `{ ${fields.join(' ')} },`;
 }
 
 function renderSection(section) {
@@ -103,127 +161,208 @@ function renderSection(section) {
     `slug: ${JSON.stringify(section.slug)},`,
     `title: ${JSON.stringify(section.title)},`,
     `href: ${JSON.stringify(section.href)},`,
-    `order: ${section.order},`,
   ].join(' ');
   return `{ ${head} pages: [\n${section.pages.map(renderPage).join('\n')}\n] },`;
 }
 
-function renderModule(manifest) {
-  return `// AUTO-GENERATED by apps/docs/scripts/generate-page-manifest.mjs — do not edit.
-// Regenerate with \`pnpm --filter @nexus_ds/docs generate:manifest\`.
+const HEADER = `// AUTO-GENERATED by apps/docs/scripts/generate-page-manifest.mjs — do not edit.
+// Regenerate with \`pnpm --filter @nexus_ds/docs generate:manifest\`.`;
 
-import type { ComponentType } from 'react';
-
-/** Where a page's body comes from; \`placeholder\` pages render the registry wireframe. */
-export type ManifestPageKind = 'mdx' | 'component' | 'placeholder';
-
-// eslint-disable-next-line @nexus_ds/no-render-prop-types -- \`default: ComponentType\` is the shape of a lazily-imported page module, not a component-as-prop.
-export type ManifestPageLoader = () => Promise<{ default: ComponentType }>;
+function renderManifestModule(manifest) {
+  return `${HEADER}
 
 export type ManifestPage = {
   /** Route path, e.g. \`/foundations/color\`. */
   route: string;
   slug: string;
   label: string;
-  /** Position within the section, zero-based. */
-  order: number;
   /** Non-interactive labels rendered under this page in the left rail. */
   nested?: readonly string[];
-  kind: ManifestPageKind;
-  /** Source file relative to \`apps/docs\`; \`null\` for placeholder pages. */
-  file: string | null;
-  /** Lazy module loader; \`null\` for placeholder pages. */
-  load: ManifestPageLoader | null;
-};
+} & (
+  | {
+      kind: 'mdx' | 'component';
+      /** Source file relative to \`apps/docs\`; the module is \`PAGE_LOADERS[route]\`. */
+      file: string;
+    }
+  | {
+      /** No page file yet; the body is \`PAGE_WIREFRAMES[route]\`. */
+      kind: 'placeholder';
+      file: null;
+    }
+);
 
 export type ManifestSection = {
   slug: string;
   title: string;
   href: string;
-  /** Position in the top-level nav, zero-based. */
-  order: number;
   pages: readonly ManifestPage[];
 };
 
+/** Every docs page, in nav order. Serializable — safe to import from a client component. */
 export const PAGE_MANIFEST: readonly ManifestSection[] = [
 ${manifest.map(renderSection).join('\n')}
 ];
 `;
 }
 
+function renderContentModule({ loaders, wireframes }) {
+  const loaderEntries = loaders.map(
+    ({ route, specifier }) =>
+      `${JSON.stringify(route)}: () => import(${JSON.stringify(specifier)}),`
+  );
+  const wireframeEntries = wireframes.map(
+    ({ route, lede, blocks }) =>
+      `${JSON.stringify(route)}: { lede: ${JSON.stringify(lede)}, blocks: ${JSON.stringify(blocks)} },`
+  );
+  return `${HEADER}
+
+import type { ComponentType } from 'react';
+
+import type { Block } from './sections';
+
+// The thunks below import page and MDX modules, so a \`'use client'\` importer
+// would pull the whole docs body into the client bundle.
+import 'server-only';
+
+// eslint-disable-next-line @nexus_ds/no-render-prop-types -- \`default: ComponentType\` is the shape of a lazily-imported page module, not a component-as-prop.
+export type ManifestPageLoader = () => Promise<{ default: ComponentType }>;
+
+export type PageWireframe = {
+  lede: string;
+  blocks: readonly Block[];
+};
+
+/** Route → page module, for every \`PAGE_MANIFEST\` entry with a source file. */
+export const PAGE_LOADERS: Record<string, ManifestPageLoader> = {
+${loaderEntries.join('\n')}
+};
+
+/** Route → registry wireframe, for every \`kind: 'placeholder'\` entry. */
+export const PAGE_WIREFRAMES: Record<string, PageWireframe> = {
+${wireframeEntries.join('\n')}
+};
+`;
+}
+
 /**
- * Reads the docs sources under `docsRoot` and returns the manifest module as
- * formatted TypeScript source. Two runs over unchanged sources return the same
- * string: every directory listing is sorted before use.
+ * The repo's prettier config for the generated modules, minus `plugins`:
+ * `format` resolves plugin specifiers against `process.cwd()` rather than the
+ * config file, and neither module has class strings to sort.
  */
-export async function buildPageManifest(docsRoot) {
+export async function resolveFormatOptions(docsRoot) {
+  const config = {
+    ...(await prettier.resolveConfig(path.join(docsRoot, MANIFEST_FILE))),
+  };
+  delete config.plugins;
+  return config;
+}
+
+/**
+ * Reads the docs sources under `docsRoot` and returns both generated modules as
+ * formatted TypeScript source, keyed by output path. Two runs over unchanged
+ * sources return the same strings: output order comes from the registry plus an
+ * explicit slug sort, never from directory listing order. Pass `formatOptions`
+ * to format against something other than the repo's prettier config.
+ */
+export async function buildPageManifest(docsRoot, formatOptions) {
   const registryPath = path.join(docsRoot, 'app', '_lib', 'sections.ts');
   const jiti = createJiti(pathToFileURL(registryPath).href);
   const { SECTIONS } = await jiti.import(registryPath);
+
+  const sectionFor = (slug) =>
+    Object.hasOwn(SECTIONS, slug) ? SECTIONS[slug] : undefined;
 
   const sources = SOURCES.map((source) => ({
     ...source,
     pages: collectPages(docsRoot, source),
   }));
+  assertOneSourcePerRoute(sources);
   const keysOnDisk = sources.flatMap((source) => [...source.pages.keys()]);
 
   /** Registry order first, then slugs that exist only on disk, in slug order. */
   function orderedSlugs(sectionSlug) {
-    const registered = (SECTIONS[sectionSlug]?.subs ?? []).map(
+    const registered = (sectionFor(sectionSlug)?.subs ?? []).map(
       (sub) => sub.slug
     );
-    const onDisk = keysOnDisk
+    const extra = keysOnDisk
       .filter((key) => key.startsWith(`${sectionSlug}/`))
-      .map((key) => key.slice(sectionSlug.length + 1));
-    const extra = [...new Set(onDisk)]
+      .map((key) => key.slice(sectionSlug.length + 1))
       .filter((slug) => !registered.includes(slug))
       .sort();
     return [...registered, ...extra];
   }
 
-  function buildPage(sectionSlug, slug, order) {
+  function buildPage(sectionSlug, slug) {
     const key = `${sectionSlug}/${slug}`;
-    const sub = SECTIONS[sectionSlug]?.subs.find(
+    const sub = sectionFor(sectionSlug)?.subs.find(
       (entry) => entry.slug === slug
     );
-    const source = sources.find((candidate) => candidate.pages.has(key));
     const page = {
       route: `/${key}`,
       slug,
       label: sub?.label ?? humanize(slug),
-      order,
-      kind: source?.kind ?? 'placeholder',
-      file: source?.pages.get(key) ?? null,
     };
     if (sub?.nested) {
       page.nested = sub.nested;
     }
-    const specifier = source
-      ? specifierFor(page.file, source.keepExtension)
-      : null;
-    return { page, specifier };
+
+    const source = sources.find((candidate) => candidate.pages.has(key));
+    if (!source) {
+      // No file on disk, so the page is registry-only and renders its wireframe.
+      Object.assign(page, { kind: 'placeholder', file: null });
+      return { page, wireframe: { lede: sub.lede, blocks: sub.blocks } };
+    }
+
+    const file = source.pages.get(key);
+    Object.assign(page, { kind: source.kind, file });
+    return { page, specifier: specifierFor(file, source.keepExtension) };
   }
 
   /** Registry order first, then sections that exist only on disk, in slug order. */
   const extraSections = [...new Set(keysOnDisk.map((key) => key.split('/')[0]))]
-    .filter((slug) => !(slug in SECTIONS))
+    .filter((slug) => !Object.hasOwn(SECTIONS, slug))
     .sort();
 
-  const manifest = [...Object.keys(SECTIONS), ...extraSections].map(
-    (sectionSlug, order) => ({
+  const built = [...Object.keys(SECTIONS), ...extraSections].map(
+    (sectionSlug) => ({
       slug: sectionSlug,
-      title: SECTIONS[sectionSlug]?.title ?? humanize(sectionSlug),
-      href: SECTIONS[sectionSlug]?.href ?? `/${sectionSlug}`,
-      order,
-      pages: orderedSlugs(sectionSlug).map((slug, index) =>
-        buildPage(sectionSlug, slug, index)
+      title: sectionFor(sectionSlug)?.title ?? humanize(sectionSlug),
+      href: sectionFor(sectionSlug)?.href ?? `/${sectionSlug}`,
+      entries: orderedSlugs(sectionSlug).map((slug) =>
+        buildPage(sectionSlug, slug)
       ),
     })
   );
 
-  const outputPath = path.join(docsRoot, MANIFEST_FILE);
-  return prettier.format(renderModule(manifest), {
-    ...(await prettier.resolveConfig(outputPath)),
-    filepath: outputPath,
-  });
+  const manifest = built.map(({ entries, ...section }) => ({
+    ...section,
+    pages: entries.map((entry) => entry.page),
+  }));
+  manifest.forEach(assertNestedLabelsHaveNoPage);
+
+  const entries = built.flatMap((section) => section.entries);
+  const loaders = entries
+    .filter((entry) => entry.specifier)
+    .map((entry) => ({ route: entry.page.route, specifier: entry.specifier }));
+  const wireframes = entries
+    .filter((entry) => entry.wireframe)
+    .map((entry) => ({ route: entry.page.route, ...entry.wireframe }));
+
+  const format = formatOptions ?? (await resolveFormatOptions(docsRoot));
+  const formatModule = (file, source) =>
+    prettier.format(source, {
+      ...format,
+      filepath: path.join(docsRoot, file),
+    });
+
+  return {
+    [MANIFEST_FILE]: await formatModule(
+      MANIFEST_FILE,
+      renderManifestModule(manifest)
+    ),
+    [CONTENT_FILE]: await formatModule(
+      CONTENT_FILE,
+      renderContentModule({ loaders, wireframes })
+    ),
+  };
 }
