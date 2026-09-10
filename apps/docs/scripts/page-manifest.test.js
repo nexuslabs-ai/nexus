@@ -209,17 +209,7 @@ describe('page manifest', () => {
   });
 
   it('rejects a registry-only page with no wireframe to render', async () => {
-    const root = writeFixture({
-      [REGISTRY_FILE]: `export const PAGE_REGISTRY = {
-  foundations: {
-    slug: 'foundations',
-    title: 'Foundations',
-    href: '/foundations',
-    pages: [{ slug: 'color', label: 'Color' }],
-  },
-} satisfies Record<string, unknown>;
-`,
-    });
+    const root = writeFixture({ [REGISTRY_FILE]: FIXTURE_REGISTRY });
 
     await expect(buildPageManifest(root)).rejects.toThrow(
       'foundations/color has no page file'

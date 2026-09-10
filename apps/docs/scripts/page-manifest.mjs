@@ -3,7 +3,7 @@
  *
  * Sources:
  *   - `page-registry/` — section and page order, labels, and the
- *     `lede` / `blocks` wireframe a page renders until its own file lands
+ *     `wireframe` a page renders until its own file lands
  *   - `content/{section}/{slug}.mdx` — MDX pages
  *   - `app/_pages/{section}/{slug}.tsx` — hand-built pages
  *
@@ -313,7 +313,7 @@ export async function buildPageManifest(docsRoot, formatOptions) {
       };
     }
 
-    if (entry?.wireframe === undefined) {
+    if (!entry?.wireframe) {
       throw new Error(
         `${key} has no page file, so it renders its registry wireframe — give its registry entry a \`wireframe\`, or write the page.`
       );
