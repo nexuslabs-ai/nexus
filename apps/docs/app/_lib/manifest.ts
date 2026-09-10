@@ -20,14 +20,3 @@ export function requireSection(slug: string): ManifestSection {
   }
   return section;
 }
-
-/**
- * Entries the section's left rail lists: a page's nested names when it groups
- * several, otherwise the page itself.
- */
-export function countRailEntries(section: ManifestSection): number {
-  return section.pages.reduce(
-    (total, page) => total + (page.nested?.length ?? 1),
-    0
-  );
-}

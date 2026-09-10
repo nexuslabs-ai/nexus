@@ -6,7 +6,9 @@ export type ManifestPage = {
   route: string;
   slug: string;
   label: string;
-  /** Non-interactive labels rendered under this page in the left rail. */
+  /** Components this group page covers, listed under it in the left rail. */
+  components?: readonly string[];
+  /** Non-interactive headings listed under this page in the left rail. */
   nested?: readonly string[];
 } & (
   | {
@@ -136,7 +138,7 @@ export const PAGE_MANIFEST: readonly ManifestSection[] = [
         route: '/components/inputs',
         slug: 'inputs',
         label: 'Inputs',
-        nested: ['Button', 'Input', 'Select', 'Switch', 'Tabs'],
+        components: ['Button', 'Input', 'Select', 'Switch', 'Tabs'],
         kind: 'placeholder',
         file: null,
       },
@@ -144,7 +146,7 @@ export const PAGE_MANIFEST: readonly ManifestSection[] = [
         route: '/components/containers',
         slug: 'containers',
         label: 'Containers',
-        nested: ['Card', 'Dialog', 'Accordion', 'Alert'],
+        components: ['Card', 'Dialog', 'Accordion', 'Alert'],
         kind: 'placeholder',
         file: null,
       },
@@ -152,7 +154,7 @@ export const PAGE_MANIFEST: readonly ManifestSection[] = [
         route: '/components/navigation',
         slug: 'navigation',
         label: 'Navigation',
-        nested: ['DropdownMenu'],
+        components: ['DropdownMenu'],
         kind: 'placeholder',
         file: null,
       },
@@ -160,7 +162,7 @@ export const PAGE_MANIFEST: readonly ManifestSection[] = [
         route: '/components/display',
         slug: 'display',
         label: 'Display',
-        nested: ['Badge', 'Avatar', 'Tooltip'],
+        components: ['Badge', 'Avatar', 'Tooltip'],
         kind: 'placeholder',
         file: null,
       },
@@ -168,7 +170,7 @@ export const PAGE_MANIFEST: readonly ManifestSection[] = [
         route: '/components/primitives',
         slug: 'primitives',
         label: 'Primitives',
-        nested: ['Show / Hide', 'Slot'],
+        components: ['Show / Hide', 'Slot'],
         kind: 'placeholder',
         file: null,
       },

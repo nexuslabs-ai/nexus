@@ -73,11 +73,12 @@ describe('page manifest', () => {
     ).toEqual(Object.keys(PAGE_REGISTRY));
   });
 
-  it('lists every registry page, with its label, nesting and position', () => {
+  it('lists every registry page, with its label, rail labels and position', () => {
     const expected = Object.values(PAGE_REGISTRY).flatMap((section) =>
       section.pages.map((page) => ({
         route: `/${section.slug}/${page.slug}`,
         label: page.label,
+        components: page.components,
         nested: page.nested,
       }))
     );
@@ -87,7 +88,12 @@ describe('page manifest', () => {
     expect(
       pages
         .filter((page) => registered.has(page.route))
-        .map(({ route, label, nested }) => ({ route, label, nested }))
+        .map(({ route, label, components, nested }) => ({
+          route,
+          label,
+          components,
+          nested,
+        }))
     ).toEqual(expected);
   });
 
@@ -237,7 +243,7 @@ describe('page manifest', () => {
     );
   });
 
-  it('rejects a nested label that now has a page of its own', async () => {
+  it('rejects a component rail label that now has a page of its own', async () => {
     const root = writeFixture({
       [REGISTRY_FILE]: `export const PAGE_REGISTRY = {
   components: {
@@ -245,7 +251,7 @@ describe('page manifest', () => {
     title: 'Components',
     href: '/components',
     pages: [
-      { slug: 'overlays', label: 'Overlays', nested: ['DropdownMenu'], wireframe: { lede: '', blocks: [] } },
+      { slug: 'overlays', label: 'Overlays', components: ['DropdownMenu'], wireframe: { lede: '', blocks: [] } },
     ],
   },
 } satisfies Record<string, unknown>;
@@ -255,11 +261,11 @@ describe('page manifest', () => {
     });
 
     await expect(buildPageManifest(root)).rejects.toThrow(
-      '"DropdownMenu" as a nested label under overlays, but components/dropdown-menu is now a page'
+      '"DropdownMenu" as a rail label under overlays, but components/dropdown-menu is now a page'
     );
   });
 
-  it('rejects a nested label matching a page whose slug reads differently', async () => {
+  it('rejects a rail label matching a page whose slug reads differently', async () => {
     const root = writeFixture({
       [REGISTRY_FILE]: `export const PAGE_REGISTRY = {
   components: {
@@ -268,7 +274,7 @@ describe('page manifest', () => {
     href: '/components',
     pages: [
       { slug: 'menus', label: 'DropdownMenu', wireframe: { lede: '', blocks: [] } },
-      { slug: 'overlays', label: 'Overlays', nested: ['DropdownMenu'], wireframe: { lede: '', blocks: [] } },
+      { slug: 'overlays', label: 'Overlays', components: ['DropdownMenu'], wireframe: { lede: '', blocks: [] } },
     ],
   },
 } satisfies Record<string, unknown>;
@@ -276,7 +282,7 @@ describe('page manifest', () => {
     });
 
     await expect(buildPageManifest(root)).rejects.toThrow(
-      '"DropdownMenu" as a nested label under overlays, but components/menus is now a page'
+      '"DropdownMenu" as a rail label under overlays, but components/menus is now a page'
     );
   });
 });

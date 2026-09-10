@@ -119,7 +119,11 @@ function comparisonKey(value) {
   return value.toLowerCase().replace(/[^a-z0-9]/g, '');
 }
 
-function assertNestedLabelsHaveNoPage(section) {
+function railLabelsOf(page) {
+  return [...(page.components ?? []), ...(page.nested ?? [])];
+}
+
+function assertRailLabelsHaveNoPage(section) {
   const pageFor = new Map();
   for (const page of section.pages) {
     pageFor.set(comparisonKey(page.slug), page.slug);
@@ -127,11 +131,11 @@ function assertNestedLabelsHaveNoPage(section) {
   }
 
   for (const page of section.pages) {
-    for (const label of page.nested ?? []) {
+    for (const label of railLabelsOf(page)) {
       const existing = pageFor.get(comparisonKey(label));
       if (existing !== undefined) {
         throw new Error(
-          `${section.slug} lists "${label}" as a nested label under ${page.slug}, but ${section.slug}/${existing} is now a page — drop the nested label.`
+          `${section.slug} lists "${label}" as a rail label under ${page.slug}, but ${section.slug}/${existing} is now a page — drop the rail label.`
         );
       }
     }
@@ -173,7 +177,9 @@ export type ManifestPage = {
   route: string;
   slug: string;
   label: string;
-  /** Non-interactive labels rendered under this page in the left rail. */
+  /** Components this group page covers, listed under it in the left rail. */
+  components?: readonly string[];
+  /** Non-interactive headings listed under this page in the left rail. */
   nested?: readonly string[];
 } & (
   | {
@@ -295,7 +301,10 @@ export async function buildPageManifest(docsRoot, formatOptions) {
       slug,
       label: entry?.label ?? humanize(slug),
     };
-    if (entry?.nested) {
+    if (entry?.components?.length) {
+      base.components = entry.components;
+    }
+    if (entry?.nested?.length) {
       base.nested = entry.nested;
     }
 
@@ -346,7 +355,7 @@ export async function buildPageManifest(docsRoot, formatOptions) {
     href: section.href,
     pages: section.entries.map((entry) => entry.page),
   }));
-  manifest.forEach(assertNestedLabelsHaveNoPage);
+  manifest.forEach(assertRailLabelsHaveNoPage);
 
   const entries = built.flatMap((section) => section.entries);
   const loaders = [];

@@ -8,13 +8,15 @@ import {
   CardHeader,
   CardTitle,
 } from './_components/nexus';
-import { countRailEntries, requireSection } from './_lib/manifest';
+import { countComponents, describeSize } from './_lib/home-counts';
+import { PAGE_MANIFEST, requireSection } from './_lib/manifest';
 
-const COMPONENT_COUNT = countRailEntries(requireSection('components'));
+const BLUE_RAMP = [50, 100, 200, 300, 400, 500, 600, 700, 800, 900, 950];
+const BASE_CHIPS = ['slate', 'stone', 'neutral', 'gray', 'zinc'];
 
 const STATS = [
-  { n: '5', l: 'Bases' },
-  { n: String(COMPONENT_COUNT), l: 'Components' },
+  { n: String(BASE_CHIPS.length), l: 'Bases' },
+  { n: String(countComponents(requireSection('components'))), l: 'Components' },
   { n: '2', l: 'Themes' },
   { n: '100%', l: 'Tokenized' },
 ];
@@ -37,43 +39,15 @@ const AUDIENCES = [
   },
 ];
 
-const SECTION_CARDS = [
-  {
-    slug: 'foundations',
-    desc: 'Color · Typography · Spacing · Radius · Layering · Responsive',
-  },
-  {
-    slug: 'components',
-    desc: 'Inputs · Containers · Navigation · Display · Primitives',
-  },
-  {
-    slug: 'theming',
-    desc: 'Multi-brand · density modes · consumer overrides',
-  },
-  {
-    slug: 'tools',
-    desc: 'nx: prefix · Code Connect · ESLint · audits · Storybook',
-  },
-  {
-    slug: 'guidance',
-    desc: 'Engineering principles · testing model · contribution',
-  },
-  { slug: 'agents', desc: 'llms.txt · rules mirror · authoring' },
-].map(({ slug, desc }) => {
-  const section = requireSection(slug);
-  return {
-    count:
-      slug === 'components'
-        ? `${section.pages.length} groups · ${COMPONENT_COUNT} components`
-        : `${section.pages.length} pages`,
-    title: section.title,
-    desc,
-    href: section.href,
-  };
-});
-
-const BLUE_RAMP = [50, 100, 200, 300, 400, 500, 600, 700, 800, 900, 950];
-const BASE_CHIPS = ['slate', 'stone', 'neutral', 'gray', 'zinc'];
+// Getting Started is reached through the audience cards above, not a section card.
+const SECTION_CARDS = PAGE_MANIFEST.filter(
+  (section) => section.slug !== 'getting-started'
+).map((section) => ({
+  count: describeSize(section),
+  title: section.title,
+  desc: section.pages.map((page) => page.label).join(', '),
+  href: section.href,
+}));
 
 export default function Home() {
   return (
