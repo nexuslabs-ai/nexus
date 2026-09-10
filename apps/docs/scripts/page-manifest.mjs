@@ -2,30 +2,20 @@
  * Builds the docs page manifest from the filesystem.
  *
  * Sources:
- *   - `app/_lib/sections.ts` — section order, titles, sub-page order and
- *     labels, and the wireframe content (`lede` / `blocks`) placeholder pages
- *     render until a real page file lands
- *   - `content/{section}/{slug}.mdx` — MDX content pages
- *   - `app/_pages/{section}/{slug}.tsx` — hand-built React pages
+ *   - `app/_lib/sections.ts` — section and page order, labels, and the
+ *     `lede` / `blocks` wireframe a page renders until its own file lands
+ *   - `content/{section}/{slug}.mdx` — MDX pages
+ *   - `app/_pages/{section}/{slug}.tsx` — hand-built pages
  *
- * A page's route is its path on disk, so dropping in a file is the only step
- * needed to add a page. Pages the registry does not list are appended to their
- * section in slug order with a label derived from the slug.
+ * A page's route is its path on disk, so adding a page means adding a file.
+ * Pages the registry does not list are appended to their section in slug
+ * order. Routes are exactly two levels deep and a slug is one path segment;
+ * a file anywhere else fails the generator. Entries prefixed with `_` are
+ * skipped, so a page-local island can sit beside the page that uses it.
  *
- * Routes are exactly two levels deep and a slug is a single path segment — a
- * file at any other depth, or one whose name carries a second dot, fails the
- * generator rather than silently dropping out of the manifest or inventing a
- * route. So the component pages behind the registry's `nested` labels land
- * flat, at `components/{name}`. Entries prefixed with `_` are skipped, which is
- * how a page-local island co-locates with the page that uses it instead of
- * moving to `app/_components/`.
- *
- * Two modules come out, split by which side of the client boundary each half
- * belongs on:
- *   - `MANIFEST_FILE` — the IA: routes, labels, nav order. Serializable, and
- *     imported at module scope by `'use client'` nav components.
- *   - `CONTENT_FILE` — where a route's body comes from, either a dynamic import
- *     or the registry wireframe. Server-only.
+ * Output is two modules, split across the client boundary:
+ *   - `MANIFEST_FILE` — routes, labels, nav order. Imported by client nav.
+ *   - `CONTENT_FILE` — page bodies: dynamic imports and wireframes. Server-only.
  *
  * `generate-page-manifest.mjs` is the CLI that writes both.
  */
@@ -40,7 +30,6 @@ import prettier from 'prettier';
 export const MANIFEST_FILE = 'app/_lib/page-manifest.generated.ts';
 export const CONTENT_FILE = 'app/_lib/page-content.generated.ts';
 
-/** Page sources — each mirrors one arm of the `[section]/[sub]` route. */
 const SOURCES = [
   { kind: 'mdx', dir: 'content', ext: '.mdx', keepExtension: true },
   { kind: 'component', dir: 'app/_pages', ext: '.tsx', keepExtension: false },
@@ -64,11 +53,7 @@ function readDirEntries(dir) {
     );
 }
 
-/**
- * Collects `{section}/{slug}{ext}` files into a `section/slug` → source-file map.
- * Anything at another depth is a routing dead end, so it fails the generator
- * rather than silently dropping out of the manifest.
- */
+/** Collects `{section}/{slug}{ext}` files into a `section/slug` → source-file map. */
 function collectPages(docsRoot, { dir, ext }) {
   const found = new Map();
   const root = path.join(docsRoot, dir);
@@ -108,7 +93,6 @@ function collectPages(docsRoot, { dir, ext }) {
   return found;
 }
 
-/** A route resolving in two sources means one of them never renders. */
 function assertOneSourcePerRoute(sources) {
   const seen = new Map();
   for (const source of sources) {
@@ -129,10 +113,6 @@ function comparisonKey(value) {
   return value.toLowerCase().replace(/[^a-z0-9]/g, '');
 }
 
-/**
- * The registry's `nested` labels stand in for pages that do not exist yet. Once
- * one does, the label and the page would both show in the left rail.
- */
 function assertNestedLabelsHaveNoPage(section) {
   const pageFor = new Map();
   for (const page of section.pages) {
@@ -152,7 +132,7 @@ function assertNestedLabelsHaveNoPage(section) {
   }
 }
 
-/** Import specifier for a docs-root-relative file, resolved from the content module. */
+/** Import specifier for a docs-root-relative file, as seen from the content module. */
 function specifierFor(file, keepExtension) {
   const relative = toPosix(path.relative(path.dirname(CONTENT_FILE), file));
   return keepExtension
@@ -256,9 +236,8 @@ ${wireframeEntries.join('\n')}
 }
 
 /**
- * The repo's prettier config for the generated modules, minus `plugins`:
- * `format` resolves plugin specifiers against `process.cwd()` rather than the
- * config file, and neither module has class strings to sort.
+ * The repo's prettier config, minus `plugins` — `format` resolves plugin
+ * specifiers against `process.cwd()` rather than against the config file.
  */
 export async function resolveFormatOptions(docsRoot) {
   const config = {
@@ -270,9 +249,9 @@ export async function resolveFormatOptions(docsRoot) {
 
 /**
  * Reads the docs sources under `docsRoot` and returns both generated modules as
- * formatted TypeScript source, keyed by output path. Two runs over unchanged
- * sources return the same strings: output order comes from the registry plus an
- * explicit slug sort, never from directory listing order. Pass `formatOptions`
+ * formatted TypeScript source, keyed by output path. Output order comes from the
+ * registry plus an explicit slug sort, never from directory listing order, so
+ * two runs over unchanged sources return the same strings. Pass `formatOptions`
  * to format against something other than the repo's prettier config.
  */
 export async function buildPageManifest(docsRoot, formatOptions) {
@@ -305,33 +284,36 @@ export async function buildPageManifest(docsRoot, formatOptions) {
   function buildPage(sectionSlug, slug) {
     const key = `${sectionSlug}/${slug}`;
     const sub = subsOf(sectionSlug).find((entry) => entry.slug === slug);
-    const page = {
+    const base = {
       route: `/${key}`,
       slug,
       label: sub?.label ?? humanize(slug),
     };
     if (sub?.nested) {
-      page.nested = sub.nested;
+      base.nested = sub.nested;
     }
 
     const source = sources.find((candidate) => candidate.pages.has(key));
-    if (!source) {
-      // No file on disk, so the page is registry-only and renders its wireframe.
-      if (sub?.lede === undefined || sub?.blocks === undefined) {
-        throw new Error(
-          `${key} has no page file, so it renders its registry wireframe — but its registry entry has no \`lede\` or \`blocks\`.`
-        );
-      }
-      Object.assign(page, { kind: 'placeholder', file: null });
-      return { page, wireframe: { lede: sub.lede, blocks: sub.blocks } };
+    if (source) {
+      const file = source.pages.get(key);
+      return {
+        page: { ...base, kind: source.kind, file },
+        specifier: specifierFor(file, source.keepExtension),
+      };
     }
 
-    const file = source.pages.get(key);
-    Object.assign(page, { kind: source.kind, file });
-    return { page, specifier: specifierFor(file, source.keepExtension) };
+    if (sub?.lede === undefined || sub?.blocks === undefined) {
+      throw new Error(
+        `${key} has no page file, so it renders its registry wireframe — but its registry entry has no \`lede\` or \`blocks\`.`
+      );
+    }
+    return {
+      page: { ...base, kind: 'placeholder', file: null },
+      wireframe: { lede: sub.lede, blocks: sub.blocks },
+    };
   }
 
-  /** Registry order first, then sections that exist only on disk, in slug order. */
+  /** Sections that exist only on disk, appended after the registry's own. */
   const extraSections = [...new Set(keysOnDisk.map((key) => key.split('/')[0]))]
     .filter((slug) => !Object.hasOwn(SECTIONS, slug))
     .sort();
@@ -347,19 +329,26 @@ export async function buildPageManifest(docsRoot, formatOptions) {
     })
   );
 
-  const manifest = built.map(({ entries, ...section }) => ({
-    ...section,
-    pages: entries.map((entry) => entry.page),
+  const manifest = built.map((section) => ({
+    slug: section.slug,
+    title: section.title,
+    href: section.href,
+    pages: section.entries.map((entry) => entry.page),
   }));
   manifest.forEach(assertNestedLabelsHaveNoPage);
 
-  const entries = built.flatMap((section) => section.entries);
-  const loaders = entries
-    .filter((entry) => entry.specifier)
-    .map((entry) => ({ route: entry.page.route, specifier: entry.specifier }));
-  const wireframes = entries
-    .filter((entry) => entry.wireframe)
-    .map((entry) => ({ route: entry.page.route, ...entry.wireframe }));
+  const loaders = [];
+  const wireframes = [];
+  for (const { page, specifier, wireframe } of built.flatMap(
+    (section) => section.entries
+  )) {
+    if (specifier) {
+      loaders.push({ route: page.route, specifier });
+    }
+    if (wireframe) {
+      wireframes.push({ route: page.route, ...wireframe });
+    }
+  }
 
   const format = formatOptions ?? (await resolveFormatOptions(docsRoot));
   const formatModule = (file, source) =>
