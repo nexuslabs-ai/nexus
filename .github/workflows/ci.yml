@@ -319,11 +319,9 @@ jobs:
         run: pnpm install --frozen-lockfile
 
       - name: Regenerate docs page manifest
-        id: regen-manifest
         run: pnpm --filter @nexus_ds/docs generate:manifest
 
       - name: Check docs page manifest freshness
-        if: ${{ !cancelled() && steps.regen-manifest.conclusion == 'success' }}
         # `git status --porcelain` (not `git diff`) so untracked new files also fail.
         run: |
           set -euo pipefail

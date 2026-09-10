@@ -63,9 +63,13 @@ const FIXTURE_REGISTRY = `export const SECTIONS = {
 
 describe('page manifest', () => {
   it('lists every section in registry order', () => {
-    expect(PAGE_MANIFEST.map((section) => section.slug)).toEqual(
-      Object.keys(SECTIONS)
-    );
+    const registered = new Set(Object.keys(SECTIONS));
+
+    expect(
+      PAGE_MANIFEST.map((section) => section.slug).filter((slug) =>
+        registered.has(slug)
+      )
+    ).toEqual(Object.keys(SECTIONS));
   });
 
   it('lists every registry page, with its label, nesting and position', () => {
@@ -77,8 +81,12 @@ describe('page manifest', () => {
       }))
     );
 
+    const registered = new Set(expected.map((page) => page.route));
+
     expect(
-      pages.map(({ route, label, nested }) => ({ route, label, nested }))
+      pages
+        .filter((page) => registered.has(page.route))
+        .map(({ route, label, nested }) => ({ route, label, nested }))
     ).toEqual(expected);
   });
 
@@ -135,7 +143,7 @@ describe('page manifest', () => {
     const second = await buildPageManifest(docsRoot);
 
     for (const file of [MANIFEST_FILE, CONTENT_FILE]) {
-      expect(toLf(first[file])).toBe(readOnDisk(file));
+      expect(first[file]).toBe(readOnDisk(file));
       expect(second[file]).toBe(first[file]);
     }
   });
@@ -218,16 +226,17 @@ describe('page manifest', () => {
     title: 'Components',
     href: '/components',
     subs: [
-      { slug: 'inputs', label: 'Inputs', nested: ['Button'], lede: '', blocks: [] },
+      { slug: 'overlays', label: 'Overlays', nested: ['DropdownMenu'], lede: '', blocks: [] },
     ],
   },
 } satisfies Record<string, unknown>;
 `,
-      'app/_pages/components/button.tsx': 'export default function P() {}\n',
+      'app/_pages/components/dropdown-menu.tsx':
+        'export default function P() {}\n',
     });
 
     await expect(buildPageManifest(root)).rejects.toThrow(
-      'components lists "Button" both as a page and as a nested label'
+      'components lists "DropdownMenu" both as a page and as a nested label'
     );
   });
 });

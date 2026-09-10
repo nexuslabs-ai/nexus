@@ -124,15 +124,20 @@ function assertOneSourcePerRoute(sources) {
   }
 }
 
+/** `DropdownMenu`, `dropdown-menu` and `Show / Hide` all fold to one key. */
+function comparisonKey(value) {
+  return value.toLowerCase().replace(/[^a-z0-9]/g, '');
+}
+
 /**
  * The registry's `nested` labels stand in for pages that do not exist yet. Once
  * one does, the label and the page would both show in the left rail.
  */
 function assertNestedLabelsHaveNoPage(section) {
-  const labels = new Set(section.pages.map((page) => page.label));
+  const slugs = new Set(section.pages.map((page) => comparisonKey(page.slug)));
   for (const page of section.pages) {
     for (const label of page.nested ?? []) {
-      if (labels.has(label)) {
+      if (slugs.has(comparisonKey(label))) {
         throw new Error(
           `${section.slug} lists "${label}" both as a page and as a nested label under ${page.slug} — drop the nested label now the page exists.`
         );
@@ -218,7 +223,7 @@ function renderContentModule({ loaders, wireframes }) {
 
 import type { ComponentType } from 'react';
 
-import type { Block } from './sections';
+import type { Block } from './blocks';
 
 // The thunks below import page and MDX modules, so a \`'use client'\` importer
 // would pull the whole docs body into the client bundle.
@@ -271,6 +276,7 @@ export async function buildPageManifest(docsRoot, formatOptions) {
 
   const sectionFor = (slug) =>
     Object.hasOwn(SECTIONS, slug) ? SECTIONS[slug] : undefined;
+  const subsOf = (slug) => sectionFor(slug)?.subs ?? [];
 
   const sources = SOURCES.map((source) => ({
     ...source,
@@ -281,9 +287,7 @@ export async function buildPageManifest(docsRoot, formatOptions) {
 
   /** Registry order first, then slugs that exist only on disk, in slug order. */
   function orderedSlugs(sectionSlug) {
-    const registered = (sectionFor(sectionSlug)?.subs ?? []).map(
-      (sub) => sub.slug
-    );
+    const registered = subsOf(sectionSlug).map((sub) => sub.slug);
     const extra = keysOnDisk
       .filter((key) => key.startsWith(`${sectionSlug}/`))
       .map((key) => key.slice(sectionSlug.length + 1))
@@ -294,9 +298,7 @@ export async function buildPageManifest(docsRoot, formatOptions) {
 
   function buildPage(sectionSlug, slug) {
     const key = `${sectionSlug}/${slug}`;
-    const sub = sectionFor(sectionSlug)?.subs.find(
-      (entry) => entry.slug === slug
-    );
+    const sub = subsOf(sectionSlug).find((entry) => entry.slug === slug);
     const page = {
       route: `/${key}`,
       slug,
@@ -309,6 +311,11 @@ export async function buildPageManifest(docsRoot, formatOptions) {
     const source = sources.find((candidate) => candidate.pages.has(key));
     if (!source) {
       // No file on disk, so the page is registry-only and renders its wireframe.
+      if (sub.lede === undefined || sub.blocks === undefined) {
+        throw new Error(
+          `${key} has no page file, so it renders its registry wireframe — but its registry entry has no \`lede\` or \`blocks\`.`
+        );
+      }
       Object.assign(page, { kind: 'placeholder', file: null });
       return { page, wireframe: { lede: sub.lede, blocks: sub.blocks } };
     }
