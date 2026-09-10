@@ -254,7 +254,7 @@ describe('page manifest', () => {
     });
 
     await expect(buildPageManifest(root)).rejects.toThrow(
-      'but components/dropdown-menu is now a page'
+      '"DropdownMenu" as a nested label under overlays, but components/dropdown-menu is now a page'
     );
   });
 
@@ -275,7 +275,7 @@ describe('page manifest', () => {
     });
 
     await expect(buildPageManifest(root)).rejects.toThrow(
-      'but components/menus is now a page'
+      '"DropdownMenu" as a nested label under overlays, but components/menus is now a page'
     );
   });
 });
