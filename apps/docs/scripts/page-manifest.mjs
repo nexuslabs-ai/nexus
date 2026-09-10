@@ -337,11 +337,10 @@ export async function buildPageManifest(docsRoot, formatOptions) {
   }));
   manifest.forEach(assertNestedLabelsHaveNoPage);
 
+  const entries = built.flatMap((section) => section.entries);
   const loaders = [];
   const wireframes = [];
-  for (const { page, specifier, wireframe } of built.flatMap(
-    (section) => section.entries
-  )) {
+  for (const { page, specifier, wireframe } of entries) {
     if (specifier) {
       loaders.push({ route: page.route, specifier });
     }
