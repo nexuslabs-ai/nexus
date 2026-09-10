@@ -15,7 +15,7 @@ export function PageWireframeView({
   const wireframe = PAGE_WIREFRAMES[page.route];
   if (!wireframe) {
     throw new Error(
-      `${page.route} is a placeholder page with no PAGE_WIREFRAMES entry — the manifest and the content module have desynced.`
+      `${page.route} is a placeholder page with no PAGE_WIREFRAMES entry — run \`pnpm --filter @nexus_ds/docs generate:manifest\` to resync the generated modules.`
     );
   }
 

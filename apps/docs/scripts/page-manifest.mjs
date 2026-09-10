@@ -29,7 +29,7 @@ import prettier from 'prettier';
 /** Nav metadata source, relative to the docs app root. */
 export const REGISTRY_FILE = 'page-registry/index.ts';
 
-/** Wireframe block types the generated content module imports, same-relative. */
+/** Wireframe block types the generated content module imports, relative to the docs app root. */
 const BLOCKS_FILE = 'page-registry/blocks.ts';
 
 /** Output paths, relative to the docs app root. */
@@ -278,27 +278,25 @@ export async function buildPageManifest(docsRoot, formatOptions) {
 
   /** Registry order first, then slugs that exist only on disk, in slug order. */
   function orderedSlugs(sectionSlug) {
-    const registered = pagesOf(sectionSlug).map((entry) => entry.slug);
+    const registeredSlugs = pagesOf(sectionSlug).map((entry) => entry.slug);
     const extra = keysOnDisk
       .filter((key) => key.startsWith(`${sectionSlug}/`))
       .map((key) => key.slice(sectionSlug.length + 1))
-      .filter((slug) => !registered.includes(slug))
+      .filter((slug) => !registeredSlugs.includes(slug))
       .sort();
-    return [...registered, ...extra];
+    return [...registeredSlugs, ...extra];
   }
 
   function buildPage(sectionSlug, slug) {
     const key = `${sectionSlug}/${slug}`;
-    const registered = pagesOf(sectionSlug).find(
-      (entry) => entry.slug === slug
-    );
+    const entry = pagesOf(sectionSlug).find((page) => page.slug === slug);
     const base = {
       route: `/${key}`,
       slug,
-      label: registered?.label ?? humanize(slug),
+      label: entry?.label ?? humanize(slug),
     };
-    if (registered?.nested) {
-      base.nested = registered.nested;
+    if (entry?.nested) {
+      base.nested = entry.nested;
     }
 
     const source = sources.find((candidate) => candidate.pages.has(key));
@@ -310,14 +308,14 @@ export async function buildPageManifest(docsRoot, formatOptions) {
       };
     }
 
-    if (registered?.lede === undefined || registered?.blocks === undefined) {
+    if (entry?.lede === undefined || entry?.blocks === undefined) {
       throw new Error(
         `${key} has no page file, so it renders its registry wireframe — but its registry entry has no \`lede\` or \`blocks\`.`
       );
     }
     return {
       page: { ...base, kind: 'placeholder', file: null },
-      wireframe: { lede: registered.lede, blocks: registered.blocks },
+      wireframe: { lede: entry.lede, blocks: entry.blocks },
     };
   }
 
