@@ -39,7 +39,7 @@ const AUDIENCES = [
   },
 ];
 
-// Getting Started is reached through the audience cards above, not a section card.
+// requireSection, not the literal: a renamed section fails the build here.
 const AUDIENCE_SLUG = requireSection('getting-started').slug;
 
 const SECTION_CARDS = PAGE_MANIFEST.filter(

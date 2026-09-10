@@ -12,7 +12,6 @@ export function countComponents(section: ManifestSection): number {
   );
 }
 
-/** How big a section is, in the unit it declares in the page registry. */
 export function describeSize(section: ManifestSection): string {
   switch (section.unit) {
     case 'components': {

@@ -136,9 +136,7 @@ function assertLabelsAvoidTheCardJoiner(section) {
 }
 
 function assertComponentsDeclareTheirUnit(section) {
-  if (section.unit === 'components') {
-    return;
-  }
+  if (section.unit === 'components') return;
   for (const page of section.pages) {
     if (page.components) {
       throw new Error(
