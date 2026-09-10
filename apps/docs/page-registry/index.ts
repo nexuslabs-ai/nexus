@@ -1,7 +1,7 @@
 /**
  * Nav metadata the docs filesystem cannot supply, and the only input
  * `scripts/page-manifest.mjs` reads that is not a page file. A page renders
- * its `lede` / `blocks` wireframe only until it has a real file; its entry
+ * its `wireframe` only until it has a real file; its entry
  * stays either way, carrying label, order and rail nesting.
  */
 
@@ -12,10 +12,8 @@ export type RegistryPage = {
   label: string;
   /** Optional nested labels rendered inline in the left rail (non-interactive). */
   nested?: string[];
-  /** Wireframe lede, carried only while the page has no source file. */
-  lede?: string;
-  /** Wireframe-style content blocks, carried alongside `lede`. */
-  blocks?: Block[];
+  /** Placeholder body, carried only while the page has no source file. */
+  wireframe?: { lede: string; blocks: Block[] };
 };
 
 export type RegistrySection = {
@@ -42,51 +40,58 @@ export const PAGE_REGISTRY = {
       {
         slug: 'first-component',
         label: 'Your first component',
-        lede: '[ Render a Button, swap a variant, observe the data attributes ]',
-        blocks: [
-          {
-            type: 'placeholder',
-            variant: 'code',
-            label: '[ Code block — JSX import + render ]',
-          },
-          {
-            type: 'placeholder',
-            variant: 'storybook',
-            label: '[ Storybook embed — Button playground ]',
-          },
-        ],
+        wireframe: {
+          lede: '[ Render a Button, swap a variant, observe the data attributes ]',
+          blocks: [
+            {
+              type: 'placeholder',
+              variant: 'code',
+              label: '[ Code block — JSX import + render ]',
+            },
+            {
+              type: 'placeholder',
+              variant: 'storybook',
+              label: '[ Storybook embed — Button playground ]',
+            },
+          ],
+        },
       },
       {
         slug: 'designers',
         label: 'For designers',
-        lede: '[ Open the Figma library · use the variables · sync via Code Connect ]',
-        blocks: [
-          {
-            type: 'placeholder',
-            label: '[ External-link list — Figma library, Code Connect docs ]',
-          },
-          {
-            type: 'placeholder',
-            variant: 'diagram',
-            label: '[ Diagram — code ↔ Figma parity flow ]',
-          },
-        ],
+        wireframe: {
+          lede: '[ Open the Figma library · use the variables · sync via Code Connect ]',
+          blocks: [
+            {
+              type: 'placeholder',
+              label:
+                '[ External-link list — Figma library, Code Connect docs ]',
+            },
+            {
+              type: 'placeholder',
+              variant: 'diagram',
+              label: '[ Diagram — code ↔ Figma parity flow ]',
+            },
+          ],
+        },
       },
       {
         slug: 'agents',
         label: 'For AI agents',
-        lede: '[ Point your agent at llms.txt · load the rule files · use the system prompt ]',
-        blocks: [
-          {
-            type: 'placeholder',
-            variant: 'code',
-            label: '[ Code block — system-prompt snippet ]',
-          },
-          {
-            type: 'placeholder',
-            label: '[ Download / copy buttons — llms.txt, rules.zip ]',
-          },
-        ],
+        wireframe: {
+          lede: '[ Point your agent at llms.txt · load the rule files · use the system prompt ]',
+          blocks: [
+            {
+              type: 'placeholder',
+              variant: 'code',
+              label: '[ Code block — system-prompt snippet ]',
+            },
+            {
+              type: 'placeholder',
+              label: '[ Download / copy buttons — llms.txt, rules.zip ]',
+            },
+          ],
+        },
       },
     ],
   },
@@ -136,86 +141,96 @@ export const PAGE_REGISTRY = {
         slug: 'inputs',
         label: 'Inputs',
         nested: ['Button', 'Input', 'Select', 'Switch', 'Tabs'],
-        lede: '[ Interactive controls · per-component Storybook page below ]',
-        blocks: [
-          {
-            type: 'row',
-            blocks: [
-              {
-                variant: 'storybook',
-                label: '[ Storybook embed — selected component ]',
-              },
-              { variant: 'tall', label: '[ Variant matrix · props table ]' },
-            ],
-          },
-          { type: 'h2', text: '[ Per-component pages ]' },
-          {
-            type: 'placeholder',
-            label: '[ Index — Button · Input · Select · Switch · Tabs ]',
-          },
-          {
-            type: 'placeholder',
-            variant: 'code',
-            label: '[ Code — JSX usage example ]',
-          },
-        ],
+        wireframe: {
+          lede: '[ Interactive controls · per-component Storybook page below ]',
+          blocks: [
+            {
+              type: 'row',
+              blocks: [
+                {
+                  variant: 'storybook',
+                  label: '[ Storybook embed — selected component ]',
+                },
+                { variant: 'tall', label: '[ Variant matrix · props table ]' },
+              ],
+            },
+            { type: 'h2', text: '[ Per-component pages ]' },
+            {
+              type: 'placeholder',
+              label: '[ Index — Button · Input · Select · Switch · Tabs ]',
+            },
+            {
+              type: 'placeholder',
+              variant: 'code',
+              label: '[ Code — JSX usage example ]',
+            },
+          ],
+        },
       },
       {
         slug: 'containers',
         label: 'Containers',
         nested: ['Card', 'Dialog', 'Accordion', 'Alert'],
-        lede: '[ Card · Dialog · Accordion · Alert ]',
-        blocks: [
-          {
-            type: 'placeholder',
-            variant: 'storybook',
-            label: '[ Storybook embed ]',
-          },
-          {
-            type: 'placeholder',
-            label: '[ Composition patterns · slots / children ]',
-          },
-        ],
+        wireframe: {
+          lede: '[ Card · Dialog · Accordion · Alert ]',
+          blocks: [
+            {
+              type: 'placeholder',
+              variant: 'storybook',
+              label: '[ Storybook embed ]',
+            },
+            {
+              type: 'placeholder',
+              label: '[ Composition patterns · slots / children ]',
+            },
+          ],
+        },
       },
       {
         slug: 'navigation',
         label: 'Navigation',
         nested: ['DropdownMenu'],
-        lede: '[ DropdownMenu · (future) NavigationMenu · Breadcrumbs ]',
-        blocks: [
-          {
-            type: 'placeholder',
-            variant: 'storybook',
-            label: '[ Storybook embed ]',
-          },
-        ],
+        wireframe: {
+          lede: '[ DropdownMenu · (future) NavigationMenu · Breadcrumbs ]',
+          blocks: [
+            {
+              type: 'placeholder',
+              variant: 'storybook',
+              label: '[ Storybook embed ]',
+            },
+          ],
+        },
       },
       {
         slug: 'display',
         label: 'Display',
         nested: ['Badge', 'Avatar', 'Tooltip'],
-        lede: '[ Badge · Avatar · Tooltip ]',
-        blocks: [
-          {
-            type: 'placeholder',
-            variant: 'storybook',
-            label: '[ Storybook embed ]',
-          },
-        ],
+        wireframe: {
+          lede: '[ Badge · Avatar · Tooltip ]',
+          blocks: [
+            {
+              type: 'placeholder',
+              variant: 'storybook',
+              label: '[ Storybook embed ]',
+            },
+          ],
+        },
       },
       {
         slug: 'primitives',
         label: 'Primitives',
         nested: ['Show / Hide', 'Slot'],
-        lede: '[ Low-level building blocks: Show / Hide · Slot ]',
-        blocks: [
-          {
-            type: 'placeholder',
-            variant: 'code',
-            label: '[ Code — Show / Hide usage ]',
-          },
-          { type: 'placeholder', label: '[ API table ]' },
-        ],
+        wireframe: {
+          lede: '[ Low-level building blocks: Show / Hide · Slot ]',
+          blocks: [
+            {
+              type: 'placeholder',
+              variant: 'code',
+              label: '[ Code — Show / Hide usage ]',
+            },
+            { type: 'placeholder', label: '[ API table ]' },
+          ],
+        },
       },
     ],
   },
@@ -235,36 +250,40 @@ export const PAGE_REGISTRY = {
       {
         slug: 'density-modes',
         label: 'Density modes',
-        lede: '[ Spacing density via data-density ]',
-        blocks: [
-          {
-            type: 'placeholder',
-            variant: 'tall',
-            label:
-              '[ Live demo — 6-mode grid · same component, different density ]',
-          },
-          {
-            type: 'placeholder',
-            variant: 'code',
-            label: '[ Code — data-density attribute pattern ]',
-          },
-        ],
+        wireframe: {
+          lede: '[ Spacing density via data-density ]',
+          blocks: [
+            {
+              type: 'placeholder',
+              variant: 'tall',
+              label:
+                '[ Live demo — 6-mode grid · same component, different density ]',
+            },
+            {
+              type: 'placeholder',
+              variant: 'code',
+              label: '[ Code — data-density attribute pattern ]',
+            },
+          ],
+        },
       },
       {
         slug: 'overrides',
         label: 'Consumer overrides',
-        lede: '[ Re-point a token via CSS variable in your stylesheet ]',
-        blocks: [
-          {
-            type: 'placeholder',
-            variant: 'code',
-            label: '[ Code — :root override pattern ]',
-          },
-          {
-            type: 'placeholder',
-            label: "[ Body — what's safe to override, what isn't ]",
-          },
-        ],
+        wireframe: {
+          lede: '[ Re-point a token via CSS variable in your stylesheet ]',
+          blocks: [
+            {
+              type: 'placeholder',
+              variant: 'code',
+              label: '[ Code — :root override pattern ]',
+            },
+            {
+              type: 'placeholder',
+              label: "[ Body — what's safe to override, what isn't ]",
+            },
+          ],
+        },
       },
     ],
   },
@@ -276,87 +295,98 @@ export const PAGE_REGISTRY = {
       {
         slug: 'nx-prefix',
         label: 'nx: prefix (Tailwind)',
-        lede: '[ Why everything is prefixed · how it composes with modifiers ]',
-        blocks: [
-          {
-            type: 'placeholder',
-            variant: 'code',
-            label: "[ Code — examples · do / don't ]",
-          },
-          {
-            type: 'placeholder',
-            variant: 'table',
-            label: '[ Table — prefix placement rules ]',
-          },
-        ],
+        wireframe: {
+          lede: '[ Why everything is prefixed · how it composes with modifiers ]',
+          blocks: [
+            {
+              type: 'placeholder',
+              variant: 'code',
+              label: "[ Code — examples · do / don't ]",
+            },
+            {
+              type: 'placeholder',
+              variant: 'table',
+              label: '[ Table — prefix placement rules ]',
+            },
+          ],
+        },
       },
       {
         slug: 'code-connect',
         label: 'Figma Code Connect',
-        lede: '[ Mapping Figma components to code · maintaining .figma.ts ]',
-        blocks: [
-          {
-            type: 'placeholder',
-            variant: 'code',
-            label: '[ Code — example .figma.ts ]',
-          },
-          {
-            type: 'placeholder',
-            variant: 'diagram',
-            label: '[ Diagram — Figma ↔ code parity ]',
-          },
-        ],
+        wireframe: {
+          lede: '[ Mapping Figma components to code · maintaining .figma.ts ]',
+          blocks: [
+            {
+              type: 'placeholder',
+              variant: 'code',
+              label: '[ Code — example .figma.ts ]',
+            },
+            {
+              type: 'placeholder',
+              variant: 'diagram',
+              label: '[ Diagram — Figma ↔ code parity ]',
+            },
+          ],
+        },
       },
       {
         slug: 'eslint',
         label: 'ESLint plugin',
-        lede: '[ @nexus_ds/eslint-plugin · canonical-spacing-steps · class conventions ]',
-        blocks: [
-          {
-            type: 'placeholder',
-            variant: 'code',
-            label: '[ Code — install + config ]',
-          },
-          {
-            type: 'placeholder',
-            variant: 'table',
-            label: '[ Table — rules · severity · what they flag ]',
-          },
-        ],
+        wireframe: {
+          lede: '[ @nexus_ds/eslint-plugin · canonical-spacing-steps · class conventions ]',
+          blocks: [
+            {
+              type: 'placeholder',
+              variant: 'code',
+              label: '[ Code — install + config ]',
+            },
+            {
+              type: 'placeholder',
+              variant: 'table',
+              label: '[ Table — rules · severity · what they flag ]',
+            },
+          ],
+        },
       },
       {
         slug: 'audits',
         label: 'Token audits',
-        lede: '[ figma-parity · APCA contrast · spacing-modes ]',
-        blocks: [
-          {
-            type: 'placeholder',
-            variant: 'table',
-            label: '[ Table — audit · command · exit codes · what it catches ]',
-          },
-          {
-            type: 'placeholder',
-            variant: 'code',
-            label: '[ Code — CI workflow snippet ]',
-          },
-        ],
+        wireframe: {
+          lede: '[ figma-parity · APCA contrast · spacing-modes ]',
+          blocks: [
+            {
+              type: 'placeholder',
+              variant: 'table',
+              label:
+                '[ Table — audit · command · exit codes · what it catches ]',
+            },
+            {
+              type: 'placeholder',
+              variant: 'code',
+              label: '[ Code — CI workflow snippet ]',
+            },
+          ],
+        },
       },
       {
         slug: 'storybook',
         label: 'Storybook',
-        lede: '[ Stories-as-tests · autodocs · base-variant grids ]',
-        blocks: [
-          {
-            type: 'placeholder',
-            variant: 'storybook',
-            label: '[ Storybook embed — example component ]',
-          },
-          {
-            type: 'placeholder',
-            variant: 'code',
-            label: '[ Code — story template ]',
-          },
-        ],
+        wireframe: {
+          lede: '[ Stories-as-tests · autodocs · base-variant grids ]',
+          blocks: [
+            {
+              type: 'placeholder',
+              variant: 'storybook',
+              label: '[ Storybook embed — example component ]',
+            },
+            {
+              type: 'placeholder',
+              variant: 'code',
+              label: '[ Code — story template ]',
+            },
+          ],
+        },
       },
     ],
   },
@@ -368,52 +398,59 @@ export const PAGE_REGISTRY = {
       {
         slug: 'engineering',
         label: 'Engineering principles',
-        lede: '[ Simplicity over cleverness · guard clauses · composition · ripple effect ]',
-        blocks: [
-          {
-            type: 'placeholder',
-            variant: 'table',
-            label: '[ Table — principle · rule file · one-line summary ]',
-          },
-          {
-            type: 'placeholder',
-            label: '[ Cards — each rule from code-quality.md children ]',
-          },
-        ],
+        wireframe: {
+          lede: '[ Simplicity over cleverness · guard clauses · composition · ripple effect ]',
+          blocks: [
+            {
+              type: 'placeholder',
+              variant: 'table',
+              label: '[ Table — principle · rule file · one-line summary ]',
+            },
+            {
+              type: 'placeholder',
+              label: '[ Cards — each rule from code-quality.md children ]',
+            },
+          ],
+        },
       },
       {
         slug: 'testing',
         label: 'Testing model',
-        lede: '[ Stories are tests · vitest projects · APCA at the token layer ]',
-        blocks: [
-          {
-            type: 'placeholder',
-            variant: 'diagram',
-            label: '[ Diagram — what runs where (storybook / unit / audits) ]',
-          },
-          {
-            type: 'placeholder',
-            variant: 'code',
-            label: '[ Code — play function example ]',
-          },
-        ],
+        wireframe: {
+          lede: '[ Stories are tests · vitest projects · APCA at the token layer ]',
+          blocks: [
+            {
+              type: 'placeholder',
+              variant: 'diagram',
+              label:
+                '[ Diagram — what runs where (storybook / unit / audits) ]',
+            },
+            {
+              type: 'placeholder',
+              variant: 'code',
+              label: '[ Code — play function example ]',
+            },
+          ],
+        },
       },
       {
         slug: 'contribution',
         label: 'Contribution workflow',
-        lede: '[ Branch · PR title · review accounts · DoD ]',
-        blocks: [
-          {
-            type: 'placeholder',
-            variant: 'diagram',
-            label: '[ Diagram — issue → branch → PR → review → merge ]',
-          },
-          {
-            type: 'placeholder',
-            variant: 'table',
-            label: '[ Table — verdicts · review events · who posts ]',
-          },
-        ],
+        wireframe: {
+          lede: '[ Branch · PR title · review accounts · DoD ]',
+          blocks: [
+            {
+              type: 'placeholder',
+              variant: 'diagram',
+              label: '[ Diagram — issue → branch → PR → review → merge ]',
+            },
+            {
+              type: 'placeholder',
+              variant: 'table',
+              label: '[ Table — verdicts · review events · who posts ]',
+            },
+          ],
+        },
       },
     ],
   },
@@ -425,40 +462,46 @@ export const PAGE_REGISTRY = {
       {
         slug: 'llms-txt',
         label: 'llms.txt',
-        lede: '[ Point your model at one URL · machine-readable site map ]',
-        blocks: [
-          {
-            type: 'placeholder',
-            variant: 'code',
-            label: '[ Code — llms.txt preview ]',
-          },
-          { type: 'placeholder', label: '[ Download · copy link ]' },
-        ],
+        wireframe: {
+          lede: '[ Point your model at one URL · machine-readable site map ]',
+          blocks: [
+            {
+              type: 'placeholder',
+              variant: 'code',
+              label: '[ Code — llms.txt preview ]',
+            },
+            { type: 'placeholder', label: '[ Download · copy link ]' },
+          ],
+        },
       },
       {
         slug: 'rules-mirror',
         label: 'Rules mirror',
-        lede: '[ All 17 rule files · readable on the web · always up to date ]',
-        blocks: [
-          {
-            type: 'placeholder',
-            variant: 'table',
-            label: '[ Table — rule file · purpose · related ]',
-          },
-        ],
+        wireframe: {
+          lede: '[ All 17 rule files · readable on the web · always up to date ]',
+          blocks: [
+            {
+              type: 'placeholder',
+              variant: 'table',
+              label: '[ Table — rule file · purpose · related ]',
+            },
+          ],
+        },
       },
       {
         slug: 'authoring',
         label: 'Agent authoring',
-        lede: '[ Copy-paste system prompts · authoring conventions · common pitfalls ]',
-        blocks: [
-          {
-            type: 'placeholder',
-            variant: 'code',
-            label: '[ Code — system prompt template ]',
-          },
-          { type: 'placeholder', label: "[ Do / Don't list ]" },
-        ],
+        wireframe: {
+          lede: '[ Copy-paste system prompts · authoring conventions · common pitfalls ]',
+          blocks: [
+            {
+              type: 'placeholder',
+              variant: 'code',
+              label: '[ Code — system prompt template ]',
+            },
+            { type: 'placeholder', label: "[ Do / Don't list ]" },
+          ],
+        },
       },
     ],
   },

@@ -57,7 +57,7 @@ const FIXTURE_REGISTRY = `export const PAGE_REGISTRY = {
     slug: 'foundations',
     title: 'Foundations',
     href: '/foundations',
-    pages: [{ slug: 'color', label: 'Color', lede: '', blocks: [] }],
+    pages: [{ slug: 'color', label: 'Color' }],
   },
 } satisfies Record<string, unknown>;
 `;
@@ -117,10 +117,7 @@ describe('page manifest', () => {
       const registered = PAGE_REGISTRY[sectionSlug].pages.find(
         (entry) => entry.slug === page.slug
       );
-      expect(PAGE_WIREFRAMES[page.route]).toEqual({
-        lede: registered.lede,
-        blocks: registered.blocks,
-      });
+      expect(PAGE_WIREFRAMES[page.route]).toEqual(registered.wireframe);
     }
   });
 
@@ -229,6 +226,27 @@ describe('page manifest', () => {
     );
   });
 
+  it('rejects a wireframe left behind by a page that now has a file', async () => {
+    const root = writeFixture({
+      [REGISTRY_FILE]: `export const PAGE_REGISTRY = {
+  foundations: {
+    slug: 'foundations',
+    title: 'Foundations',
+    href: '/foundations',
+    pages: [
+      { slug: 'color', label: 'Color', wireframe: { lede: '', blocks: [] } },
+    ],
+  },
+} satisfies Record<string, unknown>;
+`,
+      'content/foundations/color.mdx': '# Color\n',
+    });
+
+    await expect(buildPageManifest(root)).rejects.toThrow(
+      'foundations/color is written at content/foundations/color.mdx'
+    );
+  });
+
   it('rejects a nested label that now has a page of its own', async () => {
     const root = writeFixture({
       [REGISTRY_FILE]: `export const PAGE_REGISTRY = {
@@ -237,7 +255,7 @@ describe('page manifest', () => {
     title: 'Components',
     href: '/components',
     pages: [
-      { slug: 'overlays', label: 'Overlays', nested: ['DropdownMenu'], lede: '', blocks: [] },
+      { slug: 'overlays', label: 'Overlays', nested: ['DropdownMenu'], wireframe: { lede: '', blocks: [] } },
     ],
   },
 } satisfies Record<string, unknown>;
@@ -259,8 +277,8 @@ describe('page manifest', () => {
     title: 'Components',
     href: '/components',
     pages: [
-      { slug: 'menus', label: 'DropdownMenu', lede: '', blocks: [] },
-      { slug: 'overlays', label: 'Overlays', nested: ['DropdownMenu'], lede: '', blocks: [] },
+      { slug: 'menus', label: 'DropdownMenu', wireframe: { lede: '', blocks: [] } },
+      { slug: 'overlays', label: 'Overlays', nested: ['DropdownMenu'], wireframe: { lede: '', blocks: [] } },
     ],
   },
 } satisfies Record<string, unknown>;

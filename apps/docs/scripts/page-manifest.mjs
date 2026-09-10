@@ -302,20 +302,25 @@ export async function buildPageManifest(docsRoot, formatOptions) {
     const source = sources.find((candidate) => candidate.pages.has(key));
     if (source) {
       const file = source.pages.get(key);
+      if (entry?.wireframe) {
+        throw new Error(
+          `${key} is written at ${file}, so its registry wireframe can never render — drop the \`wireframe\` from its registry entry.`
+        );
+      }
       return {
         page: { ...base, kind: source.kind, file },
         specifier: specifierFor(file, source.keepExtension),
       };
     }
 
-    if (entry?.lede === undefined || entry?.blocks === undefined) {
+    if (entry?.wireframe === undefined) {
       throw new Error(
-        `${key} has no page file, so it renders its registry wireframe — give its registry entry a \`lede\` and \`blocks\`, or add the page file.`
+        `${key} has no page file, so it renders its registry wireframe — give its registry entry a \`wireframe\`, or write the page.`
       );
     }
     return {
       page: { ...base, kind: 'placeholder', file: null },
-      wireframe: { lede: entry.lede, blocks: entry.blocks },
+      wireframe: entry.wireframe,
     };
   }
 
