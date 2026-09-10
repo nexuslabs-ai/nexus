@@ -123,7 +123,6 @@ function railLabelsOf(page) {
   return [...(page.components ?? []), ...(page.nested ?? [])];
 }
 
-/** The separator the home page's section cards join page labels with. */
 const CARD_JOINER = ' · ';
 
 function assertLabelsAvoidTheCardJoiner(section) {
