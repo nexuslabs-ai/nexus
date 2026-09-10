@@ -34,7 +34,7 @@ const AUDIENCES = [
   },
 ];
 
-const SECTIONS = [
+const SECTION_CARDS = [
   {
     count: '6 pages',
     title: 'Foundations',
@@ -139,7 +139,7 @@ export default function Home() {
         What&rsquo;s inside
       </h2>
       <div className="nx:grid nx:grid-cols-1 nx:md:grid-cols-3 nx:gap-3">
-        {SECTIONS.map((s) => (
+        {SECTION_CARDS.map((s) => (
           <Link
             key={s.title}
             href={s.href}

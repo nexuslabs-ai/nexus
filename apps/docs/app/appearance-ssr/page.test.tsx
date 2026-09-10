@@ -9,7 +9,7 @@ import {
 } from '@nexus_ds/core';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
-import { SERVER_ROUTE_PAGES } from '../_lib/real-pages';
+import { SERVER_ROUTE_PAGES } from '../_lib/server-route-pages';
 
 const { cookieGetMock, cookiesMock } = vi.hoisted(() => ({
   cookieGetMock: vi.fn(),

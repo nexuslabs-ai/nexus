@@ -1,9 +1,10 @@
 import { notFound, redirect } from 'next/navigation';
 
-import { getDefaultSub, getSection, SECTIONS } from '../_lib/sections';
+import { getSection } from '../_lib/manifest';
+import { PAGE_MANIFEST } from '../_lib/page-manifest.generated';
 
 export function generateStaticParams() {
-  return Object.keys(SECTIONS).map((section) => ({ section }));
+  return PAGE_MANIFEST.map((section) => ({ section: section.slug }));
 }
 
 export const dynamicParams = false;
@@ -14,6 +15,7 @@ export default async function Page({
   params: Promise<{ section: string }>;
 }) {
   const { section } = await params;
-  if (!getSection(section)) notFound();
-  redirect(`/${section}/${getDefaultSub(section)}`);
+  const first = getSection(section)?.pages[0];
+  if (!first) notFound();
+  redirect(first.route);
 }

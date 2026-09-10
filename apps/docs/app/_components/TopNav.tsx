@@ -7,14 +7,14 @@ import { useNexusAppearance } from '@nexus_ds/react/appearance';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 
-import { SECTIONS } from '../_lib/sections';
+import { PAGE_MANIFEST } from '../_lib/page-manifest.generated';
 
 import { Button } from './nexus';
 import { SearchPalette } from './SearchPalette';
 
 const NAV_LINKS = [
   { href: '/', label: 'Home', match: '/' },
-  ...Object.values(SECTIONS).map((section) => ({
+  ...PAGE_MANIFEST.map((section) => ({
     href: section.href,
     label: section.title,
     match: section.href,

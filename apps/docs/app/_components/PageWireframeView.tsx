@@ -1,21 +1,24 @@
 import { notFound } from 'next/navigation';
 
 import type { Block } from '../_lib/blocks';
-import { getSection, getSubPage } from '../_lib/sections';
+import { PAGE_WIREFRAMES } from '../_lib/page-content.generated';
+import type {
+  ManifestPage,
+  ManifestSection,
+} from '../_lib/page-manifest.generated';
 
 import { Breadcrumb } from './Breadcrumb';
 import { Placeholder } from './Placeholder';
 
-export function SubPageView({
-  sectionSlug,
-  subSlug,
+export function PageWireframeView({
+  section,
+  page,
 }: {
-  sectionSlug: string;
-  subSlug: string;
+  section: ManifestSection;
+  page: ManifestPage;
 }) {
-  const section = getSection(sectionSlug);
-  const sub = getSubPage(sectionSlug, subSlug);
-  if (!section || !sub) notFound();
+  const wireframe = PAGE_WIREFRAMES[page.route];
+  if (!wireframe) notFound();
 
   return (
     <>
@@ -23,14 +26,14 @@ export function SubPageView({
         items={[
           { label: 'Home', href: '/' },
           { label: section.title, href: section.href },
-          { label: sub.label },
+          { label: page.label },
         ]}
       />
-      <h1 className="nx:typography-heading-large">[ {sub.label} ]</h1>
+      <h1 className="nx:typography-heading-large">[ {page.label} ]</h1>
       <p className="nx:typography-body-default nx:text-muted-foreground nx:mb-5">
-        {sub.lede}
+        {wireframe.lede}
       </p>
-      {sub.blocks.map((block, i) => (
+      {wireframe.blocks.map((block, i) => (
         <BlockRender key={i} block={block} />
       ))}
     </>

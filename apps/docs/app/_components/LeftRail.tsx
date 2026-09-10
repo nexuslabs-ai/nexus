@@ -4,12 +4,12 @@ import { cn } from '@nexus_ds/react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 
-import type { Section } from '../_lib/sections';
+import type { ManifestSection } from '../_lib/page-manifest.generated';
 
 const RAIL_LINK_BASE =
   'nx:block nx:px-2 nx:py-1 nx:typography-label-default nx:rounded-sm nx:border-l-2 nx:no-underline nx:focus-visible:outline-2 nx:focus-visible:outline-focus-default nx:focus-visible:outline-offset-(--focus-offset)';
 
-export function LeftRail({ section }: { section: Section }) {
+export function LeftRail({ section }: { section: ManifestSection }) {
   const pathname = usePathname();
   return (
     <aside className="nx:sticky nx:top-(--docs-header-h) nx:self-start nx:max-h-[calc(100svh-var(--docs-header-h))] nx:overflow-y-auto nx:pr-2">
@@ -17,13 +17,12 @@ export function LeftRail({ section }: { section: Section }) {
         {section.title}
       </h3>
       <ul className="nx:list-none nx:p-0 nx:m-0">
-        {section.subs.map((sub) => {
-          const href = `${section.href}/${sub.slug}`;
-          const active = pathname === href;
+        {section.pages.map((page) => {
+          const active = pathname === page.route;
           return (
-            <li key={sub.slug}>
+            <li key={page.slug}>
               <Link
-                href={href}
+                href={page.route}
                 aria-current={active ? 'page' : undefined}
                 className={cn(
                   RAIL_LINK_BASE,
@@ -32,11 +31,11 @@ export function LeftRail({ section }: { section: Section }) {
                     : 'nx:text-muted-foreground nx:border-transparent nx:hover:text-foreground nx:hover:bg-container-hover'
                 )}
               >
-                {sub.label}
+                {page.label}
               </Link>
-              {sub.nested && sub.nested.length > 0 && (
+              {page.nested && page.nested.length > 0 && (
                 <ul className="nx:list-none nx:ml-2 nx:my-1 nx:pl-2 nx:border-l nx:border-dashed nx:border-border-default">
-                  {sub.nested.map((label) => (
+                  {page.nested.map((label) => (
                     <li
                       key={label}
                       className="nx:px-2 nx:py-0.5 nx:typography-label-small nx:text-muted-foreground-subtle"

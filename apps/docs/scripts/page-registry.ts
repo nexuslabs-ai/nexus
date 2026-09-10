@@ -1,18 +1,19 @@
 /**
- * Section registry — single source of truth for the docs IA.
+ * Nav metadata the docs filesystem cannot supply, and the only input
+ * `page-manifest.mjs` reads that is not a page file.
  *
- * Each section has sub-pages; each sub-page has wireframe blocks.
- * Section routes (`app/{slug}/`) read this config to render layouts,
- * left rails, redirects, and content. Adding a sub-page is a single
- * append to the relevant `subs` array.
+ * Sections carry their order, title and href; pages carry their order, display
+ * label and rail nesting. A page with no file yet also carries the `lede` and
+ * `blocks` wireframe it renders until one lands — delete its entry here when
+ * it gets a real page.
  *
- * The `blocks` array is just placeholder content for now — the real
- * docs content fills in section-by-section in later phases.
+ * Nothing in the app imports this. Routing and navigation read the generated
+ * `app/_lib/page-manifest.generated.ts` instead.
  */
 
-import type { Block } from './blocks';
+import type { Block } from '../app/_lib/blocks';
 
-export type SubPage = {
+export type RegistrySubPage = {
   slug: string;
   label: string;
   /** Optional nested labels rendered inline in the left rail (non-interactive). */
@@ -22,14 +23,14 @@ export type SubPage = {
   blocks: Block[];
 };
 
-export type Section = {
+export type RegistrySection = {
   slug: string;
   title: string;
   href: string;
-  subs: SubPage[];
+  subs: RegistrySubPage[];
 };
 
-export const SECTIONS = {
+export const PAGE_REGISTRY = {
   'getting-started': {
     slug: 'getting-started',
     title: 'Getting Started',
@@ -626,21 +627,4 @@ export const SECTIONS = {
       },
     ],
   },
-} satisfies Record<string, Section>;
-
-const ALL_SECTIONS = SECTIONS as Record<string, Section>;
-
-export function getSection(slug: string): Section | undefined {
-  return ALL_SECTIONS[slug];
-}
-
-export function getSubPage(
-  sectionSlug: string,
-  subSlug: string
-): SubPage | undefined {
-  return ALL_SECTIONS[sectionSlug]?.subs.find((s) => s.slug === subSlug);
-}
-
-export function getDefaultSub(sectionSlug: string): string | undefined {
-  return ALL_SECTIONS[sectionSlug]?.subs[0]?.slug;
-}
+} satisfies Record<string, RegistrySection>;

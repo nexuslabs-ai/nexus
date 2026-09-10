@@ -2,7 +2,7 @@
  * Builds the docs page manifest from the filesystem.
  *
  * Sources:
- *   - `app/_lib/sections.ts` — section and page order, labels, and the
+ *   - `page-registry.ts` — section and page order, labels, and the
  *     `lede` / `blocks` wireframe a page renders until its own file lands
  *   - `content/{section}/{slug}.mdx` — MDX pages
  *   - `app/_pages/{section}/{slug}.tsx` — hand-built pages
@@ -25,6 +25,9 @@ import { pathToFileURL } from 'node:url';
 
 import { createJiti } from 'jiti';
 import prettier from 'prettier';
+
+/** Nav metadata source, relative to the docs app root. */
+export const REGISTRY_FILE = 'scripts/page-registry.ts';
 
 /** Output paths, relative to the docs app root. */
 export const MANIFEST_FILE = 'app/_lib/page-manifest.generated.ts';
@@ -255,12 +258,12 @@ export async function resolveFormatOptions(docsRoot) {
  * to format against something other than the repo's prettier config.
  */
 export async function buildPageManifest(docsRoot, formatOptions) {
-  const registryPath = path.join(docsRoot, 'app', '_lib', 'sections.ts');
+  const registryPath = path.join(docsRoot, REGISTRY_FILE);
   const jiti = createJiti(pathToFileURL(registryPath).href);
-  const { SECTIONS } = await jiti.import(registryPath);
+  const { PAGE_REGISTRY } = await jiti.import(registryPath);
 
   const sectionFor = (slug) =>
-    Object.hasOwn(SECTIONS, slug) ? SECTIONS[slug] : undefined;
+    Object.hasOwn(PAGE_REGISTRY, slug) ? PAGE_REGISTRY[slug] : undefined;
   const subsOf = (slug) => sectionFor(slug)?.subs ?? [];
 
   const sources = SOURCES.map((source) => ({
@@ -315,10 +318,10 @@ export async function buildPageManifest(docsRoot, formatOptions) {
 
   /** Sections that exist only on disk, appended after the registry's own. */
   const extraSections = [...new Set(keysOnDisk.map((key) => key.split('/')[0]))]
-    .filter((slug) => !Object.hasOwn(SECTIONS, slug))
+    .filter((slug) => !Object.hasOwn(PAGE_REGISTRY, slug))
     .sort();
 
-  const built = [...Object.keys(SECTIONS), ...extraSections].map(
+  const built = [...Object.keys(PAGE_REGISTRY), ...extraSections].map(
     (sectionSlug) => ({
       slug: sectionSlug,
       title: sectionFor(sectionSlug)?.title ?? humanize(sectionSlug),

@@ -4,7 +4,7 @@ import { useEffect, useState } from 'react';
 
 import { useRouter } from 'next/navigation';
 
-import { SECTIONS } from '../_lib/sections';
+import { PAGE_MANIFEST } from '../_lib/page-manifest.generated';
 
 import {
   CommandDialog,
@@ -16,16 +16,16 @@ import {
 } from './nexus';
 
 /**
- * ⌘K command-palette search over the docs IA. Indexes every section/sub-page
- * from the SECTIONS registry (the same source the nav + routes read), so it
- * stays in sync as pages are added. Built on the Nexus Command (cmdk) surface.
+ * ⌘K command-palette search over the docs IA. Indexes every page in the
+ * generated manifest (the same source the nav + routes read), so it stays in
+ * sync as pages are added. Built on the Nexus Command (cmdk) surface.
  */
 
-const INDEX = Object.values(SECTIONS).map((section) => ({
+const INDEX = PAGE_MANIFEST.map((section) => ({
   title: section.title,
-  items: section.subs.map((sub) => ({
-    label: sub.label,
-    href: `/${section.slug}/${sub.slug}`,
+  items: section.pages.map((page) => ({
+    label: page.label,
+    href: page.route,
   })),
 }));
 

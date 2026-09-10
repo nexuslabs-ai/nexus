@@ -1,6 +1,6 @@
 /**
  * Wireframe content blocks — the placeholder body a docs page renders until a
- * real page file lands. Kept out of `sections.ts` so the generated
+ * real page file lands. Kept out of `scripts/page-registry.ts` so the generated
  * `page-content.generated.ts` does not type-depend on the section registry.
  */
 

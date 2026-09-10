@@ -1,22 +1,23 @@
 import { notFound } from 'next/navigation';
 
 import { Breadcrumb } from '../../_components/Breadcrumb';
-import { SubPageView } from '../../_components/SubPageView';
-import { MDX_PAGES, REAL_PAGES } from '../../_lib/real-pages';
-import { getSection, getSubPage, SECTIONS } from '../../_lib/sections';
+import { PageWireframeView } from '../../_components/PageWireframeView';
+import { getPage, getSection } from '../../_lib/manifest';
+import { PAGE_LOADERS } from '../../_lib/page-content.generated';
+import { PAGE_MANIFEST } from '../../_lib/page-manifest.generated';
 
 export function generateStaticParams() {
-  return Object.values(SECTIONS).flatMap((section) =>
-    section.subs.map((sub) => ({ section: section.slug, sub: sub.slug }))
+  return PAGE_MANIFEST.flatMap((section) =>
+    section.pages.map((page) => ({ section: section.slug, sub: page.slug }))
   );
 }
 
 export const dynamicParams = false;
 
 /**
- * Resolution order for a sub-page: MDX content → hand-built real page →
- * registry placeholder. MDX pages get a route-provided breadcrumb so authors
- * write content only.
+ * A page with a source file renders that module; one without renders the
+ * wireframe the manifest carries for it. MDX pages get a route-provided
+ * breadcrumb so authors write content only — hand-built pages render their own.
  */
 export default async function Page({
   params,
@@ -25,30 +26,29 @@ export default async function Page({
 }) {
   const { section, sub } = await params;
   const sec = getSection(section);
-  if (!sec) notFound();
+  const page = getPage(section, sub);
+  if (!sec || !page) notFound();
 
-  const key = `${section}/${sub}`;
-
-  const mdxLoader = MDX_PAGES[key];
-  if (mdxLoader) {
-    const { default: Mdx } = await mdxLoader();
-    const subPage = getSubPage(section, sub);
-    return (
-      <>
-        <Breadcrumb
-          items={[
-            { label: 'Home', href: '/' },
-            { label: sec.title, href: sec.href },
-            { label: subPage?.label ?? sub },
-          ]}
-        />
-        <Mdx />
-      </>
-    );
+  if (page.kind === 'placeholder') {
+    return <PageWireframeView section={sec} page={page} />;
   }
 
-  const Real = REAL_PAGES[key];
-  if (Real) return <Real />;
+  const loadPage = PAGE_LOADERS[page.route];
+  if (!loadPage) notFound();
+  const { default: Body } = await loadPage();
 
-  return <SubPageView sectionSlug={section} subSlug={sub} />;
+  if (page.kind === 'component') return <Body />;
+
+  return (
+    <>
+      <Breadcrumb
+        items={[
+          { label: 'Home', href: '/' },
+          { label: sec.title, href: sec.href },
+          { label: page.label },
+        ]}
+      />
+      <Body />
+    </>
+  );
 }
