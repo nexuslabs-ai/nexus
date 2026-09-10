@@ -73,6 +73,21 @@ describe('page manifest', () => {
     ).toEqual(Object.keys(PAGE_REGISTRY));
   });
 
+  it('carries each section’s counting unit through from the registry', () => {
+    const expected = Object.values(PAGE_REGISTRY).map((section) => [
+      section.slug,
+      section.unit,
+    ]);
+
+    const registered = new Set(Object.keys(PAGE_REGISTRY));
+
+    expect(
+      PAGE_MANIFEST.filter((section) => registered.has(section.slug)).map(
+        (section) => [section.slug, section.unit]
+      )
+    ).toEqual(expected);
+  });
+
   it('lists every registry page, with its label, rail labels and position', () => {
     const expected = Object.values(PAGE_REGISTRY).flatMap((section) =>
       section.pages.map((page) => ({

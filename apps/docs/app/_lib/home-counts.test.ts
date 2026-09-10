@@ -16,20 +16,27 @@ function page(slug: string, rail: RailLabels = {}): ManifestPage {
   };
 }
 
-function section(pages: ManifestPage[]): ManifestSection {
+function section(
+  pages: ManifestPage[],
+  unit?: ManifestSection['unit']
+): ManifestSection {
   return {
     slug: 'components',
     title: 'Components',
     href: '/components',
+    ...(unit ? { unit } : {}),
     pages,
   };
 }
 
-const GROUPED = section([
-  page('inputs', { components: ['Button', 'Input', 'Select'] }),
-  page('navigation', { components: ['DropdownMenu'] }),
-  page('table'),
-]);
+const GROUPED = section(
+  [
+    page('inputs', { components: ['Button', 'Input', 'Select'] }),
+    page('navigation', { components: ['DropdownMenu'] }),
+    page('table'),
+  ],
+  'components'
+);
 
 describe('countComponents', () => {
   it('counts a group page once per component and an ungrouped page once', () => {
@@ -48,17 +55,32 @@ describe('countComponents', () => {
 });
 
 describe('describeSize', () => {
-  it('reports groups and components when pages carry component lists', () => {
+  it('reports groups and components for a section counted in components', () => {
     expect(describeSize(GROUPED)).toBe('2 groups · 5 components');
   });
 
-  it('ignores an empty component list when counting groups', () => {
-    expect(describeSize(section([page('table', { components: [] })]))).toBe(
-      '1 page'
+  it('says group, not groups, for a single group page', () => {
+    const one = section(
+      [page('inputs', { components: ['Button'] })],
+      'components'
     );
+    expect(describeSize(one)).toBe('1 group · 1 component');
   });
 
-  it('reports pages when no page carries a component list', () => {
+  // The shape the per-component pages land in: one page each, no `components`.
+  it('drops the groups clause when no page carries a component list', () => {
+    expect(
+      describeSize(section([page('button'), page('input')], 'components'))
+    ).toBe('2 components');
+  });
+
+  it('ignores an empty component list when counting groups', () => {
+    expect(
+      describeSize(section([page('table', { components: [] })], 'components'))
+    ).toBe('1 component');
+  });
+
+  it('reports pages for a section that declares no unit', () => {
     expect(describeSize(section([page('color'), page('spacing')]))).toBe(
       '2 pages'
     );

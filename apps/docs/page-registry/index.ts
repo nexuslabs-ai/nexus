@@ -22,6 +22,8 @@ export type RegistrySection = {
   slug: string;
   title: string;
   href: string;
+  /** What the section is counted in on the home page. Defaults to pages. */
+  unit?: 'components';
   pages: RegistryPage[];
 };
 
@@ -138,6 +140,7 @@ export const PAGE_REGISTRY = {
     slug: 'components',
     title: 'Components',
     href: '/components',
+    unit: 'components',
     pages: [
       {
         slug: 'inputs',

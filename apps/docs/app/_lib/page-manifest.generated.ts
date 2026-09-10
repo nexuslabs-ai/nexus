@@ -27,6 +27,8 @@ export type ManifestSection = {
   slug: string;
   title: string;
   href: string;
+  /** What the section is counted in on the home page. Defaults to pages. */
+  unit?: 'components';
   pages: readonly ManifestPage[];
 };
 
@@ -133,6 +135,7 @@ export const PAGE_MANIFEST: readonly ManifestSection[] = [
     slug: 'components',
     title: 'Components',
     href: '/components',
+    unit: 'components',
     pages: [
       {
         route: '/components/inputs',

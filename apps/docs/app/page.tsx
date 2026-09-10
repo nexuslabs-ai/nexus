@@ -40,12 +40,14 @@ const AUDIENCES = [
 ];
 
 // Getting Started is reached through the audience cards above, not a section card.
+const AUDIENCE_SECTION = requireSection('getting-started');
+
 const SECTION_CARDS = PAGE_MANIFEST.filter(
-  (section) => section.slug !== 'getting-started'
+  (section) => section !== AUDIENCE_SECTION
 ).map((section) => ({
   count: describeSize(section),
   title: section.title,
-  desc: section.pages.map((page) => page.label).join(', '),
+  desc: section.pages.map((page) => page.label).join(' · '),
   href: section.href,
 }));
 
