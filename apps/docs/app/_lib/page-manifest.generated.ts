@@ -32,6 +32,9 @@ export type ManifestSection = {
   pages: readonly ManifestPage[];
 };
 
+/** The separator the home page's section cards join a section's page labels with. */
+export const CARD_JOINER = ' · ';
+
 /** Every docs page, in nav order. Serializable — safe to import from a client component. */
 export const PAGE_MANIFEST: readonly ManifestSection[] = [
   {

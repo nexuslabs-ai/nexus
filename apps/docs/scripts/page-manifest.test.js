@@ -329,7 +329,7 @@ describe('page manifest', () => {
     });
 
     await expect(buildPageManifest(root)).rejects.toThrow(
-      'foundations/radius has " · " inside its label'
+      `foundations/radius has " · " inside its label, which is what the home page joins a section's page labels with`
     );
   });
 });

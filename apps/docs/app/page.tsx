@@ -9,7 +9,7 @@ import {
   CardTitle,
 } from './_components/nexus';
 import { countComponents, describeSize } from './_lib/home-counts';
-import { PAGE_MANIFEST, requireSection } from './_lib/manifest';
+import { CARD_JOINER, PAGE_MANIFEST, requireSection } from './_lib/manifest';
 
 const BLUE_RAMP = [50, 100, 200, 300, 400, 500, 600, 700, 800, 900, 950];
 const BASE_CHIPS = ['slate', 'stone', 'neutral', 'gray', 'zinc'];
@@ -47,7 +47,7 @@ const SECTION_CARDS = PAGE_MANIFEST.filter(
 ).map((section) => ({
   count: describeSize(section),
   title: section.title,
-  desc: section.pages.map((page) => page.label).join(' · '),
+  desc: section.pages.map((page) => page.label).join(CARD_JOINER),
   href: section.href,
 }));
 

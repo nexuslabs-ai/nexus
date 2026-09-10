@@ -123,14 +123,14 @@ function railLabelsOf(page) {
   return [...(page.components ?? []), ...(page.nested ?? [])];
 }
 
-/** The home page's section cards join a section's page labels with this. */
-const CARD_JOINER = ' \u00b7 ';
+/** The separator the home page's section cards join page labels with. */
+const CARD_JOINER = ' · ';
 
 function assertLabelsAvoidTheCardJoiner(section) {
   for (const page of section.pages) {
     if (page.label.includes(CARD_JOINER)) {
       throw new Error(
-        `${section.slug}/${page.slug} has "${CARD_JOINER}" inside its label, which is what the home page's ${section.slug} card joins page labels with — the card would read the label as several pages. Name the page without it.`
+        `${section.slug}/${page.slug} has "${CARD_JOINER}" inside its label, which is what the home page joins a section's page labels with — the card would read the label as several pages. Name the page without it.`
       );
     }
   }
@@ -231,6 +231,9 @@ export type ManifestSection = {
   unit?: 'components';
   pages: readonly ManifestPage[];
 };
+
+/** The separator the home page's section cards join a section's page labels with. */
+export const CARD_JOINER = ${JSON.stringify(CARD_JOINER)};
 
 /** Every docs page, in nav order. Serializable — safe to import from a client component. */
 export const PAGE_MANIFEST: readonly ManifestSection[] = [
