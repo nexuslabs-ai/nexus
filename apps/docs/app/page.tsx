@@ -8,10 +8,13 @@ import {
   CardHeader,
   CardTitle,
 } from './_components/nexus';
+import { countRailEntries, requireSection } from './_lib/manifest';
+
+const COMPONENT_COUNT = countRailEntries(requireSection('components'));
 
 const STATS = [
   { n: '5', l: 'Bases' },
-  { n: '17', l: 'Components' },
+  { n: String(COMPONENT_COUNT), l: 'Components' },
   { n: '2', l: 'Themes' },
   { n: '100%', l: 'Tokenized' },
 ];
@@ -36,42 +39,38 @@ const AUDIENCES = [
 
 const SECTION_CARDS = [
   {
-    count: '6 pages',
-    title: 'Foundations',
+    slug: 'foundations',
     desc: 'Color · Typography · Spacing · Radius · Layering · Responsive',
-    href: '/foundations',
   },
   {
-    count: '5 groups · 17 components',
-    title: 'Components',
+    slug: 'components',
     desc: 'Inputs · Containers · Navigation · Display · Primitives',
-    href: '/components',
   },
   {
-    count: '3 pages',
-    title: 'Theming',
+    slug: 'theming',
     desc: 'Multi-brand · density modes · consumer overrides',
-    href: '/theming',
   },
   {
-    count: '5 pages',
-    title: 'Tools',
+    slug: 'tools',
     desc: 'nx: prefix · Code Connect · ESLint · audits · Storybook',
-    href: '/tools',
   },
   {
-    count: '3 pages',
-    title: 'Guidance',
+    slug: 'guidance',
     desc: 'Engineering principles · testing model · contribution',
-    href: '/guidance',
   },
-  {
-    count: '3 pages',
-    title: 'For AI agents',
-    desc: 'llms.txt · rules mirror · authoring',
-    href: '/agents',
-  },
-];
+  { slug: 'agents', desc: 'llms.txt · rules mirror · authoring' },
+].map(({ slug, desc }) => {
+  const section = requireSection(slug);
+  return {
+    count:
+      slug === 'components'
+        ? `${section.pages.length} groups · ${COMPONENT_COUNT} components`
+        : `${section.pages.length} pages`,
+    title: section.title,
+    desc,
+    href: section.href,
+  };
+});
 
 const BLUE_RAMP = [50, 100, 200, 300, 400, 500, 600, 700, 800, 900, 950];
 const BASE_CHIPS = ['slate', 'stone', 'neutral', 'gray', 'zinc'];
