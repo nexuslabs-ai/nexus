@@ -318,6 +318,21 @@ jobs:
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
 
+      - name: Regenerate docs page manifest
+        run: pnpm --filter @nexus_ds/docs generate:manifest
+
+      - name: Check docs page manifest freshness
+        # `git status --porcelain` (not `git diff`) so untracked new files also fail.
+        run: |
+          set -euo pipefail
+          DIRTY=$(git status --porcelain -- apps/docs/app/_lib)
+          if [ -n "$DIRTY" ]; then
+            echo "::error::Docs page manifest is stale. Affected paths:"
+            echo "$DIRTY"
+            echo "::error::Run 'pnpm --filter @nexus_ds/docs generate:manifest' and commit the result."
+            exit 1
+          fi
+
       - name: Run unit tests
         run: pnpm test:unit
 

@@ -1,6 +1,6 @@
 import { notFound } from 'next/navigation';
 
-import type { Block } from '../_lib/sections';
+import type { Block } from '../_lib/blocks';
 import { getSection, getSubPage } from '../_lib/sections';
 
 import { Breadcrumb } from './Breadcrumb';

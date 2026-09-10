@@ -1,4 +1,4 @@
-import { Breadcrumb } from '../_components/Breadcrumb';
+import { Breadcrumb } from '../../_components/Breadcrumb';
 
 /**
  * Foundations → Typography. Server component — a live specimen of the type
@@ -120,7 +120,7 @@ const FAMILIES: {
   },
 ];
 
-export function Typography() {
+export default function Typography() {
   return (
     <>
       <Breadcrumb

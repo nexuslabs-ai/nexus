@@ -1,4 +1,4 @@
-import { Breadcrumb } from '../_components/Breadcrumb';
+import { Breadcrumb } from '../../_components/Breadcrumb';
 
 /**
  * Foundations → Radius · Borders · Shadows. Server component — three
@@ -49,7 +49,7 @@ const SHADOWS: { cls: string; label: string }[] = [
   { cls: 'nx:shadow-2xl', label: '2xl' },
 ];
 
-export function Radius() {
+export default function Radius() {
   return (
     <>
       <Breadcrumb
