@@ -63,21 +63,27 @@ const FIXTURE_REGISTRY = `export const PAGE_REGISTRY = {
 `;
 
 describe('page manifest', () => {
-  it('lists every section in registry order', () => {
+  it('lists every section in registry order, with its counting unit', () => {
     const registered = new Set(Object.keys(PAGE_REGISTRY));
 
     expect(
-      PAGE_MANIFEST.map((section) => section.slug).filter((slug) =>
-        registered.has(slug)
+      PAGE_MANIFEST.filter((section) => registered.has(section.slug)).map(
+        (section) => [section.slug, section.unit]
       )
-    ).toEqual(Object.keys(PAGE_REGISTRY));
+    ).toEqual(
+      Object.values(PAGE_REGISTRY).map((section) => [
+        section.slug,
+        section.unit,
+      ])
+    );
   });
 
-  it('lists every registry page, with its label, nesting and position', () => {
+  it('lists every registry page, with its label, rail labels and position', () => {
     const expected = Object.values(PAGE_REGISTRY).flatMap((section) =>
       section.pages.map((page) => ({
         route: `/${section.slug}/${page.slug}`,
         label: page.label,
+        components: page.components,
         nested: page.nested,
       }))
     );
@@ -87,7 +93,12 @@ describe('page manifest', () => {
     expect(
       pages
         .filter((page) => registered.has(page.route))
-        .map(({ route, label, nested }) => ({ route, label, nested }))
+        .map(({ route, label, components, nested }) => ({
+          route,
+          label,
+          components,
+          nested,
+        }))
     ).toEqual(expected);
   });
 
@@ -237,15 +248,16 @@ describe('page manifest', () => {
     );
   });
 
-  it('rejects a nested label that now has a page of its own', async () => {
+  it('rejects a component rail label that now has a page of its own', async () => {
     const root = writeFixture({
       [REGISTRY_FILE]: `export const PAGE_REGISTRY = {
   components: {
     slug: 'components',
     title: 'Components',
     href: '/components',
+    unit: 'components',
     pages: [
-      { slug: 'overlays', label: 'Overlays', nested: ['DropdownMenu'], wireframe: { lede: '', blocks: [] } },
+      { slug: 'overlays', label: 'Overlays', components: ['DropdownMenu'], wireframe: { lede: '', blocks: [] } },
     ],
   },
 } satisfies Record<string, unknown>;
@@ -255,20 +267,21 @@ describe('page manifest', () => {
     });
 
     await expect(buildPageManifest(root)).rejects.toThrow(
-      '"DropdownMenu" as a nested label under overlays, but components/dropdown-menu is now a page'
+      '"DropdownMenu" as a rail label under overlays, but components/dropdown-menu is now a page'
     );
   });
 
-  it('rejects a nested label matching a page whose slug reads differently', async () => {
+  it('rejects a rail label matching a page whose slug reads differently', async () => {
     const root = writeFixture({
       [REGISTRY_FILE]: `export const PAGE_REGISTRY = {
   components: {
     slug: 'components',
     title: 'Components',
     href: '/components',
+    unit: 'components',
     pages: [
       { slug: 'menus', label: 'DropdownMenu', wireframe: { lede: '', blocks: [] } },
-      { slug: 'overlays', label: 'Overlays', nested: ['DropdownMenu'], wireframe: { lede: '', blocks: [] } },
+      { slug: 'overlays', label: 'Overlays', components: ['DropdownMenu'], wireframe: { lede: '', blocks: [] } },
     ],
   },
 } satisfies Record<string, unknown>;
@@ -276,7 +289,47 @@ describe('page manifest', () => {
     });
 
     await expect(buildPageManifest(root)).rejects.toThrow(
-      '"DropdownMenu" as a nested label under overlays, but components/menus is now a page'
+      '"DropdownMenu" as a rail label under overlays, but components/menus is now a page'
+    );
+  });
+
+  it('rejects component labels in a section not counted in components', async () => {
+    const root = writeFixture({
+      [REGISTRY_FILE]: `export const PAGE_REGISTRY = {
+  foundations: {
+    slug: 'foundations',
+    title: 'Foundations',
+    href: '/foundations',
+    pages: [
+      { slug: 'color', label: 'Color', components: ['Swatch'], wireframe: { lede: '', blocks: [] } },
+    ],
+  },
+} satisfies Record<string, unknown>;
+`,
+    });
+
+    await expect(buildPageManifest(root)).rejects.toThrow(
+      'foundations/color lists components, but foundations is not counted in components'
+    );
+  });
+
+  it('rejects a label carrying the separator the home card joins with', async () => {
+    const root = writeFixture({
+      [REGISTRY_FILE]: `export const PAGE_REGISTRY = {
+  foundations: {
+    slug: 'foundations',
+    title: 'Foundations',
+    href: '/foundations',
+    pages: [
+      { slug: 'radius', label: 'Radius · Borders', wireframe: { lede: '', blocks: [] } },
+    ],
+  },
+} satisfies Record<string, unknown>;
+`,
+    });
+
+    await expect(buildPageManifest(root)).rejects.toThrow(
+      `foundations/radius has " · " inside its label, which is what the home page joins a section's page labels with`
     );
   });
 });

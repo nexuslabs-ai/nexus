@@ -1,15 +1,12 @@
 import type { Block } from '../../page-registry/blocks';
-import type { ManifestPage, ManifestSection } from '../_lib/manifest';
+import type { ManifestPage } from '../_lib/manifest';
 import { PAGE_WIREFRAMES } from '../_lib/page-content.generated';
 
-import { Breadcrumb } from './Breadcrumb';
 import { Placeholder } from './Placeholder';
 
 export function PageWireframeView({
-  section,
   page,
 }: {
-  section: ManifestSection;
   page: Extract<ManifestPage, { kind: 'placeholder' }>;
 }) {
   const wireframe = PAGE_WIREFRAMES[page.route];
@@ -21,13 +18,6 @@ export function PageWireframeView({
 
   return (
     <>
-      <Breadcrumb
-        items={[
-          { label: 'Home', href: '/' },
-          { label: section.title, href: section.href },
-          { label: page.label },
-        ]}
-      />
       <h1 className="nx:typography-heading-large">[ {page.label} ]</h1>
       <p className="nx:typography-body-default nx:text-muted-foreground nx:mb-5">
         {wireframe.lede}

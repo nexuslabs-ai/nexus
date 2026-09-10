@@ -1,4 +1,3 @@
-import { Breadcrumb } from '../../_components/Breadcrumb';
 import { Button } from '../../_components/nexus';
 
 /**
@@ -46,13 +45,6 @@ const SWATCHES = [
 export default function MultiBrand() {
   return (
     <>
-      <Breadcrumb
-        items={[
-          { label: 'Home', href: '/' },
-          { label: 'Theming', href: '/theming' },
-          { label: 'Multi-brand' },
-        ]}
-      />
       <h1 className="nx:typography-heading-large">Multi-brand theming</h1>
       <p className="nx:typography-body-default nx:text-muted-foreground nx:mt-2 nx:mb-8 nx:max-w-[64ch]">
         Nexus theming is a set of independent dimensions, each a runtime mode

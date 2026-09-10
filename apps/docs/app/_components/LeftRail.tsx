@@ -19,6 +19,10 @@ export function LeftRail({ section }: { section: ManifestSection }) {
       <ul className="nx:list-none nx:p-0 nx:m-0">
         {section.pages.map((page) => {
           const active = pathname === page.route;
+          const railLabels = [
+            ...(page.components ?? []),
+            ...(page.nested ?? []),
+          ];
           return (
             <li key={page.slug}>
               <Link
@@ -33,9 +37,9 @@ export function LeftRail({ section }: { section: ManifestSection }) {
               >
                 {page.label}
               </Link>
-              {page.nested && page.nested.length > 0 && (
+              {railLabels.length > 0 && (
                 <ul className="nx:list-none nx:ml-2 nx:my-1 nx:pl-2 nx:border-l nx:border-dashed nx:border-border-default">
-                  {page.nested.map((label) => (
+                  {railLabels.map((label) => (
                     <li
                       key={label}
                       className="nx:px-2 nx:py-0.5 nx:typography-label-small nx:text-muted-foreground-subtle"

@@ -10,8 +10,10 @@ import type { Block } from './blocks';
 export type RegistryPage = {
   slug: string;
   label: string;
-  /** Optional nested labels rendered inline in the left rail (non-interactive). */
+  /** Optional in-page headings rendered inline in the left rail (non-interactive). */
   nested?: string[];
+  /** Components a group page covers, rendered inline in the left rail (non-interactive). */
+  components?: string[];
   /** Placeholder body, carried only while the page has no source file. */
   wireframe?: { lede: string; blocks: Block[] };
 };
@@ -20,6 +22,8 @@ export type RegistrySection = {
   slug: string;
   title: string;
   href: string;
+  /** What the section is counted in on the home page. Defaults to pages. */
+  unit?: 'components';
   pages: RegistryPage[];
 };
 
@@ -120,7 +124,7 @@ export const PAGE_REGISTRY = {
       },
       {
         slug: 'radius',
-        label: 'Radius · Borders · Shadows',
+        label: 'Radius, borders & shadows',
       },
       {
         slug: 'layering',
@@ -136,11 +140,12 @@ export const PAGE_REGISTRY = {
     slug: 'components',
     title: 'Components',
     href: '/components',
+    unit: 'components',
     pages: [
       {
         slug: 'inputs',
         label: 'Inputs',
-        nested: ['Button', 'Input', 'Select', 'Switch', 'Tabs'],
+        components: ['Button', 'Input', 'Select', 'Switch', 'Tabs'],
         wireframe: {
           lede: '[ Interactive controls · per-component Storybook page below ]',
           blocks: [
@@ -170,7 +175,7 @@ export const PAGE_REGISTRY = {
       {
         slug: 'containers',
         label: 'Containers',
-        nested: ['Card', 'Dialog', 'Accordion', 'Alert'],
+        components: ['Card', 'Dialog', 'Accordion', 'Alert'],
         wireframe: {
           lede: '[ Card · Dialog · Accordion · Alert ]',
           blocks: [
@@ -189,7 +194,7 @@ export const PAGE_REGISTRY = {
       {
         slug: 'navigation',
         label: 'Navigation',
-        nested: ['DropdownMenu'],
+        components: ['DropdownMenu'],
         wireframe: {
           lede: '[ DropdownMenu · (future) NavigationMenu · Breadcrumbs ]',
           blocks: [
@@ -204,7 +209,7 @@ export const PAGE_REGISTRY = {
       {
         slug: 'display',
         label: 'Display',
-        nested: ['Badge', 'Avatar', 'Tooltip'],
+        components: ['Badge', 'Avatar', 'Tooltip'],
         wireframe: {
           lede: '[ Badge · Avatar · Tooltip ]',
           blocks: [
@@ -219,7 +224,7 @@ export const PAGE_REGISTRY = {
       {
         slug: 'primitives',
         label: 'Primitives',
-        nested: ['Show / Hide', 'Slot'],
+        components: ['Show / Hide', 'Slot'],
         wireframe: {
           lede: '[ Low-level building blocks: Show / Hide · Slot ]',
           blocks: [

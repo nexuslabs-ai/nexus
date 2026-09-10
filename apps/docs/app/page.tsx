@@ -8,10 +8,15 @@ import {
   CardHeader,
   CardTitle,
 } from './_components/nexus';
+import { countComponents, describeSize } from './_lib/home-counts';
+import { CARD_JOINER, PAGE_MANIFEST, requireSection } from './_lib/manifest';
+
+const BLUE_RAMP = [50, 100, 200, 300, 400, 500, 600, 700, 800, 900, 950];
+const BASE_CHIPS = ['slate', 'stone', 'neutral', 'gray', 'zinc'];
 
 const STATS = [
-  { n: '5', l: 'Bases' },
-  { n: '17', l: 'Components' },
+  { n: String(BASE_CHIPS.length), l: 'Bases' },
+  { n: String(countComponents(requireSection('components'))), l: 'Components' },
   { n: '2', l: 'Themes' },
   { n: '100%', l: 'Tokenized' },
 ];
@@ -34,47 +39,17 @@ const AUDIENCES = [
   },
 ];
 
-const SECTION_CARDS = [
-  {
-    count: '6 pages',
-    title: 'Foundations',
-    desc: 'Color · Typography · Spacing · Radius · Layering · Responsive',
-    href: '/foundations',
-  },
-  {
-    count: '5 groups · 17 components',
-    title: 'Components',
-    desc: 'Inputs · Containers · Navigation · Display · Primitives',
-    href: '/components',
-  },
-  {
-    count: '3 pages',
-    title: 'Theming',
-    desc: 'Multi-brand · density modes · consumer overrides',
-    href: '/theming',
-  },
-  {
-    count: '5 pages',
-    title: 'Tools',
-    desc: 'nx: prefix · Code Connect · ESLint · audits · Storybook',
-    href: '/tools',
-  },
-  {
-    count: '3 pages',
-    title: 'Guidance',
-    desc: 'Engineering principles · testing model · contribution',
-    href: '/guidance',
-  },
-  {
-    count: '3 pages',
-    title: 'For AI agents',
-    desc: 'llms.txt · rules mirror · authoring',
-    href: '/agents',
-  },
-];
+// requireSection, not the literal: a renamed section fails the build here.
+const AUDIENCE_SLUG = requireSection('getting-started').slug;
 
-const BLUE_RAMP = [50, 100, 200, 300, 400, 500, 600, 700, 800, 900, 950];
-const BASE_CHIPS = ['slate', 'stone', 'neutral', 'gray', 'zinc'];
+const SECTION_CARDS = PAGE_MANIFEST.filter(
+  (section) => section.slug !== AUDIENCE_SLUG
+).map((section) => ({
+  count: describeSize(section),
+  title: section.title,
+  desc: section.pages.map((page) => page.label).join(CARD_JOINER),
+  href: section.href,
+}));
 
 export default function Home() {
   return (
