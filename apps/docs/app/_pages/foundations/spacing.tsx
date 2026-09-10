@@ -1,4 +1,4 @@
-import { Breadcrumb } from '../_components/Breadcrumb';
+import { Breadcrumb } from '../../_components/Breadcrumb';
 
 /**
  * Foundations → Spacing. Server component — a live specimen of the 4px-based
@@ -56,7 +56,7 @@ const MODES: { mode: string; archetype: string }[] = [
   { mode: 'spacious', archetype: 'Density variant' },
 ];
 
-export function Spacing() {
+export default function Spacing() {
   return (
     <>
       <Breadcrumb

@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 
-import { Button } from '../_components/nexus';
+import { Button } from './nexus';
 
 /**
  * Every Nexus color scale, with a shared color-vision-deficiency preview.

@@ -252,9 +252,15 @@ importers:
       '@types/react-dom':
         specifier: ^19.2.3
         version: 19.2.3(@types/react@19.2.16)
+      jiti:
+        specifier: ^2.7.0
+        version: 2.7.0
       postcss:
         specifier: ^8.4.49
         version: 8.5.15
+      prettier:
+        specifier: ^3.7.4
+        version: 3.8.3
       tailwindcss:
         specifier: ^4.1.18
         version: 4.3.0

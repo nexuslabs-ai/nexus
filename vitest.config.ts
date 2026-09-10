@@ -56,6 +56,7 @@ export default defineConfig({
           unstubEnvs: true,
           include: [
             'apps/*/*.test.{ts,tsx}',
+            'apps/**/scripts/**/*.test.{js,ts}',
             'apps/**/app/**/*.test.{ts,tsx}',
             'apps/**/src/**/*.test.{ts,tsx}',
             'packages/**/src/**/*.test.{ts,tsx}',

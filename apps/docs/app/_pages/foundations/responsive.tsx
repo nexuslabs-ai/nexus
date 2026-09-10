@@ -1,4 +1,4 @@
-import { Breadcrumb } from '../_components/Breadcrumb';
+import { Breadcrumb } from '../../_components/Breadcrumb';
 
 /**
  * Foundations → Responsive. Server component — the breakpoint scale, the
@@ -69,7 +69,7 @@ const MECHANISMS: { mechanism: string; use: string }[] = [
   { mechanism: 'svh / lvh / dvh', use: 'Mobile browser-chrome accommodation' },
 ];
 
-export function Responsive() {
+export default function Responsive() {
   return (
     <>
       <Breadcrumb

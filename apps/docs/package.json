@@ -5,9 +5,10 @@
   "type": "module",
   "description": "Documentation site for the Nexus Design System",
   "scripts": {
-    "dev": "next dev --turbopack",
-    "build": "next build",
+    "dev": "pnpm generate:manifest && next dev --turbopack",
+    "build": "pnpm generate:manifest && next build",
     "start": "next start",
+    "generate:manifest": "node scripts/generate-page-manifest.mjs",
     "audit:csp": "node scripts/audit-csp-inventory.mjs",
     "typecheck": "tsc --noEmit",
     "clean": "rm -rf .next dist"
@@ -34,7 +35,9 @@
     "@types/node": "^25.0.3",
     "@types/react": "^19.2.7",
     "@types/react-dom": "^19.2.3",
+    "jiti": "^2.7.0",
     "postcss": "^8.4.49",
+    "prettier": "^3.7.4",
     "tailwindcss": "^4.1.18",
     "typescript": "^5.9.3"
   }
