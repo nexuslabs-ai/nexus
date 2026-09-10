@@ -1,7 +1,8 @@
 /**
  * Nav metadata the docs filesystem cannot supply, and the only input
- * `scripts/page-manifest.mjs` reads that is not a page file. Delete a page's
- * entry here once it has a real page file.
+ * `scripts/page-manifest.mjs` reads that is not a page file. A page renders
+ * its `lede` / `blocks` wireframe only until it has a real file; its entry
+ * stays either way, carrying label, order and rail nesting.
  */
 
 import type { Block } from './blocks';
