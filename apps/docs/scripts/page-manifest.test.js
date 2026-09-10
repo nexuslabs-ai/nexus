@@ -9,6 +9,7 @@ import {
   PAGE_WIREFRAMES,
 } from '../app/_lib/page-content.generated';
 import { PAGE_MANIFEST } from '../app/_lib/page-manifest.generated';
+import { PAGE_REGISTRY } from '../page-registry';
 
 import {
   buildPageManifest,
@@ -17,7 +18,6 @@ import {
   REGISTRY_FILE,
   resolveFormatOptions,
 } from './page-manifest.mjs';
-import { PAGE_REGISTRY } from './page-registry';
 
 const docsRoot = path.resolve(
   path.dirname(fileURLToPath(import.meta.url)),
@@ -57,7 +57,7 @@ const FIXTURE_REGISTRY = `export const PAGE_REGISTRY = {
     slug: 'foundations',
     title: 'Foundations',
     href: '/foundations',
-    subs: [{ slug: 'color', label: 'Color', lede: '', blocks: [] }],
+    pages: [{ slug: 'color', label: 'Color', lede: '', blocks: [] }],
   },
 } satisfies Record<string, unknown>;
 `;
@@ -75,10 +75,10 @@ describe('page manifest', () => {
 
   it('lists every registry page, with its label, nesting and position', () => {
     const expected = Object.values(PAGE_REGISTRY).flatMap((section) =>
-      section.subs.map((sub) => ({
-        route: `/${section.slug}/${sub.slug}`,
-        label: sub.label,
-        nested: sub.nested,
+      section.pages.map((page) => ({
+        route: `/${section.slug}/${page.slug}`,
+        label: page.label,
+        nested: page.nested,
       }))
     );
 
@@ -114,12 +114,12 @@ describe('page manifest', () => {
 
     for (const page of placeholders) {
       const [, sectionSlug] = page.route.split('/');
-      const sub = PAGE_REGISTRY[sectionSlug].subs.find(
+      const registered = PAGE_REGISTRY[sectionSlug].pages.find(
         (entry) => entry.slug === page.slug
       );
       expect(PAGE_WIREFRAMES[page.route]).toEqual({
-        lede: sub.lede,
-        blocks: sub.blocks,
+        lede: registered.lede,
+        blocks: registered.blocks,
       });
     }
   });
@@ -218,7 +218,7 @@ describe('page manifest', () => {
     slug: 'foundations',
     title: 'Foundations',
     href: '/foundations',
-    subs: [{ slug: 'color', label: 'Color' }],
+    pages: [{ slug: 'color', label: 'Color' }],
   },
 } satisfies Record<string, unknown>;
 `,
@@ -236,7 +236,7 @@ describe('page manifest', () => {
     slug: 'components',
     title: 'Components',
     href: '/components',
-    subs: [
+    pages: [
       { slug: 'overlays', label: 'Overlays', nested: ['DropdownMenu'], lede: '', blocks: [] },
     ],
   },
@@ -258,7 +258,7 @@ describe('page manifest', () => {
     slug: 'components',
     title: 'Components',
     href: '/components',
-    subs: [
+    pages: [
       { slug: 'menus', label: 'DropdownMenu', lede: '', blocks: [] },
       { slug: 'overlays', label: 'Overlays', nested: ['DropdownMenu'], lede: '', blocks: [] },
     ],

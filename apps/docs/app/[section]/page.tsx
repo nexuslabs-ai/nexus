@@ -1,7 +1,6 @@
 import { notFound, redirect } from 'next/navigation';
 
-import { getSection } from '../_lib/manifest';
-import { PAGE_MANIFEST } from '../_lib/page-manifest.generated';
+import { getSection, PAGE_MANIFEST } from '../_lib/manifest';
 
 export function generateStaticParams() {
   return PAGE_MANIFEST.map((section) => ({ section: section.slug }));

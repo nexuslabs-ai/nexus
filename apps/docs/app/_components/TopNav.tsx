@@ -7,7 +7,7 @@ import { useNexusAppearance } from '@nexus_ds/react/appearance';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 
-import { PAGE_MANIFEST } from '../_lib/page-manifest.generated';
+import { PAGE_MANIFEST } from '../_lib/manifest';
 
 import { Button } from './nexus';
 import { SearchPalette } from './SearchPalette';

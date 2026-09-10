@@ -4,7 +4,7 @@ import { cn } from '@nexus_ds/react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 
-import type { ManifestSection } from '../_lib/page-manifest.generated';
+import type { ManifestSection } from '../_lib/manifest';
 
 const RAIL_LINK_BASE =
   'nx:block nx:px-2 nx:py-1 nx:typography-label-default nx:rounded-sm nx:border-l-2 nx:no-underline nx:focus-visible:outline-2 nx:focus-visible:outline-focus-default nx:focus-visible:outline-offset-(--focus-offset)';

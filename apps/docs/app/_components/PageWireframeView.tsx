@@ -1,11 +1,6 @@
-import { notFound } from 'next/navigation';
-
-import type { Block } from '../_lib/blocks';
+import type { Block } from '../../page-registry/blocks';
+import type { ManifestPage, ManifestSection } from '../_lib/manifest';
 import { PAGE_WIREFRAMES } from '../_lib/page-content.generated';
-import type {
-  ManifestPage,
-  ManifestSection,
-} from '../_lib/page-manifest.generated';
 
 import { Breadcrumb } from './Breadcrumb';
 import { Placeholder } from './Placeholder';
@@ -15,10 +10,14 @@ export function PageWireframeView({
   page,
 }: {
   section: ManifestSection;
-  page: ManifestPage;
+  page: Extract<ManifestPage, { kind: 'placeholder' }>;
 }) {
   const wireframe = PAGE_WIREFRAMES[page.route];
-  if (!wireframe) notFound();
+  if (!wireframe) {
+    throw new Error(
+      `${page.route} is a placeholder page with no PAGE_WIREFRAMES entry — the manifest and the content module have desynced.`
+    );
+  }
 
   return (
     <>

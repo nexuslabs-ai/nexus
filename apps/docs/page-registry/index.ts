@@ -1,6 +1,6 @@
 /**
  * Nav metadata the docs filesystem cannot supply, and the only input
- * `page-manifest.mjs` reads that is not a page file.
+ * `scripts/page-manifest.mjs` reads that is not a page file.
  *
  * Sections carry their order, title and href; pages carry their order, display
  * label and rail nesting. A page with no file yet also carries the `lede` and
@@ -11,9 +11,9 @@
  * `app/_lib/page-manifest.generated.ts` instead.
  */
 
-import type { Block } from '../app/_lib/blocks';
+import type { Block } from './blocks';
 
-export type RegistrySubPage = {
+export type RegistryPage = {
   slug: string;
   label: string;
   /** Optional nested labels rendered inline in the left rail (non-interactive). */
@@ -27,7 +27,7 @@ export type RegistrySection = {
   slug: string;
   title: string;
   href: string;
-  subs: RegistrySubPage[];
+  pages: RegistryPage[];
 };
 
 export const PAGE_REGISTRY = {
@@ -35,7 +35,7 @@ export const PAGE_REGISTRY = {
     slug: 'getting-started',
     title: 'Getting Started',
     href: '/getting-started',
-    subs: [
+    pages: [
       {
         slug: 'install',
         label: 'Install',
@@ -133,7 +133,7 @@ export const PAGE_REGISTRY = {
     slug: 'foundations',
     title: 'Foundations',
     href: '/foundations',
-    subs: [
+    pages: [
       {
         slug: 'color',
         label: 'Color',
@@ -292,7 +292,7 @@ export const PAGE_REGISTRY = {
     slug: 'components',
     title: 'Components',
     href: '/components',
-    subs: [
+    pages: [
       {
         slug: 'inputs',
         label: 'Inputs',
@@ -384,7 +384,7 @@ export const PAGE_REGISTRY = {
     slug: 'theming',
     title: 'Theming',
     href: '/theming',
-    subs: [
+    pages: [
       {
         slug: 'appearance',
         label: 'Appearance',
@@ -437,7 +437,7 @@ export const PAGE_REGISTRY = {
     slug: 'tools',
     title: 'Tools',
     href: '/tools',
-    subs: [
+    pages: [
       {
         slug: 'nx-prefix',
         label: 'nx: prefix (Tailwind)',
@@ -529,7 +529,7 @@ export const PAGE_REGISTRY = {
     slug: 'guidance',
     title: 'Guidance',
     href: '/guidance',
-    subs: [
+    pages: [
       {
         slug: 'engineering',
         label: 'Engineering principles',
@@ -586,7 +586,7 @@ export const PAGE_REGISTRY = {
     slug: 'agents',
     title: 'For AI agents',
     href: '/agents',
-    subs: [
+    pages: [
       {
         slug: 'llms-txt',
         label: 'llms.txt',

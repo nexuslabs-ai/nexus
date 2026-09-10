@@ -1,4 +1,4 @@
-import type { ManifestSection } from '../_lib/page-manifest.generated';
+import type { ManifestSection } from '../_lib/manifest';
 
 import { LeftRail } from './LeftRail';
 import { RightRail } from './RightRail';

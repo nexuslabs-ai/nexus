@@ -4,7 +4,7 @@ import { useEffect, useState } from 'react';
 
 import { useRouter } from 'next/navigation';
 
-import { PAGE_MANIFEST } from '../_lib/page-manifest.generated';
+import { PAGE_MANIFEST } from '../_lib/manifest';
 
 import {
   CommandDialog,

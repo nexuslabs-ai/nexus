@@ -2,13 +2,12 @@ import { notFound } from 'next/navigation';
 
 import { Breadcrumb } from '../../_components/Breadcrumb';
 import { PageWireframeView } from '../../_components/PageWireframeView';
-import { getPage, getSection } from '../../_lib/manifest';
+import { getSection, PAGE_MANIFEST } from '../../_lib/manifest';
 import { PAGE_LOADERS } from '../../_lib/page-content.generated';
-import { PAGE_MANIFEST } from '../../_lib/page-manifest.generated';
 
 export function generateStaticParams() {
   return PAGE_MANIFEST.flatMap((section) =>
-    section.pages.map((page) => ({ section: section.slug, sub: page.slug }))
+    section.pages.map((page) => ({ section: section.slug, page: page.slug }))
   );
 }
 
@@ -22,19 +21,23 @@ export const dynamicParams = false;
 export default async function Page({
   params,
 }: {
-  params: Promise<{ section: string; sub: string }>;
+  params: Promise<{ section: string; page: string }>;
 }) {
-  const { section, sub } = await params;
-  const sec = getSection(section);
-  const page = getPage(section, sub);
-  if (!sec || !page) notFound();
+  const { section: sectionSlug, page: pageSlug } = await params;
+  const section = getSection(sectionSlug);
+  const page = section?.pages.find((entry) => entry.slug === pageSlug);
+  if (!section || !page) notFound();
 
   if (page.kind === 'placeholder') {
-    return <PageWireframeView section={sec} page={page} />;
+    return <PageWireframeView section={section} page={page} />;
   }
 
   const loadPage = PAGE_LOADERS[page.route];
-  if (!loadPage) notFound();
+  if (!loadPage) {
+    throw new Error(
+      `${page.route} is a ${page.kind} page with no PAGE_LOADERS entry — the manifest and the content module have desynced.`
+    );
+  }
   const { default: Body } = await loadPage();
 
   if (page.kind === 'component') return <Body />;
@@ -44,7 +47,7 @@ export default async function Page({
       <Breadcrumb
         items={[
           { label: 'Home', href: '/' },
-          { label: sec.title, href: sec.href },
+          { label: section.title, href: section.href },
           { label: page.label },
         ]}
       />
