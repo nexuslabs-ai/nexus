@@ -254,7 +254,28 @@ describe('page manifest', () => {
     });
 
     await expect(buildPageManifest(root)).rejects.toThrow(
-      'components lists "DropdownMenu" both as a page and as a nested label'
+      'but components/dropdown-menu is now a page'
+    );
+  });
+
+  it('rejects a nested label matching a page whose slug reads differently', async () => {
+    const root = writeFixture({
+      'app/_lib/sections.ts': `export const SECTIONS = {
+  components: {
+    slug: 'components',
+    title: 'Components',
+    href: '/components',
+    subs: [
+      { slug: 'menus', label: 'DropdownMenu', lede: '', blocks: [] },
+      { slug: 'overlays', label: 'Overlays', nested: ['DropdownMenu'], lede: '', blocks: [] },
+    ],
+  },
+} satisfies Record<string, unknown>;
+`,
+    });
+
+    await expect(buildPageManifest(root)).rejects.toThrow(
+      'but components/menus is now a page'
     );
   });
 });

@@ -134,17 +134,18 @@ function comparisonKey(value) {
  * one does, the label and the page would both show in the left rail.
  */
 function assertNestedLabelsHaveNoPage(section) {
-  const taken = new Set(
-    section.pages.flatMap((page) => [
-      comparisonKey(page.slug),
-      comparisonKey(page.label),
-    ])
-  );
+  const pageFor = new Map();
+  for (const page of section.pages) {
+    pageFor.set(comparisonKey(page.slug), page.slug);
+    pageFor.set(comparisonKey(page.label), page.slug);
+  }
+
   for (const page of section.pages) {
     for (const label of page.nested ?? []) {
-      if (taken.has(comparisonKey(label))) {
+      const existing = pageFor.get(comparisonKey(label));
+      if (existing !== undefined) {
         throw new Error(
-          `${section.slug} lists "${label}" both as a page and as a nested label under ${page.slug} — drop the nested label now the page exists.`
+          `${section.slug} lists "${label}" as a nested label under ${page.slug}, but ${section.slug}/${existing} is now a page — drop the nested label.`
         );
       }
     }
