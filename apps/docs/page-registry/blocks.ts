@@ -1,7 +1,6 @@
 /**
  * Wireframe content blocks — the placeholder body a docs page renders until a
- * real page file lands. Kept in its own module so the generated
- * `page-content.generated.ts` does not type-depend on the section registry.
+ * real page file lands.
  */
 
 export type PlaceholderVariant =

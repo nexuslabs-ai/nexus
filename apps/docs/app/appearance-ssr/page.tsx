@@ -11,10 +11,6 @@ import { AppearanceFixtureClient } from './AppearanceFixtureClient';
 
 export const dynamic = 'force-dynamic';
 
-/**
- * Intentionally outside the `[section]/[page]` manifest: it reads cookies at
- * request time, so it is an App Router page of its own rather than a docs page.
- */
 export default async function AppearanceSsrFixturePage() {
   const cookieStore = await cookies();
   const snapshot = createNexusAppearanceSnapshotFromCookie(

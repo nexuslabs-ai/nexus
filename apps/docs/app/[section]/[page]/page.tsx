@@ -13,11 +13,6 @@ export function generateStaticParams() {
 
 export const dynamicParams = false;
 
-/**
- * A page with a source file renders that module; one without renders the
- * wireframe the manifest carries for it. MDX pages get a route-provided
- * breadcrumb so authors write content only — hand-built pages render their own.
- */
 export default async function Page({
   params,
 }: {
@@ -40,6 +35,7 @@ export default async function Page({
   }
   const { default: Body } = await loadPage();
 
+  // Hand-built pages draw their own breadcrumb; MDX pages get one from here.
   if (page.kind === 'component') return <Body />;
 
   return (

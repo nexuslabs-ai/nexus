@@ -1,14 +1,7 @@
 /**
  * Nav metadata the docs filesystem cannot supply, and the only input
- * `scripts/page-manifest.mjs` reads that is not a page file.
- *
- * Sections carry their order, title and href; pages carry their order, display
- * label and rail nesting. A page with no file yet also carries the `lede` and
- * `blocks` wireframe it renders until one lands — delete its entry here when
- * it gets a real page.
- *
- * Nothing in the app imports this. Routing and navigation read the generated
- * `app/_lib/page-manifest.generated.ts` instead.
+ * `scripts/page-manifest.mjs` reads that is not a page file. Delete a page's
+ * entry here once it has a real page file.
  */
 
 import type { Block } from './blocks';
