@@ -9,13 +9,13 @@ import {
   PAGE_WIREFRAMES,
 } from '../app/_lib/page-content.generated';
 import { PAGE_MANIFEST } from '../app/_lib/page-manifest.generated';
-import { MDX_PAGES, REAL_PAGES } from '../app/_lib/real-pages';
-import { SECTIONS } from '../app/_lib/sections';
+import { PAGE_REGISTRY } from '../page-registry';
 
 import {
   buildPageManifest,
   CONTENT_FILE,
   MANIFEST_FILE,
+  REGISTRY_FILE,
   resolveFormatOptions,
 } from './page-manifest.mjs';
 
@@ -25,11 +25,12 @@ const docsRoot = path.resolve(
 );
 
 const pages = PAGE_MANIFEST.flatMap((section) => section.pages);
-const routesOfKind = (kind) =>
-  pages
-    .filter((page) => page.kind === kind)
-    .map((page) => page.route)
-    .sort();
+
+/** Where a page of each sourced kind lives on disk, relative to `apps/docs`. */
+const SOURCE = {
+  mdx: { dir: 'content', ext: '.mdx' },
+  component: { dir: 'app/_pages', ext: '.tsx' },
+};
 
 /** Git may check the generated files out as CRLF; prettier always emits LF. */
 const toLf = (source) => source.replaceAll('\r\n', '\n');
@@ -38,7 +39,7 @@ const readOnDisk = (file) =>
   toLf(fs.readFileSync(path.join(docsRoot, file), 'utf8'));
 
 /**
- * Writes a throwaway docs tree — a section registry plus page files — so the
+ * Writes a throwaway docs tree — a page registry plus page files — so the
  * "a file on disk is the only edit" contract can be checked without touching
  * the real sources.
  */
@@ -51,33 +52,33 @@ function writeFixture(files) {
   return root;
 }
 
-const FIXTURE_REGISTRY = `export const SECTIONS = {
+const FIXTURE_REGISTRY = `export const PAGE_REGISTRY = {
   foundations: {
     slug: 'foundations',
     title: 'Foundations',
     href: '/foundations',
-    subs: [{ slug: 'color', label: 'Color', lede: '', blocks: [] }],
+    pages: [{ slug: 'color', label: 'Color' }],
   },
 } satisfies Record<string, unknown>;
 `;
 
 describe('page manifest', () => {
   it('lists every section in registry order', () => {
-    const registered = new Set(Object.keys(SECTIONS));
+    const registered = new Set(Object.keys(PAGE_REGISTRY));
 
     expect(
       PAGE_MANIFEST.map((section) => section.slug).filter((slug) =>
         registered.has(slug)
       )
-    ).toEqual(Object.keys(SECTIONS));
+    ).toEqual(Object.keys(PAGE_REGISTRY));
   });
 
   it('lists every registry page, with its label, nesting and position', () => {
-    const expected = Object.values(SECTIONS).flatMap((section) =>
-      section.subs.map((sub) => ({
-        route: `/${section.slug}/${sub.slug}`,
-        label: sub.label,
-        nested: sub.nested,
+    const expected = Object.values(PAGE_REGISTRY).flatMap((section) =>
+      section.pages.map((page) => ({
+        route: `/${section.slug}/${page.slug}`,
+        label: page.label,
+        nested: page.nested,
       }))
     );
 
@@ -91,25 +92,17 @@ describe('page manifest', () => {
   });
 
   it('resolves MDX and hand-built pages to their source files', () => {
-    expect(routesOfKind('mdx')).toEqual(
-      Object.keys(MDX_PAGES)
-        .map((key) => `/${key}`)
-        .sort()
-    );
-    expect(routesOfKind('component')).toEqual(
-      Object.keys(REAL_PAGES)
-        .map((key) => `/${key}`)
-        .sort()
-    );
-
     for (const page of pages) {
       if (page.kind === 'placeholder') {
         expect(page.file).toBeNull();
         expect(PAGE_LOADERS[page.route]).toBeUndefined();
-      } else {
-        expect(fs.existsSync(path.join(docsRoot, page.file))).toBe(true);
-        expect(PAGE_LOADERS[page.route]).toBeTypeOf('function');
+        continue;
       }
+
+      const { dir, ext } = SOURCE[page.kind];
+      expect(page.file).toBe(`${dir}${page.route}${ext}`);
+      expect(fs.existsSync(path.join(docsRoot, page.file))).toBe(true);
+      expect(PAGE_LOADERS[page.route]).toBeTypeOf('function');
     }
   });
 
@@ -121,13 +114,10 @@ describe('page manifest', () => {
 
     for (const page of placeholders) {
       const [, sectionSlug] = page.route.split('/');
-      const sub = SECTIONS[sectionSlug].subs.find(
+      const registered = PAGE_REGISTRY[sectionSlug].pages.find(
         (entry) => entry.slug === page.slug
       );
-      expect(PAGE_WIREFRAMES[page.route]).toEqual({
-        lede: sub.lede,
-        blocks: sub.blocks,
-      });
+      expect(PAGE_WIREFRAMES[page.route]).toEqual(registered.wireframe);
     }
   });
 
@@ -150,7 +140,7 @@ describe('page manifest', () => {
 
   it('picks up a page added on disk with no hand-editing', async () => {
     const root = writeFixture({
-      'app/_lib/sections.ts': FIXTURE_REGISTRY,
+      [REGISTRY_FILE]: FIXTURE_REGISTRY,
       'content/foundations/color.mdx': '# Color\n',
       'content/foundations/motion.mdx': '# Motion\n',
       'app/_pages/theming/multi-brand.tsx': 'export default function P() {}\n',
@@ -185,7 +175,7 @@ describe('page manifest', () => {
 
   it('rejects a page file that is not at {section}/{slug}', async () => {
     const root = writeFixture({
-      'app/_lib/sections.ts': FIXTURE_REGISTRY,
+      [REGISTRY_FILE]: FIXTURE_REGISTRY,
       'content/stray.mdx': '# Stray\n',
     });
 
@@ -196,7 +186,7 @@ describe('page manifest', () => {
 
   it('rejects a non-page sibling that would invent a route', async () => {
     const root = writeFixture({
-      'app/_lib/sections.ts': FIXTURE_REGISTRY,
+      [REGISTRY_FILE]: FIXTURE_REGISTRY,
       'app/_pages/foundations/color.tsx': 'export default function P() {}\n',
       'app/_pages/foundations/color.test.tsx': 'it("x", () => {});\n',
     });
@@ -208,7 +198,7 @@ describe('page manifest', () => {
 
   it('rejects a route claimed by two sources', async () => {
     const root = writeFixture({
-      'app/_lib/sections.ts': FIXTURE_REGISTRY,
+      [REGISTRY_FILE]: FIXTURE_REGISTRY,
       'content/foundations/color.mdx': '# Color\n',
       'app/_pages/foundations/color.tsx': 'export default function P() {}\n',
     });
@@ -219,32 +209,43 @@ describe('page manifest', () => {
   });
 
   it('rejects a registry-only page with no wireframe to render', async () => {
-    const root = writeFixture({
-      'app/_lib/sections.ts': `export const SECTIONS = {
-  foundations: {
-    slug: 'foundations',
-    title: 'Foundations',
-    href: '/foundations',
-    subs: [{ slug: 'color', label: 'Color' }],
-  },
-} satisfies Record<string, unknown>;
-`,
-    });
+    const root = writeFixture({ [REGISTRY_FILE]: FIXTURE_REGISTRY });
 
     await expect(buildPageManifest(root)).rejects.toThrow(
       'foundations/color has no page file'
     );
   });
 
+  it('rejects a wireframe left behind by a page that now has a file', async () => {
+    const root = writeFixture({
+      [REGISTRY_FILE]: `export const PAGE_REGISTRY = {
+  foundations: {
+    slug: 'foundations',
+    title: 'Foundations',
+    href: '/foundations',
+    pages: [
+      { slug: 'color', label: 'Color', wireframe: { lede: '', blocks: [] } },
+    ],
+  },
+} satisfies Record<string, unknown>;
+`,
+      'content/foundations/color.mdx': '# Color\n',
+    });
+
+    await expect(buildPageManifest(root)).rejects.toThrow(
+      'foundations/color is written at content/foundations/color.mdx'
+    );
+  });
+
   it('rejects a nested label that now has a page of its own', async () => {
     const root = writeFixture({
-      'app/_lib/sections.ts': `export const SECTIONS = {
+      [REGISTRY_FILE]: `export const PAGE_REGISTRY = {
   components: {
     slug: 'components',
     title: 'Components',
     href: '/components',
-    subs: [
-      { slug: 'overlays', label: 'Overlays', nested: ['DropdownMenu'], lede: '', blocks: [] },
+    pages: [
+      { slug: 'overlays', label: 'Overlays', nested: ['DropdownMenu'], wireframe: { lede: '', blocks: [] } },
     ],
   },
 } satisfies Record<string, unknown>;
@@ -260,14 +261,14 @@ describe('page manifest', () => {
 
   it('rejects a nested label matching a page whose slug reads differently', async () => {
     const root = writeFixture({
-      'app/_lib/sections.ts': `export const SECTIONS = {
+      [REGISTRY_FILE]: `export const PAGE_REGISTRY = {
   components: {
     slug: 'components',
     title: 'Components',
     href: '/components',
-    subs: [
-      { slug: 'menus', label: 'DropdownMenu', lede: '', blocks: [] },
-      { slug: 'overlays', label: 'Overlays', nested: ['DropdownMenu'], lede: '', blocks: [] },
+    pages: [
+      { slug: 'menus', label: 'DropdownMenu', wireframe: { lede: '', blocks: [] } },
+      { slug: 'overlays', label: 'Overlays', nested: ['DropdownMenu'], wireframe: { lede: '', blocks: [] } },
     ],
   },
 } satisfies Record<string, unknown>;

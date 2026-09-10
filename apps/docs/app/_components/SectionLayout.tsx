@@ -1,4 +1,4 @@
-import type { Section } from '../_lib/sections';
+import type { ManifestSection } from '../_lib/manifest';
 
 import { LeftRail } from './LeftRail';
 import { RightRail } from './RightRail';
@@ -7,7 +7,7 @@ export function SectionLayout({
   section,
   children,
 }: {
-  section: Section;
+  section: ManifestSection;
   children: React.ReactNode;
 }) {
   return (

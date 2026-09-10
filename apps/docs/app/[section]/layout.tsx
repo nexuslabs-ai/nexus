@@ -1,7 +1,7 @@
 import { notFound } from 'next/navigation';
 
 import { SectionLayout } from '../_components/SectionLayout';
-import { getSection } from '../_lib/sections';
+import { getSection } from '../_lib/manifest';
 
 export default async function Layout({
   children,

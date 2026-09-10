@@ -9,8 +9,6 @@ import {
 } from '@nexus_ds/core';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
-import { SERVER_ROUTE_PAGES } from '../_lib/real-pages';
-
 const { cookieGetMock, cookiesMock } = vi.hoisted(() => ({
   cookieGetMock: vi.fn(),
   cookiesMock: vi.fn(),
@@ -54,9 +52,6 @@ describe('AppearanceSsrFixturePage', () => {
     const fixtureIndex = html.indexOf('data-nexus-appearance-fixture');
     const snapshot = extractDefaultSnapshot(html);
 
-    expect(SERVER_ROUTE_PAGES['/appearance-ssr'].source).toBe(
-      'apps/docs/app/appearance-ssr/page.tsx'
-    );
     expect(scriptIndex).toBeGreaterThanOrEqual(0);
     expect(fixtureIndex).toBeGreaterThanOrEqual(0);
     expect(scriptIndex).toBeLessThan(fixtureIndex);

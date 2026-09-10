@@ -3,7 +3,7 @@
 
 import type { ComponentType } from 'react';
 
-import type { Block } from './blocks';
+import type { Block } from '../../page-registry/blocks';
 
 // The thunks below import page and MDX modules, so a `'use client'` importer
 // would pull the whole docs body into the client bundle.
