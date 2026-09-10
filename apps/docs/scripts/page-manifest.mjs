@@ -124,7 +124,7 @@ function assertOneSourcePerRoute(sources) {
   }
 }
 
-/** `DropdownMenu`, `dropdown-menu` and `Show / Hide` all fold to one key. */
+/** Folds a label or a slug to one identity — `DropdownMenu` and `dropdown-menu` both give `dropdownmenu`. */
 function comparisonKey(value) {
   return value.toLowerCase().replace(/[^a-z0-9]/g, '');
 }
@@ -134,10 +134,15 @@ function comparisonKey(value) {
  * one does, the label and the page would both show in the left rail.
  */
 function assertNestedLabelsHaveNoPage(section) {
-  const slugs = new Set(section.pages.map((page) => comparisonKey(page.slug)));
+  const taken = new Set(
+    section.pages.flatMap((page) => [
+      comparisonKey(page.slug),
+      comparisonKey(page.label),
+    ])
+  );
   for (const page of section.pages) {
     for (const label of page.nested ?? []) {
-      if (slugs.has(comparisonKey(label))) {
+      if (taken.has(comparisonKey(label))) {
         throw new Error(
           `${section.slug} lists "${label}" both as a page and as a nested label under ${page.slug} — drop the nested label now the page exists.`
         );
@@ -311,7 +316,7 @@ export async function buildPageManifest(docsRoot, formatOptions) {
     const source = sources.find((candidate) => candidate.pages.has(key));
     if (!source) {
       // No file on disk, so the page is registry-only and renders its wireframe.
-      if (sub.lede === undefined || sub.blocks === undefined) {
+      if (sub?.lede === undefined || sub?.blocks === undefined) {
         throw new Error(
           `${key} has no page file, so it renders its registry wireframe — but its registry entry has no \`lede\` or \`blocks\`.`
         );

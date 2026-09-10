@@ -218,6 +218,24 @@ describe('page manifest', () => {
     );
   });
 
+  it('rejects a registry-only page with no wireframe to render', async () => {
+    const root = writeFixture({
+      'app/_lib/sections.ts': `export const SECTIONS = {
+  foundations: {
+    slug: 'foundations',
+    title: 'Foundations',
+    href: '/foundations',
+    subs: [{ slug: 'color', label: 'Color' }],
+  },
+} satisfies Record<string, unknown>;
+`,
+    });
+
+    await expect(buildPageManifest(root)).rejects.toThrow(
+      'foundations/color has no page file'
+    );
+  });
+
   it('rejects a nested label that now has a page of its own', async () => {
     const root = writeFixture({
       'app/_lib/sections.ts': `export const SECTIONS = {
