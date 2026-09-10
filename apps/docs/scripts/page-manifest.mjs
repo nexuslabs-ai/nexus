@@ -310,7 +310,7 @@ export async function buildPageManifest(docsRoot, formatOptions) {
 
     if (entry?.lede === undefined || entry?.blocks === undefined) {
       throw new Error(
-        `${key} has no page file, so it renders its registry wireframe — but its registry entry has no \`lede\` or \`blocks\`.`
+        `${key} has no page file, so it renders its registry wireframe — give its registry entry a \`lede\` and \`blocks\`, or add the page file.`
       );
     }
     return {

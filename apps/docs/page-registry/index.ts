@@ -12,9 +12,10 @@ export type RegistryPage = {
   label: string;
   /** Optional nested labels rendered inline in the left rail (non-interactive). */
   nested?: string[];
-  lede: string;
-  /** Wireframe-style content blocks. */
-  blocks: Block[];
+  /** Wireframe lede, carried only while the page has no source file. */
+  lede?: string;
+  /** Wireframe-style content blocks, carried alongside `lede`. */
+  blocks?: Block[];
 };
 
 export type RegistrySection = {
@@ -33,44 +34,10 @@ export const PAGE_REGISTRY = {
       {
         slug: 'install',
         label: 'Install',
-        lede: '[ Prerequisites · package managers · workspace setup ]',
-        blocks: [
-          {
-            type: 'placeholder',
-            variant: 'code',
-            label: '[ Code block — package install commands ]',
-          },
-          { type: 'h2', text: '[ Prerequisites ]' },
-          {
-            type: 'placeholder',
-            variant: 'table',
-            label: '[ Table — Node / package manager versions ]',
-          },
-          { type: 'h2', text: '[ Verify install ]' },
-          {
-            type: 'placeholder',
-            variant: 'code',
-            label: '[ Code block — smoke-test snippet ]',
-          },
-        ],
       },
       {
         slug: 'theme-setup',
         label: 'Theme setup',
-        lede: '[ Wire Nexus CSS · pick a brand · enable dark mode ]',
-        blocks: [
-          {
-            type: 'placeholder',
-            variant: 'code',
-            label: '[ Code block — CSS import + Tailwind config ]',
-          },
-          {
-            type: 'placeholder',
-            variant: 'tall',
-            label:
-              '[ Live preview — theme swatches respond to brand/mode toggles ]',
-          },
-        ],
       },
       {
         slug: 'first-component',
@@ -137,148 +104,26 @@ export const PAGE_REGISTRY = {
           'Surfaces',
           'Accessibility',
         ],
-        lede: '[ Engineered, not picked — OKLCH + perceptual grid + APCA gate ]',
-        blocks: [
-          {
-            type: 'placeholder',
-            variant: 'hero',
-            label: '[ Hero — palette overview · all 5 bases ]',
-          },
-          { type: 'h2', text: '[ How color works ]' },
-          {
-            type: 'placeholder',
-            label: '[ Body text — OKLCH pipeline narrative ]',
-          },
-          {
-            type: 'placeholder',
-            variant: 'diagram',
-            label: '[ Diagram — hex → OKLCH → perceptual grid → CSS ]',
-          },
-          { type: 'h2', text: '[ Palette & shades ]' },
-          {
-            type: 'placeholder',
-            variant: 'swatches',
-            label: '[ Live swatches — 11-step grid × 5 bases ]',
-          },
-          {
-            type: 'placeholder',
-            variant: 'table',
-            label: '[ Table — shade → token mapping (50 → 950) ]',
-          },
-          { type: 'h2', text: '[ Surfaces ]' },
-          {
-            type: 'placeholder',
-            variant: 'diagram',
-            label:
-              '[ Diagram — surface and control stack (canvas / muted / control / container / popover / nav) ]',
-          },
-          { type: 'h2', text: '[ Accessibility ]' },
-          {
-            type: 'placeholder',
-            variant: 'table',
-            label: '[ Table — APCA tier thresholds per role ]',
-          },
-          {
-            type: 'placeholder',
-            variant: 'swatches',
-            label: '[ Live demo — color-blind simulation toggle ]',
-          },
-        ],
       },
       {
         slug: 'typography',
         label: 'Typography',
-        lede: '[ Type scale · 11 composite utilities ]',
-        blocks: [
-          {
-            type: 'placeholder',
-            variant: 'hero',
-            label: '[ Live type scale — render every step ]',
-          },
-          { type: 'h2', text: '[ Utilities ]' },
-          {
-            type: 'placeholder',
-            variant: 'table',
-            label: '[ Table — 11 typography utilities ]',
-          },
-        ],
       },
       {
         slug: 'spacing',
         label: 'Spacing',
-        lede: '[ Canonical step set · 6 density modes · role tokens ]',
-        blocks: [
-          {
-            type: 'placeholder',
-            variant: 'hero',
-            label: '[ Live ruler — step visualizer ]',
-          },
-          { type: 'h2', text: '[ Density modes ]' },
-          {
-            type: 'placeholder',
-            variant: 'tall',
-            label: '[ Side-by-side — 6 modes via data-density switcher ]',
-          },
-          { type: 'h2', text: '[ Role tokens ]' },
-          {
-            type: 'placeholder',
-            variant: 'table',
-            label: '[ Table — control / container / layout ]',
-          },
-        ],
       },
       {
         slug: 'radius',
         label: 'Radius · Borders · Shadows',
-        lede: '[ Visual primitives across modes ]',
-        blocks: [
-          {
-            type: 'row',
-            blocks: [
-              { label: '[ Radius grid ]' },
-              { label: '[ Border-width grid ]' },
-            ],
-          },
-          {
-            type: 'placeholder',
-            variant: 'tall',
-            label: '[ Shadow ramp — light + dark · 5 modes ]',
-          },
-        ],
       },
       {
         slug: 'layering',
         label: 'Layering',
-        lede: '[ 6-token z-index scale · why popover sits above modal ]',
-        blocks: [
-          {
-            type: 'placeholder',
-            variant: 'diagram',
-            label: '[ Diagram — stacking layers from overlay → max ]',
-          },
-          {
-            type: 'placeholder',
-            variant: 'table',
-            label: '[ Table — token / value / role / consumer ]',
-          },
-        ],
       },
       {
         slug: 'responsive',
         label: 'Responsive',
-        lede: '[ @container for components · viewport for page shell · Show/Hide primitive ]',
-        blocks: [
-          {
-            type: 'placeholder',
-            variant: 'diagram',
-            label: '[ Decision tree — which mechanism when ]',
-          },
-          {
-            type: 'placeholder',
-            variant: 'code',
-            label: '[ Code — Show/Hide example ]',
-          },
-        ],
       },
     ],
   },
@@ -382,14 +227,10 @@ export const PAGE_REGISTRY = {
       {
         slug: 'appearance',
         label: 'Appearance',
-        lede: '[ Appearance model · mode · brand · tone · contrast · density ]',
-        blocks: [],
       },
       {
         slug: 'multi-brand',
         label: 'Multi-brand',
-        lede: '[ Five bases × light / dark · the brand thesis ]',
-        blocks: [],
       },
       {
         slug: 'density-modes',
