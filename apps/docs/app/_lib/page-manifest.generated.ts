@@ -111,7 +111,7 @@ export const PAGE_MANIFEST: readonly ManifestSection[] = [
       {
         route: '/foundations/radius',
         slug: 'radius',
-        label: 'Radius · Borders · Shadows',
+        label: 'Radius, borders & shadows',
         kind: 'component',
         file: 'app/_pages/foundations/radius.tsx',
       },

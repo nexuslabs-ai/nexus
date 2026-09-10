@@ -63,29 +63,19 @@ const FIXTURE_REGISTRY = `export const PAGE_REGISTRY = {
 `;
 
 describe('page manifest', () => {
-  it('lists every section in registry order', () => {
-    const registered = new Set(Object.keys(PAGE_REGISTRY));
-
-    expect(
-      PAGE_MANIFEST.map((section) => section.slug).filter((slug) =>
-        registered.has(slug)
-      )
-    ).toEqual(Object.keys(PAGE_REGISTRY));
-  });
-
-  it('carries each section’s counting unit through from the registry', () => {
-    const expected = Object.values(PAGE_REGISTRY).map((section) => [
-      section.slug,
-      section.unit,
-    ]);
-
+  it('lists every section in registry order, with its counting unit', () => {
     const registered = new Set(Object.keys(PAGE_REGISTRY));
 
     expect(
       PAGE_MANIFEST.filter((section) => registered.has(section.slug)).map(
         (section) => [section.slug, section.unit]
       )
-    ).toEqual(expected);
+    ).toEqual(
+      Object.values(PAGE_REGISTRY).map((section) => [
+        section.slug,
+        section.unit,
+      ])
+    );
   });
 
   it('lists every registry page, with its label, rail labels and position', () => {
@@ -265,6 +255,7 @@ describe('page manifest', () => {
     slug: 'components',
     title: 'Components',
     href: '/components',
+    unit: 'components',
     pages: [
       { slug: 'overlays', label: 'Overlays', components: ['DropdownMenu'], wireframe: { lede: '', blocks: [] } },
     ],
@@ -287,6 +278,7 @@ describe('page manifest', () => {
     slug: 'components',
     title: 'Components',
     href: '/components',
+    unit: 'components',
     pages: [
       { slug: 'menus', label: 'DropdownMenu', wireframe: { lede: '', blocks: [] } },
       { slug: 'overlays', label: 'Overlays', components: ['DropdownMenu'], wireframe: { lede: '', blocks: [] } },
@@ -298,6 +290,26 @@ describe('page manifest', () => {
 
     await expect(buildPageManifest(root)).rejects.toThrow(
       '"DropdownMenu" as a rail label under overlays, but components/menus is now a page'
+    );
+  });
+
+  it('rejects component labels in a section not counted in components', async () => {
+    const root = writeFixture({
+      [REGISTRY_FILE]: `export const PAGE_REGISTRY = {
+  foundations: {
+    slug: 'foundations',
+    title: 'Foundations',
+    href: '/foundations',
+    pages: [
+      { slug: 'color', label: 'Color', components: ['Swatch'], wireframe: { lede: '', blocks: [] } },
+    ],
+  },
+} satisfies Record<string, unknown>;
+`,
+    });
+
+    await expect(buildPageManifest(root)).rejects.toThrow(
+      'foundations/color lists components, but foundations is not counted in components'
     );
   });
 });

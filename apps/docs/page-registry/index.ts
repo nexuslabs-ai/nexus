@@ -124,7 +124,7 @@ export const PAGE_REGISTRY = {
       },
       {
         slug: 'radius',
-        label: 'Radius · Borders · Shadows',
+        label: 'Radius, borders & shadows',
       },
       {
         slug: 'layering',

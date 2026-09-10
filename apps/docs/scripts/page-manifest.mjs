@@ -123,6 +123,19 @@ function railLabelsOf(page) {
   return [...(page.components ?? []), ...(page.nested ?? [])];
 }
 
+function assertComponentsDeclareTheirUnit(section) {
+  if (section.unit === 'components') {
+    return;
+  }
+  for (const page of section.pages) {
+    if (page.components) {
+      throw new Error(
+        `${section.slug}/${page.slug} lists components, but ${section.slug} is not counted in components — add \`unit: 'components'\` to the section, or move the labels to \`nested\`.`
+      );
+    }
+  }
+}
+
 function assertRailLabelsHaveNoPage(section) {
   const pageFor = new Map();
   for (const page of section.pages) {
@@ -359,9 +372,10 @@ export async function buildPageManifest(docsRoot, formatOptions) {
     slug: section.slug,
     title: section.title,
     href: section.href,
-    ...(section.unit ? { unit: section.unit } : {}),
+    unit: section.unit,
     pages: section.entries.map((entry) => entry.page),
   }));
+  manifest.forEach(assertComponentsDeclareTheirUnit);
   manifest.forEach(assertRailLabelsHaveNoPage);
 
   const entries = built.flatMap((section) => section.entries);

@@ -14,10 +14,17 @@ export function countComponents(section: ManifestSection): number {
 
 /** How big a section is, in the unit it declares in the page registry. */
 export function describeSize(section: ManifestSection): string {
-  if (section.unit !== 'components') {
-    return plural(section.pages.length, 'page');
+  switch (section.unit) {
+    case 'components': {
+      const components = plural(countComponents(section), 'component');
+      const groups = section.pages.filter(
+        (page) => page.components?.length
+      ).length;
+      return groups > 0
+        ? `${plural(groups, 'group')} · ${components}`
+        : components;
+    }
+    case undefined:
+      return plural(section.pages.length, 'page');
   }
-  const components = plural(countComponents(section), 'component');
-  const groups = section.pages.filter((page) => page.components?.length).length;
-  return groups > 0 ? `${plural(groups, 'group')} · ${components}` : components;
 }

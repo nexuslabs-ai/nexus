@@ -1,7 +1,7 @@
 import { Breadcrumb } from '../../_components/Breadcrumb';
 
 /**
- * Foundations → Radius · Borders · Shadows. Server component — three
+ * Foundations → Radius, borders & shadows. Server component — three
  * independent appearance axes, each a runtime mode swapped via the theme
  * picker. The radius and shadow specimens use literal `nx:rounded-*` /
  * `nx:shadow-*` utilities (so Tailwind scans them) that read the active mode's
@@ -56,12 +56,10 @@ export default function Radius() {
         items={[
           { label: 'Home', href: '/' },
           { label: 'Foundations', href: '/foundations' },
-          { label: 'Radius · Borders · Shadows' },
+          { label: 'Radius, borders & shadows' },
         ]}
       />
-      <h1 className="nx:typography-heading-large">
-        Radius · Borders · Shadows
-      </h1>
+      <h1 className="nx:typography-heading-large">Radius, borders & shadows</h1>
       <p className="nx:typography-body-default nx:text-muted-foreground nx:mt-2 nx:mb-8 nx:max-w-[64ch]">
         Three independent appearance axes, each a runtime mode swapped through
         the theme picker (bottom-right). Corner radius, border width, and
