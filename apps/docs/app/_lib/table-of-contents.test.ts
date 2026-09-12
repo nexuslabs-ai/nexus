@@ -70,9 +70,11 @@ describe('collectHeadings', () => {
     ]);
   });
 
-  it('assigns ids to the hand-built pages, which render headings without one', () => {
+  it('reads the ids the Heading components render on hand-built pages', () => {
     const article = renderArticle(
-      '<h2>The scale</h2><h3>Heading tiers</h3><h2>Families</h2>'
+      '<h2 id="the-scale">The scale</h2>' +
+        '<h3 id="heading-tiers">Heading tiers</h3>' +
+        '<h2 id="families">Families</h2>'
     );
 
     expect(collectHeadings(article)).toEqual<TocEntry[]>([
@@ -80,24 +82,22 @@ describe('collectHeadings', () => {
       { id: 'heading-tiers', text: 'Heading tiers', level: 3 },
       { id: 'families', text: 'Families', level: 2 },
     ]);
-    expect(article.querySelector('h3')?.id).toBe('heading-tiers');
   });
 
-  it('suffixes a generated id that would collide with another heading', () => {
-    const article = renderArticle(
-      '<h2 id="overview">Overview</h2><h2>Overview</h2><h2>Overview</h2>'
-    );
+  it('never mutates the document — a heading without an id stays without one', () => {
+    const article = renderArticle('<h2>Unanchored</h2><h2 id="real">Real</h2>');
 
-    expect(collectHeadings(article).map((entry) => entry.id)).toEqual([
-      'overview',
-      'overview-1',
-      'overview-2',
+    expect(collectHeadings(article)).toEqual<TocEntry[]>([
+      { id: 'real', text: 'Real', level: 2 },
     ]);
+    expect(article.querySelector('h2')?.hasAttribute('id')).toBe(false);
   });
 
   it('skips h1 and empty headings, and reads nested heading text', () => {
     const article = renderArticle(
-      '<h1>Typography</h1><h2></h2><h2>Live <code>tokens</code></h2>'
+      '<h1 id="typography">Typography</h1>' +
+        '<h2 id="blank"></h2>' +
+        '<h2 id="live-tokens">Live <code>tokens</code></h2>'
     );
 
     expect(collectHeadings(article)).toEqual<TocEntry[]>([
@@ -179,5 +179,32 @@ describe('getActiveHeadingId', () => {
     stubHeadingTops({ one: -3000, two: -2000, three: 700 });
 
     expect(getActiveHeadingId(entries)).toBe('three');
+  });
+
+  it('holds the first entry on a page too short to scroll', () => {
+    renderThreeHeadings();
+    stubViewport({
+      scrollY: 0,
+      innerHeight: 900,
+      scrollHeight: 900,
+      scrollPaddingTop: '80px',
+    });
+    stubHeadingTops({ one: 200, two: 400, three: 600 });
+
+    expect(getActiveHeadingId(entries)).toBe('one');
+  });
+
+  it('treats a document without scroll-padding-top as a zero offset', () => {
+    renderThreeHeadings();
+    stubViewport({
+      scrollY: 500,
+      innerHeight: 800,
+      scrollHeight: 4000,
+      scrollPaddingTop: '',
+    });
+    // `three` sits 40px down: active under an 80px offset, not under a 0 one.
+    stubHeadingTops({ one: -100, two: 1, three: 40 });
+
+    expect(getActiveHeadingId(entries)).toBe('two');
   });
 });

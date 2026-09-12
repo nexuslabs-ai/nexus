@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 
 import { cn } from '@nexus_ds/react';
 import { usePathname } from 'next/navigation';
@@ -19,6 +19,7 @@ const TOC_LINK_BASE =
 
 export function RightRail() {
   const pathname = usePathname();
+  const navRef = useRef<HTMLElement>(null);
   const [entries, setEntries] = useState<TocEntry[]>([]);
   const [activeId, setActiveId] = useState<string | null>(null);
 
@@ -33,6 +34,9 @@ export function RightRail() {
     let frame = 0;
     const sync = () => {
       frame = 0;
+      // `offsetParent` is null while the rail is display:none below lg, where
+      // tracking the reader would paint nothing.
+      if (!navRef.current?.offsetParent) return;
       setActiveId(getActiveHeadingId(entries));
     };
     const schedule = () => {
@@ -40,11 +44,18 @@ export function RightRail() {
       frame = requestAnimationFrame(sync);
     };
 
+    // The article can change height without a scroll or resize — an expanding
+    // <details>, a density swap — which moves every heading under the reader.
+    const article = document.getElementById(DOCS_ARTICLE_ID);
+    const observer = new ResizeObserver(schedule);
+    if (article) observer.observe(article);
+
     sync();
     window.addEventListener('scroll', schedule, { passive: true });
     window.addEventListener('resize', schedule, { passive: true });
     return () => {
       if (frame) cancelAnimationFrame(frame);
+      observer.disconnect();
       window.removeEventListener('scroll', schedule);
       window.removeEventListener('resize', schedule);
     };
@@ -54,6 +65,7 @@ export function RightRail() {
 
   return (
     <nav
+      ref={navRef}
       aria-labelledby={TOC_HEADING_ID}
       className="nx:sticky nx:top-(--docs-header-h) nx:self-start nx:hidden nx:lg:block nx:max-h-[calc(100svh-var(--docs-header-h))] nx:overflow-y-auto"
     >

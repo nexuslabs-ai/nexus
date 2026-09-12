@@ -1,4 +1,5 @@
 import { Breadcrumb } from '../_components/Breadcrumb';
+import { SectionHeading } from '../_components/Heading';
 
 /**
  * Foundations → Responsive. Server component — the breakpoint scale, the
@@ -94,7 +95,9 @@ export function Responsive() {
 
       {/* ── Breakpoints ─────────────────────────────────────── */}
       <section className="nx:mb-12">
-        <h2 className="nx:typography-heading-small nx:mb-1">Breakpoints</h2>
+        <SectionHeading className="nx:typography-heading-small nx:mb-1">
+          Breakpoints
+        </SectionHeading>
         <p className="nx:typography-body-default nx:text-muted-foreground nx:mb-4 nx:max-w-[64ch]">
           Five Tailwind classes plus the unprefixed base, mapped onto the Narrow
           / Standard / Wide labels. Components are tuned against two reference
@@ -139,9 +142,9 @@ export function Responsive() {
 
       {/* ── Show / Hide primitives ──────────────────────────── */}
       <section className="nx:mb-12">
-        <h2 className="nx:typography-heading-small nx:mb-1">
+        <SectionHeading className="nx:typography-heading-small nx:mb-1">
           Show / Hide primitives
-        </h2>
+        </SectionHeading>
         <p className="nx:typography-body-default nx:text-muted-foreground nx:mb-4 nx:max-w-[64ch]">
           The declarative <code>&lt;Show&gt;</code> / <code>&lt;Hide&gt;</code>{' '}
           primitives from <code>@nexus_ds/react</code> express responsive
@@ -171,7 +174,9 @@ export function Responsive() {
 
       {/* ── Which mechanism ─────────────────────────────────── */}
       <section className="nx:mb-12">
-        <h2 className="nx:typography-heading-small nx:mb-1">Which mechanism</h2>
+        <SectionHeading className="nx:typography-heading-small nx:mb-1">
+          Which mechanism
+        </SectionHeading>
         <p className="nx:typography-body-default nx:text-muted-foreground nx:mb-4 nx:max-w-[64ch]">
           Components prefer <code>@container</code> — they adapt to their
           parent&rsquo;s width, so they render consistently in a sidebar or a

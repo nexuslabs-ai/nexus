@@ -1,4 +1,5 @@
 import { Breadcrumb } from '../_components/Breadcrumb';
+import { SectionHeading } from '../_components/Heading';
 import { Button } from '../_components/nexus';
 
 /**
@@ -64,7 +65,9 @@ export function MultiBrand() {
 
       {/* ── Dimensions ──────────────────────────────────────── */}
       <section className="nx:mb-12">
-        <h2 className="nx:typography-heading-small nx:mb-1">The dimensions</h2>
+        <SectionHeading className="nx:typography-heading-small nx:mb-1">
+          The dimensions
+        </SectionHeading>
         <p className="nx:typography-body-default nx:text-muted-foreground nx:mb-4 nx:max-w-[64ch]">
           One base color axis plus five design-token axes and dark mode, each an
           orthogonal runtime mode that combines freely. Brand color is a
@@ -102,9 +105,9 @@ export function MultiBrand() {
 
       {/* ── Mechanisms ──────────────────────────────────────── */}
       <section className="nx:mb-12">
-        <h2 className="nx:typography-heading-small nx:mb-1">
+        <SectionHeading className="nx:typography-heading-small nx:mb-1">
           Two runtime mechanisms
-        </h2>
+        </SectionHeading>
         <p className="nx:typography-body-default nx:text-muted-foreground nx:mb-4 nx:max-w-[64ch]">
           Colors and most design tokens swap by re-pointing a stylesheet
           <code className="nx:typography-code-inline">
@@ -128,7 +131,9 @@ export function MultiBrand() {
 
       {/* ── Live ────────────────────────────────────────────── */}
       <section className="nx:mb-12">
-        <h2 className="nx:typography-heading-small nx:mb-1">See it live</h2>
+        <SectionHeading className="nx:typography-heading-small nx:mb-1">
+          See it live
+        </SectionHeading>
         <p className="nx:typography-body-default nx:text-muted-foreground nx:mb-4 nx:max-w-[64ch]">
           Open the theme picker (bottom-right) and swap the Base — these
           components and swatches re-resolve instantly.
@@ -152,9 +157,9 @@ export function MultiBrand() {
 
       {/* ── Consumer overrides ──────────────────────────────── */}
       <section className="nx:mb-12">
-        <h2 className="nx:typography-heading-small nx:mb-1">
+        <SectionHeading className="nx:typography-heading-small nx:mb-1">
           Re-theme as a consumer
-        </h2>
+        </SectionHeading>
         <p className="nx:typography-body-default nx:text-muted-foreground nx:mb-4 nx:max-w-[64ch]">
           Override the token variables in a stylesheet loaded after Nexus, or
           set a density mode on any subtree. No component changes — the cascade
@@ -174,7 +179,9 @@ export function MultiBrand() {
 
       {/* ── For agents ──────────────────────────────────────── */}
       <section className="nx:mb-12">
-        <h2 className="nx:typography-heading-small nx:mb-1">For agents</h2>
+        <SectionHeading className="nx:typography-heading-small nx:mb-1">
+          For agents
+        </SectionHeading>
         <p className="nx:typography-body-default nx:text-muted-foreground nx:max-w-[64ch]">
           The same dimensions are published as structured DTCG tokens, a{' '}
           <code className="nx:typography-code-inline">llms.txt</code> manifest,

@@ -1,4 +1,5 @@
 import { Breadcrumb } from '../_components/Breadcrumb';
+import { SectionHeading } from '../_components/Heading';
 
 import { ColorScales } from './ColorScales';
 
@@ -169,7 +170,9 @@ export function ColorShowcase() {
 
       {/* ── The palettes (+ shared CVD preview) ─────────────── */}
       <section className="nx:mb-12">
-        <h2 className="nx:typography-heading-small nx:mb-1">The palettes</h2>
+        <SectionHeading className="nx:typography-heading-small nx:mb-1">
+          The palettes
+        </SectionHeading>
         <p className="nx:typography-body-default nx:text-muted-foreground nx:mb-4 nx:max-w-[64ch]">
           Start with the five neutral bases — eleven shades each. Read{' '}
           <em>down</em> any column: every base&rsquo;s <code>500</code> sits at
@@ -184,7 +187,9 @@ export function ColorShowcase() {
 
       {/* ── Live semantic tokens ────────────────────────────── */}
       <section className="nx:mb-12">
-        <h2 className="nx:typography-heading-small nx:mb-1">Live tokens</h2>
+        <SectionHeading className="nx:typography-heading-small nx:mb-1">
+          Live tokens
+        </SectionHeading>
         <p className="nx:typography-body-default nx:text-muted-foreground nx:mb-4 nx:max-w-[64ch]">
           Semantic surface/text pairs — the real tokens components use. Open the
           theme picker (bottom-right) and swap the base or dark mode: every pair
@@ -211,9 +216,9 @@ export function ColorShowcase() {
 
       {/* ── Shade → role ────────────────────────────────────── */}
       <section className="nx:mb-12">
-        <h2 className="nx:typography-heading-small nx:mb-1">
+        <SectionHeading className="nx:typography-heading-small nx:mb-1">
           What each shade is for
-        </h2>
+        </SectionHeading>
         <p className="nx:typography-body-default nx:text-muted-foreground nx:mb-4 nx:max-w-[64ch]">
           The shade number is a luminance coordinate, and each step maps to
           specific semantic roles. The mapping is not a simple light/dark flip —
@@ -273,7 +278,9 @@ export function ColorShowcase() {
 
       {/* ── Accessibility / APCA gate ───────────────────────── */}
       <section className="nx:mb-12">
-        <h2 className="nx:typography-heading-small nx:mb-1">Accessibility</h2>
+        <SectionHeading className="nx:typography-heading-small nx:mb-1">
+          Accessibility
+        </SectionHeading>
         <p className="nx:typography-body-default nx:text-muted-foreground nx:mb-4 nx:max-w-[64ch]">
           Contrast is gated by APCA (not WCAG 2 ratios), with thresholds set per
           intended use. A failing pair blocks the build — thresholds are not
@@ -314,7 +321,9 @@ export function ColorShowcase() {
 
       {/* ── How it works ────────────────────────────────────── */}
       <section>
-        <h2 className="nx:typography-heading-small nx:mb-4">How it works</h2>
+        <SectionHeading className="nx:typography-heading-small nx:mb-4">
+          How it works
+        </SectionHeading>
         <ol className="nx:flex nx:flex-col nx:gap-3 nx:max-w-[64ch]">
           {[
             {
