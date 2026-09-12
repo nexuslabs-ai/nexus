@@ -116,6 +116,10 @@ async function compileMdx(source: string) {
     ids: elements
       .map((el) => el.properties?.id)
       .filter((id): id is string => typeof id === 'string'),
+    hrefs: elements
+      .filter((el) => el.tagName === 'a')
+      .map((el) => el.properties?.href)
+      .filter((href): href is string => typeof href === 'string'),
   };
 }
 
@@ -186,6 +190,44 @@ describe('MDX heading ids', () => {
       }
     }
   );
+
+  // The pin lists above keep ids stable, but a rename that updates a pin still
+  // leaves any link pointing at the old id silently dead.
+  it('points every anchor link at an id that exists', async () => {
+    const idsByFile = new Map<string, Set<string>>();
+    const fragmentLinks: { from: string; href: string }[] = [];
+
+    for (const contentPath of CONTENT_FILES) {
+      const source = await readFile(
+        path.join(CONTENT_DIR, contentPath),
+        'utf8'
+      );
+      const { ids, hrefs } = await compileMdx(source);
+
+      idsByFile.set(contentPath, new Set(ids));
+      for (const href of hrefs.filter((h) => h.includes('#'))) {
+        fragmentLinks.push({ from: contentPath, href });
+      }
+    }
+
+    expect(fragmentLinks.length).toBeGreaterThan(0);
+
+    for (const { from, href } of fragmentLinks) {
+      const hash = href.indexOf('#');
+      const route = href.slice(0, hash);
+      const fragment = href.slice(hash + 1);
+      // A bare `#id` targets the page the link sits on; `/a/b#id` targets
+      // content/a/b.mdx, the mapping MDX_PAGES registers for that route.
+      const target = route === '' ? from : `${route.replace(/^\//, '')}.mdx`;
+      const ids = idsByFile.get(target);
+
+      expect(
+        ids,
+        `${from} links to ${href}, which is not an MDX page`
+      ).toBeDefined();
+      expect([...(ids ?? [])], `${from} links to ${href}`).toContain(fragment);
+    }
+  });
 
   it('slugs every heading rank and disambiguates repeated headings', async () => {
     const { headings } = await compileMdx(FIXTURE);
