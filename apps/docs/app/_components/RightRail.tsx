@@ -75,27 +75,34 @@ export function RightRail() {
         On this page
       </h3>
       <ul className="nx:list-none nx:p-0 nx:m-0">
-        {entries.map((entry) => {
-          const active = entry.id === activeId;
-          return (
-            <li key={entry.id}>
-              <a
-                href={`#${entry.id}`}
-                aria-current={active ? 'location' : undefined}
-                className={cn(
-                  TOC_LINK_BASE,
-                  entry.level === 3 ? 'nx:pl-6' : 'nx:pl-3',
-                  active
-                    ? 'nx:text-primary-subtle-foreground nx:border-focus-default'
-                    : 'nx:text-muted-foreground-subtle nx:border-border-default nx:hover:text-foreground'
-                )}
-              >
-                {entry.text}
-              </a>
-            </li>
-          );
-        })}
+        {entries.map((entry) => (
+          <TocLink
+            key={entry.id}
+            entry={entry}
+            active={entry.id === activeId}
+          />
+        ))}
       </ul>
     </nav>
+  );
+}
+
+function TocLink({ entry, active }: { entry: TocEntry; active: boolean }) {
+  return (
+    <li>
+      <a
+        href={`#${entry.id}`}
+        aria-current={active ? 'location' : undefined}
+        className={cn(
+          TOC_LINK_BASE,
+          entry.level === 3 ? 'nx:pl-6' : 'nx:pl-3',
+          active
+            ? 'nx:text-primary-subtle-foreground nx:border-focus-default'
+            : 'nx:text-muted-foreground-subtle nx:border-border-default nx:hover:text-foreground'
+        )}
+      >
+        {entry.text}
+      </a>
+    </li>
   );
 }
