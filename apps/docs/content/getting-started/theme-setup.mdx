@@ -1,21 +1,26 @@
 # Theme setup
 
 Nexus Appearance derives a full runtime theme from one state object, paints it
-before React hydrates, and persists the user's choices. Setup has three pieces:
-CSS imports, a provider, and a first-paint script.
+before React hydrates, and persists the user's choices. Setup has two pieces: a
+provider and a first-paint script.
 
 ## Before you start
 
-This page continues from [Install](/getting-started/install): the token CSS is
-copied into `styles/nexus/` and imported from your CSS entry point, the
-appearance provider is copied into `components/appearance/`, and
-`@nexus_ds/core` is installed. Every snippet below is a change to the
-`app/layout.tsx` that page ends with, not a second file.
+This page continues from [Install](/getting-started/install), which leaves you
+with the token CSS in `styles/nexus/` imported from your CSS entry point, the
+appearance provider copied into `components/appearance/`, and `@nexus_ds/core`
+installed.
+
+The layout below replaces the one Install ends with — same file, same imports,
+now reading the appearance from a cookie. The other snippets are new files.
 
 ## Pick a default appearance
 
 Customize the shipped default by changing state fields. Brand and surface tone
 are state fields, not factory arguments.
+
+This is what replaces the bare `DEFAULT_NEXUS_APPEARANCE` that Install passes to
+the provider and the script:
 
 ```ts
 // app/appearance-state.ts or src/appearance-state.ts
@@ -71,7 +76,7 @@ export default async function RootLayout({
           defaultState={snapshot.state}
         />
       </head>
-      <body>
+      <body className="nx:bg-background nx:text-foreground">
         <NexusAppearanceProvider
           storageKey="app-appearance"
           cookieWriteKey={DEFAULT_COOKIE_KEY}
@@ -134,6 +139,7 @@ export default defineConfig({
 // src/main.tsx
 import { createRoot } from 'react-dom/client';
 import { createNexusAppearance } from './components/appearance';
+// ^ the provider folder from Install, under src/ for a Vite app
 import { defaultAppearance } from './appearance-state';
 import './index.css';
 

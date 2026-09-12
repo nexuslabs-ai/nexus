@@ -52,9 +52,11 @@ export default {
 Do not add an `@import "tailwindcss"` of your own. The Nexus token CSS imports
 Tailwind itself, as `@import 'tailwindcss' prefix(nx)` — that prefix is where
 `nx:bg-primary-background` comes from. `prefix()` is a property of the build,
-not of one import, so a second unprefixed import does not give you a second,
-unprefixed utility layer alongside the first: the two imports disagree about the
-prefix, and you get preflight and the theme layer emitted twice for it.
+not of one import, so a second unprefixed import does not buy you a second,
+unprefixed utility layer: everything stays `nx:`. What it does instead is
+re-inject Tailwind's default `@theme` after Nexus has reset those scales, so
+`nx:bg-red-500` and a stock `nx:p-4` come back alongside the tokens — and
+preflight is emitted twice.
 
 Tailwind finds class names by scanning your project, so a pasted component's
 utilities are generated with no `@source` line: the file sits in your source
@@ -91,8 +93,16 @@ everywhere in the app, not just inside pasted components: once `nexus.css` is
 your Tailwind entry point, `nx:flex` exists and bare `flex` does not. Nexus also
 resets Tailwind's default scales (`--color-*`, `--spacing-*`, `--text-*` and the
 rest are set to `initial`), so the utilities you get are the token set, not
-Tailwind's stock palette. Write your own markup as `nx:` too, and add project
-tokens to the same `@theme` rather than running a second Tailwind build.
+Tailwind's stock palette. Write your own markup as `nx:` too.
+
+To add project tokens, put your own `@theme` block in `globals.css` after the
+import — `nexus.css` is generated output stamped `DO NOT EDIT`, and pasting a
+newer copy over it would drop anything you added there.
+
+This assumes a greenfield app. Adding Nexus to one that already has unprefixed
+Tailwind utilities needs a separate nx entry point rather than a single shared
+one; that setup is being designed in
+[#604](https://github.com/nexuslabs-ai/nexus/issues/604).
 
 Then declare the native color scheme, so the browser themes scrollbars, form
 controls, and the page canvas before any JavaScript runs:
@@ -200,14 +210,38 @@ configuration is what lets `<Button className="nx:bg-error-background" />`
 override the variant's own background instead of landing beside it in the class
 list and losing to source order.
 
+## Lint guardrails
+
+Optional, but the conventions in a pasted component are now yours to keep. The
+lint rules that enforce them publish to npm:
+
+```bash
+npm install -D @nexus_ds/eslint-plugin
+```
+
+```js
+// eslint.config.js
+import { nexusComponentConfig } from '@nexus_ds/eslint-plugin/config';
+
+export default [nexusComponentConfig({ files: ['components/**/*.tsx'] })];
+```
+
+That turns on `nx-class-conventions`, `no-render-prop-types`, and
+`no-multi-statement-jsx-handler` over the files you point it at.
+
 ## Paste a component
 
 Setup is done. A component is never just its own file, so take it by following
 its imports: open the one you want, copy every relative import it names, then do
-the same for those files until nothing new appears. What is left — the bare
-package specifiers — is your install line.
+the same for those files until nothing new appears. Two things that come up
+immediately — an import of `lib/utils` is the `cn` from step 4 and is already in
+place, and an import of a sibling folder is a barrel, so take that folder's
+implementation file. What is left over — the bare package specifiers — is your
+install line.
 
-Run that on `button.tsx` and it closes after one round:
+Run that on `button.tsx` and it closes after two rounds: `spinner.tsx`,
+`button-group-context.ts` from the first, and `lib/icons.ts` (which only
+`spinner.tsx` names) from the second.
 
 ```
 components/ui/button.tsx
@@ -249,9 +283,11 @@ ones in your app. To run the second one you need a way to switch modes, which is
 the provider's `state` and `setState`:
 
 ```tsx
+// components/mode-toggle.tsx
 'use client';
 
 import { useNexusAppearance } from '@/components/appearance';
+import { Button } from '@/components/ui/button';
 
 export function ModeToggle() {
   const { state, setState, resolvedMode } = useNexusAppearance();
@@ -262,6 +298,9 @@ export function ModeToggle() {
   return <Button onClick={toggle}>Mode: {resolvedMode}</Button>;
 }
 ```
+
+Render it on the same page as the buttons. It flips off `resolvedMode` rather
+than `state.mode`, so it does the right thing from a `'system'` start.
 
 Unstyled buttons mean the token import from step 2 never reached the page.
 Styled buttons that stay light when you toggle mean the provider from step 3 is
