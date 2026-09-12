@@ -3,7 +3,6 @@ import { afterEach, describe, expect, it, vi } from 'vitest';
 import {
   collectHeadings,
   getActiveHeadingId,
-  slugify,
   type TocEntry,
 } from './table-of-contents';
 
@@ -49,16 +48,6 @@ afterEach(() => {
   document.documentElement.style.scrollPaddingTop = '';
 });
 
-describe('slugify', () => {
-  it('lowercases and hyphenates, dropping punctuation and edge separators', () => {
-    expect(slugify('Install the published packages')).toBe(
-      'install-the-published-packages'
-    );
-    expect(slugify('  Why `asChild`? ')).toBe('why-aschild');
-    expect(slugify('Tokens & themes — v2')).toBe('tokens-themes-v2');
-  });
-});
-
 describe('collectHeadings', () => {
   it('keeps ids rendered by rehype-slug on MDX pages', () => {
     const article = renderArticle(
@@ -102,6 +91,29 @@ describe('collectHeadings', () => {
 
     expect(collectHeadings(article)).toEqual<TocEntry[]>([
       { id: 'live-tokens', text: 'Live tokens', level: 2 },
+    ]);
+  });
+
+  it('skips the visually hidden Footnotes heading remark-gfm appends', () => {
+    const article = renderArticle(
+      '<h2 id="theme-setup">Theme setup</h2>' +
+        '<section data-footnotes="true" class="footnotes">' +
+        '<h2 id="footnote-label" class="nx:sr-only">Footnotes</h2>' +
+        '</section>'
+    );
+
+    expect(collectHeadings(article)).toEqual<TocEntry[]>([
+      { id: 'theme-setup', text: 'Theme setup', level: 2 },
+    ]);
+  });
+
+  it('keeps only the first of two headings sharing an id', () => {
+    const article = renderArticle(
+      '<h2 id="the-scale">The scale</h2><h2 id="the-scale">The scale</h2>'
+    );
+
+    expect(collectHeadings(article)).toEqual<TocEntry[]>([
+      { id: 'the-scale', text: 'The scale', level: 2 },
     ]);
   });
 

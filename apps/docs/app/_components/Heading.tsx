@@ -1,5 +1,3 @@
-import { slugify } from '../_lib/table-of-contents';
-
 /**
  * Headings for the hand-built pages and the registry placeholder view.
  *
@@ -8,6 +6,13 @@ import { slugify } from '../_lib/table-of-contents';
  * `#heading` deep links resolve on first paint, and lets the right rail read
  * ids rather than assign them.
  */
+
+export function slugify(text: string): string {
+  return text
+    .toLowerCase()
+    .replace(/[^\p{Letter}\p{Number}]+/gu, '-')
+    .replace(/^-+|-+$/g, '');
+}
 
 export function SectionHeading({
   children,

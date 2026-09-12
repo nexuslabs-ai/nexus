@@ -18,22 +18,20 @@ export type TocEntry = {
   level: 2 | 3;
 };
 
-export function slugify(text: string): string {
-  return text
-    .toLowerCase()
-    .replace(/[^\p{Letter}\p{Number}]+/gu, '-')
-    .replace(/^-+|-+$/g, '');
-}
-
 /** Reads the linkable `h2` / `h3` headings of `article` in document order. */
 export function collectHeadings(article: HTMLElement): TocEntry[] {
   const headings = article.querySelectorAll<HTMLHeadingElement>('h2, h3');
 
   const entries: TocEntry[] = [];
+  const seen = new Set<string>();
   for (const heading of headings) {
     const text = heading.textContent?.trim() ?? '';
-    if (!heading.id || !text) continue;
+    if (!heading.id || !text || seen.has(heading.id)) continue;
+    // remark-gfm appends a visually hidden "Footnotes" heading no page author
+    // wrote, inside a [data-footnotes] section.
+    if (heading.closest('[data-footnotes]')) continue;
 
+    seen.add(heading.id);
     entries.push({
       id: heading.id,
       text,

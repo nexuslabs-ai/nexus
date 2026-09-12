@@ -49,8 +49,9 @@ export default defineConfig({
       // Unit tests (hooks, utilities) - jsdom
       {
         extends: true,
-        // apps/docs sets `jsx: "preserve"` for Next, which would leave JSX in
-        // any .tsx source a unit test imports. Compile it here instead.
+        // apps/docs sets `jsx: "preserve"` for Next, which drops esbuild to
+        // the classic runtime — a .tsx source a unit test imports then throws
+        // `React is not defined`. Pin the automatic runtime here instead.
         esbuild: { jsx: 'automatic', jsxImportSource: 'react' },
         test: {
           name: 'unit',
