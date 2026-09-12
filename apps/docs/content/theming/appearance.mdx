@@ -1,8 +1,11 @@
 # Appearance
 
-Appearance is the runtime state that drives Nexus theming. The package derives
-colors, typography prefs, density, corners, elevation, stroke, and motion prefs
-from a single [`NexusAppearanceState`](#the-model).
+Appearance is the runtime state that drives Nexus theming. `@nexus_ds/core`
+derives colors, typography prefs, density, corners, elevation, stroke, and
+motion prefs from a single [`NexusAppearanceState`](#the-model).
+
+The `@/components/appearance` imports below are the provider folder copied in at
+[Install step 3](/getting-started/install); point them at wherever you put it.
 
 ## The model
 
@@ -66,9 +69,9 @@ function ModeButton() {
 }
 ```
 
-Nexus ships the provider and hook. Product-specific Appearance panels and quick
-controls belong in the consuming app, so they can match that product's settings
-IA.
+The provider and hook are the copied files; `useNexusAppearance` is what they
+expose. Product-specific Appearance panels and quick controls belong in the
+consuming app, so they can match that product's settings IA.
 
 ## First paint and persistence
 

@@ -11,8 +11,10 @@ with the token CSS in `styles/nexus/` imported from your CSS entry point, the
 appearance provider copied into `components/appearance/`, and `@nexus_ds/core`
 installed.
 
-The layout below replaces the one Install ends with — same file, same imports,
-now reading the appearance from a cookie. The other snippets are new files.
+The Next.js layout below replaces the one Install ends with: same file, but it
+becomes `async`, reads the appearance from a cookie, and swaps
+`DEFAULT_NEXUS_APPEARANCE` for the `defaultAppearance` and cookie helpers below.
+The Vite section is a separate track — take it instead of the Next.js one.
 
 ## Pick a default appearance
 

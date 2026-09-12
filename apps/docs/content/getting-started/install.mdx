@@ -55,7 +55,7 @@ Tailwind itself, as `@import 'tailwindcss' prefix(nx)` — that prefix is where
 not of one import, so a second unprefixed import does not buy you a second,
 unprefixed utility layer: everything stays `nx:`. What it does instead is
 re-inject Tailwind's default `@theme` after Nexus has reset those scales, so
-`nx:bg-red-500` and a stock `nx:p-4` come back alongside the tokens — and
+`nx:bg-red-500` and a stock `nx:text-lg` come back alongside the tokens — and
 preflight is emitted twice.
 
 Tailwind finds class names by scanning your project, so a pasted component's
@@ -210,25 +210,6 @@ configuration is what lets `<Button className="nx:bg-error-background" />`
 override the variant's own background instead of landing beside it in the class
 list and losing to source order.
 
-## Lint guardrails
-
-Optional, but the conventions in a pasted component are now yours to keep. The
-lint rules that enforce them publish to npm:
-
-```bash
-npm install -D @nexus_ds/eslint-plugin
-```
-
-```js
-// eslint.config.js
-import { nexusComponentConfig } from '@nexus_ds/eslint-plugin/config';
-
-export default [nexusComponentConfig({ files: ['components/**/*.tsx'] })];
-```
-
-That turns on `nx-class-conventions`, `no-render-prop-types`, and
-`no-multi-statement-jsx-handler` over the files you point it at.
-
 ## Paste a component
 
 Setup is done. A component is never just its own file, so take it by following
@@ -305,6 +286,38 @@ than `state.mode`, so it does the right thing from a `'system'` start.
 Unstyled buttons mean the token import from step 2 never reached the page.
 Styled buttons that stay light when you toggle mean the provider from step 3 is
 not wrapping them.
+
+## Lint guardrails
+
+Optional. The conventions in a pasted component are now yours to keep, and the
+rules that enforce them publish to npm:
+
+```bash
+npm install -D @nexus_ds/eslint-plugin typescript-eslint
+```
+
+`nexusComponentConfig()` contributes plugins and rules only — it sets no parser,
+so spread it into an entry that provides one and append that to your existing
+config:
+
+```js
+// eslint.config.js
+import { nexusComponentConfig } from '@nexus_ds/eslint-plugin/config';
+import tseslint from 'typescript-eslint';
+
+export default [
+  // ...your existing config
+  {
+    files: ['components/**/*.tsx'],
+    languageOptions: { parser: tseslint.parser },
+    ...nexusComponentConfig(),
+  },
+];
+```
+
+That turns on `nx-class-conventions`, `no-render-prop-types`, and
+`no-multi-statement-jsx-handler` over the files you point it at. Without the
+parser entry every `.tsx` fails to parse and no rule runs.
 
 ## Next steps
 
