@@ -5,22 +5,13 @@ import {
   getActiveHeadingId,
   type TocEntry,
 } from './table-of-contents';
+import { stubHeadingTops } from './test-support';
 
 function renderArticle(html: string): HTMLElement {
   const article = document.createElement('article');
   article.innerHTML = html;
   document.body.append(article);
   return article;
-}
-
-/** Places each heading at a fixed viewport offset, as `getActiveHeadingId` reads it. */
-function stubHeadingTops(tops: Record<string, number>): void {
-  for (const [id, top] of Object.entries(tops)) {
-    const heading = document.getElementById(id);
-    if (!heading) throw new Error(`no heading #${id}`);
-    const rect = new DOMRect(0, top, 0, 0);
-    heading.getBoundingClientRect = vi.fn(() => rect);
-  }
 }
 
 function stubViewport({

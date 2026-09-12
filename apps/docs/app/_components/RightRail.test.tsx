@@ -2,44 +2,40 @@ import { render, screen } from '@testing-library/react';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
 import { DOCS_ARTICLE_ID } from '../_lib/table-of-contents';
+import { stubHeadingTops } from '../_lib/test-support';
 
 import { RightRail } from './RightRail';
 
+const nav = vi.hoisted(() => ({ pathname: '/foundations/typography' }));
+
 vi.mock('next/navigation', () => ({
-  usePathname: () => '/foundations/typography',
+  usePathname: () => nav.pathname,
 }));
 
-const SCROLL_OFFSET = 80;
-
+/** Swaps the article in place, leaving the rail's own container mounted. */
 function renderArticle(html: string): void {
-  document.body.innerHTML = `<article id="${DOCS_ARTICLE_ID}">${html}</article>`;
+  document.getElementById(DOCS_ARTICLE_ID)?.remove();
+  const article = document.createElement('article');
+  article.id = DOCS_ARTICLE_ID;
+  article.innerHTML = html;
+  document.body.prepend(article);
 }
 
-/** Places each heading's top relative to the viewport, by element id. */
-function stubHeadingTops(tops: Record<string, number>): void {
-  for (const [id, top] of Object.entries(tops)) {
-    const heading = document.getElementById(id);
-    if (!heading) throw new Error(`no heading #${id}`);
-    const rect = new DOMRect(0, top, 0, 0);
-    heading.getBoundingClientRect = vi.fn(() => rect);
-  }
+/** jsdom reports a null offsetParent for every element, which the rail reads as hidden. */
+function showRail(): void {
+  vi.spyOn(HTMLElement.prototype, 'offsetParent', 'get').mockReturnValue(
+    document.body
+  );
 }
 
 beforeEach(() => {
+  nav.pathname = '/foundations/typography';
   document.body.innerHTML = '';
-  document.documentElement.style.scrollPaddingTop = `${SCROLL_OFFSET}px`;
-  // The rail skips its layout read when offsetParent is null, which is what
-  // jsdom reports for every element.
-  Object.defineProperty(HTMLElement.prototype, 'offsetParent', {
-    configurable: true,
-    get: () => document.body,
-  });
 });
 
 afterEach(() => {
   vi.restoreAllMocks();
   document.body.innerHTML = '';
-  document.documentElement.style.scrollPaddingTop = '';
 });
 
 describe('RightRail', () => {
@@ -56,9 +52,8 @@ describe('RightRail', () => {
 
     render(<RightRail />);
 
-    expect(
-      screen.getByRole('navigation', { name: 'On this page' })
-    ).not.toBeNull();
+    // getByRole throws unless a navigation landmark carries this exact name.
+    screen.getByRole('navigation', { name: 'On this page' });
   });
 
   it('links each heading by its id, in document order', () => {
@@ -73,27 +68,40 @@ describe('RightRail', () => {
     ).toEqual(['#families', '#weights', '#scale']);
   });
 
-  it('indents an h3 deeper than an h2', () => {
+  it('carries each heading depth through to its link', () => {
     renderArticle(
       '<h2 id="families">Families</h2><h3 id="weights">Weights</h3>'
     );
 
     render(<RightRail />);
 
-    expect(screen.getByRole('link', { name: 'Families' }).classList).toContain(
-      'nx:pl-3'
-    );
-    expect(screen.getByRole('link', { name: 'Weights' }).classList).toContain(
-      'nx:pl-6'
-    );
+    expect(
+      screen.getAllByRole('link').map((link) => link.getAttribute('data-level'))
+    ).toEqual(['2', '3']);
+  });
+
+  it('re-collects the headings when the reader navigates to another page', () => {
+    renderArticle('<h2 id="families">Families</h2>');
+
+    const { rerender } = render(<RightRail />);
+
+    nav.pathname = '/foundations/spacing';
+    renderArticle('<h2 id="the-grid">The grid</h2>');
+    rerender(<RightRail />);
+
+    expect(
+      screen.getAllByRole('link').map((link) => link.getAttribute('href'))
+    ).toEqual(['#the-grid']);
   });
 
   it('marks only the heading the reader is inside', () => {
     renderArticle(
       '<h2 id="families">Families</h2><h2 id="weights">Weights</h2><h2 id="scale">Scale</h2>'
     );
-    // Families and Weights are above the offset; Scale is still below it.
-    stubHeadingTops({ families: -200, weights: 20, scale: 400 });
+    // Families and Weights sit above the viewport; Scale is far enough below it
+    // to stay inactive whatever scroll-padding-top the page sets.
+    stubHeadingTops({ families: -400, weights: -100, scale: 600 });
+    showRail();
 
     render(<RightRail />);
 

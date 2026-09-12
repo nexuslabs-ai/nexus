@@ -92,6 +92,7 @@ function TocLink({ entry, active }: { entry: TocEntry; active: boolean }) {
     <li>
       <a
         href={`#${entry.id}`}
+        data-level={entry.level}
         aria-current={active ? 'location' : undefined}
         className={cn(
           TOC_LINK_BASE,
