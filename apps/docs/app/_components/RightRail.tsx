@@ -34,8 +34,8 @@ export function RightRail() {
     let frame = 0;
     const sync = () => {
       frame = 0;
-      // `offsetParent` is null while the rail is display:none below lg, where
-      // tracking the reader would paint nothing.
+      // Null while the rail is display:none below lg, where tracking the
+      // reader would paint nothing.
       if (!navRef.current?.offsetParent) return;
       setActiveId(getActiveHeadingId(entries));
     };
@@ -44,8 +44,7 @@ export function RightRail() {
       frame = requestAnimationFrame(sync);
     };
 
-    // The article can change height without a scroll or resize — an expanding
-    // <details>, a density swap — which moves every heading under the reader.
+    // An expanding <details> moves every heading without firing either event.
     const article = document.getElementById(DOCS_ARTICLE_ID);
     const observer = new ResizeObserver(schedule);
     if (article) observer.observe(article);
