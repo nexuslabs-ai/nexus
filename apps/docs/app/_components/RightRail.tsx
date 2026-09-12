@@ -15,7 +15,7 @@ import {
 const TOC_HEADING_ID = 'docs-toc-heading';
 
 const TOC_LINK_BASE =
-  'nx:block nx:py-1 nx:border-l-2 nx:no-underline nx:typography-label-small nx:rounded-sm nx:transition-colors nx:focus-visible:outline-2 nx:focus-visible:outline-focus-default nx:focus-visible:outline-offset-(--focus-offset)';
+  'nx:block nx:py-1 nx:pl-3 nx:data-[level=3]:pl-6 nx:border-l-2 nx:no-underline nx:typography-label-small nx:rounded-sm nx:transition-colors nx:focus-visible:outline-2 nx:focus-visible:outline-focus-default nx:focus-visible:outline-offset-(--focus-offset)';
 
 export function RightRail() {
   const pathname = usePathname();
@@ -96,7 +96,6 @@ function TocLink({ entry, active }: { entry: TocEntry; active: boolean }) {
         aria-current={active ? 'location' : undefined}
         className={cn(
           TOC_LINK_BASE,
-          entry.level === 3 ? 'nx:pl-6' : 'nx:pl-3',
           active
             ? 'nx:text-primary-subtle-foreground nx:border-focus-default'
             : 'nx:text-muted-foreground-subtle nx:border-border-default nx:hover:text-foreground'
