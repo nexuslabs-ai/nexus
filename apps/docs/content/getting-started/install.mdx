@@ -36,7 +36,7 @@ system of your own — the components and token generator forked into a
 publishable monorepo under your own scope — run `pnpm export` in a clone of the
 repo and follow that scaffold rather than this page.
 
-## 1. Tailwind 4
+## Step 1: Tailwind 4
 
 ```bash
 npm install -D tailwindcss @tailwindcss/postcss postcss
@@ -64,7 +64,7 @@ utilities are generated with no `@source` line: the file sits in your source
 tree like any other. `@source` is only for class names automatic detection
 cannot reach — `node_modules`, or files outside your project.
 
-## 2. The token CSS layer
+## Step 2: The token CSS layer
 
 Copy the token CSS into your app. Seven files, one entry point:
 
@@ -120,7 +120,7 @@ Next, write the tag itself. `nexus.css` emits the matching CSS policy — `:root
 advertises both schemes, `:root:not(.dark)` pins light, and `.dark` pins dark —
 so native UI follows the app's theme instead of the operating system's.
 
-## 3. The appearance provider
+## Step 3: The appearance provider
 
 The provider is what turns the token layer into a live theme. It derives the
 `--nx-*` values from a single appearance state, toggles `.dark`, and sets the
@@ -196,7 +196,7 @@ open dark, or `brandColor` and `surfaceTone` to move the palette.
 Vite's `transformIndexHtml`, and the storage policies. It picks up from the
 layout above and shows only what changes, against these same copied modules.
 
-## 4. The `cn` helper
+## Step 4: The `cn` helper
 
 Every Nexus component composes its classes through `cn`, so this file has to
 exist before the first paste:
