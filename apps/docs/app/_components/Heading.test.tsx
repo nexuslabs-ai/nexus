@@ -24,9 +24,17 @@ describe('Heading', () => {
   it('slugifies punctuation the hand-built pages actually use', () => {
     expect(
       renderToStaticMarkup(
-        <SubsectionHeading>Brand &amp; status hues</SubsectionHeading>
+        <SubsectionHeading>{'Brand & status hues'}</SubsectionHeading>
       )
     ).toBe('<h3 id="brand-status-hues">Brand &amp; status hues</h3>');
+  });
+
+  it('lets a caller override the slug so repeated text stays linkable', () => {
+    expect(
+      renderToStaticMarkup(
+        <SectionHeading id="the-scale-2">The scale</SectionHeading>
+      )
+    ).toBe('<h2 id="the-scale-2">The scale</h2>');
   });
 
   it('keeps the caller class list', () => {
