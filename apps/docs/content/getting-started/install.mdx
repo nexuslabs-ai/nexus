@@ -49,14 +49,15 @@ export default {
 };
 ```
 
-Do not add an `@import "tailwindcss"` of your own. The Nexus token CSS imports
-Tailwind itself, as `@import 'tailwindcss' prefix(nx)` — that prefix is where
-`nx:bg-primary-background` comes from. `prefix()` is a property of the build,
-not of one import, so a second unprefixed import does not buy you a second,
-unprefixed utility layer: everything stays `nx:`. What it does instead is
-re-inject Tailwind's default `@theme` after Nexus has reset those scales, so
-`nx:bg-red-500` and a stock `nx:text-lg` come back alongside the tokens — and
-preflight is emitted twice.
+Do not add an `@import "tailwindcss"` of your own — including the one a
+`create-next-app` scaffold leaves at the top of `globals.css`. The Nexus token
+CSS imports Tailwind itself, as `@import 'tailwindcss' prefix(nx)`, and that
+prefix is where `nx:bg-primary-background` comes from. `prefix()` is a property
+of the build, not of one import, so a second unprefixed import does not buy you
+a second, unprefixed utility layer: everything stays `nx:`. It emits preflight
+twice wherever you put it. Put it _after_ the Nexus import and it also
+re-injects Tailwind's default `@theme` on top of Nexus's resets, so
+`nx:bg-red-500` and a stock `nx:text-lg` come back alongside the tokens.
 
 Tailwind finds class names by scanning your project, so a pasted component's
 utilities are generated with no `@source` line: the file sits in your source
@@ -293,31 +294,34 @@ Optional. The conventions in a pasted component are now yours to keep, and the
 rules that enforce them publish to npm:
 
 ```bash
-npm install -D @nexus_ds/eslint-plugin typescript-eslint
+npm install -D @nexus_ds/eslint-plugin
 ```
 
-`nexusComponentConfig()` contributes plugins and rules only — it sets no parser,
-so spread it into an entry that provides one and append that to your existing
-config:
+`nexusComponentConfig()` contributes plugins and rules only. Spread it into an
+entry of your own and append that to your existing config:
 
 ```js
-// eslint.config.js
+// eslint.config.mjs
 import { nexusComponentConfig } from '@nexus_ds/eslint-plugin/config';
-import tseslint from 'typescript-eslint';
 
-export default [
+const eslintConfig = [
   // ...your existing config
   {
     files: ['components/**/*.tsx'],
-    languageOptions: { parser: tseslint.parser },
     ...nexusComponentConfig(),
   },
 ];
+
+export default eslintConfig;
 ```
 
 That turns on `nx-class-conventions`, `no-render-prop-types`, and
-`no-multi-statement-jsx-handler` over the files you point it at. Without the
-parser entry every `.tsx` fails to parse and no rule runs.
+`no-multi-statement-jsx-handler` over the files you point it at. It parses
+because something earlier in the config already set a TypeScript parser — a
+`create-next-app` scaffold does, through `next/core-web-vitals`. In a config
+that sets none, every `.tsx` fails to parse and no rule runs: install
+`typescript-eslint` as well and give the entry its own
+`languageOptions: { parser: tseslint.parser }`.
 
 ## Next steps
 
