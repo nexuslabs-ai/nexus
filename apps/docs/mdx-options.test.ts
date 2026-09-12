@@ -82,20 +82,29 @@ async function contentFiles() {
     );
 }
 
-// Top-level route directories under app/ — `/changelog`, `/appearance-ssr`.
-// Dynamic (`[section]`) and private (`_lib`) folders are not routes.
+// Routes App Router serves from a literal path: every directory holding a
+// page.tsx, minus the dynamic ones, whose paths come from SECTIONS instead.
+// Route groups — `(marketing)` — nest without contributing a path segment.
 async function staticRoutes() {
-  const entries = await readdir(APP_DIR, { withFileTypes: true });
-  return new Set(
-    entries
-      .filter(
-        (entry) =>
-          entry.isDirectory() &&
-          !entry.name.startsWith('[') &&
-          !entry.name.startsWith('_')
-      )
-      .map((entry) => `/${entry.name}`)
-  );
+  const entries = await readdir(APP_DIR, {
+    withFileTypes: true,
+    recursive: true,
+  });
+  const routes = new Set<string>();
+
+  for (const entry of entries) {
+    if (!entry.isFile() || entry.name !== 'page.tsx') continue;
+
+    const segments = path
+      .relative(APP_DIR, entry.parentPath)
+      .split(path.sep)
+      .filter((segment) => segment !== '' && !segment.startsWith('('));
+
+    if (segments.some((segment) => segment.startsWith('['))) continue;
+    routes.add(`/${segments.join('/')}`);
+  }
+
+  return routes;
 }
 
 // An href leaves the docs app when it names a scheme (`https:`, `mailto:`) or
@@ -108,14 +117,15 @@ function isInRepo(href: string) {
 // query string and trailing slash. A relative route resolves against the
 // linking page's own directory. Returns '' for a bare `#id`.
 function resolveRoute(from: string, route: string) {
-  const query = route.replace(/\?.*$/, '');
-  const clean = query.length > 1 ? query.replace(/\/+$/, '') : query;
+  const withoutQuery = route.replace(/\?.*$/, '');
+  const clean =
+    withoutQuery.length > 1 ? withoutQuery.replace(/\/+$/, '') : withoutQuery;
   if (clean === '' || clean.startsWith('/')) return clean;
   return path.posix.join('/', path.posix.dirname(from), clean);
 }
 
 function routeExists(route: string, routes: Set<string>) {
-  if (route === '/' || routes.has(route)) return true;
+  if (routes.has(route)) return true;
 
   const [section, sub, ...rest] = route.slice(1).split('/');
   if (!section || rest.length > 0) return false;
@@ -200,14 +210,21 @@ describe('MDX heading ids', () => {
     );
   });
 
-  // A content file the registry does not name renders SubPageView's
-  // placeholder instead of the page, and a registry key with no file 500s.
-  it('registers every .mdx under content/ in MDX_PAGES', () => {
+  // Three registries have to agree for a content page to render: SECTIONS
+  // emits the route, MDX_PAGES maps it to a file, and the file exists. A
+  // content file MDX_PAGES omits renders SubPageView's placeholder instead;
+  // a key SECTIONS omits is never built, and dynamicParams: false 404s it.
+  it('agrees with SECTIONS and content/ on every MDX page', () => {
     expect(
       Object.keys(MDX_PAGES)
         .map((key) => `${key}.mdx`)
         .sort()
     ).toEqual([...CONTENT_FILES].sort());
+
+    for (const key of Object.keys(MDX_PAGES)) {
+      const [section, sub] = key.split('/');
+      expect(getSubPage(section ?? '', sub ?? ''), key).toBeDefined();
+    }
   });
 
   it.each(Object.entries(EXPECTED_HEADING_IDS))(
@@ -245,8 +262,8 @@ describe('MDX heading ids', () => {
 
   // The pin lists above keep ids stable, but a rename that updates a pin still
   // leaves any link pointing at the old id silently dead. Bare route links are
-  // checked too: a placeholder or hand-built page has no ids to match, but its
-  // route still has to exist.
+  // checked too: they carry no id to verify, but their route still has to
+  // exist.
   it('points every in-repo link at a route and an id that exist', async () => {
     const idsByFile = new Map<string, Set<string>>();
     const links: { from: string; href: string }[] = [];
@@ -264,7 +281,10 @@ describe('MDX heading ids', () => {
       }
     }
 
-    expect(links.length).toBeGreaterThan(0);
+    // Footnote refs contribute same-page fragments of their own, so these
+    // count kinds rather than a total that shifts with the content.
+    let samePageChecked = 0;
+    let crossPageChecked = 0;
 
     for (const { from, href } of links) {
       const hashIndex = href.indexOf('#');
@@ -285,13 +305,23 @@ describe('MDX heading ids', () => {
       if (fragment === '') continue;
 
       // '' targets the page the link sits on; `/a/b` targets content/a/b.mdx,
-      // the mapping MDX_PAGES registers for that route. Routes outside that
-      // registry render without compiled headings, so there is no id to check.
+      // the mapping MDX_PAGES registers for that route. Only MDX pages render
+      // heading ids, so a fragment aimed anywhere else cannot resolve.
       const ids = idsByFile.get(route === '' ? from : `${route.slice(1)}.mdx`);
-      if (!ids) continue;
+      expect(
+        ids,
+        `${from} links to ${href}, and only MDX pages render heading ids`
+      ).toBeDefined();
+      expect([...(ids ?? [])], `${from} links to ${href}`).toContain(fragment);
 
-      expect([...ids], `${from} links to ${href}`).toContain(fragment);
+      if (route === '') samePageChecked++;
+      else crossPageChecked++;
     }
+
+    // Guards the loop going vacuous: without these, every anchor link could be
+    // deleted from content/ and each assertion above would still pass.
+    expect(samePageChecked, 'no same-page anchor checked').toBeGreaterThan(0);
+    expect(crossPageChecked, 'no cross-page anchor checked').toBeGreaterThan(0);
   });
 
   it('slugs every heading rank and disambiguates repeated headings', async () => {
