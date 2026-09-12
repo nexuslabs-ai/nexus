@@ -91,10 +91,10 @@ color tokens, and the typography, spacing, radius, and motion scales.
 
 This decides how you write Tailwind everywhere in the app, not just inside
 pasted components: once `nexus.css` is your Tailwind entry point, `nx:flex`
-exists and bare `flex` does not. Nexus also
-resets Tailwind's default scales (`--color-*`, `--spacing-*`, `--text-*` and the
-rest are set to `initial`), so the utilities you get are the token set, not
-Tailwind's stock palette. Write your own markup as `nx:` too.
+exists and bare `flex` does not. Nexus also resets Tailwind's default scales
+(`--color-*`, `--spacing-*`, `--text-*` and the rest are set to `initial`),
+so the utilities you get are the token set, not Tailwind's stock palette.
+Write your own markup as `nx:` too.
 
 To add project tokens, put your own `@theme` block in `globals.css` after the
 import — `nexus.css` is generated output stamped `DO NOT EDIT`, and pasting a
