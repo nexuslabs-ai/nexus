@@ -1,26 +1,28 @@
 # Theme setup
 
 Nexus Appearance derives a full runtime theme from one state object, paints it
-before React hydrates, and persists the user's choices. Setup has three pieces:
-CSS imports, a provider, and a first-paint script.
+before React hydrates, and persists the user's choices. Setup has two pieces: a
+provider and a first-paint script.
 
-## Import the styles
+## Before you start
 
-At your app's CSS entry point:
+This page continues from [Install](/getting-started/install), which leaves you
+with the token CSS in `styles/nexus/` imported from your CSS entry point, the
+appearance provider copied into `components/appearance/`, and `@nexus_ds/core`
+installed.
 
-```css
-@import '@nexus_ds/tailwind';
-@import '@nexus_ds/react/styles.css';
-```
-
-`@nexus_ds/tailwind` provides the token utilities. `@nexus_ds/react/styles.css`
-contains the utilities used inside compiled Nexus components, because Tailwind
-does not scan `node_modules`.
+The Next.js layout below replaces the one Install ends with: same file, but it
+becomes `async`, reads the appearance from a cookie, and swaps
+`DEFAULT_NEXUS_APPEARANCE` for the `defaultAppearance` and cookie helpers below.
+The Vite section is a separate track — take it instead of the Next.js one.
 
 ## Pick a default appearance
 
 Customize the shipped default by changing state fields. Brand and surface tone
 are state fields, not factory arguments.
+
+This is what replaces the bare `DEFAULT_NEXUS_APPEARANCE` that Install passes to
+the provider and the script:
 
 ```ts
 // app/appearance-state.ts or src/appearance-state.ts
@@ -50,8 +52,8 @@ import {
   createNexusAppearanceSnapshotFromCookie,
   DEFAULT_COOKIE_KEY,
 } from '@nexus_ds/core';
-import { NexusAppearanceProvider } from '@nexus_ds/react/appearance';
-import { NexusAppearanceScript } from '@nexus_ds/react/appearance/server';
+import { NexusAppearanceProvider } from '@/components/appearance';
+import { NexusAppearanceScript } from '@/components/appearance/server';
 import { defaultAppearance } from './appearance-state';
 import './globals.css';
 
@@ -76,7 +78,7 @@ export default async function RootLayout({
           defaultState={snapshot.state}
         />
       </head>
-      <body>
+      <body className="nx:bg-background nx:text-foreground">
         <NexusAppearanceProvider
           storageKey="app-appearance"
           cookieWriteKey={DEFAULT_COOKIE_KEY}
@@ -138,7 +140,8 @@ export default defineConfig({
 ```tsx
 // src/main.tsx
 import { createRoot } from 'react-dom/client';
-import { createNexusAppearance } from '@nexus_ds/react/appearance';
+import { createNexusAppearance } from './components/appearance';
+// ^ the provider folder from Install, under src/ for a Vite app
 import { defaultAppearance } from './appearance-state';
 import './index.css';
 
@@ -162,7 +165,7 @@ Vite.
 
 Load the app and confirm each of these before moving on:
 
-- [ ] `@nexus_ds/tailwind` and `@nexus_ds/react/styles.css` are both imported
+- [ ] `styles/nexus/nexus.css` is imported from your CSS entry point
 - [ ] The provider wraps your tree, and the script runs in `<head>`
 - [ ] Reloading in dark mode produces no flash of the light theme[^flash]
 - [ ] Toggling the mode persists across a full page reload — `storageKey` does

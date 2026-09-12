@@ -1,8 +1,12 @@
 # Appearance
 
-Appearance is the runtime state that drives Nexus theming. The package derives
-colors, typography prefs, density, corners, elevation, stroke, and motion prefs
-from a single [`NexusAppearanceState`](#the-model).
+Appearance is the runtime state that drives Nexus theming. `@nexus_ds/core`
+derives colors, typography prefs, density, corners, elevation, stroke, and
+motion prefs from a single [`NexusAppearanceState`](#the-model).
+
+The `@/components/appearance` imports below are the provider folder copied in at
+[Install step 3](/getting-started/install#step-3-the-appearance-provider);
+point them at wherever you put it.
 
 ## The model
 
@@ -45,7 +49,7 @@ export const defaultAppearance = {
 Use `useNexusAppearance` to build product-specific controls.
 
 ```tsx
-import { useNexusAppearance } from '@nexus_ds/react/appearance';
+import { useNexusAppearance } from '@/components/appearance';
 
 function ModeButton() {
   const { state, setState } = useNexusAppearance();
@@ -66,9 +70,9 @@ function ModeButton() {
 }
 ```
 
-Nexus ships the provider and hook. Product-specific Appearance panels and quick
-controls belong in the consuming app, so they can match that product's settings
-IA.
+The provider and hook are the copied files; `useNexusAppearance` is what they
+expose. Product-specific Appearance panels and quick controls belong in the
+consuming app, so they can match that product's settings IA.
 
 ## First paint and persistence
 
