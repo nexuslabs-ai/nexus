@@ -4,18 +4,13 @@ Nexus Appearance derives a full runtime theme from one state object, paints it
 before React hydrates, and persists the user's choices. Setup has three pieces:
 CSS imports, a provider, and a first-paint script.
 
-## Import the styles
+## Before you start
 
-At your app's CSS entry point:
-
-```css
-@import '@nexus_ds/tailwind';
-@import '@nexus_ds/react/styles.css';
-```
-
-`@nexus_ds/tailwind` provides the token utilities. `@nexus_ds/react/styles.css`
-contains the utilities used inside compiled Nexus components, because Tailwind
-does not scan `node_modules`.
+This page continues from [Install](/getting-started/install): the token CSS is
+copied into `styles/nexus/` and imported from your CSS entry point, the
+appearance provider is copied into `components/appearance/`, and
+`@nexus_ds/core` is installed. Every snippet below is a change to the
+`app/layout.tsx` that page ends with, not a second file.
 
 ## Pick a default appearance
 
@@ -50,8 +45,8 @@ import {
   createNexusAppearanceSnapshotFromCookie,
   DEFAULT_COOKIE_KEY,
 } from '@nexus_ds/core';
-import { NexusAppearanceProvider } from '@nexus_ds/react/appearance';
-import { NexusAppearanceScript } from '@nexus_ds/react/appearance/server';
+import { NexusAppearanceProvider } from '@/components/appearance';
+import { NexusAppearanceScript } from '@/components/appearance/server';
 import { defaultAppearance } from './appearance-state';
 import './globals.css';
 
@@ -138,7 +133,7 @@ export default defineConfig({
 ```tsx
 // src/main.tsx
 import { createRoot } from 'react-dom/client';
-import { createNexusAppearance } from '@nexus_ds/react/appearance';
+import { createNexusAppearance } from './components/appearance';
 import { defaultAppearance } from './appearance-state';
 import './index.css';
 
@@ -162,7 +157,7 @@ Vite.
 
 Load the app and confirm each of these before moving on:
 
-- [ ] `@nexus_ds/tailwind` and `@nexus_ds/react/styles.css` are both imported
+- [ ] `styles/nexus/nexus.css` is imported from your CSS entry point
 - [ ] The provider wraps your tree, and the script runs in `<head>`
 - [ ] Reloading in dark mode produces no flash of the light theme[^flash]
 - [ ] Toggling the mode persists across a full page reload — `storageKey` does
