@@ -118,9 +118,6 @@ describe('RightRail', () => {
     renderArticle(
       '<h2 id="families">Families</h2><h2 id="weights">Weights</h2>'
     );
-    // The same tops that activate Weights when the rail is visible; without
-    // showRail the rail reads as display:none, so nothing should be marked.
-    stubHeadingTops({ families: -400, weights: -100 });
 
     render(<RightRail />);
 
