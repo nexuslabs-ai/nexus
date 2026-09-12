@@ -5,12 +5,13 @@ import path from 'node:path';
 import { fileURLToPath, pathToFileURL } from 'node:url';
 import { describe, expect, it, vi } from 'vitest';
 
+import { MDX_PAGES } from './app/_lib/mdx-pages';
+import { getSection, getSubPage } from './app/_lib/sections';
 import { MDX_OPTIONS } from './mdx-options';
 
-const CONTENT_DIR = path.join(
-  path.dirname(fileURLToPath(import.meta.url)),
-  'content'
-);
+const DOCS_DIR = path.dirname(fileURLToPath(import.meta.url));
+const CONTENT_DIR = path.join(DOCS_DIR, 'content');
+const APP_DIR = path.join(DOCS_DIR, 'app');
 
 // `footnote-label` comes from remark-rehype: rehype-slug skips headings that
 // already carry an id.
@@ -81,6 +82,46 @@ async function contentFiles() {
     );
 }
 
+// Top-level route directories under app/ — `/changelog`, `/appearance-ssr`.
+// Dynamic (`[section]`) and private (`_lib`) folders are not routes.
+async function staticRoutes() {
+  const entries = await readdir(APP_DIR, { withFileTypes: true });
+  return new Set(
+    entries
+      .filter(
+        (entry) =>
+          entry.isDirectory() &&
+          !entry.name.startsWith('[') &&
+          !entry.name.startsWith('_')
+      )
+      .map((entry) => `/${entry.name}`)
+  );
+}
+
+// An href leaves the docs app when it names a scheme (`https:`, `mailto:`) or
+// a host (`//cdn...`); everything else resolves against these routes.
+function isInRepo(href: string) {
+  return !/^([a-z][a-z0-9+.-]*:|\/\/)/i.test(href);
+}
+
+// Normalises an href's route part to a `/`-rooted docs route, dropping any
+// query string and trailing slash. A relative route resolves against the
+// linking page's own directory. Returns '' for a bare `#id`.
+function resolveRoute(from: string, route: string) {
+  const query = route.replace(/\?.*$/, '');
+  const clean = query.length > 1 ? query.replace(/\/+$/, '') : query;
+  if (clean === '' || clean.startsWith('/')) return clean;
+  return path.posix.join('/', path.posix.dirname(from), clean);
+}
+
+function routeExists(route: string, routes: Set<string>) {
+  if (route === '/' || routes.has(route)) return true;
+
+  const [section, sub, ...rest] = route.slice(1).split('/');
+  if (!section || rest.length > 0) return false;
+  return sub ? Boolean(getSubPage(section, sub)) : Boolean(getSection(section));
+}
+
 async function loadPlugin(name: string) {
   const resolved = pathToFileURL(requireFromContent.resolve(name)).href;
   const mod = await import(/* @vite-ignore */ resolved);
@@ -124,6 +165,7 @@ async function compileMdx(source: string) {
 }
 
 const CONTENT_FILES = await contentFiles();
+const STATIC_ROUTES = await staticRoutes();
 
 describe('MDX heading ids', () => {
   it('registers rehype-slug where the loader can resolve it', () => {
@@ -156,6 +198,16 @@ describe('MDX heading ids', () => {
     expect([...CONTENT_FILES].sort()).toEqual(
       Object.keys(EXPECTED_HEADING_IDS).sort()
     );
+  });
+
+  // A content file the registry does not name renders SubPageView's
+  // placeholder instead of the page, and a registry key with no file 500s.
+  it('registers every .mdx under content/ in MDX_PAGES', () => {
+    expect(
+      Object.keys(MDX_PAGES)
+        .map((key) => `${key}.mdx`)
+        .sort()
+    ).toEqual([...CONTENT_FILES].sort());
   });
 
   it.each(Object.entries(EXPECTED_HEADING_IDS))(
@@ -192,10 +244,12 @@ describe('MDX heading ids', () => {
   );
 
   // The pin lists above keep ids stable, but a rename that updates a pin still
-  // leaves any link pointing at the old id silently dead.
-  it('points every anchor link at an id that exists', async () => {
+  // leaves any link pointing at the old id silently dead. Bare route links are
+  // checked too: a placeholder or hand-built page has no ids to match, but its
+  // route still has to exist.
+  it('points every in-repo link at a route and an id that exist', async () => {
     const idsByFile = new Map<string, Set<string>>();
-    const fragmentLinks: { from: string; href: string }[] = [];
+    const links: { from: string; href: string }[] = [];
 
     for (const contentPath of CONTENT_FILES) {
       const source = await readFile(
@@ -205,27 +259,38 @@ describe('MDX heading ids', () => {
       const { ids, hrefs } = await compileMdx(source);
 
       idsByFile.set(contentPath, new Set(ids));
-      for (const href of hrefs.filter((h) => h.includes('#'))) {
-        fragmentLinks.push({ from: contentPath, href });
+      for (const href of hrefs.filter(isInRepo)) {
+        links.push({ from: contentPath, href });
       }
     }
 
-    expect(fragmentLinks.length).toBeGreaterThan(0);
+    expect(links.length).toBeGreaterThan(0);
 
-    for (const { from, href } of fragmentLinks) {
-      const hash = href.indexOf('#');
-      const route = href.slice(0, hash);
-      const fragment = href.slice(hash + 1);
-      // A bare `#id` targets the page the link sits on; `/a/b#id` targets
-      // content/a/b.mdx, the mapping MDX_PAGES registers for that route.
-      const target = route === '' ? from : `${route.replace(/^\//, '')}.mdx`;
-      const ids = idsByFile.get(target);
+    for (const { from, href } of links) {
+      const hashIndex = href.indexOf('#');
+      const fragment = hashIndex === -1 ? '' : href.slice(hashIndex + 1);
+      const route = resolveRoute(
+        from,
+        hashIndex === -1 ? href : href.slice(0, hashIndex)
+      );
 
-      expect(
-        ids,
-        `${from} links to ${href}, which is not an MDX page`
-      ).toBeDefined();
-      expect([...(ids ?? [])], `${from} links to ${href}`).toContain(fragment);
+      if (route !== '') {
+        expect(
+          routeExists(route, STATIC_ROUTES),
+          `${from} links to ${href}, which is not a route`
+        ).toBe(true);
+      }
+
+      // A bare trailing `#` is a valid top-of-page link.
+      if (fragment === '') continue;
+
+      // '' targets the page the link sits on; `/a/b` targets content/a/b.mdx,
+      // the mapping MDX_PAGES registers for that route. Routes outside that
+      // registry render without compiled headings, so there is no id to check.
+      const ids = idsByFile.get(route === '' ? from : `${route.slice(1)}.mdx`);
+      if (!ids) continue;
+
+      expect([...ids], `${from} links to ${href}`).toContain(fragment);
     }
   });
 

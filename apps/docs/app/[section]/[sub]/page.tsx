@@ -2,7 +2,8 @@ import { notFound } from 'next/navigation';
 
 import { Breadcrumb } from '../../_components/Breadcrumb';
 import { SubPageView } from '../../_components/SubPageView';
-import { MDX_PAGES, REAL_PAGES } from '../../_lib/real-pages';
+import { MDX_PAGES } from '../../_lib/mdx-pages';
+import { REAL_PAGES } from '../../_lib/real-pages';
 import { getSection, getSubPage, SECTIONS } from '../../_lib/sections';
 
 export function generateStaticParams() {
