@@ -89,9 +89,9 @@ Import the entry point from your app's CSS entry point:
 That one import is the whole styling surface: the `nx:` utilities, the semantic
 color tokens, and the typography, spacing, radius, and motion scales.
 
-Because the prefix belongs to the build, this decides how you write Tailwind
-everywhere in the app, not just inside pasted components: once `nexus.css` is
-your Tailwind entry point, `nx:flex` exists and bare `flex` does not. Nexus also
+This decides how you write Tailwind everywhere in the app, not just inside
+pasted components: once `nexus.css` is your Tailwind entry point, `nx:flex`
+exists and bare `flex` does not. Nexus also
 resets Tailwind's default scales (`--color-*`, `--spacing-*`, `--text-*` and the
 rest are set to `initial`), so the utilities you get are the token set, not
 Tailwind's stock palette. Write your own markup as `nx:` too.
@@ -145,9 +145,9 @@ components/appearance/
 └── server.ts     # server-safe — NexusAppearanceScript
 ```
 
-Then wire the script and the provider in the root layout. This is the same
-`app/layout.tsx` from step 2, finished — the `viewport` export is the one you
-already added, not a second copy of it:
+Then wire the script and the provider in the root layout — the same
+`app/layout.tsx` from step 2, now complete. Its `viewport` export is the one you
+already added, not a second one:
 
 ```tsx
 // app/layout.tsx — complete
@@ -316,11 +316,10 @@ export default eslintConfig;
 ```
 
 That turns on `nx-class-conventions`, `no-render-prop-types`, and
-`no-multi-statement-jsx-handler` over the files you point it at. It parses
-because something earlier in the config already set a TypeScript parser — a
-`create-next-app` scaffold does, through `next/core-web-vitals`. In a config
-that sets none, every `.tsx` fails to parse and no rule runs: install
-`typescript-eslint` as well and give the entry its own
+`no-multi-statement-jsx-handler` over the files you point it at. It relies on a
+TypeScript parser set earlier in the config, which a `create-next-app` scaffold
+provides through `next/core-web-vitals`. If yours sets none, every `.tsx` fails
+to parse and no rule runs: install `typescript-eslint` too and give the entry
 `languageOptions: { parser: tseslint.parser }`.
 
 ## Next steps
