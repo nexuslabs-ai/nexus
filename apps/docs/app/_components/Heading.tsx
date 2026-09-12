@@ -5,21 +5,16 @@
  * HTML — the same guarantee `rehype-slug` gives MDX pages. That is what lets
  * `#heading` deep links resolve on first paint, and lets the right rail read
  * ids rather than assign them.
- *
- * `slugify` has no collision suffix, so two headings with the same text on one
- * page need an explicit `id` on the second to stay individually linkable.
  */
 
-export function SectionHeading({
-  children,
-  className,
-  id,
-}: {
+type HeadingProps = {
   children: string;
   className?: string;
   /** Overrides the slugified text. Use when two headings share a slug. */
   id?: string;
-}) {
+};
+
+export function SectionHeading({ children, className, id }: HeadingProps) {
   return (
     <h2 id={id ?? slugify(children)} className={className}>
       {children}
@@ -27,16 +22,7 @@ export function SectionHeading({
   );
 }
 
-export function SubsectionHeading({
-  children,
-  className,
-  id,
-}: {
-  children: string;
-  className?: string;
-  /** Overrides the slugified text. Use when two headings share a slug. */
-  id?: string;
-}) {
+export function SubsectionHeading({ children, className, id }: HeadingProps) {
   return (
     <h3 id={id ?? slugify(children)} className={className}>
       {children}

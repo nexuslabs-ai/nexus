@@ -117,6 +117,17 @@ describe('collectHeadings', () => {
     ]);
   });
 
+  it('keeps both headings when repeated text carries distinct ids', () => {
+    const article = renderArticle(
+      '<h2 id="the-scale">The scale</h2><h2 id="the-scale-2">The scale</h2>'
+    );
+
+    expect(collectHeadings(article)).toEqual<TocEntry[]>([
+      { id: 'the-scale', text: 'The scale', level: 2 },
+      { id: 'the-scale-2', text: 'The scale', level: 2 },
+    ]);
+  });
+
   it('returns nothing for a page with no headings', () => {
     expect(collectHeadings(renderArticle('<p>No headings here.</p>'))).toEqual(
       []
