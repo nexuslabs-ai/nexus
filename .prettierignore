@@ -11,8 +11,9 @@ pnpm-lock.yaml
 package-lock.json
 
 # Standalone consumer examples own their formatting; the generated export under
-# examples/.generated/ is throwaway output.
-examples
+# examples/.generated/ is throwaway output. Anchored so it cannot also swallow
+# apps/docs/examples/, whose files ship verbatim as docs code samples.
+/examples
 
 # Auto-generated CSS — produced by @nexus_ds/core token pipeline; do not reformat
 packages/tailwind/*.css

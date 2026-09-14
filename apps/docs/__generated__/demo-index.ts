@@ -6,38 +6,30 @@ import type { ComponentType } from 'react';
 export interface Demo {
   /** Path under apps/docs/examples/ without the .tsx extension. */
   id: string;
-  /** Path to the demo file, relative to the repository root. */
-  file: string;
-  /** Lazy import of the demo module; its default export is the component. */
-  load: () => Promise<{ default: ComponentType }>;
-  /** The demo file's full source, imports included. */
-  source: string;
+  /**
+   * Loads the demo's component and its own source text together. Both live in
+   * a per-demo chunk, so a page pays for the demos it renders rather than for
+   * every demo in the corpus.
+   */
+  load: () => Promise<{ Component: ComponentType; source: string }>;
 }
 
 export const demos = {
   "badge-demo": {
     id: "badge-demo",
-    file: "apps/docs/examples/badge-demo.tsx",
-    load: () => import("../examples/badge-demo"),
-    source: "'use client';\n\nimport { Badge } from '@nexus_ds/react';\n\nexport default function BadgeDemo() {\n  return <Badge>Badge</Badge>;\n}\n",
+    load: () => import("./demos/badge-demo"),
   },
   "badge-variants": {
     id: "badge-variants",
-    file: "apps/docs/examples/badge-variants.tsx",
-    load: () => import("../examples/badge-variants"),
-    source: "'use client';\n\nimport { Badge } from '@nexus_ds/react';\n\nexport default function BadgeVariants() {\n  return (\n    <div className=\"nx:flex nx:flex-wrap nx:items-center nx:gap-2\">\n      <Badge variant=\"default\">Default</Badge>\n      <Badge variant=\"secondary\">Secondary</Badge>\n      <Badge variant=\"success\">Success</Badge>\n      <Badge variant=\"warning\">Warning</Badge>\n      <Badge variant=\"error\">Error</Badge>\n      <Badge variant=\"information\">Information</Badge>\n    </div>\n  );\n}\n",
+    load: () => import("./demos/badge-variants"),
   },
   "button-demo": {
     id: "button-demo",
-    file: "apps/docs/examples/button-demo.tsx",
-    load: () => import("../examples/button-demo"),
-    source: "'use client';\n\nimport { Button } from '@nexus_ds/react';\n\nexport default function ButtonDemo() {\n  return <Button>Button</Button>;\n}\n",
+    load: () => import("./demos/button-demo"),
   },
   "button-variants": {
     id: "button-variants",
-    file: "apps/docs/examples/button-variants.tsx",
-    load: () => import("../examples/button-variants"),
-    source: "'use client';\n\nimport { Button } from '@nexus_ds/react';\n\nexport default function ButtonVariants() {\n  return (\n    <div className=\"nx:flex nx:flex-wrap nx:items-center nx:gap-2\">\n      <Button variant=\"default\">Default</Button>\n      <Button variant=\"secondary\">Secondary</Button>\n      <Button variant=\"outline\">Outline</Button>\n      <Button variant=\"ghost\">Ghost</Button>\n      <Button variant=\"destructive\">Destructive</Button>\n      <Button variant=\"link\">Link</Button>\n    </div>\n  );\n}\n",
+    load: () => import("./demos/button-variants"),
   },
 } satisfies Record<string, Demo>;
 

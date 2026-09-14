@@ -1,4 +1,5 @@
 import {
+  existsSync,
   mkdirSync,
   mkdtempSync,
   readFileSync,
@@ -9,12 +10,15 @@ import { tmpdir } from 'node:os';
 import path from 'node:path';
 import { afterEach, beforeEach, describe, expect, it } from 'vitest';
 
+import { type DemoId, getDemo } from '../__generated__/demo-index';
+
 import {
   collectDemos,
   EXAMPLES_DIR,
+  GENERATED_DIR,
   generateDemoIndex,
-  OUTPUT_FILE,
   renderDemoIndex,
+  renderDemoModule,
 } from './generate-demo-index.mjs';
 
 /** Quotes, a backslash, and a blank line — everything a naive emitter mangles. */
@@ -25,26 +29,33 @@ export default function WithFooter() {
 }
 `;
 
-const SOURCE_PREFIX = '    source: ';
+const SOURCE_LITERAL = /^export const source = (.*);$/m;
 
-/** Reads back the emitted source literal for one demo id. */
-function sourceLiteralFor(output: string, id: string) {
-  const lines = output.split('\n');
-  const start = lines.indexOf(`  ${JSON.stringify(id)}: {`);
-  const line = lines.slice(start).find((l) => l.startsWith(SOURCE_PREFIX));
-  return line?.slice(SOURCE_PREFIX.length, -1) ?? '';
+/** Reads back the `source` literal a per-demo module exports. */
+function emittedSource(moduleFile: string) {
+  const literal = readFileSync(moduleFile, 'utf8')
+    .replace(/\r\n/g, '\n')
+    .match(SOURCE_LITERAL)?.[1];
+
+  if (literal === undefined) {
+    throw new Error(`No source literal in ${moduleFile}`);
+  }
+
+  return JSON.parse(literal) as string;
 }
 
 describe('generate-demo-index', () => {
+  let workspace: string;
   let examplesDir: string;
-  let outputFile: string;
+  let outputDir: string;
 
   beforeEach(() => {
-    const workspace = mkdtempSync(path.join(tmpdir(), 'nexus-demo-index-'));
+    workspace = mkdtempSync(path.join(tmpdir(), 'nexus-demo-index-'));
     examplesDir = path.join(workspace, 'examples');
-    outputFile = path.join(workspace, '__generated__', 'demo-index.ts');
+    outputDir = path.join(workspace, '__generated__');
 
     mkdirSync(path.join(examplesDir, 'card'), { recursive: true });
+    mkdirSync(path.join(examplesDir, '_private'), { recursive: true });
     writeFileSync(
       path.join(examplesDir, 'zebra-demo.tsx'),
       'export default function Zebra() {\n  return null;\n}\n'
@@ -58,13 +69,22 @@ describe('generate-demo-index', () => {
       NESTED_DEMO
     );
     writeFileSync(path.join(examplesDir, 'notes.md'), 'not a demo\n');
+    writeFileSync(
+      path.join(examplesDir, '_helpers.tsx'),
+      'export const pad = 4;\n'
+    );
+    writeFileSync(
+      path.join(examplesDir, '_private', 'thing.tsx'),
+      'export const secret = 1;\n'
+    );
   });
 
   afterEach(() => {
-    rmSync(path.dirname(examplesDir), { recursive: true, force: true });
+    rmSync(workspace, { recursive: true, force: true });
   });
 
-  const run = () => generateDemoIndex({ examplesDir, outputFile });
+  const run = () => generateDemoIndex({ examplesDir, outputDir });
+  const moduleFor = (id: string) => path.join(outputDir, 'demos', `${id}.ts`);
 
   it('keys demos by their path under examples/, sorted, nested included', () => {
     expect(collectDemos(examplesDir).map((demo) => demo.id)).toEqual([
@@ -74,10 +94,17 @@ describe('generate-demo-index', () => {
     ]);
   });
 
-  it('skips files that are not demo modules', () => {
-    const files = collectDemos(examplesDir).map((demo) => demo.file);
+  it('collects only ids that resolve to a real .tsx on disk', () => {
+    for (const demo of collectDemos(examplesDir)) {
+      expect(existsSync(path.join(examplesDir, `${demo.id}.tsx`))).toBe(true);
+    }
+  });
 
-    expect(files).not.toContain('apps/docs/examples/notes.md');
+  it('skips underscore-prefixed files and directories', () => {
+    const ids = collectDemos(examplesDir).map((demo) => demo.id);
+
+    expect(ids).not.toContain('_helpers');
+    expect(ids).not.toContain('_private/thing');
   });
 
   it('carries each demo source in full, imports included', () => {
@@ -88,32 +115,63 @@ describe('generate-demo-index', () => {
     expect(nested?.source).toBe(NESTED_DEMO);
   });
 
-  it('emits a source literal that parses back to the file on disk', () => {
-    const literal = sourceLiteralFor(run().output, 'card/with-footer');
+  it('emits a per-demo source literal that parses back to the file on disk', () => {
+    run();
 
-    expect(JSON.parse(literal)).toBe(NESTED_DEMO);
+    expect(emittedSource(moduleFor('card/with-footer'))).toBe(NESTED_DEMO);
   });
 
-  it('points each entry at a lazy import of its module', () => {
-    expect(run().output).toContain(
-      'load: () => import("../examples/card/with-footer")'
+  it('points each per-demo module at its own example', () => {
+    run();
+
+    expect(readFileSync(moduleFor('card/with-footer'), 'utf8')).toContain(
+      "export { default as Component } from '../../../examples/card/with-footer';"
+    );
+    expect(readFileSync(moduleFor('zebra-demo'), 'utf8')).toContain(
+      "export { default as Component } from '../../examples/zebra-demo';"
     );
   });
 
-  it('produces byte-identical output on repeat runs', () => {
-    expect(run().output).toBe(run().output);
+  it('keeps demo sources out of the index, behind a lazy import', () => {
+    const { index } = run();
+
+    expect(index).toContain('load: () => import("./demos/card/with-footer")');
+    expect(index).not.toContain('export default function WithFooter');
+    expect(index).not.toContain('source: "');
+  });
+
+  it('writes an index to disk that a repeat run reproduces byte for byte', () => {
+    run();
+    const onDisk = readFileSync(path.join(outputDir, 'demo-index.ts'), 'utf8');
+
+    expect(onDisk).toBe(run().index);
   });
 
   it('picks up a new demo file with no hand-editing', () => {
-    const before = run().output;
+    expect(run().index).not.toContain('badge-demo');
+
     writeFileSync(
       path.join(examplesDir, 'badge-demo.tsx'),
       'export default function Badge() {\n  return null;\n}\n'
     );
 
-    expect(before).not.toContain('badge-demo');
-    expect(run().output).toContain(
-      'load: () => import("../examples/badge-demo")'
+    expect(run().index).toContain('load: () => import("./demos/badge-demo")');
+    expect(existsSync(moduleFor('badge-demo'))).toBe(true);
+  });
+
+  it('drops the generated module for a deleted demo', () => {
+    run();
+    expect(existsSync(moduleFor('zebra-demo'))).toBe(true);
+
+    rmSync(path.join(examplesDir, 'zebra-demo.tsx'));
+    run();
+
+    expect(existsSync(moduleFor('zebra-demo'))).toBe(false);
+  });
+
+  it('names the missing directory instead of throwing a raw ENOENT', () => {
+    expect(() => collectDemos(path.join(workspace, 'absent'))).toThrow(
+      /Missing demo directory/
     );
   });
 
@@ -123,9 +181,26 @@ describe('generate-demo-index', () => {
     );
   });
 
-  it('keeps the committed index in sync with apps/docs/examples/', () => {
-    const committed = readFileSync(OUTPUT_FILE, 'utf8').replace(/\r\n/g, '\n');
+  it('keeps the committed output in sync with apps/docs/examples/', () => {
+    const committed = (file: string) =>
+      readFileSync(file, 'utf8').replace(/\r\n/g, '\n');
+    const demos = collectDemos(EXAMPLES_DIR);
 
-    expect(renderDemoIndex(collectDemos(EXAMPLES_DIR))).toBe(committed);
+    expect(renderDemoIndex(demos)).toBe(
+      committed(path.join(GENERATED_DIR, 'demo-index.ts'))
+    );
+
+    for (const demo of demos) {
+      expect(renderDemoModule(demo)).toBe(
+        committed(path.join(GENERATED_DIR, 'demos', `${demo.id}.ts`))
+      );
+    }
+  });
+
+  it('looks a demo up by id and reports a miss', () => {
+    const id: DemoId = 'badge-demo';
+
+    expect(getDemo(id)?.id).toBe('badge-demo');
+    expect(getDemo('no-such-demo')).toBeUndefined();
   });
 });
