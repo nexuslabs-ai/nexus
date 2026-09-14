@@ -5,10 +5,11 @@
   "type": "module",
   "description": "Documentation site for the Nexus Design System",
   "scripts": {
-    "dev": "next dev --turbopack",
-    "build": "next build",
+    "dev": "pnpm generate:demos && next dev --turbopack",
+    "build": "pnpm generate:demos && next build",
     "start": "next start",
     "audit:csp": "node scripts/audit-csp-inventory.mjs",
+    "generate:demos": "node scripts/generate-demo-index.mjs",
     "typecheck": "tsc --noEmit",
     "clean": "rm -rf .next dist"
   },

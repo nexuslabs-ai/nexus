@@ -17,5 +17,8 @@ examples
 # Auto-generated CSS — produced by @nexus_ds/core token pipeline; do not reformat
 packages/tailwind/*.css
 
+# Auto-generated code — emitted by build scripts; do not reformat
+**/__generated__/
+
 # Untracked git worktree copies under .claude (full-repo clones, not part of the tree)
 .claude/worktrees/
