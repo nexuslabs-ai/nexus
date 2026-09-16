@@ -83,62 +83,6 @@ function emittedRule(element: Element, prefix: string): CSSStyleRule {
 }
 
 /**
- * The hover tint and press cue are `:has()` variants, and synthetic pointer
- * events never activate `:hover` or `:active` — so these stories assert which
- * turns each cue *selects* rather than the painted colour. Widen the scope in
- * `bubble.css` and the over-fire assertions below start matching and fail.
- */
-function compiledScope(bubble: Element, variant: string): string {
-  const rule = emittedRule(bubble, `nx:${variant}:`);
-
-  // `.cls { &:has(…) { &:hover { … } } }` — the scope lives on the nested
-  // rule, so strip the nesting `&` off it.
-  const scope = [...eachStyleRule(rule.cssRules)]
-    .map((nested) => nested.selectorText)
-    .find((selector) => selector.includes(':has('));
-
-  if (!scope) {
-    throw new Error(`"${rule.selectorText}" compiled to no :has() rule`);
-  }
-
-  return scope.replace(/^&/, '');
-}
-
-const hoverTintSelector = (bubble: Element) =>
-  compiledScope(bubble, 'bubble-hovered');
-
-const pressCueSelector = (bubble: Element) =>
-  compiledScope(bubble, 'bubble-pressed');
-
-/**
- * Both cues must keep their state pseudo-class *inside* the `:has()`, on the
- * content element — `:hover` and `:active` both match ancestors, so a cue
- * written on the turn would fire when a `BubbleReactions` pill is hovered or
- * pressed. Inside, the state is the last thing before the `:has()` closes; a
- * cue moved back onto the turn trails it after the close instead. Stripping it
- * off leaves the structural scope, which is what `.matches()` can be asserted
- * against without a real pointer.
- */
-function structuralScope(
-  selector: string,
-  state: ':hover' | ':active'
-): string {
-  if (!selector.endsWith(`${state})`)) {
-    throw new Error(`"${selector}" does not scope ${state} to the content`);
-  }
-
-  // `endsWith` proved the state closes the selector; slicing it off keeps a
-  // predicate that happens to contain `:hover` / `:active` earlier intact.
-  return `${selector.slice(0, -(state.length + 1))})`;
-}
-
-const hoverScopeOf = (bubble: Element) =>
-  structuralScope(hoverTintSelector(bubble), ':hover');
-
-const pressScopeOf = (bubble: Element) =>
-  structuralScope(pressCueSelector(bubble), ':active');
-
-/**
  * The `:has()` reservation cannot fire in Firefox 113-120, so the turn also
  * carries an unconditional fallback for that band. The `@supports` condition
  * is false in the test browser, so the rule never applies — read the reserved
@@ -524,44 +468,11 @@ export const LinksAndButtons: Story = {
     await expect(link).toHaveAttribute('data-slot', 'bubble-content');
     await expect(button).toHaveAttribute('data-slot', 'bubble-content');
 
-    // Both live turns are actionable, so each selects its own tint.
-    const linkBubble = bubbleOf(link);
-    const buttonBubble = bubbleOf(button);
-
-    await expect(linkBubble.matches(hoverScopeOf(linkBubble))).toBe(true);
-    await expect(buttonBubble.matches(hoverScopeOf(buttonBubble))).toBe(true);
-
-    // The press cue rides the *same* scope, differing only in the state
-    // pseudo-class — so it inherits every over-fire proof below, and neither
-    // cue can be widened without the other.
-    for (const bubble of [linkBubble, buttonBubble]) {
-      await expect(pressScopeOf(bubble), 'press scope').toBe(
-        hoverScopeOf(bubble)
-      );
-
-      // CSSOM normalises the attribute selector, so match its quoted form. The
-      // direct-child combinator and the dead-body guards live here; dropping
-      // any of them widens both cues and fails the over-fire checks below.
-      await expect(pressScopeOf(bubble)).toContain(
-        '> [data-bubble-part="content"]'
-      );
-      await expect(pressScopeOf(bubble)).toContain('button:not(:disabled)');
-      await expect(pressScopeOf(bubble)).toContain(
-        ':not([aria-disabled="true"])'
-      );
-    }
-
     // Links read as links on every surface, whether the body is the anchor or
     // merely contains one.
     const inlineLink = canvas.getByRole('link', {
       name: 'link inside prose',
     });
-
-    // A link buried in prose is not a whole-turn action, so it must not tint.
-    const proseBubble = bubbleOf(inlineLink);
-
-    await expect(proseBubble.matches(hoverScopeOf(proseBubble))).toBe(false);
-    await expect(proseBubble.matches(pressScopeOf(proseBubble))).toBe(false);
 
     for (const anchor of [link, inlineLink]) {
       await expect(getComputedStyle(anchor).textDecorationLine).toBe(
@@ -601,7 +512,7 @@ export const LinksAndButtons: Story = {
     }
 
     // A whole-bubble link is identified by its underline, not by a surface.
-    const linkBubbleStyle = getComputedStyle(linkBubble);
+    const linkBubbleStyle = getComputedStyle(bubbleOf(link));
 
     await expect(linkBubbleStyle.backgroundColor).toBe('rgba(0, 0, 0, 0)');
     await expect(linkBubbleStyle.borderTopColor).toBe('rgba(0, 0, 0, 0)');
@@ -710,11 +621,12 @@ export const Disabled: StoryObj<BubbleProps & { onRetry: () => void }> = {
     await userEvent.click(button);
     await expect(args.onRetry).not.toHaveBeenCalled();
 
-    // A dead body must not advertise itself with the actionable hover tint,
-    // however it is deadened — `disabled`, `aria-disabled` (which Nexus
-    // `Button` sets while loading), or an anchor with nowhere to go.
+    // A dead body must not advertise itself as actionable, however it is
+    // deadened — `disabled`, `aria-disabled` (which Nexus `Button` sets while
+    // loading), or an anchor with nowhere to go. `LinksAndButtons` asserts the
+    // live bodies do get the pointer.
     const deadAnchor = canvasElement.querySelector<HTMLElement>(
-      'a[data-bubble-part="content"]:not([href])'
+      'a[data-slot="bubble-content"]:not([href])'
     )!;
     const inert = [
       button,
@@ -723,14 +635,6 @@ export const Disabled: StoryObj<BubbleProps & { onRetry: () => void }> = {
     ];
 
     for (const body of inert) {
-      const bubble = bubbleOf(body);
-
-      await expect(bubble.matches(hoverScopeOf(bubble))).toBe(false);
-      await expect(bubble.matches(pressScopeOf(bubble))).toBe(false);
-
-      // `cursor-pointer` carries the same predicate as the two cues but in its
-      // own selector, so it has to be held to the same line — `LinksAndButtons`
-      // asserts the live bodies do get it.
       await expect(getComputedStyle(body).cursor).not.toBe('pointer');
     }
 
@@ -1212,15 +1116,5 @@ export const AllVariants: Story = {
     const bubbles = canvasElement.querySelectorAll('[data-slot="bubble"]');
 
     await expect(bubbles).toHaveLength(VARIANTS.length * 2);
-
-    // Every variant authors both cues, so every variant has to keep its state
-    // pseudo-class inside the `:has()` — one variant drifting back onto the
-    // turn would otherwise go unnoticed by the two bodies `LinksAndButtons`
-    // covers.
-    for (const bubble of bubbles) {
-      const variant = bubble.getAttribute('data-variant')!;
-
-      await expect(pressScopeOf(bubble), variant).toBe(hoverScopeOf(bubble));
-    }
   },
 };

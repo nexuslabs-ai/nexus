@@ -31,23 +31,18 @@ function BubbleGroup({ className, ...props }: BubbleGroupProps) {
 
 const bubbleVariants = cva(
   [
-    'nx:relative nx:w-fit nx:max-w-[min(80%,45rem)] nx:rounded-xl nx:border-default nx:border-transparent nx:typography-body-default nx:transition-colors nx:duration-faster',
+    'nx:relative nx:w-fit nx:max-w-[min(80%,45rem)] nx:rounded-xl nx:border-default nx:border-transparent nx:typography-body-default',
     'nx:has-[>[data-bubble-part=reactions][data-side=top]]:mt-3 nx:has-[>[data-bubble-part=reactions][data-side=bottom]]:mb-3',
     'nx:no-has-support:my-3',
   ],
   {
     variants: {
       variant: {
-        primary:
-          'nx:bg-primary-background nx:text-primary-foreground nx:bubble-hovered:bg-primary-background-hover nx:bubble-pressed:bg-primary-background-active',
-        muted:
-          'nx:bg-muted nx:text-foreground nx:bubble-hovered:bg-popover-active nx:bubble-pressed:border-border-active',
-        outline:
-          'nx:border-border-default nx:text-foreground nx:bubble-hovered:bg-container-hover nx:bubble-pressed:bg-container-active',
-        ghost:
-          'nx:text-foreground nx:bubble-hovered:bg-container-hover nx:bubble-pressed:bg-container-active',
-        destructive:
-          'nx:bg-error-subtle nx:text-error-subtle-foreground nx:bubble-hovered:bg-error-subtle-hover nx:bubble-pressed:bg-error-subtle-active',
+        primary: 'nx:bg-primary-background nx:text-primary-foreground',
+        muted: 'nx:bg-muted nx:text-foreground',
+        outline: 'nx:border-border-default nx:text-foreground',
+        ghost: 'nx:text-foreground',
+        destructive: 'nx:bg-error-subtle nx:text-error-subtle-foreground',
       },
       align: {
         start: 'nx:me-auto',
@@ -129,13 +124,15 @@ interface BubbleContentProps extends React.ComponentProps<'div'> {
    * styles onto it. Use when the message body needs different semantics — a
    * `p` for prose, or an `a` / `button` when the whole turn is actionable.
    *
-   * An interactive child takes the design-system focus ring, the pointer
-   * cursor, and the surrounding `Bubble`'s hover tint and press cue. Both are
-   * the turn advertising itself as actionable, so both are withheld from a
+   * An interactive child takes the design-system focus ring and the pointer
+   * cursor, and still owns its own accessible name. Both are withheld from a
    * body that cannot be actioned — an `a` with no `href`, a disabled
-   * `button`, or anything carrying `aria-disabled`. Both also key off this
-   * element rather than the turn, so hovering or pressing a `BubbleReactions`
-   * pill leaves the surface alone. It still owns its own accessible name.
+   * `button`, or anything carrying `aria-disabled`.
+   *
+   * The turn itself carries no hover tint or press cue: the surface stays
+   * still and the affordance reads from the body — the underline on a link,
+   * the label on a button. Add one at the call site if a product surface needs
+   * it.
    *
    * @default false
    * @example
@@ -152,9 +149,8 @@ interface BubbleContentProps extends React.ComponentProps<'div'> {
  * BubbleContent
  *
  * The message body, and the part that carries the bubble's padding — so when
- * `asChild` makes it an `a` or a `button`, the hit target, the hover tint, the
- * press cue, and the focus ring all trace the whole surface instead of a box
- * inset within it.
+ * `asChild` makes it an `a` or a `button`, the hit target and the focus ring
+ * that traces it cover the whole surface instead of a box inset within it.
  *
  * Long words, URLs, and nested `pre` blocks wrap rather than widen the bubble.
  * Anchors that can navigate are underlined, whether the body itself is the
@@ -177,7 +173,6 @@ function BubbleContent({
   return (
     <Comp
       data-slot="bubble-content"
-      data-bubble-part="content"
       className={cn(
         'nx:block nx:min-w-0 nx:rounded-[inherit] nx:px-4 nx:py-3 nx:text-start nx:wrap-break-word nx:focus-visible:outline-2 nx:focus-visible:outline-focus-default nx:focus-visible:outline-offset-(--focus-offset) nx:[&:is(a[href],button:not(:disabled)):not([aria-disabled=true])]:cursor-pointer nx:[&:is(a[href]),&_:where(a[href])]:underline nx:[&:is(a[href]),&_:where(a[href])]:underline-offset-4 nx:[&_:where(pre)]:whitespace-pre-wrap nx:[&_:where(pre)]:wrap-break-word',
         className
