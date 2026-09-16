@@ -223,6 +223,99 @@ export const BorderlessSurfaceComparison: Story = {
   },
 };
 
+export const AutofillSurfaceTokens: Story = {
+  render: () => (
+    <div className="nx:grid nx:w-[400px] nx:gap-4">
+      <div className="nx:grid nx:gap-2 nx:rounded-md nx:bg-background nx:p-4">
+        <Input
+          data-testid="autofill-light-bordered"
+          aria-label="Light bordered input"
+          defaultValue="Bordered"
+        />
+        <Input
+          data-testid="autofill-light-borderless"
+          aria-label="Light borderless input"
+          variant="borderless"
+          defaultValue="Borderless"
+        />
+        <Input
+          data-testid="autofill-light-disabled"
+          aria-label="Light disabled input"
+          defaultValue="Disabled"
+          disabled
+        />
+      </div>
+      <div className="dark nx:grid nx:gap-2 nx:rounded-md nx:bg-background nx:p-4">
+        <Input
+          data-testid="autofill-dark-bordered"
+          aria-label="Dark bordered input"
+          defaultValue="Bordered"
+        />
+        <Input
+          data-testid="autofill-dark-borderless"
+          aria-label="Dark borderless input"
+          variant="borderless"
+          defaultValue="Borderless"
+        />
+        <Input
+          data-testid="autofill-dark-disabled"
+          aria-label="Dark disabled input"
+          defaultValue="Disabled"
+          disabled
+        />
+      </div>
+    </div>
+  ),
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+
+    function expectAutofillTokens(
+      testId: string,
+      backgroundToken: string,
+      foregroundToken: string
+    ) {
+      const styles = window.getComputedStyle(canvas.getByTestId(testId));
+      expect(styles.getPropertyValue('--input-autofill-background')).toBe(
+        styles.getPropertyValue(backgroundToken)
+      );
+      expect(styles.getPropertyValue('--input-autofill-foreground')).toBe(
+        styles.getPropertyValue(foregroundToken)
+      );
+    }
+
+    expectAutofillTokens(
+      'autofill-light-bordered',
+      '--color-container',
+      '--color-foreground'
+    );
+    expectAutofillTokens(
+      'autofill-light-borderless',
+      '--color-control-background',
+      '--color-foreground'
+    );
+    expectAutofillTokens(
+      'autofill-light-disabled',
+      '--color-disabled',
+      '--color-disabled-foreground'
+    );
+    expectAutofillTokens(
+      'autofill-dark-bordered',
+      '--color-container',
+      '--color-foreground'
+    );
+    expectAutofillTokens(
+      'autofill-dark-borderless',
+      '--color-control-background',
+      '--color-foreground'
+    );
+    expectAutofillTokens(
+      'autofill-dark-disabled',
+      '--color-disabled',
+      '--color-disabled-foreground'
+    );
+  },
+};
+
 export const ReadOnlyVsDisabled: Story = {
   parameters: {
     docs: {

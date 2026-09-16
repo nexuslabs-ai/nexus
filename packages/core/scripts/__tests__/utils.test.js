@@ -13,6 +13,7 @@ import {
   extractTokens,
   formatTokenValue,
   generateFocusRingCSS,
+  generateNativeBrowserUIThemeCSS,
   generateSpacingModesCSS,
   generateSpacingRoleUtilitiesCSS,
   isReference,
@@ -220,6 +221,9 @@ describe('utils', () => {
       expect(css).toMatch(
         /box-shadow:\s*inset 0 0 0 1px var\(--color-border-default\);/
       );
+      expect(css).toMatch(
+        /--field-shadow:\s*inset 0 0 0 1px var\(--color-border-default\);/
+      );
       expect(css).toMatch(/\[data-slot='input'\]\[aria-invalid='true'\]/);
       expect(css).toMatch(
         /box-shadow:\s*inset 0 0 0 1px var\(--color-border-error\);/
@@ -243,6 +247,9 @@ describe('utils', () => {
         /\[data-slot='sidebar-input'\]\[class~='nx:aria-invalid:focus-visible:outline-focus-error'\]\[aria-invalid='true'\]:focus-visible[\s\S]*?\{[\s\S]*?border-color:\s*transparent\s*!important;[\s\S]*?border-width:\s*0;[\s\S]*?box-shadow:\s*[\s\S]*?inset 0 0 0 1px var\(--color-focus-error\),[\s\S]*?0 0 0 1px var\(--color-focus-error\);[\s\S]*?\}/
       );
       expect(css).toMatch(
+        /--field-shadow:\s*inset 0 0 0 1px var\(--color-focus-error\),\s*0 0 0 1px var\(--color-focus-error\);/
+      );
+      expect(css).toMatch(
         /\[data-slot='input-group-control'\]\[class~='nx:focus-visible:outline-focus-default'\]:focus-visible[\s\S]*?\{[\s\S]*?outline-style:\s*none\s*!important;[\s\S]*?box-shadow:\s*none;[\s\S]*?\}/
       );
       expect(css).toMatch(/--tw-outline-style:\s*none\s*!important;/);
@@ -264,6 +271,42 @@ describe('utils', () => {
       expect(css).toMatch(/outline-style:\s*solid\s*!important;/);
       expect(css).toMatch(/outline-width:\s*2px\s*!important;/);
       expect(css).toMatch(/box-shadow:\s*none\s*!important;/);
+    });
+  });
+
+  describe('generateNativeBrowserUIThemeCSS', () => {
+    it('emits surface-aware standalone and transparent grouped autofill rules', () => {
+      const css = generateNativeBrowserUIThemeCSS();
+
+      expect(css).toContain("input[data-slot='input']:-webkit-autofill");
+      expect(css).toContain("input[data-slot='input']:autofill");
+      expect(css).toContain(
+        "input[data-slot='sidebar-input']:-webkit-autofill"
+      );
+      expect(css).toContain(
+        "input[data-slot='input-group-control']:-webkit-autofill"
+      );
+      expect(css).toMatch(
+        /box-shadow:\s*var\(--field-shadow\),\s*inset 0 0 0 1000px var\(--input-autofill-background\) !important;/
+      );
+      expect(css).toMatch(
+        /input\[data-slot='input-group-control'\]:-webkit-autofill[\s\S]*?-webkit-background-clip:\s*text;[\s\S]*?box-shadow:\s*none !important;/
+      );
+      expect(css).toMatch(
+        /color:\s*var\(--input-autofill-foreground\);[\s\S]*?-webkit-text-fill-color:\s*var\(--input-autofill-foreground\);[\s\S]*?caret-color:\s*var\(--input-autofill-foreground\);/
+      );
+    });
+
+    it('restores system colors and removes autofill paint in forced-colors mode', () => {
+      const css = generateNativeBrowserUIThemeCSS();
+
+      expect(css).toMatch(/@media \(forced-colors: active\)/);
+      expect(css).toMatch(
+        /input\[data-slot='input'\]:-webkit-autofill[\s\S]*?color:\s*CanvasText;[\s\S]*?-webkit-background-clip:\s*border-box;[\s\S]*?box-shadow:\s*none !important;/
+      );
+      expect(css).toMatch(
+        /input\[data-slot='input'\]:disabled:-webkit-autofill[\s\S]*?color:\s*GrayText;[\s\S]*?-webkit-text-fill-color:\s*GrayText;/
+      );
     });
   });
 

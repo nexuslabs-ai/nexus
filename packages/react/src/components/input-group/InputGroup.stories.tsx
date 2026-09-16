@@ -297,7 +297,12 @@ export const Disabled: Story = {
   ),
   play: async ({ canvasElement }) => {
     const canvas = within(canvasElement);
-    await expect(canvas.getByRole('textbox', { name: 'Email' })).toBeDisabled();
+    const input = canvas.getByRole('textbox', { name: 'Email' });
+    await expect(input).toBeDisabled();
+    await expect(input).toHaveClass('nx:disabled:bg-transparent');
+    await expect(window.getComputedStyle(input).backgroundColor).toBe(
+      'rgba(0, 0, 0, 0)'
+    );
     await expect(
       canvas.getByRole('button', { name: 'Subscribe' })
     ).toBeDisabled();
@@ -377,6 +382,14 @@ export const BorderlessStates: Story = {
     await expect(
       canvas.getByRole('textbox', { name: 'Disabled borderless email' })
     ).toBeDisabled();
+    await expect(
+      canvas.getByRole('textbox', { name: 'Disabled borderless email' })
+    ).toHaveClass('nx:disabled:bg-transparent');
+    await expect(
+      window.getComputedStyle(
+        canvas.getByRole('textbox', { name: 'Disabled borderless email' })
+      ).backgroundColor
+    ).toBe('rgba(0, 0, 0, 0)');
     await expect(disabled).toHaveClass('nx:data-[disabled=true]:bg-disabled');
     await expect(disabled).not.toHaveClass(
       'nx:data-[disabled=true]:border-border-disabled'

@@ -348,6 +348,15 @@ export const LoadingSkeleton: Story = {
       <DemoInset />
     </SidebarProvider>
   ),
+  play: async ({ canvasElement }) => {
+    const input = within(canvasElement).getByRole('textbox', {
+      name: 'Search',
+    });
+    await expect(input).toHaveAttribute('data-slot', 'sidebar-input');
+    await expect(input).toHaveClass(
+      'nx:[--input-autofill-background:var(--color-background)]'
+    );
+  },
 };
 
 export const NarrowDrawer: Story = {

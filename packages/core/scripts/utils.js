@@ -1969,6 +1969,14 @@ const FIELD_DISABLED_BOUNDARY_SELECTORS = [
   "[data-slot='input-group'][data-variant='bordered'][data-disabled='true']",
 ];
 
+const FIELD_DEFAULT_SHADOW = 'inset 0 0 0 1px var(--color-border-default)';
+const FIELD_ERROR_SHADOW = 'inset 0 0 0 1px var(--color-border-error)';
+const FIELD_DISABLED_SHADOW = 'inset 0 0 0 1px var(--color-border-disabled)';
+const FIELD_FOCUS_SHADOW =
+  'inset 0 0 0 1px var(--color-focus-default), 0 0 0 1px var(--color-focus-default)';
+const FIELD_ERROR_FOCUS_SHADOW =
+  'inset 0 0 0 1px var(--color-focus-error), 0 0 0 1px var(--color-focus-error)';
+
 const OTP_SLOT_BOUNDARY_SELECTOR = "[data-slot='input-otp-slot']";
 const OTP_SLOT_GROUP_DISABLED_SELECTOR =
   "[class~='nx:group/input-otp']:has([data-slot='input-otp']:disabled) [data-slot='input-otp-slot']";
@@ -2039,22 +2047,30 @@ export function generateFocusRingCSS() {
 
   return `
 /* ===== FOCUS RING ===== */
+[data-slot='input'],
+[data-slot='sidebar-input'] {
+  --field-shadow: none;
+}
+
 ${fieldBoundarySelectors} {
+  --field-shadow: ${FIELD_DEFAULT_SHADOW};
   border-color: transparent !important;
   border-width: 0;
-  box-shadow: inset 0 0 0 1px var(--color-border-default);
+  box-shadow: ${FIELD_DEFAULT_SHADOW};
 }
 
 ${fieldErrorBoundarySelectors} {
+  --field-shadow: ${FIELD_ERROR_SHADOW};
   border-color: transparent !important;
   border-width: 0;
-  box-shadow: inset 0 0 0 1px var(--color-border-error);
+  box-shadow: ${FIELD_ERROR_SHADOW};
 }
 
 ${fieldDisabledBoundarySelectors} {
+  --field-shadow: ${FIELD_DISABLED_SHADOW};
   border-color: transparent !important;
   border-width: 0;
-  box-shadow: inset 0 0 0 1px var(--color-border-disabled);
+  box-shadow: ${FIELD_DISABLED_SHADOW};
 }
 
 ${OTP_SLOT_BOUNDARY_SELECTOR} {
@@ -2106,25 +2122,23 @@ ${errorSelectors} {
 }
 
 ${fieldSelectors} {
+  --field-shadow: ${FIELD_FOCUS_SHADOW};
   --tw-outline-style: none !important;
   outline-color: transparent !important;
   outline-style: none !important;
   border-color: transparent !important;
   border-width: 0;
-  box-shadow:
-    inset 0 0 0 1px var(--color-focus-default),
-    0 0 0 1px var(--color-focus-default);
+  box-shadow: ${FIELD_FOCUS_SHADOW};
 }
 
 ${fieldErrorSelectors} {
+  --field-shadow: ${FIELD_ERROR_FOCUS_SHADOW};
   --tw-outline-style: none !important;
   outline-color: transparent !important;
   outline-style: none !important;
   border-color: transparent !important;
   border-width: 0;
-  box-shadow:
-    inset 0 0 0 1px var(--color-focus-error),
-    0 0 0 1px var(--color-focus-error);
+  box-shadow: ${FIELD_ERROR_FOCUS_SHADOW};
 }
 
 ${inputGroupControlSuppressionSelectors} {
@@ -2205,6 +2219,83 @@ export function generateNativeBrowserUIThemeCSS() {
 
   :where(input[type='checkbox'], input[type='radio'], input[type='range'], progress) {
     accent-color: var(--color-primary-background);
+  }
+
+  input[data-slot='input']:-webkit-autofill,
+  input[data-slot='input']:-webkit-autofill:hover,
+  input[data-slot='input']:-webkit-autofill:focus,
+  input[data-slot='sidebar-input']:-webkit-autofill,
+  input[data-slot='sidebar-input']:-webkit-autofill:hover,
+  input[data-slot='sidebar-input']:-webkit-autofill:focus {
+    color: var(--input-autofill-foreground);
+    -webkit-text-fill-color: var(--input-autofill-foreground);
+    caret-color: var(--input-autofill-foreground);
+    box-shadow:
+      var(--field-shadow),
+      inset 0 0 0 1000px var(--input-autofill-background) !important;
+  }
+
+  input[data-slot='input']:autofill,
+  input[data-slot='input']:autofill:hover,
+  input[data-slot='input']:autofill:focus,
+  input[data-slot='sidebar-input']:autofill,
+  input[data-slot='sidebar-input']:autofill:hover,
+  input[data-slot='sidebar-input']:autofill:focus {
+    color: var(--input-autofill-foreground);
+    -webkit-text-fill-color: var(--input-autofill-foreground);
+    caret-color: var(--input-autofill-foreground);
+    box-shadow:
+      var(--field-shadow),
+      inset 0 0 0 1000px var(--input-autofill-background) !important;
+  }
+
+  input[data-slot='input-group-control']:-webkit-autofill,
+  input[data-slot='input-group-control']:-webkit-autofill:hover,
+  input[data-slot='input-group-control']:-webkit-autofill:focus {
+    color: var(--input-autofill-foreground);
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: var(--input-autofill-foreground);
+    caret-color: var(--input-autofill-foreground);
+    box-shadow: none !important;
+  }
+
+  input[data-slot='input-group-control']:autofill,
+  input[data-slot='input-group-control']:autofill:hover,
+  input[data-slot='input-group-control']:autofill:focus {
+    color: var(--input-autofill-foreground);
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: var(--input-autofill-foreground);
+    caret-color: var(--input-autofill-foreground);
+    box-shadow: none !important;
+  }
+
+  @media (forced-colors: active) {
+    input[data-slot='input']:-webkit-autofill,
+    input[data-slot='sidebar-input']:-webkit-autofill,
+    input[data-slot='input-group-control']:-webkit-autofill,
+    input[data-slot='input']:autofill,
+    input[data-slot='sidebar-input']:autofill,
+    input[data-slot='input-group-control']:autofill {
+      color: CanvasText;
+      -webkit-background-clip: border-box;
+      background-clip: border-box;
+      -webkit-text-fill-color: CanvasText;
+      caret-color: CanvasText;
+      box-shadow: none !important;
+    }
+
+    input[data-slot='input']:disabled:-webkit-autofill,
+    input[data-slot='sidebar-input']:disabled:-webkit-autofill,
+    input[data-slot='input-group-control']:disabled:-webkit-autofill,
+    input[data-slot='input']:disabled:autofill,
+    input[data-slot='sidebar-input']:disabled:autofill,
+    input[data-slot='input-group-control']:disabled:autofill {
+      color: GrayText;
+      -webkit-text-fill-color: GrayText;
+      caret-color: GrayText;
+    }
   }
 }
 `;

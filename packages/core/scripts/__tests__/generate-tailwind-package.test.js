@@ -544,6 +544,16 @@ describe('generateTailwindPackage', () => {
     expect(nexusCSS).toMatch(
       /:where\([\s\S]*input\[type='checkbox'\],[\s\S]*input\[type='radio'\],[\s\S]*input\[type='range'\],[\s\S]*progress[\s\S]*\) \{\n\s*accent-color:\s*var\(--color-primary-background\);\n\s*\}/
     );
+    expect(nexusCSS).toMatch(
+      /input\[data-slot='input'\]:-webkit-autofill[\s\S]*?box-shadow:\s*var\(--field-shadow\),\s*inset 0 0 0 1000px var\(--input-autofill-background\) !important;/
+    );
+    expect(nexusCSS).toMatch(/input\[data-slot='sidebar-input'\]:autofill/);
+    expect(nexusCSS).toMatch(
+      /input\[data-slot='input-group-control'\]:-webkit-autofill[\s\S]*?-webkit-background-clip:\s*text;[\s\S]*?box-shadow:\s*none !important;/
+    );
+    expect(nexusCSS).toMatch(
+      /@media \(forced-colors: active\)[\s\S]*?input\[data-slot='input'\]:-webkit-autofill[\s\S]*?box-shadow:\s*none !important;/
+    );
     expect(nexusCSS).not.toMatch(/light-dark\(/);
   });
 

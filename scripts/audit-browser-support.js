@@ -98,6 +98,20 @@ export const FEATURE_POLICIES = Object.freeze([
     note: 'Scope to native checkbox/radio/range/progress controls; unsupported or partial implementations fall back to UA defaults.',
   },
   {
+    id: 'autofill-selector',
+    name: ':autofill / :-webkit-autofill',
+    policy: 'adopt',
+    support: {
+      chrome: 111,
+      edge: 111,
+      firefox: 113,
+      safari: 15.4,
+      samsung: 22,
+    },
+    guide: 'html / css',
+    note: 'Emit the standard selector and its legacy WebKit alias as separate rules so every browser at the Nexus floor can retain semantic field surfaces without disabling autocomplete.',
+  },
+  {
     id: 'viewport-height-units',
     name: 'svh / lvh / dvh viewport units',
     policy: 'adopt',
