@@ -3,9 +3,33 @@ import { extendTailwindMerge } from 'tailwind-merge';
 
 /**
  * Tailwind-merge class groups for Nexus custom utilities. Hand-mirrors the
- * `@utility` sets emitted by `@nexus_ds/core` (see `packages/tailwind`) so a new
- * custom utility cannot silently drop out of `cn()`'s last-wins collapse.
+ * `@utility` sets and custom `@theme` scale keys emitted by `@nexus_ds/core`
+ * (see `packages/tailwind`) so a new custom utility cannot silently drop out
+ * of `cn()`'s last-wins collapse.
  */
+const NEXUS_THEME_SCALES = {
+  radius: ['base'],
+  ease: ['enter', 'exit', 'move'],
+  shadow: ['base', 'inner'],
+};
+
+const MOTION_CLASS_GROUPS = {
+  animate: ['animate-overlay-presence-exit'],
+  duration: [
+    'duration-0',
+    'duration-faster',
+    'duration-fast',
+    'duration-default',
+    'duration-moderate',
+    'duration-slow',
+    'duration-slower',
+  ],
+};
+
+const Z_INDEX_CLASS_GROUPS = {
+  z: ['z-overlay', 'z-sticky', 'z-modal', 'z-popover', 'z-toast', 'z-max'],
+};
+
 const ROLE_CLASS_GROUPS = {
   gap: ['gap-container', 'gap-layout-section', 'gap-layout-stack'],
   p: ['p-container'],
@@ -103,10 +127,31 @@ const BORDER_COLOR_CLASS_GROUPS = {
   ],
 };
 
-const NEXUS_CLASS_GROUPS = {
+const TYPOGRAPHY_CLASS_GROUPS = {
+  typography: [
+    'typography-heading-large',
+    'typography-heading-medium',
+    'typography-heading-small',
+    'typography-heading-xsmall',
+    'typography-heading-xxsmall',
+    'typography-body-default',
+    'typography-body-small',
+    'typography-shortcut',
+    'typography-label-default',
+    'typography-label-small',
+    'typography-label-caps',
+    'typography-code-block',
+    'typography-code-inline',
+  ],
+};
+
+export const NEXUS_CLASS_GROUPS = {
+  ...MOTION_CLASS_GROUPS,
+  ...Z_INDEX_CLASS_GROUPS,
   ...ROLE_CLASS_GROUPS,
   ...BORDER_WIDTH_CLASS_GROUPS,
   ...BORDER_COLOR_CLASS_GROUPS,
+  ...TYPOGRAPHY_CLASS_GROUPS,
 };
 
 type NexusClassGroupId = keyof typeof NEXUS_CLASS_GROUPS;
@@ -115,6 +160,7 @@ type NexusClassGroupId = keyof typeof NEXUS_CLASS_GROUPS;
 const twMerge = extendTailwindMerge<NexusClassGroupId>({
   prefix: 'nx',
   extend: {
+    theme: NEXUS_THEME_SCALES,
     classGroups: NEXUS_CLASS_GROUPS,
   },
 });
