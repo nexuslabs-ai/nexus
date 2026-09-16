@@ -1,21 +1,9 @@
 {
   "$schema": "https://turbo.build/schema.json",
+  "globalDependencies": ["tsconfig.base.json"],
   "tasks": {
     "build": {
-      "dependsOn": ["^build"],
-      "inputs": [
-        "src/**",
-        "tokens/primitives/color.json",
-        "tsup.config.ts",
-        "tsconfig.json",
-        "package.json"
-      ],
-      "outputs": ["dist/runtime/**"]
-    },
-    "build:tailwind": {
-      "dependsOn": ["build"],
-      "inputs": ["scripts/**", "tokens/**", "src/lib/perceptual-grid.json"],
-      "outputs": ["dist/tailwind/**"]
+      "dependsOn": ["^build"]
     },
     "storybook": {
       "dependsOn": ["^build"],
