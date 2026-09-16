@@ -6,12 +6,26 @@ import { fileURLToPath, pathToFileURL } from 'node:url';
 import { describe, expect, it, vi } from 'vitest';
 
 import { MDX_PAGES } from './app/_lib/mdx-pages';
-import { getSection, getSubPage } from './app/_lib/sections';
+import { getSection, getSubPage, SECTIONS } from './app/_lib/sections';
 import { MDX_OPTIONS } from './mdx-options';
+import { PAGE_EXTENSIONS } from './page-extensions';
 
 const DOCS_DIR = path.dirname(fileURLToPath(import.meta.url));
 const CONTENT_DIR = path.join(DOCS_DIR, 'content');
 const APP_DIR = path.join(DOCS_DIR, 'app');
+
+const PAGE_FILENAMES = new Set(PAGE_EXTENSIONS.map((ext) => `page.${ext}`));
+
+// Every `${section}/${sub}` generateStaticParams emits. dynamicParams is false,
+// so a key outside this set names a route that is never built and 404s.
+const SUB_PAGE_KEYS = new Set(
+  Object.values(SECTIONS).flatMap((section) =>
+    section.subs.map((sub) => `${section.slug}/${sub.slug}`)
+  )
+);
+
+// remark-rehype's clobber prefix on the ids it generates for footnotes.
+const FOOTNOTE_ID_PREFIX = 'user-content-';
 
 // `footnote-label` comes from remark-rehype: rehype-slug skips headings that
 // already carry an id.
@@ -82,9 +96,18 @@ async function contentFiles() {
     );
 }
 
-// Routes App Router serves from a literal path: every directory holding a
-// page.tsx, minus the dynamic ones, whose paths come from SECTIONS instead.
-// Route groups — `(marketing)` — nest without contributing a path segment.
+// Segments that keep a page file from being served at its literal path:
+// `[dynamic]` paths come from SECTIONS instead, `_private` folders opt out of
+// routing entirely, and an `@slot` page renders into a layout slot.
+const NON_ROUTABLE_PREFIXES = ['[', '_', '@'];
+
+function isRoutable(segment: string) {
+  return !NON_ROUTABLE_PREFIXES.some((prefix) => segment.startsWith(prefix));
+}
+
+// Routes App Router serves from a literal path: every directory holding a page
+// file, minus the ones a naming convention takes out of the path. Route groups
+// — `(marketing)` — nest without contributing a path segment.
 async function staticRoutes() {
   const entries = await readdir(APP_DIR, {
     withFileTypes: true,
@@ -93,14 +116,14 @@ async function staticRoutes() {
   const routes = new Set<string>();
 
   for (const entry of entries) {
-    if (!entry.isFile() || entry.name !== 'page.tsx') continue;
+    if (!entry.isFile() || !PAGE_FILENAMES.has(entry.name)) continue;
 
     const segments = path
       .relative(APP_DIR, entry.parentPath)
       .split(path.sep)
       .filter((segment) => segment !== '' && !segment.startsWith('('));
 
-    if (segments.some((segment) => segment.startsWith('['))) continue;
+    if (!segments.every(isRoutable)) continue;
     routes.add(`/${segments.join('/')}`);
   }
 
@@ -203,6 +226,12 @@ describe('MDX heading ids', () => {
     );
   });
 
+  it('discovers routes with the pageExtensions next.config sets', async () => {
+    const { default: config } = await import('./next.config');
+
+    expect(config.pageExtensions).toEqual(PAGE_EXTENSIONS);
+  });
+
   it('pins every .mdx under content/', () => {
     expect(CONTENT_FILES.length).toBeGreaterThan(0);
     expect([...CONTENT_FILES].sort()).toEqual(
@@ -222,8 +251,10 @@ describe('MDX heading ids', () => {
     ).toEqual([...CONTENT_FILES].sort());
 
     for (const key of Object.keys(MDX_PAGES)) {
-      const [section, sub] = key.split('/');
-      expect(getSubPage(section ?? '', sub ?? ''), key).toBeDefined();
+      expect(
+        SUB_PAGE_KEYS.has(key),
+        `MDX_PAGES key ${key} is not a route generateStaticParams emits`
+      ).toBe(true);
     }
   });
 
@@ -281,9 +312,11 @@ describe('MDX heading ids', () => {
       }
     }
 
-    // Footnote refs contribute same-page fragments of their own, so these
-    // count kinds rather than a total that shifts with the content.
-    let samePageChecked = 0;
+    // Counted by kind rather than as a total that shifts with the content.
+    // Footnote refs and back-refs are same-page links this loop still verifies,
+    // but they appear wherever a page has a footnote, so they cannot stand in
+    // for an authored anchor.
+    let authoredSamePageChecked = 0;
     let crossPageChecked = 0;
 
     for (const { from, href } of links) {
@@ -314,13 +347,17 @@ describe('MDX heading ids', () => {
       ).toBeDefined();
       expect([...(ids ?? [])], `${from} links to ${href}`).toContain(fragment);
 
-      if (route === '') samePageChecked++;
-      else crossPageChecked++;
+      if (route !== '') crossPageChecked++;
+      else if (!fragment.startsWith(FOOTNOTE_ID_PREFIX))
+        authoredSamePageChecked++;
     }
 
     // Guards the loop going vacuous: without these, every anchor link could be
     // deleted from content/ and each assertion above would still pass.
-    expect(samePageChecked, 'no same-page anchor checked').toBeGreaterThan(0);
+    expect(
+      authoredSamePageChecked,
+      'no authored same-page anchor checked'
+    ).toBeGreaterThan(0);
     expect(crossPageChecked, 'no cross-page anchor checked').toBeGreaterThan(0);
   });
 
