@@ -362,6 +362,7 @@
   --nx-radius-xl: 0px;
   --nx-radius-2xl: 0px;
   --nx-radius-3xl: 0px;
+  --nx-radius-4xl: 0px;
   --nx-radius-full: 9999px;
 
   /* shadow (quiet) */
@@ -470,6 +471,7 @@
   --nx-typography-weight-bold: 700;
   --nx-typography-weight-extrabold: 800;
   --nx-typography-weight-black: 900;
+  --nx-typography-line-height-xxs: 12px;
   --nx-typography-line-height-xs: 16px;
   --nx-typography-line-height-sm: 20px;
   --nx-typography-line-height-base: 24px;

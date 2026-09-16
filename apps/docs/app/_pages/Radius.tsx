@@ -12,11 +12,14 @@ import { Breadcrumb } from '../_components/Breadcrumb';
  */
 
 const RADII: { cls: string; label: string }[] = [
+  { cls: 'nx:rounded-base', label: 'base' },
   { cls: 'nx:rounded-sm', label: 'sm' },
   { cls: 'nx:rounded-md', label: 'md' },
   { cls: 'nx:rounded-lg', label: 'lg' },
   { cls: 'nx:rounded-xl', label: 'xl' },
   { cls: 'nx:rounded-2xl', label: '2xl' },
+  { cls: 'nx:rounded-3xl', label: '3xl' },
+  { cls: 'nx:rounded-4xl', label: '4xl' },
   { cls: 'nx:rounded-full', label: 'full' },
 ];
 
@@ -73,7 +76,7 @@ export function Radius() {
       <section className="nx:mb-12">
         <h2 className="nx:typography-heading-small nx:mb-1">Radius</h2>
         <p className="nx:typography-body-default nx:text-muted-foreground nx:mb-4 nx:max-w-[64ch]">
-          Six radius utilities, each reacting to the active Radius mode. Swap
+          Nine radius utilities, each reacting to the active Radius mode. Swap
           the mode and every corner re-rounds.
         </p>
         <div className="nx:flex nx:flex-wrap nx:gap-6 nx:mb-6">

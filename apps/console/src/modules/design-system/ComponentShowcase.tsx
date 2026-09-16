@@ -199,6 +199,7 @@ export function ComponentShowcase() {
             <RadiusBox name="xl" className="nx:rounded-xl" />
             <RadiusBox name="2xl" className="nx:rounded-2xl" />
             <RadiusBox name="3xl" className="nx:rounded-3xl" />
+            <RadiusBox name="4xl" className="nx:rounded-4xl" />
             <RadiusBox name="full" className="nx:rounded-full" />
           </div>
         </Section>
