@@ -3,18 +3,8 @@
   "extends": ["//"],
   "tasks": {
     "build": {
-      "dependsOn": ["^build"],
-      "inputs": [
-        "app/**",
-        "content/**",
-        "scripts/**",
-        "*.ts",
-        "*.tsx",
-        "postcss.config.mjs",
-        "tsconfig.json",
-        "package.json"
-      ],
-      "outputs": [".next/**", "!.next/cache/**"]
+      "inputs": ["$TURBO_DEFAULT$", "$TURBO_ROOT$/package.json"],
+      "outputs": [".next/**", "!.next/cache/**", "next-env.d.ts"]
     }
   }
 }
