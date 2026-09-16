@@ -4,6 +4,7 @@ import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 
 import { MDX_OPTIONS } from './mdx-options';
+import { PAGE_EXTENSIONS } from './page-extensions';
 import { DOCS_APPEARANCE_BOOTSTRAP_CSP_HASH } from './theme-csp';
 
 const SCRIPT_SRC = [
@@ -68,8 +69,7 @@ const SECURITY_HEADERS = [
 
 const nextConfig: NextConfig = {
   transpilePackages: ['@nexus_ds/react'],
-  // let .md/.mdx resolve as modules (for content imported by the dynamic route)
-  pageExtensions: ['ts', 'tsx', 'js', 'jsx', 'md', 'mdx'],
+  pageExtensions: PAGE_EXTENSIONS,
   // Pin the monorepo root (../.. from this file) so Turbopack doesn't walk past
   // a nested .claude/worktrees/* checkout and pick the parent repo's lockfile.
   turbopack: {
