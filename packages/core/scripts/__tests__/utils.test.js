@@ -219,19 +219,16 @@ describe('utils', () => {
       );
       expect(css).toMatch(/\[data-slot='input'\]\[data-variant='bordered'\]/);
       expect(css).toMatch(
-        /box-shadow:\s*inset 0 0 0 1px var\(--color-border-default\);/
-      );
-      expect(css).toMatch(
         /--field-shadow:\s*inset 0 0 0 1px var\(--color-border-default\);/
       );
       expect(css).toMatch(/\[data-slot='input'\]\[aria-invalid='true'\]/);
       expect(css).toMatch(
-        /box-shadow:\s*inset 0 0 0 1px var\(--color-border-error\);/
+        /--field-shadow:\s*inset 0 0 0 1px var\(--color-border-error\);/
       );
       expect(css).toMatch(/\[data-slot='input-otp-slot'\]/);
       expect(css).toMatch(/inset -1px 0 0 var\(--color-border-default\)/);
       expect(css).toMatch(
-        /\[data-slot='sidebar-input'\]\[class~='nx:focus-visible:outline-focus-default'\]:focus-visible[\s\S]*?\{[\s\S]*?border-color:\s*transparent\s*!important;[\s\S]*?border-width:\s*0;[\s\S]*?box-shadow:\s*[\s\S]*?inset 0 0 0 1px var\(--color-focus-default\),[\s\S]*?0 0 0 1px var\(--color-focus-default\);[\s\S]*?\}/
+        /\[data-slot='sidebar-input'\]\[class~='nx:focus-visible:outline-focus-default'\]:focus-visible[\s\S]*?\{[\s\S]*?border-color:\s*transparent\s*!important;[\s\S]*?border-width:\s*0;[\s\S]*?box-shadow:\s*var\(--field-shadow\);[\s\S]*?\}/
       );
       expect(css).toMatch(
         /\[data-slot='button'\]\[class~='nx:focus-visible:outline-focus-default'\]:focus-visible/
@@ -244,7 +241,7 @@ describe('utils', () => {
       );
       expect(css).toMatch(/border-color:\s*transparent\s*!important;/);
       expect(css).toMatch(
-        /\[data-slot='sidebar-input'\]\[class~='nx:aria-invalid:focus-visible:outline-focus-error'\]\[aria-invalid='true'\]:focus-visible[\s\S]*?\{[\s\S]*?border-color:\s*transparent\s*!important;[\s\S]*?border-width:\s*0;[\s\S]*?box-shadow:\s*[\s\S]*?inset 0 0 0 1px var\(--color-focus-error\),[\s\S]*?0 0 0 1px var\(--color-focus-error\);[\s\S]*?\}/
+        /\[data-slot='sidebar-input'\]\[class~='nx:aria-invalid:focus-visible:outline-focus-error'\]\[aria-invalid='true'\]:focus-visible[\s\S]*?\{[\s\S]*?border-color:\s*transparent\s*!important;[\s\S]*?border-width:\s*0;[\s\S]*?box-shadow:\s*var\(--field-shadow\);[\s\S]*?\}/
       );
       expect(css).toMatch(
         /--field-shadow:\s*inset 0 0 0 1px var\(--color-focus-error\),\s*0 0 0 1px var\(--color-focus-error\);/
@@ -273,13 +270,16 @@ describe('utils', () => {
       expect(css).toMatch(/box-shadow:\s*none\s*!important;/);
     });
 
-    it('resets --field-shadow to a composable no-op, never the `none` keyword', () => {
+    it('paints every field shadow from --field-shadow so the pair cannot drift', () => {
       const css = generateFocusRingCSS();
 
-      expect(css).toMatch(
-        /\[data-slot='input'\],\n\[data-slot='sidebar-input'\] \{\n\s*--field-shadow:\s*0 0 #0000;/
-      );
       expect(css).not.toMatch(/--field-shadow:\s*none/);
+      expect(css).not.toMatch(
+        /box-shadow:\s*inset 0 0 0 1px var\(--color-border/
+      );
+      expect(css.match(/box-shadow:\s*var\(--field-shadow\);/g)).toHaveLength(
+        5
+      );
     });
   });
 
@@ -296,7 +296,7 @@ describe('utils', () => {
         "input[data-slot='input-group-control']:-webkit-autofill"
       );
       expect(css).toMatch(
-        /box-shadow:\s*var\(--field-shadow\),\s*inset 0 0 0 1000px var\(--input-autofill-background\) !important;/
+        /box-shadow:\s*var\(--field-shadow, 0 0 #0000\),\s*inset 0 0 0 1000px var\(--input-autofill-background\) !important;/
       );
       expect(css).toMatch(
         /input\[data-slot='input-group-control'\]:-webkit-autofill[\s\S]*?-webkit-background-clip:\s*text;[\s\S]*?box-shadow:\s*none !important;/
@@ -318,11 +318,32 @@ describe('utils', () => {
       );
     });
 
-    it('keeps autofill rules free of :hover/:focus so forced colors are not outranked', () => {
+    it('lets the forced-colors fallback win: no :hover/:focus, and it is emitted last', () => {
       const css = generateNativeBrowserUIThemeCSS();
 
       expect(css).not.toMatch(/autofill:hover/);
       expect(css).not.toMatch(/autofill:focus/);
+
+      const lastNormalRule = css.lastIndexOf(
+        'inset 0 0 0 1000px var(--input-autofill-background)'
+      );
+      const forcedColorsBlock = css.indexOf('@media (forced-colors: active)');
+
+      expect(lastNormalRule).toBeGreaterThan(-1);
+      expect(forcedColorsBlock).toBeGreaterThan(lastNormalRule);
+    });
+
+    it('splits the forced-colors fallback per pseudo-class alias', () => {
+      const css = generateNativeBrowserUIThemeCSS();
+      const forcedColors = css.slice(
+        css.indexOf('@media (forced-colors: active)')
+      );
+
+      expect(forcedColors).not.toMatch(
+        /:-webkit-autofill,\n\s*input\[data-slot='[a-z-]+'\]:autofill/
+      );
+      expect(forcedColors.match(/^\s*color:\s*CanvasText;$/gm)).toHaveLength(2);
+      expect(forcedColors.match(/^\s*color:\s*GrayText;$/gm)).toHaveLength(2);
     });
   });
 

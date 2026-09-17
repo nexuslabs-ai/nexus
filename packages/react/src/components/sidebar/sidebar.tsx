@@ -487,7 +487,7 @@ function SidebarInput({ className, ...props }: SidebarInputProps) {
     <Input
       data-slot="sidebar-input"
       className={cn(
-        'nx:h-8 nx:w-full nx:bg-background nx:pointer-coarse:min-h-11 nx:[--input-autofill-background:var(--color-background)]',
+        'nx:h-8 nx:w-full nx:bg-background nx:pointer-coarse:min-h-11 nx:[--input-autofill-background:var(--nx-color-background)]',
         className
       )}
       {...props}

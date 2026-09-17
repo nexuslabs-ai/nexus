@@ -268,6 +268,10 @@ export const AutofillSurfaceTokens: Story = {
   ),
   play: async ({ canvasElement }) => {
     const canvas = within(canvasElement);
+    const backgroundOf = (testId: string) =>
+      window
+        .getComputedStyle(canvas.getByTestId(testId))
+        .getPropertyValue('--input-autofill-background');
 
     function expectAutofillTokens(
       testId: string,
@@ -275,43 +279,53 @@ export const AutofillSurfaceTokens: Story = {
       foregroundToken: string
     ) {
       const styles = window.getComputedStyle(canvas.getByTestId(testId));
-      expect(styles.getPropertyValue('--input-autofill-background')).toBe(
-        styles.getPropertyValue(backgroundToken)
-      );
-      expect(styles.getPropertyValue('--input-autofill-foreground')).toBe(
-        styles.getPropertyValue(foregroundToken)
-      );
+      const background = styles.getPropertyValue('--input-autofill-background');
+      const foreground = styles.getPropertyValue('--input-autofill-foreground');
+
+      // A mistyped token resolves to '' on both sides, so equality alone passes vacuously.
+      expect(background).not.toBe('');
+      expect(foreground).not.toBe('');
+      expect(background).toBe(styles.getPropertyValue(backgroundToken));
+      expect(foreground).toBe(styles.getPropertyValue(foregroundToken));
     }
 
     expectAutofillTokens(
       'autofill-light-bordered',
-      '--color-container',
-      '--color-foreground'
+      '--nx-color-container',
+      '--nx-color-foreground'
     );
     expectAutofillTokens(
       'autofill-light-borderless',
-      '--color-control-background',
-      '--color-foreground'
+      '--nx-color-control-background',
+      '--nx-color-foreground'
     );
     expectAutofillTokens(
       'autofill-light-disabled',
-      '--color-disabled',
-      '--color-disabled-foreground'
+      '--nx-color-disabled',
+      '--nx-color-disabled-foreground'
     );
     expectAutofillTokens(
       'autofill-dark-bordered',
-      '--color-container',
-      '--color-foreground'
+      '--nx-color-container',
+      '--nx-color-foreground'
     );
     expectAutofillTokens(
       'autofill-dark-borderless',
-      '--color-control-background',
-      '--color-foreground'
+      '--nx-color-control-background',
+      '--nx-color-foreground'
     );
     expectAutofillTokens(
       'autofill-dark-disabled',
-      '--color-disabled',
-      '--color-disabled-foreground'
+      '--nx-color-disabled',
+      '--nx-color-disabled-foreground'
+    );
+
+    // Each variant must resolve to its own surface, and dark must differ from light.
+    expect(backgroundOf('autofill-light-bordered')).not.toBe(
+      backgroundOf('autofill-light-borderless')
+    );
+    expect(backgroundOf('autofill-dark-bordered')).not.toBe(
+      backgroundOf('autofill-light-bordered')
     );
   },
 };

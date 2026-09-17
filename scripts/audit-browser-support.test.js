@@ -74,7 +74,7 @@ describe('audit-browser-support', () => {
     expect(isFeatureSafeAtFloor(oklch)).toBe(true);
     expect(isFeatureSafeAtFloor(viewportHeightUnits)).toBe(true);
     expect(isFeatureSafeAtFloor(backdropFilter)).toBe(true);
-    expect(isFeatureSafeAtFloor(autofill)).toBe(true);
+    expect(isFeatureSafeAtFloor(autofill)).toBe(false);
     expect(isFeatureSafeAtFloor(popover)).toBe(false);
   });
 
@@ -105,8 +105,8 @@ describe('audit-browser-support', () => {
         }),
         expect.objectContaining({
           id: 'autofill-selector',
-          policy: 'adopt',
-          floorSafe: true,
+          policy: 'progressive-enhancement',
+          floorSafe: false,
           problem: null,
         }),
         expect.objectContaining({

@@ -2049,30 +2049,25 @@ export function generateFocusRingCSS() {
 
   return `
 /* ===== FOCUS RING ===== */
-[data-slot='input'],
-[data-slot='sidebar-input'] {
-  --field-shadow: ${FIELD_NO_SHADOW};
-}
-
 ${fieldBoundarySelectors} {
   --field-shadow: ${FIELD_DEFAULT_SHADOW};
   border-color: transparent !important;
   border-width: 0;
-  box-shadow: ${FIELD_DEFAULT_SHADOW};
+  box-shadow: var(--field-shadow);
 }
 
 ${fieldErrorBoundarySelectors} {
   --field-shadow: ${FIELD_ERROR_SHADOW};
   border-color: transparent !important;
   border-width: 0;
-  box-shadow: ${FIELD_ERROR_SHADOW};
+  box-shadow: var(--field-shadow);
 }
 
 ${fieldDisabledBoundarySelectors} {
   --field-shadow: ${FIELD_DISABLED_SHADOW};
   border-color: transparent !important;
   border-width: 0;
-  box-shadow: ${FIELD_DISABLED_SHADOW};
+  box-shadow: var(--field-shadow);
 }
 
 ${OTP_SLOT_BOUNDARY_SELECTOR} {
@@ -2130,7 +2125,7 @@ ${fieldSelectors} {
   outline-style: none !important;
   border-color: transparent !important;
   border-width: 0;
-  box-shadow: ${FIELD_FOCUS_SHADOW};
+  box-shadow: var(--field-shadow);
 }
 
 ${fieldErrorSelectors} {
@@ -2140,7 +2135,7 @@ ${fieldErrorSelectors} {
   outline-style: none !important;
   border-color: transparent !important;
   border-width: 0;
-  box-shadow: ${FIELD_ERROR_FOCUS_SHADOW};
+  box-shadow: var(--field-shadow);
 }
 
 ${inputGroupControlSuppressionSelectors} {
@@ -2229,7 +2224,7 @@ export function generateNativeBrowserUIThemeCSS() {
     -webkit-text-fill-color: var(--input-autofill-foreground);
     caret-color: var(--input-autofill-foreground);
     box-shadow:
-      var(--field-shadow),
+      var(--field-shadow, ${FIELD_NO_SHADOW}),
       inset 0 0 0 1000px var(--input-autofill-background) !important;
   }
 
@@ -2239,7 +2234,7 @@ export function generateNativeBrowserUIThemeCSS() {
     -webkit-text-fill-color: var(--input-autofill-foreground);
     caret-color: var(--input-autofill-foreground);
     box-shadow:
-      var(--field-shadow),
+      var(--field-shadow, ${FIELD_NO_SHADOW}),
       inset 0 0 0 1000px var(--input-autofill-background) !important;
   }
 
@@ -2264,7 +2259,15 @@ export function generateNativeBrowserUIThemeCSS() {
   @media (forced-colors: active) {
     input[data-slot='input']:-webkit-autofill,
     input[data-slot='sidebar-input']:-webkit-autofill,
-    input[data-slot='input-group-control']:-webkit-autofill,
+    input[data-slot='input-group-control']:-webkit-autofill {
+      color: CanvasText;
+      -webkit-background-clip: border-box;
+      background-clip: border-box;
+      -webkit-text-fill-color: CanvasText;
+      caret-color: CanvasText;
+      box-shadow: none !important;
+    }
+
     input[data-slot='input']:autofill,
     input[data-slot='sidebar-input']:autofill,
     input[data-slot='input-group-control']:autofill {
@@ -2278,7 +2281,12 @@ export function generateNativeBrowserUIThemeCSS() {
 
     input[data-slot='input']:disabled:-webkit-autofill,
     input[data-slot='sidebar-input']:disabled:-webkit-autofill,
-    input[data-slot='input-group-control']:disabled:-webkit-autofill,
+    input[data-slot='input-group-control']:disabled:-webkit-autofill {
+      color: GrayText;
+      -webkit-text-fill-color: GrayText;
+      caret-color: GrayText;
+    }
+
     input[data-slot='input']:disabled:autofill,
     input[data-slot='sidebar-input']:disabled:autofill,
     input[data-slot='input-group-control']:disabled:autofill {
