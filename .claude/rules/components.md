@@ -150,6 +150,40 @@ minimum tap-target**. A visual box may be denser on pointer-fine surfaces; for
 touch, use padding where it fits or a coarse-pointer hit-area overlay such as an
 `::after` inset. See [responsive.md § Touch targets](responsive.md#touch-targets).
 
+### Table selection layout
+
+`TableSelectionHead` and `TableSelectionCell` compose consumer-owned Nexus
+Checkboxes in the first column; they forward the native cell props and refs.
+Consumers own selected IDs, row `data-state="selected"`, the mixed select-all
+state, accessible labels, and bulk-action announcements/focus restoration.
+These helpers do not turn the native table into an ARIA grid.
+
+The default is an ordinary visible, in-flow selection column. A named ancestor
+`nx:@container/table-selection` enables an internal logical-start gutter at
+`48rem` of allocated container width, only when container queries and `:has()`
+are supported. Give the ancestor an allocated width (for example `nx:w-full`
+inside a flex layout); inline-size containment does not provide intrinsic width.
+No named ancestor, a narrow allocation, or unsupported CSS keeps the fallback.
+
+Gutter reservation and absolute control positioning share identical feature
+gates and helper-owned `data-table-selection-part` markers. Each Table resets
+the layout variables so nested tables cannot inherit another table's gutter.
+The gutter stays inside the overflow wrapper, supports RTL, and reserves at
+least spacing-6 or the checkbox width plus both focus offsets and outlines.
+Selection cells collapse only in this enhanced layout; fallback padding remains
+spacing-2 horizontally, with the existing comfortable/compact vertical padding.
+Grid selection-column separators collapse with the gutter. Sticky selection
+headers retain an opaque background over the whole gutter.
+
+Only roomy, hover-capable, fine-primary-pointer tables with no coarse pointer
+hide idle unselected row controls. Hover, focus-within, selected rows, and
+checked/mixed controls reveal them. Keyboard focus reveals immediately;
+reduced motion disables opacity transitions. Touch and hybrid-input controls
+stay visible, reserve at least spacing-11 / 44px regardless of appearance density,
+and extend the composed Checkbox hit area without overlapping adjacent rows.
+Keep that reserved padding when overriding `containerClassName`. For a clipped
+bordered-card recipe, ordinary TableHead/TableCell selection remains valid.
+
 ## Responsive behaviour
 
 Component-internal responsive behaviour should use `@container` queries, not viewport breakpoints — a component adapts to its parent's width, not the viewport, so it renders consistently whether it lands in a sidebar or a hero. Viewport prefixes (`nx:lg:`, etc.) are reserved for page-shell decisions; full-viewport overlays (e.g. Dialog) are the documented exception, since their trigger is position relative to the viewport.

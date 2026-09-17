@@ -86,6 +86,9 @@ interface TableProps extends React.ComponentProps<'table'> {
  * on narrow viewports without forcing a page-level scrollbar. Compose with the
  * sub-components: `TableHeader` / `TableBody` / `TableFooter` wrap `TableRow`s,
  * which hold `TableHead` (column header) or `TableCell` (data) cells.
+ * Selection helpers stay in-flow by default. A `nx:@container/table-selection`
+ * ancestor enables an internally reserved leading gutter at 48rem; engines
+ * without container queries or `:has()` retain the visible in-flow column.
  *
  * @example
  * ```tsx
@@ -125,6 +128,10 @@ function Table({
         tabIndex={0}
         className={cn(
           'nx:w-full nx:overflow-x-auto nx:focus-visible:outline-2 nx:focus-visible:outline-focus-default nx:focus-visible:[outline-offset:-2px]',
+          'nx:[--table-selection-gutter:0px] nx:[--table-selection-position:static] nx:ps-(--table-selection-gutter)',
+          'nx:supports-[selector(:has(*))]:@min-[48rem]/table-selection:has-[>table>*>tr>[data-table-selection-part]]:[--table-selection-gutter:max(var(--nx-spacing-6),calc(var(--nx-spacing-4)+var(--focus-offset,2px)+var(--focus-offset,2px)+4px))]',
+          'nx:supports-[selector(:has(*))]:@min-[48rem]/table-selection:has-[>table>*>tr>[data-table-selection-part]]:[--table-selection-position:absolute]',
+          'nx:supports-[selector(:has(*))]:@min-[48rem]/table-selection:has-[>table>*>tr>[data-table-selection-part]]:[@media(any-pointer:coarse)]:[--table-selection-gutter:max(var(--nx-spacing-11),44px)]',
           stickyHeader && 'nx:overflow-y-auto',
           containerClassName
         )}
@@ -232,7 +239,7 @@ function TableFooter({ className, ...props }: TableFooterProps) {
 interface TableRowProps extends React.ComponentProps<'tr'> {}
 
 const tableRowVariants = cva(
-  'nx:transition-colors nx:hover:bg-background-hover nx:data-[state=selected]:bg-control-background nx:data-[state=selected]:hover:bg-control-background-hover',
+  'nx:group/table-row nx:transition-colors nx:hover:bg-background-hover nx:data-[state=selected]:bg-control-background nx:data-[state=selected]:hover:bg-control-background-hover',
   {
     variants: {
       variant: {
@@ -353,6 +360,99 @@ function TableCell({ className, ...props }: TableCellProps) {
   );
 }
 
+// Collapsed borders consume fractional row space; keep the touch overlay clear
+// of the adjacent row even when the appearance stroke changes.
+const tableSelectionCellClassName =
+  'nx:w-0 nx:relative nx:px-[max(0px,calc(var(--nx-spacing-2)-var(--table-selection-gutter,0px)))] nx:has-[[role=checkbox]]:pr-[max(0px,calc(var(--nx-spacing-2)-var(--table-selection-gutter,0px)))] nx:border-r-0 nx:border-e-[max(0px,calc(var(--table-selection-column-border,0px)-var(--table-selection-gutter,0px)))] nx:[@media(any-pointer:coarse)]:h-[calc(max(var(--nx-spacing-11),44px)+var(--nx-borderwidth-default))]';
+
+// Derive the overlay from the reserved target, not a sum of spacing tokens:
+// appearance modes can use non-linear spacing scales.
+const tableSelectionControlClassName =
+  'nx:inline-flex nx:items-center nx:justify-center nx:align-middle nx:[position:var(--table-selection-position,static)] nx:inset-y-0 nx:start-[calc(0px-var(--table-selection-gutter,0px))] nx:w-[max(var(--table-selection-gutter,0px),var(--nx-spacing-4))] nx:[@media(any-pointer:coarse)]:min-w-[max(var(--nx-spacing-11),44px)] nx:[@media(any-pointer:coarse)]:[&>[role=checkbox]]:after:absolute nx:[@media(any-pointer:coarse)]:[&>[role=checkbox]]:after:inset-[calc((var(--nx-spacing-4)-max(var(--nx-spacing-11),44px))/2)]';
+
+interface TableSelectionHeadProps extends TableHeadProps {}
+
+/**
+ * A semantic header cell for a consumer-owned select-all Checkbox. Compose
+ * inside the first column, paired with TableSelectionCell. Its control remains
+ * visible and follows the existing stickyHeader contract.
+ */
+function TableSelectionHead({
+  className,
+  children,
+  ...props
+}: TableSelectionHeadProps) {
+  const { variant, density, stickyHeader } = useTableContext();
+  return (
+    <TableHead
+      data-slot="table-selection-head"
+      {...props}
+      data-table-selection-part="head"
+      className={cn(
+        tableSelectionCellClassName,
+        variant === 'grid' &&
+          'nx:[--table-selection-column-border:var(--nx-borderwidth-default)]',
+        density === 'compact'
+          ? 'nx:py-[max(0px,calc(var(--nx-spacing-2_5)-var(--table-selection-gutter,0px)))]'
+          : 'nx:py-[max(0px,calc(var(--nx-spacing-3)-var(--table-selection-gutter,0px)))]',
+        stickyHeader && 'nx:sticky',
+        className
+      )}
+    >
+      <div
+        className={cn(
+          tableSelectionControlClassName,
+          stickyHeader && 'nx:bg-container'
+        )}
+      >
+        {children}
+      </div>
+    </TableHead>
+  );
+}
+
+interface TableSelectionCellProps extends TableCellProps {}
+
+/**
+ * A semantic cell for a consumer-owned row Checkbox. Set the containing row's
+ * data-state="selected" from the same selection state. Roomy gutter controls
+ * reveal on hover/focus and stay visible for selected, touch, or hybrid input.
+ * Without the named query container or platform support they remain in-flow.
+ */
+function TableSelectionCell({
+  className,
+  children,
+  ...props
+}: TableSelectionCellProps) {
+  const { variant, density } = useTableContext();
+  return (
+    <TableCell
+      data-slot="table-selection-cell"
+      {...props}
+      data-table-selection-part="cell"
+      className={cn(
+        tableSelectionCellClassName,
+        variant === 'grid' &&
+          'nx:[--table-selection-column-border:var(--nx-borderwidth-default)]',
+        density === 'compact'
+          ? 'nx:py-[max(0px,calc(var(--nx-spacing-2)-var(--table-selection-gutter,0px)))]'
+          : 'nx:py-[max(0px,calc(var(--nx-spacing-3)-var(--table-selection-gutter,0px)))]',
+        className
+      )}
+    >
+      <div
+        className={cn(
+          tableSelectionControlClassName,
+          'nx:transition-opacity nx:motion-reduce:transition-none nx:motion-reduce:duration-0 nx:group-focus-within/table-row:transition-none nx:group-focus-within/table-row:duration-0',
+          'nx:supports-[selector(:has(*))]:@min-[48rem]/table-selection:[@media(hover:hover)_and_(pointer:fine)_and_(not_(any-pointer:coarse))]:group-[:not(:hover):not(:focus-within):not([data-state=selected])]/table-row:not-has-[>[aria-checked=true],>[aria-checked=mixed],>input:checked,>input:indeterminate]:opacity-0'
+        )}
+      >
+        {children}
+      </div>
+    </TableCell>
+  );
+}
+
 /**
  * TableRowHeaderProps
  *
@@ -428,4 +528,8 @@ export {
   TableRowHeader,
   type TableRowHeaderProps,
   type TableRowProps,
+  TableSelectionCell,
+  type TableSelectionCellProps,
+  TableSelectionHead,
+  type TableSelectionHeadProps,
 };

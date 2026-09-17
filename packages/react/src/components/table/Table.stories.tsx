@@ -1,4 +1,4 @@
-import { type ReactNode, useState } from 'react';
+import { type ReactNode, useRef, useState } from 'react';
 
 import type { Meta, StoryObj } from '@storybook/react';
 import { expect, userEvent, within } from 'storybook/test';
@@ -26,8 +26,11 @@ import {
   TableFooter,
   TableHead,
   TableHeader,
+  type TableProps,
   TableRow,
   TableRowHeader,
+  TableSelectionCell,
+  TableSelectionHead,
 } from './table';
 
 const meta: Meta<typeof Table> = {
@@ -133,48 +136,281 @@ export const WithFooter: Story = {
   ),
 };
 
-// Rows carry a leading checkbox column. Selected rows set
-// `data-state="selected"` for the highlight; the header checkbox is
-// indeterminate because the selection is partial. Every checkbox has an
-// `aria-label` so screen readers announce what it selects.
-export const SelectableRows: Story = {
-  render: () => {
-    const selected = new Set(['INV001', 'INV003']);
-    return (
-      <Table>
-        <TableHeader>
-          <TableRow>
-            <TableHead>
-              <Checkbox
-                defaultChecked="indeterminate"
-                aria-label="Select all rows"
-              />
-            </TableHead>
-            <TableHead>Invoice</TableHead>
-            <TableHead>Status</TableHead>
-            <TableHead className="nx:text-right">Amount</TableHead>
-          </TableRow>
-        </TableHeader>
-        <TableBody>
-          {invoices.map((row) => (
-            <TableRow
-              key={row.invoice}
-              data-state={selected.has(row.invoice) ? 'selected' : undefined}
-            >
-              <TableCell>
-                <Checkbox
-                  defaultChecked={selected.has(row.invoice)}
-                  aria-label={`Select ${row.invoice}`}
-                />
-              </TableCell>
-              <TableCell className="nx:font-medium">{row.invoice}</TableCell>
-              <TableCell>{row.status}</TableCell>
-              <TableCell className="nx:text-right">{row.amount}</TableCell>
-            </TableRow>
-          ))}
-        </TableBody>
-      </Table>
+const selectionInvoices = invoices.map((row) => ({ ...row, id: row.invoice }));
+const stickySelectionInvoices = Array.from({ length: 3 }, (_, page) =>
+  invoices.map((row) => ({
+    ...row,
+    id: `${row.invoice}-${page + 1}`,
+  }))
+).flat();
+
+interface SelectionTableDemoProps extends TableProps {
+  rows?: typeof selectionInvoices;
+  disabled?: boolean;
+}
+
+function SelectionTableDemo({
+  rows = selectionInvoices,
+  disabled = false,
+  ...props
+}: SelectionTableDemoProps) {
+  const [selected, setSelected] = useState(
+    () =>
+      new Set(
+        disabled
+          ? []
+          : rows
+              .slice(0, 3)
+              .filter((_, i) => i !== 1)
+              .map((row) => row.id)
+      )
+  );
+  const allSelected = rows.length > 0 && selected.size === rows.length;
+  const checked = allSelected
+    ? true
+    : selected.size > 0
+      ? 'indeterminate'
+      : false;
+
+  function toggleAll(value: boolean | 'indeterminate') {
+    setSelected(
+      value === true ? new Set(rows.map((row) => row.id)) : new Set()
     );
+  }
+
+  function toggleRow(id: string) {
+    setSelected((current) => {
+      const next = new Set(current);
+      if (next.has(id)) next.delete(id);
+      else next.add(id);
+      return next;
+    });
+  }
+
+  return (
+    <Table {...props}>
+      <TableCaption>Recent invoices with row selection.</TableCaption>
+      <TableHeader>
+        <TableRow>
+          <TableSelectionHead>
+            <Checkbox
+              checked={checked}
+              onCheckedChange={toggleAll}
+              disabled={disabled || rows.length === 0}
+              aria-label="Select all rows"
+            />
+          </TableSelectionHead>
+          <TableHead>Invoice</TableHead>
+          <TableHead>Status</TableHead>
+          <TableHead className="nx:text-right">Amount</TableHead>
+        </TableRow>
+      </TableHeader>
+      <TableBody>
+        {rows.length === 0 ? (
+          <TableRow>
+            <TableCell colSpan={4}>No invoices yet.</TableCell>
+          </TableRow>
+        ) : (
+          rows.map((row) => (
+            <TableRow
+              key={row.id}
+              data-state={selected.has(row.id) ? 'selected' : undefined}
+            >
+              <TableSelectionCell>
+                <Checkbox
+                  checked={selected.has(row.id)}
+                  onCheckedChange={() => toggleRow(row.id)}
+                  disabled={disabled}
+                  aria-label={`Select ${row.id}`}
+                />
+              </TableSelectionCell>
+              <TableRowHeader>{row.id}</TableRowHeader>
+              <TableCell>{row.status}</TableCell>
+              <TableCell className="nx:text-right nx:tabular-nums">
+                {row.amount}
+              </TableCell>
+            </TableRow>
+          ))
+        )}
+      </TableBody>
+    </Table>
+  );
+}
+
+export const SelectableRows: Story = {
+  render: () => (
+    <div className="nx:@container/table-selection nx:w-full">
+      <SelectionTableDemo />
+    </div>
+  ),
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+    const first = canvas.getByRole('checkbox', { name: 'Select INV001' });
+    const second = canvas.getByRole('checkbox', { name: 'Select INV002' });
+    const header = canvas.getByRole('checkbox', { name: 'Select all rows' });
+    await expect(first).toBeChecked();
+    await expect(second).not.toBeChecked();
+    await expect(header).toHaveAttribute('aria-checked', 'mixed');
+    await expect(first.parentElement).toHaveStyle({ position: 'absolute' });
+    if (
+      matchMedia(
+        '(hover: hover) and (pointer: fine) and (not (any-pointer: coarse))'
+      ).matches
+    ) {
+      await expect(second.parentElement).toHaveStyle({ opacity: '0' });
+    }
+    await userEvent.click(second);
+    await expect(second).toBeChecked();
+    await expect(second.closest('tr')).toHaveAttribute(
+      'data-state',
+      'selected'
+    );
+    await userEvent.click(header);
+    await expect(header).toBeChecked();
+    await expect(
+      canvasElement.querySelectorAll('tbody tr[data-state=selected]')
+    ).toHaveLength(invoices.length);
+    await userEvent.click(header);
+    await expect(header).not.toBeChecked();
+    await expect(
+      canvasElement.querySelectorAll('tbody tr[data-state=selected]')
+    ).toHaveLength(0);
+  },
+};
+
+export const SelectionKeyboardInteraction: Story = {
+  render: SelectableRows.render,
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+    const container = canvasElement.querySelector(
+      '[data-slot="table-container"]'
+    );
+    const header = canvas.getByRole('checkbox', { name: 'Select all rows' });
+    const first = canvas.getByRole('checkbox', { name: 'Select INV001' });
+    await userEvent.tab();
+    await expect(container).toHaveFocus();
+    await userEvent.tab();
+    await expect(header).toHaveFocus();
+    await userEvent.tab();
+    await expect(first).toHaveFocus();
+    await expect(first.parentElement).toHaveStyle({ opacity: '1' });
+    await expect(first.parentElement).toHaveStyle({ transitionDuration: '0s' });
+    await userEvent.keyboard(' ');
+    await expect(first).not.toBeChecked();
+    await expect(first.closest('tr')).not.toHaveAttribute('data-state');
+    await userEvent.tab();
+    const second = canvas.getByRole('checkbox', { name: 'Select INV002' });
+    await expect(second).toHaveFocus();
+    await expect(second.parentElement).toHaveStyle({
+      opacity: '1',
+      transitionDuration: '0s',
+    });
+    await userEvent.keyboard(' ');
+    await expect(second).toBeChecked();
+    await userEvent.tab({ shift: true });
+    await userEvent.tab({ shift: true });
+    await expect(header).toHaveFocus();
+  },
+};
+
+export const SelectionNarrowContainer: Story = {
+  render: () => (
+    <div className="nx:@container/table-selection nx:w-80">
+      <SelectionTableDemo />
+    </div>
+  ),
+  play: async ({ canvasElement }) => {
+    const control = within(canvasElement).getByRole('checkbox', {
+      name: 'Select INV002',
+    });
+    await expect(control.parentElement).toHaveStyle({
+      position: 'static',
+      opacity: '1',
+    });
+  },
+};
+
+export const SelectionInlineFallback: Story = {
+  render: () => <SelectionTableDemo />,
+  play: SelectionNarrowContainer.play,
+};
+
+export const SelectionDisabled: Story = {
+  render: () => (
+    <div className="nx:@container/table-selection nx:w-full">
+      <SelectionTableDemo disabled />
+    </div>
+  ),
+  play: async ({ canvasElement }) => {
+    const control = within(canvasElement).getByRole('checkbox', {
+      name: 'Select INV001',
+    });
+    await expect(control).toBeDisabled();
+    await userEvent.click(control);
+    await expect(control).not.toBeChecked();
+    await expect(control.closest('tr')).not.toHaveAttribute('data-state');
+  },
+};
+
+export const SelectionEmpty: Story = {
+  render: () => (
+    <div className="nx:@container/table-selection nx:w-full">
+      <SelectionTableDemo rows={[]} />
+    </div>
+  ),
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+    const control = canvas.getByRole('checkbox', { name: 'Select all rows' });
+    await expect(control).toBeDisabled();
+    await expect(control).not.toBeChecked();
+    await expect(canvas.getByText('No invoices yet.')).toBeVisible();
+  },
+};
+
+export const SelectionLayoutMatrix: Story = {
+  render: () => (
+    <div className="nx:w-full nx:space-y-6">
+      {(['ltr', 'rtl'] as const).map((dir) =>
+        (['default', 'borderless', 'grid'] as const).map((variant) =>
+          (['comfortable', 'compact'] as const).map((density) => (
+            <div
+              key={`${dir}-${variant}-${density}`}
+              dir={dir}
+              data-testid={`${dir}-${variant}-${density}`}
+              className="nx:@container/table-selection nx:w-full nx:overflow-hidden nx:border-default nx:border-border-default"
+            >
+              <SelectionTableDemo variant={variant} density={density} striped />
+            </div>
+          ))
+        )
+      )}
+    </div>
+  ),
+  play: async ({ canvasElement }) => {
+    const containers = canvasElement.querySelectorAll<HTMLElement>(
+      '[data-slot="table-container"]'
+    );
+    await expect(containers).toHaveLength(12);
+    for (const container of containers) {
+      await expect(
+        parseFloat(getComputedStyle(container).paddingInlineStart)
+      ).toBeGreaterThan(0);
+      const cells = container.querySelectorAll<HTMLElement>(
+        '[data-table-selection-part]'
+      );
+      for (const cell of cells) {
+        const control = cell.querySelector<HTMLElement>('[role="checkbox"]');
+        if (!control) throw new Error('Selection control missing');
+        await expect(control.parentElement).toHaveStyle({
+          position: 'absolute',
+        });
+        await expect(cell.getBoundingClientRect().width).toBeLessThanOrEqual(1);
+        const bounds = container.getBoundingClientRect();
+        const box = control.getBoundingClientRect();
+        await expect(box.left).toBeGreaterThanOrEqual(bounds.left + 4);
+        await expect(box.right).toBeLessThanOrEqual(bounds.right - 4);
+      }
+    }
   },
 };
 
@@ -725,6 +961,43 @@ export const StickyHeader: Story = {
   },
 };
 
+export const StickyHeaderWithSelection: Story = {
+  render: () => (
+    <div className="nx:@container/table-selection nx:w-full">
+      <SelectionTableDemo
+        stickyHeader
+        rows={stickySelectionInvoices}
+        containerClassName="nx:max-h-64"
+      />
+    </div>
+  ),
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+    const first = canvas.getByRole('checkbox', { name: 'Select INV001-1' });
+    const copy = canvas.getByRole('checkbox', { name: 'Select INV001-2' });
+    const header = canvas.getByRole('checkbox', { name: 'Select all rows' });
+    await expect(first).toBeChecked();
+    await expect(copy).not.toBeChecked();
+    await userEvent.click(first);
+    await expect(first).not.toBeChecked();
+    await expect(copy).not.toBeChecked();
+    await userEvent.click(header);
+    await expect(
+      canvasElement.querySelectorAll('tbody tr[data-state=selected]')
+    ).toHaveLength(stickySelectionInvoices.length);
+    const head = header.closest('th');
+    if (!head) throw new Error('Selection header missing');
+    await expect(getComputedStyle(head).position).toBe('sticky');
+    const container = canvasElement.querySelector<HTMLElement>(
+      '[data-slot="table-container"]'
+    );
+    if (!container) throw new Error('Selection scroll container missing');
+    const top = head.getBoundingClientRect().top;
+    container.scrollTop = 100;
+    await expect(head.getBoundingClientRect().top).toBe(top);
+  },
+};
+
 // ============================================
 // RECIPES — patterns a consumer composes; zero added to the published bundle
 // ============================================
@@ -973,6 +1246,7 @@ export const SortableHeader: Story = {
 // in production it's TanStack Table's row-selection model.
 function SelectionDemo() {
   const [selected, setSelected] = useState<Set<string>>(new Set());
+  const selectAllRef = useRef<HTMLButtonElement>(null);
   const allSelected = selected.size === invoices.length;
   const someSelected = selected.size > 0 && !allSelected;
   const toggleAll = () =>
@@ -986,8 +1260,17 @@ function SelectionDemo() {
       else next.add(id);
       return next;
     });
+  function clearSelection() {
+    setSelected(new Set());
+    selectAllRef.current?.focus();
+  }
   return (
-    <div className="nx:space-y-2">
+    <div className="nx:@container/table-selection nx:w-full nx:space-y-2">
+      <div role="status" className="nx:sr-only">
+        {selected.size > 0
+          ? `${selected.size} selected`
+          : 'No invoices selected'}
+      </div>
       {selected.size > 0 && (
         <div className="nx:flex nx:items-center nx:gap-3 nx:rounded-md nx:bg-muted nx:px-3 nx:py-2 nx:typography-label-default">
           <span>{selected.size} selected</span>
@@ -997,20 +1280,29 @@ function SelectionDemo() {
           <Button size="sm" variant="destructive">
             Delete
           </Button>
+          <Button
+            size="sm"
+            variant="ghost"
+            onClick={clearSelection}
+            aria-label="Clear selection"
+          >
+            Clear
+          </Button>
         </div>
       )}
       <Table>
         <TableHeader>
           <TableRow>
-            <TableHead>
+            <TableSelectionHead>
               <Checkbox
+                ref={selectAllRef}
                 checked={
                   allSelected ? true : someSelected ? 'indeterminate' : false
                 }
                 onCheckedChange={toggleAll}
                 aria-label="Select all rows"
               />
-            </TableHead>
+            </TableSelectionHead>
             <TableHead>Invoice</TableHead>
             <TableHead>Status</TableHead>
           </TableRow>
@@ -1021,13 +1313,13 @@ function SelectionDemo() {
               key={row.invoice}
               data-state={selected.has(row.invoice) ? 'selected' : undefined}
             >
-              <TableCell>
+              <TableSelectionCell>
                 <Checkbox
                   checked={selected.has(row.invoice)}
                   onCheckedChange={() => toggleRow(row.invoice)}
                   aria-label={`Select ${row.invoice}`}
                 />
-              </TableCell>
+              </TableSelectionCell>
               <TableRowHeader>{row.invoice}</TableRowHeader>
               <TableCell>{row.status}</TableCell>
             </TableRow>
@@ -1041,10 +1333,9 @@ function SelectionDemo() {
 export const SelectionWithBulkActions: Story = {
   render: () => <SelectionDemo />,
   play: async ({ canvasElement }) => {
-    const selectAll = canvasElement.querySelector(
-      '[aria-label="Select all rows"]'
-    );
-    await userEvent.click(selectAll as Element);
+    const canvas = within(canvasElement);
+    const selectAll = canvas.getByRole('checkbox', { name: 'Select all rows' });
+    await userEvent.click(selectAll);
     // Select-all selects every row and reveals the bulk-action bar.
     const selectedRows = canvasElement.querySelectorAll(
       'tbody [data-slot="table-row"][data-state="selected"]'
@@ -1053,6 +1344,17 @@ export const SelectionWithBulkActions: Story = {
     await expect(canvasElement).toHaveTextContent(
       `${invoices.length} selected`
     );
+    await expect(canvas.getByRole('status')).toHaveTextContent(
+      `${invoices.length} selected`
+    );
+    await userEvent.click(
+      canvas.getByRole('button', { name: 'Clear selection' })
+    );
+    await expect(canvas.getByRole('status')).toHaveTextContent(
+      'No invoices selected'
+    );
+    await expect(selectAll).toHaveFocus();
+    await expect(selectAll).not.toBeChecked();
   },
 };
 
@@ -1595,6 +1897,7 @@ export const DataTableSortableHeaderRecipe: Story = {
 
 function DataTableSelectionRecipeDemo() {
   const [selected, setSelected] = useState<Set<string>>(new Set());
+  const selectAllRef = useRef<HTMLButtonElement>(null);
   const allSelected = selected.size === recipeRows.length;
   const someSelected = selected.size > 0 && !allSelected;
 
@@ -1615,13 +1918,20 @@ function DataTableSelectionRecipeDemo() {
     });
   }
 
+  function clearSelection() {
+    setSelected(new Set());
+    selectAllRef.current?.focus();
+  }
+
   return (
     <div className="nx:space-y-3">
+      <div role="status" className="nx:sr-only">
+        {selected.size > 0
+          ? `${selected.size} selected`
+          : 'No invoices selected'}
+      </div>
       {selected.size > 0 && (
-        <div
-          role="status"
-          className="nx:flex nx:flex-wrap nx:items-center nx:justify-between nx:gap-2 nx:rounded-md nx:border-default nx:border-border-default nx:bg-background-hover nx:px-3 nx:py-2"
-        >
+        <div className="nx:flex nx:flex-wrap nx:items-center nx:justify-between nx:gap-2 nx:rounded-md nx:border-default nx:border-border-default nx:bg-background-hover nx:px-3 nx:py-2">
           <span className="nx:typography-label-default">
             {selected.size} selected
           </span>
@@ -1635,7 +1945,7 @@ function DataTableSelectionRecipeDemo() {
             <Button
               size="sm"
               variant="ghost"
-              onClick={() => setSelected(new Set())}
+              onClick={clearSelection}
               aria-label="Clear selection"
             >
               Clear
@@ -1655,6 +1965,7 @@ function DataTableSelectionRecipeDemo() {
                   }
                   onCheckedChange={toggleAll}
                   aria-label="Select all invoices"
+                  ref={selectAllRef}
                 />
               </TableHead>
               <TableHead>Invoice</TableHead>
@@ -1713,6 +2024,10 @@ export const DataTableSelectionRecipe: Story = {
       canvas.getByRole('button', { name: 'Clear selection' })
     );
     await expect(selectAll).toHaveAttribute('data-state', 'unchecked');
+    await expect(canvas.getByRole('status')).toHaveTextContent(
+      'No invoices selected'
+    );
+    await expect(selectAll).toHaveFocus();
   },
 };
 
