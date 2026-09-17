@@ -2,20 +2,22 @@ import fs from 'node:fs';
 import path from 'node:path';
 import { describe, expect, it } from 'vitest';
 
-import { cn, NEXUS_CLASS_GROUPS } from './utils';
+import {
+  cn,
+  NEXUS_CLASS_GROUPS,
+  NEXUS_THEME_SCALES,
+  TYPOGRAPHY_CONFLICTS,
+} from './utils';
 
 /** Every root that can mint a Nexus utility: generated emissions plus co-located component CSS. */
 const EMITTING_ROOTS = ['packages/tailwind', 'packages/react/src'];
 
-const EMITTED_STYLESHEETS = EMITTING_ROOTS.flatMap((root) => {
+const EMITTED_CSS = EMITTING_ROOTS.flatMap((root) => {
   const dir = path.resolve(process.cwd(), root);
   return fs
     .readdirSync(dir, { recursive: true, encoding: 'utf8' })
     .filter((entry) => entry.endsWith('.css'))
-    .map((entry) => ({
-      root,
-      css: fs.readFileSync(path.join(dir, entry), 'utf8'),
-    }));
+    .map((entry) => fs.readFileSync(path.join(dir, entry), 'utf8'));
 });
 
 /**
@@ -24,12 +26,57 @@ const EMITTED_STYLESHEETS = EMITTING_ROOTS.flatMap((root) => {
  * registered token collapses against it and an unregistered one does not.
  */
 const THEME_NAMESPACES = [
-  { cssKey: 'radius', utility: 'rounded', sentinel: 'nx:rounded-none' },
-  { cssKey: 'ease', utility: 'ease', sentinel: 'nx:ease-initial' },
-  { cssKey: 'shadow', utility: 'shadow', sentinel: 'nx:shadow-none' },
-  { cssKey: 'animate', utility: 'animate', sentinel: 'nx:animate-none' },
-  { cssKey: 'z-index', utility: 'z', sentinel: 'nx:z-auto' },
+  {
+    cssKey: 'radius',
+    utility: 'rounded',
+    sentinel: 'nx:rounded-none',
+    registered: NEXUS_THEME_SCALES.radius,
+  },
+  {
+    cssKey: 'ease',
+    utility: 'ease',
+    sentinel: 'nx:ease-initial',
+    registered: NEXUS_THEME_SCALES.ease,
+  },
+  {
+    cssKey: 'shadow',
+    utility: 'shadow',
+    sentinel: 'nx:shadow-none',
+    registered: NEXUS_THEME_SCALES.shadow,
+  },
+  {
+    cssKey: 'animate',
+    utility: 'animate',
+    sentinel: 'nx:animate-none',
+    registered: NEXUS_THEME_SCALES.animate,
+  },
+  {
+    cssKey: 'z-index',
+    utility: 'z',
+    sentinel: 'nx:z-auto',
+    registered: NEXUS_CLASS_GROUPS.z.map((utility) =>
+      utility.replace(/^z-/, '')
+    ),
+  },
 ];
+
+/** CSS property a `typography-*` composite can declare, mapped to its owning class group. */
+const TYPOGRAPHY_PROPERTY_GROUPS: Record<string, string> = {
+  'font-family': 'font-family',
+  'font-size': 'font-size',
+  'font-weight': 'font-weight',
+  'line-height': 'leading',
+  'letter-spacing': 'tracking',
+  'text-wrap': 'text-wrap',
+};
+
+function emittedThemeTokens(cssKey: string) {
+  return EMITTED_CSS.flatMap((css) =>
+    [...css.matchAll(new RegExp(`^\\s+--${cssKey}-([a-z0-9-]+):`, 'gm'))]
+      .map(([, token]) => token)
+      .filter((token): token is string => token !== undefined)
+  );
+}
 
 describe('cn', () => {
   it.each([
@@ -93,21 +140,41 @@ describe('cn', () => {
     ['font-weight', 'nx:font-bold'],
     ['leading', 'nx:leading-none'],
     ['tracking', 'nx:tracking-wide'],
+    ['text-wrap', 'nx:text-nowrap'],
   ])('lets a typography composite displace the %s atomic', (_group, atomic) => {
-    expect(cn(atomic, 'nx:typography-label-default')).toBe(
-      'nx:typography-label-default'
+    expect(cn(atomic, 'nx:typography-heading-large')).toBe(
+      'nx:typography-heading-large'
     );
   });
   /* eslint-enable @nexus_ds/nx-class-conventions */
 
-  it.each(EMITTING_ROOTS)('scans the %s stylesheets', (root) => {
+  it('lists every property the typography composites declare as a conflict', () => {
+    const declared = new Set(
+      EMITTED_CSS.flatMap((css) =>
+        [
+          ...css.matchAll(/@utility typography-[a-z0-9-]+ \{([^}]*)\}/g),
+        ].flatMap(([, block]) =>
+          [...(block ?? '').matchAll(/^\s*([a-z-]+):/gm)].map(
+            ([, property]) => property
+          )
+        )
+      )
+    );
+    const conflicts = new Set<string>(TYPOGRAPHY_CONFLICTS);
+
+    expect([...declared].sort()).toEqual(
+      Object.keys(TYPOGRAPHY_PROPERTY_GROUPS).sort()
+    );
     expect(
-      EMITTED_STYLESHEETS.filter((stylesheet) => stylesheet.root === root)
-    ).not.toHaveLength(0);
+      [...declared].filter((property) => {
+        const group = TYPOGRAPHY_PROPERTY_GROUPS[property ?? ''];
+        return group === undefined || !conflicts.has(group);
+      })
+    ).toEqual([]);
   });
 
   it('registers every emitted custom utility', () => {
-    const emittedUtilities = EMITTED_STYLESHEETS.flatMap(({ css }) =>
+    const emittedUtilities = EMITTED_CSS.flatMap((css) =>
       [...css.matchAll(/^@utility ([a-z0-9-]+\*?) \{/gm)]
         .map(([, utility]) => utility)
         .filter((utility): utility is string => utility !== undefined)
@@ -125,16 +192,18 @@ describe('cn', () => {
   it.each(THEME_NAMESPACES)(
     'merges every emitted $cssKey theme token',
     ({ cssKey, utility, sentinel }) => {
-      const emittedTokens = EMITTED_STYLESHEETS.flatMap(({ css }) =>
-        [...css.matchAll(new RegExp(`^\\s+--${cssKey}-([a-z0-9-]+):`, 'gm'))]
-          .map(([, token]) => token)
-          .filter((token): token is string => token !== undefined)
-      );
-
-      expect(emittedTokens.length).toBeGreaterThan(0);
-      for (const token of emittedTokens) {
+      for (const token of emittedThemeTokens(cssKey)) {
         expect(cn(`nx:${utility}-${token}`, sentinel)).toBe(sentinel);
       }
+    }
+  );
+
+  it.each(THEME_NAMESPACES)(
+    'finds every registered $cssKey token in the scanned CSS',
+    ({ cssKey, registered }) => {
+      expect(emittedThemeTokens(cssKey)).toEqual(
+        expect.arrayContaining([...registered])
+      );
     }
   );
 });

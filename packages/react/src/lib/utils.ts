@@ -6,19 +6,22 @@ import {
 } from 'tailwind-merge';
 
 /**
- * Tailwind-merge registration for Nexus custom utilities. Hand-mirrors the
- * `@utility` sets and custom `@theme` scale keys emitted by `@nexus_ds/core`
- * (see `packages/tailwind`) and by co-located component CSS, so a new custom
- * utility cannot silently drop out of `cn()`'s last-wins collapse.
+ * Custom `@theme` scale values Nexus adds to built-in tailwind-merge
+ * namespaces. Hand-mirrors the keys emitted by `@nexus_ds/core` (see
+ * `packages/tailwind`) and by co-located component CSS.
  */
-const NEXUS_THEME_SCALES = {
+export const NEXUS_THEME_SCALES = {
   radius: ['base'],
   ease: ['enter', 'exit', 'move'],
   shadow: ['base', 'inner'],
   animate: ['progress-indeterminate'],
 } satisfies Partial<Record<DefaultThemeGroupIds, string[]>>;
 
-const MOTION_CLASS_GROUPS = {
+/**
+ * Nexus `@utility` names, keyed by the tailwind-merge class group each one
+ * extends, so a conflicting pair collapses to last-wins in `cn()`.
+ */
+export const NEXUS_CLASS_GROUPS = {
   animate: ['animate-overlay-presence-exit'],
   duration: [
     'duration-0',
@@ -29,18 +32,9 @@ const MOTION_CLASS_GROUPS = {
     'duration-slow',
     'duration-slower',
   ],
-} satisfies Partial<Record<DefaultClassGroupIds, string[]>>;
-
-const Z_INDEX_CLASS_GROUPS = {
   z: ['z-overlay', 'z-sticky', 'z-modal', 'z-popover', 'z-toast', 'z-max'],
-} satisfies Partial<Record<DefaultClassGroupIds, string[]>>;
-
-const ROLE_CLASS_GROUPS = {
   gap: ['gap-container', 'gap-layout-section', 'gap-layout-stack'],
   p: ['p-container'],
-} satisfies Partial<Record<DefaultClassGroupIds, string[]>>;
-
-const BORDER_WIDTH_CLASS_GROUPS = {
   'border-w': [
     'border-thin',
     'border-default',
@@ -97,9 +91,6 @@ const BORDER_WIDTH_CLASS_GROUPS = {
     'border-width-l-default',
     'border-width-l-thick',
   ],
-} satisfies Partial<Record<DefaultClassGroupIds, string[]>>;
-
-const BORDER_COLOR_CLASS_GROUPS = {
   'border-color': [
     'border-border-default',
     'border-color-default',
@@ -130,9 +121,6 @@ const BORDER_COLOR_CLASS_GROUPS = {
     'border-border-primary-active',
     'border-color-primary-active',
   ],
-} satisfies Partial<Record<DefaultClassGroupIds, string[]>>;
-
-const TYPOGRAPHY_CLASS_GROUPS = {
   typography: [
     'typography-heading-large',
     'typography-heading-medium',
@@ -148,18 +136,22 @@ const TYPOGRAPHY_CLASS_GROUPS = {
     'typography-code-block',
     'typography-code-inline',
   ],
-};
-
-export const NEXUS_CLASS_GROUPS = {
-  ...MOTION_CLASS_GROUPS,
-  ...Z_INDEX_CLASS_GROUPS,
-  ...ROLE_CLASS_GROUPS,
-  ...BORDER_WIDTH_CLASS_GROUPS,
-  ...BORDER_COLOR_CLASS_GROUPS,
-  ...TYPOGRAPHY_CLASS_GROUPS,
-};
+} satisfies Partial<Record<DefaultClassGroupIds | 'typography', string[]>>;
 
 type NexusClassGroupId = keyof typeof NEXUS_CLASS_GROUPS;
+
+/**
+ * The atomic class groups a `typography-*` composite overwrites. Every CSS
+ * property the generated composites declare must map to a group listed here.
+ */
+export const TYPOGRAPHY_CONFLICTS = [
+  'font-family',
+  'font-size',
+  'font-weight',
+  'leading',
+  'tracking',
+  'text-wrap',
+] satisfies DefaultClassGroupIds[];
 
 /** Tailwind-merge configured with `nx:` prefix and Nexus custom utility groups. */
 const twMerge = extendTailwindMerge<NexusClassGroupId>({
@@ -168,13 +160,7 @@ const twMerge = extendTailwindMerge<NexusClassGroupId>({
     theme: NEXUS_THEME_SCALES,
     classGroups: NEXUS_CLASS_GROUPS,
     conflictingClassGroups: {
-      typography: [
-        'font-family',
-        'font-size',
-        'font-weight',
-        'leading',
-        'tracking',
-      ],
+      typography: TYPOGRAPHY_CONFLICTS,
     },
   },
 });
