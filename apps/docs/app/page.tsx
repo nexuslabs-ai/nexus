@@ -8,6 +8,7 @@ import {
   CardHeader,
   CardTitle,
 } from './_components/nexus';
+import { sectionHref, subPageHref } from './_lib/routes';
 
 const STATS = [
   { n: '5', l: 'Bases' },
@@ -20,17 +21,17 @@ const AUDIENCES = [
   {
     title: 'Designer',
     desc: 'Figma library, design tokens, and Code Connect — kept in lockstep with code.',
-    href: '/getting-started/designers',
+    href: subPageHref('getting-started', 'designers'),
   },
   {
     title: 'Engineer',
     desc: 'Install, wire your theme, and ship your first component in minutes.',
-    href: '/getting-started/install',
+    href: subPageHref('getting-started', 'install'),
   },
   {
     title: 'AI agent',
     desc: 'llms.txt, a mirror of the rules, and authoring conventions agents can parse.',
-    href: '/agents',
+    href: sectionHref('agents'),
   },
 ];
 
@@ -39,37 +40,37 @@ const SECTIONS = [
     count: '6 pages',
     title: 'Foundations',
     desc: 'Color · Typography · Spacing · Radius · Layering · Responsive',
-    href: '/foundations',
+    href: sectionHref('foundations'),
   },
   {
     count: '5 groups · 17 components',
     title: 'Components',
     desc: 'Inputs · Containers · Navigation · Display · Primitives',
-    href: '/components',
+    href: sectionHref('components'),
   },
   {
     count: '3 pages',
     title: 'Theming',
     desc: 'Multi-brand · density modes · consumer overrides',
-    href: '/theming',
+    href: sectionHref('theming'),
   },
   {
     count: '5 pages',
     title: 'Tools',
     desc: 'nx: prefix · Code Connect · ESLint · audits · Storybook',
-    href: '/tools',
+    href: sectionHref('tools'),
   },
   {
     count: '3 pages',
     title: 'Guidance',
     desc: 'Engineering principles · testing model · contribution',
-    href: '/guidance',
+    href: sectionHref('guidance'),
   },
   {
     count: '3 pages',
     title: 'For AI agents',
     desc: 'llms.txt · rules mirror · authoring',
-    href: '/agents',
+    href: sectionHref('agents'),
   },
 ];
 
@@ -95,10 +96,10 @@ export default function Home() {
         </p>
         <div className="nx:mt-8 nx:flex nx:flex-wrap nx:gap-3 nx:justify-center">
           <Button asChild>
-            <Link href="/getting-started">Get started</Link>
+            <Link href={sectionHref('getting-started')}>Get started</Link>
           </Button>
           <Button asChild variant="outline">
-            <Link href="/components">Browse components</Link>
+            <Link href={sectionHref('components')}>Browse components</Link>
           </Button>
         </div>
         <dl className="nx:mt-16 nx:flex nx:flex-wrap nx:justify-center nx:gap-x-10 nx:gap-y-5 nx:border-t nx:border-border-default nx:pt-8 nx:max-w-[36rem] nx:mx-auto">

@@ -1,4 +1,5 @@
 import { Breadcrumb } from '../_components/Breadcrumb';
+import { sectionHref } from '../_lib/routes';
 
 /**
  * Foundations → Layering. Server component — the 6-token z-index scale and the
@@ -28,7 +29,7 @@ export function Layering() {
       <Breadcrumb
         items={[
           { label: 'Home', href: '/' },
-          { label: 'Foundations', href: '/foundations' },
+          { label: 'Foundations', href: sectionHref('foundations') },
           { label: 'Layering' },
         ]}
       />

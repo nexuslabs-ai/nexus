@@ -1,4 +1,5 @@
 import { Breadcrumb } from '../_components/Breadcrumb';
+import { sectionHref } from '../_lib/routes';
 
 /**
  * Foundations → Typography. Server component — a live specimen of the type
@@ -126,7 +127,7 @@ export function Typography() {
       <Breadcrumb
         items={[
           { label: 'Home', href: '/' },
-          { label: 'Foundations', href: '/foundations' },
+          { label: 'Foundations', href: sectionHref('foundations') },
           { label: 'Typography' },
         ]}
       />

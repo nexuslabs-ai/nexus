@@ -237,6 +237,15 @@ const ROUTES = new Set([
   ...subPageParams().map(({ section, sub }) => subPageHref(section, sub)),
 ]);
 
+// The inverse of subPageHref, for the fragment check below. Only routes backed
+// by an .mdx file appear: nothing else the app serves emits heading ids.
+const IDS_BY_ROUTE = new Map(
+  subPageParams().flatMap(({ section, sub }) => {
+    const content = COMPILED.get(`${section}/${sub}.mdx`);
+    return content ? [[subPageHref(section, sub), content.ids] as const] : [];
+  })
+);
+
 describe('docs MDX pipeline and link integrity', () => {
   it('registers rehype-slug where the loader can resolve it', () => {
     expect(MDX_OPTIONS.rehypePlugins).toContain('rehype-slug');
@@ -368,11 +377,8 @@ describe('docs MDX pipeline and link integrity', () => {
       // A bare trailing `#` is a valid top-of-page link.
       if (fragment === '') continue;
 
-      // Only MDX pages render heading ids, so a fragment aimed at any other
-      // route cannot resolve.
-      const targetIds = COMPILED.get(
-        route === '' ? from : `${route.slice(1)}.mdx`
-      )?.ids;
+      const targetIds =
+        route === '' ? compiled(from).ids : IDS_BY_ROUTE.get(route);
       expect(
         targetIds,
         `${from} links to ${href}, and only MDX pages render heading ids`

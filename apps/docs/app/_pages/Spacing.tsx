@@ -1,4 +1,5 @@
 import { Breadcrumb } from '../_components/Breadcrumb';
+import { sectionHref } from '../_lib/routes';
 
 /**
  * Foundations → Spacing. Server component — a live specimen of the 4px-based
@@ -62,7 +63,7 @@ export function Spacing() {
       <Breadcrumb
         items={[
           { label: 'Home', href: '/' },
-          { label: 'Foundations', href: '/foundations' },
+          { label: 'Foundations', href: sectionHref('foundations') },
           { label: 'Spacing' },
         ]}
       />

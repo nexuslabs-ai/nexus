@@ -1,4 +1,5 @@
 import { Breadcrumb } from '../_components/Breadcrumb';
+import { sectionHref } from '../_lib/routes';
 
 /**
  * Foundations → Radius · Borders · Shadows. Server component — three
@@ -55,7 +56,7 @@ export function Radius() {
       <Breadcrumb
         items={[
           { label: 'Home', href: '/' },
-          { label: 'Foundations', href: '/foundations' },
+          { label: 'Foundations', href: sectionHref('foundations') },
           { label: 'Radius · Borders · Shadows' },
         ]}
       />

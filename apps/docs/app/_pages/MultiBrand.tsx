@@ -1,5 +1,6 @@
 import { Breadcrumb } from '../_components/Breadcrumb';
 import { Button } from '../_components/nexus';
+import { sectionHref } from '../_lib/routes';
 
 /**
  * Theming → Multi-brand. The theming-model explainer (this is where
@@ -49,7 +50,7 @@ export function MultiBrand() {
       <Breadcrumb
         items={[
           { label: 'Home', href: '/' },
-          { label: 'Theming', href: '/theming' },
+          { label: 'Theming', href: sectionHref('theming') },
           { label: 'Multi-brand' },
         ]}
       />

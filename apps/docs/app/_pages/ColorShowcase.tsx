@@ -1,4 +1,5 @@
 import { Breadcrumb } from '../_components/Breadcrumb';
+import { sectionHref } from '../_lib/routes';
 
 import { ColorScales } from './ColorScales';
 
@@ -152,7 +153,7 @@ export function ColorShowcase() {
       <Breadcrumb
         items={[
           { label: 'Home', href: '/' },
-          { label: 'Foundations', href: '/foundations' },
+          { label: 'Foundations', href: sectionHref('foundations') },
           { label: 'Color' },
         ]}
       />
