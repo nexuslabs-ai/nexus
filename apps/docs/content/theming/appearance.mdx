@@ -32,8 +32,10 @@ enough to stay APCA-readable, but the hierarchy itself stays fixed.
 Start from the shipped default and override the fields you own:
 
 ```ts
-import { DEFAULT_NEXUS_APPEARANCE } from '@nexus_ds/core';
-import type { NexusAppearanceState } from '@nexus_ds/core';
+import {
+  DEFAULT_NEXUS_APPEARANCE,
+  type NexusAppearanceState,
+} from '@nexus_ds/core';
 
 export const defaultAppearance = {
   ...DEFAULT_NEXUS_APPEARANCE,
