@@ -327,6 +327,27 @@ export const AutofillSurfaceTokens: Story = {
     expect(backgroundOf('autofill-dark-bordered')).not.toBe(
       backgroundOf('autofill-light-bordered')
     );
+
+    // The computed assertions above only cover the appearance-provider path,
+    // which defines --nx-color-* for light too. A consumer loading nexus.css
+    // alone gets --nx-color-* from .dark only, so each autofill property must
+    // carry the :root --color-* alias as its fallback.
+    function expectAutofillFallbackChain(testId: string) {
+      const declarations = canvas
+        .getByTestId(testId)
+        .className.match(/\[--input-autofill-[a-z]+:[^\]]+\]/g);
+
+      expect(declarations).not.toBeNull();
+      for (const declaration of declarations ?? []) {
+        expect(declaration).toMatch(
+          /^\[--input-autofill-[a-z]+:var\(--nx-color-([a-z-]+),var\(--color-\1\)\)\]$/
+        );
+      }
+    }
+
+    expectAutofillFallbackChain('autofill-light-bordered');
+    expectAutofillFallbackChain('autofill-light-borderless');
+    expectAutofillFallbackChain('autofill-light-disabled');
   },
 };
 

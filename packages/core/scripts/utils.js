@@ -2022,6 +2022,11 @@ const BUTTON_ERROR_FOCUS_RING_SELECTORS = [
  * The component classes intentionally stay outline-based: Tailwind owns the
  * outline width/offset, this layer owns the normal-mode ring paint.
  *
+ * Produces `--field-shadow`: every rule that paints a field boundary sets the
+ * carrier and then paints from it, so the declaration and the carrier cannot
+ * drift. `generateNativeBrowserUIThemeCSS()` consumes it to compose the
+ * autofill mask on top of the current boundary.
+ *
  * @returns {string} CSS focus ring rules
  */
 export function generateFocusRingCSS() {
@@ -2198,6 +2203,21 @@ ${buttonErrorSelectors} {
 `;
 }
 
+/**
+ * Theme the browser-painted UI Nexus cannot style through utilities: native
+ * control accents, the color-scheme declaration, and the autofill surface.
+ *
+ * Consumes `--field-shadow` from `generateFocusRingCSS()`. The autofill mask is
+ * composed on top of that carrier rather than replacing `box-shadow`, so an
+ * autofilled field keeps its border and focus ring. Fields outside the boundary
+ * rules never set the carrier, hence the `FIELD_NO_SHADOW` fallback — a
+ * transparent zero-shadow, since `none` is not a valid `<shadow>` list item.
+ *
+ * The forced-colors block must stay last: it ties the base autofill rules on
+ * specificity and wins on source order alone.
+ *
+ * @returns {string} CSS native browser UI rules
+ */
 export function generateNativeBrowserUIThemeCSS() {
   return `
 /* ===== NATIVE BROWSER UI THEME ===== */
