@@ -61,7 +61,7 @@ const THEME_NAMESPACES = [
 ];
 
 /** CSS property a `typography-*` composite can declare, mapped to its owning class group. */
-const TYPOGRAPHY_PROPERTY_GROUPS: Record<string, string> = {
+const TYPOGRAPHY_PROPERTY_GROUPS = {
   'font-family': 'font-family',
   'font-size': 'font-size',
   'font-weight': 'font-weight',
