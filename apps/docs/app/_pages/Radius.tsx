@@ -76,8 +76,8 @@ export function Radius() {
       <section className="nx:mb-12">
         <h2 className="nx:typography-heading-small nx:mb-1">Radius</h2>
         <p className="nx:typography-body-default nx:text-muted-foreground nx:mb-4 nx:max-w-[64ch]">
-          Nine radius utilities, each reacting to the active Radius mode. Swap
-          the mode and every corner re-rounds.
+          Nine radius utilities. Eight react to the active Radius mode; full
+          stays pinned at 9999px. Swap the mode and the rest re-round.
         </p>
         <div className="nx:flex nx:flex-wrap nx:gap-6 nx:mb-6">
           {RADII.map((r) => (

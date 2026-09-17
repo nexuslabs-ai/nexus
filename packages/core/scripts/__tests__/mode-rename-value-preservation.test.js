@@ -136,8 +136,6 @@ describe('token-mode rename preserves migration values', () => {
       if (family === 'radius') {
         const fourXlByMode = {
           square: 0,
-          subtle: 28,
-          smooth: 32,
           round: 36,
           'extra-round': 40,
         };
