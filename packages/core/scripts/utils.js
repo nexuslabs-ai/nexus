@@ -2224,11 +2224,7 @@ export function generateNativeBrowserUIThemeCSS() {
   }
 
   input[data-slot='input']:-webkit-autofill,
-  input[data-slot='input']:-webkit-autofill:hover,
-  input[data-slot='input']:-webkit-autofill:focus,
-  input[data-slot='sidebar-input']:-webkit-autofill,
-  input[data-slot='sidebar-input']:-webkit-autofill:hover,
-  input[data-slot='sidebar-input']:-webkit-autofill:focus {
+  input[data-slot='sidebar-input']:-webkit-autofill {
     color: var(--input-autofill-foreground);
     -webkit-text-fill-color: var(--input-autofill-foreground);
     caret-color: var(--input-autofill-foreground);
@@ -2238,11 +2234,7 @@ export function generateNativeBrowserUIThemeCSS() {
   }
 
   input[data-slot='input']:autofill,
-  input[data-slot='input']:autofill:hover,
-  input[data-slot='input']:autofill:focus,
-  input[data-slot='sidebar-input']:autofill,
-  input[data-slot='sidebar-input']:autofill:hover,
-  input[data-slot='sidebar-input']:autofill:focus {
+  input[data-slot='sidebar-input']:autofill {
     color: var(--input-autofill-foreground);
     -webkit-text-fill-color: var(--input-autofill-foreground);
     caret-color: var(--input-autofill-foreground);
@@ -2251,9 +2243,7 @@ export function generateNativeBrowserUIThemeCSS() {
       inset 0 0 0 1000px var(--input-autofill-background) !important;
   }
 
-  input[data-slot='input-group-control']:-webkit-autofill,
-  input[data-slot='input-group-control']:-webkit-autofill:hover,
-  input[data-slot='input-group-control']:-webkit-autofill:focus {
+  input[data-slot='input-group-control']:-webkit-autofill {
     color: var(--input-autofill-foreground);
     -webkit-background-clip: text;
     background-clip: text;
@@ -2262,9 +2252,7 @@ export function generateNativeBrowserUIThemeCSS() {
     box-shadow: none !important;
   }
 
-  input[data-slot='input-group-control']:autofill,
-  input[data-slot='input-group-control']:autofill:hover,
-  input[data-slot='input-group-control']:autofill:focus {
+  input[data-slot='input-group-control']:autofill {
     color: var(--input-autofill-foreground);
     -webkit-background-clip: text;
     background-clip: text;

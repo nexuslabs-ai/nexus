@@ -317,6 +317,13 @@ describe('utils', () => {
         /input\[data-slot='input'\]:disabled:-webkit-autofill[\s\S]*?color:\s*GrayText;[\s\S]*?-webkit-text-fill-color:\s*GrayText;/
       );
     });
+
+    it('keeps autofill rules free of :hover/:focus so forced colors are not outranked', () => {
+      const css = generateNativeBrowserUIThemeCSS();
+
+      expect(css).not.toMatch(/autofill:hover/);
+      expect(css).not.toMatch(/autofill:focus/);
+    });
   });
 
   describe('extractTokens', () => {
