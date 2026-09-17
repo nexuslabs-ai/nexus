@@ -6,7 +6,9 @@ import { fileURLToPath, pathToFileURL } from 'node:url';
 import { describe, expect, it, vi } from 'vitest';
 
 import { MDX_PAGES } from './app/_lib/mdx-pages';
-import { getSection, getSubPage, SECTIONS } from './app/_lib/sections';
+import { SECTIONS } from './app/_lib/sections';
+import { generateStaticParams as subPageParams } from './app/[section]/[sub]/page';
+import { generateStaticParams as sectionParams } from './app/[section]/page';
 import { MDX_OPTIONS } from './mdx-options';
 import { PAGE_EXTENSIONS } from './page-extensions';
 
@@ -16,16 +18,12 @@ const APP_DIR = path.join(DOCS_DIR, 'app');
 
 const PAGE_FILENAMES = new Set(PAGE_EXTENSIONS.map((ext) => `page.${ext}`));
 
-// Every `${section}/${sub}` generateStaticParams emits. dynamicParams is false,
-// so a key outside this set names a route that is never built and 404s.
 const SUB_PAGE_KEYS = new Set(
-  Object.values(SECTIONS).flatMap((section) =>
-    section.subs.map((sub) => `${section.slug}/${sub.slug}`)
-  )
+  subPageParams().map(({ section, sub }) => `${section}/${sub}`)
 );
 
 // remark-rehype's clobber prefix on the ids it generates for footnotes.
-const FOOTNOTE_ID_PREFIX = 'user-content-';
+const FOOTNOTE_ID_PREFIX = 'user-content-fn';
 
 // `footnote-label` comes from remark-rehype: rehype-slug skips headings that
 // already carry an id.
@@ -96,18 +94,18 @@ async function contentFiles() {
     );
 }
 
-// Segments that keep a page file from being served at its literal path:
-// `[dynamic]` paths come from SECTIONS instead, `_private` folders opt out of
-// routing entirely, and an `@slot` page renders into a layout slot.
-const NON_ROUTABLE_PREFIXES = ['[', '_', '@'];
+// Segments App Router does not serve at their literal path: `[dynamic]` paths
+// come from SECTIONS, `_private` opts out of routing, `@slot` renders into a
+// layout slot, and `(.)`/`(..)` intercept another route.
+const NON_ROUTABLE_PREFIXES = ['[', '_', '@', '(.'];
 
 function isRoutable(segment: string) {
   return !NON_ROUTABLE_PREFIXES.some((prefix) => segment.startsWith(prefix));
 }
 
-// Routes App Router serves from a literal path: every directory holding a page
-// file, minus the ones a naming convention takes out of the path. Route groups
-// — `(marketing)` — nest without contributing a path segment.
+// Every directory holding a page file, minus the ones a naming convention takes
+// out of the path. Route groups — `(marketing)` — nest without contributing a
+// path segment, so they are dropped after the routable check.
 async function staticRoutes() {
   const entries = await readdir(APP_DIR, {
     withFileTypes: true,
@@ -121,38 +119,31 @@ async function staticRoutes() {
     const segments = path
       .relative(APP_DIR, entry.parentPath)
       .split(path.sep)
-      .filter((segment) => segment !== '' && !segment.startsWith('('));
+      .filter((segment) => segment !== '');
 
     if (!segments.every(isRoutable)) continue;
-    routes.add(`/${segments.join('/')}`);
+
+    const served = segments.filter((segment) => !segment.startsWith('('));
+    routes.add(`/${served.join('/')}`);
   }
 
   return routes;
 }
 
-// An href leaves the docs app when it names a scheme (`https:`, `mailto:`) or
-// a host (`//cdn...`); everything else resolves against these routes.
+// An href leaves the docs app when it names a scheme (`https:`, `mailto:`) or a
+// host (`//cdn...`).
 function isInRepo(href: string) {
   return !/^([a-z][a-z0-9+.-]*:|\/\/)/i.test(href);
 }
 
-// Normalises an href's route part to a `/`-rooted docs route, dropping any
-// query string and trailing slash. A relative route resolves against the
-// linking page's own directory. Returns '' for a bare `#id`.
+// Returns '' for a bare `#id`; a relative route resolves against the linking
+// page's own directory.
 function resolveRoute(from: string, route: string) {
   const withoutQuery = route.replace(/\?.*$/, '');
   const clean =
     withoutQuery.length > 1 ? withoutQuery.replace(/\/+$/, '') : withoutQuery;
   if (clean === '' || clean.startsWith('/')) return clean;
   return path.posix.join('/', path.posix.dirname(from), clean);
-}
-
-function routeExists(route: string, routes: Set<string>) {
-  if (routes.has(route)) return true;
-
-  const [section, sub, ...rest] = route.slice(1).split('/');
-  if (!section || rest.length > 0) return false;
-  return sub ? Boolean(getSubPage(section, sub)) : Boolean(getSection(section));
 }
 
 async function loadPlugin(name: string) {
@@ -200,6 +191,14 @@ async function compileMdx(source: string) {
 const CONTENT_FILES = await contentFiles();
 const STATIC_ROUTES = await staticRoutes();
 
+// Every route the app serves: literal page files, plus the two dynamic routes'
+// own generateStaticParams output.
+const ROUTES = new Set([
+  ...STATIC_ROUTES,
+  ...sectionParams().map(({ section }) => `/${section}`),
+  ...[...SUB_PAGE_KEYS].map((key) => `/${key}`),
+]);
+
 describe('MDX heading ids', () => {
   it('registers rehype-slug where the loader can resolve it', () => {
     expect(MDX_OPTIONS.rehypePlugins).toContain('rehype-slug');
@@ -212,7 +211,7 @@ describe('MDX heading ids', () => {
     }
   });
 
-  it('ships MDX_OPTIONS to the loader through next.config', async () => {
+  it('ships MDX_OPTIONS and pageExtensions through next.config', async () => {
     // @next/mdx only emits turbopack.rules when TURBOPACK is set.
     vi.stubEnv('TURBOPACK', '1');
     const { default: config } = await import('./next.config');
@@ -224,12 +223,24 @@ describe('MDX heading ids', () => {
     expect(rules?.['#next-mdx']?.loaders[0]?.options).toMatchObject(
       MDX_OPTIONS
     );
+    expect(config.pageExtensions).toEqual(['ts', 'tsx', 'js', 'jsx', 'mdx']);
   });
 
-  it('discovers routes with the pageExtensions next.config sets', async () => {
-    const { default: config } = await import('./next.config');
+  it('discovers the routes App Router serves from a literal path', () => {
+    expect([...STATIC_ROUTES].sort()).toEqual([
+      '/',
+      '/appearance-ssr',
+      '/changelog',
+    ]);
+  });
 
-    expect(config.pageExtensions).toEqual(PAGE_EXTENSIONS);
+  // `[section]` emits object keys and `[sub]` emits `section.slug`, while every
+  // lookup indexes SECTIONS by object key. A diverged pair builds a route that
+  // 404s.
+  it('keys every section by its own slug', () => {
+    for (const [key, section] of Object.entries(SECTIONS)) {
+      expect(section.slug, `SECTIONS key ${key}`).toBe(key);
+    }
   });
 
   it('pins every .mdx under content/', () => {
@@ -239,10 +250,6 @@ describe('MDX heading ids', () => {
     );
   });
 
-  // Three registries have to agree for a content page to render: SECTIONS
-  // emits the route, MDX_PAGES maps it to a file, and the file exists. A
-  // content file MDX_PAGES omits renders SubPageView's placeholder instead;
-  // a key SECTIONS omits is never built, and dynamicParams: false 404s it.
   it('agrees with SECTIONS and content/ on every MDX page', () => {
     expect(
       Object.keys(MDX_PAGES)
@@ -291,10 +298,6 @@ describe('MDX heading ids', () => {
     }
   );
 
-  // The pin lists above keep ids stable, but a rename that updates a pin still
-  // leaves any link pointing at the old id silently dead. Bare route links are
-  // checked too: they carry no id to verify, but their route still has to
-  // exist.
   it('points every in-repo link at a route and an id that exist', async () => {
     const idsByFile = new Map<string, Set<string>>();
     const links: { from: string; href: string }[] = [];
@@ -312,10 +315,9 @@ describe('MDX heading ids', () => {
       }
     }
 
-    // Counted by kind rather than as a total that shifts with the content.
-    // Footnote refs and back-refs are same-page links this loop still verifies,
-    // but they appear wherever a page has a footnote, so they cannot stand in
-    // for an authored anchor.
+    // Footnote refs are same-page links this loop verifies, but they appear
+    // wherever a page has a footnote, so they cannot stand in for an authored
+    // anchor.
     let authoredSamePageChecked = 0;
     let crossPageChecked = 0;
 
@@ -329,7 +331,7 @@ describe('MDX heading ids', () => {
 
       if (route !== '') {
         expect(
-          routeExists(route, STATIC_ROUTES),
+          ROUTES.has(route),
           `${from} links to ${href}, which is not a route`
         ).toBe(true);
       }
@@ -337,9 +339,8 @@ describe('MDX heading ids', () => {
       // A bare trailing `#` is a valid top-of-page link.
       if (fragment === '') continue;
 
-      // '' targets the page the link sits on; `/a/b` targets content/a/b.mdx,
-      // the mapping MDX_PAGES registers for that route. Only MDX pages render
-      // heading ids, so a fragment aimed anywhere else cannot resolve.
+      // Only MDX pages render heading ids, so a fragment aimed at any other
+      // route cannot resolve.
       const ids = idsByFile.get(route === '' ? from : `${route.slice(1)}.mdx`);
       expect(
         ids,
@@ -352,8 +353,8 @@ describe('MDX heading ids', () => {
         authoredSamePageChecked++;
     }
 
-    // Guards the loop going vacuous: without these, every anchor link could be
-    // deleted from content/ and each assertion above would still pass.
+    // Without these, every anchor link could be deleted from content/ and each
+    // assertion above would still pass.
     expect(
       authoredSamePageChecked,
       'no authored same-page anchor checked'
