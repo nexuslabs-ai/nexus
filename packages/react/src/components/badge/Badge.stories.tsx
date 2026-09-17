@@ -362,6 +362,7 @@ export const Sentence: Story = {
 };
 
 export const HeightConsistency: Story = {
+  tags: ['!autodocs', '!dev'],
   render: () => (
     <div className="nx:flex nx:flex-col nx:items-start nx:gap-4">
       {HEIGHT_VARIANTS.map((variant) =>
@@ -395,6 +396,7 @@ export const HeightConsistency: Story = {
 };
 
 export const HeightSizingRow: Story = {
+  tags: ['!autodocs', '!dev'],
   render: () => (
     <div className="nx:flex nx:flex-wrap nx:items-center nx:gap-2">
       {HEIGHT_SHAPES.map(({ name, props }) => (
@@ -415,6 +417,7 @@ export const HeightSizingRow: Story = {
 };
 
 export const EnlargedTypography: Story = {
+  tags: ['!autodocs', '!dev'],
   ...HeightSizingRow,
   globals: { density: 'compact', stroke: 'strong', uiFontSize: 32 },
   play: async ({ canvasElement }) => {
@@ -433,6 +436,7 @@ export const EnlargedTypography: Story = {
 };
 
 export const StatusTransitions: Story = {
+  tags: ['!autodocs', '!dev'],
   render: () => <StatusTransitionsScene />,
   play: async ({ canvasElement }) => {
     const canvas = within(canvasElement);
@@ -458,6 +462,7 @@ export const StatusTransitions: Story = {
 };
 
 export const BoundaryChildren: Story = {
+  tags: ['!autodocs', '!dev'],
   render: () => (
     <div className="nx:flex nx:items-center nx:gap-2">
       {[undefined, null, false, '', <></>, 0].map((children, index) => (
@@ -497,6 +502,7 @@ export const BoundaryChildren: Story = {
 };
 
 export const TallCustomContent: Story = {
+  tags: ['!autodocs', '!dev'],
   render: () => (
     <Badge fill="outline" isCaps={false} data-testid="tall-badge">
       <span className="nx:h-12 nx:inline-flex nx:items-center">
@@ -521,6 +527,7 @@ export const TallCustomContent: Story = {
 };
 
 export const MinimumHeightOverride: Story = {
+  tags: ['!autodocs', '!dev'],
   args: { children: 'Custom height', className: 'nx:min-h-8' },
   play: async ({ canvasElement }) => {
     const badge = within(canvasElement).getByText('Custom height');
