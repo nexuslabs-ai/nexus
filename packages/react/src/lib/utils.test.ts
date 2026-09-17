@@ -10,7 +10,7 @@ const EMITTING_ROOTS = ['packages/tailwind', 'packages/react/src'];
 const EMITTED_STYLESHEETS = EMITTING_ROOTS.flatMap((root) => {
   const dir = path.resolve(process.cwd(), root);
   return fs
-    .readdirSync(dir, { recursive: true })
+    .readdirSync(dir, { recursive: true, encoding: 'utf8' })
     .filter((entry) => entry.endsWith('.css'))
     .map((entry) => ({
       root,
