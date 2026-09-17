@@ -10,18 +10,18 @@ point them at wherever you put it.
 
 ## The model
 
-| Field           | Type                                                    | Meaning                                                                                        |
-| --------------- | ------------------------------------------------------- | ---------------------------------------------------------------------------------------------- |
-| `mode`          | `'light' \| 'dark' \| 'system'`                         | Color scheme; `system` follows the OS.                                                         |
-| `brandColor`    | `string`                                                | Brand color seed, default `#0a0a0a`.                                                           |
-| `surfaceTone`   | `'stone' \| 'neutral' \| 'zinc' \| 'slate' \| 'gray'`   | Neutral surface family.                                                                        |
-| `lightContrast` | `number`                                                | Structural separation (light theme) for surfaces, borders, dividers, nav, controls, and cards. |
-| `darkContrast`  | `number`                                                | Structural separation (dark theme) for surfaces, borders, dividers, nav, controls, and cards.  |
-| `density`       | `'compact' \| 'default' \| 'comfortable' \| 'spacious'` | Spacing rhythm.                                                                                |
-| `corners`       | `'square' \| 'subtle' \| 'smooth' \| 'round'`           | Radius scale.                                                                                  |
-| `elevation`     | `'quiet' \| 'standard' \| 'strong'`                     | Shadow scale.                                                                                  |
-| `stroke`        | `'fine' \| 'normal' \| 'strong'`                        | Border-width scale.                                                                            |
-| `prefs`         | `NexusAppearancePrefs`                                  | UI/code font family, UI/code size, reduce motion, pointer cursors, and font smoothing.         |
+| Field           | Type                                                                            | Meaning                                                                                        |
+| --------------- | ------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------- |
+| `mode`          | `'light' \| 'dark' \| 'system'`                                                 | Color scheme; `system` follows the OS.                                                         |
+| `brandColor`    | `string`                                                                        | Brand color seed, default `#0a0a0a`.                                                           |
+| `surfaceTone`   | `'stone' \| 'neutral' \| 'zinc' \| 'slate' \| 'gray'`                           | Neutral surface family.                                                                        |
+| `lightContrast` | `number`                                                                        | Structural separation (light theme) for surfaces, borders, dividers, nav, controls, and cards. |
+| `darkContrast`  | `number`                                                                        | Structural separation (dark theme) for surfaces, borders, dividers, nav, controls, and cards.  |
+| `density`       | `'tight' \| 'compact' \| 'default' \| 'comfortable' \| 'relaxed' \| 'spacious'` | Spacing rhythm.                                                                                |
+| `corners`       | `'square' \| 'subtle' \| 'smooth' \| 'round' \| 'extra-round'`                  | Radius scale.                                                                                  |
+| `elevation`     | `'flat' \| 'quiet' \| 'soft' \| 'standard' \| 'strong'`                         | Shadow scale.                                                                                  |
+| `stroke`        | `'fine' \| 'normal' \| 'strong'`                                                | Border-width scale.                                                                            |
+| `prefs`         | `NexusAppearancePrefs`                                                          | UI/code font family, UI/code size, reduce motion, pointer cursors, and font smoothing.         |
 
 `lightContrast` and `darkContrast` are structure controls, not text hierarchy
 knobs — each tunes its own theme independently. Text may track a moving surface
@@ -33,12 +33,13 @@ Start from the shipped default and override the fields you own:
 
 ```ts
 import { DEFAULT_NEXUS_APPEARANCE } from '@nexus_ds/core';
+import type { NexusAppearanceState } from '@nexus_ds/core';
 
 export const defaultAppearance = {
   ...DEFAULT_NEXUS_APPEARANCE,
   brandColor: '#2563eb',
   surfaceTone: 'slate',
-};
+} satisfies NexusAppearanceState;
 ```
 
 `brandColor` drives the primary palette. `surfaceTone` picks the neutral family:

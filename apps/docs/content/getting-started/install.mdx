@@ -32,9 +32,11 @@ Everything this page tells you to copy lives in the
 | Components          | `packages/react/src/components/{name}/`              |
 
 Take the files by hand, as below. If instead you want a whole standalone design
-system of your own — the components and token generator forked into a
-publishable monorepo under your own scope — run `pnpm export` in a clone of the
-repo and follow that scaffold rather than this page.
+system of your own — the components and the generated token CSS forked into a
+publishable monorepo under your own scope, still depending on the published
+`@nexus_ds/core` for the runtime engine — clone the repo, run
+`pnpm export --name=your-design-system`, and follow that scaffold rather than
+this page.
 
 ## Step 1: Tailwind 4
 

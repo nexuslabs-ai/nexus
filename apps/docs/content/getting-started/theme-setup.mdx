@@ -27,12 +27,13 @@ the provider and the script:
 ```ts
 // app/appearance-state.ts or src/appearance-state.ts
 import { DEFAULT_NEXUS_APPEARANCE } from '@nexus_ds/core';
+import type { NexusAppearanceState } from '@nexus_ds/core';
 
 export const defaultAppearance = {
   ...DEFAULT_NEXUS_APPEARANCE,
   brandColor: '#2563eb',
   surfaceTone: 'slate',
-};
+} satisfies NexusAppearanceState;
 ```
 
 Surface tones are `stone`, `neutral`, `zinc`, `slate`, and `gray`.
