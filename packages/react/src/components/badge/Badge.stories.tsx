@@ -134,6 +134,14 @@ const HEIGHT_SHAPES = [
   },
 ] satisfies { name: string; props: BadgeProps }[];
 
+const SQUARE_FLOOR_SHAPES = new Set([
+  'icon-only',
+  'right-icon-only',
+  'zero',
+  'count',
+  'high-count',
+]);
+
 function assertBadgeGeometry(badge: HTMLElement) {
   const styles = getComputedStyle(badge);
   const rect = badge.getBoundingClientRect();
@@ -148,6 +156,11 @@ function assertBadgeGeometry(badge: HTMLElement) {
   expect(styles.boxSizing).toBe('border-box');
   expect(parseFloat(styles.minHeight)).toBeCloseTo(minimum, 1);
   expect(rect.height).toBeCloseTo(minimum, 1);
+  const shape = badge.dataset.shape;
+  if (shape && SQUARE_FLOOR_SHAPES.has(shape)) {
+    expect(parseFloat(styles.minWidth)).toBeCloseTo(minimum, 1);
+    expect(rect.width).toBeGreaterThanOrEqual(minimum - 0.5);
+  }
   const innerTop = rect.top + parseFloat(styles.borderTopWidth);
   const innerBottom = rect.bottom - parseFloat(styles.borderBottomWidth);
   for (const wrapper of badge.querySelectorAll(':scope > span')) {
@@ -370,6 +383,7 @@ export const HeightSizingRow: Story = {
         <Badge
           key={name}
           data-testid="sizing-badge"
+          data-shape={name}
           fill="outline"
           {...props}
         />
