@@ -142,7 +142,25 @@ const SQUARE_FLOOR_SHAPES = new Set([
   'high-count',
 ]);
 
+function badgeLabel(badge: HTMLElement) {
+  return (
+    [badge.dataset.variant, badge.dataset.fill, badge.dataset.shape]
+      .filter(Boolean)
+      .join(' / ') || 'badge'
+  );
+}
+
 function assertBadgeGeometry(badge: HTMLElement) {
+  try {
+    assertGeometry(badge);
+  } catch (error) {
+    if (error instanceof Error)
+      error.message = `${badgeLabel(badge)}: ${error.message}`;
+    throw error;
+  }
+}
+
+function assertGeometry(badge: HTMLElement) {
   const styles = getComputedStyle(badge);
   const rect = badge.getBoundingClientRect();
   const spacing = parseFloat(styles.getPropertyValue('--nx-spacing-6'));
@@ -467,9 +485,11 @@ export const BoundaryChildren: Story = {
     const badges = within(canvasElement).getAllByTestId('boundary-badge');
     await expect(badges).toHaveLength(7);
     for (const badge of badges) assertBadgeGeometry(badge);
-    for (const badge of badges.slice(0, 2))
+    for (const badge of badges.slice(0, 4)) {
       await expect(badge).toHaveAttribute('data-icon-only', 'true');
-    for (const badge of badges.slice(2))
+      await expect(badge).toHaveAttribute('role', 'img');
+    }
+    for (const badge of badges.slice(4))
       await expect(badge).not.toHaveAttribute('data-icon-only');
     await expect(badges[6]).toHaveAttribute('data-number', 'true');
     await expect(badges[6]!.querySelectorAll('svg')).toHaveLength(0);
