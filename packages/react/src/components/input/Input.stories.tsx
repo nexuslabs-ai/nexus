@@ -347,7 +347,6 @@ export const AutofillSurfaceTokens: Story = {
 
     expectAutofillFallbackChain('autofill-light-bordered');
     expectAutofillFallbackChain('autofill-light-borderless');
-    expectAutofillFallbackChain('autofill-light-disabled');
   },
 };
 

@@ -78,7 +78,7 @@ interface InputProps
  * @example
  * ```tsx
  * // Opt a field out of the default autofill surface
- * <Input className="nx:[--input-autofill-background:var(--color-muted)]" />
+ * <Input className="nx:[--input-autofill-background:var(--nx-color-control-background,var(--color-control-background))]" />
  * ```
  */
 function Input({ className, type, size, variant, ...props }: InputProps) {
