@@ -82,18 +82,31 @@ function DrawerOverlay({
   );
 }
 
+interface DrawerContentProps extends React.ComponentProps<
+  typeof DrawerPrimitive.Content
+> {
+  /**
+   * Renders the bottom-only visual indicator, not Vaul's gesture Handle.
+   * Does not change the root's `handleOnly` or `dismissible` behavior.
+   * @default true
+   * @example <DrawerContent showHandle={false} />
+   */
+  showHandle?: boolean;
+}
+
 /**
  * DrawerContent
  *
  * The sliding panel. Renders inside a portal with an overlay; vaul's `direction`
  * prop on the root picks which edge it slides from (defaults to `bottom`). The
- * drag handle shows only for the bottom direction.
+ * visual handle shows only for the bottom direction unless `showHandle` is false.
  */
 function DrawerContent({
   className,
   children,
+  showHandle = true,
   ...props
-}: React.ComponentProps<typeof DrawerPrimitive.Content>) {
+}: DrawerContentProps) {
   return (
     <DrawerPortal>
       <DrawerOverlay />
@@ -110,10 +123,12 @@ function DrawerContent({
         )}
         {...props}
       >
-        <div
-          data-slot="drawer-handle"
-          className="nx:mx-auto nx:mt-4 nx:hidden nx:h-2 nx:w-[100px] nx:shrink-0 nx:rounded-full nx:bg-muted nx:group-data-[vaul-drawer-direction=bottom]/drawer-content:block"
-        />
+        {showHandle && (
+          <div
+            data-slot="drawer-handle"
+            className="nx:mx-auto nx:mt-4 nx:hidden nx:h-2 nx:w-[100px] nx:shrink-0 nx:rounded-full nx:bg-muted nx:group-data-[vaul-drawer-direction=bottom]/drawer-content:block"
+          />
+        )}
         {children}
       </DrawerPrimitive.Content>
     </DrawerPortal>
@@ -220,6 +235,7 @@ export {
   DrawerBody,
   DrawerClose,
   DrawerContent,
+  type DrawerContentProps,
   DrawerDescription,
   DrawerFooter,
   DrawerHeader,
