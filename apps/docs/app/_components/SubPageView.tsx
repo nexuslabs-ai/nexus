@@ -1,5 +1,6 @@
 import { notFound } from 'next/navigation';
 
+import { sectionHref } from '../_lib/routes';
 import type { Block } from '../_lib/sections';
 import { getSection, getSubPage } from '../_lib/sections';
 
@@ -22,7 +23,7 @@ export function SubPageView({
       <Breadcrumb
         items={[
           { label: 'Home', href: '/' },
-          { label: section.title, href: `/${sectionSlug}` },
+          { label: section.title, href: sectionHref(sectionSlug) },
           { label: sub.label },
         ]}
       />

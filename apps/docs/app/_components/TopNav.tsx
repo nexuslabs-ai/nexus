@@ -7,6 +7,7 @@ import { useNexusAppearance } from '@nexus_ds/react/appearance';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 
+import { sectionHref } from '../_lib/routes';
 import { SECTIONS } from '../_lib/sections';
 
 import { Button } from './nexus';
@@ -15,7 +16,7 @@ import { SearchPalette } from './SearchPalette';
 const NAV_LINKS = [
   { href: '/', label: 'Home' },
   ...Object.entries(SECTIONS).map(([slug, section]) => ({
-    href: `/${slug}`,
+    href: sectionHref(slug),
     label: section.title,
   })),
   { href: '/changelog', label: 'Changelog' },

@@ -4,19 +4,17 @@ import { cn } from '@nexus_ds/react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 
-import type { Section } from '../_lib/sections';
+import { subPageHref } from '../_lib/routes';
+import { getSection } from '../_lib/sections';
 
 const RAIL_LINK_BASE =
   'nx:block nx:px-2 nx:py-1 nx:typography-label-default nx:rounded-sm nx:border-l-2 nx:no-underline nx:focus-visible:outline-2 nx:focus-visible:outline-focus-default nx:focus-visible:outline-offset-(--focus-offset)';
 
-export function LeftRail({
-  slug,
-  section,
-}: {
-  slug: string;
-  section: Section;
-}) {
+export function LeftRail({ sectionSlug }: { sectionSlug: string }) {
   const pathname = usePathname();
+  const section = getSection(sectionSlug);
+  if (!section) return null;
+
   return (
     <aside className="nx:sticky nx:top-(--docs-header-h) nx:self-start nx:max-h-[calc(100svh-var(--docs-header-h))] nx:overflow-y-auto nx:pr-2">
       <h3 className="nx:text-[11px] nx:font-semibold nx:uppercase nx:tracking-wider nx:text-muted-foreground nx:mb-2">
@@ -24,7 +22,7 @@ export function LeftRail({
       </h3>
       <ul className="nx:list-none nx:p-0 nx:m-0">
         {section.subs.map((sub) => {
-          const href = `/${slug}/${sub.slug}`;
+          const href = subPageHref(sectionSlug, sub.slug);
           const active = pathname === href;
           return (
             <li key={sub.slug}>

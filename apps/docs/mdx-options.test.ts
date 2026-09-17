@@ -6,14 +6,19 @@ import { fileURLToPath, pathToFileURL } from 'node:url';
 import { describe, expect, it, vi } from 'vitest';
 
 import { MDX_PAGES } from './app/_lib/mdx-pages';
-import { sectionParams, subPageParams } from './app/_lib/route-params';
+import {
+  sectionHref,
+  sectionParams,
+  subPageHref,
+  subPageParams,
+} from './app/_lib/routes';
 import { MDX_OPTIONS } from './mdx-options';
 
 const DOCS_DIR = path.dirname(fileURLToPath(import.meta.url));
 const CONTENT_DIR = path.join(DOCS_DIR, 'content');
 const APP_DIR = path.join(DOCS_DIR, 'app');
 
-// Next's default pageExtensions; next.config does not override it.
+// Next's default pageExtensions, which next.config leaves unset.
 const PAGE_FILENAMES = new Set(
   ['tsx', 'ts', 'jsx', 'js'].map((ext) => `page.${ext}`)
 );
@@ -203,15 +208,18 @@ const { staticRoutes: STATIC_ROUTES, dynamicDirs: DYNAMIC_PAGE_DIRS } =
 // Compiled once here; every test body below reads this instead of recompiling.
 const COMPILED = new Map(
   await Promise.all(
-    CONTENT_FILES.map(
-      async (contentPath) =>
-        [
-          contentPath,
-          await compileMdx(
-            await readFile(path.join(CONTENT_DIR, contentPath), 'utf8')
-          ),
-        ] as const
-    )
+    CONTENT_FILES.map(async (contentPath) => {
+      const source = await readFile(
+        path.join(CONTENT_DIR, contentPath),
+        'utf8'
+      );
+      try {
+        return [contentPath, await compileMdx(source)] as const;
+      } catch (cause) {
+        // The compile error names a line and column, not the file.
+        throw new Error(`failed to compile ${contentPath}`, { cause });
+      }
+    })
   )
 );
 
@@ -225,8 +233,8 @@ function compiled(contentPath: string) {
 // generateStaticParams output.
 const ROUTES = new Set([
   ...STATIC_ROUTES,
-  ...sectionParams().map(({ section }) => `/${section}`),
-  ...[...SUB_PAGE_KEYS].map((key) => `/${key}`),
+  ...sectionParams().map(({ section }) => sectionHref(section)),
+  ...subPageParams().map(({ section, sub }) => subPageHref(section, sub)),
 ]);
 
 describe('docs MDX pipeline and link integrity', () => {
@@ -256,6 +264,12 @@ describe('docs MDX pipeline and link integrity', () => {
     expect(rules?.['#next-mdx']?.loaders[0]?.options).toMatchObject(
       MDX_OPTIONS
     );
+  });
+
+  it('leaves pageExtensions at the default PAGE_FILENAMES assumes', async () => {
+    const { default: config } = await import('./next.config');
+
+    expect(config.pageExtensions).toBeUndefined();
   });
 
   it('discovers the routes App Router serves from a literal path', () => {

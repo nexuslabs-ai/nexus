@@ -4,7 +4,7 @@ import { Breadcrumb } from '../../_components/Breadcrumb';
 import { SubPageView } from '../../_components/SubPageView';
 import { MDX_PAGES } from '../../_lib/mdx-pages';
 import { REAL_PAGES } from '../../_lib/real-pages';
-import { subPageParams } from '../../_lib/route-params';
+import { sectionHref, subPageParams } from '../../_lib/routes';
 import { getSection, getSubPage } from '../../_lib/sections';
 
 export function generateStaticParams() {
@@ -38,7 +38,7 @@ export default async function Page({
         <Breadcrumb
           items={[
             { label: 'Home', href: '/' },
-            { label: sec.title, href: `/${section}` },
+            { label: sec.title, href: sectionHref(section) },
             { label: subPage?.label ?? sub },
           ]}
         />

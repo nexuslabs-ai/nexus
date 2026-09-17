@@ -4,6 +4,7 @@ import { useEffect, useState } from 'react';
 
 import { useRouter } from 'next/navigation';
 
+import { subPageHref } from '../_lib/routes';
 import { SECTIONS } from '../_lib/sections';
 
 import {
@@ -25,7 +26,7 @@ const INDEX = Object.entries(SECTIONS).map(([slug, section]) => ({
   title: section.title,
   items: section.subs.map((sub) => ({
     label: sub.label,
-    href: `/${slug}/${sub.slug}`,
+    href: subPageHref(slug, sub.slug),
   })),
 }));
 

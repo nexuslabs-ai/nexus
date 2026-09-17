@@ -11,3 +11,13 @@ export function subPageParams() {
     subs.map((sub) => ({ section, sub: sub.slug }))
   );
 }
+
+/** The path `app/[section]` serves for a section key. */
+export function sectionHref(section: string) {
+  return `/${section}`;
+}
+
+/** The path `app/[section]/[sub]` serves for a section key and sub-page slug. */
+export function subPageHref(section: string, sub: string) {
+  return `/${section}/${sub}`;
+}

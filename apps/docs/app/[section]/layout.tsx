@@ -11,11 +11,6 @@ export default async function Layout({
   params: Promise<{ section: string }>;
 }) {
   const { section } = await params;
-  const sec = getSection(section);
-  if (!sec) notFound();
-  return (
-    <SectionLayout slug={section} section={sec}>
-      {children}
-    </SectionLayout>
-  );
+  if (!getSection(section)) notFound();
+  return <SectionLayout sectionSlug={section}>{children}</SectionLayout>;
 }

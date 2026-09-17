@@ -1,7 +1,7 @@
 import { notFound, redirect } from 'next/navigation';
 
-import { sectionParams } from '../_lib/route-params';
-import { getDefaultSub, getSection } from '../_lib/sections';
+import { sectionParams, subPageHref } from '../_lib/routes';
+import { getDefaultSub } from '../_lib/sections';
 
 export function generateStaticParams() {
   return sectionParams();
@@ -15,6 +15,7 @@ export default async function Page({
   params: Promise<{ section: string }>;
 }) {
   const { section } = await params;
-  if (!getSection(section)) notFound();
-  redirect(`/${section}/${getDefaultSub(section)}`);
+  const sub = getDefaultSub(section);
+  if (!sub) notFound();
+  redirect(subPageHref(section, sub));
 }
