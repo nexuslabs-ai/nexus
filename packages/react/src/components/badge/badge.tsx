@@ -5,7 +5,7 @@ import { cva, type VariantProps } from 'class-variance-authority';
 import { cn } from '../../lib/utils';
 
 const badgeVariants = cva(
-  'nx:inline-flex nx:items-center nx:justify-center nx:gap-1 nx:rounded-md nx:whitespace-nowrap nx:transition-colors nx:w-fit',
+  'nx:inline-flex nx:box-border nx:min-h-[max(var(--nx-spacing-6),calc(var(--nx-typography-line-height-sm)_+_2_*_var(--nx-borderwidth-default)))] nx:py-0 nx:items-center nx:justify-center nx:gap-1 nx:rounded-md nx:whitespace-nowrap nx:transition-colors nx:w-fit',
   {
     variants: {
       variant: {
@@ -141,10 +141,10 @@ function badgeShapeClasses(
   isCaps: boolean
 ) {
   if (isNumber)
-    return 'nx:min-h-6 nx:min-w-6 nx:rounded-full nx:px-1.5 nx:py-0 nx:typography-label-caps nx:tabular-nums';
-  if (isIconOnly) return 'nx:h-6 nx:min-w-6 nx:p-0';
-  if (isCaps) return 'nx:typography-label-caps nx:uppercase nx:px-2 nx:py-1';
-  return 'nx:typography-label-default nx:px-2.5 nx:py-1';
+    return 'nx:min-w-6 nx:rounded-full nx:px-1.5 nx:typography-label-caps nx:tabular-nums';
+  if (isIconOnly) return 'nx:min-w-6 nx:p-0';
+  if (isCaps) return 'nx:typography-label-caps nx:uppercase nx:px-2';
+  return 'nx:typography-label-default nx:px-2.5';
 }
 
 interface BadgeProps
