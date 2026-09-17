@@ -13,13 +13,12 @@ import { Button } from './nexus';
 import { SearchPalette } from './SearchPalette';
 
 const NAV_LINKS = [
-  { href: '/', label: 'Home', match: '/' },
-  ...Object.values(SECTIONS).map((section) => ({
-    href: section.href,
+  { href: '/', label: 'Home' },
+  ...Object.entries(SECTIONS).map(([slug, section]) => ({
+    href: `/${slug}`,
     label: section.title,
-    match: section.href,
   })),
-  { href: '/changelog', label: 'Changelog', match: '/changelog' },
+  { href: '/changelog', label: 'Changelog' },
 ];
 
 const NAV_LINK_BASE =
@@ -30,9 +29,9 @@ const PANEL_LINK_BASE = cn(NAV_LINK_BASE, 'nx:block nx:border-l-2');
 const COARSE_HIT_AREA =
   'nx:relative nx:pointer-coarse:after:absolute nx:pointer-coarse:after:-inset-2';
 
-function isActive(pathname: string, match: string) {
-  if (match === '/') return pathname === '/';
-  return pathname === match || pathname.startsWith(match + '/');
+function isActive(pathname: string, href: string) {
+  if (href === '/') return pathname === '/';
+  return pathname === href || pathname.startsWith(href + '/');
 }
 
 function centerInStrip(link: HTMLAnchorElement | null) {
@@ -51,7 +50,7 @@ export function TopNav() {
   const [menuOpen, setMenuOpen] = useState(false);
   const { resolvedMode, setState } = useNexusAppearance();
   const isDark = resolvedMode === 'dark';
-  const currentLink = NAV_LINKS.find((link) => isActive(pathname, link.match));
+  const currentLink = NAV_LINKS.find((link) => isActive(pathname, link.href));
 
   // relatedTarget is null when focus goes nowhere, not when it leaves the nav.
   const closeOnFocusLeave = (event: React.FocusEvent<HTMLElement>) => {
@@ -115,7 +114,7 @@ export function TopNav() {
         {menuOpen && (
           <ul className="nx:absolute nx:top-full nx:left-0 nx:mt-1 nx:z-popover nx:min-w-48 nx:max-h-[70svh] nx:overflow-y-auto nx:list-none nx:m-0 nx:flex nx:flex-col nx:gap-0.5 nx:p-1 nx:rounded-md nx:border nx:border-border-default nx:bg-popover nx:text-popover-foreground nx:shadow-lg">
             {NAV_LINKS.map((link) => {
-              const active = isActive(pathname, link.match);
+              const active = isActive(pathname, link.href);
               return (
                 <li key={link.href}>
                   <Link
@@ -142,7 +141,7 @@ export function TopNav() {
         className="nx:hidden nx:xl:flex nx:gap-0.5 nx:flex-1 nx:min-w-0 nx:overflow-x-auto nx:py-1.5"
       >
         {NAV_LINKS.map((link) => {
-          const active = isActive(pathname, link.match);
+          const active = isActive(pathname, link.href);
           return (
             <Link
               key={link.href}

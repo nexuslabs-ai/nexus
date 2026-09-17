@@ -22,7 +22,7 @@ export function SubPageView({
       <Breadcrumb
         items={[
           { label: 'Home', href: '/' },
-          { label: section.title, href: section.href },
+          { label: section.title, href: `/${sectionSlug}` },
           { label: sub.label },
         ]}
       />

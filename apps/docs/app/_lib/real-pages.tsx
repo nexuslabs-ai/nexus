@@ -10,9 +10,9 @@ import { Typography } from '../_pages/Typography';
 
 /**
  * Hand-built "real" pages, keyed by `${section}/${sub}`. The dynamic route
- * renders one of these if present, otherwise falls back to the registry
- * placeholder view (SubPageView). This is the page-by-page migration path:
- * a placeholder becomes real by adding an entry here (or, later, an MDX file).
+ * resolves MDX content first, then one of these, then the registry placeholder
+ * view (SubPageView). This is the page-by-page migration path: a placeholder
+ * becomes real by adding a content/ MDX file or an entry here.
  */
 export const REAL_PAGES: Record<string, ComponentType> = {
   'foundations/color': ColorShowcase,

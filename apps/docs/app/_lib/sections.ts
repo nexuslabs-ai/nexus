@@ -38,18 +38,15 @@ export type SubPage = {
   blocks: Block[];
 };
 
+/** The route slug is the SECTIONS object key, not a field here. */
 export type Section = {
-  slug: string;
   title: string;
-  href: string;
   subs: SubPage[];
 };
 
 export const SECTIONS = {
   'getting-started': {
-    slug: 'getting-started',
     title: 'Getting Started',
-    href: '/getting-started',
     subs: [
       {
         slug: 'install',
@@ -145,9 +142,7 @@ export const SECTIONS = {
     ],
   },
   foundations: {
-    slug: 'foundations',
     title: 'Foundations',
-    href: '/foundations',
     subs: [
       {
         slug: 'color',
@@ -304,9 +299,7 @@ export const SECTIONS = {
     ],
   },
   components: {
-    slug: 'components',
     title: 'Components',
-    href: '/components',
     subs: [
       {
         slug: 'inputs',
@@ -396,9 +389,7 @@ export const SECTIONS = {
     ],
   },
   theming: {
-    slug: 'theming',
     title: 'Theming',
-    href: '/theming',
     subs: [
       {
         slug: 'appearance',
@@ -449,9 +440,7 @@ export const SECTIONS = {
     ],
   },
   tools: {
-    slug: 'tools',
     title: 'Tools',
-    href: '/tools',
     subs: [
       {
         slug: 'nx-prefix',
@@ -541,9 +530,7 @@ export const SECTIONS = {
     ],
   },
   guidance: {
-    slug: 'guidance',
     title: 'Guidance',
-    href: '/guidance',
     subs: [
       {
         slug: 'engineering',
@@ -598,9 +585,7 @@ export const SECTIONS = {
     ],
   },
   agents: {
-    slug: 'agents',
     title: 'For AI agents',
-    href: '/agents',
     subs: [
       {
         slug: 'llms-txt',

@@ -6,17 +6,17 @@ import { fileURLToPath, pathToFileURL } from 'node:url';
 import { describe, expect, it, vi } from 'vitest';
 
 import { MDX_PAGES } from './app/_lib/mdx-pages';
-import { SECTIONS } from './app/_lib/sections';
-import { generateStaticParams as subPageParams } from './app/[section]/[sub]/page';
-import { generateStaticParams as sectionParams } from './app/[section]/page';
+import { sectionParams, subPageParams } from './app/_lib/route-params';
 import { MDX_OPTIONS } from './mdx-options';
-import { PAGE_EXTENSIONS } from './page-extensions';
 
 const DOCS_DIR = path.dirname(fileURLToPath(import.meta.url));
 const CONTENT_DIR = path.join(DOCS_DIR, 'content');
 const APP_DIR = path.join(DOCS_DIR, 'app');
 
-const PAGE_FILENAMES = new Set(PAGE_EXTENSIONS.map((ext) => `page.${ext}`));
+// Next's default pageExtensions; next.config does not override it.
+const PAGE_FILENAMES = new Set(
+  ['tsx', 'ts', 'jsx', 'js'].map((ext) => `page.${ext}`)
+);
 
 const SUB_PAGE_KEYS = new Set(
   subPageParams().map(({ section, sub }) => `${section}/${sub}`)
@@ -94,24 +94,27 @@ async function contentFiles() {
     );
 }
 
-// Segments App Router does not serve at their literal path: `[dynamic]` paths
-// come from SECTIONS, `_private` opts out of routing, `@slot` renders into a
-// layout slot, and `(.)`/`(..)` intercept another route.
-const NON_ROUTABLE_PREFIXES = ['[', '_', '@', '(.'];
+// Segments App Router keeps out of the served path entirely: `_private` opts
+// out of routing, `@slot` renders into a layout slot, and `(.)`/`(..)`
+// intercept another route.
+const OPT_OUT_PREFIXES = ['_', '@', '(.'];
 
-function isRoutable(segment: string) {
-  return !NON_ROUTABLE_PREFIXES.some((prefix) => segment.startsWith(prefix));
+function isServed(segment: string) {
+  return !OPT_OUT_PREFIXES.some((prefix) => segment.startsWith(prefix));
 }
 
-// Every directory holding a page file, minus the ones a naming convention takes
-// out of the path. Route groups — `(marketing)` — nest without contributing a
-// path segment, so they are dropped after the routable check.
-async function staticRoutes() {
+// Every directory holding a page file, split by how its routes are known. A
+// `[dynamic]` directory serves whatever its own generateStaticParams emits, so
+// it is returned by name for the pin below; every other directory is its own
+// path, minus route groups — `(marketing)` — which nest without contributing a
+// segment.
+async function pageDirectories() {
   const entries = await readdir(APP_DIR, {
     withFileTypes: true,
     recursive: true,
   });
-  const routes = new Set<string>();
+  const staticRoutes = new Set<string>();
+  const dynamicDirs = new Set<string>();
 
   for (const entry of entries) {
     if (!entry.isFile() || !PAGE_FILENAMES.has(entry.name)) continue;
@@ -121,13 +124,18 @@ async function staticRoutes() {
       .split(path.sep)
       .filter((segment) => segment !== '');
 
-    if (!segments.every(isRoutable)) continue;
+    if (!segments.every(isServed)) continue;
+
+    if (segments.some((segment) => segment.startsWith('['))) {
+      dynamicDirs.add(segments.join('/'));
+      continue;
+    }
 
     const served = segments.filter((segment) => !segment.startsWith('('));
-    routes.add(`/${served.join('/')}`);
+    staticRoutes.add(`/${served.join('/')}`);
   }
 
-  return routes;
+  return { staticRoutes, dynamicDirs };
 }
 
 // An href leaves the docs app when it names a scheme (`https:`, `mailto:`) or a
@@ -189,17 +197,39 @@ async function compileMdx(source: string) {
 }
 
 const CONTENT_FILES = await contentFiles();
-const STATIC_ROUTES = await staticRoutes();
+const { staticRoutes: STATIC_ROUTES, dynamicDirs: DYNAMIC_PAGE_DIRS } =
+  await pageDirectories();
 
-// Every route the app serves: literal page files, plus the two dynamic routes'
-// own generateStaticParams output.
+// Compiled once here; every test body below reads this instead of recompiling.
+const COMPILED = new Map(
+  await Promise.all(
+    CONTENT_FILES.map(
+      async (contentPath) =>
+        [
+          contentPath,
+          await compileMdx(
+            await readFile(path.join(CONTENT_DIR, contentPath), 'utf8')
+          ),
+        ] as const
+    )
+  )
+);
+
+function compiled(contentPath: string) {
+  const result = COMPILED.get(contentPath);
+  if (!result) throw new Error(`${contentPath} is not under content/`);
+  return result;
+}
+
+// Every route the app serves: literal page files, plus each dynamic route's own
+// generateStaticParams output.
 const ROUTES = new Set([
   ...STATIC_ROUTES,
   ...sectionParams().map(({ section }) => `/${section}`),
   ...[...SUB_PAGE_KEYS].map((key) => `/${key}`),
 ]);
 
-describe('MDX heading ids', () => {
+describe('docs MDX pipeline and link integrity', () => {
   it('registers rehype-slug where the loader can resolve it', () => {
     expect(MDX_OPTIONS.rehypePlugins).toContain('rehype-slug');
 
@@ -211,9 +241,12 @@ describe('MDX heading ids', () => {
     }
   });
 
-  it('ships MDX_OPTIONS and pageExtensions through next.config', async () => {
-    // @next/mdx only emits turbopack.rules when TURBOPACK is set.
+  it('ships MDX_OPTIONS through next.config', async () => {
+    // @next/mdx only emits turbopack.rules when TURBOPACK is set, and the
+    // config module is cached — reset so this does not depend on being the
+    // first importer.
     vi.stubEnv('TURBOPACK', '1');
+    vi.resetModules();
     const { default: config } = await import('./next.config');
 
     const rules = config.turbopack?.rules as
@@ -223,7 +256,6 @@ describe('MDX heading ids', () => {
     expect(rules?.['#next-mdx']?.loaders[0]?.options).toMatchObject(
       MDX_OPTIONS
     );
-    expect(config.pageExtensions).toEqual(['ts', 'tsx', 'js', 'jsx', 'mdx']);
   });
 
   it('discovers the routes App Router serves from a literal path', () => {
@@ -234,13 +266,14 @@ describe('MDX heading ids', () => {
     ]);
   });
 
-  // `[section]` emits object keys and `[sub]` emits `section.slug`, while every
-  // lookup indexes SECTIONS by object key. A diverged pair builds a route that
-  // 404s.
-  it('keys every section by its own slug', () => {
-    for (const [key, section] of Object.entries(SECTIONS)) {
-      expect(section.slug, `SECTIONS key ${key}`).toBe(key);
-    }
+  // ROUTES builds these two from sectionParams and subPageParams. Pinning the
+  // walk's output means a third dynamic route fails here until its params
+  // source is registered there.
+  it('pins every dynamic route to a registered params source', () => {
+    expect([...DYNAMIC_PAGE_DIRS].sort()).toEqual([
+      '[section]',
+      '[section]/[sub]',
+    ]);
   });
 
   it('pins every .mdx under content/', () => {
@@ -267,12 +300,8 @@ describe('MDX heading ids', () => {
 
   it.each(Object.entries(EXPECTED_HEADING_IDS))(
     'pins the heading ids of %s',
-    async (contentPath, expected) => {
-      const source = await readFile(
-        path.join(CONTENT_DIR, contentPath),
-        'utf8'
-      );
-      const { headings } = await compileMdx(source);
+    (contentPath, expected) => {
+      const { headings } = compiled(contentPath);
 
       expect(headings.map((h) => h.properties?.id)).toEqual(expected);
     }
@@ -280,12 +309,8 @@ describe('MDX heading ids', () => {
 
   it.each(CONTENT_FILES)(
     'gives %s unique, addressable heading ids',
-    async (contentPath) => {
-      const source = await readFile(
-        path.join(CONTENT_DIR, contentPath),
-        'utf8'
-      );
-      const { headings, ids } = await compileMdx(source);
+    (contentPath) => {
+      const { headings, ids } = compiled(contentPath);
 
       expect(headings.length).toBeGreaterThan(0);
       expect(new Set(ids).size).toBe(ids.length);
@@ -298,22 +323,12 @@ describe('MDX heading ids', () => {
     }
   );
 
-  it('points every in-repo link at a route and an id that exist', async () => {
-    const idsByFile = new Map<string, Set<string>>();
-    const links: { from: string; href: string }[] = [];
-
-    for (const contentPath of CONTENT_FILES) {
-      const source = await readFile(
-        path.join(CONTENT_DIR, contentPath),
-        'utf8'
-      );
-      const { ids, hrefs } = await compileMdx(source);
-
-      idsByFile.set(contentPath, new Set(ids));
-      for (const href of hrefs.filter(isInRepo)) {
-        links.push({ from: contentPath, href });
-      }
-    }
+  it('points every in-repo link at a route and an id that exist', () => {
+    const links = CONTENT_FILES.flatMap((from) =>
+      compiled(from)
+        .hrefs.filter(isInRepo)
+        .map((href) => ({ from, href }))
+    );
 
     // Footnote refs are same-page links this loop verifies, but they appear
     // wherever a page has a footnote, so they cannot stand in for an authored
@@ -341,12 +356,14 @@ describe('MDX heading ids', () => {
 
       // Only MDX pages render heading ids, so a fragment aimed at any other
       // route cannot resolve.
-      const ids = idsByFile.get(route === '' ? from : `${route.slice(1)}.mdx`);
+      const targetIds = COMPILED.get(
+        route === '' ? from : `${route.slice(1)}.mdx`
+      )?.ids;
       expect(
-        ids,
+        targetIds,
         `${from} links to ${href}, and only MDX pages render heading ids`
       ).toBeDefined();
-      expect([...(ids ?? [])], `${from} links to ${href}`).toContain(fragment);
+      expect(targetIds ?? [], `${from} links to ${href}`).toContain(fragment);
 
       if (route !== '') crossPageChecked++;
       else if (!fragment.startsWith(FOOTNOTE_ID_PREFIX))

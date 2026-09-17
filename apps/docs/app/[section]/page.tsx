@@ -1,9 +1,10 @@
 import { notFound, redirect } from 'next/navigation';
 
-import { getDefaultSub, getSection, SECTIONS } from '../_lib/sections';
+import { sectionParams } from '../_lib/route-params';
+import { getDefaultSub, getSection } from '../_lib/sections';
 
 export function generateStaticParams() {
-  return Object.keys(SECTIONS).map((section) => ({ section }));
+  return sectionParams();
 }
 
 export const dynamicParams = false;

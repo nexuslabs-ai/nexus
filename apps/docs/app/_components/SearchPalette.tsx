@@ -21,11 +21,11 @@ import {
  * stays in sync as pages are added. Built on the Nexus Command (cmdk) surface.
  */
 
-const INDEX = Object.values(SECTIONS).map((section) => ({
+const INDEX = Object.entries(SECTIONS).map(([slug, section]) => ({
   title: section.title,
   items: section.subs.map((sub) => ({
     label: sub.label,
-    href: `/${section.slug}/${sub.slug}`,
+    href: `/${slug}/${sub.slug}`,
   })),
 }));
 

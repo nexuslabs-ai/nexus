@@ -13,5 +13,9 @@ export default async function Layout({
   const { section } = await params;
   const sec = getSection(section);
   if (!sec) notFound();
-  return <SectionLayout section={sec}>{children}</SectionLayout>;
+  return (
+    <SectionLayout slug={section} section={sec}>
+      {children}
+    </SectionLayout>
+  );
 }
