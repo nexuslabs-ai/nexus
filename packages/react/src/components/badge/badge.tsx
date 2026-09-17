@@ -152,6 +152,12 @@ function badgeShapeClasses(
   return 'nx:typography-label-default nx:px-2.5';
 }
 
+function hasRenderableChildren(children: React.ReactNode) {
+  return React.Children.toArray(children).some(
+    (child) => typeof child !== 'string' || child.trim().length > 0
+  );
+}
+
 interface BadgeProps
   extends React.ComponentProps<'span'>, VariantProps<typeof badgeVariants> {
   /**
@@ -218,7 +224,7 @@ function Badge({
   children,
   ...props
 }: BadgeProps) {
-  const hasChildren = React.Children.count(children) > 0;
+  const hasChildren = hasRenderableChildren(children);
   const isIconOnly =
     !isNumber && !hasChildren && Boolean(leftIcon || rightIcon);
   const iconOnlyIcon = leftIcon ?? rightIcon;
