@@ -992,7 +992,7 @@
 /* ===== FOCUS RING ===== */
 [data-slot='input'],
 [data-slot='sidebar-input'] {
-  --field-shadow: none;
+  --field-shadow: 0 0 #0000;
 }
 
 [data-slot='input'][data-variant='bordered'],

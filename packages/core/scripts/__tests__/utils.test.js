@@ -272,6 +272,15 @@ describe('utils', () => {
       expect(css).toMatch(/outline-width:\s*2px\s*!important;/);
       expect(css).toMatch(/box-shadow:\s*none\s*!important;/);
     });
+
+    it('resets --field-shadow to a composable no-op, never the `none` keyword', () => {
+      const css = generateFocusRingCSS();
+
+      expect(css).toMatch(
+        /\[data-slot='input'\],\n\[data-slot='sidebar-input'\] \{\n\s*--field-shadow:\s*0 0 #0000;/
+      );
+      expect(css).not.toMatch(/--field-shadow:\s*none/);
+    });
   });
 
   describe('generateNativeBrowserUIThemeCSS', () => {

@@ -1969,6 +1969,8 @@ const FIELD_DISABLED_BOUNDARY_SELECTORS = [
   "[data-slot='input-group'][data-variant='bordered'][data-disabled='true']",
 ];
 
+/** Transparent no-op shadow; `none` is not a valid `<shadow>` list item. */
+const FIELD_NO_SHADOW = '0 0 #0000';
 const FIELD_DEFAULT_SHADOW = 'inset 0 0 0 1px var(--color-border-default)';
 const FIELD_ERROR_SHADOW = 'inset 0 0 0 1px var(--color-border-error)';
 const FIELD_DISABLED_SHADOW = 'inset 0 0 0 1px var(--color-border-disabled)';
@@ -2049,7 +2051,7 @@ export function generateFocusRingCSS() {
 /* ===== FOCUS RING ===== */
 [data-slot='input'],
 [data-slot='sidebar-input'] {
-  --field-shadow: none;
+  --field-shadow: ${FIELD_NO_SHADOW};
 }
 
 ${fieldBoundarySelectors} {
