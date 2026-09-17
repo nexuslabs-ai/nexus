@@ -49,15 +49,18 @@ the cookie is missing or invalid.
 
 ```tsx
 // app/layout.tsx
-import type { Viewport } from 'next';
-import { cookies } from 'next/headers';
 import {
   createNexusAppearanceSnapshotFromCookie,
   DEFAULT_COOKIE_KEY,
 } from '@nexus_ds/core';
+import type { Viewport } from 'next';
+import { cookies } from 'next/headers';
+
 import { NexusAppearanceProvider } from '@/components/appearance';
 import { NexusAppearanceScript } from '@/components/appearance/server';
+
 import { defaultAppearance } from './appearance-state';
+
 import './globals.css';
 
 export const viewport: Viewport = { colorScheme: 'light dark' };
@@ -111,12 +114,13 @@ Vite has no server render, so inject the first-paint script at build time with
 
 ```ts
 // vite.config.ts
-import { defineConfig } from 'vite';
-import react from '@vitejs/plugin-react';
 import {
   createNexusAppearanceBootstrapScript,
   createNexusAppearanceSnapshotFromState,
 } from '@nexus_ds/core';
+import react from '@vitejs/plugin-react';
+import { defineConfig } from 'vite';
+
 import { defaultAppearance } from './src/appearance-state';
 
 const STORAGE_KEY = 'app-appearance';
@@ -143,9 +147,11 @@ export default defineConfig({
 ```tsx
 // src/main.tsx
 import { createRoot } from 'react-dom/client';
-import { createNexusAppearance } from './components/appearance';
-// ^ the provider folder from Install, under src/ for a Vite app
+
 import { defaultAppearance } from './appearance-state';
+// the provider folder from Install, under src/ for a Vite app
+import { createNexusAppearance } from './components/appearance';
+
 import './index.css';
 
 const { NexusAppearanceProvider } = createNexusAppearance({
