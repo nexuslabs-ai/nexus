@@ -324,6 +324,59 @@ export const FontFamilies: Story = {
   render: () => <FontFamiliesStory />,
 };
 
+export const LabelCapsLineHeight: Story = {
+  globals: { uiFontSize: 14 },
+  render: () => (
+    <div className="nx:flex nx:flex-col nx:items-start nx:gap-2">
+      <span
+        data-testid="label-caps"
+        className="nx:typography-label-caps nx:text-muted-foreground"
+      >
+        LABEL CAPS
+      </span>
+      <span
+        data-testid="label-caps"
+        className="nx:typography-label-caps nx:text-foreground"
+      >
+        Mixed-case Label Caps
+      </span>
+      <span className="nx:typography-body-small nx:text-muted-foreground">
+        Representative standalone console/docs label rhythm
+      </span>
+    </div>
+  ),
+  play: async ({ canvasElement }) => {
+    const labels = canvasElement.querySelectorAll<HTMLElement>(
+      '[data-testid="label-caps"]'
+    );
+    await expect(labels).toHaveLength(2);
+    for (const label of labels) {
+      await waitFor(() =>
+        expect(getComputedStyle(label).lineHeight).toBe('12px')
+      );
+      expect(getComputedStyle(label).lineHeight).toBe(
+        getComputedStyle(label)
+          .getPropertyValue('--nx-typography-line-height-xxs')
+          .trim()
+      );
+    }
+  },
+};
+
+export const ScaledLabelCapsLineHeight: Story = {
+  ...LabelCapsLineHeight,
+  globals: { uiFontSize: 28 },
+  play: async ({ canvasElement }) => {
+    for (const label of canvasElement.querySelectorAll<HTMLElement>(
+      '[data-testid="label-caps"]'
+    )) {
+      await waitFor(() =>
+        expect(getComputedStyle(label).lineHeight).toBe('24px')
+      );
+    }
+  },
+};
+
 export const CompositeUtilities: Story = {
   render: () => (
     <div className="nx:flex nx:flex-col nx:gap-10 nx:p-10 nx:bg-background nx:min-w-fit">
