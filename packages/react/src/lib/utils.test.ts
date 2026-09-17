@@ -26,18 +26,39 @@ const EMITTED_CSS = EMITTING_ROOTS.flatMap((root) => {
  * registered token collapses against it and an unregistered one does not.
  */
 const THEME_NAMESPACES = [
-  { cssKey: 'radius', utility: 'rounded', sentinel: 'nx:rounded-none' },
-  { cssKey: 'ease', utility: 'ease', sentinel: 'nx:ease-initial' },
-  { cssKey: 'shadow', utility: 'shadow', sentinel: 'nx:shadow-none' },
-  { cssKey: 'animate', utility: 'animate', sentinel: 'nx:animate-none' },
-  { cssKey: 'z-index', utility: 'z', sentinel: 'nx:z-auto' },
+  {
+    cssKey: 'radius',
+    utility: 'rounded',
+    sentinel: 'nx:rounded-none',
+    registered: NEXUS_THEME_SCALES.radius,
+  },
+  {
+    cssKey: 'ease',
+    utility: 'ease',
+    sentinel: 'nx:ease-initial',
+    registered: NEXUS_THEME_SCALES.ease,
+  },
+  {
+    cssKey: 'shadow',
+    utility: 'shadow',
+    sentinel: 'nx:shadow-none',
+    registered: NEXUS_THEME_SCALES.shadow,
+  },
+  {
+    cssKey: 'animate',
+    utility: 'animate',
+    sentinel: 'nx:animate-none',
+    registered: NEXUS_THEME_SCALES.animate,
+  },
+  {
+    cssKey: 'z-index',
+    utility: 'z',
+    sentinel: 'nx:z-auto',
+    registered: NEXUS_CLASS_GROUPS.z.map((utility) =>
+      utility.replace(/^z-/, '')
+    ),
+  },
 ];
-
-/** Registered tokens per namespace. A namespace with nothing custom left is absent, not empty. */
-const REGISTERED_THEME_TOKENS: Record<string, readonly string[]> = {
-  ...NEXUS_THEME_SCALES,
-  'z-index': NEXUS_CLASS_GROUPS.z.map((utility) => utility.replace(/^z-/, '')),
-};
 
 /** CSS property a `typography-*` composite can declare, mapped to its owning class group. */
 const TYPOGRAPHY_PROPERTY_GROUPS: Record<string, string> = {
@@ -127,7 +148,7 @@ describe('cn', () => {
   });
   /* eslint-enable @nexus_ds/nx-class-conventions */
 
-  it('lists every property the typography composites declare as a conflict', () => {
+  it('conflicts with exactly the groups the typography composites declare', () => {
     const declared = new Set(
       EMITTED_CSS.flatMap((css) =>
         [
@@ -139,17 +160,13 @@ describe('cn', () => {
         )
       )
     );
-    const conflicts = new Set<string>(TYPOGRAPHY_CONFLICTS);
 
     expect([...declared].sort()).toEqual(
       Object.keys(TYPOGRAPHY_PROPERTY_GROUPS).sort()
     );
-    expect(
-      [...declared].filter((property) => {
-        const group = TYPOGRAPHY_PROPERTY_GROUPS[property ?? ''];
-        return group === undefined || !conflicts.has(group);
-      })
-    ).toEqual([]);
+    expect([...TYPOGRAPHY_CONFLICTS].sort()).toEqual(
+      [...new Set(Object.values(TYPOGRAPHY_PROPERTY_GROUPS))].sort()
+    );
   });
 
   it('registers every emitted custom utility', () => {
@@ -179,9 +196,9 @@ describe('cn', () => {
 
   it.each(THEME_NAMESPACES)(
     'finds every registered $cssKey token in the scanned CSS',
-    ({ cssKey }) => {
+    ({ cssKey, registered }) => {
       expect(emittedThemeTokens(cssKey)).toEqual(
-        expect.arrayContaining([...(REGISTERED_THEME_TOKENS[cssKey] ?? [])])
+        expect.arrayContaining([...registered])
       );
     }
   );
