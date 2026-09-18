@@ -2,8 +2,8 @@
  * Builds the docs page manifest from the filesystem.
  *
  * Sources:
- *   - `app/_lib/sections.ts` — section and page order, labels, and the
- *     `lede` / `blocks` wireframe a page renders until its own file lands
+ *   - `page-registry/` — section and page order, labels, and the
+ *     `wireframe` a page renders until its own file lands
  *   - `content/{section}/{slug}.mdx` — MDX pages
  *   - `app/_pages/{section}/{slug}.tsx` — hand-built pages
  *
@@ -25,6 +25,12 @@ import { pathToFileURL } from 'node:url';
 
 import { createJiti } from 'jiti';
 import prettier from 'prettier';
+
+/** Nav metadata source, relative to the docs app root. */
+export const REGISTRY_FILE = 'page-registry/index.ts';
+
+/** Wireframe block types the generated content module imports, relative to the docs app root. */
+const BLOCKS_FILE = 'page-registry/blocks.ts';
 
 /** Output paths, relative to the docs app root. */
 export const MANIFEST_FILE = 'app/_lib/page-manifest.generated.ts';
@@ -209,7 +215,7 @@ function renderContentModule({ loaders, wireframes }) {
 
 import type { ComponentType } from 'react';
 
-import type { Block } from './blocks';
+import type { Block } from '${specifierFor(BLOCKS_FILE, false)}';
 
 // The thunks below import page and MDX modules, so a \`'use client'\` importer
 // would pull the whole docs body into the client bundle.
@@ -255,13 +261,13 @@ export async function resolveFormatOptions(docsRoot) {
  * to format against something other than the repo's prettier config.
  */
 export async function buildPageManifest(docsRoot, formatOptions) {
-  const registryPath = path.join(docsRoot, 'app', '_lib', 'sections.ts');
+  const registryPath = path.join(docsRoot, REGISTRY_FILE);
   const jiti = createJiti(pathToFileURL(registryPath).href);
-  const { SECTIONS } = await jiti.import(registryPath);
+  const { PAGE_REGISTRY } = await jiti.import(registryPath);
 
   const sectionFor = (slug) =>
-    Object.hasOwn(SECTIONS, slug) ? SECTIONS[slug] : undefined;
-  const subsOf = (slug) => sectionFor(slug)?.subs ?? [];
+    Object.hasOwn(PAGE_REGISTRY, slug) ? PAGE_REGISTRY[slug] : undefined;
+  const pagesOf = (slug) => sectionFor(slug)?.pages ?? [];
 
   const sources = SOURCES.map((source) => ({
     ...source,
@@ -272,53 +278,58 @@ export async function buildPageManifest(docsRoot, formatOptions) {
 
   /** Registry order first, then slugs that exist only on disk, in slug order. */
   function orderedSlugs(sectionSlug) {
-    const registered = subsOf(sectionSlug).map((sub) => sub.slug);
+    const registeredSlugs = pagesOf(sectionSlug).map((entry) => entry.slug);
     const extra = keysOnDisk
       .filter((key) => key.startsWith(`${sectionSlug}/`))
       .map((key) => key.slice(sectionSlug.length + 1))
-      .filter((slug) => !registered.includes(slug))
+      .filter((slug) => !registeredSlugs.includes(slug))
       .sort();
-    return [...registered, ...extra];
+    return [...registeredSlugs, ...extra];
   }
 
   function buildPage(sectionSlug, slug) {
     const key = `${sectionSlug}/${slug}`;
-    const sub = subsOf(sectionSlug).find((entry) => entry.slug === slug);
+    const entry = pagesOf(sectionSlug).find((page) => page.slug === slug);
     const base = {
       route: `/${key}`,
       slug,
-      label: sub?.label ?? humanize(slug),
+      label: entry?.label ?? humanize(slug),
     };
-    if (sub?.nested) {
-      base.nested = sub.nested;
+    if (entry?.nested) {
+      base.nested = entry.nested;
     }
 
     const source = sources.find((candidate) => candidate.pages.has(key));
     if (source) {
       const file = source.pages.get(key);
+      if (entry?.wireframe) {
+        throw new Error(
+          `${key} is written at ${file}, so its registry wireframe can never render — drop the \`wireframe\` from its registry entry.`
+        );
+      }
       return {
         page: { ...base, kind: source.kind, file },
         specifier: specifierFor(file, source.keepExtension),
       };
     }
 
-    if (sub?.lede === undefined || sub?.blocks === undefined) {
+    if (!entry?.wireframe) {
       throw new Error(
-        `${key} has no page file, so it renders its registry wireframe — but its registry entry has no \`lede\` or \`blocks\`.`
+        `${key} has no page file, so it renders its registry wireframe — give its registry entry a \`wireframe\`, or write the page.`
       );
     }
     return {
       page: { ...base, kind: 'placeholder', file: null },
-      wireframe: { lede: sub.lede, blocks: sub.blocks },
+      wireframe: entry.wireframe,
     };
   }
 
   /** Sections that exist only on disk, appended after the registry's own. */
   const extraSections = [...new Set(keysOnDisk.map((key) => key.split('/')[0]))]
-    .filter((slug) => !Object.hasOwn(SECTIONS, slug))
+    .filter((slug) => !Object.hasOwn(PAGE_REGISTRY, slug))
     .sort();
 
-  const built = [...Object.keys(SECTIONS), ...extraSections].map(
+  const built = [...Object.keys(PAGE_REGISTRY), ...extraSections].map(
     (sectionSlug) => ({
       slug: sectionSlug,
       title: sectionFor(sectionSlug)?.title ?? humanize(sectionSlug),

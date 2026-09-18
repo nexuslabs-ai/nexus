@@ -1,4 +1,4 @@
-import type { PlaceholderVariant } from '../_lib/blocks';
+import type { PlaceholderVariant } from '../../page-registry/blocks';
 
 /**
  * Wireframe-style dashed placeholder block.
