@@ -1,4 +1,5 @@
 import { Breadcrumb } from '../_components/Breadcrumb';
+import { SectionHeading } from '../_components/Heading';
 
 /**
  * Foundations → Layering. Server component — the 6-token z-index scale and the
@@ -44,9 +45,9 @@ export function Layering() {
 
       {/* ── The z-index scale ───────────────────────────────── */}
       <section className="nx:mb-12">
-        <h2 className="nx:typography-heading-small nx:mb-1">
+        <SectionHeading className="nx:typography-heading-small nx:mb-1">
           The z-index scale
-        </h2>
+        </SectionHeading>
         <p className="nx:typography-body-default nx:text-muted-foreground nx:mb-4 nx:max-w-[64ch]">
           Six tokens, low to high. Utilities run <code>nx:z-overlay</code>{' '}
           through <code>nx:z-max</code>.
@@ -84,9 +85,9 @@ export function Layering() {
 
       {/* ── Why popover sits above modal ────────────────────── */}
       <section className="nx:mb-12">
-        <h2 className="nx:typography-heading-small nx:mb-1">
+        <SectionHeading className="nx:typography-heading-small nx:mb-1">
           Why popover sits above modal
-        </h2>
+        </SectionHeading>
         <p className="nx:typography-body-default nx:text-muted-foreground nx:mb-4 nx:max-w-[64ch]">
           Popover (70) outranks modal (50) by design. A dropdown, select, or
           tooltip opened <em>inside</em> a Dialog must paint above the dialog to
@@ -98,9 +99,9 @@ export function Layering() {
 
       {/* ── Shadow vs z-index ───────────────────────────────── */}
       <section className="nx:mb-12">
-        <h2 className="nx:typography-heading-small nx:mb-1">
+        <SectionHeading className="nx:typography-heading-small nx:mb-1">
           Shadow vs z-index
-        </h2>
+        </SectionHeading>
         <p className="nx:typography-body-default nx:text-muted-foreground nx:mb-4 nx:max-w-[64ch]">
           Shadow is perceived elevation; z-index is paint order. They are
           independent — reach for a z-index token only when two positioned

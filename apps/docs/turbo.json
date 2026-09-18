@@ -8,8 +8,8 @@
     },
     "build": {
       "dependsOn": ["^build", "generate:demos"],
-      "inputs": ["$TURBO_DEFAULT$"],
-      "outputs": [".next/**", "!.next/cache/**"]
+      "inputs": ["$TURBO_DEFAULT$", "$TURBO_ROOT$/package.json"],
+      "outputs": [".next/**", "!.next/cache/**", "next-env.d.ts"]
     },
     "typecheck": {
       "dependsOn": ["^build", "generate:demos"]

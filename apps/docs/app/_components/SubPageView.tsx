@@ -4,6 +4,7 @@ import type { Block } from '../_lib/sections';
 import { getSection, getSubPage } from '../_lib/sections';
 
 import { Breadcrumb } from './Breadcrumb';
+import { SectionHeading } from './Heading';
 import { Placeholder } from './Placeholder';
 
 export function SubPageView({
@@ -40,9 +41,9 @@ export function SubPageView({
 function BlockRender({ block }: { block: Block }) {
   if (block.type === 'h2') {
     return (
-      <h2 className="nx:typography-heading-small nx:mt-8 nx:mb-3">
+      <SectionHeading className="nx:typography-heading-small nx:mt-8 nx:mb-3">
         {block.text}
-      </h2>
+      </SectionHeading>
     );
   }
   if (block.type === 'row') {
