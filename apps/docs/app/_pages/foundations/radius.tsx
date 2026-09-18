@@ -1,3 +1,5 @@
+import { SectionHeading } from '../../_components/Heading';
+
 /**
  * Foundations → Radius, borders & shadows. Server component — three
  * independent appearance axes, each a runtime mode swapped via the theme
@@ -60,7 +62,9 @@ export default function Radius() {
 
       {/* ── Radius ──────────────────────────────────────────── */}
       <section className="nx:mb-12">
-        <h2 className="nx:typography-heading-small nx:mb-1">Radius</h2>
+        <SectionHeading className="nx:typography-heading-small nx:mb-1">
+          Radius
+        </SectionHeading>
         <p className="nx:typography-body-default nx:text-muted-foreground nx:mb-4 nx:max-w-[64ch]">
           Six radius utilities, each reacting to the active Radius mode. Swap
           the mode and every corner re-rounds.
@@ -109,7 +113,9 @@ export default function Radius() {
 
       {/* ── Border widths ───────────────────────────────────── */}
       <section className="nx:mb-12">
-        <h2 className="nx:typography-heading-small nx:mb-1">Border widths</h2>
+        <SectionHeading className="nx:typography-heading-small nx:mb-1">
+          Border widths
+        </SectionHeading>
         <p className="nx:typography-body-default nx:text-muted-foreground nx:mb-4 nx:max-w-[64ch]">
           The picker offers three distinct border-width designs. The box below
           sets its width from the runtime <code>--nx-borderwidth-thick</code>{' '}
@@ -166,7 +172,9 @@ export default function Radius() {
 
       {/* ── Shadows ─────────────────────────────────────────── */}
       <section className="nx:mb-12">
-        <h2 className="nx:typography-heading-small nx:mb-1">Shadows</h2>
+        <SectionHeading className="nx:typography-heading-small nx:mb-1">
+          Shadows
+        </SectionHeading>
         <p className="nx:typography-body-default nx:text-muted-foreground nx:mb-4 nx:max-w-[64ch]">
           Seven elevation tiers plus an inset shadow, each reacting to the
           active Shadow mode. Shadows are theme-split — tuned per light and

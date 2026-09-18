@@ -8,7 +8,8 @@ import {
   useFormState,
 } from 'react-hook-form';
 
-import { cn, Label } from '@nexus_ds/react';
+import { Label } from '@nexus_ds/react';
+import { cn } from '@nexus_ds/react/utils';
 
 type RhfFieldContextValue<
   TFieldValues extends FieldValues = FieldValues,
