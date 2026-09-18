@@ -55,8 +55,9 @@ interface InputProps
  * resting affordance.
  *
  * Browser autofill repaints the field with a UA-owned surface. Nexus overrides
- * that paint from `--input-autofill-background` and `--input-autofill-foreground`;
- * re-point either variable to opt a field out of the default surface.
+ * that paint from `--input-autofill-background` and `--input-autofill-foreground`.
+ * A field on a custom surface re-points them alongside its own surface utility so
+ * the autofilled fill matches the resting one.
  *
  * @example
  * ```tsx
@@ -77,8 +78,8 @@ interface InputProps
  *
  * @example
  * ```tsx
- * // Opt a field out of the default autofill surface
- * <Input className="nx:[--input-autofill-background:var(--nx-color-control-background,var(--color-control-background))]" />
+ * // Custom field surface: override the autofill fill to match
+ * <Input className="nx:bg-background nx:[--input-autofill-background:var(--nx-color-background,var(--color-background))]" />
  * ```
  */
 function Input({ className, type, size, variant, ...props }: InputProps) {
