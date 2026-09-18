@@ -374,7 +374,7 @@ function MultiSelectValue({
         fill="light"
         isCaps={false}
         style={{
-          display: overflowAmount > 0 && !shouldWrap ? 'block' : 'none',
+          display: overflowAmount > 0 && !shouldWrap ? undefined : 'none',
         }}
       >
         +{overflowAmount}
