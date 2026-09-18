@@ -3,9 +3,13 @@
   "extends": ["//"],
   "tasks": {
     "build": {
-      "dependsOn": ["^build"],
-      "inputs": ["$TURBO_DEFAULT$", "!CHANGELOG.md", "!CSP.md"],
-      "outputs": [".next/**", "!.next/cache/**"]
+      "inputs": [
+        "$TURBO_DEFAULT$",
+        "$TURBO_ROOT$/package.json",
+        "!CHANGELOG.md",
+        "!CSP.md"
+      ],
+      "outputs": [".next/**", "!.next/cache/**", "next-env.d.ts"]
     }
   }
 }

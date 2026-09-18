@@ -5,8 +5,6 @@ import { createJavaScriptRegexEngine } from 'shiki/engine/javascript';
 
 import { NEXUS_CODE_THEME } from '../../code-theme';
 
-import { CODE_BLOCK_SURFACE } from './code-block';
-
 import 'server-only';
 
 const LANGS = { css, tsx };
@@ -30,12 +28,13 @@ export async function highlightSample(lang: CodeSampleLanguage, code: string) {
     theme: NEXUS_CODE_THEME.name,
     transformers: [
       {
-        pre(node) {
-          node.properties.class = CODE_BLOCK_SURFACE;
-          // Shiki's `background-color` is the placeholder hex `normalizeTheme`
-          // swapped in for the token reference. Every span carries its own
-          // colour, so dropping the whole attribute loses nothing.
-          delete node.properties.style;
+        root(node) {
+          const pre = node.children[0];
+          if (pre?.type !== 'element') return;
+
+          // `CodeBlock` owns the `pre` — its surface, its tab stop, its copy
+          // control — so the sample contributes only the `code` inside it.
+          node.children = pre.children;
         },
       },
     ],

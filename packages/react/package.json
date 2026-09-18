@@ -17,6 +17,11 @@
       "import": "./dist/index.mjs",
       "require": "./dist/index.js"
     },
+    "./utils": {
+      "types": "./dist/lib/utils.d.ts",
+      "import": "./dist/utils.mjs",
+      "require": "./dist/utils.js"
+    },
     "./appearance": {
       "types": "./dist/components/appearance/provider/index.d.ts",
       "import": "./dist/appearance.mjs",

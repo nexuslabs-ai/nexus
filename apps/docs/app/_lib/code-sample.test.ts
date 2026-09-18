@@ -1,6 +1,5 @@
 import { describe, expect, it } from 'vitest';
 
-import { CODE_BLOCK_SURFACE } from './code-block';
 import { highlightSample } from './code-sample';
 
 const CSS_SOURCE = `:root {
@@ -38,12 +37,11 @@ describe('highlightSample', () => {
     }
   });
 
-  it('leaves the surface to the Nexus tokens', async () => {
+  it('emits only the code element, leaving the pre to CodeBlock', async () => {
     const html = await highlightSample('tsx', TSX_SOURCE);
-    const pre = html.slice(0, html.indexOf('>') + 1);
 
-    expect(pre).not.toMatch(/style=/);
-    expect(pre).toContain('tabindex="0"');
-    expect(pre).toContain(CODE_BLOCK_SURFACE);
+    expect(html).not.toMatch(/<pre\b/);
+    expect(html.startsWith('<code')).toBe(true);
+    expect(html.endsWith('</code>')).toBe(true);
   });
 });

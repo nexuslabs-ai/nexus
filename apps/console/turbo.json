@@ -3,8 +3,7 @@
   "extends": ["//"],
   "tasks": {
     "build": {
-      "inputs": ["*.css", "package.json"],
-      "outputs": []
+      "outputs": ["dist/**"]
     }
   }
 }
