@@ -21,6 +21,13 @@ export default defineConfig({
         replacement: path.resolve(__dirname, './packages/core/src/index.ts'),
       },
       {
+        find: '@nexus_ds/react/utils',
+        replacement: path.resolve(
+          __dirname,
+          './packages/react/src/lib/utils.ts'
+        ),
+      },
+      {
         find: '@nexus_ds/react/appearance/server',
         replacement: path.resolve(
           __dirname,
@@ -63,6 +70,21 @@ export default defineConfig({
         // classic runtime. Components rendered in a unit test would otherwise
         // need their own `import * as React`.
         esbuild: { jsx: 'automatic' },
+        // `server-only` throws unless resolved under the `react-server`
+        // condition, which no test runs under; point it at its own RSC build.
+        // Scoped to this project so the browser project still fails loudly on a
+        // client component that imports it.
+        resolve: {
+          alias: [
+            {
+              find: /^server-only$/,
+              replacement: path.resolve(
+                __dirname,
+                './node_modules/server-only/empty.js'
+              ),
+            },
+          ],
+        },
         test: {
           name: 'unit',
           environment: 'jsdom',
@@ -70,6 +92,7 @@ export default defineConfig({
           unstubEnvs: true,
           include: [
             'apps/*/*.test.{ts,tsx}',
+            'apps/**/scripts/**/*.test.{js,ts}',
             'apps/**/app/**/*.test.{ts,tsx}',
             'apps/**/src/**/*.test.{ts,tsx}',
             'packages/**/src/**/*.test.{ts,tsx}',

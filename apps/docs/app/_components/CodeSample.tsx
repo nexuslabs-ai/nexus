@@ -1,8 +1,11 @@
 import { type CodeSampleLanguage, highlightSample } from '../_lib/code-sample';
 
+import { CodeBlock } from './CodeBlock';
+
 /**
- * Hand-written code sample on a `_pages` route, tokenised by the same theme
- * the MDX fences use.
+ * Hand-written code sample on a `_pages` route. Tokenised by the same theme the
+ * MDX fences use, then handed to the same `pre` those fences render through, so
+ * a sample and a fence get the same surface and the same copy control.
  */
 export async function CodeSample({
   lang,
@@ -13,9 +16,5 @@ export async function CodeSample({
 }) {
   const html = await highlightSample(lang, children);
 
-  // Shiki emits the `pre` — including its own `tabindex` — so the wrapper is
-  // `display: contents` and generates no box.
-  return (
-    <div className="nx:contents" dangerouslySetInnerHTML={{ __html: html }} />
-  );
+  return <CodeBlock dangerouslySetInnerHTML={{ __html: html }} />;
 }
