@@ -24,7 +24,7 @@
     "audit:browser-support": "node scripts/audit-browser-support.js",
     "audit:agent-drift": "node scripts/audit-agent-drift.js",
     "audit:turbo-outputs": "node scripts/audit-turbo-outputs.js",
-    "audit:contrast": "vitest run --project=unit packages/core/src/lib/derive-theme.test.ts -t \"legibility invariant\"",
+    "audit:contrast": "vitest run --project=unit packages/core/src/lib/derive-theme.test.ts packages/core/src/lib/contrast.test.ts -t \"legibility invariant\"",
     "audit:mode-codenames": "pnpm --filter @nexus_ds/core audit:mode-codenames",
     "audit:mode-distinctness": "pnpm --filter @nexus_ds/core audit:mode-distinctness",
     "validate:spacing-modes": "pnpm --filter @nexus_ds/core validate:spacing-modes",

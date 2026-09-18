@@ -5,15 +5,14 @@ export const SURFACE_TONE: Record<
   NexusSurfaceTone,
   { h: number; lightC: number; darkC: number }
 > = {
-  slate: { h: 264.7, lightC: 0.011, darkC: 0.04 },
-  gray: { h: 261.7, lightC: 0.008, darkC: 0.027 },
-  zinc: { h: 262.8, lightC: 0.005, darkC: 0.005 },
+  slate: { h: 264.7, lightC: 0.003, darkC: 0.006 },
+  gray: { h: 261.7, lightC: 0.002, darkC: 0.004 },
+  zinc: { h: 262.8, lightC: 0.001, darkC: 0.002 },
   neutral: { h: 0, lightC: 0, darkC: 0 },
-  stone: { h: 70, lightC: 0.008, darkC: 0.006 },
+  stone: { h: 70, lightC: 0.002, darkC: 0.003 },
 };
 
 export const PAGE_L_LIGHT = 1;
-export const LIGHT_CHROMA_DEPTH_MULTIPLIER = 1.4;
 
 /**
  * Canonical opaque-surface token set. Both regime ladders are typed against

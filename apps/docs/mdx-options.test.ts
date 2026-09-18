@@ -40,6 +40,7 @@ const EXPECTED_HEADING_IDS: Record<string, string[]> = {
   'theming/appearance.mdx': [
     'appearance',
     'the-model',
+    'contrast-slider',
     'brand-and-surface-tone',
     'reading-and-updating',
     'first-paint-and-persistence',

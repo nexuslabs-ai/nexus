@@ -1,22 +1,22 @@
 /* Border Color Alias Utilities */
 
 @utility border-color-default {
-  border-color: var(--nx-color-border-default, oklch(0.1448 0 0 / 0.0941));
+  border-color: var(--nx-color-border-default, oklch(0.1448 0 0 / 0.0884));
 }
 
 @utility border-color-default-alpha {
   border-color: var(
     --nx-color-border-default-alpha,
-    oklch(0.13 0.006 70 / 0.0941)
+    oklch(0.13 0.003 70 / 0.0884)
   );
 }
 
 @utility border-color-active {
-  border-color: var(--nx-color-border-active, oklch(0.6601 0.0118 70));
+  border-color: var(--nx-color-border-active, oklch(0.7876 0.002 70));
 }
 
 @utility border-color-disabled {
-  border-color: var(--nx-color-border-disabled, oklch(0.1448 0 0 / 0.0941));
+  border-color: var(--nx-color-border-disabled, oklch(0.1448 0 0 / 0.0884));
 }
 
 @utility border-color-warning {
