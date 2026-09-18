@@ -3,6 +3,7 @@ import type { ManifestPage, ManifestSection } from '../_lib/manifest';
 import { PAGE_WIREFRAMES } from '../_lib/page-content.generated';
 
 import { Breadcrumb } from './Breadcrumb';
+import { SectionHeading } from './Heading';
 import { Placeholder } from './Placeholder';
 
 export function PageWireframeView({
@@ -42,9 +43,9 @@ export function PageWireframeView({
 function BlockRender({ block }: { block: Block }) {
   if (block.type === 'h2') {
     return (
-      <h2 className="nx:typography-heading-small nx:mt-8 nx:mb-3">
+      <SectionHeading className="nx:typography-heading-small nx:mt-8 nx:mb-3">
         {block.text}
-      </h2>
+      </SectionHeading>
     );
   }
   if (block.type === 'row') {

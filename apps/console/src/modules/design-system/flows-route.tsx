@@ -5,7 +5,6 @@ import {
   AlertDescription,
   Badge,
   Button,
-  cn,
   EmptyState,
   EmptyStateDescription,
   EmptyStateHeader,
@@ -13,6 +12,7 @@ import {
   EmptyStateTitle,
   toast,
 } from '@nexus_ds/react';
+import { cn } from '@nexus_ds/react/utils';
 import { IconLayoutDashboard } from '@tabler/icons-react';
 import { Link } from '@tanstack/react-router';
 import type { ColumnDef } from '@tanstack/react-table';
