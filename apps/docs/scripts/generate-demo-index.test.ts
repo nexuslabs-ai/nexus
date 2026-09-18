@@ -172,12 +172,12 @@ describe('generate-demo-index', () => {
 
   it('forwards the component through the boundary beside the source', () => {
     run();
-    const module = readFileSync(moduleFor('card/with-footer'), 'utf8');
+    const contents = readFileSync(moduleFor('card/with-footer'), 'utf8');
 
-    expect(module).toContain(
+    expect(contents).toContain(
       'export { Component } from "./with-footer.client"'
     );
-    expect(module).toContain('export const source =');
+    expect(contents).toContain('export const source =');
   });
 
   it('keeps demo sources out of the index, behind a lazy import', () => {
@@ -227,12 +227,15 @@ describe('generate-demo-index', () => {
 
   it('leaves a CRLF checkout of a generated module alone', () => {
     run();
-    const module = moduleFor('zebra-demo');
-    writeFileSync(module, readFileSync(module, 'utf8').replace(/\n/g, '\r\n'));
+    const moduleFile = moduleFor('zebra-demo');
+    writeFileSync(
+      moduleFile,
+      readFileSync(moduleFile, 'utf8').replace(/\n/g, '\r\n')
+    );
 
     run();
 
-    expect(readFileSync(module, 'utf8')).toContain('\r\n');
+    expect(readFileSync(moduleFile, 'utf8')).toContain('\r\n');
   });
 
   it('picks up a new demo file with no hand-editing', () => {

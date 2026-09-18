@@ -97,6 +97,7 @@ function readCanonical(file) {
 /**
  * Writes `content` only when it differs from what is on disk, so a dev-server
  * rebuild leaves untouched demos' modules — and their bundler chunks — alone.
+ * The comparison ignores line endings, so a CRLF checkout counts as unchanged.
  *
  * @param {string} file
  * @param {string} content
