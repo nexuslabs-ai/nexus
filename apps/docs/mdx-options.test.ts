@@ -143,6 +143,36 @@ async function pageDirectories() {
   return { staticRoutes, dynamicDirs };
 }
 
+// A `subPageHref('section', 'sub')` call written with two literals. The section
+// key is typed against SECTIONS, but the sub slug is a plain string, so only a
+// source walk can tell whether the pair names a page.
+const LITERAL_SUB_PAGE_HREF =
+  /\bsubPageHref\(\s*'([^']*)'\s*,\s*'([^']*)'\s*\)/g;
+
+async function literalSubPageKeys() {
+  const entries = await readdir(APP_DIR, {
+    withFileTypes: true,
+    recursive: true,
+  });
+
+  const perFile = await Promise.all(
+    entries
+      .filter((entry) => entry.isFile() && /\.tsx?$/.test(entry.name))
+      .map(async (entry) => {
+        const file = path.join(entry.parentPath, entry.name);
+        const source = await readFile(file, 'utf8');
+        return [...source.matchAll(LITERAL_SUB_PAGE_HREF)].map(
+          ([, section, sub]) => ({
+            from: path.relative(DOCS_DIR, file).split(path.sep).join('/'),
+            key: `${section}/${sub}`,
+          })
+        );
+      })
+  );
+
+  return perFile.flat();
+}
+
 // An href leaves the docs app when it names a scheme (`https:`, `mailto:`) or a
 // host (`//cdn...`).
 function isInRepo(href: string) {
@@ -204,6 +234,7 @@ async function compileMdx(source: string) {
 const CONTENT_FILES = await contentFiles();
 const { staticRoutes: STATIC_ROUTES, dynamicDirs: DYNAMIC_PAGE_DIRS } =
   await pageDirectories();
+const LITERAL_SUB_PAGE_KEYS = await literalSubPageKeys();
 
 // Compiled once here; every test body below reads this instead of recompiling.
 const COMPILED = new Map(
@@ -397,6 +428,19 @@ describe('docs MDX pipeline and link integrity', () => {
       'no authored same-page anchor checked'
     ).toBeGreaterThan(0);
     expect(crossPageChecked, 'no cross-page anchor checked').toBeGreaterThan(0);
+  });
+
+  // The link walk above reads content/ only, so a TSX call site is the one
+  // place a typo'd sub slug reaches neither tsc nor a test.
+  it('points every literal subPageHref call at a sub-page that exists', () => {
+    expect(LITERAL_SUB_PAGE_KEYS.length).toBeGreaterThan(0);
+
+    for (const { from, key } of LITERAL_SUB_PAGE_KEYS) {
+      expect(
+        SUB_PAGE_KEYS.has(key),
+        `${from} builds a href for ${key}, which is not a sub-page`
+      ).toBe(true);
+    }
   });
 
   it('slugs every heading rank and disambiguates repeated headings', async () => {

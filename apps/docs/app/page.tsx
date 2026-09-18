@@ -37,7 +37,6 @@ const AUDIENCES = [
   },
 ];
 
-// Only the blurb is authored — title, page count, and href come from the registry.
 const SECTION_CARDS: { slug: SectionSlug; desc: string }[] = [
   {
     slug: 'foundations',
@@ -129,7 +128,7 @@ export default function Home() {
       </h2>
       <div className="nx:grid nx:grid-cols-1 nx:md:grid-cols-3 nx:gap-3">
         {SECTION_CARDS.map(({ slug, desc }) => {
-          const section = getSection(slug);
+          const { title, subs } = getSection(slug);
           return (
             <Link
               key={slug}
@@ -139,10 +138,10 @@ export default function Home() {
               <Card className="nx:h-full nx:hover:border-border-primary nx:transition-colors">
                 <CardHeader>
                   <div className="nx:font-mono nx:text-[10px] nx:uppercase nx:tracking-wider nx:text-muted-foreground-subtle nx:mb-1">
-                    {section.subs.length} pages
+                    {subs.length} page{subs.length === 1 ? '' : 's'}
                   </div>
                   <CardTitle className="nx:typography-heading-xsmall">
-                    {section.title}
+                    {title}
                   </CardTitle>
                   <CardDescription className="nx:typography-body-small">
                     {desc}

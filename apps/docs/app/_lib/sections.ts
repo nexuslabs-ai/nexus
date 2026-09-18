@@ -44,7 +44,7 @@ export type Section = {
   subs: SubPage[];
 };
 
-export const SECTIONS = {
+const SECTIONS = {
   'getting-started': {
     title: 'Getting Started',
     subs: [
