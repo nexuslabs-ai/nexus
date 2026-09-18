@@ -2,6 +2,7 @@ import {
   existsSync,
   mkdirSync,
   mkdtempSync,
+  readdirSync,
   readFileSync,
   rmSync,
   statSync,
@@ -35,14 +36,30 @@ const SOURCE_LITERAL = /^export const source = (.*);$/m;
 
 const DIRECTIVE = /^(['"])([^'"]*)\1;$/;
 
+const STALE =
+  'Committed output is stale. Run `pnpm --filter @nexus_ds/docs generate:demos` and commit the result.';
+
+/** Every file under `dir`, as sorted `/`-separated paths relative to it. */
+function generatedFiles(dir: string): string[] {
+  return readdirSync(dir, { withFileTypes: true })
+    .flatMap((entry) =>
+      entry.isDirectory()
+        ? generatedFiles(path.join(dir, entry.name)).map(
+            (nested) => `${entry.name}/${nested}`
+          )
+        : [entry.name]
+    )
+    .sort();
+}
+
 /**
  * The module's directive prologue, if it opens with one. Reads the first line
  * that is neither blank nor a `//` comment, so a module that merely quotes
  * `'use client'` further down — a demo source string, say — reads as having no
  * directive at all.
  */
-function leadingDirective(module: string) {
-  const first = module
+function leadingDirective(contents: string) {
+  const first = contents
     .split('\n')
     .map((line) => line.trim())
     .find((line) => line && !line.startsWith('//'));
@@ -298,18 +315,28 @@ describe('generate-demo-index', () => {
       readFileSync(file, 'utf8').replace(/\r\n/g, '\n');
     const demos = collectDemos(EXAMPLES_DIR);
 
-    expect(renderDemoIndex(demos)).toBe(
+    expect(renderDemoIndex(demos), STALE).toBe(
       committed(path.join(GENERATED_DIR, 'demo-index.ts'))
     );
 
     for (const demo of demos) {
-      expect(renderDemoModule(demo)).toBe(
+      expect(renderDemoModule(demo), STALE).toBe(
         committed(path.join(GENERATED_DIR, 'demos', `${demo.id}.ts`))
       );
-      expect(renderDemoBoundary(demo)).toBe(
+      expect(renderDemoBoundary(demo), STALE).toBe(
         committed(path.join(GENERATED_DIR, 'demos', `${demo.id}.client.ts`))
       );
     }
+
+    expect(generatedFiles(GENERATED_DIR), STALE).toEqual(
+      [
+        'demo-index.ts',
+        ...demos.flatMap((demo) => [
+          `demos/${demo.id}.ts`,
+          `demos/${demo.id}.client.ts`,
+        ]),
+      ].sort()
+    );
   });
 
   it('looks a demo up by id and throws on a miss', () => {
