@@ -1,5 +1,3 @@
-'use client';
-
 import { Button } from '@nexus_ds/react';
 
 export default function ButtonVariants() {

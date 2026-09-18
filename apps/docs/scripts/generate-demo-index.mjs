@@ -21,6 +21,7 @@ export const GENERATED_DIR = path.join(DOCS_ROOT, '__generated__');
 const DEMO_EXTENSION = '.tsx';
 const INDEX_FILE = 'demo-index.ts';
 const MODULES_DIR = 'demos';
+const BOUNDARY_SUFFIX = '.client';
 const WATCH_DEBOUNCE_MS = 50;
 
 const GENERATED_BY =
@@ -160,9 +161,23 @@ function exampleSpecifier(id) {
 }
 
 /**
+ * The per-demo module's import specifier for its own client boundary, which
+ * sits beside it. Appending `.ts` gives the boundary's path under
+ * `__generated__/demos/`, so specifier and disk path cannot drift apart.
+ *
+ * @param {string} id
+ * @returns {string}
+ */
+function boundarySpecifier(id) {
+  return `./${path.posix.basename(id)}${BOUNDARY_SUFFIX}`;
+}
+
+/**
  * Collects every demo under `examplesDir`, ordered by id. An id with a
  * `_`-prefixed segment is skipped, so shared helpers and private folders can
- * live beside the demos without becoming addressable demos themselves.
+ * live beside the demos without becoming addressable demos themselves. A dot
+ * in an id is rejected rather than skipped: `foo.client.tsx` would generate
+ * its module at the path `foo.tsx`'s boundary already owns.
  *
  * @param {string} [examplesDir]
  * @returns {DemoFile[]}
@@ -185,13 +200,41 @@ export function collectDemos(examplesDir = EXAMPLES_DIR) {
     .filter(({ id }) =>
       id.split('/').every((segment) => !segment.startsWith('_'))
     )
-    .map(({ file, id }) => ({ id, source: readSource(file) }))
+    .map(({ file, id }) => {
+      if (id.includes('.')) {
+        throw new Error(
+          `Demo id cannot contain a dot: ${id}. Rename ${path.relative(examplesDir, file)}.`
+        );
+      }
+
+      return { id, source: readSource(file) };
+    })
     .sort((a, b) => (a.id < b.id ? -1 : a.id > b.id ? 1 : 0));
 }
 
 /**
- * Renders one demo's module: its component re-exported from the example, and
- * its source text as a plain string.
+ * Renders one demo's client boundary: the example re-exported from a module
+ * carrying `'use client'`. The examples themselves stay framework-free, so the
+ * source a reader copies is the component and nothing else.
+ *
+ * @param {DemoFile} demo
+ * @returns {string}
+ */
+export function renderDemoBoundary(demo) {
+  return `'use client';
+
+${GENERATED_BY}
+${REGENERATE_HINT}
+
+export { default as Component } from ${JSON.stringify(exampleSpecifier(demo.id))};
+`;
+}
+
+/**
+ * Renders one demo's module: its component forwarded from the boundary, and
+ * its source text as a plain string. This module carries no directive, so a
+ * server component reading `source` gets the string rather than a client
+ * reference.
  *
  * @param {DemoFile} demo
  * @returns {string}
@@ -200,7 +243,7 @@ export function renderDemoModule(demo) {
   return `${GENERATED_BY}
 ${REGENERATE_HINT}
 
-export { default as Component } from ${JSON.stringify(exampleSpecifier(demo.id))};
+export { Component } from ${JSON.stringify(boundarySpecifier(demo.id))};
 
 export const source = ${JSON.stringify(demo.source)};
 `;
@@ -249,14 +292,21 @@ export function generateDemoIndex({
 
   writeIfChanged(path.join(outputDir, INDEX_FILE), index);
 
-  const written = new Set();
+  const keep = new Set();
   for (const demo of demos) {
     const moduleFile = path.join(modulesDir, `${demo.id}.ts`);
+    const boundaryFile = path.join(
+      path.dirname(moduleFile),
+      `${boundarySpecifier(demo.id)}.ts`
+    );
+
     writeIfChanged(moduleFile, renderDemoModule(demo));
-    written.add(moduleFile);
+    writeIfChanged(boundaryFile, renderDemoBoundary(demo));
+    keep.add(moduleFile);
+    keep.add(boundaryFile);
   }
 
-  pruneOrphanModules(modulesDir, written);
+  pruneOrphanModules(modulesDir, keep);
 
   return { demos, index };
 }
@@ -300,7 +350,7 @@ function watchExamples() {
     pending = setTimeout(regenerateQuietly, WATCH_DEBOUNCE_MS);
   });
   watcher.on('error', (error) => {
-    console.error(`demo-index: watch failed — ${error.message}`);
+    console.error('demo-index: watch failed —', error);
     process.exitCode = 1;
     watcher.close();
   });
