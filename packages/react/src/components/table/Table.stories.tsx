@@ -443,9 +443,12 @@ export const SelectionGridSeparator: Story = {
     );
     await expect(cells.length).toBeGreaterThan(0);
     for (const cell of cells) {
-      await expect(
-        parseFloat(getComputedStyle(cell).borderInlineEndWidth)
-      ).toBeGreaterThan(0);
+      const style = getComputedStyle(cell);
+      await expect(parseFloat(style.borderInlineEndWidth)).toBeGreaterThan(0);
+      // A physical `pr-0` beside the logical `pe-*` would zero this in LTR only.
+      await expect(parseFloat(style.paddingInlineEnd)).toBe(
+        parseFloat(style.paddingInlineStart)
+      );
     }
   },
 };

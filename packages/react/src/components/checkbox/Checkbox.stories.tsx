@@ -122,8 +122,8 @@ export const TouchTarget: Story = {
 
     await expect(box).toHaveClass('nx:relative');
     await expect(box).toHaveClass('nx:pointer-coarse:after:absolute');
-    await expect((box as Element).className).toMatch(
-      /pointer-coarse:after:-inset-\[max\(var\(--nx-spacing-3_5\),/
+    await expect(box).toHaveClass(
+      'nx:pointer-coarse:after:-inset-[max(var(--nx-spacing-3_5),calc((max(var(--nx-spacing-11),44px)-var(--nx-spacing-4))/2))]'
     );
     await expect(box).toHaveClass('nx:bg-container');
     await expect(box).toHaveClass(

@@ -93,9 +93,9 @@ interface TableProps extends React.ComponentProps<'table'> {
    * with `stickyHeader`, vertical — overflow). Use it to bound the height
    * (`"nx:max-h-96"`) or set the surface. `className` still targets the `<table>`.
    *
-   * With `selectable`, the container also reserves the selection gutter as
-   * inline-start padding — additional horizontal padding set here stacks on top
-   * of it rather than replacing it.
+   * With `selectable`, the container reserves the selection gutter as
+   * inline-start padding. That reservation overrides inline-start padding set
+   * here; only the inline-end side is yours.
    */
   containerClassName?: string;
 }
@@ -320,7 +320,7 @@ function TableRow({ className, ...props }: TableRowProps) {
 interface TableHeadProps extends React.ComponentProps<'th'> {}
 
 const tableHeadVariants = cva(
-  'nx:px-2 nx:text-left nx:align-middle nx:typography-label-default nx:whitespace-nowrap nx:text-muted-foreground nx:has-[[role=checkbox]]:pr-0 nx:*:[[role=checkbox]]:translate-y-0.5 nx:[&[aria-sort=ascending]]:text-foreground nx:[&[aria-sort=descending]]:text-foreground',
+  'nx:px-2 nx:text-left nx:align-middle nx:typography-label-default nx:whitespace-nowrap nx:text-muted-foreground nx:has-[[role=checkbox]]:pe-0 nx:*:[[role=checkbox]]:translate-y-0.5 nx:[&[aria-sort=ascending]]:text-foreground nx:[&[aria-sort=descending]]:text-foreground',
   {
     variants: {
       variant: {
@@ -370,7 +370,7 @@ function TableHead({ className, ...props }: TableHeadProps) {
 interface TableCellProps extends React.ComponentProps<'td'> {}
 
 const tableCellVariants = cva(
-  'nx:px-2 nx:align-middle nx:whitespace-nowrap nx:has-[[role=checkbox]]:pr-0 nx:*:[[role=checkbox]]:translate-y-0.5',
+  'nx:px-2 nx:align-middle nx:whitespace-nowrap nx:has-[[role=checkbox]]:pe-0 nx:*:[[role=checkbox]]:translate-y-0.5',
   {
     variants: {
       variant: {
@@ -433,6 +433,9 @@ interface TableSelectionHeadProps extends TableHeadProps {}
  * A semantic header cell for a consumer-owned select-all Checkbox. Compose
  * inside the first column, paired with TableSelectionCell. Its control remains
  * visible and follows the existing stickyHeader contract.
+ *
+ * Pass `selectable` on the surrounding `Table` to get the reserved-gutter
+ * layout; without it this stays an ordinary in-flow column.
  */
 function TableSelectionHead({
   className,
@@ -476,9 +479,12 @@ interface TableSelectionCellProps extends TableCellProps {}
  * TableSelectionCell
  *
  * A semantic cell for a consumer-owned row Checkbox. Set the containing row's
- * data-state="selected" from the same selection state. Roomy gutter controls
- * reveal on hover/focus and stay visible for selected, touch, or hybrid input.
- * Without the named query container or platform support they remain in-flow.
+ * data-state="selected" from the same selection state.
+ *
+ * Pass `selectable` on the surrounding `Table` to get the reserved-gutter
+ * layout, where idle unselected controls reveal on hover/focus and stay visible
+ * for selected, touch, or hybrid input. Without it — or on an engine lacking
+ * container queries or `:has()` — they remain visible and in-flow.
  */
 function TableSelectionCell({
   className,
