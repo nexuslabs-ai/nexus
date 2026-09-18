@@ -30,7 +30,7 @@ export const Default: Story = {
   },
 };
 
-// Borderless, bordered and transparent accent variants.
+// Borderless, bordered and transparent stroke-only variants.
 export const Variants: Story = {
   render: () => (
     <div className="nx:flex nx:gap-3">
@@ -40,7 +40,11 @@ export const Variants: Story = {
       <Toggle variant="outline" aria-label="Italic">
         <IconItalic />
       </Toggle>
-      <Toggle variant="accentOutline" aria-label="Accent bold" defaultPressed>
+      <Toggle
+        variant="outline-primary"
+        aria-label="Outline primary bold"
+        defaultPressed
+      >
         <IconBold />
       </Toggle>
     </div>
@@ -189,10 +193,14 @@ export const AllVariants: Story = {
         <Toggle variant="outline" aria-label="Outline on" defaultPressed>
           <IconItalic />
         </Toggle>
-        <Toggle variant="accentOutline" aria-label="Accent off">
+        <Toggle variant="outline-primary" aria-label="Outline primary off">
           <IconBold />
         </Toggle>
-        <Toggle variant="accentOutline" aria-label="Accent on" defaultPressed>
+        <Toggle
+          variant="outline-primary"
+          aria-label="Outline primary on"
+          defaultPressed
+        >
           <IconBold />
         </Toggle>
       </div>
@@ -211,7 +219,7 @@ export const AllVariants: Story = {
   ),
 };
 
-const VARIANTS = ['default', 'outline', 'accentOutline'] as const;
+const VARIANTS = ['default', 'outline', 'outline-primary'] as const;
 const SIZES = ['sm', 'default', 'lg'] as const;
 
 function tokenColor(element: Element, name: string) {
@@ -271,28 +279,37 @@ export const StateMatrix: Story = {
       const invalid = toggle.getAttribute('aria-invalid') === 'true';
       await expect(toggle).toHaveAccessibleName();
       if (invalid) await expect(toggle).toHaveAccessibleDescription();
-      if (toggle.dataset.variant === 'accentOutline') {
+      if (toggle.dataset.variant === 'outline-primary') {
         const edge = getComputedStyle(toggle, '::before');
         await expect(style.backgroundColor).toBe('rgba(0, 0, 0, 0)');
         await expect(style.borderTopWidth).toBe('0px');
         await expect(edge.pointerEvents).toBe('none');
-        await expect(
-          edge.getPropertyValue('--tw-inset-ring-color').trim()
-        ).toBe(
-          tokenColor(
-            toggle,
-            disabled
-              ? 'border-disabled'
-              : invalid
+        if (disabled) {
+          // border-disabled and border-default resolve to the same value, so
+          // only the class proves which rule painted the edge.
+          await expect(toggle).toHaveClass(
+            'nx:disabled:before:inset-ring-border-disabled'
+          );
+        } else {
+          await expect(
+            edge.getPropertyValue('--tw-inset-ring-color').trim()
+          ).toBe(
+            tokenColor(
+              toggle,
+              invalid
                 ? 'border-error'
                 : pressed
-                  ? 'focus-default'
+                  ? 'border-primary-active'
                   : 'border-default'
-          )
-        );
+            )
+          );
+        }
         if (pressed && !disabled) {
           await expect(edge.getPropertyValue('--tw-ring-color').trim()).toBe(
-            tokenColor(toggle, invalid ? 'focus-error' : 'focus-default')
+            tokenColor(
+              toggle,
+              invalid ? 'border-error-active' : 'border-primary-active'
+            )
           );
         } else {
           await expect(edge.getPropertyValue('--tw-ring-shadow').trim()).toBe(
@@ -318,8 +335,8 @@ export const StateMatrix: Story = {
   },
 };
 
-export const AccentOutline: Story = {
-  args: { variant: 'accentOutline', onPressedChange: fn() },
+export const OutlinePrimary: Story = {
+  args: { variant: 'outline-primary', onPressedChange: fn() },
   render: (args) => <Toggle {...args}>Bold</Toggle>,
   play: async ({ canvasElement, args }) => {
     const toggle = within(canvasElement).getByRole('button', { name: 'Bold' });
@@ -335,7 +352,7 @@ export const AccentOutline: Story = {
       getComputedStyle(toggle, '::before')
         .getPropertyValue('--tw-inset-ring-color')
         .trim()
-    ).toBe(tokenColor(toggle, 'focus-default'));
+    ).toBe(tokenColor(toggle, 'border-primary-active'));
     await userEvent.unhover(toggle);
     await userEvent.tab({ shift: true });
     await userEvent.tab();
@@ -354,14 +371,14 @@ export const AccentOutline: Story = {
   },
 };
 
-export const InvalidAccent: Story = {
+export const InvalidOutlinePrimary: Story = {
   render: () => (
     <div className="nx:flex nx:flex-col nx:gap-4">
       <p id="toggle-invalid-error">This formatting is not supported.</p>
       {[false, true].map((pressed) => (
         <Toggle
           key={String(pressed)}
-          variant="accentOutline"
+          variant="outline-primary"
           defaultPressed={pressed}
           aria-invalid
           aria-describedby="toggle-invalid-error"
@@ -406,7 +423,7 @@ function ControlledToggle(args: ToggleProps) {
 }
 
 export const Controlled: Story = {
-  args: { variant: 'accentOutline', onPressedChange: fn() },
+  args: { variant: 'outline-primary', onPressedChange: fn() },
   render: (args) => <ControlledToggle {...args} />,
   play: async ({ canvasElement, args }) => {
     const toggle = within(canvasElement).getByRole('button', {
@@ -422,7 +439,7 @@ export const Controlled: Story = {
 
 export const AsChild: Story = {
   render: () => (
-    <Toggle asChild variant="accentOutline">
+    <Toggle asChild variant="outline-primary">
       <button type="button">Composed bold</button>
     </Toggle>
   ),
@@ -438,7 +455,7 @@ export const AsChild: Story = {
 
 export const LongContent: Story = {
   render: () => (
-    <Toggle variant="accentOutline">
+    <Toggle variant="outline-primary">
       Apply formatting to all selected paragraphs
     </Toggle>
   ),

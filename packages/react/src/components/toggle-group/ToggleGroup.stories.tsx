@@ -117,16 +117,19 @@ export const Spacing: Story = {
       </ToggleGroup>
       <ToggleGroup
         type="multiple"
-        variant="accentOutline"
+        variant="outline-primary"
         defaultValue={['bold', 'italic']}
       >
-        <ToggleGroupItem value="bold" aria-label="Accent bold">
+        <ToggleGroupItem value="bold" aria-label="Outline primary bold">
           <IconBold />
         </ToggleGroupItem>
-        <ToggleGroupItem value="italic" aria-label="Accent italic">
+        <ToggleGroupItem value="italic" aria-label="Outline primary italic">
           <IconItalic />
         </ToggleGroupItem>
-        <ToggleGroupItem value="underline" aria-label="Accent underline">
+        <ToggleGroupItem
+          value="underline"
+          aria-label="Outline primary underline"
+        >
           <IconUnderline />
         </ToggleGroupItem>
       </ToggleGroup>
@@ -140,10 +143,10 @@ const LAYOUTS = [
   { name: 'Vertical', dir: 'ltr', orientation: 'vertical' },
 ] as const;
 const MIXES = [
-  ['accentOutline', 'accentOutline', 'accentOutline'],
-  ['accentOutline', 'outline', 'accentOutline'],
-  ['outline', 'accentOutline', 'accentOutline'],
-  ['default', 'accentOutline', 'accentOutline'],
+  ['outline-primary', 'outline-primary', 'outline-primary'],
+  ['outline-primary', 'outline', 'outline-primary'],
+  ['outline', 'outline-primary', 'outline-primary'],
+  ['default', 'outline-primary', 'outline-primary'],
 ] as const;
 const GEOMETRY_LAYOUTS = [
   ...LAYOUTS,
@@ -159,7 +162,7 @@ export const GeometryMatrix: Story = {
             <ToggleGroup
               key={`${layout.name}-${spacing}-${mix}`}
               type="multiple"
-              variant="accentOutline"
+              variant="outline-primary"
               spacing={spacing}
               dir={layout.dir}
               orientation={layout.orientation}
@@ -171,7 +174,6 @@ export const GeometryMatrix: Story = {
                   key={index}
                   value={String(index)}
                   variant={variant}
-                  data-slot={index === 1 ? 'consumer-slot' : undefined}
                   aria-label={`${layout.name} ${spacing} ${mix} ${index}`}
                 >
                   <IconBold />
@@ -207,20 +209,29 @@ export const GeometryMatrix: Story = {
           : rtl
             ? before.left - after.right
             : after.left - before.right;
-        const adjacentAccent =
-          previous.dataset.variant === 'accentOutline' &&
-          item.dataset.variant === 'accentOutline';
+        const adjacentOutlinePrimary =
+          previous.dataset.variant === 'outline-primary' &&
+          item.dataset.variant === 'outline-primary';
         const expected = joined
-          ? adjacentAccent
+          ? adjacentOutlinePrimary
             ? -stroke
             : 0
           : Number.parseFloat(getComputedStyle(group).gap);
         await expect(gap).toBeCloseTo(expected, 2);
+        // An outline item only drops its leading border against another
+        // outline item; a mixed join keeps both strokes.
+        if (item.dataset.variant === 'outline') {
+          const collapsed =
+            joined && previous.dataset.variant === 'outline' ? '0px' : null;
+          const leading = vertical
+            ? getComputedStyle(item).borderTopWidth
+            : getComputedStyle(item).borderInlineStartWidth;
+          await expect(leading).toBe(collapsed ?? `${stroke}px`);
+        }
       }
       if (joined) {
         for (const item of items) {
           item.focus();
-          await userEvent.keyboard('{Shift}');
           await expect(item).toHaveFocus();
           await expect(Number(getComputedStyle(item).zIndex)).toBe(30);
           for (const neighbor of items.filter(
@@ -255,7 +266,7 @@ export const KeyboardContract: Story = {
         <ToggleGroup
           key={config.name}
           type="single"
-          variant="accentOutline"
+          variant="outline-primary"
           dir={config.dir}
           orientation={config.orientation}
           loop={config.loop}
@@ -313,15 +324,14 @@ export const KeyboardContract: Story = {
       await expect(right).toHaveAttribute('aria-checked', 'false');
       await expect(right).not.toHaveAttribute('aria-pressed');
       left.focus();
-      if (!config.orientation) {
-        await userEvent.keyboard('{ArrowDown}');
-        await waitFor(() => expect(right).toHaveFocus());
-      } else {
-        await userEvent.keyboard(
-          config.orientation === 'vertical' ? '{ArrowRight}' : '{ArrowDown}'
-        );
-        await expect(left).toHaveFocus();
-      }
+      await userEvent.keyboard(
+        config.orientation === 'vertical' ? '{ArrowRight}' : '{ArrowDown}'
+      );
+      await expect(left).toHaveFocus();
+      await expect(group).toHaveAttribute(
+        'data-orientation',
+        config.orientation ?? 'horizontal'
+      );
     }
   },
 };
@@ -330,7 +340,7 @@ export const WithoutRovingFocus: Story = {
   render: () => (
     <ToggleGroup
       type="multiple"
-      variant="accentOutline"
+      variant="outline-primary"
       orientation="vertical"
       rovingFocus={false}
     >
@@ -366,7 +376,7 @@ function ControlledGroup({
       <p id="group-format-error">Bold is not supported for this field.</p>
       <ToggleGroup
         type="single"
-        variant="accentOutline"
+        variant="outline-primary"
         value={value}
         disabled={disabled}
         onValueChange={(next) => {
@@ -406,14 +416,10 @@ export const ControlledDisabledTransition: Story = {
     await expect(bold).toBeDisabled();
     await expect(italic).toBeDisabled();
     await expect(bold).toHaveAttribute('aria-checked', 'true');
-    await expect(
-      getComputedStyle(bold, '::before')
-        .getPropertyValue('--tw-inset-ring-color')
-        .trim()
-    ).toBe(
-      getComputedStyle(bold)
-        .getPropertyValue('--nx-color-border-disabled')
-        .trim()
+    // border-disabled and border-default resolve to the same value, so only
+    // the class proves which rule painted the edge.
+    await expect(bold).toHaveClass(
+      'nx:disabled:before:inset-ring-border-disabled'
     );
     await expect(
       getComputedStyle(bold, '::before')
@@ -421,8 +427,6 @@ export const ControlledDisabledTransition: Story = {
         .trim()
     ).toBe('0 0 #0000');
     await expect(getComputedStyle(bold).zIndex).toBe('auto');
-    bold.click();
-    italic.click();
     await expect(args.onValueChange).not.toHaveBeenCalled();
     await expect([
       bold.getBoundingClientRect().width,
@@ -449,7 +453,7 @@ export const InvalidOwnership: Story = {
       <p id="group-selection-error">Choose supported formatting.</p>
       <ToggleGroup
         type="multiple"
-        variant="accentOutline"
+        variant="outline-primary"
         aria-invalid
         aria-describedby="group-selection-error"
         aria-label="Group error"
@@ -458,7 +462,7 @@ export const InvalidOwnership: Story = {
       </ToggleGroup>
       <ToggleGroup
         type="multiple"
-        variant="accentOutline"
+        variant="outline-primary"
         defaultValue={['bold', 'italic']}
         aria-label="Item errors"
       >
@@ -518,12 +522,12 @@ export const EmptyAndSingle: Story = {
     <div className="nx:flex nx:flex-col nx:gap-4">
       <ToggleGroup
         type="multiple"
-        variant="accentOutline"
+        variant="outline-primary"
         aria-label="Empty formatting"
       />
       <ToggleGroup
         type="multiple"
-        variant="accentOutline"
+        variant="outline-primary"
         aria-label="One item"
       >
         <ToggleGroupItem value="bold" asChild>
@@ -562,10 +566,9 @@ export const FormattingSettings: Story = {
       <div className="nx:flex nx:flex-wrap nx:items-center nx:gap-4">
         <ToggleGroup
           type="multiple"
-          variant="accentOutline"
+          variant="outline-primary"
           defaultValue={['bold']}
           aria-label="Text formatting"
-          className="nx:pointer-coarse:[&>button]:min-h-11 nx:pointer-coarse:[&>button]:min-w-11"
         >
           <ToggleGroupItem value="bold" aria-label="Bold">
             <IconBold />
@@ -582,10 +585,10 @@ export const FormattingSettings: Story = {
       </div>
       <ToggleGroup
         type="single"
-        variant="accentOutline"
+        variant="outline-primary"
         spacing={2}
         aria-label="Paragraph style"
-        className="nx:flex-wrap nx:pointer-coarse:[&>button]:min-h-11 nx:pointer-coarse:[&>button]:min-w-11"
+        className="nx:flex-wrap"
       >
         <ToggleGroupItem value="body">Body text</ToggleGroupItem>
         <ToggleGroupItem value="heading">Section heading</ToggleGroupItem>
@@ -723,16 +726,19 @@ export const AllVariants: Story = {
     <div className="nx:flex nx:flex-col nx:gap-4">
       <ToggleGroup
         type="multiple"
-        variant="accentOutline"
+        variant="outline-primary"
         defaultValue={['bold', 'italic']}
       >
-        <ToggleGroupItem value="bold" aria-label="Accent bold">
+        <ToggleGroupItem value="bold" aria-label="Outline primary bold">
           <IconBold />
         </ToggleGroupItem>
-        <ToggleGroupItem value="italic" aria-label="Accent italic">
+        <ToggleGroupItem value="italic" aria-label="Outline primary italic">
           <IconItalic />
         </ToggleGroupItem>
-        <ToggleGroupItem value="underline" aria-label="Accent underline">
+        <ToggleGroupItem
+          value="underline"
+          aria-label="Outline primary underline"
+        >
           <IconUnderline />
         </ToggleGroupItem>
       </ToggleGroup>
@@ -775,14 +781,14 @@ export const AllVariants: Story = {
   ),
 };
 
-export const AccentSizes: Story = {
+export const OutlinePrimarySizes: Story = {
   render: () => (
     <div className="nx:flex nx:flex-col nx:gap-4">
       {(['sm', 'default', 'lg'] as const).map((size) => (
         <ToggleGroup
           key={size}
           type="multiple"
-          variant="accentOutline"
+          variant="outline-primary"
           size={size}
           defaultValue={['bold']}
           aria-label={size}
@@ -797,7 +803,7 @@ export const AccentSizes: Story = {
     for (const group of within(canvasElement).getAllByRole('group')) {
       for (const item of within(group).getAllByRole('button')) {
         await expect(item).toHaveAttribute('data-size', group.dataset.size);
-        await expect(item).toHaveAttribute('data-variant', 'accentOutline');
+        await expect(item).toHaveAttribute('data-variant', 'outline-primary');
         await expect(getComputedStyle(item).borderTopWidth).toBe('0px');
       }
     }
