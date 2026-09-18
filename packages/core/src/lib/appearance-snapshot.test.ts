@@ -42,8 +42,8 @@ function mockSystemPrefersDark(matches: boolean): void {
 }
 
 describe('NexusAppearanceSnapshot', () => {
-  it('uses snapshot version 5 for token value adjudication', () => {
-    expect(SNAPSHOT_VERSION).toBe(5);
+  it('uses snapshot version 13 for quieter surface tones', () => {
+    expect(SNAPSHOT_VERSION).toBe(13);
   });
 
   it('stores pre-derived CSS verbatim', () => {
@@ -63,15 +63,25 @@ describe('NexusAppearanceSnapshot', () => {
     });
   });
 
-  it('recovers state on version mismatch and refreshes the stale CSS cache', () => {
+  it('recovers preferences from an experimental snapshot and refreshes stale CSS', () => {
     const dark = {
       ...DEFAULT_NEXUS_APPEARANCE,
       mode: 'dark' as const,
       brandColor: '#ff0000',
+      lightContrast: 17,
+      darkContrast: 100,
     };
     const snapshot = sanitizeNexusAppearanceSnapshot({
-      version: 999,
-      state: dark,
+      version: 8,
+      state: {
+        ...dark,
+        lightContrast: 17,
+        darkContrast: 100,
+        lightBrightness: 25,
+        darkBrightness: 80,
+        lightSaturation: 50,
+        darkSaturation: 0,
+      },
       themeCss: 'STALE',
       prefsCss: 'STALE',
     });
@@ -82,27 +92,46 @@ describe('NexusAppearanceSnapshot', () => {
     expect(snapshot.prefsCss).toBe(prefsCss(dark));
   });
 
-  it('refreshes a v1 snapshot without resetting the stored state', () => {
+  it('refreshes preset snapshots while preserving other preferences', () => {
     const state = {
       ...DEFAULT_NEXUS_APPEARANCE,
-      mode: 'dark' as const,
       surfaceTone: 'slate' as const,
-      brandColor: '#2563eb',
     };
     const snapshot = sanitizeNexusAppearanceSnapshot({
-      version: 1,
-      state,
-      themeCss: ':root { --nx-color-background: stale; }',
-      prefsCss: ':root { --stale-prefs: stale; }',
+      version: 10,
+      state: { ...state, lightContrast: 'increased', darkContrast: 'standard' },
+      themeCss: 'STALE',
+      prefsCss: 'STALE',
     });
-
-    expect(snapshot.version).toBe(SNAPSHOT_VERSION);
     expect(snapshot.state).toEqual(state);
     expect(snapshot.themeCss).toBe(themeCss(state));
-    expect(snapshot.themeCss).toContain('--nx-color-focus-default:');
-    expect(snapshot.themeCss).toContain('--nx-color-focus-error:');
     expect(snapshot.prefsCss).toBe(prefsCss(state));
   });
+
+  it.each([1, 12])(
+    'refreshes a v%s snapshot without resetting the stored state',
+    (version) => {
+      const state = {
+        ...DEFAULT_NEXUS_APPEARANCE,
+        mode: 'dark' as const,
+        surfaceTone: 'slate' as const,
+        brandColor: '#2563eb',
+      };
+      const snapshot = sanitizeNexusAppearanceSnapshot({
+        version,
+        state,
+        themeCss: ':root { --nx-color-background: stale; }',
+        prefsCss: ':root { --stale-prefs: stale; }',
+      });
+
+      expect(snapshot.version).toBe(SNAPSHOT_VERSION);
+      expect(snapshot.state).toEqual(state);
+      expect(snapshot.themeCss).toBe(themeCss(state));
+      expect(snapshot.themeCss).toContain('--nx-color-focus-default:');
+      expect(snapshot.themeCss).toContain('--nx-color-focus-error:');
+      expect(snapshot.prefsCss).toBe(prefsCss(state));
+    }
+  );
 
   it('embeds runtime focus tokens in the default first-paint snapshot', () => {
     const script = createNexusAppearanceBootstrapScript();
@@ -151,12 +180,21 @@ describe('NexusAppearanceSnapshot', () => {
       ...DEFAULT_NEXUS_APPEARANCE,
       mode: 'dark' as const,
       surfaceTone: 'gray' as const,
-      lightContrast: 85,
+      lightContrast: 35,
       darkContrast: 85,
     };
-    const raw = serializeNexusAppearanceStateCookie(state);
+    const raw = serializeNexusAppearanceStateCookie({
+      ...state,
+      ...{
+        lightBrightness: 0,
+        darkBrightness: 80,
+        lightSaturation: 50,
+        darkSaturation: 0,
+      },
+    });
 
     expect(parseNexusAppearanceStateCookie(raw)).toEqual(state);
+    expect(decodeURIComponent(raw)).not.toMatch(/Brightness|Saturation/);
 
     const snapshot = createNexusAppearanceSnapshotFromCookie(raw);
     expect(snapshot.state).toEqual(state);

@@ -1,9 +1,9 @@
 import type { Shade } from './palette';
 
 /**
- * Static (non-derived) color families emitted verbatim by `deriveTheme`: the
+ * Curated starting colors for adaptive derivation: the
  * status ramps, chart series, and the tone-independent neutral family. Unlike
- * surfaces, these are authored literals rather than seed-derived, so they live
+ * surfaces, these start from authored literals rather than a brand seed, so they live
  * outside the surface ladder.
  */
 

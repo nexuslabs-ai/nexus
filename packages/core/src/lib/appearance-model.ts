@@ -1,3 +1,4 @@
+import { normalizeContrast } from './contrast';
 import type { ThemeDerivationInput, ThemeSeeds } from './derive-theme';
 import type { NexusSurfaceTone } from './palette';
 import { isColor } from './perceptual-ramp';
@@ -47,11 +48,11 @@ export interface NexusAppearanceState {
 export const DEFAULT_BRAND_COLOR = '#0a0a0a';
 
 export const BASE_TONE_OPTIONS = [
-  { value: 'stone', label: 'Stone', color: '#78716c' },
+  { value: 'stone', label: 'Stone', color: '#747271' },
   { value: 'neutral', label: 'Neutral', color: '#737373' },
-  { value: 'zinc', label: 'Zinc', color: '#71717a' },
-  { value: 'slate', label: 'Slate', color: '#64748b' },
-  { value: 'gray', label: 'Gray', color: '#6b7280' },
+  { value: 'zinc', label: 'Zinc', color: '#717273' },
+  { value: 'slate', label: 'Slate', color: '#717376' },
+  { value: 'gray', label: 'Gray', color: '#707274' },
 ] as const satisfies readonly {
   value: NexusSurfaceTone;
   label: string;
@@ -119,8 +120,8 @@ export const DEFAULT_NEXUS_APPEARANCE: NexusAppearanceState = {
   mode: 'light',
   brandColor: DEFAULT_BRAND_COLOR,
   surfaceTone: 'stone',
-  lightContrast: 60,
-  darkContrast: 0,
+  lightContrast: 50,
+  darkContrast: 50,
   density: 'default',
   corners: 'square',
   elevation: 'quiet',
@@ -220,9 +221,6 @@ const clampFontSize = (value: unknown, fallback: number): number =>
     ? Math.min(FONT_PX_MAX, Math.max(FONT_PX_MIN, value))
     : fallback;
 
-const contrastOr = (value: unknown, fallback: number): number =>
-  typeof value === 'number' && value >= 0 && value <= 100 ? value : fallback;
-
 function formatPx(value: number): string {
   return `${Number(value.toFixed(4))}px`;
 }
@@ -313,8 +311,8 @@ export function sanitizeNexusAppearance(
         ? raw.brandColor
         : d.brandColor,
     surfaceTone: enumOr(raw.surfaceTone, SURFACE_TONES, d.surfaceTone),
-    lightContrast: contrastOr(raw.lightContrast, d.lightContrast),
-    darkContrast: contrastOr(raw.darkContrast, d.darkContrast),
+    lightContrast: normalizeContrast(raw.lightContrast, d.lightContrast),
+    darkContrast: normalizeContrast(raw.darkContrast, d.darkContrast),
     density: enumOr(raw.density, DENSITIES, d.density),
     corners: enumOr(raw.corners, CORNERS, d.corners),
     elevation: enumOr(raw.elevation, ELEVATIONS, d.elevation),

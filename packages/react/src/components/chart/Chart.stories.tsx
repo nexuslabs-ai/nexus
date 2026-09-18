@@ -1,4 +1,7 @@
+import { useId } from 'react';
+
 import type { Meta, StoryObj } from '@storybook/react';
+import { IconTexture } from '@tabler/icons-react';
 import {
   Area,
   AreaChart,
@@ -9,7 +12,7 @@ import {
   LineChart,
   XAxis,
 } from 'recharts';
-import { expect } from 'storybook/test';
+import { expect, waitFor, within } from 'storybook/test';
 
 import {
   type ChartConfig,
@@ -38,8 +41,15 @@ const data = [
 ];
 
 const config = {
-  desktop: { label: 'Desktop', color: 'var(--nx-color-chart-categorical-1)' },
-  mobile: { label: 'Mobile', color: 'var(--nx-color-chart-categorical-2)' },
+  desktop: {
+    label: 'Desktop (solid)',
+    color: 'var(--nx-color-chart-categorical-1)',
+  },
+  mobile: {
+    label: 'Mobile (patterned)',
+    color: 'var(--nx-color-chart-categorical-2)',
+    icon: IconTexture,
+  },
 } satisfies ChartConfig;
 
 const unsafeKey = 'desktop; background: red';
@@ -84,6 +94,7 @@ function AreaExample() {
           fill="var(--color-mobile)"
           fillOpacity={0.4}
           stroke="var(--color-mobile)"
+          strokeDasharray="6 4"
         />
       </AreaChart>
     </ChartContainer>
@@ -91,9 +102,25 @@ function AreaExample() {
 }
 
 function BarExample() {
+  const mobilePattern = useId();
   return (
     <ChartContainer config={config}>
       <BarChart accessibilityLayer data={data}>
+        <defs>
+          <pattern
+            id={mobilePattern}
+            width={6}
+            height={6}
+            patternUnits="userSpaceOnUse"
+          >
+            <rect width={6} height={6} fill="var(--color-mobile)" />
+            <path
+              d="M0 0L6 6M-3 3L3 9M3 -3L9 3"
+              stroke="var(--nx-color-container)"
+              strokeWidth={1.5}
+            />
+          </pattern>
+        </defs>
         <CartesianGrid vertical={false} />
         <XAxis
           dataKey="month"
@@ -105,7 +132,7 @@ function BarExample() {
         <ChartTooltip content={<ChartTooltipContent indicator="dashed" />} />
         <ChartLegend content={<ChartLegendContent />} />
         <Bar dataKey="desktop" fill="var(--color-desktop)" radius={4} />
-        <Bar dataKey="mobile" fill="var(--color-mobile)" radius={4} />
+        <Bar dataKey="mobile" fill={`url(#${mobilePattern})`} radius={4} />
       </BarChart>
     </ChartContainer>
   );
@@ -140,6 +167,7 @@ function LineExample() {
           dataKey="mobile"
           type="natural"
           stroke="var(--color-mobile)"
+          strokeDasharray="6 4"
           strokeWidth={2}
           dot={false}
         />
@@ -271,4 +299,49 @@ export const AllVariants: Story = {
       <LineExample />
     </div>
   ),
+};
+
+export const Grayscale: Story = {
+  render: () => (
+    <div
+      data-testid="grayscale-preview"
+      className="nx:w-[600px] nx:max-w-full nx:space-y-6 nx:grayscale"
+    >
+      <p className="nx:typography-body-default">
+        Desktop uses solid marks. Mobile uses dashed lines and striped bars.
+      </p>
+      <LineExample />
+      <BarExample />
+    </div>
+  ),
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+    await expect(canvas.getAllByText('Desktop (solid)').length).toBeGreaterThan(
+      0
+    );
+    await expect(
+      canvas.getAllByText('Mobile (patterned)').length
+    ).toBeGreaterThan(0);
+    await waitFor(() => {
+      const dashes = Array.from(
+        canvasElement.querySelectorAll('[stroke-dasharray]')
+      ).map((path) =>
+        path
+          .getAttribute('stroke-dasharray')
+          ?.split(/[,\s]+/)
+          .map(parseFloat)
+      );
+      expect(dashes.some((dash) => dash?.[0] === 6 && dash[1] === 4)).toBe(
+        true
+      );
+      expect(
+        getComputedStyle(canvas.getByTestId('grayscale-preview')).filter
+      ).toContain('grayscale(1)');
+    });
+    const pattern = canvasElement.querySelector('pattern');
+    await expect(pattern).toBeInTheDocument();
+    await expect(
+      canvasElement.querySelector(`[fill="url(#${pattern?.id})"]`)
+    ).toBeInTheDocument();
+  },
 };

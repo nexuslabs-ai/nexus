@@ -78,22 +78,99 @@ export const LayoutModeOptions: Story = {
   },
 };
 
-export const ContrastIsolation: Story = {
+export const ContrastSlider: Story = {
   play: async ({ canvasElement }) => {
     const canvas = within(canvasElement);
-
-    // Distinct accessible names (else getByRole is ambiguous / axe flags duplicates).
-    const lightSlider = canvas.getByRole('slider', { name: 'Light contrast' });
+    const slider = canvas.getByRole('slider', { name: 'Contrast' });
+    await expect(canvas.getAllByRole('slider')).toHaveLength(1);
     await expect(
-      canvas.getByRole('slider', { name: 'Dark contrast' })
+      canvas.queryByRole('radio', { name: 'Increased' })
+    ).not.toBeInTheDocument();
+    await expect(
+      canvas.getByText('Editing light appearance')
     ).toBeInTheDocument();
-
-    // Drive the light slider down deterministically (Radix Slider handles arrows).
-    lightSlider.focus();
+    await expect(slider).toHaveAttribute('aria-valuenow', '50');
+    slider.focus();
     await userEvent.keyboard('{ArrowLeft}{ArrowLeft}');
+    await expect(slider).toHaveAttribute('aria-valuenow', '48');
+    await expect(canvas.getByText('lightContrast: 48,')).toBeInTheDocument();
+    await userEvent.keyboard('{Home}');
+    await expect(slider).toHaveAttribute('aria-valuenow', '0');
+    await userEvent.keyboard('{End}');
+    await expect(slider).toHaveAttribute('aria-valuenow', '100');
+    await userEvent.click(canvas.getByRole('radio', { name: 'Dark' }));
+    await expect(
+      canvas.getByText('Editing dark appearance')
+    ).toBeInTheDocument();
+    await expect(slider).toHaveAttribute('aria-valuenow', '50');
+    slider.focus();
+    await userEvent.keyboard('{ArrowRight}');
+    await expect(canvas.getByText('darkContrast: 51,')).toBeInTheDocument();
+    await userEvent.click(canvas.getByRole('radio', { name: 'Light' }));
+    await expect(slider).toHaveAttribute('aria-valuenow', '100');
+  },
+};
 
-    // Config preview proves light moved and dark held — and renders numbers, not [object Object].
-    await expect(canvas.getByText('lightContrast: 58,')).toBeInTheDocument();
-    await expect(canvas.getByText('darkContrast: 0,')).toBeInTheDocument();
+const DARK_QUERY = '(prefers-color-scheme: dark)';
+let systemDark = false;
+let systemMedia: MediaQueryList;
+
+export const SystemContrast: Story = {
+  beforeEach: () => {
+    const originalMatchMedia = window.matchMedia;
+    const events = new EventTarget();
+    systemDark = false;
+    systemMedia = {
+      media: DARK_QUERY,
+      get matches() {
+        return systemDark;
+      },
+      onchange: null,
+      addEventListener: events.addEventListener.bind(events),
+      removeEventListener: events.removeEventListener.bind(events),
+      dispatchEvent: events.dispatchEvent.bind(events),
+      addListener: () => {},
+      removeListener: () => {},
+    };
+    window.matchMedia = (query) =>
+      query === DARK_QUERY
+        ? systemMedia
+        : originalMatchMedia.call(window, query);
+    return () => {
+      window.matchMedia = originalMatchMedia;
+    };
+  },
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+    const mode = within(canvas.getByLabelText('Mode'));
+    await userEvent.click(mode.getByRole('radio', { name: 'System' }));
+    await expect(
+      canvas.getByText('Editing light appearance')
+    ).toBeInTheDocument();
+    const slider = canvas.getByRole('slider', { name: 'Contrast' });
+    slider.focus();
+    await userEvent.keyboard('{End}');
+    await expect(canvas.getByText('lightContrast: 100,')).toBeInTheDocument();
+    await expect(canvas.getByText('darkContrast: 50,')).toBeInTheDocument();
+    systemDark = true;
+    systemMedia.dispatchEvent(
+      new MediaQueryListEvent('change', { matches: true, media: DARK_QUERY })
+    );
+    await waitFor(() =>
+      expect(canvas.getByText('Editing dark appearance')).toBeInTheDocument()
+    );
+    await expect(slider).toHaveAttribute('aria-valuenow', '50');
+    slider.focus();
+    await userEvent.keyboard('{ArrowRight}');
+    await expect(canvas.getByText('darkContrast: 51,')).toBeInTheDocument();
+    await expect(canvas.getByText('lightContrast: 100,')).toBeInTheDocument();
+    systemDark = false;
+    systemMedia.dispatchEvent(
+      new MediaQueryListEvent('change', { matches: false, media: DARK_QUERY })
+    );
+    await waitFor(() =>
+      expect(canvas.getByText('Editing light appearance')).toBeInTheDocument()
+    );
+    await expect(slider).toHaveAttribute('aria-valuenow', '100');
   },
 };
