@@ -26,6 +26,19 @@ import { pathToFileURL } from 'node:url';
 import { createJiti } from 'jiti';
 import prettier from 'prettier';
 
+/**
+ * @import { Block } from '../page-registry/blocks'
+ * @import { RegistrySection } from '../page-registry/index'
+ *
+ * @typedef {{ kind: 'mdx' | 'component', dir: string, ext: string, keepExtension: boolean }} PageSource
+ * @typedef {PageSource & { pages: Map<string, string> }} CollectedSource
+ * @typedef {{ lede: string, blocks: Block[] }} Wireframe
+ * @typedef {{ route: string, slug: string, label: string, components?: string[], nested?: string[] }} ManifestPageBase
+ * @typedef {ManifestPageBase & ({ kind: 'mdx' | 'component', file: string } | { kind: 'placeholder', file: null })} ManifestPage
+ * @typedef {{ slug: string, title: string, href: string, unit?: 'components', pages: ManifestPage[] }} ManifestSection
+ * @typedef {{ page: ManifestPage, specifier?: string, wireframe?: Wireframe }} BuiltPage
+ */
+
 /** Nav metadata source, relative to the docs app root. */
 export const REGISTRY_FILE = 'page-registry/index.ts';
 
@@ -36,21 +49,28 @@ const BLOCKS_FILE = 'page-registry/blocks.ts';
 export const MANIFEST_FILE = 'app/_lib/page-manifest.generated.ts';
 export const CONTENT_FILE = 'app/_lib/page-content.generated.ts';
 
+/** @type {PageSource[]} */
 const SOURCES = [
   { kind: 'mdx', dir: 'content', ext: '.mdx', keepExtension: true },
   { kind: 'component', dir: 'app/_pages', ext: '.tsx', keepExtension: false },
 ];
 
-/** `multi-brand` → `Multi brand`. */
+/**
+ * `multi-brand` → `Multi brand`.
+ *
+ * @param {string} slug
+ */
 function humanize(slug) {
   const spaced = slug.replaceAll('-', ' ');
   return spaced.charAt(0).toUpperCase() + spaced.slice(1);
 }
 
+/** @param {string} relative */
 function toPosix(relative) {
   return relative.split(path.sep).join('/');
 }
 
+/** @param {string} dir */
 function readDirEntries(dir) {
   return fs
     .readdirSync(dir, { withFileTypes: true })
@@ -59,8 +79,15 @@ function readDirEntries(dir) {
     );
 }
 
-/** Collects `{section}/{slug}{ext}` files into a `section/slug` → source-file map. */
+/**
+ * Collects `{section}/{slug}{ext}` files into a `section/slug` → source-file map.
+ *
+ * @param {string} docsRoot
+ * @param {PageSource} source
+ * @returns {Map<string, string>}
+ */
 function collectPages(docsRoot, { dir, ext }) {
+  /** @type {Map<string, string>} */
   const found = new Map();
   const root = path.join(docsRoot, dir);
   if (!fs.existsSync(root)) {
@@ -99,7 +126,9 @@ function collectPages(docsRoot, { dir, ext }) {
   return found;
 }
 
+/** @param {readonly CollectedSource[]} sources */
 function assertOneSourcePerRoute(sources) {
+  /** @type {Map<string, string>} */
   const seen = new Map();
   for (const source of sources) {
     for (const [key, file] of source.pages) {
@@ -114,17 +143,23 @@ function assertOneSourcePerRoute(sources) {
   }
 }
 
-/** Folds a label or a slug to one identity — `DropdownMenu` and `dropdown-menu` both give `dropdownmenu`. */
+/**
+ * Folds a label or a slug to one identity — `DropdownMenu` and `dropdown-menu` both give `dropdownmenu`.
+ *
+ * @param {string} value
+ */
 function comparisonKey(value) {
   return value.toLowerCase().replace(/[^a-z0-9]/g, '');
 }
 
+/** @param {ManifestPage} page */
 function railLabelsOf(page) {
   return [...(page.components ?? []), ...(page.nested ?? [])];
 }
 
 const CARD_JOINER = ' · ';
 
+/** @param {ManifestSection} section */
 function assertLabelsAvoidTheCardJoiner(section) {
   for (const page of section.pages) {
     if (page.label.includes(CARD_JOINER)) {
@@ -135,6 +170,7 @@ function assertLabelsAvoidTheCardJoiner(section) {
   }
 }
 
+/** @param {ManifestSection} section */
 function assertComponentsDeclareTheirUnit(section) {
   if (section.unit === 'components') return;
   for (const page of section.pages) {
@@ -146,7 +182,9 @@ function assertComponentsDeclareTheirUnit(section) {
   }
 }
 
+/** @param {ManifestSection} section */
 function assertRailLabelsHaveNoPage(section) {
+  /** @type {Map<string, string>} */
   const pageFor = new Map();
   for (const page of section.pages) {
     pageFor.set(comparisonKey(page.slug), page.slug);
@@ -165,7 +203,12 @@ function assertRailLabelsHaveNoPage(section) {
   }
 }
 
-/** Import specifier for a docs-root-relative file, as seen from the content module. */
+/**
+ * Import specifier for a docs-root-relative file, as seen from the content module.
+ *
+ * @param {string} file
+ * @param {boolean} keepExtension
+ */
 function specifierFor(file, keepExtension) {
   const relative = toPosix(path.relative(path.dirname(CONTENT_FILE), file));
   return keepExtension
@@ -173,6 +216,7 @@ function specifierFor(file, keepExtension) {
     : relative.slice(0, relative.lastIndexOf('.'));
 }
 
+/** @param {ManifestPage} page */
 function renderPage(page) {
   const fields = Object.entries(page).map(
     ([key, value]) => `${key}: ${JSON.stringify(value)},`
@@ -180,6 +224,7 @@ function renderPage(page) {
   return `{ ${fields.join(' ')} },`;
 }
 
+/** @param {ManifestSection} section */
 function renderSection(section) {
   const head = [
     `slug: ${JSON.stringify(section.slug)},`,
@@ -195,6 +240,7 @@ function renderSection(section) {
 const HEADER = `// AUTO-GENERATED by apps/docs/scripts/generate-page-manifest.mjs — do not edit.
 // Regenerate with \`pnpm --filter @nexus_ds/docs generate:manifest\`.`;
 
+/** @param {readonly ManifestSection[]} manifest */
 function renderManifestModule(manifest) {
   return `${HEADER}
 
@@ -239,6 +285,7 @@ ${manifest.map(renderSection).join('\n')}
 `;
 }
 
+/** @param {{ loaders: readonly { route: string, specifier: string }[], wireframes: readonly ({ route: string } & Wireframe)[] }} content */
 function renderContentModule({ loaders, wireframes }) {
   const loaderEntries = loaders.map(
     ({ route, specifier }) =>
@@ -281,6 +328,8 @@ ${wireframeEntries.join('\n')}
 /**
  * The repo's prettier config, minus `plugins` — `format` resolves plugin
  * specifiers against `process.cwd()` rather than against the config file.
+ *
+ * @param {string} docsRoot
  */
 export async function resolveFormatOptions(docsRoot) {
   const config = {
@@ -296,14 +345,22 @@ export async function resolveFormatOptions(docsRoot) {
  * registry plus an explicit slug sort, never from directory listing order, so
  * two runs over unchanged sources return the same strings. Pass `formatOptions`
  * to format against something other than the repo's prettier config.
+ *
+ * @param {string} docsRoot
+ * @param {import('prettier').Options} [formatOptions]
  */
 export async function buildPageManifest(docsRoot, formatOptions) {
   const registryPath = path.join(docsRoot, REGISTRY_FILE);
   const jiti = createJiti(pathToFileURL(registryPath).href);
-  const { PAGE_REGISTRY } = await jiti.import(registryPath);
+  const { PAGE_REGISTRY } =
+    /** @type {{ PAGE_REGISTRY: Record<string, RegistrySection> }} */ (
+      await jiti.import(registryPath)
+    );
 
+  /** @param {string} slug */
   const sectionFor = (slug) =>
     Object.hasOwn(PAGE_REGISTRY, slug) ? PAGE_REGISTRY[slug] : undefined;
+  /** @param {string} slug */
   const pagesOf = (slug) => sectionFor(slug)?.pages ?? [];
 
   const sources = SOURCES.map((source) => ({
@@ -313,7 +370,11 @@ export async function buildPageManifest(docsRoot, formatOptions) {
   assertOneSourcePerRoute(sources);
   const keysOnDisk = sources.flatMap((source) => [...source.pages.keys()]);
 
-  /** Registry order first, then slugs that exist only on disk, in slug order. */
+  /**
+   * Registry order first, then slugs that exist only on disk, in slug order.
+   *
+   * @param {string} sectionSlug
+   */
   function orderedSlugs(sectionSlug) {
     const registeredSlugs = pagesOf(sectionSlug).map((entry) => entry.slug);
     const extra = keysOnDisk
@@ -324,9 +385,15 @@ export async function buildPageManifest(docsRoot, formatOptions) {
     return [...registeredSlugs, ...extra];
   }
 
+  /**
+   * @param {string} sectionSlug
+   * @param {string} slug
+   * @returns {BuiltPage}
+   */
   function buildPage(sectionSlug, slug) {
     const key = `${sectionSlug}/${slug}`;
     const entry = pagesOf(sectionSlug).find((page) => page.slug === slug);
+    /** @type {ManifestPageBase} */
     const base = {
       route: `/${key}`,
       slug,
@@ -339,9 +406,10 @@ export async function buildPageManifest(docsRoot, formatOptions) {
       base.nested = entry.nested;
     }
 
-    const source = sources.find((candidate) => candidate.pages.has(key));
-    if (source) {
+    for (const source of sources) {
       const file = source.pages.get(key);
+      if (!file) continue;
+
       if (entry?.wireframe) {
         throw new Error(
           `${key} is written at ${file}, so its registry wireframe can never render — drop the \`wireframe\` from its registry entry.`
@@ -365,7 +433,9 @@ export async function buildPageManifest(docsRoot, formatOptions) {
   }
 
   /** Sections that exist only on disk, appended after the registry's own. */
-  const extraSections = [...new Set(keysOnDisk.map((key) => key.split('/')[0]))]
+  const extraSections = [
+    ...new Set(keysOnDisk.map((key) => key.split('/')[0] ?? key)),
+  ]
     .filter((slug) => !Object.hasOwn(PAGE_REGISTRY, slug))
     .sort();
 
@@ -393,7 +463,9 @@ export async function buildPageManifest(docsRoot, formatOptions) {
   manifest.forEach(assertRailLabelsHaveNoPage);
 
   const entries = built.flatMap((section) => section.entries);
+  /** @type {{ route: string, specifier: string }[]} */
   const loaders = [];
+  /** @type {({ route: string } & Wireframe)[]} */
   const wireframes = [];
   for (const { page, specifier, wireframe } of entries) {
     if (specifier) {
@@ -405,6 +477,10 @@ export async function buildPageManifest(docsRoot, formatOptions) {
   }
 
   const format = formatOptions ?? (await resolveFormatOptions(docsRoot));
+  /**
+   * @param {string} file
+   * @param {string} source
+   */
   const formatModule = (file, source) =>
     prettier.format(source, {
       ...format,

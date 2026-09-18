@@ -27,25 +27,28 @@ pages:
 
 | Source                                        | Style attributes | Distinct values |
 | --------------------------------------------- | ---------------: | --------------: |
-| Shiki token spans (`color:var(--nx-color-*)`) |             ~505 |               8 |
-| The docs app's own pages and components       |              816 |             280 |
-| **Total**                                     |        **~1320** |         **288** |
+| Shiki token spans (`color:var(--nx-color-*)`) |              846 |               8 |
+| The docs app's own pages and components       |              420 |             278 |
+| **Total**                                     |         **1266** |         **286** |
 
-The distinct-value counts are stable across builds and are what the argument
-rests on. The raw attribute total is not: Shiki's span count drifts by a span or
-two between builds of the same tree (observed 1341 / 1320 / 1321 / 1322), which
-is a tokenisation-determinism question for the highlighter, not a CSP one. The
-audit gates on whether inline content exists at all, never on an exact count.
+The argument rests on the distinct-value counts, since they are what a
+hash-based policy would have to enumerate. Four builds of this tree produced
+identical totals, but the raw attribute count is not something to rely on:
+Shiki's span count has drifted by a span or two between builds of the same
+sources, which is a tokenisation-determinism question for the highlighter, not a
+CSP one. The audit gates on whether inline content exists at all, never on an
+exact count.
 
-The docs app's own inline styles outnumber Shiki's, and 280 distinct values put
-a hash-based `style-src` out of reach — `'unsafe-hashes'` would need one hash
-per value, and it lets an attacker reuse any hashed declaration anywhere, so it
-buys very little for a header that size. Next.js also emits one inline `<style>`
-element in its built-in `not-found` page, which the app does not own.
+The docs app's own inline styles carry almost all of the variety, and 278
+distinct values put a hash-based `style-src` out of reach — `'unsafe-hashes'`
+would need one hash per value, and it lets an attacker reuse any hashed
+declaration anywhere, so it buys very little for a header that size. Next.js
+also emits one inline `<style>` element in its built-in `not-found` page, which
+the app does not own.
 
 Moving Shiki's output into a stylesheet is therefore possible but pointless: it
-would remove 8 of the 288 distinct values and `'unsafe-inline'` would still have
-to stay for the other 280. Shiki's colours already reference Nexus tokens rather
+would remove 8 of the 286 distinct values and `'unsafe-inline'` would still have
+to stay for the other 278. Shiki's colours already reference Nexus tokens rather
 than baked hex, so nothing about theming depends on the move either.
 
 **Decision: keep `'unsafe-inline'` in `style-src` and leave Shiki's output
@@ -59,7 +62,7 @@ still Report-Only.
 
 The policy hash-lists exactly one inline script, the appearance bootstrap.
 Next.js App Router streams its RSC payload through **inline**
-`self.__next_f.push(…)` scripts — 658 of them across the build — and a hash in
+`self.__next_f.push(…)` scripts — 706 of them across the build — and a hash in
 `script-src` makes any `'unsafe-inline'` inert, so an enforced policy blocks all
 of them.
 
@@ -85,7 +88,7 @@ The pages render **blank**, not merely unhydrated: the client bundle loads from
 
 - **A nonce.** Next.js's documented approach. Middleware generates a nonce per
   request and Next stamps it on its own inline scripts. It forces dynamic
-  rendering, so all 44 pages lose static prerendering.
+  rendering, so all 41 prerendered pages lose static prerendering.
 - **Build-time hashes.** Hash each page's inline scripts after the build and
   emit per-route headers. Keeps prerendering, but means ~30 hashes per route in
   the response headers and it cannot cover a dynamically rendered page.
@@ -172,14 +175,14 @@ one directive name literally.
 
 ```
 $ pnpm --filter @nexus_ds/docs audit:csp
-  "flightScripts": 658,
+  "flightScripts": 706,
   "otherInlineScripts": 0,
   "cspHeader": "Content-Security-Policy-Report-Only",
   "integrityFailures": [],
   "enforcementBlockers": [
     {
       "tracked": "#687",
-      "message": "script-src (…) blocks 658 inline scripts that carry no hash (Next.js RSC flight data)."
+      "message": "script-src (…) blocks 706 inline scripts that carry no hash (Next.js RSC flight data)."
     }
   ]
 ```
