@@ -1,4 +1,3 @@
-import { Breadcrumb } from '../../_components/Breadcrumb';
 import { SectionHeading } from '../../_components/Heading';
 
 /**
@@ -60,13 +59,6 @@ const MODES: { mode: string; archetype: string }[] = [
 export default function Spacing() {
   return (
     <>
-      <Breadcrumb
-        items={[
-          { label: 'Home', href: '/' },
-          { label: 'Foundations', href: '/foundations' },
-          { label: 'Spacing' },
-        ]}
-      />
       <h1 className="nx:typography-heading-large">Spacing</h1>
       <p className="nx:typography-body-default nx:text-muted-foreground nx:mt-2 nx:mb-8 nx:max-w-[64ch]">
         A 4px-based scale, exposed as named steps only — there is no base{' '}

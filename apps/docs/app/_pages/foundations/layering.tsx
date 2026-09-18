@@ -1,4 +1,3 @@
-import { Breadcrumb } from '../../_components/Breadcrumb';
 import { SectionHeading } from '../../_components/Heading';
 
 /**
@@ -26,13 +25,6 @@ const LAYERS: { token: string; value: number; use: string }[] = [
 export default function Layering() {
   return (
     <>
-      <Breadcrumb
-        items={[
-          { label: 'Home', href: '/' },
-          { label: 'Foundations', href: '/foundations' },
-          { label: 'Layering' },
-        ]}
-      />
       <h1 className="nx:typography-heading-large">Layering</h1>
       <p className="nx:typography-body-default nx:text-muted-foreground nx:mt-2 nx:mb-8 nx:max-w-[64ch]">
         A 6-token z-index scale for stacking overlays. Shadow communicates{' '}

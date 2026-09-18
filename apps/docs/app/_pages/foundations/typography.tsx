@@ -1,4 +1,3 @@
-import { Breadcrumb } from '../../_components/Breadcrumb';
 import { CodeBlock } from '../../_components/CodeBlock';
 import { SectionHeading, SubsectionHeading } from '../../_components/Heading';
 
@@ -125,13 +124,6 @@ const FAMILIES: {
 export default function Typography() {
   return (
     <>
-      <Breadcrumb
-        items={[
-          { label: 'Home', href: '/' },
-          { label: 'Foundations', href: '/foundations' },
-          { label: 'Typography' },
-        ]}
-      />
       <h1 className="nx:typography-heading-large">Typography</h1>
       <p className="nx:typography-body-default nx:text-muted-foreground nx:mt-2 nx:mb-8 nx:max-w-[64ch]">
         One scale for the whole system. Every tier is a composite utility —

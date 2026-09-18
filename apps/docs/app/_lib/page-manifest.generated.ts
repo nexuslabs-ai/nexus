@@ -6,7 +6,9 @@ export type ManifestPage = {
   route: string;
   slug: string;
   label: string;
-  /** Non-interactive labels rendered under this page in the left rail. */
+  /** Components this group page covers, listed under it in the left rail. */
+  components?: readonly string[];
+  /** Non-interactive headings listed under this page in the left rail. */
   nested?: readonly string[];
 } & (
   | {
@@ -25,8 +27,13 @@ export type ManifestSection = {
   slug: string;
   title: string;
   href: string;
+  /** What the section is counted in on the home page. Defaults to pages. */
+  unit?: 'components';
   pages: readonly ManifestPage[];
 };
+
+/** The separator the home page's section cards join a section's page labels with. */
+export const CARD_JOINER = ' · ';
 
 /** Every docs page, in nav order. Serializable — safe to import from a client component. */
 export const PAGE_MANIFEST: readonly ManifestSection[] = [
@@ -107,7 +114,7 @@ export const PAGE_MANIFEST: readonly ManifestSection[] = [
       {
         route: '/foundations/radius',
         slug: 'radius',
-        label: 'Radius · Borders · Shadows',
+        label: 'Radius, borders & shadows',
         kind: 'component',
         file: 'app/_pages/foundations/radius.tsx',
       },
@@ -131,12 +138,13 @@ export const PAGE_MANIFEST: readonly ManifestSection[] = [
     slug: 'components',
     title: 'Components',
     href: '/components',
+    unit: 'components',
     pages: [
       {
         route: '/components/inputs',
         slug: 'inputs',
         label: 'Inputs',
-        nested: ['Button', 'Input', 'Select', 'Switch', 'Tabs'],
+        components: ['Button', 'Input', 'Select', 'Switch', 'Tabs'],
         kind: 'placeholder',
         file: null,
       },
@@ -144,7 +152,7 @@ export const PAGE_MANIFEST: readonly ManifestSection[] = [
         route: '/components/containers',
         slug: 'containers',
         label: 'Containers',
-        nested: ['Card', 'Dialog', 'Accordion', 'Alert'],
+        components: ['Card', 'Dialog', 'Accordion', 'Alert'],
         kind: 'placeholder',
         file: null,
       },
@@ -152,7 +160,7 @@ export const PAGE_MANIFEST: readonly ManifestSection[] = [
         route: '/components/navigation',
         slug: 'navigation',
         label: 'Navigation',
-        nested: ['DropdownMenu'],
+        components: ['DropdownMenu'],
         kind: 'placeholder',
         file: null,
       },
@@ -160,7 +168,7 @@ export const PAGE_MANIFEST: readonly ManifestSection[] = [
         route: '/components/display',
         slug: 'display',
         label: 'Display',
-        nested: ['Badge', 'Avatar', 'Tooltip'],
+        components: ['Badge', 'Avatar', 'Tooltip'],
         kind: 'placeholder',
         file: null,
       },
@@ -168,7 +176,7 @@ export const PAGE_MANIFEST: readonly ManifestSection[] = [
         route: '/components/primitives',
         slug: 'primitives',
         label: 'Primitives',
-        nested: ['Show / Hide', 'Slot'],
+        components: ['Show / Hide', 'Slot'],
         kind: 'placeholder',
         file: null,
       },

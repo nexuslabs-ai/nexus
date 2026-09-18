@@ -1,4 +1,3 @@
-import { Breadcrumb } from '../../_components/Breadcrumb';
 import { CodeBlock } from '../../_components/CodeBlock';
 import { SectionHeading } from '../../_components/Heading';
 
@@ -74,13 +73,6 @@ const MECHANISMS: { mechanism: string; use: string }[] = [
 export default function Responsive() {
   return (
     <>
-      <Breadcrumb
-        items={[
-          { label: 'Home', href: '/' },
-          { label: 'Foundations', href: '/foundations' },
-          { label: 'Responsive' },
-        ]}
-      />
       <h1 className="nx:typography-heading-large">Responsive</h1>
       <p className="nx:typography-body-default nx:text-muted-foreground nx:mt-2 nx:mb-8 nx:max-w-[64ch]">
         Nexus is designed mobile-first and desktop-first — Narrow (mobile) and
