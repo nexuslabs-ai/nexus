@@ -121,7 +121,10 @@ export const TouchTarget: Story = {
     const box = canvasElement.querySelector('[data-slot="checkbox"]');
 
     await expect(box).toHaveClass('nx:relative');
-    await expect(box).toHaveClass('nx:pointer-coarse:after:-inset-3.5');
+    await expect(box).toHaveClass('nx:pointer-coarse:after:absolute');
+    await expect((box as Element).className).toMatch(
+      /pointer-coarse:after:-inset-\[max\(var\(--nx-spacing-3_5\),/
+    );
     await expect(box).toHaveClass('nx:bg-container');
     await expect(box).toHaveClass(
       'nx:enabled:data-[state=unchecked]:hover:bg-container-hover'

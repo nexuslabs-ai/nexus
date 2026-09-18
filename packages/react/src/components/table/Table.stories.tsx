@@ -238,11 +238,7 @@ function SelectionTableDemo({
 }
 
 export const SelectableRows: Story = {
-  render: () => (
-    <div className="nx:@container/table-selection nx:w-full">
-      <SelectionTableDemo />
-    </div>
-  ),
+  render: () => <SelectionTableDemo selectable />,
   play: async ({ canvasElement }) => {
     const canvas = within(canvasElement);
     const first = canvas.getByRole('checkbox', { name: 'Select INV001' });
@@ -315,8 +311,8 @@ export const SelectionKeyboardInteraction: Story = {
 
 export const SelectionNarrowContainer: Story = {
   render: () => (
-    <div className="nx:@container/table-selection nx:w-80">
-      <SelectionTableDemo />
+    <div className="nx:w-80">
+      <SelectionTableDemo selectable />
     </div>
   ),
   play: async ({ canvasElement }) => {
@@ -336,11 +332,7 @@ export const SelectionInlineFallback: Story = {
 };
 
 export const SelectionDisabled: Story = {
-  render: () => (
-    <div className="nx:@container/table-selection nx:w-full">
-      <SelectionTableDemo disabled />
-    </div>
-  ),
+  render: () => <SelectionTableDemo selectable disabled />,
   play: async ({ canvasElement }) => {
     const control = within(canvasElement).getByRole('checkbox', {
       name: 'Select INV001',
@@ -353,11 +345,7 @@ export const SelectionDisabled: Story = {
 };
 
 export const SelectionEmpty: Story = {
-  render: () => (
-    <div className="nx:@container/table-selection nx:w-full">
-      <SelectionTableDemo rows={[]} />
-    </div>
-  ),
+  render: () => <SelectionTableDemo selectable rows={[]} />,
   play: async ({ canvasElement }) => {
     const canvas = within(canvasElement);
     const control = canvas.getByRole('checkbox', { name: 'Select all rows' });
@@ -376,10 +364,14 @@ export const SelectionLayoutMatrix: Story = {
             <div
               key={`${dir}-${variant}-${density}`}
               dir={dir}
-              data-testid={`${dir}-${variant}-${density}`}
-              className="nx:@container/table-selection nx:w-full nx:overflow-hidden nx:border-default nx:border-border-default"
+              className="nx:w-full nx:overflow-hidden nx:border-default nx:border-border-default"
             >
-              <SelectionTableDemo variant={variant} density={density} striped />
+              <SelectionTableDemo
+                selectable
+                variant={variant}
+                density={density}
+                striped
+              />
             </div>
           ))
         )
@@ -411,6 +403,67 @@ export const SelectionLayoutMatrix: Story = {
         await expect(box.right).toBeLessThanOrEqual(bounds.right - 4);
       }
     }
+  },
+};
+
+export const SelectionDataAttributes: Story = {
+  render: () => <SelectionTableDemo selectable />,
+  play: async ({ canvasElement }) => {
+    const control = within(canvasElement).getByRole('checkbox', {
+      name: 'Select INV001',
+    });
+    await expect(control.closest('td')).toHaveAttribute(
+      'data-slot',
+      'table-selection-cell'
+    );
+    await expect(
+      canvasElement.querySelector('[data-slot="table-selection-head"]')
+    ).toBeInTheDocument();
+    await expect(
+      canvasElement.querySelector('[data-slot="table-selection-container"]')
+    ).toBeInTheDocument();
+  },
+};
+
+// The selection column separator is a logical border. A physical `border-r-0`
+// alongside it would win the cascade in LTR only, silently dropping the rule.
+export const SelectionGridSeparator: Story = {
+  render: () => (
+    <div className="nx:w-full nx:space-y-6">
+      {(['ltr', 'rtl'] as const).map((dir) => (
+        <div key={dir} dir={dir} className="nx:w-full">
+          <SelectionTableDemo variant="grid" />
+        </div>
+      ))}
+    </div>
+  ),
+  play: async ({ canvasElement }) => {
+    const cells = canvasElement.querySelectorAll<HTMLElement>(
+      '[data-slot="table-selection-cell"], [data-slot="table-selection-head"]'
+    );
+    await expect(cells.length).toBeGreaterThan(0);
+    for (const cell of cells) {
+      await expect(
+        parseFloat(getComputedStyle(cell).borderInlineEndWidth)
+      ).toBeGreaterThan(0);
+    }
+  },
+};
+
+// Without `selectable` the gutter rule never matches, so container padding set
+// through containerClassName survives on both sides.
+export const SelectionFallbackKeepsContainerPadding: Story = {
+  render: () => <SelectionTableDemo containerClassName="nx:px-3" />,
+  play: async ({ canvasElement }) => {
+    const container = canvasElement.querySelector<HTMLElement>(
+      '[data-slot="table-container"]'
+    );
+    if (!container) throw new Error('Table container missing');
+    const style = getComputedStyle(container);
+    await expect(parseFloat(style.paddingInlineStart)).toBeGreaterThan(0);
+    await expect(parseFloat(style.paddingInlineStart)).toBe(
+      parseFloat(style.paddingInlineEnd)
+    );
   },
 };
 
@@ -869,7 +922,9 @@ export const Grid: Story = {
       'nx:border-b-default',
       'nx:border-border-default-alpha'
     );
-    await expect(cell).toHaveClass('nx:border-r-default');
+    await expect(
+      parseFloat(getComputedStyle(cell as Element).borderInlineEndWidth)
+    ).toBeGreaterThan(0);
   },
 };
 
@@ -963,13 +1018,12 @@ export const StickyHeader: Story = {
 
 export const StickyHeaderWithSelection: Story = {
   render: () => (
-    <div className="nx:@container/table-selection nx:w-full">
-      <SelectionTableDemo
-        stickyHeader
-        rows={stickySelectionInvoices}
-        containerClassName="nx:max-h-64"
-      />
-    </div>
+    <SelectionTableDemo
+      selectable
+      stickyHeader
+      rows={stickySelectionInvoices}
+      containerClassName="nx:max-h-64"
+    />
   ),
   play: async ({ canvasElement }) => {
     const canvas = within(canvasElement);
@@ -1265,7 +1319,7 @@ function SelectionDemo() {
     selectAllRef.current?.focus();
   }
   return (
-    <div className="nx:@container/table-selection nx:w-full nx:space-y-2">
+    <div className="nx:w-full nx:space-y-2">
       <div role="status" className="nx:sr-only">
         {selected.size > 0
           ? `${selected.size} selected`
@@ -1290,7 +1344,7 @@ function SelectionDemo() {
           </Button>
         </div>
       )}
-      <Table>
+      <Table selectable>
         <TableHeader>
           <TableRow>
             <TableSelectionHead>
