@@ -147,6 +147,7 @@ const MIXES = [
   ['outline-primary', 'outline', 'outline-primary'],
   ['outline', 'outline-primary', 'outline-primary'],
   ['default', 'outline-primary', 'outline-primary'],
+  ['outline', 'outline', 'outline-primary'],
 ] as const;
 const GEOMETRY_LAYOUTS = [
   ...LAYOUTS,
@@ -187,7 +188,7 @@ export const GeometryMatrix: Story = {
   ),
   play: async ({ canvasElement }) => {
     const groups = within(canvasElement).getAllByRole('group');
-    await expect(groups).toHaveLength(32);
+    await expect(groups).toHaveLength(40);
     for (const group of groups) {
       const items = within(group).getAllByRole('button');
       const vertical = group.dataset.orientation === 'vertical';
@@ -416,10 +417,14 @@ export const ControlledDisabledTransition: Story = {
     await expect(bold).toBeDisabled();
     await expect(italic).toBeDisabled();
     await expect(bold).toHaveAttribute('aria-checked', 'true');
-    // border-disabled and border-default resolve to the same value, so only
-    // the class proves which rule painted the edge.
-    await expect(bold).toHaveClass(
-      'nx:disabled:before:inset-ring-border-disabled'
+    await expect(
+      getComputedStyle(bold, '::before')
+        .getPropertyValue('--tw-inset-ring-color')
+        .trim()
+    ).toBe(
+      getComputedStyle(bold)
+        .getPropertyValue('--nx-color-border-disabled')
+        .trim()
     );
     await expect(
       getComputedStyle(bold, '::before')

@@ -285,8 +285,11 @@ export const StateMatrix: Story = {
         await expect(style.borderTopWidth).toBe('0px');
         await expect(edge.pointerEvents).toBe('none');
         if (disabled) {
-          // border-disabled and border-default resolve to the same value, so
-          // only the class proves which rule painted the edge.
+          // The value catches a selected/invalid rule leaking past its
+          // not-disabled: gate; the class catches the disabled rule going away.
+          await expect(
+            edge.getPropertyValue('--tw-inset-ring-color').trim()
+          ).toBe(tokenColor(toggle, 'border-disabled'));
           await expect(toggle).toHaveClass(
             'nx:disabled:before:inset-ring-border-disabled'
           );
