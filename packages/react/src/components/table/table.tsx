@@ -326,7 +326,7 @@ const tableHeadVariants = cva(
       variant: {
         default: '',
         borderless: '',
-        grid: 'nx:border-e-[length:var(--nx-borderwidth-default)] nx:border-border-default-alpha nx:[&:last-child]:border-e-0',
+        grid: 'nx:border-e-default nx:border-border-default-alpha nx:[&:last-child]:border-e-0',
       } satisfies Record<TableVariant, string>,
       density: {
         comfortable: 'nx:py-3 nx:[--table-selection-py:var(--nx-spacing-3)]',
@@ -376,7 +376,7 @@ const tableCellVariants = cva(
       variant: {
         default: '',
         borderless: '',
-        grid: 'nx:border-e-[length:var(--nx-borderwidth-default)] nx:border-border-default-alpha nx:[&:last-child]:border-e-0',
+        grid: 'nx:border-e-default nx:border-border-default-alpha nx:[&:last-child]:border-e-0',
       } satisfies Record<TableVariant, string>,
       density: {
         comfortable: 'nx:py-3 nx:[--table-selection-py:var(--nx-spacing-3)]',

@@ -68,6 +68,22 @@ const BORDER_WIDTH_CLASS_GROUPS = {
     'border-width-l-default',
     'border-width-l-thick',
   ],
+  'border-w-s': [
+    'border-s-thin',
+    'border-s-default',
+    'border-s-thick',
+    'border-width-s-thin',
+    'border-width-s-default',
+    'border-width-s-thick',
+  ],
+  'border-w-e': [
+    'border-e-thin',
+    'border-e-default',
+    'border-e-thick',
+    'border-width-e-thin',
+    'border-width-e-default',
+    'border-width-e-thick',
+  ],
 };
 
 const BORDER_COLOR_CLASS_GROUPS = {
