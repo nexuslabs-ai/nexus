@@ -6,11 +6,7 @@ import type { ComponentType } from 'react';
 export interface Demo {
   /** Path under apps/docs/examples/ without the .tsx extension. */
   id: string;
-  /**
-   * Loads the demo's component and its own source text together. Both live in
-   * a per-demo chunk, so a page pays for the demos it renders rather than for
-   * every demo in the corpus.
-   */
+  /** Loads the demo's component and its own source text together. */
   load: () => Promise<{ Component: ComponentType; source: string }>;
 }
 

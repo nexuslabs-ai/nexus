@@ -37,11 +37,7 @@ import type { ComponentType } from 'react';
 export interface Demo {
   /** Path under apps/docs/examples/ without the .tsx extension. */
   id: string;
-  /**
-   * Loads the demo's component and its own source text together. Both live in
-   * a per-demo chunk, so a page pays for the demos it renders rather than for
-   * every demo in the corpus.
-   */
+  /** Loads the demo's component and its own source text together. */
   load: () => Promise<{ Component: ComponentType; source: string }>;
 }
 `;
@@ -83,9 +79,7 @@ function walk(dir) {
 }
 
 /**
- * Reads a file as the canonical LF form of its contents. Windows checkouts
- * carry CRLF, so comparing or emitting the raw bytes would make the result
- * differ by platform.
+ * Reads a file as the canonical LF form of its contents.
  *
  * @param {string} file
  * @returns {string}
@@ -95,10 +89,6 @@ function readCanonical(file) {
 }
 
 /**
- * Writes `content` only when it differs from what is on disk, so a dev-server
- * rebuild leaves untouched demos' modules — and their bundler chunks — alone.
- * The comparison ignores line endings, so a CRLF checkout counts as unchanged.
- *
  * @param {string} file
  * @param {string} content
  */
@@ -130,10 +120,7 @@ function pruneEmptyDirs(dir) {
 }
 
 /**
- * Deletes everything under `outputDir` that this run did not write, leaving
- * every live file — and its mtime — untouched. The scope is the whole output
- * directory, matching the `outputs` this package's turbo task declares, so a
- * stray file anywhere under it is cleared by a regeneration.
+ * Deletes everything under `outputDir` that is not in `keep`.
  *
  * @param {string} outputDir
  * @param {Set<string>} keep Paths of the files that should survive.
@@ -161,8 +148,7 @@ function exampleSpecifier(id) {
 
 /**
  * The per-demo module's import specifier for its own client boundary, which
- * sits beside it. Appending `.ts` gives the boundary's path under
- * `__generated__/demos/`, so specifier and disk path cannot drift apart.
+ * sits beside it.
  *
  * @param {string} id
  * @returns {string}
@@ -173,10 +159,8 @@ function boundarySpecifier(id) {
 
 /**
  * Collects every demo under `examplesDir`, ordered by id. An id with a
- * `_`-prefixed segment is skipped, so shared helpers and private folders can
- * live beside the demos without becoming addressable demos themselves. A dot
- * in an id is rejected rather than skipped: `foo.client.tsx` would generate
- * its module at the path `foo.tsx`'s boundary already owns.
+ * `_`-prefixed segment is skipped; a dot in an id is rejected, because
+ * `foo.client.tsx` would claim the module path `foo.tsx`'s boundary owns.
  *
  * @param {string} [examplesDir]
  * @returns {DemoFile[]}
@@ -213,8 +197,7 @@ export function collectDemos(examplesDir = EXAMPLES_DIR) {
 
 /**
  * Renders one demo's client boundary: the example re-exported from a module
- * carrying `'use client'`. The examples themselves stay framework-free, so the
- * source a reader copies is the component and nothing else.
+ * carrying `'use client'`.
  *
  * @param {DemoFile} demo
  * @returns {string}
@@ -231,9 +214,7 @@ export { default as Component } from ${JSON.stringify(exampleSpecifier(demo.id))
 
 /**
  * Renders one demo's module: its component forwarded from the boundary, and
- * its source text as a plain string. This module carries no directive, so a
- * server component reading `source` gets the string rather than a client
- * reference.
+ * its source text as a plain string. It carries no directive of its own.
  *
  * @param {DemoFile} demo
  * @returns {string}
@@ -249,8 +230,6 @@ export const source = ${JSON.stringify(demo.source)};
 }
 
 /**
- * Renders the index module for the given demos.
- *
  * @param {DemoFile[]} demos
  * @returns {string}
  */

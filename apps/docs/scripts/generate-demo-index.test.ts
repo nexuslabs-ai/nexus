@@ -51,10 +51,9 @@ function generatedFiles(dir: string): string[] {
 }
 
 /**
- * The module's directive prologue, if it opens with one. Reads the first line
- * that is neither blank nor a `//` comment, so a module that merely quotes
- * `'use client'` further down — a demo source string, say — reads as having no
- * directive at all.
+ * The module's directive prologue, if it opens with one. Only the first line
+ * that is neither blank nor a `//` comment counts, so a `'use client'` quoted
+ * further down — inside a demo source string — is not one.
  */
 function leadingDirective(contents: string) {
   const first = contents
