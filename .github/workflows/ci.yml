@@ -148,6 +148,11 @@ jobs:
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
 
+      # Reads two manifests and needs no build, so it runs before the ESLint
+      # cache restore — a lint failure must not hide a grammar skew.
+      - name: Docs grammar pin
+        run: pnpm --filter @nexus_ds/docs audit:grammar-pin
+
       - name: Restore ESLint cache
         uses: actions/cache@v4
         with:
@@ -238,6 +243,11 @@ jobs:
 
           pnpm turbo build "${filter[@]}"
           node scripts/audit-turbo-outputs.js --post-build "${filter[@]}"
+
+      - name: Docs CSP inventory
+        run: |
+          pnpm turbo build --filter=@nexus_ds/docs
+          pnpm --filter @nexus_ds/docs audit:csp
 
       - name: Upload build artifacts
         uses: actions/upload-artifact@v4
@@ -341,6 +351,21 @@ jobs:
 
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
+
+      - name: Regenerate docs page manifest
+        run: pnpm --filter @nexus_ds/docs generate:manifest
+
+      - name: Check docs page manifest freshness
+        # `git status --porcelain` (not `git diff`) so untracked new files also fail.
+        run: |
+          set -euo pipefail
+          DIRTY=$(git status --porcelain -- apps/docs/app/_lib)
+          if [ -n "$DIRTY" ]; then
+            echo "::error::Docs page manifest is stale. Affected paths:"
+            echo "$DIRTY"
+            echo "::error::Run 'pnpm --filter @nexus_ds/docs generate:manifest' and commit the result."
+            exit 1
+          fi
 
       - name: Run unit tests
         run: pnpm test:unit

@@ -1,7 +1,7 @@
-import { Breadcrumb } from '../_components/Breadcrumb';
+import { SectionHeading } from '../../_components/Heading';
 
 /**
- * Foundations → Radius · Borders · Shadows. Server component — three
+ * Foundations → Radius, borders & shadows. Server component — three
  * independent appearance axes, each a runtime mode swapped via the theme
  * picker. The radius and shadow specimens use literal `nx:rounded-*` /
  * `nx:shadow-*` utilities (so Tailwind scans them) that read the active mode's
@@ -52,19 +52,10 @@ const SHADOWS: { cls: string; label: string }[] = [
   { cls: 'nx:shadow-2xl', label: '2xl' },
 ];
 
-export function Radius() {
+export default function Radius() {
   return (
     <>
-      <Breadcrumb
-        items={[
-          { label: 'Home', href: '/' },
-          { label: 'Foundations', href: '/foundations' },
-          { label: 'Radius · Borders · Shadows' },
-        ]}
-      />
-      <h1 className="nx:typography-heading-large">
-        Radius · Borders · Shadows
-      </h1>
+      <h1 className="nx:typography-heading-large">Radius, borders & shadows</h1>
       <p className="nx:typography-body-default nx:text-muted-foreground nx:mt-2 nx:mb-8 nx:max-w-[64ch]">
         Three independent appearance axes, each a runtime mode swapped through
         the theme picker (bottom-right). Corner radius, border width, and
@@ -74,7 +65,9 @@ export function Radius() {
 
       {/* ── Radius ──────────────────────────────────────────── */}
       <section className="nx:mb-12">
-        <h2 className="nx:typography-heading-small nx:mb-1">Radius</h2>
+        <SectionHeading className="nx:typography-heading-small nx:mb-1">
+          Radius
+        </SectionHeading>
         <p className="nx:typography-body-default nx:text-muted-foreground nx:mb-4 nx:max-w-[64ch]">
           Nine radius utilities. Eight react to the active Radius mode; full
           stays pinned at 9999px. Swap the mode and the rest re-round.
@@ -123,7 +116,9 @@ export function Radius() {
 
       {/* ── Border widths ───────────────────────────────────── */}
       <section className="nx:mb-12">
-        <h2 className="nx:typography-heading-small nx:mb-1">Border widths</h2>
+        <SectionHeading className="nx:typography-heading-small nx:mb-1">
+          Border widths
+        </SectionHeading>
         <p className="nx:typography-body-default nx:text-muted-foreground nx:mb-4 nx:max-w-[64ch]">
           The picker offers three distinct border-width designs. The box below
           sets its width from the runtime <code>--nx-borderwidth-thick</code>{' '}
@@ -180,7 +175,9 @@ export function Radius() {
 
       {/* ── Shadows ─────────────────────────────────────────── */}
       <section className="nx:mb-12">
-        <h2 className="nx:typography-heading-small nx:mb-1">Shadows</h2>
+        <SectionHeading className="nx:typography-heading-small nx:mb-1">
+          Shadows
+        </SectionHeading>
         <p className="nx:typography-body-default nx:text-muted-foreground nx:mb-4 nx:max-w-[64ch]">
           Seven elevation tiers plus an inset shadow, each reacting to the
           active Shadow mode. Shadows are theme-split — tuned per light and
