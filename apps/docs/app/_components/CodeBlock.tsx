@@ -18,8 +18,13 @@ const COPY_STATUS = {
 
 type CopyStatus = keyof typeof COPY_STATUS;
 
+// Every docs code block — MDX fence and hand-written `CodeSample` alike —
+// renders through here, so this is the one code-block surface. `bg-container`
+// is the surface the syntax colours are APCA-gated against; `pe-14` keeps the
+// copy control clear of the code; the `code` resets undo the inline-code
+// styling the MDX `code` override applies inside a fence.
 const PRE_CLASS =
-  'nx:bg-muted nx:border nx:border-border-default nx:rounded-md nx:p-4 nx:pe-14 nx:overflow-x-auto nx:typography-code-block nx:focus-visible:outline-2 nx:focus-visible:outline-focus-default nx:focus-visible:outline-offset-(--focus-offset) nx:[&_code]:bg-transparent nx:[&_code]:p-0 nx:[&_code]:typography-code-block';
+  'nx:typography-code-block nx:bg-container nx:border nx:border-border-default nx:rounded-md nx:p-4 nx:pe-14 nx:overflow-x-auto nx:focus-visible:outline-2 nx:focus-visible:outline-focus-default nx:focus-visible:outline-offset-(--focus-offset) nx:[&_code]:bg-transparent nx:[&_code]:p-0 nx:[&_code]:typography-code-block';
 
 const BUTTON_CLASS =
   'nx:absolute nx:top-2 nx:end-2 nx:data-[copy-status=copied]:text-success-subtle-foreground nx:data-[copy-status=failed]:text-error-subtle-foreground';

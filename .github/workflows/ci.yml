@@ -148,6 +148,11 @@ jobs:
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
 
+      # Reads two manifests and needs no build, so it runs before the ESLint
+      # cache restore — a lint failure must not hide a grammar skew.
+      - name: Docs grammar pin
+        run: pnpm --filter @nexus_ds/docs audit:grammar-pin
+
       - name: Restore ESLint cache
         uses: actions/cache@v4
         with:
@@ -238,6 +243,11 @@ jobs:
 
           pnpm turbo build "${filter[@]}"
           node scripts/audit-turbo-outputs.js --post-build "${filter[@]}"
+
+      - name: Docs CSP inventory
+        run: |
+          pnpm turbo build --filter=@nexus_ds/docs
+          pnpm --filter @nexus_ds/docs audit:csp
 
       - name: Upload build artifacts
         uses: actions/upload-artifact@v4

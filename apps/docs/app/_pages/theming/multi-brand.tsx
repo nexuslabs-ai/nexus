@@ -1,4 +1,4 @@
-import { CodeBlock } from '../../_components/CodeBlock';
+import { CodeSample } from '../../_components/CodeSample';
 import { SectionHeading } from '../../_components/Heading';
 import { Button } from '../../_components/nexus';
 
@@ -159,15 +159,15 @@ export default function MultiBrand() {
           does the rest. See <strong>Consumer overrides</strong> for the full
           surface.
         </p>
-        <CodeBlock>
-          <code>{`/* loaded after @nexus_ds/tailwind */
+        <CodeSample lang="css">
+          {`/* loaded after @nexus_ds/tailwind */
 :root {
   --nx-color-primary-background: oklch(0.55 0.2 145); /* your brand */
 }
 
 /* density on a subtree */
-<section data-density="compact"> … compact … </section>`}</code>
-        </CodeBlock>
+<section data-density="compact"> … compact … </section>`}
+        </CodeSample>
       </section>
 
       {/* ── For agents ──────────────────────────────────────── */}

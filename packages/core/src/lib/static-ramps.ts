@@ -78,7 +78,7 @@ export const CHART_DARK = [
   'oklch(0.91 0.0819 70.697)',
   'oklch(0.885 0.0771 10.001)',
   'oklch(0.865 0.069 274.039)',
-] as const;
+] as const satisfies { length: (typeof CHART_LIGHT)['length'] };
 
 /** Tone-independent neutral surface family (9 tokens, no borders). */
 export const NEUTRAL = {

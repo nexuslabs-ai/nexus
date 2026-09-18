@@ -1,4 +1,4 @@
-import { CodeBlock } from '../../_components/CodeBlock';
+import { CodeSample } from '../../_components/CodeSample';
 import { SectionHeading } from '../../_components/Heading';
 
 /**
@@ -152,8 +152,8 @@ export default function Responsive() {
           <code>containerAbove=&quot;md&quot;</code> do not fire at the same
           width.
         </p>
-        <CodeBlock>
-          <code>{`// Viewport axis — page-shell decision
+        <CodeSample lang="tsx">
+          {`// Viewport axis — page-shell decision
 <Show above="lg">
   <Sidebar />
 </Show>
@@ -161,8 +161,8 @@ export default function Responsive() {
 // Container axis — component adapts to its parent
 <Hide containerBelow="md">
   <Actions />
-</Hide>`}</code>
-        </CodeBlock>
+</Hide>`}
+        </CodeSample>
       </section>
 
       {/* ── Which mechanism ─────────────────────────────────── */}

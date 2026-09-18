@@ -1,4 +1,4 @@
-import { CodeBlock } from '../../_components/CodeBlock';
+import { CodeSample } from '../../_components/CodeSample';
 import { SectionHeading, SubsectionHeading } from '../../_components/Heading';
 
 /**
@@ -179,11 +179,11 @@ export default function Typography() {
           </code>{' '}
           in running prose.
         </p>
-        <CodeBlock>
-          <code>{`import { Button } from '@nexus_ds/react';
+        <CodeSample lang="tsx">
+          {`import { Button } from '@nexus_ds/react';
 
-<Button variant="secondary">Ship it</Button>`}</code>
-        </CodeBlock>
+<Button variant="secondary">Ship it</Button>`}
+        </CodeSample>
       </section>
 
       {/* ── Families ────────────────────────────────────────── */}

@@ -1,3 +1,5 @@
+import { CHART_LIGHT } from './static-ramps';
+
 export type ApcaTier = 'body' | 'ui' | 'incidental';
 
 export interface ApcaPair {
@@ -16,6 +18,8 @@ const FAMILY_PAIRS = [
   'error',
   'information',
 ] as const;
+
+const CATEGORICAL_INDICES = CHART_LIGHT.map((_, index) => index + 1);
 
 const FOCUS_SURFACES = [
   'background',
@@ -39,10 +43,13 @@ export const APCA_PAIRS = [
   pair('foreground', 'muted', 'ui'),
   pair('muted-foreground', 'muted', 'incidental'),
   pair('muted-foreground-subtle', 'muted', 'incidental'),
+  pair('muted-foreground', 'container', 'incidental'),
+  pair('muted-foreground-subtle', 'container', 'incidental'),
   pair('foreground', 'muted-extralight', 'ui'),
   pair('muted-foreground', 'muted-extralight', 'incidental'),
   pair('disabled-foreground', 'disabled', 'incidental'),
   pair('container-foreground', 'container', 'body'),
+  pair('foreground', 'container', 'body'),
   pair('popover-foreground', 'popover', 'body'),
   pair('popover-foreground', 'popover-hover', 'ui'),
   pair('foreground', 'control-background', 'ui'),
@@ -57,9 +64,10 @@ export const APCA_PAIRS = [
     pair(`${family}-foreground`, `${family}-background`, 'ui'),
     pair(`${family}-subtle-foreground`, `${family}-subtle`, 'ui'),
   ]),
-  ...Array.from({ length: 5 }, (_, index) =>
-    pair(`chart-categorical-${index + 1}`, 'container', 'ui')
-  ),
+  ...CATEGORICAL_INDICES.flatMap((index) => [
+    pair(`chart-categorical-${index}`, 'container', 'ui'),
+    pair(`chart-categorical-${index}`, 'background', 'ui'),
+  ]),
   ...FOCUS_SURFACES.flatMap((surface) => [
     pair('focus-default', surface, 'incidental'),
     pair('focus-error', surface, 'incidental'),

@@ -6,6 +6,16 @@ import { defineConfig } from 'vitest/config';
 export default defineConfig({
   resolve: {
     alias: [
+      // Server components under test render in jsdom, which does not resolve
+      // the `react-server` export condition. Point at the no-op the condition
+      // would have selected so the guard stays live in the Next build only.
+      {
+        find: /^server-only$/,
+        replacement: path.resolve(
+          __dirname,
+          './node_modules/server-only/empty.js'
+        ),
+      },
       {
         find: '@nexus_ds/core',
         replacement: path.resolve(__dirname, './packages/core/src/index.ts'),
