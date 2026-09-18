@@ -3,7 +3,6 @@
   "extends": ["//"],
   "tasks": {
     "generate:demos": {
-      "inputs": ["examples/**", "scripts/generate-demo-index.mjs"],
       "outputs": ["__generated__/**"],
       "cache": false
     },

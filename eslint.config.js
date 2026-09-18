@@ -248,6 +248,28 @@ export default tseslint.config(
     ...nexusSpacingTokenConfig({ parser: jsoncParser }),
   },
 
+  // The demo-index staleness gate lives in generate-demo-index.test.ts and must
+  // reach the generated output only through the filesystem. A static import
+  // is resolved by Vite at collect time, so a missing generated file would
+  // kill the run before the gate could report which file to regenerate.
+  {
+    files: ['apps/docs/scripts/generate-demo-index.test.ts'],
+    rules: {
+      'no-restricted-imports': [
+        'error',
+        {
+          patterns: [
+            {
+              group: ['**/__generated__/**'],
+              message:
+                'Import generated output through the filesystem here; a static import breaks the staleness gate. Tests needing the index live in demo-index.test.ts.',
+            },
+          ],
+        },
+      ],
+    },
+  },
+
   // Disable rules that conflict with Prettier
   prettierConfig
 );
