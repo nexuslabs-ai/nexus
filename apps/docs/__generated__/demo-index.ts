@@ -37,6 +37,14 @@ export type DemoId = keyof typeof demos;
 
 const byId: Record<string, Demo> = demos;
 
-export function getDemo(id: string): Demo | undefined {
-  return byId[id];
+export function getDemo(id: string): Demo {
+  const demo = byId[id];
+
+  if (!demo) {
+    throw new Error(
+      `Unknown demo id: ${id}. Add apps/docs/examples/${id}.tsx, or fix the id.`
+    );
+  }
+
+  return demo;
 }

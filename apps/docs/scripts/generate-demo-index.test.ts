@@ -4,6 +4,7 @@ import {
   mkdtempSync,
   readFileSync,
   rmSync,
+  statSync,
   writeFileSync,
 } from 'node:fs';
 import { tmpdir } from 'node:os';
@@ -125,10 +126,10 @@ describe('generate-demo-index', () => {
     run();
 
     expect(readFileSync(moduleFor('card/with-footer'), 'utf8')).toContain(
-      "export { default as Component } from '../../../examples/card/with-footer';"
+      'export { default as Component } from "../../../examples/card/with-footer";'
     );
     expect(readFileSync(moduleFor('zebra-demo'), 'utf8')).toContain(
-      "export { default as Component } from '../../examples/zebra-demo';"
+      'export { default as Component } from "../../examples/zebra-demo";'
     );
   });
 
@@ -145,6 +146,34 @@ describe('generate-demo-index', () => {
     const onDisk = readFileSync(path.join(outputDir, 'demo-index.ts'), 'utf8');
 
     expect(onDisk).toBe(run().index);
+  });
+
+  it('writes per-demo modules that a repeat run reproduces byte for byte', () => {
+    const before = run().demos.map((demo) => ({
+      id: demo.id,
+      bytes: readFileSync(moduleFor(demo.id), 'utf8'),
+    }));
+
+    expect(before.length).toBeGreaterThan(0);
+
+    run();
+
+    for (const { id, bytes } of before) {
+      expect(readFileSync(moduleFor(id), 'utf8')).toBe(bytes);
+    }
+  });
+
+  it('leaves an unchanged demo module alone on a repeat run', () => {
+    run();
+    const untouched = statSync(moduleFor('zebra-demo')).mtimeMs;
+
+    writeFileSync(
+      path.join(examplesDir, 'alpha-demo.tsx'),
+      'export default function Alpha() {\n  return true;\n}\n'
+    );
+    run();
+
+    expect(statSync(moduleFor('zebra-demo')).mtimeMs).toBe(untouched);
   });
 
   it('picks up a new demo file with no hand-editing', () => {
@@ -197,10 +226,17 @@ describe('generate-demo-index', () => {
     }
   });
 
-  it('looks a demo up by id and reports a miss', () => {
+  it('looks a demo up by id and throws on a miss', () => {
     const id: DemoId = 'badge-demo';
 
-    expect(getDemo(id)?.id).toBe('badge-demo');
-    expect(getDemo('no-such-demo')).toBeUndefined();
+    expect(getDemo(id).id).toBe('badge-demo');
+    expect(() => getDemo('no-such-demo')).toThrow(/Unknown demo id/);
+  });
+
+  it('keeps DemoId a literal union rather than a widened string', () => {
+    // @ts-expect-error - fails to compile once DemoId widens to string.
+    const invalid: DemoId = 'no-such-demo';
+
+    expect(() => getDemo(invalid)).toThrow(/Unknown demo id/);
   });
 });

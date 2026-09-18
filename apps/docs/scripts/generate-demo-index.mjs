@@ -49,8 +49,16 @@ const INDEX_FOOTER = `export type DemoId = keyof typeof demos;
 
 const byId: Record<string, Demo> = demos;
 
-export function getDemo(id: string): Demo | undefined {
-  return byId[id];
+export function getDemo(id: string): Demo {
+  const demo = byId[id];
+
+  if (!demo) {
+    throw new Error(
+      \`Unknown demo id: \${id}. Add apps/docs/examples/\${id}.tsx, or fix the id.\`
+    );
+  }
+
+  return demo;
 }
 `;
 
@@ -61,20 +69,16 @@ export function getDemo(id: string): Demo | undefined {
  */
 
 /**
- * Lists every file under `dir`, skipping `_`-prefixed entries so shared
- * helpers and private folders can live beside the demos without becoming
- * addressable demos themselves.
+ * Lists every file under `dir`, recursively.
  *
  * @param {string} dir
  * @returns {string[]}
  */
 function walk(dir) {
-  return readdirSync(dir, { withFileTypes: true })
-    .filter((entry) => !entry.name.startsWith('_'))
-    .flatMap((entry) => {
-      const entryPath = path.join(dir, entry.name);
-      return entry.isDirectory() ? walk(entryPath) : [entryPath];
-    });
+  return readdirSync(dir, { withFileTypes: true }).flatMap((entry) => {
+    const entryPath = path.join(dir, entry.name);
+    return entry.isDirectory() ? walk(entryPath) : [entryPath];
+  });
 }
 
 /**
@@ -90,6 +94,61 @@ function readSource(file) {
 }
 
 /**
+ * Writes `content` only when it differs from what is on disk, so a dev-server
+ * rebuild leaves untouched demos' modules — and their bundler chunks — alone.
+ *
+ * @param {string} file
+ * @param {string} content
+ */
+function writeIfChanged(file, content) {
+  if (existsSync(file) && readFileSync(file, 'utf8') === content) {
+    return;
+  }
+
+  mkdirSync(path.dirname(file), { recursive: true });
+  writeFileSync(file, content, 'utf8');
+}
+
+/**
+ * Removes every directory under `dir` — `dir` itself included — that has no
+ * files left in it.
+ *
+ * @param {string} dir
+ */
+function pruneEmptyDirs(dir) {
+  for (const entry of readdirSync(dir, { withFileTypes: true })) {
+    if (entry.isDirectory()) {
+      pruneEmptyDirs(path.join(dir, entry.name));
+    }
+  }
+
+  if (readdirSync(dir).length === 0) {
+    rmSync(dir, { recursive: true });
+  }
+}
+
+/**
+ * Deletes generated modules whose demo no longer exists, leaving every module
+ * that is still live — and its mtime — untouched.
+ *
+ * @param {string} modulesDir
+ * @param {Set<string>} keep Paths of the modules that should survive.
+ */
+function pruneOrphanModules(modulesDir, keep) {
+  if (!existsSync(modulesDir)) {
+    return;
+  }
+
+  for (const file of walk(modulesDir)) {
+    if (!keep.has(file)) {
+      rmSync(file);
+    }
+  }
+
+  pruneEmptyDirs(modulesDir);
+}
+
+/**
  * The per-demo module's import specifier for its example, relative to the
  * module's own nesting under `__generated__/demos/`.
  *
@@ -101,7 +160,9 @@ function exampleSpecifier(id) {
 }
 
 /**
- * Collects every demo under `examplesDir`, ordered by id.
+ * Collects every demo under `examplesDir`, ordered by id. An id with a
+ * `_`-prefixed segment is skipped, so shared helpers and private folders can
+ * live beside the demos without becoming addressable demos themselves.
  *
  * @param {string} [examplesDir]
  * @returns {DemoFile[]}
@@ -113,16 +174,18 @@ export function collectDemos(examplesDir = EXAMPLES_DIR) {
 
   return walk(examplesDir)
     .filter((file) => file.endsWith(DEMO_EXTENSION))
-    .map((file) => {
-      const relative = path
+    .map((file) => ({
+      file,
+      id: path
         .relative(examplesDir, file)
         .split(path.sep)
-        .join('/');
-      return {
-        id: relative.slice(0, -DEMO_EXTENSION.length),
-        source: readSource(file),
-      };
-    })
+        .join('/')
+        .slice(0, -DEMO_EXTENSION.length),
+    }))
+    .filter(({ id }) =>
+      id.split('/').every((segment) => !segment.startsWith('_'))
+    )
+    .map(({ file, id }) => ({ id, source: readSource(file) }))
     .sort((a, b) => (a.id < b.id ? -1 : a.id > b.id ? 1 : 0));
 }
 
@@ -137,7 +200,7 @@ export function renderDemoModule(demo) {
   return `${GENERATED_BY}
 ${REGENERATE_HINT}
 
-export { default as Component } from '${exampleSpecifier(demo.id)}';
+export { default as Component } from ${JSON.stringify(exampleSpecifier(demo.id))};
 
 export const source = ${JSON.stringify(demo.source)};
 `;
@@ -171,8 +234,8 @@ ${INDEX_FOOTER}`;
 
 /**
  * Regenerates the demo index and its per-demo modules on disk, and returns
- * what it wrote. The modules directory is rebuilt from scratch so a deleted
- * demo does not leave a stale module behind.
+ * what it wrote. A file is rewritten only when its content changed, and a
+ * module is deleted only once its demo is gone.
  *
  * @param {{ examplesDir?: string, outputDir?: string }} [options]
  */
@@ -184,15 +247,16 @@ export function generateDemoIndex({
   const index = renderDemoIndex(demos);
   const modulesDir = path.join(outputDir, MODULES_DIR);
 
-  rmSync(modulesDir, { recursive: true, force: true });
-  mkdirSync(outputDir, { recursive: true });
-  writeFileSync(path.join(outputDir, INDEX_FILE), index, 'utf8');
+  writeIfChanged(path.join(outputDir, INDEX_FILE), index);
 
+  const written = new Set();
   for (const demo of demos) {
     const moduleFile = path.join(modulesDir, `${demo.id}.ts`);
-    mkdirSync(path.dirname(moduleFile), { recursive: true });
-    writeFileSync(moduleFile, renderDemoModule(demo), 'utf8');
+    writeIfChanged(moduleFile, renderDemoModule(demo));
+    written.add(moduleFile);
   }
+
+  pruneOrphanModules(modulesDir, written);
 
   return { demos, index };
 }
@@ -205,23 +269,49 @@ function generateAndLog() {
   );
 }
 
-if (process.argv[1] === fileURLToPath(import.meta.url)) {
-  generateAndLog();
+/** Regenerates without letting a broken examples/ state take the watcher down. */
+function regenerateQuietly() {
+  try {
+    generateAndLog();
+  } catch (error) {
+    console.error(`demo-index: ${error.message}`);
+  }
+}
 
-  if (process.argv.includes('--watch')) {
-    let pending;
-    watch(EXAMPLES_DIR, { recursive: true }, () => {
-      clearTimeout(pending);
-      pending = setTimeout(() => {
-        try {
-          generateAndLog();
-        } catch (error) {
-          console.error(`demo-index: ${error.message}`);
-        }
-      }, WATCH_DEBOUNCE_MS);
-    });
-    console.log(
-      `demo-index: watching ${path.relative(DOCS_ROOT, EXAMPLES_DIR)}`
+function watchExamples() {
+  const relativeExamples = path.relative(DOCS_ROOT, EXAMPLES_DIR);
+
+  regenerateQuietly();
+
+  let watcher;
+  try {
+    watcher = watch(EXAMPLES_DIR, { recursive: true });
+  } catch (error) {
+    console.error(
+      `demo-index: cannot watch ${relativeExamples} — ${error.message}`
     );
+    process.exitCode = 1;
+    return;
+  }
+
+  let pending;
+  watcher.on('change', () => {
+    clearTimeout(pending);
+    pending = setTimeout(regenerateQuietly, WATCH_DEBOUNCE_MS);
+  });
+  watcher.on('error', (error) => {
+    console.error(`demo-index: watch failed — ${error.message}`);
+    process.exitCode = 1;
+    watcher.close();
+  });
+
+  console.log(`demo-index: watching ${relativeExamples}`);
+}
+
+if (process.argv[1] === fileURLToPath(import.meta.url)) {
+  if (process.argv.includes('--watch')) {
+    watchExamples();
+  } else {
+    generateAndLog();
   }
 }
