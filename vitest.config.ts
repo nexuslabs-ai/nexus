@@ -11,6 +11,13 @@ export default defineConfig({
         replacement: path.resolve(__dirname, './packages/core/src/index.ts'),
       },
       {
+        find: '@nexus_ds/react/utils',
+        replacement: path.resolve(
+          __dirname,
+          './packages/react/src/lib/utils.ts'
+        ),
+      },
+      {
         find: '@nexus_ds/react/appearance/server',
         replacement: path.resolve(
           __dirname,
@@ -49,6 +56,10 @@ export default defineConfig({
       // Unit tests (hooks, utilities) - jsdom
       {
         extends: true,
+        // apps/docs sets `jsx: preserve` for Next, which esbuild reads as the
+        // classic runtime. Components rendered in a unit test would otherwise
+        // need their own `import * as React`.
+        esbuild: { jsx: 'automatic' },
         // `server-only` throws unless resolved under the `react-server`
         // condition, which no test runs under; point it at its own RSC build.
         // Scoped to this project so the browser project still fails loudly on a
