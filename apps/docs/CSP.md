@@ -17,8 +17,10 @@ Shiki writes every syntax colour as an inline `style` attribute, so enforcing a
 enforcing header produced **zero `style-src` violations** on four pages, three of
 them carrying code blocks.
 
-On `/getting-started/theme-setup` all 344 token spans kept their inline colour
-under enforcement, resolving to 7 distinct computed values.
+On `/getting-started/theme-setup` all 352 token spans kept their inline colour
+under enforcement, resolving to 7 distinct computed values. The measurement is
+taken at `DOMContentLoaded`, because of what `script-src` does to the same page
+a moment later — [§ What still blocks enforcement](#what-still-blocks-enforcement).
 
 ### Why the keyword stays rather than moving Shiki into a stylesheet
 
@@ -69,20 +71,24 @@ of them.
 Measured in Chromium against a build with `CSP_HEADER_NAME` set to the enforcing
 header:
 
-| Page                           | Violations | All `script-src-elem`? | Rendered body |
-| ------------------------------ | ---------: | ---------------------- | ------------- |
-| `/getting-started/theme-setup` |         45 | yes                    | empty         |
-| `/getting-started/install`     |         30 | yes                    | empty         |
-| `/theming/appearance`          |         34 | yes                    | empty         |
-| `/foundations/color`           |         26 | yes                    | empty         |
+| Page                           | Violations | All `script-src-elem`? | Body at `DOMContentLoaded` | Body after hydration |
+| ------------------------------ | ---------: | ---------------------- | -------------------------: | -------------------- |
+| `/getting-started/theme-setup` |         47 | yes                    |                6,077 chars | empty                |
+| `/getting-started/install`     |         69 | yes                    |               11,665 chars | empty                |
+| `/theming/appearance`          |         34 | yes                    |                3,608 chars | empty                |
+| `/foundations/color`           |         28 | yes                    |                4,954 chars | empty                |
 
-The appearance bootstrap itself is never among them — its hash works. Every
-violation is Next.js flight data. `/foundations/color` has no code blocks at
-all and still fails, which is the clearest evidence that this is not Shiki's
-doing.
+The appearance bootstrap itself is never among them — its hash works, and the
+`class` and `style` it writes are on `<html>` by `DOMContentLoaded`. Every
+violation is Next.js flight data. `/foundations/color` carries no code blocks at
+all — zero Shiki spans — and still fails, which is the clearest evidence that
+this is not Shiki's doing.
 
 The pages render **blank**, not merely unhydrated: the client bundle loads from
-`'self'`, finds no RSC payload, and React clears the server HTML.
+`'self'`, finds no RSC payload, and React clears the server HTML. The two body
+columns above are the same page before and after that happens, which is why the
+`style-src` evidence is collected at `DOMContentLoaded` — a moment later there is
+no markup left to measure.
 
 ### The options, and what each costs
 
@@ -199,6 +205,12 @@ pnpm --filter @nexus_ds/docs start
 That serves a real enforcing header. Load a page and collect
 `securitypolicyviolation` events; the counts above come from that build. Revert
 the constant afterwards.
+
+Register the listener and take any DOM measurement before hydration runs — an
+init script that adds the listener at document start and snapshots at
+`DOMContentLoaded`. Querying afterwards reports zero Shiki spans on a page that
+served hundreds of them, because React has already cleared the body, and reading
+that as a `style-src` failure is the trap this section exists to prevent.
 
 Do not substitute rewriting the header inside the browser's own request
 interception — doing so truncated the streamed HTML and produced a misleading
