@@ -3,9 +3,9 @@ import { describe, expect, it } from 'vitest';
 import { type DemoId, getDemo } from '../__generated__/demo-index';
 
 /**
- * The generated index's own surface. It lives apart from the generator tests
- * so that a missing or stale generated file fails those with the regeneration
- * hint rather than dying here at collect time on an unresolvable import.
+ * The generated index's own surface. A missing generated file takes this file
+ * down at collect time, so the staleness gate lives with the generator tests,
+ * which import nothing generated and survive to report the regeneration hint.
  */
 describe('demo-index', () => {
   it('looks a demo up by id and throws on a miss', () => {

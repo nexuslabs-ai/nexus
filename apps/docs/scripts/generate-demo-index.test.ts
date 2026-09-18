@@ -39,6 +39,8 @@ const STALE =
 
 /** Every file under `dir`, as `/`-separated paths relative to it, unordered. */
 function generatedFiles(dir: string): string[] {
+  if (!existsSync(dir)) return [];
+
   return readdirSync(dir, { withFileTypes: true }).flatMap((entry) =>
     entry.isDirectory()
       ? generatedFiles(path.join(dir, entry.name)).map(
