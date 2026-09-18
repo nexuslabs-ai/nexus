@@ -1,1 +1,8 @@
 pnpm lint-staged --concurrent false
+
+# lint-staged's file list is --diff-filter=ACMR, so a deleted demo never reaches
+# the generator entry and would leave a stale index behind.
+if git diff --cached --name-only --diff-filter=D | grep -q '^apps/docs/examples/'; then
+  node apps/docs/scripts/generate-demo-index.mjs
+  git add apps/docs/__generated__
+fi

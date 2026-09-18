@@ -225,6 +225,16 @@ describe('generate-demo-index', () => {
     expect(statSync(moduleFor('zebra-demo')).mtimeMs).toBe(untouched);
   });
 
+  it('leaves a CRLF checkout of a generated module alone', () => {
+    run();
+    const module = moduleFor('zebra-demo');
+    writeFileSync(module, readFileSync(module, 'utf8').replace(/\n/g, '\r\n'));
+
+    run();
+
+    expect(readFileSync(module, 'utf8')).toContain('\r\n');
+  });
+
   it('picks up a new demo file with no hand-editing', () => {
     expect(run().index).not.toContain('badge-demo');
 
@@ -247,6 +257,16 @@ describe('generate-demo-index', () => {
 
     expect(existsSync(moduleFor('zebra-demo'))).toBe(false);
     expect(existsSync(boundaryFor('zebra-demo'))).toBe(false);
+  });
+
+  it('prunes the directory an emptied nested demo leaves behind', () => {
+    run();
+    expect(existsSync(path.join(outputDir, 'demos', 'card'))).toBe(true);
+
+    rmSync(path.join(examplesDir, 'card', 'with-footer.tsx'));
+    run();
+
+    expect(existsSync(path.join(outputDir, 'demos', 'card'))).toBe(false);
   });
 
   it('rejects a dotted id rather than letting it claim another demo’s boundary', () => {
@@ -294,6 +314,12 @@ describe('generate-demo-index', () => {
 
     expect(getDemo(id).id).toBe('badge-demo');
     expect(() => getDemo('no-such-demo')).toThrow(/Unknown demo id/);
+  });
+
+  it('throws for an inherited prototype key rather than returning it', () => {
+    for (const key of ['toString', 'constructor', 'valueOf', '__proto__']) {
+      expect(() => getDemo(key)).toThrow(/Unknown demo id/);
+    }
   });
 
   it('keeps DemoId a literal union rather than a widened string', () => {

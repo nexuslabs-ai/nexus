@@ -35,10 +35,10 @@ export const demos = {
 
 export type DemoId = keyof typeof demos;
 
-const byId: Record<string, Demo> = demos;
+const byId = new Map<string, Demo>(Object.entries(demos));
 
 export function getDemo(id: string): Demo {
-  const demo = byId[id];
+  const demo = byId.get(id);
 
   if (!demo) {
     throw new Error(

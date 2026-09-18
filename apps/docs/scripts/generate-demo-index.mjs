@@ -48,10 +48,10 @@ export interface Demo {
 
 const INDEX_FOOTER = `export type DemoId = keyof typeof demos;
 
-const byId: Record<string, Demo> = demos;
+const byId = new Map<string, Demo>(Object.entries(demos));
 
 export function getDemo(id: string): Demo {
-  const demo = byId[id];
+  const demo = byId.get(id);
 
   if (!demo) {
     throw new Error(
@@ -83,14 +83,14 @@ function walk(dir) {
 }
 
 /**
- * Reads a demo file as the canonical LF form of its contents. Windows
- * checkouts carry CRLF, so returning the raw bytes would make the emitted
- * output differ by platform.
+ * Reads a file as the canonical LF form of its contents. Windows checkouts
+ * carry CRLF, so comparing or emitting the raw bytes would make the result
+ * differ by platform.
  *
  * @param {string} file
  * @returns {string}
  */
-function readSource(file) {
+function readCanonical(file) {
   return readFileSync(file, 'utf8').replace(/\r\n/g, '\n');
 }
 
@@ -102,7 +102,7 @@ function readSource(file) {
  * @param {string} content
  */
 function writeIfChanged(file, content) {
-  if (existsSync(file) && readFileSync(file, 'utf8') === content) {
+  if (existsSync(file) && readCanonical(file) === content) {
     return;
   }
 
@@ -207,7 +207,7 @@ export function collectDemos(examplesDir = EXAMPLES_DIR) {
         );
       }
 
-      return { id, source: readSource(file) };
+      return { id, source: readCanonical(file) };
     })
     .sort((a, b) => (a.id < b.id ? -1 : a.id > b.id ? 1 : 0));
 }
