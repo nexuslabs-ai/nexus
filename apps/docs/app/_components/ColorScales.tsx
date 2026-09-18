@@ -2,7 +2,8 @@
 
 import { useState } from 'react';
 
-import { Button } from '../_components/nexus';
+import { SubsectionHeading } from './Heading';
+import { Button } from './nexus';
 
 /**
  * Every Nexus color scale, with a shared color-vision-deficiency preview.
@@ -96,9 +97,9 @@ export function ColorScales() {
 
       <SwatchGrid items={NEUTRAL} cvd={cvd} />
 
-      <h3 className="nx:typography-heading-xsmall nx:mt-8 nx:mb-1">
+      <SubsectionHeading className="nx:typography-heading-xsmall nx:mt-8 nx:mb-1">
         Brand &amp; status hues
-      </h3>
+      </SubsectionHeading>
       <p className="nx:typography-body-default nx:text-muted-foreground nx:mb-4 nx:max-w-[64ch]">
         Brand modes are blue, purple, pink, teal, orange, and black. The
         chromatic brand modes share the OKLCH pipeline; black is a monochrome

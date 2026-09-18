@@ -29,7 +29,18 @@ jobs:
     runs-on: ubuntu-latest
     outputs:
       react: ${{ steps.filter.outputs.react }}
+      browser: ${{ steps.filter.outputs.browser }}
+      browser_source: ${{ steps.filter.outputs.browser_source }}
+      scripts: ${{ steps.filter.outputs.scripts }}
+      # A root file belongs to no package, so a diff filter selects nothing
+      # for it. Every gated job reads this, so a root-level change opens all
+      # of them rather than the subset some source filter happens to match.
       root_config: ${{ steps.filter.outputs.root_config }}
+      # True when the change is root-level, so build and typecheck run
+      # unfiltered instead of resolving to zero tasks.
+      build_all: ${{ steps.filter.outputs.ci == 'true' || steps.filter.outputs.root_config == 'true' || steps.filter.outputs.build_scripts == 'true' }}
+      # `packages` is true if any package OR any app changed — both are built
+      # and typechecked by the shared turbo `build` / `typecheck` jobs.
       packages: ${{ steps.filter.outputs.packages }}
       ci: ${{ steps.filter.outputs.ci }}
     steps:
@@ -43,57 +54,57 @@ jobs:
           filters: |
             # `react` tracks package-library source. App consumers (docs,
             # console) ride `packages` into the shared build/typecheck jobs.
-            # `react` and `packages` also match the root files that decide what
-            # resolves or how tasks run. None of them is source, and a change
-            # to any one can break a job with no source diff.
             react:
               - 'packages/react/**'
               - 'packages/tailwind/**'
               - 'packages/core/**'
               - 'packages/test-utils/**'
-              - 'pnpm-lock.yaml'
-              - '.npmrc'
-              - 'package.json'
-              - 'pnpm-workspace.yaml'
-              - '.nvmrc'
-              - 'turbo.json'
-              - 'tsconfig.base.json'
-              - 'tsconfig.json'
-              - 'vitest.config.ts'
-            # `packages` gates build, typecheck, test-unit, audit-tokens, and
-            # audit-browser-support. Any package, app, or root script can
-            # affect them.
+            # `packages` gates the shared turbo build/typecheck jobs; any
+            # package or app can affect them, so both are matched here.
             packages:
               - 'packages/**'
               - 'apps/**'
-              - 'scripts/**'
-              - 'pnpm-lock.yaml'
-              - '.npmrc'
+            # Mirrors the source roots scanned by `pnpm audit:browser-support`.
+            browser_source:
+              - 'apps/**'
+              - 'packages/**'
+            browser:
               - 'package.json'
-              - 'pnpm-workspace.yaml'
-              - '.nvmrc'
-              - 'turbo.json'
-              - 'tsconfig.base.json'
-              - 'tsconfig.json'
-              - 'vitest.config.ts'
-            # Every root file build and typecheck read. No package path
-            # expresses them, so membership forces both jobs to an
-            # unfiltered run.
+              - 'scripts/audit-browser-support.js'
+              - 'scripts/audit-browser-support.test.js'
+              - 'README.md'
+              - 'AGENTS.md'
+              - 'RTK.md'
+            # Root config sits outside every package, so turbo's
+            # `--filter=...[base]` selects no tasks for it.
             root_config:
-              - 'pnpm-workspace.yaml'
-              - '.nvmrc'
-              - '.npmrc'
-              - 'package.json'
-              - 'pnpm-lock.yaml'
               - 'tsconfig.base.json'
               - 'tsconfig.json'
+              - 'package.json'
               - 'turbo.json'
+              - 'pnpm-workspace.yaml'
+              - 'pnpm-lock.yaml'
+              - '.npmrc'
+              - '.nvmrc'
+            # Repo-level scripts and the config deciding what the unit
+            # suites collect. Both sit outside every workspace, so no
+            # package filter matches them.
+            scripts:
+              - 'scripts/**'
+              - 'vitest.config.ts'
+            # The subset the build and typecheck jobs execute.
+            build_scripts:
+              - 'scripts/audit-turbo-outputs.js'
+              - 'scripts/typecheck-tailwind-dist.mjs'
             ci:
               - '.github/workflows/**'
+              - '.github/actions/**'
 
   # format-check and lint run full-tree to mirror local `pnpm lint` /
   # `pnpm format:check`, so neither is path-filtered: a filter would have to
   # restate ESLint's and Prettier's file sets and would drift out of them.
+  # It is also what lets `UNGATED_ROOT_FILES` in `scripts/ci-filters.test.js`
+  # exempt files like `eslint.config.js`, which no other job reads.
 
   format-check:
     name: Format Check
@@ -162,7 +173,9 @@ jobs:
     runs-on: ubuntu-latest
     needs: changes
     if: >-
-      needs.changes.outputs.packages == 'true' ||
+      needs.changes.outputs.browser == 'true' ||
+      needs.changes.outputs.browser_source == 'true' ||
+      needs.changes.outputs.root_config == 'true' ||
       needs.changes.outputs.ci == 'true'
     steps:
       - name: Checkout
@@ -187,7 +200,7 @@ jobs:
     name: Build
     runs-on: ubuntu-latest
     needs: changes
-    if: needs.changes.outputs.packages == 'true' || needs.changes.outputs.ci == 'true'
+    if: needs.changes.outputs.packages == 'true' || needs.changes.outputs.build_all == 'true'
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -214,17 +227,22 @@ jobs:
           restore-keys: |
             turbo-${{ runner.os }}-
 
+      - name: Audit turbo output declarations
+        run: pnpm audit:turbo-outputs
+
       - name: Build affected packages
         env:
           BASE_REF: ${{ github.base_ref }}
+          BUILD_ALL: ${{ needs.changes.outputs.build_all }}
         run: |
-          if [ "${{ needs.changes.outputs.ci }}" = "true" ] || [ "${{ needs.changes.outputs.root_config }}" = "true" ]; then
-            pnpm turbo build
-          elif [ "${{ github.event_name }}" = "pull_request" ]; then
-            pnpm turbo build --filter="...[origin/$BASE_REF]"
-          else
-            pnpm turbo build
+          set -euo pipefail
+          filter=()
+          if [ "$BUILD_ALL" != "true" ] && [ "${{ github.event_name }}" = "pull_request" ]; then
+            filter=(--filter="...[origin/$BASE_REF]")
           fi
+
+          pnpm turbo build "${filter[@]}"
+          node scripts/audit-turbo-outputs.js --post-build "${filter[@]}"
 
       - name: Docs CSP inventory
         run: |
@@ -237,7 +255,7 @@ jobs:
           name: build-artifacts
           path: packages/**/dist
           retention-days: 1
-          if-no-files-found: warn
+          if-no-files-found: error
 
   # ============================================
   # TypeScript Check (affected packages)
@@ -247,7 +265,7 @@ jobs:
     name: TypeScript Check
     runs-on: ubuntu-latest
     needs: [changes, build]
-    if: needs.changes.outputs.packages == 'true' || needs.changes.outputs.ci == 'true'
+    if: needs.changes.outputs.packages == 'true' || needs.changes.outputs.build_all == 'true'
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -283,14 +301,15 @@ jobs:
       - name: TypeScript check (affected packages)
         env:
           BASE_REF: ${{ github.base_ref }}
+          BUILD_ALL: ${{ needs.changes.outputs.build_all }}
         run: |
-          if [ "${{ needs.changes.outputs.ci }}" = "true" ] || [ "${{ needs.changes.outputs.root_config }}" = "true" ]; then
-            pnpm turbo typecheck
-          elif [ "${{ github.event_name }}" = "pull_request" ]; then
-            pnpm turbo typecheck --filter="...[origin/$BASE_REF]"
-          else
-            pnpm turbo typecheck
+          set -euo pipefail
+          filter=()
+          if [ "$BUILD_ALL" != "true" ] && [ "${{ github.event_name }}" = "pull_request" ]; then
+            filter=(--filter="...[origin/$BASE_REF]")
           fi
+
+          pnpm turbo typecheck "${filter[@]}"
 
       - name: Core runtime export contract
         run: pnpm --filter @nexus_ds/core audit:runtime-exports
@@ -310,10 +329,13 @@ jobs:
     name: Unit Tests
     runs-on: ubuntu-latest
     needs: changes
-    # Runs the whole unit suite (packages + apps), so gate on `packages`
+    # Runs the whole unit suite (packages + apps), so gate on `browser_source`
     # (apps/** + packages/**), not `react` which intentionally excludes apps/.
     if: >-
-      needs.changes.outputs.packages == 'true' ||
+      needs.changes.outputs.browser_source == 'true' ||
+      needs.changes.outputs.browser == 'true' ||
+      needs.changes.outputs.scripts == 'true' ||
+      needs.changes.outputs.root_config == 'true' ||
       needs.changes.outputs.ci == 'true'
     steps:
       - name: Checkout
@@ -331,6 +353,21 @@ jobs:
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
 
+      - name: Regenerate docs page manifest
+        run: pnpm --filter @nexus_ds/docs generate:manifest
+
+      - name: Check docs page manifest freshness
+        # `git status --porcelain` (not `git diff`) so untracked new files also fail.
+        run: |
+          set -euo pipefail
+          DIRTY=$(git status --porcelain -- apps/docs/app/_lib)
+          if [ -n "$DIRTY" ]; then
+            echo "::error::Docs page manifest is stale. Affected paths:"
+            echo "$DIRTY"
+            echo "::error::Run 'pnpm --filter @nexus_ds/docs generate:manifest' and commit the result."
+            exit 1
+          fi
+
       - name: Run unit tests
         run: pnpm test:unit
 
@@ -342,10 +379,13 @@ jobs:
     name: Audit Tokens
     runs-on: ubuntu-latest
     needs: changes
-    # Gate on `packages` (apps/** + packages/**): the freshness check
+    # Gate on `browser_source` (apps/** + packages/**): the freshness check
     # and the audit:class-refs / audit:mode-codenames steps scan apps/** and
     # packages/** sources, including apps/docs.
-    if: needs.changes.outputs.packages == 'true' || needs.changes.outputs.ci == 'true'
+    if: >-
+      needs.changes.outputs.browser_source == 'true' ||
+      needs.changes.outputs.root_config == 'true' ||
+      needs.changes.outputs.ci == 'true'
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -423,7 +463,10 @@ jobs:
     name: Test (React)
     runs-on: ubuntu-latest
     needs: changes
-    if: needs.changes.outputs.react == 'true' || needs.changes.outputs.ci == 'true'
+    if: >-
+      needs.changes.outputs.react == 'true' ||
+      needs.changes.outputs.root_config == 'true' ||
+      needs.changes.outputs.ci == 'true'
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -468,31 +511,16 @@ jobs:
     name: Build Storybook
     runs-on: ubuntu-latest
     needs: changes
-    if: needs.changes.outputs.react == 'true' || needs.changes.outputs.ci == 'true'
+    if: >-
+      needs.changes.outputs.react == 'true' ||
+      needs.changes.outputs.root_config == 'true' ||
+      needs.changes.outputs.ci == 'true'
     steps:
       - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Install pnpm
-        uses: pnpm/action-setup@v4
-
-      - name: Setup Node
-        uses: actions/setup-node@v4
-        with:
-          node-version-file: '.nvmrc'
-          cache: 'pnpm'
-
-      - name: Install dependencies
-        run: pnpm install --frozen-lockfile
-
-      # The AdjustContrast story imports @nexus_ds/core, which is consumed via
-      # its built dist/runtime entry (package.json exports). Build it so the
-      # Storybook production build can resolve the package.
-      - name: Build @nexus_ds/core
-        run: pnpm --filter @nexus_ds/core build
-
       - name: Build Storybook
-        run: pnpm build-storybook
+        uses: ./.github/actions/build-storybook
 
       - name: Upload Storybook build
         uses: actions/upload-artifact@v4
@@ -505,7 +533,10 @@ jobs:
     name: Bundle Size
     runs-on: ubuntu-latest
     needs: [changes, build]
-    if: needs.changes.outputs.react == 'true' || needs.changes.outputs.ci == 'true'
+    if: >-
+      needs.changes.outputs.react == 'true' ||
+      needs.changes.outputs.root_config == 'true' ||
+      needs.changes.outputs.ci == 'true'
     steps:
       - name: Checkout
         uses: actions/checkout@v4

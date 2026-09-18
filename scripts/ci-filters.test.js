@@ -116,7 +116,7 @@ if (!detectStep) {
 // `filters` is a YAML string embedded in the step input, so it parses twice.
 const filters = parseYaml(detectStep.with.filters);
 
-const exportedFilters = Object.keys(jobNamed('changes').outputs);
+const exportedOutputs = Object.keys(jobNamed('changes').outputs);
 
 // Root files no path filter needs to match: `lint` and `format-check` run
 // unconditionally, and no other job reads these.
@@ -126,12 +126,9 @@ const UNGATED_ROOT_FILES = [
   '.mcp.json',
   '.prettierignore',
   '.prettierrc',
-  'AGENTS.md',
   'COMPONENT-REVIEW.md',
   'CONTRIBUTING.md',
   'Makefile',
-  'README.md',
-  'RTK.md',
   'eslint.config.js',
   'skills-lock.json',
 ];
@@ -145,8 +142,12 @@ const UNGATED_JOBS = ['format-check', 'lint'];
 const UNCONDITIONAL_JOBS = ['changes', ...UNGATED_JOBS];
 
 const OUTPUT_READ = /needs\.changes\.outputs\.(\w+)/g;
+// The two shapes an exported output may take: one filter forwarded whole, or
+// a disjunction of filter reads folded into one signal.
+const FORWARDED_OUTPUT = /^\$\{\{\s*steps\.filter\.outputs\.(\w+)\s*\}\}$/;
+const DERIVED_TERM = /^steps\.filter\.outputs\.(\w+) == 'true'$/;
 const GATE_TERM = /^needs\.changes\.outputs\.(\w+) == 'true'$/;
-const GUARD_TERM = /^\[ "([^"]*)" = "([^"]*)" \]$/;
+const GUARD_TERM = /^\[ "([^"]*)" (!?=) "([^"]*)" \]$/;
 const RESULT_TERM = /^contains\(needs\.\*\.result,\s*'(\w+)'\)$/;
 const EXPRESSION = /\$\{\{\s*([^}]+?)\s*\}\}/g;
 const WRAPPED_EXPRESSION = /^\$\{\{\s*(.+?)\s*\}\}$/;
@@ -164,11 +165,22 @@ const FAIL_STEP_ECHO = /^echo [^;&|<]*[^;&|<\\]$/;
 // The shell options it may set. `-o` takes `pipefail` and nothing else, and the
 // letters exclude `n`, so neither spelling of noexec — which parses the exit
 // without running it — is an allowed command.
-const FAIL_STEP_PRELUDE = /^set -[eux]*(?:o pipefail)?$/;
+const SET_OPTION = /^set -[eux]*(?:o pipefail)?$/;
+// An array assigned outside the chain and expanded after it: the one way a
+// step may carry a branch's choice into a command the chain does not hold.
+// A single word per element, so a command substitution cannot pass as one.
+const ARRAY_ASSIGN = /^(\w+)=\((.*)\)$/;
+const ARRAY_EXPANSION = /"\$\{(\w+)\[@\]\}"/g;
 // The whole task set, run by name. Asserting this exact shape rather than
 // denying known narrowing flags means every other way to narrow — `--filter`,
 // `-F`, `--affected`, or a `pkg#task` argument — fails without being listed.
 const UNFILTERED_RUN = /^pnpm turbo (?:run )?[a-z-]+$/;
+// A command that runs turbo itself. Matched on the program rather than on
+// the word `turbo` anywhere in the line, so a script whose *name* carries it
+// — `pnpm audit:turbo-outputs`, `node scripts/audit-turbo-outputs.js` — stays
+// out of the task-set model. Neither runs a turbo task: the audit reaches
+// turbo only for a `--dry=json` read of the graph it then checks.
+const TURBO_INVOCATION = /^(?:pnpm (?:exec )?|npx )?turbo\b/;
 
 // A narrowed turbo run that is not diff scoping: one fixed, named target for a
 // check of its own, so a root-config change does not widen it. The filter has
@@ -193,6 +205,50 @@ function filterNamed(name) {
   }
 
   return paths;
+}
+
+// An exported output either forwards one filter or combines several into a
+// derived signal, so a gate names an output, not always a filter. Both forms
+// reduce to the filters the output reads, and a shape that is neither throws
+// rather than resolving to no paths — an output the model cannot read would
+// otherwise gate a job on nothing.
+function filtersOfOutput(name) {
+  const value = jobNamed('changes').outputs?.[name];
+
+  if (value === undefined) {
+    throw new Error(`ci.yml \`changes\` job exports no \`${name}\` output`);
+  }
+
+  const [, forwarded] = value.match(FORWARDED_OUTPUT) ?? [];
+
+  if (forwarded) {
+    return [forwarded];
+  }
+
+  const [, expression] = value.match(WRAPPED_EXPRESSION) ?? [];
+
+  if (!expression) {
+    throw new Error(
+      `ci.yml \`${name}\` output is not a \`\${{ }}\` expression: ${value}`
+    );
+  }
+
+  return expression.split('||').map((term) => {
+    const [, filter] = term.trim().match(DERIVED_TERM) ?? [];
+
+    if (!filter) {
+      throw new Error(
+        `ci.yml \`${name}\` output term is not \`steps.filter.outputs.X == 'true'\`: ${term.trim()}`
+      );
+    }
+
+    return filter;
+  });
+}
+
+// The filter paths a set of gate-named outputs opens on.
+function pathsOpening(names) {
+  return names.flatMap(filtersOfOutput).flatMap(filterNamed);
 }
 
 // Only a disjunction of `== 'true'` terms lets a filter turn the job on, so
@@ -467,7 +523,7 @@ function diffScopedFilters() {
 // filter has to fail the tests that read it, not empty the suite before any of
 // them collect. `dorny/paths-filter` matches with `dot: true`.
 function matcherFor(names) {
-  return picomatch(names.flatMap(filterNamed), { dot: true });
+  return picomatch(pathsOpening(names), { dot: true });
 }
 
 // A filter entry is a glob and a filter matches paths, so a `*` run stands in
@@ -510,7 +566,7 @@ function nodeVersionFiles() {
 // declared globals themselves. Pinned rather than spread from `turbo.json`, so
 // emptying `globalDependencies` fails the suite instead of shrinking this floor
 // along with it.
-const TURBO_GLOBAL_DEPENDENCIES = ['tsconfig.base.json', 'tsconfig.json'];
+const TURBO_GLOBAL_DEPENDENCIES = ['tsconfig.base.json'];
 const TURBO_GLOBALS = [
   'turbo.json',
   'pnpm-lock.yaml',
@@ -519,10 +575,12 @@ const TURBO_GLOBALS = [
 ];
 
 // The root files a diff-scoped job's gate matches but `root_config` need not
-// carry, because that job does not read them. `vitest.config.ts` configures the
-// suites `test-unit` and `test-react` run whole; neither `build` nor
-// `typecheck` reads it, so a change to it need not widen either.
-const ROOT_CONFIG_EXEMPT = ['vitest.config.ts'];
+// carry, because that job does not read them. Empty today: `vitest.config.ts`
+// is the one root file in that position, and it rides `scripts`, which gates
+// the jobs running the suites and neither diff-scoped job. Kept rather than
+// deleted so the assertion below still rejects an exemption that names a file
+// no diff-scoped job gates on.
+const ROOT_CONFIG_EXEMPT = [];
 
 // `continue-on-error: false` is the default and lets a failure stand. `true`
 // swallows it, and an expression is a value the model cannot resolve — both are
@@ -542,24 +600,60 @@ function commandsOf(script) {
 function turboLinesIn(branch) {
   return commandsOf(branch.body)
     .map((line) => line.trim())
-    .filter((line) => line.includes('turbo'));
+    .filter((line) => TURBO_INVOCATION.test(line));
 }
 
-// The step's script is exactly one flat `if` / `elif` / `else` / `fi` chain.
-// A nested or second `if`, a control line not written `if <test>; then`, and
-// any command outside the chain all throw — a step must not be able to narrow
-// the task set somewhere the model does not read.
-function branchesOf(script) {
-  const lines = commandsOf(script);
+// The words an array assignment carries, or `null` for a line that is not one.
+function arrayAssigned(line) {
+  const [, name, words] = line.match(ARRAY_ASSIGN) ?? [];
+
+  return name === undefined ? null : { name, words: words.trim() };
+}
+
+// The chain picks the values; the tail runs the commands. Substituting here is
+// what lets the model read a step whose narrowing lives in a variable: an
+// expansion of an array the branch never set, or of anything the assignments do
+// not name, throws rather than surviving into a command as literal text.
+function expand(line, assigned) {
+  const substituted = line.replace(ARRAY_EXPANSION, (_, name) => {
+    if (!(name in assigned)) {
+      throw new Error(`run step expands unassigned \`${name}\`: ${line}`);
+    }
+
+    return assigned[name];
+  });
+
+  for (const name of Object.keys(assigned)) {
+    if (new RegExp(`\\$\\{?${name}\\b`).test(substituted)) {
+      throw new Error(
+        `run step reads \`${name}\` outside \`"\${${name}[@]}"\`: ${line}`
+      );
+    }
+  }
+
+  return substituted.replace(/\s+/g, ' ').trim();
+}
+
+// The step's script is a prelude, exactly one flat `if` / `elif` / `else` / `fi`
+// chain, and a tail. A nested or second `if`, a control line not written
+// `if <test>; then`, and a chain that never closes all throw. Outside the chain
+// the model reads only what it can resolve whole: shell options, and array
+// assignments whose expansion it substitutes into the tail. Every other command
+// before the chain throws — a step must not be able to narrow the task set
+// somewhere the model does not read.
+function branchesOf(step) {
+  const lines = commandsOf(step.run);
 
   // A script with no control line is one unguarded branch: whatever it lists,
   // it runs. Anything that opens, extends, or closes a chain goes through the
   // parser below, so a malformed chain throws instead of reading as flat.
   if (!lines.some((line) => CONTROL_LINE.test(line))) {
-    return [{ guard: null, body: lines.join('\n') }];
+    return [{ guard: null, body: lines.join('\n'), env: step.env ?? {} }];
   }
 
+  const defaults = {};
   const branches = [];
+  const tail = [];
   let closed = false;
 
   for (const line of lines) {
@@ -567,14 +661,14 @@ function branchesOf(script) {
     const open = branches.length > 0;
     const fellBack = open && branches.at(-1).guard === null;
 
-    if (closed) {
-      throw new Error(`run step continues after \`fi\`: ${text}`);
-    }
-
-    const opening = line.match(/^\s*(el)?if (.+); then$/);
+    const opening = text.match(/^(el)?if (.+); then$/);
 
     if (opening) {
       const [, elif, guard] = opening;
+
+      if (closed) {
+        throw new Error(`run step opens a second \`if\`: ${text}`);
+      }
 
       if (!elif && open) {
         throw new Error(`run step opens a second \`if\`: ${text}`);
@@ -588,12 +682,12 @@ function branchesOf(script) {
         throw new Error(`run step \`elif\` follows \`else\`: ${text}`);
       }
 
-      branches.push({ guard, body: [] });
+      branches.push({ guard, assigned: { ...defaults }, body: [] });
       continue;
     }
 
-    if (/^\s*else$/.test(line)) {
-      if (!open) {
+    if (/^else$/.test(text)) {
+      if (!open || closed) {
         throw new Error('run step `else` opens no `if`');
       }
 
@@ -601,12 +695,12 @@ function branchesOf(script) {
         throw new Error('run step declares a second `else`');
       }
 
-      branches.push({ guard: null, body: [] });
+      branches.push({ guard: null, assigned: { ...defaults }, body: [] });
       continue;
     }
 
-    if (/^\s*fi$/.test(line)) {
-      if (!open) {
+    if (/^fi$/.test(text)) {
+      if (!open || closed) {
         throw new Error('run step `fi` closes no `if`');
       }
 
@@ -614,30 +708,61 @@ function branchesOf(script) {
       continue;
     }
 
-    if (CONTROL_LINE.test(line)) {
+    if (CONTROL_LINE.test(text)) {
       throw new Error(`run step control line is malformed: ${text}`);
     }
 
-    if (!open) {
-      throw new Error(`run step runs a command before its \`if\`: ${text}`);
+    const assignment = arrayAssigned(text);
+
+    if (open && !closed) {
+      if (assignment) {
+        branches.at(-1).assigned[assignment.name] = assignment.words;
+      } else {
+        branches.at(-1).body.push(text);
+      }
+
+      continue;
     }
 
-    branches.at(-1).body.push(line);
+    if (closed) {
+      tail.push(text);
+      continue;
+    }
+
+    // Before the chain. Only what the model resolves whole may run here.
+    if (assignment) {
+      defaults[assignment.name] = assignment.words;
+      continue;
+    }
+
+    if (!SET_OPTION.test(text)) {
+      throw new Error(`run step runs a command before its \`if\`: ${text}`);
+    }
   }
 
   if (!closed) {
     throw new Error('run step has no closing `fi`');
   }
 
-  return branches.map(({ guard, body }) => ({ guard, body: body.join('\n') }));
+  // A chain with no `else` still reaches its tail, carrying the values set
+  // before it. Leaving that case out would read as a step that takes no branch.
+  if (!branches.some(({ guard }) => guard === null)) {
+    branches.push({ guard: null, assigned: { ...defaults }, body: [] });
+  }
+
+  return branches.map(({ guard, assigned, body }) => ({
+    guard,
+    body: [...body, ...tail].map((line) => expand(line, assigned)).join('\n'),
+    env: step.env ?? {},
+  }));
 }
 
 // A step fails its job only where nothing can route around the exit: one
 // chain-free branch — an `else` arm carries no guard either, so a null guard
 // alone is not enough — ending in a non-zero `exit`, with nothing before it
 // that could exit first.
-function failsUnconditionally(script) {
-  const branches = branchesOf(script);
+function failsUnconditionally(step) {
+  const branches = branchesOf(step);
 
   if (branches.length !== 1 || branches[0].guard !== null) return false;
 
@@ -647,50 +772,106 @@ function failsUnconditionally(script) {
 
   return commands
     .slice(0, -1)
-    .every((line) => FAIL_STEP_ECHO.test(line) || FAIL_STEP_PRELUDE.test(line));
+    .every((line) => FAIL_STEP_ECHO.test(line) || SET_OPTION.test(line));
 }
 
 // A guard the model cannot resolve must throw. Silently reading it as unequal
 // would send every case to `else` and pass whatever sits there.
-function operand(value, env) {
-  const expanded = value.replace(EXPRESSION, (_, expression) => {
-    if (!(expression in env)) {
-      throw new Error(`run-step guard reads unmodelled \`${expression}\``);
+//
+// Three layers resolve, in the order a runner applies them: a shell variable
+// from the step's own `env:`, the `${{ }}` expressions that `env:` and the
+// script share, and a changes output read as the filters it carries. Anything
+// left unresolved throws.
+function operand(value, env, stepEnv) {
+  const shellExpanded = value.replace(/\$\{?(\w+)\}?/g, (_, name) => {
+    if (!(name in stepEnv)) {
+      throw new Error(`run-step guard reads unmodelled \`$${name}\``);
     }
 
-    return env[expression];
+    return String(stepEnv[name]);
   });
 
+  const expanded = shellExpanded.replace(EXPRESSION, (_, expression) =>
+    resolveExpression(expression.trim(), env)
+  );
+
   if (expanded.includes('$')) {
-    throw new Error(`run-step guard reads a shell variable: ${value}`);
+    throw new Error(`run-step guard does not resolve: ${value}`);
   }
 
   return expanded;
 }
 
-// `else` carries no guard and always wins if it is reached.
-function guardHolds(guard, env) {
+// A changes output is true when any filter it carries matched, so one rule
+// reads both a forwarded output and a derived one. A scenario that does not
+// value every filter the output reads throws rather than resolving to `false`.
+function resolveExpression(expression, env) {
+  if (expression in env) {
+    return env[expression];
+  }
+
+  const [, output] = expression.match(/^needs\.changes\.outputs\.(\w+)$/) ?? [];
+
+  if (!output) {
+    throw new Error(`run-step guard reads unmodelled \`${expression}\``);
+  }
+
+  const carried = filtersOfOutput(output);
+  const unmodelled = carried.filter((filter) => !(filter in env.filters));
+
+  if (unmodelled.length > 0) {
+    throw new Error(
+      `run-step guard reads \`${output}\`, carrying unmodelled filters: ${unmodelled.join(', ')}`
+    );
+  }
+
+  return String(carried.some((filter) => env.filters[filter] === 'true'));
+}
+
+// `||` and `&&` are left-associative in shell, so a guard mixing them does not
+// group the way either reading suggests. Rejecting the mix keeps the model from
+// having to pick one.
+function guardHolds(guard, env, stepEnv = {}) {
   if (guard === null) return true;
 
-  return guard.split('||').some((term) => {
-    const [, left, right] = term.trim().match(GUARD_TERM) ?? [];
+  if (guard.includes('||') && guard.includes('&&')) {
+    throw new Error(`run-step guard mixes \`||\` and \`&&\`: ${guard}`);
+  }
+
+  const holds = (term) => {
+    const [, left, operator, right] = term.trim().match(GUARD_TERM) ?? [];
 
     if (left === undefined) {
       throw new Error(
-        `run-step guard term is not \`[ "X" = "Y" ]\`: ${term.trim()}`
+        `run-step guard term is not \`[ "X" = "Y" ]\` or \`[ "X" != "Y" ]\`: ${term.trim()}`
       );
     }
 
-    return operand(left, env) === operand(right, env);
-  });
+    const equal = operand(left, env, stepEnv) === operand(right, env, stepEnv);
+
+    return operator === '=' ? equal : !equal;
+  };
+
+  return guard.includes('&&')
+    ? guard.split('&&').every(holds)
+    : guard.split('||').some(holds);
 }
 
 // A root-config change on a pull request: the case where filtering by diff
 // selects nothing, so the job must fall through to an unfiltered run.
 const ROOT_CONFIG_PULL_REQUEST = {
-  'needs.changes.outputs.ci': 'false',
-  'needs.changes.outputs.root_config': 'true',
   'github.event_name': 'pull_request',
+  'github.base_ref': 'main',
+  // Valued per filter rather than per output, so an output the workflow derives
+  // from several filters resolves from the same scenario as one it forwards.
+  // Every filter is listed: a new one leaves the guards reading it unmodelled,
+  // which throws rather than resolving to `false`.
+  filters: Object.fromEntries(
+    Object.keys(filters).map((filter) => [
+      filter,
+      filter === 'root_config' ? 'true' : 'false',
+    ])
+  ),
 };
 
 // Only turbo runs can narrow the task set, and the branch model must not be
@@ -699,14 +880,14 @@ function turboStepsOf(name) {
   return stepsOf(name).filter(
     (step) =>
       step.run !== undefined &&
-      commandsOf(step.run).some((line) => line.includes('turbo'))
+      commandsOf(step.run).some((line) => TURBO_INVOCATION.test(line.trim()))
   );
 }
 
 // Every branch, so a run narrowed on the `push` path is as visible as one
 // narrowed on the pull-request path.
 function turboLinesOf(step) {
-  return branchesOf(step.run).flatMap(turboLinesIn);
+  return branchesOf(step).flatMap(turboLinesIn);
 }
 
 // Narrowing is read off the one shape the suite already trusts: a turbo line
@@ -816,7 +997,7 @@ describe('ci path filters', () => {
     expect(aggregator.if).toBe('always()');
 
     const failing = stepsOf('ci-status').filter(
-      (step) => step.run !== undefined && failsUnconditionally(step.run)
+      (step) => step.run !== undefined && failsUnconditionally(step)
     );
 
     expect(
@@ -951,8 +1132,8 @@ describe('ci path filters', () => {
       for (const step of steps) {
         const where = `\`${name}\` step "${step.name}"`;
 
-        const taken = branchesOf(step.run).find(({ guard }) =>
-          guardHolds(guard, ROOT_CONFIG_PULL_REQUEST)
+        const taken = branchesOf(step).find(({ guard, env }) =>
+          guardHolds(guard, ROOT_CONFIG_PULL_REQUEST, env)
         );
 
         expect(taken, `${where} takes no branch`).toBeDefined();
@@ -1063,8 +1244,7 @@ describe('ci path filters', () => {
       const opensNeed = matcherFor(filtersGating(need));
 
       expect(
-        filtersGating(name)
-          .flatMap(filterNamed)
+        pathsOpening(filtersGating(name))
           .flatMap(samplesOf)
           .filter((sample) => !opensNeed(sample)),
         `filter paths that open \`${name}\` but skip \`${need}\``
@@ -1163,23 +1343,36 @@ describe('ci path filters', () => {
     ).toEqual([]);
   });
 
-  it('forwards every filter output it exports', () => {
-    for (const [name, value] of Object.entries(jobNamed('changes').outputs)) {
-      expect(value).toBe(`\${{ steps.filter.outputs.${name} }}`);
+  // A gate is only as good as what its output carries. An output reading an
+  // undeclared filter opens nothing, and one forwarding a filter it is not
+  // named for reads as a gate it is not: `react` wired to the `packages`
+  // filter turns the react lane on for every app change. A derived output has
+  // no filter of its own, so it is held to its terms instead.
+  it('resolves every exported output to the filters it names', () => {
+    const declared = new Set(Object.keys(filters));
+
+    expect(exportedOutputs.length).toBeGreaterThan(0);
+
+    for (const name of exportedOutputs) {
+      const carried = filtersOfOutput(name);
+
+      expect(carried, `\`${name}\` carries no filter`).not.toHaveLength(0);
+      expect(
+        carried.filter((filter) => !declared.has(filter)),
+        `\`${name}\` reads filters \`ci.yml\` does not declare`
+      ).toEqual([]);
+
+      if (declared.has(name)) {
+        expect(
+          carried,
+          `\`${name}\` forwards a filter it is not named for`
+        ).toEqual([name]);
+      }
     }
   });
 
-  it('declares a filter for every output it exports', () => {
-    const declared = new Set(Object.keys(filters));
-
-    expect(exportedFilters.length).toBeGreaterThan(0);
-    expect(exportedFilters.filter((filter) => !declared.has(filter))).toEqual(
-      []
-    );
-  });
-
   it('exports exactly the filters the workflow reads', () => {
-    const exported = new Set(exportedFilters);
+    const exported = new Set(exportedOutputs);
     const read = new Set(filtersReadBy(JSON.stringify(workflow)));
 
     expect(read.size).toBeGreaterThan(0);
