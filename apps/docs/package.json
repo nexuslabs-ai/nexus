@@ -5,10 +5,12 @@
   "type": "module",
   "description": "Documentation site for the Nexus Design System",
   "scripts": {
-    "dev": "next dev --turbopack",
+    "dev": "concurrently -n demos,next -c gray,cyan \"pnpm generate:demos:watch\" \"next dev --turbopack\"",
     "build": "next build",
     "start": "next start",
     "audit:csp": "node scripts/audit-csp-inventory.mjs",
+    "generate:demos": "node scripts/generate-demo-index.mjs",
+    "generate:demos:watch": "node scripts/generate-demo-index.mjs --watch",
     "typecheck": "tsc --noEmit",
     "clean": "rm -rf .next dist"
   },
@@ -31,6 +33,7 @@
   "devDependencies": {
     "@mdx-js/mdx": "^3.1.1",
     "@tailwindcss/postcss": "^4.1.18",
+    "concurrently": "^10.0.5",
     "@types/mdx": "^2.0.13",
     "@types/node": "^25.0.3",
     "@types/react": "^19.2.7",
