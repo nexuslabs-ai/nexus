@@ -2,6 +2,7 @@ import { NexusAppearanceProvider } from '@nexus_ds/react/appearance';
 import { NexusAppearanceScript } from '@nexus_ds/react/appearance/server';
 import type { Metadata } from 'next';
 
+import { CopyAnnouncerProvider } from './_components/CopyAnnouncer';
 import { Footer } from './_components/Footer';
 import { ThemePicker } from './_components/ThemePicker';
 import { TopNav } from './_components/TopNav';
@@ -25,7 +26,7 @@ export default function RootLayout({
   return (
     <html
       lang="en"
-      className="nx:scroll-pt-(--docs-scroll-offset)"
+      className="nx:scroll-pt-(--docs-scroll-offset) nx:scroll-pb-(--docs-panel-offset)"
       data-density={DOCS_APPEARANCE_DEFAULT_STATE.density}
       data-radius={DOCS_APPEARANCE_DEFAULT_STATE.corners}
       data-shadow={DOCS_APPEARANCE_DEFAULT_STATE.elevation}
@@ -44,10 +45,12 @@ export default function RootLayout({
           storageKey={DOCS_APPEARANCE_STORAGE_KEY}
           defaultState={DOCS_APPEARANCE_DEFAULT_STATE}
         >
-          <TopNav />
-          <main>{children}</main>
-          <ThemePicker />
-          <Footer />
+          <CopyAnnouncerProvider>
+            <TopNav />
+            <main>{children}</main>
+            <ThemePicker />
+            <Footer />
+          </CopyAnnouncerProvider>
         </NexusAppearanceProvider>
       </body>
     </html>
