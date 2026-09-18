@@ -2,8 +2,8 @@
 
 import { useState } from 'react';
 
-import { SubsectionHeading } from '../_components/Heading';
-import { Button } from '../_components/nexus';
+import { SubsectionHeading } from './Heading';
+import { Button } from './nexus';
 
 /**
  * Every Nexus color scale, with a shared color-vision-deficiency preview.

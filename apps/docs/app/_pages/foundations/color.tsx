@@ -1,7 +1,6 @@
-import { Breadcrumb } from '../_components/Breadcrumb';
-import { SectionHeading } from '../_components/Heading';
-
-import { ColorScales } from './ColorScales';
+import { Breadcrumb } from '../../_components/Breadcrumb';
+import { ColorScales } from '../../_components/ColorScales';
+import { SectionHeading } from '../../_components/Heading';
 
 /**
  * Foundations → Color — the proof-of-depth exemplar page.
@@ -147,7 +146,7 @@ const APCA_TIERS: { pair: string; lc: string; covers: string }[] = [
   },
 ];
 
-export function ColorShowcase() {
+export default function ColorShowcase() {
   return (
     <>
       <Breadcrumb

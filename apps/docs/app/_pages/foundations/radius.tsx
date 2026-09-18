@@ -1,5 +1,5 @@
-import { Breadcrumb } from '../_components/Breadcrumb';
-import { SectionHeading } from '../_components/Heading';
+import { Breadcrumb } from '../../_components/Breadcrumb';
+import { SectionHeading } from '../../_components/Heading';
 
 /**
  * Foundations → Radius · Borders · Shadows. Server component — three
@@ -50,7 +50,7 @@ const SHADOWS: { cls: string; label: string }[] = [
   { cls: 'nx:shadow-2xl', label: '2xl' },
 ];
 
-export function Radius() {
+export default function Radius() {
   return (
     <>
       <Breadcrumb

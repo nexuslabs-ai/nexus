@@ -1,12 +1,12 @@
 import type { ComponentType } from 'react';
 
-import { ColorShowcase } from '../_pages/ColorShowcase';
-import { Layering } from '../_pages/Layering';
-import { MultiBrand } from '../_pages/MultiBrand';
-import { Radius } from '../_pages/Radius';
-import { Responsive } from '../_pages/Responsive';
-import { Spacing } from '../_pages/Spacing';
-import { Typography } from '../_pages/Typography';
+import ColorShowcase from '../_pages/foundations/color';
+import Layering from '../_pages/foundations/layering';
+import Radius from '../_pages/foundations/radius';
+import Responsive from '../_pages/foundations/responsive';
+import Spacing from '../_pages/foundations/spacing';
+import Typography from '../_pages/foundations/typography';
+import MultiBrand from '../_pages/theming/multi-brand';
 
 /**
  * Hand-built "real" pages, keyed by `${section}/${sub}`. The dynamic route

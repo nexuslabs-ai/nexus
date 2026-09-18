@@ -1,7 +1,7 @@
-import { Breadcrumb } from '../_components/Breadcrumb';
-import { CodeBlock } from '../_components/CodeBlock';
-import { SectionHeading } from '../_components/Heading';
-import { Button } from '../_components/nexus';
+import { Breadcrumb } from '../../_components/Breadcrumb';
+import { CodeBlock } from '../../_components/CodeBlock';
+import { SectionHeading } from '../../_components/Heading';
+import { Button } from '../../_components/nexus';
 
 /**
  * Theming → Multi-brand. The theming-model explainer (this is where
@@ -45,7 +45,7 @@ const SWATCHES = [
   'foreground',
 ];
 
-export function MultiBrand() {
+export default function MultiBrand() {
   return (
     <>
       <Breadcrumb

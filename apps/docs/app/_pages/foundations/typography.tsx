@@ -1,6 +1,6 @@
-import { Breadcrumb } from '../_components/Breadcrumb';
-import { CodeBlock } from '../_components/CodeBlock';
-import { SectionHeading, SubsectionHeading } from '../_components/Heading';
+import { Breadcrumb } from '../../_components/Breadcrumb';
+import { CodeBlock } from '../../_components/CodeBlock';
+import { SectionHeading, SubsectionHeading } from '../../_components/Heading';
 
 /**
  * Foundations → Typography. Server component — a live specimen of the type
@@ -122,7 +122,7 @@ const FAMILIES: {
   },
 ];
 
-export function Typography() {
+export default function Typography() {
   return (
     <>
       <Breadcrumb

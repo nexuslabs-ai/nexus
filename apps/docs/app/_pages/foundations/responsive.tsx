@@ -1,6 +1,6 @@
-import { Breadcrumb } from '../_components/Breadcrumb';
-import { CodeBlock } from '../_components/CodeBlock';
-import { SectionHeading } from '../_components/Heading';
+import { Breadcrumb } from '../../_components/Breadcrumb';
+import { CodeBlock } from '../../_components/CodeBlock';
+import { SectionHeading } from '../../_components/Heading';
 
 /**
  * Foundations → Responsive. Server component — the breakpoint scale, the
@@ -71,7 +71,7 @@ const MECHANISMS: { mechanism: string; use: string }[] = [
   { mechanism: 'svh / lvh / dvh', use: 'Mobile browser-chrome accommodation' },
 ];
 
-export function Responsive() {
+export default function Responsive() {
   return (
     <>
       <Breadcrumb

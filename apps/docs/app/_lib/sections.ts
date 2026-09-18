@@ -10,23 +10,7 @@
  * docs content fills in section-by-section in later phases.
  */
 
-export type PlaceholderVariant =
-  | 'default'
-  | 'code'
-  | 'storybook'
-  | 'swatches'
-  | 'diagram'
-  | 'table'
-  | 'tall'
-  | 'hero';
-
-export type Block =
-  | { type: 'h2'; text: string }
-  | { type: 'placeholder'; variant?: PlaceholderVariant; label: string }
-  | {
-      type: 'row';
-      blocks: { variant?: PlaceholderVariant; label: string }[];
-    };
+import type { Block } from './blocks';
 
 export type SubPage = {
   slug: string;

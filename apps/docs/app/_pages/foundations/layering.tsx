@@ -1,5 +1,5 @@
-import { Breadcrumb } from '../_components/Breadcrumb';
-import { SectionHeading } from '../_components/Heading';
+import { Breadcrumb } from '../../_components/Breadcrumb';
+import { SectionHeading } from '../../_components/Heading';
 
 /**
  * Foundations → Layering. Server component — the 6-token z-index scale and the
@@ -23,7 +23,7 @@ const LAYERS: { token: string; value: number; use: string }[] = [
   { token: 'max', value: 9999, use: 'Host system UI' },
 ];
 
-export function Layering() {
+export default function Layering() {
   return (
     <>
       <Breadcrumb

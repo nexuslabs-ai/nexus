@@ -1,18 +1,10 @@
+import type { PlaceholderVariant } from '../_lib/blocks';
+
 /**
  * Wireframe-style dashed placeholder block.
  * Keeps the "this is a wireframe" affordance while the chrome
  * around it is real Nexus.
  */
-export type PlaceholderVariant =
-  | 'default'
-  | 'code'
-  | 'storybook'
-  | 'swatches'
-  | 'diagram'
-  | 'table'
-  | 'tall'
-  | 'hero';
-
 export function Placeholder({
   children,
   variant = 'default',
