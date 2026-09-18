@@ -276,8 +276,8 @@ ${INDEX_FOOTER}`;
 
 /**
  * Regenerates the demo index and its per-demo modules on disk, and returns
- * what it wrote. A file is rewritten only when its content changed, and a
- * module is deleted only once its demo is gone.
+ * what it wrote. A file is rewritten only when its content changed, and every
+ * file under `outputDir` this run did not write is deleted.
  *
  * @param {{ examplesDir?: string, outputDir?: string }} [options]
  */
