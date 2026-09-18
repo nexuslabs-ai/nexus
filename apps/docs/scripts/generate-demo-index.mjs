@@ -130,24 +130,22 @@ function pruneEmptyDirs(dir) {
 }
 
 /**
- * Deletes generated modules whose demo no longer exists, leaving every module
- * that is still live — and its mtime — untouched.
+ * Deletes everything under `outputDir` that this run did not write, leaving
+ * every live file — and its mtime — untouched. The scope is the whole output
+ * directory, matching the `outputs` this package's turbo task declares, so a
+ * stray file anywhere under it is cleared by a regeneration.
  *
- * @param {string} modulesDir
- * @param {Set<string>} keep Paths of the modules that should survive.
+ * @param {string} outputDir
+ * @param {Set<string>} keep Paths of the files that should survive.
  */
-function pruneOrphanModules(modulesDir, keep) {
-  if (!existsSync(modulesDir)) {
-    return;
-  }
-
-  for (const file of walk(modulesDir)) {
+function pruneOrphans(outputDir, keep) {
+  for (const file of walk(outputDir)) {
     if (!keep.has(file)) {
       rmSync(file);
     }
   }
 
-  pruneEmptyDirs(modulesDir);
+  pruneEmptyDirs(outputDir);
 }
 
 /**
@@ -290,10 +288,11 @@ export function generateDemoIndex({
   const demos = collectDemos(examplesDir);
   const index = renderDemoIndex(demos);
   const modulesDir = path.join(outputDir, MODULES_DIR);
+  const indexFile = path.join(outputDir, INDEX_FILE);
 
-  writeIfChanged(path.join(outputDir, INDEX_FILE), index);
+  writeIfChanged(indexFile, index);
 
-  const keep = new Set();
+  const keep = new Set([indexFile]);
   for (const demo of demos) {
     const moduleFile = path.join(modulesDir, `${demo.id}.ts`);
     const boundaryFile = path.join(
@@ -307,7 +306,7 @@ export function generateDemoIndex({
     keep.add(boundaryFile);
   }
 
-  pruneOrphanModules(modulesDir, keep);
+  pruneOrphans(outputDir, keep);
 
   return { demos, index };
 }

@@ -39,17 +39,15 @@ const DIRECTIVE = /^(['"])([^'"]*)\1;$/;
 const STALE =
   'Committed output is stale. Run `pnpm --filter @nexus_ds/docs generate:demos` and commit the result.';
 
-/** Every file under `dir`, as sorted `/`-separated paths relative to it. */
+/** Every file under `dir`, as `/`-separated paths relative to it, unordered. */
 function generatedFiles(dir: string): string[] {
-  return readdirSync(dir, { withFileTypes: true })
-    .flatMap((entry) =>
-      entry.isDirectory()
-        ? generatedFiles(path.join(dir, entry.name)).map(
-            (nested) => `${entry.name}/${nested}`
-          )
-        : [entry.name]
-    )
-    .sort();
+  return readdirSync(dir, { withFileTypes: true }).flatMap((entry) =>
+    entry.isDirectory()
+      ? generatedFiles(path.join(dir, entry.name)).map(
+          (nested) => `${entry.name}/${nested}`
+        )
+      : [entry.name]
+  );
 }
 
 /**
@@ -289,6 +287,16 @@ describe('generate-demo-index', () => {
     expect(existsSync(path.join(outputDir, 'demos', 'card'))).toBe(false);
   });
 
+  it('clears a stray file at the output root, not just under demos/', () => {
+    run();
+    const stray = path.join(outputDir, 'stray.ts');
+    writeFileSync(stray, 'export const gone = true;\n');
+
+    run();
+
+    expect(existsSync(stray)).toBe(false);
+  });
+
   it('rejects a dotted id rather than letting it claim another demo’s boundary', () => {
     writeFileSync(
       path.join(examplesDir, 'zebra-demo.client.tsx'),
@@ -315,6 +323,16 @@ describe('generate-demo-index', () => {
       readFileSync(file, 'utf8').replace(/\r\n/g, '\n');
     const demos = collectDemos(EXAMPLES_DIR);
 
+    expect(generatedFiles(GENERATED_DIR).sort(), STALE).toEqual(
+      [
+        'demo-index.ts',
+        ...demos.flatMap((demo) => [
+          `demos/${demo.id}.ts`,
+          `demos/${demo.id}.client.ts`,
+        ]),
+      ].sort()
+    );
+
     expect(renderDemoIndex(demos), STALE).toBe(
       committed(path.join(GENERATED_DIR, 'demo-index.ts'))
     );
@@ -327,16 +345,6 @@ describe('generate-demo-index', () => {
         committed(path.join(GENERATED_DIR, 'demos', `${demo.id}.client.ts`))
       );
     }
-
-    expect(generatedFiles(GENERATED_DIR), STALE).toEqual(
-      [
-        'demo-index.ts',
-        ...demos.flatMap((demo) => [
-          `demos/${demo.id}.ts`,
-          `demos/${demo.id}.client.ts`,
-        ]),
-      ].sort()
-    );
   });
 
   it('looks a demo up by id and throws on a miss', () => {
