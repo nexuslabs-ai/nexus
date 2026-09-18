@@ -210,6 +210,11 @@ interface BadgeProps
  * `role="img"`, so pass `aria-label`, `aria-labelledby`, or `title` to name
  * them. The badge is not a live region; if its status or count updates, wrap it
  * in `aria-live="polite"`.
+ *
+ * Every shape shares one minimum size, applied to the block axis and — for the
+ * number and icon-only shapes — the inline axis too. For an arbitrary minimum,
+ * override `--badge-min-size` via `className`. Centering is flex-derived, so a
+ * consumer that overrides `display` loses it.
  */
 function Badge({
   className,
