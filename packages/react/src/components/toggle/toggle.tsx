@@ -13,12 +13,12 @@ const toggleVariants = cva(
         default: 'nx:bg-transparent',
         outline:
           'nx:border-default nx:border-border-default nx:bg-transparent nx:disabled:border-border-disabled nx:aria-invalid:disabled:border-border-disabled',
-        accentOutline: [
+        'outline-primary': [
           'nx:relative nx:border-0 nx:bg-transparent nx:hover:bg-transparent nx:data-[state=on]:bg-transparent nx:data-[state=on]:hover:bg-transparent nx:data-[state=on]:disabled:bg-transparent',
           'nx:before:pointer-events-none nx:before:absolute nx:before:inset-0 nx:before:rounded-[inherit] nx:before:content-[""] nx:before:inset-ring-(length:--nx-borderwidth-default) nx:before:inset-ring-border-default',
-          'nx:enabled:hover:before:inset-ring-border-primary-active nx:data-[state=on]:enabled:before:inset-ring-focus-default nx:data-[state=on]:enabled:hover:before:inset-ring-focus-default nx:data-[state=on]:enabled:before:ring-(length:--nx-borderwidth-default) nx:data-[state=on]:enabled:before:ring-focus-default',
-          'nx:aria-invalid:enabled:before:inset-ring-border-error nx:aria-invalid:enabled:hover:before:inset-ring-border-error nx:aria-invalid:data-[state=on]:enabled:before:inset-ring-border-error nx:aria-invalid:data-[state=on]:enabled:hover:before:inset-ring-border-error nx:aria-invalid:data-[state=on]:enabled:before:ring-focus-error nx:disabled:before:inset-ring-border-disabled',
-          'nx:forced-colors:before:outline nx:forced-colors:before:outline-1 nx:forced-colors:before:-outline-offset-1 nx:forced-colors:before:outline-[ButtonText] nx:forced-colors:data-[state=on]:before:outline-2 nx:forced-colors:data-[state=on]:before:-outline-offset-2 nx:forced-colors:data-[state=on]:enabled:before:outline-[Highlight] nx:forced-colors:disabled:before:outline-[GrayText]',
+          'nx:not-disabled:hover:before:inset-ring-border-primary nx:data-[state=on]:not-disabled:before:inset-ring-border-primary-active nx:data-[state=on]:not-disabled:before:ring-(length:--nx-borderwidth-default) nx:data-[state=on]:not-disabled:before:ring-border-primary-active',
+          'nx:aria-invalid:not-disabled:before:inset-ring-border-error nx:aria-invalid:data-[state=on]:not-disabled:before:inset-ring-border-error nx:aria-invalid:data-[state=on]:not-disabled:before:ring-border-error-active nx:disabled:before:inset-ring-border-disabled',
+          'nx:forced-colors:before:outline-1 nx:forced-colors:before:-outline-offset-1 nx:forced-colors:before:outline-[ButtonText] nx:forced-colors:data-[state=on]:before:outline-2 nx:forced-colors:data-[state=on]:before:-outline-offset-2 nx:forced-colors:data-[state=on]:not-disabled:before:outline-[Highlight] nx:forced-colors:disabled:before:outline-[GrayText]',
         ],
       },
       size: {
@@ -29,19 +29,19 @@ const toggleVariants = cva(
     },
     compoundVariants: [
       {
-        variant: 'accentOutline',
+        variant: 'outline-primary',
         size: 'sm',
         className:
           'nx:px-[calc(var(--nx-spacing-3)+var(--nx-borderwidth-default))] nx:py-[calc(var(--nx-spacing-1_5)+var(--nx-borderwidth-default))]',
       },
       {
-        variant: 'accentOutline',
+        variant: 'outline-primary',
         size: 'default',
         className:
           'nx:px-[calc(var(--nx-spacing-4)+var(--nx-borderwidth-default))] nx:py-[calc(var(--nx-spacing-2)+var(--nx-borderwidth-default))]',
       },
       {
-        variant: 'accentOutline',
+        variant: 'outline-primary',
         size: 'lg',
         className:
           'nx:px-[calc(var(--nx-spacing-8)+var(--nx-borderwidth-default))] nx:py-[calc(var(--nx-spacing-3)+var(--nx-borderwidth-default))]',

@@ -40,8 +40,12 @@ type ToggleGroupProps = React.ComponentProps<typeof ToggleGroupPrimitive.Root> &
  * ToggleGroup
  *
  * A set of related `ToggleGroupItem`s sharing `variant` / `size` via context.
- * `type="single"` behaves like a radio group; `type="multiple"` allows several
- * items pressed at once.
+ * `type="single"` behaves like a radio group, except that the selected item can
+ * be cleared back to an empty value; `type="multiple"` allows several items
+ * pressed at once.
+ *
+ * `aria-invalid` on the group does not style its items — mark the individual
+ * `ToggleGroupItem`s invalid and describe the error with your own text.
  *
  * @example
  * ```tsx
@@ -60,19 +64,12 @@ function ToggleGroup({
   variant,
   size,
   spacing = 0,
-  orientation,
+  orientation = 'horizontal',
   children,
   ...props
 }: ToggleGroupProps) {
-  const visualOrientation = orientation ?? 'horizontal';
-
   return (
     <ToggleGroupPrimitive.Root
-      data-slot="toggle-group"
-      data-variant={variant ?? 'default'}
-      data-size={size ?? 'default'}
-      data-spacing={spacing}
-      data-orientation={visualOrientation}
       orientation={orientation}
       // Spacing-scale gap via the runtime spacing var (Nexus resets the base
       // --spacing, so Tailwind's --spacing() function is unavailable here).
@@ -82,9 +79,14 @@ function ToggleGroup({
         className
       )}
       {...props}
+      data-slot="toggle-group"
+      data-variant={variant ?? 'default'}
+      data-size={size ?? 'default'}
+      data-spacing={spacing}
+      data-orientation={orientation}
     >
       <ToggleGroupContext.Provider
-        value={{ variant, size, spacing, orientation: visualOrientation }}
+        value={{ variant, size, spacing, orientation }}
       >
         {children}
       </ToggleGroupContext.Provider>
@@ -121,22 +123,21 @@ function ToggleGroupItem({
 
   return (
     <ToggleGroupPrimitive.Item
+      className={cn(
+        toggleVariants({ variant: resolvedVariant, size: resolvedSize }),
+        'nx:min-w-0 nx:shrink-0',
+        'nx:data-[spacing=0]:rounded-none nx:data-[spacing=0]:data-[orientation=horizontal]:first:rounded-s-md nx:data-[spacing=0]:data-[orientation=horizontal]:last:rounded-e-md nx:data-[spacing=0]:data-[orientation=vertical]:first:rounded-t-md nx:data-[spacing=0]:data-[orientation=vertical]:last:rounded-b-md',
+        'nx:data-[spacing=0]:data-[variant=outline]:data-[orientation=horizontal]:[[data-slot=toggle-group-item][data-variant=outline]+&]:border-s-0 nx:data-[spacing=0]:data-[variant=outline]:data-[orientation=vertical]:[[data-slot=toggle-group-item][data-variant=outline]+&]:border-t-0',
+        'nx:data-[spacing=0]:data-[variant=outline-primary]:data-[orientation=horizontal]:[[data-slot=toggle-group-item][data-variant=outline-primary]+&]:-ms-(--nx-borderwidth-default) nx:data-[spacing=0]:data-[variant=outline-primary]:data-[orientation=vertical]:[[data-slot=toggle-group-item][data-variant=outline-primary]+&]:-mt-(--nx-borderwidth-default)',
+        'nx:data-[spacing=0]:relative nx:data-[spacing=0]:not-disabled:hover:not-focus-visible:z-10 nx:data-[spacing=0]:data-[state=on]:not-disabled:not-focus-visible:z-20 nx:data-[spacing=0]:aria-invalid:not-disabled:not-focus-visible:z-20 nx:data-[spacing=0]:focus-visible:z-30',
+        className
+      )}
+      {...props}
       data-slot="toggle-group-item"
       data-variant={resolvedVariant}
       data-size={resolvedSize}
       data-spacing={context.spacing}
       data-orientation={context.orientation}
-      className={cn(
-        toggleVariants({ variant: resolvedVariant, size: resolvedSize }),
-        'nx:min-w-0 nx:shrink-0',
-        'nx:data-[spacing=0]:rounded-none nx:data-[spacing=0]:data-[orientation=horizontal]:first:rounded-s-md nx:data-[spacing=0]:data-[orientation=horizontal]:last:rounded-e-md nx:data-[spacing=0]:data-[orientation=vertical]:first:rounded-t-md nx:data-[spacing=0]:data-[orientation=vertical]:last:rounded-b-md',
-        'nx:data-[spacing=0]:data-[variant=outline]:data-[orientation=horizontal]:not-first:border-s-0 nx:data-[spacing=0]:data-[variant=outline]:data-[orientation=vertical]:not-first:border-t-0 nx:data-[spacing=0]:data-[variant=outline]:data-[orientation=horizontal]:[[data-toggle-group-item][data-variant=accentOutline]+&]:border-s-default nx:data-[spacing=0]:data-[variant=outline]:data-[orientation=vertical]:[[data-toggle-group-item][data-variant=accentOutline]+&]:border-t-default',
-        'nx:data-[spacing=0]:data-[variant=accentOutline]:data-[orientation=horizontal]:[[data-toggle-group-item][data-variant=accentOutline]+&]:-ms-(--nx-borderwidth-default) nx:data-[spacing=0]:data-[variant=accentOutline]:data-[orientation=vertical]:[[data-toggle-group-item][data-variant=accentOutline]+&]:-mt-(--nx-borderwidth-default)',
-        'nx:data-[spacing=0]:relative nx:data-[spacing=0]:enabled:hover:not-focus-visible:z-10 nx:data-[spacing=0]:data-[state=on]:enabled:not-focus-visible:z-20 nx:data-[spacing=0]:aria-invalid:enabled:not-focus-visible:z-20 nx:data-[spacing=0]:focus-visible:z-30',
-        className
-      )}
-      {...props}
-      data-toggle-group-item=""
     >
       {children}
     </ToggleGroupPrimitive.Item>
