@@ -248,23 +248,18 @@ export default tseslint.config(
     ...nexusSpacingTokenConfig({ parser: jsoncParser }),
   },
 
-  // The demo-index staleness gate lives in generate-demo-index.test.ts and must
-  // reach the generated output only through the filesystem. A static import
-  // is resolved by Vite at collect time, so a missing generated file would
-  // kill the run before the gate could report which file to regenerate.
+  // Only demo-index.test.ts may reach __generated__ through the module graph.
   {
-    files: ['apps/docs/scripts/generate-demo-index.test.ts'],
+    files: ['apps/docs/scripts/**/*.test.{js,ts}'],
+    ignores: ['apps/docs/scripts/demo-index.test.ts'],
     rules: {
-      'no-restricted-imports': [
+      'no-restricted-syntax': [
         'error',
         {
-          patterns: [
-            {
-              group: ['**/__generated__/**'],
-              message:
-                'Import generated output through the filesystem here; a static import breaks the staleness gate. Tests needing the index live in demo-index.test.ts.',
-            },
-          ],
+          selector:
+            ':matches(ImportDeclaration, ImportExpression, ExportNamedDeclaration, ExportAllDeclaration)[source.value=/__generated__/]',
+          message:
+            'Read generated output from disk here. Vite resolves these at transform time, so a missing file kills the run before the staleness gate can name the fix. Tests that need the index live in demo-index.test.ts.',
         },
       ],
     },

@@ -25,8 +25,9 @@ export function auditTurboOutputs(options = {}) {
       code: 'missing-outputs',
       task: task.taskId,
       message:
-        'Package has a `build` script but declares no `outputs`. A cache hit ' +
-        'would restore nothing. Add an `outputs` array to the package turbo.json.',
+        task.resolvedTaskDefinition?.cache === false
+          ? 'Task declares no `outputs`, so nothing states which files it is responsible for emitting. Add an `outputs` array to the package turbo.json.'
+          : 'Package has a `build` script but declares no `outputs`. A cache hit would restore nothing. Add an `outputs` array to the package turbo.json.',
     });
   }
 
