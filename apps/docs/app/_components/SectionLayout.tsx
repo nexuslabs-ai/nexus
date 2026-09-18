@@ -1,3 +1,5 @@
+import type { SectionSlug } from '../_lib/sections';
+
 import { LeftRail } from './LeftRail';
 import { RightRail } from './RightRail';
 
@@ -5,7 +7,7 @@ export function SectionLayout({
   sectionSlug,
   children,
 }: {
-  sectionSlug: string;
+  sectionSlug: SectionSlug;
   children: React.ReactNode;
 }) {
   return (

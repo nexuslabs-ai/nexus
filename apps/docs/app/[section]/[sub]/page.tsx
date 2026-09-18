@@ -5,7 +5,7 @@ import { SubPageView } from '../../_components/SubPageView';
 import { MDX_PAGES } from '../../_lib/mdx-pages';
 import { REAL_PAGES } from '../../_lib/real-pages';
 import { sectionHref, subPageParams } from '../../_lib/routes';
-import { getSection, getSubPage } from '../../_lib/sections';
+import { getSection, getSubPage, isSectionSlug } from '../../_lib/sections';
 
 export function generateStaticParams() {
   return subPageParams();
@@ -24,8 +24,7 @@ export default async function Page({
   params: Promise<{ section: string; sub: string }>;
 }) {
   const { section, sub } = await params;
-  const sec = getSection(section);
-  if (!sec) notFound();
+  if (!isSectionSlug(section)) notFound();
 
   const key = `${section}/${sub}`;
 
@@ -38,7 +37,7 @@ export default async function Page({
         <Breadcrumb
           items={[
             { label: 'Home', href: '/' },
-            { label: sec.title, href: sectionHref(section) },
+            { label: getSection(section).title, href: sectionHref(section) },
             { label: subPage?.label ?? sub },
           ]}
         />

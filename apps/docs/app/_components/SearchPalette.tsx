@@ -5,7 +5,7 @@ import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 
 import { subPageHref } from '../_lib/routes';
-import { SECTIONS } from '../_lib/sections';
+import { getSection, SECTION_SLUGS } from '../_lib/sections';
 
 import {
   CommandDialog,
@@ -22,13 +22,16 @@ import {
  * stays in sync as pages are added. Built on the Nexus Command (cmdk) surface.
  */
 
-const INDEX = Object.entries(SECTIONS).map(([slug, section]) => ({
-  title: section.title,
-  items: section.subs.map((sub) => ({
-    label: sub.label,
-    href: subPageHref(slug, sub.slug),
-  })),
-}));
+const INDEX = SECTION_SLUGS.map((slug) => {
+  const { title, subs } = getSection(slug);
+  return {
+    title,
+    items: subs.map((sub) => ({
+      label: sub.label,
+      href: subPageHref(slug, sub.slug),
+    })),
+  };
+});
 
 export function SearchPalette() {
   const [open, setOpen] = useState(false);

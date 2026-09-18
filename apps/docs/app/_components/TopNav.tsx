@@ -8,16 +8,16 @@ import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 
 import { sectionHref } from '../_lib/routes';
-import { SECTIONS } from '../_lib/sections';
+import { getSection, SECTION_SLUGS } from '../_lib/sections';
 
 import { Button } from './nexus';
 import { SearchPalette } from './SearchPalette';
 
 const NAV_LINKS = [
   { href: '/', label: 'Home' },
-  ...Object.entries(SECTIONS).map(([slug, section]) => ({
+  ...SECTION_SLUGS.map((slug) => ({
     href: sectionHref(slug),
-    label: section.title,
+    label: getSection(slug).title,
   })),
   { href: '/changelog', label: 'Changelog' },
 ];

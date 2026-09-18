@@ -9,6 +9,8 @@ import {
   CardTitle,
 } from './_components/nexus';
 import { sectionHref, subPageHref } from './_lib/routes';
+import type { SectionSlug } from './_lib/sections';
+import { getSection } from './_lib/sections';
 
 const STATS = [
   { n: '5', l: 'Bases' },
@@ -35,43 +37,29 @@ const AUDIENCES = [
   },
 ];
 
-const SECTIONS = [
+// Only the blurb is authored — title, page count, and href come from the registry.
+const SECTION_CARDS: { slug: SectionSlug; desc: string }[] = [
   {
-    count: '6 pages',
-    title: 'Foundations',
+    slug: 'foundations',
     desc: 'Color · Typography · Spacing · Radius · Layering · Responsive',
-    href: sectionHref('foundations'),
   },
   {
-    count: '5 groups · 17 components',
-    title: 'Components',
+    slug: 'components',
     desc: 'Inputs · Containers · Navigation · Display · Primitives',
-    href: sectionHref('components'),
   },
   {
-    count: '3 pages',
-    title: 'Theming',
-    desc: 'Multi-brand · density modes · consumer overrides',
-    href: sectionHref('theming'),
+    slug: 'theming',
+    desc: 'Appearance · multi-brand · density modes · consumer overrides',
   },
   {
-    count: '5 pages',
-    title: 'Tools',
+    slug: 'tools',
     desc: 'nx: prefix · Code Connect · ESLint · audits · Storybook',
-    href: sectionHref('tools'),
   },
   {
-    count: '3 pages',
-    title: 'Guidance',
+    slug: 'guidance',
     desc: 'Engineering principles · testing model · contribution',
-    href: sectionHref('guidance'),
   },
-  {
-    count: '3 pages',
-    title: 'For AI agents',
-    desc: 'llms.txt · rules mirror · authoring',
-    href: sectionHref('agents'),
-  },
+  { slug: 'agents', desc: 'llms.txt · rules mirror · authoring' },
 ];
 
 const BLUE_RAMP = [50, 100, 200, 300, 400, 500, 600, 700, 800, 900, 950];
@@ -140,27 +128,30 @@ export default function Home() {
         What&rsquo;s inside
       </h2>
       <div className="nx:grid nx:grid-cols-1 nx:md:grid-cols-3 nx:gap-3">
-        {SECTIONS.map((s) => (
-          <Link
-            key={s.title}
-            href={s.href}
-            className="nx:no-underline nx:text-inherit"
-          >
-            <Card className="nx:h-full nx:hover:border-border-primary nx:transition-colors">
-              <CardHeader>
-                <div className="nx:font-mono nx:text-[10px] nx:uppercase nx:tracking-wider nx:text-muted-foreground-subtle nx:mb-1">
-                  {s.count}
-                </div>
-                <CardTitle className="nx:typography-heading-xsmall">
-                  {s.title}
-                </CardTitle>
-                <CardDescription className="nx:typography-body-small">
-                  {s.desc}
-                </CardDescription>
-              </CardHeader>
-            </Card>
-          </Link>
-        ))}
+        {SECTION_CARDS.map(({ slug, desc }) => {
+          const section = getSection(slug);
+          return (
+            <Link
+              key={slug}
+              href={sectionHref(slug)}
+              className="nx:no-underline nx:text-inherit"
+            >
+              <Card className="nx:h-full nx:hover:border-border-primary nx:transition-colors">
+                <CardHeader>
+                  <div className="nx:font-mono nx:text-[10px] nx:uppercase nx:tracking-wider nx:text-muted-foreground-subtle nx:mb-1">
+                    {section.subs.length} pages
+                  </div>
+                  <CardTitle className="nx:typography-heading-xsmall">
+                    {section.title}
+                  </CardTitle>
+                  <CardDescription className="nx:typography-body-small">
+                    {desc}
+                  </CardDescription>
+                </CardHeader>
+              </Card>
+            </Link>
+          );
+        })}
       </div>
 
       {/* Highlights */}

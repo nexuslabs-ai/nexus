@@ -1,7 +1,7 @@
 import { notFound } from 'next/navigation';
 
 import { sectionHref } from '../_lib/routes';
-import type { Block } from '../_lib/sections';
+import type { Block, SectionSlug } from '../_lib/sections';
 import { getSection, getSubPage } from '../_lib/sections';
 
 import { Breadcrumb } from './Breadcrumb';
@@ -11,12 +11,12 @@ export function SubPageView({
   sectionSlug,
   subSlug,
 }: {
-  sectionSlug: string;
+  sectionSlug: SectionSlug;
   subSlug: string;
 }) {
   const section = getSection(sectionSlug);
   const sub = getSubPage(sectionSlug, subSlug);
-  if (!section || !sub) notFound();
+  if (!sub) notFound();
 
   return (
     <>

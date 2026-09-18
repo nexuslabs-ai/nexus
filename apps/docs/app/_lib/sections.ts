@@ -629,19 +629,29 @@ export const SECTIONS = {
   },
 } satisfies Record<string, Section>;
 
-const ALL_SECTIONS = SECTIONS as Record<string, Section>;
+export type SectionSlug = keyof typeof SECTIONS;
 
-export function getSection(slug: string): Section | undefined {
-  return ALL_SECTIONS[slug];
+export const SECTION_SLUGS = Object.keys(SECTIONS) as SectionSlug[];
+
+export function isSectionSlug(slug: string): slug is SectionSlug {
+  return Object.hasOwn(SECTIONS, slug);
+}
+
+/**
+ * Returns the entry widened to `Section`, so optional fields like `nested`
+ * stay accessible on a section the caller picked by key.
+ */
+export function getSection(slug: SectionSlug): Section {
+  return SECTIONS[slug];
 }
 
 export function getSubPage(
-  sectionSlug: string,
+  sectionSlug: SectionSlug,
   subSlug: string
 ): SubPage | undefined {
-  return ALL_SECTIONS[sectionSlug]?.subs.find((s) => s.slug === subSlug);
+  return getSection(sectionSlug).subs.find((s) => s.slug === subSlug);
 }
 
-export function getDefaultSub(sectionSlug: string): string | undefined {
-  return ALL_SECTIONS[sectionSlug]?.subs[0]?.slug;
+export function getDefaultSub(sectionSlug: SectionSlug): string | undefined {
+  return getSection(sectionSlug).subs[0]?.slug;
 }

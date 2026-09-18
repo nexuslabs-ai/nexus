@@ -1,7 +1,7 @@
 import { notFound } from 'next/navigation';
 
 import { SectionLayout } from '../_components/SectionLayout';
-import { getSection } from '../_lib/sections';
+import { isSectionSlug } from '../_lib/sections';
 
 export default async function Layout({
   children,
@@ -11,6 +11,6 @@ export default async function Layout({
   params: Promise<{ section: string }>;
 }) {
   const { section } = await params;
-  if (!getSection(section)) notFound();
+  if (!isSectionSlug(section)) notFound();
   return <SectionLayout sectionSlug={section}>{children}</SectionLayout>;
 }
