@@ -1,4 +1,5 @@
 import { Breadcrumb } from '../_components/Breadcrumb';
+import { SectionHeading } from '../_components/Heading';
 
 /**
  * Foundations → Spacing. Server component — a live specimen of the 4px-based
@@ -79,7 +80,9 @@ export function Spacing() {
 
       {/* ── The scale ───────────────────────────────────────── */}
       <section className="nx:mb-12">
-        <h2 className="nx:typography-heading-small nx:mb-1">The scale</h2>
+        <SectionHeading className="nx:typography-heading-small nx:mb-1">
+          The scale
+        </SectionHeading>
         <p className="nx:typography-body-default nx:text-muted-foreground nx:mb-4 nx:max-w-[64ch]">
           Fourteen steps from 2px to 128px. Each bar&rsquo;s width is the
           runtime <code>--nx-spacing-N</code> var, so the whole ladder rescales
@@ -108,7 +111,9 @@ export function Spacing() {
 
       {/* ── Role tokens ─────────────────────────────────────── */}
       <section className="nx:mb-12">
-        <h2 className="nx:typography-heading-small nx:mb-1">Role tokens</h2>
+        <SectionHeading className="nx:typography-heading-small nx:mb-1">
+          Role tokens
+        </SectionHeading>
         <p className="nx:typography-body-default nx:text-muted-foreground nx:mb-4 nx:max-w-[64ch]">
           Components don&rsquo;t reach for raw steps — they consume these
           semantic roles (e.g. a button&rsquo;s padding). Because the roles map
@@ -148,9 +153,9 @@ export function Spacing() {
 
       {/* ── Six density modes ─────────────────────────────── */}
       <section className="nx:mb-12">
-        <h2 className="nx:typography-heading-small nx:mb-1">
+        <SectionHeading className="nx:typography-heading-small nx:mb-1">
           Six density modes
-        </h2>
+        </SectionHeading>
         <p className="nx:typography-body-default nx:text-muted-foreground nx:mb-4 nx:max-w-[64ch]">
           Every build ships all six. Swapping the &ldquo;Size&rdquo; control in
           the theme picker rescales the whole page live. The{' '}
