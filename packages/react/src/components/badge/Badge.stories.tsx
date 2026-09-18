@@ -142,6 +142,14 @@ const SQUARE_FLOOR_SHAPES = new Set([
   'high-count',
 ]);
 
+const BASE_LINE_HEIGHT_SM = 20;
+const BASE_UI_FONT_SIZE = 14;
+const ENLARGED_GLOBALS = {
+  density: 'compact',
+  stroke: 'strong',
+  uiFontSize: 32,
+} as const;
+
 function badgeLabel(badge: HTMLElement) {
   return (
     [badge.dataset.variant, badge.dataset.fill, badge.dataset.shape]
@@ -426,9 +434,9 @@ export const HeightSizingRow: Story = {
 };
 
 export const EnlargedTypography: Story = {
-  tags: ['!autodocs', '!dev'],
   ...HeightSizingRow,
-  globals: { density: 'compact', stroke: 'strong', uiFontSize: 32 },
+  tags: ['!autodocs', '!dev'],
+  globals: ENLARGED_GLOBALS,
   play: async ({ canvasElement }) => {
     const badges = within(canvasElement).getAllByTestId('sizing-badge');
     await waitFor(() =>
@@ -438,7 +446,10 @@ export const EnlargedTypography: Story = {
             '--nx-typography-line-height-sm'
           )
         )
-      ).toBeCloseTo((20 * 32) / 14, 3)
+      ).toBeCloseTo(
+        (BASE_LINE_HEIGHT_SM * ENLARGED_GLOBALS.uiFontSize) / BASE_UI_FONT_SIZE,
+        3
+      )
     );
     for (const badge of badges) assertBadgeGeometry(badge);
   },

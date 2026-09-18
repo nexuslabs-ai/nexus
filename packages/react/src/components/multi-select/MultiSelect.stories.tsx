@@ -162,6 +162,15 @@ export const OverflowCollapse: Story = {
     // Six chips overflow the 256px field, so measurement collapses the excess
     // into a visible `+N` badge.
     await waitFor(() => expect(canvas.getByText(/^\+\d+$/)).toBeVisible());
+
+    const overflow = canvas.getByText(/^\+\d+$/);
+    const box = overflow.getBoundingClientRect();
+    const range = document.createRange();
+    range.selectNodeContents(overflow);
+    const label = range.getBoundingClientRect();
+    expect(
+      Math.abs((label.top + label.bottom) / 2 - (box.top + box.bottom) / 2)
+    ).toBeLessThan(1);
   },
 };
 
