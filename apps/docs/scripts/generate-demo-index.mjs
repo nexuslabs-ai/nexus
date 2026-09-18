@@ -148,7 +148,7 @@ function exampleSpecifier(id) {
 
 /**
  * The per-demo module's import specifier for its own client boundary, which
- * sits beside it.
+ * sits beside it. Appending `.ts` gives the boundary's path on disk.
  *
  * @param {string} id
  * @returns {string}
@@ -214,7 +214,7 @@ export { default as Component } from ${JSON.stringify(exampleSpecifier(demo.id))
 
 /**
  * Renders one demo's module: its component forwarded from the boundary, and
- * its source text as a plain string. It carries no directive of its own.
+ * its source text as a plain string.
  *
  * @param {DemoFile} demo
  * @returns {string}
