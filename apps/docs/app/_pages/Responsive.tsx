@@ -1,4 +1,5 @@
 import { Breadcrumb } from '../_components/Breadcrumb';
+import { CodeBlock } from '../_components/CodeBlock';
 import { SectionHeading } from '../_components/Heading';
 
 /**
@@ -159,8 +160,8 @@ export function Responsive() {
           <code>containerAbove=&quot;md&quot;</code> do not fire at the same
           width.
         </p>
-        <pre className="nx:typography-code-block nx:rounded-lg nx:border nx:border-border-default nx:bg-muted nx:p-4 nx:overflow-x-auto">
-          {`// Viewport axis — page-shell decision
+        <CodeBlock>
+          <code>{`// Viewport axis — page-shell decision
 <Show above="lg">
   <Sidebar />
 </Show>
@@ -168,8 +169,8 @@ export function Responsive() {
 // Container axis — component adapts to its parent
 <Hide containerBelow="md">
   <Actions />
-</Hide>`}
-        </pre>
+</Hide>`}</code>
+        </CodeBlock>
       </section>
 
       {/* ── Which mechanism ─────────────────────────────────── */}

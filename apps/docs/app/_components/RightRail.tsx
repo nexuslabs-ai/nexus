@@ -2,7 +2,7 @@
 
 import { useEffect, useRef, useState } from 'react';
 
-import { cn } from '@nexus_ds/react';
+import { cn } from '@nexus_ds/react/utils';
 import { usePathname } from 'next/navigation';
 
 import {
