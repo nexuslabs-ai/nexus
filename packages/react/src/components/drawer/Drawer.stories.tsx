@@ -737,7 +737,7 @@ export const HandleVisibilityWhileOpen: Story = {
     await expect(
       drawer.querySelector('[data-slot="drawer-handle"]')
     ).toBeVisible();
-    await expect(header!.offsetTop).toBeGreaterThan(hiddenOffset);
+    await expect(header!.offsetTop).toBeGreaterThanOrEqual(hiddenOffset + 8);
     await expect(document.querySelector('[role="dialog"]')).toBe(drawer);
     await userEvent.click(
       within(drawer).getByRole('button', { name: 'Hide handle' })

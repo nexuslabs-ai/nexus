@@ -98,8 +98,8 @@ interface DrawerContentProps extends React.ComponentProps<
 > {
   /**
    * Whether to show the bottom-only visual handle. This is a static indicator,
-   * not vaul's gesture `Handle`, so it does not change the root's `handleOnly`
-   * or `dismissible` behavior.
+   * not vaul's gesture `Handle`, so it does not change dragging or the root's
+   * `dismissible` behavior.
    * @default true
    */
   showHandle?: boolean;
