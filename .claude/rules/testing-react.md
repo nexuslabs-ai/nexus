@@ -126,6 +126,23 @@ Rules:
 3. Use canonical names for new components unless a documented archetype equivalence applies.
 4. When a component omits a canonical interaction requirement (e.g. Dialog omits `Disabled`), the audit emits an informational entry per omitted name so the archetype decision is visible in audit output, not silent.
 
+### Guard Fixtures
+
+A **guard fixture** is a story whose only job is to fail when a contract regresses — a geometry sweep across every variant/shape combination, a boundary-input matrix, a scaled-appearance measurement. It documents nothing a reader of the docs page wants, and a large one distorts the page it lands on.
+
+Tag guard fixtures `['!autodocs', '!dev']`:
+
+| Tag         | Effect                                                                 |
+| ----------- | ---------------------------------------------------------------------- |
+| `!autodocs` | Drops it from the docs page, which `preview.tsx` opts every story into |
+| `!dev`      | Drops it from the sidebar                                              |
+
+Stories keep the implicit `test` tag either way, and the vitest addon filters on `include: ['test']` — so a tagged fixture still runs. Verify that when adding one: the suite count must not fall.
+
+A guard fixture is not a substitute for the stories in the matrix above. Every state a reader needs to _see_ stays an ordinary, visible story; only the machine-facing sweep is hidden. Live consumer: `Badge.stories.tsx`.
+
+When the spread form is used to share a render between fixtures, declare `tags` **after** the spread — the static CSF indexer reads the literal, so a `tags` above the spread and a different `tags` inside it disagree between index and runtime.
+
 ## Play Function Patterns
 
 ### Click Testing

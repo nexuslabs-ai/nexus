@@ -4,8 +4,11 @@ import { cva, type VariantProps } from 'class-variance-authority';
 
 import { cn } from '../../lib/utils';
 
+const badgeMinSize =
+  'nx:[--badge-min-size:max(var(--nx-spacing-6),calc(var(--nx-typography-line-height-sm)_+_2_*_var(--nx-borderwidth-default)))]';
+
 const badgeVariants = cva(
-  'nx:inline-flex nx:items-center nx:justify-center nx:gap-1 nx:rounded-md nx:whitespace-nowrap nx:transition-colors nx:w-fit',
+  `nx:inline-flex nx:box-border ${badgeMinSize} nx:min-h-(--badge-min-size) nx:py-0 nx:items-center nx:justify-center nx:gap-1 nx:rounded-md nx:whitespace-nowrap nx:transition-colors nx:w-fit`,
   {
     variants: {
       variant: {
@@ -141,10 +144,16 @@ function badgeShapeClasses(
   isCaps: boolean
 ) {
   if (isNumber)
-    return 'nx:min-h-6 nx:min-w-6 nx:rounded-full nx:px-1.5 nx:py-0 nx:typography-label-caps nx:tabular-nums';
-  if (isIconOnly) return 'nx:h-6 nx:min-w-6 nx:p-0';
-  if (isCaps) return 'nx:typography-label-caps nx:uppercase nx:px-2 nx:py-1';
-  return 'nx:typography-label-default nx:px-2.5 nx:py-1';
+    return 'nx:min-w-(--badge-min-size) nx:rounded-full nx:px-1.5 nx:typography-label-caps nx:tabular-nums';
+  if (isIconOnly) return 'nx:min-w-(--badge-min-size) nx:p-0';
+  if (isCaps) return 'nx:typography-label-caps nx:uppercase nx:px-2';
+  return 'nx:typography-label-default nx:px-2.5';
+}
+
+function hasRenderableChildren(children: React.ReactNode) {
+  return React.Children.toArray(children).some(
+    (child) => typeof child !== 'string' || child.trim().length > 0
+  );
 }
 
 interface BadgeProps
@@ -201,6 +210,11 @@ interface BadgeProps
  * `role="img"`, so pass `aria-label`, `aria-labelledby`, or `title` to name
  * them. The badge is not a live region; if its status or count updates, wrap it
  * in `aria-live="polite"`.
+ *
+ * Every shape shares one minimum size, applied to the block axis and — for the
+ * number and icon-only shapes — the inline axis too. For an arbitrary minimum,
+ * override `--badge-min-size` via `className`. Centering is flex-derived, so a
+ * consumer that overrides `display` loses it.
  */
 function Badge({
   className,
@@ -213,7 +227,7 @@ function Badge({
   children,
   ...props
 }: BadgeProps) {
-  const hasChildren = React.Children.count(children) > 0;
+  const hasChildren = hasRenderableChildren(children);
   const isIconOnly =
     !isNumber && !hasChildren && Boolean(leftIcon || rightIcon);
   const iconOnlyIcon = leftIcon ?? rightIcon;
