@@ -74,20 +74,6 @@ export const Default: Story = {
   },
 };
 
-export const CapsBadgeHeight: Story = {
-  args: {
-    children: 'Label',
-  },
-  play: async ({ canvasElement }) => {
-    const canvas = within(canvasElement);
-    const badge = canvas.getByText('Label');
-    const rect = badge.getBoundingClientRect();
-
-    await expect(badge).toHaveAttribute('data-caps', 'true');
-    expect(Math.round(rect.height)).toBe(24);
-  },
-};
-
 export const Primary: Story = {
   args: {
     variant: 'default',
@@ -176,9 +162,18 @@ export const OutlineFill: Story = {
 // ============================================
 
 export const Caps: Story = {
+  globals: { density: 'default' },
   args: {
     isCaps: true,
     children: 'Label',
+  },
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+    const badge = canvas.getByText('Label');
+    const rect = badge.getBoundingClientRect();
+
+    await expect(badge).toHaveAttribute('data-caps', 'true');
+    expect(Math.round(rect.height)).toBe(24);
   },
 };
 
@@ -270,6 +265,7 @@ export const WithBothIcons: Story = {
 };
 
 export const IconOnly: Story = {
+  globals: { density: 'default' },
   args: {
     variant: 'success',
     fill: 'light',
@@ -385,6 +381,7 @@ export const NumberBadge: Story = {
 };
 
 export const NumberBadgeHighValue: Story = {
+  globals: { density: 'default' },
   args: {
     isNumber: true,
     children: '99+',
