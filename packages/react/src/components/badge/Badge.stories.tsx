@@ -74,6 +74,20 @@ export const Default: Story = {
   },
 };
 
+export const CapsBadgeHeight: Story = {
+  args: {
+    children: 'Label',
+  },
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+    const badge = canvas.getByText('Label');
+    const rect = badge.getBoundingClientRect();
+
+    await expect(badge).toHaveAttribute('data-caps', 'true');
+    expect(Math.round(rect.height)).toBe(24);
+  },
+};
+
 export const Primary: Story = {
   args: {
     variant: 'default',

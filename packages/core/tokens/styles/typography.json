@@ -77,7 +77,7 @@
         "lineHeight": "{line-height.xs}",
         "letterSpacing": "{letterspacing.normal}"
       },
-      "$description": "12"
+      "$description": "Supporting copy, captions, and secondary text under a heading"
     }
   },
   "shortcut": {
@@ -101,7 +101,7 @@
         "lineHeight": "{line-height.sm}",
         "letterSpacing": "{letterspacing.normal}"
       },
-      "$description": "14"
+      "$description": "Form, field, and control labels at default density"
     },
     "small": {
       "$type": "typography",
@@ -112,7 +112,7 @@
         "lineHeight": "{line-height.xs}",
         "letterSpacing": "{letterspacing.normal}"
       },
-      "$description": "12"
+      "$description": "Compact form and control labels in dense layouts"
     },
     "caps": {
       "$type": "typography",
@@ -123,7 +123,7 @@
         "lineHeight": "{line-height.xxs}",
         "letterSpacing": "{letterspacing.wide}"
       },
-      "$description": "Compact uppercase labels with a tight line box"
+      "$description": "Compact eyebrow and section labels, tuned for all-caps; apply uppercase at the call site"
     }
   },
   "code": {
