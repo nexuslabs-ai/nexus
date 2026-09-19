@@ -1,3 +1,5 @@
+import { useId } from 'react';
+
 import {
   type ChartConfig,
   ChartContainer,
@@ -6,6 +8,7 @@ import {
   ChartTooltip,
   ChartTooltipContent,
 } from '@nexus_ds/react';
+import { IconTexture } from '@tabler/icons-react';
 import {
   Area,
   AreaChart,
@@ -60,15 +63,20 @@ export function RevenueChart({ data }: { data: TrendPoint[] }) {
 }
 
 const audienceConfig = {
-  newUsers: { label: 'New', color: 'var(--nx-color-chart-categorical-2)' },
+  newUsers: {
+    label: 'New (solid, lower)',
+    color: 'var(--nx-color-chart-categorical-2)',
+  },
   returningUsers: {
-    label: 'Returning',
+    label: 'Returning (striped, upper)',
     color: 'var(--nx-color-chart-categorical-3)',
+    icon: IconTexture,
   },
 } satisfies ChartConfig;
 
 /** New vs returning users, stacked per bucket = total audience. Two series → legend. */
 export function AudienceChart({ data }: { data: TrendPoint[] }) {
+  const returningPattern = useId();
   return (
     <ChartContainer config={audienceConfig} className={CHART_BOX}>
       <BarChart
@@ -76,6 +84,21 @@ export function AudienceChart({ data }: { data: TrendPoint[] }) {
         data={data}
         margin={{ left: 12, right: 12, top: 8 }}
       >
+        <defs>
+          <pattern
+            id={returningPattern}
+            width={6}
+            height={6}
+            patternUnits="userSpaceOnUse"
+          >
+            <rect width={6} height={6} fill="var(--color-returningUsers)" />
+            <path
+              d="M0 0L6 6M-3 3L3 9M3 -3L9 3"
+              stroke="var(--nx-color-container)"
+              strokeWidth={1.5}
+            />
+          </pattern>
+        </defs>
         <CartesianGrid vertical={false} />
         <XAxis
           dataKey="label"
@@ -94,7 +117,7 @@ export function AudienceChart({ data }: { data: TrendPoint[] }) {
         <Bar
           dataKey="returningUsers"
           stackId="audience"
-          fill="var(--color-returningUsers)"
+          fill={`url(#${returningPattern})`}
           radius={[4, 4, 0, 0]}
         />
       </BarChart>

@@ -8,6 +8,8 @@ export interface ApcaPair {
   /** Bare semantic token name, without the --nx-color- prefix. */
   bg: string;
   tier: ApcaTier;
+  /** Opaque token or hex color underneath a translucent background. */
+  backdrop?: string;
 }
 
 const FAMILY_PAIRS = [
@@ -62,7 +64,11 @@ export const APCA_PAIRS = [
   pair('error-subtle-foreground', 'container', 'ui'),
   ...FAMILY_PAIRS.flatMap((family) => [
     pair(`${family}-foreground`, `${family}-background`, 'ui'),
+    pair(`${family}-foreground`, `${family}-background-hover`, 'ui'),
+    pair(`${family}-foreground`, `${family}-background-active`, 'ui'),
     pair(`${family}-subtle-foreground`, `${family}-subtle`, 'ui'),
+    pair(`${family}-subtle-foreground`, `${family}-subtle-hover`, 'ui'),
+    pair(`${family}-subtle-foreground`, `${family}-subtle-active`, 'ui'),
   ]),
   ...CATEGORICAL_INDICES.flatMap((index) => [
     pair(`chart-categorical-${index}`, 'container', 'ui'),
@@ -72,4 +78,30 @@ export const APCA_PAIRS = [
     pair('focus-default', surface, 'incidental'),
     pair('focus-error', surface, 'incidental'),
   ]),
+  ...[
+    'background-active',
+    'container-hover',
+    'container-active',
+    'popover',
+    'popover-hover',
+    'popover-active',
+    'nav-background',
+  ].flatMap((surface) => [
+    pair('foreground', surface, 'ui'),
+    pair('muted-foreground', surface, 'incidental'),
+    pair('muted-foreground-subtle', surface, 'incidental'),
+  ]),
+  pair('muted-foreground', 'background', 'incidental'),
+  pair('muted-foreground-subtle', 'background', 'incidental'),
+  pair('container-foreground', 'container-hover', 'ui'),
+  pair('container-foreground', 'container-active', 'ui'),
+  pair('popover-foreground', 'popover-active', 'ui'),
+  ...['background', 'container', 'popover'].flatMap((backdrop) => [
+    { ...pair('popover-foreground', 'popover-alpha', 'body'), backdrop },
+    { ...pair('foreground', 'background-hover-alpha', 'ui'), backdrop },
+  ]),
+  ...['#000000', '#ffffff'].map((backdrop) => ({
+    ...pair('popover-foreground', 'popover-alpha', 'body'),
+    backdrop,
+  })),
 ] as const satisfies readonly ApcaPair[];

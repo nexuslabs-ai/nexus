@@ -25,8 +25,8 @@ describe('appearance model', () => {
       mode: 'light',
       brandColor: DEFAULT_BRAND_COLOR,
       surfaceTone: 'stone',
-      lightContrast: 60,
-      darkContrast: 0,
+      lightContrast: 50,
+      darkContrast: 50,
       density: 'default',
       corners: 'square',
       elevation: 'quiet',
@@ -112,7 +112,7 @@ describe('sanitizeNexusAppearance', () => {
       brandColor: '#2563eb',
       surfaceTone: 'slate' as const,
       lightContrast: 42,
-      darkContrast: 42,
+      darkContrast: 82,
       density: 'tight' as const,
       corners: 'extra-round' as const,
       elevation: 'flat' as const,
@@ -176,7 +176,7 @@ describe('sanitizeNexusAppearance', () => {
         ...DEFAULT_NEXUS_APPEARANCE,
         lightContrast: 999,
       }).lightContrast
-    ).toBe(60);
+    ).toBe(100);
     expect(
       sanitizeNexusAppearance({
         ...DEFAULT_NEXUS_APPEARANCE,
@@ -308,7 +308,7 @@ describe('createNexusThemeContract', () => {
       BASE_TONE_SEEDS.slate.dark.foreground
     );
     expect(contract.surfaceTone).toBe('slate');
-    expect(contract.contrast).toEqual({ light: 60, dark: 0 });
+    expect(contract.contrast).toEqual({ light: 50, dark: 50 });
   });
 
   it.each(['stone', 'neutral', 'zinc', 'slate', 'gray'] as const)(
@@ -331,28 +331,53 @@ describe('createNexusThemeContract', () => {
     const clean = (patch: Record<string, unknown>) =>
       sanitizeNexusAppearance({ ...DEFAULT_NEXUS_APPEARANCE, ...patch });
 
-    it('accepts independent in-range light/dark values', () => {
-      expect(clean({ lightContrast: 40, darkContrast: 80 })).toMatchObject({
-        lightContrast: 40,
-        darkContrast: 80,
+    it('accepts independent light/dark values', () => {
+      expect(clean({ lightContrast: 37, darkContrast: 82 })).toMatchObject({
+        lightContrast: 37,
+        darkContrast: 82,
       });
     });
 
-    it('falls back per-field on out-of-range, NaN, and wrong type', () => {
-      expect(clean({ lightContrast: 999, darkContrast: -5 })).toMatchObject({
-        lightContrast: 60,
-        darkContrast: 0,
+    it.each([
+      [-5, 0],
+      [999, 100],
+      [42.5, 42.5],
+    ])('clamps finite contrast %s to %s', (value, expected) => {
+      expect(clean({ lightContrast: value }).lightContrast).toBe(expected);
+    });
+
+    it.each([
+      Number.NaN,
+      Infinity,
+      -Infinity,
+      'standard',
+      'increased',
+      'x',
+      'toString',
+      null,
+      undefined,
+    ])('uses 50 for an invalid contrast preference: %s', (value) => {
+      expect(clean({ lightContrast: value, darkContrast: 82 })).toMatchObject({
+        lightContrast: 50,
+        darkContrast: 82,
       });
-      expect(
-        clean({ lightContrast: Number.NaN, darkContrast: 42 })
-      ).toMatchObject({
-        lightContrast: 60,
-        darkContrast: 42,
+    });
+
+    it('drops experimental brightness and saturation fields', () => {
+      const state = clean({
+        lightBrightness: 0,
+        darkBrightness: 100,
+        lightSaturation: 0,
+        darkSaturation: 20,
       });
-      expect(clean({ lightContrast: 'x', darkContrast: 30 })).toMatchObject({
-        lightContrast: 60,
-        darkContrast: 30,
-      });
+      for (const field of [
+        'lightBrightness',
+        'darkBrightness',
+        'lightSaturation',
+        'darkSaturation',
+      ]) {
+        expect(state).not.toHaveProperty(field);
+      }
     });
 
     it('does NOT migrate a pre-split scalar `contrast` key — resets to defaults', () => {
@@ -367,7 +392,10 @@ describe('createNexusThemeContract', () => {
         stroke: 'normal',
         prefs: DEFAULT_NEXUS_APPEARANCE.prefs,
       });
-      expect(result).toMatchObject({ lightContrast: 60, darkContrast: 0 });
+      expect(result).toMatchObject({
+        lightContrast: 50,
+        darkContrast: 50,
+      });
     });
   });
 });
