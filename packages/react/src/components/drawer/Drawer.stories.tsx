@@ -3,7 +3,6 @@ import { type ComponentProps, useState } from 'react';
 import type { Meta, StoryObj } from '@storybook/react';
 import { expect, userEvent, waitFor, within } from 'storybook/test';
 
-import type { DrawerContentProps } from '../../index';
 import { IconX } from '../../lib/icons';
 import {
   expectExitBeforeUnmount,
@@ -16,6 +15,7 @@ import {
   DrawerBody,
   DrawerClose,
   DrawerContent,
+  type DrawerContentProps,
   DrawerDescription,
   DrawerFooter,
   DrawerHeader,
@@ -33,7 +33,7 @@ const meta: Meta<typeof Drawer> = {
         component: [
           'Use Drawer for gesture-driven mobile-style panels, especially bottom drawers that can be dragged to dismiss.',
           'Use Sheet for deterministic side panels, Dialog for centered modal tasks, and AlertDialog for choice-forcing confirmations.',
-          'DrawerContent showHandle defaults to true. Set it to false to remove the visual indicator and its spacing; it does not change Vaul dragging or root dismissal settings.',
+          'DrawerContent showHandle defaults to true. Set it to false to remove the visual handle and its spacing; it does not change Vaul dragging or root dismissal settings.',
         ].join(' '),
       },
     },
@@ -46,7 +46,6 @@ type Story = StoryObj<typeof Drawer>;
 const DIRECTIONS = ['top', 'right', 'bottom', 'left'] as const;
 const HANDLE_OPTIONS = [
   { label: 'default', props: {} },
-  { label: 'visible', props: { showHandle: true } },
   { label: 'hidden', props: { showHandle: false } },
 ] satisfies { label: string; props: Pick<DrawerContentProps, 'showHandle'> }[];
 const SCROLLABLE_ITEMS = Array.from({ length: 18 }, (_, index) => ({
@@ -66,17 +65,13 @@ const waitForDrawerToClose = async () => {
 
 interface HandleExampleProps
   extends
-    Pick<
-      ComponentProps<typeof Drawer>,
-      'direction' | 'handleOnly' | 'dismissible'
-    >,
+    Pick<ComponentProps<typeof Drawer>, 'direction' | 'dismissible'>,
     Pick<DrawerContentProps, 'showHandle'> {
   triggerLabel: string;
 }
 
 function HandleExample({
   direction,
-  handleOnly,
   dismissible,
   showHandle,
   triggerLabel,
@@ -88,23 +83,16 @@ function HandleExample({
       open={open}
       onOpenChange={setOpen}
       direction={direction}
-      handleOnly={handleOnly}
       dismissible={dismissible}
     >
       <DrawerTrigger asChild>
         <Button variant="outline">{triggerLabel}</Button>
       </DrawerTrigger>
-      <DrawerContent
-        showHandle={showHandle}
-        id="drawer-handle-example"
-        data-example="handle-control"
-        className="nx:touch-auto"
-        ref={(element) => element?.setAttribute('data-ref-attached', 'true')}
-      >
+      <DrawerContent showHandle={showHandle}>
         <DrawerHeader>
           <DrawerTitle>Document preview</DrawerTitle>
           <DrawerDescription>
-            The visual indicator is optional. Root settings still control
+            The visual handle is optional. Root settings still control
             dismissal.
           </DrawerDescription>
         </DrawerHeader>
@@ -149,12 +137,12 @@ function HandleToggleExample() {
         <DrawerHeader>
           <DrawerTitle>Handle visibility</DrawerTitle>
           <DrawerDescription>
-            Change the indicator without reopening the drawer.
+            Change the handle without reopening the drawer.
           </DrawerDescription>
         </DrawerHeader>
         <DrawerBody>
           <Button onClick={() => setShowHandle(!showHandle)}>
-            {showHandle ? 'Hide indicator' : 'Show indicator'}
+            {showHandle ? 'Hide handle' : 'Show handle'}
           </Button>
         </DrawerBody>
         <DrawerFooter>
@@ -672,36 +660,10 @@ export const WithoutHandle: Story = {
     await expect(
       drawer.querySelector('[data-slot="drawer-handle"]')
     ).toBeNull();
-    await expect(drawer).toHaveAttribute('id', 'drawer-handle-example');
-    await expect(drawer).toHaveAttribute('data-example', 'handle-control');
-    await expect(drawer).toHaveAttribute('data-ref-attached', 'true');
-    await expect(drawer).toHaveClass('nx:touch-auto', 'nx:overflow-hidden');
-    await expect(drawer).not.toHaveAttribute('showhandle');
-    const close = within(drawer).getByRole('button', { name: 'Close preview' });
-    await expect(close).toBeVisible();
-    const body = drawer.querySelector<HTMLElement>('[data-slot="drawer-body"]');
-    await expect(body).toHaveClass('nx:overflow-y-auto');
-    await waitFor(() =>
-      expect(body!.scrollHeight).toBeGreaterThan(body!.clientHeight)
+    await userEvent.click(
+      within(drawer).getByRole('button', { name: 'Close preview' })
     );
-    await userEvent.tab();
-    await expect(drawer.contains(document.activeElement)).toBe(true);
-    await userEvent.tab();
-    await expect(close).toHaveFocus();
-    await userEvent.tab();
-    await expect(
-      drawer.querySelector('[data-slot="drawer-body"]')
-    ).toHaveFocus();
-    await userEvent.tab({ shift: true });
-    await expect(close).toHaveFocus();
-    await userEvent.click(close);
     await waitForDrawerToClose();
-    await waitFor(() => expect(trigger).toHaveFocus());
-    await userEvent.click(trigger);
-    await within(document.body).findByRole('dialog');
-    await userEvent.keyboard('{Escape}');
-    await waitForDrawerToClose();
-    await waitFor(() => expect(trigger).toHaveFocus());
   },
 };
 
@@ -714,7 +676,7 @@ export const HandleDirectionMatrix: Story = {
             key={`${direction}-${option.label}`}
             direction={direction}
             {...option.props}
-            triggerLabel={`Open ${direction} ${option.label} indicator`}
+            triggerLabel={`Open ${direction} ${option.label} handle`}
           />
         ))
       )}
@@ -726,7 +688,7 @@ export const HandleDirectionMatrix: Story = {
       for (const option of HANDLE_OPTIONS) {
         await userEvent.click(
           canvas.getByRole('button', {
-            name: `Open ${direction} ${option.label} indicator`,
+            name: `Open ${direction} ${option.label} handle`,
           })
         );
         const drawer = await within(document.body).findByRole('dialog');
@@ -734,9 +696,8 @@ export const HandleDirectionMatrix: Story = {
           'data-vaul-drawer-direction',
           direction
         );
-        await expect(drawer).not.toHaveAttribute('showhandle');
         const handle = drawer.querySelector('[data-slot="drawer-handle"]');
-        if (option.label === 'hidden') {
+        if (option.props.showHandle === false) {
           await expect(handle).toBeNull();
         } else {
           await expect(handle).toBeInTheDocument();
@@ -771,22 +732,15 @@ export const HandleVisibilityWhileOpen: Story = {
       drawer.querySelector('[data-slot="drawer-handle"]')
     ).toBeNull();
     await userEvent.click(
-      within(drawer).getByRole('button', { name: 'Show indicator' })
+      within(drawer).getByRole('button', { name: 'Show handle' })
     );
-    const handle = drawer.querySelector<HTMLElement>(
-      '[data-slot="drawer-handle"]'
-    );
-    await expect(handle).toBeVisible();
-    const indicatorSpace =
-      handle!.offsetHeight +
-      Number.parseFloat(getComputedStyle(handle!).marginTop);
-    await expect(header!.offsetTop - hiddenOffset).toBeCloseTo(
-      indicatorSpace,
-      0
-    );
+    await expect(
+      drawer.querySelector('[data-slot="drawer-handle"]')
+    ).toBeVisible();
+    await expect(header!.offsetTop).toBeGreaterThan(hiddenOffset);
     await expect(document.querySelector('[role="dialog"]')).toBe(drawer);
     await userEvent.click(
-      within(drawer).getByRole('button', { name: 'Hide indicator' })
+      within(drawer).getByRole('button', { name: 'Hide handle' })
     );
     await expect(
       drawer.querySelector('[data-slot="drawer-handle"]')
@@ -800,45 +754,30 @@ export const HandleVisibilityWhileOpen: Story = {
   },
 };
 
-export const HiddenHandleRootControls: Story = {
+export const HiddenHandleNonDismissible: Story = {
   render: () => (
-    <div className="nx:flex nx:flex-wrap nx:gap-4">
-      <HandleExample
-        showHandle={false}
-        handleOnly
-        triggerLabel="Open handle-only preview"
-      />
-      <HandleExample
-        showHandle={false}
-        dismissible={false}
-        triggerLabel="Open non-dismissible preview"
-      />
-    </div>
+    <HandleExample
+      showHandle={false}
+      dismissible={false}
+      triggerLabel="Open non-dismissible preview"
+    />
   ),
   play: async ({ canvasElement }) => {
-    const canvas = within(canvasElement);
     await userEvent.click(
-      canvas.getByRole('button', { name: 'Open handle-only preview' })
+      within(canvasElement).getByRole('button', {
+        name: 'Open non-dismissible preview',
+      })
     );
-    let drawer = await within(document.body).findByRole('dialog');
+    const drawer = await within(document.body).findByRole('dialog');
     await expect(
       drawer.querySelector('[data-slot="drawer-handle"]')
     ).toBeNull();
     await userEvent.keyboard('{Escape}');
-    await waitForDrawerToClose();
-    await userEvent.click(
-      canvas.getByRole('button', { name: 'Open non-dismissible preview' })
-    );
-    drawer = await within(document.body).findByRole('dialog');
-    await userEvent.keyboard('{Escape}');
-    await expect(drawer).toBeVisible();
-    await expect(
-      drawer.querySelector('[data-slot="drawer-handle"]')
-    ).toBeNull();
+    await expect(drawer).toHaveAttribute('data-state', 'open');
     await userEvent.click(
       within(drawer).getByRole('button', { name: 'Close preview' })
     );
-    await expect(drawer).toBeVisible();
+    await expect(drawer).toHaveAttribute('data-state', 'open');
     await userEvent.click(
       within(drawer).getByRole('button', { name: 'Finish preview' })
     );

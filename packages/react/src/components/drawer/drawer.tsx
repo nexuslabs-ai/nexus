@@ -59,14 +59,20 @@ const DrawerPortal = DrawerPrimitive.Portal;
 const DrawerClose = DrawerPrimitive.Close;
 
 /**
+ * DrawerOverlayProps
+ *
+ * Props for the DrawerOverlay component.
+ */
+interface DrawerOverlayProps extends React.ComponentProps<
+  typeof DrawerPrimitive.Overlay
+> {}
+
+/**
  * DrawerOverlay
  *
  * Semi-transparent scrim behind the drawer content.
  */
-function DrawerOverlay({
-  className,
-  ...props
-}: React.ComponentProps<typeof DrawerPrimitive.Overlay>) {
+function DrawerOverlay({ className, ...props }: DrawerOverlayProps) {
   return (
     <DrawerPrimitive.Overlay
       data-slot="drawer-overlay"
@@ -82,14 +88,19 @@ function DrawerOverlay({
   );
 }
 
+/**
+ * DrawerContentProps
+ *
+ * Props for the DrawerContent component.
+ */
 interface DrawerContentProps extends React.ComponentProps<
   typeof DrawerPrimitive.Content
 > {
   /**
-   * Renders the bottom-only visual indicator, not Vaul's gesture Handle.
-   * Does not change the root's `handleOnly` or `dismissible` behavior.
+   * Whether to show the bottom-only visual handle. This is a static indicator,
+   * not vaul's gesture `Handle`, so it does not change the root's `handleOnly`
+   * or `dismissible` behavior.
    * @default true
-   * @example <DrawerContent showHandle={false} />
    */
   showHandle?: boolean;
 }
@@ -136,11 +147,18 @@ function DrawerContent({
 }
 
 /**
+ * DrawerHeaderProps
+ *
+ * Props for the DrawerHeader component.
+ */
+interface DrawerHeaderProps extends React.ComponentProps<'div'> {}
+
+/**
  * DrawerHeader
  *
  * Container for the drawer title and description.
  */
-function DrawerHeader({ className, ...props }: React.ComponentProps<'div'>) {
+function DrawerHeader({ className, ...props }: DrawerHeaderProps) {
   return (
     <div
       data-slot="drawer-header"
@@ -154,12 +172,19 @@ function DrawerHeader({ className, ...props }: React.ComponentProps<'div'>) {
 }
 
 /**
+ * DrawerBodyProps
+ *
+ * Props for the DrawerBody component.
+ */
+interface DrawerBodyProps extends React.ComponentProps<'div'> {}
+
+/**
  * DrawerBody
  *
  * Container for the drawer's main content between the header and footer. Insets
  * its content horizontally to match the header and footer.
  */
-function DrawerBody({ className, ...props }: React.ComponentProps<'div'>) {
+function DrawerBody({ className, ...props }: DrawerBodyProps) {
   return (
     <div
       data-slot="drawer-body"
@@ -173,11 +198,18 @@ function DrawerBody({ className, ...props }: React.ComponentProps<'div'>) {
 }
 
 /**
+ * DrawerFooterProps
+ *
+ * Props for the DrawerFooter component.
+ */
+interface DrawerFooterProps extends React.ComponentProps<'div'> {}
+
+/**
  * DrawerFooter
  *
  * Container for the drawer action buttons. Pinned to the bottom of the panel.
  */
-function DrawerFooter({ className, ...props }: React.ComponentProps<'div'>) {
+function DrawerFooter({ className, ...props }: DrawerFooterProps) {
   return (
     <div
       data-slot="drawer-footer"
@@ -191,15 +223,21 @@ function DrawerFooter({ className, ...props }: React.ComponentProps<'div'>) {
 }
 
 /**
+ * DrawerTitleProps
+ *
+ * Props for the DrawerTitle component.
+ */
+interface DrawerTitleProps extends React.ComponentProps<
+  typeof DrawerPrimitive.Title
+> {}
+
+/**
  * DrawerTitle
  *
  * The accessible title of the drawer. Required for screen-reader labelling —
  * vaul wires `aria-labelledby` to it.
  */
-function DrawerTitle({
-  className,
-  ...props
-}: React.ComponentProps<typeof DrawerPrimitive.Title>) {
+function DrawerTitle({ className, ...props }: DrawerTitleProps) {
   return (
     <DrawerPrimitive.Title
       data-slot="drawer-title"
@@ -210,14 +248,20 @@ function DrawerTitle({
 }
 
 /**
+ * DrawerDescriptionProps
+ *
+ * Props for the DrawerDescription component.
+ */
+interface DrawerDescriptionProps extends React.ComponentProps<
+  typeof DrawerPrimitive.Description
+> {}
+
+/**
  * DrawerDescription
  *
  * Supporting text that provides additional context for the drawer.
  */
-function DrawerDescription({
-  className,
-  ...props
-}: React.ComponentProps<typeof DrawerPrimitive.Description>) {
+function DrawerDescription({ className, ...props }: DrawerDescriptionProps) {
   return (
     <DrawerPrimitive.Description
       data-slot="drawer-description"
@@ -233,14 +277,20 @@ function DrawerDescription({
 export {
   Drawer,
   DrawerBody,
+  type DrawerBodyProps,
   DrawerClose,
   DrawerContent,
   type DrawerContentProps,
   DrawerDescription,
+  type DrawerDescriptionProps,
   DrawerFooter,
+  type DrawerFooterProps,
   DrawerHeader,
+  type DrawerHeaderProps,
   DrawerOverlay,
+  type DrawerOverlayProps,
   DrawerPortal,
   DrawerTitle,
+  type DrawerTitleProps,
   DrawerTrigger,
 };
