@@ -1969,6 +1969,16 @@ const FIELD_DISABLED_BOUNDARY_SELECTORS = [
   "[data-slot='input-group'][data-variant='bordered'][data-disabled='true']",
 ];
 
+/** Transparent no-op shadow; `none` is not a valid `<shadow>` list item. */
+const FIELD_NO_SHADOW = '0 0 #0000';
+const FIELD_DEFAULT_SHADOW = 'inset 0 0 0 1px var(--color-border-default)';
+const FIELD_ERROR_SHADOW = 'inset 0 0 0 1px var(--color-border-error)';
+const FIELD_DISABLED_SHADOW = 'inset 0 0 0 1px var(--color-border-disabled)';
+const FIELD_FOCUS_SHADOW =
+  'inset 0 0 0 1px var(--color-focus-default), 0 0 0 1px var(--color-focus-default)';
+const FIELD_ERROR_FOCUS_SHADOW =
+  'inset 0 0 0 1px var(--color-focus-error), 0 0 0 1px var(--color-focus-error)';
+
 const OTP_SLOT_BOUNDARY_SELECTOR = "[data-slot='input-otp-slot']";
 const OTP_SLOT_GROUP_DISABLED_SELECTOR =
   "[class~='nx:group/input-otp']:has([data-slot='input-otp']:disabled) [data-slot='input-otp-slot']";
@@ -2012,6 +2022,11 @@ const BUTTON_ERROR_FOCUS_RING_SELECTORS = [
  * The component classes intentionally stay outline-based: Tailwind owns the
  * outline width/offset, this layer owns the normal-mode ring paint.
  *
+ * Produces `--field-shadow`: every rule that paints a field boundary sets the
+ * carrier and then paints from it, so the declaration and the carrier cannot
+ * drift. `generateNativeBrowserUIThemeCSS()` consumes it to compose the
+ * autofill mask on top of the current boundary.
+ *
  * @returns {string} CSS focus ring rules
  */
 export function generateFocusRingCSS() {
@@ -2040,21 +2055,24 @@ export function generateFocusRingCSS() {
   return `
 /* ===== FOCUS RING ===== */
 ${fieldBoundarySelectors} {
+  --field-shadow: ${FIELD_DEFAULT_SHADOW};
   border-color: transparent !important;
   border-width: 0;
-  box-shadow: inset 0 0 0 1px var(--color-border-default);
+  box-shadow: var(--field-shadow);
 }
 
 ${fieldErrorBoundarySelectors} {
+  --field-shadow: ${FIELD_ERROR_SHADOW};
   border-color: transparent !important;
   border-width: 0;
-  box-shadow: inset 0 0 0 1px var(--color-border-error);
+  box-shadow: var(--field-shadow);
 }
 
 ${fieldDisabledBoundarySelectors} {
+  --field-shadow: ${FIELD_DISABLED_SHADOW};
   border-color: transparent !important;
   border-width: 0;
-  box-shadow: inset 0 0 0 1px var(--color-border-disabled);
+  box-shadow: var(--field-shadow);
 }
 
 ${OTP_SLOT_BOUNDARY_SELECTOR} {
@@ -2106,25 +2124,23 @@ ${errorSelectors} {
 }
 
 ${fieldSelectors} {
+  --field-shadow: ${FIELD_FOCUS_SHADOW};
   --tw-outline-style: none !important;
   outline-color: transparent !important;
   outline-style: none !important;
   border-color: transparent !important;
   border-width: 0;
-  box-shadow:
-    inset 0 0 0 1px var(--color-focus-default),
-    0 0 0 1px var(--color-focus-default);
+  box-shadow: var(--field-shadow);
 }
 
 ${fieldErrorSelectors} {
+  --field-shadow: ${FIELD_ERROR_FOCUS_SHADOW};
   --tw-outline-style: none !important;
   outline-color: transparent !important;
   outline-style: none !important;
   border-color: transparent !important;
   border-width: 0;
-  box-shadow:
-    inset 0 0 0 1px var(--color-focus-error),
-    0 0 0 1px var(--color-focus-error);
+  box-shadow: var(--field-shadow);
 }
 
 ${inputGroupControlSuppressionSelectors} {
@@ -2187,6 +2203,21 @@ ${buttonErrorSelectors} {
 `;
 }
 
+/**
+ * Theme the browser-painted UI Nexus cannot style through utilities: native
+ * control accents, the color-scheme declaration, and the autofill surface.
+ *
+ * Consumes `--field-shadow` from `generateFocusRingCSS()`. The autofill mask is
+ * composed on top of that carrier rather than replacing `box-shadow`, so an
+ * autofilled field keeps its border and focus ring. Fields outside the boundary
+ * rules never set the carrier, hence the `FIELD_NO_SHADOW` fallback — a
+ * transparent zero-shadow, since `none` is not a valid `<shadow>` list item.
+ *
+ * The forced-colors block must stay last: it ties the base autofill rules on
+ * specificity and wins on source order alone.
+ *
+ * @returns {string} CSS native browser UI rules
+ */
 export function generateNativeBrowserUIThemeCSS() {
   return `
 /* ===== NATIVE BROWSER UI THEME ===== */
@@ -2205,6 +2236,84 @@ export function generateNativeBrowserUIThemeCSS() {
 
   :where(input[type='checkbox'], input[type='radio'], input[type='range'], progress) {
     accent-color: var(--color-primary-background);
+  }
+
+  input[data-slot='input']:-webkit-autofill,
+  input[data-slot='sidebar-input']:-webkit-autofill {
+    color: var(--input-autofill-foreground);
+    -webkit-text-fill-color: var(--input-autofill-foreground);
+    caret-color: var(--input-autofill-foreground);
+    box-shadow:
+      var(--field-shadow, ${FIELD_NO_SHADOW}),
+      inset 0 0 0 1000px var(--input-autofill-background) !important;
+  }
+
+  input[data-slot='input']:autofill,
+  input[data-slot='sidebar-input']:autofill {
+    color: var(--input-autofill-foreground);
+    -webkit-text-fill-color: var(--input-autofill-foreground);
+    caret-color: var(--input-autofill-foreground);
+    box-shadow:
+      var(--field-shadow, ${FIELD_NO_SHADOW}),
+      inset 0 0 0 1000px var(--input-autofill-background) !important;
+  }
+
+  input[data-slot='input-group-control']:-webkit-autofill {
+    color: var(--input-autofill-foreground);
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: var(--input-autofill-foreground);
+    caret-color: var(--input-autofill-foreground);
+    box-shadow: none !important;
+  }
+
+  input[data-slot='input-group-control']:autofill {
+    color: var(--input-autofill-foreground);
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: var(--input-autofill-foreground);
+    caret-color: var(--input-autofill-foreground);
+    box-shadow: none !important;
+  }
+
+  @media (forced-colors: active) {
+    input[data-slot='input']:-webkit-autofill,
+    input[data-slot='sidebar-input']:-webkit-autofill,
+    input[data-slot='input-group-control']:-webkit-autofill {
+      color: CanvasText;
+      -webkit-background-clip: border-box;
+      background-clip: border-box;
+      -webkit-text-fill-color: CanvasText;
+      caret-color: CanvasText;
+      box-shadow: none !important;
+    }
+
+    input[data-slot='input']:autofill,
+    input[data-slot='sidebar-input']:autofill,
+    input[data-slot='input-group-control']:autofill {
+      color: CanvasText;
+      -webkit-background-clip: border-box;
+      background-clip: border-box;
+      -webkit-text-fill-color: CanvasText;
+      caret-color: CanvasText;
+      box-shadow: none !important;
+    }
+
+    input[data-slot='input']:disabled:-webkit-autofill,
+    input[data-slot='sidebar-input']:disabled:-webkit-autofill,
+    input[data-slot='input-group-control']:disabled:-webkit-autofill {
+      color: GrayText;
+      -webkit-text-fill-color: GrayText;
+      caret-color: GrayText;
+    }
+
+    input[data-slot='input']:disabled:autofill,
+    input[data-slot='sidebar-input']:disabled:autofill,
+    input[data-slot='input-group-control']:disabled:autofill {
+      color: GrayText;
+      -webkit-text-fill-color: GrayText;
+      caret-color: GrayText;
+    }
   }
 }
 `;

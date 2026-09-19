@@ -223,6 +223,133 @@ export const BorderlessSurfaceComparison: Story = {
   },
 };
 
+export const AutofillSurfaceTokens: Story = {
+  render: () => (
+    <div className="nx:grid nx:w-[400px] nx:gap-4">
+      <div className="nx:grid nx:gap-2 nx:rounded-md nx:bg-background nx:p-4">
+        <Input
+          data-testid="autofill-light-bordered"
+          aria-label="Light bordered input"
+          defaultValue="Bordered"
+        />
+        <Input
+          data-testid="autofill-light-borderless"
+          aria-label="Light borderless input"
+          variant="borderless"
+          defaultValue="Borderless"
+        />
+        <Input
+          data-testid="autofill-light-disabled"
+          aria-label="Light disabled input"
+          defaultValue="Disabled"
+          disabled
+        />
+      </div>
+      <div className="dark nx:grid nx:gap-2 nx:rounded-md nx:bg-background nx:p-4">
+        <Input
+          data-testid="autofill-dark-bordered"
+          aria-label="Dark bordered input"
+          defaultValue="Bordered"
+        />
+        <Input
+          data-testid="autofill-dark-borderless"
+          aria-label="Dark borderless input"
+          variant="borderless"
+          defaultValue="Borderless"
+        />
+        <Input
+          data-testid="autofill-dark-disabled"
+          aria-label="Dark disabled input"
+          defaultValue="Disabled"
+          disabled
+        />
+      </div>
+    </div>
+  ),
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+    const backgroundOf = (testId: string) =>
+      window
+        .getComputedStyle(canvas.getByTestId(testId))
+        .getPropertyValue('--input-autofill-background');
+
+    function expectAutofillTokens(
+      testId: string,
+      backgroundToken: string,
+      foregroundToken: string
+    ) {
+      const styles = window.getComputedStyle(canvas.getByTestId(testId));
+      const background = styles.getPropertyValue('--input-autofill-background');
+      const foreground = styles.getPropertyValue('--input-autofill-foreground');
+
+      // A mistyped token resolves to '' on both sides, so equality alone passes vacuously.
+      expect(background).not.toBe('');
+      expect(foreground).not.toBe('');
+      expect(background).toBe(styles.getPropertyValue(backgroundToken));
+      expect(foreground).toBe(styles.getPropertyValue(foregroundToken));
+    }
+
+    expectAutofillTokens(
+      'autofill-light-bordered',
+      '--nx-color-container',
+      '--nx-color-foreground'
+    );
+    expectAutofillTokens(
+      'autofill-light-borderless',
+      '--nx-color-control-background',
+      '--nx-color-foreground'
+    );
+    expectAutofillTokens(
+      'autofill-light-disabled',
+      '--nx-color-disabled',
+      '--nx-color-disabled-foreground'
+    );
+    expectAutofillTokens(
+      'autofill-dark-bordered',
+      '--nx-color-container',
+      '--nx-color-foreground'
+    );
+    expectAutofillTokens(
+      'autofill-dark-borderless',
+      '--nx-color-control-background',
+      '--nx-color-foreground'
+    );
+    expectAutofillTokens(
+      'autofill-dark-disabled',
+      '--nx-color-disabled',
+      '--nx-color-disabled-foreground'
+    );
+
+    // Each variant must resolve to its own surface, and dark must differ from light.
+    expect(backgroundOf('autofill-light-bordered')).not.toBe(
+      backgroundOf('autofill-light-borderless')
+    );
+    expect(backgroundOf('autofill-dark-bordered')).not.toBe(
+      backgroundOf('autofill-light-bordered')
+    );
+
+    // The computed assertions above only cover the appearance-provider path,
+    // which defines --nx-color-* for light too. A consumer loading nexus.css
+    // alone gets --nx-color-* from .dark only, so each autofill property must
+    // carry the :root --color-* alias as its fallback.
+    function expectAutofillFallbackChain(testId: string) {
+      const declarations = canvas
+        .getByTestId(testId)
+        .className.match(/\[--input-autofill-[a-z]+:[^\]]+\]/g);
+
+      expect(declarations).not.toBeNull();
+      for (const declaration of declarations ?? []) {
+        expect(declaration).toMatch(
+          /^\[--input-autofill-[a-z]+:var\(--nx-color-([a-z-]+),var\(--color-\1\)\)\]$/
+        );
+      }
+    }
+
+    expectAutofillFallbackChain('autofill-light-bordered');
+    expectAutofillFallbackChain('autofill-light-borderless');
+  },
+};
+
 export const ReadOnlyVsDisabled: Story = {
   parameters: {
     docs: {

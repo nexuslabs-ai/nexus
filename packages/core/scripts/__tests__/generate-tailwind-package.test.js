@@ -311,23 +311,23 @@ describe('generateTailwindPackage', () => {
       /\[data-slot='input'\]\[data-variant='bordered'\]/
     );
     expect(nexusCSS).toMatch(
-      /box-shadow:\s*inset 0 0 0 1px var\(--color-border-default\);/
+      /--field-shadow:\s*inset 0 0 0 1px var\(--color-border-default\);/
     );
     expect(nexusCSS).toMatch(/\[data-slot='input'\]\[aria-invalid='true'\]/);
     expect(nexusCSS).toMatch(
-      /box-shadow:\s*inset 0 0 0 1px var\(--color-border-error\);/
+      /--field-shadow:\s*inset 0 0 0 1px var\(--color-border-error\);/
     );
     expect(nexusCSS).toMatch(/\[data-slot='input-otp-slot'\]/);
     expect(nexusCSS).toMatch(/inset -1px 0 0 var\(--color-border-default\)/);
     expect(nexusCSS).toMatch(
-      /\[data-slot='sidebar-input'\]\[class~='nx:focus-visible:outline-focus-default'\]:focus-visible[\s\S]*?\{[\s\S]*?border-color:\s*transparent\s*!important;[\s\S]*?border-width:\s*0;[\s\S]*?box-shadow:\s*[\s\S]*?inset 0 0 0 1px var\(--color-focus-default\),[\s\S]*?0 0 0 1px var\(--color-focus-default\);[\s\S]*?\}/
+      /\[data-slot='sidebar-input'\]\[class~='nx:focus-visible:outline-focus-default'\]:focus-visible[\s\S]*?\{[\s\S]*?border-color:\s*transparent\s*!important;[\s\S]*?border-width:\s*0;[\s\S]*?box-shadow:\s*var\(--field-shadow\);[\s\S]*?\}/
     );
     expect(nexusCSS).toMatch(
       /\[data-slot='button'\]\[class~='nx:focus-visible:outline-focus-default'\]:focus-visible/
     );
     expect(nexusCSS).toMatch(/border-color:\s*transparent\s*!important;/);
     expect(nexusCSS).toMatch(
-      /\[data-slot='sidebar-input'\]\[class~='nx:aria-invalid:focus-visible:outline-focus-error'\]\[aria-invalid='true'\]:focus-visible[\s\S]*?\{[\s\S]*?border-color:\s*transparent\s*!important;[\s\S]*?border-width:\s*0;[\s\S]*?box-shadow:\s*[\s\S]*?inset 0 0 0 1px var\(--color-focus-error\),[\s\S]*?0 0 0 1px var\(--color-focus-error\);[\s\S]*?\}/
+      /\[data-slot='sidebar-input'\]\[class~='nx:aria-invalid:focus-visible:outline-focus-error'\]\[aria-invalid='true'\]:focus-visible[\s\S]*?\{[\s\S]*?border-color:\s*transparent\s*!important;[\s\S]*?border-width:\s*0;[\s\S]*?box-shadow:\s*var\(--field-shadow\);[\s\S]*?\}/
     );
     expect(nexusCSS).toMatch(
       /\[data-slot='input-group-control'\]\[class~='nx:focus-visible:outline-focus-default'\]:focus-visible[\s\S]*?\{[\s\S]*?outline-style:\s*none\s*!important;[\s\S]*?box-shadow:\s*none;[\s\S]*?\}/
@@ -543,6 +543,16 @@ describe('generateTailwindPackage', () => {
     expect(nexusCSS).toMatch(/\.dark \{\n\s*color-scheme:\s*dark;\n\s*\}/);
     expect(nexusCSS).toMatch(
       /:where\([\s\S]*input\[type='checkbox'\],[\s\S]*input\[type='radio'\],[\s\S]*input\[type='range'\],[\s\S]*progress[\s\S]*\) \{\n\s*accent-color:\s*var\(--color-primary-background\);\n\s*\}/
+    );
+    expect(nexusCSS).toMatch(
+      /input\[data-slot='input'\]:-webkit-autofill[\s\S]*?box-shadow:\s*var\(--field-shadow, 0 0 #0000\),\s*inset 0 0 0 1000px var\(--input-autofill-background\) !important;/
+    );
+    expect(nexusCSS).toMatch(/input\[data-slot='sidebar-input'\]:autofill/);
+    expect(nexusCSS).toMatch(
+      /input\[data-slot='input-group-control'\]:-webkit-autofill[\s\S]*?-webkit-background-clip:\s*text;[\s\S]*?box-shadow:\s*none !important;/
+    );
+    expect(nexusCSS).toMatch(
+      /@media \(forced-colors: active\)[\s\S]*?input\[data-slot='input'\]:-webkit-autofill[\s\S]*?box-shadow:\s*none !important;/
     );
     expect(nexusCSS).not.toMatch(/light-dark\(/);
   });

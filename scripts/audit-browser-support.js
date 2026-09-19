@@ -98,6 +98,20 @@ export const FEATURE_POLICIES = Object.freeze([
     note: 'Scope to native checkbox/radio/range/progress controls; unsupported or partial implementations fall back to UA defaults.',
   },
   {
+    id: 'autofill-selector',
+    name: ':autofill / :-webkit-autofill',
+    policy: 'progressive-enhancement',
+    support: {
+      chrome: 110,
+      edge: 110,
+      firefox: null,
+      safari: 15,
+      samsung: 21,
+    },
+    guide: 'autofill-highlight-inputs',
+    note: 'Firefox matches credential fields only (https://bugzil.la/1923525), so it is recorded as unsupported for general field surfaces; browsers without it fall back to the UA autofill paint. Emit the standard selector and its legacy WebKit alias as separate rules so one unparsed pseudo-class cannot drop the other rule.',
+  },
+  {
     id: 'viewport-height-units',
     name: 'svh / lvh / dvh viewport units',
     policy: 'adopt',

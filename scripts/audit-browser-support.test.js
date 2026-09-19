@@ -64,6 +64,9 @@ describe('audit-browser-support', () => {
     const backdropFilter = FEATURE_POLICIES.find(
       (feature) => feature.id === 'backdrop-filter'
     );
+    const autofill = FEATURE_POLICIES.find(
+      (feature) => feature.id === 'autofill-selector'
+    );
     const popover = FEATURE_POLICIES.find(
       (feature) => feature.id === 'popover-api'
     );
@@ -71,6 +74,7 @@ describe('audit-browser-support', () => {
     expect(isFeatureSafeAtFloor(oklch)).toBe(true);
     expect(isFeatureSafeAtFloor(viewportHeightUnits)).toBe(true);
     expect(isFeatureSafeAtFloor(backdropFilter)).toBe(true);
+    expect(isFeatureSafeAtFloor(autofill)).toBe(false);
     expect(isFeatureSafeAtFloor(popover)).toBe(false);
   });
 
@@ -97,6 +101,12 @@ describe('audit-browser-support', () => {
           id: 'accent-color',
           policy: 'progressive-enhancement',
           floorSafe: true,
+          problem: null,
+        }),
+        expect.objectContaining({
+          id: 'autofill-selector',
+          policy: 'progressive-enhancement',
+          floorSafe: false,
           problem: null,
         }),
         expect.objectContaining({
