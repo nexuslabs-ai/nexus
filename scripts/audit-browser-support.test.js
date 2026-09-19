@@ -56,6 +56,12 @@ describe('audit-browser-support', () => {
     ]);
   });
 
+  it('declares each feature policy id exactly once', () => {
+    const ids = FEATURE_POLICIES.map((feature) => feature.id);
+
+    expect(ids).toHaveLength(new Set(ids).size);
+  });
+
   it('treats OKLCH as floor-safe and Popover API as outside the floor', () => {
     const oklch = FEATURE_POLICIES.find((feature) => feature.id === 'oklch');
     const viewportHeightUnits = FEATURE_POLICIES.find(

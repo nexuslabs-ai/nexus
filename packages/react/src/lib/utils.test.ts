@@ -112,6 +112,13 @@ describe('cn', () => {
       'nx:gap-layout-stack',
     ],
     ['border width', 'nx:border-thin nx:border-thick', 'nx:border-thick'],
+    // Paired against an arbitrary length, not another named width: two
+    // unregistered names would still collapse as border-colors and pass.
+    [
+      'logical border width',
+      'nx:border-e-default nx:border-e-[2px]',
+      'nx:border-e-[2px]',
+    ],
     [
       'border color',
       'nx:border-color-default nx:border-color-error',

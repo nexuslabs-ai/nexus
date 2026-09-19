@@ -182,6 +182,20 @@ export const FEATURE_POLICIES = Object.freeze([
     note: 'Use Radix positioning or feature-detected enhancement for anchored overlays.',
   },
   {
+    id: 'container-size-queries',
+    name: 'Container size queries',
+    policy: 'progressive-enhancement',
+    support: {
+      chrome: 105,
+      edge: 105,
+      firefox: 110,
+      safari: 16,
+      samsung: 20,
+    },
+    guide: 'css-layout',
+    note: 'Safari 16 is above the 15.4 floor: a size query must only add layout an unsupporting engine can do without. Table selection gutter degrades to an in-flow column.',
+  },
+  {
     id: 'container-style-queries',
     name: 'Container style queries',
     policy: 'fallback',

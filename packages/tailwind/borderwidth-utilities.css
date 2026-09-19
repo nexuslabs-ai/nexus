@@ -35,6 +35,16 @@
   border-left-width: var(--nx-borderwidth-thin);
 }
 
+@utility border-s-thin {
+  border-inline-start-style: var(--tw-border-style, solid);
+  border-inline-start-width: var(--nx-borderwidth-thin);
+}
+
+@utility border-e-thin {
+  border-inline-end-style: var(--tw-border-style, solid);
+  border-inline-end-width: var(--nx-borderwidth-thin);
+}
+
 @utility border-default {
   border-style: var(--tw-border-style, solid);
   border-width: var(--nx-borderwidth-default);
@@ -70,6 +80,16 @@
   border-left-width: var(--nx-borderwidth-default);
 }
 
+@utility border-s-default {
+  border-inline-start-style: var(--tw-border-style, solid);
+  border-inline-start-width: var(--nx-borderwidth-default);
+}
+
+@utility border-e-default {
+  border-inline-end-style: var(--tw-border-style, solid);
+  border-inline-end-width: var(--nx-borderwidth-default);
+}
+
 @utility border-thick {
   border-style: var(--tw-border-style, solid);
   border-width: var(--nx-borderwidth-thick);
@@ -103,6 +123,16 @@
 @utility border-l-thick {
   border-left-style: var(--tw-border-style, solid);
   border-left-width: var(--nx-borderwidth-thick);
+}
+
+@utility border-s-thick {
+  border-inline-start-style: var(--tw-border-style, solid);
+  border-inline-start-width: var(--nx-borderwidth-thick);
+}
+
+@utility border-e-thick {
+  border-inline-end-style: var(--tw-border-style, solid);
+  border-inline-end-width: var(--nx-borderwidth-thick);
 }
 
 /* Border Width Alias Utilities */
@@ -142,6 +172,16 @@
   border-left-width: var(--nx-borderwidth-thin);
 }
 
+@utility border-width-s-thin {
+  border-inline-start-style: var(--tw-border-style, solid);
+  border-inline-start-width: var(--nx-borderwidth-thin);
+}
+
+@utility border-width-e-thin {
+  border-inline-end-style: var(--tw-border-style, solid);
+  border-inline-end-width: var(--nx-borderwidth-thin);
+}
+
 @utility border-width-default {
   border-style: var(--tw-border-style, solid);
   border-width: var(--nx-borderwidth-default);
@@ -177,6 +217,16 @@
   border-left-width: var(--nx-borderwidth-default);
 }
 
+@utility border-width-s-default {
+  border-inline-start-style: var(--tw-border-style, solid);
+  border-inline-start-width: var(--nx-borderwidth-default);
+}
+
+@utility border-width-e-default {
+  border-inline-end-style: var(--tw-border-style, solid);
+  border-inline-end-width: var(--nx-borderwidth-default);
+}
+
 @utility border-width-thick {
   border-style: var(--tw-border-style, solid);
   border-width: var(--nx-borderwidth-thick);
@@ -210,4 +260,14 @@
 @utility border-width-l-thick {
   border-left-style: var(--tw-border-style, solid);
   border-left-width: var(--nx-borderwidth-thick);
+}
+
+@utility border-width-s-thick {
+  border-inline-start-style: var(--tw-border-style, solid);
+  border-inline-start-width: var(--nx-borderwidth-thick);
+}
+
+@utility border-width-e-thick {
+  border-inline-end-style: var(--tw-border-style, solid);
+  border-inline-end-width: var(--nx-borderwidth-thick);
 }

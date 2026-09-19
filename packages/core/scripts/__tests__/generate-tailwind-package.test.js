@@ -222,7 +222,7 @@ describe('border alias utility generators', () => {
       { cssName: 'nx-borderwidth-thick' },
     ]);
 
-    expect(result.count).toBe(28);
+    expect(result.count).toBe(36);
     expect(result.css.match(/^@utility /gm)).toHaveLength(result.count);
   });
 
@@ -1105,6 +1105,25 @@ describe('generateTailwindPackage', () => {
     expect(inlineBlock).toMatch(
       /border-inline-width:\s*var\(--nx-borderwidth-thick\);/
     );
+
+    const inlineEndBlock = extractBlock(
+      borderWidthUtilitiesCSS,
+      '@utility border-e-default'
+    );
+    expect(inlineEndBlock).toMatch(
+      /border-inline-end-style:\s*var\(--tw-border-style, solid\);/
+    );
+    expect(inlineEndBlock).toMatch(
+      /border-inline-end-width:\s*var\(--nx-borderwidth-default\);/
+    );
+
+    const inlineStartBlock = extractBlock(
+      borderWidthUtilitiesCSS,
+      '@utility border-s-default'
+    );
+    expect(inlineStartBlock).toMatch(
+      /border-inline-start-width:\s*var\(--nx-borderwidth-default\);/
+    );
   });
 
   it('borderwidth-utilities.css declares self-describing stroke width aliases', () => {
@@ -1196,6 +1215,7 @@ describe('generateTailwindPackage', () => {
         'nx:border-width-b-default',
         'nx:border-x-thick',
         'nx:border-width-x-thick',
+        'nx:border-e-default',
         'nx:border-color-default',
         'nx:border-color-error',
       ])
@@ -1207,6 +1227,9 @@ describe('generateTailwindPackage', () => {
     );
     expect(css).toMatch(
       /border-inline-width:\s*var\(--nx-borderwidth-thick\);/
+    );
+    expect(css).toMatch(
+      /border-inline-end-width:\s*var\(--nx-borderwidth-default\);/
     );
     expect(css).toMatch(
       colorPropertyFallbackPattern('border-color', 'border-default')

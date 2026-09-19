@@ -1,8 +1,15 @@
 import * as React from 'react';
 
+import { DENSITY_OPTIONS, STROKE_OPTIONS } from '@nexus_ds/core';
 import type { Meta, StoryObj } from '@storybook/react';
 import { expect, fn, userEvent, within } from 'storybook/test';
 
+import {
+  coarseTouchTargetBoxClassName,
+  coarseTouchTargetClassName,
+  coarseTouchTargetProbeClassName,
+} from '../../lib/touch-target';
+import { cn } from '../../lib/utils';
 import { Label } from '../label';
 
 import { Checkbox } from './checkbox';
@@ -121,7 +128,9 @@ export const TouchTarget: Story = {
     const box = canvasElement.querySelector('[data-slot="checkbox"]');
 
     await expect(box).toHaveClass('nx:relative');
-    await expect(box).toHaveClass('nx:pointer-coarse:after:-inset-3.5');
+    for (const className of coarseTouchTargetClassName.split(' ')) {
+      await expect(box).toHaveClass(className);
+    }
     await expect(box).toHaveClass('nx:bg-container');
     await expect(box).toHaveClass(
       'nx:enabled:data-[state=unchecked]:hover:bg-container-hover'
@@ -129,6 +138,56 @@ export const TouchTarget: Story = {
     await expect(box).toHaveClass(
       'nx:enabled:data-[state=unchecked]:active:bg-container-active'
     );
+  },
+};
+
+// The overlay is absolutely positioned, so it resolves against the control's
+// padding box — `size-4` minus both *used* borders. Measure every appearance
+// rather than deriving from tokens: a single-appearance check read 44px while
+// the `fine` stroke sat at 43px.
+export const TouchTargetGeometry: Story = {
+  render: () => (
+    <>
+      {DENSITY_OPTIONS.map(({ value: density }) =>
+        STROKE_OPTIONS.map(({ value: stroke }) => (
+          <div
+            key={`${density}-${stroke}`}
+            data-density={density}
+            data-borderwidth={stroke}
+          >
+            <span
+              data-probe={`${density}|${stroke}`}
+              className={cn(
+                'nx:relative nx:inline-flex nx:border-border-default',
+                coarseTouchTargetBoxClassName,
+                coarseTouchTargetProbeClassName
+              )}
+            />
+          </div>
+        ))
+      )}
+    </>
+  ),
+  play: async ({ canvasElement }) => {
+    const probes = canvasElement.querySelectorAll<HTMLElement>('[data-probe]');
+
+    await expect(probes.length).toBe(
+      DENSITY_OPTIONS.length * STROKE_OPTIONS.length
+    );
+
+    for (const probe of probes) {
+      const overlay = getComputedStyle(probe, '::after');
+      const appearance = probe.dataset.probe;
+
+      await expect(
+        parseFloat(overlay.height),
+        `${appearance} height`
+      ).toBeGreaterThanOrEqual(44);
+      await expect(
+        parseFloat(overlay.width),
+        `${appearance} width`
+      ).toBeGreaterThanOrEqual(44);
+    }
   },
 };
 
