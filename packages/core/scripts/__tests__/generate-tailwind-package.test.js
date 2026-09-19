@@ -557,6 +557,35 @@ describe('generateTailwindPackage', () => {
     expect(themeBlock).toMatch(/--z-index-max: 9999;/);
   });
 
+  it('emits and compiles the 4xl radius across every runtime mode', async () => {
+    const themeBlock = extractBlock(nexusCSS, '@theme');
+    expect(themeBlock).toMatch(/--radius-4xl: var\(--nx-radius-4xl\);/);
+
+    const valuesByMode = {
+      square: '0px',
+      subtle: '28px',
+      smooth: '32px',
+      round: '36px',
+      'extra-round': '40px',
+    };
+
+    for (const [mode, value] of Object.entries(valuesByMode)) {
+      expect(extractDataAttrBlock(nexusCSS, 'data-radius', mode)).toMatch(
+        new RegExp(`--nx-radius-4xl: ${value};`)
+      );
+    }
+
+    const css = await compileGeneratedTailwind(distDir, ['nx:rounded-4xl']);
+    expect(
+      compactCss(extractCompiledClassBlock(css, 'nx:rounded-4xl'))
+    ).toMatch(/border-radius: var\(--nx-radius-4xl\);/);
+  });
+
+  it('emits the xxs typography line-height primitive', () => {
+    const rootBlock = extractBlock(variablesCSS, ':root');
+    expect(rootBlock).toMatch(/--nx-typography-line-height-xxs: 12px;/);
+  });
+
   // The breakpoint tokens are owned by collectBreakpointsTokens; the generic
   // standalone-semantic dimension scan must skip breakpoints.json to avoid
   // double-emission. Asserting exactly one declaration per breakpoint guards

@@ -1,5 +1,5 @@
 import type { Meta, StoryObj } from '@storybook/react';
-import { expect } from 'storybook/test';
+import { expect, waitFor } from 'storybook/test';
 
 import {
   tokenValue,
@@ -36,6 +36,7 @@ const WEIGHT_KEYS = [
 ] as const;
 const FAMILY_KEYS = ['font-sans', 'font-serif', 'font-mono'] as const;
 const LINE_HEIGHT_DISPLAY_KEYS = [
+  'xxs',
   'xs',
   'sm',
   'base',
@@ -196,8 +197,8 @@ function LineHeightsStory() {
           Line Heights
         </h2>
         <p className="nx:text-muted-foreground nx:typography-body-small nx:max-w-2xl">
-          Line-height tokens pair with size tokens by key. Showing `xs` through
-          `2xl` — the readable body range where rhythm matters most.
+          Line-height tokens pair with size tokens by key. Showing `xxs` through
+          `2xl` — the readable label and body range where rhythm matters most.
         </p>
       </div>
       <section className="nx:flex nx:flex-col">
@@ -214,6 +215,7 @@ function LineHeightsStory() {
               alignStart={true}
               preview={
                 <p
+                  data-testid={`line-height-${key}`}
                   className="nx:text-foreground nx:max-w-md"
                   style={{
                     fontSize: `var(${sizeName})`,
@@ -302,6 +304,20 @@ export const Weights: Story = {
 
 export const LineHeights: Story = {
   render: () => <LineHeightsStory />,
+};
+
+export const ScaledLineHeightXXS: Story = {
+  globals: { uiFontSize: 28 },
+  render: () => <LineHeightsStory />,
+  play: async ({ canvasElement }) => {
+    const sample = canvasElement.querySelector<HTMLElement>(
+      '[data-testid="line-height-xxs"]'
+    );
+
+    await waitFor(() =>
+      expect(getComputedStyle(sample!).lineHeight).toBe('24px')
+    );
+  },
 };
 
 export const FontFamilies: Story = {

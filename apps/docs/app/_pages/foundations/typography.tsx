@@ -1,4 +1,5 @@
-import { Breadcrumb } from '../_components/Breadcrumb';
+import { CodeSample } from '../../_components/CodeSample';
+import { SectionHeading, SubsectionHeading } from '../../_components/Heading';
 
 /**
  * Foundations → Typography. Server component — a live specimen of the type
@@ -120,16 +121,9 @@ const FAMILIES: {
   },
 ];
 
-export function Typography() {
+export default function Typography() {
   return (
     <>
-      <Breadcrumb
-        items={[
-          { label: 'Home', href: '/' },
-          { label: 'Foundations', href: '/foundations' },
-          { label: 'Typography' },
-        ]}
-      />
       <h1 className="nx:typography-heading-large">Typography</h1>
       <p className="nx:typography-body-default nx:text-muted-foreground nx:mt-2 nx:mb-8 nx:max-w-[64ch]">
         One scale for the whole system. Every tier is a composite utility —
@@ -140,7 +134,9 @@ export function Typography() {
 
       {/* ── The scale ───────────────────────────────────────── */}
       <section className="nx:mb-12">
-        <h2 className="nx:typography-heading-small nx:mb-1">The scale</h2>
+        <SectionHeading className="nx:typography-heading-small nx:mb-1">
+          The scale
+        </SectionHeading>
         <p className="nx:typography-body-small nx:text-muted-foreground nx:mb-6 nx:max-w-[64ch]">
           Twelve composite tiers across five groups. Most use normal (0)
           letter-spacing; label-caps adds +0.8px for all-caps legibility, and
@@ -148,9 +144,9 @@ export function Typography() {
         </p>
         {SCALE.map((group) => (
           <div key={group.group} className="nx:mb-8">
-            <h3 className="nx:typography-label-caps nx:text-muted-foreground-subtle nx:mb-4">
+            <SubsectionHeading className="nx:typography-label-caps nx:text-muted-foreground-subtle nx:mb-4">
               {group.group}
-            </h3>
+            </SubsectionHeading>
             <div className="nx:flex nx:flex-col">
               {group.tiers.map((t) => (
                 <div
@@ -170,7 +166,9 @@ export function Typography() {
 
       {/* ── Code tiers ──────────────────────────────────────── */}
       <section className="nx:mb-12">
-        <h2 className="nx:typography-heading-small nx:mb-1">Code</h2>
+        <SectionHeading className="nx:typography-heading-small nx:mb-1">
+          Code
+        </SectionHeading>
         <p className="nx:typography-body-small nx:text-muted-foreground nx:mb-4 nx:max-w-[64ch]">
           Two monospace tiers — inline spans and fenced blocks.
         </p>
@@ -181,16 +179,18 @@ export function Typography() {
           </code>{' '}
           in running prose.
         </p>
-        <pre className="nx:typography-code-block nx:rounded-lg nx:border nx:border-border-default nx:bg-muted nx:p-4 nx:overflow-x-auto">
+        <CodeSample lang="tsx">
           {`import { Button } from '@nexus_ds/react';
 
 <Button variant="secondary">Ship it</Button>`}
-        </pre>
+        </CodeSample>
       </section>
 
       {/* ── Families ────────────────────────────────────────── */}
       <section className="nx:mb-12">
-        <h2 className="nx:typography-heading-small nx:mb-1">Families</h2>
+        <SectionHeading className="nx:typography-heading-small nx:mb-1">
+          Families
+        </SectionHeading>
         <p className="nx:typography-body-small nx:text-muted-foreground nx:mb-4 nx:max-w-[64ch]">
           Three typefaces — one system.
         </p>

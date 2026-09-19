@@ -133,13 +133,26 @@ describe('token-mode rename preserves migration values', () => {
         }
       }
 
+      if (family === 'radius') {
+        const fourXlByMode = {
+          square: 0,
+          round: 36,
+          'extra-round': 40,
+        };
+        expected = {
+          ...expected,
+          '4xl': { value: fourXlByMode[friendly], unit: 'px' },
+        };
+      }
+
       if (family === 'typography' && friendly === 'default') {
         // Additive typography tokens introduced after the codename migration:
-        // the `xxs` size step and a dedicated `font-heading` family that defaults
-        // to the same stack as `font-sans` (brands may override it at runtime).
+        // the `xxs` size and line-height steps plus a dedicated `font-heading`
+        // family that defaults to the same stack as `font-sans`.
         expected = {
           ...expected,
           'size.xxs': { value: 11, unit: 'px' },
+          'line-height.xxs': { value: 12, unit: 'px' },
           'family.font-heading': expected['family.font-sans'],
         };
       }
