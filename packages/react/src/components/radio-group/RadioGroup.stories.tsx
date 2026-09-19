@@ -3,6 +3,7 @@ import * as React from 'react';
 import type { Meta, StoryObj } from '@storybook/react';
 import { expect, fn, userEvent, waitFor, within } from 'storybook/test';
 
+import { coarseTouchTargetClassName } from '../../lib/touch-target';
 import { Label } from '../label';
 
 import { RadioGroup, RadioGroupItem } from './radio-group';
@@ -128,10 +129,9 @@ export const TouchTarget: Story = {
 
     await expect(item).toHaveClass('nx:relative');
     await expect(item).toHaveClass('nx:bg-container');
-    await expect(item).toHaveClass('nx:pointer-coarse:after:absolute');
-    await expect(item).toHaveClass(
-      'nx:pointer-coarse:after:-inset-[max(var(--nx-spacing-3_5),calc((max(var(--nx-spacing-11),44px)-var(--nx-spacing-4))/2))]'
-    );
+    for (const className of coarseTouchTargetClassName.split(' ')) {
+      await expect(item).toHaveClass(className);
+    }
   },
 };
 

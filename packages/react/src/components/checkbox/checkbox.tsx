@@ -4,6 +4,7 @@ import * as CheckboxPrimitive from '@radix-ui/react-checkbox';
 
 import { IconCheck, IconMinus } from '../../lib/icons';
 import { selectionIndicatorMotionClassName } from '../../lib/motion';
+import { coarseTouchTargetClassName } from '../../lib/touch-target';
 import { cn } from '../../lib/utils';
 
 /**
@@ -57,7 +58,7 @@ function Checkbox({ className, ...props }: CheckboxProps) {
       data-slot="checkbox"
       className={cn(
         'nx:group nx:peer nx:relative nx:inline-flex nx:size-4 nx:shrink-0 nx:items-center nx:justify-center',
-        'nx:pointer-coarse:after:absolute nx:pointer-coarse:after:-inset-[max(var(--nx-spacing-3_5),calc((max(var(--nx-spacing-11),44px)-var(--nx-spacing-4))/2))]',
+        coarseTouchTargetClassName,
         'nx:rounded-sm nx:border-default nx:border-border-default nx:bg-container',
         'nx:transition-colors',
         'nx:focus-visible:outline-2 nx:focus-visible:outline-focus-default nx:focus-visible:outline-offset-(--focus-offset)',

@@ -3,6 +3,11 @@ import * as React from 'react';
 import type { Meta, StoryObj } from '@storybook/react';
 import { expect, fn, userEvent, within } from 'storybook/test';
 
+import {
+  coarseTouchTargetClassName,
+  coarseTouchTargetProbeClassName,
+} from '../../lib/touch-target';
+import { cn } from '../../lib/utils';
 import { Label } from '../label';
 
 import { Checkbox } from './checkbox';
@@ -121,10 +126,9 @@ export const TouchTarget: Story = {
     const box = canvasElement.querySelector('[data-slot="checkbox"]');
 
     await expect(box).toHaveClass('nx:relative');
-    await expect(box).toHaveClass('nx:pointer-coarse:after:absolute');
-    await expect(box).toHaveClass(
-      'nx:pointer-coarse:after:-inset-[max(var(--nx-spacing-3_5),calc((max(var(--nx-spacing-11),44px)-var(--nx-spacing-4))/2))]'
-    );
+    for (const className of coarseTouchTargetClassName.split(' ')) {
+      await expect(box).toHaveClass(className);
+    }
     await expect(box).toHaveClass('nx:bg-container');
     await expect(box).toHaveClass(
       'nx:enabled:data-[state=unchecked]:hover:bg-container-hover'
@@ -132,6 +136,31 @@ export const TouchTarget: Story = {
     await expect(box).toHaveClass(
       'nx:enabled:data-[state=unchecked]:active:bg-container-active'
     );
+  },
+};
+
+// The overlay is absolutely positioned, so it resolves against the control's
+// padding box — `size-4` minus both borders. Measure it rather than deriving it
+// from the spacing tokens, which is how a 42px target once read as 44px.
+export const TouchTargetGeometry: Story = {
+  render: () => (
+    <span
+      data-testid="probe"
+      className={cn(
+        'nx:relative nx:inline-flex nx:size-4 nx:border-default nx:border-border-default',
+        coarseTouchTargetProbeClassName
+      )}
+    />
+  ),
+  play: async ({ canvasElement }) => {
+    const probe = canvasElement.querySelector<HTMLElement>(
+      '[data-testid="probe"]'
+    );
+    if (!probe) throw new Error('probe missing');
+
+    const overlay = getComputedStyle(probe, '::after');
+    await expect(parseFloat(overlay.height)).toBeGreaterThanOrEqual(44);
+    await expect(parseFloat(overlay.width)).toBeGreaterThanOrEqual(44);
   },
 };
 
