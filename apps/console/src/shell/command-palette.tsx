@@ -12,6 +12,7 @@ import { useNexusAppearance } from '@nexus_ds/react/appearance';
 import {
   IconAddressBook,
   IconBriefcase,
+  IconColorSwatch,
   IconInbox,
   IconMoon,
   IconPalette,
@@ -243,6 +244,16 @@ export function CommandPalette({ open, onOpenChange }: CommandPaletteProps) {
         )}
 
         <CommandGroup heading="Actions">
+          <CommandItem
+            value="color-token-atlas"
+            keywords={['color', 'token', 'atlas', 'draft', 'swatch']}
+            onSelect={() =>
+              runCommand(() => navigate({ to: '/design/color-atlas' }))
+            }
+          >
+            <IconColorSwatch />
+            <span>Color Token Atlas</span>
+          </CommandItem>
           <CommandItem
             value="toggle-theme"
             keywords={['theme', 'dark', 'light', 'mode']}

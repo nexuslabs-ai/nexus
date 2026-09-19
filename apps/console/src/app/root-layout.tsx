@@ -3,6 +3,7 @@ import { useEffect, useState } from 'react';
 import { SidebarInset, SidebarProvider } from '@nexus_ds/react';
 import { Outlet } from '@tanstack/react-router';
 
+import { ColorDraftSync } from '../modules/design-system/color-atlas/color-draft-sync';
 import { AppSidebar } from '../shell/app-sidebar';
 import { CommandPalette } from '../shell/command-palette';
 import { Topbar } from '../shell/topbar';
@@ -48,6 +49,7 @@ export function RootLayout() {
         </div>
       </SidebarInset>
       <CommandPalette open={commandOpen} onOpenChange={setCommandOpen} />
+      <ColorDraftSync />
     </SidebarProvider>
   );
 }
