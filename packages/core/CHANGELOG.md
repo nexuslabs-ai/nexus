@@ -1,5 +1,12 @@
 # @nexus_ds/core
 
+## 0.5.0
+
+### Minor Changes
+
+- 416a7a0: Add the `4xl` runtime radius step across every corner mode and the `xxs`
+  typography line-height primitive.
+
 ## 0.4.0
 
 ### Minor Changes
