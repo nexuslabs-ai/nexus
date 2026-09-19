@@ -48,6 +48,13 @@
     },
     "$type": "dimension"
   },
+  "4xl": {
+    "$value": {
+      "value": 0,
+      "unit": "px"
+    },
+    "$type": "dimension"
+  },
   "full": {
     "$value": {
       "value": 9999,
