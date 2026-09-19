@@ -12,9 +12,11 @@ describe('coarseTouchTargetClassName', () => {
     );
   });
 
-  it('adds both borders back to the inset', () => {
+  // A declared `0.5px` stroke is used as 1px, so the inset must compensate the
+  // used width or the target lands at 43px.
+  it('adds both used borders back to the inset', () => {
     expect(coarseTouchTargetClassName).toContain(
-      '2*var(--nx-borderwidth-default)'
+      '2*max(1px,var(--nx-borderwidth-default))'
     );
   });
 });

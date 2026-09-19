@@ -1,9 +1,11 @@
 import * as React from 'react';
 
+import { DENSITY_OPTIONS, STROKE_OPTIONS } from '@nexus_ds/core';
 import type { Meta, StoryObj } from '@storybook/react';
 import { expect, fn, userEvent, within } from 'storybook/test';
 
 import {
+  coarseTouchTargetBoxClassName,
   coarseTouchTargetClassName,
   coarseTouchTargetProbeClassName,
 } from '../../lib/touch-target';
@@ -140,27 +142,52 @@ export const TouchTarget: Story = {
 };
 
 // The overlay is absolutely positioned, so it resolves against the control's
-// padding box — `size-4` minus both borders. Measure it rather than deriving it
-// from the spacing tokens, which is how a 42px target once read as 44px.
+// padding box — `size-4` minus both *used* borders. Measure every appearance
+// rather than deriving from tokens: a single-appearance check read 44px while
+// the `fine` stroke sat at 43px.
 export const TouchTargetGeometry: Story = {
   render: () => (
-    <span
-      data-testid="probe"
-      className={cn(
-        'nx:relative nx:inline-flex nx:size-4 nx:border-default nx:border-border-default',
-        coarseTouchTargetProbeClassName
+    <>
+      {DENSITY_OPTIONS.map(({ value: density }) =>
+        STROKE_OPTIONS.map(({ value: stroke }) => (
+          <div
+            key={`${density}-${stroke}`}
+            data-density={density}
+            data-borderwidth={stroke}
+          >
+            <span
+              data-probe={`${density}|${stroke}`}
+              className={cn(
+                'nx:relative nx:inline-flex nx:border-border-default',
+                coarseTouchTargetBoxClassName,
+                coarseTouchTargetProbeClassName
+              )}
+            />
+          </div>
+        ))
       )}
-    />
+    </>
   ),
   play: async ({ canvasElement }) => {
-    const probe = canvasElement.querySelector<HTMLElement>(
-      '[data-testid="probe"]'
-    );
-    if (!probe) throw new Error('probe missing');
+    const probes = canvasElement.querySelectorAll<HTMLElement>('[data-probe]');
 
-    const overlay = getComputedStyle(probe, '::after');
-    await expect(parseFloat(overlay.height)).toBeGreaterThanOrEqual(44);
-    await expect(parseFloat(overlay.width)).toBeGreaterThanOrEqual(44);
+    await expect(probes.length).toBe(
+      DENSITY_OPTIONS.length * STROKE_OPTIONS.length
+    );
+
+    for (const probe of probes) {
+      const overlay = getComputedStyle(probe, '::after');
+      const appearance = probe.dataset.probe;
+
+      await expect(
+        parseFloat(overlay.height),
+        `${appearance} height`
+      ).toBeGreaterThanOrEqual(44);
+      await expect(
+        parseFloat(overlay.width),
+        `${appearance} width`
+      ).toBeGreaterThanOrEqual(44);
+    }
   },
 };
 
