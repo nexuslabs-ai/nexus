@@ -1,3 +1,4 @@
+import fs from 'node:fs';
 import { describe, expect, it } from 'vitest';
 
 import {
@@ -6,10 +7,13 @@ import {
   BASE_PALETTES,
   buildPalettesSrgb,
   buildSimulatedByVision,
+  buildSummary,
   CHART_PALETTES,
   computeDeltaE,
   findConfusableAdjacent,
   findStatusPairConfusable,
+  isAcceptedStatusLimitation,
+  PRIMITIVES_FILE,
   SHADES,
   simulatePalette,
   simulateRgb,
@@ -62,11 +66,9 @@ describe('constants', () => {
     ]);
   });
 
-  it('ALL_PALETTES is base ∪ status ∪ chart with no overlap', () => {
+  it('ALL_PALETTES is the deduplicated base ∪ status ∪ chart union', () => {
     expect(ALL_PALETTES).toEqual([
-      ...BASE_PALETTES,
-      ...STATUS_PALETTES,
-      ...CHART_PALETTES,
+      ...new Set([...BASE_PALETTES, ...STATUS_PALETTES, ...CHART_PALETTES]),
     ]);
     expect(new Set(ALL_PALETTES).size).toBe(ALL_PALETTES.length);
   });
@@ -96,6 +98,70 @@ describe('constants', () => {
     // no unordered pair repeats
     const keys = STATUS_PAIRS_600.map(([a, b]) => [a, b].sort().join('|'));
     expect(new Set(keys).size).toBe(STATUS_PAIRS_600.length);
+  });
+});
+
+describe('accepted status limitation', () => {
+  const limitation = {
+    check: 'status-pair',
+    roles: ['success', 'warning'],
+    paletteA: 'green',
+    paletteB: 'orange',
+    shade: '600',
+    visionType: 'deuteranopia',
+    deltaE: 0.016918143393970703,
+    label: 'green.600 ↔ orange.600',
+  };
+
+  it('reports the actual starting-palette limitation without hiding it', () => {
+    const simulated = buildSimulatedByVision(
+      JSON.parse(fs.readFileSync(PRIMITIVES_FILE, 'utf8'))
+    );
+    const adjacent = VISION_TYPES.slice(1).flatMap((vision) =>
+      ALL_PALETTES.flatMap((palette) =>
+        findConfusableAdjacent(simulated[vision][palette], palette, vision)
+      )
+    );
+    const status = VISION_TYPES.slice(1).flatMap((vision) =>
+      findStatusPairConfusable(simulated[vision], vision)
+    );
+    expect(adjacent).toEqual([]);
+    expect(status).toHaveLength(1);
+    expect(status[0]).toMatchObject({
+      check: 'status-pair',
+      roles: ['success', 'warning'],
+      visionType: 'deuteranopia',
+      shade: '600',
+    });
+    expect(isAcceptedStatusLimitation(status[0])).toBe(true);
+    const report = buildSummary(adjacent, status);
+    expect(report).toContain('0.0169');
+    expect(report).toContain('requires icon + label');
+    expect(report).toContain(
+      '1 accepted status limitation(s); 0 unaccepted finding(s)'
+    );
+  });
+
+  it.each([
+    { check: 'adjacent-shade' },
+    { check: 'chart-pair' },
+    { roles: ['success', 'error'] },
+    { shade: '500' },
+    { visionType: 'protanopia' },
+    { visionType: 'normal' },
+    { deltaE: 0 },
+    { deltaE: Number.NaN },
+    { deltaE: Number.POSITIVE_INFINITY },
+  ])('does not excuse $check $roles $shade $visionType $deltaE', (change) => {
+    expect(isAcceptedStatusLimitation({ ...limitation, ...change })).toBe(
+      false
+    );
+  });
+
+  it('reports identical status colors as an unaccepted finding', () => {
+    expect(buildSummary([], [{ ...limitation, deltaE: 0 }])).toContain(
+      '0 accepted status limitation(s); 1 unaccepted finding(s)'
+    );
   });
 });
 
@@ -278,7 +344,7 @@ describe('findStatusPairConfusable', () => {
   it('flags every status pair when all four converge to one color', () => {
     const same = [120, 120, 120];
     const findings = findStatusPairConfusable(
-      statusPalettes({ red: same, green: same, yellow: same, blue: same }),
+      statusPalettes({ red: same, green: same, orange: same, blue: same }),
       'deuteranopia'
     );
     // 4-choose-2 = 6 pairs; all collapse.
@@ -296,7 +362,7 @@ describe('findStatusPairConfusable', () => {
       statusPalettes({
         red: [255, 0, 0],
         green: [0, 255, 0],
-        yellow: [255, 235, 0],
+        orange: [255, 235, 0],
         blue: [0, 0, 255],
       }),
       'normal'

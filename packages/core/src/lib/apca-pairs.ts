@@ -1,4 +1,4 @@
-import { CHART_LIGHT } from './static-ramps';
+import { CHART_PALETTE_REFERENCES } from './semantic-palette-references';
 
 export type ApcaTier = 'body' | 'ui' | 'incidental';
 
@@ -21,7 +21,9 @@ const FAMILY_PAIRS = [
   'information',
 ] as const;
 
-const CATEGORICAL_INDICES = CHART_LIGHT.map((_, index) => index + 1);
+const CATEGORICAL_INDICES = CHART_PALETTE_REFERENCES.map(
+  (_, index) => index + 1
+);
 
 const FOCUS_SURFACES = [
   'background',

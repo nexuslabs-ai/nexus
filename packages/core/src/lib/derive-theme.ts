@@ -12,7 +12,11 @@ import {
   TIER_THRESHOLDS,
 } from './palette';
 import { rampFromSeed, seedOklch } from './perceptual-ramp';
-import { CHART_DARK, CHART_LIGHT, NEUTRAL, STATUS_RAMP } from './static-ramps';
+import { getPaletteRamp, getPaletteShade } from './primitive-palette';
+import {
+  CHART_PALETTE_REFERENCES,
+  STATUS_PALETTE_FAMILIES,
+} from './semantic-palette-references';
 import {
   anchorToStep,
   DARK_SURFACE_LADDER,
@@ -306,7 +310,7 @@ function apcaSafeAgainstAll(
 
 /** First shade (in `order`) that clears `floor` against `bg`; else the black/white endpoint. */
 function legibleShade(
-  ramp: Record<Shade, string>,
+  ramp: Readonly<Record<Shade, string>>,
   bg: string,
   floor: number,
   order: Shade[]
@@ -316,7 +320,7 @@ function legibleShade(
 }
 
 function legibleShadeAcross(
-  ramp: Record<Shade, string>,
+  ramp: Readonly<Record<Shade, string>>,
   backgrounds: string[],
   floor: number,
   order: Shade[]
@@ -332,7 +336,7 @@ function legibleShadeAcross(
 /** 11 tokens for a named color family (background, foreground, subtle, borders). */
 export function deriveFamily(
   name: string,
-  ramp: Record<Shade, string>,
+  ramp: Readonly<Record<Shade, string>>,
   mode: Mode
 ): TokenMap {
   const dark = mode === 'dark';
@@ -358,12 +362,11 @@ export function deriveFamily(
   };
 }
 
-const STATUS_FAMILIES = ['success', 'warning', 'error', 'information'] as const;
-
 function deriveStatus(mode: Mode, surfaces: TokenMap): TokenMap {
   const out: TokenMap = {};
-  for (const family of STATUS_FAMILIES) {
-    const tokens = deriveFamily(family, STATUS_RAMP[family], mode);
+  for (const [family, palette] of Object.entries(STATUS_PALETTE_FAMILIES)) {
+    const ramp = getPaletteRamp(palette);
+    const tokens = deriveFamily(family, ramp, mode);
 
     if (family === 'error') {
       const subtle = tokens['--nx-color-error-subtle'];
@@ -376,7 +379,7 @@ function deriveStatus(mode: Mode, surfaces: TokenMap): TokenMap {
       }
 
       tokens['--nx-color-error-subtle-foreground'] = legibleShadeAcross(
-        STATUS_RAMP.error,
+        ramp,
         [subtle, background, container],
         TIER_THRESHOLDS.ui,
         mode === 'dark'
@@ -391,11 +394,10 @@ function deriveStatus(mode: Mode, surfaces: TokenMap): TokenMap {
 }
 
 function deriveChart(mode: Mode): TokenMap {
-  const set = mode === 'dark' ? CHART_DARK : CHART_LIGHT;
   return Object.fromEntries(
-    set.map((value, index) => [
+    CHART_PALETTE_REFERENCES.map((reference, index) => [
       `--nx-color-chart-categorical-${index + 1}`,
-      value,
+      getPaletteShade(reference.palette, reference[mode]),
     ])
   );
 }
@@ -434,7 +436,10 @@ function deriveFocus(
   surfaces: TokenMap,
   primary: TokenMap
 ): TokenMap {
-  const errorSeed = STATUS_RAMP.error[mode === 'dark' ? '300' : '600'];
+  const errorSeed = getPaletteShade(
+    STATUS_PALETTE_FAMILIES.error,
+    mode === 'dark' ? '300' : '600'
+  );
   const background =
     surfaces['--nx-color-background'] ??
     (mode === 'dark' ? 'oklch(0 0 0)' : 'oklch(1 0 0)');
@@ -485,14 +490,9 @@ const PRIMARY_DARK_LIFT_EXPONENT = 1.6;
 const PRIMARY_HOVER_STEP = 0.05;
 const PRIMARY_ACTIVE_STEP = 0.1;
 const PRIMARY_ACTIVE_DARK_FILL_STEP = 0.03;
-// Endpoint (achromatic near-black / near-white) brand state fills track the
-// NEUTRAL ramp (single source of truth), so a ramp retune stays in sync.
-const endpointL = (shade: keyof typeof NEUTRAL): number =>
-  seedOklch(NEUTRAL[shade]).l ?? 0;
-const PRIMARY_DARK_ENDPOINT_HOVER_L = endpointL('900');
-const PRIMARY_DARK_ENDPOINT_ACTIVE_L = endpointL('950');
-const PRIMARY_LIGHT_ENDPOINT_HOVER_L = endpointL('100');
-const PRIMARY_LIGHT_ENDPOINT_ACTIVE_L = endpointL('200');
+// Endpoint brand interactions follow the same authored Neutral palette as secondary fills.
+const endpointL = (shade: Shade): number =>
+  seedOklch(getPaletteShade('neutral', shade)).l ?? 0;
 
 function primaryFillLightness(seedL: number, mode: Mode): number {
   if (mode === 'light') return clamp01(Math.min(seedL, PRIMARY_FILL_LIGHT_CAP));
@@ -566,19 +566,17 @@ function stateFillLightness(
 
 function hoverFillTarget(baseL: number): number {
   if (baseL <= PRIMARY_DARK_ENDPOINT_LIFT_FLOOR) {
-    return PRIMARY_DARK_ENDPOINT_HOVER_L;
+    return endpointL('900');
   }
-  if (baseL >= PRIMARY_LIGHT_ENDPOINT_CEIL)
-    return PRIMARY_LIGHT_ENDPOINT_HOVER_L;
+  if (baseL >= PRIMARY_LIGHT_ENDPOINT_CEIL) return endpointL('100');
   return towardMid(baseL, PRIMARY_HOVER_STEP);
 }
 
 function activeFillTarget(baseL: number): number {
   if (baseL <= PRIMARY_DARK_ENDPOINT_LIFT_FLOOR) {
-    return PRIMARY_DARK_ENDPOINT_ACTIVE_L;
+    return endpointL('950');
   }
-  if (baseL >= PRIMARY_LIGHT_ENDPOINT_CEIL)
-    return PRIMARY_LIGHT_ENDPOINT_ACTIVE_L;
+  if (baseL >= PRIMARY_LIGHT_ENDPOINT_CEIL) return endpointL('200');
   return clamp01(
     baseL < 0.5
       ? baseL - PRIMARY_ACTIVE_DARK_FILL_STEP
@@ -630,7 +628,7 @@ export function derivePrimary(accentHex: string, mode: Mode): TokenMap {
 
 export function deriveSecondary(mode: Mode): TokenMap {
   const d = mode === 'dark';
-  const n = NEUTRAL;
+  const n = getPaletteRamp('neutral');
   return {
     '--nx-color-secondary-background': d ? n['900'] : n['100'],
     '--nx-color-secondary-background-hover': d ? n['700'] : n['200'],

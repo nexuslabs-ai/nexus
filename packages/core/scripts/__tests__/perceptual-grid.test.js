@@ -1,8 +1,3 @@
-import fs from 'node:fs';
-import path from 'node:path';
-import { fileURLToPath } from 'node:url';
-import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
-
 import {
   hexToOklchMechanical,
   hexToOklchPinned,
@@ -10,7 +5,11 @@ import {
   isPaletteShadeKey,
   PERCEPTUAL_L_GRID,
   PERCEPTUAL_L_GRID_HUE,
-} from '../lib/perceptual-grid.js';
+} from '@nexus_ds/core/palette';
+import fs from 'node:fs';
+import path from 'node:path';
+import { fileURLToPath } from 'node:url';
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
 const OKLCH_RE = /^oklch\(([-\d.]+) ([-\d.]+) ([-\d.]+)(?: \/ ([\d.]+))?\)$/;
 
@@ -181,7 +180,9 @@ describe('P3 gamut clip warning', () => {
   });
 
   it('warns when chroma drops more than 20% on a shade outside P3 at its pinned L (amber.950 #392402)', () => {
-    hexToOklchPinned('#392402', '950');
+    hexToOklchPinned('#392402', '950', undefined, (message) =>
+      console.warn(message)
+    );
     expect(warnSpy).toHaveBeenCalledTimes(1);
     const message = warnSpy.mock.calls[0][0];
     expect(message).toContain('#392402');
@@ -189,7 +190,9 @@ describe('P3 gamut clip warning', () => {
   });
 
   it('does not warn on shades within P3 at their pinned L', () => {
-    hexToOklchPinned('#3b82f6', '500');
+    hexToOklchPinned('#3b82f6', '500', undefined, (message) =>
+      console.warn(message)
+    );
     expect(warnSpy).not.toHaveBeenCalled();
   });
 });

@@ -20,6 +20,25 @@ pnpm add @nexus_ds/core
 
 See the Nexus docs, Theming -> Appearance, for setup recipes.
 
+## Authored palette lookup
+
+The browser-safe `@nexus_ds/core/palette` entry resolves the same authored palettes used by CSS generation:
+
+```ts
+import { getPaletteRamp, getPaletteShade } from '@nexus_ds/core/palette';
+
+getPaletteShade('green', '600'); // oklch(0.62 0.2233 140.055)
+const neutral = getPaletteRamp('neutral'); // Frozen, readonly shade map
+```
+
+`PrimitivePaletteName` covers the 22 shade families; `Shade` covers 50 through 950. White and Black are singleton colors, not ramps. Existing `PALETTE_KEYS` still identifies only the five surface-tone families. Lookups resolve on first use and cache immutable values; importing the engine does not convert palettes.
+
+`STATUS_PALETTE_FAMILIES` and `CHART_PALETTE_REFERENCES` describe the engine's starting colors. Success uses Green, Warning Orange, Error Red, and Information Blue. Secondary colors and near-black/near-white primary interaction endpoints use Neutral. The contrast solver can adjust these starting colors before emission.
+
+The palette entry also exports the build converters `hexToOklchPinned`, `hexToOklchMechanical`, `hexToSrgbInts`, and `isPaletteShadeKey`, along with their lightness grids. Pinned conversion optionally reports gamut clipping through its fourth argument; runtime lookups do not log. Audit conversion uses unrounded coordinates and rejects transparent inputs that have not been composited.
+
+Custom brand ramps and raw surface-tone references retain their separate algorithms. A palette's processed 600 shade is not interchangeable with its authored hex as a brand seed.
+
 ## Non-React Shell Example
 
 Use the engine directly when a host shell owns DOM or native styling.
@@ -98,7 +117,7 @@ All tokens follow the [Design Tokens Community Group](https://tr.designtokens.or
 
 ### Color generation
 
-Color tokens don't ship the values stored on disk. Source files hold hex; the build converts to OKLCH, pins each shade to a perceptual lightness grid (so the same step is equally light across every palette), and gates every text/surface pair with APCA contrast in CI.
+Color tokens don't ship the values stored on disk. Source files hold hex. Build and runtime share authored-palette conversion: chromatic families use their hue-specific lightness curves and P3 cusp chroma; neutral families use the flat lightness grid and source chroma. Both preserve each authored shade's hue. Runtime semantic text/surface pairs are checked against the registered APCA constraints in CI.
 
 Generated global CSS sets the native browser UI policy alongside the tokens: `:root` advertises light/dark support, `.dark` pins native controls and scrollbars to dark, and the light root stays light when `.dark` is absent. Native checkbox, radio, range, and progress controls use the primary semantic token for `accent-color`; custom Nexus components remain fully token-styled.
 
@@ -125,6 +144,16 @@ at build time.
 ```bash
 pnpm build:tailwind       # Generate @nexus_ds/tailwind package CSS
 ```
+
+This command builds the runtime entries first. Root unit-test commands and the color-vision audit also build core before consuming its compiled exports. Direct Node script invocations require an existing core build.
+
+### Palette parity baseline
+
+`src/lib/palette-parity.fixture.json` was captured before consolidation at commit `3f78877ffa5106e1bd8db0e38c60c52b78b75d5c`. It records all 242 processed shades and audit RGB tuples, the 63 engine starting values, and fixed SHA-256 digests of 700 complete light/dark contracts and their CSS. The contracts cover the default and eight prospective preset seeds, black/white and nearby endpoints, gray, six custom foreground/background examples, five surface tones, five contrast levels, and asymmetric light/dark contrast. The seven generated CSS files have independent digests too. These are preservation assertions, not snapshots to refresh to make a refactor pass.
+
+The color-vision audit reports one existing status limitation: Success/Warning starting shades under deuteranopia require an icon and label. Only that status-role pair at shade 600 is accepted, with finite positive color distance. It remains visible in the report; identical colors, all other findings, adjacent shades, and chart checks receive no exemption. Derived semantic status colors continue to have their own tests.
+
+Appearance snapshot version 13 remains unchanged because this consolidation preserves output. An intentional future palette or curve edit that changes theme colors must invalidate persisted appearance snapshots and regenerate CSS.
 
 ### Output Files
 

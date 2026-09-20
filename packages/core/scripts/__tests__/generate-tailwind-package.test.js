@@ -1,6 +1,7 @@
 import * as engine from '@nexus_ds/core';
 import fs from 'fs';
 import { createRequire } from 'module';
+import { createHash } from 'node:crypto';
 import os from 'os';
 import path from 'path';
 import * as prettier from 'prettier';
@@ -8,6 +9,7 @@ import { compile } from 'tailwindcss';
 import { fileURLToPath } from 'url';
 import { afterAll, beforeAll, describe, expect, it } from 'vitest';
 
+import paletteBaseline from '../../src/lib/palette-parity.fixture.json';
 import { generateTailwindPackage } from '../generate-tailwind-package.js';
 import {
   DEFAULT_CONFIG,
@@ -270,6 +272,20 @@ describe('generateTailwindPackage', () => {
     spacingUtilitiesCSS = read(distDir, 'spacing-utilities.css');
     borderWidthUtilitiesCSS = read(distDir, 'borderwidth-utilities.css');
     borderColorAliasesCSS = read(distDir, 'border-color-aliases.css');
+  });
+
+  it('preserves all seven generated CSS files from the reviewed palette baseline', () => {
+    const files = fs
+      .readdirSync(distDir)
+      .filter((name) => name.endsWith('.css'))
+      .sort();
+    expect(files).toEqual(Object.keys(paletteBaseline.generatedCss).sort());
+    for (const name of files) {
+      const hash = createHash('sha256')
+        .update(read(distDir, name))
+        .digest('hex');
+      expect(hash, name).toBe(paletteBaseline.generatedCss[name]);
+    }
   });
 
   it('emits a :root block in variables.css', () => {
