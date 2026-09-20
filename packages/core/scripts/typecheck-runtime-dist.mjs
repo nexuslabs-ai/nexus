@@ -88,7 +88,17 @@ await writeFile(
   themeToCss,
   type NexusAppearanceState,
 } from '@nexus_ds/core';
-import { getPaletteRamp, getPaletteShade, type PrimitivePaletteName, type Shade } from '@nexus_ds/core/palette';
+import { BRAND_COLOR_PRESETS, getPaletteRamp, getPaletteShade, type BrandColorPreset, type PrimitivePaletteName, type Shade } from '@nexus_ds/core/palette';
+
+const preset: BrandColorPreset | undefined = BRAND_COLOR_PRESETS[0];
+if (preset) {
+  const seed: string = preset.color;
+  // @ts-expect-error public preset colors are immutable.
+  preset.color = '#000000';
+  void seed;
+}
+// @ts-expect-error the preset catalog is immutable.
+BRAND_COLOR_PRESETS.push({ value: 'custom', label: 'Custom', color: '#123456' });
 
 const palette: PrimitivePaletteName = 'green';
 const shade: Shade = '600';

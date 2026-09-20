@@ -33,7 +33,7 @@ import {
 import { Slider } from '../../slider';
 import { Switch } from '../../switch';
 import { ToggleGroup, ToggleGroupItem } from '../../toggle-group';
-import { NexusAppearanceColorField } from '../color-field';
+import { NexusAppearanceBrandColorField } from '../brand-color-field';
 import { NexusAppearanceConfigPreview } from '../config-preview';
 import { useNexusAppearance } from '../provider';
 import { NexusAppearanceSettingRow } from '../setting-row';
@@ -222,7 +222,7 @@ export function NexusAppearanceSettings() {
             label="Brand color"
             description="Primary actions, selected states, and highlights"
           >
-            <NexusAppearanceColorField
+            <NexusAppearanceBrandColorField
               label="Brand color"
               value={state.brandColor}
               onChange={(brandColor) =>

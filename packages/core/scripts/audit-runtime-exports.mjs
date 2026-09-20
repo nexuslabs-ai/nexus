@@ -47,6 +47,7 @@ const EXPECTED_RUNTIME_EXPORTS = [
 ];
 
 const EXPECTED_PALETTE_EXPORTS = [
+  'BRAND_COLOR_PRESETS',
   'CHART_PALETTE_REFERENCES',
   'STATUS_PALETTE_FAMILIES',
   'SHADES',
@@ -95,6 +96,10 @@ const paletteEsm = await import('@nexus_ds/core/palette');
 const paletteCjs = require('@nexus_ds/core/palette');
 assertExports('Palette ESM', paletteEsm, EXPECTED_PALETTE_EXPORTS);
 assertExports('Palette CJS', paletteCjs, EXPECTED_PALETTE_EXPORTS);
+assert.deepEqual(
+  paletteEsm.BRAND_COLOR_PRESETS,
+  paletteCjs.BRAND_COLOR_PRESETS
+);
 for (const name of paletteEsm.PRIMITIVE_PALETTE_NAMES) {
   assert.deepEqual(
     paletteEsm.getPaletteRamp(name),

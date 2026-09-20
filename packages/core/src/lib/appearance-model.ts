@@ -1,3 +1,4 @@
+import { DEFAULT_BRAND_COLOR } from './brand-presets';
 import { normalizeContrast } from './contrast';
 import type { ThemeDerivationInput, ThemeSeeds } from './derive-theme';
 import type { NexusSurfaceTone } from './palette';
@@ -45,7 +46,7 @@ export interface NexusAppearanceState {
   prefs: NexusAppearancePrefs;
 }
 
-export const DEFAULT_BRAND_COLOR = '#0a0a0a';
+export { DEFAULT_BRAND_COLOR } from './brand-presets';
 
 export const BASE_TONE_OPTIONS = [
   { value: 'stone', label: 'Stone', color: '#747271' },
