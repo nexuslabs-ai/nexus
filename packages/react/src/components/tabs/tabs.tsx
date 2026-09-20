@@ -173,7 +173,7 @@ const tabsTriggerVariants = cva(
     'nx:whitespace-nowrap',
     'nx:text-muted-foreground',
     'nx:transition-colors',
-    'nx:focus-visible:outline-2 nx:focus-visible:outline-focus-default nx:focus-visible:outline-offset-(--focus-offset)',
+    'nx:focus-visible:outline-2 nx:focus-visible:outline-focus-default',
     'nx:disabled:pointer-events-none nx:disabled:text-disabled-foreground',
   ],
   {
@@ -281,7 +281,7 @@ function TabsContent({ className, ...props }: TabsContentProps) {
       data-slot="tabs-content"
       className={cn(
         'nx:mt-2',
-        'nx:focus-visible:outline-2 nx:focus-visible:outline-focus-default nx:focus-visible:outline-offset-(--focus-offset)',
+        'nx:focus-visible:outline-2 nx:focus-visible:outline-focus-default',
         className
       )}
       {...props}

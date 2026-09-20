@@ -15,7 +15,7 @@ import {
 const TOC_HEADING_ID = 'docs-toc-heading';
 
 const TOC_LINK_BASE =
-  'nx:block nx:py-1 nx:pl-3 nx:data-[level=3]:pl-6 nx:border-l-2 nx:no-underline nx:typography-label-small nx:rounded-sm nx:transition-colors nx:focus-visible:outline-2 nx:focus-visible:outline-focus-default nx:focus-visible:outline-offset-(--focus-offset)';
+  'nx:block nx:py-1 nx:pl-3 nx:data-[level=3]:pl-6 nx:border-l-2 nx:no-underline nx:typography-label-small nx:rounded-sm nx:transition-colors nx:focus-visible:outline-2 nx:focus-visible:outline-focus-default';
 
 export function RightRail() {
   const pathname = usePathname();

@@ -289,17 +289,14 @@ describe('generateTailwindPackage', () => {
   // outline-focus-* utilities. Default focus falls through to primary accent; error
   // focus keeps its primitive-backed token. The focus paint is shared CSS, while
   // the outline remains the forced-colors fallback.
-  // The outline offset is also tokenised so components share one tune-point.
-  // --focus-offset emits once at :root (not @theme: Tailwind tree-shakes @theme
-  // vars referenced only via arbitrary utilities, #506). The count guard also
-  // catches duplicate emission via the dimension scan (the --breakpoint-* trap).
-  it('promotes focus colours to --color-* and emits --focus-offset plus focus ring CSS', () => {
+  // Offsets are literal at the call site: --focus-offset was deleted with the
+  // last semantic dimension token, so no :root dimension block is emitted.
+  it('promotes focus colours to --color-* and emits focus ring CSS', () => {
     const themeBlock = compactCss(extractBlock(nexusCSS, '@theme inline'));
     expect(themeBlock).toMatch(colorFallbackPattern('focus-default'));
     expect(themeBlock).toMatch(colorFallbackPattern('focus-error'));
-    expect(nexusCSS.match(/--focus-offset:/g)).toHaveLength(1);
-    expect(themeBlock).not.toMatch(/--focus-offset/);
-    expect(nexusCSS).toMatch(/:root\s*\{[^}]*--focus-offset: 2px;[^}]*\}/);
+    expect(nexusCSS).not.toMatch(/--focus-offset/);
+    expect(nexusCSS).not.toMatch(/RUNTIME DIMENSION TOKENS/);
     expect(nexusCSS).toMatch(/\/\* ===== FOCUS RING ===== \*\//);
     expect(nexusCSS).toMatch(
       /\[class~='nx:focus-visible:outline-focus-default'\]:focus-visible/

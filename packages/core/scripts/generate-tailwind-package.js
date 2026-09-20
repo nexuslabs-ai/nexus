@@ -10,17 +10,14 @@ import {
   collectMotionTokens,
   collectRadiusModes,
   collectRadiusTokens,
-  collectSemanticDimensionTokens,
   collectShadowModes,
   collectShadowTokens,
   collectSpacingTokens,
   collectZIndexTokens,
   DEFAULT_CONFIG,
   discoverPrimitives,
-  discoverSemantics,
   ensureDir,
   extractTokens,
-  FILES_WITH_DEDICATED_DIMENSION_COLLECTORS,
   filterDivergentDark,
   formatDistCssFiles,
   formatTokenValue,
@@ -30,7 +27,6 @@ import {
   generateFocusRingCSS,
   generateMotionUtilitiesCSS,
   generateNativeBrowserUIThemeCSS,
-  generateRootDimensionsCSS,
   generateSpacingModesCSS,
   generateSpacingRoleUtilitiesCSS,
   generateThemeCSS,
@@ -133,12 +129,6 @@ function assertPrimitiveFilesExist(primitiveFiles) {
       );
     }
   }
-}
-
-function getSemanticSupportFiles(discovered) {
-  return {
-    standalone: discovered.standalone,
-  };
 }
 
 function assertTokenEngine(engine) {
@@ -446,7 +436,6 @@ function generateVariablesCSS(primitiveTokens, divergentDark, usedModes) {
  * (build-time); the cascade flip happens at runtime via the per-mode blocks.
  */
 function generateNexusCSS(
-  semanticFiles,
   primitiveMap,
   lightSemanticTokens,
   darkSemanticTokens,
@@ -467,21 +456,6 @@ function generateNexusCSS(
     log.success(
       `Generated Google Fonts import for typography mode: ${typographyMode}`
     );
-  }
-
-  // Semantic colors are engine-owned in the Tailwind bundle. Dimension tokens
-  // (e.g. focus.offset) still come from semantic JSON and emit at :root, not
-  // @theme (see generateRootDimensionsCSS / #506).
-  const dimensionTokens = [];
-
-  // Process standalone semantic files for non-color dimensions. Color leaves are
-  // ignored here because the engine registry now owns the Tailwind color surface.
-  for (const standaloneFile of semanticFiles.standalone) {
-    if (!FILES_WITH_DEDICATED_DIMENSION_COLLECTORS.has(standaloneFile)) {
-      dimensionTokens.push(
-        ...collectSemanticDimensionTokens(SEMANTIC_DIR, standaloneFile)
-      );
-    }
   }
 
   // Per-mode spacing — default numerics seed @theme for Tailwind's spacing-utility
@@ -547,8 +521,6 @@ function generateNexusCSS(
     prefixDarkVars: true, // Use --nx-color-* for dark mode overrides
   });
 
-  // Fixed dimension primitives at :root (e.g. --focus-offset) — see #506.
-  css += generateRootDimensionsCSS(dimensionTokens);
   css += generateFocusRingCSS();
 
   // Per-mode spacing override blocks (`:root, [data-density="<default>"]` for
@@ -602,8 +574,6 @@ export async function generateTailwindPackage(
   };
 
   const discoveredPrimitives = discoverPrimitives(PRIMITIVES_DIR);
-  const discoveredSemantics = discoverSemantics(SEMANTIC_DIR);
-  const semanticFiles = getSemanticSupportFiles(discoveredSemantics);
   const { baseTone, lightSemanticTokens, darkSemanticTokens } =
     deriveEngineSemanticTokens(config, tokenEngine);
 
@@ -692,7 +662,6 @@ export async function generateTailwindPackage(
     borderwidthModes: collectBorderwidthModes(TOKENS_DIR),
   };
   const nexusCSS = generateNexusCSS(
-    semanticFiles,
     primitiveMap,
     lightSemanticTokens,
     darkSemanticTokens,

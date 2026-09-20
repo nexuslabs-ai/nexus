@@ -157,7 +157,7 @@ const overlayCloseButtonClassName = [
   'nx:motion-reduce:transition-none',
   'nx:hover:bg-container-hover nx:hover:text-foreground',
   'nx:focus-visible:bg-container-hover nx:focus-visible:text-foreground',
-  'nx:focus-visible:outline-2 nx:focus-visible:outline-focus-default nx:focus-visible:outline-offset-(--focus-offset)',
+  'nx:focus-visible:outline-2 nx:focus-visible:outline-focus-default',
   'nx:disabled:pointer-events-none',
 ].join(' ');
 

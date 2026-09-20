@@ -842,7 +842,7 @@ export const InScrollContainer: Story = {
       aria-label="Conversation"
       // eslint-disable-next-line jsx-a11y/no-noninteractive-tabindex -- axe requires a scrollable region to be keyboard-reachable (scrollable-region-focusable), which is the behaviour this story exists to prove
       tabIndex={0}
-      className="nx:h-56 nx:w-full nx:max-w-md nx:overflow-y-auto nx:rounded-md nx:border-default nx:border-border-default nx:px-3 nx:py-4 nx:focus-visible:outline-2 nx:focus-visible:outline-focus-default nx:focus-visible:outline-offset-(--focus-offset)"
+      className="nx:h-56 nx:w-full nx:max-w-md nx:overflow-y-auto nx:rounded-md nx:border-default nx:border-border-default nx:px-3 nx:py-4 nx:focus-visible:outline-2 nx:focus-visible:outline-focus-default"
     >
       <BubbleGroup>
         <Bubble align="start">
@@ -915,7 +915,7 @@ export const InScrollContainer: Story = {
 // ============================================
 
 const receiptIconClassName =
-  'nx:inline-flex nx:size-5 nx:shrink-0 nx:cursor-pointer nx:items-center nx:justify-center nx:rounded-sm nx:opacity-70 nx:transition-opacity nx:duration-faster nx:hover:opacity-100 nx:focus-visible:outline-2 nx:focus-visible:outline-focus-default nx:focus-visible:outline-offset-(--focus-offset) nx:[&_svg]:size-4';
+  'nx:inline-flex nx:size-5 nx:shrink-0 nx:cursor-pointer nx:items-center nx:justify-center nx:rounded-sm nx:opacity-70 nx:transition-opacity nx:duration-faster nx:hover:opacity-100 nx:focus-visible:outline-2 nx:focus-visible:outline-focus-default nx:[&_svg]:size-4';
 
 export const WithTooltip: Story = {
   render: () => (

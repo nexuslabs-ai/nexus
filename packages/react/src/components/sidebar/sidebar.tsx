@@ -658,7 +658,7 @@ function SidebarGroupLabel({
     <Comp
       data-slot="sidebar-group-label"
       className={cn(
-        'nx:flex nx:h-8 nx:shrink-0 nx:items-center nx:rounded-md nx:px-2 nx:typography-label-small nx:text-nav-muted-foreground nx:transition-[margin,opacity] nx:duration-default nx:ease-linear nx:motion-reduce:transition-none nx:focus-visible:outline-2 nx:focus-visible:outline-focus-default nx:focus-visible:outline-offset-(--focus-offset) nx:[&>svg]:size-4 nx:[&>svg]:shrink-0',
+        'nx:flex nx:h-8 nx:shrink-0 nx:items-center nx:rounded-md nx:px-2 nx:typography-label-small nx:text-nav-muted-foreground nx:transition-[margin,opacity] nx:duration-default nx:ease-linear nx:motion-reduce:transition-none nx:focus-visible:outline-2 nx:focus-visible:outline-focus-default nx:[&>svg]:size-4 nx:[&>svg]:shrink-0',
         'nx:group-data-[collapsible=icon]:-mt-8 nx:group-data-[collapsible=icon]:opacity-0',
         className
       )}
@@ -697,7 +697,7 @@ function SidebarGroupAction({
     <Comp
       data-slot="sidebar-group-action"
       className={cn(
-        'nx:absolute nx:top-3.5 nx:right-3 nx:flex nx:aspect-square nx:w-5 nx:items-center nx:justify-center nx:rounded-md nx:p-0 nx:text-nav-foreground nx:hover:bg-nav-item-hover nx:focus-visible:outline-2 nx:focus-visible:outline-focus-default nx:focus-visible:outline-offset-(--focus-offset) nx:[&>svg]:size-4 nx:[&>svg]:shrink-0',
+        'nx:absolute nx:top-3.5 nx:right-3 nx:flex nx:aspect-square nx:w-5 nx:items-center nx:justify-center nx:rounded-md nx:p-0 nx:text-nav-foreground nx:hover:bg-nav-item-hover nx:focus-visible:outline-2 nx:focus-visible:outline-focus-default nx:[&>svg]:size-4 nx:[&>svg]:shrink-0',
         // Enlarges the hit area on coarse (touch) pointers.
         'nx:pointer-coarse:after:absolute nx:pointer-coarse:after:-inset-2',
         'nx:group-data-[collapsible=icon]:hidden',
@@ -787,7 +787,7 @@ const sidebarMenuButtonVariants = cva(
     'nx:group-has-data-[slot=sidebar-menu-action]/menu-item:pr-8 nx:group-data-[collapsible=icon]:size-8',
     'nx:group-data-[collapsible=icon]:justify-center nx:group-data-[collapsible=icon]:[&>span]:sr-only nx:group-data-[collapsible=icon]:[&>svg:not(:first-child)]:hidden',
     'nx:hover:bg-nav-item-hover nx:active:bg-nav-item-active',
-    'nx:focus-visible:outline-2 nx:focus-visible:outline-focus-default nx:focus-visible:outline-offset-(--focus-offset)',
+    'nx:focus-visible:outline-2 nx:focus-visible:outline-focus-default',
     'nx:disabled:pointer-events-none nx:disabled:text-disabled-foreground nx:aria-disabled:pointer-events-none nx:aria-disabled:text-disabled-foreground',
     'nx:data-[active=true]:bg-nav-item-active nx:data-[active=true]:text-nav-foreground',
     'nx:data-[state=open]:hover:bg-nav-item-hover',
@@ -932,7 +932,7 @@ function SidebarMenuAction({
     <Comp
       data-slot="sidebar-menu-action"
       className={cn(
-        'nx:absolute nx:top-1.5 nx:right-1 nx:flex nx:aspect-square nx:w-5 nx:items-center nx:justify-center nx:rounded-md nx:p-0 nx:text-nav-foreground nx:hover:bg-nav-item-hover nx:focus-visible:outline-2 nx:focus-visible:outline-focus-default nx:focus-visible:outline-offset-(--focus-offset) nx:[&>svg]:size-4 nx:[&>svg]:shrink-0',
+        'nx:absolute nx:top-1.5 nx:right-1 nx:flex nx:aspect-square nx:w-5 nx:items-center nx:justify-center nx:rounded-md nx:p-0 nx:text-nav-foreground nx:hover:bg-nav-item-hover nx:focus-visible:outline-2 nx:focus-visible:outline-focus-default nx:[&>svg]:size-4 nx:[&>svg]:shrink-0',
         // Enlarges the hit area on coarse (touch) pointers.
         'nx:pointer-coarse:after:absolute nx:pointer-coarse:after:-inset-2',
         'nx:peer-data-[size=sm]/menu-button:top-1',
@@ -1128,7 +1128,7 @@ function SidebarMenuSubButton({
       data-active={isActive}
       aria-current={isActive ? 'page' : undefined}
       className={cn(
-        'nx:flex nx:h-7 nx:min-w-0 nx:-translate-x-px nx:items-center nx:gap-2 nx:overflow-hidden nx:rounded-md nx:px-2 nx:text-nav-muted-foreground nx:outline-hidden nx:hover:bg-nav-item-hover nx:focus-visible:outline-2 nx:focus-visible:outline-focus-default nx:focus-visible:outline-offset-(--focus-offset) nx:active:bg-nav-item-active nx:disabled:pointer-events-none nx:disabled:text-disabled-foreground nx:aria-disabled:pointer-events-none nx:aria-disabled:text-disabled-foreground nx:[&>span:last-child]:truncate nx:[&>svg]:size-4 nx:[&>svg]:shrink-0',
+        'nx:flex nx:h-7 nx:min-w-0 nx:-translate-x-px nx:items-center nx:gap-2 nx:overflow-hidden nx:rounded-md nx:px-2 nx:text-nav-muted-foreground nx:outline-hidden nx:hover:bg-nav-item-hover nx:focus-visible:outline-2 nx:focus-visible:outline-focus-default nx:active:bg-nav-item-active nx:disabled:pointer-events-none nx:disabled:text-disabled-foreground nx:aria-disabled:pointer-events-none nx:aria-disabled:text-disabled-foreground nx:[&>span:last-child]:truncate nx:[&>svg]:size-4 nx:[&>svg]:shrink-0',
         'nx:data-[active=true]:bg-nav-item-active nx:data-[active=true]:text-nav-foreground',
         size === 'sm' && 'nx:typography-body-small',
         size === 'md' && 'nx:typography-body-default',

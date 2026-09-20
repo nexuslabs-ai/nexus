@@ -102,7 +102,7 @@ export function useMDXComponents(components: MDXComponents): MDXComponents {
         // A scroll container with no focusable children needs its own tab stop.
         // eslint-disable-next-line jsx-a11y/no-noninteractive-tabindex
         tabIndex={0}
-        className="nx:mb-4 nx:overflow-x-auto nx:focus-visible:outline-2 nx:focus-visible:outline-focus-default nx:focus-visible:outline-offset-(--focus-offset)"
+        className="nx:mb-4 nx:overflow-x-auto nx:focus-visible:outline-2 nx:focus-visible:outline-focus-default"
       >
         <table
           className={cn(

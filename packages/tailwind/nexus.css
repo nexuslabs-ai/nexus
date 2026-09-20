@@ -985,11 +985,6 @@
   --nx-color-popover-backdrop: oklch(0.13 0.006 70 / 0.9098);
 }
 
-/* ===== RUNTIME DIMENSION TOKENS ===== */
-:root {
-  --focus-offset: 2px;
-}
-
 /* ===== FOCUS RING ===== */
 [data-slot='input'][data-variant='bordered'],
 [data-slot='sidebar-input'][data-variant='bordered'],
@@ -1210,7 +1205,7 @@
   [data-slot='button'][class~='nx:aria-invalid:focus-visible:outline-focus-error'][aria-invalid='true']:focus-visible {
     --tw-outline-style: solid !important;
     outline-color: Highlight !important;
-    outline-offset: var(--focus-offset) !important;
+    outline-offset: 0 !important;
     outline-style: solid !important;
     outline-width: 2px !important;
     box-shadow: none !important;

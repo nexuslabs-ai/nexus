@@ -639,34 +639,29 @@ describe('utils', () => {
   }
 
   describe('discoverSemantics', () => {
-    it('routes spacing-*.json into perModeFiles.spacing (not standalone)', () => {
+    it('buckets spacing-*.json by mode and ignores every other file', () => {
       withSpacingModesFixture(
         {
           default: { spacing: {} },
           tight: { spacing: {} },
         },
         (dir) => {
-          // Also write a true standalone to confirm the partition.
+          // A non-spacing semantic file must not land in any bucket.
           fs.writeFileSync(
-            path.join(dir, 'focus.json'),
-            JSON.stringify({
-              offset: { $value: { value: 2, unit: 'px' }, $type: 'dimension' },
-            })
+            path.join(dir, 'z-index.json'),
+            JSON.stringify({ modal: { $value: 50, $type: 'number' } })
           );
 
           const result = discoverSemantics(dir);
 
-          expect(result.perModeFiles).toEqual({
-            spacing: {
-              default: 'spacing-default.json',
-              tight: 'spacing-tight.json',
+          expect(result).toEqual({
+            perModeFiles: {
+              spacing: {
+                default: 'spacing-default.json',
+                tight: 'spacing-tight.json',
+              },
             },
           });
-          expect(result.standalone).toEqual(['focus.json']);
-          // Confirm spacing files did NOT leak into standalone — without
-          // this gate they'd get double-emitted by the generic dimension scan.
-          expect(result.standalone).not.toContain('spacing-default.json');
-          expect(result.standalone).not.toContain('spacing-tight.json');
         }
       );
     });
@@ -674,7 +669,7 @@ describe('utils', () => {
     it('returns empty perModeFiles when no spacing-*.json files are present', () => {
       const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'nexus-disc-test-'));
       try {
-        fs.writeFileSync(path.join(dir, 'focus.json'), JSON.stringify({}));
+        fs.writeFileSync(path.join(dir, 'z-index.json'), JSON.stringify({}));
         const result = discoverSemantics(dir);
         expect(result.perModeFiles).toEqual({});
       } finally {

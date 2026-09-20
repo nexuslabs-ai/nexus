@@ -18,20 +18,8 @@ describe('semantic token shape', () => {
     expect(semanticFiles('base')).toEqual([]);
     expect(semanticFiles('theme')).toEqual([]);
     expect(semanticFiles('chart-categorical')).toEqual([]);
-  });
-
-  it('keeps focus as a dimension-only semantic file', () => {
-    const focus = JSON.parse(
-      fs.readFileSync(path.join(SEMANTIC_DIR, 'focus.json'), 'utf8')
-    );
-
-    expect(focus).toEqual({
-      focus: {
-        offset: {
-          $value: { value: 2, unit: 'px' },
-          $type: 'dimension',
-        },
-      },
-    });
+    // focus.offset was the last literal dimension in semantic/; its removal
+    // retired the generic standalone-dimension scan with it.
+    expect(fs.existsSync(path.join(SEMANTIC_DIR, 'focus.json'))).toBe(false);
   });
 });

@@ -283,16 +283,16 @@ export function discoverPrimitives(primitivesDir) {
 }
 
 /**
- * Discover semantic token files from the file system, partitioning
- * spacing-mode files (spacing-{mode}.json) into perModeFiles from plain
- * standalone files ({name}.json).
+ * Discover semantic token files from the file system, bucketing spacing-mode
+ * files (spacing-{mode}.json) by mode. Every other semantic file is read by a
+ * dedicated collector that names it directly, so only the per-mode categories
+ * need discovering.
  *
  * @param {string} semanticDir - Path to semantic directory
- * @returns {object} { standalone: string[], perModeFiles: { category: { mode: filename } } }
+ * @returns {object} { perModeFiles: { category: { mode: filename } } }
  */
 export function discoverSemantics(semanticDir) {
   const result = {
-    standalone: [],
     // Bucket for per-mode semantic categories. Keyed by category so a future
     // per-mode category (e.g. per-mode color shading) lands as a sibling key
     // here. Detection of new categories still requires a regex branch below —
@@ -308,24 +308,18 @@ export function discoverSemantics(semanticDir) {
 
   // Pattern for spacing-mode files: spacing-{mode}.json. Their values are
   // direct px (no `{N}` refs) and emit per-mode `[data-density="X"]` blocks via
-  // `collectSpacingTokens` — they intentionally bypass the generic
-  // standalone-dimension scan, which would otherwise emit each file's keys
-  // into `@theme` once per mode and last-write-wins.
+  // `collectSpacingTokens`.
   const spacingModePattern = /^spacing-([a-z]+)\.json$/;
 
   for (const file of files) {
     const spacingMatch = file.match(spacingModePattern);
-    if (spacingMatch) {
-      const [, mode] = spacingMatch;
-      if (!result.perModeFiles.spacing) {
-        result.perModeFiles.spacing = {};
-      }
-      result.perModeFiles.spacing[mode] = file;
-      continue;
-    }
+    if (!spacingMatch) continue;
 
-    // Standalone file (not a spacing mode)
-    result.standalone.push(file);
+    const [, mode] = spacingMatch;
+    if (!result.perModeFiles.spacing) {
+      result.perModeFiles.spacing = {};
+    }
+    result.perModeFiles.spacing[mode] = file;
   }
 
   return result;
@@ -1664,85 +1658,6 @@ export function collectShadowTokens(tokensDir, primitiveMap) {
 }
 
 /**
- * Files in `semanticFiles.standalone` that own a dedicated dimension collector.
- * Callers iterating standalone files for the generic `collectSemanticDimensionTokens`
- * scan MUST skip these to avoid duplicate emission of the same `--*` variable
- * from two different code paths.
- *
- *   breakpoints.json → collectBreakpointsTokens (literal {value, unit})
- *   z-index.json     → collectZIndexTokens  ($type: number, not dimension)
- *
- * Spacing files (`spacing-{mode}.json`) are NOT in this list — `discoverSemantics`
- * routes them into the `perModeFiles.spacing` bucket so they never enter
- * `standalone` in the first place.
- */
-export const FILES_WITH_DEDICATED_DIMENSION_COLLECTORS = new Set([
-  'breakpoints.json',
-  'z-index.json',
-]);
-
-/**
- * Collect literal-valued `$type: dimension` leaves from a token file and
- * emit them with the path as the CSS-variable name — e.g. `focus.offset` →
- * `--focus-offset`. Skips the `color-` prefix so the path drives the variable
- * name directly.
- *
- * Filter behavior:
- * - `$type: dimension` only.
- * - Reference-valued dimensions (`"$value": "{spacing.0}"`) are skipped here;
- *   they are emitted by their owning collector instead.
- * - Literal-valued dimensions in files that ALSO have a dedicated collector
- *   (breakpoints.json's `{value, unit}` literals) are NOT skipped by this
- *   function — that gating is the caller's responsibility via
- *   `FILES_WITH_DEDICATED_DIMENSION_COLLECTORS`.
- *
- * Self-namespacing: because no category prefix is added, top-level keys in the
- * input file must self-namespace their CSS variable name (e.g. `focus.offset`
- * → `--focus-offset` is fine; a bare top-level `offset`/`padding`/`gap` would
- * collide with Tailwind utility namespaces).
- *
- * @param {string} semanticDir - Path to semantic directory
- * @param {string} fileName - Semantic token file name
- * @returns {object[]} Array of { cssName, value }
- */
-export function collectSemanticDimensionTokens(semanticDir, fileName) {
-  const filePath = path.join(semanticDir, fileName);
-  if (!fs.existsSync(filePath)) {
-    throw new Error(`Semantic file missing: ${filePath}`);
-  }
-
-  const tokenData = readTokenFile(filePath);
-  const tokens = [];
-
-  function extractPaths(obj, pathParts = []) {
-    for (const [key, value] of Object.entries(obj)) {
-      if (key.startsWith('$')) continue;
-
-      const currentPath = [...pathParts, key];
-
-      if (
-        value.$value !== undefined &&
-        value.$type === 'dimension' &&
-        !isReference(value.$value)
-      ) {
-        const cssName = currentPath.join('-');
-        const resolvedValue = formatTokenValue(value.$value, 'dimension');
-        tokens.push({ cssName, value: resolvedValue });
-      } else if (typeof value === 'object' && !Array.isArray(value)) {
-        extractPaths(value, currentPath);
-      }
-    }
-  }
-
-  extractPaths(tokenData);
-  return tokens;
-}
-
-// ============================================
-// THEME CSS GENERATION
-// ============================================
-
-/**
  * Generate @theme CSS block for Tailwind
  * This is the shared function used by generate-tailwind-package.js
  *
@@ -1751,7 +1666,7 @@ export function collectSemanticDimensionTokens(semanticDir, fileName) {
  * @param {string} [config.googleFontsImport] - Google Fonts @import statement
  * @param {string[]} config.imports - CSS imports (e.g., ['tailwindcss', './variables.css'])
  * @param {string} [config.tailwindPrefix='nx'] - Tailwind prefix
- * @param {object[]} config.semanticTokens - Array of { cssName, value } for semantic colours (dimensions emit at :root via generateRootDimensionsCSS)
+ * @param {object[]} config.semanticTokens - Array of { cssName, value } for semantic colours
  * @param {object[]} config.spacingTokens - Array of { cssName, value } for numeric spacing (default baseline; per-mode overrides live outside @theme)
  * @param {object[]} config.radiusTokens - Array of { cssName, varRef } for radius
  * @param {object[]} config.borderwidthTokens - Array of { cssName, varRef } for borderwidth
@@ -1905,28 +1820,6 @@ export function generateThemeCSS(config) {
     css += `}\n`;
   }
 
-  return css;
-}
-
-/**
- * Emit fixed dimension primitives (e.g. --focus-offset) as a `:root {}` block.
- *
- * Kept out of @theme: they're consumed only via arbitrary utilities like
- * `outline-offset-(--focus-offset)`, which Tailwind doesn't track as @theme
- * usage and therefore tree-shakes from the runtime cascade (#506).
- *
- * @param {object[]} dimensionTokens - Array of { cssName, value }
- * @returns {string} CSS `:root {}` block, or '' when empty
- */
-export function generateRootDimensionsCSS(dimensionTokens = []) {
-  if (dimensionTokens.length === 0) return '';
-
-  let css = `\n/* ===== RUNTIME DIMENSION TOKENS ===== */\n`;
-  css += `:root {\n`;
-  for (const token of dimensionTokens) {
-    css += `  --${token.cssName}: ${token.value};\n`;
-  }
-  css += `}\n`;
   return css;
 }
 
@@ -2171,7 +2064,7 @@ ${buttonErrorSelectors} {
   ${allSelectors} {
     --tw-outline-style: solid !important;
     outline-color: Highlight !important;
-    outline-offset: var(--focus-offset) !important;
+    outline-offset: 0 !important;
     outline-style: solid !important;
     outline-width: 2px !important;
     box-shadow: none !important;

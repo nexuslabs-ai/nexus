@@ -60,7 +60,7 @@ function Checkbox({ className, ...props }: CheckboxProps) {
         'nx:pointer-coarse:after:absolute nx:pointer-coarse:after:-inset-3.5',
         'nx:rounded-sm nx:border-default nx:border-border-default nx:bg-container',
         'nx:transition-colors',
-        'nx:focus-visible:outline-2 nx:focus-visible:outline-focus-default nx:focus-visible:outline-offset-(--focus-offset)',
+        'nx:focus-visible:outline-2 nx:focus-visible:outline-focus-default',
         'nx:aria-invalid:border-border-error nx:aria-invalid:focus-visible:outline-focus-error',
         'nx:disabled:cursor-not-allowed nx:disabled:border-border-disabled nx:disabled:bg-disabled',
         'nx:enabled:data-[state=unchecked]:hover:bg-container-hover nx:enabled:data-[state=unchecked]:active:bg-container-active',

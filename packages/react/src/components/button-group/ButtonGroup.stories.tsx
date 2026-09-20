@@ -311,9 +311,6 @@ export const AsChild: Story = {
     await expect(link).toHaveAttribute('data-slot', 'button-group-text');
     await expect(link).toHaveClass('nx:focus-visible:outline-2');
     await expect(link).toHaveClass('nx:focus-visible:outline-focus-default');
-    await expect(link).toHaveClass(
-      'nx:focus-visible:outline-offset-(--focus-offset)'
-    );
     await expect(link).toHaveClass('nx:transition-colors');
     await expect(link).toHaveClass('nx:duration-fast');
     await expect(link).toHaveClass('nx:motion-reduce:transition-none');
