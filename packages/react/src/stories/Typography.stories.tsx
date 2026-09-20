@@ -1,5 +1,5 @@
 import type { Meta, StoryObj } from '@storybook/react';
-import { expect, waitFor } from 'storybook/test';
+import { expect, waitFor, within } from 'storybook/test';
 
 import {
   tokenValue,
@@ -322,6 +322,73 @@ export const ScaledLineHeightXXS: Story = {
 
 export const FontFamilies: Story = {
   render: () => <FontFamiliesStory />,
+};
+
+/** Asserts the caps line box resolves to `expected` at the story's `uiFontSize`. */
+async function expectCapsLineHeight(
+  canvasElement: HTMLElement,
+  expected: string
+) {
+  const label = within(canvasElement).getByTestId('label-caps');
+
+  await waitFor(() =>
+    expect(
+      getComputedStyle(label)
+        .getPropertyValue('--nx-typography-line-height-xxs')
+        .trim()
+    ).toBe(expected)
+  );
+  expect(getComputedStyle(label).lineHeight).toBe(expected);
+
+  return label;
+}
+
+export const LabelCapsLineHeight: Story = {
+  globals: { uiFontSize: 14 },
+  render: () => (
+    <div className="nx:flex nx:flex-col nx:items-start">
+      <span
+        data-testid="label-caps"
+        className="nx:typography-label-caps nx:text-muted-foreground nx:uppercase"
+      >
+        Label caps
+      </span>
+    </div>
+  ),
+  play: async ({ canvasElement }) => {
+    await expectCapsLineHeight(canvasElement, '12px');
+  },
+};
+
+export const ScaledLabelCapsLineHeight: Story = {
+  ...LabelCapsLineHeight,
+  globals: { uiFontSize: 28 },
+  play: async ({ canvasElement }) => {
+    await expectCapsLineHeight(canvasElement, '24px');
+  },
+};
+
+export const WrappedLabelCapsLineHeight: Story = {
+  globals: { uiFontSize: 14 },
+  render: () => (
+    <div className="nx:flex nx:w-40 nx:flex-col nx:items-start">
+      <span
+        data-testid="label-caps"
+        className="nx:typography-label-caps nx:text-muted-foreground nx:uppercase"
+      >
+        Container — p-container, gap-container
+      </span>
+    </div>
+  ),
+  play: async ({ canvasElement }) => {
+    const label = await expectCapsLineHeight(canvasElement, '12px');
+    const lineHeight = Number.parseFloat(getComputedStyle(label).lineHeight);
+
+    // Guards the fixture: under two line boxes means it stopped wrapping.
+    expect(label.getBoundingClientRect().height).toBeGreaterThanOrEqual(
+      lineHeight * 2
+    );
+  },
 };
 
 export const CompositeUtilities: Story = {

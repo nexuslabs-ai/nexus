@@ -586,6 +586,14 @@ describe('generateTailwindPackage', () => {
     expect(rootBlock).toMatch(/--nx-typography-line-height-xxs: 12px;/);
   });
 
+  it('maps compact caps labels to the xxs line-height without changing font size', () => {
+    const block = extractBlock(typographyCSS, '@utility typography-label-caps');
+    expect(block).toMatch(
+      /line-height: var\(--nx-typography-line-height-xxs\);/
+    );
+    expect(block).toMatch(/font-size: var\(--nx-typography-size-xxs\);/);
+  });
+
   // The breakpoint tokens are owned by collectBreakpointsTokens; the generic
   // standalone-semantic dimension scan must skip breakpoints.json to avoid
   // double-emission. Asserting exactly one declaration per breakpoint guards
