@@ -452,6 +452,33 @@ export const KeyboardInteraction: Story = {
   },
 };
 
+/**
+ * Bug 2 from #726: the focus gap used to be painted as an opaque
+ * `0 0 0 2px var(--color-background)` shadow band, so on a `container` or
+ * popover surface it showed the page background instead of the real one.
+ * `outline-offset` leaves the gap transparent.
+ */
+export const FocusGapOnContainer: Story = {
+  render: () => (
+    <div className="nx:bg-container nx:rounded-md nx:p-6">
+      <Button>On container</Button>
+    </div>
+  ),
+  play: async ({ canvasElement }) => {
+    const button = within(canvasElement).getByRole('button');
+
+    await userEvent.tab();
+    await expect(button).toHaveFocus();
+
+    const styles = getComputedStyle(button);
+    await expect(styles.outlineStyle).toBe('solid');
+    await expect(styles.outlineWidth).toBe('2px');
+    await expect(styles.outlineOffset).toBe('2px');
+    // No shadow means nothing is painting into the gap.
+    await expect(styles.boxShadow).toBe('none');
+  },
+};
+
 export const FocusManagement: Story = {
   args: {
     children: 'Focus me',
@@ -467,8 +494,14 @@ export const FocusManagement: Story = {
     await userEvent.tab();
     await expect(button).toHaveFocus();
 
-    await expect(getComputedStyle(button).outlineOffset).toBe('2px');
-    await expect(getComputedStyle(button).boxShadow).toContain('4px');
+    // The ring is a real outline with a transparent 2px gap, so the gap shows
+    // whatever surface the button sits on rather than an opaque page-background
+    // band painted by a box-shadow.
+    const focusStyles = getComputedStyle(button);
+    await expect(focusStyles.outlineOffset).toBe('2px');
+    await expect(focusStyles.outlineStyle).toBe('solid');
+    await expect(focusStyles.outlineWidth).toBe('2px');
+    await expect(focusStyles.boxShadow).toBe('none');
 
     // Shift+Tab should blur
     await userEvent.tab({ shift: true });

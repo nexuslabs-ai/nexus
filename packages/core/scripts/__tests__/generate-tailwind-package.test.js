@@ -298,50 +298,30 @@ describe('generateTailwindPackage', () => {
     expect(nexusCSS).not.toMatch(/--focus-offset/);
     expect(nexusCSS).not.toMatch(/RUNTIME DIMENSION TOKENS/);
     expect(nexusCSS).toMatch(/\/\* ===== FOCUS RING ===== \*\//);
-    expect(nexusCSS).toMatch(
-      /\[class~='nx:focus-visible:outline-focus-default'\]:focus-visible/
-    );
-    expect(nexusCSS).toMatch(
-      /\[data-slot='input'\]\[class~='nx:focus-visible:outline-focus-default'\]:focus-visible/
-    );
-    expect(nexusCSS).toMatch(
-      /\[data-slot='input'\]\[data-variant='bordered'\]/
-    );
-    expect(nexusCSS).toMatch(
-      /box-shadow:\s*inset 0 0 0 1px var\(--color-border-default\);/
-    );
-    expect(nexusCSS).toMatch(/\[data-slot='input'\]\[aria-invalid='true'\]/);
-    expect(nexusCSS).toMatch(
-      /box-shadow:\s*inset 0 0 0 1px var\(--color-border-error\);/
-    );
+
+    // InputOTP is the only surface still shadow-painted (#727).
     expect(nexusCSS).toMatch(/\[data-slot='input-otp-slot'\]/);
     expect(nexusCSS).toMatch(/inset -1px 0 0 var\(--color-border-default\)/);
-    expect(nexusCSS).toMatch(
-      /\[data-slot='sidebar-input'\]\[class~='nx:focus-visible:outline-focus-default'\]:focus-visible[\s\S]*?\{[\s\S]*?border-color:\s*transparent\s*!important;[\s\S]*?border-width:\s*0;[\s\S]*?box-shadow:\s*[\s\S]*?inset 0 0 0 1px var\(--color-focus-default\),[\s\S]*?0 0 0 1px var\(--color-focus-default\);[\s\S]*?\}/
-    );
-    expect(nexusCSS).toMatch(
-      /\[data-slot='button'\]\[class~='nx:focus-visible:outline-focus-default'\]:focus-visible/
-    );
-    expect(nexusCSS).toMatch(/border-color:\s*transparent\s*!important;/);
-    expect(nexusCSS).toMatch(
-      /\[data-slot='sidebar-input'\]\[class~='nx:aria-invalid:focus-visible:outline-focus-error'\]\[aria-invalid='true'\]:focus-visible[\s\S]*?\{[\s\S]*?border-color:\s*transparent\s*!important;[\s\S]*?border-width:\s*0;[\s\S]*?box-shadow:\s*[\s\S]*?inset 0 0 0 1px var\(--color-focus-error\),[\s\S]*?0 0 0 1px var\(--color-focus-error\);[\s\S]*?\}/
-    );
-    expect(nexusCSS).toMatch(
-      /\[data-slot='input-group-control'\]\[class~='nx:focus-visible:outline-focus-default'\]:focus-visible[\s\S]*?\{[\s\S]*?outline-style:\s*none\s*!important;[\s\S]*?box-shadow:\s*none;[\s\S]*?\}/
-    );
-    expect(nexusCSS).toMatch(/outline-style:\s*none\s*!important;/);
-    expect(nexusCSS).toMatch(/0 0 0 2px var\(--color-focus-default\);/);
     expect(nexusCSS).toMatch(/inset 0 0 0 1px var\(--color-focus-default\),/);
-    expect(nexusCSS).toMatch(/0 0 0 1px var\(--color-focus-default\);/);
-    expect(nexusCSS).toMatch(/inset 0 0 0 1px var\(--color-focus-error\),/);
-    expect(nexusCSS).toMatch(/0 0 0 1px var\(--color-focus-error\);/);
-    expect(nexusCSS).toMatch(/border-width:\s*0;/);
-    expect(nexusCSS).not.toMatch(/border-width:\s*2px;/);
-    expect(nexusCSS).toMatch(/0 0 0 2px var\(--color-background\),/);
-    expect(nexusCSS).toMatch(/0 0 0 4px var\(--color-focus-default\);/);
-    expect(nexusCSS).not.toMatch(/0 0 0 8px var\(--color-focus-default\);/);
+
+    // Fields, buttons and controls own their border + outline in component CSS.
+    expect(nexusCSS).not.toMatch(
+      /\[data-slot='input'\]\[data-variant='bordered'\]/
+    );
+    expect(nexusCSS).not.toMatch(/\[data-slot='sidebar-input'\]/);
+    expect(nexusCSS).not.toMatch(
+      /\[data-slot='button'\]\[class~='nx:focus-visible:outline-focus-default'\]/
+    );
+    expect(nexusCSS).not.toMatch(
+      /box-shadow:\s*inset 0 0 0 1px var\(--color-border-error\);/
+    );
+    expect(nexusCSS).not.toMatch(/0 0 0 2px var\(--color-background\),/);
+    expect(nexusCSS).not.toMatch(/0 0 0 4px var\(--color-focus-default\);/);
+
+    // Forced colors keeps the system Highlight ring.
     expect(nexusCSS).toMatch(/@media \(forced-colors: active\)/);
     expect(nexusCSS).toMatch(/border-color:\s*CanvasText\s*!important;/);
+    expect(nexusCSS).toMatch(/outline-color:\s*Highlight\s*!important;/);
     expect(nexusCSS).toMatch(/outline-style:\s*solid\s*!important;/);
     expect(nexusCSS).not.toMatch(/--shadow-focus-/);
   });

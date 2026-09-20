@@ -6,12 +6,13 @@ import { cn } from '../../lib/utils';
 
 const textareaVariants = cva(
   [
-    'nx:flex nx:box-border nx:min-h-16 nx:w-full nx:rounded-md nx:border-0',
-    'nx:text-foreground nx:transition-colors',
+    'nx:flex nx:box-border nx:min-h-16 nx:w-full nx:rounded-md nx:border-default',
+    'nx:text-foreground nx:transition-[color,background-color]',
+    'nx:forced-colors:disabled:border-[GrayText]',
     'nx:placeholder:text-muted-foreground',
     'nx:px-3 nx:py-2 nx:typography-body-default',
-    'nx:focus-visible:outline-2 nx:focus-visible:outline-focus-default',
-    'nx:aria-invalid:border-border-error nx:aria-invalid:focus-visible:outline-focus-error',
+    'nx:focus-visible:outline-1 nx:focus-visible:outline-focus-default nx:focus-visible:border-focus-default',
+    'nx:aria-invalid:border-border-error nx:aria-invalid:focus-visible:outline-focus-error nx:aria-invalid:focus-visible:border-focus-error',
     'nx:disabled:cursor-not-allowed nx:disabled:bg-disabled nx:disabled:text-disabled-foreground nx:disabled:placeholder:text-disabled-foreground',
   ],
   {

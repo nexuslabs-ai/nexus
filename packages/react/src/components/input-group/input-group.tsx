@@ -9,7 +9,8 @@ import { Textarea } from '../textarea';
 
 const inputGroupVariants = cva(
   [
-    'nx:group/input-group nx:relative nx:flex nx:box-border nx:w-full nx:min-w-0 nx:items-center nx:rounded-md nx:border-0 nx:transition-colors nx:outline-none',
+    'nx:group/input-group nx:relative nx:flex nx:box-border nx:w-full nx:min-w-0 nx:items-center nx:rounded-md nx:border-default nx:transition-[color,background-color]',
+    'nx:forced-colors:data-[disabled=true]:border-[GrayText]',
     // Size: an inline group matches standalone Input's height for the
     // control's data-size. `not-has-[>[data-align^=block]]` scopes this to
     // non-stacked layouts (no block addon) so the fixed-height rule and the
@@ -30,11 +31,11 @@ const inputGroupVariants = cva(
     'nx:data-[disabled=true]:cursor-not-allowed nx:data-[disabled=true]:bg-disabled',
     // Focus: the group shows the ring when the inner control is focused
     // (the control suppresses its own outline).
-    'nx:has-[[data-slot=input-group-control]:focus-visible]:outline-2 nx:has-[[data-slot=input-group-control]:focus-visible]:outline-focus-default',
+    'nx:has-[[data-slot=input-group-control]:focus-visible]:outline-1 nx:has-[[data-slot=input-group-control]:focus-visible]:outline-focus-default nx:has-[[data-slot=input-group-control]:focus-visible]:border-focus-default',
     // Error: an invalid control reddens the border; an invalid focused
     // control switches the ring to the error colour (matches Input).
     'nx:has-[[data-slot][aria-invalid=true]]:border-border-error',
-    'nx:has-[[data-slot=input-group-control][aria-invalid=true]:focus-visible]:outline-focus-error',
+    'nx:has-[[data-slot=input-group-control][aria-invalid=true]:focus-visible]:outline-focus-error nx:has-[[data-slot=input-group-control][aria-invalid=true]:focus-visible]:border-focus-error',
   ],
   {
     variants: {
@@ -278,7 +279,7 @@ function InputGroupTextarea({ className, ...props }: InputGroupTextareaProps) {
     <Textarea
       data-slot="input-group-control"
       className={cn(
-        'nx:flex-1 nx:resize-none nx:rounded-none nx:border-0 nx:bg-transparent nx:enabled:hover:bg-transparent nx:py-3 nx:shadow-none nx:focus-visible:outline-none',
+        'nx:flex-1 nx:resize-none nx:rounded-none nx:border-0 nx:bg-transparent nx:enabled:hover:bg-transparent nx:py-3 nx:focus-visible:outline-none',
         className
       )}
       {...props}

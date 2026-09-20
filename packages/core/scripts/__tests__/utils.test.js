@@ -206,64 +206,49 @@ describe('utils', () => {
   });
 
   describe('generateFocusRingCSS', () => {
-    it('emits Notion-style field and 2px-gap button focus rules with a forced-colors outline fallback', () => {
+    it('emits only the InputOTP shadow boundary and the forced-colors Highlight override', () => {
       const css = generateFocusRingCSS();
 
       expect(css).toMatch(/\/\* ===== FOCUS RING ===== \*\//);
-      expect(css).toMatch(
-        /\[class~='nx:focus-visible:outline-focus-default'\]:focus-visible/
-      );
-      expect(css).toMatch(
-        /\[data-slot='input'\]\[class~='nx:focus-visible:outline-focus-default'\]:focus-visible/
-      );
-      expect(css).toMatch(/\[data-slot='input'\]\[data-variant='bordered'\]/);
-      expect(css).toMatch(
-        /box-shadow:\s*inset 0 0 0 1px var\(--color-border-default\);/
-      );
-      expect(css).toMatch(/\[data-slot='input'\]\[aria-invalid='true'\]/);
-      expect(css).toMatch(
-        /box-shadow:\s*inset 0 0 0 1px var\(--color-border-error\);/
-      );
+
+      // InputOTP keeps its three-sided shared hairline (#727).
       expect(css).toMatch(/\[data-slot='input-otp-slot'\]/);
       expect(css).toMatch(/inset -1px 0 0 var\(--color-border-default\)/);
+      expect(css).toMatch(/inset -1px 0 0 var\(--color-border-disabled\)/);
       expect(css).toMatch(
-        /\[data-slot='sidebar-input'\]\[class~='nx:focus-visible:outline-focus-default'\]:focus-visible[\s\S]*?\{[\s\S]*?border-color:\s*transparent\s*!important;[\s\S]*?border-width:\s*0;[\s\S]*?box-shadow:\s*[\s\S]*?inset 0 0 0 1px var\(--color-focus-default\),[\s\S]*?0 0 0 1px var\(--color-focus-default\);[\s\S]*?\}/
+        /\[data-slot='input-otp-slot'\]\[class~='nx:data-\[active=true\]:outline-focus-default'\]\[data-active='true'\][\s\S]*?\{[\s\S]*?outline-style:\s*none\s*!important;[\s\S]*?inset 0 0 0 1px var\(--color-focus-default\),[\s\S]*?0 0 0 1px var\(--color-focus-default\);[\s\S]*?\}/
       );
-      expect(css).toMatch(
-        /\[data-slot='button'\]\[class~='nx:focus-visible:outline-focus-default'\]:focus-visible/
+
+      // Fields, buttons and controls now paint their own border + outline, so
+      // the generator emits nothing for them.
+      expect(css).not.toMatch(/\[data-slot='input'\]/);
+      expect(css).not.toMatch(/\[data-slot='sidebar-input'\]/);
+      expect(css).not.toMatch(/\[data-slot='textarea'\]/);
+      expect(css).not.toMatch(/\[data-slot='native-select'\]/);
+      expect(css).not.toMatch(/\[data-slot='select-trigger'\]/);
+      expect(css).not.toMatch(/\[data-slot='button'\]/);
+      // The control's own outline suppression is now a component class
+      // (nx:focus-visible:outline-none), not a generated !important rule.
+      expect(css).not.toMatch(
+        /\[data-slot='input-group-control'\]\[class~='nx:focus-visible:outline-focus-default'\]/
       );
-      expect(css).toMatch(
-        /\[class~='nx:data-\[active=true\]:outline-focus-default'\]\[data-active='true'\]/
-      );
-      expect(css).toMatch(
-        /\[class~='nx:aria-invalid:focus-visible:outline-focus-error'\]\[aria-invalid='true'\]:focus-visible/
-      );
-      expect(css).toMatch(/border-color:\s*transparent\s*!important;/);
-      expect(css).toMatch(
-        /\[data-slot='sidebar-input'\]\[class~='nx:aria-invalid:focus-visible:outline-focus-error'\]\[aria-invalid='true'\]:focus-visible[\s\S]*?\{[\s\S]*?border-color:\s*transparent\s*!important;[\s\S]*?border-width:\s*0;[\s\S]*?box-shadow:\s*[\s\S]*?inset 0 0 0 1px var\(--color-focus-error\),[\s\S]*?0 0 0 1px var\(--color-focus-error\);[\s\S]*?\}/
-      );
-      expect(css).toMatch(
-        /\[data-slot='input-group-control'\]\[class~='nx:focus-visible:outline-focus-default'\]:focus-visible[\s\S]*?\{[\s\S]*?outline-style:\s*none\s*!important;[\s\S]*?box-shadow:\s*none;[\s\S]*?\}/
-      );
-      expect(css).toMatch(/--tw-outline-style:\s*none\s*!important;/);
-      expect(css).toMatch(/outline-style:\s*none\s*!important;/);
-      expect(css).toMatch(/0 0 0 2px var\(--color-focus-default\);/);
-      expect(css).toMatch(/inset 0 0 0 1px var\(--color-focus-default\),/);
-      expect(css).toMatch(/0 0 0 1px var\(--color-focus-default\);/);
-      expect(css).toMatch(/inset 0 0 0 1px var\(--color-focus-error\),/);
-      expect(css).toMatch(/0 0 0 1px var\(--color-focus-error\);/);
-      expect(css).toMatch(/border-width:\s*0;/);
-      expect(css).not.toMatch(/border-width:\s*2px;/);
-      expect(css).toMatch(/0 0 0 2px var\(--color-background\),/);
-      expect(css).toMatch(/0 0 0 4px var\(--color-focus-default\);/);
-      expect(css).not.toMatch(/0 0 0 8px var\(--color-focus-default\);/);
+      expect(css).not.toMatch(/box-shadow:\s*none;/);
+      expect(css).not.toMatch(/var\(--color-border-error\)/);
+      expect(css).not.toMatch(/0 0 0 2px var\(--color-background\),/);
+      expect(css).not.toMatch(/0 0 0 4px var\(--color-focus-default\);/);
+      expect(css).not.toMatch(/--focus-offset/);
       expect(css).not.toMatch(/color-mix\(/);
+
+      // Forced colors: author outline-color would map to CanvasText, making a
+      // focused control identical to its own border — force Highlight instead.
       expect(css).toMatch(/@media \(forced-colors: active\)/);
       expect(css).toMatch(/border-color:\s*CanvasText\s*!important;/);
+      expect(css).toMatch(/border-color:\s*GrayText\s*!important;/);
       expect(css).toMatch(/outline-color:\s*Highlight\s*!important;/);
       expect(css).toMatch(/outline-style:\s*solid\s*!important;/);
       expect(css).toMatch(/outline-width:\s*2px\s*!important;/);
-      expect(css).toMatch(/box-shadow:\s*none\s*!important;/);
+      // The offset is owned by the component (Button alone sets one).
+      expect(css).not.toMatch(/outline-offset:/);
     });
   });
 

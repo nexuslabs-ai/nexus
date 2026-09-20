@@ -48,12 +48,13 @@ const SelectValue = SelectPrimitive.Value;
 const selectTriggerVariants = cva(
   [
     'nx:group/select-trigger nx:flex nx:box-border nx:w-full nx:items-center nx:justify-between nx:gap-2',
-    'nx:rounded-md nx:border-0 nx:transition-colors',
+    'nx:rounded-md nx:border-default nx:transition-[color,background-color]',
+    'nx:forced-colors:disabled:border-[GrayText]',
     'nx:h-10 nx:px-3 nx:py-0 nx:typography-body-default',
     'nx:whitespace-nowrap',
     'nx:data-[placeholder]:text-muted-foreground',
-    'nx:focus-visible:outline-2 nx:focus-visible:outline-focus-default',
-    'nx:aria-invalid:border-border-error nx:aria-invalid:focus-visible:outline-focus-error',
+    'nx:focus-visible:outline-1 nx:focus-visible:outline-focus-default nx:focus-visible:border-focus-default',
+    'nx:aria-invalid:border-border-error nx:aria-invalid:focus-visible:outline-focus-error nx:aria-invalid:focus-visible:border-focus-error',
     'nx:disabled:cursor-not-allowed nx:disabled:bg-disabled nx:disabled:text-disabled-foreground',
     'nx:[&>span]:line-clamp-1',
   ],
