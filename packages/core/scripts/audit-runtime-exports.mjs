@@ -1,3 +1,4 @@
+import assert from 'node:assert/strict';
 import { createRequire } from 'node:module';
 import path from 'node:path';
 import { fileURLToPath, pathToFileURL } from 'node:url';
@@ -45,9 +46,24 @@ const EXPECTED_RUNTIME_EXPORTS = [
   'themeToCss',
 ];
 
-function assertExports(label, mod) {
+const EXPECTED_PALETTE_EXPORTS = [
+  'CHART_PALETTE_REFERENCES',
+  'STATUS_PALETTE_FAMILIES',
+  'SHADES',
+  'PERCEPTUAL_L_GRID',
+  'PERCEPTUAL_L_GRID_HUE',
+  'PRIMITIVE_PALETTE_NAMES',
+  'getPaletteRamp',
+  'getPaletteShade',
+  'hexToOklchMechanical',
+  'hexToOklchPinned',
+  'hexToSrgbInts',
+  'isPaletteShadeKey',
+];
+
+function assertExports(label, mod, allowlist = EXPECTED_RUNTIME_EXPORTS) {
   const actual = Object.keys(mod).sort();
-  const expected = [...EXPECTED_RUNTIME_EXPORTS].sort();
+  const expected = [...allowlist].sort();
   const missing = expected.filter((name) => !actual.includes(name));
   const extra = actual.filter((name) => !expected.includes(name));
 
@@ -73,4 +89,22 @@ assertExports('CJS', cjs);
 
 console.log(
   `@nexus_ds/core runtime export allowlist clean (${EXPECTED_RUNTIME_EXPORTS.length} exports).`
+);
+
+const paletteEsm = await import('@nexus_ds/core/palette');
+const paletteCjs = require('@nexus_ds/core/palette');
+assertExports('Palette ESM', paletteEsm, EXPECTED_PALETTE_EXPORTS);
+assertExports('Palette CJS', paletteCjs, EXPECTED_PALETTE_EXPORTS);
+for (const name of paletteEsm.PRIMITIVE_PALETTE_NAMES) {
+  assert.deepEqual(
+    paletteEsm.getPaletteRamp(name),
+    paletteCjs.getPaletteRamp(name)
+  );
+}
+assert.equal(
+  paletteEsm.getPaletteShade('green', '600'),
+  'oklch(0.62 0.2233 140.055)'
+);
+console.log(
+  `@nexus_ds/core/palette exports and ESM/CJS parity clean (${EXPECTED_PALETTE_EXPORTS.length} exports).`
 );

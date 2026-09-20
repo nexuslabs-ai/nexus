@@ -4,7 +4,7 @@ import primitiveColors from '../../tokens/primitives/color.json';
 
 import perceptualGrid from './perceptual-grid.json';
 
-export const SHADES = [
+export const SHADES = Object.freeze([
   '50',
   '100',
   '200',
@@ -16,7 +16,7 @@ export const SHADES = [
   '800',
   '900',
   '950',
-] as const;
+] as const);
 
 export type Shade = (typeof SHADES)[number];
 

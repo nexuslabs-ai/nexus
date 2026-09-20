@@ -9,6 +9,7 @@ const packageRoot = path.resolve(scriptDir, '..');
 const repoRoot = path.resolve(packageRoot, '../..');
 const probeDir = path.join(packageRoot, '.runtime-dist-typecheck');
 const probePath = path.join(probeDir, 'probe.ts');
+const commonJsProbePath = path.join(probeDir, 'probe.cts');
 const tsconfigPath = path.join(probeDir, 'tsconfig.json');
 const tscBin = path.join(repoRoot, 'node_modules', 'typescript', 'bin', 'tsc');
 const packageJsonPath = path.join(packageRoot, 'package.json');
@@ -87,6 +88,19 @@ await writeFile(
   themeToCss,
   type NexusAppearanceState,
 } from '@nexus_ds/core';
+import { getPaletteRamp, getPaletteShade, type PrimitivePaletteName, type Shade } from '@nexus_ds/core/palette';
+
+const palette: PrimitivePaletteName = 'green';
+const shade: Shade = '600';
+const ramp = getPaletteRamp(palette);
+const green: string = getPaletteShade(palette, shade);
+// @ts-expect-error public ramps are immutable.
+ramp['600'] = '#000000';
+// @ts-expect-error singleton colors are not shade ramps.
+getPaletteRamp('white');
+// @ts-expect-error only authored shades are accepted.
+getPaletteShade('green', '999');
+void green;
 
 const state: NexusAppearanceState = sanitizeNexusAppearance({
   ...DEFAULT_NEXUS_APPEARANCE,
@@ -115,6 +129,8 @@ void firstPaint.colorScheme;
 `
 );
 
+await writeFile(commonJsProbePath, await readFile(probePath, 'utf8'));
+
 await writeFile(
   tsconfigPath,
   JSON.stringify(
@@ -122,15 +138,15 @@ await writeFile(
       compilerOptions: {
         target: 'ES2020',
         lib: ['ES2020', 'DOM'],
-        module: 'ESNext',
-        moduleResolution: 'bundler',
+        module: 'NodeNext',
+        moduleResolution: 'NodeNext',
         strict: true,
         noEmit: true,
         esModuleInterop: true,
         skipLibCheck: true,
         forceConsistentCasingInFileNames: true,
       },
-      include: ['probe.ts'],
+      include: ['probe.ts', 'probe.cts'],
     },
     null,
     2

@@ -1,13 +1,12 @@
-import fs from 'fs';
-import path from 'path';
-import * as prettier from 'prettier';
-import { fileURLToPath } from 'url';
-
 import {
   hexToOklchMechanical,
   hexToOklchPinned,
   isPaletteShadeKey,
-} from './lib/perceptual-grid.js';
+} from '@nexus_ds/core/palette';
+import fs from 'fs';
+import path from 'path';
+import * as prettier from 'prettier';
+import { fileURLToPath } from 'url';
 
 /**
  * Ensure a directory exists, creating it if necessary
@@ -78,7 +77,8 @@ export function formatTokenValue(value, type, tokenPath) {
       return hexToOklchPinned(
         value,
         lastSegment,
-        tokenPath[tokenPath.length - 2]
+        tokenPath[tokenPath.length - 2],
+        (message) => console.warn(message)
       );
     }
 

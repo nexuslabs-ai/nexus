@@ -54,7 +54,7 @@ export default defineConfig({
     },
     rollupOptions: {
       external: [
-        '@nexus_ds/core',
+        /^@nexus_ds\/core(?:\/.*)?$/,
         'react',
         'react-dom',
         'react/jsx-runtime',
