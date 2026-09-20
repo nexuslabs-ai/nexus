@@ -72,6 +72,7 @@ export * from './components/tooltip';
 
 // Appearance (editor UI — provider is published separately via ./appearance subentry)
 export * from './components/appearance/appearance-settings';
+export * from './components/appearance/brand-color-field';
 export * from './components/appearance/color-field';
 export * from './components/appearance/config-preview';
 export * from './components/appearance/setting-row';

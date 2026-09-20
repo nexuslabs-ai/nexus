@@ -39,6 +39,8 @@ Under deuteranopia the Success (Green) and Warning (Orange) 600 shades are hard 
 
 Custom brand ramps and raw surface-tone references retain their separate algorithms. A palette's processed 600 shade is not interchangeable with its authored hex as a brand seed.
 
+`BRAND_COLOR_PRESETS` (and its `BrandColorPreset` type) provides a frozen catalog of Default, Indigo, Blue, Violet, Rose, Orange, Amber, Green, and Teal. The eight color choices reference each family's authored 600 hex; Default uses the existing `DEFAULT_BRAND_COLOR`. Assign a preset's `color` to `brandColor` and derive the theme normally. Presets do not replace the custom-brand algorithm or add a new appearance-state field.
+
 ## Non-React Shell Example
 
 Use the engine directly when a host shell owns DOM or native styling.
