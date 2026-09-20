@@ -120,7 +120,7 @@
     "Chrome >= 111",
     "Edge >= 111",
     "Firefox >= 113",
-    "Safari >= 15.4",
+    "Safari >= 16.4",
     "Samsung >= 22"
   ],
   "lint-staged": {

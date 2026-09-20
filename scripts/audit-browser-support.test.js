@@ -43,7 +43,7 @@ describe('audit-browser-support', () => {
       chrome: 111,
       edge: 111,
       firefox: 113,
-      safari: 15.4,
+      safari: 16.4,
       samsung: 22,
     });
 
@@ -51,7 +51,7 @@ describe('audit-browser-support', () => {
       'Chrome >= 111',
       'Edge >= 111',
       'Firefox >= 113',
-      'Safari >= 15.4',
+      'Safari >= 16.4',
       'Samsung >= 22',
     ]);
   });
@@ -216,7 +216,7 @@ describe('audit-browser-support', () => {
       missing: [
         'Edge >= 111',
         'Firefox >= 113',
-        'Safari >= 15.4',
+        'Safari >= 16.4',
         'Samsung >= 22',
       ],
       extra: [],

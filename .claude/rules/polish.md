@@ -81,11 +81,12 @@ Nexus supports:
 - Chrome 111+
 - Edge 111+
 - Firefox 113+
-- Safari 15.4+
+- Safari 16.4+
 - Samsung Internet 22+
 
-Treat OKLCH as the browser-floor feature. Do not assume every Baseline 2023
-feature is safe. Check each feature against this browser floor and use
+The browser-floor feature is an outline that follows `border-radius` — focus
+rings are real outlines, so a rounded control needs one. Do not assume every
+Baseline 2023 feature is safe. Check each feature against this browser floor and use
 progressive enhancement or fallbacks when support falls outside it. Run
 `pnpm audit:browser-support` when adopting or reclassifying browser-platform
 features.

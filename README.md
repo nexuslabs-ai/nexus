@@ -49,7 +49,7 @@ make dev          # Storybook — the component catalog & dev surface
 | Chrome           | 111             |
 | Edge             | 111             |
 | Firefox          | 113             |
-| Safari           | 15.4            |
+| Safari           | 16.4            |
 | Samsung Internet | 22              |
 
-Design tokens use OKLCH color (Baseline 2023). Browsers below these versions do not support OKLCH and will not receive hex fallbacks — consumers needing older support must pin to the last pre-OKLCH-migration tag. The same floor is encoded in root `package.json#browserslist`; run `pnpm audit:browser-support` before adopting a new Modern Web Guidance feature.
+Focus rings are real outlines, so the floor is set by the first version that traces `border-radius` with an outline (Safari 16.4); design tokens use OKLCH, which clears it on every engine. Browsers below these versions receive no fallbacks — consumers needing older support must pin to the last pre-16.4-floor tag. The same floor is encoded in root `package.json#browserslist`; run `pnpm audit:browser-support` before adopting a new Modern Web Guidance feature.

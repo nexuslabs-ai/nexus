@@ -28,7 +28,7 @@ export const BROWSER_FLOOR = Object.freeze({
   chrome: 111,
   edge: 111,
   firefox: 113,
-  safari: 15.4,
+  safari: 16.4,
   samsung: 22,
 });
 
@@ -36,7 +36,7 @@ export const EXPECTED_BROWSERSLIST = Object.freeze([
   'Chrome >= 111',
   'Edge >= 111',
   'Firefox >= 113',
-  'Safari >= 15.4',
+  'Safari >= 16.4',
   'Samsung >= 22',
 ]);
 
@@ -53,7 +53,21 @@ export const FEATURE_POLICIES = Object.freeze([
       samsung: 22,
     },
     guide: 'css',
-    note: 'Nexus uses OKLCH as the browser-floor feature and does not emit hex fallbacks.',
+    note: 'Nexus emits OKLCH with no hex fallbacks; it sits at or below the floor on every engine.',
+  },
+  {
+    id: 'outline-border-radius',
+    name: 'outline follows border-radius',
+    policy: 'adopt',
+    support: {
+      chrome: 94,
+      edge: 94,
+      firefox: 88,
+      safari: 16.4,
+      samsung: 17,
+    },
+    guide: 'css',
+    note: 'The floor-defining feature: focus rings are real outlines, so a rounded control needs the outline to trace its radius rather than paint a rectangle.',
   },
   {
     id: 'has-selector',
