@@ -257,11 +257,13 @@ const preview: Preview = {
     // axe-core's WCAG-based contrast rules so the two gates don't conflict.
     a11y: {
       test: 'error',
-      config: {
-        rules: [
-          { id: 'color-contrast', enabled: false },
-          { id: 'color-contrast-enhanced', enabled: false },
-        ],
+      // Storybook merges objects but replaces arrays. Run options preserve
+      // these rules when a story supplies its own config.rules array.
+      options: {
+        rules: {
+          'color-contrast': { enabled: false },
+          'color-contrast-enhanced': { enabled: false },
+        },
       },
     },
     controls: {
