@@ -184,29 +184,46 @@ No shipped component needs this yet — it's the rule for the first one that doe
 
 ## Focus States
 
-Use the design-system focus token with the canonical outline utilities and the tokenised offset (`--focus-offset`, currently `2px`). The generated theme turns those utilities into a hard focus treatment in normal rendering and keeps the real outline as the forced-colors fallback:
+Focus rings are real `outline`s. There are three recipes; which one a component takes depends on whether it already has a border.
+
+**Controls** (no border of their own) — the outline is the whole ring:
 
 ```
-nx:focus-visible:outline-2 nx:focus-visible:outline-focus-default nx:focus-visible:outline-offset-(--focus-offset)
+nx:focus-visible:outline-2 nx:focus-visible:outline-focus-default
+```
+
+**Buttons** — the same ring, plus a literal offset so the gap is transparent and shows whatever surface the button sits on:
+
+```
+nx:focus-visible:outline-2 nx:focus-visible:outline-focus-default nx:focus-visible:outline-offset-2
+```
+
+**Fields** — the border supplies the inner half of the ring, so it recolours on focus and the outline is only `1px`:
+
+```
+nx:border-default nx:border-border-default
+nx:focus-visible:outline-1 nx:focus-visible:outline-focus-default nx:focus-visible:border-focus-default
+nx:disabled:border-border-disabled nx:forced-colors:disabled:border-[GrayText]
 ```
 
 Not every component takes this ring — see [§ Surface exception map](#surface-exception-map) for which component types use the ring, a background-tint `:focus`, or no focus treatment at all.
 
-For invalid fields, wire both an always-on error border and an error-coloured focus treatment:
+For invalid fields, wire an always-on error border plus an error-coloured focus treatment on **both** properties:
 
 ```
-nx:aria-invalid:border-border-error nx:aria-invalid:focus-visible:outline-focus-error
+nx:aria-invalid:border-border-error
+nx:aria-invalid:focus-visible:outline-focus-error nx:aria-invalid:focus-visible:border-focus-error
 ```
 
 Live consumer: `packages/react/src/components/input/input.tsx`.
 
-### Why outline utilities plus focus CSS
+### Rules that fall out of using a real outline
 
-The component API stays outline-based even though normal rendering uses box-shadow paint:
-
-- **One component contract.** Components keep using `outline-focus-default` / `outline-focus-error`, so the design-system CSS can change the look globally without per-component rewrites.
-- **Windows High Contrast Mode survives.** `forced-colors: active` strips box-shadows, so the generated CSS restores the outline in the user's system focus colour.
-- **Notion-style focus.** Inputs, textareas, selects, OTP slots, and input groups set their real border to `0` on focus and paint the visible focus edge with two 1px shadows: one inset and one outside. Buttons get a 2px surface gap plus a 2px outer primary ring. Other keyboard-focusable controls get a hard 2px primary ring.
+- **Never put `nx:outline-none` / `nx:outline-hidden` on an element that also carries a focus-outline class.** Tailwind's `outline-none` sets `--tw-outline-style: none`, and `outline-<n>` emits `outline-style: var(--tw-outline-style)` — so the ring silently never paints. Suppress a nested control's own ring with the `focus-visible:` variant instead (`nx:focus-visible:outline-none`), as `InputGroupInput` does.
+- **Keep `outline-color` out of a field's transition.** `nx:transition-colors` animates `border-color` and `outline-color`, which fades the ring in. Fields use `nx:transition-[color,background-color]` so focus stays instant; `Button` names its properties explicitly for the same reason.
+- **Forced colors needs help.** The forced palette maps an author `outline-color` to `CanvasText` — the same value as the element's own border, making focus invisible. Generated CSS forces `Highlight` for every focus-ring class; do not re-declare it per component. Disabled field borders do need a per-component `nx:forced-colors:disabled:border-[GrayText]`.
+- **Offsets are literal at the call site.** `--focus-offset` is gone: `outline-offset`'s initial value is already `0`, which is what controls and fields want, and `Button` is the only surface that needs a gap.
+- **`InputOTPSlot` is the exception.** Its slots share one hairline between adjacent cells, which a real border cannot express, so it keeps a generated three-sided `box-shadow` and suppresses its own outline. Tracked in #727.
 
 ### Uniform primary focus across variants
 
@@ -220,8 +237,8 @@ Not every focusable thing takes the outline ring, and not everything that shows 
 
 | Component type                                                                                                                               | Pattern                                                                                                                                      | Rationale                                                                                                                                                                                                                                                                                                             |
 | -------------------------------------------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| **Interactive controls** — Button, Input, Select trigger, Switch, Tabs trigger, Accordion trigger, Dialog close                              | the canonical ring — see [§ Focus States](#focus-states)                                                                                     | Keyboard-only ring. The real `outline` survives Windows High Contrast Mode and stays legible on every surface.                                                                                                                                                                                                        |
-| **Error-state inputs**                                                                                                                       | the canonical ring **plus** the `aria-invalid` error border + ring (see [§ Focus States](#focus-states))                                     | Always-on error border + red focus ring signal an invalid value. Live consumer: `input.tsx`.                                                                                                                                                                                                                          |
+| **Interactive controls** — Button, Input, Select trigger, Switch, Tabs trigger, Accordion trigger, Dialog close                              | the recipe for its shape — see [§ Focus States](#focus-states)                                                                               | Keyboard-only ring. The real `outline` survives Windows High Contrast Mode and stays legible on every surface.                                                                                                                                                                                                        |
+| **Error-state inputs**                                                                                                                       | the field recipe **plus** the `aria-invalid` error border + ring (see [§ Focus States](#focus-states))                                       | Always-on error border + red focus ring signal an invalid value. Live consumer: `input.tsx`.                                                                                                                                                                                                                          |
 | **Menu / overlay rows** — DropdownMenuItem, ContextMenuItem, Menubar overlay items, SelectItem, CommandItem, and NavigationMenu flyout links | `nx:focus:bg-popover-hover nx:focus:text-popover-foreground` or the component's selected/open equivalent — popover-surface tint, **no ring** | Radix roving focus moves DOM focus to the item under the pointer, so `:focus` fires on mouse-hover too. A `:focus-visible` ring would flash for pointer users while giving them no steady indicator — wrong UX. The tint stays within the elevated popover surface and reads correctly for both keyboard and pointer. |
 | **Destructive menu items**                                                                                                                   | `nx:focus:bg-error-background nx:focus:text-error-foreground`                                                                                | Same roving-focus tint; the red fill signals a destructive action.                                                                                                                                                                                                                                                    |
 | **Non-focusable elevated surfaces** — Card, Dialog body, popover / menu container                                                            | none on the surface itself                                                                                                                   | The ring lives on focusable children (DialogClose, controls inside a Card), not the container. See [§ No shadow on focusable elements](#no-shadow-on-focusable-elements).                                                                                                                                             |
