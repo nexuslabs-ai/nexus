@@ -229,7 +229,7 @@ describe('cn', () => {
 
 - **No `*.test.tsx` for components** — the `unit` project doesn't collect them; move the assertion into a story's `play` function.
 - **No snapshot tests** — no `toMatchSnapshot` / `toMatchInlineSnapshot` and no frozen output fixtures. Assert the property that matters (a contrast floor, a merge result), not the exact output.
-- **No tests for apps, repo scripts, or hooks** — the audits CI runs prove themselves by running, and the rest (`scripts/export.mjs` among them) are reviewed, not gated; hooks are covered by the stories of the components that use them.
+- **No tests for apps, repo scripts, or hooks** — the ones CI runs prove themselves by running, and the rest (`scripts/export.mjs` among them) are reviewed, not gated; hooks are covered by the stories of the components that use them.
 - **Don't assert on Tailwind class names** — they change as variants are restyled. Use `data-*`, ARIA attributes, or accessible queries (`getByRole`, `getByLabelText`).
 - **No play functions for** visual appearance, computed CSS / pixel measurements, `:hover` snapshots, or animation timing.
 

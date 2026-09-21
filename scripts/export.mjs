@@ -8,9 +8,7 @@
  *
  * This file holds the pure, side-effect-free helpers. The CLI orchestration
  * lives below them behind an `import.meta.url` guard so importing this module
- * runs nothing. Nothing here runs in CI — like every repo script outside the
- * audits, it is reviewed, not gated (`.claude/rules/testing.md` § What We Don't
- * Test).
+ * runs nothing.
  */
 
 import { execFileSync, spawnSync } from 'node:child_process';

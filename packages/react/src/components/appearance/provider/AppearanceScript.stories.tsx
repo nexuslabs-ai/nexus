@@ -1,19 +1,24 @@
 import type { Meta, StoryObj } from '@storybook/react';
 import { expect } from 'storybook/test';
 
-import { createNexusAppearanceScript, NexusAppearanceScript } from './server';
+import {
+  createNexusAppearanceScript,
+  type CreateNexusAppearanceScriptOptions,
+  NexusAppearanceScript,
+  type NexusAppearanceScriptProps,
+} from './server';
 
 // The component renders nothing a user can see: it emits the inline first-paint
 // `<script>` a consumer puts in their server-rendered document head. The stories
 // assert the emitted element instead of an appearance.
-const meta: Meta<typeof NexusAppearanceScript> = {
+const meta: Meta<NexusAppearanceScriptProps> = {
   title: 'Appearance/AppearanceScript',
   component: NexusAppearanceScript,
   args: { storageKey: false },
 };
 
 export default meta;
-type Story = StoryObj<typeof NexusAppearanceScript>;
+type Story = StoryObj<typeof meta>;
 
 function bootstrapScriptIn(root: ParentNode) {
   const script = root.querySelector<HTMLScriptElement>(
@@ -41,9 +46,10 @@ export const WithNonce: Story = {
   },
 };
 
-const ConfiguredAppearanceScript = createNexusAppearanceScript({
+const factoryOptions: CreateNexusAppearanceScriptOptions = {
   storageKey: false,
-});
+};
+const ConfiguredAppearanceScript = createNexusAppearanceScript(factoryOptions);
 
 export const FromFactory: Story = {
   render: () => <ConfiguredAppearanceScript nonce="nexus-factory-nonce" />,
