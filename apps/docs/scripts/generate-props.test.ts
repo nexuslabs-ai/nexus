@@ -1,5 +1,11 @@
 import { execFileSync } from 'node:child_process';
-import { mkdtempSync, readdirSync, readFileSync, rmSync } from 'node:fs';
+import {
+  existsSync,
+  mkdtempSync,
+  readdirSync,
+  readFileSync,
+  rmSync,
+} from 'node:fs';
 import { tmpdir } from 'node:os';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
@@ -112,10 +118,14 @@ function reactExportNames() {
 
   const names = new Set<string>();
   for (const entry of entryPoints) {
-    const moduleSymbol = checker.getSymbolAtLocation(
-      program.getSourceFile(entry)!
-    );
-    for (const symbol of checker.getExportsOfModule(moduleSymbol!)) {
+    const sourceFile = program.getSourceFile(entry);
+    if (!sourceFile)
+      throw new Error(`entry point ${entry} is not in the program`);
+
+    const moduleSymbol = checker.getSymbolAtLocation(sourceFile);
+    if (!moduleSymbol) throw new Error(`entry point ${entry} exports nothing`);
+
+    for (const symbol of checker.getExportsOfModule(moduleSymbol)) {
       names.add(symbol.getName());
     }
   }
@@ -156,14 +166,26 @@ function reactTypeNames() {
 }
 
 describe('docs props data', () => {
-  it('has an entry for every component folder', () => {
+  it('has an entry for every component folder that exports a component', () => {
     const folders = readdirSync(componentsRoot, { withFileTypes: true })
       .filter((folder) => folder.isDirectory())
       .map((folder) => folder.name)
       .sort(byName);
 
-    expect(slugs).toEqual(folders);
-    expect(entries.map((entry) => entry.slug)).toEqual(folders);
+    // The only two that export no component: `focus-ring` holds a stories
+    // file, `overlay-layout` a shared class-name module.
+    expect(folders.filter((folder) => !slugs.includes(folder))).toEqual([
+      'focus-ring',
+      'overlay-layout',
+    ]);
+    expect(entries.map((entry) => entry.slug)).toEqual(slugs);
+    expect(slugs).toEqual([...slugs].sort(byName));
+  });
+
+  it('never indexes a slug with no components', () => {
+    expect(entries.filter((entry) => entry.components.length === 0)).toEqual(
+      []
+    );
   });
 
   it('indexes every component name in its slug', () => {
@@ -265,6 +287,21 @@ describe('docs props data', () => {
     expect(propOf('alert-dialog', 'AlertDialogContent', 'variant').type).toBe(
       '"default" | "center"'
     );
+  });
+
+  it('refuses an output directory outside the docs app', () => {
+    // Everything in the target directory's `*.json` is deleted before writing,
+    // so a stray argument must not be able to name the repo root.
+    const outside = path.join(repoRoot, 'node_modules', '.props-guard-probe');
+
+    expect(() =>
+      execFileSync(
+        process.execPath,
+        [path.join(docsRoot, 'scripts', 'generate-props.mjs'), outside],
+        { stdio: 'pipe' }
+      )
+    ).toThrow(/Refusing to write to/);
+    expect(existsSync(outside)).toBe(false);
   });
 
   it('never names a type a reader cannot resolve', { timeout: 120_000 }, () => {

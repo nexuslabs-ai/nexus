@@ -90,7 +90,7 @@
         },
         {
           "name": "formatter",
-          "type": "(value: RechartsPrimitive.TooltipPayloadEntry[\"value\"], name: RechartsPrimitive.TooltipPayloadEntry[\"name\"], item: RechartsPrimitive.TooltipPayloadEntry, index: number, payload: RechartsPrimitive.TooltipPayloadEntry[\"payload\"]) => React.ReactNode",
+          "type": "ChartTooltipFormatter",
           "required": false,
           "defaultValue": null,
           "description": ""

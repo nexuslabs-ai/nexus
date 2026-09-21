@@ -5,6 +5,7 @@ import {
   unlinkSync,
   writeFileSync,
 } from 'node:fs';
+import { tmpdir } from 'node:os';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 
@@ -20,9 +21,28 @@ const reactRoot = path.join(repoRoot, 'packages', 'react');
 const reactSrc = path.join(reactRoot, 'src');
 const componentsRoot = path.join(reactSrc, 'components');
 const reactTsconfig = path.join(reactRoot, 'tsconfig.json');
-const outputDir = process.argv[2]
-  ? path.resolve(process.argv[2])
-  : path.join(docsRoot, 'generated', 'props');
+
+/**
+ * The directory is emptied of its JSON before writing, so an argument naming
+ * the repo root would take `package.json` and `turbo.json` with it. The only
+ * callers are the docs build (no argument) and the test (a temp directory).
+ */
+function resolveOutputDir(argument) {
+  if (!argument) return path.join(docsRoot, 'generated', 'props');
+
+  const resolved = path.resolve(argument);
+  const isWithin = (root) =>
+    !path.relative(root, resolved).startsWith('..') && resolved !== root;
+
+  if (!isWithin(docsRoot) && !isWithin(tmpdir())) {
+    throw new Error(
+      `Refusing to write to ${resolved}: the output directory must sit under ${docsRoot} or ${tmpdir()}.`
+    );
+  }
+  return resolved;
+}
+
+const outputDir = resolveOutputDir(process.argv[2]);
 
 function isComponentSource(filePath) {
   const name = path.basename(filePath);
@@ -61,15 +81,19 @@ function entryPoints() {
     readFileSync(path.join(reactRoot, 'package.json'), 'utf8')
   );
 
-  return Object.values(manifest.exports)
-    .map((subpath) => subpath?.types)
-    .filter((types) => typeof types === 'string')
-    .map((types) =>
-      path.join(
+  return Object.entries(manifest.exports)
+    .filter(([, subpath]) => typeof subpath === 'object')
+    .map(([name, subpath]) => {
+      if (typeof subpath.types !== 'string') {
+        throw new Error(
+          `@nexus_ds/react exports "${name}" without a "types" subpath; its components would be dropped from the props JSON.`
+        );
+      }
+      return path.join(
         reactRoot,
-        types.replace(/^\.\/dist\//, 'src/').replace(/\.d\.ts$/, '.ts')
-      )
-    )
+        subpath.types.replace(/^\.\/dist\//, 'src/').replace(/\.d\.ts$/, '.ts')
+      );
+    })
     .sort();
 }
 
@@ -158,11 +182,16 @@ function publicExports(checker, program) {
   const exported = new Map();
 
   for (const entry of entryPoints()) {
-    const moduleSymbol = checker.getSymbolAtLocation(
-      program.getSourceFile(entry)
-    );
+    const sourceFile = program.getSourceFile(entry);
+    if (!sourceFile) {
+      throw new Error(
+        `Entry point ${toRepoPath(entry)} is not in the program; check the "exports" map still points at a file under src/.`
+      );
+    }
 
-    for (const symbol of checker.getExportsOfModule(moduleSymbol)) {
+    for (const symbol of checker.getExportsOfModule(
+      checker.getSymbolAtLocation(sourceFile)
+    )) {
       exported.set(symbol.getName(), resolveAlias(checker, symbol));
     }
   }
@@ -187,31 +216,64 @@ function publicComponents(exported) {
   );
 }
 
+function namespaceImportNames(sourceFile) {
+  return sourceFile.statements
+    .filter((statement) => ts.isImportDeclaration(statement))
+    .map((statement) => statement.importClause?.namedBindings)
+    .filter((bindings) => bindings && ts.isNamespaceImport(bindings))
+    .map((bindings) => bindings.name.text);
+}
+
+/**
+ * `typeToString` spells names as the declaring file sees them: a namespace
+ * import prints as its local alias (`RechartsPrimitive.TooltipPayloadEntry`),
+ * and a type that file never imported prints as `import("<absolute path>")` —
+ * a machine path that would make the output differ per checkout.
+ */
+function isPortableExpansion(text, localNamespaces) {
+  if (text.includes('import(')) return false;
+  return !localNamespaces.some((namespace) =>
+    new RegExp(`\\b${namespace}\\.`).test(text)
+  );
+}
+
 /**
  * A prop typed with a repo-local alias prints that alias name, which a reader
  * cannot resolve unless the package exports it. Print the alias body instead,
- * so no component has to inline a union for the docs' sake.
+ * so no component has to inline a union for the docs' sake. An alias whose body
+ * will not print portably keeps its name, and the resolvability test then asks
+ * for it to be exported.
  */
 function localAliasExpansions(checker, program, exported) {
   const srcPath = toRepoPath(reactSrc);
   const expansions = new Map();
+  const claimed = new Set();
 
   for (const sourceFile of program.getSourceFiles()) {
     if (!toRepoPath(sourceFile.fileName).startsWith(srcPath)) continue;
+    const localNamespaces = namespaceImportNames(sourceFile);
 
     for (const statement of sourceFile.statements) {
       if (!ts.isTypeAliasDeclaration(statement)) continue;
       const name = statement.name.text;
       if (exported.has(name)) continue;
 
-      expansions.set(
-        name,
-        checker.typeToString(
-          checker.getTypeAtLocation(statement.name),
-          statement,
-          ts.TypeFormatFlags.InTypeAlias | ts.TypeFormatFlags.NoTruncation
-        )
+      const text = checker.typeToString(
+        checker.getTypeAtLocation(statement.name),
+        statement,
+        ts.TypeFormatFlags.InTypeAlias | ts.TypeFormatFlags.NoTruncation
       );
+
+      // Two files declaring the same unexported alias would otherwise expand
+      // whichever was parsed last into both components' props.
+      if (claimed.has(name) && expansions.get(name) !== text) {
+        expansions.delete(name);
+        continue;
+      }
+      claimed.add(name);
+
+      if (!isPortableExpansion(text, localNamespaces)) continue;
+      expansions.set(name, text);
     }
   }
 
@@ -304,7 +366,9 @@ const exported = publicExports(checker, program);
 const components = publicComponents(exported);
 const expansions = localAliasExpansions(checker, program, exported);
 
-const parser = docgen.withCustomConfig(reactTsconfig, {
+// `parseWithProgramProvider` ignores the parser's own options once a program
+// is supplied, so this reuses the ones the program was built with.
+const parser = docgen.withCompilerOptions(compilerOptions, {
   savePropValueAsString: true,
   shouldIncludeExpression: true,
   shouldIncludePropTagMap: true,
@@ -348,6 +412,10 @@ const index = {};
 let propCount = 0;
 
 for (const [slug, entries] of bySlug) {
+  // A folder that exports no component (`focus-ring` is stories only,
+  // `overlay-layout` is a util module) has no page, so it gets no entry.
+  if (entries.length === 0) continue;
+
   entries.sort(byNameThenSource);
   adoptPropsTypeDescriptions(entries, typeExportDescriptions);
 
@@ -363,5 +431,5 @@ for (const [slug, entries] of bySlug) {
 writeJson(path.join(outputDir, 'index.json'), index);
 
 console.log(
-  `props: ${slugs.length} entries, ${components.size} components, ${propCount} props -> ${toRepoPath(outputDir)}`
+  `props: ${Object.keys(index).length} entries, ${components.size} components, ${propCount} props -> ${toRepoPath(outputDir)}`
 );
