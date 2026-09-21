@@ -157,6 +157,7 @@ const TYPOGRAPHY_SIZE_PX = {
   '9xl': 128,
 } as const;
 const TYPOGRAPHY_LINE_HEIGHT_PX = {
+  xxs: 12,
   xs: 16,
   sm: 20,
   base: 24,

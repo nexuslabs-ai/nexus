@@ -70,6 +70,7 @@
   --radius-xl: var(--nx-radius-xl);
   --radius-2xl: var(--nx-radius-2xl);
   --radius-3xl: var(--nx-radius-3xl);
+  --radius-4xl: var(--nx-radius-4xl);
   --radius-full: var(--nx-radius-full);
 
   /* Border width tokens */
@@ -1484,6 +1485,7 @@
   --nx-radius-xl: 0px;
   --nx-radius-2xl: 0px;
   --nx-radius-3xl: 0px;
+  --nx-radius-4xl: 0px;
   --nx-radius-full: 9999px;
 }
 
@@ -1495,6 +1497,7 @@
   --nx-radius-xl: 20px;
   --nx-radius-2xl: 24px;
   --nx-radius-3xl: 32px;
+  --nx-radius-4xl: 40px;
   --nx-radius-full: 9999px;
 }
 
@@ -1506,6 +1509,7 @@
   --nx-radius-xl: 16px;
   --nx-radius-2xl: 20px;
   --nx-radius-3xl: 28px;
+  --nx-radius-4xl: 36px;
   --nx-radius-full: 9999px;
 }
 
@@ -1517,6 +1521,7 @@
   --nx-radius-xl: 12px;
   --nx-radius-2xl: 16px;
   --nx-radius-3xl: 24px;
+  --nx-radius-4xl: 32px;
   --nx-radius-full: 9999px;
 }
 
@@ -1528,6 +1533,7 @@
   --nx-radius-xl: 8px;
   --nx-radius-2xl: 12px;
   --nx-radius-3xl: 20px;
+  --nx-radius-4xl: 28px;
   --nx-radius-full: 9999px;
 }
 
