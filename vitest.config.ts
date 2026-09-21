@@ -67,6 +67,18 @@ export default defineConfig({
   test: {
     // Use projects feature (Vitest 4)
     projects: [
+      {
+        extends: true,
+        test: {
+          name: 'console',
+          environment: 'node',
+          include: ['apps/console/e2e/**/*.test.ts'],
+          fileParallelism: false,
+          hookTimeout: 60000,
+          testTimeout: 30000,
+          passWithNoTests: false,
+        },
+      },
       // Unit tests (hooks, utilities) - jsdom
       {
         extends: true,

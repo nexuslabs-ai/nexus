@@ -1,53 +1,32 @@
-import { useEffect, useState } from 'react';
-
-import { SidebarInset, SidebarProvider } from '@nexus_ds/react';
+import { Button, SidebarInset, SidebarProvider } from '@nexus_ds/react';
 import { Outlet } from '@tanstack/react-router';
 
 import { AppSidebar } from '../shell/app-sidebar';
-import { CommandPalette } from '../shell/command-palette';
 import { Topbar } from '../shell/topbar';
 
-import { useSidebarStore } from './sidebar-store';
-
-/**
- * The authenticated app shell, rendered by the `_app` pathless layout route
- * (which guards it behind a session): collapsible sidebar + top bar with the
- * active module's content in the inset. Mounted once, so the sidebar and top
- * bar persist across navigations.
- */
 export function RootLayout() {
-  const [commandOpen, setCommandOpen] = useState(false);
-  const sidebarOpen = useSidebarStore((s) => s.open);
-  const setSidebarOpen = useSidebarStore((s) => s.setOpen);
-
-  // ⌘K / Ctrl+K toggles the command palette from anywhere — a global keyboard
-  // subscription, which is exactly what an effect is for.
-  useEffect(() => {
-    const onKeyDown = (e: KeyboardEvent) => {
-      if (e.key === 'k' && (e.metaKey || e.ctrlKey)) {
-        e.preventDefault();
-        setCommandOpen((prev) => !prev);
-      }
-    };
-    document.addEventListener('keydown', onKeyDown);
-    return () => document.removeEventListener('keydown', onKeyDown);
-  }, []);
-
   return (
-    <SidebarProvider open={sidebarOpen} onOpenChange={setSidebarOpen}>
+    <SidebarProvider>
+      <Button
+        asChild
+        variant="outline"
+        className="nx:sr-only nx:focus:not-sr-only nx:focus:fixed nx:focus:left-4 nx:focus:top-4 nx:focus:z-max"
+      >
+        <a href="#console-content">Skip to content</a>
+      </Button>
       <AppSidebar />
-      <SidebarInset>
-        <Topbar onSearchClick={() => setCommandOpen(true)} />
-        {/* SidebarInset already provides the <main> landmark, so this is a
-            plain <div> (a second <main> trips axe landmark rules).
-            nx:text-foreground re-establishes the adaptive base text color for
-            module content — without it, reused content that relies on inherited
-            foreground (e.g. the typography showcase) renders black in dark mode. */}
-        <div className="nx:text-foreground nx:min-w-0 nx:flex-1">
-          <Outlet />
+      <SidebarInset className="nx:min-w-0">
+        <Topbar />
+        <div
+          id="console-content"
+          tabIndex={-1}
+          className="nx:typography-body-default nx:text-foreground nx:min-w-0 nx:flex-1 nx:p-6 nx:lg:p-12"
+        >
+          <div className="nx:mx-auto nx:w-full nx:max-w-6xl">
+            <Outlet />
+          </div>
         </div>
       </SidebarInset>
-      <CommandPalette open={commandOpen} onOpenChange={setCommandOpen} />
     </SidebarProvider>
   );
 }

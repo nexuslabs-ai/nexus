@@ -29,6 +29,7 @@ jobs:
     runs-on: ubuntu-latest
     outputs:
       react: ${{ steps.filter.outputs.react }}
+      console: ${{ steps.filter.outputs.console }}
       browser: ${{ steps.filter.outputs.browser }}
       browser_source: ${{ steps.filter.outputs.browser_source }}
       scripts: ${{ steps.filter.outputs.scripts }}
@@ -50,6 +51,19 @@ jobs:
           filters: |
             # `react` tracks package-library source. App consumers (docs,
             # console) ride `packages` into the shared build/typecheck jobs.
+            console:
+              - 'apps/console/**'
+              - 'packages/core/**'
+              - 'packages/react/**'
+              - 'packages/tailwind/**'
+              - 'packages/test-utils/**'
+              - 'scripts/**'
+              - 'vitest.config.ts'
+              - 'package.json'
+              - 'pnpm-lock.yaml'
+              - 'pnpm-workspace.yaml'
+              - 'tsconfig*.json'
+              - 'turbo.json'
             react:
               - 'packages/react/**'
               - 'packages/tailwind/**'
@@ -496,6 +510,28 @@ jobs:
       - name: Run story tests
         run: pnpm test:storybook
 
+  test-console:
+    name: Test (Console)
+    runs-on: ubuntu-latest
+    needs: changes
+    if: needs.changes.outputs.console == 'true' || needs.changes.outputs.ci == 'true'
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Install pnpm
+        uses: pnpm/action-setup@v4
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version-file: '.nvmrc'
+          cache: 'pnpm'
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+      - name: Install browser and system dependencies
+        run: pnpm exec playwright install --with-deps chromium
+      - name: Build and test Console in a real browser
+        run: pnpm test:console
+
   build-storybook:
     name: Build Storybook
     runs-on: ubuntu-latest
@@ -571,6 +607,7 @@ jobs:
       - test-unit
       - audit-tokens
       - test-react
+      - test-console
       - build-storybook
       - bundle-size
     steps:

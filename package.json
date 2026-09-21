@@ -45,7 +45,8 @@
     "changeset": "changeset",
     "version-packages": "changeset version",
     "release": "pnpm turbo build && changeset publish",
-    "prepare": "husky"
+    "prepare": "husky",
+    "test:console": "turbo run build --filter=@nexus_ds/console && vitest run --project=console"
   },
   "size-limit": [
     {
