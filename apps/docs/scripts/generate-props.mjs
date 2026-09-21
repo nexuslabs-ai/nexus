@@ -13,6 +13,14 @@ import docgen from 'react-docgen-typescript';
 import ts from 'typescript';
 
 import {
+  isComponentName,
+  isPortableExpansion,
+  isRenderable,
+  opaqueNamespaceNames,
+  recordedSlugs,
+  toSlugFolder,
+} from './props-contract.mjs';
+import {
   reactEntryPoints,
   reactRoot,
   repoRoot,
@@ -53,21 +61,6 @@ function collectSourceFiles(dir) {
 
 function toRepoPath(absolutePath) {
   return path.relative(repoRoot, absolutePath).split(path.sep).join('/');
-}
-
-/**
- * The slug is the folder a component lives in. A path that escapes
- * `components/`, or names a file sitting directly in it, has no slug and so no
- * page to land on.
- */
-function toSlugFolder(relativePath) {
-  if (path.isAbsolute(relativePath)) return null;
-
-  const segments = relativePath.split(path.sep);
-  if (segments.length < 2) return null;
-  if (segments[0] === '..') return null;
-
-  return segments[0];
 }
 
 function toSlug(absolutePath) {
@@ -136,18 +129,13 @@ function resolveAlias(checker, symbol) {
   }
 }
 
-function symbolSourcePath(symbol) {
-  const sourceFile = symbol.declarations?.[0]?.getSourceFile?.();
-  return sourceFile ? toRepoPath(sourceFile.fileName) : null;
+function symbolSourceFile(symbol) {
+  return symbol.declarations?.[0]?.getSourceFile?.() ?? null;
 }
 
-/**
- * A component name is PascalCase. Screaming-snake exports
- * (`NEXUS_APPEARANCE_COOKIE_MAX_AGE_SECONDS`) share the leading capital but are
- * constants.
- */
-function isComponentName(name) {
-  return /^[A-Z]/.test(name) && !/^[A-Z0-9_]+$/.test(name);
+function symbolSourcePath(symbol) {
+  const sourceFile = symbolSourceFile(symbol);
+  return sourceFile ? toRepoPath(sourceFile.fileName) : null;
 }
 
 /**
@@ -181,22 +169,6 @@ function publicExports(checker, program) {
   return exported;
 }
 
-const componentValueFlags =
-  ts.SymbolFlags.Function | ts.SymbolFlags.Class | ts.SymbolFlags.Variable;
-
-/**
- * A PascalCase value export is only a component if it can be rendered, so the
- * call signature is what separates `Button` from an exported config object.
- */
-function isRenderable(checker, symbol) {
-  if ((symbol.flags & componentValueFlags) === 0) return false;
-  const declaration = symbol.declarations?.[0];
-  if (!declaration) return false;
-
-  const type = checker.getTypeOfSymbolAtLocation(symbol, declaration);
-  return checker.getSignaturesOfType(type, ts.SignatureKind.Call).length > 0;
-}
-
 /**
  * A slug is a folder under `src/components/`, so a component declared anywhere
  * else — or directly in `components/` with no folder of its own — has nowhere
@@ -210,14 +182,10 @@ function publicComponents(checker, exported) {
     if (!isComponentName(name)) continue;
     if (!isRenderable(checker, symbol)) continue;
 
-    const declaredIn = symbolSourcePath(symbol);
-    const withinComponents = declaredIn
-      ? path.relative(componentsRoot, path.join(repoRoot, declaredIn))
-      : null;
-
-    if (!withinComponents || !toSlugFolder(withinComponents)) {
+    const sourceFile = symbolSourceFile(symbol);
+    if (!sourceFile || !toSlug(sourceFile.fileName)) {
       throw new Error(
-        `@nexus_ds/react exports the component ${name} from ${declaredIn ?? 'an unresolvable file'}; it needs a folder of its own under ${toRepoPath(componentsRoot)}/ to get a props entry.`
+        `@nexus_ds/react exports the component ${name} from ${symbolSourcePath(symbol) ?? 'an unresolvable file'}; it needs a folder of its own under ${toRepoPath(componentsRoot)}/ to get a props entry.`
       );
     }
 
@@ -225,38 +193,6 @@ function publicComponents(checker, exported) {
   }
 
   return new Map(found.sort(([a], [b]) => a.localeCompare(b, 'en')));
-}
-
-/**
- * `React.CSSProperties` is spelled the same in every file and reads as itself,
- * so the conventional `React` binding is exempt; a namespace over any other
- * module — or react under a different local name — prints a name only that
- * file knows.
- */
-function opaqueNamespaceNames(sourceFile) {
-  return sourceFile.statements
-    .filter((statement) => ts.isImportDeclaration(statement))
-    .map((statement) => ({
-      module: statement.moduleSpecifier.text,
-      bindings: statement.importClause?.namedBindings,
-    }))
-    .filter(({ bindings }) => bindings && ts.isNamespaceImport(bindings))
-    .map(({ module, bindings }) => ({ module, name: bindings.name.text }))
-    .filter(({ module, name }) => !(module === 'react' && name === 'React'))
-    .map(({ name }) => name);
-}
-
-/**
- * `typeToString` spells names as the declaring file sees them: a namespace
- * import prints as its local alias (`RechartsPrimitive.TooltipPayloadEntry`),
- * and a type that file never imported prints as `import("<absolute path>")` —
- * a machine path that would make the output differ per checkout.
- */
-function isPortableExpansion(text, opaqueNamespaces) {
-  if (text.includes('import(')) return false;
-  return !opaqueNamespaces.some((namespace) =>
-    new RegExp(`\\b${namespace}\\.`).test(text)
-  );
 }
 
 /**
@@ -369,17 +305,16 @@ function writeJson(filePath, value) {
 
 /**
  * Removes what the last run wrote and nothing else, so a folder renamed or
- * deleted since then leaves no orphan behind. The previous `index.json` is the
- * record of that: it names every slug file written, including ones no current
- * folder would account for.
+ * deleted since then leaves no orphan behind. Every current slug is rewritten
+ * straight after, so the previous index is the only record worth reading.
  */
 function clearPreviousOutput() {
   const indexPath = path.join(outputDir, indexFile);
   const previous = existsSync(indexPath)
-    ? Object.keys(JSON.parse(readFileSync(indexPath, 'utf8')))
+    ? recordedSlugs(readFileSync(indexPath, 'utf8'))
     : [];
 
-  for (const slug of new Set([...previous, ...slugs])) {
+  for (const slug of previous) {
     rmSync(path.join(outputDir, `${slug}.json`), { force: true });
   }
   rmSync(indexPath, { force: true });

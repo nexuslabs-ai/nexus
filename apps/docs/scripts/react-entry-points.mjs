@@ -10,12 +10,6 @@ const docsRoot = path.resolve(
 export const repoRoot = path.resolve(docsRoot, '..', '..');
 export const reactRoot = path.join(repoRoot, 'packages', 'react');
 
-/**
- * The `exports` map points at built declarations; the same subpaths under
- * `src/` are what the program is built from, so a new public subentry is picked
- * up without a second list to maintain. Shared with the test so the generator
- * and the yardstick it is measured against cannot disagree about the surface.
- */
 const CODE_EXTENSIONS = new Set([
   '.cjs',
   '.cts',
@@ -28,36 +22,68 @@ const CODE_EXTENSIONS = new Set([
 ]);
 
 /**
- * A subpath the package deliberately does not export (`null`), or one pointing
- * straight at an asset (`"./styles.css": "./dist/react.css"`), carries no
- * module surface. Both are read off the target rather than the subpath name, so
- * a dotted name such as `"./v1.2"` is still treated as code.
+ * Every file a subpath can resolve to, flattened out of however many condition
+ * objects it is nested in.
  */
-function isModuleSurface(target) {
-  if (target === null) return false;
-  if (typeof target === 'string') {
-    return CODE_EXTENSIONS.has(path.extname(target));
-  }
-  return true;
+function targetFiles(target) {
+  if (typeof target === 'string') return [target];
+  if (target === null || typeof target !== 'object') return [];
+  return Object.values(target).flatMap(targetFiles);
 }
 
-export function reactEntryPoints() {
-  const manifest = JSON.parse(
-    readFileSync(path.join(reactRoot, 'package.json'), 'utf8')
+/**
+ * A subpath the package deliberately does not export (`null`), or one that only
+ * ever lands on an asset (`"./styles.css": "./dist/react.css"`), carries no
+ * module surface. Read off the files the target resolves to rather than the
+ * subpath name, so a dotted name such as `"./v1.2"` is still treated as code.
+ */
+function isModuleSurface(target) {
+  return targetFiles(target).some((file) =>
+    CODE_EXTENSIONS.has(path.extname(file))
   );
+}
 
+/**
+ * The declarations for a subpath: a `types` condition at the top of its object,
+ * or inside a nested one (`{ import: { types, default } }`).
+ */
+function typesCondition(target) {
+  if (target === null || typeof target !== 'object') return null;
+  if (typeof target.types === 'string') return target.types;
+
+  for (const value of Object.values(target)) {
+    const nested = typesCondition(value);
+    if (nested) return nested;
+  }
+  return null;
+}
+
+/**
+ * The `exports` map points at built declarations; the same subpaths under
+ * `src/` are what the program is built from, so a new public subentry is picked
+ * up without a second list to maintain. Shared with the test so the generator
+ * and the yardstick it is measured against cannot disagree about the surface.
+ */
+export function entryPointsFromManifest(manifest) {
   return Object.entries(manifest.exports)
     .filter(([, target]) => isModuleSurface(target))
     .map(([subpath, target]) => {
-      if (typeof target?.types !== 'string') {
+      const types = typesCondition(target);
+      if (!types) {
         throw new Error(
           `@nexus_ds/react exports "${subpath}" without a "types" entry; its components would be dropped from the props JSON.`
         );
       }
       return path.join(
         reactRoot,
-        target.types.replace(/^\.\/dist\//, 'src/').replace(/\.d\.ts$/, '.ts')
+        types.replace(/^\.\/dist\//, 'src/').replace(/\.d\.ts$/, '.ts')
       );
     })
     .sort();
+}
+
+export function reactEntryPoints() {
+  return entryPointsFromManifest(
+    JSON.parse(readFileSync(path.join(reactRoot, 'package.json'), 'utf8'))
+  );
 }
