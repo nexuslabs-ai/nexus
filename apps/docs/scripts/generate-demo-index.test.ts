@@ -64,7 +64,6 @@ function leadingDirective(contents: string) {
   return first?.match(DIRECTIVE)?.[2];
 }
 
-/** Reads back the `source` literal a per-demo module exports. */
 function emittedSource(moduleFile: string) {
   const literal = readFileSync(moduleFile, 'utf8')
     .replace(/\r\n/g, '\n')

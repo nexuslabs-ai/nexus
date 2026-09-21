@@ -65,12 +65,6 @@ export function getDemo(id: string): Demo {
  * @property {string} source The demo file's full contents.
  */
 
-/**
- * Lists every file under `dir`, recursively.
- *
- * @param {string} dir
- * @returns {string[]}
- */
 function walk(dir) {
   return readdirSync(dir, { withFileTypes: true }).flatMap((entry) => {
     const entryPath = path.join(dir, entry.name);
@@ -78,20 +72,10 @@ function walk(dir) {
   });
 }
 
-/**
- * Reads a file as the canonical LF form of its contents.
- *
- * @param {string} file
- * @returns {string}
- */
 function readCanonical(file) {
   return readFileSync(file, 'utf8').replace(/\r\n/g, '\n');
 }
 
-/**
- * @param {string} file
- * @param {string} content
- */
 function writeIfChanged(file, content) {
   if (existsSync(file) && readCanonical(file) === content) {
     return;
@@ -101,12 +85,7 @@ function writeIfChanged(file, content) {
   writeFileSync(file, content, 'utf8');
 }
 
-/**
- * Removes every directory under `dir` — `dir` itself included — that has no
- * files left in it.
- *
- * @param {string} dir
- */
+// Removes `dir` itself too, once its last child is gone.
 function pruneEmptyDirs(dir) {
   for (const entry of readdirSync(dir, { withFileTypes: true })) {
     if (entry.isDirectory()) {
@@ -119,12 +98,6 @@ function pruneEmptyDirs(dir) {
   }
 }
 
-/**
- * Deletes everything under `outputDir` that is not in `keep`.
- *
- * @param {string} outputDir
- * @param {Set<string>} keep Paths of the files that should survive.
- */
 function pruneOrphans(outputDir, keep) {
   for (const file of walk(outputDir)) {
     if (!keep.has(file)) {
@@ -135,36 +108,17 @@ function pruneOrphans(outputDir, keep) {
   pruneEmptyDirs(outputDir);
 }
 
-/**
- * The per-demo module's import specifier for its example, relative to the
- * module's own nesting under `__generated__/demos/`.
- *
- * @param {string} id
- * @returns {string}
- */
+// Two levels out of `__generated__/demos/`, plus one per directory in the id.
 function exampleSpecifier(id) {
   return `${'../'.repeat(id.split('/').length + 1)}examples/${id}`;
 }
 
-/**
- * The per-demo module's import specifier for its own client boundary, which
- * sits beside it. Appending `.ts` gives the boundary's path on disk.
- *
- * @param {string} id
- * @returns {string}
- */
+// The boundary sits beside its module, so the id's directory drops away.
 function boundarySpecifier(id) {
   return `./${path.posix.basename(id)}${BOUNDARY_SUFFIX}`;
 }
 
-/**
- * Collects every demo under `examplesDir`, ordered by id. An id with a
- * `_`-prefixed segment is skipped; a dot in an id is rejected, because
- * `foo.client.tsx` would claim the module path `foo.tsx`'s boundary owns.
- *
- * @param {string} [examplesDir]
- * @returns {DemoFile[]}
- */
+/** @returns {DemoFile[]} */
 export function collectDemos(examplesDir = EXAMPLES_DIR) {
   if (!existsSync(examplesDir)) {
     throw new Error(`Missing demo directory: ${examplesDir}`);
@@ -184,6 +138,7 @@ export function collectDemos(examplesDir = EXAMPLES_DIR) {
       id.split('/').every((segment) => !segment.startsWith('_'))
     )
     .map(({ file, id }) => {
+      // `foo.client.tsx` would claim the module path `foo.tsx`'s boundary owns.
       if (id.includes('.')) {
         throw new Error(
           `Demo id cannot contain a dot: ${id}. Rename ${path.relative(examplesDir, file)}.`
@@ -195,13 +150,7 @@ export function collectDemos(examplesDir = EXAMPLES_DIR) {
     .sort((a, b) => (a.id < b.id ? -1 : a.id > b.id ? 1 : 0));
 }
 
-/**
- * Renders one demo's client boundary: the example re-exported from a module
- * carrying `'use client'`.
- *
- * @param {DemoFile} demo
- * @returns {string}
- */
+/** @param {DemoFile} demo */
 export function renderDemoBoundary(demo) {
   return `'use client';
 
@@ -212,13 +161,7 @@ export { default as Component } from ${JSON.stringify(exampleSpecifier(demo.id))
 `;
 }
 
-/**
- * Renders one demo's module: its component forwarded from the boundary, and
- * its source text as a plain string.
- *
- * @param {DemoFile} demo
- * @returns {string}
- */
+/** @param {DemoFile} demo */
 export function renderDemoModule(demo) {
   return `${GENERATED_BY}
 ${REGENERATE_HINT}
@@ -229,10 +172,7 @@ export const source = ${JSON.stringify(demo.source)};
 `;
 }
 
-/**
- * @param {DemoFile[]} demos
- * @returns {string}
- */
+/** @param {DemoFile[]} demos */
 export function renderDemoIndex(demos) {
   const entries = demos
     .map((demo) =>
@@ -253,13 +193,6 @@ export const demos = ${literal} satisfies Record<string, Demo>;
 ${INDEX_FOOTER}`;
 }
 
-/**
- * Regenerates the demo index and its per-demo modules on disk, and returns
- * what it wrote. A file is rewritten only when its content changed, and every
- * file under `outputDir` that is not part of this run's output is deleted.
- *
- * @param {{ examplesDir?: string, outputDir?: string }} [options]
- */
 export function generateDemoIndex({
   examplesDir = EXAMPLES_DIR,
   outputDir = GENERATED_DIR,
@@ -298,7 +231,6 @@ function generateAndLog() {
   );
 }
 
-/** Regenerates without letting a broken examples/ state take the watcher down. */
 function regenerateQuietly() {
   try {
     generateAndLog();
