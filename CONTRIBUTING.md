@@ -43,7 +43,7 @@ make verify       # the full gate: lint + format check + typecheck + tests + tok
 
 - `make lint` — ESLint (cheap; run it constantly)
 - `make typecheck` — `tsc` across the packages
-- `pnpm test:unit` — just the jsdom unit tests (hooks / utilities)
+- `pnpm test:unit` — just the unit tests (core engine, `cn` merge, ESLint rules)
 - `pnpm test:storybook:ui` — the interactive debugger when a story's `play` function fails
 
 The pre-commit hook already formats and `nx:`-lints staged files, so you rarely format by hand (`pnpm format` does a full-tree pass if you want one).
@@ -75,13 +75,13 @@ A single `*.stories.tsx` file does four jobs at once:
 
 You don't write a separate `*.test.tsx` for a component. That's not a stylistic preference — `vitest.config.ts` explicitly excludes `packages/react/src/components/**/*.test.{ts,tsx}` from the `unit` project.
 
-Hooks and utilities use `*.test.ts` files with `@nexus_ds/test-utils`. Scripts under `packages/core/scripts/__tests__/` use `.test.js` and import from `vitest` directly. Both run under Vitest's `unit` project (jsdom).
+Outside stories, only three kinds of unit test exist, all under Vitest's `unit` project (jsdom): the core engine's behaviour (`packages/core/src/lib`), the Nexus `cn` merge (`packages/react/src/lib/utils.test.ts`), and the ESLint plugin's rules (`packages/eslint-plugin-nexus/__tests__`). Apps, repo scripts, and hooks have no tests of their own, and nothing uses snapshots.
 
 ```
-┌─────────────────────────────────────────────────────────────────┐
-│  Components  →  *.stories.tsx (storybook project, real browser) │
-│  Hooks/utils →  *.test.ts     (unit project, jsdom)             │
-└─────────────────────────────────────────────────────────────────┘
+┌──────────────────────────────────────────────────────────────────────┐
+│  Components        →  *.stories.tsx (storybook project, real browser) │
+│  Engine / cn / lint →  *.test.ts|js  (unit project, jsdom)            │
+└──────────────────────────────────────────────────────────────────────┘
 ```
 
 The full spec lives in `.claude/rules/testing-react.md` and `.claude/rules/components.md`. This section is the on-ramp.
@@ -209,27 +209,27 @@ export const Destructive: Story = {
 };
 ```
 
-### Hooks and utilities: `*.test.ts`
+### Unit tests: `*.test.ts`
 
-Plain Vitest with `@nexus_ds/test-utils` (re-exports `act`, `renderHook`, `waitFor` plus the standard Vitest globals — **not** `render` / `screen` / `userEvent` / `axe`, which only make sense for component tests, and those live in stories):
+Plain Vitest, importing from `vitest` directly. A unit test earns its place only when it pins behaviour a consumer would see and no story can: contrast and legibility of the derived theme, registry/engine agreement, the first-paint script, `cn` merging `nx:` utilities, or an ESLint rule's reports.
 
-```tsx
-import { act, describe, expect, it, renderHook } from '@nexus_ds/test-utils';
+```ts
+import { describe, expect, it } from 'vitest';
 
-import { useCounter } from './use-counter';
+import { cn } from './utils';
 
-describe('useCounter', () => {
-  it('increments count', () => {
-    const { result } = renderHook(() => useCounter());
-    act(() => result.current.increment());
-    expect(result.current.count).toBe(1);
+describe('cn', () => {
+  it('lets the later z-index layer win', () => {
+    expect(cn('nx:z-overlay nx:z-popover')).toBe('nx:z-popover');
   });
 });
 ```
 
 ### What's out of scope
 
-- **No `*.test.tsx` for components** — `vitest.config.ts` excludes them; move the assertion into a story's `play` function.
+- **No `*.test.tsx` for components** — the `unit` project doesn't collect them; move the assertion into a story's `play` function.
+- **No snapshot tests** — no `toMatchSnapshot` / `toMatchInlineSnapshot` and no frozen output fixtures. Assert the property that matters (a contrast floor, a merge result), not the exact output.
+- **No tests for apps, repo scripts, or hooks** — the audits in `scripts/` run in CI as scripts; hooks are covered by the stories of the components that use them.
 - **Don't assert on Tailwind class names** — they change as variants are restyled. Use `data-*`, ARIA attributes, or accessible queries (`getByRole`, `getByLabelText`).
 - **No play functions for** visual appearance, computed CSS / pixel measurements, `:hover` snapshots, or animation timing.
 
@@ -258,7 +258,7 @@ A11y is automatic — every story is axe-checked, no separate a11y story needed.
 | Command                  | What it does                                                      |
 | ------------------------ | ----------------------------------------------------------------- |
 | `pnpm test`              | both vitest projects — `unit` (jsdom) + `storybook` (Chromium)    |
-| `pnpm test:unit`         | unit only — fastest loop for hooks / utilities                    |
+| `pnpm test:unit`         | unit only — core engine, `cn` merge, ESLint rules                 |
 | `pnpm test:storybook`    | every story's play function in a real browser                     |
 | `pnpm test:storybook:ui` | **debugger** — Vitest's interactive UI when a play function fails |
 
@@ -315,7 +315,6 @@ Releases are driven by [changesets](https://github.com/changesets/changesets) an
 | `@nexus_ds/eslint-plugin` | **npm**    | Lint guardrails consumers install and use                               |
 | `@nexus_ds/tailwind`      | copy/own   | Generated token CSS — consumers regenerate with their own token choices |
 | `@nexus_ds/react`         | copy/own   | Components are copied and owned; delivered by the export tool (#541)    |
-| `@nexus_ds/test-utils`    | private    | Internal test tooling                                                   |
 | `@nexus_ds/console/docs`  | private    | Apps                                                                    |
 
 Everything lives under the `@nexus_ds` scope — the published packages on npm and the ESLint plugin's **rule namespace** (rules are referenced as `@nexus_ds/*`, e.g. `@nexus_ds/no-render-prop-types`). The rule namespace is a flat-config key the plugin registers, independent of the npm package name; it is kept in lockstep with the scope so the repo reads consistently.

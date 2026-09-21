@@ -52,7 +52,7 @@ These rules apply to ALL skills this agent executes. Read and internalize before
 | Area                  | What You Care About                                     |
 | --------------------- | ------------------------------------------------------- |
 | **Result Validation** | Does the output match what we expect? Not line coverage |
-| **Test Strategy**     | Right test type for the job (unit, integration, e2e)    |
+| **Test Strategy**     | Only the four kinds in testing.md § Scope; no snapshots |
 | **Determinism**       | Tests must be reproducible, no flakiness                |
 | **Fixture Design**    | Real data patterns, not synthetic garbage               |
 | **Mock Strategy**     | Mock external dependencies, not internal logic          |
@@ -70,32 +70,22 @@ These rules apply to ALL skills this agent executes. Read and internalize before
 └─────────────────────────────────────────────────────────────────┘
 ```
 
-**Given input X, expect output Y.** This applies at every level:
-
-- Unit tests: function input → function output
-- Integration tests: component input → component output
-- E2E tests: user action → visible result
+**Given input X, expect output Y** — a seed colour in, a legible theme out; source code in, a lint report out; a user action in a story, a visible result out.
 
 ## Principles
 
 1. **Result validation over code coverage** — 90% coverage with bad assertions is worse than 60% coverage with good assertions
-2. **Real fixtures over synthetic data** — Use actual component code, real API responses, genuine user flows
+2. **Real inputs over synthetic data** — Use real seed colours, real component code, genuine user flows
 3. **Partial matching over exact equality** — Assert on the fields you care about, not every byte
 4. **Determinism is non-negotiable** — If a test can fail randomly, it's broken
-5. **Mock boundaries, not internals** — Mock the database, not the repository methods
+5. **Stub the browser, not Nexus** — Replace a browser API the environment lacks (e.g. `matchMedia`); never mock Nexus's own functions
 6. **Test behavior, not implementation** — Tests shouldn't break when you refactor internals
 7. **One reason to fail** — Each test should fail for exactly one reason
 8. **Search before assuming** — When unsure about testing patterns or framework APIs, use WebSearch
 
 ## Test Type Selection
 
-| Test Type         | When to Use                                     | Mock Strategy              |
-| ----------------- | ----------------------------------------------- | -------------------------- |
-| **Unit**          | Pure functions, utilities, isolated logic       | None or minimal            |
-| **Integration**   | Component interactions, pipelines               | External services only     |
-| **E2E**           | User flows, critical paths                      | Nothing (or test database) |
-| **Fixture-based** | Data transformation pipelines, parsers          | Input files as fixtures    |
-| **Snapshot**      | UI components (with caution), serialized output | None                       |
+Nexus has exactly four kinds of test: component stories, core engine, `cn` merge, and ESLint rules. See the Scope table in [testing.md](../../.claude/rules/testing.md#scope). There are no snapshot tests, no app tests, no tests for repo scripts, and no hook tests.
 
 ## Fixture Design Patterns
 
@@ -167,6 +157,8 @@ expect(result.data.timestamp).toBe('2025-01-15T10:00:00Z');
 ## Anti-Patterns to Flag
 
 - Tests that pass but don't actually verify behavior
+- Snapshots, or frozen fixtures that stand in for one
+- Tests outside the four kinds in testing.md § Scope (apps, repo scripts, hooks)
 - Mocking internal implementation details
 - Exact JSON equality when partial matching would suffice
 - Missing error case coverage
@@ -194,7 +186,7 @@ When you identify a testing problem:
 Apply your testing expertise to the implement-test skill:
 
 - Understand the code before writing tests
-- Choose appropriate test type (unit/integration/e2e)
+- Pick one of the four kinds in testing.md § Scope; never take a snapshot
 - Design fixtures from real data patterns
 - Use partial matching for assertions
 - Mock only external boundaries

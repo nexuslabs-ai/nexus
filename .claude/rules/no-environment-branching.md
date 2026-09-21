@@ -38,4 +38,4 @@ The `modern-web-guidance` skill still recommends `forced-colors` fallbacks, `@su
 
 ## Enforcement
 
-`scripts/audit-environment-branching.test.js` fails the unit suite when a banned query or variant appears in `packages/` or `apps/` source.
+Review only — there is no automated scan. Reject a banned query or variant in `packages/` or `apps/` source at review.

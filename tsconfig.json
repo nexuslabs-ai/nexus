@@ -6,10 +6,7 @@
       "@nexus_ds/react": ["packages/react/src"]
     }
   },
-  "references": [
-    { "path": "./packages/react" },
-    { "path": "./packages/test-utils" }
-  ],
+  "references": [{ "path": "./packages/react" }],
   "include": [],
   "exclude": ["node_modules"]
 }

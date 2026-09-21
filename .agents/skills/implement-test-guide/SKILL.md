@@ -22,7 +22,6 @@ Implement tests with a focus on result validation over code coverage. Works with
 - Implementing tests for new or existing code
 - Building testing infrastructure (fixtures, mocks, utilities)
 - Adding coverage to untested modules
-- Creating integration test suites
 
 ## Context Sources
 
@@ -37,15 +36,15 @@ This skill works with multiple input types:
 
 ## Package-Specific Testing Patterns
 
-Based on what you're testing, different patterns apply:
+Nexus tests only four kinds of thing — see `.claude/rules/testing.md` § Scope. Based on what you're testing:
 
-| Package            | Detect By              | Testing Approach                                   |
-| ------------------ | ---------------------- | -------------------------------------------------- |
-| Core               | `packages/core/`       | Unit tests for token generation scripts (Vitest)   |
-| React              | `packages/react/`      | Story-first: play functions in `*.stories.tsx`     |
-| Test utils         | `packages/test-utils/` | Unit tests for shared helpers                      |
-| Tailwind           | `packages/tailwind/`   | Generated CSS — verify via consuming-package tests |
-| General TypeScript | Any `.ts`              | Vitest unit/integration tests                      |
+| Target               | Detect By                                            | Testing Approach                                                    |
+| -------------------- | ---------------------------------------------------- | ------------------------------------------------------------------- |
+| React components     | `packages/react/src/components/`                     | Story-first: play functions in `*.stories.tsx`                      |
+| Core engine          | `packages/core/src/lib/`                             | Vitest behaviour tests — thresholds and invariants, never snapshots |
+| `cn` merge           | `packages/react/src/lib/utils.ts`                    | Vitest, in `utils.test.ts`                                          |
+| ESLint rules         | `packages/eslint-plugin-nexus/`                      | `RuleTester` valid/invalid cases in `__tests__/`                    |
+| Apps, scripts, hooks | `apps/`, `scripts/`, `packages/*/scripts/`, `hooks/` | No tests — stop and tell the user                                   |
 
 ## Base Rules
 
@@ -183,10 +182,9 @@ After test implementation is complete:
 
 ### Test Files
 
-| File                          | Tests | Description                    |
-| ----------------------------- | ----- | ------------------------------ |
-| `path/to/module.test.ts`      | 5     | Unit tests for core functions  |
-| `path/to/integration.test.ts` | 3     | Integration tests for pipeline |
+| File                     | Tests | Description                   |
+| ------------------------ | ----- | ----------------------------- |
+| `path/to/module.test.ts` | 5     | Unit tests for core functions |
 
 ### Coverage
 
@@ -257,11 +255,11 @@ expect(result.error.code).toBe('VALIDATION_ERROR');
 
 ## Common Testing Frameworks
 
-| Framework | Use Case               | Import Pattern                                                   |
-| --------- | ---------------------- | ---------------------------------------------------------------- |
-| Vitest    | Unit/integration tests | `import { describe, it, expect } from 'vitest'`                  |
-| Storybook | Component tests        | `import { expect, fn, userEvent, within } from 'storybook/test'` |
-| Jest      | Legacy/specific needs  | `import { describe, it, expect } from '@jest/globals'`           |
+| Framework | Use Case              | Import Pattern                                                   |
+| --------- | --------------------- | ---------------------------------------------------------------- |
+| Vitest    | Unit tests            | `import { describe, it, expect } from 'vitest'`                  |
+| Storybook | Component tests       | `import { expect, fn, userEvent, within } from 'storybook/test'` |
+| Jest      | Legacy/specific needs | `import { describe, it, expect } from '@jest/globals'`           |
 
 ## Principles to Follow
 

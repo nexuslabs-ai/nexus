@@ -10,7 +10,6 @@ This file is the Codex-facing entrypoint for the Nexus design-system repo. The e
   - `packages/core`: DTCG design tokens and token build/audit scripts.
   - `packages/tailwind`: generated Tailwind theme utilities using the `nx:` prefix.
   - `packages/react`: React component library built on Radix primitives, CVA variants, semantic tokens, and Storybook tests.
-  - `packages/test-utils`: Vitest/testing-library utility exports for hooks and utilities.
 - Apps:
   - `apps/console`: token/theme exploration UI.
   - `apps/docs`: documentation site.
@@ -110,7 +109,7 @@ import { expect, fn, userEvent, within } from 'storybook/test';
 
 Required component story purposes are defined in `.claude/rules/testing-react.md`. New components generally need default, variant, size, disabled, click interaction, keyboard interaction, data-attribute, composition, edge-case, and showcase stories unless that rule documents an archetype-specific exception.
 
-Hooks and utilities use `*.test.ts` with `@nexus_ds/test-utils`. Do not use Storybook imports in hook/utility tests.
+Outside stories, unit tests (`*.test.ts`, importing from `vitest`) cover only the core engine, the `cn` merge, and the ESLint plugin's rules. Apps, repo scripts, and hooks get no tests, and nothing uses snapshots — see `.claude/rules/testing.md`.
 
 Before finishing component work, run the narrowest meaningful checks first, then broaden as risk increases:
 

@@ -25,14 +25,13 @@ make dev          # Storybook — the component catalog & dev surface
 
 ## Workspace layout
 
-| Path                  | Purpose                                                       |
-| --------------------- | ------------------------------------------------------------- |
-| `packages/core`       | Internal design tokens and theme definitions (not published)  |
-| `packages/tailwind`   | Tailwind CSS theme with `nx:` prefix                          |
-| `packages/react`      | React components built with Radix UI and Tailwind CSS         |
-| `packages/test-utils` | Test utilities for hooks and utilities                        |
-| `apps/console`        | Theme/token exploration UI                                    |
-| `apps/docs`           | Documentation site (Next.js — IA shell + live theme explorer) |
+| Path                | Purpose                                                       |
+| ------------------- | ------------------------------------------------------------- |
+| `packages/core`     | Internal design tokens and theme definitions (not published)  |
+| `packages/tailwind` | Tailwind CSS theme with `nx:` prefix                          |
+| `packages/react`    | React components built with Radix UI and Tailwind CSS         |
+| `apps/console`      | Theme/token exploration UI                                    |
+| `apps/docs`         | Documentation site (Next.js — IA shell + live theme explorer) |
 
 ## Where to learn more
 
