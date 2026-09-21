@@ -11,7 +11,8 @@
           "type": "\"horizontal\" | \"vertical\" | \"responsive\" | null",
           "required": false,
           "defaultValue": "vertical",
-          "description": ""
+          "description": "",
+          "example": null
         }
       ]
     },
@@ -37,7 +38,8 @@
           "type": "({ message?: string; })[] | undefined",
           "required": false,
           "defaultValue": null,
-          "description": "Validation errors to render. Deduplicated by message; a single error shows\ninline, multiple render as a list. Ignored when `children` is provided."
+          "description": "Validation errors to render. Deduplicated by message; a single error shows\ninline, multiple render as a list. Ignored when `children` is provided.",
+          "example": null
         }
       ]
     },
@@ -63,7 +65,8 @@
           "type": "\"label\" | \"legend\"",
           "required": false,
           "defaultValue": "legend",
-          "description": "Caption emphasis. `legend` is the larger fieldset caption; `label` matches\na field label's size."
+          "description": "Caption emphasis. `legend` is the larger fieldset caption; `label` matches\na field label's size.",
+          "example": null
         }
       ]
     },
@@ -77,7 +80,8 @@
           "type": "ReactNode",
           "required": false,
           "defaultValue": null,
-          "description": "Optional-field content to render instead of the required marker. This\nremains readable by assistive tech and takes precedence over `children`.\nRequired semantics still belong on the control via `required` or\n`aria-required`."
+          "description": "Optional-field content to render instead of the required marker. This\nremains readable by assistive tech and takes precedence over `children`.\nRequired semantics still belong on the control via `required` or\n`aria-required`.",
+          "example": "```tsx\n<FieldLabel htmlFor=\"email\">\n  Email <FieldRequiredIndicator />\n</FieldLabel>\n<Input id=\"email\" required />\n```\n```tsx\n<FieldRequiredIndicator fallback=\"Optional\">Required</FieldRequiredIndicator>\n```"
         }
       ]
     },

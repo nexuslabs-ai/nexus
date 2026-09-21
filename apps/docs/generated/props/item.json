@@ -11,21 +11,24 @@
           "type": "boolean",
           "required": false,
           "defaultValue": "false",
-          "description": "Render as the child element via Radix Slot — e.g. an `<a>` or router link —\nkeeping the item styling."
+          "description": "Render as the child element via Radix Slot — e.g. an `<a>` or router link —\nkeeping the item styling.",
+          "example": null
         },
         {
           "name": "size",
           "type": "\"default\" | \"sm\" | null",
           "required": false,
           "defaultValue": "default",
-          "description": ""
+          "description": "",
+          "example": null
         },
         {
           "name": "variant",
           "type": "\"default\" | \"outline\" | \"muted\" | null",
           "required": false,
           "defaultValue": "default",
-          "description": ""
+          "description": "",
+          "example": null
         }
       ]
     },
@@ -75,7 +78,8 @@
           "type": "\"default\" | \"icon\" | \"image\" | null",
           "required": false,
           "defaultValue": "default",
-          "description": ""
+          "description": "",
+          "example": null
         }
       ]
     },

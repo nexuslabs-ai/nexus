@@ -11,7 +11,8 @@
           "type": "boolean",
           "required": false,
           "defaultValue": "true",
-          "description": "Render the shared flyout viewport panel beneath the menu. Set `false` to\nrender each item's content inline under its own trigger instead."
+          "description": "Render the shared flyout viewport panel beneath the menu. Set `false` to\nrender each item's content inline under its own trigger instead.",
+          "example": null
         }
       ]
     },

@@ -16,26 +16,48 @@ export const reactRoot = path.join(repoRoot, 'packages', 'react');
  * up without a second list to maintain. Shared with the test so the generator
  * and the yardstick it is measured against cannot disagree about the surface.
  */
+const CODE_EXTENSIONS = new Set([
+  '.cjs',
+  '.cts',
+  '.js',
+  '.jsx',
+  '.mjs',
+  '.mts',
+  '.ts',
+  '.tsx',
+]);
+
+/**
+ * A subpath the package deliberately does not export (`null`), or one pointing
+ * straight at an asset (`"./styles.css": "./dist/react.css"`), carries no
+ * module surface. Both are read off the target rather than the subpath name, so
+ * a dotted name such as `"./v1.2"` is still treated as code.
+ */
+function isModuleSurface(target) {
+  if (target === null) return false;
+  if (typeof target === 'string') {
+    return CODE_EXTENSIONS.has(path.extname(target));
+  }
+  return true;
+}
+
 export function reactEntryPoints() {
   const manifest = JSON.parse(
     readFileSync(path.join(reactRoot, 'package.json'), 'utf8')
   );
 
-  return (
-    Object.entries(manifest.exports)
-      // `./styles.css` ships an asset, not a module surface.
-      .filter(([subpath]) => !path.extname(subpath))
-      .map(([subpath, target]) => {
-        if (typeof target?.types !== 'string') {
-          throw new Error(
-            `@nexus_ds/react exports "${subpath}" without a "types" entry; its components would be dropped from the props JSON.`
-          );
-        }
-        return path.join(
-          reactRoot,
-          target.types.replace(/^\.\/dist\//, 'src/').replace(/\.d\.ts$/, '.ts')
+  return Object.entries(manifest.exports)
+    .filter(([, target]) => isModuleSurface(target))
+    .map(([subpath, target]) => {
+      if (typeof target?.types !== 'string') {
+        throw new Error(
+          `@nexus_ds/react exports "${subpath}" without a "types" entry; its components would be dropped from the props JSON.`
         );
-      })
-      .sort()
-  );
+      }
+      return path.join(
+        reactRoot,
+        target.types.replace(/^\.\/dist\//, 'src/').replace(/\.d\.ts$/, '.ts')
+      );
+    })
+    .sort();
 }

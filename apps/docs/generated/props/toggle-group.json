@@ -11,21 +11,24 @@
           "type": "\"default\" | \"sm\" | \"lg\" | null",
           "required": false,
           "defaultValue": null,
-          "description": ""
+          "description": "",
+          "example": null
         },
         {
           "name": "spacing",
           "type": "number",
           "required": false,
           "defaultValue": "0",
-          "description": "Gap between items, in spacing-scale units. `0` (default) joins the items\ninto a segmented control — shared borders, only the ends rounded; a\npositive value separates them into individual pills."
+          "description": "Gap between items, in spacing-scale units. `0` (default) joins the items\ninto a segmented control — shared borders, only the ends rounded; a\npositive value separates them into individual pills.",
+          "example": null
         },
         {
           "name": "variant",
           "type": "\"default\" | \"outline\" | null",
           "required": false,
           "defaultValue": null,
-          "description": ""
+          "description": "",
+          "example": null
         }
       ]
     },
@@ -39,14 +42,16 @@
           "type": "\"default\" | \"sm\" | \"lg\" | null",
           "required": false,
           "defaultValue": null,
-          "description": ""
+          "description": "",
+          "example": null
         },
         {
           "name": "variant",
           "type": "\"default\" | \"outline\" | null",
           "required": false,
           "defaultValue": null,
-          "description": ""
+          "description": "",
+          "example": null
         }
       ]
     }

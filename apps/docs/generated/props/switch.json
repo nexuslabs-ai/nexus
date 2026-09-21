@@ -11,7 +11,8 @@
           "type": "\"default\" | \"sm\" | null",
           "required": false,
           "defaultValue": null,
-          "description": ""
+          "description": "",
+          "example": null
         }
       ]
     }

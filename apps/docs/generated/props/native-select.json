@@ -11,14 +11,16 @@
           "type": "\"default\" | \"sm\" | null",
           "required": false,
           "defaultValue": "default",
-          "description": ""
+          "description": "",
+          "example": null
         },
         {
           "name": "variant",
           "type": "\"borderless\" | \"bordered\" | null",
           "required": false,
           "defaultValue": null,
-          "description": ""
+          "description": "",
+          "example": null
         }
       ]
     },

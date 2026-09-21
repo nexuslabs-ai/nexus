@@ -11,21 +11,24 @@
           "type": "string",
           "required": true,
           "defaultValue": null,
-          "description": ""
+          "description": "",
+          "example": null
         },
         {
           "name": "onChange",
           "type": "(hex: string) => void",
           "required": true,
           "defaultValue": null,
-          "description": ""
+          "description": "",
+          "example": null
         },
         {
           "name": "value",
           "type": "string",
           "required": true,
           "defaultValue": null,
-          "description": ""
+          "description": "",
+          "example": null
         }
       ]
     },
@@ -39,14 +42,16 @@
           "type": "NexusResolvedAppearanceMode",
           "required": true,
           "defaultValue": null,
-          "description": ""
+          "description": "",
+          "example": null
         },
         {
           "name": "state",
           "type": "NexusAppearanceState",
           "required": true,
           "defaultValue": null,
-          "description": ""
+          "description": "",
+          "example": null
         }
       ]
     },
@@ -60,42 +65,48 @@
           "type": "NexusAppearanceCookieOptions",
           "required": false,
           "defaultValue": null,
-          "description": ""
+          "description": "",
+          "example": null
         },
         {
           "name": "cookieWriteKey",
           "type": "string | false",
           "required": false,
           "defaultValue": "false",
-          "description": "Optional state cookie for SSR and first-paint seeding. The cookie is written\nfrom the active client state for the next request; during client hydration it\nis NOT read — `localStorage` (when `storageKey` is enabled) wins. This keeps\nthe SSR paint stable: the server renders from the cookie, the client then\nadopts the local snapshot without a flash. Consumers who seed only the\ncookie (no `storageKey`, or a fresh device with no localStorage) will hydrate\nfrom `defaultState` and paint with whatever the server did not override."
+          "description": "Optional state cookie for SSR and first-paint seeding. The cookie is written\nfrom the active client state for the next request; during client hydration it\nis NOT read — `localStorage` (when `storageKey` is enabled) wins. This keeps\nthe SSR paint stable: the server renders from the cookie, the client then\nadopts the local snapshot without a flash. Consumers who seed only the\ncookie (no `storageKey`, or a fresh device with no localStorage) will hydrate\nfrom `defaultState` and paint with whatever the server did not override.",
+          "example": null
         },
         {
           "name": "defaultState",
           "type": "NexusAppearanceState",
           "required": false,
           "defaultValue": null,
-          "description": ""
+          "description": "",
+          "example": null
         },
         {
           "name": "onStateChange",
           "type": "((state: NexusAppearanceState) => void)",
           "required": false,
           "defaultValue": null,
-          "description": ""
+          "description": "",
+          "example": null
         },
         {
           "name": "state",
           "type": "NexusAppearanceState",
           "required": false,
           "defaultValue": null,
-          "description": ""
+          "description": "",
+          "example": null
         },
         {
           "name": "storageKey",
           "type": "string | false",
           "required": false,
           "defaultValue": "nexus-appearance",
-          "description": "Client snapshot storage. When enabled, the local snapshot is read after\nmount and is the client-side source of truth — it takes precedence over the\nSSR-seeded cookie and `defaultState`. Disable with `false` to make the\nprovider cookie/SSR-driven only."
+          "description": "Client snapshot storage. When enabled, the local snapshot is read after\nmount and is the client-side source of truth — it takes precedence over the\nSSR-seeded cookie and `defaultState`. Disable with `false` to make the\nprovider cookie/SSR-driven only.",
+          "example": null
         }
       ]
     },
@@ -109,21 +120,24 @@
           "type": "NexusAppearanceState",
           "required": false,
           "defaultValue": null,
-          "description": ""
+          "description": "",
+          "example": null
         },
         {
           "name": "nonce",
           "type": "string",
           "required": false,
           "defaultValue": null,
-          "description": ""
+          "description": "",
+          "example": null
         },
         {
           "name": "storageKey",
           "type": "string | false",
           "required": false,
           "defaultValue": null,
-          "description": ""
+          "description": "",
+          "example": null
         }
       ]
     },
@@ -137,14 +151,16 @@
           "type": "string",
           "required": false,
           "defaultValue": null,
-          "description": ""
+          "description": "",
+          "example": null
         },
         {
           "name": "label",
           "type": "string",
           "required": true,
           "defaultValue": null,
-          "description": ""
+          "description": "",
+          "example": null
         }
       ]
     },
@@ -164,7 +180,8 @@
           "type": "(() => void)",
           "required": false,
           "defaultValue": null,
-          "description": ""
+          "description": "",
+          "example": null
         }
       ]
     }

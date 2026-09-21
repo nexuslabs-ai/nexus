@@ -29,14 +29,16 @@
           "type": "\"default\" | \"sm\" | \"lg\" | null",
           "required": false,
           "defaultValue": "default",
-          "description": "Size variant"
+          "description": "Size variant",
+          "example": null
         },
         {
           "name": "variant",
           "type": "\"default\" | \"underline\" | null",
           "required": false,
           "defaultValue": "default",
-          "description": "Visual style variant"
+          "description": "Visual style variant",
+          "example": null
         }
       ]
     }

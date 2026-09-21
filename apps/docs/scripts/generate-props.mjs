@@ -1,4 +1,11 @@
-import { mkdirSync, readdirSync, unlinkSync, writeFileSync } from 'node:fs';
+import {
+  existsSync,
+  mkdirSync,
+  readdirSync,
+  readFileSync,
+  rmSync,
+  writeFileSync,
+} from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 
@@ -19,34 +26,11 @@ const reactSrc = path.join(reactRoot, 'src');
 const componentsRoot = path.join(reactSrc, 'components');
 const reactTsconfig = path.join(reactRoot, 'tsconfig.json');
 
-/**
- * The directory is emptied of its JSON before writing, so an argument naming
- * the repo root would take `package.json` and `turbo.json` with it. The only
- * callers are the docs build (no argument) and the test (a directory it makes
- * under `generated/`).
- */
-function resolveOutputDir(argument) {
-  if (!argument) return path.join(docsRoot, 'generated', 'props');
+const outputDir = process.argv[2]
+  ? path.resolve(process.argv[2])
+  : path.join(docsRoot, 'generated', 'props');
 
-  const resolved = path.resolve(argument);
-  // `path.relative` answers with an absolute path across drives and compares
-  // case-insensitively on Windows, so neither a bare prefix test nor
-  // `resolved !== docsRoot` is enough on its own.
-  const relative = path.relative(docsRoot, resolved);
-
-  if (
-    relative === '' ||
-    path.isAbsolute(relative) ||
-    relative.split(path.sep)[0] === '..'
-  ) {
-    throw new Error(
-      `Refusing to write to ${resolved}: the output directory must sit under ${docsRoot}.`
-    );
-  }
-  return resolved;
-}
-
-const outputDir = resolveOutputDir(process.argv[2]);
+const indexFile = 'index.json';
 
 function isComponentSource(filePath) {
   const name = path.basename(filePath);
@@ -71,8 +55,23 @@ function toRepoPath(absolutePath) {
   return path.relative(repoRoot, absolutePath).split(path.sep).join('/');
 }
 
+/**
+ * The slug is the folder a component lives in. A path that escapes
+ * `components/`, or names a file sitting directly in it, has no slug and so no
+ * page to land on.
+ */
+function toSlugFolder(relativePath) {
+  if (path.isAbsolute(relativePath)) return null;
+
+  const segments = relativePath.split(path.sep);
+  if (segments.length < 2) return null;
+  if (segments[0] === '..') return null;
+
+  return segments[0];
+}
+
 function toSlug(absolutePath) {
-  return path.relative(componentsRoot, absolutePath).split(path.sep)[0];
+  return toSlugFolder(path.relative(componentsRoot, absolutePath));
 }
 
 /**
@@ -186,41 +185,65 @@ const componentValueFlags =
   ts.SymbolFlags.Function | ts.SymbolFlags.Class | ts.SymbolFlags.Variable;
 
 /**
- * A slug is a folder under `src/components/`, so a component declared anywhere
- * else has nowhere to land. Dropping it silently would leave the output short
- * of the export surface with nothing to say so.
+ * A PascalCase value export is only a component if it can be rendered, so the
+ * call signature is what separates `Button` from an exported config object.
  */
-function publicComponents(exported) {
-  const componentsPath = toRepoPath(componentsRoot);
+function isRenderable(checker, symbol) {
+  if ((symbol.flags & componentValueFlags) === 0) return false;
+  const declaration = symbol.declarations?.[0];
+  if (!declaration) return false;
 
-  return new Map(
-    [...exported]
-      .filter(([name, symbol]) => {
-        if (!isComponentName(name)) return false;
-        if ((symbol.flags & componentValueFlags) === 0) return false;
-
-        const declaredIn = symbolSourcePath(symbol);
-        if (declaredIn?.startsWith(componentsPath)) return true;
-
-        throw new Error(
-          `@nexus_ds/react exports the component ${name} from ${declaredIn ?? 'an unresolvable file'}; move it under ${componentsPath}/ so it gets a props entry.`
-        );
-      })
-      .sort(([a], [b]) => a.localeCompare(b, 'en'))
-  );
+  const type = checker.getTypeOfSymbolAtLocation(symbol, declaration);
+  return checker.getSignaturesOfType(type, ts.SignatureKind.Call).length > 0;
 }
 
 /**
- * `React.CSSProperties` is spelled the same in every file and reads as itself;
- * a namespace over any other module prints a name only that file knows.
+ * A slug is a folder under `src/components/`, so a component declared anywhere
+ * else — or directly in `components/` with no folder of its own — has nowhere
+ * to land. Dropping it silently would leave the output short of the export
+ * surface with nothing to say so.
+ */
+function publicComponents(checker, exported) {
+  const found = [];
+
+  for (const [name, symbol] of exported) {
+    if (!isComponentName(name)) continue;
+    if (!isRenderable(checker, symbol)) continue;
+
+    const declaredIn = symbolSourcePath(symbol);
+    const withinComponents = declaredIn
+      ? path.relative(componentsRoot, path.join(repoRoot, declaredIn))
+      : null;
+
+    if (!withinComponents || !toSlugFolder(withinComponents)) {
+      throw new Error(
+        `@nexus_ds/react exports the component ${name} from ${declaredIn ?? 'an unresolvable file'}; it needs a folder of its own under ${toRepoPath(componentsRoot)}/ to get a props entry.`
+      );
+    }
+
+    found.push([name, symbol]);
+  }
+
+  return new Map(found.sort(([a], [b]) => a.localeCompare(b, 'en')));
+}
+
+/**
+ * `React.CSSProperties` is spelled the same in every file and reads as itself,
+ * so the conventional `React` binding is exempt; a namespace over any other
+ * module — or react under a different local name — prints a name only that
+ * file knows.
  */
 function opaqueNamespaceNames(sourceFile) {
   return sourceFile.statements
     .filter((statement) => ts.isImportDeclaration(statement))
-    .filter((statement) => statement.moduleSpecifier.text !== 'react')
-    .map((statement) => statement.importClause?.namedBindings)
-    .filter((bindings) => bindings && ts.isNamespaceImport(bindings))
-    .map((bindings) => bindings.name.text);
+    .map((statement) => ({
+      module: statement.moduleSpecifier.text,
+      bindings: statement.importClause?.namedBindings,
+    }))
+    .filter(({ bindings }) => bindings && ts.isNamespaceImport(bindings))
+    .map(({ module, bindings }) => ({ module, name: bindings.name.text }))
+    .filter(({ module, name }) => !(module === 'react' && name === 'React'))
+    .map(({ name }) => name);
 }
 
 /**
@@ -286,6 +309,11 @@ function toPropEntry(prop, expansions) {
     required: prop.required,
     defaultValue: prop.defaultValue?.value ?? null,
     description: prop.description,
+    // `shouldIncludePropTagMap` strips `@example` out of `description`, so the
+    // snippet only survives if it is carried across from the tag map — which,
+    // unlike `description`, docgen hands back with the checkout's own line
+    // endings.
+    example: prop.tags?.example?.replace(/\r\n/g, '\n') ?? null,
   };
 }
 
@@ -339,6 +367,24 @@ function writeJson(filePath, value) {
   writeFileSync(filePath, `${JSON.stringify(value, null, 2)}\n`, 'utf8');
 }
 
+/**
+ * Removes what the last run wrote and nothing else, so a folder renamed or
+ * deleted since then leaves no orphan behind. The previous `index.json` is the
+ * record of that: it names every slug file written, including ones no current
+ * folder would account for.
+ */
+function clearPreviousOutput() {
+  const indexPath = path.join(outputDir, indexFile);
+  const previous = existsSync(indexPath)
+    ? Object.keys(JSON.parse(readFileSync(indexPath, 'utf8')))
+    : [];
+
+  for (const slug of new Set([...previous, ...slugs])) {
+    rmSync(path.join(outputDir, `${slug}.json`), { force: true });
+  }
+  rmSync(indexPath, { force: true });
+}
+
 const slugs = readdirSync(componentsRoot, { withFileTypes: true })
   .filter((entry) => entry.isDirectory())
   .map((entry) => entry.name)
@@ -362,7 +408,6 @@ const program = ts.createProgram([...sourceFiles, ...reactEntryPoints()], {
 const checker = program.getTypeChecker();
 
 const exported = publicExports(checker, program);
-const components = publicComponents(exported);
 const expansions = localAliasExpansions(checker, program, exported);
 
 // `parseWithProgramProvider` ignores the parser's own options once a program
@@ -391,6 +436,11 @@ for (const doc of parser.parseWithProgramProvider(sourceFiles, () => program)) {
   docsByName.set(exportName(doc), doc);
 }
 
+// A union prints its members in the order the checker first interned them, so
+// resolving component types ahead of the alias expansions and the docgen parse
+// would reorder the type strings those two produce.
+const components = publicComponents(checker, exported);
+
 const bySlug = new Map(slugs.map((slug) => [slug, []]));
 
 for (const [name, symbol] of components) {
@@ -403,9 +453,7 @@ for (const [name, symbol] of components) {
 }
 
 mkdirSync(outputDir, { recursive: true });
-for (const file of readdirSync(outputDir)) {
-  if (file.endsWith('.json')) unlinkSync(path.join(outputDir, file));
-}
+clearPreviousOutput();
 
 const index = {};
 let propCount = 0;
@@ -427,7 +475,7 @@ for (const [slug, entries] of bySlug) {
   });
 }
 
-writeJson(path.join(outputDir, 'index.json'), index);
+writeJson(path.join(outputDir, indexFile), index);
 
 console.log(
   `props: ${Object.keys(index).length} entries, ${components.size} components, ${propCount} props -> ${toRepoPath(outputDir)}`

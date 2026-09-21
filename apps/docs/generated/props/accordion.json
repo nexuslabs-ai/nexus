@@ -11,7 +11,8 @@
           "type": "\"stacked\" | \"floating\" | null",
           "required": false,
           "defaultValue": "stacked",
-          "description": ""
+          "description": "",
+          "example": null
         }
       ]
     },

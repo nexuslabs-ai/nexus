@@ -29,28 +29,32 @@
           "type": "ReactNode",
           "required": false,
           "defaultValue": null,
-          "description": "Optional body content rendered in a generated `DialogBody` before\n`children`. Ignored when a composed `DialogBody` child is present."
+          "description": "Optional body content rendered in a generated `DialogBody` before\n`children`. Ignored when a composed `DialogBody` child is present.",
+          "example": null
         },
         {
           "name": "description",
           "type": "ReactNode",
           "required": false,
           "defaultValue": null,
-          "description": "Optional description for a prop-driven header, rendered before `children`.\nIgnored when a composed `DialogHeader` child is present."
+          "description": "Optional description for a prop-driven header, rendered before `children`.\nIgnored when a composed `DialogHeader` child is present.",
+          "example": null
         },
         {
           "name": "showCloseButton",
           "type": "boolean",
           "required": false,
           "defaultValue": "true",
-          "description": "Whether to show the close button in the top-right corner."
+          "description": "Whether to show the close button in the top-right corner.",
+          "example": null
         },
         {
           "name": "title",
           "type": "ReactNode",
           "required": false,
           "defaultValue": null,
-          "description": "Optional title for a prop-driven header, rendered before `children`.\nIgnored when a composed `DialogHeader` child is present. Detection covers\na direct child or a Fragment-wrapped header; a header nested inside another\nelement is not detected."
+          "description": "Optional title for a prop-driven header, rendered before `children`.\nIgnored when a composed `DialogHeader` child is present. Detection covers\na direct child or a Fragment-wrapped header; a header nested inside another\nelement is not detected.",
+          "example": null
         }
       ]
     },

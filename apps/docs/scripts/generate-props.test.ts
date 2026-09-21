@@ -5,17 +5,15 @@ import {
   readdirSync,
   readFileSync,
   rmSync,
+  writeFileSync,
 } from 'node:fs';
+import { tmpdir } from 'node:os';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import ts from 'typescript';
 import { afterAll, describe, expect, it } from 'vitest';
 
-import {
-  reactEntryPoints,
-  reactRoot,
-  repoRoot,
-} from './react-entry-points.mjs';
+import { reactEntryPoints, reactRoot } from './react-entry-points.mjs';
 
 const docsRoot = path.resolve(
   path.dirname(fileURLToPath(import.meta.url)),
@@ -31,6 +29,7 @@ type PropEntry = {
   required: boolean;
   defaultValue: string | null;
   description: string;
+  example: string | null;
 };
 
 type ComponentEntry = {
@@ -86,6 +85,14 @@ let freshDir: string | null = null;
 afterAll(() => {
   if (freshDir) rmSync(freshDir, { recursive: true, force: true });
 });
+
+function runGenerator(outputDir: string) {
+  execFileSync(
+    process.execPath,
+    [path.join(docsRoot, 'scripts', 'generate-props.mjs'), outputDir],
+    { stdio: 'pipe' }
+  );
+}
 
 let exportNames: Set<string> | null = null;
 
@@ -267,6 +274,14 @@ describe('docs props data', () => {
     );
   });
 
+  it('carries the snippet an @example tag documents', () => {
+    // The tag map is the only place this survives — docgen strips the tag out
+    // of `description`, so a dropped field would read as no example at all.
+    expect(propOf('button', 'Button', 'asChild').example).toContain('<Button');
+    expect(propOf('badge', 'Badge', 'leftIcon').example).toBeTruthy();
+    expect(propOf('badge', 'Badge', 'variant').example).toBeNull();
+  });
+
   it('prints an unexported alias as its members, not its name', () => {
     expect(propOf('slider', 'Slider', 'markers').type).toBe(
       'number[] | "steps"'
@@ -279,19 +294,24 @@ describe('docs props data', () => {
     );
   });
 
-  it('refuses an output directory outside the docs app', () => {
-    // Everything in the target directory's `*.json` is deleted before writing,
-    // so a stray argument must not be able to name the repo root.
-    const outside = path.join(repoRoot, 'node_modules', '.props-guard-probe');
+  it('clears the files it wrote last run and nothing else', () => {
+    const dir = mkdtempSync(path.join(tmpdir(), 'nexus-props-clear-'));
+    // A slug the previous run recorded but no folder accounts for any more,
+    // next to a file the generator has no business touching.
+    writeFileSync(path.join(dir, 'index.json'), '{"retired-widget":["X"]}\n');
+    writeFileSync(path.join(dir, 'retired-widget.json'), '{}\n');
+    writeFileSync(path.join(dir, 'package.json'), '{"name":"bystander"}\n');
 
-    expect(() =>
-      execFileSync(
-        process.execPath,
-        [path.join(docsRoot, 'scripts', 'generate-props.mjs'), outside],
-        { stdio: 'pipe' }
-      )
-    ).toThrow(/Refusing to write to/);
-    expect(existsSync(outside)).toBe(false);
+    try {
+      runGenerator(dir);
+
+      expect(existsSync(path.join(dir, 'retired-widget.json'))).toBe(false);
+      expect(readFileSync(path.join(dir, 'package.json'), 'utf8')).toBe(
+        '{"name":"bystander"}\n'
+      );
+    } finally {
+      rmSync(dir, { recursive: true, force: true });
+    }
   });
 
   it('never names a type a reader cannot resolve', { timeout: 120_000 }, () => {
@@ -348,13 +368,8 @@ describe('docs props data', () => {
   // change committed without rerunning the generator — a stale file here
   // fails the same way a hand-edited one would.
   it('matches a fresh run of the generator', { timeout: 120_000 }, () => {
-    freshDir = mkdtempSync(path.join(docsRoot, 'generated', 'props-fresh-'));
-
-    execFileSync(
-      process.execPath,
-      [path.join(docsRoot, 'scripts', 'generate-props.mjs'), freshDir],
-      { stdio: 'pipe' }
-    );
+    freshDir = mkdtempSync(path.join(tmpdir(), 'nexus-props-'));
+    runGenerator(freshDir);
 
     const fresh = readdirSync(freshDir).sort(byName);
     expect(fresh).toEqual(readdirSync(generatedDir).sort(byName));

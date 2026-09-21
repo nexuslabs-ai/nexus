@@ -11,21 +11,24 @@
           "type": "\"icon\" | \"none\" | \"offcanvas\"",
           "required": false,
           "defaultValue": "offcanvas",
-          "description": "Collapse behaviour: slide `offcanvas`, shrink to an `icon` rail, or `none`."
+          "description": "Collapse behaviour: slide `offcanvas`, shrink to an `icon` rail, or `none`.",
+          "example": null
         },
         {
           "name": "side",
           "type": "\"left\" | \"right\"",
           "required": false,
           "defaultValue": "left",
-          "description": "Which edge the sidebar docks to."
+          "description": "Which edge the sidebar docks to.",
+          "example": null
         },
         {
           "name": "variant",
           "type": "\"inset\" | \"floating\" | \"sidebar\"",
           "required": false,
           "defaultValue": "sidebar",
-          "description": "Visual treatment: flush `sidebar`, detached `floating`, or `inset` (pairs\nwith `SidebarInset` for a card-like main region)."
+          "description": "Visual treatment: flush `sidebar`, detached `floating`, or `inset` (pairs\nwith `SidebarInset` for a card-like main region).",
+          "example": null
         }
       ]
     },
@@ -57,7 +60,8 @@
           "type": "boolean",
           "required": false,
           "defaultValue": "false",
-          "description": "Render as the child element via Radix `Slot`."
+          "description": "Render as the child element via Radix `Slot`.",
+          "example": null
         }
       ]
     },
@@ -77,7 +81,8 @@
           "type": "boolean",
           "required": false,
           "defaultValue": "false",
-          "description": "Render as the child element via Radix `Slot` (e.g. an accessible heading)."
+          "description": "Render as the child element via Radix `Slot` (e.g. an accessible heading).",
+          "example": null
         }
       ]
     },
@@ -97,14 +102,16 @@
           "type": "\"default\" | \"sm\" | \"lg\" | null",
           "required": false,
           "defaultValue": null,
-          "description": ""
+          "description": "",
+          "example": null
         },
         {
           "name": "variant",
           "type": "\"borderless\" | \"bordered\" | null",
           "required": false,
           "defaultValue": null,
-          "description": ""
+          "description": "",
+          "example": null
         }
       ]
     },
@@ -130,14 +137,16 @@
           "type": "boolean",
           "required": false,
           "defaultValue": "false",
-          "description": "Render as the child element via Radix `Slot`."
+          "description": "Render as the child element via Radix `Slot`.",
+          "example": null
         },
         {
           "name": "showOnHover",
           "type": "boolean",
           "required": false,
           "defaultValue": "false",
-          "description": "Reveal the action only on hover/focus of the menu item (vs. always shown)."
+          "description": "Reveal the action only on hover/focus of the menu item (vs. always shown).",
+          "example": null
         }
       ]
     },
@@ -157,35 +166,40 @@
           "type": "boolean",
           "required": false,
           "defaultValue": "false",
-          "description": "Render as the child element via Radix `Slot` (e.g. an `<a>` or router link)."
+          "description": "Render as the child element via Radix `Slot` (e.g. an `<a>` or router link).",
+          "example": null
         },
         {
           "name": "isActive",
           "type": "boolean",
           "required": false,
           "defaultValue": "false",
-          "description": "Marks the item as the current page; styles it as selected."
+          "description": "Marks the item as the current page; styles it as selected.",
+          "example": null
         },
         {
           "name": "size",
           "type": "\"default\" | \"sm\" | \"lg\" | null",
           "required": false,
           "defaultValue": "default",
-          "description": ""
+          "description": "",
+          "example": null
         },
         {
           "name": "tooltip",
           "type": "string | TooltipContentProps",
           "required": false,
           "defaultValue": null,
-          "description": "Tooltip shown only when the sidebar is collapsed to the icon rail. Pass a\nstring for label-only, or `TooltipContent` props for full control."
+          "description": "Tooltip shown only when the sidebar is collapsed to the icon rail. Pass a\nstring for label-only, or `TooltipContent` props for full control.",
+          "example": null
         },
         {
           "name": "variant",
           "type": "\"default\" | \"outline\" | null",
           "required": false,
           "defaultValue": "default",
-          "description": ""
+          "description": "",
+          "example": null
         }
       ]
     },
@@ -205,7 +219,8 @@
           "type": "boolean",
           "required": false,
           "defaultValue": "false",
-          "description": "Render a leading icon-sized skeleton block alongside the text bar."
+          "description": "Render a leading icon-sized skeleton block alongside the text bar.",
+          "example": null
         }
       ]
     },
@@ -225,21 +240,24 @@
           "type": "boolean",
           "required": false,
           "defaultValue": "false",
-          "description": "Render as the child element via Radix `Slot` (e.g. a router link)."
+          "description": "Render as the child element via Radix `Slot` (e.g. a router link).",
+          "example": null
         },
         {
           "name": "isActive",
           "type": "boolean",
           "required": false,
           "defaultValue": "false",
-          "description": "Marks the sub-item as the current page; styles it as selected."
+          "description": "Marks the sub-item as the current page; styles it as selected.",
+          "example": null
         },
         {
           "name": "size",
           "type": "\"sm\" | \"md\"",
           "required": false,
           "defaultValue": "md",
-          "description": "Text size of the sub-item."
+          "description": "Text size of the sub-item.",
+          "example": null
         }
       ]
     },
@@ -259,21 +277,24 @@
           "type": "boolean",
           "required": false,
           "defaultValue": "true",
-          "description": "Whether the sidebar starts open when uncontrolled.\n\nWhen uncontrolled, the provider persists the open state to a `sidebar_state`\ncookie. It does not read the cookie back — restore across reloads by reading\nit server-side and passing the result here."
+          "description": "Whether the sidebar starts open when uncontrolled.\n\nWhen uncontrolled, the provider persists the open state to a `sidebar_state`\ncookie. It does not read the cookie back — restore across reloads by reading\nit server-side and passing the result here.",
+          "example": "```tsx\n// Server Component (e.g. Next.js app/layout.tsx)\nconst store = await cookies();\nconst defaultOpen = store.get('sidebar_state')?.value !== 'false';\nreturn <SidebarProvider defaultOpen={defaultOpen}>{children}</SidebarProvider>;\n```"
         },
         {
           "name": "onOpenChange",
           "type": "((open: boolean) => void)",
           "required": false,
           "defaultValue": null,
-          "description": "Called when the open state changes (in controlled mode)."
+          "description": "Called when the open state changes (in controlled mode).",
+          "example": null
         },
         {
           "name": "open",
           "type": "boolean",
           "required": false,
           "defaultValue": null,
-          "description": "Controlled open state. Pair with `onOpenChange` to control externally."
+          "description": "Controlled open state. Pair with `onOpenChange` to control externally.",
+          "example": null
         }
       ]
     },
@@ -299,42 +320,48 @@
           "type": "boolean",
           "required": false,
           "defaultValue": "false",
-          "description": "When true, the button renders as its child element (via Radix Slot),\napplying button styling to e.g. an `<a>` while leaving the child's own\ncontent untouched — compose icons inside the child. `loading` and the\n`startIcon` / `endIcon` slots apply to the native `<button>` only."
+          "description": "When true, the button renders as its child element (via Radix Slot),\napplying button styling to e.g. an `<a>` while leaving the child's own\ncontent untouched — compose icons inside the child. `loading` and the\n`startIcon` / `endIcon` slots apply to the native `<button>` only.",
+          "example": "```tsx\n<Button asChild>\n  <a href=\"/page\">Link styled as button</a>\n</Button>\n```"
         },
         {
           "name": "endIcon",
           "type": "ReactNode",
           "required": false,
           "defaultValue": null,
-          "description": "Decorative icon rendered after the button label. Use either `endIcon`\nor `startIcon`, not both. Hidden while `loading` (the spinner replaces all\ncontent)."
+          "description": "Decorative icon rendered after the button label. Use either `endIcon`\nor `startIcon`, not both. Hidden while `loading` (the spinner replaces all\ncontent).",
+          "example": null
         },
         {
           "name": "loading",
           "type": "boolean",
           "required": false,
           "defaultValue": "false",
-          "description": "Shows a loading indicator and disables the button. While loading, the\nspinner replaces all visible content and any icon slots are hidden."
+          "description": "Shows a loading indicator and disables the button. While loading, the\nspinner replaces all visible content and any icon slots are hidden.",
+          "example": "```tsx\n<Button loading>Submitting...</Button>\n```"
         },
         {
           "name": "size",
           "type": "\"default\" | \"sm\" | \"lg\" | \"icon-sm\" | \"icon\" | \"icon-lg\" | null",
           "required": false,
           "defaultValue": null,
-          "description": ""
+          "description": "",
+          "example": null
         },
         {
           "name": "startIcon",
           "type": "ReactNode",
           "required": false,
           "defaultValue": null,
-          "description": "Decorative icon rendered before the button label. Use either `startIcon`\nor `endIcon`, not both. Hidden while `loading` (the spinner replaces all\ncontent)."
+          "description": "Decorative icon rendered before the button label. Use either `startIcon`\nor `endIcon`, not both. Hidden while `loading` (the spinner replaces all\ncontent).",
+          "example": null
         },
         {
           "name": "variant",
           "type": "\"default\" | \"error\" | \"destructive\" | \"outline\" | \"dashed\" | \"secondary\" | \"ghost\" | \"link\" | null",
           "required": false,
           "defaultValue": null,
-          "description": ""
+          "description": "",
+          "example": null
         }
       ]
     }

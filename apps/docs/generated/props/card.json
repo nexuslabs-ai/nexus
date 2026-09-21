@@ -47,7 +47,8 @@
           "type": "boolean",
           "required": false,
           "defaultValue": "false",
-          "description": "Render the title styles on a child element. Use this when the card title\nneeds a different heading level in the page outline."
+          "description": "Render the title styles on a child element. Use this when the card title\nneeds a different heading level in the page outline.",
+          "example": "```tsx\n<CardTitle asChild>\n  <h2>Section Title</h2>\n</CardTitle>\n```"
         }
       ]
     }

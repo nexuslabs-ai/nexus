@@ -35,21 +35,24 @@
           "type": "boolean",
           "required": false,
           "defaultValue": "false",
-          "description": "Render as the child element via Radix Slot — e.g. a framework router link\n(`next/link`, TanStack Router `Link`) — keeping the pagination-link\nstyling. The router link renders its own `<a>`, so this avoids the nested\n`<a><a>` that wrapping would produce."
+          "description": "Render as the child element via Radix Slot — e.g. a framework router link\n(`next/link`, TanStack Router `Link`) — keeping the pagination-link\nstyling. The router link renders its own `<a>`, so this avoids the nested\n`<a><a>` that wrapping would produce.",
+          "example": null
         },
         {
           "name": "isActive",
           "type": "boolean",
           "required": false,
           "defaultValue": "false",
-          "description": "Marks this link as the current page — applies the `outline` button\ntreatment and sets `aria-current=\"page\"`."
+          "description": "Marks this link as the current page — applies the `outline` button\ntreatment and sets `aria-current=\"page\"`.",
+          "example": null
         },
         {
           "name": "size",
           "type": "\"default\" | \"sm\" | \"lg\" | \"icon-sm\" | \"icon\" | \"icon-lg\" | null",
           "required": false,
           "defaultValue": "icon",
-          "description": ""
+          "description": "",
+          "example": null
         }
       ]
     },
@@ -63,21 +66,24 @@
           "type": "boolean",
           "required": false,
           "defaultValue": "false",
-          "description": "Render as the child element via Radix Slot — e.g. a framework router link\n(`next/link`, TanStack Router `Link`) — keeping the pagination-link\nstyling. The router link renders its own `<a>`, so this avoids the nested\n`<a><a>` that wrapping would produce."
+          "description": "Render as the child element via Radix Slot — e.g. a framework router link\n(`next/link`, TanStack Router `Link`) — keeping the pagination-link\nstyling. The router link renders its own `<a>`, so this avoids the nested\n`<a><a>` that wrapping would produce.",
+          "example": null
         },
         {
           "name": "isActive",
           "type": "boolean",
           "required": false,
           "defaultValue": "false",
-          "description": "Marks this link as the current page — applies the `outline` button\ntreatment and sets `aria-current=\"page\"`."
+          "description": "Marks this link as the current page — applies the `outline` button\ntreatment and sets `aria-current=\"page\"`.",
+          "example": null
         },
         {
           "name": "size",
           "type": "\"default\" | \"sm\" | \"lg\" | \"icon-sm\" | \"icon\" | \"icon-lg\" | null",
           "required": false,
           "defaultValue": null,
-          "description": ""
+          "description": "",
+          "example": null
         }
       ]
     },
@@ -91,21 +97,24 @@
           "type": "boolean",
           "required": false,
           "defaultValue": "false",
-          "description": "Render as the child element via Radix Slot — e.g. a framework router link\n(`next/link`, TanStack Router `Link`) — keeping the pagination-link\nstyling. The router link renders its own `<a>`, so this avoids the nested\n`<a><a>` that wrapping would produce."
+          "description": "Render as the child element via Radix Slot — e.g. a framework router link\n(`next/link`, TanStack Router `Link`) — keeping the pagination-link\nstyling. The router link renders its own `<a>`, so this avoids the nested\n`<a><a>` that wrapping would produce.",
+          "example": null
         },
         {
           "name": "isActive",
           "type": "boolean",
           "required": false,
           "defaultValue": "false",
-          "description": "Marks this link as the current page — applies the `outline` button\ntreatment and sets `aria-current=\"page\"`."
+          "description": "Marks this link as the current page — applies the `outline` button\ntreatment and sets `aria-current=\"page\"`.",
+          "example": null
         },
         {
           "name": "size",
           "type": "\"default\" | \"sm\" | \"lg\" | \"icon-sm\" | \"icon\" | \"icon-lg\" | null",
           "required": false,
           "defaultValue": null,
-          "description": ""
+          "description": "",
+          "example": null
         }
       ]
     }

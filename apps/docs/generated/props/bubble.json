@@ -11,14 +11,16 @@
           "type": "\"end\" | \"start\" | null",
           "required": false,
           "defaultValue": null,
-          "description": ""
+          "description": "",
+          "example": null
         },
         {
           "name": "variant",
           "type": "\"destructive\" | \"outline\" | \"ghost\" | \"muted\" | \"primary\" | null",
           "required": false,
           "defaultValue": "muted",
-          "description": ""
+          "description": "",
+          "example": null
         }
       ]
     },
@@ -32,7 +34,8 @@
           "type": "boolean",
           "required": false,
           "defaultValue": "false",
-          "description": "Render as the child element instead of a `div`, merging BubbleContent's\nstyles onto it. Use when the message body needs different semantics — a\n`p` for prose, or an `a` / `button` when the whole turn is actionable.\n\nAn interactive child takes the design-system focus ring and the pointer\ncursor, and still owns its own accessible name. Both are withheld from a\nbody that cannot be actioned — an `a` with no `href`, a disabled\n`button`, or anything carrying `aria-disabled`.\n\nThe turn itself carries no hover tint or press cue: the surface stays\nstill and the affordance reads from the body — the underline on a link,\nthe label on a button. Add one at the call site if a product surface needs\nit."
+          "description": "Render as the child element instead of a `div`, merging BubbleContent's\nstyles onto it. Use when the message body needs different semantics — a\n`p` for prose, or an `a` / `button` when the whole turn is actionable.\n\nAn interactive child takes the design-system focus ring and the pointer\ncursor, and still owns its own accessible name. Both are withheld from a\nbody that cannot be actioned — an `a` with no `href`, a disabled\n`button`, or anything carrying `aria-disabled`.\n\nThe turn itself carries no hover tint or press cue: the surface stays\nstill and the affordance reads from the body — the underline on a link,\nthe label on a button. Add one at the call site if a product surface needs\nit.",
+          "example": "```tsx\n<BubbleContent asChild>\n  <button type=\"button\">Retry this step</button>\n</BubbleContent>\n```"
         }
       ]
     },
@@ -52,14 +55,16 @@
           "type": "\"end\" | \"start\" | null",
           "required": false,
           "defaultValue": "end",
-          "description": ""
+          "description": "",
+          "example": null
         },
         {
           "name": "side",
           "type": "\"bottom\" | \"top\" | null",
           "required": false,
           "defaultValue": "bottom",
-          "description": ""
+          "description": "",
+          "example": null
         }
       ]
     }

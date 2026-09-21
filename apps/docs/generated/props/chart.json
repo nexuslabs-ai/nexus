@@ -11,7 +11,8 @@
           "type": "ChartConfig",
           "required": true,
           "defaultValue": null,
-          "description": ""
+          "description": "",
+          "example": null
         }
       ]
     },
@@ -31,28 +32,32 @@
           "type": "string",
           "required": false,
           "defaultValue": null,
-          "description": ""
+          "description": "",
+          "example": null
         },
         {
           "name": "hideIcon",
           "type": "boolean",
           "required": false,
           "defaultValue": "false",
-          "description": ""
+          "description": "",
+          "example": null
         },
         {
           "name": "nameKey",
           "type": "string",
           "required": false,
           "defaultValue": null,
-          "description": ""
+          "description": "",
+          "example": null
         },
         {
           "name": "verticalAlign",
           "type": "\"bottom\" | \"top\"",
           "required": false,
           "defaultValue": "bottom",
-          "description": ""
+          "description": "",
+          "example": null
         }
       ]
     },
@@ -72,63 +77,72 @@
           "type": "boolean",
           "required": false,
           "defaultValue": null,
-          "description": ""
+          "description": "",
+          "example": null
         },
         {
           "name": "className",
           "type": "string",
           "required": false,
           "defaultValue": null,
-          "description": ""
+          "description": "",
+          "example": null
         },
         {
           "name": "color",
           "type": "string",
           "required": false,
           "defaultValue": null,
-          "description": ""
+          "description": "",
+          "example": null
         },
         {
           "name": "formatter",
           "type": "ChartTooltipFormatter",
           "required": false,
           "defaultValue": null,
-          "description": ""
+          "description": "",
+          "example": null
         },
         {
           "name": "hideIndicator",
           "type": "boolean",
           "required": false,
           "defaultValue": "false",
-          "description": ""
+          "description": "",
+          "example": null
         },
         {
           "name": "hideLabel",
           "type": "boolean",
           "required": false,
           "defaultValue": "false",
-          "description": ""
+          "description": "",
+          "example": null
         },
         {
           "name": "indicator",
           "type": "\"dashed\" | \"line\" | \"dot\"",
           "required": false,
           "defaultValue": "dot",
-          "description": ""
+          "description": "",
+          "example": null
         },
         {
           "name": "labelKey",
           "type": "string",
           "required": false,
           "defaultValue": null,
-          "description": ""
+          "description": "",
+          "example": null
         },
         {
           "name": "nameKey",
           "type": "string",
           "required": false,
           "defaultValue": null,
-          "description": ""
+          "description": "",
+          "example": null
         }
       ]
     }

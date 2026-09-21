@@ -17,28 +17,32 @@
           "type": "string",
           "required": false,
           "defaultValue": null,
-          "description": "Class names forwarded to the underlying DialogContent."
+          "description": "Class names forwarded to the underlying DialogContent.",
+          "example": null
         },
         {
           "name": "description",
           "type": "string",
           "required": false,
           "defaultValue": "Search for a command to run...",
-          "description": "Accessible description for the dialog, rendered visually hidden."
+          "description": "Accessible description for the dialog, rendered visually hidden.",
+          "example": null
         },
         {
           "name": "showCloseButton",
           "type": "boolean",
           "required": false,
           "defaultValue": "false",
-          "description": "Whether to show the dialog's close button. Command palettes conventionally\nrely on Escape / click-outside, so this is off by default."
+          "description": "Whether to show the dialog's close button. Command palettes conventionally\nrely on Escape / click-outside, so this is off by default.",
+          "example": null
         },
         {
           "name": "title",
           "type": "string",
           "required": false,
           "defaultValue": "Command Palette",
-          "description": "Accessible title for the dialog, rendered visually hidden. Also labels the\ncommand input."
+          "description": "Accessible title for the dialog, rendered visually hidden. Also labels the\ncommand input.",
+          "example": null
         }
       ]
     },

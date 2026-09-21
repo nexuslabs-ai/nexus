@@ -11,7 +11,8 @@
           "type": "ReactNode",
           "required": false,
           "defaultValue": null,
-          "description": "The OTP slots — `InputOTPGroup` / `InputOTPSlot` / `InputOTPSeparator`."
+          "description": "The OTP slots — `InputOTPGroup` / `InputOTPSlot` / `InputOTPSeparator`.",
+          "example": null
         }
       ]
     },
@@ -37,7 +38,8 @@
           "type": "number",
           "required": true,
           "defaultValue": null,
-          "description": "The slot's position within the OTP input. Used to read this slot's\ncharacter, caret, and active state from context."
+          "description": "The slot's position within the OTP input. Used to read this slot's\ncharacter, caret, and active state from context.",
+          "example": null
         }
       ]
     }

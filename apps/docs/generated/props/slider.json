@@ -11,14 +11,16 @@
           "type": "number[] | \"steps\"",
           "required": false,
           "defaultValue": null,
-          "description": "Optional visual marks in the slider value domain. Pass an array for custom\npositions or `\"steps\"` to render one marker at each interior step."
+          "description": "Optional visual marks in the slider value domain. Pass an array for custom\npositions or `\"steps\"` to render one marker at each interior step.",
+          "example": "```tsx\n<Slider defaultValue={[2]} max={4} step={1} markers={[3]} />\n<Slider defaultValue={[2]} max={4} step={1} markers=\"steps\" />\n```"
         },
         {
           "name": "size",
           "type": "\"standard\" | \"comfortable\"",
           "required": false,
           "defaultValue": "standard",
-          "description": "Visual density for the slider rail and thumb."
+          "description": "Visual density for the slider rail and thumb.",
+          "example": "```tsx\n<Slider size=\"comfortable\" defaultValue={[50]} aria-label=\"Progress\" />\n```"
         }
       ]
     }

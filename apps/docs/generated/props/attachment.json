@@ -11,28 +11,32 @@
           "type": "\"horizontal\" | \"vertical\" | null",
           "required": false,
           "defaultValue": "horizontal",
-          "description": ""
+          "description": "",
+          "example": null
         },
         {
           "name": "size",
           "type": "\"default\" | \"sm\" | null",
           "required": false,
           "defaultValue": "default",
-          "description": ""
+          "description": "",
+          "example": null
         },
         {
           "name": "state",
           "type": "AttachmentState",
           "required": false,
           "defaultValue": "done",
-          "description": "The attachment's lifecycle state. Drives the border treatment (dashed while\n`idle`, error-coloured while `error`) and the text announced to assistive\ntech."
+          "description": "The attachment's lifecycle state. Drives the border treatment (dashed while\n`idle`, error-coloured while `error`) and the text announced to assistive\ntech.",
+          "example": null
         },
         {
           "name": "statusLabel",
           "type": "string",
           "required": false,
           "defaultValue": "a built-in phrase per state, e.g. 'Uploading'",
-          "description": "Overrides the assistive-tech status text for the current `state` — pass a\nlocalised string, or one that names the file. Ignored while the attachment\nis settled (`idle` / `done`), which announces nothing."
+          "description": "Overrides the assistive-tech status text for the current `state` — pass a\nlocalised string, or one that names the file. Ignored while the attachment\nis settled (`idle` / `done`), which announces nothing.",
+          "example": "```tsx\n<Attachment state=\"uploading\" statusLabel=\"Uploading report.pdf\" />\n```"
         }
       ]
     },
@@ -64,14 +68,16 @@
           "type": "string",
           "required": false,
           "defaultValue": null,
-          "description": ""
+          "description": "",
+          "example": null
         },
         {
           "name": "aria-labelledby",
           "type": "string",
           "required": false,
           "defaultValue": null,
-          "description": ""
+          "description": "",
+          "example": null
         }
       ]
     },
@@ -85,7 +91,8 @@
           "type": "\"default\" | \"icon\" | \"image\" | null",
           "required": false,
           "defaultValue": null,
-          "description": ""
+          "description": "",
+          "example": null
         }
       ]
     },
@@ -105,7 +112,8 @@
           "type": "ReactNode",
           "required": false,
           "defaultValue": null,
-          "description": "A badge or status icon pinned after the file name. It keeps `ItemTitle`'s\n`gap-2` spacing and its own width while the name truncates beside it."
+          "description": "A badge or status icon pinned after the file name. It keeps `ItemTitle`'s\n`gap-2` spacing and its own width while the name truncates beside it.",
+          "example": "```tsx\n<AttachmentTitle trailing={<IconCircleCheckFilled />}>\n  report.pdf\n</AttachmentTitle>\n```"
         }
       ]
     },
@@ -119,7 +127,8 @@
           "type": "boolean",
           "required": false,
           "defaultValue": "false",
-          "description": "Render as the child element via Radix Slot — e.g. an `<a>` opening the\nfile — keeping the full-card hit area."
+          "description": "Render as the child element via Radix Slot — e.g. an `<a>` opening the\nfile — keeping the full-card hit area.",
+          "example": null
         }
       ]
     }

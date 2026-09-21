@@ -11,42 +11,48 @@
           "type": "boolean",
           "required": false,
           "defaultValue": "false",
-          "description": "When true, the button renders as its child element (via Radix Slot),\napplying button styling to e.g. an `<a>` while leaving the child's own\ncontent untouched — compose icons inside the child. `loading` and the\n`startIcon` / `endIcon` slots apply to the native `<button>` only."
+          "description": "When true, the button renders as its child element (via Radix Slot),\napplying button styling to e.g. an `<a>` while leaving the child's own\ncontent untouched — compose icons inside the child. `loading` and the\n`startIcon` / `endIcon` slots apply to the native `<button>` only.",
+          "example": "```tsx\n<Button asChild>\n  <a href=\"/page\">Link styled as button</a>\n</Button>\n```"
         },
         {
           "name": "endIcon",
           "type": "ReactNode",
           "required": false,
           "defaultValue": null,
-          "description": "Decorative icon rendered after the button label. Use either `endIcon`\nor `startIcon`, not both. Hidden while `loading` (the spinner replaces all\ncontent)."
+          "description": "Decorative icon rendered after the button label. Use either `endIcon`\nor `startIcon`, not both. Hidden while `loading` (the spinner replaces all\ncontent).",
+          "example": null
         },
         {
           "name": "loading",
           "type": "boolean",
           "required": false,
           "defaultValue": "false",
-          "description": "Shows a loading indicator and disables the button. While loading, the\nspinner replaces all visible content and any icon slots are hidden."
+          "description": "Shows a loading indicator and disables the button. While loading, the\nspinner replaces all visible content and any icon slots are hidden.",
+          "example": "```tsx\n<Button loading>Submitting...</Button>\n```"
         },
         {
           "name": "size",
           "type": "\"default\" | \"sm\" | \"lg\" | \"icon-sm\" | \"icon\" | \"icon-lg\" | null",
           "required": false,
           "defaultValue": null,
-          "description": ""
+          "description": "",
+          "example": null
         },
         {
           "name": "startIcon",
           "type": "ReactNode",
           "required": false,
           "defaultValue": null,
-          "description": "Decorative icon rendered before the button label. Use either `startIcon`\nor `endIcon`, not both. Hidden while `loading` (the spinner replaces all\ncontent)."
+          "description": "Decorative icon rendered before the button label. Use either `startIcon`\nor `endIcon`, not both. Hidden while `loading` (the spinner replaces all\ncontent).",
+          "example": null
         },
         {
           "name": "variant",
           "type": "\"default\" | \"error\" | \"destructive\" | \"outline\" | \"dashed\" | \"secondary\" | \"ghost\" | \"link\" | null",
           "required": false,
           "defaultValue": "default",
-          "description": ""
+          "description": "",
+          "example": null
         }
       ]
     }

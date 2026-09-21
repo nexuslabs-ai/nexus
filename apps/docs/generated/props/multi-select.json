@@ -11,21 +11,24 @@
           "type": "string[]",
           "required": false,
           "defaultValue": null,
-          "description": "Initial selected values for uncontrolled usage."
+          "description": "Initial selected values for uncontrolled usage.",
+          "example": null
         },
         {
           "name": "onValuesChange",
           "type": "((values: string[]) => void)",
           "required": false,
           "defaultValue": null,
-          "description": "Called with the next selected values whenever selection changes."
+          "description": "Called with the next selected values whenever selection changes.",
+          "example": null
         },
         {
           "name": "values",
           "type": "string[]",
           "required": false,
           "defaultValue": null,
-          "description": "Controlled selected values."
+          "description": "Controlled selected values.",
+          "example": null
         }
       ]
     },
@@ -39,14 +42,16 @@
           "type": "ReactNode",
           "required": false,
           "defaultValue": "No results found.",
-          "description": "Shown when the search matches no options."
+          "description": "Shown when the search matches no options.",
+          "example": null
         },
         {
           "name": "searchPlaceholder",
           "type": "string",
           "required": false,
           "defaultValue": "Search…",
-          "description": "Placeholder for the search input."
+          "description": "Placeholder for the search input.",
+          "example": null
         }
       ]
     },
@@ -66,21 +71,24 @@
           "type": "ReactNode",
           "required": false,
           "defaultValue": null,
-          "description": "Label for the trigger chip when it differs from the option content (e.g. the\noption renders an icon + text but the chip should show text only)."
+          "description": "Label for the trigger chip when it differs from the option content (e.g. the\noption renders an icon + text but the chip should show text only).",
+          "example": null
         },
         {
           "name": "onSelect",
           "type": "((value: string) => void)",
           "required": false,
           "defaultValue": null,
-          "description": "Called with the value after it is toggled."
+          "description": "Called with the value after it is toggled.",
+          "example": null
         },
         {
           "name": "value",
           "type": "string",
           "required": true,
           "defaultValue": null,
-          "description": ""
+          "description": "",
+          "example": null
         }
       ]
     },
@@ -106,21 +114,24 @@
           "type": "boolean",
           "required": false,
           "defaultValue": "true",
-          "description": "Render each selected value as a removable chip."
+          "description": "Render each selected value as a removable chip.",
+          "example": null
         },
         {
           "name": "overflowBehavior",
           "type": "\"wrap\" | \"wrap-when-open\" | \"cutoff\"",
           "required": false,
           "defaultValue": "wrap-when-open",
-          "description": "How chips behave when they exceed the field width:\n- `wrap` — always wrap onto multiple lines.\n- `wrap-when-open` — wrap while the popover is open, collapse to `+N` when closed.\n- `cutoff` — always collapse overflow into a `+N` badge."
+          "description": "How chips behave when they exceed the field width:\n- `wrap` — always wrap onto multiple lines.\n- `wrap-when-open` — wrap while the popover is open, collapse to `+N` when closed.\n- `cutoff` — always collapse overflow into a `+N` badge.",
+          "example": null
         },
         {
           "name": "placeholder",
           "type": "ReactNode",
           "required": false,
           "defaultValue": "Select options",
-          "description": "Shown when nothing is selected."
+          "description": "Shown when nothing is selected.",
+          "example": null
         }
       ]
     }

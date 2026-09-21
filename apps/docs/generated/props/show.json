@@ -11,35 +11,40 @@
           "type": "\"sm\" | \"lg\" | \"md\" | \"xl\" | \"2xl\"",
           "required": false,
           "defaultValue": null,
-          "description": ""
+          "description": "",
+          "example": null
         },
         {
           "name": "as",
           "type": "\"span\" | \"div\"",
           "required": false,
           "defaultValue": "span",
-          "description": "Wrapper tag: `span` (inline) or `div` (block) — match the child's layout.\nTag-only and non-semantic: `display: contents` can\ndrop a semantic element's box from the accessibility tree, so put semantics\non a child *inside* `<Show>` / `<Hide>` instead."
+          "description": "Wrapper tag: `span` (inline) or `div` (block) — match the child's layout.\nTag-only and non-semantic: `display: contents` can\ndrop a semantic element's box from the accessibility tree, so put semantics\non a child *inside* `<Show>` / `<Hide>` instead.",
+          "example": null
         },
         {
           "name": "below",
           "type": "\"sm\" | \"lg\" | \"md\" | \"xl\" | \"2xl\"",
           "required": false,
           "defaultValue": null,
-          "description": ""
+          "description": "",
+          "example": null
         },
         {
           "name": "containerAbove",
           "type": "\"sm\" | \"lg\" | \"md\" | \"xl\" | \"2xl\"",
           "required": false,
           "defaultValue": null,
-          "description": ""
+          "description": "",
+          "example": null
         },
         {
           "name": "containerBelow",
           "type": "\"sm\" | \"lg\" | \"md\" | \"xl\" | \"2xl\"",
           "required": false,
           "defaultValue": null,
-          "description": ""
+          "description": "",
+          "example": null
         }
       ]
     }

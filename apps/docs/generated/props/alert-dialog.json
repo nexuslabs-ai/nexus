@@ -17,14 +17,16 @@
           "type": "\"default\" | \"sm\" | \"lg\" | \"icon-sm\" | \"icon\" | \"icon-lg\" | null",
           "required": false,
           "defaultValue": null,
-          "description": ""
+          "description": "",
+          "example": null
         },
         {
           "name": "variant",
           "type": "\"default\" | \"error\" | \"destructive\" | \"outline\" | \"dashed\" | \"secondary\" | \"ghost\" | \"link\" | null",
           "required": false,
           "defaultValue": "default",
-          "description": ""
+          "description": "",
+          "example": null
         }
       ]
     },
@@ -44,14 +46,16 @@
           "type": "\"default\" | \"sm\" | \"lg\" | \"icon-sm\" | \"icon\" | \"icon-lg\" | null",
           "required": false,
           "defaultValue": null,
-          "description": ""
+          "description": "",
+          "example": null
         },
         {
           "name": "variant",
           "type": "\"default\" | \"error\" | \"destructive\" | \"outline\" | \"dashed\" | \"secondary\" | \"ghost\" | \"link\" | null",
           "required": false,
           "defaultValue": "outline",
-          "description": ""
+          "description": "",
+          "example": null
         }
       ]
     },
@@ -65,7 +69,8 @@
           "type": "\"default\" | \"center\"",
           "required": false,
           "defaultValue": "default",
-          "description": "Layout variant for the alert dialog content.\n\n`default` keeps the header left-aligned and footer actions horizontal.\n`center` centers the header and stacks full-width footer actions."
+          "description": "Layout variant for the alert dialog content.\n\n`default` keeps the header left-aligned and footer actions horizontal.\n`center` centers the header and stacks full-width footer actions.",
+          "example": null
         }
       ]
     },
@@ -91,7 +96,8 @@
           "type": "\"default\" | \"center\" | null",
           "required": false,
           "defaultValue": null,
-          "description": ""
+          "description": "",
+          "example": null
         }
       ]
     },

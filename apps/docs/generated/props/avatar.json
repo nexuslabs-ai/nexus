@@ -11,21 +11,24 @@
           "type": "boolean",
           "required": false,
           "defaultValue": "false",
-          "description": "When true, renders a non-interactive emphasis ring around the avatar.\nUse for selected/current visual emphasis; focus rings belong on the\ninteractive wrapper, not Avatar itself."
+          "description": "When true, renders a non-interactive emphasis ring around the avatar.\nUse for selected/current visual emphasis; focus rings belong on the\ninteractive wrapper, not Avatar itself.",
+          "example": "```tsx\n<Avatar ring>\n  <AvatarFallback>JD</AvatarFallback>\n</Avatar>\n```"
         },
         {
           "name": "shape",
           "type": "\"rounded\" | \"circle\" | null",
           "required": false,
           "defaultValue": null,
-          "description": ""
+          "description": "",
+          "example": null
         },
         {
           "name": "size",
           "type": "\"sm\" | \"lg\" | \"2xs\" | \"xs\" | \"md\" | \"xl\" | \"2xl\" | \"3xl\" | \"4xl\" | null",
           "required": false,
           "defaultValue": null,
-          "description": ""
+          "description": "",
+          "example": null
         }
       ]
     },
@@ -45,21 +48,24 @@
           "type": "number",
           "required": false,
           "defaultValue": null,
-          "description": "Maximum number of avatars to render before collapsing the remainder into a\n+N tile."
+          "description": "Maximum number of avatars to render before collapsing the remainder into a\n+N tile.",
+          "example": "```tsx\n<AvatarGroup size=\"lg\" max={3}>{avatars}</AvatarGroup>\n```"
         },
         {
           "name": "shape",
           "type": "\"rounded\" | \"circle\" | null",
           "required": false,
           "defaultValue": null,
-          "description": ""
+          "description": "",
+          "example": null
         },
         {
           "name": "size",
           "type": "\"sm\" | \"lg\" | \"2xs\" | \"xs\" | \"md\" | \"xl\" | \"2xl\" | \"3xl\" | \"4xl\" | null",
           "required": false,
           "defaultValue": null,
-          "description": ""
+          "description": "",
+          "example": null
         }
       ]
     },
@@ -79,14 +85,16 @@
           "type": "string",
           "required": false,
           "defaultValue": "the capitalised `status` ('Online', 'Away', 'Busy', 'Offline')",
-          "description": "Visually-hidden text announced by assistive tech in place of the\ncolour-only dot. Defaults to the capitalised `status`. Pass `''` to opt\nout when an adjacent text label already conveys presence."
+          "description": "Visually-hidden text announced by assistive tech in place of the\ncolour-only dot. Defaults to the capitalised `status`. Pass `''` to opt\nout when an adjacent text label already conveys presence.",
+          "example": null
         },
         {
           "name": "status",
           "type": "\"online\" | \"away\" | \"busy\" | \"offline\" | null",
           "required": false,
           "defaultValue": "online",
-          "description": ""
+          "description": "",
+          "example": null
         }
       ]
     }

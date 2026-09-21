@@ -64,7 +64,7 @@ When a component's internal CSS needs to find its own parts, give those parts a 
 
 Define props as a named interface above the function, extending `React.ComponentProps<'element'>` and/or `VariantProps<typeof componentVariants>`. Custom (non-inherited) props get JSDoc with a description, `@default`, and an `@example` for non-obvious usage. Handle boolean props with ternaries in the component body, **not** CVA variants — keeps CVA focused on enum-style variants and makes the boolean logic explicit.
 
-**A named type that appears in a public prop signature is exported.** A prop typed with a file-local alias gives the consumer a name they cannot import and the docs a name they cannot link. Either export the alias from the component folder (and through `src/index.ts`), or write the type inline. A type used only inside the implementation stays local.
+**A prop type that names another module's types is exported.** The docs print a file-local alias as its body, so `type TableVariant = 'default' | 'borderless'` needs no export — the reader sees the union. That breaks down when the body would only print as the declaring file spells it: a namespace import (`RechartsPrimitive.TooltipPayloadEntry`) or a type that file never imported. Those keep their bare alias name, which a consumer cannot import, so export the alias from the component folder and through `src/index.ts`. `ChartTooltipFormatter` is the live case.
 
 ## Class Naming
 

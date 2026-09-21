@@ -11,35 +11,40 @@
           "type": "string",
           "required": false,
           "defaultValue": null,
-          "description": "Classes for the scroll container (the element that owns horizontal — and,\nwith `stickyHeader`, vertical — overflow). Use it to bound the height\n(`\"nx:max-h-96\"`) or set the surface. `className` still targets the `<table>`."
+          "description": "Classes for the scroll container (the element that owns horizontal — and,\nwith `stickyHeader`, vertical — overflow). Use it to bound the height\n(`\"nx:max-h-96\"`) or set the surface. `className` still targets the `<table>`.",
+          "example": null
         },
         {
           "name": "density",
           "type": "\"comfortable\" | \"compact\"",
           "required": false,
           "defaultValue": "comfortable",
-          "description": "Row density.\n\n- `comfortable` — roomier ~44px rows (the default).\n- `compact` — tighter ~36px rows for dense data."
+          "description": "Row density.\n\n- `comfortable` — roomier ~44px rows (the default).\n- `compact` — tighter ~36px rows for dense data.",
+          "example": null
         },
         {
           "name": "stickyHeader",
           "type": "boolean",
           "required": false,
           "defaultValue": "false",
-          "description": "Pin the header row while the body scrolls vertically.\n\nRequires a height-bounded scroll container — set one via `containerClassName`\n(e.g. `\"nx:max-h-96\"`), or there is nothing to scroll. The sticky header\npaints on the component `container` surface so it stays raised above the page\ncanvas in Model 2."
+          "description": "Pin the header row while the body scrolls vertically.\n\nRequires a height-bounded scroll container — set one via `containerClassName`\n(e.g. `\"nx:max-h-96\"`), or there is nothing to scroll. The sticky header\npaints on the component `container` surface so it stays raised above the page\ncanvas in Model 2.",
+          "example": null
         },
         {
           "name": "striped",
           "type": "boolean",
           "required": false,
           "defaultValue": "false",
-          "description": "Zebra striping — tint alternating body rows so the eye tracks across a wide\nrow. Selection and hover take precedence over the stripe."
+          "description": "Zebra striping — tint alternating body rows so the eye tracks across a wide\nrow. Selection and hover take precedence over the stripe.",
+          "example": null
         },
         {
           "name": "variant",
           "type": "\"default\" | \"borderless\" | \"grid\"",
           "required": false,
           "defaultValue": "default",
-          "description": "Border treatment for the table's internal lines.\n\n- `default` — softened horizontal row rules + a header underline.\n- `borderless` — no internal lines; rows separate by hover + spacing.\n- `grid` — row **and** column rules (a full cell grid)."
+          "description": "Border treatment for the table's internal lines.\n\n- `default` — softened horizontal row rules + a header underline.\n- `borderless` — no internal lines; rows separate by hover + spacing.\n- `grid` — row **and** column rules (a full cell grid).",
+          "example": "```tsx\n<Table variant=\"borderless\">…</Table>\n```"
         }
       ]
     },

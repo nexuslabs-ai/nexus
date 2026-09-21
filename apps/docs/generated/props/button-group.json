@@ -11,14 +11,16 @@
           "type": "\"horizontal\" | \"vertical\" | null",
           "required": false,
           "defaultValue": "horizontal",
-          "description": ""
+          "description": "",
+          "example": null
         },
         {
           "name": "size",
           "type": "ButtonGroupSize",
           "required": false,
           "defaultValue": "default",
-          "description": "Size shared with ButtonGroupText and any Button member that doesn't set its\nown size. Inherited through context, so a Button nested inside a trigger\nwrapper (a split button) picks it up too."
+          "description": "Size shared with ButtonGroupText and any Button member that doesn't set its\nown size. Inherited through context, so a Button nested inside a trigger\nwrapper (a split button) picks it up too.",
+          "example": null
         }
       ]
     },
@@ -38,14 +40,16 @@
           "type": "boolean",
           "required": false,
           "defaultValue": "false",
-          "description": "Render as the child element via Radix Slot, keeping the addon styling."
+          "description": "Render as the child element via Radix Slot, keeping the addon styling.",
+          "example": null
         },
         {
           "name": "size",
           "type": "ButtonGroupSize",
           "required": false,
           "defaultValue": "\"default\"",
-          "description": "Addon size. Inherits from ButtonGroup when omitted."
+          "description": "Addon size. Inherits from ButtonGroup when omitted.",
+          "example": null
         }
       ]
     }

@@ -35,14 +35,16 @@
           "type": "boolean",
           "required": false,
           "defaultValue": "false",
-          "description": "Indents the item to align with items that have a leading icon or checkbox."
+          "description": "Indents the item to align with items that have a leading icon or checkbox.",
+          "example": null
         },
         {
           "name": "variant",
           "type": "\"default\" | \"destructive\" | null",
           "required": false,
           "defaultValue": "default",
-          "description": ""
+          "description": "",
+          "example": null
         }
       ]
     },
@@ -56,7 +58,8 @@
           "type": "boolean",
           "required": false,
           "defaultValue": "false",
-          "description": "Indents the label to align with items that have a leading icon or checkbox."
+          "description": "Indents the label to align with items that have a leading icon or checkbox.",
+          "example": null
         }
       ]
     },
@@ -112,7 +115,8 @@
           "type": "boolean",
           "required": false,
           "defaultValue": "false",
-          "description": "Indents the trigger to align with items that have a leading icon or checkbox."
+          "description": "Indents the trigger to align with items that have a leading icon or checkbox.",
+          "example": null
         }
       ]
     },

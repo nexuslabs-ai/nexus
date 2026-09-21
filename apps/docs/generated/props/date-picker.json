@@ -11,21 +11,24 @@
           "type": "\"default\" | \"error\" | \"destructive\" | \"outline\" | \"dashed\" | \"secondary\" | \"ghost\" | \"link\" | null",
           "required": false,
           "defaultValue": "ghost",
-          "description": "Button variant for the previous / next navigation arrows."
+          "description": "Button variant for the previous / next navigation arrows.",
+          "example": null
         },
         {
           "name": "cellSize",
           "type": "DatePickerCellSize",
           "required": false,
           "defaultValue": "default",
-          "description": "Day-cell size preset: `default` (32px), `large` (48px), `xlarge` (56px).\nFor an arbitrary size, override `--cell-size` via `className`."
+          "description": "Day-cell size preset: `default` (32px), `large` (48px), `xlarge` (56px).\nFor an arbitrary size, override `--cell-size` via `className`.",
+          "example": null
         },
         {
           "name": "renderDayContent",
           "type": "((props: DatePickerDayContentProps) => ReactNode)",
           "required": false,
           "defaultValue": null,
-          "description": "Custom content rendered inside each day button while preserving\nreact-day-picker's native button semantics and keyboard behavior.\n\nA render callback (not a `children` slot) because react-day-picker owns\nthe per-day render loop, so per-day content cannot be passed as children."
+          "description": "Custom content rendered inside each day button while preserving\nreact-day-picker's native button semantics and keyboard behavior.\n\nA render callback (not a `children` slot) because react-day-picker owns\nthe per-day render loop, so per-day content cannot be passed as children.",
+          "example": null
         }
       ]
     },

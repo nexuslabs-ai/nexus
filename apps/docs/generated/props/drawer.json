@@ -29,7 +29,8 @@
           "type": "boolean",
           "required": false,
           "defaultValue": "true",
-          "description": "Whether to show the bottom-only visual handle. This is a static indicator,\nnot vaul's gesture `Handle`, so it does not change dragging or the root's\n`dismissible` behavior."
+          "description": "Whether to show the bottom-only visual handle. This is a static indicator,\nnot vaul's gesture `Handle`, so it does not change dragging or the root's\n`dismissible` behavior.",
+          "example": null
         }
       ]
     },

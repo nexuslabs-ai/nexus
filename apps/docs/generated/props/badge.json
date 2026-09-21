@@ -11,42 +11,48 @@
           "type": "\"outline\" | \"light\" | \"solid\" | null",
           "required": false,
           "defaultValue": null,
-          "description": ""
+          "description": "",
+          "example": null
         },
         {
           "name": "isCaps",
           "type": "boolean",
           "required": false,
           "defaultValue": "true",
-          "description": "When true, uses uppercase text with wider letter-spacing."
+          "description": "When true, uses uppercase text with wider letter-spacing.",
+          "example": null
         },
         {
           "name": "isNumber",
           "type": "boolean",
           "required": false,
           "defaultValue": "false",
-          "description": "When true, renders as a circular number badge.\nPass the number as children. A bare count is ambiguous to assistive tech —\npass an `aria-label` for context (e.g. `aria-label=\"8 unread\"`)."
+          "description": "When true, renders as a circular number badge.\nPass the number as children. A bare count is ambiguous to assistive tech —\npass an `aria-label` for context (e.g. `aria-label=\"8 unread\"`).",
+          "example": "```tsx\n<Badge isNumber>8</Badge>\n<Badge isNumber variant=\"error\">99+</Badge>\n```"
         },
         {
           "name": "leftIcon",
           "type": "ReactNode",
           "required": false,
           "defaultValue": null,
-          "description": "Icon to display before the label.\nIcon is automatically sized to 14px (3.5 spacing units).\nIf the badge has no children, this renders as an icon-only badge.\nIgnored when `isNumber` is true."
+          "description": "Icon to display before the label.\nIcon is automatically sized to 14px (3.5 spacing units).\nIf the badge has no children, this renders as an icon-only badge.\nIgnored when `isNumber` is true.",
+          "example": "```tsx\n<Badge leftIcon={<IconCheck />}>Verified</Badge>\n```"
         },
         {
           "name": "rightIcon",
           "type": "ReactNode",
           "required": false,
           "defaultValue": null,
-          "description": "Icon to display after the label.\nIcon is automatically sized to 14px (3.5 spacing units).\nIf the badge has no children and no `leftIcon`, this renders as an icon-only badge.\nIgnored when `isNumber` is true."
+          "description": "Icon to display after the label.\nIcon is automatically sized to 14px (3.5 spacing units).\nIf the badge has no children and no `leftIcon`, this renders as an icon-only badge.\nIgnored when `isNumber` is true.",
+          "example": "```tsx\n<Badge rightIcon={<IconX />}>Dismiss</Badge>\n```"
         },
         {
           "name": "variant",
           "type": "\"default\" | \"error\" | \"secondary\" | \"success\" | \"information\" | \"warning\" | null",
           "required": false,
           "defaultValue": null,
-          "description": ""
+          "description": "",
+          "example": null
         }
       ]
     }

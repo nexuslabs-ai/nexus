@@ -29,14 +29,16 @@
           "type": "boolean",
           "required": false,
           "defaultValue": "true",
-          "description": "Whether to show the close button in the top-right corner."
+          "description": "Whether to show the close button in the top-right corner.",
+          "example": null
         },
         {
           "name": "side",
           "type": "\"bottom\" | \"left\" | \"right\" | \"top\" | null",
           "required": false,
           "defaultValue": "right",
-          "description": ""
+          "description": "",
+          "example": null
         }
       ]
     },
