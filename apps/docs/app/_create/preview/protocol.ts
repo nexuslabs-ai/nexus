@@ -1,4 +1,10 @@
-import type { NexusFirstPaintResolution } from '@nexus_ds/core';
+import type {
+  NexusAppearanceState,
+  NexusFirstPaintResolution,
+} from '@nexus_ds/core';
+import { sanitizeNexusAppearance } from '@nexus_ds/core';
+
+import { type ComponentId, isComponentId } from '../gallery';
 
 export const PREVIEW_CHANNEL = 'nexus-preview';
 export const PREVIEW_VERSION = 1;
@@ -12,6 +18,12 @@ interface Envelope {
 export interface PreviewResult {
   revision: number;
   appearance: NexusFirstPaintResolution;
+  scene?: {
+    view: 'examples' | 'components';
+    component: ComponentId;
+    reset: number;
+  };
+  state?: NexusAppearanceState;
 }
 
 export type HostMessage = Envelope &
@@ -22,6 +34,12 @@ export type HostMessage = Envelope &
 
 export type PreviewMessage = Envelope & { documentId: string } & (
     | { type: 'ready' }
+    | {
+        type: 'appearance-change';
+        revision: number;
+        state: NexusAppearanceState;
+      }
+    | { type: 'inspect'; revision: number; component: ComponentId }
     | { type: 'applied' | 'error' | 'exit' | 'unloading'; revision: number }
   );
 
@@ -92,13 +110,33 @@ export function isHostMessage(value: unknown): value is HostMessage {
     value.type === 'apply' &&
     isId(value.documentId) &&
     isRevision(value.revision) &&
-    isPreviewAppearance(value.appearance)
+    isPreviewAppearance(value.appearance) &&
+    (value.state === undefined ||
+      (isRecord(value.state) &&
+        JSON.stringify(sanitizeNexusAppearance(value.state)) ===
+          JSON.stringify(value.state))) &&
+    (value.scene === undefined ||
+      (isRecord(value.scene) &&
+        (value.scene.view === 'examples' ||
+          value.scene.view === 'components') &&
+        isComponentId(value.scene.component) &&
+        Number.isSafeInteger(value.scene.reset) &&
+        Number(value.scene.reset) >= 0))
   );
 }
 
 export function isPreviewMessage(value: unknown): value is PreviewMessage {
   if (!isEnvelope(value) || !isId(value.documentId)) return false;
   if (value.type === 'ready') return true;
+  if (value.type === 'appearance-change')
+    return (
+      isRevision(value.revision) &&
+      isRecord(value.state) &&
+      JSON.stringify(sanitizeNexusAppearance(value.state)) ===
+        JSON.stringify(value.state)
+    );
+  if (value.type === 'inspect')
+    return isComponentId(value.component) && isRevision(value.revision);
   return (
     (value.type === 'applied' ||
       value.type === 'error' ||

@@ -138,7 +138,7 @@ export const PAGE_WIREFRAMES: Record<string, PageWireframe> = {
     ],
   },
   '/components/primitives': {
-    lede: '[ Low-level building blocks: Show / Hide · Slot ]',
+    lede: '[ Low-level building blocks: AspectRatio · Show / Hide · Separator ]',
     blocks: [
       {
         type: 'placeholder',

@@ -1,3 +1,7 @@
+import type { NexusAppearanceState } from '@nexus_ds/core';
+
+import type { ComponentId } from '../gallery';
+
 import {
   type HostMessage,
   isPreviewMessage,
@@ -18,7 +22,9 @@ const RESPONSE_TIMEOUT_MS = 8000;
 export function connectPreview(
   frame: HTMLIFrameElement,
   onStatus: (status: PreviewStatus) => void,
-  onExit: () => void
+  onExit: () => void,
+  onInspect?: (component: ComponentId) => void,
+  onAppearanceChange?: (state: NexusAppearanceState) => void
 ) {
   const host = frame.ownerDocument.defaultView;
   if (!host) throw new Error('Missing preview host window');
@@ -27,6 +33,7 @@ export function connectPreview(
   let documentId: string | undefined;
   let latest: PreviewResult | undefined;
   let timer: ReturnType<typeof setTimeout> | undefined;
+  let handshake: ReturnType<typeof setInterval> | undefined;
   let disposed = false;
   let failed = false;
 
@@ -43,6 +50,7 @@ export function connectPreview(
       )
         return;
       failed = true;
+      clearInterval(handshake);
       onStatus({ phase: 'error', revision });
     }, RESPONSE_TIMEOUT_MS);
   }
@@ -72,12 +80,18 @@ export function connectPreview(
     failed = false;
     onStatus({ phase: 'loading' });
     awaitResponse();
-    send({
-      channel: PREVIEW_CHANNEL,
-      version: PREVIEW_VERSION,
-      type: 'connect',
-      connection,
-    });
+    clearInterval(handshake);
+    const connect = () =>
+      send({
+        channel: PREVIEW_CHANNEL,
+        version: PREVIEW_VERSION,
+        type: 'connect',
+        connection,
+      });
+    connect();
+    // Next may hydrate after the frame load event. Retry only this bounded
+    // handshake; the validated ready reply ends retries before applying state.
+    handshake = setInterval(connect, 200);
   }
 
   function receive(event: MessageEvent<unknown>) {
@@ -94,6 +108,7 @@ export function connectPreview(
     if (message.type === 'ready') {
       if (documentId) return;
       documentId = message.documentId;
+      clearInterval(handshake);
       clearTimeout(timer);
       applyLatest();
       return;
@@ -110,6 +125,14 @@ export function connectPreview(
       message.revision !== latest?.revision
     )
       return;
+    if (message.type === 'appearance-change') {
+      onAppearanceChange?.(message.state);
+      return;
+    }
+    if (message.type === 'inspect') {
+      onInspect?.(message.component);
+      return;
+    }
     if (message.type === 'exit') {
       onExit();
       return;
@@ -133,6 +156,7 @@ export function connectPreview(
     },
     dispose() {
       disposed = true;
+      clearInterval(handshake);
       clearTimeout(timer);
       host.removeEventListener('message', receive);
       frame.removeEventListener('load', start);

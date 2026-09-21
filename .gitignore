@@ -64,3 +64,6 @@ opencode.json
 
 # Superpowers brainstorming companion (local mockups + server state)
 .superpowers/
+
+# Build-time playground data
+apps/docs/app/_create/generated/

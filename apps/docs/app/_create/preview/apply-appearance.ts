@@ -1,6 +1,6 @@
 import type { NexusFirstPaintResolution } from '@nexus_ds/core';
 
-/** Called only by the preview entry; its document never belongs to the Console shell. */
+/** Called only by the preview entry; its document never belongs to the docs shell. */
 export function applyPreviewAppearance(
   doc: Document,
   appearance: NexusFirstPaintResolution

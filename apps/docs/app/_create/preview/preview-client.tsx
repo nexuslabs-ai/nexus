@@ -4,6 +4,12 @@ import { useEffect, useRef } from 'react';
 import { flushSync } from 'react-dom';
 import { createRoot } from 'react-dom/client';
 
+import type { NexusAppearanceState } from '@nexus_ds/core';
+
+import type { ComponentId } from '../gallery';
+
+import { PREVIEW_DEFAULT_STATE } from './accepted-result';
+import { PreviewAppearanceContext } from './appearance-context';
 import { applyPreviewAppearance } from './apply-appearance';
 import { PreviewScene } from './preview-scene';
 import {
@@ -25,6 +31,12 @@ export function PreviewClient() {
     function send(
       message:
         | { type: 'ready' }
+        | { type: 'inspect'; revision: number; component: ComponentId }
+        | {
+            type: 'appearance-change';
+            revision: number;
+            state: NexusAppearanceState;
+          }
         | { type: 'applied' | 'error' | 'exit' | 'unloading'; revision: number }
     ) {
       if (window.parent === window || !connection) return;
@@ -77,12 +89,30 @@ export function PreviewClient() {
         applyPreviewAppearance(document, message.appearance);
         flushSync(() =>
           root.render(
-            <PreviewScene mode={message.appearance.colorScheme} onExit={exit} />
+            <PreviewAppearanceContext.Provider
+              value={{
+                state: message.state ?? PREVIEW_DEFAULT_STATE,
+                onChange: (state) =>
+                  send({ type: 'appearance-change', revision, state }),
+              }}
+            >
+              <PreviewScene
+                onApplied={() => {
+                  if (!failed && revision === message.revision) {
+                    if (element) element.dataset.revision = String(revision);
+                    send({ type: 'applied', revision });
+                  }
+                }}
+                scene={message.scene}
+                onInspect={(component) =>
+                  send({ type: 'inspect', revision, component })
+                }
+                onExit={exit}
+              />
+            </PreviewAppearanceContext.Provider>
           )
         );
         if (failed) return;
-        if (element) element.dataset.revision = String(revision);
-        send({ type: 'applied', revision });
       } catch {
         fail();
       }

@@ -2,25 +2,46 @@
 
 import { useEffect, useRef, useState } from 'react';
 
+import type { NexusAppearanceState } from '@nexus_ds/core';
 import { Button } from '@nexus_ds/react';
+
+import type { ComponentId } from '../gallery';
 
 import { connectPreview, type PreviewStatus } from './frame-channel';
 import type { PreviewResult } from './protocol';
 
 interface PreviewFrameProps {
   result: PreviewResult;
+  onInspect?: (component: ComponentId) => void;
+  onAppearanceChange?: (state: NexusAppearanceState) => void;
 }
 
-function ConnectedPreview({ result }: PreviewFrameProps) {
+function ConnectedPreview({
+  result,
+  onInspect,
+  onAppearanceChange,
+}: PreviewFrameProps) {
   const frame = useRef<HTMLIFrameElement>(null);
   const enterButton = useRef<HTMLButtonElement>(null);
+  const inspectRef = useRef(onInspect);
+  const appearanceRef = useRef(onAppearanceChange);
+  useEffect(() => {
+    appearanceRef.current = onAppearanceChange;
+  }, [onAppearanceChange]);
+  useEffect(() => {
+    inspectRef.current = onInspect;
+  }, [onInspect]);
   const channel = useRef<ReturnType<typeof connectPreview>>(null);
   const [status, setStatus] = useState<PreviewStatus>({ phase: 'loading' });
 
   useEffect(() => {
     if (!frame.current) return;
-    const connection = connectPreview(frame.current, setStatus, () =>
-      enterButton.current?.focus()
+    const connection = connectPreview(
+      frame.current,
+      setStatus,
+      () => enterButton.current?.focus(),
+      (component) => inspectRef.current?.(component),
+      (state) => appearanceRef.current?.(state)
     );
     channel.current = connection;
     return () => {
@@ -85,7 +106,11 @@ function ConnectedPreview({ result }: PreviewFrameProps) {
   );
 }
 
-export function PreviewFrame({ result }: PreviewFrameProps) {
+export function PreviewFrame({
+  result,
+  onInspect,
+  onAppearanceChange,
+}: PreviewFrameProps) {
   const [instance, setInstance] = useState(0);
   return (
     <section
@@ -93,7 +118,12 @@ export function PreviewFrame({ result }: PreviewFrameProps) {
       className="nx:space-y-3"
       data-slot="preview-frame"
     >
-      <ConnectedPreview key={instance} result={result} />
+      <ConnectedPreview
+        key={instance}
+        result={result}
+        onInspect={onInspect}
+        onAppearanceChange={onAppearanceChange}
+      />
       <Button
         variant="link"
         size="sm"

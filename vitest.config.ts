@@ -79,6 +79,17 @@ export default defineConfig({
           passWithNoTests: false,
         },
       },
+      {
+        extends: true,
+        test: {
+          name: 'docs-create',
+          environment: 'node',
+          include: ['apps/docs/e2e/**/*.test.ts'],
+          fileParallelism: false,
+          hookTimeout: 60000,
+          testTimeout: 40000,
+        },
+      },
       // Unit tests (hooks, utilities) - jsdom
       {
         extends: true,

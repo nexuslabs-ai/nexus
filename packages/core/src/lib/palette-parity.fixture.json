@@ -1133,10 +1133,10 @@
     "border-color-aliases.css": "c9f181f6b667efbd5a4a3fa9fe9c34162313cc086bf11255a87332f1b09a85c6",
     "borderwidth-utilities.css": "9bb52d210d56905dae5fe5c28a841b2dd2b89cbd9f43714e52e18d07a9923b91",
     "motion-utilities.css": "c4350542dd3faa51a66be998ef8efa2a573587aae917eff0453223df580ceb63",
-    "nexus.css": "5bd121c3b480587f9a80fb80d4232b4d5f8a8ee41d92f61cc85850e59a0017b6",
+    "nexus.css": "7d5b38e997cbca80b5b2e5fd95ea95ffd4f63dfa69c58eb8620f105049ab0301",
     "spacing-utilities.css": "5aa26120a47d5f63b3f564c573c0d2052b9f82a766b33ba1134eeaddc3f487c5",
-    "typography-utilities.css": "2995b32eb264826f3c1f2dd30def65ab25b564d173a332bb5148e7080694da40",
-    "variables.css": "9bde681c4286366cab87a0e12384bd76e5426c54bfef029b77ebb9209b0c1a15"
+    "typography-utilities.css": "93fd1858dbd91cfbe03884813c2488d35ab64ef6adf22ea9cca810bd0fedfbc3",
+    "variables.css": "bd335a3b52348797a883d583183c319f62fa56879772a5dcedfe570d7be54f99"
   },
   "themes": [
     {
@@ -9239,5 +9239,6 @@
         }
       ]
     }
-  ]
+  ],
+  "generatedCssRevision": "5a3ea89bf2affd8d3bcfc2826bbbd8f38490a024"
 }

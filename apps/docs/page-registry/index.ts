@@ -145,7 +145,30 @@ export const PAGE_REGISTRY = {
       {
         slug: 'inputs',
         label: 'Inputs',
-        components: ['Button', 'Input', 'Select', 'Switch', 'Tabs'],
+        components: [
+          'Button',
+          'ButtonGroup',
+          'Checkbox',
+          'ChoiceCard',
+          'ChoiceRow',
+          'Combobox',
+          'DatePicker',
+          'Field',
+          'Input',
+          'InputGroup',
+          'InputOtp',
+          'Label',
+          'MultiSelect',
+          'NativeSelect',
+          'RadioGroup',
+          'Select',
+          'Slider',
+          'Switch',
+          'Tabs',
+          'Textarea',
+          'Toggle',
+          'ToggleGroup',
+        ],
         wireframe: {
           lede: '[ Interactive controls · per-component Storybook page below ]',
           blocks: [
@@ -175,7 +198,19 @@ export const PAGE_REGISTRY = {
       {
         slug: 'containers',
         label: 'Containers',
-        components: ['Card', 'Dialog', 'Accordion', 'Alert'],
+        components: [
+          'Accordion',
+          'AlertDialog',
+          'Card',
+          'Collapsible',
+          'Dialog',
+          'Drawer',
+          'HoverCard',
+          'Popover',
+          'Resizable',
+          'ScrollArea',
+          'Sheet',
+        ],
         wireframe: {
           lede: '[ Card · Dialog · Accordion · Alert ]',
           blocks: [
@@ -194,7 +229,16 @@ export const PAGE_REGISTRY = {
       {
         slug: 'navigation',
         label: 'Navigation',
-        components: ['DropdownMenu'],
+        components: [
+          'Breadcrumb',
+          'Command',
+          'ContextMenu',
+          'DropdownMenu',
+          'Menubar',
+          'NavigationMenu',
+          'Pagination',
+          'Sidebar',
+        ],
         wireframe: {
           lede: '[ DropdownMenu · (future) NavigationMenu · Breadcrumbs ]',
           blocks: [
@@ -209,7 +253,25 @@ export const PAGE_REGISTRY = {
       {
         slug: 'display',
         label: 'Display',
-        components: ['Badge', 'Avatar', 'Tooltip'],
+        components: [
+          'Alert',
+          'Attachment',
+          'Avatar',
+          'Badge',
+          'Bubble',
+          'Carousel',
+          'Chart',
+          'EmptyState',
+          'Item',
+          'Kbd',
+          'Progress',
+          'Skeleton',
+          'Sonner',
+          'Spinner',
+          'Table',
+          'Tooltip',
+          'Appearance',
+        ],
         wireframe: {
           lede: '[ Badge · Avatar · Tooltip ]',
           blocks: [
@@ -224,9 +286,9 @@ export const PAGE_REGISTRY = {
       {
         slug: 'primitives',
         label: 'Primitives',
-        components: ['Show / Hide', 'Slot'],
+        components: ['AspectRatio', 'Hide', 'Separator', 'Show'],
         wireframe: {
-          lede: '[ Low-level building blocks: Show / Hide · Slot ]',
+          lede: '[ Low-level building blocks: AspectRatio · Show / Hide · Separator ]',
           blocks: [
             {
               type: 'placeholder',
