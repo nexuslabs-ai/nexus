@@ -287,8 +287,7 @@ describe('generateTailwindPackage', () => {
 
   // Focus colours are promoted to the --color-* namespace so Tailwind emits
   // outline-focus-* utilities. Default focus falls through to primary accent; error
-  // focus keeps its primitive-backed token. The focus paint is shared CSS, while
-  // the outline remains the forced-colors fallback.
+  // focus keeps its primitive-backed token.
   // The outline offset is also tokenised so components share one tune-point.
   // --focus-offset emits once at :root (not @theme: Tailwind tree-shakes @theme
   // vars referenced only via arbitrary utilities, #506). The count guard also
@@ -332,7 +331,14 @@ describe('generateTailwindPackage', () => {
     expect(nexusCSS).toMatch(
       /\[data-slot='input-group-control'\]\[class~='nx:focus-visible:outline-focus-default'\]:focus-visible[\s\S]*?\{[\s\S]*?outline-style:\s*none\s*!important;[\s\S]*?box-shadow:\s*none;[\s\S]*?\}/
     );
-    expect(nexusCSS).toMatch(/outline-style:\s*none\s*!important;/);
+    // One rule per ring set: default, error, field, field error, button, button error.
+    const focusRingBodies = nexusCSS.match(
+      /\{[^}]*var\(--color-focus-[^}]*\}/g
+    );
+    expect(focusRingBodies).toHaveLength(6);
+    for (const body of focusRingBodies) {
+      expect(body).toMatch(/outline:\s*2px solid transparent\s*!important;/);
+    }
     expect(nexusCSS).toMatch(/0 0 0 2px var\(--color-focus-default\);/);
     expect(nexusCSS).toMatch(/inset 0 0 0 1px var\(--color-focus-default\),/);
     expect(nexusCSS).toMatch(/0 0 0 1px var\(--color-focus-default\);/);
@@ -343,9 +349,7 @@ describe('generateTailwindPackage', () => {
     expect(nexusCSS).toMatch(/0 0 0 2px var\(--color-background\),/);
     expect(nexusCSS).toMatch(/0 0 0 4px var\(--color-focus-default\);/);
     expect(nexusCSS).not.toMatch(/0 0 0 8px var\(--color-focus-default\);/);
-    expect(nexusCSS).toMatch(/@media \(forced-colors: active\)/);
-    expect(nexusCSS).toMatch(/border-color:\s*CanvasText\s*!important;/);
-    expect(nexusCSS).toMatch(/outline-style:\s*solid\s*!important;/);
+    expect(nexusCSS).not.toMatch(/forced-colors/);
     expect(nexusCSS).not.toMatch(/--shadow-focus-/);
   });
 

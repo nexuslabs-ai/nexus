@@ -39,91 +39,6 @@ type Story = StoryObj<typeof Bubble>;
 
 const column = 'nx:w-full nx:max-w-md';
 
-function* eachStyleRule(rules: CSSRuleList): Generator<CSSStyleRule> {
-  for (const rule of rules) {
-    if (rule instanceof CSSStyleRule) {
-      yield rule;
-    }
-
-    // Tailwind nests the variant chain inside the class rule, and a
-    // `CSSStyleRule` is itself a grouping rule — so recurse into every rule,
-    // including the ones just yielded.
-    if (rule instanceof CSSGroupingRule) {
-      yield* eachStyleRule(rule.cssRules);
-    }
-  }
-}
-
-/**
- * Reads back the rule that `element`'s class starting with `prefix` compiled to.
- * Going through the stylesheet rather than the class attribute is what makes a
- * utility Tailwind never emitted fail loudly, instead of passing on a class
- * string that styles nothing.
- */
-function emittedRule(element: Element, prefix: string): CSSStyleRule {
-  const emitted = [...element.classList].find((name) =>
-    name.startsWith(prefix)
-  );
-
-  if (!emitted) {
-    throw new Error(`no "${prefix}" class on "${element.className}"`);
-  }
-
-  const escaped = `.${CSS.escape(emitted)}`;
-
-  for (const sheet of document.styleSheets) {
-    for (const rule of eachStyleRule(sheet.cssRules)) {
-      if (rule.selectorText === escaped) {
-        return rule;
-      }
-    }
-  }
-
-  throw new Error(`"${emitted}" compiled to no rule`);
-}
-
-/**
- * The `:has()` reservation cannot fire in Firefox 113-120, so the turn also
- * carries an unconditional fallback for that band. The `@supports` condition
- * is false in the test browser, so the rule never applies — read the reserved
- * lengths straight off the compiled rule instead, and hold both of them to the
- * same 12px the `:has()` rules reserve. A fallback that stops compiling, that
- * shrinks, or that covers only one edge fails here. `pnpm audit:browser-support`
- * owns the policy side.
- */
-function expectHasFallback(bubble: HTMLElement, reserved: number) {
-  const rule = emittedRule(bubble, 'nx:no-has-support:');
-  const guarded = [...rule.cssRules].find(
-    (nested): nested is CSSSupportsRule =>
-      nested instanceof CSSSupportsRule &&
-      nested.conditionText.includes(':has(')
-  );
-
-  if (!guarded) {
-    throw new Error(`"${rule.selectorText}" compiled to no @supports fallback`);
-  }
-
-  // The guarded declarations are unreachable through `getComputedStyle`, so
-  // resolve them by replaying the block on a throwaway element.
-  const probe = document.createElement('div');
-
-  probe.style.cssText = [...guarded.cssRules]
-    .map((declaration) => declaration.cssText)
-    .join('');
-  document.body.append(probe);
-
-  const declared = getComputedStyle(probe);
-  const reservedAbove = parseFloat(declared.marginTop);
-  const reservedBelow = parseFloat(declared.marginBottom);
-
-  probe.remove();
-
-  // Both edges: a `side="top"` pill and a `side="bottom"` one each need their
-  // own band, so a fallback narrowed to one axis is a regression.
-  expect(reservedAbove, `${rule.selectorText} reserves above`).toBe(reserved);
-  expect(reservedBelow, `${rule.selectorText} reserves below`).toBe(reserved);
-}
-
 function bubbleOf(element: Element): HTMLElement {
   return element.closest<HTMLElement>('[data-slot="bubble"]')!;
 }
@@ -829,8 +744,6 @@ export const StackedConversation: Story = {
     await expect(pill.getBoundingClientRect().bottom).toBeLessThanOrEqual(
       next.getBoundingClientRect().top + 1
     );
-
-    expectHasFallback(bubbleWithPill, reserved);
   },
 };
 

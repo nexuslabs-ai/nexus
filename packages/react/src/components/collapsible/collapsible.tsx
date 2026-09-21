@@ -82,7 +82,7 @@ function CollapsibleContent({ className, ...props }: CollapsibleContentProps) {
     <CollapsiblePrimitive.CollapsibleContent
       data-slot="collapsible-content"
       className={cn(
-        'nx:overflow-hidden nx:duration-default nx:data-[state=closed]:animate-collapsible-up nx:data-[state=open]:animate-collapsible-down nx:motion-reduce:data-[state=closed]:animate-none nx:motion-reduce:data-[state=open]:animate-none',
+        'nx:overflow-hidden nx:duration-default nx:data-[state=closed]:animate-collapsible-up nx:data-[state=open]:animate-collapsible-down',
         className
       )}
       {...props}

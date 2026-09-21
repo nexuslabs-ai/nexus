@@ -121,7 +121,7 @@ function NavigationMenuItem({ className, ...props }: NavigationMenuItemProps) {
 }
 
 const navigationMenuTriggerStyle = cva(
-  'nx:group nx:inline-flex nx:w-max nx:items-center nx:justify-center nx:rounded-md nx:bg-background nx:px-4 nx:py-2 nx:typography-label-default nx:outline-none nx:transition-colors nx:motion-reduce:transition-none nx:hover:bg-background-hover nx:hover:text-foreground nx:focus-visible:outline-2 nx:focus-visible:outline-focus-default nx:focus-visible:outline-offset-(--focus-offset) nx:disabled:pointer-events-none nx:disabled:text-disabled-foreground nx:data-[state=open]:bg-background-hover nx:data-[state=open]:text-foreground'
+  'nx:group nx:inline-flex nx:w-max nx:items-center nx:justify-center nx:rounded-md nx:bg-background nx:px-4 nx:py-2 nx:typography-label-default nx:outline-none nx:transition-colors nx:hover:bg-background-hover nx:hover:text-foreground nx:focus-visible:outline-2 nx:focus-visible:outline-focus-default nx:focus-visible:outline-offset-(--focus-offset) nx:disabled:pointer-events-none nx:disabled:text-disabled-foreground nx:data-[state=open]:bg-background-hover nx:data-[state=open]:text-foreground'
 );
 
 /**
@@ -152,7 +152,7 @@ function NavigationMenuTrigger({
     >
       {children}{' '}
       <IconChevronDown
-        className="nx:relative nx:top-px nx:ml-1 nx:size-3 nx:transition nx:duration-slow nx:motion-reduce:transition-none nx:group-data-[state=open]:rotate-180"
+        className="nx:relative nx:top-px nx:ml-1 nx:size-3 nx:transition nx:duration-slow nx:group-data-[state=open]:rotate-180"
         aria-hidden="true"
       />
     </NavigationMenuPrimitive.Trigger>
@@ -188,7 +188,6 @@ function NavigationMenuContent({
         'nx:data-[motion^=from-]:animate-in nx:data-[motion^=from-]:fade-in nx:data-[motion^=to-]:animate-out nx:data-[motion^=to-]:fade-out',
         'nx:data-[motion^=from-]:duration-default nx:data-[motion^=from-]:ease-enter',
         'nx:data-[motion^=to-]:duration-fast nx:data-[motion^=to-]:ease-exit',
-        'nx:motion-reduce:data-[motion^=from-]:animate-none nx:motion-reduce:data-[motion^=to-]:animate-none',
         'nx:@md/navmenu:absolute nx:@md/navmenu:w-auto',
         'nx:group-data-[viewport=false]/navigation-menu:top-full',
         'nx:group-data-[viewport=false]/navigation-menu:mt-1.5',
@@ -259,7 +258,6 @@ function NavigationMenuLink({ className, ...props }: NavigationMenuLinkProps) {
       data-slot="navigation-menu-link"
       className={cn(
         'nx:flex nx:flex-col nx:gap-1 nx:rounded-sm nx:p-2 nx:typography-body-default nx:outline-none nx:transition-colors',
-        'nx:motion-reduce:transition-none',
         'nx:hover:bg-popover-hover nx:hover:text-popover-foreground',
         'nx:focus-visible:outline-2 nx:focus-visible:outline-focus-default nx:focus-visible:outline-offset-(--focus-offset)',
         'nx:data-[active=true]:bg-popover-hover nx:data-[active=true]:text-popover-foreground',
@@ -294,8 +292,8 @@ function NavigationMenuIndicator({
       data-slot="navigation-menu-indicator"
       className={cn(
         'nx:top-full nx:z-1 nx:flex nx:h-1.5 nx:items-end nx:justify-center nx:overflow-hidden',
-        'nx:transition-opacity nx:duration-fast nx:ease-move nx:motion-reduce:transition-none',
-        'nx:data-[state=hidden]:opacity-0 nx:data-[state=hidden]:animate-overlay-presence-exit nx:motion-reduce:data-[state=hidden]:animate-none',
+        'nx:transition-opacity nx:duration-fast nx:ease-move',
+        'nx:data-[state=hidden]:opacity-0 nx:data-[state=hidden]:animate-overlay-presence-exit',
         className
       )}
       {...props}

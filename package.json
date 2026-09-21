@@ -21,7 +21,6 @@
     "clean": "turbo run clean && rm -rf node_modules",
     "typecheck": "turbo run typecheck",
     "tokens:tailwind": "cd packages/core && pnpm build:tailwind && cp dist/tailwind/* ../../packages/tailwind/",
-    "audit:browser-support": "node scripts/audit-browser-support.js",
     "audit:agent-drift": "node scripts/audit-agent-drift.js",
     "audit:turbo-outputs": "node scripts/audit-turbo-outputs.js",
     "audit:contrast": "vitest run --project=unit packages/core/src/lib/derive-theme.test.ts -t \"legibility invariant\"",
@@ -116,13 +115,6 @@
   "engines": {
     "node": ">=20.19.0"
   },
-  "browserslist": [
-    "Chrome >= 111",
-    "Edge >= 111",
-    "Firefox >= 113",
-    "Safari >= 15.4",
-    "Samsung >= 22"
-  ],
   "lint-staged": {
     "*.{ts,tsx,js,jsx}": [
       "eslint --fix",

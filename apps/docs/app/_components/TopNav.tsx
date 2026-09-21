@@ -27,9 +27,6 @@ const NAV_LINK_BASE =
 
 const PANEL_LINK_BASE = cn(NAV_LINK_BASE, 'nx:block nx:border-l-2');
 
-const COARSE_HIT_AREA =
-  'nx:relative nx:pointer-coarse:after:absolute nx:pointer-coarse:after:-inset-2';
-
 function isActive(pathname: string, match: string) {
   if (match === '/') return pathname === '/';
   return pathname === match || pathname.startsWith(match + '/');
@@ -107,7 +104,6 @@ export function TopNav() {
           size="sm"
           aria-expanded={menuOpen}
           onClick={() => setMenuOpen((open) => !open)}
-          className={COARSE_HIT_AREA}
         >
           <span aria-hidden="true">☰</span>
           {currentLink?.label ?? 'Sections'}
@@ -167,7 +163,6 @@ export function TopNav() {
         size="sm"
         onClick={toggleMode}
         aria-label={isDark ? 'Switch to light mode' : 'Switch to dark mode'}
-        className={COARSE_HIT_AREA}
       >
         {isDark ? '☀' : '◐'}
       </Button>

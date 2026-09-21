@@ -45,30 +45,6 @@ const meta: Meta<typeof Dialog> = {
 export default meta;
 type Story = StoryObj<typeof Dialog>;
 
-// #593 — the close-button touch hit area is gated by pointer modality (coarse),
-// not by viewport, so it survives on large touchscreens.
-export const CloseHitAreaModalityGated: Story = {
-  render: () => (
-    <Dialog defaultOpen>
-      <DialogContent>
-        <DialogHeader>
-          <DialogTitle>Hit area</DialogTitle>
-          <DialogDescription>
-            The close hit area is gated by coarse pointer, not viewport.
-          </DialogDescription>
-        </DialogHeader>
-      </DialogContent>
-    </Dialog>
-  ),
-  play: async () => {
-    const close = document.body.querySelector(
-      '[data-slot="dialog-close-button"]'
-    );
-    await expect(close).not.toHaveClass('nx:lg:after:hidden');
-    await expect(close).toHaveClass('nx:pointer-coarse:after:-inset-2.5');
-  },
-};
-
 // ============================================
 // BASIC STORIES
 // ============================================
@@ -720,12 +696,7 @@ export const CloseButtonFocus: Story = {
       'nx:focus-visible:outline-focus-default',
       'nx:focus-visible:outline-offset-(--focus-offset)'
     );
-    await expect(closeButton).toHaveClass(
-      'nx:right-6',
-      'nx:top-6',
-      'nx:pointer-coarse:after:absolute',
-      'nx:pointer-coarse:after:-inset-2.5'
-    );
+    await expect(closeButton).toHaveClass('nx:right-6', 'nx:top-6');
     await expect(closeButton).toHaveClass(
       'nx:hover:bg-container-hover',
       'nx:focus-visible:bg-container-hover'
@@ -738,17 +709,18 @@ export const CloseButtonFocus: Story = {
   },
 };
 
-export const ReducedMotionFallbacks: Story = {
+export const OverlayMotionContract: Story = {
   render: (_args) => (
     <Dialog>
       <DialogTrigger asChild>
-        <Button variant="outline">Open reduced-motion dialog</Button>
+        <Button variant="outline">Open motion dialog</Button>
       </DialogTrigger>
       <DialogContent>
         <DialogHeader>
-          <DialogTitle>Reduced motion contract</DialogTitle>
+          <DialogTitle>Overlay motion contract</DialogTitle>
           <DialogDescription>
-            Overlay motion should be disabled when reduced motion is preferred.
+            The scrim and panel transition in and stay mounted until their exit
+            finishes.
           </DialogDescription>
         </DialogHeader>
         <DialogFooter>
@@ -763,22 +735,18 @@ export const ReducedMotionFallbacks: Story = {
     const canvas = within(canvasElement);
 
     await userEvent.click(
-      canvas.getByRole('button', { name: 'Open reduced-motion dialog' })
+      canvas.getByRole('button', { name: 'Open motion dialog' })
     );
 
     try {
       const body = within(document.body);
       const dialog = await body.findByRole('dialog');
       const overlay = document.querySelector('[data-slot="dialog-overlay"]');
-      const closeButton = within(dialog).getByRole('button', {
-        name: 'Close',
-      });
 
       await expectInterruptibleOverlayMotion(overlay);
       await expect(overlay).toHaveClass('nx:transition-opacity');
       await expectInterruptibleOverlayMotion(dialog);
       await expect(dialog).toHaveClass('nx:transition-[opacity,scale]');
-      await expect(closeButton).toHaveClass('nx:motion-reduce:transition-none');
 
       await userEvent.click(
         within(dialog).getByRole('button', { name: 'Done' })

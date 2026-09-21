@@ -153,7 +153,7 @@ function TabsList({ className, children, ref, ...props }: TabsListProps) {
           'nx:data-[variant=default]:rounded-sm nx:data-[variant=default]:border-default nx:data-[variant=default]:border-border-default nx:data-[variant=default]:bg-background',
           'nx:data-[variant=underline]:bg-primary-background',
           ready &&
-            'nx:transition-[transform,width,height] nx:duration-fast nx:ease-move nx:motion-reduce:transition-none'
+            'nx:transition-[transform,width,height] nx:duration-fast nx:ease-move'
         )}
       />
       {children}
