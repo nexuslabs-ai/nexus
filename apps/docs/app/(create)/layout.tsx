@@ -2,16 +2,14 @@ import { NexusAppearanceProvider } from '@nexus_ds/react/appearance';
 import { NexusAppearanceScript } from '@nexus_ds/react/appearance/server';
 import type { Metadata } from 'next';
 
-import { CopyAnnouncerProvider } from './_components/CopyAnnouncer';
-import { Footer } from './_components/Footer';
-import { ThemePicker } from './_components/ThemePicker';
-import { TopNav } from './_components/TopNav';
+import { CopyAnnouncerProvider } from '../_components/CopyAnnouncer';
+import { TopNav } from '../_components/TopNav';
 import {
   DOCS_APPEARANCE_DEFAULT_STATE,
   DOCS_APPEARANCE_STORAGE_KEY,
-} from './_lib/appearance-controls';
+} from '../_lib/appearance-controls';
 
-import './globals.css';
+import '../globals.css';
 
 export const metadata: Metadata = {
   title: 'Nexus Design System — Docs',
@@ -48,8 +46,6 @@ export default function RootLayout({
           <CopyAnnouncerProvider>
             <TopNav />
             <main>{children}</main>
-            <ThemePicker />
-            <Footer />
           </CopyAnnouncerProvider>
         </NexusAppearanceProvider>
       </body>

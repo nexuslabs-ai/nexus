@@ -164,7 +164,7 @@ if (fixtureOrderChecks === 0 && existsSync(appearanceFixtureSource)) {
 
   if (scriptIndex === -1 || markerIndex === -1 || scriptIndex > markerIndex) {
     console.error(
-      'Expected apps/docs/app/appearance-ssr/page.tsx to render NexusAppearanceScript before the fixture marker.'
+      'Expected apps/docs/app/(docs)/appearance-ssr/page.tsx to render NexusAppearanceScript before the fixture marker.'
     );
     process.exit(1);
   }

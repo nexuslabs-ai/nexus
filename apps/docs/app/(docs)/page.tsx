@@ -1,15 +1,15 @@
 import Link from 'next/link';
 
-import { LiveThemeSwapper } from './_components/LiveThemeSwapper';
+import { LiveThemeSwapper } from '../_components/LiveThemeSwapper';
 import {
   Button,
   Card,
   CardDescription,
   CardHeader,
   CardTitle,
-} from './_components/nexus';
-import { countComponents, describeSize } from './_lib/home-counts';
-import { CARD_JOINER, PAGE_MANIFEST, requireSection } from './_lib/manifest';
+} from '../_components/nexus';
+import { countComponents, describeSize } from '../_lib/home-counts';
+import { CARD_JOINER, PAGE_MANIFEST, requireSection } from '../_lib/manifest';
 
 const BLUE_RAMP = [50, 100, 200, 300, 400, 500, 600, 700, 800, 900, 950];
 const BASE_CHIPS = ['slate', 'stone', 'neutral', 'gray', 'zinc'];

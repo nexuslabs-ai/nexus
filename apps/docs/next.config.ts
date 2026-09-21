@@ -81,6 +81,18 @@ const nextConfig: NextConfig = {
         source: '/:path*',
         headers: SECURITY_HEADERS,
       },
+      {
+        source: '/create/preview',
+        headers: [
+          {
+            key: 'Content-Security-Policy-Report-Only',
+            value: CONTENT_SECURITY_POLICY_REPORT_ONLY.replace(
+              "frame-ancestors 'none'",
+              "frame-ancestors 'self'"
+            ),
+          },
+        ],
+      },
     ];
   },
 };

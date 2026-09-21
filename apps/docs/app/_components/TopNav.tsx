@@ -14,6 +14,7 @@ import { SearchPalette } from './SearchPalette';
 
 const NAV_LINKS = [
   { href: '/', label: 'Home', match: '/' },
+  { href: '/create', label: 'Create', match: '/create' },
   ...PAGE_MANIFEST.map((section) => ({
     href: section.href,
     label: section.title,
