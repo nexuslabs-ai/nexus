@@ -2009,6 +2009,10 @@ const BUTTON_ERROR_FOCUS_RING_SELECTORS = [
  * Turn the canonical focus outline utilities into the shipped hard focus
  * treatment.
  *
+ * The transparent outline paints nothing normally. Forced colors mode drops
+ * the box-shadow ring and repaints that outline in a system colour, so focus
+ * stays visible there without a second code path.
+ *
  * @returns {string} CSS focus ring rules
  */
 export function generateFocusRingCSS() {
@@ -2081,23 +2085,17 @@ ${OTP_SLOT_GROUP_DISABLED_SELECTOR}:first-child {
 }
 
 ${defaultSelectors} {
-  --tw-outline-style: none !important;
-  outline-color: transparent !important;
-  outline-style: none !important;
+  outline: 2px solid transparent !important;
   box-shadow: 0 0 0 2px var(--color-focus-default);
 }
 
 ${errorSelectors} {
-  --tw-outline-style: none !important;
-  outline-color: transparent !important;
-  outline-style: none !important;
+  outline: 2px solid transparent !important;
   box-shadow: 0 0 0 2px var(--color-focus-error);
 }
 
 ${fieldSelectors} {
-  --tw-outline-style: none !important;
-  outline-color: transparent !important;
-  outline-style: none !important;
+  outline: 2px solid transparent !important;
   border-color: transparent !important;
   border-width: 0;
   box-shadow:
@@ -2106,9 +2104,7 @@ ${fieldSelectors} {
 }
 
 ${fieldErrorSelectors} {
-  --tw-outline-style: none !important;
-  outline-color: transparent !important;
-  outline-style: none !important;
+  outline: 2px solid transparent !important;
   border-color: transparent !important;
   border-width: 0;
   box-shadow:
@@ -2124,18 +2120,14 @@ ${inputGroupControlSuppressionSelectors} {
 }
 
 ${buttonSelectors} {
-  --tw-outline-style: none !important;
-  outline-color: transparent !important;
-  outline-style: none !important;
+  outline: 2px solid transparent !important;
   box-shadow:
     0 0 0 2px var(--color-background),
     0 0 0 4px var(--color-focus-default);
 }
 
 ${buttonErrorSelectors} {
-  --tw-outline-style: none !important;
-  outline-color: transparent !important;
-  outline-style: none !important;
+  outline: 2px solid transparent !important;
   box-shadow:
     0 0 0 2px var(--color-background),
     0 0 0 4px var(--color-focus-error);

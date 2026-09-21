@@ -331,6 +331,9 @@ describe('generateTailwindPackage', () => {
     expect(nexusCSS).toMatch(
       /\[data-slot='input-group-control'\]\[class~='nx:focus-visible:outline-focus-default'\]:focus-visible[\s\S]*?\{[\s\S]*?outline-style:\s*none\s*!important;[\s\S]*?box-shadow:\s*none;[\s\S]*?\}/
     );
+    expect(nexusCSS).toMatch(
+      /\[data-slot='button'\]\[class~='nx:focus-visible:outline-focus-default'\]:focus-visible[\s\S]*?\{[\s\S]*?outline:\s*2px solid transparent\s*!important;[\s\S]*?\}/
+    );
     expect(nexusCSS).toMatch(/outline-style:\s*none\s*!important;/);
     expect(nexusCSS).toMatch(/0 0 0 2px var\(--color-focus-default\);/);
     expect(nexusCSS).toMatch(/inset 0 0 0 1px var\(--color-focus-default\),/);

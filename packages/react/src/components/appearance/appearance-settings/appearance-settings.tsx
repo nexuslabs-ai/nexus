@@ -39,23 +39,11 @@ import { useNexusAppearance } from '../provider';
 import { NexusAppearanceSettingRow } from '../setting-row';
 
 const APPEARANCE_MODES: NexusAppearanceMode[] = ['light', 'dark', 'system'];
-const REDUCE_MOTION_OPTIONS: NexusAppearancePrefs['reduceMotion'][] = [
-  'on',
-  'off',
-];
 const FONT_SIZE_MIN = 8;
 const FONT_SIZE_MAX = 32;
 
 function isAppearanceMode(value: string): value is NexusAppearanceMode {
   return APPEARANCE_MODES.includes(value as NexusAppearanceMode);
-}
-
-function isReduceMotion(
-  value: string
-): value is NexusAppearancePrefs['reduceMotion'] {
-  return REDUCE_MOTION_OPTIONS.includes(
-    value as NexusAppearancePrefs['reduceMotion']
-  );
 }
 
 function AxisSelect<TValue extends string>({
@@ -186,11 +174,6 @@ export function NexusAppearanceSettings() {
     }
 
     updatePrefs({ codeFontSize: value });
-  };
-
-  const setReduceMotion = (value: string) => {
-    if (!isReduceMotion(value)) return;
-    updatePrefs({ reduceMotion: value });
   };
 
   return (
@@ -397,16 +380,11 @@ export function NexusAppearanceSettings() {
             />
           </NexusAppearanceSettingRow>
           <NexusAppearanceSettingRow label="Reduce motion">
-            <ToggleGroup
-              type="single"
-              value={state.prefs.reduceMotion}
-              onValueChange={setReduceMotion}
-              variant="outline"
+            <Switch
+              checked={state.prefs.reduceMotion}
+              onCheckedChange={(reduceMotion) => updatePrefs({ reduceMotion })}
               aria-label="Reduce motion"
-            >
-              <ToggleGroupItem value="on">On</ToggleGroupItem>
-              <ToggleGroupItem value="off">Off</ToggleGroupItem>
-            </ToggleGroup>
+            />
           </NexusAppearanceSettingRow>
           <NexusAppearanceSettingRow
             label="Font smoothing"

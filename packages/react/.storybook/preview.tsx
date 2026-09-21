@@ -129,11 +129,10 @@ function appearanceStateFromGlobals(
         typeof globals.codeFontSize === 'number'
           ? globals.codeFontSize
           : prefs.codeFontSize,
-      reduceMotion: pickOption(
-        globals.reduceMotion,
-        [{ value: 'on' }, { value: 'off' }] as const,
-        prefs.reduceMotion
-      ),
+      reduceMotion:
+        typeof globals.reduceMotion === 'boolean'
+          ? globals.reduceMotion
+          : prefs.reduceMotion,
       pointerCursors:
         typeof globals.pointerCursors === 'boolean'
           ? globals.pointerCursors

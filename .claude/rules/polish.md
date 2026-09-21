@@ -121,7 +121,10 @@ Check at least:
 - Accessible names, descriptions, roles, states, and relationships.
 - APG-aligned roving focus, selection, disclosure, dialog, menu, tab, and
   composite-widget behavior when those patterns apply.
-- Pointer cancellation, dragging alternatives, and target size.
+- Pointer cancellation, dragging alternatives, and target size: at least
+  24×24 CSS px per
+  [SC 2.5.8](https://www.w3.org/WAI/WCAG22/Understanding/target-size-minimum.html),
+  or enough spacing to meet its exception.
 - Name/role/value and status/error announcements for controls, feedback, and
   form surfaces.
 

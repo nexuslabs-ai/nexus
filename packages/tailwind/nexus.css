@@ -1067,9 +1067,7 @@
 [class~='nx:has-[[data-slot=input-group-control]:focus-visible]:outline-focus-default']:has(
   [data-slot='input-group-control']:focus-visible
 ) {
-  --tw-outline-style: none !important;
-  outline-color: transparent !important;
-  outline-style: none !important;
+  outline: 2px solid transparent !important;
   box-shadow: 0 0 0 2px var(--color-focus-default);
 }
 
@@ -1077,9 +1075,7 @@
 [class~='nx:has-[[data-slot=input-group-control][aria-invalid=true]:focus-visible]:outline-focus-error']:has(
   [data-slot='input-group-control'][aria-invalid='true']:focus-visible
 ) {
-  --tw-outline-style: none !important;
-  outline-color: transparent !important;
-  outline-style: none !important;
+  outline: 2px solid transparent !important;
   box-shadow: 0 0 0 2px var(--color-focus-error);
 }
 
@@ -1092,9 +1088,7 @@
 [data-slot='input-group'][class~='nx:has-[[data-slot=input-group-control]:focus-visible]:outline-focus-default']:has(
     [data-slot='input-group-control']:focus-visible
   ) {
-  --tw-outline-style: none !important;
-  outline-color: transparent !important;
-  outline-style: none !important;
+  outline: 2px solid transparent !important;
   border-color: transparent !important;
   border-width: 0;
   box-shadow:
@@ -1110,9 +1104,7 @@
 [data-slot='input-group'][class~='nx:has-[[data-slot=input-group-control][aria-invalid=true]:focus-visible]:outline-focus-error']:has(
     [data-slot='input-group-control'][aria-invalid='true']:focus-visible
   ) {
-  --tw-outline-style: none !important;
-  outline-color: transparent !important;
-  outline-style: none !important;
+  outline: 2px solid transparent !important;
   border-color: transparent !important;
   border-width: 0;
   box-shadow:
@@ -1129,18 +1121,14 @@
 }
 
 [data-slot='button'][class~='nx:focus-visible:outline-focus-default']:focus-visible {
-  --tw-outline-style: none !important;
-  outline-color: transparent !important;
-  outline-style: none !important;
+  outline: 2px solid transparent !important;
   box-shadow:
     0 0 0 2px var(--color-background),
     0 0 0 4px var(--color-focus-default);
 }
 
 [data-slot='button'][class~='nx:aria-invalid:focus-visible:outline-focus-error'][aria-invalid='true']:focus-visible {
-  --tw-outline-style: none !important;
-  outline-color: transparent !important;
-  outline-style: none !important;
+  outline: 2px solid transparent !important;
   box-shadow:
     0 0 0 2px var(--color-background),
     0 0 0 4px var(--color-focus-error);
