@@ -331,10 +331,14 @@ describe('generateTailwindPackage', () => {
     expect(nexusCSS).toMatch(
       /\[data-slot='input-group-control'\]\[class~='nx:focus-visible:outline-focus-default'\]:focus-visible[\s\S]*?\{[\s\S]*?outline-style:\s*none\s*!important;[\s\S]*?box-shadow:\s*none;[\s\S]*?\}/
     );
-    expect(nexusCSS).toMatch(
-      /\[data-slot='button'\]\[class~='nx:focus-visible:outline-focus-default'\]:focus-visible[\s\S]*?\{[\s\S]*?outline:\s*2px solid transparent\s*!important;[\s\S]*?\}/
+    // One rule per ring set: default, error, field, field error, button, button error.
+    const focusRingBodies = nexusCSS.match(
+      /\{[^}]*var\(--color-focus-[^}]*\}/g
     );
-    expect(nexusCSS).toMatch(/outline-style:\s*none\s*!important;/);
+    expect(focusRingBodies).toHaveLength(6);
+    for (const body of focusRingBodies) {
+      expect(body).toMatch(/outline:\s*2px solid transparent\s*!important;/);
+    }
     expect(nexusCSS).toMatch(/0 0 0 2px var\(--color-focus-default\);/);
     expect(nexusCSS).toMatch(/inset 0 0 0 1px var\(--color-focus-default\),/);
     expect(nexusCSS).toMatch(/0 0 0 1px var\(--color-focus-default\);/);

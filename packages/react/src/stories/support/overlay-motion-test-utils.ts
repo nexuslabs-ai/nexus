@@ -2,7 +2,7 @@ import { expect, waitForElementToBeRemoved } from 'storybook/test';
 
 export async function expectInterruptibleOverlayMotion(
   surface: Element | null,
-  oldOpenAnimationClass = 'nx:data-[state=open]:animate-in'
+  { oldOpenAnimationClass = 'nx:data-[state=open]:animate-in' } = {}
 ): Promise<void> {
   await expect(surface).toBeInTheDocument();
   await expect(surface).not.toHaveClass(oldOpenAnimationClass);

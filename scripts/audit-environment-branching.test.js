@@ -17,8 +17,8 @@ const BANNED_BRANCHES = [
   },
   {
     label: 'supports variant',
-    pattern: /\bsupports-[^\s:]*:/,
-    sample: 'nx:not-supports-[backdrop-filter]:bg-popover',
+    pattern: /\bsupports-/,
+    sample: '@variant not-supports-[backdrop-filter] {',
   },
   {
     label: 'CSS.supports()',
@@ -37,8 +37,8 @@ const BANNED_BRANCHES = [
   },
   {
     label: 'contrast variant',
-    pattern: /\bcontrast-(?:more|less):/,
-    sample: 'nx:contrast-more:border-border-default',
+    pattern: /\bcontrast-(?:more|less)\b/,
+    sample: '@variant contrast-more {',
   },
   {
     label: 'inverted-colors',
@@ -47,8 +47,8 @@ const BANNED_BRANCHES = [
   },
   {
     label: 'motion variant',
-    pattern: /\bmotion-(?:reduce|safe):/,
-    sample: 'nx:motion-reduce:transition-none',
+    pattern: /\bmotion-(?:reduce|safe)\b/,
+    sample: '@variant motion-reduce {',
   },
   {
     label: 'reduce-transparency variant',
@@ -57,8 +57,8 @@ const BANNED_BRANCHES = [
   },
   {
     label: 'pointer variant',
-    pattern: /\b(?:any-)?pointer-(?:coarse|fine|none):/,
-    sample: 'nx:pointer-coarse:after:-inset-2',
+    pattern: /\b(?:any-)?pointer-(?:coarse|fine|none)\b/,
+    sample: '@variant pointer-coarse {',
   },
   {
     label: 'pointer media query',
@@ -69,6 +69,11 @@ const BANNED_BRANCHES = [
     label: 'hover media query',
     pattern: /\((?:any-)?hover\s*:/,
     sample: 'nx:[@media(any-hover:hover)]:underline',
+  },
+  {
+    label: 'boolean hover or pointer media query',
+    pattern: /(?:@media[^{\]]*|['"])\((?:any-)?(?:hover|pointer)\s*\)/,
+    sample: 'nx:[@media(hover)]:underline',
   },
   {
     label: 'user-agent sniffing',

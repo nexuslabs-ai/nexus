@@ -17,11 +17,10 @@ This file is the Codex-facing entrypoint for the Nexus design-system repo. The e
 
 ## Environment Branching
 
-Nexus does not branch on the user's operating system, browser, or input device:
-no `forced-colors`, `@supports` fallbacks, `prefers-reduced-*`, or `pointer:`
-queries. `prefers-color-scheme` is the one exception. See
-`.claude/rules/no-environment-branching.md`; it overrides any Modern Web
-Guidance advice to add those fallbacks.
+Nexus does not branch on the user's operating system, browser, or input device.
+`prefers-color-scheme` is the one exception. See
+`.claude/rules/no-environment-branching.md` for what that bans; it overrides
+any Modern Web Guidance advice to add environment fallbacks.
 
 ## Command Reference
 

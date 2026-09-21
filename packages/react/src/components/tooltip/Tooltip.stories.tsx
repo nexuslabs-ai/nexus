@@ -163,7 +163,9 @@ export const HoverInteraction: Story = {
       expect(tooltip).toBeInTheDocument();
     });
     const tooltip = document.querySelector('[data-slot="tooltip-content"]');
-    await expectInterruptibleOverlayMotion(tooltip, 'nx:animate-in');
+    await expectInterruptibleOverlayMotion(tooltip, {
+      oldOpenAnimationClass: 'nx:animate-in',
+    });
 
     // Move away from trigger
     await userEvent.unhover(trigger);

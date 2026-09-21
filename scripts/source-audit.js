@@ -11,7 +11,8 @@ const SOURCE_FILE_RE = /\.(?:[cm]?js|[cm]?ts|jsx|tsx|css|scss|mdx)$/i;
 
 /**
  * Tracked and new, non-ignored source files under `apps/` and `packages/`, so
- * a local run scans the same files CI does.
+ * a local run scans the same files CI does. Tracked files deleted from the
+ * working tree are skipped.
  */
 export function readSourceFiles() {
   return execFileSync(
@@ -30,6 +31,7 @@ export function readSourceFiles() {
   )
     .split('\0')
     .filter((file) => SOURCE_FILE_RE.test(file))
+    .filter((file) => fs.existsSync(path.join(REPO_ROOT, file)))
     .map((file) => ({
       file,
       lines: fs.readFileSync(path.join(REPO_ROOT, file), 'utf8').split('\n'),
