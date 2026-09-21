@@ -20,7 +20,6 @@ const IGNORED_DIRS = new Set([
   'storybook-static',
 ]);
 
-// See .claude/rules/no-environment-branching.md.
 const BANNED_BRANCHES = [
   {
     label: 'forced-colors',
@@ -115,7 +114,6 @@ describe('environment branching', () => {
     }
   });
 
-  // Tests may name a banned pattern to assert its absence.
   it('no source file branches on OS, browser, or input device', () => {
     const files = sourceFiles.filter(({ file }) => !TEST_FILE_RE.test(file));
     expect(findUsages(BANNED_BRANCHES, files)).toEqual([]);

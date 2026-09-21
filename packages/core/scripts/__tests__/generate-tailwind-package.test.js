@@ -287,7 +287,7 @@ describe('generateTailwindPackage', () => {
 
   // Focus colours are promoted to the --color-* namespace so Tailwind emits
   // outline-focus-* utilities. Default focus falls through to primary accent; error
-  // focus keeps its primitive-backed token. The focus paint is shared CSS.
+  // focus keeps its primitive-backed token.
   // The outline offset is also tokenised so components share one tune-point.
   // --focus-offset emits once at :root (not @theme: Tailwind tree-shakes @theme
   // vars referenced only via arbitrary utilities, #506). The count guard also

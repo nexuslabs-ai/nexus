@@ -21,8 +21,7 @@ interface ScrollAreaProps extends React.ComponentProps<
  * ScrollArea
  *
  * A viewport with cross-browser custom scrollbars, so a scrollable region reads
- * the same on every platform instead of inheriting the OS scrollbar. This is an
- * intentional divergence from native scrollbar styling guidance: Radix keeps
+ * the same on every platform instead of inheriting the OS scrollbar. Radix keeps
  * scrolling native, while Nexus owns the visible track and thumb.
  *
  * Wraps its children in a measured viewport and renders a vertical scrollbar

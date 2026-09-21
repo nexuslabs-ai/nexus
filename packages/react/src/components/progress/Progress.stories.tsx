@@ -77,7 +77,6 @@ export const Indeterminate: Story = {
     // Radix marks the bar indeterminate and omits the numeric value
     await expect(indicator).toHaveAttribute('data-state', 'indeterminate');
     await expect(progress).not.toHaveAttribute('aria-valuenow');
-    // The sweep is actually applied (not just present as a class)
     await expect(getComputedStyle(indicator as Element).animationName).toBe(
       'progress-indeterminate'
     );

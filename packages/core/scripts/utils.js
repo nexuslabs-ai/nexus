@@ -2009,9 +2009,6 @@ const BUTTON_ERROR_FOCUS_RING_SELECTORS = [
  * Turn the canonical focus outline utilities into the shipped hard focus
  * treatment.
  *
- * The component classes intentionally stay outline-based: Tailwind owns the
- * outline width/offset, this layer owns the normal-mode ring paint.
- *
  * @returns {string} CSS focus ring rules
  */
 export function generateFocusRingCSS() {

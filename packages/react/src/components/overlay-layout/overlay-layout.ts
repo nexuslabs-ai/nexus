@@ -49,8 +49,7 @@ const navigationMenuInlinePopoverTransitionClassName = [
 // animation keeps a closing overlay mounted while the opacity/scale/translate
 // TRANSITIONS above run the visible exit. It animates an unread custom property (see
 // generateMotionUtilitiesCSS in @nexus/core), never a transitioned property, so it
-// cannot override those transitions. Retire this bridge if Radix Presence gains a
-// transition-aware unmount path.
+// cannot override those transitions.
 const overlayPresenceExitClassName =
   'nx:data-[state=closed]:animate-overlay-presence-exit';
 
