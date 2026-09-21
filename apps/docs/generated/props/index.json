@@ -34,6 +34,7 @@
     "NexusAppearanceProvider",
     "NexusAppearanceScript",
     "NexusAppearanceSettingRow",
+    "NexusAppearanceSettings",
     "NexusThemeQuickControl"
   ],
   "aspect-ratio": [
@@ -69,6 +70,12 @@
     "BreadcrumbMenuTrigger",
     "BreadcrumbPage",
     "BreadcrumbSeparator"
+  ],
+  "bubble": [
+    "Bubble",
+    "BubbleContent",
+    "BubbleGroup",
+    "BubbleReactions"
   ],
   "button": [
     "Button"
@@ -281,6 +288,7 @@
     "MenubarGroup",
     "MenubarItem",
     "MenubarLabel",
+    "MenubarMenu",
     "MenubarPortal",
     "MenubarRadioGroup",
     "MenubarRadioItem",

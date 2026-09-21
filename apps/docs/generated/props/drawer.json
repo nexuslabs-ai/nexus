@@ -21,9 +21,17 @@
     },
     {
       "name": "DrawerContent",
-      "description": "DrawerContent\n\nThe sliding panel. Renders inside a portal with an overlay; vaul's `direction`\nprop on the root picks which edge it slides from (defaults to `bottom`). The\ndrag handle shows only for the bottom direction.",
+      "description": "DrawerContent\n\nThe sliding panel. Renders inside a portal with an overlay; vaul's `direction`\nprop on the root picks which edge it slides from (defaults to `bottom`). The\nvisual handle shows only for the bottom direction unless `showHandle` is false.",
       "sourcePath": "packages/react/src/components/drawer/drawer.tsx",
-      "props": []
+      "props": [
+        {
+          "name": "showHandle",
+          "type": "boolean",
+          "required": false,
+          "defaultValue": "true",
+          "description": "Whether to show the bottom-only visual handle. This is a static indicator,\nnot vaul's gesture `Handle`, so it does not change dragging or the root's\n`dismissible` behavior."
+        }
+      ]
     },
     {
       "name": "DrawerDescription",

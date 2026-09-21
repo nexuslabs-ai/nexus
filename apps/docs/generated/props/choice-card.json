@@ -8,7 +8,7 @@
       "props": [
         {
           "name": "variant",
-          "type": "\"bordered\" | \"borderless\" | null",
+          "type": "\"borderless\" | \"bordered\" | null",
           "required": false,
           "defaultValue": null,
           "description": ""

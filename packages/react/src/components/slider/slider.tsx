@@ -48,6 +48,7 @@ const sliderMarkerClassName =
 
 const sliderFloatTolerance = 0.000001;
 type SliderSize = NonNullable<VariantProps<typeof sliderTrackVariants>['size']>;
+type SliderMarkers = number[] | 'steps';
 
 function getStepMarkerValues(min: number, max: number, step: number) {
   if (!Number.isFinite(min) || !Number.isFinite(max)) return [];
@@ -116,7 +117,7 @@ interface SliderProps extends React.ComponentProps<
    * <Slider defaultValue={[2]} max={4} step={1} markers="steps" />
    * ```
    */
-  markers?: number[] | 'steps';
+  markers?: SliderMarkers;
 }
 
 /**

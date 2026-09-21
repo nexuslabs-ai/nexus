@@ -49,7 +49,7 @@
         },
         {
           "name": "verticalAlign",
-          "type": "\"top\" | \"bottom\"",
+          "type": "\"bottom\" | \"top\"",
           "required": false,
           "defaultValue": "bottom",
           "description": ""
@@ -90,7 +90,7 @@
         },
         {
           "name": "formatter",
-          "type": "ChartTooltipFormatter",
+          "type": "(value: RechartsPrimitive.TooltipPayloadEntry[\"value\"], name: RechartsPrimitive.TooltipPayloadEntry[\"name\"], item: RechartsPrimitive.TooltipPayloadEntry, index: number, payload: RechartsPrimitive.TooltipPayloadEntry[\"payload\"]) => React.ReactNode",
           "required": false,
           "defaultValue": null,
           "description": ""
@@ -111,7 +111,7 @@
         },
         {
           "name": "indicator",
-          "type": "ChartIndicator",
+          "type": "\"dashed\" | \"line\" | \"dot\"",
           "required": false,
           "defaultValue": "dot",
           "description": ""

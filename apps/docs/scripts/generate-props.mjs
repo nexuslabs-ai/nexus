@@ -1,4 +1,10 @@
-import { mkdirSync, readdirSync, rmSync, writeFileSync } from 'node:fs';
+import {
+  mkdirSync,
+  readdirSync,
+  readFileSync,
+  unlinkSync,
+  writeFileSync,
+} from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 
@@ -10,14 +16,10 @@ const docsRoot = path.resolve(
   '..'
 );
 const repoRoot = path.resolve(docsRoot, '..', '..');
-const componentsRoot = path.join(
-  repoRoot,
-  'packages',
-  'react',
-  'src',
-  'components'
-);
-const reactTsconfig = path.join(repoRoot, 'packages', 'react', 'tsconfig.json');
+const reactRoot = path.join(repoRoot, 'packages', 'react');
+const reactSrc = path.join(reactRoot, 'src');
+const componentsRoot = path.join(reactSrc, 'components');
+const reactTsconfig = path.join(reactRoot, 'tsconfig.json');
 const outputDir = process.argv[2]
   ? path.resolve(process.argv[2])
   : path.join(docsRoot, 'generated', 'props');
@@ -47,6 +49,28 @@ function toRepoPath(absolutePath) {
 
 function toSlug(absolutePath) {
   return path.relative(componentsRoot, absolutePath).split(path.sep)[0];
+}
+
+/**
+ * The `exports` map points at built declarations; the same subpaths under
+ * `src/` are what the program is built from, so a new public subentry is picked
+ * up without a second list to maintain.
+ */
+function entryPoints() {
+  const manifest = JSON.parse(
+    readFileSync(path.join(reactRoot, 'package.json'), 'utf8')
+  );
+
+  return Object.values(manifest.exports)
+    .map((subpath) => subpath?.types)
+    .filter((types) => typeof types === 'string')
+    .map((types) =>
+      path.join(
+        reactRoot,
+        types.replace(/^\.\/dist\//, 'src/').replace(/\.d\.ts$/, '.ts')
+      )
+    )
+    .sort();
 }
 
 /**
@@ -82,16 +106,6 @@ function exportName(doc) {
   return doc.rootExpression?.getName() ?? doc.displayName;
 }
 
-/**
- * docgen resolves a call signature on any exported function, so hooks
- * (`useSidebar`) and factories (`createNexusAppearance`) arrive as components
- * with their options object flattened into `props`. JSX requires a component to
- * be uppercase-first, which is the same line React itself draws.
- */
-function isComponentExport(doc) {
-  return /^[A-Z]/.test(exportName(doc));
-}
-
 function declarationPath(doc) {
   const sourceFile = doc.expression?.declarations?.[0]?.getSourceFile?.();
   return sourceFile ? toRepoPath(sourceFile.fileName) : null;
@@ -112,24 +126,129 @@ function isReExport(doc, parsedPaths) {
   );
 }
 
-function toPropEntry(prop) {
+function resolveAlias(checker, symbol) {
+  if ((symbol.flags & ts.SymbolFlags.Alias) === 0) return symbol;
+  try {
+    return checker.getAliasedSymbol(symbol);
+  } catch {
+    return symbol;
+  }
+}
+
+function symbolSourcePath(symbol) {
+  const sourceFile = symbol.declarations?.[0]?.getSourceFile?.();
+  return sourceFile ? toRepoPath(sourceFile.fileName) : null;
+}
+
+/**
+ * A component name is PascalCase. Screaming-snake exports
+ * (`NEXUS_APPEARANCE_COOKIE_MAX_AGE_SECONDS`) share the leading capital but are
+ * constants.
+ */
+function isComponentName(name) {
+  return /^[A-Z]/.test(name) && !/^[A-Z0-9_]+$/.test(name);
+}
+
+/**
+ * The package's public exports, not docgen's reports, decide what gets an
+ * entry: docgen drops a component whose function takes no props parameter, and
+ * would otherwise document anything reachable from a parsed file.
+ */
+function publicExports(checker, program) {
+  const exported = new Map();
+
+  for (const entry of entryPoints()) {
+    const moduleSymbol = checker.getSymbolAtLocation(
+      program.getSourceFile(entry)
+    );
+
+    for (const symbol of checker.getExportsOfModule(moduleSymbol)) {
+      exported.set(symbol.getName(), resolveAlias(checker, symbol));
+    }
+  }
+
+  return exported;
+}
+
+const componentValueFlags =
+  ts.SymbolFlags.Function | ts.SymbolFlags.Class | ts.SymbolFlags.Variable;
+
+function publicComponents(exported) {
+  const componentsPath = toRepoPath(componentsRoot);
+
+  return new Map(
+    [...exported]
+      .filter(([name, symbol]) => {
+        if (!isComponentName(name)) return false;
+        if ((symbol.flags & componentValueFlags) === 0) return false;
+        return symbolSourcePath(symbol)?.startsWith(componentsPath) ?? false;
+      })
+      .sort(([a], [b]) => a.localeCompare(b, 'en'))
+  );
+}
+
+/**
+ * A prop typed with a repo-local alias prints that alias name, which a reader
+ * cannot resolve unless the package exports it. Print the alias body instead,
+ * so no component has to inline a union for the docs' sake.
+ */
+function localAliasExpansions(checker, program, exported) {
+  const srcPath = toRepoPath(reactSrc);
+  const expansions = new Map();
+
+  for (const sourceFile of program.getSourceFiles()) {
+    if (!toRepoPath(sourceFile.fileName).startsWith(srcPath)) continue;
+
+    for (const statement of sourceFile.statements) {
+      if (!ts.isTypeAliasDeclaration(statement)) continue;
+      const name = statement.name.text;
+      if (exported.has(name)) continue;
+
+      expansions.set(
+        name,
+        checker.typeToString(
+          checker.getTypeAtLocation(statement.name),
+          statement,
+          ts.TypeFormatFlags.InTypeAlias | ts.TypeFormatFlags.NoTruncation
+        )
+      );
+    }
+  }
+
+  return expansions;
+}
+
+function toPropEntry(prop, expansions) {
   return {
     name: prop.name,
-    type: prop.type.name,
+    type: expansions.get(prop.type.name) ?? prop.type.name,
     required: prop.required,
     defaultValue: prop.defaultValue?.value ?? null,
     description: prop.description,
   };
 }
 
-function toComponentEntry(doc) {
+function toComponentEntry(name, doc, expansions) {
   return {
-    name: exportName(doc),
+    name,
     description: doc.description,
     sourcePath: toRepoPath(doc.filePath),
     props: Object.values(doc.props)
-      .map(toPropEntry)
+      .map((prop) => toPropEntry(prop, expansions))
       .sort((a, b) => a.name.localeCompare(b.name, 'en')),
+  };
+}
+
+function toProplessEntry(checker, name, symbol) {
+  return {
+    name,
+    // docgen normalizes line endings; reading the comment off the symbol
+    // directly would carry a CRLF checkout into the output.
+    description: ts
+      .displayPartsToString(symbol.getDocumentationComment(checker))
+      .replace(/\r\n/g, '\n'),
+    sourcePath: symbolSourcePath(symbol),
+    props: [],
   };
 }
 
@@ -138,18 +257,13 @@ function toComponentEntry(doc) {
  * the function leave docgen attributing the description to the type export.
  * Move it back onto the component.
  */
-function adoptPropsTypeDescriptions(components, typeExports) {
-  const byKey = new Map(
-    typeExports.map((doc) => [
-      `${toRepoPath(doc.filePath)}#${doc.displayName}`,
-      doc.description,
-    ])
-  );
-
+function adoptPropsTypeDescriptions(components, typeExportDescriptions) {
   for (const component of components) {
     if (component.description) continue;
     component.description =
-      byKey.get(`${component.sourcePath}#${component.name}Props`) ?? '';
+      typeExportDescriptions.get(
+        `${component.sourcePath}#${component.name}Props`
+      ) ?? '';
   }
 }
 
@@ -174,6 +288,22 @@ const sourceFiles = slugs
   .sort();
 const parsedPaths = new Set(sourceFiles.map(toRepoPath));
 
+const compilerOptions = ts.parseJsonConfigFileContent(
+  ts.readConfigFile(reactTsconfig, ts.sys.readFile).config,
+  ts.sys,
+  path.dirname(reactTsconfig)
+).options;
+
+const program = ts.createProgram([...sourceFiles, ...entryPoints()], {
+  ...compilerOptions,
+  noEmit: true,
+});
+const checker = program.getTypeChecker();
+
+const exported = publicExports(checker, program);
+const components = publicComponents(exported);
+const expansions = localAliasExpansions(checker, program, exported);
+
 const parser = docgen.withCustomConfig(reactTsconfig, {
   savePropValueAsString: true,
   shouldIncludeExpression: true,
@@ -182,41 +312,56 @@ const parser = docgen.withCustomConfig(reactTsconfig, {
   propFilter: isOwnProp,
 });
 
-const bySlug = new Map(slugs.map((slug) => [slug, []]));
+const docsByName = new Map();
+const typeExportDescriptions = new Map();
 
-for (const doc of parser.parse(sourceFiles)) {
-  bySlug.get(toSlug(doc.filePath)).push(doc);
+for (const doc of parser.parseWithProgramProvider(sourceFiles, () => program)) {
+  if (isTypeExport(doc)) {
+    typeExportDescriptions.set(
+      `${toRepoPath(doc.filePath)}#${doc.displayName}`,
+      doc.description
+    );
+    continue;
+  }
+  if (isReExport(doc, parsedPaths)) continue;
+
+  docsByName.set(exportName(doc), doc);
 }
 
-rmSync(outputDir, { recursive: true, force: true });
+const bySlug = new Map(slugs.map((slug) => [slug, []]));
+
+for (const [name, symbol] of components) {
+  const doc = docsByName.get(name);
+  const entry = doc
+    ? toComponentEntry(name, doc, expansions)
+    : toProplessEntry(checker, name, symbol);
+
+  bySlug.get(toSlug(path.join(repoRoot, entry.sourcePath))).push(entry);
+}
+
 mkdirSync(outputDir, { recursive: true });
+for (const file of readdirSync(outputDir)) {
+  if (file.endsWith('.json')) unlinkSync(path.join(outputDir, file));
+}
 
 const index = {};
-let componentCount = 0;
 let propCount = 0;
 
-for (const [slug, docs] of bySlug) {
-  const components = docs
-    .filter(
-      (doc) =>
-        !isTypeExport(doc) &&
-        !isReExport(doc, parsedPaths) &&
-        isComponentExport(doc)
-    )
-    .map(toComponentEntry)
-    .sort(byNameThenSource);
+for (const [slug, entries] of bySlug) {
+  entries.sort(byNameThenSource);
+  adoptPropsTypeDescriptions(entries, typeExportDescriptions);
 
-  adoptPropsTypeDescriptions(components, docs.filter(isTypeExport));
+  propCount += entries.reduce((total, entry) => total + entry.props.length, 0);
+  index[slug] = entries.map((entry) => entry.name);
 
-  componentCount += components.length;
-  propCount += components.reduce((total, c) => total + c.props.length, 0);
-  index[slug] = components.map((component) => component.name);
-
-  writeJson(path.join(outputDir, `${slug}.json`), { slug, components });
+  writeJson(path.join(outputDir, `${slug}.json`), {
+    slug,
+    components: entries,
+  });
 }
 
 writeJson(path.join(outputDir, 'index.json'), index);
 
 console.log(
-  `props: ${slugs.length} entries, ${componentCount} components, ${propCount} props -> ${toRepoPath(outputDir)}`
+  `props: ${slugs.length} entries, ${components.size} components, ${propCount} props -> ${toRepoPath(outputDir)}`
 );

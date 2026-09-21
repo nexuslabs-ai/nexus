@@ -61,6 +61,12 @@
       ]
     },
     {
+      "name": "MenubarMenu",
+      "description": "MenubarMenu\n\nGroups a trigger with its content. One per top-level menu.",
+      "sourcePath": "packages/react/src/components/menubar/menubar.tsx",
+      "props": []
+    },
+    {
       "name": "MenubarPortal",
       "description": "MenubarPortal\n\nPortals the content to the body.",
       "sourcePath": "packages/react/src/components/menubar/menubar.tsx",

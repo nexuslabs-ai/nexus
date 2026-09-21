@@ -107,7 +107,7 @@
         },
         {
           "name": "variant",
-          "type": "\"link\" | \"default\" | \"error\" | \"destructive\" | \"outline\" | \"dashed\" | \"secondary\" | \"ghost\" | null",
+          "type": "\"default\" | \"error\" | \"destructive\" | \"outline\" | \"dashed\" | \"secondary\" | \"ghost\" | \"link\" | null",
           "required": false,
           "defaultValue": "outline",
           "description": ""

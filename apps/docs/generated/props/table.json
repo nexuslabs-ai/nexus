@@ -15,7 +15,7 @@
         },
         {
           "name": "density",
-          "type": "TableDensity",
+          "type": "\"comfortable\" | \"compact\"",
           "required": false,
           "defaultValue": "comfortable",
           "description": "Row density.\n\n- `comfortable` — roomier ~44px rows (the default).\n- `compact` — tighter ~36px rows for dense data."
@@ -36,7 +36,7 @@
         },
         {
           "name": "variant",
-          "type": "TableVariant",
+          "type": "\"default\" | \"borderless\" | \"grid\"",
           "required": false,
           "defaultValue": "default",
           "description": "Border treatment for the table's internal lines.\n\n- `default` — softened horizontal row rules + a header underline.\n- `borderless` — no internal lines; rows separate by hover + spacing.\n- `grid` — row **and** column rules (a full cell grid)."

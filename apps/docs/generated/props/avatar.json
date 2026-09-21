@@ -15,7 +15,7 @@
         },
         {
           "name": "shape",
-          "type": "\"circle\" | \"rounded\" | null",
+          "type": "\"rounded\" | \"circle\" | null",
           "required": false,
           "defaultValue": null,
           "description": ""
@@ -49,7 +49,7 @@
         },
         {
           "name": "shape",
-          "type": "\"circle\" | \"rounded\" | null",
+          "type": "\"rounded\" | \"circle\" | null",
           "required": false,
           "defaultValue": null,
           "description": ""

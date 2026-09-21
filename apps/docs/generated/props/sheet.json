@@ -33,7 +33,7 @@
         },
         {
           "name": "side",
-          "type": "\"left\" | \"right\" | \"top\" | \"bottom\" | null",
+          "type": "\"bottom\" | \"left\" | \"right\" | \"top\" | null",
           "required": false,
           "defaultValue": "right",
           "description": ""

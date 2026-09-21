@@ -15,7 +15,7 @@
         },
         {
           "name": "size",
-          "type": "SliderSize",
+          "type": "\"standard\" | \"comfortable\"",
           "required": false,
           "defaultValue": "standard",
           "description": "Visual density for the slider rail and thumb."

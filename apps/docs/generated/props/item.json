@@ -72,7 +72,7 @@
       "props": [
         {
           "name": "variant",
-          "type": "\"image\" | \"default\" | \"icon\" | null",
+          "type": "\"default\" | \"icon\" | \"image\" | null",
           "required": false,
           "defaultValue": "default",
           "description": ""

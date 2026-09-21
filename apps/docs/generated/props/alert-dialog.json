@@ -21,7 +21,7 @@
         },
         {
           "name": "variant",
-          "type": "\"link\" | \"default\" | \"error\" | \"destructive\" | \"outline\" | \"dashed\" | \"secondary\" | \"ghost\" | null",
+          "type": "\"default\" | \"error\" | \"destructive\" | \"outline\" | \"dashed\" | \"secondary\" | \"ghost\" | \"link\" | null",
           "required": false,
           "defaultValue": "default",
           "description": ""
@@ -48,7 +48,7 @@
         },
         {
           "name": "variant",
-          "type": "\"link\" | \"default\" | \"error\" | \"destructive\" | \"outline\" | \"dashed\" | \"secondary\" | \"ghost\" | null",
+          "type": "\"default\" | \"error\" | \"destructive\" | \"outline\" | \"dashed\" | \"secondary\" | \"ghost\" | \"link\" | null",
           "required": false,
           "defaultValue": "outline",
           "description": ""
@@ -62,7 +62,7 @@
       "props": [
         {
           "name": "variant",
-          "type": "OverlayVariant",
+          "type": "\"default\" | \"center\"",
           "required": false,
           "defaultValue": "default",
           "description": "Layout variant for the alert dialog content.\n\n`default` keeps the header left-aligned and footer actions horizontal.\n`center` centers the header and stacks full-width footer actions."
@@ -88,7 +88,7 @@
       "props": [
         {
           "name": "variant",
-          "type": "\"center\" | \"default\" | null",
+          "type": "\"default\" | \"center\" | null",
           "required": false,
           "defaultValue": null,
           "description": ""

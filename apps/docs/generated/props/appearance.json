@@ -149,6 +149,12 @@
       ]
     },
     {
+      "name": "NexusAppearanceSettings",
+      "description": "",
+      "sourcePath": "packages/react/src/components/appearance/appearance-settings/appearance-settings.tsx",
+      "props": []
+    },
+    {
       "name": "NexusThemeQuickControl",
       "description": "",
       "sourcePath": "packages/react/src/components/appearance/theme-quick-control/theme-quick-control.tsx",

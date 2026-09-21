@@ -8,35 +8,35 @@
       "props": [
         {
           "name": "above",
-          "type": "Breakpoint",
+          "type": "\"sm\" | \"lg\" | \"md\" | \"xl\" | \"2xl\"",
           "required": false,
           "defaultValue": null,
           "description": ""
         },
         {
           "name": "as",
-          "type": "\"div\" | \"span\"",
+          "type": "\"span\" | \"div\"",
           "required": false,
           "defaultValue": "span",
           "description": "Wrapper tag: `span` (inline) or `div` (block) — match the child's layout.\nTag-only and non-semantic: `display: contents` can\ndrop a semantic element's box from the accessibility tree, so put semantics\non a child *inside* `<Show>` / `<Hide>` instead."
         },
         {
           "name": "below",
-          "type": "Breakpoint",
+          "type": "\"sm\" | \"lg\" | \"md\" | \"xl\" | \"2xl\"",
           "required": false,
           "defaultValue": null,
           "description": ""
         },
         {
           "name": "containerAbove",
-          "type": "Breakpoint",
+          "type": "\"sm\" | \"lg\" | \"md\" | \"xl\" | \"2xl\"",
           "required": false,
           "defaultValue": null,
           "description": ""
         },
         {
           "name": "containerBelow",
-          "type": "Breakpoint",
+          "type": "\"sm\" | \"lg\" | \"md\" | \"xl\" | \"2xl\"",
           "required": false,
           "defaultValue": null,
           "description": ""

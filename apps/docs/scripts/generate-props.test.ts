@@ -3,22 +3,18 @@ import { mkdtempSync, readdirSync, readFileSync, rmSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
+import ts from 'typescript';
 import { afterAll, describe, expect, it } from 'vitest';
 
 const docsRoot = path.resolve(
   path.dirname(fileURLToPath(import.meta.url)),
   '..'
 );
+const repoRoot = path.resolve(docsRoot, '..', '..');
 const generatedDir = path.join(docsRoot, 'generated', 'props');
-const componentsRoot = path.resolve(
-  docsRoot,
-  '..',
-  '..',
-  'packages',
-  'react',
-  'src',
-  'components'
-);
+const reactRoot = path.join(repoRoot, 'packages', 'react');
+const reactSrc = path.join(reactRoot, 'src');
+const componentsRoot = path.join(reactSrc, 'components');
 
 type PropEntry = {
   name: string;
@@ -54,28 +50,109 @@ function byName(a: string, b: string) {
   return a.localeCompare(b, 'en');
 }
 
-const freshDir = mkdtempSync(path.join(tmpdir(), 'nexus-props-'));
-
-afterAll(() => {
-  rmSync(freshDir, { recursive: true, force: true });
-});
-
 const index: Record<string, string[]> = JSON.parse(read('index.json'));
 const slugs = Object.keys(index);
 const entries = slugs.map(readEntry);
 const allComponents = entries.flatMap((entry) => entry.components);
 
-function propsOf(slug: string, component: string) {
+function componentOf(slug: string, component: string) {
   const entry = entries[slugs.indexOf(slug)];
   const match = entry?.components.find((c) => c.name === component);
   if (!match) throw new Error(`${slug} has no ${component} entry`);
-  return match.props;
+  return match;
+}
+
+function propsOf(slug: string, component: string) {
+  return componentOf(slug, component).props;
 }
 
 function propOf(slug: string, component: string, prop: string) {
   const match = propsOf(slug, component).find((p) => p.name === prop);
   if (!match) throw new Error(`${slug}/${component} has no ${prop} prop`);
   return match;
+}
+
+let freshDir: string | null = null;
+
+afterAll(() => {
+  if (freshDir) rmSync(freshDir, { recursive: true, force: true });
+});
+
+let exportNames: Set<string> | null = null;
+
+/**
+ * Everything `@nexus_ds/react` exports, read straight off the package's own
+ * entry points rather than off the generator — what a consumer can import is
+ * the yardstick the output is measured against.
+ */
+function reactExportNames() {
+  if (exportNames) return exportNames;
+
+  const manifest = JSON.parse(
+    readFileSync(path.join(reactRoot, 'package.json'), 'utf8')
+  );
+  const entryPoints: string[] = Object.values(manifest.exports)
+    .map((subpath) => (subpath as { types?: string })?.types)
+    .filter((types): types is string => typeof types === 'string')
+    .map((types) =>
+      path.join(
+        reactRoot,
+        types.replace(/^\.\/dist\//, 'src/').replace(/\.d\.ts$/, '.ts')
+      )
+    );
+
+  const tsconfig = path.join(reactRoot, 'tsconfig.json');
+  const { options } = ts.parseJsonConfigFileContent(
+    ts.readConfigFile(tsconfig, ts.sys.readFile).config,
+    ts.sys,
+    path.dirname(tsconfig)
+  );
+  const program = ts.createProgram(entryPoints, { ...options, noEmit: true });
+  const checker = program.getTypeChecker();
+
+  const names = new Set<string>();
+  for (const entry of entryPoints) {
+    const moduleSymbol = checker.getSymbolAtLocation(
+      program.getSourceFile(entry)!
+    );
+    for (const symbol of checker.getExportsOfModule(moduleSymbol!)) {
+      names.add(symbol.getName());
+    }
+  }
+
+  exportNames = names;
+  return names;
+}
+
+/**
+ * Every type declared at the top level of a file under the react package —
+ * anchored at column 0 so an indented `type X,` inside an import block is not
+ * mistaken for a declaration.
+ */
+function reactTypeNames() {
+  const names = new Set<string>();
+
+  const walk = (dir: string) => {
+    for (const entry of readdirSync(dir, { withFileTypes: true })) {
+      const entryPath = path.join(dir, entry.name);
+      if (entry.isDirectory()) {
+        walk(entryPath);
+        continue;
+      }
+      if (!/\.tsx?$/.test(entry.name)) continue;
+
+      const source = readFileSync(entryPath, 'utf8');
+      for (const match of source.matchAll(
+        /^(?:export )?(?:declare )?(?:type|interface) ([A-Za-z_$][\w$]*)/gm
+      )) {
+        const [, name] = match;
+        if (name) names.add(name);
+      }
+    }
+  };
+
+  walk(reactSrc);
+  return names;
 }
 
 describe('docs props data', () => {
@@ -97,12 +174,32 @@ describe('docs props data', () => {
     }
   });
 
-  it('lists only components, not hooks or factories', () => {
-    const notComponents = allComponents
+  it('documents nothing a consumer cannot import', { timeout: 120_000 }, () => {
+    const exported = reactExportNames();
+    const unreachable = allComponents
       .map((component) => component.name)
-      .filter((name) => !/^[A-Z]/.test(name));
+      .filter((name) => !exported.has(name));
 
-    expect(notComponents).toEqual([]);
+    expect(unreachable).toEqual([]);
+  });
+
+  it('drops the hooks and factories docgen reports as components', () => {
+    const names = new Set(allComponents.map((component) => component.name));
+
+    expect(names.has('useSidebar')).toBe(false);
+    expect(names.has('createNexusAppearance')).toBe(false);
+    expect(names.has('createNexusAppearanceScript')).toBe(false);
+    expect(names.has('resolveOverlayButtonOrientation')).toBe(false);
+    expect(names.has('SidebarProvider')).toBe(true);
+  });
+
+  it('keeps an exported component whose function takes no props', () => {
+    // docgen resolves props off the first call-signature parameter, so these
+    // two are reported as nothing at all.
+    expect(componentOf('appearance', 'NexusAppearanceSettings').props).toEqual(
+      []
+    );
+    expect(componentOf('menubar', 'MenubarMenu').props).toEqual([]);
   });
 
   it('lists only the props Badge declares itself', () => {
@@ -158,6 +255,34 @@ describe('docs props data', () => {
     );
   });
 
+  it('prints an unexported alias as its members, not its name', () => {
+    expect(propOf('slider', 'Slider', 'markers').type).toBe(
+      'number[] | "steps"'
+    );
+    expect(propOf('table', 'Table', 'variant').type).toBe(
+      '"default" | "borderless" | "grid"'
+    );
+    expect(propOf('alert-dialog', 'AlertDialogContent', 'variant').type).toBe(
+      '"default" | "center"'
+    );
+  });
+
+  it('never names a type a reader cannot resolve', { timeout: 120_000 }, () => {
+    const exported = reactExportNames();
+    const unresolvable = [...reactTypeNames()].filter(
+      (name) => !exported.has(name)
+    );
+    const pattern = new RegExp(`\\b(?:${unresolvable.join('|')})\\b`);
+
+    const named = allComponents.flatMap((component) =>
+      component.props
+        .filter((prop) => pattern.test(prop.type))
+        .map((prop) => `${component.name}.${prop.name}: ${prop.type}`)
+    );
+
+    expect(named).toEqual([]);
+  });
+
   it('reports a component under the name it is exported as', () => {
     const drawer = readEntry('drawer').components.map((c) => c.name);
 
@@ -196,6 +321,8 @@ describe('docs props data', () => {
   // change committed without rerunning the generator — a stale file here
   // fails the same way a hand-edited one would.
   it('matches a fresh run of the generator', { timeout: 120_000 }, () => {
+    freshDir = mkdtempSync(path.join(tmpdir(), 'nexus-props-'));
+
     execFileSync(
       process.execPath,
       [path.join(docsRoot, 'scripts', 'generate-props.mjs'), freshDir],

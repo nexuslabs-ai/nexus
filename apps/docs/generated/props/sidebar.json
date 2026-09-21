@@ -8,7 +8,7 @@
       "props": [
         {
           "name": "collapsible",
-          "type": "\"none\" | \"icon\" | \"offcanvas\"",
+          "type": "\"icon\" | \"none\" | \"offcanvas\"",
           "required": false,
           "defaultValue": "offcanvas",
           "description": "Collapse behaviour: slide `offcanvas`, shrink to an `icon` rail, or `none`."
@@ -22,7 +22,7 @@
         },
         {
           "name": "variant",
-          "type": "\"floating\" | \"inset\" | \"sidebar\"",
+          "type": "\"inset\" | \"floating\" | \"sidebar\"",
           "required": false,
           "defaultValue": "sidebar",
           "description": "Visual treatment: flush `sidebar`, detached `floating`, or `inset` (pairs\nwith `SidebarInset` for a card-like main region)."
@@ -101,7 +101,7 @@
         },
         {
           "name": "variant",
-          "type": "\"bordered\" | \"borderless\" | null",
+          "type": "\"borderless\" | \"bordered\" | null",
           "required": false,
           "defaultValue": null,
           "description": ""
@@ -331,7 +331,7 @@
         },
         {
           "name": "variant",
-          "type": "\"link\" | \"default\" | \"error\" | \"destructive\" | \"outline\" | \"dashed\" | \"secondary\" | \"ghost\" | null",
+          "type": "\"default\" | \"error\" | \"destructive\" | \"outline\" | \"dashed\" | \"secondary\" | \"ghost\" | \"link\" | null",
           "required": false,
           "defaultValue": null,
           "description": ""
