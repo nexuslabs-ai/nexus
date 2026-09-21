@@ -44,7 +44,7 @@
           "name": "max",
           "type": "number",
           "required": false,
-          "defaultValue": "undefined",
+          "defaultValue": null,
           "description": "Maximum number of avatars to render before collapsing the remainder into a\n+N tile."
         },
         {

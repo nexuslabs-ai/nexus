@@ -1,7 +1,9 @@
-import { readdirSync, readFileSync } from 'node:fs';
+import { execFileSync } from 'node:child_process';
+import { mkdtempSync, readdirSync, readFileSync, rmSync } from 'node:fs';
+import { tmpdir } from 'node:os';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { describe, expect, it } from 'vitest';
+import { afterAll, describe, expect, it } from 'vitest';
 
 const docsRoot = path.resolve(
   path.dirname(fileURLToPath(import.meta.url)),
@@ -52,7 +54,14 @@ function byName(a: string, b: string) {
   return a.localeCompare(b, 'en');
 }
 
-const slugs: string[] = JSON.parse(read('index.json'));
+const freshDir = mkdtempSync(path.join(tmpdir(), 'nexus-props-'));
+
+afterAll(() => {
+  rmSync(freshDir, { recursive: true, force: true });
+});
+
+const index: Record<string, string[]> = JSON.parse(read('index.json'));
+const slugs = Object.keys(index);
 const entries = slugs.map(readEntry);
 const allComponents = entries.flatMap((entry) => entry.components);
 
@@ -78,6 +87,22 @@ describe('docs props data', () => {
 
     expect(slugs).toEqual(folders);
     expect(entries.map((entry) => entry.slug)).toEqual(folders);
+  });
+
+  it('indexes every component name in its slug', () => {
+    for (const entry of entries) {
+      expect(index[entry.slug], entry.slug).toEqual(
+        entry.components.map((component) => component.name)
+      );
+    }
+  });
+
+  it('lists only components, not hooks or factories', () => {
+    const notComponents = allComponents
+      .map((component) => component.name)
+      .filter((name) => !/^[A-Z]/.test(name));
+
+    expect(notComponents).toEqual([]);
   });
 
   it('lists only the props Badge declares itself', () => {
@@ -164,6 +189,25 @@ describe('docs props data', () => {
     for (const file of [...slugs.map((slug) => `${slug}.json`), 'index.json']) {
       const raw = read(file);
       expect(`${JSON.stringify(JSON.parse(raw), null, 2)}\n`, file).toBe(raw);
+    }
+  });
+
+  // Regenerating and comparing proves determinism and catches a component
+  // change committed without rerunning the generator — a stale file here
+  // fails the same way a hand-edited one would.
+  it('matches a fresh run of the generator', { timeout: 120_000 }, () => {
+    execFileSync(
+      process.execPath,
+      [path.join(docsRoot, 'scripts', 'generate-props.mjs'), freshDir],
+      { stdio: 'pipe' }
+    );
+
+    const fresh = readdirSync(freshDir).sort(byName);
+    expect(fresh).toEqual(readdirSync(generatedDir).sort(byName));
+
+    for (const file of fresh) {
+      const generated = readFileSync(path.join(freshDir, file), 'utf8');
+      expect(generated, file).toBe(read(file));
     }
   });
 });

@@ -299,7 +299,6 @@ interface AvatarGroupProps
   /**
    * Maximum number of avatars to render before collapsing the remainder into a
    * +N tile.
-   * @default undefined
    * @example
    * ```tsx
    * <AvatarGroup size="lg" max={3}>{avatars}</AvatarGroup>

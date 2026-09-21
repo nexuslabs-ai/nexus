@@ -337,12 +337,6 @@
           "description": ""
         }
       ]
-    },
-    {
-      "name": "useSidebar",
-      "description": "useSidebar\n\nReads the sidebar context (open state, narrow-tier state, and the toggle helper).\nMust be called within a `SidebarProvider`; throws otherwise.",
-      "sourcePath": "packages/react/src/components/sidebar/sidebar.tsx",
-      "props": []
     }
   ]
 }

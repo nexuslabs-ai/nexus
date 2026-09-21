@@ -18,7 +18,9 @@ const componentsRoot = path.join(
   'components'
 );
 const reactTsconfig = path.join(repoRoot, 'packages', 'react', 'tsconfig.json');
-const outputDir = path.join(docsRoot, 'generated', 'props');
+const outputDir = process.argv[2]
+  ? path.resolve(process.argv[2])
+  : path.join(docsRoot, 'generated', 'props');
 
 function isComponentSource(filePath) {
   const name = path.basename(filePath);
@@ -71,6 +73,25 @@ function isTypeExport(doc) {
   return ((doc.expression?.flags ?? 0) & ts.SymbolFlags.Alias) !== 0;
 }
 
+/**
+ * `displayName` reports the primitive's own name for a re-export such as
+ * `const DrawerPortal = DrawerPrimitive.Portal`; the export name is what
+ * consumers import.
+ */
+function exportName(doc) {
+  return doc.rootExpression?.getName() ?? doc.displayName;
+}
+
+/**
+ * docgen resolves a call signature on any exported function, so hooks
+ * (`useSidebar`) and factories (`createNexusAppearance`) arrive as components
+ * with their options object flattened into `props`. JSX requires a component to
+ * be uppercase-first, which is the same line React itself draws.
+ */
+function isComponentExport(doc) {
+  return /^[A-Z]/.test(exportName(doc));
+}
+
 function declarationPath(doc) {
   const sourceFile = doc.expression?.declarations?.[0]?.getSourceFile?.();
   return sourceFile ? toRepoPath(sourceFile.fileName) : null;
@@ -94,7 +115,7 @@ function isReExport(doc, parsedPaths) {
 function toPropEntry(prop) {
   return {
     name: prop.name,
-    type: prop.type.raw ?? prop.type.name,
+    type: prop.type.name,
     required: prop.required,
     defaultValue: prop.defaultValue?.value ?? null,
     description: prop.description,
@@ -103,10 +124,7 @@ function toPropEntry(prop) {
 
 function toComponentEntry(doc) {
   return {
-    // `displayName` reports the primitive's own name for a re-export such as
-    // `const DrawerPortal = DrawerPrimitive.Portal`; the export name is what
-    // consumers import.
-    name: doc.rootExpression?.getName() ?? doc.displayName,
+    name: exportName(doc),
     description: doc.description,
     sourcePath: toRepoPath(doc.filePath),
     props: Object.values(doc.props)
@@ -173,12 +191,18 @@ for (const doc of parser.parse(sourceFiles)) {
 rmSync(outputDir, { recursive: true, force: true });
 mkdirSync(outputDir, { recursive: true });
 
+const index = {};
 let componentCount = 0;
 let propCount = 0;
 
 for (const [slug, docs] of bySlug) {
   const components = docs
-    .filter((doc) => !isTypeExport(doc) && !isReExport(doc, parsedPaths))
+    .filter(
+      (doc) =>
+        !isTypeExport(doc) &&
+        !isReExport(doc, parsedPaths) &&
+        isComponentExport(doc)
+    )
     .map(toComponentEntry)
     .sort(byNameThenSource);
 
@@ -186,11 +210,12 @@ for (const [slug, docs] of bySlug) {
 
   componentCount += components.length;
   propCount += components.reduce((total, c) => total + c.props.length, 0);
+  index[slug] = components.map((component) => component.name);
 
   writeJson(path.join(outputDir, `${slug}.json`), { slug, components });
 }
 
-writeJson(path.join(outputDir, 'index.json'), slugs);
+writeJson(path.join(outputDir, 'index.json'), index);
 
 console.log(
   `props: ${slugs.length} entries, ${componentCount} components, ${propCount} props -> ${toRepoPath(outputDir)}`

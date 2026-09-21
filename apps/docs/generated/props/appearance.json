@@ -2,62 +2,6 @@
   "slug": "appearance",
   "components": [
     {
-      "name": "createNexusAppearance",
-      "description": "",
-      "sourcePath": "packages/react/src/components/appearance/provider/factory.tsx",
-      "props": [
-        {
-          "name": "cookieOptions",
-          "type": "NexusAppearanceCookieOptions",
-          "required": false,
-          "defaultValue": null,
-          "description": ""
-        },
-        {
-          "name": "cookieWriteKey",
-          "type": "string | false",
-          "required": false,
-          "defaultValue": null,
-          "description": ""
-        },
-        {
-          "name": "defaultState",
-          "type": "NexusAppearanceState",
-          "required": false,
-          "defaultValue": null,
-          "description": ""
-        },
-        {
-          "name": "storageKey",
-          "type": "string | false",
-          "required": false,
-          "defaultValue": null,
-          "description": ""
-        }
-      ]
-    },
-    {
-      "name": "createNexusAppearanceScript",
-      "description": "",
-      "sourcePath": "packages/react/src/components/appearance/provider/script.tsx",
-      "props": [
-        {
-          "name": "defaultState",
-          "type": "NexusAppearanceState",
-          "required": false,
-          "defaultValue": null,
-          "description": ""
-        },
-        {
-          "name": "storageKey",
-          "type": "string | false",
-          "required": false,
-          "defaultValue": null,
-          "description": ""
-        }
-      ]
-    },
-    {
       "name": "NexusAppearanceColorField",
       "description": "",
       "sourcePath": "packages/react/src/components/appearance/color-field/color-field.tsx",

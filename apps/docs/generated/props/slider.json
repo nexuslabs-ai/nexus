@@ -8,7 +8,7 @@
       "props": [
         {
           "name": "markers",
-          "type": "SliderMarkers",
+          "type": "number[] | \"steps\"",
           "required": false,
           "defaultValue": null,
           "description": "Optional visual marks in the slider value domain. Pass an array for custom\npositions or `\"steps\"` to render one marker at each interior step."

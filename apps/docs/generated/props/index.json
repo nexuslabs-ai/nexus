@@ -1,65 +1,454 @@
-[
-  "accordion",
-  "alert",
-  "alert-dialog",
-  "appearance",
-  "aspect-ratio",
-  "attachment",
-  "avatar",
-  "badge",
-  "breadcrumb",
-  "button",
-  "button-group",
-  "card",
-  "carousel",
-  "chart",
-  "checkbox",
-  "choice-card",
-  "choice-row",
-  "collapsible",
-  "combobox",
-  "command",
-  "context-menu",
-  "date-picker",
-  "dialog",
-  "drawer",
-  "dropdown-menu",
-  "empty-state",
-  "field",
-  "focus-ring",
-  "hide",
-  "hover-card",
-  "input",
-  "input-group",
-  "input-otp",
-  "item",
-  "kbd",
-  "label",
-  "menubar",
-  "multi-select",
-  "native-select",
-  "navigation-menu",
-  "overlay-layout",
-  "pagination",
-  "popover",
-  "progress",
-  "radio-group",
-  "resizable",
-  "scroll-area",
-  "select",
-  "separator",
-  "sheet",
-  "show",
-  "sidebar",
-  "skeleton",
-  "slider",
-  "sonner",
-  "spinner",
-  "switch",
-  "table",
-  "tabs",
-  "textarea",
-  "toggle",
-  "toggle-group",
-  "tooltip"
-]
+{
+  "accordion": [
+    "Accordion",
+    "AccordionContent",
+    "AccordionItem",
+    "AccordionTrigger"
+  ],
+  "alert": [
+    "Alert",
+    "AlertActions",
+    "AlertClose",
+    "AlertContent",
+    "AlertDescription",
+    "AlertIcon",
+    "AlertTitle"
+  ],
+  "alert-dialog": [
+    "AlertDialog",
+    "AlertDialogAction",
+    "AlertDialogBody",
+    "AlertDialogCancel",
+    "AlertDialogContent",
+    "AlertDialogDescription",
+    "AlertDialogFooter",
+    "AlertDialogHeader",
+    "AlertDialogOverlay",
+    "AlertDialogPortal",
+    "AlertDialogTitle",
+    "AlertDialogTrigger"
+  ],
+  "appearance": [
+    "NexusAppearanceColorField",
+    "NexusAppearanceConfigPreview",
+    "NexusAppearanceProvider",
+    "NexusAppearanceScript",
+    "NexusAppearanceSettingRow",
+    "NexusThemeQuickControl"
+  ],
+  "aspect-ratio": [
+    "AspectRatio"
+  ],
+  "attachment": [
+    "Attachment",
+    "AttachmentActions",
+    "AttachmentContent",
+    "AttachmentDescription",
+    "AttachmentGroup",
+    "AttachmentMedia",
+    "AttachmentProgress",
+    "AttachmentTitle",
+    "AttachmentTrigger"
+  ],
+  "avatar": [
+    "Avatar",
+    "AvatarFallback",
+    "AvatarGroup",
+    "AvatarImage",
+    "AvatarStatus"
+  ],
+  "badge": [
+    "Badge"
+  ],
+  "breadcrumb": [
+    "Breadcrumb",
+    "BreadcrumbEllipsis",
+    "BreadcrumbItem",
+    "BreadcrumbLink",
+    "BreadcrumbList",
+    "BreadcrumbMenuTrigger",
+    "BreadcrumbPage",
+    "BreadcrumbSeparator"
+  ],
+  "button": [
+    "Button"
+  ],
+  "button-group": [
+    "ButtonGroup",
+    "ButtonGroupSeparator",
+    "ButtonGroupText"
+  ],
+  "card": [
+    "Card",
+    "CardAction",
+    "CardContent",
+    "CardDescription",
+    "CardFooter",
+    "CardHeader",
+    "CardTitle"
+  ],
+  "carousel": [
+    "Carousel",
+    "CarouselContent",
+    "CarouselItem",
+    "CarouselNext",
+    "CarouselPrevious"
+  ],
+  "chart": [
+    "ChartContainer",
+    "ChartLegend",
+    "ChartLegendContent",
+    "ChartTooltip",
+    "ChartTooltipContent"
+  ],
+  "checkbox": [
+    "Checkbox"
+  ],
+  "choice-card": [
+    "ChoiceCard",
+    "ChoiceCardContent",
+    "ChoiceCardDescription",
+    "ChoiceCardTitle"
+  ],
+  "choice-row": [
+    "ChoiceRow",
+    "ChoiceRowContent",
+    "ChoiceRowDescription",
+    "ChoiceRowTitle"
+  ],
+  "collapsible": [
+    "Collapsible",
+    "CollapsibleContent",
+    "CollapsibleTrigger"
+  ],
+  "combobox": [
+    "Combobox",
+    "ComboboxContent",
+    "ComboboxEmpty",
+    "ComboboxGroup",
+    "ComboboxInput",
+    "ComboboxItem",
+    "ComboboxList",
+    "ComboboxSeparator",
+    "ComboboxTrigger"
+  ],
+  "command": [
+    "Command",
+    "CommandDialog",
+    "CommandEmpty",
+    "CommandGroup",
+    "CommandInput",
+    "CommandItem",
+    "CommandList",
+    "CommandLoading",
+    "CommandSeparator",
+    "CommandShortcut"
+  ],
+  "context-menu": [
+    "ContextMenu",
+    "ContextMenuCheckboxItem",
+    "ContextMenuContent",
+    "ContextMenuGroup",
+    "ContextMenuItem",
+    "ContextMenuLabel",
+    "ContextMenuPortal",
+    "ContextMenuRadioGroup",
+    "ContextMenuRadioItem",
+    "ContextMenuSeparator",
+    "ContextMenuShortcut",
+    "ContextMenuSub",
+    "ContextMenuSubContent",
+    "ContextMenuSubTrigger",
+    "ContextMenuTrigger"
+  ],
+  "date-picker": [
+    "DatePicker",
+    "DatePickerDayButton"
+  ],
+  "dialog": [
+    "Dialog",
+    "DialogBody",
+    "DialogClose",
+    "DialogContent",
+    "DialogDescription",
+    "DialogFooter",
+    "DialogHeader",
+    "DialogOverlay",
+    "DialogPortal",
+    "DialogTitle",
+    "DialogTrigger"
+  ],
+  "drawer": [
+    "Drawer",
+    "DrawerBody",
+    "DrawerClose",
+    "DrawerContent",
+    "DrawerDescription",
+    "DrawerFooter",
+    "DrawerHeader",
+    "DrawerOverlay",
+    "DrawerPortal",
+    "DrawerTitle",
+    "DrawerTrigger"
+  ],
+  "dropdown-menu": [
+    "DropdownMenu",
+    "DropdownMenuCheckboxItem",
+    "DropdownMenuContent",
+    "DropdownMenuGroup",
+    "DropdownMenuItem",
+    "DropdownMenuLabel",
+    "DropdownMenuPortal",
+    "DropdownMenuRadioGroup",
+    "DropdownMenuRadioItem",
+    "DropdownMenuSeparator",
+    "DropdownMenuShortcut",
+    "DropdownMenuSub",
+    "DropdownMenuSubContent",
+    "DropdownMenuSubTrigger",
+    "DropdownMenuTrigger"
+  ],
+  "empty-state": [
+    "EmptyState",
+    "EmptyStateContent",
+    "EmptyStateDescription",
+    "EmptyStateHeader",
+    "EmptyStateMedia",
+    "EmptyStateTitle"
+  ],
+  "field": [
+    "Field",
+    "FieldContent",
+    "FieldDescription",
+    "FieldError",
+    "FieldGroup",
+    "FieldLabel",
+    "FieldLegend",
+    "FieldRequiredIndicator",
+    "FieldSeparator",
+    "FieldSet",
+    "FieldTitle"
+  ],
+  "focus-ring": [],
+  "hide": [
+    "Hide"
+  ],
+  "hover-card": [
+    "HoverCard",
+    "HoverCardContent",
+    "HoverCardTrigger"
+  ],
+  "input": [
+    "Input"
+  ],
+  "input-group": [
+    "InputGroup",
+    "InputGroupAddon",
+    "InputGroupButton",
+    "InputGroupInput",
+    "InputGroupText",
+    "InputGroupTextarea"
+  ],
+  "input-otp": [
+    "InputOTP",
+    "InputOTPGroup",
+    "InputOTPSeparator",
+    "InputOTPSlot"
+  ],
+  "item": [
+    "Item",
+    "ItemActions",
+    "ItemContent",
+    "ItemDescription",
+    "ItemFooter",
+    "ItemGroup",
+    "ItemHeader",
+    "ItemMedia",
+    "ItemSeparator",
+    "ItemTitle"
+  ],
+  "kbd": [
+    "Kbd",
+    "KbdGroup"
+  ],
+  "label": [
+    "Label"
+  ],
+  "menubar": [
+    "Menubar",
+    "MenubarCheckboxItem",
+    "MenubarContent",
+    "MenubarGroup",
+    "MenubarItem",
+    "MenubarLabel",
+    "MenubarPortal",
+    "MenubarRadioGroup",
+    "MenubarRadioItem",
+    "MenubarSeparator",
+    "MenubarShortcut",
+    "MenubarSub",
+    "MenubarSubContent",
+    "MenubarSubTrigger",
+    "MenubarTrigger"
+  ],
+  "multi-select": [
+    "MultiSelect",
+    "MultiSelectContent",
+    "MultiSelectGroup",
+    "MultiSelectItem",
+    "MultiSelectSeparator",
+    "MultiSelectTrigger",
+    "MultiSelectValue"
+  ],
+  "native-select": [
+    "NativeSelect",
+    "NativeSelectOptGroup",
+    "NativeSelectOption"
+  ],
+  "navigation-menu": [
+    "NavigationMenu",
+    "NavigationMenuContent",
+    "NavigationMenuIndicator",
+    "NavigationMenuItem",
+    "NavigationMenuLink",
+    "NavigationMenuList",
+    "NavigationMenuTrigger",
+    "NavigationMenuViewport"
+  ],
+  "overlay-layout": [],
+  "pagination": [
+    "Pagination",
+    "PaginationContent",
+    "PaginationEllipsis",
+    "PaginationItem",
+    "PaginationLink",
+    "PaginationNext",
+    "PaginationPrevious"
+  ],
+  "popover": [
+    "Popover",
+    "PopoverAnchor",
+    "PopoverContent",
+    "PopoverTrigger"
+  ],
+  "progress": [
+    "Progress"
+  ],
+  "radio-group": [
+    "RadioGroup",
+    "RadioGroupItem"
+  ],
+  "resizable": [
+    "ResizableHandle",
+    "ResizablePanel",
+    "ResizablePanelGroup"
+  ],
+  "scroll-area": [
+    "ScrollArea",
+    "ScrollBar"
+  ],
+  "select": [
+    "Select",
+    "SelectContent",
+    "SelectGroup",
+    "SelectItem",
+    "SelectLabel",
+    "SelectScrollDownButton",
+    "SelectScrollUpButton",
+    "SelectSeparator",
+    "SelectTrigger",
+    "SelectValue"
+  ],
+  "separator": [
+    "Separator"
+  ],
+  "sheet": [
+    "Sheet",
+    "SheetBody",
+    "SheetClose",
+    "SheetContent",
+    "SheetDescription",
+    "SheetFooter",
+    "SheetHeader",
+    "SheetOverlay",
+    "SheetPortal",
+    "SheetTitle",
+    "SheetTrigger"
+  ],
+  "show": [
+    "Show"
+  ],
+  "sidebar": [
+    "Sidebar",
+    "SidebarContent",
+    "SidebarFooter",
+    "SidebarGroup",
+    "SidebarGroupAction",
+    "SidebarGroupContent",
+    "SidebarGroupLabel",
+    "SidebarHeader",
+    "SidebarInput",
+    "SidebarInset",
+    "SidebarMenu",
+    "SidebarMenuAction",
+    "SidebarMenuBadge",
+    "SidebarMenuButton",
+    "SidebarMenuItem",
+    "SidebarMenuSkeleton",
+    "SidebarMenuSub",
+    "SidebarMenuSubButton",
+    "SidebarMenuSubItem",
+    "SidebarProvider",
+    "SidebarRail",
+    "SidebarSeparator",
+    "SidebarTrigger"
+  ],
+  "skeleton": [
+    "Skeleton"
+  ],
+  "slider": [
+    "Slider"
+  ],
+  "sonner": [
+    "Toaster"
+  ],
+  "spinner": [
+    "Spinner"
+  ],
+  "switch": [
+    "Switch"
+  ],
+  "table": [
+    "Table",
+    "TableBody",
+    "TableCaption",
+    "TableCell",
+    "TableFooter",
+    "TableHead",
+    "TableHeader",
+    "TableRow",
+    "TableRowHeader"
+  ],
+  "tabs": [
+    "Tabs",
+    "TabsContent",
+    "TabsList",
+    "TabsTrigger"
+  ],
+  "textarea": [
+    "Textarea"
+  ],
+  "toggle": [
+    "Toggle"
+  ],
+  "toggle-group": [
+    "ToggleGroup",
+    "ToggleGroupItem"
+  ],
+  "tooltip": [
+    "Tooltip",
+    "TooltipContent",
+    "TooltipProvider",
+    "TooltipTrigger"
+  ]
+}
