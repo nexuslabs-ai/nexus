@@ -1,0 +1,54 @@
+{
+  "slug": "badge",
+  "components": [
+    {
+      "name": "Badge",
+      "description": "Status / label chip — a non-interactive `<span>`.\n\nAccessibility: status is conveyed by color, so don't rely on color alone —\npair a status `variant` with text or a leading icon. Icon-only badges set\n`role=\"img\"`, so pass `aria-label`, `aria-labelledby`, or `title` to name\nthem. The badge is not a live region; if its status or count updates, wrap it\nin `aria-live=\"polite\"`.",
+      "sourcePath": "packages/react/src/components/badge/badge.tsx",
+      "props": [
+        {
+          "name": "fill",
+          "type": "\"outline\" | \"light\" | \"solid\" | null",
+          "required": false,
+          "defaultValue": null,
+          "description": ""
+        },
+        {
+          "name": "isCaps",
+          "type": "boolean",
+          "required": false,
+          "defaultValue": "true",
+          "description": "When true, uses uppercase text with wider letter-spacing."
+        },
+        {
+          "name": "isNumber",
+          "type": "boolean",
+          "required": false,
+          "defaultValue": "false",
+          "description": "When true, renders as a circular number badge.\nPass the number as children. A bare count is ambiguous to assistive tech —\npass an `aria-label` for context (e.g. `aria-label=\"8 unread\"`)."
+        },
+        {
+          "name": "leftIcon",
+          "type": "ReactNode",
+          "required": false,
+          "defaultValue": null,
+          "description": "Icon to display before the label.\nIcon is automatically sized to 14px (3.5 spacing units).\nIf the badge has no children, this renders as an icon-only badge.\nIgnored when `isNumber` is true."
+        },
+        {
+          "name": "rightIcon",
+          "type": "ReactNode",
+          "required": false,
+          "defaultValue": null,
+          "description": "Icon to display after the label.\nIcon is automatically sized to 14px (3.5 spacing units).\nIf the badge has no children and no `leftIcon`, this renders as an icon-only badge.\nIgnored when `isNumber` is true."
+        },
+        {
+          "name": "variant",
+          "type": "\"default\" | \"error\" | \"secondary\" | \"success\" | \"information\" | \"warning\" | null",
+          "required": false,
+          "defaultValue": null,
+          "description": ""
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,108 @@
+{
+  "slug": "input-group",
+  "components": [
+    {
+      "name": "InputGroup",
+      "description": "InputGroup\n\nWraps an input (or textarea) with leading/trailing addons — icons, text,\nbuttons, or kbd hints — inside one framed field that shares a focus ring.\nPlace an `InputGroupInput` / `InputGroupTextarea` as the control and one or\nmore `InputGroupAddon`s (positioned with `align`) around it; the whole group\nlights up when the control is focused, and reflects the control's invalid\nstate.\n\nThe visible frame matches a standalone `Input`: an inline group takes the\ncontrol's `size` height. Stacked (block-aligned) groups stay auto-height.\nThe `variant=\"bordered\"` treatment is the default; use `variant=\"borderless\"`\nto remove the resting field stroke while keeping a tonal control fill for\nresting affordance.",
+      "sourcePath": "packages/react/src/components/input-group/input-group.tsx",
+      "props": [
+        {
+          "name": "variant",
+          "type": "\"bordered\" | \"borderless\" | null",
+          "required": false,
+          "defaultValue": null,
+          "description": ""
+        }
+      ]
+    },
+    {
+      "name": "InputGroupAddon",
+      "description": "InputGroupAddon\n\nA leading / trailing / stacked slot for icons, text, buttons, or kbd hints.\nPosition with `align` — inline (start / end) or stacked (block start / end).",
+      "sourcePath": "packages/react/src/components/input-group/input-group.tsx",
+      "props": [
+        {
+          "name": "align",
+          "type": "\"inline-start\" | \"inline-end\" | \"block-start\" | \"block-end\" | null",
+          "required": false,
+          "defaultValue": "inline-start",
+          "description": ""
+        }
+      ]
+    },
+    {
+      "name": "InputGroupButton",
+      "description": "InputGroupButton\n\nA compact button sized to sit inside an `InputGroupAddon` — defaults to the\n`ghost` variant and the `xs` in-field size.",
+      "sourcePath": "packages/react/src/components/input-group/input-group.tsx",
+      "props": [
+        {
+          "name": "asChild",
+          "type": "boolean",
+          "required": false,
+          "defaultValue": "false",
+          "description": "When true, the button renders as its child element (via Radix Slot),\napplying button styling to e.g. an `<a>` while leaving the child's own\ncontent untouched — compose icons inside the child. `loading` and the\n`startIcon` / `endIcon` slots apply to the native `<button>` only."
+        },
+        {
+          "name": "endIcon",
+          "type": "ReactNode",
+          "required": false,
+          "defaultValue": null,
+          "description": "Decorative icon rendered after the button label. Use either `endIcon`\nor `startIcon`, not both. Hidden while `loading` (the spinner replaces all\ncontent)."
+        },
+        {
+          "name": "loading",
+          "type": "boolean",
+          "required": false,
+          "defaultValue": "false",
+          "description": "Shows a loading indicator and disables the button. While loading, the\nspinner replaces all visible content and any icon slots are hidden."
+        },
+        {
+          "name": "size",
+          "type": "\"sm\" | \"icon-sm\" | \"xs\" | \"icon-xs\" | null",
+          "required": false,
+          "defaultValue": "xs",
+          "description": ""
+        },
+        {
+          "name": "startIcon",
+          "type": "ReactNode",
+          "required": false,
+          "defaultValue": null,
+          "description": "Decorative icon rendered before the button label. Use either `startIcon`\nor `endIcon`, not both. Hidden while `loading` (the spinner replaces all\ncontent)."
+        },
+        {
+          "name": "variant",
+          "type": "\"link\" | \"default\" | \"error\" | \"destructive\" | \"outline\" | \"dashed\" | \"secondary\" | \"ghost\" | null",
+          "required": false,
+          "defaultValue": "ghost",
+          "description": ""
+        }
+      ]
+    },
+    {
+      "name": "InputGroupInput",
+      "description": "InputGroupInput\n\nThe text input inside an `InputGroup` — borderless and transparent so the\ngroup provides the frame and focus ring. Keeps `Input`'s per-size padding and\ntypography; the group supplies the height.",
+      "sourcePath": "packages/react/src/components/input-group/input-group.tsx",
+      "props": [
+        {
+          "name": "size",
+          "type": "\"default\" | \"sm\" | \"lg\" | null",
+          "required": false,
+          "defaultValue": null,
+          "description": ""
+        }
+      ]
+    },
+    {
+      "name": "InputGroupText",
+      "description": "InputGroupText\n\nInline addon text — a unit, a label, a prefix.",
+      "sourcePath": "packages/react/src/components/input-group/input-group.tsx",
+      "props": []
+    },
+    {
+      "name": "InputGroupTextarea",
+      "description": "InputGroupTextarea\n\nThe textarea inside an `InputGroup` — borderless and transparent so the group\nprovides the frame and focus ring.",
+      "sourcePath": "packages/react/src/components/input-group/input-group.tsx",
+      "props": []
+    }
+  ]
+}

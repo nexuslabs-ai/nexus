@@ -1,0 +1,47 @@
+{
+  "slug": "hide",
+  "components": [
+    {
+      "name": "Hide",
+      "description": "The inverse of `<Show>`: renders its children only when a responsive condition\nis **not** met, via a CSS `display` toggle (`contents` ↔ `none`). Children\nalways render to the DOM; only their visibility changes (no mount / unmount).\n\nProvide **exactly one** axis (enforced at compile time):\n- `above` / `below` — viewport min / max width (scale: `sm` 40rem … `2xl` 96rem).\n- `containerAbove` / `containerBelow` — the nearest `@container` ancestor's\n  min / max width (Tailwind's container scale: `sm` 24rem … `2xl` 42rem —\n  smaller than the viewport scale for the same name).\n\nContainer axes require an ancestor with `container-type` (e.g. a parent\ncarrying the `nx:@container` utility). v1 queries the nearest *unnamed*\ncontainer only; for a specific named container, fall back to raw\n`nx:@container/{name}/{bp}:` utilities.",
+      "sourcePath": "packages/react/src/components/hide/hide.tsx",
+      "props": [
+        {
+          "name": "above",
+          "type": "Breakpoint",
+          "required": false,
+          "defaultValue": null,
+          "description": ""
+        },
+        {
+          "name": "as",
+          "type": "\"div\" | \"span\"",
+          "required": false,
+          "defaultValue": "span",
+          "description": "Wrapper tag: `span` (inline) or `div` (block) — match the child's layout.\nTag-only and non-semantic: `display: contents` can\ndrop a semantic element's box from the accessibility tree, so put semantics\non a child *inside* `<Show>` / `<Hide>` instead."
+        },
+        {
+          "name": "below",
+          "type": "Breakpoint",
+          "required": false,
+          "defaultValue": null,
+          "description": ""
+        },
+        {
+          "name": "containerAbove",
+          "type": "Breakpoint",
+          "required": false,
+          "defaultValue": null,
+          "description": ""
+        },
+        {
+          "name": "containerBelow",
+          "type": "Breakpoint",
+          "required": false,
+          "defaultValue": null,
+          "description": ""
+        }
+      ]
+    }
+  ]
+}

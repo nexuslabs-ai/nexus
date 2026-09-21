@@ -1,0 +1,11 @@
+{
+  "slug": "overlay-layout",
+  "components": [
+    {
+      "name": "resolveOverlayButtonOrientation",
+      "description": "",
+      "sourcePath": "packages/react/src/components/overlay-layout/overlay-layout.ts",
+      "props": []
+    }
+  ]
+}

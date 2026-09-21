@@ -1,0 +1,128 @@
+{
+  "slug": "multi-select",
+  "components": [
+    {
+      "name": "MultiSelect",
+      "description": "MultiSelect\n\nA searchable multiple-selection field. cmdk (via `Command`) owns filtering and\nkeyboard navigation; this component adds the selected-value model and the chip\ntrigger, reading option labels from its own children so chips stay labeled\nwhile the list is closed. For searchable single selection, use `Combobox`.",
+      "sourcePath": "packages/react/src/components/multi-select/multi-select.tsx",
+      "props": [
+        {
+          "name": "defaultValues",
+          "type": "string[]",
+          "required": false,
+          "defaultValue": null,
+          "description": "Initial selected values for uncontrolled usage."
+        },
+        {
+          "name": "onValuesChange",
+          "type": "((values: string[]) => void)",
+          "required": false,
+          "defaultValue": null,
+          "description": "Called with the next selected values whenever selection changes."
+        },
+        {
+          "name": "values",
+          "type": "string[]",
+          "required": false,
+          "defaultValue": null,
+          "description": "Controlled selected values."
+        }
+      ]
+    },
+    {
+      "name": "MultiSelectContent",
+      "description": "MultiSelectContent\n\nThe searchable option list, rendered in a Popover so Radix owns focus,\ndismissal, and open/close motion.",
+      "sourcePath": "packages/react/src/components/multi-select/multi-select.tsx",
+      "props": [
+        {
+          "name": "emptyMessage",
+          "type": "ReactNode",
+          "required": false,
+          "defaultValue": "No results found.",
+          "description": "Shown when the search matches no options."
+        },
+        {
+          "name": "searchPlaceholder",
+          "type": "string",
+          "required": false,
+          "defaultValue": "Search…",
+          "description": "Placeholder for the search input."
+        }
+      ]
+    },
+    {
+      "name": "MultiSelectGroup",
+      "description": "MultiSelectGroup\n\nGroups related options under an optional `heading`.",
+      "sourcePath": "packages/react/src/components/multi-select/multi-select.tsx",
+      "props": []
+    },
+    {
+      "name": "MultiSelectItem",
+      "description": "MultiSelectItem\n\nA selectable option with a checkbox indicator. cmdk filters on `value` +\n`keywords`, so `value` is forwarded to disambiguate duplicate labels and\nicon-only content, and string children seed `keywords` so typing the label\nmatches.",
+      "sourcePath": "packages/react/src/components/multi-select/multi-select.tsx",
+      "props": [
+        {
+          "name": "badgeLabel",
+          "type": "ReactNode",
+          "required": false,
+          "defaultValue": null,
+          "description": "Label for the trigger chip when it differs from the option content (e.g. the\noption renders an icon + text but the chip should show text only)."
+        },
+        {
+          "name": "onSelect",
+          "type": "((value: string) => void)",
+          "required": false,
+          "defaultValue": null,
+          "description": "Called with the value after it is toggled."
+        },
+        {
+          "name": "value",
+          "type": "string",
+          "required": true,
+          "defaultValue": null,
+          "description": ""
+        }
+      ]
+    },
+    {
+      "name": "MultiSelectSeparator",
+      "description": "MultiSelectSeparator\n\nA visual divider between groups or options.",
+      "sourcePath": "packages/react/src/components/multi-select/multi-select.tsx",
+      "props": []
+    },
+    {
+      "name": "MultiSelectTrigger",
+      "description": "MultiSelectTrigger\n\nThe field surface. Renders the selected value(s) plus a chevron and toggles\nthe popover. Pass an `aria-label` (or a visible label via `Field`) so the\ncombobox has an accessible name. Backspace / Delete removes the last selected\nvalue, so keyboard users can clear chips without reopening the list.",
+      "sourcePath": "packages/react/src/components/multi-select/multi-select.tsx",
+      "props": []
+    },
+    {
+      "name": "MultiSelectValue",
+      "description": "MultiSelectValue\n\nRenders the selected values inside the trigger as removable chips. When chips\nexceed the field width they collapse into a measured `+N` badge (unless\nwrapping). A selected value with no collected label falls back to its raw\nvalue so a non-empty selection never shows the placeholder.",
+      "sourcePath": "packages/react/src/components/multi-select/multi-select.tsx",
+      "props": [
+        {
+          "name": "clickToRemove",
+          "type": "boolean",
+          "required": false,
+          "defaultValue": "true",
+          "description": "Render each selected value as a removable chip."
+        },
+        {
+          "name": "overflowBehavior",
+          "type": "\"wrap\" | \"wrap-when-open\" | \"cutoff\"",
+          "required": false,
+          "defaultValue": "wrap-when-open",
+          "description": "How chips behave when they exceed the field width:\n- `wrap` — always wrap onto multiple lines.\n- `wrap-when-open` — wrap while the popover is open, collapse to `+N` when closed.\n- `cutoff` — always collapse overflow into a `+N` badge."
+        },
+        {
+          "name": "placeholder",
+          "type": "ReactNode",
+          "required": false,
+          "defaultValue": "Select options",
+          "description": "Shown when nothing is selected."
+        }
+      ]
+    }
+  ]
+}

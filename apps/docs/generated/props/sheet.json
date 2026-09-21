@@ -1,0 +1,86 @@
+{
+  "slug": "sheet",
+  "components": [
+    {
+      "name": "Sheet",
+      "description": "Sheet\n\nRoot component for the sheet — a panel that slides in from an edge of the\nviewport. Built on Radix Dialog; controls open/close state.",
+      "sourcePath": "packages/react/src/components/sheet/sheet.tsx",
+      "props": []
+    },
+    {
+      "name": "SheetBody",
+      "description": "SheetBody\n\nContainer for the sheet's main content between the header and footer. Insets\nits content horizontally to match SheetHeader and SheetFooter; vertical\nseparation comes from the header's and footer's padding.",
+      "sourcePath": "packages/react/src/components/sheet/sheet.tsx",
+      "props": []
+    },
+    {
+      "name": "SheetClose",
+      "description": "SheetClose\n\nButton that closes the sheet. Use `asChild` to render as your own component.",
+      "sourcePath": "packages/react/src/components/sheet/sheet.tsx",
+      "props": []
+    },
+    {
+      "name": "SheetContent",
+      "description": "SheetContent\n\nThe sliding panel. Renders inside a portal with an overlay; the `side` prop\npicks which edge it slides from (defaults to `right`).",
+      "sourcePath": "packages/react/src/components/sheet/sheet.tsx",
+      "props": [
+        {
+          "name": "showCloseButton",
+          "type": "boolean",
+          "required": false,
+          "defaultValue": "true",
+          "description": "Whether to show the close button in the top-right corner."
+        },
+        {
+          "name": "side",
+          "type": "\"left\" | \"right\" | \"top\" | \"bottom\" | null",
+          "required": false,
+          "defaultValue": "right",
+          "description": ""
+        }
+      ]
+    },
+    {
+      "name": "SheetDescription",
+      "description": "SheetDescription\n\nSupporting text that provides additional context for the sheet.",
+      "sourcePath": "packages/react/src/components/sheet/sheet.tsx",
+      "props": []
+    },
+    {
+      "name": "SheetFooter",
+      "description": "SheetFooter\n\nContainer for sheet action buttons. Pinned to the bottom of the panel.",
+      "sourcePath": "packages/react/src/components/sheet/sheet.tsx",
+      "props": []
+    },
+    {
+      "name": "SheetHeader",
+      "description": "SheetHeader\n\nContainer for sheet title and description. Provides consistent spacing.",
+      "sourcePath": "packages/react/src/components/sheet/sheet.tsx",
+      "props": []
+    },
+    {
+      "name": "SheetOverlay",
+      "description": "SheetOverlay\n\nSemi-transparent overlay behind the sheet content.",
+      "sourcePath": "packages/react/src/components/sheet/sheet.tsx",
+      "props": []
+    },
+    {
+      "name": "SheetPortal",
+      "description": "SheetPortal\n\nPortals the sheet content to document.body.",
+      "sourcePath": "packages/react/src/components/sheet/sheet.tsx",
+      "props": []
+    },
+    {
+      "name": "SheetTitle",
+      "description": "SheetTitle\n\nThe title of the sheet. Should be used within SheetHeader.",
+      "sourcePath": "packages/react/src/components/sheet/sheet.tsx",
+      "props": []
+    },
+    {
+      "name": "SheetTrigger",
+      "description": "SheetTrigger\n\nButton that opens the sheet. Use `asChild` to render as your own component.",
+      "sourcePath": "packages/react/src/components/sheet/sheet.tsx",
+      "props": []
+    }
+  ]
+}

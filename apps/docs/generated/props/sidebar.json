@@ -1,0 +1,348 @@
+{
+  "slug": "sidebar",
+  "components": [
+    {
+      "name": "Sidebar",
+      "description": "Sidebar\n\nThe sidebar panel. In the Narrow tier (below `md`) it renders as a Sheet\ndrawer; at or above `md` it docks to the chosen `side` and collapses per the\n`collapsible` mode.",
+      "sourcePath": "packages/react/src/components/sidebar/sidebar.tsx",
+      "props": [
+        {
+          "name": "collapsible",
+          "type": "\"none\" | \"icon\" | \"offcanvas\"",
+          "required": false,
+          "defaultValue": "offcanvas",
+          "description": "Collapse behaviour: slide `offcanvas`, shrink to an `icon` rail, or `none`."
+        },
+        {
+          "name": "side",
+          "type": "\"left\" | \"right\"",
+          "required": false,
+          "defaultValue": "left",
+          "description": "Which edge the sidebar docks to."
+        },
+        {
+          "name": "variant",
+          "type": "\"floating\" | \"inset\" | \"sidebar\"",
+          "required": false,
+          "defaultValue": "sidebar",
+          "description": "Visual treatment: flush `sidebar`, detached `floating`, or `inset` (pairs\nwith `SidebarInset` for a card-like main region)."
+        }
+      ]
+    },
+    {
+      "name": "SidebarContent",
+      "description": "SidebarContent\n\nThe sidebar's scrollable nav region holding its groups and menus. Renders as a\n`<nav>` landmark, named via `aria-label` (default \"Sidebar\"), so assistive tech\ncan jump to it — pass a distinct `aria-label` when a page has more than one\nnavigation. Hides overflow when collapsed to the icon rail.",
+      "sourcePath": "packages/react/src/components/sidebar/sidebar.tsx",
+      "props": []
+    },
+    {
+      "name": "SidebarFooter",
+      "description": "SidebarFooter\n\nBottom region of the sidebar — typically a user menu or sign-out control.",
+      "sourcePath": "packages/react/src/components/sidebar/sidebar.tsx",
+      "props": []
+    },
+    {
+      "name": "SidebarGroup",
+      "description": "SidebarGroup\n\nA labelled section of the sidebar, grouping related menu items.",
+      "sourcePath": "packages/react/src/components/sidebar/sidebar.tsx",
+      "props": []
+    },
+    {
+      "name": "SidebarGroupAction",
+      "description": "SidebarGroupAction\n\nA small action button pinned to a group's top-right (e.g. \"add\" next to a\ngroup label). Hidden when collapsed to the icon rail.",
+      "sourcePath": "packages/react/src/components/sidebar/sidebar.tsx",
+      "props": [
+        {
+          "name": "asChild",
+          "type": "boolean",
+          "required": false,
+          "defaultValue": "false",
+          "description": "Render as the child element via Radix `Slot`."
+        }
+      ]
+    },
+    {
+      "name": "SidebarGroupContent",
+      "description": "SidebarGroupContent\n\nWrapper for the body of a `SidebarGroup` (usually a `SidebarMenu`).",
+      "sourcePath": "packages/react/src/components/sidebar/sidebar.tsx",
+      "props": []
+    },
+    {
+      "name": "SidebarGroupLabel",
+      "description": "SidebarGroupLabel\n\nThe heading above a `SidebarGroup`. Fades out when the sidebar collapses to\nthe icon rail.",
+      "sourcePath": "packages/react/src/components/sidebar/sidebar.tsx",
+      "props": [
+        {
+          "name": "asChild",
+          "type": "boolean",
+          "required": false,
+          "defaultValue": "false",
+          "description": "Render as the child element via Radix `Slot` (e.g. an accessible heading)."
+        }
+      ]
+    },
+    {
+      "name": "SidebarHeader",
+      "description": "SidebarHeader\n\nTop region of the sidebar — typically the brand mark or a workspace switcher.",
+      "sourcePath": "packages/react/src/components/sidebar/sidebar.tsx",
+      "props": []
+    },
+    {
+      "name": "SidebarInput",
+      "description": "SidebarInput\n\nAn `Input` pre-styled to sit inside the sidebar (e.g. a filter field).",
+      "sourcePath": "packages/react/src/components/sidebar/sidebar.tsx",
+      "props": [
+        {
+          "name": "size",
+          "type": "\"default\" | \"sm\" | \"lg\" | null",
+          "required": false,
+          "defaultValue": null,
+          "description": ""
+        },
+        {
+          "name": "variant",
+          "type": "\"bordered\" | \"borderless\" | null",
+          "required": false,
+          "defaultValue": null,
+          "description": ""
+        }
+      ]
+    },
+    {
+      "name": "SidebarInset",
+      "description": "SidebarInset\n\nThe main content region beside the sidebar. With `variant=\"inset\"` it floats\nas a rounded card; otherwise it fills the remaining width. `min-w-0` lets a\nwide child (e.g. a data table) scroll inside its own container instead of\nforcing the inset — and the page — wider than the viewport.",
+      "sourcePath": "packages/react/src/components/sidebar/sidebar.tsx",
+      "props": []
+    },
+    {
+      "name": "SidebarMenu",
+      "description": "SidebarMenu\n\nThe `<ul>` holding a group's navigation items.",
+      "sourcePath": "packages/react/src/components/sidebar/sidebar.tsx",
+      "props": []
+    },
+    {
+      "name": "SidebarMenuAction",
+      "description": "SidebarMenuAction\n\nA secondary action pinned to a menu item's right edge (e.g. a \"more\" button).",
+      "sourcePath": "packages/react/src/components/sidebar/sidebar.tsx",
+      "props": [
+        {
+          "name": "asChild",
+          "type": "boolean",
+          "required": false,
+          "defaultValue": "false",
+          "description": "Render as the child element via Radix `Slot`."
+        },
+        {
+          "name": "showOnHover",
+          "type": "boolean",
+          "required": false,
+          "defaultValue": "false",
+          "description": "Reveal the action only on hover/focus of the menu item (vs. always shown)."
+        }
+      ]
+    },
+    {
+      "name": "SidebarMenuBadge",
+      "description": "SidebarMenuBadge\n\nA count or status pill aligned to a menu item's right edge.",
+      "sourcePath": "packages/react/src/components/sidebar/sidebar.tsx",
+      "props": []
+    },
+    {
+      "name": "SidebarMenuButton",
+      "description": "SidebarMenuButton\n\nThe primary clickable nav item. When the sidebar collapses to icons, an\noptional `tooltip` surfaces the label on hover.",
+      "sourcePath": "packages/react/src/components/sidebar/sidebar.tsx",
+      "props": [
+        {
+          "name": "asChild",
+          "type": "boolean",
+          "required": false,
+          "defaultValue": "false",
+          "description": "Render as the child element via Radix `Slot` (e.g. an `<a>` or router link)."
+        },
+        {
+          "name": "isActive",
+          "type": "boolean",
+          "required": false,
+          "defaultValue": "false",
+          "description": "Marks the item as the current page; styles it as selected."
+        },
+        {
+          "name": "size",
+          "type": "\"default\" | \"sm\" | \"lg\" | null",
+          "required": false,
+          "defaultValue": "default",
+          "description": ""
+        },
+        {
+          "name": "tooltip",
+          "type": "string | TooltipContentProps",
+          "required": false,
+          "defaultValue": null,
+          "description": "Tooltip shown only when the sidebar is collapsed to the icon rail. Pass a\nstring for label-only, or `TooltipContent` props for full control."
+        },
+        {
+          "name": "variant",
+          "type": "\"default\" | \"outline\" | null",
+          "required": false,
+          "defaultValue": "default",
+          "description": ""
+        }
+      ]
+    },
+    {
+      "name": "SidebarMenuItem",
+      "description": "SidebarMenuItem\n\nA single `<li>` in a `SidebarMenu`; wraps a `SidebarMenuButton` plus optional\naction/badge/sub-menu.",
+      "sourcePath": "packages/react/src/components/sidebar/sidebar.tsx",
+      "props": []
+    },
+    {
+      "name": "SidebarMenuSkeleton",
+      "description": "SidebarMenuSkeleton\n\nLoading placeholder for a menu row. Render a cluster while nav data loads.",
+      "sourcePath": "packages/react/src/components/sidebar/sidebar.tsx",
+      "props": [
+        {
+          "name": "showIcon",
+          "type": "boolean",
+          "required": false,
+          "defaultValue": "false",
+          "description": "Render a leading icon-sized skeleton block alongside the text bar."
+        }
+      ]
+    },
+    {
+      "name": "SidebarMenuSub",
+      "description": "SidebarMenuSub\n\nThe `<ul>` for a nested submenu, drawn with a left guide rule. Hidden when\ncollapsed to the icon rail.",
+      "sourcePath": "packages/react/src/components/sidebar/sidebar.tsx",
+      "props": []
+    },
+    {
+      "name": "SidebarMenuSubButton",
+      "description": "SidebarMenuSubButton\n\nA clickable item inside a submenu, rendered as an `<a>` by default.",
+      "sourcePath": "packages/react/src/components/sidebar/sidebar.tsx",
+      "props": [
+        {
+          "name": "asChild",
+          "type": "boolean",
+          "required": false,
+          "defaultValue": "false",
+          "description": "Render as the child element via Radix `Slot` (e.g. a router link)."
+        },
+        {
+          "name": "isActive",
+          "type": "boolean",
+          "required": false,
+          "defaultValue": "false",
+          "description": "Marks the sub-item as the current page; styles it as selected."
+        },
+        {
+          "name": "size",
+          "type": "\"sm\" | \"md\"",
+          "required": false,
+          "defaultValue": "md",
+          "description": "Text size of the sub-item."
+        }
+      ]
+    },
+    {
+      "name": "SidebarMenuSubItem",
+      "description": "SidebarMenuSubItem\n\nA single `<li>` within a `SidebarMenuSub`.",
+      "sourcePath": "packages/react/src/components/sidebar/sidebar.tsx",
+      "props": []
+    },
+    {
+      "name": "SidebarProvider",
+      "description": "SidebarProvider\n\nOwns the sidebar's open state, the `Ctrl/Cmd+B` keyboard shortcut, and cookie\npersistence. Wrap your app shell in it; every sidebar part reads its context.\nRenders a `TooltipProvider` so collapsed-icon tooltips work out of the box.",
+      "sourcePath": "packages/react/src/components/sidebar/sidebar.tsx",
+      "props": [
+        {
+          "name": "defaultOpen",
+          "type": "boolean",
+          "required": false,
+          "defaultValue": "true",
+          "description": "Whether the sidebar starts open when uncontrolled.\n\nWhen uncontrolled, the provider persists the open state to a `sidebar_state`\ncookie. It does not read the cookie back — restore across reloads by reading\nit server-side and passing the result here."
+        },
+        {
+          "name": "onOpenChange",
+          "type": "((open: boolean) => void)",
+          "required": false,
+          "defaultValue": null,
+          "description": "Called when the open state changes (in controlled mode)."
+        },
+        {
+          "name": "open",
+          "type": "boolean",
+          "required": false,
+          "defaultValue": null,
+          "description": "Controlled open state. Pair with `onOpenChange` to control externally."
+        }
+      ]
+    },
+    {
+      "name": "SidebarRail",
+      "description": "SidebarRail\n\nThin hit-target along the sidebar's inner edge that toggles it on click —\na quick affordance for collapsing/expanding without leaving the panel.",
+      "sourcePath": "packages/react/src/components/sidebar/sidebar.tsx",
+      "props": []
+    },
+    {
+      "name": "SidebarSeparator",
+      "description": "SidebarSeparator\n\nA `Separator` inset to align with the sidebar's content padding.",
+      "sourcePath": "packages/react/src/components/sidebar/sidebar.tsx",
+      "props": []
+    },
+    {
+      "name": "SidebarTrigger",
+      "description": "SidebarTrigger\n\nIcon button that toggles the sidebar. Place it in your top bar or sidebar\nheader. Also reachable via `Ctrl/Cmd+B`.",
+      "sourcePath": "packages/react/src/components/sidebar/sidebar.tsx",
+      "props": [
+        {
+          "name": "asChild",
+          "type": "boolean",
+          "required": false,
+          "defaultValue": "false",
+          "description": "When true, the button renders as its child element (via Radix Slot),\napplying button styling to e.g. an `<a>` while leaving the child's own\ncontent untouched — compose icons inside the child. `loading` and the\n`startIcon` / `endIcon` slots apply to the native `<button>` only."
+        },
+        {
+          "name": "endIcon",
+          "type": "ReactNode",
+          "required": false,
+          "defaultValue": null,
+          "description": "Decorative icon rendered after the button label. Use either `endIcon`\nor `startIcon`, not both. Hidden while `loading` (the spinner replaces all\ncontent)."
+        },
+        {
+          "name": "loading",
+          "type": "boolean",
+          "required": false,
+          "defaultValue": "false",
+          "description": "Shows a loading indicator and disables the button. While loading, the\nspinner replaces all visible content and any icon slots are hidden."
+        },
+        {
+          "name": "size",
+          "type": "\"default\" | \"sm\" | \"lg\" | \"icon-sm\" | \"icon\" | \"icon-lg\" | null",
+          "required": false,
+          "defaultValue": null,
+          "description": ""
+        },
+        {
+          "name": "startIcon",
+          "type": "ReactNode",
+          "required": false,
+          "defaultValue": null,
+          "description": "Decorative icon rendered before the button label. Use either `startIcon`\nor `endIcon`, not both. Hidden while `loading` (the spinner replaces all\ncontent)."
+        },
+        {
+          "name": "variant",
+          "type": "\"link\" | \"default\" | \"error\" | \"destructive\" | \"outline\" | \"dashed\" | \"secondary\" | \"ghost\" | null",
+          "required": false,
+          "defaultValue": null,
+          "description": ""
+        }
+      ]
+    },
+    {
+      "name": "useSidebar",
+      "description": "useSidebar\n\nReads the sidebar context (open state, narrow-tier state, and the toggle helper).\nMust be called within a `SidebarProvider`; throws otherwise.",
+      "sourcePath": "packages/react/src/components/sidebar/sidebar.tsx",
+      "props": []
+    }
+  ]
+}

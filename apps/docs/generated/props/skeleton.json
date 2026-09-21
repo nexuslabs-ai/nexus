@@ -1,0 +1,11 @@
+{
+  "slug": "skeleton",
+  "components": [
+    {
+      "name": "Skeleton",
+      "description": "Skeleton\n\nA pulsing placeholder block for loading states. Render one — or a cluster —\nin place of content that hasn't arrived yet to hold the layout and signal\nthat something is coming. Shape and size come from consumer utilities:\n`nx:h-*` / `nx:w-*` for a bar, `nx:size-* nx:rounded-full` for a circle.",
+      "sourcePath": "packages/react/src/components/skeleton/skeleton.tsx",
+      "props": []
+    }
+  ]
+}

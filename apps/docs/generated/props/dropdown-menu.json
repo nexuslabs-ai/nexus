@@ -1,0 +1,126 @@
+{
+  "slug": "dropdown-menu",
+  "components": [
+    {
+      "name": "DropdownMenu",
+      "description": "DropdownMenu\n\nRoot component for the dropdown menu. Controls open/close state.",
+      "sourcePath": "packages/react/src/components/dropdown-menu/dropdown-menu.tsx",
+      "props": []
+    },
+    {
+      "name": "DropdownMenuCheckboxItem",
+      "description": "DropdownMenuCheckboxItem\n\nA menu item that can be checked/unchecked.",
+      "sourcePath": "packages/react/src/components/dropdown-menu/dropdown-menu.tsx",
+      "props": []
+    },
+    {
+      "name": "DropdownMenuContent",
+      "description": "DropdownMenuContent\n\nThe dropdown content container.",
+      "sourcePath": "packages/react/src/components/dropdown-menu/dropdown-menu.tsx",
+      "props": []
+    },
+    {
+      "name": "DropdownMenuGroup",
+      "description": "DropdownMenuGroup\n\nGroups related menu items together.",
+      "sourcePath": "packages/react/src/components/dropdown-menu/dropdown-menu.tsx",
+      "props": []
+    },
+    {
+      "name": "DropdownMenuItem",
+      "description": "DropdownMenuItem\n\nAn individual menu item.",
+      "sourcePath": "packages/react/src/components/dropdown-menu/dropdown-menu.tsx",
+      "props": [
+        {
+          "name": "inset",
+          "type": "boolean",
+          "required": false,
+          "defaultValue": "false",
+          "description": "Indents the item to align with items that have a leading icon or checkbox."
+        },
+        {
+          "name": "variant",
+          "type": "\"default\" | \"destructive\" | null",
+          "required": false,
+          "defaultValue": "default",
+          "description": ""
+        }
+      ]
+    },
+    {
+      "name": "DropdownMenuLabel",
+      "description": "DropdownMenuLabel\n\nA label for a group of menu items.",
+      "sourcePath": "packages/react/src/components/dropdown-menu/dropdown-menu.tsx",
+      "props": [
+        {
+          "name": "inset",
+          "type": "boolean",
+          "required": false,
+          "defaultValue": "false",
+          "description": "Indents the label to align with items that have a leading icon or checkbox."
+        }
+      ]
+    },
+    {
+      "name": "DropdownMenuPortal",
+      "description": "DropdownMenuPortal\n\nPortals the content to the body.",
+      "sourcePath": "packages/react/src/components/dropdown-menu/dropdown-menu.tsx",
+      "props": []
+    },
+    {
+      "name": "DropdownMenuRadioGroup",
+      "description": "DropdownMenuRadioGroup\n\nGroups radio items together.",
+      "sourcePath": "packages/react/src/components/dropdown-menu/dropdown-menu.tsx",
+      "props": []
+    },
+    {
+      "name": "DropdownMenuRadioItem",
+      "description": "DropdownMenuRadioItem\n\nA radio menu item for exclusive selection.",
+      "sourcePath": "packages/react/src/components/dropdown-menu/dropdown-menu.tsx",
+      "props": []
+    },
+    {
+      "name": "DropdownMenuSeparator",
+      "description": "DropdownMenuSeparator\n\nA visual divider between menu items.",
+      "sourcePath": "packages/react/src/components/dropdown-menu/dropdown-menu.tsx",
+      "props": []
+    },
+    {
+      "name": "DropdownMenuShortcut",
+      "description": "DropdownMenuShortcut\n\nDisplays a keyboard shortcut hint.",
+      "sourcePath": "packages/react/src/components/dropdown-menu/dropdown-menu.tsx",
+      "props": []
+    },
+    {
+      "name": "DropdownMenuSub",
+      "description": "DropdownMenuSub\n\nContains a submenu.",
+      "sourcePath": "packages/react/src/components/dropdown-menu/dropdown-menu.tsx",
+      "props": []
+    },
+    {
+      "name": "DropdownMenuSubContent",
+      "description": "DropdownMenuSubContent\n\nThe content container for a submenu.",
+      "sourcePath": "packages/react/src/components/dropdown-menu/dropdown-menu.tsx",
+      "props": []
+    },
+    {
+      "name": "DropdownMenuSubTrigger",
+      "description": "DropdownMenuSubTrigger\n\nThe trigger for a submenu. Renders a chevron to indicate a submenu.",
+      "sourcePath": "packages/react/src/components/dropdown-menu/dropdown-menu.tsx",
+      "props": [
+        {
+          "name": "inset",
+          "type": "boolean",
+          "required": false,
+          "defaultValue": "false",
+          "description": "Indents the trigger to align with items that have a leading icon or checkbox."
+        }
+      ]
+    },
+    {
+      "name": "DropdownMenuTrigger",
+      "description": "DropdownMenuTrigger\n\nThe button that toggles the dropdown menu.",
+      "sourcePath": "packages/react/src/components/dropdown-menu/dropdown-menu.tsx",
+      "props": []
+    }
+  ]
+}

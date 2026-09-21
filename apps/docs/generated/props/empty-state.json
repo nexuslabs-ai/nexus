@@ -1,0 +1,65 @@
+{
+  "slug": "empty-state",
+  "components": [
+    {
+      "name": "EmptyState",
+      "description": "EmptyState\n\nA centered empty-state region for list, table, and record views with no\ncontent yet — an icon, a title, a short description, and an optional action.\nCompose with the sub-components: `EmptyStateHeader` groups the\n`EmptyStateMedia` (icon), `EmptyStateTitle`, and `EmptyStateDescription`;\n`EmptyStateContent` holds the call to action. Pass `bordered` to render the\ndashed frame (e.g. to match a bordered skeleton slot).",
+      "sourcePath": "packages/react/src/components/empty-state/empty-state.tsx",
+      "props": [
+        {
+          "name": "bordered",
+          "type": "boolean",
+          "required": false,
+          "defaultValue": "false",
+          "description": "Render the dashed frame around the empty state — use it to match a\nbordered skeleton slot so a loading→empty swap doesn't reflow."
+        }
+      ]
+    },
+    {
+      "name": "EmptyStateContent",
+      "description": "EmptyStateContent\n\nThe action area below the header — typically one or two buttons.",
+      "sourcePath": "packages/react/src/components/empty-state/empty-state.tsx",
+      "props": []
+    },
+    {
+      "name": "EmptyStateDescription",
+      "description": "EmptyStateDescription\n\nSupporting copy beneath the title; anchors inside are underlined.",
+      "sourcePath": "packages/react/src/components/empty-state/empty-state.tsx",
+      "props": []
+    },
+    {
+      "name": "EmptyStateHeader",
+      "description": "EmptyStateHeader\n\nGroups the media, title, and description in a narrow centered column.",
+      "sourcePath": "packages/react/src/components/empty-state/empty-state.tsx",
+      "props": []
+    },
+    {
+      "name": "EmptyStateMedia",
+      "description": "EmptyStateMedia\n\nHolds the empty-state's icon or illustration. The `icon` variant renders a\nmuted rounded medallion sized for a single glyph; `default` is an unstyled\nwrapper for a larger illustration.",
+      "sourcePath": "packages/react/src/components/empty-state/empty-state.tsx",
+      "props": [
+        {
+          "name": "variant",
+          "type": "\"default\" | \"icon\" | null",
+          "required": false,
+          "defaultValue": "default",
+          "description": ""
+        }
+      ]
+    },
+    {
+      "name": "EmptyStateTitle",
+      "description": "EmptyStateTitle\n\nThe headline of the empty state — what is missing. Renders as a `div` by\ndefault; use `asChild` to apply empty-state title styling to a semantic\nheading when the page outline needs one.",
+      "sourcePath": "packages/react/src/components/empty-state/empty-state.tsx",
+      "props": [
+        {
+          "name": "asChild",
+          "type": "boolean",
+          "required": false,
+          "defaultValue": "false",
+          "description": "Render the title styles on a child element. Use this when the empty-state\ntitle should participate in the page outline as a real heading."
+        }
+      ]
+    }
+  ]
+}

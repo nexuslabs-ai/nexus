@@ -1,0 +1,73 @@
+{
+  "slug": "select",
+  "components": [
+    {
+      "name": "Select",
+      "description": "Select\n\nRoot component for the select. Controls open/close state and value.",
+      "sourcePath": "packages/react/src/components/select/select.tsx",
+      "props": []
+    },
+    {
+      "name": "SelectContent",
+      "description": "SelectContent\n\nThe dropdown content container for select items.",
+      "sourcePath": "packages/react/src/components/select/select.tsx",
+      "props": []
+    },
+    {
+      "name": "SelectGroup",
+      "description": "SelectGroup\n\nGroups related select items together.",
+      "sourcePath": "packages/react/src/components/select/select.tsx",
+      "props": []
+    },
+    {
+      "name": "SelectItem",
+      "description": "SelectItem\n\nIndividual selectable option in the select dropdown.",
+      "sourcePath": "packages/react/src/components/select/select.tsx",
+      "props": []
+    },
+    {
+      "name": "SelectLabel",
+      "description": "SelectLabel\n\nLabel for a group of select items.",
+      "sourcePath": "packages/react/src/components/select/select.tsx",
+      "props": []
+    },
+    {
+      "name": "SelectScrollDownButton",
+      "description": "SelectScrollDownButton\n\nButton to scroll down in the select content.",
+      "sourcePath": "packages/react/src/components/select/select.tsx",
+      "props": []
+    },
+    {
+      "name": "SelectScrollUpButton",
+      "description": "SelectScrollUpButton\n\nButton to scroll up in the select content.",
+      "sourcePath": "packages/react/src/components/select/select.tsx",
+      "props": []
+    },
+    {
+      "name": "SelectSeparator",
+      "description": "SelectSeparator\n\nVisual divider between select items or groups.",
+      "sourcePath": "packages/react/src/components/select/select.tsx",
+      "props": []
+    },
+    {
+      "name": "SelectTrigger",
+      "description": "SelectTrigger\n\nButton that opens the select dropdown. The `variant=\"bordered\"` treatment is\nthe default; use `variant=\"borderless\"` to remove the resting field stroke\nwhile keeping a tonal control fill for resting affordance.",
+      "sourcePath": "packages/react/src/components/select/select.tsx",
+      "props": [
+        {
+          "name": "variant",
+          "type": "\"bordered\" | \"borderless\" | null",
+          "required": false,
+          "defaultValue": null,
+          "description": ""
+        }
+      ]
+    },
+    {
+      "name": "SelectValue",
+      "description": "SelectValue\n\nDisplays the selected value. Use `placeholder` for empty state.",
+      "sourcePath": "packages/react/src/components/select/select.tsx",
+      "props": []
+    }
+  ]
+}

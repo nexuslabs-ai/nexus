@@ -1,0 +1,26 @@
+{
+  "slug": "toggle",
+  "components": [
+    {
+      "name": "Toggle",
+      "description": "Toggle\n\nA two-state button that is either on or off — e.g. a formatting control\n(Bold / Italic). For a set of related toggles, use `ToggleGroup`.",
+      "sourcePath": "packages/react/src/components/toggle/toggle.tsx",
+      "props": [
+        {
+          "name": "size",
+          "type": "\"default\" | \"sm\" | \"lg\" | null",
+          "required": false,
+          "defaultValue": null,
+          "description": ""
+        },
+        {
+          "name": "variant",
+          "type": "\"default\" | \"outline\" | null",
+          "required": false,
+          "defaultValue": null,
+          "description": ""
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,31 @@
+{
+  "slug": "resizable",
+  "components": [
+    {
+      "name": "ResizableHandle",
+      "description": "ResizableHandle\n\nThe draggable / keyboard-resizable divider between two panels. Pass\n`withHandle` to render a visible grip. As a focusable splitter it should be\ngiven an `aria-label`.",
+      "sourcePath": "packages/react/src/components/resizable/resizable.tsx",
+      "props": [
+        {
+          "name": "withHandle",
+          "type": "boolean",
+          "required": false,
+          "defaultValue": "false",
+          "description": "Render a visible grip affordance in the centre of the handle."
+        }
+      ]
+    },
+    {
+      "name": "ResizablePanel",
+      "description": "ResizablePanel\n\nA single panel within a `ResizablePanelGroup`.",
+      "sourcePath": "packages/react/src/components/resizable/resizable.tsx",
+      "props": []
+    },
+    {
+      "name": "ResizablePanelGroup",
+      "description": "ResizablePanelGroup\n\nContainer for a set of resizable panels. `orientation` (\"horizontal\" |\n\"vertical\") sets the split axis. `react-resizable-panels` is an optional peer\ndependency — install it in the consuming app.",
+      "sourcePath": "packages/react/src/components/resizable/resizable.tsx",
+      "props": []
+    }
+  ]
+}

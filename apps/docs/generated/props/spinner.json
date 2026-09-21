@@ -1,0 +1,11 @@
+{
+  "slug": "spinner",
+  "components": [
+    {
+      "name": "Spinner",
+      "description": "Spinner\n\nA loading indicator — a continuously rotating glyph for full-page loads,\n\"loading more…\" rows, overlays on cards and tables, and Suspense fallbacks.\nAnnounces itself to assistive tech via `role=\"status\"` and an `aria-label`,\nand honours `prefers-reduced-motion` (it freezes rather than spins when the\nuser has reduced motion on). Size it with a `nx:size-*` class; it draws in\n`currentColor`, so recolour with `nx:text-*`.",
+      "sourcePath": "packages/react/src/components/spinner/spinner.tsx",
+      "props": []
+    }
+  ]
+}

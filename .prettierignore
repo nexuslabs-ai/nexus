@@ -17,5 +17,9 @@ examples
 # Auto-generated CSS — produced by @nexus_ds/core token pipeline; do not reformat
 packages/tailwind/*.css
 
+# Auto-generated docs data — the generator owns these bytes, and reformatting
+# them would break the byte-identical guarantee its regeneration relies on
+apps/docs/generated/
+
 # Untracked git worktree copies under .claude (full-repo clones, not part of the tree)
 .claude/worktrees/

@@ -1,0 +1,11 @@
+{
+  "slug": "checkbox",
+  "components": [
+    {
+      "name": "Checkbox",
+      "description": "Checkbox\n\nA tri-state checkbox (checked / unchecked / indeterminate) for selecting one\nor more options, or toggling a single setting. Shows a check mark when checked\nand a minus when indeterminate. Pair the 16px checkbox with a wired label row\nso the label text carries the touch target; set `checked=\"indeterminate\"` for\nthe mixed state — e.g. a \"select all\" control whose children are only\npartially selected.\n\nPair it with `Label` for a simple inline label, wrap it in `ChoiceRow` for a\ncompact option row, or wrap it in `ChoiceCard` for a rich option card with\ntitle and description. Use `FieldLabel + Field` when you need lower-level\nfield layout composition. Each pattern stays driven by this real control, so\nclicking the label surface toggles via native `htmlFor` association — no\nduplicated indicator.",
+      "sourcePath": "packages/react/src/components/checkbox/checkbox.tsx",
+      "props": []
+    }
+  ]
+}

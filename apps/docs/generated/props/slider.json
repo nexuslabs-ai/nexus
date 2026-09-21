@@ -1,0 +1,26 @@
+{
+  "slug": "slider",
+  "components": [
+    {
+      "name": "Slider",
+      "description": "Slider\n\nA value / range slider built on Radix Slider. Renders one thumb per value, so\na single `defaultValue={[50]}` is a value slider and `defaultValue={[25, 75]}`\nis a range slider. Supports steps, keyboard, and vertical orientation.",
+      "sourcePath": "packages/react/src/components/slider/slider.tsx",
+      "props": [
+        {
+          "name": "markers",
+          "type": "SliderMarkers",
+          "required": false,
+          "defaultValue": null,
+          "description": "Optional visual marks in the slider value domain. Pass an array for custom\npositions or `\"steps\"` to render one marker at each interior step."
+        },
+        {
+          "name": "size",
+          "type": "SliderSize",
+          "required": false,
+          "defaultValue": "standard",
+          "description": "Visual density for the slider rail and thumb."
+        }
+      ]
+    }
+  ]
+}

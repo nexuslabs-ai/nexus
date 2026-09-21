@@ -1,0 +1,54 @@
+{
+  "slug": "toggle-group",
+  "components": [
+    {
+      "name": "ToggleGroup",
+      "description": "ToggleGroup\n\nA set of related `ToggleGroupItem`s sharing `variant` / `size` via context.\n`type=\"single\"` behaves like a radio group; `type=\"multiple\"` allows several\nitems pressed at once.",
+      "sourcePath": "packages/react/src/components/toggle-group/toggle-group.tsx",
+      "props": [
+        {
+          "name": "size",
+          "type": "\"default\" | \"sm\" | \"lg\" | null",
+          "required": false,
+          "defaultValue": null,
+          "description": ""
+        },
+        {
+          "name": "spacing",
+          "type": "number",
+          "required": false,
+          "defaultValue": "0",
+          "description": "Gap between items, in spacing-scale units. `0` (default) joins the items\ninto a segmented control — shared borders, only the ends rounded; a\npositive value separates them into individual pills."
+        },
+        {
+          "name": "variant",
+          "type": "\"default\" | \"outline\" | null",
+          "required": false,
+          "defaultValue": null,
+          "description": ""
+        }
+      ]
+    },
+    {
+      "name": "ToggleGroupItem",
+      "description": "ToggleGroupItem\n\nA single item within a `ToggleGroup`. Inherits `variant` / `size` from the\ngroup unless overridden.",
+      "sourcePath": "packages/react/src/components/toggle-group/toggle-group.tsx",
+      "props": [
+        {
+          "name": "size",
+          "type": "\"default\" | \"sm\" | \"lg\" | null",
+          "required": false,
+          "defaultValue": null,
+          "description": ""
+        },
+        {
+          "name": "variant",
+          "type": "\"default\" | \"outline\" | null",
+          "required": false,
+          "defaultValue": null,
+          "description": ""
+        }
+      ]
+    }
+  ]
+}

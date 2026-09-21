@@ -1,0 +1,17 @@
+{
+  "slug": "radio-group",
+  "components": [
+    {
+      "name": "RadioGroup",
+      "description": "RadioGroup\n\nA set of mutually exclusive options where exactly one can be selected. Render\none `RadioGroupItem` per option; Radix handles roving focus and arrow-key\nnavigation between them. Pair each item with `Label` for simple inline\nlabels, wrap each item in `ChoiceRow` for compact row-owned choices, or wrap\neach item in `ChoiceCard` for rich option cards with title and description.\nUse `FieldLabel + Field` when you need lower-level field layout composition.\nControl the selection with `value` / `onValueChange`, or set an initial\nselection with `defaultValue`.",
+      "sourcePath": "packages/react/src/components/radio-group/radio-group.tsx",
+      "props": []
+    },
+    {
+      "name": "RadioGroupItem",
+      "description": "RadioGroupItem\n\nA single selectable option within a `RadioGroup`. Pair it with a `Label`\n(via matching `id` / `htmlFor`) for simple inline labels, or compose it in\n`ChoiceRow` / `ChoiceCard` for row-owned or card-owned option surfaces.",
+      "sourcePath": "packages/react/src/components/radio-group/radio-group.tsx",
+      "props": []
+    }
+  ]
+}

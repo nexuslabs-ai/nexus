@@ -1,0 +1,19 @@
+{
+  "slug": "textarea",
+  "components": [
+    {
+      "name": "Textarea",
+      "description": "Textarea\n\nA multi-line text input. Mirrors Input's surface, focus, and `aria-invalid`\ntreatment and accepts all native textarea attributes. Use `rows` (or a\n`min-height` override via `className`) to set the initial height. The\n`variant=\"bordered\"` treatment is the default; use `variant=\"borderless\"` to\nremove the resting field stroke while keeping a tonal control fill for\nresting affordance.",
+      "sourcePath": "packages/react/src/components/textarea/textarea.tsx",
+      "props": [
+        {
+          "name": "variant",
+          "type": "\"bordered\" | \"borderless\" | null",
+          "required": false,
+          "defaultValue": null,
+          "description": ""
+        }
+      ]
+    }
+  ]
+}

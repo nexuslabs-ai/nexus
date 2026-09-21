@@ -1,0 +1,127 @@
+{
+  "slug": "attachment",
+  "components": [
+    {
+      "name": "Attachment",
+      "description": "Attachment\n\nA single file's preview — thumbnail or icon, name, size, and trailing\nactions — with an upload lifecycle on top. Built on `Item`, and composed with\n`AttachmentMedia`, `AttachmentContent`, `AttachmentTitle`,\n`AttachmentDescription`, and `AttachmentActions`.\n\nThe card is pinned to `Item`'s `outline` variant: the `idle` dashed border and\nthe `error` border are the state signal, and both need a visible border to\npaint on.\n\n`orientation=\"horizontal\"` is a row for lists and upload queues;\n`orientation=\"vertical\"` is a fixed-width tile for composer strips, where the\nmedia fills the card width. Group several with `AttachmentGroup`.\n\nWhile uploading, processing, or failed, the current `state` is announced\nthrough a visually hidden `role=\"status\"` region, so progress is never\nconveyed by animation alone.",
+      "sourcePath": "packages/react/src/components/attachment/attachment.tsx",
+      "props": [
+        {
+          "name": "orientation",
+          "type": "\"horizontal\" | \"vertical\" | null",
+          "required": false,
+          "defaultValue": "horizontal",
+          "description": ""
+        },
+        {
+          "name": "size",
+          "type": "\"default\" | \"sm\" | null",
+          "required": false,
+          "defaultValue": "default",
+          "description": ""
+        },
+        {
+          "name": "state",
+          "type": "AttachmentState",
+          "required": false,
+          "defaultValue": "done",
+          "description": "The attachment's lifecycle state. Drives the border treatment (dashed while\n`idle`, error-coloured while `error`) and the text announced to assistive\ntech."
+        },
+        {
+          "name": "statusLabel",
+          "type": "string",
+          "required": false,
+          "defaultValue": "a built-in phrase per state, e.g. 'Uploading'",
+          "description": "Overrides the assistive-tech status text for the current `state` — pass a\nlocalised string, or one that names the file. Ignored while the attachment\nis settled (`idle` / `done`), which announces nothing."
+        }
+      ]
+    },
+    {
+      "name": "AttachmentActions",
+      "description": "AttachmentActions\n\nThe trailing controls of an attachment — typically a remove or retry button.\nLifts itself above `AttachmentTrigger`'s full-card overlay so its buttons stay\nindependently clickable.",
+      "sourcePath": "packages/react/src/components/attachment/attachment.tsx",
+      "props": []
+    },
+    {
+      "name": "AttachmentContent",
+      "description": "AttachmentContent\n\nThe middle column of an attachment — title, description, and progress.",
+      "sourcePath": "packages/react/src/components/attachment/attachment.tsx",
+      "props": []
+    },
+    {
+      "name": "AttachmentDescription",
+      "description": "AttachmentDescription\n\nThe supporting line under the file name — size, progress, or the reason an\nupload failed. Picks up the error tint when the card has failed.",
+      "sourcePath": "packages/react/src/components/attachment/attachment.tsx",
+      "props": []
+    },
+    {
+      "name": "AttachmentGroup",
+      "description": "AttachmentGroup\n\nA horizontally scrolling strip of attachments, snapping each card to the\nstart edge. Defaults to `role=\"group\"`, which stays overridable through\nprops — pass `role=\"list\"`, plus `role=\"listitem\"` on the children, when the\ngrouping is genuinely a list rather than a composer strip.\n\nThe strip is itself keyboard-focusable so it can be scrolled by keyboard, and\nit takes a required accessible name — `aria-label` or `aria-labelledby`.",
+      "sourcePath": "packages/react/src/components/attachment/attachment.tsx",
+      "props": [
+        {
+          "name": "aria-label",
+          "type": "string",
+          "required": false,
+          "defaultValue": null,
+          "description": ""
+        },
+        {
+          "name": "aria-labelledby",
+          "type": "string",
+          "required": false,
+          "defaultValue": null,
+          "description": ""
+        }
+      ]
+    },
+    {
+      "name": "AttachmentMedia",
+      "description": "AttachmentMedia\n\nThe attachment's thumbnail or file-type icon. Adds the Attachment-specific\nbehaviour on top of `ItemMedia`: in a vertical tile it fills the card width\nas a square, and it picks up the error tint when the card has failed.",
+      "sourcePath": "packages/react/src/components/attachment/attachment.tsx",
+      "props": [
+        {
+          "name": "variant",
+          "type": "\"image\" | \"default\" | \"icon\" | null",
+          "required": false,
+          "defaultValue": null,
+          "description": ""
+        }
+      ]
+    },
+    {
+      "name": "AttachmentProgress",
+      "description": "AttachmentProgress\n\nThe upload progress bar for an in-flight attachment, sized to sit inside\n`AttachmentContent` beneath the description. Pass `value` for a determinate\nupload and omit it while the total is unknown. Give it an `aria-label` that\nnames the file — several attachments uploading at once are otherwise\nindistinguishable to a screen reader.",
+      "sourcePath": "packages/react/src/components/attachment/attachment.tsx",
+      "props": []
+    },
+    {
+      "name": "AttachmentTitle",
+      "description": "AttachmentTitle\n\nThe file name. Truncates to one line — file names are long and the card is\nnarrow — while `trailing` content keeps its full width beside it.",
+      "sourcePath": "packages/react/src/components/attachment/attachment.tsx",
+      "props": [
+        {
+          "name": "trailing",
+          "type": "ReactNode",
+          "required": false,
+          "defaultValue": null,
+          "description": "A badge or status icon pinned after the file name. It keeps `ItemTitle`'s\n`gap-2` spacing and its own width while the name truncates beside it."
+        }
+      ]
+    },
+    {
+      "name": "AttachmentTrigger",
+      "description": "AttachmentTrigger\n\nMakes the whole card activate one action — opening or previewing the file —\nby stretching an invisible control across it. Use this instead of rendering\nthe card itself as a link, so that buttons inside `AttachmentActions` stay\nvalid and independently clickable. Needs a text label, visually hidden if the\ncard already shows the file name.",
+      "sourcePath": "packages/react/src/components/attachment/attachment.tsx",
+      "props": [
+        {
+          "name": "asChild",
+          "type": "boolean",
+          "required": false,
+          "defaultValue": "false",
+          "description": "Render as the child element via Radix Slot — e.g. an `<a>` opening the\nfile — keeping the full-card hit area."
+        }
+      ]
+    }
+  ]
+}

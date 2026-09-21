@@ -1,0 +1,29 @@
+{
+  "slug": "popover",
+  "components": [
+    {
+      "name": "Popover",
+      "description": "Popover\n\nRoot component for the popover. Controls open/close state.",
+      "sourcePath": "packages/react/src/components/popover/popover.tsx",
+      "props": []
+    },
+    {
+      "name": "PopoverAnchor",
+      "description": "PopoverAnchor\n\nOptional element to anchor the popover against, instead of the trigger. Useful\nwhen the popover should position relative to a different element than the one\nthat opens it.",
+      "sourcePath": "packages/react/src/components/popover/popover.tsx",
+      "props": []
+    },
+    {
+      "name": "PopoverContent",
+      "description": "PopoverContent\n\nThe floating content container, anchored to the trigger and portaled to the body.",
+      "sourcePath": "packages/react/src/components/popover/popover.tsx",
+      "props": []
+    },
+    {
+      "name": "PopoverTrigger",
+      "description": "PopoverTrigger\n\nButton that toggles the popover. Use `asChild` to render as your own component.",
+      "sourcePath": "packages/react/src/components/popover/popover.tsx",
+      "props": []
+    }
+  ]
+}

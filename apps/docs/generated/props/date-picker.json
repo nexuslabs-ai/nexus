@@ -1,0 +1,39 @@
+{
+  "slug": "date-picker",
+  "components": [
+    {
+      "name": "DatePicker",
+      "description": "DatePicker\n\nDate-grid date picker (react-day-picker). Supports single / range / multiple\nselection. `react-day-picker` is an optional peer dependency — install it\nin the consuming app.",
+      "sourcePath": "packages/react/src/components/date-picker/date-picker.tsx",
+      "props": [
+        {
+          "name": "buttonVariant",
+          "type": "\"link\" | \"default\" | \"error\" | \"destructive\" | \"outline\" | \"dashed\" | \"secondary\" | \"ghost\" | null",
+          "required": false,
+          "defaultValue": "ghost",
+          "description": "Button variant for the previous / next navigation arrows."
+        },
+        {
+          "name": "cellSize",
+          "type": "DatePickerCellSize",
+          "required": false,
+          "defaultValue": "default",
+          "description": "Day-cell size preset: `default` (32px), `large` (48px), `xlarge` (56px).\nFor an arbitrary size, override `--cell-size` via `className`."
+        },
+        {
+          "name": "renderDayContent",
+          "type": "((props: DatePickerDayContentProps) => ReactNode)",
+          "required": false,
+          "defaultValue": null,
+          "description": "Custom content rendered inside each day button while preserving\nreact-day-picker's native button semantics and keyboard behavior.\n\nA render callback (not a `children` slot) because react-day-picker owns\nthe per-day render loop, so per-day content cannot be passed as children."
+        }
+      ]
+    },
+    {
+      "name": "DatePickerDayButton",
+      "description": "DatePickerDayButton\n\nThe button rendered for each day. Reflects range / selected modifiers via\n`data-*` attributes and shows the keyboard-focus ring on the focused day.",
+      "sourcePath": "packages/react/src/components/date-picker/date-picker.tsx",
+      "props": []
+    }
+  ]
+}

@@ -1,0 +1,61 @@
+{
+  "slug": "breadcrumb",
+  "components": [
+    {
+      "name": "Breadcrumb",
+      "description": "Breadcrumb\n\nA hierarchical navigation trail wrapped in the `navigation` landmark. Compose\nwith the sub-components: `BreadcrumbList` lays out a row of `BreadcrumbItem`s,\neach holding a `BreadcrumbLink` (an ancestor) or `BreadcrumbPage` (the current\npage); `BreadcrumbSeparator` divides them and `BreadcrumbEllipsis` reveals a\ncollapsed middle when composed with a menu.",
+      "sourcePath": "packages/react/src/components/breadcrumb/breadcrumb.tsx",
+      "props": []
+    },
+    {
+      "name": "BreadcrumbEllipsis",
+      "description": "BreadcrumbEllipsis\n\nOverflow trigger for a collapsed run of middle items. Compose it with\n`DropdownMenuTrigger asChild` and put the hidden paths in the menu content.",
+      "sourcePath": "packages/react/src/components/breadcrumb/breadcrumb.tsx",
+      "props": []
+    },
+    {
+      "name": "BreadcrumbItem",
+      "description": "BreadcrumbItem\n\nA single `<li>` slot in the trail.",
+      "sourcePath": "packages/react/src/components/breadcrumb/breadcrumb.tsx",
+      "props": []
+    },
+    {
+      "name": "BreadcrumbLink",
+      "description": "BreadcrumbLink\n\nA link to an ancestor page. It keeps the canonical focus ring since it is\nreachable by keyboard. Wrap the label in a `<span>` so it truncates at the\n150px cap — both for plain text and when composing an icon with text.",
+      "sourcePath": "packages/react/src/components/breadcrumb/breadcrumb.tsx",
+      "props": [
+        {
+          "name": "asChild",
+          "type": "boolean",
+          "required": false,
+          "defaultValue": "false",
+          "description": "Render as the child element via Radix Slot — e.g. a router `<Link>` — while\nkeeping the breadcrumb link styling."
+        }
+      ]
+    },
+    {
+      "name": "BreadcrumbList",
+      "description": "BreadcrumbList\n\nThe `<ol>` that lays the trail out in one horizontal row. When the trail is\nwider than its container it becomes a keyboard-focusable horizontal scroll\nregion, so the current page can be scrolled into view instead of being clipped.",
+      "sourcePath": "packages/react/src/components/breadcrumb/breadcrumb.tsx",
+      "props": []
+    },
+    {
+      "name": "BreadcrumbMenuTrigger",
+      "description": "BreadcrumbMenuTrigger\n\nAn icon button for revealing alternate paths for the adjacent breadcrumb\nsegment. Compose it with `DropdownMenuTrigger asChild`; do not nest it inside\na `BreadcrumbLink`.",
+      "sourcePath": "packages/react/src/components/breadcrumb/breadcrumb.tsx",
+      "props": []
+    },
+    {
+      "name": "BreadcrumbPage",
+      "description": "BreadcrumbPage\n\nThe current page — non-interactive, announced via `aria-current=\"page\"`. Wrap\nthe label in a `<span>` so it truncates at the 150px cap.",
+      "sourcePath": "packages/react/src/components/breadcrumb/breadcrumb.tsx",
+      "props": []
+    },
+    {
+      "name": "BreadcrumbSeparator",
+      "description": "BreadcrumbSeparator\n\nThe divider between items — a slash by default; pass `children` to use a\ndifferent glyph.",
+      "sourcePath": "packages/react/src/components/breadcrumb/breadcrumb.tsx",
+      "props": []
+    }
+  ]
+}

@@ -1,0 +1,29 @@
+{
+  "slug": "choice-row",
+  "components": [
+    {
+      "name": "ChoiceRow",
+      "description": "ChoiceRow\n\nA compact label row for checkbox and radio choices. The row owns the\nclick/tap target through native `htmlFor`/`id` wiring, while the nested\nCheckbox or RadioGroupItem remains the only interactive control and keeps\nselected/focus semantics.",
+      "sourcePath": "packages/react/src/components/choice-row/choice-row.tsx",
+      "props": []
+    },
+    {
+      "name": "ChoiceRowContent",
+      "description": "ChoiceRowContent\n\nOptional vertical wrapper for title + description choice text.",
+      "sourcePath": "packages/react/src/components/choice-row/choice-row.tsx",
+      "props": []
+    },
+    {
+      "name": "ChoiceRowDescription",
+      "description": "ChoiceRowDescription\n\nOptional helper text for a choice. Pair its `id` with the child control's\n`aria-describedby`.",
+      "sourcePath": "packages/react/src/components/choice-row/choice-row.tsx",
+      "props": []
+    },
+    {
+      "name": "ChoiceRowTitle",
+      "description": "ChoiceRowTitle\n\nVisible choice label text. Use its `id` as the child control's\n`aria-labelledby` target when the row also includes a description.",
+      "sourcePath": "packages/react/src/components/choice-row/choice-row.tsx",
+      "props": []
+    }
+  ]
+}

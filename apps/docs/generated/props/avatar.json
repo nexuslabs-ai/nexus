@@ -1,0 +1,94 @@
+{
+  "slug": "avatar",
+  "components": [
+    {
+      "name": "Avatar",
+      "description": "Avatar\n\nDisplays a user's profile image or initials as a visual identifier.\nFalls back to initials or placeholder when no image is available.",
+      "sourcePath": "packages/react/src/components/avatar/avatar.tsx",
+      "props": [
+        {
+          "name": "ring",
+          "type": "boolean",
+          "required": false,
+          "defaultValue": "false",
+          "description": "When true, renders a non-interactive emphasis ring around the avatar.\nUse for selected/current visual emphasis; focus rings belong on the\ninteractive wrapper, not Avatar itself."
+        },
+        {
+          "name": "shape",
+          "type": "\"circle\" | \"rounded\" | null",
+          "required": false,
+          "defaultValue": null,
+          "description": ""
+        },
+        {
+          "name": "size",
+          "type": "\"sm\" | \"lg\" | \"2xs\" | \"xs\" | \"md\" | \"xl\" | \"2xl\" | \"3xl\" | \"4xl\" | null",
+          "required": false,
+          "defaultValue": null,
+          "description": ""
+        }
+      ]
+    },
+    {
+      "name": "AvatarFallback",
+      "description": "AvatarFallback\n\nDisplays when the image fails to load or while loading.\nTypically shows user initials or a placeholder icon.",
+      "sourcePath": "packages/react/src/components/avatar/avatar.tsx",
+      "props": []
+    },
+    {
+      "name": "AvatarGroup",
+      "description": "",
+      "sourcePath": "packages/react/src/components/avatar/avatar.tsx",
+      "props": [
+        {
+          "name": "max",
+          "type": "number",
+          "required": false,
+          "defaultValue": "undefined",
+          "description": "Maximum number of avatars to render before collapsing the remainder into a\n+N tile."
+        },
+        {
+          "name": "shape",
+          "type": "\"circle\" | \"rounded\" | null",
+          "required": false,
+          "defaultValue": null,
+          "description": ""
+        },
+        {
+          "name": "size",
+          "type": "\"sm\" | \"lg\" | \"2xs\" | \"xs\" | \"md\" | \"xl\" | \"2xl\" | \"3xl\" | \"4xl\" | null",
+          "required": false,
+          "defaultValue": null,
+          "description": ""
+        }
+      ]
+    },
+    {
+      "name": "AvatarImage",
+      "description": "AvatarImage\n\nDisplays the avatar image. Automatically handles loading states.",
+      "sourcePath": "packages/react/src/components/avatar/avatar.tsx",
+      "props": []
+    },
+    {
+      "name": "AvatarStatus",
+      "description": "AvatarStatus\n\nA presence dot pinned to the avatar's corner. Conveys status with colour and\nan attached visually-hidden label, so assistive tech announces it (e.g.\n\"Online\"). Sighted users who cannot rely on colour should be given a\nredundant text label by the consumer.",
+      "sourcePath": "packages/react/src/components/avatar/avatar.tsx",
+      "props": [
+        {
+          "name": "label",
+          "type": "string",
+          "required": false,
+          "defaultValue": "the capitalised `status` ('Online', 'Away', 'Busy', 'Offline')",
+          "description": "Visually-hidden text announced by assistive tech in place of the\ncolour-only dot. Defaults to the capitalised `status`. Pass `''` to opt\nout when an adjacent text label already conveys presence."
+        },
+        {
+          "name": "status",
+          "type": "\"online\" | \"away\" | \"busy\" | \"offline\" | null",
+          "required": false,
+          "defaultValue": "online",
+          "description": ""
+        }
+      ]
+    }
+  ]
+}

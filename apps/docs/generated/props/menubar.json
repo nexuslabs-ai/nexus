@@ -1,0 +1,126 @@
+{
+  "slug": "menubar",
+  "components": [
+    {
+      "name": "Menubar",
+      "description": "Menubar\n\nRoot component — a horizontal bar of menus (desktop-app style).",
+      "sourcePath": "packages/react/src/components/menubar/menubar.tsx",
+      "props": []
+    },
+    {
+      "name": "MenubarCheckboxItem",
+      "description": "MenubarCheckboxItem\n\nA menu item that can be checked/unchecked.",
+      "sourcePath": "packages/react/src/components/menubar/menubar.tsx",
+      "props": []
+    },
+    {
+      "name": "MenubarContent",
+      "description": "MenubarContent\n\nThe menu content container. Anchors below its trigger.",
+      "sourcePath": "packages/react/src/components/menubar/menubar.tsx",
+      "props": []
+    },
+    {
+      "name": "MenubarGroup",
+      "description": "MenubarGroup\n\nGroups related menu items together.",
+      "sourcePath": "packages/react/src/components/menubar/menubar.tsx",
+      "props": []
+    },
+    {
+      "name": "MenubarItem",
+      "description": "MenubarItem\n\nAn individual menu item.",
+      "sourcePath": "packages/react/src/components/menubar/menubar.tsx",
+      "props": [
+        {
+          "name": "inset",
+          "type": "boolean",
+          "required": false,
+          "defaultValue": "false",
+          "description": "Indents the item to align with items that have a leading icon or checkbox."
+        },
+        {
+          "name": "variant",
+          "type": "\"default\" | \"destructive\" | null",
+          "required": false,
+          "defaultValue": "default",
+          "description": ""
+        }
+      ]
+    },
+    {
+      "name": "MenubarLabel",
+      "description": "MenubarLabel\n\nA label for a group of menu items.",
+      "sourcePath": "packages/react/src/components/menubar/menubar.tsx",
+      "props": [
+        {
+          "name": "inset",
+          "type": "boolean",
+          "required": false,
+          "defaultValue": "false",
+          "description": "Indents the label to align with items that have a leading icon or checkbox."
+        }
+      ]
+    },
+    {
+      "name": "MenubarPortal",
+      "description": "MenubarPortal\n\nPortals the content to the body.",
+      "sourcePath": "packages/react/src/components/menubar/menubar.tsx",
+      "props": []
+    },
+    {
+      "name": "MenubarRadioGroup",
+      "description": "MenubarRadioGroup\n\nGroups radio items together.",
+      "sourcePath": "packages/react/src/components/menubar/menubar.tsx",
+      "props": []
+    },
+    {
+      "name": "MenubarRadioItem",
+      "description": "MenubarRadioItem\n\nA radio menu item for exclusive selection.",
+      "sourcePath": "packages/react/src/components/menubar/menubar.tsx",
+      "props": []
+    },
+    {
+      "name": "MenubarSeparator",
+      "description": "MenubarSeparator\n\nA visual divider between menu items.",
+      "sourcePath": "packages/react/src/components/menubar/menubar.tsx",
+      "props": []
+    },
+    {
+      "name": "MenubarShortcut",
+      "description": "MenubarShortcut\n\nDisplays a keyboard shortcut hint.",
+      "sourcePath": "packages/react/src/components/menubar/menubar.tsx",
+      "props": []
+    },
+    {
+      "name": "MenubarSub",
+      "description": "MenubarSub\n\nContains a submenu.",
+      "sourcePath": "packages/react/src/components/menubar/menubar.tsx",
+      "props": []
+    },
+    {
+      "name": "MenubarSubContent",
+      "description": "MenubarSubContent\n\nThe content container for a submenu.",
+      "sourcePath": "packages/react/src/components/menubar/menubar.tsx",
+      "props": []
+    },
+    {
+      "name": "MenubarSubTrigger",
+      "description": "MenubarSubTrigger\n\nThe trigger for a submenu. Renders a chevron to indicate a submenu.",
+      "sourcePath": "packages/react/src/components/menubar/menubar.tsx",
+      "props": [
+        {
+          "name": "inset",
+          "type": "boolean",
+          "required": false,
+          "defaultValue": "false",
+          "description": "Indents the trigger to align with items that have a leading icon or checkbox."
+        }
+      ]
+    },
+    {
+      "name": "MenubarTrigger",
+      "description": "MenubarTrigger\n\nA top-level menu trigger in the bar. Opens its menu on click.",
+      "sourcePath": "packages/react/src/components/menubar/menubar.tsx",
+      "props": []
+    }
+  ]
+}

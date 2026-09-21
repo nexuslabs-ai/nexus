@@ -1,0 +1,95 @@
+{
+  "slug": "table",
+  "components": [
+    {
+      "name": "Table",
+      "description": "Table\n\nA semantic data table — header, body, optional footer, and rows of cells.\nRenders inside a horizontally-scrollable wrapper so wide tables stay usable\non narrow viewports without forcing a page-level scrollbar. Compose with the\nsub-components: `TableHeader` / `TableBody` / `TableFooter` wrap `TableRow`s,\nwhich hold `TableHead` (column header) or `TableCell` (data) cells.",
+      "sourcePath": "packages/react/src/components/table/table.tsx",
+      "props": [
+        {
+          "name": "containerClassName",
+          "type": "string",
+          "required": false,
+          "defaultValue": null,
+          "description": "Classes for the scroll container (the element that owns horizontal — and,\nwith `stickyHeader`, vertical — overflow). Use it to bound the height\n(`\"nx:max-h-96\"`) or set the surface. `className` still targets the `<table>`."
+        },
+        {
+          "name": "density",
+          "type": "TableDensity",
+          "required": false,
+          "defaultValue": "comfortable",
+          "description": "Row density.\n\n- `comfortable` — roomier ~44px rows (the default).\n- `compact` — tighter ~36px rows for dense data."
+        },
+        {
+          "name": "stickyHeader",
+          "type": "boolean",
+          "required": false,
+          "defaultValue": "false",
+          "description": "Pin the header row while the body scrolls vertically.\n\nRequires a height-bounded scroll container — set one via `containerClassName`\n(e.g. `\"nx:max-h-96\"`), or there is nothing to scroll. The sticky header\npaints on the component `container` surface so it stays raised above the page\ncanvas in Model 2."
+        },
+        {
+          "name": "striped",
+          "type": "boolean",
+          "required": false,
+          "defaultValue": "false",
+          "description": "Zebra striping — tint alternating body rows so the eye tracks across a wide\nrow. Selection and hover take precedence over the stripe."
+        },
+        {
+          "name": "variant",
+          "type": "TableVariant",
+          "required": false,
+          "defaultValue": "default",
+          "description": "Border treatment for the table's internal lines.\n\n- `default` — softened horizontal row rules + a header underline.\n- `borderless` — no internal lines; rows separate by hover + spacing.\n- `grid` — row **and** column rules (a full cell grid)."
+        }
+      ]
+    },
+    {
+      "name": "TableBody",
+      "description": "TableBody\n\nThe `<tbody>` grouping for data rows. The last row drops its bottom border so\nthe body doesn't draw a rule against a following footer or the table edge.",
+      "sourcePath": "packages/react/src/components/table/table.tsx",
+      "props": []
+    },
+    {
+      "name": "TableCaption",
+      "description": "TableCaption\n\nA caption describing the table. Rendered below the table (`caption-bottom`).",
+      "sourcePath": "packages/react/src/components/table/table.tsx",
+      "props": []
+    },
+    {
+      "name": "TableCell",
+      "description": "TableCell\n\nA data cell (`<td>`).",
+      "sourcePath": "packages/react/src/components/table/table.tsx",
+      "props": []
+    },
+    {
+      "name": "TableFooter",
+      "description": "TableFooter\n\nThe `<tfoot>` grouping for a summary/totals row — a muted fill and medium\nweight set it apart from the data rows above.",
+      "sourcePath": "packages/react/src/components/table/table.tsx",
+      "props": []
+    },
+    {
+      "name": "TableHead",
+      "description": "TableHead\n\nA column-header cell (`<th>`). Rendered in muted foreground to sit quietly\nabove the data it labels.",
+      "sourcePath": "packages/react/src/components/table/table.tsx",
+      "props": []
+    },
+    {
+      "name": "TableHeader",
+      "description": "TableHeader\n\nThe `<thead>` grouping for column-header rows. The underline beneath the\nheader comes from its `TableRow`'s bottom border, so it tracks the `variant`.",
+      "sourcePath": "packages/react/src/components/table/table.tsx",
+      "props": []
+    },
+    {
+      "name": "TableRow",
+      "description": "TableRow\n\nA table row. Highlights on hover and when selected — set\n`data-state=\"selected\"` to mark a row as part of the current selection.",
+      "sourcePath": "packages/react/src/components/table/table.tsx",
+      "props": []
+    },
+    {
+      "name": "TableRowHeader",
+      "description": "TableRowHeader\n\nThe identifying header cell of a row (`<th scope=\"row\">`) — an invoice number,\na person's name. Scoping it to the row gives every row an accessible name, so\na screen reader announces which row a data cell belongs to. Styled like a data\ncell but with medium weight.",
+      "sourcePath": "packages/react/src/components/table/table.tsx",
+      "props": []
+    }
+  ]
+}

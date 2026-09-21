@@ -6,7 +6,8 @@
   "description": "Documentation site for the Nexus Design System",
   "scripts": {
     "dev": "pnpm generate:manifest && next dev --turbopack",
-    "build": "pnpm generate:manifest && next build",
+    "generate:props": "node scripts/generate-props.mjs",
+    "build": "pnpm generate:manifest && pnpm generate:props && next build",
     "start": "next start",
     "generate:manifest": "node scripts/generate-page-manifest.mjs",
     "audit:csp": "node scripts/audit-csp-inventory.mjs",
@@ -44,6 +45,7 @@
     "jiti": "^2.7.0",
     "postcss": "^8.4.49",
     "prettier": "^3.7.4",
+    "react-docgen-typescript": "^2.4.0",
     "tailwindcss": "^4.1.18",
     "typescript": "^5.9.3"
   }

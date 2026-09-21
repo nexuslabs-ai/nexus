@@ -1,0 +1,38 @@
+{
+  "slug": "native-select",
+  "components": [
+    {
+      "name": "NativeSelect",
+      "description": "NativeSelect\n\nA styled wrapper over the native `<select>` — on mobile it opens the OS\npicker (iOS wheel / Android sheet), the preferred dense-form UX there. The\nopen list is OS-rendered. For rich options (icons, descriptions, grouping)\non desktop, use `Select`. The `variant=\"bordered\"` treatment is the default;\nuse `variant=\"borderless\"` to remove the resting field stroke while keeping a\ntonal control fill for resting affordance.",
+      "sourcePath": "packages/react/src/components/native-select/native-select.tsx",
+      "props": [
+        {
+          "name": "size",
+          "type": "\"default\" | \"sm\" | null",
+          "required": false,
+          "defaultValue": "default",
+          "description": ""
+        },
+        {
+          "name": "variant",
+          "type": "\"bordered\" | \"borderless\" | null",
+          "required": false,
+          "defaultValue": null,
+          "description": ""
+        }
+      ]
+    },
+    {
+      "name": "NativeSelectOptGroup",
+      "description": "NativeSelectOptGroup\n\nAn `<optgroup>` for grouping `NativeSelect` options.",
+      "sourcePath": "packages/react/src/components/native-select/native-select.tsx",
+      "props": []
+    },
+    {
+      "name": "NativeSelectOption",
+      "description": "NativeSelectOption\n\nAn `<option>` for `NativeSelect`. Uses the `Canvas` / `CanvasText` system\ncolors so the OS-rendered list stays legible in both light and dark themes.",
+      "sourcePath": "packages/react/src/components/native-select/native-select.tsx",
+      "props": []
+    }
+  ]
+}

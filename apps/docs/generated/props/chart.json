@@ -1,0 +1,136 @@
+{
+  "slug": "chart",
+  "components": [
+    {
+      "name": "ChartContainer",
+      "description": "",
+      "sourcePath": "packages/react/src/components/chart/chart.tsx",
+      "props": [
+        {
+          "name": "config",
+          "type": "ChartConfig",
+          "required": true,
+          "defaultValue": null,
+          "description": ""
+        }
+      ]
+    },
+    {
+      "name": "ChartLegend",
+      "description": "",
+      "sourcePath": "packages/react/src/components/chart/chart.tsx",
+      "props": []
+    },
+    {
+      "name": "ChartLegendContent",
+      "description": "",
+      "sourcePath": "packages/react/src/components/chart/chart.tsx",
+      "props": [
+        {
+          "name": "className",
+          "type": "string",
+          "required": false,
+          "defaultValue": null,
+          "description": ""
+        },
+        {
+          "name": "hideIcon",
+          "type": "boolean",
+          "required": false,
+          "defaultValue": "false",
+          "description": ""
+        },
+        {
+          "name": "nameKey",
+          "type": "string",
+          "required": false,
+          "defaultValue": null,
+          "description": ""
+        },
+        {
+          "name": "verticalAlign",
+          "type": "\"top\" | \"bottom\"",
+          "required": false,
+          "defaultValue": "bottom",
+          "description": ""
+        }
+      ]
+    },
+    {
+      "name": "ChartTooltip",
+      "description": "The Tooltip component displays a floating box with data values when hovering over or clicking on chart elements.\n\nIt can be configured to show information for individual data points or for all points at a specific axis coordinate.\nThe appearance and content of the tooltip can be customized via props.",
+      "sourcePath": "packages/react/src/components/chart/chart.tsx",
+      "props": []
+    },
+    {
+      "name": "ChartTooltipContent",
+      "description": "",
+      "sourcePath": "packages/react/src/components/chart/chart.tsx",
+      "props": [
+        {
+          "name": "active",
+          "type": "boolean",
+          "required": false,
+          "defaultValue": null,
+          "description": ""
+        },
+        {
+          "name": "className",
+          "type": "string",
+          "required": false,
+          "defaultValue": null,
+          "description": ""
+        },
+        {
+          "name": "color",
+          "type": "string",
+          "required": false,
+          "defaultValue": null,
+          "description": ""
+        },
+        {
+          "name": "formatter",
+          "type": "ChartTooltipFormatter",
+          "required": false,
+          "defaultValue": null,
+          "description": ""
+        },
+        {
+          "name": "hideIndicator",
+          "type": "boolean",
+          "required": false,
+          "defaultValue": "false",
+          "description": ""
+        },
+        {
+          "name": "hideLabel",
+          "type": "boolean",
+          "required": false,
+          "defaultValue": "false",
+          "description": ""
+        },
+        {
+          "name": "indicator",
+          "type": "ChartIndicator",
+          "required": false,
+          "defaultValue": "dot",
+          "description": ""
+        },
+        {
+          "name": "labelKey",
+          "type": "string",
+          "required": false,
+          "defaultValue": null,
+          "description": ""
+        },
+        {
+          "name": "nameKey",
+          "type": "string",
+          "required": false,
+          "defaultValue": null,
+          "description": ""
+        }
+      ]
+    }
+  ]
+}

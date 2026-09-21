@@ -1,0 +1,17 @@
+{
+  "slug": "kbd",
+  "components": [
+    {
+      "name": "Kbd",
+      "description": "Kbd\n\nA keyboard-key indicator for documenting shortcuts — one keycap per key\n(`⌘`, `Esc`, `Enter`). Compose several inside `KbdGroup` to show a chord\n(`⌘ K`). Non-interactive by design (`pointer-events-none`): it labels a\nshortcut, it does not handle one.",
+      "sourcePath": "packages/react/src/components/kbd/kbd.tsx",
+      "props": []
+    },
+    {
+      "name": "KbdGroup",
+      "description": "KbdGroup\n\nLays out a row of `Kbd` keycaps as one chord (e.g. `⌘ K`).",
+      "sourcePath": "packages/react/src/components/kbd/kbd.tsx",
+      "props": []
+    }
+  ]
+}
