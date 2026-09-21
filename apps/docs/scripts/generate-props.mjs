@@ -1,5 +1,4 @@
 import {
-  existsSync,
   mkdirSync,
   readdirSync,
   readFileSync,
@@ -13,11 +12,16 @@ import docgen from 'react-docgen-typescript';
 import ts from 'typescript';
 
 import {
-  isComponentName,
+  exportName,
+  isComponentSource,
+  isOwnProp,
   isPortableExpansion,
-  isRenderable,
+  isReExport,
+  isTypeExport,
   opaqueNamespaceNames,
-  recordedSlugs,
+  publicComponents,
+  publicExports,
+  toRepoPath,
   toSlugFolder,
 } from './props-contract.mjs';
 import {
@@ -39,15 +43,7 @@ const outputDir = process.argv[2]
   : path.join(docsRoot, 'generated', 'props');
 
 const indexFile = 'index.json';
-
-function isComponentSource(filePath) {
-  const name = path.basename(filePath);
-  if (!/\.tsx?$/.test(name)) return false;
-  if (/\.(?:stories|test)\.tsx?$/.test(name)) return false;
-  // A barrel would re-report every component it re-exports under a second
-  // source path.
-  return !/^index\.tsx?$/.test(name);
-}
+const entryPoints = reactEntryPoints();
 
 function collectSourceFiles(dir) {
   return readdirSync(dir, { withFileTypes: true })
@@ -59,140 +55,13 @@ function collectSourceFiles(dir) {
     .filter(isComponentSource);
 }
 
-function toRepoPath(absolutePath) {
-  return path.relative(repoRoot, absolutePath).split(path.sep).join('/');
-}
-
 function toSlug(absolutePath) {
   return toSlugFolder(path.relative(componentsRoot, absolutePath));
 }
 
-/**
- * Keeps a prop only when this repo declares it. Props reaching a component
- * through `React.ComponentProps<'element'>` or a Radix primitive resolve to a
- * declaration under `node_modules`; `cva` variant keys arrive as synthesized
- * mapped-type members carrying neither a declaration nor a parent.
- */
-function isOwnProp(prop) {
-  const declarations = prop.declarations ?? [];
-  if (declarations.length === 0) return !prop.parent;
-  return declarations.some(
-    (declaration) => !declaration.fileName.includes('node_modules')
-  );
-}
-
-/**
- * docgen reports every export it can attach a doc comment to, so type exports
- * (`type AttachmentState`, `interface BadgeProps`) arrive alongside the
- * components. Only a type export keeps the alias flag — anything exported as a
- * value resolves through to its function or interface symbol.
- */
-function isTypeExport(doc) {
-  return ((doc.expression?.flags ?? 0) & ts.SymbolFlags.Alias) !== 0;
-}
-
-/**
- * `displayName` reports the primitive's own name for a re-export such as
- * `const DrawerPortal = DrawerPrimitive.Portal`; the export name is what
- * consumers import.
- */
-function exportName(doc) {
-  return doc.rootExpression?.getName() ?? doc.displayName;
-}
-
-function declarationPath(doc) {
-  const sourceFile = doc.expression?.declarations?.[0]?.getSourceFile?.();
-  return sourceFile ? toRepoPath(sourceFile.fileName) : null;
-}
-
-/**
- * `provider/server.ts` re-exports the script component from `provider/script.tsx`,
- * so docgen reports it once per file. Keep the report from the file that
- * declares it; a component declared outside the parsed set (a Radix or vaul
- * primitive re-exported under a Nexus name) is only ever reported once.
- */
-function isReExport(doc, parsedPaths) {
-  const declaredIn = declarationPath(doc);
-  return (
-    declaredIn !== null &&
-    declaredIn !== toRepoPath(doc.filePath) &&
-    parsedPaths.has(declaredIn)
-  );
-}
-
-function resolveAlias(checker, symbol) {
-  if ((symbol.flags & ts.SymbolFlags.Alias) === 0) return symbol;
-  try {
-    return checker.getAliasedSymbol(symbol);
-  } catch {
-    return symbol;
-  }
-}
-
-function symbolSourceFile(symbol) {
-  return symbol.declarations?.[0]?.getSourceFile?.() ?? null;
-}
-
+// `publicComponents` has already proven the declaration and its file resolve.
 function symbolSourcePath(symbol) {
-  const sourceFile = symbolSourceFile(symbol);
-  return sourceFile ? toRepoPath(sourceFile.fileName) : null;
-}
-
-/**
- * The package's public exports, not docgen's reports, decide what gets an
- * entry: docgen drops a component whose function takes no props parameter, and
- * would otherwise document anything reachable from a parsed file.
- */
-function publicExports(checker, program) {
-  const exported = new Map();
-
-  for (const entry of reactEntryPoints()) {
-    const sourceFile = program.getSourceFile(entry);
-    if (!sourceFile) {
-      throw new Error(
-        `Entry point ${toRepoPath(entry)} is not in the program; check the "exports" map still points at a file under src/.`
-      );
-    }
-
-    const moduleSymbol = checker.getSymbolAtLocation(sourceFile);
-    if (!moduleSymbol) {
-      throw new Error(
-        `Entry point ${toRepoPath(entry)} exports nothing; check it is still a module.`
-      );
-    }
-
-    for (const symbol of checker.getExportsOfModule(moduleSymbol)) {
-      exported.set(symbol.getName(), resolveAlias(checker, symbol));
-    }
-  }
-
-  return exported;
-}
-
-/**
- * A slug is a folder under `src/components/`, so a component declared anywhere
- * else — or directly in `components/` with no folder of its own — has nowhere
- * to land. Dropping it silently would leave the output short of the export
- * surface with nothing to say so.
- */
-function publicComponents(checker, exported) {
-  const found = [];
-
-  for (const [name, symbol] of exported) {
-    if (!isComponentName(name)) continue;
-    if (!isRenderable(checker, symbol)) continue;
-
-    const sourceFile = symbolSourceFile(symbol);
-    if (!sourceFile || !toSlug(sourceFile.fileName)) {
-      throw new Error(
-        `@nexus_ds/react exports the component ${name} from ${symbolSourcePath(symbol) ?? 'an unresolvable file'}; it needs a folder of its own under ${toRepoPath(componentsRoot)}/ to get a props entry.`
-      );
-    }
-
-    found.push([name, symbol]);
-  }
-
-  return new Map(found.sort(([a], [b]) => a.localeCompare(b, 'en')));
+  return toRepoPath(symbol.declarations[0].getSourceFile().fileName);
 }
 
 /**
@@ -304,20 +173,29 @@ function writeJson(filePath, value) {
 }
 
 /**
- * Removes what the last run wrote and nothing else, so a folder renamed or
- * deleted since then leaves no orphan behind. Every current slug is rewritten
- * straight after, so the previous index is the only record worth reading.
+ * A slug file names its own slug in its body, so a run can recognise the files
+ * a previous one wrote without trusting anything to name a path: the names come
+ * from the directory listing, and the body only has to agree with the name it
+ * already has. That leaves a folder renamed or deleted since the last run with
+ * no orphan behind, whatever state the index arrives in.
  */
-function clearPreviousOutput() {
-  const indexPath = path.join(outputDir, indexFile);
-  const previous = existsSync(indexPath)
-    ? recordedSlugs(readFileSync(indexPath, 'utf8'))
-    : [];
-
-  for (const slug of previous) {
-    rmSync(path.join(outputDir, `${slug}.json`), { force: true });
+function wasGeneratedHere(fileName) {
+  try {
+    const body = JSON.parse(
+      readFileSync(path.join(outputDir, fileName), 'utf8')
+    );
+    return body?.slug === path.basename(fileName, '.json');
+  } catch {
+    return false;
   }
-  rmSync(indexPath, { force: true });
+}
+
+function clearPreviousOutput() {
+  for (const fileName of readdirSync(outputDir)) {
+    if (!wasGeneratedHere(fileName)) continue;
+    rmSync(path.join(outputDir, fileName), { force: true });
+  }
+  rmSync(path.join(outputDir, indexFile), { force: true });
 }
 
 const slugs = readdirSync(componentsRoot, { withFileTypes: true })
@@ -336,13 +214,13 @@ const compilerOptions = ts.parseJsonConfigFileContent(
   path.dirname(reactTsconfig)
 ).options;
 
-const program = ts.createProgram([...sourceFiles, ...reactEntryPoints()], {
+const program = ts.createProgram([...sourceFiles, ...entryPoints], {
   ...compilerOptions,
   noEmit: true,
 });
 const checker = program.getTypeChecker();
 
-const exported = publicExports(checker, program);
+const exported = publicExports(checker, program, entryPoints);
 const expansions = localAliasExpansions(checker, program, exported);
 
 // `parseWithProgramProvider` ignores the parser's own options once a program
@@ -374,7 +252,7 @@ for (const doc of parser.parseWithProgramProvider(sourceFiles, () => program)) {
 // A union prints its members in the order the checker first interned them, so
 // resolving component types ahead of the alias expansions and the docgen parse
 // would reorder the type strings those two produce.
-const components = publicComponents(checker, exported);
+const components = publicComponents(checker, exported, componentsRoot);
 
 const bySlug = new Map(slugs.map((slug) => [slug, []]));
 

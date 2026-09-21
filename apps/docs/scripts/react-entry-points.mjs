@@ -43,16 +43,20 @@ function isModuleSurface(target) {
   );
 }
 
+const CONDITION_PRIORITY = ['import', 'module', 'require', 'node', 'default'];
+
 /**
  * The declarations for a subpath: a `types` condition at the top of its object,
- * or inside a nested one (`{ import: { types, default } }`).
+ * or inside a nested one (`{ import: { types, default } }`). A manifest can
+ * spell `types` under more than one condition, so the nested ones are walked in
+ * a fixed order rather than whichever the object happens to list first.
  */
 function typesCondition(target) {
   if (target === null || typeof target !== 'object') return null;
   if (typeof target.types === 'string') return target.types;
 
-  for (const value of Object.values(target)) {
-    const nested = typesCondition(value);
+  for (const condition of CONDITION_PRIORITY) {
+    const nested = typesCondition(target[condition]);
     if (nested) return nested;
   }
   return null;

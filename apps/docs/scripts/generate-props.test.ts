@@ -15,12 +15,15 @@ import ts from 'typescript';
 import { afterAll, describe, expect, it } from 'vitest';
 
 import {
+  exportName,
   isComponentName,
+  isComponentSource,
+  isOwnProp,
   isPortableExpansion,
   isRenderable,
-  isSlugName,
   opaqueNamespaceNames,
-  recordedSlugs,
+  publicComponents,
+  publicExports,
   toSlugFolder,
 } from './props-contract.mjs';
 import {
@@ -192,13 +195,19 @@ const FIXTURE_SOURCE = [
   'export function FunctionWidget(props: { label: string }) {',
   '  return props.label;',
   '}',
-  'export class ClassWidget {',
+  'export class RenderWidget {',
+  '  render() {',
+  '    return null;',
+  '  }',
+  '}',
+  'export class PlainClass {',
   "  label = '';",
   '}',
   'export const ConfigWidget = { gap: 4 };',
   'export interface WidgetProps {',
   '  label: string;',
   '}',
+  'export const NOT_A_COMPONENT = 1;',
 ].join('\n');
 
 let fixtureDir: string | null = null;
@@ -236,7 +245,7 @@ function buildFixture() {
     return symbol;
   };
 
-  return { checker, sourceFile, symbolNamed };
+  return { checker, program, sourceFile, file, symbols, symbolNamed };
 }
 
 let fixture: ReturnType<typeof buildFixture> | null = null;
@@ -244,19 +253,121 @@ const fixtureModule = () => (fixture ??= buildFixture());
 
 describe('component export predicates', () => {
   it(
-    'counts a call or a construct signature as renderable',
+    'counts a call signature, or a construct signature that renders',
     { timeout: 120_000 },
     () => {
       const { checker, symbolNamed } = fixtureModule();
 
-      // A class component is rendered through `new`, so it carries a construct
-      // signature and no call signature at all.
-      expect(isRenderable(checker, symbolNamed('ClassWidget'))).toBe(true);
       expect(isRenderable(checker, symbolNamed('FunctionWidget'))).toBe(true);
+
+      // A class component is rendered through `new`, so it carries a construct
+      // signature and no call signature at all — but so does every other
+      // exported class, and only a component answers to `render`.
+      expect(isRenderable(checker, symbolNamed('RenderWidget'))).toBe(true);
+      expect(isRenderable(checker, symbolNamed('PlainClass'))).toBe(false);
+
       expect(isRenderable(checker, symbolNamed('ConfigWidget'))).toBe(false);
       expect(isRenderable(checker, symbolNamed('WidgetProps'))).toBe(false);
     }
   );
+
+  it(
+    'takes the components off the export surface, not every export',
+    { timeout: 120_000 },
+    () => {
+      const { checker, symbols, file } = fixtureModule();
+      const componentsRoot = path.dirname(path.dirname(file));
+
+      expect([
+        ...publicComponents(checker, symbols, componentsRoot).keys(),
+      ]).toEqual(['FunctionWidget', 'RenderWidget']);
+    }
+  );
+
+  it(
+    'refuses a component with no folder of its own to land in',
+    { timeout: 120_000 },
+    () => {
+      const { checker, symbols, file } = fixtureModule();
+
+      // The fixture sits directly in this root, so its components have no
+      // folder to become a slug.
+      expect(() =>
+        publicComponents(checker, symbols, path.dirname(file))
+      ).toThrow(/needs a folder of its own/);
+    }
+  );
+
+  it(
+    'refuses an entry point the program never loaded',
+    { timeout: 120_000 },
+    () => {
+      const { checker, program, file } = fixtureModule();
+      const absent = path.join(path.dirname(file), 'absent.ts');
+
+      expect(() => publicExports(checker, program, [absent])).toThrow(
+        /is not in the program/
+      );
+    }
+  );
+
+  it(
+    'reads a file that exports nothing as no entry point',
+    { timeout: 120_000 },
+    () => {
+      const dir = mkdtempSync(path.join(tmpdir(), 'nexus-props-entry-'));
+      const file = path.join(dir, 'script.ts');
+      writeFileSync(file, 'const local = 1;\n', 'utf8');
+
+      try {
+        const program = ts.createProgram([file], {
+          noEmit: true,
+          skipLibCheck: true,
+        });
+
+        expect(() =>
+          publicExports(program.getTypeChecker(), program, [file])
+        ).toThrow(/exports nothing/);
+      } finally {
+        rmSync(dir, { recursive: true, force: true });
+      }
+    }
+  );
+
+  it('reads only a component source, not a barrel or a story', () => {
+    expect(isComponentSource(path.join('badge', 'badge.tsx'))).toBe(true);
+    expect(isComponentSource(path.join('badge', 'use-badge.ts'))).toBe(true);
+    expect(isComponentSource(path.join('badge', 'index.ts'))).toBe(false);
+    expect(isComponentSource(path.join('badge', 'Badge.stories.tsx'))).toBe(
+      false
+    );
+    expect(isComponentSource(path.join('badge', 'badge.test.ts'))).toBe(false);
+    expect(isComponentSource(path.join('badge', 'badge.css'))).toBe(false);
+  });
+
+  it('keeps a prop this repo declares and drops an inherited one', () => {
+    const local = { declarations: [{ fileName: '/repo/src/badge.tsx' }] };
+    const inherited = {
+      declarations: [{ fileName: '/repo/node_modules/@radix-ui/index.d.ts' }],
+    };
+
+    expect(isOwnProp(local)).toBe(true);
+    expect(isOwnProp(inherited)).toBe(false);
+
+    // A `cva` variant key arrives synthesized, carrying neither.
+    expect(isOwnProp({ declarations: [], parent: null })).toBe(true);
+    expect(isOwnProp({ parent: { name: 'HTMLAttributes' } })).toBe(false);
+  });
+
+  it('names a re-export by the name consumers import', () => {
+    expect(exportName({ displayName: 'Root' })).toBe('Root');
+    expect(
+      exportName({
+        displayName: 'Root',
+        rootExpression: { getName: () => 'Drawer' },
+      })
+    ).toBe('Drawer');
+  });
 
   it(
     'exempts only the conventional React namespace binding',
@@ -301,45 +412,6 @@ describe('component export predicates', () => {
     ).toBeNull();
   });
 
-  it('accepts only a bare kebab-case name as a slug to delete', () => {
-    expect(isSlugName('alert-dialog')).toBe(true);
-    expect(isSlugName('input-otp')).toBe(true);
-    expect(isSlugName('../bystander')).toBe(false);
-    expect(isSlugName(path.join('..', 'bystander'))).toBe(false);
-    expect(isSlugName('..')).toBe(false);
-    expect(isSlugName('nested/slug')).toBe(false);
-    expect(isSlugName('C:/tmp/bystander')).toBe(false);
-    expect(isSlugName('')).toBe(false);
-    expect(isSlugName(null)).toBe(false);
-  });
-
-  it('records only the slug-shaped keys a previous index names', () => {
-    expect(
-      recordedSlugs('{"badge":["Badge"],"alert-dialog":["AlertDialog"]}')
-    ).toEqual(['badge', 'alert-dialog']);
-
-    // The generator deletes `{key}.json`, so a key naming a path would reach
-    // outside the directory the index sits in.
-    expect(recordedSlugs('{"../bystander":["Y"],"badge":["Badge"]}')).toEqual([
-      'badge',
-    ]);
-    expect(recordedSlugs('{"nested/slug":["Y"]}')).toEqual([]);
-  });
-
-  it('treats a body it cannot use as no record at all', () => {
-    // A merge-conflicted, half-written, or wrong-shaped index must not fail the
-    // docs build over files this run is about to replace.
-    expect(
-      recordedSlugs('<<<<<<< HEAD\n{"badge":["Badge"]}\n=======\n{}\n')
-    ).toEqual([]);
-    expect(recordedSlugs('')).toEqual([]);
-    expect(recordedSlugs('{"badge":["Badge"]')).toEqual([]);
-    expect(recordedSlugs('null')).toEqual([]);
-    expect(recordedSlugs('"badge"')).toEqual([]);
-    expect(recordedSlugs('42')).toEqual([]);
-    expect(recordedSlugs('["badge","alert-dialog"]')).toEqual([]);
-  });
-
   it('reads a component name as PascalCase, not a screaming-snake constant', () => {
     expect(isComponentName('Button')).toBe(true);
     expect(isComponentName('NEXUS_APPEARANCE_COOKIE_MAX_AGE_SECONDS')).toBe(
@@ -354,13 +426,16 @@ describe('react entry points', () => {
     path.relative(reactRoot, entry).split(path.sep).join('/');
 
   it('takes one entry point per subpath that resolves to code', () => {
+    // Declared out of alphabetical order: the generator feeds these to
+    // `ts.createProgram`, whose input order decides which union member the
+    // checker interns first, so the sort is what keeps the output stable.
     const entries = entryPointsFromManifest({
       exports: {
-        '.': { types: './dist/index.d.ts', import: './dist/index.mjs' },
+        './v1.2': { types: './dist/v1.2.d.ts', import: './dist/v1.2.mjs' },
         './nested': {
           import: { types: './dist/nested.d.ts', default: './dist/nested.mjs' },
         },
-        './v1.2': { types: './dist/v1.2.d.ts', import: './dist/v1.2.mjs' },
+        '.': { types: './dist/index.d.ts', import: './dist/index.mjs' },
         './styles.css': './dist/react.css',
         './asset-object': { default: './dist/react.css' },
         './blocked': null,
@@ -372,6 +447,22 @@ describe('react entry points', () => {
       'src/nested.ts',
       'src/v1.2.ts',
     ]);
+  });
+
+  it('reads types by condition priority, not by the order they are listed', () => {
+    const entries = entryPointsFromManifest({
+      exports: {
+        '.': {
+          require: {
+            types: './dist/index.cjs.d.ts',
+            default: './dist/index.js',
+          },
+          import: { types: './dist/index.d.ts', default: './dist/index.mjs' },
+        },
+      },
+    });
+
+    expect(entries.map(relative)).toEqual(['src/index.ts']);
   });
 
   it('refuses a code subpath that declares no types', () => {
@@ -544,17 +635,19 @@ describe('docs props data', () => {
       const dir = path.join(root, 'props');
       mkdirSync(dir);
 
-      // A slug the previous run recorded but no folder accounts for any more, a
-      // file the generator has no business touching, and a key that is not a slug
-      // at all — a conflicted or hand-edited index must not be able to name a
-      // path outside the directory it sits in.
+      // A slug no folder accounts for any more, next to two files the generator
+      // has no business touching — one of them named exactly as a slug file
+      // would be.
+      writeFileSync(path.join(dir, 'index.json'), '{"retired-widget":["X"]}\n');
       writeFileSync(
-        path.join(dir, 'index.json'),
-        '{"retired-widget":["X"],"../bystander":["Y"]}\n'
+        path.join(dir, 'retired-widget.json'),
+        '{"slug":"retired-widget","components":[]}\n'
       );
-      writeFileSync(path.join(dir, 'retired-widget.json'), '{}\n');
       writeFileSync(path.join(dir, 'package.json'), '{"name":"bystander"}\n');
-      writeFileSync(path.join(root, 'bystander.json'), '{"keep":true}\n');
+      writeFileSync(
+        path.join(dir, 'badge.json.bak'),
+        '{"slug":"badge.json","components":[]}\n'
+      );
 
       try {
         runGenerator(dir);
@@ -563,7 +656,7 @@ describe('docs props data', () => {
         expect(readFileSync(path.join(dir, 'package.json'), 'utf8')).toBe(
           '{"name":"bystander"}\n'
         );
-        expect(existsSync(path.join(root, 'bystander.json'))).toBe(true);
+        expect(existsSync(path.join(dir, 'badge.json.bak'))).toBe(true);
       } finally {
         rmSync(root, { recursive: true, force: true });
       }
@@ -571,17 +664,26 @@ describe('docs props data', () => {
   );
 
   it(
-    'treats an index it cannot read as no previous record',
+    'clears an orphan even when the index cannot be read',
     { timeout: 120_000 },
     () => {
       const dir = mkdtempSync(path.join(tmpdir(), 'nexus-props-conflict-'));
+
+      // The index is tracked, so it can arrive merge-conflicted. The files it
+      // would have named are recognised from their own bodies instead.
       writeFileSync(
         path.join(dir, 'index.json'),
-        '<<<<<<< HEAD\n{"badge":["Badge"]}\n=======\n{}\n>>>>>>> main\n'
+        '<<<<<<< HEAD\n{"retired-widget":["X"]}\n=======\n{}\n>>>>>>> main\n'
+      );
+      writeFileSync(
+        path.join(dir, 'retired-widget.json'),
+        '{"slug":"retired-widget","components":[]}\n'
       );
 
       try {
         runGenerator(dir);
+
+        expect(existsSync(path.join(dir, 'retired-widget.json'))).toBe(false);
         expect(existsSync(path.join(dir, 'badge.json'))).toBe(true);
       } finally {
         rmSync(dir, { recursive: true, force: true });
