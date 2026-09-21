@@ -287,8 +287,7 @@ describe('generateTailwindPackage', () => {
 
   // Focus colours are promoted to the --color-* namespace so Tailwind emits
   // outline-focus-* utilities. Default focus falls through to primary accent; error
-  // focus keeps its primitive-backed token. The focus paint is shared CSS, while
-  // the outline remains the forced-colors fallback.
+  // focus keeps its primitive-backed token. The focus paint is shared CSS.
   // The outline offset is also tokenised so components share one tune-point.
   // --focus-offset emits once at :root (not @theme: Tailwind tree-shakes @theme
   // vars referenced only via arbitrary utilities, #506). The count guard also
@@ -343,9 +342,7 @@ describe('generateTailwindPackage', () => {
     expect(nexusCSS).toMatch(/0 0 0 2px var\(--color-background\),/);
     expect(nexusCSS).toMatch(/0 0 0 4px var\(--color-focus-default\);/);
     expect(nexusCSS).not.toMatch(/0 0 0 8px var\(--color-focus-default\);/);
-    expect(nexusCSS).toMatch(/@media \(forced-colors: active\)/);
-    expect(nexusCSS).toMatch(/border-color:\s*CanvasText\s*!important;/);
-    expect(nexusCSS).toMatch(/outline-style:\s*solid\s*!important;/);
+    expect(nexusCSS).not.toMatch(/forced-colors/);
     expect(nexusCSS).not.toMatch(/--shadow-focus-/);
   });
 

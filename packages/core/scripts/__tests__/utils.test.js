@@ -206,7 +206,7 @@ describe('utils', () => {
   });
 
   describe('generateFocusRingCSS', () => {
-    it('emits Notion-style field and 2px-gap button focus rules with a forced-colors outline fallback', () => {
+    it('emits Notion-style field and 2px-gap button focus rules', () => {
       const css = generateFocusRingCSS();
 
       expect(css).toMatch(/\/\* ===== FOCUS RING ===== \*\//);
@@ -258,12 +258,7 @@ describe('utils', () => {
       expect(css).toMatch(/0 0 0 4px var\(--color-focus-default\);/);
       expect(css).not.toMatch(/0 0 0 8px var\(--color-focus-default\);/);
       expect(css).not.toMatch(/color-mix\(/);
-      expect(css).toMatch(/@media \(forced-colors: active\)/);
-      expect(css).toMatch(/border-color:\s*CanvasText\s*!important;/);
-      expect(css).toMatch(/outline-color:\s*Highlight\s*!important;/);
-      expect(css).toMatch(/outline-style:\s*solid\s*!important;/);
-      expect(css).toMatch(/outline-width:\s*2px\s*!important;/);
-      expect(css).toMatch(/box-shadow:\s*none\s*!important;/);
+      expect(css).not.toMatch(/forced-colors/);
     });
   });
 
