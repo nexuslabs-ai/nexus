@@ -1,23 +1,20 @@
-import {
-  mkdirSync,
-  readdirSync,
-  readFileSync,
-  unlinkSync,
-  writeFileSync,
-} from 'node:fs';
-import { tmpdir } from 'node:os';
+import { mkdirSync, readdirSync, unlinkSync, writeFileSync } from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 
 import docgen from 'react-docgen-typescript';
 import ts from 'typescript';
 
+import {
+  reactEntryPoints,
+  reactRoot,
+  repoRoot,
+} from './react-entry-points.mjs';
+
 const docsRoot = path.resolve(
   path.dirname(fileURLToPath(import.meta.url)),
   '..'
 );
-const repoRoot = path.resolve(docsRoot, '..', '..');
-const reactRoot = path.join(repoRoot, 'packages', 'react');
 const reactSrc = path.join(reactRoot, 'src');
 const componentsRoot = path.join(reactSrc, 'components');
 const reactTsconfig = path.join(reactRoot, 'tsconfig.json');
@@ -25,18 +22,25 @@ const reactTsconfig = path.join(reactRoot, 'tsconfig.json');
 /**
  * The directory is emptied of its JSON before writing, so an argument naming
  * the repo root would take `package.json` and `turbo.json` with it. The only
- * callers are the docs build (no argument) and the test (a temp directory).
+ * callers are the docs build (no argument) and the test (a directory it makes
+ * under `generated/`).
  */
 function resolveOutputDir(argument) {
   if (!argument) return path.join(docsRoot, 'generated', 'props');
 
   const resolved = path.resolve(argument);
-  const isWithin = (root) =>
-    !path.relative(root, resolved).startsWith('..') && resolved !== root;
+  // `path.relative` answers with an absolute path across drives and compares
+  // case-insensitively on Windows, so neither a bare prefix test nor
+  // `resolved !== docsRoot` is enough on its own.
+  const relative = path.relative(docsRoot, resolved);
 
-  if (!isWithin(docsRoot) && !isWithin(tmpdir())) {
+  if (
+    relative === '' ||
+    path.isAbsolute(relative) ||
+    relative.split(path.sep)[0] === '..'
+  ) {
     throw new Error(
-      `Refusing to write to ${resolved}: the output directory must sit under ${docsRoot} or ${tmpdir()}.`
+      `Refusing to write to ${resolved}: the output directory must sit under ${docsRoot}.`
     );
   }
   return resolved;
@@ -69,32 +73,6 @@ function toRepoPath(absolutePath) {
 
 function toSlug(absolutePath) {
   return path.relative(componentsRoot, absolutePath).split(path.sep)[0];
-}
-
-/**
- * The `exports` map points at built declarations; the same subpaths under
- * `src/` are what the program is built from, so a new public subentry is picked
- * up without a second list to maintain.
- */
-function entryPoints() {
-  const manifest = JSON.parse(
-    readFileSync(path.join(reactRoot, 'package.json'), 'utf8')
-  );
-
-  return Object.entries(manifest.exports)
-    .filter(([, subpath]) => typeof subpath === 'object')
-    .map(([name, subpath]) => {
-      if (typeof subpath.types !== 'string') {
-        throw new Error(
-          `@nexus_ds/react exports "${name}" without a "types" subpath; its components would be dropped from the props JSON.`
-        );
-      }
-      return path.join(
-        reactRoot,
-        subpath.types.replace(/^\.\/dist\//, 'src/').replace(/\.d\.ts$/, '.ts')
-      );
-    })
-    .sort();
 }
 
 /**
@@ -181,7 +159,7 @@ function isComponentName(name) {
 function publicExports(checker, program) {
   const exported = new Map();
 
-  for (const entry of entryPoints()) {
+  for (const entry of reactEntryPoints()) {
     const sourceFile = program.getSourceFile(entry);
     if (!sourceFile) {
       throw new Error(
@@ -189,9 +167,14 @@ function publicExports(checker, program) {
       );
     }
 
-    for (const symbol of checker.getExportsOfModule(
-      checker.getSymbolAtLocation(sourceFile)
-    )) {
+    const moduleSymbol = checker.getSymbolAtLocation(sourceFile);
+    if (!moduleSymbol) {
+      throw new Error(
+        `Entry point ${toRepoPath(entry)} exports nothing; check it is still a module.`
+      );
+    }
+
+    for (const symbol of checker.getExportsOfModule(moduleSymbol)) {
       exported.set(symbol.getName(), resolveAlias(checker, symbol));
     }
   }
@@ -202,6 +185,11 @@ function publicExports(checker, program) {
 const componentValueFlags =
   ts.SymbolFlags.Function | ts.SymbolFlags.Class | ts.SymbolFlags.Variable;
 
+/**
+ * A slug is a folder under `src/components/`, so a component declared anywhere
+ * else has nowhere to land. Dropping it silently would leave the output short
+ * of the export surface with nothing to say so.
+ */
 function publicComponents(exported) {
   const componentsPath = toRepoPath(componentsRoot);
 
@@ -210,15 +198,26 @@ function publicComponents(exported) {
       .filter(([name, symbol]) => {
         if (!isComponentName(name)) return false;
         if ((symbol.flags & componentValueFlags) === 0) return false;
-        return symbolSourcePath(symbol)?.startsWith(componentsPath) ?? false;
+
+        const declaredIn = symbolSourcePath(symbol);
+        if (declaredIn?.startsWith(componentsPath)) return true;
+
+        throw new Error(
+          `@nexus_ds/react exports the component ${name} from ${declaredIn ?? 'an unresolvable file'}; move it under ${componentsPath}/ so it gets a props entry.`
+        );
       })
       .sort(([a], [b]) => a.localeCompare(b, 'en'))
   );
 }
 
-function namespaceImportNames(sourceFile) {
+/**
+ * `React.CSSProperties` is spelled the same in every file and reads as itself;
+ * a namespace over any other module prints a name only that file knows.
+ */
+function opaqueNamespaceNames(sourceFile) {
   return sourceFile.statements
     .filter((statement) => ts.isImportDeclaration(statement))
+    .filter((statement) => statement.moduleSpecifier.text !== 'react')
     .map((statement) => statement.importClause?.namedBindings)
     .filter((bindings) => bindings && ts.isNamespaceImport(bindings))
     .map((bindings) => bindings.name.text);
@@ -230,9 +229,9 @@ function namespaceImportNames(sourceFile) {
  * and a type that file never imported prints as `import("<absolute path>")` —
  * a machine path that would make the output differ per checkout.
  */
-function isPortableExpansion(text, localNamespaces) {
+function isPortableExpansion(text, opaqueNamespaces) {
   if (text.includes('import(')) return false;
-  return !localNamespaces.some((namespace) =>
+  return !opaqueNamespaces.some((namespace) =>
     new RegExp(`\\b${namespace}\\.`).test(text)
   );
 }
@@ -246,12 +245,11 @@ function isPortableExpansion(text, localNamespaces) {
  */
 function localAliasExpansions(checker, program, exported) {
   const srcPath = toRepoPath(reactSrc);
-  const expansions = new Map();
-  const claimed = new Set();
+  const candidates = new Map();
 
   for (const sourceFile of program.getSourceFiles()) {
     if (!toRepoPath(sourceFile.fileName).startsWith(srcPath)) continue;
-    const localNamespaces = namespaceImportNames(sourceFile);
+    const opaqueNamespaces = opaqueNamespaceNames(sourceFile);
 
     for (const statement of sourceFile.statements) {
       if (!ts.isTypeAliasDeclaration(statement)) continue;
@@ -264,20 +262,21 @@ function localAliasExpansions(checker, program, exported) {
         ts.TypeFormatFlags.InTypeAlias | ts.TypeFormatFlags.NoTruncation
       );
 
-      // Two files declaring the same unexported alias would otherwise expand
-      // whichever was parsed last into both components' props.
-      if (claimed.has(name) && expansions.get(name) !== text) {
-        expansions.delete(name);
-        continue;
-      }
-      claimed.add(name);
-
-      if (!isPortableExpansion(text, localNamespaces)) continue;
-      expansions.set(name, text);
+      if (!candidates.has(name)) candidates.set(name, new Set());
+      candidates
+        .get(name)
+        .add(isPortableExpansion(text, opaqueNamespaces) ? text : null);
     }
   }
 
-  return expansions;
+  // Two files declaring the same unexported alias would otherwise expand
+  // whichever was parsed last into both components' props, so a name has to be
+  // claimed by one body — and by a body that prints portably everywhere.
+  return new Map(
+    [...candidates]
+      .filter(([, texts]) => texts.size === 1 && !texts.has(null))
+      .map(([name, texts]) => [name, [...texts][0]])
+  );
 }
 
 function toPropEntry(prop, expansions) {
@@ -356,7 +355,7 @@ const compilerOptions = ts.parseJsonConfigFileContent(
   path.dirname(reactTsconfig)
 ).options;
 
-const program = ts.createProgram([...sourceFiles, ...entryPoints()], {
+const program = ts.createProgram([...sourceFiles, ...reactEntryPoints()], {
   ...compilerOptions,
   noEmit: true,
 });

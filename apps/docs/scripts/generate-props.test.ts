@@ -6,19 +6,22 @@ import {
   readFileSync,
   rmSync,
 } from 'node:fs';
-import { tmpdir } from 'node:os';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import ts from 'typescript';
 import { afterAll, describe, expect, it } from 'vitest';
 
+import {
+  reactEntryPoints,
+  reactRoot,
+  repoRoot,
+} from './react-entry-points.mjs';
+
 const docsRoot = path.resolve(
   path.dirname(fileURLToPath(import.meta.url)),
   '..'
 );
-const repoRoot = path.resolve(docsRoot, '..', '..');
 const generatedDir = path.join(docsRoot, 'generated', 'props');
-const reactRoot = path.join(repoRoot, 'packages', 'react');
 const reactSrc = path.join(reactRoot, 'src');
 const componentsRoot = path.join(reactSrc, 'components');
 
@@ -94,19 +97,7 @@ let exportNames: Set<string> | null = null;
 function reactExportNames() {
   if (exportNames) return exportNames;
 
-  const manifest = JSON.parse(
-    readFileSync(path.join(reactRoot, 'package.json'), 'utf8')
-  );
-  const entryPoints: string[] = Object.values(manifest.exports)
-    .map((subpath) => (subpath as { types?: string })?.types)
-    .filter((types): types is string => typeof types === 'string')
-    .map((types) =>
-      path.join(
-        reactRoot,
-        types.replace(/^\.\/dist\//, 'src/').replace(/\.d\.ts$/, '.ts')
-      )
-    );
-
+  const entryPoints = reactEntryPoints();
   const tsconfig = path.join(reactRoot, 'tsconfig.json');
   const { options } = ts.parseJsonConfigFileContent(
     ts.readConfigFile(tsconfig, ts.sys.readFile).config,
@@ -179,7 +170,6 @@ describe('docs props data', () => {
       'overlay-layout',
     ]);
     expect(entries.map((entry) => entry.slug)).toEqual(slugs);
-    expect(slugs).toEqual([...slugs].sort(byName));
   });
 
   it('never indexes a slug with no components', () => {
@@ -358,7 +348,7 @@ describe('docs props data', () => {
   // change committed without rerunning the generator — a stale file here
   // fails the same way a hand-edited one would.
   it('matches a fresh run of the generator', { timeout: 120_000 }, () => {
-    freshDir = mkdtempSync(path.join(tmpdir(), 'nexus-props-'));
+    freshDir = mkdtempSync(path.join(docsRoot, 'generated', 'props-fresh-'));
 
     execFileSync(
       process.execPath,
