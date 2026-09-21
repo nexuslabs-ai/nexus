@@ -9,6 +9,8 @@ and Storybook.
 - `/` opens `/explore`.
 - `/explore` provides the complete searchable catalog, logical token groups,
   mode variants, aliases, generated CSS, source provenance, and runtime inspection.
+- `/preview` runs real Button, Dialog, and Popover components in an isolated
+  document with brand presets, light/dark mode, reset, and recovery.
 - `/settings/appearance` changes the saved Console interface preferences.
 
 Retired business, learning, and reference URLs show a page-not-found screen with
@@ -36,3 +38,6 @@ source file and mock worker at baseline `22edcb96d23d3361f45a35aead48866cd746411
 The mock business/auth app, API fixtures, worker, learning chapters, and duplicate
 reference screens are absent. The shared appearance provider remains; its Sonner
 peer dependency is retained. No accounts or business API requests are required.
+
+See [preview isolation](PREVIEW.md) for the message contract and browser coverage.
+Preview appearance is local to the page and never changes saved Console settings.

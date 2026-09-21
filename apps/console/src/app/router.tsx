@@ -32,6 +32,14 @@ const exploreRoute = createRoute({
     'ExploreRoute'
   ),
 });
+const previewRoute = createRoute({
+  getParentRoute: () => rootRoute,
+  path: '/preview',
+  component: lazyRouteComponent(
+    () => import('../modules/preview/preview-route'),
+    'PreviewRoute'
+  ),
+});
 const appearanceRoute = createRoute({
   getParentRoute: () => rootRoute,
   path: '/settings/appearance',
@@ -39,7 +47,12 @@ const appearanceRoute = createRoute({
 });
 
 export const router = createRouter({
-  routeTree: rootRoute.addChildren([indexRoute, exploreRoute, appearanceRoute]),
+  routeTree: rootRoute.addChildren([
+    indexRoute,
+    exploreRoute,
+    previewRoute,
+    appearanceRoute,
+  ]),
   scrollRestoration: true,
   basepath: import.meta.env.BASE_URL,
 });

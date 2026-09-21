@@ -30,16 +30,32 @@ export default defineConfig(({ command }) => ({
           ]
         : [],
   },
-  build: { target: ['chrome111', 'edge111', 'firefox113', 'safari15.4'] },
+  build: {
+    target: ['chrome111', 'edge111', 'firefox113', 'safari15.4'],
+    rollupOptions: {
+      input: {
+        console: fileURLToPath(new URL('./index.html', import.meta.url)),
+        preview: fileURLToPath(
+          new URL('./component-preview.html', import.meta.url)
+        ),
+      },
+    },
+  },
   plugins: [
     tokenCatalogPlugin(),
     {
       name: 'console-appearance-bootstrap',
-      transformIndexHtml: (html) =>
-        injectAppearanceBootstrap(html, {
+      transformIndexHtml: (html, context) => {
+        if (
+          context.filename !==
+          fileURLToPath(new URL('./index.html', import.meta.url))
+        )
+          return html;
+        return injectAppearanceBootstrap(html, {
           storageKey: CONSOLE_STORAGE_KEY,
           defaultState: CONSOLE_APPEARANCE_DEFAULT,
-        }),
+        });
+      },
     },
     react(),
     tailwindcss(),

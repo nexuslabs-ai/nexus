@@ -21,6 +21,7 @@ import { Link, useRouterState } from '@tanstack/react-router';
 
 const CONSOLE_LINKS = [
   { to: '/explore', label: 'Token Explorer', icon: IconComponents },
+  { to: '/preview', label: 'Preview', icon: IconPalette },
 ] as const;
 
 export function AppSidebar() {
