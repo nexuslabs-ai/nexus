@@ -14,7 +14,6 @@ const popoverSurfaceClassName = [
   'nx:backdrop-blur-md',
   'nx:text-popover-foreground',
   'nx:shadow-lg',
-  'nx:reduce-transparency:bg-popover',
 ].join(' ');
 
 const tooltipSurfaceClassName = [
@@ -34,7 +33,6 @@ const navigationMenuInlinePopoverSurfaceClassName = [
   'nx:group-data-[viewport=false]/navigation-menu:backdrop-blur-md',
   'nx:group-data-[viewport=false]/navigation-menu:text-popover-foreground',
   'nx:group-data-[viewport=false]/navigation-menu:shadow-lg',
-  'nx:group-data-[viewport=false]/navigation-menu:reduce-transparency:bg-popover',
 ].join(' ');
 
 const navigationMenuInlinePopoverTransitionClassName = [
