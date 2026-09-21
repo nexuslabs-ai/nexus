@@ -181,8 +181,7 @@ Check at least:
 - Accessible names, descriptions, roles, states, and relationships.
 - APG-aligned roving focus, selection, disclosure, dialog, menu, tab, and
   composite-widget behavior when those patterns apply.
-- Pointer cancellation, dragging alternatives, target size, and coarse-pointer
-  usability for touch contexts.
+- Pointer cancellation, dragging alternatives, and target size.
 - Name/role/value and status/error announcements for controls, feedback, and
   form surfaces.
 

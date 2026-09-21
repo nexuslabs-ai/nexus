@@ -394,7 +394,7 @@ function SidebarTrigger({ className, onClick, ...props }: SidebarTriggerProps) {
       data-slot="sidebar-trigger"
       variant="ghost"
       size="icon"
-      className={cn('nx:size-7 nx:pointer-coarse:after:-inset-2', className)}
+      className={cn('nx:size-7', className)}
       onClick={handleClick}
       {...props}
     >
@@ -486,10 +486,7 @@ function SidebarInput({ className, ...props }: SidebarInputProps) {
   return (
     <Input
       data-slot="sidebar-input"
-      className={cn(
-        'nx:h-8 nx:w-full nx:bg-background nx:pointer-coarse:min-h-11',
-        className
-      )}
+      className={cn('nx:h-8 nx:w-full nx:bg-background', className)}
       {...props}
     />
   );
@@ -698,8 +695,6 @@ function SidebarGroupAction({
       data-slot="sidebar-group-action"
       className={cn(
         'nx:absolute nx:top-3.5 nx:right-3 nx:flex nx:aspect-square nx:w-5 nx:items-center nx:justify-center nx:rounded-md nx:p-0 nx:text-nav-foreground nx:hover:bg-nav-item-hover nx:focus-visible:outline-2 nx:focus-visible:outline-focus-default nx:focus-visible:outline-offset-(--focus-offset) nx:[&>svg]:size-4 nx:[&>svg]:shrink-0',
-        // Enlarges the hit area on coarse (touch) pointers.
-        'nx:pointer-coarse:after:absolute nx:pointer-coarse:after:-inset-2',
         'nx:group-data-[collapsible=icon]:hidden',
         className
       )}
@@ -933,8 +928,6 @@ function SidebarMenuAction({
       data-slot="sidebar-menu-action"
       className={cn(
         'nx:absolute nx:top-1.5 nx:right-1 nx:flex nx:aspect-square nx:w-5 nx:items-center nx:justify-center nx:rounded-md nx:p-0 nx:text-nav-foreground nx:hover:bg-nav-item-hover nx:focus-visible:outline-2 nx:focus-visible:outline-focus-default nx:focus-visible:outline-offset-(--focus-offset) nx:[&>svg]:size-4 nx:[&>svg]:shrink-0',
-        // Enlarges the hit area on coarse (touch) pointers.
-        'nx:pointer-coarse:after:absolute nx:pointer-coarse:after:-inset-2',
         'nx:peer-data-[size=sm]/menu-button:top-1',
         'nx:peer-data-[size=default]/menu-button:top-1.5',
         'nx:peer-data-[size=lg]/menu-button:top-2.5',

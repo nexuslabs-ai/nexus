@@ -32,10 +32,9 @@ const buttonVariants = cva(
         sm: 'nx:h-8 nx:px-2.5 nx:gap-2 nx:typography-label-default',
         default: 'nx:h-10 nx:px-3 nx:gap-2 nx:typography-label-default',
         lg: 'nx:h-12 nx:px-3.5 nx:gap-2 nx:typography-label-default',
-        'icon-sm':
-          'nx:relative nx:size-8 nx:gap-0 nx:p-0 nx:pointer-coarse:after:absolute nx:pointer-coarse:after:-inset-1.5',
-        icon: 'nx:relative nx:size-10 nx:gap-0 nx:p-0 nx:pointer-coarse:after:absolute nx:pointer-coarse:after:-inset-0.5',
-        'icon-lg': 'nx:relative nx:size-12 nx:gap-0 nx:p-0',
+        'icon-sm': 'nx:size-8 nx:gap-0 nx:p-0',
+        icon: 'nx:size-10 nx:gap-0 nx:p-0',
+        'icon-lg': 'nx:size-12 nx:gap-0 nx:p-0',
       },
     },
     compoundVariants: [

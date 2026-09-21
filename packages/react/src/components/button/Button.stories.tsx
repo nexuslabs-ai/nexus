@@ -176,11 +176,8 @@ export const IconSize: Story = {
     const canvas = within(canvasElement);
     const button = canvas.getByRole('button', { name: 'Star' });
 
-    await expect(button).toHaveClass('nx:relative');
     await expect(button).toHaveClass('nx:size-10');
     await expect(button).toHaveClass('nx:p-0');
-    await expect(button).toHaveClass('nx:pointer-coarse:after:absolute');
-    await expect(button).toHaveClass('nx:pointer-coarse:after:-inset-0.5');
     await expect(button).toHaveAttribute('data-icon-only', 'true');
   },
 };

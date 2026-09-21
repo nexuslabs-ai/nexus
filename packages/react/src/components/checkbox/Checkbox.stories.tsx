@@ -114,13 +114,11 @@ export const Disabled: Story = {
   },
 };
 
-export const TouchTarget: Story = {
+export const SurfaceTokens: Story = {
   render: () => <Checkbox aria-label="Accept" />,
   play: async ({ canvasElement }) => {
     const box = canvasElement.querySelector('[data-slot="checkbox"]');
 
-    await expect(box).toHaveClass('nx:relative');
-    await expect(box).toHaveClass('nx:pointer-coarse:after:-inset-3.5');
     await expect(box).toHaveClass('nx:bg-container');
     await expect(box).toHaveClass(
       'nx:enabled:data-[state=unchecked]:hover:bg-container-hover'

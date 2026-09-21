@@ -68,11 +68,6 @@ Resolved: `BreadcrumbEllipsis` and `BreadcrumbMenuTrigger` are interactive
 `<button>` triggers composed with `DropdownMenuTrigger asChild` — no longer a
 presentational span.
 
-Decision: breadcrumb is a desktop / pointer-fine control (not used on touch or
-small screens), so the ~44px touch-target floor does not apply — segments and
-icon triggers keep their compact sizing and the touch-only hit-area overlays were
-removed (responsive.md: the touch case sets the floor).
-
 Resolved: `BreadcrumbList` is a keyboard-focusable horizontal scroll region
 (`overflow-x-auto` + `tabIndex`), so an overflowing trail — including the
 non-focusable current page — can be scrolled into reach instead of being clipped.
@@ -85,11 +80,9 @@ arbitrary value.
 
 Typography (raw, on the canonical component): base `nx:text-sm nx:font-medium` → `nx:typography-label-default`; `sm` size `nx:text-xs` → `nx:typography-label-small`. Badge uses composites, button doesn't — inconsistent.
 
-Touch target (mobile, discuss): `size="icon"` = `p-2.5` (10px) + `size-4` icon = 36px square, under ~44px floor. Add `::after` hit-area or accept as pointer-dense.
-
 Minor: `data-variant`/`data-size` omitted on default (`default`/`default`).
 
-Numeric spacing note: density-stable square hit-target on icon `p-2.5` ties into the touch-target note.
+Numeric spacing note: density-stable square hit-target on icon `p-2.5`.
 
 ## button-group
 
@@ -105,8 +98,6 @@ Typography: pervasive raw (`text-sm`, `font-medium`, `font-normal`, `text-xs`) �
 
 Numeric spacing notes: `p-3` (chrome), `gap-4` (month-grid ×2), `gap-1` (nav), `gap-1.5` (dropdown).
 
-Minor (mobile): day buttons = `--cell-size` (`--nx-spacing-8` = 32px), under ~44px. Track with the recurring touch-target batch.
-
 ## card
 
 Typography — use composites:
@@ -118,19 +109,11 @@ Discuss: `CardAction` is `absolute` top-right (not grid-reserved), so a long `Ca
 
 Numeric spacing notes: header `gap-1.5`, action `gap-2`, footer `gap-2`.
 
-## carousel
-
-Minor: controls are `size="icon"` (36px), under ~44px (recurring touch-target batch).
-
 ## chart
 
 Typography (raw, lower priority — dense data-viz): `text-xs` (root + tooltip), `font-medium` (tooltip labels) → composites. Value's `font-mono tabular-nums` is intentional, leave it.
 
 ESLint exception: file-level `eslint-disable @nexus_ds/no-render-prop-types` — recharts mandates render-prop shapes (`ChartConfig.icon`, Tooltip formatters). Composition rule permits a third-party opt-out; confirm the scope stays minimal.
-
-## checkbox
-
-Touch target (mobile, discuss): `nx:size-4` (16px) with no hit-area extension (no padding/`::after`) — far under ~44px. Consider the Sidebar `::after:-inset-2` pattern; today relies on a wired `<label>`.
 
 ## command
 
@@ -156,8 +139,6 @@ Typography — use composites:
 - DialogDescription: `nx:text-sm` → `nx:typography-body-small`
 
 Discuss (animation): canonical home of the diagonal-slide block (`slide-in-from-left-1/2` + `slide-in-from-top-[48%]`) — same drift as alert-dialog; fix both (drop directional slide, keep zoom+fade).
-
-Touch target (mobile, discuss): close button is `absolute right-4 top-4` with a bare 16px `<IconX>`, no padding → ~16px tap target, under ~44px.
 
 Numeric spacing notes: header `gap-1.5`, footer `sm:gap-2`.
 
@@ -272,15 +253,9 @@ Indeterminate mode documented but not implemented: JSDoc `@example` promises `<P
 
 ## radio-group
 
-Touch target: control is `nx:size-4` (16px) with no `::after` hit-area overlay or padding — below the ~44px tap floor. Tappable only via a paired `Label`; the radio itself isn't. Fix with a Sidebar-style `nx:after:-inset-2` overlay.
-
 No error-state wiring: no `aria-invalid:border-border-error` / `aria-invalid:focus-visible:outline-focus-error`, unlike `input.tsx`. Invalid/required group has no visual error cue. (likely shared with checkbox/switch)
 
 Numeric spacing note: `gap-2` (line 53, group spacing).
-
-## resizable
-
-Handle hit area below floor: `::after` drag target is `after:w-1` (4px) / `after:h-1` (4px horizontal) — under the ~44px touch floor; visible grip is only `h-4 w-3`. Less acute (resize is pointer-fine) but the documented floor isn't met.
 
 ## select
 
@@ -298,8 +273,6 @@ No issues.
 
 Typography (raw): Title `text-lg font-semibold leading-none tracking-tight` (290), Description `text-sm` (323) → composites.
 
-Close-button touch target: `IconX` (16px) with no padding, only `right-4 top-4` positioning → hit area ~16px, below ~44px floor. Add padding or `::after` overlay. (likely mirrors dialog.tsx)
-
 Numeric spacing notes: header `gap-1.5` (224), footer `gap-2` (258). (`sm:max-w-sm` is the sanctioned full-viewport-overlay exception — not flagged.)
 
 ## sidebar
@@ -308,8 +281,6 @@ Numeric spacing notes: header `gap-1.5` (224), footer `gap-2` (258). (`sm:max-w-
 
 Typography (raw): group-label `text-xs`/`font-medium` (660), group-content `text-sm` (729), menu-button base+sizes (787, 804–806), badge `text-xs`/`font-medium` (967), sub-button `text-xs`/`text-sm` (1134–1135) → composites. (nav-\* color tokens are correct.)
 
-Touch targets: SidebarTrigger forced to `size-7` (28px, 394), SidebarInput `h-8` (32px, 486) — under ~44px floor.
-
 Numeric spacing notes: 12, all the same blanket "nav-chrome rhythm" comment — container `p-2` (347), header `gap-2`/`p-2` (508), footer `gap-2`/`p-2` (531), content `gap-2` (594), group `p-2` (620), group-label `px-2` (659), menu `gap-1` (752), menu-button `gap-2`/`p-2` (786), badge `px-1` (966), skeleton `gap-2`/`px-2` (1013), sub `gap-1`/`px-2.5`/`py-0.5` (1056), sub-button `gap-2`/`px-2` (1131). Justification is boilerplate, not per-numeric.
 
 (Compound-ancestor selectors `[[data-side=x][data-state=y]_&]` at 430/432/433 — two attrs, same ancestor — have no `in-*` shorthand; leave. Single-attr ones already canonical `in-data-` at 429.)
@@ -317,10 +288,6 @@ Numeric spacing notes: 12, all the same blanket "nav-chrome rhythm" comment — 
 ## skeleton
 
 No issues.
-
-## slider
-
-Touch target: thumb is `nx:size-4` (16px) with no `::after` hit-area or padding — below ~44px floor. Mitigated by Radix track-click, but the thumb grab target is small.
 
 ## sonner
 
@@ -331,8 +298,6 @@ Touch target: thumb is `nx:size-4` (16px) with no `::after` hit-area or padding 
 Obsolete numeric note: default icon footprint on `nx:size-4` (37) — `size-*` was not rule-flagged, so it suppresses nothing. Remove.
 
 ## switch
-
-Touch target: Root is `nx:h-5 nx:w-9` (20×36px) with no `::after` hit-area or padding — below ~44px floor.
 
 Thumb `nx:shadow-sm` (55): components.md § "No shadow on focusable elements" lists Switch as a focusable control that should rely on border/background, not shadow elevation. Diverges from the rule — reconsider.
 
@@ -346,7 +311,7 @@ Numeric spacing notes: head `px-2`/`py-2.5` (166), cell `p-2` (192). Justified "
 
 Typography (raw): trigger base `font-medium` (74), size text `text-xs`/`text-sm`/`text-base` (106–108) → composites.
 
-Numeric spacing notes: list `p-1` (55), sm size `px-2`/`py-1` (105). sm "dense pill" renders below ~44px on touch (deliberate dense variant; default/lg use `control-*` role utilities).
+Numeric spacing notes: list `p-1` (55), sm size `px-2`/`py-1` (105).
 
 ## textarea
 
