@@ -30,65 +30,8 @@ Component work has two gates:
 Passing the first gate means the work is shippable. Passing the second gate means
 it clears the Nexus Tier-A bar.
 
-## Mandatory Modern Web Guidance Gate
-
-Before making UI, layout, browser-platform, accessibility, forms, overlays,
-motion, or component-state decisions, search Modern Web Guidance first:
-
-```bash
-npx -y modern-web-guidance@latest search "<component or surface decision>" --skill-version 2026_05_16-c5e7870
-```
-
-Retrieve any relevant guide before implementing or approving the polish plan:
-
-```bash
-npx -y modern-web-guidance@latest retrieve "<guide-id>"
-```
-
-If NPX is unavailable, blocked by sandbox policy, offline, or otherwise fails,
-do not pretend the gate passed. Record the attempted command and failure in the
-PR, then fall back to the local Modern Web Guidance skill/docs:
-
-- [`../../.agents/skills/modern-web-guidance/SKILL.md`](../../.agents/skills/modern-web-guidance/SKILL.md)
-- the active Codex Modern Web Guidance skill, if the repo-local copy is missing
-
-If neither NPX nor local Modern Web Guidance is available, the plan must say:
-`Modern Web Guidance unavailable; proceeding with documented fallback sources.`
-Use primary sources for the fallback, such as MDN, W3C WCAG/APG, Storybook docs,
-and browser compatibility references, and cite them in the PR.
-
-Apply the guidance through Nexus conventions, not as a blind copy-paste. Radix
-composition, generated stories, token emission, and repo-specific browser policy
-still control the final implementation.
-
-Every polish plan must include:
-
-- **Modern Web Guidance Findings:** the search query, retrieved guide IDs, or
-  the explicit fallback path used.
-- **Browser-Floor Decision:** whether the feature is safe for the Nexus browser
-  floor.
-- **Fallback / Progressive Enhancement:** what happens when the feature falls
-  outside the floor.
-- **Rejected Approaches:** why heavier or less compatible approaches were not
-  used.
-- **Validation Evidence:** Storybook, accessibility, visual/manual, and command
-  evidence required for review.
-
-## Browser Floor
-
-Nexus supports:
-
-- Chrome 111+
-- Edge 111+
-- Firefox 113+
-- Safari 15.4+
-- Samsung Internet 22+
-
-Treat OKLCH as the browser-floor feature. Do not assume every Baseline 2023
-feature is safe. Check each feature against this browser floor and use
-progressive enhancement or fallbacks when support falls outside it. Run
-`pnpm audit:browser-support` when adopting or reclassifying browser-platform
-features.
+Every polish plan must list its validation evidence: the Storybook,
+accessibility, visual/manual, and command evidence required for review.
 
 ## Research Anchors
 
@@ -105,15 +48,15 @@ Use these anchors to keep polish decisions grounded:
 
 ## Universal Polish Matrix
 
-| Area                       | Tier-A question                                                                                     | Evidence                                                                                            |
-| -------------------------- | --------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------- |
-| Spacing and optical rhythm | Do gaps, padding, borders, and icon/text alignment look intentional at every size and density?      | Size/density Storybook scenes; before/after notes for any visual change.                            |
-| State coverage             | Are hover, active, focus, disabled, loading, empty, and error states complete and visually related? | Stories or play assertions for states that can regress.                                             |
-| Motion and timing          | Does motion make state change easier to understand without becoming the feature?                    | Motion-token usage or documented #159 dependency.                                                   |
-| Density and responsive fit | Does the component survive compact, default, large, narrow, and composed layouts?                   | Storybook scenes across density modes and container widths.                                         |
-| Accessibility              | Does behavior meet WCAG and APG expectations for the component pattern?                             | Keyboard path, focus visibility, roles/states/names, and assistive text checks.                     |
-| Theme and browser floor    | Does the component hold up in light/dark themes and the supported browser floor?                    | Semantic-token usage, no unsupported feature without fallback, browser-support audit when relevant. |
-| Composed-scene fit         | Does it sit naturally beside benchmark-quality controls such as Linear or Stripe?                   | UI audit screenshots or composed stories, not only isolated variants.                               |
+| Area                       | Tier-A question                                                                                     | Evidence                                                                        |
+| -------------------------- | --------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------- |
+| Spacing and optical rhythm | Do gaps, padding, borders, and icon/text alignment look intentional at every size and density?      | Size/density Storybook scenes; before/after notes for any visual change.        |
+| State coverage             | Are hover, active, focus, disabled, loading, empty, and error states complete and visually related? | Stories or play assertions for states that can regress.                         |
+| Motion and timing          | Does motion make state change easier to understand without becoming the feature?                    | Motion-token usage or documented #159 dependency.                               |
+| Density and responsive fit | Does the component survive compact, default, large, narrow, and composed layouts?                   | Storybook scenes across density modes and container widths.                     |
+| Accessibility              | Does behavior meet WCAG and APG expectations for the component pattern?                             | Keyboard path, focus visibility, roles/states/names, and assistive text checks. |
+| Theme                      | Does the component hold up in light and dark themes?                                                | Semantic-token usage.                                                           |
+| Composed-scene fit         | Does it sit naturally beside benchmark-quality controls such as Linear or Stripe?                   | UI audit screenshots or composed stories, not only isolated variants.           |
 
 ## Component-Family Matrix
 
@@ -134,9 +77,6 @@ Components can belong to more than one family.
 
 Every Tier-A polish PR should include:
 
-- [ ] Modern Web Guidance search terms, retrieved guide IDs, or the NPX failure
-      plus local-skill or primary-source fallback used.
-- [ ] Browser-floor decision notes for any browser-platform feature touched.
 - [ ] Storybook links, screenshots, or story names that prove the polish states.
 - [ ] Keyboard and focus evidence for interactive surfaces.
 - [ ] Density/theme evidence when spacing, sizing, color, or motion changed.

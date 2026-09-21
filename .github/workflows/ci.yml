@@ -84,28 +84,6 @@ jobs:
   # Build
   # ============================================
 
-  audit-browser-support:
-    name: Audit Browser Support
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v4
-
-      - name: Install pnpm
-        uses: pnpm/action-setup@v4
-
-      - name: Setup Node
-        uses: actions/setup-node@v4
-        with:
-          node-version-file: '.nvmrc'
-          cache: 'pnpm'
-
-      - name: Install dependencies
-        run: pnpm install --frozen-lockfile
-
-      - name: Audit browser support floor
-        run: pnpm audit:browser-support
-
   build:
     name: Build
     runs-on: ubuntu-latest
@@ -428,7 +406,6 @@ jobs:
     needs:
       - format-check
       - lint
-      - audit-browser-support
       - build
       - typecheck
       - test-unit

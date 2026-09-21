@@ -242,6 +242,12 @@ describe('normalizeAppearanceModeIds', () => {
 });
 
 describe('sanitizeNexusAppearancePrefs', () => {
+  it("sanitizes a stored 'system' reduceMotion to 'off'", () => {
+    expect(
+      sanitizeNexusAppearancePrefs({ reduceMotion: 'system' }).reduceMotion
+    ).toBe('off');
+  });
+
   it('clamps font sizes into [8,32] and falls back per field', () => {
     expect(sanitizeNexusAppearancePrefs({ uiFontSize: 99 }).uiFontSize).toBe(
       32
