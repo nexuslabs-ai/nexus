@@ -310,6 +310,9 @@ importers:
       '@types/culori':
         specifier: ^4.0.1
         version: 4.0.1
+      postcss:
+        specifier: 8.5.15
+        version: 8.5.15
       prettier:
         specifier: ^3.7.4
         version: 3.8.3

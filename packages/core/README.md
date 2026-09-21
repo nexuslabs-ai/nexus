@@ -180,3 +180,10 @@ When multi-platform support is needed, tools like Style Dictionary can be added 
 - **Non-color** (spacing, radius, shadow, borderwidth, motion, typography): edit the DTCG token files in `tokens/` (`$value`, `$type`, `$description`).
 
 Then run `make tokens` (or `pnpm build:tailwind`) to regenerate CSS; the output is copied into the `@nexus_ds/tailwind` package.
+
+## Build-only token catalog
+
+Nexus Lab consumes the complete authored inventory and runtime registry through
+Node-only build helpers. See [Token catalog](./docs/token-catalog.md) for
+provenance, mode/alias/composite handling, production CSS parity, and development
+refresh. These helpers are not part of the published runtime exports.

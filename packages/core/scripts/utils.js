@@ -109,23 +109,32 @@ export function formatTokenValue(value, type, tokenPath) {
  * @param {object[]} result - Accumulated results
  * @returns {object[]} Array of { path, value, type, description }
  */
-export function extractTokens(obj, currentPath = [], result = []) {
+export function extractTokens(
+  obj,
+  currentPath = [],
+  result = [],
+  inheritedType = obj.$type
+) {
   for (const [key, value] of Object.entries(obj)) {
     // Skip metadata keys
     if (key.startsWith('$')) continue;
 
     if (value && typeof value === 'object') {
-      // Check if this is a token (has $value and $type)
-      if (value.$value !== undefined && value.$type !== undefined) {
+      const type = value.$type ?? inheritedType;
+      if (Object.hasOwn(value, '$value')) {
+        if (!type)
+          throw new Error(
+            `Token ${[...currentPath, key].join('.')} has $value but no $type`
+          );
         result.push({
           path: [...currentPath, key],
           value: value.$value,
-          type: value.$type,
+          type,
           description: value.$description,
         });
       } else {
         // Recurse into group
-        extractTokens(value, [...currentPath, key], result);
+        extractTokens(value, [...currentPath, key], result, type);
       }
     }
   }
@@ -169,6 +178,47 @@ export function isReference(value) {
  */
 export function extractRefPath(ref) {
   return ref.slice(1, -1);
+}
+
+/** Recursively dereference typed values, preserving every edge of a composite. */
+export function resolveTokenReferences(rawValue, lookup, sourceId = 'value') {
+  const references = [];
+  function visit(value, field, stack) {
+    if (isReference(value)) {
+      const reference = extractRefPath(value);
+      const target = lookup(reference);
+      if (!target)
+        throw new Error(
+          `Unresolved reference ${value} in ${sourceId} at ${field || '$value'}`
+        );
+      if (stack.includes(target.id))
+        throw new Error(
+          `Reference cycle: ${[...stack, target.id].join(' → ')}`
+        );
+      references.push({
+        field,
+        reference,
+        targetId: target.id,
+        source: target.file,
+        depth: stack.length,
+      });
+      return visit(target.rawValue, field, [...stack, target.id]);
+    }
+    if (Array.isArray(value))
+      return value.map((item, index) =>
+        visit(item, `${field}[${index}]`, stack)
+      );
+    if (value && typeof value === 'object') {
+      return Object.fromEntries(
+        Object.entries(value).map(([key, item]) => [
+          key,
+          visit(item, field ? `${field}.${key}` : key, stack),
+        ])
+      );
+    }
+    return value;
+  }
+  return { value: visit(rawValue, '', [sourceId]), references };
 }
 
 /**
@@ -562,6 +612,11 @@ export function getGoogleFontsImportFromTokens(typographyFilePath) {
   return generateGoogleFontsImport(fonts);
 }
 
+export const STYLE_TOKEN_FILES = {
+  typography: 'styles/typography.json',
+  shadow: 'styles/shadows.json',
+};
+
 // ============================================
 // TYPOGRAPHY UTILITIES
 // ============================================
@@ -591,7 +646,7 @@ function resolveTypographyProperty(value, primitiveMap) {
  * @returns {{ css: string, count: number }} Generated CSS and token count
  */
 export function generateTypographyUtilitiesCSS(tokensDir, primitiveMap) {
-  const typographyPath = path.join(tokensDir, 'styles/typography.json');
+  const typographyPath = path.join(tokensDir, STYLE_TOKEN_FILES.typography);
 
   if (!fs.existsSync(typographyPath)) {
     throw new Error(`Typography styles file missing: ${typographyPath}`);
@@ -609,12 +664,12 @@ export function generateTypographyUtilitiesCSS(tokensDir, primitiveMap) {
   let css = `/* Typography Utilities */\n\n`;
 
   for (const token of tokens) {
-    const name = token.path.join('-');
+    const name = pathToCssVarPrefixed(token.path, 'typography');
     const value = token.value;
 
     // Use 'typography-' prefix to avoid tailwind-merge conflicts with Tailwind's
     // text-* utilities (which are used for both color and font-size)
-    css += `@utility typography-${name} {\n`;
+    css += `@utility ${name} {\n`;
 
     if (value.fontFamily) {
       css += `  font-family: ${resolveTypographyProperty(value.fontFamily, primitiveMap)};\n`;
@@ -1626,7 +1681,7 @@ export function generateMotionUtilitiesCSS(motionTokens) {
  * Returns array of { cssName, value } for @theme block
  */
 export function collectShadowTokens(tokensDir, primitiveMap) {
-  const stylesFile = path.join(tokensDir, 'styles/shadows.json');
+  const stylesFile = path.join(tokensDir, STYLE_TOKEN_FILES.shadow);
   if (!fs.existsSync(stylesFile)) {
     throw new Error(`Shadow styles file missing: ${stylesFile}`);
   }
@@ -1643,12 +1698,12 @@ export function collectShadowTokens(tokensDir, primitiveMap) {
         for (const [subKey, subValue] of Object.entries(value)) {
           if (subKey.startsWith('$')) continue;
           if (subValue.$type === 'shadow') {
-            const shadowName = `${key}-${subKey}`;
+            const shadowName = pathToCssVarPrefixed([key, subKey], 'shadow');
             const cssValue = formatShadowComposite(
               subValue.$value,
               primitiveMap
             );
-            shadows.push({ cssName: `shadow-${shadowName}`, value: cssValue });
+            shadows.push({ cssName: shadowName, value: cssValue });
           }
         }
       }
@@ -1657,7 +1712,10 @@ export function collectShadowTokens(tokensDir, primitiveMap) {
 
     const isInset = key === 'inner';
     const cssValue = formatShadowComposite(value.$value, primitiveMap, isInset);
-    shadows.push({ cssName: `shadow-${key}`, value: cssValue });
+    shadows.push({
+      cssName: pathToCssVarPrefixed([key], 'shadow'),
+      value: cssValue,
+    });
   }
 
   return shadows;
@@ -2235,39 +2293,15 @@ export function generateBaseLayerCSS() {
 
 const SCRIPTS_DIR = path.dirname(fileURLToPath(import.meta.url));
 
-/**
- * Format every `.css` file directly inside `distDir` in place with prettier,
- * using the repo's `.prettierrc`. Resolves the config from the script's own
- * location so callers can write to a temporary dist (e.g. tests) without
- * losing config resolution.
- *
- * Only walks the top level. Throws if a subdirectory appears so a future nested
- * layout cannot silently skip files.
- */
-export async function formatDistCssFiles(distDir) {
+/** Format in-memory outputs with the same repo config used for the package. */
+export async function formatCssArtifacts(files) {
   const config = await prettier.resolveConfig(SCRIPTS_DIR);
-  const entries = fs.readdirSync(distDir, { withFileTypes: true });
-  const cssFiles = [];
-
-  for (const entry of entries) {
-    if (entry.isDirectory()) {
-      throw new Error(
-        `formatDistCssFiles: unexpected subdirectory '${entry.name}' in ${distDir}. ` +
-          `Helper assumes a flat layout; update it to walk recursively if nesting is intentional.`
-      );
-    }
-    if (entry.isFile() && entry.name.endsWith('.css')) {
-      cssFiles.push(entry.name);
-    }
-  }
-
-  for (const name of cssFiles) {
-    const filePath = path.join(distDir, name);
-    const raw = fs.readFileSync(filePath, 'utf8');
-    const formatted = await prettier.format(raw, {
+  const formatted = {};
+  for (const [name, css] of Object.entries(files)) {
+    formatted[name] = await prettier.format(css, {
       ...config,
-      filepath: filePath,
+      filepath: path.join(SCRIPTS_DIR, '../dist/tailwind', name),
     });
-    fs.writeFileSync(filePath, formatted);
   }
+  return formatted;
 }

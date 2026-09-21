@@ -2,6 +2,7 @@ import fs from 'fs';
 import path from 'path';
 import { fileURLToPath, pathToFileURL } from 'url';
 
+import { collectTokenSources, resolveTokenSources } from './token-sources.js';
 import {
   CANONICAL_SPACING_DEFAULT_MODE,
   collectBorderwidthModes,
@@ -22,7 +23,7 @@ import {
   extractTokens,
   FILES_WITH_DEDICATED_DIMENSION_COLLECTORS,
   filterDivergentDark,
-  formatDistCssFiles,
+  formatCssArtifacts,
   formatTokenValue,
   generateBaseLayerCSS,
   generateBorderColorAliasUtilitiesCSS,
@@ -50,12 +51,10 @@ import {
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const TOKENS_DIR = path.join(__dirname, '../tokens');
 const DEFAULT_DIST_DIR = path.join(__dirname, '../dist/tailwind');
-const PRIMITIVES_DIR = path.join(TOKENS_DIR, 'primitives');
-const SEMANTIC_DIR = path.join(TOKENS_DIR, 'semantic');
 const RUNTIME_DIST_ENTRY = path.join(__dirname, '../dist/runtime/index.js');
 
 async function loadDistRuntimeEngine() {
-  return import(pathToFileURL(RUNTIME_DIST_ENTRY).href);
+  return import(/* @vite-ignore */ pathToFileURL(RUNTIME_DIST_ENTRY).href);
 }
 
 /**
@@ -64,7 +63,7 @@ async function loadDistRuntimeEngine() {
  * both light and dark paths so the bundled output can emit a `.dark` override
  * block in variables.css.
  */
-function getPrimitiveFiles(discovered, config) {
+function getPrimitiveFiles(discovered, config, primitivesDir) {
   const result = {};
 
   for (const [category, info] of Object.entries(discovered)) {
@@ -72,7 +71,7 @@ function getPrimitiveFiles(discovered, config) {
       result[category] = {
         themed: false,
         mode: null,
-        filePath: path.join(PRIMITIVES_DIR, `${category}.json`),
+        filePath: path.join(primitivesDir, `${category}.json`),
       };
       continue;
     }
@@ -85,12 +84,12 @@ function getPrimitiveFiles(discovered, config) {
         themed: true,
         mode,
         lightFilePath: path.join(
-          PRIMITIVES_DIR,
+          primitivesDir,
           category,
           `${category}-${mode}-light.json`
         ),
         darkFilePath: path.join(
-          PRIMITIVES_DIR,
+          primitivesDir,
           category,
           `${category}-${mode}-dark.json`
         ),
@@ -100,7 +99,7 @@ function getPrimitiveFiles(discovered, config) {
         themed: false,
         mode,
         filePath: path.join(
-          PRIMITIVES_DIR,
+          primitivesDir,
           category,
           `${category}-${mode}.json`
         ),
@@ -334,13 +333,17 @@ function resolveCrossPrimitiveReferences(tokenList, primitiveMap) {
  * Returns light tokens (for `:root`), dark tokens (for `.dark` override block),
  * the resolved primitive map, and the chosen mode per category for logging.
  */
-function processPrimitivesWithNxPrefix(discovered, config) {
+function processPrimitivesWithNxPrefix(discovered, config, tokensDir) {
   const primitiveTokens = [];
   const darkPrimitiveTokens = [];
   const primitiveMap = new Map();
   const usedModes = {};
 
-  const primitiveFiles = getPrimitiveFiles(discovered, config);
+  const primitiveFiles = getPrimitiveFiles(
+    discovered,
+    config,
+    path.join(tokensDir, 'primitives')
+  );
   assertPrimitiveFilesExist(primitiveFiles);
 
   for (const [category, fileInfo] of Object.entries(primitiveFiles)) {
@@ -453,21 +456,17 @@ function generateNexusCSS(
   usedModes,
   spacingModes,
   spacingDefault,
-  runtimeModes
+  runtimeModes,
+  tokensDir
 ) {
+  const semanticDir = path.join(tokensDir, 'semantic');
   // Get Google Fonts import
   const typographyMode = usedModes.typography || 'default';
   const typographyFilePath = path.join(
-    TOKENS_DIR,
+    tokensDir,
     `primitives/typography/typography-${typographyMode}.json`
   );
   const googleFontsImport = getGoogleFontsImportFromTokens(typographyFilePath);
-
-  if (googleFontsImport) {
-    log.success(
-      `Generated Google Fonts import for typography mode: ${typographyMode}`
-    );
-  }
 
   // Semantic colors are engine-owned in the Tailwind bundle. Dimension tokens
   // (e.g. focus.offset) still come from semantic JSON and emit at :root, not
@@ -479,7 +478,7 @@ function generateNexusCSS(
   for (const standaloneFile of semanticFiles.standalone) {
     if (!FILES_WITH_DEDICATED_DIMENSION_COLLECTORS.has(standaloneFile)) {
       dimensionTokens.push(
-        ...collectSemanticDimensionTokens(SEMANTIC_DIR, standaloneFile)
+        ...collectSemanticDimensionTokens(semanticDir, standaloneFile)
       );
     }
   }
@@ -494,17 +493,17 @@ function generateNexusCSS(
   );
 
   const radiusMode = usedModes.radius || DEFAULT_CONFIG.radius;
-  const radiusTokens = collectRadiusTokens(TOKENS_DIR, radiusMode);
+  const radiusTokens = collectRadiusTokens(tokensDir, radiusMode);
   const borderwidthMode = usedModes.borderwidth || DEFAULT_CONFIG.borderwidth;
   const borderwidthTokens = collectBorderwidthTokens(
-    TOKENS_DIR,
+    tokensDir,
     borderwidthMode
   );
   const motionMode = usedModes.motion || 'snappy';
-  const motionTokens = collectMotionTokens(TOKENS_DIR, motionMode);
-  const shadowTokens = collectShadowTokens(TOKENS_DIR, primitiveMap);
-  const zIndexTokens = collectZIndexTokens(SEMANTIC_DIR);
-  const breakpointTokens = collectBreakpointsTokens(SEMANTIC_DIR);
+  const motionTokens = collectMotionTokens(tokensDir, motionMode);
+  const shadowTokens = collectShadowTokens(tokensDir, primitiveMap);
+  const zIndexTokens = collectZIndexTokens(semanticDir);
+  const breakpointTokens = collectBreakpointsTokens(semanticDir);
 
   // Generate header
   const header = `/* ===== NEXUS DESIGN SYSTEM - TAILWIND THEME ===== */
@@ -583,26 +582,28 @@ function generateNexusCSS(
 }
 
 /**
- * Main generation function. Exported so tests can run it against a temp
- * `distDir` without overwriting the committed bundle in `dist/tailwind`.
+ * Generate the production package in memory for the writer and catalog.
+ * A tokensDir override supports isolated source fixtures without repository writes.
  */
-export async function generateTailwindPackage(
-  config,
-  { distDir = DEFAULT_DIST_DIR, engine } = {}
+export async function generateTailwindArtifacts(
+  config = DEFAULT_CONFIG,
+  { tokensDir = TOKENS_DIR, engine } = {}
 ) {
   const tokenEngine = assertTokenEngine(
     engine ?? (await loadDistRuntimeEngine())
   );
-  ensureDir(distDir);
+  const primitivesDir = path.join(tokensDir, 'primitives');
+  const semanticDir = path.join(tokensDir, 'semantic');
+  const sources = collectTokenSources(tokensDir);
+  const resolvedSources = resolveTokenSources(sources, config);
+  const files = {};
 
   const writeDistFile = (fileName, content) => {
-    const filePath = path.join(distDir, fileName);
-    fs.writeFileSync(filePath, content);
-    log.file(fileName);
+    files[fileName] = content;
   };
 
-  const discoveredPrimitives = discoverPrimitives(PRIMITIVES_DIR);
-  const discoveredSemantics = discoverSemantics(SEMANTIC_DIR);
+  const discoveredPrimitives = discoverPrimitives(primitivesDir);
+  const discoveredSemantics = discoverSemantics(semanticDir);
   const semanticFiles = getSemanticSupportFiles(discoveredSemantics);
   const { baseTone, lightSemanticTokens, darkSemanticTokens } =
     deriveEngineSemanticTokens(config, tokenEngine);
@@ -612,17 +613,7 @@ export async function generateTailwindPackage(
     darkTokens: darkPrimitiveTokens,
     primitiveMap,
     usedModes,
-  } = processPrimitivesWithNxPrefix(discoveredPrimitives, config);
-
-  console.log('');
-  console.log(`📦 Theme Configuration:`);
-  for (const [category, mode] of Object.entries(usedModes)) {
-    if (mode) {
-      console.log(`   ${category}: ${mode}`);
-    }
-  }
-  console.log(`   base: ${baseTone}`);
-  console.log('');
+  } = processPrimitivesWithNxPrefix(discoveredPrimitives, config, tokensDir);
 
   const divergentDark = filterDivergentDark(
     primitiveTokens,
@@ -635,10 +626,9 @@ export async function generateTailwindPackage(
   );
   writeDistFile('variables.css', variablesCSS);
 
-  const typography = generateTypographyUtilitiesCSS(TOKENS_DIR, primitiveMap);
+  const typography = generateTypographyUtilitiesCSS(tokensDir, primitiveMap);
   if (typography.css) {
     writeDistFile('typography-utilities.css', typography.css);
-    log.success(`Generated ${typography.count} typography utilities`);
   }
 
   const borderwidthTokens = primitiveTokens.filter(
@@ -647,38 +637,32 @@ export async function generateTailwindPackage(
   const borderWidth = generateBorderWidthUtilitiesCSS(borderwidthTokens);
   if (borderWidth.css) {
     writeDistFile('borderwidth-utilities.css', borderWidth.css);
-    log.success(`Generated ${borderWidth.count} border width utilities`);
   }
 
   const borderColorAliases =
     generateBorderColorAliasUtilitiesCSS(lightSemanticTokens);
   if (borderColorAliases.css) {
     writeDistFile('border-color-aliases.css', borderColorAliases.css);
-    log.success(
-      `Generated ${borderColorAliases.count} border color alias utilities`
-    );
   }
 
   // Spacing role utilities — data-driven from default role tokens. Numeric
   // spacing flows through @theme in generateNexusCSS; role tokens get
   // dedicated @utility declarations that read the per-mode --nx-control-*,
   // --nx-container-*, --nx-layout-* variables.
-  const spacingModes = collectSpacingTokens(SEMANTIC_DIR);
+  const spacingModes = collectSpacingTokens(semanticDir);
   const { role: defaultSpacingRole } = splitSpacingTokens(
     spacingModes[CANONICAL_SPACING_DEFAULT_MODE]
   );
   const spacingUtilities = generateSpacingRoleUtilitiesCSS(defaultSpacingRole);
   if (spacingUtilities.css) {
     writeDistFile('spacing-utilities.css', spacingUtilities.css);
-    log.success(`Generated ${spacingUtilities.count} spacing role utilities`);
   }
 
   const motionUtilities = generateMotionUtilitiesCSS(
-    collectMotionTokens(TOKENS_DIR, usedModes.motion || 'snappy')
+    collectMotionTokens(tokensDir, usedModes.motion || 'snappy')
   );
   if (motionUtilities.css) {
     writeDistFile('motion-utilities.css', motionUtilities.css);
-    log.success(`Generated ${motionUtilities.count} motion duration utilities`);
   }
 
   // `spacingDefault` controls which mode lands under `:root, [data-density="X"]`.
@@ -687,9 +671,9 @@ export async function generateTailwindPackage(
   const spacingDefault =
     config.spacingDefault || CANONICAL_SPACING_DEFAULT_MODE;
   const runtimeModes = {
-    radiusModes: collectRadiusModes(TOKENS_DIR),
-    shadowModes: collectShadowModes(TOKENS_DIR),
-    borderwidthModes: collectBorderwidthModes(TOKENS_DIR),
+    radiusModes: collectRadiusModes(tokensDir),
+    shadowModes: collectShadowModes(tokensDir),
+    borderwidthModes: collectBorderwidthModes(tokensDir),
   };
   const nexusCSS = generateNexusCSS(
     semanticFiles,
@@ -699,24 +683,31 @@ export async function generateTailwindPackage(
     usedModes,
     spacingModes,
     spacingDefault,
-    runtimeModes
+    runtimeModes,
+    tokensDir
   );
   writeDistFile('nexus.css', nexusCSS);
 
-  await formatDistCssFiles(distDir);
+  return {
+    files: await formatCssArtifacts(files),
+    usedModes,
+    sources: resolvedSources,
+    baseTone,
+  };
+}
 
-  console.log('');
-  console.log(`📊 Summary:`);
-  console.log(
-    `   Primitives: ${primitiveTokens.length} tokens (with --nx-* prefix)`
-  );
-  if (divergentDark.length > 0) {
-    console.log(`   Dark overrides: ${divergentDark.length} tokens`);
+/** Write exactly the artifacts used by the build-only catalog. */
+export async function generateTailwindPackage(
+  config,
+  { distDir = DEFAULT_DIST_DIR, ...options } = {}
+) {
+  const result = await generateTailwindArtifacts(config, options);
+  ensureDir(distDir);
+  for (const [name, css] of Object.entries(result.files)) {
+    fs.writeFileSync(path.join(distDir, name), css);
+    log.file(name);
   }
-  console.log(`   Engine semantic colors: ${lightSemanticTokens.length}`);
-  console.log(`   Typography utilities: ${typography.count}`);
-  console.log(`   Border width utilities: ${borderWidth.count}`);
-  console.log(`   Output: ${distDir}`);
+  return result;
 }
 
 if (process.argv[1] === fileURLToPath(import.meta.url)) {

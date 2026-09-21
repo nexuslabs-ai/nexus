@@ -850,7 +850,7 @@ describe('utils', () => {
       const css = generateSpacingModesCSS(modes);
       // generateSpacingModesCSS returns a raw string with double-quoted
       // attribute selectors; prettier rewrites to single quotes only after
-      // formatDistCssFiles runs. Match the raw form here.
+      // formatCssArtifacts runs. Match the raw form here.
       const comfortableIdx = css.indexOf('[data-density="comfortable"]');
       const tightIdx = css.indexOf('[data-density="tight"]');
       expect(comfortableIdx).toBeGreaterThan(-1);
