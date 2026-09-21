@@ -250,7 +250,7 @@ export default tseslint.config(
 
   // Only demo-index.test.ts may reach __generated__ through the module graph.
   {
-    files: ['apps/docs/scripts/**/*.test.{js,ts}'],
+    files: ['apps/docs/scripts/**/*.{js,mjs,ts}'],
     ignores: ['apps/docs/scripts/demo-index.test.ts'],
     rules: {
       'no-restricted-syntax': [

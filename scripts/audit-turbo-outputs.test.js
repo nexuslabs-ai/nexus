@@ -16,12 +16,15 @@ afterEach(() => {
   }
 });
 
-function task(taskId, { command = 'build', outputs = [], directory } = {}) {
+function task(
+  taskId,
+  { command = 'build', outputs = [], directory, cache = true } = {}
+) {
   return {
     taskId,
     command,
     directory: directory ?? taskId.split('#')[0],
-    resolvedTaskDefinition: { outputs },
+    resolvedTaskDefinition: { outputs, cache },
   };
 }
 
@@ -74,7 +77,7 @@ describe('auditTurboOutputs', () => {
     expect(result.problems).toEqual([]);
   });
 
-  it('flags a package that has a build script but no outputs', () => {
+  it('flags a task that runs a script but declares no outputs', () => {
     const result = auditTurboOutputs({
       tasks: [task('@nexus_ds/future#build')],
     });
@@ -83,6 +86,25 @@ describe('auditTurboOutputs', () => {
     expect(result.problems).toMatchObject([
       { code: 'missing-outputs', task: '@nexus_ds/future#build' },
     ]);
+  });
+
+  it('tells a cached task what the cache would restore', () => {
+    const result = auditTurboOutputs({
+      tasks: [task('@nexus_ds/future#build')],
+    });
+
+    expect(result.problems[0].message).toContain(
+      'A cache hit would restore nothing.'
+    );
+  });
+
+  it('drops the cache clause for an uncached task', () => {
+    const result = auditTurboOutputs({
+      tasks: [task('@nexus_ds/docs#generate:demos', { cache: false })],
+    });
+
+    expect(result.problems[0].message).toContain('responsible for emitting.');
+    expect(result.problems[0].message).not.toContain('cache');
   });
 
   it('exempts packages with no build script', () => {
@@ -153,6 +175,30 @@ describe('auditEmittedOutputs', () => {
     expect(result.problems).toMatchObject([
       { code: 'unmatched-outputs', task: '@nexus_ds/test-utils#build' },
     ]);
+    expect(result.problems[0].message).toContain(
+      'A cache hit would restore an empty artifact.'
+    );
+  });
+
+  it('drops the cache clause for an uncached task', () => {
+    const repoRoot = makeRepo({ 'apps/docs/package.json': '{}\n' });
+
+    const result = auditEmittedOutputs({
+      repoRoot,
+      tasks: [
+        task('@nexus_ds/docs#generate:demos', {
+          cache: false,
+          command: 'generate:demos',
+          directory: 'apps/docs',
+          outputs: ['__generated__/**'],
+        }),
+      ],
+    });
+
+    expect(result.problems[0].message).toContain(
+      'emitted no files under `apps/docs/__generated__`.'
+    );
+    expect(result.problems[0].message).not.toContain('cache');
   });
 
   it('flags an output tree that holds only empty directories', () => {

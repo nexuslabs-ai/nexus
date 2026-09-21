@@ -25,9 +25,10 @@ export function auditTurboOutputs(options = {}) {
       code: 'missing-outputs',
       task: task.taskId,
       message:
-        task.resolvedTaskDefinition?.cache === false
-          ? 'Task declares no `outputs`, so nothing states which files it is responsible for emitting. Add an `outputs` array to the package turbo.json.'
-          : 'Package has a `build` script but declares no `outputs`. A cache hit would restore nothing. Add an `outputs` array to the package turbo.json.',
+        'Task declares no `outputs`, so nothing states which files it is ' +
+        'responsible for emitting.' +
+        cacheClause(task, ' A cache hit would restore nothing.') +
+        ' Add an `outputs` array to the package turbo.json.',
     });
   }
 
@@ -68,14 +69,18 @@ export function auditEmittedOutputs(options = {}) {
         code: 'unmatched-outputs',
         task: task.taskId,
         message:
-          `Declared output \`${glob}\` emitted no files under \`${checked}\`. ` +
-          `A cache hit would restore an empty artifact. Fix the glob in ` +
-          `${directory}/turbo.json.`,
+          `Declared output \`${glob}\` emitted no files under \`${checked}\`.` +
+          cacheClause(task, ' A cache hit would restore an empty artifact.') +
+          ` Fix the glob in ${directory}/turbo.json.`,
       });
     }
   }
 
   return { ok: problems.length === 0, problems };
+}
+
+function cacheClause(task, clause) {
+  return task.resolvedTaskDefinition?.cache === false ? '' : clause;
 }
 
 function literalPrefix(glob) {
