@@ -73,7 +73,7 @@ A single `*.stories.tsx` file does four jobs at once:
 3. **Behavior tests** — `play` functions run as real assertions under Vitest's storybook project (real Chromium via Playwright).
 4. **Accessibility assertions** — addon-a11y runs axe-core against every story with `test: 'error'`, so any violation fails the test.
 
-You don't write a separate `*.test.tsx` for a component. That's not a stylistic preference — the `unit` project's `include` list in `vitest.config.ts` is one glob per row of `.claude/rules/testing.md` § Scope, and a component test file matches none of them.
+You don't write a separate `*.test.tsx` for a component. That's not a stylistic preference — the `unit` project's `include` list in `vitest.config.ts` is one glob per non-story row of `.claude/rules/testing.md` § Scope (the stories row belongs to the `storybook` project), and a component test file matches none of them.
 
 Outside stories, only three kinds of unit test exist, all under Vitest's `unit` project (jsdom): the core engine's behaviour (`packages/core/src/lib`), the Nexus `cn` merge (`packages/react/src/lib/utils.test.ts`), and the ESLint plugin's rules (`packages/eslint-plugin-nexus/__tests__`). Apps, repo scripts, and hooks have no tests of their own, and nothing uses snapshots.
 
@@ -229,7 +229,7 @@ describe('cn', () => {
 
 - **No `*.test.tsx` for components** — the `unit` project doesn't collect them; move the assertion into a story's `play` function.
 - **No snapshot tests** — no `toMatchSnapshot` / `toMatchInlineSnapshot` and no frozen output fixtures. Assert the property that matters (a contrast floor, a merge result), not the exact output.
-- **No tests for apps, repo scripts, or hooks** — the audits in `scripts/` run in CI as scripts; hooks are covered by the stories of the components that use them.
+- **No tests for apps, repo scripts, or hooks** — the audits CI runs prove themselves by running, and the rest (`scripts/export.mjs` among them) are reviewed, not gated; hooks are covered by the stories of the components that use them.
 - **Don't assert on Tailwind class names** — they change as variants are restyled. Use `data-*`, ARIA attributes, or accessible queries (`getByRole`, `getByLabelText`).
 - **No play functions for** visual appearance, computed CSS / pixel measurements, `:hover` snapshots, or animation timing.
 

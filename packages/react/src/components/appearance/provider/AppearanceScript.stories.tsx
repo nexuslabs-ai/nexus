@@ -1,7 +1,7 @@
 import type { Meta, StoryObj } from '@storybook/react';
 import { expect } from 'storybook/test';
 
-import { createNexusAppearanceScript, NexusAppearanceScript } from './script';
+import { createNexusAppearanceScript, NexusAppearanceScript } from './server';
 
 // The component renders nothing a user can see: it emits the inline first-paint
 // `<script>` a consumer puts in their server-rendered document head. The stories
@@ -15,19 +15,20 @@ const meta: Meta<typeof NexusAppearanceScript> = {
 export default meta;
 type Story = StoryObj<typeof NexusAppearanceScript>;
 
-function bootstrapScriptIn(canvasElement: HTMLElement) {
-  return canvasElement.querySelector<HTMLScriptElement>(
+function bootstrapScriptIn(root: ParentNode) {
+  const script = root.querySelector<HTMLScriptElement>(
     'script[data-nexus-appearance-script]'
   );
+  if (!script) throw new Error('Missing the appearance bootstrap script');
+  return script;
 }
 
 export const Default: Story = {
   play: async ({ canvasElement }) => {
     const script = bootstrapScriptIn(canvasElement);
 
-    await expect(script).not.toBeNull();
-    await expect(script!.nonce).toBe('');
-    await expect(script!.textContent).toContain('data-nexus-appearance-theme');
+    await expect(script.nonce).toBe('');
+    await expect(script.textContent).toContain('data-nexus-appearance-theme');
   },
 };
 
@@ -36,8 +37,7 @@ export const WithNonce: Story = {
   play: async ({ canvasElement, args }) => {
     const script = bootstrapScriptIn(canvasElement);
 
-    await expect(script).not.toBeNull();
-    await expect(script!.nonce).toBe(args.nonce);
+    await expect(script.nonce).toBe(args.nonce);
   },
 };
 
@@ -50,8 +50,7 @@ export const FromFactory: Story = {
   play: async ({ canvasElement }) => {
     const script = bootstrapScriptIn(canvasElement);
 
-    await expect(script).not.toBeNull();
-    await expect(script!.nonce).toBe('nexus-factory-nonce');
-    await expect(script!.textContent).toContain('data-nexus-appearance-theme');
+    await expect(script.nonce).toBe('nexus-factory-nonce');
+    await expect(script.textContent).toContain('data-nexus-appearance-theme');
   },
 };
