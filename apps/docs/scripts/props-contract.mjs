@@ -9,7 +9,7 @@ import path from 'node:path';
 
 import ts from 'typescript';
 
-import { repoRoot } from './react-entry-points.mjs';
+import { repoRoot } from './roots.mjs';
 
 export function toRepoPath(absolutePath) {
   return path.relative(repoRoot, absolutePath).split(path.sep).join('/');

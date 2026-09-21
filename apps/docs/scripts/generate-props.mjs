@@ -6,7 +6,6 @@ import {
   writeFileSync,
 } from 'node:fs';
 import path from 'node:path';
-import { fileURLToPath } from 'node:url';
 
 import docgen from 'react-docgen-typescript';
 import ts from 'typescript';
@@ -24,16 +23,9 @@ import {
   toRepoPath,
   toSlugFolder,
 } from './props-contract.mjs';
-import {
-  reactEntryPoints,
-  reactRoot,
-  repoRoot,
-} from './react-entry-points.mjs';
+import { reactEntryPoints } from './react-entry-points.mjs';
+import { docsRoot, reactRoot, repoRoot } from './roots.mjs';
 
-const docsRoot = path.resolve(
-  path.dirname(fileURLToPath(import.meta.url)),
-  '..'
-);
 const reactSrc = path.join(reactRoot, 'src');
 const componentsRoot = path.join(reactSrc, 'components');
 const reactTsconfig = path.join(reactRoot, 'tsconfig.json');
@@ -195,7 +187,6 @@ function clearPreviousOutput() {
     if (!wasGeneratedHere(fileName)) continue;
     rmSync(path.join(outputDir, fileName), { force: true });
   }
-  rmSync(path.join(outputDir, indexFile), { force: true });
 }
 
 const slugs = readdirSync(componentsRoot, { withFileTypes: true })

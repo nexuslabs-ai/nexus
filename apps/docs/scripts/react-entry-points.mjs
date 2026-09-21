@@ -1,14 +1,7 @@
 import { readFileSync } from 'node:fs';
 import path from 'node:path';
-import { fileURLToPath } from 'node:url';
 
-const docsRoot = path.resolve(
-  path.dirname(fileURLToPath(import.meta.url)),
-  '..'
-);
-
-export const repoRoot = path.resolve(docsRoot, '..', '..');
-export const reactRoot = path.join(repoRoot, 'packages', 'react');
+import { reactRoot } from './roots.mjs';
 
 const CODE_EXTENSIONS = new Set([
   '.cjs',
@@ -48,14 +41,23 @@ const CONDITION_PRIORITY = ['import', 'module', 'require', 'node', 'default'];
 /**
  * The declarations for a subpath: a `types` condition at the top of its object,
  * or inside a nested one (`{ import: { types, default } }`). A manifest can
- * spell `types` under more than one condition, so the nested ones are walked in
- * a fixed order rather than whichever the object happens to list first.
+ * spell `types` under more than one condition, so the named ones are walked in
+ * a fixed order rather than whichever the object happens to list first. The
+ * rest follow in declaration order, so a condition this list does not name —
+ * `browser`, `react-server`, or an array fallback's elements — still resolves,
+ * matching the keys `targetFiles` reads to call the subpath code in the first
+ * place.
  */
 function typesCondition(target) {
   if (target === null || typeof target !== 'object') return null;
   if (typeof target.types === 'string') return target.types;
 
-  for (const condition of CONDITION_PRIORITY) {
+  const named = CONDITION_PRIORITY.filter((condition) => condition in target);
+  const rest = Object.keys(target).filter(
+    (key) => !CONDITION_PRIORITY.includes(key)
+  );
+
+  for (const condition of [...named, ...rest]) {
     const nested = typesCondition(target[condition]);
     if (nested) return nested;
   }

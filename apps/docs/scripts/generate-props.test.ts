@@ -10,7 +10,6 @@ import {
 } from 'node:fs';
 import { tmpdir } from 'node:os';
 import path from 'node:path';
-import { fileURLToPath } from 'node:url';
 import ts from 'typescript';
 import { afterAll, describe, expect, it } from 'vitest';
 
@@ -29,13 +28,9 @@ import {
 import {
   entryPointsFromManifest,
   reactEntryPoints,
-  reactRoot,
 } from './react-entry-points.mjs';
+import { docsRoot, reactRoot } from './roots.mjs';
 
-const docsRoot = path.resolve(
-  path.dirname(fileURLToPath(import.meta.url)),
-  '..'
-);
 const generatedDir = path.join(docsRoot, 'generated', 'props');
 const reactSrc = path.join(reactRoot, 'src');
 const componentsRoot = path.join(reactSrc, 'components');
@@ -271,6 +266,13 @@ describe('component export predicates', () => {
     }
   );
 
+  it('declines a symbol carrying no declaration to read a type from', () => {
+    // `publicComponents` derefs `symbol.declarations[0]` on everything this
+    // admits. Passing no checker proves the guard answers before one is used.
+    expect(isRenderable(null, { declarations: undefined })).toBe(false);
+    expect(isRenderable(null, { declarations: [] })).toBe(false);
+  });
+
   it(
     'takes the components off the export surface, not every export',
     { timeout: 120_000 },
@@ -450,19 +452,46 @@ describe('react entry points', () => {
   });
 
   it('reads types by condition priority, not by the order they are listed', () => {
+    const priority = ['import', 'module', 'require', 'node', 'default'];
+
+    // Each manifest declares its conditions in reverse priority order, so only
+    // the priority walk can pick the expected winner — listing order would
+    // always yield the last entry instead. Dropping one rung from the list
+    // fails the round that starts at it.
+    for (let i = 0; i < priority.length; i += 1) {
+      const remaining = priority.slice(i);
+      const target = Object.fromEntries(
+        [...remaining].reverse().map((condition) => [
+          condition,
+          {
+            types: `./dist/${condition}.d.ts`,
+            default: `./dist/${condition}.mjs`,
+          },
+        ])
+      );
+
+      const entries = entryPointsFromManifest({ exports: { '.': target } });
+
+      expect(entries.map(relative)).toEqual([`src/${remaining[0]}.ts`]);
+    }
+  });
+
+  it('reads types under a condition the priority list does not name', () => {
     const entries = entryPointsFromManifest({
       exports: {
-        '.': {
-          require: {
-            types: './dist/index.cjs.d.ts',
-            default: './dist/index.js',
+        './browser-only': {
+          browser: {
+            types: './dist/browser.d.ts',
+            default: './dist/browser.mjs',
           },
-          import: { types: './dist/index.d.ts', default: './dist/index.mjs' },
         },
+        './array-fallback': [
+          { types: './dist/array.d.ts', default: './dist/array.mjs' },
+        ],
       },
     });
 
-    expect(entries.map(relative)).toEqual(['src/index.ts']);
+    expect(entries.map(relative)).toEqual(['src/array.ts', 'src/browser.ts']);
   });
 
   it('refuses a code subpath that declares no types', () => {
