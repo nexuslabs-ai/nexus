@@ -86,13 +86,6 @@ describe('auditTurboOutputs', () => {
     expect(result.problems).toMatchObject([
       { code: 'missing-outputs', task: '@nexus_ds/future#build' },
     ]);
-  });
-
-  it('tells a cached task what the cache would restore', () => {
-    const result = auditTurboOutputs({
-      tasks: [task('@nexus_ds/future#build')],
-    });
-
     expect(result.problems[0].message).toBe(
       'Task declares no `outputs`, so nothing states which files it is ' +
         'responsible for emitting. A cache hit would restore nothing. Add an ' +
