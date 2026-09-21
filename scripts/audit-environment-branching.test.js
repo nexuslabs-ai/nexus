@@ -8,84 +8,92 @@ const BANNED_BRANCHES = [
   {
     label: 'forced-colors',
     pattern: /forced-colors/,
-    sample: '@media (forced-colors: active)',
+    samples: ['@media (forced-colors: active)'],
   },
   {
     label: '@supports',
     pattern: /@supports\b/,
-    sample: '@supports not (selector(:has(*)))',
+    samples: ['@supports not (selector(:has(*)))'],
   },
   {
     label: 'supports variant',
     pattern: /\bsupports-/,
-    sample: '@variant not-supports-[backdrop-filter] {',
+    samples: [
+      'nx:not-supports-[backdrop-filter]:bg-popover',
+      '@variant not-supports-[backdrop-filter] {',
+    ],
   },
   {
     label: 'CSS.supports()',
     pattern: /\bCSS\.supports\s*\(/,
-    sample: "CSS.supports('selector(:has(*))')",
+    samples: ["CSS.supports('selector(:has(*))')"],
   },
   {
     label: 'prefers-reduced-*',
     pattern: /prefers-reduced-/,
-    sample: '@media (prefers-reduced-motion: reduce)',
+    samples: ['@media (prefers-reduced-motion: reduce)'],
   },
   {
     label: 'prefers-contrast',
     pattern: /prefers-contrast/,
-    sample: '@media (prefers-contrast: more)',
+    samples: ['@media (prefers-contrast: more)'],
   },
   {
     label: 'contrast variant',
     pattern: /\bcontrast-(?:more|less)\b/,
-    sample: '@variant contrast-more {',
+    samples: [
+      'nx:contrast-more:border-border-default',
+      '@variant contrast-more {',
+    ],
   },
   {
     label: 'inverted-colors',
     pattern: /inverted-colors/,
-    sample: 'nx:inverted-colors:shadow-none',
+    samples: ['nx:inverted-colors:shadow-none'],
   },
   {
     label: 'motion variant',
     pattern: /\bmotion-(?:reduce|safe)\b/,
-    sample: '@variant motion-reduce {',
+    samples: ['nx:motion-reduce:transition-none', '@variant motion-reduce {'],
   },
   {
     label: 'reduce-transparency variant',
     pattern: /\breduce-transparency\b/,
-    sample: 'nx:reduce-transparency:bg-popover',
+    samples: ['nx:reduce-transparency:bg-popover'],
   },
   {
     label: 'pointer variant',
     pattern: /\b(?:any-)?pointer-(?:coarse|fine|none)\b/,
-    sample: '@variant pointer-coarse {',
+    samples: ['nx:pointer-coarse:after:-inset-2', '@variant pointer-coarse {'],
   },
   {
     label: 'pointer media query',
     pattern: /\((?:any-)?pointer\s*:/,
-    sample: 'nx:[@media(pointer:fine)]:hidden',
+    samples: ['nx:[@media(pointer:fine)]:hidden'],
   },
   {
     label: 'hover media query',
     pattern: /\((?:any-)?hover\s*:/,
-    sample: 'nx:[@media(any-hover:hover)]:underline',
+    samples: ['nx:[@media(any-hover:hover)]:underline'],
   },
   {
     label: 'boolean hover or pointer media query',
     pattern: /(?:@media[^{\]]*|['"])\((?:any-)?(?:hover|pointer)\s*\)/,
-    sample: 'nx:[@media(hover)]:underline',
+    samples: ['nx:[@media(hover)]:underline', "matchMedia('(pointer)')"],
   },
   {
     label: 'user-agent sniffing',
     pattern: /navigator\.(?:userAgent|platform)\b|\buserAgentData\b/,
-    sample: 'navigator.userAgent',
+    samples: ['navigator.userAgent'],
   },
 ];
 
 describe('environment branching', () => {
-  it('each banned pattern matches its sample', () => {
-    for (const { label, pattern, sample } of BANNED_BRANCHES) {
-      expect(pattern.test(sample), label).toBe(true);
+  it('each banned pattern matches its samples', () => {
+    for (const { label, pattern, samples } of BANNED_BRANCHES) {
+      for (const sample of samples) {
+        expect(pattern.test(sample), `${label}: ${sample}`).toBe(true);
+      }
     }
   });
 
