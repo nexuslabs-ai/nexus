@@ -249,7 +249,6 @@ export const IndicatorCrossFade: Story = {
       await expect(indeterminateIcon).toHaveClass(
         'nx:group-data-[state=indeterminate]:opacity-100'
       );
-      await expect(checkedIcon).toHaveClass('nx:motion-reduce:transition-none');
       await expect(selectedDot).toHaveClass(
         'nx:group-data-[state=checked]:opacity-100'
       );

@@ -26,7 +26,7 @@ export interface NexusAppearancePrefs {
   codeFont: string;
   uiFontSize: number;
   codeFontSize: number;
-  reduceMotion: 'system' | 'on' | 'off';
+  reduceMotion: 'on' | 'off';
   pointerCursors: boolean;
   fontSmoothing: boolean;
 }
@@ -130,7 +130,7 @@ export const DEFAULT_NEXUS_APPEARANCE: NexusAppearanceState = {
     codeFont: 'ui-monospace, "SF Mono", Menlo, monospace',
     uiFontSize: 14,
     codeFontSize: 12,
-    reduceMotion: 'system',
+    reduceMotion: 'off',
     pointerCursors: false,
     fontSmoothing: true,
   },
@@ -192,7 +192,6 @@ const STROKES = new Set<NexusStroke>(
   STROKE_OPTIONS.map((option) => option.value)
 );
 const REDUCE_MOTION = new Set<NexusAppearancePrefs['reduceMotion']>([
-  'system',
   'on',
   'off',
 ]);

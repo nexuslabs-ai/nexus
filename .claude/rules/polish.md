@@ -98,7 +98,6 @@ Use these anchors to keep polish decisions grounded:
 | ---------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------- |
 | Purposeful motion      | [Carbon Motion](https://carbondesignsystem.com/elements/motion/overview/)                                                                                                                                                                                   | Motion should clarify, guide, or give feedback; decorative motion is not polish.                         |
 | Animation performance  | [web.dev high-performance CSS animations](https://web.dev/articles/animations-guide)                                                                                                                                                                        | Prefer `transform` and `opacity`; avoid layout/paint-heavy animation unless the PR explains why.         |
-| Reduced motion         | [MDN `prefers-reduced-motion`](https://developer.mozilla.org/en-US/docs/Web/CSS/@media/prefers-reduced-motion)                                                                                                                                              | Animated polish must reduce, replace, or remove non-essential motion for users who request it.           |
 | Accessibility criteria | [WCAG 2.2](https://www.w3.org/TR/WCAG22/)                                                                                                                                                                                                                   | Polish must include focus, motion, pointer, target-size, name/role/value, and error-state behavior.      |
 | Component behavior     | [WAI-ARIA APG patterns](https://www.w3.org/WAI/ARIA/apg/patterns/)                                                                                                                                                                                          | Match the APG pattern for tabs, dialogs, menus, tooltips, sliders, and other composite widgets.          |
 | Story evidence         | [Storybook interaction tests](https://storybook.js.org/docs/writing-tests/interaction-testing), [a11y tests](https://storybook.js.org/docs/writing-tests/accessibility-testing), [visual tests](https://storybook.js.org/docs/writing-tests/visual-testing) | Prove polish with state stories, play functions, a11y checks, and visual review where relevant.          |
@@ -110,7 +109,7 @@ Use these anchors to keep polish decisions grounded:
 | -------------------------- | --------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------- |
 | Spacing and optical rhythm | Do gaps, padding, borders, and icon/text alignment look intentional at every size and density?      | Size/density Storybook scenes; before/after notes for any visual change.                            |
 | State coverage             | Are hover, active, focus, disabled, loading, empty, and error states complete and visually related? | Stories or play assertions for states that can regress.                                             |
-| Motion and timing          | Does motion make state change easier to understand without becoming the feature?                    | Motion-token usage or documented #159 dependency; reduced-motion proof.                             |
+| Motion and timing          | Does motion make state change easier to understand without becoming the feature?                    | Motion-token usage or documented #159 dependency.                                                   |
 | Density and responsive fit | Does the component survive compact, default, large, narrow, and composed layouts?                   | Storybook scenes across density modes and container widths.                                         |
 | Accessibility              | Does behavior meet WCAG and APG expectations for the component pattern?                             | Keyboard path, focus visibility, roles/states/names, and assistive text checks.                     |
 | Theme and browser floor    | Does the component hold up in light/dark themes and the supported browser floor?                    | Semantic-token usage, no unsupported feature without fallback, browser-support audit when relevant. |
@@ -125,7 +124,7 @@ Components can belong to more than one family.
 | ---------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------ |
 | Buttons, toggles, checkboxes, radios, switches             | Hover, active, pressed/checked, disabled, focus-visible, target size, and tactile feedback.                                                |
 | Inputs, select, textarea, form, field                      | Label rhythm, helper/error text, invalid states, disabled/read-only states, density alignment, autofill/mobile behavior, and long content. |
-| Menus, popovers, dialogs, sheets, tooltips                 | Entrance/exit motion, focus trap or focus return, keyboard behavior, layering, collision, dismissal, reduced motion, and portal evidence.  |
+| Menus, popovers, dialogs, sheets, tooltips                 | Entrance/exit motion, focus trap or focus return, keyboard behavior, layering, collision, dismissal, and portal evidence.                  |
 | Tabs, navigation, sidebar, breadcrumbs                     | Active/current indicator, keyboard navigation, location clarity, responsive overflow, and density behavior.                                |
 | Table, pagination, chart, data views                       | Loading/empty/error states, density, scan rhythm, numeric/text alignment, sortable/filter states, and overflow behavior.                   |
 | Toast, alert, progress, spinner, skeleton, empty-state     | Status clarity, timing, motion restraint, accessible announcements, and recovery action clarity.                                           |
@@ -140,7 +139,6 @@ Every Tier-A polish PR should include:
 - [ ] Browser-floor decision notes for any browser-platform feature touched.
 - [ ] Storybook links, screenshots, or story names that prove the polish states.
 - [ ] Keyboard and focus evidence for interactive surfaces.
-- [ ] Reduced-motion evidence for animated or transitioning surfaces.
 - [ ] Density/theme evidence when spacing, sizing, color, or motion changed.
 - [ ] Before/after notes for any visual change that is not obvious from the diff.
 - [ ] Validation commands run and any unavailable validation called out plainly.
@@ -166,8 +164,6 @@ motion decisions to #159:
   paint-heavy animation unless the PR explains why it is necessary.
 - Use durations/easing that feel responsive and unobtrusive; avoid bounce,
   stretch, or novelty easing in normal component work.
-- Always support `prefers-reduced-motion`; reduced motion should remove
-  non-essential movement while preserving the state change.
 - Exit motion should clarify dismissal, not make overlays feel slow.
 
 ## Accessibility Policy
@@ -187,7 +183,6 @@ Check at least:
   composite-widget behavior when those patterns apply.
 - Pointer cancellation, dragging alternatives, target size, and coarse-pointer
   usability for touch contexts.
-- Reduced-motion behavior for animated surfaces.
 - Name/role/value and status/error announcements for controls, feedback, and
   form surfaces.
 

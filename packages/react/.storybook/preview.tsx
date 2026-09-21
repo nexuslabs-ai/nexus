@@ -131,7 +131,7 @@ function appearanceStateFromGlobals(
           : prefs.codeFontSize,
       reduceMotion: pickOption(
         globals.reduceMotion,
-        [{ value: 'system' }, { value: 'on' }, { value: 'off' }] as const,
+        [{ value: 'on' }, { value: 'off' }] as const,
         prefs.reduceMotion
       ),
       pointerCursors:

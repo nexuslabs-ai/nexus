@@ -34,7 +34,7 @@ describe('appearance model', () => {
       prefs: {
         uiFontSize: 14,
         codeFontSize: 12,
-        reduceMotion: 'system',
+        reduceMotion: 'off',
         pointerCursors: false,
         fontSmoothing: true,
       },
@@ -435,9 +435,6 @@ describe('appearancePrefsToCss', () => {
     );
     expect(
       appearancePrefsToCss({ ...prefs, reduceMotion: 'off' })
-    ).not.toContain('0.01ms');
-    expect(
-      appearancePrefsToCss({ ...prefs, reduceMotion: 'system' })
     ).not.toContain('0.01ms');
   });
 

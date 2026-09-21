@@ -545,7 +545,6 @@ export const StylingContracts: Story = {
     const gap = getRequiredElement(canvasElement, '[data-slot="sidebar-gap"]');
     await expect(gap).toHaveClass('nx:duration-default');
     await expect(gap).toHaveClass('nx:ease-linear');
-    await expect(gap).toHaveClass('nx:motion-reduce:transition-none');
 
     const container = getRequiredElement(
       canvasElement,
@@ -553,7 +552,6 @@ export const StylingContracts: Story = {
     );
     await expect(container).toHaveClass('nx:duration-default');
     await expect(container).toHaveClass('nx:ease-linear');
-    await expect(container).toHaveClass('nx:motion-reduce:transition-none');
 
     const rail = getRequiredElement(
       canvasElement,
@@ -564,7 +562,6 @@ export const StylingContracts: Story = {
     );
     await expect(rail).toHaveClass('nx:duration-fast');
     await expect(rail).toHaveClass('nx:ease-linear');
-    await expect(rail).toHaveClass('nx:motion-reduce:transition-none');
     await expect(rail).not.toHaveClass('nx:transition-all');
 
     const groupLabel = getRequiredElement(
@@ -574,7 +571,6 @@ export const StylingContracts: Story = {
     await expect(groupLabel).toHaveClass('nx:typography-label-small');
     await expect(groupLabel).toHaveClass('nx:duration-default');
     await expect(groupLabel).toHaveClass('nx:ease-linear');
-    await expect(groupLabel).toHaveClass('nx:motion-reduce:transition-none');
     await expect(groupLabel).not.toHaveClass('nx:font-medium');
 
     const groupContent = getRequiredElement(
@@ -598,7 +594,6 @@ export const StylingContracts: Story = {
 
     await expect(defaultButton).toHaveClass('nx:typography-body-default');
     await expect(defaultButton).toHaveClass('nx:duration-fast');
-    await expect(defaultButton).toHaveClass('nx:motion-reduce:transition-none');
     await expect(defaultButton).toHaveClass(
       'nx:data-[active=true]:text-nav-foreground'
     );

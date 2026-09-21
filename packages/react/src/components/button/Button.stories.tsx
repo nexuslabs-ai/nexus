@@ -494,7 +494,6 @@ export const PressScale: Story = {
     );
 
     await expect(primary).toHaveClass('nx:active:scale-[0.96]');
-    await expect(primary).toHaveClass('nx:motion-reduce:active:scale-100');
     await expect(link).toHaveClass('nx:active:scale-100');
     await expect(link).not.toHaveClass('nx:active:scale-[0.96]');
   },

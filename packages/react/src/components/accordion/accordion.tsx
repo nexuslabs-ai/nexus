@@ -110,7 +110,7 @@ function AccordionTrigger({
           {children}
         </span>
         <IconChevronDown
-          className="nx:size-4 nx:shrink-0 nx:text-muted-foreground nx:transition-transform nx:duration-default nx:motion-reduce:transition-none"
+          className="nx:size-4 nx:shrink-0 nx:text-muted-foreground nx:transition-transform nx:duration-default"
           aria-hidden="true"
         />
       </AccordionPrimitive.Trigger>
@@ -136,7 +136,7 @@ function AccordionContent({
   return (
     <AccordionPrimitive.Content
       data-slot="accordion-content"
-      className="nx:overflow-hidden nx:typography-body-default nx:text-muted-foreground nx:duration-default nx:data-[state=closed]:animate-accordion-up nx:data-[state=open]:animate-accordion-down nx:motion-reduce:data-[state=closed]:animate-none nx:motion-reduce:data-[state=open]:animate-none"
+      className="nx:overflow-hidden nx:typography-body-default nx:text-muted-foreground nx:duration-default nx:data-[state=closed]:animate-accordion-up nx:data-[state=open]:animate-accordion-down"
       {...props}
     >
       <div className={className}>{children}</div>

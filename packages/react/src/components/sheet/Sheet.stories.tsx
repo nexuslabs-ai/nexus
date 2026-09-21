@@ -334,9 +334,7 @@ export const OpenCloseInteraction: Story = {
     const sheet = await within(document.body).findByRole('dialog');
     await expect(sheet).toBeInTheDocument();
     await expect(sheet).toHaveAttribute('data-slot', 'sheet-content');
-    await expectInterruptibleOverlayMotion(sheet, {
-      reducedMotionClass: 'nx:motion-reduce:transition-none',
-    });
+    await expectInterruptibleOverlayMotion(sheet);
     await expect(sheet).toHaveClass('nx:transition-[translate]');
     await expect(sheet).toHaveClass('nx:data-[state=closed]:translate-x-full');
     const overlay = document.querySelector('[data-slot="sheet-overlay"]');

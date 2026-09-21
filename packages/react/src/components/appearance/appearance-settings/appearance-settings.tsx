@@ -40,7 +40,6 @@ import { NexusAppearanceSettingRow } from '../setting-row';
 
 const APPEARANCE_MODES: NexusAppearanceMode[] = ['light', 'dark', 'system'];
 const REDUCE_MOTION_OPTIONS: NexusAppearancePrefs['reduceMotion'][] = [
-  'system',
   'on',
   'off',
 ];
@@ -405,7 +404,6 @@ export function NexusAppearanceSettings() {
               variant="outline"
               aria-label="Reduce motion"
             >
-              <ToggleGroupItem value="system">System</ToggleGroupItem>
               <ToggleGroupItem value="on">On</ToggleGroupItem>
               <ToggleGroupItem value="off">Off</ToggleGroupItem>
             </ToggleGroup>

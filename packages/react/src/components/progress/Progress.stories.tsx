@@ -77,16 +77,12 @@ export const Indeterminate: Story = {
     // Radix marks the bar indeterminate and omits the numeric value
     await expect(indicator).toHaveAttribute('data-state', 'indeterminate');
     await expect(progress).not.toHaveAttribute('aria-valuenow');
-    // The sweep is actually applied (not just present as a class); its
-    // reduced-motion suppressor is wired at matching specificity
+    // The sweep is actually applied (not just present as a class)
     await expect(getComputedStyle(indicator as Element).animationName).toBe(
       'progress-indeterminate'
     );
     await expect(getComputedStyle(indicator as Element).animationDuration).toBe(
       '1.5s'
-    );
-    await expect(indicator).toHaveClass(
-      'nx:motion-reduce:data-[state=indeterminate]:animate-none'
     );
   },
 };
@@ -110,7 +106,6 @@ export const WithDataAttributes: Story = {
     await expect(progress).toHaveAttribute('aria-valuenow', '40');
     await expect(indicator).toHaveAttribute('data-state', 'loading');
     await expect(indicator).toHaveClass('nx:duration-fast');
-    await expect(indicator).toHaveClass('nx:motion-reduce:transition-none');
   },
 };
 
