@@ -120,7 +120,9 @@ it('contains dialog overlays and returns focus', async () => {
   await expect
     .poll(() =>
       page.locator('iframe').evaluate((element) => {
-        const content = element.contentDocument?.getElementById('preview-root');
+        const content = (
+          element as HTMLIFrameElement
+        ).contentDocument?.getElementById('preview-root');
         return (
           !!content &&
           Math.abs(
