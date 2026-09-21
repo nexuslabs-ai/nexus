@@ -11,10 +11,12 @@ import {
 import { tmpdir } from 'node:os';
 import path from 'node:path';
 import ts from 'typescript';
-import { afterAll, describe, expect, it } from 'vitest';
+import { afterAll, beforeAll, describe, expect, it } from 'vitest';
 
 import {
+  assertWorkspaceTypes,
   exportName,
+  importedWorkspaceSpecifiers,
   isComponentName,
   isComponentSource,
   isOwnProp,
@@ -24,7 +26,6 @@ import {
   publicComponents,
   publicExports,
   toSlugFolder,
-  unresolvedModuleMessages,
 } from './props-contract.mjs';
 import {
   entryPointsFromManifest,
@@ -32,7 +33,6 @@ import {
 } from './react-entry-points.mjs';
 import { docsRoot, reactRoot } from './roots.mjs';
 
-const generatedDir = path.join(docsRoot, 'generated', 'props');
 const reactSrc = path.join(reactRoot, 'src');
 const componentsRoot = path.join(reactSrc, 'components');
 
@@ -52,19 +52,18 @@ type ComponentEntry = {
   props: PropEntry[];
 };
 
-// Git checks these files out with CRLF on Windows; the generator writes LF.
-function read(file: string) {
-  return readFileSync(path.join(generatedDir, file), 'utf8').replace(
-    /\r\n/g,
-    '\n'
-  );
+function read(dir: string, file: string) {
+  return readFileSync(path.join(dir, file), 'utf8');
 }
 
-function readEntry(slug: string): {
+function readEntry(
+  dir: string,
+  slug: string
+): {
   slug: string;
   components: ComponentEntry[];
 } {
-  return JSON.parse(read(`${slug}.json`));
+  return JSON.parse(read(dir, `${slug}.json`));
 }
 
 function byName(a: string, b: string) {
@@ -72,10 +71,11 @@ function byName(a: string, b: string) {
 }
 
 const FENCED_BLOCK = /^```[a-z]*\n[\s\S]*\n```$/;
-const index: Record<string, string[]> = JSON.parse(read('index.json'));
-const slugs = Object.keys(index);
-const entries = slugs.map(readEntry);
-const allComponents = entries.flatMap((entry) => entry.components);
+let generatedDir: string;
+let index: Record<string, string[]>;
+let slugs: string[];
+let entries: { slug: string; components: ComponentEntry[] }[];
+let allComponents: ComponentEntry[];
 
 function componentOf(slug: string, component: string) {
   const entry = entries[slugs.indexOf(slug)];
@@ -94,10 +94,29 @@ function propOf(slug: string, component: string, prop: string) {
   return match;
 }
 
-let freshDir: string | null = null;
+/**
+ * The guard reports by throwing, so its message is the only thing a caller
+ * sees; this reads it back rather than asserting the guard merely fired.
+ */
+function failureFrom(run: () => void) {
+  try {
+    run();
+  } catch (error) {
+    return (error as Error).message;
+  }
+  throw new Error('the guard accepted a dependency with no declarations');
+}
+
+const tempDirs: string[] = [];
+
+function tempDir(prefix: string) {
+  const dir = mkdtempSync(path.join(tmpdir(), prefix));
+  tempDirs.push(dir);
+  return dir;
+}
 
 afterAll(() => {
-  if (freshDir) rmSync(freshDir, { recursive: true, force: true });
+  for (const dir of tempDirs) rmSync(dir, { recursive: true, force: true });
 });
 
 function runGenerator(outputDir: string) {
@@ -206,14 +225,8 @@ const FIXTURE_SOURCE = [
   'export const NOT_A_COMPONENT = 1;',
 ].join('\n');
 
-let fixtureDir: string | null = null;
-
-afterAll(() => {
-  if (fixtureDir) rmSync(fixtureDir, { recursive: true, force: true });
-});
-
 function buildFixture() {
-  fixtureDir = mkdtempSync(path.join(tmpdir(), 'nexus-props-fixture-'));
+  const fixtureDir = tempDir('nexus-props-fixture-');
 
   const file = path.join(fixtureDir, 'fixture.ts');
   writeFileSync(file, FIXTURE_SOURCE, 'utf8');
@@ -422,43 +435,83 @@ describe('component export predicates', () => {
     );
     expect(isComponentName('useSidebar')).toBe(false);
   });
+});
 
-  it('reports only the imports the program could not resolve', () => {
-    const diagnostic = (code: number, messageText: string) => ({
-      code,
-      messageText,
-    });
+describe('workspace dependency types', () => {
+  it('names only the workspace packages the source binds from', () => {
+    const source = ts.createSourceFile(
+      'widget.ts',
+      [
+        "import { tokens } from '@nexus_ds/core';",
+        "import { derive } from '@nexus_ds/core/runtime';",
+        "export type { Mode } from '@nexus_ds/core';",
+        "import { cva } from 'class-variance-authority';",
+        "import { cn } from './lib/utils';",
+        // Binds nothing, so nothing it fails to type can reach a prop.
+        "import '@nexus_ds/tailwind/nexus.css';",
+      ].join('\n'),
+      ts.ScriptTarget.ES2020,
+      true
+    );
 
     expect(
-      unresolvedModuleMessages([
-        diagnostic(2307, "Cannot find module '@nexus_ds/core'."),
-        // Same module reported once per importing file.
-        diagnostic(2307, "Cannot find module '@nexus_ds/core'."),
-        diagnostic(2792, "Cannot find module './themes'."),
-        // An ordinary type error is not this guard's business.
-        diagnostic(2345, "Argument of type 'string' is not assignable."),
-      ])
-    ).toEqual([
-      "Cannot find module './themes'.",
-      "Cannot find module '@nexus_ds/core'.",
-    ]);
-
-    expect(unresolvedModuleMessages([])).toEqual([]);
+      importedWorkspaceSpecifiers([source], {
+        dependencies: {
+          '@nexus_ds/core': 'workspace:*',
+          'class-variance-authority': '^0.7.1',
+        },
+        peerDependencies: { '@nexus_ds/tailwind': 'workspace:*' },
+      })
+    ).toEqual(['@nexus_ds/core', '@nexus_ds/core/runtime']);
   });
 
-  it('flattens a chained unresolved-import message', () => {
-    const chained = {
-      code: 2307,
-      messageText: {
-        messageText: "Cannot find module '@nexus_ds/core'.",
-        next: [{ messageText: 'Build the package first.' }],
-      },
+  it('refuses a dependency that resolves to no declarations', () => {
+    const root = tempDir('nexus-props-types-');
+
+    const dependency = (name: string, target: Record<string, string>) => {
+      const dir = path.join(root, 'node_modules', name);
+      mkdirSync(dir, { recursive: true });
+      writeFileSync(
+        path.join(dir, 'package.json'),
+        JSON.stringify({
+          name,
+          version: '0.0.0',
+          exports: { '.': { import: target } },
+        })
+      );
+      for (const file of Object.values(target)) {
+        writeFileSync(path.join(dir, file), '');
+      }
     };
 
-    // Reading `messageText` directly would stringify the chain to
-    // `[object Object]`; flattening keeps the nested note, indented.
-    expect(unresolvedModuleMessages([chained])).toEqual([
-      "Cannot find module '@nexus_ds/core'.   Build the package first.",
+    dependency('typed', { types: './index.d.ts', default: './index.js' });
+    // tsup writes JavaScript and declarations in separate passes, so a failed
+    // declaration pass leaves the package importable and type-less — and
+    // `allowJs` then types every prop reached through it as `any` without a
+    // single unresolved-module error to show for it.
+    dependency('js-only', { default: './index.js' });
+
+    const caller = path.join(root, 'caller.ts');
+    const options = {
+      module: ts.ModuleKind.ESNext,
+      moduleResolution: ts.ModuleResolutionKind.Bundler,
+      allowJs: true,
+    };
+
+    expect(() =>
+      assertWorkspaceTypes(['typed'], options, caller)
+    ).not.toThrow();
+    expect(() => assertWorkspaceTypes([], options, caller)).not.toThrow();
+
+    expect(
+      failureFrom(() =>
+        assertWorkspaceTypes(['js-only', 'absent'], options, caller)
+      ).split('\n')
+    ).toEqual([
+      'props JSON: a workspace dependency resolves to no type declarations, so every prop typed through it would be documented as `any`.',
+      'Build the workspace dependencies first: pnpm turbo build --filter=@nexus_ds/react^...',
+      '  js-only',
+      '  absent',
     ]);
   });
 });
@@ -547,6 +600,18 @@ describe('react entry points', () => {
 });
 
 describe('docs props data', () => {
+  // The output is a build artifact, not a committed file: what the suite
+  // measures is what a run of the generator produces right now.
+  beforeAll(() => {
+    generatedDir = tempDir('nexus-props-');
+    runGenerator(generatedDir);
+
+    index = JSON.parse(read(generatedDir, 'index.json'));
+    slugs = Object.keys(index);
+    entries = slugs.map((slug) => readEntry(generatedDir, slug));
+    allComponents = entries.flatMap((entry) => entry.components);
+  }, 120_000);
+
   it('has an entry for every component folder that exports a component', () => {
     const folders = readdirSync(componentsRoot, { withFileTypes: true })
       .filter((folder) => folder.isDirectory())
@@ -781,7 +846,9 @@ describe('docs props data', () => {
   });
 
   it('reports a component under the name it is exported as', () => {
-    const drawer = readEntry('drawer').components.map((c) => c.name);
+    const drawer = readEntry(generatedDir, 'drawer').components.map(
+      (c) => c.name
+    );
 
     expect(drawer).toContain('Drawer');
     expect(drawer).toContain('DrawerPortal');
@@ -809,24 +876,23 @@ describe('docs props data', () => {
 
   it('is written in the generator’s canonical JSON form', () => {
     for (const file of [...slugs.map((slug) => `${slug}.json`), 'index.json']) {
-      const raw = read(file);
+      const raw = read(generatedDir, file);
       expect(`${JSON.stringify(JSON.parse(raw), null, 2)}\n`, file).toBe(raw);
     }
   });
 
-  // Regenerating and comparing proves determinism and catches a component
-  // change committed without rerunning the generator — a stale file here
-  // fails the same way a hand-edited one would.
-  it('matches a fresh run of the generator', { timeout: 120_000 }, () => {
-    freshDir = mkdtempSync(path.join(tmpdir(), 'nexus-props-'));
-    runGenerator(freshDir);
+  // Two runs over the same tree have to agree byte for byte: a union prints
+  // its members in whichever order the checker interned them, and the docs
+  // build would otherwise turn that ordering into a cache miss.
+  it('is byte-identical across runs', { timeout: 120_000 }, () => {
+    const repeat = tempDir('nexus-props-repeat-');
+    runGenerator(repeat);
 
-    const fresh = readdirSync(freshDir).sort(byName);
-    expect(fresh).toEqual(readdirSync(generatedDir).sort(byName));
+    const files = readdirSync(repeat).sort(byName);
+    expect(files).toEqual(readdirSync(generatedDir).sort(byName));
 
-    for (const file of fresh) {
-      const generated = readFileSync(path.join(freshDir, file), 'utf8');
-      expect(generated, file).toBe(read(file));
+    for (const file of files) {
+      expect(read(repeat, file), file).toBe(read(generatedDir, file));
     }
   });
 });

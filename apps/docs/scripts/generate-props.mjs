@@ -11,7 +11,9 @@ import docgen from 'react-docgen-typescript';
 import ts from 'typescript';
 
 import {
+  assertWorkspaceTypes,
   exportName,
+  importedWorkspaceSpecifiers,
   isComponentSource,
   isOwnProp,
   isPortableExpansion,
@@ -22,7 +24,6 @@ import {
   publicExports,
   toRepoPath,
   toSlugFolder,
-  unresolvedModuleMessages,
 } from './props-contract.mjs';
 import { reactEntryPoints } from './react-entry-points.mjs';
 import { docsRoot, reactRoot, repoRoot } from './roots.mjs';
@@ -30,6 +31,7 @@ import { docsRoot, reactRoot, repoRoot } from './roots.mjs';
 const reactSrc = path.join(reactRoot, 'src');
 const componentsRoot = path.join(reactSrc, 'components');
 const reactTsconfig = path.join(reactRoot, 'tsconfig.json');
+const reactManifest = path.join(reactRoot, 'package.json');
 
 const outputDir = process.argv[2]
   ? path.resolve(process.argv[2])
@@ -182,28 +184,6 @@ function wasGeneratedHere(fileName) {
   }
 }
 
-/**
- * The generator is the only place that can tell a missing workspace build from
- * an ordinary type error, so it asks the program what it failed to resolve
- * rather than leaving the next run to show it as an unexplained freshness diff.
- * Runs after the type strings are produced: a full check interns union members,
- * and the passes that print them depend on that order.
- */
-function assertProgramResolves() {
-  const unresolved = unresolvedModuleMessages(
-    ts.getPreEmitDiagnostics(program)
-  );
-  if (unresolved.length === 0) return;
-
-  throw new Error(
-    [
-      'props JSON: the react program has unresolved imports, so every prop typed through them would be documented as `any`.',
-      'Build the workspace dependencies first: pnpm turbo build --filter=@nexus_ds/docs^...',
-      ...unresolved.map((message) => `  ${message}`),
-    ].join('\n')
-  );
-}
-
 function clearPreviousOutput() {
   for (const fileName of readdirSync(outputDir)) {
     if (!wasGeneratedHere(fileName)) continue;
@@ -231,6 +211,23 @@ const program = ts.createProgram([...sourceFiles, ...entryPoints], {
   ...compilerOptions,
   noEmit: true,
 });
+
+// The generator is the only place that can tell a missing workspace build from
+// an ordinary type error, so it asks the resolver for the declarations before
+// reading a single type off them.
+assertWorkspaceTypes(
+  importedWorkspaceSpecifiers(
+    program
+      .getSourceFiles()
+      .filter((file) =>
+        toRepoPath(file.fileName).startsWith(toRepoPath(reactSrc))
+      ),
+    JSON.parse(readFileSync(reactManifest, 'utf8'))
+  ),
+  compilerOptions,
+  path.join(reactSrc, 'index.ts')
+);
+
 const checker = program.getTypeChecker();
 
 const exported = publicExports(checker, program, entryPoints);
@@ -266,8 +263,6 @@ for (const doc of parser.parseWithProgramProvider(sourceFiles, () => program)) {
 // resolving component types ahead of the alias expansions and the docgen parse
 // would reorder the type strings those two produce.
 const components = publicComponents(checker, exported, componentsRoot);
-
-assertProgramResolves();
 
 const bySlug = new Map(slugs.map((slug) => [slug, []]));
 

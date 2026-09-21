@@ -4,7 +4,12 @@
   "tasks": {
     "build": {
       "inputs": ["$TURBO_DEFAULT$", "$TURBO_ROOT$/package.json"],
-      "outputs": [".next/**", "!.next/cache/**", "next-env.d.ts"]
+      "outputs": [
+        ".next/**",
+        "!.next/cache/**",
+        "next-env.d.ts",
+        "generated/props/**"
+      ]
     }
   }
 }

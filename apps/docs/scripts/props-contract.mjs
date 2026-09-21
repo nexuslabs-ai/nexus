@@ -192,26 +192,89 @@ export function publicComponents(checker, exported, componentsRoot) {
   return new Map(found.sort(([a], [b]) => a.localeCompare(b, 'en')));
 }
 
-// `Cannot find module "X" or its corresponding type declarations`, and the
-// variant that blames `moduleResolution`.
-const MODULE_RESOLUTION_CODES = new Set([2307, 2792]);
+/**
+ * The workspace packages `packages/react/src` imports. `pnpm install` links
+ * these into `node_modules` in whatever state their last build left them, so
+ * they are the imports that can be present and carry no types at all.
+ */
+export function importedWorkspaceSpecifiers(sourceFiles, manifest) {
+  const packages = Object.entries({
+    ...manifest.dependencies,
+    ...manifest.peerDependencies,
+  })
+    .filter(([, range]) => range.startsWith('workspace:'))
+    .map(([name]) => name);
+
+  const imported = new Set();
+
+  for (const sourceFile of sourceFiles) {
+    for (const statement of sourceFile.statements) {
+      // A side-effect import binds nothing, so it cannot widen a prop however
+      // type-less the module it names turns out to be.
+      const bindsNames = ts.isImportDeclaration(statement)
+        ? Boolean(statement.importClause)
+        : ts.isExportDeclaration(statement);
+      if (!bindsNames) continue;
+
+      const specifier = statement.moduleSpecifier?.text;
+      if (!specifier) continue;
+
+      if (
+        packages.some(
+          (name) => specifier === name || specifier.startsWith(`${name}/`)
+        )
+      ) {
+        imported.add(specifier);
+      }
+    }
+  }
+
+  return [...imported].sort();
+}
+
+const DECLARATION_EXTENSIONS = new Set([
+  ts.Extension.Dts,
+  ts.Extension.Dcts,
+  ts.Extension.Dmts,
+]);
 
 /**
- * An import the program could not resolve is not an error the checker reports
- * on the props that travel through it: the type widens to `any`, which reads as
- * a documented type. The props JSON is a build output of `packages/react/src`
- * and of the workspace packages that source types itself against, and only the
- * first is a declared input anywhere in the build graph — so an unbuilt
- * dependency has to be read off the diagnostics to be noticed at all.
+ * An unbuilt workspace dependency is not an error the checker reports on the
+ * props that travel through it. A package with no `dist` at all reports
+ * against the import site; one whose declaration pass failed is worse, because
+ * `allowJs` lets its JavaScript into the program and every type taken from it
+ * silently widens to `any` — which reads in the output as a documented type.
+ * The props JSON is a build output of those packages as much as of
+ * `packages/react/src`, and none of them is a declared input anywhere in the
+ * build graph, so the declarations have to be asked for rather than inferred
+ * from the diagnostics they fail to produce.
  */
-export function unresolvedModuleMessages(diagnostics) {
-  const messages = diagnostics
-    .filter((diagnostic) => MODULE_RESOLUTION_CODES.has(diagnostic.code))
-    .map((diagnostic) =>
-      ts.flattenDiagnosticMessageText(diagnostic.messageText, ' ')
+export function assertWorkspaceTypes(
+  specifiers,
+  compilerOptions,
+  containingFile
+) {
+  const untyped = specifiers.filter((specifier) => {
+    const { resolvedModule } = ts.resolveModuleName(
+      specifier,
+      containingFile,
+      compilerOptions,
+      ts.sys
     );
+    return (
+      !resolvedModule || !DECLARATION_EXTENSIONS.has(resolvedModule.extension)
+    );
+  });
 
-  return [...new Set(messages)].sort();
+  if (untyped.length === 0) return;
+
+  throw new Error(
+    [
+      'props JSON: a workspace dependency resolves to no type declarations, so every prop typed through it would be documented as `any`.',
+      'Build the workspace dependencies first: pnpm turbo build --filter=@nexus_ds/react^...',
+      ...untyped.map((specifier) => `  ${specifier}`),
+    ].join('\n')
+  );
 }
 
 /**
