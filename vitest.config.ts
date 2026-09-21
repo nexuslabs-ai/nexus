@@ -29,16 +29,16 @@ export default defineConfig({
     // Use projects feature (Vitest 4)
     projects: [
       // Core engine, the `cn` merge, and ESLint rules - jsdom for the
-      // first-paint script tests
+      // first-paint script tests. One glob per row of testing.md § Scope.
       {
         extends: true,
         test: {
           name: 'unit',
           environment: 'jsdom',
           include: [
-            'packages/core/src/**/*.test.ts',
-            'packages/react/src/lib/**/*.test.ts',
-            'packages/eslint-plugin-nexus/__tests__/**/*.test.js',
+            'packages/core/src/lib/*.test.ts',
+            'packages/react/src/lib/utils.test.ts',
+            'packages/eslint-plugin-nexus/__tests__/*.test.js',
           ],
         },
       },

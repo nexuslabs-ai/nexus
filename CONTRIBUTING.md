@@ -73,15 +73,15 @@ A single `*.stories.tsx` file does four jobs at once:
 3. **Behavior tests** — `play` functions run as real assertions under Vitest's storybook project (real Chromium via Playwright).
 4. **Accessibility assertions** — addon-a11y runs axe-core against every story with `test: 'error'`, so any violation fails the test.
 
-You don't write a separate `*.test.tsx` for a component. That's not a stylistic preference — `vitest.config.ts` explicitly excludes `packages/react/src/components/**/*.test.{ts,tsx}` from the `unit` project.
+You don't write a separate `*.test.tsx` for a component. That's not a stylistic preference — the `unit` project's `include` list in `vitest.config.ts` is one glob per row of `.claude/rules/testing.md` § Scope, and a component test file matches none of them.
 
 Outside stories, only three kinds of unit test exist, all under Vitest's `unit` project (jsdom): the core engine's behaviour (`packages/core/src/lib`), the Nexus `cn` merge (`packages/react/src/lib/utils.test.ts`), and the ESLint plugin's rules (`packages/eslint-plugin-nexus/__tests__`). Apps, repo scripts, and hooks have no tests of their own, and nothing uses snapshots.
 
 ```
-┌──────────────────────────────────────────────────────────────────────┐
-│  Components        →  *.stories.tsx (storybook project, real browser) │
-│  Engine / cn / lint →  *.test.ts|js  (unit project, jsdom)            │
-└──────────────────────────────────────────────────────────────────────┘
+┌──────────────────────────────────────────────────────────────────────────┐
+│  Components          →  *.stories.tsx (storybook project, real browser)  │
+│  Engine / cn / lint  →  *.test.ts|js  (unit project, jsdom)              │
+└──────────────────────────────────────────────────────────────────────────┘
 ```
 
 The full spec lives in `.claude/rules/testing-react.md` and `.claude/rules/components.md`. This section is the on-ramp.
