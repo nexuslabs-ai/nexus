@@ -2,9 +2,11 @@ import primitiveColors from '../../tokens/primitives/color.json';
 
 import { type Shade, SHADES } from './palette';
 import {
+  describePaletteConversion,
   hexToOklchPinned,
   isPaletteShadeKey,
 } from './primitive-palette-conversion';
+import type { PaletteProvenance, ThemeTrace } from './theme-inspection';
 
 export type PrimitivePaletteName = Exclude<
   keyof typeof primitiveColors,
@@ -30,6 +32,14 @@ export function getPaletteShade(
   palette: PrimitivePaletteName,
   shade: Shade
 ): string {
+  return readPaletteShade(palette, shade);
+}
+
+export function readPaletteShade(
+  palette: PrimitivePaletteName,
+  shade: Shade,
+  trace?: ThemeTrace
+): string {
   if (!PRIMITIVE_PALETTE_NAMES.includes(palette)) {
     throw new Error(`palette: unknown primitive palette "${palette}"`);
   }
@@ -38,7 +48,10 @@ export function getPaletteShade(
   }
   const shades = shadeCache.get(palette) ?? {};
   const cached = shades[shade];
-  if (cached !== undefined) return cached;
+  if (cached !== undefined) {
+    recordProvenance(palette, shade, trace);
+    return cached;
+  }
   const color = hexToOklchPinned(
     primitiveColors[palette][shade].$value,
     shade,
@@ -46,19 +59,56 @@ export function getPaletteShade(
   );
   shades[shade] = color;
   shadeCache.set(palette, shades);
+  recordProvenance(palette, shade, trace);
   return color;
 }
 
 export function getPaletteRamp(
   palette: PrimitivePaletteName
 ): PrimitivePaletteRamp {
+  return readPaletteRamp(palette);
+}
+
+export function readPaletteRamp(
+  palette: PrimitivePaletteName,
+  trace?: ThemeTrace
+): PrimitivePaletteRamp {
   const cached = rampCache.get(palette);
-  if (cached) return cached;
+  if (cached) {
+    if (trace)
+      for (const shade of SHADES) recordProvenance(palette, shade, trace);
+    return cached;
+  }
   const ramp = Object.freeze(
     Object.fromEntries(
-      SHADES.map((shade) => [shade, getPaletteShade(palette, shade)])
+      SHADES.map((shade) => [shade, readPaletteShade(palette, shade, trace)])
     )
   ) as PrimitivePaletteRamp;
   rampCache.set(palette, ramp);
   return ramp;
+}
+
+const provenanceCache = new Map<string, PaletteProvenance>();
+
+function recordProvenance(
+  palette: PrimitivePaletteName,
+  shade: Shade,
+  trace?: ThemeTrace
+): void {
+  if (!trace) return;
+  const key = `${palette}.${shade}`;
+  let provenance = provenanceCache.get(key);
+  if (!provenance) {
+    provenance = describePaletteConversion(
+      primitiveColors[palette][shade].$value,
+      shade,
+      palette
+    );
+    provenanceCache.set(key, provenance);
+  }
+  trace.record({
+    kind: 'palette',
+    origin: 'authored-palette-provenance',
+    provenance,
+  });
 }

@@ -1,12 +1,13 @@
-import { APCAcontrast, sRGBtoY } from 'apca-w3';
-import { clampChroma } from 'culori';
+import { sRGBtoY } from 'apca-w3';
 
-import { resolveToSrgbInts } from './apca';
+import { measureLuminance, resolveToSrgbInts } from './apca';
 import { APCA_PAIRS, type ApcaPair } from './apca-pairs';
 import type { TokenMap } from './derive-theme';
 import { formatOklch } from './oklch-format';
 import { type Mode, type Tier, TIER_THRESHOLDS } from './palette';
 import { seedOklch } from './perceptual-ramp';
+import { clampThemeChroma } from './theme-gamut';
+import type { ThemeTrace } from './theme-inspection';
 
 export function normalizeContrast(value: unknown, fallback = 50): number {
   return typeof value === 'number' && Number.isFinite(value)
@@ -26,30 +27,43 @@ const token = (map: TokenMap, name: string): string => {
 
 export function pairBackground(
   map: TokenMap,
-  pair: ApcaPair
+  pair: ApcaPair,
+  trace?: ThemeTrace
 ): [number, number, number] {
   const backdrop = pair.backdrop
     ? resolveToSrgbInts(
         pair.backdrop.startsWith('#')
           ? pair.backdrop
-          : token(map, pair.backdrop)
+          : token(map, pair.backdrop),
+        undefined,
+        trace
       )
     : undefined;
-  return resolveToSrgbInts(token(map, pair.bg), backdrop);
+  return resolveToSrgbInts(token(map, pair.bg), backdrop, trace);
 }
 
-export function contrastForPair(map: TokenMap, pair: ApcaPair): number {
-  const background = pairBackground(map, pair);
-  return Math.abs(
-    APCAcontrast(
-      sRGBtoY(resolveToSrgbInts(token(map, pair.fg), background)),
-      sRGBtoY(background)
-    ) as number
+export function contrastForPair(
+  map: TokenMap,
+  pair: ApcaPair,
+  trace?: ThemeTrace
+): number {
+  const background = pairBackground(map, pair, trace);
+  const foregroundY = sRGBtoY(
+    resolveToSrgbInts(token(map, pair.fg), background, trace)
+  );
+  const backgroundY = sRGBtoY(background);
+  return measureLuminance(
+    foregroundY,
+    backgroundY,
+    token(map, pair.fg),
+    token(map, pair.bg),
+    trace
   );
 }
 
 interface Constraint {
   backgroundY: number;
+  background: string;
   target: number;
   floor: number;
 }
@@ -65,62 +79,143 @@ const TEXT_FOREGROUNDS = new Set([
   'disabled-foreground',
 ]);
 
+export function pairTarget(pair: ApcaPair, contrast: number): number {
+  return (
+    contrastTarget(pair.tier, contrast) +
+    (pair.fg.startsWith('chart-categorical-')
+      ? (Number(pair.fg.slice(-1)) - 1) * 4.5
+      : 0)
+  );
+}
+
 function constraintsFor(
   map: TokenMap,
   pairs: readonly ApcaPair[],
-  contrast: number
+  contrast: number,
+  trace?: ThemeTrace
 ): Constraint[] {
-  // Stagger chart lightness targets so categories retain more than hue differences.
-  return pairs.map((pair) => ({
-    backgroundY: sRGBtoY(pairBackground(map, pair)),
-    target:
-      contrastTarget(pair.tier, contrast) +
-      (pair.fg.startsWith('chart-categorical-')
-        ? (Number(pair.fg.slice(-1)) - 1) * 4.5
-        : 0),
-    floor: TIER_THRESHOLDS[pair.tier],
-  }));
+  return pairs.map((pair) => {
+    const backgroundY = sRGBtoY(pairBackground(map, pair, trace));
+    const target = pairTarget(pair, contrast);
+    const floor = TIER_THRESHOLDS[pair.tier];
+    trace?.decision('foreground-constraint', {
+      background: pair.bg,
+      backdrop: pair.backdrop ?? null,
+      backgroundY,
+      tier: pair.tier,
+      target,
+      floor,
+    });
+    return { backgroundY, background: token(map, pair.bg), target, floor };
+  });
 }
 
-const luminance = (color: string) => sRGBtoY(resolveToSrgbInts(color));
-const score = (foregroundY: number, backgroundY: number) =>
-  Math.abs(APCAcontrast(foregroundY, backgroundY) as number);
+const luminance = (color: string, trace?: ThemeTrace) =>
+  sRGBtoY(resolveToSrgbInts(color, undefined, trace));
 
 function solveForeground(
   seed: string,
   constraints: Constraint[],
   endpoint: 0 | 1,
-  preserveSeed: boolean
+  preserveSeed: boolean,
+  trace?: ThemeTrace
 ): string | undefined {
   const endpointColor = `oklch(${endpoint} 0 0)`;
-  const endpointY = luminance(endpointColor);
-  if (constraints.some((c) => score(endpointY, c.backgroundY) < c.floor))
-    return undefined;
-  const targets = constraints.map((c) =>
-    Math.min(c.target, score(endpointY, c.backgroundY))
-  );
-  const passes = (color: string) => {
-    const y = luminance(color);
-    return constraints.every((c, index) => {
-      const target = targets[index];
-      return target !== undefined && score(y, c.backgroundY) >= target;
+  const endpointY = luminance(endpointColor, trace);
+  trace?.decision('foreground-endpoint', {
+    endpoint,
+    preserveSeed,
+    seed,
+    constraints: constraints.length,
+  });
+  if (
+    constraints.some(
+      (c) =>
+        measureLuminance(
+          endpointY,
+          c.backgroundY,
+          endpointColor,
+          c.background,
+          trace,
+          c.floor
+        ) < c.floor
+    )
+  ) {
+    trace?.decision('foreground-unreachable', {
+      endpoint,
+      reason: 'endpoint-below-floor',
     });
+    return undefined;
+  }
+  const targets = constraints.map((c) => {
+    const maximum = measureLuminance(
+      endpointY,
+      c.backgroundY,
+      endpointColor,
+      c.background,
+      trace
+    );
+    const target = Math.min(c.target, maximum);
+    trace?.decision('reachable-target', {
+      background: c.background,
+      requested: c.target,
+      maximum,
+      target,
+      capped: target < c.target,
+    });
+    return target;
+  });
+  const passes = (color: string) => {
+    const y = luminance(color, trace);
+    let evaluated = 0;
+    const passed = constraints.every((c, index) => {
+      const target = targets[index];
+      if (target === undefined) return false;
+      evaluated += 1;
+      return (
+        measureLuminance(
+          y,
+          c.backgroundY,
+          color,
+          c.background,
+          trace,
+          target
+        ) >= target
+      );
+    });
+    trace?.decision('foreground-candidate', {
+      color,
+      passed,
+      evaluated,
+      unevaluated: constraints.length - evaluated,
+    });
+    return passed;
   };
   const parsed = seedOklch(seed);
-  if (preserveSeed && passes(seed)) return seed;
+  if (preserveSeed && passes(seed)) {
+    trace?.decision('foreground-preserved', { seed });
+    return seed;
+  }
   let fail = preserveSeed ? parsed.l : 1 - endpoint;
   let pass: number = endpoint;
   let result = endpointColor;
   for (let i = 0; i < 12; i++) {
     const l = (fail + pass) / 2;
+    trace?.decision('foreground-bisection', {
+      iteration: i,
+      fail,
+      pass,
+      lightness: l,
+    });
     const candidate = formatOklch(
-      clampChroma({ ...parsed, l, alpha: 1 }, 'oklch', 'p3')
+      clampThemeChroma({ ...parsed, l, alpha: 1 }, 'p3', trace)
     );
     if (passes(candidate)) {
       pass = l;
       result = candidate;
     } else fail = l;
   }
+  trace?.decision('foreground-result', { result });
   return result;
 }
 
@@ -135,32 +230,83 @@ function constrainFamilyFills(
   map: TokenMap,
   name: string,
   pairs: readonly ApcaPair[],
-  contrast: number
+  contrast: number,
+  trace?: ThemeTrace
 ) {
   const basePair = pairs[0];
   if (!basePair) throw new Error(`contrast: missing pairs for ${name}`);
   const base = token(map, basePair.bg);
-  const baseY = luminance(base);
-  const endpoint: 0 | 1 = score(1, baseY) >= score(0, baseY) ? 1 : 0;
+  const baseY = luminance(base, trace);
+  const endpoint: 0 | 1 =
+    measureLuminance(1, baseY, 'oklch(1 0 0)', base, trace) >=
+    measureLuminance(0, baseY, 'oklch(0 0 0)', base, trace)
+      ? 1
+      : 0;
   const label = `oklch(${endpoint} 0 0)`;
   map[`--nx-color-${name}`] = label;
+  trace?.record({
+    kind: 'assignment',
+    value: label,
+    source: 'family-label-endpoint',
+  });
   for (const pair of pairs) {
+    const fillTrace = trace?.at('constraints', `--nx-color-${pair.bg}`);
     const value = token(map, pair.bg);
     const target = contrastTarget(pair.tier, contrast);
-    if (score(endpoint, luminance(value)) >= target) continue;
+    fillTrace?.decision('family-fill-target', {
+      label,
+      value,
+      target,
+      foreground: pair.fg,
+    });
+    if (
+      measureLuminance(
+        endpoint,
+        luminance(value, fillTrace),
+        label,
+        value,
+        fillTrace,
+        target
+      ) >= target
+    ) {
+      fillTrace?.decision('family-fill-preserved', { value });
+      continue;
+    }
     const seed = seedOklch(value);
     let fail = seed.l;
     let pass = 1 - endpoint;
     let result = `oklch(${pass} 0 0)`;
     for (let i = 0; i < 12; i++) {
       const l = (fail + pass) / 2;
-      const candidate = formatOklch(clampChroma({ ...seed, l }, 'oklch', 'p3'));
-      if (score(endpoint, luminance(candidate)) >= target) {
+      fillTrace?.decision('family-fill-bisection', {
+        iteration: i,
+        fail,
+        pass,
+        lightness: l,
+      });
+      const candidate = formatOklch(
+        clampThemeChroma({ ...seed, l }, 'p3', fillTrace)
+      );
+      if (
+        measureLuminance(
+          endpoint,
+          luminance(candidate, fillTrace),
+          label,
+          candidate,
+          fillTrace,
+          target
+        ) >= target
+      ) {
         pass = l;
         result = candidate;
       } else fail = l;
     }
     map[`--nx-color-${pair.bg}`] = result;
+    fillTrace?.record({
+      kind: 'assignment',
+      value: result,
+      source: 'family-fill-search',
+    });
   }
 }
 
@@ -168,7 +314,8 @@ function constrainFamilyFills(
 export function constrainColors(
   map: TokenMap,
   mode: Mode,
-  contrast: number
+  contrast: number,
+  trace?: ThemeTrace
 ): TokenMap {
   for (const [name, pairs] of FOREGROUND_GROUPS) {
     if (
@@ -176,7 +323,13 @@ export function constrainColors(
         name
       )
     ) {
-      constrainFamilyFills(map, name, pairs, contrast);
+      constrainFamilyFills(
+        map,
+        name,
+        pairs,
+        contrast,
+        trace?.at('constraints', `--nx-color-${name}`)
+      );
     }
   }
   for (const [name, pairs] of FOREGROUND_GROUPS) {
@@ -186,17 +339,24 @@ export function constrainColors(
       )
     )
       continue;
-    const constraints = constraintsFor(map, pairs, contrast);
+    const tokenTrace = trace?.at('constraints', `--nx-color-${name}`);
+    const constraints = constraintsFor(map, pairs, contrast, tokenTrace);
     const seed = token(map, name);
     const result = solveForeground(
       seed,
       constraints,
       mode === 'dark' ? 1 : 0,
-      mode === 'light' && TEXT_FOREGROUNDS.has(name)
+      mode === 'light' && TEXT_FOREGROUNDS.has(name),
+      tokenTrace
     );
     if (result === undefined)
       throw new Error(`contrast: no readable ${name} in ${mode}`);
     map[`--nx-color-${name}`] = result;
+    tokenTrace?.record({
+      kind: 'assignment',
+      value: result,
+      source: 'foreground-constraints',
+    });
   }
   return map;
 }

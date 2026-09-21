@@ -12,6 +12,7 @@ pnpm add @nexus_ds/core
 
 - `DEFAULT_NEXUS_APPEARANCE`, `sanitizeNexusAppearance`, `NexusAppearanceState`: the appearance model.
 - `createNexusThemeContract`, `deriveTheme`, `themeToCss`: derive a full token set from appearance state and render it to CSS.
+- `inspectTheme`: derive the same theme with actual decision traces, immutable palette provenance, and separate final contrast diagnostics. See [Theme inspection](./docs/theme-inspection.md) for the versioned API and evidence boundaries.
 - `createNexusAppearanceSnapshotFromState`, `createNexusAppearanceBootstrapScript`, `resolveFirstPaint`, `DEFAULT_STORAGE_KEY`: first-paint, no-flash bootstrap.
 
 ## Advanced / Engine Exports

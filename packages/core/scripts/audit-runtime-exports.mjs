@@ -35,6 +35,7 @@ const EXPECTED_RUNTIME_EXPORTS = [
   'createNexusAppearanceStateCookie',
   'createNexusThemeContract',
   'deriveTheme',
+  'inspectTheme',
   'isColor',
   'normalizeAppearanceModeIds',
   'parseNexusAppearanceStateCookie',
@@ -113,3 +114,12 @@ assert.equal(
 console.log(
   `@nexus_ds/core/palette exports and ESM/CJS parity clean (${EXPECTED_PALETTE_EXPORTS.length} exports).`
 );
+
+const inspectionInput = esm.createNexusThemeContract(
+  esm.DEFAULT_NEXUS_APPEARANCE
+);
+const inspection = esm.inspectTheme(inspectionInput);
+assert.deepEqual(inspection, cjs.inspectTheme(inspectionInput));
+assert.deepEqual(inspection.theme, esm.deriveTheme(inspectionInput));
+assert.equal(inspection.schemaVersion, 1);
+console.log('Theme inspection ESM/CJS execution parity clean.');

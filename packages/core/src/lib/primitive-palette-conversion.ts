@@ -2,6 +2,7 @@ import { clampChroma, converter, type Oklch, oklch, parse } from 'culori';
 
 import { PERCEPTUAL_L_GRID, type Shade } from './palette';
 import hueGrid from './perceptual-grid-hue.json';
+import type { PaletteProvenance } from './theme-inspection';
 
 export { PERCEPTUAL_L_GRID } from './palette';
 
@@ -59,7 +60,8 @@ function computePinnedOklch(
   hex: string,
   shade: string,
   palette?: string,
-  reportGamutClip?: (message: string) => void
+  reportGamutClip?: (message: string) => void,
+  record?: (provenance: PaletteProvenance) => void
 ): Oklch {
   const hueCurve = palette ? PERCEPTUAL_L_GRID_HUE[palette] : undefined;
   const pinnedL = isPaletteShadeKey(shade)
@@ -75,6 +77,7 @@ function computePinnedOklch(
   // pale near white, vivid at the peak — driven by the gamut, not the source
   // hex. Every other palette keeps its source chroma (flat-grid behaviour).
   let chroma = source.c ?? 0;
+  let cuspChroma: number | undefined;
   if (hueCurve) {
     const cuspC =
       clampChroma(
@@ -82,6 +85,7 @@ function computePinnedOklch(
         'oklch',
         EMIT_GAMUT
       ).c ?? 0;
+    cuspChroma = cuspC;
     chroma = cuspC * CUSP_FRACTION;
   }
 
@@ -105,6 +109,20 @@ function computePinnedOklch(
     }
   }
 
+  record?.(
+    Object.freeze({
+      hex,
+      shade,
+      palette,
+      grid: hueCurve ? 'hue' : 'common',
+      source: Object.freeze({ ...source }),
+      cuspChroma,
+      cuspFraction: hueCurve ? CUSP_FRACTION : undefined,
+      target: Object.freeze({ ...target }),
+      clamped: Object.freeze({ ...clamped }),
+      css: formatPaletteOklch(clamped),
+    })
+  );
   return clamped;
 }
 
@@ -117,6 +135,20 @@ export function hexToOklchPinned(
   return formatPaletteOklch(
     computePinnedOklch(hex, shade, palette, reportGamutClip)
   );
+}
+
+export function describePaletteConversion(
+  hex: string,
+  shade: string,
+  palette: string
+): PaletteProvenance {
+  let provenance: PaletteProvenance | undefined;
+  computePinnedOklch(hex, shade, palette, undefined, (value) => {
+    provenance = value;
+  });
+  if (!provenance)
+    throw new Error(`palette: missing provenance for ${palette}.${shade}`);
+  return provenance;
 }
 
 export function hexToOklchMechanical(hex: string): string {

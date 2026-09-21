@@ -1,7 +1,9 @@
-import { clampChroma, type Oklch, oklch, parse } from 'culori';
+import { type Oklch, oklch, parse } from 'culori';
 
 import { formatOklch } from './oklch-format';
 import { PERCEPTUAL_L_GRID, type Shade, SHADES } from './palette';
+import { clampThemeChroma } from './theme-gamut';
+import type { ThemeTrace } from './theme-inspection';
 
 // emit ships P3 chroma (browsers gamut-map at render); sit just inside the cusp.
 const EMIT_GAMUT = 'p3';
@@ -32,7 +34,8 @@ export interface RampOptions {
 export function pinnedOklch(
   seedHex: string,
   shade: Shade,
-  options: RampOptions = {}
+  options: RampOptions = {},
+  trace?: ThemeTrace
 ): string {
   const { capAtSeedChroma = true } = options;
   const seed = seedOklch(seedHex);
@@ -42,8 +45,8 @@ export function pinnedOklch(
 
   // Max chroma in P3 at this (L, hue): start past the gamut and clamp inward.
   const cuspC =
-    clampChroma({ mode: 'oklch', l, c: 0.5, h: hue }, 'oklch', EMIT_GAMUT).c ??
-    0;
+    clampThemeChroma({ mode: 'oklch', l, c: 0.5, h: hue }, EMIT_GAMUT, trace)
+      .c ?? 0;
   let chroma = cuspC * CUSP_FRACTION;
   // Cap at the seed's own chroma so a muted accent stays muted — and an
   // achromatic seed (seedC === 0) stays fully neutral instead of picking up the
@@ -51,15 +54,33 @@ export function pinnedOklch(
   if (capAtSeedChroma) chroma = Math.min(chroma, seedC);
 
   const target: Oklch = { mode: 'oklch', l, c: chroma, h: hue };
-  return formatOklch(clampChroma(target, 'oklch', EMIT_GAMUT));
+  const css = formatOklch(clampThemeChroma(target, EMIT_GAMUT, trace));
+  trace?.decision('brand-ramp-shade', {
+    seed: seedHex,
+    shade,
+    lightness: l,
+    hue,
+    seedChroma: seedC,
+    cuspChroma: cuspC,
+    cuspFraction: CUSP_FRACTION,
+    capAtSeedChroma,
+    achromatic: seedC === 0,
+    chroma,
+    css,
+  });
+  return css;
 }
 
 export type Ramp = Record<Shade, string>;
 
 /** Full 50→950 ramp from one seed color. */
-export function rampFromSeed(seedHex: string, options: RampOptions = {}): Ramp {
+export function rampFromSeed(
+  seedHex: string,
+  options: RampOptions = {},
+  trace?: ThemeTrace
+): Ramp {
   const ramp: Partial<Ramp> = {};
   for (const shade of SHADES)
-    ramp[shade] = pinnedOklch(seedHex, shade, options);
+    ramp[shade] = pinnedOklch(seedHex, shade, options, trace);
   return ramp as Ramp;
 }

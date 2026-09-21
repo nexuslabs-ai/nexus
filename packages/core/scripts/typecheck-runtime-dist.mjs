@@ -83,6 +83,9 @@ await writeFile(
   DEFAULT_NEXUS_APPEARANCE,
   DEFAULT_STORAGE_KEY,
   deriveTheme,
+  inspectTheme,
+  type ThemeInspection,
+  type ThemeTraceEvent,
   resolveFirstPaint,
   sanitizeNexusAppearance,
   themeToCss,
@@ -127,6 +130,17 @@ const bootstrap: string = createNexusAppearanceBootstrapScript({
   defaultSnapshot: snapshot,
 });
 const firstPaint = resolveFirstPaint(snapshot, true);
+const inspection: ThemeInspection = inspectTheme(createNexusThemeContract(state));
+const event: ThemeTraceEvent | undefined = inspection.trace[0];
+if (event?.kind === 'measurement') {
+  const lc: number = event.lc;
+  void lc;
+}
+// @ts-expect-error inspection events are a discriminated union.
+event.notAnInspectionField;
+// @ts-expect-error the inspection schema is versioned.
+const wrongVersion: ThemeInspection['schemaVersion'] = 2;
+void wrongVersion;
 
 // @ts-expect-error proves the public state is not any.
 state.notARealNexusAppearanceField;
