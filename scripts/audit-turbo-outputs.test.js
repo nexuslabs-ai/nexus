@@ -93,8 +93,10 @@ describe('auditTurboOutputs', () => {
       tasks: [task('@nexus_ds/future#build')],
     });
 
-    expect(result.problems[0].message).toContain(
-      'A cache hit would restore nothing.'
+    expect(result.problems[0].message).toBe(
+      'Task declares no `outputs`, so nothing states which files it is ' +
+        'responsible for emitting. A cache hit would restore nothing. Add an ' +
+        '`outputs` array to the package turbo.json.'
     );
   });
 
@@ -103,8 +105,11 @@ describe('auditTurboOutputs', () => {
       tasks: [task('@nexus_ds/docs#generate:demos', { cache: false })],
     });
 
-    expect(result.problems[0].message).toContain('responsible for emitting.');
-    expect(result.problems[0].message).not.toContain('cache');
+    expect(result.problems[0].message).toBe(
+      'Task declares no `outputs`, so nothing states which files it is ' +
+        'responsible for emitting. Add an `outputs` array to the package ' +
+        'turbo.json.'
+    );
   });
 
   it('exempts packages with no build script', () => {
@@ -175,8 +180,10 @@ describe('auditEmittedOutputs', () => {
     expect(result.problems).toMatchObject([
       { code: 'unmatched-outputs', task: '@nexus_ds/test-utils#build' },
     ]);
-    expect(result.problems[0].message).toContain(
-      'A cache hit would restore an empty artifact.'
+    expect(result.problems[0].message).toBe(
+      'Declared output `dist/runtime/**` emitted no files under ' +
+        '`packages/test-utils/dist/runtime`. A cache hit would restore an ' +
+        'empty artifact. Fix the glob in packages/test-utils/turbo.json.'
     );
   });
 
@@ -195,10 +202,10 @@ describe('auditEmittedOutputs', () => {
       ],
     });
 
-    expect(result.problems[0].message).toContain(
-      'emitted no files under `apps/docs/__generated__`.'
+    expect(result.problems[0].message).toBe(
+      'Declared output `__generated__/**` emitted no files under ' +
+        '`apps/docs/__generated__`. Fix the glob in apps/docs/turbo.json.'
     );
-    expect(result.problems[0].message).not.toContain('cache');
   });
 
   it('flags an output tree that holds only empty directories', () => {
@@ -255,6 +262,11 @@ describe('auditEmittedOutputs', () => {
       { code: 'unanchored-outputs' },
       { code: 'unanchored-outputs' },
     ]);
+    expect(result.problems[0].message).toBe(
+      'Declared output `*.tsbuildinfo` starts with a wildcard, so this audit ' +
+        'cannot resolve a directory to check. Anchor it under a literal ' +
+        'directory in packages/core/turbo.json.'
+    );
   });
 
   it('ignores negated globs', () => {

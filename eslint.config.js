@@ -248,9 +248,9 @@ export default tseslint.config(
     ...nexusSpacingTokenConfig({ parser: jsoncParser }),
   },
 
-  // Only demo-index.test.ts may reach __generated__ through the module graph.
+  // Inside apps/docs/scripts/, only demo-index.test.ts may import __generated__.
   {
-    files: ['apps/docs/scripts/**/*.{js,mjs,ts}'],
+    files: ['apps/docs/scripts/**/*.{js,jsx,mjs,cjs,ts,tsx,mts,cts}'],
     ignores: ['apps/docs/scripts/demo-index.test.ts'],
     rules: {
       'no-restricted-syntax': [
