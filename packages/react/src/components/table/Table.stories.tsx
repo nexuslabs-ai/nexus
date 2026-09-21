@@ -1857,5 +1857,5 @@ export const DataTableStatesRecipe: Story = {
 // These recipe stories show the assembled shell, focused sortable headers,
 // selection, pagination, and state rows over the Table primitives with plain
 // React state. The production version wires TanStack Table over the same markup
-// in apps/console/src/components/data-table.tsx; the engine stays a consumer
+// in a consuming application; the engine stays a consumer
 // dependency, out of the published bundle.

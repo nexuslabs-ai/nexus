@@ -175,14 +175,14 @@ describe('auditEmittedOutputs', () => {
   });
 
   it('flags an output directory that exists but is empty', () => {
-    const repoRoot = makeRepo({ 'apps/console/README.md': '# console\n' });
-    fs.mkdirSync(path.join(repoRoot, 'apps/console/dist'));
+    const repoRoot = makeRepo({ 'apps/docs/README.md': '# docs\n' });
+    fs.mkdirSync(path.join(repoRoot, 'apps/docs/dist'));
 
     const result = auditEmittedOutputs({
       repoRoot,
       tasks: [
-        task('@nexus_ds/console#build', {
-          directory: 'apps/console',
+        task('@nexus_ds/docs#build', {
+          directory: 'apps/docs',
           outputs: ['dist/**'],
         }),
       ],

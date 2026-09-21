@@ -24,17 +24,12 @@ import {
 function AreaExample() {
   return (
     <ChartContainer config={config}>
-      <AreaChart
-        accessibilityLayer
-        data={data}
-        margin={{ left: 12, right: 12 }}
-      >
+      <AreaChart accessibilityLayer data={data}>
         <CartesianGrid vertical={false} />
         <XAxis
           dataKey="month"
           tickLine={false}
           axisLine={false}
-          tickMargin={8}
           tickFormatter={shortMonth}
         />
         <ChartTooltip content={<ChartTooltipContent indicator="dot" />} />
@@ -74,7 +69,7 @@ function BarExample() {
             <path
               d="M0 0L6 6M-3 3L3 9M3 -3L9 3"
               stroke="var(--nx-color-container)"
-              strokeWidth={1.5}
+              strokeWidth="var(--nx-borderwidth-default)"
             />
           </pattern>
         </defs>
@@ -83,13 +78,12 @@ function BarExample() {
           dataKey="month"
           tickLine={false}
           axisLine={false}
-          tickMargin={8}
           tickFormatter={shortMonth}
         />
         <ChartTooltip content={<ChartTooltipContent indicator="dashed" />} />
         <ChartLegend content={<ChartLegendContent />} />
-        <Bar dataKey="desktop" fill="var(--color-desktop)" radius={4} />
-        <Bar dataKey="mobile" fill={`url(#${mobilePattern})`} radius={4} />
+        <Bar dataKey="desktop" fill="var(--color-desktop)" />
+        <Bar dataKey="mobile" fill={`url(#${mobilePattern})`} />
       </BarChart>
     </ChartContainer>
   );
@@ -97,17 +91,12 @@ function BarExample() {
 function LineExample() {
   return (
     <ChartContainer config={config}>
-      <LineChart
-        accessibilityLayer
-        data={data}
-        margin={{ left: 12, right: 12 }}
-      >
+      <LineChart accessibilityLayer data={data}>
         <CartesianGrid vertical={false} />
         <XAxis
           dataKey="month"
           tickLine={false}
           axisLine={false}
-          tickMargin={8}
           tickFormatter={shortMonth}
         />
         <ChartTooltip content={<ChartTooltipContent indicator="line" />} />
@@ -116,7 +105,7 @@ function LineExample() {
           dataKey="desktop"
           type="natural"
           stroke="var(--color-desktop)"
-          strokeWidth={2}
+          strokeWidth="var(--nx-borderwidth-thick)"
           dot={false}
         />
         <Line
@@ -124,7 +113,7 @@ function LineExample() {
           type="natural"
           stroke="var(--color-mobile)"
           strokeDasharray="6 4"
-          strokeWidth={2}
+          strokeWidth="var(--nx-borderwidth-thick)"
           dot={false}
         />
       </LineChart>

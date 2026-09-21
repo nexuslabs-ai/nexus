@@ -1,4 +1,5 @@
 import { type ChildProcess, spawn } from 'node:child_process';
+import fs from 'node:fs';
 import net from 'node:net';
 import path from 'node:path';
 import {
@@ -306,4 +307,99 @@ it('falls back from corrupt storage and keeps rapid appearance edits consistent'
   expect(
     await page.locator('[data-slot="create-inspector"] code').textContent()
   ).toContain('<Button');
+});
+
+it('operates selection and popover controls with the keyboard inside the preview', async () => {
+  await page.goto(base + '/create');
+  await ready();
+  const frame = page.frameLocator('iframe');
+  await page
+    .getByRole('button', { name: 'Enter preview', exact: true })
+    .click();
+  expect(await frame.locator(':focus').count()).toBe(1);
+  await frame.getByRole('combobox', { name: 'Visibility' }).focus();
+  await page.keyboard.press('Enter');
+  await frame.getByRole('listbox').waitFor();
+  await page.keyboard.press('ArrowDown');
+  await page.keyboard.press('Enter');
+  await page.keyboard.press('Escape');
+  await frame.getByRole('listbox').waitFor({ state: 'hidden' });
+  await frame
+    .getByRole('button', { name: 'Quick details', exact: true })
+    .press('Enter');
+  await frame.getByText('Same theme, another layer.').waitFor();
+  expect(await page.getByText('Same theme, another layer.').count()).toBe(0);
+  await page.keyboard.press('Escape');
+  await expect
+    .poll(() =>
+      frame
+        .getByRole('button', { name: 'Quick details', exact: true })
+        .evaluate((el) => el === document.activeElement)
+    )
+    .toBe(true);
+});
+
+it('distinguishes active theme tokens from build defaults and recovers invalid deep links', async () => {
+  await page.goto(
+    base + '/create?view=tokens&token=runtime%3Acolor%3Abackground-hover'
+  );
+  const active = page
+    .getByRole('region', { name: 'Active preview value' })
+    .locator('code');
+  await active.waitFor();
+  const before = await active.textContent();
+  await page.getByLabel('Appearance', { exact: true }).selectOption('dark');
+  await expect.poll(() => active.textContent()).not.toBe(before);
+  await page.goto(base + '/create?view=tokens&token=removed');
+  await page
+    .getByRole('heading', { name: 'This token was not found.' })
+    .waitFor();
+  await page.getByRole('link', { name: 'Explore all tokens' }).click();
+  await page.getByLabel('Find a token').fill('no-such-nexus-token');
+  await page
+    .getByRole('heading', { name: 'No tokens match these filters.' })
+    .waitFor();
+});
+
+it('keeps generator and filesystem tooling out of production browser chunks', () => {
+  const root = path.resolve('apps/docs/.next/static/chunks');
+  const files: string[] = [];
+  function collect(dir: string) {
+    for (const entry of fs.readdirSync(dir, { withFileTypes: true })) {
+      const file = path.join(dir, entry.name);
+      if (entry.isDirectory()) collect(file);
+      else if (entry.name.endsWith('.js')) files.push(file);
+    }
+  }
+  collect(root);
+  expect(files.length).toBeGreaterThan(0);
+  for (const file of files)
+    expect(fs.readFileSync(file, 'utf8')).not.toMatch(
+      /node:fs|node:child_process|generateTokenCatalog|collectTokenSources|class CssSyntaxError/
+    );
+});
+
+it('keeps the narrow Button demo usable with enlarged text and density extremes', async () => {
+  await page.setViewportSize({ width: 390, height: 844 });
+  await page.goto(base + '/create?view=components&component=button');
+  await ready();
+  await page.getByRole('button', { name: 'Appearance', exact: true }).click();
+  const controls = page.getByRole('dialog');
+  await controls.getByLabel('UI font size', { exact: true }).fill('28');
+  for (const density of ['tight', 'spacious']) {
+    await controls.getByLabel('Density', { exact: true }).selectOption(density);
+    await ready();
+    expect(
+      await page
+        .frameLocator('iframe')
+        .locator('html')
+        .evaluate((el) => el.scrollWidth <= innerWidth)
+    ).toBe(true);
+  }
+  await page.keyboard.press('Escape');
+  expect(
+    await page.evaluate(
+      () => document.documentElement.scrollWidth <= innerWidth
+    )
+  ).toBe(true);
 });

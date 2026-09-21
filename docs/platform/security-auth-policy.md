@@ -35,17 +35,13 @@ source in this PR.
 | CSP reporting endpoint | Add `Reporting-Endpoints` / `report-to` only when a real endpoint exists and report payloads are scrubbed for PII or secrets.                      |
 | HSTS                   | Start with `Strict-Transport-Security: max-age=300`; expand to one year, `includeSubDomains`, and `preload` only after HTTPS and subdomain audits. |
 | COOP / CORP / COEP     | Evaluate popup, embed, package fixture, and cross-origin asset compatibility before enforcement.                                                   |
-| Vite console headers   | Configure at the static host; the console appearance bootstrap is inline and needs its own hash or nonce before CSP enforcement.                   |
 
-## Demo Console Session Policy
+## Playground and production sessions
 
-The console auth flow is MSW-backed demo behavior. It is useful for showing the
-Atlas shell, but it is not a production auth boundary and must not be copied as
-a production session pattern.
+The docs playground uses local demonstration data and performs no authentication
+or server mutations. It persists only optional appearance preferences under a
+separate key. This is not a production session mechanism.
 
-- `apps/console/src/app/session.ts` may persist the demo `User` object in
-  `localStorage` only for the mock console.
-- Demo logout must clear the script-readable `nexus-console-session` key.
 - Production auth/session state must be server-issued cookie state, for example
   `__Host-session=...; Secure; HttpOnly; SameSite=Lax; Path=/`.
 - Do not set a `Domain` attribute unless a deliberate cross-subdomain auth

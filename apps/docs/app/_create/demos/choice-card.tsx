@@ -131,7 +131,7 @@ function Example0() {
 }
 function Example1() {
   return (
-    <div className="nx:grid nx:w-full nx:max-w-4xl nx:grid-cols-1 nx:gap-6 nx:md:grid-cols-2">
+    <div className="nx:grid nx:w-full nx:max-w-4xl nx:grid-cols-1 nx:gap-6 nx:@lg:grid-cols-2">
       <div className="nx:grid nx:gap-3">
         <CheckboxChoiceCard
           id="choice-card-checkbox-bordered"

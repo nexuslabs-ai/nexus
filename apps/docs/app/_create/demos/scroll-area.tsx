@@ -23,7 +23,7 @@ const artworks = [
 ];
 function Example0() {
   return (
-    <ScrollArea className="nx:h-48 nx:w-72 nx:rounded-md nx:border-default nx:border-border-default">
+    <ScrollArea className="nx:h-48 nx:w-72 nx:max-w-full nx:rounded-md nx:border-default nx:border-border-default">
       <div className="nx:flex nx:flex-col nx:gap-3 nx:p-4 nx:typography-label-default nx:text-foreground">
         <h4 className="nx:font-medium nx:leading-none">Release notes</h4>
         {releaseNotes.map((note, i) => (
@@ -56,7 +56,7 @@ function Example1() {
 
       <div className="nx:flex nx:flex-col nx:gap-2">
         <span className="nx:text-muted-foreground">Horizontal</span>
-        <ScrollArea className="nx:w-64 nx:rounded-md nx:border-default nx:border-border-default nx:whitespace-nowrap">
+        <ScrollArea className="nx:w-64 nx:max-w-full nx:rounded-md nx:border-default nx:border-border-default nx:whitespace-nowrap">
           <div className="nx:flex nx:w-max nx:gap-3 nx:p-3">
             {artworks.map((artwork) => (
               <div
@@ -73,7 +73,7 @@ function Example1() {
 
       <div className="nx:flex nx:flex-col nx:gap-2">
         <span className="nx:text-muted-foreground">Both</span>
-        <ScrollArea className="nx:h-40 nx:w-64 nx:rounded-md nx:border-default nx:border-border-default">
+        <ScrollArea className="nx:h-40 nx:w-64 nx:max-w-full nx:rounded-md nx:border-default nx:border-border-default">
           <div className="nx:w-max nx:p-3">
             {Array.from({ length: 12 }, (_, row) => (
               <div key={row} className="nx:flex nx:gap-2 nx:py-1">

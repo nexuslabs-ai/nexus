@@ -19,7 +19,7 @@ function ComboboxExample({
   items = frameworks,
   placeholder = 'Select framework',
   searchPlaceholder = 'Search framework...',
-  triggerClassName = 'nx:w-64',
+  triggerClassName = 'nx:w-64 nx:max-w-full',
   ...triggerProps
 }: {
   defaultValue?: string;
@@ -112,7 +112,7 @@ function Example0() {
 }
 function Example1() {
   return (
-    <div className="nx:grid nx:w-full nx:max-w-md nx:grid-cols-2 nx:gap-4">
+    <div className="nx:grid nx:w-full nx:max-w-md nx:grid-cols-1 nx:@lg:grid-cols-2 nx:gap-4">
       <ComboboxExample placeholder="Empty" triggerClassName="nx:w-full" />
       <ComboboxExample
         defaultValue="next"

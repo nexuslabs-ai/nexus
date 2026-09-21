@@ -137,7 +137,7 @@ function Example1() {
         <h3 className="nx:text-foreground nx:mb-4 nx:typography-label-default">
           Settings Pattern
         </h3>
-        <div className="nx:w-80 nx:space-y-4">
+        <div className="nx:w-80 nx:max-w-full nx:space-y-4">
           <div className="nx:flex nx:items-center nx:justify-between">
             <label
               htmlFor={`${uid}-setting1`}

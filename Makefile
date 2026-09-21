@@ -1,6 +1,6 @@
 .DEFAULT_GOAL := help
 
-.PHONY: help setup fresh clean dev console docs dev-all build tokens \
+.PHONY: help setup fresh clean dev docs dev-all build tokens \
         lint typecheck audit verify \
         up down serve publish
 
@@ -34,13 +34,10 @@ clean: ## Stop docs-mcp, remove build outputs + node_modules
 dev: ## Storybook — the primary component-dev surface (builds @nexus_ds/core first)
 	pnpm turbo storybook --filter=@nexus_ds/react
 
-console: ## Console app + live @nexus_ds/react (turbo: app + react watcher)
-	pnpm turbo dev --filter=@nexus_ds/console...
-
 docs: ## Docs site + live @nexus_ds/react (turbo: docs + react watcher)
 	pnpm turbo dev --filter=@nexus_ds/docs...
 
-dev-all: ## Everything: console + docs + storybook + package watchers (turbo)
+dev-all: ## Everything: docs + storybook + package watchers (turbo)
 	pnpm turbo dev storybook
 
 # ── Build ─────────────────────────────────────────────────────────────────────

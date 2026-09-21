@@ -19,7 +19,6 @@ permissions:
 # cannot go green on a change no job looked at.
 
 jobs:
-
   # format-check and lint run full-tree to mirror local `pnpm lint` /
   # `pnpm format:check`.
 
@@ -245,6 +244,11 @@ jobs:
             exit 1
           fi
 
+      - name: Regenerate playground data and verify Inspector evidence
+        run: |
+          pnpm --filter @nexus_ds/docs generate:catalog
+          git diff --exit-code -- apps/docs/app/_create/gallery-evidence.json
+
       - name: Run unit tests
         run: pnpm test:unit
 
@@ -367,11 +371,9 @@ jobs:
       - name: Run story tests
         run: pnpm test:storybook
 
-  test-console:
-    name: Test (Console)
+  test-create:
+    name: Test (Docs playground)
     runs-on: ubuntu-latest
-    needs: changes
-    if: needs.changes.outputs.console == 'true' || needs.changes.outputs.ci == 'true'
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -386,8 +388,8 @@ jobs:
         run: pnpm install --frozen-lockfile
       - name: Install browser and system dependencies
         run: pnpm exec playwright install --with-deps chromium
-      - name: Build and test Console in a real browser
-        run: pnpm test:console
+      - name: Build and test docs playground in a real browser
+        run: pnpm test:create
 
   build-storybook:
     name: Build Storybook
@@ -457,7 +459,7 @@ jobs:
       - test-unit
       - audit-tokens
       - test-react
-      - test-console
+      - test-create
       - build-storybook
       - bundle-size
     steps:

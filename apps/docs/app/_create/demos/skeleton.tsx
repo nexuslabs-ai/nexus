@@ -18,7 +18,7 @@ function Example1() {
         <Skeleton className="nx:h-4 nx:w-full" />
         <Skeleton className="nx:h-4 nx:w-4/5" />
       </div>
-      <div className="nx:flex nx:w-80 nx:flex-col nx:gap-4">
+      <div className="nx:flex nx:w-80 nx:max-w-full nx:flex-col nx:gap-4">
         <Skeleton className="nx:h-40 nx:w-full nx:rounded-lg" />
         <div className="nx:flex nx:items-center nx:gap-3">
           <Skeleton className="nx:size-10 nx:rounded-full" />

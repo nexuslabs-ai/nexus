@@ -35,7 +35,7 @@ function Example0() {
 function Example1() {
   return (
     <div className="nx:flex nx:flex-col nx:gap-6">
-      <div className="nx:flex nx:w-80 nx:flex-col nx:gap-3">
+      <div className="nx:flex nx:w-80 nx:max-w-full nx:flex-col nx:gap-3">
         {(['idle', 'uploading', 'processing', 'error', 'done'] as const).map(
           (state) => (
             <Attachment key={state} state={state}>

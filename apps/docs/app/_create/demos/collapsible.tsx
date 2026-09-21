@@ -11,7 +11,7 @@ import { IconSelector } from '@tabler/icons-react';
 
 function Example0() {
   return (
-    <Collapsible className="nx:flex nx:w-72 nx:flex-col">
+    <Collapsible className="nx:flex nx:w-72 nx:max-w-full nx:flex-col">
       <div className="nx:flex nx:flex-col nx:gap-2">
         <div className="nx:flex nx:items-center nx:justify-between nx:gap-4">
           <span className="nx:typography-label-default nx:text-foreground">
@@ -45,7 +45,7 @@ function Example0() {
 function Example1() {
   return (
     <div className="nx:flex nx:flex-col nx:gap-6">
-      <Collapsible className="nx:flex nx:w-64 nx:flex-col">
+      <Collapsible className="nx:flex nx:w-64 nx:max-w-full nx:flex-col">
         <CollapsibleTrigger asChild>
           <Button variant="outline">Closed by default</Button>
         </CollapsibleTrigger>
@@ -55,7 +55,10 @@ function Example1() {
           </div>
         </CollapsibleContent>
       </Collapsible>
-      <Collapsible defaultOpen className="nx:flex nx:w-64 nx:flex-col">
+      <Collapsible
+        defaultOpen
+        className="nx:flex nx:w-64 nx:max-w-full nx:flex-col"
+      >
         <CollapsibleTrigger asChild>
           <Button variant="outline">Open by default</Button>
         </CollapsibleTrigger>
@@ -74,7 +77,7 @@ function Example2() {
     <Collapsible
       disabled
       onOpenChange={args.onOpenChange}
-      className="nx:flex nx:w-72 nx:flex-col"
+      className="nx:flex nx:w-72 nx:max-w-full nx:flex-col"
     >
       <CollapsibleTrigger asChild>
         <Button variant="outline">Toggle details</Button>

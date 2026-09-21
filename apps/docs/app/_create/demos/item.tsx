@@ -35,7 +35,7 @@ function Example0() {
 }
 function Example1() {
   return (
-    <div className="nx:flex nx:w-96 nx:flex-col nx:gap-3">
+    <div className="nx:flex nx:w-96 nx:max-w-full nx:flex-col nx:gap-3">
       <Item variant="outline">
         <ItemMedia variant="icon">
           <IconFile />

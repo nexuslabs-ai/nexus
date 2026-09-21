@@ -25,7 +25,7 @@ function Example0() {
 }
 function Example1() {
   return (
-    <div className="nx:w-80 nx:rounded-lg nx:border nx:border-border-default nx:bg-container nx:p-6">
+    <div className="nx:w-80 nx:max-w-full nx:rounded-lg nx:border nx:border-border-default nx:bg-container nx:p-6">
       <FieldSet>
         <FieldLegend variant="legend">Account</FieldLegend>
         <Field>

@@ -12,8 +12,7 @@ This file is the Codex-facing entrypoint for the Nexus design-system repo. The e
   - `packages/react`: React component library built on Radix primitives, CVA variants, semantic tokens, and Storybook tests.
   - `packages/test-utils`: Vitest/testing-library utility exports for hooks and utilities.
 - Apps:
-  - `apps/console`: token/theme exploration UI.
-  - `apps/docs`: documentation site.
+  - `apps/docs`: documentation site and `/create` playground.
 
 ## Modern Web Guidance Policy
 
@@ -39,7 +38,7 @@ Run commands from the repo root.
 pnpm install
 pnpm dev
 pnpm storybook
-pnpm console
+pnpm --filter @nexus_ds/docs dev
 pnpm build
 pnpm typecheck
 pnpm lint

@@ -316,7 +316,7 @@ Releases are driven by [changesets](https://github.com/changesets/changesets) an
 | `@nexus_ds/tailwind`      | copy/own   | Generated token CSS — consumers regenerate with their own token choices |
 | `@nexus_ds/react`         | copy/own   | Components are copied and owned; delivered by the export tool (#541)    |
 | `@nexus_ds/test-utils`    | private    | Internal test tooling                                                   |
-| `@nexus_ds/console/docs`  | private    | Apps                                                                    |
+| `@nexus_ds/docs`          | private    | Apps                                                                    |
 
 Everything lives under the `@nexus_ds` scope — the published packages on npm and the ESLint plugin's **rule namespace** (rules are referenced as `@nexus_ds/*`, e.g. `@nexus_ds/no-render-prop-types`). The rule namespace is a flat-config key the plugin registers, independent of the npm package name; it is kept in lockstep with the scope so the repo reads consistently.
 

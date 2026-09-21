@@ -1,5 +1,6 @@
 import fs from 'node:fs/promises';
 import { fileURLToPath } from 'node:url';
+import { format, resolveConfig } from 'prettier';
 
 // The Inspector displays the actual authored demo, so props cannot drift from
 // the example people are operating. This module is build tooling only.
@@ -43,10 +44,14 @@ export async function generateGalleryEvidence() {
     ].sort();
     evidence[id] = { source, tokens };
   }
-  await fs.writeFile(
-    new URL('../app/_create/gallery-evidence.json', import.meta.url),
-    JSON.stringify(evidence, null, 2) + '\n'
+  const target = fileURLToPath(
+    new URL('../app/_create/gallery-evidence.json', import.meta.url)
   );
+  const formatted = await format(JSON.stringify(evidence), {
+    ...(await resolveConfig(target)),
+    filepath: target,
+  });
+  await fs.writeFile(target, formatted);
 }
 if (process.argv[1] === fileURLToPath(import.meta.url))
   await generateGalleryEvidence();

@@ -18,9 +18,14 @@ async function refresh() {
   } while (pending);
   running = false;
 }
-const watchers = ['tokens', 'src', 'scripts'].map((dir) =>
+const watchedPaths = [
+  ...['tokens', 'src', 'scripts'].map((dir) => '../../../packages/core/' + dir),
+  '../app/_create/demos',
+  '../../../packages/react/src/components',
+];
+const watchers = watchedPaths.map((relativePath) =>
   watch(
-    fileURLToPath(new URL('../../../packages/core/' + dir, import.meta.url)),
+    fileURLToPath(new URL(relativePath, import.meta.url)),
     { recursive: true },
     () => {
       clearTimeout(timer);

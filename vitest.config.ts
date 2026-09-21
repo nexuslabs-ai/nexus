@@ -70,18 +70,6 @@ export default defineConfig({
       {
         extends: true,
         test: {
-          name: 'console',
-          environment: 'node',
-          include: ['apps/console/e2e/**/*.test.ts'],
-          fileParallelism: false,
-          hookTimeout: 60000,
-          testTimeout: 30000,
-          passWithNoTests: false,
-        },
-      },
-      {
-        extends: true,
-        test: {
           name: 'docs-create',
           environment: 'node',
           include: ['apps/docs/e2e/**/*.test.ts'],
