@@ -2,7 +2,6 @@
 import { useCallback, useSyncExternalStore } from 'react';
 
 import { isComponentId } from './gallery';
-export type CreateView = 'examples' | 'components' | 'tokens';
 function subscribe(callback: () => void) {
   window.addEventListener('popstate', callback);
   window.addEventListener('nexus-create-location', callback);
@@ -18,9 +17,6 @@ export function useCreateLocation() {
     () => ''
   );
   const search = new URLSearchParams(query);
-  const raw = search.get('view');
-  const view: CreateView =
-    raw === 'components' || raw === 'tokens' ? raw : 'examples';
   const selected = search.get('component');
   const component = isComponentId(selected) ? selected : 'button';
   const navigate = useCallback(
@@ -35,5 +31,5 @@ export function useCreateLocation() {
     },
     []
   );
-  return { view, component, search, navigate };
+  return { component, search, navigate };
 }

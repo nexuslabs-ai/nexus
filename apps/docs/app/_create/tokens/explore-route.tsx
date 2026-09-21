@@ -1,23 +1,18 @@
 'use client';
-import { Fragment } from 'react';
 
 import {
+  Accordion,
+  AccordionContent,
+  AccordionItem,
+  AccordionTrigger,
   Badge,
   Button,
   Input,
-  Item,
-  ItemActions,
-  ItemContent,
-  ItemDescription,
-  ItemGroup,
-  ItemSeparator,
-  ItemTitle,
   NativeSelect,
   NativeSelectOptGroup,
   NativeSelectOption,
   Separator,
 } from '@nexus_ds/react';
-import { IconArrowRight } from '@tabler/icons-react';
 
 import type { CatalogResult } from '../../../../../packages/core/scripts/token-catalog';
 import payload from '../generated/catalog.json';
@@ -50,13 +45,27 @@ const NAMESPACE_LABELS: Record<string, string> = {
   runtime: 'Runtime semantics',
 };
 
-function CatalogBrowser({ catalog }: { catalog: TokenCatalog }) {
+export function TokenFilters() {
   const search = useTokenSearch();
   const navigate = useTokenNavigate();
-  const groups = filterTokens(catalog, search);
-  const pageCount = Math.max(1, Math.ceil(groups.length / PAGE_SIZE));
-  const page = Math.min(search.page ?? 1, pageCount);
-  const visible = groups.slice((page - 1) * PAGE_SIZE, page * PAGE_SIZE);
+  if (result.status === 'error') return null;
+  return (
+    <CatalogFilters
+      catalog={result.catalog}
+      search={search}
+      navigate={navigate}
+    />
+  );
+}
+function CatalogFilters({
+  catalog,
+  search,
+  navigate,
+}: {
+  catalog: TokenCatalog;
+  search: ExploreSearch;
+  navigate: ReturnType<typeof useTokenNavigate>;
+}) {
   const {
     groups: filterGroups,
     types,
@@ -67,12 +76,172 @@ function CatalogBrowser({ catalog }: { catalog: TokenCatalog }) {
   ];
   const changeFilter = (patch: Partial<ExploreSearch>) =>
     navigate({
-      search: updateExploreFilters(catalog, search, patch),
+      search: {
+        ...updateExploreFilters(catalog, search, patch),
+        token: undefined,
+        variant: undefined,
+      },
       replace: true,
       resetScroll: false,
     });
+  return (
+    <section aria-label="Find tokens" className="nx:space-y-4">
+      <div className="nx:flex nx:flex-col nx:gap-2">
+        <label htmlFor="token-search" className="nx:typography-label-small">
+          Find a token
+        </label>
+        <Input
+          id="token-search"
+          type="search"
+          placeholder="Try primary-background, spacing.4, or typography…"
+          value={search.q ?? ''}
+          onChange={(event) =>
+            changeFilter({ q: event.target.value || undefined })
+          }
+        />
+      </div>
+      <p
+        id="token-filter-help"
+        className="nx:typography-body-small nx:text-muted-foreground"
+      >
+        Browse a design group. Value types and modes follow your selection.
+      </p>
+      <div className="nx:grid nx:gap-4">
+        <div className="nx:flex nx:flex-col nx:gap-2">
+          <label htmlFor="token-group" className="nx:typography-label-small">
+            Token group
+          </label>
+          <NativeSelect
+            id="token-group"
+            aria-describedby="token-filter-help"
+            value={search.group ?? ''}
+            onChange={(event) =>
+              changeFilter({ group: event.target.value || undefined })
+            }
+          >
+            <NativeSelectOption value="">All tokens</NativeSelectOption>
+            {search.group &&
+              !filterGroups.some((group) => group.value === search.group) && (
+                <NativeSelectOption value={search.group}>
+                  Unavailable group
+                </NativeSelectOption>
+              )}
+            {groupSections.map((section) => (
+              <NativeSelectOptGroup key={section} label={section}>
+                {filterGroups
+                  .filter((group) => group.section === section)
+                  .map((group) => (
+                    <NativeSelectOption
+                      value={group.value}
+                      key={group.value}
+                      disabled={group.count === 0}
+                    >
+                      {group.label} ({group.count})
+                    </NativeSelectOption>
+                  ))}
+              </NativeSelectOptGroup>
+            ))}
+          </NativeSelect>
+        </div>
+        <div className="nx:flex nx:flex-col nx:gap-2">
+          <label htmlFor="token-type" className="nx:typography-label-small">
+            Value type
+          </label>
+          <NativeSelect
+            id="token-type"
+            disabled={types.length <= 1 && !search.type}
+            value={search.type ?? ''}
+            onChange={(event) =>
+              changeFilter({ type: event.target.value || undefined })
+            }
+          >
+            <NativeSelectOption value="">
+              {types.length === 1 ? `${types[0]} only` : 'All types'}
+            </NativeSelectOption>
+            {search.type && !types.includes(search.type) && (
+              <NativeSelectOption value={search.type}>
+                Unavailable type: {search.type}
+              </NativeSelectOption>
+            )}
+            {types.map((type) => (
+              <NativeSelectOption value={type} key={type}>
+                {type}
+              </NativeSelectOption>
+            ))}
+          </NativeSelect>
+        </div>
+        <div className="nx:flex nx:flex-col nx:gap-2">
+          <label htmlFor="token-mode" className="nx:typography-label-small">
+            Mode
+          </label>
+          <NativeSelect
+            id="token-mode"
+            disabled={modes.length === 0 && !search.mode}
+            value={search.mode ?? ''}
+            onChange={(event) =>
+              changeFilter({ mode: event.target.value || undefined })
+            }
+          >
+            <NativeSelectOption value="">
+              {modes.length === 0 ? 'Shared across modes' : 'All modes'}
+            </NativeSelectOption>
+            {search.mode && !modes.includes(search.mode) && (
+              <NativeSelectOption value={search.mode}>
+                Unavailable mode: {search.mode}
+              </NativeSelectOption>
+            )}
+            {modes.map((mode) => (
+              <NativeSelectOption value={mode} key={mode}>
+                {mode}
+              </NativeSelectOption>
+            ))}
+          </NativeSelect>
+        </div>
+      </div>
+      <Button asChild variant="ghost" size="sm">
+        <Link search={{}}>Clear filters</Link>
+      </Button>
+    </section>
+  );
+}
+
+function CatalogBrowser({
+  catalog,
+  accepted,
+}: {
+  catalog: TokenCatalog;
+  accepted: AcceptedPreview;
+}) {
+  const search = useTokenSearch();
+  const navigate = useTokenNavigate();
+  const groups = filterTokens(catalog, search);
+  const selectedRecords = catalog.records.filter(
+    (record) => record.logicalId === search.token
+  );
+  if (
+    selectedRecords.length &&
+    !groups.some((records) => records[0]?.logicalId === search.token)
+  )
+    groups.push(selectedRecords);
+  const selectedIndex = groups.findIndex(
+    (records) => records[0]?.logicalId === search.token
+  );
+  const pageCount = Math.max(1, Math.ceil(groups.length / PAGE_SIZE));
+  const page =
+    selectedIndex >= 0
+      ? Math.floor(selectedIndex / PAGE_SIZE) + 1
+      : Math.min(search.page ?? 1, pageCount);
+  const visible = groups.slice((page - 1) * PAGE_SIZE, page * PAGE_SIZE);
   const changePage = (nextPage: number) =>
-    navigate({ search: { ...search, page: nextPage }, resetScroll: false });
+    navigate({
+      search: {
+        ...search,
+        page: nextPage,
+        token: undefined,
+        variant: undefined,
+      },
+      resetScroll: false,
+    });
 
   return (
     <div className="nx:space-y-8" data-slot="token-explorer">
@@ -91,120 +260,6 @@ function CatalogBrowser({ catalog }: { catalog: TokenCatalog }) {
           {catalog.counts.runtimeTokens} runtime colors
         </p>
       </header>
-      <section aria-label="Find tokens" className="nx:space-y-4">
-        <div className="nx:flex nx:flex-col nx:gap-2">
-          <label htmlFor="token-search" className="nx:typography-label-small">
-            Find a token
-          </label>
-          <Input
-            id="token-search"
-            type="search"
-            placeholder="Try primary-background, spacing.4, or typography…"
-            value={search.q ?? ''}
-            onChange={(event) =>
-              changeFilter({ q: event.target.value || undefined })
-            }
-          />
-        </div>
-        <p
-          id="token-filter-help"
-          className="nx:typography-body-small nx:text-muted-foreground"
-        >
-          Browse a design group. Value types and modes follow your selection.
-        </p>
-        <div className="nx:grid nx:gap-4 nx:lg:grid-cols-3">
-          <div className="nx:flex nx:flex-col nx:gap-2">
-            <label htmlFor="token-group" className="nx:typography-label-small">
-              Token group
-            </label>
-            <NativeSelect
-              id="token-group"
-              aria-describedby="token-filter-help"
-              value={search.group ?? ''}
-              onChange={(event) =>
-                changeFilter({ group: event.target.value || undefined })
-              }
-            >
-              <NativeSelectOption value="">All tokens</NativeSelectOption>
-              {search.group &&
-                !filterGroups.some((group) => group.value === search.group) && (
-                  <NativeSelectOption value={search.group}>
-                    Unavailable group
-                  </NativeSelectOption>
-                )}
-              {groupSections.map((section) => (
-                <NativeSelectOptGroup key={section} label={section}>
-                  {filterGroups
-                    .filter((group) => group.section === section)
-                    .map((group) => (
-                      <NativeSelectOption
-                        value={group.value}
-                        key={group.value}
-                        disabled={group.count === 0}
-                      >
-                        {group.label} ({group.count})
-                      </NativeSelectOption>
-                    ))}
-                </NativeSelectOptGroup>
-              ))}
-            </NativeSelect>
-          </div>
-          <div className="nx:flex nx:flex-col nx:gap-2">
-            <label htmlFor="token-type" className="nx:typography-label-small">
-              Value type
-            </label>
-            <NativeSelect
-              id="token-type"
-              disabled={types.length <= 1 && !search.type}
-              value={search.type ?? ''}
-              onChange={(event) =>
-                changeFilter({ type: event.target.value || undefined })
-              }
-            >
-              <NativeSelectOption value="">
-                {types.length === 1 ? `${types[0]} only` : 'All types'}
-              </NativeSelectOption>
-              {search.type && !types.includes(search.type) && (
-                <NativeSelectOption value={search.type}>
-                  Unavailable type: {search.type}
-                </NativeSelectOption>
-              )}
-              {types.map((type) => (
-                <NativeSelectOption value={type} key={type}>
-                  {type}
-                </NativeSelectOption>
-              ))}
-            </NativeSelect>
-          </div>
-          <div className="nx:flex nx:flex-col nx:gap-2">
-            <label htmlFor="token-mode" className="nx:typography-label-small">
-              Mode
-            </label>
-            <NativeSelect
-              id="token-mode"
-              disabled={modes.length === 0 && !search.mode}
-              value={search.mode ?? ''}
-              onChange={(event) =>
-                changeFilter({ mode: event.target.value || undefined })
-              }
-            >
-              <NativeSelectOption value="">
-                {modes.length === 0 ? 'Shared across modes' : 'All modes'}
-              </NativeSelectOption>
-              {search.mode && !modes.includes(search.mode) && (
-                <NativeSelectOption value={search.mode}>
-                  Unavailable mode: {search.mode}
-                </NativeSelectOption>
-              )}
-              {modes.map((mode) => (
-                <NativeSelectOption value={mode} key={mode}>
-                  {mode}
-                </NativeSelectOption>
-              ))}
-            </NativeSelect>
-          </div>
-        </div>
-      </section>
       <section aria-label="Token results" className="nx:space-y-4">
         <div className="nx:flex nx:flex-wrap nx:items-center nx:justify-between nx:gap-3">
           <p
@@ -216,9 +271,6 @@ function CatalogBrowser({ catalog }: { catalog: TokenCatalog }) {
               ? ` · ${(page - 1) * PAGE_SIZE + 1}–${Math.min(page * PAGE_SIZE, groups.length)}`
               : ''}
           </p>
-          <Button asChild variant="ghost" size="sm">
-            <Link search={{}}>Clear filters</Link>
-          </Button>
         </div>
         <Separator />
         {visible.length === 0 ? (
@@ -231,47 +283,59 @@ function CatalogBrowser({ catalog }: { catalog: TokenCatalog }) {
             </p>
           </div>
         ) : (
-          <ItemGroup>
-            {visible.map((variants, index) => {
+          <Accordion
+            type="single"
+            collapsible
+            value={search.token ?? ''}
+            onValueChange={(token) =>
+              navigate({
+                search: {
+                  ...search,
+                  page,
+                  token: token || undefined,
+                  variant: undefined,
+                },
+                resetScroll: false,
+              })
+            }
+          >
+            {visible.map((variants) => {
               const record = variants[0];
               if (!record) return null;
               return (
-                <Fragment key={record.logicalId}>
-                  {index > 0 && <ItemSeparator />}
-                  <Item asChild className="nx:px-0 nx:py-4">
-                    <Link
-                      search={{
-                        ...search,
-                        token: record.logicalId,
-                        variant: record.id,
-                      }}
-                    >
+                <AccordionItem key={record.logicalId} value={record.logicalId}>
+                  <AccordionTrigger>
+                    <span className="nx:flex nx:items-center nx:gap-4 nx:min-w-0">
                       <TokenSample record={record} catalog={catalog} />
-                      <ItemContent className="nx:min-w-0">
-                        <ItemTitle className="nx:break-all">
+                      <span className="nx:flex nx:flex-col nx:gap-2 nx:min-w-0">
+                        <span className="nx:break-all">
                           {tokenName(record)}
-                        </ItemTitle>
-                        <ItemDescription>
+                        </span>
+                        <span className="nx:typography-body-small nx:text-muted-foreground">
                           {NAMESPACE_LABELS[record.namespace] ??
                             record.namespace}{' '}
                           · {record.family} ·{' '}
                           {variants.length > 1
                             ? `${variants.length} variants`
                             : record.type}
-                        </ItemDescription>
-                      </ItemContent>
-                      <ItemActions>
-                        <IconArrowRight
-                          aria-hidden="true"
-                          className="nx:size-4"
-                        />
-                      </ItemActions>
-                    </Link>
-                  </Item>
-                </Fragment>
+                        </span>
+                      </span>
+                    </span>
+                  </AccordionTrigger>
+                  <AccordionContent>
+                    <TokenDetail
+                      embedded
+                      catalog={catalog}
+                      records={catalog.records.filter(
+                        (item) => item.logicalId === record.logicalId
+                      )}
+                      accepted={accepted}
+                    />
+                  </AccordionContent>
+                </AccordionItem>
               );
             })}
-          </ItemGroup>
+          </Accordion>
         )}
         {pageCount > 1 && (
           <nav
@@ -306,8 +370,8 @@ function CatalogBrowser({ catalog }: { catalog: TokenCatalog }) {
         <p className="nx:typography-body-small nx:text-muted-foreground">
           All authored leaves and mode variants are included. Runtime semantics
           come from the engine’s registry. The catalog uses build defaults;
-          these values remain the build defaults. The Inspector shows your
-          active appearance separately.
+          these values remain the build defaults. Expanded token details show
+          your active appearance separately.
         </p>
         <p className="nx:typography-body-small nx:text-muted-foreground">
           {catalog.build.boundary}
@@ -346,7 +410,8 @@ export function ExploreRoute({ accepted }: { accepted: AcceptedPreview }) {
       </div>
     );
   const catalog = result.catalog;
-  if (!search.token) return <CatalogBrowser catalog={catalog} />;
+  if (!search.token)
+    return <CatalogBrowser catalog={catalog} accepted={accepted} />;
   const records = catalog.records.filter(
     (record) => record.logicalId === search.token
   );
@@ -376,7 +441,5 @@ export function ExploreRoute({ accepted }: { accepted: AcceptedPreview }) {
         </Button>
       </div>
     );
-  return (
-    <TokenDetail catalog={catalog} records={records} accepted={accepted} />
-  );
+  return <CatalogBrowser catalog={catalog} accepted={accepted} />;
 }

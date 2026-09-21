@@ -86,10 +86,12 @@ function EmissionList({ emissions }: { emissions: TokenEmission[] }) {
 }
 
 export function TokenDetail({
+  embedded = false,
   catalog,
   records,
   accepted,
 }: {
+  embedded?: boolean;
   catalog: TokenCatalog;
   records: TokenRecord[];
   accepted: AcceptedPreview;
@@ -117,7 +119,8 @@ export function TokenDetail({
     seeds: catalog.build.input[engineMode],
     contrast: catalog.build.input.contrast[engineMode],
   };
-  const activeMode = accepted.state.mode === 'dark' ? 'dark' : 'light';
+  const activeMode =
+    accepted.render.appearance.colorScheme === 'dark' ? 'dark' : 'light';
   const activeTheme = accepted.inspection.theme[activeMode];
   const activeColor =
     record.namespace === 'runtime'
@@ -133,12 +136,15 @@ export function TokenDetail({
 
   return (
     <article className="nx:space-y-8" data-slot="token-detail">
-      <Button variant="ghost" asChild>
-        <Link search={returnSearch}>
-          <IconArrowLeft aria-hidden="true" />
-          All tokens
-        </Link>
-      </Button>
+      {!embedded && (
+        <Button variant="ghost" asChild>
+          <Link search={returnSearch}>
+            <IconArrowLeft aria-hidden="true" />
+            All tokens
+          </Link>
+        </Button>
+      )}
+
       {activeColor && (
         <section
           className="nx:space-y-2 nx:rounded-base nx:border-default nx:border-border-default nx:p-4"

@@ -8,7 +8,7 @@ import { NexusAppearanceProvider } from '@nexus_ds/react/appearance';
 
 import { usePreviewAppearance } from '../preview/appearance-context';
 export default function AppearanceDemo() {
-  const { state, onChange } = usePreviewAppearance();
+  const { state, onChange, resolvedMode } = usePreviewAppearance();
   return (
     <NexusAppearanceProvider
       state={state}
@@ -21,7 +21,7 @@ export default function AppearanceDemo() {
         <NexusAppearanceSettings />
         <NexusAppearanceConfigPreview
           state={state}
-          resolvedMode={state.mode === 'dark' ? 'dark' : 'light'}
+          resolvedMode={resolvedMode}
         />
       </div>
     </NexusAppearanceProvider>

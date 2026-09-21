@@ -23,7 +23,8 @@ export const PREVIEW_DEFAULT_STATE: NexusAppearanceState = {
 export function createPreviewResult(
   state: NexusAppearanceState,
   revision: number,
-  inspection = inspectTheme(createNexusThemeContract(state))
+  inspection = inspectTheme(createNexusThemeContract(state)),
+  systemPrefersDark = false
 ) {
   const snapshot = createNexusAppearanceSnapshot(
     state,
@@ -33,7 +34,10 @@ export function createPreviewResult(
   return {
     state,
     inspection,
-    render: { revision, appearance: resolveFirstPaint(snapshot, false) },
+    render: {
+      revision,
+      appearance: resolveFirstPaint(snapshot, systemPrefersDark),
+    },
   };
 }
 

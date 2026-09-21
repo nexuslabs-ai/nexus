@@ -10,8 +10,6 @@ import {
 } from 'playwright';
 import { afterAll, afterEach, beforeAll, beforeEach, expect, it } from 'vitest';
 
-import { GALLERY } from '../app/_create/gallery';
-
 let browser: Browser,
   context: BrowserContext,
   page: Page,
@@ -87,21 +85,16 @@ async function ready() {
     .toBe('applied');
 }
 
-it('isolates theme, preserves demo state through undo, and remembers only playground appearance', async () => {
+it('shares theme with docs, preserves demo state through undo, and remembers appearance', async () => {
   await page.goto(base + '/create');
   await ready();
   const frame = page.frameLocator('iframe');
   await frame.getByLabel('Project name', { exact: true }).fill('Keep my draft');
-  const host = await page.evaluate(
-    () => document.documentElement.outerHTML.split('<body')[0]
-  );
   await page.getByLabel('Appearance', { exact: true }).selectOption('dark');
   await ready();
-  expect(
-    await page.evaluate(
-      () => document.documentElement.outerHTML.split('<body')[0]
-    )
-  ).toBe(host);
+  await expect
+    .poll(() => page.locator('html').getAttribute('class'))
+    .toContain('dark');
   expect(await frame.locator('html').getAttribute('class')).toContain('dark');
   await page.getByRole('button', { name: 'Undo', exact: true }).click();
   await ready();
@@ -124,6 +117,25 @@ it('contains dialog overlays and returns focus', async () => {
   await page.goto(base + '/create');
   await ready();
   const frame = page.frameLocator('iframe');
+  await expect
+    .poll(() =>
+      page.locator('iframe').evaluate((element) => {
+        const content = element.contentDocument?.getElementById('preview-root');
+        return (
+          !!content &&
+          Math.abs(
+            element.getBoundingClientRect().height -
+              content.getBoundingClientRect().height
+          ) <= 1
+        );
+      })
+    )
+    .toBe(true);
+  expect(
+    await page
+      .locator('iframe')
+      .evaluate((element) => getComputedStyle(element).borderTopWidth)
+  ).toBe('0px');
   await frame.getByRole('button', { name: 'Open dialog', exact: true }).click();
   expect(await frame.getByRole('dialog').isVisible()).toBe(true);
   expect(await page.getByRole('dialog').count()).toBe(0);
@@ -133,34 +145,44 @@ it('contains dialog overlays and returns focus', async () => {
       .getByRole('button', { name: 'Open dialog', exact: true })
       .evaluate((el) => el === document.activeElement)
   ).toBe(true);
-  await frame.getByRole('button', { name: 'Return to controls' }).click();
-  await expect
-    .poll(() =>
-      page
-        .getByRole('button', { name: 'Enter preview' })
-        .evaluate((el) => el === document.activeElement)
-    )
-    .toBe(true);
+  expect(
+    await frame.getByRole('button', { name: 'Return to controls' }).count()
+  ).toBe(0);
+  expect(
+    await page
+      .getByRole('button', { name: /Enter preview|Reload preview|Inspect/ })
+      .count()
+  ).toBe(0);
+  expect(await frame.getByRole('button', { name: /Inspect/ }).count()).toBe(0);
 });
-it('renders every public component composition without preview failures', async () => {
-  const errors: string[] = [];
-  page.on('pageerror', (error) => errors.push(error.message));
+it('keeps Create focused on examples even for former component-view links', async () => {
   await page.goto(base + '/create?view=components&component=button');
   await ready();
-  for (const entry of GALLERY) {
-    await page.getByLabel('Component', { exact: true }).selectOption(entry.id);
-    await ready();
-    await expect
-      .poll(() =>
-        page
-          .frameLocator('iframe')
-          .getByRole('heading', { name: entry.label, exact: true, level: 1 })
-          .count()
-      )
-      .toBe(1);
-    expect(errors, entry.id).toEqual([]);
-  }
-}, 180000);
+  expect(
+    await page.getByRole('button', { name: 'Components', exact: true }).count()
+  ).toBe(0);
+  expect(await page.getByLabel('Component', { exact: true }).count()).toBe(0);
+  const rail = await page
+    .getByRole('complementary', { name: 'Playground controls' })
+    .boundingBox();
+  const canvas = await page
+    .getByRole('region', { name: 'Playground canvas' })
+    .boundingBox();
+  expect(rail).not.toBeNull();
+  expect(canvas).not.toBeNull();
+  expect(rail!.x + rail!.width).toBeLessThanOrEqual(canvas!.x);
+  expect(Math.abs(rail!.height - canvas!.height)).toBeLessThan(2);
+  expect(
+    await page.evaluate(
+      () => document.documentElement.scrollHeight <= window.innerHeight
+    )
+  ).toBe(true);
+
+  await page
+    .frameLocator('iframe')
+    .getByRole('heading', { name: 'A fresh start' })
+    .waitFor();
+});
 it('retains Explorer deep links, logical filtering and browser navigation', async () => {
   await page.goto(
     base +
@@ -169,14 +191,18 @@ it('retains Explorer deep links, logical filtering and browser navigation', asyn
   await expect
     .poll(() => page.locator('[data-slot="token-detail"]').count())
     .toBe(1);
-  await page.getByRole('link', { name: 'All tokens' }).click();
+  expect(new URL(page.url()).pathname).toBe('/token');
+  expect(new URL(page.url()).searchParams.has('view')).toBe(false);
+  await page
+    .locator('[data-slot="accordion-trigger"][aria-expanded="true"]')
+    .click();
   await expect
     .poll(() => page.locator('[data-slot="token-explorer"]').count())
     .toBe(1);
   await page.getByLabel('Find a token').fill('primary-background');
   expect(
     await page
-      .getByRole('link')
+      .getByRole('button')
       .filter({ hasText: 'primary-background' })
       .count()
   ).toBeGreaterThan(0);
@@ -200,9 +226,7 @@ it('recovers a reloaded frame and exposes a narrow-screen controls panel', async
     )
     .toBe(true);
   await page.keyboard.press('Escape');
-  await page
-    .getByRole('button', { name: 'Reload preview', exact: true })
-    .click();
+  await page.reload();
   await ready();
   expect(
     await page.evaluate(
@@ -259,9 +283,7 @@ it('recovers missing documents and partial application failures without acceptin
     .waitFor({ timeout: 12000 });
   expect(await page.locator('iframe').isVisible()).toBe(false);
   await page.unroute('**/create/preview');
-  await page
-    .getByRole('button', { name: 'Reload preview', exact: true })
-    .click();
+  await page.reload();
   await ready();
   await page
     .frameLocator('iframe')
@@ -275,9 +297,7 @@ it('recovers missing documents and partial application failures without acceptin
   await page
     .locator('[data-slot="preview-connection"][data-state="error"]')
     .waitFor();
-  await page
-    .getByRole('button', { name: 'Reload preview', exact: true })
-    .click();
+  await page.reload();
   await ready();
   expect(
     await page.frameLocator('iframe').locator('html').getAttribute('class')
@@ -286,13 +306,13 @@ it('recovers missing documents and partial application failures without acceptin
 
 it('falls back from corrupt storage and keeps rapid appearance edits consistent', async () => {
   await context.addInitScript(() =>
-    localStorage.setItem('nexus-create-appearance-v1', '{ broken')
+    localStorage.setItem('nexus-docs-appearance', '{ broken')
   );
   await page.goto(base + '/create');
   await ready();
   expect(
     await page.getByLabel('Appearance', { exact: true }).inputValue()
-  ).toBe('light');
+  ).toBe('system');
   for (const density of ['tight', 'spacious', 'compact'])
     await page.getByLabel('Density', { exact: true }).selectOption(density);
   await ready();
@@ -302,20 +322,13 @@ it('falls back from corrupt storage and keeps rapid appearance edits consistent'
       .locator('html')
       .getAttribute('data-density')
   ).toBe('compact');
-  await page.getByRole('button', { name: 'Inspect', exact: true }).click();
-  await page.locator('[data-slot="create-inspector"]').waitFor();
-  expect(
-    await page.locator('[data-slot="create-inspector"] code').textContent()
-  ).toContain('<Button');
 });
 
 it('operates selection and popover controls with the keyboard inside the preview', async () => {
   await page.goto(base + '/create');
   await ready();
   const frame = page.frameLocator('iframe');
-  await page
-    .getByRole('button', { name: 'Enter preview', exact: true })
-    .click();
+  await frame.getByLabel('Project name', { exact: true }).focus();
   expect(await frame.locator(':focus').count()).toBe(1);
   await frame.getByRole('combobox', { name: 'Visibility' }).focus();
   await page.keyboard.press('Enter');
@@ -324,6 +337,13 @@ it('operates selection and popover controls with the keyboard inside the preview
   await page.keyboard.press('Enter');
   await page.keyboard.press('Escape');
   await frame.getByRole('listbox').waitFor({ state: 'hidden' });
+  await expect
+    .poll(() =>
+      frame
+        .getByRole('combobox', { name: 'Visibility' })
+        .evaluate((el) => el === document.activeElement)
+    )
+    .toBe(true);
   await frame
     .getByRole('button', { name: 'Quick details', exact: true })
     .press('Enter');
@@ -340,17 +360,17 @@ it('operates selection and popover controls with the keyboard inside the preview
 });
 
 it('distinguishes active theme tokens from build defaults and recovers invalid deep links', async () => {
-  await page.goto(
-    base + '/create?view=tokens&token=runtime%3Acolor%3Abackground-hover'
-  );
+  await page.goto(base + '/token?token=runtime%3Acolor%3Abackground-hover');
   const active = page
     .getByRole('region', { name: 'Active preview value' })
     .locator('code');
   await active.waitFor();
   const before = await active.textContent();
-  await page.getByLabel('Appearance', { exact: true }).selectOption('dark');
+  await page
+    .getByRole('button', { name: 'Switch to dark mode', exact: true })
+    .click();
   await expect.poll(() => active.textContent()).not.toBe(before);
-  await page.goto(base + '/create?view=tokens&token=removed');
+  await page.goto(base + '/token?token=removed');
   await page
     .getByRole('heading', { name: 'This token was not found.' })
     .waitFor();
@@ -379,7 +399,7 @@ it('keeps generator and filesystem tooling out of production browser chunks', ()
     );
 });
 
-it('keeps the narrow Button demo usable with enlarged text and density extremes', async () => {
+it('keeps the narrow examples usable with enlarged text and density extremes', async () => {
   await page.setViewportSize({ width: 390, height: 844 });
   await page.goto(base + '/create?view=components&component=button');
   await ready();
@@ -402,4 +422,128 @@ it('keeps the narrow Button demo usable with enlarged text and density extremes'
       () => document.documentElement.scrollWidth <= innerWidth
     )
   ).toBe(true);
+});
+
+it('shares surfaces across Create, article navigation and the docs selector', async () => {
+  await page.goto(base + '/create');
+  await ready();
+  await page.getByLabel('Surface tone', { exact: true }).selectOption('slate');
+  await page.getByLabel('Appearance', { exact: true }).selectOption('dark');
+  await ready();
+  const hostSurface = await page
+    .locator('html')
+    .evaluate((el) =>
+      getComputedStyle(el).getPropertyValue('--nx-color-background')
+    );
+  const frameSurface = await page
+    .frameLocator('iframe')
+    .locator('html')
+    .evaluate((el) =>
+      getComputedStyle(el).getPropertyValue('--nx-color-background')
+    );
+  expect(frameSurface.trim()).toBe(hostSurface.trim());
+  await page.goto(base + '/getting-started/install');
+  await expect
+    .poll(() =>
+      page.getByRole('combobox', { name: 'Surface tone' }).textContent()
+    )
+    .toContain('Slate');
+  await expect
+    .poll(() => page.locator('html').getAttribute('class'))
+    .toContain('dark');
+  await page.getByRole('combobox', { name: 'Surface tone' }).click();
+  await page.getByRole('option', { name: 'Zinc', exact: true }).click();
+  await page.goto(base + '/create');
+  await ready();
+  expect(
+    await page.getByLabel('Surface tone', { exact: true }).inputValue()
+  ).toBe('zinc');
+  await page
+    .getByRole('button', { name: 'Switch to light mode', exact: true })
+    .click();
+  await ready();
+  await expect
+    .poll(() => page.getByLabel('Appearance', { exact: true }).inputValue())
+    .toBe('light');
+  await page.getByRole('button', { name: 'Undo', exact: true }).click();
+  await ready();
+  expect(
+    await page.getByLabel('Appearance', { exact: true }).inputValue()
+  ).toBe('dark');
+});
+
+it('follows device mode in the site and preview without changing the saved preference', async () => {
+  await page.emulateMedia({ colorScheme: 'dark' });
+  await page.goto(base + '/create');
+  await ready();
+  expect(
+    await page.getByLabel('Appearance', { exact: true }).inputValue()
+  ).toBe('system');
+  await expect
+    .poll(() =>
+      page.frameLocator('iframe').locator('html').getAttribute('class')
+    )
+    .toContain('dark');
+  await page.emulateMedia({ colorScheme: 'light' });
+  await expect
+    .poll(() =>
+      page.frameLocator('iframe').locator('html').getAttribute('class')
+    )
+    .not.toContain('dark');
+  expect(
+    await page.getByLabel('Appearance', { exact: true }).inputValue()
+  ).toBe('system');
+});
+
+it('uses token filters in the left rail and in a narrow-screen panel', async () => {
+  await page.goto(base + '/token');
+  const rail = page.getByRole('complementary', { name: 'Token filters' });
+  await rail.getByLabel('Find a token').waitFor();
+  expect(await page.getByLabel('Surface tone', { exact: true }).count()).toBe(
+    0
+  );
+  expect(
+    await page.getByRole('button', { name: 'Use this theme' }).count()
+  ).toBe(0);
+  await rail.getByLabel('Token group', { exact: true }).selectOption('runtime');
+  expect(new URL(page.url()).searchParams.get('group')).toBe('runtime');
+  await rail.getByLabel('Find a token').fill('primary-background');
+  await page
+    .getByRole('region', { name: 'Token results' })
+    .getByRole('button')
+    .filter({ hasText: 'primary-background' })
+    .first()
+    .waitFor();
+  await page.setViewportSize({ width: 390, height: 844 });
+  await page.getByRole('button', { name: 'Filters', exact: true }).click();
+  const panel = page.getByRole('dialog');
+  expect(
+    await panel.getByLabel('Token group', { exact: true }).inputValue()
+  ).toBe('runtime');
+  await panel.getByRole('link', { name: 'Clear filters' }).click();
+  expect(new URL(page.url()).searchParams.has('group')).toBe(false);
+  await page.keyboard.press('Escape');
+  expect(
+    await page.evaluate(
+      () => document.documentElement.scrollWidth <= innerWidth
+    )
+  ).toBe(true);
+});
+
+it('expands token details in place and keeps variant deep links through reload', async () => {
+  await page.goto(base + '/token');
+  const first = page.getByRole('button', { name: /borderwidth.thin/ });
+  await first.click();
+  expect(await first.getAttribute('aria-expanded')).toBe('true');
+  await page.locator('[data-slot="token-detail"]').waitFor();
+  expect(
+    await page.getByRole('button', { name: /borderwidth.default/ }).isVisible()
+  ).toBe(true);
+  expect(new URL(page.url()).searchParams.get('token')).toBeTruthy();
+  await page.reload();
+  await page.locator('[data-slot="token-detail"]').waitFor();
+  await first.focus();
+  await page.keyboard.press('Enter');
+  expect(await first.getAttribute('aria-expanded')).toBe('false');
+  expect(new URL(page.url()).searchParams.has('token')).toBe(false);
 });

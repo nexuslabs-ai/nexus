@@ -5,17 +5,19 @@ import {
 } from '@nexus_ds/core';
 import { describe, expect, it } from 'vitest';
 
-import { exportAppearance, restoreAppearance } from './appearance-state';
+import { exportAppearance } from './appearance-state';
 import {
   createPreviewResult,
   PREVIEW_DEFAULT_STATE,
   updatePreviewResult,
 } from './preview/accepted-result';
 describe('playground appearance', () => {
-  it('falls back safely for corrupt or missing saved data', () => {
-    expect(restoreAppearance('{')).toEqual(PREVIEW_DEFAULT_STATE);
-    expect(restoreAppearance('null')).toEqual(PREVIEW_DEFAULT_STATE);
-    expect(restoreAppearance(null)).toEqual(PREVIEW_DEFAULT_STATE);
+  it('resolves system mode consistently for preview and export', () => {
+    const state = { ...PREVIEW_DEFAULT_STATE, mode: 'system' as const };
+    const accepted = createPreviewResult(state, 1, undefined, true);
+    expect(accepted.render.appearance.colorScheme).toBe('dark');
+    expect(exportAppearance(accepted).appearance.mode).toBe('system');
+    expect(exportAppearance(accepted).root.className).toBe('dark');
   });
   it('rederives tone and contrast while export exactly matches accepted preview', () => {
     const initial = createPreviewResult(PREVIEW_DEFAULT_STATE, 1);

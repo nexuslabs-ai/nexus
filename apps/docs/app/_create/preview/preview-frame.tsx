@@ -3,34 +3,21 @@
 import { useEffect, useRef, useState } from 'react';
 
 import type { NexusAppearanceState } from '@nexus_ds/core';
-import { Button } from '@nexus_ds/react';
-
-import type { ComponentId } from '../gallery';
 
 import { connectPreview, type PreviewStatus } from './frame-channel';
 import type { PreviewResult } from './protocol';
 
 interface PreviewFrameProps {
   result: PreviewResult;
-  onInspect?: (component: ComponentId) => void;
   onAppearanceChange?: (state: NexusAppearanceState) => void;
 }
 
-function ConnectedPreview({
-  result,
-  onInspect,
-  onAppearanceChange,
-}: PreviewFrameProps) {
+function ConnectedPreview({ result, onAppearanceChange }: PreviewFrameProps) {
   const frame = useRef<HTMLIFrameElement>(null);
-  const enterButton = useRef<HTMLButtonElement>(null);
-  const inspectRef = useRef(onInspect);
   const appearanceRef = useRef(onAppearanceChange);
   useEffect(() => {
     appearanceRef.current = onAppearanceChange;
   }, [onAppearanceChange]);
-  useEffect(() => {
-    inspectRef.current = onInspect;
-  }, [onInspect]);
   const channel = useRef<ReturnType<typeof connectPreview>>(null);
   const [status, setStatus] = useState<PreviewStatus>({ phase: 'loading' });
 
@@ -39,8 +26,8 @@ function ConnectedPreview({
     const connection = connectPreview(
       frame.current,
       setStatus,
-      () => enterButton.current?.focus(),
-      (component) => inspectRef.current?.(component),
+      () => frame.current?.focus(),
+      undefined,
       (state) => appearanceRef.current?.(state)
     );
     channel.current = connection;
@@ -54,53 +41,55 @@ function ConnectedPreview({
     channel.current?.update(result);
   }, [result]);
 
+  useEffect(() => {
+    const element = frame.current;
+    if (!element) return;
+    let observer: ResizeObserver | undefined;
+    function observeContent() {
+      observer?.disconnect();
+      const content = element?.contentDocument?.getElementById('preview-root');
+      if (!content || !element) return;
+      const resize = () => {
+        element.style.height = `${Math.ceil(content.getBoundingClientRect().height)}px`;
+      };
+      observer = new ResizeObserver(resize);
+      observer.observe(content);
+      resize();
+    }
+    element.addEventListener('load', observeContent);
+    observeContent();
+    return () => {
+      element.removeEventListener('load', observeContent);
+      observer?.disconnect();
+    };
+  }, []);
+
   const applied =
     status.phase === 'applied' && status.revision === result.revision;
   const failed = status.phase === 'error';
-  function enterPreview() {
-    frame.current?.contentDocument
-      ?.querySelector<HTMLButtonElement>('button')
-      ?.focus();
-  }
-
   return (
     <div
-      className="nx:space-y-3"
+      className="nx:flex nx:flex-col nx:gap-3 nx:min-h-0"
       data-slot="preview-connection"
       data-state={failed ? 'error' : applied ? 'applied' : 'pending'}
       data-revision={applied ? status.revision : undefined}
     >
-      <div className="nx:flex nx:flex-wrap nx:items-center nx:justify-between nx:gap-3">
+      {!applied && (
         <p
           role="status"
           className="nx:typography-body-small nx:text-muted-foreground"
         >
           {failed
-            ? 'The preview is unavailable. Reload it to try again.'
-            : applied
-              ? 'Preview is up to date.'
-              : 'Preparing your preview…'}
+            ? 'The preview is unavailable. Refresh this page to try again.'
+            : 'Preparing your preview…'}
         </p>
-        <Button
-          ref={enterButton}
-          variant="ghost"
-          size="sm"
-          disabled={!applied}
-          onClick={enterPreview}
-        >
-          Enter preview
-        </Button>
-      </div>
+      )}
       <iframe
         ref={frame}
         title="Nexus component preview"
         src="/create/preview"
         hidden={failed}
-        className={
-          failed
-            ? 'nx:hidden'
-            : 'nx:block nx:h-svh nx:w-full nx:rounded-lg nx:border-default nx:border-border-default'
-        }
+        className={failed ? 'nx:hidden' : 'nx:block nx:w-full nx:border-0'}
       />
     </div>
   );
@@ -108,29 +97,18 @@ function ConnectedPreview({
 
 export function PreviewFrame({
   result,
-  onInspect,
   onAppearanceChange,
 }: PreviewFrameProps) {
-  const [instance, setInstance] = useState(0);
   return (
     <section
       aria-label="Live component preview"
-      className="nx:space-y-3"
+      className="nx:flex nx:flex-col nx:gap-3 nx:min-h-0"
       data-slot="preview-frame"
     >
       <ConnectedPreview
-        key={instance}
         result={result}
-        onInspect={onInspect}
         onAppearanceChange={onAppearanceChange}
       />
-      <Button
-        variant="link"
-        size="sm"
-        onClick={() => setInstance(instance + 1)}
-      >
-        Reload preview
-      </Button>
     </section>
   );
 }

@@ -189,7 +189,16 @@ function ModeSelect({
 }) {
   return (
     <Select value={value} onValueChange={onChange}>
-      <SelectTrigger className="nx:w-[120px] nx:h-8 nx:typography-label-small nx:capitalize">
+      <SelectTrigger
+        aria-label={
+          mode === 'base'
+            ? 'Surface tone'
+            : mode === 'mode'
+              ? 'Appearance'
+              : mode
+        }
+        className="nx:w-[120px] nx:h-8 nx:typography-label-small nx:capitalize"
+      >
         <SelectValue />
       </SelectTrigger>
       <SelectContent>

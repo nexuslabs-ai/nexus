@@ -57,9 +57,6 @@ export function PreviewClient() {
     function unload() {
       if (revision > 0) send({ type: 'unloading', revision });
     }
-    function exit() {
-      send({ type: 'exit', revision });
-    }
     function receive(event: MessageEvent<unknown>) {
       if (
         window.parent === window ||
@@ -92,6 +89,7 @@ export function PreviewClient() {
             <PreviewAppearanceContext.Provider
               value={{
                 state: message.state ?? PREVIEW_DEFAULT_STATE,
+                resolvedMode: message.appearance.colorScheme,
                 onChange: (state) =>
                   send({ type: 'appearance-change', revision, state }),
               }}
@@ -104,10 +102,6 @@ export function PreviewClient() {
                   }
                 }}
                 scene={message.scene}
-                onInspect={(component) =>
-                  send({ type: 'inspect', revision, component })
-                }
-                onExit={exit}
               />
             </PreviewAppearanceContext.Provider>
           )

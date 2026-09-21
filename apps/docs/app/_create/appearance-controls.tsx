@@ -83,11 +83,12 @@ export function AppearanceControls({ state, onChange }: ControlsProps) {
         label="Appearance"
         value={state.mode}
         options={[
+          { value: 'system', label: 'Follow device' },
           { value: 'light', label: 'Light' },
           { value: 'dark', label: 'Dark' },
         ]}
         onChange={(mode) =>
-          onChange({ mode: mode === 'dark' ? 'dark' : 'light' })
+          onChange({ mode: mode as NexusAppearanceState['mode'] })
         }
       />
       <SelectField
@@ -222,7 +223,7 @@ export function AppearanceControls({ state, onChange }: ControlsProps) {
         />
       </label>
       <p className="nx:typography-body-small nx:text-muted-foreground">
-        Changes apply to the canvas. Your docs preferences stay separate.
+        One appearance for the docs, canvas, and every surface.
       </p>
     </section>
   );

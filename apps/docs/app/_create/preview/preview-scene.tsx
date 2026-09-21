@@ -30,11 +30,10 @@ import {
 } from '@nexus_ds/react';
 
 import { GalleryDemo } from '../demos/gallery-demo';
-import { type ComponentId, GALLERY } from '../gallery';
 
 import type { PreviewResult } from './protocol';
 
-function Sampler({ onInspect }: { onInspect: (id: ComponentId) => void }) {
+function Sampler() {
   const [saved, setSaved] = useState(false);
   function submit(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -46,13 +45,6 @@ function Sampler({ onInspect }: { onInspect: (id: ComponentId) => void }) {
         <CardHeader>
           <div className="nx:flex nx:items-center nx:justify-between nx:gap-2">
             <CardTitle>A fresh start</CardTitle>
-            <Button
-              size="sm"
-              variant="ghost"
-              onClick={() => onInspect('input')}
-            >
-              Inspect Input
-            </Button>
           </div>
           <CardDescription>Give your next idea a name.</CardDescription>
         </CardHeader>
@@ -121,13 +113,6 @@ function Sampler({ onInspect }: { onInspect: (id: ComponentId) => void }) {
               Go back
             </Button>
             <Button disabled>Unavailable</Button>
-            <Button
-              size="sm"
-              variant="ghost"
-              onClick={() => onInspect('button')}
-            >
-              Inspect Button
-            </Button>
           </CardContent>
         </Card>
         <Card>
@@ -214,17 +199,12 @@ function Applied({ onApplied }: { onApplied: () => void }) {
 }
 export function PreviewScene({
   scene,
-  onExit,
-  onInspect,
   onApplied,
 }: {
   scene: PreviewResult['scene'];
-  onExit: () => void;
-  onInspect: (id: ComponentId) => void;
   onApplied: () => void;
 }) {
   const id = scene?.component ?? 'button';
-  const item = GALLERY.find((entry) => entry.id === id) ?? GALLERY[0];
   const components = scene?.view === 'components';
   return (
     <TooltipProvider>
@@ -233,37 +213,18 @@ export function PreviewScene({
         className="nx:@container nx:space-y-8 nx:p-6"
         data-slot="preview-scene"
       >
-        <header className="nx:space-y-2">
-          <p className="nx:typography-label-small nx:text-muted-foreground">
-            {components
-              ? 'COMPONENTS / ' + item.label.toUpperCase()
-              : 'YOUR NEXUS, IN ACTION'}
-          </p>
-          <h1 className="nx:typography-heading-large">
-            {components ? item.label : 'Small details. One system.'}
-          </h1>
-          <p className="nx:typography-body-small nx:text-muted-foreground">
-            Try it. Change the theme. See what responds.
-          </p>
-        </header>
         <Suspense fallback={<p role="status">Loading example…</p>}>
           {components ? (
             <>
-              <Button variant="outline" onClick={() => onInspect(id)}>
-                Inspect {item.label}
-              </Button>
               <DemoFeedback key={id}>
                 <GalleryDemo id={id} />
               </DemoFeedback>
             </>
           ) : (
-            <Sampler onInspect={onInspect} />
+            <Sampler />
           )}
           <Applied onApplied={onApplied} />
         </Suspense>
-        <Button variant="ghost" size="sm" onClick={onExit}>
-          Return to controls
-        </Button>
       </main>
     </TooltipProvider>
   );

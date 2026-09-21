@@ -15,6 +15,7 @@ import { SearchPalette } from './SearchPalette';
 const NAV_LINKS = [
   { href: '/', label: 'Home', match: '/' },
   { href: '/create', label: 'Create', match: '/create' },
+  { href: '/token', label: 'Tokens', match: '/token' },
   ...PAGE_MANIFEST.map((section) => ({
     href: section.href,
     label: section.title,
@@ -89,7 +90,7 @@ export function TopNav() {
   };
 
   return (
-    <header className="nx:sticky nx:top-0 nx:z-30 nx:flex nx:items-center nx:gap-6 nx:px-6 nx:h-(--docs-header-h) nx:bg-nav-background nx:text-nav-foreground nx:border-b nx:border-nav-border">
+    <header className="nx:sticky nx:top-0 nx:z-30 nx:flex nx:items-center nx:gap-2 nx:sm:gap-6 nx:px-4 nx:sm:px-6 nx:h-(--docs-header-h) nx:bg-nav-background nx:text-nav-foreground nx:border-b nx:border-nav-border">
       <div className="nx:flex nx:items-center nx:gap-2 nx:font-semibold nx:typography-label-default">
         Nexus DS
         <span className="nx:text-[10px] nx:uppercase nx:tracking-wider nx:text-nav-muted-foreground nx:px-1.5 nx:py-0.5 nx:border nx:border-dashed nx:border-nav-border nx:rounded-sm">
@@ -100,7 +101,7 @@ export function TopNav() {
         ref={menuRef}
         aria-label="Sections"
         onBlur={closeOnFocusLeave}
-        className="nx:relative nx:flex-1 nx:xl:hidden"
+        className="nx:relative nx:min-w-0 nx:flex-1 nx:xl:hidden"
       >
         <Button
           ref={triggerRef}
@@ -108,10 +109,12 @@ export function TopNav() {
           size="sm"
           aria-expanded={menuOpen}
           onClick={() => setMenuOpen((open) => !open)}
-          className={COARSE_HIT_AREA}
+          className={cn(COARSE_HIT_AREA, 'nx:max-w-full')}
         >
           <span aria-hidden="true">☰</span>
-          {currentLink?.label ?? 'Sections'}
+          <span className="nx:truncate">
+            {currentLink?.label ?? 'Sections'}
+          </span>
         </Button>
         {menuOpen && (
           <ul className="nx:absolute nx:top-full nx:left-0 nx:mt-1 nx:z-popover nx:min-w-48 nx:max-h-[70svh] nx:overflow-y-auto nx:list-none nx:m-0 nx:flex nx:flex-col nx:gap-0.5 nx:p-1 nx:rounded-md nx:border nx:border-border-default nx:bg-popover nx:text-popover-foreground nx:shadow-lg">

@@ -21,16 +21,19 @@ article sidebars, footer and floating appearance picker. `app/(preview)` serves
 `/create/preview` without docs providers or appearance persistence. Only that
 internal, non-indexed route permits same-origin framing in the frame policy.
 
-The host computes one accepted appearance result. Preview, Inspector, token
-runtime values and export consume it. Invalid changes leave the accepted result
+The docs appearance provider is the shared source of truth across articles and
+Create, including surface tone, mode and appearance preferences. The host computes
+one accepted preview appearance result. Preview, token runtime values and export consume it. Invalid changes leave the accepted result
 intact. Undo affects appearance only; Reset also remounts the active demo. The
-optional `nexus-create-appearance-v1` storage key is independent of docs settings.
+optional `nexus-docs-appearance` key persists the shared state. Create no longer
+reads or writes its former playground-only storage key. Follow-device mode resolves
+consistently in the site, preview and export.
 
 The frame channel validates source, origin, connection, document and revision.
 A bounded handshake accommodates hydration after load; acknowledgement follows
-successful scene commit, including lazy examples. Failed frames expose Reload.
-Portals stay inside the preview document. Enter preview and Return to controls
-provide explicit keyboard movement between documents.
+successful scene commit, including lazy examples. Failed frames ask visitors to
+refresh the page. Portals stay inside the preview document. The borderless preview
+sizes to its content; native keyboard navigation moves between documents.
 
 ## Adding examples
 
@@ -41,7 +44,8 @@ families. Provider/hooks/types/internal helpers are not gallery entries.
 
 Update the docs registry when adding a family. Coverage reconciles the registry,
 package export paths, story files, demos and generated Inspector evidence. The
-production browser suite renders every entry and checks for runtime failures.
+production browser suite checks the Examples sampler. Individual component demos
+are retained for a separate docs PR; Create does not expose a Components view.
 Use local data and existing Nexus components/tokens; demo navigation remains local.
 
 `generate:catalog` uses the authoritative Core generator; browser code imports only
@@ -58,3 +62,13 @@ in Turbo build outputs; filesystem/parser tooling never enters browser chunks.
 Exports include the appearance configuration, generated light/dark theme CSS,
 preference CSS and root attributes/setup guidance. Project generation, theme import,
 shuffle/locks and appearance-sharing URLs are deliberately out of scope.
+
+### Token workspace
+
+`/token` hosts the token explorer in the same two-pane layout as `/create`,
+with search, token group, value type, and mode filters in the left rail (a Filters
+panel on narrow screens). The docs header links to Tokens. It inherits the shared
+docs appearance without showing theme-editing controls. Token filters, variants, provenance and browser history
+remain available; old `/create?view=tokens` links redirect with their selections.
+Token rows expand in place using Nexus accordions, with URL-backed selection and
+variant deep links. Create itself contains only the examples canvas.

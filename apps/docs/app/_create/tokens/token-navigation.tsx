@@ -28,7 +28,7 @@ export function useTokenNavigate() {
         variant: undefined,
         page: undefined,
         ...search,
-        view: 'tokens',
+        view: undefined,
       },
       replace
     );
@@ -39,7 +39,7 @@ export function TokenLink({
   ...props
 }: Omit<ComponentProps<'a'>, 'href'> & { search: ExploreSearch }) {
   const navigate = useTokenNavigate();
-  const params = new URLSearchParams({ view: 'tokens' });
+  const params = new URLSearchParams();
   for (const [key, value] of Object.entries(search))
     if (value !== undefined) params.set(key, String(value));
   function visit(event: React.MouseEvent<HTMLAnchorElement>) {
@@ -55,7 +55,7 @@ export function TokenLink({
     navigate({ search });
   }
   return (
-    <a {...props} href={'/create?' + params} onClick={visit}>
+    <a {...props} href={'/token?' + params} onClick={visit}>
       {children}
     </a>
   );

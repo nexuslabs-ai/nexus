@@ -17,7 +17,7 @@ export default function Inspector({
   const entry = evidence[id];
   const theme =
     accepted.inspection.theme[
-      accepted.state.mode === 'dark' ? 'dark' : 'light'
+      accepted.render.appearance.colorScheme === 'dark' ? 'dark' : 'light'
     ];
   const tokens = entry.tokens.filter((name) =>
     Object.hasOwn(theme, `--nx-color-${name}`)
@@ -27,7 +27,8 @@ export default function Inspector({
       <div className="nx:space-y-2">
         <h2 className="nx:typography-heading-small">{item.label}</h2>
         <p className="nx:typography-body-small nx:text-muted-foreground">
-          Configured example and active {accepted.state.mode} appearance.
+          Configured example and active {accepted.render.appearance.colorScheme}{' '}
+          appearance.
         </p>
       </div>
       <pre className="nx:max-h-64 nx:overflow-auto nx:bg-muted nx:p-4 nx:rounded-base nx:typography-code-inline">
