@@ -244,6 +244,9 @@ jobs:
             exit 1
           fi
 
+      - name: Build Core for catalog generation
+        run: pnpm --filter @nexus_ds/core build
+
       - name: Regenerate playground data and verify Inspector evidence
         run: |
           pnpm --filter @nexus_ds/docs generate:catalog

@@ -1,7 +1,10 @@
 import * as React from 'react';
 
 import type { Meta, StoryObj } from '@storybook/react';
-import { CheckCheckIcon, InfoIcon } from 'lucide-react';
+import {
+  IconChecks as CheckCheckIcon,
+  IconInfoCircle as InfoIcon,
+} from '@tabler/icons-react';
 import { expect, fn, userEvent, waitFor, within } from 'storybook/test';
 
 import { Button } from '../button';
