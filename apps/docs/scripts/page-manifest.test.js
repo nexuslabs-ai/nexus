@@ -1,7 +1,6 @@
 import fs from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
-import { fileURLToPath } from 'node:url';
 import { describe, expect, it } from 'vitest';
 
 import {
@@ -18,11 +17,7 @@ import {
   REGISTRY_FILE,
   resolveFormatOptions,
 } from './page-manifest.mjs';
-
-const docsRoot = path.resolve(
-  path.dirname(fileURLToPath(import.meta.url)),
-  '..'
-);
+import { docsRoot } from './roots.mjs';
 
 const pages = PAGE_MANIFEST.flatMap((section) => section.pages);
 

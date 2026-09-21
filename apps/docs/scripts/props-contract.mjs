@@ -192,6 +192,28 @@ export function publicComponents(checker, exported, componentsRoot) {
   return new Map(found.sort(([a], [b]) => a.localeCompare(b, 'en')));
 }
 
+// `Cannot find module "X" or its corresponding type declarations`, and the
+// variant that blames `moduleResolution`.
+const MODULE_RESOLUTION_CODES = new Set([2307, 2792]);
+
+/**
+ * An import the program could not resolve is not an error the checker reports
+ * on the props that travel through it: the type widens to `any`, which reads as
+ * a documented type. The props JSON is a build output of `packages/react/src`
+ * and of the workspace packages that source types itself against, and only the
+ * first is a declared input anywhere in the build graph — so an unbuilt
+ * dependency has to be read off the diagnostics to be noticed at all.
+ */
+export function unresolvedModuleMessages(diagnostics) {
+  const messages = diagnostics
+    .filter((diagnostic) => MODULE_RESOLUTION_CODES.has(diagnostic.code))
+    .map((diagnostic) =>
+      ts.flattenDiagnosticMessageText(diagnostic.messageText, ' ')
+    );
+
+  return [...new Set(messages)].sort();
+}
+
 /**
  * `React.CSSProperties` is spelled the same in every file and reads as itself,
  * so the conventional `React` binding is exempt; a namespace over any other

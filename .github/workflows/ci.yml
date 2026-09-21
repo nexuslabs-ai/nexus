@@ -244,6 +244,21 @@ jobs:
             exit 1
           fi
 
+      - name: Restore Turbo cache (read-only)
+        uses: actions/cache/restore@v4
+        with:
+          path: .turbo
+          key: turbo-${{ runner.os }}-${{ github.sha }}
+          restore-keys: |
+            turbo-${{ runner.os }}-
+
+      # `test:unit` is raw vitest, so nothing in it carries turbo's
+      # `^build` edge. The docs props generator types `packages/react/src`
+      # against `@nexus_ds/core`'s built declarations, and an unbuilt
+      # dependency documents every prop reached through it as `any`.
+      - name: Build workspace dependencies
+        run: pnpm turbo build --filter=@nexus_ds/docs^...
+
       - name: Run unit tests
         run: pnpm test:unit
 

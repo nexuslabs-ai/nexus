@@ -24,6 +24,7 @@ import {
   publicComponents,
   publicExports,
   toSlugFolder,
+  unresolvedModuleMessages,
 } from './props-contract.mjs';
 import {
   entryPointsFromManifest,
@@ -421,6 +422,45 @@ describe('component export predicates', () => {
     );
     expect(isComponentName('useSidebar')).toBe(false);
   });
+
+  it('reports only the imports the program could not resolve', () => {
+    const diagnostic = (code: number, messageText: string) => ({
+      code,
+      messageText,
+    });
+
+    expect(
+      unresolvedModuleMessages([
+        diagnostic(2307, "Cannot find module '@nexus_ds/core'."),
+        // Same module reported once per importing file.
+        diagnostic(2307, "Cannot find module '@nexus_ds/core'."),
+        diagnostic(2792, "Cannot find module './themes'."),
+        // An ordinary type error is not this guard's business.
+        diagnostic(2345, "Argument of type 'string' is not assignable."),
+      ])
+    ).toEqual([
+      "Cannot find module './themes'.",
+      "Cannot find module '@nexus_ds/core'.",
+    ]);
+
+    expect(unresolvedModuleMessages([])).toEqual([]);
+  });
+
+  it('flattens a chained unresolved-import message', () => {
+    const chained = {
+      code: 2307,
+      messageText: {
+        messageText: "Cannot find module '@nexus_ds/core'.",
+        next: [{ messageText: 'Build the package first.' }],
+      },
+    };
+
+    // Reading `messageText` directly would stringify the chain to
+    // `[object Object]`; flattening keeps the nested note, indented.
+    expect(unresolvedModuleMessages([chained])).toEqual([
+      "Cannot find module '@nexus_ds/core'.   Build the package first.",
+    ]);
+  });
 });
 
 describe('react entry points', () => {
@@ -454,21 +494,26 @@ describe('react entry points', () => {
   it('reads types by condition priority, not by the order they are listed', () => {
     const priority = ['import', 'module', 'require', 'node', 'default'];
 
+    const declaration = (condition: string): [string, unknown] => [
+      condition,
+      {
+        types: `./dist/${condition}.d.ts`,
+        default: `./dist/${condition}.mjs`,
+      },
+    ];
+
     // Each manifest declares its conditions in reverse priority order, so only
     // the priority walk can pick the expected winner — listing order would
-    // always yield the last entry instead. Dropping one rung from the list
-    // fails the round that starts at it.
+    // always yield the last entry instead. `browser` leads every round: a
+    // condition the list does not name still has to lose to every one it does,
+    // so dropping a rung fails the round that starts at it, and walking the
+    // unnamed conditions ahead of the named ones fails all five.
     for (let i = 0; i < priority.length; i += 1) {
       const remaining = priority.slice(i);
-      const target = Object.fromEntries(
-        [...remaining].reverse().map((condition) => [
-          condition,
-          {
-            types: `./dist/${condition}.d.ts`,
-            default: `./dist/${condition}.mjs`,
-          },
-        ])
-      );
+      const target = Object.fromEntries([
+        declaration('browser'),
+        ...[...remaining].reverse().map(declaration),
+      ]);
 
       const entries = entryPointsFromManifest({ exports: { '.': target } });
 

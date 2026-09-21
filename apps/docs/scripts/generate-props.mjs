@@ -22,6 +22,7 @@ import {
   publicExports,
   toRepoPath,
   toSlugFolder,
+  unresolvedModuleMessages,
 } from './props-contract.mjs';
 import { reactEntryPoints } from './react-entry-points.mjs';
 import { docsRoot, reactRoot, repoRoot } from './roots.mjs';
@@ -34,7 +35,6 @@ const outputDir = process.argv[2]
   ? path.resolve(process.argv[2])
   : path.join(docsRoot, 'generated', 'props');
 
-const indexFile = 'index.json';
 const entryPoints = reactEntryPoints();
 
 function collectSourceFiles(dir) {
@@ -182,6 +182,28 @@ function wasGeneratedHere(fileName) {
   }
 }
 
+/**
+ * The generator is the only place that can tell a missing workspace build from
+ * an ordinary type error, so it asks the program what it failed to resolve
+ * rather than leaving the next run to show it as an unexplained freshness diff.
+ * Runs after the type strings are produced: a full check interns union members,
+ * and the passes that print them depend on that order.
+ */
+function assertProgramResolves() {
+  const unresolved = unresolvedModuleMessages(
+    ts.getPreEmitDiagnostics(program)
+  );
+  if (unresolved.length === 0) return;
+
+  throw new Error(
+    [
+      'props JSON: the react program has unresolved imports, so every prop typed through them would be documented as `any`.',
+      'Build the workspace dependencies first: pnpm turbo build --filter=@nexus_ds/docs^...',
+      ...unresolved.map((message) => `  ${message}`),
+    ].join('\n')
+  );
+}
+
 function clearPreviousOutput() {
   for (const fileName of readdirSync(outputDir)) {
     if (!wasGeneratedHere(fileName)) continue;
@@ -245,6 +267,8 @@ for (const doc of parser.parseWithProgramProvider(sourceFiles, () => program)) {
 // would reorder the type strings those two produce.
 const components = publicComponents(checker, exported, componentsRoot);
 
+assertProgramResolves();
+
 const bySlug = new Map(slugs.map((slug) => [slug, []]));
 
 for (const [name, symbol] of components) {
@@ -279,7 +303,7 @@ for (const [slug, entries] of bySlug) {
   });
 }
 
-writeJson(path.join(outputDir, indexFile), index);
+writeJson(path.join(outputDir, 'index.json'), index);
 
 console.log(
   `props: ${Object.keys(index).length} entries, ${components.size} components, ${propCount} props -> ${toRepoPath(outputDir)}`
