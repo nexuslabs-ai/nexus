@@ -115,8 +115,8 @@ refinement is accepted.
 Check at least:
 
 - Keyboard reachability and expected key bindings for the pattern.
-- Visible focus treatment that follows
-  [components.md](components.md#focus-states).
+- Visible focus treatment matching the shipped focus utilities — see
+  `button.tsx` and `input.tsx` for the canonical outline recipe.
 - Focus not obscured by author-created overlays, sticky chrome, or portal layers.
 - Accessible names, descriptions, roles, states, and relationships.
 - APG-aligned roving focus, selection, disclosure, dialog, menu, tab, and

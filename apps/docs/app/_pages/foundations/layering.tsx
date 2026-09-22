@@ -6,7 +6,7 @@ import { SectionHeading } from '../../_components/Heading';
  * independent axes. Static spec; the z-index tokens are theme-agnostic, so
  * nothing here reacts to the picker.
  *
- * Source: .claude/rules/components.md § Layering model.
+ * Source: packages/core/tokens/semantic/z-index.json.
  */
 
 const LAYERS: { token: string; value: number; use: string }[] = [
