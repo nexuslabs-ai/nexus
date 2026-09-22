@@ -66,5 +66,5 @@ opencode.json
 .superpowers/
 
 # Docs props JSON (a build output of packages/react/src, written by the
-# `@nexus_ds/docs#generate:props` turbo task that `build` and `dev` run first)
+# `@nexus_ds/docs#generate:props` turbo task that `build` runs first)
 apps/docs/generated/props/
