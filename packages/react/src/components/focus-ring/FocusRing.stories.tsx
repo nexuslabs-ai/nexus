@@ -56,9 +56,11 @@ const TRANSPARENT = 'rgba(0, 0, 0, 0)';
 
 /**
  * Every field surface draws its boundary with a real border and completes the
- * focus ring with a 1px outline. `expectedRestBorderColor` is transparent for
- * `variant="borderless"` — the border is still there, just invisible, which is
- * what keeps the two variants the same size.
+ * focus ring with an `outline-default` outer edge — the same borderwidth token
+ * the border reads, so a `[data-borderwidth]` swap moves both halves.
+ * `expectedRestBorderColor` is transparent for `variant="borderless"` — the
+ * border is still there, just invisible, which is what keeps the two variants
+ * the same size.
  */
 async function expectFieldFocusBoundary({
   surface,
@@ -362,15 +364,15 @@ export const FieldBorderWidthModes: Story = {
         await expect(width).toBeGreaterThanOrEqual(min);
         await expect(width).toBeLessThanOrEqual(max);
 
-        // The ring's outer half tracks the same token, so both halves stay
-        // equal instead of a mode thickening only the inside of the ring.
+        // The ring's outer half reads the same token, so it lands on exactly
+        // the border's width instead of a mode thickening only the inside of
+        // the ring.
         await focusAsKeyboard(field);
         const outlineWidth = Number.parseFloat(
           getComputedStyle(field).outlineWidth
         );
 
-        await expect(outlineWidth).toBeGreaterThanOrEqual(min);
-        await expect(outlineWidth).toBeLessThanOrEqual(max);
+        await expect(outlineWidth).toBe(width);
       }
     }
   },

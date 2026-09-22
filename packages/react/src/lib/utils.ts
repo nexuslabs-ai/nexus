@@ -18,8 +18,11 @@ export const NEXUS_THEME_SCALES = {
 } satisfies Partial<Record<DefaultThemeGroupIds, string[]>>;
 
 /**
- * Nexus `@utility` names, keyed by the tailwind-merge class group each one
- * extends, so a conflicting pair collapses to last-wins in `cn()`.
+ * Nexus class names tailwind-merge does not know, keyed by the class group
+ * each one extends, so a conflicting pair collapses to last-wins in `cn()`.
+ * Most are `@utility` definitions (`z-modal`, `typography-*`,
+ * `border-{thin,default,thick}`); `outline-{thin,default,thick}` are not —
+ * Tailwind generates those from the `--outline-width-*` `@theme` namespace.
  */
 export const NEXUS_CLASS_GROUPS = {
   animate: ['animate-overlay-presence-exit'],

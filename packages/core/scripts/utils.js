@@ -283,6 +283,13 @@ export function discoverPrimitives(primitivesDir) {
 }
 
 /**
+ * Matches a per-mode spacing file in `semantic/`, capturing the mode name.
+ * `discoverSpacingModeFiles` reads these; `assertSemanticFilesAreClaimed`
+ * checks the same pattern to prove the collector claims them.
+ */
+export const SPACING_MODE_FILE_PATTERN = /^spacing-([a-z]+)\.json$/;
+
+/**
  * Find the per-mode spacing files in `semantic/`. Their values are direct px
  * (no `{N}` refs) and emit per-mode `[data-density="X"]` blocks via
  * `collectSpacingTokens`. Every other semantic file is read by a collector
@@ -299,7 +306,7 @@ export function discoverSpacingModeFiles(semanticDir) {
   const files = {};
 
   for (const file of fs.readdirSync(semanticDir)) {
-    const match = file.match(/^spacing-([a-z]+)\.json$/);
+    const match = file.match(SPACING_MODE_FILE_PATTERN);
     if (!match) continue;
 
     files[match[1]] = file;

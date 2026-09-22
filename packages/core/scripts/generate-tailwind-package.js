@@ -40,6 +40,7 @@ import {
   pathToCssVarPrefixed,
   readTokenFile,
   resolveValue,
+  SPACING_MODE_FILE_PATTERN,
   splitSpacingTokens,
 } from './utils.js';
 
@@ -113,7 +114,7 @@ function getPrimitiveFiles(discovered, config) {
 // generic scan any more, so a file nobody claims would emit nothing and raise
 // nothing — assertSemanticFilesAreClaimed turns that into a build failure.
 const CLAIMED_SEMANTIC_FILES = [
-  /^spacing-[a-z]+\.json$/,
+  SPACING_MODE_FILE_PATTERN,
   /^breakpoints\.json$/,
   /^z-index\.json$/,
 ];
