@@ -29,7 +29,7 @@ Pick the surface you're working on — each is one `make` command that turbo orc
 | `make docs`    | the docs site **+ live `@nexus_ds/react`**                                                  |
 | `make dev-all` | everything: console + docs + storybook + all package watchers                               |
 
-> **The docs site's generated inputs come from the turbo graph**, not from its package scripts: `apps/docs/turbo.json` puts `generate:manifest` (the page manifest and its loader map) and `generate:props` (the per-component props JSON) ahead of `build` and `dev`. `make docs` and `make build` get them, along with the `@nexus_ds/react` build they read. A bare `pnpm --filter @nexus_ds/docs dev` runs neither: it serves whatever `app/_lib/*.generated.ts` is committed, and whatever `generated/props/` a previous `make docs` or `make build` left behind — absent on a clean checkout, stale after that.
+> **The docs site's generated inputs come from the turbo graph**, not from its package scripts: `apps/docs/turbo.json` puts `generate:manifest` (the page manifest and its loader map) ahead of `build` and `dev`, and `generate:props` (the per-component props JSON) ahead of `build` alone — no page reads it yet, so `dev` does not pay a full `react-docgen` pass to come up. `make build` gets both; `make docs` gets the manifest and the `@nexus_ds/react` build the site reads. A bare `pnpm --filter @nexus_ds/docs dev` runs neither: it serves whatever `app/_lib/*.generated.ts` is committed, and whatever `generated/props/` a previous `make build` left behind — absent on a clean checkout, stale after that.
 
 Leave **`make up`** running in another terminal so the docs-MCP is available to Claude Code (see [AI Documentation MCP](#ai-documentation-mcp-nexus-docs-mcp)).
 
