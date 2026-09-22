@@ -98,8 +98,10 @@ export const Disabled: Story = {
     const slot = canvasElement.querySelector<HTMLElement>(
       '[data-slot="input-otp-slot"]'
     )!;
-    await expect(getComputedStyle(slot).borderTopWidth).toBe('0px');
-    await expect(getComputedStyle(slot).boxShadow).not.toBe('none');
+    await expect(
+      Number.parseFloat(getComputedStyle(slot).borderTopWidth)
+    ).toBeGreaterThan(0);
+    await expect(getComputedStyle(slot).boxShadow).toBe('none');
     await expect(getComputedStyle(slot).opacity).toBe('1');
   },
 };
@@ -124,9 +126,6 @@ export const ClickInteraction: Story = {
     );
 
     await expect(slot).toHaveClass('nx:duration-fast');
-    await expect(slot).toHaveClass(
-      'nx:transition-[color,background-color,box-shadow]'
-    );
     await expect(caret).toHaveClass('nx:animate-caret-blink');
     await expect(caret).not.toHaveClass('nx:duration-1000');
   },
@@ -147,9 +146,7 @@ export const TransitionScoped: Story = {
     const slot = canvasElement.querySelector('[data-slot="input-otp-slot"]');
 
     await expect(slot).not.toHaveClass('nx:transition-all');
-    await expect(slot).toHaveClass(
-      'nx:transition-[color,background-color,box-shadow]'
-    );
+    await expect(slot).toHaveClass('nx:transition-field');
   },
 };
 

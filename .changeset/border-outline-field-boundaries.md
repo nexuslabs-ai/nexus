@@ -13,9 +13,6 @@ of generated `box-shadow`.
   the existing `--border-*` keys off the same borderwidth primitives. A field's
   focus ring is a `border-default` inner edge plus an `outline-default` outer
   edge, so both halves follow a `[data-borderwidth]` mode swap together.
-- `generateFocusRingCSS` is now `generateInputOtpSlotCSS`: the only generated
-  rules left are the InputOTP slot's shared-hairline shadows, which a real
-  border cannot express (#727).
 - Added the `transition-control` / `transition-field` utilities to
   `motion-utilities.css`. Tailwind's `transition-colors` carries
   `outline-color`, so an element painting a real ring would fade it in instead

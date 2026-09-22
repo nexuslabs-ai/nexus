@@ -1,5 +1,5 @@
 import type { Meta, StoryObj } from '@storybook/react';
-import { expect, userEvent, within } from 'storybook/test';
+import { expect, within } from 'storybook/test';
 
 import { Checkbox } from '../checkbox';
 import { Input } from '../input';
@@ -188,30 +188,15 @@ export const FieldSurfaceFocusBoundaries: Story = {
       control: canvas.getByRole('textbox', { name: 'Grouped textarea' }),
     });
 
-    const otpInput = canvasElement.querySelector<HTMLElement>(
-      'input[data-slot="input-otp"]'
-    )!;
-    const firstSlot = canvasElement.querySelector<HTMLElement>(
-      '[data-slot="input-otp-slot"]'
-    )!;
-    // InputOTP is the one surface still painted with shadows (#727).
-    const restSlotShadow = getComputedStyle(firstSlot).boxShadow;
-
-    await expect(getComputedStyle(firstSlot).borderTopWidth).toBe('0px');
-    await expect(restSlotShadow).not.toBe('none');
-
-    await userEvent.click(otpInput);
-    await waitForFocusPaint();
-
-    const activeSlot =
-      canvasElement.querySelector<HTMLElement>(
-        '[data-slot="input-otp-slot"][data-active="true"]'
-      ) ?? firstSlot;
-    const activeSlotStyles = getComputedStyle(activeSlot);
-
-    await expect(activeSlotStyles.borderTopWidth).toBe('0px');
-    await expect(activeSlotStyles.boxShadow).not.toBe('none');
-    await expect(activeSlotStyles.boxShadow).toContain('inset');
+    // Focusing an empty OTP field makes its first slot the active one.
+    await expectFieldFocusBoundary({
+      surface: canvasElement.querySelector<HTMLElement>(
+        '[data-slot="input-otp-slot"]'
+      )!,
+      control: canvasElement.querySelector<HTMLElement>(
+        'input[data-slot="input-otp"]'
+      )!,
+    });
   },
 };
 

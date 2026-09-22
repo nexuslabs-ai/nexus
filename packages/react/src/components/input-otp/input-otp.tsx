@@ -118,11 +118,11 @@ function InputOTPSlot({ index, className, ...props }: InputOTPSlotProps) {
       data-active={isActive}
       className={cn(
         'nx:relative nx:flex nx:box-border nx:size-10 nx:items-center nx:justify-center',
-        'nx:border-0',
-        'nx:group-has-[:disabled]/input-otp:bg-disabled nx:group-has-[:disabled]/input-otp:text-disabled-foreground',
-        'nx:bg-container nx:text-foreground nx:typography-body-small nx:transition-[color,background-color,box-shadow] nx:duration-fast',
+        'nx:border-default nx:border-border-default nx:not-first:-ml-(--nx-borderwidth-default)',
+        'nx:group-has-[:disabled]/input-otp:border-border-disabled nx:group-has-[:disabled]/input-otp:bg-disabled nx:group-has-[:disabled]/input-otp:text-disabled-foreground',
+        'nx:bg-container nx:text-foreground nx:typography-body-small nx:transition-field nx:duration-fast',
         'nx:first:rounded-l-md nx:last:rounded-r-md',
-        'nx:data-[active=true]:z-10 nx:data-[active=true]:outline-2 nx:data-[active=true]:outline-focus-default',
+        'nx:data-[active=true]:z-10 nx:data-[active=true]:border-focus-default nx:data-[active=true]:outline-default nx:data-[active=true]:outline-focus-default',
         className
       )}
       {...props}
