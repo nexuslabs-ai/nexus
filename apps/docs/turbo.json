@@ -3,7 +3,7 @@
   "extends": ["//"],
   "tasks": {
     "generate:props": {
-      "dependsOn": ["@nexus_ds/core#build"],
+      "dependsOn": ["^build"],
       "inputs": [
         "scripts/generate-props.mjs",
         "scripts/props-contract.mjs",
@@ -19,6 +19,11 @@
       "dependsOn": ["^build", "generate:props"],
       "inputs": ["$TURBO_DEFAULT$", "$TURBO_ROOT$/package.json"],
       "outputs": [".next/**", "!.next/cache/**", "next-env.d.ts"]
+    },
+    "dev": {
+      "dependsOn": ["generate:props"],
+      "cache": false,
+      "persistent": true
     }
   }
 }

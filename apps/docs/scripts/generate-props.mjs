@@ -11,7 +11,7 @@ import docgen from 'react-docgen-typescript';
 import ts from 'typescript';
 
 import {
-  assertProgramWorkspaceTypes,
+  assertWorkspaceTypes,
   exportName,
   isComponentSource,
   isOwnProp,
@@ -31,13 +31,13 @@ import { docsRoot, reactRoot, repoRoot } from './roots.mjs';
 const reactSrc = path.join(reactRoot, 'src');
 const componentsRoot = path.join(reactSrc, 'components');
 const reactTsconfig = path.join(reactRoot, 'tsconfig.json');
-const reactManifest = path.join(reactRoot, 'package.json');
 
-const outputDir = process.argv[2]
-  ? path.resolve(process.argv[2])
-  : path.join(docsRoot, 'generated', 'props');
+const outputDir = path.join(docsRoot, 'generated', 'props');
 
-const entryPoints = reactEntryPoints();
+const reactManifest = JSON.parse(
+  readFileSync(path.join(reactRoot, 'package.json'), 'utf8')
+);
+const entryPoints = reactEntryPoints(reactManifest);
 
 function collectSourceFiles(dir) {
   return readdirSync(dir, { withFileTypes: true })
@@ -62,8 +62,8 @@ function symbolSourcePath(symbol) {
  * A prop typed with a repo-local alias prints that alias name, which a reader
  * cannot resolve unless the package exports it. Print the alias body instead,
  * so no component has to inline a union for the docs' sake. An alias whose body
- * will not print portably keeps its name, and the resolvability test then asks
- * for it to be exported.
+ * will not print portably has nothing to print but its bare name, so it comes
+ * back as unresolvable for `assertResolvableTypes` to report.
  */
 function localAliasExpansions(checker, program, exported) {
   const candidates = new Map();
@@ -93,10 +93,40 @@ function localAliasExpansions(checker, program, exported) {
   // Two files declaring the same unexported alias would otherwise expand
   // whichever was parsed last into both components' props, so a name has to be
   // claimed by one body — and by a body that prints portably everywhere.
-  return new Map(
+  const expansions = new Map(
     [...candidates]
       .filter(([, texts]) => texts.size === 1 && !texts.has(null))
       .map(([name, texts]) => [name, [...texts][0]])
+  );
+
+  return {
+    expansions,
+    unresolvable: new Set(
+      [...candidates.keys()].filter((name) => !expansions.has(name))
+    ),
+  };
+}
+
+/**
+ * A prop left printing a bare alias name the package does not export names
+ * something the reader has no way to look up. Expanding the body is the usual
+ * answer; when it will not print portably, exporting the alias is.
+ */
+function assertResolvableTypes(entries, unresolvable) {
+  const offenders = entries.flatMap((entry) =>
+    entry.props
+      .filter((prop) => unresolvable.has(prop.type))
+      .map((prop) => `  ${entry.name}.${prop.name}: ${prop.type}`)
+  );
+
+  if (offenders.length === 0) return;
+
+  throw new Error(
+    [
+      'props JSON: a prop is documented with a repo-local type alias that @nexus_ds/react does not export, so a reader cannot resolve it.',
+      'Export the alias from its component folder and from src/index.ts, or give it a body that prints portably.',
+      ...offenders,
+    ].join('\n')
   );
 }
 
@@ -214,9 +244,9 @@ const program = ts.createProgram([...sourceFiles, ...entryPoints], {
 // The generator is the only place that can tell a missing workspace build from
 // an ordinary type error, so it asks the resolver for the declarations before
 // reading a single type off them.
-assertProgramWorkspaceTypes(program, {
+assertWorkspaceTypes(program, {
   srcRoot: reactSrc,
-  manifestPath: reactManifest,
+  manifest: reactManifest,
   compilerOptions,
   containingFile: path.join(reactSrc, 'index.ts'),
 });
@@ -224,7 +254,11 @@ assertProgramWorkspaceTypes(program, {
 const checker = program.getTypeChecker();
 
 const exported = publicExports(checker, program, entryPoints);
-const expansions = localAliasExpansions(checker, program, exported);
+const { expansions, unresolvable } = localAliasExpansions(
+  checker,
+  program,
+  exported
+);
 
 // `parseWithProgramProvider` ignores the parser's own options once a program
 // is supplied, so this reuses the ones the program was built with.
@@ -249,7 +283,12 @@ for (const doc of parser.parseWithProgramProvider(sourceFiles, () => program)) {
   }
   if (isReExport(doc, parsedPaths)) continue;
 
-  docsByName.set(exportName(doc), doc);
+  // A file-local component sharing a public export's name would otherwise
+  // claim the entry, and take it to whichever slug it happens to live in.
+  const name = exportName(doc);
+  if (!exported.has(name)) continue;
+
+  docsByName.set(name, doc);
 }
 
 // A union prints its members in the order the checker first interned them, so
@@ -267,6 +306,8 @@ for (const [name, symbol] of components) {
 
   bySlug.get(toSlug(path.join(repoRoot, entry.sourcePath))).push(entry);
 }
+
+assertResolvableTypes([...bySlug.values()].flat(), unresolvable);
 
 mkdirSync(outputDir, { recursive: true });
 clearPreviousOutput();

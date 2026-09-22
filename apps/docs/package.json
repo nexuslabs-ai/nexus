@@ -5,7 +5,7 @@
   "type": "module",
   "description": "Documentation site for the Nexus Design System",
   "scripts": {
-    "dev": "pnpm generate:manifest && pnpm generate:props && next dev --turbopack",
+    "dev": "pnpm generate:manifest && next dev --turbopack",
     "generate:props": "node scripts/generate-props.mjs",
     "build": "pnpm generate:manifest && next build",
     "start": "next start",

@@ -4,7 +4,6 @@
  * generator turns the answers into files.
  */
 
-import { readFileSync } from 'node:fs';
 import path from 'node:path';
 
 import ts from 'typescript';
@@ -264,7 +263,17 @@ const DECLARATION_EXTENSIONS = new Set([
  * build graph, so the declarations have to be asked for rather than inferred
  * from the diagnostics they fail to produce.
  */
-function assertWorkspaceTypes(specifiers, compilerOptions, containingFile) {
+export function assertWorkspaceTypes(
+  program,
+  { srcRoot, manifest, compilerOptions, containingFile }
+) {
+  // Only the program's own source files can bind a specifier the output
+  // documents, and the manifest is what says which of those are workspace links.
+  const specifiers = importedWorkspaceSpecifiers(
+    program.getSourceFiles().filter((file) => isUnder(file.fileName, srcRoot)),
+    manifest
+  );
+
   const untyped = specifiers.filter((specifier) => {
     const { resolvedModule } = ts.resolveModuleName(
       specifier,
@@ -282,30 +291,9 @@ function assertWorkspaceTypes(specifiers, compilerOptions, containingFile) {
   throw new Error(
     [
       'props JSON: a workspace dependency resolves to no type declarations, so every prop typed through it would be documented as `any`.',
-      'Build the workspace dependencies first: pnpm turbo generate:props --filter=@nexus_ds/docs',
+      'Build the workspace dependencies first: pnpm turbo build --filter=@nexus_ds/react',
       ...untyped.map((specifier) => `  ${specifier}`),
     ].join('\n')
-  );
-}
-
-/**
- * The guard as the generator needs it: only the program's own source files can
- * bind a specifier the output documents, and the package manifest is what says
- * which of those specifiers are workspace links.
- */
-export function assertProgramWorkspaceTypes(
-  program,
-  { srcRoot, manifestPath, compilerOptions, containingFile }
-) {
-  assertWorkspaceTypes(
-    importedWorkspaceSpecifiers(
-      program
-        .getSourceFiles()
-        .filter((file) => isUnder(file.fileName, srcRoot)),
-      JSON.parse(readFileSync(manifestPath, 'utf8'))
-    ),
-    compilerOptions,
-    containingFile
   );
 }
 

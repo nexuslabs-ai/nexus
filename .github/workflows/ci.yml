@@ -123,6 +123,19 @@ jobs:
           pnpm turbo build
           node scripts/audit-turbo-outputs.js --post-build
 
+      # The props JSON is not committed, so there is no working tree to compare
+      # against. Regenerating it twice is what proves the run is reproducible:
+      # a checker-order or filesystem-order dependency shows up as a diff here.
+      - name: Check props JSON determinism
+        run: |
+          set -euo pipefail
+          cp -r apps/docs/generated/props "$RUNNER_TEMP/props-first"
+          pnpm turbo generate:props --filter=@nexus_ds/docs --force
+          if ! diff -r "$RUNNER_TEMP/props-first" apps/docs/generated/props; then
+            echo "::error::The props JSON differs between two runs of the same commit."
+            exit 1
+          fi
+
       - name: Docs CSP inventory
         run: |
           pnpm turbo build --filter=@nexus_ds/docs

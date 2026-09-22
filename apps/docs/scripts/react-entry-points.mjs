@@ -1,4 +1,3 @@
-import { readFileSync } from 'node:fs';
 import path from 'node:path';
 
 import { reactRoot } from './roots.mjs';
@@ -67,10 +66,9 @@ function typesCondition(target) {
 /**
  * The `exports` map points at built declarations; the same subpaths under
  * `src/` are what the program is built from, so a new public subentry is picked
- * up without a second list to maintain. Shared with the test so the generator
- * and the yardstick it is measured against cannot disagree about the surface.
+ * up without a second list to maintain.
  */
-function entryPointsFromManifest(manifest) {
+export function reactEntryPoints(manifest) {
   return Object.entries(manifest.exports)
     .filter(([, target]) => isModuleSurface(target))
     .map(([subpath, target]) => {
@@ -86,10 +84,4 @@ function entryPointsFromManifest(manifest) {
       );
     })
     .sort();
-}
-
-export function reactEntryPoints() {
-  return entryPointsFromManifest(
-    JSON.parse(readFileSync(path.join(reactRoot, 'package.json'), 'utf8'))
-  );
 }
