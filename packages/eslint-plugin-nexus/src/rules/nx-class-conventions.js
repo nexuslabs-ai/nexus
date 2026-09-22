@@ -1,5 +1,5 @@
 // Enforces the nx: Tailwind class conventions from
-// `.claude/rules/components.md` and `.claude/rules/shadcn-divergences.md` on
+// `.claude/rules/shadcn-divergences.md` on
 // class strings (string literals and template literals). Ported from the
 // former `.claude/hooks/lint-nx-prefix.mjs` Claude hook so the checks run in
 // `pnpm lint` and the pre-commit hook for every contributor — not only on

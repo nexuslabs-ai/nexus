@@ -8,14 +8,13 @@ Start at [`.claude/rules/code-quality.md`](.claude/rules/code-quality.md): it is
 the governing principle and indexes every per-rule file. The domain rules it
 does not index:
 
-| Area                             | Rule                                                           |
-| -------------------------------- | -------------------------------------------------------------- |
-| React components, tokens, sizing | [`components.md`](.claude/rules/components.md)                 |
-| Testing scope and philosophy     | [`testing.md`](.claude/rules/testing.md)                       |
-| Stories as tests                 | [`testing-react.md`](.claude/rules/testing-react.md)           |
-| Branches, commits, PRs, reviews  | [`github.md`](.claude/rules/github.md)                         |
-| shadcn/ui adaptation             | [`shadcn-divergences.md`](.claude/rules/shadcn-divergences.md) |
-| Third-party API lookups          | [`docs-mcp.md`](.claude/rules/docs-mcp.md)                     |
+| Area                            | Rule                                                           |
+| ------------------------------- | -------------------------------------------------------------- |
+| Testing scope and philosophy    | [`testing.md`](.claude/rules/testing.md)                       |
+| Stories as tests                | [`testing-react.md`](.claude/rules/testing-react.md)           |
+| Branches, commits, PRs, reviews | [`github.md`](.claude/rules/github.md)                         |
+| shadcn/ui adaptation            | [`shadcn-divergences.md`](.claude/rules/shadcn-divergences.md) |
+| Third-party API lookups         | [`docs-mcp.md`](.claude/rules/docs-mcp.md)                     |
 
 Workspace layout, setup, and the full command reference are in
 [`CONTRIBUTING.md`](CONTRIBUTING.md). Day to day:

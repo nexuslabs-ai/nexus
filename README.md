@@ -38,5 +38,4 @@ make dev          # Storybook — the component catalog & dev surface
 - **[`CONTRIBUTING.md`](CONTRIBUTING.md)** — setup, the `make` workflow, the testing model, story patterns, and the docs-MCP
 - [`.claude/rules/`](.claude/rules/) — project conventions (canonical; there is no root `CLAUDE.md`). High-traffic files:
   - [`testing-react.md`](.claude/rules/testing-react.md) — testing patterns for the React package
-  - [`components.md`](.claude/rules/components.md) — component architecture, `nx:` prefix, data attributes
 - [Issue tracker](../../issues) — bugs and feature requests

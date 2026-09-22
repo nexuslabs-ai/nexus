@@ -211,7 +211,7 @@ export default tseslint.config(
     },
   },
 
-  // UI components: allow empty interface extends per .claude/rules/components.md
+  // UI components: an empty interface extending ComponentProps is the documented props pattern
   {
     files: ['packages/react/src/components/**/*.{ts,tsx}'],
     rules: {
