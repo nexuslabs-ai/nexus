@@ -207,27 +207,34 @@ function matchedMessageIds(raw, filename) {
   return matched;
 }
 
-// A class composer joins every string it is handed — a base, an array element,
-// a `variants` value — so the whole call is one scope. Two sibling `variants`
-// values never share an element, which makes the scope an over-approximation;
-// that is the safe direction for this check. A bare array is not a scope: its
-// elements are per-item class strings that never meet on an element. The
-// callee has to be one of these names written plainly, so an aliased or
-// member-expression composer (`utils.cn`, a renamed import) is not a scope.
+// A class composer joins every string it is handed — base, array element,
+// `variants` value — so the whole call is one scope. The name has to be
+// written plainly; an aliased or member-expression composer is invisible.
 const CLASS_COMPOSING_CALLEES = new Set(['cva', 'cn', 'clsx', 'cx']);
 
-function isClassComposingCall(node) {
+// `[…].join(' ')` collapses the array literal into one class attribute.
+function isJoinedArrayLiteral(node) {
+  const { callee } = node;
   return (
-    node.type === 'CallExpression' &&
-    node.callee.type === 'Identifier' &&
-    CLASS_COMPOSING_CALLEES.has(node.callee.name)
+    callee.type === 'MemberExpression' &&
+    !callee.computed &&
+    callee.object.type === 'ArrayExpression' &&
+    callee.property.name === 'join'
   );
 }
 
-// Where a scope ends. A string handed to some other function reaches the class
-// attribute only through that call's return value — the same call-site join
-// that already separates two `const`s. A callback body sits inside such a call
-// by construction, so it needs no case of its own.
+function isClassComposingCall(node) {
+  if (node.type !== 'CallExpression') {
+    return false;
+  }
+  if (node.callee.type === 'Identifier') {
+    return CLASS_COMPOSING_CALLEES.has(node.callee.name);
+  }
+  return isJoinedArrayLiteral(node);
+}
+
+// A string handed to some other function reaches the class attribute only
+// through that call's return value, so it leaves the scope.
 function breaksClassScope(node) {
   return node.type === 'CallExpression' && !isClassComposingCall(node);
 }
@@ -310,8 +317,6 @@ export default {
       }
     }
 
-    // A string inside a `cva()` / `cn()` call is covered by that call's scope,
-    // so only a standalone one is a scope of its own.
     function reportScope(node) {
       if (isDocsSpecimenPage(filename) || isInsideClassCall(node)) {
         return;

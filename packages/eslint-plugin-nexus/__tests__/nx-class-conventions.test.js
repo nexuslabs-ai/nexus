@@ -85,8 +85,10 @@ ruleTester.run('nx-class-conventions', rule, {
     "const c = cva(['nx:transition-field', 'nx:focus-visible:outline-default']);",
     // The pair must actually share a scope — two unrelated class strings do not.
     "const a = 'nx:transition-colors'; const b = 'nx:focus-visible:outline-2';",
-    // A bare array is a list of per-item class strings, not one attribute.
+    // An unjoined array is a list of per-item class strings, not one attribute.
     "const c = ['nx:transition-colors', 'nx:focus-visible:outline-2'];",
+    // A chained call in between breaks the scope, like an aliased composer.
+    "const c = ['nx:transition-colors', 'nx:focus-visible:outline-2'].filter(Boolean).join(' ');",
     // Only a width or a colour paints a ring, so there is nothing for
     // `transition-colors` to fade — InputGroup's inner control ships exactly
     // the first of these suppressions.
@@ -98,9 +100,8 @@ ruleTester.run('nx-class-conventions', rule, {
     "const c = 'nx:transition-colors nx:focus-visible:outline-dashed';",
     "const c = 'nx:transition-colors nx:focus-visible:outline-dotted';",
     "const c = 'nx:transition-colors nx:focus-visible:outline-double';",
-    // A string handed to another function reaches the attribute only through
-    // that call's return value, so it is outside the scope — including one
-    // written in a callback body, which sits inside such a call.
+    // A string handed to another function, including from a callback body,
+    // reaches the attribute only through that call's return value.
     "const c = cn('nx:transition-colors', useRing({ ring: 'nx:focus-visible:outline-2' }));",
     "const c = cn('nx:transition-colors', items.map(() => 'nx:focus-visible:outline-2'));",
     // Only the docs pages render a pairing as the subject of the prose.
@@ -264,6 +265,11 @@ ruleTester.run('nx-class-conventions', rule, {
     // `transition-colors` carries `outline-color`, so it fades the ring in.
     {
       code: "const c = 'nx:transition-colors nx:focus-visible:outline-2 nx:focus-visible:outline-focus-default';",
+      errors: [{ messageId: 'ringFadingTransition' }],
+    },
+    // `[…].join(' ')` is one attribute — the shape `overlay-layout.ts` uses.
+    {
+      code: "const c = ['nx:transition-colors', 'nx:focus-visible:outline-2'].join(' ');",
       errors: [{ messageId: 'ringFadingTransition' }],
     },
     // A `cva([...])` array is one class string, so the pair is caught across
