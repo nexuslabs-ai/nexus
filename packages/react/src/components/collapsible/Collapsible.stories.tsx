@@ -182,12 +182,6 @@ export const WithDataAttributes: Story = {
     await expect(
       canvasElement.querySelector('[data-slot="collapsible-content"]')
     ).toHaveClass('nx:duration-default');
-    await expect(
-      canvasElement.querySelector('[data-slot="collapsible-content"]')
-    ).toHaveClass('nx:motion-reduce:data-[state=open]:animate-none');
-    await expect(
-      canvasElement.querySelector('[data-slot="collapsible-content"]')
-    ).toHaveClass('nx:motion-reduce:data-[state=closed]:animate-none');
   },
 };
 

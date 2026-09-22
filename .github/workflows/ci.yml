@@ -68,6 +68,9 @@ jobs:
       - name: Docs grammar pin
         run: pnpm --filter @nexus_ds/docs audit:grammar-pin
 
+      - name: Agent drift audit
+        run: pnpm audit:agent-drift
+
       - name: Restore ESLint cache
         uses: actions/cache@v4
         with:
@@ -83,28 +86,6 @@ jobs:
   # ============================================
   # Build
   # ============================================
-
-  audit-browser-support:
-    name: Audit Browser Support
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v4
-
-      - name: Install pnpm
-        uses: pnpm/action-setup@v4
-
-      - name: Setup Node
-        uses: actions/setup-node@v4
-        with:
-          node-version-file: '.nvmrc'
-          cache: 'pnpm'
-
-      - name: Install dependencies
-        run: pnpm install --frozen-lockfile
-
-      - name: Audit browser support floor
-        run: pnpm audit:browser-support
 
   build:
     name: Build
@@ -243,15 +224,6 @@ jobs:
             echo "::error::Run 'pnpm --filter @nexus_ds/docs generate:manifest' and commit the result."
             exit 1
           fi
-
-      # `test:unit` is raw vitest, so nothing in it carries turbo's `^build`
-      # edge. The props generator types `packages/react/src` against its
-      # workspace dependencies' built declarations, and an unbuilt one
-      # documents every prop reached through it as `any`. Running the task
-      # rather than naming a package builds exactly what the generator
-      # resolves, and keeps that set in the build graph instead of here.
-      - name: Generate docs props JSON
-        run: pnpm turbo generate:props --filter=@nexus_ds/docs
 
       - name: Run unit tests
         run: pnpm test:unit
@@ -437,7 +409,6 @@ jobs:
     needs:
       - format-check
       - lint
-      - audit-browser-support
       - build
       - typecheck
       - test-unit

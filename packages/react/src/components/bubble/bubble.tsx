@@ -33,7 +33,6 @@ const bubbleVariants = cva(
   [
     'nx:relative nx:w-fit nx:max-w-[min(80%,45rem)] nx:rounded-xl nx:border-default nx:border-transparent nx:typography-body-default',
     'nx:has-[>[data-bubble-part=reactions][data-side=top]]:mt-3 nx:has-[>[data-bubble-part=reactions][data-side=bottom]]:mb-3',
-    'nx:no-has-support:my-3',
   ],
   {
     variants: {

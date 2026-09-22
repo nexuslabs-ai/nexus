@@ -13,11 +13,13 @@
 
 ## Testing Split
 
-| What       | Where           | Imports From           |
-| ---------- | --------------- | ---------------------- |
-| Components | `*.stories.tsx` | `storybook/test`       |
-| Hooks      | `*.test.ts`     | `@nexus_ds/test-utils` |
-| Utilities  | `*.test.ts`     | `@nexus_ds/test-utils` |
+| What                   | Where                                  | Imports From     |
+| ---------------------- | -------------------------------------- | ---------------- |
+| Components             | `*.stories.tsx`                        | `storybook/test` |
+| `cn` merge             | `packages/react/src/lib/utils.test.ts` | `vitest`         |
+| Hooks, other utilities | No tests of their own                  | —                |
+
+Hooks and utilities are covered by the stories of the components that use them. The one exception is `cn`, whose Nexus-specific merge groups no story can observe. See [testing.md § Scope](testing.md#scope) for the unit tests outside this package.
 
 ## File Structure
 
@@ -31,18 +33,6 @@ component-name/              # kebab-case folder
 ```
 
 **No separate `*.test.tsx` files for components.** Tests live in stories.
-
-### Hooks & Utilities (Unit Tests)
-
-```
-hooks/
-├── use-hook-name.ts
-└── use-hook-name.test.ts    # Unit test
-
-lib/
-├── utils.ts
-└── utils.test.ts            # Unit test
-```
 
 ## Story Template with Play Functions
 
@@ -191,65 +181,13 @@ play: async ({ canvasElement }) => {
 };
 ```
 
-## Hook Tests (Using @nexus_ds/test-utils)
-
-```tsx
-// use-counter.test.ts
-import { act, describe, expect, it, renderHook } from '@nexus_ds/test-utils';
-
-import { useCounter } from './use-counter';
-
-describe('useCounter', () => {
-  it('increments count', () => {
-    const { result } = renderHook(() => useCounter());
-
-    act(() => {
-      result.current.increment();
-    });
-
-    expect(result.current.count).toBe(1);
-  });
-});
-```
-
-## Utility Tests
-
-```tsx
-// format-currency.test.ts
-import { describe, expect, it } from '@nexus_ds/test-utils';
-
-import { formatCurrency } from './format-currency';
-
-describe('formatCurrency', () => {
-  it('formats USD', () => {
-    expect(formatCurrency(1234.56, 'USD')).toBe('$1,234.56');
-  });
-});
-```
-
 ## Imports Reference
-
-### For Stories (Component Tests)
 
 ```tsx
 import { expect, fn, userEvent, within } from 'storybook/test';
 ```
 
 **Note:** In Storybook 10, use `storybook/test` (not `@storybook/test`).
-
-### For Unit Tests (Hooks/Utilities)
-
-```tsx
-import {
-  act,
-  describe,
-  expect,
-  it,
-  renderHook,
-  vi,
-  waitFor,
-} from '@nexus_ds/test-utils';
-```
 
 ## Accessibility Testing
 
@@ -266,7 +204,7 @@ pnpm test
 # Run only storybook tests (components)
 pnpm test:storybook
 
-# Run only unit tests (hooks, utilities)
+# Run only unit tests (core engine, cn merge, ESLint rules)
 pnpm test:unit
 
 # Watch mode for storybook
@@ -282,10 +220,9 @@ pnpm test:storybook:ui
 | ----------------------------------------------- | -------------------------------------- |
 | Create `component.test.tsx`                     | Add play functions to stories          |
 | Import from `@testing-library/react` in stories | Use `storybook/test`                   |
-| Import `render` from `@nexus_ds/test-utils`     | Use stories for components             |
 | Add manual `axe()` assertions                   | Let addon-a11y handle it               |
 | Skip keyboard interaction tests                 | Every interactive component needs them |
-| Use `@nexus_ds/test-utils` for components       | Use `storybook/test` in stories        |
+| Write a `use-hook.test.ts` for a hook           | Cover it through a component's stories |
 | Import from `@storybook/test`                   | Use `storybook/test` (Storybook 10)    |
 
 ## Do Not

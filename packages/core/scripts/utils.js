@@ -2007,10 +2007,11 @@ const BUTTON_ERROR_FOCUS_RING_SELECTORS = [
 
 /**
  * Turn the canonical focus outline utilities into the shipped hard focus
- * treatment while preserving a real outline in forced-colors mode.
+ * treatment.
  *
- * The component classes intentionally stay outline-based: Tailwind owns the
- * outline width/offset, this layer owns the normal-mode ring paint.
+ * The transparent outline paints nothing normally. Forced colors mode drops
+ * the box-shadow ring and repaints that outline in a system colour, so focus
+ * stays visible there without a second code path.
  *
  * @returns {string} CSS focus ring rules
  */
@@ -2028,14 +2029,6 @@ export function generateFocusRingCSS() {
     INPUT_GROUP_CONTROL_FOCUS_SUPPRESSION_SELECTORS.join(',\n');
   const buttonSelectors = BUTTON_FOCUS_RING_SELECTORS.join(',\n');
   const buttonErrorSelectors = BUTTON_ERROR_FOCUS_RING_SELECTORS.join(',\n');
-  const allSelectors = [
-    ...DEFAULT_FOCUS_RING_SELECTORS,
-    ...ERROR_FOCUS_RING_SELECTORS,
-    ...FIELD_FOCUS_RING_SELECTORS,
-    ...FIELD_ERROR_FOCUS_RING_SELECTORS,
-    ...BUTTON_FOCUS_RING_SELECTORS,
-    ...BUTTON_ERROR_FOCUS_RING_SELECTORS,
-  ].join(',\n');
 
   return `
 /* ===== FOCUS RING ===== */
@@ -2092,23 +2085,17 @@ ${OTP_SLOT_GROUP_DISABLED_SELECTOR}:first-child {
 }
 
 ${defaultSelectors} {
-  --tw-outline-style: none !important;
-  outline-color: transparent !important;
-  outline-style: none !important;
+  outline: 2px solid transparent !important;
   box-shadow: 0 0 0 2px var(--color-focus-default);
 }
 
 ${errorSelectors} {
-  --tw-outline-style: none !important;
-  outline-color: transparent !important;
-  outline-style: none !important;
+  outline: 2px solid transparent !important;
   box-shadow: 0 0 0 2px var(--color-focus-error);
 }
 
 ${fieldSelectors} {
-  --tw-outline-style: none !important;
-  outline-color: transparent !important;
-  outline-style: none !important;
+  outline: 2px solid transparent !important;
   border-color: transparent !important;
   border-width: 0;
   box-shadow:
@@ -2117,9 +2104,7 @@ ${fieldSelectors} {
 }
 
 ${fieldErrorSelectors} {
-  --tw-outline-style: none !important;
-  outline-color: transparent !important;
-  outline-style: none !important;
+  outline: 2px solid transparent !important;
   border-color: transparent !important;
   border-width: 0;
   box-shadow:
@@ -2135,54 +2120,17 @@ ${inputGroupControlSuppressionSelectors} {
 }
 
 ${buttonSelectors} {
-  --tw-outline-style: none !important;
-  outline-color: transparent !important;
-  outline-style: none !important;
+  outline: 2px solid transparent !important;
   box-shadow:
     0 0 0 2px var(--color-background),
     0 0 0 4px var(--color-focus-default);
 }
 
 ${buttonErrorSelectors} {
-  --tw-outline-style: none !important;
-  outline-color: transparent !important;
-  outline-style: none !important;
+  outline: 2px solid transparent !important;
   box-shadow:
     0 0 0 2px var(--color-background),
     0 0 0 4px var(--color-focus-error);
-}
-
-@media (forced-colors: active) {
-  ${fieldBoundarySelectors},
-  ${fieldErrorBoundarySelectors},
-  ${OTP_SLOT_BOUNDARY_SELECTOR} {
-    border-color: CanvasText !important;
-    border-width: 1px;
-    box-shadow: none !important;
-  }
-
-  ${fieldDisabledBoundarySelectors},
-  ${OTP_SLOT_GROUP_DISABLED_SELECTOR} {
-    border-color: GrayText !important;
-    border-width: 1px;
-    box-shadow: none !important;
-  }
-
-  ${allSelectors} {
-    --tw-outline-style: solid !important;
-    outline-color: Highlight !important;
-    outline-offset: var(--focus-offset) !important;
-    outline-style: solid !important;
-    outline-width: 2px !important;
-    box-shadow: none !important;
-  }
-
-  ${inputGroupControlSuppressionSelectors} {
-    --tw-outline-style: none !important;
-    outline-color: transparent !important;
-    outline-style: none !important;
-    box-shadow: none !important;
-  }
 }
 `;
 }

@@ -10,26 +10,16 @@ This file is the Codex-facing entrypoint for the Nexus design-system repo. The e
   - `packages/core`: DTCG design tokens and token build/audit scripts.
   - `packages/tailwind`: generated Tailwind theme utilities using the `nx:` prefix.
   - `packages/react`: React component library built on Radix primitives, CVA variants, semantic tokens, and Storybook tests.
-  - `packages/test-utils`: Vitest/testing-library utility exports for hooks and utilities.
 - Apps:
   - `apps/console`: token/theme exploration UI.
   - `apps/docs`: documentation site.
 
-## Modern Web Guidance Policy
+## Environment Branching
 
-Modern Web Guidance is installed outside the repo for agent use. For HTML, CSS,
-client-side JavaScript, accessibility, forms, layout, performance, overlays, and
-browser-platform work, search Modern Web Guidance first and adapt its guidance to
-Nexus conventions.
-
-Browser support is Chrome 111+, Edge 111+, Firefox 113+, Safari 15.4+, and
-Samsung Internet 22+. OKLCH is the browser-floor feature and is documented as
-Baseline 2023, but do not treat all Baseline 2023 features as safe by default.
-Check the specific feature's support against this browser floor and use
-progressive enhancement or fallbacks where the floor does not cover it. The
-canonical floor is also encoded in root `package.json#browserslist`; run
-`pnpm audit:browser-support` when adopting or reclassifying browser-platform
-features from Modern Web Guidance.
+Nexus does not branch on the user's operating system, browser, or input device.
+`prefers-color-scheme` is the one exception. See
+`.claude/rules/no-environment-branching.md` for what that bans; it overrides
+any Modern Web Guidance advice to add environment fallbacks.
 
 ## Command Reference
 
@@ -46,7 +36,6 @@ pnpm lint
 pnpm test
 pnpm test:unit
 pnpm test:storybook
-pnpm audit:browser-support
 pnpm audit:contrast
 ```
 
@@ -66,6 +55,7 @@ The `.claude/rules` directory is the detailed source of truth for repo conventio
 - Core testing philosophy: `.claude/rules/testing.md`
 - Design tokens: `packages/core/tokens/`
 - Responsive behavior: `.claude/rules/responsive.md`
+- Environment branching (OS, browser, input device): `.claude/rules/no-environment-branching.md`
 - GitHub/PR conventions: `.claude/rules/github.md`
 - shadcn adaptation differences: `.claude/rules/shadcn-divergences.md`
 
@@ -119,7 +109,7 @@ import { expect, fn, userEvent, within } from 'storybook/test';
 
 Required component story purposes are defined in `.claude/rules/testing-react.md`. New components generally need default, variant, size, disabled, click interaction, keyboard interaction, data-attribute, composition, edge-case, and showcase stories unless that rule documents an archetype-specific exception.
 
-Hooks and utilities use `*.test.ts` with `@nexus_ds/test-utils`. Do not use Storybook imports in hook/utility tests.
+Outside stories, unit tests (`*.test.ts`, importing from `vitest`) cover only the core engine, the `cn` merge, and the ESLint plugin's rules. Apps, repo scripts, and hooks get no tests, and nothing uses snapshots — see `.claude/rules/testing.md`.
 
 Before finishing component work, run the narrowest meaningful checks first, then broaden as risk increases:
 

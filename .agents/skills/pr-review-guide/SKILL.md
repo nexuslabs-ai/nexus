@@ -38,6 +38,7 @@ Always load and check the diff against:
 | [code-comments.md](../../../.claude/rules/code-comments.md)                                 | Flag rationale blocks, unjustified TODOs, comments that restate the code           |
 | [no-follow-up-deferral.md](../../../.claude/rules/no-follow-up-deferral.md)                 | Reject deferral framing unless a tracked issue is cited                            |
 | [project-stage.md](../../../.claude/rules/project-stage.md)                                 | Reject new migration files; flag backcompat shims and feature flags                |
+| [no-environment-branching.md](../../../.claude/rules/no-environment-branching.md)           | Flag any OS, browser, or input-device query or variant the rule bans               |
 | [docs-mcp.md](../../../.claude/rules/docs-mcp.md)                                           | Verify third-party API usage via nexus-docs-mcp before approving                   |
 
 ## Review Process

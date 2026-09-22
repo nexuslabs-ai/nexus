@@ -124,12 +124,10 @@ export const ClickInteraction: Story = {
     );
 
     await expect(slot).toHaveClass('nx:duration-fast');
-    await expect(slot).toHaveClass('nx:motion-reduce:transition-none');
     await expect(slot).toHaveClass(
       'nx:transition-[color,background-color,box-shadow]'
     );
     await expect(caret).toHaveClass('nx:animate-caret-blink');
-    await expect(caret).toHaveClass('nx:motion-reduce:animate-none');
     await expect(caret).not.toHaveClass('nx:duration-1000');
   },
 };

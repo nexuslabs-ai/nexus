@@ -1,8 +1,7 @@
 /**
  * What the props JSON documents: which files are read, which of docgen's
  * reports count, and which of the package's exports are components. The
- * generator turns the answers into files; nothing here writes any, so every
- * rule can be exercised without running it.
+ * generator turns the answers into files.
  */
 
 import { readFileSync } from 'node:fs';
@@ -88,7 +87,7 @@ export function exportName(doc) {
   return doc.rootExpression?.getName() ?? doc.displayName;
 }
 
-export function declarationPath(doc) {
+function declarationPath(doc) {
   const sourceFile = doc.expression?.declarations?.[0]?.getSourceFile?.();
   return sourceFile ? toRepoPath(sourceFile.fileName) : null;
 }
@@ -113,7 +112,7 @@ export function isReExport(doc, parsedPaths) {
  * (`NEXUS_APPEARANCE_COOKIE_MAX_AGE_SECONDS`) share the leading capital but are
  * constants.
  */
-export function isComponentName(name) {
+function isComponentName(name) {
   return /^[A-Z]/.test(name) && !/^[A-Z0-9_]+$/.test(name);
 }
 
@@ -123,7 +122,7 @@ export function isComponentName(name) {
  * through `new` and carries a construct signature instead, so its instance has
  * to answer to `render` for an ordinary exported class not to read as one.
  */
-export function isRenderable(checker, symbol) {
+function isRenderable(checker, symbol) {
   const declaration = symbol.declarations?.[0];
   if (!declaration) return false;
 
@@ -213,7 +212,7 @@ export function publicComponents(checker, exported, componentsRoot) {
  * these into `node_modules` in whatever state their last build left them, so
  * they are the imports that can be present and carry no types at all.
  */
-export function importedWorkspaceSpecifiers(sourceFiles, manifest) {
+function importedWorkspaceSpecifiers(sourceFiles, manifest) {
   const packages = Object.entries({
     ...manifest.dependencies,
     ...manifest.peerDependencies,
@@ -265,11 +264,7 @@ const DECLARATION_EXTENSIONS = new Set([
  * build graph, so the declarations have to be asked for rather than inferred
  * from the diagnostics they fail to produce.
  */
-export function assertWorkspaceTypes(
-  specifiers,
-  compilerOptions,
-  containingFile
-) {
+function assertWorkspaceTypes(specifiers, compilerOptions, containingFile) {
   const untyped = specifiers.filter((specifier) => {
     const { resolvedModule } = ts.resolveModuleName(
       specifier,

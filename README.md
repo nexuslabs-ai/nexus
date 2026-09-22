@@ -25,14 +25,13 @@ make dev          # Storybook — the component catalog & dev surface
 
 ## Workspace layout
 
-| Path                  | Purpose                                                       |
-| --------------------- | ------------------------------------------------------------- |
-| `packages/core`       | Internal design tokens and theme definitions (not published)  |
-| `packages/tailwind`   | Tailwind CSS theme with `nx:` prefix                          |
-| `packages/react`      | React components built with Radix UI and Tailwind CSS         |
-| `packages/test-utils` | Test utilities for hooks and utilities                        |
-| `apps/console`        | Theme/token exploration UI                                    |
-| `apps/docs`           | Documentation site (Next.js — IA shell + live theme explorer) |
+| Path                | Purpose                                                       |
+| ------------------- | ------------------------------------------------------------- |
+| `packages/core`     | Internal design tokens and theme definitions (not published)  |
+| `packages/tailwind` | Tailwind CSS theme with `nx:` prefix                          |
+| `packages/react`    | React components built with Radix UI and Tailwind CSS         |
+| `apps/console`      | Theme/token exploration UI                                    |
+| `apps/docs`         | Documentation site (Next.js — IA shell + live theme explorer) |
 
 ## Where to learn more
 
@@ -41,15 +40,3 @@ make dev          # Storybook — the component catalog & dev surface
   - [`testing-react.md`](.claude/rules/testing-react.md) — testing patterns for the React package
   - [`components.md`](.claude/rules/components.md) — component architecture, `nx:` prefix, data attributes
 - [Issue tracker](../../issues) — bugs and feature requests
-
-## Browser support
-
-| Browser          | Minimum version |
-| ---------------- | --------------- |
-| Chrome           | 111             |
-| Edge             | 111             |
-| Firefox          | 113             |
-| Safari           | 15.4            |
-| Samsung Internet | 22              |
-
-Design tokens use OKLCH color (Baseline 2023). Browsers below these versions do not support OKLCH and will not receive hex fallbacks — consumers needing older support must pin to the last pre-OKLCH-migration tag. The same floor is encoded in root `package.json#browserslist`; run `pnpm audit:browser-support` before adopting a new Modern Web Guidance feature.

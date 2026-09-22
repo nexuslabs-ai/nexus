@@ -70,7 +70,7 @@ function typesCondition(target) {
  * up without a second list to maintain. Shared with the test so the generator
  * and the yardstick it is measured against cannot disagree about the surface.
  */
-export function entryPointsFromManifest(manifest) {
+function entryPointsFromManifest(manifest) {
   return Object.entries(manifest.exports)
     .filter(([, target]) => isModuleSurface(target))
     .map(([subpath, target]) => {

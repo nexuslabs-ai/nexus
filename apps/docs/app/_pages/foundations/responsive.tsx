@@ -79,11 +79,10 @@ export default function Responsive() {
         Standard (desktop) are both first-class targets, neither a degradation
         of the other. Author mobile-first: base styles are the mobile case, and
         min-width prefixes layer on the wider tiers. Wide (≥1536px) gets extra
-        breathing room; interactive controls clear a ~44px minimum tap-target
-        for touch. Breakpoints are rem-based, so they track the user&rsquo;s
-        font-size preference — raise the base font and each breakpoint fires at
-        a narrower viewport, dropping the layout to a roomier tier as the text
-        enlarges.
+        breathing room. Breakpoints are rem-based, so they track the
+        user&rsquo;s font-size preference — raise the base font and each
+        breakpoint fires at a narrower viewport, dropping the layout to a
+        roomier tier as the text enlarges.
       </p>
 
       {/* ── Breakpoints ─────────────────────────────────────── */}
