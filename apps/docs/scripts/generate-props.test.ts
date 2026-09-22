@@ -14,6 +14,7 @@ import ts from 'typescript';
 import { afterAll, beforeAll, describe, expect, it } from 'vitest';
 
 import {
+  assertProgramWorkspaceTypes,
   assertWorkspaceTypes,
   exportName,
   importedWorkspaceSpecifiers,
@@ -22,6 +23,7 @@ import {
   isOwnProp,
   isPortableExpansion,
   isRenderable,
+  isUnder,
   opaqueNamespaceNames,
   publicComponents,
   publicExports,
@@ -437,14 +439,66 @@ describe('component export predicates', () => {
   });
 });
 
+/**
+ * A workspace link resolved two ways: `typed` as a finished build, `js-only`
+ * as one whose declaration pass failed — tsup writes JavaScript and
+ * declarations separately, so that state leaves the package importable and
+ * type-less, and `allowJs` then types every prop reached through it as `any`
+ * without a single unresolved-module error to show for it.
+ */
+function typesFixture() {
+  const root = tempDir('nexus-props-types-');
+
+  const dependency = (name: string, target: Record<string, string>) => {
+    const dir = path.join(root, 'node_modules', name);
+    mkdirSync(dir, { recursive: true });
+    writeFileSync(
+      path.join(dir, 'package.json'),
+      JSON.stringify({
+        name,
+        version: '0.0.0',
+        exports: { '.': { import: target } },
+      })
+    );
+    for (const file of Object.values(target)) {
+      writeFileSync(path.join(dir, file), '');
+    }
+  };
+
+  dependency('typed', { types: './index.d.ts', default: './index.js' });
+  dependency('js-only', { default: './index.js' });
+
+  return {
+    root,
+    options: {
+      module: ts.ModuleKind.ESNext,
+      moduleResolution: ts.ModuleResolutionKind.Bundler,
+      allowJs: true,
+    },
+  };
+}
+
 describe('workspace dependency types', () => {
+  it('reads a path as inside a directory only on a segment boundary', () => {
+    const src = path.join(reactRoot, 'src');
+
+    expect(isUnder(path.join(src, 'components', 'badge.tsx'), src)).toBe(true);
+    expect(isUnder(path.join(reactRoot, 'src-gen', 'badge.tsx'), src)).toBe(
+      false
+    );
+    expect(isUnder(reactRoot, src)).toBe(false);
+    expect(isUnder(src, src)).toBe(false);
+  });
+
   it('names only the workspace packages the source binds from', () => {
     const source = ts.createSourceFile(
       'widget.ts',
       [
         "import { tokens } from '@nexus_ds/core';",
         "import { derive } from '@nexus_ds/core/runtime';",
-        "export type { Mode } from '@nexus_ds/core';",
+        // Its own specifier, so a re-export is the only statement that can
+        // put it in the set.
+        "export type { Mode } from '@nexus_ds/core/theme';",
         "import { cva } from 'class-variance-authority';",
         "import { cn } from './lib/utils';",
         // Binds nothing, so nothing it fails to type can reach a prop.
@@ -462,41 +516,16 @@ describe('workspace dependency types', () => {
         },
         peerDependencies: { '@nexus_ds/tailwind': 'workspace:*' },
       })
-    ).toEqual(['@nexus_ds/core', '@nexus_ds/core/runtime']);
+    ).toEqual([
+      '@nexus_ds/core',
+      '@nexus_ds/core/runtime',
+      '@nexus_ds/core/theme',
+    ]);
   });
 
   it('refuses a dependency that resolves to no declarations', () => {
-    const root = tempDir('nexus-props-types-');
-
-    const dependency = (name: string, target: Record<string, string>) => {
-      const dir = path.join(root, 'node_modules', name);
-      mkdirSync(dir, { recursive: true });
-      writeFileSync(
-        path.join(dir, 'package.json'),
-        JSON.stringify({
-          name,
-          version: '0.0.0',
-          exports: { '.': { import: target } },
-        })
-      );
-      for (const file of Object.values(target)) {
-        writeFileSync(path.join(dir, file), '');
-      }
-    };
-
-    dependency('typed', { types: './index.d.ts', default: './index.js' });
-    // tsup writes JavaScript and declarations in separate passes, so a failed
-    // declaration pass leaves the package importable and type-less — and
-    // `allowJs` then types every prop reached through it as `any` without a
-    // single unresolved-module error to show for it.
-    dependency('js-only', { default: './index.js' });
-
+    const { root, options } = typesFixture();
     const caller = path.join(root, 'caller.ts');
-    const options = {
-      module: ts.ModuleKind.ESNext,
-      moduleResolution: ts.ModuleResolutionKind.Bundler,
-      allowJs: true,
-    };
 
     expect(() =>
       assertWorkspaceTypes(['typed'], options, caller)
@@ -509,10 +538,51 @@ describe('workspace dependency types', () => {
       ).split('\n')
     ).toEqual([
       'props JSON: a workspace dependency resolves to no type declarations, so every prop typed through it would be documented as `any`.',
-      'Build the workspace dependencies first: pnpm turbo build --filter=@nexus_ds/react^...',
+      'Build the workspace dependencies first: pnpm turbo generate:props --filter=@nexus_ds/docs',
       '  js-only',
       '  absent',
     ]);
+  });
+
+  it('reads a program for the specifiers its own sources bind', () => {
+    const { root, options } = typesFixture();
+    const srcRoot = path.join(root, 'src');
+    mkdirSync(srcRoot, { recursive: true });
+
+    const manifestPath = path.join(root, 'package.json');
+    writeFileSync(
+      manifestPath,
+      JSON.stringify({
+        dependencies: { typed: 'workspace:*', 'js-only': 'workspace:*' },
+      })
+    );
+
+    const sourceFile = (file: string, specifier: string) => {
+      const filePath = path.join(root, file);
+      writeFileSync(filePath, `import { thing } from '${specifier}';\n`);
+      return filePath;
+    };
+
+    const inSrc = sourceFile(path.join('src', 'widget.ts'), 'typed');
+    // Only a file the output documents can widen a prop, so a program member
+    // outside `src/` cannot put a specifier in front of the guard.
+    const outside = sourceFile('sibling.ts', 'js-only');
+
+    const guard = (files: string[]) => () =>
+      assertProgramWorkspaceTypes(ts.createProgram(files, options), {
+        srcRoot,
+        manifestPath,
+        compilerOptions: options,
+        containingFile: path.join(srcRoot, 'index.ts'),
+      });
+
+    expect(guard([inSrc, outside])).not.toThrow();
+
+    expect(
+      failureFrom(guard([sourceFile(path.join('src', 'other.ts'), 'js-only')]))
+        .split('\n')
+        .at(-1)
+    ).toBe('  js-only');
   });
 });
 

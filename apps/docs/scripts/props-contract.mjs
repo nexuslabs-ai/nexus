@@ -1,10 +1,11 @@
 /**
  * What the props JSON documents: which files are read, which of docgen's
  * reports count, and which of the package's exports are components. The
- * generator turns the answers into files; nothing here touches disk, so every
+ * generator turns the answers into files; nothing here writes any, so every
  * rule can be exercised without running it.
  */
 
+import { readFileSync } from 'node:fs';
 import path from 'node:path';
 
 import ts from 'typescript';
@@ -13,6 +14,21 @@ import { repoRoot } from './roots.mjs';
 
 export function toRepoPath(absolutePath) {
   return path.relative(repoRoot, absolutePath).split(path.sep).join('/');
+}
+
+/**
+ * Whether a file sits inside a directory. Compares path segments rather than
+ * string prefixes, so a sibling whose name starts with the directory's own
+ * (`src-gen` beside `src`) does not read as being under it.
+ */
+export function isUnder(filePath, directory) {
+  const relative = path.relative(directory, filePath);
+  return (
+    relative !== '' &&
+    relative !== '..' &&
+    !relative.startsWith(`..${path.sep}`) &&
+    !path.isAbsolute(relative)
+  );
 }
 
 /**
@@ -271,9 +287,30 @@ export function assertWorkspaceTypes(
   throw new Error(
     [
       'props JSON: a workspace dependency resolves to no type declarations, so every prop typed through it would be documented as `any`.',
-      'Build the workspace dependencies first: pnpm turbo build --filter=@nexus_ds/react^...',
+      'Build the workspace dependencies first: pnpm turbo generate:props --filter=@nexus_ds/docs',
       ...untyped.map((specifier) => `  ${specifier}`),
     ].join('\n')
+  );
+}
+
+/**
+ * The guard as the generator needs it: only the program's own source files can
+ * bind a specifier the output documents, and the package manifest is what says
+ * which of those specifiers are workspace links.
+ */
+export function assertProgramWorkspaceTypes(
+  program,
+  { srcRoot, manifestPath, compilerOptions, containingFile }
+) {
+  assertWorkspaceTypes(
+    importedWorkspaceSpecifiers(
+      program
+        .getSourceFiles()
+        .filter((file) => isUnder(file.fileName, srcRoot)),
+      JSON.parse(readFileSync(manifestPath, 'utf8'))
+    ),
+    compilerOptions,
+    containingFile
   );
 }
 

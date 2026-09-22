@@ -2,14 +2,23 @@
   "$schema": "https://turbo.build/schema.json",
   "extends": ["//"],
   "tasks": {
+    "generate:props": {
+      "dependsOn": ["@nexus_ds/core#build"],
+      "inputs": [
+        "scripts/generate-props.mjs",
+        "scripts/props-contract.mjs",
+        "scripts/react-entry-points.mjs",
+        "scripts/roots.mjs",
+        "$TURBO_ROOT$/packages/react/src/**",
+        "$TURBO_ROOT$/packages/react/package.json",
+        "$TURBO_ROOT$/packages/react/tsconfig.json"
+      ],
+      "outputs": ["generated/props/**"]
+    },
     "build": {
+      "dependsOn": ["^build", "generate:props"],
       "inputs": ["$TURBO_DEFAULT$", "$TURBO_ROOT$/package.json"],
-      "outputs": [
-        ".next/**",
-        "!.next/cache/**",
-        "next-env.d.ts",
-        "generated/props/**"
-      ]
+      "outputs": [".next/**", "!.next/cache/**", "next-env.d.ts"]
     }
   }
 }

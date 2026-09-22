@@ -11,14 +11,14 @@ import docgen from 'react-docgen-typescript';
 import ts from 'typescript';
 
 import {
-  assertWorkspaceTypes,
+  assertProgramWorkspaceTypes,
   exportName,
-  importedWorkspaceSpecifiers,
   isComponentSource,
   isOwnProp,
   isPortableExpansion,
   isReExport,
   isTypeExport,
+  isUnder,
   opaqueNamespaceNames,
   publicComponents,
   publicExports,
@@ -66,11 +66,10 @@ function symbolSourcePath(symbol) {
  * for it to be exported.
  */
 function localAliasExpansions(checker, program, exported) {
-  const srcPath = toRepoPath(reactSrc);
   const candidates = new Map();
 
   for (const sourceFile of program.getSourceFiles()) {
-    if (!toRepoPath(sourceFile.fileName).startsWith(srcPath)) continue;
+    if (!isUnder(sourceFile.fileName, reactSrc)) continue;
     const opaqueNamespaces = opaqueNamespaceNames(sourceFile);
 
     for (const statement of sourceFile.statements) {
@@ -215,18 +214,12 @@ const program = ts.createProgram([...sourceFiles, ...entryPoints], {
 // The generator is the only place that can tell a missing workspace build from
 // an ordinary type error, so it asks the resolver for the declarations before
 // reading a single type off them.
-assertWorkspaceTypes(
-  importedWorkspaceSpecifiers(
-    program
-      .getSourceFiles()
-      .filter((file) =>
-        toRepoPath(file.fileName).startsWith(toRepoPath(reactSrc))
-      ),
-    JSON.parse(readFileSync(reactManifest, 'utf8'))
-  ),
+assertProgramWorkspaceTypes(program, {
+  srcRoot: reactSrc,
+  manifestPath: reactManifest,
   compilerOptions,
-  path.join(reactSrc, 'index.ts')
-);
+  containingFile: path.join(reactSrc, 'index.ts'),
+});
 
 const checker = program.getTypeChecker();
 

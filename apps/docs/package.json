@@ -7,13 +7,13 @@
   "scripts": {
     "dev": "pnpm generate:manifest && pnpm generate:props && next dev --turbopack",
     "generate:props": "node scripts/generate-props.mjs",
-    "build": "pnpm generate:manifest && pnpm generate:props && next build",
+    "build": "pnpm generate:manifest && next build",
     "start": "next start",
     "generate:manifest": "node scripts/generate-page-manifest.mjs",
     "audit:csp": "node scripts/audit-csp-inventory.mjs",
     "audit:grammar-pin": "node scripts/audit-grammar-pin.mjs",
     "typecheck": "tsc --noEmit",
-    "clean": "rm -rf .next dist"
+    "clean": "rm -rf .next generated/props"
   },
   "dependencies": {
     "@mdx-js/loader": "^3.1.0",
