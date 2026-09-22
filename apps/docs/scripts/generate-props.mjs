@@ -107,14 +107,15 @@ function localAliasExpansions(checker, program, exported) {
  * spells: a quoted member is a value, and a name followed by `:` is a member or
  * parameter being declared. Neither is something the reader has to look up.
  * A declaration name only ever opens a member or parameter list, so matching it
- * against the delimiter in front of it leaves the one other name that can
- * precede a colon — a conditional type's true branch — counted as a reference.
+ * against the delimiter in front of it — and the `readonly` a member may carry
+ * between the two — leaves the one other name that can precede a colon, a
+ * conditional type's true branch, counted as a reference.
  */
 function typeReferenceTokens(type) {
   return (
     type
       .replace(/(['"])(?:\\.|(?!\1)[^\\])*\1/g, '""')
-      .replace(/(^|[{;,([])\s*[A-Za-z_$][\w$]*\s*\??\s*:/g, '$1:')
+      .replace(/(^|[{;,([])\s*(?:readonly\s+)?[A-Za-z_$][\w$]*\s*\??\s*:/g, '$1:')
       .match(/[A-Za-z_$][\w$]*/g) ?? []
   );
 }
@@ -336,9 +337,7 @@ clearPreviousOutput();
 const index = {};
 let propCount = 0;
 
-for (const slug of [...bySlug.keys()].sort()) {
-  const entries = bySlug.get(slug);
-
+for (const [slug, entries] of bySlug) {
   // A folder that exports no component (`focus-ring` is stories only,
   // `overlay-layout` is a util module) has no page, so it gets no entry.
   if (entries.length === 0) continue;
