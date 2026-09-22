@@ -98,9 +98,10 @@ export const NEXUS_CLASS_GROUPS = {
   // land in tailwind-merge's `outline-color` group and a field's
   // `outline-focus-default` silently drops the width beside it.
   'outline-w': ['outline-thin', 'outline-default', 'outline-thick'],
-  // Only the `@utility` aliases. `border-border-*` is Tailwind-generated from
-  // `--color-*`, and tailwind-merge's default `theme.color` is `[isAny]`, so it
-  // already lands in this group without being named.
+  // Only the `@utility` aliases, which the emitted-utility drift guard in
+  // `utils.test.ts` requires to declare a group. `border-border-*` is
+  // Tailwind-generated from `--color-*` rather than emitted as a utility, and
+  // tailwind-merge's default `theme.color` is `[isAny]`, so it needs no entry.
   'border-color': [
     'border-color-default',
     'border-color-default-alpha',

@@ -117,10 +117,11 @@ const CHECKS = [
   },
 ];
 
-// `outline-none`, `outline-hidden` and `outline-offset-*` change no outline
-// colour, so they are suppressions and offsets rather than a painted ring.
+// Only a width or a colour paints a ring. `outline-none` / `outline-hidden`
+// suppress one, `outline-0` is a zero width, `outline-offset-*` shifts a ring
+// it does not paint, and the style keywords set `outline-style` alone.
 const RING_PAINTING_OUTLINE =
-  /focus-visible:outline-(?!none\b|hidden\b|offset-)/;
+  /focus-visible:outline-(?!none\b|hidden\b|0\b|offset-|solid\b|dashed\b|dotted\b|double\b)/;
 
 // `nx:transition-colors` expands to a property list that includes
 // `outline-color`, so a surface that also paints a focus ring fades the ring in
@@ -139,10 +140,17 @@ function isDocsFile(filename) {
   return /(?:^|[/\\])apps[/\\]docs[/\\]/.test(filename);
 }
 
-// Stories and docs pages quote utilities as specimens and prose, so a checked
-// class string there is an example rather than a shipped appearance.
+// What the runtime-only checks skip: stories and the docs app quote utilities
+// as specimens and prose, and the docs app styles its own chrome off-system.
 function isExampleFile(filename) {
   return isStoryFile(filename) || isDocsFile(filename);
+}
+
+// The ring check skips less: only the docs pages, which render a pairing as
+// the subject of the prose around it. The rest of the docs app is its own
+// shipped chrome, and a story's class strings are the component's real ones.
+function isDocsSpecimenPage(filename) {
+  return /(?:^|[/\\])apps[/\\]docs[/\\]app[/\\]_pages[/\\]/.test(filename);
 }
 
 const RAW_TYPOGRAPHY_EXCEPTIONS = [
@@ -199,10 +207,13 @@ function matchedMessageIds(raw, filename) {
   return matched;
 }
 
-// `cva()` and `cn()` join every string they are handed — a base, an array
-// element, a `variants` value — into one class attribute, so the whole call is
-// one scope. A bare array is not: its elements are per-item class strings that
-// never meet on an element.
+// A class composer joins every string it is handed — a base, an array element,
+// a `variants` value — so the whole call is one scope. Two sibling `variants`
+// values never share an element, which makes the scope an over-approximation;
+// that is the safe direction for this check. A bare array is not a scope: its
+// elements are per-item class strings that never meet on an element. The
+// callee has to be one of these names written plainly, so an aliased or
+// member-expression composer (`utils.cn`, a renamed import) is not a scope.
 const CLASS_COMPOSING_CALLEES = new Set(['cva', 'cn', 'clsx', 'cx']);
 
 function isClassComposingCall(node) {
@@ -213,17 +224,29 @@ function isClassComposingCall(node) {
   );
 }
 
-function enclosingClassCall(node) {
+// Where a scope ends. A string handed to some other function reaches the class
+// attribute only through that call's return value — the same call-site join
+// that already separates two `const`s. A callback body sits inside such a call
+// by construction, so it needs no case of its own.
+function breaksClassScope(node) {
+  return node.type === 'CallExpression' && !isClassComposingCall(node);
+}
+
+function isInsideClassCall(node) {
   for (let current = node.parent; current; current = current.parent) {
     if (isClassComposingCall(current)) {
-      return current;
+      return true;
+    }
+    if (breaksClassScope(current)) {
+      return false;
     }
   }
-  return null;
+  return false;
 }
 
 // Every class string a node can contribute: its own value, a template
-// literal's quasis, and the same for anything nested inside it.
+// literal's quasis, and the same for anything nested inside it that still
+// reaches the same class attribute.
 function collectClassStrings(node, visitorKeys, collected) {
   if (node.type === 'Literal') {
     if (typeof node.value === 'string') {
@@ -239,7 +262,7 @@ function collectClassStrings(node, visitorKeys, collected) {
   for (const key of visitorKeys[node.type] ?? []) {
     const child = node[key];
     for (const value of Array.isArray(child) ? child : [child]) {
-      if (value?.type) {
+      if (value?.type && !breaksClassScope(value)) {
         collectClassStrings(value, visitorKeys, collected);
       }
     }
@@ -290,7 +313,7 @@ export default {
     // A string inside a `cva()` / `cn()` call is covered by that call's scope,
     // so only a standalone one is a scope of its own.
     function reportScope(node) {
-      if (isExampleFile(filename) || enclosingClassCall(node)) {
+      if (isDocsSpecimenPage(filename) || isInsideClassCall(node)) {
         return;
       }
       const collected = [];

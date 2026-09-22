@@ -24,7 +24,10 @@ of generated `box-shadow`.
   decoration and may fade, while a field's border is the ring's inner half.
 - `@nexus_ds/nx-class-conventions` gained a `ringFadingTransition` check that
   fails `nx:transition-colors` sharing a scope with a ring-painting
-  `focus-visible:outline-*` class. A scope is one class string, or one `cva()` /
-  `cn()` call — base, array elements and `variants` values all reach the same
-  `class` attribute. `outline-none`, `outline-hidden` and `outline-offset-*`
-  paint no ring and are exempt.
+  `focus-visible:outline-*` class. A scope is one class string, or one `cva` /
+  `cn` / `clsx` / `cx` call — base, array elements and `variants` values read
+  together. That over-approximates the class attribute: sibling `variants`
+  values of one key never share an element and are reported anyway, which is
+  the safe direction. Only a width or a colour paints a ring, so
+  `outline-none`, `outline-hidden`, `outline-0`, `outline-offset-*` and the
+  `outline-solid` / `dashed` / `dotted` / `double` style keywords are exempt.

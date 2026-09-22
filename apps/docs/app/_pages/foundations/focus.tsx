@@ -249,8 +249,9 @@ nx:aria-invalid:focus-visible:border-focus-error`}
           , so the ring fades in over the duration instead of landing with the
           keypress. <code>pnpm lint</code> fails the pair wherever both land in
           one class string or one <code>cva()</code> / <code>cn()</code> call;
-          two strings that only meet somewhere else pass. Nexus ships the two
-          ring-safe replacements — reach for those instead:
+          two strings that only meet somewhere else pass, and the specimens on
+          these docs pages are the one surface the check skips. Nexus ships the
+          two ring-safe replacements — reach for those instead:
         </p>
         <div className="nx:overflow-x-auto nx:mt-4">
           <table className="nx:w-full nx:min-w-[480px] nx:border-collapse nx:typography-label-default">
