@@ -288,17 +288,12 @@ export const FieldErrorFocusBoundaries: Story = {
       canvas.getByRole('textbox', { name: 'Invalid grouped input' })
     );
 
-    // Disabled keeps a real border and declares its forced-colors fallback,
-    // which replaces the generated GrayText rule this refactor deleted.
     const disabled = canvas.getByRole('textbox', { name: 'Disabled input' });
     const disabledStyles = getComputedStyle(disabled);
     await expect(
       Number.parseFloat(disabledStyles.borderTopWidth)
     ).toBeGreaterThan(0);
     await expect(disabled).toHaveClass('nx:disabled:border-border-disabled');
-    await expect(disabled).toHaveClass(
-      'nx:forced-colors:disabled:border-[GrayText]'
-    );
   },
 };
 

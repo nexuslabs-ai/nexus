@@ -8,7 +8,6 @@ const inputVariants = cva(
   [
     'nx:flex nx:box-border nx:w-full nx:rounded-md nx:border-default',
     'nx:text-foreground nx:transition-[color,background-color]',
-    'nx:forced-colors:disabled:border-[GrayText]',
     'nx:file:border-0 nx:file:bg-transparent nx:file:typography-label-default nx:file:text-foreground nx:disabled:file:text-disabled-foreground',
     'nx:placeholder:text-muted-foreground',
     'nx:focus-visible:outline-1 nx:focus-visible:outline-focus-default nx:focus-visible:border-focus-default',

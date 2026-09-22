@@ -166,7 +166,7 @@ function AvatarImage({
       decoding={decoding}
       className={cn(
         'nx:aspect-square nx:size-full nx:rounded-[inherit] nx:object-cover',
-        'nx:animate-in nx:fade-in-0 nx:duration-fast nx:ease-enter nx:motion-reduce:animate-none',
+        'nx:animate-in nx:fade-in-0 nx:duration-fast nx:ease-enter',
         className
       )}
       {...props}

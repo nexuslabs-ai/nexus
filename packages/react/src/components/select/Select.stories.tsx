@@ -99,9 +99,6 @@ export const IndicatorCrossFade: Story = {
       await expect(selectedCheck).toHaveClass(
         'nx:group-data-[state=checked]:opacity-100'
       );
-      await expect(selectedCheck).toHaveClass(
-        'nx:motion-reduce:transition-none'
-      );
     } finally {
       await userEvent.keyboard('{Escape}');
       await waitFor(() => {

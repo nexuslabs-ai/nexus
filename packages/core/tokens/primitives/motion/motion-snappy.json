@@ -3,7 +3,7 @@
     "0": {
       "$value": "0ms",
       "$type": "duration",
-      "$description": "Instant state changes and reduced-motion fallbacks."
+      "$description": "Instant state changes."
     },
     "faster": {
       "$value": "100ms",

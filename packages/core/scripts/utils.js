@@ -1823,22 +1823,6 @@ export function generateThemeCSS(config) {
   return css;
 }
 
-/**
- * Every element that paints a keyboard focus ring through the canonical
- * outline utilities. Normal rendering needs no help — the outline is real —
- * so these exist only to force the system Highlight colour under
- * forced-colors, where an author `outline-color` would otherwise be mapped to
- * `CanvasText` and become indistinguishable from the element's own border.
- */
-const FOCUS_RING_SELECTORS = [
-  "[class~='nx:focus-visible:outline-focus-default']:focus-visible",
-  "[class~='nx:data-[active=true]:outline-focus-default'][data-active='true']",
-  "[data-focused='true'] [class~='nx:group-data-[focused=true]/day:outline-focus-default']",
-  "[class~='nx:has-[[data-slot=input-group-control]:focus-visible]:outline-focus-default']:has([data-slot='input-group-control']:focus-visible)",
-  "[class~='nx:aria-invalid:focus-visible:outline-focus-error'][aria-invalid='true']:focus-visible",
-  "[class~='nx:has-[[data-slot=input-group-control][aria-invalid=true]:focus-visible]:outline-focus-error']:has([data-slot='input-group-control'][aria-invalid='true']:focus-visible)",
-];
-
 // InputOTP slots draw their boundary as three-sided shadows so adjacent slots
 // share one hairline, which a real border cannot express. Tracked in #727;
 // until then these rules stay and the slot's own outline stays suppressed.
@@ -1853,14 +1837,11 @@ const OTP_SLOT_ACTIVE_RING_SELECTOR =
  *
  * Fields and controls paint their boundary with `border` and their focus ring
  * with `outline`, so nothing is generated for them. What remains is the
- * InputOTP slot's shared-hairline shadows (#727) and the forced-colors
- * Highlight override for every focus ring.
+ * InputOTP slot's shared-hairline shadows (#727).
  *
  * @returns {string} CSS focus ring rules
  */
 export function generateFocusRingCSS() {
-  const focusRingSelectors = FOCUS_RING_SELECTORS.join(',\n');
-
   return `
 /* ===== FOCUS RING ===== */
 ${OTP_SLOT_BOUNDARY_SELECTOR} {
@@ -1898,36 +1879,12 @@ ${OTP_SLOT_GROUP_DISABLED_SELECTOR}:first-child {
 }
 
 ${OTP_SLOT_ACTIVE_RING_SELECTOR} {
-  --tw-outline-style: none !important;
-  outline-color: transparent !important;
-  outline-style: none !important;
+  outline: 2px solid transparent !important;
   border-color: transparent !important;
   border-width: 0;
   box-shadow:
     inset 0 0 0 1px var(--color-focus-default),
     0 0 0 1px var(--color-focus-default);
-}
-
-@media (forced-colors: active) {
-  ${OTP_SLOT_BOUNDARY_SELECTOR} {
-    border-color: CanvasText !important;
-    border-width: 1px;
-    box-shadow: none !important;
-  }
-
-  ${OTP_SLOT_GROUP_DISABLED_SELECTOR} {
-    border-color: GrayText !important;
-    border-width: 1px;
-    box-shadow: none !important;
-  }
-
-  ${focusRingSelectors} {
-    --tw-outline-style: solid !important;
-    outline-color: Highlight !important;
-    outline-style: solid !important;
-    outline-width: 2px !important;
-    box-shadow: none !important;
-  }
 }
 `;
 }

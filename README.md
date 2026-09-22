@@ -25,14 +25,13 @@ make dev          # Storybook — the component catalog & dev surface
 
 ## Workspace layout
 
-| Path                  | Purpose                                                       |
-| --------------------- | ------------------------------------------------------------- |
-| `packages/core`       | Internal design tokens and theme definitions (not published)  |
-| `packages/tailwind`   | Tailwind CSS theme with `nx:` prefix                          |
-| `packages/react`      | React components built with Radix UI and Tailwind CSS         |
-| `packages/test-utils` | Test utilities for hooks and utilities                        |
-| `apps/console`        | Theme/token exploration UI                                    |
-| `apps/docs`           | Documentation site (Next.js — IA shell + live theme explorer) |
+| Path                | Purpose                                                       |
+| ------------------- | ------------------------------------------------------------- |
+| `packages/core`     | Internal design tokens and theme definitions (not published)  |
+| `packages/tailwind` | Tailwind CSS theme with `nx:` prefix                          |
+| `packages/react`    | React components built with Radix UI and Tailwind CSS         |
+| `apps/console`      | Theme/token exploration UI                                    |
+| `apps/docs`         | Documentation site (Next.js — IA shell + live theme explorer) |
 
 ## Where to learn more
 
@@ -41,15 +40,3 @@ make dev          # Storybook — the component catalog & dev surface
   - [`testing-react.md`](.claude/rules/testing-react.md) — testing patterns for the React package
   - [`components.md`](.claude/rules/components.md) — component architecture, `nx:` prefix, data attributes
 - [Issue tracker](../../issues) — bugs and feature requests
-
-## Browser support
-
-| Browser          | Minimum version |
-| ---------------- | --------------- |
-| Chrome           | 111             |
-| Edge             | 111             |
-| Firefox          | 113             |
-| Safari           | 16.4            |
-| Samsung Internet | 22              |
-
-Focus rings are real outlines, so the floor is set by the first version that traces `border-radius` with an outline (Safari 16.4); design tokens use OKLCH, which clears it on every engine. Browsers below these versions receive no fallbacks — consumers needing older support must pin to the last pre-16.4-floor tag. The same floor is encoded in root `package.json#browserslist`; run `pnpm audit:browser-support` before adopting a new Modern Web Guidance feature.

@@ -10,7 +10,6 @@ import { Textarea } from '../textarea';
 const inputGroupVariants = cva(
   [
     'nx:group/input-group nx:relative nx:flex nx:box-border nx:w-full nx:min-w-0 nx:items-center nx:rounded-md nx:border-default nx:transition-[color,background-color]',
-    'nx:forced-colors:data-[disabled=true]:border-[GrayText]',
     // Size: an inline group matches standalone Input's height for the
     // control's data-size. `not-has-[>[data-align^=block]]` scopes this to
     // non-stacked layouts (no block addon) so the fixed-height rule and the

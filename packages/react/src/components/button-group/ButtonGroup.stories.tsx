@@ -313,7 +313,6 @@ export const AsChild: Story = {
     await expect(link).toHaveClass('nx:focus-visible:outline-focus-default');
     await expect(link).toHaveClass('nx:transition-colors');
     await expect(link).toHaveClass('nx:duration-fast');
-    await expect(link).toHaveClass('nx:motion-reduce:transition-none');
     await expect(link).toHaveClass('nx:hover:bg-container-hover');
     await expect(link).toHaveClass('nx:active:bg-container-active');
   },
@@ -386,7 +385,7 @@ export const TierAPolishEvidence: Story = {
     docs: {
       description: {
         story:
-          'ButtonGroup Tier-A polish contract: focus-visible addon links, tokenized color motion with reduced-motion fallback, inherited loading/disabled button states, and vertical density evidence.',
+          'ButtonGroup Tier-A polish contract: focus-visible addon links, tokenized color motion, inherited loading/disabled button states, and vertical density evidence.',
       },
     },
   },
@@ -437,7 +436,6 @@ export const TierAPolishEvidence: Story = {
 
     await expect(link).toHaveClass('nx:transition-colors');
     await expect(link).toHaveClass('nx:duration-fast');
-    await expect(link).toHaveClass('nx:motion-reduce:transition-none');
     await expect(link).toHaveClass('nx:focus-visible:outline-2');
     await expect(link).toHaveClass('nx:hover:bg-container-hover');
     await expect(link).toHaveClass('nx:active:bg-container-active');
