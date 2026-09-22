@@ -121,7 +121,7 @@ function NavigationMenuItem({ className, ...props }: NavigationMenuItemProps) {
 }
 
 const navigationMenuTriggerStyle = cva(
-  'nx:group nx:inline-flex nx:w-max nx:items-center nx:justify-center nx:rounded-md nx:bg-background nx:px-4 nx:py-2 nx:typography-label-default nx:transition-[color,background-color] nx:hover:bg-background-hover nx:hover:text-foreground nx:focus-visible:outline-2 nx:focus-visible:outline-focus-default nx:disabled:pointer-events-none nx:disabled:text-disabled-foreground nx:data-[state=open]:bg-background-hover nx:data-[state=open]:text-foreground'
+  'nx:group nx:inline-flex nx:w-max nx:items-center nx:justify-center nx:rounded-md nx:bg-background nx:px-4 nx:py-2 nx:typography-label-default nx:transition-control nx:hover:bg-background-hover nx:hover:text-foreground nx:focus-visible:outline-2 nx:focus-visible:outline-focus-default nx:disabled:pointer-events-none nx:disabled:text-disabled-foreground nx:data-[state=open]:bg-background-hover nx:data-[state=open]:text-foreground'
 );
 
 /**
@@ -257,7 +257,7 @@ function NavigationMenuLink({ className, ...props }: NavigationMenuLinkProps) {
     <NavigationMenuPrimitive.Link
       data-slot="navigation-menu-link"
       className={cn(
-        'nx:flex nx:flex-col nx:gap-1 nx:rounded-sm nx:p-2 nx:typography-body-default nx:transition-[color,background-color]',
+        'nx:flex nx:flex-col nx:gap-1 nx:rounded-sm nx:p-2 nx:typography-body-default nx:transition-control',
         'nx:hover:bg-popover-hover nx:hover:text-popover-foreground',
         'nx:focus-visible:outline-2 nx:focus-visible:outline-focus-default',
         'nx:data-[active=true]:bg-popover-hover nx:data-[active=true]:text-popover-foreground',

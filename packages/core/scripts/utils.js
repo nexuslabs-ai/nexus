@@ -1556,7 +1556,11 @@ export function collectMotionTokens(tokensDir, mode) {
  * 1. Data-driven duration utilities. Tailwind v4 codegens named easing
  *    utilities from --ease-* theme vars, but not named duration utilities from
  *    --duration-* vars, so emit duration-* explicitly (e.g. nx:duration-fast).
- * 2. A static, non-token `overlay-presence-exit` keyframe + its
+ * 2. The two ring-safe colour transitions, `transition-control` and
+ *    `transition-field` — Tailwind's own `transition-colors` carries
+ *    `outline-color`, which would fade a focus ring in (see the block comment
+ *    below).
+ * 3. A static, non-token `overlay-presence-exit` keyframe + its
  *    `animate-overlay-presence-exit` utility — the Radix Presence bridge (see
  *    the block comment below). It animates an inert custom property so it fires
  *    `animationend` without overriding the transitioned opacity/scale exit.
@@ -1583,6 +1587,25 @@ export function generateMotionUtilitiesCSS(motionTokens) {
     css += `  transition-duration: ${token.varRef};\n`;
     css += `}\n\n`;
   }
+
+  // Ring-safe colour transitions. Tailwind's `transition-colors` expands to a
+  // list that includes `outline-color`, and every Nexus focus ring is a real
+  // `outline` — so an element carrying both fades its own ring in over the
+  // duration instead of landing it with the keypress. These name the properties
+  // a surface actually wants, and are the only colour transitions component
+  // code should reach for. The split is the focus recipe: a control's border is
+  // its own decoration and may fade, while a field's border is the ring's inner
+  // half, so fading it would make focus a visible two-stage change.
+  css += `@utility transition-control {\n`;
+  css += `  transition-property: color, background-color, border-color;\n`;
+  css += `  transition-timing-function: var(--tw-ease, var(--default-transition-timing-function));\n`;
+  css += `  transition-duration: var(--tw-duration, var(--default-transition-duration));\n`;
+  css += `}\n\n`;
+  css += `@utility transition-field {\n`;
+  css += `  transition-property: color, background-color;\n`;
+  css += `  transition-timing-function: var(--tw-ease, var(--default-transition-timing-function));\n`;
+  css += `  transition-duration: var(--tw-duration, var(--default-transition-duration));\n`;
+  css += `}\n\n`;
 
   // Static "presence bridge" (not token-derived): a non-visual animation whose only
   // job is to fire `animationend` so Radix Presence — which waits on `animationName`,

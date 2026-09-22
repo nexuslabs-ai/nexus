@@ -36,6 +36,9 @@ export const NEXUS_CLASS_GROUPS = {
     'duration-slow',
     'duration-slower',
   ],
+  // The two ring-safe colour transitions. Without this they land nowhere and a
+  // later `transition-none` / `transition-all` fails to replace them.
+  transition: ['transition-control', 'transition-field'],
   z: ['z-overlay', 'z-sticky', 'z-modal', 'z-popover', 'z-toast', 'z-max'],
   gap: ['gap-container', 'gap-layout-section', 'gap-layout-stack'],
   p: ['p-container'],

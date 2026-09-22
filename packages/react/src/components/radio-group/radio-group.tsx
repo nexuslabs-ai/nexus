@@ -73,7 +73,7 @@ function RadioGroupItem({ className, ...props }: RadioGroupItemProps) {
       data-slot="radio-group-item"
       className={cn(
         'nx:group nx:size-4 nx:shrink-0 nx:cursor-pointer nx:rounded-full nx:border-default nx:border-border-default nx:bg-container',
-        'nx:transition-[color,background-color,border-color]',
+        'nx:transition-control',
         'nx:focus-visible:outline-2 nx:focus-visible:outline-focus-default',
         'nx:aria-invalid:border-border-error nx:aria-invalid:focus-visible:outline-focus-error',
         'nx:disabled:cursor-not-allowed nx:disabled:border-border-disabled nx:disabled:bg-disabled',

@@ -9,7 +9,7 @@ const switchVariants = cva(
   [
     'nx:peer nx:inline-flex nx:shrink-0 nx:cursor-pointer nx:items-center',
     'nx:rounded-full nx:border-thick nx:border-border-default',
-    'nx:transition-[color,background-color,border-color]',
+    'nx:transition-control',
     'nx:focus-visible:outline-2 nx:focus-visible:outline-focus-default',
     'nx:aria-invalid:border-border-error nx:aria-invalid:focus-visible:outline-focus-error',
     'nx:aria-invalid:data-[state=checked]:border-primary-background',

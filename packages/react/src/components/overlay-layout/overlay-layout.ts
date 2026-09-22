@@ -143,7 +143,7 @@ const overlayFooterVariants = cva('nx:flex nx:shrink-0 nx:gap-2 nx:px-6', {
 
 const overlayCloseButtonClassName = [
   'nx:absolute nx:right-6 nx:top-6 nx:rounded-sm nx:p-1 nx:text-muted-foreground-subtle',
-  'nx:transition-[color,background-color,border-color]',
+  'nx:transition-control',
   'nx:hover:bg-container-hover nx:hover:text-foreground',
   'nx:focus-visible:bg-container-hover nx:focus-visible:text-foreground',
   'nx:focus-visible:outline-2 nx:focus-visible:outline-focus-default',

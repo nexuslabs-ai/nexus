@@ -20,7 +20,7 @@ export function Footer() {
               href={link.href}
               target="_blank"
               rel="noreferrer"
-              className="nx:rounded-sm nx:hover:text-foreground nx:transition-[color,background-color,border-color] nx:focus-visible:outline-2 nx:focus-visible:outline-focus-default"
+              className="nx:rounded-sm nx:hover:text-foreground nx:transition-control nx:focus-visible:outline-2 nx:focus-visible:outline-focus-default"
             >
               {link.label}
               <span className="nx:sr-only"> (opens in a new tab)</span>

@@ -7,7 +7,7 @@ import { cn } from '../../lib/utils';
 const textareaVariants = cva(
   [
     'nx:flex nx:box-border nx:min-h-16 nx:w-full nx:rounded-md nx:border-default',
-    'nx:text-foreground nx:transition-[color,background-color]',
+    'nx:text-foreground nx:transition-field',
     'nx:placeholder:text-muted-foreground',
     'nx:px-3 nx:py-2 nx:typography-body-default',
     'nx:focus-visible:outline-default nx:focus-visible:outline-focus-default nx:focus-visible:border-focus-default',

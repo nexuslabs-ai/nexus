@@ -172,7 +172,7 @@ const tabsTriggerVariants = cva(
     'nx:relative nx:z-1 nx:inline-flex nx:items-center nx:justify-center',
     'nx:whitespace-nowrap',
     'nx:text-muted-foreground',
-    'nx:transition-[color,background-color,border-color]',
+    'nx:transition-control',
     'nx:focus-visible:outline-2 nx:focus-visible:outline-focus-default',
     'nx:disabled:pointer-events-none nx:disabled:text-disabled-foreground',
   ],

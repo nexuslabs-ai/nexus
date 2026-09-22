@@ -15,3 +15,9 @@ of generated `box-shadow`.
 - `generateFocusRingCSS` is now `generateInputOtpSlotCSS`: the only generated
   rules left are the InputOTP slot's shared-hairline shadows, which a real
   border cannot express (#727).
+- Added the `transition-control` / `transition-field` utilities to
+  `motion-utilities.css`. Tailwind's `transition-colors` carries
+  `outline-color`, so an element painting a real ring would fade it in instead
+  of landing it with the keypress; these name the properties a surface actually
+  wants. The split follows the focus recipe: a control's border is its own
+  decoration and may fade, while a field's border is the ring's inner half.

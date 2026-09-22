@@ -43,7 +43,7 @@ function ItemSeparator({
 }
 
 const itemVariants = cva(
-  'nx:group/item nx:flex nx:flex-wrap nx:items-center nx:rounded-md nx:border-default nx:border-transparent nx:typography-body-default nx:transition-[color,background-color,border-color] nx:duration-faster nx:focus-visible:outline-2 nx:focus-visible:outline-focus-default nx:[a]:hover:bg-background-hover',
+  'nx:group/item nx:flex nx:flex-wrap nx:items-center nx:rounded-md nx:border-default nx:border-transparent nx:typography-body-default nx:transition-control nx:duration-faster nx:focus-visible:outline-2 nx:focus-visible:outline-focus-default nx:[a]:hover:bg-background-hover',
   {
     variants: {
       variant: {

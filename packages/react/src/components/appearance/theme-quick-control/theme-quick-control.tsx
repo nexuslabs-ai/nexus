@@ -52,7 +52,7 @@ function SwatchRow({ label, value, onSelect }: SwatchRowProps) {
               aria-label={`${label}: ${option.label}`}
               aria-pressed={active}
               title={option.label}
-              className="nx:hover:bg-background-hover nx:focus-visible:outline-focus-default nx:relative nx:flex nx:size-9 nx:items-center nx:justify-center nx:rounded-full nx:transition-[color,background-color,border-color] nx:after:absolute nx:after:-inset-1 nx:focus-visible:outline-2"
+              className="nx:hover:bg-background-hover nx:focus-visible:outline-focus-default nx:relative nx:flex nx:size-9 nx:items-center nx:justify-center nx:rounded-full nx:transition-control nx:after:absolute nx:after:-inset-1 nx:focus-visible:outline-2"
             >
               <span
                 className={cn(

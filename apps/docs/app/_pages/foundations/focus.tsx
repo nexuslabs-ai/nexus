@@ -47,6 +47,19 @@ const NO_RING: { surface: string; instead: string }[] = [
   },
 ];
 
+const TRANSITIONS: { utility: string; properties: string; use: string }[] = [
+  {
+    utility: 'nx:transition-control',
+    properties: 'color, background-color, border-color',
+    use: 'Controls — the border is decoration, so it may fade. Button adds `scale` to the same list',
+  },
+  {
+    utility: 'nx:transition-field',
+    properties: 'color, background-color',
+    use: 'Field surfaces — the border is half the ring, so it must not fade',
+  },
+];
+
 export default function Focus() {
   return (
     <>
@@ -229,16 +242,45 @@ nx:aria-invalid:focus-visible:border-focus-error`}
         </p>
         <p className="nx:typography-body-default nx:text-muted-foreground nx:max-w-[64ch]">
           <strong className="nx:text-foreground">
-            A surface that paints a ring names its transition properties.
+            Never use <code>nx:transition-colors</code> on a surface that paints
+            a ring.
           </strong>{' '}
-          <code>nx:transition-colors</code> expands to a list that includes{' '}
-          <code>outline-color</code>, so the ring fades in over the duration
-          instead of landing with the keypress. Controls take{' '}
-          <code>nx:transition-[color,background-color,border-color]</code>;
-          fields drop <code>border-color</code> as well, because their border is
-          half the ring and fading it would make focus a visible two-stage
-          change.
+          Tailwind expands it to a list that includes <code>outline-color</code>
+          , so the ring fades in over the duration instead of landing with the
+          keypress. Nexus ships the two ring-safe replacements — reach for those
+          instead:
         </p>
+        <div className="nx:overflow-x-auto nx:mt-4">
+          <table className="nx:w-full nx:min-w-[480px] nx:border-collapse nx:typography-label-default">
+            <thead>
+              <tr className="nx:border-b nx:border-border-default nx:text-left">
+                <th className="nx:py-2 nx:pr-3 nx:font-semibold">Utility</th>
+                <th className="nx:py-2 nx:pr-3 nx:font-semibold">
+                  Transitions
+                </th>
+                <th className="nx:py-2 nx:font-semibold">Use on</th>
+              </tr>
+            </thead>
+            <tbody>
+              {TRANSITIONS.map((row) => (
+                <tr
+                  key={row.utility}
+                  className="nx:border-b nx:border-border-default"
+                >
+                  <td className="nx:py-2 nx:pr-3 nx:font-mono nx:typography-label-small">
+                    {row.utility}
+                  </td>
+                  <td className="nx:py-2 nx:pr-3 nx:font-mono nx:text-muted-foreground nx:typography-label-small">
+                    {row.properties}
+                  </td>
+                  <td className="nx:py-2 nx:text-muted-foreground nx:typography-label-small">
+                    {row.use}
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
       </section>
     </>
   );

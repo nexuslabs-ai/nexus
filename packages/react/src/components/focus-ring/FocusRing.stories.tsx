@@ -1,6 +1,7 @@
 import type { Meta, StoryObj } from '@storybook/react';
 import { expect, userEvent, within } from 'storybook/test';
 
+import { Checkbox } from '../checkbox';
 import { Input } from '../input';
 import {
   InputGroup,
@@ -375,5 +376,40 @@ export const FieldBorderWidthModes: Story = {
         await expect(outlineWidth).toBe(width);
       }
     }
+  },
+};
+
+/**
+ * Tailwind's `transition-colors` expands to a list carrying `outline-color`, so
+ * an element that paints a real ring fades it up from its resting colour over
+ * the duration instead of landing it with the keypress. `transition-control`
+ * and `transition-field` are the ring-safe replacements, generated from
+ * `@nexus_ds/core`. They are asserted on the compiled `transition-property`
+ * rather than the class name: if either `@utility` stopped emitting, the class
+ * would resolve to nothing and the property would fall back to its `all`
+ * initial value — which transitions the ring again, silently.
+ */
+export const RingSafeTransitions: Story = {
+  render: () => (
+    <div className="nx:flex nx:flex-col nx:items-start nx:gap-3">
+      <Checkbox aria-label="control surface" />
+      <Input aria-label="field surface" />
+    </div>
+  ),
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+    const control = canvas.getByRole('checkbox', { name: 'control surface' });
+    const field = canvas.getByRole('textbox', { name: 'field surface' });
+
+    // A control's border is its own decoration, so it may fade across states.
+    await expect(getComputedStyle(control).transitionProperty).toBe(
+      'color, background-color, border-color'
+    );
+
+    // A field's border is the ring's inner half — fading it would make focus a
+    // two-stage change, so it is excluded for the same reason outline-color is.
+    await expect(getComputedStyle(field).transitionProperty).toBe(
+      'color, background-color'
+    );
   },
 };

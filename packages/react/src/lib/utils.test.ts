@@ -131,8 +131,23 @@ describe('cn', () => {
       'nx:typography-label-small nx:typography-body-default',
       'nx:typography-body-default',
     ],
+    [
+      'transition',
+      'nx:transition-control nx:transition-field',
+      'nx:transition-field',
+    ],
   ])('uses last-wins merging for the %s group', (_group, input, expected) => {
     expect(cn(input)).toBe(expected);
+  });
+
+  it.each([
+    ['nx:transition-control', 'nx:transition-colors'],
+    ['nx:transition-field', 'nx:transition-none'],
+    ['nx:transition-control', 'nx:transition-[color,opacity]'],
+  ])('lets a built-in transition displace %s', (nexusUtility, builtIn) => {
+    // Without the `transition` group entry these land nowhere and both survive,
+    // so a consumer's `className` override would stack rather than replace.
+    expect(cn(nexusUtility, builtIn)).toBe(builtIn);
   });
 
   it('keeps a named outline width beside an outline colour', () => {
