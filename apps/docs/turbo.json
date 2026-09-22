@@ -16,7 +16,15 @@
       "outputs": ["generated/props/**"]
     },
     "generate:manifest": {
-      "cache": false,
+      "inputs": [
+        "scripts/generate-page-manifest.mjs",
+        "scripts/page-manifest.mjs",
+        "scripts/roots.mjs",
+        "page-registry/**",
+        "content/**",
+        "app/_pages/**",
+        "$TURBO_ROOT$/.prettierrc"
+      ],
       "outputs": [
         "app/_lib/page-manifest.generated.ts",
         "app/_lib/page-content.generated.ts"
@@ -28,7 +36,7 @@
       "outputs": [".next/**", "!.next/cache/**", "next-env.d.ts"]
     },
     "dev": {
-      "dependsOn": ["generate:manifest", "generate:props"],
+      "dependsOn": ["^build", "generate:manifest", "generate:props"],
       "cache": false,
       "persistent": true
     }

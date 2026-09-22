@@ -31,6 +31,8 @@ Pick the surface you're working on — each is one `make` command that turbo orc
 
 > **First start on a clean checkout:** `console` / `docs` read `@nexus_ds/react`'s `dist`, which the watcher emits a moment after launch — a brief error on the very first start is expected, or run `make build` once beforehand.
 
+> **The docs site's generated inputs come from the turbo graph**, not from its package scripts: `apps/docs/turbo.json` puts `generate:manifest` (the page manifest and its loader map) and `generate:props` (the per-component props JSON) ahead of `build` and `dev`. `make docs` and `make build` get them; a bare `pnpm --filter @nexus_ds/docs dev` does not, and will serve whatever `app/_lib/*.generated.ts` is committed.
+
 Leave **`make up`** running in another terminal so the docs-MCP is available to Claude Code (see [AI Documentation MCP](#ai-documentation-mcp-nexus-docs-mcp)).
 
 ## Before you push

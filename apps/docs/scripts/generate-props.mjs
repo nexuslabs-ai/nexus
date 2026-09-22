@@ -103,7 +103,21 @@ function localAliasExpansions(checker, program, exported) {
 }
 
 /**
- * A type that still spells a repo-local alias the package does not export
+ * The names a printed type refers to, which is narrower than the names it
+ * spells: a quoted member is a value, and a name followed by `:` is a member or
+ * parameter being declared. Neither is something the reader has to look up.
+ */
+function typeReferenceTokens(type) {
+  return (
+    type
+      .replace(/(['"])(?:\\.|(?!\1)[^\\])*\1/g, '""')
+      .replace(/[A-Za-z_$][\w$]*\s*\??\s*:/g, ':')
+      .match(/[A-Za-z_$][\w$]*/g) ?? []
+  );
+}
+
+/**
+ * A type that still refers to a repo-local alias the package does not export
  * leaves the reader a name with nothing to look it up in. Expansion is the
  * usual answer, and it only reaches a type that is the alias and nothing else —
  * so an alias surviving in a composed position (`TableVariant[]`) is caught
@@ -111,13 +125,17 @@ function localAliasExpansions(checker, program, exported) {
  */
 function assertResolvableTypes(entries, localAliases) {
   const offenders = entries.flatMap((entry) =>
-    entry.props
-      .filter((prop) =>
-        (prop.type.match(/[A-Za-z_$][\w$]*/g) ?? []).some((token) =>
-          localAliases.has(token)
-        )
-      )
-      .map((prop) => `  ${entry.name}.${prop.name}: ${prop.type}`)
+    entry.props.flatMap((prop) => {
+      const matched = typeReferenceTokens(prop.type).filter((token) =>
+        localAliases.has(token)
+      );
+
+      if (matched.length === 0) return [];
+
+      return [
+        `  ${entry.name}.${prop.name}: ${prop.type}\n    unresolved: ${[...new Set(matched)].join(', ')}`,
+      ];
+    })
   );
 
   if (offenders.length === 0) return;

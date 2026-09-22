@@ -124,10 +124,11 @@ jobs:
           node scripts/audit-turbo-outputs.js --post-build
 
       # The props JSON is not committed, so there is no working tree to compare
-      # against. The build above produced one copy; running the generator again
-      # over the same sources is what proves a second run lands on the same
-      # bytes. It is invoked directly so that turbo neither serves the first
-      # run's cache nor rebuilds the dependencies the previous step just built.
+      # against. Emitted order is pinned by the generator's own sorts, so what
+      # is left for a second run to catch is a type string that prints
+      # differently the second time through the same checker. It is invoked
+      # directly so that turbo neither serves the first run's cache nor
+      # rebuilds the dependencies the previous step just built.
       - name: Check props JSON determinism
         run: |
           set -euo pipefail
