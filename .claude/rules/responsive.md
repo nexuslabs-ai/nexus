@@ -6,7 +6,7 @@ Nexus is designed **mobile-first and desktop-first**: **Narrow (mobile) and Stan
 
 ## Display class table
 
-**This table is the single source of truth.** Other rule files (`components.md`) link here rather than duplicating these rows.
+**This table is the single source of truth.** Other rule files link here rather than duplicating these rows.
 
 | Tailwind class | Range (rem / px @16) | Nexus display class | Design target                                       |
 | -------------- | -------------------- | ------------------- | --------------------------------------------------- |
@@ -73,7 +73,6 @@ For exceptions, use viewport breakpoints (`nx:sm:`, `nx:md:`, etc.) as you norma
 
 ## See also
 
-- [components.md](components.md) — component-authoring rules; `@container` internal use is the responsive corollary of the Sizing Convention
 - [#103](https://github.com/nexuslabs-ai/nexus/issues/103) + `packages/react/src/components/{show,hide}/` (sharing `packages/react/src/lib/responsive-visibility.ts`) — the shipped `<Show>` / `<Hide>` source, stories, and spike-conclusion header
 - `packages/core/tokens/semantic/breakpoints.json` — the `--breakpoint-*` token values
 - `packages/react/src/components/dialog/dialog.tsx` — the live viewport-driven exception

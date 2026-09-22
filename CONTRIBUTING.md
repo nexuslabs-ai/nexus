@@ -68,190 +68,28 @@ Anything not wrapped is still a plain pnpm script (`pnpm test`, `pnpm test:story
 
 ## Testing
 
-A single `*.stories.tsx` file does four jobs at once:
+A single `*.stories.tsx` file does four jobs: autodocs renders it as visual
+documentation, `argTypes` makes it an interactive playground, its `play`
+function runs as a behaviour test in real Chromium, and addon-a11y runs
+axe-core against it with `test: 'error'` so any violation fails.
 
-1. **Visual documentation** — autodocs is enabled globally in `packages/react/.storybook/preview.tsx`, so every story renders an autodoc page.
-2. **Interactive playground** — Storybook's `argTypes` controls let designers and developers exercise every prop combination.
-3. **Behavior tests** — `play` functions run as real assertions under Vitest's storybook project (real Chromium via Playwright).
-4. **Accessibility assertions** — addon-a11y runs axe-core against every story with `test: 'error'`, so any violation fails the test.
+You don't write a separate `*.test.tsx` for a component. That's not a stylistic
+preference — the `unit` project's `include` list in `vitest.config.ts` is one
+glob per non-story row of [`.claude/rules/testing.md`](.claude/rules/testing.md)
+§ Scope, and a component test file matches none of them.
 
-You don't write a separate `*.test.tsx` for a component. That's not a stylistic preference — the `unit` project's `include` list in `vitest.config.ts` is one glob per non-story row of `.claude/rules/testing.md` § Scope (the stories row belongs to the `storybook` project), and a component test file matches none of them.
+Outside stories, three kinds of unit test exist, all under the `unit` project
+(jsdom): the core engine's behaviour (`packages/core/src/lib`), the Nexus `cn`
+merge (`packages/react/src/lib/utils.test.ts`), and the ESLint plugin's rules
+(`packages/eslint-plugin-nexus/__tests__`). Apps, repo scripts and hooks have no
+tests of their own, and nothing uses snapshots.
 
-Outside stories, only three kinds of unit test exist, all under Vitest's `unit` project (jsdom): the core engine's behaviour (`packages/core/src/lib`), the Nexus `cn` merge (`packages/react/src/lib/utils.test.ts`), and the ESLint plugin's rules (`packages/eslint-plugin-nexus/__tests__`). Apps, repo scripts, and hooks have no tests of their own, and nothing uses snapshots.
-
-```
-┌──────────────────────────────────────────────────────────────────────────┐
-│  Components          →  *.stories.tsx (storybook project, real browser)  │
-│  Engine / cn / lint  →  *.test.ts|js  (unit project, jsdom)              │
-└──────────────────────────────────────────────────────────────────────────┘
-```
-
-The full spec lives in `.claude/rules/testing-react.md` and `.claude/rules/components.md`. This section is the on-ramp.
-
-### Components: stories as tests
-
-Two distinct import sources:
-
-```tsx
-// Types
-import type { Meta, StoryObj } from '@storybook/react';
-
-// Test utilities (Storybook 10 — note: `storybook/test`, NOT `@storybook/test`)
-import { expect, fn, userEvent, within } from 'storybook/test';
-```
-
-A real example from `Button.stories.tsx`:
-
-```tsx
-import type { Meta, StoryObj } from '@storybook/react';
-import { expect, fn, userEvent, within } from 'storybook/test';
-
-import { Button } from './button';
-
-const meta: Meta<typeof Button> = {
-  title: 'Components/Button',
-  component: Button,
-  args: {
-    onClick: fn(), // spy function for testing
-  },
-  argTypes: {
-    variant: {
-      control: 'select',
-      options: [
-        'default',
-        'destructive',
-        'outline',
-        'secondary',
-        'ghost',
-        'link',
-      ],
-    },
-    size: { control: 'select', options: ['default', 'sm', 'lg', 'icon'] },
-    disabled: { control: 'boolean' },
-    asChild: { control: 'boolean' },
-  },
-};
-
-export default meta;
-type Story = StoryObj<typeof Button>;
-```
-
-Do **not** add `tags: ['autodocs']` to your meta — autodocs is global; setting it per-story is redundant.
-
-**Visual stories** (no play function):
-
-```tsx
-export const Default: Story = { args: { children: 'Button' } };
-export const Secondary: Story = {
-  args: { variant: 'secondary', children: 'Secondary' },
-};
-```
-
-**Interaction tests** (with play functions). Use data attributes (`data-slot`, `data-variant`, `data-size`) as the stable test surface — not class names. Tailwind classes carry the `nx:` prefix and may change as variants are restyled; data attributes are part of the component contract.
-
-```tsx
-export const ClickInteraction: Story = {
-  args: { children: 'Click me' },
-  play: async ({ canvasElement, args }) => {
-    const canvas = within(canvasElement);
-    const button = canvas.getByRole('button');
-
-    await userEvent.click(button);
-    await expect(args.onClick).toHaveBeenCalledTimes(1);
-  },
-};
-
-export const WithDataAttributes: Story = {
-  args: { children: 'Data Attrs', variant: 'secondary', size: 'lg' },
-  play: async ({ canvasElement }) => {
-    const canvas = within(canvasElement);
-    const button = canvas.getByRole('button');
-
-    await expect(button).toHaveAttribute('data-slot', 'button');
-    await expect(button).toHaveAttribute('data-variant', 'secondary');
-    await expect(button).toHaveAttribute('data-size', 'lg');
-  },
-};
-
-export const Disabled: Story = {
-  args: { disabled: true, children: 'Disabled' },
-  play: async ({ canvasElement, args }) => {
-    const canvas = within(canvasElement);
-    const button = canvas.getByRole('button');
-
-    await expect(button).toBeDisabled();
-    await expect(args.onClick).not.toHaveBeenCalled();
-  },
-};
-```
-
-**Composition via `asChild`:**
-
-```tsx
-export const AsLink: Story = {
-  render: (args) => (
-    <Button {...args} asChild>
-      <a href="https://example.com">Visit Website</a>
-    </Button>
-  ),
-  play: async ({ canvasElement }) => {
-    const link = within(canvasElement).getByRole('link');
-    await expect(link).toHaveAttribute('href', 'https://example.com');
-    await expect(link).toHaveAttribute('data-slot', 'button');
-  },
-};
-```
-
-**A11y escape hatch** — some stories trigger known-broken a11y rules (e.g. a contrast pair tracked for token retuning). Use sparingly; the default every story inherits is `test: 'error'` (a violation fails CI):
-
-```tsx
-export const Destructive: Story = {
-  args: { variant: 'destructive', children: 'Delete' },
-  parameters: { a11y: { test: 'todo' } }, // tracked separately; don't fail the suite
-};
-```
-
-### Unit tests: `*.test.ts`
-
-Plain Vitest, importing from `vitest` directly. A unit test earns its place only when it pins behaviour a consumer would see and no story can: contrast and legibility of the derived theme, registry/engine agreement, the first-paint script, `cn` merging `nx:` utilities, or an ESLint rule's reports.
-
-```ts
-import { describe, expect, it } from 'vitest';
-
-import { cn } from './utils';
-
-describe('cn', () => {
-  it('lets the later z-index layer win', () => {
-    expect(cn('nx:z-overlay nx:z-popover')).toBe('nx:z-popover');
-  });
-});
-```
-
-### What's out of scope
-
-- **No `*.test.tsx` for components** — the `unit` project doesn't collect them; move the assertion into a story's `play` function.
-- **No snapshot tests** — no `toMatchSnapshot` / `toMatchInlineSnapshot` and no frozen output fixtures. Assert the property that matters (a contrast floor, a merge result), not the exact output.
-- **No tests for apps, repo scripts, or hooks** — the ones CI runs prove themselves by running, and the rest (`scripts/export.mjs` among them) are reviewed, not gated; hooks are covered by the stories of the components that use them.
-- **Don't assert on Tailwind class names** — they change as variants are restyled. Use `data-*`, ARIA attributes, or accessible queries (`getByRole`, `getByLabelText`).
-- **No play functions for** visual appearance, computed CSS / pixel measurements, `:hover` snapshots, or animation timing.
-
-### Component checklist
-
-A new (or updated) component ships these stories (fuller table in `.claude/rules/testing-react.md`):
-
-| Story                                | Play function? | Purpose                                         |
-| ------------------------------------ | -------------- | ----------------------------------------------- |
-| `Default`                            | Optional       | Default args                                    |
-| One per variant / size               | No             | Visual documentation                            |
-| `Disabled`                           | Yes            | Disabled state; `onClick` not called            |
-| `ClickInteraction`                   | Yes            | Click handler fires                             |
-| `KeyboardInteraction`                | Yes            | Tab focuses; Enter/Space triggers               |
-| `WithDataAttributes`                 | Yes            | `data-slot` / `data-variant` / `data-size`      |
-| `AsLink` / `asChild` (if applicable) | Yes            | Composition keeps `data-slot`                   |
-| Edge cases                           | Yes            | Empty / long / special-char children, with icon |
-| `AllVariants`                        | No             | Visual grid for review                          |
-
-A11y is automatic — every story is axe-checked, no separate a11y story needed.
+The spec lives in the rules, not here — what earns a test and what is
+deliberately out of scope in
+[`testing.md`](.claude/rules/testing.md), and the stories a component ships plus
+the play-function patterns in
+[`testing-react.md`](.claude/rules/testing-react.md). Read those before adding
+coverage; this section is orientation only.
 
 ### Running tests
 
@@ -363,5 +201,4 @@ To version locally without publishing (e.g. to preview the bump): `pnpm version-
 This handbook is the on-ramp. The canonical conventions live in [`.claude/rules/`](.claude/rules/) — there is no root `CLAUDE.md`. When this doc and a rule file disagree, the rule file wins.
 
 - [`testing-react.md`](.claude/rules/testing-react.md) — testing patterns and required stories
-- [`components.md`](.claude/rules/components.md) — component architecture, `nx:` prefix, data attributes, variants
 - [`github.md`](.claude/rules/github.md) — branch naming, PR title/body conventions, the review-bot flow
