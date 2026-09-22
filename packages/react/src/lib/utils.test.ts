@@ -58,6 +58,14 @@ const THEME_NAMESPACES = [
       utility.replace(/^z-/, '')
     ),
   },
+  {
+    cssKey: 'outline-width',
+    utility: 'outline',
+    sentinel: 'nx:outline-2',
+    registered: NEXUS_CLASS_GROUPS['outline-w'].map((utility) =>
+      utility.replace(/^outline-/, '')
+    ),
+  },
 ];
 
 /** CSS property a `typography-*` composite can declare, mapped to its owning class group. */
@@ -112,9 +120,15 @@ describe('cn', () => {
       'nx:gap-layout-stack',
     ],
     ['border width', 'nx:border-thin nx:border-thick', 'nx:border-thick'],
+    ['outline width', 'nx:outline-thin nx:outline-thick', 'nx:outline-thick'],
     [
       'border color',
       'nx:border-color-default nx:border-color-error',
+      'nx:border-color-error',
+    ],
+    [
+      'theme-generated border color',
+      'nx:border-border-default nx:border-color-error',
       'nx:border-color-error',
     ],
     [
@@ -122,8 +136,36 @@ describe('cn', () => {
       'nx:typography-label-small nx:typography-body-default',
       'nx:typography-body-default',
     ],
+    [
+      'transition',
+      'nx:transition-control nx:transition-field',
+      'nx:transition-field',
+    ],
   ])('uses last-wins merging for the %s group', (_group, input, expected) => {
     expect(cn(input)).toBe(expected);
+  });
+
+  it.each([
+    ['nx:transition-control', 'nx:transition-colors'],
+    ['nx:transition-field', 'nx:transition-none'],
+    ['nx:transition-control', 'nx:transition-[color,opacity]'],
+  ])('%s is displaced by %s', (nexusUtility, builtIn) => {
+    // Without the `transition` group entry these land nowhere and both survive,
+    // so a consumer's `className` override would stack rather than replace.
+    expect(cn(nexusUtility, builtIn)).toBe(builtIn);
+  });
+
+  it('keeps a named outline width beside an outline colour', () => {
+    // `outline-default` is a width; without its own group tailwind-merge reads
+    // it as a colour and the adjacent `outline-focus-default` drops it, leaving
+    // a field with a colour and no ring.
+    expect(
+      cn(
+        'nx:focus-visible:outline-default nx:focus-visible:outline-focus-default'
+      )
+    ).toBe(
+      'nx:focus-visible:outline-default nx:focus-visible:outline-focus-default'
+    );
   });
 
   it('merges custom utilities within the same modifier scope', () => {

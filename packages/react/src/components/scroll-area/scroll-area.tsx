@@ -59,7 +59,7 @@ function ScrollArea({ className, children, ...props }: ScrollAreaProps) {
         tabIndex={0}
         className={cn(
           'nx:size-full nx:rounded-[inherit]',
-          'nx:focus-visible:outline-2 nx:focus-visible:outline-focus-default nx:focus-visible:outline-offset-(--focus-offset)'
+          'nx:focus-visible:outline-2 nx:focus-visible:outline-focus-default'
         )}
       >
         {children}

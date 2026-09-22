@@ -18,8 +18,8 @@ export const NEXUS_THEME_SCALES = {
 } satisfies Partial<Record<DefaultThemeGroupIds, string[]>>;
 
 /**
- * Nexus `@utility` names, keyed by the tailwind-merge class group each one
- * extends, so a conflicting pair collapses to last-wins in `cn()`.
+ * Nexus class names tailwind-merge does not know, keyed by the class group
+ * each one extends, so a conflicting pair collapses to last-wins in `cn()`.
  */
 export const NEXUS_CLASS_GROUPS = {
   animate: ['animate-overlay-presence-exit'],
@@ -32,6 +32,9 @@ export const NEXUS_CLASS_GROUPS = {
     'duration-slow',
     'duration-slower',
   ],
+  // The two ring-safe colour transitions. Without this they land nowhere and a
+  // later `transition-none` / `transition-all` fails to replace them.
+  transition: ['transition-control', 'transition-field'],
   z: ['z-overlay', 'z-sticky', 'z-modal', 'z-popover', 'z-toast', 'z-max'],
   gap: ['gap-container', 'gap-layout-section', 'gap-layout-stack'],
   p: ['p-container'],
@@ -91,34 +94,28 @@ export const NEXUS_CLASS_GROUPS = {
     'border-width-l-default',
     'border-width-l-thick',
   ],
+  // `outline-{thin,default,thick}` are widths, not colours. Without this they
+  // land in tailwind-merge's `outline-color` group and a field's
+  // `outline-focus-default` silently drops the width beside it.
+  'outline-w': ['outline-thin', 'outline-default', 'outline-thick'],
+  // Only the `@utility` aliases, which the emitted-utility drift guard in
+  // `utils.test.ts` requires to declare a group. `border-border-*` is
+  // Tailwind-generated from `--color-*` rather than emitted as a utility, and
+  // tailwind-merge's default `theme.color` is `[isAny]`, so it needs no entry.
   'border-color': [
-    'border-border-default',
     'border-color-default',
-    'border-border-default-alpha',
     'border-color-default-alpha',
-    'border-border-active',
     'border-color-active',
-    'border-border-disabled',
     'border-color-disabled',
-    'border-border-warning',
     'border-color-warning',
-    'border-border-warning-active',
     'border-color-warning-active',
-    'border-border-success',
     'border-color-success',
-    'border-border-success-active',
     'border-color-success-active',
-    'border-border-error',
     'border-color-error',
-    'border-border-error-active',
     'border-color-error-active',
-    'border-border-information',
     'border-color-information',
-    'border-border-information-active',
     'border-color-information-active',
-    'border-border-primary',
     'border-color-primary',
-    'border-border-primary-active',
     'border-color-primary-active',
   ],
   typography: [

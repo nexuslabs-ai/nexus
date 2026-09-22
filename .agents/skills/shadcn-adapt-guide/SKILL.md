@@ -91,7 +91,7 @@ Read at the start; re-fire whenever a trigger lights up. The trigger is the thin
 - _Pasting a shadcn `className`?_ → strip raw Tailwind; put `nx:` **before** every modifier (`nx:hover:…`, not `hover:nx:…`); map each utility to a **semantic** token via `shadcn-divergences.md` — never `bg-primary` (incomplete) or `bg-blue-500` (primitive). (`shadcn-divergences.md`)
 - _See `bg-accent` / `text-accent-foreground` / `hover:bg-accent`?_ → there is **no `accent` token** in Nexus; map **by context** — ghost/control hover → `background-hover`, menu/dropdown item → `popover-hover`, list/card row → `container-hover`. If the surface isn't inferable, ask rather than guess. (`shadcn-divergences.md` § Accent)
 - _See a `dark:` modifier?_ → delete it. Semantic tokens already carry their dark value. (`shadcn-divergences.md`)
-- _See `ring-*` / `focus:ring` / `ring-offset`?_ → use `nx:focus-visible:outline-2 nx:focus-visible:outline-focus-default nx:focus-visible:outline-offset-(--focus-offset)`; invalid fields add `nx:aria-invalid:focus-visible:outline-focus-error`. (mirror `input.tsx`)
+- _See `ring-*` / `focus:ring` / `ring-offset`?_ → use `nx:focus-visible:outline-2 nx:focus-visible:outline-focus-default` (Button adds `nx:focus-visible:outline-offset-2`; fields swap `outline-2` for `nx:focus-visible:outline-default` plus `nx:focus-visible:border-focus-default`); invalid fields add `nx:aria-invalid:focus-visible:outline-focus-error nx:aria-invalid:focus-visible:border-focus-error`. Drop any `outline-none` on the same element, and swap `nx:transition-colors` for `nx:transition-control` (or `nx:transition-field` on a field) — `transition-colors` carries `outline-color`, which fades the ring in, and `pnpm lint` fails the pair. (mirror `input.tsx`; spec: `/foundations/focus`)
 - _Sizing a control?_ → copy the `size` variants straight from `button.tsx` (it covers both the text and icon-only shapes) or `input.tsx`. Don't derive a scale of your own.
 - _Adding any element?_ → `data-slot="{name}"` (+ `data-variant`/`data-size` if it has them).
 - _shadcn uses `destructive`?_ → keep the **variant name** `destructive` in the public API; map internals to `error-*` tokens. (`shadcn-divergences.md`)
@@ -109,7 +109,7 @@ Read at the start; re-fire whenever a trigger lights up. The trigger is the thin
 - [ ] Public API shape preserved; `asChild` where interactive
 - [ ] `nx:` prefix before all modifiers; semantic token paths only; no `dark:` on semantic tokens
 - [ ] `data-slot` (+ `data-variant`/`data-size`); sizing copied from the archetype component
-- [ ] Named interface + JSDoc on custom props; focus ring = `outline-focus-default` + tokenised offset
+- [ ] Named interface + JSDoc on custom props; focus ring = `outline-focus-default`, with the 2px offset on Button only
 - [ ] Stories with play-fns + AllVariants; a11y clean
 - [ ] Dep added + installed; icons added; exported from `src/index.ts`
 - [ ] `typecheck` + `eslint packages` + story tests all green
