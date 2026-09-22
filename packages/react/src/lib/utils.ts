@@ -20,9 +20,10 @@ export const NEXUS_THEME_SCALES = {
 /**
  * Nexus class names tailwind-merge does not know, keyed by the class group
  * each one extends, so a conflicting pair collapses to last-wins in `cn()`.
- * Most are `@utility` definitions (`z-modal`, `typography-*`,
- * `border-{thin,default,thick}`); `outline-{thin,default,thick}` are not —
- * Tailwind generates those from the `--outline-width-*` `@theme` namespace.
+ * Most are `@utility` definitions (`typography-*`,
+ * `border-{thin,default,thick}`); `z-*` and `outline-{thin,default,thick}` are
+ * not — Tailwind generates those from the `--z-index-*` and `--outline-width-*`
+ * `@theme` namespaces.
  */
 export const NEXUS_CLASS_GROUPS = {
   animate: ['animate-overlay-presence-exit'],

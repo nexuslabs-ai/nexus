@@ -127,6 +127,10 @@ export const PAGE_REGISTRY = {
         label: 'Radius, borders & shadows',
       },
       {
+        slug: 'focus',
+        label: 'Focus',
+      },
+      {
         slug: 'layering',
         label: 'Layering',
       },

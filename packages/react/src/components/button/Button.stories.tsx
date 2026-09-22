@@ -481,12 +481,9 @@ export const FocusGapShowsSurfaceBehind: Story = {
     await userEvent.tab();
     await expect(button).toHaveFocus();
 
-    // The gap carries no fill of its own: the ring is the focus token, not a
-    // band tinted with either surface. `FocusManagement` owns the offset and
-    // no-shadow assertions; only this scene can prove the colours differ.
-    const outlineColor = getComputedStyle(button).outlineColor;
-    await expect(outlineColor).not.toBe(surfaceFill);
-    await expect(outlineColor).not.toBe(pageFill);
+    // The band that used to paint the page fill into the gap was a box-shadow.
+    // With none, the gap is unpainted and the `muted` surface shows through.
+    await expect(getComputedStyle(button).boxShadow).toBe('none');
   },
 };
 

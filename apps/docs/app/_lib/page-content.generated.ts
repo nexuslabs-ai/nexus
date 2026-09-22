@@ -27,6 +27,7 @@ export const PAGE_LOADERS: Record<string, ManifestPageLoader> = {
   '/foundations/typography': () => import('../_pages/foundations/typography'),
   '/foundations/spacing': () => import('../_pages/foundations/spacing'),
   '/foundations/radius': () => import('../_pages/foundations/radius'),
+  '/foundations/focus': () => import('../_pages/foundations/focus'),
   '/foundations/layering': () => import('../_pages/foundations/layering'),
   '/foundations/responsive': () => import('../_pages/foundations/responsive'),
   '/theming/appearance': () => import('../../content/theming/appearance.mdx'),

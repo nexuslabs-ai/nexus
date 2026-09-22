@@ -119,6 +119,13 @@ export const PAGE_MANIFEST: readonly ManifestSection[] = [
         file: 'app/_pages/foundations/radius.tsx',
       },
       {
+        route: '/foundations/focus',
+        slug: 'focus',
+        label: 'Focus',
+        kind: 'component',
+        file: 'app/_pages/foundations/focus.tsx',
+      },
+      {
         route: '/foundations/layering',
         slug: 'layering',
         label: 'Layering',

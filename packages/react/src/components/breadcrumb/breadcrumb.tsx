@@ -124,7 +124,7 @@ function BreadcrumbLink({ asChild, className, ...props }: BreadcrumbLinkProps) {
     <Comp
       data-slot="breadcrumb-link"
       className={cn(
-        'nx:inline-flex nx:min-w-0 nx:max-w-[150px] nx:items-center nx:gap-1 nx:rounded-md nx:px-1.5 nx:typography-label-default nx:transition-colors nx:hover:bg-background-hover nx:active:bg-background-active nx:focus-visible:outline-2 nx:focus-visible:outline-focus-default nx:[&>span]:min-w-0 nx:[&>span]:truncate nx:[&_svg]:size-4 nx:[&_svg]:shrink-0',
+        'nx:inline-flex nx:min-w-0 nx:max-w-[150px] nx:items-center nx:gap-1 nx:rounded-md nx:px-1.5 nx:typography-label-default nx:transition-[color,background-color,border-color] nx:hover:bg-background-hover nx:active:bg-background-active nx:focus-visible:outline-2 nx:focus-visible:outline-focus-default nx:[&>span]:min-w-0 nx:[&>span]:truncate nx:[&_svg]:size-4 nx:[&_svg]:shrink-0',
         className
       )}
       {...props}
@@ -188,7 +188,7 @@ function BreadcrumbMenuTrigger({
       type={type}
       aria-label={ariaLabel}
       className={cn(
-        'nx:inline-flex nx:size-5 nx:shrink-0 nx:items-center nx:justify-center nx:rounded-md nx:transition-colors nx:hover:bg-background-hover nx:active:bg-background-active nx:data-[state=open]:bg-background-active nx:focus-visible:outline-2 nx:focus-visible:outline-focus-default nx:[&_svg]:size-4 nx:[&_svg]:shrink-0',
+        'nx:inline-flex nx:size-5 nx:shrink-0 nx:items-center nx:justify-center nx:rounded-md nx:transition-[color,background-color,border-color] nx:hover:bg-background-hover nx:active:bg-background-active nx:data-[state=open]:bg-background-active nx:focus-visible:outline-2 nx:focus-visible:outline-focus-default nx:[&_svg]:size-4 nx:[&_svg]:shrink-0',
         className
       )}
       {...props}
@@ -259,7 +259,7 @@ function BreadcrumbEllipsis({
       type={type}
       aria-label={ariaLabel}
       className={cn(
-        'nx:inline-flex nx:shrink-0 nx:items-center nx:justify-center nx:rounded-md nx:px-1.5 nx:typography-body-default nx:transition-colors nx:hover:bg-background-hover nx:active:bg-background-active nx:data-[state=open]:bg-background-active nx:focus-visible:outline-2 nx:focus-visible:outline-focus-default',
+        'nx:inline-flex nx:shrink-0 nx:items-center nx:justify-center nx:rounded-md nx:px-1.5 nx:typography-body-default nx:transition-[color,background-color,border-color] nx:hover:bg-background-hover nx:active:bg-background-active nx:data-[state=open]:bg-background-active nx:focus-visible:outline-2 nx:focus-visible:outline-focus-default',
         className
       )}
       {...props}
