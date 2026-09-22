@@ -30,7 +30,7 @@ const inputGroupVariants = cva(
     'nx:data-[disabled=true]:cursor-not-allowed nx:data-[disabled=true]:bg-disabled',
     // Focus: the group shows the ring when the inner control is focused
     // (the control suppresses its own outline).
-    'nx:has-[[data-slot=input-group-control]:focus-visible]:outline-1 nx:has-[[data-slot=input-group-control]:focus-visible]:outline-focus-default nx:has-[[data-slot=input-group-control]:focus-visible]:border-focus-default',
+    'nx:has-[[data-slot=input-group-control]:focus-visible]:outline-default nx:has-[[data-slot=input-group-control]:focus-visible]:outline-focus-default nx:has-[[data-slot=input-group-control]:focus-visible]:border-focus-default',
     // Error: an invalid control reddens the border; an invalid focused
     // control switches the ring to the error colour (matches Input).
     'nx:has-[[data-slot][aria-invalid=true]]:border-border-error',

@@ -24,7 +24,7 @@ import {
   generateBaseLayerCSS,
   generateBorderColorAliasUtilitiesCSS,
   generateBorderWidthUtilitiesCSS,
-  generateFocusRingCSS,
+  generateInputOtpSlotCSS,
   generateMotionUtilitiesCSS,
   generateNativeBrowserUIThemeCSS,
   generateSpacingModesCSS,
@@ -105,6 +105,33 @@ function getPrimitiveFiles(discovered, config) {
   }
 
   return result;
+}
+
+// Every `tokens/semantic/*.json` is read by a collector that names it:
+// `spacing-{mode}` by collectSpacingTokens, `breakpoints` by
+// collectBreakpointsTokens, `z-index` by collectZIndexTokens. There is no
+// generic scan any more, so a file nobody claims would emit nothing and raise
+// nothing — assertSemanticFilesAreClaimed turns that into a build failure.
+const CLAIMED_SEMANTIC_FILES = [
+  /^spacing-[a-z]+\.json$/,
+  /^breakpoints\.json$/,
+  /^z-index\.json$/,
+];
+
+/**
+ * Throws if a semantic token file is not read by any collector.
+ */
+function assertSemanticFilesAreClaimed() {
+  const unclaimed = fs
+    .readdirSync(SEMANTIC_DIR)
+    .filter((file) => file.endsWith('.json'))
+    .filter((file) => !CLAIMED_SEMANTIC_FILES.some((rule) => rule.test(file)));
+
+  if (unclaimed.length > 0) {
+    throw new Error(
+      `Unclaimed semantic token file(s): ${unclaimed.join(', ')} — every tokens/semantic/*.json must be read by a named collector in generate-tailwind-package.js, and listed in CLAIMED_SEMANTIC_FILES.`
+    );
+  }
 }
 
 /**
@@ -521,7 +548,7 @@ function generateNexusCSS(
     prefixDarkVars: true, // Use --nx-color-* for dark mode overrides
   });
 
-  css += generateFocusRingCSS();
+  css += generateInputOtpSlotCSS();
 
   // Per-mode spacing override blocks (`:root, [data-density="<default>"]` for
   // the consumer-chosen default + plain `[data-density="X"]` for the others).
@@ -572,6 +599,8 @@ export async function generateTailwindPackage(
     fs.writeFileSync(filePath, content);
     log.file(fileName);
   };
+
+  assertSemanticFilesAreClaimed();
 
   const discoveredPrimitives = discoverPrimitives(PRIMITIVES_DIR);
   const { baseTone, lightSemanticTokens, darkSemanticTokens } =

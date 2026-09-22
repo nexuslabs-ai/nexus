@@ -91,6 +91,10 @@ export const NEXUS_CLASS_GROUPS = {
     'border-width-l-default',
     'border-width-l-thick',
   ],
+  // `outline-{thin,default,thick}` are widths, not colours. Without this they
+  // land in tailwind-merge's `outline-color` group and a field's
+  // `outline-focus-default` silently drops the width beside it.
+  'outline-w': ['outline-thin', 'outline-default', 'outline-thick'],
   'border-color': [
     'border-border-default',
     'border-color-default',

@@ -78,6 +78,11 @@
   --border-default: var(--nx-borderwidth-default);
   --border-thick: var(--nx-borderwidth-thick);
 
+  /* Outline width tokens — same values, so a focus ring can match a border */
+  --outline-width-thin: var(--nx-borderwidth-thin);
+  --outline-width-default: var(--nx-borderwidth-default);
+  --outline-width-thick: var(--nx-borderwidth-thick);
+
   /* Motion tokens */
   --ease-linear: var(--nx-motion-ease-linear);
   --ease-enter: var(--nx-motion-ease-enter);
@@ -985,7 +990,7 @@
   --nx-color-popover-backdrop: oklch(0.13 0.006 70 / 0.9098);
 }
 
-/* ===== FOCUS RING ===== */
+/* ===== INPUT OTP SLOT ===== */
 [data-slot='input-otp-slot'] {
   border-color: transparent !important;
   border-width: 0;
@@ -1023,7 +1028,7 @@
 }
 
 [data-slot='input-otp-slot'][class~='nx:data-[active=true]:outline-focus-default'][data-active='true'] {
-  outline: 2px solid transparent !important;
+  outline: none !important;
   border-color: transparent !important;
   border-width: 0;
   box-shadow:

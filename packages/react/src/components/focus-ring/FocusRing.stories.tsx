@@ -250,6 +250,13 @@ export const FieldErrorFocusBoundaries: Story = {
     const valid = canvas.getByRole('textbox', { name: 'Valid input' });
     const validBorder = getComputedStyle(valid).borderTopColor;
 
+    // Capture the default focus ring from a control that is actually focused —
+    // an unfocused outline resolves to `currentColor` and would compare equal
+    // to nothing in particular.
+    await focusAsKeyboard(valid);
+    const validFocusOutline = getComputedStyle(valid).outlineColor;
+    await expect(validFocusOutline).not.toBe(TRANSPARENT);
+
     async function expectErrorBoundary(
       surface: HTMLElement,
       control = surface
@@ -266,9 +273,7 @@ export const FieldErrorFocusBoundaries: Story = {
       await expect(focusStyles.outlineStyle).toBe('solid');
       await expect(focusStyles.outlineColor).not.toBe(TRANSPARENT);
       // The error ring is not the default focus ring.
-      await expect(focusStyles.outlineColor).not.toBe(
-        getComputedStyle(valid).outlineColor
-      );
+      await expect(focusStyles.outlineColor).not.toBe(validFocusOutline);
     }
 
     await expectErrorBoundary(
@@ -297,16 +302,25 @@ export const FieldErrorFocusBoundaries: Story = {
   },
 };
 
+// Chromium snaps a sub-pixel border up to one device pixel, so `fine` (0.5px)
+// measures anywhere in [0.5, 1] depending on dpr — true of every bordered
+// component, not just fields. The whole-pixel modes are exact, and `strong`
+// pinned at 2 is what proves the mode now reaches a field at all, which is the
+// bug #726 set out to fix.
 const BORDER_WIDTH_MODES = [
-  { mode: 'fine', expected: 0.5 },
-  { mode: 'normal', expected: 1 },
-  { mode: 'strong', expected: 2 },
+  { mode: 'fine', min: 0.5, max: 1 },
+  { mode: 'normal', min: 1, max: 1 },
+  { mode: 'strong', min: 2, max: 2 },
 ] as const;
+
+const BORDER_WIDTH_FIELDS = ['input', 'textarea', 'select'] as const;
 
 /**
  * Bug 1 from #726: the boundary was a hardcoded 1px shadow, so the
  * `[data-borderwidth]` appearance mode moved `MultiSelectTrigger` and
- * `Sidebar` but left every real field behind. A real border tracks it.
+ * `Sidebar` but left every real field behind. A real border tracks it, and so
+ * does the focus ring's outer half — `outline-default` reads the same
+ * borderwidth token as `border-default`.
  */
 export const FieldBorderWidthModes: Story = {
   render: () => (
@@ -335,31 +349,29 @@ export const FieldBorderWidthModes: Story = {
   play: async ({ canvasElement }) => {
     const canvas = within(canvasElement);
 
-    const measured: number[] = [];
-    for (const { mode } of BORDER_WIDTH_MODES) {
-      for (const label of ['input', 'textarea', 'select']) {
+    for (const { mode, min, max } of BORDER_WIDTH_MODES) {
+      for (const label of BORDER_WIDTH_FIELDS) {
         const field = within(
           canvas.getByTestId(`borderwidth-${mode}`)
         ).getByRole(label === 'select' ? 'combobox' : 'textbox', {
           name: `${mode} ${label}`,
         });
 
-        measured.push(
-          Number.parseFloat(getComputedStyle(field).borderTopWidth)
+        const width = Number.parseFloat(getComputedStyle(field).borderTopWidth);
+
+        await expect(width).toBeGreaterThanOrEqual(min);
+        await expect(width).toBeLessThanOrEqual(max);
+
+        // The ring's outer half tracks the same token, so both halves stay
+        // equal instead of a mode thickening only the inside of the ring.
+        await focusAsKeyboard(field);
+        const outlineWidth = Number.parseFloat(
+          getComputedStyle(field).outlineWidth
         );
+
+        await expect(outlineWidth).toBeGreaterThanOrEqual(min);
+        await expect(outlineWidth).toBeLessThanOrEqual(max);
       }
     }
-
-    // Chromium snaps a sub-pixel border up to one device pixel, so `fine`
-    // (0.5px) measures 1px at dpr 1 — true of every bordered component, not
-    // just fields. `strong` is the assertion that proves the mode now reaches
-    // a field at all, which is the bug #726 set out to fix.
-    const fine = measured.slice(0, 3);
-    const normal = measured.slice(3, 6);
-    const strong = measured.slice(6, 9);
-
-    await expect(normal).toEqual([1, 1, 1]);
-    await expect(strong).toEqual([2, 2, 2]);
-    await expect(fine.every((width) => width <= 1)).toBe(true);
   },
 };

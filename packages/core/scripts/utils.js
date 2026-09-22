@@ -283,46 +283,29 @@ export function discoverPrimitives(primitivesDir) {
 }
 
 /**
- * Discover semantic token files from the file system, bucketing spacing-mode
- * files (spacing-{mode}.json) by mode. Every other semantic file is read by a
- * dedicated collector that names it directly, so only the per-mode categories
- * need discovering.
+ * Find the per-mode spacing files in `semantic/`. Their values are direct px
+ * (no `{N}` refs) and emit per-mode `[data-density="X"]` blocks via
+ * `collectSpacingTokens`. Every other semantic file is read by a collector
+ * that names it directly.
  *
  * @param {string} semanticDir - Path to semantic directory
- * @returns {object} { perModeFiles: { category: { mode: filename } } }
+ * @returns {Record<string, string>} Mode name keyed to its `spacing-{mode}.json` filename
  */
-export function discoverSemantics(semanticDir) {
-  const result = {
-    // Bucket for per-mode semantic categories. Keyed by category so a future
-    // per-mode category (e.g. per-mode color shading) lands as a sibling key
-    // here. Detection of new categories still requires a regex branch below —
-    // only `spacing` is wired today.
-    perModeFiles: {},
-  };
-
+export function discoverSpacingModeFiles(semanticDir) {
   if (!fs.existsSync(semanticDir)) {
-    return result;
+    return {};
   }
 
-  const files = fs.readdirSync(semanticDir).filter((f) => f.endsWith('.json'));
+  const files = {};
 
-  // Pattern for spacing-mode files: spacing-{mode}.json. Their values are
-  // direct px (no `{N}` refs) and emit per-mode `[data-density="X"]` blocks via
-  // `collectSpacingTokens`.
-  const spacingModePattern = /^spacing-([a-z]+)\.json$/;
+  for (const file of fs.readdirSync(semanticDir)) {
+    const match = file.match(/^spacing-([a-z]+)\.json$/);
+    if (!match) continue;
 
-  for (const file of files) {
-    const spacingMatch = file.match(spacingModePattern);
-    if (!spacingMatch) continue;
-
-    const [, mode] = spacingMatch;
-    if (!result.perModeFiles.spacing) {
-      result.perModeFiles.spacing = {};
-    }
-    result.perModeFiles.spacing[mode] = file;
+    files[match[1]] = file;
   }
 
-  return result;
+  return files;
 }
 
 /**
@@ -855,8 +838,7 @@ export const CANONICAL_SPACING_DEFAULT_MODE = 'default';
  *   reverse-engineering it from `cssName`.
  */
 export function collectSpacingTokens(semanticDir) {
-  const { perModeFiles } = discoverSemantics(semanticDir);
-  const spacingFiles = perModeFiles.spacing ?? {};
+  const spacingFiles = discoverSpacingModeFiles(semanticDir);
 
   const modeNames = Object.keys(spacingFiles);
   if (modeNames.length === 0) {
@@ -1476,11 +1458,13 @@ export function collectRadiusTokens(tokensDir, mode) {
 
 /**
  * Collect borderwidth token mappings from a mode file
- * Returns array of { cssName, varRef } for @theme block
+ * Returns array of { key, cssName, varRef } for @theme block. `key` is kept
+ * because the same value seeds two Tailwind namespaces: `--border-{key}` and
+ * `--outline-width-{key}` (see generateThemeCSS).
  *
  * @param {string} tokensDir - Path to tokens directory
  * @param {string} mode - Borderwidth mode (e.g., 'vega')
- * @returns {object[]} Array of { cssName, varRef }
+ * @returns {object[]} Array of { key, cssName, varRef }
  */
 export function collectBorderwidthTokens(tokensDir, mode) {
   const filePath = path.join(
@@ -1499,6 +1483,7 @@ export function collectBorderwidthTokens(tokensDir, mode) {
   for (const key of Object.keys(tokenData)) {
     if (key.startsWith('$')) continue;
     tokens.push({
+      key,
       cssName: `border-${key}`,
       varRef: `var(--nx-borderwidth-${key})`,
     });
@@ -1669,7 +1654,7 @@ export function collectShadowTokens(tokensDir, primitiveMap) {
  * @param {object[]} config.semanticTokens - Array of { cssName, value } for semantic colours
  * @param {object[]} config.spacingTokens - Array of { cssName, value } for numeric spacing (default baseline; per-mode overrides live outside @theme)
  * @param {object[]} config.radiusTokens - Array of { cssName, varRef } for radius
- * @param {object[]} config.borderwidthTokens - Array of { cssName, varRef } for borderwidth
+ * @param {object[]} config.borderwidthTokens - Array of { key, cssName, varRef } for borderwidth; each one emits both a --border-* and an --outline-width-* theme key
  * @param {object[]} config.motionTokens - Array of { group, key, cssName, varRef } for duration/ease
  * @param {object[]} config.shadowTokens - Array of { cssName, value } for shadows
  * @param {object[]} [config.darkSemanticTokens] - Array of { cssName, value } for dark mode semantic tokens
@@ -1741,11 +1726,19 @@ export function generateThemeCSS(config) {
     }
   }
 
-  // Borderwidth tokens
+  // Borderwidth tokens. The same values also seed Tailwind's --outline-width-*
+  // namespace: a field's focus ring is a `border-default` inner edge plus an
+  // `outline-default` outer edge, so both halves have to move together when
+  // [data-borderwidth] swaps the mode.
   if (borderwidthTokens.length > 0) {
     css += `\n  /* Border width tokens */\n`;
     for (const token of borderwidthTokens) {
       css += `  --${token.cssName}: ${token.varRef};\n`;
+    }
+
+    css += `\n  /* Outline width tokens — same values, so a focus ring can match a border */\n`;
+    for (const token of borderwidthTokens) {
+      css += `  --outline-width-${token.key}: ${token.varRef};\n`;
     }
   }
 
@@ -1839,11 +1832,11 @@ const OTP_SLOT_ACTIVE_RING_SELECTOR =
  * with `outline`, so nothing is generated for them. What remains is the
  * InputOTP slot's shared-hairline shadows (#727).
  *
- * @returns {string} CSS focus ring rules
+ * @returns {string} CSS rules for the InputOTP slot boundary and active ring
  */
-export function generateFocusRingCSS() {
+export function generateInputOtpSlotCSS() {
   return `
-/* ===== FOCUS RING ===== */
+/* ===== INPUT OTP SLOT ===== */
 ${OTP_SLOT_BOUNDARY_SELECTOR} {
   border-color: transparent !important;
   border-width: 0;
@@ -1879,7 +1872,7 @@ ${OTP_SLOT_GROUP_DISABLED_SELECTOR}:first-child {
 }
 
 ${OTP_SLOT_ACTIVE_RING_SELECTOR} {
-  outline: 2px solid transparent !important;
+  outline: none !important;
   border-color: transparent !important;
   border-width: 0;
   box-shadow:

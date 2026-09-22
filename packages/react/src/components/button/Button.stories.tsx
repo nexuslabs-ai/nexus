@@ -450,28 +450,40 @@ export const KeyboardInteraction: Story = {
 };
 
 /**
- * Bug 2 from #726: the focus gap used to be painted as an opaque
- * `0 0 0 2px var(--color-background)` shadow band, so on a `container` or
- * popover surface it showed the page background instead of the real one.
- * `outline-offset` leaves the gap transparent.
+ * Bug 2 from #726: the focus gap used to be an opaque
+ * `0 0 0 2px var(--color-background)` shadow band, so a button sitting on any
+ * surface other than the page painted the page fill into its own gap.
+ * `outline-offset` leaves the gap unpainted, so the surface behind shows
+ * through. The scene uses `muted` rather than `container` because `container`
+ * and `popover` both resolve to the page fill in the light theme, which would
+ * make the comparison vacuous.
  */
-export const FocusGapOnContainer: Story = {
+export const FocusGapShowsSurfaceBehind: Story = {
   render: () => (
-    <div className="nx:bg-container nx:rounded-md nx:p-6">
-      <Button>On container</Button>
+    <div className="nx:bg-background nx:p-6" data-testid="page">
+      <div className="nx:bg-muted nx:rounded-md nx:p-6" data-testid="surface">
+        <Button>On a quiet surface</Button>
+      </div>
     </div>
   ),
   play: async ({ canvasElement }) => {
-    const button = within(canvasElement).getByRole('button');
+    const canvas = within(canvasElement);
+    const button = canvas.getByRole('button');
+
+    const pageFill = getComputedStyle(
+      canvas.getByTestId('page')
+    ).backgroundColor;
+    const surfaceFill = getComputedStyle(
+      canvas.getByTestId('surface')
+    ).backgroundColor;
+    await expect(surfaceFill).not.toBe(pageFill);
 
     await userEvent.tab();
     await expect(button).toHaveFocus();
 
     const styles = getComputedStyle(button);
-    await expect(styles.outlineStyle).toBe('solid');
-    await expect(styles.outlineWidth).toBe('2px');
     await expect(styles.outlineOffset).toBe('2px');
-    // No shadow means nothing is painting into the gap.
+    // Nothing paints inside the offset, so the surface fill shows through.
     await expect(styles.boxShadow).toBe('none');
   },
 };

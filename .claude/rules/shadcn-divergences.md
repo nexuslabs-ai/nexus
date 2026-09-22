@@ -262,13 +262,13 @@ shadcn 2024+ ships a `sidebar-*` namespace; Nexus uses `nav-*` for the equivalen
 
 ## Focus Ring Tokens
 
-| shadcn                   | Nexus                                   | Notes                                                            |
-| ------------------------ | --------------------------------------- | ---------------------------------------------------------------- |
-| `ring-ring`              | `nx:outline-focus-default`              | Focus ring colour hook (current primary accent)                  |
-| `ring-offset-background` | `nx:focus-visible:outline-offset-2`     | Literal offset; only Button needs a gap (initial value is `0`)   |
-| `focus-visible:ring-2`   | `nx:focus-visible:outline-2`            | Outline width — fields use `outline-1`, their border is the rest |
-| —                        | `nx:focus-visible:border-focus-default` | Field-only: the border supplies the inner half of the ring       |
-| —                        | `nx:focus-visible:outline-focus-error`  | Error focus colour hook (invalid inputs)                         |
+| shadcn                   | Nexus                                   | Notes                                                                   |
+| ------------------------ | --------------------------------------- | ----------------------------------------------------------------------- |
+| `ring-ring`              | `nx:outline-focus-default`              | Focus ring colour hook (current primary accent)                         |
+| `ring-offset-background` | `nx:focus-visible:outline-offset-2`     | Literal offset; only Button needs a gap (initial value is `0`)          |
+| `focus-visible:ring-2`   | `nx:focus-visible:outline-2`            | Outline width — fields use `outline-default`, the `border-default` twin |
+| —                        | `nx:focus-visible:border-focus-default` | Field-only: the border supplies the inner half of the ring              |
+| —                        | `nx:focus-visible:outline-focus-error`  | Error focus colour hook (invalid inputs)                                |
 
 **Example transformation:**
 
