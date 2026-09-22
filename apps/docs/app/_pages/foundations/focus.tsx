@@ -247,7 +247,9 @@ nx:aria-invalid:focus-visible:border-focus-error`}
           </strong>{' '}
           Tailwind expands it to a list that includes <code>outline-color</code>
           , so the ring fades in over the duration instead of landing with the
-          keypress. <code>pnpm lint</code> fails the pair. Nexus ships the two
+          keypress. <code>pnpm lint</code> fails the pair wherever both land in
+          one class string or one <code>cva()</code> / <code>cn()</code> call;
+          two strings that only meet somewhere else pass. Nexus ships the two
           ring-safe replacements — reach for those instead:
         </p>
         <div className="nx:overflow-x-auto nx:mt-4">

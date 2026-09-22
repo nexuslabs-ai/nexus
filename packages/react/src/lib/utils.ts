@@ -98,34 +98,23 @@ export const NEXUS_CLASS_GROUPS = {
   // land in tailwind-merge's `outline-color` group and a field's
   // `outline-focus-default` silently drops the width beside it.
   'outline-w': ['outline-thin', 'outline-default', 'outline-thick'],
+  // Only the `@utility` aliases. `border-border-*` is Tailwind-generated from
+  // `--color-*`, and tailwind-merge's default `theme.color` is `[isAny]`, so it
+  // already lands in this group without being named.
   'border-color': [
-    'border-border-default',
     'border-color-default',
-    'border-border-default-alpha',
     'border-color-default-alpha',
-    'border-border-active',
     'border-color-active',
-    'border-border-disabled',
     'border-color-disabled',
-    'border-border-warning',
     'border-color-warning',
-    'border-border-warning-active',
     'border-color-warning-active',
-    'border-border-success',
     'border-color-success',
-    'border-border-success-active',
     'border-color-success-active',
-    'border-border-error',
     'border-color-error',
-    'border-border-error-active',
     'border-color-error-active',
-    'border-border-information',
     'border-color-information',
-    'border-border-information-active',
     'border-color-information-active',
-    'border-border-primary',
     'border-color-primary',
-    'border-border-primary-active',
     'border-color-primary-active',
   ],
   typography: [

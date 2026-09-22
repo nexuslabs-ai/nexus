@@ -82,9 +82,26 @@ ruleTester.run('nx-class-conventions', rule, {
     "const c = 'nx:transition-colors nx:focus:bg-popover-hover';",
     // A ring surface on one of the two ring-safe utilities is the fixed shape.
     "const c = 'nx:transition-control nx:focus-visible:outline-2 nx:focus-visible:outline-focus-default';",
-    "const c = ['nx:transition-field', 'nx:focus-visible:outline-default'];",
+    "const c = cva(['nx:transition-field', 'nx:focus-visible:outline-default']);",
     // The pair must actually share a scope — two unrelated class strings do not.
     "const a = 'nx:transition-colors'; const b = 'nx:focus-visible:outline-2';",
+    // A bare array is a list of per-item class strings, not one attribute.
+    "const c = ['nx:transition-colors', 'nx:focus-visible:outline-2'];",
+    // `outline-none` / `outline-hidden` / `outline-offset-*` paint no ring, so
+    // there is nothing for `transition-colors` to fade — InputGroup's inner
+    // control ships exactly this suppression.
+    "const c = cn('nx:transition-colors nx:bg-transparent', 'nx:focus-visible:outline-none');",
+    "const c = 'nx:transition-colors nx:focus-visible:outline-hidden';",
+    "const c = 'nx:transition-colors nx:focus-visible:outline-offset-2';",
+    // Stories and docs quote utilities as specimens, like the other checks.
+    {
+      code: "const c = 'nx:transition-colors nx:focus-visible:outline-2';",
+      filename: '/repo/packages/react/src/components/input/Input.stories.tsx',
+    },
+    {
+      code: "const c = 'nx:transition-colors nx:focus-visible:outline-2';",
+      filename: '/repo/apps/docs/app/_pages/foundations/focus.tsx',
+    },
   ],
   invalid: [
     {
@@ -246,7 +263,17 @@ ruleTester.run('nx-class-conventions', rule, {
     // A `cva([...])` array is one class string, so the pair is caught across
     // elements — which is the shape every field surface is written in.
     {
-      code: "const c = ['nx:rounded-md nx:transition-colors', 'nx:focus-visible:outline-default nx:focus-visible:border-focus-default'];",
+      code: "const c = cva(['nx:rounded-md nx:transition-colors', 'nx:focus-visible:outline-default nx:focus-visible:border-focus-default']);",
+      errors: [{ messageId: 'ringFadingTransition' }],
+    },
+    // A `cva()` base and a `variants` value land on the same element too.
+    {
+      code: "const c = cva('nx:transition-colors', { variants: { variant: { solid: 'nx:focus-visible:outline-2' } } });",
+      errors: [{ messageId: 'ringFadingTransition' }],
+    },
+    // So do two `cn()` arguments.
+    {
+      code: "const c = cn('nx:transition-colors', 'nx:focus-visible:outline-2');",
       errors: [{ messageId: 'ringFadingTransition' }],
     },
     {

@@ -127,6 +127,11 @@ describe('cn', () => {
       'nx:border-color-error',
     ],
     [
+      'theme-generated border color',
+      'nx:border-border-default nx:border-color-error',
+      'nx:border-color-error',
+    ],
+    [
       'typography',
       'nx:typography-label-small nx:typography-body-default',
       'nx:typography-body-default',

@@ -117,13 +117,17 @@ const CHECKS = [
   },
 ];
 
+// `outline-none`, `outline-hidden` and `outline-offset-*` change no outline
+// colour, so they are suppressions and offsets rather than a painted ring.
+const RING_PAINTING_OUTLINE =
+  /focus-visible:outline-(?!none\b|hidden\b|offset-)/;
+
 // `nx:transition-colors` expands to a property list that includes
 // `outline-color`, so a surface that also paints a focus ring fades the ring in
 // over the duration instead of landing it with the keypress.
 function fadesItsFocusRing(scope) {
   return (
-    /\bnx:transition-colors\b/.test(scope) &&
-    /focus-visible:outline-/.test(scope)
+    /\bnx:transition-colors\b/.test(scope) && RING_PAINTING_OUTLINE.test(scope)
   );
 }
 
@@ -133,6 +137,12 @@ function isStoryFile(filename) {
 
 function isDocsFile(filename) {
   return /(?:^|[/\\])apps[/\\]docs[/\\]/.test(filename);
+}
+
+// Stories and docs pages quote utilities as specimens and prose, so a checked
+// class string there is an example rather than a shipped appearance.
+function isExampleFile(filename) {
+  return isStoryFile(filename) || isDocsFile(filename);
 }
 
 const RAW_TYPOGRAPHY_EXCEPTIONS = [
@@ -169,7 +179,7 @@ function shouldRunCheck(check, filename, raw) {
   if (!check.runtimeOnly) {
     return true;
   }
-  if (isStoryFile(filename) || isDocsFile(filename)) {
+  if (isExampleFile(filename)) {
     return false;
   }
   return !isRawTypographyException(check, filename, raw);
@@ -189,19 +199,51 @@ function matchedMessageIds(raw, filename) {
   return matched;
 }
 
-// The class string a scope check sees: a literal's own value, or every string
-// an array or template literal is built from.
-function scopeText(node) {
+// `cva()` and `cn()` join every string they are handed — a base, an array
+// element, a `variants` value — into one class attribute, so the whole call is
+// one scope. A bare array is not: its elements are per-item class strings that
+// never meet on an element.
+const CLASS_COMPOSING_CALLEES = new Set(['cva', 'cn', 'clsx', 'cx']);
+
+function isClassComposingCall(node) {
+  return (
+    node.type === 'CallExpression' &&
+    node.callee.type === 'Identifier' &&
+    CLASS_COMPOSING_CALLEES.has(node.callee.name)
+  );
+}
+
+function enclosingClassCall(node) {
+  for (let current = node.parent; current; current = current.parent) {
+    if (isClassComposingCall(current)) {
+      return current;
+    }
+  }
+  return null;
+}
+
+// Every class string a node can contribute: its own value, a template
+// literal's quasis, and the same for anything nested inside it.
+function collectClassStrings(node, visitorKeys, collected) {
   if (node.type === 'Literal') {
-    return typeof node.value === 'string' ? node.value : '';
+    if (typeof node.value === 'string') {
+      collected.push(node.value);
+    }
+    return;
   }
   if (node.type === 'TemplateLiteral') {
-    return node.quasis.map((q) => q.value.cooked ?? q.value.raw).join(' ');
+    for (const quasi of node.quasis) {
+      collected.push(quasi.value.cooked ?? quasi.value.raw);
+    }
   }
-  if (node.type === 'ArrayExpression') {
-    return node.elements.map((el) => (el ? scopeText(el) : '')).join(' ');
+  for (const key of visitorKeys[node.type] ?? []) {
+    const child = node[key];
+    for (const value of Array.isArray(child) ? child : [child]) {
+      if (value?.type) {
+        collectClassStrings(value, visitorKeys, collected);
+      }
+    }
   }
-  return '';
 }
 
 export default {
@@ -236,19 +278,24 @@ export default {
     },
   },
   create(context) {
+    const filename = context.filename ?? '';
+    const { visitorKeys } = context.sourceCode;
+
     function report(node, raw) {
-      for (const messageId of matchedMessageIds(raw, context.filename ?? '')) {
+      for (const messageId of matchedMessageIds(raw, filename)) {
         context.report({ node, messageId });
       }
     }
 
-    // A `cva([...])` array is one class string split across elements, so the
-    // array is the scope and its own elements are skipped.
+    // A string inside a `cva()` / `cn()` call is covered by that call's scope,
+    // so only a standalone one is a scope of its own.
     function reportScope(node) {
-      if (node.parent?.type === 'ArrayExpression') {
+      if (isExampleFile(filename) || enclosingClassCall(node)) {
         return;
       }
-      if (fadesItsFocusRing(scopeText(node))) {
+      const collected = [];
+      collectClassStrings(node, visitorKeys, collected);
+      if (fadesItsFocusRing(collected.join(' '))) {
         context.report({ node, messageId: 'ringFadingTransition' });
       }
     }
@@ -265,7 +312,7 @@ export default {
         const matched = new Set();
         for (const quasi of node.quasis) {
           const raw = quasi.value.cooked ?? quasi.value.raw;
-          for (const id of matchedMessageIds(raw, context.filename ?? '')) {
+          for (const id of matchedMessageIds(raw, filename)) {
             matched.add(id);
           }
         }
@@ -274,7 +321,10 @@ export default {
         }
         reportScope(node);
       },
-      ArrayExpression(node) {
+      CallExpression(node) {
+        if (!isClassComposingCall(node)) {
+          return;
+        }
         reportScope(node);
       },
     };

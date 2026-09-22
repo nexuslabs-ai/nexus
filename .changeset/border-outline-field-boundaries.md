@@ -23,7 +23,8 @@ of generated `box-shadow`.
   wants. The split follows the focus recipe: a control's border is its own
   decoration and may fade, while a field's border is the ring's inner half.
 - `@nexus_ds/nx-class-conventions` gained a `ringFadingTransition` check that
-  fails `nx:transition-colors` sharing a class-string scope with a
-  `focus-visible:outline-*` class. A `cva([...])` array counts as one scope,
-  because a field surface writes its transition and its ring in different
-  elements.
+  fails `nx:transition-colors` sharing a scope with a ring-painting
+  `focus-visible:outline-*` class. A scope is one class string, or one `cva()` /
+  `cn()` call — base, array elements and `variants` values all reach the same
+  `class` attribute. `outline-none`, `outline-hidden` and `outline-offset-*`
+  paint no ring and are exempt.
