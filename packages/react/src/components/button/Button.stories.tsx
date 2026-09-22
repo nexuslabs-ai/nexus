@@ -453,38 +453,18 @@ export const KeyboardInteraction: Story = {
  * Bug 2 from #726: the focus gap used to be an opaque
  * `0 0 0 2px var(--color-background)` shadow band, so a button sitting on any
  * surface other than the page painted the page fill into its own gap.
- * `outline-offset` leaves the gap unpainted, so the surface behind shows
- * through. The scene uses `muted` rather than `container` because `container`
- * and `popover` both resolve to the page fill in the light theme, which would
- * make the comparison vacuous.
+ * `outline-offset` leaves the gap unpainted, so the `muted` surface shows
+ * through. Visual scene — `FocusManagement` asserts the absent `box-shadow`
+ * that makes it true.
  */
 export const FocusGapShowsSurfaceBehind: Story = {
   render: () => (
-    <div className="nx:bg-background nx:p-6" data-testid="page">
-      <div className="nx:bg-muted nx:rounded-md nx:p-6" data-testid="surface">
+    <div className="nx:bg-background nx:p-6">
+      <div className="nx:bg-muted nx:rounded-md nx:p-6">
         <Button>On a quiet surface</Button>
       </div>
     </div>
   ),
-  play: async ({ canvasElement }) => {
-    const canvas = within(canvasElement);
-    const button = canvas.getByRole('button');
-
-    const pageFill = getComputedStyle(
-      canvas.getByTestId('page')
-    ).backgroundColor;
-    const surfaceFill = getComputedStyle(
-      canvas.getByTestId('surface')
-    ).backgroundColor;
-    await expect(surfaceFill).not.toBe(pageFill);
-
-    await userEvent.tab();
-    await expect(button).toHaveFocus();
-
-    // The band that used to paint the page fill into the gap was a box-shadow.
-    // With none, the gap is unpainted and the `muted` surface shows through.
-    await expect(getComputedStyle(button).boxShadow).toBe('none');
-  },
 };
 
 export const FocusManagement: Story = {

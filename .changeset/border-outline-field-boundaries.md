@@ -1,5 +1,6 @@
 ---
 '@nexus_ds/core': minor
+'@nexus_ds/eslint-plugin': minor
 ---
 
 Paint field boundaries and focus rings with real `border` and `outline` instead
@@ -21,3 +22,8 @@ of generated `box-shadow`.
   of landing it with the keypress; these name the properties a surface actually
   wants. The split follows the focus recipe: a control's border is its own
   decoration and may fade, while a field's border is the ring's inner half.
+- `@nexus_ds/nx-class-conventions` gained a `ringFadingTransition` check that
+  fails `nx:transition-colors` sharing a class-string scope with a
+  `focus-visible:outline-*` class. A `cva([...])` array counts as one scope,
+  because a field surface writes its transition and its ring in different
+  elements.

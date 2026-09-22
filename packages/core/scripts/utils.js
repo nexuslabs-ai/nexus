@@ -1550,8 +1550,8 @@ export function collectMotionTokens(tokensDir, mode) {
 /**
  * Generate motion `@utility` declarations.
  *
- * Emits two kinds of motion utility together, since components consume them as
- * one file:
+ * Emits three kinds of motion utility together, since components consume them
+ * as one file:
  *
  * 1. Data-driven duration utilities. Tailwind v4 codegens named easing
  *    utilities from --ease-* theme vars, but not named duration utilities from
@@ -1575,11 +1575,7 @@ export function generateMotionUtilitiesCSS(motionTokens) {
     (token) => token.group === 'duration'
   );
 
-  if (durationTokens.length === 0) {
-    return { css: '', count: 0 };
-  }
-
-  let css = `/* Motion duration utilities - data-driven from canonical motion tokens. */\n\n`;
+  let css = `/* Motion utilities - duration utilities are data-driven from canonical motion tokens; the ring-safe transitions and the presence bridge below are static. */\n\n`;
 
   for (const token of durationTokens) {
     css += `@utility duration-${token.key} {\n`;
@@ -1588,14 +1584,10 @@ export function generateMotionUtilitiesCSS(motionTokens) {
     css += `}\n\n`;
   }
 
-  // Ring-safe colour transitions. Tailwind's `transition-colors` expands to a
-  // list that includes `outline-color`, and every Nexus focus ring is a real
-  // `outline` — so an element carrying both fades its own ring in over the
-  // duration instead of landing it with the keypress. These name the properties
-  // a surface actually wants, and are the only colour transitions component
-  // code should reach for. The split is the focus recipe: a control's border is
-  // its own decoration and may fade, while a field's border is the ring's inner
-  // half, so fading it would make focus a visible two-stage change.
+  // Tailwind's `transition-colors` expands to a list that includes
+  // `outline-color`, and every Nexus focus ring is a real `outline` — so an
+  // element carrying both fades its own ring in over the duration instead of
+  // landing it with the keypress.
   css += `@utility transition-control {\n`;
   css += `  transition-property: color, background-color, border-color;\n`;
   css += `  transition-timing-function: var(--tw-ease, var(--default-transition-timing-function));\n`;

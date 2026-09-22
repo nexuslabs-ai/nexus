@@ -117,6 +117,16 @@ const CHECKS = [
   },
 ];
 
+// `nx:transition-colors` expands to a property list that includes
+// `outline-color`, so a surface that also paints a focus ring fades the ring in
+// over the duration instead of landing it with the keypress.
+function fadesItsFocusRing(scope) {
+  return (
+    /\bnx:transition-colors\b/.test(scope) &&
+    /focus-visible:outline-/.test(scope)
+  );
+}
+
 function isStoryFile(filename) {
   return /\.stories\.[jt]sx?$/.test(filename);
 }
@@ -179,12 +189,27 @@ function matchedMessageIds(raw, filename) {
   return matched;
 }
 
+// The class string a scope check sees: a literal's own value, or every string
+// an array or template literal is built from.
+function scopeText(node) {
+  if (node.type === 'Literal') {
+    return typeof node.value === 'string' ? node.value : '';
+  }
+  if (node.type === 'TemplateLiteral') {
+    return node.quasis.map((q) => q.value.cooked ?? q.value.raw).join(' ');
+  }
+  if (node.type === 'ArrayExpression') {
+    return node.elements.map((el) => (el ? scopeText(el) : '')).join(' ');
+  }
+  return '';
+}
+
 export default {
   meta: {
     type: 'problem',
     docs: {
       description:
-        'Enforce nx: Tailwind class conventions — correct prefix order, no banned `accent` token, complete semantic token paths, no raw primitive colors, and no raw named font-size utilities.',
+        'Enforce nx: Tailwind class conventions — correct prefix order, no banned `accent` token, complete semantic token paths, no raw primitive colors, no raw named font-size utilities, and no ring-fading `transition-colors` on a focus-ring surface.',
     },
     schema: [],
     messages: {
@@ -204,6 +229,8 @@ export default {
         'Raw Tailwind line-height utility — let a typography composite own line-height instead of `nx:leading-*`.',
       rawLetterSpacing:
         'Raw Tailwind letter-spacing utility — use a typography composite such as `nx:typography-label-caps` instead of `nx:tracking-*`.',
+      ringFadingTransition:
+        'Ring-fading transition — `nx:transition-colors` includes `outline-color`, so this focus ring fades in instead of landing with the keypress. Use `nx:transition-control` (or `nx:transition-field` on a field surface).',
       deadTypography:
         'Unknown typography composite — this `nx:typography-*` utility is not emitted by typography-utilities.css and renders nothing. Use a live tier (e.g. `nx:typography-body-default`, `nx:typography-label-default`).',
     },
@@ -215,12 +242,24 @@ export default {
       }
     }
 
+    // A `cva([...])` array is one class string split across elements, so the
+    // array is the scope and its own elements are skipped.
+    function reportScope(node) {
+      if (node.parent?.type === 'ArrayExpression') {
+        return;
+      }
+      if (fadesItsFocusRing(scopeText(node))) {
+        context.report({ node, messageId: 'ringFadingTransition' });
+      }
+    }
+
     return {
       Literal(node) {
         if (typeof node.value !== 'string') {
           return;
         }
         report(node, node.value);
+        reportScope(node);
       },
       TemplateLiteral(node) {
         const matched = new Set();
@@ -233,6 +272,10 @@ export default {
         for (const messageId of matched) {
           context.report({ node, messageId });
         }
+        reportScope(node);
+      },
+      ArrayExpression(node) {
+        reportScope(node);
       },
     };
   },

@@ -77,6 +77,14 @@ ruleTester.run('nx-class-conventions', rule, {
       code: "const c = 'nx:text-foreground nx:font-mono nx:font-medium nx:tabular-nums';",
       filename: '/repo/packages/react/src/components/chart/chart.tsx',
     },
+    // `transition-colors` is legal on a surface that paints no ring — menu rows
+    // take the popover tint instead.
+    "const c = 'nx:transition-colors nx:focus:bg-popover-hover';",
+    // A ring surface on one of the two ring-safe utilities is the fixed shape.
+    "const c = 'nx:transition-control nx:focus-visible:outline-2 nx:focus-visible:outline-focus-default';",
+    "const c = ['nx:transition-field', 'nx:focus-visible:outline-default'];",
+    // The pair must actually share a scope — two unrelated class strings do not.
+    "const a = 'nx:transition-colors'; const b = 'nx:focus-visible:outline-2';",
   ],
   invalid: [
     {
@@ -229,6 +237,21 @@ ruleTester.run('nx-class-conventions', rule, {
     {
       code: "const c = 'nx:hover:typography-display-large';",
       errors: [{ messageId: 'deadTypography' }],
+    },
+    // `transition-colors` carries `outline-color`, so it fades the ring in.
+    {
+      code: "const c = 'nx:transition-colors nx:focus-visible:outline-2 nx:focus-visible:outline-focus-default';",
+      errors: [{ messageId: 'ringFadingTransition' }],
+    },
+    // A `cva([...])` array is one class string, so the pair is caught across
+    // elements — which is the shape every field surface is written in.
+    {
+      code: "const c = ['nx:rounded-md nx:transition-colors', 'nx:focus-visible:outline-default nx:focus-visible:border-focus-default'];",
+      errors: [{ messageId: 'ringFadingTransition' }],
+    },
+    {
+      code: 'const c = `nx:transition-colors ${x} nx:focus-visible:outline-2`;',
+      errors: [{ messageId: 'ringFadingTransition' }],
     },
   ],
 });

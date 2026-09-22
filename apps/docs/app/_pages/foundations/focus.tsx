@@ -27,7 +27,7 @@ const RECIPES: { name: string; members: string; ring: string }[] = [
     name: 'Field',
     members:
       'Input · Textarea · NativeSelect · SelectTrigger · MultiSelectTrigger · InputGroup',
-    ring: 'nx:focus-visible:outline-default + nx:focus-visible:border-focus-default',
+    ring: 'nx:focus-visible:outline-default nx:focus-visible:outline-focus-default + nx:focus-visible:border-focus-default',
   },
 ];
 
@@ -51,7 +51,7 @@ const TRANSITIONS: { utility: string; properties: string; use: string }[] = [
   {
     utility: 'nx:transition-control',
     properties: 'color, background-color, border-color',
-    use: 'Controls — the border is decoration, so it may fade. Button adds `scale` to the same list',
+    use: 'Controls — the border is decoration, so it may fade. Button adds scale to the same list',
   },
   {
     utility: 'nx:transition-field',
@@ -247,8 +247,8 @@ nx:aria-invalid:focus-visible:border-focus-error`}
           </strong>{' '}
           Tailwind expands it to a list that includes <code>outline-color</code>
           , so the ring fades in over the duration instead of landing with the
-          keypress. Nexus ships the two ring-safe replacements — reach for those
-          instead:
+          keypress. <code>pnpm lint</code> fails the pair. Nexus ships the two
+          ring-safe replacements — reach for those instead:
         </p>
         <div className="nx:overflow-x-auto nx:mt-4">
           <table className="nx:w-full nx:min-w-[480px] nx:border-collapse nx:typography-label-default">

@@ -1,4 +1,4 @@
-/* Motion duration utilities - data-driven from canonical motion tokens. */
+/* Motion utilities - duration utilities are data-driven from canonical motion tokens; the ring-safe transitions and the presence bridge below are static. */
 
 @utility duration-0 {
   --tw-duration: var(--nx-motion-duration-0);

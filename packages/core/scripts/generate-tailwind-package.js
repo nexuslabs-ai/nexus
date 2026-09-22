@@ -676,10 +676,8 @@ export async function generateTailwindPackage(
   const motionUtilities = generateMotionUtilitiesCSS(
     collectMotionTokens(TOKENS_DIR, usedModes.motion || 'snappy')
   );
-  if (motionUtilities.css) {
-    writeDistFile('motion-utilities.css', motionUtilities.css);
-    log.success(`Generated ${motionUtilities.count} motion duration utilities`);
-  }
+  writeDistFile('motion-utilities.css', motionUtilities.css);
+  log.success(`Generated ${motionUtilities.count} motion duration utilities`);
 
   // `spacingDefault` controls which mode lands under `:root, [data-density="X"]`.
   // Falls back to the canonical baseline so older config objects without the

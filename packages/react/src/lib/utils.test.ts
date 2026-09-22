@@ -144,7 +144,7 @@ describe('cn', () => {
     ['nx:transition-control', 'nx:transition-colors'],
     ['nx:transition-field', 'nx:transition-none'],
     ['nx:transition-control', 'nx:transition-[color,opacity]'],
-  ])('lets a built-in transition displace %s', (nexusUtility, builtIn) => {
+  ])('%s is displaced by %s', (nexusUtility, builtIn) => {
     // Without the `transition` group entry these land nowhere and both survive,
     // so a consumer's `className` override would stack rather than replace.
     expect(cn(nexusUtility, builtIn)).toBe(builtIn);

@@ -14,6 +14,8 @@ Requires `jsonc-eslint-parser`. Wired in the root `eslint.config.js` to target s
 
 Enforces the `nx:` Tailwind-class conventions from `.claude/rules/shadcn-divergences.md` on class strings (string + single-quasi template literals): correct prefix order (`nx:` before every modifier, not `hover:nx:…`), no banned `accent` token, complete semantic token paths (`-background` / `-foreground` / `-subtle`), and no raw primitive colors (`nx:bg-blue-500`). Ported from the former `.claude/hooks/lint-nx-prefix.mjs` so the checks run in `pnpm lint` and the pre-commit hook. Wired for `packages/react/src/**` and `apps/**` `.tsx`.
 
+One check reads a whole class-string scope rather than a single literal: `nx:transition-colors` beside a `focus-visible:outline-*` class fades the focus ring in, because Tailwind expands `transition-colors` to a list carrying `outline-color`. A `cva([…])` array counts as one scope, since a field surface writes its transition and its ring in different elements. Use `nx:transition-control` / `nx:transition-field` instead — see `/foundations/focus`.
+
 ### `@nexus_ds/no-render-prop-types`
 
 Enforces `.claude/rules/composition-over-render-props.md`: component props must not be typed as render callbacks (`(...) => ReactNode`) or component references (`ComponentType` / `FC` / `ElementType`). Event-handler-named props (`on*`) are exempt. Use `children` / named `ReactNode` slots or per-mode components instead. Third-party-mandated shapes (e.g. recharts) opt out with a scoped `eslint-disable` + reason.
