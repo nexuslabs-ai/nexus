@@ -39,19 +39,6 @@ const reactManifest = JSON.parse(
 );
 const entryPoints = reactEntryPoints(reactManifest);
 
-const reverseSourceOrder = process.argv.includes('--reverse-source-order');
-
-/**
- * The order the program is rooted at sets the order the checker interns types
- * in, and so the member order of every union the output prints — which is why
- * the listings below are sorted. A second run off the same filesystem gets the
- * same listing either way, so `--reverse-source-order` hands the sorts an order
- * to normalise and gives CI's determinism diff something it can fail on.
- */
-function asListed(entries) {
-  return reverseSourceOrder ? entries.reverse() : entries;
-}
-
 function collectSourceFiles(dir) {
   return readdirSync(dir, { withFileTypes: true })
     .flatMap((entry) => {
@@ -258,15 +245,14 @@ function clearPreviousOutput() {
   }
 }
 
-const slugs = asListed(
-  readdirSync(componentsRoot, { withFileTypes: true })
-    .filter((entry) => entry.isDirectory())
-    .map((entry) => entry.name)
-).sort();
+const slugs = readdirSync(componentsRoot, { withFileTypes: true })
+  .filter((entry) => entry.isDirectory())
+  .map((entry) => entry.name)
+  .sort();
 
-const sourceFiles = asListed(
-  slugs.flatMap((slug) => collectSourceFiles(path.join(componentsRoot, slug)))
-).sort();
+const sourceFiles = slugs
+  .flatMap((slug) => collectSourceFiles(path.join(componentsRoot, slug)))
+  .sort();
 const parsedPaths = new Set(sourceFiles.map(toRepoPath));
 
 const compilerOptions = ts.parseJsonConfigFileContent(
