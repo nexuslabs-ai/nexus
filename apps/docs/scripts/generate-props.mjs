@@ -61,9 +61,9 @@ function symbolSourcePath(symbol) {
 /**
  * A prop typed with a repo-local alias prints that alias name, which a reader
  * cannot resolve unless the package exports it. Print the alias body instead,
- * so no component has to inline a union for the docs' sake. An alias whose body
- * will not print portably has nothing to print but its bare name, so it comes
- * back as unresolvable for `assertResolvableTypes` to report.
+ * so no component has to inline a union for the docs' sake. Every candidate
+ * name comes back alongside the expansions, because a name still standing in
+ * the emitted type is one the expansion did not reach.
  */
 function localAliasExpansions(checker, program, exported) {
   const candidates = new Map();
@@ -99,23 +99,24 @@ function localAliasExpansions(checker, program, exported) {
       .map(([name, texts]) => [name, [...texts][0]])
   );
 
-  return {
-    expansions,
-    unresolvable: new Set(
-      [...candidates.keys()].filter((name) => !expansions.has(name))
-    ),
-  };
+  return { expansions, localAliases: new Set(candidates.keys()) };
 }
 
 /**
- * A prop left printing a bare alias name the package does not export names
- * something the reader has no way to look up. Expanding the body is the usual
- * answer; when it will not print portably, exporting the alias is.
+ * A type that still spells a repo-local alias the package does not export
+ * leaves the reader a name with nothing to look it up in. Expansion is the
+ * usual answer, and it only reaches a type that is the alias and nothing else —
+ * so an alias surviving in a composed position (`TableVariant[]`) is caught
+ * here alongside one whose body would not have printed portably.
  */
-function assertResolvableTypes(entries, unresolvable) {
+function assertResolvableTypes(entries, localAliases) {
   const offenders = entries.flatMap((entry) =>
     entry.props
-      .filter((prop) => unresolvable.has(prop.type))
+      .filter((prop) =>
+        (prop.type.match(/[A-Za-z_$][\w$]*/g) ?? []).some((token) =>
+          localAliases.has(token)
+        )
+      )
       .map((prop) => `  ${entry.name}.${prop.name}: ${prop.type}`)
   );
 
@@ -124,7 +125,7 @@ function assertResolvableTypes(entries, unresolvable) {
   throw new Error(
     [
       'props JSON: a prop is documented with a repo-local type alias that @nexus_ds/react does not export, so a reader cannot resolve it.',
-      'Export the alias from its component folder and from src/index.ts, or give it a body that prints portably.',
+      'Export the alias from its component folder and from src/index.ts. Expansion covers the rest, but only for a prop typed as the bare alias, and only when its body prints portably.',
       ...offenders,
     ].join('\n')
   );
@@ -145,18 +146,18 @@ function toPropEntry(prop, expansions) {
   };
 }
 
-function toComponentEntry(name, doc, expansions) {
+function toComponentEntry(name, sourcePath, doc, expansions) {
   return {
     name,
     description: doc.description,
-    sourcePath: toRepoPath(doc.filePath),
+    sourcePath,
     props: Object.values(doc.props)
       .map((prop) => toPropEntry(prop, expansions))
       .sort((a, b) => a.name.localeCompare(b.name, 'en')),
   };
 }
 
-function toProplessEntry(checker, name, symbol) {
+function toProplessEntry(checker, name, sourcePath, symbol) {
   return {
     name,
     // docgen normalizes line endings; reading the comment off the symbol
@@ -164,7 +165,7 @@ function toProplessEntry(checker, name, symbol) {
     description: ts
       .displayPartsToString(symbol.getDocumentationComment(checker))
       .replace(/\r\n/g, '\n'),
-    sourcePath: symbolSourcePath(symbol),
+    sourcePath,
     props: [],
   };
 }
@@ -254,7 +255,7 @@ assertWorkspaceTypes(program, {
 const checker = program.getTypeChecker();
 
 const exported = publicExports(checker, program, entryPoints);
-const { expansions, unresolvable } = localAliasExpansions(
+const { expansions, localAliases } = localAliasExpansions(
   checker,
   program,
   exported
@@ -270,7 +271,7 @@ const parser = docgen.withCompilerOptions(compilerOptions, {
   propFilter: isOwnProp,
 });
 
-const docsByName = new Map();
+const docsByDeclaration = new Map();
 const typeExportDescriptions = new Map();
 
 for (const doc of parser.parseWithProgramProvider(sourceFiles, () => program)) {
@@ -283,12 +284,10 @@ for (const doc of parser.parseWithProgramProvider(sourceFiles, () => program)) {
   }
   if (isReExport(doc, parsedPaths)) continue;
 
-  // A file-local component sharing a public export's name would otherwise
-  // claim the entry, and take it to whichever slug it happens to live in.
-  const name = exportName(doc);
-  if (!exported.has(name)) continue;
-
-  docsByName.set(name, doc);
+  // Keyed by file as well as name: a component sharing a public export's name
+  // would otherwise claim its entry, and take it to whichever slug the shadow
+  // happens to live in.
+  docsByDeclaration.set(`${toRepoPath(doc.filePath)}#${exportName(doc)}`, doc);
 }
 
 // A union prints its members in the order the checker first interned them, so
@@ -299,15 +298,16 @@ const components = publicComponents(checker, exported, componentsRoot);
 const bySlug = new Map(slugs.map((slug) => [slug, []]));
 
 for (const [name, symbol] of components) {
-  const doc = docsByName.get(name);
+  const sourcePath = symbolSourcePath(symbol);
+  const doc = docsByDeclaration.get(`${sourcePath}#${name}`);
   const entry = doc
-    ? toComponentEntry(name, doc, expansions)
-    : toProplessEntry(checker, name, symbol);
+    ? toComponentEntry(name, sourcePath, doc, expansions)
+    : toProplessEntry(checker, name, sourcePath, symbol);
 
-  bySlug.get(toSlug(path.join(repoRoot, entry.sourcePath))).push(entry);
+  bySlug.get(toSlug(path.join(repoRoot, sourcePath))).push(entry);
 }
 
-assertResolvableTypes([...bySlug.values()].flat(), unresolvable);
+assertResolvableTypes([...bySlug.values()].flat(), localAliases);
 
 mkdirSync(outputDir, { recursive: true });
 clearPreviousOutput();

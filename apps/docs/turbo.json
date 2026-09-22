@@ -15,13 +15,20 @@
       ],
       "outputs": ["generated/props/**"]
     },
+    "generate:manifest": {
+      "cache": false,
+      "outputs": [
+        "app/_lib/page-manifest.generated.ts",
+        "app/_lib/page-content.generated.ts"
+      ]
+    },
     "build": {
-      "dependsOn": ["^build", "generate:props"],
+      "dependsOn": ["^build", "generate:manifest", "generate:props"],
       "inputs": ["$TURBO_DEFAULT$", "$TURBO_ROOT$/package.json"],
       "outputs": [".next/**", "!.next/cache/**", "next-env.d.ts"]
     },
     "dev": {
-      "dependsOn": ["generate:props"],
+      "dependsOn": ["generate:manifest", "generate:props"],
       "cache": false,
       "persistent": true
     }
