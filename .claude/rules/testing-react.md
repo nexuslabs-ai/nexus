@@ -86,35 +86,7 @@ export const Interactive: Story = {
 | Edge cases              | Empty, long content, etc. | Yes            |
 | AllVariants ★           | Visual grid reference     | No             |
 
-★ The canonical showcase name is `AllVariants`; per-component exceptions (e.g. Avatar uses `AllSizes`) are noted in the component's stories.
-
-### Archetype Equivalence Policy
-
-The matrix above is canonical by story **purpose**. For a subset of components, equivalent story names are accepted when the literal name would duplicate behavior.
-
-| Archetype           | Components   | Requirement          | Accepted Story Names                                    |
-| ------------------- | ------------ | -------------------- | ------------------------------------------------------- |
-| Trigger-and-overlay | Dialog       | Click interaction    | `ClickInteraction`, `OpenCloseInteraction`              |
-| Trigger-and-overlay | DropdownMenu | Click interaction    | `ClickInteraction`, `OpenCloseInteraction`              |
-| Trigger-and-overlay | DropdownMenu | Disabled behavior    | `Disabled`, `WithDisabledItems`                         |
-| Trigger-and-overlay | Select       | Click interaction    | `ClickInteraction`, `OpenCloseInteraction`              |
-| Trigger-and-overlay | Select       | Disabled behavior    | `Disabled`, `DisabledInteraction`                       |
-| Text input          | Input        | Click interaction    | `ClickInteraction`, `FocusBlurInteraction`              |
-| Text input          | Input        | Keyboard interaction | `KeyboardInteraction`, `TypeInteraction`                |
-| Accordion toggle    | Accordion    | Click interaction    | `ClickInteraction`, `ExpandInteraction`                 |
-| Tab selection       | Tabs         | Disabled behavior    | `Disabled`, `WithDisabledTab`, `DisabledTabInteraction` |
-| Axis toggle         | Show, Hide   | Showcase story       | `AllAxes`                                               |
-
-Dialog has no `Disabled` requirement — a modal frame has no internal items to
-disable. DropdownMenu and Select do (their items can be individually disabled),
-so each gets a Disabled row with the equivalent name that matches its idiom.
-
-Rules:
-
-1. If one accepted name for that requirement exists, coverage passes.
-2. Drift is only reported when no accepted equivalent exists and a true drift alias is found.
-3. Use canonical names for new components unless a documented archetype equivalence applies.
-4. When a component omits a canonical interaction requirement (e.g. Dialog omits `Disabled`), the audit emits an informational entry per omitted name so the archetype decision is visible in audit output, not silent.
+★ The canonical showcase name is `AllVariants`; per-component exceptions (e.g. Avatar uses `AllSizes`) are noted in the component's stories. The matrix is canonical by story **purpose**, not by literal name — a component whose idiom reads better as `OpenCloseInteraction` or `ExpandInteraction` satisfies the click-interaction row, and a pattern with nothing to disable (a modal frame) has no Disabled row to fill.
 
 ## Play Function Patterns
 

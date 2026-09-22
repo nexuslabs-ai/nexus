@@ -4,7 +4,7 @@ Token-driven design system for product UI. Three layers compose into one consuma
 
 - **`@nexus_ds/core`** — DTCG design tokens (color, spacing, radius, shadow, typography, motion). Color emits as OKLCH at build time via a perceptual-L grid; spacing is per-mode (mode swap at runtime via the `data-density` attribute).
 - **`@nexus_ds/tailwind`** — Tailwind CSS theme generated from the tokens. All utilities are namespaced with the `nx:` prefix.
-- **`@nexus_ds/react`** — React components built on Radix UI primitives and the Tailwind layer. Variants via CVA; data-attribute test surface; padding-based sizing.
+- **`@nexus_ds/react`** — React components built on Radix UI primitives and the Tailwind layer. Variants via CVA; data-attribute test surface.
 
 A console app exercises the tokens visually; Storybook hosts the component catalog and runs both visual docs and interaction tests against the real components. The catalog is published from `main` at **<https://nexuslabs-ai.github.io/nexus/>**.
 
@@ -38,5 +38,4 @@ make dev          # Storybook — the component catalog & dev surface
 - **[`CONTRIBUTING.md`](CONTRIBUTING.md)** — setup, the `make` workflow, the testing model, story patterns, and the docs-MCP
 - [`.claude/rules/`](.claude/rules/) — project conventions (canonical; there is no root `CLAUDE.md`). High-traffic files:
   - [`testing-react.md`](.claude/rules/testing-react.md) — testing patterns for the React package
-  - [`components.md`](.claude/rules/components.md) — component architecture, `nx:` prefix, data attributes
 - [Issue tracker](../../issues) — bugs and feature requests

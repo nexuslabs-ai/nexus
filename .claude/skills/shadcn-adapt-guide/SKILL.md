@@ -1,6 +1,6 @@
 ---
 name: shadcn-adapt-guide
-description: Adapt a shadcn/ui component into a first-class Nexus component. Use when porting, adapting, converting, or translating a shadcn (or shadcn/ui) component to Nexus — mapping tokens via shadcn-divergences.md, applying the nx: prefix, data attributes, padding-based sizing, the focus-ring pattern, and Storybook play-fn tests. Triggers on "adapt X to Nexus", "port shadcn X", "add the X component" for the Component library epic, or a shadcn source URL/issue asking to bring a component into the design system.
+description: Adapt a shadcn/ui component into a first-class Nexus component. Use when porting, adapting, converting, or translating a shadcn (or shadcn/ui) component to Nexus — mapping tokens via shadcn-divergences.md, applying the nx: prefix, data attributes, component sizing, the focus-ring pattern, and Storybook play-fn tests. Triggers on "adapt X to Nexus", "port shadcn X", "add the X component" for the Component library epic, or a shadcn source URL/issue asking to bring a component into the design system.
 allowed-tools:
   - Read
   - Grep
@@ -26,7 +26,6 @@ The authoritative rules live in `.claude/rules/*.md`. This guide orchestrates th
 | Rule                                                                                                                                                                                                     | What it owns                                                                |
 | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------- |
 | `shadcn-divergences.md`                                                                                                                                                                                  | **THE** shadcn→Nexus token mapping, sizing, data-attrs, focus, checklist    |
-| `components.md`                                                                                                                                                                                          | Component architecture: CVA, data-slot, `nx:` prefix order, focus, layering |
 | `base-*.json` (surface/nav tokens)                                                                                                                                                                       | Surface/elevation tokens (container/popover/overlay), the `nav-*` namespace |
 | `testing-react.md`                                                                                                                                                                                       | Required stories, play-fns, a11y, and story coverage audit                  |
 | `packages/core/tokens/`                                                                                                                                                                                  | Token names — verify a token exists before using it                         |
@@ -89,14 +88,14 @@ Run these and fix everything before reporting — no deferral (`no-follow-up-def
 
 Read at the start; re-fire whenever a trigger lights up. The trigger is the thing you're about to type; the arrow is what to do instead.
 
-- _Pasting a shadcn `className`?_ → strip raw Tailwind; put `nx:` **before** every modifier (`nx:hover:…`, not `hover:nx:…`); map each utility to a **semantic** token via `shadcn-divergences.md` — never `bg-primary` (incomplete) or `bg-blue-500` (primitive). (`components.md`, `shadcn-divergences.md`)
+- _Pasting a shadcn `className`?_ → strip raw Tailwind; put `nx:` **before** every modifier (`nx:hover:…`, not `hover:nx:…`); map each utility to a **semantic** token via `shadcn-divergences.md` — never `bg-primary` (incomplete) or `bg-blue-500` (primitive). (`shadcn-divergences.md`)
 - _See `bg-accent` / `text-accent-foreground` / `hover:bg-accent`?_ → there is **no `accent` token** in Nexus; map **by context** — ghost/control hover → `background-hover`, menu/dropdown item → `popover-hover`, list/card row → `container-hover`. If the surface isn't inferable, ask rather than guess. (`shadcn-divergences.md` § Accent)
-- _See a `dark:` modifier?_ → delete it. Semantic tokens already carry their dark value. (`components.md`)
-- _See `ring-*` / `focus:ring` / `ring-offset`?_ → use `nx:focus-visible:outline-2 nx:focus-visible:outline-focus-default` (Button adds `nx:focus-visible:outline-offset-2`); invalid fields add `nx:aria-invalid:focus-visible:outline-focus-error nx:aria-invalid:focus-visible:border-focus-error`. Drop any `outline-none` on the same element. (`components.md` § Focus)
-- _See a fixed height (`h-10`, `h-9`), or about to type numeric `nx:py-*` on a control?_ → padding-based sizing via the density-aware role utility `nx:py-control-{sm,md,lg}` (mirror `button.tsx` / `input.tsx`) — not a fixed height, not numeric `py`. Fixed-dimension exceptions: progress-bar height, avatar, modal. (`components.md` § Sizing)
-- _Adding any element?_ → `data-slot="{name}"` (+ `data-variant`/`data-size` if it has them). (`components.md`)
+- _See a `dark:` modifier?_ → delete it. Semantic tokens already carry their dark value. (`shadcn-divergences.md`)
+- _See `ring-*` / `focus:ring` / `ring-offset`?_ → use `nx:focus-visible:outline-2 nx:focus-visible:outline-focus-default` (Button adds `nx:focus-visible:outline-offset-2`; fields swap `outline-2` for `nx:focus-visible:outline-default` plus `nx:focus-visible:border-focus-default`); invalid fields add `nx:aria-invalid:focus-visible:outline-focus-error nx:aria-invalid:focus-visible:border-focus-error`. Drop any `outline-none` on the same element. (mirror `input.tsx`)
+- _Sizing a control?_ → copy the `size` variants straight from `button.tsx` (it covers both the text and icon-only shapes) or `input.tsx`. Don't derive a scale of your own.
+- _Adding any element?_ → `data-slot="{name}"` (+ `data-variant`/`data-size` if it has them).
 - _shadcn uses `destructive`?_ → keep the **variant name** `destructive` in the public API; map internals to `error-*` tokens. (`shadcn-divergences.md`)
-- _Overlay / portal / floating layer?_ → mirror `dialog.tsx`: `nx:bg-overlay` scrim, `nx:bg-container`/`nx:bg-popover` surface, `nx:z-modal` (dialog/sheet/alert-dialog) or `nx:z-popover` (popover/command), tw-animate-css fade/zoom/slide. (`components.md` § Layering)
+- _Overlay / portal / floating layer?_ → mirror `dialog.tsx`: `nx:bg-overlay` scrim, `nx:bg-container`/`nx:bg-popover` surface, `nx:z-modal` (dialog/sheet/alert-dialog) or `nx:z-popover` (popover/command), tw-animate-css fade/zoom/slide.
 - _Nav / sidebar chrome?_ → `nav-*` namespace (`nx:bg-nav-background`, `nx:hover:bg-nav-item-hover`, `nx:border-nav-border`), not the base surface tokens.
 - _Defining a prop typed `(…) => ReactNode` / `ComponentType` / a `mode` discriminator?_ → use `children`/named slots or per-mode components. (`composition-over-render-props.md`)
 - _Inline JSX handler 3+ lines or branching?_ → extract a named `handleX` above `return`. (`extract-inline-handlers.md`)
@@ -109,8 +108,8 @@ Read at the start; re-fire whenever a trigger lights up. The trigger is the thin
 
 - [ ] Public API shape preserved; `asChild` where interactive
 - [ ] `nx:` prefix before all modifiers; semantic token paths only; no `dark:` on semantic tokens
-- [ ] `data-slot` (+ `data-variant`/`data-size`); padding-based sizing (documented exceptions only)
-- [ ] Named interface + JSDoc on custom props; focus ring = `outline-focus-default` + tokenised offset
+- [ ] `data-slot` (+ `data-variant`/`data-size`); sizing copied from the archetype component
+- [ ] Named interface + JSDoc on custom props; focus ring = `outline-focus-default`, with the 2px offset on Button only
 - [ ] Stories with play-fns + AllVariants; a11y clean
 - [ ] Dep added + installed; icons added; exported from `src/index.ts`
 - [ ] `typecheck` + `eslint packages` + story tests all green
@@ -118,5 +117,5 @@ Read at the start; re-fire whenever a trigger lights up. The trigger is the thin
 
 ## Notes
 
-- **Spacing:** role-named utilities are the norm — mirror the archetype. `nx:py-control-{sm,md,lg}` is the **height mechanism** for a control (it resolves per `data-density` density mode; numeric `nx:py-2` does not). `button.tsx` also uses `nx:px-control-*` / `nx:gap-control-*`; numeric `nx:px-*` / `nx:gap-*` stay only for non-control spacing (icon gaps, internal layout). Never reach for numeric `py` on a control. (Role-utilities rolled out in #124, now closed.)
+- **Spacing:** a control sizes itself with a fixed height plus numeric inline padding — mirror the archetype rather than deriving a scale. Role-named spacing utilities still exist, but only for container and layout roles; `packages/tailwind/spacing-utilities.css` is the current set. There is no `control-*` spacing family — it was dropped in #489 when every component moved to numeric spacing.
 - **Don't over-plan.** The recipe above _is_ the plan — no planning doc, no approval gate. Orient, transform, verify, report.
