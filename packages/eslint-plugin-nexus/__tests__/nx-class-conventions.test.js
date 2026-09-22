@@ -89,6 +89,8 @@ ruleTester.run('nx-class-conventions', rule, {
     "const c = ['nx:transition-colors', 'nx:focus-visible:outline-2'];",
     // A chained call in between breaks the scope, like an aliased composer.
     "const c = ['nx:transition-colors', 'nx:focus-visible:outline-2'].filter(Boolean).join(' ');",
+    // A private `#join` is not `Array.prototype.join`.
+    "class A { #join() {} m() { return ['nx:transition-colors', 'nx:focus-visible:outline-2'].#join(' '); } }",
     // Only a width or a colour paints a ring, so there is nothing for
     // `transition-colors` to fade — InputGroup's inner control ships exactly
     // the first of these suppressions.

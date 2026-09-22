@@ -219,6 +219,7 @@ function isJoinedArrayLiteral(node) {
     callee.type === 'MemberExpression' &&
     !callee.computed &&
     callee.object.type === 'ArrayExpression' &&
+    callee.property.type === 'Identifier' &&
     callee.property.name === 'join'
   );
 }
