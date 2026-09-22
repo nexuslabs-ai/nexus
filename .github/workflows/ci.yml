@@ -68,6 +68,9 @@ jobs:
       - name: Docs grammar pin
         run: pnpm --filter @nexus_ds/docs audit:grammar-pin
 
+      - name: Agent drift audit
+        run: pnpm audit:agent-drift
+
       - name: Restore ESLint cache
         uses: actions/cache@v4
         with:

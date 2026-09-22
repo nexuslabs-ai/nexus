@@ -59,9 +59,10 @@ lint: ## ESLint — no warnings allowed
 typecheck: ## TypeScript check across packages
 	pnpm typecheck
 
-audit: ## Token / a11y audits
+audit: ## Token / a11y / agent-mirror audits
 	pnpm validate:spacing-modes
 	pnpm audit:contrast
+	pnpm audit:agent-drift
 
 verify: ## Full pre-push gate: lint + format + typecheck + test + audits
 	pnpm lint

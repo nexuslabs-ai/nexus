@@ -6,44 +6,9 @@ import { defineConfig } from 'vitest/config';
 export default defineConfig({
   resolve: {
     alias: [
-      // Server components under test render in jsdom, which does not resolve
-      // the `react-server` export condition. Point at the no-op the condition
-      // would have selected so the guard stays live in the Next build only.
-      {
-        find: /^server-only$/,
-        replacement: path.resolve(
-          __dirname,
-          './node_modules/server-only/empty.js'
-        ),
-      },
       {
         find: '@nexus_ds/core',
         replacement: path.resolve(__dirname, './packages/core/src/index.ts'),
-      },
-      {
-        find: '@nexus_ds/react/utils',
-        replacement: path.resolve(
-          __dirname,
-          './packages/react/src/lib/utils.ts'
-        ),
-      },
-      {
-        find: '@nexus_ds/react/appearance/server',
-        replacement: path.resolve(
-          __dirname,
-          './packages/react/src/components/appearance/provider/server.ts'
-        ),
-      },
-      {
-        find: '@nexus_ds/react/appearance',
-        replacement: path.resolve(
-          __dirname,
-          './packages/react/src/components/appearance/provider/index.ts'
-        ),
-      },
-      {
-        find: /^@nexus_ds\/react$/,
-        replacement: path.resolve(__dirname, './packages/react/src/index.ts'),
       },
       {
         find: /^@\//,
@@ -63,46 +28,19 @@ export default defineConfig({
   test: {
     // Use projects feature (Vitest 4)
     projects: [
-      // Unit tests (hooks, utilities) - jsdom
+      // Core engine, the `cn` merge, and ESLint rules - jsdom for the
+      // first-paint script tests. One glob per non-story row of testing.md
+      // § Scope; the stories row belongs to the `storybook` project below.
       {
         extends: true,
-        // apps/docs sets `jsx: preserve` for Next, which esbuild reads as the
-        // classic runtime. Components rendered in a unit test would otherwise
-        // need their own `import * as React`.
-        esbuild: { jsx: 'automatic' },
-        // `server-only` throws unless resolved under the `react-server`
-        // condition, which no test runs under; point it at its own RSC build.
-        // Scoped to this project so the browser project still fails loudly on a
-        // client component that imports it.
-        resolve: {
-          alias: [
-            {
-              find: /^server-only$/,
-              replacement: path.resolve(
-                __dirname,
-                './node_modules/server-only/empty.js'
-              ),
-            },
-          ],
-        },
         test: {
           name: 'unit',
           environment: 'jsdom',
-          globals: true,
-          unstubEnvs: true,
           include: [
-            'apps/*/*.test.{ts,tsx}',
-            'apps/**/scripts/**/*.test.{js,ts}',
-            'apps/**/app/**/*.test.{ts,tsx}',
-            'apps/**/src/**/*.test.{ts,tsx}',
-            'packages/**/src/**/*.test.{ts,tsx}',
-            'packages/**/scripts/**/*.test.{js,ts}',
-            'packages/eslint-plugin-nexus/__tests__/**/*.test.js',
-            'scripts/**/*.test.js',
-            // Exclude component tests - they're now in stories
-            '!packages/react/src/components/**/*.test.{ts,tsx}',
+            'packages/core/src/lib/*.test.ts',
+            'packages/react/src/lib/utils.test.ts',
+            'packages/eslint-plugin-nexus/__tests__/*.test.js',
           ],
-          setupFiles: ['./packages/test-utils/src/setup.ts'],
         },
       },
       // Story tests - real browser via Playwright
