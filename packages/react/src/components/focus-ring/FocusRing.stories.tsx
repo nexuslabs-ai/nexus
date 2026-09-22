@@ -330,6 +330,14 @@ export const FieldBorderWidthModes: Story = {
               <SelectItem value="apple">Apple</SelectItem>
             </SelectContent>
           </Select>
+          <InputOTP maxLength={4} aria-label={`${mode} one-time password`}>
+            <InputOTPGroup>
+              <InputOTPSlot index={0} />
+              <InputOTPSlot index={1} />
+              <InputOTPSlot index={2} />
+              <InputOTPSlot index={3} />
+            </InputOTPGroup>
+          </InputOTP>
         </div>
       ))}
     </div>
@@ -338,12 +346,32 @@ export const FieldBorderWidthModes: Story = {
     const canvas = within(canvasElement);
 
     for (const { mode, min, max } of BORDER_WIDTH_MODES) {
+      const modeScene = canvas.getByTestId(`borderwidth-${mode}`);
+      const otpSlot = modeScene.querySelector<HTMLElement>(
+        '[data-slot="input-otp-slot"]'
+      )!;
+      const otpWidth = Number.parseFloat(
+        getComputedStyle(otpSlot).borderTopWidth
+      );
+
+      await expect(otpWidth).toBeGreaterThanOrEqual(min);
+      await expect(otpWidth).toBeLessThanOrEqual(max);
+
+      // Focusing the empty OTP input activates its first slot.
+      await focusAsKeyboard(
+        modeScene.querySelector<HTMLElement>('input[data-slot="input-otp"]')!
+      );
+      await expect(
+        Number.parseFloat(getComputedStyle(otpSlot).outlineWidth)
+      ).toBe(otpWidth);
+
       for (const label of BORDER_WIDTH_FIELDS) {
-        const field = within(
-          canvas.getByTestId(`borderwidth-${mode}`)
-        ).getByRole(label === 'select' ? 'combobox' : 'textbox', {
-          name: `${mode} ${label}`,
-        });
+        const field = within(modeScene).getByRole(
+          label === 'select' ? 'combobox' : 'textbox',
+          {
+            name: `${mode} ${label}`,
+          }
+        );
 
         const width = Number.parseFloat(getComputedStyle(field).borderTopWidth);
 

@@ -26,7 +26,7 @@ const RECIPES: { name: string; members: string; ring: string }[] = [
   {
     name: 'Field',
     members:
-      'Input · Textarea · NativeSelect · SelectTrigger · MultiSelectTrigger · InputGroup',
+      'Input · Textarea · NativeSelect · SelectTrigger · MultiSelectTrigger · InputGroup · InputOTPSlot (active slot)',
     ring: 'nx:focus-visible:outline-default nx:focus-visible:outline-focus-default + nx:focus-visible:border-focus-default',
   },
 ];
@@ -146,6 +146,15 @@ nx:focus-visible:outline-default nx:focus-visible:outline-focus-default
 nx:focus-visible:border-focus-default
 nx:disabled:border-border-disabled`}
         </CodeSample>
+        <p className="nx:typography-body-default nx:text-muted-foreground nx:mt-4 nx:mb-4 nx:max-w-[64ch]">
+          <code>InputOTPSlot</code> takes the same two halves under{' '}
+          <code>data-[active=true]:</code> rather than{' '}
+          <code>focus-visible:</code>: one transparent input sits over the
+          slots, so the ring marks the slot the caret is in, on any focus. It
+          has no error state. Slots overlap their full borders by one border
+          width, so the active slot recolours all four of its sides without
+          moving the row.
+        </p>
         <p className="nx:typography-body-default nx:text-muted-foreground nx:mt-4 nx:mb-4 nx:max-w-[64ch]">
           An invalid field wires an always-on error border plus an
           error-coloured ring on <em>both</em> properties. Tab into the field

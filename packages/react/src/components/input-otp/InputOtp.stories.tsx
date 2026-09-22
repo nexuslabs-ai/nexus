@@ -1,5 +1,5 @@
 import type { Meta, StoryObj } from '@storybook/react';
-import { expect, fn, userEvent } from 'storybook/test';
+import { expect, fn, userEvent, waitFor } from 'storybook/test';
 
 import {
   InputOTP,
@@ -16,6 +16,58 @@ function SixDigitSlots() {
       ))}
     </InputOTPGroup>
   );
+}
+
+function slotsIn(scene: HTMLElement) {
+  return Array.from(
+    scene.querySelectorAll<HTMLElement>('[data-slot="input-otp-slot"]')
+  );
+}
+
+function slotLefts(slots: HTMLElement[]) {
+  return slots.map((slot) => slot.getBoundingClientRect().left);
+}
+
+async function expectCollapsedWithinGroups(slots: HTMLElement[]) {
+  for (const slot of slots) {
+    // A group's first slot has no previous sibling, so it starts un-overlapped.
+    const previous = slot.previousElementSibling;
+    if (!previous) continue;
+
+    // Adjacent slots overlap by one border width, so their shared edge is a
+    // single hairline rather than two borders side by side.
+    await expect(slot.getBoundingClientRect().left).toBeCloseTo(
+      previous.getBoundingClientRect().right -
+        Number.parseFloat(getComputedStyle(previous).borderRightWidth),
+      1
+    );
+  }
+}
+
+async function expectActiveSlotRing(
+  slots: HTMLElement[],
+  index: number,
+  restLefts: number[],
+  restBorderColor: string
+) {
+  await waitFor(() =>
+    expect(slots.findIndex((slot) => slot.dataset.active === 'true')).toBe(
+      index
+    )
+  );
+
+  const styles = getComputedStyle(
+    slots.find((slot) => slot.dataset.active === 'true')!
+  );
+
+  // The overlapped left edge is the active slot's own border, so it takes the
+  // focus colour like the other three sides.
+  await expect(styles.borderLeftColor).not.toBe(restBorderColor);
+  await expect(styles.borderLeftColor).toBe(styles.borderTopColor);
+  await expect(styles.outlineStyle).toBe('solid');
+
+  // Border widths never change with state, so activating a slot moves nothing.
+  await expect(slotLefts(slots)).toEqual(restLefts);
 }
 
 const meta: Meta<typeof InputOTP> = {
@@ -147,6 +199,70 @@ export const TransitionScoped: Story = {
 
     await expect(slot).not.toHaveClass('nx:transition-all');
     await expect(slot).toHaveClass('nx:transition-field');
+  },
+};
+
+/**
+ * Slots share one hairline by overlapping their full borders, and the active
+ * slot recolours its own four sides — so moving between slots never shifts
+ * the row, and the first slot of each group starts un-overlapped.
+ */
+export const ActiveSlotRing: Story = {
+  render: () => (
+    <div className="nx:flex nx:flex-col nx:gap-4">
+      <div data-testid="joined">
+        <InputOTP maxLength={6} aria-label="One-time password">
+          <SixDigitSlots />
+        </InputOTP>
+      </div>
+      <div data-testid="split">
+        <InputOTP maxLength={6} aria-label="One-time password, split">
+          <InputOTPGroup>
+            <InputOTPSlot index={0} />
+            <InputOTPSlot index={1} />
+            <InputOTPSlot index={2} />
+          </InputOTPGroup>
+          <InputOTPSeparator />
+          <InputOTPGroup>
+            <InputOTPSlot index={3} />
+            <InputOTPSlot index={4} />
+            <InputOTPSlot index={5} />
+          </InputOTPGroup>
+        </InputOTP>
+      </div>
+    </div>
+  ),
+  play: async ({ canvasElement }) => {
+    for (const testId of ['joined', 'split']) {
+      const scene = canvasElement.querySelector<HTMLElement>(
+        `[data-testid="${testId}"]`
+      )!;
+      const input = scene.querySelector<HTMLInputElement>(
+        'input[data-slot="input-otp"]'
+      )!;
+      const slots = slotsIn(scene);
+      const restLefts = slotLefts(slots);
+      const restBorderColor = getComputedStyle(slots[0]!).borderLeftColor;
+
+      await expectCollapsedWithinGroups(slots);
+
+      await userEvent.click(input);
+      await userEvent.keyboard('123');
+      await expectActiveSlotRing(slots, 3, restLefts, restBorderColor);
+
+      await userEvent.keyboard('456');
+      await expectActiveSlotRing(slots, 5, restLefts, restBorderColor);
+    }
+
+    const split = slotsIn(
+      canvasElement.querySelector<HTMLElement>('[data-testid="split"]')!
+    );
+
+    // The second group restarts at its own first slot — no overlap across the
+    // separator.
+    await expect(split[3]!.getBoundingClientRect().left).toBeGreaterThan(
+      split[2]!.getBoundingClientRect().right
+    );
   },
 };
 
