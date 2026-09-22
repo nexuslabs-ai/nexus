@@ -30,6 +30,14 @@ Component work has two gates:
 Passing the first gate means the work is shippable. Passing the second gate means
 it clears the Nexus Tier-A bar.
 
+For substantial UI changes, consult
+[`Modern Web Guidance`](../../.agents/skills/modern-web-guidance/SKILL.md) and
+record the query/guide IDs (or local guide paths), the applicable decision, and
+how the result was verified. The
+[`no-environment-branching` rule](no-environment-branching.md) takes precedence
+over upstream fallback advice. A failed lookup must be identified as a fallback,
+not a completed guidance check. Routine text-only edits can reuse prior guidance.
+
 Every polish plan must list its validation evidence: the Storybook,
 accessibility, visual/manual, and command evidence required for review.
 
