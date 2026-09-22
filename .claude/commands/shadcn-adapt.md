@@ -1,6 +1,6 @@
 # Shadcn Adapt
 
-Adapt a single shadcn/ui component into a first-class Nexus component — `nx:` prefix, semantic tokens, data attributes, padding-based sizing, the focus-ring pattern, and Storybook stories with play-fns — following the shadcn-adapt guide. This is a **deterministic recipe**, not open-ended implementation.
+Adapt a single shadcn/ui component into a first-class Nexus component — `nx:` prefix, semantic tokens, data attributes, component sizing, the focus-ring pattern, and Storybook stories with play-fns — following the shadcn-adapt guide. This is a **deterministic recipe**, not open-ended implementation.
 
 ## Skill Used
 

@@ -1,6 +1,6 @@
 ---
 name: shadcn-adapt-guide
-description: Adapt a shadcn/ui component into a first-class Nexus component. Use when porting, adapting, converting, or translating a shadcn (or shadcn/ui) component to Nexus — mapping tokens via shadcn-divergences.md, applying the nx: prefix, data attributes, padding-based sizing, the focus-ring pattern, and Storybook play-fn tests. Triggers on "adapt X to Nexus", "port shadcn X", "add the X component" for the Component library epic, or a shadcn source URL/issue asking to bring a component into the design system.
+description: Adapt a shadcn/ui component into a first-class Nexus component. Use when porting, adapting, converting, or translating a shadcn (or shadcn/ui) component to Nexus — mapping tokens via shadcn-divergences.md, applying the nx: prefix, data attributes, component sizing, the focus-ring pattern, and Storybook play-fn tests. Triggers on "adapt X to Nexus", "port shadcn X", "add the X component" for the Component library epic, or a shadcn source URL/issue asking to bring a component into the design system.
 allowed-tools:
   - Read
   - Grep
@@ -92,7 +92,7 @@ Read at the start; re-fire whenever a trigger lights up. The trigger is the thin
 - _See `bg-accent` / `text-accent-foreground` / `hover:bg-accent`?_ → there is **no `accent` token** in Nexus; map **by context** — ghost/control hover → `background-hover`, menu/dropdown item → `popover-hover`, list/card row → `container-hover`. If the surface isn't inferable, ask rather than guess. (`shadcn-divergences.md` § Accent)
 - _See a `dark:` modifier?_ → delete it. Semantic tokens already carry their dark value. (`shadcn-divergences.md`)
 - _See `ring-*` / `focus:ring` / `ring-offset`?_ → use `nx:focus-visible:outline-2 nx:focus-visible:outline-focus-default nx:focus-visible:outline-offset-(--focus-offset)`; invalid fields add `nx:aria-invalid:focus-visible:outline-focus-error`. (mirror `input.tsx`)
-- _See a fixed height (`h-10`, `h-9`), or about to type numeric `nx:py-*` on a control?_ → padding-based sizing via the density-aware role utility `nx:py-control-{sm,md,lg}` (mirror `button.tsx` / `input.tsx`) — not a fixed height, not numeric `py`. Fixed-dimension exceptions: progress-bar height, avatar, modal.
+- _Sizing a control?_ → copy the `size` variants straight from `button.tsx` (it covers both the text and icon-only shapes) or `input.tsx`. Don't derive a scale of your own.
 - _Adding any element?_ → `data-slot="{name}"` (+ `data-variant`/`data-size` if it has them).
 - _shadcn uses `destructive`?_ → keep the **variant name** `destructive` in the public API; map internals to `error-*` tokens. (`shadcn-divergences.md`)
 - _Overlay / portal / floating layer?_ → mirror `dialog.tsx`: `nx:bg-overlay` scrim, `nx:bg-container`/`nx:bg-popover` surface, `nx:z-modal` (dialog/sheet/alert-dialog) or `nx:z-popover` (popover/command), tw-animate-css fade/zoom/slide.
@@ -108,7 +108,7 @@ Read at the start; re-fire whenever a trigger lights up. The trigger is the thin
 
 - [ ] Public API shape preserved; `asChild` where interactive
 - [ ] `nx:` prefix before all modifiers; semantic token paths only; no `dark:` on semantic tokens
-- [ ] `data-slot` (+ `data-variant`/`data-size`); padding-based sizing (documented exceptions only)
+- [ ] `data-slot` (+ `data-variant`/`data-size`); sizing copied from the archetype component
 - [ ] Named interface + JSDoc on custom props; focus ring = `outline-focus-default` + tokenised offset
 - [ ] Stories with play-fns + AllVariants; a11y clean
 - [ ] Dep added + installed; icons added; exported from `src/index.ts`
@@ -117,5 +117,5 @@ Read at the start; re-fire whenever a trigger lights up. The trigger is the thin
 
 ## Notes
 
-- **Spacing:** role-named utilities are the norm — mirror the archetype. `nx:py-control-{sm,md,lg}` is the **height mechanism** for a control (it resolves per `data-density` density mode; numeric `nx:py-2` does not). `button.tsx` also uses `nx:px-control-*` / `nx:gap-control-*`; numeric `nx:px-*` / `nx:gap-*` stay only for non-control spacing (icon gaps, internal layout). Never reach for numeric `py` on a control. (Role-utilities rolled out in #124, now closed.)
+- **Spacing:** a control sizes itself with a fixed height plus numeric inline padding — mirror the archetype rather than deriving a scale. Role-named spacing utilities still exist, but only for container and layout roles; `packages/tailwind/spacing-utilities.css` is the current set. There is no `control-*` spacing family — it was dropped in #489 when every component moved to numeric spacing.
 - **Don't over-plan.** The recipe above _is_ the plan — no planning doc, no approval gate. Orient, transform, verify, report.
