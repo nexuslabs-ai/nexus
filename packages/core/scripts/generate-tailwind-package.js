@@ -4,6 +4,10 @@ import { fileURLToPath, pathToFileURL } from 'url';
 
 import { formatTokenValue, resolveValue } from '../src/token-source/format.js';
 import {
+  SPACING_MODE_FILE_PATTERN,
+  splitSpacingTokens,
+} from '../src/token-source/spacing.js';
+import {
   extractTokens,
   isReference,
   pathToCssVarPrefixed,
@@ -43,8 +47,6 @@ import {
   parseArgs,
   partitionThemedModes,
   readTokenFile,
-  SPACING_MODE_FILE_PATTERN,
-  splitSpacingTokens,
 } from './utils.js';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
