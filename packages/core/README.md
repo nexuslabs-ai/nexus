@@ -61,6 +61,16 @@ Under deuteranopia the Success (Green) and Warning (Orange) 600 shades are hard 
 
 Custom brand ramps and raw surface-tone references retain their separate algorithms. A palette's processed 600 shade is not interchangeable with its authored hex as a brand seed.
 
+## Token catalogue
+
+The browser-safe `@nexus_ds/core/catalogue` entry describes the colour and typography tokens for tools and docs. Each token has its `--nx-*` name, aliases, per-mode values as the generated CSS declares them, and the authored source leaf. See [Token catalogue](./docs/token-catalogue.md).
+
+```ts
+import { createTokenCatalogue } from '@nexus_ds/core/catalogue';
+
+const tokens = createTokenCatalogue();
+```
+
 ## Non-React Shell Example
 
 Use the engine directly when a host shell owns DOM or native styling.
@@ -188,4 +198,4 @@ When multi-platform support is needed, tools like Style Dictionary can be added 
 - **Color** is engine-owned: edit the derivation in `src/lib/surface-ladder.ts` / `src/lib/derive-theme.ts` (color primitives live in `tokens/primitives/color.json`).
 - **Non-color** (spacing, radius, shadow, borderwidth, motion, typography): edit the DTCG token files in `tokens/` (`$value`, `$type`, `$description`).
 
-Then run `make tokens` (or `pnpm tokens:tailwind`) to regenerate CSS; the output is copied into the `@nexus_ds/tailwind` package.
+Then run `make tokens` (or `pnpm tokens:tailwind`) to regenerate CSS; the output is copied into the `@nexus_ds/tailwind` package. A new or renamed token file also needs an import in `src/catalogue/token-files.ts`; `pnpm test:unit` fails until the manifest matches the files on disk.
