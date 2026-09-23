@@ -9,31 +9,39 @@ import { DOCS_APPEARANCE_DEFAULT_STATE } from '../_lib/appearance-controls';
 
 const HISTORY_LIMIT = 100;
 
+type ChangeGroup = keyof NexusAppearanceState;
+
 /**
  * The shared docs appearance plus an undo history of the edits made through
- * `change` and `reset`. Edits persist through the docs appearance provider.
+ * `change` and `reset`. Consecutive changes in the same `group` share one undo
+ * step. Edits persist through the docs appearance provider.
  */
 export function useAppearanceHistory() {
   const { state, setState } = useNexusAppearance();
   const [history, setHistory] = useState<NexusAppearanceState[]>([]);
+  const [lastGroup, setLastGroup] = useState<ChangeGroup | null>(null);
 
-  function commit(next: NexusAppearanceState) {
-    setHistory((past) => [...past, state].slice(-HISTORY_LIMIT));
+  function commit(next: NexusAppearanceState, group: ChangeGroup | null) {
+    if (group === null || group !== lastGroup) {
+      setHistory((past) => [...past, state].slice(-HISTORY_LIMIT));
+    }
+    setLastGroup(group);
     setState(next);
   }
 
-  function change(patch: Partial<NexusAppearanceState>) {
-    commit({ ...state, ...patch });
+  function change(patch: Partial<NexusAppearanceState>, group?: ChangeGroup) {
+    commit({ ...state, ...patch }, group ?? null);
   }
 
   function reset() {
-    commit(DOCS_APPEARANCE_DEFAULT_STATE);
+    commit(DOCS_APPEARANCE_DEFAULT_STATE, null);
   }
 
   function undo() {
     const previous = history.at(-1);
     if (!previous) return;
     setHistory((past) => past.slice(0, -1));
+    setLastGroup(null);
     setState(previous);
   }
 

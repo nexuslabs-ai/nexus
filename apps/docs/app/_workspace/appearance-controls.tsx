@@ -216,7 +216,10 @@ export function AppearanceControls({
 }: {
   state: NexusAppearanceState;
   resolvedMode: NexusResolvedAppearanceMode;
-  onChange: (patch: Partial<NexusAppearanceState>) => void;
+  onChange: (
+    patch: Partial<NexusAppearanceState>,
+    group?: keyof NexusAppearanceState
+  ) => void;
 }) {
   const contrastKey =
     resolvedMode === 'dark' ? 'darkContrast' : 'lightContrast';
@@ -230,7 +233,7 @@ export function AppearanceControls({
       <ControlGroup title="Color">
         <BrandColorField
           value={state.brandColor}
-          onChange={(brandColor) => onChange({ brandColor })}
+          onChange={(brandColor) => onChange({ brandColor }, 'brandColor')}
         />
         <SelectField
           label="Mode"
