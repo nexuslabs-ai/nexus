@@ -191,7 +191,7 @@ export function findStatusPairConfusable(
   return findings;
 }
 
-export function isAcceptedStatusLimitation(finding) {
+function isAcceptedStatusLimitation(finding) {
   return (
     finding.check === 'status-pair' &&
     finding.shade === '600' &&
@@ -213,7 +213,7 @@ function formatFindingLine(finding, accepted = false) {
   return `  ${status} ${finding.label.padEnd(38)} ΔE ${finding.deltaE.toFixed(4)}   (< ${ADJACENT_CONFUSABLE_DELTA_E})${note}`;
 }
 
-export function buildSummary(adjacentFindings, statusFindings) {
+function buildSummary(adjacentFindings, statusFindings) {
   const lines = [];
   const adjacentByVision = new Map();
   for (const f of adjacentFindings) {
