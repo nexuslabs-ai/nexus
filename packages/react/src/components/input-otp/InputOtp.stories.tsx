@@ -41,21 +41,24 @@ async function expectCollapsedWithinGroups(slots: HTMLElement[]) {
   }
 }
 
-async function expectActiveSlotRing(
-  slots: HTMLElement[],
-  index: number,
-  restLefts: number[],
-  restBorderColor: string
-) {
+async function expectActiveSlotRing({
+  slots,
+  index,
+  restLefts,
+  restBorderColor,
+}: {
+  slots: HTMLElement[];
+  index: number;
+  restLefts: number[];
+  restBorderColor: string;
+}) {
   await waitFor(() =>
     expect(slots.findIndex((slot) => slot.dataset.active === 'true')).toBe(
       index
     )
   );
 
-  const styles = getComputedStyle(
-    slots.find((slot) => slot.dataset.active === 'true')!
-  );
+  const styles = getComputedStyle(slots[index]!);
 
   await expect(styles.borderLeftColor).not.toBe(restBorderColor);
   await expect(styles.borderLeftColor).toBe(styles.borderTopColor);
@@ -141,9 +144,12 @@ export const Disabled: Story = {
 
     // A disabled OTP field dims its slots via the group's has-[:disabled] hook,
     // using a semantic boundary token at full opacity (not a fade).
-    const slot = canvasElement.querySelector<HTMLElement>(
-      '[data-slot="input-otp-slot"]'
-    )!;
+    const slot = slotsIn(canvasElement)[0]!;
+    // border-disabled derives the same value as border-default, so only the
+    // class can prove the disabled token is wired.
+    await expect(slot).toHaveClass(
+      'nx:group-has-[:disabled]/input-otp:border-border-disabled'
+    );
     await expect(
       Number.parseFloat(getComputedStyle(slot).borderTopWidth)
     ).toBeGreaterThan(0);
@@ -237,10 +243,20 @@ export const ActiveSlotRing: Story = {
 
       await userEvent.click(input);
       await userEvent.keyboard('123');
-      await expectActiveSlotRing(slots, 3, restLefts, restBorderColor);
+      await expectActiveSlotRing({
+        slots,
+        index: 3,
+        restLefts,
+        restBorderColor,
+      });
 
       await userEvent.keyboard('456');
-      await expectActiveSlotRing(slots, 5, restLefts, restBorderColor);
+      await expectActiveSlotRing({
+        slots,
+        index: 5,
+        restLefts,
+        restBorderColor,
+      });
     }
 
     const split = slotsIn(

@@ -72,7 +72,7 @@ async function expectFieldFocusBoundary({
   control: HTMLElement;
   expectedRestBorderColor?: 'opaque' | 'transparent';
 }) {
-  const restStart = contentStart(control);
+  const restStart = contentStart(surface);
   const restSurfaceStyles = getComputedStyle(surface);
   const restBorderColor = restSurfaceStyles.borderTopColor;
 
@@ -102,7 +102,7 @@ async function expectFieldFocusBoundary({
   ).toBeGreaterThan(0);
   await expect(focusSurfaceStyles.boxShadow).toBe('none');
   // Border width is identical at rest and on focus, so focus never reflows.
-  await expect(contentStart(control)).toBe(restStart);
+  await expect(contentStart(surface)).toBe(restStart);
 }
 
 export const FieldSurfaceFocusBoundaries: Story = {
@@ -303,6 +303,22 @@ const BORDER_WIDTH_MODES = [
 
 const BORDER_WIDTH_FIELDS = ['input', 'textarea', 'select'] as const;
 
+async function expectOtpSlotsOverlapByBorder(scene: HTMLElement) {
+  const slots = Array.from(
+    scene.querySelectorAll<HTMLElement>('[data-slot="input-otp-slot"]')
+  );
+
+  for (const [i, slot] of slots.slice(1).entries()) {
+    const previous = slots[i]!;
+
+    await expect(slot.getBoundingClientRect().left).toBeCloseTo(
+      previous.getBoundingClientRect().right -
+        Number.parseFloat(getComputedStyle(previous).borderRightWidth),
+      1
+    );
+  }
+}
+
 /**
  * Bug 1 from #726: the boundary was a hardcoded 1px shadow, so the
  * `[data-borderwidth]` appearance mode moved `MultiSelectTrigger` and
@@ -356,6 +372,9 @@ export const FieldBorderWidthModes: Story = {
 
       await expect(otpWidth).toBeGreaterThanOrEqual(min);
       await expect(otpWidth).toBeLessThanOrEqual(max);
+      // The -ml overlap is not snapped like the border, so fine's slot spacing
+      // is only exact on displays where 0.5px is a whole device pixel.
+      if (min === max) await expectOtpSlotsOverlapByBorder(modeScene);
 
       // Focusing the empty OTP input activates its first slot.
       await focusAsKeyboard(

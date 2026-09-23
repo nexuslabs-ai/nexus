@@ -83,7 +83,7 @@ function InputOTPGroup({ className, ...props }: InputOTPGroupProps) {
   return (
     <div
       data-slot="input-otp-group"
-      className={cn('nx:flex nx:items-center', className)}
+      className={cn('nx:isolate nx:flex nx:items-center', className)}
       {...props}
     />
   );
@@ -122,7 +122,7 @@ function InputOTPSlot({ index, className, ...props }: InputOTPSlotProps) {
         'nx:group-has-[:disabled]/input-otp:border-border-disabled nx:group-has-[:disabled]/input-otp:bg-disabled nx:group-has-[:disabled]/input-otp:text-disabled-foreground',
         'nx:bg-container nx:text-foreground nx:typography-body-small nx:transition-field nx:duration-fast',
         'nx:first:rounded-l-md nx:last:rounded-r-md',
-        'nx:data-[active=true]:z-10 nx:data-[active=true]:border-focus-default nx:data-[active=true]:outline-default nx:data-[active=true]:outline-focus-default',
+        'nx:data-[active=true]:z-1 nx:data-[active=true]:border-focus-default nx:data-[active=true]:outline-default nx:data-[active=true]:outline-focus-default',
         className
       )}
       {...props}
