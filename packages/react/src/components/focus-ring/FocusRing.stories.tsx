@@ -294,11 +294,12 @@ export const FieldErrorFocusBoundaries: Story = {
 // measures anywhere in [0.5, 1] depending on dpr — true of every bordered
 // component, not just fields. The whole-pixel modes are exact, and `strong`
 // pinned at 2 is what proves the mode now reaches a field at all, which is the
-// bug #726 set out to fix.
+// bug #726 set out to fix. The OTP slots' -ml overlap is not snapped like the
+// border, so their spacing is only exact in the whole-pixel modes.
 const BORDER_WIDTH_MODES = [
-  { mode: 'fine', min: 0.5, max: 1 },
-  { mode: 'normal', min: 1, max: 1 },
-  { mode: 'strong', min: 2, max: 2 },
+  { mode: 'fine', min: 0.5, max: 1, exactPixels: false },
+  { mode: 'normal', min: 1, max: 1, exactPixels: true },
+  { mode: 'strong', min: 2, max: 2, exactPixels: true },
 ] as const;
 
 const BORDER_WIDTH_FIELDS = ['input', 'textarea', 'select'] as const;
@@ -307,6 +308,8 @@ async function expectOtpSlotsOverlapByBorder(scene: HTMLElement) {
   const slots = Array.from(
     scene.querySelectorAll<HTMLElement>('[data-slot="input-otp-slot"]')
   );
+
+  await expect(slots).toHaveLength(4);
 
   for (const [i, slot] of slots.slice(1).entries()) {
     const previous = slots[i]!;
@@ -361,7 +364,7 @@ export const FieldBorderWidthModes: Story = {
   play: async ({ canvasElement }) => {
     const canvas = within(canvasElement);
 
-    for (const { mode, min, max } of BORDER_WIDTH_MODES) {
+    for (const { mode, min, max, exactPixels } of BORDER_WIDTH_MODES) {
       const modeScene = canvas.getByTestId(`borderwidth-${mode}`);
       const otpSlot = modeScene.querySelector<HTMLElement>(
         '[data-slot="input-otp-slot"]'
@@ -372,9 +375,7 @@ export const FieldBorderWidthModes: Story = {
 
       await expect(otpWidth).toBeGreaterThanOrEqual(min);
       await expect(otpWidth).toBeLessThanOrEqual(max);
-      // The -ml overlap is not snapped like the border, so fine's slot spacing
-      // is only exact on displays where 0.5px is a whole device pixel.
-      if (min === max) await expectOtpSlotsOverlapByBorder(modeScene);
+      if (exactPixels) await expectOtpSlotsOverlapByBorder(modeScene);
 
       // Focusing the empty OTP input activates its first slot.
       await focusAsKeyboard(
