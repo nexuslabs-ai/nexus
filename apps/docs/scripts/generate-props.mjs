@@ -11,11 +11,9 @@ import {
   isPortableExpansion,
   isReExport,
   isTypeExport,
-  isUnder,
   opaqueNamespaceNames,
   publicComponents,
   publicExports,
-  toRepoPath,
   toSlugFolder,
 } from './props-contract.mjs';
 import { reactEntryPoints } from './react-entry-points.mjs';
@@ -23,10 +21,13 @@ import {
   collectSourceFiles,
   componentSlugs,
   componentsRoot,
+  isUnder,
   reactSrc,
+  toRepoPath,
   writeJson,
 } from './react-sources.mjs';
 import { docsRoot, reactRoot } from './roots.mjs';
+
 const reactTsconfig = path.join(reactRoot, 'tsconfig.json');
 
 const outputDir = path.join(docsRoot, 'generated', 'props');

@@ -19,7 +19,6 @@
     "generate:dependencies": {
       "inputs": [
         "scripts/generate-dependencies.mjs",
-        "scripts/props-contract.mjs",
         "scripts/react-sources.mjs",
         "scripts/roots.mjs",
         "$TURBO_ROOT$/packages/react/src/**",
@@ -54,7 +53,7 @@
       "outputs": [".next/**", "!.next/cache/**", "next-env.d.ts"]
     },
     "dev": {
-      "dependsOn": ["^build", "generate:manifest", "generate:dependencies"],
+      "dependsOn": ["^build", "generate:manifest"],
       "cache": false,
       "persistent": true
     }

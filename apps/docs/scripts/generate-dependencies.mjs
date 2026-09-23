@@ -1,15 +1,15 @@
-import { mkdirSync, readFileSync, rmSync } from 'node:fs';
+import { mkdirSync, readdirSync, readFileSync, rmSync } from 'node:fs';
 import path from 'node:path';
 
 import { Project, SyntaxKind, ts } from 'ts-morph';
 
-import { isUnder, toRepoPath } from './props-contract.mjs';
 import {
-  collectFiles,
   collectSourceFiles,
   componentSlugs,
   componentsRoot,
+  isUnder,
   reactSrc,
+  toRepoPath,
   writeJson,
 } from './react-sources.mjs';
 import { docsRoot, reactRoot } from './roots.mjs';
@@ -123,25 +123,35 @@ function walk(roots) {
   return { files: [...visited], packages: [...packages] };
 }
 
+// No TS file imports a component's stylesheet, so it rides along with its folder.
+function colocatedStyles(files) {
+  const folders = new Set(files.map((file) => path.dirname(file)));
+  return [...folders].flatMap((folder) =>
+    readdirSync(folder)
+      .filter((name) => name.endsWith('.css'))
+      .map((name) => path.join(folder, name))
+  );
+}
+
 function toEntry(slug) {
   const slugDir = path.join(componentsRoot, slug);
   const roots = collectSourceFiles(slugDir);
   if (roots.length === 0) return null;
 
   const walked = walk(roots);
-  const styles = collectFiles(slugDir).filter((file) => file.endsWith('.css'));
-  const own = [...walked.files, ...styles].filter((file) =>
-    isUnder(file, slugDir)
-  );
+  const needed = [...walked.files, ...colocatedStyles(walked.files)];
 
   return {
     slug,
     install: walked.packages.filter((name) => name !== 'react').sort(),
-    copy: walked.files
+    copy: needed
       .filter((file) => !isUnder(file, slugDir))
       .map(toSrcPath)
       .sort(),
-    files: own.map(toSrcPath).sort(),
+    files: needed
+      .filter((file) => isUnder(file, slugDir))
+      .map(toSrcPath)
+      .sort(),
   };
 }
 

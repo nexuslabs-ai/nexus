@@ -2,21 +2,7 @@ import path from 'node:path';
 
 import ts from 'typescript';
 
-import { repoRoot } from './roots.mjs';
-
-export function toRepoPath(absolutePath) {
-  return path.relative(repoRoot, absolutePath).split(path.sep).join('/');
-}
-
-export function isUnder(filePath, directory) {
-  const relative = path.relative(directory, filePath);
-  return (
-    relative !== '' &&
-    relative !== '..' &&
-    !relative.startsWith(`..${path.sep}`) &&
-    !path.isAbsolute(relative)
-  );
-}
+import { isUnder, toRepoPath } from './react-sources.mjs';
 
 export function toSlugFolder(relativePath) {
   if (path.isAbsolute(relativePath)) return null;
@@ -26,14 +12,6 @@ export function toSlugFolder(relativePath) {
   if (segments[0] === '..') return null;
 
   return segments[0];
-}
-
-export function isComponentSource(filePath) {
-  const name = path.basename(filePath);
-  if (!/\.tsx?$/.test(name)) return false;
-  if (/\.(?:stories|test)\.tsx?$/.test(name)) return false;
-  if (/-fixtures\.tsx?$/.test(name)) return false;
-  return !/^index\.tsx?$/.test(name);
 }
 
 // `cva` variant keys are synthesized members with no declaration and no parent.
