@@ -32,6 +32,7 @@ export function isComponentSource(filePath) {
   const name = path.basename(filePath);
   if (!/\.tsx?$/.test(name)) return false;
   if (/\.(?:stories|test)\.tsx?$/.test(name)) return false;
+  if (/-fixtures\.tsx?$/.test(name)) return false;
   return !/^index\.tsx?$/.test(name);
 }
 

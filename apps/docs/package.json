@@ -7,13 +7,14 @@
   "scripts": {
     "dev": "next dev --turbopack",
     "generate:props": "node scripts/generate-props.mjs",
+    "generate:dependencies": "node scripts/generate-dependencies.mjs",
     "build": "next build",
     "start": "next start",
     "generate:manifest": "node scripts/generate-page-manifest.mjs",
     "audit:csp": "node scripts/audit-csp-inventory.mjs",
     "audit:grammar-pin": "node scripts/audit-grammar-pin.mjs",
     "typecheck": "tsc --noEmit",
-    "clean": "rm -rf .next generated/props"
+    "clean": "rm -rf .next generated"
   },
   "dependencies": {
     "@mdx-js/loader": "^3.1.0",
@@ -47,6 +48,7 @@
     "prettier": "^3.7.4",
     "react-docgen-typescript": "^2.4.0",
     "tailwindcss": "^4.1.18",
+    "ts-morph": "^28.0.0",
     "typescript": "^5.9.3"
   }
 }
