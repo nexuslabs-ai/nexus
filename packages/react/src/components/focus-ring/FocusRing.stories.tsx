@@ -1,5 +1,5 @@
 import type { Meta, StoryObj } from '@storybook/react';
-import { expect, userEvent, within } from 'storybook/test';
+import { expect, within } from 'storybook/test';
 
 import { Checkbox } from '../checkbox';
 import { Input } from '../input';
@@ -72,7 +72,7 @@ async function expectFieldFocusBoundary({
   control: HTMLElement;
   expectedRestBorderColor?: 'opaque' | 'transparent';
 }) {
-  const restStart = contentStart(control);
+  const restStart = contentStart(surface);
   const restSurfaceStyles = getComputedStyle(surface);
   const restBorderColor = restSurfaceStyles.borderTopColor;
 
@@ -102,7 +102,7 @@ async function expectFieldFocusBoundary({
   ).toBeGreaterThan(0);
   await expect(focusSurfaceStyles.boxShadow).toBe('none');
   // Border width is identical at rest and on focus, so focus never reflows.
-  await expect(contentStart(control)).toBe(restStart);
+  await expect(contentStart(surface)).toBe(restStart);
 }
 
 export const FieldSurfaceFocusBoundaries: Story = {
@@ -188,30 +188,15 @@ export const FieldSurfaceFocusBoundaries: Story = {
       control: canvas.getByRole('textbox', { name: 'Grouped textarea' }),
     });
 
-    const otpInput = canvasElement.querySelector<HTMLElement>(
-      'input[data-slot="input-otp"]'
-    )!;
-    const firstSlot = canvasElement.querySelector<HTMLElement>(
-      '[data-slot="input-otp-slot"]'
-    )!;
-    // InputOTP is the one surface still painted with shadows (#727).
-    const restSlotShadow = getComputedStyle(firstSlot).boxShadow;
-
-    await expect(getComputedStyle(firstSlot).borderTopWidth).toBe('0px');
-    await expect(restSlotShadow).not.toBe('none');
-
-    await userEvent.click(otpInput);
-    await waitForFocusPaint();
-
-    const activeSlot =
-      canvasElement.querySelector<HTMLElement>(
-        '[data-slot="input-otp-slot"][data-active="true"]'
-      ) ?? firstSlot;
-    const activeSlotStyles = getComputedStyle(activeSlot);
-
-    await expect(activeSlotStyles.borderTopWidth).toBe('0px');
-    await expect(activeSlotStyles.boxShadow).not.toBe('none');
-    await expect(activeSlotStyles.boxShadow).toContain('inset');
+    // Focusing an empty OTP field makes its first slot the active one.
+    await expectFieldFocusBoundary({
+      surface: canvasElement.querySelector<HTMLElement>(
+        '[data-slot="input-otp-slot"]'
+      )!,
+      control: canvasElement.querySelector<HTMLElement>(
+        'input[data-slot="input-otp"]'
+      )!,
+    });
   },
 };
 
@@ -309,14 +294,33 @@ export const FieldErrorFocusBoundaries: Story = {
 // measures anywhere in [0.5, 1] depending on dpr — true of every bordered
 // component, not just fields. The whole-pixel modes are exact, and `strong`
 // pinned at 2 is what proves the mode now reaches a field at all, which is the
-// bug #726 set out to fix.
+// bug #726 set out to fix. The OTP slots' -ml overlap is not snapped like the
+// border, so their spacing is only exact in the whole-pixel modes.
 const BORDER_WIDTH_MODES = [
-  { mode: 'fine', min: 0.5, max: 1 },
-  { mode: 'normal', min: 1, max: 1 },
-  { mode: 'strong', min: 2, max: 2 },
+  { mode: 'fine', min: 0.5, max: 1, exactPixels: false },
+  { mode: 'normal', min: 1, max: 1, exactPixels: true },
+  { mode: 'strong', min: 2, max: 2, exactPixels: true },
 ] as const;
 
 const BORDER_WIDTH_FIELDS = ['input', 'textarea', 'select'] as const;
+
+async function expectOtpSlotsOverlapByBorder(scene: HTMLElement) {
+  const slots = Array.from(
+    scene.querySelectorAll<HTMLElement>('[data-slot="input-otp-slot"]')
+  );
+
+  await expect(slots).toHaveLength(4);
+
+  for (const [i, slot] of slots.slice(1).entries()) {
+    const previous = slots[i]!;
+
+    await expect(slot.getBoundingClientRect().left).toBeCloseTo(
+      previous.getBoundingClientRect().right -
+        Number.parseFloat(getComputedStyle(previous).borderRightWidth),
+      1
+    );
+  }
+}
 
 /**
  * Bug 1 from #726: the boundary was a hardcoded 1px shadow, so the
@@ -345,6 +349,14 @@ export const FieldBorderWidthModes: Story = {
               <SelectItem value="apple">Apple</SelectItem>
             </SelectContent>
           </Select>
+          <InputOTP maxLength={4} aria-label={`${mode} one-time password`}>
+            <InputOTPGroup>
+              <InputOTPSlot index={0} />
+              <InputOTPSlot index={1} />
+              <InputOTPSlot index={2} />
+              <InputOTPSlot index={3} />
+            </InputOTPGroup>
+          </InputOTP>
         </div>
       ))}
     </div>
@@ -352,13 +364,34 @@ export const FieldBorderWidthModes: Story = {
   play: async ({ canvasElement }) => {
     const canvas = within(canvasElement);
 
-    for (const { mode, min, max } of BORDER_WIDTH_MODES) {
+    for (const { mode, min, max, exactPixels } of BORDER_WIDTH_MODES) {
+      const modeScene = canvas.getByTestId(`borderwidth-${mode}`);
+      const otpSlot = modeScene.querySelector<HTMLElement>(
+        '[data-slot="input-otp-slot"]'
+      )!;
+      const otpWidth = Number.parseFloat(
+        getComputedStyle(otpSlot).borderTopWidth
+      );
+
+      await expect(otpWidth).toBeGreaterThanOrEqual(min);
+      await expect(otpWidth).toBeLessThanOrEqual(max);
+      if (exactPixels) await expectOtpSlotsOverlapByBorder(modeScene);
+
+      // Focusing the empty OTP input activates its first slot.
+      await focusAsKeyboard(
+        modeScene.querySelector<HTMLElement>('input[data-slot="input-otp"]')!
+      );
+      await expect(
+        Number.parseFloat(getComputedStyle(otpSlot).outlineWidth)
+      ).toBe(otpWidth);
+
       for (const label of BORDER_WIDTH_FIELDS) {
-        const field = within(
-          canvas.getByTestId(`borderwidth-${mode}`)
-        ).getByRole(label === 'select' ? 'combobox' : 'textbox', {
-          name: `${mode} ${label}`,
-        });
+        const field = within(modeScene).getByRole(
+          label === 'select' ? 'combobox' : 'textbox',
+          {
+            name: `${mode} ${label}`,
+          }
+        );
 
         const width = Number.parseFloat(getComputedStyle(field).borderTopWidth);
 
