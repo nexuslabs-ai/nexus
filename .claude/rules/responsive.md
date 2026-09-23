@@ -6,7 +6,7 @@ Nexus is designed **mobile-first and desktop-first**: **Narrow (mobile) and Stan
 
 ## Display class table
 
-**This table is the single source of truth.** Other rule files (`components.md`) link here rather than duplicating these rows.
+**This table is the single source of truth.** Other rule files link here rather than duplicating these rows.
 
 | Tailwind class | Range (rem / px @16) | Nexus display class | Design target                                       |
 | -------------- | -------------------- | ------------------- | --------------------------------------------------- |
@@ -20,19 +20,6 @@ Nexus is designed **mobile-first and desktop-first**: **Narrow (mobile) and Stan
 **Narrow / Standard / Wide are documentation labels, not utilities.** There is no `nx:standard:` class. Contributors use the standard Tailwind class names (`nx:sm:`, `nx:md:`, `nx:lg:`, `nx:xl:`, `nx:2xl:`) in code; the display-class labels exist to anchor design and review conversations.
 
 > **Rem breakpoints track the user's font-size preference — not zoom.** Breakpoints are rem-based, so they respond to the browser's **default font-size** setting — in a media query, `rem` resolves against that browser default (a user preference), not against any `html { font-size }` the page itself sets. Full-page zoom is _not_ the mechanism: zoom scales every length unit, rem and px alike, so rem-vs-px makes no difference under it. The payoff is for a user who raises their base font size — each rem grows, the breakpoints fire at a _narrower_ viewport, and the layout drops to a roomier tier as the text enlarges (a px-based layout would ignore the preference). Example: doubling the base font to 32px turns `nx:lg:` (64rem) into a 2048px threshold and `nx:md:` (48rem) into 1536px, so a 1280px viewport that is normally Standard (`nx:xl:` matches) now reads Narrow — only `nx:sm:` (40rem → 1280px) still matches. This is intended accessibility behaviour: layout should follow text size. Test components at 100/150/200% zoom (for reflow) **and** with an enlarged browser default font (for breakpoint behaviour).
-
-## Touch targets
-
-Both Narrow (mobile) and Standard (desktop) are first-class, so every interactive
-component must be comfortably **tappable**, not just clickable. **Minimum
-interactive target: ~44px** (WCAG 2.5.5 Target Size · Apple HIG 44pt;
-Material's 48dp is the roomier bar). This is a **hit-area floor, not a
-visual-size mandate** — a component may look smaller as long as its tappable
-area clears ~44px on touch. Component visual sizes are defined in
-[components.md § Sizing Convention](components.md#sizing-convention); this
-section only governs the extra hit area. For touch, extend the hit area with
-padding where it fits or with a coarse-pointer `::after` overlay such as
-Sidebar's `nx:after:-inset-2` pattern.
 
 ## Decision tree — which responsive mechanism
 
@@ -66,7 +53,7 @@ Prefer the primitive over raw class toggling (`nx:hidden nx:lg:block`), which is
 ## Anti-patterns
 
 - **Don't use `nx:sm:` inside component internals.** Use `@container` queries instead. A viewport prefix inside a component leaks page-shell concerns into the component's internal layout — the component then renders inconsistently when dropped into a sidebar vs a hero. The exception is full-viewport overlays; see Viewport-driven exceptions below.
-- **Don't use raw `vh` units.** They reflect the largest possible viewport on mobile and overshoot when browser chrome is visible. Per [web.dev's viewport-units guide](https://web.dev/blog/viewport-units) and MDN: use `svh` (small viewport — chrome-shown size) for content that must not clip on initial load — modals, sticky elements; use `lvh` (large viewport — chrome-hidden size) for immersive full-bleed heroes; use `dvh` (dynamic) for layouts that should grow and shrink as chrome shows/hides.
+- **Don't use raw `vh` units.** They reflect the largest possible viewport on mobile and overshoot when browser chrome is visible. Per [web.dev's viewport-units guide](https://web.dev/blog/viewport-units) and MDN: use `svh` (small viewport — chrome-shown size) for content that must not clip on initial load — modals, sticky elements; use `lvh` (large viewport — chrome-hidden size) for immersive full-bleed heroes; use `dvh` (dynamic) for layouts that should grow and shrink as chrome shows/hides. The `h-screen` / `min-h-screen` / `max-h-screen` utilities compile to `100vh`, so they count as raw `vh` too.
 - **Don't use `dvh` for overlay internals.** Dialog-family overlays (Dialog and AlertDialog), Sheet, and Drawer bounds use `svh` so their measured height does not jitter as mobile browser chrome collapses or expands. Reach for `dvh` only when the whole surface is intentionally supposed to resize during that chrome transition.
 - **Don't write responsive component code that assumes a viewport width.** Components don't know their consumer's page shell. Render decisions should follow the component's parent width (`@container`) or be passed in as props — never inferred from the viewport.
 
@@ -86,7 +73,6 @@ For exceptions, use viewport breakpoints (`nx:sm:`, `nx:md:`, etc.) as you norma
 
 ## See also
 
-- [components.md](components.md) — component-authoring rules; `@container` internal use is the responsive corollary of the Sizing Convention
 - [#103](https://github.com/nexuslabs-ai/nexus/issues/103) + `packages/react/src/components/{show,hide}/` (sharing `packages/react/src/lib/responsive-visibility.ts`) — the shipped `<Show>` / `<Hide>` source, stories, and spike-conclusion header
 - `packages/core/tokens/semantic/breakpoints.json` — the `--breakpoint-*` token values
 - `packages/react/src/components/dialog/dialog.tsx` — the live viewport-driven exception

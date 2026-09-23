@@ -91,7 +91,7 @@
   font-family: var(--nx-typography-family-font-sans);
   font-size: var(--nx-typography-size-xxs);
   font-weight: var(--nx-typography-weight-semibold);
-  line-height: var(--nx-typography-line-height-xs);
+  line-height: var(--nx-typography-line-height-xxs);
   letter-spacing: var(--nx-typography-letterspacing-wide);
 }
 

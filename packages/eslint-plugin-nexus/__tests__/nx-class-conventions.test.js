@@ -77,6 +77,40 @@ ruleTester.run('nx-class-conventions', rule, {
       code: "const c = 'nx:text-foreground nx:font-mono nx:font-medium nx:tabular-nums';",
       filename: '/repo/packages/react/src/components/chart/chart.tsx',
     },
+    // `transition-colors` is legal on a surface that paints no ring — menu rows
+    // take the popover tint instead.
+    "const c = 'nx:transition-colors nx:focus:bg-popover-hover';",
+    // A ring surface on one of the two ring-safe utilities is the fixed shape.
+    "const c = 'nx:transition-control nx:focus-visible:outline-2 nx:focus-visible:outline-focus-default';",
+    "const c = cva(['nx:transition-field', 'nx:focus-visible:outline-default']);",
+    // The pair must actually share a scope — two unrelated class strings do not.
+    "const a = 'nx:transition-colors'; const b = 'nx:focus-visible:outline-2';",
+    // An unjoined array is a list of per-item class strings, not one attribute.
+    "const c = ['nx:transition-colors', 'nx:focus-visible:outline-2'];",
+    // A chained call in between breaks the scope, like an aliased composer.
+    "const c = ['nx:transition-colors', 'nx:focus-visible:outline-2'].filter(Boolean).join(' ');",
+    // A private `#join` is not `Array.prototype.join`.
+    "class A { #join() {} m() { return ['nx:transition-colors', 'nx:focus-visible:outline-2'].#join(' '); } }",
+    // Only a width or a colour paints a ring, so there is nothing for
+    // `transition-colors` to fade — InputGroup's inner control ships exactly
+    // the first of these suppressions.
+    "const c = cn('nx:transition-colors nx:bg-transparent', 'nx:focus-visible:outline-none');",
+    "const c = 'nx:transition-colors nx:focus-visible:outline-hidden';",
+    "const c = 'nx:transition-colors nx:focus-visible:outline-offset-2';",
+    "const c = 'nx:transition-colors nx:focus-visible:outline-0';",
+    "const c = 'nx:transition-colors nx:focus-visible:outline-solid';",
+    "const c = 'nx:transition-colors nx:focus-visible:outline-dashed';",
+    "const c = 'nx:transition-colors nx:focus-visible:outline-dotted';",
+    "const c = 'nx:transition-colors nx:focus-visible:outline-double';",
+    // A string handed to another function, including from a callback body,
+    // reaches the attribute only through that call's return value.
+    "const c = cn('nx:transition-colors', useRing({ ring: 'nx:focus-visible:outline-2' }));",
+    "const c = cn('nx:transition-colors', items.map(() => 'nx:focus-visible:outline-2'));",
+    // Only the docs pages render a pairing as the subject of the prose.
+    {
+      code: "const c = 'nx:transition-colors nx:focus-visible:outline-2';",
+      filename: '/repo/apps/docs/app/_pages/foundations/focus.tsx',
+    },
   ],
   invalid: [
     {
@@ -229,6 +263,65 @@ ruleTester.run('nx-class-conventions', rule, {
     {
       code: "const c = 'nx:hover:typography-display-large';",
       errors: [{ messageId: 'deadTypography' }],
+    },
+    // `transition-colors` carries `outline-color`, so it fades the ring in.
+    {
+      code: "const c = 'nx:transition-colors nx:focus-visible:outline-2 nx:focus-visible:outline-focus-default';",
+      errors: [{ messageId: 'ringFadingTransition' }],
+    },
+    // `[…].join(' ')` is one attribute — the shape `overlay-layout.ts` uses.
+    {
+      code: "const c = ['nx:transition-colors', 'nx:focus-visible:outline-2'].join(' ');",
+      errors: [{ messageId: 'ringFadingTransition' }],
+    },
+    // A `cva([...])` array is one class string, so the pair is caught across
+    // elements — which is the shape every field surface is written in.
+    {
+      code: "const c = cva(['nx:rounded-md nx:transition-colors', 'nx:focus-visible:outline-default nx:focus-visible:border-focus-default']);",
+      errors: [{ messageId: 'ringFadingTransition' }],
+    },
+    // A `cva()` base and a `variants` value land on the same element too.
+    {
+      code: "const c = cva('nx:transition-colors', { variants: { variant: { solid: 'nx:focus-visible:outline-2' } } });",
+      errors: [{ messageId: 'ringFadingTransition' }],
+    },
+    // So do two `cn()` arguments.
+    {
+      code: "const c = cn('nx:transition-colors', 'nx:focus-visible:outline-2');",
+      errors: [{ messageId: 'ringFadingTransition' }],
+    },
+    {
+      code: 'const c = `nx:transition-colors ${x} nx:focus-visible:outline-2`;',
+      errors: [{ messageId: 'ringFadingTransition' }],
+    },
+    // The barrier cuts both ways: a string behind a non-class call leaves the
+    // enclosing `cn()` scope, so it becomes a scope of its own rather than
+    // falling through the gap between the two.
+    {
+      code: "const c = cn('nx:rounded-md', useRing('nx:transition-colors nx:focus-visible:outline-2'));",
+      errors: [{ messageId: 'ringFadingTransition' }],
+    },
+    // `clsx` and `cx` compose a class attribute the same way, including from
+    // object keys.
+    {
+      code: "const c = clsx('nx:transition-colors', 'nx:focus-visible:outline-2');",
+      errors: [{ messageId: 'ringFadingTransition' }],
+    },
+    {
+      code: "const c = cx({ 'nx:transition-colors': true, 'nx:focus-visible:outline-2': on });",
+      errors: [{ messageId: 'ringFadingTransition' }],
+    },
+    // A story's class strings are the component's real ones, and the docs app
+    // outside `_pages` is its own shipped chrome — both are checked.
+    {
+      code: "const c = 'nx:transition-colors nx:focus-visible:outline-2';",
+      filename: '/repo/packages/react/src/components/input/Input.stories.tsx',
+      errors: [{ messageId: 'ringFadingTransition' }],
+    },
+    {
+      code: "const c = 'nx:transition-colors nx:focus-visible:outline-2';",
+      filename: '/repo/apps/docs/app/_components/TopNav.tsx',
+      errors: [{ messageId: 'ringFadingTransition' }],
     },
   ],
 });

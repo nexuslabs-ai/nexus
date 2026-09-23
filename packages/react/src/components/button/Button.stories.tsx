@@ -176,11 +176,8 @@ export const IconSize: Story = {
     const canvas = within(canvasElement);
     const button = canvas.getByRole('button', { name: 'Star' });
 
-    await expect(button).toHaveClass('nx:relative');
     await expect(button).toHaveClass('nx:size-10');
     await expect(button).toHaveClass('nx:p-0');
-    await expect(button).toHaveClass('nx:pointer-coarse:after:absolute');
-    await expect(button).toHaveClass('nx:pointer-coarse:after:-inset-0.5');
     await expect(button).toHaveAttribute('data-icon-only', 'true');
   },
 };
@@ -452,6 +449,24 @@ export const KeyboardInteraction: Story = {
   },
 };
 
+/**
+ * Bug 2 from #726: the focus gap used to be an opaque
+ * `0 0 0 2px var(--color-background)` shadow band, so a button sitting on any
+ * surface other than the page painted the page fill into its own gap.
+ * `outline-offset` leaves the gap unpainted, so the `muted` surface shows
+ * through. Visual scene — `FocusManagement` asserts the absent `box-shadow`
+ * that makes it true.
+ */
+export const FocusGapShowsSurfaceBehind: Story = {
+  render: () => (
+    <div className="nx:bg-background nx:p-6">
+      <div className="nx:bg-muted nx:rounded-md nx:p-6">
+        <Button>On a quiet surface</Button>
+      </div>
+    </div>
+  ),
+};
+
 export const FocusManagement: Story = {
   args: {
     children: 'Focus me',
@@ -467,13 +482,14 @@ export const FocusManagement: Story = {
     await userEvent.tab();
     await expect(button).toHaveFocus();
 
-    // #506: --focus-offset must resolve at runtime, not collapse to 0.
-    const root = canvasElement.ownerDocument.documentElement;
-    await expect(
-      getComputedStyle(root).getPropertyValue('--focus-offset').trim()
-    ).toBe('2px');
-    await expect(getComputedStyle(button).outlineOffset).toBe('2px');
-    await expect(getComputedStyle(button).boxShadow).toContain('4px');
+    // The ring is a real outline with a transparent 2px gap, so the gap shows
+    // whatever surface the button sits on rather than an opaque page-background
+    // band painted by a box-shadow.
+    const focusStyles = getComputedStyle(button);
+    await expect(focusStyles.outlineOffset).toBe('2px');
+    await expect(focusStyles.outlineStyle).toBe('solid');
+    await expect(focusStyles.outlineWidth).toBe('2px');
+    await expect(focusStyles.boxShadow).toBe('none');
 
     // Shift+Tab should blur
     await userEvent.tab({ shift: true });
@@ -494,7 +510,6 @@ export const PressScale: Story = {
     );
 
     await expect(primary).toHaveClass('nx:active:scale-[0.96]');
-    await expect(primary).toHaveClass('nx:motion-reduce:active:scale-100');
     await expect(link).toHaveClass('nx:active:scale-100');
     await expect(link).not.toHaveClass('nx:active:scale-[0.96]');
   },

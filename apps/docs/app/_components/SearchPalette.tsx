@@ -4,7 +4,7 @@ import { useEffect, useState } from 'react';
 
 import { useRouter } from 'next/navigation';
 
-import { SECTIONS } from '../_lib/sections';
+import { PAGE_MANIFEST } from '../_lib/manifest';
 
 import {
   CommandDialog,
@@ -16,16 +16,16 @@ import {
 } from './nexus';
 
 /**
- * ⌘K command-palette search over the docs IA. Indexes every section/sub-page
- * from the SECTIONS registry (the same source the nav + routes read), so it
- * stays in sync as pages are added. Built on the Nexus Command (cmdk) surface.
+ * ⌘K command-palette search over the docs IA. Indexes every page in the
+ * generated manifest (the same source the nav + routes read), so it stays in
+ * sync as pages are added. Built on the Nexus Command (cmdk) surface.
  */
 
-const INDEX = Object.values(SECTIONS).map((section) => ({
+const INDEX = PAGE_MANIFEST.map((section) => ({
   title: section.title,
-  items: section.subs.map((sub) => ({
-    label: sub.label,
-    href: `/${section.slug}/${sub.slug}`,
+  items: section.pages.map((page) => ({
+    label: page.label,
+    href: page.route,
   })),
 }));
 
@@ -54,7 +54,7 @@ export function SearchPalette() {
       <button
         type="button"
         onClick={() => setOpen(true)}
-        className="nx:hidden nx:lg:flex nx:items-center nx:gap-2 nx:px-3 nx:py-1 nx:typography-label-small nx:text-nav-muted-foreground nx:border nx:border-nav-border nx:rounded-sm nx:transition-colors nx:hover:bg-nav-item-hover nx:hover:text-nav-foreground nx:focus-visible:outline-2 nx:focus-visible:outline-focus-default nx:focus-visible:outline-offset-2"
+        className="nx:hidden nx:lg:flex nx:items-center nx:gap-2 nx:px-3 nx:py-1 nx:typography-label-small nx:text-nav-muted-foreground nx:border nx:border-nav-border nx:rounded-sm nx:transition-control nx:hover:bg-nav-item-hover nx:hover:text-nav-foreground nx:focus-visible:outline-2 nx:focus-visible:outline-focus-default nx:focus-visible:outline-offset-2"
       >
         Search
         <kbd className="nx:font-mono nx:text-[10px] nx:rounded-sm nx:border nx:border-nav-border nx:px-1 nx:py-0.5">

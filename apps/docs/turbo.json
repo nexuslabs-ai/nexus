@@ -6,13 +6,51 @@
       "outputs": ["__generated__/**"],
       "cache": false
     },
+    "generate:props": {
+      "dependsOn": ["^build"],
+      "inputs": [
+        "scripts/generate-props.mjs",
+        "scripts/props-contract.mjs",
+        "scripts/react-entry-points.mjs",
+        "scripts/roots.mjs",
+        "$TURBO_ROOT$/packages/react/src/**",
+        "$TURBO_ROOT$/packages/react/package.json",
+        "$TURBO_ROOT$/packages/react/tsconfig.json"
+      ],
+      "outputs": ["generated/props/**"]
+    },
+    "generate:manifest": {
+      "inputs": [
+        "scripts/generate-page-manifest.mjs",
+        "scripts/page-manifest.mjs",
+        "scripts/roots.mjs",
+        "page-registry/**",
+        "content/**",
+        "app/_pages/**",
+        "$TURBO_ROOT$/.prettierrc"
+      ],
+      "outputs": [
+        "app/_lib/page-manifest.generated.ts",
+        "app/_lib/page-content.generated.ts"
+      ]
+    },
     "build": {
-      "dependsOn": ["^build", "generate:demos"],
+      "dependsOn": [
+        "^build",
+        "generate:manifest",
+        "generate:props",
+        "generate:demos"
+      ],
       "inputs": ["$TURBO_DEFAULT$", "$TURBO_ROOT$/package.json"],
       "outputs": [".next/**", "!.next/cache/**", "next-env.d.ts"]
     },
     "typecheck": {
       "dependsOn": ["^build", "generate:demos"]
+    },
+    "dev": {
+      "dependsOn": ["^build", "generate:manifest"],
+      "cache": false,
+      "persistent": true
     }
   }
 }

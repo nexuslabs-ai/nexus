@@ -14,7 +14,6 @@ const popoverSurfaceClassName = [
   'nx:backdrop-blur-md',
   'nx:text-popover-foreground',
   'nx:shadow-lg',
-  'nx:reduce-transparency:bg-popover',
 ].join(' ');
 
 const tooltipSurfaceClassName = [
@@ -34,18 +33,15 @@ const navigationMenuInlinePopoverSurfaceClassName = [
   'nx:group-data-[viewport=false]/navigation-menu:backdrop-blur-md',
   'nx:group-data-[viewport=false]/navigation-menu:text-popover-foreground',
   'nx:group-data-[viewport=false]/navigation-menu:shadow-lg',
-  'nx:group-data-[viewport=false]/navigation-menu:reduce-transparency:bg-popover',
 ].join(' ');
 
 const navigationMenuInlinePopoverTransitionClassName = [
   'nx:group-data-[viewport=false]/navigation-menu:transition-[opacity,scale]',
   'nx:group-data-[viewport=false]/navigation-menu:duration-fast',
   'nx:group-data-[viewport=false]/navigation-menu:ease-move',
-  'nx:motion-reduce:group-data-[viewport=false]/navigation-menu:transition-none',
   'nx:group-data-[viewport=false]/navigation-menu:data-[state=closed]:scale-95',
   'nx:group-data-[viewport=false]/navigation-menu:data-[state=closed]:opacity-0',
   'nx:group-data-[viewport=false]/navigation-menu:data-[state=closed]:animate-overlay-presence-exit',
-  'nx:motion-reduce:group-data-[viewport=false]/navigation-menu:data-[state=closed]:animate-none',
 ].join(' ');
 
 // `animate-overlay-presence-exit` is a non-visual "presence bridge": the installed
@@ -53,16 +49,14 @@ const navigationMenuInlinePopoverTransitionClassName = [
 // animation keeps a closing overlay mounted while the opacity/scale/translate
 // TRANSITIONS above run the visible exit. It animates an unread custom property (see
 // generateMotionUtilitiesCSS in @nexus/core), never a transitioned property, so it
-// cannot override those transitions. Reduced motion drops both. Retire this bridge if
-// Radix Presence gains a transition-aware unmount path.
+// cannot override those transitions.
 const overlayPresenceExitClassName =
-  'nx:data-[state=closed]:animate-overlay-presence-exit nx:motion-reduce:data-[state=closed]:animate-none';
+  'nx:data-[state=closed]:animate-overlay-presence-exit';
 
 const overlayFloatingTransitionClassName = [
   'nx:transition-[opacity,scale]',
   'nx:duration-fast',
   'nx:ease-move',
-  'nx:motion-reduce:transition-none',
   'nx:data-[state=closed]:scale-95',
   'nx:data-[state=closed]:opacity-0',
   overlayPresenceExitClassName,
@@ -72,7 +66,6 @@ const overlayContentTransitionClassName = [
   'nx:transition-[opacity,scale]',
   'nx:duration-default',
   'nx:ease-move',
-  'nx:motion-reduce:transition-none',
   'nx:data-[state=closed]:scale-95',
   'nx:data-[state=closed]:opacity-0',
   overlayPresenceExitClassName,
@@ -82,7 +75,6 @@ const overlayScrimTransitionClassName = [
   'nx:transition-opacity',
   'nx:duration-default',
   'nx:ease-move',
-  'nx:motion-reduce:transition-none',
   'nx:data-[state=closed]:opacity-0',
   overlayPresenceExitClassName,
 ].join(' ');
@@ -91,7 +83,6 @@ const overlayPanelTransitionClassName = [
   'nx:transition-[translate]',
   'nx:duration-slow',
   'nx:ease-move',
-  'nx:motion-reduce:transition-none',
   overlayPresenceExitClassName,
 ].join(' ');
 
@@ -152,12 +143,10 @@ const overlayFooterVariants = cva('nx:flex nx:shrink-0 nx:gap-2 nx:px-6', {
 
 const overlayCloseButtonClassName = [
   'nx:absolute nx:right-6 nx:top-6 nx:rounded-sm nx:p-1 nx:text-muted-foreground-subtle',
-  'nx:pointer-coarse:after:absolute nx:pointer-coarse:after:-inset-2.5',
-  'nx:transition-colors',
-  'nx:motion-reduce:transition-none',
+  'nx:transition-control',
   'nx:hover:bg-container-hover nx:hover:text-foreground',
   'nx:focus-visible:bg-container-hover nx:focus-visible:text-foreground',
-  'nx:focus-visible:outline-2 nx:focus-visible:outline-focus-default nx:focus-visible:outline-offset-(--focus-offset)',
+  'nx:focus-visible:outline-2 nx:focus-visible:outline-focus-default',
   'nx:disabled:pointer-events-none',
 ].join(' ');
 

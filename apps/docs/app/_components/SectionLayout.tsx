@@ -1,4 +1,4 @@
-import type { Section } from '../_lib/sections';
+import type { ManifestSection } from '../_lib/manifest';
 import { DOCS_ARTICLE_ID } from '../_lib/table-of-contents';
 
 import { LeftRail } from './LeftRail';
@@ -8,7 +8,7 @@ export function SectionLayout({
   section,
   children,
 }: {
-  section: Section;
+  section: ManifestSection;
   children: React.ReactNode;
 }) {
   return (

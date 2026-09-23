@@ -7,11 +7,10 @@ import { cn } from '../../lib/utils';
 
 const switchVariants = cva(
   [
-    'nx:peer nx:relative nx:inline-flex nx:shrink-0 nx:cursor-pointer nx:items-center',
-    'nx:pointer-coarse:after:absolute nx:pointer-coarse:after:-inset-3',
+    'nx:peer nx:inline-flex nx:shrink-0 nx:cursor-pointer nx:items-center',
     'nx:rounded-full nx:border-thick nx:border-border-default',
-    'nx:transition-colors',
-    'nx:focus-visible:outline-2 nx:focus-visible:outline-focus-default nx:focus-visible:outline-offset-(--focus-offset)',
+    'nx:transition-control',
+    'nx:focus-visible:outline-2 nx:focus-visible:outline-focus-default',
     'nx:aria-invalid:border-border-error nx:aria-invalid:focus-visible:outline-focus-error',
     'nx:aria-invalid:data-[state=checked]:border-primary-background',
     'nx:disabled:cursor-not-allowed nx:disabled:border-border-disabled',

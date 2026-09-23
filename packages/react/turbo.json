@@ -5,6 +5,11 @@
     "build": {
       "inputs": ["src/**", "vite.config.ts", "tsconfig.json"],
       "outputs": ["dist/**"]
+    },
+    "dev": {
+      "dependsOn": ["build"],
+      "cache": false,
+      "persistent": true
     }
   }
 }

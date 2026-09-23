@@ -329,11 +329,10 @@ function AlertClose({
     <button
       data-slot="alert-close"
       className={cn(
-        'nx:relative nx:inline-flex nx:size-8 nx:shrink-0 nx:items-center nx:justify-center nx:rounded-sm nx:text-muted-foreground',
-        'nx:pointer-coarse:after:absolute nx:pointer-coarse:after:-inset-1.5',
-        'nx:transition-colors nx:hover:bg-container-hover nx:hover:text-foreground',
+        'nx:inline-flex nx:size-8 nx:shrink-0 nx:items-center nx:justify-center nx:rounded-sm nx:text-muted-foreground',
+        'nx:transition-control nx:hover:bg-container-hover nx:hover:text-foreground',
         'nx:focus-visible:bg-container-hover nx:focus-visible:text-foreground',
-        'nx:focus-visible:outline-2 nx:focus-visible:outline-focus-default nx:focus-visible:outline-offset-(--focus-offset)',
+        'nx:focus-visible:outline-2 nx:focus-visible:outline-focus-default',
         'nx:disabled:pointer-events-none nx:disabled:text-disabled-foreground',
         'nx:[&_svg]:size-4 nx:[&_svg]:shrink-0',
         className

@@ -151,7 +151,7 @@ export const VisibleAffordance: Story = {
     docs: {
       description: {
         story:
-          '`type="always"` pins the custom scrollbar chrome for dense panels where scrollability needs to be visible without hover. The Radix custom scrollbar remains the default; native `scrollbar-color`, `scrollbar-width`, and scroll-state queries are progressive-only relative to the Nexus browser floor.',
+          '`type="always"` pins the custom scrollbar chrome for dense panels where scrollability needs to be visible without hover.',
       },
     },
   },
@@ -198,40 +198,16 @@ export const VisibleAffordance: Story = {
     const horizontalScrollbar = canvasElement.querySelector(
       '[data-slot="scroll-bar"][data-orientation="horizontal"]'
     );
-    const corner = canvasElement.querySelector(
-      '[data-slot="scroll-area-corner"]'
-    );
 
     await expect(viewport).toHaveAttribute('tabindex', '0');
     await expect(verticalScrollbar).toBeInTheDocument();
     await expect(horizontalScrollbar).toBeInTheDocument();
-    await expect(verticalScrollbar).toHaveClass(
-      'nx:forced-colors:bg-[Canvas]',
-      'nx:forced-colors:border-l-[ButtonBorder]'
-    );
-    await expect(horizontalScrollbar).toHaveClass(
-      'nx:forced-colors:bg-[Canvas]',
-      'nx:forced-colors:border-t-[ButtonBorder]'
-    );
-
-    if (corner) {
-      await expect(corner).toHaveClass(
-        'nx:forced-colors:bg-[Canvas]',
-        'nx:forced-colors:border-[ButtonBorder]'
-      );
-    }
 
     await waitFor(() => {
       expect(
         canvasElement.querySelectorAll('[data-slot="scroll-bar-thumb"]').length
       ).toBeGreaterThan(1);
     });
-
-    for (const thumb of canvasElement.querySelectorAll(
-      '[data-slot="scroll-bar-thumb"]'
-    )) {
-      await expect(thumb).toHaveClass('nx:forced-colors:bg-[CanvasText]');
-    }
   },
 };
 
