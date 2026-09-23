@@ -123,6 +123,18 @@ jobs:
           pnpm turbo build
           node scripts/audit-turbo-outputs.js --post-build
 
+      # The build step's props JSON may be a turbo cache restore; regenerating
+      # it outside turbo catches a stale cache entry or nondeterministic output.
+      - name: Check props JSON matches a fresh regeneration
+        run: |
+          set -euo pipefail
+          cp -r apps/docs/generated/props "$RUNNER_TEMP/props-build"
+          pnpm --filter @nexus_ds/docs generate:props
+          if ! diff -r "$RUNNER_TEMP/props-build" apps/docs/generated/props; then
+            echo "::error::The props JSON differs from the build step's copy: either generate:props in apps/docs/turbo.json is missing an input the generator reads, or the generator's output is nondeterministic."
+            exit 1
+          fi
+
       - name: Docs CSP inventory
         run: |
           pnpm turbo build --filter=@nexus_ds/docs
