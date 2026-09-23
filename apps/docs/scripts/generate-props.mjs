@@ -261,8 +261,8 @@ for (const doc of parser.parseWithProgramProvider(sourceFiles, () => program)) {
   docsByDeclaration.set(`${toRepoPath(doc.filePath)}#${exportName(doc)}`, doc);
 }
 
-// Must run after docgen: union members print in the order the checker first
-// interned them.
+// Must run after the alias expansions and the docgen parse: union members print
+// in the order the checker first interned them.
 const components = publicComponents(checker, exported, componentsRoot);
 
 const bySlug = new Map(slugs.map((slug) => [slug, []]));
