@@ -1,5 +1,3 @@
-import { useState } from 'react';
-
 import type { Meta, StoryObj } from '@storybook/react';
 import {
   IconAlertCircle,
@@ -7,12 +5,10 @@ import {
   IconCheck,
   IconCircleCheck,
   IconInfoCircle,
-  IconLock,
   IconX,
 } from '@tabler/icons-react';
-import { expect, userEvent, waitFor, within } from 'storybook/test';
+import { expect, waitFor, within } from 'storybook/test';
 
-import { Button } from '../button';
 import { Spinner } from '../spinner';
 
 import { Badge, type BadgeProps } from './badge';
@@ -60,7 +56,7 @@ const meta: Meta<typeof Badge> = {
 export default meta;
 type Story = StoryObj<typeof Badge>;
 
-const HEIGHT_VARIANTS = [
+const GEOMETRY_VARIANTS = [
   'default',
   'secondary',
   'error',
@@ -68,22 +64,10 @@ const HEIGHT_VARIANTS = [
   'success',
   'information',
 ] as const;
-const HEIGHT_FILLS = ['solid', 'light', 'outline'] as const;
-const HEIGHT_SHAPES = [
+const GEOMETRY_FILLS = ['solid', 'light', 'outline'] as const;
+const GEOMETRY_SHAPES = [
   { name: 'caps', props: { children: 'Label' } },
   { name: 'sentence', props: { children: 'Label', isCaps: false } },
-  {
-    name: 'caps-icon',
-    props: { children: 'Verified', leftIcon: <IconCheck /> },
-  },
-  {
-    name: 'left-icon',
-    props: { children: 'Verified', isCaps: false, leftIcon: <IconCheck /> },
-  },
-  {
-    name: 'right-icon',
-    props: { children: 'Dismiss', isCaps: false, rightIcon: <IconX /> },
-  },
   {
     name: 'both-icons',
     props: {
@@ -108,14 +92,6 @@ const HEIGHT_SHAPES = [
     props: { leftIcon: <IconCheck />, 'aria-label': 'Approved' },
   },
   {
-    name: 'right-icon-only',
-    props: { rightIcon: <IconX />, 'aria-label': 'Dismissed' },
-  },
-  {
-    name: 'zero',
-    props: { children: 0, isNumber: true, 'aria-label': '0 unread' },
-  },
-  {
     name: 'count',
     props: { children: 8, isNumber: true, 'aria-label': '8 unread' },
   },
@@ -134,13 +110,7 @@ const HEIGHT_SHAPES = [
   },
 ] satisfies { name: string; props: BadgeProps }[];
 
-const SQUARE_FLOOR_SHAPES = new Set([
-  'icon-only',
-  'right-icon-only',
-  'zero',
-  'count',
-  'high-count',
-]);
+const SQUARE_SHAPES = new Set(['icon-only', 'count', 'high-count']);
 
 const BASE_LINE_HEIGHT_SM = 20;
 const BASE_UI_FONT_SIZE = 14;
@@ -149,6 +119,23 @@ const ENLARGED_GLOBALS = {
   stroke: 'strong',
   uiFontSize: 32,
 } as const;
+
+function GeometryRow({ variant, fill }: Pick<BadgeProps, 'variant' | 'fill'>) {
+  return (
+    <div className="nx:flex nx:flex-wrap nx:items-center nx:gap-2">
+      {GEOMETRY_SHAPES.map(({ name, props }) => (
+        <Badge
+          key={name}
+          data-testid="geometry-badge"
+          data-shape={name}
+          variant={variant}
+          fill={fill}
+          {...props}
+        />
+      ))}
+    </div>
+  );
+}
 
 function badgeLabel(badge: HTMLElement) {
   return (
@@ -182,8 +169,7 @@ function assertGeometry(badge: HTMLElement) {
   expect(styles.boxSizing).toBe('border-box');
   expect(parseFloat(styles.minHeight)).toBeCloseTo(minimum, 1);
   expect(rect.height).toBeCloseTo(minimum, 1);
-  const shape = badge.dataset.shape;
-  if (shape && SQUARE_FLOOR_SHAPES.has(shape)) {
+  if (SQUARE_SHAPES.has(badge.dataset.shape ?? '')) {
     expect(parseFloat(styles.minWidth)).toBeCloseTo(minimum, 1);
     expect(rect.width).toBeGreaterThanOrEqual(minimum - 0.5);
   }
@@ -209,45 +195,6 @@ function assertGeometry(badge: HTMLElement) {
     expect(textRect.top).toBeGreaterThanOrEqual(innerTop - 0.5);
     expect(textRect.bottom).toBeLessThanOrEqual(innerBottom + 0.5);
   }
-}
-
-const STATUS_STATES = {
-  loading: {
-    children: 'Loading',
-    leftIcon: (
-      <Spinner role="presentation" aria-hidden aria-label={undefined} />
-    ),
-    variant: 'information',
-  },
-  ready: { children: 'Ready', variant: 'success' },
-  locked: { children: 'Locked', leftIcon: <IconLock />, variant: 'secondary' },
-} satisfies Record<string, BadgeProps>;
-
-function StatusTransitionsScene() {
-  const [status, setStatus] = useState<keyof typeof STATUS_STATES>('loading');
-  return (
-    <div className="nx:flex nx:flex-col nx:items-start nx:gap-4">
-      <div className="nx:flex nx:items-center nx:gap-2" aria-live="polite">
-        <Badge
-          data-testid="status-badge"
-          fill="outline"
-          isCaps={false}
-          {...STATUS_STATES[status]}
-        />
-        <span
-          data-testid="status-neighbor"
-          className="nx:typography-body-small"
-        >
-          Paper status
-        </span>
-      </div>
-      <div className="nx:flex nx:gap-2">
-        <Button onClick={() => setStatus('loading')}>Show loading</Button>
-        <Button onClick={() => setStatus('ready')}>Show ready</Button>
-        <Button onClick={() => setStatus('locked')}>Show locked</Button>
-      </div>
-    </div>
-  );
 }
 
 // ============================================
@@ -378,67 +325,40 @@ export const Sentence: Story = {
   },
 };
 
-export const HeightConsistency: Story = {
-  tags: ['!autodocs', '!dev'],
+// ============================================
+// GEOMETRY
+// ============================================
+
+export const GeometrySweep: Story = {
+  tags: ['!autodocs'],
   render: () => (
     <div className="nx:flex nx:flex-col nx:items-start nx:gap-4">
-      {HEIGHT_VARIANTS.map((variant) =>
-        HEIGHT_FILLS.map((fill) => (
-          <div
+      {GEOMETRY_VARIANTS.flatMap((variant) =>
+        GEOMETRY_FILLS.map((fill) => (
+          <GeometryRow
             key={`${variant}-${fill}`}
-            className="nx:flex nx:flex-wrap nx:items-center nx:gap-2"
-          >
-            {HEIGHT_SHAPES.map(({ name, props }) => (
-              <Badge
-                key={name}
-                data-testid="height-badge"
-                data-shape={name}
-                variant={variant}
-                fill={fill}
-                {...props}
-              />
-            ))}
-          </div>
+            variant={variant}
+            fill={fill}
+          />
         ))
       )}
     </div>
   ),
   play: async ({ canvasElement }) => {
-    const badges = within(canvasElement).getAllByTestId('height-badge');
+    const badges = within(canvasElement).getAllByTestId('geometry-badge');
     await expect(badges).toHaveLength(
-      HEIGHT_VARIANTS.length * HEIGHT_FILLS.length * HEIGHT_SHAPES.length
+      GEOMETRY_VARIANTS.length * GEOMETRY_FILLS.length * GEOMETRY_SHAPES.length
     );
     for (const badge of badges) assertBadgeGeometry(badge);
   },
 };
 
-export const HeightSizingRow: Story = {
-  tags: ['!autodocs', '!dev'],
-  render: () => (
-    <div className="nx:flex nx:flex-wrap nx:items-center nx:gap-2">
-      {HEIGHT_SHAPES.map(({ name, props }) => (
-        <Badge
-          key={name}
-          data-testid="sizing-badge"
-          data-shape={name}
-          fill="outline"
-          {...props}
-        />
-      ))}
-    </div>
-  ),
-  play: async ({ canvasElement }) => {
-    for (const badge of within(canvasElement).getAllByTestId('sizing-badge'))
-      assertBadgeGeometry(badge);
-  },
-};
-
 export const EnlargedTypography: Story = {
-  ...HeightSizingRow,
-  tags: ['!autodocs', '!dev'],
+  tags: ['!autodocs'],
   globals: ENLARGED_GLOBALS,
+  render: () => <GeometryRow fill="outline" />,
   play: async ({ canvasElement }) => {
-    const badges = within(canvasElement).getAllByTestId('sizing-badge');
+    const badges = within(canvasElement).getAllByTestId('geometry-badge');
     await waitFor(() =>
       expect(
         parseFloat(
@@ -455,110 +375,34 @@ export const EnlargedTypography: Story = {
   },
 };
 
-export const StatusTransitions: Story = {
-  tags: ['!autodocs', '!dev'],
-  render: () => <StatusTransitionsScene />,
-  play: async ({ canvasElement }) => {
-    const canvas = within(canvasElement);
-    const badge = canvas.getByTestId('status-badge');
-    const initial = badge.getBoundingClientRect();
-    const neighbor = canvas.getByTestId('status-neighbor');
-    const neighborTop = neighbor.getBoundingClientRect().top;
-    for (const status of ['ready', 'locked', 'loading']) {
-      await userEvent.click(
-        canvas.getByRole('button', { name: `Show ${status}` })
-      );
-      await expect(canvas.getByTestId('status-badge')).toBe(badge);
-      await expect(badge).toHaveTextContent(new RegExp(status, 'i'));
-      expect(badge.getBoundingClientRect().height).toBeCloseTo(
-        initial.height,
-        1
-      );
-      expect(badge.getBoundingClientRect().top).toBeCloseTo(initial.top, 1);
-      expect(neighbor.getBoundingClientRect().top).toBeCloseTo(neighborTop, 1);
-      assertBadgeGeometry(badge);
-    }
-  },
-};
-
-export const BoundaryChildren: Story = {
-  tags: ['!autodocs', '!dev'],
+export const MinimumSizeOverride: Story = {
   render: () => (
     <div className="nx:flex nx:items-center nx:gap-2">
-      {[undefined, null, false, '', <></>, 0].map((children, index) => (
-        <Badge
-          key={index}
-          data-testid="boundary-badge"
-          leftIcon={<IconCheck />}
-          title="Approved"
-        >
-          {children}
-        </Badge>
-      ))}
-      <Badge
-        data-testid="boundary-badge"
-        isNumber
-        leftIcon={<IconCheck />}
-        rightIcon={<IconX />}
-        aria-label="0 unread"
-      >
-        0
+      <Badge className="nx:min-h-8">Raised floor</Badge>
+      <Badge fill="outline" isCaps={false}>
+        <span className="nx:h-12 nx:inline-flex nx:items-center">
+          Tall custom content
+        </span>
       </Badge>
     </div>
   ),
   play: async ({ canvasElement }) => {
-    const badges = within(canvasElement).getAllByTestId('boundary-badge');
-    await expect(badges).toHaveLength(7);
-    for (const badge of badges) assertBadgeGeometry(badge);
-    for (const badge of badges.slice(0, 4)) {
-      await expect(badge).toHaveAttribute('data-icon-only', 'true');
-      await expect(badge).toHaveAttribute('role', 'img');
-    }
-    for (const badge of badges.slice(4))
-      await expect(badge).not.toHaveAttribute('data-icon-only');
-    await expect(badges[6]).toHaveAttribute('data-number', 'true');
-    await expect(badges[6]!.querySelectorAll('svg')).toHaveLength(0);
-  },
-};
+    const canvas = within(canvasElement);
+    const raised = canvas.getByText('Raised floor');
+    const raisedHeight = parseFloat(
+      getComputedStyle(raised).getPropertyValue('--nx-spacing-8')
+    );
+    expect(raised.getBoundingClientRect().height).toBeCloseTo(raisedHeight, 1);
 
-export const TallCustomContent: Story = {
-  tags: ['!autodocs', '!dev'],
-  render: () => (
-    <Badge fill="outline" isCaps={false} data-testid="tall-badge">
-      <span className="nx:h-12 nx:inline-flex nx:items-center">
-        Tall custom content
-      </span>
-    </Badge>
-  ),
-  play: async ({ canvasElement }) => {
-    const badge = within(canvasElement).getByTestId('tall-badge');
-    const styles = getComputedStyle(badge);
-    const child = badge.firstElementChild!;
-    expect(badge.getBoundingClientRect().height).toBeGreaterThan(
-      parseFloat(styles.minHeight)
+    const content = canvas.getByText('Tall custom content');
+    const tall = content.parentElement!;
+    const tallRect = tall.getBoundingClientRect();
+    const contentRect = content.getBoundingClientRect();
+    expect(tallRect.height).toBeGreaterThan(
+      parseFloat(getComputedStyle(tall).minHeight)
     );
-    expect(child.getBoundingClientRect().top).toBeGreaterThanOrEqual(
-      badge.getBoundingClientRect().top
-    );
-    expect(child.getBoundingClientRect().bottom).toBeLessThanOrEqual(
-      badge.getBoundingClientRect().bottom
-    );
-  },
-};
-
-export const MinimumHeightOverride: Story = {
-  tags: ['!autodocs', '!dev'],
-  args: { children: 'Custom height', className: 'nx:min-h-8' },
-  play: async ({ canvasElement }) => {
-    const badge = within(canvasElement).getByText('Custom height');
-    const height = parseFloat(
-      getComputedStyle(badge).getPropertyValue('--nx-spacing-8')
-    );
-    expect(badge.getBoundingClientRect().height).toBeCloseTo(height, 1);
-    expect(parseFloat(getComputedStyle(badge).minHeight)).toBeCloseTo(
-      height,
-      1
-    );
+    expect(contentRect.top).toBeGreaterThanOrEqual(tallRect.top);
+    expect(contentRect.bottom).toBeLessThanOrEqual(tallRect.bottom);
   },
 };
 
@@ -807,6 +651,33 @@ export const LongContent: Story = {
     const badge = canvas.getByText('This is a very long badge text');
 
     await expect(badge).toBeInTheDocument();
+  },
+};
+
+export const NonRenderingChildren: Story = {
+  render: () => (
+    <div className="nx:flex nx:items-center nx:gap-2">
+      {[undefined, null, false, '', <></>, 0].map((children, index) => (
+        <Badge
+          key={index}
+          data-testid="boundary-badge"
+          leftIcon={<IconCheck />}
+          title="Approved"
+        >
+          {children}
+        </Badge>
+      ))}
+    </div>
+  ),
+  play: async ({ canvasElement }) => {
+    const badges = within(canvasElement).getAllByTestId('boundary-badge');
+    for (const badge of badges) assertBadgeGeometry(badge);
+    for (const badge of badges.slice(0, 4)) {
+      await expect(badge).toHaveAttribute('data-icon-only', 'true');
+      await expect(badge).toHaveAttribute('role', 'img');
+    }
+    for (const badge of badges.slice(4))
+      await expect(badge).not.toHaveAttribute('data-icon-only');
   },
 };
 

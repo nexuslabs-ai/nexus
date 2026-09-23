@@ -4,11 +4,13 @@ import { cva, type VariantProps } from 'class-variance-authority';
 
 import { cn } from '../../lib/utils';
 
-const badgeMinSize =
-  'nx:[--badge-min-size:max(var(--nx-spacing-6),calc(var(--nx-typography-line-height-sm)_+_2_*_var(--nx-borderwidth-default)))]';
+const badgeMinHeight =
+  'nx:min-h-[max(var(--nx-spacing-6),calc(var(--nx-typography-line-height-sm)_+_2_*_var(--nx-borderwidth-default)))]';
+const badgeMinWidth =
+  'nx:min-w-[max(var(--nx-spacing-6),calc(var(--nx-typography-line-height-sm)_+_2_*_var(--nx-borderwidth-default)))]';
 
 const badgeVariants = cva(
-  `nx:inline-flex nx:box-border ${badgeMinSize} nx:min-h-(--badge-min-size) nx:py-0 nx:items-center nx:justify-center nx:gap-1 nx:rounded-md nx:whitespace-nowrap nx:transition-colors nx:w-fit`,
+  `nx:inline-flex nx:box-border ${badgeMinHeight} nx:py-0 nx:items-center nx:justify-center nx:gap-1 nx:rounded-md nx:whitespace-nowrap nx:transition-colors nx:w-fit`,
   {
     variants: {
       variant: {
@@ -144,8 +146,8 @@ function badgeShapeClasses(
   isCaps: boolean
 ) {
   if (isNumber)
-    return 'nx:min-w-(--badge-min-size) nx:rounded-full nx:px-1.5 nx:typography-label-caps nx:tabular-nums';
-  if (isIconOnly) return 'nx:min-w-(--badge-min-size) nx:p-0';
+    return `${badgeMinWidth} nx:rounded-full nx:px-1.5 nx:typography-label-caps nx:tabular-nums`;
+  if (isIconOnly) return `${badgeMinWidth} nx:p-0`;
   if (isCaps) return 'nx:typography-label-caps nx:uppercase nx:px-2';
   return 'nx:typography-label-default nx:px-2.5';
 }
@@ -212,8 +214,8 @@ interface BadgeProps
  * in `aria-live="polite"`.
  *
  * Every shape shares one minimum size, applied to the block axis and — for the
- * number and icon-only shapes — the inline axis too. For an arbitrary minimum,
- * override `--badge-min-size` via `className`. Centering is flex-derived, so a
+ * number and icon-only shapes — the inline axis too. Override it with a plain
+ * `nx:min-h-*` / `nx:min-w-*` in `className`. Centering is flex-derived, so a
  * consumer that overrides `display` loses it.
  */
 function Badge({

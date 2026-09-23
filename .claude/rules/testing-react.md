@@ -88,23 +88,6 @@ export const Interactive: Story = {
 
 ★ The canonical showcase name is `AllVariants`; per-component exceptions (e.g. Avatar uses `AllSizes`) are noted in the component's stories. The matrix is canonical by story **purpose**, not by literal name — a component whose idiom reads better as `OpenCloseInteraction` or `ExpandInteraction` satisfies the click-interaction row, and a pattern with nothing to disable (a modal frame) has no Disabled row to fill.
 
-### Guard Fixtures
-
-A **guard fixture** is a story whose only job is to fail when a contract regresses — a geometry sweep across every variant/shape combination, a boundary-input matrix, a scaled-appearance measurement. It documents nothing a reader of the docs page wants, and a large one distorts the page it lands on.
-
-Tag guard fixtures `['!autodocs', '!dev']`:
-
-| Tag         | Effect                                                                 |
-| ----------- | ---------------------------------------------------------------------- |
-| `!autodocs` | Drops it from the docs page, which `preview.tsx` opts every story into |
-| `!dev`      | Drops it from the sidebar                                              |
-
-Stories keep the implicit `test` tag either way, and the vitest addon filters on `include: ['test']` — so a tagged fixture still runs. Verify that when adding one: the suite count must not fall.
-
-A guard fixture is not a substitute for the stories in the matrix above. Every state a reader needs to _see_ stays an ordinary, visible story; only the machine-facing sweep is hidden. Live consumer: `Badge.stories.tsx`.
-
-When the spread form is used to share a render between fixtures, declare `tags` **after** the spread — the static CSF indexer reads the literal, so a `tags` above the spread and a different `tags` inside it disagree between index and runtime.
-
 ## Play Function Patterns
 
 ### Click Testing
