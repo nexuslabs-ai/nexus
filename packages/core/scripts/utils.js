@@ -1840,46 +1840,13 @@ export function generateThemeCSS(config) {
 
 /**
  * Theme the browser-painted UI Nexus cannot style through utilities: the
- * color-scheme declaration and the autofill surface.
- *
- * Browsers paint autofilled fields with `!important` background and text
- * colours that author `bg-*` / `text-*` classes cannot override. A field pairs
- * each of those classes with an `autofill-*` utility of the same token
- * (`nx:bg-container nx:autofill-bg-container`), which repaints the surface as
- * an inset fill shadow and the text through `-webkit-text-fill-color`. The
- * shadow stops at the padding edge, so the browser surface is clipped there too
- * or it shows through a translucent border.
- * `autofill-bg-transparent` clips the browser surface away instead, for
- * controls whose parent owns the surface.
+ * color-scheme declaration.
  *
  * @returns {string} CSS native browser UI rules
  */
 export function generateNativeBrowserUIThemeCSS() {
   return `
 /* ===== NATIVE BROWSER UI THEME ===== */
-@utility autofill-bg-* {
-  &:autofill {
-    background-clip: padding-box;
-    box-shadow: inset 0 0 0 1000px --value(--color-*);
-  }
-}
-
-@utility autofill-bg-transparent {
-  &:autofill {
-    -webkit-background-clip: text;
-    background-clip: text;
-    box-shadow: none;
-  }
-}
-
-@utility autofill-text-* {
-  &:autofill {
-    color: --value(--color-*);
-    -webkit-text-fill-color: --value(--color-*);
-    caret-color: --value(--color-*);
-  }
-}
-
 @layer base {
   :root {
     color-scheme: light dark;
@@ -1891,6 +1858,54 @@ export function generateNativeBrowserUIThemeCSS() {
 
   .dark {
     color-scheme: dark;
+  }
+}
+`;
+}
+
+/**
+ * Autofill utilities. Browsers paint autofilled fields with `!important`
+ * background and text colours that author `bg-*` / `text-*` classes cannot
+ * override. A field pairs each of those classes with an `autofill-*` utility of
+ * the same token (`nx:bg-container nx:autofill-bg-container`), which repaints
+ * the surface as an inset fill shadow and the text through
+ * `-webkit-text-fill-color`. The fill sits in front of Tailwind's shadow stack,
+ * so `shadow-*` / `ring-*` on the field survive autofill. The shadow stops at
+ * the padding edge, so the browser surface is clipped there too or it shows
+ * through a translucent border.
+ * `autofill-bg-transparent` clips the browser surface away instead, for
+ * controls whose parent owns the surface.
+ *
+ * @returns {string} CSS @utility declarations
+ */
+export function generateAutofillUtilitiesCSS() {
+  return `
+/* ===== AUTOFILL UTILITIES ===== */
+@utility autofill-bg-* {
+  &:autofill {
+    background-clip: padding-box;
+    box-shadow:
+      inset 0 0 0 1000px --value(--color-*),
+      var(--tw-inset-shadow, 0 0 #0000),
+      var(--tw-inset-ring-shadow, 0 0 #0000),
+      var(--tw-ring-offset-shadow, 0 0 #0000),
+      var(--tw-ring-shadow, 0 0 #0000),
+      var(--tw-shadow, 0 0 #0000);
+  }
+}
+
+@utility autofill-bg-transparent {
+  &:autofill {
+    -webkit-background-clip: text;
+    background-clip: text;
+  }
+}
+
+@utility autofill-text-* {
+  &:autofill {
+    color: --value(--color-*);
+    -webkit-text-fill-color: --value(--color-*);
+    caret-color: --value(--color-*);
   }
 }
 `;
@@ -1909,15 +1924,15 @@ export function generateSurfaceUtilitiesCSS() {
   return `
 /* ===== SURFACE UTILITIES ===== */
 @utility surface-* {
-  --surface: --value(--color-*);
+  --nx-surface: --value(--color-*);
 }
 
 @utility ring-surface {
-  --tw-ring-color: var(--surface, --theme(--color-background));
+  --tw-ring-color: var(--nx-surface, --theme(--color-background));
 }
 
 @utility ring-offset-surface {
-  --tw-ring-offset-color: var(--surface, --theme(--color-background));
+  --tw-ring-offset-color: var(--nx-surface, --theme(--color-background));
 }
 `;
 }

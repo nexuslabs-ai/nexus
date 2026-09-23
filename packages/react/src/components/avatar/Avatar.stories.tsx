@@ -586,10 +586,11 @@ export const OnContainerSurface: Story = {
     docs: {
       description: {
         story:
-          'Avatars on a `container` surface (e.g. a card). The card declares its surface with `surface-container`, so the separator and status rings match it instead of leaving a `background`-coloured halo.',
+          'Avatars on a `container` surface (e.g. a card), in dark mode where `container` and `background` differ. The card declares its surface with `surface-container`, so the separator and status rings match it instead of leaving a `background`-coloured halo.',
       },
     },
   },
+  globals: { mode: 'dark' },
   render: (_args) => (
     <div
       data-testid="card"
@@ -609,12 +610,15 @@ export const OnContainerSurface: Story = {
   play: async ({ canvasElement }) => {
     const canvas = within(canvasElement);
     const card = canvas.getByTestId('card');
-    const surface = window.getComputedStyle(card).getPropertyValue('--surface');
 
-    // Light `container` and `background` can share a value, so check the rings
-    // read the declared surface rather than comparing colours alone.
-    await expect(surface).not.toBe('');
-    await expect(surface).toBe(window.getComputedStyle(card).backgroundColor);
+    await waitFor(() => expect(document.documentElement).toHaveClass('dark'));
+    const surface = window.getComputedStyle(card).backgroundColor;
+    await expect(surface).not.toBe(
+      window
+        .getComputedStyle(document.documentElement)
+        .getPropertyValue('--color-background')
+        .trim()
+    );
 
     const rings = card.querySelectorAll<HTMLElement>(
       '[data-slot="avatar"], [data-slot="avatar-status"]'

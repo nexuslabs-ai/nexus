@@ -2063,29 +2063,6 @@
 }
 
 /* ===== NATIVE BROWSER UI THEME ===== */
-@utility autofill-bg-* {
-  &:autofill {
-    background-clip: padding-box;
-    box-shadow: inset 0 0 0 1000px --value(--color-*);
-  }
-}
-
-@utility autofill-bg-transparent {
-  &:autofill {
-    -webkit-background-clip: text;
-    background-clip: text;
-    box-shadow: none;
-  }
-}
-
-@utility autofill-text-* {
-  &:autofill {
-    color: --value(--color-*);
-    -webkit-text-fill-color: --value(--color-*);
-    caret-color: --value(--color-*);
-  }
-}
-
 @layer base {
   :root {
     color-scheme: light dark;
@@ -2100,17 +2077,46 @@
   }
 }
 
+/* ===== AUTOFILL UTILITIES ===== */
+@utility autofill-bg-* {
+  &:autofill {
+    background-clip: padding-box;
+    box-shadow:
+      inset 0 0 0 1000px --value(--color-*),
+      var(--tw-inset-shadow, 0 0 #0000),
+      var(--tw-inset-ring-shadow, 0 0 #0000),
+      var(--tw-ring-offset-shadow, 0 0 #0000),
+      var(--tw-ring-shadow, 0 0 #0000),
+      var(--tw-shadow, 0 0 #0000);
+  }
+}
+
+@utility autofill-bg-transparent {
+  &:autofill {
+    -webkit-background-clip: text;
+    background-clip: text;
+  }
+}
+
+@utility autofill-text-* {
+  &:autofill {
+    color: --value(--color-*);
+    -webkit-text-fill-color: --value(--color-*);
+    caret-color: --value(--color-*);
+  }
+}
+
 /* ===== SURFACE UTILITIES ===== */
 @utility surface-* {
-  --surface: --value(--color-*);
+  --nx-surface: --value(--color-*);
 }
 
 @utility ring-surface {
-  --tw-ring-color: var(--surface, --theme(--color-background));
+  --tw-ring-color: var(--nx-surface, --theme(--color-background));
 }
 
 @utility ring-offset-surface {
-  --tw-ring-offset-color: var(--surface, --theme(--color-background));
+  --tw-ring-offset-color: var(--nx-surface, --theme(--color-background));
 }
 
 /* ===== BASE LAYER ===== */

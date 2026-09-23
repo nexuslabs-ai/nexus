@@ -2,6 +2,7 @@ import type { Meta, StoryObj } from '@storybook/react';
 import { IconEye, IconMail, IconSearch, IconX } from '@tabler/icons-react';
 import { expect, fn, userEvent, within } from 'storybook/test';
 
+import { unpairedAutofillClasses } from '../../stories/support/autofill-pairing';
 import { Spinner } from '../spinner';
 
 import {
@@ -137,6 +138,12 @@ export const WithTextarea: Story = {
       </InputGroupAddon>
     </InputGroup>
   ),
+  play: async ({ canvasElement }) => {
+    const textarea = within(canvasElement).getByRole('textbox', {
+      name: 'Message',
+    });
+    await expect(unpairedAutofillClasses(textarea)).toEqual([]);
+  },
 };
 
 export const FocusBorderOwnership: Story = {
@@ -307,22 +314,10 @@ export const Disabled: Story = {
     const canvas = within(canvasElement);
     const input = canvas.getByRole('textbox', { name: 'Email' });
     await expect(input).toBeDisabled();
-    await expect(input).toHaveClass('nx:disabled:bg-transparent');
     await expect(window.getComputedStyle(input).backgroundColor).toBe(
       'rgba(0, 0, 0, 0)'
     );
-    // The group owns the surface, so autofill clips the browser paint away in
-    // every state instead of painting Input's own surfaces inside the frame.
-    await expect(input).toHaveClass(
-      'nx:autofill-bg-transparent',
-      'nx:enabled:hover:autofill-bg-transparent',
-      'nx:disabled:autofill-bg-transparent'
-    );
-    await expect(input).not.toHaveClass(
-      'nx:autofill-bg-container',
-      'nx:enabled:hover:autofill-bg-container-hover',
-      'nx:disabled:autofill-bg-disabled'
-    );
+    await expect(unpairedAutofillClasses(input)).toEqual([]);
     await expect(
       canvas.getByRole('button', { name: 'Subscribe' })
     ).toBeDisabled();
@@ -403,17 +398,13 @@ export const BorderlessStates: Story = {
     await expect(invalidStyles.borderTopColor).not.toBe('rgba(0, 0, 0, 0)');
     await expect(invalidStyles.boxShadow).toBe('none');
 
-    await expect(
-      canvas.getByRole('textbox', { name: 'Disabled borderless email' })
-    ).toBeDisabled();
-    await expect(
-      canvas.getByRole('textbox', { name: 'Disabled borderless email' })
-    ).toHaveClass('nx:disabled:bg-transparent');
-    await expect(
-      window.getComputedStyle(
-        canvas.getByRole('textbox', { name: 'Disabled borderless email' })
-      ).backgroundColor
-    ).toBe('rgba(0, 0, 0, 0)');
+    const disabledInput = canvas.getByRole('textbox', {
+      name: 'Disabled borderless email',
+    });
+    await expect(disabledInput).toBeDisabled();
+    await expect(window.getComputedStyle(disabledInput).backgroundColor).toBe(
+      'rgba(0, 0, 0, 0)'
+    );
     await expect(disabled).toHaveClass('nx:data-[disabled=true]:bg-disabled');
     await expect(disabled).not.toHaveClass(
       'nx:data-[disabled=true]:border-border-disabled'

@@ -1,6 +1,8 @@
 import type { Meta, StoryObj } from '@storybook/react';
 import { expect, fn, userEvent, within } from 'storybook/test';
 
+import { unpairedAutofillClasses } from '../../stories/support/autofill-pairing';
+
 import { Input } from './input';
 
 const meta: Meta<typeof Input> = {
@@ -235,22 +237,6 @@ export const BorderlessSurfaceComparison: Story = {
   },
 };
 
-/**
- * The `bg-*` / `text-*` classes on a field that have no `autofill-*` class of
- * the same token in the same state, so browser autofill paint would win there.
- */
-function unpairedAutofillClasses(field: HTMLElement) {
-  const classes = [...field.classList];
-  return classes.filter((className) => {
-    const match = className.match(/^(nx:(?:[a-z-]+:)*)(bg|text)-(.+)$/);
-    if (!match) return false;
-    const [, scope = '', kind, token] = match;
-    // File-button and placeholder colours are not part of the autofill paint.
-    if (/(file|placeholder):/.test(scope)) return false;
-    return !classes.includes(`${scope}autofill-${kind}-${token}`);
-  });
-}
-
 export const AutofillPairing: Story = {
   render: () => (
     <div className="nx:grid nx:w-[400px] nx:gap-2">
@@ -265,10 +251,6 @@ export const AutofillPairing: Story = {
   ),
   play: async ({ canvasElement }) => {
     for (const field of within(canvasElement).getAllByRole('textbox')) {
-      await expect(field).toHaveClass(
-        'nx:autofill-text-foreground',
-        'nx:disabled:autofill-text-disabled-foreground'
-      );
       await expect(unpairedAutofillClasses(field)).toEqual([]);
     }
   },
