@@ -131,7 +131,7 @@ jobs:
           cp -r apps/docs/generated/props "$RUNNER_TEMP/props-cached"
           pnpm --filter @nexus_ds/docs generate:props
           if ! diff -r "$RUNNER_TEMP/props-cached" apps/docs/generated/props; then
-            echo "::error::The props JSON differs from its turbo-cached copy; generate:props in apps/docs/turbo.json is missing an input the generator reads."
+            echo "::error::The props JSON differs from the build step's copy: either generate:props in apps/docs/turbo.json is missing an input the generator reads, or the generator's output is nondeterministic."
             exit 1
           fi
 
