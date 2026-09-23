@@ -2,7 +2,7 @@ import { useState } from 'react';
 
 import type { Meta, StoryObj } from '@storybook/react';
 import { IconBold, IconItalic } from '@tabler/icons-react';
-import { expect, fn, userEvent, within } from 'storybook/test';
+import { expect, fn, userEvent, waitFor, within } from 'storybook/test';
 
 import { Toggle, type ToggleProps } from './toggle';
 
@@ -228,6 +228,15 @@ function tokenColor(element: Element, name: string) {
     .trim();
 }
 
+function outlinePrimaryBorder(toggle: HTMLElement) {
+  if (toggle.hasAttribute('disabled')) return 'border-disabled';
+  const pressed = toggle.getAttribute('aria-pressed') === 'true';
+  if (toggle.getAttribute('aria-invalid') === 'true') {
+    return pressed ? 'border-error-active' : 'border-error';
+  }
+  return pressed ? 'border-primary-active' : 'border-default';
+}
+
 export const StateMatrix: Story = {
   render: () => (
     <div className="nx:flex nx:flex-col nx:gap-4">
@@ -280,45 +289,10 @@ export const StateMatrix: Story = {
       await expect(toggle).toHaveAccessibleName();
       if (invalid) await expect(toggle).toHaveAccessibleDescription();
       if (toggle.dataset.variant === 'outline-primary') {
-        const edge = getComputedStyle(toggle, '::before');
         await expect(style.backgroundColor).toBe('rgba(0, 0, 0, 0)');
-        await expect(style.borderTopWidth).toBe('0px');
-        await expect(edge.pointerEvents).toBe('none');
-        if (disabled) {
-          // The value catches a selected/invalid rule leaking past its
-          // not-disabled: gate; the class catches the disabled rule going away.
-          await expect(
-            edge.getPropertyValue('--tw-inset-ring-color').trim()
-          ).toBe(tokenColor(toggle, 'border-disabled'));
-          await expect(toggle).toHaveClass(
-            'nx:disabled:before:inset-ring-border-disabled'
-          );
-        } else {
-          await expect(
-            edge.getPropertyValue('--tw-inset-ring-color').trim()
-          ).toBe(
-            tokenColor(
-              toggle,
-              invalid
-                ? 'border-error'
-                : pressed
-                  ? 'border-primary-active'
-                  : 'border-default'
-            )
-          );
-        }
-        if (pressed && !disabled) {
-          await expect(edge.getPropertyValue('--tw-ring-color').trim()).toBe(
-            tokenColor(
-              toggle,
-              invalid ? 'border-error-active' : 'border-primary-active'
-            )
-          );
-        } else {
-          await expect(edge.getPropertyValue('--tw-ring-shadow').trim()).toBe(
-            '0 0 #0000'
-          );
-        }
+        await expect(style.borderTopColor).toBe(
+          tokenColor(toggle, outlinePrimaryBorder(toggle))
+        );
       } else if (pressed && disabled) {
         await expect(style.backgroundColor).toBe(
           tokenColor(toggle, 'disabled')
@@ -344,25 +318,24 @@ export const OutlinePrimary: Story = {
   play: async ({ canvasElement, args }) => {
     const toggle = within(canvasElement).getByRole('button', { name: 'Bold' });
     const initial = toggle.getBoundingClientRect();
-    await userEvent.hover(toggle);
     await userEvent.click(toggle);
     await expect(args.onPressedChange).toHaveBeenCalledWith(true);
-    await expect(toggle).toHaveAttribute('aria-pressed', 'true');
+    await expect(toggle).toHaveAttribute('data-state', 'on');
     await expect(getComputedStyle(toggle).backgroundColor).toBe(
       'rgba(0, 0, 0, 0)'
     );
-    await expect(
-      getComputedStyle(toggle, '::before')
-        .getPropertyValue('--tw-inset-ring-color')
-        .trim()
-    ).toBe(tokenColor(toggle, 'border-primary-active'));
-    await userEvent.unhover(toggle);
+    // border-color eases through transition-control; wait for it to settle.
+    await waitFor(() =>
+      expect(getComputedStyle(toggle).borderTopColor).toBe(
+        tokenColor(toggle, 'border-primary-active')
+      )
+    );
     await userEvent.tab({ shift: true });
     await userEvent.tab();
     await expect(toggle).toHaveFocus();
-    await expect(getComputedStyle(toggle).boxShadow).toContain('2px');
-    await expect(getComputedStyle(toggle, '::before').boxShadow).not.toBe(
-      'none'
+    await expect(getComputedStyle(toggle).outlineWidth).toBe('2px');
+    await expect(getComputedStyle(toggle).outlineColor).toBe(
+      tokenColor(toggle, 'focus-default')
     );
     await userEvent.keyboard(' ');
     await expect(toggle).toHaveAttribute('aria-pressed', 'false');
@@ -392,17 +365,17 @@ export const InvalidOutlinePrimary: Story = {
     </div>
   ),
   play: async ({ canvasElement }) => {
-    for (const toggle of within(canvasElement).getAllByRole('button')) {
-      await userEvent.hover(toggle);
-      await expect(
-        getComputedStyle(toggle, '::before')
-          .getPropertyValue('--tw-inset-ring-color')
-          .trim()
-      ).toBe(tokenColor(toggle, 'border-error'));
-      await userEvent.unhover(toggle);
+    const [resting, selected] = within(canvasElement).getAllByRole('button');
+    await expect(getComputedStyle(resting).borderTopColor).toBe(
+      tokenColor(resting, 'border-error')
+    );
+    await expect(getComputedStyle(selected).borderTopColor).toBe(
+      tokenColor(selected, 'border-error-active')
+    );
+    for (const toggle of [resting, selected]) {
       await userEvent.tab();
       await expect(toggle).toHaveFocus();
-      await expect(getComputedStyle(toggle).boxShadow).toContain(
+      await expect(getComputedStyle(toggle).outlineColor).toBe(
         tokenColor(toggle, 'focus-error')
       );
     }

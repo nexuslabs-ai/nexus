@@ -75,7 +75,7 @@ function ToggleGroup({
       // --spacing, so Tailwind's --spacing() function is unavailable here).
       style={spacing ? { gap: `var(--nx-spacing-${spacing})` } : undefined}
       className={cn(
-        'nx:isolate nx:flex nx:w-fit nx:items-center nx:rounded-md nx:data-[orientation=vertical]:flex-col nx:data-[orientation=vertical]:items-stretch',
+        'nx:flex nx:w-fit nx:items-center nx:rounded-md nx:data-[orientation=vertical]:flex-col nx:data-[orientation=vertical]:items-stretch',
         className
       )}
       {...props}
@@ -127,9 +127,10 @@ function ToggleGroupItem({
         toggleVariants({ variant: resolvedVariant, size: resolvedSize }),
         'nx:min-w-0 nx:shrink-0',
         'nx:data-[spacing=0]:rounded-none nx:data-[spacing=0]:data-[orientation=horizontal]:first:rounded-s-md nx:data-[spacing=0]:data-[orientation=horizontal]:last:rounded-e-md nx:data-[spacing=0]:data-[orientation=vertical]:first:rounded-t-md nx:data-[spacing=0]:data-[orientation=vertical]:last:rounded-b-md',
-        'nx:data-[spacing=0]:data-[variant=outline]:data-[orientation=horizontal]:[[data-slot=toggle-group-item][data-variant=outline]+&]:border-s-0 nx:data-[spacing=0]:data-[variant=outline]:data-[orientation=vertical]:[[data-slot=toggle-group-item][data-variant=outline]+&]:border-t-0',
-        'nx:data-[spacing=0]:data-[variant=outline-primary]:data-[orientation=horizontal]:[[data-slot=toggle-group-item][data-variant=outline-primary]+&]:-ms-(--nx-borderwidth-default) nx:data-[spacing=0]:data-[variant=outline-primary]:data-[orientation=vertical]:[[data-slot=toggle-group-item][data-variant=outline-primary]+&]:-mt-(--nx-borderwidth-default)',
-        'nx:data-[spacing=0]:relative nx:data-[spacing=0]:not-disabled:hover:not-focus-visible:z-10 nx:data-[spacing=0]:data-[state=on]:not-disabled:not-focus-visible:z-20 nx:data-[spacing=0]:aria-invalid:not-disabled:not-focus-visible:z-20 nx:data-[spacing=0]:focus-visible:z-30',
+        // A bordered item following another bordered item drops its leading
+        // border so the pair shares one edge.
+        'nx:data-[spacing=0]:data-[orientation=horizontal]:[[data-slot=toggle-group-item]:not([data-variant=default])+&]:border-s-0 nx:data-[spacing=0]:data-[orientation=vertical]:[[data-slot=toggle-group-item]:not([data-variant=default])+&]:border-t-0',
+        'nx:data-[spacing=0]:focus-visible:relative nx:data-[spacing=0]:focus-visible:z-10',
         className
       )}
       {...props}

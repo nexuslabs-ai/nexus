@@ -197,7 +197,6 @@ export const GeometryMatrix: Story = {
       const stroke = Number.parseFloat(
         getComputedStyle(group).getPropertyValue('--nx-borderwidth-default')
       );
-      await expect(getComputedStyle(group).isolation).toBe('isolate');
       for (const [index, item] of items.entries()) {
         if (index === 0) continue;
         const previous = items[index - 1];
@@ -210,37 +209,28 @@ export const GeometryMatrix: Story = {
           : rtl
             ? before.left - after.right
             : after.left - before.right;
-        const adjacentOutlinePrimary =
-          previous.dataset.variant === 'outline-primary' &&
-          item.dataset.variant === 'outline-primary';
         const expected = joined
-          ? adjacentOutlinePrimary
-            ? -stroke
-            : 0
+          ? 0
           : Number.parseFloat(getComputedStyle(group).gap);
         await expect(gap).toBeCloseTo(expected, 2);
-        // An outline item only drops its leading border against another
-        // outline item; a mixed join keeps both strokes.
-        if (item.dataset.variant === 'outline') {
-          const collapsed =
-            joined && previous.dataset.variant === 'outline' ? '0px' : null;
-          const leading = vertical
-            ? getComputedStyle(item).borderTopWidth
-            : getComputedStyle(item).borderInlineStartWidth;
-          await expect(leading).toBe(collapsed ?? `${stroke}px`);
-        }
+        if (item.dataset.variant === 'default') continue;
+        // A bordered item drops its leading border only against a bordered
+        // neighbour; next to a borderless item it keeps its own edge.
+        const collapsed = joined && previous.dataset.variant !== 'default';
+        const leading = vertical
+          ? getComputedStyle(item).borderTopWidth
+          : getComputedStyle(item).borderInlineStartWidth;
+        await expect(leading).toBe(collapsed ? '0px' : `${stroke}px`);
       }
       if (joined) {
         for (const item of items) {
           item.focus();
           await expect(item).toHaveFocus();
-          await expect(Number(getComputedStyle(item).zIndex)).toBe(30);
+          await expect(getComputedStyle(item).zIndex).toBe('10');
           for (const neighbor of items.filter(
             (candidate) => candidate !== item
           )) {
-            await expect(
-              Number.parseInt(getComputedStyle(neighbor).zIndex) || 0
-            ).toBeLessThan(30);
+            await expect(getComputedStyle(neighbor).zIndex).toBe('auto');
           }
         }
       }
@@ -410,28 +400,23 @@ export const ControlledDisabledTransition: Story = {
     const bold = canvas.getByRole('radio', { name: 'Bold' });
     const italic = canvas.getByRole('radio', { name: 'Italic' });
     const box = bold.getBoundingClientRect();
-    const enabledEdge = getComputedStyle(bold, '::before').boxShadow;
+    const token = (name: string) =>
+      getComputedStyle(bold).getPropertyValue(`--nx-color-${name}`).trim();
+    await expect(getComputedStyle(bold).borderTopColor).toBe(
+      token('border-error-active')
+    );
     await userEvent.click(
       canvas.getByRole('button', { name: 'Disable formatting' })
     );
     await expect(bold).toBeDisabled();
     await expect(italic).toBeDisabled();
     await expect(bold).toHaveAttribute('aria-checked', 'true');
-    await expect(
-      getComputedStyle(bold, '::before')
-        .getPropertyValue('--tw-inset-ring-color')
-        .trim()
-    ).toBe(
-      getComputedStyle(bold)
-        .getPropertyValue('--nx-color-border-disabled')
-        .trim()
+    // border-color eases through transition-control; wait for it to settle.
+    await waitFor(() =>
+      expect(getComputedStyle(bold).borderTopColor).toBe(
+        token('border-disabled')
+      )
     );
-    await expect(
-      getComputedStyle(bold, '::before')
-        .getPropertyValue('--tw-ring-shadow')
-        .trim()
-    ).toBe('0 0 #0000');
-    await expect(getComputedStyle(bold).zIndex).toBe('auto');
     await expect(args.onValueChange).not.toHaveBeenCalled();
     await expect([
       bold.getBoundingClientRect().width,
@@ -441,8 +426,10 @@ export const ControlledDisabledTransition: Story = {
       canvas.getByRole('button', { name: 'Enable formatting' })
     );
     await expect(bold).not.toBeDisabled();
-    await expect(getComputedStyle(bold, '::before').boxShadow).toBe(
-      enabledEdge
+    await waitFor(() =>
+      expect(getComputedStyle(bold).borderTopColor).toBe(
+        token('border-error-active')
+      )
     );
     await userEvent.click(bold);
     await expect(args.onValueChange).toHaveBeenCalledWith('');
@@ -492,11 +479,7 @@ export const InvalidOwnership: Story = {
     const canvas = within(canvasElement);
     const normal = canvas.getByRole('button', { name: 'Bold' });
     await expect(normal).not.toHaveAttribute('aria-invalid');
-    await expect(
-      getComputedStyle(normal, '::before')
-        .getPropertyValue('--tw-inset-ring-color')
-        .trim()
-    ).toBe(
+    await expect(getComputedStyle(normal).borderTopColor).toBe(
       getComputedStyle(normal)
         .getPropertyValue('--nx-color-border-default')
         .trim()
@@ -507,17 +490,11 @@ export const InvalidOwnership: Story = {
       await expect(item).toHaveAccessibleDescription(
         'Choose supported formatting.'
       );
-      await userEvent.hover(item);
-      await expect(
-        getComputedStyle(item, '::before')
-          .getPropertyValue('--tw-inset-ring-color')
-          .trim()
-      ).toBe(
+      await expect(getComputedStyle(item).borderTopColor).toBe(
         getComputedStyle(item)
-          .getPropertyValue('--nx-color-border-error')
+          .getPropertyValue('--nx-color-border-error-active')
           .trim()
       );
-      await userEvent.unhover(item);
     }
   },
 };
@@ -786,31 +763,47 @@ export const AllVariants: Story = {
   ),
 };
 
+const SIZES = ['sm', 'default', 'lg'] as const;
+
+// outline-primary shares the outline variant's box at every size — only the
+// border colour differs.
 export const OutlinePrimarySizes: Story = {
   render: () => (
     <div className="nx:flex nx:flex-col nx:gap-4">
-      {(['sm', 'default', 'lg'] as const).map((size) => (
-        <ToggleGroup
-          key={size}
-          type="multiple"
-          variant="outline-primary"
-          size={size}
-          defaultValue={['bold']}
-          aria-label={size}
-        >
-          <ToggleGroupItem value="bold">Bold</ToggleGroupItem>
-          <ToggleGroupItem value="italic">Italic</ToggleGroupItem>
-        </ToggleGroup>
-      ))}
+      {SIZES.flatMap((size) =>
+        (['outline', 'outline-primary'] as const).map((variant) => (
+          <ToggleGroup
+            key={`${variant}-${size}`}
+            type="multiple"
+            variant={variant}
+            size={size}
+            defaultValue={['bold']}
+            aria-label={`${variant} ${size}`}
+          >
+            <ToggleGroupItem value="bold">Bold</ToggleGroupItem>
+            <ToggleGroupItem value="italic">Italic</ToggleGroupItem>
+          </ToggleGroup>
+        ))
+      )}
     </div>
   ),
   play: async ({ canvasElement }) => {
-    for (const group of within(canvasElement).getAllByRole('group')) {
-      for (const item of within(group).getAllByRole('button')) {
-        await expect(item).toHaveAttribute('data-size', group.dataset.size);
+    const canvas = within(canvasElement);
+    for (const size of SIZES) {
+      const outline = canvas.getByRole('group', { name: `outline ${size}` });
+      const primary = canvas.getByRole('group', {
+        name: `outline-primary ${size}`,
+      });
+      for (const item of within(primary).getAllByRole('button')) {
+        await expect(item).toHaveAttribute('data-size', size);
         await expect(item).toHaveAttribute('data-variant', 'outline-primary');
-        await expect(getComputedStyle(item).borderTopWidth).toBe('0px');
       }
+      const outlineBox = outline.getBoundingClientRect();
+      const primaryBox = primary.getBoundingClientRect();
+      await expect([primaryBox.width, primaryBox.height]).toEqual([
+        outlineBox.width,
+        outlineBox.height,
+      ]);
     }
   },
 };

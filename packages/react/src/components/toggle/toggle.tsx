@@ -14,11 +14,9 @@ const toggleVariants = cva(
         outline:
           'nx:border-default nx:border-border-default nx:bg-transparent nx:disabled:border-border-disabled nx:aria-invalid:disabled:border-border-disabled',
         'outline-primary': [
-          'nx:relative nx:border-0 nx:bg-transparent nx:hover:bg-transparent nx:data-[state=on]:bg-transparent nx:data-[state=on]:hover:bg-transparent nx:data-[state=on]:disabled:bg-transparent',
-          'nx:before:pointer-events-none nx:before:absolute nx:before:inset-0 nx:before:rounded-[inherit] nx:before:content-[""] nx:before:inset-ring-(length:--nx-borderwidth-default) nx:before:inset-ring-border-default',
-          'nx:not-disabled:hover:before:inset-ring-border-primary nx:data-[state=on]:not-disabled:before:inset-ring-border-primary-active nx:data-[state=on]:not-disabled:before:ring-(length:--nx-borderwidth-default) nx:data-[state=on]:not-disabled:before:ring-border-primary-active',
-          'nx:aria-invalid:not-disabled:before:inset-ring-border-error nx:aria-invalid:data-[state=on]:not-disabled:before:inset-ring-border-error nx:aria-invalid:data-[state=on]:not-disabled:before:ring-border-error-active nx:disabled:before:inset-ring-border-disabled',
-          'nx:forced-colors:before:outline-1 nx:forced-colors:before:-outline-offset-1 nx:forced-colors:before:outline-[ButtonText] nx:forced-colors:data-[state=on]:before:outline-2 nx:forced-colors:data-[state=on]:before:-outline-offset-2 nx:forced-colors:data-[state=on]:not-disabled:before:outline-[Highlight] nx:forced-colors:disabled:before:outline-[GrayText]',
+          'nx:border-default nx:border-border-default nx:bg-transparent nx:hover:bg-transparent nx:data-[state=on]:bg-transparent nx:data-[state=on]:hover:bg-transparent nx:data-[state=on]:disabled:bg-transparent',
+          'nx:data-[state=off]:not-aria-invalid:hover:border-border-primary nx:not-disabled:data-[state=on]:border-border-primary-active nx:not-disabled:aria-invalid:data-[state=on]:border-border-error-active',
+          'nx:disabled:border-border-disabled nx:aria-invalid:disabled:border-border-disabled',
         ],
       },
       size: {
@@ -27,26 +25,6 @@ const toggleVariants = cva(
         lg: 'nx:px-8 nx:py-3 nx:gap-2.5 nx:typography-label-default',
       },
     },
-    compoundVariants: [
-      {
-        variant: 'outline-primary',
-        size: 'sm',
-        className:
-          'nx:px-[calc(var(--nx-spacing-3)+var(--nx-borderwidth-default))] nx:py-[calc(var(--nx-spacing-1_5)+var(--nx-borderwidth-default))]',
-      },
-      {
-        variant: 'outline-primary',
-        size: 'default',
-        className:
-          'nx:px-[calc(var(--nx-spacing-4)+var(--nx-borderwidth-default))] nx:py-[calc(var(--nx-spacing-2)+var(--nx-borderwidth-default))]',
-      },
-      {
-        variant: 'outline-primary',
-        size: 'lg',
-        className:
-          'nx:px-[calc(var(--nx-spacing-8)+var(--nx-borderwidth-default))] nx:py-[calc(var(--nx-spacing-3)+var(--nx-borderwidth-default))]',
-      },
-    ],
     defaultVariants: {
       variant: 'default',
       size: 'default',
