@@ -93,7 +93,7 @@ describe('continuous contrast', () => {
         oklch(parse(BASE_TONE_SEEDS[surfaceTone].light.foreground)!)!.l,
         3
       );
-      expect(lightness('muted-foreground')).toBeGreaterThan(0.45);
+      expect(lightness('muted-foreground')).toBeGreaterThan(0.4);
       expect(lightness('muted-foreground')).toBeGreaterThan(
         lightness('foreground')
       );

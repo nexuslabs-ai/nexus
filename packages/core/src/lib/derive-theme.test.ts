@@ -913,7 +913,7 @@ describe('text inks stay legible composited over their surface', () => {
     [string, string, keyof typeof TIER_THRESHOLDS]
   > = [
     ['--nx-color-foreground', '--nx-color-background', 'body'],
-    ['--nx-color-muted-foreground', '--nx-color-muted', 'incidental'],
+    ['--nx-color-muted-foreground', '--nx-color-muted', 'ui'],
     ['--nx-color-muted-foreground-subtle', '--nx-color-muted', 'incidental'],
   ];
 
