@@ -217,7 +217,7 @@
   );
   --color-muted-foreground: var(
     --nx-color-muted-foreground,
-    oklch(0.6081 0.003 56.043)
+    oklch(0.5238 0.003 56.043)
   );
   --color-nav-muted-foreground: var(
     --nx-color-nav-muted-foreground,
@@ -583,7 +583,7 @@
   );
   --color-muted-foreground: var(
     --nx-color-muted-foreground,
-    oklch(0.6081 0.003 56.043)
+    oklch(0.5238 0.003 56.043)
   );
   --color-nav-muted-foreground: var(
     --nx-color-nav-muted-foreground,
@@ -905,7 +905,7 @@
   --nx-color-container-foreground: oklch(0.8928 0.0013 106.424);
   --nx-color-popover-foreground: oklch(0.908 0.0013 106.424);
   --nx-color-nav-foreground: oklch(0.825 0.0013 106.424);
-  --nx-color-muted-foreground: oklch(0.7583 0.0013 106.424);
+  --nx-color-muted-foreground: oklch(0.8403 0.0013 106.424);
   --nx-color-nav-muted-foreground: oklch(0.73 0.0013 106.424);
   --nx-color-muted-foreground-subtle: oklch(0.7583 0.0013 106.424);
   --nx-color-disabled-foreground: oklch(0.73 0.0013 106.424);
