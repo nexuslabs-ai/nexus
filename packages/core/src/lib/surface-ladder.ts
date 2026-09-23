@@ -50,18 +50,9 @@ export type ShadeAnchor =
       step: number;
     };
 
-const DELTA_MIN = 0.02;
-const DELTA_MAX = 0.08;
-const CONTRAST_ANCHOR = 60;
-const lerp = (a: number, b: number, t: number) => a + (b - a) * t;
-const clampContrast = (contrast: number) =>
-  Math.max(0, Math.min(100, contrast));
-
-function surfaceDeltaAt(contrast: number): number {
-  return lerp(DELTA_MIN, DELTA_MAX, clampContrast(contrast) / 100);
-}
-
-const SURFACE_DELTA_AT_ANCHOR = surfaceDeltaAt(CONTRAST_ANCHOR);
+// OKLCH lightness per ladder step: the unit that converts a shade anchor into a
+// step count. deriveSurfaces scales the steps by its own contrast spacing.
+const STEP_L = 0.056;
 
 const LIGHT_VIRTUAL_ANCHOR_STEPS = {
   50: -0.27,
@@ -72,10 +63,10 @@ const LIGHT_VIRTUAL_ANCHOR_STEPS = {
   400: -6.07,
 } as const;
 
-const SURFACE_ANCHOR_L_AT_60: Record<number, number> = Object.fromEntries(
+const SURFACE_ANCHOR_L: Record<number, number> = Object.fromEntries(
   Object.entries(LIGHT_VIRTUAL_ANCHOR_STEPS).map(([shade, step]) => [
     Number(shade),
-    PAGE_L_LIGHT + step * SURFACE_DELTA_AT_ANCHOR,
+    PAGE_L_LIGHT + step * STEP_L,
   ])
 );
 
@@ -99,13 +90,13 @@ export function anchorToStep(
   if (typeof anchor === 'object') return anchor.step;
   if (anchor === 'base') return 0;
 
-  const shadeL = SURFACE_ANCHOR_L_AT_60[anchor];
+  const shadeL = SURFACE_ANCHOR_L[anchor];
   if (shadeL === undefined) {
     throw new Error(`surface-ladder: unknown shade anchor '${anchor}'`);
   }
 
   const anchorL = mode === 'dark' ? darkAnchorL(surfaceTone) : PAGE_L_LIGHT;
-  return Number(((shadeL - anchorL) / SURFACE_DELTA_AT_ANCHOR).toFixed(4));
+  return Number(((shadeL - anchorL) / STEP_L).toFixed(4));
 }
 
 export const LIGHT_SURFACE_LADDER = {

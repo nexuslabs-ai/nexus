@@ -2,14 +2,27 @@ import { CHART_LIGHT } from './static-ramps';
 
 export type ApcaTier = 'body' | 'ui' | 'incidental';
 
+/**
+ * How the contrast solver resolves a pair's foreground.
+ * - `text`: reading text; light mode keeps a seed that already passes.
+ * - `label`: black/white label on a family fill; the solver moves the fill.
+ * - `ink`: any other mark; the solver re-solves its lightness, keeping hue.
+ */
+export type ApcaSolveKind = 'text' | 'label' | 'ink';
+
 export interface ApcaPair {
   /** Bare semantic token name, without the --nx-color- prefix. */
   fg: string;
   /** Bare semantic token name, without the --nx-color- prefix. */
   bg: string;
   tier: ApcaTier;
+  kind: ApcaSolveKind;
   /** Opaque token or hex color underneath a translucent background. */
   backdrop?: string;
+  /** Extra Lc on top of the tier target, e.g. to stagger chart series. */
+  offset?: number;
+  /** Solve jointly with another foreground and emit one shared color. */
+  solveAs?: string;
 }
 
 const FAMILY_PAIRS = [
@@ -22,6 +35,9 @@ const FAMILY_PAIRS = [
 ] as const;
 
 const CATEGORICAL_INDICES = CHART_LIGHT.map((_, index) => index + 1);
+// Each chart series asks for this much more Lc than the previous one, so
+// categories differ in lightness as well as hue.
+const CHART_STAGGER_LC = 4.5;
 
 const FOCUS_SURFACES = [
   'background',
@@ -33,50 +49,70 @@ const FOCUS_SURFACES = [
   'nav-border',
 ] as const;
 
-const pair = (fg: string, bg: string, tier: ApcaTier): ApcaPair => ({
+const text = (fg: string, bg: string, tier: ApcaTier): ApcaPair => ({
   fg,
   bg,
   tier,
+  kind: 'text',
+});
+const label = (fg: string, bg: string, tier: ApcaTier): ApcaPair => ({
+  fg,
+  bg,
+  tier,
+  kind: 'label',
+});
+const ink = (fg: string, bg: string, tier: ApcaTier): ApcaPair => ({
+  fg,
+  bg,
+  tier,
+  kind: 'ink',
 });
 
 export const APCA_PAIRS = [
-  pair('foreground', 'background', 'body'),
-  pair('foreground', 'background-hover', 'ui'),
-  pair('foreground', 'muted', 'ui'),
-  pair('muted-foreground', 'muted', 'ui'),
-  pair('muted-foreground-subtle', 'muted', 'incidental'),
-  pair('muted-foreground', 'container', 'ui'),
-  pair('muted-foreground-subtle', 'container', 'incidental'),
-  pair('foreground', 'muted-extralight', 'ui'),
-  pair('muted-foreground', 'muted-extralight', 'ui'),
-  pair('disabled-foreground', 'disabled', 'incidental'),
-  pair('container-foreground', 'container', 'body'),
-  pair('foreground', 'container', 'body'),
-  pair('popover-foreground', 'popover', 'body'),
-  pair('popover-foreground', 'popover-hover', 'ui'),
-  pair('foreground', 'control-background', 'ui'),
-  pair('foreground', 'control-background-hover', 'ui'),
-  pair('nav-foreground', 'nav-background', 'ui'),
-  pair('nav-muted-foreground', 'nav-background', 'incidental'),
-  pair('nav-foreground', 'nav-item-hover', 'ui'),
-  pair('nav-foreground', 'nav-item-active', 'ui'),
-  pair('error-subtle-foreground', 'background', 'ui'),
-  pair('error-subtle-foreground', 'container', 'ui'),
+  text('foreground', 'background', 'body'),
+  text('foreground', 'background-hover', 'ui'),
+  text('foreground', 'muted', 'ui'),
+  text('muted-foreground', 'muted', 'ui'),
+  text('muted-foreground-subtle', 'muted', 'incidental'),
+  text('muted-foreground', 'container', 'ui'),
+  text('muted-foreground-subtle', 'container', 'incidental'),
+  text('foreground', 'muted-extralight', 'ui'),
+  text('muted-foreground', 'muted-extralight', 'ui'),
+  text('disabled-foreground', 'disabled', 'incidental'),
+  text('container-foreground', 'container', 'body'),
+  text('foreground', 'container', 'body'),
+  text('popover-foreground', 'popover', 'body'),
+  text('popover-foreground', 'popover-hover', 'ui'),
+  text('foreground', 'control-background', 'ui'),
+  text('foreground', 'control-background-hover', 'ui'),
+  text('nav-foreground', 'nav-background', 'ui'),
+  text('nav-muted-foreground', 'nav-background', 'incidental'),
+  text('nav-foreground', 'nav-item-hover', 'ui'),
+  text('nav-foreground', 'nav-item-active', 'ui'),
+  ink('error-subtle-foreground', 'background', 'ui'),
+  ink('error-subtle-foreground', 'container', 'ui'),
   ...FAMILY_PAIRS.flatMap((family) => [
-    pair(`${family}-foreground`, `${family}-background`, 'ui'),
-    pair(`${family}-foreground`, `${family}-background-hover`, 'ui'),
-    pair(`${family}-foreground`, `${family}-background-active`, 'ui'),
-    pair(`${family}-subtle-foreground`, `${family}-subtle`, 'ui'),
-    pair(`${family}-subtle-foreground`, `${family}-subtle-hover`, 'ui'),
-    pair(`${family}-subtle-foreground`, `${family}-subtle-active`, 'ui'),
+    label(`${family}-foreground`, `${family}-background`, 'ui'),
+    label(`${family}-foreground`, `${family}-background-hover`, 'ui'),
+    label(`${family}-foreground`, `${family}-background-active`, 'ui'),
+    ink(`${family}-subtle-foreground`, `${family}-subtle`, 'ui'),
+    ink(`${family}-subtle-foreground`, `${family}-subtle-hover`, 'ui'),
+    ink(`${family}-subtle-foreground`, `${family}-subtle-active`, 'ui'),
   ]),
-  ...CATEGORICAL_INDICES.flatMap((index) => [
-    pair(`chart-categorical-${index}`, 'container', 'ui'),
-    pair(`chart-categorical-${index}`, 'background', 'ui'),
-  ]),
+  ...CATEGORICAL_INDICES.flatMap((index) =>
+    ['container', 'background'].map((bg) => ({
+      ...ink(`chart-categorical-${index}`, bg, 'ui'),
+      offset: (index - 1) * CHART_STAGGER_LC,
+    }))
+  ),
+  // Focus is the primary accent (components.md § Focus States), so it shares
+  // one solved color with primary-subtle-foreground.
   ...FOCUS_SURFACES.flatMap((surface) => [
-    pair('focus-default', surface, 'incidental'),
-    pair('focus-error', surface, 'incidental'),
+    {
+      ...ink('focus-default', surface, 'incidental'),
+      solveAs: 'primary-subtle-foreground',
+    },
+    ink('focus-error', surface, 'incidental'),
   ]),
   ...[
     'background-active',
@@ -87,21 +123,21 @@ export const APCA_PAIRS = [
     'popover-active',
     'nav-background',
   ].flatMap((surface) => [
-    pair('foreground', surface, 'ui'),
-    pair('muted-foreground', surface, 'ui'),
-    pair('muted-foreground-subtle', surface, 'incidental'),
+    text('foreground', surface, 'ui'),
+    text('muted-foreground', surface, 'ui'),
+    text('muted-foreground-subtle', surface, 'incidental'),
   ]),
-  pair('muted-foreground', 'background', 'ui'),
-  pair('muted-foreground-subtle', 'background', 'incidental'),
-  pair('container-foreground', 'container-hover', 'ui'),
-  pair('container-foreground', 'container-active', 'ui'),
-  pair('popover-foreground', 'popover-active', 'ui'),
+  text('muted-foreground', 'background', 'ui'),
+  text('muted-foreground-subtle', 'background', 'incidental'),
+  text('container-foreground', 'container-hover', 'ui'),
+  text('container-foreground', 'container-active', 'ui'),
+  text('popover-foreground', 'popover-active', 'ui'),
   ...['background', 'container', 'popover'].flatMap((backdrop) => [
-    { ...pair('popover-foreground', 'popover-alpha', 'body'), backdrop },
-    { ...pair('foreground', 'background-hover-alpha', 'ui'), backdrop },
+    { ...text('popover-foreground', 'popover-alpha', 'body'), backdrop },
+    { ...text('foreground', 'background-hover-alpha', 'ui'), backdrop },
   ]),
   ...['#000000', '#ffffff'].map((backdrop) => ({
-    ...pair('popover-foreground', 'popover-alpha', 'body'),
+    ...text('popover-foreground', 'popover-alpha', 'body'),
     backdrop,
   })),
 ] as const satisfies readonly ApcaPair[];

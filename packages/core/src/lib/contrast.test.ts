@@ -10,11 +10,20 @@ import {
   sanitizeNexusAppearance,
 } from './appearance-model';
 import { contrastForPair } from './contrast';
-import { deriveTheme, type TokenMap } from './derive-theme';
+import { deriveTheme, deriveThemeMode, type TokenMap } from './derive-theme';
 import { TIER_THRESHOLDS } from './palette';
 import { SURFACE_TOKENS } from './surface-ladder';
+import { SEMANTIC_TOKEN_REGISTRY } from './token-registry';
 
+// Contrast is normalized to an integer, so these 101 stops are every input.
 const STOPS = Array.from({ length: 101 }, (_, index) => index);
+const RUNTIME_TOKENS = SEMANTIC_TOKEN_REGISTRY.map(
+  ({ name }) => `--nx-color-${name}`
+).sort();
+// Bisection quantizes each solve, so adjacent stops may dip by a fraction of an Lc.
+const MONOTONIC_TOLERANCE_LC = 0.5;
+// 5 tones × 7 brands × 101 stops of one mode's derivation.
+const SWEEP_TIMEOUT_MS = 120_000;
 const BRANDS = [
   '#000000',
   '#ffffff',
@@ -37,12 +46,16 @@ describe('continuous contrast', () => {
         for (const brandColor of BRANDS) {
           let previous: TokenMap | undefined;
           for (const contrast of STOPS) {
-            const map = colors({
-              surfaceTone,
-              brandColor,
-              [`${mode}Contrast`]: contrast,
-            })[mode];
-            expect(Object.keys(map)).toHaveLength(107);
+            const map = deriveThemeMode(
+              createNexusThemeContract({
+                ...DEFAULT_NEXUS_APPEARANCE,
+                surfaceTone,
+                brandColor,
+                [`${mode}Contrast`]: contrast,
+              }),
+              mode
+            );
+            expect(Object.keys(map).sort()).toEqual(RUNTIME_TOKENS);
             if (mode === 'light') {
               expect(map['--nx-color-background']).toBe('oklch(1 0 0)');
               expect(map['--nx-color-container']).toBe(
@@ -62,7 +75,7 @@ describe('continuous contrast', () => {
               // which background limits a shared ink, so check their floors above.
               if (previous && pair.bg === 'background' && !pair.backdrop) {
                 expect(
-                  score + 0.5,
+                  score + MONOTONIC_TOLERANCE_LC,
                   context + ' monotonic on fixed page'
                 ).toBeGreaterThanOrEqual(contrastForPair(previous, pair));
               }
@@ -74,7 +87,7 @@ describe('continuous contrast', () => {
           }
         }
     },
-    120_000
+    SWEEP_TIMEOUT_MS
   );
 
   it.each(BASE_TONE_OPTIONS.map(({ value }) => value))(

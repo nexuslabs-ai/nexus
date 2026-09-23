@@ -84,9 +84,6 @@ export const ContrastSlider: Story = {
     const slider = canvas.getByRole('slider', { name: 'Contrast' });
     await expect(canvas.getAllByRole('slider')).toHaveLength(1);
     await expect(
-      canvas.queryByRole('radio', { name: 'Increased' })
-    ).not.toBeInTheDocument();
-    await expect(
       canvas.getByText('Editing light appearance')
     ).toBeInTheDocument();
     await expect(slider).toHaveAttribute('aria-valuenow', '50');

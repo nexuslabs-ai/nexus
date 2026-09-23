@@ -340,8 +340,8 @@ describe('createNexusThemeContract', () => {
     it.each([
       [-5, 0],
       [999, 100],
-      [42.5, 42.5],
-    ])('clamps finite contrast %s to %s', (value, expected) => {
+      [42.4, 42],
+    ])('clamps and rounds finite contrast %s to %s', (value, expected) => {
       expect(clean({ lightContrast: value }).lightContrast).toBe(expected);
     });
 
@@ -349,8 +349,7 @@ describe('createNexusThemeContract', () => {
       Number.NaN,
       Infinity,
       -Infinity,
-      'standard',
-      'increased',
+      '50',
       'x',
       'toString',
       null,
@@ -360,23 +359,6 @@ describe('createNexusThemeContract', () => {
         lightContrast: 50,
         darkContrast: 82,
       });
-    });
-
-    it('drops experimental brightness and saturation fields', () => {
-      const state = clean({
-        lightBrightness: 0,
-        darkBrightness: 100,
-        lightSaturation: 0,
-        darkSaturation: 20,
-      });
-      for (const field of [
-        'lightBrightness',
-        'darkBrightness',
-        'lightSaturation',
-        'darkSaturation',
-      ]) {
-        expect(state).not.toHaveProperty(field);
-      }
     });
 
     it('does NOT migrate a pre-split scalar `contrast` key — resets to defaults', () => {

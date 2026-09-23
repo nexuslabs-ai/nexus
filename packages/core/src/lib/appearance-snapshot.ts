@@ -5,9 +5,10 @@ import {
   type NexusAppearanceState,
   sanitizeNexusAppearance,
 } from './appearance-model';
-import { deriveTheme, themeToCss } from './derive-theme';
+import { deriveThemeMode, themeToCss, type TokenMap } from './derive-theme';
+import type { Mode } from './palette';
 
-export const SNAPSHOT_VERSION = 13;
+export const SNAPSHOT_VERSION = 6;
 const SNAPSHOT_CACHE_LIMIT = 50;
 
 export const NEXUS_APPEARANCE_DATA_ATTRS = [
@@ -53,13 +54,42 @@ const isRecord = (value: unknown): value is Record<string, unknown> =>
   typeof value === 'object' && value !== null;
 
 const cachedSnapshots = new Map<string, NexusAppearanceSnapshot>();
+const cachedModes = new Map<string, TokenMap>();
 
 function cacheKeyForState(state: NexusAppearanceState): string {
   return JSON.stringify(state);
 }
 
+function remember<T>(cache: Map<string, T>, key: string, value: T): T {
+  cache.set(key, value);
+  if (cache.size > SNAPSHOT_CACHE_LIMIT) {
+    const oldestKey = cache.keys().next().value;
+    if (oldestKey !== undefined) cache.delete(oldestKey);
+  }
+  return value;
+}
+
+// Each mode is cached on only the inputs it reads, so moving one mode's
+// contrast slider (or any non-color preference) re-derives at most one mode.
+function deriveModeCached(state: NexusAppearanceState, mode: Mode): TokenMap {
+  const contract = createNexusThemeContract(state);
+  const key = JSON.stringify([
+    mode,
+    contract.surfaceTone,
+    contract[mode],
+    contract.contrast[mode],
+  ]);
+  return (
+    cachedModes.get(key) ??
+    remember(cachedModes, key, deriveThemeMode(contract, mode))
+  );
+}
+
 function deriveThemeCss(state: NexusAppearanceState): string {
-  return themeToCss(deriveTheme(createNexusThemeContract(state)));
+  return themeToCss({
+    light: deriveModeCached(state, 'light'),
+    dark: deriveModeCached(state, 'dark'),
+  });
 }
 
 function derivePrefsCss(state: NexusAppearanceState): string {
@@ -88,20 +118,15 @@ export function createNexusAppearanceSnapshotFromState(
 
   if (cachedSnapshot) return cachedSnapshot;
 
-  const snapshot = createNexusAppearanceSnapshot(
-    sanitizedState,
-    deriveThemeCss(sanitizedState),
-    derivePrefsCss(sanitizedState)
+  return remember(
+    cachedSnapshots,
+    cacheKey,
+    createNexusAppearanceSnapshot(
+      sanitizedState,
+      deriveThemeCss(sanitizedState),
+      derivePrefsCss(sanitizedState)
+    )
   );
-
-  cachedSnapshots.set(cacheKey, snapshot);
-
-  if (cachedSnapshots.size > SNAPSHOT_CACHE_LIMIT) {
-    const oldestKey = cachedSnapshots.keys().next().value;
-    if (oldestKey) cachedSnapshots.delete(oldestKey);
-  }
-
-  return snapshot;
 }
 
 export function createNexusAppearanceStateCookie(

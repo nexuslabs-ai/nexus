@@ -9,7 +9,7 @@ import {
 import { describe, expect, it } from 'vitest';
 
 import { apcaLc } from './apca';
-import { APCA_PAIRS, type ApcaPair } from './apca-pairs';
+import { APCA_PAIRS } from './apca-pairs';
 import {
   BASE_TONE_OPTIONS,
   createNexusThemeContract,
@@ -74,10 +74,6 @@ function alphaOf(color: string): number {
 
 function rgbString([r, g, b]: [number, number, number]): string {
   return `rgb(${r}, ${g}, ${b})`;
-}
-
-function apcaLcForPair(map: Record<string, string>, pair: ApcaPair): number {
-  return contrastForPair(map, pair);
 }
 
 function simulatedRgb(
@@ -252,58 +248,62 @@ describe('derivePrimary', () => {
       0
     );
   });
+});
 
-  it('picks an on-primary foreground that clears the ui tier', () => {
-    const p = derivePrimary('#339cff', 'light');
-    expect(
-      apcaLc(
-        p['--nx-color-primary-foreground']!,
-        p['--nx-color-primary-background']!
-      )
-    ).toBeGreaterThanOrEqual(TIER_THRESHOLDS.ui);
-  });
+describe('primary fills after contrast solving', () => {
+  const PRIMARY_SEEDS = ['#1b2a4a', '#0a0a0a', '#2563eb', '#339cff', '#7c3aed'];
+  const FILLS = [
+    '--nx-color-primary-background',
+    '--nx-color-primary-background-hover',
+    '--nx-color-primary-background-active',
+  ] as const;
+  const themeFor = (accent: string, contrast = 50) =>
+    deriveTheme({
+      ...CONTRACT,
+      light: { ...CONTRACT.light, accent },
+      dark: { ...CONTRACT.dark, accent },
+      contrast: { light: contrast, dark: contrast },
+    });
 
-  it('keeps the shared label legible on the hover and active fills, not only the base', () => {
-    // Honoring the seed lightness can land the fill near mid-grey, where the
-    // toward-mid hover/active nudge erodes contrast against the single shared
-    // foreground. Every state fill must clear the ui tier against that label —
-    // e.g. deep navy in dark mode lifts to a mid fill and used to drop hover
-    // (~53) and active (~46) below the 60 floor.
-    const seeds = ['#1b2a4a', '#0a0a0a', '#2563eb', '#339cff', '#7c3aed'];
-    const states = [
-      '--nx-color-primary-background',
-      '--nx-color-primary-background-hover',
-      '--nx-color-primary-background-active',
-    ] as const;
-    for (const seed of seeds) {
+  it('keeps the shared label legible on the base, hover, and active fills', () => {
+    for (const seed of PRIMARY_SEEDS) {
       for (const mode of ['light', 'dark'] as const) {
-        const p = derivePrimary(seed, mode);
-        const label = p['--nx-color-primary-foreground']!;
-        for (const state of states) {
+        const map = themeFor(seed)[mode];
+        const label = map['--nx-color-primary-foreground']!;
+        for (const fill of FILLS) {
           expect(
-            apcaLc(label, p[state]!),
-            `${seed} ${mode} ${state}`
+            apcaLc(label, map[fill]!),
+            `${seed} ${mode} ${fill}`
           ).toBeGreaterThanOrEqual(TIER_THRESHOLDS.ui);
         }
       }
     }
   });
 
+  it('leaves the brand fills unchanged as the contrast slider moves', () => {
+    for (const seed of PRIMARY_SEEDS) {
+      const low = themeFor(seed, 0);
+      const high = themeFor(seed, 100);
+      for (const mode of ['light', 'dark'] as const) {
+        for (const fill of FILLS) {
+          expect(high[mode][fill], `${seed} ${mode} ${fill}`).toBe(
+            low[mode][fill]
+          );
+        }
+      }
+    }
+  });
+
   it('keeps a black brand black in light mode and flips it to white in dark mode', () => {
-    const light = derivePrimary('#0a0a0a', 'light');
+    const { light, dark } = themeFor('#0a0a0a');
     expect(lOf(light['--nx-color-primary-background'])).toBeLessThan(0.2);
     expect(lOf(light['--nx-color-primary-background-active'])).toBeLessThan(
       lOf(light['--nx-color-primary-background'])
     );
-    expect(light['--nx-color-primary-subtle-foreground']).toBe(
-      'oklch(0.1448 0 0)'
-    );
-    expect(lOf(light['--nx-color-primary-foreground'])).toBeGreaterThan(0.9);
+    expect(light['--nx-color-primary-foreground']).toBe('oklch(1 0 0)');
 
-    const dark = derivePrimary('#000000', 'dark');
     expect(lOf(dark['--nx-color-primary-background'])).toBeCloseTo(1, 3);
-    expect(dark['--nx-color-primary-subtle-foreground']).toBe('oklch(1 0 0)');
-    expect(dark['--nx-color-primary-foreground']).toBe('oklch(0.1448 0 0)');
+    expect(dark['--nx-color-primary-foreground']).toBe('oklch(0 0 0)');
   });
 });
 
@@ -396,9 +396,8 @@ describe('deriveTheme', () => {
         '--nx-color-muted',
       ];
 
-      expect(hOf(map['--nx-color-focus-default'])).toBeCloseTo(
-        hOf(map['--nx-color-primary-subtle-foreground']),
-        0
+      expect(map['--nx-color-focus-default']).toBe(
+        map['--nx-color-primary-subtle-foreground']
       );
 
       for (const surface of surfaces) {
@@ -417,11 +416,9 @@ describe('deriveTheme', () => {
   it.each(['light', 'dark'] as const)(
     'keeps a colored brand focus ring legible on page surfaces in %s mode',
     (mode) => {
-      // The default brand is achromatic, so focus-default resolves to near-black
-      // or white and clears the page by a wide margin. A colored brand takes the
-      // general deriver path: focus-default follows primary-subtle-foreground,
-      // guaranteed only against primary-subtle — this locks that it also clears
-      // the page surfaces the ring actually paints on.
+      // focus-default is solved together with primary-subtle-foreground, so a
+      // colored brand's ring must clear both the subtle fills and the page
+      // surfaces the ring actually paints on.
       const map = deriveTheme({
         light: {
           accent: '#2563eb',
@@ -436,9 +433,8 @@ describe('deriveTheme', () => {
         contrast: { light: 50, dark: 50 },
       })[mode];
 
-      expect(hOf(map['--nx-color-focus-default'])).toBeCloseTo(
-        hOf(map['--nx-color-primary-subtle-foreground']),
-        0
+      expect(map['--nx-color-focus-default']).toBe(
+        map['--nx-color-primary-subtle-foreground']
       );
 
       for (const surface of [
@@ -571,7 +567,7 @@ describe('deriveSecondary', () => {
       for (const pair of APCA_PAIRS.filter((pair) =>
         pair.fg.startsWith('secondary-')
       )) {
-        expect(apcaLcForPair(theme[mode], pair)).toBeGreaterThanOrEqual(
+        expect(contrastForPair(theme[mode], pair)).toBeGreaterThanOrEqual(
           TIER_THRESHOLDS[pair.tier]
         );
       }
@@ -957,7 +953,7 @@ describe('legibility invariant: every APCA pair clears its floor', () => {
   it.each(
     SWEEP_SEEDS.flatMap((seed) =>
       SURFACE_TONES.flatMap((surfaceTone) =>
-        ([50, 100] as const).map((contrast) => ({
+        ([0, 50, 100] as const).map((contrast) => ({
           ...seed,
           surfaceTone,
           contrast,
@@ -978,7 +974,7 @@ describe('legibility invariant: every APCA pair clears its floor', () => {
 
       for (const pair of APCA_PAIRS) {
         expect(
-          apcaLcForPair(map, pair),
+          contrastForPair(map, pair),
           `${surfaceTone} ${mode}: ${pair.fg} on ${pair.bg}`
         ).toBeGreaterThanOrEqual(TIER_THRESHOLDS[pair.tier]);
       }
