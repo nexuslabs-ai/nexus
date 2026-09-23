@@ -635,7 +635,30 @@ export function generateTypographyUtilitiesCSS(tokensDir, primitiveMap) {
 // BORDER WIDTH UTILITIES
 // ============================================
 
-const BORDER_WIDTH_UTILITIES_PER_TOKEN = 14;
+const BORDER_WIDTH_SIDES = [
+  { suffix: '', style: 'border-style', width: 'border-width' },
+  { suffix: 'x-', style: 'border-inline-style', width: 'border-inline-width' },
+  { suffix: 'y-', style: 'border-block-style', width: 'border-block-width' },
+  { suffix: 't-', style: 'border-top-style', width: 'border-top-width' },
+  { suffix: 'r-', style: 'border-right-style', width: 'border-right-width' },
+  { suffix: 'b-', style: 'border-bottom-style', width: 'border-bottom-width' },
+  { suffix: 'l-', style: 'border-left-style', width: 'border-left-width' },
+  {
+    suffix: 's-',
+    style: 'border-inline-start-style',
+    width: 'border-inline-start-width',
+  },
+  {
+    suffix: 'e-',
+    style: 'border-inline-end-style',
+    width: 'border-inline-end-width',
+  },
+];
+
+const BORDER_WIDTH_PREFIXES = ['border-', 'border-width-'];
+
+const BORDER_WIDTH_UTILITIES_PER_TOKEN =
+  BORDER_WIDTH_SIDES.length * BORDER_WIDTH_PREFIXES.length;
 
 /**
  * Generate border width utility CSS from token array.
@@ -650,90 +673,27 @@ export function generateBorderWidthUtilitiesCSS(tokens) {
     return { css: '', count: 0 };
   }
 
+  const emitSides = (prefix) =>
+    tokens
+      .map((token) => {
+        // Extract the name part (e.g., "default" from "nx-borderwidth-default")
+        const name = token.cssName.replace('nx-borderwidth-', '');
+        const value = `var(--${token.cssName})`;
+
+        return BORDER_WIDTH_SIDES.map(
+          (side) =>
+            `@utility ${prefix}${side.suffix}${name} {\n` +
+            `  ${side.style}: var(--tw-border-style, solid);\n` +
+            `  ${side.width}: ${value};\n` +
+            `}\n\n`
+        ).join('');
+      })
+      .join('');
+
   let css = `/* Border Width Utilities */\n\n`;
-
-  for (const token of tokens) {
-    // Extract the name part (e.g., "default" from "nx-borderwidth-default")
-    const name = token.cssName.replace('nx-borderwidth-', '');
-    const value = `var(--${token.cssName})`;
-
-    css += `@utility border-${name} {\n`;
-    css += `  border-style: var(--tw-border-style, solid);\n`;
-    css += `  border-width: ${value};\n`;
-    css += `}\n\n`;
-
-    css += `@utility border-x-${name} {\n`;
-    css += `  border-inline-style: var(--tw-border-style, solid);\n`;
-    css += `  border-inline-width: ${value};\n`;
-    css += `}\n\n`;
-
-    css += `@utility border-y-${name} {\n`;
-    css += `  border-block-style: var(--tw-border-style, solid);\n`;
-    css += `  border-block-width: ${value};\n`;
-    css += `}\n\n`;
-
-    css += `@utility border-t-${name} {\n`;
-    css += `  border-top-style: var(--tw-border-style, solid);\n`;
-    css += `  border-top-width: ${value};\n`;
-    css += `}\n\n`;
-
-    css += `@utility border-r-${name} {\n`;
-    css += `  border-right-style: var(--tw-border-style, solid);\n`;
-    css += `  border-right-width: ${value};\n`;
-    css += `}\n\n`;
-
-    css += `@utility border-b-${name} {\n`;
-    css += `  border-bottom-style: var(--tw-border-style, solid);\n`;
-    css += `  border-bottom-width: ${value};\n`;
-    css += `}\n\n`;
-
-    css += `@utility border-l-${name} {\n`;
-    css += `  border-left-style: var(--tw-border-style, solid);\n`;
-    css += `  border-left-width: ${value};\n`;
-    css += `}\n\n`;
-  }
-
+  css += emitSides('border-');
   css += `/* Border Width Alias Utilities */\n\n`;
-
-  for (const token of tokens) {
-    const name = token.cssName.replace('nx-borderwidth-', '');
-    const value = `var(--${token.cssName})`;
-
-    css += `@utility border-width-${name} {\n`;
-    css += `  border-style: var(--tw-border-style, solid);\n`;
-    css += `  border-width: ${value};\n`;
-    css += `}\n\n`;
-
-    css += `@utility border-width-x-${name} {\n`;
-    css += `  border-inline-style: var(--tw-border-style, solid);\n`;
-    css += `  border-inline-width: ${value};\n`;
-    css += `}\n\n`;
-
-    css += `@utility border-width-y-${name} {\n`;
-    css += `  border-block-style: var(--tw-border-style, solid);\n`;
-    css += `  border-block-width: ${value};\n`;
-    css += `}\n\n`;
-
-    css += `@utility border-width-t-${name} {\n`;
-    css += `  border-top-style: var(--tw-border-style, solid);\n`;
-    css += `  border-top-width: ${value};\n`;
-    css += `}\n\n`;
-
-    css += `@utility border-width-r-${name} {\n`;
-    css += `  border-right-style: var(--tw-border-style, solid);\n`;
-    css += `  border-right-width: ${value};\n`;
-    css += `}\n\n`;
-
-    css += `@utility border-width-b-${name} {\n`;
-    css += `  border-bottom-style: var(--tw-border-style, solid);\n`;
-    css += `  border-bottom-width: ${value};\n`;
-    css += `}\n\n`;
-
-    css += `@utility border-width-l-${name} {\n`;
-    css += `  border-left-style: var(--tw-border-style, solid);\n`;
-    css += `  border-left-width: ${value};\n`;
-    css += `}\n\n`;
-  }
+  css += emitSides('border-width-');
 
   return { css, count: tokens.length * BORDER_WIDTH_UTILITIES_PER_TOKEN };
 }

@@ -120,6 +120,11 @@ describe('cn', () => {
       'nx:gap-layout-stack',
     ],
     ['border width', 'nx:border-thin nx:border-thick', 'nx:border-thick'],
+    [
+      'logical border width',
+      'nx:border-e-default nx:border-e-[2px]',
+      'nx:border-e-[2px]',
+    ],
     ['outline width', 'nx:outline-thin nx:outline-thick', 'nx:outline-thick'],
     [
       'border color',
