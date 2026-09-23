@@ -125,6 +125,29 @@ function assertResolvableTypes(entries, localAliases) {
   );
 }
 
+/**
+ * @typedef {object} PropEntry
+ * @property {string} name
+ * @property {string} type
+ * @property {boolean} required
+ * @property {string | null} defaultValue
+ * @property {string} description
+ * @property {string | null} example
+ */
+
+/**
+ * @typedef {object} ComponentEntry
+ * @property {string} name
+ * @property {string} description
+ * @property {string} sourcePath
+ * @property {PropEntry[]} props
+ */
+
+/** @typedef {{ slug: string; components: ComponentEntry[] }} PropsFile */
+
+/** @typedef {Record<string, string[]>} PropsIndex */
+
+/** @returns {PropEntry} */
 function toPropEntry(prop, expansions) {
   return {
     name: prop.name,
@@ -137,6 +160,7 @@ function toPropEntry(prop, expansions) {
   };
 }
 
+/** @returns {ComponentEntry} */
 function toComponentEntry(name, sourcePath, doc, expansions) {
   return {
     name,
@@ -283,6 +307,7 @@ assertResolvableTypes([...bySlug.values()].flat(), localAliases);
 mkdirSync(outputDir, { recursive: true });
 clearPreviousOutput();
 
+/** @type {PropsIndex} */
 const index = {};
 let propCount = 0;
 
