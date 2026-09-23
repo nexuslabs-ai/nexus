@@ -144,11 +144,16 @@ const stickySelectionInvoices = Array.from({ length: 3 }, (_, page) =>
   }))
 ).flat();
 
+const selectionPartSelector =
+  '[data-slot="table-selection-head"], [data-slot="table-selection-cell"]';
+
 interface SelectionTableDemoProps extends TableProps {
   rows?: typeof selectionInvoices;
   disabled?: boolean;
 }
 
+// Consumer-owned selection state: INV001 and INV003 start selected, so the
+// header checkbox opens in its mixed state.
 function SelectionTableDemo({
   rows = selectionInvoices,
   disabled = false,
@@ -159,10 +164,7 @@ function SelectionTableDemo({
       new Set(
         disabled
           ? []
-          : rows
-              .slice(0, 3)
-              .filter((_, i) => i !== 1)
-              .map((row) => row.id)
+          : rows.filter((_, i) => i === 0 || i === 2).map((row) => row.id)
       )
   );
   const allSelected = rows.length > 0 && selected.size === rows.length;
@@ -202,7 +204,7 @@ function SelectionTableDemo({
           </TableSelectionHead>
           <TableHead>Invoice</TableHead>
           <TableHead>Status</TableHead>
-          <TableHead className="nx:text-right">Amount</TableHead>
+          <TableHead className="nx:text-end">Amount</TableHead>
         </TableRow>
       </TableHeader>
       <TableBody>
@@ -226,7 +228,7 @@ function SelectionTableDemo({
               </TableSelectionCell>
               <TableRowHeader>{row.id}</TableRowHeader>
               <TableCell>{row.status}</TableCell>
-              <TableCell className="nx:text-right nx:tabular-nums">
+              <TableCell className="nx:text-end nx:tabular-nums">
                 {row.amount}
               </TableCell>
             </TableRow>
@@ -237,6 +239,8 @@ function SelectionTableDemo({
   );
 }
 
+// `selectable` on a table at least 48rem wide moves the checkboxes into a
+// leading gutter. Every checkbox is visible without hovering its row.
 export const SelectableRows: Story = {
   render: () => <SelectionTableDemo selectable />,
   play: async ({ canvasElement }) => {
@@ -246,15 +250,9 @@ export const SelectableRows: Story = {
     const header = canvas.getByRole('checkbox', { name: 'Select all rows' });
     await expect(first).toBeChecked();
     await expect(second).not.toBeChecked();
+    await expect(second).toBeVisible();
     await expect(header).toHaveAttribute('aria-checked', 'mixed');
     await expect(first.parentElement).toHaveStyle({ position: 'absolute' });
-    if (
-      matchMedia(
-        '(hover: hover) and (pointer: fine) and (not (any-pointer: coarse))'
-      ).matches
-    ) {
-      await expect(second.parentElement).toHaveStyle({ opacity: '0' });
-    }
     await userEvent.click(second);
     await expect(second).toBeChecked();
     await expect(second.closest('tr')).toHaveAttribute(
@@ -283,24 +281,18 @@ export const SelectionKeyboardInteraction: Story = {
     );
     const header = canvas.getByRole('checkbox', { name: 'Select all rows' });
     const first = canvas.getByRole('checkbox', { name: 'Select INV001' });
+    const second = canvas.getByRole('checkbox', { name: 'Select INV002' });
     await userEvent.tab();
     await expect(container).toHaveFocus();
     await userEvent.tab();
     await expect(header).toHaveFocus();
     await userEvent.tab();
     await expect(first).toHaveFocus();
-    await expect(first.parentElement).toHaveStyle({ opacity: '1' });
-    await expect(first.parentElement).toHaveStyle({ transitionDuration: '0s' });
     await userEvent.keyboard(' ');
     await expect(first).not.toBeChecked();
     await expect(first.closest('tr')).not.toHaveAttribute('data-state');
     await userEvent.tab();
-    const second = canvas.getByRole('checkbox', { name: 'Select INV002' });
     await expect(second).toHaveFocus();
-    await expect(second.parentElement).toHaveStyle({
-      opacity: '1',
-      transitionDuration: '0s',
-    });
     await userEvent.keyboard(' ');
     await expect(second).toBeChecked();
     await userEvent.tab({ shift: true });
@@ -309,6 +301,8 @@ export const SelectionKeyboardInteraction: Story = {
   },
 };
 
+// Below 48rem the selection column stays in-flow. The checkboxes are visible
+// and selectable before any pointer has hovered a row, as on a touch screen.
 export const SelectionNarrowContainer: Story = {
   render: () => (
     <div className="nx:w-80">
@@ -316,19 +310,37 @@ export const SelectionNarrowContainer: Story = {
     </div>
   ),
   play: async ({ canvasElement }) => {
-    const control = within(canvasElement).getByRole('checkbox', {
-      name: 'Select INV002',
-    });
-    await expect(control.parentElement).toHaveStyle({
-      position: 'static',
-      opacity: '1',
-    });
+    const canvas = within(canvasElement);
+    const controls = canvas.getAllByRole('checkbox');
+    await expect(controls).toHaveLength(invoices.length + 1);
+    for (const control of controls) {
+      await expect(control).toBeVisible();
+      await expect(control.parentElement).toHaveStyle({ position: 'static' });
+    }
+    const second = canvas.getByRole('checkbox', { name: 'Select INV002' });
+    second.focus();
+    await userEvent.keyboard(' ');
+    await expect(second).toBeChecked();
+    await expect(second.closest('tr')).toHaveAttribute(
+      'data-state',
+      'selected'
+    );
   },
 };
 
-export const SelectionInlineFallback: Story = {
+// Without `selectable` the selection column is an ordinary in-flow column at
+// every width.
+export const SelectionInFlow: Story = {
   render: () => <SelectionTableDemo />,
-  play: SelectionNarrowContainer.play,
+  play: async ({ canvasElement }) => {
+    await expect(
+      canvasElement.querySelector('[data-slot="table-selection-container"]')
+    ).not.toBeInTheDocument();
+    for (const control of within(canvasElement).getAllByRole('checkbox')) {
+      await expect(control).toBeVisible();
+      await expect(control.parentElement).toHaveStyle({ position: 'static' });
+    }
+  },
 };
 
 export const SelectionDisabled: Story = {
@@ -355,6 +367,8 @@ export const SelectionEmpty: Story = {
   },
 };
 
+// Every variant × density, in both directions: the selection column collapses
+// to zero width and each checkbox sits inside the reserved gutter.
 export const SelectionLayoutMatrix: Story = {
   render: () => (
     <div className="nx:w-full nx:space-y-6">
@@ -387,17 +401,16 @@ export const SelectionLayoutMatrix: Story = {
       await expect(
         parseFloat(getComputedStyle(container).paddingInlineStart)
       ).toBeGreaterThan(0);
-      const cells = container.querySelectorAll<HTMLElement>(
-        '[data-table-selection-part]'
-      );
-      for (const cell of cells) {
+      const bounds = container.getBoundingClientRect();
+      for (const cell of container.querySelectorAll<HTMLElement>(
+        selectionPartSelector
+      )) {
         const control = cell.querySelector<HTMLElement>('[role="checkbox"]');
         if (!control) throw new Error('Selection control missing');
         await expect(control.parentElement).toHaveStyle({
           position: 'absolute',
         });
         await expect(cell.getBoundingClientRect().width).toBeLessThanOrEqual(1);
-        const bounds = container.getBoundingClientRect();
         const box = control.getBoundingClientRect();
         await expect(box.left).toBeGreaterThanOrEqual(bounds.left + 4);
         await expect(box.right).toBeLessThanOrEqual(bounds.right - 4);
@@ -425,8 +438,8 @@ export const SelectionDataAttributes: Story = {
   },
 };
 
-// The selection column separator is a logical border. A physical `border-r-0`
-// alongside it would win the cascade in LTR only, silently dropping the rule.
+// The in-flow separator and padding are logical, so they land on the same
+// edges in both directions: a rule and no padding on inline-end.
 export const SelectionGridSeparator: Story = {
   render: () => (
     <div className="nx:w-full nx:space-y-6">
@@ -439,23 +452,21 @@ export const SelectionGridSeparator: Story = {
   ),
   play: async ({ canvasElement }) => {
     const cells = canvasElement.querySelectorAll<HTMLElement>(
-      '[data-slot="table-selection-cell"], [data-slot="table-selection-head"]'
+      selectionPartSelector
     );
     await expect(cells.length).toBeGreaterThan(0);
     for (const cell of cells) {
       const style = getComputedStyle(cell);
       await expect(parseFloat(style.borderInlineEndWidth)).toBeGreaterThan(0);
-      // A physical `pr-0` beside the logical `pe-*` would zero this in LTR only.
-      await expect(parseFloat(style.paddingInlineEnd)).toBe(
-        parseFloat(style.paddingInlineStart)
-      );
+      await expect(parseFloat(style.paddingInlineStart)).toBeGreaterThan(0);
+      await expect(parseFloat(style.paddingInlineEnd)).toBe(0);
     }
   },
 };
 
-// Without `selectable` the gutter rule never matches, so container padding set
-// through containerClassName survives on both sides.
-export const SelectionFallbackKeepsContainerPadding: Story = {
+// Without `selectable` nothing reserves a gutter, so container padding set
+// through `containerClassName` survives on both sides.
+export const SelectionInFlowKeepsContainerPadding: Story = {
   render: () => <SelectionTableDemo containerClassName="nx:px-3" />,
   play: async ({ canvasElement }) => {
     const container = canvasElement.querySelector<HTMLElement>(

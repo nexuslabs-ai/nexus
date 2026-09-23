@@ -71,11 +71,10 @@ interface TableProps extends React.ComponentProps<'table'> {
    */
   striped?: boolean;
   /**
-   * Opt into the roomy selection layout for `TableSelectionHead` /
-   * `TableSelectionCell`. Wraps the table in its own query container so the
-   * selection column can be reserved as a leading gutter once the table is at
-   * least 48rem wide; below that, or without this prop, the selection column
-   * stays visible and in-flow.
+   * Move the `TableSelectionHead` / `TableSelectionCell` column into a leading
+   * gutter once the table is at least 48rem wide. Below that, or without this
+   * prop, the selection column stays an ordinary in-flow column. The checkboxes
+   * are visible in both layouts.
    *
    * The table does not own selection state — set `data-state="selected"` on each
    * selected `TableRow` yourself.
@@ -94,20 +93,11 @@ interface TableProps extends React.ComponentProps<'table'> {
    * (`"nx:max-h-96"`) or set the surface. `className` still targets the `<table>`.
    *
    * With `selectable`, the container reserves the selection gutter as
-   * inline-start padding. That reservation overrides inline-start padding set
-   * here; only the inline-end side is yours.
+   * inline-start padding once the gutter layout applies, overriding any
+   * inline-start padding set here.
    */
   containerClassName?: string;
 }
-
-const selectionGutter = cn(
-  'nx:@min-[48rem]/table-selection:has-[>table>*>tr>[data-table-selection-part]]:[--table-selection-gutter:max(var(--nx-spacing-6),calc(var(--nx-spacing-4)+var(--focus-offset,2px)+var(--focus-offset,2px)+4px))]',
-  'nx:@min-[48rem]/table-selection:has-[>table>*>tr>[data-table-selection-part]]:[--table-selection-position:absolute]',
-  'nx:@min-[48rem]/table-selection:has-[>table>*>tr>[data-table-selection-part]]:any-pointer-coarse:[--table-selection-gutter:max(var(--nx-spacing-11),44px)]'
-);
-
-const selectionGutterPadding =
-  'nx:@min-[48rem]/table-selection:has-[>table>*>tr>[data-table-selection-part]]:ps-(--table-selection-gutter)';
 
 /**
  * Table
@@ -117,8 +107,8 @@ const selectionGutterPadding =
  * on narrow viewports without forcing a page-level scrollbar. Compose with the
  * sub-components: `TableHeader` / `TableBody` / `TableFooter` wrap `TableRow`s,
  * which hold `TableHead` (column header) or `TableCell` (data) cells.
- * Selection helpers stay in-flow by default; pass `selectable` to reserve the
- * selection column as a leading gutter once the table is at least 48rem wide.
+ * Selection cells stay in-flow by default; pass `selectable` to move them into
+ * a leading gutter once the table is at least 48rem wide.
  *
  * @example
  * ```tsx
@@ -158,11 +148,9 @@ function Table({
       tabIndex={0}
       className={cn(
         'nx:w-full nx:overflow-x-auto nx:focus-visible:outline-2 nx:focus-visible:outline-focus-default nx:focus-visible:[outline-offset:-2px]',
-        'nx:[--table-selection-gutter:0px] nx:[--table-selection-position:static]',
-        selectionGutter,
         stickyHeader && 'nx:overflow-y-auto',
         containerClassName,
-        selectionGutterPadding
+        selectable && 'nx:@3xl/table-selection:ps-6'
       )}
     >
       <table
@@ -282,7 +270,7 @@ function TableFooter({ className, ...props }: TableFooterProps) {
 interface TableRowProps extends React.ComponentProps<'tr'> {}
 
 const tableRowVariants = cva(
-  'nx:group/table-row nx:transition-colors nx:hover:bg-background-hover nx:data-[state=selected]:bg-control-background nx:data-[state=selected]:hover:bg-control-background-hover',
+  'nx:transition-colors nx:hover:bg-background-hover nx:data-[state=selected]:bg-control-background nx:data-[state=selected]:hover:bg-control-background-hover',
   {
     variants: {
       variant: {
@@ -326,11 +314,11 @@ const tableHeadVariants = cva(
       variant: {
         default: '',
         borderless: '',
-        grid: 'nx:border-e-default nx:border-border-default-alpha nx:[&:last-child]:border-e-0',
+        grid: 'nx:border-e-default nx:border-border-default-alpha nx:last:border-e-0',
       } satisfies Record<TableVariant, string>,
       density: {
-        comfortable: 'nx:py-3 nx:[--table-selection-py:var(--nx-spacing-3)]',
-        compact: 'nx:py-2.5 nx:[--table-selection-py:var(--nx-spacing-2_5)]',
+        comfortable: 'nx:py-3',
+        compact: 'nx:py-2.5',
       } satisfies Record<TableDensity, string>,
     },
     defaultVariants: {
@@ -376,11 +364,11 @@ const tableCellVariants = cva(
       variant: {
         default: '',
         borderless: '',
-        grid: 'nx:border-e-default nx:border-border-default-alpha nx:[&:last-child]:border-e-0',
+        grid: 'nx:border-e-default nx:border-border-default-alpha nx:last:border-e-0',
       } satisfies Record<TableVariant, string>,
       density: {
-        comfortable: 'nx:py-3 nx:[--table-selection-py:var(--nx-spacing-3)]',
-        compact: 'nx:py-2 nx:[--table-selection-py:var(--nx-spacing-2)]',
+        comfortable: 'nx:py-3',
+        compact: 'nx:py-2',
       } satisfies Record<TableDensity, string>,
     },
     defaultVariants: { variant: 'default', density: 'comfortable' },
@@ -404,20 +392,13 @@ function TableCell({ className, ...props }: TableCellProps) {
 }
 
 const tableSelectionCellClassName = cn(
-  'nx:w-0',
-  'nx:px-[max(0px,calc(var(--nx-spacing-2)-var(--table-selection-gutter,0px)))]',
-  'nx:has-[[role=checkbox]]:pe-[max(0px,calc(var(--nx-spacing-2)-var(--table-selection-gutter,0px)))]',
-  'nx:py-[max(0px,calc(var(--table-selection-py,var(--nx-spacing-3))-var(--table-selection-gutter,0px)))]',
-  'nx:border-e-[max(0px,calc(var(--table-selection-column-border,0px)-var(--table-selection-gutter,0px)))]',
-  'nx:any-pointer-coarse:h-[calc(max(var(--nx-spacing-11),44px)+var(--nx-borderwidth-default))]'
+  'nx:relative nx:w-0',
+  'nx:@3xl/table-selection:p-0 nx:@3xl/table-selection:border-e-0'
 );
 
 const tableSelectionControlClassName = cn(
   'nx:inline-flex nx:items-center nx:justify-center nx:align-middle',
-  'nx:[position:var(--table-selection-position,static)] nx:inset-y-0',
-  'nx:start-[calc(0px-var(--table-selection-gutter,0px))]',
-  'nx:w-[max(var(--table-selection-gutter,0px),var(--nx-spacing-4))]',
-  'nx:any-pointer-coarse:min-w-[max(var(--nx-spacing-11),44px)]'
+  'nx:@3xl/table-selection:absolute nx:@3xl/table-selection:inset-y-0 nx:@3xl/table-selection:-start-6 nx:@3xl/table-selection:w-6'
 );
 
 /**
@@ -430,29 +411,23 @@ interface TableSelectionHeadProps extends TableHeadProps {}
 /**
  * TableSelectionHead
  *
- * A semantic header cell for a consumer-owned select-all Checkbox. Compose
- * inside the first column, paired with TableSelectionCell. Its control remains
- * visible and follows the existing stickyHeader contract.
- *
- * Pass `selectable` on the surrounding `Table` to get the reserved-gutter
- * layout; without it this stays an ordinary in-flow column.
+ * The header cell for a consumer-owned select-all Checkbox. Compose it as the
+ * first header cell, paired with `TableSelectionCell` in each body row. With
+ * `stickyHeader` it stays pinned along with the rest of the header.
  */
 function TableSelectionHead({
   className,
   children,
   ...props
 }: TableSelectionHeadProps) {
-  const { variant, stickyHeader } = useTableContext();
+  const { stickyHeader } = useTableContext();
   return (
     <TableHead
       data-slot="table-selection-head"
       {...props}
-      data-table-selection-part="head"
       className={cn(
         tableSelectionCellClassName,
-        variant === 'grid' &&
-          'nx:[--table-selection-column-border:var(--nx-borderwidth-default)]',
-        !stickyHeader && 'nx:relative',
+        stickyHeader && 'nx:sticky',
         className
       )}
     >
@@ -478,42 +453,21 @@ interface TableSelectionCellProps extends TableCellProps {}
 /**
  * TableSelectionCell
  *
- * A semantic cell for a consumer-owned row Checkbox. Set the containing row's
- * data-state="selected" from the same selection state.
- *
- * Pass `selectable` on the surrounding `Table` to get the reserved-gutter
- * layout, where idle unselected controls reveal on hover/focus and stay visible
- * for selected, touch, or hybrid input. Without it — or on an engine lacking
- * container queries or `:has()` — they remain visible and in-flow.
+ * The cell for a consumer-owned row Checkbox. Set the containing row's
+ * `data-state="selected"` from the same selection state.
  */
 function TableSelectionCell({
   className,
   children,
   ...props
 }: TableSelectionCellProps) {
-  const { variant } = useTableContext();
   return (
     <TableCell
       data-slot="table-selection-cell"
       {...props}
-      data-table-selection-part="cell"
-      className={cn(
-        tableSelectionCellClassName,
-        'nx:relative',
-        variant === 'grid' &&
-          'nx:[--table-selection-column-border:var(--nx-borderwidth-default)]',
-        className
-      )}
+      className={cn(tableSelectionCellClassName, className)}
     >
-      <div
-        className={cn(
-          tableSelectionControlClassName,
-          'nx:transition-opacity nx:motion-reduce:transition-none nx:motion-reduce:duration-0 nx:group-focus-within/table-row:transition-none nx:group-focus-within/table-row:duration-0',
-          'nx:@min-[48rem]/table-selection:[@media(hover:hover)_and_(pointer:fine)]:not-any-pointer-coarse:group-[:not(:hover):not(:focus-within):not([data-state=selected])]/table-row:not-has-[>[aria-checked=true],>[aria-checked=mixed],>input:checked,>input:indeterminate]:opacity-0'
-        )}
-      >
-        {children}
-      </div>
+      <div className={tableSelectionControlClassName}>{children}</div>
     </TableCell>
   );
 }
