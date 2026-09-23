@@ -1870,12 +1870,11 @@ export function generateNativeBrowserUIThemeCSS() {
  * the same token (`nx:bg-container nx:autofill-bg-container`), which repaints
  * the surface as an inset fill shadow and the text through
  * `-webkit-text-fill-color`. The fill is the last, bottom-most layer of
- * Tailwind's shadow stack, so `shadow-*`, `ring-*` and `inset-*` on the field
- * survive autofill. The shadow stops at
- * the padding edge, so the browser surface is clipped there too or it shows
- * through a translucent border.
- * `autofill-bg-transparent` clips the browser surface away instead, for
- * controls whose parent owns the surface.
+ * Tailwind's shadow stack, so `shadow-*`, `ring-*`, `inset-shadow-*` and
+ * `inset-ring-*` on the field survive autofill. The shadow stops at the padding
+ * edge, so the browser surface is clipped there too or it shows through a
+ * translucent border. `autofill-bg-transparent` clips the browser surface away
+ * instead, for controls whose parent owns the surface.
  *
  * @returns {string} CSS @utility declarations
  */
