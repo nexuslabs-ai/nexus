@@ -23,7 +23,7 @@ const NAV_LINKS = [
 ];
 
 const NAV_LINK_BASE =
-  'nx:px-3 nx:py-1 nx:shrink-0 nx:typography-label-default nx:rounded-sm nx:focus-visible:outline-2 nx:focus-visible:outline-focus-default nx:focus-visible:outline-offset-(--focus-offset)';
+  'nx:px-3 nx:py-1 nx:shrink-0 nx:typography-label-default nx:rounded-sm nx:focus-visible:outline-2 nx:focus-visible:outline-focus-default';
 
 const PANEL_LINK_BASE = cn(NAV_LINK_BASE, 'nx:block nx:border-l-2');
 

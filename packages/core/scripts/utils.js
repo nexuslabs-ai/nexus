@@ -283,52 +283,36 @@ export function discoverPrimitives(primitivesDir) {
 }
 
 /**
- * Discover semantic token files from the file system, partitioning
- * spacing-mode files (spacing-{mode}.json) into perModeFiles from plain
- * standalone files ({name}.json).
+ * Matches a per-mode spacing file in `semantic/`, capturing the mode name.
+ * `discoverSpacingModeFiles` reads these; `assertSemanticFilesAreClaimed`
+ * checks the same pattern to prove the collector claims them.
+ */
+export const SPACING_MODE_FILE_PATTERN = /^spacing-([a-z]+)\.json$/;
+
+/**
+ * Find the per-mode spacing files in `semantic/`. Their values are direct px
+ * (no `{N}` refs) and emit per-mode `[data-density="X"]` blocks via
+ * `collectSpacingTokens`. Every other semantic file is read by a collector
+ * that names it directly.
  *
  * @param {string} semanticDir - Path to semantic directory
- * @returns {object} { standalone: string[], perModeFiles: { category: { mode: filename } } }
+ * @returns {Record<string, string>} Mode name keyed to its `spacing-{mode}.json` filename
  */
-export function discoverSemantics(semanticDir) {
-  const result = {
-    standalone: [],
-    // Bucket for per-mode semantic categories. Keyed by category so a future
-    // per-mode category (e.g. per-mode color shading) lands as a sibling key
-    // here. Detection of new categories still requires a regex branch below —
-    // only `spacing` is wired today.
-    perModeFiles: {},
-  };
-
+export function discoverSpacingModeFiles(semanticDir) {
   if (!fs.existsSync(semanticDir)) {
-    return result;
+    return {};
   }
 
-  const files = fs.readdirSync(semanticDir).filter((f) => f.endsWith('.json'));
+  const files = {};
 
-  // Pattern for spacing-mode files: spacing-{mode}.json. Their values are
-  // direct px (no `{N}` refs) and emit per-mode `[data-density="X"]` blocks via
-  // `collectSpacingTokens` — they intentionally bypass the generic
-  // standalone-dimension scan, which would otherwise emit each file's keys
-  // into `@theme` once per mode and last-write-wins.
-  const spacingModePattern = /^spacing-([a-z]+)\.json$/;
+  for (const file of fs.readdirSync(semanticDir)) {
+    const match = file.match(SPACING_MODE_FILE_PATTERN);
+    if (!match) continue;
 
-  for (const file of files) {
-    const spacingMatch = file.match(spacingModePattern);
-    if (spacingMatch) {
-      const [, mode] = spacingMatch;
-      if (!result.perModeFiles.spacing) {
-        result.perModeFiles.spacing = {};
-      }
-      result.perModeFiles.spacing[mode] = file;
-      continue;
-    }
-
-    // Standalone file (not a spacing mode)
-    result.standalone.push(file);
+    files[match[1]] = file;
   }
 
-  return result;
+  return files;
 }
 
 /**
@@ -861,8 +845,7 @@ export const CANONICAL_SPACING_DEFAULT_MODE = 'default';
  *   reverse-engineering it from `cssName`.
  */
 export function collectSpacingTokens(semanticDir) {
-  const { perModeFiles } = discoverSemantics(semanticDir);
-  const spacingFiles = perModeFiles.spacing ?? {};
+  const spacingFiles = discoverSpacingModeFiles(semanticDir);
 
   const modeNames = Object.keys(spacingFiles);
   if (modeNames.length === 0) {
@@ -1482,11 +1465,13 @@ export function collectRadiusTokens(tokensDir, mode) {
 
 /**
  * Collect borderwidth token mappings from a mode file
- * Returns array of { cssName, varRef } for @theme block
+ * Returns array of { key, cssName, varRef } for @theme block. `key` is kept
+ * because the same value seeds two Tailwind namespaces: `--border-{key}` and
+ * `--outline-width-{key}` (see generateThemeCSS).
  *
  * @param {string} tokensDir - Path to tokens directory
  * @param {string} mode - Borderwidth mode (e.g., 'vega')
- * @returns {object[]} Array of { cssName, varRef }
+ * @returns {object[]} Array of { key, cssName, varRef }
  */
 export function collectBorderwidthTokens(tokensDir, mode) {
   const filePath = path.join(
@@ -1505,6 +1490,7 @@ export function collectBorderwidthTokens(tokensDir, mode) {
   for (const key of Object.keys(tokenData)) {
     if (key.startsWith('$')) continue;
     tokens.push({
+      key,
       cssName: `border-${key}`,
       varRef: `var(--nx-borderwidth-${key})`,
     });
@@ -1564,13 +1550,17 @@ export function collectMotionTokens(tokensDir, mode) {
 /**
  * Generate motion `@utility` declarations.
  *
- * Emits two kinds of motion utility together, since components consume them as
- * one file:
+ * Emits three kinds of motion utility together, since components consume them
+ * as one file:
  *
  * 1. Data-driven duration utilities. Tailwind v4 codegens named easing
  *    utilities from --ease-* theme vars, but not named duration utilities from
  *    --duration-* vars, so emit duration-* explicitly (e.g. nx:duration-fast).
- * 2. A static, non-token `overlay-presence-exit` keyframe + its
+ * 2. The two ring-safe colour transitions, `transition-control` and
+ *    `transition-field` — Tailwind's own `transition-colors` carries
+ *    `outline-color`, which would fade a focus ring in (see the block comment
+ *    below).
+ * 3. A static, non-token `overlay-presence-exit` keyframe + its
  *    `animate-overlay-presence-exit` utility — the Radix Presence bridge (see
  *    the block comment below). It animates an inert custom property so it fires
  *    `animationend` without overriding the transitioned opacity/scale exit.
@@ -1585,11 +1575,7 @@ export function generateMotionUtilitiesCSS(motionTokens) {
     (token) => token.group === 'duration'
   );
 
-  if (durationTokens.length === 0) {
-    return { css: '', count: 0 };
-  }
-
-  let css = `/* Motion duration utilities - data-driven from canonical motion tokens. */\n\n`;
+  let css = `/* Motion utilities - duration utilities are data-driven from canonical motion tokens; the ring-safe transitions and the presence bridge below are static. */\n\n`;
 
   for (const token of durationTokens) {
     css += `@utility duration-${token.key} {\n`;
@@ -1597,6 +1583,21 @@ export function generateMotionUtilitiesCSS(motionTokens) {
     css += `  transition-duration: ${token.varRef};\n`;
     css += `}\n\n`;
   }
+
+  // Tailwind's `transition-colors` expands to a list that includes
+  // `outline-color`, and every Nexus focus ring is a real `outline` — so an
+  // element carrying both fades its own ring in over the duration instead of
+  // landing it with the keypress.
+  css += `@utility transition-control {\n`;
+  css += `  transition-property: color, background-color, border-color;\n`;
+  css += `  transition-timing-function: var(--tw-ease, var(--default-transition-timing-function));\n`;
+  css += `  transition-duration: var(--tw-duration, var(--default-transition-duration));\n`;
+  css += `}\n\n`;
+  css += `@utility transition-field {\n`;
+  css += `  transition-property: color, background-color;\n`;
+  css += `  transition-timing-function: var(--tw-ease, var(--default-transition-timing-function));\n`;
+  css += `  transition-duration: var(--tw-duration, var(--default-transition-duration));\n`;
+  css += `}\n\n`;
 
   // Static "presence bridge" (not token-derived): a non-visual animation whose only
   // job is to fire `animationend` so Radix Presence — which waits on `animationName`,
@@ -1664,85 +1665,6 @@ export function collectShadowTokens(tokensDir, primitiveMap) {
 }
 
 /**
- * Files in `semanticFiles.standalone` that own a dedicated dimension collector.
- * Callers iterating standalone files for the generic `collectSemanticDimensionTokens`
- * scan MUST skip these to avoid duplicate emission of the same `--*` variable
- * from two different code paths.
- *
- *   breakpoints.json → collectBreakpointsTokens (literal {value, unit})
- *   z-index.json     → collectZIndexTokens  ($type: number, not dimension)
- *
- * Spacing files (`spacing-{mode}.json`) are NOT in this list — `discoverSemantics`
- * routes them into the `perModeFiles.spacing` bucket so they never enter
- * `standalone` in the first place.
- */
-export const FILES_WITH_DEDICATED_DIMENSION_COLLECTORS = new Set([
-  'breakpoints.json',
-  'z-index.json',
-]);
-
-/**
- * Collect literal-valued `$type: dimension` leaves from a token file and
- * emit them with the path as the CSS-variable name — e.g. `focus.offset` →
- * `--focus-offset`. Skips the `color-` prefix so the path drives the variable
- * name directly.
- *
- * Filter behavior:
- * - `$type: dimension` only.
- * - Reference-valued dimensions (`"$value": "{spacing.0}"`) are skipped here;
- *   they are emitted by their owning collector instead.
- * - Literal-valued dimensions in files that ALSO have a dedicated collector
- *   (breakpoints.json's `{value, unit}` literals) are NOT skipped by this
- *   function — that gating is the caller's responsibility via
- *   `FILES_WITH_DEDICATED_DIMENSION_COLLECTORS`.
- *
- * Self-namespacing: because no category prefix is added, top-level keys in the
- * input file must self-namespace their CSS variable name (e.g. `focus.offset`
- * → `--focus-offset` is fine; a bare top-level `offset`/`padding`/`gap` would
- * collide with Tailwind utility namespaces).
- *
- * @param {string} semanticDir - Path to semantic directory
- * @param {string} fileName - Semantic token file name
- * @returns {object[]} Array of { cssName, value }
- */
-export function collectSemanticDimensionTokens(semanticDir, fileName) {
-  const filePath = path.join(semanticDir, fileName);
-  if (!fs.existsSync(filePath)) {
-    throw new Error(`Semantic file missing: ${filePath}`);
-  }
-
-  const tokenData = readTokenFile(filePath);
-  const tokens = [];
-
-  function extractPaths(obj, pathParts = []) {
-    for (const [key, value] of Object.entries(obj)) {
-      if (key.startsWith('$')) continue;
-
-      const currentPath = [...pathParts, key];
-
-      if (
-        value.$value !== undefined &&
-        value.$type === 'dimension' &&
-        !isReference(value.$value)
-      ) {
-        const cssName = currentPath.join('-');
-        const resolvedValue = formatTokenValue(value.$value, 'dimension');
-        tokens.push({ cssName, value: resolvedValue });
-      } else if (typeof value === 'object' && !Array.isArray(value)) {
-        extractPaths(value, currentPath);
-      }
-    }
-  }
-
-  extractPaths(tokenData);
-  return tokens;
-}
-
-// ============================================
-// THEME CSS GENERATION
-// ============================================
-
-/**
  * Generate @theme CSS block for Tailwind
  * This is the shared function used by generate-tailwind-package.js
  *
@@ -1751,10 +1673,10 @@ export function collectSemanticDimensionTokens(semanticDir, fileName) {
  * @param {string} [config.googleFontsImport] - Google Fonts @import statement
  * @param {string[]} config.imports - CSS imports (e.g., ['tailwindcss', './variables.css'])
  * @param {string} [config.tailwindPrefix='nx'] - Tailwind prefix
- * @param {object[]} config.semanticTokens - Array of { cssName, value } for semantic colours (dimensions emit at :root via generateRootDimensionsCSS)
+ * @param {object[]} config.semanticTokens - Array of { cssName, value } for semantic colours
  * @param {object[]} config.spacingTokens - Array of { cssName, value } for numeric spacing (default baseline; per-mode overrides live outside @theme)
  * @param {object[]} config.radiusTokens - Array of { cssName, varRef } for radius
- * @param {object[]} config.borderwidthTokens - Array of { cssName, varRef } for borderwidth
+ * @param {object[]} config.borderwidthTokens - Array of { key, cssName, varRef } for borderwidth; each one emits both a --border-* and an --outline-width-* theme key
  * @param {object[]} config.motionTokens - Array of { group, key, cssName, varRef } for duration/ease
  * @param {object[]} config.shadowTokens - Array of { cssName, value } for shadows
  * @param {object[]} [config.darkSemanticTokens] - Array of { cssName, value } for dark mode semantic tokens
@@ -1826,11 +1748,19 @@ export function generateThemeCSS(config) {
     }
   }
 
-  // Borderwidth tokens
+  // Borderwidth tokens. The same values also seed Tailwind's --outline-width-*
+  // namespace: a field's focus ring is a `border-default` inner edge plus an
+  // `outline-default` outer edge, so both halves have to move together when
+  // [data-borderwidth] swaps the mode.
   if (borderwidthTokens.length > 0) {
     css += `\n  /* Border width tokens */\n`;
     for (const token of borderwidthTokens) {
       css += `  --${token.cssName}: ${token.varRef};\n`;
+    }
+
+    css += `\n  /* Outline width tokens — same values, so a focus ring can match a border */\n`;
+    for (const token of borderwidthTokens) {
+      css += `  --outline-width-${token.key}: ${token.varRef};\n`;
     }
   }
 
@@ -1906,233 +1836,6 @@ export function generateThemeCSS(config) {
   }
 
   return css;
-}
-
-/**
- * Emit fixed dimension primitives (e.g. --focus-offset) as a `:root {}` block.
- *
- * Kept out of @theme: they're consumed only via arbitrary utilities like
- * `outline-offset-(--focus-offset)`, which Tailwind doesn't track as @theme
- * usage and therefore tree-shakes from the runtime cascade (#506).
- *
- * @param {object[]} dimensionTokens - Array of { cssName, value }
- * @returns {string} CSS `:root {}` block, or '' when empty
- */
-export function generateRootDimensionsCSS(dimensionTokens = []) {
-  if (dimensionTokens.length === 0) return '';
-
-  let css = `\n/* ===== RUNTIME DIMENSION TOKENS ===== */\n`;
-  css += `:root {\n`;
-  for (const token of dimensionTokens) {
-    css += `  --${token.cssName}: ${token.value};\n`;
-  }
-  css += `}\n`;
-  return css;
-}
-
-const DEFAULT_FOCUS_RING_SELECTORS = [
-  "[class~='nx:focus-visible:outline-focus-default']:focus-visible",
-  "[class~='nx:data-[active=true]:outline-focus-default'][data-active='true']",
-  "[data-focused='true'] [class~='nx:group-data-[focused=true]/day:outline-focus-default']",
-  "[class~='nx:has-[[data-slot=input-group-control]:focus-visible]:outline-focus-default']:has([data-slot='input-group-control']:focus-visible)",
-];
-
-const ERROR_FOCUS_RING_SELECTORS = [
-  "[class~='nx:aria-invalid:focus-visible:outline-focus-error'][aria-invalid='true']:focus-visible",
-  "[class~='nx:has-[[data-slot=input-group-control][aria-invalid=true]:focus-visible]:outline-focus-error']:has([data-slot='input-group-control'][aria-invalid='true']:focus-visible)",
-];
-
-const FIELD_BOUNDARY_SELECTORS = [
-  "[data-slot='input'][data-variant='bordered']",
-  "[data-slot='sidebar-input'][data-variant='bordered']",
-  "[data-slot='textarea'][data-variant='bordered']",
-  "[data-slot='native-select'][data-variant='bordered']",
-  "[data-slot='select-trigger'][data-variant='bordered']",
-  "[data-slot='input-group'][data-variant='bordered']",
-];
-
-const FIELD_ERROR_BOUNDARY_SELECTORS = [
-  "[data-slot='input'][aria-invalid='true']",
-  "[data-slot='sidebar-input'][aria-invalid='true']",
-  "[data-slot='textarea'][aria-invalid='true']",
-  "[data-slot='native-select'][aria-invalid='true']",
-  "[data-slot='select-trigger'][aria-invalid='true']",
-  "[data-slot='input-group']:has([data-slot][aria-invalid='true'])",
-];
-
-const FIELD_DISABLED_BOUNDARY_SELECTORS = [
-  "[data-slot='input'][data-variant='bordered']:disabled",
-  "[data-slot='sidebar-input'][data-variant='bordered']:disabled",
-  "[data-slot='textarea'][data-variant='bordered']:disabled",
-  "[data-slot='native-select'][data-variant='bordered']:disabled",
-  "[data-slot='select-trigger'][data-variant='bordered']:disabled",
-  "[data-slot='input-group'][data-variant='bordered'][data-disabled='true']",
-];
-
-const OTP_SLOT_BOUNDARY_SELECTOR = "[data-slot='input-otp-slot']";
-const OTP_SLOT_GROUP_DISABLED_SELECTOR =
-  "[class~='nx:group/input-otp']:has([data-slot='input-otp']:disabled) [data-slot='input-otp-slot']";
-
-const FIELD_FOCUS_RING_SELECTORS = [
-  "[data-slot='input'][class~='nx:focus-visible:outline-focus-default']:focus-visible",
-  "[data-slot='sidebar-input'][class~='nx:focus-visible:outline-focus-default']:focus-visible",
-  "[data-slot='textarea'][class~='nx:focus-visible:outline-focus-default']:focus-visible",
-  "[data-slot='native-select'][class~='nx:focus-visible:outline-focus-default']:focus-visible",
-  "[data-slot='select-trigger'][class~='nx:focus-visible:outline-focus-default']:focus-visible",
-  "[data-slot='input-otp-slot'][class~='nx:data-[active=true]:outline-focus-default'][data-active='true']",
-  "[data-slot='input-group'][class~='nx:has-[[data-slot=input-group-control]:focus-visible]:outline-focus-default']:has([data-slot='input-group-control']:focus-visible)",
-];
-
-const FIELD_ERROR_FOCUS_RING_SELECTORS = [
-  "[data-slot='input'][class~='nx:aria-invalid:focus-visible:outline-focus-error'][aria-invalid='true']:focus-visible",
-  "[data-slot='sidebar-input'][class~='nx:aria-invalid:focus-visible:outline-focus-error'][aria-invalid='true']:focus-visible",
-  "[data-slot='textarea'][class~='nx:aria-invalid:focus-visible:outline-focus-error'][aria-invalid='true']:focus-visible",
-  "[data-slot='native-select'][class~='nx:aria-invalid:focus-visible:outline-focus-error'][aria-invalid='true']:focus-visible",
-  "[data-slot='select-trigger'][class~='nx:aria-invalid:focus-visible:outline-focus-error'][aria-invalid='true']:focus-visible",
-  "[data-slot='input-group'][class~='nx:has-[[data-slot=input-group-control][aria-invalid=true]:focus-visible]:outline-focus-error']:has([data-slot='input-group-control'][aria-invalid='true']:focus-visible)",
-];
-
-const INPUT_GROUP_CONTROL_FOCUS_SUPPRESSION_SELECTORS = [
-  "[data-slot='input-group-control'][class~='nx:focus-visible:outline-focus-default']:focus-visible",
-  "[data-slot='input-group-control'][class~='nx:aria-invalid:focus-visible:outline-focus-error'][aria-invalid='true']:focus-visible",
-];
-
-const BUTTON_FOCUS_RING_SELECTORS = [
-  "[data-slot='button'][class~='nx:focus-visible:outline-focus-default']:focus-visible",
-];
-
-const BUTTON_ERROR_FOCUS_RING_SELECTORS = [
-  "[data-slot='button'][class~='nx:aria-invalid:focus-visible:outline-focus-error'][aria-invalid='true']:focus-visible",
-];
-
-/**
- * Turn the canonical focus outline utilities into the shipped hard focus
- * treatment.
- *
- * The transparent outline paints nothing normally. Forced colors mode drops
- * the box-shadow ring and repaints that outline in a system colour, so focus
- * stays visible there without a second code path.
- *
- * @returns {string} CSS focus ring rules
- */
-export function generateFocusRingCSS() {
-  const defaultSelectors = DEFAULT_FOCUS_RING_SELECTORS.join(',\n');
-  const errorSelectors = ERROR_FOCUS_RING_SELECTORS.join(',\n');
-  const fieldBoundarySelectors = FIELD_BOUNDARY_SELECTORS.join(',\n');
-  const fieldErrorBoundarySelectors =
-    FIELD_ERROR_BOUNDARY_SELECTORS.join(',\n');
-  const fieldDisabledBoundarySelectors =
-    FIELD_DISABLED_BOUNDARY_SELECTORS.join(',\n');
-  const fieldSelectors = FIELD_FOCUS_RING_SELECTORS.join(',\n');
-  const fieldErrorSelectors = FIELD_ERROR_FOCUS_RING_SELECTORS.join(',\n');
-  const inputGroupControlSuppressionSelectors =
-    INPUT_GROUP_CONTROL_FOCUS_SUPPRESSION_SELECTORS.join(',\n');
-  const buttonSelectors = BUTTON_FOCUS_RING_SELECTORS.join(',\n');
-  const buttonErrorSelectors = BUTTON_ERROR_FOCUS_RING_SELECTORS.join(',\n');
-
-  return `
-/* ===== FOCUS RING ===== */
-${fieldBoundarySelectors} {
-  border-color: transparent !important;
-  border-width: 0;
-  box-shadow: inset 0 0 0 1px var(--color-border-default);
-}
-
-${fieldErrorBoundarySelectors} {
-  border-color: transparent !important;
-  border-width: 0;
-  box-shadow: inset 0 0 0 1px var(--color-border-error);
-}
-
-${fieldDisabledBoundarySelectors} {
-  border-color: transparent !important;
-  border-width: 0;
-  box-shadow: inset 0 0 0 1px var(--color-border-disabled);
-}
-
-${OTP_SLOT_BOUNDARY_SELECTOR} {
-  border-color: transparent !important;
-  border-width: 0;
-  box-shadow:
-    inset 0 1px 0 var(--color-border-default),
-    inset -1px 0 0 var(--color-border-default),
-    inset 0 -1px 0 var(--color-border-default);
-}
-
-${OTP_SLOT_BOUNDARY_SELECTOR}:first-child {
-  box-shadow:
-    inset 0 1px 0 var(--color-border-default),
-    inset 1px 0 0 var(--color-border-default),
-    inset -1px 0 0 var(--color-border-default),
-    inset 0 -1px 0 var(--color-border-default);
-}
-
-${OTP_SLOT_GROUP_DISABLED_SELECTOR} {
-  border-color: transparent !important;
-  border-width: 0;
-  box-shadow:
-    inset 0 1px 0 var(--color-border-disabled),
-    inset -1px 0 0 var(--color-border-disabled),
-    inset 0 -1px 0 var(--color-border-disabled);
-}
-
-${OTP_SLOT_GROUP_DISABLED_SELECTOR}:first-child {
-  box-shadow:
-    inset 0 1px 0 var(--color-border-disabled),
-    inset 1px 0 0 var(--color-border-disabled),
-    inset -1px 0 0 var(--color-border-disabled),
-    inset 0 -1px 0 var(--color-border-disabled);
-}
-
-${defaultSelectors} {
-  outline: 2px solid transparent !important;
-  box-shadow: 0 0 0 2px var(--color-focus-default);
-}
-
-${errorSelectors} {
-  outline: 2px solid transparent !important;
-  box-shadow: 0 0 0 2px var(--color-focus-error);
-}
-
-${fieldSelectors} {
-  outline: 2px solid transparent !important;
-  border-color: transparent !important;
-  border-width: 0;
-  box-shadow:
-    inset 0 0 0 1px var(--color-focus-default),
-    0 0 0 1px var(--color-focus-default);
-}
-
-${fieldErrorSelectors} {
-  outline: 2px solid transparent !important;
-  border-color: transparent !important;
-  border-width: 0;
-  box-shadow:
-    inset 0 0 0 1px var(--color-focus-error),
-    0 0 0 1px var(--color-focus-error);
-}
-
-${inputGroupControlSuppressionSelectors} {
-  --tw-outline-style: none !important;
-  outline-color: transparent !important;
-  outline-style: none !important;
-  box-shadow: none;
-}
-
-${buttonSelectors} {
-  outline: 2px solid transparent !important;
-  box-shadow:
-    0 0 0 2px var(--color-background),
-    0 0 0 4px var(--color-focus-default);
-}
-
-${buttonErrorSelectors} {
-  outline: 2px solid transparent !important;
-  box-shadow:
-    0 0 0 2px var(--color-background),
-    0 0 0 4px var(--color-focus-error);
-}
-`;
 }
 
 export function generateNativeBrowserUIThemeCSS() {

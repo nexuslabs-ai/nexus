@@ -693,8 +693,7 @@ export const CloseButtonFocus: Story = {
     await waitFor(() => expect(closeButton).toHaveFocus());
     await expect(closeButton).toHaveClass(
       'nx:focus-visible:outline-2',
-      'nx:focus-visible:outline-focus-default',
-      'nx:focus-visible:outline-offset-(--focus-offset)'
+      'nx:focus-visible:outline-focus-default'
     );
     await expect(closeButton).toHaveClass('nx:right-6', 'nx:top-6');
     await expect(closeButton).toHaveClass(

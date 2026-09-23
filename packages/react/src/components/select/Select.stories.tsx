@@ -235,8 +235,20 @@ export const BorderlessStates: Story = {
 
     await expect(invalid).toHaveAttribute('aria-invalid', 'true');
     await expect(invalid).toHaveClass('nx:aria-invalid:border-border-error');
-    await expect(window.getComputedStyle(invalid).borderTopWidth).toBe('0px');
-    await expect(window.getComputedStyle(invalid).boxShadow).not.toBe('none');
+    // The stroke is a real border now, so a borderless field keeps a
+    // transparent one and the invalid state recolours it in place.
+    const restStyles = window.getComputedStyle(empty);
+    await expect(Number.parseFloat(restStyles.borderTopWidth)).toBeGreaterThan(
+      0
+    );
+    await expect(restStyles.borderTopColor).toBe('rgba(0, 0, 0, 0)');
+
+    const invalidStyles = window.getComputedStyle(invalid);
+    await expect(
+      Number.parseFloat(invalidStyles.borderTopWidth)
+    ).toBeGreaterThan(0);
+    await expect(invalidStyles.borderTopColor).not.toBe('rgba(0, 0, 0, 0)');
+    await expect(invalidStyles.boxShadow).toBe('none');
 
     await expect(disabled).toBeDisabled();
     await expect(disabled).toHaveClass('nx:disabled:bg-disabled');
