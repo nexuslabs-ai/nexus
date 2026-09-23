@@ -81,16 +81,21 @@ await writeFile(
   createNexusAppearanceSnapshotFromCookie,
   createNexusAppearanceSnapshotFromState,
   createNexusThemeContract,
+  DARK_SURFACE_LADDER,
   DEFAULT_NEXUS_APPEARANCE,
   DEFAULT_STORAGE_KEY,
   deriveTheme,
+  LIGHT_SURFACE_LADDER,
   measureThemeContrast,
   resolveFirstPaint,
   sanitizeNexusAppearance,
+  SURFACE_TOKENS,
   themeToCss,
   type BrandColorPreset,
   type Mode,
   type NexusAppearanceState,
+  type ShadeAnchor,
+  type SurfaceToken,
   type ThemeContrastCheck,
   type Tier,
 } from '@nexus_ds/core';
@@ -183,6 +188,12 @@ const checkTier: Tier | undefined = checks[0]?.tier;
 // @ts-expect-error contrast checks are typed records.
 checks[0]?.notAContrastCheckField;
 
+const surface: SurfaceToken = SURFACE_TOKENS[0];
+const lightAnchor: ShadeAnchor = LIGHT_SURFACE_LADDER[surface];
+const darkAnchor: ShadeAnchor = DARK_SURFACE_LADDER[surface];
+// @ts-expect-error the surface ladders are keyed by surface tokens only.
+void LIGHT_SURFACE_LADDER['primary-background'];
+
 // @ts-expect-error proves the public state is not any.
 state.notARealNexusAppearanceField;
 
@@ -194,6 +205,8 @@ void firstPaint.colorScheme;
 void lc;
 void checkMode;
 void checkTier;
+void lightAnchor;
+void darkAnchor;
 `
 );
 
