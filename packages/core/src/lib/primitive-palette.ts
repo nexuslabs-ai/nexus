@@ -1,10 +1,10 @@
 import primitiveColors from '../../tokens/primitives/color.json';
-
-import { type Shade, SHADES } from './palette';
 import {
   hexToOklchPinned,
   isPaletteShadeKey,
-} from './primitive-palette-conversion';
+} from '../token-source/perceptual-grid';
+
+import { type Shade, SHADES } from './palette';
 
 export type PrimitivePaletteName = Exclude<
   keyof typeof primitiveColors,

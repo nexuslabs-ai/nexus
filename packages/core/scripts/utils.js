@@ -7,7 +7,7 @@ import {
   hexToOklchMechanical,
   hexToOklchPinned,
   isPaletteShadeKey,
-} from '../dist/scripts/palette.js';
+} from '../src/token-source/perceptual-grid.js';
 
 /**
  * Ensure a directory exists, creating it if necessary

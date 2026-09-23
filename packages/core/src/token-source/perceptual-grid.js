@@ -1,7 +1,11 @@
-import { clampChroma, converter, type Oklch, oklch, parse } from 'culori';
+// @ts-check
+import { clampChroma, converter, oklch, parse } from 'culori';
 
-import { PERCEPTUAL_L_GRID, type Shade, SHADES } from './palette';
-import hueGrid from './perceptual-grid-hue.json';
+import flatGrid from './perceptual-grid.json' with { type: 'json' };
+import hueGrid from './perceptual-grid-hue.json' with { type: 'json' };
+
+/** @typedef {import('culori').Oklch} Oklch */
+/** @typedef {import('../lib/palette').Shade} Shade */
 
 // emit ships P3 chroma; audit scores in sRGB (legacy-display equivalent)
 const EMIT_GAMUT = 'p3';
@@ -9,9 +13,11 @@ const AUDIT_GAMUT = 'rgb';
 
 const toRgb = converter('rgb');
 
-const PERCEPTUAL_L_GRID_HUE: Readonly<
-  Record<string, Readonly<Record<Shade, number>>>
-> = Object.freeze(
+/** @type {Readonly<Record<Shade, number>>} */
+export const PERCEPTUAL_L_GRID = Object.freeze(flatGrid);
+
+/** @type {Readonly<Record<string, Readonly<Record<Shade, number>>>>} */
+const PERCEPTUAL_L_GRID_HUE = Object.freeze(
   Object.fromEntries(
     Object.entries(hueGrid).map(([name, curve]) => [name, Object.freeze(curve)])
   )
@@ -19,18 +25,29 @@ const PERCEPTUAL_L_GRID_HUE: Readonly<
 
 const CUSP_FRACTION = 0.95; // sit just inside the P3 cusp for render safety
 
-export function isPaletteShadeKey(key: unknown): key is Shade {
-  return (SHADES as readonly unknown[]).includes(key);
+const SHADE_KEY_RE = /^(50|100|200|300|400|500|600|700|800|900|950)$/;
+
+/**
+ * @param {unknown} key
+ * @returns {key is Shade}
+ */
+export function isPaletteShadeKey(key) {
+  return typeof key === 'string' && SHADE_KEY_RE.test(key);
 }
 
-function round(value: number, decimals: number) {
+/**
+ * @param {number} value
+ * @param {number} decimals
+ */
+function round(value, decimals) {
   const factor = 10 ** decimals;
   return Math.round(value * factor) / factor;
 }
 
-function formatPaletteOklch({ l, c, h, alpha }: Oklch) {
-  const finite = (v: number | undefined) =>
-    v !== undefined && Number.isFinite(v) ? v : 0;
+/** @param {Oklch} color */
+function formatPaletteOklch({ l, c, h, alpha }) {
+  /** @param {number | undefined} v */
+  const finite = (v) => (v !== undefined && Number.isFinite(v) ? v : 0);
   const lRounded = round(finite(l), 4);
   const cRounded = round(finite(c), 4);
   // Hue is undefined when chroma is 0 (achromatic). Emit 0 rather than `none`
@@ -43,7 +60,11 @@ function formatPaletteOklch({ l, c, h, alpha }: Oklch) {
   return `${base})`;
 }
 
-function parseToOklch(hex: string): Oklch {
+/**
+ * @param {string} hex
+ * @returns {Oklch}
+ */
+function parseToOklch(hex) {
   const parsed = parse(hex);
   if (!parsed) {
     throw new Error(`palette: cannot parse color "${hex}"`);
@@ -51,12 +72,14 @@ function parseToOklch(hex: string): Oklch {
   return oklch(parsed);
 }
 
-function computePinnedOklch(
-  hex: string,
-  shade: string,
-  palette?: string,
-  reportGamutClip?: (message: string) => void
-): Oklch {
+/**
+ * @param {string} hex
+ * @param {string} shade
+ * @param {string} [palette]
+ * @param {(message: string) => void} [reportGamutClip]
+ * @returns {Oklch}
+ */
+function computePinnedOklch(hex, shade, palette, reportGamutClip) {
   const hueCurve = palette ? PERCEPTUAL_L_GRID_HUE[palette] : undefined;
   const pinnedL = isPaletteShadeKey(shade)
     ? (hueCurve ?? PERCEPTUAL_L_GRID)[shade]
@@ -81,7 +104,8 @@ function computePinnedOklch(
     chroma = cuspC * CUSP_FRACTION;
   }
 
-  const target: Oklch = {
+  /** @type {Oklch} */
+  const target = {
     mode: 'oklch',
     l: pinnedL,
     c: chroma,
@@ -104,22 +128,32 @@ function computePinnedOklch(
   return clamped;
 }
 
-export function hexToOklchPinned(
-  hex: string,
-  shade: string,
-  palette?: string,
-  reportGamutClip?: (message: string) => void
-): string {
+/**
+ * @param {string} hex
+ * @param {string} shade
+ * @param {string} [palette]
+ * @param {(message: string) => void} [reportGamutClip]
+ * @returns {string}
+ */
+export function hexToOklchPinned(hex, shade, palette, reportGamutClip) {
   return formatPaletteOklch(
     computePinnedOklch(hex, shade, palette, reportGamutClip)
   );
 }
 
-export function hexToOklchMechanical(hex: string): string {
+/**
+ * @param {string} hex
+ * @returns {string}
+ */
+export function hexToOklchMechanical(hex) {
   return formatPaletteOklch(parseToOklch(hex));
 }
 
-function oklchToSrgbInts(oklchColor: Oklch): [number, number, number] {
+/**
+ * @param {Oklch} oklchColor
+ * @returns {[number, number, number]}
+ */
+function oklchToSrgbInts(oklchColor) {
   const rgb = toRgb(clampChroma(oklchColor, 'oklch', AUDIT_GAMUT));
   if ((rgb.alpha ?? 1) < 1) {
     // apca-w3 `sRGBtoY` reads only [r,g,b]; an alpha-bearing color must be
@@ -128,18 +162,20 @@ function oklchToSrgbInts(oklchColor: Oklch): [number, number, number] {
       'palette: oklchToSrgbInts received alpha-bearing color; pre-blend before contrast computation'
     );
   }
-  const channel = (v: number) =>
-    Math.max(0, Math.min(255, Math.round(v * 255)));
+  /** @param {number} v */
+  const channel = (v) => Math.max(0, Math.min(255, Math.round(v * 255)));
   return [channel(rgb.r), channel(rgb.g), channel(rgb.b)];
 }
 
 // Audit conversion retains the unrounded coordinates; parsing emitted CSS
 // first would change some sRGB integer channels at rounding boundaries.
-export function hexToSrgbInts(
-  hex: string,
-  shade?: string,
-  palette?: string
-): [number, number, number] {
+/**
+ * @param {string} hex
+ * @param {string} [shade]
+ * @param {string} [palette]
+ * @returns {[number, number, number]}
+ */
+export function hexToSrgbInts(hex, shade, palette) {
   if (shade !== undefined) {
     return oklchToSrgbInts(computePinnedOklch(hex, shade, palette));
   }
