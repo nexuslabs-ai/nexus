@@ -19,6 +19,10 @@ export const demos = {
     id: "badge-variants",
     load: () => import("./demos/badge-variants"),
   },
+  "button-core-variants": {
+    id: "button-core-variants",
+    load: () => import("./demos/button-core-variants"),
+  },
   "button-demo": {
     id: "button-demo",
     load: () => import("./demos/button-demo"),
