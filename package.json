@@ -28,7 +28,6 @@
     "audit:mode-codenames": "pnpm --filter @nexus_ds/core audit:mode-codenames",
     "audit:mode-distinctness": "pnpm --filter @nexus_ds/core audit:mode-distinctness",
     "validate:spacing-modes": "pnpm --filter @nexus_ds/core validate:spacing-modes",
-    "console": "cd apps/console && pnpm dev",
     "docs:serve": "npx @arabold/docs-mcp-server@latest server --store-path ./docs-mcp/data --protocol http --host 127.0.0.1 --port 6282",
     "docs:export": "cp ./docs-mcp/data/documents.db ./docs-mcp/documents.db && echo 'Exported docs-mcp database to docs-mcp/documents.db'",
     "docs:build": "docker build -t ghcr.io/nexuslabs-ai-bot/nexus-docs-mcp:latest ./docs-mcp",
@@ -138,10 +137,9 @@
     ]
   },
   "pnpm": {
-    "//overrides": "zod is pinned to dedupe @hookform/resolvers' broad peer range (^3.25.0 || ^4.0.0) onto the console app's zod v4 copy. @radix-ui/react-context is deduped to 1.1.3 (react-menubar pins 1.1.2) so a single, top-level-nameable copy exists — otherwise the .d.ts rollup fails with TS2742 under pnpm.",
+    "//overrides": "@radix-ui/react-context is deduped to 1.1.3 (react-menubar pins 1.1.2) so a single, top-level-nameable copy exists — otherwise the .d.ts rollup fails with TS2742 under pnpm.",
     "overrides": {
       "minimatch": "^10.1.2",
-      "zod": "^4.4.3",
       "@radix-ui/react-context": "1.1.3"
     }
   }
