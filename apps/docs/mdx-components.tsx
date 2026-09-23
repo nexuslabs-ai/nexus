@@ -2,6 +2,7 @@ import { cn } from '@nexus_ds/react/utils';
 import type { MDXComponents } from 'mdx/types';
 
 import { CodeBlock } from './app/_components/CodeBlock';
+import { InlineCode } from './app/_components/InlineCode';
 import * as Nexus from './app/_components/nexus';
 
 /**
@@ -87,15 +88,7 @@ export function useMDXComponents(components: MDXComponents): MDXComponents {
         {children}
       </a>
     ),
-    code: ({ className, ...props }) => (
-      <code
-        className={cn(
-          'nx:font-mono nx:typography-code-inline nx:bg-muted nx:px-1 nx:py-0.5 nx:rounded-sm',
-          className
-        )}
-        {...props}
-      />
-    ),
+    code: InlineCode,
     pre: CodeBlock,
     table: ({ className, ...props }) => (
       <div
