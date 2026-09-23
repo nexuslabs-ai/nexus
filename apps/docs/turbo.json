@@ -8,12 +8,25 @@
         "scripts/generate-props.mjs",
         "scripts/props-contract.mjs",
         "scripts/react-entry-points.mjs",
+        "scripts/react-sources.mjs",
         "scripts/roots.mjs",
         "$TURBO_ROOT$/packages/react/src/**",
         "$TURBO_ROOT$/packages/react/package.json",
         "$TURBO_ROOT$/packages/react/tsconfig.json"
       ],
       "outputs": ["generated/props/**"]
+    },
+    "generate:dependencies": {
+      "inputs": [
+        "scripts/generate-dependencies.mjs",
+        "scripts/props-contract.mjs",
+        "scripts/react-sources.mjs",
+        "scripts/roots.mjs",
+        "$TURBO_ROOT$/packages/react/src/**",
+        "$TURBO_ROOT$/packages/react/package.json",
+        "$TURBO_ROOT$/packages/react/tsconfig.json"
+      ],
+      "outputs": ["generated/dependencies/**"]
     },
     "generate:manifest": {
       "inputs": [
@@ -31,12 +44,17 @@
       ]
     },
     "build": {
-      "dependsOn": ["^build", "generate:manifest", "generate:props"],
+      "dependsOn": [
+        "^build",
+        "generate:manifest",
+        "generate:props",
+        "generate:dependencies"
+      ],
       "inputs": ["$TURBO_DEFAULT$", "$TURBO_ROOT$/package.json"],
       "outputs": [".next/**", "!.next/cache/**", "next-env.d.ts"]
     },
     "dev": {
-      "dependsOn": ["^build", "generate:manifest"],
+      "dependsOn": ["^build", "generate:manifest", "generate:dependencies"],
       "cache": false,
       "persistent": true
     }
