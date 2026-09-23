@@ -15,9 +15,10 @@ Some components render Button with their own radius class, which replaces
 - InputGroupButton at sizes `xs`, `icon-xs` (`rounded-sm`) and `sm`
   (`rounded-md`). Size `icon-sm` follows the override.
 - Carousel previous and next buttons (`rounded-full`).
-- Calendar and DatePicker selected days, which take `rounded-md` or
-  `rounded-none` from their range position and week edge. Unselected days and
-  the month navigation buttons follow the override.
+- DatePicker range days: `rounded-md` at the range start and end,
+  `rounded-none` in the middle. A selected day at a week edge also takes
+  `rounded-l-md` or `rounded-r-md` on that side. A single selected day, all
+  other days and the month navigation buttons follow the override.
 
 ## Rounded buttons, unchanged inputs
 
