@@ -4,10 +4,14 @@ import * as prettier from 'prettier';
 import { fileURLToPath } from 'url';
 
 import {
-  hexToOklchMechanical,
-  hexToOklchPinned,
-  isPaletteShadeKey,
-} from '../src/token-source/perceptual-grid.js';
+  formatShadowComposite,
+  formatTokenValue,
+  formatTypographyDeclarations,
+} from '../src/token-source/format.js';
+import {
+  extractTokens,
+  pathToCssVarPrefixed,
+} from '../src/token-source/tokens.js';
 
 /**
  * Ensure a directory exists, creating it if necessary
@@ -36,185 +40,6 @@ export function readTokenFile(filePath) {
  */
 export function titleCase(s) {
   return s.length === 0 ? s : s[0].toUpperCase() + s.slice(1);
-}
-
-/**
- * Format a token value to a CSS string. For `$type: "color"` hex values,
- * routes through the OKLCH converters: palette shade tokens (path ending in a
- * shade key like `'500'`) get pinned to the perceptual L grid; everything else
- * (white/black/semantic hex literals with alpha) is converted mechanically.
- * @param {object|string|number} value - Token value
- * @param {string} type - Token type
- * @param {string[]} [tokenPath] - Token path (used to route shade conversions)
- * @returns {string} Formatted CSS value
- * @throws {Error} If value is undefined
- */
-export function formatTokenValue(value, type, tokenPath) {
-  if (value === undefined) {
-    throw new Error(`formatTokenValue: value is undefined (type="${type}")`);
-  }
-
-  if (
-    type === 'dimension' &&
-    typeof value === 'object' &&
-    value !== null &&
-    'value' in value
-  ) {
-    // Round to 4 decimals to strip Figma's float-32 export artifacts
-    // (e.g. -0.800000011920929 → -0.8).
-    const rounded = Math.round(value.value * 10000) / 10000;
-    return `${rounded}${value.unit || 'px'}`;
-  }
-
-  if (type === 'color' && typeof value === 'string' && value.startsWith('#')) {
-    const lastSegment =
-      tokenPath && tokenPath.length > 0
-        ? tokenPath[tokenPath.length - 1]
-        : undefined;
-
-    if (tokenPath && tokenPath.length >= 2 && isPaletteShadeKey(lastSegment)) {
-      // The segment before the shade is the palette/hue (e.g. ['blue','500']),
-      // which selects the per-hue lightness curve in the grid.
-      return hexToOklchPinned(
-        value,
-        lastSegment,
-        tokenPath[tokenPath.length - 2],
-        (message) => console.warn(message)
-      );
-    }
-
-    if (isPaletteShadeKey(lastSegment)) {
-      console.warn(
-        `formatTokenValue: shade-key color "${tokenPath.join('.')}" lacks palette root — falling through to mechanical`
-      );
-    }
-
-    return hexToOklchMechanical(value);
-  }
-
-  if (typeof value === 'string') {
-    return value;
-  }
-
-  if (typeof value === 'number') {
-    return String(value);
-  }
-
-  return JSON.stringify(value);
-}
-
-/**
- * Recursively extract tokens from DTCG format
- * @param {object} obj - Token object
- * @param {string[]} currentPath - Current path in token tree
- * @param {object[]} result - Accumulated results
- * @returns {object[]} Array of { path, value, type, description }
- */
-export function extractTokens(obj, currentPath = [], result = []) {
-  for (const [key, value] of Object.entries(obj)) {
-    // Skip metadata keys
-    if (key.startsWith('$')) continue;
-
-    if (value && typeof value === 'object') {
-      // Check if this is a token (has $value and $type)
-      if (value.$value !== undefined && value.$type !== undefined) {
-        result.push({
-          path: [...currentPath, key],
-          value: value.$value,
-          type: value.$type,
-          description: value.$description,
-        });
-      } else {
-        // Recurse into group
-        extractTokens(value, [...currentPath, key], result);
-      }
-    }
-  }
-
-  return result;
-}
-
-/**
- * Convert token path to CSS variable name with optional nx- prefix
- * Used for generating prefixed CSS variables for @nexus_ds/tailwind package
- * @param {string[]} tokenPath - Token path array
- * @param {string|null} categoryPrefix - Optional category prefix (e.g., 'color', 'radius')
- * @param {boolean} useNxPrefix - Whether to add nx- prefix
- * @returns {string} CSS variable name (without --)
- */
-export function pathToCssVarPrefixed(
-  tokenPath,
-  categoryPrefix = null,
-  useNxPrefix = false
-) {
-  const cssName = tokenPath.join('-');
-  const base = categoryPrefix ? `${categoryPrefix}-${cssName}` : cssName;
-  return useNxPrefix ? `nx-${base}` : base;
-}
-
-/**
- * Check if a value is a DTCG reference (e.g., "{blue.500}")
- * @param {*} value - Value to check
- * @returns {boolean}
- */
-export function isReference(value) {
-  return (
-    typeof value === 'string' && value.startsWith('{') && value.endsWith('}')
-  );
-}
-
-/**
- * Extract reference path from DTCG reference string
- * @param {string} ref - Reference string like "{blue.500}"
- * @returns {string} Path like "blue.500"
- */
-export function extractRefPath(ref) {
-  return ref.slice(1, -1);
-}
-
-/**
- * Resolve a DTCG reference to CSS var() or raw value
- * @param {*} value - Token value (might be a reference)
- * @param {Map} primitiveMap - Map of primitive token paths to CSS names
- * @returns {string} Resolved CSS value
- */
-export function resolveReference(value, primitiveMap) {
-  if (!isReference(value)) {
-    return value;
-  }
-
-  const refPath = extractRefPath(value);
-  const primitiveInfo = primitiveMap.get(refPath);
-
-  if (primitiveInfo) {
-    return `var(--${primitiveInfo.cssName})`;
-  }
-
-  console.warn(`⚠ Reference not found: ${value}`);
-  return value;
-}
-
-/**
- * Resolve a value that might be a reference or a dimension object
- * @param {*} value - Token value
- * @param {Map} primitiveMap - Map of primitives
- * @param {string} type - Token type
- * @param {string[]} [tokenPath] - Token path for color routing
- * @returns {string} Resolved CSS value
- */
-export function resolveValue(value, primitiveMap, type = 'unknown', tokenPath) {
-  if (isReference(value)) {
-    return resolveReference(value, primitiveMap);
-  }
-
-  if (
-    type === 'dimension' ||
-    (typeof value === 'object' && value !== null && 'value' in value)
-  ) {
-    return formatTokenValue(value, 'dimension');
-  }
-
-  return formatTokenValue(value, type, tokenPath);
 }
 
 /**
@@ -416,51 +241,6 @@ export const log = {
 };
 
 // ============================================
-// SHADOW COMPOSITE HELPERS
-// ============================================
-
-/**
- * Format a shadow property value as a var() reference or literal.
- * References are resolved through the primitive map so the var name matches
- * the actual primitive cssName. This means shadow property references can
- * point to any primitive category, not just `--nx-shadow-*`.
- */
-function formatShadowPropertyAsVar(value, primitiveMap) {
-  if (isReference(value)) {
-    return resolveValue(value, primitiveMap);
-  }
-
-  if (typeof value === 'object' && value !== null && 'value' in value) {
-    return formatTokenValue(value, 'dimension');
-  }
-
-  return String(value);
-}
-
-function formatShadowLayer(layer, primitiveMap, isInset = false) {
-  const x = formatShadowPropertyAsVar(layer.offsetX, primitiveMap);
-  const y = formatShadowPropertyAsVar(layer.offsetY, primitiveMap);
-  const blur = formatShadowPropertyAsVar(layer.blur, primitiveMap);
-  const spread = formatShadowPropertyAsVar(layer.spread, primitiveMap);
-  const color = formatShadowPropertyAsVar(layer.color, primitiveMap);
-  const inset = isInset || layer.inset ? 'inset ' : '';
-
-  return `${inset}${x} ${y} ${blur} ${spread} ${color}`;
-}
-
-/**
- * Format a complete shadow composite (single or multi-layer) to CSS value.
- * `primitiveMap` is required so the resolver can map reference paths to their
- * actual primitive cssNames.
- */
-export function formatShadowComposite(value, primitiveMap, isInset = false) {
-  const layers = Array.isArray(value) ? value : [value];
-  return layers
-    .map((layer) => formatShadowLayer(layer, primitiveMap, isInset))
-    .join(', ');
-}
-
-// ============================================
 // GOOGLE FONTS HELPERS
 // ============================================
 
@@ -552,22 +332,6 @@ export function getGoogleFontsImportFromTokens(typographyFilePath) {
 // ============================================
 
 /**
- * Resolve a typography property value to CSS
- * Handles 'auto' values, references, dimension objects, and raw values
- *
- * @param {*} value - Typography property value
- * @param {Map} primitiveMap - Map of primitives with nx- prefixed cssName
- * @returns {string} Resolved CSS value
- */
-function resolveTypographyProperty(value, primitiveMap) {
-  // Figma exports `lineHeight: "auto"` for the code-inline typography token,
-  // but `line-height: auto` is invalid CSS — browsers ignore it. Map to
-  // `normal` (CSS spec default, ~1.2) so the emitted utility is well-formed.
-  if (value === 'auto') return 'normal';
-  return resolveValue(value, primitiveMap, 'unknown');
-}
-
-/**
  * Generate typography utility CSS from token file
  * Creates @utility rules with typography-* prefix for all typography composite tokens
  *
@@ -594,38 +358,16 @@ export function generateTypographyUtilitiesCSS(tokensDir, primitiveMap) {
   let css = `/* Typography Utilities */\n\n`;
 
   for (const token of tokens) {
-    const name = token.path.join('-');
-    const value = token.value;
-
     // Use 'typography-' prefix to avoid tailwind-merge conflicts with Tailwind's
     // text-* utilities (which are used for both color and font-size)
-    css += `@utility typography-${name} {\n`;
-
-    if (value.fontFamily) {
-      css += `  font-family: ${resolveTypographyProperty(value.fontFamily, primitiveMap)};\n`;
+    css += `@utility ${pathToCssVarPrefixed(token.path, 'typography')} {\n`;
+    for (const declaration of formatTypographyDeclarations(
+      token.path,
+      token.value,
+      primitiveMap
+    )) {
+      css += `  ${declaration.property}: ${declaration.value};\n`;
     }
-    if (value.fontSize) {
-      css += `  font-size: ${resolveTypographyProperty(value.fontSize, primitiveMap)};\n`;
-    }
-    if (value.fontWeight) {
-      css += `  font-weight: ${resolveTypographyProperty(value.fontWeight, primitiveMap)};\n`;
-    }
-    if (value.lineHeight) {
-      css += `  line-height: ${resolveTypographyProperty(value.lineHeight, primitiveMap)};\n`;
-    }
-    if (value.letterSpacing) {
-      css += `  letter-spacing: ${resolveTypographyProperty(value.letterSpacing, primitiveMap)};\n`;
-    }
-
-    if (token.path[0] === 'heading') {
-      css += `  text-wrap: balance;\n`;
-    }
-
-    if (token.path[0] === 'body') {
-      // orphan/widow protection for multi-line copy
-      css += `  text-wrap: pretty;\n`;
-    }
-
     css += `}\n\n`;
   }
 
