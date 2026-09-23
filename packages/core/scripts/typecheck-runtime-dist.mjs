@@ -84,11 +84,13 @@ await writeFile(
   DEFAULT_NEXUS_APPEARANCE,
   DEFAULT_STORAGE_KEY,
   deriveTheme,
+  measureThemeContrast,
   resolveFirstPaint,
   sanitizeNexusAppearance,
   themeToCss,
   type BrandColorPreset,
   type NexusAppearanceState,
+  type ThemeContrastCheck,
 } from '@nexus_ds/core';
 import {
   getPaletteRamp,
@@ -141,6 +143,20 @@ const bootstrap: string = createNexusAppearanceBootstrapScript({
   defaultSnapshot: snapshot,
 });
 const firstPaint = resolveFirstPaint(snapshot, true);
+const contract = createNexusThemeContract(state);
+const checks: ThemeContrastCheck[] = measureThemeContrast(
+  deriveTheme(contract),
+  contract.contrast
+);
+const check = checks[0];
+if (check) {
+  const lc: number = check.lc;
+  const mode: 'light' | 'dark' = check.mode;
+  void lc;
+  void mode;
+}
+// @ts-expect-error contrast checks are typed records.
+check?.notAContrastCheckField;
 
 // @ts-expect-error proves the public state is not any.
 state.notARealNexusAppearanceField;

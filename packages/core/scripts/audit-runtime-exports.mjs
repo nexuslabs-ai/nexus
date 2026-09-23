@@ -38,6 +38,7 @@ const EXPECTED_RUNTIME_EXPORTS = [
   'deriveTheme',
   'findBrandColorPreset',
   'isColor',
+  'measureThemeContrast',
   'normalizeAppearanceModeIds',
   'parseNexusAppearanceStateCookie',
   'resolveFirstPaint',
