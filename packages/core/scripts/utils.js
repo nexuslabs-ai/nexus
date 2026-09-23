@@ -1838,6 +1838,12 @@ export function generateThemeCSS(config) {
   return css;
 }
 
+/**
+ * Theme the browser-painted UI Nexus cannot style through utilities: the
+ * color-scheme declaration.
+ *
+ * @returns {string} CSS native browser UI rules
+ */
 export function generateNativeBrowserUIThemeCSS() {
   return `
 /* ===== NATIVE BROWSER UI THEME ===== */
@@ -1853,10 +1859,80 @@ export function generateNativeBrowserUIThemeCSS() {
   .dark {
     color-scheme: dark;
   }
+}
+`;
+}
 
-  :where(input[type='checkbox'], input[type='radio'], input[type='range'], progress) {
-    accent-color: var(--color-primary-background);
+/**
+ * Autofill utilities. Browsers paint autofilled fields with `!important`
+ * background and text colours that author `bg-*` / `text-*` classes cannot
+ * override. A field pairs each of those classes with an `autofill-*` utility of
+ * the same token (`nx:bg-container nx:autofill-bg-container`), which repaints
+ * the surface as an inset fill shadow and the text through
+ * `-webkit-text-fill-color`. The fill is the last, bottom-most layer of
+ * Tailwind's shadow stack, so `shadow-*`, `ring-*`, `inset-shadow-*` and
+ * `inset-ring-*` on the field survive autofill. The shadow stops at the padding
+ * edge, so the browser surface is clipped there too or it shows through a
+ * translucent border. `autofill-bg-transparent` clips the browser surface away
+ * instead, for controls whose parent owns the surface.
+ *
+ * @returns {string} CSS @utility declarations
+ */
+export function generateAutofillUtilitiesCSS() {
+  return `
+/* ===== AUTOFILL UTILITIES ===== */
+@utility autofill-bg-* {
+  &:autofill {
+    background-clip: padding-box;
+    box-shadow:
+      var(--tw-inset-shadow, 0 0 #0000),
+      var(--tw-inset-ring-shadow, 0 0 #0000),
+      var(--tw-ring-offset-shadow, 0 0 #0000),
+      var(--tw-ring-shadow, 0 0 #0000),
+      var(--tw-shadow, 0 0 #0000),
+      inset 0 0 0 1000px --value(--color-*);
   }
+}
+
+@utility autofill-bg-transparent {
+  &:autofill {
+    -webkit-background-clip: text;
+    background-clip: text;
+  }
+}
+
+@utility autofill-text-* {
+  &:autofill {
+    color: --value(--color-*);
+    -webkit-text-fill-color: --value(--color-*);
+    caret-color: --value(--color-*);
+  }
+}
+`;
+}
+
+/**
+ * Surface utilities: a wrapper declares the surface it paints with
+ * `surface-*` beside its `bg-*` class (`nx:bg-container nx:surface-container`),
+ * and descendants cut themselves out of it with `ring-surface` /
+ * `ring-offset-surface`. Without a declared surface the rings fall back to
+ * `background`.
+ *
+ * @returns {string} CSS @utility declarations
+ */
+export function generateSurfaceUtilitiesCSS() {
+  return `
+/* ===== SURFACE UTILITIES ===== */
+@utility surface-* {
+  --nx-surface: --value(--color-*);
+}
+
+@utility ring-surface {
+  --tw-ring-color: var(--nx-surface, --theme(--color-background));
+}
+
+@utility ring-offset-surface {
+  --tw-ring-offset-color: var(--nx-surface, --theme(--color-background));
 }
 `;
 }

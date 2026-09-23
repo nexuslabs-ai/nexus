@@ -27,19 +27,20 @@ Review pull requests to ensure code quality, architectural soundness, and adhere
 
 Always load and check the diff against:
 
-| Rule                                                                                        | Purpose                                                                            |
-| ------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------- |
-| [code-quality.md](../../../.claude/rules/code-quality.md)                                   | Governing principle: favor simplicity over cleverness; index to per-rule files     |
-| [ripple-effect.md](../../../.claude/rules/ripple-effect.md)                                 | Flag callers, callees, or adjacent code left inconsistent after the change         |
-| [guard-clauses.md](../../../.claude/rules/guard-clauses.md)                                 | Flag deeply nested conditionals; require happy path at column 0                    |
-| [composition-over-render-props.md](../../../.claude/rules/composition-over-render-props.md) | Flag `renderItem` / `mode` discriminators; require `children` or per-mode split    |
-| [useeffect-escape-hatch.md](../../../.claude/rules/useeffect-escape-hatch.md)               | Flag effects that orchestrate React state instead of syncing with external systems |
-| [logging-proportionality.md](../../../.claude/rules/logging-proportionality.md)             | Flag noisy incremental logs; require one dense canonical log line                  |
-| [code-comments.md](../../../.claude/rules/code-comments.md)                                 | Flag rationale blocks, unjustified TODOs, comments that restate the code           |
-| [no-follow-up-deferral.md](../../../.claude/rules/no-follow-up-deferral.md)                 | Reject deferral framing unless a tracked issue is cited                            |
-| [project-stage.md](../../../.claude/rules/project-stage.md)                                 | Reject new migration files; flag backcompat shims and feature flags                |
-| [no-environment-branching.md](../../../.claude/rules/no-environment-branching.md)           | Flag any OS, browser, or input-device query or variant the rule bans               |
-| [docs-mcp.md](../../../.claude/rules/docs-mcp.md)                                           | Verify third-party API usage via nexus-docs-mcp before approving                   |
+| Rule                                                                                        | Purpose                                                                                                             |
+| ------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------- |
+| [code-quality.md](../../../.claude/rules/code-quality.md)                                   | Governing principle: favor simplicity over cleverness; index to per-rule files                                      |
+| [ripple-effect.md](../../../.claude/rules/ripple-effect.md)                                 | Flag callers, callees, or adjacent code left inconsistent after the change                                          |
+| [guard-clauses.md](../../../.claude/rules/guard-clauses.md)                                 | Flag deeply nested conditionals; require happy path at column 0                                                     |
+| [composition-over-render-props.md](../../../.claude/rules/composition-over-render-props.md) | Flag `renderItem` / `mode` discriminators; require `children` or per-mode split                                     |
+| [useeffect-escape-hatch.md](../../../.claude/rules/useeffect-escape-hatch.md)               | Flag effects that orchestrate React state instead of syncing with external systems                                  |
+| [logging-proportionality.md](../../../.claude/rules/logging-proportionality.md)             | Flag noisy incremental logs; require one dense canonical log line                                                   |
+| [code-comments.md](../../../.claude/rules/code-comments.md)                                 | Flag rationale blocks, unjustified TODOs, comments that restate the code                                            |
+| [no-follow-up-deferral.md](../../../.claude/rules/no-follow-up-deferral.md)                 | Reject deferral framing unless a tracked issue is cited                                                             |
+| [project-stage.md](../../../.claude/rules/project-stage.md)                                 | Reject new migration files; flag backcompat shims and feature flags                                                 |
+| [no-environment-branching.md](../../../.claude/rules/no-environment-branching.md)           | Flag any OS, browser, or input-device query or variant the rule bans                                                |
+| [component-owned-styling.md](../../../.claude/rules/component-owned-styling.md)             | Reject theme selectors that target a component (`data-slot`, `class~=`); require a utility applied in the component |
+| [docs-mcp.md](../../../.claude/rules/docs-mcp.md)                                           | Verify third-party API usage via nexus-docs-mcp before approving                                                    |
 
 ## Review Process
 
