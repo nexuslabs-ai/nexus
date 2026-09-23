@@ -1,10 +1,7 @@
 import type { NexusAppearanceState } from '../lib/appearance-model';
 import type { TokenValue } from '../token-source/types';
 
-import type { TokenFile } from './token-files';
-
 export type { TokenValue } from '../token-source/types';
-export type { TokenFile } from './token-files';
 
 /** Token families the catalogue covers. */
 export type CatalogueFamily = 'color' | 'typography';
@@ -25,8 +22,8 @@ export interface CatalogueAlias {
 
 /** The authored leaf a variant comes from. */
 export interface CatalogueSource {
-  /** Path under `packages/core/tokens/`. */
-  file: TokenFile;
+  /** Path under `packages/core/tokens/`, e.g. `styles/typography.json`. */
+  file: string;
   /** Group keys from the document root to the leaf. */
   path: readonly string[];
 }

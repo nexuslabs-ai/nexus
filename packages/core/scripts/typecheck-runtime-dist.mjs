@@ -103,6 +103,11 @@ import {
   type PrimitivePaletteRamp,
   type Shade,
 } from '@nexus_ds/core/palette';
+import {
+  createTokenCatalogue,
+  type CatalogueToken,
+  type CatalogueTokenName,
+} from '@nexus_ds/core/catalogue';
 
 const preset: BrandColorPreset | undefined = BRAND_COLOR_PRESETS[0];
 if (preset) {
@@ -129,6 +134,23 @@ getPaletteShade('green', '999');
 void green;
 void palettes;
 void shades;
+
+const catalogue: readonly CatalogueToken[] = createTokenCatalogue();
+const catalogued = catalogue[0];
+if (catalogued) {
+  const name: CatalogueTokenName = catalogued.name;
+  const variant = catalogued.variants[0];
+  const file: string | undefined = variant?.source?.file;
+  const appearanceMode: string | undefined = variant?.appearance?.mode;
+  // @ts-expect-error catalogue variants are immutable.
+  catalogued.variants.push(catalogued.variants[0]);
+  void name;
+  void file;
+  void appearanceMode;
+}
+// @ts-expect-error canonical names are --nx-* custom properties.
+const aliasName: CatalogueTokenName = '--color-background';
+void aliasName;
 
 const state: NexusAppearanceState = sanitizeNexusAppearance({
   ...DEFAULT_NEXUS_APPEARANCE,
