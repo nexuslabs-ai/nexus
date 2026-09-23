@@ -240,6 +240,7 @@ export const GeometryMatrix: Story = {
 
 interface SharedEdgeCase {
   name: string;
+  variant: 'outline' | 'outline-primary';
   spacing: number;
   leading: { invalid?: boolean };
   trailing: { invalid?: boolean; pressed?: boolean; disabled?: boolean };
@@ -249,6 +250,7 @@ interface SharedEdgeCase {
 const SHARED_EDGE_CASES: readonly SharedEdgeCase[] = [
   {
     name: 'selected',
+    variant: 'outline-primary',
     spacing: 0,
     leading: {},
     trailing: { pressed: true },
@@ -256,6 +258,7 @@ const SHARED_EDGE_CASES: readonly SharedEdgeCase[] = [
   },
   {
     name: 'invalid',
+    variant: 'outline-primary',
     spacing: 0,
     leading: {},
     trailing: { invalid: true },
@@ -263,6 +266,7 @@ const SHARED_EDGE_CASES: readonly SharedEdgeCase[] = [
   },
   {
     name: 'invalid selected',
+    variant: 'outline-primary',
     spacing: 0,
     leading: {},
     trailing: { invalid: true, pressed: true },
@@ -270,6 +274,7 @@ const SHARED_EDGE_CASES: readonly SharedEdgeCase[] = [
   },
   {
     name: 'disabled selected',
+    variant: 'outline-primary',
     spacing: 0,
     leading: {},
     trailing: { disabled: true, pressed: true },
@@ -277,6 +282,7 @@ const SHARED_EDGE_CASES: readonly SharedEdgeCase[] = [
   },
   {
     name: 'own invalid',
+    variant: 'outline-primary',
     spacing: 0,
     leading: { invalid: true },
     trailing: { pressed: true },
@@ -284,15 +290,65 @@ const SHARED_EDGE_CASES: readonly SharedEdgeCase[] = [
   },
   {
     name: 'spaced',
+    variant: 'outline-primary',
     spacing: 2,
     leading: {},
     trailing: { pressed: true },
     owner: 'own',
   },
+  {
+    name: 'outline selected',
+    variant: 'outline',
+    spacing: 0,
+    leading: {},
+    trailing: { pressed: true },
+    owner: 'own',
+  },
+  {
+    name: 'outline invalid',
+    variant: 'outline',
+    spacing: 0,
+    leading: {},
+    trailing: { invalid: true },
+    owner: 'next',
+  },
+  {
+    name: 'outline invalid selected',
+    variant: 'outline',
+    spacing: 0,
+    leading: {},
+    trailing: { invalid: true, pressed: true },
+    owner: 'next',
+  },
+  {
+    name: 'outline disabled invalid',
+    variant: 'outline',
+    spacing: 0,
+    leading: {},
+    trailing: { invalid: true, disabled: true },
+    owner: 'own',
+  },
+  {
+    name: 'outline own invalid',
+    variant: 'outline',
+    spacing: 0,
+    leading: { invalid: true },
+    trailing: { pressed: true },
+    owner: 'own',
+  },
+  {
+    name: 'outline spaced',
+    variant: 'outline',
+    spacing: 2,
+    leading: {},
+    trailing: { invalid: true },
+    owner: 'own',
+  },
 ];
 
-// The joined edge between two outline-primary items takes the next item's
-// selected / invalid colour unless the leading item's own state is invalid.
+// The joined edge between two bordered items takes the next item's border
+// colour (outline: invalid only; outline-primary: selected / invalid) unless
+// the leading item's own state is invalid.
 export const JoinedSharedEdge: Story = {
   render: () => (
     <div className="nx:flex nx:flex-wrap nx:items-start nx:gap-8">
@@ -303,7 +359,7 @@ export const JoinedSharedEdge: Story = {
             <ToggleGroup
               key={label}
               type="multiple"
-              variant="outline-primary"
+              variant={edgeCase.variant}
               spacing={edgeCase.spacing}
               dir={layout.dir}
               orientation={layout.orientation}
