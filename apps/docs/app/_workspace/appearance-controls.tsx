@@ -21,6 +21,7 @@ import {
   Slider,
   Switch,
 } from '@nexus_ds/react';
+import type { NexusResolvedAppearanceMode } from '@nexus_ds/react/appearance';
 
 const MODE_OPTIONS = [
   { value: 'system', label: 'Follow device' },
@@ -86,11 +87,11 @@ function SelectField<T extends string>({
 
 /** Moves freely while dragged and commits once the thumb is released. */
 function ContrastField({
-  label,
+  mode,
   value,
   onChange,
 }: {
-  label: string;
+  mode: NexusResolvedAppearanceMode;
   value: number;
   onChange: (value: number) => void;
 }) {
@@ -107,7 +108,7 @@ function ContrastField({
     <div className={FIELD_CLASS}>
       <div className="nx:flex nx:items-center nx:justify-between nx:gap-2">
         <span id={id} className={LABEL_CLASS}>
-          {label}
+          Contrast
         </span>
         <span className="nx:typography-label-default nx:tabular-nums nx:text-muted-foreground">
           {shown}
@@ -122,6 +123,9 @@ function ContrastField({
         onValueChange={([next]) => setDraft(next ?? null)}
         onValueCommit={commit}
       />
+      <p className="nx:typography-body-small nx:text-muted-foreground">
+        Adjusts {mode} mode
+      </p>
     </div>
   );
 }
@@ -207,11 +211,16 @@ function BrandColorField({
 
 export function AppearanceControls({
   state,
+  resolvedMode,
   onChange,
 }: {
   state: NexusAppearanceState;
+  resolvedMode: NexusResolvedAppearanceMode;
   onChange: (patch: Partial<NexusAppearanceState>) => void;
 }) {
+  const contrastKey =
+    resolvedMode === 'dark' ? 'darkContrast' : 'lightContrast';
+
   function changePrefs(patch: Partial<NexusAppearancePrefs>) {
     onChange({ prefs: { ...state.prefs, ...patch } });
   }
@@ -236,14 +245,9 @@ export function AppearanceControls({
           onChange={(surfaceTone) => onChange({ surfaceTone })}
         />
         <ContrastField
-          label="Light contrast"
-          value={state.lightContrast}
-          onChange={(lightContrast) => onChange({ lightContrast })}
-        />
-        <ContrastField
-          label="Dark contrast"
-          value={state.darkContrast}
-          onChange={(darkContrast) => onChange({ darkContrast })}
+          mode={resolvedMode}
+          value={state[contrastKey]}
+          onChange={(contrast) => onChange({ [contrastKey]: contrast })}
         />
       </ControlGroup>
       <ControlGroup title="Shape">

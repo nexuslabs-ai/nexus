@@ -1,6 +1,7 @@
 'use client';
 
 import { Button } from '@nexus_ds/react';
+import { useNexusAppearance } from '@nexus_ds/react/appearance';
 
 import { AppearanceControls } from './appearance-controls';
 import { useAppearanceHistory } from './appearance-state';
@@ -11,10 +12,15 @@ import { WorkspaceLayout } from './workspace-layout';
 
 export function CreateWorkspace() {
   const { state, change, reset, undo, canUndo } = useAppearanceHistory();
+  const { resolvedMode } = useNexusAppearance();
 
   const panel = (
     <div className="nx:space-y-8">
-      <AppearanceControls state={state} onChange={change} />
+      <AppearanceControls
+        state={state}
+        resolvedMode={resolvedMode}
+        onChange={change}
+      />
       <div className="nx:flex nx:flex-col nx:gap-2 nx:pt-4 nx:border-t-default nx:border-border-default">
         <div className="nx:grid nx:grid-cols-2 nx:gap-2">
           <Button variant="outline" onClick={undo} disabled={!canUndo}>
