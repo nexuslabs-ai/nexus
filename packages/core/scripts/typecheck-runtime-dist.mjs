@@ -76,6 +76,7 @@ await mkdir(probeDir, { recursive: true });
 await writeFile(
   probePath,
   `import {
+  BRAND_COLOR_PRESETS,
   createNexusAppearanceBootstrapScript,
   createNexusAppearanceSnapshotFromCookie,
   createNexusAppearanceSnapshotFromState,
@@ -86,15 +87,14 @@ await writeFile(
   resolveFirstPaint,
   sanitizeNexusAppearance,
   themeToCss,
+  type BrandColorPreset,
   type NexusAppearanceState,
 } from '@nexus_ds/core';
 import {
-  BRAND_COLOR_PRESETS,
   getPaletteRamp,
   getPaletteShade,
   PRIMITIVE_PALETTE_NAMES,
   SHADES,
-  type BrandColorPreset,
   type PrimitivePaletteName,
   type PrimitivePaletteRamp,
   type Shade,

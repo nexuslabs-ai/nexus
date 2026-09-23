@@ -1,6 +1,6 @@
 import type { ComponentProps } from 'react';
 
-import { BRAND_COLOR_PRESETS } from '@nexus_ds/core/palette';
+import { BRAND_COLOR_PRESETS } from '@nexus_ds/core';
 
 import { normalizeHex } from '../../../lib/normalize-hex';
 import { cn } from '../../../lib/utils';

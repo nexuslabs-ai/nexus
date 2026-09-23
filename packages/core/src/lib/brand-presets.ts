@@ -1,39 +1,32 @@
 import primitiveColors from '../../tokens/primitives/color.json';
 
+import type { PrimitivePaletteName } from './primitive-palette';
+
 export const DEFAULT_BRAND_COLOR = '#0a0a0a';
 
-export const BRAND_COLOR_PRESETS = Object.freeze(
-  [
-    { value: 'default', label: 'Default', color: DEFAULT_BRAND_COLOR },
-    {
-      value: 'indigo',
-      label: 'Indigo',
-      color: primitiveColors.indigo['600'].$value,
-    },
-    { value: 'blue', label: 'Blue', color: primitiveColors.blue['600'].$value },
-    {
-      value: 'violet',
-      label: 'Violet',
-      color: primitiveColors.violet['600'].$value,
-    },
-    { value: 'rose', label: 'Rose', color: primitiveColors.rose['600'].$value },
-    {
-      value: 'orange',
-      label: 'Orange',
-      color: primitiveColors.orange['600'].$value,
-    },
-    {
-      value: 'amber',
-      label: 'Amber',
-      color: primitiveColors.amber['600'].$value,
-    },
-    {
-      value: 'green',
-      label: 'Green',
-      color: primitiveColors.green['600'].$value,
-    },
-    { value: 'teal', label: 'Teal', color: primitiveColors.teal['600'].$value },
-  ].map((preset) => Object.freeze(preset))
-);
+const BRAND_PRESET_FAMILIES = [
+  'indigo',
+  'blue',
+  'violet',
+  'rose',
+  'orange',
+  'amber',
+  'green',
+  'teal',
+] as const satisfies readonly PrimitivePaletteName[];
 
-export type BrandColorPreset = (typeof BRAND_COLOR_PRESETS)[number];
+export interface BrandColorPreset {
+  readonly value: 'default' | (typeof BRAND_PRESET_FAMILIES)[number];
+  readonly label: string;
+  /** Six-digit lowercase hex seed for `brandColor`. */
+  readonly color: string;
+}
+
+export const BRAND_COLOR_PRESETS: readonly BrandColorPreset[] = [
+  { value: 'default', label: 'Default', color: DEFAULT_BRAND_COLOR },
+  ...BRAND_PRESET_FAMILIES.map((family) => ({
+    value: family,
+    label: family.charAt(0).toUpperCase() + family.slice(1),
+    color: primitiveColors[family]['600'].$value,
+  })),
+];

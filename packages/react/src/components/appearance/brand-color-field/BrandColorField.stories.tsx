@@ -1,7 +1,6 @@
 import { useState } from 'react';
 
-import { DEFAULT_BRAND_COLOR } from '@nexus_ds/core';
-import { BRAND_COLOR_PRESETS } from '@nexus_ds/core/palette';
+import { BRAND_COLOR_PRESETS, DEFAULT_BRAND_COLOR } from '@nexus_ds/core';
 import type { Meta, StoryObj } from '@storybook/react';
 import { expect, fireEvent, fn, userEvent, within } from 'storybook/test';
 

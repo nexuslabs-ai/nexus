@@ -11,6 +11,7 @@ pnpm add @nexus_ds/core
 ## Primary Exports
 
 - `DEFAULT_NEXUS_APPEARANCE`, `sanitizeNexusAppearance`, `NexusAppearanceState`: the appearance model.
+- `BRAND_COLOR_PRESETS`, `BrandColorPreset`, `DEFAULT_BRAND_COLOR`: brand color choices for appearance editors. Default is `DEFAULT_BRAND_COLOR`; Indigo, Blue, Violet, Rose, Orange, Amber, Green, and Teal use each family's authored 600 hex. Assign a preset's `color` to `brandColor`.
 - `createNexusThemeContract`, `deriveTheme`, `themeToCss`: derive a full token set from appearance state and render it to CSS.
 - `createNexusAppearanceSnapshotFromState`, `createNexusAppearanceBootstrapScript`, `resolveFirstPaint`, `DEFAULT_STORAGE_KEY`: first-paint, no-flash bootstrap.
 
@@ -38,8 +39,6 @@ The engine starts from authored palettes: Success uses Green, Warning Orange, Er
 Under deuteranopia the Success (Green) and Warning (Orange) 600 shades are hard to tell apart, so status UI must pair color with an icon and label. The color-vision audit reports this pair as its one accepted limitation.
 
 Custom brand ramps and raw surface-tone references retain their separate algorithms. A palette's processed 600 shade is not interchangeable with its authored hex as a brand seed.
-
-`BRAND_COLOR_PRESETS` (and its `BrandColorPreset` type) provides a frozen catalog of Default, Indigo, Blue, Violet, Rose, Orange, Amber, Green, and Teal. The eight color choices reference each family's authored 600 hex; Default uses the existing `DEFAULT_BRAND_COLOR`. Assign a preset's `color` to `brandColor` and derive the theme normally. Presets do not replace the custom-brand algorithm or add a new appearance-state field.
 
 ## Non-React Shell Example
 

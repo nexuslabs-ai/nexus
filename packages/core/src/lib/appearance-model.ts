@@ -46,8 +46,6 @@ export interface NexusAppearanceState {
   prefs: NexusAppearancePrefs;
 }
 
-export { DEFAULT_BRAND_COLOR } from './brand-presets';
-
 export const BASE_TONE_OPTIONS = [
   { value: 'stone', label: 'Stone', color: '#747271' },
   { value: 'neutral', label: 'Neutral', color: '#737373' },

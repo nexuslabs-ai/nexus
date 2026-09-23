@@ -1,13 +1,13 @@
 import { useState } from 'react';
 
 import {
+  BRAND_COLOR_PRESETS,
   CORNER_OPTIONS,
   createNexusAppearanceSnapshotFromState,
   DEFAULT_NEXUS_APPEARANCE,
   DENSITY_OPTIONS,
   ELEVATION_OPTIONS,
 } from '@nexus_ds/core';
-import { BRAND_COLOR_PRESETS } from '@nexus_ds/core/palette';
 import type { Meta, StoryObj } from '@storybook/react';
 import { expect, userEvent, waitFor, within } from 'storybook/test';
 

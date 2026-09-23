@@ -7,6 +7,7 @@ export { adjustContrast } from './lib/adjust-contrast';
 export { apcaLc } from './lib/apca';
 export * from './lib/appearance-model';
 export * from './lib/appearance-snapshot';
+export * from './lib/brand-presets';
 export type {
   DerivedTheme,
   NexusThemeContract,

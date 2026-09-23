@@ -8,7 +8,6 @@ import {
   BASE_TONE_SEEDS,
   CORNER_OPTIONS,
   createNexusThemeContract,
-  DEFAULT_BRAND_COLOR,
   DEFAULT_NEXUS_APPEARANCE,
   DENSITY_OPTIONS,
   ELEVATION_OPTIONS,
@@ -17,6 +16,7 @@ import {
   sanitizeNexusAppearancePrefs,
   STROKE_OPTIONS,
 } from './appearance-model';
+import { DEFAULT_BRAND_COLOR } from './brand-presets';
 import { deriveTheme } from './derive-theme';
 
 describe('appearance model', () => {
