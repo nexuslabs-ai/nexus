@@ -1,9 +1,3 @@
-/**
- * The directories every other script in here resolves paths against. A leaf so
- * that reading the package manifest and deciding what the props JSON documents
- * stay independent of each other.
- */
-
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 

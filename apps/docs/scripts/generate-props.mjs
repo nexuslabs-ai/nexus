@@ -26,7 +26,7 @@ import {
   toSlugFolder,
 } from './props-contract.mjs';
 import { reactEntryPoints } from './react-entry-points.mjs';
-import { docsRoot, reactRoot, repoRoot } from './roots.mjs';
+import { docsRoot, reactRoot } from './roots.mjs';
 
 const reactSrc = path.join(reactRoot, 'src');
 const componentsRoot = path.join(reactSrc, 'components');
@@ -49,22 +49,7 @@ function collectSourceFiles(dir) {
     .filter(isComponentSource);
 }
 
-function toSlug(absolutePath) {
-  return toSlugFolder(path.relative(componentsRoot, absolutePath));
-}
-
-// `publicComponents` has already proven the declaration and its file resolve.
-function symbolSourcePath(symbol) {
-  return toRepoPath(symbol.declarations[0].getSourceFile().fileName);
-}
-
-/**
- * A prop typed with a repo-local alias prints that alias name, which a reader
- * cannot resolve unless the package exports it. Print the alias body instead,
- * so no component has to inline a union for the docs' sake. Every candidate
- * name comes back alongside the expansions, because a name still standing in
- * the emitted type is one the expansion did not reach.
- */
+// Maps each unexported repo-local alias name to its printed body.
 function localAliasExpansions(checker, program, exported) {
   const candidates = new Map();
 
@@ -90,9 +75,7 @@ function localAliasExpansions(checker, program, exported) {
     }
   }
 
-  // Two files declaring the same unexported alias would otherwise expand
-  // whichever was parsed last into both components' props, so a name has to be
-  // claimed by one body — and by a body that prints portably everywhere.
+  // Expand a name only when every declaration of it prints the same portable body.
   const expansions = new Map(
     [...candidates]
       .filter(([, texts]) => texts.size === 1 && !texts.has(null))
@@ -102,14 +85,8 @@ function localAliasExpansions(checker, program, exported) {
   return { expansions, localAliases: new Set(candidates.keys()) };
 }
 
-/**
- * The names a printed type refers to, which is narrower than the names it
- * spells. Stripped: a quoted member, which is a value rather than a name, and a
- * declaration name — a member or parameter, `readonly` or not, recognised by
- * the delimiter that opens its list sitting in front of it.
- * Kept: a conditional type's true branch, the one other name that can precede a
- * colon, which is a reference like any other.
- */
+// Identifiers a printed type refers to: string literals and member/parameter
+// names (a name followed by `:` right after `{ ; , ( [`) are stripped first.
 function typeReferenceTokens(type) {
   return (
     type
@@ -122,13 +99,6 @@ function typeReferenceTokens(type) {
   );
 }
 
-/**
- * A type that still refers to a repo-local alias the package does not export
- * leaves the reader a name with nothing to look it up in. Expansion is the
- * usual answer, and it only reaches a type that is the alias and nothing else —
- * so an alias surviving in a composed position (`TableVariant[]`) is caught
- * here alongside one whose body would not have printed portably.
- */
 function assertResolvableTypes(entries, localAliases) {
   const offenders = entries.flatMap((entry) =>
     entry.props.flatMap((prop) => {
@@ -162,10 +132,7 @@ function toPropEntry(prop, expansions) {
     required: prop.required,
     defaultValue: prop.defaultValue?.value ?? null,
     description: prop.description,
-    // `shouldIncludePropTagMap` strips `@example` out of `description`, so the
-    // snippet only survives if it is carried across from the tag map — which,
-    // unlike `description`, docgen hands back with the checkout's own line
-    // endings.
+    // Unlike `description`, docgen leaves tag values with CRLF line endings.
     example: prop.tags?.example?.replace(/\r\n/g, '\n') ?? null,
   };
 }
@@ -184,8 +151,6 @@ function toComponentEntry(name, sourcePath, doc, expansions) {
 function toProplessEntry(checker, name, sourcePath, symbol) {
   return {
     name,
-    // docgen normalizes line endings; reading the comment off the symbol
-    // directly would carry a CRLF checkout into the output.
     description: ts
       .displayPartsToString(symbol.getDocumentationComment(checker))
       .replace(/\r\n/g, '\n'),
@@ -194,11 +159,7 @@ function toProplessEntry(checker, name, sourcePath, symbol) {
   };
 }
 
-/**
- * Components documented above their `{Name}Props` interface rather than above
- * the function leave docgen attributing the description to the type export.
- * Move it back onto the component.
- */
+// A component documented on its `{Name}Props` interface takes that description.
 function adoptPropsTypeDescriptions(components, typeExportDescriptions) {
   for (const component of components) {
     if (component.description) continue;
@@ -220,13 +181,7 @@ function writeJson(filePath, value) {
   writeFileSync(filePath, `${JSON.stringify(value, null, 2)}\n`, 'utf8');
 }
 
-/**
- * A slug file names its own slug in its body, so a run can recognise the files
- * a previous one wrote without trusting anything to name a path: the names come
- * from the directory listing, and the body only has to agree with the name it
- * already has. That leaves a folder renamed or deleted since the last run with
- * no orphan behind, whatever state the index arrives in.
- */
+// A file this script wrote carries its own slug in its body.
 function wasGeneratedHere(fileName) {
   try {
     const body = JSON.parse(
@@ -266,9 +221,6 @@ const program = ts.createProgram([...sourceFiles, ...entryPoints], {
   noEmit: true,
 });
 
-// The generator is the only place that can tell a missing workspace build from
-// an ordinary type error, so it asks the resolver for the declarations before
-// reading a single type off them.
 assertWorkspaceTypes(program, {
   srcRoot: reactSrc,
   manifest: reactManifest,
@@ -285,8 +237,6 @@ const { expansions, localAliases } = localAliasExpansions(
   exported
 );
 
-// `parseWithProgramProvider` ignores the parser's own options once a program
-// is supplied, so this reuses the ones the program was built with.
 const parser = docgen.withCompilerOptions(compilerOptions, {
   savePropValueAsString: true,
   shouldIncludeExpression: true,
@@ -308,27 +258,24 @@ for (const doc of parser.parseWithProgramProvider(sourceFiles, () => program)) {
   }
   if (isReExport(doc, parsedPaths)) continue;
 
-  // Keyed by file as well as name: a component sharing a public export's name
-  // would otherwise claim its entry, and take it to whichever slug the shadow
-  // happens to live in.
   docsByDeclaration.set(`${toRepoPath(doc.filePath)}#${exportName(doc)}`, doc);
 }
 
-// A union prints its members in the order the checker first interned them, so
-// resolving component types ahead of the alias expansions and the docgen parse
-// would reorder the type strings those two produce.
+// Must run after docgen: union members print in the order the checker first
+// interned them.
 const components = publicComponents(checker, exported, componentsRoot);
 
 const bySlug = new Map(slugs.map((slug) => [slug, []]));
 
 for (const [name, symbol] of components) {
-  const sourcePath = symbolSourcePath(symbol);
+  const { fileName } = symbol.declarations[0].getSourceFile();
+  const sourcePath = toRepoPath(fileName);
   const doc = docsByDeclaration.get(`${sourcePath}#${name}`);
   const entry = doc
     ? toComponentEntry(name, sourcePath, doc, expansions)
     : toProplessEntry(checker, name, sourcePath, symbol);
 
-  bySlug.get(toSlug(path.join(repoRoot, sourcePath))).push(entry);
+  bySlug.get(toSlugFolder(path.relative(componentsRoot, fileName))).push(entry);
 }
 
 assertResolvableTypes([...bySlug.values()].flat(), localAliases);
@@ -340,8 +287,6 @@ const index = {};
 let propCount = 0;
 
 for (const [slug, entries] of bySlug) {
-  // A folder that exports no component (`focus-ring` is stories only,
-  // `overlay-layout` is a util module) has no page, so it gets no entry.
   if (entries.length === 0) continue;
 
   entries.sort(byNameThenSource);

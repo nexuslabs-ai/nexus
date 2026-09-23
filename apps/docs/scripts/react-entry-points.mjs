@@ -13,22 +13,12 @@ const CODE_EXTENSIONS = new Set([
   '.tsx',
 ]);
 
-/**
- * Every file a subpath can resolve to, flattened out of however many condition
- * objects it is nested in.
- */
 function targetFiles(target) {
   if (typeof target === 'string') return [target];
   if (target === null || typeof target !== 'object') return [];
   return Object.values(target).flatMap(targetFiles);
 }
 
-/**
- * A subpath the package deliberately does not export (`null`), or one that only
- * ever lands on an asset (`"./styles.css": "./dist/react.css"`), carries no
- * module surface. Read off the files the target resolves to rather than the
- * subpath name, so a dotted name such as `"./v1.2"` is still treated as code.
- */
 function isModuleSurface(target) {
   return targetFiles(target).some((file) =>
     CODE_EXTENSIONS.has(path.extname(file))
@@ -37,16 +27,7 @@ function isModuleSurface(target) {
 
 const CONDITION_PRIORITY = ['import', 'module', 'require', 'node', 'default'];
 
-/**
- * The declarations for a subpath: a `types` condition at the top of its object,
- * or inside a nested one (`{ import: { types, default } }`). A manifest can
- * spell `types` under more than one condition, so the named ones are walked in
- * a fixed order rather than whichever the object happens to list first. The
- * rest follow in declaration order, so a condition this list does not name —
- * `browser`, `react-server`, or an array fallback's elements — still resolves,
- * matching the keys `targetFiles` reads to call the subpath code in the first
- * place.
- */
+// Named conditions first, in a fixed order; any others after, as listed.
 function typesCondition(target) {
   if (target === null || typeof target !== 'object') return null;
   if (typeof target.types === 'string') return target.types;
@@ -63,11 +44,7 @@ function typesCondition(target) {
   return null;
 }
 
-/**
- * The `exports` map points at built declarations; the same subpaths under
- * `src/` are what the program is built from, so a new public subentry is picked
- * up without a second list to maintain.
- */
+// Maps each `exports` subpath's `dist/*.d.ts` back to its `src/*.ts`.
 export function reactEntryPoints(manifest) {
   return Object.entries(manifest.exports)
     .filter(([, target]) => isModuleSurface(target))
