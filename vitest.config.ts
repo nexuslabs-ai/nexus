@@ -38,7 +38,7 @@ export default defineConfig({
           environment: 'jsdom',
           include: [
             'packages/core/src/lib/*.test.ts',
-            'packages/react/src/lib/utils.test.ts',
+            'packages/react/src/lib/*.test.ts',
             'packages/eslint-plugin-nexus/__tests__/*.test.js',
           ],
         },
