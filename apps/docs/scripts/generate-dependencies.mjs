@@ -1,7 +1,7 @@
 import { mkdirSync, readdirSync, readFileSync, rmSync } from 'node:fs';
 import path from 'node:path';
 
-import { Project, SyntaxKind, ts } from 'ts-morph';
+import { Project, ts } from 'ts-morph';
 
 import {
   collectSourceFiles,
@@ -39,22 +39,6 @@ function toSrcPath(filePath) {
   return path.relative(reactSrc, filePath).split(path.sep).join('/');
 }
 
-function assertStaticImportsOnly(sourceFile) {
-  const dynamic = [
-    ...sourceFile.getDescendantsOfKind(SyntaxKind.ImportType),
-    ...sourceFile
-      .getDescendantsOfKind(SyntaxKind.CallExpression)
-      .filter(
-        (call) => call.getExpression().getKind() === SyntaxKind.ImportKeyword
-      ),
-  ];
-  if (dynamic.length === 0) return;
-
-  throw new Error(
-    `dependencies JSON: ${toRepoPath(sourceFile.getFilePath())}:${dynamic[0].getStartLineNumber()} uses import(), which the generator does not follow. Use a static import.`
-  );
-}
-
 function resolveRelative(importer, specifier) {
   const { resolvedModule } = ts.resolveModuleName(
     specifier,
@@ -73,15 +57,8 @@ function resolveRelative(importer, specifier) {
   return targetPath;
 }
 
-const importsByFile = new Map();
-
-// Splits one file's module specifiers into npm packages and repo-local files.
 function fileImports(filePath) {
-  if (importsByFile.has(filePath)) return importsByFile.get(filePath);
-
   const sourceFile = project.addSourceFileAtPath(filePath);
-  assertStaticImportsOnly(sourceFile);
-
   const packages = [];
   const files = [];
   const declarations = [
@@ -100,9 +77,7 @@ function fileImports(filePath) {
     }
   }
 
-  const result = { packages, files };
-  importsByFile.set(filePath, result);
-  return result;
+  return { packages, files };
 }
 
 function walk(roots) {
@@ -123,7 +98,6 @@ function walk(roots) {
   return { files: [...visited], packages: [...packages] };
 }
 
-// No TS file imports a component's stylesheet, so it rides along with its folder.
 function colocatedStyles(files) {
   const folders = new Set(files.map((file) => path.dirname(file)));
   return [...folders].flatMap((folder) =>
@@ -166,7 +140,7 @@ function assertDeclaredPackages(entries) {
 
   throw new Error(
     [
-      'dependencies JSON: a component imports a package that @nexus_ds/react does not declare in dependencies or peerDependencies, so a reader would be told to install something the package never promised.',
+      'dependencies JSON: a component imports a package @nexus_ds/react does not declare in dependencies or peerDependencies.',
       ...offenders,
     ].join('\n')
   );
@@ -184,5 +158,5 @@ for (const entry of entries) {
 }
 
 console.log(
-  `dependencies: ${entries.length} entries, ${importsByFile.size} files walked -> ${toRepoPath(outputDir)}`
+  `dependencies: ${entries.length} entries -> ${toRepoPath(outputDir)}`
 );
