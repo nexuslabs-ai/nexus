@@ -19,6 +19,7 @@ import {
   isReExport,
   isTypeExport,
   isUnder,
+  isWidenedVariant,
   opaqueNamespaceNames,
   publicComponents,
   publicExports,
@@ -120,6 +121,24 @@ function assertResolvableTypes(entries, localAliases) {
     [
       'props JSON: a prop is documented with a repo-local type alias that @nexus_ds/react does not export, so a reader cannot resolve it.',
       'Export the alias from its component folder and from src/index.ts. Expansion covers the rest, but only for a prop typed as the bare alias, and only when its body prints portably.',
+      ...offenders,
+    ].join('\n')
+  );
+}
+
+function assertVariantUnions(documented) {
+  const offenders = documented.flatMap(([name, doc]) =>
+    Object.values(doc.props)
+      .filter(isWidenedVariant)
+      .map((prop) => `  ${name}.${prop.name}: ${prop.type.name}`)
+  );
+
+  if (offenders.length === 0) return;
+
+  throw new Error(
+    [
+      'props JSON: a cva variant prop widened to string, so its options would be documented as a bare string.',
+      'Check the variant still reaches the component through VariantProps<typeof ...> and that its cva() variants object keeps literal keys.',
       ...offenders,
     ].join('\n')
   );
@@ -266,11 +285,13 @@ for (const doc of parser.parseWithProgramProvider(sourceFiles, () => program)) {
 const components = publicComponents(checker, exported, componentsRoot);
 
 const bySlug = new Map(slugs.map((slug) => [slug, []]));
+const documented = [];
 
 for (const [name, symbol] of components) {
   const { fileName } = symbol.declarations[0].getSourceFile();
   const sourcePath = toRepoPath(fileName);
   const doc = docsByDeclaration.get(`${sourcePath}#${name}`);
+  if (doc) documented.push([name, doc]);
   const entry = doc
     ? toComponentEntry(name, sourcePath, doc, expansions)
     : toProplessEntry(checker, name, sourcePath, symbol);
@@ -278,6 +299,7 @@ for (const [name, symbol] of components) {
   bySlug.get(toSlugFolder(path.relative(componentsRoot, fileName))).push(entry);
 }
 
+assertVariantUnions(documented);
 assertResolvableTypes([...bySlug.values()].flat(), localAliases);
 
 mkdirSync(outputDir, { recursive: true });

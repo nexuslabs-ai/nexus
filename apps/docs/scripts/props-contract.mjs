@@ -44,6 +44,11 @@ export function isOwnProp(prop) {
   );
 }
 
+export function isWidenedVariant(prop) {
+  const isSynthesized = (prop.declarations ?? []).length === 0 && !prop.parent;
+  return isSynthesized && /^string( \| null)?$/.test(prop.type.name);
+}
+
 // Only a type export keeps the alias flag; a value export resolves through it.
 export function isTypeExport(doc) {
   return ((doc.expression?.flags ?? 0) & ts.SymbolFlags.Alias) !== 0;
