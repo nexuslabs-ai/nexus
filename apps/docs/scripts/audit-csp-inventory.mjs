@@ -2,10 +2,8 @@ import { existsSync, readdirSync, readFileSync } from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 
-const docsRoot = path.resolve(
-  path.dirname(fileURLToPath(import.meta.url)),
-  '..'
-);
+import { docsRoot } from './roots.mjs';
+
 const appOutputDir = path.join(docsRoot, '.next', 'server', 'app');
 const clientOutputDir = path.join(docsRoot, '.next', 'static');
 // String literals only — identifiers and property names are mangled away, and

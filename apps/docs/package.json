@@ -5,14 +5,15 @@
   "type": "module",
   "description": "Documentation site for the Nexus Design System",
   "scripts": {
-    "dev": "pnpm generate:manifest && next dev --turbopack",
-    "build": "pnpm generate:manifest && next build",
+    "dev": "next dev --turbopack",
+    "generate:props": "node scripts/generate-props.mjs",
+    "build": "next build",
     "start": "next start",
     "generate:manifest": "node scripts/generate-page-manifest.mjs",
     "audit:csp": "node scripts/audit-csp-inventory.mjs",
     "audit:grammar-pin": "node scripts/audit-grammar-pin.mjs",
     "typecheck": "tsc --noEmit",
-    "clean": "rm -rf .next dist"
+    "clean": "rm -rf .next generated/props"
   },
   "dependencies": {
     "@mdx-js/loader": "^3.1.0",
@@ -44,6 +45,7 @@
     "jiti": "^2.7.0",
     "postcss": "^8.4.49",
     "prettier": "^3.7.4",
+    "react-docgen-typescript": "^2.4.0",
     "tailwindcss": "^4.1.18",
     "typescript": "^5.9.3"
   }

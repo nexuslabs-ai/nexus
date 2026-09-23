@@ -5,14 +5,9 @@
  */
 import fs from 'node:fs';
 import path from 'node:path';
-import { fileURLToPath } from 'node:url';
 
 import { buildPageManifest } from './page-manifest.mjs';
-
-const docsRoot = path.resolve(
-  path.dirname(fileURLToPath(import.meta.url)),
-  '..'
-);
+import { docsRoot } from './roots.mjs';
 
 const modules = await buildPageManifest(docsRoot);
 for (const [file, contents] of Object.entries(modules)) {
