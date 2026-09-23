@@ -1,13 +1,13 @@
 import { notFound } from 'next/navigation';
 
-import { Breadcrumb } from '../../_components/Breadcrumb';
-import { PageWireframeView } from '../../_components/PageWireframeView';
+import { Breadcrumb } from '../../../_components/Breadcrumb';
+import { PageWireframeView } from '../../../_components/PageWireframeView';
 import {
   getSection,
   type ManifestPage,
   PAGE_MANIFEST,
-} from '../../_lib/manifest';
-import { PAGE_LOADERS } from '../../_lib/page-content.generated';
+} from '../../../_lib/manifest';
+import { PAGE_LOADERS } from '../../../_lib/page-content.generated';
 
 export function generateStaticParams() {
   return PAGE_MANIFEST.flatMap((section) =>
