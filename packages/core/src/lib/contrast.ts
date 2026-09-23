@@ -117,11 +117,25 @@ function solveForeground(
   );
 }
 
+interface SolveGroup {
+  kind: ApcaSolveKind;
+  pairs: ApcaPair[];
+}
+
 /** Pairs grouped by the color they resolve to (`solveAs`, else their own foreground). */
-const SOLVE_GROUPS = new Map<string, ApcaPair[]>();
+const SOLVE_GROUPS = new Map<string, SolveGroup>();
 for (const pair of APCA_PAIRS) {
   const key = pair.solveAs ?? pair.fg;
-  SOLVE_GROUPS.set(key, [...(SOLVE_GROUPS.get(key) ?? []), pair]);
+  const group = SOLVE_GROUPS.get(key);
+  if (!group) {
+    SOLVE_GROUPS.set(key, { kind: pair.kind, pairs: [pair] });
+    continue;
+  }
+  if (group.kind !== pair.kind)
+    throw new Error(
+      `contrast: ${pair.fg} is '${pair.kind}' but joins '${group.kind}' group ${key}`
+    );
+  group.pairs.push(pair);
 }
 
 /** Pick the black/white label for a family and move any fill it can't read on to the tier floor. */
@@ -153,16 +167,13 @@ export function constrainColors(
   mode: Mode,
   contrast: number
 ): TokenMap {
-  const labels = [...SOLVE_GROUPS].filter(
-    ([, pairs]) => pairs[0]?.kind === 'label'
-  );
-  for (const [name, pairs] of labels) constrainFamilyFills(map, name, pairs);
+  for (const [name, { kind, pairs }] of SOLVE_GROUPS)
+    if (kind === 'label') constrainFamilyFills(map, name, pairs);
 
   const endpoint: 0 | 1 = mode === 'dark' ? 1 : 0;
   const endpointY = luminance(`oklch(${endpoint} 0 0)`);
-  for (const [name, pairs] of SOLVE_GROUPS) {
-    const kind = pairs[0]?.kind;
-    if (kind === undefined || kind === 'label') continue;
+  for (const [name, { kind, pairs }] of SOLVE_GROUPS) {
+    if (kind === 'label') continue;
     const constraints = constraintsFor(map, pairs, contrast, endpointY);
     if (constraints === undefined)
       throw new Error(`contrast: no readable ${name} in ${mode}`);

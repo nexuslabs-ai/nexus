@@ -5,7 +5,12 @@ import {
   type NexusAppearanceState,
   sanitizeNexusAppearance,
 } from './appearance-model';
-import { deriveThemeMode, themeToCss, type TokenMap } from './derive-theme';
+import {
+  deriveThemeMode,
+  type ThemeDerivationInput,
+  themeToCss,
+  type TokenMap,
+} from './derive-theme';
 import type { Mode } from './palette';
 
 export const SNAPSHOT_VERSION = 6;
@@ -71,8 +76,10 @@ function remember<T>(cache: Map<string, T>, key: string, value: T): T {
 
 // Each mode is cached on only the inputs it reads, so moving one mode's
 // contrast slider (or any non-color preference) re-derives at most one mode.
-function deriveModeCached(state: NexusAppearanceState, mode: Mode): TokenMap {
-  const contract = createNexusThemeContract(state);
+function deriveModeCached(
+  contract: ThemeDerivationInput,
+  mode: Mode
+): TokenMap {
   const key = JSON.stringify([
     mode,
     contract.surfaceTone,
@@ -86,9 +93,10 @@ function deriveModeCached(state: NexusAppearanceState, mode: Mode): TokenMap {
 }
 
 function deriveThemeCss(state: NexusAppearanceState): string {
+  const contract = createNexusThemeContract(state);
   return themeToCss({
-    light: deriveModeCached(state, 'light'),
-    dark: deriveModeCached(state, 'dark'),
+    light: deriveModeCached(contract, 'light'),
+    dark: deriveModeCached(contract, 'dark'),
   });
 }
 

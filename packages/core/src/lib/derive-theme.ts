@@ -243,10 +243,6 @@ function deriveChart(mode: Mode): TokenMap {
   );
 }
 
-function formatAlpha(alpha: number): string {
-  return alpha.toFixed(4).replace(/0+$/, '').replace(/\.$/, '');
-}
-
 function deriveAlpha(
   surfaceTone: NexusSurfaceTone,
   mode: Mode,
@@ -255,11 +251,9 @@ function deriveAlpha(
   const tone = SURFACE_TONE[surfaceTone];
   const dark = mode === 'dark';
   const toneInk = (alpha: number) =>
-    `oklch(0.13 ${tone.darkC.toFixed(4)} ${tone.h.toFixed(1)} / ${formatAlpha(alpha)})`;
+    formatOklch({ mode: 'oklch', l: 0.13, c: tone.darkC, h: tone.h, alpha });
   const contrastInk = (alpha: number) =>
-    dark
-      ? `oklch(1 0 0 / ${formatAlpha(alpha)})`
-      : `oklch(0.1448 0 0 / ${formatAlpha(alpha)})`;
+    formatOklch({ mode: 'oklch', l: dark ? 1 : 0.1448, c: 0, h: 0, alpha });
 
   return {
     '--nx-color-overlay': toneInk(dark ? 0.8471 : 0.7529),
