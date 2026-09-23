@@ -238,6 +238,130 @@ export const GeometryMatrix: Story = {
   },
 };
 
+interface SharedEdgeCase {
+  name: string;
+  spacing: number;
+  leading: { invalid?: boolean };
+  trailing: { invalid?: boolean; pressed?: boolean; disabled?: boolean };
+  owner: 'own' | 'next';
+}
+
+const SHARED_EDGE_CASES: readonly SharedEdgeCase[] = [
+  {
+    name: 'selected',
+    spacing: 0,
+    leading: {},
+    trailing: { pressed: true },
+    owner: 'next',
+  },
+  {
+    name: 'invalid',
+    spacing: 0,
+    leading: {},
+    trailing: { invalid: true },
+    owner: 'next',
+  },
+  {
+    name: 'invalid selected',
+    spacing: 0,
+    leading: {},
+    trailing: { invalid: true, pressed: true },
+    owner: 'next',
+  },
+  {
+    name: 'disabled selected',
+    spacing: 0,
+    leading: {},
+    trailing: { disabled: true, pressed: true },
+    owner: 'own',
+  },
+  {
+    name: 'own invalid',
+    spacing: 0,
+    leading: { invalid: true },
+    trailing: { pressed: true },
+    owner: 'own',
+  },
+  {
+    name: 'spaced',
+    spacing: 2,
+    leading: {},
+    trailing: { pressed: true },
+    owner: 'own',
+  },
+];
+
+// The joined edge between two outline-primary items takes the next item's
+// selected / invalid colour unless the leading item's own state is invalid.
+export const JoinedSharedEdge: Story = {
+  render: () => (
+    <div className="nx:flex nx:flex-wrap nx:items-start nx:gap-8">
+      {GEOMETRY_LAYOUTS.flatMap((layout) =>
+        SHARED_EDGE_CASES.map((edgeCase) => {
+          const label = `${layout.name} ${edgeCase.name}`;
+          return (
+            <ToggleGroup
+              key={label}
+              type="multiple"
+              variant="outline-primary"
+              spacing={edgeCase.spacing}
+              dir={layout.dir}
+              orientation={layout.orientation}
+              defaultValue={edgeCase.trailing.pressed ? ['trailing'] : []}
+              aria-label={label}
+            >
+              <ToggleGroupItem
+                value="leading"
+                aria-invalid={edgeCase.leading.invalid}
+                aria-label={`${label} leading`}
+              >
+                <IconBold />
+              </ToggleGroupItem>
+              <ToggleGroupItem
+                value="trailing"
+                aria-invalid={edgeCase.trailing.invalid}
+                disabled={edgeCase.trailing.disabled}
+                aria-label={`${label} trailing`}
+              >
+                <IconItalic />
+              </ToggleGroupItem>
+            </ToggleGroup>
+          );
+        })
+      )}
+    </div>
+  ),
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+    for (const layout of GEOMETRY_LAYOUTS) {
+      const vertical = layout.orientation === 'vertical';
+      const start = (item: HTMLElement) =>
+        vertical
+          ? getComputedStyle(item).borderTopColor
+          : getComputedStyle(item).borderInlineStartColor;
+      const end = (item: HTMLElement) =>
+        vertical
+          ? getComputedStyle(item).borderBottomColor
+          : getComputedStyle(item).borderInlineEndColor;
+      const item = (label: string, position: 'leading' | 'trailing') =>
+        canvas.getByRole('button', { name: `${label} ${position}` });
+      const selected = end(item(`${layout.name} selected`, 'trailing'));
+      for (const edgeCase of SHARED_EDGE_CASES) {
+        const label = `${layout.name} ${edgeCase.name}`;
+        const leading = item(label, 'leading');
+        const trailing = item(label, 'trailing');
+        if (edgeCase.owner === 'next') {
+          await expect(end(trailing), label).not.toBe(start(leading));
+          await expect(end(leading), label).toBe(end(trailing));
+          continue;
+        }
+        await expect(start(leading), label).not.toBe(selected);
+        await expect(end(leading), label).toBe(start(leading));
+      }
+    }
+  },
+};
+
 const NAVIGATION = [
   ...LAYOUTS.map((layout) => ({ ...layout, loop: true })),
   { name: 'Vertical RTL', dir: 'rtl', orientation: 'vertical', loop: true },

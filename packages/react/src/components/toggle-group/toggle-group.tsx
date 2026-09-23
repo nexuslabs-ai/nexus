@@ -94,6 +94,19 @@ function ToggleGroup({
   );
 }
 
+const joinedOutlinePrimaryEdge = {
+  horizontal: [
+    'nx:[&:not([aria-invalid=true]:not(:disabled)):has(+[data-variant=outline-primary]:not(:disabled)[data-state=on])]:border-e-border-primary-active',
+    'nx:[&:not([aria-invalid=true]:not(:disabled)):has(+[data-variant=outline-primary]:not(:disabled)[aria-invalid=true])]:border-e-border-error',
+    'nx:[&:not([aria-invalid=true]:not(:disabled)):has(+[data-variant=outline-primary]:not(:disabled)[aria-invalid=true][data-state=on])]:border-e-border-error-active',
+  ],
+  vertical: [
+    'nx:[&:not([aria-invalid=true]:not(:disabled)):has(+[data-variant=outline-primary]:not(:disabled)[data-state=on])]:border-b-border-primary-active',
+    'nx:[&:not([aria-invalid=true]:not(:disabled)):has(+[data-variant=outline-primary]:not(:disabled)[aria-invalid=true])]:border-b-border-error',
+    'nx:[&:not([aria-invalid=true]:not(:disabled)):has(+[data-variant=outline-primary]:not(:disabled)[aria-invalid=true][data-state=on])]:border-b-border-error-active',
+  ],
+} as const;
+
 /**
  * ToggleGroupItemProps
  *
@@ -120,6 +133,8 @@ function ToggleGroupItem({
   const context = React.useContext(ToggleGroupContext);
   const resolvedVariant = variant ?? context.variant ?? 'default';
   const resolvedSize = size ?? context.size ?? 'default';
+  const joinedOutlinePrimary =
+    context.spacing === 0 && resolvedVariant === 'outline-primary';
 
   return (
     <ToggleGroupPrimitive.Item
@@ -131,6 +146,8 @@ function ToggleGroupItem({
         // border so the pair shares one edge.
         'nx:data-[spacing=0]:data-[orientation=horizontal]:[[data-slot=toggle-group-item]:not([data-variant=default])+&]:border-s-0 nx:data-[spacing=0]:data-[orientation=vertical]:[[data-slot=toggle-group-item]:not([data-variant=default])+&]:border-t-0',
         'nx:data-[spacing=0]:focus-visible:relative nx:data-[spacing=0]:focus-visible:z-10',
+        joinedOutlinePrimary &&
+          joinedOutlinePrimaryEdge[context.orientation ?? 'horizontal'],
         className
       )}
       {...props}
