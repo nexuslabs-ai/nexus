@@ -51,14 +51,14 @@ export function isWidenedVariant(prop) {
   return isSynthesized(prop) && /^string( \| null)?$/.test(prop.type.name);
 }
 
-// A `cva` variants object typed `Record<string, …>` turns `VariantProps` into an
-// index signature, so its props vanish instead of widening.
 export function hasStringIndexProps(checker, symbol) {
   const declaration = symbol.declarations[0];
   const type = checker.getTypeOfSymbolAtLocation(symbol, declaration);
 
-  return checker
-    .getSignaturesOfType(type, ts.SignatureKind.Call)
+  return [
+    ...checker.getSignaturesOfType(type, ts.SignatureKind.Call),
+    ...checker.getSignaturesOfType(type, ts.SignatureKind.Construct),
+  ]
     .flatMap((signature) => signature.parameters.slice(0, 1))
     .some((props) =>
       checker
