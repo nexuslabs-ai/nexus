@@ -311,6 +311,18 @@ export const Disabled: Story = {
     await expect(window.getComputedStyle(input).backgroundColor).toBe(
       'rgba(0, 0, 0, 0)'
     );
+    // The group owns the surface, so autofill clips the browser paint away in
+    // every state instead of painting Input's own surfaces inside the frame.
+    await expect(input).toHaveClass(
+      'nx:autofill-bg-transparent',
+      'nx:enabled:hover:autofill-bg-transparent',
+      'nx:disabled:autofill-bg-transparent'
+    );
+    await expect(input).not.toHaveClass(
+      'nx:autofill-bg-container',
+      'nx:enabled:hover:autofill-bg-container-hover',
+      'nx:disabled:autofill-bg-disabled'
+    );
     await expect(
       canvas.getByRole('button', { name: 'Subscribe' })
     ).toBeDisabled();

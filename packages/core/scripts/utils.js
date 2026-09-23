@@ -1839,22 +1839,47 @@ export function generateThemeCSS(config) {
 }
 
 /**
- * Theme the browser-painted UI Nexus cannot style through utilities: native
- * control accents, the color-scheme declaration, and the autofill surface.
+ * Theme the browser-painted UI Nexus cannot style through utilities: the
+ * color-scheme declaration and the autofill surface.
  *
- * Browsers ignore `background-color` on an autofilled field, so the surface is
- * repainted with an inset fill shadow. Field boundaries are real borders and
- * focus rings are real outlines, both outside the padding box an inset shadow
- * paints, so the fill never covers them.
- *
- * The forced-colors block must stay last: it ties the base autofill rules on
- * specificity and wins on source order alone.
+ * Browsers paint autofilled fields with `!important` background and text
+ * colours that author `bg-*` / `text-*` classes cannot override. A field pairs
+ * each of those classes with an `autofill-*` utility of the same token
+ * (`nx:bg-container nx:autofill-bg-container`), which repaints the surface as
+ * an inset fill shadow and the text through `-webkit-text-fill-color`. The
+ * shadow stops at the padding edge, so the browser surface is clipped there too
+ * or it shows through a translucent border.
+ * `autofill-bg-transparent` clips the browser surface away instead, for
+ * controls whose parent owns the surface.
  *
  * @returns {string} CSS native browser UI rules
  */
 export function generateNativeBrowserUIThemeCSS() {
   return `
 /* ===== NATIVE BROWSER UI THEME ===== */
+@utility autofill-bg-* {
+  &:autofill {
+    background-clip: padding-box;
+    box-shadow: inset 0 0 0 1000px --value(--color-*);
+  }
+}
+
+@utility autofill-bg-transparent {
+  &:autofill {
+    -webkit-background-clip: text;
+    background-clip: text;
+    box-shadow: none;
+  }
+}
+
+@utility autofill-text-* {
+  &:autofill {
+    color: --value(--color-*);
+    -webkit-text-fill-color: --value(--color-*);
+    caret-color: --value(--color-*);
+  }
+}
+
 @layer base {
   :root {
     color-scheme: light dark;
@@ -1867,84 +1892,32 @@ export function generateNativeBrowserUIThemeCSS() {
   .dark {
     color-scheme: dark;
   }
+}
+`;
+}
 
-  :where(input[type='checkbox'], input[type='radio'], input[type='range'], progress) {
-    accent-color: var(--color-primary-background);
-  }
+/**
+ * Surface utilities: a wrapper declares the surface it paints with
+ * `surface-*` beside its `bg-*` class (`nx:bg-container nx:surface-container`),
+ * and descendants cut themselves out of it with `ring-surface` /
+ * `ring-offset-surface`. Without a declared surface the rings fall back to
+ * `background`.
+ *
+ * @returns {string} CSS @utility declarations
+ */
+export function generateSurfaceUtilitiesCSS() {
+  return `
+/* ===== SURFACE UTILITIES ===== */
+@utility surface-* {
+  --surface: --value(--color-*);
+}
 
-  input[data-slot='input']:-webkit-autofill,
-  input[data-slot='sidebar-input']:-webkit-autofill {
-    color: var(--input-autofill-foreground);
-    -webkit-text-fill-color: var(--input-autofill-foreground);
-    caret-color: var(--input-autofill-foreground);
-    box-shadow: inset 0 0 0 1000px var(--input-autofill-background) !important;
-  }
+@utility ring-surface {
+  --tw-ring-color: var(--surface, --theme(--color-background));
+}
 
-  input[data-slot='input']:autofill,
-  input[data-slot='sidebar-input']:autofill {
-    color: var(--input-autofill-foreground);
-    -webkit-text-fill-color: var(--input-autofill-foreground);
-    caret-color: var(--input-autofill-foreground);
-    box-shadow: inset 0 0 0 1000px var(--input-autofill-background) !important;
-  }
-
-  input[data-slot='input-group-control']:-webkit-autofill {
-    color: var(--input-autofill-foreground);
-    -webkit-background-clip: text;
-    background-clip: text;
-    -webkit-text-fill-color: var(--input-autofill-foreground);
-    caret-color: var(--input-autofill-foreground);
-    box-shadow: none !important;
-  }
-
-  input[data-slot='input-group-control']:autofill {
-    color: var(--input-autofill-foreground);
-    -webkit-background-clip: text;
-    background-clip: text;
-    -webkit-text-fill-color: var(--input-autofill-foreground);
-    caret-color: var(--input-autofill-foreground);
-    box-shadow: none !important;
-  }
-
-  @media (forced-colors: active) {
-    input[data-slot='input']:-webkit-autofill,
-    input[data-slot='sidebar-input']:-webkit-autofill,
-    input[data-slot='input-group-control']:-webkit-autofill {
-      color: CanvasText;
-      -webkit-background-clip: border-box;
-      background-clip: border-box;
-      -webkit-text-fill-color: CanvasText;
-      caret-color: CanvasText;
-      box-shadow: none !important;
-    }
-
-    input[data-slot='input']:autofill,
-    input[data-slot='sidebar-input']:autofill,
-    input[data-slot='input-group-control']:autofill {
-      color: CanvasText;
-      -webkit-background-clip: border-box;
-      background-clip: border-box;
-      -webkit-text-fill-color: CanvasText;
-      caret-color: CanvasText;
-      box-shadow: none !important;
-    }
-
-    input[data-slot='input']:disabled:-webkit-autofill,
-    input[data-slot='sidebar-input']:disabled:-webkit-autofill,
-    input[data-slot='input-group-control']:disabled:-webkit-autofill {
-      color: GrayText;
-      -webkit-text-fill-color: GrayText;
-      caret-color: GrayText;
-    }
-
-    input[data-slot='input']:disabled:autofill,
-    input[data-slot='sidebar-input']:disabled:autofill,
-    input[data-slot='input-group-control']:disabled:autofill {
-      color: GrayText;
-      -webkit-text-fill-color: GrayText;
-      caret-color: GrayText;
-    }
-  }
+@utility ring-offset-surface {
+  --tw-ring-offset-color: var(--surface, --theme(--color-background));
 }
 `;
 }

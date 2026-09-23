@@ -586,12 +586,15 @@ export const OnContainerSurface: Story = {
     docs: {
       description: {
         story:
-          'Avatars on a `container` surface (e.g. a card). The separator and status rings read `--avatar-surface` — set here to the container colour — so they match the card instead of leaving a `background`-coloured halo.',
+          'Avatars on a `container` surface (e.g. a card). The card declares its surface with `surface-container`, so the separator and status rings match it instead of leaving a `background`-coloured halo.',
       },
     },
   },
   render: (_args) => (
-    <div className="nx:rounded-xl nx:bg-container nx:p-6 nx:[--avatar-surface:var(--nx-color-container)]">
+    <div
+      data-testid="card"
+      className="nx:rounded-xl nx:bg-container nx:p-6 nx:surface-container"
+    >
       <AvatarGroup max={4} role="group" aria-label="Team on a card">
         {TEAM.map((person, index) => (
           <TeamAvatar
@@ -603,6 +606,26 @@ export const OnContainerSurface: Story = {
       </AvatarGroup>
     </div>
   ),
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+    const card = canvas.getByTestId('card');
+    const surface = window.getComputedStyle(card).getPropertyValue('--surface');
+
+    // Light `container` and `background` can share a value, so check the rings
+    // read the declared surface rather than comparing colours alone.
+    await expect(surface).not.toBe('');
+    await expect(surface).toBe(window.getComputedStyle(card).backgroundColor);
+
+    const rings = card.querySelectorAll<HTMLElement>(
+      '[data-slot="avatar"], [data-slot="avatar-status"]'
+    );
+    await expect(rings.length).toBeGreaterThan(0);
+    for (const ring of rings) {
+      await expect(
+        window.getComputedStyle(ring).getPropertyValue('--tw-ring-color')
+      ).toBe(surface);
+    }
+  },
 };
 
 // ============================================

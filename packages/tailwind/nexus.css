@@ -2063,6 +2063,29 @@
 }
 
 /* ===== NATIVE BROWSER UI THEME ===== */
+@utility autofill-bg-* {
+  &:autofill {
+    background-clip: padding-box;
+    box-shadow: inset 0 0 0 1000px --value(--color-*);
+  }
+}
+
+@utility autofill-bg-transparent {
+  &:autofill {
+    -webkit-background-clip: text;
+    background-clip: text;
+    box-shadow: none;
+  }
+}
+
+@utility autofill-text-* {
+  &:autofill {
+    color: --value(--color-*);
+    -webkit-text-fill-color: --value(--color-*);
+    caret-color: --value(--color-*);
+  }
+}
+
 @layer base {
   :root {
     color-scheme: light dark;
@@ -2075,89 +2098,19 @@
   .dark {
     color-scheme: dark;
   }
+}
 
-  :where(
-    input[type='checkbox'],
-    input[type='radio'],
-    input[type='range'],
-    progress
-  ) {
-    accent-color: var(--color-primary-background);
-  }
+/* ===== SURFACE UTILITIES ===== */
+@utility surface-* {
+  --surface: --value(--color-*);
+}
 
-  input[data-slot='input']:-webkit-autofill,
-  input[data-slot='sidebar-input']:-webkit-autofill {
-    color: var(--input-autofill-foreground);
-    -webkit-text-fill-color: var(--input-autofill-foreground);
-    caret-color: var(--input-autofill-foreground);
-    box-shadow: inset 0 0 0 1000px var(--input-autofill-background) !important;
-  }
+@utility ring-surface {
+  --tw-ring-color: var(--surface, --theme(--color-background));
+}
 
-  input[data-slot='input']:autofill,
-  input[data-slot='sidebar-input']:autofill {
-    color: var(--input-autofill-foreground);
-    -webkit-text-fill-color: var(--input-autofill-foreground);
-    caret-color: var(--input-autofill-foreground);
-    box-shadow: inset 0 0 0 1000px var(--input-autofill-background) !important;
-  }
-
-  input[data-slot='input-group-control']:-webkit-autofill {
-    color: var(--input-autofill-foreground);
-    -webkit-background-clip: text;
-    background-clip: text;
-    -webkit-text-fill-color: var(--input-autofill-foreground);
-    caret-color: var(--input-autofill-foreground);
-    box-shadow: none !important;
-  }
-
-  input[data-slot='input-group-control']:autofill {
-    color: var(--input-autofill-foreground);
-    -webkit-background-clip: text;
-    background-clip: text;
-    -webkit-text-fill-color: var(--input-autofill-foreground);
-    caret-color: var(--input-autofill-foreground);
-    box-shadow: none !important;
-  }
-
-  @media (forced-colors: active) {
-    input[data-slot='input']:-webkit-autofill,
-    input[data-slot='sidebar-input']:-webkit-autofill,
-    input[data-slot='input-group-control']:-webkit-autofill {
-      color: CanvasText;
-      -webkit-background-clip: border-box;
-      background-clip: border-box;
-      -webkit-text-fill-color: CanvasText;
-      caret-color: CanvasText;
-      box-shadow: none !important;
-    }
-
-    input[data-slot='input']:autofill,
-    input[data-slot='sidebar-input']:autofill,
-    input[data-slot='input-group-control']:autofill {
-      color: CanvasText;
-      -webkit-background-clip: border-box;
-      background-clip: border-box;
-      -webkit-text-fill-color: CanvasText;
-      caret-color: CanvasText;
-      box-shadow: none !important;
-    }
-
-    input[data-slot='input']:disabled:-webkit-autofill,
-    input[data-slot='sidebar-input']:disabled:-webkit-autofill,
-    input[data-slot='input-group-control']:disabled:-webkit-autofill {
-      color: GrayText;
-      -webkit-text-fill-color: GrayText;
-      caret-color: GrayText;
-    }
-
-    input[data-slot='input']:disabled:autofill,
-    input[data-slot='sidebar-input']:disabled:autofill,
-    input[data-slot='input-group-control']:disabled:autofill {
-      color: GrayText;
-      -webkit-text-fill-color: GrayText;
-      caret-color: GrayText;
-    }
-  }
+@utility ring-offset-surface {
+  --tw-ring-offset-color: var(--surface, --theme(--color-background));
 }
 
 /* ===== BASE LAYER ===== */

@@ -1,8 +1,10 @@
 import { type ClassValue, clsx } from 'clsx';
 import {
+  type ClassValidator,
   type DefaultClassGroupIds,
   type DefaultThemeGroupIds,
   extendTailwindMerge,
+  validators,
 } from 'tailwind-merge';
 
 /**
@@ -35,6 +37,12 @@ export const NEXUS_CLASS_GROUPS = {
   // The two ring-safe colour transitions. Without this they land nowhere and a
   // later `transition-none` / `transition-all` fails to replace them.
   transition: ['transition-control', 'transition-field'],
+  // Take any colour token, like `bg-*` / `text-*`.
+  'autofill-bg': [{ 'autofill-bg': [validators.isAny] }],
+  'autofill-text': [{ 'autofill-text': [validators.isAny] }],
+  surface: [{ surface: [validators.isAny] }],
+  'ring-color': ['ring-surface'],
+  'ring-offset-color': ['ring-offset-surface'],
   z: ['z-overlay', 'z-sticky', 'z-modal', 'z-popover', 'z-toast', 'z-max'],
   gap: ['gap-container', 'gap-layout-section', 'gap-layout-stack'],
   p: ['p-container'],
@@ -133,7 +141,16 @@ export const NEXUS_CLASS_GROUPS = {
     'typography-code-block',
     'typography-code-inline',
   ],
-} satisfies Partial<Record<DefaultClassGroupIds | 'typography', string[]>>;
+} satisfies Partial<
+  Record<
+    | DefaultClassGroupIds
+    | 'typography'
+    | 'autofill-bg'
+    | 'autofill-text'
+    | 'surface',
+    (string | Record<string, ClassValidator[]>)[]
+  >
+>;
 
 type NexusClassGroupId = keyof typeof NEXUS_CLASS_GROUPS;
 

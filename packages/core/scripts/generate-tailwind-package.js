@@ -28,6 +28,7 @@ import {
   generateNativeBrowserUIThemeCSS,
   generateSpacingModesCSS,
   generateSpacingRoleUtilitiesCSS,
+  generateSurfaceUtilitiesCSS,
   generateThemeCSS,
   generateThemedModesCSS,
   generateTypographyUtilitiesCSS,
@@ -572,6 +573,7 @@ function generateNexusCSS(
   });
 
   css += generateNativeBrowserUIThemeCSS();
+  css += generateSurfaceUtilitiesCSS();
 
   // Add base layer
   css += generateBaseLayerCSS();

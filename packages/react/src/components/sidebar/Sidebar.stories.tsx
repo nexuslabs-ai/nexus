@@ -327,8 +327,10 @@ export const LoadingSkeleton: Story = {
     });
     await expect(input).toHaveAttribute('data-slot', 'sidebar-input');
     await expect(input).toHaveClass(
-      'nx:[--input-autofill-background:var(--nx-color-background,var(--color-background))]'
+      'nx:bg-background',
+      'nx:autofill-bg-background'
     );
+    await expect(input).not.toHaveClass('nx:autofill-bg-container');
   },
 };
 
