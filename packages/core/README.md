@@ -85,7 +85,7 @@ All tokens follow the [Design Tokens Community Group](https://tr.designtokens.or
 **Semantic** (`tokens/semantic/`)
 
 - Contextual meanings that reference primitives (and per-mode direct values for spacing)
-- Semantic **color** is engine-derived (`deriveTheme`), not authored here; `tokens/semantic/` now holds only spacing, breakpoints, focus offset, and z-index
+- Semantic **color** is engine-derived (`deriveTheme`), not authored here; `tokens/semantic/` now holds only spacing, breakpoints, and z-index
 - Output: Tailwind v4 `@theme` block (semantic color via `@theme inline`, accepting runtime `--nx-color-*` overrides) + per-mode `[data-density="X"]` blocks
 - Example: `--color-background: var(--nx-color-background, oklch(1 0 0))` (engine color floor), `--nx-spacing-4: 16px`
 

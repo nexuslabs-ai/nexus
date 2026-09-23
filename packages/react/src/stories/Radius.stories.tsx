@@ -1,4 +1,5 @@
 import type { Meta, StoryObj } from '@storybook/react';
+import { expect, waitFor } from 'storybook/test';
 
 import {
   tokenValue,
@@ -13,6 +14,7 @@ const RADIUS_KEYS = [
   'xl',
   '2xl',
   '3xl',
+  '4xl',
   'full',
 ] as const;
 const BORDERWIDTH_KEYS = ['thin', 'default', 'thick'] as const;
@@ -26,6 +28,7 @@ function RadiusSwatch({ name, value }: { name: string; value: string }) {
   return (
     <div className="nx:flex nx:flex-col nx:items-center nx:gap-1">
       <div
+        data-testid={`radius-${name.replace('--nx-radius-', '')}`}
         className="nx:bg-primary-background"
         style={{
           width: 64,
@@ -140,6 +143,20 @@ type Story = StoryObj;
 
 export const Radii: Story = {
   render: () => <RadiiStory />,
+};
+
+export const ExtraRoundFourXL: Story = {
+  globals: { corners: 'extra-round' },
+  render: () => <RadiiStory />,
+  play: async ({ canvasElement }) => {
+    const swatch = canvasElement.querySelector<HTMLElement>(
+      '[data-testid="radius-4xl"]'
+    );
+
+    await waitFor(() =>
+      expect(getComputedStyle(swatch!).borderRadius).toBe('40px')
+    );
+  },
 };
 
 export const BorderWidths: Story = {

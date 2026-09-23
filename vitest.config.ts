@@ -11,24 +11,6 @@ export default defineConfig({
         replacement: path.resolve(__dirname, './packages/core/src/index.ts'),
       },
       {
-        find: '@nexus_ds/react/appearance/server',
-        replacement: path.resolve(
-          __dirname,
-          './packages/react/src/components/appearance/provider/server.ts'
-        ),
-      },
-      {
-        find: '@nexus_ds/react/appearance',
-        replacement: path.resolve(
-          __dirname,
-          './packages/react/src/components/appearance/provider/index.ts'
-        ),
-      },
-      {
-        find: /^@nexus_ds\/react$/,
-        replacement: path.resolve(__dirname, './packages/react/src/index.ts'),
-      },
-      {
         find: /^@\//,
         replacement: `${path.resolve(__dirname, './packages/react/src')}/`,
       },
@@ -46,30 +28,19 @@ export default defineConfig({
   test: {
     // Use projects feature (Vitest 4)
     projects: [
-      // Unit tests (hooks, utilities) - jsdom
+      // Core engine, the `cn` merge, and ESLint rules - jsdom for the
+      // first-paint script tests. One glob per non-story row of testing.md
+      // § Scope; the stories row belongs to the `storybook` project below.
       {
         extends: true,
-        // apps/docs sets `jsx: preserve` for Next, which esbuild reads as the
-        // classic runtime. Components rendered in a unit test would otherwise
-        // need their own `import * as React`.
-        esbuild: { jsx: 'automatic' },
         test: {
           name: 'unit',
           environment: 'jsdom',
-          globals: true,
-          unstubEnvs: true,
           include: [
-            'apps/*/*.test.{ts,tsx}',
-            'apps/**/app/**/*.test.{ts,tsx}',
-            'apps/**/src/**/*.test.{ts,tsx}',
-            'packages/**/src/**/*.test.{ts,tsx}',
-            'packages/**/scripts/**/*.test.{js,ts}',
-            'packages/eslint-plugin-nexus/__tests__/**/*.test.js',
-            'scripts/**/*.test.js',
-            // Exclude component tests - they're now in stories
-            '!packages/react/src/components/**/*.test.{ts,tsx}',
+            'packages/core/src/lib/*.test.ts',
+            'packages/react/src/lib/utils.test.ts',
+            'packages/eslint-plugin-nexus/__tests__/*.test.js',
           ],
-          setupFiles: ['./packages/test-utils/src/setup.ts'],
         },
       },
       // Story tests - real browser via Playwright

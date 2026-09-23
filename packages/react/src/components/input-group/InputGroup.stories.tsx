@@ -184,11 +184,19 @@ export const FocusBorderOwnership: Story = {
       const groupStyles = getComputedStyle(group);
       const controlStyles = getComputedStyle(control);
 
-      await expect(groupStyles.borderTopWidth).toBe('0px');
-      await expect(groupStyles.borderTopColor).toBe('rgba(0, 0, 0, 0)');
-      await expect(groupStyles.boxShadow).not.toBe('none');
-      await expect(groupStyles.boxShadow).toContain('inset');
+      // The group owns the boundary: a real recoloured border plus the 1px
+      // outline that completes the ring. The control paints neither.
+      await expect(
+        Number.parseFloat(groupStyles.borderTopWidth)
+      ).toBeGreaterThan(0);
+      await expect(groupStyles.borderTopColor).not.toBe('rgba(0, 0, 0, 0)');
+      await expect(groupStyles.outlineStyle).toBe('solid');
+      await expect(Number.parseFloat(groupStyles.outlineWidth)).toBeGreaterThan(
+        0
+      );
+      await expect(groupStyles.boxShadow).toBe('none');
       await expect(controlStyles.borderTopWidth).toBe('0px');
+      await expect(controlStyles.outlineStyle).toBe('none');
       await expect(controlStyles.boxShadow).toBe('none');
     }
 
@@ -376,8 +384,12 @@ export const BorderlessStates: Story = {
     await expect(invalid).toHaveClass(
       'nx:has-[[data-slot][aria-invalid=true]]:border-border-error'
     );
-    await expect(window.getComputedStyle(invalid).borderTopWidth).toBe('0px');
-    await expect(window.getComputedStyle(invalid).boxShadow).not.toBe('none');
+    const invalidStyles = window.getComputedStyle(invalid);
+    await expect(
+      Number.parseFloat(invalidStyles.borderTopWidth)
+    ).toBeGreaterThan(0);
+    await expect(invalidStyles.borderTopColor).not.toBe('rgba(0, 0, 0, 0)');
+    await expect(invalidStyles.boxShadow).toBe('none');
 
     await expect(
       canvas.getByRole('textbox', { name: 'Disabled borderless email' })
@@ -687,8 +699,8 @@ export const Invalid: Story = {
     // Error boundary fires: the invalid group's visual stroke differs from valid.
     const valid = canvas.getByTestId('ig-valid');
     const invalid = canvas.getByTestId('ig-invalid');
-    await expect(window.getComputedStyle(invalid).boxShadow).not.toBe(
-      window.getComputedStyle(valid).boxShadow
+    await expect(window.getComputedStyle(invalid).borderTopColor).not.toBe(
+      window.getComputedStyle(valid).borderTopColor
     );
   },
 };

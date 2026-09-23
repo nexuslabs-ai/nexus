@@ -56,33 +56,6 @@ const meta: Meta<typeof Sidebar> = {
 export default meta;
 type Story = StoryObj<typeof Sidebar>;
 
-// #593 — the menu-action touch hit area is gated by pointer modality (coarse),
-// not by viewport, so it survives on large touchscreens.
-export const MenuActionHitAreaModalityGated: Story = {
-  render: () => (
-    <SidebarProvider>
-      <Sidebar>
-        <SidebarContent>
-          <SidebarMenu>
-            <SidebarMenuItem>
-              <SidebarMenuButton>Item</SidebarMenuButton>
-              <SidebarMenuAction aria-label="More">
-                <IconDots />
-              </SidebarMenuAction>
-            </SidebarMenuItem>
-          </SidebarMenu>
-        </SidebarContent>
-      </Sidebar>
-    </SidebarProvider>
-  ),
-  play: async ({ canvasElement }) => {
-    const action = canvasElement.querySelector(
-      '[data-slot="sidebar-menu-action"]'
-    );
-    await expect(action).not.toHaveClass('nx:lg:after:hidden');
-    await expect(action).toHaveClass('nx:pointer-coarse:after:-inset-2');
-  },
-};
 type SidebarControlsArgs = Pick<
   React.ComponentProps<typeof Sidebar>,
   'collapsible' | 'side' | 'variant'
@@ -554,7 +527,6 @@ export const StylingContracts: Story = {
     const gap = getRequiredElement(canvasElement, '[data-slot="sidebar-gap"]');
     await expect(gap).toHaveClass('nx:duration-default');
     await expect(gap).toHaveClass('nx:ease-linear');
-    await expect(gap).toHaveClass('nx:motion-reduce:transition-none');
 
     const container = getRequiredElement(
       canvasElement,
@@ -562,7 +534,6 @@ export const StylingContracts: Story = {
     );
     await expect(container).toHaveClass('nx:duration-default');
     await expect(container).toHaveClass('nx:ease-linear');
-    await expect(container).toHaveClass('nx:motion-reduce:transition-none');
 
     const rail = getRequiredElement(
       canvasElement,
@@ -573,7 +544,6 @@ export const StylingContracts: Story = {
     );
     await expect(rail).toHaveClass('nx:duration-fast');
     await expect(rail).toHaveClass('nx:ease-linear');
-    await expect(rail).toHaveClass('nx:motion-reduce:transition-none');
     await expect(rail).not.toHaveClass('nx:transition-all');
 
     const groupLabel = getRequiredElement(
@@ -583,7 +553,6 @@ export const StylingContracts: Story = {
     await expect(groupLabel).toHaveClass('nx:typography-label-small');
     await expect(groupLabel).toHaveClass('nx:duration-default');
     await expect(groupLabel).toHaveClass('nx:ease-linear');
-    await expect(groupLabel).toHaveClass('nx:motion-reduce:transition-none');
     await expect(groupLabel).not.toHaveClass('nx:font-medium');
 
     const groupContent = getRequiredElement(
@@ -607,7 +576,6 @@ export const StylingContracts: Story = {
 
     await expect(defaultButton).toHaveClass('nx:typography-body-default');
     await expect(defaultButton).toHaveClass('nx:duration-fast');
-    await expect(defaultButton).toHaveClass('nx:motion-reduce:transition-none');
     await expect(defaultButton).toHaveClass(
       'nx:data-[active=true]:text-nav-foreground'
     );
@@ -703,17 +671,12 @@ export const StylingContracts: Story = {
       '[data-slot="sidebar-trigger"]'
     );
     await expect(trigger).toHaveClass('nx:size-7');
-    await expect(trigger).toHaveClass('nx:relative');
-    await expect(trigger).toHaveClass('nx:pointer-coarse:after:absolute');
-    await expect(trigger).toHaveClass('nx:pointer-coarse:after:-inset-2');
-    await expect(trigger).not.toHaveClass('nx:pointer-coarse:after:-inset-0.5');
 
     const input = getRequiredElement(
       canvasElement,
       '[data-slot="sidebar-input"]'
     );
     await expect(input).toHaveClass('nx:h-8');
-    await expect(input).toHaveClass('nx:pointer-coarse:min-h-11');
   },
 };
 

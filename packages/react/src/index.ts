@@ -6,7 +6,6 @@ export {
   CHART_CATEGORICAL_SERIES,
   type ChartCategoricalIndex,
 } from './lib/chart';
-export { cn } from './lib/utils';
 
 // Components
 export * from './components/accordion';

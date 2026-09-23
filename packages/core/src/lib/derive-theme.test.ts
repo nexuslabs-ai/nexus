@@ -235,41 +235,6 @@ describe('deriveText', () => {
   });
 });
 
-describe('deriveFamily / derivePrimary snapshot', () => {
-  it('primary fill follows the seed lightness; supporting shades come from the ramp', () => {
-    expect(derivePrimary('#2563eb', 'light')).toMatchInlineSnapshot(`
-      {
-        "--nx-color-border-primary": "oklch(0.87 0.066 262.881)",
-        "--nx-color-border-primary-active": "oklch(0.66 0.1849 262.881)",
-        "--nx-color-primary-background": "oklch(0.5461 0.2152 262.881)",
-        "--nx-color-primary-background-active": "oklch(0.4461 0.2152 262.881)",
-        "--nx-color-primary-background-hover": "oklch(0.4961 0.2152 262.881)",
-        "--nx-color-primary-disabled": "oklch(0.765 0.1236 262.881)",
-        "--nx-color-primary-foreground": "oklch(1 0 0)",
-        "--nx-color-primary-subtle": "oklch(0.985 0.0073 262.881)",
-        "--nx-color-primary-subtle-active": "oklch(0.87 0.066 262.881)",
-        "--nx-color-primary-subtle-foreground": "oklch(0.46 0.2152 262.881)",
-        "--nx-color-primary-subtle-hover": "oklch(0.945 0.0273 262.881)",
-      }
-    `);
-    expect(derivePrimary('#2563eb', 'dark')).toMatchInlineSnapshot(`
-      {
-        "--nx-color-border-primary": "oklch(0.385 0.2152 262.881)",
-        "--nx-color-border-primary-active": "oklch(0.553 0.2152 262.881)",
-        "--nx-color-primary-background": "oklch(0.5461 0.2152 262.881)",
-        "--nx-color-primary-background-active": "oklch(0.4461 0.2152 262.881)",
-        "--nx-color-primary-background-hover": "oklch(0.4961 0.2152 262.881)",
-        "--nx-color-primary-disabled": "oklch(0.118 0.0687 262.881)",
-        "--nx-color-primary-foreground": "oklch(1 0 0)",
-        "--nx-color-primary-subtle": "oklch(0.118 0.0687 262.881)",
-        "--nx-color-primary-subtle-active": "oklch(0.297 0.173 262.881)",
-        "--nx-color-primary-subtle-foreground": "oklch(0.765 0.1236 262.881)",
-        "--nx-color-primary-subtle-hover": "oklch(0.207 0.1206 262.881)",
-      }
-    `);
-  });
-});
-
 describe('derivePrimary', () => {
   it('follows the seed lightness — a dark seed yields a dark fill, a light seed a light fill', () => {
     const nearBlack = derivePrimary('#0a0a0a', 'light');

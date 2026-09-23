@@ -83,7 +83,7 @@ function InputOTPGroup({ className, ...props }: InputOTPGroupProps) {
   return (
     <div
       data-slot="input-otp-group"
-      className={cn('nx:flex nx:items-center', className)}
+      className={cn('nx:isolate nx:flex nx:items-center', className)}
       {...props}
     />
   );
@@ -118,11 +118,11 @@ function InputOTPSlot({ index, className, ...props }: InputOTPSlotProps) {
       data-active={isActive}
       className={cn(
         'nx:relative nx:flex nx:box-border nx:size-10 nx:items-center nx:justify-center',
-        'nx:border-0',
-        'nx:group-has-[:disabled]/input-otp:bg-disabled nx:group-has-[:disabled]/input-otp:text-disabled-foreground',
-        'nx:bg-container nx:text-foreground nx:typography-body-small nx:transition-[color,background-color,box-shadow] nx:duration-fast nx:motion-reduce:transition-none',
+        'nx:border-default nx:border-border-default nx:not-first:-ml-(--nx-borderwidth-default)',
+        'nx:group-has-[:disabled]/input-otp:border-border-disabled nx:group-has-[:disabled]/input-otp:bg-disabled nx:group-has-[:disabled]/input-otp:text-disabled-foreground',
+        'nx:bg-container nx:text-foreground nx:typography-body-small nx:transition-field nx:duration-fast',
         'nx:first:rounded-l-md nx:last:rounded-r-md',
-        'nx:data-[active=true]:z-10 nx:data-[active=true]:outline-2 nx:data-[active=true]:outline-focus-default nx:data-[active=true]:outline-offset-(--focus-offset)',
+        'nx:data-[active=true]:z-1 nx:data-[active=true]:border-focus-default nx:data-[active=true]:outline-default nx:data-[active=true]:outline-focus-default',
         className
       )}
       {...props}
@@ -130,7 +130,7 @@ function InputOTPSlot({ index, className, ...props }: InputOTPSlotProps) {
       {char}
       {hasFakeCaret && (
         <div className="nx:pointer-events-none nx:absolute nx:inset-0 nx:flex nx:items-center nx:justify-center">
-          <div className="nx:h-4 nx:w-px nx:animate-caret-blink nx:bg-foreground nx:motion-reduce:animate-none" />
+          <div className="nx:h-4 nx:w-px nx:animate-caret-blink nx:bg-foreground" />
         </div>
       )}
     </div>

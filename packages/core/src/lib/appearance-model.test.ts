@@ -34,7 +34,7 @@ describe('appearance model', () => {
       prefs: {
         uiFontSize: 14,
         codeFontSize: 12,
-        reduceMotion: 'system',
+        reduceMotion: false,
         pointerCursors: false,
         fontSmoothing: true,
       },
@@ -121,7 +121,7 @@ describe('sanitizeNexusAppearance', () => {
         ...DEFAULT_NEXUS_APPEARANCE.prefs,
         uiFontSize: 16,
         codeFontSize: 13,
-        reduceMotion: 'on' as const,
+        reduceMotion: true,
         pointerCursors: true,
       },
     };
@@ -259,7 +259,7 @@ describe('sanitizeNexusAppearancePrefs', () => {
     const result = sanitizeNexusAppearancePrefs({
       uiFont: 'Inter',
       codeFont: 123,
-      reduceMotion: 'off',
+      reduceMotion: 'on',
       pointerCursors: true,
       fontSmoothing: 'yes',
     });
@@ -267,7 +267,6 @@ describe('sanitizeNexusAppearancePrefs', () => {
     expect(result).toEqual({
       ...DEFAULT_NEXUS_APPEARANCE.prefs,
       uiFont: 'Inter',
-      reduceMotion: 'off',
       pointerCursors: true,
     });
   });
@@ -394,6 +393,7 @@ describe('appearancePrefsToCss', () => {
     expect(css).toContain('--nx-typography-family-font-mono: JetBrains Mono;');
     expect(css).toContain('font-size: 32px;');
     expect(css).toContain('--nx-typography-size-sm: 32px;');
+    expect(css).toContain('--nx-typography-line-height-xxs: 27.4286px;');
     expect(css).toContain('--nx-typography-line-height-sm: 45.7143px;');
     expect(css).toContain(
       'code, pre, .nx\\:font-mono, .nx\\:typography-code-block, .nx\\:typography-code-inline { font-size: 12px; }'
@@ -429,14 +429,11 @@ describe('appearancePrefsToCss', () => {
   });
 
   it('emits the reduced-motion block only when reduceMotion is on', () => {
-    expect(appearancePrefsToCss({ ...prefs, reduceMotion: 'on' })).toContain(
+    expect(appearancePrefsToCss({ ...prefs, reduceMotion: true })).toContain(
       'transition-duration: 0.01ms'
     );
     expect(
-      appearancePrefsToCss({ ...prefs, reduceMotion: 'off' })
-    ).not.toContain('0.01ms');
-    expect(
-      appearancePrefsToCss({ ...prefs, reduceMotion: 'system' })
+      appearancePrefsToCss({ ...prefs, reduceMotion: false })
     ).not.toContain('0.01ms');
   });
 
