@@ -13,6 +13,7 @@ import ts from 'typescript';
 import {
   assertWorkspaceTypes,
   exportName,
+  hasStringIndexProps,
   isComponentSource,
   isOwnProp,
   isPortableExpansion,
@@ -137,8 +138,24 @@ function assertVariantUnions(documented) {
 
   throw new Error(
     [
-      'props JSON: a cva variant prop widened to string, so its options would be documented as a bare string.',
-      'Check the variant still reaches the component through VariantProps<typeof ...> and that its cva() variants object keeps literal keys.',
+      'props JSON: a prop with no declaration of its own is typed as a bare string, so its options would be documented as `string`.',
+      'Usually a cva() variants object lost its literal keys; otherwise a mapped or Record<...> key in the props type widened.',
+      ...offenders,
+    ].join('\n')
+  );
+}
+
+function assertNoStringIndexProps(checker, components) {
+  const offenders = [...components]
+    .filter(([, symbol]) => hasStringIndexProps(checker, symbol))
+    .map(([name]) => `  ${name}`);
+
+  if (offenders.length === 0) return;
+
+  throw new Error(
+    [
+      'props JSON: a component accepts arbitrary string-keyed props, so the keys a reader can pass cannot be documented.',
+      'Usually a cva() variants object is typed Record<string, ...>; give it literal keys.',
       ...offenders,
     ].join('\n')
   );
@@ -299,6 +316,7 @@ for (const [name, symbol] of components) {
   bySlug.get(toSlugFolder(path.relative(componentsRoot, fileName))).push(entry);
 }
 
+assertNoStringIndexProps(checker, components);
 assertVariantUnions(documented);
 assertResolvableTypes([...bySlug.values()].flat(), localAliases);
 

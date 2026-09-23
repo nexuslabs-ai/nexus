@@ -36,17 +36,37 @@ export function isComponentSource(filePath) {
 }
 
 // `cva` variant keys are synthesized members with no declaration and no parent.
+function isSynthesized(prop) {
+  return (prop.declarations ?? []).length === 0 && !prop.parent;
+}
+
 export function isOwnProp(prop) {
-  const declarations = prop.declarations ?? [];
-  if (declarations.length === 0) return !prop.parent;
-  return declarations.some(
+  if (isSynthesized(prop)) return true;
+  return (prop.declarations ?? []).some(
     (declaration) => !declaration.fileName.includes('node_modules')
   );
 }
 
 export function isWidenedVariant(prop) {
-  const isSynthesized = (prop.declarations ?? []).length === 0 && !prop.parent;
-  return isSynthesized && /^string( \| null)?$/.test(prop.type.name);
+  return isSynthesized(prop) && /^string( \| null)?$/.test(prop.type.name);
+}
+
+// A `cva` variants object typed `Record<string, …>` turns `VariantProps` into an
+// index signature, so its props vanish instead of widening.
+export function hasStringIndexProps(checker, symbol) {
+  const declaration = symbol.declarations[0];
+  const type = checker.getTypeOfSymbolAtLocation(symbol, declaration);
+
+  return checker
+    .getSignaturesOfType(type, ts.SignatureKind.Call)
+    .flatMap((signature) => signature.parameters.slice(0, 1))
+    .some((props) =>
+      checker
+        .getIndexInfosOfType(
+          checker.getTypeOfSymbolAtLocation(props, declaration)
+        )
+        .some((info) => (info.keyType.flags & ts.TypeFlags.String) !== 0)
+    );
 }
 
 // Only a type export keeps the alias flag; a value export resolves through it.
