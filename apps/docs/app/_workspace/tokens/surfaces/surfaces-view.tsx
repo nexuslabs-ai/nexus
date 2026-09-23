@@ -21,7 +21,7 @@ import {
 import { useNexusAppearance } from '@nexus_ds/react/appearance';
 
 import { PageHeading } from '../../page-heading';
-import { useCreateLocation } from '../../use-create-location';
+import { useWorkspaceLocation } from '../../use-workspace-location';
 import type { LiveTheme } from '../use-live-theme';
 
 import {
@@ -30,21 +30,14 @@ import {
 } from './component-token-matrix';
 import { formatAnchorLabel, rungSiblings } from './surface-ladder';
 
-export const SURFACES_VIEW = 'surfaces';
-
 const LADDERS = { light: LIGHT_SURFACE_LADDER, dark: DARK_SURFACE_LADDER };
 
-export function surfacesParams(query = '') {
-  const params = new URLSearchParams({ view: SURFACES_VIEW });
-  if (query) params.set('q', query);
-  return params;
-}
-
 function useComponentQuery() {
-  const { search, navigate } = useCreateLocation();
+  const { search, navigate } = useWorkspaceLocation();
   return {
     query: search.get('q') ?? '',
-    setQuery: (query: string) => navigate(surfacesParams(query), true),
+    setQuery: (query: string) =>
+      navigate(new URLSearchParams(query ? { q: query } : undefined), true),
   };
 }
 
