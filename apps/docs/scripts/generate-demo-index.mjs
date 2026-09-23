@@ -15,8 +15,8 @@ const DOCS_ROOT = path.resolve(
   '..'
 );
 
-export const EXAMPLES_DIR = path.join(DOCS_ROOT, 'examples');
-export const GENERATED_DIR = path.join(DOCS_ROOT, '__generated__');
+const EXAMPLES_DIR = path.join(DOCS_ROOT, 'examples');
+const GENERATED_DIR = path.join(DOCS_ROOT, '__generated__');
 
 const DEMO_EXTENSION = '.tsx';
 const INDEX_FILE = 'demo-index.ts';
@@ -119,7 +119,7 @@ function boundarySpecifier(id) {
 }
 
 /** @returns {DemoFile[]} */
-export function collectDemos(examplesDir = EXAMPLES_DIR) {
+function collectDemos(examplesDir = EXAMPLES_DIR) {
   if (!existsSync(examplesDir)) {
     throw new Error(`Missing demo directory: ${examplesDir}`);
   }
@@ -151,7 +151,7 @@ export function collectDemos(examplesDir = EXAMPLES_DIR) {
 }
 
 /** @param {DemoFile} demo */
-export function renderDemoBoundary(demo) {
+function renderDemoBoundary(demo) {
   return `'use client';
 
 ${GENERATED_BY}
@@ -162,7 +162,7 @@ export { default as Component } from ${JSON.stringify(exampleSpecifier(demo.id))
 }
 
 /** @param {DemoFile} demo */
-export function renderDemoModule(demo) {
+function renderDemoModule(demo) {
   return `${GENERATED_BY}
 ${REGENERATE_HINT}
 
@@ -173,7 +173,7 @@ export const source = ${JSON.stringify(demo.source)};
 }
 
 /** @param {DemoFile[]} demos */
-export function renderDemoIndex(demos) {
+function renderDemoIndex(demos) {
   const entries = demos
     .map((demo) =>
       [
@@ -193,7 +193,7 @@ export const demos = ${literal} satisfies Record<string, Demo>;
 ${INDEX_FOOTER}`;
 }
 
-export function generateDemoIndex({
+function generateDemoIndex({
   examplesDir = EXAMPLES_DIR,
   outputDir = GENERATED_DIR,
 } = {}) {

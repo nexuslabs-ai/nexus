@@ -153,7 +153,7 @@ function TabsList({ className, children, ref, ...props }: TabsListProps) {
           'nx:data-[variant=default]:rounded-sm nx:data-[variant=default]:border-default nx:data-[variant=default]:border-border-default nx:data-[variant=default]:bg-background',
           'nx:data-[variant=underline]:bg-primary-background',
           ready &&
-            'nx:transition-[transform,width,height] nx:duration-fast nx:ease-move nx:motion-reduce:transition-none'
+            'nx:transition-[transform,width,height] nx:duration-fast nx:ease-move'
         )}
       />
       {children}
@@ -172,8 +172,8 @@ const tabsTriggerVariants = cva(
     'nx:relative nx:z-1 nx:inline-flex nx:items-center nx:justify-center',
     'nx:whitespace-nowrap',
     'nx:text-muted-foreground',
-    'nx:transition-colors',
-    'nx:focus-visible:outline-2 nx:focus-visible:outline-focus-default nx:focus-visible:outline-offset-(--focus-offset)',
+    'nx:transition-control',
+    'nx:focus-visible:outline-2 nx:focus-visible:outline-focus-default',
     'nx:disabled:pointer-events-none nx:disabled:text-disabled-foreground',
   ],
   {
@@ -281,7 +281,7 @@ function TabsContent({ className, ...props }: TabsContentProps) {
       data-slot="tabs-content"
       className={cn(
         'nx:mt-2',
-        'nx:focus-visible:outline-2 nx:focus-visible:outline-focus-default nx:focus-visible:outline-offset-(--focus-offset)',
+        'nx:focus-visible:outline-2 nx:focus-visible:outline-focus-default',
         className
       )}
       {...props}

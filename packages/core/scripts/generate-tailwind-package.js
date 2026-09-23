@@ -10,29 +10,26 @@ import {
   collectMotionTokens,
   collectRadiusModes,
   collectRadiusTokens,
-  collectSemanticDimensionTokens,
   collectShadowModes,
   collectShadowTokens,
   collectSpacingTokens,
   collectZIndexTokens,
   DEFAULT_CONFIG,
   discoverPrimitives,
-  discoverSemantics,
   ensureDir,
   extractTokens,
-  FILES_WITH_DEDICATED_DIMENSION_COLLECTORS,
   filterDivergentDark,
   formatDistCssFiles,
   formatTokenValue,
+  generateAutofillUtilitiesCSS,
   generateBaseLayerCSS,
   generateBorderColorAliasUtilitiesCSS,
   generateBorderWidthUtilitiesCSS,
-  generateFocusRingCSS,
   generateMotionUtilitiesCSS,
   generateNativeBrowserUIThemeCSS,
-  generateRootDimensionsCSS,
   generateSpacingModesCSS,
   generateSpacingRoleUtilitiesCSS,
+  generateSurfaceUtilitiesCSS,
   generateThemeCSS,
   generateThemedModesCSS,
   generateTypographyUtilitiesCSS,
@@ -44,6 +41,7 @@ import {
   pathToCssVarPrefixed,
   readTokenFile,
   resolveValue,
+  SPACING_MODE_FILE_PATTERN,
   splitSpacingTokens,
 } from './utils.js';
 
@@ -111,6 +109,33 @@ function getPrimitiveFiles(discovered, config) {
   return result;
 }
 
+// Every `tokens/semantic/*.json` is read by a collector that names it:
+// `spacing-{mode}` by collectSpacingTokens, `breakpoints` by
+// collectBreakpointsTokens, `z-index` by collectZIndexTokens. There is no
+// generic scan any more, so a file nobody claims would emit nothing and raise
+// nothing — assertSemanticFilesAreClaimed turns that into a build failure.
+const CLAIMED_SEMANTIC_FILES = [
+  SPACING_MODE_FILE_PATTERN,
+  /^breakpoints\.json$/,
+  /^z-index\.json$/,
+];
+
+/**
+ * Throws if a semantic token file is not read by any collector.
+ */
+function assertSemanticFilesAreClaimed() {
+  const unclaimed = fs
+    .readdirSync(SEMANTIC_DIR)
+    .filter((file) => file.endsWith('.json'))
+    .filter((file) => !CLAIMED_SEMANTIC_FILES.some((rule) => rule.test(file)));
+
+  if (unclaimed.length > 0) {
+    throw new Error(
+      `Unclaimed semantic token file(s): ${unclaimed.join(', ')} — every tokens/semantic/*.json must be read by a named collector in generate-tailwind-package.js, and listed in CLAIMED_SEMANTIC_FILES.`
+    );
+  }
+}
+
 /**
  * Throws if any primitive file does not exist.
  */
@@ -133,12 +158,6 @@ function assertPrimitiveFilesExist(primitiveFiles) {
       );
     }
   }
-}
-
-function getSemanticSupportFiles(discovered) {
-  return {
-    standalone: discovered.standalone,
-  };
 }
 
 function assertTokenEngine(engine) {
@@ -446,7 +465,6 @@ function generateVariablesCSS(primitiveTokens, divergentDark, usedModes) {
  * (build-time); the cascade flip happens at runtime via the per-mode blocks.
  */
 function generateNexusCSS(
-  semanticFiles,
   primitiveMap,
   lightSemanticTokens,
   darkSemanticTokens,
@@ -467,21 +485,6 @@ function generateNexusCSS(
     log.success(
       `Generated Google Fonts import for typography mode: ${typographyMode}`
     );
-  }
-
-  // Semantic colors are engine-owned in the Tailwind bundle. Dimension tokens
-  // (e.g. focus.offset) still come from semantic JSON and emit at :root, not
-  // @theme (see generateRootDimensionsCSS / #506).
-  const dimensionTokens = [];
-
-  // Process standalone semantic files for non-color dimensions. Color leaves are
-  // ignored here because the engine registry now owns the Tailwind color surface.
-  for (const standaloneFile of semanticFiles.standalone) {
-    if (!FILES_WITH_DEDICATED_DIMENSION_COLLECTORS.has(standaloneFile)) {
-      dimensionTokens.push(
-        ...collectSemanticDimensionTokens(SEMANTIC_DIR, standaloneFile)
-      );
-    }
   }
 
   // Per-mode spacing — default numerics seed @theme for Tailwind's spacing-utility
@@ -547,10 +550,6 @@ function generateNexusCSS(
     prefixDarkVars: true, // Use --nx-color-* for dark mode overrides
   });
 
-  // Fixed dimension primitives at :root (e.g. --focus-offset) — see #506.
-  css += generateRootDimensionsCSS(dimensionTokens);
-  css += generateFocusRingCSS();
-
   // Per-mode spacing override blocks (`:root, [data-density="<default>"]` for
   // the consumer-chosen default + plain `[data-density="X"]` for the others).
   // Lives outside @theme so the cascade can pick the active mode at runtime
@@ -575,6 +574,8 @@ function generateNexusCSS(
   });
 
   css += generateNativeBrowserUIThemeCSS();
+  css += generateAutofillUtilitiesCSS();
+  css += generateSurfaceUtilitiesCSS();
 
   // Add base layer
   css += generateBaseLayerCSS();
@@ -601,9 +602,9 @@ export async function generateTailwindPackage(
     log.file(fileName);
   };
 
+  assertSemanticFilesAreClaimed();
+
   const discoveredPrimitives = discoverPrimitives(PRIMITIVES_DIR);
-  const discoveredSemantics = discoverSemantics(SEMANTIC_DIR);
-  const semanticFiles = getSemanticSupportFiles(discoveredSemantics);
   const { baseTone, lightSemanticTokens, darkSemanticTokens } =
     deriveEngineSemanticTokens(config, tokenEngine);
 
@@ -676,10 +677,8 @@ export async function generateTailwindPackage(
   const motionUtilities = generateMotionUtilitiesCSS(
     collectMotionTokens(TOKENS_DIR, usedModes.motion || 'snappy')
   );
-  if (motionUtilities.css) {
-    writeDistFile('motion-utilities.css', motionUtilities.css);
-    log.success(`Generated ${motionUtilities.count} motion duration utilities`);
-  }
+  writeDistFile('motion-utilities.css', motionUtilities.css);
+  log.success(`Generated ${motionUtilities.count} motion duration utilities`);
 
   // `spacingDefault` controls which mode lands under `:root, [data-density="X"]`.
   // Falls back to the canonical baseline so older config objects without the
@@ -692,7 +691,6 @@ export async function generateTailwindPackage(
     borderwidthModes: collectBorderwidthModes(TOKENS_DIR),
   };
   const nexusCSS = generateNexusCSS(
-    semanticFiles,
     primitiveMap,
     lightSemanticTokens,
     darkSemanticTokens,

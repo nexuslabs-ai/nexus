@@ -211,7 +211,7 @@ export default tseslint.config(
     },
   },
 
-  // UI components: allow empty interface extends per .claude/rules/components.md
+  // UI components: an empty interface extending ComponentProps is the documented props pattern
   {
     files: ['packages/react/src/components/**/*.{ts,tsx}'],
     rules: {
@@ -246,23 +246,6 @@ export default tseslint.config(
   {
     files: ['packages/core/tokens/semantic/spacing-*.json'],
     ...nexusSpacingTokenConfig({ parser: jsoncParser }),
-  },
-
-  // Inside apps/docs/scripts/, only demo-index.test.ts may import __generated__.
-  {
-    files: ['apps/docs/scripts/**/*.{js,jsx,mjs,cjs,ts,tsx,mts,cts}'],
-    ignores: ['apps/docs/scripts/demo-index.test.ts'],
-    rules: {
-      'no-restricted-syntax': [
-        'error',
-        {
-          selector:
-            ':matches(ImportDeclaration, ImportExpression, ExportNamedDeclaration, ExportAllDeclaration)[source.value=/__generated__/]',
-          message:
-            'Read generated output from disk here. Vite resolves these at transform time, so a missing file kills the run before the staleness gate can name the fix. Tests that need the index live in demo-index.test.ts.',
-        },
-      ],
-    },
   },
 
   // Disable rules that conflict with Prettier

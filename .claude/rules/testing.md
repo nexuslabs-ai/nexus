@@ -1,9 +1,27 @@
 # Testing Rules - Core Philosophy
 
-> This file contains testing principles that apply to ALL packages.
-> For package-specific patterns, see:
->
-> - [testing-react.md](testing-react.md) — React components, Storybook
+> This file sets what Nexus tests and the principles every test follows.
+> For story patterns, see [testing-react.md](testing-react.md).
+
+## Scope
+
+A test earns its place only when it pins behaviour a consumer of the design system would see. Nexus has exactly four kinds:
+
+| Kind                  | Lives in                                           | Pins                                                                                                                                      |
+| --------------------- | -------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------- |
+| **Component stories** | `packages/react/src/**/*.stories.tsx`              | Component behaviour and accessibility, via `play` functions and the axe check on every story                                              |
+| **Core engine**       | `packages/core/src/lib/*.test.ts`                  | Derived-theme contrast and legibility, colour-blind separation, registry/engine agreement, first-paint script, perceptual-ramp shade grid |
+| **`cn` merge**        | `packages/react/src/lib/utils.test.ts`             | `cn` resolving conflicts between Nexus `nx:` utilities                                                                                    |
+| **ESLint rules**      | `packages/eslint-plugin-nexus/__tests__/*.test.js` | Each published rule reports what it should, and nothing else                                                                              |
+
+Components are tested only through stories — see [testing-react.md](testing-react.md). The other three run under Vitest's `unit` project and import from `vitest` directly.
+
+## What We Don't Test
+
+- **No snapshot tests.** No `toMatchSnapshot` / `toMatchInlineSnapshot`, and no frozen output fixtures compared with `toEqual`. Assert the property that matters — a contrast floor, a merge result, a reported lint error — not the exact output.
+- **No app tests.** `apps/console` and `apps/docs` are demo surfaces, not the design system.
+- **No tests for repo scripts.** Audits and generators in `scripts/` and `packages/*/scripts/` get no tests of their own: the ones CI runs prove themselves by running, and a freshness check covers generated output. The rest — `scripts/export.mjs` among them — are reviewed, not gated.
+- **No hook tests.** A hook is covered by the stories of the components that use it.
 
 ## Core Philosophy
 
@@ -16,50 +34,17 @@
 └─────────────────────────────────────────────────────────────────┘
 ```
 
-**Given input X, expect output Y.** This applies at every level:
-
-- Unit tests: function input → function output
-- Integration tests: component input → component output
-- E2E tests: user action → visible result
+**Given input X, expect output Y** — a seed colour in, a legible theme out; source code in, a lint report out; a user action in a story, a visible result out.
 
 ## Principles
 
 1. **Result validation over code coverage** — 90% coverage with bad assertions is worse than 60% coverage with good assertions
-2. **Real fixtures over synthetic data** — Use actual component code, real API responses, genuine user flows
-3. **Partial matching over exact equality** — Assert on fields you care about, not every byte
+2. **Real inputs over synthetic data** — Use real seed colours, real component code, genuine user flows
+3. **Partial matching over exact equality** — Assert on the fields you care about, not every byte
 4. **Determinism is non-negotiable** — If a test can fail randomly, it's broken
-5. **Mock boundaries, not internals** — Mock the database, not the repository methods
+5. **Stub the browser, not Nexus** — Replace a browser API the environment lacks (e.g. `matchMedia`); never mock Nexus's own functions
 6. **Test behavior, not implementation** — Tests shouldn't break when you refactor internals
 7. **One reason to fail** — Each test should fail for exactly one reason
-
-## Test Type Selection
-
-| Test Type         | When to Use                               | Mock Strategy              |
-| ----------------- | ----------------------------------------- | -------------------------- |
-| **Unit**          | Pure functions, utilities, isolated logic | None or minimal            |
-| **Integration**   | Component interactions, pipelines         | External services only     |
-| **E2E**           | User flows, critical paths                | Nothing (or test database) |
-| **Fixture-based** | Data transformation pipelines, parsers    | Input files as fixtures    |
-
-## Fixture Design
-
-### Good Fixtures
-
-| Pattern            | Description                                 |
-| ------------------ | ------------------------------------------- |
-| **Real data**      | Actual component code, real API responses   |
-| **Edge cases**     | Empty arrays, null values, maximum lengths  |
-| **Representative** | Covers common patterns in actual usage      |
-| **Documented**     | Comments explaining what each fixture tests |
-
-### Bad Fixtures
-
-| Anti-pattern        | Why It's Bad                                       |
-| ------------------- | -------------------------------------------------- |
-| `foo`, `bar`, `baz` | Meaningless data that doesn't represent real usage |
-| Generated data      | Random data makes tests non-deterministic          |
-| Minimal fixtures    | Misses edge cases that exist in production         |
-| Outdated fixtures   | Fixtures that don't match current system behavior  |
 
 ## Assertion Patterns
 
@@ -72,78 +57,37 @@ expect(result).toMatchObject({
   data: { name: 'Button' },
 });
 
-// Good - custom helper for domain objects
-expectPropsToInclude(result.props, [{ name: 'variant', type: 'string' }]);
-
 // Bad - exact matching breaks on irrelevant changes
 expect(result).toEqual(fullExpectedObject);
 ```
 
-### Structural Validation
+### Thresholds Over Exact Values
 
 ```typescript
-// Good - validates structure without brittle values
-expect(result.success).toBe(true);
-expect(result.data.name).toBeTruthy();
-expect(result.data.items.length).toBeGreaterThan(0);
-
-// Bad - asserts on unstable values
-expect(result.data.timestamp).toBe('2025-01-15T10:00:00Z');
-```
-
-### Array Assertions
-
-```typescript
-// Good - checks contents without order dependency
-expect(result.items).toContain('expected-item');
-expect(result.items).toHaveLength(3);
-
-// Good - checks structure
-expect(result.items).toEqual(
-  expect.arrayContaining([expect.objectContaining({ id: 'item-1' })])
+// Good - pins the behaviour: text clears its contrast floor
+expect(apcaLcForPair(map, pair)).toBeGreaterThanOrEqual(
+  TIER_THRESHOLDS[pair.tier]
 );
+
+// Bad - pins today's output: any intended colour change fails the test
+expect(map['--nx-color-foreground']).toBe('oklch(0.2 0 0)');
 ```
 
 ### Error Assertions
 
 ```typescript
-// Good - checks error type and message
-await expect(doThing()).rejects.toThrow('specific error');
-
-// Good - checks error shape for discriminated unions
-const result = await doThing();
-expect(result.success).toBe(false);
-if (!result.success) {
-  expect(result.error.code).toBe('VALIDATION_ERROR');
-}
+// Good - checks the diagnostic, not just that something threw
+expect(() => adjustContrast('not-a-color')).toThrow(
+  /cannot parse input 'not-a-color'/
+);
 ```
-
-## Mock Strategy
-
-### When to Mock
-
-| Mock This               | Don't Mock This      |
-| ----------------------- | -------------------- |
-| External APIs           | Internal functions   |
-| Databases               | Business logic       |
-| File system (sometimes) | Data transformations |
-| Time/dates              | Validation logic     |
-| LLM/AI providers        | Internal state       |
-| Network requests        | Utility functions    |
-
-### Mock Design Principles
-
-1. **Implement real interfaces** — Mocks should satisfy the same contract as real implementations
-2. **Track call history** — For verifying interactions when needed
-3. **Configurable responses** — Support happy path, errors, edge cases
-4. **Fail explicitly** — Unconfigured mocks should throw, not return undefined
 
 ## Anti-Patterns to Avoid
 
 - Tests that pass but don't actually verify behavior
+- Snapshots, or frozen fixtures that stand in for one
 - Mocking internal implementation details
-- Exact JSON equality when partial matching would suffice
-- Missing error case coverage
+- Exact equality when partial matching or a threshold would suffice
 - Tests that depend on execution order
 - Flaky tests with `retry` or `timeout` workarounds
 - `skip` or `only` committed to codebase
@@ -152,11 +96,15 @@ if (!result.success) {
 ## Running Tests
 
 ```bash
-pnpm test               # Run all tests
+pnpm test               # Run all tests (unit + storybook)
+pnpm test:unit          # Core engine, cn merge, ESLint rules
+pnpm test:storybook     # Every story's play function in a real browser
 ```
 
 ## Do Not
 
+- Add a test outside the four kinds in [Scope](#scope)
+- Take snapshots
 - Focus on line coverage over result correctness
 - Use synthetic `foo`/`bar` test data
 - Mock internal functions

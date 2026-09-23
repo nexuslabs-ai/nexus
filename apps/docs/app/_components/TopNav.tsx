@@ -7,14 +7,14 @@ import { cn } from '@nexus_ds/react/utils';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 
-import { SECTIONS } from '../_lib/sections';
+import { PAGE_MANIFEST } from '../_lib/manifest';
 
 import { Button } from './nexus';
 import { SearchPalette } from './SearchPalette';
 
 const NAV_LINKS = [
   { href: '/', label: 'Home', match: '/' },
-  ...Object.values(SECTIONS).map((section) => ({
+  ...PAGE_MANIFEST.map((section) => ({
     href: section.href,
     label: section.title,
     match: section.href,
@@ -23,12 +23,9 @@ const NAV_LINKS = [
 ];
 
 const NAV_LINK_BASE =
-  'nx:px-3 nx:py-1 nx:shrink-0 nx:typography-label-default nx:rounded-sm nx:focus-visible:outline-2 nx:focus-visible:outline-focus-default nx:focus-visible:outline-offset-(--focus-offset)';
+  'nx:px-3 nx:py-1 nx:shrink-0 nx:typography-label-default nx:rounded-sm nx:focus-visible:outline-2 nx:focus-visible:outline-focus-default';
 
 const PANEL_LINK_BASE = cn(NAV_LINK_BASE, 'nx:block nx:border-l-2');
-
-const COARSE_HIT_AREA =
-  'nx:relative nx:pointer-coarse:after:absolute nx:pointer-coarse:after:-inset-2';
 
 function isActive(pathname: string, match: string) {
   if (match === '/') return pathname === '/';
@@ -107,7 +104,6 @@ export function TopNav() {
           size="sm"
           aria-expanded={menuOpen}
           onClick={() => setMenuOpen((open) => !open)}
-          className={COARSE_HIT_AREA}
         >
           <span aria-hidden="true">☰</span>
           {currentLink?.label ?? 'Sections'}
@@ -167,7 +163,6 @@ export function TopNav() {
         size="sm"
         onClick={toggleMode}
         aria-label={isDark ? 'Switch to light mode' : 'Switch to dark mode'}
-        className={COARSE_HIT_AREA}
       >
         {isDark ? '☀' : '◐'}
       </Button>

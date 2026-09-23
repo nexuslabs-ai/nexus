@@ -27,18 +27,20 @@ Re-review a pull request after the author has pushed changes in response to init
 
 Always load and check the new diff against:
 
-| Rule                                                                             | Purpose                                                                            |
-| -------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------- |
-| [code-quality.md](../../rules/code-quality.md)                                   | Governing principle: favor simplicity over cleverness; index to per-rule files     |
-| [ripple-effect.md](../../rules/ripple-effect.md)                                 | Flag callers, callees, or adjacent code left inconsistent after the change         |
-| [guard-clauses.md](../../rules/guard-clauses.md)                                 | Flag deeply nested conditionals; require happy path at column 0                    |
-| [composition-over-render-props.md](../../rules/composition-over-render-props.md) | Flag `renderItem` / `mode` discriminators; require `children` or per-mode split    |
-| [useeffect-escape-hatch.md](../../rules/useeffect-escape-hatch.md)               | Flag effects that orchestrate React state instead of syncing with external systems |
-| [logging-proportionality.md](../../rules/logging-proportionality.md)             | Flag noisy incremental logs; require one dense canonical log line                  |
-| [code-comments.md](../../rules/code-comments.md)                                 | Flag rationale blocks, unjustified TODOs, comments that restate the code           |
-| [no-follow-up-deferral.md](../../rules/no-follow-up-deferral.md)                 | Reject deferral framing unless a tracked issue is cited                            |
-| [project-stage.md](../../rules/project-stage.md)                                 | Reject new migration files; flag backcompat shims and feature flags                |
-| [docs-mcp.md](../../rules/docs-mcp.md)                                           | Verify third-party API usage via nexus-docs-mcp before approving                   |
+| Rule                                                                             | Purpose                                                                                                             |
+| -------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------- |
+| [code-quality.md](../../rules/code-quality.md)                                   | Governing principle: favor simplicity over cleverness; index to per-rule files                                      |
+| [ripple-effect.md](../../rules/ripple-effect.md)                                 | Flag callers, callees, or adjacent code left inconsistent after the change                                          |
+| [guard-clauses.md](../../rules/guard-clauses.md)                                 | Flag deeply nested conditionals; require happy path at column 0                                                     |
+| [composition-over-render-props.md](../../rules/composition-over-render-props.md) | Flag `renderItem` / `mode` discriminators; require `children` or per-mode split                                     |
+| [useeffect-escape-hatch.md](../../rules/useeffect-escape-hatch.md)               | Flag effects that orchestrate React state instead of syncing with external systems                                  |
+| [logging-proportionality.md](../../rules/logging-proportionality.md)             | Flag noisy incremental logs; require one dense canonical log line                                                   |
+| [code-comments.md](../../rules/code-comments.md)                                 | Flag rationale blocks, unjustified TODOs, comments that restate the code                                            |
+| [no-follow-up-deferral.md](../../rules/no-follow-up-deferral.md)                 | Reject deferral framing unless a tracked issue is cited                                                             |
+| [project-stage.md](../../rules/project-stage.md)                                 | Reject new migration files; flag backcompat shims and feature flags                                                 |
+| [no-environment-branching.md](../../rules/no-environment-branching.md)           | Flag any OS, browser, or input-device query or variant the rule bans                                                |
+| [component-owned-styling.md](../../rules/component-owned-styling.md)             | Reject theme selectors that target a component (`data-slot`, `class~=`); require a utility applied in the component |
+| [docs-mcp.md](../../rules/docs-mcp.md)                                           | Verify third-party API usage via nexus-docs-mcp before approving                                                    |
 
 ## Prerequisites
 

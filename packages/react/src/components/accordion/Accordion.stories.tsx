@@ -495,18 +495,14 @@ export const WithDataAttributes: Story = {
     await expect(item).toHaveClass('nx:hover:bg-container-hover');
     await expect(item).toHaveClass('nx:data-disabled:hover:bg-container');
     await expect(trigger).toHaveAttribute('data-slot', 'accordion-trigger');
-    await expect(trigger).toHaveClass('nx:transition-colors');
+    await expect(trigger).toHaveClass('nx:transition-control');
     await expect(trigger).toHaveClass('nx:duration-fast');
     await expect(trigger).not.toHaveClass('nx:transition-all');
     await expect(chevron).toHaveClass('nx:duration-default');
-    await expect(chevron).toHaveClass('nx:motion-reduce:transition-none');
     await expect(content).toBeInTheDocument();
     await expect(content).toHaveClass('nx:duration-default');
     await expect(content).toHaveClass(
       'nx:data-[state=open]:animate-accordion-down'
-    );
-    await expect(content).toHaveClass(
-      'nx:motion-reduce:data-[state=open]:animate-none'
     );
     await expect(content).not.toHaveClass('nx:transition-all');
   },

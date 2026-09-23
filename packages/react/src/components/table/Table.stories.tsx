@@ -933,7 +933,7 @@ function SortableHeaderDemo() {
             <button
               type="button"
               onClick={() => setSort((s) => (s === 'asc' ? 'desc' : 'asc'))}
-              className="nx:ml-auto nx:inline-flex nx:items-center nx:gap-1 nx:focus-visible:outline-2 nx:focus-visible:outline-focus-default nx:focus-visible:outline-offset-(--focus-offset)"
+              className="nx:ml-auto nx:inline-flex nx:items-center nx:gap-1 nx:focus-visible:outline-2 nx:focus-visible:outline-focus-default"
             >
               Amount
               <Icon className="nx:size-4" aria-hidden />
@@ -1077,7 +1077,7 @@ export const RowLink: Story = {
             <TableRowHeader>
               <a
                 href={`#/invoices/${row.invoice}`}
-                className="nx:after:absolute nx:after:inset-0 nx:after:content-[''] nx:focus-visible:outline-2 nx:focus-visible:outline-focus-default nx:focus-visible:outline-offset-(--focus-offset)"
+                className="nx:after:absolute nx:after:inset-0 nx:after:content-[''] nx:focus-visible:outline-2 nx:focus-visible:outline-focus-default"
               >
                 {row.invoice}
               </a>
@@ -1353,7 +1353,7 @@ function DataTableRecipeDemo() {
                 <button
                   type="button"
                   onClick={() => setSort((s) => (s === 'asc' ? 'desc' : 'asc'))}
-                  className="nx:ml-auto nx:inline-flex nx:items-center nx:gap-1 nx:typography-label-default nx:text-inherit nx:focus-visible:outline-2 nx:focus-visible:outline-focus-default nx:focus-visible:outline-offset-(--focus-offset)"
+                  className="nx:ml-auto nx:inline-flex nx:items-center nx:gap-1 nx:typography-label-default nx:text-inherit nx:focus-visible:outline-2 nx:focus-visible:outline-focus-default"
                 >
                   Amount
                   <SortIcon className="nx:size-4" aria-hidden />
@@ -1487,7 +1487,7 @@ function SortableRecipeHead({
         onClick={() => onSort(sortKey)}
         className={[
           'nx:inline-flex nx:items-center nx:gap-1 nx:typography-label-default nx:text-inherit',
-          'nx:focus-visible:outline-2 nx:focus-visible:outline-focus-default nx:focus-visible:outline-offset-(--focus-offset)',
+          'nx:focus-visible:outline-2 nx:focus-visible:outline-focus-default',
           align === 'right' ? 'nx:ml-auto' : '',
         ].join(' ')}
       >

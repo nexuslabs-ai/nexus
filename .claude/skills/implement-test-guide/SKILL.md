@@ -20,9 +20,7 @@ Implement tests with a focus on result validation over code coverage. Works with
 ## When to Use
 
 - Implementing tests for new or existing code
-- Building testing infrastructure (fixtures, mocks, utilities)
-- Adding coverage to untested modules
-- Creating integration test suites
+- Adding coverage to code that falls inside `.claude/rules/testing.md` § Scope
 
 ## Context Sources
 
@@ -37,15 +35,15 @@ This skill works with multiple input types:
 
 ## Package-Specific Testing Patterns
 
-Based on what you're testing, different patterns apply:
+Nexus tests only four kinds of thing — see `.claude/rules/testing.md` § Scope. Based on what you're testing:
 
-| Package            | Detect By              | Testing Approach                                   |
-| ------------------ | ---------------------- | -------------------------------------------------- |
-| Core               | `packages/core/`       | Unit tests for token generation scripts (Vitest)   |
-| React              | `packages/react/`      | Story-first: play functions in `*.stories.tsx`     |
-| Test utils         | `packages/test-utils/` | Unit tests for shared helpers                      |
-| Tailwind           | `packages/tailwind/`   | Generated CSS — verify via consuming-package tests |
-| General TypeScript | Any `.ts`              | Vitest unit/integration tests                      |
+| Target               | Detect By                                            | Testing Approach                                                    |
+| -------------------- | ---------------------------------------------------- | ------------------------------------------------------------------- |
+| React components     | `packages/react/src/components/`                     | Story-first: play functions in `*.stories.tsx`                      |
+| Core engine          | `packages/core/src/lib/`                             | Vitest behaviour tests — thresholds and invariants, never snapshots |
+| `cn` merge           | `packages/react/src/lib/utils.ts`                    | Vitest, in `utils.test.ts`                                          |
+| ESLint rules         | `packages/eslint-plugin-nexus/`                      | `RuleTester` valid/invalid cases in `__tests__/`                    |
+| Apps, scripts, hooks | `apps/`, `scripts/`, `packages/*/scripts/`, `hooks/` | No tests — stop and tell the user                                   |
 
 ## Base Rules
 
@@ -88,31 +86,25 @@ Always load and follow:
 
 ### Phase 2: Design Test Strategy
 
-1. **Choose test type:**
+1. **Pick the kind** from the Package-Specific Testing Patterns table above. If
+   the code is not in one of the four rows, it gets no test — stop and tell the
+   user. There is no integration, e2e, or snapshot tier to fall back on.
 
-   | Code Type               | Test Type          | Why                     |
-   | ----------------------- | ------------------ | ----------------------- |
-   | Pure function           | Unit test          | No dependencies to mock |
-   | Class with dependencies | Unit + mocks       | Isolate the unit        |
-   | Data pipeline           | Integration        | Test real flow          |
-   | Component with UI       | Story with play fn | Visual + interaction    |
-   | External API consumer   | Integration + mock | Mock the API            |
-
-2. **Design fixtures:**
-   - Use real data patterns from the codebase
+2. **Design inputs:**
+   - Use real data patterns from the codebase — real seed colours, real
+     component source, genuine user flows
    - Cover happy path, errors, edge cases
-   - Document what each fixture tests
 
-3. **Plan mock strategy:**
-   - Mock external services (APIs, DBs, LLMs)
-   - Don't mock internal functions
-   - Mocks must implement real interfaces
+3. **Stub only what the environment lacks:**
+   - Replace a browser API the runner has no implementation of (e.g.
+     `matchMedia`)
+   - Never mock Nexus's own functions
 
 ### Phase 3: Implement Tests
 
 1. **Work through systematically:**
    - Set up test file and imports
-   - Create fixtures/mocks needed
+   - Create the real inputs the assertions need
    - Implement happy path tests
    - Implement error case tests
    - Implement edge case tests
@@ -183,10 +175,9 @@ After test implementation is complete:
 
 ### Test Files
 
-| File                          | Tests | Description                    |
-| ----------------------------- | ----- | ------------------------------ |
-| `path/to/module.test.ts`      | 5     | Unit tests for core functions  |
-| `path/to/integration.test.ts` | 3     | Integration tests for pipeline |
+| File                     | Tests | Description                   |
+| ------------------------ | ----- | ----------------------------- |
+| `path/to/module.test.ts` | 5     | Unit tests for core functions |
 
 ### Coverage
 
@@ -198,7 +189,7 @@ After test implementation is complete:
 
 ### Key Test Patterns
 
-{Notable patterns used - fixtures, mocks, assertions}
+{Notable patterns used - real inputs, assertions, play-function flow}
 
 ### Verification
 
@@ -257,18 +248,17 @@ expect(result.error.code).toBe('VALIDATION_ERROR');
 
 ## Common Testing Frameworks
 
-| Framework | Use Case               | Import Pattern                                                   |
-| --------- | ---------------------- | ---------------------------------------------------------------- |
-| Vitest    | Unit/integration tests | `import { describe, it, expect } from 'vitest'`                  |
-| Storybook | Component tests        | `import { expect, fn, userEvent, within } from 'storybook/test'` |
-| Jest      | Legacy/specific needs  | `import { describe, it, expect } from '@jest/globals'`           |
+| Framework | Use Case        | Import Pattern                                                   |
+| --------- | --------------- | ---------------------------------------------------------------- |
+| Vitest    | Unit tests      | `import { describe, it, expect } from 'vitest'`                  |
+| Storybook | Component tests | `import { expect, fn, userEvent, within } from 'storybook/test'` |
 
 ## Principles to Follow
 
 1. **Result validation over coverage** — Good assertions matter more than line count
-2. **Real fixtures** — Use actual data patterns from the system
+2. **Real inputs** — Use actual data patterns from the system
 3. **Partial matching** — Assert on what matters, not everything
-4. **Mock boundaries** — Mock external services, not internal logic
+4. **Stub the browser, not Nexus** — Replace an API the runner lacks; never mock Nexus's own functions
 5. **Determinism** — Tests must produce same result every time
 6. **One focus per test** — Each test should have one reason to fail
 7. **Readable tests** — Test code is documentation

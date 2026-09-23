@@ -1,17 +1,51 @@
 import { type ClassValue, clsx } from 'clsx';
-import { extendTailwindMerge } from 'tailwind-merge';
+import {
+  type ClassValidator,
+  type DefaultClassGroupIds,
+  type DefaultThemeGroupIds,
+  extendTailwindMerge,
+  validators,
+} from 'tailwind-merge';
 
 /**
- * Tailwind-merge class groups for Nexus custom utilities. Hand-mirrors the
- * `@utility` sets emitted by `@nexus_ds/core` (see `packages/tailwind`) so a new
- * custom utility cannot silently drop out of `cn()`'s last-wins collapse.
+ * Custom `@theme` scale values Nexus adds to built-in tailwind-merge
+ * namespaces. Hand-mirrors the keys emitted by `@nexus_ds/core` (see
+ * `packages/tailwind`) and by co-located component CSS.
  */
-const ROLE_CLASS_GROUPS = {
+export const NEXUS_THEME_SCALES = {
+  radius: ['base'],
+  ease: ['enter', 'exit', 'move'],
+  shadow: ['base', 'inner'],
+  animate: ['progress-indeterminate'],
+} satisfies Partial<Record<DefaultThemeGroupIds, string[]>>;
+
+/**
+ * Nexus class names tailwind-merge does not know, keyed by the class group
+ * each one extends, so a conflicting pair collapses to last-wins in `cn()`.
+ */
+export const NEXUS_CLASS_GROUPS = {
+  animate: ['animate-overlay-presence-exit'],
+  duration: [
+    'duration-0',
+    'duration-faster',
+    'duration-fast',
+    'duration-default',
+    'duration-moderate',
+    'duration-slow',
+    'duration-slower',
+  ],
+  // The two ring-safe colour transitions. Without this they land nowhere and a
+  // later `transition-none` / `transition-all` fails to replace them.
+  transition: ['transition-control', 'transition-field'],
+  // Take any colour token, like `bg-*` / `text-*`.
+  'autofill-bg': [{ 'autofill-bg': [validators.isAny] }],
+  'autofill-text': [{ 'autofill-text': [validators.isAny] }],
+  surface: [{ surface: [validators.isAny] }],
+  'ring-color': ['ring-surface'],
+  'ring-offset-color': ['ring-offset-surface'],
+  z: ['z-overlay', 'z-sticky', 'z-modal', 'z-popover', 'z-toast', 'z-max'],
   gap: ['gap-container', 'gap-layout-section', 'gap-layout-stack'],
   p: ['p-container'],
-};
-
-const BORDER_WIDTH_CLASS_GROUPS = {
   'border-w': [
     'border-thin',
     'border-default',
@@ -68,54 +102,80 @@ const BORDER_WIDTH_CLASS_GROUPS = {
     'border-width-l-default',
     'border-width-l-thick',
   ],
-};
-
-const BORDER_COLOR_CLASS_GROUPS = {
+  // `outline-{thin,default,thick}` are widths, not colours. Without this they
+  // land in tailwind-merge's `outline-color` group and a field's
+  // `outline-focus-default` silently drops the width beside it.
+  'outline-w': ['outline-thin', 'outline-default', 'outline-thick'],
+  // Only the `@utility` aliases, which the emitted-utility drift guard in
+  // `utils.test.ts` requires to declare a group. `border-border-*` is
+  // Tailwind-generated from `--color-*` rather than emitted as a utility, and
+  // tailwind-merge's default `theme.color` is `[isAny]`, so it needs no entry.
   'border-color': [
-    'border-border-default',
     'border-color-default',
-    'border-border-default-alpha',
     'border-color-default-alpha',
-    'border-border-active',
     'border-color-active',
-    'border-border-disabled',
     'border-color-disabled',
-    'border-border-warning',
     'border-color-warning',
-    'border-border-warning-active',
     'border-color-warning-active',
-    'border-border-success',
     'border-color-success',
-    'border-border-success-active',
     'border-color-success-active',
-    'border-border-error',
     'border-color-error',
-    'border-border-error-active',
     'border-color-error-active',
-    'border-border-information',
     'border-color-information',
-    'border-border-information-active',
     'border-color-information-active',
-    'border-border-primary',
     'border-color-primary',
-    'border-border-primary-active',
     'border-color-primary-active',
   ],
-};
-
-const NEXUS_CLASS_GROUPS = {
-  ...ROLE_CLASS_GROUPS,
-  ...BORDER_WIDTH_CLASS_GROUPS,
-  ...BORDER_COLOR_CLASS_GROUPS,
-};
+  typography: [
+    'typography-heading-large',
+    'typography-heading-medium',
+    'typography-heading-small',
+    'typography-heading-xsmall',
+    'typography-heading-xxsmall',
+    'typography-body-default',
+    'typography-body-small',
+    'typography-shortcut',
+    'typography-label-default',
+    'typography-label-small',
+    'typography-label-caps',
+    'typography-code-block',
+    'typography-code-inline',
+  ],
+} satisfies Partial<
+  Record<
+    | DefaultClassGroupIds
+    | 'typography'
+    | 'autofill-bg'
+    | 'autofill-text'
+    | 'surface',
+    (string | Record<string, ClassValidator[]>)[]
+  >
+>;
 
 type NexusClassGroupId = keyof typeof NEXUS_CLASS_GROUPS;
+
+/**
+ * The atomic class groups a `typography-*` composite overwrites. Every CSS
+ * property the generated composites declare must map to a group listed here.
+ */
+export const TYPOGRAPHY_CONFLICTS = [
+  'font-family',
+  'font-size',
+  'font-weight',
+  'leading',
+  'tracking',
+  'text-wrap',
+] satisfies DefaultClassGroupIds[];
 
 /** Tailwind-merge configured with `nx:` prefix and Nexus custom utility groups. */
 const twMerge = extendTailwindMerge<NexusClassGroupId>({
   prefix: 'nx',
   extend: {
+    theme: NEXUS_THEME_SCALES,
     classGroups: NEXUS_CLASS_GROUPS,
+    conflictingClassGroups: {
+      typography: TYPOGRAPHY_CONFLICTS,
+    },
   },
 });
 

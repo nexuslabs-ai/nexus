@@ -114,7 +114,7 @@ const ChartTooltip = RechartsPrimitive.Tooltip;
 
 type ChartIndicator = 'line' | 'dot' | 'dashed';
 
-type ChartTooltipFormatter = (
+export type ChartTooltipFormatter = (
   value: RechartsPrimitive.TooltipPayloadEntry['value'],
   name: RechartsPrimitive.TooltipPayloadEntry['name'],
   item: RechartsPrimitive.TooltipPayloadEntry,
