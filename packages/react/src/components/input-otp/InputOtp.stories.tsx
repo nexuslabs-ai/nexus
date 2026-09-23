@@ -30,12 +30,9 @@ function slotLefts(slots: HTMLElement[]) {
 
 async function expectCollapsedWithinGroups(slots: HTMLElement[]) {
   for (const slot of slots) {
-    // A group's first slot has no previous sibling, so it starts un-overlapped.
     const previous = slot.previousElementSibling;
     if (!previous) continue;
 
-    // Adjacent slots overlap by one border width, so their shared edge is a
-    // single hairline rather than two borders side by side.
     await expect(slot.getBoundingClientRect().left).toBeCloseTo(
       previous.getBoundingClientRect().right -
         Number.parseFloat(getComputedStyle(previous).borderRightWidth),
@@ -60,13 +57,10 @@ async function expectActiveSlotRing(
     slots.find((slot) => slot.dataset.active === 'true')!
   );
 
-  // The overlapped left edge is the active slot's own border, so it takes the
-  // focus colour like the other three sides.
   await expect(styles.borderLeftColor).not.toBe(restBorderColor);
   await expect(styles.borderLeftColor).toBe(styles.borderTopColor);
   await expect(styles.outlineStyle).toBe('solid');
 
-  // Border widths never change with state, so activating a slot moves nothing.
   await expect(slotLefts(slots)).toEqual(restLefts);
 }
 
@@ -202,11 +196,6 @@ export const TransitionScoped: Story = {
   },
 };
 
-/**
- * Slots share one hairline by overlapping their full borders, and the active
- * slot recolours its own four sides — so moving between slots never shifts
- * the row, and the first slot of each group starts un-overlapped.
- */
 export const ActiveSlotRing: Story = {
   render: () => (
     <div className="nx:flex nx:flex-col nx:gap-4">
@@ -258,8 +247,6 @@ export const ActiveSlotRing: Story = {
       canvasElement.querySelector<HTMLElement>('[data-testid="split"]')!
     );
 
-    // The second group restarts at its own first slot — no overlap across the
-    // separator.
     await expect(split[3]!.getBoundingClientRect().left).toBeGreaterThan(
       split[2]!.getBoundingClientRect().right
     );
