@@ -8,15 +8,11 @@ import {
   writeFileSync,
 } from 'node:fs';
 import path from 'node:path';
-import { fileURLToPath } from 'node:url';
 
-const DOCS_ROOT = path.resolve(
-  path.dirname(fileURLToPath(import.meta.url)),
-  '..'
-);
+import { docsRoot } from './roots.mjs';
 
-const EXAMPLES_DIR = path.join(DOCS_ROOT, 'examples');
-const GENERATED_DIR = path.join(DOCS_ROOT, '__generated__');
+const EXAMPLES_DIR = path.join(docsRoot, 'examples');
+const GENERATED_DIR = path.join(docsRoot, '__generated__');
 
 const DEMO_EXTENSION = '.tsx';
 const INDEX_FILE = 'demo-index.ts';
@@ -98,14 +94,14 @@ function pruneEmptyDirs(dir) {
   }
 }
 
-function pruneOrphans(outputDir, keep) {
-  for (const file of walk(outputDir)) {
+function pruneOrphans(keep) {
+  for (const file of walk(GENERATED_DIR)) {
     if (!keep.has(file)) {
       rmSync(file);
     }
   }
 
-  pruneEmptyDirs(outputDir);
+  pruneEmptyDirs(GENERATED_DIR);
 }
 
 // Two levels out of `__generated__/demos/`, plus one per directory in the id.
@@ -119,17 +115,17 @@ function boundarySpecifier(id) {
 }
 
 /** @returns {DemoFile[]} */
-function collectDemos(examplesDir = EXAMPLES_DIR) {
-  if (!existsSync(examplesDir)) {
-    throw new Error(`Missing demo directory: ${examplesDir}`);
+function collectDemos() {
+  if (!existsSync(EXAMPLES_DIR)) {
+    throw new Error(`Missing demo directory: ${EXAMPLES_DIR}`);
   }
 
-  return walk(examplesDir)
+  return walk(EXAMPLES_DIR)
     .filter((file) => file.endsWith(DEMO_EXTENSION))
     .map((file) => ({
       file,
       id: path
-        .relative(examplesDir, file)
+        .relative(EXAMPLES_DIR, file)
         .split(path.sep)
         .join('/')
         .slice(0, -DEMO_EXTENSION.length),
@@ -141,7 +137,7 @@ function collectDemos(examplesDir = EXAMPLES_DIR) {
       // `foo.client.tsx` would claim the module path `foo.tsx`'s boundary owns.
       if (id.includes('.')) {
         throw new Error(
-          `Demo id cannot contain a dot: ${id}. Rename ${path.relative(examplesDir, file)}.`
+          `Demo id cannot contain a dot: ${id}. Rename ${path.relative(EXAMPLES_DIR, file)}.`
         );
       }
 
@@ -193,16 +189,12 @@ export const demos = ${literal} satisfies Record<string, Demo>;
 ${INDEX_FOOTER}`;
 }
 
-function generateDemoIndex({
-  examplesDir = EXAMPLES_DIR,
-  outputDir = GENERATED_DIR,
-} = {}) {
-  const demos = collectDemos(examplesDir);
-  const index = renderDemoIndex(demos);
-  const modulesDir = path.join(outputDir, MODULES_DIR);
-  const indexFile = path.join(outputDir, INDEX_FILE);
+function generateDemoIndex() {
+  const demos = collectDemos();
+  const modulesDir = path.join(GENERATED_DIR, MODULES_DIR);
+  const indexFile = path.join(GENERATED_DIR, INDEX_FILE);
 
-  writeIfChanged(indexFile, index);
+  writeIfChanged(indexFile, renderDemoIndex(demos));
 
   const keep = new Set([indexFile]);
   for (const demo of demos) {
@@ -218,16 +210,16 @@ function generateDemoIndex({
     keep.add(boundaryFile);
   }
 
-  pruneOrphans(outputDir, keep);
+  pruneOrphans(keep);
 
-  return { demos, index };
+  return demos;
 }
 
 function generateAndLog() {
-  const { demos } = generateDemoIndex();
+  const demos = generateDemoIndex();
   const plural = demos.length === 1 ? 'demo' : 'demos';
   console.log(
-    `demo-index: ${demos.length} ${plural} -> ${path.relative(DOCS_ROOT, GENERATED_DIR)}`
+    `demo-index: ${demos.length} ${plural} -> ${path.relative(docsRoot, GENERATED_DIR)}`
   );
 }
 
@@ -240,7 +232,7 @@ function regenerateQuietly() {
 }
 
 function watchExamples() {
-  const relativeExamples = path.relative(DOCS_ROOT, EXAMPLES_DIR);
+  const relativeExamples = path.relative(docsRoot, EXAMPLES_DIR);
 
   regenerateQuietly();
 
@@ -269,10 +261,8 @@ function watchExamples() {
   console.log(`demo-index: watching ${relativeExamples}`);
 }
 
-if (process.argv[1] === fileURLToPath(import.meta.url)) {
-  if (process.argv.includes('--watch')) {
-    watchExamples();
-  } else {
-    generateAndLog();
-  }
+if (process.argv.includes('--watch')) {
+  watchExamples();
+} else {
+  generateAndLog();
 }
