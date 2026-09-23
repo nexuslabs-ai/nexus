@@ -365,7 +365,9 @@ export const InvalidOutlinePrimary: Story = {
     </div>
   ),
   play: async ({ canvasElement }) => {
-    const [resting, selected] = within(canvasElement).getAllByRole('button');
+    const canvas = within(canvasElement);
+    const resting = canvas.getByRole('button', { name: 'Invalid resting' });
+    const selected = canvas.getByRole('button', { name: 'Invalid selected' });
     await expect(getComputedStyle(resting).borderTopColor).toBe(
       tokenColor(resting, 'border-error')
     );
