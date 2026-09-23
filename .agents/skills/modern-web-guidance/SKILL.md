@@ -21,6 +21,34 @@ description: |
 
 A skill to search for specific web development use cases and retrieve their corresponding best practice guides.
 
+## Nexus integration (repository policy takes precedence)
+
+Apply this guidance through Nexus components, semantic tokens, and `nx:` utilities.
+
+Nexus declares a browser support policy in `../../../AGENTS.md`: it implements no
+feature-detection or environment fallbacks. Read
+`../../../.claude/rules/no-environment-branching.md` before applying any guide's
+browser-support or fallback recommendation. That rule overrides this skill's
+generic fallback advice: choose a simpler primitive instead of adding banned
+environment branches. Do not reintroduce a browser-floor registry.
+
+For substantial UI work, record a compact guidance note in the plan or PR:
+
+- **Source:** search query and retrieved guide IDs, or exact bundled guide paths.
+- **Decision:** the applicable pattern and any Nexus-policy override.
+- **Verification:** how the implementation was checked against the guidance.
+
+For a text-only edit or removal that introduces no layout, interaction, or
+platform decision, an existing relevant guide can be reused; a new search is
+unnecessary. Do not describe reading this skill alone as consulting a guide.
+
+If the CLI cannot run, record the actual failure and read the relevant Markdown
+under `guides/` using file search. The bundled collection does not require npm or
+network access. If no bundled guide fits, use official platform/library sources
+and identify that fallback. Never report a failed lookup as a successful check.
+
+See `UPSTREAM.md` for snapshot provenance and refresh instructions.
+
 ## When to use
 
 Must use this skill:
@@ -89,7 +117,7 @@ If the output is truncated, you must repeat the command but redirect to a file a
 
 When generating or modifying code, cross-check the implementation against the retrieved guide before concluding:
 
-- **Applicable Guidance & Fallbacks**: Ensure the relevant modern patterns and necessary fallback strategies from the guide are correctly applied, without forcing unrequested features.
+- **Applicable Guidance & Fallbacks**: Ensure the relevant modern patterns and necessary fallback strategies from the guide are correctly applied, without forcing unrequested features. Nexus declares a no-fallback policy; see Nexus integration above.
 - **Task Fulfillment**: Confirm that the implementation fully satisfies the user's request.
 
 ## Using npx / pnpx
@@ -110,7 +138,7 @@ When generating or modifying code, cross-check the implementation against the re
 
 ## Interpreting Browser Support & Fallbacks
 
-- **Default Behavior**: All guides assume **Baseline Widely available** features are safe to use without fallbacks. For features that are not Baseline widely available, you **MUST** follow the fallback recommendations in the guide, unless the user has specified a custom browser support policy.
+- **Default Behavior**: All guides assume **Baseline Widely available** features are safe to use without fallbacks. For features that are not Baseline widely available, you **MUST** follow the fallback recommendations in the guide, unless the user or project has specified a custom browser support policy. Nexus has; see Nexus integration above.
 - **Custom Policies**: If the user has already defined explicit browser support requirements, use the browser compatibility data in the guide to determine if a fallback can be safely ignored.
   - For Baseline YYYY targets, a feature satisfies this target if its "Baseline since" date is <= YYYY.
   - **Policy Examples**:
@@ -125,28 +153,3 @@ When generating or modifying code, cross-check the implementation against the re
   - Questions if a feature is safe to use without fallbacks.
 
   No defined policy format. This is an example: `**Browser Support:** Allow Newly Available features, but only adopt custom fallback code that adds <= 20 lines and does not require external dependencies.`
-
-## Nexus integration (repository policy takes precedence)
-
-Apply this guidance through Nexus components, semantic tokens, and `nx:` utilities.
-Read `../../../.claude/rules/no-environment-branching.md` before applying any
-upstream browser-support or fallback recommendation. That rule overrides this
-skill's generic fallback advice: choose a simpler primitive instead of adding
-banned environment branches. Do not reintroduce a browser-floor registry.
-
-For substantial UI work, record a compact guidance note in the plan or PR:
-
-- **Source:** search query and retrieved guide IDs, or exact bundled guide paths.
-- **Decision:** the applicable pattern and any Nexus-policy override.
-- **Verification:** how the implementation was checked against the guidance.
-
-For a text-only edit or removal that introduces no layout, interaction, or
-platform decision, an existing relevant guide can be reused; a new search is
-unnecessary. Do not describe reading this skill alone as consulting a guide.
-
-If the CLI cannot run, record the actual failure and read the relevant Markdown
-under `guides/` using file search. The bundled collection does not require npm or
-network access. If no bundled guide fits, use official platform/library sources
-and identify that fallback. Never report a failed lookup as a successful check.
-
-See `UPSTREAM.md` for snapshot provenance and refresh instructions.

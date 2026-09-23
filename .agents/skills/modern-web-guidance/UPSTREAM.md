@@ -18,8 +18,10 @@ for freshness detection, not a pin on the version fetched by `@latest`.
    directory. Do not run the installer over Nexus's custom agent setup.
 2. Compare guide IDs, moved paths, and content; replace the bundled guide tree
    with that release's Markdown files, removing stale paths.
-3. Update `SKILL.md` and `skill-version.txt`, preserving the Nexus integration
-   section. Keep Nexus's current environment policy authoritative.
+3. Update `SKILL.md` and `skill-version.txt`, preserving the Nexus-local
+   overrides: the Nexus integration section at the top of the skill body, and
+   the one-sentence Nexus-policy references in Step 3 and "Interpreting Browser
+   Support & Fallbacks". Keep Nexus's current environment policy authoritative.
 4. Update this provenance record and upstream license/notices. Format the
    Markdown using the repository formatter.
 5. Exercise a CLI search and retrieval; independently confirm a local guide can
@@ -28,5 +30,5 @@ for freshness detection, not a pin on the version fetched by `@latest`.
 
 Refresh this snapshot deliberately; npm `@latest` does not update these files.
 Markdown may be reformatted to match the repository, but guide content is not
-customized. Repository-specific overrides belong in the skill integration section
-and Nexus rules, not in upstream guide prose.
+customized. Repository-specific overrides belong in the Nexus-local `SKILL.md`
+lines listed in step 3 and in Nexus rules, not in upstream guide prose.
