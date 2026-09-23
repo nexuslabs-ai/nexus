@@ -123,21 +123,15 @@ jobs:
           pnpm turbo build
           node scripts/audit-turbo-outputs.js --post-build
 
-      # The props JSON is not committed, so there is no working tree to compare
-      # against. The copy this diffs is whatever the previous step left behind —
-      # often a turbo cache restore from an earlier commit's runner, which is
-      # what makes this a cross-run comparison rather than a same-process
-      # repeat. Emitted order is pinned by the generator's own sorts, so what is
-      # left for a second pass to catch is a type string a fresh checker prints
-      # differently. It is invoked directly so that turbo neither serves the
-      # first run's cache nor rebuilds the dependencies just built.
-      - name: Check props JSON determinism
+      # The build step's props JSON may be a turbo cache restore; regenerating
+      # it outside turbo shows whether that cached copy is stale.
+      - name: Check props JSON turbo cache is fresh
         run: |
           set -euo pipefail
-          cp -r apps/docs/generated/props "$RUNNER_TEMP/props-first"
+          cp -r apps/docs/generated/props "$RUNNER_TEMP/props-cached"
           pnpm --filter @nexus_ds/docs generate:props
-          if ! diff -r "$RUNNER_TEMP/props-first" apps/docs/generated/props; then
-            echo "::error::The props JSON differs between two runs of the same commit."
+          if ! diff -r "$RUNNER_TEMP/props-cached" apps/docs/generated/props; then
+            echo "::error::The props JSON differs from its turbo-cached copy; generate:props in apps/docs/turbo.json is missing an input the generator reads."
             exit 1
           fi
 
