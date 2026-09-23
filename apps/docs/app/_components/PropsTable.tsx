@@ -1,5 +1,7 @@
 import type * as React from 'react';
 
+import { cn } from '@nexus_ds/react/utils';
+
 import {
   type ComponentEntry,
   loadComponentDocs,
@@ -64,9 +66,12 @@ export async function PropsTable({
   ));
 }
 
-// `AlertDialogContent` → `props-alert-dialog-content`.
+// `InputOTPGroup` → `props-input-otp-group`.
 function propsHeadingId(name: string) {
-  return `props-${slugify(name.replace(/([a-z0-9])([A-Z])/g, '$1 $2'))}`;
+  const words = name
+    .replace(/([a-z0-9])([A-Z])/g, '$1 $2')
+    .replace(/([A-Z])([A-Z][a-z])/g, '$1 $2');
+  return `props-${slugify(words)}`;
 }
 
 function ComponentProps({ entry }: { entry: ComponentEntry }) {
@@ -105,7 +110,7 @@ function PropRow({ prop }: { prop: PropEntry }) {
           )}
         </span>
       </TableRowHeader>
-      <TableCell className={`${CELL_CLASS} nx:min-w-40`}>
+      <TableCell className={cn(CELL_CLASS, 'nx:min-w-40')}>
         <InlineCode>{prop.type}</InlineCode>
       </TableCell>
       <TableCell className={CELL_CLASS}>
@@ -116,7 +121,7 @@ function PropRow({ prop }: { prop: PropEntry }) {
         )}
       </TableCell>
       <TableCell
-        className={`${CELL_CLASS} nx:min-w-64 nx:text-muted-foreground`}
+        className={cn(CELL_CLASS, 'nx:min-w-64 nx:text-muted-foreground')}
       >
         {prop.description ? (
           <Description text={prop.description} />
@@ -137,7 +142,7 @@ function Missing({ label }: { label: string }) {
   );
 }
 
-/** Renders the Markdown subset JSDoc uses: paragraphs, `- ` lists, code, bold. */
+/** Renders the Markdown subset JSDoc uses: paragraphs, `- ` lists, code, bold, italic. */
 function Description({ text }: { text: string }) {
   return (
     <div className="nx:flex nx:flex-col nx:gap-2">
@@ -190,19 +195,19 @@ function Inline({ text }: { text: string }) {
   const parts: React.ReactNode[] = [];
   let last = 0;
 
-  for (const match of text.matchAll(/`([^`]+)`|\*\*([^*]+)\*\*/g)) {
+  for (const match of text.matchAll(/`([^`]+)`|\*\*([^*]+)\*\*|\*([^*]+)\*/g)) {
     parts.push(text.slice(last, match.index));
-    const [, code, strong] = match;
-    parts.push(
-      code === undefined ? (
-        <strong key={match.index}>{strong}</strong>
-      ) : (
-        <InlineCode key={match.index}>{code}</InlineCode>
-      )
-    );
+    parts.push(<InlineSpan key={match.index} match={match} />);
     last = match.index + match[0].length;
   }
   parts.push(text.slice(last));
 
   return parts;
+}
+
+function InlineSpan({ match }: { match: RegExpExecArray }) {
+  const [, code, strong, emphasis] = match;
+  if (code !== undefined) return <InlineCode>{code}</InlineCode>;
+  if (strong !== undefined) return <strong>{strong}</strong>;
+  return <em>{emphasis}</em>;
 }

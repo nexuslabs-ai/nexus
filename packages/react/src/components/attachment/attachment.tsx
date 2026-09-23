@@ -84,8 +84,8 @@ interface AttachmentProps
   /**
    * Overrides the assistive-tech status text for the current `state` — pass a
    * localised string, or one that names the file. Ignored while the attachment
-   * is settled (`idle` / `done`), which announces nothing.
-   * @default a built-in phrase per state, e.g. 'Uploading'
+   * is settled (`idle` / `done`), which announces nothing. Defaults to a
+   * built-in phrase per state, such as 'Uploading'.
    * @example
    * ```tsx
    * <Attachment state="uploading" statusLabel="Uploading report.pdf" />

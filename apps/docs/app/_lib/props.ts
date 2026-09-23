@@ -1,3 +1,5 @@
+import { cache } from 'react';
+
 import { readFile } from 'node:fs/promises';
 import path from 'node:path';
 
@@ -5,38 +7,38 @@ import type {
   ComponentEntry,
   PropsFile,
   PropsIndex,
-} from '../../scripts/generate-props.mjs';
+} from '../../scripts/props-entries.mjs';
 
 import 'server-only';
 
 export type {
   ComponentEntry,
   PropEntry,
-} from '../../scripts/generate-props.mjs';
+} from '../../scripts/props-entries.mjs';
 
 const PROPS_DIR = path.join(process.cwd(), 'generated', 'props');
 
-async function readPropsJson<T>(fileName: string): Promise<T> {
-  return JSON.parse(await readFile(path.join(PROPS_DIR, fileName), 'utf8'));
-}
-
-async function readIndex(): Promise<PropsIndex> {
+const readPropsJson = cache(async (fileName: string): Promise<unknown> => {
+  const filePath = path.join(PROPS_DIR, fileName);
   try {
-    return await readPropsJson<PropsIndex>('index.json');
+    return JSON.parse(await readFile(filePath, 'utf8'));
   } catch (error) {
+    const missing = (error as NodeJS.ErrnoException).code === 'ENOENT';
     throw new Error(
-      'No props JSON — run `pnpm --filter @nexus_ds/docs generate:props`.',
+      missing
+        ? `No props JSON at ${filePath} — run \`pnpm --filter @nexus_ds/docs generate:props\`.`
+        : `Could not read ${filePath}.`,
       { cause: error }
     );
   }
-}
+});
 
 /** The generated prop docs for `slug`, narrowed to `component` when given. */
 export async function loadComponentDocs(
   slug: string,
   component?: string
 ): Promise<ComponentEntry[]> {
-  const index = await readIndex();
+  const index = (await readPropsJson('index.json')) as PropsIndex;
 
   const names = Object.hasOwn(index, slug) ? index[slug] : undefined;
   if (!names) {
@@ -50,7 +52,7 @@ export async function loadComponentDocs(
     );
   }
 
-  const { components } = await readPropsJson<PropsFile>(`${slug}.json`);
+  const { components } = (await readPropsJson(`${slug}.json`)) as PropsFile;
   if (!component) return components;
   return components.filter((entry) => entry.name === component);
 }

@@ -25,6 +25,11 @@ import {
   toRepoPath,
   toSlugFolder,
 } from './props-contract.mjs';
+import {
+  toComponentEntry,
+  toProplessEntry,
+  variantDefaults,
+} from './props-entries.mjs';
 import { reactEntryPoints } from './react-entry-points.mjs';
 import { docsRoot, reactRoot } from './roots.mjs';
 
@@ -123,64 +128,6 @@ function assertResolvableTypes(entries, localAliases) {
       ...offenders,
     ].join('\n')
   );
-}
-
-/**
- * @typedef {object} PropEntry
- * @property {string} name
- * @property {string} type
- * @property {boolean} required
- * @property {string | null} defaultValue
- * @property {string} description
- * @property {string | null} example
- */
-
-/**
- * @typedef {object} ComponentEntry
- * @property {string} name
- * @property {string} description
- * @property {string} sourcePath
- * @property {PropEntry[]} props
- */
-
-/** @typedef {{ slug: string; components: ComponentEntry[] }} PropsFile */
-
-/** @typedef {Record<string, string[]>} PropsIndex */
-
-/** @returns {PropEntry} */
-function toPropEntry(prop, expansions) {
-  return {
-    name: prop.name,
-    type: expansions.get(prop.type.name) ?? prop.type.name,
-    required: prop.required,
-    defaultValue: prop.defaultValue?.value ?? null,
-    description: prop.description,
-    // Unlike `description`, docgen leaves tag values with CRLF line endings.
-    example: prop.tags?.example?.replace(/\r\n/g, '\n') ?? null,
-  };
-}
-
-/** @returns {ComponentEntry} */
-function toComponentEntry(name, sourcePath, doc, expansions) {
-  return {
-    name,
-    description: doc.description,
-    sourcePath,
-    props: Object.values(doc.props)
-      .map((prop) => toPropEntry(prop, expansions))
-      .sort((a, b) => a.name.localeCompare(b.name, 'en')),
-  };
-}
-
-function toProplessEntry(checker, name, sourcePath, symbol) {
-  return {
-    name,
-    description: ts
-      .displayPartsToString(symbol.getDocumentationComment(checker))
-      .replace(/\r\n/g, '\n'),
-    sourcePath,
-    props: [],
-  };
 }
 
 // A component documented on its `{Name}Props` interface takes that description.
@@ -296,7 +243,13 @@ for (const [name, symbol] of components) {
   const sourcePath = toRepoPath(fileName);
   const doc = docsByDeclaration.get(`${sourcePath}#${name}`);
   const entry = doc
-    ? toComponentEntry(name, sourcePath, doc, expansions)
+    ? toComponentEntry(
+        name,
+        sourcePath,
+        doc,
+        expansions,
+        variantDefaults(checker, symbol)
+      )
     : toProplessEntry(checker, name, sourcePath, symbol);
 
   bySlug.get(toSlugFolder(path.relative(componentsRoot, fileName))).push(entry);
@@ -307,7 +260,7 @@ assertResolvableTypes([...bySlug.values()].flat(), localAliases);
 mkdirSync(outputDir, { recursive: true });
 clearPreviousOutput();
 
-/** @type {PropsIndex} */
+/** @type {import('./props-entries.mjs').PropsIndex} */
 const index = {};
 let propCount = 0;
 

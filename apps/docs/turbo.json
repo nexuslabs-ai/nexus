@@ -7,6 +7,7 @@
       "inputs": [
         "scripts/generate-props.mjs",
         "scripts/props-contract.mjs",
+        "scripts/props-entries.mjs",
         "scripts/react-entry-points.mjs",
         "scripts/roots.mjs",
         "$TURBO_ROOT$/packages/react/src/**",
