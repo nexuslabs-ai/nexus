@@ -96,11 +96,16 @@ function ContrastField({
   onChange: (value: number) => void;
 }) {
   const id = useId();
+  // Only a pointer drag holds a draft; keyboard steps commit straight to `value`.
   const [draft, setDraft] = useState<number | null>(null);
   const shown = draft ?? value;
 
+  function moveDraft([next]: number[]) {
+    if (next === undefined) return;
+    setDraft((current) => (current === null ? null : next));
+  }
+
   function commit([next]: number[]) {
-    setDraft(null);
     if (next !== undefined && next !== value) onChange(next);
   }
 
@@ -120,7 +125,9 @@ function ContrastField({
         max={CONTRAST_MAX}
         step={1}
         value={[shown]}
-        onValueChange={([next]) => setDraft(next ?? null)}
+        onPointerDown={() => setDraft(value)}
+        onPointerUp={() => setDraft(null)}
+        onValueChange={moveDraft}
         onValueCommit={commit}
       />
       <p className="nx:typography-body-small nx:text-muted-foreground">
@@ -187,16 +194,28 @@ function SwitchField({
   );
 }
 
+/**
+ * A preset pick, picker session, or hex edit always begins with a focus or a
+ * click inside the field, so either one starts a new undo step.
+ */
 function BrandColorField({
   value,
   onChange,
+  onGestureStart,
 }: {
   value: string;
   onChange: (value: string) => void;
+  onGestureStart: () => void;
 }) {
   const id = useId();
   return (
-    <div role="group" aria-labelledby={id} className={FIELD_CLASS}>
+    <div
+      role="group"
+      aria-labelledby={id}
+      className={FIELD_CLASS}
+      onFocusCapture={onGestureStart}
+      onClickCapture={onGestureStart}
+    >
       <span id={id} className={LABEL_CLASS}>
         Brand color
       </span>
@@ -213,6 +232,7 @@ export function AppearanceControls({
   state,
   resolvedMode,
   onChange,
+  onGestureStart,
 }: {
   state: NexusAppearanceState;
   resolvedMode: NexusResolvedAppearanceMode;
@@ -220,6 +240,7 @@ export function AppearanceControls({
     patch: Partial<NexusAppearanceState>,
     group?: keyof NexusAppearanceState
   ) => void;
+  onGestureStart: () => void;
 }) {
   const contrastKey =
     resolvedMode === 'dark' ? 'darkContrast' : 'lightContrast';
@@ -234,6 +255,7 @@ export function AppearanceControls({
         <BrandColorField
           value={state.brandColor}
           onChange={(brandColor) => onChange({ brandColor }, 'brandColor')}
+          onGestureStart={onGestureStart}
         />
         <SelectField
           label="Mode"

@@ -14,7 +14,8 @@ type ChangeGroup = keyof NexusAppearanceState;
 /**
  * The shared docs appearance plus an undo history of the edits made through
  * `change` and `reset`. Consecutive changes in the same `group` share one undo
- * step. Edits persist through the docs appearance provider.
+ * step until `startStep` is called. Edits persist through the docs appearance
+ * provider.
  */
 export function useAppearanceHistory() {
   const { state, setState } = useNexusAppearance();
@@ -37,13 +38,24 @@ export function useAppearanceHistory() {
     commit(DOCS_APPEARANCE_DEFAULT_STATE, null);
   }
 
+  function startStep() {
+    setLastGroup(null);
+  }
+
   function undo() {
     const previous = history.at(-1);
     if (!previous) return;
     setHistory((past) => past.slice(0, -1));
-    setLastGroup(null);
+    startStep();
     setState(previous);
   }
 
-  return { state, change, reset, undo, canUndo: history.length > 0 };
+  return {
+    state,
+    change,
+    startStep,
+    reset,
+    undo,
+    canUndo: history.length > 0,
+  };
 }

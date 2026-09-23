@@ -11,7 +11,8 @@ import { ThemeExport } from './theme-export';
 import { WorkspaceLayout } from './workspace-layout';
 
 export function CreateWorkspace() {
-  const { state, change, reset, undo, canUndo } = useAppearanceHistory();
+  const { state, change, startStep, reset, undo, canUndo } =
+    useAppearanceHistory();
   const { resolvedMode } = useNexusAppearance();
 
   const panel = (
@@ -20,6 +21,7 @@ export function CreateWorkspace() {
         state={state}
         resolvedMode={resolvedMode}
         onChange={change}
+        onGestureStart={startStep}
       />
       <div className="nx:flex nx:flex-col nx:gap-2 nx:pt-4 nx:border-t-default nx:border-border-default">
         <div className="nx:grid nx:grid-cols-2 nx:gap-2">
