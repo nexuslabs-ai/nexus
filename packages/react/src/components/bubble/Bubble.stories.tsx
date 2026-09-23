@@ -1,7 +1,7 @@
 import * as React from 'react';
 
 import type { Meta, StoryObj } from '@storybook/react';
-import { CheckCheckIcon, InfoIcon } from 'lucide-react';
+import { IconChecks, IconInfoCircle } from '@tabler/icons-react';
 import { expect, fn, userEvent, waitFor, within } from 'storybook/test';
 
 import { Button } from '../button';
@@ -847,7 +847,7 @@ export const WithTooltip: Story = {
                 aria-label="Delivery details"
                 className={receiptIconClassName}
               >
-                <CheckCheckIcon />
+                <IconChecks />
               </button>
             </TooltipTrigger>
             <TooltipContent>Read 09:15 &middot; 24 Aug 2026</TooltipContent>
@@ -892,7 +892,7 @@ export const WithPopover: Story = {
               aria-label="Message details"
               className={receiptIconClassName}
             >
-              <InfoIcon />
+              <IconInfoCircle />
             </button>
           </PopoverTrigger>
           <PopoverContent
