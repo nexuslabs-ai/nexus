@@ -128,14 +128,13 @@ jobs:
       - name: Check docs JSON matches a fresh regeneration
         run: |
           set -euo pipefail
-          for name in props dependencies; do
-            cp -r "apps/docs/generated/$name" "$RUNNER_TEMP/$name-build"
-            pnpm --filter @nexus_ds/docs "generate:$name"
-            if ! diff -r "$RUNNER_TEMP/$name-build" "apps/docs/generated/$name"; then
-              echo "::error::The $name JSON differs from the build step's copy: either generate:$name in apps/docs/turbo.json is missing an input the generator reads, or the generator's output is nondeterministic."
-              exit 1
-            fi
-          done
+          cp -r apps/docs/generated "$RUNNER_TEMP/docs-generated-build"
+          pnpm --filter @nexus_ds/docs generate:props
+          pnpm --filter @nexus_ds/docs generate:dependencies
+          if ! diff -r "$RUNNER_TEMP/docs-generated-build" apps/docs/generated; then
+            echo "::error::The docs JSON differs from the build step's copy: either a generate:* task in apps/docs/turbo.json is missing an input its generator reads, or the generator's output is nondeterministic."
+            exit 1
+          fi
 
       - name: Docs CSP inventory
         run: |
