@@ -247,71 +247,53 @@ function attributeDefault(checker, value, owner) {
 }
 
 /**
- * What one `<X>` does to a prop of `X`. `text` compares settings across `<X>`
- * elements; `resolve` is `undefined` when `X`'s own default still applies.
- * @typedef {{ text: string; resolve: LazyDefault | undefined }} AttributeSetting
- */
-
-/** @type {AttributeSetting} */
-const INHERITED = { text: 'inherited', resolve: undefined };
-
-/** @type {AttributeSetting} */
-const FIXED = { text: 'fixed', resolve: () => null };
-
-/**
- * The settings one `<X>` gives its attributes. An attribute a later spread can
- * override is the wrapper's default; one after every spread fixes the prop, so
- * it has none; a forwarded prop keeps `X`'s default.
+ * The defaults one `<X>` sets through its attributes. An attribute a later
+ * spread can override is the wrapper's default; one after every spread fixes
+ * the prop, so it has none. A forwarded prop is left out, keeping `X`'s own.
  * @param {ts.TypeChecker} checker
  * @param {string} owner
  * @param {ts.SignatureDeclaration} fn
  * @param {ts.Symbol} target
  * @param {ts.JsxOpeningElement | ts.JsxSelfClosingElement} element
- * @returns {Map<string, AttributeSetting>}
+ * @returns {Map<string, LazyDefault>}
  */
 function attributeSettings(checker, owner, fn, target, element) {
   const { properties } = element.attributes;
   const lastSpread = properties.findLastIndex(ts.isJsxSpreadAttribute);
-  /** @type {Map<string, AttributeSetting>} */
+  /** @type {Map<string, LazyDefault>} */
   const settings = new Map();
 
   properties.forEach((attribute, position) => {
     if (!ts.isJsxAttribute(attribute)) return;
     const key = attribute.name.getText();
     const value = attribute.initializer;
+    if (isForwardedProp(checker, fn, value)) return;
 
-    if (isForwardedProp(checker, fn, value)) {
-      settings.set(key, INHERITED);
-      return;
-    }
     if (position > lastSpread) {
-      settings.set(key, FIXED);
+      settings.set(key, () => null);
       return;
     }
-
     const where = `${owner}'s <${target.getName()} ${key}>`;
-    settings.set(key, {
-      text: `default:${value?.getText() ?? 'true'}`,
-      resolve: () => attributeDefault(checker, value, where),
-    });
+    settings.set(key, () => attributeDefault(checker, value, where));
   });
 
   return settings;
 }
 
 /**
- * The defaults `fn` gives `target`'s props through JSX. Every `<X>` must agree
- * on a prop — a branch that forwards or omits it counts as keeping `X`'s own
- * default.
+ * The defaults `fn` gives `target`'s props through JSX. Every `<X>` must
+ * resolve a prop to the same value — one that forwards or omits it resolves to
+ * `inherited`, `X`'s own default.
  * @param {ts.TypeChecker} checker
  * @param {string} owner
  * @param {ts.SignatureDeclaration} fn
  * @param {ts.Symbol} target
+ * @param {Map<string, LazyDefault>} inherited
  * @returns {Map<string, LazyDefault>}
  */
-function attributeDefaults(checker, owner, fn, target) {
-  /** @type {Map<string, AttributeSetting>[]} */
-  const elements = [];
+function attributeDefaults(checker, owner, fn, target, inherited) {
+  /** @type {Map<string, LazyDefault>[]} */
+  const settingsPerElement = [];
 
   /** @param {ts.Node} node */
   function visit(node) {
@@ -319,7 +301,9 @@ function attributeDefaults(checker, owner, fn, target) {
       (ts.isJsxOpeningElement(node) || ts.isJsxSelfClosingElement(node)) &&
       symbolAt(checker, node.tagName) === target
     ) {
-      elements.push(attributeSettings(checker, owner, fn, target, node));
+      settingsPerElement.push(
+        attributeSettings(checker, owner, fn, target, node)
+      );
     }
     ts.forEachChild(node, visit);
   }
@@ -328,21 +312,21 @@ function attributeDefaults(checker, owner, fn, target) {
 
   /** @type {Map<string, LazyDefault>} */
   const defaults = new Map();
-  const keys = new Set(elements.flatMap((settings) => [...settings.keys()]));
+  const keys = new Set(
+    settingsPerElement.flatMap((settings) => [...settings.keys()])
+  );
 
   for (const key of keys) {
-    const [first = INHERITED, ...rest] = elements.map(
-      (settings) => settings.get(key) ?? INHERITED
+    const resolvers = settingsPerElement.map(
+      (settings) => settings.get(key) ?? inherited.get(key) ?? (() => null)
     );
-    if (rest.some((setting) => setting.text !== first.text)) {
-      defaults.set(key, () => {
-        throw new Error(
-          `props JSON: ${owner} passes different \`${key}\` values to <${target.getName()}>, so it has no single default. Give it an \`@default\` tag.`
-        );
-      });
-      continue;
-    }
-    if (first.resolve) defaults.set(key, first.resolve);
+    defaults.set(key, () => {
+      const [first = null, ...rest] = resolvers.map((resolve) => resolve());
+      if (rest.every((value) => value === first)) return first;
+      throw new Error(
+        `props JSON: ${owner} passes different \`${key}\` values to <${target.getName()}>, so it has no single default. Give it an \`@default\` tag.`
+      );
+    });
   }
 
   return defaults;
@@ -392,10 +376,10 @@ function functionDefaults(checker, owner, fn) {
       return;
     }
 
-    const attributes = attributeDefaults(checker, owner, fn, target);
-    for (const [key, inherited] of componentDefaults(checker, target)) {
-      if (!defaults.has(key))
-        defaults.set(key, attributes.get(key) ?? inherited);
+    const inherited = componentDefaults(checker, target);
+    const attributes = attributeDefaults(checker, owner, fn, target, inherited);
+    for (const [key, value] of inherited) {
+      if (!defaults.has(key)) defaults.set(key, attributes.get(key) ?? value);
     }
   }
 
