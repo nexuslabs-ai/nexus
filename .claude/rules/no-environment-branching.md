@@ -39,4 +39,4 @@ The `modern-web-guidance` skill still recommends `forced-colors` fallbacks, `@su
 
 ## Enforcement
 
-Review only — there is no automated scan. Reject a banned query or variant in `packages/` or `apps/` source at review.
+Review only — there is no automated scan. Reject a banned query, variant, or non-Baseline feature in `packages/` or `apps/` source at review.
