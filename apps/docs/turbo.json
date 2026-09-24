@@ -53,7 +53,7 @@
       "outputs": [".next/**", "!.next/cache/**", "next-env.d.ts"]
     },
     "dev": {
-      "dependsOn": ["^build", "generate:manifest"],
+      "dependsOn": ["^build", "generate:manifest", "generate:dependencies"],
       "cache": false,
       "persistent": true
     }
