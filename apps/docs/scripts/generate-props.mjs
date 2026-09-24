@@ -6,12 +6,14 @@ import ts from 'typescript';
 
 import {
   assertWorkspaceTypes,
+  cvaVariantKeys,
   exportName,
   isOwnProp,
   isPortableExpansion,
   isReExport,
   isTypeExport,
   opaqueNamespaceNames,
+  propsContractProblems,
   publicComponents,
   publicExports,
   toSlugFolder,
@@ -109,6 +111,37 @@ function assertResolvableTypes(entries, localAliases) {
       'props JSON: a prop is documented with a repo-local type alias that @nexus_ds/react does not export, so a reader cannot resolve it.',
       'Export the alias from its component folder and from src/index.ts. Expansion covers the rest, but only for a prop typed as the bare alias, and only when its body prints portably.',
       ...offenders,
+    ].join('\n')
+  );
+}
+
+function assertPropsContract(checker, program, components, docFor) {
+  const variantKeys = cvaVariantKeys(
+    checker,
+    program
+      .getSourceFiles()
+      .filter((sourceFile) => isUnder(sourceFile.fileName, reactSrc))
+  );
+
+  const offenders = [...components].flatMap(([name, symbol]) =>
+    propsContractProblems(
+      checker,
+      variantKeys,
+      name,
+      symbol,
+      docFor(name, symbol)?.props ?? {}
+    )
+  );
+
+  if (offenders.length === 0) return;
+
+  throw new Error(
+    [
+      'props JSON: a component props type does not document as a closed set of keys and options.',
+      'string-keyed props: a cva() variants object is typed Record<string, ...>; give it literal keys.',
+      'widened: one cva() variant group lost its literal option names; type its options literally.',
+      'missing: docgen dropped a cva() variant key; check isOwnProp still matches synthesized members.',
+      ...offenders.map((offender) => `  ${offender}`),
     ].join('\n')
   );
 }
@@ -246,12 +279,19 @@ for (const doc of parser.parseWithProgramProvider(sourceFiles, () => program)) {
 // in the order the checker first interned them.
 const components = publicComponents(checker, exported, componentsRoot);
 
+function docFor(name, symbol) {
+  const sourcePath = toRepoPath(
+    symbol.declarations[0].getSourceFile().fileName
+  );
+  return docsByDeclaration.get(`${sourcePath}#${name}`);
+}
+
 const bySlug = new Map(slugs.map((slug) => [slug, []]));
 
 for (const [name, symbol] of components) {
   const { fileName } = symbol.declarations[0].getSourceFile();
   const sourcePath = toRepoPath(fileName);
-  const doc = docsByDeclaration.get(`${sourcePath}#${name}`);
+  const doc = docFor(name, symbol);
   const entry = doc
     ? toComponentEntry(name, sourcePath, doc, expansions)
     : toProplessEntry(checker, name, sourcePath, symbol);
@@ -259,6 +299,7 @@ for (const [name, symbol] of components) {
   bySlug.get(toSlugFolder(path.relative(componentsRoot, fileName))).push(entry);
 }
 
+assertPropsContract(checker, program, components, docFor);
 assertResolvableTypes([...bySlug.values()].flat(), localAliases);
 
 mkdirSync(outputDir, { recursive: true });
