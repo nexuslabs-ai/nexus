@@ -35,7 +35,7 @@ export function isComponentSource(filePath) {
   return !/^index\.tsx?$/.test(name);
 }
 
-// `cva` variant keys are synthesized members with no declaration and no parent.
+// docgen reports a `cva` variant key as a PropItem with no declarations and no parent.
 function isSynthesized(prop) {
   return (prop.declarations ?? []).length === 0 && !prop.parent;
 }
@@ -59,18 +59,42 @@ function hasStringIndex(checker, propsType) {
   );
 }
 
-// A `cva` variant key is declared by a property of the config object, not a type member.
-function isVariantKey(member) {
-  const declaration = member.declarations?.[0];
-  if (!declaration) return false;
+function isCvaCall(node) {
   return (
-    ts.isPropertyAssignment(declaration) ||
-    ts.isShorthandPropertyAssignment(declaration)
+    ts.isCallExpression(node) &&
+    ts.isIdentifier(node.expression) &&
+    node.expression.text === 'cva'
   );
 }
 
+// A `cva` variant key is declared by a property of `cva(base, { variants: { … } })`.
+function isVariantKey(member) {
+  const declaration = member.declarations?.[0];
+  if (!declaration) return false;
+  if (
+    !ts.isPropertyAssignment(declaration) &&
+    !ts.isShorthandPropertyAssignment(declaration)
+  ) {
+    return false;
+  }
+
+  const variantsProperty = declaration.parent.parent;
+  if (!variantsProperty || !ts.isPropertyAssignment(variantsProperty)) {
+    return false;
+  }
+  if (variantsProperty.name.getText() !== 'variants') return false;
+
+  const config = variantsProperty.parent;
+  return isCvaCall(config.parent) && config.parent.arguments[1] === config;
+}
+
 function variantKeyProblem(checker, member, location, documentedProps) {
-  if (!documentedProps[member.name]) return 'missing from the docgen output';
+  const documented = documentedProps[member.name];
+  if (!documented) return 'missing from the docgen output';
+
+  if (documented.type.name.split(' | ').includes('string')) {
+    return `widened to ${documented.type.name} in the docgen output`;
+  }
 
   const type = checker.getTypeOfSymbolAtLocation(member, location);
   const isWidened = branches(type).some(
@@ -84,7 +108,7 @@ export function propsContractProblems(checker, name, symbol, documentedProps) {
   const declaration = symbol.declarations[0];
   const type = checker.getTypeOfSymbolAtLocation(symbol, declaration);
 
-  return [
+  const problems = [
     ...checker.getSignaturesOfType(type, ts.SignatureKind.Call),
     ...checker.getSignaturesOfType(type, ts.SignatureKind.Construct),
   ]
@@ -108,6 +132,9 @@ export function propsContractProblems(checker, name, symbol, documentedProps) {
           return problem ? [`${name}.${member.name}: ${problem}`] : [];
         });
     });
+
+  // A class component resolves the same props through each `React.Component` constructor overload.
+  return [...new Set(problems)];
 }
 
 // Only a type export keeps the alias flag; a value export resolves through it.
