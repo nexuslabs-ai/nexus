@@ -18,15 +18,16 @@ enters the bundle through a static JSON import, so it runs the same in Node, a
 bundler, or at a docs site's build time. The main `@nexus_ds/core` entry does
 not import it.
 
-`createTokenCatalogue()` builds a fresh array on each call. It derives both
+`createTokenCatalogue()` builds a fresh array on each call, with its own
+copies of the authored values. Its types are read-only. It derives both
 runtime colour modes, so call it once per build or page, not per render.
 
 ## Identity
 
-- **`name`** is the canonical identity: the token's `--nx-*` CSS custom
-  property. A typography style has no custom property of its own. Its name
-  follows the same scheme, `--nx-typography-heading-large`, and the utility it
-  emits is an alias.
+- **`name`** is the canonical identity, an identifier in the `--nx-*` custom
+  property scheme. Scalar tokens declare it in the generated CSS. A typography
+  style does not: its name, such as `--nx-typography-heading-large`, is never
+  declared, and the utility it emits is an alias.
 - **`aliases`** map other names onto the token:
   - `css-variable`: the Tailwind theme property that reads a runtime colour,
     such as `--color-muted-foreground`;
@@ -34,10 +35,16 @@ runtime colour modes, so call it once per build or page, not per render.
     `nx:typography-heading-large`;
   - `reference`: the DTCG reference paths other token files use, such as
     `size.3xl` and `typography.size.3xl`.
-- **`variants`** hold one entry per mode or preset. An authored variant's
-  `source` names its leaf: `file` is a path under `packages/core/tokens/`, and
-  `path` is the list of group keys to the leaf. `mode` is `null` when a token
-  has only one mode.
+- **`variants`** hold one entry per theme mode and preset. Each variant sets
+  two separate axes:
+  - `mode` is the theme mode, `light` or `dark`, or `null` when the value
+    applies in both;
+  - `preset` is the family's mode file the value comes from, such as a spacing
+    mode, or `null` when the family has a single file. Typography primitives
+    come from `typography-default.json` alone, so their `preset` is `null`.
+
+  An authored variant's `source` names its leaf: `file` is a path under
+  `packages/core/tokens/`, and `path` is the list of group keys to the leaf.
 
 `group` is the registry category for a runtime colour (`surface`, `text`, …)
 and the top-level group for an authored token (`green`, `size`, `heading`, …).
@@ -74,5 +81,5 @@ the manifest matches.
   overrides, primitive values in `variables.css`, and the typography
   utilities.
 - `pnpm --filter @nexus_ds/core audit:runtime-exports` checks the entry's
-  exports and ESM/CJS parity. It fails if a catalogue description or catalogue
-  code reaches the main bundles.
+  exports and ESM/CJS parity. It fails if a runtime colour description or
+  catalogue code reaches the main bundles.

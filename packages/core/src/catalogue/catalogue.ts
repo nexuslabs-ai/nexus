@@ -39,28 +39,33 @@ type ReferenceLookup = ReadonlyMap<
 interface PrimitiveLeaf {
   family: CatalogueFamily;
   file: TokenFile;
-  mode: string | null;
+  preset: string | null;
   leaf: ExtractedToken;
 }
 
-function primitiveFileMode(
-  file: TokenFile,
-  family: CatalogueFamily
-): string | null | undefined {
-  if (file === `primitives/${family}.json`) return null;
+function primitiveFiles(family: CatalogueFamily): TokenFile[] {
+  return (Object.keys(TOKEN_FILES) as TokenFile[]).filter(
+    (file) =>
+      file === `primitives/${family}.json` ||
+      file.startsWith(`primitives/${family}/${family}-`)
+  );
+}
+
+/** The mode file's suffix, e.g. `default` for `typography-default.json`. */
+function presetName(file: TokenFile, family: CatalogueFamily): string | null {
   const prefix = `primitives/${family}/${family}-`;
-  if (!file.startsWith(prefix)) return undefined;
+  if (!file.startsWith(prefix)) return null;
   return file.slice(prefix.length, -'.json'.length);
 }
 
 function primitiveLeaves(family: CatalogueFamily): PrimitiveLeaf[] {
-  return (Object.keys(TOKEN_FILES) as TokenFile[]).flatMap((file) => {
-    const mode = primitiveFileMode(file, family);
-    if (mode === undefined) return [];
+  const files = primitiveFiles(family);
+  return files.flatMap((file) => {
+    const preset = files.length > 1 ? presetName(file, family) : null;
     return extractTokens(TOKEN_FILES[file]).map((leaf) => ({
       family,
       file,
-      mode,
+      preset,
       leaf,
     }));
   });
@@ -83,8 +88,15 @@ function primitiveLookup(leaves: readonly PrimitiveLeaf[]): ReferenceLookup {
     const name = primitiveName(family, leaf.path);
     const entry = { cssName: name.slice('--'.length), name };
     const reference = leaf.path.join('.');
-    lookup.set(reference, entry);
-    lookup.set(`${family}.${reference}`, entry);
+    for (const key of [reference, `${family}.${reference}`]) {
+      const existing = lookup.get(key);
+      if (existing && existing.name !== name) {
+        throw new Error(
+          `catalogue: reference {${key}} matches both ${existing.name} and ${name}`
+        );
+      }
+      lookup.set(key, entry);
+    }
   }
   return lookup;
 }
@@ -112,7 +124,7 @@ function primitiveTokens(
     CatalogueTokenName,
     CatalogueToken & { variants: CatalogueVariant[] }
   >();
-  for (const { family, file, mode, leaf } of leaves) {
+  for (const { family, file, preset, leaf } of leaves) {
     const name = primitiveName(family, leaf.path);
     const reference = leaf.path.join('.');
     const token = tokens.get(name) ?? {
@@ -128,10 +140,11 @@ function primitiveTokens(
       variants: [],
     };
     token.variants.push({
-      mode,
+      mode: null,
+      preset,
       source: { file, path: leaf.path },
       appearance: null,
-      authoredValue: leaf.value,
+      authoredValue: structuredClone(leaf.value),
       declarations: [
         {
           property: name,
@@ -179,6 +192,7 @@ function runtimeColorTokens(): CatalogueToken[] {
         }
         return {
           mode,
+          preset: null,
           source: null,
           appearance,
           authoredValue: null,
@@ -205,9 +219,10 @@ function typographyStyleTokens(lookup: ReferenceLookup): CatalogueToken[] {
         variants: [
           {
             mode: null,
+            preset: null,
             source: { file: TYPOGRAPHY_STYLES_FILE, path: leaf.path },
             appearance: null,
-            authoredValue: leaf.value,
+            authoredValue: structuredClone(leaf.value),
             declarations: formatTypographyDeclarations(
               leaf.path,
               leaf.value,

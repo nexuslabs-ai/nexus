@@ -4,5 +4,5 @@ export type TokenValue =
   | number
   | boolean
   | null
-  | TokenValue[]
-  | { [key: string]: TokenValue };
+  | readonly TokenValue[]
+  | { readonly [key: string]: TokenValue };

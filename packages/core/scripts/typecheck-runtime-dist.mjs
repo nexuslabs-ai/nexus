@@ -140,15 +140,23 @@ const catalogued = catalogue[0];
 if (catalogued) {
   const name: CatalogueTokenName = catalogued.name;
   const variant = catalogued.variants[0];
+  const themeMode: Mode | null | undefined = variant?.mode;
+  const filePreset: string | null | undefined = variant?.preset;
   const file: string | undefined = variant?.source?.file;
   const appearanceMode: string | undefined = variant?.appearance?.mode;
   // @ts-expect-error catalogue variants are immutable.
   catalogued.variants.push(catalogued.variants[0]);
+  if (variant?.appearance) {
+    // @ts-expect-error a variant's appearance is immutable.
+    variant.appearance.prefs.uiFontSize = 16;
+  }
   void name;
+  void themeMode;
+  void filePreset;
   void file;
   void appearanceMode;
 }
-// @ts-expect-error canonical names are --nx-* custom properties.
+// @ts-expect-error canonical names are in the --nx-* scheme.
 const aliasName: CatalogueTokenName = '--color-background';
 void aliasName;
 

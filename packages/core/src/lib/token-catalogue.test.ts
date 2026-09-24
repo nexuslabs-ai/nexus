@@ -7,6 +7,7 @@ import { RUNTIME_COLOR_DESCRIPTIONS } from '../catalogue/descriptions';
 import type { CatalogueToken } from '../catalogue/types';
 
 import { DEFAULT_NEXUS_APPEARANCE } from './appearance-model';
+import type { Mode } from './palette';
 import { SEMANTIC_TOKEN_REGISTRY } from './token-registry';
 
 const catalogue = createTokenCatalogue();
@@ -58,7 +59,7 @@ function only<T>(items: readonly T[]): T {
   return items[0]!;
 }
 
-function variantValue(token: CatalogueToken, mode: string | null): string {
+function variantValue(token: CatalogueToken, mode: Mode): string {
   const variant = token.variants.find((candidate) => candidate.mode === mode);
   return only(variant?.declarations ?? []).value;
 }
@@ -77,14 +78,20 @@ describe('token catalogue', () => {
     );
     for (const token of runtimeColors) {
       expect(
-        token.variants.map(({ mode, appearance }) => ({ mode, appearance }))
+        token.variants.map(({ mode, preset, appearance }) => ({
+          mode,
+          preset,
+          appearance,
+        }))
       ).toEqual([
         {
           mode: 'light',
+          preset: null,
           appearance: { ...DEFAULT_NEXUS_APPEARANCE, mode: 'light' },
         },
         {
           mode: 'dark',
+          preset: null,
           appearance: { ...DEFAULT_NEXUS_APPEARANCE, mode: 'dark' },
         },
       ]);
@@ -106,13 +113,26 @@ describe('token catalogue', () => {
     }
   });
 
+  it('gives authored tokens from single-file families no mode or preset', () => {
+    expect(authored.length).toBeGreaterThan(0);
+    for (const token of authored) {
+      for (const { mode, preset } of token.variants) {
+        expect({ mode, preset }, token.name).toEqual({
+          mode: null,
+          preset: null,
+        });
+      }
+    }
+  });
+
   it('agrees with the generated primitive colour and typography values', () => {
     const root = blockDeclarations(generated('variables.css'), ':root');
     const primitives = authored.filter((token) => token.type !== 'typography');
     expect(primitives.length).toBeGreaterThan(0);
     for (const token of primitives) {
+      const { declarations } = only(token.variants);
       expect(root.get(token.name), token.name).toBe(
-        collapse(variantValue(token, token.variants[0]!.mode))
+        collapse(only(declarations).value)
       );
     }
   });
@@ -144,6 +164,19 @@ describe('token catalogue', () => {
     for (const { reference, target } of references) {
       expect(byName.has(target), `${reference} → ${target}`).toBe(true);
     }
+  });
+
+  it('hands each call authored values of its own', () => {
+    const [first, second] = [
+      createTokenCatalogue(),
+      createTokenCatalogue(),
+    ].map((tokens) => tokens.find((token) => token.type === 'typography'));
+    const authoredValue = only(first!.variants).authoredValue as Record<
+      string,
+      unknown
+    >;
+    delete authoredValue.fontFamily;
+    expect(only(second!.variants).authoredValue).toHaveProperty('fontFamily');
   });
 
   it('carries each runtime colour description on its registry token', () => {

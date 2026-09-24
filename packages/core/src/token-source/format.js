@@ -84,24 +84,20 @@ export function formatTokenValue(value, type, tokenPath) {
 }
 
 /**
- * Resolve a DTCG reference to CSS var() or raw value
- * @param {TokenValue} value - Token value (might be a reference)
+ * Resolve a DTCG reference to a CSS var(), or leave it as authored
+ * @param {string} reference - A reference string like "{blue.500}"
  * @param {PrimitiveLookup} primitiveMap
- * @returns {TokenValue} `var(--…)` for a known reference, otherwise the input
+ * @returns {string} `var(--…)` for a known reference, otherwise the input
  */
-export function resolveReference(value, primitiveMap) {
-  if (!isReference(value)) {
-    return value;
-  }
-
-  const primitiveInfo = primitiveMap.get(extractRefPath(value));
+function resolveReference(reference, primitiveMap) {
+  const primitiveInfo = primitiveMap.get(extractRefPath(reference));
 
   if (primitiveInfo) {
     return `var(--${primitiveInfo.cssName})`;
   }
 
-  console.warn(`⚠ Reference not found: ${value}`);
-  return value;
+  console.warn(`⚠ Reference not found: ${reference}`);
+  return reference;
 }
 
 /**
@@ -114,7 +110,7 @@ export function resolveReference(value, primitiveMap) {
  */
 export function resolveValue(value, primitiveMap, type = 'unknown', tokenPath) {
   if (isReference(value)) {
-    return String(resolveReference(value, primitiveMap));
+    return resolveReference(value, primitiveMap);
   }
 
   if (type === 'dimension' || isDimension(value)) {

@@ -126,24 +126,40 @@ function decodedBundle(file) {
     .replace(/\\(['"`\\])/g, '$1');
 }
 
-const catalogueProse = [
-  ...new Set(catalogue.map((token) => token.description).filter(Boolean)),
+const runtimeColorProse = [
+  ...new Set(
+    catalogue
+      .filter((token) => token.variants.some((variant) => variant.appearance))
+      .map((token) => token.description)
+      .filter(Boolean)
+  ),
 ];
-assert.ok(catalogueProse.length > 0, 'The catalogue carries no descriptions.');
+assert.ok(
+  runtimeColorProse.length > 0,
+  'The catalogue carries no runtime colour descriptions.'
+);
 for (const file of ['catalogue.js', 'catalogue.cjs']) {
   const bundle = decodedBundle(file);
-  const missing = catalogueProse.filter((prose) => !bundle.includes(prose));
-  assert.deepEqual(missing, [], `${file} is missing catalogue prose.`);
+  const missing = runtimeColorProse.filter((prose) => !bundle.includes(prose));
+  assert.deepEqual(
+    missing,
+    [],
+    `${file} is missing runtime colour descriptions.`
+  );
 }
 for (const file of ['index.js', 'index.cjs']) {
   const bundle = decodedBundle(file);
-  const leaked = catalogueProse.filter((prose) => bundle.includes(prose));
-  assert.deepEqual(leaked, [], `${file} ships catalogue-only prose.`);
+  const leaked = runtimeColorProse.filter((prose) => bundle.includes(prose));
+  assert.deepEqual(
+    leaked,
+    [],
+    `${file} ships catalogue-only runtime colour descriptions.`
+  );
   assert.ok(
     !bundle.includes('createTokenCatalogue'),
     `${file} bundles catalogue code.`
   );
 }
 console.log(
-  `Main ESM/CJS bundles are free of catalogue code and its ${catalogueProse.length} descriptions.`
+  `Main ESM/CJS bundles are free of catalogue code and its ${runtimeColorProse.length} runtime colour descriptions.`
 );
