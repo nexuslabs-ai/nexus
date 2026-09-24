@@ -52,8 +52,8 @@ of flash-free restoration for local-storage-only deployments.
 ## Coordinated consumers and release
 
 Upgrade core together with copied React/Tailwind, application utilities and
-class-merging configuration. Old-name aliases are not added. Examlly needs an
-isolated candidate-package rehearsal and its own reviewed migration before release.
+class-merging configuration. Old-name aliases are not added. Validate the candidate
+package in consuming projects and review their migrations before upgrading them.
 Only core is published among these three packages; copying the private React and
 Tailwind sources is a separate consumer update. Follow CONTRIBUTING.md's major
 changeset requirement for breaking runtime changes. No package is published by
