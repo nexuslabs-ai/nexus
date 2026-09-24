@@ -140,7 +140,7 @@ npm install @nexus_ds/core
 The React wiring is copy/own like the components. Copy the provider in:
 
 ```
-components/appearance/
+components/appearance/provider/
 ├── index.ts      # client surface — createNexusAppearance, NexusAppearanceProvider, useNexusAppearance
 ├── provider.tsx
 ├── factory.tsx
@@ -157,8 +157,8 @@ already added, not a second one:
 import { DEFAULT_NEXUS_APPEARANCE } from '@nexus_ds/core';
 import type { Viewport } from 'next';
 
-import { NexusAppearanceProvider } from '@/components/appearance';
-import { NexusAppearanceScript } from '@/components/appearance/server';
+import { NexusAppearanceProvider } from '@/components/appearance/provider';
+import { NexusAppearanceScript } from '@/components/appearance/provider/server';
 
 import './globals.css';
 
@@ -260,7 +260,7 @@ the provider's `state` and `setState`:
 // components/mode-toggle.tsx
 'use client';
 
-import { useNexusAppearance } from '@/components/appearance';
+import { useNexusAppearance } from '@/components/appearance/provider';
 import { Button } from '@/components/button/button';
 
 export function ModeToggle() {
