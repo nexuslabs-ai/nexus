@@ -37,6 +37,15 @@ const STATIC_UTILITIES = [
   'nx:animate-overlay-presence-exit',
 ];
 
+/** The generated files that declare `@utility` rules for tokens. */
+const UTILITY_FILES = [
+  'typography-utilities.css',
+  'borderwidth-utilities.css',
+  'border-color-aliases.css',
+  'spacing-utilities.css',
+  'motion-utilities.css',
+];
+
 function generated(file: string): string {
   return readFileSync(
     resolve(process.cwd(), 'packages/tailwind', file),
@@ -279,13 +288,7 @@ describe('token catalogue', () => {
 
   it('maps every data-driven generated utility to the token it reads', () => {
     const utilities = new Map(
-      [
-        'typography-utilities.css',
-        'borderwidth-utilities.css',
-        'border-color-aliases.css',
-        'spacing-utilities.css',
-        'motion-utilities.css',
-      ].flatMap((file) => [...utilityDeclarations(generated(file))])
+      UTILITY_FILES.flatMap((file) => [...utilityDeclarations(generated(file))])
     );
     const aliased = catalogue.flatMap((token) =>
       aliasesOf(token, 'utility').map((alias) => ({ alias, token }))
@@ -297,12 +300,30 @@ describe('token catalogue', () => {
     );
     for (const { alias, token } of aliased) {
       if (token.type === 'typography') continue;
+      const reads = new RegExp(`var\\(${token.name}[),]`);
       expect(
-        utilities
-          .get(alias)
-          ?.some((line) => line.includes(`var(${token.name}`)),
+        utilities.get(alias)?.some((line) => reads.test(line)),
         alias
       ).toBe(true);
+    }
+  });
+
+  it('declares only custom properties the generated CSS declares', () => {
+    const declared = new Set(
+      ['variables.css', 'nexus.css', ...UTILITY_FILES].flatMap((file) =>
+        [...generated(file).matchAll(/(--[\w-]+):/g)].map(([, name]) => name)
+      )
+    );
+    const properties = catalogue.flatMap((token) =>
+      token.variants.flatMap((variant) =>
+        variant.declarations
+          .map(({ property }) => property)
+          .filter((property) => property.startsWith('--'))
+      )
+    );
+    expect(properties.length).toBeGreaterThan(0);
+    for (const property of new Set(properties)) {
+      expect(declared.has(property), property).toBe(true);
     }
   });
 
