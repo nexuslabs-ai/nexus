@@ -188,7 +188,8 @@ function assertGeometry(badge: HTMLElement) {
     }
   }
   for (const child of badge.childNodes) {
-    if (child.nodeType !== Node.TEXT_NODE || !child.textContent) continue;
+    if (child.nodeType !== Node.TEXT_NODE || !child.textContent?.trim())
+      continue;
     const range = document.createRange();
     range.selectNodeContents(child);
     const textRect = range.getBoundingClientRect();
@@ -657,12 +658,21 @@ export const LongContent: Story = {
 export const NonRenderingChildren: Story = {
   render: () => (
     <div className="nx:flex nx:items-center nx:gap-2">
-      {[undefined, null, false, '', <></>, 0].map((children, index) => (
+      {[undefined, null, false, '', <></>, <> </>].map((children, index) => (
         <Badge
           key={index}
-          data-testid="boundary-badge"
+          data-testid="non-rendering-badge"
           leftIcon={<IconCheck />}
           title="Approved"
+        >
+          {children}
+        </Badge>
+      ))}
+      {[0, <>Approved</>].map((children, index) => (
+        <Badge
+          key={index}
+          data-testid="rendering-badge"
+          leftIcon={<IconCheck />}
         >
           {children}
         </Badge>
@@ -670,13 +680,16 @@ export const NonRenderingChildren: Story = {
     </div>
   ),
   play: async ({ canvasElement }) => {
-    const badges = within(canvasElement).getAllByTestId('boundary-badge');
-    for (const badge of badges) assertBadgeGeometry(badge);
-    for (const badge of badges.slice(0, 4)) {
+    const canvas = within(canvasElement);
+    const nonRendering = canvas.getAllByTestId('non-rendering-badge');
+    const rendering = canvas.getAllByTestId('rendering-badge');
+    for (const badge of [...nonRendering, ...rendering])
+      assertBadgeGeometry(badge);
+    for (const badge of nonRendering) {
       await expect(badge).toHaveAttribute('data-icon-only', 'true');
       await expect(badge).toHaveAttribute('role', 'img');
     }
-    for (const badge of badges.slice(4))
+    for (const badge of rendering)
       await expect(badge).not.toHaveAttribute('data-icon-only');
   },
 };

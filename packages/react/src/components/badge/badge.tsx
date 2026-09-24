@@ -152,10 +152,14 @@ function badgeShapeClasses(
   return 'nx:typography-label-default nx:px-2.5';
 }
 
-function hasRenderableChildren(children: React.ReactNode) {
-  return React.Children.toArray(children).some(
-    (child) => typeof child !== 'string' || child.trim().length > 0
-  );
+function hasRenderableChildren(children: React.ReactNode): boolean {
+  return React.Children.toArray(children).some((child) => {
+    if (typeof child === 'string') return child.trim().length > 0;
+    if (!React.isValidElement<{ children?: React.ReactNode }>(child))
+      return true;
+    if (child.type !== React.Fragment) return true;
+    return hasRenderableChildren(child.props.children);
+  });
 }
 
 interface BadgeProps
