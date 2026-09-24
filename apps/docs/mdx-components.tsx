@@ -2,7 +2,12 @@ import { cn } from '@nexus_ds/react/utils';
 import type { MDXComponents } from 'mdx/types';
 
 import { CodeBlock } from './app/_components/CodeBlock';
+import { ComponentPreview } from './app/_components/ComponentPreview';
+import { ComponentSource } from './app/_components/ComponentSource';
+import { InlineCode } from './app/_components/InlineCode';
+import { InstallBlock } from './app/_components/InstallBlock';
 import * as Nexus from './app/_components/nexus';
+import { PropsTable } from './app/_components/PropsTable';
 
 /**
  * Required by @next/mdx in the App Router. Maps Markdown-rendered HTML to
@@ -87,15 +92,7 @@ export function useMDXComponents(components: MDXComponents): MDXComponents {
         {children}
       </a>
     ),
-    code: ({ className, ...props }) => (
-      <code
-        className={cn(
-          'nx:font-mono nx:typography-code-inline nx:bg-muted nx:px-1 nx:py-0.5 nx:rounded-sm',
-          className
-        )}
-        {...props}
-      />
-    ),
+    code: InlineCode,
     pre: CodeBlock,
     table: ({ className, ...props }) => (
       <div
@@ -143,6 +140,10 @@ export function useMDXComponents(components: MDXComponents): MDXComponents {
         {...props}
       />
     ),
+    ComponentPreview,
+    ComponentSource,
+    InstallBlock,
+    PropsTable,
     // live @nexus_ds/react components, usable in MDX without an import
     ...Nexus,
     // caller-provided overrides win

@@ -1,6 +1,8 @@
 import type { Meta, StoryObj } from '@storybook/react';
 import { expect, fn, userEvent, within } from 'storybook/test';
 
+import { unpairedAutofillClasses } from '../../stories/support/autofill-pairing';
+
 import { Input } from './input';
 
 const meta: Meta<typeof Input> = {
@@ -232,6 +234,25 @@ export const BorderlessSurfaceComparison: Story = {
     await expect(container).toHaveClass(
       'nx:enabled:hover:bg-control-background-hover'
     );
+  },
+};
+
+export const AutofillPairing: Story = {
+  render: () => (
+    <div className="nx:grid nx:w-[400px] nx:gap-2">
+      <Input aria-label="Bordered input" defaultValue="Bordered" />
+      <Input
+        aria-label="Borderless input"
+        variant="borderless"
+        defaultValue="Borderless"
+      />
+      <Input aria-label="Disabled input" defaultValue="Disabled" disabled />
+    </div>
+  ),
+  play: async ({ canvasElement }) => {
+    for (const field of within(canvasElement).getAllByRole('textbox')) {
+      await expect(unpairedAutofillClasses(field)).toEqual([]);
+    }
   },
 };
 

@@ -27,7 +27,12 @@ export default defineConfig({
     tailwindcss(),
     dts({
       include: ['src'],
-      exclude: ['**/*.test.ts', '**/*.test.tsx', '**/*.stories.tsx'],
+      exclude: [
+        '**/*.test.ts',
+        '**/*.test.tsx',
+        '**/*.stories.tsx',
+        'src/stories/**',
+      ],
       outDir: 'dist',
       beforeWriteFile: rewriteRootDeclaration,
     }),
