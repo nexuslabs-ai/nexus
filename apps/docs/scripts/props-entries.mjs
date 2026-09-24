@@ -31,19 +31,25 @@ import { reactRoot } from './roots.mjs';
 
 /** @typedef {Record<string, string[]>} PropsIndex */
 
+/**
+ * Resolved only for a prop docgen lists without an `@default` tag, so a tag can
+ * stand in for a default the generator cannot print.
+ * @typedef {() => string | null} LazyDefault
+ */
+
 const reactSrc = path.join(reactRoot, 'src');
 
 const LITERAL_KEYWORD = /^(?:true|false|null|undefined|-?\d+(?:\.\d+)?)$/;
 
 /**
  * @param {PropItem} prop
- * @param {string | undefined} codeDefault
+ * @param {LazyDefault | undefined} codeDefault
  * @returns {string | null}
  */
 function toDefaultValue(prop, codeDefault) {
   const tags = /** @type {Record<string, string> | undefined} */ (prop.tags);
   const tag = tags?.default;
-  if (tag === undefined) return codeDefault ?? null;
+  if (tag === undefined) return codeDefault?.() ?? null;
 
   const quoted = tag.match(/^(['"])(.*)\1$/s);
   if (quoted) return JSON.stringify(quoted[2]);
@@ -150,7 +156,7 @@ function typeofArgument(node) {
 /**
  * @param {ts.TypeChecker} checker
  * @param {ts.Symbol} cva the variable holding the `cva(…)` call
- * @returns {[string, string][]}
+ * @returns {[string, LazyDefault][]}
  */
 function cvaDefaultVariants(checker, cva) {
   const declaration = cva.valueDeclaration;
@@ -174,11 +180,12 @@ function cvaDefaultVariants(checker, cva) {
       const key = property.name.getText().replace(/^['"]|['"]$/g, '');
       return [
         key,
-        literalDefault(
-          checker,
-          property.initializer,
-          `${cva.getName()} defaultVariants.${key}`
-        ),
+        () =>
+          literalDefault(
+            checker,
+            property.initializer,
+            `${cva.getName()} defaultVariants.${key}`
+          ),
       ];
     });
 }
@@ -187,7 +194,7 @@ function cvaDefaultVariants(checker, cva) {
  * @param {ts.TypeChecker} checker
  * @param {string} owner
  * @param {ts.ParameterDeclaration | undefined} parameter
- * @returns {[string, string][]}
+ * @returns {[string, LazyDefault][]}
  */
 function destructuringDefaults(checker, owner, parameter) {
   if (!parameter || !ts.isObjectBindingPattern(parameter.name)) return [];
@@ -195,39 +202,32 @@ function destructuringDefaults(checker, owner, parameter) {
   return parameter.name.elements.flatMap((element) => {
     if (!element.initializer || element.dotDotDotToken) return [];
     const key = (element.propertyName ?? element.name).getText();
+    const { initializer } = element;
     return [
-      [key, literalDefault(checker, element.initializer, `${owner}.${key}`)],
+      [key, () => literalDefault(checker, initializer, `${owner}.${key}`)],
     ];
   });
 }
 
 /**
- * The JSX attributes `fn` sets on `target`, by name.
+ * Whether `value` hands `fn`'s own prop straight through, as in
+ * `variant={variant}`.
  * @param {ts.TypeChecker} checker
  * @param {ts.SignatureDeclaration} fn
- * @param {ts.Symbol} target
- * @returns {Map<string, ts.JsxAttributeValue | undefined>}
+ * @param {ts.JsxAttributeValue | undefined} value
  */
-function attributesSetOn(checker, fn, target) {
-  /** @type {Map<string, ts.JsxAttributeValue | undefined>} */
-  const attributes = new Map();
-
-  /** @param {ts.Node} node */
-  function visit(node) {
-    if (
-      (ts.isJsxOpeningElement(node) || ts.isJsxSelfClosingElement(node)) &&
-      symbolAt(checker, node.tagName) === target
-    ) {
-      for (const attribute of node.attributes.properties) {
-        if (!ts.isJsxAttribute(attribute)) continue;
-        attributes.set(attribute.name.getText(), attribute.initializer);
-      }
-    }
-    ts.forEachChild(node, visit);
-  }
-
-  ts.forEachChild(fn, visit);
-  return attributes;
+function isForwardedProp(checker, fn, value) {
+  if (!value || !ts.isJsxExpression(value) || !value.expression) return false;
+  if (!ts.isIdentifier(value.expression)) return false;
+  const declaration = symbolAt(checker, value.expression)?.valueDeclaration;
+  const [parameter] = fn.parameters;
+  return (
+    !!declaration &&
+    !!parameter &&
+    ts.isBindingElement(declaration) &&
+    declaration.pos >= parameter.pos &&
+    declaration.end <= parameter.end
+  );
 }
 
 /**
@@ -248,13 +248,80 @@ function attributeDefault(checker, value, owner) {
 }
 
 /**
+ * The defaults `fn` gives `target`'s props through JSX. An attribute a later
+ * spread can override is the wrapper's default; one after every spread fixes
+ * the prop, so it has none.
+ * @param {ts.TypeChecker} checker
+ * @param {string} owner
+ * @param {ts.SignatureDeclaration} fn
+ * @param {ts.Symbol} target
+ * @returns {Map<string, LazyDefault>}
+ */
+function attributeDefaults(checker, owner, fn, target) {
+  /** @type {Map<string, { text: string; resolve: LazyDefault }>} */
+  const found = new Map();
+  /** @type {Set<string>} */
+  const conflicting = new Set();
+
+  /** @param {ts.JsxOpeningElement | ts.JsxSelfClosingElement} element */
+  function collect(element) {
+    const { properties } = element.attributes;
+    const lastSpread = properties.findLastIndex(ts.isJsxSpreadAttribute);
+
+    properties.forEach((attribute, position) => {
+      if (!ts.isJsxAttribute(attribute)) return;
+      const value = attribute.initializer;
+      if (isForwardedProp(checker, fn, value)) return;
+
+      const key = attribute.name.getText();
+      const overridable = position < lastSpread;
+      const text = `${overridable}:${value?.getText() ?? 'true'}`;
+      const where = `${owner}'s <${target.getName()} ${key}>`;
+      if (found.has(key) && found.get(key)?.text !== text) conflicting.add(key);
+      found.set(key, {
+        text,
+        resolve: overridable
+          ? () => attributeDefault(checker, value, where)
+          : () => null,
+      });
+    });
+  }
+
+  /** @param {ts.Node} node */
+  function visit(node) {
+    if (
+      (ts.isJsxOpeningElement(node) || ts.isJsxSelfClosingElement(node)) &&
+      symbolAt(checker, node.tagName) === target
+    ) {
+      collect(node);
+    }
+    ts.forEachChild(node, visit);
+  }
+
+  ts.forEachChild(fn, visit);
+
+  return new Map(
+    [...found].map(([key, { resolve }]) => [
+      key,
+      conflicting.has(key)
+        ? () => {
+            throw new Error(
+              `props JSON: ${owner} passes different \`${key}\` values to <${target.getName()}>, so it has no single default. Give it an \`@default\` tag.`
+            );
+          }
+        : resolve,
+    ])
+  );
+}
+
+/**
  * Default values docgen cannot print faithfully: the component's own
  * destructuring defaults, then `x`'s cva `defaultVariants` for
  * `VariantProps<typeof x>`, then the defaults a `ComponentProps<typeof X>`
  * wrapper inherits from `X` — or the value it passes to `<X>` itself.
  * @param {ts.TypeChecker} checker
  * @param {ts.Symbol} symbol the component
- * @returns {Map<string, string>}
+ * @returns {Map<string, LazyDefault>}
  */
 export function componentDefaults(checker, symbol) {
   const fn = componentFunction(symbol);
@@ -266,7 +333,7 @@ export function componentDefaults(checker, symbol) {
  * @param {ts.TypeChecker} checker
  * @param {string} owner
  * @param {ts.SignatureDeclaration} fn
- * @returns {Map<string, string>}
+ * @returns {Map<string, LazyDefault>}
  */
 function functionDefaults(checker, owner, fn) {
   const [parameter] = fn.parameters;
@@ -291,19 +358,10 @@ function functionDefaults(checker, owner, fn) {
       return;
     }
 
-    const attributes = attributesSetOn(checker, fn, target);
-    for (const [key, value] of componentDefaults(checker, target)) {
-      if (defaults.has(key)) continue;
-      defaults.set(
-        key,
-        attributes.has(key)
-          ? attributeDefault(
-              checker,
-              attributes.get(key),
-              `${owner}'s <${target.getName()} ${key}>`
-            )
-          : value
-      );
+    const attributes = attributeDefaults(checker, owner, fn, target);
+    for (const [key, inherited] of componentDefaults(checker, target)) {
+      if (!defaults.has(key))
+        defaults.set(key, attributes.get(key) ?? inherited);
     }
   }
 
@@ -330,7 +388,7 @@ function functionDefaults(checker, owner, fn) {
 
   /** @param {ts.Node} node */
   function visit(node) {
-    if (visited.has(node)) return;
+    if (visited.has(node) || ts.isPropertySignature(node)) return;
     visited.add(node);
 
     const argument = typeofArgument(node);
@@ -348,7 +406,7 @@ function functionDefaults(checker, owner, fn) {
 /**
  * @param {PropItem} prop
  * @param {Map<string, string>} expansions
- * @param {Map<string, string>} defaults
+ * @param {Map<string, LazyDefault>} defaults
  * @returns {PropEntry}
  */
 function toPropEntry(prop, expansions, defaults) {
@@ -369,7 +427,7 @@ function toPropEntry(prop, expansions, defaults) {
  * @param {string} sourcePath
  * @param {ComponentDoc} doc
  * @param {Map<string, string>} expansions
- * @param {Map<string, string>} defaults
+ * @param {Map<string, LazyDefault>} defaults
  * @returns {ComponentEntry}
  */
 export function toComponentEntry(name, sourcePath, doc, expansions, defaults) {
