@@ -37,7 +37,7 @@ Always load and check the new diff against:
 | [logging-proportionality.md](../../../.claude/rules/logging-proportionality.md)             | Flag noisy incremental logs; require one dense canonical log line                                                   |
 | [code-comments.md](../../../.claude/rules/code-comments.md)                                 | Flag rationale blocks, unjustified TODOs, comments that restate the code                                            |
 | [no-follow-up-deferral.md](../../../.claude/rules/no-follow-up-deferral.md)                 | Reject deferral framing unless a tracked issue is cited                                                             |
-| [project-stage.md](../../../.claude/rules/project-stage.md)                                 | Reject new migration files; flag backcompat shims and feature flags                                                 |
+| [project-stage.md](../../../.claude/rules/project-stage.md)                                 | Flag shims and feature flags; published token renames need a migration guide + breaking changeset                   |
 | [no-environment-branching.md](../../../.claude/rules/no-environment-branching.md)           | Flag any OS, browser, or input-device query or variant the rule bans                                                |
 | [component-owned-styling.md](../../../.claude/rules/component-owned-styling.md)             | Reject theme selectors that target a component (`data-slot`, `class~=`); require a utility applied in the component |
 | [docs-mcp.md](../../../.claude/rules/docs-mcp.md)                                           | Verify third-party API usage via nexus-docs-mcp before approving                                                    |

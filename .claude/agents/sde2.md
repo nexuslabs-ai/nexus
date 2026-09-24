@@ -26,17 +26,17 @@ Think like a **Senior Software Engineer (SDE2)** focused on code quality, mainta
 
 These rules apply to ALL skills this agent executes. Read and internalize before starting any task.
 
-| Rule                                                                          | Purpose                                                                              |
-| ----------------------------------------------------------------------------- | ------------------------------------------------------------------------------------ |
-| [code-quality.md](../rules/code-quality.md)                                   | Governing principle: favor simplicity over cleverness; index to per-rule files       |
-| [ripple-effect.md](../rules/ripple-effect.md)                                 | A change isn't done until callers, callees, and adjacent code are consistently clean |
-| [guard-clauses.md](../rules/guard-clauses.md)                                 | Keep the happy path at column 0; exit early                                          |
-| [composition-over-render-props.md](../rules/composition-over-render-props.md) | `children` or per-mode components; never `renderItem` / `mode` discriminators        |
-| [useeffect-escape-hatch.md](../rules/useeffect-escape-hatch.md)               | Effects sync with external systems, not React state                                  |
-| [logging-proportionality.md](../rules/logging-proportionality.md)             | One dense canonical log line beats ten incremental ones                              |
-| [code-comments.md](../rules/code-comments.md)                                 | Comment only non-obvious logic; no rationale blocks; TODOs require tracked issues    |
-| [project-stage.md](../rules/project-stage.md)                                 | Pre-production: no backcompat, no shims, no feature flags — change code in place     |
-| [docs-mcp.md](../rules/docs-mcp.md)                                           | MANDATORY: query nexus-docs-mcp for any third-party API; do not guess from memory    |
+| Rule                                                                          | Purpose                                                                                                                          |
+| ----------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------- |
+| [code-quality.md](../rules/code-quality.md)                                   | Governing principle: favor simplicity over cleverness; index to per-rule files                                                   |
+| [ripple-effect.md](../rules/ripple-effect.md)                                 | A change isn't done until callers, callees, and adjacent code are consistently clean                                             |
+| [guard-clauses.md](../rules/guard-clauses.md)                                 | Keep the happy path at column 0; exit early                                                                                      |
+| [composition-over-render-props.md](../rules/composition-over-render-props.md) | `children` or per-mode components; never `renderItem` / `mode` discriminators                                                    |
+| [useeffect-escape-hatch.md](../rules/useeffect-escape-hatch.md)               | Effects sync with external systems, not React state                                                                              |
+| [logging-proportionality.md](../rules/logging-proportionality.md)             | One dense canonical log line beats ten incremental ones                                                                          |
+| [code-comments.md](../rules/code-comments.md)                                 | Comment only non-obvious logic; no rationale blocks; TODOs require tracked issues                                                |
+| [project-stage.md](../rules/project-stage.md)                                 | Pre-production internals change in place, no shims or flags; published token renames need a migration guide + breaking changeset |
+| [docs-mcp.md](../rules/docs-mcp.md)                                           | MANDATORY: query nexus-docs-mcp for any third-party API; do not guess from memory                                                |
 
 ## Focus Areas
 

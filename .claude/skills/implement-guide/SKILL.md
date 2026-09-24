@@ -293,7 +293,7 @@ _Diagnostic noise_
 _Pre-production hygiene_
 
 - _About to create a feature flag, backcompat shim, deprecation comment, `_unused` rename, or `// removed in X` marker?_
-  -> Don't. Delete instead of deprecate; rename in place instead of shim; remove unused exports entirely. There is no live deployment to protect. (`project-stage.md`)
+  -> Don't. Delete instead of deprecate; rename in place instead of shim; remove unused exports entirely. There is no live deployment to protect. Published token names are the exception: they are a public API, so a rename needs a migration guide + breaking changeset. (`project-stage.md`)
 
 When a reflex fires and you're not certain of the spec, open the linked rule file. The reflex list above is the trigger; the rule file is the answer.
 
