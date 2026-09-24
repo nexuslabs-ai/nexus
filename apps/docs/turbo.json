@@ -29,7 +29,7 @@
         "$TURBO_ROOT$/packages/react/package.json",
         "$TURBO_ROOT$/packages/react/tsconfig.json"
       ],
-      "outputs": ["generated/dependencies/**"]
+      "outputs": ["generated/dependencies/**", "generated/prerequisites.json"]
     },
     "generate:manifest": {
       "inputs": [
