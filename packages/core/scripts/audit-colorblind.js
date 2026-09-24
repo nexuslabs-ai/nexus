@@ -1,13 +1,14 @@
 import { simulate } from '@bjornlu/colorblind';
+import { differenceEuclidean } from 'culori';
+import path from 'node:path';
+import { fileURLToPath } from 'node:url';
+
 import {
   CHART_PALETTE_REFERENCES,
   hexToSrgbInts,
   SHADES,
   STATUS_PALETTE_FAMILIES,
-} from '@nexus_ds/core/palette';
-import { differenceEuclidean } from 'culori';
-import path from 'node:path';
-import { fileURLToPath } from 'node:url';
+} from '../dist/scripts/palette.js';
 
 import { BASE_PALETTES } from './lib/palettes.js';
 import { readTokenFile, titleCase } from './utils.js';
@@ -27,8 +28,6 @@ export const PRIMITIVES_FILE = path.join(
   'primitives',
   'color.json'
 );
-
-export { SHADES };
 
 // Grouped because the SVG sections them visually and the cross-status pair
 // confusability test only fires for STATUS_PALETTES.
@@ -77,7 +76,9 @@ function unorderedPairs(items) {
 
 // Shade 600 diagnoses starting status palettes. Runtime semantic fills are
 // subsequently contrast-solved and checked separately by derive-theme tests.
-export const STATUS_PAIRS_600 = unorderedPairs(STATUS_PALETTES);
+export const STATUS_PAIRS_600 = unorderedPairs(
+  Object.keys(STATUS_PALETTE_FAMILIES)
+);
 const STATUS_PAIR_SHADE = '600';
 
 export function buildPalettesSrgb(primitives) {
@@ -165,7 +166,8 @@ export function findStatusPairConfusable(
   threshold = ADJACENT_CONFUSABLE_DELTA_E
 ) {
   const findings = [];
-  for (const [a, b] of STATUS_PAIRS_600) {
+  for (const roles of STATUS_PAIRS_600) {
+    const [a, b] = roles.map((role) => STATUS_PALETTE_FAMILIES[role]);
     const deltaE = computeDeltaE(
       simulatedPalettes[a][STATUS_PAIR_SHADE],
       simulatedPalettes[b][STATUS_PAIR_SHADE]
@@ -173,12 +175,7 @@ export function findStatusPairConfusable(
     if (!Number.isFinite(deltaE) || deltaE < threshold) {
       findings.push({
         check: 'status-pair',
-        roles: [a, b].map(
-          (palette) =>
-            Object.entries(STATUS_PALETTE_FAMILIES).find(
-              ([, family]) => family === palette
-            )?.[0]
-        ),
+        roles,
         visionType,
         paletteA: a,
         paletteB: b,
@@ -196,7 +193,6 @@ function isAcceptedStatusLimitation(finding) {
     finding.check === 'status-pair' &&
     finding.shade === '600' &&
     finding.visionType === 'deuteranopia' &&
-    finding.roles?.length === 2 &&
     finding.roles.includes('success') &&
     finding.roles.includes('warning') &&
     Number.isFinite(finding.deltaE) &&

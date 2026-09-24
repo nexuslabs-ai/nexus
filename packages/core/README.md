@@ -31,13 +31,11 @@ getPaletteShade('green', '600'); // oklch(0.62 0.2233 140.055)
 const neutral = getPaletteRamp('neutral'); // Frozen, readonly shade map
 ```
 
-`PrimitivePaletteName` covers the 22 shade families; `Shade` covers 50 through 950. White and Black are singleton colors, not ramps. `PALETTE_KEYS` identifies only the five surface-tone families. Lookups resolve on first use and cache immutable values; importing the engine does not convert palettes.
+`PRIMITIVE_PALETTE_NAMES` lists the 22 shade families typed by `PrimitivePaletteName`; `SHADES` lists 50 through 950, typed by `Shade`. White and Black are singleton colors, not ramps. `PALETTE_KEYS` identifies only the five surface-tone families. Lookups resolve on first use and cache immutable values; importing the engine does not convert palettes.
 
-`STATUS_PALETTE_FAMILIES` and `CHART_PALETTE_REFERENCES` describe the engine's starting colors. Success uses Green, Warning Orange, Error Red, and Information Blue. Secondary colors and near-black/near-white primary interaction endpoints use Neutral. The contrast solver can adjust these starting colors before emission.
+The engine starts from authored palettes: Success uses Green, Warning Orange, Error Red, and Information Blue. Secondary colors and near-black/near-white primary interaction endpoints use Neutral. The contrast solver can adjust these starting colors before emission.
 
 Under deuteranopia the Success (Green) and Warning (Orange) 600 shades are hard to tell apart, so status UI must pair color with an icon and label. The color-vision audit reports this pair as its one accepted limitation.
-
-The palette entry also exports the build converters `hexToOklchPinned`, `hexToOklchMechanical`, `hexToSrgbInts`, and `isPaletteShadeKey`, along with their lightness grids. Pinned conversion optionally reports gamut clipping through its fourth argument; runtime lookups do not log. Audit conversion uses unrounded coordinates and rejects transparent inputs that have not been composited.
 
 Custom brand ramps and raw surface-tone references retain their separate algorithms. A palette's processed 600 shade is not interchangeable with its authored hex as a brand seed.
 

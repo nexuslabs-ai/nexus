@@ -88,11 +88,21 @@ await writeFile(
   themeToCss,
   type NexusAppearanceState,
 } from '@nexus_ds/core';
-import { getPaletteRamp, getPaletteShade, type PrimitivePaletteName, type Shade } from '@nexus_ds/core/palette';
+import {
+  getPaletteRamp,
+  getPaletteShade,
+  PRIMITIVE_PALETTE_NAMES,
+  SHADES,
+  type PrimitivePaletteName,
+  type PrimitivePaletteRamp,
+  type Shade,
+} from '@nexus_ds/core/palette';
 
+const palettes: readonly PrimitivePaletteName[] = PRIMITIVE_PALETTE_NAMES;
+const shades: readonly Shade[] = SHADES;
 const palette: PrimitivePaletteName = 'green';
 const shade: Shade = '600';
-const ramp = getPaletteRamp(palette);
+const ramp: PrimitivePaletteRamp = getPaletteRamp(palette);
 const green: string = getPaletteShade(palette, shade);
 // @ts-expect-error public ramps are immutable.
 ramp['600'] = '#000000';
@@ -101,6 +111,8 @@ getPaletteRamp('white');
 // @ts-expect-error only authored shades are accepted.
 getPaletteShade('green', '999');
 void green;
+void palettes;
+void shades;
 
 const state: NexusAppearanceState = sanitizeNexusAppearance({
   ...DEFAULT_NEXUS_APPEARANCE,

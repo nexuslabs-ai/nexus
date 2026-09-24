@@ -47,19 +47,13 @@ const EXPECTED_RUNTIME_EXPORTS = [
 ];
 
 const EXPECTED_PALETTE_EXPORTS = [
-  'CHART_PALETTE_REFERENCES',
-  'STATUS_PALETTE_FAMILIES',
-  'SHADES',
-  'PERCEPTUAL_L_GRID',
-  'PERCEPTUAL_L_GRID_HUE',
   'PRIMITIVE_PALETTE_NAMES',
+  'SHADES',
   'getPaletteRamp',
   'getPaletteShade',
-  'hexToOklchMechanical',
-  'hexToOklchPinned',
-  'hexToSrgbInts',
-  'isPaletteShadeKey',
 ];
+
+const OKLCH_VALUE = /^oklch\(\d+(\.\d+)? \d+(\.\d+)? \d+(\.\d+)?\)$/;
 
 function assertExports(label, mod, allowlist = EXPECTED_RUNTIME_EXPORTS) {
   const actual = Object.keys(mod).sort();
@@ -96,15 +90,12 @@ const paletteCjs = require('@nexus_ds/core/palette');
 assertExports('Palette ESM', paletteEsm, EXPECTED_PALETTE_EXPORTS);
 assertExports('Palette CJS', paletteCjs, EXPECTED_PALETTE_EXPORTS);
 for (const name of paletteEsm.PRIMITIVE_PALETTE_NAMES) {
-  assert.deepEqual(
-    paletteEsm.getPaletteRamp(name),
-    paletteCjs.getPaletteRamp(name)
-  );
+  const ramp = paletteEsm.getPaletteRamp(name);
+  assert.deepEqual(ramp, paletteCjs.getPaletteRamp(name));
+  for (const shade of paletteEsm.SHADES) {
+    assert.match(ramp[shade], OKLCH_VALUE, `${name}.${shade}`);
+  }
 }
-assert.equal(
-  paletteEsm.getPaletteShade('green', '600'),
-  'oklch(0.62 0.2233 140.055)'
-);
 console.log(
   `@nexus_ds/core/palette exports and ESM/CJS parity clean (${EXPECTED_PALETTE_EXPORTS.length} exports).`
 );

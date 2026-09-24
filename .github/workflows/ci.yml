@@ -273,9 +273,6 @@ jobs:
       - name: Check canonical step set freshness
         run: pnpm --filter @nexus_ds/eslint-plugin refresh:canonical-set --check
 
-      - name: Build @nexus_ds/core
-        run: pnpm --filter @nexus_ds/core build
-
       - name: Regenerate token outputs (tailwind)
         id: regen
         run: |

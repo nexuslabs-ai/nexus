@@ -9,7 +9,7 @@
         "tsup.config.ts",
         "tsconfig.json"
       ],
-      "outputs": ["dist/runtime/**"]
+      "outputs": ["dist/runtime/**", "dist/scripts/**"]
     },
     "build:tailwind": {
       "dependsOn": ["build"],

@@ -1,9 +1,7 @@
 import { clampChroma, converter, type Oklch, oklch, parse } from 'culori';
 
-import { PERCEPTUAL_L_GRID, type Shade } from './palette';
+import { PERCEPTUAL_L_GRID, type Shade, SHADES } from './palette';
 import hueGrid from './perceptual-grid-hue.json';
-
-export { PERCEPTUAL_L_GRID } from './palette';
 
 // emit ships P3 chroma; audit scores in sRGB (legacy-display equivalent)
 const EMIT_GAMUT = 'p3';
@@ -11,7 +9,7 @@ const AUDIT_GAMUT = 'rgb';
 
 const toRgb = converter('rgb');
 
-export const PERCEPTUAL_L_GRID_HUE: Readonly<
+const PERCEPTUAL_L_GRID_HUE: Readonly<
   Record<string, Readonly<Record<Shade, number>>>
 > = Object.freeze(
   Object.fromEntries(
@@ -21,10 +19,8 @@ export const PERCEPTUAL_L_GRID_HUE: Readonly<
 
 const CUSP_FRACTION = 0.95; // sit just inside the P3 cusp for render safety
 
-const SHADE_KEY_RE = /^(50|100|200|300|400|500|600|700|800|900|950)$/;
-
 export function isPaletteShadeKey(key: unknown): key is Shade {
-  return typeof key === 'string' && SHADE_KEY_RE.test(key);
+  return (SHADES as readonly unknown[]).includes(key);
 }
 
 function round(value: number, decimals: number) {
@@ -50,7 +46,7 @@ function formatPaletteOklch({ l, c, h, alpha }: Oklch) {
 function parseToOklch(hex: string): Oklch {
   const parsed = parse(hex);
   if (!parsed) {
-    throw new Error(`perceptual-grid: cannot parse color "${hex}"`);
+    throw new Error(`palette: cannot parse color "${hex}"`);
   }
   return oklch(parsed);
 }
@@ -66,7 +62,7 @@ function computePinnedOklch(
     ? (hueCurve ?? PERCEPTUAL_L_GRID)[shade]
     : undefined;
   if (pinnedL === undefined) {
-    throw new Error(`perceptual-grid: unknown shade "${shade}" for ${hex}`);
+    throw new Error(`palette: unknown shade "${shade}" for ${hex}`);
   }
 
   const source = parseToOklch(hex);
@@ -100,7 +96,7 @@ function computePinnedOklch(
     const clampedC = clamped.c ?? 0;
     if (originalC > 0 && (originalC - clampedC) / originalC > 0.2) {
       reportGamutClip?.(
-        `perceptual-grid: P3 gamut clip on ${hex} at shade ${shade} — C ${originalC.toFixed(4)} → ${clampedC.toFixed(4)}`
+        `palette: P3 gamut clip on ${hex} at shade ${shade} — C ${originalC.toFixed(4)} → ${clampedC.toFixed(4)}`
       );
     }
   }
@@ -129,7 +125,7 @@ function oklchToSrgbInts(oklchColor: Oklch): [number, number, number] {
     // apca-w3 `sRGBtoY` reads only [r,g,b]; an alpha-bearing color must be
     // pre-blended against its actual background before contrast computation.
     throw new Error(
-      'perceptual-grid: oklchToSrgbInts received alpha-bearing color; pre-blend before contrast computation'
+      'palette: oklchToSrgbInts received alpha-bearing color; pre-blend before contrast computation'
     );
   }
   const channel = (v: number) =>

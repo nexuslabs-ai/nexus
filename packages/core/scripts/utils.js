@@ -1,12 +1,13 @@
-import {
-  hexToOklchMechanical,
-  hexToOklchPinned,
-  isPaletteShadeKey,
-} from '@nexus_ds/core/palette';
 import fs from 'fs';
 import path from 'path';
 import * as prettier from 'prettier';
 import { fileURLToPath } from 'url';
+
+import {
+  hexToOklchMechanical,
+  hexToOklchPinned,
+  isPaletteShadeKey,
+} from '../dist/scripts/palette.js';
 
 /**
  * Ensure a directory exists, creating it if necessary
