@@ -247,20 +247,26 @@ function attributeDefault(checker, value, owner) {
 }
 
 /**
- * Whether a value of `type` can carry `key`: any member of a union, and any
- * `any`, `unknown` or string-indexed type.
+ * Whether a value of `type` can carry `key`: any member of a union, a type
+ * parameter's constraint, and any `any`, `unknown`, unconstrained or indexed
+ * type.
+ * @param {ts.TypeChecker} checker
  * @param {ts.Type} type
  * @param {string} key
  * @returns {boolean}
  */
-function carriesKey(type, key) {
+function carriesKey(checker, type, key) {
+  if (type.flags & ts.TypeFlags.TypeParameter) {
+    const constraint = checker.getBaseConstraintOfType(type);
+    return !constraint || carriesKey(checker, constraint, key);
+  }
   if (type.flags & (ts.TypeFlags.Any | ts.TypeFlags.Unknown)) return true;
   if (type.isUnion()) {
-    return type.types.some((member) => carriesKey(member, key));
+    return type.types.some((member) => carriesKey(checker, member, key));
   }
   return (
     type.getProperty(key) !== undefined ||
-    type.getStringIndexType() !== undefined
+    checker.getIndexInfosOfType(type).length > 0
   );
 }
 
@@ -277,7 +283,7 @@ function isOverridable(checker, properties, position, key) {
     .some(
       (property) =>
         ts.isJsxSpreadAttribute(property) &&
-        carriesKey(checker.getTypeAtLocation(property.expression), key)
+        carriesKey(checker, checker.getTypeAtLocation(property.expression), key)
     );
 }
 
