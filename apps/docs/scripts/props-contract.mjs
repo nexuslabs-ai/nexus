@@ -84,7 +84,7 @@ function variantKeyDeclarations(checker, node) {
   if (!variants) return [];
 
   return checker
-    .getTypeOfSymbol(variants)
+    .getNonNullableType(checker.getTypeOfSymbol(variants))
     .getProperties()
     .flatMap((key) => key.declarations ?? []);
 }
@@ -101,6 +101,13 @@ export function cvaVariantKeys(checker, sourceFiles) {
   }
 
   for (const sourceFile of sourceFiles) visit(sourceFile);
+
+  if (keys.size === 0) {
+    throw new Error(
+      'props JSON: no cva() call resolved to the `cva` declared in class-variance-authority/dist/index.d.ts, so no variant key would be checked. Update isCvaCall to match the installed class-variance-authority.'
+    );
+  }
+
   return keys;
 }
 
