@@ -2,6 +2,8 @@ import { cn } from '@nexus_ds/react/utils';
 import type { MDXComponents } from 'mdx/types';
 
 import { CodeBlock } from './app/_components/CodeBlock';
+import { ComponentPreview } from './app/_components/ComponentPreview';
+import { ComponentSource } from './app/_components/ComponentSource';
 import * as Nexus from './app/_components/nexus';
 
 /**
@@ -143,6 +145,8 @@ export function useMDXComponents(components: MDXComponents): MDXComponents {
         {...props}
       />
     ),
+    ComponentPreview,
+    ComponentSource,
     // live @nexus_ds/react components, usable in MDX without an import
     ...Nexus,
     // caller-provided overrides win
