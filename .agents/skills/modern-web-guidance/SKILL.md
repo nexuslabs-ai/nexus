@@ -25,14 +25,17 @@ A skill to search for specific web development use cases and retrieve their corr
 
 Apply this guidance through Nexus components, semantic tokens, and `nx:` utilities.
 
-Nexus declares a browser support policy in `../../../AGENTS.md`: it implements no
-feature-detection or environment fallbacks. Read
+Nexus declares a browser support policy in `../../../AGENTS.md`: it does no
+feature detection and no OS, browser, preference, or input-device queries, and a
+feature that is not Baseline widely available across major browsers is replaced
+by a simpler approach. Read
 `../../../.claude/rules/no-environment-branching.md` before applying any guide's
 browser-support or fallback recommendation. That rule overrides this skill's
 generic fallback advice: choose a simpler primitive instead of adding banned
 environment branches. Do not reintroduce a browser-floor registry.
 
-For substantial UI work, record a compact guidance note in the plan or PR:
+For a substantial UI change — one that introduces a layout, interaction, or
+browser-platform decision — record a compact guidance note in the plan or PR:
 
 - **Source:** search query and retrieved guide IDs, or exact bundled guide paths.
 - **Decision:** the applicable pattern and any Nexus-policy override.
@@ -41,6 +44,8 @@ For substantial UI work, record a compact guidance note in the plan or PR:
 For a text-only edit or removal that introduces no layout, interaction, or
 platform decision, an existing relevant guide can be reused; a new search is
 unnecessary. Do not describe reading this skill alone as consulting a guide.
+In Nexus, this substantial-UI-change threshold narrows the frontmatter's
+"MANDATORY: Execute FIRST for all HTML/CSS and clientside JS tasks" trigger.
 
 If the CLI cannot run, record the actual failure and read the relevant Markdown
 under `guides/` using file search. The bundled collection does not require npm or
@@ -117,7 +122,7 @@ If the output is truncated, you must repeat the command but redirect to a file a
 
 When generating or modifying code, cross-check the implementation against the retrieved guide before concluding:
 
-- **Applicable Guidance & Fallbacks**: Ensure the relevant modern patterns and necessary fallback strategies from the guide are correctly applied, without forcing unrequested features. Nexus declares a no-fallback policy; see Nexus integration above.
+- **Applicable Guidance & Fallbacks**: Ensure the relevant modern patterns and necessary fallback strategies from the guide are correctly applied, without forcing unrequested features. Nexus's browser support policy overrides fallback advice; see Nexus integration above.
 - **Task Fulfillment**: Confirm that the implementation fully satisfies the user's request.
 
 ## Using npx / pnpx

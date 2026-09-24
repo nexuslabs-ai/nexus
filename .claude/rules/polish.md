@@ -30,7 +30,7 @@ Component work has two gates:
 Passing the first gate means the work is shippable. Passing the second gate means
 it clears the Nexus Tier-A bar.
 
-For substantial UI changes, record a guidance note as described in
+For a substantial UI change, record a guidance note as described in
 [Modern Web Guidance's Nexus integration](../../.agents/skills/modern-web-guidance/SKILL.md#nexus-integration-repository-policy-takes-precedence).
 
 Every polish plan must list its validation evidence: the Storybook,
