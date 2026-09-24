@@ -64,8 +64,8 @@ const SHADE_ROLES: {
   {
     shade: 400,
     role: 'Medium-light',
-    light: 'border.active, disabled-foreground',
-    dark: 'border.active',
+    light: 'border-focus, disabled-foreground',
+    dark: 'border-focus',
   },
   {
     shade: 500,

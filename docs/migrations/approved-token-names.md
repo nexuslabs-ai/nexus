@@ -1,41 +1,57 @@
-# Approved token-name migration (#763)
+# Approved token-name migration
 
 This is a breaking public-name migration. It preserves existing color values,
 selectors and contrast pairings; it does not broaden readability guarantees.
 
 ## Rename map
 
-| Before                          | After                |
-| ------------------------------- | -------------------- |
-| `primary-subtle-foreground`     | `primary-text`       |
-| `secondary-subtle-foreground`   | `secondary-text`     |
-| `error-subtle-foreground`       | `error-text`         |
-| `information-subtle-foreground` | `information-text`   |
-| `success-subtle-foreground`     | `success-text`       |
-| `warning-subtle-foreground`     | `warning-text`       |
-| `border-active`                 | `border-focus`       |
-| `border-error`                  | `error-border`       |
-| `border-information`            | `information-border` |
-| `border-success`                | `success-border`     |
-| `border-warning`                | `warning-border`     |
+| Before                          | After                   |
+| ------------------------------- | ----------------------- |
+| `primary-subtle-foreground`     | `primary-text`          |
+| `secondary-subtle-foreground`   | `secondary-text`        |
+| `error-subtle-foreground`       | `error-text`            |
+| `information-subtle-foreground` | `information-text`      |
+| `success-subtle-foreground`     | `success-text`          |
+| `warning-subtle-foreground`     | `warning-text`          |
+| `border-active`                 | `border-focus`          |
+| `border-error`                  | `error-border`          |
+| `border-information`            | `information-border`    |
+| `border-success`                | `success-border`        |
+| `border-warning`                | `warning-border`        |
+| `border-primary`                | `primary-border`        |
+| `border-primary-active`         | `primary-border-active` |
 
 Apply this map to `--nx-color-*` runtime variables, `--color-*` theme aliases,
 and utilities. For example, `nx:text-primary-subtle-foreground` becomes
-`nx:text-primary-text`; `nx:border-border-error` becomes `nx:border-error-border`.
-Keep modifiers: `nx:focus-within:border-border-active` becomes
+`nx:text-primary-text`; `nx:border-border-error` becomes `nx:border-error-border`;
+`nx:ring-border-primary` becomes `nx:ring-primary-border`. Keep modifiers:
+`nx:focus-within:border-border-active` becomes
 `nx:focus-within:border-border-focus`.
 
-The explicit `nx:border-color-error/information/success/warning` utility aliases
-keep their names and reference the renamed normal borders. `nx:border-color-active`
-becomes `nx:border-color-focus`. Verify class-merging configuration in copied
-consumer libraries as well as application classes and raw CSS/SVG variables.
+The explicit `nx:border-color-error/information/success/warning/primary` and
+`nx:border-color-primary-active` utility aliases keep their names and reference
+the renamed borders. `nx:border-color-active` becomes `nx:border-color-focus`.
+The status active borders (`border-error-active`, `border-information-active`,
+`border-success-active`, `border-warning-active`) keep their names in this
+release. Verify class-merging configuration in copied consumer libraries as well
+as application classes and raw CSS/SVG variables.
 
 The six `*-foreground` roles remain content colors for filled backgrounds.
 `*-text` also serves matching icons. `foreground` and `muted-foreground` keep
 their general hierarchy meaning. Existing APCA pairings are unchanged; the new
-names are not a universal promise of contrast on every background. `focus-default`
-shares the solved primary text color, with focus surfaces included in the contrast
-constraints.
+names are not a universal promise of contrast on every background.
+
+## `border-focus` is not the focus ring
+
+`border-focus` and `focus-default` are different colors for different jobs:
+
+| Token           | Color                        | Use                                                               |
+| --------------- | ---------------------------- | ----------------------------------------------------------------- |
+| `border-focus`  | Neutral grey                 | A container's border while focus is inside it (`focus-within:`)   |
+| `focus-default` | Brand, shares `primary-text` | The ring on the focused control itself (`focus-visible:` outline) |
+
+A focused control always uses `focus-default`. Use `border-focus` only on the
+wrapper around it, such as a search row or a date-picker frame.
 
 ## Saved appearance
 
@@ -50,24 +66,9 @@ falls back to the embedded default for first paint; its state is recovered by th
 client sanitizer. This is the existing version-mismatch behavior, not a guarantee
 of flash-free restoration for local-storage-only deployments.
 
-## Coordinated consumers and release
+## Upgrading
 
 Upgrade core together with copied React/Tailwind, application utilities and
-class-merging configuration. Old-name aliases are not added. Validate the candidate
-package in consuming projects and review their migrations before upgrading them.
-Only core is published among these three packages; copying the private React and
-Tailwind sources is a separate consumer update. Follow CONTRIBUTING.md's major
-changeset requirement for breaking runtime changes. No package is published by
-this PR itself; merging the Version Packages PR can trigger publishing.
-
-This delivery is stacked on token explorer PR #758 at
-`838c19937848a4c338f3d7e1ee1b5e73d9861b46`, including the engine/catalogue chain
-#722 → #724 → #725 → #755 → #757 → #758. Catalogue aliases and explorer data use
-the renamed token identities. Validate against this parent, merge in dependency
-order, and revalidate if its implementation changes before landing.
-
-Issue #764 owns the separately approved interaction families and their pending
-value/application proposal, including primary hover vs selection and status
-hover/active/focus borders. Old status active-border tokens remain until that
-migration chooses their replacement values. Radius documentation is already in
-#743 / #740. Shared sizing and other inventory proposals are outside this delivery.
+class-merging configuration. Old-name aliases are not added. Only core is
+published; copying the React and Tailwind sources is a separate consumer update.
+Validate the new package in your project before upgrading.
