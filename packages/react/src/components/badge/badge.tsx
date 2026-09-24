@@ -91,7 +91,7 @@ const badgeVariants = cva(
         variant: 'default',
         fill: 'outline',
         className:
-          'nx:border-default nx:border-border-primary nx:bg-primary-subtle nx:text-primary-text',
+          'nx:border-default nx:border-primary-border nx:bg-primary-subtle nx:text-primary-text',
       },
       {
         variant: 'secondary',

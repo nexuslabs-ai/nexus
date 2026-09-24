@@ -83,7 +83,7 @@ function ChipRow({
             onClick={() => onPick(v)}
             aria-pressed={v === active}
             data-active={v === active}
-            className="nx:capitalize nx:rounded-md nx:border nx:px-2.5 nx:py-1 nx:typography-label-small nx:transition-control nx:border-border-default nx:text-muted-foreground nx:hover:bg-background-hover nx:data-[active=true]:border-border-primary nx:data-[active=true]:bg-primary-subtle nx:data-[active=true]:text-primary-text nx:focus-visible:outline-2 nx:focus-visible:outline-focus-default"
+            className="nx:capitalize nx:rounded-md nx:border nx:px-2.5 nx:py-1 nx:typography-label-small nx:transition-control nx:border-border-default nx:text-muted-foreground nx:hover:bg-background-hover nx:data-[active=true]:border-primary-border nx:data-[active=true]:bg-primary-subtle nx:data-[active=true]:text-primary-text nx:focus-visible:outline-2 nx:focus-visible:outline-focus-default"
           >
             {v}
           </button>

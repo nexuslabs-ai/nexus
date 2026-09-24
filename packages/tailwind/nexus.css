@@ -267,9 +267,9 @@
     --nx-color-primary-subtle-active,
     oklch(0.87 0 0)
   );
-  --color-border-primary: var(--nx-color-border-primary, oklch(0.87 0 0));
-  --color-border-primary-active: var(
-    --nx-color-border-primary-active,
+  --color-primary-border: var(--nx-color-primary-border, oklch(0.87 0 0));
+  --color-primary-border-active: var(
+    --nx-color-primary-border-active,
     oklch(0.66 0 0)
   );
   --color-secondary-background: var(
@@ -624,9 +624,9 @@
     --nx-color-primary-subtle-active,
     oklch(0.87 0 0)
   );
-  --color-border-primary: var(--nx-color-border-primary, oklch(0.87 0 0));
-  --color-border-primary-active: var(
-    --nx-color-border-primary-active,
+  --color-primary-border: var(--nx-color-primary-border, oklch(0.87 0 0));
+  --color-primary-border-active: var(
+    --nx-color-primary-border-active,
     oklch(0.66 0 0)
   );
   --color-secondary-background: var(
@@ -903,8 +903,8 @@
   --nx-color-primary-text: oklch(0.8252 0 0);
   --nx-color-primary-subtle-hover: oklch(0.207 0 0);
   --nx-color-primary-subtle-active: oklch(0.297 0 0);
-  --nx-color-border-primary: oklch(0.385 0 0);
-  --nx-color-border-primary-active: oklch(0.553 0 0);
+  --nx-color-primary-border: oklch(0.385 0 0);
+  --nx-color-primary-border-active: oklch(0.553 0 0);
   --nx-color-secondary-background: oklch(0.207 0 0);
   --nx-color-secondary-background-hover: oklch(0.385 0 0);
   --nx-color-secondary-background-active: oklch(0.46 0 0);

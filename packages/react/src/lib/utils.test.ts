@@ -115,7 +115,7 @@ function emittedThemeTokens(cssKey: string) {
 }
 
 describe('cn', () => {
-  it.each(['error', 'information', 'success', 'warning'])(
+  it.each(['primary', 'error', 'information', 'success', 'warning'])(
     'keeps border widths while merging renamed %s colors and aliases',
     (family) => {
       const named = `nx:border-${family}-border`;

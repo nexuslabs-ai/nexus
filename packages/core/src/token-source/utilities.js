@@ -75,8 +75,8 @@ export const BORDER_COLOR_ALIAS_TOKENS = /** @type {const} */ ({
   'error-active': 'border-error-active',
   information: 'information-border',
   'information-active': 'border-information-active',
-  primary: 'border-primary',
-  'primary-active': 'border-primary-active',
+  primary: 'primary-border',
+  'primary-active': 'primary-border-active',
 });
 
 export const BORDER_COLOR_ALIAS_NAMES = Object.keys(BORDER_COLOR_ALIAS_TOKENS);

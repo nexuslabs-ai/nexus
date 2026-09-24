@@ -61,9 +61,9 @@
 }
 
 @utility border-color-primary {
-  border-color: var(--nx-color-border-primary, oklch(0.87 0 0));
+  border-color: var(--nx-color-primary-border, oklch(0.87 0 0));
 }
 
 @utility border-color-primary-active {
-  border-color: var(--nx-color-border-primary-active, oklch(0.66 0 0));
+  border-color: var(--nx-color-primary-border-active, oklch(0.66 0 0));
 }

@@ -192,8 +192,14 @@ function cataloguePreset(family: CatalogueFamily, key: VariantKey) {
 }
 
 describe('token catalogue', () => {
-  it('keeps status border utilities while exposing the renamed focus alias', () => {
-    for (const family of ['error', 'information', 'success', 'warning']) {
+  it('keeps family border utilities while exposing the renamed focus alias', () => {
+    for (const family of [
+      'primary',
+      'error',
+      'information',
+      'success',
+      'warning',
+    ]) {
       const token = byName.get(`--nx-color-${family}-border`)!;
       expect(aliasesOf(token, 'utility')).toEqual([
         `nx:border-color-${family}`,

@@ -364,7 +364,7 @@ export function ComponentShowcase() {
                 <div className="nx:border-2 nx:border-border-default nx:rounded nx:px-4 nx:py-2 nx:typography-label-default">
                   Default
                 </div>
-                <div className="nx:border-2 nx:border-border-primary nx:rounded nx:px-4 nx:py-2 nx:typography-label-default">
+                <div className="nx:border-2 nx:border-primary-border nx:rounded nx:px-4 nx:py-2 nx:typography-label-default">
                   Primary
                 </div>
                 <div className="nx:border-2 nx:border-success-border nx:rounded nx:px-4 nx:py-2 nx:typography-label-default">

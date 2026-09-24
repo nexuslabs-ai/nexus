@@ -171,7 +171,7 @@ export const FlexParent: Story = {
         <Hide containerBelow="md" data-testid="wrap">
           <div
             data-testid="item-b"
-            className="nx:rounded-md nx:border-default nx:border-border-primary"
+            className="nx:rounded-md nx:border-default nx:border-primary-border"
             style={{ width: 48, height: 48 }}
           />
         </Hide>
