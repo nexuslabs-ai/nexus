@@ -182,7 +182,7 @@ function isRenderable(checker, symbol) {
     );
 }
 
-function resolveAlias(checker, symbol) {
+export function resolveAlias(checker, symbol) {
   if ((symbol.flags & ts.SymbolFlags.Alias) === 0) return symbol;
   try {
     return checker.getAliasedSymbol(symbol);

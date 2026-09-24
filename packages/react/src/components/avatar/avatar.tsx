@@ -242,7 +242,6 @@ interface AvatarStatusProps
    * Visually-hidden text announced by assistive tech in place of the
    * colour-only dot. Defaults to the capitalised `status`. Pass `''` to opt
    * out when an adjacent text label already conveys presence.
-   * @default the capitalised `status` ('Online', 'Away', 'Busy', 'Offline')
    */
   label?: string;
 }

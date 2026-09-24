@@ -11,6 +11,7 @@
       "inputs": [
         "scripts/generate-props.mjs",
         "scripts/props-contract.mjs",
+        "scripts/props-entries.mjs",
         "scripts/react-entry-points.mjs",
         "scripts/react-sources.mjs",
         "scripts/roots.mjs",
@@ -58,7 +59,12 @@
       "outputs": [".next/**", "!.next/cache/**", "next-env.d.ts"]
     },
     "dev": {
-      "dependsOn": ["^build", "generate:manifest", "generate:dependencies"],
+      "dependsOn": [
+        "^build",
+        "generate:manifest",
+        "generate:props",
+        "generate:dependencies"
+      ],
       "cache": false,
       "persistent": true
     },
