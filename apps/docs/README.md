@@ -1,8 +1,8 @@
 # Nexus docs
 
 The Nexus documentation site. Article routes live in `app/(docs)`; the
-full-height workspaces live in `app/(workspace)` and share the docs header but not
-the article chrome.
+full-height workspaces live in `app/(workspace)` and share the docs header but
+not the article chrome.
 
 ## Run and validate
 
@@ -25,8 +25,10 @@ product scene built from public Nexus components.
   The example scene renders inline under that same appearance. Its overlays
   portal into the docs document, so they look the same as the canvas.
 - **Undo and Reset.** `useAppearanceHistory` (`app/_workspace/appearance-state.ts`)
-  keeps up to 100 earlier states. Each edit or reset pushes one. Undo restores
-  the last one. The history is per visit and is not persisted.
+  keeps up to 100 undo steps. Each edit or reset records the previous values of
+  only the keys it changed, and Undo writes those back, so changes made outside
+  the panel (such as the top-nav light/dark toggle) survive an Undo. The history
+  is per visit and is not persisted.
 - **Export.** "Use this theme" shows three files, each with a copy control:
   `nexus-appearance.ts` holds the appearance state to pass as `defaultState`,
   `theme.css` holds the derived light and dark themes, and `preferences.css`

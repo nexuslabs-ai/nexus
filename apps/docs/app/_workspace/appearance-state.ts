@@ -9,33 +9,65 @@ import { DOCS_APPEARANCE_DEFAULT_STATE } from '../_lib/appearance-controls';
 
 const HISTORY_LIMIT = 100;
 
-type ChangeGroup = keyof NexusAppearanceState;
+type AppearancePatch = Partial<NexusAppearanceState>;
+type AppearanceKey = keyof NexusAppearanceState;
+
+function isShallowEqual(a: unknown, b: unknown): boolean {
+  if (Object.is(a, b)) return true;
+  if (typeof a !== 'object' || typeof b !== 'object') return false;
+  if (a === null || b === null) return false;
+  const aEntries = Object.entries(a);
+  const bRecord = b as Record<string, unknown>;
+  return (
+    aEntries.length === Object.keys(b).length &&
+    aEntries.every(([key, value]) => Object.is(value, bRecord[key]))
+  );
+}
+
+/** The current values of the keys `patch` would change. */
+function inverseOf(
+  state: NexusAppearanceState,
+  patch: AppearancePatch
+): AppearancePatch {
+  const changedKeys = (Object.keys(patch) as AppearanceKey[]).filter(
+    (key) => !isShallowEqual(state[key], patch[key])
+  );
+  return Object.fromEntries(
+    changedKeys.map((key) => [key, state[key]])
+  ) as AppearancePatch;
+}
 
 /**
  * The shared docs appearance plus an undo history of the edits made through
- * `change` and `reset`. Consecutive changes in the same `group` share one undo
+ * `change` and `reset`. Each step stores only the previous values of the keys
+ * it changed, so Undo leaves writes made elsewhere (such as the top-nav mode
+ * toggle) in place. Consecutive changes in the same `group` share one undo
  * step until `startStep` is called. Edits persist through the docs appearance
  * provider.
  */
 export function useAppearanceHistory() {
   const { state, setState } = useNexusAppearance();
-  const [history, setHistory] = useState<NexusAppearanceState[]>([]);
-  const [lastGroup, setLastGroup] = useState<ChangeGroup | null>(null);
+  const [history, setHistory] = useState<AppearancePatch[]>([]);
+  const [lastGroup, setLastGroup] = useState<AppearanceKey | null>(null);
 
-  function commit(next: NexusAppearanceState, group: ChangeGroup | null) {
-    if (group === null || group !== lastGroup) {
-      setHistory((past) => [...past, state].slice(-HISTORY_LIMIT));
-    }
-    setLastGroup(group);
-    setState(next);
-  }
+  function change(patch: AppearancePatch, group?: AppearanceKey) {
+    const inverse = inverseOf(state, patch);
+    if (Object.keys(inverse).length === 0) return;
 
-  function change(patch: Partial<NexusAppearanceState>, group?: ChangeGroup) {
-    commit({ ...state, ...patch }, group ?? null);
+    const extendsStep = group !== undefined && group === lastGroup;
+    setHistory((past) => {
+      const step = past.at(-1);
+      if (!extendsStep || !step)
+        return [...past, inverse].slice(-HISTORY_LIMIT);
+      // The open step keeps the value each key had before the group began.
+      return [...past.slice(0, -1), { ...inverse, ...step }];
+    });
+    setLastGroup(group ?? null);
+    setState((current) => ({ ...current, ...patch }));
   }
 
   function reset() {
-    commit(DOCS_APPEARANCE_DEFAULT_STATE, null);
+    change(DOCS_APPEARANCE_DEFAULT_STATE);
   }
 
   function startStep() {
@@ -43,11 +75,11 @@ export function useAppearanceHistory() {
   }
 
   function undo() {
-    const previous = history.at(-1);
-    if (!previous) return;
+    const inverse = history.at(-1);
+    if (!inverse) return;
     setHistory((past) => past.slice(0, -1));
     startStep();
-    setState(previous);
+    setState((current) => ({ ...current, ...inverse }));
   }
 
   return {
