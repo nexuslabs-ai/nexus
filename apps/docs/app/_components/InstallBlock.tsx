@@ -3,10 +3,6 @@ import { loadDependencies } from '../_lib/dependencies';
 import { CodeBlock } from './CodeBlock';
 import { CodeSample } from './CodeSample';
 
-/**
- * What to install and which files to copy for a component: the Nexus files it
- * imports first, then its own.
- */
 export async function InstallBlock({ slug }: { slug: string }) {
   const { install, copy, files } = await loadDependencies(slug);
   const toCopy = [...copy, ...files];
