@@ -324,8 +324,8 @@ export const SelectionEmpty: Story = {
   },
 };
 
-// Every variant × density, in both directions: each checkbox sits inside its
-// own cell, and the header and row checkboxes line up in one column.
+// Every variant × density, in both directions: each selection cell shrinks to
+// its checkbox, and the header and row checkboxes line up in one column.
 export const SelectionLayoutMatrix: Story = {
   render: () => (
     <div className="nx:w-full nx:space-y-6">
@@ -358,10 +358,13 @@ export const SelectionLayoutMatrix: Story = {
       for (const cell of cells) {
         const control = cell.querySelector<HTMLElement>('[role="checkbox"]');
         if (!control) throw new Error('Selection control missing');
-        const cellBox = cell.getBoundingClientRect();
+        const style = getComputedStyle(cell);
+        const contentWidth =
+          cell.clientWidth -
+          parseFloat(style.paddingInlineStart) -
+          parseFloat(style.paddingInlineEnd);
         const box = control.getBoundingClientRect();
-        await expect(box.left).toBeGreaterThanOrEqual(cellBox.left);
-        await expect(box.right).toBeLessThanOrEqual(cellBox.right);
+        await expect(Math.abs(contentWidth - box.width)).toBeLessThanOrEqual(1);
         columnStarts.add(Math.round(box.left));
       }
       await expect(columnStarts.size).toBe(1);

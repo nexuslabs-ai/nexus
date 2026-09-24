@@ -20,6 +20,7 @@ import {
 import { Link } from '@tanstack/react-router';
 import type { Column, ColumnDef } from '@tanstack/react-table';
 
+import { SELECT_COLUMN_ID } from '../../components/data-table';
 import type { Contact } from '../../lib/crm-api';
 import { formatCurrency, formatDate, initials } from '../../lib/format';
 
@@ -55,7 +56,7 @@ function SortHeader({
 
 export const contactColumns: ColumnDef<Contact>[] = [
   {
-    id: 'select',
+    id: SELECT_COLUMN_ID,
     header: ({ table }) => (
       <Checkbox
         checked={

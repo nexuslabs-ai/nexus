@@ -20,6 +20,7 @@ import {
 import { Link } from '@tanstack/react-router';
 import type { Column, ColumnDef } from '@tanstack/react-table';
 
+import { SELECT_COLUMN_ID } from '../../components/data-table';
 import { formatDate, initials } from '../../lib/format';
 import type { Member } from '../../lib/people-api';
 
@@ -55,7 +56,7 @@ function SortHeader({
 
 export const memberColumns: ColumnDef<Member>[] = [
   {
-    id: 'select',
+    id: SELECT_COLUMN_ID,
     header: ({ table }) => (
       <Checkbox
         checked={

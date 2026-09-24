@@ -25,6 +25,8 @@ import {
 import { DataPager } from './data-pager';
 import { FilterInput } from './filter-input';
 
+export const SELECT_COLUMN_ID = 'select';
+
 /**
  * Generic, app-level data table — the canonical recipe of headless
  * `@tanstack/react-table` wired over the Nexus `Table` primitives, with
@@ -79,7 +81,9 @@ export function DataTable<TData>({
     : undefined;
   // The select column is opt-in (domain-supplied), so only summarise selection
   // when a consumer actually wires one — otherwise show a plain row count.
-  const enableSelection = columns.some((column) => column.id === 'select');
+  const enableSelection = columns.some(
+    (column) => column.id === SELECT_COLUMN_ID
+  );
 
   return (
     <div className="nx:space-y-4">
@@ -98,7 +102,7 @@ export function DataTable<TData>({
               <TableRow key={headerGroup.id}>
                 {headerGroup.headers.map((header) => {
                   const Head =
-                    header.column.id === 'select'
+                    header.column.id === SELECT_COLUMN_ID
                       ? TableSelectionHead
                       : TableHead;
                   return (
@@ -124,7 +128,7 @@ export function DataTable<TData>({
                 >
                   {row.getVisibleCells().map((cell) => {
                     const Cell =
-                      cell.column.id === 'select'
+                      cell.column.id === SELECT_COLUMN_ID
                         ? TableSelectionCell
                         : TableCell;
                     return (
