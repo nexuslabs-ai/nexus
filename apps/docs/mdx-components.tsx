@@ -5,6 +5,7 @@ import { CodeBlock } from './app/_components/CodeBlock';
 import { ComponentPreview } from './app/_components/ComponentPreview';
 import { ComponentSource } from './app/_components/ComponentSource';
 import { InlineCode } from './app/_components/InlineCode';
+import { InstallBlock } from './app/_components/InstallBlock';
 import * as Nexus from './app/_components/nexus';
 import { PropsTable } from './app/_components/PropsTable';
 
@@ -141,6 +142,7 @@ export function useMDXComponents(components: MDXComponents): MDXComponents {
     ),
     ComponentPreview,
     ComponentSource,
+    InstallBlock,
     PropsTable,
     // live @nexus_ds/react components, usable in MDX without an import
     ...Nexus,
