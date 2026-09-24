@@ -25,14 +25,11 @@ A skill to search for specific web development use cases and retrieve their corr
 
 Apply this guidance through Nexus components, semantic tokens, and `nx:` utilities.
 
-Nexus declares a browser support policy in `../../../AGENTS.md`: it does no
-feature detection and no OS, browser, preference, or input-device queries, and a
-feature that is not Baseline widely available across major browsers is replaced
-by a simpler approach. Read
-`../../../.claude/rules/no-environment-branching.md` before applying any guide's
-browser-support or fallback recommendation. That rule overrides this skill's
-generic fallback advice: choose a simpler primitive instead of adding banned
-environment branches. Do not reintroduce a browser-floor registry.
+Nexus's browser support policy is
+`../../../.claude/rules/no-environment-branching.md`. Read it before applying
+any guide's Baseline, browser-support, or fallback recommendation. That rule
+overrides this skill's generic fallback advice: choose a simpler primitive
+instead of adding banned environment branches. Do not reintroduce a browser-floor registry.
 
 For a substantial UI change — one that introduces a layout, interaction, or
 browser-platform decision — record a compact guidance note in the plan or PR:
@@ -44,8 +41,9 @@ browser-platform decision — record a compact guidance note in the plan or PR:
 For a text-only edit or removal that introduces no layout, interaction, or
 platform decision, an existing relevant guide can be reused; a new search is
 unnecessary. Do not describe reading this skill alone as consulting a guide.
-In Nexus, this substantial-UI-change threshold narrows the frontmatter's
-"MANDATORY: Execute FIRST for all HTML/CSS and clientside JS tasks" trigger.
+In Nexus, this substantial-UI-change threshold narrows both the frontmatter's
+"MANDATORY: Execute FIRST for all HTML/CSS and clientside JS tasks" trigger and
+the "When to use" list below.
 
 If the CLI cannot run, record the actual failure and read the relevant Markdown
 under `guides/` using file search. The bundled collection does not require npm or

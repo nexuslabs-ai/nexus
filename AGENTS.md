@@ -19,9 +19,8 @@ does not index:
 **Browser Support:** Nexus does no feature detection and no OS, browser,
 preference, or input-device queries.
 [`no-environment-branching.md`](.claude/rules/no-environment-branching.md) is
-authoritative over any guide's fallback advice; `prefers-color-scheme` is the
-one exception. A feature that is not Baseline widely available across major
-browsers is not used; pick a simpler approach instead.
+authoritative over any guide's fallback advice and sets which features Nexus may
+use; `prefers-color-scheme` is the one exception.
 
 **Modern Web Guidance:** for a substantial UI change — one that introduces a
 layout, interaction, or browser-platform decision — search and retrieve

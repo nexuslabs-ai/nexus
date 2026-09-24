@@ -13,6 +13,7 @@ Every environment branch is a code path nobody on the team is looking at and CI 
 - No `pointer` / `any-pointer` or `hover` / `any-hover` media queries written by hand, such as `[@media(hover:hover)]:`. The plain `hover:` variant is fine.
 - No user-agent sniffing.
 - No browser-floor policy registry.
+- No feature that is not Baseline widely available across major browsers. Pick a simpler approach instead.
 
 A component has **one appearance per variant × size × theme**. That is the whole state space, and it is the state space stories have to cover.
 
