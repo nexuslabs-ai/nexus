@@ -281,9 +281,9 @@ function attributeSettings(checker, owner, fn, target, element) {
 }
 
 /**
- * The defaults `fn` gives `target`'s props through JSX. Every `<X>` must
- * resolve a prop to the same value — one that forwards or omits it resolves to
- * `inherited`, `X`'s own default.
+ * `X`'s own defaults, `inherited`, as `fn` leaves them after passing its JSX
+ * attributes. Every `<X>` must resolve a prop to the same value — one that
+ * forwards or omits it keeps `X`'s own default.
  * @param {ts.TypeChecker} checker
  * @param {string} owner
  * @param {ts.SignatureDeclaration} fn
@@ -309,16 +309,14 @@ function attributeDefaults(checker, owner, fn, target, inherited) {
   }
 
   ts.forEachChild(fn, visit);
+  if (settingsPerElement.length === 0) return inherited;
 
   /** @type {Map<string, LazyDefault>} */
   const defaults = new Map();
-  const keys = new Set(
-    settingsPerElement.flatMap((settings) => [...settings.keys()])
-  );
 
-  for (const key of keys) {
+  for (const [key, own] of inherited) {
     const resolvers = settingsPerElement.map(
-      (settings) => settings.get(key) ?? inherited.get(key) ?? (() => null)
+      (settings) => settings.get(key) ?? own
     );
     defaults.set(key, () => {
       const [first = null, ...rest] = resolvers.map((resolve) => resolve());
@@ -377,9 +375,9 @@ function functionDefaults(checker, owner, fn) {
     }
 
     const inherited = componentDefaults(checker, target);
-    const attributes = attributeDefaults(checker, owner, fn, target, inherited);
-    for (const [key, value] of inherited) {
-      if (!defaults.has(key)) defaults.set(key, attributes.get(key) ?? value);
+    const passed = attributeDefaults(checker, owner, fn, target, inherited);
+    for (const [key, value] of passed) {
+      if (!defaults.has(key)) defaults.set(key, value);
     }
   }
 
