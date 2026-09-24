@@ -51,7 +51,6 @@
     "prettier": "^3.7.4",
     "react-docgen-typescript": "^2.4.0",
     "tailwindcss": "^4.1.18",
-    "ts-morph": "^27.0.2",
     "typescript": "^5.9.3"
   }
 }

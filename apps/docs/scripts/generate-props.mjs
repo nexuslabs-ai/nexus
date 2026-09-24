@@ -22,13 +22,16 @@ import { reactEntryPoints } from './react-entry-points.mjs';
 import {
   collectSourceFiles,
   componentSlugs,
-  componentsRoot,
-  isUnder,
-  reactSrc,
-  toRepoPath,
   writeJson,
 } from './react-sources.mjs';
-import { docsRoot, reactRoot } from './roots.mjs';
+import {
+  componentsRoot,
+  docsRoot,
+  isUnder,
+  reactRoot,
+  reactSrc,
+  toRepoPath,
+} from './roots.mjs';
 
 const reactTsconfig = path.join(reactRoot, 'tsconfig.json');
 
