@@ -20,7 +20,10 @@ export async function InstallBlock({ slug }: { slug: string }) {
       )}
       {styles.length > 0 && (
         <CodeSample lang="css">
-          {styles.map((file) => `@import '../${file}';`).join('\n')}
+          {[
+            '/* app/globals.css */',
+            ...styles.map((file) => `@import '../${file}';`),
+          ].join('\n')}
         </CodeSample>
       )}
     </>
