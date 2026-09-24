@@ -18,6 +18,13 @@ import {
   publicExports,
   toSlugFolder,
 } from './props-contract.mjs';
+import {
+  componentDefaults,
+  toComponentEntry,
+  toPropsFile,
+  toPropsIndex,
+  toProplessEntry,
+} from './props-entries.mjs';
 import { reactEntryPoints } from './react-entry-points.mjs';
 import {
   collectSourceFiles,
@@ -150,40 +157,6 @@ function assertPropsContract(checker, program, components, docFor) {
   );
 }
 
-function toPropEntry(prop, expansions) {
-  return {
-    name: prop.name,
-    type: expansions.get(prop.type.name) ?? prop.type.name,
-    required: prop.required,
-    defaultValue: prop.defaultValue?.value ?? null,
-    description: prop.description,
-    // Unlike `description`, docgen leaves tag values with CRLF line endings.
-    example: prop.tags?.example?.replace(/\r\n/g, '\n') ?? null,
-  };
-}
-
-function toComponentEntry(name, sourcePath, doc, expansions) {
-  return {
-    name,
-    description: doc.description,
-    sourcePath,
-    props: Object.values(doc.props)
-      .map((prop) => toPropEntry(prop, expansions))
-      .sort((a, b) => a.name.localeCompare(b.name, 'en')),
-  };
-}
-
-function toProplessEntry(checker, name, sourcePath, symbol) {
-  return {
-    name,
-    description: ts
-      .displayPartsToString(symbol.getDocumentationComment(checker))
-      .replace(/\r\n/g, '\n'),
-    sourcePath,
-    props: [],
-  };
-}
-
 // A component documented on its `{Name}Props` interface takes that description.
 function adoptPropsTypeDescriptions(components, typeExportDescriptions) {
   for (const component of components) {
@@ -299,7 +272,13 @@ for (const [name, symbol] of components) {
   const sourcePath = toRepoPath(fileName);
   const doc = docFor(name, symbol);
   const entry = doc
-    ? toComponentEntry(name, sourcePath, doc, expansions)
+    ? toComponentEntry(
+        name,
+        sourcePath,
+        doc,
+        expansions,
+        componentDefaults(checker, symbol)
+      )
     : toProplessEntry(checker, name, sourcePath, symbol);
 
   bySlug.get(toSlugFolder(path.relative(componentsRoot, fileName))).push(entry);
@@ -311,25 +290,24 @@ assertResolvableTypes([...bySlug.values()].flat(), localAliases);
 mkdirSync(outputDir, { recursive: true });
 clearPreviousOutput();
 
-const index = {};
-let propCount = 0;
-
-for (const [slug, entries] of bySlug) {
-  if (entries.length === 0) continue;
-
-  entries.sort(byNameThenSource);
-  adoptPropsTypeDescriptions(entries, typeExportDescriptions);
-
-  propCount += entries.reduce((total, entry) => total + entry.props.length, 0);
-  index[slug] = entries.map((entry) => entry.name);
-
-  writeJson(path.join(outputDir, `${slug}.json`), {
-    slug,
-    components: entries,
+const files = [...bySlug]
+  .filter(([, entries]) => entries.length > 0)
+  .map(([slug, entries]) => {
+    entries.sort(byNameThenSource);
+    adoptPropsTypeDescriptions(entries, typeExportDescriptions);
+    return toPropsFile(slug, entries);
   });
+
+for (const file of files) {
+  writeJson(path.join(outputDir, `${file.slug}.json`), file);
 }
 
+const index = toPropsIndex(files);
 writeJson(path.join(outputDir, 'index.json'), index);
+
+const propCount = files
+  .flatMap((file) => file.components)
+  .reduce((total, component) => total + component.props.length, 0);
 
 console.log(
   `props: ${Object.keys(index).length} entries, ${components.size} components, ${propCount} props -> ${toRepoPath(outputDir)}`
