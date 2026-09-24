@@ -242,12 +242,28 @@ interface SharedEdgeCase {
   name: string;
   variant: 'outline' | 'outline-primary';
   spacing: number;
-  leading: { invalid?: boolean };
+  leading: { invalid?: boolean; pressed?: boolean };
   trailing: { invalid?: boolean; pressed?: boolean; disabled?: boolean };
   owner: 'own' | 'next';
 }
 
 const SHARED_EDGE_CASES: readonly SharedEdgeCase[] = [
+  {
+    name: 'rest',
+    variant: 'outline-primary',
+    spacing: 0,
+    leading: {},
+    trailing: {},
+    owner: 'own',
+  },
+  {
+    name: 'leading selected',
+    variant: 'outline-primary',
+    spacing: 0,
+    leading: { pressed: true },
+    trailing: {},
+    owner: 'own',
+  },
   {
     name: 'selected',
     variant: 'outline-primary',
@@ -355,13 +371,22 @@ const SHARED_EDGE_CASES: readonly SharedEdgeCase[] = [
 ];
 
 // Synthetic hover events do not set CSS `:hover`, so the hover rule is
-// asserted by class rather than by computed colour.
+// asserted by class, and its state guards by matching the rule's selector
+// with `:hover` dropped.
 const HOVER_SHARED_EDGE = {
   horizontal:
-    'nx:[&:not([aria-invalid=true]:not(:disabled)):has(+[data-variant=outline-primary][data-state=off]:not([aria-invalid=true]):not(:disabled):hover)]:border-e-border-primary',
+    'nx:[&:not([aria-invalid=true]:not(:disabled)):not([data-variant=outline-primary][data-state=on]:not(:disabled)):has(+[data-variant=outline-primary][data-state=off]:not([aria-invalid=true]):not(:disabled):hover)]:border-e-border-primary',
   vertical:
-    'nx:[&:not([aria-invalid=true]:not(:disabled)):has(+[data-variant=outline-primary][data-state=off]:not([aria-invalid=true]):not(:disabled):hover)]:border-b-border-primary',
+    'nx:[&:not([aria-invalid=true]:not(:disabled)):not([data-variant=outline-primary][data-state=on]:not(:disabled)):has(+[data-variant=outline-primary][data-state=off]:not([aria-invalid=true]):not(:disabled):hover)]:border-b-border-primary',
 } as const;
+
+const matchesHoverRule = (item: HTMLElement, hoverClass: string) =>
+  item.matches(
+    hoverClass
+      .slice('nx:['.length, hoverClass.lastIndexOf(']:'))
+      .replace('&', '')
+      .replace(':hover', '')
+  );
 
 // Pins the shared-edge colour rules on `joinedItem` in toggle-group.tsx.
 export const JoinedSharedEdge: Story = {
@@ -378,7 +403,9 @@ export const JoinedSharedEdge: Story = {
               spacing={edgeCase.spacing}
               dir={layout.dir}
               orientation={layout.orientation}
-              defaultValue={edgeCase.trailing.pressed ? ['trailing'] : []}
+              defaultValue={(['leading', 'trailing'] as const).filter(
+                (position) => edgeCase[position].pressed
+              )}
               aria-label={label}
             >
               <ToggleGroupItem
@@ -424,6 +451,15 @@ export const JoinedSharedEdge: Story = {
       await expect(item(`${layout.name} spaced`, 'leading')).not.toHaveClass(
         hoverEdge
       );
+      await expect(
+        matchesHoverRule(item(`${layout.name} rest`, 'leading'), hoverEdge)
+      ).toBe(true);
+      await expect(
+        matchesHoverRule(
+          item(`${layout.name} leading selected`, 'leading'),
+          hoverEdge
+        )
+      ).toBe(false);
       for (const edgeCase of SHARED_EDGE_CASES) {
         const label = `${layout.name} ${edgeCase.name}`;
         const leading = item(label, 'leading');
@@ -433,8 +469,9 @@ export const JoinedSharedEdge: Story = {
           await expect(end(leading), label).toBe(end(trailing));
           continue;
         }
-        await expect(start(leading), label).not.toBe(selected);
         await expect(end(leading), label).toBe(start(leading));
+        if (edgeCase.leading.pressed) continue;
+        await expect(start(leading), label).not.toBe(selected);
       }
     }
   },

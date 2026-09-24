@@ -97,13 +97,14 @@ function ToggleGroup({
 // A bordered item after another bordered item drops its leading border, so the
 // pair's shared edge is the first item's trailing border. That edge takes the
 // next item's hover / selected / invalid colour unless the first item is
-// itself invalid; a selected invalid next item wins even then. Each rule
-// matches a distinct next-item state, so no two rules compete.
+// itself invalid; a selected invalid next item wins even then, and hover never
+// replaces a selected first item's colour. Each rule matches a distinct
+// next-item state, so no two rules compete.
 const joinedItem = {
   horizontal: [
     'nx:first:rounded-s-md nx:last:rounded-e-md',
     'nx:[[data-slot=toggle-group-item]:not([data-variant=default])+&]:border-s-0',
-    'nx:[&:not([aria-invalid=true]:not(:disabled)):has(+[data-variant=outline-primary][data-state=off]:not([aria-invalid=true]):not(:disabled):hover)]:border-e-border-primary',
+    'nx:[&:not([aria-invalid=true]:not(:disabled)):not([data-variant=outline-primary][data-state=on]:not(:disabled)):has(+[data-variant=outline-primary][data-state=off]:not([aria-invalid=true]):not(:disabled):hover)]:border-e-border-primary',
     'nx:[&:not([aria-invalid=true]:not(:disabled)):has(+[data-variant=outline-primary][data-state=on]:not([aria-invalid=true]):not(:disabled))]:border-e-border-primary-active',
     'nx:[&:not([aria-invalid=true]:not(:disabled)):has(+:is([data-variant=outline],[data-variant=outline-primary][data-state=off])[aria-invalid=true]:not(:disabled))]:border-e-border-error',
     'nx:[&:has(+[data-variant=outline-primary][data-state=on][aria-invalid=true]:not(:disabled))]:border-e-border-error-active',
@@ -111,7 +112,7 @@ const joinedItem = {
   vertical: [
     'nx:first:rounded-t-md nx:last:rounded-b-md',
     'nx:[[data-slot=toggle-group-item]:not([data-variant=default])+&]:border-t-0',
-    'nx:[&:not([aria-invalid=true]:not(:disabled)):has(+[data-variant=outline-primary][data-state=off]:not([aria-invalid=true]):not(:disabled):hover)]:border-b-border-primary',
+    'nx:[&:not([aria-invalid=true]:not(:disabled)):not([data-variant=outline-primary][data-state=on]:not(:disabled)):has(+[data-variant=outline-primary][data-state=off]:not([aria-invalid=true]):not(:disabled):hover)]:border-b-border-primary',
     'nx:[&:not([aria-invalid=true]:not(:disabled)):has(+[data-variant=outline-primary][data-state=on]:not([aria-invalid=true]):not(:disabled))]:border-b-border-primary-active',
     'nx:[&:not([aria-invalid=true]:not(:disabled)):has(+:is([data-variant=outline],[data-variant=outline-primary][data-state=off])[aria-invalid=true]:not(:disabled))]:border-b-border-error',
     'nx:[&:has(+[data-variant=outline-primary][data-state=on][aria-invalid=true]:not(:disabled))]:border-b-border-error-active',
