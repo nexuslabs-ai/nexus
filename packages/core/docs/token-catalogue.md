@@ -72,8 +72,11 @@ or the family for a token in a flat file (`radius`, `z-index`, …).
 ## Values
 
 A variant's `declarations` are what the generated `@nexus_ds/tailwind` CSS
-declares. A scalar token or a shadow style has one declaration, its own custom
-property. A typography style has the declarations of its `@utility` body. The
+declares. A scalar token or a shadow style has one custom property
+declaration: its own name, or the theme property for a token declared only
+under `@theme` (`--z-index-modal: 50`, `--breakpoint-lg: 64rem`,
+`--shadow-sm: …`). A typography style has the declarations of its `@utility`
+body. The
 catalogue formats values and derives utility names with the same modules the
 generator uses (`src/token-source/`), so hex colours appear as the pinned
 OKLCH the package emits. `authoredValue` keeps the value exactly as authored, and `references`

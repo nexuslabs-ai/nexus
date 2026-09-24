@@ -297,12 +297,11 @@ function primitiveEntry(lookup: ReferenceLookup) {
   };
 }
 
-/** Spacing, z-index, and breakpoint tokens: authored values with no references. */
-function semanticEntry({ family, leaf }: AuthoredLeaf): LeafEntry {
+function spacingEntry({ leaf }: AuthoredLeaf): LeafEntry {
   const key = leaf.path.join('-');
   const name: CatalogueTokenName = `--nx-${key}`;
   const alias =
-    family === 'spacing' && spacingTokenKind(leaf.path) === 'role'
+    spacingTokenKind(leaf.path) === 'role'
       ? utility(spacingRoleUtility(leaf.path).name)
       : cssVariable(`--${key}`);
   return {
@@ -313,6 +312,19 @@ function semanticEntry({ family, leaf }: AuthoredLeaf): LeafEntry {
         property: name,
         value: formatTokenValue(leaf.value, leaf.type, leaf.path),
       },
+    ],
+  };
+}
+
+/** Z-index layers and breakpoints, declared only as their `@theme` property. */
+function themeOnlyEntry({ leaf }: AuthoredLeaf): LeafEntry {
+  const key = leaf.path.join('-');
+  const property = `--${key}`;
+  return {
+    name: `--nx-${key}`,
+    aliases: [cssVariable(property)],
+    declarations: [
+      { property, value: formatTokenValue(leaf.value, leaf.type, leaf.path) },
     ],
   };
 }
@@ -331,13 +343,13 @@ function typographyStyleEntry(lookup: ReferenceLookup) {
 function shadowStyleEntry(lookup: ReferenceLookup) {
   return ({ leaf }: AuthoredLeaf): LeafEntry => {
     const key = pathToCssVarPrefixed(leaf.path, 'shadow');
-    const name: CatalogueTokenName = `--nx-${key}`;
+    const property = `--${key}`;
     return {
-      name,
-      aliases: [cssVariable(`--${key}`)],
+      name: `--nx-${key}`,
+      aliases: [cssVariable(property)],
       declarations: [
         {
-          property: name,
+          property,
           value: formatShadowStyle(leaf.path, leaf.value, lookup),
         },
       ],
@@ -417,15 +429,15 @@ function runtimeColorTokens(): CatalogueToken[] {
 export function createTokenCatalogue(): readonly CatalogueToken[] {
   const primitives = PRIMITIVE_FAMILIES.flatMap(primitiveLeaves);
   const lookup = primitiveLookup(primitives);
-  const semantic = [
-    ...spacingLeaves(),
+  const themeOnly = [
     ...fileLeaves('z-index', Z_INDEX_FILE, SINGLE_SOURCE),
     ...fileLeaves('breakpoint', BREAKPOINTS_FILE, SINGLE_SOURCE),
   ];
   return [
     ...authoredTokens(primitives, lookup, primitiveEntry(lookup)),
     ...runtimeColorTokens(),
-    ...authoredTokens(semantic, lookup, semanticEntry),
+    ...authoredTokens(spacingLeaves(), lookup, spacingEntry),
+    ...authoredTokens(themeOnly, lookup, themeOnlyEntry),
     ...authoredTokens(
       styleLeaves('typography', TYPOGRAPHY_STYLES_FILE),
       lookup,

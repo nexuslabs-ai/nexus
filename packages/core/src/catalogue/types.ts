@@ -23,7 +23,9 @@ export type CatalogueFamily =
 
 /**
  * Canonical identity: an identifier in the `--nx-*` custom property scheme.
- * Scalar tokens declare it in the generated CSS; a typography style does not.
+ * Most tokens declare it in the generated CSS. Typography and shadow styles,
+ * z-index layers, and breakpoints do not; they declare a theme property or a
+ * utility instead.
  */
 export type CatalogueTokenName = `--nx-${string}`;
 
@@ -79,8 +81,10 @@ export interface CatalogueVariant {
   readonly appearance: DeepReadonly<NexusAppearanceState> | null;
   readonly authoredValue: TokenValue | null;
   /**
-   * What the generated CSS declares: the custom property for a scalar or a
-   * shadow style, or the `@utility` body for a typography style.
+   * What the generated CSS declares: one custom property for a scalar or a
+   * shadow style (`--nx-spacing-4`, or `--z-index-modal` and `--shadow-sm` for
+   * a token declared only under `@theme`), or the `@utility` body for a
+   * typography style.
    */
   readonly declarations: readonly CatalogueDeclaration[];
   readonly references: readonly CatalogueReference[];
