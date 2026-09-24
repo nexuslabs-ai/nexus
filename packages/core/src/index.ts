@@ -16,7 +16,7 @@ export type {
   TokenMap,
 } from './lib/derive-theme';
 export { deriveTheme, themeToCss } from './lib/derive-theme';
-export type { NexusSurfaceTone } from './lib/palette';
+export type { Mode, NexusSurfaceTone, Tier } from './lib/palette';
 export { PALETTE_KEYS, TIER_THRESHOLDS } from './lib/palette';
 export { isColor } from './lib/perceptual-ramp';
 export type { SurfaceToken } from './lib/surface-ladder';
