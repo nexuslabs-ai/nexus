@@ -5,9 +5,9 @@ import 'server-only';
 
 const DEPENDENCIES_DIR = path.join(process.cwd(), 'generated', 'dependencies');
 
-const LIST_NAMES = ['install', 'copy', 'files'] as const;
+type Package = { name: string; range: string };
 
-type Dependencies = Record<(typeof LIST_NAMES)[number], string[]>;
+type Dependencies = { install: Package[]; copy: string[]; files: string[] };
 
 async function listDependencyFiles() {
   try {
@@ -21,24 +21,42 @@ async function listDependencyFiles() {
   }
 }
 
+function isRecord(value: unknown): value is Partial<Record<string, unknown>> {
+  return typeof value === 'object' && value !== null;
+}
+
 function isStringList(value: unknown): value is string[] {
   return (
     Array.isArray(value) && value.every((item) => typeof item === 'string')
   );
 }
 
+function isPackage(value: unknown): value is Package {
+  return (
+    isRecord(value) &&
+    typeof value.name === 'string' &&
+    typeof value.range === 'string'
+  );
+}
+
 function isDependencies(value: unknown): value is Dependencies {
-  if (typeof value !== 'object' || value === null) return false;
-  const lists: Partial<Record<string, unknown>> = value;
-  return LIST_NAMES.every((name) => isStringList(lists[name]));
+  return (
+    isRecord(value) &&
+    Array.isArray(value.install) &&
+    value.install.every(isPackage) &&
+    isStringList(value.copy) &&
+    isStringList(value.files)
+  );
 }
 
 export async function loadDependencies(slug: string): Promise<Dependencies> {
   const fileNames = await listDependencyFiles();
   const fileName = `${slug}.json`;
 
-  if (!fileNames.includes(fileName)) {
-    const known = fileNames.map((name) => path.basename(name, '.json'));
+  if (slug.startsWith('_') || !fileNames.includes(fileName)) {
+    const known = fileNames
+      .map((name) => path.basename(name, '.json'))
+      .filter((name) => !name.startsWith('_'));
     throw new Error(
       `InstallBlock: unknown slug "${slug}". Known slugs: ${known.join(', ')}.`
     );
@@ -49,7 +67,7 @@ export async function loadDependencies(slug: string): Promise<Dependencies> {
 
   if (!isDependencies(parsed)) {
     throw new Error(
-      `InstallBlock: ${filePath} needs string arrays ${LIST_NAMES.join(', ')} — rerun \`pnpm --filter @nexus_ds/docs generate:dependencies\`.`
+      `InstallBlock: ${filePath} needs an install list of { name, range } and string arrays copy, files — rerun \`pnpm --filter @nexus_ds/docs generate:dependencies\`.`
     );
   }
   return parsed;
