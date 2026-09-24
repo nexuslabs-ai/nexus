@@ -59,52 +59,68 @@ function hasStringIndex(checker, propsType) {
   );
 }
 
-function isCvaCall(node) {
+// Matches `cva` however it is imported or re-bound: by the declaration its call resolves to.
+function isCvaCall(checker, node) {
+  if (!ts.isCallExpression(node)) return false;
+
+  const declaration = checker.getResolvedSignature(node)?.getDeclaration();
+  const variable = declaration?.parent;
   return (
-    ts.isCallExpression(node) &&
-    ts.isIdentifier(node.expression) &&
-    node.expression.text === 'cva'
+    variable !== undefined &&
+    ts.isVariableDeclaration(variable) &&
+    ts.isIdentifier(variable.name) &&
+    variable.name.text === 'cva' &&
+    variable.getSourceFile().fileName.includes('/class-variance-authority/')
   );
 }
 
-// A `cva` variant key is declared by a property of `cva(base, { variants: { … } })`.
-function isVariantKey(member) {
-  const declaration = member.declarations?.[0];
-  if (!declaration) return false;
-  if (
-    !ts.isPropertyAssignment(declaration) &&
-    !ts.isShorthandPropertyAssignment(declaration)
-  ) {
-    return false;
-  }
+function variantKeyDeclarations(checker, node) {
+  if (!isCvaCall(checker, node)) return [];
 
-  const variantsProperty = declaration.parent.parent;
-  if (!variantsProperty || !ts.isPropertyAssignment(variantsProperty)) {
-    return false;
-  }
-  if (variantsProperty.name.getText() !== 'variants') return false;
+  const config = node.arguments[1];
+  if (!config) return [];
 
-  const config = variantsProperty.parent;
-  return isCvaCall(config.parent) && config.parent.arguments[1] === config;
+  const variants = checker.getTypeAtLocation(config).getProperty('variants');
+  if (!variants) return [];
+
+  return checker
+    .getTypeOfSymbol(variants)
+    .getProperties()
+    .flatMap((key) => key.declarations ?? []);
 }
 
-function variantKeyProblem(checker, member, location, documentedProps) {
+// The declarations of every key in a `cva()` config's `variants`, however the config is written.
+export function cvaVariantKeys(checker, sourceFiles) {
+  const keys = new Set();
+
+  function visit(node) {
+    for (const declaration of variantKeyDeclarations(checker, node)) {
+      keys.add(declaration);
+    }
+    ts.forEachChild(node, visit);
+  }
+
+  for (const sourceFile of sourceFiles) visit(sourceFile);
+  return keys;
+}
+
+function variantKeyProblem(member, documentedProps) {
   const documented = documentedProps[member.name];
   if (!documented) return 'missing from the docgen output';
 
-  if (documented.type.name.split(' | ').includes('string')) {
-    return `widened to ${documented.type.name} in the docgen output`;
-  }
-
-  const type = checker.getTypeOfSymbolAtLocation(member, location);
-  const isWidened = branches(type).some(
-    (branch) => (branch.flags & ts.TypeFlags.String) !== 0
-  );
-  return isWidened ? `widened to ${checker.typeToString(type)}` : null;
+  return documented.type.name.split(' | ').includes('string')
+    ? `widened to ${documented.type.name} in the docgen output`
+    : null;
 }
 
 // Checks each props type the checker resolves against the docgen output for it.
-export function propsContractProblems(checker, name, symbol, documentedProps) {
+export function propsContractProblems(
+  checker,
+  variantKeys,
+  name,
+  symbol,
+  documentedProps
+) {
   const declaration = symbol.declarations[0];
   const type = checker.getTypeOfSymbolAtLocation(symbol, declaration);
 
@@ -121,14 +137,9 @@ export function propsContractProblems(checker, name, symbol, documentedProps) {
 
       return checker
         .getPropertiesOfType(propsType)
-        .filter(isVariantKey)
+        .filter((member) => variantKeys.has(member.declarations?.[0]))
         .flatMap((member) => {
-          const problem = variantKeyProblem(
-            checker,
-            member,
-            declaration,
-            documentedProps
-          );
+          const problem = variantKeyProblem(member, documentedProps);
           return problem ? [`${name}.${member.name}: ${problem}`] : [];
         });
     });

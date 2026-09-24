@@ -12,6 +12,7 @@ import ts from 'typescript';
 
 import {
   assertWorkspaceTypes,
+  cvaVariantKeys,
   exportName,
   isComponentSource,
   isOwnProp,
@@ -126,10 +127,18 @@ function assertResolvableTypes(entries, localAliases) {
   );
 }
 
-function assertPropsContract(checker, components, docFor) {
+function assertPropsContract(checker, program, components, docFor) {
+  const variantKeys = cvaVariantKeys(
+    checker,
+    program
+      .getSourceFiles()
+      .filter((sourceFile) => isUnder(sourceFile.fileName, reactSrc))
+  );
+
   const offenders = [...components].flatMap(([name, symbol]) =>
     propsContractProblems(
       checker,
+      variantKeys,
       name,
       symbol,
       docFor(name, symbol)?.props ?? {}
@@ -309,7 +318,7 @@ for (const [name, symbol] of components) {
   bySlug.get(toSlugFolder(path.relative(componentsRoot, fileName))).push(entry);
 }
 
-assertPropsContract(checker, components, docFor);
+assertPropsContract(checker, program, components, docFor);
 assertResolvableTypes([...bySlug.values()].flat(), localAliases);
 
 mkdirSync(outputDir, { recursive: true });
