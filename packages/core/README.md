@@ -142,7 +142,7 @@ at build time.
 ### Generate CSS
 
 ```bash
-pnpm build:tailwind       # Generate @nexus_ds/tailwind package CSS
+pnpm tokens:tailwind      # From the repo root: build core and generate @nexus_ds/tailwind CSS
 ```
 
 ### Output Files
@@ -166,4 +166,4 @@ When multi-platform support is needed, tools like Style Dictionary can be added 
 - **Color** is engine-owned: edit the derivation in `src/lib/surface-ladder.ts` / `src/lib/derive-theme.ts` (color primitives live in `tokens/primitives/color.json`).
 - **Non-color** (spacing, radius, shadow, borderwidth, motion, typography): edit the DTCG token files in `tokens/` (`$value`, `$type`, `$description`).
 
-Then run `make tokens` (or `pnpm build:tailwind`) to regenerate CSS; the output is copied into the `@nexus_ds/tailwind` package.
+Then run `make tokens` (or `pnpm tokens:tailwind`) to regenerate CSS; the output is copied into the `@nexus_ds/tailwind` package.

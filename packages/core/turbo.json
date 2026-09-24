@@ -15,6 +15,10 @@
       "dependsOn": ["build"],
       "inputs": ["scripts/**", "tokens/**"],
       "outputs": ["dist/tailwind/**"]
+    },
+    "audit:colorblind": {
+      "dependsOn": ["build"],
+      "cache": false
     }
   }
 }
