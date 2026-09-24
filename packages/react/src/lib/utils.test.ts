@@ -20,7 +20,7 @@ const EMITTED_CSS = EMITTING_ROOTS.flatMap((root) => {
     .map((entry) => fs.readFileSync(path.join(dir, entry), 'utf8'));
 });
 
-/** Every border side Tailwind builds from a `--border-width-*` theme key. */
+/** Every border side and divide axis Tailwind builds from a `--border-width-*` theme key. */
 const BORDER_WIDTH_GROUPS = [
   'border-w',
   'border-w-x',
@@ -33,6 +33,8 @@ const BORDER_WIDTH_GROUPS = [
   'border-w-e',
   'border-w-bs',
   'border-w-be',
+  'divide-x',
+  'divide-y',
 ] as const satisfies readonly (keyof typeof NEXUS_CLASS_GROUPS)[];
 
 /**
