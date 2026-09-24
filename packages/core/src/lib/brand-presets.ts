@@ -1,3 +1,5 @@
+import { formatHex, parse } from 'culori';
+
 import primitiveColors from '../../tokens/primitives/color.json';
 
 import { DEFAULT_BRAND_COLOR } from './appearance-model';
@@ -33,6 +35,9 @@ export const BRAND_COLOR_PRESETS: readonly BrandColorPreset[] = [
 export function findBrandColorPreset(
   color: string
 ): BrandColorPreset | undefined {
-  const normalized = color.trim().toLowerCase();
-  return BRAND_COLOR_PRESETS.find((preset) => preset.color === normalized);
+  const parsed = parse(color.trim());
+  if (!parsed || (parsed.alpha ?? 1) < 1) return undefined;
+
+  const hex = formatHex(parsed);
+  return BRAND_COLOR_PRESETS.find((preset) => preset.color === hex);
 }

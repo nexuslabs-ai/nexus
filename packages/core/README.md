@@ -11,7 +11,7 @@ pnpm add @nexus_ds/core
 ## Primary Exports
 
 - `DEFAULT_NEXUS_APPEARANCE`, `sanitizeNexusAppearance`, `NexusAppearanceState`: the appearance model.
-- `BRAND_COLOR_PRESETS`, `BrandColorPreset`, `findBrandColorPreset`, `DEFAULT_BRAND_COLOR`: brand color choices for appearance editors. Default is `DEFAULT_BRAND_COLOR`; Indigo, Blue, Violet, Rose, Orange, Amber, Green, and Teal use each family's authored 600 hex. Assign a preset's `color` to `brandColor`; `findBrandColorPreset(brandColor)` returns the matching preset, ignoring case and surrounding whitespace, or `undefined` for a custom color.
+- `BRAND_COLOR_PRESETS`, `BrandColorPreset`, `findBrandColorPreset`, `DEFAULT_BRAND_COLOR`: brand color choices for appearance editors. Default is `DEFAULT_BRAND_COLOR`; Indigo, Blue, Violet, Rose, Orange, Amber, Green, and Teal use each family's authored 600 hex. Assign a preset's `color` to `brandColor`; `findBrandColorPreset(brandColor)` returns the preset an opaque saved color matches in any CSS notation the engine parses (`#4F46E5`, `4f46e5`, `rgb(79 70 229)`), ignoring surrounding whitespace, or `undefined` for a custom or unparseable color.
 - `createNexusThemeContract`, `deriveTheme`, `themeToCss`: derive a full token set from appearance state and render it to CSS.
 - `createNexusAppearanceSnapshotFromState`, `createNexusAppearanceBootstrapScript`, `resolveFirstPaint`, `DEFAULT_STORAGE_KEY`: first-paint, no-flash bootstrap.
 
