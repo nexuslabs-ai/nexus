@@ -12,12 +12,24 @@
         "scripts/generate-props.mjs",
         "scripts/props-contract.mjs",
         "scripts/react-entry-points.mjs",
+        "scripts/react-sources.mjs",
         "scripts/roots.mjs",
         "$TURBO_ROOT$/packages/react/src/**",
         "$TURBO_ROOT$/packages/react/package.json",
         "$TURBO_ROOT$/packages/react/tsconfig.json"
       ],
       "outputs": ["generated/props/**"]
+    },
+    "generate:dependencies": {
+      "inputs": [
+        "scripts/generate-dependencies.mjs",
+        "scripts/react-sources.mjs",
+        "scripts/roots.mjs",
+        "$TURBO_ROOT$/packages/react/src/**",
+        "$TURBO_ROOT$/packages/react/package.json",
+        "$TURBO_ROOT$/packages/react/tsconfig.json"
+      ],
+      "outputs": ["generated/dependencies/**"]
     },
     "generate:manifest": {
       "inputs": [
@@ -39,6 +51,7 @@
         "^build",
         "generate:manifest",
         "generate:props",
+        "generate:dependencies",
         "generate:demos"
       ],
       "inputs": ["$TURBO_DEFAULT$", "$TURBO_ROOT$/package.json"],

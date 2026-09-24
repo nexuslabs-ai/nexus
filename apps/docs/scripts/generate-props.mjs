@@ -1,10 +1,4 @@
-import {
-  mkdirSync,
-  readdirSync,
-  readFileSync,
-  rmSync,
-  writeFileSync,
-} from 'node:fs';
+import { mkdirSync, readdirSync, readFileSync, rmSync } from 'node:fs';
 import path from 'node:path';
 
 import docgen from 'react-docgen-typescript';
@@ -14,24 +8,32 @@ import {
   assertWorkspaceTypes,
   cvaVariantKeys,
   exportName,
-  isComponentSource,
   isOwnProp,
   isPortableExpansion,
   isReExport,
   isTypeExport,
-  isUnder,
   opaqueNamespaceNames,
   propsContractProblems,
   publicComponents,
   publicExports,
-  toRepoPath,
   toSlugFolder,
 } from './props-contract.mjs';
 import { reactEntryPoints } from './react-entry-points.mjs';
-import { docsRoot, reactRoot } from './roots.mjs';
+import {
+  collectSourceFiles,
+  componentSlugs,
+  isComponentSource,
+  writeJson,
+} from './react-sources.mjs';
+import {
+  componentsRoot,
+  docsRoot,
+  isUnder,
+  reactRoot,
+  reactSrc,
+  toRepoPath,
+} from './roots.mjs';
 
-const reactSrc = path.join(reactRoot, 'src');
-const componentsRoot = path.join(reactSrc, 'components');
 const reactTsconfig = path.join(reactRoot, 'tsconfig.json');
 
 const outputDir = path.join(docsRoot, 'generated', 'props');
@@ -40,16 +42,6 @@ const reactManifest = JSON.parse(
   readFileSync(path.join(reactRoot, 'package.json'), 'utf8')
 );
 const entryPoints = reactEntryPoints(reactManifest);
-
-function collectSourceFiles(dir) {
-  return readdirSync(dir, { withFileTypes: true })
-    .flatMap((entry) => {
-      const entryPath = path.join(dir, entry.name);
-      if (entry.isDirectory()) return collectSourceFiles(entryPath);
-      return [entryPath];
-    })
-    .filter(isComponentSource);
-}
 
 // Maps each unexported repo-local alias name to its printed body.
 function localAliasExpansions(checker, program, exported) {
@@ -210,10 +202,6 @@ function byNameThenSource(a, b) {
   );
 }
 
-function writeJson(filePath, value) {
-  writeFileSync(filePath, `${JSON.stringify(value, null, 2)}\n`, 'utf8');
-}
-
 // A file this script wrote carries its own slug in its body.
 function wasGeneratedHere(fileName) {
   try {
@@ -233,13 +221,12 @@ function clearPreviousOutput() {
   }
 }
 
-const slugs = readdirSync(componentsRoot, { withFileTypes: true })
-  .filter((entry) => entry.isDirectory())
-  .map((entry) => entry.name)
-  .sort();
+const slugs = componentSlugs();
 
 const sourceFiles = slugs
-  .flatMap((slug) => collectSourceFiles(path.join(componentsRoot, slug)))
+  .flatMap((slug) =>
+    collectSourceFiles(path.join(componentsRoot, slug), isComponentSource)
+  )
   .sort();
 const parsedPaths = new Set(sourceFiles.map(toRepoPath));
 

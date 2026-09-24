@@ -7,6 +7,7 @@
   "scripts": {
     "dev": "concurrently --kill-others-on-fail -n demos,next -c gray,cyan \"pnpm generate:demos:watch\" \"next dev --turbopack\"",
     "generate:props": "node scripts/generate-props.mjs",
+    "generate:dependencies": "node scripts/generate-dependencies.mjs",
     "build": "next build",
     "start": "next start",
     "generate:manifest": "node scripts/generate-page-manifest.mjs",
@@ -15,7 +16,7 @@
     "generate:demos:watch": "node scripts/generate-demo-index.mjs --watch",
     "audit:grammar-pin": "node scripts/audit-grammar-pin.mjs",
     "typecheck": "tsc --noEmit",
-    "clean": "rm -rf .next generated/props"
+    "clean": "rm -rf .next generated"
   },
   "dependencies": {
     "@mdx-js/loader": "^3.1.0",
