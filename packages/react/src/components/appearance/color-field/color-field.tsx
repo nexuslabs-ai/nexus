@@ -1,12 +1,21 @@
 import { useState } from 'react';
 
-import { normalizeHex } from '../../../lib/normalize-hex';
 import { Input } from '../../input';
 
 export interface NexusAppearanceColorFieldProps {
   value: string;
   onChange: (hex: string) => void;
   label: string;
+}
+
+const HEX_RE = /^#[0-9a-fA-F]{6}$/;
+const HEX_BODY_RE = /^[0-9a-fA-F]{6}$/;
+
+function normalizeHex(value: string) {
+  const trimmed = value.trim();
+  if (HEX_RE.test(trimmed)) return trimmed.toLowerCase();
+  if (HEX_BODY_RE.test(trimmed)) return `#${trimmed.toLowerCase()}`;
+  return null;
 }
 
 export function NexusAppearanceColorField({
@@ -44,7 +53,7 @@ export function NexusAppearanceColorField({
         />
         <div
           aria-hidden="true"
-          className="nx:size-full nx:rounded-full nx:border-default nx:border-border-default nx:peer-focus-visible:outline-2 nx:peer-focus-visible:outline-focus-default nx:peer-focus-visible:outline-offset-(--focus-offset)"
+          className="nx:size-full nx:rounded-full nx:border-default nx:border-border-default nx:peer-focus-visible:outline-2 nx:peer-focus-visible:outline-focus-default nx:peer-focus-visible:outline-offset-2"
           style={{
             backgroundColor: normalizedValue ?? 'transparent',
           }}

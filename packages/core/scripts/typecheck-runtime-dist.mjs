@@ -105,10 +105,10 @@ if (preset) {
   const seed: string = preset.color;
   // @ts-expect-error public preset colors are immutable.
   preset.color = '#000000';
+  // @ts-expect-error the preset catalog is immutable.
+  BRAND_COLOR_PRESETS.push(preset);
   void seed;
 }
-// @ts-expect-error the preset catalog is immutable.
-BRAND_COLOR_PRESETS.push({ value: 'custom', label: 'Custom', color: '#123456' });
 
 const palettes: readonly PrimitivePaletteName[] = PRIMITIVE_PALETTE_NAMES;
 const shades: readonly Shade[] = SHADES;

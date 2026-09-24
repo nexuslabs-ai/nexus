@@ -197,6 +197,7 @@ export const KeyboardInteraction: Story = {
     const swatch = picker.nextElementSibling!;
     await expect(getComputedStyle(swatch).outlineStyle).toBe('solid');
     await expect(getComputedStyle(swatch).outlineWidth).toBe('2px');
+    await expect(getComputedStyle(swatch).outlineOffset).toBe('2px');
     await userEvent.tab();
     await expect(
       canvas.getByRole('textbox', { name: 'Brand color hex value' })

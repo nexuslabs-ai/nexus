@@ -83,7 +83,7 @@ function SavedAppearanceExample({ storageKey }: { storageKey: string }) {
 }
 
 function savedColorStory(brandColor: string, expectedLabel: string): Story {
-  const storageKey = `storybook-unit2-brand-${brandColor}`;
+  const storageKey = `storybook-saved-brand-${brandColor}`;
   return {
     beforeEach: () => {
       const previous = localStorage.getItem(storageKey);

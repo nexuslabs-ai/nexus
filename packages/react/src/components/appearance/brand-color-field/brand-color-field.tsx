@@ -1,8 +1,7 @@
 import type { ComponentProps } from 'react';
 
-import { BRAND_COLOR_PRESETS } from '@nexus_ds/core';
+import { BRAND_COLOR_PRESETS, findBrandColorPreset } from '@nexus_ds/core';
 
-import { normalizeHex } from '../../../lib/normalize-hex';
 import { cn } from '../../../lib/utils';
 import {
   Select,
@@ -28,10 +27,7 @@ export function NexusAppearanceBrandColorField({
   className,
   ...props
 }: NexusAppearanceBrandColorFieldProps) {
-  const normalizedValue = normalizeHex(value);
-  const selected = BRAND_COLOR_PRESETS.find(
-    (preset) => preset.color === normalizedValue
-  );
+  const selected = findBrandColorPreset(value);
 
   const selectPreset = (next: string) => {
     const preset = BRAND_COLOR_PRESETS.find((option) => option.value === next);

@@ -109,6 +109,8 @@ function BrandEditor() {
 
 The preset catalog is also exported as `BRAND_COLOR_PRESETS` from
 `@nexus_ds/core`, beside `BASE_TONE_OPTIONS`, for other editor implementations.
+`findBrandColorPreset(brandColor)` returns the preset a saved color matches,
+ignoring case and surrounding whitespace, or `undefined` for a custom color.
 The compact theme control continues to use its existing custom-color field.
 
 Surface tones are near-neutral: Stone adds a faint warm undertone; Zinc, Gray,

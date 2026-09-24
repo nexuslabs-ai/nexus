@@ -1,8 +1,7 @@
 import primitiveColors from '../../tokens/primitives/color.json';
 
+import { DEFAULT_BRAND_COLOR } from './appearance-model';
 import type { PrimitivePaletteName } from './primitive-palette';
-
-export const DEFAULT_BRAND_COLOR = '#0a0a0a';
 
 const BRAND_PRESET_FAMILIES = [
   'indigo',
@@ -30,3 +29,10 @@ export const BRAND_COLOR_PRESETS: readonly BrandColorPreset[] = [
     color: primitiveColors[family]['600'].$value,
   })),
 ];
+
+export function findBrandColorPreset(
+  color: string
+): BrandColorPreset | undefined {
+  const normalized = color.trim().toLowerCase();
+  return BRAND_COLOR_PRESETS.find((preset) => preset.color === normalized);
+}
