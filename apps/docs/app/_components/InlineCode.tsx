@@ -2,7 +2,6 @@ import type * as React from 'react';
 
 import { cn } from '@nexus_ds/react/utils';
 
-/** Inline code in prose — the MDX `code` override and generated prop docs. */
 export function InlineCode({
   className,
   ...props

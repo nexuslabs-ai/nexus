@@ -27,10 +27,6 @@ type DescriptionBlock =
   | { kind: 'paragraph'; lines: string[] }
   | { kind: 'list'; items: string[] };
 
-/**
- * The generated prop docs for one component slug — every component in it with
- * props of its own, or just `component` for one part of a multi-part slug.
- */
 export async function PropsTable({
   slug,
   component,
@@ -142,7 +138,7 @@ function Missing({ label }: { label: string }) {
   );
 }
 
-/** Renders the Markdown subset JSDoc uses: paragraphs, `- ` lists, code, bold, italic. */
+// The Markdown subset JSDoc uses: paragraphs, `- ` lists, code, bold, italic.
 function Description({ text }: { text: string }) {
   return (
     <div className="nx:flex nx:flex-col nx:gap-2">

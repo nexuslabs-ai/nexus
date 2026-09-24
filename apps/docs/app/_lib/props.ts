@@ -33,7 +33,6 @@ const readPropsJson = cache(async (fileName: string): Promise<unknown> => {
   }
 });
 
-/** The generated prop docs for `slug`, narrowed to `component` when given. */
 export async function loadComponentDocs(
   slug: string,
   component?: string
