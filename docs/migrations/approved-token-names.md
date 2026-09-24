@@ -34,7 +34,8 @@ The six `*-foreground` roles remain content colors for filled backgrounds.
 `*-text` also serves matching icons. `foreground` and `muted-foreground` keep
 their general hierarchy meaning. Existing APCA pairings are unchanged; the new
 names are not a universal promise of contrast on every background. `focus-default`
-remains independently derived from primary text and adjusted for its surfaces.
+shares the solved primary text color, with focus surfaces included in the contrast
+constraints.
 
 ## Saved appearance
 
