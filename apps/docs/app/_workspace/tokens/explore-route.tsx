@@ -273,6 +273,8 @@ function CatalogueBrowser({
       ? Math.floor(selectedIndex / PAGE_SIZE) + 1
       : Math.min(search.page ?? 1, pageCount);
   const visible = results.slice((page - 1) * PAGE_SIZE, page * PAGE_SIZE);
+  const firstShown = (page - 1) * PAGE_SIZE + 1;
+  const lastShown = Math.min(page * PAGE_SIZE, matches.length);
   const runtimeCount = index.tokens.filter(isRuntime).length;
   const familyCount = new Set(index.tokens.map((token) => token.family)).size;
   const changePage = (nextPage: number) =>
@@ -315,8 +317,8 @@ function CatalogueBrowser({
           className="nx:typography-label-small nx:text-muted-foreground"
         >
           {matches.length} {matches.length === 1 ? 'token' : 'tokens'}
-          {results.length > PAGE_SIZE
-            ? ` · ${(page - 1) * PAGE_SIZE + 1}–${Math.min(page * PAGE_SIZE, results.length)}`
+          {matches.length > PAGE_SIZE && firstShown <= lastShown
+            ? ` · ${firstShown}–${lastShown}`
             : ''}
         </p>
         <Separator />
