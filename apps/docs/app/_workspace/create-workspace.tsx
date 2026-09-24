@@ -25,7 +25,7 @@ export function CreateWorkspace() {
       />
       <div className="nx:flex nx:flex-col nx:gap-2 nx:pt-4 nx:border-t-default nx:border-border-default">
         <div className="nx:grid nx:grid-cols-2 nx:gap-2">
-          <Button variant="outline" onClick={undo} disabled={!canUndo}>
+          <Button variant="outline" onClick={undo} aria-disabled={!canUndo}>
             Undo
           </Button>
           <Button variant="outline" onClick={reset}>

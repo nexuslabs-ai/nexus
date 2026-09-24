@@ -7,7 +7,6 @@ import {
   CORNER_OPTIONS,
   DENSITY_OPTIONS,
   ELEVATION_OPTIONS,
-  type NexusAppearanceMode,
   type NexusAppearancePrefs,
   type NexusAppearanceState,
   STROKE_OPTIONS,
@@ -23,11 +22,7 @@ import {
 } from '@nexus_ds/react';
 import type { NexusResolvedAppearanceMode } from '@nexus_ds/react/appearance';
 
-const MODE_OPTIONS = [
-  { value: 'system', label: 'Follow device' },
-  { value: 'light', label: 'Light' },
-  { value: 'dark', label: 'Dark' },
-] as const satisfies readonly { value: NexusAppearanceMode; label: string }[];
+import { THEME_MODE_OPTIONS } from '../_lib/appearance-controls';
 
 const CONTRAST_MIN = 0;
 const CONTRAST_MAX = 100;
@@ -95,7 +90,8 @@ function ContrastField({
   value: number;
   onChange: (value: number) => void;
 }) {
-  const id = useId();
+  const labelId = useId();
+  const noteId = useId();
   // Only a pointer drag holds a draft; keyboard steps commit straight to `value`.
   const [draft, setDraft] = useState<number | null>(null);
   const shown = draft ?? value;
@@ -112,7 +108,7 @@ function ContrastField({
   return (
     <div className={FIELD_CLASS}>
       <div className="nx:flex nx:items-center nx:justify-between nx:gap-2">
-        <span id={id} className={LABEL_CLASS}>
+        <span id={labelId} className={LABEL_CLASS}>
           Contrast
         </span>
         <span className="nx:typography-label-default nx:tabular-nums nx:text-muted-foreground">
@@ -120,17 +116,21 @@ function ContrastField({
         </span>
       </div>
       <Slider
-        aria-labelledby={id}
+        aria-labelledby={`${labelId} ${noteId}`}
         min={CONTRAST_MIN}
         max={CONTRAST_MAX}
         step={1}
         value={[shown]}
         onPointerDown={() => setDraft(value)}
         onPointerUp={() => setDraft(null)}
+        onLostPointerCapture={() => setDraft(null)}
         onValueChange={moveDraft}
         onValueCommit={commit}
       />
-      <p className="nx:typography-body-small nx:text-muted-foreground">
+      <p
+        id={noteId}
+        className="nx:typography-body-small nx:text-muted-foreground"
+      >
         Adjusts {mode} mode
       </p>
     </div>
@@ -260,7 +260,7 @@ export function AppearanceControls({
         <SelectField
           label="Mode"
           value={state.mode}
-          options={MODE_OPTIONS}
+          options={THEME_MODE_OPTIONS.mode}
           onChange={(mode) => onChange({ mode })}
         />
         <SelectField
