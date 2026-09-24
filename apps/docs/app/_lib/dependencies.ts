@@ -7,7 +7,12 @@ const DEPENDENCIES_DIR = path.join(process.cwd(), 'generated', 'dependencies');
 
 type Package = { name: string; range: string };
 
-type Dependencies = { install: Package[]; copy: string[]; files: string[] };
+type Dependencies = {
+  install: Package[];
+  copy: string[];
+  files: string[];
+  styles: string[];
+};
 
 async function listDependencyFiles() {
   try {
@@ -45,7 +50,8 @@ function isDependencies(value: unknown): value is Dependencies {
     Array.isArray(value.install) &&
     value.install.every(isPackage) &&
     isStringList(value.copy) &&
-    isStringList(value.files)
+    isStringList(value.files) &&
+    isStringList(value.styles)
   );
 }
 
@@ -67,7 +73,7 @@ export async function loadDependencies(slug: string): Promise<Dependencies> {
 
   if (!isDependencies(parsed)) {
     throw new Error(
-      `InstallBlock: ${filePath} needs an install list of { name, range } and string arrays copy, files — rerun \`pnpm --filter @nexus_ds/docs generate:dependencies\`.`
+      `InstallBlock: ${filePath} needs an install list of { name, range } and string arrays copy, files, styles — rerun \`pnpm --filter @nexus_ds/docs generate:dependencies\`.`
     );
   }
   return parsed;

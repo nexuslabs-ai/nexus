@@ -4,7 +4,7 @@ import { CodeBlock } from './CodeBlock';
 import { CodeSample } from './CodeSample';
 
 export async function InstallBlock({ slug }: { slug: string }) {
-  const { install, copy, files } = await loadDependencies(slug);
+  const { install, copy, files, styles } = await loadDependencies(slug);
   const packages = install.map(({ name, range }) => `${name}@${range}`);
   const toCopy = [...copy, ...files];
 
@@ -17,6 +17,11 @@ export async function InstallBlock({ slug }: { slug: string }) {
         <CodeBlock>
           <code>{toCopy.join('\n')}</code>
         </CodeBlock>
+      )}
+      {styles.length > 0 && (
+        <CodeSample lang="css">
+          {styles.map((file) => `@import '../${file}';`).join('\n')}
+        </CodeSample>
       )}
     </>
   );

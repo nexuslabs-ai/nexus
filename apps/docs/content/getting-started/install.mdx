@@ -82,15 +82,21 @@ styles/nexus/
 └── spacing-utilities.css
 ```
 
-Import the entry point from your app's CSS entry point:
+Import the entry point from your app's CSS entry point, followed by the
+animation utilities some components use for their enter and exit states:
+
+```bash
+npm install tw-animate-css
+```
 
 ```css
 /* app/globals.css */
 @import '../styles/nexus/nexus.css';
+@import 'tw-animate-css';
 ```
 
-That one import is the whole styling surface: the `nx:` utilities, the semantic
-color tokens, and the typography, spacing, radius, and motion scales.
+`nexus.css` is the whole token surface: the `nx:` utilities, the semantic color
+tokens, and the typography, spacing, radius, and motion scales.
 
 This decides how you write Tailwind everywhere in the app, not just inside
 pasted components: once `nexus.css` is your Tailwind entry point, `nx:flex`
@@ -226,7 +232,9 @@ imports first, its own last:
 Every path is relative to `packages/react/src/` in the repo. Keep it as it is
 under your `@/` root, next to the `lib/utils.ts` from step 4, and the relative
 imports between the files — barrels included — resolve without an edit.
-Rerunning an install line or recopying `lib/utils.ts` changes nothing.
+Rerunning an install line or recopying `lib/utils.ts` changes nothing. A
+component with its own stylesheet, such as Progress, also lists the `@import`
+lines to add to `app/globals.css`.
 
 Render it:
 
