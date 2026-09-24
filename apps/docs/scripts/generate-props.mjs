@@ -13,15 +13,14 @@ import ts from 'typescript';
 import {
   assertWorkspaceTypes,
   exportName,
-  hasStringIndexProps,
   isComponentSource,
   isOwnProp,
   isPortableExpansion,
   isReExport,
   isTypeExport,
   isUnder,
-  isWidenedVariant,
   opaqueNamespaceNames,
+  propsContractProblems,
   publicComponents,
   publicExports,
   toRepoPath,
@@ -127,36 +126,25 @@ function assertResolvableTypes(entries, localAliases) {
   );
 }
 
-function assertVariantUnions(documented) {
-  const offenders = documented.flatMap(([name, doc]) =>
-    Object.values(doc.props)
-      .filter(isWidenedVariant)
-      .map((prop) => `  ${name}.${prop.name}: ${prop.type.name}`)
+function assertPropsContract(checker, components, docFor) {
+  const offenders = [...components].flatMap(([name, symbol]) =>
+    propsContractProblems(
+      checker,
+      name,
+      symbol,
+      docFor(name, symbol)?.props ?? {}
+    )
   );
 
   if (offenders.length === 0) return;
 
   throw new Error(
     [
-      'props JSON: a prop with no declaration of its own is typed as a bare string, so its options would be documented as `string`.',
-      'Usually a cva() variants object lost its literal keys; otherwise a mapped or Record<...> key in the props type widened.',
-      ...offenders,
-    ].join('\n')
-  );
-}
-
-function assertNoStringIndexProps(checker, components) {
-  const offenders = [...components]
-    .filter(([, symbol]) => hasStringIndexProps(checker, symbol))
-    .map(([name]) => `  ${name}`);
-
-  if (offenders.length === 0) return;
-
-  throw new Error(
-    [
-      'props JSON: a component accepts arbitrary string-keyed props, so the keys a reader can pass cannot be documented.',
-      'Usually a cva() variants object is typed Record<string, ...>; give it literal keys.',
-      ...offenders,
+      'props JSON: a component props type does not document as a closed set of keys and options.',
+      'string-keyed props: a cva() variants object is typed Record<string, ...>; give it literal keys.',
+      'widened: one cva() variant group lost its literal option names; type its options literally.',
+      'missing: docgen dropped a cva() variant key; check isOwnProp still matches synthesized members.',
+      ...offenders.map((offender) => `  ${offender}`),
     ].join('\n')
   );
 }
@@ -301,14 +289,19 @@ for (const doc of parser.parseWithProgramProvider(sourceFiles, () => program)) {
 // in the order the checker first interned them.
 const components = publicComponents(checker, exported, componentsRoot);
 
+function docFor(name, symbol) {
+  const sourcePath = toRepoPath(
+    symbol.declarations[0].getSourceFile().fileName
+  );
+  return docsByDeclaration.get(`${sourcePath}#${name}`);
+}
+
 const bySlug = new Map(slugs.map((slug) => [slug, []]));
-const documented = [];
 
 for (const [name, symbol] of components) {
   const { fileName } = symbol.declarations[0].getSourceFile();
   const sourcePath = toRepoPath(fileName);
-  const doc = docsByDeclaration.get(`${sourcePath}#${name}`);
-  if (doc) documented.push([name, doc]);
+  const doc = docFor(name, symbol);
   const entry = doc
     ? toComponentEntry(name, sourcePath, doc, expansions)
     : toProplessEntry(checker, name, sourcePath, symbol);
@@ -316,8 +309,7 @@ for (const [name, symbol] of components) {
   bySlug.get(toSlugFolder(path.relative(componentsRoot, fileName))).push(entry);
 }
 
-assertNoStringIndexProps(checker, components);
-assertVariantUnions(documented);
+assertPropsContract(checker, components, docFor);
 assertResolvableTypes([...bySlug.values()].flat(), localAliases);
 
 mkdirSync(outputDir, { recursive: true });

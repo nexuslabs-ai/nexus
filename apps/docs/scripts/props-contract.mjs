@@ -47,11 +47,40 @@ export function isOwnProp(prop) {
   );
 }
 
-export function isWidenedVariant(prop) {
-  return isSynthesized(prop) && /^string( \| null)?$/.test(prop.type.name);
+function branches(type) {
+  return type.isUnion() ? type.types : [type];
 }
 
-export function hasStringIndexProps(checker, symbol) {
+function hasStringIndex(checker, propsType) {
+  return branches(propsType).some((branch) =>
+    checker
+      .getIndexInfosOfType(branch)
+      .some((info) => (info.keyType.flags & ts.TypeFlags.String) !== 0)
+  );
+}
+
+// A `cva` variant key is declared by a property of the config object, not a type member.
+function isVariantKey(member) {
+  const declaration = member.declarations?.[0];
+  if (!declaration) return false;
+  return (
+    ts.isPropertyAssignment(declaration) ||
+    ts.isShorthandPropertyAssignment(declaration)
+  );
+}
+
+function variantKeyProblem(checker, member, location, documentedProps) {
+  if (!documentedProps[member.name]) return 'missing from the docgen output';
+
+  const type = checker.getTypeOfSymbolAtLocation(member, location);
+  const isWidened = branches(type).some(
+    (branch) => (branch.flags & ts.TypeFlags.String) !== 0
+  );
+  return isWidened ? `widened to ${checker.typeToString(type)}` : null;
+}
+
+// Checks each props type the checker resolves against the docgen output for it.
+export function propsContractProblems(checker, name, symbol, documentedProps) {
   const declaration = symbol.declarations[0];
   const type = checker.getTypeOfSymbolAtLocation(symbol, declaration);
 
@@ -60,13 +89,25 @@ export function hasStringIndexProps(checker, symbol) {
     ...checker.getSignaturesOfType(type, ts.SignatureKind.Construct),
   ]
     .flatMap((signature) => signature.parameters.slice(0, 1))
-    .some((props) =>
-      checker
-        .getIndexInfosOfType(
-          checker.getTypeOfSymbolAtLocation(props, declaration)
-        )
-        .some((info) => (info.keyType.flags & ts.TypeFlags.String) !== 0)
-    );
+    .map((props) => checker.getTypeOfSymbolAtLocation(props, declaration))
+    .flatMap((propsType) => {
+      if (hasStringIndex(checker, propsType)) {
+        return [`${name}: accepts arbitrary string-keyed props`];
+      }
+
+      return checker
+        .getPropertiesOfType(propsType)
+        .filter(isVariantKey)
+        .flatMap((member) => {
+          const problem = variantKeyProblem(
+            checker,
+            member,
+            declaration,
+            documentedProps
+          );
+          return problem ? [`${name}.${member.name}: ${problem}`] : [];
+        });
+    });
 }
 
 // Only a type export keeps the alias flag; a value export resolves through it.
