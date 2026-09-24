@@ -22,6 +22,7 @@ import { reactEntryPoints } from './react-entry-points.mjs';
 import {
   collectSourceFiles,
   componentSlugs,
+  isComponentSource,
   writeJson,
 } from './react-sources.mjs';
 import {
@@ -223,7 +224,9 @@ function clearPreviousOutput() {
 const slugs = componentSlugs();
 
 const sourceFiles = slugs
-  .flatMap((slug) => collectSourceFiles(path.join(componentsRoot, slug)))
+  .flatMap((slug) =>
+    collectSourceFiles(path.join(componentsRoot, slug), isComponentSource)
+  )
   .sort();
 const parsedPaths = new Set(sourceFiles.map(toRepoPath));
 

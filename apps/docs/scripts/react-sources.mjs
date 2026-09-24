@@ -23,7 +23,7 @@ export function componentSlugs() {
     .sort();
 }
 
-export function collectSourceFiles(dir, include = isComponentSource) {
+export function collectSourceFiles(dir, include) {
   return readdirSync(dir, { withFileTypes: true })
     .flatMap((entry) => {
       const entryPath = path.join(dir, entry.name);

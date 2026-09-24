@@ -33,12 +33,17 @@ function readManifest(packageDir) {
 }
 
 const reactManifest = readManifest(reactRoot);
-const declaredRanges = new Map(
-  Object.entries({
-    ...reactManifest.peerDependencies,
-    ...reactManifest.dependencies,
-  })
+const runtimeRanges = {
+  ...reactManifest.peerDependencies,
+  ...reactManifest.dependencies,
+};
+const declaredRanges = new Map(Object.entries(runtimeRanges));
+// Stylesheet packages are compiled into the shipped CSS, so they are devDependencies.
+const manifestRanges = new Map(
+  Object.entries({ ...reactManifest.devDependencies, ...runtimeRanges })
 );
+
+const reactStylesheet = path.join(reactSrc, 'index.css');
 
 const reactTsconfig = path.join(reactRoot, 'tsconfig.json');
 const compilerOptions = ts.parseJsonConfigFileContent(
@@ -49,7 +54,7 @@ const compilerOptions = ts.parseJsonConfigFileContent(
 
 // Mirrors how `pnpm publish` rewrites a `workspace:` range.
 function publishedRange(name) {
-  const range = declaredRanges.get(name);
+  const range = manifestRanges.get(name);
   if (!range.startsWith('workspace:')) return range;
 
   const spec = range.slice('workspace:'.length);
@@ -63,6 +68,10 @@ function packageName(specifier) {
   const segments = specifier.split('/');
   if (specifier.startsWith('@')) return segments.slice(0, 2).join('/');
   return segments[0];
+}
+
+function toInstall(name) {
+  return { name, range: publishedRange(name) };
 }
 
 function toSrcPath(filePath) {
@@ -173,9 +182,7 @@ function assertDeclaredPackages(walks) {
 function toEntry({ slug, slugDir, packages, files }) {
   return {
     slug,
-    install: packages
-      .sort()
-      .map((name) => ({ name, range: publishedRange(name) })),
+    install: packages.sort().map(toInstall),
     copy: files
       .filter((file) => !isUnder(file, slugDir))
       .map(toSrcPath)
@@ -191,11 +198,31 @@ function toEntry({ slug, slugDir, packages, files }) {
   };
 }
 
+function stylesheetPackages() {
+  const css = readFileSync(reactStylesheet, 'utf8');
+  const specifiers = [
+    ...css.matchAll(/@(?:import|reference)\s+['"]([^'"]+)['"]/g),
+  ].map(([, specifier]) => specifier);
+  const names = specifiers
+    .filter((specifier) => !specifier.startsWith('.'))
+    .map(packageName);
+
+  const undeclared = names.filter((name) => !manifestRanges.has(name));
+  if (undeclared.length > 0) {
+    throw new Error(
+      `dependencies JSON: ${toRepoPath(reactStylesheet)} imports ${undeclared.join(', ')}, which @nexus_ds/react does not declare in its manifest.`
+    );
+  }
+
+  return [...new Set(names)].sort();
+}
+
 const walks = componentSlugs().map(walkSlug).filter(Boolean);
 
 assertDeclaredPackages(walks);
 
 const entries = walks.map(toEntry);
+const prerequisites = { install: stylesheetPackages().map(toInstall) };
 
 rmSync(outputDir, { recursive: true, force: true });
 mkdirSync(outputDir, { recursive: true });
@@ -203,6 +230,7 @@ mkdirSync(outputDir, { recursive: true });
 for (const entry of entries) {
   writeJson(path.join(outputDir, `${entry.slug}.json`), entry);
 }
+writeJson(path.join(outputDir, '_prerequisites.json'), prerequisites);
 
 console.log(
   `dependencies: ${entries.length} entries -> ${toRepoPath(outputDir)}`
