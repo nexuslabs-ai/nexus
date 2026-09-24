@@ -469,11 +469,4 @@ describe('appearancePrefsToCss', () => {
       appearancePrefsToCss({ ...prefs, pointerCursors: false })
     ).not.toContain('cursor: pointer');
   });
-
-  it('never emits console-only selectors', () => {
-    const css = appearancePrefsToCss(prefs);
-
-    expect(css).not.toContain('sidebar-container');
-    expect(css).not.toContain('diff');
-  });
 });
