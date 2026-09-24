@@ -1,19 +1,12 @@
-import {
-  type NexusSurfaceTone,
-  type ShadeAnchor,
-  SURFACE_TOKENS,
-  type SurfaceToken,
-} from '@nexus_ds/core';
+import type { SurfaceToken } from '@nexus_ds/core';
+import { type ShadeAnchor, SURFACE_TOKENS } from '@nexus_ds/core/catalogue';
 
 type SurfaceLadder = Record<SurfaceToken, ShadeAnchor>;
 
-/** `base` is the page seed, a number is a light shade of the surface tone, and `step` is a raw ladder step. */
-export function formatAnchorLabel(
-  anchor: ShadeAnchor,
-  surfaceTone: NexusSurfaceTone
-): string {
+/** `base` is the page seed, a number is a virtual light shade that is the same for every surface tone, and `step` is a raw ladder step. */
+export function formatAnchorLabel(anchor: ShadeAnchor): string {
   if (anchor === 'base') return 'base';
-  if (typeof anchor === 'number') return `${surfaceTone}.${anchor}`;
+  if (typeof anchor === 'number') return `shade ${anchor}`;
   return `step ${anchor.step}`;
 }
 

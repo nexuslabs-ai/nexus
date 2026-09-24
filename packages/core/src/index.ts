@@ -19,16 +19,12 @@ export { deriveTheme, themeToCss } from './lib/derive-theme';
 export type { Mode, NexusSurfaceTone, Tier } from './lib/palette';
 export { PALETTE_KEYS, TIER_THRESHOLDS } from './lib/palette';
 export { isColor } from './lib/perceptual-ramp';
-export type { ShadeAnchor, SurfaceToken } from './lib/surface-ladder';
-export {
-  DARK_SURFACE_LADDER,
-  LIGHT_SURFACE_LADDER,
-  SURFACE_TOKENS,
-} from './lib/surface-ladder';
+export type { SurfaceToken } from './lib/surface-ladder';
 export type { ThemeContrastCheck } from './lib/theme-contrast';
 export { measureThemeContrast } from './lib/theme-contrast';
 export {
   SEMANTIC_TOKEN_REGISTRY,
+  type SemanticColorName,
   type SemanticTokenMeta,
   type TokenCategory,
 } from './lib/token-registry';

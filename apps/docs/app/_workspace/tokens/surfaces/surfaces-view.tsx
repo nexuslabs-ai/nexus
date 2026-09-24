@@ -2,11 +2,12 @@
 
 import { useId } from 'react';
 
+import type { SemanticColorName } from '@nexus_ds/core';
 import {
   DARK_SURFACE_LADDER,
   LIGHT_SURFACE_LADDER,
   SURFACE_TOKENS,
-} from '@nexus_ds/core';
+} from '@nexus_ds/core/catalogue';
 import {
   Badge,
   Input,
@@ -18,7 +19,6 @@ import {
   TableRow,
   TableRowHeader,
 } from '@nexus_ds/react';
-import { useNexusAppearance } from '@nexus_ds/react/appearance';
 
 import { PageHeading } from '../../page-heading';
 import { useWorkspaceLocation } from '../../use-workspace-location';
@@ -51,7 +51,13 @@ function Swatch({ color }: { color: string | undefined }) {
   );
 }
 
-function TokenBadge({ token, live }: { token: string; live: LiveTheme }) {
+function TokenBadge({
+  token,
+  live,
+}: {
+  token: SemanticColorName;
+  live: LiveTheme;
+}) {
   return (
     <Badge
       variant="secondary"
@@ -94,7 +100,6 @@ export function SurfaceFilters() {
 
 function SurfaceLadderTable({ live }: { live: LiveTheme }) {
   const headingId = useId();
-  const { state } = useNexusAppearance();
   const ladder = LADDERS[live.mode];
   return (
     <section aria-labelledby={headingId} className="nx:space-y-4">
@@ -133,16 +138,10 @@ function SurfaceLadderTable({ live }: { live: LiveTheme }) {
                   </span>
                 </TableCell>
                 <TableCell>
-                  {formatAnchorLabel(
-                    LIGHT_SURFACE_LADDER[token],
-                    state.surfaceTone
-                  )}
+                  {formatAnchorLabel(LIGHT_SURFACE_LADDER[token])}
                 </TableCell>
                 <TableCell>
-                  {formatAnchorLabel(
-                    DARK_SURFACE_LADDER[token],
-                    state.surfaceTone
-                  )}
+                  {formatAnchorLabel(DARK_SURFACE_LADDER[token])}
                 </TableCell>
                 <TableCell className="nx:whitespace-normal nx:min-w-64">
                   {siblings.length === 0 ? (

@@ -1,9 +1,11 @@
+import type { SemanticColorName } from '@nexus_ds/core';
+
 /** Which semantic color tokens a component part reads, and the stories that show them. */
 export interface ComponentTokenEntry {
   component: string;
   part: string;
   states: string;
-  tokens: readonly string[];
+  tokens: readonly SemanticColorName[];
   sourceFile: string;
   stories: readonly string[];
 }
@@ -41,6 +43,8 @@ export const COMPONENT_TOKEN_MATRIX: readonly ComponentTokenEntry[] = [
       'container-active',
       'foreground',
       'border-default',
+      'border-disabled',
+      'secondary-disabled',
       'disabled',
       'disabled-foreground',
     ],
@@ -120,6 +124,8 @@ export const COMPONENT_TOKEN_MATRIX: readonly ComponentTokenEntry[] = [
       'popover-alpha',
       'popover-hover',
       'popover-foreground',
+      'border-default',
+      'error-subtle-foreground',
       'error-background',
       'error-foreground',
       'border-default-alpha',
@@ -131,19 +137,31 @@ export const COMPONENT_TOKEN_MATRIX: readonly ComponentTokenEntry[] = [
   {
     component: 'Select',
     part: 'Trigger and item rows',
-    states: 'Rest, hover, focus, checked item',
+    states: 'Rest, hover, focus, invalid, disabled, checked item',
     tokens: [
       'container',
       'container-hover',
       'control-background',
       'control-background-hover',
+      'muted-foreground',
+      'popover-alpha',
       'popover-hover',
       'popover-foreground',
       'border-default',
+      'border-disabled',
+      'border-error',
       'focus-default',
+      'focus-error',
+      'disabled',
+      'disabled-foreground',
     ],
     sourceFile: 'packages/react/src/components/select/select.tsx',
-    stories: ['AllVariants', 'KeyboardInteraction'],
+    stories: [
+      'AllVariants',
+      'KeyboardInteraction',
+      'InvalidTrigger',
+      'Disabled',
+    ],
   },
   {
     component: 'Popover',
@@ -165,6 +183,7 @@ export const COMPONENT_TOKEN_MATRIX: readonly ComponentTokenEntry[] = [
       'popover-alpha',
       'popover-hover',
       'popover-foreground',
+      'border-default',
     ],
     sourceFile:
       'packages/react/src/components/navigation-menu/navigation-menu.tsx',
@@ -173,7 +192,7 @@ export const COMPONENT_TOKEN_MATRIX: readonly ComponentTokenEntry[] = [
   {
     component: 'Menubar',
     part: 'Bar, trigger, floating menu',
-    states: 'Rest, focus, open',
+    states: 'Rest, focus, open, destructive',
     tokens: [
       'container',
       'container-hover',
@@ -182,9 +201,12 @@ export const COMPONENT_TOKEN_MATRIX: readonly ComponentTokenEntry[] = [
       'popover-alpha',
       'popover-hover',
       'popover-foreground',
+      'error-subtle-foreground',
+      'error-background',
+      'error-foreground',
     ],
     sourceFile: 'packages/react/src/components/menubar/menubar.tsx',
-    stories: ['KeyboardInteraction', 'WithSubMenu'],
+    stories: ['KeyboardInteraction', 'WithSubMenu', 'AllVariants'],
   },
   {
     component: 'Sidebar',
