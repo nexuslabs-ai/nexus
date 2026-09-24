@@ -3,8 +3,8 @@ import path from 'node:path';
 
 import ts from 'typescript';
 
-import { isUnder, resolveAlias } from './props-contract.mjs';
-import { reactRoot } from './roots.mjs';
+import { resolveAlias } from './props-contract.mjs';
+import { isUnder, reactRoot } from './roots.mjs';
 
 /** @typedef {import('react-docgen-typescript').ComponentDoc} ComponentDoc */
 /** @typedef {import('react-docgen-typescript').PropItem} PropItem */

@@ -1,10 +1,4 @@
-import {
-  mkdirSync,
-  readdirSync,
-  readFileSync,
-  rmSync,
-  writeFileSync,
-} from 'node:fs';
+import { mkdirSync, readdirSync, readFileSync, rmSync } from 'node:fs';
 import path from 'node:path';
 
 import docgen from 'react-docgen-typescript';
@@ -12,17 +6,16 @@ import ts from 'typescript';
 
 import {
   assertWorkspaceTypes,
+  cvaVariantKeys,
   exportName,
-  isComponentSource,
   isOwnProp,
   isPortableExpansion,
   isReExport,
   isTypeExport,
-  isUnder,
   opaqueNamespaceNames,
+  propsContractProblems,
   publicComponents,
   publicExports,
-  toRepoPath,
   toSlugFolder,
 } from './props-contract.mjs';
 import {
@@ -33,10 +26,21 @@ import {
   toProplessEntry,
 } from './props-entries.mjs';
 import { reactEntryPoints } from './react-entry-points.mjs';
-import { docsRoot, reactRoot } from './roots.mjs';
+import {
+  collectSourceFiles,
+  componentSlugs,
+  isComponentSource,
+  writeJson,
+} from './react-sources.mjs';
+import {
+  componentsRoot,
+  docsRoot,
+  isUnder,
+  reactRoot,
+  reactSrc,
+  toRepoPath,
+} from './roots.mjs';
 
-const reactSrc = path.join(reactRoot, 'src');
-const componentsRoot = path.join(reactSrc, 'components');
 const reactTsconfig = path.join(reactRoot, 'tsconfig.json');
 
 const outputDir = path.join(docsRoot, 'generated', 'props');
@@ -45,16 +49,6 @@ const reactManifest = JSON.parse(
   readFileSync(path.join(reactRoot, 'package.json'), 'utf8')
 );
 const entryPoints = reactEntryPoints(reactManifest);
-
-function collectSourceFiles(dir) {
-  return readdirSync(dir, { withFileTypes: true })
-    .flatMap((entry) => {
-      const entryPath = path.join(dir, entry.name);
-      if (entry.isDirectory()) return collectSourceFiles(entryPath);
-      return [entryPath];
-    })
-    .filter(isComponentSource);
-}
 
 // Maps each unexported repo-local alias name to its printed body.
 function localAliasExpansions(checker, program, exported) {
@@ -132,6 +126,37 @@ function assertResolvableTypes(entries, localAliases) {
   );
 }
 
+function assertPropsContract(checker, program, components, docFor) {
+  const variantKeys = cvaVariantKeys(
+    checker,
+    program
+      .getSourceFiles()
+      .filter((sourceFile) => isUnder(sourceFile.fileName, reactSrc))
+  );
+
+  const offenders = [...components].flatMap(([name, symbol]) =>
+    propsContractProblems(
+      checker,
+      variantKeys,
+      name,
+      symbol,
+      docFor(name, symbol)?.props ?? {}
+    )
+  );
+
+  if (offenders.length === 0) return;
+
+  throw new Error(
+    [
+      'props JSON: a component props type does not document as a closed set of keys and options.',
+      'string-keyed props: a cva() variants object is typed Record<string, ...>; give it literal keys.',
+      'widened: one cva() variant group lost its literal option names; type its options literally.',
+      'missing: docgen dropped a cva() variant key; check isOwnProp still matches synthesized members.',
+      ...offenders.map((offender) => `  ${offender}`),
+    ].join('\n')
+  );
+}
+
 // A component documented on its `{Name}Props` interface takes that description.
 function adoptPropsTypeDescriptions(components, typeExportDescriptions) {
   for (const component of components) {
@@ -148,10 +173,6 @@ function byNameThenSource(a, b) {
     a.name.localeCompare(b.name, 'en') ||
     a.sourcePath.localeCompare(b.sourcePath, 'en')
   );
-}
-
-function writeJson(filePath, value) {
-  writeFileSync(filePath, `${JSON.stringify(value, null, 2)}\n`, 'utf8');
 }
 
 // A file this script wrote carries its own slug in its body.
@@ -173,13 +194,12 @@ function clearPreviousOutput() {
   }
 }
 
-const slugs = readdirSync(componentsRoot, { withFileTypes: true })
-  .filter((entry) => entry.isDirectory())
-  .map((entry) => entry.name)
-  .sort();
+const slugs = componentSlugs();
 
 const sourceFiles = slugs
-  .flatMap((slug) => collectSourceFiles(path.join(componentsRoot, slug)))
+  .flatMap((slug) =>
+    collectSourceFiles(path.join(componentsRoot, slug), isComponentSource)
+  )
   .sort();
 const parsedPaths = new Set(sourceFiles.map(toRepoPath));
 
@@ -238,12 +258,19 @@ for (const doc of parser.parseWithProgramProvider(sourceFiles, () => program)) {
 // in the order the checker first interned them.
 const components = publicComponents(checker, exported, componentsRoot);
 
+function docFor(name, symbol) {
+  const sourcePath = toRepoPath(
+    symbol.declarations[0].getSourceFile().fileName
+  );
+  return docsByDeclaration.get(`${sourcePath}#${name}`);
+}
+
 const bySlug = new Map(slugs.map((slug) => [slug, []]));
 
 for (const [name, symbol] of components) {
   const { fileName } = symbol.declarations[0].getSourceFile();
   const sourcePath = toRepoPath(fileName);
-  const doc = docsByDeclaration.get(`${sourcePath}#${name}`);
+  const doc = docFor(name, symbol);
   const entry = doc
     ? toComponentEntry(
         name,
@@ -257,6 +284,7 @@ for (const [name, symbol] of components) {
   bySlug.get(toSlugFolder(path.relative(componentsRoot, fileName))).push(entry);
 }
 
+assertPropsContract(checker, program, components, docFor);
 assertResolvableTypes([...bySlug.values()].flat(), localAliases);
 
 mkdirSync(outputDir, { recursive: true });
