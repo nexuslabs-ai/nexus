@@ -247,9 +247,28 @@ function attributeDefault(checker, value, owner) {
 }
 
 /**
+ * Whether a spread after `position` in `properties` can carry `key`.
+ * @param {ts.TypeChecker} checker
+ * @param {ts.NodeArray<ts.JsxAttributeLike>} properties
+ * @param {number} position
+ * @param {string} key
+ */
+function isOverridable(checker, properties, position, key) {
+  return properties
+    .slice(position + 1)
+    .some(
+      (property) =>
+        ts.isJsxSpreadAttribute(property) &&
+        checker.getTypeAtLocation(property.expression).getProperty(key) !==
+          undefined
+    );
+}
+
+/**
  * The defaults one `<X>` sets through its attributes. An attribute a later
- * spread can override is the wrapper's default; one after every spread fixes
- * the prop, so it has none. A forwarded prop is left out, keeping `X`'s own.
+ * spread can override is the wrapper's default; one no later spread carries
+ * fixes the prop, so it has none. A forwarded prop is left out, keeping `X`'s
+ * own.
  * @param {ts.TypeChecker} checker
  * @param {string} owner
  * @param {ts.SignatureDeclaration} fn
@@ -259,7 +278,6 @@ function attributeDefault(checker, value, owner) {
  */
 function attributeSettings(checker, owner, fn, target, element) {
   const { properties } = element.attributes;
-  const lastSpread = properties.findLastIndex(ts.isJsxSpreadAttribute);
   /** @type {Map<string, LazyDefault>} */
   const settings = new Map();
 
@@ -269,7 +287,7 @@ function attributeSettings(checker, owner, fn, target, element) {
     const value = attribute.initializer;
     if (isForwardedProp(checker, fn, value)) return;
 
-    if (position > lastSpread) {
+    if (!isOverridable(checker, properties, position, key)) {
       settings.set(key, () => null);
       return;
     }
@@ -283,7 +301,7 @@ function attributeSettings(checker, owner, fn, target, element) {
 /**
  * `X`'s own defaults, `inherited`, as `fn` leaves them after passing its JSX
  * attributes. Every `<X>` must resolve a prop to the same value — one that
- * forwards or omits it keeps `X`'s own default.
+ * forwards or omits it keeps `X`'s own default, or none.
  * @param {ts.TypeChecker} checker
  * @param {string} owner
  * @param {ts.SignatureDeclaration} fn
@@ -313,8 +331,13 @@ function attributeDefaults(checker, owner, fn, target, inherited) {
 
   /** @type {Map<string, LazyDefault>} */
   const defaults = new Map();
+  const keys = new Set([
+    ...inherited.keys(),
+    ...settingsPerElement.flatMap((settings) => [...settings.keys()]),
+  ]);
 
-  for (const [key, own] of inherited) {
+  for (const key of keys) {
+    const own = inherited.get(key) ?? (() => null);
     const resolvers = settingsPerElement.map(
       (settings) => settings.get(key) ?? own
     );
