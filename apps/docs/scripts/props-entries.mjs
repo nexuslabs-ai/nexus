@@ -247,6 +247,24 @@ function attributeDefault(checker, value, owner) {
 }
 
 /**
+ * Whether a value of `type` can carry `key`: any member of a union, and any
+ * `any`, `unknown` or string-indexed type.
+ * @param {ts.Type} type
+ * @param {string} key
+ * @returns {boolean}
+ */
+function carriesKey(type, key) {
+  if (type.flags & (ts.TypeFlags.Any | ts.TypeFlags.Unknown)) return true;
+  if (type.isUnion()) {
+    return type.types.some((member) => carriesKey(member, key));
+  }
+  return (
+    type.getProperty(key) !== undefined ||
+    type.getStringIndexType() !== undefined
+  );
+}
+
+/**
  * Whether a spread after `position` in `properties` can carry `key`.
  * @param {ts.TypeChecker} checker
  * @param {ts.NodeArray<ts.JsxAttributeLike>} properties
@@ -259,8 +277,7 @@ function isOverridable(checker, properties, position, key) {
     .some(
       (property) =>
         ts.isJsxSpreadAttribute(property) &&
-        checker.getTypeAtLocation(property.expression).getProperty(key) !==
-          undefined
+        carriesKey(checker.getTypeAtLocation(property.expression), key)
     );
 }
 
