@@ -262,9 +262,10 @@ function CatalogueBrowser({
   const resultsHeadingId = useId();
   const search = useTokenSearch();
   const navigate = useTokenNavigate();
-  const results = filterTokens(index, search);
+  const matches = filterTokens(index, search);
   const selected = search.token ? index.byName.get(search.token) : undefined;
-  if (selected && !results.includes(selected)) results.push(selected);
+  const results =
+    selected && !matches.includes(selected) ? [...matches, selected] : matches;
   const selectedIndex = selected ? results.indexOf(selected) : -1;
   const pageCount = Math.max(1, Math.ceil(results.length / PAGE_SIZE));
   const page =
@@ -313,7 +314,7 @@ function CatalogueBrowser({
           role="status"
           className="nx:typography-label-small nx:text-muted-foreground"
         >
-          {results.length} tokens
+          {matches.length} {matches.length === 1 ? 'token' : 'tokens'}
           {results.length > PAGE_SIZE
             ? ` · ${(page - 1) * PAGE_SIZE + 1}–${Math.min(page * PAGE_SIZE, results.length)}`
             : ''}
@@ -339,7 +340,7 @@ function CatalogueBrowser({
               <AccordionItem key={token.name} value={token.name}>
                 <AccordionTrigger>
                   <span className="nx:flex nx:items-center nx:gap-4 nx:min-w-0">
-                    <TokenSample token={token} />
+                    <TokenSample token={token} live={live} />
                     <span className="nx:flex nx:flex-col nx:gap-2 nx:min-w-0">
                       <span className="nx:break-all">{token.name}</span>
                       <span className="nx:typography-body-small nx:text-muted-foreground">

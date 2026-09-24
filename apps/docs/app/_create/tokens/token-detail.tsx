@@ -46,8 +46,19 @@ const ALIAS_LABELS: Record<CatalogueAlias['kind'], string> = {
   reference: 'Reference paths',
 };
 
-function sampleStyle(token: CatalogueToken): CSSProperties | null {
-  const value = token.variants[0]?.declarations[0]?.value;
+/** A runtime colour's live value; otherwise the variant in the page's mode. */
+function sampleValue(token: CatalogueToken, live: LiveTheme) {
+  if (isRuntime(token)) return live.tokens[token.name];
+  const variant =
+    token.variants.find(({ mode }) => mode === live.mode) ?? token.variants[0];
+  return variant?.declarations[0]?.value;
+}
+
+function sampleStyle(
+  token: CatalogueToken,
+  live: LiveTheme
+): CSSProperties | null {
+  const value = sampleValue(token, live);
   if (!value) return null;
   if (token.type === 'color') return { backgroundColor: value };
   if (token.type === 'shadow') return { boxShadow: value };
@@ -55,8 +66,14 @@ function sampleStyle(token: CatalogueToken): CSSProperties | null {
   return null;
 }
 
-export function TokenSample({ token }: { token: CatalogueToken }) {
-  const style = sampleStyle(token);
+export function TokenSample({
+  token,
+  live,
+}: {
+  token: CatalogueToken;
+  live: LiveTheme;
+}) {
+  const style = sampleStyle(token, live);
   if (style) {
     return <span aria-hidden="true" className={SAMPLE_CLASS} style={style} />;
   }
