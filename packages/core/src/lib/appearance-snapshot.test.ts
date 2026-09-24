@@ -42,8 +42,8 @@ function mockSystemPrefersDark(matches: boolean): void {
 }
 
 describe('NexusAppearanceSnapshot', () => {
-  it('uses snapshot version 6 for contrast-solved themes', () => {
-    expect(SNAPSHOT_VERSION).toBe(6);
+  it('invalidates cached CSS for the renamed public tokens', () => {
+    expect(SNAPSHOT_VERSION).toBe(7);
   });
 
   it('stores pre-derived CSS verbatim', () => {
@@ -97,7 +97,7 @@ describe('NexusAppearanceSnapshot', () => {
     expect(snapshot.state).toEqual(state);
   });
 
-  it.each([1, 5])(
+  it.each([1, 5, 6])(
     'refreshes a v%s snapshot without resetting the stored state',
     (version) => {
       const state = {
@@ -121,6 +121,29 @@ describe('NexusAppearanceSnapshot', () => {
       expect(snapshot.prefsCss).toBe(prefsCss(state));
     }
   );
+  it('rebuilds v6 CSS under the new names without losing appearance state', () => {
+    const state = {
+      ...DEFAULT_NEXUS_APPEARANCE,
+      mode: 'system' as const,
+      brandColor: '#6366f1',
+      surfaceTone: 'slate' as const,
+      density: 'compact' as const,
+    };
+    const snapshot = sanitizeNexusAppearanceSnapshot({
+      version: 6,
+      state,
+      themeCss: ':root { --nx-color-primary-subtle-foreground: red; }',
+      prefsCss: 'STALE',
+    });
+
+    expect(snapshot.state).toEqual(state);
+    expect(snapshot.themeCss).toContain('--nx-color-primary-text:');
+    expect(snapshot.themeCss).toContain('--nx-color-border-focus:');
+    expect(snapshot.themeCss).not.toContain(
+      '--nx-color-primary-subtle-foreground:'
+    );
+    expect(snapshot.prefsCss).toBe(prefsCss(state));
+  });
 
   it('embeds runtime focus tokens in the default first-paint snapshot', () => {
     const script = createNexusAppearanceBootstrapScript();
@@ -157,7 +180,7 @@ describe('NexusAppearanceSnapshot', () => {
     const decoded = JSON.parse(decodeURIComponent(raw));
 
     expect(decoded).toEqual({
-      version: SNAPSHOT_VERSION,
+      version: 6,
       state,
     });
     expect(decoded.themeCss).toBeUndefined();
@@ -204,7 +227,7 @@ describe('NexusAppearanceSnapshot', () => {
       parseNexusAppearanceStateCookie(
         encodeURIComponent(
           JSON.stringify({
-            version: SNAPSHOT_VERSION - 1,
+            version: 4,
             state: { ...DEFAULT_NEXUS_APPEARANCE, mode: 'dark' },
           })
         )
@@ -311,6 +334,60 @@ describe('createNexusAppearanceBootstrapScript', () => {
     expect(
       document.querySelector('style[data-nexus-appearance-prefs]')?.textContent
     ).toBe(':root { --test-prefs: dark; }');
+  });
+
+  it('uses fresh cookie-derived CSS before hydration when storage contains v6 CSS', () => {
+    const state = {
+      ...DEFAULT_NEXUS_APPEARANCE,
+      mode: 'system' as const,
+      brandColor: '#6366f1',
+      density: 'compact' as const,
+    };
+    const oldCookie = encodeURIComponent(JSON.stringify({ version: 6, state }));
+    const serverSnapshot = createNexusAppearanceSnapshotFromCookie(oldCookie);
+    window.localStorage.setItem(
+      'nexus-appearance',
+      JSON.stringify({
+        version: 6,
+        state,
+        themeCss: ':root { --nx-color-primary-subtle-foreground: red; }',
+        prefsCss: 'STALE',
+      })
+    );
+    mockSystemPrefersDark(true);
+
+    new Function(
+      createNexusAppearanceBootstrapScript({ defaultSnapshot: serverSnapshot })
+    )();
+
+    expect(serverSnapshot.state).toEqual(state);
+    expect(document.documentElement.classList.contains('dark')).toBe(true);
+    expect(document.documentElement.getAttribute('data-density')).toBe(
+      'compact'
+    );
+    const rendered = document.querySelector(
+      'style[data-nexus-appearance-theme]'
+    )?.textContent;
+    expect(rendered).toBe(serverSnapshot.themeCss);
+    expect(rendered).toContain('--nx-color-primary-text:');
+    expect(rendered).not.toContain('--nx-color-primary-subtle-foreground:');
+  });
+
+  it('ignores obsolete CSS without a cookie and recovers preferences on hydration', () => {
+    const state = {
+      ...DEFAULT_NEXUS_APPEARANCE,
+      mode: 'dark' as const,
+      brandColor: '#6366f1',
+    };
+    const stale = { version: 6, state, themeCss: 'STALE', prefsCss: 'STALE' };
+    window.localStorage.setItem('nexus-appearance', JSON.stringify(stale));
+    new Function(createNexusAppearanceBootstrapScript())();
+    const css = document.querySelector(
+      'style[data-nexus-appearance-theme]'
+    )?.textContent;
+    expect(css).toContain('--nx-color-primary-text:');
+    expect(css).not.toContain('STALE');
+    expect(sanitizeNexusAppearanceSnapshot(stale).state).toEqual(state);
   });
 
   it('falls back to the embedded default snapshot on empty storage', () => {

@@ -97,9 +97,9 @@ const RELEASES: Release[] = [
 ];
 
 const BADGE: Record<Change['type'], string> = {
-  Added: 'nx:bg-success-subtle nx:text-success-subtle-foreground',
-  Changed: 'nx:bg-primary-subtle nx:text-primary-subtle-foreground',
-  Fixed: 'nx:bg-warning-subtle nx:text-warning-subtle-foreground',
+  Added: 'nx:bg-success-subtle nx:text-success-text',
+  Changed: 'nx:bg-primary-subtle nx:text-primary-text',
+  Fixed: 'nx:bg-warning-subtle nx:text-warning-text',
 };
 
 export default function Changelog() {
@@ -141,7 +141,7 @@ export default function Changelog() {
                           href={`${REPO}/pull/${change.pr}`}
                           target="_blank"
                           rel="noreferrer"
-                          className="nx:font-mono nx:typography-label-small nx:text-primary-subtle-foreground nx:hover:underline nx:focus-visible:outline-2 nx:focus-visible:outline-focus-default nx:focus-visible:outline-offset-2 nx:rounded-sm"
+                          className="nx:font-mono nx:typography-label-small nx:text-primary-text nx:hover:underline nx:focus-visible:outline-2 nx:focus-visible:outline-focus-default nx:focus-visible:outline-offset-2 nx:rounded-sm"
                         >
                           #{change.pr}
                         </a>

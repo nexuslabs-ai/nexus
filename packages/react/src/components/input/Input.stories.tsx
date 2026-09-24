@@ -160,7 +160,7 @@ export const BorderlessStates: Story = {
     await expect(readOnly).not.toBeDisabled();
 
     await expect(invalid).toHaveAttribute('aria-invalid', 'true');
-    await expect(invalid).toHaveClass('nx:aria-invalid:border-border-error');
+    await expect(invalid).toHaveClass('nx:aria-invalid:border-error-border');
     // The stroke is a real border now, so a borderless field keeps a
     // transparent one and the invalid state recolours it in place.
     const restStyles = window.getComputedStyle(empty);
@@ -337,11 +337,11 @@ export const WarningVsError: Story = {
           aria-label="Warning budget"
           aria-describedby="input-warning-message"
           defaultValue="95"
-          className="nx:border-border-warning"
+          className="nx:border-warning-border"
         />
         <p
           id="input-warning-message"
-          className="nx:typography-body-small nx:text-warning-subtle-foreground"
+          className="nx:typography-body-small nx:text-warning-text"
         >
           Near the monthly limit. You can continue.
         </p>
@@ -366,7 +366,7 @@ export const WarningVsError: Story = {
         <p
           id="input-error-message"
           role="alert"
-          className="nx:typography-body-small nx:text-error-subtle-foreground"
+          className="nx:typography-body-small nx:text-error-text"
         >
           Budget cannot exceed 100.
         </p>

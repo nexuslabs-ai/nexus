@@ -122,7 +122,7 @@ export function TopNav() {
                     className={cn(
                       PANEL_LINK_BASE,
                       active
-                        ? 'nx:border-focus-default nx:font-semibold nx:bg-primary-subtle nx:text-primary-subtle-foreground'
+                        ? 'nx:border-focus-default nx:font-semibold nx:bg-primary-subtle nx:text-primary-text'
                         : 'nx:border-transparent nx:hover:bg-popover-hover'
                     )}
                   >
@@ -149,7 +149,7 @@ export function TopNav() {
               className={cn(
                 NAV_LINK_BASE,
                 active
-                  ? 'nx:bg-nav-item-active nx:text-primary-subtle-foreground'
+                  ? 'nx:bg-nav-item-active nx:text-primary-text'
                   : 'nx:text-nav-muted-foreground nx:hover:text-nav-foreground nx:hover:bg-nav-item-hover'
               )}
             >

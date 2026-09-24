@@ -367,13 +367,13 @@ export function ComponentShowcase() {
                 <div className="nx:border-2 nx:border-border-primary nx:rounded nx:px-4 nx:py-2 nx:typography-label-default">
                   Primary
                 </div>
-                <div className="nx:border-2 nx:border-border-success nx:rounded nx:px-4 nx:py-2 nx:typography-label-default">
+                <div className="nx:border-2 nx:border-success-border nx:rounded nx:px-4 nx:py-2 nx:typography-label-default">
                   Success
                 </div>
-                <div className="nx:border-2 nx:border-border-error nx:rounded nx:px-4 nx:py-2 nx:typography-label-default">
+                <div className="nx:border-2 nx:border-error-border nx:rounded nx:px-4 nx:py-2 nx:typography-label-default">
                   Error
                 </div>
-                <div className="nx:border-2 nx:border-border-information nx:rounded nx:px-4 nx:py-2 nx:typography-label-default">
+                <div className="nx:border-2 nx:border-information-border nx:rounded nx:px-4 nx:py-2 nx:typography-label-default">
                   Info
                 </div>
               </div>
@@ -387,27 +387,27 @@ export function ComponentShowcase() {
           description="Feedback and alert styles"
         >
           <div className="nx:grid nx:gap-4 nx:md:grid-cols-2">
-            <div className="nx:bg-success-subtle nx:border-default nx:border-border-success nx:rounded-lg nx:p-4 nx:flex nx:items-center nx:gap-3">
+            <div className="nx:bg-success-subtle nx:border-default nx:border-success-border nx:rounded-lg nx:p-4 nx:flex nx:items-center nx:gap-3">
               <div className="nx:w-2 nx:h-2 nx:rounded-full nx:bg-success-background" />
-              <span className="nx:text-success-subtle-foreground nx:typography-label-default">
+              <span className="nx:text-success-text nx:typography-label-default">
                 Success message
               </span>
             </div>
-            <div className="nx:bg-error-subtle nx:border-default nx:border-border-error nx:rounded-lg nx:p-4 nx:flex nx:items-center nx:gap-3">
+            <div className="nx:bg-error-subtle nx:border-default nx:border-error-border nx:rounded-lg nx:p-4 nx:flex nx:items-center nx:gap-3">
               <div className="nx:w-2 nx:h-2 nx:rounded-full nx:bg-error-background" />
-              <span className="nx:text-error-subtle-foreground nx:typography-label-default">
+              <span className="nx:text-error-text nx:typography-label-default">
                 Error message
               </span>
             </div>
-            <div className="nx:bg-warning-subtle nx:border-default nx:border-border-warning nx:rounded-lg nx:p-4 nx:flex nx:items-center nx:gap-3">
+            <div className="nx:bg-warning-subtle nx:border-default nx:border-warning-border nx:rounded-lg nx:p-4 nx:flex nx:items-center nx:gap-3">
               <div className="nx:w-2 nx:h-2 nx:rounded-full nx:bg-warning-background" />
-              <span className="nx:text-warning-subtle-foreground nx:typography-label-default">
+              <span className="nx:text-warning-text nx:typography-label-default">
                 Warning message
               </span>
             </div>
-            <div className="nx:bg-information-subtle nx:border-default nx:border-border-information nx:rounded-lg nx:p-4 nx:flex nx:items-center nx:gap-3">
+            <div className="nx:bg-information-subtle nx:border-default nx:border-information-border nx:rounded-lg nx:p-4 nx:flex nx:items-center nx:gap-3">
               <div className="nx:w-2 nx:h-2 nx:rounded-full nx:bg-information-background" />
-              <span className="nx:text-information-subtle-foreground nx:typography-label-default">
+              <span className="nx:text-information-text nx:typography-label-default">
                 Info message
               </span>
             </div>

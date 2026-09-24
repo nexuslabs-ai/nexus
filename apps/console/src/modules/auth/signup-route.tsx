@@ -141,7 +141,7 @@ export function SignupRoute() {
               Already have an account?{' '}
               <Link
                 to="/login"
-                className="nx:text-primary-subtle-foreground nx:hover:underline"
+                className="nx:text-primary-text nx:hover:underline"
               >
                 Sign in
               </Link>

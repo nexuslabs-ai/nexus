@@ -59,70 +59,69 @@ const badgeVariants = cva(
       {
         variant: 'default',
         fill: 'light',
-        className: 'nx:bg-primary-subtle nx:text-primary-subtle-foreground',
+        className: 'nx:bg-primary-subtle nx:text-primary-text',
       },
       {
         variant: 'secondary',
         fill: 'light',
-        className: 'nx:bg-secondary-subtle nx:text-secondary-subtle-foreground',
+        className: 'nx:bg-secondary-subtle nx:text-secondary-text',
       },
       {
         variant: 'error',
         fill: 'light',
-        className: 'nx:bg-error-subtle nx:text-error-subtle-foreground',
+        className: 'nx:bg-error-subtle nx:text-error-text',
       },
       {
         variant: 'warning',
         fill: 'light',
-        className: 'nx:bg-warning-subtle nx:text-warning-subtle-foreground',
+        className: 'nx:bg-warning-subtle nx:text-warning-text',
       },
       {
         variant: 'success',
         fill: 'light',
-        className: 'nx:bg-success-subtle nx:text-success-subtle-foreground',
+        className: 'nx:bg-success-subtle nx:text-success-text',
       },
       {
         variant: 'information',
         fill: 'light',
-        className:
-          'nx:bg-information-subtle nx:text-information-subtle-foreground',
+        className: 'nx:bg-information-subtle nx:text-information-text',
       },
       // Outline fill variants
       {
         variant: 'default',
         fill: 'outline',
         className:
-          'nx:border-default nx:border-border-primary nx:bg-primary-subtle nx:text-primary-subtle-foreground',
+          'nx:border-default nx:border-border-primary nx:bg-primary-subtle nx:text-primary-text',
       },
       {
         variant: 'secondary',
         fill: 'outline',
         className:
-          'nx:border-default nx:border-border-default nx:bg-secondary-subtle nx:text-secondary-subtle-foreground',
+          'nx:border-default nx:border-border-default nx:bg-secondary-subtle nx:text-secondary-text',
       },
       {
         variant: 'error',
         fill: 'outline',
         className:
-          'nx:border-default nx:border-border-error nx:bg-error-subtle nx:text-error-subtle-foreground',
+          'nx:border-default nx:border-error-border nx:bg-error-subtle nx:text-error-text',
       },
       {
         variant: 'warning',
         fill: 'outline',
         className:
-          'nx:border-default nx:border-border-warning nx:bg-warning-subtle nx:text-warning-subtle-foreground',
+          'nx:border-default nx:border-warning-border nx:bg-warning-subtle nx:text-warning-text',
       },
       {
         variant: 'success',
         fill: 'outline',
         className:
-          'nx:border-default nx:border-border-success nx:bg-success-subtle nx:text-success-subtle-foreground',
+          'nx:border-default nx:border-success-border nx:bg-success-subtle nx:text-success-text',
       },
       {
         variant: 'information',
         fill: 'outline',
         className:
-          'nx:border-default nx:border-border-information nx:bg-information-subtle nx:text-information-subtle-foreground',
+          'nx:border-default nx:border-information-border nx:bg-information-subtle nx:text-information-text',
       },
     ],
     defaultVariants: {

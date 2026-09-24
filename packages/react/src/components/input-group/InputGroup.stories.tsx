@@ -389,7 +389,7 @@ export const BorderlessStates: Story = {
       canvas.getByRole('textbox', { name: 'Invalid borderless email' })
     ).toHaveAttribute('aria-invalid', 'true');
     await expect(invalid).toHaveClass(
-      'nx:has-[[data-slot][aria-invalid=true]]:border-border-error'
+      'nx:has-[[data-slot][aria-invalid=true]]:border-error-border'
     );
     const invalidStyles = window.getComputedStyle(invalid);
     await expect(
@@ -468,7 +468,7 @@ export const StateMatrix: Story = {
         <span className="nx:typography-label-default nx:text-foreground">
           Warning
         </span>
-        <InputGroup className="nx:border-border-warning">
+        <InputGroup className="nx:border-warning-border">
           <InputGroupInput
             aria-label="Warning email"
             aria-describedby="state-warning-message"
@@ -477,7 +477,7 @@ export const StateMatrix: Story = {
           <InputGroupAddon align="block-end">
             <InputGroupText
               id="state-warning-message"
-              className="nx:text-warning-subtle-foreground"
+              className="nx:text-warning-text"
             >
               External domain. You can continue after review.
             </InputGroupText>
@@ -499,7 +499,7 @@ export const StateMatrix: Story = {
             <InputGroupText
               id="state-error-message"
               role="alert"
-              className="nx:text-error-subtle-foreground"
+              className="nx:text-error-text"
             >
               Enter a complete email address.
             </InputGroupText>

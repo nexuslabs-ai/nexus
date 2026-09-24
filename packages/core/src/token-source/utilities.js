@@ -61,20 +61,34 @@ export function durationUtility(key) {
   };
 }
 
-/** Registry `border-*` colours that get a `border-color-*` utility, in emit order. */
-export const BORDER_COLOR_ALIAS_NAMES = /** @type {const} */ ([
-  'default',
-  'default-alpha',
-  'active',
-  'disabled',
-  'warning',
-  'warning-active',
-  'success',
-  'success-active',
-  'error',
-  'error-active',
-  'information',
-  'information-active',
-  'primary',
-  'primary-active',
-]);
+/** Semantic border tokens keyed by their utility alias, in emit order. */
+export const BORDER_COLOR_ALIAS_TOKENS = /** @type {const} */ ({
+  default: 'border-default',
+  'default-alpha': 'border-default-alpha',
+  focus: 'border-focus',
+  disabled: 'border-disabled',
+  warning: 'warning-border',
+  'warning-active': 'border-warning-active',
+  success: 'success-border',
+  'success-active': 'border-success-active',
+  error: 'error-border',
+  'error-active': 'border-error-active',
+  information: 'information-border',
+  'information-active': 'border-information-active',
+  primary: 'border-primary',
+  'primary-active': 'border-primary-active',
+});
+
+export const BORDER_COLOR_ALIAS_NAMES = Object.keys(BORDER_COLOR_ALIAS_TOKENS);
+
+/**
+ * @param {string} tokenName - The semantic color name without the CSS prefix.
+ * @returns {string | null}
+ */
+export function borderColorAliasName(tokenName) {
+  return (
+    Object.entries(BORDER_COLOR_ALIAS_TOKENS).find(
+      ([, token]) => token === tokenName
+    )?.[0] ?? null
+  );
+}

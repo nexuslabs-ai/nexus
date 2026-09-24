@@ -27,7 +27,7 @@ const PRE_CLASS =
   'nx:typography-code-block nx:bg-container nx:border nx:border-border-default nx:rounded-md nx:p-4 nx:pe-14 nx:overflow-x-auto nx:focus-visible:outline-2 nx:focus-visible:outline-focus-default nx:[&_code]:bg-transparent nx:[&_code]:p-0 nx:[&_code]:typography-code-block';
 
 const BUTTON_CLASS =
-  'nx:absolute nx:top-2 nx:end-2 nx:data-[copy-status=copied]:text-success-subtle-foreground nx:data-[copy-status=failed]:text-error-subtle-foreground';
+  'nx:absolute nx:top-2 nx:end-2 nx:data-[copy-status=copied]:text-success-text nx:data-[copy-status=failed]:text-error-text';
 
 /** The MDX `<pre>` override: the code block plus a control that copies it. */
 export function CodeBlock({

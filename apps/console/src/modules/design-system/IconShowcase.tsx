@@ -25,7 +25,7 @@ export function IconShowcase() {
                 href={meta.url}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="nx:text-primary-subtle-foreground nx:underline nx:hover:no-underline"
+                className="nx:text-primary-text nx:underline nx:hover:no-underline"
               >
                 {meta.label}
               </a>

@@ -70,7 +70,7 @@ const staticDayPickerClassNames = {
     defaultClassNames.dropdowns
   ),
   dropdown_root: cn(
-    'nx:relative nx:rounded-md nx:border-default nx:border-border-default nx:shadow-xs nx:has-focus:border-border-active',
+    'nx:relative nx:rounded-md nx:border-default nx:border-border-default nx:shadow-xs nx:has-focus:border-border-focus',
     defaultClassNames.dropdown_root
   ),
   dropdown: cn(
@@ -349,7 +349,7 @@ function DatePickerDayButton({
         'nx:data-[range-start=true]:rounded-md nx:data-[range-start=true]:bg-primary-background nx:data-[range-start=true]:text-primary-foreground',
         'nx:data-[range-end=true]:rounded-md nx:data-[range-end=true]:bg-primary-background nx:data-[range-end=true]:text-primary-foreground',
         // Range middle → subtle primary fill (continuous with the cell rail).
-        'nx:data-[range-middle=true]:rounded-none nx:data-[range-middle=true]:bg-primary-subtle nx:data-[range-middle=true]:text-primary-subtle-foreground',
+        'nx:data-[range-middle=true]:rounded-none nx:data-[range-middle=true]:bg-primary-subtle nx:data-[range-middle=true]:text-primary-text',
         defaultClassNames.day_button,
         className
       )}

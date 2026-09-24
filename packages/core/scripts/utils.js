@@ -18,6 +18,7 @@ import {
 } from '../src/token-source/tokens.js';
 import {
   BORDER_COLOR_ALIAS_NAMES,
+  borderColorAliasName,
   borderWidthAliasUtilities,
   durationUtility,
 } from '../src/token-source/utilities.js';
@@ -417,18 +418,6 @@ export function generateBorderWidthUtilitiesCSS(tokens) {
   return { css, count: rules.length };
 }
 
-const BORDER_COLOR_ALIAS_NAME_SET = new Set(BORDER_COLOR_ALIAS_NAMES);
-
-function getBorderColorAliasName(cssName) {
-  const prefix = 'color-border-';
-  if (!cssName.startsWith(prefix)) {
-    return null;
-  }
-
-  const name = cssName.slice(prefix.length);
-  return BORDER_COLOR_ALIAS_NAME_SET.has(name) ? name : null;
-}
-
 /**
  * Generate border color alias utility CSS from semantic color tokens.
  * Creates @utility rules with border-color-{name} patterns for every
@@ -439,7 +428,10 @@ function getBorderColorAliasName(cssName) {
  */
 export function generateBorderColorAliasUtilitiesCSS(tokens) {
   const borderColorTokens = (tokens ?? [])
-    .map((token) => ({ token, name: getBorderColorAliasName(token.cssName) }))
+    .map((token) => ({
+      token,
+      name: borderColorAliasName(token.cssName.replace(/^color-/, '')),
+    }))
     .filter(({ name }) => name !== null)
     .sort(
       (a, b) =>

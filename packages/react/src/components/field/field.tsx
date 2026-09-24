@@ -83,7 +83,7 @@ function FieldGroup({ className, ...props }: React.ComponentProps<'div'>) {
 }
 
 const fieldVariants = cva(
-  'nx:group/field nx:flex nx:w-full nx:gap-2 nx:data-[invalid=true]:text-error-subtle-foreground',
+  'nx:group/field nx:flex nx:w-full nx:gap-2 nx:data-[invalid=true]:text-error-text',
   {
     variants: {
       orientation: {
@@ -232,7 +232,7 @@ function FieldRequiredIndicator({
       data-slot="field-required-indicator"
       data-optional={isOptional ? 'true' : undefined}
       className={cn(
-        'nx:text-error-subtle-foreground nx:data-[optional=true]:typography-body-default nx:data-[optional=true]:text-muted-foreground',
+        'nx:text-error-text nx:data-[optional=true]:typography-body-default nx:data-[optional=true]:text-muted-foreground',
         className
       )}
     >
@@ -271,7 +271,7 @@ function FieldDescription({ className, ...props }: React.ComponentProps<'p'>) {
       data-slot="field-description"
       className={cn(
         'nx:typography-body-default nx:text-muted-foreground nx:group-has-data-[orientation=horizontal]/field:text-balance',
-        'nx:[&>a]:underline nx:[&>a]:underline-offset-4 nx:[&>a:hover]:text-primary-subtle-foreground',
+        'nx:[&>a]:underline nx:[&>a]:underline-offset-4 nx:[&>a:hover]:text-primary-text',
         className
       )}
       {...props}
@@ -347,10 +347,7 @@ function FieldError({
       role="alert"
       aria-atomic="true"
       data-slot="field-error"
-      className={cn(
-        'nx:typography-body-default nx:text-error-subtle-foreground',
-        className
-      )}
+      className={cn('nx:typography-body-default nx:text-error-text', className)}
       {...props}
     >
       {children ||

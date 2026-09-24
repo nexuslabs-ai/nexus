@@ -248,7 +248,7 @@ const menubarItemVariants = cva(
       variant: {
         default: '',
         destructive:
-          'nx:text-error-subtle-foreground nx:focus:bg-error-background nx:focus:text-error-foreground',
+          'nx:text-error-text nx:focus:bg-error-background nx:focus:text-error-foreground',
       },
     },
     defaultVariants: {

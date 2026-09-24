@@ -132,9 +132,7 @@ function KpiCard({ kpi }: { kpi: Kpi }) {
       </p>
       <p
         className={`nx:flex nx:items-center nx:gap-1 nx:typography-label-small nx:tabular-nums ${
-          up
-            ? 'nx:text-success-subtle-foreground'
-            : 'nx:text-error-subtle-foreground'
+          up ? 'nx:text-success-text' : 'nx:text-error-text'
         }`}
       >
         <TrendIcon className="nx:size-3.5 nx:shrink-0" />

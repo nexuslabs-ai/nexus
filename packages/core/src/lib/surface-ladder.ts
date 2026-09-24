@@ -37,7 +37,7 @@ export const SURFACE_TOKENS = [
   'nav-item-active',
   'nav-border',
   'disabled',
-  'border-active',
+  'border-focus',
 ] as const;
 
 export type SurfaceToken = (typeof SURFACE_TOKENS)[number];
@@ -121,7 +121,7 @@ export const LIGHT_SURFACE_LADDER = {
   'nav-item-active': 150,
   'nav-border': 150,
   disabled: 100,
-  'border-active': 400,
+  'border-focus': 400,
 } as const satisfies Record<SurfaceToken, ShadeAnchor>;
 
 // Current dark surfaces are bg-seed-relative and do not sit on shared shade
@@ -145,7 +145,7 @@ export const DARK_SURFACE_LADDER = {
   'nav-item-active': { step: 3.2 },
   'nav-border': { step: 3.2 },
   disabled: { step: 1.6 },
-  'border-active': { step: 9.68 },
+  'border-focus': { step: 9.68 },
 } as const satisfies Record<SurfaceToken, ShadeAnchor>;
 
 function stepsFromLadder(

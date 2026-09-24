@@ -172,7 +172,7 @@ export const Invalid: Story = {
         </div>
         <p
           id={errorId}
-          className="nx:typography-body-default nx:text-error-subtle-foreground"
+          className="nx:typography-body-default nx:text-error-text"
         >
           Choose at least one required option.
         </p>
@@ -217,7 +217,7 @@ export const InvalidStates: Story = {
           </div>
           <p
             id={uncheckedErrorId}
-            className="nx:typography-body-default nx:text-error-subtle-foreground"
+            className="nx:typography-body-default nx:text-error-text"
           >
             Choose this option before continuing.
           </p>
@@ -235,7 +235,7 @@ export const InvalidStates: Story = {
           </div>
           <p
             id={checkedErrorId}
-            className="nx:typography-body-default nx:text-error-subtle-foreground"
+            className="nx:typography-body-default nx:text-error-text"
           >
             Resolve the related error before continuing.
           </p>
@@ -255,7 +255,7 @@ export const InvalidStates: Story = {
           </div>
           <p
             id={indeterminateErrorId}
-            className="nx:typography-body-default nx:text-error-subtle-foreground"
+            className="nx:typography-body-default nx:text-error-text"
           >
             Review the partially selected options.
           </p>

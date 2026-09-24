@@ -114,7 +114,7 @@ const APCA_TIERS: { pair: string; lc: string; covers: string }[] = [
     covers: 'UI labels — buttons, badges',
   },
   {
-    pair: '*-subtle-foreground ↔ -subtle',
+    pair: '*-text ↔ -subtle',
     lc: '≥ 60',
     covers: 'Labels on tinted fills',
   },

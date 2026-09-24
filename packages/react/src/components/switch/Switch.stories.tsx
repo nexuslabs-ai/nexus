@@ -91,7 +91,7 @@ export const Invalid: Story = {
         </div>
         <p
           id={errorId}
-          className="nx:typography-body-default nx:text-error-subtle-foreground"
+          className="nx:typography-body-default nx:text-error-text"
         >
           This setting must be enabled to continue.
         </p>
@@ -108,7 +108,7 @@ export const Invalid: Story = {
     await expect(switchEl).toHaveAccessibleDescription(
       'This setting must be enabled to continue.'
     );
-    await expect(switchEl).toHaveClass('nx:aria-invalid:border-border-error');
+    await expect(switchEl).toHaveClass('nx:aria-invalid:border-error-border');
     await expect(switchEl).toHaveClass(
       'nx:aria-invalid:focus-visible:outline-focus-error'
     );

@@ -398,7 +398,7 @@ describe('deriveTheme', () => {
       ];
 
       expect(map['--nx-color-focus-default']).toBe(
-        map['--nx-color-primary-subtle-foreground']
+        map['--nx-color-primary-text']
       );
 
       for (const surface of surfaces) {
@@ -417,7 +417,7 @@ describe('deriveTheme', () => {
   it.each(['light', 'dark'] as const)(
     'keeps a colored brand focus ring legible on page surfaces in %s mode',
     (mode) => {
-      // focus-default is solved together with primary-subtle-foreground, so a
+      // focus-default is solved together with primary-text, so a
       // colored brand's ring must clear both the subtle fills and the page
       // surfaces the ring actually paints on.
       const map = deriveTheme({
@@ -435,7 +435,7 @@ describe('deriveTheme', () => {
       })[mode];
 
       expect(map['--nx-color-focus-default']).toBe(
-        map['--nx-color-primary-subtle-foreground']
+        map['--nx-color-primary-text']
       );
 
       for (const surface of [
@@ -618,7 +618,7 @@ describe('status families', () => {
         ).toBeGreaterThanOrEqual(TIER_THRESHOLDS.ui);
         expect(
           apcaLc(
-            theme[`--nx-color-${status}-subtle-foreground`]!,
+            theme[`--nx-color-${status}-text`]!,
             theme[`--nx-color-${status}-subtle`]!
           ),
           `${status} subtle foreground on subtle`

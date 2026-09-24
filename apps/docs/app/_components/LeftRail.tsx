@@ -31,7 +31,7 @@ export function LeftRail({ section }: { section: ManifestSection }) {
                 className={cn(
                   RAIL_LINK_BASE,
                   active
-                    ? 'nx:bg-primary-subtle nx:text-primary-subtle-foreground nx:border-focus-default'
+                    ? 'nx:bg-primary-subtle nx:text-primary-text nx:border-focus-default'
                     : 'nx:text-muted-foreground nx:border-transparent nx:hover:text-foreground nx:hover:bg-container-hover'
                 )}
               >

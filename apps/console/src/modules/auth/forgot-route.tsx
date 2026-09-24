@@ -52,7 +52,7 @@ export function ForgotRoute() {
         <CardFooter>
           <Link
             to="/login"
-            className="nx:text-primary-subtle-foreground nx:typography-label-default nx:hover:underline"
+            className="nx:text-primary-text nx:typography-label-default nx:hover:underline"
           >
             Back to sign in
           </Link>

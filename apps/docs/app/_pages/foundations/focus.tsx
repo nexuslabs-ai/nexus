@@ -169,7 +169,7 @@ nx:disabled:border-border-disabled`}
           />
         </div>
         <CodeSample lang="tsx">
-          {`nx:aria-invalid:border-border-error
+          {`nx:aria-invalid:border-error-border
 nx:aria-invalid:focus-visible:outline-focus-error
 nx:aria-invalid:focus-visible:border-focus-error`}
         </CodeSample>
@@ -184,11 +184,12 @@ nx:aria-invalid:focus-visible:border-focus-error`}
           Primary, secondary, outline, ghost, destructive — they all focus in{' '}
           <code>focus-default</code>. Focus is a system signal (&ldquo;you are
           here&rdquo;), not a per-variant or status signal, so there is no
-          per-variant focus colour. <code>focus-default</code> resolves to the
-          active brand&rsquo;s <code>primary.subtle-foreground</code>, which is
-          why the ring re-tints with the theme picker and component code never
-          needs a brand-specific focus class. Only the error state differs, and
-          it has its own token: <code>focus-error</code>.
+          per-variant focus colour. <code>focus-default</code> is derived from
+          the active brand&rsquo;s <code>primary-text</code> and adjusted for
+          contrast, which is why the ring re-tints with the theme picker and
+          component code never needs a brand-specific focus class. Only the
+          error state differs, and it has its own token:{' '}
+          <code>focus-error</code>.
         </p>
       </section>
 

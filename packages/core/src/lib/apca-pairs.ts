@@ -91,15 +91,15 @@ export const APCA_PAIRS = [
   text('nav-muted-foreground', 'nav-background', 'incidental'),
   text('nav-foreground', 'nav-item-hover', 'ui'),
   text('nav-foreground', 'nav-item-active', 'ui'),
-  ink('error-subtle-foreground', 'background', 'ui'),
-  ink('error-subtle-foreground', 'container', 'ui'),
+  ink('error-text', 'background', 'ui'),
+  ink('error-text', 'container', 'ui'),
   ...FAMILY_PAIRS.flatMap((family) => [
     label(`${family}-foreground`, `${family}-background`, 'ui'),
     label(`${family}-foreground`, `${family}-background-hover`, 'ui'),
     label(`${family}-foreground`, `${family}-background-active`, 'ui'),
-    ink(`${family}-subtle-foreground`, `${family}-subtle`, 'ui'),
-    ink(`${family}-subtle-foreground`, `${family}-subtle-hover`, 'ui'),
-    ink(`${family}-subtle-foreground`, `${family}-subtle-active`, 'ui'),
+    ink(`${family}-text`, `${family}-subtle`, 'ui'),
+    ink(`${family}-text`, `${family}-subtle-hover`, 'ui'),
+    ink(`${family}-text`, `${family}-subtle-active`, 'ui'),
   ]),
   ...CATEGORICAL_INDICES.flatMap((index) =>
     ['container', 'background'].map((bg) => ({
@@ -108,11 +108,11 @@ export const APCA_PAIRS = [
     }))
   ),
   // Focus is the primary accent (components.md § Focus States), so it shares
-  // one solved color with primary-subtle-foreground.
+  // one solved color with primary-text.
   ...FOCUS_SURFACES.flatMap((surface) => [
     {
       ...ink('focus-default', surface, 'incidental'),
-      solveAs: 'primary-subtle-foreground',
+      solveAs: 'primary-text',
     },
     ink('focus-error', surface, 'incidental'),
   ]),

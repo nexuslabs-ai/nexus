@@ -861,7 +861,7 @@ export const VariantClassesMatchFigmaTokens: Story = {
       'nx:active:bg-secondary-background-active'
     );
     await expect(canvas.getByRole('button', { name: 'Error' })).toHaveClass(
-      'nx:text-error-subtle-foreground'
+      'nx:text-error-text'
     );
     await expect(
       canvas.getByRole('button', { name: 'Destructive' })

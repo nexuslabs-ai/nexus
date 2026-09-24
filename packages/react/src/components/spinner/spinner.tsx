@@ -22,7 +22,7 @@ interface SpinnerProps extends React.ComponentProps<'svg'> {}
  * @example
  * ```tsx
  * <Spinner />
- * <Spinner className="nx:size-6 nx:text-primary-subtle-foreground" />
+ * <Spinner className="nx:size-6 nx:text-primary-text" />
  * <Spinner aria-label="Saving changes" />
  * ```
  */

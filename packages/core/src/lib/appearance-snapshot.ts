@@ -13,7 +13,9 @@ import {
 } from './derive-theme';
 import type { Mode } from './palette';
 
-export const SNAPSHOT_VERSION = 6;
+export const SNAPSHOT_VERSION = 7;
+// State cookies do not contain CSS and their payload shape is unchanged.
+const STATE_COOKIE_VERSION = 6;
 const SNAPSHOT_CACHE_LIMIT = 50;
 
 export const NEXUS_APPEARANCE_DATA_ATTRS = [
@@ -34,7 +36,7 @@ export interface NexusAppearanceSnapshot {
 }
 
 export interface NexusAppearanceStateCookie {
-  version: typeof SNAPSHOT_VERSION;
+  version: typeof STATE_COOKIE_VERSION;
   state: NexusAppearanceState;
 }
 
@@ -141,7 +143,7 @@ export function createNexusAppearanceStateCookie(
   state: NexusAppearanceState
 ): NexusAppearanceStateCookie {
   return {
-    version: SNAPSHOT_VERSION,
+    version: STATE_COOKIE_VERSION,
     state: sanitizeNexusAppearance(state),
   };
 }
@@ -165,7 +167,7 @@ export function parseNexusAppearanceStateCookie(
 
     if (
       !isRecord(parsed) ||
-      parsed.version !== SNAPSHOT_VERSION ||
+      parsed.version !== STATE_COOKIE_VERSION ||
       !isRecord(parsed.state)
     ) {
       return null;

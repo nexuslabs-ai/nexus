@@ -158,7 +158,7 @@ export const States: Story = {
         <AttachmentContent>
           <AttachmentTitle
             trailing={
-              <IconCircleCheckFilled className="nx:size-4 nx:text-success-subtle-foreground" />
+              <IconCircleCheckFilled className="nx:size-4 nx:text-success-text" />
             }
           >
             notes.txt
