@@ -383,7 +383,7 @@ export function generateTypographyUtilitiesCSS(tokensDir, primitiveMap) {
 /**
  * Render one `@utility` rule the way the committed CSS spells it.
  *
- * @param {{ name: string, declarations: { property: string, value: string }[] }} rule
+ * @param {import('../src/token-source/utilities.js').UtilityRule} rule
  * @returns {string}
  */
 function formatUtilityRule({ name, declarations }) {
