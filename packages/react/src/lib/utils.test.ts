@@ -141,6 +141,16 @@ describe('cn', () => {
       'nx:transition-control nx:transition-field',
       'nx:transition-field',
     ],
+    [
+      'autofill surface',
+      'nx:autofill-bg-container nx:autofill-bg-background',
+      'nx:autofill-bg-background',
+    ],
+    [
+      'autofill text',
+      'nx:autofill-text-foreground nx:autofill-text-disabled-foreground',
+      'nx:autofill-text-disabled-foreground',
+    ],
   ])('uses last-wins merging for the %s group', (_group, input, expected) => {
     expect(cn(input)).toBe(expected);
   });
@@ -217,13 +227,21 @@ describe('cn', () => {
         .map(([, utility]) => utility)
         .filter((utility): utility is string => utility !== undefined)
     );
-    const registeredUtilities = new Set(
-      Object.values(NEXUS_CLASS_GROUPS).flat()
-    );
+    // A `{ prefix: [validator] }` entry registers `prefix-*` and every static
+    // `prefix-<value>` utility beside it.
+    const registeredUtilities = Object.values(NEXUS_CLASS_GROUPS).flat();
+    const isRegistered = (utility: string) =>
+      registeredUtilities.some((entry) =>
+        typeof entry === 'string'
+          ? entry === utility
+          : Object.keys(entry).some((prefix) =>
+              utility.startsWith(`${prefix}-`)
+            )
+      );
 
     expect(emittedUtilities.length).toBeGreaterThan(0);
     expect(
-      emittedUtilities.filter((utility) => !registeredUtilities.has(utility))
+      emittedUtilities.filter((utility) => !isRegistered(utility))
     ).toEqual([]);
   });
 

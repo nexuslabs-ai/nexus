@@ -249,7 +249,9 @@ function InputGroupInput({ className, ...props }: InputGroupInputProps) {
     <Input
       data-slot="input-group-control"
       className={cn(
-        'nx:flex-1 nx:rounded-none nx:border-0 nx:bg-transparent nx:enabled:hover:bg-transparent nx:focus-visible:outline-none',
+        'nx:flex-1 nx:rounded-none nx:border-0 nx:focus-visible:outline-none',
+        'nx:bg-transparent nx:enabled:hover:bg-transparent nx:disabled:bg-transparent',
+        'nx:autofill-bg-transparent nx:enabled:hover:autofill-bg-transparent nx:disabled:autofill-bg-transparent',
         className
       )}
       {...props}
@@ -278,7 +280,9 @@ function InputGroupTextarea({ className, ...props }: InputGroupTextareaProps) {
     <Textarea
       data-slot="input-group-control"
       className={cn(
-        'nx:flex-1 nx:resize-none nx:rounded-none nx:border-0 nx:bg-transparent nx:enabled:hover:bg-transparent nx:py-3 nx:focus-visible:outline-none',
+        'nx:flex-1 nx:resize-none nx:rounded-none nx:border-0 nx:py-3 nx:focus-visible:outline-none',
+        'nx:bg-transparent nx:enabled:hover:bg-transparent nx:disabled:bg-transparent',
+        'nx:autofill-bg-transparent nx:enabled:hover:autofill-bg-transparent nx:disabled:autofill-bg-transparent',
         className
       )}
       {...props}

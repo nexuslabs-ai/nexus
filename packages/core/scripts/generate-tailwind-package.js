@@ -21,6 +21,7 @@ import {
   filterDivergentDark,
   formatDistCssFiles,
   formatTokenValue,
+  generateAutofillUtilitiesCSS,
   generateBaseLayerCSS,
   generateBorderColorAliasUtilitiesCSS,
   generateBorderWidthUtilitiesCSS,
@@ -28,6 +29,7 @@ import {
   generateNativeBrowserUIThemeCSS,
   generateSpacingModesCSS,
   generateSpacingRoleUtilitiesCSS,
+  generateSurfaceUtilitiesCSS,
   generateThemeCSS,
   generateThemedModesCSS,
   generateTypographyUtilitiesCSS,
@@ -572,6 +574,8 @@ function generateNexusCSS(
   });
 
   css += generateNativeBrowserUIThemeCSS();
+  css += generateAutofillUtilitiesCSS();
+  css += generateSurfaceUtilitiesCSS();
 
   // Add base layer
   css += generateBaseLayerCSS();

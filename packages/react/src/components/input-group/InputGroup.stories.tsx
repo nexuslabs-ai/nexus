@@ -2,6 +2,7 @@ import type { Meta, StoryObj } from '@storybook/react';
 import { IconEye, IconMail, IconSearch, IconX } from '@tabler/icons-react';
 import { expect, fn, userEvent, within } from 'storybook/test';
 
+import { unpairedAutofillClasses } from '../../stories/support/autofill-pairing';
 import { Spinner } from '../spinner';
 
 import {
@@ -137,6 +138,12 @@ export const WithTextarea: Story = {
       </InputGroupAddon>
     </InputGroup>
   ),
+  play: async ({ canvasElement }) => {
+    const textarea = within(canvasElement).getByRole('textbox', {
+      name: 'Message',
+    });
+    await expect(unpairedAutofillClasses(textarea)).toEqual([]);
+  },
 };
 
 export const FocusBorderOwnership: Story = {
@@ -305,7 +312,12 @@ export const Disabled: Story = {
   ),
   play: async ({ canvasElement }) => {
     const canvas = within(canvasElement);
-    await expect(canvas.getByRole('textbox', { name: 'Email' })).toBeDisabled();
+    const input = canvas.getByRole('textbox', { name: 'Email' });
+    await expect(input).toBeDisabled();
+    await expect(window.getComputedStyle(input).backgroundColor).toBe(
+      'rgba(0, 0, 0, 0)'
+    );
+    await expect(unpairedAutofillClasses(input)).toEqual([]);
     await expect(
       canvas.getByRole('button', { name: 'Subscribe' })
     ).toBeDisabled();
@@ -386,9 +398,13 @@ export const BorderlessStates: Story = {
     await expect(invalidStyles.borderTopColor).not.toBe('rgba(0, 0, 0, 0)');
     await expect(invalidStyles.boxShadow).toBe('none');
 
-    await expect(
-      canvas.getByRole('textbox', { name: 'Disabled borderless email' })
-    ).toBeDisabled();
+    const disabledInput = canvas.getByRole('textbox', {
+      name: 'Disabled borderless email',
+    });
+    await expect(disabledInput).toBeDisabled();
+    await expect(window.getComputedStyle(disabledInput).backgroundColor).toBe(
+      'rgba(0, 0, 0, 0)'
+    );
     await expect(disabled).toHaveClass('nx:data-[disabled=true]:bg-disabled');
     await expect(disabled).not.toHaveClass(
       'nx:data-[disabled=true]:border-border-disabled'

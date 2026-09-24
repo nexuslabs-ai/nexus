@@ -2075,15 +2075,48 @@
   .dark {
     color-scheme: dark;
   }
+}
 
-  :where(
-    input[type='checkbox'],
-    input[type='radio'],
-    input[type='range'],
-    progress
-  ) {
-    accent-color: var(--color-primary-background);
+/* ===== AUTOFILL UTILITIES ===== */
+@utility autofill-bg-* {
+  &:autofill {
+    background-clip: padding-box;
+    box-shadow:
+      var(--tw-inset-shadow, 0 0 #0000),
+      var(--tw-inset-ring-shadow, 0 0 #0000),
+      var(--tw-ring-offset-shadow, 0 0 #0000),
+      var(--tw-ring-shadow, 0 0 #0000),
+      var(--tw-shadow, 0 0 #0000),
+      inset 0 0 0 1000px --value(--color-*);
   }
+}
+
+@utility autofill-bg-transparent {
+  &:autofill {
+    -webkit-background-clip: text;
+    background-clip: text;
+  }
+}
+
+@utility autofill-text-* {
+  &:autofill {
+    color: --value(--color-*);
+    -webkit-text-fill-color: --value(--color-*);
+    caret-color: --value(--color-*);
+  }
+}
+
+/* ===== SURFACE UTILITIES ===== */
+@utility surface-* {
+  --nx-surface: --value(--color-*);
+}
+
+@utility ring-surface {
+  --tw-ring-color: var(--nx-surface, --theme(--color-background));
+}
+
+@utility ring-offset-surface {
+  --tw-ring-offset-color: var(--nx-surface, --theme(--color-background));
 }
 
 /* ===== BASE LAYER ===== */

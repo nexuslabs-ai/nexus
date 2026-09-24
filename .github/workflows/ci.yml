@@ -239,6 +239,20 @@ jobs:
             exit 1
           fi
 
+      - name: Regenerate docs demo index
+        run: pnpm --filter @nexus_ds/docs generate:demos
+
+      - name: Check docs demo index freshness
+        run: |
+          set -euo pipefail
+          DIRTY=$(git status --porcelain -- apps/docs/__generated__)
+          if [ -n "$DIRTY" ]; then
+            echo "::error::Docs demo index is stale. Affected paths:"
+            echo "$DIRTY"
+            echo "::error::Run 'pnpm --filter @nexus_ds/docs generate:demos' and commit the result."
+            exit 1
+          fi
+
       - name: Run unit tests
         run: pnpm test:unit
 
