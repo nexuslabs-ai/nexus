@@ -8,8 +8,8 @@ import { toggleVariants } from '../toggle';
 
 const ToggleGroupContext = React.createContext<
   VariantProps<typeof toggleVariants> & {
-    spacing?: number;
-    orientation?: 'horizontal' | 'vertical';
+    spacing: number;
+    orientation: 'horizontal' | 'vertical';
   }
 >({
   spacing: 0,
@@ -94,16 +94,27 @@ function ToggleGroup({
   );
 }
 
-const joinedSharedEdge = {
+// A bordered item after another bordered item drops its leading border, so the
+// pair's shared edge is the first item's trailing border. That edge takes the
+// next item's hover / selected / invalid colour unless the first item is
+// itself invalid; a selected invalid next item wins even then. Each rule
+// matches a distinct next-item state, so no two rules compete.
+const joinedItem = {
   horizontal: [
-    'nx:[&:not([aria-invalid=true]:not(:disabled)):has(+[data-variant=outline-primary]:not(:disabled)[data-state=on]:not([aria-invalid=true]))]:border-e-border-primary-active',
-    'nx:[&:not([aria-invalid=true]:not(:disabled)):has(+:is([data-variant=outline],[data-variant=outline-primary]):not(:disabled)[aria-invalid=true])]:border-e-border-error',
-    'nx:[&:not([aria-invalid=true]:not(:disabled)):has(+[data-variant=outline-primary]:not(:disabled)[aria-invalid=true][data-state=on])]:border-e-border-error-active',
+    'nx:first:rounded-s-md nx:last:rounded-e-md',
+    'nx:[[data-slot=toggle-group-item]:not([data-variant=default])+&]:border-s-0',
+    'nx:[&:not([aria-invalid=true]:not(:disabled)):has(+[data-variant=outline-primary][data-state=off]:not([aria-invalid=true]):not(:disabled):hover)]:border-e-border-primary',
+    'nx:[&:not([aria-invalid=true]:not(:disabled)):has(+[data-variant=outline-primary][data-state=on]:not([aria-invalid=true]):not(:disabled))]:border-e-border-primary-active',
+    'nx:[&:not([aria-invalid=true]:not(:disabled)):has(+:is([data-variant=outline],[data-variant=outline-primary][data-state=off])[aria-invalid=true]:not(:disabled))]:border-e-border-error',
+    'nx:[&:has(+[data-variant=outline-primary][data-state=on][aria-invalid=true]:not(:disabled))]:border-e-border-error-active',
   ],
   vertical: [
-    'nx:[&:not([aria-invalid=true]:not(:disabled)):has(+[data-variant=outline-primary]:not(:disabled)[data-state=on]:not([aria-invalid=true]))]:border-b-border-primary-active',
-    'nx:[&:not([aria-invalid=true]:not(:disabled)):has(+:is([data-variant=outline],[data-variant=outline-primary]):not(:disabled)[aria-invalid=true])]:border-b-border-error',
-    'nx:[&:not([aria-invalid=true]:not(:disabled)):has(+[data-variant=outline-primary]:not(:disabled)[aria-invalid=true][data-state=on])]:border-b-border-error-active',
+    'nx:first:rounded-t-md nx:last:rounded-b-md',
+    'nx:[[data-slot=toggle-group-item]:not([data-variant=default])+&]:border-t-0',
+    'nx:[&:not([aria-invalid=true]:not(:disabled)):has(+[data-variant=outline-primary][data-state=off]:not([aria-invalid=true]):not(:disabled):hover)]:border-b-border-primary',
+    'nx:[&:not([aria-invalid=true]:not(:disabled)):has(+[data-variant=outline-primary][data-state=on]:not([aria-invalid=true]):not(:disabled))]:border-b-border-primary-active',
+    'nx:[&:not([aria-invalid=true]:not(:disabled)):has(+:is([data-variant=outline],[data-variant=outline-primary][data-state=off])[aria-invalid=true]:not(:disabled))]:border-b-border-error',
+    'nx:[&:has(+[data-variant=outline-primary][data-state=on][aria-invalid=true]:not(:disabled))]:border-b-border-error-active',
   ],
 } as const;
 
@@ -133,19 +144,17 @@ function ToggleGroupItem({
   const context = React.useContext(ToggleGroupContext);
   const resolvedVariant = variant ?? context.variant ?? 'default';
   const resolvedSize = size ?? context.size ?? 'default';
-  const joinedBordered = context.spacing === 0 && resolvedVariant !== 'default';
+  const joined = context.spacing === 0;
 
   return (
     <ToggleGroupPrimitive.Item
       className={cn(
         toggleVariants({ variant: resolvedVariant, size: resolvedSize }),
         'nx:min-w-0 nx:shrink-0',
-        'nx:data-[spacing=0]:rounded-none nx:data-[spacing=0]:data-[orientation=horizontal]:first:rounded-s-md nx:data-[spacing=0]:data-[orientation=horizontal]:last:rounded-e-md nx:data-[spacing=0]:data-[orientation=vertical]:first:rounded-t-md nx:data-[spacing=0]:data-[orientation=vertical]:last:rounded-b-md',
-        // A bordered item following another bordered item drops its leading
-        // border so the pair shares one edge.
-        'nx:data-[spacing=0]:data-[orientation=horizontal]:[[data-slot=toggle-group-item]:not([data-variant=default])+&]:border-s-0 nx:data-[spacing=0]:data-[orientation=vertical]:[[data-slot=toggle-group-item]:not([data-variant=default])+&]:border-t-0',
-        'nx:data-[spacing=0]:focus-visible:relative nx:data-[spacing=0]:focus-visible:z-10',
-        joinedBordered && joinedSharedEdge[context.orientation ?? 'horizontal'],
+        joined && [
+          'nx:rounded-none nx:focus-visible:relative nx:focus-visible:z-10',
+          joinedItem[context.orientation],
+        ],
         className
       )}
       {...props}

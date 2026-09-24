@@ -289,6 +289,14 @@ const SHARED_EDGE_CASES: readonly SharedEdgeCase[] = [
     owner: 'own',
   },
   {
+    name: 'both invalid selected',
+    variant: 'outline-primary',
+    spacing: 0,
+    leading: { invalid: true },
+    trailing: { invalid: true, pressed: true },
+    owner: 'next',
+  },
+  {
     name: 'spaced',
     variant: 'outline-primary',
     spacing: 2,
@@ -346,9 +354,16 @@ const SHARED_EDGE_CASES: readonly SharedEdgeCase[] = [
   },
 ];
 
-// The joined edge between two bordered items takes the next item's border
-// colour (outline: invalid only; outline-primary: selected / invalid) unless
-// the leading item's own state is invalid.
+// Synthetic hover events do not set CSS `:hover`, so the hover rule is
+// asserted by class rather than by computed colour.
+const HOVER_SHARED_EDGE = {
+  horizontal:
+    'nx:[&:not([aria-invalid=true]:not(:disabled)):has(+[data-variant=outline-primary][data-state=off]:not([aria-invalid=true]):not(:disabled):hover)]:border-e-border-primary',
+  vertical:
+    'nx:[&:not([aria-invalid=true]:not(:disabled)):has(+[data-variant=outline-primary][data-state=off]:not([aria-invalid=true]):not(:disabled):hover)]:border-b-border-primary',
+} as const;
+
+// Pins the shared-edge colour rules on `joinedItem` in toggle-group.tsx.
 export const JoinedSharedEdge: Story = {
   render: () => (
     <div className="nx:flex nx:flex-wrap nx:items-start nx:gap-8">
@@ -402,6 +417,13 @@ export const JoinedSharedEdge: Story = {
       const item = (label: string, position: 'leading' | 'trailing') =>
         canvas.getByRole('button', { name: `${label} ${position}` });
       const selected = end(item(`${layout.name} selected`, 'trailing'));
+      const hoverEdge = HOVER_SHARED_EDGE[layout.orientation];
+      await expect(item(`${layout.name} selected`, 'leading')).toHaveClass(
+        hoverEdge
+      );
+      await expect(item(`${layout.name} spaced`, 'leading')).not.toHaveClass(
+        hoverEdge
+      );
       for (const edgeCase of SHARED_EDGE_CASES) {
         const label = `${layout.name} ${edgeCase.name}`;
         const leading = item(label, 'leading');
