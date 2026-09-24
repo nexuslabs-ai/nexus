@@ -648,7 +648,7 @@ export async function generateTailwindPackage(
   const borderWidth = generateBorderWidthUtilitiesCSS(borderwidthTokens);
   if (borderWidth.css) {
     writeDistFile('borderwidth-utilities.css', borderWidth.css);
-    log.success(`Generated ${borderWidth.count} border width utilities`);
+    log.success(`Generated ${borderWidth.count} border width alias utilities`);
   }
 
   const borderColorAliases =
@@ -713,7 +713,7 @@ export async function generateTailwindPackage(
   }
   console.log(`   Engine semantic colors: ${lightSemanticTokens.length}`);
   console.log(`   Typography utilities: ${typography.count}`);
-  console.log(`   Border width utilities: ${borderWidth.count}`);
+  console.log(`   Border width alias utilities: ${borderWidth.count}`);
   console.log(`   Output: ${distDir}`);
 }
 

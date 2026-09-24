@@ -73,16 +73,6 @@
   --radius-4xl: var(--nx-radius-4xl);
   --radius-full: var(--nx-radius-full);
 
-  /* Border width tokens */
-  --border-thin: var(--nx-borderwidth-thin);
-  --border-default: var(--nx-borderwidth-default);
-  --border-thick: var(--nx-borderwidth-thick);
-
-  /* Outline width tokens — same values, so a focus ring can match a border */
-  --outline-width-thin: var(--nx-borderwidth-thin);
-  --outline-width-default: var(--nx-borderwidth-default);
-  --outline-width-thick: var(--nx-borderwidth-thick);
-
   /* Motion tokens */
   --ease-linear: var(--nx-motion-ease-linear);
   --ease-enter: var(--nx-motion-ease-enter);
@@ -145,6 +135,16 @@
   --breakpoint-lg: 64rem;
   --breakpoint-xl: 80rem;
   --breakpoint-2xl: 96rem;
+}
+
+@theme inline {
+  /* Border and outline width tokens */
+  --border-width-thin: var(--nx-borderwidth-thin);
+  --border-width-default: var(--nx-borderwidth-default);
+  --border-width-thick: var(--nx-borderwidth-thick);
+  --outline-width-thin: var(--nx-borderwidth-thin);
+  --outline-width-default: var(--nx-borderwidth-default);
+  --outline-width-thick: var(--nx-borderwidth-thick);
 }
 
 @theme inline {
