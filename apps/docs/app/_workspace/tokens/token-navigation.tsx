@@ -2,7 +2,7 @@
 
 import type { ComponentProps, MouseEvent } from 'react';
 
-import { useCreateLocation } from '../use-create-location';
+import { useWorkspaceLocation } from '../use-workspace-location';
 
 import { type ExploreSearch, parseExploreSearch } from './token-index';
 
@@ -14,12 +14,12 @@ function toParams(search: ExploreSearch) {
 }
 
 export function useTokenSearch() {
-  const { search } = useCreateLocation();
+  const { search } = useWorkspaceLocation();
   return parseExploreSearch(search);
 }
 
 export function useTokenNavigate() {
-  const { navigate } = useCreateLocation();
+  const { navigate } = useWorkspaceLocation();
   return (search: ExploreSearch, replace = false) =>
     navigate(toParams(search), replace);
 }

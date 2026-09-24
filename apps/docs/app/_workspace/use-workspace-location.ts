@@ -2,7 +2,7 @@
 
 import { useCallback, useSyncExternalStore } from 'react';
 
-const LOCATION_EVENT = 'nexus-create-location';
+const LOCATION_EVENT = 'nexus-workspace-location';
 
 function subscribe(callback: () => void) {
   window.addEventListener('popstate', callback);
@@ -13,8 +13,8 @@ function subscribe(callback: () => void) {
   };
 }
 
-/** Query-string state for the create workspaces, kept in the URL so views deep-link. */
-export function useCreateLocation() {
+/** Query-string state for the workspaces, kept in the URL so views deep-link. */
+export function useWorkspaceLocation() {
   const query = useSyncExternalStore(
     subscribe,
     () => location.search,
