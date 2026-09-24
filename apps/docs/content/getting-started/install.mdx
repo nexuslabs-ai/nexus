@@ -216,33 +216,22 @@ list and losing to source order.
 
 ## Paste a component
 
-Setup is done. A component is never just its own file, so take it by following
-its imports: open the one you want, copy every relative import it names, then do
-the same for those files until nothing new appears. Two things that come up
-immediately — an import of `lib/utils` is the `cn` from step 4 and is already in
-place, and an import of a sibling folder is a barrel, so take that folder's
-implementation file. What is left over — the bare package specifiers — is your
-install line.
+Setup is done. A component is never just its own file: it imports other Nexus
+files, and those import packages. Each component lists both, generated from its
+imports. For Button, install these and copy these files first:
 
-Run that on `button.tsx` and it closes after two rounds: `spinner.tsx`,
-`button-group-context.ts` from the first, and `lib/icons.ts` (which only
-`spinner.tsx` names) from the second.
+<InstallBlock slug="button" />
 
-```
-components/ui/button.tsx
-components/ui/spinner.tsx             # the loading state
-components/ui/button-group-context.ts # size inherited from a ButtonGroup
-lib/icons.ts                          # the internal @tabler/icons-react barrel
-```
+Then copy `components/button/button.tsx` itself. Every path is relative to
+`packages/react/src/` in the repo: keep it as it is under your `@/` root, next
+to the `lib/utils.ts` from step 4, and the relative imports between the files —
+barrels included — resolve without an edit. Rerunning an install line or
+recopying `lib/utils.ts` changes nothing.
 
-```bash
-npm install @radix-ui/react-slot class-variance-authority @tabler/icons-react
-```
-
-Repoint the relative imports at wherever you put the files, then render it:
+Render it:
 
 ```tsx
-import { Button } from '@/components/ui/button';
+import { Button } from '@/components/button/button';
 
 export default function Page() {
   return (
@@ -272,7 +261,7 @@ the provider's `state` and `setState`:
 'use client';
 
 import { useNexusAppearance } from '@/components/appearance';
-import { Button } from '@/components/ui/button';
+import { Button } from '@/components/button/button';
 
 export function ModeToggle() {
   const { state, setState, resolvedMode } = useNexusAppearance();
