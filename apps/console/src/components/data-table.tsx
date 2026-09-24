@@ -7,6 +7,8 @@ import {
   TableHead,
   TableHeader,
   TableRow,
+  TableSelectionCell,
+  TableSelectionHead,
 } from '@nexus_ds/react';
 import {
   type ColumnDef,
@@ -94,16 +96,22 @@ export function DataTable<TData>({
           <TableHeader>
             {table.getHeaderGroups().map((headerGroup) => (
               <TableRow key={headerGroup.id}>
-                {headerGroup.headers.map((header) => (
-                  <TableHead key={header.id}>
-                    {header.isPlaceholder
-                      ? null
-                      : flexRender(
-                          header.column.columnDef.header,
-                          header.getContext()
-                        )}
-                  </TableHead>
-                ))}
+                {headerGroup.headers.map((header) => {
+                  const Head =
+                    header.column.id === 'select'
+                      ? TableSelectionHead
+                      : TableHead;
+                  return (
+                    <Head key={header.id}>
+                      {header.isPlaceholder
+                        ? null
+                        : flexRender(
+                            header.column.columnDef.header,
+                            header.getContext()
+                          )}
+                    </Head>
+                  );
+                })}
               </TableRow>
             ))}
           </TableHeader>
@@ -114,14 +122,20 @@ export function DataTable<TData>({
                   key={row.id}
                   data-state={row.getIsSelected() ? 'selected' : undefined}
                 >
-                  {row.getVisibleCells().map((cell) => (
-                    <TableCell key={cell.id}>
-                      {flexRender(
-                        cell.column.columnDef.cell,
-                        cell.getContext()
-                      )}
-                    </TableCell>
-                  ))}
+                  {row.getVisibleCells().map((cell) => {
+                    const Cell =
+                      cell.column.id === 'select'
+                        ? TableSelectionCell
+                        : TableCell;
+                    return (
+                      <Cell key={cell.id}>
+                        {flexRender(
+                          cell.column.columnDef.cell,
+                          cell.getContext()
+                        )}
+                      </Cell>
+                    );
+                  })}
                 </TableRow>
               ))
             ) : (

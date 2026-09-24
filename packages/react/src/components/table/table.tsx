@@ -71,30 +71,9 @@ interface TableProps extends React.ComponentProps<'table'> {
    */
   striped?: boolean;
   /**
-   * Move the `TableSelectionHead` / `TableSelectionCell` column into a leading
-   * gutter once the table is at least 48rem wide. Below that, or without this
-   * prop, the selection column stays an ordinary in-flow column. The checkboxes
-   * are visible in both layouts.
-   *
-   * The table does not own selection state — set `data-state="selected"` on each
-   * selected `TableRow` yourself.
-   *
-   * @default false
-   *
-   * @example
-   * ```tsx
-   * <Table selectable>…</Table>
-   * ```
-   */
-  selectable?: boolean;
-  /**
    * Classes for the scroll container (the element that owns horizontal — and,
    * with `stickyHeader`, vertical — overflow). Use it to bound the height
    * (`"nx:max-h-96"`) or set the surface. `className` still targets the `<table>`.
-   *
-   * With `selectable`, the container reserves the selection gutter as
-   * inline-start padding once the gutter layout applies, overriding any
-   * inline-start padding set here.
    */
   containerClassName?: string;
 }
@@ -107,8 +86,6 @@ interface TableProps extends React.ComponentProps<'table'> {
  * on narrow viewports without forcing a page-level scrollbar. Compose with the
  * sub-components: `TableHeader` / `TableBody` / `TableFooter` wrap `TableRow`s,
  * which hold `TableHead` (column header) or `TableCell` (data) cells.
- * Selection cells stay in-flow by default; pass `selectable` to move them into
- * a leading gutter once the table is at least 48rem wide.
  *
  * @example
  * ```tsx
@@ -134,52 +111,37 @@ function Table({
   density = 'comfortable',
   stickyHeader = false,
   striped = false,
-  selectable = false,
   containerClassName,
   ...props
 }: TableProps) {
-  const container = (
-    <div
-      data-slot="table-container"
-      // A wide table overflows horizontally and holds no focusable children, so
-      // the container itself must be keyboard-focusable to scroll into view
-      // (axe scrollable-region-focusable / WCAG 2.1.1).
-      // eslint-disable-next-line jsx-a11y/no-noninteractive-tabindex
-      tabIndex={0}
-      className={cn(
-        'nx:w-full nx:overflow-x-auto nx:focus-visible:outline-2 nx:focus-visible:outline-focus-default nx:focus-visible:[outline-offset:-2px]',
-        stickyHeader && 'nx:overflow-y-auto',
-        containerClassName,
-        selectable && 'nx:@3xl/table-selection:ps-6'
-      )}
-    >
-      <table
-        data-slot="table"
-        data-variant={variant}
-        data-table-density={density}
-        data-sticky-header={stickyHeader || undefined}
-        data-striped={striped || undefined}
-        className={cn(
-          'nx:w-full nx:caption-bottom nx:typography-body-default nx:[&[data-striped]_tbody_tr:nth-child(even):not(:hover):not([data-state=selected])]:bg-muted nx:[&[data-striped]_tfoot]:border-t-default nx:[&[data-striped]_tfoot]:border-border-default-alpha',
-          className
-        )}
-        {...props}
-      />
-    </div>
-  );
-
   return (
     <TableContext.Provider value={{ variant, density, stickyHeader }}>
-      {selectable ? (
-        <div
-          data-slot="table-selection-container"
-          className="nx:@container/table-selection nx:w-full"
-        >
-          {container}
-        </div>
-      ) : (
-        container
-      )}
+      <div
+        data-slot="table-container"
+        // A wide table overflows horizontally and holds no focusable children, so
+        // the container itself must be keyboard-focusable to scroll into view
+        // (axe scrollable-region-focusable / WCAG 2.1.1).
+        // eslint-disable-next-line jsx-a11y/no-noninteractive-tabindex
+        tabIndex={0}
+        className={cn(
+          'nx:w-full nx:overflow-x-auto nx:focus-visible:outline-2 nx:focus-visible:outline-focus-default nx:focus-visible:[outline-offset:-2px]',
+          stickyHeader && 'nx:overflow-y-auto',
+          containerClassName
+        )}
+      >
+        <table
+          data-slot="table"
+          data-variant={variant}
+          data-table-density={density}
+          data-sticky-header={stickyHeader || undefined}
+          data-striped={striped || undefined}
+          className={cn(
+            'nx:w-full nx:caption-bottom nx:typography-body-default nx:[&[data-striped]_tbody_tr:nth-child(even):not(:hover):not([data-state=selected])]:bg-muted nx:[&[data-striped]_tfoot]:border-t-default nx:[&[data-striped]_tfoot]:border-border-default-alpha',
+            className
+          )}
+          {...props}
+        />
+      </div>
     </TableContext.Provider>
   );
 }
@@ -308,7 +270,7 @@ function TableRow({ className, ...props }: TableRowProps) {
 interface TableHeadProps extends React.ComponentProps<'th'> {}
 
 const tableHeadVariants = cva(
-  'nx:px-2 nx:text-start nx:align-middle nx:typography-label-default nx:whitespace-nowrap nx:text-muted-foreground nx:has-[[role=checkbox]]:pe-0 nx:*:[[role=checkbox]]:translate-y-0.5 nx:[&[aria-sort=ascending]]:text-foreground nx:[&[aria-sort=descending]]:text-foreground',
+  'nx:px-2 nx:text-start nx:align-middle nx:typography-label-default nx:whitespace-nowrap nx:text-muted-foreground nx:[&[aria-sort=ascending]]:text-foreground nx:[&[aria-sort=descending]]:text-foreground',
   {
     variants: {
       variant: {
@@ -357,23 +319,20 @@ function TableHead({ className, ...props }: TableHeadProps) {
  */
 interface TableCellProps extends React.ComponentProps<'td'> {}
 
-const tableCellVariants = cva(
-  'nx:px-2 nx:align-middle nx:whitespace-nowrap nx:has-[[role=checkbox]]:pe-0 nx:*:[[role=checkbox]]:translate-y-0.5',
-  {
-    variants: {
-      variant: {
-        default: '',
-        borderless: '',
-        grid: 'nx:border-e-default nx:border-border-default-alpha nx:last:border-e-0',
-      } satisfies Record<TableVariant, string>,
-      density: {
-        comfortable: 'nx:py-3',
-        compact: 'nx:py-2',
-      } satisfies Record<TableDensity, string>,
-    },
-    defaultVariants: { variant: 'default', density: 'comfortable' },
-  }
-);
+const tableCellVariants = cva('nx:px-2 nx:align-middle nx:whitespace-nowrap', {
+  variants: {
+    variant: {
+      default: '',
+      borderless: '',
+      grid: 'nx:border-e-default nx:border-border-default-alpha nx:last:border-e-0',
+    } satisfies Record<TableVariant, string>,
+    density: {
+      comfortable: 'nx:py-3',
+      compact: 'nx:py-2',
+    } satisfies Record<TableDensity, string>,
+  },
+  defaultVariants: { variant: 'default', density: 'comfortable' },
+});
 
 /**
  * TableCell
@@ -391,15 +350,8 @@ function TableCell({ className, ...props }: TableCellProps) {
   );
 }
 
-const tableSelectionCellClassName = cn(
-  'nx:relative nx:w-0',
-  'nx:@3xl/table-selection:p-0 nx:@3xl/table-selection:border-e-0'
-);
-
-const tableSelectionControlClassName = cn(
-  'nx:inline-flex nx:items-center nx:justify-center nx:align-middle',
-  'nx:@3xl/table-selection:absolute nx:@3xl/table-selection:inset-y-0 nx:@3xl/table-selection:-start-6 nx:@3xl/table-selection:w-6'
-);
+const tableSelectionCellClassName =
+  'nx:w-0 nx:pe-0 nx:*:[[role=checkbox]]:translate-y-0.5';
 
 /**
  * TableSelectionHeadProps
@@ -415,31 +367,13 @@ interface TableSelectionHeadProps extends TableHeadProps {}
  * first header cell, paired with `TableSelectionCell` in each body row. With
  * `stickyHeader` it stays pinned along with the rest of the header.
  */
-function TableSelectionHead({
-  className,
-  children,
-  ...props
-}: TableSelectionHeadProps) {
-  const { stickyHeader } = useTableContext();
+function TableSelectionHead({ className, ...props }: TableSelectionHeadProps) {
   return (
     <TableHead
       data-slot="table-selection-head"
       {...props}
-      className={cn(
-        tableSelectionCellClassName,
-        stickyHeader && 'nx:sticky',
-        className
-      )}
-    >
-      <div
-        className={cn(
-          tableSelectionControlClassName,
-          stickyHeader && 'nx:bg-container'
-        )}
-      >
-        {children}
-      </div>
-    </TableHead>
+      className={cn(tableSelectionCellClassName, className)}
+    />
   );
 }
 
@@ -456,19 +390,13 @@ interface TableSelectionCellProps extends TableCellProps {}
  * The cell for a consumer-owned row Checkbox. Set the containing row's
  * `data-state="selected"` from the same selection state.
  */
-function TableSelectionCell({
-  className,
-  children,
-  ...props
-}: TableSelectionCellProps) {
+function TableSelectionCell({ className, ...props }: TableSelectionCellProps) {
   return (
     <TableCell
       data-slot="table-selection-cell"
       {...props}
       className={cn(tableSelectionCellClassName, className)}
-    >
-      <div className={tableSelectionControlClassName}>{children}</div>
-    </TableCell>
+    />
   );
 }
 

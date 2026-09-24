@@ -239,10 +239,10 @@ function SelectionTableDemo({
   );
 }
 
-// `selectable` on a table at least 48rem wide moves the checkboxes into a
-// leading gutter. Every checkbox is visible without hovering its row.
+// `TableSelectionHead` / `TableSelectionCell` hold the checkboxes in a leading
+// in-flow column. Every checkbox is visible without hovering its row.
 export const SelectableRows: Story = {
-  render: () => <SelectionTableDemo selectable />,
+  render: () => <SelectionTableDemo />,
   play: async ({ canvasElement }) => {
     const canvas = within(canvasElement);
     const first = canvas.getByRole('checkbox', { name: 'Select INV001' });
@@ -252,7 +252,6 @@ export const SelectableRows: Story = {
     await expect(second).not.toBeChecked();
     await expect(second).toBeVisible();
     await expect(header).toHaveAttribute('aria-checked', 'mixed');
-    await expect(first.parentElement).toHaveStyle({ position: 'absolute' });
     await userEvent.click(second);
     await expect(second).toBeChecked();
     await expect(second.closest('tr')).toHaveAttribute(
@@ -301,50 +300,8 @@ export const SelectionKeyboardInteraction: Story = {
   },
 };
 
-// Below 48rem the selection column stays in-flow. The checkboxes are visible
-// and selectable before any pointer has hovered a row, as on a touch screen.
-export const SelectionNarrowContainer: Story = {
-  render: () => (
-    <div className="nx:w-80">
-      <SelectionTableDemo selectable />
-    </div>
-  ),
-  play: async ({ canvasElement }) => {
-    const canvas = within(canvasElement);
-    const controls = canvas.getAllByRole('checkbox');
-    await expect(controls).toHaveLength(invoices.length + 1);
-    for (const control of controls) {
-      await expect(control).toBeVisible();
-      await expect(control.parentElement).toHaveStyle({ position: 'static' });
-    }
-    const second = canvas.getByRole('checkbox', { name: 'Select INV002' });
-    second.focus();
-    await userEvent.keyboard(' ');
-    await expect(second).toBeChecked();
-    await expect(second.closest('tr')).toHaveAttribute(
-      'data-state',
-      'selected'
-    );
-  },
-};
-
-// Without `selectable` the selection column is an ordinary in-flow column at
-// every width.
-export const SelectionInFlow: Story = {
-  render: () => <SelectionTableDemo />,
-  play: async ({ canvasElement }) => {
-    await expect(
-      canvasElement.querySelector('[data-slot="table-selection-container"]')
-    ).not.toBeInTheDocument();
-    for (const control of within(canvasElement).getAllByRole('checkbox')) {
-      await expect(control).toBeVisible();
-      await expect(control.parentElement).toHaveStyle({ position: 'static' });
-    }
-  },
-};
-
 export const SelectionDisabled: Story = {
-  render: () => <SelectionTableDemo selectable disabled />,
+  render: () => <SelectionTableDemo disabled />,
   play: async ({ canvasElement }) => {
     const control = within(canvasElement).getByRole('checkbox', {
       name: 'Select INV001',
@@ -357,7 +314,7 @@ export const SelectionDisabled: Story = {
 };
 
 export const SelectionEmpty: Story = {
-  render: () => <SelectionTableDemo selectable rows={[]} />,
+  render: () => <SelectionTableDemo rows={[]} />,
   play: async ({ canvasElement }) => {
     const canvas = within(canvasElement);
     const control = canvas.getByRole('checkbox', { name: 'Select all rows' });
@@ -367,8 +324,8 @@ export const SelectionEmpty: Story = {
   },
 };
 
-// Every variant × density, in both directions: the selection column collapses
-// to zero width and each checkbox sits inside the reserved gutter.
+// Every variant × density, in both directions: each checkbox sits inside its
+// own cell, and the header and row checkboxes line up in one column.
 export const SelectionLayoutMatrix: Story = {
   render: () => (
     <div className="nx:w-full nx:space-y-6">
@@ -380,12 +337,7 @@ export const SelectionLayoutMatrix: Story = {
               dir={dir}
               className="nx:w-full nx:overflow-hidden nx:border-default nx:border-border-default"
             >
-              <SelectionTableDemo
-                selectable
-                variant={variant}
-                density={density}
-                striped
-              />
+              <SelectionTableDemo variant={variant} density={density} striped />
             </div>
           ))
         )
@@ -398,48 +350,40 @@ export const SelectionLayoutMatrix: Story = {
     );
     await expect(containers).toHaveLength(12);
     for (const container of containers) {
-      await expect(
-        parseFloat(getComputedStyle(container).paddingInlineStart)
-      ).toBeGreaterThan(0);
-      const bounds = container.getBoundingClientRect();
-      for (const cell of container.querySelectorAll<HTMLElement>(
+      const cells = container.querySelectorAll<HTMLElement>(
         selectionPartSelector
-      )) {
+      );
+      await expect(cells).toHaveLength(invoices.length + 1);
+      const columnStarts = new Set<number>();
+      for (const cell of cells) {
         const control = cell.querySelector<HTMLElement>('[role="checkbox"]');
         if (!control) throw new Error('Selection control missing');
-        await expect(control.parentElement).toHaveStyle({
-          position: 'absolute',
-        });
-        await expect(cell.getBoundingClientRect().width).toBeLessThanOrEqual(1);
+        const cellBox = cell.getBoundingClientRect();
         const box = control.getBoundingClientRect();
-        await expect(box.left).toBeGreaterThanOrEqual(bounds.left + 4);
-        await expect(box.right).toBeLessThanOrEqual(bounds.right - 4);
+        await expect(box.left).toBeGreaterThanOrEqual(cellBox.left);
+        await expect(box.right).toBeLessThanOrEqual(cellBox.right);
+        columnStarts.add(Math.round(box.left));
       }
+      await expect(columnStarts.size).toBe(1);
     }
   },
 };
 
 export const SelectionDataAttributes: Story = {
-  render: () => <SelectionTableDemo selectable />,
+  render: () => <SelectionTableDemo />,
   play: async ({ canvasElement }) => {
-    const control = within(canvasElement).getByRole('checkbox', {
-      name: 'Select INV001',
-    });
-    await expect(control.closest('td')).toHaveAttribute(
-      'data-slot',
-      'table-selection-cell'
-    );
+    const canvas = within(canvasElement);
     await expect(
-      canvasElement.querySelector('[data-slot="table-selection-head"]')
-    ).toBeInTheDocument();
+      canvas.getByRole('checkbox', { name: 'Select INV001' }).closest('td')
+    ).toHaveAttribute('data-slot', 'table-selection-cell');
     await expect(
-      canvasElement.querySelector('[data-slot="table-selection-container"]')
-    ).toBeInTheDocument();
+      canvas.getByRole('checkbox', { name: 'Select all rows' }).closest('th')
+    ).toHaveAttribute('data-slot', 'table-selection-head');
   },
 };
 
-// The in-flow separator and padding are logical, so they land on the same
-// edges in both directions: a rule and no padding on inline-end.
+// The separator and padding are logical, so they land on the same edges in
+// both directions: a rule and no padding on inline-end.
 export const SelectionGridSeparator: Story = {
   render: () => (
     <div className="nx:w-full nx:space-y-6">
@@ -461,23 +405,6 @@ export const SelectionGridSeparator: Story = {
       await expect(parseFloat(style.paddingInlineStart)).toBeGreaterThan(0);
       await expect(parseFloat(style.paddingInlineEnd)).toBe(0);
     }
-  },
-};
-
-// Without `selectable` nothing reserves a gutter, so container padding set
-// through `containerClassName` survives on both sides.
-export const SelectionInFlowKeepsContainerPadding: Story = {
-  render: () => <SelectionTableDemo containerClassName="nx:px-3" />,
-  play: async ({ canvasElement }) => {
-    const container = canvasElement.querySelector<HTMLElement>(
-      '[data-slot="table-container"]'
-    );
-    if (!container) throw new Error('Table container missing');
-    const style = getComputedStyle(container);
-    await expect(parseFloat(style.paddingInlineStart)).toBeGreaterThan(0);
-    await expect(parseFloat(style.paddingInlineStart)).toBe(
-      parseFloat(style.paddingInlineEnd)
-    );
   },
 };
 
@@ -931,13 +858,15 @@ export const Grid: Story = {
     const row = canvasElement.querySelector('[data-slot="table-row"]');
     const cell = canvasElement.querySelector('[data-slot="table-cell"]');
 
+    if (!cell) throw new Error('Grid cell missing');
+
     await expect(table).toHaveAttribute('data-variant', 'grid');
     await expect(row).toHaveClass(
       'nx:border-b-default',
       'nx:border-border-default-alpha'
     );
     await expect(
-      parseFloat(getComputedStyle(cell as Element).borderInlineEndWidth)
+      parseFloat(getComputedStyle(cell).borderInlineEndWidth)
     ).toBeGreaterThan(0);
   },
 };
@@ -1033,7 +962,6 @@ export const StickyHeader: Story = {
 export const StickyHeaderWithSelection: Story = {
   render: () => (
     <SelectionTableDemo
-      selectable
       stickyHeader
       rows={stickySelectionInvoices}
       containerClassName="nx:max-h-64"
@@ -1062,6 +990,7 @@ export const StickyHeaderWithSelection: Story = {
     if (!container) throw new Error('Selection scroll container missing');
     const top = head.getBoundingClientRect().top;
     container.scrollTop = 100;
+    await expect(container.scrollTop).toBeGreaterThan(0);
     await expect(head.getBoundingClientRect().top).toBe(top);
   },
 };
@@ -1358,7 +1287,7 @@ function SelectionDemo() {
           </Button>
         </div>
       )}
-      <Table selectable>
+      <Table>
         <TableHeader>
           <TableRow>
             <TableSelectionHead>
@@ -1714,9 +1643,9 @@ function DataTableRecipeDemo() {
         <Table>
           <TableHeader>
             <TableRow>
-              <TableHead>
+              <TableSelectionHead>
                 <span className="nx:sr-only">Select</span>
-              </TableHead>
+              </TableSelectionHead>
               <TableHead>Invoice</TableHead>
               <TableHead>Status</TableHead>
               <TableHead aria-sort={ariaSort} className="nx:text-right">
@@ -1749,13 +1678,13 @@ function DataTableRecipeDemo() {
                     selected.has(row.invoice) ? 'selected' : undefined
                   }
                 >
-                  <TableCell>
+                  <TableSelectionCell>
                     <Checkbox
                       checked={selected.has(row.invoice)}
                       onCheckedChange={() => toggleRow(row.invoice)}
                       aria-label={`Select ${row.invoice}`}
                     />
-                  </TableCell>
+                  </TableSelectionCell>
                   <TableRowHeader>{row.invoice}</TableRowHeader>
                   <TableCell>{row.status}</TableCell>
                   <TableCell className="nx:text-right nx:tabular-nums">
@@ -2026,7 +1955,7 @@ function DataTableSelectionRecipeDemo() {
         <Table>
           <TableHeader>
             <TableRow>
-              <TableHead>
+              <TableSelectionHead>
                 <Checkbox
                   checked={
                     allSelected ? true : someSelected ? 'indeterminate' : false
@@ -2035,7 +1964,7 @@ function DataTableSelectionRecipeDemo() {
                   aria-label="Select all invoices"
                   ref={selectAllRef}
                 />
-              </TableHead>
+              </TableSelectionHead>
               <TableHead>Invoice</TableHead>
               <TableHead>Status</TableHead>
               <TableHead className="nx:text-right">Amount</TableHead>
@@ -2047,13 +1976,13 @@ function DataTableSelectionRecipeDemo() {
                 key={row.invoice}
                 data-state={selected.has(row.invoice) ? 'selected' : undefined}
               >
-                <TableCell>
+                <TableSelectionCell>
                   <Checkbox
                     checked={selected.has(row.invoice)}
                     onCheckedChange={() => toggleRow(row.invoice)}
                     aria-label={`Select ${row.invoice}`}
                   />
-                </TableCell>
+                </TableSelectionCell>
                 <TableRowHeader>{row.invoice}</TableRowHeader>
                 <TableCell>{row.status}</TableCell>
                 <TableCell className="nx:text-right nx:tabular-nums">
