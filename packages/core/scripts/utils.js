@@ -632,7 +632,7 @@ export function generateTypographyUtilitiesCSS(tokensDir, primitiveMap) {
 }
 
 // ============================================
-// BORDER WIDTH UTILITIES
+// BORDER WIDTH ALIAS UTILITIES
 // ============================================
 
 const BORDER_WIDTH_SIDES = [
@@ -653,17 +653,23 @@ const BORDER_WIDTH_SIDES = [
     style: 'border-inline-end-style',
     width: 'border-inline-end-width',
   },
+  {
+    suffix: 'bs-',
+    style: 'border-block-start-style',
+    width: 'border-block-start-width',
+  },
+  {
+    suffix: 'be-',
+    style: 'border-block-end-style',
+    width: 'border-block-end-width',
+  },
 ];
 
-const BORDER_WIDTH_PREFIXES = ['border-', 'border-width-'];
-
-const BORDER_WIDTH_UTILITIES_PER_TOKEN =
-  BORDER_WIDTH_SIDES.length * BORDER_WIDTH_PREFIXES.length;
-
 /**
- * Generate border width utility CSS from token array.
- * Creates @utility rules with border-{side?}-{name} patterns for all
- * borderwidth tokens, so runtime stroke modes can affect one-sided borders.
+ * Generate the `border-width-{side?}-{name}` alias utilities for every
+ * borderwidth token. The `border-{side?}-{name}` spellings are Tailwind's own
+ * border utilities, resolved from the `--border-width-*` theme keys that
+ * generateThemeCSS emits.
  *
  * @param {object[]} tokens - Array of borderwidth tokens with cssName property (e.g., "nx-borderwidth-default")
  * @returns {{ css: string, count: number }} Generated CSS and utility count
@@ -673,29 +679,22 @@ export function generateBorderWidthUtilitiesCSS(tokens) {
     return { css: '', count: 0 };
   }
 
-  const emitSides = (prefix) =>
-    tokens
-      .map((token) => {
-        // Extract the name part (e.g., "default" from "nx-borderwidth-default")
-        const name = token.cssName.replace('nx-borderwidth-', '');
-        const value = `var(--${token.cssName})`;
+  let css = `/* Border Width Alias Utilities */\n\n`;
 
-        return BORDER_WIDTH_SIDES.map(
-          (side) =>
-            `@utility ${prefix}${side.suffix}${name} {\n` +
-            `  ${side.style}: var(--tw-border-style, solid);\n` +
-            `  ${side.width}: ${value};\n` +
-            `}\n\n`
-        ).join('');
-      })
-      .join('');
+  for (const token of tokens) {
+    // Extract the name part (e.g., "default" from "nx-borderwidth-default")
+    const name = token.cssName.replace('nx-borderwidth-', '');
+    const value = `var(--${token.cssName})`;
 
-  let css = `/* Border Width Utilities */\n\n`;
-  css += emitSides('border-');
-  css += `/* Border Width Alias Utilities */\n\n`;
-  css += emitSides('border-width-');
+    for (const side of BORDER_WIDTH_SIDES) {
+      css += `@utility border-width-${side.suffix}${name} {\n`;
+      css += `  ${side.style}: var(--tw-border-style, solid);\n`;
+      css += `  ${side.width}: ${value};\n`;
+      css += `}\n\n`;
+    }
+  }
 
-  return { css, count: tokens.length * BORDER_WIDTH_UTILITIES_PER_TOKEN };
+  return { css, count: tokens.length * BORDER_WIDTH_SIDES.length };
 }
 
 const BORDER_COLOR_ALIAS_NAMES = [
@@ -1425,13 +1424,13 @@ export function collectRadiusTokens(tokensDir, mode) {
 
 /**
  * Collect borderwidth token mappings from a mode file
- * Returns array of { key, cssName, varRef } for @theme block. `key` is kept
- * because the same value seeds two Tailwind namespaces: `--border-{key}` and
- * `--outline-width-{key}` (see generateThemeCSS).
+ * Returns array of { key, varRef } for the @theme block, where each value seeds
+ * two Tailwind namespaces: `--border-width-{key}` and `--outline-width-{key}`
+ * (see generateThemeCSS).
  *
  * @param {string} tokensDir - Path to tokens directory
  * @param {string} mode - Borderwidth mode (e.g., 'vega')
- * @returns {object[]} Array of { key, cssName, varRef }
+ * @returns {object[]} Array of { key, varRef }
  */
 export function collectBorderwidthTokens(tokensDir, mode) {
   const filePath = path.join(
@@ -1451,7 +1450,6 @@ export function collectBorderwidthTokens(tokensDir, mode) {
     if (key.startsWith('$')) continue;
     tokens.push({
       key,
-      cssName: `border-${key}`,
       varRef: `var(--nx-borderwidth-${key})`,
     });
   }
@@ -1636,7 +1634,7 @@ export function collectShadowTokens(tokensDir, primitiveMap) {
  * @param {object[]} config.semanticTokens - Array of { cssName, value } for semantic colours
  * @param {object[]} config.spacingTokens - Array of { cssName, value } for numeric spacing (default baseline; per-mode overrides live outside @theme)
  * @param {object[]} config.radiusTokens - Array of { cssName, varRef } for radius
- * @param {object[]} config.borderwidthTokens - Array of { key, cssName, varRef } for borderwidth; each one emits both a --border-* and an --outline-width-* theme key
+ * @param {object[]} config.borderwidthTokens - Array of { key, varRef } for borderwidth; each one emits both a --border-width-* and an --outline-width-* inline theme key
  * @param {object[]} config.motionTokens - Array of { group, key, cssName, varRef } for duration/ease
  * @param {object[]} config.shadowTokens - Array of { cssName, value } for shadows
  * @param {object[]} [config.darkSemanticTokens] - Array of { cssName, value } for dark mode semantic tokens
@@ -1708,22 +1706,6 @@ export function generateThemeCSS(config) {
     }
   }
 
-  // Borderwidth tokens. The same values also seed Tailwind's --outline-width-*
-  // namespace: a field's focus ring is a `border-default` inner edge plus an
-  // `outline-default` outer edge, so both halves have to move together when
-  // [data-borderwidth] swaps the mode.
-  if (borderwidthTokens.length > 0) {
-    css += `\n  /* Border width tokens */\n`;
-    for (const token of borderwidthTokens) {
-      css += `  --${token.cssName}: ${token.varRef};\n`;
-    }
-
-    css += `\n  /* Outline width tokens — same values, so a focus ring can match a border */\n`;
-    for (const token of borderwidthTokens) {
-      css += `  --outline-width-${token.key}: ${token.varRef};\n`;
-    }
-  }
-
   // Motion tokens
   if (motionTokens.length > 0) {
     css += `\n  /* Motion tokens */\n`;
@@ -1759,6 +1741,22 @@ export function generateThemeCSS(config) {
   }
 
   css += `}\n`;
+
+  // Inlined so every border and outline utility reads `--nx-borderwidth-*` on
+  // the element itself, where a `[data-borderwidth]` ancestor has set it. A
+  // field's focus ring is a `border-default` inner edge plus an
+  // `outline-default` outer edge, so both namespaces share each value.
+  if (borderwidthTokens.length > 0) {
+    css += `\n@theme inline {\n`;
+    css += `  /* Border and outline width tokens */\n`;
+    for (const token of borderwidthTokens) {
+      css += `  --border-width-${token.key}: ${token.varRef};\n`;
+    }
+    for (const token of borderwidthTokens) {
+      css += `  --outline-width-${token.key}: ${token.varRef};\n`;
+    }
+    css += `}\n`;
+  }
 
   // Semantic colour utilities need their fallback expression inlined into the
   // generated utility, otherwise Tailwind's `prefix(nx)` rewrites the @theme

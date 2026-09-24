@@ -20,6 +20,21 @@ const EMITTED_CSS = EMITTING_ROOTS.flatMap((root) => {
     .map((entry) => fs.readFileSync(path.join(dir, entry), 'utf8'));
 });
 
+/** Every border side Tailwind builds from a `--border-width-*` theme key. */
+const BORDER_WIDTH_GROUPS = [
+  'border-w',
+  'border-w-x',
+  'border-w-y',
+  'border-w-t',
+  'border-w-r',
+  'border-w-b',
+  'border-w-l',
+  'border-w-s',
+  'border-w-e',
+  'border-w-bs',
+  'border-w-be',
+] as const satisfies readonly (keyof typeof NEXUS_CLASS_GROUPS)[];
+
 /**
  * Namespaces where a Nexus `@theme` key reaches `cn()` through a built-in
  * tailwind-merge group. Each sentinel is a literal member of that group, so a
@@ -66,6 +81,17 @@ const THEME_NAMESPACES = [
       utility.replace(/^outline-/, '')
     ),
   },
+  ...BORDER_WIDTH_GROUPS.map((group) => {
+    const utility = group.replace(/^border-w/, 'border');
+    return {
+      cssKey: 'border-width',
+      utility,
+      sentinel: `nx:${utility}-2`,
+      registered: NEXUS_CLASS_GROUPS[group]
+        .filter((name) => !name.startsWith('border-width-'))
+        .map((name) => name.slice(`${utility}-`.length)),
+    };
+  }),
 ];
 
 /** CSS property a `typography-*` composite can declare, mapped to its owning class group. */
@@ -233,7 +259,7 @@ describe('cn', () => {
   });
 
   it.each(THEME_NAMESPACES)(
-    'merges every emitted $cssKey theme token',
+    'merges every emitted $cssKey theme token as $utility',
     ({ cssKey, utility, sentinel }) => {
       for (const token of emittedThemeTokens(cssKey)) {
         expect(cn(`nx:${utility}-${token}`, sentinel)).toBe(sentinel);
@@ -242,7 +268,7 @@ describe('cn', () => {
   );
 
   it.each(THEME_NAMESPACES)(
-    'finds every registered $cssKey token in the scanned CSS',
+    'finds every registered $utility $cssKey token in the scanned CSS',
     ({ cssKey, registered }) => {
       expect(emittedThemeTokens(cssKey)).toEqual(
         expect.arrayContaining([...registered])
