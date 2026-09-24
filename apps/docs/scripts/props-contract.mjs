@@ -104,7 +104,7 @@ export function cvaVariantKeys(checker, sourceFiles) {
 
   if (keys.size === 0) {
     throw new Error(
-      'props JSON: no cva() call resolved to the `cva` declared in class-variance-authority/dist/index.d.ts, so no variant key would be checked. Update isCvaCall to match the installed class-variance-authority.'
+      'props JSON: no cva() call with `variants` resolved to the `cva` declared in class-variance-authority/dist/index.d.ts, so no variant key would be checked. Update isCvaCall in apps/docs/scripts/props-contract.mjs to match the installed class-variance-authority.'
     );
   }
 
