@@ -2,6 +2,10 @@
   "$schema": "https://turbo.build/schema.json",
   "extends": ["//"],
   "tasks": {
+    "generate:demos": {
+      "outputs": ["__generated__/**"],
+      "cache": false
+    },
     "generate:props": {
       "dependsOn": ["^build"],
       "inputs": [
@@ -31,7 +35,12 @@
       ]
     },
     "build": {
-      "dependsOn": ["^build", "generate:manifest", "generate:props"],
+      "dependsOn": [
+        "^build",
+        "generate:manifest",
+        "generate:props",
+        "generate:demos"
+      ],
       "inputs": ["$TURBO_DEFAULT$", "$TURBO_ROOT$/package.json"],
       "outputs": [".next/**", "!.next/cache/**", "next-env.d.ts"]
     },
@@ -39,6 +48,9 @@
       "dependsOn": ["^build", "generate:manifest"],
       "cache": false,
       "persistent": true
+    },
+    "typecheck": {
+      "dependsOn": ["^build", "generate:demos"]
     }
   }
 }
