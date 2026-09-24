@@ -59,10 +59,8 @@ export async function loadDependencies(slug: string): Promise<Dependencies> {
   const fileNames = await listDependencyFiles();
   const fileName = `${slug}.json`;
 
-  if (slug.startsWith('_') || !fileNames.includes(fileName)) {
-    const known = fileNames
-      .map((name) => path.basename(name, '.json'))
-      .filter((name) => !name.startsWith('_'));
+  if (!fileNames.includes(fileName)) {
+    const known = fileNames.map((name) => path.basename(name, '.json'));
     throw new Error(
       `InstallBlock: unknown slug "${slug}". Known slugs: ${known.join(', ')}.`
     );
