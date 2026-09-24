@@ -175,7 +175,7 @@ Any PR that changes `@nexus_ds/core` or `@nexus_ds/eslint-plugin` includes a cha
 pnpm changeset        # pick packages + semver bump, write a summary
 ```
 
-Commit the generated `.changeset/*.md` file with your PR. Semver is a contract: `major` for a breaking change to core's runtime surface or the plugin's rule API, `minor` for additive, `patch` for fixes.
+Commit the generated `.changeset/*.md` file with your PR. Semver is a contract. While a package is below 1.0, use `minor` for a breaking change to core's runtime surface or the plugin's rule API and for additive changes, and `patch` for fixes. A `major` bump turns 0.x into 1.0.0, so use it only when the team decides to cut 1.0. See [`project-stage.md`](.claude/rules/project-stage.md) for what counts as the published surface.
 
 ### Cutting a release
 
