@@ -26,9 +26,11 @@ import {
   toSlugFolder,
 } from './props-contract.mjs';
 import {
+  componentDefaults,
   toComponentEntry,
+  toPropsFile,
+  toPropsIndex,
   toProplessEntry,
-  variantDefaults,
 } from './props-entries.mjs';
 import { reactEntryPoints } from './react-entry-points.mjs';
 import { docsRoot, reactRoot } from './roots.mjs';
@@ -248,7 +250,7 @@ for (const [name, symbol] of components) {
         sourcePath,
         doc,
         expansions,
-        variantDefaults(checker, symbol)
+        componentDefaults(checker, symbol)
       )
     : toProplessEntry(checker, name, sourcePath, symbol);
 
@@ -260,26 +262,24 @@ assertResolvableTypes([...bySlug.values()].flat(), localAliases);
 mkdirSync(outputDir, { recursive: true });
 clearPreviousOutput();
 
-/** @type {import('./props-entries.mjs').PropsIndex} */
-const index = {};
-let propCount = 0;
-
-for (const [slug, entries] of bySlug) {
-  if (entries.length === 0) continue;
-
-  entries.sort(byNameThenSource);
-  adoptPropsTypeDescriptions(entries, typeExportDescriptions);
-
-  propCount += entries.reduce((total, entry) => total + entry.props.length, 0);
-  index[slug] = entries.map((entry) => entry.name);
-
-  writeJson(path.join(outputDir, `${slug}.json`), {
-    slug,
-    components: entries,
+const files = [...bySlug]
+  .filter(([, entries]) => entries.length > 0)
+  .map(([slug, entries]) => {
+    entries.sort(byNameThenSource);
+    adoptPropsTypeDescriptions(entries, typeExportDescriptions);
+    return toPropsFile(slug, entries);
   });
+
+for (const file of files) {
+  writeJson(path.join(outputDir, `${file.slug}.json`), file);
 }
 
+const index = toPropsIndex(files);
 writeJson(path.join(outputDir, 'index.json'), index);
+
+const propCount = files
+  .flatMap((file) => file.components)
+  .reduce((total, component) => total + component.props.length, 0);
 
 console.log(
   `props: ${Object.keys(index).length} entries, ${components.size} components, ${propCount} props -> ${toRepoPath(outputDir)}`
