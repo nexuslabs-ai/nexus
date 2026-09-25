@@ -28,6 +28,16 @@
         "types": "./dist/runtime/index.d.cts",
         "default": "./dist/runtime/index.cjs"
       }
+    },
+    "./palette": {
+      "import": {
+        "types": "./dist/runtime/palette.d.ts",
+        "default": "./dist/runtime/palette.js"
+      },
+      "require": {
+        "types": "./dist/runtime/palette.d.cts",
+        "default": "./dist/runtime/palette.cjs"
+      }
     }
   },
   "scripts": {

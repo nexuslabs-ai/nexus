@@ -7,7 +7,7 @@ import {
   hexToOklchMechanical,
   hexToOklchPinned,
   isPaletteShadeKey,
-} from './lib/perceptual-grid.js';
+} from '../dist/scripts/palette.js';
 
 /**
  * Ensure a directory exists, creating it if necessary
@@ -78,7 +78,8 @@ export function formatTokenValue(value, type, tokenPath) {
       return hexToOklchPinned(
         value,
         lastSegment,
-        tokenPath[tokenPath.length - 2]
+        tokenPath[tokenPath.length - 2],
+        (message) => console.warn(message)
       );
     }
 

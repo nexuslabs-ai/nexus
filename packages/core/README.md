@@ -20,6 +20,25 @@ pnpm add @nexus_ds/core
 
 See the Nexus docs, Theming -> Appearance, for setup recipes.
 
+## Authored palette lookup
+
+The browser-safe `@nexus_ds/core/palette` entry resolves the same authored palettes used by CSS generation:
+
+```ts
+import { getPaletteRamp, getPaletteShade } from '@nexus_ds/core/palette';
+
+getPaletteShade('green', '600'); // oklch(0.62 0.2233 140.055)
+const neutral = getPaletteRamp('neutral'); // Frozen, readonly shade map
+```
+
+`PRIMITIVE_PALETTE_NAMES` lists the 22 shade families typed by `PrimitivePaletteName`; `SHADES` lists 50 through 950, typed by `Shade`. White and Black are singleton colors, not ramps. `PALETTE_KEYS` identifies only the five surface-tone families. Lookups resolve on first use and cache immutable values; importing the engine does not convert palettes.
+
+The engine starts from authored palettes: Success uses Green, Warning Orange, Error Red, and Information Blue. Secondary colors and near-black/near-white primary interaction endpoints use Neutral. The contrast solver can adjust these starting colors before emission.
+
+Under deuteranopia the Success (Green) and Warning (Orange) 600 shades are hard to tell apart, so status UI must pair color with an icon and label. The color-vision audit reports this pair as its one accepted limitation.
+
+Custom brand ramps and raw surface-tone references retain their separate algorithms. A palette's processed 600 shade is not interchangeable with its authored hex as a brand seed.
+
 ## Non-React Shell Example
 
 Use the engine directly when a host shell owns DOM or native styling.
@@ -98,7 +117,7 @@ All tokens follow the [Design Tokens Community Group](https://tr.designtokens.or
 
 ### Color generation
 
-Color tokens don't ship the values stored on disk. Source files hold hex; the build converts to OKLCH, pins each shade to a perceptual lightness grid (so the same step is equally light across every palette), and gates every text/surface pair with APCA contrast in CI.
+Color tokens don't ship the values stored on disk. Source files hold hex. Build and runtime share authored-palette conversion: chromatic families use their hue-specific lightness curves and P3 cusp chroma; neutral families use the flat lightness grid and source chroma. Both preserve each authored shade's hue. Runtime semantic text/surface pairs are checked against the registered APCA constraints in CI.
 
 Generated global CSS sets the native browser UI policy alongside the tokens: `:root` advertises light/dark support, `.dark` pins native controls and scrollbars to dark, and the light root stays light when `.dark` is absent.
 
@@ -123,7 +142,7 @@ at build time.
 ### Generate CSS
 
 ```bash
-pnpm build:tailwind       # Generate @nexus_ds/tailwind package CSS
+pnpm tokens:tailwind      # From the repo root: build core and generate @nexus_ds/tailwind CSS
 ```
 
 ### Output Files
@@ -147,4 +166,4 @@ When multi-platform support is needed, tools like Style Dictionary can be added 
 - **Color** is engine-owned: edit the derivation in `src/lib/surface-ladder.ts` / `src/lib/derive-theme.ts` (color primitives live in `tokens/primitives/color.json`).
 - **Non-color** (spacing, radius, shadow, borderwidth, motion, typography): edit the DTCG token files in `tokens/` (`$value`, `$type`, `$description`).
 
-Then run `make tokens` (or `pnpm build:tailwind`) to regenerate CSS; the output is copied into the `@nexus_ds/tailwind` package.
+Then run `make tokens` (or `pnpm tokens:tailwind`) to regenerate CSS; the output is copied into the `@nexus_ds/tailwind` package.

@@ -25,7 +25,8 @@ import {
   themeToCss,
 } from './derive-theme';
 import { type NexusSurfaceTone, TIER_THRESHOLDS } from './palette';
-import { STATUS_RAMP } from './static-ramps';
+import { getPaletteRamp } from './primitive-palette';
+import { STATUS_PALETTE_FAMILIES } from './semantic-palette-references';
 
 function lOf(oklchStr: string | undefined): number {
   return oklch(parse(oklchStr!)!)!.l!;
@@ -373,11 +374,11 @@ describe('deriveTheme', () => {
     const d = deriveTheme(createNexusThemeContract(DEFAULT_NEXUS_APPEARANCE));
 
     expect(hOf(d.light['--nx-color-focus-error'])).toBeCloseTo(
-      hOf(STATUS_RAMP.error['600']),
+      hOf(getPaletteRamp(STATUS_PALETTE_FAMILIES.error)['600']),
       2
     );
     expect(hOf(d.dark['--nx-color-focus-error'])).toBeCloseTo(
-      hOf(STATUS_RAMP.error['300']),
+      hOf(getPaletteRamp(STATUS_PALETTE_FAMILIES.error)['300']),
       2
     );
   });

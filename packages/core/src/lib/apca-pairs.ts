@@ -1,4 +1,4 @@
-import { CHART_LIGHT } from './static-ramps';
+import { CHART_PALETTE_REFERENCES } from './semantic-palette-references';
 
 export type ApcaTier = 'body' | 'ui' | 'incidental';
 
@@ -34,7 +34,9 @@ const FAMILY_PAIRS = [
   'information',
 ] as const;
 
-const CATEGORICAL_INDICES = CHART_LIGHT.map((_, index) => index + 1);
+const CATEGORICAL_INDICES = CHART_PALETTE_REFERENCES.map(
+  (_, index) => index + 1
+);
 // Each chart series asks for this much more Lc than the previous one, so
 // categories differ in lightness as well as hue.
 const CHART_STAGGER_LC = 4.5;
