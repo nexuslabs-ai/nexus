@@ -3,10 +3,31 @@ import { loadDependencies } from '../_lib/dependencies';
 import { CodeBlock } from './CodeBlock';
 import { CodeSample } from './CodeSample';
 
-export async function InstallBlock({ slug }: { slug: string }) {
-  const { install, copy, files, styles } = await loadDependencies(slug);
-  const packages = install.map(({ name, range }) => `${name}@${range}`);
-  const toCopy = [...copy, ...files];
+const NOTHING_INSTALLED = { install: [], copy: [], files: [], styles: [] };
+
+/** `besides` names a block the reader already has; its entries are left out. */
+export async function InstallBlock({
+  slug,
+  besides,
+}: {
+  slug: string;
+  besides?: string;
+}) {
+  const [{ install, copy, files, styles }, installed] = await Promise.all([
+    loadDependencies(slug),
+    besides ? loadDependencies(besides) : NOTHING_INSTALLED,
+  ]);
+  const installedPackages = new Set(installed.install.map(({ name }) => name));
+  const installedFiles = new Set([...installed.copy, ...installed.files]);
+  const installedStyles = new Set(installed.styles);
+
+  const packages = install
+    .filter(({ name }) => !installedPackages.has(name))
+    .map(({ name, range }) => `${name}@${range}`);
+  const toCopy = [...copy, ...files].filter(
+    (file) => !installedFiles.has(file)
+  );
+  const toImport = styles.filter((file) => !installedStyles.has(file));
 
   return (
     <>
@@ -18,11 +39,11 @@ export async function InstallBlock({ slug }: { slug: string }) {
           <code>{toCopy.join('\n')}</code>
         </CodeBlock>
       )}
-      {styles.length > 0 && (
+      {toImport.length > 0 && (
         <CodeSample lang="css">
           {[
             '/* app/globals.css */',
-            ...styles.map((file) => `@import '../${file}';`),
+            ...toImport.map((file) => `@import '../${file}';`),
           ].join('\n')}
         </CodeSample>
       )}

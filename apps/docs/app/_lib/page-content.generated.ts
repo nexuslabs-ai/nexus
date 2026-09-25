@@ -97,7 +97,7 @@ export const PAGE_WIREFRAMES: Record<string, PageWireframe> = {
         ],
       },
       { type: 'h2', text: '[ Per-component pages ]' },
-      { type: 'placeholder', label: '[ Index — Select · Switch · Tabs ]' },
+      { type: 'placeholder', label: '[ Index — per-component pages ]' },
       {
         type: 'placeholder',
         variant: 'code',
@@ -106,7 +106,7 @@ export const PAGE_WIREFRAMES: Record<string, PageWireframe> = {
     ],
   },
   '/components/containers': {
-    lede: '[ Card · Dialog · Accordion · Alert ]',
+    lede: '[ Surfaces that hold content · per-component Storybook page below ]',
     blocks: [
       {
         type: 'placeholder',
@@ -120,7 +120,7 @@ export const PAGE_WIREFRAMES: Record<string, PageWireframe> = {
     ],
   },
   '/components/navigation': {
-    lede: '[ DropdownMenu · (future) NavigationMenu · Breadcrumbs ]',
+    lede: '[ Moving between views · per-component Storybook page below ]',
     blocks: [
       {
         type: 'placeholder',
@@ -130,7 +130,7 @@ export const PAGE_WIREFRAMES: Record<string, PageWireframe> = {
     ],
   },
   '/components/display': {
-    lede: '[ Badge · Avatar · Tooltip ]',
+    lede: '[ Status and identity at a glance · per-component Storybook page below ]',
     blocks: [
       {
         type: 'placeholder',
@@ -140,7 +140,7 @@ export const PAGE_WIREFRAMES: Record<string, PageWireframe> = {
     ],
   },
   '/components/primitives': {
-    lede: '[ Low-level building blocks: Show / Hide · Slot ]',
+    lede: '[ Low-level building blocks ]',
     blocks: [
       {
         type: 'placeholder',

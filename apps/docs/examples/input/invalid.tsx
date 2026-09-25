@@ -1,16 +1,12 @@
 'use client';
 
+import { Field, FieldError, FieldLabel } from '@/components/field/field';
 import { Input } from '@/components/input/input';
 
 export default function InputInvalid() {
   return (
-    <div className="nx:grid nx:w-full nx:max-w-sm nx:gap-1.5">
-      <label
-        htmlFor="input-invalid-email"
-        className="nx:typography-label-default nx:text-foreground"
-      >
-        Email
-      </label>
+    <Field data-invalid="true" className="nx:max-w-sm">
+      <FieldLabel htmlFor="input-invalid-email">Email</FieldLabel>
       <Input
         id="input-invalid-email"
         type="email"
@@ -18,12 +14,9 @@ export default function InputInvalid() {
         aria-invalid
         aria-describedby="input-invalid-email-error"
       />
-      <p
-        id="input-invalid-email-error"
-        className="nx:typography-body-small nx:text-error-subtle-foreground"
-      >
+      <FieldError id="input-invalid-email-error">
         Enter a complete email address.
-      </p>
-    </div>
+      </FieldError>
+    </Field>
   );
 }

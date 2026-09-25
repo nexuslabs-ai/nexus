@@ -3,4 +3,4 @@
 
 export { Component } from "./with-label.client";
 
-export const source = "'use client';\n\nimport { Input } from '@/components/input/input';\n\nexport default function InputWithLabel() {\n  return (\n    <div className=\"nx:grid nx:w-full nx:max-w-sm nx:gap-1.5\">\n      <label\n        htmlFor=\"input-with-label-name\"\n        className=\"nx:typography-label-default nx:text-foreground\"\n      >\n        Full name\n      </label>\n      <Input id=\"input-with-label-name\" placeholder=\"Ada Lovelace\" />\n    </div>\n  );\n}\n";
+export const source = "'use client';\n\nimport { Input } from '@/components/input/input';\nimport { Label } from '@/components/label/label';\n\nexport default function InputWithLabel() {\n  return (\n    <div className=\"nx:grid nx:w-full nx:max-w-sm nx:gap-1.5\">\n      <Label htmlFor=\"input-with-label-name\">Full name</Label>\n      <Input id=\"input-with-label-name\" placeholder=\"Ada Lovelace\" />\n    </div>\n  );\n}\n";

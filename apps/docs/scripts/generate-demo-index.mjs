@@ -42,6 +42,8 @@ import type { ComponentType } from 'react';
 export interface Demo {
   /** Path under apps/docs/examples/ without the .tsx extension. */
   id: string;
+  /** Install blocks the demo needs beyond its folder's own. */
+  alsoInstall: readonly string[];
   /** Loads the demo's component and its own source text together. */
   load: () => Promise<{ Component: ComponentType; source: string }>;
 }
@@ -68,6 +70,7 @@ export function getDemo(id: string): Demo {
  * @typedef {object} DemoFile
  * @property {string} id Path under examples/ without the .tsx extension.
  * @property {string} source The demo file's full contents.
+ * @property {string[]} alsoInstall Install blocks it needs beyond its folder's.
  */
 
 function walk(dir) {
@@ -163,24 +166,23 @@ function readInstallBlocks() {
   return blocks;
 }
 
+function copies(copied, specifier) {
+  const file = specifier.slice(COPIED_PREFIX.length);
+  return copied.has(file) || copied.has(`${file}/index`);
+}
+
 /**
- * A component's demos paste beside its own install block. A folder with no
- * block of its own, like `getting-started`, pastes beside the block of every
- * component it imports.
+ * A demo pastes beside its folder's install block, when the folder is a
+ * component, and beside the block of every component it imports.
  */
 function installSlugsFor(id, specifiers, blocks) {
   const folder = id.split('/')[0];
-  if (blocks.has(folder)) {
-    return [folder];
-  }
-
-  const slugs = [
-    ...new Set(
-      specifiers
-        .map((specifier) => specifier.match(COMPONENT_IMPORT)?.[1])
-        .filter(Boolean)
-    ),
-  ];
+  const own = blocks.get(folder);
+  const imported = specifiers
+    .filter((specifier) => !own || !copies(own.copied, specifier))
+    .map((specifier) => specifier.match(COMPONENT_IMPORT)?.[1])
+    .filter(Boolean);
+  const slugs = [...new Set([...(own ? [folder] : []), ...imported])];
   if (slugs.length === 0) {
     throw new Error(
       `Demo ${id} imports no @/components/, and ${folder} has no install block of its own, so there is nothing to paste it beside. Import the component it demonstrates, or move it to examples/{slug}/.`
@@ -196,6 +198,7 @@ function installSlugsFor(id, specifiers, blocks) {
   return slugs;
 }
 
+/** @returns {string[]} The install blocks the demo pastes beside. */
 function assertImportsInstalled(id, source, blocks) {
   const specifiers = importSpecifiers(source);
   const slugs = installSlugsFor(id, specifiers, blocks);
@@ -207,8 +210,7 @@ function assertImportsInstalled(id, source, blocks) {
 
   for (const specifier of specifiers) {
     if (specifier.startsWith(COPIED_PREFIX)) {
-      const file = specifier.slice(COPIED_PREFIX.length);
-      if (!copied.has(file) && !copied.has(`${file}/index`)) {
+      if (!copies(copied, specifier)) {
         throw new Error(
           `Demo ${id} imports ${specifier}, but the ${blockNames} install block does not copy it. Import a file the block copies: ${[...copied].join(', ')}.`
         );
@@ -223,6 +225,7 @@ function assertImportsInstalled(id, source, blocks) {
       );
     }
   }
+  return slugs;
 }
 
 /** @returns {DemoFile[]} */
@@ -256,9 +259,14 @@ function collectDemos() {
         );
       }
       const source = readCanonical(file);
-      assertImportsInstalled(id, source, installBlocks);
+      const folder = id.split('/')[0];
+      const alsoInstall = assertImportsInstalled(
+        id,
+        source,
+        installBlocks
+      ).filter((slug) => slug !== folder);
 
-      return { id, source };
+      return { id, source, alsoInstall };
     })
     .sort((a, b) => (a.id < b.id ? -1 : a.id > b.id ? 1 : 0));
 }
@@ -292,6 +300,7 @@ function renderDemoIndex(demos) {
       [
         `  ${JSON.stringify(demo.id)}: {`,
         `    id: ${JSON.stringify(demo.id)},`,
+        `    alsoInstall: ${JSON.stringify(demo.alsoInstall)},`,
         `    load: () => import(${JSON.stringify(`./${MODULES_DIR}/${demo.id}`)}),`,
         `  },`,
       ].join('\n')
