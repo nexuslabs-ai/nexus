@@ -3,12 +3,7 @@
   "extends": ["//"],
   "tasks": {
     "build": {
-      "inputs": [
-        "src/**",
-        "tokens/primitives/color.json",
-        "tsup.config.ts",
-        "tsconfig.json"
-      ],
+      "inputs": ["src/**", "tokens/**", "tsup.config.ts", "tsconfig.json"],
       "outputs": ["dist/runtime/**", "dist/scripts/**"]
     },
     "build:tailwind": {

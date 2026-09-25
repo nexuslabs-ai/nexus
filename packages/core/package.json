@@ -38,6 +38,16 @@
         "types": "./dist/runtime/palette.d.cts",
         "default": "./dist/runtime/palette.cjs"
       }
+    },
+    "./catalogue": {
+      "import": {
+        "types": "./dist/runtime/catalogue.d.ts",
+        "default": "./dist/runtime/catalogue.js"
+      },
+      "require": {
+        "types": "./dist/runtime/catalogue.d.cts",
+        "default": "./dist/runtime/catalogue.cjs"
+      }
     }
   },
   "scripts": {
