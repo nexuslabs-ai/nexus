@@ -543,6 +543,55 @@ export const ControlledEditingStaysOpen: Story = {
   },
 };
 
+function ExternalCloseExample() {
+  const [editing, setEditing] = useState(false);
+
+  function handleEditingChange(next: boolean) {
+    if (next) setEditing(true);
+  }
+
+  return (
+    <div className="nx:grid nx:w-full nx:max-w-sm nx:gap-4">
+      <InlineEdit
+        label="Name"
+        value="Priya Shah"
+        editing={editing}
+        blurBehavior="cancel"
+        onEditingChange={handleEditingChange}
+        onCommit={fn()}
+      />
+      <Button variant="outline">Elsewhere</Button>
+      <Button
+        variant="outline"
+        onMouseDown={(event) => event.preventDefault()}
+        onClick={() => setEditing(false)}
+      >
+        Close from toolbar
+      </Button>
+    </div>
+  );
+}
+
+export const ExternalCloseReturnsFocus: Story = {
+  render: () => <ExternalCloseExample />,
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+    await userEvent.click(canvas.getByRole('button', { name: 'Edit Name' }));
+    const input = canvas.getByRole('textbox', { name: 'Name' });
+    await userEvent.click(canvas.getByRole('button', { name: 'Elsewhere' }));
+    await expect(input).toBeInTheDocument();
+
+    await userEvent.click(input);
+    await userEvent.click(
+      canvas.getByRole('button', { name: 'Close from toolbar' })
+    );
+    await expect(canvas.queryByRole('textbox')).not.toBeInTheDocument();
+    await expect(
+      canvas.getByRole('button', { name: 'Edit Name' })
+    ).toHaveFocus();
+  },
+};
+
 export const StableEditingTypography: Story = {
   render: () => (
     <div className="nx:grid nx:w-full nx:max-w-sm nx:gap-4">
