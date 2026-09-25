@@ -148,7 +148,10 @@ function readInstallBlocks() {
   }
 
   const blocks = new Map();
-  for (const file of readdirSync(DEPENDENCIES_DIR)) {
+  const dependencyFiles = readdirSync(DEPENDENCIES_DIR).filter((file) =>
+    file.endsWith('.json')
+  );
+  for (const file of dependencyFiles) {
     const { slug, install, copy, files } = JSON.parse(
       readCanonical(path.join(DEPENDENCIES_DIR, file))
     );
