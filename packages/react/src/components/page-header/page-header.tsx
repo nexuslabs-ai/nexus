@@ -1,5 +1,7 @@
 import * as React from 'react';
 
+import { Slot } from '@radix-ui/react-slot';
+
 import { cn } from '../../lib/utils';
 
 function PageHeader({ className, ...props }: React.ComponentProps<'header'>) {
@@ -32,19 +34,33 @@ function PageHeaderContent({
 }
 
 interface PageHeaderTitleProps extends React.ComponentProps<'h1'> {
-  as?: 'h1' | 'h2' | 'h3' | 'h4' | 'h5' | 'h6';
+  /**
+   * Render the title styles on a child element. Use this when the header
+   * needs a different heading level in the page outline.
+   *
+   * @default false
+   * @example
+   * ```tsx
+   * <PageHeaderTitle asChild>
+   *   <h2>Notification settings</h2>
+   * </PageHeaderTitle>
+   * ```
+   */
+  asChild?: boolean;
 }
 
 function PageHeaderTitle({
-  as: Heading = 'h1',
+  asChild = false,
   className,
   ...props
 }: PageHeaderTitleProps) {
+  const Comp = asChild ? Slot : 'h1';
+
   return (
-    <Heading
+    <Comp
       data-slot="page-header-title"
       className={cn(
-        'nx:wrap-anywhere nx:typography-heading-large nx:text-foreground',
+        'nx:wrap-anywhere nx:typography-heading-medium nx:text-foreground',
         className
       )}
       {...props}
