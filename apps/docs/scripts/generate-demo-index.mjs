@@ -17,8 +17,11 @@ const GENERATED_DIR = path.join(docsRoot, '__generated__');
 const DEPENDENCIES_DIR = path.join(docsRoot, 'generated', 'dependencies');
 
 const COPIED_PREFIX = '@/';
-const IMPORT_SPECIFIER =
-  /^\s*import\s+(?:[^'"]*?\s+from\s+)?['"]([^'"]+)['"]/gm;
+const IMPORT_PATTERNS = [
+  /^\s*(?:import|export)\s+(?:[^'";()]*?\s+from\s+)?['"]([^'"]+)['"]/gm,
+  /\bimport\(\s*['"]([^'"]+)['"]/g,
+];
+const COMPONENT_IMPORT = /^@\/components\/([^/]+)\//;
 // Every React app has these, so no install block lists them.
 const ALWAYS_INSTALLED = new Set(['react', 'react-dom']);
 
@@ -132,29 +135,78 @@ function withoutExtension(file) {
   return file.replace(/\.tsx?$/, '');
 }
 
+function importSpecifiers(source) {
+  return IMPORT_PATTERNS.flatMap((pattern) =>
+    [...source.matchAll(pattern)].map(([, specifier]) => specifier)
+  );
+}
+
+/** @returns {{ packages: Set<string>, copied: Set<string> } | undefined} */
+function readInstallBlock(slug, cache) {
+  if (!cache.has(slug)) {
+    const dependencyFile = path.join(DEPENDENCIES_DIR, `${slug}.json`);
+    cache.set(
+      slug,
+      existsSync(dependencyFile)
+        ? parseInstallBlock(readCanonical(dependencyFile))
+        : undefined
+    );
+  }
+  return cache.get(slug);
+}
+
+function parseInstallBlock(json) {
+  const { install, copy, files } = JSON.parse(json);
+  return {
+    packages: new Set(install.map(({ name }) => name)),
+    copied: new Set([...copy, ...files].map(withoutExtension)),
+  };
+}
+
 /**
- * A demo is the Code a reader pastes next to its slug's install block, so it may
- * import only the packages and `@/` files that block lists.
+ * A component's demos paste beside its own install block. A folder with no
+ * block of its own, like `getting-started`, pastes beside the block of every
+ * component it imports.
  */
-function assertImportsInstalled(id) {
-  const slug = id.split('/')[0];
-  const dependencyFile = path.join(DEPENDENCIES_DIR, `${slug}.json`);
-  if (!existsSync(dependencyFile)) {
-    return;
+function installSlugsFor(id, specifiers, cache) {
+  const folder = id.split('/')[0];
+  if (readInstallBlock(folder, cache)) {
+    return [folder];
   }
 
-  const { install, copy, files } = JSON.parse(readCanonical(dependencyFile));
-  const packages = new Set(install.map(({ name }) => name));
-  const copied = new Set([...copy, ...files].map(withoutExtension));
+  const slugs = new Set(
+    specifiers
+      .map((specifier) => specifier.match(COMPONENT_IMPORT)?.[1])
+      .filter(Boolean)
+  );
+  for (const slug of slugs) {
+    if (!readInstallBlock(slug, cache)) {
+      throw new Error(
+        `Demo ${id} imports @/components/${slug}/, but there is no ${path.relative(docsRoot, path.join(DEPENDENCIES_DIR, `${slug}.json`))} install block for it.`
+      );
+    }
+  }
+  return [...slugs];
+}
 
-  for (const [, specifier] of readCanonical(
-    path.join(EXAMPLES_DIR, `${id}${DEMO_EXTENSION}`)
-  ).matchAll(IMPORT_SPECIFIER)) {
+/**
+ * A demo is the Code a reader pastes next to an install block, so it may
+ * import only the packages and `@/` files that block lists.
+ */
+function assertImportsInstalled(id, source, cache) {
+  const specifiers = importSpecifiers(source);
+  const slugs = installSlugsFor(id, specifiers, cache);
+  const blocks = slugs.map((slug) => readInstallBlock(slug, cache));
+  const packages = new Set(blocks.flatMap((block) => [...block.packages]));
+  const copied = new Set(blocks.flatMap((block) => [...block.copied]));
+  const blockNames = slugs.join(' + ') || 'no';
+
+  for (const specifier of specifiers) {
     if (specifier.startsWith(COPIED_PREFIX)) {
       const file = specifier.slice(COPIED_PREFIX.length);
       if (!copied.has(file) && !copied.has(`${file}/index`)) {
         throw new Error(
-          `Demo ${id} imports ${specifier}, but the ${slug} install block does not copy it. Import a file the block copies: ${[...copied].join(', ')}.`
+          `Demo ${id} imports ${specifier}, but the ${blockNames} install block does not copy it. Import a file the block copies: ${[...copied].join(', ') || 'none'}.`
         );
       }
       continue;
@@ -163,7 +215,7 @@ function assertImportsInstalled(id) {
     const name = packageName(specifier);
     if (!ALWAYS_INSTALLED.has(name) && !packages.has(name)) {
       throw new Error(
-        `Demo ${id} imports ${name}, but the ${slug} install block does not install it. Use a package the block lists: ${[...packages].join(', ')}.`
+        `Demo ${id} imports ${name}, but the ${blockNames} install block does not install it. Use a package the block lists: ${[...packages].join(', ') || 'none'}.`
       );
     }
   }
@@ -180,6 +232,7 @@ function collectDemos() {
     );
   }
 
+  const installBlocks = new Map();
   return walk(EXAMPLES_DIR)
     .filter((file) => file.endsWith(DEMO_EXTENSION))
     .map((file) => ({
@@ -203,9 +256,10 @@ function collectDemos() {
           `Demo ${id} must live at apps/docs/examples/{folder}/{name}.tsx — a component's demos go in examples/{slug}/.`
         );
       }
-      assertImportsInstalled(id);
+      const source = readCanonical(file);
+      assertImportsInstalled(id, source, installBlocks);
 
-      return { id, source: readCanonical(file) };
+      return { id, source };
     })
     .sort((a, b) => (a.id < b.id ? -1 : a.id > b.id ? 1 : 0));
 }

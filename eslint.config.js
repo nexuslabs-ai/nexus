@@ -244,6 +244,11 @@ export default tseslint.config(
               message:
                 'Import the copied file under `@/` (e.g. `@/components/button/button`) — the install block lists it, @nexus_ds/react is not in a pasting app.',
             },
+            {
+              group: ['@/components/appearance', '@/components/appearance/*'],
+              message:
+                'The docs shell provides appearance from @nexus_ds/react, so a demo importing it from `@/` gets a second context and throws.',
+            },
           ],
         },
       ],
