@@ -33,6 +33,8 @@ export const PAGE_LOADERS: Record<string, ManifestPageLoader> = {
   '/components/button': () => import('../../content/components/button.mdx'),
   '/theming/appearance': () => import('../../content/theming/appearance.mdx'),
   '/theming/multi-brand': () => import('../_pages/theming/multi-brand'),
+  '/theming/radius-overrides': () =>
+    import('../../content/theming/radius-overrides.mdx'),
 };
 
 /** Route → registry wireframe, for every `kind: 'placeholder'` entry. */

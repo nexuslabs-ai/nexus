@@ -316,6 +316,10 @@ export const PAGE_REGISTRY = {
           ],
         },
       },
+      {
+        slug: 'radius-overrides',
+        label: 'Radius overrides',
+      },
     ],
   },
   tools: {

@@ -247,6 +247,13 @@ export const PAGE_MANIFEST: readonly ManifestSection[] = [
         kind: 'placeholder',
         file: null,
       },
+      {
+        route: '/theming/radius-overrides',
+        slug: 'radius-overrides',
+        label: 'Radius overrides',
+        kind: 'mdx',
+        file: 'content/theming/radius-overrides.mdx',
+      },
     ],
   },
   {
