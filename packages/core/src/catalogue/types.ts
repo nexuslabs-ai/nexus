@@ -10,19 +10,30 @@ type DeepReadonly<T> = T extends object
   : T;
 
 /** Token families the catalogue covers. */
-export type CatalogueFamily = 'color' | 'typography';
+export type CatalogueFamily =
+  | 'borderwidth'
+  | 'breakpoint'
+  | 'color'
+  | 'motion'
+  | 'radius'
+  | 'shadow'
+  | 'spacing'
+  | 'typography'
+  | 'z-index';
 
 /**
  * Canonical identity: an identifier in the `--nx-*` custom property scheme.
- * Scalar tokens declare it in the generated CSS; a typography style does not.
+ * Most tokens declare it in the generated CSS. Typography and shadow styles,
+ * z-index layers, and breakpoints do not; they declare a theme property or a
+ * utility instead.
  */
 export type CatalogueTokenName = `--nx-${string}`;
 
 /** Another name that maps onto the canonical token. */
 export interface CatalogueAlias {
   /**
-   * `css-variable` — a Tailwind theme property that reads the token.
-   * `utility` — the `nx:` utility a composite emits.
+   * `css-variable` — a Tailwind theme property that reads or declares the token.
+   * `utility` — an `nx:` utility the generated CSS declares for the token.
    * `reference` — a DTCG reference path other token files use.
    */
   readonly kind: 'css-variable' | 'utility' | 'reference';
@@ -53,11 +64,15 @@ export interface CatalogueDeclaration {
 
 /** The token's value in one theme mode and preset. */
 export interface CatalogueVariant {
-  /** The theme mode the value applies in, or `null` when it applies in both. */
+  /**
+   * The theme mode the value applies in (`light` / `dark` for a runtime
+   * colour or a shadow layer), or `null` when it applies in both.
+   */
   readonly mode: Mode | null;
   /**
-   * The family mode file the value comes from, such as `default`, or `null`
-   * when the family has a single file.
+   * The family mode file the value comes from without its theme mode
+   * (`square`, `compact`, `quiet`), or `null` when the family has a single
+   * file.
    */
   readonly preset: string | null;
   /** The authored leaf, or `null` for a colour the engine derives. */
@@ -66,8 +81,10 @@ export interface CatalogueVariant {
   readonly appearance: DeepReadonly<NexusAppearanceState> | null;
   readonly authoredValue: TokenValue | null;
   /**
-   * What the generated CSS declares: the custom property for a scalar, or the
-   * `@utility` body for a composite.
+   * What the generated CSS declares: one custom property for a scalar or a
+   * shadow style (`--nx-spacing-4`, or `--z-index-modal` and `--shadow-sm` for
+   * a token declared only under `@theme`), or the `@utility` body for a
+   * typography style.
    */
   readonly declarations: readonly CatalogueDeclaration[];
   readonly references: readonly CatalogueReference[];
@@ -76,7 +93,10 @@ export interface CatalogueVariant {
 export interface CatalogueToken {
   readonly name: CatalogueTokenName;
   readonly family: CatalogueFamily;
-  /** The registry category for a derived colour; the top-level group otherwise. */
+  /**
+   * The registry category for a derived colour, the first path key for a
+   * nested leaf (`green`, `size`, `container`), or the family for a flat file.
+   */
   readonly group: string;
   /** The DTCG `$type`. */
   readonly type: string;

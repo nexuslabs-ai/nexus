@@ -172,6 +172,19 @@ export function formatShadowComposite(value, primitiveMap, isInset = false) {
     .join(', ');
 }
 
+/**
+ * Format a shadow style from `styles/shadows.json`. The top-level `inner`
+ * style is inset.
+ * @param {readonly string[]} tokenPath - e.g. `['inner']` or `['focus', 'error']`
+ * @param {TokenValue} value
+ * @param {PrimitiveLookup} primitiveMap
+ * @returns {string}
+ */
+export function formatShadowStyle(tokenPath, value, primitiveMap) {
+  const isInset = tokenPath.length === 1 && tokenPath[0] === 'inner';
+  return formatShadowComposite(value, primitiveMap, isInset);
+}
+
 const TYPOGRAPHY_PROPERTIES = /** @type {const} */ ([
   ['fontFamily', 'font-family'],
   ['fontSize', 'font-size'],

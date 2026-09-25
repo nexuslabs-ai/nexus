@@ -1,4 +1,4 @@
-import { Breadcrumb } from '../_components/Breadcrumb';
+import { Breadcrumb } from '../../_components/Breadcrumb';
 
 /**
  * Changelog. Pre-1.0 — grouped by date, not semver, until the first tagged
