@@ -29,6 +29,7 @@ import {
   type ProfileValues,
   saveFailureMessage,
   type SaveProfile,
+  slowSave,
   validateEmail,
   validateName,
 } from './support/profile-settings';
@@ -174,10 +175,7 @@ export const Validation: Story = { play: verifyProfileValidation };
 
 export const Saving: Story = {
   args: {
-    onSave: fn(
-      (_values: ProfileValues) =>
-        new Promise<void>((resolve) => setTimeout(resolve, 1000))
-    ),
+    onSave: fn(slowSave),
   },
   parameters: {
     docs: {
