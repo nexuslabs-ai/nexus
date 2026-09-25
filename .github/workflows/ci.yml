@@ -239,7 +239,9 @@ jobs:
           fi
 
       - name: Regenerate docs demo index
-        run: pnpm --filter @nexus_ds/docs generate:demos
+        run: |
+          pnpm --filter @nexus_ds/docs generate:dependencies
+          pnpm --filter @nexus_ds/docs generate:demos
 
       - name: Check docs demo index freshness
         run: |
