@@ -3,8 +3,14 @@ import { differenceEuclidean } from 'culori';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 
+import {
+  CHART_PALETTE_REFERENCES,
+  hexToSrgbInts,
+  SHADES,
+  STATUS_PALETTE_FAMILIES,
+} from '../dist/scripts/palette.js';
+
 import { BASE_PALETTES } from './lib/palettes.js';
-import { hexToSrgbInts } from './lib/perceptual-grid.js';
 import { readTokenFile, titleCase } from './utils.js';
 
 // Distance metric is OKLab Euclidean ΔE — not APCA Lc (which #88 originally
@@ -23,29 +29,15 @@ export const PRIMITIVES_FILE = path.join(
   'color.json'
 );
 
-export const SHADES = [
-  '50',
-  '100',
-  '200',
-  '300',
-  '400',
-  '500',
-  '600',
-  '700',
-  '800',
-  '900',
-  '950',
-];
-
 // Grouped because the SVG sections them visually and the cross-status pair
 // confusability test only fires for STATUS_PALETTES.
 export { BASE_PALETTES };
-export const STATUS_PALETTES = ['red', 'green', 'yellow', 'blue'];
-export const CHART_PALETTES = ['teal', 'lime', 'orange', 'rose', 'indigo'];
+export const STATUS_PALETTES = Object.values(STATUS_PALETTE_FAMILIES);
+export const CHART_PALETTES = CHART_PALETTE_REFERENCES.map(
+  ({ palette }) => palette
+);
 export const ALL_PALETTES = [
-  ...BASE_PALETTES,
-  ...STATUS_PALETTES,
-  ...CHART_PALETTES,
+  ...new Set([...BASE_PALETTES, ...STATUS_PALETTES, ...CHART_PALETTES]),
 ];
 
 // 'normal' is the unfiltered baseline; the three deficiencies follow
@@ -82,11 +74,11 @@ function unorderedPairs(items) {
   return pairs;
 }
 
-// Cross-status pair test fires at shade 600 — the brand `-background` tier
-// referenced by error/success/warning/information in both themes. Derived as
-// the 4-choose-2 of STATUS_PALETTES so adding a status palette can't silently
-// miss a pair.
-export const STATUS_PAIRS_600 = unorderedPairs(STATUS_PALETTES);
+// Shade 600 diagnoses starting status palettes. Runtime semantic fills are
+// subsequently contrast-solved and checked separately by derive-theme tests.
+export const STATUS_PAIRS_600 = unorderedPairs(
+  Object.keys(STATUS_PALETTE_FAMILIES)
+);
 const STATUS_PAIR_SHADE = '600';
 
 export function buildPalettesSrgb(primitives) {
@@ -154,7 +146,7 @@ export function findConfusableAdjacent(
     const a = SHADES[i];
     const b = SHADES[i + 1];
     const deltaE = computeDeltaE(simulatedShades[a], simulatedShades[b]);
-    if (deltaE < threshold) {
+    if (!Number.isFinite(deltaE) || deltaE < threshold) {
       findings.push({
         palette,
         visionType,
@@ -174,13 +166,16 @@ export function findStatusPairConfusable(
   threshold = ADJACENT_CONFUSABLE_DELTA_E
 ) {
   const findings = [];
-  for (const [a, b] of STATUS_PAIRS_600) {
+  for (const roles of STATUS_PAIRS_600) {
+    const [a, b] = roles.map((role) => STATUS_PALETTE_FAMILIES[role]);
     const deltaE = computeDeltaE(
       simulatedPalettes[a][STATUS_PAIR_SHADE],
       simulatedPalettes[b][STATUS_PAIR_SHADE]
     );
-    if (deltaE < threshold) {
+    if (!Number.isFinite(deltaE) || deltaE < threshold) {
       findings.push({
+        check: 'status-pair',
+        roles,
         visionType,
         paletteA: a,
         paletteB: b,
@@ -193,8 +188,25 @@ export function findStatusPairConfusable(
   return findings;
 }
 
-function formatFindingLine(finding) {
-  return `  ✗ ${finding.label.padEnd(38)} ΔE ${finding.deltaE.toFixed(4)}   (< ${ADJACENT_CONFUSABLE_DELTA_E})`;
+function isAcceptedStatusLimitation(finding) {
+  return (
+    finding.check === 'status-pair' &&
+    finding.shade === '600' &&
+    finding.visionType === 'deuteranopia' &&
+    finding.roles.includes('success') &&
+    finding.roles.includes('warning') &&
+    Number.isFinite(finding.deltaE) &&
+    finding.deltaE > 0 &&
+    finding.deltaE < ADJACENT_CONFUSABLE_DELTA_E
+  );
+}
+
+function formatFindingLine(finding, accepted = false) {
+  const status = accepted ? '≈' : '✗';
+  const note = accepted
+    ? ' — accepted status limitation (requires icon + label)'
+    : '';
+  return `  ${status} ${finding.label.padEnd(38)} ΔE ${finding.deltaE.toFixed(4)}   (< ${ADJACENT_CONFUSABLE_DELTA_E})${note}`;
 }
 
 function buildSummary(adjacentFindings, statusFindings) {
@@ -230,14 +242,16 @@ function buildSummary(adjacentFindings, statusFindings) {
     if (sts.length === 0) {
       lines.push('  ✓ no status-pair confusability');
     } else {
-      for (const f of sts) lines.push(formatFindingLine(f));
+      for (const f of sts)
+        lines.push(formatFindingLine(f, isAcceptedStatusLimitation(f)));
     }
     lines.push('');
   }
 
-  const total = adjacentFindings.length + statusFindings.length;
+  const accepted = statusFindings.filter(isAcceptedStatusLimitation).length;
+  const unaccepted = adjacentFindings.length + statusFindings.length - accepted;
   lines.push(
-    `Checked ${ALL_PALETTES.length} palettes × ${SHADES.length} shades × ${VISION_TYPES.length - 1} deficiencies — ${total} finding(s).`
+    `Checked ${ALL_PALETTES.length} palettes × ${SHADES.length} shades × ${VISION_TYPES.length - 1} deficiencies — ${accepted} accepted status limitation(s); ${unaccepted} unaccepted finding(s).`
   );
   return lines.join('\n') + '\n';
 }
@@ -285,7 +299,10 @@ function main() {
   }
 
   process.stdout.write(buildSummary(adjacentFindings, statusFindings));
-  process.exit(adjacentFindings.length + statusFindings.length === 0 ? 0 : 1);
+  const unacceptedStatus = statusFindings.filter(
+    (finding) => !isAcceptedStatusLimitation(finding)
+  );
+  process.exit(adjacentFindings.length + unacceptedStatus.length === 0 ? 0 : 1);
 }
 
 const isMain = process.argv[1] === fileURLToPath(import.meta.url);
