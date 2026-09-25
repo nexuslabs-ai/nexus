@@ -186,9 +186,9 @@ function assertComponentPageIsOneLineMdx(docsRoot, kind, file, slug) {
 function assertExamplesExist(docsRoot, key, slug, examples) {
   const seen = new Set();
   for (const name of examples) {
-    if (/[./\\]/.test(name)) {
+    if (/^_|[./\\]/.test(name)) {
       throw new Error(
-        `${key} lists "${name}" in its registry \`examples\`, but an example is named by its file under examples/${slug}/ — one path segment, no dot.`
+        `${key} lists "${name}" in its registry \`examples\`, but an example is named by its file under examples/${slug}/ — one path segment, no dot, no leading underscore.`
       );
     }
     if (name === PREVIEW_DEMO) {
