@@ -58,7 +58,12 @@ const EXPECTED_PALETTE_EXPORTS = [
   'getPaletteShade',
 ];
 
-const EXPECTED_CATALOGUE_EXPORTS = ['createTokenCatalogue'];
+const EXPECTED_CATALOGUE_EXPORTS = [
+  'DARK_SURFACE_LADDER',
+  'LIGHT_SURFACE_LADDER',
+  'SURFACE_TOKENS',
+  'createTokenCatalogue',
+];
 
 const OKLCH_VALUE = /^oklch\(\d+(\.\d+)? \d+(\.\d+)? \d+(\.\d+)?\)$/;
 

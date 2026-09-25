@@ -9,6 +9,7 @@ import { WorkspaceLayout } from '../workspace-layout';
 
 import { ExploreRoute, TokenFilters } from './explore-route';
 import { indexTokens } from './token-index';
+import { TokenViewNav } from './token-view-nav';
 import { useLiveTheme } from './use-live-theme';
 
 export function TokenWorkspace({
@@ -25,6 +26,7 @@ export function TokenWorkspace({
       aside={<TokenFilters index={index} />}
       sheetTrigger={<Button variant="outline">Filters</Button>}
     >
+      <TokenViewNav />
       <ExploreRoute index={index} live={live} />
     </WorkspaceLayout>
   );

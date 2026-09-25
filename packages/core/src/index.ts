@@ -24,6 +24,7 @@ export type { ThemeContrastCheck } from './lib/theme-contrast';
 export { measureThemeContrast } from './lib/theme-contrast';
 export {
   SEMANTIC_TOKEN_REGISTRY,
+  type SemanticColorName,
   type SemanticTokenMeta,
   type TokenCategory,
 } from './lib/token-registry';
