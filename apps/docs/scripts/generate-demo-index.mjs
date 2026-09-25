@@ -167,41 +167,64 @@ function readInstallBlocks() {
 }
 
 function copies(copied, specifier) {
+  if (!specifier.startsWith(COPIED_PREFIX)) {
+    return false;
+  }
   const file = specifier.slice(COPIED_PREFIX.length);
   return copied.has(file) || copied.has(`${file}/index`);
 }
 
+function importedComponent(specifier) {
+  return specifier.match(COMPONENT_IMPORT)?.[1];
+}
+
 /**
  * A demo pastes beside its folder's install block, when the folder is a
- * component, and beside the block of every component it imports.
+ * component, and beside the block of each other component it imports — unless
+ * one of those blocks already copies what the demo imports from it.
+ *
+ * @returns {{ own: string | undefined, extra: string[] }}
  */
 function installSlugsFor(id, specifiers, blocks) {
   const folder = id.split('/')[0];
-  const own = blocks.get(folder);
-  const imported = specifiers
-    .filter((specifier) => !own || !copies(own.copied, specifier))
-    .map((specifier) => specifier.match(COMPONENT_IMPORT)?.[1])
-    .filter(Boolean);
-  const slugs = [...new Set([...(own ? [folder] : []), ...imported])];
-  if (slugs.length === 0) {
-    throw new Error(
-      `Demo ${id} imports no @/components/, and ${folder} has no install block of its own, so there is nothing to paste it beside. Import the component it demonstrates, or move it to examples/{slug}/.`
-    );
-  }
-  for (const slug of slugs) {
+  const own = blocks.has(folder) ? folder : undefined;
+  const ownCopied = own ? blocks.get(own).copied : new Set();
+
+  const importsBySlug = new Map();
+  for (const specifier of specifiers) {
+    const slug = importedComponent(specifier);
+    if (!slug || copies(ownCopied, specifier)) {
+      continue;
+    }
     if (!blocks.has(slug)) {
       throw new Error(
         `Demo ${id} imports @/components/${slug}, but there is no ${slug} install block for it.`
       );
     }
+    importsBySlug.set(slug, [...(importsBySlug.get(slug) ?? []), specifier]);
   }
-  return slugs;
+
+  const candidates = [...importsBySlug.keys()];
+  const extra = candidates.filter(
+    (slug) =>
+      !candidates.some(
+        (other) =>
+          other !== slug &&
+          importsBySlug
+            .get(slug)
+            .every((specifier) => copies(blocks.get(other).copied, specifier))
+      )
+  );
+
+  if (!own && extra.length === 0) {
+    throw new Error(
+      `Demo ${id} imports no @/components/, and ${folder} has no install block of its own, so there is nothing to paste it beside. Import the component it demonstrates, or move it to examples/{slug}/.`
+    );
+  }
+  return { own, extra };
 }
 
-/** @returns {string[]} The install blocks the demo pastes beside. */
-function assertImportsInstalled(id, source, blocks) {
-  const specifiers = importSpecifiers(source);
-  const slugs = installSlugsFor(id, specifiers, blocks);
+function assertImportsInstalled(id, specifiers, slugs, blocks) {
   const packages = new Set(
     slugs.flatMap((slug) => [...blocks.get(slug).packages])
   );
@@ -225,7 +248,6 @@ function assertImportsInstalled(id, source, blocks) {
       );
     }
   }
-  return slugs;
 }
 
 /** @returns {DemoFile[]} */
@@ -259,14 +281,16 @@ function collectDemos() {
         );
       }
       const source = readCanonical(file);
-      const folder = id.split('/')[0];
-      const alsoInstall = assertImportsInstalled(
+      const specifiers = importSpecifiers(source);
+      const { own, extra } = installSlugsFor(id, specifiers, installBlocks);
+      assertImportsInstalled(
         id,
-        source,
+        specifiers,
+        own ? [own, ...extra] : extra,
         installBlocks
-      ).filter((slug) => slug !== folder);
+      );
 
-      return { id, source, alsoInstall };
+      return { id, source, alsoInstall: extra };
     })
     .sort((a, b) => (a.id < b.id ? -1 : a.id > b.id ? 1 : 0));
 }

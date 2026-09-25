@@ -3,31 +3,39 @@ import { loadDependencies } from '../_lib/dependencies';
 import { CodeBlock } from './CodeBlock';
 import { CodeSample } from './CodeSample';
 
-const NOTHING_INSTALLED = { install: [], copy: [], files: [], styles: [] };
-
-/** `besides` names a block the reader already has; its entries are left out. */
+/** Everything `slugs` needs, less what the blocks in `besides` already list. */
 export async function InstallBlock({
-  slug,
-  besides,
+  slugs,
+  besides = [],
 }: {
-  slug: string;
-  besides?: string;
+  slugs: readonly string[];
+  besides?: readonly string[];
 }) {
-  const [{ install, copy, files, styles }, installed] = await Promise.all([
-    loadDependencies(slug),
-    besides ? loadDependencies(besides) : NOTHING_INSTALLED,
+  const [needed, installed] = await Promise.all([
+    Promise.all(slugs.map(loadDependencies)),
+    Promise.all(besides.map(loadDependencies)),
   ]);
-  const installedPackages = new Set(installed.install.map(({ name }) => name));
-  const installedFiles = new Set([...installed.copy, ...installed.files]);
-  const installedStyles = new Set(installed.styles);
-
-  const packages = install
-    .filter(({ name }) => !installedPackages.has(name))
-    .map(({ name, range }) => `${name}@${range}`);
-  const toCopy = [...copy, ...files].filter(
-    (file) => !installedFiles.has(file)
+  const installedPackages = new Set(
+    installed.flatMap(({ install }) => install.map(({ name }) => name))
   );
-  const toImport = styles.filter((file) => !installedStyles.has(file));
+  const installedFiles = new Set(
+    installed.flatMap(({ copy, files }) => [...copy, ...files])
+  );
+  const installedStyles = new Set(installed.flatMap(({ styles }) => styles));
+
+  const ranges = new Map(
+    needed
+      .flatMap(({ install }) => install)
+      .filter(({ name }) => !installedPackages.has(name))
+      .map(({ name, range }) => [name, range])
+  );
+  const packages = [...ranges].map(([name, range]) => `${name}@${range}`);
+  const toCopy = [
+    ...new Set(needed.flatMap(({ copy, files }) => [...copy, ...files])),
+  ].filter((file) => !installedFiles.has(file));
+  const toImport = [...new Set(needed.flatMap(({ styles }) => styles))].filter(
+    (file) => !installedStyles.has(file)
+  );
 
   return (
     <>

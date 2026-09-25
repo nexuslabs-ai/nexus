@@ -227,7 +227,7 @@ files, and those import packages. Each component lists both, generated from its
 imports. For Button, install the packages, then copy the files — the ones it
 imports first, its own last:
 
-<InstallBlock slug="button" />
+<InstallBlock slugs={['button']} />
 
 Every path is relative to `packages/react/src/` in the repo. Keep it as it is
 under your `@/` root, next to the `lib/utils.ts` from step 4, and the relative

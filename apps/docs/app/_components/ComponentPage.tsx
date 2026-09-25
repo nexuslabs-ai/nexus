@@ -49,7 +49,7 @@ export function ComponentPage({ slug }: { slug: string }) {
       <SectionHeading className={SECTION_HEADING_CLASS}>
         Installation
       </SectionHeading>
-      <InstallBlock slug={slug} />
+      <InstallBlock slugs={[slug]} />
 
       <SectionHeading className={SECTION_HEADING_CLASS}>Code</SectionHeading>
       <ComponentSource id={previewId} />
@@ -76,9 +76,9 @@ export function ComponentPage({ slug }: { slug: string }) {
               This example also needs:
             </p>
           )}
-          {alsoInstall.map((extra) => (
-            <InstallBlock key={extra} slug={extra} besides={slug} />
-          ))}
+          {alsoInstall.length > 0 && (
+            <InstallBlock slugs={alsoInstall} besides={[slug]} />
+          )}
           <ComponentSource id={id} />
         </section>
       ))}
