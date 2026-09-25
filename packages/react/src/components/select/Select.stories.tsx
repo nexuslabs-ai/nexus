@@ -504,6 +504,7 @@ export const Sizes: Story = {
       const trigger = canvas.getByRole('combobox', { name: `${size} select` });
       const input = canvas.getByRole('textbox', { name: `${size} input` });
 
+      await expect(trigger).toHaveAttribute('data-size', size);
       await expect(height(trigger)).toBe(height(input));
     }
   },
@@ -790,54 +791,32 @@ export const DisabledInteraction: Story = {
 
 export const WithDataAttributes: Story = {
   render: (_args) => (
-    <div className="nx:flex nx:gap-3">
-      <Select>
-        <SelectTrigger className="nx:w-[180px]" aria-label="Select a fruit">
-          <SelectValue placeholder="Select a fruit" />
-        </SelectTrigger>
-        <SelectContent>
-          <SelectGroup>
-            <SelectLabel>Fruits</SelectLabel>
-            <SelectItem value="apple">Apple</SelectItem>
-          </SelectGroup>
-          <SelectSeparator />
-          <SelectItem value="banana">Banana</SelectItem>
-        </SelectContent>
-      </Select>
-      <Select>
-        <SelectTrigger
-          size="lg"
-          className="nx:w-[180px]"
-          aria-label="Select a vegetable"
-        >
-          <SelectValue placeholder="Select a vegetable" />
-        </SelectTrigger>
-        <SelectContent>
-          <SelectItem value="carrot">Carrot</SelectItem>
-        </SelectContent>
-      </Select>
-    </div>
+    <Select>
+      <SelectTrigger className="nx:w-[180px]" aria-label="Select a fruit">
+        <SelectValue placeholder="Select a fruit" />
+      </SelectTrigger>
+      <SelectContent>
+        <SelectGroup>
+          <SelectLabel>Fruits</SelectLabel>
+          <SelectItem value="apple">Apple</SelectItem>
+        </SelectGroup>
+        <SelectSeparator />
+        <SelectItem value="banana">Banana</SelectItem>
+      </SelectContent>
+    </Select>
   ),
   play: async ({ canvasElement }) => {
     const canvas = within(canvasElement);
 
-    // Check trigger data-slot
-    const trigger = canvas.getByRole('combobox', { name: 'Select a fruit' });
+    const trigger = canvas.getByRole('combobox');
     await expect(trigger).toHaveAttribute('data-slot', 'select-trigger');
     await expect(trigger).toHaveAttribute('data-size', 'default');
     await expect(trigger).toHaveAttribute('data-variant', 'bordered');
     await expect(trigger).toHaveClass('nx:bg-container');
     await expect(trigger).toHaveClass('nx:enabled:hover:bg-container-hover');
 
-    const lgTrigger = canvas.getByRole('combobox', {
-      name: 'Select a vegetable',
-    });
-    await expect(lgTrigger).toHaveAttribute('data-size', 'lg');
-
-    // Open the select
     await userEvent.click(trigger);
 
-    // Wait for content and check data-slots
     await waitFor(() => {
       expect(
         document.querySelector('[data-slot="select-content"]')
@@ -853,7 +832,6 @@ export const WithDataAttributes: Story = {
       ).toBeInTheDocument();
     });
 
-    // Close
     await userEvent.keyboard('{Escape}');
   },
 };
