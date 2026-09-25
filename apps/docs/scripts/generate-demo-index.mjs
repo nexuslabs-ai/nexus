@@ -179,6 +179,11 @@ function installSlugsFor(id, specifiers, cache) {
       .map((specifier) => specifier.match(COMPONENT_IMPORT)?.[1])
       .filter(Boolean)
   );
+  if (slugs.size === 0) {
+    throw new Error(
+      `Demo ${id} imports no @/components/, and ${folder} has no install block of its own, so there is nothing to paste it beside. Import the component it demonstrates, or move it to examples/{slug}/.`
+    );
+  }
   for (const slug of slugs) {
     if (!readInstallBlock(slug, cache)) {
       throw new Error(
@@ -199,14 +204,14 @@ function assertImportsInstalled(id, source, cache) {
   const blocks = slugs.map((slug) => readInstallBlock(slug, cache));
   const packages = new Set(blocks.flatMap((block) => [...block.packages]));
   const copied = new Set(blocks.flatMap((block) => [...block.copied]));
-  const blockNames = slugs.join(' + ') || 'no';
+  const blockNames = slugs.join(' + ');
 
   for (const specifier of specifiers) {
     if (specifier.startsWith(COPIED_PREFIX)) {
       const file = specifier.slice(COPIED_PREFIX.length);
       if (!copied.has(file) && !copied.has(`${file}/index`)) {
         throw new Error(
-          `Demo ${id} imports ${specifier}, but the ${blockNames} install block does not copy it. Import a file the block copies: ${[...copied].join(', ') || 'none'}.`
+          `Demo ${id} imports ${specifier}, but the ${blockNames} install block does not copy it. Import a file the block copies: ${[...copied].join(', ')}.`
         );
       }
       continue;
