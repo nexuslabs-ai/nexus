@@ -140,6 +140,11 @@ function collectDemos() {
           `Demo id cannot contain a dot: ${id}. Rename ${path.relative(EXAMPLES_DIR, file)}.`
         );
       }
+      if (id.split('/').length !== 2) {
+        throw new Error(
+          `Demo ${id} must live at apps/docs/examples/{folder}/{name}.tsx — a component's demos go in examples/{slug}/.`
+        );
+      }
 
       return { id, source: readCanonical(file) };
     })

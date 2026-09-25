@@ -1,4 +1,5 @@
 import { type DemoId, demos, isDemoId } from '../../__generated__/demo-index';
+import { humanize } from '../../scripts/humanize.mjs';
 import { requireSection } from '../_lib/manifest';
 
 import { ComponentPreview } from './ComponentPreview';
@@ -7,6 +8,7 @@ import {
   PAGE_HEADING_CLASS,
   SECTION_HEADING_CLASS,
   SectionHeading,
+  slugify,
   SUBSECTION_HEADING_CLASS,
   SubsectionHeading,
 } from './Heading';
@@ -20,7 +22,8 @@ type Example = { id: DemoId; name: string };
 /**
  * A component's docs page: Preview, Install, Code, Props, then Examples, all
  * derived from `slug`. Demos live at `apps/docs/examples/{slug}/{name}.tsx`;
- * `demo` feeds Preview and Code, every other name is an example.
+ * `demo` feeds Preview and Code, every other name is an example — the page's
+ * registry `examples` first, then the rest in name order.
  */
 export function ComponentPage({ slug }: { slug: string }) {
   const page = requireSection('components').pages.find(
@@ -39,7 +42,7 @@ export function ComponentPage({ slug }: { slug: string }) {
     );
   }
 
-  const examples = examplesFor(slug);
+  const examples = examplesFor(slug, page.examples ?? []);
 
   return (
     <>
@@ -65,7 +68,7 @@ export function ComponentPage({ slug }: { slug: string }) {
       {examples.map(({ id, name }) => (
         <section key={id}>
           <SubsectionHeading
-            id={`example-${name}`}
+            id={`example-${slugify(name)}`}
             className={SUBSECTION_HEADING_CLASS}
           >
             {humanize(name)}
@@ -78,26 +81,21 @@ export function ComponentPage({ slug }: { slug: string }) {
   );
 }
 
-function examplesFor(slug: string): Example[] {
+function examplesFor(slug: string, order: readonly string[]): Example[] {
   const prefix = `${slug}/`;
-
-  return Object.keys(demos)
-    .filter(isDemoId)
+  const names = Object.keys(demos)
     .filter((id) => id.startsWith(prefix))
-    .map((id) => {
-      const name = id.slice(prefix.length);
-      if (name.includes('/')) {
-        throw new Error(
-          `ComponentPage: apps/docs/examples/${id}.tsx is nested too deep — a component's demos live at examples/${slug}/{name}.tsx.`
-        );
-      }
-      return { id, name };
-    })
-    .filter(({ name }) => name !== PREVIEW_DEMO);
-}
+    .map((id) => id.slice(prefix.length))
+    .filter((name) => name !== PREVIEW_DEMO);
+  const ordered = [...order, ...names.filter((name) => !order.includes(name))];
 
-// `with-icon` → `With icon`.
-function humanize(name: string) {
-  const spaced = name.replaceAll('-', ' ');
-  return spaced.charAt(0).toUpperCase() + spaced.slice(1);
+  return ordered.map((name) => {
+    const id = `${prefix}${name}`;
+    if (!isDemoId(id)) {
+      throw new Error(
+        `ComponentPage: no demo ${id} in the demo index — run \`pnpm --filter @nexus_ds/docs generate:demos\`.`
+      );
+    }
+    return { id, name };
+  });
 }
