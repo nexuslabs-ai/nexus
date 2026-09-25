@@ -7,6 +7,7 @@
  * module, so server pages render Nexus components as client islands.
  */
 export {
+  Badge,
   Button,
   Card,
   CardAction,
@@ -32,4 +33,11 @@ export {
   SelectTrigger,
   SelectValue,
   Switch,
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+  TableRowHeader,
 } from '@nexus_ds/react';

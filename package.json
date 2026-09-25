@@ -121,6 +121,10 @@
     "*.{json,md,css}": [
       "prettier --write"
     ],
+    "apps/docs/examples/**/*.tsx": [
+      "node apps/docs/scripts/generate-demo-index.mjs",
+      "git add apps/docs/__generated__"
+    ],
     "packages/core/tokens/semantic/spacing-*.json": [
       "pnpm validate:spacing-modes",
       "eslint --fix --no-warn-ignored"

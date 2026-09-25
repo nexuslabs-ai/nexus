@@ -2,6 +2,8 @@ import { readFileSync } from 'node:fs';
 import { resolve } from 'node:path';
 import { describe, expect, it } from 'vitest';
 
+import typographyTokens from '../../tokens/primitives/typography/typography-default.json';
+
 import {
   appearancePrefsToCss,
   BASE_TONE_OPTIONS,
@@ -389,6 +391,18 @@ describe('appearancePrefsToCss', () => {
   function typographyDeclarations(css: string) {
     return (css.match(typographyVarPattern) ?? []).sort();
   }
+
+  it('scales only px typography dimensions', () => {
+    const dimensions = [
+      ...Object.entries(typographyTokens.size),
+      ...Object.entries(typographyTokens['line-height']),
+    ];
+    const nonPx = dimensions
+      .filter(([, token]) => token.$value.unit !== 'px')
+      .map(([name, token]) => `${name}: ${token.$value.unit}`);
+
+    expect(nonPx).toEqual([]);
+  });
 
   it('emits font variables, clamped root size, code size, and smoothing', () => {
     const css = appearancePrefsToCss({
