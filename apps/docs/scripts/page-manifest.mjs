@@ -4,7 +4,8 @@
  * Sources:
  *   - `page-registry/` — section and page order, labels, and the
  *     `wireframe` a page renders until its own file lands
- *   - `content/{section}/{slug}.mdx` — MDX pages
+ *   - `content/{section}/{slug}.mdx` — MDX pages; under `components/`, exactly
+ *     `<ComponentPage slug="{slug}" />`
  *   - `app/_pages/{section}/{slug}.tsx` — hand-built pages
  *
  * A page's route is its path on disk, so adding a page means adding a file.
@@ -162,6 +163,19 @@ function assertRailLabelsHaveNoPage(section) {
         );
       }
     }
+  }
+}
+
+/** Section whose MDX pages are one `<ComponentPage>` line each. */
+const COMPONENTS_SECTION = 'components';
+
+function assertComponentPageNamesOnlyItsComponent(docsRoot, file, slug) {
+  const expected = `<ComponentPage slug="${slug}" />`;
+  const body = fs.readFileSync(path.join(docsRoot, file), 'utf8').trim();
+  if (body !== expected) {
+    throw new Error(
+      `${file} must contain exactly ${expected} — a component page names its component and nothing else; ComponentPage renders the rest.`
+    );
   }
 }
 
@@ -342,6 +356,9 @@ export async function buildPageManifest(docsRoot, formatOptions) {
     const source = sources.find((candidate) => candidate.pages.has(key));
     if (source) {
       const file = source.pages.get(key);
+      if (sectionSlug === COMPONENTS_SECTION && source.kind === 'mdx') {
+        assertComponentPageNamesOnlyItsComponent(docsRoot, file, slug);
+      }
       if (entry?.wireframe) {
         throw new Error(
           `${key} is written at ${file}, so its registry wireframe can never render — drop the \`wireframe\` from its registry entry.`
