@@ -160,60 +160,46 @@ function readInstallBlocks() {
     );
     blocks.set(slug, {
       packages: new Set(install.map(({ name }) => name)),
+      files: files.map(withoutExtension),
       copied: new Set([...copy, ...files].map(withoutExtension)),
     });
   }
   return blocks;
 }
 
-function copies(copied, specifier) {
-  if (!specifier.startsWith(COPIED_PREFIX)) {
-    return false;
-  }
-  const file = specifier.slice(COPIED_PREFIX.length);
-  return copied.has(file) || copied.has(`${file}/index`);
-}
-
-function importedComponent(specifier) {
-  return specifier.match(COMPONENT_IMPORT)?.[1];
-}
-
 /**
- * A demo pastes beside its folder's install block, when the folder is a
- * component, and beside the block of each other component it imports — unless
- * one of those blocks already copies what the demo imports from it.
- *
- * @returns {{ own: string | undefined, extra: string[] }}
+ * A demo pastes beside its folder's block, if the folder is a component, and
+ * beside each imported component's block that no other one already copies.
  */
 function installSlugsFor(id, specifiers, blocks) {
   const folder = id.split('/')[0];
   const own = blocks.has(folder) ? folder : undefined;
-  const ownCopied = own ? blocks.get(own).copied : new Set();
-
-  const importsBySlug = new Map();
-  for (const specifier of specifiers) {
-    const slug = importedComponent(specifier);
-    if (!slug || copies(ownCopied, specifier)) {
-      continue;
-    }
+  const imported = [
+    ...new Set(
+      specifiers
+        .map((specifier) => specifier.match(COMPONENT_IMPORT)?.[1])
+        .filter(Boolean)
+    ),
+  ];
+  for (const slug of imported) {
     if (!blocks.has(slug)) {
       throw new Error(
         `Demo ${id} imports @/components/${slug}, but there is no ${slug} install block for it.`
       );
     }
-    importsBySlug.set(slug, [...(importsBySlug.get(slug) ?? []), specifier]);
   }
 
-  const candidates = [...importsBySlug.keys()];
-  const extra = candidates.filter(
-    (slug) =>
-      !candidates.some(
-        (other) =>
-          other !== slug &&
-          importsBySlug
-            .get(slug)
-            .every((specifier) => copies(blocks.get(other).copied, specifier))
-      )
+  const all = own ? [own, ...imported] : imported;
+  const coveredByAnother = (slug) =>
+    all.some(
+      (other) =>
+        other !== slug &&
+        blocks
+          .get(slug)
+          .files.every((file) => blocks.get(other).copied.has(file))
+    );
+  const extra = imported.filter(
+    (slug) => slug !== own && !coveredByAnother(slug)
   );
 
   if (!own && extra.length === 0) {
@@ -233,7 +219,8 @@ function assertImportsInstalled(id, specifiers, slugs, blocks) {
 
   for (const specifier of specifiers) {
     if (specifier.startsWith(COPIED_PREFIX)) {
-      if (!copies(copied, specifier)) {
+      const file = specifier.slice(COPIED_PREFIX.length);
+      if (!copied.has(file) && !copied.has(`${file}/index`)) {
         throw new Error(
           `Demo ${id} imports ${specifier}, but the ${blockNames} install block does not copy it. Import a file the block copies: ${[...copied].join(', ')}.`
         );

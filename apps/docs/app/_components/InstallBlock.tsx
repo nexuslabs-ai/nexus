@@ -1,9 +1,24 @@
-import { loadDependencies } from '../_lib/dependencies';
+import { type Dependencies, loadDependencies } from '../_lib/dependencies';
 
 import { CodeBlock } from './CodeBlock';
 import { CodeSample } from './CodeSample';
 
-/** Everything `slugs` needs, less what the blocks in `besides` already list. */
+type ListOf = (dependencies: Dependencies) => string[];
+
+const packagesOf: ListOf = ({ install }) =>
+  install.map(({ name, range }) => `${name}@${range}`);
+const filesOf: ListOf = ({ copy, files }) => [...copy, ...files];
+const stylesOf: ListOf = ({ styles }) => styles;
+
+function missing(
+  pick: ListOf,
+  needed: Dependencies[],
+  installed: Dependencies[]
+) {
+  const have = new Set(installed.flatMap(pick));
+  return [...new Set(needed.flatMap(pick))].filter((item) => !have.has(item));
+}
+
 export async function InstallBlock({
   slugs,
   besides = [],
@@ -15,27 +30,9 @@ export async function InstallBlock({
     Promise.all(slugs.map((slug) => loadDependencies(slug))),
     Promise.all(besides.map((slug) => loadDependencies(slug))),
   ]);
-  const installedPackages = new Set(
-    installed.flatMap(({ install }) => install.map(({ name }) => name))
-  );
-  const installedFiles = new Set(
-    installed.flatMap(({ copy, files }) => [...copy, ...files])
-  );
-  const installedStyles = new Set(installed.flatMap(({ styles }) => styles));
-
-  const ranges = new Map(
-    needed
-      .flatMap(({ install }) => install)
-      .filter(({ name }) => !installedPackages.has(name))
-      .map(({ name, range }) => [name, range])
-  );
-  const packages = [...ranges].map(([name, range]) => `${name}@${range}`);
-  const toCopy = [
-    ...new Set(needed.flatMap(({ copy, files }) => [...copy, ...files])),
-  ].filter((file) => !installedFiles.has(file));
-  const toImport = [...new Set(needed.flatMap(({ styles }) => styles))].filter(
-    (file) => !installedStyles.has(file)
-  );
+  const packages = missing(packagesOf, needed, installed);
+  const toCopy = missing(filesOf, needed, installed);
+  const styles = missing(stylesOf, needed, installed);
 
   return (
     <>
@@ -47,11 +44,11 @@ export async function InstallBlock({
           <code>{toCopy.join('\n')}</code>
         </CodeBlock>
       )}
-      {toImport.length > 0 && (
+      {styles.length > 0 && (
         <CodeSample lang="css">
           {[
             '/* app/globals.css */',
-            ...toImport.map((file) => `@import '../${file}';`),
+            ...styles.map((file) => `@import '../${file}';`),
           ].join('\n')}
         </CodeSample>
       )}

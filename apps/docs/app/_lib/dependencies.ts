@@ -9,7 +9,7 @@ const DEPENDENCIES_DIR = path.join(process.cwd(), 'generated', 'dependencies');
 
 type Package = { name: string; range: string };
 
-type Dependencies = {
+export type Dependencies = {
   install: Package[];
   copy: string[];
   files: string[];
