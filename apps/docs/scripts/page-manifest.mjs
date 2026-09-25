@@ -29,7 +29,7 @@ import { pathToFileURL } from 'node:url';
 import { createJiti } from 'jiti';
 import prettier from 'prettier';
 
-import { PREVIEW_DEMO } from './examples.mjs';
+import { DEMO_EXTENSION, isDemoName, PREVIEW_DEMO } from './examples.mjs';
 import { humanize } from './humanize.mjs';
 
 /** Nav metadata source, relative to the docs app root. */
@@ -183,14 +183,23 @@ function assertComponentPageIsOneLineMdx(docsRoot, kind, file, slug) {
   }
 }
 
+/** Demo names under `examples/{slug}/`, matched case-sensitively whatever the filesystem. */
+function demoNamesIn(docsRoot, slug) {
+  const dir = path.join(docsRoot, 'examples', slug);
+  if (!fs.existsSync(dir)) return new Set();
+  return new Set(
+    fs
+      .readdirSync(dir, { withFileTypes: true })
+      .filter((entry) => entry.isFile() && entry.name.endsWith(DEMO_EXTENSION))
+      .map((entry) => entry.name.slice(0, -DEMO_EXTENSION.length))
+      .filter(isDemoName)
+  );
+}
+
 function assertExamplesExist(docsRoot, key, slug, examples) {
+  const demos = demoNamesIn(docsRoot, slug);
   const seen = new Set();
   for (const name of examples) {
-    if (/^_|[./\\]/.test(name)) {
-      throw new Error(
-        `${key} lists "${name}" in its registry \`examples\`, but an example is named by its file under examples/${slug}/ — one path segment, no dot, no leading underscore.`
-      );
-    }
     if (name === PREVIEW_DEMO) {
       throw new Error(
         `${key} lists "${PREVIEW_DEMO}" in its registry \`examples\`, but that demo is the page's Preview and Code — drop it from the list.`
@@ -202,10 +211,9 @@ function assertExamplesExist(docsRoot, key, slug, examples) {
       );
     }
     seen.add(name);
-    const demo = `examples/${slug}/${name}.tsx`;
-    if (!fs.existsSync(path.join(docsRoot, demo))) {
+    if (!demos.has(name)) {
       throw new Error(
-        `${key} lists "${name}" in its registry \`examples\`, but there is no ${demo}.`
+        `${key} lists "${name}" in its registry \`examples\`, but examples/${slug}/ has no demo by that name. Its demos: ${[...demos].join(', ') || 'none'}.`
       );
     }
   }

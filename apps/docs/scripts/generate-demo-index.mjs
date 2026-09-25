@@ -9,12 +9,12 @@ import {
 } from 'node:fs';
 import path from 'node:path';
 
+import { DEMO_EXTENSION, isDemoName } from './examples.mjs';
 import { docsRoot } from './roots.mjs';
 
 const EXAMPLES_DIR = path.join(docsRoot, 'examples');
 const GENERATED_DIR = path.join(docsRoot, '__generated__');
 
-const DEMO_EXTENSION = '.tsx';
 const INDEX_FILE = 'demo-index.ts';
 const MODULES_DIR = 'demos';
 const BOUNDARY_SUFFIX = '.client';
@@ -130,9 +130,7 @@ function collectDemos() {
         .join('/')
         .slice(0, -DEMO_EXTENSION.length),
     }))
-    .filter(({ id }) =>
-      id.split('/').every((segment) => !segment.startsWith('_'))
-    )
+    .filter(({ id }) => id.split('/').every(isDemoName))
     .map(({ file, id }) => {
       // `foo.client.tsx` would claim the module path `foo.tsx`'s boundary owns.
       if (id.includes('.')) {
