@@ -11,6 +11,7 @@ const cjsPath = path.join(packageRoot, 'dist', 'runtime', 'index.cjs');
 const EXPECTED_RUNTIME_EXPORTS = [
   'BASE_TONE_OPTIONS',
   'BASE_TONE_SEEDS',
+  'BRAND_COLOR_PRESETS',
   'CORNER_OPTIONS',
   'DEFAULT_BRAND_COLOR',
   'DEFAULT_COOKIE_KEY',
@@ -35,6 +36,7 @@ const EXPECTED_RUNTIME_EXPORTS = [
   'createNexusAppearanceStateCookie',
   'createNexusThemeContract',
   'deriveTheme',
+  'findBrandColorPreset',
   'isColor',
   'normalizeAppearanceModeIds',
   'parseNexusAppearanceStateCookie',

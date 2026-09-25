@@ -73,6 +73,48 @@ export const defaultAppearance = {
 `brandColor` drives the primary palette. `surfaceTone` picks the neutral family:
 `stone`, `neutral`, `zinc`, `slate`, or `gray`.
 
+Appearance settings offers Default, Indigo, Blue, Violet, Rose, Orange, Amber,
+Green, and Teal beside the existing color picker and hex field. Choosing a
+preset sets `brandColor` to that palette's authored 600 hex seed; Default uses
+`DEFAULT_BRAND_COLOR`. The engine then derives the theme as it does for a custom
+color. The preset swatch shows the seed, so final button colors can differ after
+contrast solving.
+
+The hex field stays editable. Type a six-digit hex with or without `#`; matching
+colors show their preset name, and other values show **Custom**. Incomplete or
+invalid typing keeps the last valid committed color, and leaving the field
+restores that value. Preset names are inferred from `brandColor`, so existing
+saved colors keep working without a storage migration. Existing supported CSS
+color strings remain Custom and are preserved until you choose a new color.
+
+For a controlled editor outside settings, `@nexus_ds/react` exports
+`NexusAppearanceBrandColorField` with `value`, `onChange`, and `label` props:
+
+```tsx
+import { useState } from 'react';
+import { DEFAULT_BRAND_COLOR } from '@nexus_ds/core';
+import { NexusAppearanceBrandColorField } from '@nexus_ds/react';
+
+function BrandEditor() {
+  const [brandColor, setBrandColor] = useState(DEFAULT_BRAND_COLOR);
+  return (
+    <NexusAppearanceBrandColorField
+      label="Brand color"
+      value={brandColor}
+      onChange={setBrandColor}
+    />
+  );
+}
+```
+
+The preset catalog is also exported as `BRAND_COLOR_PRESETS` from
+`@nexus_ds/core`, beside `BASE_TONE_OPTIONS`, for other editor implementations.
+`findBrandColorPreset(brandColor)` returns the preset an opaque saved color
+matches in any CSS notation the engine parses (`#4F46E5`, `4f46e5`,
+`rgb(79 70 229)`), ignoring surrounding whitespace, or `undefined` for a
+custom or unparseable color.
+The compact theme control continues to use its existing custom-color field.
+
 Surface tones are near-neutral: Stone adds a faint warm undertone; Zinc, Gray,
 and Slate add progressively stronger cool undertones. Neutral stays achromatic.
 Tint strength stays restrained across hover, pressed, and elevated surfaces.

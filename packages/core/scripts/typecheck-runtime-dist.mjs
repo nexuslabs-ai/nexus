@@ -76,6 +76,7 @@ await mkdir(probeDir, { recursive: true });
 await writeFile(
   probePath,
   `import {
+  BRAND_COLOR_PRESETS,
   createNexusAppearanceBootstrapScript,
   createNexusAppearanceSnapshotFromCookie,
   createNexusAppearanceSnapshotFromState,
@@ -86,6 +87,7 @@ await writeFile(
   resolveFirstPaint,
   sanitizeNexusAppearance,
   themeToCss,
+  type BrandColorPreset,
   type NexusAppearanceState,
 } from '@nexus_ds/core';
 import {
@@ -97,6 +99,16 @@ import {
   type PrimitivePaletteRamp,
   type Shade,
 } from '@nexus_ds/core/palette';
+
+const preset: BrandColorPreset | undefined = BRAND_COLOR_PRESETS[0];
+if (preset) {
+  const seed: string = preset.color;
+  // @ts-expect-error public preset colors are immutable.
+  preset.color = '#000000';
+  // @ts-expect-error the preset catalog is immutable.
+  BRAND_COLOR_PRESETS.push(preset);
+  void seed;
+}
 
 const palettes: readonly PrimitivePaletteName[] = PRIMITIVE_PALETTE_NAMES;
 const shades: readonly Shade[] = SHADES;
