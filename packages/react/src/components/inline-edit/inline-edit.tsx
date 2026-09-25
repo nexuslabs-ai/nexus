@@ -91,7 +91,8 @@ interface InlineEditEditorProps {
   requiredMessage: string;
   placeholder?: string;
   onCommit: InlineEditCommit;
-  onClose: (returnFocus: boolean) => void;
+  onClose: () => void;
+  focusReturn: React.RefObject<boolean>;
 }
 
 function InlineEditEditor({
@@ -104,6 +105,7 @@ function InlineEditEditor({
   placeholder,
   onCommit,
   onClose,
+  focusReturn,
 }: InlineEditEditorProps) {
   const [draft, setDraft] = React.useState(value);
   const [missing, setMissing] = React.useState(false);
@@ -113,9 +115,12 @@ function InlineEditEditor({
   const message = missing ? requiredMessage : error;
   const invalid = Boolean(message);
 
-  function close() {
-    onClose(Boolean(group.current?.contains(document.activeElement)));
-  }
+  React.useLayoutEffect(() => {
+    const node = group.current;
+    return () => {
+      focusReturn.current = Boolean(node?.contains(document.activeElement));
+    };
+  }, [focusReturn]);
 
   function commit() {
     if (pending) return;
@@ -129,7 +134,7 @@ function InlineEditEditor({
     Promise.resolve(result).then(
       () => {
         setPending(false);
-        close();
+        onClose();
       },
       () => setPending(false)
     );
@@ -137,7 +142,7 @@ function InlineEditEditor({
 
   function cancel() {
     if (pending) return;
-    close();
+    onClose();
   }
 
   function handleBlur(event: React.FocusEvent<HTMLDivElement>) {
@@ -265,15 +270,13 @@ function InlineEdit({
     onEditingChange?.(next);
   }
 
-  function close(returnFocus: boolean) {
-    restoreFocus.current = returnFocus;
+  function close() {
     setEditing(false);
   }
 
   function focusTrigger(button: HTMLButtonElement | null) {
     if (!button || !restoreFocus.current) return;
     restoreFocus.current = false;
-    if (document.activeElement !== document.body) return;
     button.focus();
   }
 
@@ -293,6 +296,7 @@ function InlineEdit({
           placeholder={placeholder}
           onCommit={onCommit}
           onClose={close}
+          focusReturn={restoreFocus}
         />
       );
     }
