@@ -4,7 +4,10 @@
  * Sources:
  *   - `page-registry/` — section and page order, labels, and the
  *     `wireframe` a page renders until its own file lands
- *   - `content/{section}/{slug}.mdx` — MDX pages
+ *   - `content/{section}/{slug}.mdx` — MDX pages; a component page (under
+ *     `components/`, not a group page) is exactly `<ComponentPage slug="{slug}" />`
+ *   - `examples/{slug}/{name}.tsx` — checked against a component page's
+ *     registry `examples` order
  *   - `app/_pages/{section}/{slug}.tsx` — hand-built pages
  *
  * A page's route is its path on disk, so adding a page means adding a file.
@@ -26,6 +29,9 @@ import { pathToFileURL } from 'node:url';
 import { createJiti } from 'jiti';
 import prettier from 'prettier';
 
+import { DEMO_EXTENSION, isDemoName, PREVIEW_DEMO } from './examples.mjs';
+import { humanize } from './humanize.mjs';
+
 /** Nav metadata source, relative to the docs app root. */
 export const REGISTRY_FILE = 'page-registry/index.ts';
 
@@ -40,12 +46,6 @@ const SOURCES = [
   { kind: 'mdx', dir: 'content', ext: '.mdx', keepExtension: true },
   { kind: 'component', dir: 'app/_pages', ext: '.tsx', keepExtension: false },
 ];
-
-/** `multi-brand` → `Multi brand`. */
-function humanize(slug) {
-  const spaced = slug.replaceAll('-', ' ');
-  return spaced.charAt(0).toUpperCase() + spaced.slice(1);
-}
 
 function toPosix(relative) {
   return relative.split(path.sep).join('/');
@@ -165,6 +165,61 @@ function assertRailLabelsHaveNoPage(section) {
   }
 }
 
+const COMPONENTS_SECTION = 'components';
+
+function assertComponentPageIsOneLineMdx(docsRoot, kind, file, slug) {
+  if (kind !== 'mdx') {
+    throw new Error(
+      `${file} is a component page, so it must be content/${COMPONENTS_SECTION}/${slug}.mdx containing <ComponentPage slug="${slug}" />.`
+    );
+  }
+  const expected = `<ComponentPage slug="${slug}" />`;
+  const body = fs.readFileSync(path.join(docsRoot, file), 'utf8').trim();
+  if (body !== expected) {
+    throw new Error(
+      `${file} must contain exactly ${expected} — a component page names its component and nothing else; ComponentPage renders the rest.`
+    );
+  }
+}
+
+function demoNamesIn(docsRoot, slug) {
+  const dir = path.join(docsRoot, 'examples', slug);
+  if (!fs.existsSync(dir)) return [];
+  return fs
+    .readdirSync(dir, { withFileTypes: true })
+    .filter(
+      (entry) => !entry.isDirectory() && entry.name.endsWith(DEMO_EXTENSION)
+    )
+    .map((entry) => entry.name.slice(0, -DEMO_EXTENSION.length))
+    .filter(isDemoName)
+    .sort();
+}
+
+function assertExamplesExist(docsRoot, key, slug, examples) {
+  const available = demoNamesIn(docsRoot, slug).filter(
+    (name) => name !== PREVIEW_DEMO
+  );
+  const seen = new Set();
+  for (const name of examples) {
+    if (name === PREVIEW_DEMO) {
+      throw new Error(
+        `${key} lists "${PREVIEW_DEMO}" in its registry \`examples\`, but that demo is the page's Preview and Code — drop it from the list.`
+      );
+    }
+    if (seen.has(name)) {
+      throw new Error(
+        `${key} lists "${name}" twice in its registry \`examples\`.`
+      );
+    }
+    seen.add(name);
+    if (!available.includes(name)) {
+      throw new Error(
+        `${key} lists "${name}" in its registry \`examples\`, but examples/${slug}/ has no demo by that name. Its examples: ${available.join(', ') || 'none'}.`
+      );
+    }
+  }
+}
+
 /** Import specifier for a docs-root-relative file, as seen from the content module. */
 function specifierFor(file, keepExtension) {
   const relative = toPosix(path.relative(path.dirname(CONTENT_FILE), file));
@@ -207,6 +262,8 @@ export type ManifestPage = {
   components?: readonly string[];
   /** Non-interactive headings listed under this page in the left rail. */
   nested?: readonly string[];
+  /** Example demo names a component page shows first, in this order. */
+  examples?: readonly string[];
 } & (
   | {
       kind: 'mdx' | 'component';
@@ -340,8 +397,23 @@ export async function buildPageManifest(docsRoot, formatOptions) {
     }
 
     const source = sources.find((candidate) => candidate.pages.has(key));
+    const isComponentPage =
+      sectionSlug === COMPONENTS_SECTION && !entry?.components?.length;
+    if (entry?.examples?.length) {
+      if (!isComponentPage || !source) {
+        throw new Error(
+          `${key} has registry \`examples\`, but only a written component page under ${COMPONENTS_SECTION}/ renders examples — drop the list.`
+        );
+      }
+      assertExamplesExist(docsRoot, key, slug, entry.examples);
+      base.examples = entry.examples;
+    }
+
     if (source) {
       const file = source.pages.get(key);
+      if (isComponentPage) {
+        assertComponentPageIsOneLineMdx(docsRoot, source.kind, file, slug);
+      }
       if (entry?.wireframe) {
         throw new Error(
           `${key} is written at ${file}, so its registry wireframe can never render — drop the \`wireframe\` from its registry entry.`

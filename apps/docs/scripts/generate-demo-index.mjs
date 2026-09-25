@@ -9,12 +9,12 @@ import {
 } from 'node:fs';
 import path from 'node:path';
 
+import { DEMO_EXTENSION, isDemoName } from './examples.mjs';
 import { docsRoot } from './roots.mjs';
 
 const EXAMPLES_DIR = path.join(docsRoot, 'examples');
 const GENERATED_DIR = path.join(docsRoot, '__generated__');
 
-const DEMO_EXTENSION = '.tsx';
 const INDEX_FILE = 'demo-index.ts';
 const MODULES_DIR = 'demos';
 const BOUNDARY_SUFFIX = '.client';
@@ -40,18 +40,18 @@ export interface Demo {
 
 const INDEX_FOOTER = `export type DemoId = keyof typeof demos;
 
-const byId = new Map<string, Demo>(Object.entries(demos));
+export function isDemoId(id: string): id is DemoId {
+  return Object.hasOwn(demos, id);
+}
 
 export function getDemo(id: string): Demo {
-  const demo = byId.get(id);
-
-  if (!demo) {
+  if (!isDemoId(id)) {
     throw new Error(
       \`Unknown demo id: \${id}. Add apps/docs/examples/\${id}.tsx, or fix the id.\`
     );
   }
 
-  return demo;
+  return demos[id];
 }
 `;
 
@@ -130,14 +130,17 @@ function collectDemos() {
         .join('/')
         .slice(0, -DEMO_EXTENSION.length),
     }))
-    .filter(({ id }) =>
-      id.split('/').every((segment) => !segment.startsWith('_'))
-    )
+    .filter(({ id }) => id.split('/').every(isDemoName))
     .map(({ file, id }) => {
       // `foo.client.tsx` would claim the module path `foo.tsx`'s boundary owns.
       if (id.includes('.')) {
         throw new Error(
           `Demo id cannot contain a dot: ${id}. Rename ${path.relative(EXAMPLES_DIR, file)}.`
+        );
+      }
+      if (id.split('/').length !== 2) {
+        throw new Error(
+          `Demo ${id} must live at apps/docs/examples/{folder}/{name}.tsx — a component's demos go in examples/{slug}/.`
         );
       }
 

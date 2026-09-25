@@ -14,6 +14,11 @@ export type RegistryPage = {
   nested?: string[];
   /** Components a group page covers, rendered inline in the left rail (non-interactive). */
   components?: string[];
+  /**
+   * A component page's demo names under `examples/{slug}/`, shown first and in
+   * this order; unlisted demos follow in name order.
+   */
+  examples?: string[];
   /** Placeholder body, carried only while the page has no source file. */
   wireframe?: { lede: string; blocks: Block[] };
 };

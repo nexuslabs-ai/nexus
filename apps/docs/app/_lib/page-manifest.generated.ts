@@ -10,6 +10,8 @@ export type ManifestPage = {
   components?: readonly string[];
   /** Non-interactive headings listed under this page in the left rail. */
   nested?: readonly string[];
+  /** Example demo names a component page shows first, in this order. */
+  examples?: readonly string[];
 } & (
   | {
       kind: 'mdx' | 'component';
