@@ -1,5 +1,13 @@
 import type { ReactNode } from 'react';
 
+import {
+  PageHeader as Header,
+  PageHeaderActions,
+  PageHeaderContent,
+  PageHeaderDescription,
+  PageHeaderTitle,
+} from '@nexus_ds/react';
+
 interface PageHeaderProps {
   title: string;
   description: string;
@@ -13,16 +21,12 @@ interface PageHeaderProps {
 /** Module-route header: a large title, a muted description, and optional actions. */
 export function PageHeader({ title, description, children }: PageHeaderProps) {
   return (
-    <header className="nx:flex nx:flex-wrap nx:items-start nx:justify-between nx:gap-4">
-      <div className="nx:space-y-1">
-        <h1 className="nx:typography-heading-large nx:text-foreground">
-          {title}
-        </h1>
-        <p className="nx:text-muted-foreground">{description}</p>
-      </div>
-      {children ? (
-        <div className="nx:flex nx:items-center nx:gap-2">{children}</div>
-      ) : null}
-    </header>
+    <Header>
+      <PageHeaderContent>
+        <PageHeaderTitle>{title}</PageHeaderTitle>
+        <PageHeaderDescription>{description}</PageHeaderDescription>
+      </PageHeaderContent>
+      {children ? <PageHeaderActions>{children}</PageHeaderActions> : null}
+    </Header>
   );
 }
