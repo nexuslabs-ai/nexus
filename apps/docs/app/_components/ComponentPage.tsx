@@ -72,12 +72,12 @@ export function ComponentPage({ slug }: { slug: string }) {
           </SubsectionHeading>
           <ComponentPreview id={id} />
           {alsoInstall.length > 0 && (
-            <p className="nx:typography-body-default nx:text-muted-foreground">
-              This example also needs:
-            </p>
-          )}
-          {alsoInstall.length > 0 && (
-            <InstallBlock slugs={alsoInstall} besides={[slug]} />
+            <>
+              <p className="nx:typography-body-default nx:text-muted-foreground">
+                This example also needs:
+              </p>
+              <InstallBlock slugs={alsoInstall} besides={[slug]} />
+            </>
           )}
           <ComponentSource id={id} />
         </section>

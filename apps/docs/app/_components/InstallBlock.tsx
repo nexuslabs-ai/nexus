@@ -12,8 +12,8 @@ export async function InstallBlock({
   besides?: readonly string[];
 }) {
   const [needed, installed] = await Promise.all([
-    Promise.all(slugs.map(loadDependencies)),
-    Promise.all(besides.map(loadDependencies)),
+    Promise.all(slugs.map((slug) => loadDependencies(slug))),
+    Promise.all(besides.map((slug) => loadDependencies(slug))),
   ]);
   const installedPackages = new Set(
     installed.flatMap(({ install }) => install.map(({ name }) => name))
