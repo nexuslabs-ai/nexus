@@ -19,10 +19,8 @@ import { PropsTable } from './PropsTable';
 type Example = { id: DemoId; name: string };
 
 /**
- * A component's docs page: Preview, Install, Code, Props, then Examples, all
- * derived from `slug`. Demos live at `apps/docs/examples/{slug}/{name}.tsx`;
- * `demo` feeds Preview and Code, every other name is an example — the page's
- * registry `examples` first, then the rest in name order.
+ * `examples/{slug}/demo.tsx` is the Preview and Code; every other demo in that
+ * folder is an example, registry `examples` first, then the rest by name.
  */
 export function ComponentPage({ slug }: { slug: string }) {
   const page = requireSection('components').pages.find(

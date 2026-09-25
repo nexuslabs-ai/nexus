@@ -165,7 +165,6 @@ function assertRailLabelsHaveNoPage(section) {
   }
 }
 
-/** Section whose pages, other than group pages, are one `<ComponentPage>` line each. */
 const COMPONENTS_SECTION = 'components';
 
 function assertComponentPageIsOneLineMdx(docsRoot, kind, file, slug) {
@@ -183,7 +182,6 @@ function assertComponentPageIsOneLineMdx(docsRoot, kind, file, slug) {
   }
 }
 
-/** Demo names under `examples/{slug}/`, matched case-sensitively whatever the filesystem. */
 function demoNamesIn(docsRoot, slug) {
   const dir = path.join(docsRoot, 'examples', slug);
   if (!fs.existsSync(dir)) return [];
