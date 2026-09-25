@@ -30,14 +30,19 @@ const collapse = (value: string) =>
 
 /** Declarations of the first top-level block opened by exactly `selector {`. */
 function blockDeclarations(css: string, selector: string): Map<string, string> {
-  const start = css.indexOf(`\n${selector} {\n`);
-  if (start === -1) throw new Error(`no top-level "${selector}" block`);
-  const body = css.slice(start, css.indexOf('\n}\n', start));
+  const bodies = css
+    .split(`\n${selector} {\n`)
+    .slice(1)
+    .map((rest) => rest.slice(0, rest.indexOf('\n}\n')));
+  if (bodies.length === 0) {
+    throw new Error(`no top-level "${selector}" block`);
+  }
   return new Map(
-    [...body.matchAll(/(--[\w-]+):\s*([^;]+);/g)].map(([, name, value]) => [
-      name!,
-      collapse(value!),
-    ])
+    bodies.flatMap((body) =>
+      [...body.matchAll(/(--[\w-]+):\s*([^;]+);/g)].map(
+        ([, name, value]) => [name!, collapse(value!)] as const
+      )
+    )
   );
 }
 
