@@ -5,23 +5,16 @@ import type { VariantProps } from 'class-variance-authority';
 
 import { cn } from '../../lib/utils';
 import { buttonVariants } from '../button';
-import { toggleVariants } from '../toggle';
 
 type ToolbarProps = React.ComponentProps<typeof ToolbarPrimitive.Root>;
 
 /** Label the toolbar with aria-label or aria-labelledby. Controls wrap in DOM order. */
-function Toolbar({
-  className,
-  orientation = 'horizontal',
-  ...props
-}: ToolbarProps) {
+function Toolbar({ className, ...props }: ToolbarProps) {
   return (
     <ToolbarPrimitive.Root
       data-slot="toolbar"
-      data-orientation={orientation}
-      orientation={orientation}
       className={cn(
-        'nx:flex nx:w-fit nx:max-w-full nx:min-w-0 nx:flex-wrap nx:items-center nx:gap-0.5 nx:rounded-lg nx:border-default nx:border-border-default nx:bg-container nx:p-0.5 nx:shadow-sm nx:data-[orientation=vertical]:w-fit nx:data-[orientation=vertical]:flex-col nx:data-[orientation=vertical]:items-stretch',
+        'nx:flex nx:w-fit nx:max-w-full nx:min-w-0 nx:flex-wrap nx:items-center nx:gap-0.5 nx:rounded-lg nx:border-default nx:border-border-default nx:bg-container nx:p-0.5 nx:shadow-sm nx:data-[orientation=vertical]:flex-col nx:data-[orientation=vertical]:items-stretch',
         className
       )}
       {...props}
@@ -116,9 +109,8 @@ function ToolbarToggleItem({
       data-slot="toolbar-toggle-item"
       data-size={size}
       className={cn(
-        toggleVariants(),
         buttonVariants({ variant: 'ghost', size }),
-        'nx:py-0 nx:data-[state=on]:bg-transparent nx:data-[state=on]:text-primary-subtle-foreground nx:data-[state=on]:[font-weight:var(--nx-typography-weight-bold)] nx:data-[state=on]:hover:bg-transparent nx:data-[state=on]:hover:text-primary-subtle-foreground nx:data-[state=on]:[&_svg]:stroke-[3]',
+        'nx:data-[state=on]:bg-primary-subtle nx:data-[state=on]:text-primary-subtle-foreground nx:data-[state=on]:hover:bg-primary-subtle-hover nx:data-[state=on]:active:bg-primary-subtle-active',
         className
       )}
       {...props}

@@ -65,7 +65,7 @@ const meta: Meta<typeof Toolbar> = {
     docs: {
       description: {
         component:
-          'A contained group of related controls with one Tab stop. The shared defaults provide a theme-aware surface, border, corners, shadow, 2px padding and gaps. Selected toggles use primary text, bold labels and heavier icon strokes. Override className only for intentional compositions such as attached or flush action bars. Arrow keys move between controls; Home/End reach the first/last control. Use ToolbarButton, ToolbarLink, and ToolbarToggleGroup/Item so every control shares the toolbar focus sequence. Button and link expose Nexus button variant/size styles (ghost/sm by default); toggles use matching sizes. These are Radix controls, not the full Button loading/icon-slot API. Use asChild for menu triggers, preserving native interactive semantics. Controls wrap in DOM order in narrow containers; horizontal arrow navigation continues across wrapped rows. Keep labels concise and choose secondary menu actions explicitly. Provide aria-label or aria-labelledby; use ordinary layout and Buttons for simple action rows that should keep separate Tab stops. Keep text fields outside the toolbar to avoid arrow-key conflicts. Inline, Attached, and Selection demonstrate compositions using this same API. Applications own commands, selection, visibility, placement, and persistence.',
+          'A contained group of related controls with one Tab stop. The shared defaults provide a theme-aware surface, border, corners, shadow, 2px padding and gaps. Selected toggles use a subtle primary background and primary text, so selection never changes their width. Override className only for intentional compositions such as attached or flush action bars. Arrow keys move between controls; Home/End reach the first/last control. Use ToolbarButton, ToolbarLink, and ToolbarToggleGroup/Item so every control shares the toolbar focus sequence. Button and link expose Nexus button variant/size styles (ghost/sm by default); toggles use matching sizes. These are Radix controls, not the full Button loading/icon-slot API. Use asChild for menu triggers, preserving native interactive semantics. Controls wrap in DOM order in narrow containers; horizontal arrow navigation continues across wrapped rows. Keep labels concise and choose secondary menu actions explicitly. Provide aria-label or aria-labelledby; use ordinary layout and Buttons for simple action rows that should keep separate Tab stops. Keep text fields outside the toolbar to avoid arrow-key conflicts. Inline, Attached, and Selection demonstrate compositions using this same API. Applications own commands, selection, visibility, placement, and persistence.',
       },
     },
   },
@@ -145,14 +145,12 @@ function EditorToolbar({ className }: { className?: string } = {}) {
           </Tooltip>
         </ToolbarToggleGroup>
         <ToolbarSeparator className="nx:data-[orientation=vertical]:h-4" />
-        <span className="nx:inline-flex">
-          <ToolbarLink
-            className="nx:text-muted-foreground"
-            href={`#${previewId}`}
-          >
-            Preview
-          </ToolbarLink>
-        </span>
+        <ToolbarLink
+          className="nx:text-muted-foreground"
+          href={`#${previewId}`}
+        >
+          Preview
+        </ToolbarLink>
       </Toolbar>
       <p
         id={previewId}
@@ -175,6 +173,9 @@ export const Default: Story = {
   render: () => <EditorToolbar />,
   play: async ({ canvasElement }) => {
     const canvas = within(canvasElement);
+    await expect(
+      canvas.getByRole('group', { name: 'Text style' })
+    ).toBeInTheDocument();
     const bold = canvas.getByRole('button', { name: 'Bold' });
     const italic = canvas.getByRole('button', { name: 'Italic' });
     await userEvent.click(bold);
@@ -267,11 +268,14 @@ export const Calendar: Story = {
   render: () => <CalendarToolbar />,
   play: async ({ canvasElement }) => {
     const canvas = within(canvasElement);
-    await userEvent.click(canvas.getByRole('radio', { name: 'Month' }));
-    await expect(canvas.getByRole('radio', { name: 'Month' })).toHaveAttribute(
-      'aria-checked',
-      'true'
-    );
+    await expect(
+      canvas.getByRole('radiogroup', { name: 'Calendar view' })
+    ).toBeInTheDocument();
+    const month = canvas.getByRole('radio', { name: 'Month' });
+    const unselectedWidth = month.getBoundingClientRect().width;
+    await userEvent.click(month);
+    await expect(month).toHaveAttribute('aria-checked', 'true');
+    await expect(month.getBoundingClientRect().width).toBe(unselectedWidth);
     await expect(canvas.getByRole('radio', { name: 'Week' })).toHaveAttribute(
       'aria-checked',
       'false'
@@ -852,7 +856,7 @@ export const VisualDirections: Story = {
               Individual surfaces, spacing-only groups.
             </p>
           </div>
-          <EditorToolbar className="nx:gap-2 nx:border-transparent nx:bg-background nx:shadow-none nx:[&_[data-slot=toolbar-separator]]:hidden nx:[&_[data-slot=toolbar-button]]:bg-container nx:[&_[data-slot=toolbar-button]]:border-border-default nx:[&_[data-slot=toolbar-toggle-item]]:bg-container nx:[&_[data-slot=toolbar-toggle-item]]:border-border-default nx:[&_[data-slot=toolbar-toggle-item][data-state=on]]:bg-container nx:[&_[data-slot=toolbar-toggle-item][data-state=on]]:border-border-default" />
+          <EditorToolbar className="nx:gap-2 nx:border-transparent nx:bg-background nx:shadow-none nx:[&_[data-slot=toolbar-separator]]:hidden nx:[&_[data-slot=toolbar-button]]:bg-container nx:[&_[data-slot=toolbar-button]]:border-border-default nx:[&_[data-slot=toolbar-toggle-item]]:bg-container nx:[&_[data-slot=toolbar-toggle-item]]:border-border-default" />
         </section>
       </div>
     </div>
@@ -944,7 +948,6 @@ function DrawingTools() {
         >
           <ToolbarToggleGroup
             type="single"
-            orientation="vertical"
             value={tool}
             onValueChange={changeTool}
             aria-label="Active drawing tool"
