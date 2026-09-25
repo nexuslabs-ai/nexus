@@ -76,3 +76,4 @@ export * from './components/appearance/color-field';
 export * from './components/appearance/config-preview';
 export * from './components/appearance/setting-row';
 export * from './components/appearance/theme-quick-control';
+export * from './components/toolbar';
