@@ -1,12 +1,18 @@
 import { clampChroma, type Oklch } from 'culori';
 
 import { apcaLc } from './apca';
+import { APCA_PAIRS } from './apca-pairs';
+import {
+  bisect,
+  constrainColors,
+  contrastTarget,
+  normalizeContrast,
+} from './contrast';
 import { formatOklch } from './oklch-format';
 import {
   type Mode,
   type NexusSurfaceTone,
   type Shade,
-  type Tier,
   TIER_THRESHOLDS,
 } from './palette';
 import { rampFromSeed, seedOklch } from './perceptual-ramp';
@@ -14,11 +20,10 @@ import { CHART_DARK, CHART_LIGHT, NEUTRAL, STATUS_RAMP } from './static-ramps';
 import {
   anchorToStep,
   DARK_SURFACE_LADDER,
-  LIGHT_CHROMA_DEPTH_MULTIPLIER,
   LIGHT_SURFACE_LADDER,
-  PAGE_L_LIGHT,
   SURFACE_TOKENS,
   SURFACE_TONE,
+  type SurfaceToken,
 } from './surface-ladder';
 
 export interface ThemeSeeds {
@@ -26,7 +31,7 @@ export interface ThemeSeeds {
   accent: string;
   /** Drives surface lightness. Hue/chroma come from `surfaceTone`. */
   background: string;
-  /** Drives the text tiers. */
+  /** Drives text hue/lightness; tinted surface tones cap text chroma. */
   foreground: string;
 }
 
@@ -35,7 +40,7 @@ export interface ThemeDerivationInput {
   surfaceTone?: NexusSurfaceTone;
   light: ThemeSeeds;
   dark: ThemeSeeds;
-  /** 0–100 per mode. Separation between background↔surfaces and foreground↔text. */
+  /** 0–100 per mode. Higher values strengthen surface and content contrast. */
   contrast: {
     light: number;
     dark: number;
@@ -53,14 +58,7 @@ export interface DerivedTheme {
   dark: TokenMap;
 }
 
-// --- Tunable contrast model (spec §10.1) ---------------------------------
-const DELTA_MIN = 0.02;
-const DELTA_MAX = 0.08;
-const CONTRAST_ANCHOR = 60;
-const lerp = (a: number, b: number, t: number) => a + (b - a) * t;
 const clamp01 = (l: number) => Math.max(0.03, Math.min(1, l));
-const clampContrast = (contrast: number) =>
-  Math.max(0, Math.min(100, contrast));
 
 interface ContrastProfile {
   surfaceDelta: number;
@@ -68,41 +66,36 @@ interface ContrastProfile {
   hoverAlpha: number;
 }
 
-const FOCUS_APCA_FLOOR = 45;
-const BLACK_BASE = 'oklch(0.1448 0 0)';
-const BLACK_A500 = 'oklch(0.1448 0 0 / 0.502)';
-const BLACK_A600 = 'oklch(0.1448 0 0 / 0.6275)';
-const BLACK_A900 = 'oklch(0.1448 0 0 / 0.9098)';
-const WHITE_BASE = 'oklch(1 0 0)';
-const WHITE_A600 = 'oklch(1 0 0 / 0.6275)';
-const WHITE_A900 = 'oklch(1 0 0 / 0.9098)';
+// Border and hover opacities hit their `anchor` value at this contrast and
+// interpolate linearly on either side of it.
+const CONTRAST_ANCHOR = 60;
 
-function anchoredContrastLerp(
+function anchoredContrast(
   contrast: number,
   min: number,
   anchor: number,
   max: number
 ): number {
-  const c = clampContrast(contrast);
-  if (c === CONTRAST_ANCHOR) return anchor;
   const value =
-    c < CONTRAST_ANCHOR
-      ? lerp(min, anchor, c / CONTRAST_ANCHOR)
-      : lerp(anchor, max, (c - CONTRAST_ANCHOR) / (100 - CONTRAST_ANCHOR));
+    contrast <= CONTRAST_ANCHOR
+      ? min + ((anchor - min) * contrast) / CONTRAST_ANCHOR
+      : anchor +
+        ((max - anchor) * (contrast - CONTRAST_ANCHOR)) /
+          (100 - CONTRAST_ANCHOR);
   return Number(value.toFixed(4));
 }
 
 function contrastProfile(mode: Mode, contrast: number): ContrastProfile {
   const dark = mode === 'dark';
   return {
-    surfaceDelta: lerp(DELTA_MIN, DELTA_MAX, clampContrast(contrast) / 100),
-    borderAlpha: anchoredContrastLerp(
+    surfaceDelta: 0.02 + (((dark ? 0.03 : 0.05) - 0.02) * contrast) / 100,
+    borderAlpha: anchoredContrast(
       contrast,
       dark ? 0.12 : 0.06,
       dark ? 0.1882 : 0.0941,
       dark ? 0.2337 : 0.1168
     ),
-    hoverAlpha: anchoredContrastLerp(
+    hoverAlpha: anchoredContrast(
       contrast,
       dark ? 0.04 : 0.035,
       0.0627,
@@ -111,199 +104,103 @@ function contrastProfile(mode: Mode, contrast: number): ContrastProfile {
   };
 }
 
+const WHITE_BASE = 'oklch(1 0 0)';
+
+const isSurfaceToken = (name: string): name is SurfaceToken =>
+  (SURFACE_TOKENS as readonly string[]).includes(name);
+
 /** Opaque surface tiers derived from the background seed + contrast Δ. */
 export function deriveSurfaces(
   backgroundHex: string,
   surfaceTone: NexusSurfaceTone,
   mode: Mode,
-  delta: number
+  delta: number,
+  contrast = 50
 ): TokenMap {
-  const bg = seedOklch(backgroundHex);
   const tone = SURFACE_TONE[surfaceTone];
   const dark = mode === 'dark';
-  const anchorL = dark ? (bg.l ?? 0) : PAGE_L_LIGHT;
+  const anchorL = dark
+    ? Math.max(0.08, Math.min(0.32, seedOklch(backgroundHex).l))
+    : 1;
   const baseC = dark ? tone.darkC : tone.lightC;
   const out: TokenMap = {};
   const ladder = dark ? DARK_SURFACE_LADDER : LIGHT_SURFACE_LADDER;
-  for (const token of SURFACE_TOKENS) {
+  const surfaceAt = (token: SurfaceToken, spacing: number) => {
     const step = anchorToStep(ladder[token], mode, surfaceTone);
-    const l = clamp01(anchorL + step * delta);
-    const c = dark
-      ? baseC
-      : l >= 1
-        ? 0
-        : baseC * (1 + (1 - l) * LIGHT_CHROMA_DEPTH_MULTIPLIER);
-    const color: Oklch = {
-      mode: 'oklch',
-      l,
-      c,
-      h: tone.h,
-    };
-    out[`--nx-color-${token}`] = formatOklch(color);
-  }
+    const l = clamp01(anchorL + step * spacing);
+    const c = !dark && l >= 1 ? 0 : baseC;
+    return formatOklch(
+      clampChroma({ mode: 'oklch', l, c, h: tone.h }, 'oklch', 'p3')
+    );
+  };
+  const endpoint = dark ? 'oklch(1 0 0)' : 'oklch(0 0 0)';
+  const page = surfaceAt('background', 0);
+  const pageMaximum = apcaLc(endpoint, page);
+  const surfacePairs = APCA_PAIRS.flatMap(({ bg, tier, backdrop }) =>
+    !backdrop && isSurfaceToken(bg) ? [{ bg, tier }] : []
+  );
+  const fits = (spacing: number) =>
+    surfacePairs.every(
+      ({ bg, tier }) =>
+        apcaLc(endpoint, surfaceAt(bg, spacing)) >=
+        (dark
+          ? Math.min(contrastTarget(tier, contrast), pageMaximum)
+          : TIER_THRESHOLDS[tier])
+    );
+  const spacing = fits(delta) ? delta : bisect(delta, 0, fits);
+  for (const token of SURFACE_TOKENS)
+    out[`--nx-color-${token}`] = surfaceAt(token, spacing);
   out['--nx-color-control-thumb'] = 'oklch(1 0 0)';
   return out;
 }
 
 /**
- * Quietest legible text tier. Start `quiet` of the way from the foreground
- * toward its surface (softer = lower contrast), then walk back toward the
- * foreground until the APCA floor is met — so muted text is as quiet as
- * legibility allows, not as loud as the tier permits. `quiet = 0` returns the
- * foreground itself (full contrast). Never throws: if even the foreground
- * fails the floor, snap to the higher-contrast black/white endpoint.
+ * Text seed `quiet` of the way from the foreground toward its surface (softer =
+ * lower contrast); `quiet = 0` is the foreground itself. The contrast solver
+ * moves it back toward the foreground only as far as legibility requires.
  */
-function quietText(
-  fg: Oklch,
-  surfaceColor: string,
-  floor: number,
-  quiet: number
-): string {
+function quietText(fg: Oklch, surfaceColor: string, quiet: number): string {
   const surfL = seedOklch(surfaceColor).l ?? 0;
   const fgL = fg.l ?? 0;
-  const c = fg.c ?? 0;
-  const h = fg.h ?? 0;
-  for (let q = quiet; q > 0; q -= 0.1) {
-    const candidate = formatOklch({
-      mode: 'oklch',
-      l: clamp01(fgL + (surfL - fgL) * q),
-      c,
-      h,
-    });
-    if (apcaLc(candidate, surfaceColor) >= floor) return candidate;
-  }
-  const fgString = formatOklch({ mode: 'oklch', l: fgL, c, h });
-  if (apcaLc(fgString, surfaceColor) >= floor) return fgString;
-  return apcaLc('oklch(1 0 0)', surfaceColor) >=
-    apcaLc('oklch(0 0 0)', surfaceColor)
-    ? 'oklch(1 0 0)'
-    : 'oklch(0 0 0)';
+  return formatOklch({
+    mode: 'oklch',
+    l: clamp01(fgL + (surfL - fgL) * quiet),
+    c: fg.c ?? 0,
+    h: fg.h ?? 0,
+  });
 }
 
-/** Each text token: the surface it sits on, its APCA floor, and how quiet to aim. */
-const TEXT_ON: Record<string, { surface: string; tier: Tier; quiet: number }> =
-  {
-    'container-foreground': {
-      surface: '--nx-color-container',
-      tier: 'body',
-      quiet: 0,
-    },
-    'popover-foreground': {
-      surface: '--nx-color-popover',
-      tier: 'body',
-      quiet: 0,
-    },
-    'nav-foreground': {
-      surface: '--nx-color-nav-background',
-      tier: 'body',
-      quiet: 0,
-    },
-    'nav-muted-foreground': {
-      surface: '--nx-color-nav-background',
-      tier: 'ui',
-      quiet: 0.4,
-    },
-    'disabled-foreground': {
-      surface: '--nx-color-disabled',
-      tier: 'incidental',
-      quiet: 0.5,
-    },
-  };
+/** Each text token: the surface it sits on and how quiet to aim. */
+const TEXT_ON: Record<string, { surface: string; quiet: number }> = {
+  'container-foreground': { surface: '--nx-color-container', quiet: 0 },
+  'popover-foreground': { surface: '--nx-color-popover', quiet: 0 },
+  'nav-foreground': { surface: '--nx-color-nav-background', quiet: 0 },
+  'nav-muted-foreground': { surface: '--nx-color-nav-background', quiet: 0.4 },
+  'disabled-foreground': { surface: '--nx-color-disabled', quiet: 0.5 },
+  'muted-foreground': { surface: '--nx-color-background', quiet: 0.5 },
+  'muted-foreground-subtle': { surface: '--nx-color-background', quiet: 0.6 },
+};
 
-/**
- * Text tiers. The surface-relative tiers are walked to their APCA floor on their
- * surface; foreground, muted, and subtle are fixed per-mode alpha inks.
- */
+/** Text seeds; the contrast solver makes them legible on every registered background. */
 export function deriveText(
   foregroundHex: string,
   surfaces: TokenMap,
   mode: Mode
 ): TokenMap {
   const fg = seedOklch(foregroundHex);
-  const out: TokenMap = {};
-  for (const [token, { surface, tier, quiet }] of Object.entries(TEXT_ON)) {
-    const surfaceColor = surfaces[surface] ?? foregroundHex;
-    out[`--nx-color-${token}`] = quietText(
-      fg,
-      surfaceColor,
-      TIER_THRESHOLDS[tier],
-      quiet
-    );
-  }
-  return {
-    ...out,
-    '--nx-color-foreground': mode === 'dark' ? WHITE_A900 : BLACK_A900,
-    '--nx-color-muted-foreground': mode === 'dark' ? WHITE_A600 : BLACK_A600,
-    '--nx-color-muted-foreground-subtle':
-      mode === 'dark' ? WHITE_A600 : BLACK_A500,
-  };
+  // A fixed light reference keeps text strength independent of moving surfaces.
+  const textSurface = (name: string) =>
+    mode === 'light' ? WHITE_BASE : (surfaces[name] ?? foregroundHex);
+  const out: TokenMap = { '--nx-color-foreground': formatOklch(fg) };
+  for (const [token, { surface, quiet }] of Object.entries(TEXT_ON))
+    out[`--nx-color-${token}`] = quietText(fg, textSurface(surface), quiet);
+  return out;
 }
 
-/** Pick the on-color (black or white) with the higher APCA contrast against `bg`. */
-function readableOn(bg: string): string {
-  return apcaLc('oklch(1 0 0)', bg) >= apcaLc('oklch(0 0 0)', bg)
-    ? 'oklch(1 0 0)'
-    : 'oklch(0 0 0)';
-}
-
-function firstBackground(backgrounds: string[]): string {
-  const bg = backgrounds[0];
-  if (bg === undefined) {
-    throw new Error('Expected at least one APCA background.');
-  }
-  return bg;
-}
-
-function apcaSafeAgainstAll(
-  color: string,
-  backgrounds: string[],
-  mode: Mode
-): string {
-  const seed = seedOklch(color);
-  const c = seed.c ?? 0;
-  const h = seed.h ?? 0;
-  const initialL = seed.l ?? (mode === 'dark' ? 1 : 0);
-  const direction = mode === 'dark' ? 1 : -1;
-  for (let step = 0; step <= 100; step += 1) {
-    const candidate = formatOklch({
-      mode: 'oklch',
-      l: clamp01(initialL + direction * step * 0.01),
-      c,
-      h,
-    });
-    if (backgrounds.every((bg) => apcaLc(candidate, bg) >= FOCUS_APCA_FLOOR)) {
-      return candidate;
-    }
-  }
-  return readableOn(firstBackground(backgrounds));
-}
-
-/** First shade (in `order`) that clears `floor` against `bg`; else the black/white endpoint. */
-function legibleShade(
-  ramp: Record<Shade, string>,
-  bg: string,
-  floor: number,
-  order: Shade[]
-): string {
-  for (const k of order) if (apcaLc(ramp[k], bg) >= floor) return ramp[k];
-  return readableOn(bg);
-}
-
-function legibleShadeAcross(
-  ramp: Record<Shade, string>,
-  backgrounds: string[],
-  floor: number,
-  order: Shade[]
-): string {
-  for (const k of order) {
-    if (backgrounds.every((bg) => apcaLc(ramp[k], bg) >= floor)) {
-      return ramp[k];
-    }
-  }
-  return readableOn(firstBackground(backgrounds));
-}
-
-/** 11 tokens for a named color family (background, foreground, subtle, borders). */
+/**
+ * Fill, subtle, and border seeds for a named color family. The contrast solver
+ * adds the black/white `-foreground` label and resolves `-subtle-foreground`.
+ */
 export function deriveFamily(
   name: string,
   ramp: Record<Shade, string>,
@@ -311,20 +208,13 @@ export function deriveFamily(
 ): TokenMap {
   const dark = mode === 'dark';
   const p = `--nx-color-${name}`;
-  const subtle = dark ? ramp['950'] : ramp['50'];
   return {
     [`${p}-background`]: ramp['600'],
     [`${p}-background-hover`]: ramp['700'],
     [`${p}-background-active`]: ramp['800'],
-    [`${p}-foreground`]: readableOn(ramp['600']),
     [`${p}-disabled`]: dark ? ramp['950'] : ramp['300'],
-    [`${p}-subtle`]: subtle,
-    [`${p}-subtle-foreground`]: legibleShade(
-      ramp,
-      subtle,
-      TIER_THRESHOLDS.ui,
-      dark ? ['300', '200', '100', '50'] : ['600', '700', '800', '900']
-    ),
+    [`${p}-subtle`]: dark ? ramp['950'] : ramp['50'],
+    [`${p}-subtle-foreground`]: dark ? ramp['300'] : ramp['600'],
     [`${p}-subtle-hover`]: dark ? ramp['900'] : ramp['100'],
     [`${p}-subtle-active`]: dark ? ramp['800'] : ramp['200'],
     [`--nx-color-border-${name}`]: dark ? ramp['700'] : ramp['200'],
@@ -334,34 +224,13 @@ export function deriveFamily(
 
 const STATUS_FAMILIES = ['success', 'warning', 'error', 'information'] as const;
 
-function deriveStatus(mode: Mode, surfaces: TokenMap): TokenMap {
-  const out: TokenMap = {};
-  for (const family of STATUS_FAMILIES) {
-    const tokens = deriveFamily(family, STATUS_RAMP[family], mode);
-
-    if (family === 'error') {
-      const subtle = tokens['--nx-color-error-subtle'];
-      const background = surfaces['--nx-color-background'];
-      const container = surfaces['--nx-color-container'];
-      if (!subtle || !background || !container) {
-        throw new Error(
-          'Expected error subtle, background, and container colors.'
-        );
-      }
-
-      tokens['--nx-color-error-subtle-foreground'] = legibleShadeAcross(
-        STATUS_RAMP.error,
-        [subtle, background, container],
-        TIER_THRESHOLDS.ui,
-        mode === 'dark'
-          ? ['300', '200', '100', '50']
-          : ['600', '700', '800', '900']
-      );
-    }
-
-    Object.assign(out, tokens);
-  }
-  return out;
+function deriveStatus(mode: Mode): TokenMap {
+  return Object.assign(
+    {},
+    ...STATUS_FAMILIES.map((family) =>
+      deriveFamily(family, STATUS_RAMP[family], mode)
+    )
+  );
 }
 
 function deriveChart(mode: Mode): TokenMap {
@@ -374,10 +243,6 @@ function deriveChart(mode: Mode): TokenMap {
   );
 }
 
-function formatAlpha(alpha: number): string {
-  return alpha.toFixed(4).replace(/0+$/, '').replace(/\.$/, '');
-}
-
 function deriveAlpha(
   surfaceTone: NexusSurfaceTone,
   mode: Mode,
@@ -386,63 +251,18 @@ function deriveAlpha(
   const tone = SURFACE_TONE[surfaceTone];
   const dark = mode === 'dark';
   const toneInk = (alpha: number) =>
-    `oklch(0.13 ${tone.darkC.toFixed(4)} ${tone.h.toFixed(1)} / ${formatAlpha(alpha)})`;
+    formatOklch({ mode: 'oklch', l: 0.13, c: tone.darkC, h: tone.h, alpha });
   const contrastInk = (alpha: number) =>
-    dark
-      ? `oklch(1 0 0 / ${formatAlpha(alpha)})`
-      : `oklch(0.1448 0 0 / ${formatAlpha(alpha)})`;
+    formatOklch({ mode: 'oklch', l: dark ? 1 : 0.1448, c: 0, h: 0, alpha });
 
   return {
     '--nx-color-overlay': toneInk(dark ? 0.8471 : 0.7529),
     '--nx-color-popover-backdrop': toneInk(0.9098),
     '--nx-color-border-default-alpha': toneInk(profile.borderAlpha),
     '--nx-color-background-hover-alpha': toneInk(profile.hoverAlpha),
-    '--nx-color-popover-alpha': dark
-      ? toneInk(0.7529)
-      : 'oklch(1 0 0 / 0.7529)',
     '--nx-color-border-hairline': contrastInk(0.0941),
     '--nx-color-border-default': contrastInk(profile.borderAlpha),
     '--nx-color-border-disabled': contrastInk(profile.borderAlpha),
-  };
-}
-
-function deriveFocus(
-  mode: Mode,
-  surfaces: TokenMap,
-  primary: TokenMap
-): TokenMap {
-  const errorSeed = STATUS_RAMP.error[mode === 'dark' ? '300' : '600'];
-  const background =
-    surfaces['--nx-color-background'] ??
-    (mode === 'dark' ? 'oklch(0 0 0)' : 'oklch(1 0 0)');
-  const focusBackgrounds = [
-    background,
-    surfaces['--nx-color-container'],
-    surfaces['--nx-color-popover'],
-    surfaces['--nx-color-nav-background'],
-    surfaces['--nx-color-nav-item-hover'],
-    surfaces['--nx-color-nav-item-active'],
-    surfaces['--nx-color-nav-border'],
-  ].filter((value): value is string => typeof value === 'string');
-  const primaryFocus = primary['--nx-color-primary-subtle-foreground'];
-
-  if (primaryFocus === undefined) {
-    throw new Error(
-      'deriveFocus: missing --nx-color-primary-subtle-foreground'
-    );
-  }
-
-  return {
-    '--nx-color-focus-default': apcaSafeAgainstAll(
-      primaryFocus,
-      focusBackgrounds,
-      mode
-    ),
-    '--nx-color-focus-error': apcaSafeAgainstAll(
-      errorSeed,
-      focusBackgrounds,
-      mode
-    ),
   };
 }
 
@@ -493,54 +313,6 @@ const towardMid = (l: number, step: number): number =>
 const seedFill = (l: number, c: number, h: number): string =>
   formatOklch(clampChroma({ mode: 'oklch', l, c, h }, 'oklch', FILL_GAMUT));
 
-const bestOnColorLc = (fill: string): number =>
-  Math.max(apcaLc('oklch(1 0 0)', fill), apcaLc('oklch(0 0 0)', fill));
-
-// Honoring the seed's lightness can land the fill in a mid band where neither a
-// black nor white label clears the ui tier. Nudge the fill toward whichever
-// extreme its better on-color already prefers until a pure label passes — a
-// no-op for dark or saturated seeds, active only in that band.
-function legibleFillLightness(l: number, c: number, h: number): number {
-  const fill = seedFill(l, c, h);
-  if (bestOnColorLc(fill) >= TIER_THRESHOLDS.ui) return l;
-  const dir =
-    apcaLc('oklch(1 0 0)', fill) >= apcaLc('oklch(0 0 0)', fill) ? -1 : 1;
-  for (let step = 1; step <= 100; step += 1) {
-    const candidate = clamp01(l + dir * step * 0.01);
-    if (bestOnColorLc(seedFill(candidate, c, h)) >= TIER_THRESHOLDS.ui) {
-      return candidate;
-    }
-  }
-  return l;
-}
-
-// The base, hover, and active fills share one `-foreground` label, so nudging
-// hover/active toward mid can erode that fixed label below the ui tier even
-// though the base fill cleared it. Nudge toward mid for the state cue, but stop
-// at the furthest point where the shared label still clears — legibility of the
-// label outranks the size of the state cue in the rare mid-band. The base fill
-// clears by construction, so it is always a legible fallback.
-function stateFillLightness(
-  baseL: number,
-  target: number,
-  label: string,
-  c: number,
-  h: number
-): number {
-  if (apcaLc(label, seedFill(target, c, h)) >= TIER_THRESHOLDS.ui) {
-    return target;
-  }
-  const dir = target >= baseL ? 1 : -1;
-  const span = Math.round(Math.abs(target - baseL) * 100);
-  for (let s = span; s >= 1; s -= 1) {
-    const candidate = clamp01(baseL + dir * s * 0.01);
-    if (apcaLc(label, seedFill(candidate, c, h)) >= TIER_THRESHOLDS.ui) {
-      return candidate;
-    }
-  }
-  return baseL;
-}
-
 function hoverFillTarget(baseL: number): number {
   if (baseL <= PRIMARY_DARK_ENDPOINT_LIFT_FLOOR) {
     return PRIMARY_DARK_ENDPOINT_HOVER_L;
@@ -564,44 +336,29 @@ function activeFillTarget(baseL: number): number {
 }
 
 /**
- * The 11-token primary family from one accent seed. Supporting shades (subtle,
- * borders, disabled) come from the seed ramp via {@link deriveFamily}; the solid
- * fill and its on-color follow the seed's own lightness.
+ * Primary family seeds from one accent. Supporting shades (subtle, borders,
+ * disabled) come from the seed ramp via {@link deriveFamily}; the solid fills
+ * follow the seed's own lightness, and the contrast solver moves any fill its
+ * label can't read on.
  */
 export function derivePrimary(accentHex: string, mode: Mode): TokenMap {
   const seed = seedOklch(accentHex);
   const h = seed.h ?? 0;
   const c = seed.c ?? 0;
-  const fillL = legibleFillLightness(
-    primaryFillLightness(seed.l ?? 0, mode),
-    c,
-    h
-  );
-  const background = seedFill(fillL, c, h);
-  const label = readableOn(background);
-  const endpointBrand =
-    c <= 0.005 && (seed.l ?? 0) <= PRIMARY_DARK_ENDPOINT_LIFT_FLOOR;
+  const fillL = primaryFillLightness(seed.l ?? 0, mode);
   return {
     ...deriveFamily('primary', rampFromSeed(accentHex), mode),
-    ...(endpointBrand
-      ? {
-          '--nx-color-primary-subtle-foreground':
-            mode === 'dark' ? WHITE_BASE : BLACK_BASE,
-        }
-      : {}),
-    '--nx-color-primary-background': background,
+    '--nx-color-primary-background': seedFill(fillL, c, h),
     '--nx-color-primary-background-hover': seedFill(
-      stateFillLightness(fillL, hoverFillTarget(fillL), label, c, h),
+      hoverFillTarget(fillL),
       c,
       h
     ),
     '--nx-color-primary-background-active': seedFill(
-      stateFillLightness(fillL, activeFillTarget(fillL), label, c, h),
+      activeFillTarget(fillL),
       c,
       h
     ),
-    '--nx-color-primary-foreground':
-      endpointBrand && mode === 'dark' ? BLACK_BASE : label,
   };
 }
 
@@ -621,36 +378,60 @@ export function deriveSecondary(mode: Mode): TokenMap {
   };
 }
 
-function deriveMode(
-  seeds: ThemeSeeds,
-  surfaceTone: NexusSurfaceTone,
-  mode: Mode,
-  contrast: number
+const gamutColor = (value: string): string =>
+  formatOklch(clampChroma(seedOklch(value), 'oklch', 'p3'));
+
+// Text in each mode is capped at the opposite mode's surface chroma: light ink
+// in dark mode sits closest to the light surfaces' tint, and vice versa.
+const textChromaCap = (surfaceTone: NexusSurfaceTone, mode: Mode): number =>
+  mode === 'dark'
+    ? SURFACE_TONE[surfaceTone].lightC
+    : SURFACE_TONE[surfaceTone].darkC;
+
+/** Derive one mode's `--nx-color-*` map, so callers can cache each mode independently. */
+export function deriveThemeMode(
+  input: ThemeDerivationInput,
+  mode: Mode
 ): TokenMap {
+  const surfaceTone = input.surfaceTone ?? 'neutral';
+  const seeds = input[mode];
+  const contrast = normalizeContrast(input.contrast[mode]);
   const profile = contrastProfile(mode, contrast);
   const surfaces = deriveSurfaces(
     seeds.background,
     surfaceTone,
     mode,
-    profile.surfaceDelta
+    profile.surfaceDelta,
+    contrast
   );
-  const text = deriveText(seeds.foreground, surfaces, mode);
-  const primary = derivePrimary(seeds.accent, mode);
-  const secondary = deriveSecondary(mode);
-  const status = deriveStatus(mode, surfaces);
-  const chart = deriveChart(mode);
-  const alpha = deriveAlpha(surfaceTone, mode, profile);
-  const focus = deriveFocus(mode, surfaces, primary);
-  return {
-    ...surfaces,
-    ...text,
-    ...primary,
-    ...secondary,
-    ...status,
-    ...chart,
-    ...alpha,
-    ...focus,
+  let foreground = seeds.foreground;
+  if (surfaceTone !== 'neutral') {
+    const ink = seedOklch(foreground);
+    foreground = formatOklch({
+      ...ink,
+      c: Math.min(ink.c, textChromaCap(surfaceTone, mode)),
+    });
+  }
+  const candidates = {
+    ...deriveText(foreground, surfaces, mode),
+    ...derivePrimary(seeds.accent, mode),
+    ...deriveSecondary(mode),
+    ...deriveStatus(mode),
+    ...deriveChart(mode),
+    ...deriveAlpha(surfaceTone, mode, profile),
+    '--nx-color-focus-error':
+      STATUS_RAMP.error[mode === 'dark' ? '300' : '600'],
   };
+  const map = { ...surfaces };
+  for (const [name, value] of Object.entries(candidates))
+    map[name] = gamutColor(value);
+  const popover = surfaces['--nx-color-popover'];
+  if (!popover) throw new Error('deriveThemeMode: missing popover surface');
+  map['--nx-color-popover-alpha'] = formatOklch({
+    ...seedOklch(popover),
+    alpha: 0.94 + (0.06 * contrast) / 100,
+  });
+  return constrainColors(map, mode, contrast);
 }
 
 /**
@@ -660,10 +441,9 @@ function deriveMode(
  * secondary, status, chart, alpha/translucent, focus).
  */
 export function deriveTheme(input: ThemeDerivationInput): DerivedTheme {
-  const surfaceTone = input.surfaceTone ?? 'neutral';
   return {
-    light: deriveMode(input.light, surfaceTone, 'light', input.contrast.light),
-    dark: deriveMode(input.dark, surfaceTone, 'dark', input.contrast.dark),
+    light: deriveThemeMode(input, 'light'),
+    dark: deriveThemeMode(input, 'dark'),
   };
 }
 

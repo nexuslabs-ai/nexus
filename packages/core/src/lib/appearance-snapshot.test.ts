@@ -42,8 +42,8 @@ function mockSystemPrefersDark(matches: boolean): void {
 }
 
 describe('NexusAppearanceSnapshot', () => {
-  it('uses snapshot version 5 for token value adjudication', () => {
-    expect(SNAPSHOT_VERSION).toBe(5);
+  it('uses snapshot version 6 for contrast-solved themes', () => {
+    expect(SNAPSHOT_VERSION).toBe(6);
   });
 
   it('stores pre-derived CSS verbatim', () => {
@@ -68,6 +68,7 @@ describe('NexusAppearanceSnapshot', () => {
       ...DEFAULT_NEXUS_APPEARANCE,
       mode: 'dark' as const,
       brandColor: '#ff0000',
+      darkContrast: 100,
     };
     const snapshot = sanitizeNexusAppearanceSnapshot({
       version: 999,
@@ -82,27 +83,44 @@ describe('NexusAppearanceSnapshot', () => {
     expect(snapshot.prefsCss).toBe(prefsCss(dark));
   });
 
-  it('refreshes a v1 snapshot without resetting the stored state', () => {
+  it('falls back to the default contrast for non-numeric stored values', () => {
     const state = {
       ...DEFAULT_NEXUS_APPEARANCE,
-      mode: 'dark' as const,
       surfaceTone: 'slate' as const,
-      brandColor: '#2563eb',
     };
     const snapshot = sanitizeNexusAppearanceSnapshot({
-      version: 1,
-      state,
-      themeCss: ':root { --nx-color-background: stale; }',
-      prefsCss: ':root { --stale-prefs: stale; }',
+      version: SNAPSHOT_VERSION,
+      state: { ...state, lightContrast: 'high', darkContrast: null },
+      themeCss: 'STALE',
+      prefsCss: 'STALE',
     });
-
-    expect(snapshot.version).toBe(SNAPSHOT_VERSION);
     expect(snapshot.state).toEqual(state);
-    expect(snapshot.themeCss).toBe(themeCss(state));
-    expect(snapshot.themeCss).toContain('--nx-color-focus-default:');
-    expect(snapshot.themeCss).toContain('--nx-color-focus-error:');
-    expect(snapshot.prefsCss).toBe(prefsCss(state));
   });
+
+  it.each([1, 5])(
+    'refreshes a v%s snapshot without resetting the stored state',
+    (version) => {
+      const state = {
+        ...DEFAULT_NEXUS_APPEARANCE,
+        mode: 'dark' as const,
+        surfaceTone: 'slate' as const,
+        brandColor: '#2563eb',
+      };
+      const snapshot = sanitizeNexusAppearanceSnapshot({
+        version,
+        state,
+        themeCss: ':root { --nx-color-background: stale; }',
+        prefsCss: ':root { --stale-prefs: stale; }',
+      });
+
+      expect(snapshot.version).toBe(SNAPSHOT_VERSION);
+      expect(snapshot.state).toEqual(state);
+      expect(snapshot.themeCss).toBe(themeCss(state));
+      expect(snapshot.themeCss).toContain('--nx-color-focus-default:');
+      expect(snapshot.themeCss).toContain('--nx-color-focus-error:');
+      expect(snapshot.prefsCss).toBe(prefsCss(state));
+    }
+  );
 
   it('embeds runtime focus tokens in the default first-paint snapshot', () => {
     const script = createNexusAppearanceBootstrapScript();
@@ -151,12 +169,16 @@ describe('NexusAppearanceSnapshot', () => {
       ...DEFAULT_NEXUS_APPEARANCE,
       mode: 'dark' as const,
       surfaceTone: 'gray' as const,
-      lightContrast: 85,
+      lightContrast: 35,
       darkContrast: 85,
     };
-    const raw = serializeNexusAppearanceStateCookie(state);
+    const raw = serializeNexusAppearanceStateCookie({
+      ...state,
+      ...{ unknownField: 'dropped' },
+    });
 
     expect(parseNexusAppearanceStateCookie(raw)).toEqual(state);
+    expect(decodeURIComponent(raw)).not.toContain('unknownField');
 
     const snapshot = createNexusAppearanceSnapshotFromCookie(raw);
     expect(snapshot.state).toEqual(state);
