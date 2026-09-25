@@ -1,3 +1,5 @@
+import type { ReactNode } from 'react';
+
 import type { Meta, StoryObj } from '@storybook/react';
 import { expect, fn, userEvent, within } from 'storybook/test';
 
@@ -33,7 +35,7 @@ const meta: Meta<typeof PageHeader> = {
     docs: {
       description: {
         component:
-          'Shared page and section anatomy. Compact, standard, and detail are compositions, not component variants. Everyday examples use heading-medium; LargeHeading demonstrates the larger treatment. Compose content and actions as needed. Title defaults to h1; choose the heading level for the document hierarchy, and use className to adjust visual size independently. Action behavior belongs to the application. Actions wrap below content in narrow containers. Place page headers inside main and section headers inside their section.',
+          'Shared page and section anatomy. Compact, standard, and detail are compositions, not component variants. Title defaults to an h1 at heading-medium, the everyday size; LargeHeading opts into heading-large with className. Use asChild to choose the heading level for the document hierarchy. Compose content and actions as needed. Action behavior belongs to the application. Actions wrap below content in narrow containers. Place page headers inside main and section headers inside their section.',
       },
     },
   },
@@ -41,13 +43,15 @@ const meta: Meta<typeof PageHeader> = {
 export default meta;
 type Story = StoryObj<typeof PageHeader>;
 
-function ReportHeader() {
+function ReportHeader({
+  title = <PageHeaderTitle>Activity report</PageHeaderTitle>,
+}: {
+  title?: ReactNode;
+}) {
   return (
     <PageHeader>
       <PageHeaderContent>
-        <PageHeaderTitle className="nx:typography-heading-medium">
-          Activity report
-        </PageHeaderTitle>
+        {title}
         <PageHeaderDescription>
           Review activity for the selected period.
         </PageHeaderDescription>
@@ -70,13 +74,49 @@ export const Default: Story = {
     ).toBeVisible();
   },
 };
+export const WithDataAttributes: Story = {
+  render: () => (
+    <PageHeader data-testid="header">
+      <PageHeaderContent data-testid="content">
+        <PageHeaderTitle data-testid="title">Activity report</PageHeaderTitle>
+        <PageHeaderDescription data-testid="description">
+          Review activity for the selected period.
+        </PageHeaderDescription>
+      </PageHeaderContent>
+      <PageHeaderActions data-testid="actions">
+        <Button>Share</Button>
+      </PageHeaderActions>
+    </PageHeader>
+  ),
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+    await expect(canvas.getByTestId('header')).toHaveAttribute(
+      'data-slot',
+      'page-header'
+    );
+    await expect(canvas.getByTestId('content')).toHaveAttribute(
+      'data-slot',
+      'page-header-content'
+    );
+    await expect(canvas.getByTestId('title')).toHaveAttribute(
+      'data-slot',
+      'page-header-title'
+    );
+    await expect(canvas.getByTestId('description')).toHaveAttribute(
+      'data-slot',
+      'page-header-description'
+    );
+    await expect(canvas.getByTestId('actions')).toHaveAttribute(
+      'data-slot',
+      'page-header-actions'
+    );
+  },
+};
 export const TitleOnly: Story = {
   render: () => (
     <PageHeader>
       <PageHeaderContent>
-        <PageHeaderTitle className="nx:typography-heading-medium">
-          Documents
-        </PageHeaderTitle>
+        <PageHeaderTitle>Documents</PageHeaderTitle>
       </PageHeaderContent>
     </PageHeader>
   ),
@@ -86,12 +126,8 @@ export const SectionHeader: Story = {
     <section aria-labelledby="settings-title">
       <PageHeader>
         <PageHeaderContent>
-          <PageHeaderTitle
-            as="h2"
-            id="settings-title"
-            className="nx:typography-heading-medium"
-          >
-            Notification settings
+          <PageHeaderTitle asChild>
+            <h2 id="settings-title">Notification settings</h2>
           </PageHeaderTitle>
           <PageHeaderDescription>
             Choose which updates you receive.
@@ -109,7 +145,7 @@ export const SectionHeader: Story = {
         level: 2,
         name: 'Notification settings',
       })
-    ).toBeVisible();
+    ).toHaveAttribute('data-slot', 'page-header-title');
   },
 };
 export const ContainerLayouts: Story = {
@@ -125,21 +161,29 @@ export const ContainerLayouts: Story = {
   ),
   play: async ({ canvasElement }) => {
     const canvas = within(canvasElement);
-    for (const name of ['narrow', 'wide']) {
-      const container = canvas.getByTestId(name);
-      const content = container
-        .querySelector('[data-slot="page-header-content"]')!
-        .getBoundingClientRect();
-      const actions = container
-        .querySelector('[data-slot="page-header-actions"]')!
-        .getBoundingClientRect();
-      if (name === 'narrow')
-        await expect(actions.top).toBeGreaterThanOrEqual(content.bottom);
-      else await expect(actions.left).toBeGreaterThanOrEqual(content.right);
-      await expect(container.scrollWidth).toBeLessThanOrEqual(
-        container.clientWidth + 1
-      );
-    }
+    const description = 'Review activity for the selected period.';
+
+    const narrow = canvas.getByTestId('narrow');
+    const narrowContent = within(narrow)
+      .getByText(description)
+      .getBoundingClientRect();
+    const narrowAction = within(narrow)
+      .getByRole('button', { name: 'Export' })
+      .getBoundingClientRect();
+    await expect(narrowAction.top).toBeGreaterThanOrEqual(narrowContent.bottom);
+    await expect(narrow.scrollWidth).toBeLessThanOrEqual(
+      narrow.clientWidth + 1
+    );
+
+    const wide = canvas.getByTestId('wide');
+    const wideContent = within(wide)
+      .getByText(description)
+      .getBoundingClientRect();
+    const wideAction = within(wide)
+      .getByRole('button', { name: 'Export' })
+      .getBoundingClientRect();
+    await expect(wideAction.left).toBeGreaterThanOrEqual(wideContent.right);
+    await expect(wide.scrollWidth).toBeLessThanOrEqual(wide.clientWidth + 1);
   },
 };
 export const LongContent: Story = {
@@ -147,7 +191,7 @@ export const LongContent: Story = {
     <section style={{ width: 280 }}>
       <PageHeader>
         <PageHeaderContent>
-          <PageHeaderTitle className="nx:typography-heading-medium">
+          <PageHeaderTitle>
             RegionalDisasterRecoveryConfigurationReview
           </PageHeaderTitle>
           <PageHeaderDescription>
@@ -178,9 +222,7 @@ export const KeyboardAction: Story = {
   render: () => (
     <PageHeader>
       <PageHeaderContent>
-        <PageHeaderTitle className="nx:typography-heading-medium">
-          Document
-        </PageHeaderTitle>
+        <PageHeaderTitle>Document</PageHeaderTitle>
       </PageHeaderContent>
       <PageHeaderActions>
         <Button onClick={onSave}>Save</Button>
@@ -197,14 +239,18 @@ export const KeyboardAction: Story = {
   },
 };
 
-function CompactHeader() {
+function CompactHeader({
+  title = (
+    <PageHeaderTitle className="nx:typography-heading-small">
+      Reports
+    </PageHeaderTitle>
+  ),
+}: {
+  title?: ReactNode;
+}) {
   return (
     <PageHeader>
-      <PageHeaderContent>
-        <PageHeaderTitle className="nx:typography-heading-small">
-          Reports
-        </PageHeaderTitle>
-      </PageHeaderContent>
+      <PageHeaderContent>{title}</PageHeaderContent>
       <PageHeaderActions>
         <Button size="sm">New report</Button>
       </PageHeaderActions>
@@ -212,7 +258,11 @@ function CompactHeader() {
   );
 }
 
-function DetailHeader() {
+function DetailHeader({
+  title = <PageHeaderTitle>Purchase order</PageHeaderTitle>,
+}: {
+  title?: ReactNode;
+}) {
   return (
     <div className="nx:grid nx:gap-6">
       <PageHeader>
@@ -221,9 +271,7 @@ function DetailHeader() {
             PO-0001 · Project 254
           </p>
           <div className="nx:flex nx:flex-wrap nx:items-center nx:gap-2">
-            <PageHeaderTitle className="nx:typography-heading-medium">
-              Purchase order
-            </PageHeaderTitle>
+            {title}
             <Badge variant="secondary">Sent</Badge>
           </div>
           <PageHeaderDescription>
@@ -253,14 +301,16 @@ function DetailHeader() {
   );
 }
 
-function TabbedHeader() {
+function TabbedHeader({
+  title = <PageHeaderTitle>Usage</PageHeaderTitle>,
+}: {
+  title?: ReactNode;
+}) {
   return (
     <div className="nx:grid nx:gap-4">
       <PageHeader>
         <PageHeaderContent>
-          <PageHeaderTitle className="nx:typography-heading-medium">
-            Usage
-          </PageHeaderTitle>
+          {title}
           <PageHeaderDescription>
             Monitor activity and spending across your workspace.
           </PageHeaderDescription>
@@ -321,17 +371,48 @@ export const AllVariants: Story = {
   render: () => (
     <div className="nx:grid nx:gap-10">
       <section aria-label="Compact header">
-        <CompactHeader />
+        <CompactHeader
+          title={
+            <PageHeaderTitle asChild className="nx:typography-heading-small">
+              <h2>Reports</h2>
+            </PageHeaderTitle>
+          }
+        />
       </section>
       <section aria-label="Standard header">
-        <ReportHeader />
+        <ReportHeader
+          title={
+            <PageHeaderTitle asChild>
+              <h2>Activity report</h2>
+            </PageHeaderTitle>
+          }
+        />
       </section>
       <section aria-label="Detail header">
-        <DetailHeader />
+        <DetailHeader
+          title={
+            <PageHeaderTitle asChild>
+              <h2>Purchase order</h2>
+            </PageHeaderTitle>
+          }
+        />
       </section>
       <section aria-label="Header with tabs">
-        <TabbedHeader />
+        <TabbedHeader
+          title={
+            <PageHeaderTitle asChild>
+              <h2>Usage</h2>
+            </PageHeaderTitle>
+          }
+        />
       </section>
     </div>
   ),
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+    await expect(canvas.queryAllByRole('heading', { level: 1 })).toHaveLength(
+      0
+    );
+    await expect(canvas.getAllByRole('heading', { level: 2 })).toHaveLength(4);
+  },
 };
