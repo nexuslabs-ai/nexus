@@ -68,6 +68,7 @@ export * from './components/tabs';
 export * from './components/textarea';
 export * from './components/toggle';
 export * from './components/toggle-group';
+export * from './components/toolbar';
 export * from './components/tooltip';
 
 // Appearance (editor UI — provider is published separately via ./appearance subentry)
@@ -76,4 +77,3 @@ export * from './components/appearance/color-field';
 export * from './components/appearance/config-preview';
 export * from './components/appearance/setting-row';
 export * from './components/appearance/theme-quick-control';
-export * from './components/toolbar';
