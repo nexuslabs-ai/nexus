@@ -250,7 +250,7 @@ function InlineEdit({
   blurBehavior = 'keep-open',
   readOnly,
   required = false,
-  requiredMessage = `${label} is required.`,
+  requiredMessage,
   emptyText = 'Not provided',
   placeholder,
   className,
@@ -289,7 +289,7 @@ function InlineEdit({
           error={error}
           blurBehavior={blurBehavior}
           required={required}
-          requiredMessage={requiredMessage}
+          requiredMessage={requiredMessage ?? `${label} is required.`}
           placeholder={placeholder}
           onCommit={onCommit}
           onClose={close}
