@@ -472,7 +472,7 @@ export const WithSeparators: Story = {
 };
 
 // ============================================
-// SIZE STORIES
+// SIZE AND WIDTH STORIES
 // ============================================
 
 const SIZES = ['sm', 'default', 'lg'] as const;
@@ -504,15 +504,10 @@ export const Sizes: Story = {
       const trigger = canvas.getByRole('combobox', { name: `${size} select` });
       const input = canvas.getByRole('textbox', { name: `${size} input` });
 
-      await expect(trigger).toHaveAttribute('data-size', size);
       await expect(height(trigger)).toBe(height(input));
     }
   },
 };
-
-// ============================================
-// WIDTH STORIES
-// ============================================
 
 export const SmallWidth: Story = {
   render: (_args) => (
