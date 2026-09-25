@@ -3,6 +3,7 @@
   "extends": ["//"],
   "tasks": {
     "generate:demos": {
+      "dependsOn": ["generate:dependencies"],
       "outputs": ["__generated__/**"],
       "cache": false
     },

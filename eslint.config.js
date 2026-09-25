@@ -232,8 +232,6 @@ export default tseslint.config(
     ...nexusComponentConfig(),
   },
 
-  // Docs demos are the Code a reader pastes, so they import the copied files
-  // under `@/`, never the package.
   {
     files: ['apps/docs/examples/**/*.tsx'],
     rules: {
@@ -245,6 +243,25 @@ export default tseslint.config(
               group: ['@nexus_ds/react', '@nexus_ds/react/*'],
               message:
                 'Import the copied file under `@/` (e.g. `@/components/button/button`) — the install block lists it, @nexus_ds/react is not in a pasting app.',
+            },
+          ],
+        },
+      ],
+    },
+  },
+
+  {
+    files: ['apps/docs/**/*.{ts,tsx,js,mjs}'],
+    ignores: ['apps/docs/examples/**'],
+    rules: {
+      'no-restricted-imports': [
+        'error',
+        {
+          patterns: [
+            {
+              group: ['@/*'],
+              message:
+                '`@/` resolves to packages/react/src for the paste-ready demos only — import @nexus_ds/react here.',
             },
           ],
         },

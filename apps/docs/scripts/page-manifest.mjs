@@ -12,7 +12,8 @@
  *
  * A page's route is its path on disk, so adding a page means adding a file.
  * Pages the registry does not list are appended to their section in slug
- * order. Routes are exactly two levels deep and a slug is one path segment;
+ * order. In `components/`, component pages follow the group pages in label
+ * order, wherever the registry lists them. Routes are exactly two levels deep and a slug is one path segment;
  * a file anywhere else fails the generator. Entries prefixed with `_` are
  * skipped, so a page-local island can sit beside the page that uses it.
  *
@@ -180,6 +181,14 @@ function assertComponentPageIsOneLineMdx(docsRoot, kind, file, slug) {
       `${file} must contain exactly ${expected} — a component page names its component and nothing else; ComponentPage renders the rest.`
     );
   }
+}
+
+function byGroupThenComponentLabel(entries) {
+  const groups = entries.filter(({ page }) => page.components);
+  const components = entries
+    .filter(({ page }) => !page.components)
+    .sort((a, b) => a.page.label.localeCompare(b.page.label, 'en'));
+  return [...groups, ...components];
 }
 
 function demoNamesIn(docsRoot, slug) {
@@ -436,6 +445,15 @@ export async function buildPageManifest(docsRoot, formatOptions) {
     };
   }
 
+  function orderedEntries(sectionSlug) {
+    const entries = orderedSlugs(sectionSlug).map((slug) =>
+      buildPage(sectionSlug, slug)
+    );
+    return sectionSlug === COMPONENTS_SECTION
+      ? byGroupThenComponentLabel(entries)
+      : entries;
+  }
+
   /** Sections that exist only on disk, appended after the registry's own. */
   const extraSections = [...new Set(keysOnDisk.map((key) => key.split('/')[0]))]
     .filter((slug) => !Object.hasOwn(PAGE_REGISTRY, slug))
@@ -447,9 +465,7 @@ export async function buildPageManifest(docsRoot, formatOptions) {
       title: sectionFor(sectionSlug)?.title ?? humanize(sectionSlug),
       href: sectionFor(sectionSlug)?.href ?? `/${sectionSlug}`,
       unit: sectionFor(sectionSlug)?.unit,
-      entries: orderedSlugs(sectionSlug).map((slug) =>
-        buildPage(sectionSlug, slug)
-      ),
+      entries: orderedEntries(sectionSlug),
     })
   );
 

@@ -7,21 +7,33 @@
 
 import type { Block } from './blocks';
 
-export type RegistryPage = {
+export type GuidePage = {
   slug: string;
   label: string;
   /** Optional in-page headings rendered inline in the left rail (non-interactive). */
   nested?: string[];
   /** Components a group page covers, rendered inline in the left rail (non-interactive). */
   components?: string[];
-  /**
-   * A component page's demo names under `examples/{slug}/`, shown first and in
-   * this order; unlisted demos follow in name order.
-   */
-  examples?: string[];
   /** Placeholder body, carried only while the page has no source file. */
   wireframe?: { lede: string; blocks: Block[] };
+  examples?: never;
 };
+
+/** A `components/` page written as `<ComponentPage slug="{slug}" />`. */
+export type ComponentPageEntry = {
+  slug: string;
+  label: string;
+  /**
+   * Demo names under `examples/{slug}/`, shown first and in this order;
+   * unlisted demos follow in name order.
+   */
+  examples: string[];
+  nested?: never;
+  components?: never;
+  wireframe?: never;
+};
+
+export type RegistryPage = GuidePage | ComponentPageEntry;
 
 export type RegistrySection = {
   slug: string;
