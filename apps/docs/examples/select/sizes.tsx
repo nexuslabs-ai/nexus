@@ -12,7 +12,7 @@ export default function SelectSizes() {
   return (
     <div className="nx:flex nx:w-full nx:max-w-[180px] nx:flex-col nx:gap-3">
       <Select>
-        <SelectTrigger size="sm" aria-label="Plan (small)">
+        <SelectTrigger size="sm" aria-label="Plan">
           <SelectValue placeholder="Small" />
         </SelectTrigger>
         <SelectContent>
@@ -32,7 +32,7 @@ export default function SelectSizes() {
         </SelectContent>
       </Select>
       <Select>
-        <SelectTrigger size="lg" aria-label="Plan (large)">
+        <SelectTrigger size="lg" aria-label="Plan">
           <SelectValue placeholder="Large" />
         </SelectTrigger>
         <SelectContent>

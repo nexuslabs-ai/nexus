@@ -27,7 +27,7 @@ export default function SelectInvalid() {
       </Select>
       <p
         id="select-invalid-region-error"
-        className="nx:typography-body-small nx:text-error-subtle-foreground"
+        className="nx:typography-body-default nx:text-error-subtle-foreground"
       >
         Choose a region to deploy to.
       </p>

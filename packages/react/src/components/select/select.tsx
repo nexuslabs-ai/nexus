@@ -3,6 +3,7 @@ import * as React from 'react';
 import * as SelectPrimitive from '@radix-ui/react-select';
 import { cva, type VariantProps } from 'class-variance-authority';
 
+import { fieldSizeVariants } from '../../lib/field-size';
 import { IconCheck, IconChevronDown, IconChevronUp } from '../../lib/icons';
 import { selectionIndicatorMotionClassName } from '../../lib/motion';
 import { cn } from '../../lib/utils';
@@ -58,11 +59,7 @@ const selectTriggerVariants = cva(
   ],
   {
     variants: {
-      size: {
-        default: 'nx:h-10 nx:px-3 nx:py-0 nx:typography-body-default',
-        sm: 'nx:h-8 nx:px-2.5 nx:py-0 nx:typography-body-small',
-        lg: 'nx:h-12 nx:px-3.5 nx:py-0 nx:typography-body-default',
-      },
+      size: fieldSizeVariants,
       variant: {
         bordered:
           'nx:border-border-default nx:bg-container nx:enabled:hover:bg-container-hover nx:disabled:border-border-disabled',
@@ -92,8 +89,7 @@ interface SelectTriggerProps
  *
  * Button that opens the select dropdown. The `variant="bordered"` treatment is
  * the default; use `variant="borderless"` to remove the resting field stroke
- * while keeping a tonal control fill for resting affordance. `size` matches
- * Input's `sm` / `default` / `lg` heights so the two align in a form row.
+ * while keeping a tonal control fill for resting affordance.
  *
  * @example
  * ```tsx

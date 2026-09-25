@@ -4,6 +4,7 @@ import { expect, userEvent, waitFor, within } from 'storybook/test';
 import { expectImmediateItemMotion } from '../../stories/support/motion-test-utils';
 import { expectInterruptibleOverlayMotion } from '../../stories/support/overlay-motion-test-utils';
 import { expectHeightPinned } from '../../stories/support/story-height-test-utils';
+import { Input } from '../input';
 import { NativeSelect, NativeSelectOption } from '../native-select';
 
 import {
@@ -474,47 +475,38 @@ export const WithSeparators: Story = {
 // SIZE STORIES
 // ============================================
 
+const SIZES = ['sm', 'default', 'lg'] as const;
+
 export const Sizes: Story = {
   render: (_args) => (
-    <div className="nx:flex nx:w-[200px] nx:flex-col nx:gap-3">
-      <Select>
-        <SelectTrigger size="sm" aria-label="Small select">
-          <SelectValue placeholder="Small" />
-        </SelectTrigger>
-        <SelectContent>
-          <SelectItem value="apple">Apple</SelectItem>
-        </SelectContent>
-      </Select>
-      <Select>
-        <SelectTrigger aria-label="Default select">
-          <SelectValue placeholder="Default" />
-        </SelectTrigger>
-        <SelectContent>
-          <SelectItem value="apple">Apple</SelectItem>
-        </SelectContent>
-      </Select>
-      <Select>
-        <SelectTrigger size="lg" aria-label="Large select">
-          <SelectValue placeholder="Large" />
-        </SelectTrigger>
-        <SelectContent>
-          <SelectItem value="apple">Apple</SelectItem>
-        </SelectContent>
-      </Select>
+    <div className="nx:flex nx:w-[420px] nx:flex-col nx:gap-3">
+      {SIZES.map((size) => (
+        <div key={size} className="nx:flex nx:items-center nx:gap-3">
+          <Select>
+            <SelectTrigger size={size} aria-label={`${size} select`}>
+              <SelectValue placeholder={size} />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="apple">Apple</SelectItem>
+            </SelectContent>
+          </Select>
+          <Input size={size} placeholder={size} aria-label={`${size} input`} />
+        </div>
+      ))}
     </div>
   ),
   play: async ({ canvasElement }) => {
     const canvas = within(canvasElement);
-    const small = canvas.getByRole('combobox', { name: 'Small select' });
-    const medium = canvas.getByRole('combobox', { name: 'Default select' });
-    const large = canvas.getByRole('combobox', { name: 'Large select' });
+    const height = (element: HTMLElement) =>
+      Math.round(element.getBoundingClientRect().height);
 
-    await expect(small).toHaveAttribute('data-size', 'sm');
-    await expect(medium).toHaveAttribute('data-size', 'default');
-    await expect(large).toHaveAttribute('data-size', 'lg');
-    await expect(small.getBoundingClientRect().height).toBe(32);
-    await expect(medium.getBoundingClientRect().height).toBe(40);
-    await expect(large.getBoundingClientRect().height).toBe(48);
+    for (const size of SIZES) {
+      const trigger = canvas.getByRole('combobox', { name: `${size} select` });
+      const input = canvas.getByRole('textbox', { name: `${size} input` });
+
+      await expect(trigger).toHaveAttribute('data-size', size);
+      await expect(height(trigger)).toBe(height(input));
+    }
   },
 };
 
@@ -905,7 +897,7 @@ export const AllVariants: Story = {
           Sizes
         </h3>
         <div className="nx:flex nx:flex-col nx:gap-4">
-          {(['sm', 'default', 'lg'] as const).map((size) => (
+          {SIZES.map((size) => (
             <div key={size} className="nx:flex nx:items-center nx:gap-4">
               <span className="nx:typography-label-small nx:text-muted-foreground nx:w-24">
                 {size}
