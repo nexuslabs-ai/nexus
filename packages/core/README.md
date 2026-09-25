@@ -13,6 +13,7 @@ pnpm add @nexus_ds/core
 - `DEFAULT_NEXUS_APPEARANCE`, `sanitizeNexusAppearance`, `NexusAppearanceState`: the appearance model.
 - `BRAND_COLOR_PRESETS`, `BrandColorPreset`, `findBrandColorPreset`, `DEFAULT_BRAND_COLOR`: brand color choices for appearance editors. Default is `DEFAULT_BRAND_COLOR`; Indigo, Blue, Violet, Rose, Orange, Amber, Green, and Teal use each family's authored 600 hex. Assign a preset's `color` to `brandColor`; `findBrandColorPreset(brandColor)` returns the preset an opaque saved color matches in any CSS notation the engine parses (`#4F46E5`, `4f46e5`, `rgb(79 70 229)`), ignoring surrounding whitespace, or `undefined` for a custom or unparseable color.
 - `createNexusThemeContract`, `deriveTheme`, `themeToCss`: derive a full token set from appearance state and render it to CSS.
+- `measureThemeContrast`, `ThemeContrastCheck`, `Mode`, `Tier`: measure a derived theme against every registered APCA pair. See [Contrast report](#contrast-report).
 - `createNexusAppearanceSnapshotFromState`, `createNexusAppearanceBootstrapScript`, `resolveFirstPaint`, `DEFAULT_STORAGE_KEY`: first-paint, no-flash bootstrap.
 
 ## Advanced / Engine Exports
@@ -20,6 +21,26 @@ pnpm add @nexus_ds/core
 `adjustContrast`, `PALETTE_KEYS`, `TIER_THRESHOLDS`, `isColor`: low-level palette and contrast utilities. Stability is not guaranteed pre-1.0.
 
 See the Nexus docs, Theming -> Appearance, for setup recipes.
+
+## Contrast report
+
+`measureThemeContrast(theme)` measures a derived theme after derivation. It returns one `ThemeContrastCheck` per registered foreground/background pair in each mode:
+
+```ts
+import {
+  createNexusThemeContract,
+  DEFAULT_NEXUS_APPEARANCE,
+  deriveTheme,
+  measureThemeContrast,
+} from '@nexus_ds/core';
+
+const checks = measureThemeContrast(
+  deriveTheme(createNexusThemeContract(DEFAULT_NEXUS_APPEARANCE))
+);
+const failing = checks.filter((check) => !check.pass);
+```
+
+Each check has `mode`, the `fg` and `bg` CSS variable names (such as `--nx-color-foreground`), an optional `backdrop` (a CSS variable name or hex color), `tier`, the measured absolute APCA `lc`, the tier `floor`, and `pass` (`lc >= floor`). Translucent colors are composited over their backdrop before measurement.
 
 ## Authored palette lookup
 
