@@ -123,15 +123,16 @@ jobs:
           pnpm turbo build
           node scripts/audit-turbo-outputs.js --post-build
 
-      # The build step's props JSON may be a turbo cache restore; regenerating
+      # The build step's docs JSON may be a turbo cache restore; regenerating
       # it outside turbo catches a stale cache entry or nondeterministic output.
-      - name: Check props JSON matches a fresh regeneration
+      - name: Check docs JSON matches a fresh regeneration
         run: |
           set -euo pipefail
-          cp -r apps/docs/generated/props "$RUNNER_TEMP/props-build"
+          cp -r apps/docs/generated "$RUNNER_TEMP/docs-generated-build"
           pnpm --filter @nexus_ds/docs generate:props
-          if ! diff -r "$RUNNER_TEMP/props-build" apps/docs/generated/props; then
-            echo "::error::The props JSON differs from the build step's copy: either generate:props in apps/docs/turbo.json is missing an input the generator reads, or the generator's output is nondeterministic."
+          pnpm --filter @nexus_ds/docs generate:dependencies
+          if ! diff -r "$RUNNER_TEMP/docs-generated-build" apps/docs/generated; then
+            echo "::error::The docs JSON differs from the build step's copy: either a generate:* task in apps/docs/turbo.json is missing an input its generator reads, or the generator's output is nondeterministic."
             exit 1
           fi
 
@@ -237,6 +238,22 @@ jobs:
             exit 1
           fi
 
+      - name: Regenerate docs demo index
+        run: |
+          pnpm --filter @nexus_ds/docs generate:dependencies
+          pnpm --filter @nexus_ds/docs generate:demos
+
+      - name: Check docs demo index freshness
+        run: |
+          set -euo pipefail
+          DIRTY=$(git status --porcelain -- apps/docs/__generated__)
+          if [ -n "$DIRTY" ]; then
+            echo "::error::Docs demo index is stale. Affected paths:"
+            echo "$DIRTY"
+            echo "::error::Run 'pnpm --filter @nexus_ds/docs generate:demos' and commit the result."
+            exit 1
+          fi
+
       - name: Run unit tests
         run: pnpm test:unit
 
@@ -273,9 +290,6 @@ jobs:
       - name: Check canonical step set freshness
         run: pnpm --filter @nexus_ds/eslint-plugin refresh:canonical-set --check
 
-      - name: Build @nexus_ds/core
-        run: pnpm --filter @nexus_ds/core build
-
       - name: Regenerate token outputs (tailwind)
         id: regen
         run: |
@@ -302,7 +316,7 @@ jobs:
 
       - name: Color-blind audit
         if: ${{ !cancelled() && steps.regen.conclusion == 'success' }}
-        run: pnpm --filter @nexus_ds/core audit:colorblind
+        run: pnpm audit:colorblind
 
       - name: Tailwind class-ref audit
         if: ${{ !cancelled() && steps.regen.conclusion == 'success' }}

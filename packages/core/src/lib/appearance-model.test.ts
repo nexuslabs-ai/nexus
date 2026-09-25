@@ -2,6 +2,8 @@ import { readFileSync } from 'node:fs';
 import { resolve } from 'node:path';
 import { describe, expect, it } from 'vitest';
 
+import typographyTokens from '../../tokens/primitives/typography/typography-default.json';
+
 import {
   appearancePrefsToCss,
   BASE_TONE_OPTIONS,
@@ -25,8 +27,8 @@ describe('appearance model', () => {
       mode: 'light',
       brandColor: DEFAULT_BRAND_COLOR,
       surfaceTone: 'stone',
-      lightContrast: 60,
-      darkContrast: 0,
+      lightContrast: 50,
+      darkContrast: 50,
       density: 'default',
       corners: 'square',
       elevation: 'quiet',
@@ -112,7 +114,7 @@ describe('sanitizeNexusAppearance', () => {
       brandColor: '#2563eb',
       surfaceTone: 'slate' as const,
       lightContrast: 42,
-      darkContrast: 42,
+      darkContrast: 82,
       density: 'tight' as const,
       corners: 'extra-round' as const,
       elevation: 'flat' as const,
@@ -176,7 +178,7 @@ describe('sanitizeNexusAppearance', () => {
         ...DEFAULT_NEXUS_APPEARANCE,
         lightContrast: 999,
       }).lightContrast
-    ).toBe(60);
+    ).toBe(100);
     expect(
       sanitizeNexusAppearance({
         ...DEFAULT_NEXUS_APPEARANCE,
@@ -307,7 +309,7 @@ describe('createNexusThemeContract', () => {
       BASE_TONE_SEEDS.slate.dark.foreground
     );
     expect(contract.surfaceTone).toBe('slate');
-    expect(contract.contrast).toEqual({ light: 60, dark: 0 });
+    expect(contract.contrast).toEqual({ light: 50, dark: 50 });
   });
 
   it.each(['stone', 'neutral', 'zinc', 'slate', 'gray'] as const)(
@@ -330,27 +332,34 @@ describe('createNexusThemeContract', () => {
     const clean = (patch: Record<string, unknown>) =>
       sanitizeNexusAppearance({ ...DEFAULT_NEXUS_APPEARANCE, ...patch });
 
-    it('accepts independent in-range light/dark values', () => {
-      expect(clean({ lightContrast: 40, darkContrast: 80 })).toMatchObject({
-        lightContrast: 40,
-        darkContrast: 80,
+    it('accepts independent light/dark values', () => {
+      expect(clean({ lightContrast: 37, darkContrast: 82 })).toMatchObject({
+        lightContrast: 37,
+        darkContrast: 82,
       });
     });
 
-    it('falls back per-field on out-of-range, NaN, and wrong type', () => {
-      expect(clean({ lightContrast: 999, darkContrast: -5 })).toMatchObject({
-        lightContrast: 60,
-        darkContrast: 0,
-      });
-      expect(
-        clean({ lightContrast: Number.NaN, darkContrast: 42 })
-      ).toMatchObject({
-        lightContrast: 60,
-        darkContrast: 42,
-      });
-      expect(clean({ lightContrast: 'x', darkContrast: 30 })).toMatchObject({
-        lightContrast: 60,
-        darkContrast: 30,
+    it.each([
+      [-5, 0],
+      [999, 100],
+      [42.4, 42],
+    ])('clamps and rounds finite contrast %s to %s', (value, expected) => {
+      expect(clean({ lightContrast: value }).lightContrast).toBe(expected);
+    });
+
+    it.each([
+      Number.NaN,
+      Infinity,
+      -Infinity,
+      '50',
+      'x',
+      'toString',
+      null,
+      undefined,
+    ])('uses 50 for an invalid contrast preference: %s', (value) => {
+      expect(clean({ lightContrast: value, darkContrast: 82 })).toMatchObject({
+        lightContrast: 50,
+        darkContrast: 82,
       });
     });
 
@@ -366,7 +375,10 @@ describe('createNexusThemeContract', () => {
         stroke: 'normal',
         prefs: DEFAULT_NEXUS_APPEARANCE.prefs,
       });
-      expect(result).toMatchObject({ lightContrast: 60, darkContrast: 0 });
+      expect(result).toMatchObject({
+        lightContrast: 50,
+        darkContrast: 50,
+      });
     });
   });
 });
@@ -379,6 +391,18 @@ describe('appearancePrefsToCss', () => {
   function typographyDeclarations(css: string) {
     return (css.match(typographyVarPattern) ?? []).sort();
   }
+
+  it('scales only px typography dimensions', () => {
+    const dimensions = [
+      ...Object.entries(typographyTokens.size),
+      ...Object.entries(typographyTokens['line-height']),
+    ];
+    const nonPx = dimensions
+      .filter(([, token]) => token.$value.unit !== 'px')
+      .map(([name, token]) => `${name}: ${token.$value.unit}`);
+
+    expect(nonPx).toEqual([]);
+  });
 
   it('emits font variables, clamped root size, code size, and smoothing', () => {
     const css = appearancePrefsToCss({

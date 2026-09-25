@@ -259,6 +259,48 @@ export default tseslint.config(
     },
   },
 
+  {
+    files: ['apps/docs/examples/**/*.tsx'],
+    rules: {
+      'no-restricted-imports': [
+        'error',
+        {
+          patterns: [
+            {
+              group: ['@nexus_ds/react', '@nexus_ds/react/*'],
+              message:
+                'Import the copied file under `@/` (e.g. `@/components/button/button`) — the install block lists it, @nexus_ds/react is not in a pasting app.',
+            },
+            {
+              group: ['@/components/appearance', '@/components/appearance/*'],
+              message:
+                'The docs shell provides appearance from @nexus_ds/react, so a demo importing it from `@/` gets a second context and throws.',
+            },
+          ],
+        },
+      ],
+    },
+  },
+
+  {
+    files: ['apps/docs/**/*.{ts,tsx,js,mjs}'],
+    ignores: ['apps/docs/examples/**'],
+    rules: {
+      'no-restricted-imports': [
+        'error',
+        {
+          patterns: [
+            {
+              group: ['@/*'],
+              message:
+                '`@/` resolves to packages/react/src for the paste-ready demos only — import @nexus_ds/react here.',
+            },
+          ],
+        },
+      ],
+    },
+  },
+
   // Tests and stories assert known fixture invariants (queried elements, seeded
   // array indices), so non-null assertions are idiomatic there. Keep the rule
   // on production source only.

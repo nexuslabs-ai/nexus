@@ -2,7 +2,7 @@ import type { Block } from '../../page-registry/blocks';
 import type { ManifestPage } from '../_lib/manifest';
 import { PAGE_WIREFRAMES } from '../_lib/page-content.generated';
 
-import { SectionHeading } from './Heading';
+import { SECTION_HEADING_CLASS, SectionHeading } from './Heading';
 import { Placeholder } from './Placeholder';
 
 export function PageWireframeView({
@@ -33,7 +33,7 @@ export function PageWireframeView({
 function BlockRender({ block }: { block: Block }) {
   if (block.type === 'h2') {
     return (
-      <SectionHeading className="nx:typography-heading-small nx:mt-8 nx:mb-3">
+      <SectionHeading className={SECTION_HEADING_CLASS}>
         {block.text}
       </SectionHeading>
     );

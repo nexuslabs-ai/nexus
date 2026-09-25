@@ -9,12 +9,16 @@
         "tsup.config.ts",
         "tsconfig.json"
       ],
-      "outputs": ["dist/runtime/**"]
+      "outputs": ["dist/runtime/**", "dist/scripts/**"]
     },
     "build:tailwind": {
       "dependsOn": ["build"],
       "inputs": ["scripts/**", "tokens/**"],
       "outputs": ["dist/tailwind/**"]
+    },
+    "audit:colorblind": {
+      "dependsOn": ["build"],
+      "cache": false
     }
   }
 }

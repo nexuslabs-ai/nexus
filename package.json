@@ -20,10 +20,11 @@
     "format:check": "prettier --check \"**/*.{ts,tsx,js,jsx,json,md,mdx,css,yml}\" \".claude/**/*.md\"",
     "clean": "turbo run clean && rm -rf node_modules",
     "typecheck": "turbo run typecheck",
-    "tokens:tailwind": "cd packages/core && pnpm build:tailwind && cp dist/tailwind/* ../../packages/tailwind/",
+    "tokens:tailwind": "turbo run build:tailwind --filter=@nexus_ds/core && cp packages/core/dist/tailwind/* packages/tailwind/",
     "audit:agent-drift": "node scripts/audit-agent-drift.js",
     "audit:turbo-outputs": "node scripts/audit-turbo-outputs.js",
-    "audit:contrast": "vitest run --project=unit packages/core/src/lib/derive-theme.test.ts -t \"legibility invariant\"",
+    "audit:contrast": "vitest run --project=unit packages/core/src/lib/derive-theme.test.ts packages/core/src/lib/contrast.test.ts -t \"legibility invariant\"",
+    "audit:colorblind": "turbo run audit:colorblind --filter=@nexus_ds/core",
     "audit:mode-codenames": "pnpm --filter @nexus_ds/core audit:mode-codenames",
     "audit:mode-distinctness": "pnpm --filter @nexus_ds/core audit:mode-distinctness",
     "validate:spacing-modes": "pnpm --filter @nexus_ds/core validate:spacing-modes",
@@ -119,6 +120,10 @@
     ],
     "*.{json,md,css}": [
       "prettier --write"
+    ],
+    "apps/docs/examples/**/*.tsx": [
+      "node apps/docs/scripts/generate-demo-index.mjs",
+      "git add apps/docs/__generated__"
     ],
     "packages/core/tokens/semantic/spacing-*.json": [
       "pnpm validate:spacing-modes",

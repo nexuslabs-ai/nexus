@@ -82,15 +82,21 @@ styles/nexus/
 └── spacing-utilities.css
 ```
 
-Import the entry point from your app's CSS entry point:
+Import the entry point from your app's CSS entry point, followed by the
+animation utilities some components use for their enter and exit states:
+
+```bash
+npm install tw-animate-css
+```
 
 ```css
 /* app/globals.css */
 @import '../styles/nexus/nexus.css';
+@import 'tw-animate-css';
 ```
 
-That one import is the whole styling surface: the `nx:` utilities, the semantic
-color tokens, and the typography, spacing, radius, and motion scales.
+`nexus.css` is the whole token surface: the `nx:` utilities, the semantic color
+tokens, and the typography, spacing, radius, and motion scales.
 
 This decides how you write Tailwind everywhere in the app, not just inside
 pasted components: once `nexus.css` is your Tailwind entry point, `nx:flex`
@@ -140,7 +146,7 @@ npm install @nexus_ds/core
 The React wiring is copy/own like the components. Copy the provider in:
 
 ```
-components/appearance/
+components/appearance/provider/
 ├── index.ts      # client surface — createNexusAppearance, NexusAppearanceProvider, useNexusAppearance
 ├── provider.tsx
 ├── factory.tsx
@@ -157,8 +163,8 @@ already added, not a second one:
 import { DEFAULT_NEXUS_APPEARANCE } from '@nexus_ds/core';
 import type { Viewport } from 'next';
 
-import { NexusAppearanceProvider } from '@/components/appearance';
-import { NexusAppearanceScript } from '@/components/appearance/server';
+import { NexusAppearanceProvider } from '@/components/appearance/provider';
+import { NexusAppearanceScript } from '@/components/appearance/provider/server';
 
 import './globals.css';
 
@@ -216,52 +222,25 @@ list and losing to source order.
 
 ## Paste a component
 
-Setup is done. A component is never just its own file, so take it by following
-its imports: open the one you want, copy every relative import it names, then do
-the same for those files until nothing new appears. Two things that come up
-immediately — an import of `lib/utils` is the `cn` from step 4 and is already in
-place, and an import of a sibling folder is a barrel, so take that folder's
-implementation file. What is left over — the bare package specifiers — is your
-install line.
+Setup is done. A component is never just its own file: it imports other Nexus
+files, and those import packages. Each component lists both, generated from its
+imports. For Button, install the packages, then copy the files — the ones it
+imports first, its own last:
 
-Run that on `button.tsx` and it closes after two rounds: `spinner.tsx`,
-`button-group-context.ts` from the first, and `lib/icons.ts` (which only
-`spinner.tsx` names) from the second.
+<InstallBlock slug="button" />
 
-```
-components/ui/button.tsx
-components/ui/spinner.tsx             # the loading state
-components/ui/button-group-context.ts # size inherited from a ButtonGroup
-lib/icons.ts                          # the internal @tabler/icons-react barrel
-```
+Every path is relative to `packages/react/src/` in the repo. Keep it as it is
+under your `@/` root, next to the `lib/utils.ts` from step 4, and the relative
+imports between the files — barrels included — resolve without an edit.
+Rerunning an install line or recopying `lib/utils.ts` changes nothing. A
+component with its own stylesheet, such as Progress, also lists the `@import`
+lines to add to `app/globals.css`.
 
-```bash
-npm install @radix-ui/react-slot class-variance-authority @tabler/icons-react
-```
+Render it:
 
-Repoint the relative imports at wherever you put the files, then render it:
+<ComponentSource id="getting-started/button-core-variants" />
 
-```tsx
-import { Button } from '@/components/ui/button';
-
-export default function Page() {
-  return (
-    <div className="nx:flex nx:flex-wrap nx:gap-3">
-      <Button>Primary</Button>
-      <Button variant="secondary">Secondary</Button>
-      <Button variant="outline">Outline</Button>
-      <Button variant="ghost">Ghost</Button>
-    </div>
-  );
-}
-```
-
-<div className="nx:flex nx:flex-wrap nx:gap-3 nx:my-6">
-  <Button>Primary</Button>
-  <Button variant="secondary">Secondary</Button>
-  <Button variant="outline">Outline</Button>
-  <Button variant="ghost">Ghost</Button>
-</div>
+<ComponentPreview id="getting-started/button-core-variants" />
 
 Those are this page's own buttons, always styled — the checks below are for the
 ones in your app. To run the second one you need a way to switch modes, which is
@@ -271,8 +250,8 @@ the provider's `state` and `setState`:
 // components/mode-toggle.tsx
 'use client';
 
-import { useNexusAppearance } from '@/components/appearance';
-import { Button } from '@/components/ui/button';
+import { useNexusAppearance } from '@/components/appearance/provider';
+import { Button } from '@/components/button/button';
 
 export function ModeToggle() {
   const { state, setState, resolvedMode } = useNexusAppearance();
