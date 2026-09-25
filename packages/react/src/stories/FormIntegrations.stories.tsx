@@ -17,6 +17,7 @@ import {
   type ProfileValues,
   saveFailureMessage,
   type SaveProfile,
+  slowSave,
   validateEmail,
   validateName,
 } from './support/profile-settings';
@@ -267,10 +268,6 @@ const meta = {
 } satisfies Meta<typeof ReactHookFormExample>;
 export default meta;
 type Story = StoryObj<typeof meta>;
-
-function slowSave(_values: ProfileValues) {
-  return new Promise<void>((resolve) => setTimeout(resolve, 1000));
-}
 
 export const ReactHookForm: Story = { play: verifyProfileSaveCancel };
 export const TanStackForm: Story = {

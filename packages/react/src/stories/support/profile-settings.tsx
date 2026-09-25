@@ -32,6 +32,10 @@ export const saveFailureMessage =
 const EMAIL_PATTERN =
   /^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?(?:\.[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)*$/;
 
+export function slowSave(_values: ProfileValues) {
+  return new Promise<void>((resolve) => setTimeout(resolve, 1000));
+}
+
 export function validateName(value: string) {
   return value.trim() ? undefined : 'Enter your name.';
 }
