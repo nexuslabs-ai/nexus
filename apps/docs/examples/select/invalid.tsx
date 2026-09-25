@@ -10,15 +10,27 @@ import {
 
 export default function SelectInvalid() {
   return (
-    <Select>
-      <SelectTrigger className="nx:w-[180px]" aria-label="Region" aria-invalid>
-        <SelectValue placeholder="Select a region" />
-      </SelectTrigger>
-      <SelectContent>
-        <SelectItem value="us-east">US East</SelectItem>
-        <SelectItem value="eu-west">EU West</SelectItem>
-        <SelectItem value="ap-south">AP South</SelectItem>
-      </SelectContent>
-    </Select>
+    <div className="nx:grid nx:w-[180px] nx:gap-1.5">
+      <Select>
+        <SelectTrigger
+          aria-label="Region"
+          aria-invalid
+          aria-describedby="select-invalid-region-error"
+        >
+          <SelectValue placeholder="Select a region" />
+        </SelectTrigger>
+        <SelectContent>
+          <SelectItem value="us-east">US East</SelectItem>
+          <SelectItem value="eu-west">EU West</SelectItem>
+          <SelectItem value="ap-south">AP South</SelectItem>
+        </SelectContent>
+      </Select>
+      <p
+        id="select-invalid-region-error"
+        className="nx:typography-body-small nx:text-error-subtle-foreground"
+      >
+        Choose a region to deploy to.
+      </p>
+    </div>
   );
 }

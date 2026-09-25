@@ -22,7 +22,7 @@ export default function SelectPlaceholder() {
         </SelectContent>
       </Select>
       <Select defaultValue="est">
-        <SelectTrigger aria-label="Timezone with value">
+        <SelectTrigger aria-label="Timezone">
           <SelectValue placeholder="Select a timezone" />
         </SelectTrigger>
         <SelectContent>

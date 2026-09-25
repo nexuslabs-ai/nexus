@@ -97,10 +97,7 @@ export const PAGE_WIREFRAMES: Record<string, PageWireframe> = {
         ],
       },
       { type: 'h2', text: '[ Per-component pages ]' },
-      {
-        type: 'placeholder',
-        label: '[ Index — Input · Select · Switch · Tabs ]',
-      },
+      { type: 'placeholder', label: '[ Index — Input · Switch · Tabs ]' },
       {
         type: 'placeholder',
         variant: 'code',

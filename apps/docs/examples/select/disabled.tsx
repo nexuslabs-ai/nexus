@@ -12,7 +12,7 @@ export default function SelectDisabled() {
   return (
     <div className="nx:flex nx:w-full nx:max-w-[180px] nx:flex-col nx:gap-3">
       <Select disabled>
-        <SelectTrigger aria-label="Disabled">
+        <SelectTrigger aria-label="Fruit">
           <SelectValue placeholder="Disabled" />
         </SelectTrigger>
         <SelectContent>
@@ -21,7 +21,7 @@ export default function SelectDisabled() {
         </SelectContent>
       </Select>
       <Select>
-        <SelectTrigger aria-label="With disabled items">
+        <SelectTrigger aria-label="Plan">
           <SelectValue placeholder="Disabled items" />
         </SelectTrigger>
         <SelectContent>

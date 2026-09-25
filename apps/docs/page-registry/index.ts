@@ -183,7 +183,7 @@ export const PAGE_REGISTRY = {
             { type: 'h2', text: '[ Per-component pages ]' },
             {
               type: 'placeholder',
-              label: '[ Index — Input · Select · Switch · Tabs ]',
+              label: '[ Index — Input · Switch · Tabs ]',
             },
             {
               type: 'placeholder',
@@ -268,7 +268,7 @@ export const PAGE_REGISTRY = {
         label: 'Select',
         examples: [
           'variants',
-          'widths',
+          'sizes',
           'placeholder',
           'groups',
           'disabled',

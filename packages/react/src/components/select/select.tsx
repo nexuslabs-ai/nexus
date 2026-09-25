@@ -49,7 +49,6 @@ const selectTriggerVariants = cva(
   [
     'nx:group/select-trigger nx:flex nx:box-border nx:w-full nx:items-center nx:justify-between nx:gap-2',
     'nx:rounded-md nx:border-default nx:transition-field',
-    'nx:h-10 nx:px-3 nx:py-0 nx:typography-body-default',
     'nx:whitespace-nowrap',
     'nx:data-[placeholder]:text-muted-foreground',
     'nx:focus-visible:outline-default nx:focus-visible:outline-focus-default nx:focus-visible:border-focus-default',
@@ -59,6 +58,11 @@ const selectTriggerVariants = cva(
   ],
   {
     variants: {
+      size: {
+        default: 'nx:h-10 nx:px-3 nx:py-0 nx:typography-body-default',
+        sm: 'nx:h-8 nx:px-2.5 nx:py-0 nx:typography-body-small',
+        lg: 'nx:h-12 nx:px-3.5 nx:py-0 nx:typography-body-default',
+      },
       variant: {
         bordered:
           'nx:border-border-default nx:bg-container nx:enabled:hover:bg-container-hover nx:disabled:border-border-disabled',
@@ -67,6 +71,7 @@ const selectTriggerVariants = cva(
       },
     },
     defaultVariants: {
+      size: 'default',
       variant: 'bordered',
     },
   }
@@ -87,7 +92,8 @@ interface SelectTriggerProps
  *
  * Button that opens the select dropdown. The `variant="bordered"` treatment is
  * the default; use `variant="borderless"` to remove the resting field stroke
- * while keeping a tonal control fill for resting affordance.
+ * while keeping a tonal control fill for resting affordance. `size` matches
+ * Input's `sm` / `default` / `lg` heights so the two align in a form row.
  *
  * @example
  * ```tsx
@@ -99,14 +105,16 @@ interface SelectTriggerProps
 function SelectTrigger({
   className,
   children,
+  size,
   variant,
   ...props
 }: SelectTriggerProps) {
   return (
     <SelectPrimitive.Trigger
       data-slot="select-trigger"
+      data-size={size ?? 'default'}
       data-variant={variant ?? 'bordered'}
-      className={cn(selectTriggerVariants({ variant, className }))}
+      className={cn(selectTriggerVariants({ size, variant, className }))}
       {...props}
     >
       {children}

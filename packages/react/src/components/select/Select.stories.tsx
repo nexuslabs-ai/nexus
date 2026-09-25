@@ -471,6 +471,54 @@ export const WithSeparators: Story = {
 };
 
 // ============================================
+// SIZE STORIES
+// ============================================
+
+export const Sizes: Story = {
+  render: (_args) => (
+    <div className="nx:flex nx:w-[200px] nx:flex-col nx:gap-3">
+      <Select>
+        <SelectTrigger size="sm" aria-label="Small select">
+          <SelectValue placeholder="Small" />
+        </SelectTrigger>
+        <SelectContent>
+          <SelectItem value="apple">Apple</SelectItem>
+        </SelectContent>
+      </Select>
+      <Select>
+        <SelectTrigger aria-label="Default select">
+          <SelectValue placeholder="Default" />
+        </SelectTrigger>
+        <SelectContent>
+          <SelectItem value="apple">Apple</SelectItem>
+        </SelectContent>
+      </Select>
+      <Select>
+        <SelectTrigger size="lg" aria-label="Large select">
+          <SelectValue placeholder="Large" />
+        </SelectTrigger>
+        <SelectContent>
+          <SelectItem value="apple">Apple</SelectItem>
+        </SelectContent>
+      </Select>
+    </div>
+  ),
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+    const small = canvas.getByRole('combobox', { name: 'Small select' });
+    const medium = canvas.getByRole('combobox', { name: 'Default select' });
+    const large = canvas.getByRole('combobox', { name: 'Large select' });
+
+    await expect(small).toHaveAttribute('data-size', 'sm');
+    await expect(medium).toHaveAttribute('data-size', 'default');
+    await expect(large).toHaveAttribute('data-size', 'lg');
+    await expect(small.getBoundingClientRect().height).toBe(32);
+    await expect(medium.getBoundingClientRect().height).toBe(40);
+    await expect(large.getBoundingClientRect().height).toBe(48);
+  },
+};
+
+// ============================================
 // WIDTH STORIES
 // ============================================
 
@@ -775,6 +823,7 @@ export const WithDataAttributes: Story = {
     // Check trigger data-slot
     const trigger = canvas.getByRole('combobox');
     await expect(trigger).toHaveAttribute('data-slot', 'select-trigger');
+    await expect(trigger).toHaveAttribute('data-size', 'default');
     await expect(trigger).toHaveAttribute('data-variant', 'bordered');
     await expect(trigger).toHaveClass('nx:bg-container');
     await expect(trigger).toHaveClass('nx:enabled:hover:bg-container-hover');
@@ -848,6 +897,33 @@ export const AllVariants: Story = {
               </SelectContent>
             </Select>
           </div>
+        </div>
+      </div>
+
+      <div>
+        <h3 className="nx:text-foreground nx:mb-4 nx:typography-label-default">
+          Sizes
+        </h3>
+        <div className="nx:flex nx:flex-col nx:gap-4">
+          {(['sm', 'default', 'lg'] as const).map((size) => (
+            <div key={size} className="nx:flex nx:items-center nx:gap-4">
+              <span className="nx:typography-label-small nx:text-muted-foreground nx:w-24">
+                {size}
+              </span>
+              <Select>
+                <SelectTrigger
+                  size={size}
+                  className="nx:w-[180px]"
+                  aria-label={`${size} size select`}
+                >
+                  <SelectValue placeholder="Select option" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="option1">Option 1</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+          ))}
         </div>
       </div>
 

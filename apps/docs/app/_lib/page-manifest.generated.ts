@@ -218,7 +218,7 @@ export const PAGE_MANIFEST: readonly ManifestSection[] = [
         label: 'Select',
         examples: [
           'variants',
-          'widths',
+          'sizes',
           'placeholder',
           'groups',
           'disabled',

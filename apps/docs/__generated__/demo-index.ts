@@ -63,13 +63,13 @@ export const demos = {
     id: "select/placeholder",
     load: () => import("./demos/select/placeholder"),
   },
+  "select/sizes": {
+    id: "select/sizes",
+    load: () => import("./demos/select/sizes"),
+  },
   "select/variants": {
     id: "select/variants",
     load: () => import("./demos/select/variants"),
-  },
-  "select/widths": {
-    id: "select/widths",
-    load: () => import("./demos/select/widths"),
   },
 } satisfies Record<string, Demo>;
 

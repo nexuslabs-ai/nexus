@@ -12,7 +12,7 @@ export default function SelectVariants() {
   return (
     <div className="nx:flex nx:w-full nx:max-w-[180px] nx:flex-col nx:gap-3">
       <Select>
-        <SelectTrigger variant="bordered" aria-label="Bordered">
+        <SelectTrigger variant="bordered" aria-label="Theme">
           <SelectValue placeholder="Bordered" />
         </SelectTrigger>
         <SelectContent>
@@ -22,7 +22,7 @@ export default function SelectVariants() {
         </SelectContent>
       </Select>
       <Select>
-        <SelectTrigger variant="borderless" aria-label="Borderless">
+        <SelectTrigger variant="borderless" aria-label="Theme">
           <SelectValue placeholder="Borderless" />
         </SelectTrigger>
         <SelectContent>
