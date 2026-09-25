@@ -187,7 +187,7 @@ function installSlugsFor(id, specifiers, cache) {
   for (const slug of slugs) {
     if (!readInstallBlock(slug, cache)) {
       throw new Error(
-        `Demo ${id} imports @/components/${slug}/, but there is no ${path.relative(docsRoot, path.join(DEPENDENCIES_DIR, `${slug}.json`))} install block for it.`
+        `Demo ${id} imports @/components/${slug}, but there is no ${path.relative(docsRoot, path.join(DEPENDENCIES_DIR, `${slug}.json`))} install block for it.`
       );
     }
   }
