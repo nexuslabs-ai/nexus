@@ -29,6 +29,7 @@ import { pathToFileURL } from 'node:url';
 import { createJiti } from 'jiti';
 import prettier from 'prettier';
 
+import { PREVIEW_DEMO } from './examples.mjs';
 import { humanize } from './humanize.mjs';
 
 /** Nav metadata source, relative to the docs app root. */
@@ -167,16 +168,8 @@ function assertRailLabelsHaveNoPage(section) {
 /** Section whose pages, other than group pages, are one `<ComponentPage>` line each. */
 const COMPONENTS_SECTION = 'components';
 
-/** The demo `ComponentPage` shows as Preview and Code rather than as an example. */
-const PREVIEW_DEMO = 'demo';
-
-function assertComponentPageNamesOnlyItsComponent(
-  docsRoot,
-  source,
-  file,
-  slug
-) {
-  if (source.kind !== 'mdx') {
+function assertComponentPageIsOneLineMdx(docsRoot, kind, file, slug) {
+  if (kind !== 'mdx') {
     throw new Error(
       `${file} is a component page, so it must be content/${COMPONENTS_SECTION}/${slug}.mdx containing <ComponentPage slug="${slug}" />.`
     );
@@ -193,6 +186,11 @@ function assertComponentPageNamesOnlyItsComponent(
 function assertExamplesExist(docsRoot, key, slug, examples) {
   const seen = new Set();
   for (const name of examples) {
+    if (/[./\\]/.test(name)) {
+      throw new Error(
+        `${key} lists "${name}" in its registry \`examples\`, but an example is named by its file under examples/${slug}/ — one path segment, no dot.`
+      );
+    }
     if (name === PREVIEW_DEMO) {
       throw new Error(
         `${key} lists "${PREVIEW_DEMO}" in its registry \`examples\`, but that demo is the page's Preview and Code — drop it from the list.`
@@ -405,7 +403,7 @@ export async function buildPageManifest(docsRoot, formatOptions) {
     if (source) {
       const file = source.pages.get(key);
       if (isComponentPage) {
-        assertComponentPageNamesOnlyItsComponent(docsRoot, source, file, slug);
+        assertComponentPageIsOneLineMdx(docsRoot, source.kind, file, slug);
       }
       if (entry?.wireframe) {
         throw new Error(

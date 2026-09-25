@@ -1,4 +1,5 @@
 import { type DemoId, demos, isDemoId } from '../../__generated__/demo-index';
+import { PREVIEW_DEMO } from '../../scripts/examples.mjs';
 import { humanize } from '../../scripts/humanize.mjs';
 import { requireSection } from '../_lib/manifest';
 
@@ -14,8 +15,6 @@ import {
 } from './Heading';
 import { InstallBlock } from './InstallBlock';
 import { PropsTable } from './PropsTable';
-
-const PREVIEW_DEMO = 'demo';
 
 type Example = { id: DemoId; name: string };
 
