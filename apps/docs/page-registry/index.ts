@@ -166,7 +166,7 @@ export const PAGE_REGISTRY = {
       {
         slug: 'inputs',
         label: 'Inputs',
-        components: ['Input', 'Select', 'Switch', 'Tabs'],
+        components: ['Select', 'Switch', 'Tabs'],
         wireframe: {
           lede: '[ Interactive controls · per-component Storybook page below ]',
           blocks: [
@@ -183,7 +183,7 @@ export const PAGE_REGISTRY = {
             { type: 'h2', text: '[ Per-component pages ]' },
             {
               type: 'placeholder',
-              label: '[ Index — Input · Select · Switch · Tabs ]',
+              label: '[ Index — Select · Switch · Tabs ]',
             },
             {
               type: 'placeholder',
@@ -262,6 +262,11 @@ export const PAGE_REGISTRY = {
         slug: 'button',
         label: 'Button',
         examples: ['variants', 'sizes', 'with-icon', 'disabled'],
+      },
+      {
+        slug: 'input',
+        label: 'Input',
+        examples: ['variants', 'sizes', 'with-label', 'invalid', 'disabled'],
       },
     ],
   },

@@ -43,6 +43,30 @@ export const demos = {
     id: "getting-started/button-core-variants",
     load: () => import("./demos/getting-started/button-core-variants"),
   },
+  "input/demo": {
+    id: "input/demo",
+    load: () => import("./demos/input/demo"),
+  },
+  "input/disabled": {
+    id: "input/disabled",
+    load: () => import("./demos/input/disabled"),
+  },
+  "input/invalid": {
+    id: "input/invalid",
+    load: () => import("./demos/input/invalid"),
+  },
+  "input/sizes": {
+    id: "input/sizes",
+    load: () => import("./demos/input/sizes"),
+  },
+  "input/variants": {
+    id: "input/variants",
+    load: () => import("./demos/input/variants"),
+  },
+  "input/with-label": {
+    id: "input/with-label",
+    load: () => import("./demos/input/with-label"),
+  },
 } satisfies Record<string, Demo>;
 
 export type DemoId = keyof typeof demos;
