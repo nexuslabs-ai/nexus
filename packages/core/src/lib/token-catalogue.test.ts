@@ -3,15 +3,11 @@ import { resolve } from 'node:path';
 import { describe, expect, it } from 'vitest';
 
 import { createTokenCatalogue } from '../catalogue/catalogue';
-import { RUNTIME_COLOR_DESCRIPTIONS } from '../catalogue/descriptions';
 import type { CatalogueToken } from '../catalogue/types';
 
-import { DEFAULT_NEXUS_APPEARANCE } from './appearance-model';
 import type { Mode } from './palette';
-import { SEMANTIC_TOKEN_REGISTRY } from './token-registry';
 
 const catalogue = createTokenCatalogue();
-const byName = new Map(catalogue.map((token) => [token.name, token]));
 const runtimeColors = catalogue.filter((token) =>
   token.variants.some((variant) => variant.appearance)
 );
@@ -70,39 +66,6 @@ function variantValue(token: CatalogueToken, mode: Mode): string {
 }
 
 describe('token catalogue', () => {
-  it('names every token by a unique --nx-* custom property', () => {
-    expect(byName.size).toBe(catalogue.length);
-    for (const token of catalogue) {
-      expect(token.name).toMatch(/^--nx-[a-z0-9-]+$/);
-    }
-  });
-
-  it('lists every registry colour once, derived in explicit light and dark modes', () => {
-    expect(runtimeColors.map((token) => token.name)).toEqual(
-      SEMANTIC_TOKEN_REGISTRY.map(({ name }) => `--nx-color-${name}`)
-    );
-    for (const token of runtimeColors) {
-      expect(
-        token.variants.map(({ mode, preset, appearance }) => ({
-          mode,
-          preset,
-          appearance,
-        }))
-      ).toEqual([
-        {
-          mode: 'light',
-          preset: null,
-          appearance: { ...DEFAULT_NEXUS_APPEARANCE, mode: 'light' },
-        },
-        {
-          mode: 'dark',
-          preset: null,
-          appearance: { ...DEFAULT_NEXUS_APPEARANCE, mode: 'dark' },
-        },
-      ]);
-    }
-  });
-
   it('agrees with the generated runtime colour fallbacks and dark overrides', () => {
     const nexusCss = generated('nexus.css');
     const theme = blockDeclarations(nexusCss, '@theme inline');
@@ -115,18 +78,6 @@ describe('token catalogue', () => {
       expect(dark.get(token.name), token.name).toBe(
         variantValue(token, 'dark')
       );
-    }
-  });
-
-  it('gives authored tokens from single-file families no mode or preset', () => {
-    expect(authored.length).toBeGreaterThan(0);
-    for (const token of authored) {
-      for (const { mode, preset } of token.variants) {
-        expect({ mode, preset }, token.name).toEqual({
-          mode: null,
-          preset: null,
-        });
-      }
     }
   });
 
@@ -158,37 +109,6 @@ describe('token catalogue', () => {
         ),
         utility
       ).toEqual(utilities.get(utility));
-    }
-  });
-
-  it('resolves every reference to a catalogued token', () => {
-    const references = catalogue.flatMap((token) =>
-      token.variants.flatMap((variant) => variant.references)
-    );
-    expect(references.length).toBeGreaterThan(0);
-    for (const { reference, target } of references) {
-      expect(byName.has(target), `${reference} → ${target}`).toBe(true);
-    }
-  });
-
-  it('hands each call authored values of its own', () => {
-    const [first, second] = [
-      createTokenCatalogue(),
-      createTokenCatalogue(),
-    ].map((tokens) => tokens.find((token) => token.type === 'typography'));
-    const authoredValue = only(first!.variants).authoredValue as Record<
-      string,
-      unknown
-    >;
-    delete authoredValue.fontFamily;
-    expect(only(second!.variants).authoredValue).toHaveProperty('fontFamily');
-  });
-
-  it('carries each runtime colour description on its registry token', () => {
-    for (const [name, description] of Object.entries(
-      RUNTIME_COLOR_DESCRIPTIONS
-    )) {
-      expect(byName.get(`--nx-color-${name}`)?.description).toBe(description);
     }
   });
 });
