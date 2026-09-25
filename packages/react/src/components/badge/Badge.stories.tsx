@@ -7,11 +7,11 @@ import {
   IconInfoCircle,
   IconX,
 } from '@tabler/icons-react';
-import { expect, within } from 'storybook/test';
+import { expect, waitFor, within } from 'storybook/test';
 
 import { Spinner } from '../spinner';
 
-import { Badge } from './badge';
+import { Badge, type BadgeProps } from './badge';
 
 const meta: Meta<typeof Badge> = {
   title: 'Components/Badge',
@@ -55,6 +55,148 @@ const meta: Meta<typeof Badge> = {
 
 export default meta;
 type Story = StoryObj<typeof Badge>;
+
+const GEOMETRY_VARIANTS = [
+  'default',
+  'secondary',
+  'error',
+  'warning',
+  'success',
+  'information',
+] as const;
+const GEOMETRY_FILLS = ['solid', 'light', 'outline'] as const;
+const GEOMETRY_SHAPES = [
+  { name: 'caps', props: { children: 'Label' } },
+  { name: 'sentence', props: { children: 'Label', isCaps: false } },
+  {
+    name: 'both-icons',
+    props: {
+      children: 'Status',
+      isCaps: false,
+      leftIcon: <IconCheck />,
+      rightIcon: <IconX />,
+    },
+  },
+  {
+    name: 'loading',
+    props: {
+      children: 'Loading',
+      isCaps: false,
+      leftIcon: (
+        <Spinner role="presentation" aria-hidden aria-label={undefined} />
+      ),
+    },
+  },
+  {
+    name: 'icon-only',
+    props: { leftIcon: <IconCheck />, 'aria-label': 'Approved' },
+  },
+  {
+    name: 'count',
+    props: { children: 8, isNumber: true, 'aria-label': '8 unread' },
+  },
+  {
+    name: 'high-count',
+    props: {
+      children: '99+',
+      isNumber: true,
+      'aria-label': '99 or more unread',
+    },
+  },
+  { name: 'empty', props: { children: '' } },
+  {
+    name: 'long',
+    props: { children: 'This is a very long badge label', isCaps: false },
+  },
+] satisfies { name: string; props: BadgeProps }[];
+
+const SQUARE_SHAPES = new Set(['icon-only', 'count', 'high-count']);
+
+const BASE_LINE_HEIGHT_SM = 20;
+const BASE_UI_FONT_SIZE = 14;
+const ENLARGED_GLOBALS = {
+  density: 'compact',
+  stroke: 'strong',
+  uiFontSize: 32,
+} as const;
+
+function GeometryRow({ variant, fill }: Pick<BadgeProps, 'variant' | 'fill'>) {
+  return (
+    <div className="nx:flex nx:flex-wrap nx:items-center nx:gap-2">
+      {GEOMETRY_SHAPES.map(({ name, props }) => (
+        <Badge
+          key={name}
+          data-testid="geometry-badge"
+          data-shape={name}
+          variant={variant}
+          fill={fill}
+          {...props}
+        />
+      ))}
+    </div>
+  );
+}
+
+function badgeLabel(badge: HTMLElement) {
+  return (
+    [badge.dataset.variant, badge.dataset.fill, badge.dataset.shape]
+      .filter(Boolean)
+      .join(' / ') || 'badge'
+  );
+}
+
+function assertBadgeGeometry(badge: HTMLElement) {
+  try {
+    assertGeometry(badge);
+  } catch (error) {
+    if (error instanceof Error)
+      error.message = `${badgeLabel(badge)}: ${error.message}`;
+    throw error;
+  }
+}
+
+function assertGeometry(badge: HTMLElement) {
+  const styles = getComputedStyle(badge);
+  const rect = badge.getBoundingClientRect();
+  const spacing = parseFloat(styles.getPropertyValue('--nx-spacing-6'));
+  const lineHeight = parseFloat(
+    styles.getPropertyValue('--nx-typography-line-height-sm')
+  );
+  const stroke = parseFloat(
+    styles.getPropertyValue('--nx-borderwidth-default')
+  );
+  const minimum = Math.max(spacing, lineHeight + 2 * stroke);
+  expect(styles.boxSizing).toBe('border-box');
+  expect(parseFloat(styles.minHeight)).toBeCloseTo(minimum, 1);
+  expect(rect.height).toBeCloseTo(minimum, 1);
+  if (SQUARE_SHAPES.has(badge.dataset.shape ?? '')) {
+    expect(parseFloat(styles.minWidth)).toBeCloseTo(minimum, 1);
+    expect(rect.width).toBeGreaterThanOrEqual(minimum - 0.5);
+  }
+  const innerTop = rect.top + parseFloat(styles.borderTopWidth);
+  const innerBottom = rect.bottom - parseFloat(styles.borderBottomWidth);
+  for (const wrapper of badge.querySelectorAll(':scope > span')) {
+    const wrapperRect = wrapper.getBoundingClientRect();
+    expect((wrapperRect.top + wrapperRect.bottom) / 2).toBeCloseTo(
+      (innerTop + innerBottom) / 2,
+      1
+    );
+    for (const svg of wrapper.querySelectorAll('svg')) {
+      const svgRect = svg.getBoundingClientRect();
+      expect(svgRect.top).toBeGreaterThanOrEqual(innerTop - 0.5);
+      expect(svgRect.bottom).toBeLessThanOrEqual(innerBottom + 0.5);
+    }
+  }
+  for (const child of badge.childNodes) {
+    if (child.nodeType !== Node.TEXT_NODE || !child.textContent?.trim())
+      continue;
+    const range = document.createRange();
+    range.selectNodeContents(child);
+    const textRect = range.getBoundingClientRect();
+    expect(textRect.top).toBeGreaterThanOrEqual(innerTop - 0.5);
+    expect(textRect.bottom).toBeLessThanOrEqual(innerBottom + 0.5);
+  }
+}
 
 // ============================================
 // VARIANT STORIES (Solid Fill)
@@ -181,6 +323,87 @@ export const Sentence: Story = {
   args: {
     isCaps: false,
     children: 'Label',
+  },
+};
+
+// ============================================
+// GEOMETRY
+// ============================================
+
+export const GeometrySweep: Story = {
+  tags: ['!autodocs'],
+  render: () => (
+    <div className="nx:flex nx:flex-col nx:items-start nx:gap-4">
+      {GEOMETRY_VARIANTS.flatMap((variant) =>
+        GEOMETRY_FILLS.map((fill) => (
+          <GeometryRow
+            key={`${variant}-${fill}`}
+            variant={variant}
+            fill={fill}
+          />
+        ))
+      )}
+    </div>
+  ),
+  play: async ({ canvasElement }) => {
+    const badges = within(canvasElement).getAllByTestId('geometry-badge');
+    await expect(badges).toHaveLength(
+      GEOMETRY_VARIANTS.length * GEOMETRY_FILLS.length * GEOMETRY_SHAPES.length
+    );
+    for (const badge of badges) assertBadgeGeometry(badge);
+  },
+};
+
+export const EnlargedTypography: Story = {
+  tags: ['!autodocs'],
+  globals: ENLARGED_GLOBALS,
+  render: () => <GeometryRow fill="outline" />,
+  play: async ({ canvasElement }) => {
+    const badges = within(canvasElement).getAllByTestId('geometry-badge');
+    await waitFor(() =>
+      expect(
+        parseFloat(
+          getComputedStyle(badges[0]!).getPropertyValue(
+            '--nx-typography-line-height-sm'
+          )
+        )
+      ).toBeCloseTo(
+        (BASE_LINE_HEIGHT_SM * ENLARGED_GLOBALS.uiFontSize) / BASE_UI_FONT_SIZE,
+        3
+      )
+    );
+    for (const badge of badges) assertBadgeGeometry(badge);
+  },
+};
+
+export const MinimumSizeOverride: Story = {
+  render: () => (
+    <div className="nx:flex nx:items-center nx:gap-2">
+      <Badge className="nx:min-h-8">Raised floor</Badge>
+      <Badge fill="outline" isCaps={false}>
+        <span className="nx:h-12 nx:inline-flex nx:items-center">
+          Tall custom content
+        </span>
+      </Badge>
+    </div>
+  ),
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+    const raised = canvas.getByText('Raised floor');
+    const raisedHeight = parseFloat(
+      getComputedStyle(raised).getPropertyValue('--nx-spacing-8')
+    );
+    expect(raised.getBoundingClientRect().height).toBeCloseTo(raisedHeight, 1);
+
+    const content = canvas.getByText('Tall custom content');
+    const tall = content.parentElement!;
+    const tallRect = tall.getBoundingClientRect();
+    const contentRect = content.getBoundingClientRect();
+    expect(tallRect.height).toBeGreaterThan(
+      parseFloat(getComputedStyle(tall).minHeight)
+    );
+    expect(contentRect.top).toBeGreaterThanOrEqual(tallRect.top);
+    expect(contentRect.bottom).toBeLessThanOrEqual(tallRect.bottom);
   },
 };
 
@@ -429,6 +652,45 @@ export const LongContent: Story = {
     const badge = canvas.getByText('This is a very long badge text');
 
     await expect(badge).toBeInTheDocument();
+  },
+};
+
+export const NonRenderingChildren: Story = {
+  render: () => (
+    <div className="nx:flex nx:items-center nx:gap-2">
+      {[undefined, null, false, '', <></>, <> </>].map((children, index) => (
+        <Badge
+          key={index}
+          data-testid="non-rendering-badge"
+          leftIcon={<IconCheck />}
+          title="Approved"
+        >
+          {children}
+        </Badge>
+      ))}
+      {[0, <>Approved</>].map((children, index) => (
+        <Badge
+          key={index}
+          data-testid="rendering-badge"
+          leftIcon={<IconCheck />}
+        >
+          {children}
+        </Badge>
+      ))}
+    </div>
+  ),
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+    const nonRendering = canvas.getAllByTestId('non-rendering-badge');
+    const rendering = canvas.getAllByTestId('rendering-badge');
+    for (const badge of [...nonRendering, ...rendering])
+      assertBadgeGeometry(badge);
+    for (const badge of nonRendering) {
+      await expect(badge).toHaveAttribute('data-icon-only', 'true');
+      await expect(badge).toHaveAttribute('role', 'img');
+    }
+    for (const badge of rendering)
+      await expect(badge).not.toHaveAttribute('data-icon-only');
   },
 };
 
