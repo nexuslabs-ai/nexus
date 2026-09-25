@@ -19,6 +19,8 @@ import {
 import { useArgs } from 'storybook/preview-api';
 import { expect, userEvent, within } from 'storybook/test';
 
+import { unpairedAutofillClasses } from '../../stories/support/autofill-pairing';
+
 import {
   Sidebar,
   SidebarContent,
@@ -321,6 +323,14 @@ export const LoadingSkeleton: Story = {
       <DemoInset />
     </SidebarProvider>
   ),
+  play: async ({ canvasElement }) => {
+    const input = within(canvasElement).getByRole('textbox', {
+      name: 'Search',
+    });
+    await expect(input).toHaveAttribute('data-slot', 'sidebar-input');
+    await expect(input).toHaveClass('nx:bg-background');
+    await expect(unpairedAutofillClasses(input)).toEqual([]);
+  },
 };
 
 export const NarrowDrawer: Story = {

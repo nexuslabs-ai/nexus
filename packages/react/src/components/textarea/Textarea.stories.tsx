@@ -3,6 +3,7 @@ import * as React from 'react';
 import type { Meta, StoryObj } from '@storybook/react';
 import { expect, fn, userEvent, within } from 'storybook/test';
 
+import { unpairedAutofillClasses } from '../../stories/support/autofill-pairing';
 import { Label } from '../label';
 
 import { Textarea } from './textarea';
@@ -249,6 +250,29 @@ export const BorderlessStates: Story = {
     await expect(disabled).not.toHaveClass(
       'nx:disabled:border-border-disabled'
     );
+  },
+};
+
+export const AutofillPairing: Story = {
+  render: () => (
+    <div className="nx:grid nx:w-[400px] nx:gap-2">
+      <Textarea aria-label="Bordered textarea" defaultValue="Bordered" />
+      <Textarea
+        aria-label="Borderless textarea"
+        variant="borderless"
+        defaultValue="Borderless"
+      />
+      <Textarea
+        aria-label="Disabled textarea"
+        defaultValue="Disabled"
+        disabled
+      />
+    </div>
+  ),
+  play: async ({ canvasElement }) => {
+    for (const field of within(canvasElement).getAllByRole('textbox')) {
+      await expect(unpairedAutofillClasses(field)).toEqual([]);
+    }
   },
 };
 

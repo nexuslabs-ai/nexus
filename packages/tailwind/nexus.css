@@ -73,16 +73,6 @@
   --radius-4xl: var(--nx-radius-4xl);
   --radius-full: var(--nx-radius-full);
 
-  /* Border width tokens */
-  --border-thin: var(--nx-borderwidth-thin);
-  --border-default: var(--nx-borderwidth-default);
-  --border-thick: var(--nx-borderwidth-thick);
-
-  /* Outline width tokens — same values, so a focus ring can match a border */
-  --outline-width-thin: var(--nx-borderwidth-thin);
-  --outline-width-default: var(--nx-borderwidth-default);
-  --outline-width-thick: var(--nx-borderwidth-thick);
-
   /* Motion tokens */
   --ease-linear: var(--nx-motion-ease-linear);
   --ease-enter: var(--nx-motion-ease-enter);
@@ -145,6 +135,16 @@
   --breakpoint-lg: 64rem;
   --breakpoint-xl: 80rem;
   --breakpoint-2xl: 96rem;
+}
+
+@theme inline {
+  /* Border and outline width tokens */
+  --border-width-thin: var(--nx-borderwidth-thin);
+  --border-width-default: var(--nx-borderwidth-default);
+  --border-width-thick: var(--nx-borderwidth-thick);
+  --outline-width-thin: var(--nx-borderwidth-thin);
+  --outline-width-default: var(--nx-borderwidth-default);
+  --outline-width-thick: var(--nx-borderwidth-thick);
 }
 
 @theme inline {
@@ -2075,15 +2075,48 @@
   .dark {
     color-scheme: dark;
   }
+}
 
-  :where(
-    input[type='checkbox'],
-    input[type='radio'],
-    input[type='range'],
-    progress
-  ) {
-    accent-color: var(--color-primary-background);
+/* ===== AUTOFILL UTILITIES ===== */
+@utility autofill-bg-* {
+  &:autofill {
+    background-clip: padding-box;
+    box-shadow:
+      var(--tw-inset-shadow, 0 0 #0000),
+      var(--tw-inset-ring-shadow, 0 0 #0000),
+      var(--tw-ring-offset-shadow, 0 0 #0000),
+      var(--tw-ring-shadow, 0 0 #0000),
+      var(--tw-shadow, 0 0 #0000),
+      inset 0 0 0 1000px --value(--color-*);
   }
+}
+
+@utility autofill-bg-transparent {
+  &:autofill {
+    -webkit-background-clip: text;
+    background-clip: text;
+  }
+}
+
+@utility autofill-text-* {
+  &:autofill {
+    color: --value(--color-*);
+    -webkit-text-fill-color: --value(--color-*);
+    caret-color: --value(--color-*);
+  }
+}
+
+/* ===== SURFACE UTILITIES ===== */
+@utility surface-* {
+  --nx-surface: --value(--color-*);
+}
+
+@utility ring-surface {
+  --tw-ring-color: var(--nx-surface, --theme(--color-background));
+}
+
+@utility ring-offset-surface {
+  --tw-ring-offset-color: var(--nx-surface, --theme(--color-background));
 }
 
 /* ===== BASE LAYER ===== */
