@@ -592,6 +592,57 @@ export const ExternalCloseReturnsFocus: Story = {
   },
 };
 
+function LockExample() {
+  const [editing, setEditing] = useState(false);
+  const [locked, setLocked] = useState(false);
+  const access = locked ? { readOnly: true as const } : { onCommit: fn() };
+
+  function lock() {
+    setEditing(false);
+    setLocked(true);
+  }
+
+  return (
+    <div className="nx:grid nx:w-full nx:max-w-sm nx:gap-4">
+      <InlineEdit
+        label="Name"
+        value="Priya Shah"
+        editing={editing}
+        onEditingChange={setEditing}
+        {...access}
+      />
+      <Button
+        variant="outline"
+        onMouseDown={(event) => event.preventDefault()}
+        onClick={lock}
+      >
+        Lock
+      </Button>
+      <Button variant="outline" onClick={() => setLocked(false)}>
+        Unlock
+      </Button>
+    </div>
+  );
+}
+
+export const ReadOnlyWhileEditingKeepsFocus: Story = {
+  render: () => <LockExample />,
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+    await userEvent.click(canvas.getByRole('button', { name: 'Edit Name' }));
+    await userEvent.click(canvas.getByRole('textbox', { name: 'Name' }));
+    await userEvent.click(canvas.getByRole('button', { name: 'Lock' }));
+    await expect(canvas.queryByRole('textbox')).not.toBeInTheDocument();
+
+    const unlock = canvas.getByRole('button', { name: 'Unlock' });
+    await userEvent.click(unlock);
+    await expect(
+      canvas.getByRole('button', { name: 'Edit Name' })
+    ).toBeVisible();
+    await expect(unlock).toHaveFocus();
+  },
+};
+
 export const StableEditingTypography: Story = {
   render: () => (
     <div className="nx:grid nx:w-full nx:max-w-sm nx:gap-4">
