@@ -4,9 +4,9 @@ Appearance is the runtime state that drives Nexus theming. `@nexus_ds/core`
 derives colors, typography prefs, density, corners, elevation, stroke, and
 motion prefs from a single [`NexusAppearanceState`](#the-model).
 
-The `@/components/appearance` imports below are the provider folder copied in at
-[Install step 3](/getting-started/install#step-3-the-appearance-provider);
-point them at wherever you put it.
+The `@/components/appearance/provider` imports below are the provider folder
+copied in at
+[Install step 3](/getting-started/install#step-3-the-appearance-provider).
 
 ## The model
 
@@ -89,7 +89,7 @@ Light-mode page, card, and popover bases remain white.
 Use `useNexusAppearance` to build product-specific controls.
 
 ```tsx
-import { useNexusAppearance } from '@/components/appearance';
+import { useNexusAppearance } from '@/components/appearance/provider';
 
 function ModeButton() {
   const { state, setState } = useNexusAppearance();

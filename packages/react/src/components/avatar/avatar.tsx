@@ -90,15 +90,15 @@ interface AvatarProps
  * ```
  *
  * @remarks
- * The emphasis `ring`, `AvatarStatus`, and `AvatarGroup` separator rings read
- * the `--avatar-surface` CSS variable (default: `background`). When avatars sit
- * on a non-default surface, set it on a wrapper so the rings match it instead
- * of leaving a `background`-coloured halo:
+ * The emphasis `ring`, `AvatarStatus`, and `AvatarGroup` separator rings take
+ * the colour of the surface behind them (default: `background`). When avatars
+ * sit on a non-default surface, declare it on the wrapper with `surface-*` so
+ * the rings match it instead of leaving a `background`-coloured halo:
  *
  * @example
  * ```tsx
  * // On a container surface — rings match the card, no halo
- * <div className="nx:bg-container nx:[--avatar-surface:var(--nx-color-container)]">
+ * <div className="nx:bg-container nx:surface-container">
  *   <AvatarGroup>{avatars}</AvatarGroup>
  * </div>
  * ```
@@ -123,7 +123,7 @@ function Avatar({
       className={cn(
         avatarVariants({ size: resolvedSize, shape: resolvedShape }),
         ring &&
-          'nx:ring-2 nx:ring-border-primary nx:ring-offset-2 nx:ring-offset-(--avatar-surface,var(--nx-color-background))',
+          'nx:ring-2 nx:ring-border-primary nx:ring-offset-2 nx:ring-offset-surface',
         className
       )}
       {...props}
@@ -208,7 +208,7 @@ function AvatarFallback({ className, ...props }: AvatarFallbackProps) {
 }
 
 const avatarStatusVariants = cva(
-  'nx:absolute nx:right-[0.04em] nx:bottom-[0.04em] nx:size-[0.6em] nx:rounded-full nx:ring-[0.1em] nx:ring-(--avatar-surface,var(--nx-color-background))',
+  'nx:absolute nx:right-[0.04em] nx:bottom-[0.04em] nx:size-[0.6em] nx:rounded-full nx:ring-[0.1em] nx:ring-surface',
   {
     variants: {
       status: {
@@ -242,7 +242,6 @@ interface AvatarStatusProps
    * Visually-hidden text announced by assistive tech in place of the
    * colour-only dot. Defaults to the capitalised `status`. Pass `''` to opt
    * out when an adjacent text label already conveys presence.
-   * @default the capitalised `status` ('Online', 'Away', 'Busy', 'Offline')
    */
   label?: string;
 }
@@ -333,7 +332,7 @@ function AvatarGroup({
           // tuck stays ~proportional from 2xs to 4xl instead of a fixed px.
           'nx:[&>[data-slot=avatar]+[data-slot=avatar]]:ms-[-0.7em]',
           'nx:*:data-[slot=avatar]:relative',
-          'nx:*:data-[slot=avatar]:ring-[0.1em] nx:*:data-[slot=avatar]:ring-(--avatar-surface,var(--nx-color-background))',
+          'nx:*:data-[slot=avatar]:ring-[0.1em] nx:*:data-[slot=avatar]:ring-surface',
           className
         )}
         {...props}

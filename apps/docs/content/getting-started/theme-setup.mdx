@@ -8,8 +8,8 @@ provider and a first-paint script.
 
 This page continues from [Install](/getting-started/install), which leaves you
 with the token CSS in `styles/nexus/` imported from your CSS entry point, the
-appearance provider copied into `components/appearance/`, and `@nexus_ds/core`
-installed.
+appearance provider copied into `components/appearance/provider/`, and
+`@nexus_ds/core` installed.
 
 The Next.js layout below replaces the one Install ends with: same file, but it
 becomes `async`, reads the appearance from a cookie, and swaps
@@ -56,8 +56,8 @@ import {
 import type { Viewport } from 'next';
 import { cookies } from 'next/headers';
 
-import { NexusAppearanceProvider } from '@/components/appearance';
-import { NexusAppearanceScript } from '@/components/appearance/server';
+import { NexusAppearanceProvider } from '@/components/appearance/provider';
+import { NexusAppearanceScript } from '@/components/appearance/provider/server';
 
 import { defaultAppearance } from './appearance-state';
 
@@ -151,7 +151,7 @@ import { createRoot } from 'react-dom/client';
 import App from './App';
 import { defaultAppearance } from './appearance-state';
 // the provider folder from Install, under src/ for a Vite app
-import { createNexusAppearance } from './components/appearance';
+import { createNexusAppearance } from './components/appearance/provider';
 
 import './index.css';
 

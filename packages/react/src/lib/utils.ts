@@ -1,8 +1,10 @@
 import { type ClassValue, clsx } from 'clsx';
 import {
+  type ClassValidator,
   type DefaultClassGroupIds,
   type DefaultThemeGroupIds,
   extendTailwindMerge,
+  validators,
 } from 'tailwind-merge';
 
 /**
@@ -35,6 +37,12 @@ export const NEXUS_CLASS_GROUPS = {
   // The two ring-safe colour transitions. Without this they land nowhere and a
   // later `transition-none` / `transition-all` fails to replace them.
   transition: ['transition-control', 'transition-field'],
+  // Take any colour token, like `bg-*` / `text-*`.
+  'autofill-bg': [{ 'autofill-bg': [validators.isAny] }],
+  'autofill-text': [{ 'autofill-text': [validators.isAny] }],
+  surface: [{ surface: [validators.isAny] }],
+  'ring-color': ['ring-surface'],
+  'ring-offset-color': ['ring-offset-surface'],
   z: ['z-overlay', 'z-sticky', 'z-modal', 'z-popover', 'z-toast', 'z-max'],
   gap: ['gap-container', 'gap-layout-section', 'gap-layout-stack'],
   p: ['p-container'],
@@ -94,6 +102,40 @@ export const NEXUS_CLASS_GROUPS = {
     'border-width-l-default',
     'border-width-l-thick',
   ],
+  'border-w-s': [
+    'border-s-thin',
+    'border-s-default',
+    'border-s-thick',
+    'border-width-s-thin',
+    'border-width-s-default',
+    'border-width-s-thick',
+  ],
+  'border-w-e': [
+    'border-e-thin',
+    'border-e-default',
+    'border-e-thick',
+    'border-width-e-thin',
+    'border-width-e-default',
+    'border-width-e-thick',
+  ],
+  'border-w-bs': [
+    'border-bs-thin',
+    'border-bs-default',
+    'border-bs-thick',
+    'border-width-bs-thin',
+    'border-width-bs-default',
+    'border-width-bs-thick',
+  ],
+  'border-w-be': [
+    'border-be-thin',
+    'border-be-default',
+    'border-be-thick',
+    'border-width-be-thin',
+    'border-width-be-default',
+    'border-width-be-thick',
+  ],
+  'divide-x': ['divide-x-thin', 'divide-x-default', 'divide-x-thick'],
+  'divide-y': ['divide-y-thin', 'divide-y-default', 'divide-y-thick'],
   // `outline-{thin,default,thick}` are widths, not colours. Without this they
   // land in tailwind-merge's `outline-color` group and a field's
   // `outline-focus-default` silently drops the width beside it.
@@ -133,7 +175,16 @@ export const NEXUS_CLASS_GROUPS = {
     'typography-code-block',
     'typography-code-inline',
   ],
-} satisfies Partial<Record<DefaultClassGroupIds | 'typography', string[]>>;
+} satisfies Partial<
+  Record<
+    | DefaultClassGroupIds
+    | 'typography'
+    | 'autofill-bg'
+    | 'autofill-text'
+    | 'surface',
+    (string | Record<string, ClassValidator[]>)[]
+  >
+>;
 
 type NexusClassGroupId = keyof typeof NEXUS_CLASS_GROUPS;
 

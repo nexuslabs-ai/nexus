@@ -632,15 +632,44 @@ export function generateTypographyUtilitiesCSS(tokensDir, primitiveMap) {
 }
 
 // ============================================
-// BORDER WIDTH UTILITIES
+// BORDER WIDTH ALIAS UTILITIES
 // ============================================
 
-const BORDER_WIDTH_UTILITIES_PER_TOKEN = 14;
+const BORDER_WIDTH_SIDES = [
+  { suffix: '', style: 'border-style', width: 'border-width' },
+  { suffix: 'x-', style: 'border-inline-style', width: 'border-inline-width' },
+  { suffix: 'y-', style: 'border-block-style', width: 'border-block-width' },
+  { suffix: 't-', style: 'border-top-style', width: 'border-top-width' },
+  { suffix: 'r-', style: 'border-right-style', width: 'border-right-width' },
+  { suffix: 'b-', style: 'border-bottom-style', width: 'border-bottom-width' },
+  { suffix: 'l-', style: 'border-left-style', width: 'border-left-width' },
+  {
+    suffix: 's-',
+    style: 'border-inline-start-style',
+    width: 'border-inline-start-width',
+  },
+  {
+    suffix: 'e-',
+    style: 'border-inline-end-style',
+    width: 'border-inline-end-width',
+  },
+  {
+    suffix: 'bs-',
+    style: 'border-block-start-style',
+    width: 'border-block-start-width',
+  },
+  {
+    suffix: 'be-',
+    style: 'border-block-end-style',
+    width: 'border-block-end-width',
+  },
+];
 
 /**
- * Generate border width utility CSS from token array.
- * Creates @utility rules with border-{side?}-{name} patterns for all
- * borderwidth tokens, so runtime stroke modes can affect one-sided borders.
+ * Generate the `border-width-{side?}-{name}` alias utilities for every
+ * borderwidth token. The `border-{side?}-{name}` spellings are Tailwind's own
+ * border utilities, resolved from the `--border-width-*` theme keys that
+ * generateThemeCSS emits.
  *
  * @param {object[]} tokens - Array of borderwidth tokens with cssName property (e.g., "nx-borderwidth-default")
  * @returns {{ css: string, count: number }} Generated CSS and utility count
@@ -650,92 +679,22 @@ export function generateBorderWidthUtilitiesCSS(tokens) {
     return { css: '', count: 0 };
   }
 
-  let css = `/* Border Width Utilities */\n\n`;
+  let css = `/* Border Width Alias Utilities */\n\n`;
 
   for (const token of tokens) {
     // Extract the name part (e.g., "default" from "nx-borderwidth-default")
     const name = token.cssName.replace('nx-borderwidth-', '');
     const value = `var(--${token.cssName})`;
 
-    css += `@utility border-${name} {\n`;
-    css += `  border-style: var(--tw-border-style, solid);\n`;
-    css += `  border-width: ${value};\n`;
-    css += `}\n\n`;
-
-    css += `@utility border-x-${name} {\n`;
-    css += `  border-inline-style: var(--tw-border-style, solid);\n`;
-    css += `  border-inline-width: ${value};\n`;
-    css += `}\n\n`;
-
-    css += `@utility border-y-${name} {\n`;
-    css += `  border-block-style: var(--tw-border-style, solid);\n`;
-    css += `  border-block-width: ${value};\n`;
-    css += `}\n\n`;
-
-    css += `@utility border-t-${name} {\n`;
-    css += `  border-top-style: var(--tw-border-style, solid);\n`;
-    css += `  border-top-width: ${value};\n`;
-    css += `}\n\n`;
-
-    css += `@utility border-r-${name} {\n`;
-    css += `  border-right-style: var(--tw-border-style, solid);\n`;
-    css += `  border-right-width: ${value};\n`;
-    css += `}\n\n`;
-
-    css += `@utility border-b-${name} {\n`;
-    css += `  border-bottom-style: var(--tw-border-style, solid);\n`;
-    css += `  border-bottom-width: ${value};\n`;
-    css += `}\n\n`;
-
-    css += `@utility border-l-${name} {\n`;
-    css += `  border-left-style: var(--tw-border-style, solid);\n`;
-    css += `  border-left-width: ${value};\n`;
-    css += `}\n\n`;
+    for (const side of BORDER_WIDTH_SIDES) {
+      css += `@utility border-width-${side.suffix}${name} {\n`;
+      css += `  ${side.style}: var(--tw-border-style, solid);\n`;
+      css += `  ${side.width}: ${value};\n`;
+      css += `}\n\n`;
+    }
   }
 
-  css += `/* Border Width Alias Utilities */\n\n`;
-
-  for (const token of tokens) {
-    const name = token.cssName.replace('nx-borderwidth-', '');
-    const value = `var(--${token.cssName})`;
-
-    css += `@utility border-width-${name} {\n`;
-    css += `  border-style: var(--tw-border-style, solid);\n`;
-    css += `  border-width: ${value};\n`;
-    css += `}\n\n`;
-
-    css += `@utility border-width-x-${name} {\n`;
-    css += `  border-inline-style: var(--tw-border-style, solid);\n`;
-    css += `  border-inline-width: ${value};\n`;
-    css += `}\n\n`;
-
-    css += `@utility border-width-y-${name} {\n`;
-    css += `  border-block-style: var(--tw-border-style, solid);\n`;
-    css += `  border-block-width: ${value};\n`;
-    css += `}\n\n`;
-
-    css += `@utility border-width-t-${name} {\n`;
-    css += `  border-top-style: var(--tw-border-style, solid);\n`;
-    css += `  border-top-width: ${value};\n`;
-    css += `}\n\n`;
-
-    css += `@utility border-width-r-${name} {\n`;
-    css += `  border-right-style: var(--tw-border-style, solid);\n`;
-    css += `  border-right-width: ${value};\n`;
-    css += `}\n\n`;
-
-    css += `@utility border-width-b-${name} {\n`;
-    css += `  border-bottom-style: var(--tw-border-style, solid);\n`;
-    css += `  border-bottom-width: ${value};\n`;
-    css += `}\n\n`;
-
-    css += `@utility border-width-l-${name} {\n`;
-    css += `  border-left-style: var(--tw-border-style, solid);\n`;
-    css += `  border-left-width: ${value};\n`;
-    css += `}\n\n`;
-  }
-
-  return { css, count: tokens.length * BORDER_WIDTH_UTILITIES_PER_TOKEN };
+  return { css, count: tokens.length * BORDER_WIDTH_SIDES.length };
 }
 
 const BORDER_COLOR_ALIAS_NAMES = [
@@ -1465,13 +1424,13 @@ export function collectRadiusTokens(tokensDir, mode) {
 
 /**
  * Collect borderwidth token mappings from a mode file
- * Returns array of { key, cssName, varRef } for @theme block. `key` is kept
- * because the same value seeds two Tailwind namespaces: `--border-{key}` and
- * `--outline-width-{key}` (see generateThemeCSS).
+ * Returns array of { key, varRef } for the @theme block, where each value seeds
+ * two Tailwind namespaces: `--border-width-{key}` and `--outline-width-{key}`
+ * (see generateThemeCSS).
  *
  * @param {string} tokensDir - Path to tokens directory
  * @param {string} mode - Borderwidth mode (e.g., 'vega')
- * @returns {object[]} Array of { key, cssName, varRef }
+ * @returns {object[]} Array of { key, varRef }
  */
 export function collectBorderwidthTokens(tokensDir, mode) {
   const filePath = path.join(
@@ -1491,7 +1450,6 @@ export function collectBorderwidthTokens(tokensDir, mode) {
     if (key.startsWith('$')) continue;
     tokens.push({
       key,
-      cssName: `border-${key}`,
       varRef: `var(--nx-borderwidth-${key})`,
     });
   }
@@ -1676,7 +1634,7 @@ export function collectShadowTokens(tokensDir, primitiveMap) {
  * @param {object[]} config.semanticTokens - Array of { cssName, value } for semantic colours
  * @param {object[]} config.spacingTokens - Array of { cssName, value } for numeric spacing (default baseline; per-mode overrides live outside @theme)
  * @param {object[]} config.radiusTokens - Array of { cssName, varRef } for radius
- * @param {object[]} config.borderwidthTokens - Array of { key, cssName, varRef } for borderwidth; each one emits both a --border-* and an --outline-width-* theme key
+ * @param {object[]} config.borderwidthTokens - Array of { key, varRef } for borderwidth; each one emits both a --border-width-* and an --outline-width-* inline theme key
  * @param {object[]} config.motionTokens - Array of { group, key, cssName, varRef } for duration/ease
  * @param {object[]} config.shadowTokens - Array of { cssName, value } for shadows
  * @param {object[]} [config.darkSemanticTokens] - Array of { cssName, value } for dark mode semantic tokens
@@ -1748,22 +1706,6 @@ export function generateThemeCSS(config) {
     }
   }
 
-  // Borderwidth tokens. The same values also seed Tailwind's --outline-width-*
-  // namespace: a field's focus ring is a `border-default` inner edge plus an
-  // `outline-default` outer edge, so both halves have to move together when
-  // [data-borderwidth] swaps the mode.
-  if (borderwidthTokens.length > 0) {
-    css += `\n  /* Border width tokens */\n`;
-    for (const token of borderwidthTokens) {
-      css += `  --${token.cssName}: ${token.varRef};\n`;
-    }
-
-    css += `\n  /* Outline width tokens — same values, so a focus ring can match a border */\n`;
-    for (const token of borderwidthTokens) {
-      css += `  --outline-width-${token.key}: ${token.varRef};\n`;
-    }
-  }
-
   // Motion tokens
   if (motionTokens.length > 0) {
     css += `\n  /* Motion tokens */\n`;
@@ -1799,6 +1741,22 @@ export function generateThemeCSS(config) {
   }
 
   css += `}\n`;
+
+  // Inlined so every border and outline utility reads `--nx-borderwidth-*` on
+  // the element itself, where a `[data-borderwidth]` ancestor has set it. A
+  // field's focus ring is a `border-default` inner edge plus an
+  // `outline-default` outer edge, so both namespaces share each value.
+  if (borderwidthTokens.length > 0) {
+    css += `\n@theme inline {\n`;
+    css += `  /* Border and outline width tokens */\n`;
+    for (const token of borderwidthTokens) {
+      css += `  --border-width-${token.key}: ${token.varRef};\n`;
+    }
+    for (const token of borderwidthTokens) {
+      css += `  --outline-width-${token.key}: ${token.varRef};\n`;
+    }
+    css += `}\n`;
+  }
 
   // Semantic colour utilities need their fallback expression inlined into the
   // generated utility, otherwise Tailwind's `prefix(nx)` rewrites the @theme
@@ -1838,6 +1796,12 @@ export function generateThemeCSS(config) {
   return css;
 }
 
+/**
+ * Theme the browser-painted UI Nexus cannot style through utilities: the
+ * color-scheme declaration.
+ *
+ * @returns {string} CSS native browser UI rules
+ */
 export function generateNativeBrowserUIThemeCSS() {
   return `
 /* ===== NATIVE BROWSER UI THEME ===== */
@@ -1853,10 +1817,80 @@ export function generateNativeBrowserUIThemeCSS() {
   .dark {
     color-scheme: dark;
   }
+}
+`;
+}
 
-  :where(input[type='checkbox'], input[type='radio'], input[type='range'], progress) {
-    accent-color: var(--color-primary-background);
+/**
+ * Autofill utilities. Browsers paint autofilled fields with `!important`
+ * background and text colours that author `bg-*` / `text-*` classes cannot
+ * override. A field pairs each of those classes with an `autofill-*` utility of
+ * the same token (`nx:bg-container nx:autofill-bg-container`), which repaints
+ * the surface as an inset fill shadow and the text through
+ * `-webkit-text-fill-color`. The fill is the last, bottom-most layer of
+ * Tailwind's shadow stack, so `shadow-*`, `ring-*`, `inset-shadow-*` and
+ * `inset-ring-*` on the field survive autofill. The shadow stops at the padding
+ * edge, so the browser surface is clipped there too or it shows through a
+ * translucent border. `autofill-bg-transparent` clips the browser surface away
+ * instead, for controls whose parent owns the surface.
+ *
+ * @returns {string} CSS @utility declarations
+ */
+export function generateAutofillUtilitiesCSS() {
+  return `
+/* ===== AUTOFILL UTILITIES ===== */
+@utility autofill-bg-* {
+  &:autofill {
+    background-clip: padding-box;
+    box-shadow:
+      var(--tw-inset-shadow, 0 0 #0000),
+      var(--tw-inset-ring-shadow, 0 0 #0000),
+      var(--tw-ring-offset-shadow, 0 0 #0000),
+      var(--tw-ring-shadow, 0 0 #0000),
+      var(--tw-shadow, 0 0 #0000),
+      inset 0 0 0 1000px --value(--color-*);
   }
+}
+
+@utility autofill-bg-transparent {
+  &:autofill {
+    -webkit-background-clip: text;
+    background-clip: text;
+  }
+}
+
+@utility autofill-text-* {
+  &:autofill {
+    color: --value(--color-*);
+    -webkit-text-fill-color: --value(--color-*);
+    caret-color: --value(--color-*);
+  }
+}
+`;
+}
+
+/**
+ * Surface utilities: a wrapper declares the surface it paints with
+ * `surface-*` beside its `bg-*` class (`nx:bg-container nx:surface-container`),
+ * and descendants cut themselves out of it with `ring-surface` /
+ * `ring-offset-surface`. Without a declared surface the rings fall back to
+ * `background`.
+ *
+ * @returns {string} CSS @utility declarations
+ */
+export function generateSurfaceUtilitiesCSS() {
+  return `
+/* ===== SURFACE UTILITIES ===== */
+@utility surface-* {
+  --nx-surface: --value(--color-*);
+}
+
+@utility ring-surface {
+  --tw-ring-color: var(--nx-surface, --theme(--color-background));
+}
+
+@utility ring-offset-surface {
+  --tw-ring-offset-color: var(--nx-surface, --theme(--color-background));
 }
 `;
 }
