@@ -182,9 +182,29 @@ export default function ColorShowcase() {
           Live tokens
         </SectionHeading>
         <p className="nx:typography-body-default nx:text-muted-foreground nx:mb-4 nx:max-w-[64ch]">
-          Semantic surface/text pairs — the real tokens components use. Open the
-          theme picker (bottom-right) and swap the base or dark mode: every pair
-          re-resolves live, and each clears the APCA gate by construction.
+          Semantic surface/foreground pairs — the real tokens components use.
+          Open the theme picker (bottom-right) and swap the base or dark mode:
+          every pair re-resolves live, and each clears the APCA gate by
+          construction.
+        </p>
+        <p className="nx:typography-body-default nx:text-muted-foreground nx:mb-4 nx:max-w-[64ch]">
+          <strong>
+            Foreground describes its relationship to a surface; text describes
+            one application.
+          </strong>{' '}
+          The relationship comes first when naming a token. Text and icons share
+          that color; a foreground can also paint a control part or indicator on
+          the same surface. For example, <code>primary-foreground</code> colors
+          both a button&rsquo;s label and a checked switch&rsquo;s knob on{' '}
+          <code>primary-background</code>. Likewise,{' '}
+          <code>error-subtle-foreground</code> colors the message and icon on{' '}
+          <code>error-subtle</code>.
+        </p>
+        <p className="nx:typography-body-default nx:text-muted-foreground nx:mb-4 nx:max-w-[64ch]">
+          A foreground has a default background partner, not necessarily an
+          exclusive one. Use it on other surfaces only with contrast coverage
+          for the intended content tier. A token name alone does not guarantee
+          readability on every background or at every text size.
         </p>
         <div className="nx:grid nx:grid-cols-2 nx:md:grid-cols-5 nx:gap-3">
           {SEMANTIC_PAIRS.map((pair) => (

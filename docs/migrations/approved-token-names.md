@@ -29,6 +29,23 @@ The status active borders (`border-error-active`, `border-information-active`,
 release. Verify class-merging configuration in copied consumer libraries as well
 as application classes and raw CSS/SVG variables.
 
+## Why foreground names stay
+
+> **Foreground describes its relationship to a surface; text describes one application.**
+
+Name the relationship first; document applications as examples of that role.
+Text and icons share a color token. A foreground can also paint a contrasting
+control part or indicator when that element uses the same surface relationship.
+For example, `primary-foreground` colors both a primary button's label/icon and a
+checked switch's knob on `primary-background`. `error-subtle-foreground` is the
+foreground partner of `error-subtle`, including its alert message and icon.
+
+The background partner is the default pairing, not a claim of exclusive use.
+Other surfaces need explicit contrast coverage for the intended content tier;
+the name alone does not guarantee readability for every background or text size.
+These broader roles are why we retain foreground names instead of renaming them
+to text-specific names.
+
 Content-color names are unchanged in this migration. The six
 `primary-subtle-foreground`, `secondary-subtle-foreground`,
 `error-subtle-foreground`, `information-subtle-foreground`,
