@@ -91,7 +91,7 @@ export const Invalid: Story = {
         </div>
         <p
           id={errorId}
-          className="nx:typography-body-default nx:text-error-text"
+          className="nx:typography-body-default nx:text-error-subtle-foreground"
         >
           This setting must be enabled to continue.
         </p>

@@ -56,7 +56,7 @@ export default function Home() {
     <div className="nx:max-w-[960px] nx:mx-auto nx:px-6">
       {/* Hero */}
       <section className="nx:text-center nx:pt-20 nx:pb-16">
-        <span className="nx:inline-flex nx:items-center nx:gap-2 nx:font-mono nx:typography-label-caps nx:uppercase nx:tracking-[0.14em] nx:text-primary-text">
+        <span className="nx:inline-flex nx:items-center nx:gap-2 nx:font-mono nx:typography-label-caps nx:uppercase nx:tracking-[0.14em] nx:text-primary-subtle-foreground">
           <span className="nx:size-1.5 nx:rounded-full nx:bg-primary-background" />
           AI-native design system
         </span>

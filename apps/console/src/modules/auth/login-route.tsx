@@ -96,7 +96,7 @@ export function LoginRoute() {
                     <RhfFieldLabel>Password</RhfFieldLabel>
                     <Link
                       to="/forgot"
-                      className="nx:text-primary-text nx:typography-label-default nx:hover:underline"
+                      className="nx:text-primary-subtle-foreground nx:typography-label-default nx:hover:underline"
                     >
                       Forgot password?
                     </Link>
@@ -128,7 +128,7 @@ export function LoginRoute() {
               No account?{' '}
               <Link
                 to="/signup"
-                className="nx:text-primary-text nx:hover:underline"
+                className="nx:text-primary-subtle-foreground nx:hover:underline"
               >
                 Create one
               </Link>

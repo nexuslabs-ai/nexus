@@ -237,7 +237,7 @@ export default function IncrementalPage() {
                   className="nx:bg-muted flex items-center justify-between rounded-lg p-3"
                 >
                   <span className="text-sm text-slate-600">{k}</span>
-                  <span className="nx:typography-label-small nx:text-primary-text">
+                  <span className="nx:typography-label-small nx:text-primary-subtle-foreground">
                     {v}
                   </span>
                 </div>
@@ -252,7 +252,7 @@ export default function IncrementalPage() {
               <span className="rounded-full bg-violet-100 px-2.5 py-0.5 text-xs font-medium text-violet-700">
                 app pill
               </span>
-              <span className="nx:bg-primary-subtle nx:text-primary-text rounded-full px-2.5 py-0.5 text-xs font-medium">
+              <span className="nx:bg-primary-subtle nx:text-primary-subtle-foreground rounded-full px-2.5 py-0.5 text-xs font-medium">
                 nx pill
               </span>
               <span className="rounded-full bg-slate-100 px-2.5 py-0.5 text-xs font-medium text-slate-600">

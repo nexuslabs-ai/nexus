@@ -97,7 +97,7 @@ function TocLink({ entry, active }: { entry: TocEntry; active: boolean }) {
         className={cn(
           TOC_LINK_BASE,
           active
-            ? 'nx:text-primary-text nx:border-focus-default'
+            ? 'nx:text-primary-subtle-foreground nx:border-focus-default'
             : 'nx:text-muted-foreground-subtle nx:border-border-default nx:hover:text-foreground'
         )}
       >

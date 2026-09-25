@@ -185,10 +185,10 @@ nx:aria-invalid:focus-visible:border-focus-error`}
           <code>focus-default</code>. Focus is a system signal (&ldquo;you are
           here&rdquo;), not a per-variant or status signal, so there is no
           per-variant focus colour. <code>focus-default</code> shares the solved
-          <code>primary-text</code> colour, with focus surfaces included in its
-          contrast checks. That is why the ring re-tints with the theme picker
-          and component code never needs a brand-specific focus class. Only the
-          error state differs, and it has its own token:{' '}
+          <code>primary-subtle-foreground</code> colour, with focus surfaces
+          included in its contrast checks. That is why the ring re-tints with
+          the theme picker and component code never needs a brand-specific focus
+          class. Only the error state differs, and it has its own token:{' '}
           <code>focus-error</code>.
         </p>
       </section>

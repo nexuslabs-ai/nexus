@@ -203,7 +203,7 @@ export function deriveText(
 
 /**
  * Fill, subtle, and border seeds for a named color family. The contrast solver
- * adds the black/white `-foreground` label and resolves `-text`.
+ * adds the black/white `-foreground` label and resolves `-subtle-foreground`.
  */
 export function deriveFamily(
   name: string,
@@ -222,7 +222,7 @@ export function deriveFamily(
     [`${p}-background-active`]: ramp['800'],
     [`${p}-disabled`]: dark ? ramp['950'] : ramp['300'],
     [`${p}-subtle`]: dark ? ramp['950'] : ramp['50'],
-    [`${p}-text`]: dark ? ramp['300'] : ramp['600'],
+    [`${p}-subtle-foreground`]: dark ? ramp['300'] : ramp['600'],
     [`${p}-subtle-hover`]: dark ? ramp['900'] : ramp['100'],
     [`${p}-subtle-active`]: dark ? ramp['800'] : ramp['200'],
     [`${p}-border`]: dark ? ramp['700'] : ramp['200'],
@@ -370,7 +370,7 @@ export function deriveSecondary(mode: Mode): TokenMap {
     '--nx-color-secondary-foreground': d ? n['100'] : n['900'],
     '--nx-color-secondary-disabled': d ? n['950'] : n['50'],
     '--nx-color-secondary-subtle': d ? n['800'] : n['100'],
-    '--nx-color-secondary-text': d ? n['200'] : n['600'],
+    '--nx-color-secondary-subtle-foreground': d ? n['200'] : n['600'],
     '--nx-color-secondary-subtle-hover': d ? n['700'] : n['200'],
     '--nx-color-secondary-subtle-active': d ? n['600'] : n['300'],
   };

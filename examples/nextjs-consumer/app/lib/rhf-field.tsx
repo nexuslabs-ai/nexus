@@ -107,7 +107,7 @@ function RhfFieldLabel({ className, ...props }: RhfFieldLabelProps) {
       data-slot="rhf-field-label"
       data-error={!!error}
       className={cn(
-        'nx:data-[error=true]:text-error-text',
+        'nx:data-[error=true]:text-error-subtle-foreground',
         className
       )}
       htmlFor={fieldId}
@@ -187,7 +187,7 @@ function RhfFieldMessage({
       data-slot="rhf-field-message"
       id={messageId}
       className={cn(
-        'nx:typography-body-small nx:text-error-text',
+        'nx:typography-body-small nx:text-error-subtle-foreground',
         className
       )}
     >

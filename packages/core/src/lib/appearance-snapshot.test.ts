@@ -109,16 +109,14 @@ describe('NexusAppearanceSnapshot', () => {
       const snapshot = sanitizeNexusAppearanceSnapshot({
         version,
         state,
-        themeCss: ':root { --nx-color-primary-subtle-foreground: stale; }',
+        themeCss: ':root { --nx-color-border-active: stale; }',
         prefsCss: ':root { --stale-prefs: stale; }',
       });
 
       expect(snapshot.version).toBe(SNAPSHOT_VERSION);
       expect(snapshot.state).toEqual(state);
       expect(snapshot.themeCss).toBe(themeCss(state));
-      expect(snapshot.themeCss).not.toContain(
-        '--nx-color-primary-subtle-foreground:'
-      );
+      expect(snapshot.themeCss).not.toContain('--nx-color-border-active:');
       expect(snapshot.themeCss).toContain('--nx-color-focus-default:');
       expect(snapshot.themeCss).toContain('--nx-color-focus-error:');
       expect(snapshot.prefsCss).toBe(prefsCss(state));
@@ -330,7 +328,7 @@ describe('createNexusAppearanceBootstrapScript', () => {
       JSON.stringify({
         version: 6,
         state,
-        themeCss: ':root { --nx-color-primary-subtle-foreground: red; }',
+        themeCss: ':root { --nx-color-border-active: red; }',
         prefsCss: 'STALE',
       })
     );
@@ -349,8 +347,8 @@ describe('createNexusAppearanceBootstrapScript', () => {
       'style[data-nexus-appearance-theme]'
     )?.textContent;
     expect(rendered).toBe(serverSnapshot.themeCss);
-    expect(rendered).toContain('--nx-color-primary-text:');
-    expect(rendered).not.toContain('--nx-color-primary-subtle-foreground:');
+    expect(rendered).toContain('--nx-color-border-focus:');
+    expect(rendered).not.toContain('--nx-color-border-active:');
   });
 
   it('paints the default first paint when storage holds only obsolete v6 CSS', () => {

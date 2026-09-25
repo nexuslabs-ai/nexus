@@ -23,7 +23,7 @@ export const Sizes: Story = {
     <div className="nx:flex nx:items-center nx:gap-4 nx:text-foreground">
       <Spinner className="nx:size-4" />
       <Spinner className="nx:size-6" />
-      <Spinner className="nx:size-8 nx:text-primary-text" />
+      <Spinner className="nx:size-8 nx:text-primary-subtle-foreground" />
     </div>
   ),
 };

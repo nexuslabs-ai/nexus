@@ -17,7 +17,10 @@ export function NotFound() {
       <p className="nx:text-muted-foreground nx:max-w-md">
         That page doesn’t exist — it may have moved, or the link was mistyped.
       </p>
-      <Link to="/" className="nx:text-primary-text nx:hover:underline">
+      <Link
+        to="/"
+        className="nx:text-primary-subtle-foreground nx:hover:underline"
+      >
         Back to Atlas
       </Link>
     </div>

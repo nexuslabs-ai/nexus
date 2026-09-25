@@ -195,7 +195,7 @@ describe('continuous contrast', () => {
           bg: 'primary-background-hover',
         }),
         expect.objectContaining({
-          fg: 'warning-text',
+          fg: 'warning-subtle-foreground',
           bg: 'warning-subtle-active',
         }),
         expect.objectContaining({ fg: 'muted-foreground', bg: 'container' }),

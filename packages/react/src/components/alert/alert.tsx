@@ -11,13 +11,13 @@ const alertVariants = cva('nx:group/alert nx:grid nx:w-full nx:px-6 nx:py-4', {
     variant: {
       default: 'nx:border-border-default nx:bg-container nx:text-foreground',
       destructive:
-        'nx:border-error-border nx:bg-error-subtle nx:text-error-text',
+        'nx:border-error-border nx:bg-error-subtle nx:text-error-subtle-foreground',
       success:
-        'nx:border-success-border nx:bg-success-subtle nx:text-success-text',
+        'nx:border-success-border nx:bg-success-subtle nx:text-success-subtle-foreground',
       information:
-        'nx:border-information-border nx:bg-information-subtle nx:text-information-text',
+        'nx:border-information-border nx:bg-information-subtle nx:text-information-subtle-foreground',
       warning:
-        'nx:border-warning-border nx:bg-warning-subtle nx:text-warning-text',
+        'nx:border-warning-border nx:bg-warning-subtle nx:text-warning-subtle-foreground',
     },
     presentation: {
       card: 'nx:rounded-md nx:border-default',

@@ -5,25 +5,18 @@ selectors and contrast pairings; it does not broaden readability guarantees.
 
 ## Rename map
 
-| Before                          | After                   |
-| ------------------------------- | ----------------------- |
-| `primary-subtle-foreground`     | `primary-text`          |
-| `secondary-subtle-foreground`   | `secondary-text`        |
-| `error-subtle-foreground`       | `error-text`            |
-| `information-subtle-foreground` | `information-text`      |
-| `success-subtle-foreground`     | `success-text`          |
-| `warning-subtle-foreground`     | `warning-text`          |
-| `border-active`                 | `border-focus`          |
-| `border-error`                  | `error-border`          |
-| `border-information`            | `information-border`    |
-| `border-success`                | `success-border`        |
-| `border-warning`                | `warning-border`        |
-| `border-primary`                | `primary-border`        |
-| `border-primary-active`         | `primary-border-active` |
+| Before                  | After                   |
+| ----------------------- | ----------------------- |
+| `border-active`         | `border-focus`          |
+| `border-error`          | `error-border`          |
+| `border-information`    | `information-border`    |
+| `border-success`        | `success-border`        |
+| `border-warning`        | `warning-border`        |
+| `border-primary`        | `primary-border`        |
+| `border-primary-active` | `primary-border-active` |
 
 Apply this map to `--nx-color-*` runtime variables, `--color-*` theme aliases,
-and utilities. For example, `nx:text-primary-subtle-foreground` becomes
-`nx:text-primary-text`; `nx:border-border-error` becomes `nx:border-error-border`;
+and utilities. For example, `nx:border-border-error` becomes `nx:border-error-border`;
 `nx:ring-border-primary` becomes `nx:ring-primary-border`. Keep modifiers:
 `nx:focus-within:border-border-active` becomes
 `nx:focus-within:border-border-focus`.
@@ -36,19 +29,25 @@ The status active borders (`border-error-active`, `border-information-active`,
 release. Verify class-merging configuration in copied consumer libraries as well
 as application classes and raw CSS/SVG variables.
 
-The six `*-foreground` roles remain content colors for filled backgrounds.
-`*-text` also serves matching icons. `foreground` and `muted-foreground` keep
-their general hierarchy meaning. Existing APCA pairings are unchanged; the new
-names are not a universal promise of contrast on every background.
+Content-color names are unchanged in this migration. The six
+`primary-subtle-foreground`, `secondary-subtle-foreground`,
+`error-subtle-foreground`, `information-subtle-foreground`,
+`success-subtle-foreground`, and `warning-subtle-foreground` tokens retain their
+names and values. Their filled-background `*-foreground` counterparts also stay
+unchanged. This release introduces no `*-text` names.
+
+Existing APCA pairings are unchanged; the border renames do not broaden contrast
+guarantees.
 
 ## `border-focus` is not the focus ring
 
 `border-focus` and `focus-default` are different colors for different jobs:
 
-| Token           | Color                        | Use                                                               |
-| --------------- | ---------------------------- | ----------------------------------------------------------------- |
-| `border-focus`  | Neutral grey                 | A container's border while focus is inside it (`focus-within:`)   |
-| `focus-default` | Brand, shares `primary-text` | The ring on the focused control itself (`focus-visible:` outline) |
+| Token          | Color        | Use                                                             |
+| -------------- | ------------ | --------------------------------------------------------------- |
+| `border-focus` | Neutral grey | A container's border while focus is inside it (`focus-within:`) |
+
+| `focus-default` | Brand, shares `primary-subtle-foreground` | The ring on the focused control itself (`focus-visible:` outline) |
 
 A focused control always uses `focus-default`. Use `border-focus` only on the
 wrapper around it, such as a search row or a date-picker frame.

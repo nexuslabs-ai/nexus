@@ -65,8 +65,8 @@ function ContrastBadge({
     <span
       className={`nx:rounded-sm nx:px-1.5 nx:py-0.5 nx:typography-label-small nx:font-mono ${
         passes
-          ? 'nx:bg-success-subtle nx:text-success-text'
-          : 'nx:bg-error-subtle nx:text-error-text'
+          ? 'nx:bg-success-subtle nx:text-success-subtle-foreground'
+          : 'nx:bg-error-subtle nx:text-error-subtle-foreground'
       }`}
     >
       {label}

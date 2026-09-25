@@ -341,7 +341,7 @@ export const WarningVsError: Story = {
         />
         <p
           id="input-warning-message"
-          className="nx:typography-body-small nx:text-warning-text"
+          className="nx:typography-body-small nx:text-warning-subtle-foreground"
         >
           Near the monthly limit. You can continue.
         </p>
@@ -366,7 +366,7 @@ export const WarningVsError: Story = {
         <p
           id="input-error-message"
           role="alert"
-          className="nx:typography-body-small nx:text-error-text"
+          className="nx:typography-body-small nx:text-error-subtle-foreground"
         >
           Budget cannot exceed 100.
         </p>

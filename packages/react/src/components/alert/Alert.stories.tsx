@@ -730,7 +730,7 @@ export const DescriptionLinkAction: Story = {
       <AlertDescription>
         Reconnect the integration from{' '}
         <a
-          className="nx:font-medium nx:text-primary-text nx:underline-offset-4 nx:hover:underline"
+          className="nx:font-medium nx:text-primary-subtle-foreground nx:underline-offset-4 nx:hover:underline"
           href="/settings"
         >
           workspace settings
@@ -863,7 +863,7 @@ export const HelperBanner: Story = {
         <AlertDescription>
           Scheduled maintenance begins at 9 PM.{' '}
           <a
-            className="nx:font-medium nx:text-primary-text nx:underline-offset-4 nx:hover:underline"
+            className="nx:font-medium nx:text-primary-subtle-foreground nx:underline-offset-4 nx:hover:underline"
             href="/status"
           >
             View status

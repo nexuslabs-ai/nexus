@@ -204,7 +204,7 @@ function EmptyStateDescription({
     <p
       data-slot="empty-state-description"
       className={cn(
-        'nx:typography-body-default nx:text-muted-foreground nx:[&>a]:underline nx:[&>a]:underline-offset-4 nx:[&>a:hover]:text-primary-text',
+        'nx:typography-body-default nx:text-muted-foreground nx:[&>a]:underline nx:[&>a]:underline-offset-4 nx:[&>a:hover]:text-primary-subtle-foreground',
         className
       )}
       {...props}

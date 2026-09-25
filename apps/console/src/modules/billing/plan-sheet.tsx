@@ -136,7 +136,7 @@ export function PlanSheet({
                           key={feature}
                           className="nx:flex nx:items-center nx:gap-2"
                         >
-                          <IconCheck className="nx:text-success-text nx:size-4 nx:shrink-0" />
+                          <IconCheck className="nx:text-success-subtle-foreground nx:size-4 nx:shrink-0" />
                           {feature}
                         </li>
                       ))}

@@ -41,7 +41,7 @@ const bubbleVariants = cva(
         muted: 'nx:bg-muted nx:text-foreground',
         outline: 'nx:border-border-default nx:text-foreground',
         ghost: 'nx:text-foreground',
-        destructive: 'nx:bg-error-subtle nx:text-error-text',
+        destructive: 'nx:bg-error-subtle nx:text-error-subtle-foreground',
       },
       align: {
         start: 'nx:me-auto',

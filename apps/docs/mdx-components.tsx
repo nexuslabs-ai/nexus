@@ -84,7 +84,7 @@ export function useMDXComponents(components: MDXComponents): MDXComponents {
     a: ({ children, className, ...props }) => (
       <a
         className={cn(
-          'nx:text-primary-text nx:underline nx:underline-offset-2',
+          'nx:text-primary-subtle-foreground nx:underline nx:underline-offset-2',
           className
         )}
         {...props}

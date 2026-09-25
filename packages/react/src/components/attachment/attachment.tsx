@@ -192,7 +192,7 @@ function AttachmentMedia({ className, ...props }: AttachmentMediaProps) {
         // media atom beside a description, not a full-width thumbnail.
         'nx:group-data-[orientation=vertical]/attachment:size-auto nx:group-data-[orientation=vertical]/attachment:aspect-square nx:group-data-[orientation=vertical]/attachment:w-full nx:group-data-[orientation=vertical]/attachment:translate-y-0 nx:group-data-[orientation=vertical]/attachment:self-auto',
         'nx:group-data-[orientation=vertical]/attachment:[&_svg]:size-8',
-        'nx:group-data-[state=error]/attachment:border-error-border nx:group-data-[state=error]/attachment:bg-error-subtle nx:group-data-[state=error]/attachment:text-error-text',
+        'nx:group-data-[state=error]/attachment:border-error-border nx:group-data-[state=error]/attachment:bg-error-subtle nx:group-data-[state=error]/attachment:text-error-subtle-foreground',
         className
       )}
       {...props}
@@ -281,7 +281,7 @@ function AttachmentDescription({
     <ItemDescription
       data-slot="attachment-description"
       className={cn(
-        'nx:group-data-[state=error]/attachment:text-error-text',
+        'nx:group-data-[state=error]/attachment:text-error-subtle-foreground',
         className
       )}
       {...props}

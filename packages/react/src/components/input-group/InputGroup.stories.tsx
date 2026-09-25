@@ -477,7 +477,7 @@ export const StateMatrix: Story = {
           <InputGroupAddon align="block-end">
             <InputGroupText
               id="state-warning-message"
-              className="nx:text-warning-text"
+              className="nx:text-warning-subtle-foreground"
             >
               External domain. You can continue after review.
             </InputGroupText>
@@ -499,7 +499,7 @@ export const StateMatrix: Story = {
             <InputGroupText
               id="state-error-message"
               role="alert"
-              className="nx:text-error-text"
+              className="nx:text-error-subtle-foreground"
             >
               Enter a complete email address.
             </InputGroupText>

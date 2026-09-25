@@ -285,7 +285,7 @@ export function UsageMeterBar({ meter }: { meter: UsageMeter }) {
           {meter.label}
         </span>
         <span
-          className={`nx:typography-label-small nx:tabular-nums ${nearCap ? 'nx:text-warning-text' : 'nx:text-muted-foreground'}`}
+          className={`nx:typography-label-small nx:tabular-nums ${nearCap ? 'nx:text-warning-subtle-foreground' : 'nx:text-muted-foreground'}`}
         >
           {meter.used} / {meter.limit} {meter.unit}
         </span>

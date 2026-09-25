@@ -243,7 +243,7 @@ function MessageBubble({ message }: { message: Message }) {
           </span>
         </div>
         <div
-          className={`nx:mt-1 nx:rounded-lg nx:px-3 nx:py-2 nx:typography-body-default nx:whitespace-pre-wrap ${isAgent ? 'nx:bg-primary-subtle nx:text-primary-text' : 'nx:bg-muted nx:text-foreground'}`}
+          className={`nx:mt-1 nx:rounded-lg nx:px-3 nx:py-2 nx:typography-body-default nx:whitespace-pre-wrap ${isAgent ? 'nx:bg-primary-subtle nx:text-primary-subtle-foreground' : 'nx:bg-muted nx:text-foreground'}`}
         >
           {message.body}
         </div>
