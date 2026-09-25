@@ -18,7 +18,7 @@ const COPY_STATUS = {
 
 type CopyStatus = keyof typeof COPY_STATUS;
 
-// Every docs code block — MDX fence and hand-written `CodeSample` alike —
+// Every docs code block — MDX fence and `CodeSample` alike —
 // renders through here, so this is the one code-block surface. `bg-container`
 // is the surface the syntax colours are APCA-gated against; `pe-14` keeps the
 // copy control clear of the code; the `code` resets undo the inline-code
