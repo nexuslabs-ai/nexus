@@ -1,4 +1,6 @@
-import { Badge } from '@nexus_ds/react';
+'use client';
+
+import { Badge } from '@/components/badge/badge';
 
 export default function BadgeVariants() {
   return (

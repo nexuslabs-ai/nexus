@@ -232,6 +232,26 @@ export default tseslint.config(
     ...nexusComponentConfig(),
   },
 
+  // Docs demos are the Code a reader pastes, so they import the copied files
+  // under `@/`, never the package.
+  {
+    files: ['apps/docs/examples/**/*.tsx'],
+    rules: {
+      'no-restricted-imports': [
+        'error',
+        {
+          patterns: [
+            {
+              group: ['@nexus_ds/react', '@nexus_ds/react/*'],
+              message:
+                'Import the copied file under `@/` (e.g. `@/components/button/button`) — the install block lists it, @nexus_ds/react is not in a pasting app.',
+            },
+          ],
+        },
+      ],
+    },
+  },
+
   // Tests and stories assert known fixture invariants (queried elements, seeded
   // array indices), so non-null assertions are idiomatic there. Keep the rule
   // on production source only.

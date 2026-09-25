@@ -3,4 +3,4 @@
 
 export { Component } from "./button-core-variants.client";
 
-export const source = "import { Button } from '@nexus_ds/react';\n\nexport default function ButtonCoreVariants() {\n  return (\n    <div className=\"nx:flex nx:flex-wrap nx:gap-3\">\n      <Button>Primary</Button>\n      <Button variant=\"secondary\">Secondary</Button>\n      <Button variant=\"outline\">Outline</Button>\n      <Button variant=\"ghost\">Ghost</Button>\n    </div>\n  );\n}\n";
+export const source = "'use client';\n\nimport { Button } from '@/components/button/button';\n\nexport default function ButtonCoreVariants() {\n  return (\n    <div className=\"nx:flex nx:flex-wrap nx:gap-3\">\n      <Button>Primary</Button>\n      <Button variant=\"secondary\">Secondary</Button>\n      <Button variant=\"outline\">Outline</Button>\n      <Button variant=\"ghost\">Ghost</Button>\n    </div>\n  );\n}\n";

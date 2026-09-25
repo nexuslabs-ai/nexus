@@ -3,4 +3,4 @@
 
 export { Component } from "./demo.client";
 
-export const source = "import { Badge } from '@nexus_ds/react';\n\nexport default function BadgeDemo() {\n  return <Badge>Badge</Badge>;\n}\n";
+export const source = "'use client';\n\nimport { Badge } from '@/components/badge/badge';\n\nexport default function BadgeDemo() {\n  return <Badge>Badge</Badge>;\n}\n";
