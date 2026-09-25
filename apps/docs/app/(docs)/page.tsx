@@ -97,7 +97,7 @@ export default function Home() {
             href={a.href}
             className="nx:no-underline nx:text-inherit"
           >
-            <Card className="nx:h-full nx:hover:border-border-primary nx:transition-colors">
+            <Card className="nx:h-full nx:hover:border-primary-border nx:transition-colors">
               <CardHeader>
                 <CardTitle className="nx:typography-heading-xsmall">
                   {a.title}
@@ -120,7 +120,7 @@ export default function Home() {
             href={s.href}
             className="nx:no-underline nx:text-inherit"
           >
-            <Card className="nx:h-full nx:hover:border-border-primary nx:transition-colors">
+            <Card className="nx:h-full nx:hover:border-primary-border nx:transition-colors">
               <CardHeader>
                 <div className="nx:font-mono nx:text-[10px] nx:uppercase nx:tracking-wider nx:text-muted-foreground-subtle nx:mb-1">
                   {s.count}

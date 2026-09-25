@@ -11,7 +11,7 @@ const switchVariants = cva(
     'nx:rounded-full nx:border-thick nx:border-border-default',
     'nx:transition-control',
     'nx:focus-visible:outline-2 nx:focus-visible:outline-focus-default',
-    'nx:aria-invalid:border-border-error nx:aria-invalid:focus-visible:outline-focus-error',
+    'nx:aria-invalid:border-error-border nx:aria-invalid:focus-visible:outline-focus-error',
     'nx:aria-invalid:data-[state=checked]:border-primary-background',
     'nx:disabled:cursor-not-allowed nx:disabled:border-border-disabled',
     'nx:data-[state=checked]:border-primary-background nx:data-[state=checked]:bg-primary-background nx:enabled:data-[state=checked]:hover:bg-primary-background-hover nx:data-[state=checked]:disabled:border-primary-disabled nx:data-[state=checked]:disabled:bg-primary-disabled',

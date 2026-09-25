@@ -24,7 +24,7 @@ import {
   tokenReferences,
 } from '../token-source/tokens';
 import {
-  BORDER_COLOR_ALIAS_NAMES,
+  borderColorAliasName,
   borderWidthAliasUtilities,
   durationUtility,
 } from '../token-source/utilities';
@@ -59,7 +59,6 @@ const Z_INDEX_FILE: TokenFile = 'semantic/z-index.json';
 const BREAKPOINTS_FILE: TokenFile = 'semantic/breakpoints.json';
 const TYPOGRAPHY_STYLES_FILE: TokenFile = 'styles/typography.json';
 const SHADOW_STYLES_FILE: TokenFile = 'styles/shadows.json';
-const BORDER_COLOR_ALIASES = new Set<string>(BORDER_COLOR_ALIAS_NAMES);
 const SINGLE_SOURCE = { mode: null, preset: null } as const;
 
 /** A `PrimitiveLookup` that also carries each target's canonical name. */
@@ -373,10 +372,8 @@ function runtimeAppearance(mode: Mode): NexusAppearanceState {
 
 function runtimeColorAliases(name: string): CatalogueAlias[] {
   const aliases = [cssVariable(`--color-${name}`)];
-  const borderName = name.startsWith('border-')
-    ? name.slice('border-'.length)
-    : null;
-  if (borderName !== null && BORDER_COLOR_ALIASES.has(borderName)) {
+  const borderName = borderColorAliasName(name);
+  if (borderName !== null) {
     aliases.push(utility(`border-color-${borderName}`));
   }
   return aliases;

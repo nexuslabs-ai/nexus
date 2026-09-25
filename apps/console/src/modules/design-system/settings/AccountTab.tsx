@@ -80,7 +80,7 @@ export function AccountTab() {
         </CardContent>
       </Card>
 
-      <Card className="nx:border-border-error">
+      <Card className="nx:border-error-border">
         <CardHeader>
           <CardTitle>Danger zone</CardTitle>
           <CardDescription>

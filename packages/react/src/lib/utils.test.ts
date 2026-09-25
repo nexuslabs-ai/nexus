@@ -115,6 +115,34 @@ function emittedThemeTokens(cssKey: string) {
 }
 
 describe('cn', () => {
+  it.each(['primary', 'error', 'information', 'success', 'warning'])(
+    'keeps border widths while merging renamed %s colors and aliases',
+    (family) => {
+      const named = `nx:border-${family}-border`;
+      const alias = `nx:border-color-${family}`;
+      expect(cn('nx:border-thick', named, alias)).toBe(
+        `nx:border-thick ${alias}`
+      );
+      expect(cn('nx:border-thick', alias, named)).toBe(
+        `nx:border-thick ${named}`
+      );
+    }
+  );
+
+  it('merges focused border colors without removing their width or another state', () => {
+    expect(
+      cn(
+        'nx:border-default nx:border-error-border',
+        'nx:focus-within:border-border-focus'
+      )
+    ).toBe(
+      'nx:border-default nx:border-error-border nx:focus-within:border-border-focus'
+    );
+    expect(
+      cn('nx:border-thick nx:border-border-focus', 'nx:border-color-focus')
+    ).toBe('nx:border-thick nx:border-color-focus');
+  });
+
   it.each([
     ['radius base', 'nx:rounded-base', 'nx:rounded-md'],
     ['ease enter', 'nx:ease-enter', 'nx:ease-linear'],

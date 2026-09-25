@@ -42,8 +42,8 @@ function mockSystemPrefersDark(matches: boolean): void {
 }
 
 describe('NexusAppearanceSnapshot', () => {
-  it('uses snapshot version 6 for contrast-solved themes', () => {
-    expect(SNAPSHOT_VERSION).toBe(6);
+  it('invalidates cached CSS for the renamed public tokens', () => {
+    expect(SNAPSHOT_VERSION).toBe(7);
   });
 
   it('stores pre-derived CSS verbatim', () => {
@@ -97,7 +97,7 @@ describe('NexusAppearanceSnapshot', () => {
     expect(snapshot.state).toEqual(state);
   });
 
-  it.each([1, 5])(
+  it.each([1, 5, 6])(
     'refreshes a v%s snapshot without resetting the stored state',
     (version) => {
       const state = {
@@ -109,13 +109,14 @@ describe('NexusAppearanceSnapshot', () => {
       const snapshot = sanitizeNexusAppearanceSnapshot({
         version,
         state,
-        themeCss: ':root { --nx-color-background: stale; }',
+        themeCss: ':root { --nx-color-border-active: stale; }',
         prefsCss: ':root { --stale-prefs: stale; }',
       });
 
       expect(snapshot.version).toBe(SNAPSHOT_VERSION);
       expect(snapshot.state).toEqual(state);
       expect(snapshot.themeCss).toBe(themeCss(state));
+      expect(snapshot.themeCss).not.toContain('--nx-color-border-active:');
       expect(snapshot.themeCss).toContain('--nx-color-focus-default:');
       expect(snapshot.themeCss).toContain('--nx-color-focus-error:');
       expect(snapshot.prefsCss).toBe(prefsCss(state));
@@ -157,7 +158,7 @@ describe('NexusAppearanceSnapshot', () => {
     const decoded = JSON.parse(decodeURIComponent(raw));
 
     expect(decoded).toEqual({
-      version: SNAPSHOT_VERSION,
+      version: 6,
       state,
     });
     expect(decoded.themeCss).toBeUndefined();
@@ -204,7 +205,7 @@ describe('NexusAppearanceSnapshot', () => {
       parseNexusAppearanceStateCookie(
         encodeURIComponent(
           JSON.stringify({
-            version: SNAPSHOT_VERSION - 1,
+            version: 4,
             state: { ...DEFAULT_NEXUS_APPEARANCE, mode: 'dark' },
           })
         )
@@ -311,6 +312,59 @@ describe('createNexusAppearanceBootstrapScript', () => {
     expect(
       document.querySelector('style[data-nexus-appearance-prefs]')?.textContent
     ).toBe(':root { --test-prefs: dark; }');
+  });
+
+  it('uses fresh cookie-derived CSS before hydration when storage contains v6 CSS', () => {
+    const state = {
+      ...DEFAULT_NEXUS_APPEARANCE,
+      mode: 'system' as const,
+      brandColor: '#6366f1',
+      density: 'compact' as const,
+    };
+    const oldCookie = encodeURIComponent(JSON.stringify({ version: 6, state }));
+    const serverSnapshot = createNexusAppearanceSnapshotFromCookie(oldCookie);
+    window.localStorage.setItem(
+      'nexus-appearance',
+      JSON.stringify({
+        version: 6,
+        state,
+        themeCss: ':root { --nx-color-border-active: red; }',
+        prefsCss: 'STALE',
+      })
+    );
+    mockSystemPrefersDark(true);
+
+    new Function(
+      createNexusAppearanceBootstrapScript({ defaultSnapshot: serverSnapshot })
+    )();
+
+    expect(serverSnapshot.state).toEqual(state);
+    expect(document.documentElement.classList.contains('dark')).toBe(true);
+    expect(document.documentElement.getAttribute('data-density')).toBe(
+      'compact'
+    );
+    const rendered = document.querySelector(
+      'style[data-nexus-appearance-theme]'
+    )?.textContent;
+    expect(rendered).toBe(serverSnapshot.themeCss);
+    expect(rendered).toContain('--nx-color-border-focus:');
+    expect(rendered).not.toContain('--nx-color-border-active:');
+  });
+
+  it('paints the default first paint when storage holds only obsolete v6 CSS', () => {
+    const state = {
+      ...DEFAULT_NEXUS_APPEARANCE,
+      mode: 'dark' as const,
+      brandColor: '#6366f1',
+    };
+    const stale = { version: 6, state, themeCss: 'STALE', prefsCss: 'STALE' };
+    window.localStorage.setItem('nexus-appearance', JSON.stringify(stale));
+    new Function(createNexusAppearanceBootstrapScript())();
+
+    expect(document.documentElement.classList.contains('dark')).toBe(false);
+    expect(
+      document.querySelector('style[data-nexus-appearance-theme]')?.textContent
+    ).toBe(themeCss());
   });
 
   it('falls back to the embedded default snapshot on empty storage', () => {

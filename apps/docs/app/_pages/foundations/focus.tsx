@@ -169,7 +169,7 @@ nx:disabled:border-border-disabled`}
           />
         </div>
         <CodeSample lang="tsx">
-          {`nx:aria-invalid:border-border-error
+          {`nx:aria-invalid:border-error-border
 nx:aria-invalid:focus-visible:outline-focus-error
 nx:aria-invalid:focus-visible:border-focus-error`}
         </CodeSample>
@@ -184,12 +184,31 @@ nx:aria-invalid:focus-visible:border-focus-error`}
           Primary, secondary, outline, ghost, destructive — they all focus in{' '}
           <code>focus-default</code>. Focus is a system signal (&ldquo;you are
           here&rdquo;), not a per-variant or status signal, so there is no
-          per-variant focus colour. <code>focus-default</code> resolves to the
-          active brand&rsquo;s <code>primary.subtle-foreground</code>, which is
-          why the ring re-tints with the theme picker and component code never
-          needs a brand-specific focus class. Only the error state differs, and
-          it has its own token: <code>focus-error</code>.
+          per-variant focus colour. <code>focus-default</code> shares the solved
+          <code>primary-subtle-foreground</code> colour, with focus surfaces
+          included in its contrast checks. That is why the ring re-tints with
+          the theme picker and component code never needs a brand-specific focus
+          class. Only the error state differs, and it has its own token:{' '}
+          <code>focus-error</code>.
         </p>
+      </section>
+
+      {/* ── Container focus ─────────────────────────────────── */}
+      <section className="nx:mb-12">
+        <SectionHeading className="nx:typography-heading-small nx:mb-1">
+          Container focus is a separate, neutral token
+        </SectionHeading>
+        <p className="nx:typography-body-default nx:text-muted-foreground nx:mb-4 nx:max-w-[64ch]">
+          <code>border-focus</code> is not a ring colour. It is the neutral grey
+          border a container takes while focus is somewhere inside it — the
+          Command search row and the DatePicker frame. It does not follow the
+          brand. A focused control always uses <code>focus-default</code>; reach
+          for <code>border-focus</code> only on the wrapper around it.
+        </p>
+        <CodeSample lang="tsx">
+          {`nx:focus-within:border-border-focus   /* container: neutral */
+nx:focus-visible:outline-focus-default /* control: brand */`}
+        </CodeSample>
       </section>
 
       {/* ── Where the ring does not go ──────────────────────── */}

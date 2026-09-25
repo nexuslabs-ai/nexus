@@ -44,7 +44,7 @@ const attachmentVariants = cva(
     // so the card must be their stacking context rather than the page.
     'nx:group/attachment nx:relative nx:isolate nx:min-w-0',
     'nx:data-[state=idle]:border-dashed',
-    'nx:data-[state=error]:border-border-error',
+    'nx:data-[state=error]:border-error-border',
   ],
   {
     variants: {
@@ -192,7 +192,7 @@ function AttachmentMedia({ className, ...props }: AttachmentMediaProps) {
         // media atom beside a description, not a full-width thumbnail.
         'nx:group-data-[orientation=vertical]/attachment:size-auto nx:group-data-[orientation=vertical]/attachment:aspect-square nx:group-data-[orientation=vertical]/attachment:w-full nx:group-data-[orientation=vertical]/attachment:translate-y-0 nx:group-data-[orientation=vertical]/attachment:self-auto',
         'nx:group-data-[orientation=vertical]/attachment:[&_svg]:size-8',
-        'nx:group-data-[state=error]/attachment:border-border-error nx:group-data-[state=error]/attachment:bg-error-subtle nx:group-data-[state=error]/attachment:text-error-subtle-foreground',
+        'nx:group-data-[state=error]/attachment:border-error-border nx:group-data-[state=error]/attachment:bg-error-subtle nx:group-data-[state=error]/attachment:text-error-subtle-foreground',
         className
       )}
       {...props}

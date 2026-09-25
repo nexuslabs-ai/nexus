@@ -111,7 +111,7 @@ export function PlanSheet({
                 <Label
                   key={plan.id}
                   htmlFor={`tier-${plan.id}`}
-                  className={`nx:flex nx:cursor-pointer nx:gap-3 nx:rounded-lg nx:border-default nx:p-4 ${selected ? 'nx:border-border-primary nx:bg-primary-subtle' : 'nx:border-border-default'}`}
+                  className={`nx:flex nx:cursor-pointer nx:gap-3 nx:rounded-lg nx:border-default nx:p-4 ${selected ? 'nx:border-primary-border nx:bg-primary-subtle' : 'nx:border-border-default'}`}
                 >
                   <RadioGroupItem
                     value={plan.id}
