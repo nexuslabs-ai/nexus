@@ -40,18 +40,18 @@ export interface Demo {
 
 const INDEX_FOOTER = `export type DemoId = keyof typeof demos;
 
-const byId = new Map<string, Demo>(Object.entries(demos));
+export function isDemoId(id: string): id is DemoId {
+  return Object.hasOwn(demos, id);
+}
 
 export function getDemo(id: string): Demo {
-  const demo = byId.get(id);
-
-  if (!demo) {
+  if (!isDemoId(id)) {
     throw new Error(
       \`Unknown demo id: \${id}. Add apps/docs/examples/\${id}.tsx, or fix the id.\`
     );
   }
 
-  return demo;
+  return demos[id];
 }
 `;
 
