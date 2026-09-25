@@ -4,7 +4,7 @@ import type { Meta, StoryObj } from '@storybook/react';
 import { expect, userEvent, within } from 'storybook/test';
 
 import { Badge } from '../badge';
-import { InlineEdit } from '../inline-edit';
+import { InlineEdit, type InlineEditProps } from '../inline-edit';
 
 import {
   DescriptionList,
@@ -30,7 +30,7 @@ type Story = StoryObj<typeof DescriptionList>;
 
 function ProfileDetails() {
   return (
-    <DescriptionList aria-label="Profile details">
+    <DescriptionList>
       <DescriptionListItem>
         <DescriptionListTerm>Name</DescriptionListTerm>
         <DescriptionListDescription>Priya Shah</DescriptionListDescription>
@@ -182,11 +182,11 @@ export const LongContent: Story = {
 };
 
 function ActionExample({
-  variant = 'pencil',
+  activation = 'pencil',
   initialValue = 'Priya Shah',
   readOnly = false,
 }: {
-  variant?: 'click' | 'pencil';
+  activation?: InlineEditProps['activation'];
   initialValue?: string;
   readOnly?: boolean;
 }) {
@@ -196,14 +196,17 @@ function ActionExample({
       <DescriptionListItem>
         <DescriptionListTerm>Name</DescriptionListTerm>
         <DescriptionListDescription>
-          <InlineEdit
-            label="name"
-            value={name}
-            onValueChange={setName}
-            variant={variant}
-            readOnly={readOnly}
-            placeholder="Enter a name"
-          />
+          {readOnly ? (
+            <InlineEdit readOnly label="Name" value={name} />
+          ) : (
+            <InlineEdit
+              label="Name"
+              value={name}
+              onCommit={setName}
+              activation={activation}
+              placeholder="Enter a name"
+            />
+          )}
         </DescriptionListDescription>
       </DescriptionListItem>
     </DescriptionList>
@@ -211,10 +214,10 @@ function ActionExample({
 }
 
 export const ClickToEdit: Story = {
-  render: () => <ActionExample variant="click" />,
+  render: () => <ActionExample activation="click" />,
 };
 export const ClickToEditEmpty: Story = {
-  render: () => <ActionExample variant="click" initialValue="" />,
+  render: () => <ActionExample activation="click" initialValue="" />,
 };
 export const PencilToEditEmpty: Story = {
   render: () => <ActionExample initialValue="" />,
@@ -230,10 +233,10 @@ export const ConsumerAction: Story = {
     const canvas = within(canvasElement);
     await userEvent.tab();
     await expect(
-      canvas.getByRole('button', { name: 'Edit name' })
+      canvas.getByRole('button', { name: 'Edit Name' })
     ).toHaveFocus();
     await userEvent.keyboard('{Enter}');
-    const input = canvas.getByRole('textbox', { name: 'name' });
+    const input = canvas.getByRole('textbox', { name: 'Name' });
     await expect(input).toHaveFocus();
     await userEvent.clear(input);
     await userEvent.type(input, 'Priya Sharma{Enter}');
@@ -241,30 +244,30 @@ export const ConsumerAction: Story = {
       canvas.getByText('Priya Sharma', { exact: true })
     ).toHaveTextContent('Priya Sharma');
     await expect(
-      canvas.getByRole('button', { name: 'Edit name' })
+      canvas.getByRole('button', { name: 'Edit Name' })
     ).toHaveFocus();
     await userEvent.keyboard('{Enter}');
-    await userEvent.clear(canvas.getByRole('textbox', { name: 'name' }));
+    await userEvent.clear(canvas.getByRole('textbox', { name: 'Name' }));
     await userEvent.keyboard('{Escape}');
     await expect(
       canvas.getByText('Priya Sharma', { exact: true })
     ).toHaveTextContent('Priya Sharma');
     await expect(
-      canvas.getByRole('button', { name: 'Edit name' })
+      canvas.getByRole('button', { name: 'Edit Name' })
     ).toHaveFocus();
-    await userEvent.click(canvas.getByRole('button', { name: 'Edit name' }));
-    await userEvent.clear(canvas.getByRole('textbox', { name: 'name' }));
+    await userEvent.click(canvas.getByRole('button', { name: 'Edit Name' }));
+    await userEvent.clear(canvas.getByRole('textbox', { name: 'Name' }));
     await userEvent.type(
-      canvas.getByRole('textbox', { name: 'name' }),
+      canvas.getByRole('textbox', { name: 'Name' }),
       'Priya Shah'
     );
-    await userEvent.click(canvas.getByRole('button', { name: 'Save name' }));
+    await userEvent.click(canvas.getByRole('button', { name: 'Save Name' }));
     await expect(
       canvas.getByText('Priya Shah', { exact: true })
     ).toHaveTextContent('Priya Shah');
-    await userEvent.click(canvas.getByRole('button', { name: 'Edit name' }));
+    await userEvent.click(canvas.getByRole('button', { name: 'Edit Name' }));
     await userEvent.click(
-      canvas.getByRole('button', { name: 'Cancel editing name' })
+      canvas.getByRole('button', { name: 'Cancel editing Name' })
     );
     await expect(canvas.queryByRole('textbox')).not.toBeInTheDocument();
   },
@@ -293,8 +296,8 @@ export const AllVariants: Story = {
       <ActionExample />
       <ActionExample initialValue="" />
       <h3 className="nx:typography-heading-small">Click to edit</h3>
-      <ActionExample variant="click" />
-      <ActionExample variant="click" initialValue="" />
+      <ActionExample activation="click" />
+      <ActionExample activation="click" initialValue="" />
       <h3 className="nx:typography-heading-small">Read only</h3>
       <ActionExample readOnly />
       <ActionExample readOnly initialValue="" />
@@ -314,7 +317,7 @@ export const AllVariants: Story = {
       '[data-slot="description-list-item"]'
     )) {
       const term = item.querySelector('dt')!;
-      const value = item.querySelector('[data-slot="inline-edit"] span')!;
+      const value = item.querySelector('[data-slot="inline-edit-value"]')!;
       const termRange = document.createRange();
       termRange.selectNodeContents(term);
       const valueRange = document.createRange();
