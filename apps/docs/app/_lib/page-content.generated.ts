@@ -31,6 +31,7 @@ export const PAGE_LOADERS: Record<string, ManifestPageLoader> = {
   '/foundations/layering': () => import('../_pages/foundations/layering'),
   '/foundations/responsive': () => import('../_pages/foundations/responsive'),
   '/components/button': () => import('../../content/components/button.mdx'),
+  '/components/select': () => import('../../content/components/select.mdx'),
   '/theming/appearance': () => import('../../content/theming/appearance.mdx'),
   '/theming/multi-brand': () => import('../_pages/theming/multi-brand'),
   '/theming/radius-overrides': () =>
