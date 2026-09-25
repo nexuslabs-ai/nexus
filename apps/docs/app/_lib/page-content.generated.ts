@@ -30,6 +30,7 @@ export const PAGE_LOADERS: Record<string, ManifestPageLoader> = {
   '/foundations/focus': () => import('../_pages/foundations/focus'),
   '/foundations/layering': () => import('../_pages/foundations/layering'),
   '/foundations/responsive': () => import('../_pages/foundations/responsive'),
+  '/components/button': () => import('../../content/components/button.mdx'),
   '/theming/appearance': () => import('../../content/theming/appearance.mdx'),
   '/theming/multi-brand': () => import('../_pages/theming/multi-brand'),
 };
@@ -95,7 +96,7 @@ export const PAGE_WIREFRAMES: Record<string, PageWireframe> = {
       { type: 'h2', text: '[ Per-component pages ]' },
       {
         type: 'placeholder',
-        label: '[ Index — Button · Input · Select · Switch · Tabs ]',
+        label: '[ Index — Input · Select · Switch · Tabs ]',
       },
       {
         type: 'placeholder',

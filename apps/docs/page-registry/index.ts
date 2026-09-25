@@ -7,21 +7,33 @@
 
 import type { Block } from './blocks';
 
-export type RegistryPage = {
+export type GuidePage = {
   slug: string;
   label: string;
   /** Optional in-page headings rendered inline in the left rail (non-interactive). */
   nested?: string[];
   /** Components a group page covers, rendered inline in the left rail (non-interactive). */
   components?: string[];
-  /**
-   * A component page's demo names under `examples/{slug}/`, shown first and in
-   * this order; unlisted demos follow in name order.
-   */
-  examples?: string[];
   /** Placeholder body, carried only while the page has no source file. */
   wireframe?: { lede: string; blocks: Block[] };
+  examples?: never;
 };
+
+/** A `components/` page written as `<ComponentPage slug="{slug}" />`. */
+export type ComponentPageEntry = {
+  slug: string;
+  label: string;
+  /**
+   * Demo names under `examples/{slug}/`, shown first and in this order;
+   * unlisted demos follow in name order.
+   */
+  examples: string[];
+  nested?: never;
+  components?: never;
+  wireframe?: never;
+};
+
+export type RegistryPage = GuidePage | ComponentPageEntry;
 
 export type RegistrySection = {
   slug: string;
@@ -154,7 +166,7 @@ export const PAGE_REGISTRY = {
       {
         slug: 'inputs',
         label: 'Inputs',
-        components: ['Button', 'Input', 'Select', 'Switch', 'Tabs'],
+        components: ['Input', 'Select', 'Switch', 'Tabs'],
         wireframe: {
           lede: '[ Interactive controls · per-component Storybook page below ]',
           blocks: [
@@ -171,7 +183,7 @@ export const PAGE_REGISTRY = {
             { type: 'h2', text: '[ Per-component pages ]' },
             {
               type: 'placeholder',
-              label: '[ Index — Button · Input · Select · Switch · Tabs ]',
+              label: '[ Index — Input · Select · Switch · Tabs ]',
             },
             {
               type: 'placeholder',
@@ -245,6 +257,11 @@ export const PAGE_REGISTRY = {
             { type: 'placeholder', label: '[ API table ]' },
           ],
         },
+      },
+      {
+        slug: 'button',
+        label: 'Button',
+        examples: ['variants', 'sizes', 'with-icon', 'disabled'],
       },
     ],
   },

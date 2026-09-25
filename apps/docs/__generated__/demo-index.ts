@@ -23,9 +23,21 @@ export const demos = {
     id: "button/demo",
     load: () => import("./demos/button/demo"),
   },
+  "button/disabled": {
+    id: "button/disabled",
+    load: () => import("./demos/button/disabled"),
+  },
+  "button/sizes": {
+    id: "button/sizes",
+    load: () => import("./demos/button/sizes"),
+  },
   "button/variants": {
     id: "button/variants",
     load: () => import("./demos/button/variants"),
+  },
+  "button/with-icon": {
+    id: "button/with-icon",
+    load: () => import("./demos/button/with-icon"),
   },
   "getting-started/button-core-variants": {
     id: "getting-started/button-core-variants",
