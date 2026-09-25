@@ -21,7 +21,7 @@ const IMPORT_PATTERNS = [
   /^\s*(?:import|export)\s+(?:[^'";()]*?\s+from\s+)?['"]([^'"]+)['"]/gm,
   /\bimport\(\s*['"]([^'"]+)['"]/g,
 ];
-const COMPONENT_IMPORT = /^@\/components\/([^/]+)\//;
+const COMPONENT_IMPORT = /^@\/components\/([^/]+)(?:\/|$)/;
 // Every React app has these, so no install block lists them.
 const ALWAYS_INSTALLED = new Set(['react', 'react-dom']);
 
