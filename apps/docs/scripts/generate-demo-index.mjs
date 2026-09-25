@@ -22,7 +22,6 @@ const IMPORT_PATTERNS = [
   /\bimport\(\s*['"]([^'"]+)['"]/g,
 ];
 const COMPONENT_IMPORT = /^@\/components\/([^/]+)(?:\/|$)/;
-// Every React app has these, so no install block lists them.
 const ALWAYS_INSTALLED = new Set(['react', 'react-dom']);
 
 const INDEX_FILE = 'demo-index.ts';
@@ -141,26 +140,24 @@ function importSpecifiers(source) {
   );
 }
 
-/** @returns {{ packages: Set<string>, copied: Set<string> } | undefined} */
-function readInstallBlock(slug, cache) {
-  if (!cache.has(slug)) {
-    const dependencyFile = path.join(DEPENDENCIES_DIR, `${slug}.json`);
-    cache.set(
-      slug,
-      existsSync(dependencyFile)
-        ? parseInstallBlock(readCanonical(dependencyFile))
-        : undefined
+function readInstallBlocks() {
+  if (!existsSync(DEPENDENCIES_DIR)) {
+    throw new Error(
+      `Missing ${path.relative(docsRoot, DEPENDENCIES_DIR)} — run \`pnpm --filter @nexus_ds/docs generate:dependencies\` first.`
     );
   }
-  return cache.get(slug);
-}
 
-function parseInstallBlock(json) {
-  const { install, copy, files } = JSON.parse(json);
-  return {
-    packages: new Set(install.map(({ name }) => name)),
-    copied: new Set([...copy, ...files].map(withoutExtension)),
-  };
+  const blocks = new Map();
+  for (const file of readdirSync(DEPENDENCIES_DIR)) {
+    const { slug, install, copy, files } = JSON.parse(
+      readCanonical(path.join(DEPENDENCIES_DIR, file))
+    );
+    blocks.set(slug, {
+      packages: new Set(install.map(({ name }) => name)),
+      copied: new Set([...copy, ...files].map(withoutExtension)),
+    });
+  }
+  return blocks;
 }
 
 /**
@@ -168,42 +165,41 @@ function parseInstallBlock(json) {
  * block of its own, like `getting-started`, pastes beside the block of every
  * component it imports.
  */
-function installSlugsFor(id, specifiers, cache) {
+function installSlugsFor(id, specifiers, blocks) {
   const folder = id.split('/')[0];
-  if (readInstallBlock(folder, cache)) {
+  if (blocks.has(folder)) {
     return [folder];
   }
 
-  const slugs = new Set(
-    specifiers
-      .map((specifier) => specifier.match(COMPONENT_IMPORT)?.[1])
-      .filter(Boolean)
-  );
-  if (slugs.size === 0) {
+  const slugs = [
+    ...new Set(
+      specifiers
+        .map((specifier) => specifier.match(COMPONENT_IMPORT)?.[1])
+        .filter(Boolean)
+    ),
+  ];
+  if (slugs.length === 0) {
     throw new Error(
       `Demo ${id} imports no @/components/, and ${folder} has no install block of its own, so there is nothing to paste it beside. Import the component it demonstrates, or move it to examples/{slug}/.`
     );
   }
   for (const slug of slugs) {
-    if (!readInstallBlock(slug, cache)) {
+    if (!blocks.has(slug)) {
       throw new Error(
-        `Demo ${id} imports @/components/${slug}, but there is no ${path.relative(docsRoot, path.join(DEPENDENCIES_DIR, `${slug}.json`))} install block for it.`
+        `Demo ${id} imports @/components/${slug}, but there is no ${slug} install block for it.`
       );
     }
   }
-  return [...slugs];
+  return slugs;
 }
 
-/**
- * A demo is the Code a reader pastes next to an install block, so it may
- * import only the packages and `@/` files that block lists.
- */
-function assertImportsInstalled(id, source, cache) {
+function assertImportsInstalled(id, source, blocks) {
   const specifiers = importSpecifiers(source);
-  const slugs = installSlugsFor(id, specifiers, cache);
-  const blocks = slugs.map((slug) => readInstallBlock(slug, cache));
-  const packages = new Set(blocks.flatMap((block) => [...block.packages]));
-  const copied = new Set(blocks.flatMap((block) => [...block.copied]));
+  const slugs = installSlugsFor(id, specifiers, blocks);
+  const packages = new Set(
+    slugs.flatMap((slug) => [...blocks.get(slug).packages])
+  );
+  const copied = new Set(slugs.flatMap((slug) => [...blocks.get(slug).copied]));
   const blockNames = slugs.join(' + ');
 
   for (const specifier of specifiers) {
@@ -231,13 +227,8 @@ function collectDemos() {
   if (!existsSync(EXAMPLES_DIR)) {
     throw new Error(`Missing demo directory: ${EXAMPLES_DIR}`);
   }
-  if (!existsSync(DEPENDENCIES_DIR)) {
-    throw new Error(
-      `Missing ${path.relative(docsRoot, DEPENDENCIES_DIR)} — run \`pnpm --filter @nexus_ds/docs generate:dependencies\` first.`
-    );
-  }
 
-  const installBlocks = new Map();
+  const installBlocks = readInstallBlocks();
   return walk(EXAMPLES_DIR)
     .filter((file) => file.endsWith(DEMO_EXTENSION))
     .map((file) => ({

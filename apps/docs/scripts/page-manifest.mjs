@@ -5,7 +5,8 @@
  *   - `page-registry/` — section and page order, labels, and the
  *     `wireframe` a page renders until its own file lands
  *   - `content/{section}/{slug}.mdx` — MDX pages; a component page (under
- *     `components/`, not a group page) is exactly `<ComponentPage slug="{slug}" />`
+ *     `components/`, not a group page) is exactly
+ *     `<ComponentPage slug="{slug}" />`
  *   - `examples/{slug}/{name}.tsx` — checked against a component page's
  *     registry `examples` order
  *   - `app/_pages/{section}/{slug}.tsx` — hand-built pages
@@ -13,10 +14,10 @@
  * A page's route is its path on disk, so adding a page means adding a file.
  * Pages the registry does not list are appended to their section in slug
  * order. In `components/`, component pages follow the group pages in label
- * order, wherever the registry lists them. Routes are exactly two levels deep
- * and a slug is one path segment; a file anywhere else fails the generator.
- * Entries prefixed with `_` are skipped, so a page-local island can sit beside
- * the page that uses it.
+ * order, wherever the registry lists them. Routes are exactly two levels
+ * deep and a slug is one path segment; a file anywhere else fails the
+ * generator. Entries prefixed with `_` are skipped, so a page-local island
+ * can sit beside the page that uses it.
  *
  * Output is two modules, split across the client boundary:
  *   - `MANIFEST_FILE` — routes, labels, nav order. Imported by client nav.
