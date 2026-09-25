@@ -265,6 +265,10 @@ function InlineEdit({
   const editing = editingProp ?? uncontrolledEditing;
   const restoreFocus = React.useRef(false);
 
+  React.useLayoutEffect(() => {
+    restoreFocus.current = false;
+  });
+
   function setEditing(next: boolean) {
     if (editingProp === undefined) setUncontrolledEditing(next);
     onEditingChange?.(next);
@@ -276,7 +280,6 @@ function InlineEdit({
 
   function focusTrigger(button: HTMLButtonElement | null) {
     if (!button || !restoreFocus.current) return;
-    restoreFocus.current = false;
     button.focus();
   }
 
