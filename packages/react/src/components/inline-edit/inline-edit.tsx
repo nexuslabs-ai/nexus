@@ -126,7 +126,13 @@ function InlineEditEditor({
     }
     const result = onCommit(next);
     setPending(true);
-    Promise.resolve(result).then(close, () => setPending(false));
+    Promise.resolve(result).then(
+      () => {
+        setPending(false);
+        close();
+      },
+      () => setPending(false)
+    );
   }
 
   function cancel() {
@@ -266,8 +272,9 @@ function InlineEdit({
 
   function focusTrigger(button: HTMLButtonElement | null) {
     if (!button || !restoreFocus.current) return;
-    button.focus();
     restoreFocus.current = false;
+    if (document.activeElement !== document.body) return;
+    button.focus();
   }
 
   function content() {

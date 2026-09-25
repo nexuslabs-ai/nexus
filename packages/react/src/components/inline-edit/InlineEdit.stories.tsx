@@ -483,6 +483,66 @@ export const ControlledEditing: Story = {
   },
 };
 
+function StaysOpenExample({
+  onEditingChange,
+}: {
+  onEditingChange?: (editing: boolean) => void;
+}) {
+  const [value, setValue] = useState('Priya Shah');
+  const [editing, setEditing] = useState(false);
+
+  function handleEditingChange(next: boolean) {
+    onEditingChange?.(next);
+    if (next) setEditing(true);
+  }
+
+  return (
+    <div className="nx:grid nx:w-full nx:max-w-sm nx:gap-4">
+      <InlineEdit
+        label="Name"
+        value={value}
+        editing={editing}
+        onEditingChange={handleEditingChange}
+        onCommit={setValue}
+      />
+      <Button variant="outline" onClick={() => setEditing(false)}>
+        Done
+      </Button>
+    </div>
+  );
+}
+
+export const ControlledEditingStaysOpen: Story = {
+  args: { onEditingChange: fn() },
+  render: (args) => <StaysOpenExample onEditingChange={args.onEditingChange} />,
+  play: async ({ canvasElement, args }) => {
+    const canvas = within(canvasElement);
+    await userEvent.click(canvas.getByRole('button', { name: 'Edit Name' }));
+    const input = canvas.getByRole('textbox', { name: 'Name' });
+    await userEvent.type(input, ' Rao{Enter}');
+    await expect(args.onEditingChange).toHaveBeenLastCalledWith(false);
+    await expect(input).toBeInTheDocument();
+    await expect(input).not.toHaveAttribute('readonly');
+    await expect(
+      canvas.getByRole('group', { name: 'Edit Name' })
+    ).not.toHaveAttribute('aria-busy');
+
+    await userEvent.type(input, 'o');
+    await expect(input).toHaveValue('Priya Shah Raoo');
+    await userEvent.keyboard('{Escape}');
+    await expect(args.onEditingChange).toHaveBeenCalledTimes(3);
+    await userEvent.click(
+      canvas.getByRole('button', { name: 'Cancel editing Name' })
+    );
+    await expect(args.onEditingChange).toHaveBeenCalledTimes(4);
+
+    const done = canvas.getByRole('button', { name: 'Done' });
+    await userEvent.click(done);
+    await expect(canvas.queryByRole('textbox')).not.toBeInTheDocument();
+    await expect(done).toHaveFocus();
+  },
+};
+
 export const StableEditingTypography: Story = {
   render: () => (
     <div className="nx:grid nx:w-full nx:max-w-sm nx:gap-4">
