@@ -101,7 +101,7 @@ Read at the start; re-fire whenever a trigger lights up. The trigger is the thin
 - _Inline JSX handler 3+ lines or branching?_ → extract a named `handleX` above `return`. (`extract-inline-handlers.md`)
 - _Reaching for `useEffect`?_ → external systems only (subscriptions, DOM measurement); never to sync React state. (`useeffect-escape-hatch.md`)
 - _Typing `// TODO` / "for now" / "follow-up"?_ → don't. Fix in this PR, or `// TODO(#N):` against a tracked issue. (`code-comments.md`, `no-follow-up-deferral.md`)
-- _Tempted by a backcompat shim / deprecation / feature flag?_ → delete or rename in place; this is pre-production. (`project-stage.md`)
+- _Tempted by a backcompat shim / deprecation / feature flag?_ → delete or rename internals in place; this is pre-production. Breaking published-API changes need a migration guide + a `minor` changeset while below 1.0. (`project-stage.md`)
 - _A semantic token you need doesn't exist?_ → **stop and surface it.** Don't reach for a primitive or invent one; the token set is the contract. (`packages/core/tokens/`)
 
 ## Definition of done

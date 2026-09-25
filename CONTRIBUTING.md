@@ -169,13 +169,13 @@ The workflow grants `id-token: write` for the OIDC exchange, upgrades npm to a t
 
 ### Day-to-day: adding a changeset
 
-Any PR that changes `@nexus_ds/core` or `@nexus_ds/eslint-plugin` includes a changeset describing the bump:
+Any PR that changes `@nexus_ds/core` or `@nexus_ds/eslint-plugin`, or makes a consumer-facing rename in a copy/own package (`@nexus_ds/tailwind`, `@nexus_ds/react` — an emitted `--nx-*` name or an `nx:` utility), includes a changeset describing the bump:
 
 ```bash
 pnpm changeset        # pick packages + semver bump, write a summary
 ```
 
-Commit the generated `.changeset/*.md` file with your PR. Semver is a contract: `major` for a breaking change to core's runtime surface or the plugin's rule API, `minor` for additive, `patch` for fixes.
+Commit the generated `.changeset/*.md` file with your PR. Semver is a contract. While a package is below 1.0, use `minor` for a breaking change to core's runtime surface, the plugin's rule API, or a copy/own package's consumer-facing names, and for additive changes, and `patch` for fixes. A `major` bump turns 0.x into 1.0.0, so use it only when the team decides to cut 1.0. See [`project-stage.md`](.claude/rules/project-stage.md) for what counts as the published surface.
 
 ### Cutting a release
 
