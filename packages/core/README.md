@@ -63,7 +63,7 @@ Custom brand ramps and raw surface-tone references retain their separate algorit
 
 ## Token catalogue
 
-The browser-safe `@nexus_ds/core/catalogue` entry describes the colour and typography tokens for tools and docs. Each token has its `--nx-*` name, aliases, values per theme mode and preset as the generated CSS declares them, and the authored source leaf. See [Token catalogue](./docs/token-catalogue.md).
+The browser-safe `@nexus_ds/core/catalogue` entry describes every token family for tools and docs: colour, typography, spacing, radius, border width, shadow, motion, z-index, and breakpoints. Each token has its `--nx-*` name, aliases, values per theme mode and preset as the generated CSS declares them, and the authored source leaf. See [Token catalogue](./docs/token-catalogue.md).
 
 ```ts
 import { createTokenCatalogue } from '@nexus_ds/core/catalogue';
