@@ -790,27 +790,44 @@ export const DisabledInteraction: Story = {
 
 export const WithDataAttributes: Story = {
   render: (_args) => (
-    <Select>
-      <SelectTrigger className="nx:w-[180px]" aria-label="Select a fruit">
-        <SelectValue placeholder="Select a fruit" />
-      </SelectTrigger>
-      <SelectContent>
-        <SelectGroup>
-          <SelectLabel>Fruits</SelectLabel>
-          <SelectItem value="apple">Apple</SelectItem>
-        </SelectGroup>
-        <SelectSeparator />
-        <SelectItem value="banana">Banana</SelectItem>
-      </SelectContent>
-    </Select>
+    <div className="nx:flex nx:gap-3">
+      <Select>
+        <SelectTrigger className="nx:w-[180px]" aria-label="Select a fruit">
+          <SelectValue placeholder="Select a fruit" />
+        </SelectTrigger>
+        <SelectContent>
+          <SelectGroup>
+            <SelectLabel>Fruits</SelectLabel>
+            <SelectItem value="apple">Apple</SelectItem>
+          </SelectGroup>
+          <SelectSeparator />
+          <SelectItem value="banana">Banana</SelectItem>
+        </SelectContent>
+      </Select>
+      <Select>
+        <SelectTrigger
+          size="lg"
+          className="nx:w-[180px]"
+          aria-label="Select a vegetable"
+        >
+          <SelectValue placeholder="Select a vegetable" />
+        </SelectTrigger>
+        <SelectContent>
+          <SelectItem value="carrot">Carrot</SelectItem>
+        </SelectContent>
+      </Select>
+    </div>
   ),
   play: async ({ canvasElement }) => {
     const canvas = within(canvasElement);
 
     // Check trigger data-slot
-    const trigger = canvas.getByRole('combobox');
+    const trigger = canvas.getByRole('combobox', { name: 'Select a fruit' });
     await expect(trigger).toHaveAttribute('data-slot', 'select-trigger');
     await expect(trigger).toHaveAttribute('data-size', 'default');
+    await expect(
+      canvas.getByRole('combobox', { name: 'Select a vegetable' })
+    ).toHaveAttribute('data-size', 'lg');
     await expect(trigger).toHaveAttribute('data-variant', 'bordered');
     await expect(trigger).toHaveClass('nx:bg-container');
     await expect(trigger).toHaveClass('nx:enabled:hover:bg-container-hover');
