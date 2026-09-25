@@ -186,18 +186,21 @@ function assertComponentPageIsOneLineMdx(docsRoot, kind, file, slug) {
 /** Demo names under `examples/{slug}/`, matched case-sensitively whatever the filesystem. */
 function demoNamesIn(docsRoot, slug) {
   const dir = path.join(docsRoot, 'examples', slug);
-  if (!fs.existsSync(dir)) return new Set();
-  return new Set(
-    fs
-      .readdirSync(dir, { withFileTypes: true })
-      .filter((entry) => entry.isFile() && entry.name.endsWith(DEMO_EXTENSION))
-      .map((entry) => entry.name.slice(0, -DEMO_EXTENSION.length))
-      .filter(isDemoName)
-  );
+  if (!fs.existsSync(dir)) return [];
+  return fs
+    .readdirSync(dir, { withFileTypes: true })
+    .filter(
+      (entry) => !entry.isDirectory() && entry.name.endsWith(DEMO_EXTENSION)
+    )
+    .map((entry) => entry.name.slice(0, -DEMO_EXTENSION.length))
+    .filter(isDemoName)
+    .sort();
 }
 
 function assertExamplesExist(docsRoot, key, slug, examples) {
-  const demos = demoNamesIn(docsRoot, slug);
+  const available = demoNamesIn(docsRoot, slug).filter(
+    (name) => name !== PREVIEW_DEMO
+  );
   const seen = new Set();
   for (const name of examples) {
     if (name === PREVIEW_DEMO) {
@@ -211,9 +214,9 @@ function assertExamplesExist(docsRoot, key, slug, examples) {
       );
     }
     seen.add(name);
-    if (!demos.has(name)) {
+    if (!available.includes(name)) {
       throw new Error(
-        `${key} lists "${name}" in its registry \`examples\`, but examples/${slug}/ has no demo by that name. Its demos: ${[...demos].join(', ') || 'none'}.`
+        `${key} lists "${name}" in its registry \`examples\`, but examples/${slug}/ has no demo by that name. Its examples: ${available.join(', ') || 'none'}.`
       );
     }
   }
