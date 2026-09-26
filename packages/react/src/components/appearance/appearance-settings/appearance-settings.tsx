@@ -33,30 +33,17 @@ import {
 import { Slider } from '../../slider';
 import { Switch } from '../../switch';
 import { ToggleGroup, ToggleGroupItem } from '../../toggle-group';
-import { NexusAppearanceColorField } from '../color-field';
+import { NexusAppearanceBrandColorField } from '../brand-color-field';
 import { NexusAppearanceConfigPreview } from '../config-preview';
 import { useNexusAppearance } from '../provider';
 import { NexusAppearanceSettingRow } from '../setting-row';
 
 const APPEARANCE_MODES: NexusAppearanceMode[] = ['light', 'dark', 'system'];
-const REDUCE_MOTION_OPTIONS: NexusAppearancePrefs['reduceMotion'][] = [
-  'system',
-  'on',
-  'off',
-];
 const FONT_SIZE_MIN = 8;
 const FONT_SIZE_MAX = 32;
 
 function isAppearanceMode(value: string): value is NexusAppearanceMode {
   return APPEARANCE_MODES.includes(value as NexusAppearanceMode);
-}
-
-function isReduceMotion(
-  value: string
-): value is NexusAppearancePrefs['reduceMotion'] {
-  return REDUCE_MOTION_OPTIONS.includes(
-    value as NexusAppearancePrefs['reduceMotion']
-  );
 }
 
 function AxisSelect<TValue extends string>({
@@ -168,16 +155,13 @@ export function NexusAppearanceSettings() {
     setState((current) => ({ ...current, mode: value }));
   };
 
-  const setLightContrast = (values: number[]) => {
-    const lightContrast = values[0];
-    if (lightContrast === undefined) return;
-    setState((current) => ({ ...current, lightContrast }));
-  };
+  const contrastKey =
+    resolvedMode === 'dark' ? 'darkContrast' : 'lightContrast';
 
-  const setDarkContrast = (values: number[]) => {
-    const darkContrast = values[0];
-    if (darkContrast === undefined) return;
-    setState((current) => ({ ...current, darkContrast }));
+  const setContrast = (values: number[]) => {
+    const value = values[0];
+    if (value === undefined) return;
+    setState((current) => ({ ...current, [contrastKey]: value }));
   };
 
   const setFontSize = (key: 'uiFontSize' | 'codeFontSize', value: number) => {
@@ -189,18 +173,13 @@ export function NexusAppearanceSettings() {
     updatePrefs({ codeFontSize: value });
   };
 
-  const setReduceMotion = (value: string) => {
-    if (!isReduceMotion(value)) return;
-    updatePrefs({ reduceMotion: value });
-  };
-
   return (
     <div data-slot="appearance-settings" className="nx:space-y-6">
       <Card>
         <CardHeader>
           <CardTitle>Theme</CardTitle>
           <CardDescription>
-            Brand color, surface tone, and contrast apply live across the app.
+            Choose your mode, brand color, surface tone, and contrast.
           </CardDescription>
         </CardHeader>
         <CardContent className="nx:space-y-4">
@@ -225,7 +204,7 @@ export function NexusAppearanceSettings() {
             label="Brand color"
             description="Primary actions, selected states, and highlights"
           >
-            <NexusAppearanceColorField
+            <NexusAppearanceBrandColorField
               label="Brand color"
               value={state.brandColor}
               onChange={(brandColor) =>
@@ -248,32 +227,23 @@ export function NexusAppearanceSettings() {
             />
           </NexusAppearanceSettingRow>
 
+          <p
+            className="nx:typography-body-small nx:text-muted-foreground"
+            role="status"
+          >
+            Editing {resolvedMode} appearance
+          </p>
           <NexusAppearanceSettingRow
-            label="Light contrast"
-            description={`${state.lightContrast}`}
+            label="Contrast"
+            description={`Text and surface definition · ${state[contrastKey]}`}
           >
             <Slider
-              value={[state.lightContrast]}
-              onValueChange={setLightContrast}
+              value={[state[contrastKey]]}
+              onValueChange={setContrast}
               min={0}
               max={100}
               step={1}
-              aria-label="Light contrast"
-              className="nx:w-48"
-            />
-          </NexusAppearanceSettingRow>
-
-          <NexusAppearanceSettingRow
-            label="Dark contrast"
-            description={`${state.darkContrast}`}
-          >
-            <Slider
-              value={[state.darkContrast]}
-              onValueChange={setDarkContrast}
-              min={0}
-              max={100}
-              step={1}
-              aria-label="Dark contrast"
+              aria-label="Contrast"
               className="nx:w-48"
             />
           </NexusAppearanceSettingRow>
@@ -398,17 +368,11 @@ export function NexusAppearanceSettings() {
             />
           </NexusAppearanceSettingRow>
           <NexusAppearanceSettingRow label="Reduce motion">
-            <ToggleGroup
-              type="single"
-              value={state.prefs.reduceMotion}
-              onValueChange={setReduceMotion}
-              variant="outline"
+            <Switch
+              checked={state.prefs.reduceMotion}
+              onCheckedChange={(reduceMotion) => updatePrefs({ reduceMotion })}
               aria-label="Reduce motion"
-            >
-              <ToggleGroupItem value="system">System</ToggleGroupItem>
-              <ToggleGroupItem value="on">On</ToggleGroupItem>
-              <ToggleGroupItem value="off">Off</ToggleGroupItem>
-            </ToggleGroup>
+            />
           </NexusAppearanceSettingRow>
           <NexusAppearanceSettingRow
             label="Font smoothing"

@@ -2,8 +2,6 @@ import { oklch, parse } from 'culori';
 
 import primitiveColors from '../../tokens/primitives/color.json';
 
-import perceptualGrid from './perceptual-grid.json';
-
 export const SHADES = [
   '50',
   '100',
@@ -44,31 +42,13 @@ export type Mode = 'light' | 'dark';
 /** Surface tone families a Nexus theme can be seeded with. */
 export type NexusSurfaceTone = 'stone' | 'neutral' | 'zinc' | 'slate' | 'gray';
 
-export const PERCEPTUAL_L_GRID: Record<Shade, number> = Object.freeze(
-  perceptualGrid as Record<Shade, number>
-);
-
-function shade500Hex(palette: PaletteKey): string {
-  const palettes = primitiveColors as Record<string, unknown>;
-  const entry = palettes[palette];
-  if (entry && typeof entry === 'object' && '500' in entry) {
-    const shade = (entry as Record<string, { $value?: string }>)['500'];
-    if (shade && typeof shade.$value === 'string') {
-      return shade.$value;
-    }
-  }
-  throw new Error(
-    `palette: missing primitive token '${palette}.500' in color.json`
-  );
-}
-
 export interface PaletteReference {
   c: number;
   h: number;
 }
 
 function deriveReference(palette: PaletteKey): PaletteReference {
-  const hex = shade500Hex(palette);
+  const hex = primitiveColors[palette]['500'].$value;
   const parsed = parse(hex);
   if (!parsed) {
     throw new Error(`palette: cannot parse '${palette}.500' hex '${hex}'`);

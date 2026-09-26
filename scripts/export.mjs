@@ -6,9 +6,9 @@
  *
  * Interim stopgap ahead of the CLI (registry + 3-way merge). See issue #541.
  *
- * This file holds the pure, side-effect-free helpers (unit-tested in
- * `export.test.js`). The CLI orchestration lives below the helpers behind an
- * `import.meta.url` guard so importing this module runs nothing.
+ * This file holds the pure, side-effect-free helpers. The CLI orchestration
+ * lives below them behind an `import.meta.url` guard so importing this module
+ * runs nothing.
  */
 
 import { execFileSync, spawnSync } from 'node:child_process';

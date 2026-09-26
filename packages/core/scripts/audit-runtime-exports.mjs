@@ -1,15 +1,19 @@
+import assert from 'node:assert/strict';
+import { readFileSync } from 'node:fs';
 import { createRequire } from 'node:module';
 import path from 'node:path';
 import { fileURLToPath, pathToFileURL } from 'node:url';
 
 const scriptDir = path.dirname(fileURLToPath(import.meta.url));
 const packageRoot = path.resolve(scriptDir, '..');
-const esmPath = path.join(packageRoot, 'dist', 'runtime', 'index.js');
-const cjsPath = path.join(packageRoot, 'dist', 'runtime', 'index.cjs');
+const runtimeDir = path.join(packageRoot, 'dist', 'runtime');
+const esmPath = path.join(runtimeDir, 'index.js');
+const cjsPath = path.join(runtimeDir, 'index.cjs');
 
 const EXPECTED_RUNTIME_EXPORTS = [
   'BASE_TONE_OPTIONS',
   'BASE_TONE_SEEDS',
+  'BRAND_COLOR_PRESETS',
   'CORNER_OPTIONS',
   'DEFAULT_BRAND_COLOR',
   'DEFAULT_COOKIE_KEY',
@@ -34,7 +38,9 @@ const EXPECTED_RUNTIME_EXPORTS = [
   'createNexusAppearanceStateCookie',
   'createNexusThemeContract',
   'deriveTheme',
+  'findBrandColorPreset',
   'isColor',
+  'measureThemeContrast',
   'normalizeAppearanceModeIds',
   'parseNexusAppearanceStateCookie',
   'resolveFirstPaint',
@@ -45,9 +51,25 @@ const EXPECTED_RUNTIME_EXPORTS = [
   'themeToCss',
 ];
 
-function assertExports(label, mod) {
+const EXPECTED_PALETTE_EXPORTS = [
+  'PRIMITIVE_PALETTE_NAMES',
+  'SHADES',
+  'getPaletteRamp',
+  'getPaletteShade',
+];
+
+const EXPECTED_CATALOGUE_EXPORTS = [
+  'DARK_SURFACE_LADDER',
+  'LIGHT_SURFACE_LADDER',
+  'SURFACE_TOKENS',
+  'createTokenCatalogue',
+];
+
+const OKLCH_VALUE = /^oklch\(\d+(\.\d+)? \d+(\.\d+)? \d+(\.\d+)?\)$/;
+
+function assertExports(label, mod, allowlist = EXPECTED_RUNTIME_EXPORTS) {
   const actual = Object.keys(mod).sort();
-  const expected = [...EXPECTED_RUNTIME_EXPORTS].sort();
+  const expected = [...allowlist].sort();
   const missing = expected.filter((name) => !actual.includes(name));
   const extra = actual.filter((name) => !expected.includes(name));
 
@@ -73,4 +95,76 @@ assertExports('CJS', cjs);
 
 console.log(
   `@nexus_ds/core runtime export allowlist clean (${EXPECTED_RUNTIME_EXPORTS.length} exports).`
+);
+
+const paletteEsm = await import('@nexus_ds/core/palette');
+const paletteCjs = require('@nexus_ds/core/palette');
+assertExports('Palette ESM', paletteEsm, EXPECTED_PALETTE_EXPORTS);
+assertExports('Palette CJS', paletteCjs, EXPECTED_PALETTE_EXPORTS);
+for (const name of paletteEsm.PRIMITIVE_PALETTE_NAMES) {
+  const ramp = paletteEsm.getPaletteRamp(name);
+  assert.deepEqual(ramp, paletteCjs.getPaletteRamp(name));
+  for (const shade of paletteEsm.SHADES) {
+    assert.match(ramp[shade], OKLCH_VALUE, `${name}.${shade}`);
+  }
+}
+console.log(
+  `@nexus_ds/core/palette exports and ESM/CJS parity clean (${EXPECTED_PALETTE_EXPORTS.length} exports).`
+);
+
+const catalogueEsm = await import('@nexus_ds/core/catalogue');
+const catalogueCjs = require('@nexus_ds/core/catalogue');
+assertExports('Catalogue ESM', catalogueEsm, EXPECTED_CATALOGUE_EXPORTS);
+assertExports('Catalogue CJS', catalogueCjs, EXPECTED_CATALOGUE_EXPORTS);
+const catalogue = catalogueEsm.createTokenCatalogue();
+assert.deepEqual(catalogue, catalogueCjs.createTokenCatalogue());
+console.log(
+  `@nexus_ds/core/catalogue exports and ESM/CJS parity clean (${catalogue.length} tokens).`
+);
+
+// esbuild escapes non-ASCII and quote characters inside string literals.
+function decodedBundle(file) {
+  return readFileSync(path.join(runtimeDir, file), 'utf8')
+    .replace(/\\u([0-9a-fA-F]{4})/g, (_, hex) =>
+      String.fromCharCode(Number.parseInt(hex, 16))
+    )
+    .replace(/\\(['"`\\])/g, '$1');
+}
+
+const runtimeColorProse = [
+  ...new Set(
+    catalogue
+      .filter((token) => token.variants.some((variant) => variant.appearance))
+      .map((token) => token.description)
+      .filter(Boolean)
+  ),
+];
+assert.ok(
+  runtimeColorProse.length > 0,
+  'The catalogue carries no runtime colour descriptions.'
+);
+for (const file of ['catalogue.js', 'catalogue.cjs']) {
+  const bundle = decodedBundle(file);
+  const missing = runtimeColorProse.filter((prose) => !bundle.includes(prose));
+  assert.deepEqual(
+    missing,
+    [],
+    `${file} is missing runtime colour descriptions.`
+  );
+}
+for (const file of ['index.js', 'index.cjs']) {
+  const bundle = decodedBundle(file);
+  const leaked = runtimeColorProse.filter((prose) => bundle.includes(prose));
+  assert.deepEqual(
+    leaked,
+    [],
+    `${file} ships catalogue-only runtime colour descriptions.`
+  );
+  assert.ok(
+    !bundle.includes('createTokenCatalogue'),
+    `${file} bundles catalogue code.`
+  );
+}
+console.log(
+  `Main ESM/CJS bundles are free of catalogue code and its ${runtimeColorProse.length} runtime colour descriptions.`
 );

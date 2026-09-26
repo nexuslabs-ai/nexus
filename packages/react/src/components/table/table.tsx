@@ -270,13 +270,13 @@ function TableRow({ className, ...props }: TableRowProps) {
 interface TableHeadProps extends React.ComponentProps<'th'> {}
 
 const tableHeadVariants = cva(
-  'nx:px-2 nx:text-left nx:align-middle nx:typography-label-default nx:whitespace-nowrap nx:text-muted-foreground nx:has-[[role=checkbox]]:pr-0 nx:*:[[role=checkbox]]:translate-y-0.5 nx:[&[aria-sort=ascending]]:text-foreground nx:[&[aria-sort=descending]]:text-foreground',
+  'nx:px-2 nx:text-start nx:align-middle nx:typography-label-default nx:whitespace-nowrap nx:text-muted-foreground nx:[&[aria-sort=ascending]]:text-foreground nx:[&[aria-sort=descending]]:text-foreground',
   {
     variants: {
       variant: {
         default: '',
         borderless: '',
-        grid: 'nx:border-r-default nx:border-border-default-alpha nx:[&:last-child]:border-r-0',
+        grid: 'nx:border-e-default nx:border-border-default-alpha nx:last:border-e-0',
       } satisfies Record<TableVariant, string>,
       density: {
         comfortable: 'nx:py-3',
@@ -319,23 +319,20 @@ function TableHead({ className, ...props }: TableHeadProps) {
  */
 interface TableCellProps extends React.ComponentProps<'td'> {}
 
-const tableCellVariants = cva(
-  'nx:px-2 nx:align-middle nx:whitespace-nowrap nx:has-[[role=checkbox]]:pr-0 nx:*:[[role=checkbox]]:translate-y-0.5',
-  {
-    variants: {
-      variant: {
-        default: '',
-        borderless: '',
-        grid: 'nx:border-r-default nx:border-border-default-alpha nx:[&:last-child]:border-r-0',
-      } satisfies Record<TableVariant, string>,
-      density: {
-        comfortable: 'nx:py-3',
-        compact: 'nx:py-2',
-      } satisfies Record<TableDensity, string>,
-    },
-    defaultVariants: { variant: 'default', density: 'comfortable' },
-  }
-);
+const tableCellVariants = cva('nx:px-2 nx:align-middle nx:whitespace-nowrap', {
+  variants: {
+    variant: {
+      default: '',
+      borderless: '',
+      grid: 'nx:border-e-default nx:border-border-default-alpha nx:last:border-e-0',
+    } satisfies Record<TableVariant, string>,
+    density: {
+      comfortable: 'nx:py-3',
+      compact: 'nx:py-2',
+    } satisfies Record<TableDensity, string>,
+  },
+  defaultVariants: { variant: 'default', density: 'comfortable' },
+});
 
 /**
  * TableCell
@@ -349,6 +346,56 @@ function TableCell({ className, ...props }: TableCellProps) {
       data-slot="table-cell"
       className={cn(tableCellVariants({ variant, density }), className)}
       {...props}
+    />
+  );
+}
+
+const tableSelectionCellClassName =
+  'nx:w-0 nx:pe-0 nx:*:[[role=checkbox]]:translate-y-0.5';
+
+/**
+ * TableSelectionHeadProps
+ *
+ * Props for the TableSelectionHead component.
+ */
+interface TableSelectionHeadProps extends TableHeadProps {}
+
+/**
+ * TableSelectionHead
+ *
+ * The header cell for a consumer-owned select-all Checkbox. Compose it as the
+ * first header cell, paired with `TableSelectionCell` in each body row. With
+ * `stickyHeader` it stays pinned along with the rest of the header.
+ */
+function TableSelectionHead({ className, ...props }: TableSelectionHeadProps) {
+  return (
+    <TableHead
+      data-slot="table-selection-head"
+      {...props}
+      className={cn(tableSelectionCellClassName, className)}
+    />
+  );
+}
+
+/**
+ * TableSelectionCellProps
+ *
+ * Props for the TableSelectionCell component.
+ */
+interface TableSelectionCellProps extends TableCellProps {}
+
+/**
+ * TableSelectionCell
+ *
+ * The cell for a consumer-owned row Checkbox. Set the containing row's
+ * `data-state="selected"` from the same selection state.
+ */
+function TableSelectionCell({ className, ...props }: TableSelectionCellProps) {
+  return (
+    <TableCell
+      data-slot="table-selection-cell"
+      {...props}
+      className={cn(tableSelectionCellClassName, className)}
     />
   );
 }
@@ -428,4 +475,8 @@ export {
   TableRowHeader,
   type TableRowHeaderProps,
   type TableRowProps,
+  TableSelectionCell,
+  type TableSelectionCellProps,
+  TableSelectionHead,
+  type TableSelectionHeadProps,
 };

@@ -64,3 +64,6 @@ opencode.json
 
 # Superpowers brainstorming companion (local mockups + server state)
 .superpowers/
+
+# Docs JSON, written by the `@nexus_ds/docs#generate:*` tasks
+apps/docs/generated/

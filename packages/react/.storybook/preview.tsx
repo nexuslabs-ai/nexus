@@ -129,11 +129,10 @@ function appearanceStateFromGlobals(
         typeof globals.codeFontSize === 'number'
           ? globals.codeFontSize
           : prefs.codeFontSize,
-      reduceMotion: pickOption(
-        globals.reduceMotion,
-        [{ value: 'system' }, { value: 'on' }, { value: 'off' }] as const,
-        prefs.reduceMotion
-      ),
+      reduceMotion:
+        typeof globals.reduceMotion === 'boolean'
+          ? globals.reduceMotion
+          : prefs.reduceMotion,
       pointerCursors:
         typeof globals.pointerCursors === 'boolean'
           ? globals.pointerCursors
@@ -255,13 +254,16 @@ const preview: Preview = {
     // Color-contrast is APCA-gated via `pnpm audit:contrast`
     // (see `packages/core/src/lib/apca-pairs.ts`), not WCAG 2 — disable
     // axe-core's WCAG-based contrast rules so the two gates don't conflict.
+    // Rules live in `options` as an id-keyed object: Storybook deep-merges
+    // parameter objects but replaces arrays, so a story's own rules would
+    // otherwise drop these global disables.
     a11y: {
       test: 'error',
-      config: {
-        rules: [
-          { id: 'color-contrast', enabled: false },
-          { id: 'color-contrast-enhanced', enabled: false },
-        ],
+      options: {
+        rules: {
+          'color-contrast': { enabled: false },
+          'color-contrast-enhanced': { enabled: false },
+        },
       },
     },
     controls: {

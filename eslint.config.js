@@ -12,6 +12,10 @@ import globals from 'globals';
 import * as jsoncParser from 'jsonc-eslint-parser';
 import tseslint from 'typescript-eslint';
 
+const radiusBaseConsumer = String.raw`/rounded(?:-[a-z]{1,2})?-base\b|radius-base/`;
+const radiusBaseMessage =
+  'Only Button consumes --nx-radius-base (rounded-base). Use another radius token, or update apps/docs/content/theming/radius-overrides.mdx if this component should follow the base override.';
+
 export default tseslint.config(
   // Global ignores
   {
@@ -211,7 +215,7 @@ export default tseslint.config(
     },
   },
 
-  // UI components: allow empty interface extends per .claude/rules/components.md
+  // UI components: an empty interface extending ComponentProps is the documented props pattern
   {
     files: ['packages/react/src/components/**/*.{ts,tsx}'],
     rules: {
@@ -230,6 +234,71 @@ export default tseslint.config(
   {
     files: ['packages/react/src/**/*.{ts,tsx}', 'apps/**/*.{ts,tsx}'],
     ...nexusComponentConfig(),
+  },
+
+  // Only Button consumes --nx-radius-base (documented in theming/radius-overrides).
+  {
+    files: ['packages/react/src/components/**/*.{ts,tsx}'],
+    ignores: [
+      'packages/react/src/components/button/button.tsx',
+      '**/*.stories.tsx',
+      '**/*.test.{ts,tsx}',
+    ],
+    rules: {
+      'no-restricted-syntax': [
+        'error',
+        {
+          selector: `Literal[value=${radiusBaseConsumer}]`,
+          message: radiusBaseMessage,
+        },
+        {
+          selector: `TemplateElement[value.raw=${radiusBaseConsumer}]`,
+          message: radiusBaseMessage,
+        },
+      ],
+    },
+  },
+
+  {
+    files: ['apps/docs/examples/**/*.tsx'],
+    rules: {
+      'no-restricted-imports': [
+        'error',
+        {
+          patterns: [
+            {
+              group: ['@nexus_ds/react', '@nexus_ds/react/*'],
+              message:
+                'Import the copied file under `@/` (e.g. `@/components/button/button`) — the install block lists it, @nexus_ds/react is not in a pasting app.',
+            },
+            {
+              group: ['@/components/appearance', '@/components/appearance/*'],
+              message:
+                'The docs shell provides appearance from @nexus_ds/react, so a demo importing it from `@/` gets a second context and throws.',
+            },
+          ],
+        },
+      ],
+    },
+  },
+
+  {
+    files: ['apps/docs/**/*.{ts,tsx,js,mjs}'],
+    ignores: ['apps/docs/examples/**'],
+    rules: {
+      'no-restricted-imports': [
+        'error',
+        {
+          patterns: [
+            {
+              group: ['@/*'],
+              message:
+                '`@/` resolves to packages/react/src for the paste-ready demos only — import @nexus_ds/react here.',
+            },
+          ],
+        },
+      ],
+    },
   },
 
   // Tests and stories assert known fixture invariants (queried elements, seeded

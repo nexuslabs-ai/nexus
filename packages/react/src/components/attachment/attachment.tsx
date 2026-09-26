@@ -84,8 +84,8 @@ interface AttachmentProps
   /**
    * Overrides the assistive-tech status text for the current `state` — pass a
    * localised string, or one that names the file. Ignored while the attachment
-   * is settled (`idle` / `done`), which announces nothing.
-   * @default a built-in phrase per state, e.g. 'Uploading'
+   * is settled (`idle` / `done`), which announces nothing. Defaults to a
+   * built-in phrase per state, such as 'Uploading'.
    * @example
    * ```tsx
    * <Attachment state="uploading" statusLabel="Uploading report.pdf" />
@@ -358,7 +358,7 @@ function AttachmentGroup({ className, ...props }: AttachmentGroupProps) {
       tabIndex={0}
       className={cn(
         'nx:flex nx:min-w-0 nx:snap-x nx:gap-3 nx:overflow-x-auto nx:overscroll-x-contain nx:py-1',
-        'nx:focus-visible:outline-2 nx:focus-visible:outline-focus-default nx:focus-visible:outline-offset-(--focus-offset)',
+        'nx:focus-visible:outline-2 nx:focus-visible:outline-focus-default',
         'nx:*:data-[slot=attachment]:flex-none nx:*:data-[slot=attachment]:snap-start',
         className
       )}
@@ -443,8 +443,8 @@ function AttachmentTrigger({
       data-slot="attachment-trigger"
       type={asChild ? undefined : (type ?? 'button')}
       className={cn(
-        'nx:absolute nx:inset-0 nx:z-10 nx:cursor-pointer nx:rounded-[inherit] nx:outline-none',
-        'nx:focus-visible:outline-2 nx:focus-visible:outline-focus-default nx:focus-visible:outline-offset-(--focus-offset)',
+        'nx:absolute nx:inset-0 nx:z-10 nx:cursor-pointer nx:rounded-[inherit]',
+        'nx:focus-visible:outline-2 nx:focus-visible:outline-focus-default',
         className
       )}
       {...props}

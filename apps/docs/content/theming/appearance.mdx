@@ -1,51 +1,137 @@
 # Appearance
 
-Appearance is the runtime state that drives Nexus theming. The package derives
-colors, typography prefs, density, corners, elevation, stroke, and motion prefs
-from a single `NexusAppearanceState`.
+Appearance is the runtime state that drives Nexus theming. `@nexus_ds/core`
+derives colors, typography prefs, density, corners, elevation, stroke, and
+motion prefs from a single [`NexusAppearanceState`](#the-model).
+
+The `@/components/appearance/provider` imports below are the provider folder
+copied in at
+[Install step 3](/getting-started/install#step-3-the-appearance-provider).
 
 ## The model
 
-| Field           | Type                                                    | Meaning                                                                                        |
-| --------------- | ------------------------------------------------------- | ---------------------------------------------------------------------------------------------- |
-| `mode`          | `'light' \| 'dark' \| 'system'`                         | Color scheme; `system` follows the OS.                                                         |
-| `brandColor`    | `string`                                                | Brand color seed, default `#0a0a0a`.                                                           |
-| `surfaceTone`   | `'stone' \| 'neutral' \| 'zinc' \| 'slate' \| 'gray'`   | Neutral surface family.                                                                        |
-| `lightContrast` | `number`                                                | Structural separation (light theme) for surfaces, borders, dividers, nav, controls, and cards. |
-| `darkContrast`  | `number`                                                | Structural separation (dark theme) for surfaces, borders, dividers, nav, controls, and cards.  |
-| `density`       | `'compact' \| 'default' \| 'comfortable' \| 'spacious'` | Spacing rhythm.                                                                                |
-| `corners`       | `'square' \| 'subtle' \| 'smooth' \| 'round'`           | Radius scale.                                                                                  |
-| `elevation`     | `'quiet' \| 'standard' \| 'strong'`                     | Shadow scale.                                                                                  |
-| `stroke`        | `'fine' \| 'normal' \| 'strong'`                        | Border-width scale.                                                                            |
-| `prefs`         | `NexusAppearancePrefs`                                  | UI/code font family, UI/code size, reduce motion, pointer cursors, and font smoothing.         |
+| Field                            | Type                                                                            | Meaning                                                                                |
+| -------------------------------- | ------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------- |
+| `mode`                           | `'light' \| 'dark' \| 'system'`                                                 | Color scheme; `system` follows the OS.                                                 |
+| `brandColor`                     | `string`                                                                        | Brand color seed, default `#0a0a0a`.                                                   |
+| `surfaceTone`                    | `'stone' \| 'neutral' \| 'zinc' \| 'slate' \| 'gray'`                           | Neutral surface family.                                                                |
+| `lightContrast` / `darkContrast` | `number` (0–100)                                                                | Independent contrast values; both default to `50`.                                     |
+| `density`                        | `'tight' \| 'compact' \| 'default' \| 'comfortable' \| 'relaxed' \| 'spacious'` | Spacing rhythm.                                                                        |
+| `corners`                        | `'square' \| 'subtle' \| 'smooth' \| 'round' \| 'extra-round'`                  | Radius scale.                                                                          |
+| `elevation`                      | `'flat' \| 'quiet' \| 'soft' \| 'standard' \| 'strong'`                         | Shadow scale.                                                                          |
+| `stroke`                         | `'fine' \| 'normal' \| 'strong'`                                                | Border-width scale.                                                                    |
+| `prefs`                          | `NexusAppearancePrefs`                                                          | UI/code font family, UI/code size, reduce motion, pointer cursors, and font smoothing. |
 
-`lightContrast` and `darkContrast` are structure controls, not text hierarchy
-knobs — each tunes its own theme independently. Text may track a moving surface
-enough to stay APCA-readable, but the hierarchy itself stays fixed.
+## Contrast slider
+
+Each mode remembers its own contrast value from **0 to 100**, with **50** as the
+default. The single Contrast slider edits the displayed mode; System follows the
+resolved OS appearance. Both values persist through storage, cookies, and
+first-paint snapshots.
+
+Turning contrast up strengthens text, borders, and interaction-state definition.
+The runtime gradually raises APCA targets from 75 to 90 for body text, 60 to 75
+for UI labels, and 45 to 60 for incidental pairs. Targets can plateau at the
+strongest achievable contrast; the readability floors of 75 / 60 / 45 remain
+mandatory even at zero. Light borders span a 6%–11.68% opacity range.
+
+The slider never repaints your brand. Primary and status fills keep the color
+you chose at every contrast value; a fill only moves if its black or white
+label could not meet the fixed floor, and then by the same amount everywhere.
+
+Light-mode pages, cards, and popovers share a white base. Dark-mode surfaces
+follow the selected tone's seed. Brand, status, and chart colors retain their
+palette chroma. Labels, icons, and chart patterns should carry meaning alongside
+color.
+
+The runtime checks shared foregrounds against every supported background,
+including hover, pressed, and composited translucent states. Components keep
+using the same 107 semantic token names per mode.
+
+Contrast values are clamped to 0–100 and rounded to whole numbers; anything
+non-numeric uses 50. Snapshot version **6** refreshes cached CSS, and
+incompatible server cookies use the configured default, following the existing
+version policy.
 
 ## Brand and surface tone
 
 Start from the shipped default and override the fields you own:
 
 ```ts
-import { DEFAULT_NEXUS_APPEARANCE } from '@nexus_ds/core';
+import {
+  DEFAULT_NEXUS_APPEARANCE,
+  type NexusAppearanceState,
+} from '@nexus_ds/core';
 
 export const defaultAppearance = {
   ...DEFAULT_NEXUS_APPEARANCE,
   brandColor: '#2563eb',
   surfaceTone: 'slate',
-};
+} satisfies NexusAppearanceState;
 ```
 
 `brandColor` drives the primary palette. `surfaceTone` picks the neutral family:
 `stone`, `neutral`, `zinc`, `slate`, or `gray`.
+
+Appearance settings offers Default, Indigo, Blue, Violet, Rose, Orange, Amber,
+Green, and Teal beside the existing color picker and hex field. Choosing a
+preset sets `brandColor` to that palette's authored 600 hex seed; Default uses
+`DEFAULT_BRAND_COLOR`. The engine then derives the theme as it does for a custom
+color. The preset swatch shows the seed, so final button colors can differ after
+contrast solving.
+
+The hex field stays editable. Type a six-digit hex with or without `#`; matching
+colors show their preset name, and other values show **Custom**. Incomplete or
+invalid typing keeps the last valid committed color, and leaving the field
+restores that value. Preset names are inferred from `brandColor`, so existing
+saved colors keep working without a storage migration. Existing supported CSS
+color strings remain Custom and are preserved until you choose a new color.
+
+For a controlled editor outside settings, `@nexus_ds/react` exports
+`NexusAppearanceBrandColorField` with `value`, `onChange`, and `label` props:
+
+```tsx
+import { useState } from 'react';
+import { DEFAULT_BRAND_COLOR } from '@nexus_ds/core';
+import { NexusAppearanceBrandColorField } from '@nexus_ds/react';
+
+function BrandEditor() {
+  const [brandColor, setBrandColor] = useState(DEFAULT_BRAND_COLOR);
+  return (
+    <NexusAppearanceBrandColorField
+      label="Brand color"
+      value={brandColor}
+      onChange={setBrandColor}
+    />
+  );
+}
+```
+
+The preset catalog is also exported as `BRAND_COLOR_PRESETS` from
+`@nexus_ds/core`, beside `BASE_TONE_OPTIONS`, for other editor implementations.
+`findBrandColorPreset(brandColor)` returns the preset an opaque saved color
+matches in any CSS notation the engine parses (`#4F46E5`, `4f46e5`,
+`rgb(79 70 229)`), ignoring surrounding whitespace, or `undefined` for a
+custom or unparseable color.
+The compact theme control continues to use its existing custom-color field.
+
+Surface tones are near-neutral: Stone adds a faint warm undertone; Zinc, Gray,
+and Slate add progressively stronger cool undertones. Neutral stays achromatic.
+Tint strength stays restrained across hover, pressed, and elevated surfaces.
+Ordinary text and translucent overlays follow the same subdued palette; brand
+and status palettes keep their original color seeds. Final lightness can still
+adjust to meet contrast requirements.
+
+For custom derivation inputs, tinted surface tones cap foreground-seed chroma
+while retaining hue and lightness. Neutral keeps the supplied foreground seed.
+Light-mode page, card, and popover bases remain white.
 
 ## Reading and updating
 
 Use `useNexusAppearance` to build product-specific controls.
 
 ```tsx
-import { useNexusAppearance } from '@nexus_ds/react/appearance';
+import { useNexusAppearance } from '@/components/appearance/provider';
 
 function ModeButton() {
   const { state, setState } = useNexusAppearance();
@@ -66,9 +152,9 @@ function ModeButton() {
 }
 ```
 
-Nexus ships the provider and hook. Product-specific Appearance panels and quick
-controls belong in the consuming app, so they can match that product's settings
-IA.
+The provider and hook are the copied files; `useNexusAppearance` is what they
+expose. Product-specific Appearance panels and quick controls belong in the
+consuming app, so they can match that product's settings IA.
 
 ## First paint and persistence
 

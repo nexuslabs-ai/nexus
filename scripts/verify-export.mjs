@@ -173,10 +173,14 @@ async function smokeImport(producedDir) {
 
   const distDir = path.join(producedDir, 'packages', 'react', 'dist');
   const lib = await import(pathToFileURL(path.join(distDir, 'index.mjs')).href);
+  const utils = await import(pathToFileURL(path.join(distDir, 'utils.mjs')).href);
   const appearance = await import(pathToFileURL(path.join(distDir, 'appearance.mjs')).href);
 
   if (typeof lib.Button !== 'function') {
     throw new Error('Built index.mjs did not export a `Button` component.');
+  }
+  if (typeof utils.cn !== 'function') {
+    throw new Error('Built utils.mjs did not export a `cn` helper.');
   }
   if (typeof appearance.NexusAppearanceProvider !== 'function') {
     throw new Error('Built appearance.mjs did not export `NexusAppearanceProvider`.');

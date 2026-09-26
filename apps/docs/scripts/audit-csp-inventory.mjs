@@ -2,14 +2,23 @@ import { existsSync, readdirSync, readFileSync } from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 
-const docsRoot = path.resolve(
-  path.dirname(fileURLToPath(import.meta.url)),
-  '..'
-);
+import { docsRoot } from './roots.mjs';
+
 const appOutputDir = path.join(docsRoot, '.next', 'server', 'app');
+const clientOutputDir = path.join(docsRoot, '.next', 'static');
+// String literals only — identifiers and property names are mangled away, and
+// a generic marker collides with unrelated client code.
+const highlighterMarkers = [
+  { source: '__shiki_resolved', module: '@shikijs/primitive' },
+  { source: 'Shiki instance has been disposed', module: '@shikijs/primitive' },
+  { source: 'source.tsx', module: '@shikijs/langs/tsx' },
+  { source: 'source.css', module: '@shikijs/langs/css' },
+  { source: 'Invalid recursionLimit; use 2-20', module: 'oniguruma-to-es' },
+];
 const appearanceFixtureSource = path.join(
   docsRoot,
   'app',
+  '(docs)',
   'appearance-ssr',
   'page.tsx'
 );
@@ -23,8 +32,20 @@ function walk(dir) {
   });
 }
 
-if (!existsSync(appOutputDir)) {
-  console.error('Missing .next/server/app. Run `pnpm build` first.');
+for (const { source, module } of highlighterMarkers) {
+  const dist = readFileSync(fileURLToPath(import.meta.resolve(module)), 'utf8');
+  if (!dist.includes(source)) {
+    console.error(
+      `Highlighter marker "${source}" is gone from ${module}; the client-bundle scan can no longer detect a highlighter.`
+    );
+    process.exit(1);
+  }
+}
+
+if (!existsSync(appOutputDir) || !existsSync(clientOutputDir)) {
+  console.error(
+    'Missing .next/server/app or .next/static. Run `pnpm build` first.'
+  );
   process.exit(1);
 }
 
@@ -35,6 +56,21 @@ const serverFiles = walk(appOutputDir).filter((file) =>
 
 if (htmlFiles.length === 0) {
   console.error('No prerendered app HTML files found under .next/server/app.');
+  process.exit(1);
+}
+
+const highlighterChunks = walk(clientOutputDir).filter((file) => {
+  if (!/\.(?:js|mjs)$/.test(file)) return false;
+  const contents = readFileSync(file, 'utf8');
+  return highlighterMarkers.some((marker) => contents.includes(marker.source));
+});
+
+if (highlighterChunks.length > 0) {
+  console.error(
+    `Highlighter reached the client bundle: ${highlighterChunks
+      .map((file) => path.relative(docsRoot, file))
+      .join(', ')}`
+  );
   process.exit(1);
 }
 
@@ -92,6 +128,7 @@ console.log(
       serializedDocsStorageReferences,
       fixtureOrderChecks,
       inlineStyleAttributes,
+      highlighterChunks: highlighterChunks.length,
     },
     null,
     2
@@ -126,7 +163,7 @@ if (fixtureOrderChecks === 0 && existsSync(appearanceFixtureSource)) {
 
   if (scriptIndex === -1 || markerIndex === -1 || scriptIndex > markerIndex) {
     console.error(
-      'Expected apps/docs/app/appearance-ssr/page.tsx to render NexusAppearanceScript before the fixture marker.'
+      'Expected apps/docs/app/(docs)/appearance-ssr/page.tsx to render NexusAppearanceScript before the fixture marker.'
     );
     process.exit(1);
   }

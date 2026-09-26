@@ -51,9 +51,7 @@ const SKIP_DIR = new Set([
 
 export const DEFAULT_ALLOWLIST = [
   'packages/core/scripts/lib/mode-rename-map.js',
-  'packages/core/scripts/capture-mode-values.js',
-  'packages/core/scripts/__tests__/__fixtures__/pre-rename-mode-values.json',
-  'apps/docs/app/changelog',
+  'apps/docs/app/(docs)/changelog',
 ];
 
 export function scanText(file, text) {

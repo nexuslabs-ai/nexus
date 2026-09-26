@@ -8,16 +8,6 @@
  * (and thus override / stale-out) a consumer's tokens.
  */
 @import 'tailwindcss' prefix(nx);
-@custom-variant reduce-transparency (@media (prefers-reduced-transparency: reduce));
 @reference '@nexus_ds/tailwind';
 @import 'tw-animate-css';
 @import './components/progress/progress.css';
-
-@media (prefers-reduced-motion: reduce) {
-  /* Vaul injects drawer motion CSS at runtime, outside Tailwind utilities. */
-  [data-slot='drawer-content'][data-vaul-drawer],
-  [data-slot='drawer-overlay'][data-vaul-overlay] {
-    animation: none !important;
-    transition: none !important;
-  }
-}

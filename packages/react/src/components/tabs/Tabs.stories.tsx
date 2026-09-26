@@ -395,17 +395,6 @@ export const ClickInteraction: Story = {
   },
 };
 
-export const ReducedMotion: Story = {
-  render: Default.render,
-  play: async ({ canvasElement }) => {
-    const indicator = getTabsIndicator(canvasElement);
-
-    await waitFor(() =>
-      expect(indicator).toHaveClass('nx:motion-reduce:transition-none')
-    );
-  },
-};
-
 export const KeyboardInteraction: Story = {
   render: (_args) => (
     <Tabs defaultValue="tab1" className="nx:w-[400px]">

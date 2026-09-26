@@ -23,4 +23,6 @@ Every rule below is a concrete application of this principle. When they conflict
 - `code-comments.md` — comment non-obvious logic only; TODOs must cite a tracked issue
 - `no-follow-up-deferral.md` — every issue flagged by a PR review is fixed in the same PR
 - `project-stage.md` — pre-production: no backcompat, no shims, no feature flags — change code in place
+- `no-environment-branching.md` — one appearance per variant × size × theme; no OS, browser, or input-device queries
+- `component-owned-styling.md` — the theme supplies tokens and utilities; component UI and behaviour live in the component, never in `nexus.css` selectors
 - [`polish.md`](polish.md) — Tier-A component polish is a checkable completion bar, not vibes

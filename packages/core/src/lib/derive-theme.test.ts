@@ -8,12 +8,14 @@ import {
 } from 'culori';
 import { describe, expect, it } from 'vitest';
 
-import { apcaLc, resolveToSrgbInts, type SrgbInts } from './apca';
-import { APCA_PAIRS, type ApcaPair } from './apca-pairs';
+import { apcaLc } from './apca';
+import { APCA_PAIRS } from './apca-pairs';
 import {
+  BASE_TONE_OPTIONS,
   createNexusThemeContract,
   DEFAULT_NEXUS_APPEARANCE,
 } from './appearance-model';
+import { contrastForPair } from './contrast';
 import {
   derivePrimary,
   deriveSurfaces,
@@ -23,7 +25,8 @@ import {
   themeToCss,
 } from './derive-theme';
 import { type NexusSurfaceTone, TIER_THRESHOLDS } from './palette';
-import { STATUS_RAMP } from './static-ramps';
+import { getPaletteRamp } from './primitive-palette';
+import { STATUS_PALETTE_FAMILIES } from './semantic-palette-references';
 
 function lOf(oklchStr: string | undefined): number {
   return oklch(parse(oklchStr!)!)!.l!;
@@ -72,21 +75,6 @@ function alphaOf(color: string): number {
 
 function rgbString([r, g, b]: [number, number, number]): string {
   return `rgb(${r}, ${g}, ${b})`;
-}
-
-function semanticColor(map: Record<string, string>, name: string): string {
-  const token = `--nx-color-${name}`;
-  const value = map[token];
-  if (typeof value !== 'string') {
-    throw new Error(`Missing semantic color ${token}.`);
-  }
-  return value;
-}
-
-function apcaLcForPair(map: Record<string, string>, pair: ApcaPair): number {
-  const bgInts: SrgbInts = resolveToSrgbInts(semanticColor(map, pair.bg));
-  const fgInts = resolveToSrgbInts(semanticColor(map, pair.fg), bgInts);
-  return Math.abs(apcaLc(rgbString(fgInts), rgbString(bgInts)));
 }
 
 function simulatedRgb(
@@ -193,9 +181,10 @@ describe('deriveSurfaces', () => {
     );
   });
 
-  it('keeps light container on the same white plane as the page', () => {
+  it('keeps the light container and popover on the page plane', () => {
     const s = deriveSurfaces('#ffffff', 'stone', 'light', 0.056);
     expect(s['--nx-color-container']).toBe(s['--nx-color-background']);
+    expect(s['--nx-color-popover']).toBe(s['--nx-color-background']);
     expect(lOf(s['--nx-color-background'])).toBeCloseTo(1, 3);
   });
 
@@ -211,62 +200,28 @@ describe('deriveSurfaces', () => {
 describe('deriveText', () => {
   const surfaces = deriveSurfaces('#181818', 'neutral', 'dark', 0.05);
 
-  it('emits the JSON alpha ink model for foreground tiers', () => {
-    const light = deriveText('#0a0a0a', surfaces, 'light');
+  it('uses foreground seeds and surface-relative muted candidates', () => {
+    const light = deriveText(
+      '#0a0a0a',
+      deriveSurfaces('#ffffff', 'neutral', 'light', 0.05),
+      'light'
+    );
     const dark = deriveText('#ffffff', surfaces, 'dark');
-
-    expect(light['--nx-color-foreground']).toBe('oklch(0.1448 0 0 / 0.9098)');
-    expect(light['--nx-color-muted-foreground']).toBe(
-      'oklch(0.1448 0 0 / 0.6275)'
+    expect(lOf(light['--nx-color-foreground'])).toBeCloseTo(
+      lOf('oklch(0.1448 0 0)')
     );
-    expect(light['--nx-color-muted-foreground-subtle']).toBe(
-      'oklch(0.1448 0 0 / 0.502)'
+    expect(dark['--nx-color-foreground']).toBe('oklch(1 0 0)');
+    expect(lOf(light['--nx-color-muted-foreground'])).toBeGreaterThan(
+      lOf(light['--nx-color-foreground'])
     );
-    expect(dark['--nx-color-foreground']).toBe('oklch(1 0 0 / 0.9098)');
-    expect(dark['--nx-color-muted-foreground']).toBe('oklch(1 0 0 / 0.6275)');
-    expect(dark['--nx-color-muted-foreground-subtle']).toBe(
-      'oklch(1 0 0 / 0.6275)'
+    expect(lOf(dark['--nx-color-muted-foreground'])).toBeLessThan(
+      lOf(dark['--nx-color-foreground'])
     );
   });
 
   it('does not throw on a pathological mid-grey pairing', () => {
     const mid = deriveSurfaces('#7d7d7d', 'neutral', 'light', 0.05);
     expect(() => deriveText('#808080', mid, 'light')).not.toThrow();
-  });
-});
-
-describe('deriveFamily / derivePrimary snapshot', () => {
-  it('primary fill follows the seed lightness; supporting shades come from the ramp', () => {
-    expect(derivePrimary('#2563eb', 'light')).toMatchInlineSnapshot(`
-      {
-        "--nx-color-border-primary": "oklch(0.87 0.066 262.881)",
-        "--nx-color-border-primary-active": "oklch(0.66 0.1849 262.881)",
-        "--nx-color-primary-background": "oklch(0.5461 0.2152 262.881)",
-        "--nx-color-primary-background-active": "oklch(0.4461 0.2152 262.881)",
-        "--nx-color-primary-background-hover": "oklch(0.4961 0.2152 262.881)",
-        "--nx-color-primary-disabled": "oklch(0.765 0.1236 262.881)",
-        "--nx-color-primary-foreground": "oklch(1 0 0)",
-        "--nx-color-primary-subtle": "oklch(0.985 0.0073 262.881)",
-        "--nx-color-primary-subtle-active": "oklch(0.87 0.066 262.881)",
-        "--nx-color-primary-subtle-foreground": "oklch(0.46 0.2152 262.881)",
-        "--nx-color-primary-subtle-hover": "oklch(0.945 0.0273 262.881)",
-      }
-    `);
-    expect(derivePrimary('#2563eb', 'dark')).toMatchInlineSnapshot(`
-      {
-        "--nx-color-border-primary": "oklch(0.385 0.2152 262.881)",
-        "--nx-color-border-primary-active": "oklch(0.553 0.2152 262.881)",
-        "--nx-color-primary-background": "oklch(0.5461 0.2152 262.881)",
-        "--nx-color-primary-background-active": "oklch(0.4461 0.2152 262.881)",
-        "--nx-color-primary-background-hover": "oklch(0.4961 0.2152 262.881)",
-        "--nx-color-primary-disabled": "oklch(0.118 0.0687 262.881)",
-        "--nx-color-primary-foreground": "oklch(1 0 0)",
-        "--nx-color-primary-subtle": "oklch(0.118 0.0687 262.881)",
-        "--nx-color-primary-subtle-active": "oklch(0.297 0.173 262.881)",
-        "--nx-color-primary-subtle-foreground": "oklch(0.765 0.1236 262.881)",
-        "--nx-color-primary-subtle-hover": "oklch(0.207 0.1206 262.881)",
-      }
-    `);
   });
 });
 
@@ -294,71 +249,75 @@ describe('derivePrimary', () => {
       0
     );
   });
+});
 
-  it('picks an on-primary foreground that clears the ui tier', () => {
-    const p = derivePrimary('#339cff', 'light');
-    expect(
-      apcaLc(
-        p['--nx-color-primary-foreground']!,
-        p['--nx-color-primary-background']!
-      )
-    ).toBeGreaterThanOrEqual(TIER_THRESHOLDS.ui);
-  });
+describe('primary fills after contrast solving', () => {
+  const PRIMARY_SEEDS = ['#1b2a4a', '#0a0a0a', '#2563eb', '#339cff', '#7c3aed'];
+  const FILLS = [
+    '--nx-color-primary-background',
+    '--nx-color-primary-background-hover',
+    '--nx-color-primary-background-active',
+  ] as const;
+  const themeFor = (accent: string, contrast = 50) =>
+    deriveTheme({
+      ...CONTRACT,
+      light: { ...CONTRACT.light, accent },
+      dark: { ...CONTRACT.dark, accent },
+      contrast: { light: contrast, dark: contrast },
+    });
 
-  it('keeps the shared label legible on the hover and active fills, not only the base', () => {
-    // Honoring the seed lightness can land the fill near mid-grey, where the
-    // toward-mid hover/active nudge erodes contrast against the single shared
-    // foreground. Every state fill must clear the ui tier against that label —
-    // e.g. deep navy in dark mode lifts to a mid fill and used to drop hover
-    // (~53) and active (~46) below the 60 floor.
-    const seeds = ['#1b2a4a', '#0a0a0a', '#2563eb', '#339cff', '#7c3aed'];
-    const states = [
-      '--nx-color-primary-background',
-      '--nx-color-primary-background-hover',
-      '--nx-color-primary-background-active',
-    ] as const;
-    for (const seed of seeds) {
+  it('keeps the shared label legible on the base, hover, and active fills', () => {
+    for (const seed of PRIMARY_SEEDS) {
       for (const mode of ['light', 'dark'] as const) {
-        const p = derivePrimary(seed, mode);
-        const label = p['--nx-color-primary-foreground']!;
-        for (const state of states) {
+        const map = themeFor(seed)[mode];
+        const label = map['--nx-color-primary-foreground']!;
+        for (const fill of FILLS) {
           expect(
-            apcaLc(label, p[state]!),
-            `${seed} ${mode} ${state}`
+            apcaLc(label, map[fill]!),
+            `${seed} ${mode} ${fill}`
           ).toBeGreaterThanOrEqual(TIER_THRESHOLDS.ui);
         }
       }
     }
   });
 
+  it('leaves the brand fills unchanged as the contrast slider moves', () => {
+    for (const seed of PRIMARY_SEEDS) {
+      const low = themeFor(seed, 0);
+      const high = themeFor(seed, 100);
+      for (const mode of ['light', 'dark'] as const) {
+        for (const fill of FILLS) {
+          expect(high[mode][fill], `${seed} ${mode} ${fill}`).toBe(
+            low[mode][fill]
+          );
+        }
+      }
+    }
+  });
+
   it('keeps a black brand black in light mode and flips it to white in dark mode', () => {
-    const light = derivePrimary('#0a0a0a', 'light');
+    const { light, dark } = themeFor('#0a0a0a');
     expect(lOf(light['--nx-color-primary-background'])).toBeLessThan(0.2);
     expect(lOf(light['--nx-color-primary-background-active'])).toBeLessThan(
       lOf(light['--nx-color-primary-background'])
     );
-    expect(light['--nx-color-primary-subtle-foreground']).toBe(
-      'oklch(0.1448 0 0)'
-    );
-    expect(lOf(light['--nx-color-primary-foreground'])).toBeGreaterThan(0.9);
+    expect(light['--nx-color-primary-foreground']).toBe('oklch(1 0 0)');
 
-    const dark = derivePrimary('#000000', 'dark');
     expect(lOf(dark['--nx-color-primary-background'])).toBeCloseTo(1, 3);
-    expect(dark['--nx-color-primary-subtle-foreground']).toBe('oklch(1 0 0)');
-    expect(dark['--nx-color-primary-foreground']).toBe('oklch(0.1448 0 0)');
+    expect(dark['--nx-color-primary-foreground']).toBe('oklch(0 0 0)');
   });
 });
 
 const CONTRACT: ThemeDerivationInput = {
   light: { accent: '#2563eb', background: '#ffffff', foreground: '#0a0a0a' },
   dark: { accent: '#339cff', background: '#181818', foreground: '#ffffff' },
-  contrast: { light: 60, dark: 60 },
+  contrast: { light: 50, dark: 50 },
 };
 
 const SURFACE_TONE_SEEDS = {
   light: { accent: '#2563eb', background: '#ffffff', foreground: '#181818' },
   dark: { accent: '#2563eb', background: '#181818', foreground: '#ffffff' },
-  contrast: { light: 60, dark: 60 },
+  contrast: { light: 50, dark: 50 },
 } as const;
 
 describe('deriveTheme', () => {
@@ -384,7 +343,7 @@ describe('deriveTheme', () => {
         foreground: '#181818',
       },
       dark: { accent: '#2563eb', background: '#181818', foreground: '#ffffff' },
-      contrast: { light: 60, dark: 60 },
+      contrast: { light: 50, dark: 50 },
     };
     const { light, dark } = deriveTheme(seedsOnly);
     expect(light['--nx-color-background']).toBeDefined();
@@ -414,8 +373,14 @@ describe('deriveTheme', () => {
   it('keeps runtime error focus aligned with the shipped red primitives', () => {
     const d = deriveTheme(createNexusThemeContract(DEFAULT_NEXUS_APPEARANCE));
 
-    expect(d.light['--nx-color-focus-error']).toBe(STATUS_RAMP.error['600']);
-    expect(d.dark['--nx-color-focus-error']).toBe(STATUS_RAMP.error['300']);
+    expect(hOf(d.light['--nx-color-focus-error'])).toBeCloseTo(
+      hOf(getPaletteRamp(STATUS_PALETTE_FAMILIES.error)['600']),
+      2
+    );
+    expect(hOf(d.dark['--nx-color-focus-error'])).toBeCloseTo(
+      hOf(getPaletteRamp(STATUS_PALETTE_FAMILIES.error)['300']),
+      2
+    );
   });
 
   it.each(['light', 'dark'] as const)(
@@ -452,11 +417,9 @@ describe('deriveTheme', () => {
   it.each(['light', 'dark'] as const)(
     'keeps a colored brand focus ring legible on page surfaces in %s mode',
     (mode) => {
-      // The default brand is achromatic, so focus-default resolves to near-black
-      // or white and clears the page by a wide margin. A colored brand takes the
-      // general deriver path: focus-default follows primary-subtle-foreground,
-      // guaranteed only against primary-subtle — this locks that it also clears
-      // the page surfaces the ring actually paints on.
+      // focus-default is solved together with primary-subtle-foreground, so a
+      // colored brand's ring must clear both the subtle fills and the page
+      // surfaces the ring actually paints on.
       const map = deriveTheme({
         light: {
           accent: '#2563eb',
@@ -468,7 +431,7 @@ describe('deriveTheme', () => {
           background: '#181818',
           foreground: '#ffffff',
         },
-        contrast: { light: 60, dark: 60 },
+        contrast: { light: 50, dark: 50 },
       })[mode];
 
       expect(map['--nx-color-focus-default']).toBe(
@@ -501,8 +464,8 @@ describe('deriveTheme', () => {
           ...SURFACE_TONE_SEEDS,
           contrast: { light: contrast, dark: contrast },
         })[mode];
-      const soft = at(0);
-      const strong = at(100);
+      const standard = at(50);
+      const increased = at(100);
 
       const sharedContrastSteppedTokens = [
         '--nx-color-control-background',
@@ -529,35 +492,35 @@ describe('deriveTheme', () => {
             ];
 
       for (const token of modeSteppedTokens) {
-        expect(strong[token], `${mode} ${token}`).not.toBe(soft[token]);
+        expect(increased[token], `${mode} ${token}`).not.toBe(standard[token]);
       }
 
       if (mode === 'dark') {
-        expect(strong['--nx-color-disabled']).toBe(
-          strong['--nx-color-container']
+        expect(increased['--nx-color-disabled']).toBe(
+          increased['--nx-color-container']
         );
-        expect(strong['--nx-color-nav-background']).toBe(
-          strong['--nx-color-container']
+        expect(increased['--nx-color-nav-background']).toBe(
+          increased['--nx-color-container']
         );
-        expect(strong['--nx-color-nav-item-active']).toBe(
-          strong['--nx-color-container-hover']
+        expect(increased['--nx-color-nav-item-active']).toBe(
+          increased['--nx-color-container-hover']
         );
-        expect(strong['--nx-color-nav-border']).toBe(
-          strong['--nx-color-container-hover']
+        expect(increased['--nx-color-nav-border']).toBe(
+          increased['--nx-color-container-hover']
         );
       } else {
-        expect(lOf(strong['--nx-color-container-hover'])).toBeLessThan(
-          lOf(strong['--nx-color-background'])
+        expect(lOf(increased['--nx-color-container-hover'])).toBeLessThan(
+          lOf(increased['--nx-color-background'])
         );
-        expect(lOf(strong['--nx-color-popover-hover'])).toBeLessThan(
-          lOf(strong['--nx-color-background-hover'])
+        expect(lOf(increased['--nx-color-popover-hover'])).toBeLessThan(
+          lOf(increased['--nx-color-background-hover'])
         );
       }
     }
   );
 
   it.each(['light', 'dark'] as const)(
-    'keeps background-anchored text stable as contrast changes in %s mode',
+    'increases background-anchored text contrast as requested in %s mode',
     (mode) => {
       const at = (contrast: number) =>
         deriveTheme({
@@ -565,18 +528,18 @@ describe('deriveTheme', () => {
           ...SURFACE_TONE_SEEDS,
           contrast: { light: contrast, dark: contrast },
         })[mode];
-      const soft = at(0);
-      const defaultContrast = at(60);
-      const strong = at(100);
+      const standard = at(50);
+      const increased = at(100);
 
       for (const token of [
         '--nx-color-foreground',
         '--nx-color-muted-foreground',
       ]) {
-        expect(defaultContrast[token], `${mode} ${token} at 60`).toBe(
-          soft[token]
+        const surface = '--nx-color-background';
+        const scores = [standard, increased].map((map) =>
+          apcaLc(map[token]!, map[surface]!)
         );
-        expect(strong[token], `${mode} ${token} at 100`).toBe(soft[token]);
+        expect(scores[1]).toBeGreaterThanOrEqual(scores[0]!);
       }
     }
   );
@@ -593,50 +556,28 @@ describe('themeToCss', () => {
 });
 
 describe('deriveSecondary', () => {
-  const secondaryTokens = (map: Record<string, string>) =>
-    Object.fromEntries(
-      Object.entries(map).filter(([key]) =>
-        key.startsWith('--nx-color-secondary-')
-      )
-    );
-
-  it('secondary exactly matches the curated neutral map (both modes)', () => {
-    const { light, dark } = deriveTheme({
-      light: {
-        accent: '#2563eb',
-        background: '#ffffff',
-        foreground: '#181818',
-      },
-      dark: { accent: '#2563eb', background: '#181818', foreground: '#ffffff' },
-      contrast: { light: 60, dark: 60 },
+  it('keeps secondary neutral while resolving shared labels across states', () => {
+    const theme = deriveTheme({
+      ...SURFACE_TONE_SEEDS,
     });
-
-    expect(secondaryTokens(light)).toEqual({
-      '--nx-color-secondary-background': 'oklch(0.945 0 0)',
-      '--nx-color-secondary-background-active': 'oklch(0.765 0 0)',
-      '--nx-color-secondary-background-hover': 'oklch(0.87 0 0)',
-      '--nx-color-secondary-disabled': 'oklch(0.985 0 0)',
-      '--nx-color-secondary-foreground': 'oklch(0.207 0 0)',
-      '--nx-color-secondary-subtle': 'oklch(0.945 0 0)',
-      '--nx-color-secondary-subtle-active': 'oklch(0.765 0 0)',
-      '--nx-color-secondary-subtle-foreground': 'oklch(0.46 0 0)',
-      '--nx-color-secondary-subtle-hover': 'oklch(0.87 0 0)',
-    });
-    expect(secondaryTokens(dark)).toEqual({
-      '--nx-color-secondary-background': 'oklch(0.207 0 0)',
-      '--nx-color-secondary-background-active': 'oklch(0.46 0 0)',
-      '--nx-color-secondary-background-hover': 'oklch(0.385 0 0)',
-      '--nx-color-secondary-disabled': 'oklch(0.118 0 0)',
-      '--nx-color-secondary-foreground': 'oklch(0.945 0 0)',
-      '--nx-color-secondary-subtle': 'oklch(0.297 0 0)',
-      '--nx-color-secondary-subtle-active': 'oklch(0.46 0 0)',
-      '--nx-color-secondary-subtle-foreground': 'oklch(0.87 0 0)',
-      '--nx-color-secondary-subtle-hover': 'oklch(0.385 0 0)',
-    });
-    expect(light['--nx-color-border-secondary']).toBeUndefined();
-    expect(dark['--nx-color-border-secondary']).toBeUndefined();
+    for (const mode of ['light', 'dark'] as const) {
+      for (const [key, value] of Object.entries(theme[mode])) {
+        if (key.startsWith('--nx-color-secondary-'))
+          expect(seedChroma(value)).toBe(0);
+      }
+      for (const pair of APCA_PAIRS.filter((pair) =>
+        pair.fg.startsWith('secondary-')
+      )) {
+        expect(contrastForPair(theme[mode], pair)).toBeGreaterThanOrEqual(
+          TIER_THRESHOLDS[pair.tier]
+        );
+      }
+      expect(theme[mode]['--nx-color-border-secondary']).toBeUndefined();
+    }
   });
 });
+
+const seedChroma = (value: string) => oklch(parse(value)!)!.c;
 
 describe('status families', () => {
   const STATUS_HUES = {
@@ -660,7 +601,7 @@ describe('status families', () => {
           background: '#181818',
           foreground: '#ffffff',
         },
-        contrast: { light: 60, dark: 60 },
+        contrast: { light: 50, dark: 50 },
       })[mode];
 
       for (const [status, hue] of Object.entries(STATUS_HUES)) {
@@ -688,7 +629,7 @@ describe('status families', () => {
 });
 
 describe('surfaceTone surfaces', () => {
-  it('keeps light page and cards white while supporting softer surface tiers', () => {
+  it('keeps a shared white light plane with tinted interaction states', () => {
     const slate = deriveTheme({
       surfaceTone: 'slate',
       ...SURFACE_TONE_SEEDS,
@@ -699,7 +640,7 @@ describe('surfaceTone surfaces', () => {
     }).light;
 
     expect(slate['--nx-color-container']).toBe(slate['--nx-color-background']);
-    expect(slate['--nx-color-popover']).toBe(slate['--nx-color-container']);
+    expect(slate['--nx-color-popover']).toBe(slate['--nx-color-background']);
     expect(slate['--nx-color-background']).toBe(
       neutral['--nx-color-background']
     );
@@ -748,13 +689,27 @@ describe('chart colors', () => {
 });
 
 describe('derived colorblind distinguishability', () => {
-  it.each(['light', 'dark'] as const)(
-    'keeps emitted chart and status colors distinguishable in %s mode outside approved JSON exceptions',
-    (mode) => {
-      const map = deriveTheme({
-        surfaceTone: 'slate',
-        ...SURFACE_TONE_SEEDS,
-      })[mode];
+  it.each(
+    BASE_TONE_OPTIONS.flatMap(({ value: surfaceTone }) =>
+      ([0, 25, 50, 75, 100] as const).flatMap((contrast) =>
+        (['light', 'dark'] as const).map((mode) => ({
+          surfaceTone,
+          contrast,
+          mode,
+        }))
+      )
+    )
+  )(
+    'keeps chart and status colors distinguishable in $surfaceTone $mode $contrast outside approved JSON exceptions',
+    ({ surfaceTone, contrast, mode }) => {
+      const map = deriveTheme(
+        createNexusThemeContract({
+          ...DEFAULT_NEXUS_APPEARANCE,
+          surfaceTone,
+          lightContrast: contrast,
+          darkContrast: contrast,
+        })
+      )[mode];
       // Accepted (not deferred): these deuteranopia-ambiguous pairs stay in
       // canon because charts and status never rely on hue alone — each carries
       // an icon + label, so the pair stays distinguishable in product. The
@@ -793,140 +748,71 @@ describe('derived colorblind distinguishability', () => {
 });
 
 describe('alpha and translucent colors', () => {
-  it('emits tone-ink + contrast-ink alpha tokens with correct L C H alpha in both modes', () => {
-    const { light, dark } = deriveTheme({
+  const at = (contrast: number) =>
+    deriveTheme({
       surfaceTone: 'slate',
       ...SURFACE_TONE_SEEDS,
+      contrast: { light: contrast, dark: contrast },
     });
 
-    expect(light['--nx-color-overlay']).toBe(
-      'oklch(0.13 0.0400 264.7 / 0.7529)'
-    );
-    expect(dark['--nx-color-overlay']).toBe(
-      'oklch(0.13 0.0400 264.7 / 0.8471)'
-    );
-    expect(light['--nx-color-popover-backdrop']).toBe(
-      'oklch(0.13 0.0400 264.7 / 0.9098)'
-    );
-    expect(dark['--nx-color-popover-backdrop']).toBe(
-      'oklch(0.13 0.0400 264.7 / 0.9098)'
-    );
-    expect(light['--nx-color-border-default-alpha']).toBe(
-      'oklch(0.13 0.0400 264.7 / 0.0941)'
-    );
-    expect(dark['--nx-color-border-default-alpha']).toBe(
-      'oklch(0.13 0.0400 264.7 / 0.1882)'
-    );
-    expect(light['--nx-color-background-hover-alpha']).toBe(
-      'oklch(0.13 0.0400 264.7 / 0.0627)'
-    );
-    expect(dark['--nx-color-background-hover-alpha']).toBe(
-      'oklch(0.13 0.0400 264.7 / 0.0627)'
-    );
-    expect(light['--nx-color-popover-alpha']).toBe('oklch(1 0 0 / 0.7529)');
-    expect(dark['--nx-color-popover-alpha']).toBe(
-      'oklch(0.13 0.0400 264.7 / 0.7529)'
-    );
-    expect(light['--nx-color-border-default']).toBe(
-      'oklch(0.1448 0 0 / 0.0941)'
-    );
-    expect(dark['--nx-color-border-default']).toBe('oklch(1 0 0 / 0.1882)');
-    expect(light['--nx-color-border-hairline']).toBe(
-      'oklch(0.1448 0 0 / 0.0941)'
-    );
-    expect(dark['--nx-color-border-hairline']).toBe('oklch(1 0 0 / 0.0941)');
-    expect(light['--nx-color-border-disabled']).toBe(
-      'oklch(0.1448 0 0 / 0.0941)'
-    );
-    expect(dark['--nx-color-border-disabled']).toBe('oklch(1 0 0 / 0.1882)');
+  it('preserves tone-ink opacity and curated border strength at default and maximum contrast', () => {
+    for (const contrast of [50, 100] as const) {
+      const { light, dark } = at(contrast);
+      expect(light['--nx-color-overlay']).toBe(
+        'oklch(0.13 0.006 264.7 / 0.7529)'
+      );
+      expect(dark['--nx-color-overlay']).toBe(
+        'oklch(0.13 0.006 264.7 / 0.8471)'
+      );
+      expect(light['--nx-color-popover-backdrop']).toBe(
+        'oklch(0.13 0.006 264.7 / 0.9098)'
+      );
+      expect(dark['--nx-color-popover-backdrop']).toBe(
+        light['--nx-color-popover-backdrop']
+      );
+      const lightBorder = contrast === 50 ? 0.0884 : 0.1168;
+      const darkBorder = contrast === 50 ? 0.1768 : 0.2337;
+      for (const token of [
+        'border-default',
+        'border-disabled',
+        'border-default-alpha',
+      ]) {
+        expect(alphaOf(light[`--nx-color-${token}`]!)).toBe(lightBorder);
+        expect(alphaOf(dark[`--nx-color-${token}`]!)).toBe(darkBorder);
+      }
+      expect(alphaOf(light['--nx-color-border-hairline']!)).toBe(0.0941);
+      expect(alphaOf(dark['--nx-color-border-hairline']!)).toBe(0.0941);
+      expect(alphaOf(light['--nx-color-popover-alpha']!)).toBe(
+        contrast === 50 ? 0.97 : 1
+      );
+      expect(alphaOf(dark['--nx-color-popover-alpha']!)).toBe(
+        contrast === 50 ? 0.97 : 1
+      );
+    }
   });
 
-  it('scales default border alpha with contrast, anchored at the curated default', () => {
-    const at = (contrast: number) =>
-      deriveTheme({
-        surfaceTone: 'slate',
-        ...SURFACE_TONE_SEEDS,
-        contrast: { light: contrast, dark: contrast },
-      });
-
-    expect(at(0).light['--nx-color-border-default']).toBe(
-      'oklch(0.1448 0 0 / 0.06)'
+  it('strengthens hover ink while keeping scrims anchored', () => {
+    const standard = at(50);
+    const increased = at(100);
+    expect(alphaOf(standard.light['--nx-color-background-hover-alpha']!)).toBe(
+      0.0581
     );
-    expect(at(0).dark['--nx-color-border-default']).toBe('oklch(1 0 0 / 0.12)');
-    expect(at(0).light['--nx-color-border-disabled']).toBe(
-      'oklch(0.1448 0 0 / 0.06)'
+    expect(alphaOf(standard.dark['--nx-color-background-hover-alpha']!)).toBe(
+      0.0589
     );
-    expect(at(0).dark['--nx-color-border-disabled']).toBe(
-      'oklch(1 0 0 / 0.12)'
+    expect(alphaOf(increased.light['--nx-color-background-hover-alpha']!)).toBe(
+      0.085
     );
-    expect(at(60).light['--nx-color-border-default']).toBe(
-      'oklch(0.1448 0 0 / 0.0941)'
+    expect(alphaOf(increased.dark['--nx-color-background-hover-alpha']!)).toBe(
+      0.09
     );
-    expect(at(60).dark['--nx-color-border-default']).toBe(
-      'oklch(1 0 0 / 0.1882)'
-    );
-    expect(at(60).light['--nx-color-border-default-alpha']).toBe(
-      'oklch(0.13 0.0400 264.7 / 0.0941)'
-    );
-    expect(at(60).dark['--nx-color-border-default-alpha']).toBe(
-      'oklch(0.13 0.0400 264.7 / 0.1882)'
-    );
-    expect(at(100).light['--nx-color-border-default']).toBe(
-      'oklch(0.1448 0 0 / 0.1168)'
-    );
-    expect(at(100).dark['--nx-color-border-default']).toBe(
-      'oklch(1 0 0 / 0.2337)'
-    );
-    expect(at(100).dark['--nx-color-border-default-alpha']).toBe(
-      'oklch(0.13 0.0400 264.7 / 0.2337)'
-    );
-    expect(at(100).light['--nx-color-border-hairline']).toBe(
-      'oklch(0.1448 0 0 / 0.0941)'
-    );
-    expect(at(100).dark['--nx-color-border-hairline']).toBe(
-      'oklch(1 0 0 / 0.0941)'
-    );
-    // contrast 30 exercises the sub-anchor lerp branch + toFixed rounding —
-    // every assertion above is an endpoint (0/100) or the c===60 early return.
-    expect(at(30).dark['--nx-color-border-default']).toBe(
-      'oklch(1 0 0 / 0.1541)'
-    );
-    expect(at(30).light['--nx-color-border-default']).toBe(
-      'oklch(0.1448 0 0 / 0.0771)'
-    );
-  });
-
-  it('scales background-hover-alpha with contrast while leaving scrims anchored', () => {
-    const at = (contrast: number) =>
-      deriveTheme({
-        surfaceTone: 'slate',
-        ...SURFACE_TONE_SEEDS,
-        contrast: { light: contrast, dark: contrast },
-      });
-
-    expect(at(0).light['--nx-color-background-hover-alpha']).toBe(
-      'oklch(0.13 0.0400 264.7 / 0.035)'
-    );
-    expect(at(0).dark['--nx-color-background-hover-alpha']).toBe(
-      'oklch(0.13 0.0400 264.7 / 0.04)'
-    );
-    expect(at(60).light['--nx-color-background-hover-alpha']).toBe(
-      'oklch(0.13 0.0400 264.7 / 0.0627)'
-    );
-    expect(at(60).dark['--nx-color-background-hover-alpha']).toBe(
-      'oklch(0.13 0.0400 264.7 / 0.0627)'
-    );
-    expect(at(100).light['--nx-color-background-hover-alpha']).toBe(
-      'oklch(0.13 0.0400 264.7 / 0.085)'
-    );
-    expect(at(100).dark['--nx-color-background-hover-alpha']).toBe(
-      'oklch(0.13 0.0400 264.7 / 0.09)'
-    );
-    expect(at(0).dark['--nx-color-overlay']).toBe(
-      at(100).dark['--nx-color-overlay']
-    );
-    expect(at(0).dark['--nx-color-popover-alpha']).toBe(
-      at(100).dark['--nx-color-popover-alpha']
+    for (const mode of ['light', 'dark'] as const) {
+      expect(standard[mode]['--nx-color-overlay']).toBe(
+        increased[mode]['--nx-color-overlay']
+      );
+    }
+    expect(lOf(increased.dark['--nx-color-popover-alpha'])).toBeGreaterThan(
+      lOf(standard.dark['--nx-color-popover-alpha'])
     );
   });
 });
@@ -1019,24 +905,18 @@ describe('popover-alpha worst-case readability', () => {
   );
 });
 
-describe('fixed alpha text inks stay legible composited over their surface', () => {
-  // foreground/muted/subtle are emitted as fixed translucent inks, no longer
-  // walked to an APCA floor by construction — and apcaLc scores colors as opaque
-  // (audit:contrast composites them, but only at the shipped contrast). Composite
-  // each ink over its surface (the real rendered pixel) and assert it clears its
-  // floor across every tone and both contrast extremes; light `muted` recedes
-  // furthest at high contrast, the worst case.
+describe('text inks stay legible composited over their surface', () => {
   const INK_CHECKS: ReadonlyArray<
     [string, string, keyof typeof TIER_THRESHOLDS]
   > = [
     ['--nx-color-foreground', '--nx-color-background', 'body'],
-    ['--nx-color-muted-foreground', '--nx-color-muted', 'incidental'],
+    ['--nx-color-muted-foreground', '--nx-color-muted', 'ui'],
     ['--nx-color-muted-foreground-subtle', '--nx-color-muted', 'incidental'],
   ];
 
   it.each(
     SURFACE_TONES.flatMap((surfaceTone) =>
-      [0, 100].flatMap((contrast) =>
+      ([0, 25, 50, 75, 100] as const).flatMap((contrast) =>
         (['light', 'dark'] as const).map((mode) => ({
           surfaceTone,
           contrast,
@@ -1074,7 +954,7 @@ describe('legibility invariant: every APCA pair clears its floor', () => {
   it.each(
     SWEEP_SEEDS.flatMap((seed) =>
       SURFACE_TONES.flatMap((surfaceTone) =>
-        [0, 60, 100].map((contrast) => ({
+        ([0, 50, 100] as const).map((contrast) => ({
           ...seed,
           surfaceTone,
           contrast,
@@ -1095,7 +975,7 @@ describe('legibility invariant: every APCA pair clears its floor', () => {
 
       for (const pair of APCA_PAIRS) {
         expect(
-          apcaLcForPair(map, pair),
+          contrastForPair(map, pair),
           `${surfaceTone} ${mode}: ${pair.fg} on ${pair.bg}`
         ).toBeGreaterThanOrEqual(TIER_THRESHOLDS[pair.tier]);
       }
@@ -1113,34 +993,34 @@ describe('per-mode contrast isolation', () => {
   it('light contrast drives light tokens and leaves the whole dark map identical', () => {
     const baseline = deriveTheme({
       ...seeds,
-      contrast: { light: 60, dark: 60 },
+      contrast: { light: 50, dark: 50 },
     });
-    const lightLowered = deriveTheme({
+    const lightIncreased = deriveTheme({
       ...seeds,
-      contrast: { light: 0, dark: 60 },
+      contrast: { light: 100, dark: 50 },
     });
 
     // control-background is contrast-stepped in both modes (see the
     // 'moves structure tokens as contrast changes' test above).
-    expect(lightLowered.light['--nx-color-control-background']).not.toBe(
+    expect(lightIncreased.light['--nx-color-control-background']).not.toBe(
       baseline.light['--nx-color-control-background']
     );
-    expect(lightLowered.dark).toEqual(baseline.dark); // whole dark map byte-identical
+    expect(lightIncreased.dark).toEqual(baseline.dark); // whole dark map byte-identical
   });
 
   it('dark contrast drives dark tokens and leaves the whole light map identical', () => {
     const baseline = deriveTheme({
       ...seeds,
-      contrast: { light: 60, dark: 60 },
+      contrast: { light: 50, dark: 50 },
     });
-    const darkLowered = deriveTheme({
+    const darkIncreased = deriveTheme({
       ...seeds,
-      contrast: { light: 60, dark: 0 },
+      contrast: { light: 50, dark: 100 },
     });
 
-    expect(darkLowered.dark['--nx-color-control-background']).not.toBe(
+    expect(darkIncreased.dark['--nx-color-control-background']).not.toBe(
       baseline.dark['--nx-color-control-background']
     );
-    expect(darkLowered.light).toEqual(baseline.light);
+    expect(darkIncreased.light).toEqual(baseline.light);
   });
 });

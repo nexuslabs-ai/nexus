@@ -27,7 +27,12 @@ export default defineConfig({
     tailwindcss(),
     dts({
       include: ['src'],
-      exclude: ['**/*.test.ts', '**/*.test.tsx', '**/*.stories.tsx'],
+      exclude: [
+        '**/*.test.ts',
+        '**/*.test.tsx',
+        '**/*.stories.tsx',
+        'src/stories/**',
+      ],
       outDir: 'dist',
       beforeWriteFile: rewriteRootDeclaration,
     }),
@@ -36,6 +41,7 @@ export default defineConfig({
     lib: {
       entry: {
         index: path.resolve(__dirname, 'src/index.ts'),
+        utils: path.resolve(__dirname, 'src/lib/utils.ts'),
         appearance: path.resolve(
           __dirname,
           'src/components/appearance/provider/index.ts'

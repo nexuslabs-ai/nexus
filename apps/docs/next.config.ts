@@ -3,6 +3,7 @@ import type { NextConfig } from 'next';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 
+import { MDX_OPTIONS } from './mdx-options';
 import { DOCS_APPEARANCE_BOOTSTRAP_CSP_HASH } from './theme-csp';
 
 const SCRIPT_SRC = [
@@ -84,8 +85,6 @@ const nextConfig: NextConfig = {
   },
 };
 
-// No remark/rehype plugins yet — keeps dev (Turbopack) happy. When GFM tables
-// or heading anchors are needed, add them as string-named plugins.
-const withMDX = createMDX({});
+const withMDX = createMDX({ options: MDX_OPTIONS });
 
 export default withMDX(nextConfig);

@@ -21,12 +21,8 @@ interface ScrollAreaProps extends React.ComponentProps<
  * ScrollArea
  *
  * A viewport with cross-browser custom scrollbars, so a scrollable region reads
- * the same on every platform instead of inheriting the OS scrollbar. This is an
- * intentional divergence from native scrollbar styling guidance: Radix keeps
- * scrolling native, while Nexus owns the visible track and thumb. In
- * `forced-colors` environments, the scrollbar chrome switches to system colors
- * as a progressive enhancement and leaves user content under the browser's
- * normal forced-color adjustment.
+ * the same on every platform instead of inheriting the OS scrollbar. Radix keeps
+ * scrolling native, while Nexus owns the visible track and thumb.
  *
  * Wraps its children in a measured viewport and renders a vertical scrollbar
  * for you. For horizontal (or both-axis) scrolling, add a
@@ -63,16 +59,13 @@ function ScrollArea({ className, children, ...props }: ScrollAreaProps) {
         tabIndex={0}
         className={cn(
           'nx:size-full nx:rounded-[inherit]',
-          'nx:focus-visible:outline-2 nx:focus-visible:outline-focus-default nx:focus-visible:outline-offset-(--focus-offset)'
+          'nx:focus-visible:outline-2 nx:focus-visible:outline-focus-default'
         )}
       >
         {children}
       </ScrollAreaPrimitive.Viewport>
       <ScrollBar />
-      <ScrollAreaPrimitive.Corner
-        data-slot="scroll-area-corner"
-        className="nx:forced-colors:border-default nx:forced-colors:border-[ButtonBorder] nx:forced-colors:bg-[Canvas]"
-      />
+      <ScrollAreaPrimitive.Corner data-slot="scroll-area-corner" />
     </ScrollAreaPrimitive.Root>
   );
 }
@@ -89,14 +82,14 @@ interface ScrollBarProps extends React.ComponentProps<
 > {}
 
 const scrollBarVariants = cva(
-  'nx:flex nx:touch-none nx:select-none nx:p-px nx:transition-colors nx:forced-colors:bg-[Canvas]',
+  'nx:flex nx:touch-none nx:select-none nx:p-px nx:transition-colors',
   {
     variants: {
       orientation: {
         vertical:
-          'nx:h-full nx:w-2.5 nx:border-l-default nx:border-l-transparent nx:forced-colors:border-l-[ButtonBorder]',
+          'nx:h-full nx:w-2.5 nx:border-l-default nx:border-l-transparent',
         horizontal:
-          'nx:h-2.5 nx:flex-col nx:border-t-default nx:border-t-transparent nx:forced-colors:border-t-[ButtonBorder]',
+          'nx:h-2.5 nx:flex-col nx:border-t-default nx:border-t-transparent',
       },
     },
     defaultVariants: {
@@ -131,7 +124,7 @@ function ScrollBar({
     >
       <ScrollAreaPrimitive.ScrollAreaThumb
         data-slot="scroll-bar-thumb"
-        className="nx:relative nx:flex-1 nx:rounded-full nx:bg-border-default nx:forced-colors:bg-[CanvasText]"
+        className="nx:relative nx:flex-1 nx:rounded-full nx:bg-border-default"
       />
     </ScrollAreaPrimitive.ScrollAreaScrollbar>
   );

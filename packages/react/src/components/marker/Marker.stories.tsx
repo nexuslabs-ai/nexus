@@ -287,14 +287,7 @@ export const Disabled: StoryObj<MarkerProps & { onRevert: () => void }> = {
   },
 };
 
-/**
- * The two `variant="separator"` rules are painted with `background-color` on
- * `::before` / `::after`, which the forced-color adjustment flattens to
- * `Canvas`. Both carry a `CanvasText` fallback so the divider survives Windows
- * High Contrast Mode; `Separator` carries the same fallback. HCM itself is
- * visual evidence — the play function only guards that the rules paint at all.
- */
-export const ForcedColors: Story = {
+export const SeparatorRules: Story = {
   render: () => (
     <Marker variant="separator">
       <MarkerContent>Today</MarkerContent>

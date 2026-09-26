@@ -1,3 +1,5 @@
+import { type ComponentProps, useState } from 'react';
+
 import type { Meta, StoryObj } from '@storybook/react';
 import { expect, userEvent, waitFor, within } from 'storybook/test';
 
@@ -13,6 +15,7 @@ import {
   DrawerBody,
   DrawerClose,
   DrawerContent,
+  type DrawerContentProps,
   DrawerDescription,
   DrawerFooter,
   DrawerHeader,
@@ -30,6 +33,7 @@ const meta: Meta<typeof Drawer> = {
         component: [
           'Use Drawer for gesture-driven mobile-style panels, especially bottom drawers that can be dragged to dismiss.',
           'Use Sheet for deterministic side panels, Dialog for centered modal tasks, and AlertDialog for choice-forcing confirmations.',
+          'DrawerContent showHandle defaults to true. Set it to false to remove the visual handle and its spacing; it does not change Vaul dragging or root dismissal settings.',
         ].join(' '),
       },
     },
@@ -40,6 +44,10 @@ export default meta;
 type Story = StoryObj<typeof Drawer>;
 
 const DIRECTIONS = ['top', 'right', 'bottom', 'left'] as const;
+const HANDLE_OPTIONS = [
+  { label: 'default', props: {} },
+  { label: 'hidden', props: { showHandle: false } },
+] satisfies { label: string; props: Pick<DrawerContentProps, 'showHandle'> }[];
 const SCROLLABLE_ITEMS = Array.from({ length: 18 }, (_, index) => ({
   title: `Audit item ${index + 1}`,
   description:
@@ -54,6 +62,98 @@ const waitForDrawerToClose = async () => {
     { timeout: 3000 }
   );
 };
+
+interface HandleExampleProps
+  extends
+    Pick<ComponentProps<typeof Drawer>, 'direction' | 'dismissible'>,
+    Pick<DrawerContentProps, 'showHandle'> {
+  triggerLabel: string;
+}
+
+function HandleExample({
+  direction,
+  dismissible,
+  showHandle,
+  triggerLabel,
+}: HandleExampleProps) {
+  const [open, setOpen] = useState(false);
+
+  return (
+    <Drawer
+      open={open}
+      onOpenChange={setOpen}
+      direction={direction}
+      dismissible={dismissible}
+    >
+      <DrawerTrigger asChild>
+        <Button variant="outline">{triggerLabel}</Button>
+      </DrawerTrigger>
+      <DrawerContent showHandle={showHandle}>
+        <DrawerHeader>
+          <DrawerTitle>Document preview</DrawerTitle>
+          <DrawerDescription>
+            The visual handle is optional. Root settings still control
+            dismissal.
+          </DrawerDescription>
+        </DrawerHeader>
+        <DrawerBody className="nx:max-h-[45svh] nx:pb-6">
+          <p className="nx:typography-body-default nx:text-foreground">
+            Review the document. Root settings determine which dismissal methods
+            are available.
+          </p>
+          <ul className="nx:flex nx:flex-col nx:gap-3">
+            {SCROLLABLE_ITEMS.map((item) => (
+              <li
+                key={item.title}
+                className="nx:typography-body-default nx:text-foreground"
+              >
+                {item.title}
+              </li>
+            ))}
+          </ul>
+        </DrawerBody>
+        <DrawerFooter>
+          <DrawerClose asChild>
+            <Button variant="outline">Close preview</Button>
+          </DrawerClose>
+          {dismissible === false && (
+            <Button onClick={() => setOpen(false)}>Finish preview</Button>
+          )}
+        </DrawerFooter>
+      </DrawerContent>
+    </Drawer>
+  );
+}
+
+function HandleToggleExample() {
+  const [showHandle, setShowHandle] = useState(false);
+
+  return (
+    <Drawer>
+      <DrawerTrigger asChild>
+        <Button variant="outline">Open handle toggle</Button>
+      </DrawerTrigger>
+      <DrawerContent showHandle={showHandle}>
+        <DrawerHeader>
+          <DrawerTitle>Handle visibility</DrawerTitle>
+          <DrawerDescription>
+            Change the handle without reopening the drawer.
+          </DrawerDescription>
+        </DrawerHeader>
+        <DrawerBody>
+          <Button onClick={() => setShowHandle(!showHandle)}>
+            {showHandle ? 'Hide handle' : 'Show handle'}
+          </Button>
+        </DrawerBody>
+        <DrawerFooter>
+          <DrawerClose asChild>
+            <Button variant="outline">Close preview</Button>
+          </DrawerClose>
+        </DrawerFooter>
+      </DrawerContent>
+    </Drawer>
+  );
+}
 
 // ============================================
 // BASIC STORIES
@@ -543,6 +643,144 @@ export const BottomDragHandleVisibility: Story = {
       within(drawer).getByRole('button', { name: 'Close right handle' })
     );
 
+    await waitForDrawerToClose();
+  },
+};
+
+export const WithoutHandle: Story = {
+  render: () => (
+    <HandleExample showHandle={false} triggerLabel="Open without handle" />
+  ),
+  play: async ({ canvasElement }) => {
+    const trigger = within(canvasElement).getByRole('button', {
+      name: 'Open without handle',
+    });
+    await userEvent.click(trigger);
+    const drawer = await within(document.body).findByRole('dialog');
+    await expect(
+      drawer.querySelector('[data-slot="drawer-handle"]')
+    ).toBeNull();
+    await userEvent.click(
+      within(drawer).getByRole('button', { name: 'Close preview' })
+    );
+    await waitForDrawerToClose();
+  },
+};
+
+export const HandleDirectionMatrix: Story = {
+  render: () => (
+    <div className="nx:flex nx:flex-wrap nx:gap-4">
+      {DIRECTIONS.flatMap((direction) =>
+        HANDLE_OPTIONS.map((option) => (
+          <HandleExample
+            key={`${direction}-${option.label}`}
+            direction={direction}
+            {...option.props}
+            triggerLabel={`Open ${direction} ${option.label} handle`}
+          />
+        ))
+      )}
+    </div>
+  ),
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+    for (const direction of DIRECTIONS) {
+      for (const option of HANDLE_OPTIONS) {
+        await userEvent.click(
+          canvas.getByRole('button', {
+            name: `Open ${direction} ${option.label} handle`,
+          })
+        );
+        const drawer = await within(document.body).findByRole('dialog');
+        await expect(drawer).toHaveAttribute(
+          'data-vaul-drawer-direction',
+          direction
+        );
+        const handle = drawer.querySelector('[data-slot="drawer-handle"]');
+        if (option.props.showHandle === false) {
+          await expect(handle).toBeNull();
+        } else {
+          await expect(handle).toBeInTheDocument();
+          if (direction === 'bottom') {
+            await expect(handle).toBeVisible();
+          } else {
+            await expect(handle).not.toBeVisible();
+          }
+        }
+        await userEvent.click(
+          within(drawer).getByRole('button', { name: 'Close preview' })
+        );
+        await waitForDrawerToClose();
+      }
+    }
+  },
+};
+
+export const HandleVisibilityWhileOpen: Story = {
+  render: () => <HandleToggleExample />,
+  play: async ({ canvasElement }) => {
+    await userEvent.click(
+      within(canvasElement).getByRole('button', { name: 'Open handle toggle' })
+    );
+    const drawer = await within(document.body).findByRole('dialog');
+    const header = drawer.querySelector<HTMLElement>(
+      '[data-slot="drawer-header"]'
+    );
+    await expect(header).not.toBeNull();
+    const hiddenOffset = header!.offsetTop;
+    await expect(
+      drawer.querySelector('[data-slot="drawer-handle"]')
+    ).toBeNull();
+    await userEvent.click(
+      within(drawer).getByRole('button', { name: 'Show handle' })
+    );
+    await expect(
+      drawer.querySelector('[data-slot="drawer-handle"]')
+    ).toBeVisible();
+    await expect(header!.offsetTop).toBeGreaterThanOrEqual(hiddenOffset + 8);
+    await expect(document.querySelector('[role="dialog"]')).toBe(drawer);
+    await userEvent.click(
+      within(drawer).getByRole('button', { name: 'Hide handle' })
+    );
+    await expect(
+      drawer.querySelector('[data-slot="drawer-handle"]')
+    ).toBeNull();
+    await expect(header!.offsetTop).toBe(hiddenOffset);
+    await expect(document.querySelector('[role="dialog"]')).toBe(drawer);
+    await userEvent.click(
+      within(drawer).getByRole('button', { name: 'Close preview' })
+    );
+    await waitForDrawerToClose();
+  },
+};
+
+export const HiddenHandleNonDismissible: Story = {
+  render: () => (
+    <HandleExample
+      showHandle={false}
+      dismissible={false}
+      triggerLabel="Open non-dismissible preview"
+    />
+  ),
+  play: async ({ canvasElement }) => {
+    await userEvent.click(
+      within(canvasElement).getByRole('button', {
+        name: 'Open non-dismissible preview',
+      })
+    );
+    const drawer = await within(document.body).findByRole('dialog');
+    await expect(
+      drawer.querySelector('[data-slot="drawer-handle"]')
+    ).toBeNull();
+    await userEvent.keyboard('{Escape}');
+    await expect(drawer).toHaveAttribute('data-state', 'open');
+    await userEvent.click(
+      within(drawer).getByRole('button', { name: 'Close preview' })
+    );
+    await expect(drawer).toHaveAttribute('data-state', 'open');
+    await userEvent.click(
+      within(drawer).getByRole('button', { name: 'Finish preview' })
+    );
     await waitForDrawerToClose();
   },
 };

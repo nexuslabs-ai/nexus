@@ -176,6 +176,13 @@
     }
   },
   "line-height": {
+    "xxs": {
+      "$value": {
+        "value": 12,
+        "unit": "px"
+      },
+      "$type": "dimension"
+    },
     "xs": {
       "$value": {
         "value": 16,

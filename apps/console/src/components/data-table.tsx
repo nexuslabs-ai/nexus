@@ -7,6 +7,8 @@ import {
   TableHead,
   TableHeader,
   TableRow,
+  TableSelectionCell,
+  TableSelectionHead,
 } from '@nexus_ds/react';
 import {
   type ColumnDef,
@@ -22,6 +24,8 @@ import {
 
 import { DataPager } from './data-pager';
 import { FilterInput } from './filter-input';
+
+export const SELECT_COLUMN_ID = 'select';
 
 /**
  * Generic, app-level data table — the canonical recipe of headless
@@ -77,7 +81,9 @@ export function DataTable<TData>({
     : undefined;
   // The select column is opt-in (domain-supplied), so only summarise selection
   // when a consumer actually wires one — otherwise show a plain row count.
-  const enableSelection = columns.some((column) => column.id === 'select');
+  const enableSelection = columns.some(
+    (column) => column.id === SELECT_COLUMN_ID
+  );
 
   return (
     <div className="nx:space-y-4">
@@ -94,16 +100,22 @@ export function DataTable<TData>({
           <TableHeader>
             {table.getHeaderGroups().map((headerGroup) => (
               <TableRow key={headerGroup.id}>
-                {headerGroup.headers.map((header) => (
-                  <TableHead key={header.id}>
-                    {header.isPlaceholder
-                      ? null
-                      : flexRender(
-                          header.column.columnDef.header,
-                          header.getContext()
-                        )}
-                  </TableHead>
-                ))}
+                {headerGroup.headers.map((header) => {
+                  const Head =
+                    header.column.id === SELECT_COLUMN_ID
+                      ? TableSelectionHead
+                      : TableHead;
+                  return (
+                    <Head key={header.id}>
+                      {header.isPlaceholder
+                        ? null
+                        : flexRender(
+                            header.column.columnDef.header,
+                            header.getContext()
+                          )}
+                    </Head>
+                  );
+                })}
               </TableRow>
             ))}
           </TableHeader>
@@ -114,14 +126,20 @@ export function DataTable<TData>({
                   key={row.id}
                   data-state={row.getIsSelected() ? 'selected' : undefined}
                 >
-                  {row.getVisibleCells().map((cell) => (
-                    <TableCell key={cell.id}>
-                      {flexRender(
-                        cell.column.columnDef.cell,
-                        cell.getContext()
-                      )}
-                    </TableCell>
-                  ))}
+                  {row.getVisibleCells().map((cell) => {
+                    const Cell =
+                      cell.column.id === SELECT_COLUMN_ID
+                        ? TableSelectionCell
+                        : TableCell;
+                    return (
+                      <Cell key={cell.id}>
+                        {flexRender(
+                          cell.column.columnDef.cell,
+                          cell.getContext()
+                        )}
+                      </Cell>
+                    );
+                  })}
                 </TableRow>
               ))
             ) : (

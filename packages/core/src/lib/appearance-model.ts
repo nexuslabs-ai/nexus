@@ -1,3 +1,6 @@
+import typographyTokens from '../../tokens/primitives/typography/typography-default.json';
+
+import { normalizeContrast } from './contrast';
 import type { ThemeDerivationInput, ThemeSeeds } from './derive-theme';
 import type { NexusSurfaceTone } from './palette';
 import { isColor } from './perceptual-ramp';
@@ -26,7 +29,7 @@ export interface NexusAppearancePrefs {
   codeFont: string;
   uiFontSize: number;
   codeFontSize: number;
-  reduceMotion: 'system' | 'on' | 'off';
+  reduceMotion: boolean;
   pointerCursors: boolean;
   fontSmoothing: boolean;
 }
@@ -47,11 +50,11 @@ export interface NexusAppearanceState {
 export const DEFAULT_BRAND_COLOR = '#0a0a0a';
 
 export const BASE_TONE_OPTIONS = [
-  { value: 'stone', label: 'Stone', color: '#78716c' },
+  { value: 'stone', label: 'Stone', color: '#747271' },
   { value: 'neutral', label: 'Neutral', color: '#737373' },
-  { value: 'zinc', label: 'Zinc', color: '#71717a' },
-  { value: 'slate', label: 'Slate', color: '#64748b' },
-  { value: 'gray', label: 'Gray', color: '#6b7280' },
+  { value: 'zinc', label: 'Zinc', color: '#717273' },
+  { value: 'slate', label: 'Slate', color: '#717376' },
+  { value: 'gray', label: 'Gray', color: '#707274' },
 ] as const satisfies readonly {
   value: NexusSurfaceTone;
   label: string;
@@ -119,8 +122,8 @@ export const DEFAULT_NEXUS_APPEARANCE: NexusAppearanceState = {
   mode: 'light',
   brandColor: DEFAULT_BRAND_COLOR,
   surfaceTone: 'stone',
-  lightContrast: 60,
-  darkContrast: 0,
+  lightContrast: 50,
+  darkContrast: 50,
   density: 'default',
   corners: 'square',
   elevation: 'quiet',
@@ -130,7 +133,7 @@ export const DEFAULT_NEXUS_APPEARANCE: NexusAppearanceState = {
     codeFont: 'ui-monospace, "SF Mono", Menlo, monospace',
     uiFontSize: 14,
     codeFontSize: 12,
-    reduceMotion: 'system',
+    reduceMotion: false,
     pointerCursors: false,
     fontSmoothing: true,
   },
@@ -138,37 +141,6 @@ export const DEFAULT_NEXUS_APPEARANCE: NexusAppearanceState = {
 
 const FONT_PX_MIN = 8;
 const FONT_PX_MAX = 32;
-const TYPOGRAPHY_SIZE_PX = {
-  xxs: 11,
-  xs: 12,
-  sm: 14,
-  base: 16,
-  lg: 18,
-  xl: 20,
-  '2xl': 24,
-  '3xl': 30,
-  '4xl': 36,
-  '5xl': 48,
-  '6xl': 60,
-  '7xl': 72,
-  '8xl': 96,
-  '9xl': 128,
-} as const;
-const TYPOGRAPHY_LINE_HEIGHT_PX = {
-  xs: 16,
-  sm: 20,
-  base: 24,
-  lg: 28,
-  xl: 28,
-  '2xl': 32,
-  '3xl': 36,
-  '4xl': 48,
-  '5xl': 48,
-  '6xl': 60,
-  '7xl': 72,
-  '8xl': 96,
-  '9xl': 128,
-} as const;
 
 const APPEARANCE_MODES = new Set<NexusAppearanceMode>([
   'light',
@@ -190,11 +162,6 @@ const ELEVATIONS = new Set<NexusElevation>(
 const STROKES = new Set<NexusStroke>(
   STROKE_OPTIONS.map((option) => option.value)
 );
-const REDUCE_MOTION = new Set<NexusAppearancePrefs['reduceMotion']>([
-  'system',
-  'on',
-  'off',
-]);
 
 const isRecord = (value: unknown): value is Record<string, unknown> =>
   typeof value === 'object' && value !== null;
@@ -224,22 +191,19 @@ const clampFontSize = (value: unknown, fallback: number): number =>
     ? Math.min(FONT_PX_MAX, Math.max(FONT_PX_MIN, value))
     : fallback;
 
-const contrastOr = (value: unknown, fallback: number): number =>
-  typeof value === 'number' && value >= 0 && value <= 100 ? value : fallback;
-
 function formatPx(value: number): string {
   return `${Number(value.toFixed(4))}px`;
 }
 
 function typographyScaleVariables(uiPx: number): string {
   const scale = uiPx / DEFAULT_NEXUS_APPEARANCE.prefs.uiFontSize;
-  const sizeVars = Object.entries(TYPOGRAPHY_SIZE_PX).map(
-    ([name, value]) =>
-      `  --nx-typography-size-${name}: ${formatPx(value * scale)};`
+  const sizeVars = Object.entries(typographyTokens.size).map(
+    ([name, token]) =>
+      `  --nx-typography-size-${name}: ${formatPx(token.$value.value * scale)};`
   );
-  const lineHeightVars = Object.entries(TYPOGRAPHY_LINE_HEIGHT_PX).map(
-    ([name, value]) =>
-      `  --nx-typography-line-height-${name}: ${formatPx(value * scale)};`
+  const lineHeightVars = Object.entries(typographyTokens['line-height']).map(
+    ([name, token]) =>
+      `  --nx-typography-line-height-${name}: ${formatPx(token.$value.value * scale)};`
   );
 
   return [...sizeVars, ...lineHeightVars].join('\n');
@@ -298,7 +262,7 @@ export function sanitizeNexusAppearancePrefs(
     codeFont: fontFamilyOr(o.codeFont, d.codeFont),
     uiFontSize: clampFontSize(o.uiFontSize, d.uiFontSize),
     codeFontSize: clampFontSize(o.codeFontSize, d.codeFontSize),
-    reduceMotion: enumOr(o.reduceMotion, REDUCE_MOTION, d.reduceMotion),
+    reduceMotion: boolOr(o.reduceMotion, d.reduceMotion),
     pointerCursors: boolOr(o.pointerCursors, d.pointerCursors),
     fontSmoothing: boolOr(o.fontSmoothing, d.fontSmoothing),
   };
@@ -317,8 +281,8 @@ export function sanitizeNexusAppearance(
         ? raw.brandColor
         : d.brandColor,
     surfaceTone: enumOr(raw.surfaceTone, SURFACE_TONES, d.surfaceTone),
-    lightContrast: contrastOr(raw.lightContrast, d.lightContrast),
-    darkContrast: contrastOr(raw.darkContrast, d.darkContrast),
+    lightContrast: normalizeContrast(raw.lightContrast, d.lightContrast),
+    darkContrast: normalizeContrast(raw.darkContrast, d.darkContrast),
     density: enumOr(raw.density, DENSITIES, d.density),
     corners: enumOr(raw.corners, CORNERS, d.corners),
     elevation: enumOr(raw.elevation, ELEVATIONS, d.elevation),
@@ -363,7 +327,7 @@ ${typographyScaleVariables(uiPx)}
       `button:not(:disabled), [role="button"], [role="tab"], [role="radio"], a[href], summary { cursor: pointer; }`
     );
   }
-  if (prefs.reduceMotion === 'on') {
+  if (prefs.reduceMotion) {
     blocks.push(
       `*, *::before, *::after { animation-duration: 0.01ms !important; animation-iteration-count: 1 !important; transition-duration: 0.01ms !important; scroll-behavior: auto !important; }`
     );

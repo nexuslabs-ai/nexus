@@ -4,10 +4,23 @@ import * as prettier from 'prettier';
 import { fileURLToPath } from 'url';
 
 import {
-  hexToOklchMechanical,
-  hexToOklchPinned,
-  isPaletteShadeKey,
-} from './lib/perceptual-grid.js';
+  formatShadowStyle,
+  formatTokenValue,
+  formatTypographyDeclarations,
+} from '../src/token-source/format.js';
+import {
+  SPACING_MODE_FILE_PATTERN,
+  spacingRoleUtility,
+} from '../src/token-source/spacing.js';
+import {
+  extractTokens,
+  pathToCssVarPrefixed,
+} from '../src/token-source/tokens.js';
+import {
+  BORDER_COLOR_ALIAS_NAMES,
+  borderWidthAliasUtilities,
+  durationUtility,
+} from '../src/token-source/utilities.js';
 
 /**
  * Ensure a directory exists, creating it if necessary
@@ -36,184 +49,6 @@ export function readTokenFile(filePath) {
  */
 export function titleCase(s) {
   return s.length === 0 ? s : s[0].toUpperCase() + s.slice(1);
-}
-
-/**
- * Format a token value to a CSS string. For `$type: "color"` hex values,
- * routes through the OKLCH converters: palette shade tokens (path ending in a
- * shade key like `'500'`) get pinned to the perceptual L grid; everything else
- * (white/black/semantic hex literals with alpha) is converted mechanically.
- * @param {object|string|number} value - Token value
- * @param {string} type - Token type
- * @param {string[]} [tokenPath] - Token path (used to route shade conversions)
- * @returns {string} Formatted CSS value
- * @throws {Error} If value is undefined
- */
-export function formatTokenValue(value, type, tokenPath) {
-  if (value === undefined) {
-    throw new Error(`formatTokenValue: value is undefined (type="${type}")`);
-  }
-
-  if (
-    type === 'dimension' &&
-    typeof value === 'object' &&
-    value !== null &&
-    'value' in value
-  ) {
-    // Round to 4 decimals to strip Figma's float-32 export artifacts
-    // (e.g. -0.800000011920929 → -0.8).
-    const rounded = Math.round(value.value * 10000) / 10000;
-    return `${rounded}${value.unit || 'px'}`;
-  }
-
-  if (type === 'color' && typeof value === 'string' && value.startsWith('#')) {
-    const lastSegment =
-      tokenPath && tokenPath.length > 0
-        ? tokenPath[tokenPath.length - 1]
-        : undefined;
-
-    if (tokenPath && tokenPath.length >= 2 && isPaletteShadeKey(lastSegment)) {
-      // The segment before the shade is the palette/hue (e.g. ['blue','500']),
-      // which selects the per-hue lightness curve in the grid.
-      return hexToOklchPinned(
-        value,
-        lastSegment,
-        tokenPath[tokenPath.length - 2]
-      );
-    }
-
-    if (isPaletteShadeKey(lastSegment)) {
-      console.warn(
-        `formatTokenValue: shade-key color "${tokenPath.join('.')}" lacks palette root — falling through to mechanical`
-      );
-    }
-
-    return hexToOklchMechanical(value);
-  }
-
-  if (typeof value === 'string') {
-    return value;
-  }
-
-  if (typeof value === 'number') {
-    return String(value);
-  }
-
-  return JSON.stringify(value);
-}
-
-/**
- * Recursively extract tokens from DTCG format
- * @param {object} obj - Token object
- * @param {string[]} currentPath - Current path in token tree
- * @param {object[]} result - Accumulated results
- * @returns {object[]} Array of { path, value, type, description }
- */
-export function extractTokens(obj, currentPath = [], result = []) {
-  for (const [key, value] of Object.entries(obj)) {
-    // Skip metadata keys
-    if (key.startsWith('$')) continue;
-
-    if (value && typeof value === 'object') {
-      // Check if this is a token (has $value and $type)
-      if (value.$value !== undefined && value.$type !== undefined) {
-        result.push({
-          path: [...currentPath, key],
-          value: value.$value,
-          type: value.$type,
-          description: value.$description,
-        });
-      } else {
-        // Recurse into group
-        extractTokens(value, [...currentPath, key], result);
-      }
-    }
-  }
-
-  return result;
-}
-
-/**
- * Convert token path to CSS variable name with optional nx- prefix
- * Used for generating prefixed CSS variables for @nexus_ds/tailwind package
- * @param {string[]} tokenPath - Token path array
- * @param {string|null} categoryPrefix - Optional category prefix (e.g., 'color', 'radius')
- * @param {boolean} useNxPrefix - Whether to add nx- prefix
- * @returns {string} CSS variable name (without --)
- */
-export function pathToCssVarPrefixed(
-  tokenPath,
-  categoryPrefix = null,
-  useNxPrefix = false
-) {
-  const cssName = tokenPath.join('-');
-  const base = categoryPrefix ? `${categoryPrefix}-${cssName}` : cssName;
-  return useNxPrefix ? `nx-${base}` : base;
-}
-
-/**
- * Check if a value is a DTCG reference (e.g., "{blue.500}")
- * @param {*} value - Value to check
- * @returns {boolean}
- */
-export function isReference(value) {
-  return (
-    typeof value === 'string' && value.startsWith('{') && value.endsWith('}')
-  );
-}
-
-/**
- * Extract reference path from DTCG reference string
- * @param {string} ref - Reference string like "{blue.500}"
- * @returns {string} Path like "blue.500"
- */
-export function extractRefPath(ref) {
-  return ref.slice(1, -1);
-}
-
-/**
- * Resolve a DTCG reference to CSS var() or raw value
- * @param {*} value - Token value (might be a reference)
- * @param {Map} primitiveMap - Map of primitive token paths to CSS names
- * @returns {string} Resolved CSS value
- */
-export function resolveReference(value, primitiveMap) {
-  if (!isReference(value)) {
-    return value;
-  }
-
-  const refPath = extractRefPath(value);
-  const primitiveInfo = primitiveMap.get(refPath);
-
-  if (primitiveInfo) {
-    return `var(--${primitiveInfo.cssName})`;
-  }
-
-  console.warn(`⚠ Reference not found: ${value}`);
-  return value;
-}
-
-/**
- * Resolve a value that might be a reference or a dimension object
- * @param {*} value - Token value
- * @param {Map} primitiveMap - Map of primitives
- * @param {string} type - Token type
- * @param {string[]} [tokenPath] - Token path for color routing
- * @returns {string} Resolved CSS value
- */
-export function resolveValue(value, primitiveMap, type = 'unknown', tokenPath) {
-  if (isReference(value)) {
-    return resolveReference(value, primitiveMap);
-  }
-
-  if (
-    type === 'dimension' ||
-    (typeof value === 'object' && value !== null && 'value' in value)
-  ) {
-    return formatTokenValue(value, 'dimension');
-  }
-
-  return formatTokenValue(value, type, tokenPath);
 }
 
 /**
@@ -283,52 +118,29 @@ export function discoverPrimitives(primitivesDir) {
 }
 
 /**
- * Discover semantic token files from the file system, partitioning
- * spacing-mode files (spacing-{mode}.json) into perModeFiles from plain
- * standalone files ({name}.json).
+ * Find the per-mode spacing files in `semantic/`. Their values are direct px
+ * (no `{N}` refs) and emit per-mode `[data-density="X"]` blocks via
+ * `collectSpacingTokens`. Every other semantic file is read by a collector
+ * that names it directly.
  *
  * @param {string} semanticDir - Path to semantic directory
- * @returns {object} { standalone: string[], perModeFiles: { category: { mode: filename } } }
+ * @returns {Record<string, string>} Mode name keyed to its `spacing-{mode}.json` filename
  */
-export function discoverSemantics(semanticDir) {
-  const result = {
-    standalone: [],
-    // Bucket for per-mode semantic categories. Keyed by category so a future
-    // per-mode category (e.g. per-mode color shading) lands as a sibling key
-    // here. Detection of new categories still requires a regex branch below —
-    // only `spacing` is wired today.
-    perModeFiles: {},
-  };
-
+export function discoverSpacingModeFiles(semanticDir) {
   if (!fs.existsSync(semanticDir)) {
-    return result;
+    return {};
   }
 
-  const files = fs.readdirSync(semanticDir).filter((f) => f.endsWith('.json'));
+  const files = {};
 
-  // Pattern for spacing-mode files: spacing-{mode}.json. Their values are
-  // direct px (no `{N}` refs) and emit per-mode `[data-density="X"]` blocks via
-  // `collectSpacingTokens` — they intentionally bypass the generic
-  // standalone-dimension scan, which would otherwise emit each file's keys
-  // into `@theme` once per mode and last-write-wins.
-  const spacingModePattern = /^spacing-([a-z]+)\.json$/;
+  for (const file of fs.readdirSync(semanticDir)) {
+    const match = file.match(SPACING_MODE_FILE_PATTERN);
+    if (!match) continue;
 
-  for (const file of files) {
-    const spacingMatch = file.match(spacingModePattern);
-    if (spacingMatch) {
-      const [, mode] = spacingMatch;
-      if (!result.perModeFiles.spacing) {
-        result.perModeFiles.spacing = {};
-      }
-      result.perModeFiles.spacing[mode] = file;
-      continue;
-    }
-
-    // Standalone file (not a spacing mode)
-    result.standalone.push(file);
+    files[match[1]] = file;
   }
 
-  return result;
+  return files;
 }
 
 /**
@@ -431,51 +243,6 @@ export const log = {
 };
 
 // ============================================
-// SHADOW COMPOSITE HELPERS
-// ============================================
-
-/**
- * Format a shadow property value as a var() reference or literal.
- * References are resolved through the primitive map so the var name matches
- * the actual primitive cssName. This means shadow property references can
- * point to any primitive category, not just `--nx-shadow-*`.
- */
-function formatShadowPropertyAsVar(value, primitiveMap) {
-  if (isReference(value)) {
-    return resolveValue(value, primitiveMap);
-  }
-
-  if (typeof value === 'object' && value !== null && 'value' in value) {
-    return formatTokenValue(value, 'dimension');
-  }
-
-  return String(value);
-}
-
-function formatShadowLayer(layer, primitiveMap, isInset = false) {
-  const x = formatShadowPropertyAsVar(layer.offsetX, primitiveMap);
-  const y = formatShadowPropertyAsVar(layer.offsetY, primitiveMap);
-  const blur = formatShadowPropertyAsVar(layer.blur, primitiveMap);
-  const spread = formatShadowPropertyAsVar(layer.spread, primitiveMap);
-  const color = formatShadowPropertyAsVar(layer.color, primitiveMap);
-  const inset = isInset || layer.inset ? 'inset ' : '';
-
-  return `${inset}${x} ${y} ${blur} ${spread} ${color}`;
-}
-
-/**
- * Format a complete shadow composite (single or multi-layer) to CSS value.
- * `primitiveMap` is required so the resolver can map reference paths to their
- * actual primitive cssNames.
- */
-export function formatShadowComposite(value, primitiveMap, isInset = false) {
-  const layers = Array.isArray(value) ? value : [value];
-  return layers
-    .map((layer) => formatShadowLayer(layer, primitiveMap, isInset))
-    .join(', ');
-}
-
-// ============================================
 // GOOGLE FONTS HELPERS
 // ============================================
 
@@ -567,22 +334,6 @@ export function getGoogleFontsImportFromTokens(typographyFilePath) {
 // ============================================
 
 /**
- * Resolve a typography property value to CSS
- * Handles 'auto' values, references, dimension objects, and raw values
- *
- * @param {*} value - Typography property value
- * @param {Map} primitiveMap - Map of primitives with nx- prefixed cssName
- * @returns {string} Resolved CSS value
- */
-function resolveTypographyProperty(value, primitiveMap) {
-  // Figma exports `lineHeight: "auto"` for the code-inline typography token,
-  // but `line-height: auto` is invalid CSS — browsers ignore it. Map to
-  // `normal` (CSS spec default, ~1.2) so the emitted utility is well-formed.
-  if (value === 'auto') return 'normal';
-  return resolveValue(value, primitiveMap, 'unknown');
-}
-
-/**
  * Generate typography utility CSS from token file
  * Creates @utility rules with typography-* prefix for all typography composite tokens
  *
@@ -609,38 +360,16 @@ export function generateTypographyUtilitiesCSS(tokensDir, primitiveMap) {
   let css = `/* Typography Utilities */\n\n`;
 
   for (const token of tokens) {
-    const name = token.path.join('-');
-    const value = token.value;
-
     // Use 'typography-' prefix to avoid tailwind-merge conflicts with Tailwind's
     // text-* utilities (which are used for both color and font-size)
-    css += `@utility typography-${name} {\n`;
-
-    if (value.fontFamily) {
-      css += `  font-family: ${resolveTypographyProperty(value.fontFamily, primitiveMap)};\n`;
+    css += `@utility ${pathToCssVarPrefixed(token.path, 'typography')} {\n`;
+    for (const declaration of formatTypographyDeclarations(
+      token.path,
+      token.value,
+      primitiveMap
+    )) {
+      css += `  ${declaration.property}: ${declaration.value};\n`;
     }
-    if (value.fontSize) {
-      css += `  font-size: ${resolveTypographyProperty(value.fontSize, primitiveMap)};\n`;
-    }
-    if (value.fontWeight) {
-      css += `  font-weight: ${resolveTypographyProperty(value.fontWeight, primitiveMap)};\n`;
-    }
-    if (value.lineHeight) {
-      css += `  line-height: ${resolveTypographyProperty(value.lineHeight, primitiveMap)};\n`;
-    }
-    if (value.letterSpacing) {
-      css += `  letter-spacing: ${resolveTypographyProperty(value.letterSpacing, primitiveMap)};\n`;
-    }
-
-    if (token.path[0] === 'heading') {
-      css += `  text-wrap: balance;\n`;
-    }
-
-    if (token.path[0] === 'body') {
-      // orphan/widow protection for multi-line copy
-      css += `  text-wrap: pretty;\n`;
-    }
-
     css += `}\n\n`;
   }
 
@@ -648,15 +377,28 @@ export function generateTypographyUtilitiesCSS(tokensDir, primitiveMap) {
 }
 
 // ============================================
-// BORDER WIDTH UTILITIES
+// BORDER WIDTH ALIAS UTILITIES
 // ============================================
 
-const BORDER_WIDTH_UTILITIES_PER_TOKEN = 14;
+/**
+ * Render one `@utility` rule the way the committed CSS spells it.
+ *
+ * @param {import('../src/token-source/utilities.js').UtilityRule} rule
+ * @returns {string}
+ */
+function formatUtilityRule({ name, declarations }) {
+  let css = `@utility ${name} {\n`;
+  for (const { property, value } of declarations) {
+    css += `  ${property}: ${value};\n`;
+  }
+  return `${css}}\n\n`;
+}
 
 /**
- * Generate border width utility CSS from token array.
- * Creates @utility rules with border-{side?}-{name} patterns for all
- * borderwidth tokens, so runtime stroke modes can affect one-sided borders.
+ * Generate the `border-width-{side?}-{name}` alias utilities for every
+ * borderwidth token. The `border-{side?}-{name}` spellings are Tailwind's own
+ * border utilities, resolved from the `--border-width-*` theme keys that
+ * generateThemeCSS emits.
  *
  * @param {object[]} tokens - Array of borderwidth tokens with cssName property (e.g., "nx-borderwidth-default")
  * @returns {{ css: string, count: number }} Generated CSS and utility count
@@ -666,110 +408,14 @@ export function generateBorderWidthUtilitiesCSS(tokens) {
     return { css: '', count: 0 };
   }
 
-  let css = `/* Border Width Utilities */\n\n`;
+  let css = `/* Border Width Alias Utilities */\n\n`;
+  const rules = tokens.flatMap((token) =>
+    borderWidthAliasUtilities(token.cssName.replace('nx-borderwidth-', ''))
+  );
+  css += rules.map(formatUtilityRule).join('');
 
-  for (const token of tokens) {
-    // Extract the name part (e.g., "default" from "nx-borderwidth-default")
-    const name = token.cssName.replace('nx-borderwidth-', '');
-    const value = `var(--${token.cssName})`;
-
-    css += `@utility border-${name} {\n`;
-    css += `  border-style: var(--tw-border-style, solid);\n`;
-    css += `  border-width: ${value};\n`;
-    css += `}\n\n`;
-
-    css += `@utility border-x-${name} {\n`;
-    css += `  border-inline-style: var(--tw-border-style, solid);\n`;
-    css += `  border-inline-width: ${value};\n`;
-    css += `}\n\n`;
-
-    css += `@utility border-y-${name} {\n`;
-    css += `  border-block-style: var(--tw-border-style, solid);\n`;
-    css += `  border-block-width: ${value};\n`;
-    css += `}\n\n`;
-
-    css += `@utility border-t-${name} {\n`;
-    css += `  border-top-style: var(--tw-border-style, solid);\n`;
-    css += `  border-top-width: ${value};\n`;
-    css += `}\n\n`;
-
-    css += `@utility border-r-${name} {\n`;
-    css += `  border-right-style: var(--tw-border-style, solid);\n`;
-    css += `  border-right-width: ${value};\n`;
-    css += `}\n\n`;
-
-    css += `@utility border-b-${name} {\n`;
-    css += `  border-bottom-style: var(--tw-border-style, solid);\n`;
-    css += `  border-bottom-width: ${value};\n`;
-    css += `}\n\n`;
-
-    css += `@utility border-l-${name} {\n`;
-    css += `  border-left-style: var(--tw-border-style, solid);\n`;
-    css += `  border-left-width: ${value};\n`;
-    css += `}\n\n`;
-  }
-
-  css += `/* Border Width Alias Utilities */\n\n`;
-
-  for (const token of tokens) {
-    const name = token.cssName.replace('nx-borderwidth-', '');
-    const value = `var(--${token.cssName})`;
-
-    css += `@utility border-width-${name} {\n`;
-    css += `  border-style: var(--tw-border-style, solid);\n`;
-    css += `  border-width: ${value};\n`;
-    css += `}\n\n`;
-
-    css += `@utility border-width-x-${name} {\n`;
-    css += `  border-inline-style: var(--tw-border-style, solid);\n`;
-    css += `  border-inline-width: ${value};\n`;
-    css += `}\n\n`;
-
-    css += `@utility border-width-y-${name} {\n`;
-    css += `  border-block-style: var(--tw-border-style, solid);\n`;
-    css += `  border-block-width: ${value};\n`;
-    css += `}\n\n`;
-
-    css += `@utility border-width-t-${name} {\n`;
-    css += `  border-top-style: var(--tw-border-style, solid);\n`;
-    css += `  border-top-width: ${value};\n`;
-    css += `}\n\n`;
-
-    css += `@utility border-width-r-${name} {\n`;
-    css += `  border-right-style: var(--tw-border-style, solid);\n`;
-    css += `  border-right-width: ${value};\n`;
-    css += `}\n\n`;
-
-    css += `@utility border-width-b-${name} {\n`;
-    css += `  border-bottom-style: var(--tw-border-style, solid);\n`;
-    css += `  border-bottom-width: ${value};\n`;
-    css += `}\n\n`;
-
-    css += `@utility border-width-l-${name} {\n`;
-    css += `  border-left-style: var(--tw-border-style, solid);\n`;
-    css += `  border-left-width: ${value};\n`;
-    css += `}\n\n`;
-  }
-
-  return { css, count: tokens.length * BORDER_WIDTH_UTILITIES_PER_TOKEN };
+  return { css, count: rules.length };
 }
-
-const BORDER_COLOR_ALIAS_NAMES = [
-  'default',
-  'default-alpha',
-  'active',
-  'disabled',
-  'warning',
-  'warning-active',
-  'success',
-  'success-active',
-  'error',
-  'error-active',
-  'information',
-  'information-active',
-  'primary',
-  'primary-active',
-];
 
 const BORDER_COLOR_ALIAS_NAME_SET = new Set(BORDER_COLOR_ALIAS_NAMES);
 
@@ -861,8 +507,7 @@ export const CANONICAL_SPACING_DEFAULT_MODE = 'default';
  *   reverse-engineering it from `cssName`.
  */
 export function collectSpacingTokens(semanticDir) {
-  const { perModeFiles } = discoverSemantics(semanticDir);
-  const spacingFiles = perModeFiles.spacing ?? {};
+  const spacingFiles = discoverSpacingModeFiles(semanticDir);
 
   const modeNames = Object.keys(spacingFiles);
   if (modeNames.length === 0) {
@@ -899,49 +544,6 @@ export function collectSpacingTokens(semanticDir) {
   }
 
   return result;
-}
-
-/**
- * Top-level keys that may appear in `spacing-{mode}.json`. Acts as a closed
- * allowlist for `splitSpacingTokens` so a future accidental top-level key
- * (e.g. `motion`, `border`) throws at partition time — close to the JSON
- * edit — instead of falling through to `deriveRoleUtility` and producing
- * cryptic "unhandled path shape" errors at the emit step.
- */
-const SPACING_NUMERIC_ROOTS = new Set(['spacing']);
-const SPACING_ROLE_ROOTS = new Set(['container', 'layout']);
-
-/**
- * Split a per-mode token list into `{ numeric, role }` halves. Numeric tokens
- * (path starts with `spacing`) feed `@theme` for Tailwind's `nx:p-*` /
- * `nx:m-*` / `nx:gap-*` / `nx:h-*` / `nx:w-*` utility codegen. Role tokens
- * (`container.*`, `layout.*`) feed only the per-mode
- * `[data-density="X"]` overrides and the `spacing-utilities` `@utility`
- * declarations. Role tokens never enter `@theme`, both because Tailwind v4's
- * `--container-*` namespace would otherwise auto-codegen `nx:w-p` and
- * friends from `--nx-container-p`, and because role tokens don't map onto
- * Tailwind's unified `--spacing-*` namespace cleanly.
- *
- * Partitioning reads `token.path[0]` — `path` is the structured form,
- * `cssName` is the flattened output artifact. Throws when a path's root is
- * outside the two allowlists; extending requires a deliberate edit here.
- */
-export function splitSpacingTokens(tokens) {
-  const numeric = [];
-  const role = [];
-  for (const token of tokens) {
-    const root = token.path[0];
-    if (SPACING_NUMERIC_ROOTS.has(root)) {
-      numeric.push(token);
-    } else if (SPACING_ROLE_ROOTS.has(root)) {
-      role.push(token);
-    } else {
-      throw new Error(
-        `splitSpacingTokens: unknown top-level key "${root}" in path [${token.path.join('.')}] — extend SPACING_NUMERIC_ROOTS / SPACING_ROLE_ROOTS`
-      );
-    }
-  }
-  return { numeric, role };
 }
 
 /**
@@ -1080,92 +682,6 @@ export function generateThemedModesCSS(modesByName, opts) {
 }
 
 /**
- * Three-segment family registry. Each row defines one CSS-design decision —
- * what utility prefix to emit and which CSS properties to set — for one
- * family segment of a `[role, family, size]` role-token path. The 2-segment
- * paths (`container.p`, `container.gap`, `layout.<x>-gap`) are handled
- * inline in `deriveRoleUtility` and do not go through this map.
- *
- * Adding a new 3-segment family (e.g. `m` → `margin`) means adding one row
- * here. The set of role tokens themselves is JSON-driven — see
- * `generateSpacingRoleUtilitiesCSS`.
- */
-const FAMILY_TO_UTILITY = {
-  'padding-x': { prefix: 'px', properties: ['padding-left', 'padding-right'] },
-  'padding-y': { prefix: 'py', properties: ['padding-top', 'padding-bottom'] },
-  gap: { prefix: 'gap', properties: ['gap'] },
-};
-
-/**
- * Derive a `{utilityName, properties}` for a role-token path.
- *
- * Naming convention — `<property-shorthand>-<role>[-<size>]`:
- *   `<role>.<family>.<size>`  → utility `<prefix>-<role>-<size>` (3-segment form)
- *   `container.p`             → utility `p-container`,         padding
- *   `container.gap`           → utility `gap-container`,       gap
- *   `layout.section-gap`      → utility `gap-layout-section`,  gap
- *   `layout.stack-gap`        → utility `gap-layout-stack`,    gap
- *
- * Utility-name prefix per property:
- *   padding      → `p-`
- *   padding-x    → `px-`
- *   padding-y    → `py-`
- *   gap          → `gap-`
- *
- * The last path segment selects the property family (and may be a size
- * suffix like `sm/md/lg`, or the family token itself like `gap`); the
- * preceding segments form the role name.
- */
-function deriveRoleUtility(tokenPath) {
-  // Path forms we handle:
-  //   [role, suffix]             — e.g. ['container', 'p'], ['container', 'gap']
-  //   [role, family, size]       — 3-segment form (e.g. ['<role>', 'padding-x', 'md'])
-  //   [role, 'X-gap']            — e.g. ['layout', 'section-gap'] (composite suffix)
-  if (tokenPath.length < 2 || tokenPath.length > 3) {
-    throw new Error(
-      `deriveRoleUtility: path [${tokenPath.join('.')}] has ${tokenPath.length} segment(s); only 2- or 3-segment role paths are supported`
-    );
-  }
-  const [role, second, third] = tokenPath;
-
-  // Three-segment path: [role, family, size]. family ∈ {padding-x, padding-y, gap}.
-  if (third !== undefined) {
-    const family = second;
-    const size = third;
-    const entry = FAMILY_TO_UTILITY[family];
-    if (!entry) {
-      throw new Error(
-        `deriveRoleUtility: unknown family "${family}" in path [${tokenPath.join('.')}] — extend FAMILY_TO_UTILITY`
-      );
-    }
-    return {
-      utilityName: `${entry.prefix}-${role}-${size}`,
-      properties: entry.properties,
-    };
-  }
-
-  // Two-segment path: [role, suffix].
-  //   suffix === 'gap'         → gap-<role>
-  //   suffix === 'p'           → p-<role>
-  //   suffix === '<x>-gap'     → gap-<role>-<x>  (e.g. layout.section-gap → gap-layout-section)
-  if (second === 'gap') {
-    return { utilityName: `gap-${role}`, properties: ['gap'] };
-  }
-  if (second === 'p') {
-    return { utilityName: `p-${role}`, properties: ['padding'] };
-  }
-  const gapSuffixMatch = second.match(/^(.+)-gap$/);
-  if (gapSuffixMatch) {
-    const [, qualifier] = gapSuffixMatch;
-    return { utilityName: `gap-${role}-${qualifier}`, properties: ['gap'] };
-  }
-
-  throw new Error(
-    `deriveRoleUtility: unhandled path shape [${tokenPath.join('.')}] — extend deriveRoleUtility cases`
-  );
-}
-
-/**
  * Generate `@utility` declarations for spacing role tokens.
  *
  * Walks the canonical mode's role tokens, derives each utility name +
@@ -1186,23 +702,11 @@ function deriveRoleUtility(tokenPath) {
 export function generateSpacingRoleUtilitiesCSS(canonicalRoleTokens) {
   let css = `/* Spacing role utilities — data-driven from canonical mode role tokens. */\n\n`;
 
-  let count = 0;
   for (const token of canonicalRoleTokens) {
-    const { utilityName, properties } = deriveRoleUtility(token.path);
-
-    css += `@utility ${utilityName} {\n`;
-    for (const prop of properties) {
-      // @utility lives in Tailwind's source-pass, so it WILL pick up the
-      // `prefix(nx)` rewrite — but the var name we're referencing is in our
-      // own per-mode `[data-density="X"]` block, which is already prefixed.
-      // Emit the prefixed form directly so both sides match.
-      css += `  ${prop}: var(--nx-${token.cssName});\n`;
-    }
-    css += `}\n\n`;
-    count += 1;
+    css += formatUtilityRule(spacingRoleUtility(token.path));
   }
 
-  return { css, count };
+  return { css, count: canonicalRoleTokens.length };
 }
 
 /**
@@ -1482,11 +986,13 @@ export function collectRadiusTokens(tokensDir, mode) {
 
 /**
  * Collect borderwidth token mappings from a mode file
- * Returns array of { cssName, varRef } for @theme block
+ * Returns array of { key, varRef } for the @theme block, where each value seeds
+ * two Tailwind namespaces: `--border-width-{key}` and `--outline-width-{key}`
+ * (see generateThemeCSS).
  *
  * @param {string} tokensDir - Path to tokens directory
  * @param {string} mode - Borderwidth mode (e.g., 'vega')
- * @returns {object[]} Array of { cssName, varRef }
+ * @returns {object[]} Array of { key, varRef }
  */
 export function collectBorderwidthTokens(tokensDir, mode) {
   const filePath = path.join(
@@ -1505,7 +1011,7 @@ export function collectBorderwidthTokens(tokensDir, mode) {
   for (const key of Object.keys(tokenData)) {
     if (key.startsWith('$')) continue;
     tokens.push({
-      cssName: `border-${key}`,
+      key,
       varRef: `var(--nx-borderwidth-${key})`,
     });
   }
@@ -1564,13 +1070,17 @@ export function collectMotionTokens(tokensDir, mode) {
 /**
  * Generate motion `@utility` declarations.
  *
- * Emits two kinds of motion utility together, since components consume them as
- * one file:
+ * Emits three kinds of motion utility together, since components consume them
+ * as one file:
  *
  * 1. Data-driven duration utilities. Tailwind v4 codegens named easing
  *    utilities from --ease-* theme vars, but not named duration utilities from
  *    --duration-* vars, so emit duration-* explicitly (e.g. nx:duration-fast).
- * 2. A static, non-token `overlay-presence-exit` keyframe + its
+ * 2. The two ring-safe colour transitions, `transition-control` and
+ *    `transition-field` — Tailwind's own `transition-colors` carries
+ *    `outline-color`, which would fade a focus ring in (see the block comment
+ *    below).
+ * 3. A static, non-token `overlay-presence-exit` keyframe + its
  *    `animate-overlay-presence-exit` utility — the Radix Presence bridge (see
  *    the block comment below). It animates an inert custom property so it fires
  *    `animationend` without overriding the transitioned opacity/scale exit.
@@ -1585,18 +1095,26 @@ export function generateMotionUtilitiesCSS(motionTokens) {
     (token) => token.group === 'duration'
   );
 
-  if (durationTokens.length === 0) {
-    return { css: '', count: 0 };
-  }
-
-  let css = `/* Motion duration utilities - data-driven from canonical motion tokens. */\n\n`;
+  let css = `/* Motion utilities - duration utilities are data-driven from canonical motion tokens; the ring-safe transitions and the presence bridge below are static. */\n\n`;
 
   for (const token of durationTokens) {
-    css += `@utility duration-${token.key} {\n`;
-    css += `  --tw-duration: ${token.varRef};\n`;
-    css += `  transition-duration: ${token.varRef};\n`;
-    css += `}\n\n`;
+    css += formatUtilityRule(durationUtility(token.key));
   }
+
+  // Tailwind's `transition-colors` expands to a list that includes
+  // `outline-color`, and every Nexus focus ring is a real `outline` — so an
+  // element carrying both fades its own ring in over the duration instead of
+  // landing it with the keypress.
+  css += `@utility transition-control {\n`;
+  css += `  transition-property: color, background-color, border-color;\n`;
+  css += `  transition-timing-function: var(--tw-ease, var(--default-transition-timing-function));\n`;
+  css += `  transition-duration: var(--tw-duration, var(--default-transition-duration));\n`;
+  css += `}\n\n`;
+  css += `@utility transition-field {\n`;
+  css += `  transition-property: color, background-color;\n`;
+  css += `  transition-timing-function: var(--tw-ease, var(--default-transition-timing-function));\n`;
+  css += `  transition-duration: var(--tw-duration, var(--default-transition-duration));\n`;
+  css += `}\n\n`;
 
   // Static "presence bridge" (not token-derived): a non-visual animation whose only
   // job is to fire `animationend` so Radix Presence — which waits on `animationName`,
@@ -1644,7 +1162,8 @@ export function collectShadowTokens(tokensDir, primitiveMap) {
           if (subKey.startsWith('$')) continue;
           if (subValue.$type === 'shadow') {
             const shadowName = `${key}-${subKey}`;
-            const cssValue = formatShadowComposite(
+            const cssValue = formatShadowStyle(
+              [key, subKey],
               subValue.$value,
               primitiveMap
             );
@@ -1655,92 +1174,12 @@ export function collectShadowTokens(tokensDir, primitiveMap) {
       continue;
     }
 
-    const isInset = key === 'inner';
-    const cssValue = formatShadowComposite(value.$value, primitiveMap, isInset);
+    const cssValue = formatShadowStyle([key], value.$value, primitiveMap);
     shadows.push({ cssName: `shadow-${key}`, value: cssValue });
   }
 
   return shadows;
 }
-
-/**
- * Files in `semanticFiles.standalone` that own a dedicated dimension collector.
- * Callers iterating standalone files for the generic `collectSemanticDimensionTokens`
- * scan MUST skip these to avoid duplicate emission of the same `--*` variable
- * from two different code paths.
- *
- *   breakpoints.json → collectBreakpointsTokens (literal {value, unit})
- *   z-index.json     → collectZIndexTokens  ($type: number, not dimension)
- *
- * Spacing files (`spacing-{mode}.json`) are NOT in this list — `discoverSemantics`
- * routes them into the `perModeFiles.spacing` bucket so they never enter
- * `standalone` in the first place.
- */
-export const FILES_WITH_DEDICATED_DIMENSION_COLLECTORS = new Set([
-  'breakpoints.json',
-  'z-index.json',
-]);
-
-/**
- * Collect literal-valued `$type: dimension` leaves from a token file and
- * emit them with the path as the CSS-variable name — e.g. `focus.offset` →
- * `--focus-offset`. Skips the `color-` prefix so the path drives the variable
- * name directly.
- *
- * Filter behavior:
- * - `$type: dimension` only.
- * - Reference-valued dimensions (`"$value": "{spacing.0}"`) are skipped here;
- *   they are emitted by their owning collector instead.
- * - Literal-valued dimensions in files that ALSO have a dedicated collector
- *   (breakpoints.json's `{value, unit}` literals) are NOT skipped by this
- *   function — that gating is the caller's responsibility via
- *   `FILES_WITH_DEDICATED_DIMENSION_COLLECTORS`.
- *
- * Self-namespacing: because no category prefix is added, top-level keys in the
- * input file must self-namespace their CSS variable name (e.g. `focus.offset`
- * → `--focus-offset` is fine; a bare top-level `offset`/`padding`/`gap` would
- * collide with Tailwind utility namespaces).
- *
- * @param {string} semanticDir - Path to semantic directory
- * @param {string} fileName - Semantic token file name
- * @returns {object[]} Array of { cssName, value }
- */
-export function collectSemanticDimensionTokens(semanticDir, fileName) {
-  const filePath = path.join(semanticDir, fileName);
-  if (!fs.existsSync(filePath)) {
-    throw new Error(`Semantic file missing: ${filePath}`);
-  }
-
-  const tokenData = readTokenFile(filePath);
-  const tokens = [];
-
-  function extractPaths(obj, pathParts = []) {
-    for (const [key, value] of Object.entries(obj)) {
-      if (key.startsWith('$')) continue;
-
-      const currentPath = [...pathParts, key];
-
-      if (
-        value.$value !== undefined &&
-        value.$type === 'dimension' &&
-        !isReference(value.$value)
-      ) {
-        const cssName = currentPath.join('-');
-        const resolvedValue = formatTokenValue(value.$value, 'dimension');
-        tokens.push({ cssName, value: resolvedValue });
-      } else if (typeof value === 'object' && !Array.isArray(value)) {
-        extractPaths(value, currentPath);
-      }
-    }
-  }
-
-  extractPaths(tokenData);
-  return tokens;
-}
-
-// ============================================
-// THEME CSS GENERATION
-// ============================================
 
 /**
  * Generate @theme CSS block for Tailwind
@@ -1751,10 +1190,10 @@ export function collectSemanticDimensionTokens(semanticDir, fileName) {
  * @param {string} [config.googleFontsImport] - Google Fonts @import statement
  * @param {string[]} config.imports - CSS imports (e.g., ['tailwindcss', './variables.css'])
  * @param {string} [config.tailwindPrefix='nx'] - Tailwind prefix
- * @param {object[]} config.semanticTokens - Array of { cssName, value } for semantic colours (dimensions emit at :root via generateRootDimensionsCSS)
+ * @param {object[]} config.semanticTokens - Array of { cssName, value } for semantic colours
  * @param {object[]} config.spacingTokens - Array of { cssName, value } for numeric spacing (default baseline; per-mode overrides live outside @theme)
  * @param {object[]} config.radiusTokens - Array of { cssName, varRef } for radius
- * @param {object[]} config.borderwidthTokens - Array of { cssName, varRef } for borderwidth
+ * @param {object[]} config.borderwidthTokens - Array of { key, varRef } for borderwidth; each one emits both a --border-width-* and an --outline-width-* inline theme key
  * @param {object[]} config.motionTokens - Array of { group, key, cssName, varRef } for duration/ease
  * @param {object[]} config.shadowTokens - Array of { cssName, value } for shadows
  * @param {object[]} [config.darkSemanticTokens] - Array of { cssName, value } for dark mode semantic tokens
@@ -1826,14 +1265,6 @@ export function generateThemeCSS(config) {
     }
   }
 
-  // Borderwidth tokens
-  if (borderwidthTokens.length > 0) {
-    css += `\n  /* Border width tokens */\n`;
-    for (const token of borderwidthTokens) {
-      css += `  --${token.cssName}: ${token.varRef};\n`;
-    }
-  }
-
   // Motion tokens
   if (motionTokens.length > 0) {
     css += `\n  /* Motion tokens */\n`;
@@ -1869,6 +1300,22 @@ export function generateThemeCSS(config) {
   }
 
   css += `}\n`;
+
+  // Inlined so every border and outline utility reads `--nx-borderwidth-*` on
+  // the element itself, where a `[data-borderwidth]` ancestor has set it. A
+  // field's focus ring is a `border-default` inner edge plus an
+  // `outline-default` outer edge, so both namespaces share each value.
+  if (borderwidthTokens.length > 0) {
+    css += `\n@theme inline {\n`;
+    css += `  /* Border and outline width tokens */\n`;
+    for (const token of borderwidthTokens) {
+      css += `  --border-width-${token.key}: ${token.varRef};\n`;
+    }
+    for (const token of borderwidthTokens) {
+      css += `  --outline-width-${token.key}: ${token.varRef};\n`;
+    }
+    css += `}\n`;
+  }
 
   // Semantic colour utilities need their fallback expression inlined into the
   // generated utility, otherwise Tailwind's `prefix(nx)` rewrites the @theme
@@ -1909,284 +1356,11 @@ export function generateThemeCSS(config) {
 }
 
 /**
- * Emit fixed dimension primitives (e.g. --focus-offset) as a `:root {}` block.
+ * Theme the browser-painted UI Nexus cannot style through utilities: the
+ * color-scheme declaration.
  *
- * Kept out of @theme: they're consumed only via arbitrary utilities like
- * `outline-offset-(--focus-offset)`, which Tailwind doesn't track as @theme
- * usage and therefore tree-shakes from the runtime cascade (#506).
- *
- * @param {object[]} dimensionTokens - Array of { cssName, value }
- * @returns {string} CSS `:root {}` block, or '' when empty
+ * @returns {string} CSS native browser UI rules
  */
-export function generateRootDimensionsCSS(dimensionTokens = []) {
-  if (dimensionTokens.length === 0) return '';
-
-  let css = `\n/* ===== RUNTIME DIMENSION TOKENS ===== */\n`;
-  css += `:root {\n`;
-  for (const token of dimensionTokens) {
-    css += `  --${token.cssName}: ${token.value};\n`;
-  }
-  css += `}\n`;
-  return css;
-}
-
-const DEFAULT_FOCUS_RING_SELECTORS = [
-  "[class~='nx:focus-visible:outline-focus-default']:focus-visible",
-  "[class~='nx:data-[active=true]:outline-focus-default'][data-active='true']",
-  "[data-focused='true'] [class~='nx:group-data-[focused=true]/day:outline-focus-default']",
-  "[class~='nx:has-[[data-slot=input-group-control]:focus-visible]:outline-focus-default']:has([data-slot='input-group-control']:focus-visible)",
-];
-
-const ERROR_FOCUS_RING_SELECTORS = [
-  "[class~='nx:aria-invalid:focus-visible:outline-focus-error'][aria-invalid='true']:focus-visible",
-  "[class~='nx:has-[[data-slot=input-group-control][aria-invalid=true]:focus-visible]:outline-focus-error']:has([data-slot='input-group-control'][aria-invalid='true']:focus-visible)",
-];
-
-const FIELD_BOUNDARY_SELECTORS = [
-  "[data-slot='input'][data-variant='bordered']",
-  "[data-slot='sidebar-input'][data-variant='bordered']",
-  "[data-slot='textarea'][data-variant='bordered']",
-  "[data-slot='native-select'][data-variant='bordered']",
-  "[data-slot='select-trigger'][data-variant='bordered']",
-  "[data-slot='input-group'][data-variant='bordered']",
-];
-
-const FIELD_ERROR_BOUNDARY_SELECTORS = [
-  "[data-slot='input'][aria-invalid='true']",
-  "[data-slot='sidebar-input'][aria-invalid='true']",
-  "[data-slot='textarea'][aria-invalid='true']",
-  "[data-slot='native-select'][aria-invalid='true']",
-  "[data-slot='select-trigger'][aria-invalid='true']",
-  "[data-slot='input-group']:has([data-slot][aria-invalid='true'])",
-];
-
-const FIELD_DISABLED_BOUNDARY_SELECTORS = [
-  "[data-slot='input'][data-variant='bordered']:disabled",
-  "[data-slot='sidebar-input'][data-variant='bordered']:disabled",
-  "[data-slot='textarea'][data-variant='bordered']:disabled",
-  "[data-slot='native-select'][data-variant='bordered']:disabled",
-  "[data-slot='select-trigger'][data-variant='bordered']:disabled",
-  "[data-slot='input-group'][data-variant='bordered'][data-disabled='true']",
-];
-
-const OTP_SLOT_BOUNDARY_SELECTOR = "[data-slot='input-otp-slot']";
-const OTP_SLOT_GROUP_DISABLED_SELECTOR =
-  "[class~='nx:group/input-otp']:has([data-slot='input-otp']:disabled) [data-slot='input-otp-slot']";
-
-const FIELD_FOCUS_RING_SELECTORS = [
-  "[data-slot='input'][class~='nx:focus-visible:outline-focus-default']:focus-visible",
-  "[data-slot='sidebar-input'][class~='nx:focus-visible:outline-focus-default']:focus-visible",
-  "[data-slot='textarea'][class~='nx:focus-visible:outline-focus-default']:focus-visible",
-  "[data-slot='native-select'][class~='nx:focus-visible:outline-focus-default']:focus-visible",
-  "[data-slot='select-trigger'][class~='nx:focus-visible:outline-focus-default']:focus-visible",
-  "[data-slot='input-otp-slot'][class~='nx:data-[active=true]:outline-focus-default'][data-active='true']",
-  "[data-slot='input-group'][class~='nx:has-[[data-slot=input-group-control]:focus-visible]:outline-focus-default']:has([data-slot='input-group-control']:focus-visible)",
-];
-
-const FIELD_ERROR_FOCUS_RING_SELECTORS = [
-  "[data-slot='input'][class~='nx:aria-invalid:focus-visible:outline-focus-error'][aria-invalid='true']:focus-visible",
-  "[data-slot='sidebar-input'][class~='nx:aria-invalid:focus-visible:outline-focus-error'][aria-invalid='true']:focus-visible",
-  "[data-slot='textarea'][class~='nx:aria-invalid:focus-visible:outline-focus-error'][aria-invalid='true']:focus-visible",
-  "[data-slot='native-select'][class~='nx:aria-invalid:focus-visible:outline-focus-error'][aria-invalid='true']:focus-visible",
-  "[data-slot='select-trigger'][class~='nx:aria-invalid:focus-visible:outline-focus-error'][aria-invalid='true']:focus-visible",
-  "[data-slot='input-group'][class~='nx:has-[[data-slot=input-group-control][aria-invalid=true]:focus-visible]:outline-focus-error']:has([data-slot='input-group-control'][aria-invalid='true']:focus-visible)",
-];
-
-const INPUT_GROUP_CONTROL_FOCUS_SUPPRESSION_SELECTORS = [
-  "[data-slot='input-group-control'][class~='nx:focus-visible:outline-focus-default']:focus-visible",
-  "[data-slot='input-group-control'][class~='nx:aria-invalid:focus-visible:outline-focus-error'][aria-invalid='true']:focus-visible",
-];
-
-const BUTTON_FOCUS_RING_SELECTORS = [
-  "[data-slot='button'][class~='nx:focus-visible:outline-focus-default']:focus-visible",
-];
-
-const BUTTON_ERROR_FOCUS_RING_SELECTORS = [
-  "[data-slot='button'][class~='nx:aria-invalid:focus-visible:outline-focus-error'][aria-invalid='true']:focus-visible",
-];
-
-/**
- * Turn the canonical focus outline utilities into the shipped hard focus
- * treatment while preserving a real outline in forced-colors mode.
- *
- * The component classes intentionally stay outline-based: Tailwind owns the
- * outline width/offset, this layer owns the normal-mode ring paint.
- *
- * @returns {string} CSS focus ring rules
- */
-export function generateFocusRingCSS() {
-  const defaultSelectors = DEFAULT_FOCUS_RING_SELECTORS.join(',\n');
-  const errorSelectors = ERROR_FOCUS_RING_SELECTORS.join(',\n');
-  const fieldBoundarySelectors = FIELD_BOUNDARY_SELECTORS.join(',\n');
-  const fieldErrorBoundarySelectors =
-    FIELD_ERROR_BOUNDARY_SELECTORS.join(',\n');
-  const fieldDisabledBoundarySelectors =
-    FIELD_DISABLED_BOUNDARY_SELECTORS.join(',\n');
-  const fieldSelectors = FIELD_FOCUS_RING_SELECTORS.join(',\n');
-  const fieldErrorSelectors = FIELD_ERROR_FOCUS_RING_SELECTORS.join(',\n');
-  const inputGroupControlSuppressionSelectors =
-    INPUT_GROUP_CONTROL_FOCUS_SUPPRESSION_SELECTORS.join(',\n');
-  const buttonSelectors = BUTTON_FOCUS_RING_SELECTORS.join(',\n');
-  const buttonErrorSelectors = BUTTON_ERROR_FOCUS_RING_SELECTORS.join(',\n');
-  const allSelectors = [
-    ...DEFAULT_FOCUS_RING_SELECTORS,
-    ...ERROR_FOCUS_RING_SELECTORS,
-    ...FIELD_FOCUS_RING_SELECTORS,
-    ...FIELD_ERROR_FOCUS_RING_SELECTORS,
-    ...BUTTON_FOCUS_RING_SELECTORS,
-    ...BUTTON_ERROR_FOCUS_RING_SELECTORS,
-  ].join(',\n');
-
-  return `
-/* ===== FOCUS RING ===== */
-${fieldBoundarySelectors} {
-  border-color: transparent !important;
-  border-width: 0;
-  box-shadow: inset 0 0 0 1px var(--color-border-default);
-}
-
-${fieldErrorBoundarySelectors} {
-  border-color: transparent !important;
-  border-width: 0;
-  box-shadow: inset 0 0 0 1px var(--color-border-error);
-}
-
-${fieldDisabledBoundarySelectors} {
-  border-color: transparent !important;
-  border-width: 0;
-  box-shadow: inset 0 0 0 1px var(--color-border-disabled);
-}
-
-${OTP_SLOT_BOUNDARY_SELECTOR} {
-  border-color: transparent !important;
-  border-width: 0;
-  box-shadow:
-    inset 0 1px 0 var(--color-border-default),
-    inset -1px 0 0 var(--color-border-default),
-    inset 0 -1px 0 var(--color-border-default);
-}
-
-${OTP_SLOT_BOUNDARY_SELECTOR}:first-child {
-  box-shadow:
-    inset 0 1px 0 var(--color-border-default),
-    inset 1px 0 0 var(--color-border-default),
-    inset -1px 0 0 var(--color-border-default),
-    inset 0 -1px 0 var(--color-border-default);
-}
-
-${OTP_SLOT_GROUP_DISABLED_SELECTOR} {
-  border-color: transparent !important;
-  border-width: 0;
-  box-shadow:
-    inset 0 1px 0 var(--color-border-disabled),
-    inset -1px 0 0 var(--color-border-disabled),
-    inset 0 -1px 0 var(--color-border-disabled);
-}
-
-${OTP_SLOT_GROUP_DISABLED_SELECTOR}:first-child {
-  box-shadow:
-    inset 0 1px 0 var(--color-border-disabled),
-    inset 1px 0 0 var(--color-border-disabled),
-    inset -1px 0 0 var(--color-border-disabled),
-    inset 0 -1px 0 var(--color-border-disabled);
-}
-
-${defaultSelectors} {
-  --tw-outline-style: none !important;
-  outline-color: transparent !important;
-  outline-style: none !important;
-  box-shadow: 0 0 0 2px var(--color-focus-default);
-}
-
-${errorSelectors} {
-  --tw-outline-style: none !important;
-  outline-color: transparent !important;
-  outline-style: none !important;
-  box-shadow: 0 0 0 2px var(--color-focus-error);
-}
-
-${fieldSelectors} {
-  --tw-outline-style: none !important;
-  outline-color: transparent !important;
-  outline-style: none !important;
-  border-color: transparent !important;
-  border-width: 0;
-  box-shadow:
-    inset 0 0 0 1px var(--color-focus-default),
-    0 0 0 1px var(--color-focus-default);
-}
-
-${fieldErrorSelectors} {
-  --tw-outline-style: none !important;
-  outline-color: transparent !important;
-  outline-style: none !important;
-  border-color: transparent !important;
-  border-width: 0;
-  box-shadow:
-    inset 0 0 0 1px var(--color-focus-error),
-    0 0 0 1px var(--color-focus-error);
-}
-
-${inputGroupControlSuppressionSelectors} {
-  --tw-outline-style: none !important;
-  outline-color: transparent !important;
-  outline-style: none !important;
-  box-shadow: none;
-}
-
-${buttonSelectors} {
-  --tw-outline-style: none !important;
-  outline-color: transparent !important;
-  outline-style: none !important;
-  box-shadow:
-    0 0 0 2px var(--color-background),
-    0 0 0 4px var(--color-focus-default);
-}
-
-${buttonErrorSelectors} {
-  --tw-outline-style: none !important;
-  outline-color: transparent !important;
-  outline-style: none !important;
-  box-shadow:
-    0 0 0 2px var(--color-background),
-    0 0 0 4px var(--color-focus-error);
-}
-
-@media (forced-colors: active) {
-  ${fieldBoundarySelectors},
-  ${fieldErrorBoundarySelectors},
-  ${OTP_SLOT_BOUNDARY_SELECTOR} {
-    border-color: CanvasText !important;
-    border-width: 1px;
-    box-shadow: none !important;
-  }
-
-  ${fieldDisabledBoundarySelectors},
-  ${OTP_SLOT_GROUP_DISABLED_SELECTOR} {
-    border-color: GrayText !important;
-    border-width: 1px;
-    box-shadow: none !important;
-  }
-
-  ${allSelectors} {
-    --tw-outline-style: solid !important;
-    outline-color: Highlight !important;
-    outline-offset: var(--focus-offset) !important;
-    outline-style: solid !important;
-    outline-width: 2px !important;
-    box-shadow: none !important;
-  }
-
-  ${inputGroupControlSuppressionSelectors} {
-    --tw-outline-style: none !important;
-    outline-color: transparent !important;
-    outline-style: none !important;
-    box-shadow: none !important;
-  }
-}
-`;
-}
-
 export function generateNativeBrowserUIThemeCSS() {
   return `
 /* ===== NATIVE BROWSER UI THEME ===== */
@@ -2202,10 +1376,80 @@ export function generateNativeBrowserUIThemeCSS() {
   .dark {
     color-scheme: dark;
   }
+}
+`;
+}
 
-  :where(input[type='checkbox'], input[type='radio'], input[type='range'], progress) {
-    accent-color: var(--color-primary-background);
+/**
+ * Autofill utilities. Browsers paint autofilled fields with `!important`
+ * background and text colours that author `bg-*` / `text-*` classes cannot
+ * override. A field pairs each of those classes with an `autofill-*` utility of
+ * the same token (`nx:bg-container nx:autofill-bg-container`), which repaints
+ * the surface as an inset fill shadow and the text through
+ * `-webkit-text-fill-color`. The fill is the last, bottom-most layer of
+ * Tailwind's shadow stack, so `shadow-*`, `ring-*`, `inset-shadow-*` and
+ * `inset-ring-*` on the field survive autofill. The shadow stops at the padding
+ * edge, so the browser surface is clipped there too or it shows through a
+ * translucent border. `autofill-bg-transparent` clips the browser surface away
+ * instead, for controls whose parent owns the surface.
+ *
+ * @returns {string} CSS @utility declarations
+ */
+export function generateAutofillUtilitiesCSS() {
+  return `
+/* ===== AUTOFILL UTILITIES ===== */
+@utility autofill-bg-* {
+  &:autofill {
+    background-clip: padding-box;
+    box-shadow:
+      var(--tw-inset-shadow, 0 0 #0000),
+      var(--tw-inset-ring-shadow, 0 0 #0000),
+      var(--tw-ring-offset-shadow, 0 0 #0000),
+      var(--tw-ring-shadow, 0 0 #0000),
+      var(--tw-shadow, 0 0 #0000),
+      inset 0 0 0 1000px --value(--color-*);
   }
+}
+
+@utility autofill-bg-transparent {
+  &:autofill {
+    -webkit-background-clip: text;
+    background-clip: text;
+  }
+}
+
+@utility autofill-text-* {
+  &:autofill {
+    color: --value(--color-*);
+    -webkit-text-fill-color: --value(--color-*);
+    caret-color: --value(--color-*);
+  }
+}
+`;
+}
+
+/**
+ * Surface utilities: a wrapper declares the surface it paints with
+ * `surface-*` beside its `bg-*` class (`nx:bg-container nx:surface-container`),
+ * and descendants cut themselves out of it with `ring-surface` /
+ * `ring-offset-surface`. Without a declared surface the rings fall back to
+ * `background`.
+ *
+ * @returns {string} CSS @utility declarations
+ */
+export function generateSurfaceUtilitiesCSS() {
+  return `
+/* ===== SURFACE UTILITIES ===== */
+@utility surface-* {
+  --nx-surface: --value(--color-*);
+}
+
+@utility ring-surface {
+  --tw-ring-color: var(--nx-surface, --theme(--color-background));
+}
+
+@utility ring-offset-surface {
+  --tw-ring-offset-color: var(--nx-surface, --theme(--color-background));
 }
 `;
 }
