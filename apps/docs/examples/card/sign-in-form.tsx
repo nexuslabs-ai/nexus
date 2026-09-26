@@ -14,49 +14,40 @@ import { Label } from '@/components/label/label';
 
 export default function CardSignInForm() {
   return (
-    <Card className="nx:w-full nx:max-w-sm">
-      <CardHeader>
-        <CardTitle asChild>
-          <h4>Sign in</h4>
-        </CardTitle>
-        <CardDescription>
-          Enter your email and password to continue.
-        </CardDescription>
-      </CardHeader>
-      <CardContent>
-        <form
-          id="card-sign-in-form"
-          className="nx:grid nx:gap-4"
-          onSubmit={(event) => event.preventDefault()}
-        >
+    <form
+      className="nx:w-full nx:max-w-sm"
+      onSubmit={(event) => event.preventDefault()}
+    >
+      <Card>
+        <CardHeader>
+          <CardTitle asChild>
+            <h4>Sign in</h4>
+          </CardTitle>
+          <CardDescription>
+            Enter your email and password to continue.
+          </CardDescription>
+        </CardHeader>
+        <CardContent className="nx:grid nx:gap-4">
           <div className="nx:grid nx:gap-1.5">
             <Label htmlFor="card-sign-in-email">Email</Label>
             <Input
               id="card-sign-in-email"
-              name="email"
               type="email"
-              autoComplete="email"
-              required
               placeholder="you@example.com"
+              required
             />
           </div>
           <div className="nx:grid nx:gap-1.5">
             <Label htmlFor="card-sign-in-password">Password</Label>
-            <Input
-              id="card-sign-in-password"
-              name="password"
-              type="password"
-              autoComplete="current-password"
-              required
-            />
+            <Input id="card-sign-in-password" type="password" required />
           </div>
-        </form>
-      </CardContent>
-      <CardFooter>
-        <Button type="submit" form="card-sign-in-form" className="nx:w-full">
-          Sign in
-        </Button>
-      </CardFooter>
-    </Card>
+        </CardContent>
+        <CardFooter>
+          <Button type="submit" className="nx:w-full">
+            Sign in
+          </Button>
+        </CardFooter>
+      </Card>
+    </form>
   );
 }
