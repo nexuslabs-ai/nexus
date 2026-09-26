@@ -505,7 +505,6 @@ export const WithDataAttributes: Story = {
     await expect(tabsList).toHaveAttribute('data-variant', 'underline');
     await expect(tabsList).toHaveAttribute('data-size', 'lg');
 
-    // Triggers take data-variant and data-size from the list
     const tab1 = canvas.getByRole('tab', { name: 'Tab 1' });
     await expect(tab1).toHaveAttribute('data-slot', 'tabs-trigger');
     await expect(tab1).toHaveAttribute('data-variant', 'underline');
