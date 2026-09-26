@@ -28,5 +28,8 @@
   "dependencies": {
     "jsonc-eslint-parser": "^3.1.0"
   },
+  "peerDependencies": {
+    "eslint-plugin-better-tailwindcss": "^4.7.0"
+  },
   "license": "MIT"
 }

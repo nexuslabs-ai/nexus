@@ -37,14 +37,26 @@
 
 @utility transition-control {
   transition-property: color, background-color, border-color;
-  transition-timing-function: var(--tw-ease, var(--nx-motion-ease-enter));
-  transition-duration: var(--tw-duration, var(--nx-motion-duration-default));
+  transition-timing-function: var(
+    --tw-ease,
+    --theme(--default-transition-timing-function)
+  );
+  transition-duration: var(
+    --tw-duration,
+    --theme(--default-transition-duration)
+  );
 }
 
 @utility transition-field {
   transition-property: color, background-color;
-  transition-timing-function: var(--tw-ease, var(--nx-motion-ease-enter));
-  transition-duration: var(--tw-duration, var(--nx-motion-duration-default));
+  transition-timing-function: var(
+    --tw-ease,
+    --theme(--default-transition-timing-function)
+  );
+  transition-duration: var(
+    --tw-duration,
+    --theme(--default-transition-duration)
+  );
 }
 
 @keyframes overlay-presence-exit {

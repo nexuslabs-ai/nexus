@@ -1107,13 +1107,13 @@ export function generateMotionUtilitiesCSS(motionTokens) {
   // landing it with the keypress.
   css += `@utility transition-control {\n`;
   css += `  transition-property: color, background-color, border-color;\n`;
-  css += `  transition-timing-function: var(--tw-ease, var(--nx-motion-ease-enter));\n`;
-  css += `  transition-duration: var(--tw-duration, var(--nx-motion-duration-default));\n`;
+  css += `  transition-timing-function: var(--tw-ease, --theme(--default-transition-timing-function));\n`;
+  css += `  transition-duration: var(--tw-duration, --theme(--default-transition-duration));\n`;
   css += `}\n\n`;
   css += `@utility transition-field {\n`;
   css += `  transition-property: color, background-color;\n`;
-  css += `  transition-timing-function: var(--tw-ease, var(--nx-motion-ease-enter));\n`;
-  css += `  transition-duration: var(--tw-duration, var(--nx-motion-duration-default));\n`;
+  css += `  transition-timing-function: var(--tw-ease, --theme(--default-transition-timing-function));\n`;
+  css += `  transition-duration: var(--tw-duration, --theme(--default-transition-duration));\n`;
   css += `}\n\n`;
 
   // Static "presence bridge" (not token-derived): a non-visual animation whose only
@@ -1300,6 +1300,23 @@ export function generateThemeCSS(config) {
   }
 
   css += `}\n`;
+
+  // Every `transition-*` utility falls back to these when no `duration-*` /
+  // `ease-*` class is set. Inlined so a motion-mode override on any ancestor
+  // reaches them.
+  const defaultDuration = motionTokens.find(
+    (token) => token.group === 'duration' && token.key === 'default'
+  );
+  const defaultEase = motionTokens.find(
+    (token) => token.group === 'ease' && token.key === 'enter'
+  );
+  if (defaultDuration && defaultEase) {
+    css += `\n@theme inline {\n`;
+    css += `  /* Default transition timing */\n`;
+    css += `  --default-transition-duration: ${defaultDuration.varRef};\n`;
+    css += `  --default-transition-timing-function: ${defaultEase.varRef};\n`;
+    css += `}\n`;
+  }
 
   // Inlined so every border and outline utility reads `--nx-borderwidth-*` on
   // the element itself, where a `[data-borderwidth]` ancestor has set it. A

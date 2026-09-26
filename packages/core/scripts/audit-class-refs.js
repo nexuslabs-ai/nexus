@@ -30,9 +30,15 @@ const COMPONENTS_DIR = path.join(
   'components'
 );
 
-const SOURCE_FILE = /\.(tsx?|jsx?|mjs)$/;
+const SOURCE_FILE = /\.(tsx?|jsx?|mjs|mdx)$/;
 const SKIPPED_FILE =
   /(\/node_modules\/|\/dist\/|\/\.next\/|\/generated\/|\/__generated__\/|\.test\.tsx?$)/;
+const STORY_FILE = /\.stories\.tsx?$/;
+
+// Tailwind's scanner reads prose too, so a class name written as text (a
+// table header documenting a utility pattern) would be reported. Put this
+// marker in a comment on the line above to skip that line's candidates.
+const IGNORE_NEXT_LINE = 'audit-class-refs-ignore-next-line';
 
 // `group` / `peer` (and their `/name` forms) are markers that variants key
 // off; Tailwind emits no CSS for them by design.
@@ -40,7 +46,8 @@ const VARIANT_MARKER = /^nx:(group|peer)(\/[\w-]+)?$/;
 
 // Custom properties that source code sets at runtime rather than in CSS:
 // Radix writes `--radix-*` on its own elements, and components set their own
-// through inline-style keys or `style.setProperty`.
+// through inline-style keys or `style.setProperty`. Stories are not read for
+// these, so a story cannot declare a var a component forgot to set.
 const LIBRARY_RUNTIME_VAR = /^--radix-/;
 const RUNTIME_VAR_DECLARATIONS = [
   /['"](--[\w-]+)['"]\s*:/g,
@@ -48,6 +55,18 @@ const RUNTIME_VAR_DECLARATIONS = [
 ];
 
 const VAR_WITHOUT_FALLBACK = /var\(\s*(--[\w-]+)\s*\)/g;
+// v3's `nx:bg-[--x]` shorthand emits `background-color: --x;`, which is not a
+// var() read and so is invalid CSS.
+const BARE_VAR_VALUE = /:\s*(--[\w-]+)\s*;/g;
+
+// Run through every target before its real candidates: if one of these is not
+// caught, the Tailwind internals the audit relies on have changed shape and a
+// pass would prove nothing.
+const CANARIES = {
+  unknown: 'nx:audit-canary-not-a-class',
+  undeclaredVar: 'nx:bg-(--audit-canary-undeclared)',
+  bareVar: 'nx:bg-[--audit-canary-bare]',
+};
 
 async function loadSemanticRegistryNames() {
   const runtime = await import(pathToFileURL(RUNTIME_ENTRY).href);
@@ -108,27 +127,68 @@ function scanSources(sourceDir) {
 
   for (const file of files) {
     const content = fs.readFileSync(file, 'utf8');
-    for (const re of RUNTIME_VAR_DECLARATIONS) {
-      for (const match of content.matchAll(re)) runtimeVars.add(match[1]);
+    if (!STORY_FILE.test(file)) {
+      for (const re of RUNTIME_VAR_DECLARATIONS) {
+        for (const match of content.matchAll(re)) runtimeVars.add(match[1]);
+      }
     }
+    const lines = content.split('\n');
     const found = scanner.getCandidatesWithPositions({
       content,
       extension: path.extname(file).slice(1),
     });
     for (const { candidate, position } of found) {
       if (!candidate.startsWith('nx:')) continue;
+      const line = lineOf(content, position);
+      if (lines[line - 2]?.includes(IGNORE_NEXT_LINE)) continue;
       if (!occurrences.has(candidate)) occurrences.set(candidate, []);
-      occurrences
-        .get(candidate)
-        .push(`${relative(file)}:${lineOf(content, position)}`);
+      occurrences.get(candidate).push(`${relative(file)}:${line}`);
     }
   }
   return { files, occurrences, runtimeVars };
 }
 
 /**
+ * What is wrong with one candidate's emitted CSS, or `null` if nothing is.
+ */
+function diagnose(candidate, emitted, declared) {
+  if (emitted === null) {
+    return VARIANT_MARKER.test(candidate) ? null : { kind: 'unknown' };
+  }
+  const bare = [...emitted.matchAll(BARE_VAR_VALUE)].map((m) => m[1]);
+  if (bare.length > 0) return { kind: 'bareVar', names: bare };
+
+  const missing = new Set();
+  for (const match of emitted.matchAll(VAR_WITHOUT_FALLBACK)) {
+    const name = match[1];
+    if (declared.has(name) || LIBRARY_RUNTIME_VAR.test(name)) continue;
+    missing.add(name);
+  }
+  if (missing.size > 0) return { kind: 'undeclaredVar', names: [...missing] };
+  return null;
+}
+
+function assertDetectionWorks(css, designSystem, declared, files, candidates) {
+  if (files.length === 0) {
+    throw new Error(`audit-class-refs: ${css} scanned 0 source files.`);
+  }
+  if (candidates.length === 0) {
+    throw new Error(`audit-class-refs: ${css} found 0 nx: candidates.`);
+  }
+  const canaries = Object.entries(CANARIES);
+  const emitted = designSystem.candidatesToCss(canaries.map(([, c]) => c));
+  canaries.forEach(([kind, candidate], index) => {
+    if (diagnose(candidate, emitted[index], declared)?.kind === kind) return;
+    throw new Error(
+      `audit-class-refs: canary ${candidate} was not reported as ${kind} for ${css} — the Tailwind APIs this audit relies on have changed.`
+    );
+  });
+}
+
+/**
  * Asks Tailwind, through the stylesheet that builds this tree, which classes
- * emit nothing and which reference a custom property nothing declares.
+ * emit nothing, which reference a custom property nothing declares, and which
+ * emit a bare `--name` value.
  */
 async function auditTarget({ css, sources }) {
   const cssPath = path.join(REPO_ROOT, css);
@@ -139,7 +199,6 @@ async function auditTarget({ css, sources }) {
 
   const { files, occurrences, runtimeVars } = scanSources(sources);
   const candidates = [...occurrences.keys()];
-  const classCss = designSystem.candidatesToCss(candidates);
 
   const stylesheet = compiler.build(candidates);
   const declared = new Set(runtimeVars);
@@ -150,32 +209,21 @@ async function auditTarget({ css, sources }) {
     declared.add(match[1]);
   }
 
-  const unknownClasses = [];
-  const undeclaredVars = [];
+  assertDetectionWorks(css, designSystem, declared, files, candidates);
+
+  const classCss = designSystem.candidatesToCss(candidates);
+  const findings = { unknown: [], undeclaredVar: [], bareVar: [] };
   candidates.forEach((candidate, index) => {
-    const emitted = classCss[index];
-    if (emitted === null) {
-      if (!VARIANT_MARKER.test(candidate)) {
-        unknownClasses.push({ candidate, at: occurrences.get(candidate) });
-      }
-      return;
-    }
-    const missing = new Set();
-    for (const match of emitted.matchAll(VAR_WITHOUT_FALLBACK)) {
-      const name = match[1];
-      if (declared.has(name) || LIBRARY_RUNTIME_VAR.test(name)) continue;
-      missing.add(name);
-    }
-    if (missing.size > 0) {
-      undeclaredVars.push({
-        candidate,
-        names: [...missing],
-        at: occurrences.get(candidate),
-      });
-    }
+    const problem = diagnose(candidate, classCss[index], declared);
+    if (!problem) return;
+    findings[problem.kind].push({
+      candidate,
+      names: problem.names,
+      at: occurrences.get(candidate),
+    });
   });
 
-  return { scanned: files.length, unknownClasses, undeclaredVars };
+  return { scanned: files.length, ...findings };
 }
 
 function findPrimitiveComponentColorVars(registryNames) {
@@ -221,18 +269,20 @@ async function main() {
   const primitiveVarRefs = findPrimitiveComponentColorVars(registryNames);
 
   const scanned = results.reduce((sum, r) => sum + r.scanned, 0);
-  const unknownClasses = mergeByCandidate(
-    results.flatMap((r) => r.unknownClasses)
-  );
+  const unknownClasses = mergeByCandidate(results.flatMap((r) => r.unknown));
   const undeclaredVars = mergeByCandidate(
-    results.flatMap((r) => r.undeclaredVars)
+    results.flatMap((r) => r.undeclaredVar)
   );
+  const bareVars = mergeByCandidate(results.flatMap((r) => r.bareVar));
   const failures =
-    unknownClasses.length + undeclaredVars.length + primitiveVarRefs.length;
+    unknownClasses.length +
+    undeclaredVars.length +
+    bareVars.length +
+    primitiveVarRefs.length;
 
   if (failures === 0) {
     write(
-      `audit-class-refs: scanned ${scanned} files — every nx: class emits CSS, every var() it reads is declared, and component color vars are semantic.`
+      `audit-class-refs: scanned ${scanned} files — every nx: class emits CSS, every var() it reads is declared and no value is a bare --name, and component color vars are semantic.`
     );
     process.exit(0);
   }
@@ -252,6 +302,16 @@ async function main() {
       `audit-class-refs: ${undeclaredVars.length} nx: class(es) read a custom property with no fallback that nothing declares:`
     );
     for (const { candidate, names, at } of undeclaredVars) {
+      write(`  ${candidate}  → ${names.join(', ')}`);
+      for (const location of at) write(`    ${location}`);
+    }
+  }
+
+  if (bareVars.length > 0) {
+    write(
+      `audit-class-refs: ${bareVars.length} nx: class(es) emit a bare custom property as a value — write \`(--x)\`, not \`[--x]\`:`
+    );
+    for (const { candidate, names, at } of bareVars) {
       write(`  ${candidate}  → ${names.join(', ')}`);
       for (const location of at) write(`    ${location}`);
     }

@@ -145,6 +145,12 @@
 }
 
 @theme inline {
+  /* Default transition timing */
+  --default-transition-duration: var(--nx-motion-duration-default);
+  --default-transition-timing-function: var(--nx-motion-ease-enter);
+}
+
+@theme inline {
   /* Border and outline width tokens */
   --border-width-thin: var(--nx-borderwidth-thin);
   --border-width-default: var(--nx-borderwidth-default);

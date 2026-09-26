@@ -2,49 +2,22 @@ import js from '@eslint/js';
 import {
   nexusComponentConfig,
   nexusSpacingTokenConfig,
+  nexusTailwindClassesConfig,
 } from '@nexus_ds/eslint-plugin/config';
 import prettierConfig from 'eslint-config-prettier';
-import betterTailwindcss from 'eslint-plugin-better-tailwindcss';
-import { getDefaultSelectors } from 'eslint-plugin-better-tailwindcss/defaults';
 import jsxA11yPlugin from 'eslint-plugin-jsx-a11y';
 import reactPlugin from 'eslint-plugin-react';
 import reactHooksPlugin from 'eslint-plugin-react-hooks';
 import simpleImportSort from 'eslint-plugin-simple-import-sort';
 import globals from 'globals';
 import * as jsoncParser from 'jsonc-eslint-parser';
+import path from 'node:path';
 import tseslint from 'typescript-eslint';
 
-const tailwindClassSelectors = [
-  ...getDefaultSelectors(),
-  {
-    kind: 'variable',
-    name: '^.*(?:ClassName|Classes?)$',
-    match: [{ type: 'strings' }],
-  },
-  {
-    kind: 'variable',
-    name: '.*',
-    match: [{ type: 'objectValues', path: '(?:^|\\.)className$' }],
-  },
-];
-
-// Under `prefix(nx)` Tailwind only resolves `nx:` classes, so a class string
-// holding a bare utility is reported as unknown.
-function tailwindClassesConfig(files, entryPoint) {
-  return {
-    files,
-    plugins: { 'better-tailwindcss': betterTailwindcss },
-    settings: {
-      'better-tailwindcss': { entryPoint, selectors: tailwindClassSelectors },
-    },
-    rules: {
-      // `dark` is the hook for the `@custom-variant dark` in nexus.css.
-      'better-tailwindcss/no-unknown-classes': [
-        'error',
-        { ignore: ['^dark$'] },
-      ],
-    },
-  };
+// `next build` lints from its own app directory, so paths the lint config
+// hands to plugins must not depend on the process cwd.
+function repoPath(relativePath) {
+  return path.join(import.meta.dirname, relativePath);
 }
 
 const radiusBaseConsumer = String.raw`/rounded(?:-[a-z]{1,2})?-base\b|radius-base/`;
@@ -271,18 +244,18 @@ export default tseslint.config(
     ...nexusComponentConfig(),
   },
 
-  tailwindClassesConfig(
-    ['packages/react/src/**/*.{ts,tsx}'],
-    'packages/react/.storybook/preview.css'
-  ),
-  tailwindClassesConfig(
-    ['apps/docs/**/*.{ts,tsx}'],
-    'apps/docs/app/globals.css'
-  ),
-  tailwindClassesConfig(
-    ['apps/console/src/**/*.{ts,tsx}'],
-    'apps/console/src/App.css'
-  ),
+  nexusTailwindClassesConfig({
+    files: ['packages/react/src/**/*.{ts,tsx}'],
+    entryPoint: repoPath('packages/react/.storybook/preview.css'),
+  }),
+  nexusTailwindClassesConfig({
+    files: ['apps/docs/**/*.{ts,tsx}'],
+    entryPoint: repoPath('apps/docs/app/globals.css'),
+  }),
+  nexusTailwindClassesConfig({
+    files: ['apps/console/src/**/*.{ts,tsx}'],
+    entryPoint: repoPath('apps/console/src/App.css'),
+  }),
 
   // Only Button consumes --nx-radius-base (documented in theming/radius-overrides).
   {

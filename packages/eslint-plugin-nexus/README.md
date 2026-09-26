@@ -40,3 +40,9 @@ that want the Nexus rules without copying this monorepo's full lint setup:
 - `nexusComponentConfig({ files })` wires the component-authoring rules.
 - `nexusSpacingTokenConfig({ files, parser })` wires the spacing-token rule; pass
   `jsonc-eslint-parser` when linting JSON token files.
+- `nexusTailwindClassesConfig({ files, entryPoint })` wires
+  `eslint-plugin-better-tailwindcss`'s `no-unknown-classes` (a peer dependency)
+  against the stylesheet that builds `files`. Under `prefix(nx)` it reports a
+  bare utility, a typo, and any class the theme no longer emits. Pass
+  `entryPoint` as an absolute path — tools such as `next build` lint from their
+  own directory.
