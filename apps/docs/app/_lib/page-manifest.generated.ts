@@ -192,7 +192,7 @@ export const PAGE_MANIFEST: readonly ManifestSection[] = [
         route: '/components/display',
         slug: 'display',
         label: 'Display',
-        components: ['Badge', 'Avatar', 'Tooltip'],
+        components: ['Avatar', 'Tooltip'],
         kind: 'placeholder',
         file: null,
       },
@@ -203,6 +203,14 @@ export const PAGE_MANIFEST: readonly ManifestSection[] = [
         components: ['Show / Hide', 'Slot'],
         kind: 'placeholder',
         file: null,
+      },
+      {
+        route: '/components/badge',
+        slug: 'badge',
+        label: 'Badge',
+        examples: ['variants', 'fills', 'with-icon', 'icon-only'],
+        kind: 'mdx',
+        file: 'content/components/badge.mdx',
       },
       {
         route: '/components/button',
