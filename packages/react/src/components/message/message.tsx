@@ -13,6 +13,9 @@ interface MessageGroupProps extends React.ComponentProps<'div'> {
    * Announce turns as they arrive, for a live assistant or chat stream. Leave
    * it off for a static transcript, and for one that pages or virtualises.
    *
+   * Text streaming into an existing turn is announced too, so set `aria-busy`
+   * on that turn until the reply finishes — otherwise every chunk is read out.
+   *
    * @default false
    * @example
    * ```tsx
@@ -38,7 +41,6 @@ function MessageGroup({
     <div
       data-slot="message-group"
       role={announce ? 'log' : undefined}
-      aria-relevant={announce ? 'additions' : undefined}
       className={cn(
         'nx:flex nx:w-full nx:min-w-0 nx:flex-col nx:gap-4',
         className
@@ -193,7 +195,7 @@ function MessageContent({ className, ...props }: MessageContentProps) {
 }
 
 const messageMetaClassName =
-  'nx:flex nx:min-w-0 nx:max-w-full nx:items-center nx:gap-2 nx:px-4 nx:typography-label-small nx:text-muted-foreground';
+  'nx:flex nx:max-w-full nx:items-center nx:gap-2 nx:px-4 nx:wrap-anywhere nx:typography-label-small nx:text-muted-foreground';
 
 /**
  * MessageHeaderProps

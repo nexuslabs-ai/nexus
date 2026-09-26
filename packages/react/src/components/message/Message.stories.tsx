@@ -2,6 +2,7 @@ import type { Meta, StoryObj } from '@storybook/react';
 import { CopyIcon, FileTextIcon, RefreshCcwIcon } from 'lucide-react';
 import { expect, userEvent, waitFor, within } from 'storybook/test';
 
+import { cn } from '../../lib/utils';
 import {
   Attachment,
   AttachmentContent,
@@ -284,119 +285,90 @@ export const AvatarAlignmentMatrix: Story = {
 // GROUPING
 // ============================================
 
-export const ConsecutiveTurns: Story = {
-  render: () => (
-    <MessageGroup className={column}>
-      <Message>
-        <MessageAvatar>
-          <AvatarFallback>AB</AvatarFallback>
-        </MessageAvatar>
-        <MessageContent>
-          <MessageHeader>Ana Bianchi</MessageHeader>
-          <Bubble>
-            <BubbleContent>
-              Can you take a look at the failing run?
-            </BubbleContent>
-          </Bubble>
-          <MessageFooter>09:14</MessageFooter>
-        </MessageContent>
-      </Message>
-      <Message>
-        <MessageAvatar>
-          <AvatarFallback>AB</AvatarFallback>
-        </MessageAvatar>
-        <MessageContent>
-          <Bubble>
-            <BubbleContent>It started after the token refactor.</BubbleContent>
-          </Bubble>
-          <MessageFooter>09:15</MessageFooter>
-        </MessageContent>
-      </Message>
-      <Message align="end">
-        <MessageAvatar>
-          <AvatarFallback>YOU</AvatarFallback>
-        </MessageAvatar>
-        <MessageContent>
-          <MessageHeader>You</MessageHeader>
-          <Bubble variant="primary">
-            <BubbleContent>Looking now.</BubbleContent>
-          </Bubble>
-          <MessageFooter>Read 09:16</MessageFooter>
-        </MessageContent>
-      </Message>
-    </MessageGroup>
-  ),
-};
-
 const typingDotClassName =
-  'nx:size-1.5 nx:animate-bounce nx:rounded-full nx:bg-muted-foreground nx:motion-reduce:animate-none';
+  'nx:size-1.5 nx:animate-bounce nx:rounded-full nx:bg-muted-foreground';
 
 /**
- * A received turn followed by the sender's typing indicator. The dots are
- * decorative; the footer carries the same state as real text so it lands in
- * reading order, and the group is announced so the state reaches assistive
- * tech when it appears.
+ * A received turn followed by the sender's typing indicator. Typing is
+ * transient status, not history, so it sits in a `role="status"` beside the
+ * log rather than inside it. The dots are decorative; the footer carries the
+ * same state as real text.
  */
 export const TypingIndicator: Story = {
   render: () => (
-    <MessageGroup announce className={column}>
-      <Message>
-        <MessageAvatar>
-          <AvatarFallback>AB</AvatarFallback>
-        </MessageAvatar>
-        <MessageContent>
-          <MessageHeader>Ana Bianchi</MessageHeader>
-          <Bubble>
-            <BubbleContent>
-              Can you take a look at the failing run?
-            </BubbleContent>
-          </Bubble>
-          <MessageFooter>09:22</MessageFooter>
-        </MessageContent>
-      </Message>
-      <Message>
-        <MessageAvatar placeholder />
-        <MessageContent>
-          <Bubble>
-            <BubbleContent>
-              <span
-                aria-hidden="true"
-                className="nx:flex nx:items-center nx:gap-1 nx:py-1"
-              >
-                <span className={typingDotClassName} />
+    <div className={cn(column, 'nx:flex nx:flex-col nx:gap-4')}>
+      <MessageGroup announce>
+        <Message>
+          <MessageAvatar>
+            <AvatarFallback>AB</AvatarFallback>
+          </MessageAvatar>
+          <MessageContent>
+            <MessageHeader>Ana Bianchi</MessageHeader>
+            <Bubble>
+              <BubbleContent>
+                Can you take a look at the failing run?
+              </BubbleContent>
+            </Bubble>
+            <MessageFooter>09:22</MessageFooter>
+          </MessageContent>
+        </Message>
+      </MessageGroup>
+      <div role="status">
+        <Message>
+          <MessageAvatar placeholder />
+          <MessageContent>
+            <Bubble>
+              <BubbleContent>
                 <span
-                  className={`${typingDotClassName} nx:[animation-delay:150ms]`}
-                />
-                <span
-                  className={`${typingDotClassName} nx:[animation-delay:300ms]`}
-                />
-              </span>
-            </BubbleContent>
-          </Bubble>
-          <MessageFooter>Ana Bianchi is typing&hellip;</MessageFooter>
-        </MessageContent>
-      </Message>
-    </MessageGroup>
+                  aria-hidden="true"
+                  className="nx:flex nx:items-center nx:gap-1 nx:py-1"
+                >
+                  <span className={typingDotClassName} />
+                  <span
+                    className={cn(
+                      typingDotClassName,
+                      'nx:[animation-delay:150ms]'
+                    )}
+                  />
+                  <span
+                    className={cn(
+                      typingDotClassName,
+                      'nx:[animation-delay:300ms]'
+                    )}
+                  />
+                </span>
+              </BubbleContent>
+            </Bubble>
+            <MessageFooter>Ana Bianchi is typing&hellip;</MessageFooter>
+          </MessageContent>
+        </Message>
+      </div>
+    </div>
   ),
   play: async ({ canvasElement }) => {
     const canvas = within(canvasElement);
-    const group = canvasElement.querySelector<HTMLElement>(
-      '[data-slot="message-group"]'
+    const log = canvas.getByRole('log');
+    const status = canvas.getByRole('status');
+
+    await expect(
+      within(status).getByText(/Ana Bianchi is typing/)
+    ).toBeVisible();
+    await expect(
+      within(log).queryByText(/Ana Bianchi is typing/)
+    ).not.toBeInTheDocument();
+
+    const dotRow = status.querySelector<HTMLElement>(
+      '[data-slot="bubble-content"] > span'
     )!;
+    const dots = dotRow.querySelectorAll<HTMLElement>(':scope > span');
 
-    await expect(canvas.getByText(/Ana Bianchi is typing/)).toBeVisible();
-    await expect(group).toHaveAttribute('role', 'log');
-
-    const dotRow = canvasElement.querySelector<HTMLElement>(
-      '[data-slot="bubble-content"] [aria-hidden="true"]'
-    )!;
-    const dots = Array.from(dotRow.children) as HTMLElement[];
-
+    await expect(dotRow).toHaveAttribute('aria-hidden', 'true');
     await expect(dots).toHaveLength(3);
 
-    // The dots animate and are staggered; the meaning lives in the footer text,
-    // so they stay out of the a11y tree.
-    const delays = dots.map((dot) => getComputedStyle(dot).animationDelay);
+    const delays = Array.from(
+      dots,
+      (dot) => getComputedStyle(dot).animationDelay
+    );
     await expect(new Set(delays).size).toBe(3);
 
     for (const dot of dots) {
@@ -430,7 +402,7 @@ export const Announced: Story = {
     )!;
 
     await expect(group).toHaveAttribute('role', 'log');
-    await expect(group).toHaveAttribute('aria-relevant', 'additions');
+    await expect(group).not.toHaveAttribute('aria-relevant');
   },
 };
 
@@ -1013,7 +985,7 @@ export const LongUnbrokenContent: Story = {
         </MessageAvatar>
         <MessageContent>
           <MessageHeader>
-            https://nexuslabs.example.com/observability/traces/0f3a9c1b-77de-4a02-9d31
+            trace_0f3a9c1b77de4a029d31e8b4c6a2f07d5c9e1b3a8f4d6e2c0b7a9f5d3e1c8b6a
           </MessageHeader>
           <Bubble>
             <BubbleContent>
@@ -1030,7 +1002,14 @@ export const LongUnbrokenContent: Story = {
       '[data-slot="message"]'
     )!;
 
+    const header = row.querySelector<HTMLElement>(
+      '[data-slot="message-header"]'
+    )!;
+
     await expect(row.scrollWidth).toBeLessThanOrEqual(row.clientWidth + 1);
+    await expect(header.scrollWidth).toBeLessThanOrEqual(
+      header.clientWidth + 1
+    );
   },
 };
 
