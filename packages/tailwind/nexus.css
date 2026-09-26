@@ -100,6 +100,13 @@
     var(--nx-shadow-base-layer-1-x) var(--nx-shadow-base-layer-1-y)
       var(--nx-shadow-base-layer-1-blur) var(--nx-shadow-base-layer-1-spread)
       var(--nx-shadow-base-layer-1-color);
+  --shadow-md:
+    var(--nx-shadow-md-layer-2-x) var(--nx-shadow-md-layer-2-y)
+      var(--nx-shadow-md-layer-2-blur) var(--nx-shadow-md-layer-2-spread)
+      var(--nx-shadow-md-layer-2-color),
+    var(--nx-shadow-md-layer-1-x) var(--nx-shadow-md-layer-1-y)
+      var(--nx-shadow-md-layer-1-blur) var(--nx-shadow-md-layer-1-spread)
+      var(--nx-shadow-md-layer-1-color);
   --shadow-lg:
     var(--nx-shadow-lg-layer-2-x) var(--nx-shadow-lg-layer-2-y)
       var(--nx-shadow-lg-layer-2-blur) var(--nx-shadow-lg-layer-2-spread)

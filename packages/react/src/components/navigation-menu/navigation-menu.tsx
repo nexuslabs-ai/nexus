@@ -183,8 +183,8 @@ function NavigationMenuContent({
       data-slot="navigation-menu-content"
       className={cn(
         'nx:top-0 nx:left-0 nx:w-full nx:p-2 nx:pr-2.5',
-        'nx:data-[motion=from-end]:slide-in-from-right-52 nx:data-[motion=from-start]:slide-in-from-left-52',
-        'nx:data-[motion=to-end]:slide-out-to-right-52 nx:data-[motion=to-start]:slide-out-to-left-52',
+        'nx:data-[motion=from-end]:slide-in-from-right-[1.5rem] nx:data-[motion=from-start]:slide-in-from-left-[1.5rem]',
+        'nx:data-[motion=to-end]:slide-out-to-right-[1.5rem] nx:data-[motion=to-start]:slide-out-to-left-[1.5rem]',
         'nx:data-[motion^=from-]:animate-in nx:data-[motion^=from-]:fade-in nx:data-[motion^=to-]:animate-out nx:data-[motion^=to-]:fade-out',
         'nx:data-[motion^=from-]:duration-default nx:data-[motion^=from-]:ease-enter',
         'nx:data-[motion^=to-]:duration-fast nx:data-[motion^=to-]:ease-exit',
@@ -226,7 +226,7 @@ function NavigationMenuViewport({
       <NavigationMenuPrimitive.Viewport
         data-slot="navigation-menu-viewport"
         className={cn(
-          'nx:origin-top-center nx:relative nx:mt-1.5 nx:h-(--radix-navigation-menu-viewport-height) nx:w-full nx:overflow-hidden',
+          'nx:origin-top nx:relative nx:mt-1.5 nx:h-(--radix-navigation-menu-viewport-height) nx:w-full nx:overflow-hidden',
           popoverSurfaceClassName,
           overlayFloatingTransitionClassName,
           'nx:@md/navmenu:w-(--radix-navigation-menu-viewport-width)',

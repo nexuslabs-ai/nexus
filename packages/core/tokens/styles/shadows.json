@@ -57,6 +57,25 @@
       }
     ]
   },
+  "md": {
+    "$type": "shadow",
+    "$value": [
+      {
+        "offsetX": "{md.layer-2.x}",
+        "offsetY": "{md.layer-2.y}",
+        "blur": "{md.layer-2.blur}",
+        "spread": "{md.layer-2.spread}",
+        "color": "{md.layer-2.color}"
+      },
+      {
+        "offsetX": "{md.layer-1.x}",
+        "offsetY": "{md.layer-1.y}",
+        "blur": "{md.layer-1.blur}",
+        "spread": "{md.layer-1.spread}",
+        "color": "{md.layer-1.color}"
+      }
+    ]
+  },
   "lg": {
     "$type": "shadow",
     "$value": [

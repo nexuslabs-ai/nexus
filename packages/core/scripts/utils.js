@@ -1107,13 +1107,13 @@ export function generateMotionUtilitiesCSS(motionTokens) {
   // landing it with the keypress.
   css += `@utility transition-control {\n`;
   css += `  transition-property: color, background-color, border-color;\n`;
-  css += `  transition-timing-function: var(--tw-ease, var(--default-transition-timing-function));\n`;
-  css += `  transition-duration: var(--tw-duration, var(--default-transition-duration));\n`;
+  css += `  transition-timing-function: var(--tw-ease, var(--nx-motion-ease-enter));\n`;
+  css += `  transition-duration: var(--tw-duration, var(--nx-motion-duration-default));\n`;
   css += `}\n\n`;
   css += `@utility transition-field {\n`;
   css += `  transition-property: color, background-color;\n`;
-  css += `  transition-timing-function: var(--tw-ease, var(--default-transition-timing-function));\n`;
-  css += `  transition-duration: var(--tw-duration, var(--default-transition-duration));\n`;
+  css += `  transition-timing-function: var(--tw-ease, var(--nx-motion-ease-enter));\n`;
+  css += `  transition-duration: var(--tw-duration, var(--nx-motion-duration-default));\n`;
   css += `}\n\n`;
 
   // Static "presence bridge" (not token-derived): a non-visual animation whose only

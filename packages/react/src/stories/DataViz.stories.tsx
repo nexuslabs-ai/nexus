@@ -148,9 +148,9 @@ export const UtilityClasses: Story = {
         <thead>
           <tr className="nx:text-left nx:text-muted-foreground">
             <th className="nx:p-2">Series</th>
-            <th className="nx:p-2">nx:bg-chart-categorical-N</th>
-            <th className="nx:p-2">nx:text-chart-categorical-N</th>
-            <th className="nx:p-2">nx:border-chart-categorical-N</th>
+            <th className="nx:p-2">Background</th>
+            <th className="nx:p-2">Text</th>
+            <th className="nx:p-2">Border</th>
           </tr>
         </thead>
         <tbody>
