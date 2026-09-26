@@ -1301,22 +1301,23 @@ export function generateThemeCSS(config) {
 
   css += `}\n`;
 
-  // Every `transition-*` utility falls back to these when no `duration-*` /
-  // `ease-*` class is set. Inlined so a motion-mode override on any ancestor
-  // reaches them.
+  // Inlined so a motion-mode override on any ancestor reaches them.
   const defaultDuration = motionTokens.find(
     (token) => token.group === 'duration' && token.key === 'default'
   );
   const defaultEase = motionTokens.find(
     (token) => token.group === 'ease' && token.key === 'enter'
   );
-  if (defaultDuration && defaultEase) {
-    css += `\n@theme inline {\n`;
-    css += `  /* Default transition timing */\n`;
-    css += `  --default-transition-duration: ${defaultDuration.varRef};\n`;
-    css += `  --default-transition-timing-function: ${defaultEase.varRef};\n`;
-    css += `}\n`;
+  if (!defaultDuration || !defaultEase) {
+    throw new Error(
+      'generateThemeCSS: motion tokens `duration.default` and `ease.enter` are required — `transition-control` / `transition-field` read them as the default transition timing.'
+    );
   }
+  css += `\n@theme inline {\n`;
+  css += `  /* Default transition timing */\n`;
+  css += `  --default-transition-duration: ${defaultDuration.varRef};\n`;
+  css += `  --default-transition-timing-function: ${defaultEase.varRef};\n`;
+  css += `}\n`;
 
   // Inlined so every border and outline utility reads `--nx-borderwidth-*` on
   // the element itself, where a `[data-borderwidth]` ancestor has set it. A

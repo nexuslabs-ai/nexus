@@ -17,7 +17,8 @@
   "main": "./src/index.js",
   "exports": {
     ".": "./src/index.js",
-    "./config": "./src/config.js"
+    "./config": "./src/config.js",
+    "./tailwind": "./src/tailwind.js"
   },
   "files": [
     "src"
@@ -30,6 +31,11 @@
   },
   "peerDependencies": {
     "eslint-plugin-better-tailwindcss": "^4.7.0"
+  },
+  "peerDependenciesMeta": {
+    "eslint-plugin-better-tailwindcss": {
+      "optional": true
+    }
   },
   "license": "MIT"
 }

@@ -15,9 +15,9 @@ longer instant without an explicit `duration-*` class.
 
 `@nexus_ds/eslint-plugin`: `nx-class-conventions` drops its `deadTypography`
 check. Its replacement is the new `nexusTailwindClassesConfig({ files,
-entryPoint })` helper in `@nexus_ds/eslint-plugin/config`, which wires
-`eslint-plugin-better-tailwindcss`'s `no-unknown-classes` (now a peer
-dependency) against your stylesheet: it reports any class that emits no CSS,
+entryPoint })` helper in the new `@nexus_ds/eslint-plugin/tailwind` subpath, which wires
+`eslint-plugin-better-tailwindcss`'s `no-unknown-classes` (an optional peer
+dependency, needed only for that subpath) against your stylesheet: it reports any class that emits no CSS,
 including a missing `nx:` prefix.
 
 `@nexus_ds/react`: NavigationMenu content now slides 1.5rem on enter and exit;

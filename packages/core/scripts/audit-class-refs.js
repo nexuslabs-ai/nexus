@@ -9,7 +9,6 @@ const REPO_ROOT = path.resolve(__dirname, '..', '..', '..');
 const PACKAGE_ROOT = path.resolve(__dirname, '..');
 const RUNTIME_ENTRY = path.join(PACKAGE_ROOT, 'dist', 'runtime', 'index.js');
 
-// Each source tree is checked against the stylesheet that actually builds it.
 const TARGETS = [
   {
     css: 'packages/react/.storybook/preview.css',
@@ -35,19 +34,16 @@ const SKIPPED_FILE =
   /(\/node_modules\/|\/dist\/|\/\.next\/|\/generated\/|\/__generated__\/|\.test\.tsx?$)/;
 const STORY_FILE = /\.stories\.tsx?$/;
 
-// Tailwind's scanner reads prose too, so a class name written as text (a
-// table header documenting a utility pattern) would be reported. Put this
-// marker in a comment on the line above to skip that line's candidates.
+// Put this marker in a comment on the line above to skip that line's
+// candidates, e.g. a class name written as prose.
 const IGNORE_NEXT_LINE = 'audit-class-refs-ignore-next-line';
 
 // `group` / `peer` (and their `/name` forms) are markers that variants key
 // off; Tailwind emits no CSS for them by design.
 const VARIANT_MARKER = /^nx:(group|peer)(\/[\w-]+)?$/;
 
-// Custom properties that source code sets at runtime rather than in CSS:
-// Radix writes `--radix-*` on its own elements, and components set their own
-// through inline-style keys or `style.setProperty`. Stories are not read for
-// these, so a story cannot declare a var a component forgot to set.
+// Custom properties set at runtime rather than in CSS: Radix's `--radix-*`,
+// and component inline-style keys or `style.setProperty` calls.
 const LIBRARY_RUNTIME_VAR = /^--radix-/;
 const RUNTIME_VAR_DECLARATIONS = [
   /['"](--[\w-]+)['"]\s*:/g,
@@ -55,13 +51,31 @@ const RUNTIME_VAR_DECLARATIONS = [
 ];
 
 const VAR_WITHOUT_FALLBACK = /var\(\s*(--[\w-]+)\s*\)/g;
-// v3's `nx:bg-[--x]` shorthand emits `background-color: --x;`, which is not a
-// var() read and so is invalid CSS.
-const BARE_VAR_VALUE = /:\s*(--[\w-]+)\s*;/g;
+// v3's `nx:bg-[--x]` emits `background-color: --x;`. Custom properties and
+// the properties below take a `--name` value legitimately.
+const BARE_VAR_DECLARATION = /([\w-]+)\s*:\s*(--[\w-]+)\s*(?:!important\s*)?;/g;
+const DASHED_IDENT_PROPERTIES = new Set([
+  'anchor-name',
+  'position-anchor',
+  'animation-name',
+  'animation-timeline',
+  'scroll-timeline-name',
+  'view-timeline-name',
+  'timeline-scope',
+  'view-transition-name',
+  'view-transition-class',
+  'container-name',
+  'font-palette',
+  'position-try',
+  'position-try-fallbacks',
+]);
 
-// Run through every target before its real candidates: if one of these is not
-// caught, the Tailwind internals the audit relies on have changed shape and a
-// pass would prove nothing.
+function isDashedIdentProperty(property) {
+  return property.startsWith('--') || DASHED_IDENT_PROPERTIES.has(property);
+}
+
+// If one of these is not caught, the Tailwind internals the audit relies on
+// have changed shape.
 const CANARIES = {
   unknown: 'nx:audit-canary-not-a-class',
   undeclaredVar: 'nx:bg-(--audit-canary-undeclared)',
@@ -105,10 +119,6 @@ function relative(file) {
   return path.relative(REPO_ROOT, file);
 }
 
-/**
- * Every `nx:` candidate Tailwind's own scanner extracts from a source tree,
- * with where it appears, plus the custom properties that tree sets at runtime.
- */
 function scanSources(sourceDir) {
   const scanner = new Scanner({
     sources: [
@@ -148,14 +158,13 @@ function scanSources(sourceDir) {
   return { files, occurrences, runtimeVars };
 }
 
-/**
- * What is wrong with one candidate's emitted CSS, or `null` if nothing is.
- */
 function diagnose(candidate, emitted, declared) {
   if (emitted === null) {
     return VARIANT_MARKER.test(candidate) ? null : { kind: 'unknown' };
   }
-  const bare = [...emitted.matchAll(BARE_VAR_VALUE)].map((m) => m[1]);
+  const bare = [...emitted.matchAll(BARE_VAR_DECLARATION)]
+    .filter(([, property]) => !isDashedIdentProperty(property))
+    .map(([, , name]) => name);
   if (bare.length > 0) return { kind: 'bareVar', names: bare };
 
   const missing = new Set();
@@ -185,11 +194,6 @@ function assertDetectionWorks(css, designSystem, declared, files, candidates) {
   });
 }
 
-/**
- * Asks Tailwind, through the stylesheet that builds this tree, which classes
- * emit nothing, which reference a custom property nothing declares, and which
- * emit a bare `--name` value.
- */
 async function auditTarget({ css, sources }) {
   const cssPath = path.join(REPO_ROOT, css);
   const input = fs.readFileSync(cssPath, 'utf8');
@@ -248,7 +252,6 @@ function findPrimitiveComponentColorVars(registryNames) {
   return refs;
 }
 
-// The same class can surface in several targets; report it once.
 function mergeByCandidate(findings) {
   const merged = new Map();
   for (const finding of findings) {
