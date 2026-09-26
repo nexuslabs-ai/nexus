@@ -3,6 +3,7 @@ import {
   nexusComponentConfig,
   nexusSpacingTokenConfig,
 } from '@nexus_ds/eslint-plugin/config';
+import { nexusTailwindClassesConfig } from '@nexus_ds/eslint-plugin/tailwind';
 import prettierConfig from 'eslint-config-prettier';
 import jsxA11yPlugin from 'eslint-plugin-jsx-a11y';
 import reactPlugin from 'eslint-plugin-react';
@@ -10,7 +11,12 @@ import reactHooksPlugin from 'eslint-plugin-react-hooks';
 import simpleImportSort from 'eslint-plugin-simple-import-sort';
 import globals from 'globals';
 import * as jsoncParser from 'jsonc-eslint-parser';
+import path from 'node:path';
 import tseslint from 'typescript-eslint';
+
+function repoPath(relativePath) {
+  return path.join(import.meta.dirname, relativePath);
+}
 
 const radiusBaseConsumer = String.raw`/rounded(?:-[a-z]{1,2})?-base\b|radius-base/`;
 const radiusBaseMessage =
@@ -235,6 +241,19 @@ export default tseslint.config(
     files: ['packages/react/src/**/*.{ts,tsx}', 'apps/**/*.{ts,tsx}'],
     ...nexusComponentConfig(),
   },
+
+  nexusTailwindClassesConfig({
+    files: ['packages/react/src/**/*.{ts,tsx}'],
+    entryPoint: repoPath('packages/react/.storybook/preview.css'),
+  }),
+  nexusTailwindClassesConfig({
+    files: ['apps/docs/**/*.{ts,tsx}'],
+    entryPoint: repoPath('apps/docs/app/globals.css'),
+  }),
+  nexusTailwindClassesConfig({
+    files: ['apps/console/src/**/*.{ts,tsx}'],
+    entryPoint: repoPath('apps/console/src/App.css'),
+  }),
 
   // Only Button consumes --nx-radius-base (documented in theming/radius-overrides).
   {

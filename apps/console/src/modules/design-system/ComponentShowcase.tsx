@@ -77,10 +77,10 @@ export function ComponentShowcase() {
                   Code
                 </span>
                 <div className="nx:flex nx:flex-wrap nx:gap-4">
-                  <code className="nx:typography-code-block nx:bg-muted nx:px-2 nx:py-1 nx:rounded">
+                  <code className="nx:typography-code-block nx:bg-muted nx:px-2 nx:py-1 nx:rounded-sm">
                     const x = 42;
                   </code>
-                  <code className="nx:typography-code-inline nx:bg-muted nx:px-1.5 nx:py-0.5 nx:rounded">
+                  <code className="nx:typography-code-inline nx:bg-muted nx:px-1.5 nx:py-0.5 nx:rounded-sm">
                     inline
                   </code>
                 </div>
@@ -348,10 +348,10 @@ export function ComponentShowcase() {
                 Width
               </span>
               <div className="nx:flex nx:flex-wrap nx:gap-3 nx:mt-2">
-                <div className="nx:border nx:border-border-default nx:rounded nx:px-4 nx:py-2 nx:typography-label-default">
+                <div className="nx:border nx:border-border-default nx:rounded-sm nx:px-4 nx:py-2 nx:typography-label-default">
                   default
                 </div>
-                <div className="nx:border-thick nx:border-border-default nx:rounded nx:px-4 nx:py-2 nx:typography-label-default">
+                <div className="nx:border-thick nx:border-border-default nx:rounded-sm nx:px-4 nx:py-2 nx:typography-label-default">
                   thick
                 </div>
               </div>
@@ -361,19 +361,19 @@ export function ComponentShowcase() {
                 Colors
               </span>
               <div className="nx:flex nx:flex-wrap nx:gap-3 nx:mt-2">
-                <div className="nx:border-2 nx:border-border-default nx:rounded nx:px-4 nx:py-2 nx:typography-label-default">
+                <div className="nx:border-2 nx:border-border-default nx:rounded-sm nx:px-4 nx:py-2 nx:typography-label-default">
                   Default
                 </div>
-                <div className="nx:border-2 nx:border-border-primary nx:rounded nx:px-4 nx:py-2 nx:typography-label-default">
+                <div className="nx:border-2 nx:border-border-primary nx:rounded-sm nx:px-4 nx:py-2 nx:typography-label-default">
                   Primary
                 </div>
-                <div className="nx:border-2 nx:border-border-success nx:rounded nx:px-4 nx:py-2 nx:typography-label-default">
+                <div className="nx:border-2 nx:border-border-success nx:rounded-sm nx:px-4 nx:py-2 nx:typography-label-default">
                   Success
                 </div>
-                <div className="nx:border-2 nx:border-border-error nx:rounded nx:px-4 nx:py-2 nx:typography-label-default">
+                <div className="nx:border-2 nx:border-border-error nx:rounded-sm nx:px-4 nx:py-2 nx:typography-label-default">
                   Error
                 </div>
-                <div className="nx:border-2 nx:border-border-information nx:rounded nx:px-4 nx:py-2 nx:typography-label-default">
+                <div className="nx:border-2 nx:border-border-information nx:rounded-sm nx:px-4 nx:py-2 nx:typography-label-default">
                   Info
                 </div>
               </div>

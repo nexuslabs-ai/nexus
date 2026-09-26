@@ -19,6 +19,7 @@ import {
 import {
   BORDER_COLOR_ALIAS_NAMES,
   borderWidthAliasUtilities,
+  DEFAULT_TRANSITION,
   durationUtility,
 } from '../src/token-source/utilities.js';
 
@@ -1107,13 +1108,13 @@ export function generateMotionUtilitiesCSS(motionTokens) {
   // landing it with the keypress.
   css += `@utility transition-control {\n`;
   css += `  transition-property: color, background-color, border-color;\n`;
-  css += `  transition-timing-function: var(--tw-ease, var(--default-transition-timing-function));\n`;
-  css += `  transition-duration: var(--tw-duration, var(--default-transition-duration));\n`;
+  css += `  transition-timing-function: var(--tw-ease, --theme(--default-transition-timing-function));\n`;
+  css += `  transition-duration: var(--tw-duration, --theme(--default-transition-duration));\n`;
   css += `}\n\n`;
   css += `@utility transition-field {\n`;
   css += `  transition-property: color, background-color;\n`;
-  css += `  transition-timing-function: var(--tw-ease, var(--default-transition-timing-function));\n`;
-  css += `  transition-duration: var(--tw-duration, var(--default-transition-duration));\n`;
+  css += `  transition-timing-function: var(--tw-ease, --theme(--default-transition-timing-function));\n`;
+  css += `  transition-duration: var(--tw-duration, --theme(--default-transition-duration));\n`;
   css += `}\n\n`;
 
   // Static "presence bridge" (not token-derived): a non-visual animation whose only
@@ -1299,6 +1300,25 @@ export function generateThemeCSS(config) {
     }
   }
 
+  css += `}\n`;
+
+  // Inlined so a motion-mode override on any ancestor reaches them.
+  const defaultDuration = motionTokens.find(
+    (token) =>
+      token.group === 'duration' && token.key === DEFAULT_TRANSITION.duration
+  );
+  const defaultEase = motionTokens.find(
+    (token) => token.group === 'ease' && token.key === DEFAULT_TRANSITION.ease
+  );
+  if (!defaultDuration || !defaultEase) {
+    throw new Error(
+      `generateThemeCSS: motion tokens \`duration.${DEFAULT_TRANSITION.duration}\` and \`ease.${DEFAULT_TRANSITION.ease}\` are required — \`transition-control\` / \`transition-field\` read them as the default transition timing.`
+    );
+  }
+  css += `\n@theme inline {\n`;
+  css += `  /* Default transition timing */\n`;
+  css += `  --default-transition-duration: ${defaultDuration.varRef};\n`;
+  css += `  --default-transition-timing-function: ${defaultEase.varRef};\n`;
   css += `}\n`;
 
   // Inlined so every border and outline utility reads `--nx-borderwidth-*` on

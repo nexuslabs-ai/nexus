@@ -60,6 +60,7 @@ of the build, not of one import, so a second unprefixed import does not buy you
 a second, unprefixed utility layer: everything stays `nx:`. It emits preflight
 twice wherever you put it. Put it _after_ the Nexus import and it also
 re-injects Tailwind's default `@theme` on top of Nexus's resets, so
+{/* audit-class-refs-ignore-next-line */}
 `nx:bg-red-500` and a stock `nx:text-lg` come back alongside the tokens.
 
 Tailwind finds class names by scanning your project, so a pasted component's

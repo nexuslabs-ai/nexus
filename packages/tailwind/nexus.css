@@ -100,6 +100,13 @@
     var(--nx-shadow-base-layer-1-x) var(--nx-shadow-base-layer-1-y)
       var(--nx-shadow-base-layer-1-blur) var(--nx-shadow-base-layer-1-spread)
       var(--nx-shadow-base-layer-1-color);
+  --shadow-md:
+    var(--nx-shadow-md-layer-2-x) var(--nx-shadow-md-layer-2-y)
+      var(--nx-shadow-md-layer-2-blur) var(--nx-shadow-md-layer-2-spread)
+      var(--nx-shadow-md-layer-2-color),
+    var(--nx-shadow-md-layer-1-x) var(--nx-shadow-md-layer-1-y)
+      var(--nx-shadow-md-layer-1-blur) var(--nx-shadow-md-layer-1-spread)
+      var(--nx-shadow-md-layer-1-color);
   --shadow-lg:
     var(--nx-shadow-lg-layer-2-x) var(--nx-shadow-lg-layer-2-y)
       var(--nx-shadow-lg-layer-2-blur) var(--nx-shadow-lg-layer-2-spread)
@@ -135,6 +142,12 @@
   --breakpoint-lg: 64rem;
   --breakpoint-xl: 80rem;
   --breakpoint-2xl: 96rem;
+}
+
+@theme inline {
+  /* Default transition timing */
+  --default-transition-duration: var(--nx-motion-duration-default);
+  --default-transition-timing-function: var(--nx-motion-ease-enter);
 }
 
 @theme inline {

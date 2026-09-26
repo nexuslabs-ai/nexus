@@ -132,7 +132,7 @@ export const Both: Story = {
             {Array.from({ length: 15 }, (_, col) => (
               <div
                 key={col}
-                className="nx:flex nx:size-12 nx:shrink-0 nx:items-center nx:justify-center nx:rounded nx:bg-muted nx:typography-label-small nx:text-muted-foreground"
+                className="nx:flex nx:size-12 nx:shrink-0 nx:items-center nx:justify-center nx:rounded-sm nx:bg-muted nx:typography-label-small nx:text-muted-foreground"
               >
                 {row * 15 + col}
               </div>
@@ -321,7 +321,7 @@ export const AllVariants: Story = {
                 {Array.from({ length: 10 }, (_, col) => (
                   <div
                     key={col}
-                    className="nx:flex nx:size-10 nx:shrink-0 nx:items-center nx:justify-center nx:rounded nx:bg-muted nx:typography-label-small nx:text-muted-foreground"
+                    className="nx:flex nx:size-10 nx:shrink-0 nx:items-center nx:justify-center nx:rounded-sm nx:bg-muted nx:typography-label-small nx:text-muted-foreground"
                   >
                     {row * 10 + col}
                   </div>

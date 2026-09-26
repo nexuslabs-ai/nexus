@@ -123,6 +123,11 @@ jobs:
           pnpm turbo build
           node scripts/audit-turbo-outputs.js --post-build
 
+      # Reads the built @nexus_ds/react stylesheet the console imports, so it
+      # runs after the build rather than beside the token regeneration.
+      - name: Tailwind class-ref audit
+        run: pnpm --filter @nexus_ds/core audit:class-refs
+
       # The build step's docs JSON may be a turbo cache restore; regenerating
       # it outside turbo catches a stale cache entry or nondeterministic output.
       - name: Check docs JSON matches a fresh regeneration
@@ -317,10 +322,6 @@ jobs:
       - name: Color-blind audit
         if: ${{ !cancelled() && steps.regen.conclusion == 'success' }}
         run: pnpm audit:colorblind
-
-      - name: Tailwind class-ref audit
-        if: ${{ !cancelled() && steps.regen.conclusion == 'success' }}
-        run: pnpm --filter @nexus_ds/core audit:class-refs
 
       - name: Token-mode codename audit
         if: ${{ !cancelled() && steps.regen.conclusion == 'success' }}
