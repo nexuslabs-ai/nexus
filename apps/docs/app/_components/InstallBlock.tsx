@@ -19,7 +19,6 @@ function missing(
   return [...new Set(needed.flatMap(pick))].filter((item) => !have.has(item));
 }
 
-/** Renders nothing when `besides` already covers everything `slugs` needs. */
 export async function InstallBlock({
   slugs,
   besides = [],

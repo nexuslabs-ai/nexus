@@ -16,13 +16,11 @@ import {
 import { InstallBlock } from './InstallBlock';
 import { PropsTable } from './PropsTable';
 
-type Example = { id: DemoId; name: string; alsoInstall: readonly string[] };
+type Example = { id: DemoId; name: string };
 
 /**
  * `examples/{slug}/demo.tsx` is the Preview and Code; every other demo in that
  * folder is an example, registry `examples` first, then the rest by name.
- * Installation lists the component's block, then the blocks its preview demo
- * also imports, so the Code pastes as is.
  */
 export function ComponentPage({ slug }: { slug: string }) {
   const page = requireSection('components').pages.find(
@@ -42,7 +40,6 @@ export function ComponentPage({ slug }: { slug: string }) {
   }
 
   const previewAlsoInstall = demos[previewId].alsoInstall;
-  const installed = [slug, ...previewAlsoInstall];
   const examples = examplesFor(slug, page.examples);
 
   return (
@@ -71,7 +68,7 @@ export function ComponentPage({ slug }: { slug: string }) {
           Examples
         </SectionHeading>
       )}
-      {examples.map(({ id, name, alsoInstall }) => (
+      {examples.map(({ id, name }) => (
         <section key={id}>
           <SubsectionHeading
             id={`example-${slugify(name)}`}
@@ -81,8 +78,8 @@ export function ComponentPage({ slug }: { slug: string }) {
           </SubsectionHeading>
           <ComponentPreview id={id} />
           <InstallBlock
-            slugs={alsoInstall}
-            besides={installed}
+            slugs={demos[id].alsoInstall}
+            besides={[slug, ...previewAlsoInstall]}
             caption="This example also needs:"
           />
           <ComponentSource id={id} />
@@ -107,6 +104,6 @@ function examplesFor(slug: string, order: readonly string[]): Example[] {
         `ComponentPage: no demo ${id} in the demo index — run \`pnpm --filter @nexus_ds/docs generate:demos\`.`
       );
     }
-    return { id, name, alsoInstall: demos[id].alsoInstall };
+    return { id, name };
   });
 }
