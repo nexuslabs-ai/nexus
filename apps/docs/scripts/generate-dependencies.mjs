@@ -9,6 +9,7 @@ import path from 'node:path';
 
 import ts from 'typescript';
 
+import { DEMO_EXTENSION, isDemoName } from './examples.mjs';
 import {
   collectSourceFiles,
   componentSlugs,
@@ -25,6 +26,7 @@ import {
 } from './roots.mjs';
 
 const outputDir = path.join(docsRoot, 'generated', 'dependencies');
+const examplesRoot = path.join(docsRoot, 'examples');
 
 function readManifest(packageDir) {
   return JSON.parse(
@@ -140,6 +142,26 @@ function colocatedStyles(files) {
   );
 }
 
+/** Packages the demos in `examples/{slug}/` import, which a paste of them needs too. */
+function examplePackages(slug) {
+  const slugExamples = path.join(examplesRoot, slug);
+  if (!statSync(slugExamples, { throwIfNoEntry: false })?.isDirectory()) {
+    return [];
+  }
+
+  return readdirSync(slugExamples)
+    .filter((name) => name.endsWith(DEMO_EXTENSION) && isDemoName(name))
+    .flatMap((name) => {
+      const source = readFileSync(path.join(slugExamples, name), 'utf8');
+      return ts.preProcessFile(source, true, true).importedFiles;
+    })
+    .map(({ fileName: specifier }) => specifier)
+    .filter(
+      (specifier) => !specifier.startsWith('.') && !specifier.startsWith('@/')
+    )
+    .map(packageName);
+}
+
 function walkSlug(slug) {
   const slugDir = path.join(componentsRoot, slug);
   const roots = collectSourceFiles(slugDir, isModuleSource);
@@ -151,7 +173,9 @@ function walkSlug(slug) {
   return {
     slug,
     slugDir,
-    packages: walked.packages.filter((name) => name !== 'react'),
+    packages: [
+      ...new Set([...walked.packages, ...examplePackages(slug)]),
+    ].filter((name) => name !== 'react'),
     files: [...needed],
   };
 }
@@ -167,7 +191,7 @@ function assertDeclaredPackages(walks) {
 
   throw new Error(
     [
-      'dependencies JSON: a component imports a package @nexus_ds/react does not declare in dependencies or peerDependencies.',
+      'dependencies JSON: a component or its examples import a package @nexus_ds/react does not declare in dependencies or peerDependencies.',
       ...offenders,
     ].join('\n')
   );
