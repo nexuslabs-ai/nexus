@@ -48,6 +48,31 @@ export const demos = {
     alsoInstall: [],
     load: () => import("./demos/button/with-icon"),
   },
+  "card/content-only": {
+    id: "card/content-only",
+    alsoInstall: [],
+    load: () => import("./demos/card/content-only"),
+  },
+  "card/demo": {
+    id: "card/demo",
+    alsoInstall: ["button"],
+    load: () => import("./demos/card/demo"),
+  },
+  "card/footer-actions": {
+    id: "card/footer-actions",
+    alsoInstall: ["button"],
+    load: () => import("./demos/card/footer-actions"),
+  },
+  "card/header-with-action": {
+    id: "card/header-with-action",
+    alsoInstall: ["button"],
+    load: () => import("./demos/card/header-with-action"),
+  },
+  "card/sign-in-form": {
+    id: "card/sign-in-form",
+    alsoInstall: ["button","input","label"],
+    load: () => import("./demos/card/sign-in-form"),
+  },
   "dialog/demo": {
     id: "dialog/demo",
     alsoInstall: ["button"],

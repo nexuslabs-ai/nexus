@@ -196,7 +196,7 @@ export const PAGE_REGISTRY = {
       {
         slug: 'containers',
         label: 'Containers',
-        components: ['Card', 'Accordion', 'Alert'],
+        components: ['Accordion', 'Alert'],
         wireframe: {
           lede: '[ Surfaces that hold content · per-component Storybook page below ]',
           blocks: [
@@ -272,6 +272,16 @@ export const PAGE_REGISTRY = {
         slug: 'dialog',
         label: 'Dialog',
         examples: ['with-form', 'prop-driven', 'scrollable-body'],
+      },
+      {
+        slug: 'card',
+        label: 'Card',
+        examples: [
+          'header-with-action',
+          'content-only',
+          'footer-actions',
+          'sign-in-form',
+        ],
       },
     ],
   },
