@@ -29,6 +29,7 @@
         "scripts/react-sources.mjs",
         "scripts/roots.mjs",
         "examples/**",
+        "package.json",
         "$TURBO_ROOT$/packages/react/src/**",
         "$TURBO_ROOT$/packages/react/package.json",
         "$TURBO_ROOT$/packages/react/tsconfig.json"

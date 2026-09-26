@@ -48,7 +48,12 @@ const runtimeRanges = new Map(
     ...reactManifest.dependencies,
   })
 );
-const docsRanges = new Map(Object.entries(readManifest(docsRoot).dependencies));
+// A `workspace:` range has no meaning outside this repo, so a demo cannot need one.
+const docsRanges = new Map(
+  Object.entries(readManifest(docsRoot).dependencies).filter(
+    ([, range]) => !range.startsWith('workspace:')
+  )
+);
 const reactTsconfig = path.join(reactRoot, 'tsconfig.json');
 const compilerOptions = ts.parseJsonConfigFileContent(
   ts.readConfigFile(reactTsconfig, ts.sys.readFile).config,
@@ -233,7 +238,7 @@ assertDeclared(
   walks,
   'examplePackages',
   docsRanges,
-  'a demo in examples/{slug}/ imports a package @nexus_ds/docs does not declare in dependencies.'
+  'a demo in examples/{slug}/ imports a package @nexus_ds/docs does not declare in dependencies with a published range. Import Nexus code through @/, not a workspace package.'
 );
 
 const entries = walks.map(toEntry);
