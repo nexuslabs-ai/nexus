@@ -9,13 +9,11 @@ const variants = [
   'warning',
   'error',
   'information',
-] as const satisfies BadgeProps['variant'][];
+] as const satisfies NonNullable<BadgeProps['variant']>[];
 
-const fills = [
-  'solid',
-  'light',
-  'outline',
-] as const satisfies BadgeProps['fill'][];
+const fills = ['solid', 'light', 'outline'] as const satisfies NonNullable<
+  BadgeProps['fill']
+>[];
 
 export default function BadgeFills() {
   return (

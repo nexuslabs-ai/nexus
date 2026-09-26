@@ -1,3 +1,4 @@
+import { execFileSync } from 'node:child_process';
 import {
   existsSync,
   mkdirSync,
@@ -9,20 +10,26 @@ import {
 } from 'node:fs';
 import path from 'node:path';
 
-import { DEMO_EXTENSION, isDemoName } from './examples.mjs';
+import {
+  ALWAYS_INSTALLED,
+  COPIED_PREFIX,
+  DEMO_EXTENSION,
+  importSpecifiers,
+  isDemoName,
+  packageName,
+} from './examples.mjs';
 import { docsRoot } from './roots.mjs';
 
 const EXAMPLES_DIR = path.join(docsRoot, 'examples');
 const GENERATED_DIR = path.join(docsRoot, '__generated__');
 const DEPENDENCIES_DIR = path.join(docsRoot, 'generated', 'dependencies');
+const DEPENDENCIES_SCRIPT = path.join(
+  docsRoot,
+  'scripts',
+  'generate-dependencies.mjs'
+);
 
-const COPIED_PREFIX = '@/';
-const IMPORT_PATTERNS = [
-  /^\s*(?:import|export)\s+(?:[^'";()]*?\s+from\s+)?['"]([^'"]+)['"]/gm,
-  /\bimport\(\s*['"]([^'"]+)['"]/g,
-];
 const COMPONENT_IMPORT = /^@\/components\/([^/]+)(?:\/|$)/;
-const ALWAYS_INSTALLED = new Set(['react', 'react-dom']);
 
 const INDEX_FILE = 'demo-index.ts';
 const MODULES_DIR = 'demos';
@@ -123,21 +130,8 @@ function boundarySpecifier(id) {
   return `./${path.posix.basename(id)}${BOUNDARY_SUFFIX}`;
 }
 
-function packageName(specifier) {
-  const segments = specifier.split('/');
-  return specifier.startsWith('@')
-    ? segments.slice(0, 2).join('/')
-    : segments[0];
-}
-
 function withoutExtension(file) {
   return file.replace(/\.tsx?$/, '');
-}
-
-function importSpecifiers(source) {
-  return IMPORT_PATTERNS.flatMap((pattern) =>
-    [...source.matchAll(pattern)].map(([, specifier]) => specifier)
-  );
 }
 
 function readInstallBlocks() {
@@ -196,9 +190,14 @@ function installSlugsFor(id, specifiers, blocks) {
   return slugs;
 }
 
+/**
+ * generate:dependencies already lists the packages a component's own demos
+ * import, so only a folder without its own block has packages to check.
+ */
 function assertImportsInstalled(id, source, blocks) {
   const specifiers = importSpecifiers(source);
   const slugs = installSlugsFor(id, specifiers, blocks);
+  const ownBlock = blocks.has(id.split('/')[0]);
   const packages = new Set(
     slugs.flatMap((slug) => [...blocks.get(slug).packages])
   );
@@ -215,6 +214,7 @@ function assertImportsInstalled(id, source, blocks) {
       }
       continue;
     }
+    if (ownBlock) continue;
 
     const name = packageName(specifier);
     if (!ALWAYS_INSTALLED.has(name) && !packages.has(name)) {
@@ -340,8 +340,10 @@ function generateAndLog() {
   );
 }
 
+// A demo edit can change the packages its install block lists.
 function regenerateQuietly() {
   try {
+    execFileSync(process.execPath, [DEPENDENCIES_SCRIPT], { stdio: 'inherit' });
     generateAndLog();
   } catch (error) {
     console.error(`demo-index: ${error.message}`);
