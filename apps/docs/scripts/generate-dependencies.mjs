@@ -169,9 +169,14 @@ function examplePackages(slug, componentPackages) {
     .sort()
     .map((name) => {
       const range = docsDependencies[name];
-      if (!range || range.startsWith('workspace:')) {
+      if (!range) {
         throw new Error(
-          `dependencies JSON: examples/${slug}/ imports ${name}, which apps/docs/package.json does not list with an npm range.`
+          `dependencies JSON: examples/${slug}/ imports ${name}, which is not in apps/docs/package.json dependencies.`
+        );
+      }
+      if (range.startsWith('workspace:')) {
+        throw new Error(
+          `dependencies JSON: examples/${slug}/ imports workspace package ${name} — import Nexus code through @/ instead.`
         );
       }
       return { name, range };
