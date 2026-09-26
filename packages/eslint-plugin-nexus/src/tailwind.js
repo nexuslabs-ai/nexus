@@ -29,7 +29,7 @@ const tailwindClassSelectors = [
 
 export function nexusTailwindClassesConfig(options) {
   const { files, entryPoint } = options;
-  if (!path.isAbsolute(entryPoint)) {
+  if (typeof entryPoint !== 'string' || !path.isAbsolute(entryPoint)) {
     throw new Error(
       `nexusTailwindClassesConfig: \`entryPoint\` must be an absolute path, got '${entryPoint}'.`
     );

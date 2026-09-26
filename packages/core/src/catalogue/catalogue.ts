@@ -26,6 +26,7 @@ import {
 import {
   BORDER_COLOR_ALIAS_NAMES,
   borderWidthAliasUtilities,
+  DEFAULT_TRANSITION,
   durationUtility,
 } from '../token-source/utilities';
 
@@ -273,14 +274,14 @@ function primitiveAliases(
   const [group, motionKey = ''] = path;
   if (group === 'duration') {
     const aliases = [utility(durationUtility(motionKey).name)];
-    if (motionKey === 'default') {
+    if (motionKey === DEFAULT_TRANSITION.duration) {
       aliases.push(cssVariable('--default-transition-duration'));
     }
     return aliases;
   }
   if (group === 'ease') {
     const aliases = [cssVariable(`--ease-${motionKey}`)];
-    if (motionKey === 'enter') {
+    if (motionKey === DEFAULT_TRANSITION.ease) {
       aliases.push(cssVariable('--default-transition-timing-function'));
     }
     return aliases;

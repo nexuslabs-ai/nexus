@@ -68,9 +68,11 @@ const DASHED_IDENT_PROPERTIES = new Set([
   'font-palette',
   'position-try',
   'position-try-fallbacks',
+  'transition-property',
+  'will-change',
 ]);
 
-function isDashedIdentProperty(property) {
+function acceptsDashedIdentValue(property) {
   return property.startsWith('--') || DASHED_IDENT_PROPERTIES.has(property);
 }
 
@@ -163,7 +165,7 @@ function diagnose(candidate, emitted, declared) {
     return VARIANT_MARKER.test(candidate) ? null : { kind: 'unknown' };
   }
   const bare = [...emitted.matchAll(BARE_VAR_DECLARATION)]
-    .filter(([, property]) => !isDashedIdentProperty(property))
+    .filter(([, property]) => !acceptsDashedIdentValue(property))
     .map(([, , name]) => name);
   if (bare.length > 0) return { kind: 'bareVar', names: bare };
 

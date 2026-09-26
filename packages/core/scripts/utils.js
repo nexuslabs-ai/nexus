@@ -19,6 +19,7 @@ import {
 import {
   BORDER_COLOR_ALIAS_NAMES,
   borderWidthAliasUtilities,
+  DEFAULT_TRANSITION,
   durationUtility,
 } from '../src/token-source/utilities.js';
 
@@ -1303,14 +1304,15 @@ export function generateThemeCSS(config) {
 
   // Inlined so a motion-mode override on any ancestor reaches them.
   const defaultDuration = motionTokens.find(
-    (token) => token.group === 'duration' && token.key === 'default'
+    (token) =>
+      token.group === 'duration' && token.key === DEFAULT_TRANSITION.duration
   );
   const defaultEase = motionTokens.find(
-    (token) => token.group === 'ease' && token.key === 'enter'
+    (token) => token.group === 'ease' && token.key === DEFAULT_TRANSITION.ease
   );
   if (!defaultDuration || !defaultEase) {
     throw new Error(
-      'generateThemeCSS: motion tokens `duration.default` and `ease.enter` are required — `transition-control` / `transition-field` read them as the default transition timing.'
+      `generateThemeCSS: motion tokens \`duration.${DEFAULT_TRANSITION.duration}\` and \`ease.${DEFAULT_TRANSITION.ease}\` are required — \`transition-control\` / \`transition-field\` read them as the default transition timing.`
     );
   }
   css += `\n@theme inline {\n`;
