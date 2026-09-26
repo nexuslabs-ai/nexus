@@ -14,7 +14,9 @@ export default function CardFooterActions() {
   return (
     <Card className="nx:w-full nx:max-w-sm">
       <CardHeader>
-        <CardTitle>Email notifications</CardTitle>
+        <CardTitle asChild>
+          <h4>Email notifications</h4>
+        </CardTitle>
         <CardDescription>Choose what lands in your inbox.</CardDescription>
       </CardHeader>
       <CardContent>

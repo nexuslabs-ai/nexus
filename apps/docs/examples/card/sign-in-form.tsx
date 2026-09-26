@@ -16,7 +16,9 @@ export default function CardSignInForm() {
   return (
     <Card className="nx:w-full nx:max-w-sm">
       <CardHeader>
-        <CardTitle>Sign in</CardTitle>
+        <CardTitle asChild>
+          <h4>Sign in</h4>
+        </CardTitle>
         <CardDescription>
           Enter your email and password to continue.
         </CardDescription>
@@ -34,6 +36,7 @@ export default function CardSignInForm() {
               name="email"
               type="email"
               autoComplete="email"
+              required
               placeholder="you@example.com"
             />
           </div>
@@ -44,6 +47,7 @@ export default function CardSignInForm() {
               name="password"
               type="password"
               autoComplete="current-password"
+              required
             />
           </div>
         </form>

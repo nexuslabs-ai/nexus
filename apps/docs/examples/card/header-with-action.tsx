@@ -14,7 +14,9 @@ export default function CardHeaderWithAction() {
   return (
     <Card className="nx:w-full nx:max-w-sm">
       <CardHeader>
-        <CardTitle>Team members</CardTitle>
+        <CardTitle asChild>
+          <h4>Team members</h4>
+        </CardTitle>
         <CardDescription>Invite people to collaborate.</CardDescription>
         <CardAction>
           <Button size="sm" variant="outline">
