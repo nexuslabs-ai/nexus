@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useId, useRef, useState } from 'react';
 
 import { useNexusAppearance } from '@nexus_ds/react/appearance';
 import { cn } from '@nexus_ds/react/utils';
@@ -95,50 +95,44 @@ function ThemePanel() {
       {expanded && (
         <div className="nx:px-4 nx:pb-4 nx:border-t nx:border-border-default">
           <Section title="Colors">
-            <Row label="Scheme">
-              <ModeSelect
-                mode="mode"
-                value={getThemeModeValue(state, 'mode')}
-                onChange={onChange('mode')}
-              />
-            </Row>
-            <Row label="Base">
-              <ModeSelect
-                mode="base"
-                value={getThemeModeValue(state, 'base')}
-                onChange={onChange('base')}
-              />
-            </Row>
+            <ModeRow
+              label="Scheme"
+              mode="mode"
+              value={getThemeModeValue(state, 'mode')}
+              onChange={onChange('mode')}
+            />
+            <ModeRow
+              label="Base"
+              mode="base"
+              value={getThemeModeValue(state, 'base')}
+              onChange={onChange('base')}
+            />
           </Section>
           <Section title="Design Tokens">
-            <Row label="Size">
-              <ModeSelect
-                mode="spacing"
-                value={getThemeModeValue(state, 'spacing')}
-                onChange={onChange('spacing')}
-              />
-            </Row>
-            <Row label="Shadow">
-              <ModeSelect
-                mode="shadow"
-                value={getThemeModeValue(state, 'shadow')}
-                onChange={onChange('shadow')}
-              />
-            </Row>
-            <Row label="Radius">
-              <ModeSelect
-                mode="radius"
-                value={getThemeModeValue(state, 'radius')}
-                onChange={onChange('radius')}
-              />
-            </Row>
-            <Row label="Border Width">
-              <ModeSelect
-                mode="borderwidth"
-                value={getThemeModeValue(state, 'borderwidth')}
-                onChange={onChange('borderwidth')}
-              />
-            </Row>
+            <ModeRow
+              label="Size"
+              mode="spacing"
+              value={getThemeModeValue(state, 'spacing')}
+              onChange={onChange('spacing')}
+            />
+            <ModeRow
+              label="Shadow"
+              mode="shadow"
+              value={getThemeModeValue(state, 'shadow')}
+              onChange={onChange('shadow')}
+            />
+            <ModeRow
+              label="Radius"
+              mode="radius"
+              value={getThemeModeValue(state, 'radius')}
+              onChange={onChange('radius')}
+            />
+            <ModeRow
+              label="Border Width"
+              mode="borderwidth"
+              value={getThemeModeValue(state, 'borderwidth')}
+              onChange={onChange('borderwidth')}
+            />
           </Section>
         </div>
       )}
@@ -163,46 +157,40 @@ function Section({
   );
 }
 
-function Row({
+function ModeRow({
   label,
-  children,
-}: {
-  label: string;
-  children: React.ReactNode;
-}) {
-  return (
-    <div className="nx:grid nx:grid-cols-[1fr_auto] nx:items-center nx:gap-3 nx:py-1">
-      <label className="nx:typography-label-default">{label}</label>
-      {children}
-    </div>
-  );
-}
-
-function ModeSelect({
   mode,
   value,
   onChange,
 }: {
+  label: string;
   mode: ThemeMode;
   value: string;
   onChange: (v: string) => void;
 }) {
+  const id = useId();
   return (
-    <Select value={value} onValueChange={onChange}>
-      <SelectTrigger
-        size="sm"
-        className="nx:w-[120px] nx:typography-label-small nx:capitalize"
-      >
-        <SelectValue />
-      </SelectTrigger>
-      <SelectContent>
-        {getThemeModeOptions(mode).map((o) => (
-          <SelectItem key={o.value} value={o.value}>
-            {o.label}
-          </SelectItem>
-        ))}
-      </SelectContent>
-    </Select>
+    <div className="nx:grid nx:grid-cols-[1fr_auto] nx:items-center nx:gap-3 nx:py-1">
+      <label htmlFor={id} className="nx:typography-label-default">
+        {label}
+      </label>
+      <Select value={value} onValueChange={onChange}>
+        <SelectTrigger
+          id={id}
+          size="sm"
+          className="nx:w-[120px] nx:typography-label-small nx:capitalize"
+        >
+          <SelectValue />
+        </SelectTrigger>
+        <SelectContent>
+          {getThemeModeOptions(mode).map((o) => (
+            <SelectItem key={o.value} value={o.value}>
+              {o.label}
+            </SelectItem>
+          ))}
+        </SelectContent>
+      </Select>
+    </div>
   );
 }
 

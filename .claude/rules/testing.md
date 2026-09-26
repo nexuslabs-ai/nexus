@@ -7,12 +7,12 @@
 
 A test earns its place only when it pins behaviour a consumer of the design system would see. Nexus has exactly four kinds:
 
-| Kind                  | Lives in                                           | Pins                                                                                                                                      |
-| --------------------- | -------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------- |
-| **Component stories** | `packages/react/src/**/*.stories.tsx`              | Component behaviour and accessibility, via `play` functions and the axe check on every story                                              |
-| **Core engine**       | `packages/core/src/lib/*.test.ts`                  | Derived-theme contrast and legibility, colour-blind separation, registry/engine agreement, first-paint script, perceptual-ramp shade grid |
-| **`cn` merge**        | `packages/react/src/lib/utils.test.ts`             | `cn` resolving conflicts between Nexus `nx:` utilities                                                                                    |
-| **ESLint rules**      | `packages/eslint-plugin-nexus/__tests__/*.test.js` | Each published rule reports what it should, and nothing else                                                                              |
+| Kind                  | Lives in                                           | Pins                                                                                                                                                                                                             |
+| --------------------- | -------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **Component stories** | `packages/react/src/**/*.stories.tsx`              | Component behaviour and accessibility, via `play` functions and the axe check on every story                                                                                                                     |
+| **Core engine**       | `packages/core/src/lib/*.test.ts`                  | Derived-theme contrast and legibility, colour-blind separation, registry/engine agreement, first-paint script, perceptual-ramp shade grid, token catalogue agreement with the generated CSS, token-file manifest |
+| **`cn` merge**        | `packages/react/src/lib/utils.test.ts`             | `cn` resolving conflicts between Nexus `nx:` utilities                                                                                                                                                           |
+| **ESLint rules**      | `packages/eslint-plugin-nexus/__tests__/*.test.js` | Each published rule reports what it should, and nothing else                                                                                                                                                     |
 
 Components are tested only through stories — see [testing-react.md](testing-react.md). The other three run under Vitest's `unit` project and import from `vitest` directly.
 

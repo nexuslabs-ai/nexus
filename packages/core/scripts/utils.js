@@ -4,10 +4,23 @@ import * as prettier from 'prettier';
 import { fileURLToPath } from 'url';
 
 import {
-  hexToOklchMechanical,
-  hexToOklchPinned,
-  isPaletteShadeKey,
-} from '../dist/scripts/palette.js';
+  formatShadowStyle,
+  formatTokenValue,
+  formatTypographyDeclarations,
+} from '../src/token-source/format.js';
+import {
+  SPACING_MODE_FILE_PATTERN,
+  spacingRoleUtility,
+} from '../src/token-source/spacing.js';
+import {
+  extractTokens,
+  pathToCssVarPrefixed,
+} from '../src/token-source/tokens.js';
+import {
+  BORDER_COLOR_ALIAS_NAMES,
+  borderWidthAliasUtilities,
+  durationUtility,
+} from '../src/token-source/utilities.js';
 
 /**
  * Ensure a directory exists, creating it if necessary
@@ -36,185 +49,6 @@ export function readTokenFile(filePath) {
  */
 export function titleCase(s) {
   return s.length === 0 ? s : s[0].toUpperCase() + s.slice(1);
-}
-
-/**
- * Format a token value to a CSS string. For `$type: "color"` hex values,
- * routes through the OKLCH converters: palette shade tokens (path ending in a
- * shade key like `'500'`) get pinned to the perceptual L grid; everything else
- * (white/black/semantic hex literals with alpha) is converted mechanically.
- * @param {object|string|number} value - Token value
- * @param {string} type - Token type
- * @param {string[]} [tokenPath] - Token path (used to route shade conversions)
- * @returns {string} Formatted CSS value
- * @throws {Error} If value is undefined
- */
-export function formatTokenValue(value, type, tokenPath) {
-  if (value === undefined) {
-    throw new Error(`formatTokenValue: value is undefined (type="${type}")`);
-  }
-
-  if (
-    type === 'dimension' &&
-    typeof value === 'object' &&
-    value !== null &&
-    'value' in value
-  ) {
-    // Round to 4 decimals to strip Figma's float-32 export artifacts
-    // (e.g. -0.800000011920929 → -0.8).
-    const rounded = Math.round(value.value * 10000) / 10000;
-    return `${rounded}${value.unit || 'px'}`;
-  }
-
-  if (type === 'color' && typeof value === 'string' && value.startsWith('#')) {
-    const lastSegment =
-      tokenPath && tokenPath.length > 0
-        ? tokenPath[tokenPath.length - 1]
-        : undefined;
-
-    if (tokenPath && tokenPath.length >= 2 && isPaletteShadeKey(lastSegment)) {
-      // The segment before the shade is the palette/hue (e.g. ['blue','500']),
-      // which selects the per-hue lightness curve in the grid.
-      return hexToOklchPinned(
-        value,
-        lastSegment,
-        tokenPath[tokenPath.length - 2],
-        (message) => console.warn(message)
-      );
-    }
-
-    if (isPaletteShadeKey(lastSegment)) {
-      console.warn(
-        `formatTokenValue: shade-key color "${tokenPath.join('.')}" lacks palette root — falling through to mechanical`
-      );
-    }
-
-    return hexToOklchMechanical(value);
-  }
-
-  if (typeof value === 'string') {
-    return value;
-  }
-
-  if (typeof value === 'number') {
-    return String(value);
-  }
-
-  return JSON.stringify(value);
-}
-
-/**
- * Recursively extract tokens from DTCG format
- * @param {object} obj - Token object
- * @param {string[]} currentPath - Current path in token tree
- * @param {object[]} result - Accumulated results
- * @returns {object[]} Array of { path, value, type, description }
- */
-export function extractTokens(obj, currentPath = [], result = []) {
-  for (const [key, value] of Object.entries(obj)) {
-    // Skip metadata keys
-    if (key.startsWith('$')) continue;
-
-    if (value && typeof value === 'object') {
-      // Check if this is a token (has $value and $type)
-      if (value.$value !== undefined && value.$type !== undefined) {
-        result.push({
-          path: [...currentPath, key],
-          value: value.$value,
-          type: value.$type,
-          description: value.$description,
-        });
-      } else {
-        // Recurse into group
-        extractTokens(value, [...currentPath, key], result);
-      }
-    }
-  }
-
-  return result;
-}
-
-/**
- * Convert token path to CSS variable name with optional nx- prefix
- * Used for generating prefixed CSS variables for @nexus_ds/tailwind package
- * @param {string[]} tokenPath - Token path array
- * @param {string|null} categoryPrefix - Optional category prefix (e.g., 'color', 'radius')
- * @param {boolean} useNxPrefix - Whether to add nx- prefix
- * @returns {string} CSS variable name (without --)
- */
-export function pathToCssVarPrefixed(
-  tokenPath,
-  categoryPrefix = null,
-  useNxPrefix = false
-) {
-  const cssName = tokenPath.join('-');
-  const base = categoryPrefix ? `${categoryPrefix}-${cssName}` : cssName;
-  return useNxPrefix ? `nx-${base}` : base;
-}
-
-/**
- * Check if a value is a DTCG reference (e.g., "{blue.500}")
- * @param {*} value - Value to check
- * @returns {boolean}
- */
-export function isReference(value) {
-  return (
-    typeof value === 'string' && value.startsWith('{') && value.endsWith('}')
-  );
-}
-
-/**
- * Extract reference path from DTCG reference string
- * @param {string} ref - Reference string like "{blue.500}"
- * @returns {string} Path like "blue.500"
- */
-export function extractRefPath(ref) {
-  return ref.slice(1, -1);
-}
-
-/**
- * Resolve a DTCG reference to CSS var() or raw value
- * @param {*} value - Token value (might be a reference)
- * @param {Map} primitiveMap - Map of primitive token paths to CSS names
- * @returns {string} Resolved CSS value
- */
-export function resolveReference(value, primitiveMap) {
-  if (!isReference(value)) {
-    return value;
-  }
-
-  const refPath = extractRefPath(value);
-  const primitiveInfo = primitiveMap.get(refPath);
-
-  if (primitiveInfo) {
-    return `var(--${primitiveInfo.cssName})`;
-  }
-
-  console.warn(`⚠ Reference not found: ${value}`);
-  return value;
-}
-
-/**
- * Resolve a value that might be a reference or a dimension object
- * @param {*} value - Token value
- * @param {Map} primitiveMap - Map of primitives
- * @param {string} type - Token type
- * @param {string[]} [tokenPath] - Token path for color routing
- * @returns {string} Resolved CSS value
- */
-export function resolveValue(value, primitiveMap, type = 'unknown', tokenPath) {
-  if (isReference(value)) {
-    return resolveReference(value, primitiveMap);
-  }
-
-  if (
-    type === 'dimension' ||
-    (typeof value === 'object' && value !== null && 'value' in value)
-  ) {
-    return formatTokenValue(value, 'dimension');
-  }
-
-  return formatTokenValue(value, type, tokenPath);
 }
 
 /**
@@ -282,13 +116,6 @@ export function discoverPrimitives(primitivesDir) {
 
   return result;
 }
-
-/**
- * Matches a per-mode spacing file in `semantic/`, capturing the mode name.
- * `discoverSpacingModeFiles` reads these; `assertSemanticFilesAreClaimed`
- * checks the same pattern to prove the collector claims them.
- */
-export const SPACING_MODE_FILE_PATTERN = /^spacing-([a-z]+)\.json$/;
 
 /**
  * Find the per-mode spacing files in `semantic/`. Their values are direct px
@@ -416,51 +243,6 @@ export const log = {
 };
 
 // ============================================
-// SHADOW COMPOSITE HELPERS
-// ============================================
-
-/**
- * Format a shadow property value as a var() reference or literal.
- * References are resolved through the primitive map so the var name matches
- * the actual primitive cssName. This means shadow property references can
- * point to any primitive category, not just `--nx-shadow-*`.
- */
-function formatShadowPropertyAsVar(value, primitiveMap) {
-  if (isReference(value)) {
-    return resolveValue(value, primitiveMap);
-  }
-
-  if (typeof value === 'object' && value !== null && 'value' in value) {
-    return formatTokenValue(value, 'dimension');
-  }
-
-  return String(value);
-}
-
-function formatShadowLayer(layer, primitiveMap, isInset = false) {
-  const x = formatShadowPropertyAsVar(layer.offsetX, primitiveMap);
-  const y = formatShadowPropertyAsVar(layer.offsetY, primitiveMap);
-  const blur = formatShadowPropertyAsVar(layer.blur, primitiveMap);
-  const spread = formatShadowPropertyAsVar(layer.spread, primitiveMap);
-  const color = formatShadowPropertyAsVar(layer.color, primitiveMap);
-  const inset = isInset || layer.inset ? 'inset ' : '';
-
-  return `${inset}${x} ${y} ${blur} ${spread} ${color}`;
-}
-
-/**
- * Format a complete shadow composite (single or multi-layer) to CSS value.
- * `primitiveMap` is required so the resolver can map reference paths to their
- * actual primitive cssNames.
- */
-export function formatShadowComposite(value, primitiveMap, isInset = false) {
-  const layers = Array.isArray(value) ? value : [value];
-  return layers
-    .map((layer) => formatShadowLayer(layer, primitiveMap, isInset))
-    .join(', ');
-}
-
-// ============================================
 // GOOGLE FONTS HELPERS
 // ============================================
 
@@ -552,22 +334,6 @@ export function getGoogleFontsImportFromTokens(typographyFilePath) {
 // ============================================
 
 /**
- * Resolve a typography property value to CSS
- * Handles 'auto' values, references, dimension objects, and raw values
- *
- * @param {*} value - Typography property value
- * @param {Map} primitiveMap - Map of primitives with nx- prefixed cssName
- * @returns {string} Resolved CSS value
- */
-function resolveTypographyProperty(value, primitiveMap) {
-  // Figma exports `lineHeight: "auto"` for the code-inline typography token,
-  // but `line-height: auto` is invalid CSS — browsers ignore it. Map to
-  // `normal` (CSS spec default, ~1.2) so the emitted utility is well-formed.
-  if (value === 'auto') return 'normal';
-  return resolveValue(value, primitiveMap, 'unknown');
-}
-
-/**
  * Generate typography utility CSS from token file
  * Creates @utility rules with typography-* prefix for all typography composite tokens
  *
@@ -594,38 +360,16 @@ export function generateTypographyUtilitiesCSS(tokensDir, primitiveMap) {
   let css = `/* Typography Utilities */\n\n`;
 
   for (const token of tokens) {
-    const name = token.path.join('-');
-    const value = token.value;
-
     // Use 'typography-' prefix to avoid tailwind-merge conflicts with Tailwind's
     // text-* utilities (which are used for both color and font-size)
-    css += `@utility typography-${name} {\n`;
-
-    if (value.fontFamily) {
-      css += `  font-family: ${resolveTypographyProperty(value.fontFamily, primitiveMap)};\n`;
+    css += `@utility ${pathToCssVarPrefixed(token.path, 'typography')} {\n`;
+    for (const declaration of formatTypographyDeclarations(
+      token.path,
+      token.value,
+      primitiveMap
+    )) {
+      css += `  ${declaration.property}: ${declaration.value};\n`;
     }
-    if (value.fontSize) {
-      css += `  font-size: ${resolveTypographyProperty(value.fontSize, primitiveMap)};\n`;
-    }
-    if (value.fontWeight) {
-      css += `  font-weight: ${resolveTypographyProperty(value.fontWeight, primitiveMap)};\n`;
-    }
-    if (value.lineHeight) {
-      css += `  line-height: ${resolveTypographyProperty(value.lineHeight, primitiveMap)};\n`;
-    }
-    if (value.letterSpacing) {
-      css += `  letter-spacing: ${resolveTypographyProperty(value.letterSpacing, primitiveMap)};\n`;
-    }
-
-    if (token.path[0] === 'heading') {
-      css += `  text-wrap: balance;\n`;
-    }
-
-    if (token.path[0] === 'body') {
-      // orphan/widow protection for multi-line copy
-      css += `  text-wrap: pretty;\n`;
-    }
-
     css += `}\n\n`;
   }
 
@@ -636,35 +380,19 @@ export function generateTypographyUtilitiesCSS(tokensDir, primitiveMap) {
 // BORDER WIDTH ALIAS UTILITIES
 // ============================================
 
-const BORDER_WIDTH_SIDES = [
-  { suffix: '', style: 'border-style', width: 'border-width' },
-  { suffix: 'x-', style: 'border-inline-style', width: 'border-inline-width' },
-  { suffix: 'y-', style: 'border-block-style', width: 'border-block-width' },
-  { suffix: 't-', style: 'border-top-style', width: 'border-top-width' },
-  { suffix: 'r-', style: 'border-right-style', width: 'border-right-width' },
-  { suffix: 'b-', style: 'border-bottom-style', width: 'border-bottom-width' },
-  { suffix: 'l-', style: 'border-left-style', width: 'border-left-width' },
-  {
-    suffix: 's-',
-    style: 'border-inline-start-style',
-    width: 'border-inline-start-width',
-  },
-  {
-    suffix: 'e-',
-    style: 'border-inline-end-style',
-    width: 'border-inline-end-width',
-  },
-  {
-    suffix: 'bs-',
-    style: 'border-block-start-style',
-    width: 'border-block-start-width',
-  },
-  {
-    suffix: 'be-',
-    style: 'border-block-end-style',
-    width: 'border-block-end-width',
-  },
-];
+/**
+ * Render one `@utility` rule the way the committed CSS spells it.
+ *
+ * @param {import('../src/token-source/utilities.js').UtilityRule} rule
+ * @returns {string}
+ */
+function formatUtilityRule({ name, declarations }) {
+  let css = `@utility ${name} {\n`;
+  for (const { property, value } of declarations) {
+    css += `  ${property}: ${value};\n`;
+  }
+  return `${css}}\n\n`;
+}
 
 /**
  * Generate the `border-width-{side?}-{name}` alias utilities for every
@@ -681,39 +409,13 @@ export function generateBorderWidthUtilitiesCSS(tokens) {
   }
 
   let css = `/* Border Width Alias Utilities */\n\n`;
+  const rules = tokens.flatMap((token) =>
+    borderWidthAliasUtilities(token.cssName.replace('nx-borderwidth-', ''))
+  );
+  css += rules.map(formatUtilityRule).join('');
 
-  for (const token of tokens) {
-    // Extract the name part (e.g., "default" from "nx-borderwidth-default")
-    const name = token.cssName.replace('nx-borderwidth-', '');
-    const value = `var(--${token.cssName})`;
-
-    for (const side of BORDER_WIDTH_SIDES) {
-      css += `@utility border-width-${side.suffix}${name} {\n`;
-      css += `  ${side.style}: var(--tw-border-style, solid);\n`;
-      css += `  ${side.width}: ${value};\n`;
-      css += `}\n\n`;
-    }
-  }
-
-  return { css, count: tokens.length * BORDER_WIDTH_SIDES.length };
+  return { css, count: rules.length };
 }
-
-const BORDER_COLOR_ALIAS_NAMES = [
-  'default',
-  'default-alpha',
-  'active',
-  'disabled',
-  'warning',
-  'warning-active',
-  'success',
-  'success-active',
-  'error',
-  'error-active',
-  'information',
-  'information-active',
-  'primary',
-  'primary-active',
-];
 
 const BORDER_COLOR_ALIAS_NAME_SET = new Set(BORDER_COLOR_ALIAS_NAMES);
 
@@ -842,49 +544,6 @@ export function collectSpacingTokens(semanticDir) {
   }
 
   return result;
-}
-
-/**
- * Top-level keys that may appear in `spacing-{mode}.json`. Acts as a closed
- * allowlist for `splitSpacingTokens` so a future accidental top-level key
- * (e.g. `motion`, `border`) throws at partition time — close to the JSON
- * edit — instead of falling through to `deriveRoleUtility` and producing
- * cryptic "unhandled path shape" errors at the emit step.
- */
-const SPACING_NUMERIC_ROOTS = new Set(['spacing']);
-const SPACING_ROLE_ROOTS = new Set(['container', 'layout']);
-
-/**
- * Split a per-mode token list into `{ numeric, role }` halves. Numeric tokens
- * (path starts with `spacing`) feed `@theme` for Tailwind's `nx:p-*` /
- * `nx:m-*` / `nx:gap-*` / `nx:h-*` / `nx:w-*` utility codegen. Role tokens
- * (`container.*`, `layout.*`) feed only the per-mode
- * `[data-density="X"]` overrides and the `spacing-utilities` `@utility`
- * declarations. Role tokens never enter `@theme`, both because Tailwind v4's
- * `--container-*` namespace would otherwise auto-codegen `nx:w-p` and
- * friends from `--nx-container-p`, and because role tokens don't map onto
- * Tailwind's unified `--spacing-*` namespace cleanly.
- *
- * Partitioning reads `token.path[0]` — `path` is the structured form,
- * `cssName` is the flattened output artifact. Throws when a path's root is
- * outside the two allowlists; extending requires a deliberate edit here.
- */
-export function splitSpacingTokens(tokens) {
-  const numeric = [];
-  const role = [];
-  for (const token of tokens) {
-    const root = token.path[0];
-    if (SPACING_NUMERIC_ROOTS.has(root)) {
-      numeric.push(token);
-    } else if (SPACING_ROLE_ROOTS.has(root)) {
-      role.push(token);
-    } else {
-      throw new Error(
-        `splitSpacingTokens: unknown top-level key "${root}" in path [${token.path.join('.')}] — extend SPACING_NUMERIC_ROOTS / SPACING_ROLE_ROOTS`
-      );
-    }
-  }
-  return { numeric, role };
 }
 
 /**
@@ -1023,92 +682,6 @@ export function generateThemedModesCSS(modesByName, opts) {
 }
 
 /**
- * Three-segment family registry. Each row defines one CSS-design decision —
- * what utility prefix to emit and which CSS properties to set — for one
- * family segment of a `[role, family, size]` role-token path. The 2-segment
- * paths (`container.p`, `container.gap`, `layout.<x>-gap`) are handled
- * inline in `deriveRoleUtility` and do not go through this map.
- *
- * Adding a new 3-segment family (e.g. `m` → `margin`) means adding one row
- * here. The set of role tokens themselves is JSON-driven — see
- * `generateSpacingRoleUtilitiesCSS`.
- */
-const FAMILY_TO_UTILITY = {
-  'padding-x': { prefix: 'px', properties: ['padding-left', 'padding-right'] },
-  'padding-y': { prefix: 'py', properties: ['padding-top', 'padding-bottom'] },
-  gap: { prefix: 'gap', properties: ['gap'] },
-};
-
-/**
- * Derive a `{utilityName, properties}` for a role-token path.
- *
- * Naming convention — `<property-shorthand>-<role>[-<size>]`:
- *   `<role>.<family>.<size>`  → utility `<prefix>-<role>-<size>` (3-segment form)
- *   `container.p`             → utility `p-container`,         padding
- *   `container.gap`           → utility `gap-container`,       gap
- *   `layout.section-gap`      → utility `gap-layout-section`,  gap
- *   `layout.stack-gap`        → utility `gap-layout-stack`,    gap
- *
- * Utility-name prefix per property:
- *   padding      → `p-`
- *   padding-x    → `px-`
- *   padding-y    → `py-`
- *   gap          → `gap-`
- *
- * The last path segment selects the property family (and may be a size
- * suffix like `sm/md/lg`, or the family token itself like `gap`); the
- * preceding segments form the role name.
- */
-function deriveRoleUtility(tokenPath) {
-  // Path forms we handle:
-  //   [role, suffix]             — e.g. ['container', 'p'], ['container', 'gap']
-  //   [role, family, size]       — 3-segment form (e.g. ['<role>', 'padding-x', 'md'])
-  //   [role, 'X-gap']            — e.g. ['layout', 'section-gap'] (composite suffix)
-  if (tokenPath.length < 2 || tokenPath.length > 3) {
-    throw new Error(
-      `deriveRoleUtility: path [${tokenPath.join('.')}] has ${tokenPath.length} segment(s); only 2- or 3-segment role paths are supported`
-    );
-  }
-  const [role, second, third] = tokenPath;
-
-  // Three-segment path: [role, family, size]. family ∈ {padding-x, padding-y, gap}.
-  if (third !== undefined) {
-    const family = second;
-    const size = third;
-    const entry = FAMILY_TO_UTILITY[family];
-    if (!entry) {
-      throw new Error(
-        `deriveRoleUtility: unknown family "${family}" in path [${tokenPath.join('.')}] — extend FAMILY_TO_UTILITY`
-      );
-    }
-    return {
-      utilityName: `${entry.prefix}-${role}-${size}`,
-      properties: entry.properties,
-    };
-  }
-
-  // Two-segment path: [role, suffix].
-  //   suffix === 'gap'         → gap-<role>
-  //   suffix === 'p'           → p-<role>
-  //   suffix === '<x>-gap'     → gap-<role>-<x>  (e.g. layout.section-gap → gap-layout-section)
-  if (second === 'gap') {
-    return { utilityName: `gap-${role}`, properties: ['gap'] };
-  }
-  if (second === 'p') {
-    return { utilityName: `p-${role}`, properties: ['padding'] };
-  }
-  const gapSuffixMatch = second.match(/^(.+)-gap$/);
-  if (gapSuffixMatch) {
-    const [, qualifier] = gapSuffixMatch;
-    return { utilityName: `gap-${role}-${qualifier}`, properties: ['gap'] };
-  }
-
-  throw new Error(
-    `deriveRoleUtility: unhandled path shape [${tokenPath.join('.')}] — extend deriveRoleUtility cases`
-  );
-}
-
-/**
  * Generate `@utility` declarations for spacing role tokens.
  *
  * Walks the canonical mode's role tokens, derives each utility name +
@@ -1129,23 +702,11 @@ function deriveRoleUtility(tokenPath) {
 export function generateSpacingRoleUtilitiesCSS(canonicalRoleTokens) {
   let css = `/* Spacing role utilities — data-driven from canonical mode role tokens. */\n\n`;
 
-  let count = 0;
   for (const token of canonicalRoleTokens) {
-    const { utilityName, properties } = deriveRoleUtility(token.path);
-
-    css += `@utility ${utilityName} {\n`;
-    for (const prop of properties) {
-      // @utility lives in Tailwind's source-pass, so it WILL pick up the
-      // `prefix(nx)` rewrite — but the var name we're referencing is in our
-      // own per-mode `[data-density="X"]` block, which is already prefixed.
-      // Emit the prefixed form directly so both sides match.
-      css += `  ${prop}: var(--nx-${token.cssName});\n`;
-    }
-    css += `}\n\n`;
-    count += 1;
+    css += formatUtilityRule(spacingRoleUtility(token.path));
   }
 
-  return { css, count };
+  return { css, count: canonicalRoleTokens.length };
 }
 
 /**
@@ -1537,10 +1098,7 @@ export function generateMotionUtilitiesCSS(motionTokens) {
   let css = `/* Motion utilities - duration utilities are data-driven from canonical motion tokens; the ring-safe transitions and the presence bridge below are static. */\n\n`;
 
   for (const token of durationTokens) {
-    css += `@utility duration-${token.key} {\n`;
-    css += `  --tw-duration: ${token.varRef};\n`;
-    css += `  transition-duration: ${token.varRef};\n`;
-    css += `}\n\n`;
+    css += formatUtilityRule(durationUtility(token.key));
   }
 
   // Tailwind's `transition-colors` expands to a list that includes
@@ -1604,7 +1162,8 @@ export function collectShadowTokens(tokensDir, primitiveMap) {
           if (subKey.startsWith('$')) continue;
           if (subValue.$type === 'shadow') {
             const shadowName = `${key}-${subKey}`;
-            const cssValue = formatShadowComposite(
+            const cssValue = formatShadowStyle(
+              [key, subKey],
               subValue.$value,
               primitiveMap
             );
@@ -1615,8 +1174,7 @@ export function collectShadowTokens(tokensDir, primitiveMap) {
       continue;
     }
 
-    const isInset = key === 'inner';
-    const cssValue = formatShadowComposite(value.$value, primitiveMap, isInset);
+    const cssValue = formatShadowStyle([key], value.$value, primitiveMap);
     shadows.push({ cssName: `shadow-${key}`, value: cssValue });
   }
 
