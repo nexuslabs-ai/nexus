@@ -48,12 +48,7 @@ const runtimeRanges = new Map(
     ...reactManifest.dependencies,
   })
 );
-// A `workspace:` range has no meaning outside this repo, so a demo cannot need one.
-const docsRanges = new Map(
-  Object.entries(readManifest(docsRoot).dependencies).filter(
-    ([, range]) => !range.startsWith('workspace:')
-  )
-);
+const docsDependencies = readManifest(docsRoot).dependencies;
 const reactTsconfig = path.join(reactRoot, 'tsconfig.json');
 const compilerOptions = ts.parseJsonConfigFileContent(
   ts.readConfigFile(reactTsconfig, ts.sys.readFile).config,
@@ -167,9 +162,20 @@ function examplePackages(slug, componentPackages) {
     )
     .map(packageName);
 
-  return [...new Set(names)].filter(
-    (name) => !ALWAYS_INSTALLED.has(name) && !componentPackages.includes(name)
-  );
+  return [...new Set(names)]
+    .filter(
+      (name) => !ALWAYS_INSTALLED.has(name) && !componentPackages.includes(name)
+    )
+    .sort()
+    .map((name) => {
+      const range = docsDependencies[name];
+      if (!range || range.startsWith('workspace:')) {
+        throw new Error(
+          `dependencies JSON: examples/${slug}/ imports ${name}, which apps/docs/package.json does not list with an npm range.`
+        );
+      }
+      return { name, range };
+    });
 }
 
 function walkSlug(slug) {
@@ -187,30 +193,33 @@ function walkSlug(slug) {
     slug,
     slugDir,
     packages,
-    examplePackages: examplePackages(slug, packages),
+    examples: examplePackages(slug, packages),
     files: [...needed],
   };
 }
 
-function assertDeclared(walks, field, ranges, message) {
+function assertDeclaredPackages(walks) {
   const offenders = walks.flatMap((walked) =>
-    walked[field]
-      .filter((name) => !ranges.has(name))
+    walked.packages
+      .filter((name) => !runtimeRanges.has(name))
       .map((name) => `  ${walked.slug}: ${name}`)
   );
 
   if (offenders.length === 0) return;
 
-  throw new Error([`dependencies JSON: ${message}`, ...offenders].join('\n'));
+  throw new Error(
+    [
+      'dependencies JSON: a component imports a package @nexus_ds/react does not declare in dependencies or peerDependencies.',
+      ...offenders,
+    ].join('\n')
+  );
 }
 
-function toEntry({ slug, slugDir, packages, examplePackages, files }) {
+function toEntry({ slug, slugDir, packages, examples, files }) {
   return {
     slug,
     install: packages.sort().map(toInstall),
-    examples: examplePackages
-      .sort()
-      .map((name) => ({ name, range: docsRanges.get(name) })),
+    examples,
     copy: files
       .filter((file) => !isUnder(file, slugDir))
       .map(toSrcPath)
@@ -228,18 +237,7 @@ function toEntry({ slug, slugDir, packages, examplePackages, files }) {
 
 const walks = componentSlugs().map(walkSlug).filter(Boolean);
 
-assertDeclared(
-  walks,
-  'packages',
-  runtimeRanges,
-  'a component imports a package @nexus_ds/react does not declare in dependencies or peerDependencies.'
-);
-assertDeclared(
-  walks,
-  'examplePackages',
-  docsRanges,
-  'a demo in examples/{slug}/ imports a package @nexus_ds/docs does not declare in dependencies with a published range. Import Nexus code through @/, not a workspace package.'
-);
+assertDeclaredPackages(walks);
 
 const entries = walks.map(toEntry);
 

@@ -190,10 +190,6 @@ function installSlugsFor(id, specifiers, blocks) {
   return slugs;
 }
 
-/**
- * generate:dependencies already lists the packages a component's own demos
- * import, so only a folder without its own block has packages to check.
- */
 function assertImportsInstalled(id, source, blocks) {
   const specifiers = importSpecifiers(source);
   const slugs = installSlugsFor(id, specifiers, blocks);
@@ -214,6 +210,7 @@ function assertImportsInstalled(id, source, blocks) {
       }
       continue;
     }
+    // generate:dependencies checks the packages of a component's own demos.
     if (ownBlock) continue;
 
     const name = packageName(specifier);
@@ -340,7 +337,6 @@ function generateAndLog() {
   );
 }
 
-// A demo edit can change the packages its install block lists.
 function regenerateQuietly() {
   try {
     execFileSync(process.execPath, [DEPENDENCIES_SCRIPT], { stdio: 'inherit' });
