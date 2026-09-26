@@ -166,7 +166,7 @@ export const PAGE_REGISTRY = {
       {
         slug: 'inputs',
         label: 'Inputs',
-        components: ['Input', 'Select', 'Switch', 'Tabs'],
+        components: ['Select', 'Switch', 'Tabs'],
         wireframe: {
           lede: '[ Interactive controls · per-component Storybook page below ]',
           blocks: [
@@ -183,7 +183,7 @@ export const PAGE_REGISTRY = {
             { type: 'h2', text: '[ Per-component pages ]' },
             {
               type: 'placeholder',
-              label: '[ Index — Input · Select · Switch · Tabs ]',
+              label: '[ Index — per-component pages ]',
             },
             {
               type: 'placeholder',
@@ -198,7 +198,7 @@ export const PAGE_REGISTRY = {
         label: 'Containers',
         components: ['Card', 'Dialog', 'Accordion', 'Alert'],
         wireframe: {
-          lede: '[ Card · Dialog · Accordion · Alert ]',
+          lede: '[ Surfaces that hold content · per-component Storybook page below ]',
           blocks: [
             {
               type: 'placeholder',
@@ -217,7 +217,7 @@ export const PAGE_REGISTRY = {
         label: 'Navigation',
         components: ['DropdownMenu'],
         wireframe: {
-          lede: '[ DropdownMenu · (future) NavigationMenu · Breadcrumbs ]',
+          lede: '[ Moving between views · per-component Storybook page below ]',
           blocks: [
             {
               type: 'placeholder',
@@ -232,7 +232,7 @@ export const PAGE_REGISTRY = {
         label: 'Display',
         components: ['Badge', 'Avatar', 'Tooltip'],
         wireframe: {
-          lede: '[ Badge · Avatar · Tooltip ]',
+          lede: '[ Status and identity at a glance · per-component Storybook page below ]',
           blocks: [
             {
               type: 'placeholder',
@@ -247,7 +247,7 @@ export const PAGE_REGISTRY = {
         label: 'Primitives',
         components: ['Show / Hide', 'Slot'],
         wireframe: {
-          lede: '[ Low-level building blocks: Show / Hide · Slot ]',
+          lede: '[ Low-level building blocks ]',
           blocks: [
             {
               type: 'placeholder',
@@ -262,6 +262,11 @@ export const PAGE_REGISTRY = {
         slug: 'button',
         label: 'Button',
         examples: ['variants', 'sizes', 'with-icon', 'disabled'],
+      },
+      {
+        slug: 'input',
+        label: 'Input',
+        examples: ['variants', 'sizes', 'with-label', 'invalid', 'disabled'],
       },
     ],
   },

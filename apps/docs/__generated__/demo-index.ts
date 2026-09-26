@@ -6,6 +6,8 @@ import type { ComponentType } from 'react';
 export interface Demo {
   /** Path under apps/docs/examples/ without the .tsx extension. */
   id: string;
+  /** Install blocks the demo needs beyond its folder's own. */
+  alsoInstall: readonly string[];
   /** Loads the demo's component and its own source text together. */
   load: () => Promise<{ Component: ComponentType; source: string }>;
 }
@@ -13,35 +15,73 @@ export interface Demo {
 export const demos = {
   "badge/demo": {
     id: "badge/demo",
+    alsoInstall: [],
     load: () => import("./demos/badge/demo"),
   },
   "badge/variants": {
     id: "badge/variants",
+    alsoInstall: [],
     load: () => import("./demos/badge/variants"),
   },
   "button/demo": {
     id: "button/demo",
+    alsoInstall: [],
     load: () => import("./demos/button/demo"),
   },
   "button/disabled": {
     id: "button/disabled",
+    alsoInstall: [],
     load: () => import("./demos/button/disabled"),
   },
   "button/sizes": {
     id: "button/sizes",
+    alsoInstall: [],
     load: () => import("./demos/button/sizes"),
   },
   "button/variants": {
     id: "button/variants",
+    alsoInstall: [],
     load: () => import("./demos/button/variants"),
   },
   "button/with-icon": {
     id: "button/with-icon",
+    alsoInstall: [],
     load: () => import("./demos/button/with-icon"),
   },
   "getting-started/button-core-variants": {
     id: "getting-started/button-core-variants",
+    alsoInstall: ["button"],
     load: () => import("./demos/getting-started/button-core-variants"),
+  },
+  "input/demo": {
+    id: "input/demo",
+    alsoInstall: [],
+    load: () => import("./demos/input/demo"),
+  },
+  "input/disabled": {
+    id: "input/disabled",
+    alsoInstall: [],
+    load: () => import("./demos/input/disabled"),
+  },
+  "input/invalid": {
+    id: "input/invalid",
+    alsoInstall: ["field"],
+    load: () => import("./demos/input/invalid"),
+  },
+  "input/sizes": {
+    id: "input/sizes",
+    alsoInstall: [],
+    load: () => import("./demos/input/sizes"),
+  },
+  "input/variants": {
+    id: "input/variants",
+    alsoInstall: [],
+    load: () => import("./demos/input/variants"),
+  },
+  "input/with-label": {
+    id: "input/with-label",
+    alsoInstall: ["label"],
+    load: () => import("./demos/input/with-label"),
   },
 } satisfies Record<string, Demo>;
 
