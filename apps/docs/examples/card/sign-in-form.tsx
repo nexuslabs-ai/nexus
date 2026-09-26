@@ -33,13 +33,19 @@ export default function CardSignInForm() {
             <Input
               id="card-sign-in-email"
               type="email"
+              autoComplete="email"
               placeholder="you@example.com"
               required
             />
           </div>
           <div className="nx:grid nx:gap-1.5">
             <Label htmlFor="card-sign-in-password">Password</Label>
-            <Input id="card-sign-in-password" type="password" required />
+            <Input
+              id="card-sign-in-password"
+              type="password"
+              autoComplete="current-password"
+              required
+            />
           </div>
         </CardContent>
         <CardFooter>
