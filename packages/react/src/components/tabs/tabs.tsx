@@ -51,7 +51,12 @@ type TabsVariant = NonNullable<
   VariantProps<typeof tabsListVariants>['variant']
 >;
 
-const TabsVariantContext = React.createContext<TabsVariant>('default');
+type TabsSize = NonNullable<VariantProps<typeof tabsTriggerVariants>['size']>;
+
+const TabsListContext = React.createContext<{
+  variant: TabsVariant;
+  size: TabsSize;
+}>({ variant: 'default', size: 'default' });
 
 /**
  * TabsListProps
@@ -67,6 +72,11 @@ interface TabsListProps extends Omit<
    * @default "default"
    */
   variant?: TabsVariant;
+  /**
+   * Size, shared by every trigger in the list
+   * @default "default"
+   */
+  size?: TabsSize;
 }
 
 /**
@@ -84,7 +94,7 @@ interface TabsListProps extends Omit<
  *
  * @example
  * ```tsx
- * <TabsList variant="underline">
+ * <TabsList variant="underline" size="lg">
  *   <TabsTrigger value="tab1">Tab 1</TabsTrigger>
  *   <TabsTrigger value="tab2">Tab 2</TabsTrigger>
  * </TabsList>
@@ -95,8 +105,10 @@ function TabsList({
   children,
   ref,
   variant = 'default',
+  size = 'default',
   ...props
 }: TabsListProps) {
+  const context = React.useMemo(() => ({ variant, size }), [variant, size]);
   const listRef = React.useRef<HTMLDivElement | null>(null);
   const indicatorRef = React.useRef<HTMLSpanElement | null>(null);
   const readyRef = React.useRef(false);
@@ -181,6 +193,7 @@ function TabsList({
       ref={setListRef}
       data-slot="tabs-list"
       data-variant={variant}
+      data-size={size}
       className={cn(tabsListVariants({ variant, className }))}
       {...props}
     >
@@ -197,9 +210,9 @@ function TabsList({
             'nx:transition-[transform,width,height] nx:duration-fast nx:ease-move'
         )}
       />
-      <TabsVariantContext.Provider value={variant}>
+      <TabsListContext.Provider value={context}>
         {children}
-      </TabsVariantContext.Provider>
+      </TabsListContext.Provider>
     </TabsPrimitive.List>
   );
 }
@@ -238,7 +251,7 @@ const tabsTriggerVariants = cva(
         ],
       },
       /**
-       * Size variant
+       * Size, set by the enclosing TabsList
        * @default "default"
        */
       size: {
@@ -259,33 +272,23 @@ const tabsTriggerVariants = cva(
  *
  * Props for the TabsTrigger component.
  */
-interface TabsTriggerProps
-  extends
-    React.ComponentProps<typeof TabsPrimitive.Trigger>,
-    Omit<VariantProps<typeof tabsTriggerVariants>, 'variant'> {}
+interface TabsTriggerProps extends React.ComponentProps<
+  typeof TabsPrimitive.Trigger
+> {}
 
 /**
  * TabsTrigger
  *
  * Individual tab button that switches content when clicked. Takes its
- * variant from the enclosing TabsList.
+ * variant and size from the enclosing TabsList.
  *
  * @example
  * ```tsx
  * <TabsTrigger value="account">Account</TabsTrigger>
  * ```
- *
- * @example
- * ```tsx
- * <TabsTrigger value="account" size="lg">Account</TabsTrigger>
- * ```
  */
-function TabsTrigger({
-  className,
-  size = 'default',
-  ...props
-}: TabsTriggerProps) {
-  const variant = React.useContext(TabsVariantContext);
+function TabsTrigger({ className, ...props }: TabsTriggerProps) {
+  const { variant, size } = React.useContext(TabsListContext);
 
   return (
     <TabsPrimitive.Trigger

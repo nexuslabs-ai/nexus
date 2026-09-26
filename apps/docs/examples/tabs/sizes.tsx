@@ -10,59 +10,51 @@ import {
 export default function TabsSizes() {
   return (
     <div className="nx:flex nx:w-full nx:max-w-sm nx:flex-col nx:gap-6">
-      <Tabs defaultValue="overview">
-        <TabsList aria-label="Small tabs">
-          <TabsTrigger value="overview" size="sm">
-            Overview
-          </TabsTrigger>
-          <TabsTrigger value="activity" size="sm">
-            Activity
-          </TabsTrigger>
+      <Tabs defaultValue="week">
+        <TabsList size="sm" aria-label="Chart range">
+          <TabsTrigger value="week">Week</TabsTrigger>
+          <TabsTrigger value="month">Month</TabsTrigger>
         </TabsList>
-        <TabsContent value="overview">
+        <TabsContent value="week">
           <p className="nx:typography-body-default nx:text-muted-foreground">
-            Small overview panel.
+            Visits over the last seven days.
           </p>
         </TabsContent>
-        <TabsContent value="activity">
+        <TabsContent value="month">
           <p className="nx:typography-body-default nx:text-muted-foreground">
-            Small activity panel.
+            Visits over the last thirty days.
           </p>
         </TabsContent>
       </Tabs>
-      <Tabs defaultValue="overview">
-        <TabsList aria-label="Default tabs">
-          <TabsTrigger value="overview">Overview</TabsTrigger>
-          <TabsTrigger value="activity">Activity</TabsTrigger>
+      <Tabs defaultValue="paid">
+        <TabsList aria-label="Invoice status">
+          <TabsTrigger value="paid">Paid</TabsTrigger>
+          <TabsTrigger value="pending">Pending</TabsTrigger>
         </TabsList>
-        <TabsContent value="overview">
+        <TabsContent value="paid">
           <p className="nx:typography-body-default nx:text-muted-foreground">
-            Default overview panel.
+            Invoices settled this quarter.
           </p>
         </TabsContent>
-        <TabsContent value="activity">
+        <TabsContent value="pending">
           <p className="nx:typography-body-default nx:text-muted-foreground">
-            Default activity panel.
+            Invoices awaiting payment.
           </p>
         </TabsContent>
       </Tabs>
-      <Tabs defaultValue="overview">
-        <TabsList aria-label="Large tabs">
-          <TabsTrigger value="overview" size="lg">
-            Overview
-          </TabsTrigger>
-          <TabsTrigger value="activity" size="lg">
-            Activity
-          </TabsTrigger>
+      <Tabs defaultValue="grid">
+        <TabsList size="lg" aria-label="Library layout">
+          <TabsTrigger value="grid">Grid</TabsTrigger>
+          <TabsTrigger value="list">List</TabsTrigger>
         </TabsList>
-        <TabsContent value="overview">
+        <TabsContent value="grid">
           <p className="nx:typography-body-default nx:text-muted-foreground">
-            Large overview panel.
+            Files shown as thumbnails.
           </p>
         </TabsContent>
-        <TabsContent value="activity">
+        <TabsContent value="list">
           <p className="nx:typography-body-default nx:text-muted-foreground">
-            Large activity panel.
+            Files shown as rows.
           </p>
         </TabsContent>
       </Tabs>

@@ -65,6 +65,16 @@ export const Default: Story = {
       </TabsContent>
     </Tabs>
   ),
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+    const tabsList = canvas.getByRole('tablist');
+    const tab = canvas.getByRole('tab', { name: 'Account' });
+
+    await expect(tabsList).toHaveAttribute('data-variant', 'default');
+    await expect(tabsList).toHaveAttribute('data-size', 'default');
+    await expect(tab).toHaveAttribute('data-variant', 'default');
+    await expect(tab).toHaveAttribute('data-size', 'default');
+  },
 };
 
 // ============================================
@@ -124,16 +134,10 @@ export const UnderlineVariant: Story = {
 export const SmallSize: Story = {
   render: (_args) => (
     <Tabs defaultValue="tab1" className="nx:w-[400px]">
-      <TabsList>
-        <TabsTrigger value="tab1" size="sm">
-          Small Tab
-        </TabsTrigger>
-        <TabsTrigger value="tab2" size="sm">
-          Another
-        </TabsTrigger>
-        <TabsTrigger value="tab3" size="sm">
-          Third
-        </TabsTrigger>
+      <TabsList size="sm">
+        <TabsTrigger value="tab1">Small Tab</TabsTrigger>
+        <TabsTrigger value="tab2">Another</TabsTrigger>
+        <TabsTrigger value="tab3">Third</TabsTrigger>
       </TabsList>
       <TabsContent value="tab1">
         <p className="nx:typography-body-default nx:text-muted-foreground">
@@ -158,16 +162,10 @@ export const SmallSize: Story = {
 export const LargeSize: Story = {
   render: (_args) => (
     <Tabs defaultValue="tab1" className="nx:w-[500px]">
-      <TabsList>
-        <TabsTrigger value="tab1" size="lg">
-          Large Tab
-        </TabsTrigger>
-        <TabsTrigger value="tab2" size="lg">
-          Another
-        </TabsTrigger>
-        <TabsTrigger value="tab3" size="lg">
-          Third
-        </TabsTrigger>
+      <TabsList size="lg">
+        <TabsTrigger value="tab1">Large Tab</TabsTrigger>
+        <TabsTrigger value="tab2">Another</TabsTrigger>
+        <TabsTrigger value="tab3">Third</TabsTrigger>
       </TabsList>
       <TabsContent value="tab1">
         <p className="nx:typography-body-default nx:text-muted-foreground">
@@ -486,11 +484,9 @@ export const DisabledTabInteraction: Story = {
 export const WithDataAttributes: Story = {
   render: (_args) => (
     <Tabs defaultValue="tab1" className="nx:w-[400px]">
-      <TabsList variant="underline">
+      <TabsList variant="underline" size="lg">
         <TabsTrigger value="tab1">Tab 1</TabsTrigger>
-        <TabsTrigger value="tab2" size="lg">
-          Tab 2
-        </TabsTrigger>
+        <TabsTrigger value="tab2">Tab 2</TabsTrigger>
       </TabsList>
       <TabsContent value="tab1">
         <p>Content 1</p>
@@ -507,12 +503,13 @@ export const WithDataAttributes: Story = {
     const tabsList = canvas.getByRole('tablist');
     await expect(tabsList).toHaveAttribute('data-slot', 'tabs-list');
     await expect(tabsList).toHaveAttribute('data-variant', 'underline');
+    await expect(tabsList).toHaveAttribute('data-size', 'lg');
 
-    // Triggers take data-variant from the list
+    // Triggers take data-variant and data-size from the list
     const tab1 = canvas.getByRole('tab', { name: 'Tab 1' });
     await expect(tab1).toHaveAttribute('data-slot', 'tabs-trigger');
     await expect(tab1).toHaveAttribute('data-variant', 'underline');
-    await expect(tab1).toHaveAttribute('data-size', 'default');
+    await expect(tab1).toHaveAttribute('data-size', 'lg');
 
     const tab2 = canvas.getByRole('tab', { name: 'Tab 2' });
     await expect(tab2).toHaveAttribute('data-slot', 'tabs-trigger');
@@ -522,13 +519,6 @@ export const WithDataAttributes: Story = {
     // Check tabpanel has data-slot
     const tabPanel = canvas.getByRole('tabpanel');
     await expect(tabPanel).toHaveAttribute('data-slot', 'tabs-content');
-
-    await expect(tab1).toHaveClass(
-      'nx:typography-label-default',
-      'nx:px-3',
-      'nx:py-1.5'
-    );
-    await expect(getComputedStyle(tab1).fontSize).toBe('14px');
 
     await expect(tab2).toHaveClass(
       'nx:typography-label-default',
@@ -588,37 +578,25 @@ export const AllVariants: Story = {
         </h3>
         <div className="nx:flex nx:flex-col nx:gap-4">
           <Tabs defaultValue="tab1" className="nx:w-[400px]">
-            <TabsList>
-              <TabsTrigger value="tab1" size="sm">
-                Small
-              </TabsTrigger>
-              <TabsTrigger value="tab2" size="sm">
-                Tabs
-              </TabsTrigger>
+            <TabsList size="sm">
+              <TabsTrigger value="tab1">Small</TabsTrigger>
+              <TabsTrigger value="tab2">Tabs</TabsTrigger>
             </TabsList>
             <TabsContent value="tab1" />
             <TabsContent value="tab2" />
           </Tabs>
           <Tabs defaultValue="tab1" className="nx:w-[400px]">
-            <TabsList>
-              <TabsTrigger value="tab1" size="default">
-                Default
-              </TabsTrigger>
-              <TabsTrigger value="tab2" size="default">
-                Tabs
-              </TabsTrigger>
+            <TabsList size="default">
+              <TabsTrigger value="tab1">Default</TabsTrigger>
+              <TabsTrigger value="tab2">Tabs</TabsTrigger>
             </TabsList>
             <TabsContent value="tab1" />
             <TabsContent value="tab2" />
           </Tabs>
           <Tabs defaultValue="tab1" className="nx:w-[400px]">
-            <TabsList>
-              <TabsTrigger value="tab1" size="lg">
-                Large
-              </TabsTrigger>
-              <TabsTrigger value="tab2" size="lg">
-                Tabs
-              </TabsTrigger>
+            <TabsList size="lg">
+              <TabsTrigger value="tab1">Large</TabsTrigger>
+              <TabsTrigger value="tab2">Tabs</TabsTrigger>
             </TabsList>
             <TabsContent value="tab1" />
             <TabsContent value="tab2" />

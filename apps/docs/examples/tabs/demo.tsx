@@ -10,7 +10,7 @@ import {
 export default function TabsDemo() {
   return (
     <Tabs defaultValue="account" className="nx:w-full nx:max-w-sm">
-      <TabsList>
+      <TabsList aria-label="Account settings">
         <TabsTrigger value="account">Account</TabsTrigger>
         <TabsTrigger value="password">Password</TabsTrigger>
       </TabsList>

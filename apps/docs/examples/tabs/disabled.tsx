@@ -10,7 +10,7 @@ import {
 export default function TabsDisabled() {
   return (
     <Tabs defaultValue="account" className="nx:w-full nx:max-w-sm">
-      <TabsList>
+      <TabsList aria-label="Workspace settings">
         <TabsTrigger value="account">Account</TabsTrigger>
         <TabsTrigger value="billing" disabled>
           Billing
