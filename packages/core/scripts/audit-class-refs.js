@@ -1,3 +1,5 @@
+import { __unstable__loadDesignSystem, compile } from '@tailwindcss/node';
+import { Scanner } from '@tailwindcss/oxide';
 import fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath, pathToFileURL } from 'node:url';
@@ -6,10 +8,17 @@ const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const REPO_ROOT = path.resolve(__dirname, '..', '..', '..');
 const PACKAGE_ROOT = path.resolve(__dirname, '..');
 const RUNTIME_ENTRY = path.join(PACKAGE_ROOT, 'dist', 'runtime', 'index.js');
-const CLASS_SOURCE_DIRS = [
-  path.join(REPO_ROOT, 'packages', 'react', 'src'),
-  path.join(REPO_ROOT, 'apps'),
+
+// Each source tree is checked against the stylesheet that actually builds it.
+const TARGETS = [
+  {
+    css: 'packages/react/.storybook/preview.css',
+    sources: 'packages/react/src',
+  },
+  { css: 'apps/docs/app/globals.css', sources: 'apps/docs' },
+  { css: 'apps/console/src/App.css', sources: 'apps/console/src' },
 ];
+
 // The primitive/unknown `--nx-color-*` ban applies only to component code:
 // apps are consumers (free to reach for primitives) and non-component
 // `react/src` is internal plumbing. Components are the public surface.
@@ -21,22 +30,24 @@ const COMPONENTS_DIR = path.join(
   'components'
 );
 
-// Deleted/foreign shadcn-style families are not in the registry, but a class
-// using one is still trying to reach the semantic-token layer.
-const RETIRED_SEMANTIC_FAMILIES = ['accent'];
+const SOURCE_FILE = /\.(tsx?|jsx?|mjs)$/;
+const SKIPPED_FILE =
+  /(\/node_modules\/|\/dist\/|\/\.next\/|\/generated\/|\/__generated__\/|\.test\.tsx?$)/;
 
-// Utility prefixes that consume a color-like value (e.g., `nx:bg-X`, `nx:text-X`).
-const UTILITY_PREFIXES = [
-  'bg',
-  'text',
-  'border',
-  'ring',
-  'fill',
-  'stroke',
-  'outline',
-  'shadow',
-  'divide',
+// `group` / `peer` (and their `/name` forms) are markers that variants key
+// off; Tailwind emits no CSS for them by design.
+const VARIANT_MARKER = /^nx:(group|peer)(\/[\w-]+)?$/;
+
+// Custom properties that source code sets at runtime rather than in CSS:
+// Radix writes `--radix-*` on its own elements, and components set their own
+// through inline-style keys or `style.setProperty`.
+const LIBRARY_RUNTIME_VAR = /^--radix-/;
+const RUNTIME_VAR_DECLARATIONS = [
+  /['"](--[\w-]+)['"]\s*:/g,
+  /setProperty\(\s*['"](--[\w-]+)['"]/g,
 ];
+
+const VAR_WITHOUT_FALLBACK = /var\(\s*(--[\w-]+)\s*\)/g;
 
 async function loadSemanticRegistryNames() {
   const runtime = await import(pathToFileURL(RUNTIME_ENTRY).href);
@@ -49,22 +60,6 @@ async function loadSemanticRegistryNames() {
   return new Set(registry.map((token) => token.name));
 }
 
-function semanticFamily(name) {
-  return name.split('-')[0];
-}
-
-function semanticFamiliesFromRegistry(registryNames) {
-  const families = new Set(RETIRED_SEMANTIC_FAMILIES);
-  for (const name of registryNames) {
-    families.add(semanticFamily(name));
-  }
-  return families;
-}
-
-function isSemanticName(name, semanticFamilies) {
-  return semanticFamilies.has(semanticFamily(name));
-}
-
 function isAllowedRuntimeColorVar(name, registryNames) {
   if (name.endsWith('-')) {
     for (const registryName of registryNames) {
@@ -73,39 +68,6 @@ function isAllowedRuntimeColorVar(name, registryNames) {
   }
 
   return registryNames.has(name);
-}
-
-function* walkSources(dir) {
-  if (!fs.existsSync(dir)) return;
-  for (const entry of fs.readdirSync(dir, { withFileTypes: true })) {
-    if (entry.name === 'node_modules' || entry.name === 'dist') continue;
-    const full = path.join(dir, entry.name);
-    if (entry.isDirectory()) {
-      yield* walkSources(full);
-    } else if (/\.(tsx?|jsx?|mdx?)$/.test(entry.name)) {
-      yield full;
-    }
-  }
-}
-
-function findClassRefs(content) {
-  // Match: nx:<optional state chain>:(utility)-<color-name>
-  // State chain segments may be:
-  //   - bare words like `hover:`, `focus:`, `focus-visible:`, `dark:`
-  //   - words with arbitrary-value suffix like `data-[state=open]:`
-  //   - pure arbitrary selectors like `[&_svg]:`
-  // The leading `nx:` is anchored at a non-word boundary so `foonx:` does not
-  // match.
-  const utilityAlt = UTILITY_PREFIXES.join('|');
-  const re = new RegExp(
-    String.raw`(?:^|[^\w-])nx:(?:[a-z-]+(?:\[[^\]]+\])?:|\[[^\]]+\]:)*(?:${utilityAlt})-([a-z][a-z0-9-]*)`,
-    'g'
-  );
-  const hits = [];
-  for (const match of content.matchAll(re)) {
-    hits.push({ name: match[1], offset: match.index });
-  }
-  return hits;
 }
 
 function findRuntimeColorVarRefs(content) {
@@ -120,78 +82,188 @@ function lineOf(content, offset) {
   return content.slice(0, offset).split('\n').length;
 }
 
-async function main() {
-  const known = await loadSemanticRegistryNames();
-  const semanticFamilies = semanticFamiliesFromRegistry(known);
-  const unresolvedClassRefs = [];
-  const primitiveVarRefs = [];
-  let scanned = 0;
+function relative(file) {
+  return path.relative(REPO_ROOT, file);
+}
 
-  for (const dir of CLASS_SOURCE_DIRS) {
-    for (const file of walkSources(dir)) {
-      scanned += 1;
-      const content = fs.readFileSync(file, 'utf8');
+/**
+ * Every `nx:` candidate Tailwind's own scanner extracts from a source tree,
+ * with where it appears, plus the custom properties that tree sets at runtime.
+ */
+function scanSources(sourceDir) {
+  const scanner = new Scanner({
+    sources: [
+      {
+        base: path.join(REPO_ROOT, sourceDir),
+        pattern: '**/*',
+        negated: false,
+      },
+    ],
+  });
+  const occurrences = new Map();
+  const runtimeVars = new Set();
+  const files = scanner.files.filter(
+    (file) => SOURCE_FILE.test(file) && !SKIPPED_FILE.test(file)
+  );
 
-      const seenClassRefs = new Set();
-      for (const hit of findClassRefs(content)) {
-        // Documentation placeholders like `nx:bg-chart-categorical-N` are not
-        // real class refs; the regex stops before the uppercase placeholder.
-        if (hit.name.endsWith('-')) continue;
-        if (!isSemanticName(hit.name, semanticFamilies)) continue;
-        if (known.has(hit.name)) continue;
-        const key = `${file}:${hit.name}`;
-        if (seenClassRefs.has(key)) continue;
-        seenClassRefs.add(key);
-        unresolvedClassRefs.push({
-          file: path.relative(REPO_ROOT, file),
-          line: lineOf(content, hit.offset),
-          name: hit.name,
-        });
-      }
-
-      // Component code must reach color only through semantic runtime vars.
-      if (!file.startsWith(`${COMPONENTS_DIR}${path.sep}`)) continue;
-
-      const seenVarRefs = new Set();
-      for (const hit of findRuntimeColorVarRefs(content)) {
-        if (isAllowedRuntimeColorVar(hit.name, known)) continue;
-        const key = `${file}:${hit.name}`;
-        if (seenVarRefs.has(key)) continue;
-        seenVarRefs.add(key);
-        primitiveVarRefs.push({
-          file: path.relative(REPO_ROOT, file),
-          line: lineOf(content, hit.offset),
-          name: hit.name,
-        });
-      }
+  for (const file of files) {
+    const content = fs.readFileSync(file, 'utf8');
+    for (const re of RUNTIME_VAR_DECLARATIONS) {
+      for (const match of content.matchAll(re)) runtimeVars.add(match[1]);
+    }
+    const found = scanner.getCandidatesWithPositions({
+      content,
+      extension: path.extname(file).slice(1),
+    });
+    for (const { candidate, position } of found) {
+      if (!candidate.startsWith('nx:')) continue;
+      if (!occurrences.has(candidate)) occurrences.set(candidate, []);
+      occurrences
+        .get(candidate)
+        .push(`${relative(file)}:${lineOf(content, position)}`);
     }
   }
+  return { files, occurrences, runtimeVars };
+}
 
-  if (unresolvedClassRefs.length === 0 && primitiveVarRefs.length === 0) {
-    process.stdout.write(
-      `audit-class-refs: scanned ${scanned} files — all semantic color refs resolve and component color vars are semantic.\n`
+/**
+ * Asks Tailwind, through the stylesheet that builds this tree, which classes
+ * emit nothing and which reference a custom property nothing declares.
+ */
+async function auditTarget({ css, sources }) {
+  const cssPath = path.join(REPO_ROOT, css);
+  const input = fs.readFileSync(cssPath, 'utf8');
+  const base = path.dirname(cssPath);
+  const designSystem = await __unstable__loadDesignSystem(input, { base });
+  const compiler = await compile(input, { base, onDependency() {} });
+
+  const { files, occurrences, runtimeVars } = scanSources(sources);
+  const candidates = [...occurrences.keys()];
+  const classCss = designSystem.candidatesToCss(candidates);
+
+  const stylesheet = compiler.build(candidates);
+  const declared = new Set(runtimeVars);
+  for (const match of stylesheet.matchAll(/(--[\w-]+)\s*:/g)) {
+    declared.add(match[1]);
+  }
+  for (const match of stylesheet.matchAll(/@property\s+(--[\w-]+)/g)) {
+    declared.add(match[1]);
+  }
+
+  const unknownClasses = [];
+  const undeclaredVars = [];
+  candidates.forEach((candidate, index) => {
+    const emitted = classCss[index];
+    if (emitted === null) {
+      if (!VARIANT_MARKER.test(candidate)) {
+        unknownClasses.push({ candidate, at: occurrences.get(candidate) });
+      }
+      return;
+    }
+    const missing = new Set();
+    for (const match of emitted.matchAll(VAR_WITHOUT_FALLBACK)) {
+      const name = match[1];
+      if (declared.has(name) || LIBRARY_RUNTIME_VAR.test(name)) continue;
+      missing.add(name);
+    }
+    if (missing.size > 0) {
+      undeclaredVars.push({
+        candidate,
+        names: [...missing],
+        at: occurrences.get(candidate),
+      });
+    }
+  });
+
+  return { scanned: files.length, unknownClasses, undeclaredVars };
+}
+
+function findPrimitiveComponentColorVars(registryNames) {
+  const scanner = new Scanner({
+    sources: [{ base: COMPONENTS_DIR, pattern: '**/*', negated: false }],
+  });
+  const refs = [];
+  for (const file of scanner.files.filter((f) => SOURCE_FILE.test(f))) {
+    const content = fs.readFileSync(file, 'utf8');
+    const seen = new Set();
+    for (const hit of findRuntimeColorVarRefs(content)) {
+      if (isAllowedRuntimeColorVar(hit.name, registryNames)) continue;
+      if (seen.has(hit.name)) continue;
+      seen.add(hit.name);
+      refs.push({
+        file: relative(file),
+        line: lineOf(content, hit.offset),
+        name: hit.name,
+      });
+    }
+  }
+  return refs;
+}
+
+// The same class can surface in several targets; report it once.
+function mergeByCandidate(findings) {
+  const merged = new Map();
+  for (const finding of findings) {
+    const existing = merged.get(finding.candidate);
+    if (existing) existing.at.push(...finding.at);
+    else merged.set(finding.candidate, { ...finding, at: [...finding.at] });
+  }
+  return [...merged.values()];
+}
+
+function write(line) {
+  process.stdout.write(`${line}\n`);
+}
+
+async function main() {
+  const registryNames = await loadSemanticRegistryNames();
+  const results = await Promise.all(TARGETS.map(auditTarget));
+  const primitiveVarRefs = findPrimitiveComponentColorVars(registryNames);
+
+  const scanned = results.reduce((sum, r) => sum + r.scanned, 0);
+  const unknownClasses = mergeByCandidate(
+    results.flatMap((r) => r.unknownClasses)
+  );
+  const undeclaredVars = mergeByCandidate(
+    results.flatMap((r) => r.undeclaredVars)
+  );
+  const failures =
+    unknownClasses.length + undeclaredVars.length + primitiveVarRefs.length;
+
+  if (failures === 0) {
+    write(
+      `audit-class-refs: scanned ${scanned} files — every nx: class emits CSS, every var() it reads is declared, and component color vars are semantic.`
     );
     process.exit(0);
   }
 
-  if (unresolvedClassRefs.length > 0) {
-    process.stdout.write(
-      `audit-class-refs: scanned ${scanned} files — ${unresolvedClassRefs.length} unresolved semantic color class ref(s):\n`
+  if (unknownClasses.length > 0) {
+    write(
+      `audit-class-refs: ${unknownClasses.length} nx: class(es) Tailwind emits no CSS for:`
     );
-    for (const f of unresolvedClassRefs) {
-      process.stdout.write(
-        `  ${f.file}:${f.line}  nx:...-${f.name}  (not in SEMANTIC_TOKEN_REGISTRY)\n`
-      );
+    for (const { candidate, at } of unknownClasses) {
+      write(`  ${candidate}`);
+      for (const location of at) write(`    ${location}`);
+    }
+  }
+
+  if (undeclaredVars.length > 0) {
+    write(
+      `audit-class-refs: ${undeclaredVars.length} nx: class(es) read a custom property with no fallback that nothing declares:`
+    );
+    for (const { candidate, names, at } of undeclaredVars) {
+      write(`  ${candidate}  → ${names.join(', ')}`);
+      for (const location of at) write(`    ${location}`);
     }
   }
 
   if (primitiveVarRefs.length > 0) {
-    process.stdout.write(
-      `audit-class-refs: found ${primitiveVarRefs.length} primitive/unknown component color var ref(s):\n`
+    write(
+      `audit-class-refs: ${primitiveVarRefs.length} primitive/unknown component color var ref(s):`
     );
     for (const f of primitiveVarRefs) {
-      process.stdout.write(
-        `  ${f.file}:${f.line}  --nx-color-${f.name}  (component code must use semantic color vars)\n`
+      write(
+        `  ${f.file}:${f.line}  --nx-color-${f.name}  (component code must use semantic color vars)`
       );
     }
   }
