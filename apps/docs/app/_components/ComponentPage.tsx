@@ -21,6 +21,8 @@ type Example = { id: DemoId; name: string; alsoInstall: readonly string[] };
 /**
  * `examples/{slug}/demo.tsx` is the Preview and Code; every other demo in that
  * folder is an example, registry `examples` first, then the rest by name.
+ * Installation lists every block the preview demo needs, so its Code pastes as
+ * is; an example lists only the blocks Installation does not already cover.
  */
 export function ComponentPage({ slug }: { slug: string }) {
   const page = requireSection('components').pages.find(
@@ -39,7 +41,8 @@ export function ComponentPage({ slug }: { slug: string }) {
     );
   }
 
-  const examples = examplesFor(slug, page.examples);
+  const installed = [slug, ...demos[previewId].alsoInstall];
+  const examples = examplesFor(slug, page.examples, installed);
 
   return (
     <>
@@ -49,7 +52,7 @@ export function ComponentPage({ slug }: { slug: string }) {
       <SectionHeading className={SECTION_HEADING_CLASS}>
         Installation
       </SectionHeading>
-      <InstallBlock slugs={[slug]} />
+      <InstallBlock slugs={installed} />
 
       <SectionHeading className={SECTION_HEADING_CLASS}>Code</SectionHeading>
       <ComponentSource id={previewId} />
@@ -76,7 +79,7 @@ export function ComponentPage({ slug }: { slug: string }) {
               <p className="nx:typography-body-default nx:text-muted-foreground">
                 This example also needs:
               </p>
-              <InstallBlock slugs={alsoInstall} besides={[slug]} />
+              <InstallBlock slugs={alsoInstall} besides={installed} />
             </>
           )}
           <ComponentSource id={id} />
@@ -86,7 +89,11 @@ export function ComponentPage({ slug }: { slug: string }) {
   );
 }
 
-function examplesFor(slug: string, order: readonly string[]): Example[] {
+function examplesFor(
+  slug: string,
+  order: readonly string[],
+  installed: readonly string[]
+): Example[] {
   const prefix = `${slug}/`;
   const names = Object.keys(demos)
     .filter((id) => id.startsWith(prefix))
@@ -101,6 +108,9 @@ function examplesFor(slug: string, order: readonly string[]): Example[] {
         `ComponentPage: no demo ${id} in the demo index — run \`pnpm --filter @nexus_ds/docs generate:demos\`.`
       );
     }
-    return { id, name, alsoInstall: demos[id].alsoInstall };
+    const alsoInstall = demos[id].alsoInstall.filter(
+      (other) => !installed.includes(other)
+    );
+    return { id, name, alsoInstall };
   });
 }
