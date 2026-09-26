@@ -1,7 +1,7 @@
 import * as React from 'react';
 
 import * as TabsPrimitive from '@radix-ui/react-tabs';
-import { cva, type VariantProps } from 'class-variance-authority';
+import { cva } from 'class-variance-authority';
 
 import { cn } from '../../lib/utils';
 
@@ -27,6 +27,14 @@ const useIsomorphicLayoutEffect =
  */
 const Tabs = TabsPrimitive.Root;
 
+type TabsVariant = 'default' | 'underline';
+type TabsSize = 'sm' | 'default' | 'lg';
+
+const TabsListContext = React.createContext<{
+  variant: TabsVariant;
+  size: TabsSize;
+}>({ variant: 'default', size: 'default' });
+
 /**
  * TabsListProps
  *
@@ -35,7 +43,18 @@ const Tabs = TabsPrimitive.Root;
 interface TabsListProps extends Omit<
   React.ComponentProps<typeof TabsPrimitive.List>,
   'asChild'
-> {}
+> {
+  /**
+   * Visual style variant of every trigger in the list
+   * @default "default"
+   */
+  variant?: TabsVariant;
+  /**
+   * Size of every trigger in the list
+   * @default "default"
+   */
+  size?: TabsSize;
+}
 
 /**
  * TabsList
@@ -50,7 +69,14 @@ interface TabsListProps extends Omit<
  * </TabsList>
  * ```
  */
-function TabsList({ className, children, ref, ...props }: TabsListProps) {
+function TabsList({
+  className,
+  children,
+  ref,
+  variant = 'default',
+  size = 'default',
+  ...props
+}: TabsListProps) {
   const listRef = React.useRef<HTMLDivElement | null>(null);
   const indicatorRef = React.useRef<HTMLSpanElement | null>(null);
   const readyRef = React.useRef(false);
@@ -87,14 +113,12 @@ function TabsList({ className, children, ref, ...props }: TabsListProps) {
         return;
       }
 
-      const variant = active.dataset.variant ?? 'default';
       const height = active.offsetHeight;
       const y =
         variant === 'underline'
           ? active.offsetTop + Math.max(height - 2, 0)
           : active.offsetTop;
 
-      indicator.dataset.variant = variant;
       indicator.style.transform = `translate3d(${active.offsetLeft}px, ${y}px, 0)`;
       indicator.style.width = `${active.offsetWidth}px`;
       indicator.style.height = variant === 'underline' ? '2px' : `${height}px`;
@@ -130,15 +154,18 @@ function TabsList({ className, children, ref, ...props }: TabsListProps) {
       mutationObserver.disconnect();
       resizeObserver.disconnect();
     };
-  }, []);
+  }, [variant]);
 
   return (
     <TabsPrimitive.List
       ref={setListRef}
       data-slot="tabs-list"
+      data-variant={variant}
+      data-size={size}
       className={cn(
         'nx:relative nx:isolate nx:inline-flex nx:items-center nx:justify-center',
-        'nx:rounded-md nx:bg-control-background nx:p-1',
+        variant === 'default' &&
+          'nx:rounded-md nx:bg-control-background nx:p-1',
         className
       )}
       {...props}
@@ -147,7 +174,7 @@ function TabsList({ className, children, ref, ...props }: TabsListProps) {
         ref={indicatorRef}
         aria-hidden
         data-slot="tabs-indicator"
-        data-variant="default"
+        data-variant={variant}
         className={cn(
           'nx:pointer-events-none nx:absolute nx:top-0 nx:left-0 nx:z-0 nx:opacity-0',
           'nx:data-[variant=default]:rounded-sm nx:data-[variant=default]:border-default nx:data-[variant=default]:border-border-default nx:data-[variant=default]:bg-background',
@@ -156,7 +183,9 @@ function TabsList({ className, children, ref, ...props }: TabsListProps) {
             'nx:transition-[transform,width,height] nx:duration-fast nx:ease-move'
         )}
       />
-      {children}
+      <TabsListContext.Provider value={{ variant, size }}>
+        {children}
+      </TabsListContext.Provider>
     </TabsPrimitive.List>
   );
 }
@@ -216,32 +245,24 @@ const tabsTriggerVariants = cva(
  *
  * Props for the TabsTrigger component.
  */
-interface TabsTriggerProps
-  extends
-    React.ComponentProps<typeof TabsPrimitive.Trigger>,
-    VariantProps<typeof tabsTriggerVariants> {}
+interface TabsTriggerProps extends React.ComponentProps<
+  typeof TabsPrimitive.Trigger
+> {}
 
 /**
  * TabsTrigger
  *
- * Individual tab button that switches content when clicked.
+ * Individual tab button that switches content when clicked. Styled by the
+ * enclosing TabsList's variant and size.
  *
  * @example
  * ```tsx
  * <TabsTrigger value="account">Account</TabsTrigger>
  * ```
- *
- * @example
- * ```tsx
- * <TabsTrigger value="account" variant="underline" size="lg">Account</TabsTrigger>
- * ```
  */
-function TabsTrigger({
-  className,
-  variant = 'default',
-  size = 'default',
-  ...props
-}: TabsTriggerProps) {
+function TabsTrigger({ className, ...props }: TabsTriggerProps) {
+  const { variant, size } = React.useContext(TabsListContext);
+
   return (
     <TabsPrimitive.Trigger
       data-slot="tabs-trigger"

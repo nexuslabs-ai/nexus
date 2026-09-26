@@ -43,6 +43,22 @@ export const demos = {
     id: "getting-started/button-core-variants",
     load: () => import("./demos/getting-started/button-core-variants"),
   },
+  "tabs/demo": {
+    id: "tabs/demo",
+    load: () => import("./demos/tabs/demo"),
+  },
+  "tabs/disabled": {
+    id: "tabs/disabled",
+    load: () => import("./demos/tabs/disabled"),
+  },
+  "tabs/sizes": {
+    id: "tabs/sizes",
+    load: () => import("./demos/tabs/sizes"),
+  },
+  "tabs/variants": {
+    id: "tabs/variants",
+    load: () => import("./demos/tabs/variants"),
+  },
 } satisfies Record<string, Demo>;
 
 export type DemoId = keyof typeof demos;

@@ -31,6 +31,7 @@ export const PAGE_LOADERS: Record<string, ManifestPageLoader> = {
   '/foundations/layering': () => import('../_pages/foundations/layering'),
   '/foundations/responsive': () => import('../_pages/foundations/responsive'),
   '/components/button': () => import('../../content/components/button.mdx'),
+  '/components/tabs': () => import('../../content/components/tabs.mdx'),
   '/theming/appearance': () => import('../../content/theming/appearance.mdx'),
   '/theming/multi-brand': () => import('../_pages/theming/multi-brand'),
   '/theming/radius-overrides': () =>
@@ -96,10 +97,7 @@ export const PAGE_WIREFRAMES: Record<string, PageWireframe> = {
         ],
       },
       { type: 'h2', text: '[ Per-component pages ]' },
-      {
-        type: 'placeholder',
-        label: '[ Index — Input · Select · Switch · Tabs ]',
-      },
+      { type: 'placeholder', label: '[ Index — Input · Select · Switch ]' },
       {
         type: 'placeholder',
         variant: 'code',
