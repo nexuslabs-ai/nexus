@@ -21,8 +21,8 @@ type Example = { id: DemoId; name: string; alsoInstall: readonly string[] };
 /**
  * `examples/{slug}/demo.tsx` is the Preview and Code; every other demo in that
  * folder is an example, registry `examples` first, then the rest by name.
- * Installation lists every block the preview demo needs, so its Code pastes as
- * is; an example lists only the blocks Installation does not already cover.
+ * Installation lists the component's block, then the blocks its preview demo
+ * also imports, so the Code pastes as is.
  */
 export function ComponentPage({ slug }: { slug: string }) {
   const page = requireSection('components').pages.find(
@@ -41,8 +41,9 @@ export function ComponentPage({ slug }: { slug: string }) {
     );
   }
 
-  const installed = [slug, ...demos[previewId].alsoInstall];
-  const examples = examplesFor(slug, page.examples, installed);
+  const previewAlsoInstall = demos[previewId].alsoInstall;
+  const installed = [slug, ...previewAlsoInstall];
+  const examples = examplesFor(slug, page.examples);
 
   return (
     <>
@@ -52,7 +53,12 @@ export function ComponentPage({ slug }: { slug: string }) {
       <SectionHeading className={SECTION_HEADING_CLASS}>
         Installation
       </SectionHeading>
-      <InstallBlock slugs={installed} />
+      <InstallBlock slugs={[slug]} />
+      <InstallBlock
+        slugs={previewAlsoInstall}
+        besides={[slug]}
+        caption="The code below also uses:"
+      />
 
       <SectionHeading className={SECTION_HEADING_CLASS}>Code</SectionHeading>
       <ComponentSource id={previewId} />
@@ -74,14 +80,11 @@ export function ComponentPage({ slug }: { slug: string }) {
             {humanize(name)}
           </SubsectionHeading>
           <ComponentPreview id={id} />
-          {alsoInstall.length > 0 && (
-            <>
-              <p className="nx:typography-body-default nx:text-muted-foreground">
-                This example also needs:
-              </p>
-              <InstallBlock slugs={alsoInstall} besides={installed} />
-            </>
-          )}
+          <InstallBlock
+            slugs={alsoInstall}
+            besides={installed}
+            caption="This example also needs:"
+          />
           <ComponentSource id={id} />
         </section>
       ))}
@@ -89,11 +92,7 @@ export function ComponentPage({ slug }: { slug: string }) {
   );
 }
 
-function examplesFor(
-  slug: string,
-  order: readonly string[],
-  installed: readonly string[]
-): Example[] {
+function examplesFor(slug: string, order: readonly string[]): Example[] {
   const prefix = `${slug}/`;
   const names = Object.keys(demos)
     .filter((id) => id.startsWith(prefix))
@@ -108,9 +107,6 @@ function examplesFor(
         `ComponentPage: no demo ${id} in the demo index — run \`pnpm --filter @nexus_ds/docs generate:demos\`.`
       );
     }
-    const alsoInstall = demos[id].alsoInstall.filter(
-      (other) => !installed.includes(other)
-    );
-    return { id, name, alsoInstall };
+    return { id, name, alsoInstall: demos[id].alsoInstall };
   });
 }

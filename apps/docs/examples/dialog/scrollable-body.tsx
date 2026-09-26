@@ -30,7 +30,7 @@ export default function DialogScrollableBody() {
       <DialogTrigger asChild>
         <Button variant="outline">Review terms</Button>
       </DialogTrigger>
-      <DialogContent className="nx:max-h-80">
+      <DialogContent className="nx:h-80">
         <DialogHeader>
           <DialogTitle>Workspace terms</DialogTitle>
           <DialogDescription>
