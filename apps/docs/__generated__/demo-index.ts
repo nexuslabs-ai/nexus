@@ -43,6 +43,34 @@ export const demos = {
     id: "getting-started/button-core-variants",
     load: () => import("./demos/getting-started/button-core-variants"),
   },
+  "select/demo": {
+    id: "select/demo",
+    load: () => import("./demos/select/demo"),
+  },
+  "select/disabled": {
+    id: "select/disabled",
+    load: () => import("./demos/select/disabled"),
+  },
+  "select/groups": {
+    id: "select/groups",
+    load: () => import("./demos/select/groups"),
+  },
+  "select/invalid": {
+    id: "select/invalid",
+    load: () => import("./demos/select/invalid"),
+  },
+  "select/placeholder": {
+    id: "select/placeholder",
+    load: () => import("./demos/select/placeholder"),
+  },
+  "select/sizes": {
+    id: "select/sizes",
+    load: () => import("./demos/select/sizes"),
+  },
+  "select/variants": {
+    id: "select/variants",
+    load: () => import("./demos/select/variants"),
+  },
 } satisfies Record<string, Demo>;
 
 export type DemoId = keyof typeof demos;

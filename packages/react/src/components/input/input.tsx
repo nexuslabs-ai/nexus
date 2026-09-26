@@ -2,6 +2,7 @@ import * as React from 'react';
 
 import { cva, type VariantProps } from 'class-variance-authority';
 
+import { fieldSizeVariants } from '../../lib/field-size';
 import { cn } from '../../lib/utils';
 
 const inputVariants = cva(
@@ -16,11 +17,7 @@ const inputVariants = cva(
   ],
   {
     variants: {
-      size: {
-        default: 'nx:h-10 nx:px-3 nx:py-0 nx:typography-body-default',
-        sm: 'nx:h-8 nx:px-2.5 nx:py-0 nx:typography-body-small',
-        lg: 'nx:h-12 nx:px-3.5 nx:py-0 nx:typography-body-default',
-      },
+      size: fieldSizeVariants,
       variant: {
         bordered:
           'nx:border-border-default nx:bg-container nx:autofill-bg-container nx:enabled:hover:bg-container-hover nx:enabled:hover:autofill-bg-container-hover nx:disabled:border-border-disabled',
