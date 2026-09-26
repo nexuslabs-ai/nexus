@@ -74,16 +74,10 @@ export const Default: Story = {
 export const UnderlineVariant: Story = {
   render: (_args) => (
     <Tabs defaultValue="account" className="nx:w-[400px]">
-      <TabsList className="nx:bg-transparent nx:p-0">
-        <TabsTrigger value="account" variant="underline">
-          Account
-        </TabsTrigger>
-        <TabsTrigger value="password" variant="underline">
-          Password
-        </TabsTrigger>
-        <TabsTrigger value="settings" variant="underline">
-          Settings
-        </TabsTrigger>
+      <TabsList variant="underline">
+        <TabsTrigger value="account">Account</TabsTrigger>
+        <TabsTrigger value="password">Password</TabsTrigger>
+        <TabsTrigger value="settings">Settings</TabsTrigger>
       </TabsList>
       <TabsContent value="account">
         <p className="nx:typography-body-default nx:text-muted-foreground">
@@ -492,9 +486,9 @@ export const DisabledTabInteraction: Story = {
 export const WithDataAttributes: Story = {
   render: (_args) => (
     <Tabs defaultValue="tab1" className="nx:w-[400px]">
-      <TabsList>
+      <TabsList variant="underline">
         <TabsTrigger value="tab1">Tab 1</TabsTrigger>
-        <TabsTrigger value="tab2" variant="underline" size="lg">
+        <TabsTrigger value="tab2" size="lg">
           Tab 2
         </TabsTrigger>
       </TabsList>
@@ -512,13 +506,14 @@ export const WithDataAttributes: Story = {
     // Check data-slot attributes
     const tabsList = canvas.getByRole('tablist');
     await expect(tabsList).toHaveAttribute('data-slot', 'tabs-list');
+    await expect(tabsList).toHaveAttribute('data-variant', 'underline');
 
+    // Triggers take data-variant from the list
     const tab1 = canvas.getByRole('tab', { name: 'Tab 1' });
     await expect(tab1).toHaveAttribute('data-slot', 'tabs-trigger');
-    await expect(tab1).toHaveAttribute('data-variant', 'default');
+    await expect(tab1).toHaveAttribute('data-variant', 'underline');
     await expect(tab1).toHaveAttribute('data-size', 'default');
 
-    // Check data-variant and data-size on tab with explicit values
     const tab2 = canvas.getByRole('tab', { name: 'Tab 2' });
     await expect(tab2).toHaveAttribute('data-slot', 'tabs-trigger');
     await expect(tab2).toHaveAttribute('data-variant', 'underline');
@@ -574,16 +569,10 @@ export const AllVariants: Story = {
           Underline Variant
         </h3>
         <Tabs defaultValue="tab1" className="nx:w-[400px]">
-          <TabsList className="nx:bg-transparent nx:p-0">
-            <TabsTrigger value="tab1" variant="underline">
-              Account
-            </TabsTrigger>
-            <TabsTrigger value="tab2" variant="underline">
-              Password
-            </TabsTrigger>
-            <TabsTrigger value="tab3" variant="underline">
-              Settings
-            </TabsTrigger>
+          <TabsList variant="underline">
+            <TabsTrigger value="tab1">Account</TabsTrigger>
+            <TabsTrigger value="tab2">Password</TabsTrigger>
+            <TabsTrigger value="tab3">Settings</TabsTrigger>
           </TabsList>
           <TabsContent value="tab1">
             <p className="nx:typography-body-default nx:text-muted-foreground">

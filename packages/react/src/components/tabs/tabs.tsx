@@ -28,6 +28,32 @@ const useIsomorphicLayoutEffect =
 const Tabs = TabsPrimitive.Root;
 
 /**
+ * TabsList variants
+ *
+ * CVA configuration for TabsList styling.
+ */
+const tabsListVariants = cva(
+  'nx:relative nx:isolate nx:inline-flex nx:items-center nx:justify-center',
+  {
+    variants: {
+      variant: {
+        default: 'nx:rounded-md nx:bg-control-background nx:p-1',
+        underline: '',
+      },
+    },
+    defaultVariants: {
+      variant: 'default',
+    },
+  }
+);
+
+type TabsVariant = NonNullable<
+  VariantProps<typeof tabsListVariants>['variant']
+>;
+
+const TabsVariantContext = React.createContext<TabsVariant>('default');
+
+/**
  * TabsListProps
  *
  * Props for the TabsList component.
@@ -35,7 +61,13 @@ const Tabs = TabsPrimitive.Root;
 interface TabsListProps extends Omit<
   React.ComponentProps<typeof TabsPrimitive.List>,
   'asChild'
-> {}
+> {
+  /**
+   * Visual style variant, shared by every trigger in the list
+   * @default "default"
+   */
+  variant?: TabsVariant;
+}
 
 /**
  * TabsList
@@ -49,8 +81,22 @@ interface TabsListProps extends Omit<
  *   <TabsTrigger value="tab2">Tab 2</TabsTrigger>
  * </TabsList>
  * ```
+ *
+ * @example
+ * ```tsx
+ * <TabsList variant="underline">
+ *   <TabsTrigger value="tab1">Tab 1</TabsTrigger>
+ *   <TabsTrigger value="tab2">Tab 2</TabsTrigger>
+ * </TabsList>
+ * ```
  */
-function TabsList({ className, children, ref, ...props }: TabsListProps) {
+function TabsList({
+  className,
+  children,
+  ref,
+  variant = 'default',
+  ...props
+}: TabsListProps) {
   const listRef = React.useRef<HTMLDivElement | null>(null);
   const indicatorRef = React.useRef<HTMLSpanElement | null>(null);
   const readyRef = React.useRef(false);
@@ -87,14 +133,12 @@ function TabsList({ className, children, ref, ...props }: TabsListProps) {
         return;
       }
 
-      const variant = active.dataset.variant ?? 'default';
       const height = active.offsetHeight;
       const y =
         variant === 'underline'
           ? active.offsetTop + Math.max(height - 2, 0)
           : active.offsetTop;
 
-      indicator.dataset.variant = variant;
       indicator.style.transform = `translate3d(${active.offsetLeft}px, ${y}px, 0)`;
       indicator.style.width = `${active.offsetWidth}px`;
       indicator.style.height = variant === 'underline' ? '2px' : `${height}px`;
@@ -130,24 +174,21 @@ function TabsList({ className, children, ref, ...props }: TabsListProps) {
       mutationObserver.disconnect();
       resizeObserver.disconnect();
     };
-  }, []);
+  }, [variant]);
 
   return (
     <TabsPrimitive.List
       ref={setListRef}
       data-slot="tabs-list"
-      className={cn(
-        'nx:relative nx:isolate nx:inline-flex nx:items-center nx:justify-center',
-        'nx:rounded-md nx:bg-control-background nx:p-1',
-        className
-      )}
+      data-variant={variant}
+      className={cn(tabsListVariants({ variant, className }))}
       {...props}
     >
       <span
         ref={indicatorRef}
         aria-hidden
         data-slot="tabs-indicator"
-        data-variant="default"
+        data-variant={variant}
         className={cn(
           'nx:pointer-events-none nx:absolute nx:top-0 nx:left-0 nx:z-0 nx:opacity-0',
           'nx:data-[variant=default]:rounded-sm nx:data-[variant=default]:border-default nx:data-[variant=default]:border-border-default nx:data-[variant=default]:bg-background',
@@ -156,7 +197,9 @@ function TabsList({ className, children, ref, ...props }: TabsListProps) {
             'nx:transition-[transform,width,height] nx:duration-fast nx:ease-move'
         )}
       />
-      {children}
+      <TabsVariantContext.Provider value={variant}>
+        {children}
+      </TabsVariantContext.Provider>
     </TabsPrimitive.List>
   );
 }
@@ -179,7 +222,7 @@ const tabsTriggerVariants = cva(
   {
     variants: {
       /**
-       * Visual style variant
+       * Visual style variant, set by the enclosing TabsList
        * @default "default"
        */
       variant: {
@@ -219,12 +262,13 @@ const tabsTriggerVariants = cva(
 interface TabsTriggerProps
   extends
     React.ComponentProps<typeof TabsPrimitive.Trigger>,
-    VariantProps<typeof tabsTriggerVariants> {}
+    Omit<VariantProps<typeof tabsTriggerVariants>, 'variant'> {}
 
 /**
  * TabsTrigger
  *
- * Individual tab button that switches content when clicked.
+ * Individual tab button that switches content when clicked. Takes its
+ * variant from the enclosing TabsList.
  *
  * @example
  * ```tsx
@@ -233,15 +277,16 @@ interface TabsTriggerProps
  *
  * @example
  * ```tsx
- * <TabsTrigger value="account" variant="underline" size="lg">Account</TabsTrigger>
+ * <TabsTrigger value="account" size="lg">Account</TabsTrigger>
  * ```
  */
 function TabsTrigger({
   className,
-  variant = 'default',
   size = 'default',
   ...props
 }: TabsTriggerProps) {
+  const variant = React.useContext(TabsVariantContext);
+
   return (
     <TabsPrimitive.Trigger
       data-slot="tabs-trigger"
@@ -295,6 +340,7 @@ export {
   type TabsContentProps,
   TabsList,
   type TabsListProps,
+  tabsListVariants,
   TabsTrigger,
   type TabsTriggerProps,
   tabsTriggerVariants,
