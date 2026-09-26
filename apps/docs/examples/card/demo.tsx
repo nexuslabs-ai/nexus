@@ -14,7 +14,9 @@ export default function CardDemo() {
   return (
     <Card className="nx:w-full nx:max-w-sm">
       <CardHeader>
-        <CardTitle>Deploy to production</CardTitle>
+        <CardTitle asChild>
+          <h2>Deploy to production</h2>
+        </CardTitle>
         <CardDescription>
           Ship the latest build of the main branch.
         </CardDescription>

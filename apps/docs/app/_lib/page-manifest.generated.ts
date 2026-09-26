@@ -176,7 +176,7 @@ export const PAGE_MANIFEST: readonly ManifestSection[] = [
         route: '/components/containers',
         slug: 'containers',
         label: 'Containers',
-        components: ['Card', 'Accordion', 'Alert'],
+        components: ['Accordion', 'Alert'],
         kind: 'placeholder',
         file: null,
       },
@@ -211,6 +211,19 @@ export const PAGE_MANIFEST: readonly ManifestSection[] = [
         examples: ['variants', 'sizes', 'with-icon', 'disabled'],
         kind: 'mdx',
         file: 'content/components/button.mdx',
+      },
+      {
+        route: '/components/card',
+        slug: 'card',
+        label: 'Card',
+        examples: [
+          'header-with-action',
+          'content-only',
+          'footer-actions',
+          'sign-in-form',
+        ],
+        kind: 'mdx',
+        file: 'content/components/card.mdx',
       },
       {
         route: '/components/dialog',
