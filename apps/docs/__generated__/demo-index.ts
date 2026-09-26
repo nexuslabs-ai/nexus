@@ -15,9 +15,21 @@ export const demos = {
     id: "badge/demo",
     load: () => import("./demos/badge/demo"),
   },
+  "badge/fills": {
+    id: "badge/fills",
+    load: () => import("./demos/badge/fills"),
+  },
+  "badge/icon-only": {
+    id: "badge/icon-only",
+    load: () => import("./demos/badge/icon-only"),
+  },
   "badge/variants": {
     id: "badge/variants",
     load: () => import("./demos/badge/variants"),
+  },
+  "badge/with-icon": {
+    id: "badge/with-icon",
+    load: () => import("./demos/badge/with-icon"),
   },
   "button/demo": {
     id: "button/demo",
