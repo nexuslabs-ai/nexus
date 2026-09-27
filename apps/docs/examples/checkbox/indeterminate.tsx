@@ -2,16 +2,24 @@
 
 import * as React from 'react';
 
+import type { CheckedState } from '@radix-ui/react-checkbox';
+
 import { Checkbox } from '@/components/checkbox/checkbox';
+import { Label } from '@/components/label/label';
 
 export default function CheckboxIndeterminate() {
   const [email, setEmail] = React.useState(true);
   const [sms, setSms] = React.useState(false);
 
-  const all = email && sms;
-  const some = email || sms;
+  const allSelected = email && sms;
+  const someSelected = email || sms;
+  const allState: CheckedState = allSelected
+    ? true
+    : someSelected
+      ? 'indeterminate'
+      : false;
 
-  function selectAll(checked: boolean | 'indeterminate') {
+  function toggleAll(checked: CheckedState) {
     setEmail(checked === true);
     setSms(checked === true);
   }
@@ -21,15 +29,11 @@ export default function CheckboxIndeterminate() {
       <div className="nx:flex nx:items-center nx:gap-2">
         <Checkbox
           id="checkbox-indeterminate-all"
-          checked={all ? true : some ? 'indeterminate' : false}
-          onCheckedChange={selectAll}
+          checked={allState}
+          onCheckedChange={toggleAll}
+          aria-controls="checkbox-indeterminate-email checkbox-indeterminate-sms"
         />
-        <label
-          htmlFor="checkbox-indeterminate-all"
-          className="nx:typography-label-default nx:text-foreground nx:select-none"
-        >
-          All notifications
-        </label>
+        <Label htmlFor="checkbox-indeterminate-all">All notifications</Label>
       </div>
       <div className="nx:flex nx:flex-col nx:gap-3 nx:pl-6">
         <div className="nx:flex nx:items-center nx:gap-2">
@@ -38,12 +42,7 @@ export default function CheckboxIndeterminate() {
             checked={email}
             onCheckedChange={(checked) => setEmail(checked === true)}
           />
-          <label
-            htmlFor="checkbox-indeterminate-email"
-            className="nx:typography-label-default nx:text-foreground nx:select-none"
-          >
-            Email
-          </label>
+          <Label htmlFor="checkbox-indeterminate-email">Email</Label>
         </div>
         <div className="nx:flex nx:items-center nx:gap-2">
           <Checkbox
@@ -51,12 +50,7 @@ export default function CheckboxIndeterminate() {
             checked={sms}
             onCheckedChange={(checked) => setSms(checked === true)}
           />
-          <label
-            htmlFor="checkbox-indeterminate-sms"
-            className="nx:typography-label-default nx:text-foreground nx:select-none"
-          >
-            SMS
-          </label>
+          <Label htmlFor="checkbox-indeterminate-sms">SMS</Label>
         </div>
       </div>
     </div>

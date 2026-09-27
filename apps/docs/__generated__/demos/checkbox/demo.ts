@@ -3,4 +3,4 @@
 
 export { Component } from "./demo.client";
 
-export const source = "'use client';\n\nimport { Checkbox } from '@/components/checkbox/checkbox';\n\nexport default function CheckboxDemo() {\n  return (\n    <div className=\"nx:flex nx:items-center nx:gap-2\">\n      <Checkbox id=\"checkbox-demo-terms\" />\n      <label\n        htmlFor=\"checkbox-demo-terms\"\n        className=\"nx:typography-label-default nx:text-foreground nx:select-none\"\n      >\n        Accept terms and conditions\n      </label>\n    </div>\n  );\n}\n";
+export const source = "'use client';\n\nimport { Checkbox } from '@/components/checkbox/checkbox';\nimport { Label } from '@/components/label/label';\n\nexport default function CheckboxDemo() {\n  return (\n    <div className=\"nx:flex nx:items-center nx:gap-2\">\n      <Checkbox id=\"checkbox-demo-terms\" />\n      <Label htmlFor=\"checkbox-demo-terms\">Accept terms and conditions</Label>\n    </div>\n  );\n}\n";

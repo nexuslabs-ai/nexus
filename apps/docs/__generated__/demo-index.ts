@@ -6,6 +6,8 @@ import type { ComponentType } from 'react';
 export interface Demo {
   /** Path under apps/docs/examples/ without the .tsx extension. */
   id: string;
+  /** The install blocks the demo pastes beside, its folder's own first. */
+  installSlugs: readonly string[];
   /** Loads the demo's component and its own source text together. */
   load: () => Promise<{ Component: ComponentType; source: string }>;
 }
@@ -13,50 +15,62 @@ export interface Demo {
 export const demos = {
   "badge/demo": {
     id: "badge/demo",
+    installSlugs: ["badge"],
     load: () => import("./demos/badge/demo"),
   },
   "badge/variants": {
     id: "badge/variants",
+    installSlugs: ["badge"],
     load: () => import("./demos/badge/variants"),
   },
   "button/demo": {
     id: "button/demo",
+    installSlugs: ["button"],
     load: () => import("./demos/button/demo"),
   },
   "button/disabled": {
     id: "button/disabled",
+    installSlugs: ["button"],
     load: () => import("./demos/button/disabled"),
   },
   "button/sizes": {
     id: "button/sizes",
+    installSlugs: ["button"],
     load: () => import("./demos/button/sizes"),
   },
   "button/variants": {
     id: "button/variants",
+    installSlugs: ["button"],
     load: () => import("./demos/button/variants"),
   },
   "button/with-icon": {
     id: "button/with-icon",
+    installSlugs: ["button"],
     load: () => import("./demos/button/with-icon"),
   },
   "checkbox/checked": {
     id: "checkbox/checked",
+    installSlugs: ["checkbox","label"],
     load: () => import("./demos/checkbox/checked"),
   },
   "checkbox/demo": {
     id: "checkbox/demo",
+    installSlugs: ["checkbox","label"],
     load: () => import("./demos/checkbox/demo"),
   },
   "checkbox/disabled": {
     id: "checkbox/disabled",
+    installSlugs: ["checkbox","label"],
     load: () => import("./demos/checkbox/disabled"),
   },
   "checkbox/indeterminate": {
     id: "checkbox/indeterminate",
+    installSlugs: ["checkbox","label"],
     load: () => import("./demos/checkbox/indeterminate"),
   },
   "getting-started/button-core-variants": {
     id: "getting-started/button-core-variants",
+    installSlugs: ["button"],
     load: () => import("./demos/getting-started/button-core-variants"),
   },
 } satisfies Record<string, Demo>;

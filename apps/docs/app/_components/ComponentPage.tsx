@@ -21,6 +21,7 @@ type Example = { id: DemoId; name: string };
 /**
  * `examples/{slug}/demo.tsx` is the Preview and Code; every other demo in that
  * folder is an example, registry `examples` first, then the rest by name.
+ * Installation lists every block those demos paste beside.
  */
 export function ComponentPage({ slug }: { slug: string }) {
   const page = requireSection('components').pages.find(
@@ -40,6 +41,13 @@ export function ComponentPage({ slug }: { slug: string }) {
   }
 
   const examples = examplesFor(slug, page.examples);
+  const installSlugs = [
+    ...new Set(
+      [previewId, ...examples.map(({ id }) => id)].flatMap(
+        (id) => demos[id].installSlugs
+      )
+    ),
+  ];
 
   return (
     <>
@@ -49,7 +57,7 @@ export function ComponentPage({ slug }: { slug: string }) {
       <SectionHeading className={SECTION_HEADING_CLASS}>
         Installation
       </SectionHeading>
-      <InstallBlock slug={slug} />
+      <InstallBlock slugs={installSlugs} />
 
       <SectionHeading className={SECTION_HEADING_CLASS}>Code</SectionHeading>
       <ComponentSource id={previewId} />
