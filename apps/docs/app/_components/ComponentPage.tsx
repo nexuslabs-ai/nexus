@@ -21,7 +21,6 @@ type Example = { id: DemoId; name: string };
 /**
  * `examples/{slug}/demo.tsx` is the Preview and Code; every other demo in that
  * folder is an example, registry `examples` first, then the rest by name.
- * Installation lists every block those demos paste beside.
  */
 export function ComponentPage({ slug }: { slug: string }) {
   const page = requireSection('components').pages.find(

@@ -172,12 +172,11 @@ function readInstallBlocks() {
  */
 function installSlugsFor(id, specifiers, blocks) {
   const folder = id.split('/')[0];
+  const own = blocks.has(folder) ? [folder] : [];
   const imported = specifiers
     .map((specifier) => specifier.match(COMPONENT_IMPORT)?.[1])
     .filter(Boolean);
-  const slugs = [
-    ...new Set([...(blocks.has(folder) ? [folder] : []), ...imported]),
-  ];
+  const slugs = [...new Set([...own, ...imported])];
   if (slugs.length === 0) {
     throw new Error(
       `Demo ${id} imports no @/components/, and ${folder} has no install block of its own, so there is nothing to paste it beside. Import the component it demonstrates, or move it to examples/{slug}/.`
@@ -193,8 +192,7 @@ function installSlugsFor(id, specifiers, blocks) {
   return slugs;
 }
 
-/** @returns {string[]} The install blocks the demo pastes beside. */
-function assertImportsInstalled(id, source, blocks) {
+function resolveInstallSlugs(id, source, blocks) {
   const specifiers = importSpecifiers(source);
   const slugs = installSlugsFor(id, specifiers, blocks);
   const packages = new Set(
@@ -256,7 +254,7 @@ function collectDemos() {
         );
       }
       const source = readCanonical(file);
-      const installSlugs = assertImportsInstalled(id, source, installBlocks);
+      const installSlugs = resolveInstallSlugs(id, source, installBlocks);
 
       return { id, source, installSlugs };
     })
