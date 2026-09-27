@@ -279,7 +279,6 @@ type PlaceholderPage = {
 export type GuideManifestPage = ManifestPageBase & {
   /** Non-interactive headings listed under this page in the left rail. */
   nested?: readonly string[];
-  examples?: never;
 } & (
     | {
         kind: 'mdx' | 'component';
@@ -303,7 +302,7 @@ export type ComponentManifestPage = ManifestPageBase & {
         /** Example demo names the page shows first, in this order. */
         examples: readonly string[];
       }
-    | (PlaceholderPage & { examples?: never })
+    | PlaceholderPage
   );
 
 export type ManifestPage = GuideManifestPage | ComponentManifestPage;
@@ -403,6 +402,7 @@ export async function buildPageManifest(docsRoot, formatOptions) {
   const sectionFor = (slug) =>
     Object.hasOwn(PAGE_REGISTRY, slug) ? PAGE_REGISTRY[slug] : undefined;
   const pagesOf = (slug) => sectionFor(slug)?.pages ?? [];
+  const isComponentsSection = (slug) => sectionFor(slug)?.unit === 'components';
 
   const sources = SOURCES.map((source) => ({
     ...source,
@@ -435,7 +435,7 @@ export async function buildPageManifest(docsRoot, formatOptions) {
     }
 
     const source = sources.find((candidate) => candidate.pages.has(key));
-    const isComponentPage = sectionSlug === COMPONENTS_SECTION;
+    const isComponentPage = isComponentsSection(sectionSlug);
     const rendersExamples = isComponentPage && source !== undefined;
     if (entry?.examples?.length && !rendersExamples) {
       throw new Error(
@@ -483,7 +483,7 @@ export async function buildPageManifest(docsRoot, formatOptions) {
     const entries = orderedSlugs(sectionSlug).map((slug) =>
       buildPage(sectionSlug, slug)
     );
-    return sectionSlug === COMPONENTS_SECTION ? byLabel(entries) : entries;
+    return isComponentsSection(sectionSlug) ? byLabel(entries) : entries;
   }
 
   /** Sections that exist only on disk, appended after the registry's own. */

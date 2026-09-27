@@ -711,4 +711,6 @@ export const PAGE_REGISTRY = {
       },
     ],
   },
-} satisfies Record<string, RegistrySection>;
+} satisfies Record<string, RegistrySection> & {
+  components: ComponentsSection;
+};

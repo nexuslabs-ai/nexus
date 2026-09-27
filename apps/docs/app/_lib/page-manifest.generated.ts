@@ -17,7 +17,6 @@ type PlaceholderPage = {
 export type GuideManifestPage = ManifestPageBase & {
   /** Non-interactive headings listed under this page in the left rail. */
   nested?: readonly string[];
-  examples?: never;
 } & (
     | {
         kind: 'mdx' | 'component';
@@ -41,7 +40,7 @@ export type ComponentManifestPage = ManifestPageBase & {
         /** Example demo names the page shows first, in this order. */
         examples: readonly string[];
       }
-    | (PlaceholderPage & { examples?: never })
+    | PlaceholderPage
   );
 
 export type ManifestPage = GuideManifestPage | ComponentManifestPage;
