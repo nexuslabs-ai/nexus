@@ -415,7 +415,12 @@ export async function buildPageManifest(docsRoot, formatOptions) {
       slug,
       label: entry?.label ?? humanize(slug),
     };
-    if (entry?.components?.length) {
+    if (entry?.components?.length === 0) {
+      throw new Error(
+        `${key} lists no components — delete the group entry from the registry once its last component has its own page.`
+      );
+    }
+    if (entry?.components) {
       base.components = entry.components;
     }
     if (entry?.nested?.length) {
@@ -424,7 +429,7 @@ export async function buildPageManifest(docsRoot, formatOptions) {
 
     const source = sources.find((candidate) => candidate.pages.has(key));
     const isComponentPage =
-      sectionSlug === COMPONENTS_SECTION && !entry?.components?.length;
+      sectionSlug === COMPONENTS_SECTION && !entry?.components;
     const rendersExamples = isComponentPage && source !== undefined;
     if (entry?.examples?.length && !rendersExamples) {
       throw new Error(
