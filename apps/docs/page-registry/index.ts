@@ -213,21 +213,6 @@ export const PAGE_REGISTRY = {
         },
       },
       {
-        slug: 'navigation',
-        label: 'Navigation',
-        components: ['DropdownMenu'],
-        wireframe: {
-          lede: '[ Moving between views · per-component Storybook page below ]',
-          blocks: [
-            {
-              type: 'placeholder',
-              variant: 'storybook',
-              label: '[ Storybook embed ]',
-            },
-          ],
-        },
-      },
-      {
         slug: 'display',
         label: 'Display',
         components: ['Badge', 'Avatar', 'Tooltip'],
@@ -272,6 +257,11 @@ export const PAGE_REGISTRY = {
         slug: 'dialog',
         label: 'Dialog',
         examples: ['with-form', 'prop-driven', 'scrollable-body'],
+      },
+      {
+        slug: 'dropdown-menu',
+        label: 'DropdownMenu',
+        examples: ['checkbox-items', 'radio-items', 'submenu'],
       },
     ],
   },

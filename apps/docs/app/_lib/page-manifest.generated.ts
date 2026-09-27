@@ -181,14 +181,6 @@ export const PAGE_MANIFEST: readonly ManifestSection[] = [
         file: null,
       },
       {
-        route: '/components/navigation',
-        slug: 'navigation',
-        label: 'Navigation',
-        components: ['DropdownMenu'],
-        kind: 'placeholder',
-        file: null,
-      },
-      {
         route: '/components/display',
         slug: 'display',
         label: 'Display',
@@ -219,6 +211,14 @@ export const PAGE_MANIFEST: readonly ManifestSection[] = [
         examples: ['with-form', 'prop-driven', 'scrollable-body'],
         kind: 'mdx',
         file: 'content/components/dialog.mdx',
+      },
+      {
+        route: '/components/dropdown-menu',
+        slug: 'dropdown-menu',
+        label: 'DropdownMenu',
+        examples: ['checkbox-items', 'radio-items', 'submenu'],
+        kind: 'mdx',
+        file: 'content/components/dropdown-menu.mdx',
       },
       {
         route: '/components/input',
