@@ -112,6 +112,13 @@ const buttonOf = (canvasElement: HTMLElement) =>
 const atEnd = (viewport: HTMLElement) =>
   viewport.scrollHeight - viewport.scrollTop - viewport.clientHeight <= 1;
 
+// Resize observers are notified after a frame's animation callbacks, so only
+// the frame after next is sure to have run them.
+const afterResizeObservers = () =>
+  new Promise((resolve) =>
+    requestAnimationFrame(() => requestAnimationFrame(resolve))
+  );
+
 // ============================================
 // BASIC STORIES
 // ============================================
@@ -315,6 +322,7 @@ export const StreamingWhileScrolledAway: Story = {
         canvas.getByText('Turn 11 in the transcript.')
       ).toBeVisible();
     });
+    await afterResizeObservers();
 
     // The reader stays exactly where they were reading. This is the whole
     // point of the component: appended content must not yank the viewport.
@@ -332,21 +340,31 @@ export const ScrollToStart: Story = {
   play: async ({ canvasElement }) => {
     const canvas = within(canvasElement);
     const viewport = viewportOf(canvasElement);
+    const root = canvasElement.querySelector<HTMLElement>(
+      '[data-slot="message-scroller"]'
+    )!;
 
+    // Leave a scroll range where the start button still arms (past 24px) but
+    // every position is within 24px of the end, the start, or both.
+    const range = () => viewport.scrollHeight - viewport.clientHeight;
+    root.style.height = `${root.offsetHeight + range() - 36}px`;
+
+    const start = canvas.getByRole('button', {
+      name: 'Scroll to the oldest message',
+    });
     await waitFor(async () => {
+      await expect(range()).toBeGreaterThan(24);
+      await expect(range()).toBeLessThanOrEqual(48);
       await expect(atEnd(viewport)).toBe(true);
+      await expect(start).toHaveAttribute('data-active', 'true');
     });
 
-    await userEvent.click(
-      canvas.getByRole('button', { name: 'Scroll to the oldest message' })
-    );
-
-    await waitFor(
-      async () => {
-        await expect(viewport.scrollTop).toBe(0);
-      },
-      { timeout: 3000 }
-    );
+    // Cutting the smooth scroll short at its midpoint stands in for the
+    // animation frame that is still near the end, with no frame in between.
+    const midpoint = Math.floor(range() / 2);
+    start.click();
+    viewport.scrollTo({ top: midpoint, behavior: 'instant' });
+    await afterResizeObservers();
 
     await userEvent.click(canvas.getByRole('button', { name: 'Append turn' }));
 
@@ -355,10 +373,11 @@ export const ScrollToStart: Story = {
         canvas.getByText('Turn 11 in the transcript.')
       ).toBeVisible();
     });
+    await afterResizeObservers();
 
-    // Jumping to the start unpins, so the new turn does not pull the reader
-    // back to the end.
-    await expect(viewport.scrollTop).toBe(0);
+    // Jumping to the start unpins for the whole trip, so the new turn does not
+    // pull the reader back to the end.
+    await expect(viewport.scrollTop).toBe(midpoint);
   },
 };
 
