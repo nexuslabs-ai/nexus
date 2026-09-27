@@ -14,7 +14,6 @@ export type GuidePage = {
   nested?: string[];
   /** Placeholder body, carried only while the page has no source file. */
   wireframe?: { lede: string; blocks: Block[] };
-  examples?: never;
 };
 
 /**
@@ -30,20 +29,26 @@ export type ComponentPageEntry = {
    * unlisted demos follow in name order.
    */
   examples?: string[];
-  nested?: never;
-  wireframe?: never;
 };
 
-export type RegistryPage = GuidePage | ComponentPageEntry;
-
-export type RegistrySection = {
+type SectionBase = {
   slug: string;
   title: string;
   href: string;
-  /** What the section is counted in on the home page. Defaults to pages. */
-  unit?: 'components';
-  pages: RegistryPage[];
 };
+
+export type GuideSection = SectionBase & {
+  unit?: never;
+  pages: GuidePage[];
+};
+
+export type ComponentsSection = SectionBase & {
+  /** What the section is counted in on the home page. Other sections count pages. */
+  unit: 'components';
+  pages: ComponentPageEntry[];
+};
+
+export type RegistrySection = GuideSection | ComponentsSection;
 
 export const PAGE_REGISTRY = {
   'getting-started': {

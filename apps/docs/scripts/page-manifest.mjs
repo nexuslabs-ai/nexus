@@ -270,6 +270,12 @@ type ManifestPageBase = {
   label: string;
 };
 
+type PlaceholderPage = {
+  /** No page file yet; the body is \`PAGE_WIREFRAMES[route]\`. */
+  kind: 'placeholder';
+  file: null;
+};
+
 export type GuideManifestPage = ManifestPageBase & {
   /** Non-interactive headings listed under this page in the left rail. */
   nested?: readonly string[];
@@ -280,33 +286,46 @@ export type GuideManifestPage = ManifestPageBase & {
         /** Source file relative to \`apps/docs\`; the module is \`PAGE_LOADERS[route]\`. */
         file: string;
       }
-    | {
-        /** No page file yet; the body is \`PAGE_WIREFRAMES[route]\`. */
-        kind: 'placeholder';
-        file: null;
-      }
+    | PlaceholderPage
   );
 
-/** A written \`components/{slug}.mdx\` that renders \`<ComponentPage slug="{slug}" />\`. */
+/**
+ * A component \`@nexus_ds/react\` exports. Once \`components/{slug}.mdx\` is
+ * written it renders \`<ComponentPage slug="{slug}" />\`; until then, a placeholder.
+ */
 export type ComponentManifestPage = ManifestPageBase & {
-  /** Example demo names the page shows first, in this order. */
-  examples: readonly string[];
   nested?: never;
-  kind: 'mdx';
-  /** Source file relative to \`apps/docs\`; the module is \`PAGE_LOADERS[route]\`. */
-  file: string;
-};
+} & (
+    | {
+        kind: 'mdx';
+        /** Source file relative to \`apps/docs\`; the module is \`PAGE_LOADERS[route]\`. */
+        file: string;
+        /** Example demo names the page shows first, in this order. */
+        examples: readonly string[];
+      }
+    | (PlaceholderPage & { examples?: never })
+  );
 
 export type ManifestPage = GuideManifestPage | ComponentManifestPage;
 
-export type ManifestSection = {
+type ManifestSectionBase = {
   slug: string;
   title: string;
   href: string;
-  /** What the section is counted in on the home page. Defaults to pages. */
-  unit?: 'components';
-  pages: readonly ManifestPage[];
 };
+
+export type GuideManifestSection = ManifestSectionBase & {
+  unit?: never;
+  pages: readonly GuideManifestPage[];
+};
+
+export type ComponentsManifestSection = ManifestSectionBase & {
+  /** What the section is counted in on the home page. Other sections count pages. */
+  unit: 'components';
+  pages: readonly ComponentManifestPage[];
+};
+
+export type ManifestSection = GuideManifestSection | ComponentsManifestSection;
 
 /** The separator the home page's section cards join a section's page labels with. */
 export const CARD_JOINER = ${JSON.stringify(CARD_JOINER)};
