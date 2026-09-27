@@ -196,9 +196,9 @@ export const PAGE_REGISTRY = {
       {
         slug: 'containers',
         label: 'Containers',
-        components: ['Card', 'Dialog', 'Accordion', 'Alert'],
+        components: ['Card', 'Dialog'],
         wireframe: {
-          lede: '[ Card · Dialog · Accordion · Alert ]',
+          lede: '[ Card · Dialog ]',
           blocks: [
             {
               type: 'placeholder',
@@ -257,6 +257,26 @@ export const PAGE_REGISTRY = {
             { type: 'placeholder', label: '[ API table ]' },
           ],
         },
+      },
+      {
+        slug: 'accordion',
+        label: 'Accordion',
+        examples: ['floating', 'multiple', 'disabled'],
+      },
+      {
+        slug: 'alert',
+        label: 'Alert',
+        examples: ['variants', 'with-actions', 'dismissible', 'banner'],
+      },
+      {
+        slug: 'alert-dialog',
+        label: 'AlertDialog',
+        examples: ['destructive-action', 'center'],
+      },
+      {
+        slug: 'aspect-ratio',
+        label: 'AspectRatio',
+        examples: ['ratios'],
       },
       {
         slug: 'badge',

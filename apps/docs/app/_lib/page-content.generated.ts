@@ -30,6 +30,13 @@ export const PAGE_LOADERS: Record<string, ManifestPageLoader> = {
   '/foundations/focus': () => import('../_pages/foundations/focus'),
   '/foundations/layering': () => import('../_pages/foundations/layering'),
   '/foundations/responsive': () => import('../_pages/foundations/responsive'),
+  '/components/accordion': () =>
+    import('../../content/components/accordion.mdx'),
+  '/components/alert': () => import('../../content/components/alert.mdx'),
+  '/components/alert-dialog': () =>
+    import('../../content/components/alert-dialog.mdx'),
+  '/components/aspect-ratio': () =>
+    import('../../content/components/aspect-ratio.mdx'),
   '/components/badge': () => import('../../content/components/badge.mdx'),
   '/components/button': () => import('../../content/components/button.mdx'),
   '/theming/appearance': () => import('../../content/theming/appearance.mdx'),
@@ -109,7 +116,7 @@ export const PAGE_WIREFRAMES: Record<string, PageWireframe> = {
     ],
   },
   '/components/containers': {
-    lede: '[ Card · Dialog · Accordion · Alert ]',
+    lede: '[ Card · Dialog ]',
     blocks: [
       {
         type: 'placeholder',

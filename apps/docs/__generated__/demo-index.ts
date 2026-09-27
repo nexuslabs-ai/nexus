@@ -11,6 +11,62 @@ export interface Demo {
 }
 
 export const demos = {
+  "accordion/demo": {
+    id: "accordion/demo",
+    load: () => import("./demos/accordion/demo"),
+  },
+  "accordion/disabled": {
+    id: "accordion/disabled",
+    load: () => import("./demos/accordion/disabled"),
+  },
+  "accordion/floating": {
+    id: "accordion/floating",
+    load: () => import("./demos/accordion/floating"),
+  },
+  "accordion/multiple": {
+    id: "accordion/multiple",
+    load: () => import("./demos/accordion/multiple"),
+  },
+  "alert-dialog/center": {
+    id: "alert-dialog/center",
+    load: () => import("./demos/alert-dialog/center"),
+  },
+  "alert-dialog/demo": {
+    id: "alert-dialog/demo",
+    load: () => import("./demos/alert-dialog/demo"),
+  },
+  "alert-dialog/destructive-action": {
+    id: "alert-dialog/destructive-action",
+    load: () => import("./demos/alert-dialog/destructive-action"),
+  },
+  "alert/banner": {
+    id: "alert/banner",
+    load: () => import("./demos/alert/banner"),
+  },
+  "alert/demo": {
+    id: "alert/demo",
+    load: () => import("./demos/alert/demo"),
+  },
+  "alert/dismissible": {
+    id: "alert/dismissible",
+    load: () => import("./demos/alert/dismissible"),
+  },
+  "alert/variants": {
+    id: "alert/variants",
+    load: () => import("./demos/alert/variants"),
+  },
+  "alert/with-actions": {
+    id: "alert/with-actions",
+    load: () => import("./demos/alert/with-actions"),
+  },
+  "aspect-ratio/demo": {
+    id: "aspect-ratio/demo",
+    load: () => import("./demos/aspect-ratio/demo"),
+  },
+  "aspect-ratio/ratios": {
+    id: "aspect-ratio/ratios",
+    load: () => import("./demos/aspect-ratio/ratios"),
+  },
   "badge/demo": {
     id: "badge/demo",
     load: () => import("./demos/badge/demo"),
