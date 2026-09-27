@@ -13,11 +13,8 @@ import { ScrollBar } from '../scroll-area';
 const EDGE_THRESHOLD = 24;
 
 interface MessageScrollerContextValue {
-  /** The viewport is taller than its content has room for. */
   isScrollable: boolean;
-  /** The viewport is resting at the end, so new content should hold it there. */
   isAtEnd: boolean;
-  /** The viewport is resting at the start. */
   isAtStart: boolean;
   scrollToEnd: () => void;
   scrollToStart: () => void;
@@ -151,7 +148,6 @@ function MessageScrollerProvider({ children }: MessageScrollerProviderProps) {
 
     const observer = new ResizeObserver(holdEnd);
 
-    // Open on the newest turn.
     pinnedRef.current = true;
     viewport.scrollTo({ top: viewport.scrollHeight });
     measure();

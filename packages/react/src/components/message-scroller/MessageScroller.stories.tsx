@@ -128,7 +128,6 @@ export const Default: Story = {
   play: async ({ canvasElement }) => {
     const viewport = viewportOf(canvasElement);
 
-    // A long stream opens holding the newest turn.
     await waitFor(async () => {
       await expect(atEnd(viewport)).toBe(true);
     });
@@ -176,7 +175,6 @@ export const ShortStream: Story = {
   play: async ({ canvasElement }) => {
     const viewport = viewportOf(canvasElement);
 
-    // Nothing to scroll, so the affordance never arms.
     await expect(viewport.scrollHeight).toBeLessThanOrEqual(
       viewport.clientHeight + 1
     );
@@ -203,7 +201,6 @@ export const ScrolledAway: Story = {
 
     const name = 'Scroll to the latest message';
 
-    // Inactive: hidden, so it is out of the tab order and the a11y tree.
     await expect(canvas.queryByRole('button', { name })).toBeNull();
 
     viewport.scrollTo({ top: 0, behavior: 'instant' });
@@ -218,8 +215,6 @@ export const ScrolledAway: Story = {
     const button = canvas.getByRole('button', { name });
     await expect(button).toBeVisible();
 
-    // The affordance is a circle, not a pill: a width utility on the root
-    // would collapse the icon box onto its glyph.
     const box = button.getBoundingClientRect();
     await expect(box.width).toBe(box.height);
 
@@ -232,7 +227,6 @@ export const ScrolledAway: Story = {
       { timeout: 3000 }
     );
 
-    // Back at the end, the affordance stands down again.
     await waitFor(async () => {
       await expect(canvas.queryByRole('button', { name })).toBeNull();
     });
@@ -243,7 +237,6 @@ export const ScrolledAway: Story = {
 // STREAMING
 // ============================================
 
-// Sits beside the scroller, not inside it, the way a real composer bar does.
 function Composer({ onAppend }: { onAppend: () => void }) {
   const { scrollToEnd } = useMessageScroller();
 
@@ -290,7 +283,6 @@ export const StreamingWhilePinned: Story = {
 
     await userEvent.click(canvas.getByRole('button', { name: 'Append turn' }));
 
-    // Appending while the reader is at the end holds them there.
     await waitFor(async () => {
       await expect(
         canvas.getByText('Turn 11 in the transcript.')
@@ -324,8 +316,6 @@ export const StreamingWhileScrolledAway: Story = {
     });
     await afterResizeObservers();
 
-    // The reader stays exactly where they were reading. This is the whole
-    // point of the component: appended content must not yank the viewport.
     await expect(viewport.scrollTop).toBe(0);
     await expect(atEnd(viewport)).toBe(false);
   },
@@ -377,8 +367,6 @@ export const ScrollToStart: Story = {
     });
     await afterResizeObservers();
 
-    // Jumping to the start unpins for the whole trip, so the new turn does not
-    // pull the reader back to the end.
     await expect(viewport.scrollTop).toBe(midpoint);
   },
 };
@@ -426,8 +414,6 @@ export const KeyboardInteraction: Story = {
     const canvas = within(canvasElement);
     const viewport = viewportOf(canvasElement);
 
-    // The transcript holds nothing focusable, so the viewport itself must be
-    // reachable or a keyboard user cannot scroll it at all.
     await expect(viewport).toHaveAttribute('tabindex', '0');
 
     viewport.scrollTo({ top: 0, behavior: 'instant' });
@@ -443,7 +429,6 @@ export const KeyboardInteraction: Story = {
     await userEvent.tab();
     await expect(viewport).toHaveFocus();
 
-    // Once active, the button is the next stop after the viewport.
     await userEvent.tab();
     await expect(canvas.getByRole('button', { name })).toHaveFocus();
 
@@ -540,8 +525,6 @@ export const RightToLeft: Story = {
       );
     });
 
-    // The affordance is centred, so it holds its place under either direction
-    // rather than depending on a physical side.
     const rootBox = root.getBoundingClientRect();
     const buttonBox = canvas
       .getByRole('button', { name })
@@ -579,8 +562,6 @@ export const WithDataAttributes: Story = {
       'end'
     );
 
-    // Both states are emitted, not only the true one, so consumers can style
-    // either edge.
     await waitFor(async () => {
       await expect(root).toHaveAttribute('data-at-end', 'true');
       await expect(root).toHaveAttribute('data-at-start', 'false');
