@@ -415,11 +415,6 @@ export async function buildPageManifest(docsRoot, formatOptions) {
       slug,
       label: entry?.label ?? humanize(slug),
     };
-    if (entry?.components?.length === 0) {
-      throw new Error(
-        `${key} has an empty registry \`components\` list — once its last component has its own page, delete the group's registry entry and its page file, if it has one.`
-      );
-    }
     if (entry?.components) {
       base.components = entry.components;
     }
