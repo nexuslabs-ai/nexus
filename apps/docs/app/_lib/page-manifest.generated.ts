@@ -10,7 +10,7 @@ type ManifestPageBase = {
 
 export type GuideManifestPage = ManifestPageBase & {
   /** Components this group page covers, listed under it in the left rail. */
-  components?: readonly string[];
+  components?: readonly [string, ...string[]];
   /** Non-interactive headings listed under this page in the left rail. */
   nested?: readonly string[];
   examples?: never;

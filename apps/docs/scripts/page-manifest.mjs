@@ -273,7 +273,7 @@ type ManifestPageBase = {
 
 export type GuideManifestPage = ManifestPageBase & {
   /** Components this group page covers, listed under it in the left rail. */
-  components?: readonly string[];
+  components?: readonly [string, ...string[]];
   /** Non-interactive headings listed under this page in the left rail. */
   nested?: readonly string[];
   examples?: never;
@@ -417,7 +417,7 @@ export async function buildPageManifest(docsRoot, formatOptions) {
     };
     if (entry?.components?.length === 0) {
       throw new Error(
-        `${key} lists no components — delete the group entry from the registry once its last component has its own page.`
+        `${key} has an empty registry \`components\` list — once its last component has its own page, delete the group's registry entry and its page file, if it has one.`
       );
     }
     if (entry?.components) {
