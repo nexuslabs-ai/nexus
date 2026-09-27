@@ -1,5 +1,6 @@
 import * as React from 'react';
 
+import { useComposedRefs } from '@radix-ui/react-compose-refs';
 import * as ScrollAreaPrimitive from '@radix-ui/react-scroll-area';
 import { cva, type VariantProps } from 'class-variance-authority';
 
@@ -20,19 +21,25 @@ interface MessageScrollerContextValue {
   isAtStart: boolean;
   scrollToEnd: () => void;
   scrollToStart: () => void;
-  viewportRef: React.RefObject<HTMLDivElement | null>;
-  contentRef: React.RefObject<HTMLDivElement | null>;
+}
+
+interface MessageScrollerNodesContextValue {
+  setViewport: (node: HTMLDivElement | null) => void;
+  setContent: (node: HTMLDivElement | null) => void;
 }
 
 const MessageScrollerContext =
   React.createContext<MessageScrollerContextValue | null>(null);
 
+const MessageScrollerNodesContext =
+  React.createContext<MessageScrollerNodesContextValue | null>(null);
+
 /**
  * useMessageScroller
  *
  * Read the stream's scroll state, or drive it, from anywhere inside a
- * `MessageScroller` — including from a control rendered outside the viewport,
- * such as a button in a composer bar.
+ * `MessageScrollerProvider` — including from a control rendered outside the
+ * scroller, such as a send button in a composer bar.
  *
  * @example
  * ```tsx
@@ -44,56 +51,61 @@ function useMessageScroller() {
 
   if (!context) {
     throw new Error(
-      'useMessageScroller must be used within a <MessageScroller />'
+      'useMessageScroller must be used within a <MessageScrollerProvider />'
     );
   }
 
   return context;
 }
 
-/**
- * MessageScrollerProps
- *
- * Props for the MessageScroller component.
- */
-interface MessageScrollerProps extends React.ComponentProps<
-  typeof ScrollAreaPrimitive.Root
-> {}
+function useMessageScrollerNodes() {
+  const context = React.useContext(MessageScrollerNodesContext);
+
+  if (!context) {
+    throw new Error(
+      'MessageScroller parts must be used within a <MessageScrollerProvider />'
+    );
+  }
+
+  return context;
+}
+
+// Smooth only for this one call. A `scroll-behavior` on the viewport would
+// also animate every thumb drag, and `behavior: 'smooth'` in JS would ignore
+// the `reduceMotion` preference, which forces `scroll-behavior: auto !important`.
+function smoothScrollTo(viewport: HTMLElement, top: number) {
+  viewport.style.scrollBehavior = 'smooth';
+  viewport.scrollTo({ top });
+  viewport.style.scrollBehavior = '';
+}
 
 /**
- * MessageScroller
+ * MessageScrollerProviderProps
  *
- * The scroll container for a message stream. It holds the latest turn in view
- * while the reader is at the end, and stops doing so the moment they scroll up,
- * so appended content never yanks the viewport out from under them.
+ * Props for the MessageScrollerProvider component.
+ */
+interface MessageScrollerProviderProps {
+  children?: React.ReactNode;
+}
+
+/**
+ * MessageScrollerProvider
  *
- * It renders no live region of its own. Announcing new turns belongs to
- * `MessageGroup`'s `announce`, so a stream that opts in is announced once
- * rather than twice.
+ * Owns the stream's scroll state. Wrap it around the `MessageScroller` and
+ * anything beside it that needs to read or drive that state, such as the
+ * composer that jumps to the latest turn on send.
  *
  * @example
  * ```tsx
- * <MessageScroller className="nx:h-96">
- *   <MessageScrollerViewport>
- *     <MessageScrollerContent>
- *       {turns.map((turn) => (
- *         <MessageScrollerItem key={turn.id}>
- *           <Message>{turn.body}</Message>
- *         </MessageScrollerItem>
- *       ))}
- *     </MessageScrollerContent>
- *   </MessageScrollerViewport>
- *   <MessageScrollerButton />
- * </MessageScroller>
+ * <MessageScrollerProvider>
+ *   <MessageScroller>…</MessageScroller>
+ *   <Composer />
+ * </MessageScrollerProvider>
  * ```
  */
-function MessageScroller({
-  className,
-  children,
-  ...props
-}: MessageScrollerProps) {
-  const viewportRef = React.useRef<HTMLDivElement | null>(null);
-  const contentRef = React.useRef<HTMLDivElement | null>(null);
+function MessageScrollerProvider({ children }: MessageScrollerProviderProps) {
+  const [viewport, setViewport] = React.useState<HTMLDivElement | null>(null);
+  const [content, setContent] = React.useState<HTMLDivElement | null>(null);
   const pinnedRef = React.useRef(true);
 
   const [isScrollable, setIsScrollable] = React.useState(false);
@@ -101,9 +113,6 @@ function MessageScroller({
   const [isAtStart, setIsAtStart] = React.useState(true);
 
   React.useEffect(() => {
-    const viewport = viewportRef.current;
-    const content = contentRef.current;
-
     if (!viewport || !content) return;
 
     let lastScrollTop = 0;
@@ -129,16 +138,15 @@ function MessageScroller({
     };
 
     const holdEnd = () => {
-      if (pinnedRef.current) {
-        viewport.scrollTo({ top: viewport.scrollHeight, behavior: 'instant' });
-      }
+      if (pinnedRef.current) viewport.scrollTo({ top: viewport.scrollHeight });
       measure();
     };
 
     const observer = new ResizeObserver(holdEnd);
 
     // Open on the newest turn.
-    viewport.scrollTo({ top: viewport.scrollHeight, behavior: 'instant' });
+    pinnedRef.current = true;
+    viewport.scrollTo({ top: viewport.scrollHeight });
     measure();
     viewport.addEventListener('scroll', handleScroll, { passive: true });
     observer.observe(content);
@@ -148,47 +156,98 @@ function MessageScroller({
       viewport.removeEventListener('scroll', handleScroll);
       observer.disconnect();
     };
-  }, []);
+  }, [viewport, content]);
 
+  // Pinning first lets the resize observer carry the scroll the rest of the
+  // way when content grows mid-animation.
   const scrollToEnd = React.useCallback(() => {
-    const viewport = viewportRef.current;
-    viewport?.scrollTo({ top: viewport.scrollHeight });
-  }, []);
+    if (!viewport) return;
+    pinnedRef.current = true;
+    smoothScrollTo(viewport, viewport.scrollHeight);
+  }, [viewport]);
 
   const scrollToStart = React.useCallback(() => {
-    viewportRef.current?.scrollTo({ top: 0 });
-  }, []);
+    if (!viewport) return;
+    pinnedRef.current = false;
+    smoothScrollTo(viewport, 0);
+  }, [viewport]);
 
   const value = React.useMemo(
-    () => ({
-      isScrollable,
-      isAtEnd,
-      isAtStart,
-      scrollToEnd,
-      scrollToStart,
-      viewportRef,
-      contentRef,
-    }),
+    () => ({ isScrollable, isAtEnd, isAtStart, scrollToEnd, scrollToStart }),
     [isScrollable, isAtEnd, isAtStart, scrollToEnd, scrollToStart]
   );
 
+  const nodes = React.useMemo(() => ({ setViewport, setContent }), []);
+
   return (
     <MessageScrollerContext.Provider value={value}>
-      <ScrollAreaPrimitive.Root
-        data-slot="message-scroller"
-        data-at-start={isAtStart}
-        data-at-end={isAtEnd}
-        className={cn(
-          'nx:relative nx:flex nx:min-h-0 nx:w-full nx:flex-col nx:overflow-hidden',
-          className
-        )}
-        {...props}
-      >
+      <MessageScrollerNodesContext.Provider value={nodes}>
         {children}
-        <ScrollBar />
-        <ScrollAreaPrimitive.Corner data-slot="message-scroller-corner" />
-      </ScrollAreaPrimitive.Root>
+      </MessageScrollerNodesContext.Provider>
     </MessageScrollerContext.Provider>
+  );
+}
+
+/**
+ * MessageScrollerProps
+ *
+ * Props for the MessageScroller component.
+ */
+interface MessageScrollerProps extends React.ComponentProps<
+  typeof ScrollAreaPrimitive.Root
+> {}
+
+/**
+ * MessageScroller
+ *
+ * The scroll container for a message stream. It holds the latest turn in view
+ * while the reader is at the end, and stops doing so the moment they scroll up,
+ * so appended content never yanks the viewport out from under them.
+ *
+ * It renders no live region of its own. Announcing new turns belongs to
+ * `MessageGroup`'s `announce`, so a stream that opts in is announced once
+ * rather than twice.
+ *
+ * @example
+ * ```tsx
+ * <MessageScrollerProvider>
+ *   <MessageScroller className="nx:h-96">
+ *     <MessageScrollerViewport>
+ *       <MessageScrollerContent>
+ *         {turns.map((turn) => (
+ *           <MessageScrollerItem key={turn.id}>
+ *             <Message>{turn.body}</Message>
+ *           </MessageScrollerItem>
+ *         ))}
+ *       </MessageScrollerContent>
+ *     </MessageScrollerViewport>
+ *     <MessageScrollerButton />
+ *   </MessageScroller>
+ * </MessageScrollerProvider>
+ * ```
+ */
+function MessageScroller({
+  className,
+  children,
+  ...props
+}: MessageScrollerProps) {
+  const { isAtStart, isAtEnd } = useMessageScroller();
+
+  return (
+    <ScrollAreaPrimitive.Root
+      data-slot="message-scroller"
+      data-at-start={isAtStart}
+      data-at-end={isAtEnd}
+      className={cn(
+        'nx:relative nx:flex nx:min-h-0 nx:w-full nx:flex-col nx:overflow-hidden',
+        className
+      )}
+      {...props}
+    >
+      {children}
+      <ScrollBar />
+      <ScrollAreaPrimitive.Corner data-slot="message-scroller-corner" />
+    </ScrollAreaPrimitive.Root>
   );
 }
 
@@ -211,17 +270,20 @@ interface MessageScrollerViewportProps extends React.ComponentProps<
  */
 function MessageScrollerViewport({
   className,
+  ref,
   ...props
 }: MessageScrollerViewportProps) {
-  const { viewportRef, isAtStart, isAtEnd } = useMessageScroller();
+  const { isAtStart, isAtEnd } = useMessageScroller();
+  const { setViewport } = useMessageScrollerNodes();
+  const composedRef = useComposedRefs(ref, setViewport);
 
   return (
     <ScrollAreaPrimitive.Viewport
-      ref={viewportRef}
+      ref={composedRef}
       data-slot="message-scroller-viewport"
       tabIndex={0}
       className={cn(
-        'nx:size-full nx:min-h-0 nx:min-w-0 nx:overscroll-contain nx:scroll-smooth nx:rounded-[inherit] nx:*:h-full nx:focus-visible:outline-2 nx:focus-visible:outline-focus-default',
+        'nx:size-full nx:min-h-0 nx:min-w-0 nx:overscroll-contain nx:rounded-[inherit] nx:*:h-full nx:focus-visible:outline-2 nx:focus-visible:outline-focus-default',
         !isAtStart && 'nx:mask-t-from-90%',
         !isAtEnd && 'nx:mask-b-from-90%',
         className
@@ -246,13 +308,15 @@ interface MessageScrollerContentProps extends React.ComponentProps<'div'> {}
  */
 function MessageScrollerContent({
   className,
+  ref,
   ...props
 }: MessageScrollerContentProps) {
-  const { contentRef } = useMessageScroller();
+  const { setContent } = useMessageScrollerNodes();
+  const composedRef = useComposedRefs(ref, setContent);
 
   return (
     <div
-      ref={contentRef}
+      ref={composedRef}
       data-slot="message-scroller-content"
       className={cn(
         'nx:flex nx:h-max nx:min-h-full nx:flex-col nx:gap-6 nx:p-4',
@@ -312,7 +376,7 @@ const messageScrollerButtonVariants = cva(
  */
 interface MessageScrollerButtonProps
   extends
-    Omit<React.ComponentProps<typeof Button>, 'children'>,
+    Omit<React.ComponentProps<typeof Button>, 'children' | 'asChild'>,
     VariantProps<typeof messageScrollerButtonVariants> {}
 
 /**
@@ -375,6 +439,8 @@ export {
   MessageScrollerItem,
   type MessageScrollerItemProps,
   type MessageScrollerProps,
+  MessageScrollerProvider,
+  type MessageScrollerProviderProps,
   MessageScrollerViewport,
   type MessageScrollerViewportProps,
   useMessageScroller,

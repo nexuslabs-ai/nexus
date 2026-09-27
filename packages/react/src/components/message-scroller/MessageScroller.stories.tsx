@@ -27,7 +27,9 @@ import {
   MessageScrollerButton,
   MessageScrollerContent,
   MessageScrollerItem,
+  MessageScrollerProvider,
   MessageScrollerViewport,
+  useMessageScroller,
 } from './message-scroller';
 
 const meta: Meta<typeof MessageScroller> = {
@@ -88,6 +90,14 @@ function Stream({
   );
 }
 
+function ProvidedStream(props: React.ComponentProps<typeof Stream>) {
+  return (
+    <MessageScrollerProvider>
+      <Stream {...props} />
+    </MessageScrollerProvider>
+  );
+}
+
 const viewportOf = (canvasElement: HTMLElement) =>
   canvasElement.querySelector<HTMLElement>(
     '[data-slot="message-scroller-viewport"]'
@@ -98,15 +108,16 @@ const buttonOf = (canvasElement: HTMLElement) =>
     '[data-slot="message-scroller-button"]'
   )!;
 
+// Resting on the last pixel, not merely within the component's edge slack.
 const atEnd = (viewport: HTMLElement) =>
-  viewport.scrollHeight - viewport.scrollTop - viewport.clientHeight <= 24;
+  viewport.scrollHeight - viewport.scrollTop - viewport.clientHeight <= 1;
 
 // ============================================
 // BASIC STORIES
 // ============================================
 
 export const Default: Story = {
-  render: () => <Stream count={12} />,
+  render: () => <ProvidedStream count={12} />,
   play: async ({ canvasElement }) => {
     const viewport = viewportOf(canvasElement);
 
@@ -119,24 +130,26 @@ export const Default: Story = {
 
 export const EmptyStream: Story = {
   render: () => (
-    <MessageScroller className={frame}>
-      <MessageScrollerViewport>
-        <MessageScrollerContent>
-          <EmptyState>
-            <EmptyStateHeader>
-              <EmptyStateMedia variant="icon">
-                <IconMessage2 />
-              </EmptyStateMedia>
-              <EmptyStateTitle>No messages yet</EmptyStateTitle>
-              <EmptyStateDescription>
-                Send the first message to start this conversation.
-              </EmptyStateDescription>
-            </EmptyStateHeader>
-          </EmptyState>
-        </MessageScrollerContent>
-      </MessageScrollerViewport>
-      <MessageScrollerButton />
-    </MessageScroller>
+    <MessageScrollerProvider>
+      <MessageScroller className={frame}>
+        <MessageScrollerViewport>
+          <MessageScrollerContent>
+            <EmptyState>
+              <EmptyStateHeader>
+                <EmptyStateMedia variant="icon">
+                  <IconMessage2 />
+                </EmptyStateMedia>
+                <EmptyStateTitle>No messages yet</EmptyStateTitle>
+                <EmptyStateDescription>
+                  Send the first message to start this conversation.
+                </EmptyStateDescription>
+              </EmptyStateHeader>
+            </EmptyState>
+          </MessageScrollerContent>
+        </MessageScrollerViewport>
+        <MessageScrollerButton />
+      </MessageScroller>
+    </MessageScrollerProvider>
   ),
   play: async ({ canvasElement }) => {
     const viewport = viewportOf(canvasElement);
@@ -152,7 +165,7 @@ export const EmptyStream: Story = {
 };
 
 export const ShortStream: Story = {
-  render: () => <Stream count={2} />,
+  render: () => <ProvidedStream count={2} />,
   play: async ({ canvasElement }) => {
     const viewport = viewportOf(canvasElement);
 
@@ -172,7 +185,7 @@ export const ShortStream: Story = {
 // ============================================
 
 export const ScrolledAway: Story = {
-  render: () => <Stream count={14} />,
+  render: () => <ProvidedStream count={14} />,
   play: async ({ canvasElement }) => {
     const canvas = within(canvasElement);
     const viewport = viewportOf(canvasElement);
@@ -223,24 +236,38 @@ export const ScrolledAway: Story = {
 // STREAMING
 // ============================================
 
-function AppendableStream({ startScrolledAway = false }) {
+// Sits beside the scroller, not inside it, the way a real composer bar does.
+function Composer({ onAppend }: { onAppend: () => void }) {
+  const { scrollToEnd } = useMessageScroller();
+
+  return (
+    <div className="nx:flex nx:gap-2">
+      <Button size="sm" variant="outline" onClick={onAppend}>
+        Append turn
+      </Button>
+      <Button
+        size="sm"
+        onClick={() => {
+          onAppend();
+          scrollToEnd();
+        }}
+      >
+        Send
+      </Button>
+    </div>
+  );
+}
+
+function AppendableStream() {
   const [count, setCount] = React.useState(10);
 
   return (
-    <div className="nx:flex nx:flex-col nx:gap-3">
-      <Stream count={count} />
-      <Button
-        size="sm"
-        variant="outline"
-        className="nx:w-fit"
-        onClick={() => setCount((value) => value + 1)}
-      >
-        Append turn
-      </Button>
-      <span className="nx:sr-only">
-        {startScrolledAway ? 'away' : 'pinned'}
-      </span>
-    </div>
+    <MessageScrollerProvider>
+      <div className="nx:flex nx:flex-col nx:gap-3">
+        <Stream count={count} />
+        <Composer onAppend={() => setCount((value) => value + 1)} />
+      </div>
+    </MessageScrollerProvider>
   );
 }
 
@@ -267,7 +294,7 @@ export const StreamingWhilePinned: Story = {
 };
 
 export const StreamingWhileScrolledAway: Story = {
-  render: () => <AppendableStream startScrolledAway />,
+  render: () => <AppendableStream />,
   play: async ({ canvasElement }) => {
     const canvas = within(canvasElement);
     const viewport = viewportOf(canvasElement);
@@ -296,12 +323,45 @@ export const StreamingWhileScrolledAway: Story = {
   },
 };
 
+export const SendFromComposer: Story = {
+  render: () => <AppendableStream />,
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+    const viewport = viewportOf(canvasElement);
+
+    await waitFor(async () => {
+      await expect(atEnd(viewport)).toBe(true);
+    });
+
+    viewport.scrollTo({ top: 0, behavior: 'instant' });
+    await waitFor(async () => {
+      await expect(
+        canvas.getByRole('button', { name: 'Scroll to the latest message' })
+      ).toHaveAttribute('data-active', 'true');
+    });
+
+    // The jump starts before the new turn renders, so it aims at the old
+    // height. Re-pinning is what carries it onto the turn that just arrived.
+    await userEvent.click(canvas.getByRole('button', { name: 'Send' }));
+
+    await waitFor(
+      async () => {
+        await expect(
+          canvas.getByText('Turn 11 in the transcript.')
+        ).toBeVisible();
+        await expect(atEnd(viewport)).toBe(true);
+      },
+      { timeout: 3000 }
+    );
+  },
+};
+
 // ============================================
 // INTERACTION
 // ============================================
 
 export const KeyboardInteraction: Story = {
-  render: () => <Stream count={14} />,
+  render: () => <ProvidedStream count={14} />,
   play: async ({ canvasElement }) => {
     const canvas = within(canvasElement);
     const viewport = viewportOf(canvasElement);
@@ -320,9 +380,12 @@ export const KeyboardInteraction: Story = {
       );
     });
 
-    const button = canvas.getByRole('button', { name });
-    button.focus();
-    await expect(button).toHaveFocus();
+    await userEvent.tab();
+    await expect(viewport).toHaveFocus();
+
+    // Once active, the button is the next stop after the viewport.
+    await userEvent.tab();
+    await expect(canvas.getByRole('button', { name })).toHaveFocus();
 
     await userEvent.keyboard('{Enter}');
 
@@ -335,6 +398,30 @@ export const KeyboardInteraction: Story = {
   },
 };
 
+export const ReducedMotion: Story = {
+  render: () => <ProvidedStream count={14} />,
+  globals: { reduceMotion: true },
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+    const viewport = viewportOf(canvasElement);
+
+    viewport.scrollTo({ top: 0, behavior: 'instant' });
+
+    const name = 'Scroll to the latest message';
+    await waitFor(async () => {
+      await expect(canvas.getByRole('button', { name })).toHaveAttribute(
+        'data-active',
+        'true'
+      );
+    });
+
+    await userEvent.click(canvas.getByRole('button', { name }));
+
+    // No smooth scroll to wait out: the jump lands within the click.
+    await expect(atEnd(viewport)).toBe(true);
+  },
+};
+
 // ============================================
 // RTL
 // ============================================
@@ -342,36 +429,38 @@ export const KeyboardInteraction: Story = {
 export const RightToLeft: Story = {
   render: () => (
     <div dir="rtl">
-      <MessageScroller className={frame}>
-        <MessageScrollerViewport>
-          <MessageScrollerContent>
-            {Array.from({ length: 12 }, (_, index) => (
-              <MessageScrollerItem key={index}>
-                <MessageGroup>
-                  <Message align={index % 2 === 1 ? 'end' : 'start'}>
-                    <MessageAvatar>
-                      <AvatarFallback>
-                        {index % 2 === 1 ? 'أنت' : 'ع ب'}
-                      </AvatarFallback>
-                    </MessageAvatar>
-                    <MessageContent>
-                      <Bubble variant={index % 2 === 1 ? 'primary' : 'muted'}>
-                        <BubbleContent>
-                          الرسالة رقم {index + 1} في المحادثة.
-                        </BubbleContent>
-                      </Bubble>
-                      <MessageFooter>
-                        09:{String(10 + index).padStart(2, '0')}
-                      </MessageFooter>
-                    </MessageContent>
-                  </Message>
-                </MessageGroup>
-              </MessageScrollerItem>
-            ))}
-          </MessageScrollerContent>
-        </MessageScrollerViewport>
-        <MessageScrollerButton />
-      </MessageScroller>
+      <MessageScrollerProvider>
+        <MessageScroller className={frame}>
+          <MessageScrollerViewport>
+            <MessageScrollerContent>
+              {Array.from({ length: 12 }, (_, index) => (
+                <MessageScrollerItem key={index}>
+                  <MessageGroup>
+                    <Message align={index % 2 === 1 ? 'end' : 'start'}>
+                      <MessageAvatar>
+                        <AvatarFallback>
+                          {index % 2 === 1 ? 'أنت' : 'ع ب'}
+                        </AvatarFallback>
+                      </MessageAvatar>
+                      <MessageContent>
+                        <Bubble variant={index % 2 === 1 ? 'primary' : 'muted'}>
+                          <BubbleContent>
+                            الرسالة رقم {index + 1} في المحادثة.
+                          </BubbleContent>
+                        </Bubble>
+                        <MessageFooter>
+                          09:{String(10 + index).padStart(2, '0')}
+                        </MessageFooter>
+                      </MessageContent>
+                    </Message>
+                  </MessageGroup>
+                </MessageScrollerItem>
+              ))}
+            </MessageScrollerContent>
+          </MessageScrollerViewport>
+          <MessageScrollerButton />
+        </MessageScroller>
+      </MessageScrollerProvider>
     </div>
   ),
   play: async ({ canvasElement }) => {
@@ -410,7 +499,7 @@ export const RightToLeft: Story = {
 // ============================================
 
 export const WithDataAttributes: Story = {
-  render: () => <Stream count={12} />,
+  render: () => <ProvidedStream count={12} />,
   play: async ({ canvasElement }) => {
     const root = canvasElement.querySelector<HTMLElement>(
       '[data-slot="message-scroller"]'
@@ -432,8 +521,10 @@ export const WithDataAttributes: Story = {
 
     // Both states are emitted, not only the true one, so consumers can style
     // either edge.
-    await expect(root).toHaveAttribute('data-at-end', 'true');
-    await expect(root).toHaveAttribute('data-at-start', 'false');
+    await waitFor(async () => {
+      await expect(root).toHaveAttribute('data-at-end', 'true');
+      await expect(root).toHaveAttribute('data-at-start', 'false');
+    });
   },
 };
 
@@ -443,19 +534,21 @@ export const WithDataAttributes: Story = {
 
 export const AllVariants: Story = {
   render: () => (
-    <MessageScroller className={frame}>
-      <MessageScrollerViewport>
-        <MessageScrollerContent>
-          {Array.from({ length: 14 }, (_, index) => (
-            <MessageScrollerItem key={index}>
-              <Turn index={index} />
-            </MessageScrollerItem>
-          ))}
-        </MessageScrollerContent>
-      </MessageScrollerViewport>
-      <MessageScrollerButton direction="start" />
-      <MessageScrollerButton direction="end" />
-    </MessageScroller>
+    <MessageScrollerProvider>
+      <MessageScroller className={frame}>
+        <MessageScrollerViewport>
+          <MessageScrollerContent>
+            {Array.from({ length: 14 }, (_, index) => (
+              <MessageScrollerItem key={index}>
+                <Turn index={index} />
+              </MessageScrollerItem>
+            ))}
+          </MessageScrollerContent>
+        </MessageScrollerViewport>
+        <MessageScrollerButton direction="start" />
+        <MessageScrollerButton direction="end" />
+      </MessageScroller>
+    </MessageScrollerProvider>
   ),
   play: async ({ canvasElement }) => {
     const root = canvasElement.querySelector<HTMLElement>(
