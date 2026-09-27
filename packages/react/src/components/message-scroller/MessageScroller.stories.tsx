@@ -140,14 +140,14 @@ export const EmptyStream: Story = {
   ),
   play: async ({ canvasElement }) => {
     const viewport = viewportOf(canvasElement);
-    const button = canvasElement.querySelector(
-      '[data-slot="message-scroller-button"]'
-    );
 
     await expect(viewport.scrollHeight).toBeLessThanOrEqual(
       viewport.clientHeight + 1
     );
-    await expect(button).toHaveAttribute('data-active', 'false');
+    await expect(buttonOf(canvasElement)).toHaveAttribute(
+      'data-active',
+      'false'
+    );
   },
 };
 
@@ -160,9 +160,10 @@ export const ShortStream: Story = {
     await expect(viewport.scrollHeight).toBeLessThanOrEqual(
       viewport.clientHeight + 1
     );
-    await expect(
-      canvasElement.querySelector('[data-slot="message-scroller-button"]')
-    ).toHaveAttribute('data-active', 'false');
+    await expect(buttonOf(canvasElement)).toHaveAttribute(
+      'data-active',
+      'false'
+    );
   },
 };
 
@@ -182,8 +183,8 @@ export const ScrolledAway: Story = {
 
     const name = 'Scroll to the latest message';
 
-    // Inactive: out of the tab order, the a11y tree, and pointer hit-testing.
-    await expect(buttonOf(canvasElement)).toHaveAttribute('inert');
+    // Inactive: hidden, so it is out of the tab order and the a11y tree.
+    await expect(canvas.queryByRole('button', { name })).toBeNull();
 
     viewport.scrollTo({ top: 0, behavior: 'instant' });
 
@@ -195,7 +196,7 @@ export const ScrolledAway: Story = {
     });
 
     const button = canvas.getByRole('button', { name });
-    await expect(button).not.toHaveAttribute('inert');
+    await expect(button).toBeVisible();
 
     // The affordance is a circle, not a pill: a width utility on the root
     // would collapse the icon box onto its glyph.
@@ -213,7 +214,7 @@ export const ScrolledAway: Story = {
 
     // Back at the end, the affordance stands down again.
     await waitFor(async () => {
-      await expect(buttonOf(canvasElement)).toHaveAttribute('inert');
+      await expect(canvas.queryByRole('button', { name })).toBeNull();
     });
   },
 };

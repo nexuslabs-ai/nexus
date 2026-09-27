@@ -291,7 +291,7 @@ function MessageScrollerItem({
 }
 
 const messageScrollerButtonVariants = cva(
-  'nx:absolute nx:inset-x-0 nx:z-sticky nx:mx-auto nx:rounded-full nx:transition-[color,background-color,border-color,scale,opacity] nx:duration-fast nx:ease-enter nx:[&_svg]:size-4 nx:data-[active=false]:opacity-0',
+  'nx:absolute nx:inset-x-0 nx:z-sticky nx:mx-auto nx:rounded-full nx:[&_svg]:size-4 nx:data-[active=false]:invisible',
   {
     variants: {
       direction: {
@@ -318,10 +318,10 @@ interface MessageScrollerButtonProps
 /**
  * MessageScrollerButton
  *
- * The return-to-latest affordance. It fades in once the reader has scrolled
- * away from the edge it targets, and is inert when it is not showing — out of
- * the tab order and out of the accessibility tree, so it is never a stop for a
- * keyboard user who cannot see it.
+ * The return-to-latest affordance. It appears once the reader has scrolled
+ * away from the edge it targets. While hidden it is out of the tab order and
+ * the accessibility tree, so it is never a stop for a keyboard user who cannot
+ * see it.
  *
  * @example
  * ```tsx
@@ -354,7 +354,6 @@ function MessageScrollerButton({
           ? 'Scroll to the latest message'
           : 'Scroll to the oldest message'
       }
-      inert={!isActive}
       variant={variant}
       size={size}
       onClick={direction === 'end' ? scrollToEnd : scrollToStart}
