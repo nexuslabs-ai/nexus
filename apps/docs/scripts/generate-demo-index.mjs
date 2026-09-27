@@ -192,7 +192,7 @@ function installSlugsFor(id, specifiers, blocks) {
   return slugs;
 }
 
-function resolveInstallSlugs(id, source, blocks) {
+function checkDemoImports(id, source, blocks) {
   const specifiers = importSpecifiers(source);
   const slugs = installSlugsFor(id, specifiers, blocks);
   const packages = new Set(
@@ -254,7 +254,7 @@ function collectDemos() {
         );
       }
       const source = readCanonical(file);
-      const installSlugs = resolveInstallSlugs(id, source, installBlocks);
+      const installSlugs = checkDemoImports(id, source, installBlocks);
 
       return { id, source, installSlugs };
     })
