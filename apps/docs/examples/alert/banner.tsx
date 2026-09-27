@@ -11,7 +11,7 @@ import {
 
 export default function AlertBanner() {
   return (
-    <div className="nx:w-full nx:max-w-lg nx:overflow-hidden nx:rounded-md nx:border nx:border-border-default">
+    <div className="nx:w-full nx:max-w-lg nx:overflow-hidden nx:rounded-md nx:border-default nx:border-border-default">
       <Alert presentation="banner" variant="information">
         <AlertIcon>
           <IconInfoCircle />

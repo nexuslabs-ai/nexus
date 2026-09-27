@@ -3,4 +3,4 @@
 
 export { Component } from "./demo.client";
 
-export const source = "'use client';\n\nimport { Bubble, BubbleContent, BubbleGroup } from '@/components/bubble/bubble';\n\nexport default function BubbleDemo() {\n  return (\n    <BubbleGroup className=\"nx:w-full nx:max-w-sm\">\n      <Bubble align=\"start\">\n        <BubbleContent>How do I rotate the signing key?</BubbleContent>\n      </Bubble>\n      <Bubble variant=\"primary\" align=\"end\">\n        <BubbleContent>Run `nexus keys rotate`, then redeploy.</BubbleContent>\n      </Bubble>\n    </BubbleGroup>\n  );\n}\n";
+export const source = "'use client';\n\nimport { Bubble, BubbleContent, BubbleGroup } from '@/components/bubble/bubble';\n\nexport default function BubbleDemo() {\n  return (\n    <BubbleGroup className=\"nx:w-full nx:max-w-sm\">\n      <Bubble align=\"start\">\n        <BubbleContent>How do I rotate the signing key?</BubbleContent>\n      </Bubble>\n      <Bubble variant=\"primary\" align=\"end\">\n        <BubbleContent>Run nexus keys rotate, then redeploy.</BubbleContent>\n      </Bubble>\n    </BubbleGroup>\n  );\n}\n";

@@ -18,8 +18,8 @@ export default function AvatarSizes() {
   return (
     <div className="nx:flex nx:flex-wrap nx:items-end nx:gap-3">
       {sizes.map((size) => (
-        <Avatar key={size} size={size}>
-          <AvatarFallback>AL</AvatarFallback>
+        <Avatar key={size} size={size} role="img" aria-label="Ada Lovelace">
+          <AvatarFallback aria-hidden="true">AL</AvatarFallback>
         </Avatar>
       ))}
     </div>

@@ -9,7 +9,7 @@ export default function BubbleDemo() {
         <BubbleContent>How do I rotate the signing key?</BubbleContent>
       </Bubble>
       <Bubble variant="primary" align="end">
-        <BubbleContent>Run `nexus keys rotate`, then redeploy.</BubbleContent>
+        <BubbleContent>Run nexus keys rotate, then redeploy.</BubbleContent>
       </Bubble>
     </BubbleGroup>
   );

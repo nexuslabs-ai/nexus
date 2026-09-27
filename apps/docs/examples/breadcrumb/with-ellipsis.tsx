@@ -31,13 +31,13 @@ export default function BreadcrumbWithEllipsis() {
             </DropdownMenuTrigger>
             <DropdownMenuContent align="start">
               <DropdownMenuItem asChild>
-                <a href="/projects">Projects</a>
+                <a href="#projects">Projects</a>
               </DropdownMenuItem>
               <DropdownMenuItem asChild>
-                <a href="/projects/design-system">Design System</a>
+                <a href="#design-system">Design System</a>
               </DropdownMenuItem>
               <DropdownMenuItem asChild>
-                <a href="/projects/design-system/components">Components</a>
+                <a href="#components">Components</a>
               </DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>

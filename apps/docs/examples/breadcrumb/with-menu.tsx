@@ -28,13 +28,13 @@ export default function BreadcrumbWithMenu() {
             </DropdownMenuTrigger>
             <DropdownMenuContent align="start">
               <DropdownMenuItem asChild>
-                <a href="/workspaces/personal">Personal</a>
+                <a href="#personal">Personal</a>
               </DropdownMenuItem>
               <DropdownMenuItem asChild>
-                <a href="/workspaces/team">Team</a>
+                <a href="#team">Team</a>
               </DropdownMenuItem>
               <DropdownMenuItem asChild>
-                <a href="/workspaces/archived">Archived</a>
+                <a href="#archived">Archived</a>
               </DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>

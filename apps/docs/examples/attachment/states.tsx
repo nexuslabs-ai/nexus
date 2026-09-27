@@ -54,7 +54,7 @@ export default function AttachmentStates() {
       </Attachment>
       <Attachment state="processing">
         <AttachmentMedia variant="icon">
-          <Spinner />
+          <Spinner aria-hidden="true" />
         </AttachmentMedia>
         <AttachmentContent>
           <AttachmentTitle>scan.png</AttachmentTitle>

@@ -3,4 +3,4 @@
 
 export { Component } from "./sizes.client";
 
-export const source = "'use client';\n\nimport { Avatar, AvatarFallback } from '@/components/avatar/avatar';\n\nconst sizes = [\n  '2xs',\n  'xs',\n  'sm',\n  'md',\n  'lg',\n  'xl',\n  '2xl',\n  '3xl',\n  '4xl',\n] as const;\n\nexport default function AvatarSizes() {\n  return (\n    <div className=\"nx:flex nx:flex-wrap nx:items-end nx:gap-3\">\n      {sizes.map((size) => (\n        <Avatar key={size} size={size}>\n          <AvatarFallback>AL</AvatarFallback>\n        </Avatar>\n      ))}\n    </div>\n  );\n}\n";
+export const source = "'use client';\n\nimport { Avatar, AvatarFallback } from '@/components/avatar/avatar';\n\nconst sizes = [\n  '2xs',\n  'xs',\n  'sm',\n  'md',\n  'lg',\n  'xl',\n  '2xl',\n  '3xl',\n  '4xl',\n] as const;\n\nexport default function AvatarSizes() {\n  return (\n    <div className=\"nx:flex nx:flex-wrap nx:items-end nx:gap-3\">\n      {sizes.map((size) => (\n        <Avatar key={size} size={size} role=\"img\" aria-label=\"Ada Lovelace\">\n          <AvatarFallback aria-hidden=\"true\">AL</AvatarFallback>\n        </Avatar>\n      ))}\n    </div>\n  );\n}\n";

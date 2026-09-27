@@ -17,6 +17,7 @@ import {
   importSpecifiers,
   isDemoName,
   packageName,
+  PREVIEW_DEMO,
 } from './examples.mjs';
 import {
   collectSourceFiles,
@@ -35,6 +36,8 @@ import {
 
 const outputDir = path.join(docsRoot, 'generated', 'dependencies');
 const examplesRoot = path.join(docsRoot, 'examples');
+const publicRoot = path.join(docsRoot, 'public');
+const PUBLIC_URL = /['"`](\/[\w./-]+)['"`]/g;
 
 function readManifest(packageDir) {
   return JSON.parse(
@@ -75,6 +78,10 @@ function toInstall(name) {
 
 function toSrcPath(filePath) {
   return path.relative(reactSrc, filePath).split(path.sep).join('/');
+}
+
+function toPublicPath(filePath) {
+  return path.relative(docsRoot, filePath).split(path.sep).join('/');
 }
 
 function resolveRelative(importer, specifier) {
@@ -145,22 +152,28 @@ function colocatedStyles(files) {
   );
 }
 
-/** Every import in the demos under `examples/{slug}/`. */
-function exampleSpecifiers(slug) {
+/** The source of every demo in `examples/{slug}/`, the preview demo's apart from the rest. */
+function demoSources(slug) {
   const slugExamples = path.join(examplesRoot, slug);
   if (!statSync(slugExamples, { throwIfNoEntry: false })?.isDirectory()) {
-    return [];
+    return { preview: [], examples: [] };
   }
 
-  return readdirSync(slugExamples)
-    .filter((name) => name.endsWith(DEMO_EXTENSION) && isDemoName(name))
-    .flatMap((name) =>
-      importSpecifiers(readFileSync(path.join(slugExamples, name), 'utf8'))
-    );
+  const previewFile = `${PREVIEW_DEMO}${DEMO_EXTENSION}`;
+  const names = readdirSync(slugExamples).filter(
+    (name) => name.endsWith(DEMO_EXTENSION) && isDemoName(name)
+  );
+  const sourceOf = (name) =>
+    readFileSync(path.join(slugExamples, name), 'utf8');
+
+  return {
+    preview: names.filter((name) => name === previewFile).map(sourceOf),
+    examples: names.filter((name) => name !== previewFile).map(sourceOf),
+  };
 }
 
-/** Packages the demos in `examples/{slug}/` import beyond the component's own. */
-function examplePackages(slug, specifiers, componentPackages) {
+/** Packages the demos in `examples/{slug}/` import beyond the pasted components'. */
+function demoPackages(slug, specifiers, componentPackages) {
   const names = specifiers
     .filter(
       (specifier) =>
@@ -170,9 +183,8 @@ function examplePackages(slug, specifiers, componentPackages) {
 
   return [...new Set(names)]
     .filter(
-      (name) => !ALWAYS_INSTALLED.has(name) && !componentPackages.includes(name)
+      (name) => !ALWAYS_INSTALLED.has(name) && !componentPackages.has(name)
     )
-    .sort()
     .map((name) => {
       const range = docsDependencies[name];
       if (!range) {
@@ -189,10 +201,52 @@ function examplePackages(slug, specifiers, componentPackages) {
     });
 }
 
-/** Other components the demos in `examples/{slug}/` import through `@/components/`. */
-function exampleComponentSlugs(slug, specifiers) {
-  const slugs = specifiers.map(importedComponent).filter(Boolean);
-  return [...new Set(slugs)].filter((other) => other !== slug).sort();
+/** Files under `public/` a demo references by root-relative URL, such as `/avatars/ada.svg`. */
+function publicAssets(source) {
+  return [...source.matchAll(PUBLIC_URL)]
+    .map(([, url]) => path.join(publicRoot, url))
+    .filter((file) => statSync(file, { throwIfNoEntry: false })?.isFile());
+}
+
+/**
+ * What `sources` paste beside: the `slug` block, the block of every other
+ * component they import, the packages they import directly, and the `public/`
+ * files they reference.
+ */
+function pasteNeeds(slug, sources, walksBySlug) {
+  const specifiers = sources.flatMap(importSpecifiers);
+  const slugs = new Set([
+    slug,
+    ...specifiers.map(importedComponent).filter(Boolean),
+  ]);
+  const blocks = [...slugs].map((other) => {
+    const walked = walksBySlug.get(other);
+    if (!walked) {
+      throw new Error(
+        `dependencies JSON: examples/${slug}/ imports @/components/${other}, which has no install block.`
+      );
+    }
+    return walked;
+  });
+  const componentPackages = new Set(blocks.flatMap(({ packages }) => packages));
+
+  return {
+    packages: [
+      ...[...componentPackages].map(toInstall),
+      ...demoPackages(slug, specifiers, componentPackages),
+    ],
+    files: new Set(blocks.flatMap(({ files }) => files)),
+    assets: new Set(sources.flatMap(publicAssets)),
+  };
+}
+
+function toBlock(packages, files, assets) {
+  const paths = [...files].map(toSrcPath).sort();
+  return {
+    packages: packages.map(({ name, range }) => `${name}@${range}`).sort(),
+    copy: [...paths, ...[...assets].map(toPublicPath).sort()],
+    styles: paths.filter((file) => file.endsWith('.css')),
+  };
 }
 
 function walkSlug(slug) {
@@ -205,15 +259,13 @@ function walkSlug(slug) {
   const packages = walked.packages.filter(
     (name) => !ALWAYS_INSTALLED.has(name)
   );
-  const specifiers = exampleSpecifiers(slug);
 
   return {
     slug,
     slugDir,
     packages,
-    examples: examplePackages(slug, specifiers, packages),
-    exampleComponents: exampleComponentSlugs(slug, specifiers),
     files: [...needed],
+    demos: demoSources(slug),
   };
 }
 
@@ -234,37 +286,23 @@ function assertDeclaredPackages(walks) {
   );
 }
 
-function assertExampleComponentsExist(walks) {
-  const slugs = new Set(walks.map((walked) => walked.slug));
-  const offenders = walks.flatMap((walked) =>
-    walked.exampleComponents
-      .filter((other) => !slugs.has(other))
-      .map((other) => `  examples/${walked.slug}/: @/components/${other}`)
+/**
+ * The component's own block, then the page's: the Installation block covers
+ * the preview demo, and the examples block adds what the other demos need.
+ */
+function toEntry(walked, walksBySlug) {
+  const { slug, slugDir, packages, files, demos } = walked;
+  const preview = pasteNeeds(slug, demos.preview, walksBySlug);
+  const all = pasteNeeds(
+    slug,
+    [...demos.preview, ...demos.examples],
+    walksBySlug
   );
+  const previewPackages = preview.packages.map(({ name }) => name);
 
-  if (offenders.length === 0) return;
-
-  throw new Error(
-    [
-      'dependencies JSON: a demo imports a component that has no install block.',
-      ...offenders,
-    ].join('\n')
-  );
-}
-
-function toEntry({
-  slug,
-  slugDir,
-  packages,
-  examples,
-  exampleComponents,
-  files,
-}) {
   return {
     slug,
     install: packages.sort().map(toInstall),
-    examples,
-    exampleComponents,
     copy: files
       .filter((file) => !isUnder(file, slugDir))
       .map(toSrcPath)
@@ -273,19 +311,21 @@ function toEntry({
       .filter((file) => isUnder(file, slugDir))
       .map(toSrcPath)
       .sort(),
-    styles: files
-      .filter((file) => file.endsWith('.css'))
-      .map(toSrcPath)
-      .sort(),
+    installBlock: toBlock(preview.packages, preview.files, preview.assets),
+    examplesBlock: toBlock(
+      all.packages.filter(({ name }) => !previewPackages.includes(name)),
+      [...all.files].filter((file) => !preview.files.has(file)),
+      [...all.assets].filter((file) => !preview.assets.has(file))
+    ),
   };
 }
 
 const walks = componentSlugs().map(walkSlug).filter(Boolean);
 
 assertDeclaredPackages(walks);
-assertExampleComponentsExist(walks);
 
-const entries = walks.map(toEntry);
+const walksBySlug = new Map(walks.map((walked) => [walked.slug, walked]));
+const entries = walks.map((walked) => toEntry(walked, walksBySlug));
 
 rmSync(outputDir, { recursive: true, force: true });
 mkdirSync(outputDir, { recursive: true });

@@ -36,11 +36,7 @@ const shortMonth = (value: string) => value.slice(0, 3);
 export default function ChartLine() {
   return (
     <ChartContainer config={config} className="nx:w-full nx:max-w-md">
-      <LineChart
-        accessibilityLayer
-        data={data}
-        margin={{ left: 12, right: 12 }}
-      >
+      <LineChart data={data} margin={{ left: 12, right: 12 }}>
         <CartesianGrid vertical={false} />
         <XAxis
           dataKey="month"

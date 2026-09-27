@@ -36,11 +36,7 @@ const shortMonth = (value: string) => value.slice(0, 3);
 export default function ChartArea() {
   return (
     <ChartContainer config={config} className="nx:w-full nx:max-w-md">
-      <AreaChart
-        accessibilityLayer
-        data={data}
-        margin={{ left: 12, right: 12 }}
-      >
+      <AreaChart data={data} margin={{ left: 12, right: 12 }}>
         <CartesianGrid vertical={false} />
         <XAxis
           dataKey="month"

@@ -30,31 +30,46 @@ const config = {
   mobile: {
     label: 'Mobile',
     color: 'var(--nx-color-chart-categorical-2)',
+    icon: MobileSwatch,
   },
 } satisfies ChartConfig;
 
 const shortMonth = (value: string) => value.slice(0, 3);
+
+function HatchPattern({ id }: { id: string }) {
+  return (
+    <pattern id={id} width={6} height={6} patternUnits="userSpaceOnUse">
+      <rect width={6} height={6} fill="var(--color-mobile)" />
+      <path
+        d="M0 0L6 6M-3 3L3 9M3 -3L9 3"
+        stroke="var(--nx-color-container)"
+        strokeWidth={1.5}
+      />
+    </pattern>
+  );
+}
+
+function MobileSwatch() {
+  const pattern = useId();
+
+  return (
+    <svg viewBox="0 0 12 12" aria-hidden="true">
+      <defs>
+        <HatchPattern id={pattern} />
+      </defs>
+      <rect width={12} height={12} rx={2} fill={`url(#${pattern})`} />
+    </svg>
+  );
+}
 
 export default function ChartDemo() {
   const mobilePattern = useId();
 
   return (
     <ChartContainer config={config} className="nx:w-full nx:max-w-md">
-      <BarChart accessibilityLayer data={data}>
+      <BarChart data={data}>
         <defs>
-          <pattern
-            id={mobilePattern}
-            width={6}
-            height={6}
-            patternUnits="userSpaceOnUse"
-          >
-            <rect width={6} height={6} fill="var(--color-mobile)" />
-            <path
-              d="M0 0L6 6M-3 3L3 9M3 -3L9 3"
-              stroke="var(--nx-color-container)"
-              strokeWidth={1.5}
-            />
-          </pattern>
+          <HatchPattern id={mobilePattern} />
         </defs>
         <CartesianGrid vertical={false} />
         <XAxis
