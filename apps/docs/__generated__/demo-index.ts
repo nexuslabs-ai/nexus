@@ -68,6 +68,26 @@ export const demos = {
     alsoInstall: ["button","input","label"],
     load: () => import("./demos/dialog/with-form"),
   },
+  "dropdown-menu/checkbox-items": {
+    id: "dropdown-menu/checkbox-items",
+    alsoInstall: ["button"],
+    load: () => import("./demos/dropdown-menu/checkbox-items"),
+  },
+  "dropdown-menu/demo": {
+    id: "dropdown-menu/demo",
+    alsoInstall: ["button"],
+    load: () => import("./demos/dropdown-menu/demo"),
+  },
+  "dropdown-menu/radio-items": {
+    id: "dropdown-menu/radio-items",
+    alsoInstall: ["button"],
+    load: () => import("./demos/dropdown-menu/radio-items"),
+  },
+  "dropdown-menu/submenu": {
+    id: "dropdown-menu/submenu",
+    alsoInstall: ["button"],
+    load: () => import("./demos/dropdown-menu/submenu"),
+  },
   "getting-started/button-core-variants": {
     id: "getting-started/button-core-variants",
     alsoInstall: ["button"],
