@@ -45,6 +45,10 @@ export const PAGE_LOADERS: Record<string, ManifestPageLoader> = {
     import('../../content/components/breadcrumb.mdx'),
   '/components/bubble': () => import('../../content/components/bubble.mdx'),
   '/components/button': () => import('../../content/components/button.mdx'),
+  '/components/button-group': () =>
+    import('../../content/components/button-group.mdx'),
+  '/components/carousel': () => import('../../content/components/carousel.mdx'),
+  '/components/chart': () => import('../../content/components/chart.mdx'),
   '/theming/appearance': () => import('../../content/theming/appearance.mdx'),
   '/theming/multi-brand': () => import('../_pages/theming/multi-brand'),
   '/theming/radius-overrides': () =>

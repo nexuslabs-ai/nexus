@@ -151,6 +151,26 @@ export const demos = {
     id: "bubble/with-reactions",
     load: () => import("./demos/bubble/with-reactions"),
   },
+  "button-group/demo": {
+    id: "button-group/demo",
+    load: () => import("./demos/button-group/demo"),
+  },
+  "button-group/sizes": {
+    id: "button-group/sizes",
+    load: () => import("./demos/button-group/sizes"),
+  },
+  "button-group/vertical": {
+    id: "button-group/vertical",
+    load: () => import("./demos/button-group/vertical"),
+  },
+  "button-group/with-separator": {
+    id: "button-group/with-separator",
+    load: () => import("./demos/button-group/with-separator"),
+  },
+  "button-group/with-text": {
+    id: "button-group/with-text",
+    load: () => import("./demos/button-group/with-text"),
+  },
   "button/demo": {
     id: "button/demo",
     load: () => import("./demos/button/demo"),
@@ -170,6 +190,26 @@ export const demos = {
   "button/with-icon": {
     id: "button/with-icon",
     load: () => import("./demos/button/with-icon"),
+  },
+  "carousel/demo": {
+    id: "carousel/demo",
+    load: () => import("./demos/carousel/demo"),
+  },
+  "carousel/vertical": {
+    id: "carousel/vertical",
+    load: () => import("./demos/carousel/vertical"),
+  },
+  "chart/area": {
+    id: "chart/area",
+    load: () => import("./demos/chart/area"),
+  },
+  "chart/demo": {
+    id: "chart/demo",
+    load: () => import("./demos/chart/demo"),
+  },
+  "chart/line": {
+    id: "chart/line",
+    load: () => import("./demos/chart/line"),
   },
   "getting-started/button-core-variants": {
     id: "getting-started/button-core-variants",

@@ -308,6 +308,21 @@ export const PAGE_REGISTRY = {
         label: 'Button',
         examples: ['variants', 'sizes', 'with-icon', 'disabled'],
       },
+      {
+        slug: 'button-group',
+        label: 'ButtonGroup',
+        examples: ['sizes', 'vertical', 'with-text', 'with-separator'],
+      },
+      {
+        slug: 'carousel',
+        label: 'Carousel',
+        examples: ['vertical'],
+      },
+      {
+        slug: 'chart',
+        label: 'Chart',
+        examples: ['area', 'line'],
+      },
     ],
   },
   theming: {
