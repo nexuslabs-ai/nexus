@@ -19,10 +19,7 @@ export function LeftRail({ section }: { section: ManifestSection }) {
       <ul className="nx:list-none nx:p-0 nx:m-0">
         {section.pages.map((page) => {
           const active = pathname === page.route;
-          const railLabels = [
-            ...(page.components ?? []),
-            ...(page.nested ?? []),
-          ];
+          const railLabels = page.nested ?? [];
           return (
             <li key={page.slug}>
               <Link

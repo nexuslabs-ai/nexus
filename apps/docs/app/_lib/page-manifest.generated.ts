@@ -9,8 +9,6 @@ type ManifestPageBase = {
 };
 
 export type GuideManifestPage = ManifestPageBase & {
-  /** Components this group page covers, listed under it in the left rail. */
-  components?: readonly string[];
   /** Non-interactive headings listed under this page in the left rail. */
   nested?: readonly string[];
   examples?: never;
@@ -31,7 +29,6 @@ export type GuideManifestPage = ManifestPageBase & {
 export type ComponentManifestPage = ManifestPageBase & {
   /** Example demo names the page shows first, in this order. */
   examples: readonly string[];
-  components?: never;
   nested?: never;
   kind: 'mdx';
   /** Source file relative to `apps/docs`; the module is `PAGE_LOADERS[route]`. */
@@ -164,46 +161,6 @@ export const PAGE_MANIFEST: readonly ManifestSection[] = [
     href: '/components',
     unit: 'components',
     pages: [
-      {
-        route: '/components/inputs',
-        slug: 'inputs',
-        label: 'Inputs',
-        components: ['Input', 'Select', 'Switch', 'Tabs'],
-        kind: 'placeholder',
-        file: null,
-      },
-      {
-        route: '/components/containers',
-        slug: 'containers',
-        label: 'Containers',
-        components: ['Card', 'Dialog'],
-        kind: 'placeholder',
-        file: null,
-      },
-      {
-        route: '/components/navigation',
-        slug: 'navigation',
-        label: 'Navigation',
-        components: ['DropdownMenu'],
-        kind: 'placeholder',
-        file: null,
-      },
-      {
-        route: '/components/display',
-        slug: 'display',
-        label: 'Display',
-        components: ['Tooltip'],
-        kind: 'placeholder',
-        file: null,
-      },
-      {
-        route: '/components/primitives',
-        slug: 'primitives',
-        label: 'Primitives',
-        components: ['Show / Hide', 'Slot'],
-        kind: 'placeholder',
-        file: null,
-      },
       {
         route: '/components/accordion',
         slug: 'accordion',

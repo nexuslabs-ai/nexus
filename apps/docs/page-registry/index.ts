@@ -12,8 +12,6 @@ export type GuidePage = {
   label: string;
   /** Optional in-page headings rendered inline in the left rail (non-interactive). */
   nested?: string[];
-  /** Components a group page covers, rendered inline in the left rail (non-interactive). */
-  components?: string[];
   /** Placeholder body, carried only while the page has no source file. */
   wireframe?: { lede: string; blocks: Block[] };
   examples?: never;
@@ -29,7 +27,6 @@ export type ComponentPageEntry = {
    */
   examples: string[];
   nested?: never;
-  components?: never;
   wireframe?: never;
 };
 
@@ -163,101 +160,6 @@ export const PAGE_REGISTRY = {
     href: '/components',
     unit: 'components',
     pages: [
-      {
-        slug: 'inputs',
-        label: 'Inputs',
-        components: ['Input', 'Select', 'Switch', 'Tabs'],
-        wireframe: {
-          lede: '[ Interactive controls · per-component Storybook page below ]',
-          blocks: [
-            {
-              type: 'row',
-              blocks: [
-                {
-                  variant: 'storybook',
-                  label: '[ Storybook embed — selected component ]',
-                },
-                { variant: 'tall', label: '[ Variant matrix · props table ]' },
-              ],
-            },
-            { type: 'h2', text: '[ Per-component pages ]' },
-            {
-              type: 'placeholder',
-              label: '[ Index — Input · Select · Switch · Tabs ]',
-            },
-            {
-              type: 'placeholder',
-              variant: 'code',
-              label: '[ Code — JSX usage example ]',
-            },
-          ],
-        },
-      },
-      {
-        slug: 'containers',
-        label: 'Containers',
-        components: ['Card', 'Dialog'],
-        wireframe: {
-          lede: '[ Card · Dialog ]',
-          blocks: [
-            {
-              type: 'placeholder',
-              variant: 'storybook',
-              label: '[ Storybook embed ]',
-            },
-            {
-              type: 'placeholder',
-              label: '[ Composition patterns · slots / children ]',
-            },
-          ],
-        },
-      },
-      {
-        slug: 'navigation',
-        label: 'Navigation',
-        components: ['DropdownMenu'],
-        wireframe: {
-          lede: '[ DropdownMenu · (future) NavigationMenu ]',
-          blocks: [
-            {
-              type: 'placeholder',
-              variant: 'storybook',
-              label: '[ Storybook embed ]',
-            },
-          ],
-        },
-      },
-      {
-        slug: 'display',
-        label: 'Display',
-        components: ['Tooltip'],
-        wireframe: {
-          lede: '[ Tooltip ]',
-          blocks: [
-            {
-              type: 'placeholder',
-              variant: 'storybook',
-              label: '[ Storybook embed ]',
-            },
-          ],
-        },
-      },
-      {
-        slug: 'primitives',
-        label: 'Primitives',
-        components: ['Show / Hide', 'Slot'],
-        wireframe: {
-          lede: '[ Low-level building blocks: Show / Hide · Slot ]',
-          blocks: [
-            {
-              type: 'placeholder',
-              variant: 'code',
-              label: '[ Code — Show / Hide usage ]',
-            },
-            { type: 'placeholder', label: '[ API table ]' },
-          ],
-        },
-      },
       {
         slug: 'accordion',
         label: 'Accordion',

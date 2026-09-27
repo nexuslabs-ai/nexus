@@ -4,8 +4,8 @@
  * Sources:
  *   - `page-registry/` — section and page order, labels, and the
  *     `wireframe` a page renders until its own file lands
- *   - `content/{section}/{slug}.mdx` — MDX pages; a component page (under
- *     `components/`, not a group page) is exactly
+ *   - `content/{section}/{slug}.mdx` — MDX pages; a component page (every
+ *     page under `components/`) is exactly
  *     `<ComponentPage slug="{slug}" />`
  *   - `examples/{slug}/{name}.tsx` — checked against a component page's
  *     registry `examples` order
@@ -13,8 +13,8 @@
  *
  * A page's route is its path on disk, so adding a page means adding a file.
  * Pages the registry does not list are appended to their section in slug
- * order. In `components/`, component pages follow the group pages in label
- * order, wherever the registry lists them. Routes are exactly two levels
+ * order. `components/` is sorted by label, wherever the registry lists a
+ * page. Routes are exactly two levels
  * deep and a slug is one path segment; a file anywhere else fails the
  * generator. Entries prefixed with `_` are skipped, so a page-local island
  * can sit beside the page that uses it.
@@ -117,15 +117,6 @@ function assertOneSourcePerRoute(sources) {
   }
 }
 
-/** Folds a label or a slug to one identity — `DropdownMenu` and `dropdown-menu` both give `dropdownmenu`. */
-function comparisonKey(value) {
-  return value.toLowerCase().replace(/[^a-z0-9]/g, '');
-}
-
-function railLabelsOf(page) {
-  return [...(page.components ?? []), ...(page.nested ?? [])];
-}
-
 const CARD_JOINER = ' · ';
 
 function assertLabelsAvoidTheCardJoiner(section) {
@@ -134,36 +125,6 @@ function assertLabelsAvoidTheCardJoiner(section) {
       throw new Error(
         `${section.slug}/${page.slug} has "${CARD_JOINER}" inside its label, which is what the home page joins a section's page labels with — the card would read the label as several pages. Name the page without it.`
       );
-    }
-  }
-}
-
-function assertComponentsDeclareTheirUnit(section) {
-  if (section.unit === 'components') return;
-  for (const page of section.pages) {
-    if (page.components) {
-      throw new Error(
-        `${section.slug}/${page.slug} lists components, but ${section.slug} is not counted in components — add \`unit: 'components'\` to the section, or move the labels to \`nested\`.`
-      );
-    }
-  }
-}
-
-function assertRailLabelsHaveNoPage(section) {
-  const pageFor = new Map();
-  for (const page of section.pages) {
-    pageFor.set(comparisonKey(page.slug), page.slug);
-    pageFor.set(comparisonKey(page.label), page.slug);
-  }
-
-  for (const page of section.pages) {
-    for (const label of railLabelsOf(page)) {
-      const existing = pageFor.get(comparisonKey(label));
-      if (existing !== undefined) {
-        throw new Error(
-          `${section.slug} lists "${label}" as a rail label under ${page.slug}, but ${section.slug}/${existing} is now a page — drop the rail label.`
-        );
-      }
     }
   }
 }
@@ -185,12 +146,10 @@ function assertComponentPageIsOneLineMdx(docsRoot, kind, file, slug) {
   }
 }
 
-function byGroupThenComponentLabel(entries) {
-  const groups = entries.filter(({ page }) => page.components);
-  const components = entries
-    .filter(({ page }) => !page.components)
-    .sort((a, b) => a.page.label.localeCompare(b.page.label, 'en'));
-  return [...groups, ...components];
+function byLabel(entries) {
+  return entries.toSorted((a, b) =>
+    a.page.label.localeCompare(b.page.label, 'en')
+  );
 }
 
 function demoNamesIn(docsRoot, slug) {
@@ -272,8 +231,6 @@ type ManifestPageBase = {
 };
 
 export type GuideManifestPage = ManifestPageBase & {
-  /** Components this group page covers, listed under it in the left rail. */
-  components?: readonly string[];
   /** Non-interactive headings listed under this page in the left rail. */
   nested?: readonly string[];
   examples?: never;
@@ -294,7 +251,6 @@ export type GuideManifestPage = ManifestPageBase & {
 export type ComponentManifestPage = ManifestPageBase & {
   /** Example demo names the page shows first, in this order. */
   examples: readonly string[];
-  components?: never;
   nested?: never;
   kind: 'mdx';
   /** Source file relative to \`apps/docs\`; the module is \`PAGE_LOADERS[route]\`. */
@@ -415,16 +371,12 @@ export async function buildPageManifest(docsRoot, formatOptions) {
       slug,
       label: entry?.label ?? humanize(slug),
     };
-    if (entry?.components?.length) {
-      base.components = entry.components;
-    }
     if (entry?.nested?.length) {
       base.nested = entry.nested;
     }
 
     const source = sources.find((candidate) => candidate.pages.has(key));
-    const isComponentPage =
-      sectionSlug === COMPONENTS_SECTION && !entry?.components?.length;
+    const isComponentPage = sectionSlug === COMPONENTS_SECTION;
     const rendersExamples = isComponentPage && source !== undefined;
     if (entry?.examples?.length && !rendersExamples) {
       throw new Error(
@@ -467,9 +419,7 @@ export async function buildPageManifest(docsRoot, formatOptions) {
     const entries = orderedSlugs(sectionSlug).map((slug) =>
       buildPage(sectionSlug, slug)
     );
-    return sectionSlug === COMPONENTS_SECTION
-      ? byGroupThenComponentLabel(entries)
-      : entries;
+    return sectionSlug === COMPONENTS_SECTION ? byLabel(entries) : entries;
   }
 
   /** Sections that exist only on disk, appended after the registry's own. */
@@ -495,8 +445,6 @@ export async function buildPageManifest(docsRoot, formatOptions) {
     pages: section.entries.map((entry) => entry.page),
   }));
   manifest.forEach(assertLabelsAvoidTheCardJoiner);
-  manifest.forEach(assertComponentsDeclareTheirUnit);
-  manifest.forEach(assertRailLabelsHaveNoPage);
 
   const entries = built.flatMap((section) => section.entries);
   const loaders = [];
