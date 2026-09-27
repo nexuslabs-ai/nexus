@@ -3,10 +3,17 @@ import { loadDependencies } from '../_lib/dependencies';
 import { CodeBlock } from './CodeBlock';
 import { CodeSample } from './CodeSample';
 
-export async function InstallBlock({ slug }: { slug: string }) {
-  const { install, copy, files, styles } = await loadDependencies(slug);
-  const packages = install.map(({ name, range }) => `${name}@${range}`);
-  const toCopy = [...copy, ...files];
+export async function InstallBlock({ slugs }: { slugs: readonly string[] }) {
+  const blocks = await Promise.all(slugs.map(loadDependencies));
+  const packages = unique(
+    blocks.flatMap(({ install }) =>
+      install.map(({ name, range }) => `${name}@${range}`)
+    )
+  );
+  const toCopy = unique(
+    blocks.flatMap(({ copy, files }) => [...copy, ...files])
+  );
+  const styles = unique(blocks.flatMap((block) => block.styles));
 
   return (
     <>
@@ -28,4 +35,8 @@ export async function InstallBlock({ slug }: { slug: string }) {
       )}
     </>
   );
+}
+
+function unique(items: string[]) {
+  return [...new Set(items)];
 }

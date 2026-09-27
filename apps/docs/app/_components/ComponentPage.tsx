@@ -40,6 +40,13 @@ export function ComponentPage({ slug }: { slug: string }) {
   }
 
   const examples = examplesFor(slug, page.examples);
+  const installSlugs = [
+    ...new Set(
+      [previewId, ...examples.map(({ id }) => id)].flatMap(
+        (id) => demos[id].installSlugs
+      )
+    ),
+  ];
 
   return (
     <>
@@ -49,7 +56,7 @@ export function ComponentPage({ slug }: { slug: string }) {
       <SectionHeading className={SECTION_HEADING_CLASS}>
         Installation
       </SectionHeading>
-      <InstallBlock slug={slug} />
+      <InstallBlock slugs={installSlugs} />
 
       <SectionHeading className={SECTION_HEADING_CLASS}>Code</SectionHeading>
       <ComponentSource id={previewId} />

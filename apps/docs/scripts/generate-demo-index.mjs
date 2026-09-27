@@ -42,6 +42,8 @@ import type { ComponentType } from 'react';
 export interface Demo {
   /** Path under apps/docs/examples/ without the .tsx extension. */
   id: string;
+  /** The install blocks the demo pastes beside, its folder's own first. */
+  installSlugs: readonly string[];
   /** Loads the demo's component and its own source text together. */
   load: () => Promise<{ Component: ComponentType; source: string }>;
 }
@@ -68,6 +70,7 @@ export function getDemo(id: string): Demo {
  * @typedef {object} DemoFile
  * @property {string} id Path under examples/ without the .tsx extension.
  * @property {string} source The demo file's full contents.
+ * @property {string[]} installSlugs The install blocks the demo pastes beside.
  */
 
 function walk(dir) {
@@ -164,23 +167,16 @@ function readInstallBlocks() {
 }
 
 /**
- * A component's demos paste beside its own install block. A folder with no
- * block of its own, like `getting-started`, pastes beside the block of every
- * component it imports.
+ * A demo pastes beside its folder's install block, when the folder has one,
+ * plus the block of every component it imports.
  */
 function installSlugsFor(id, specifiers, blocks) {
   const folder = id.split('/')[0];
-  if (blocks.has(folder)) {
-    return [folder];
-  }
-
-  const slugs = [
-    ...new Set(
-      specifiers
-        .map((specifier) => specifier.match(COMPONENT_IMPORT)?.[1])
-        .filter(Boolean)
-    ),
-  ];
+  const own = blocks.has(folder) ? [folder] : [];
+  const imported = specifiers
+    .map((specifier) => specifier.match(COMPONENT_IMPORT)?.[1])
+    .filter(Boolean);
+  const slugs = [...new Set([...own, ...imported])];
   if (slugs.length === 0) {
     throw new Error(
       `Demo ${id} imports no @/components/, and ${folder} has no install block of its own, so there is nothing to paste it beside. Import the component it demonstrates, or move it to examples/{slug}/.`
@@ -196,9 +192,7 @@ function installSlugsFor(id, specifiers, blocks) {
   return slugs;
 }
 
-function assertImportsInstalled(id, source, blocks) {
-  const specifiers = importSpecifiers(source);
-  const slugs = installSlugsFor(id, specifiers, blocks);
+function checkDemoImports(id, specifiers, slugs, blocks) {
   const packages = new Set(
     slugs.flatMap((slug) => [...blocks.get(slug).packages])
   );
@@ -256,9 +250,11 @@ function collectDemos() {
         );
       }
       const source = readCanonical(file);
-      assertImportsInstalled(id, source, installBlocks);
+      const specifiers = importSpecifiers(source);
+      const installSlugs = installSlugsFor(id, specifiers, installBlocks);
+      checkDemoImports(id, specifiers, installSlugs, installBlocks);
 
-      return { id, source };
+      return { id, source, installSlugs };
     })
     .sort((a, b) => (a.id < b.id ? -1 : a.id > b.id ? 1 : 0));
 }
@@ -292,6 +288,7 @@ function renderDemoIndex(demos) {
       [
         `  ${JSON.stringify(demo.id)}: {`,
         `    id: ${JSON.stringify(demo.id)},`,
+        `    installSlugs: ${JSON.stringify(demo.installSlugs)},`,
         `    load: () => import(${JSON.stringify(`./${MODULES_DIR}/${demo.id}`)}),`,
         `  },`,
       ].join('\n')

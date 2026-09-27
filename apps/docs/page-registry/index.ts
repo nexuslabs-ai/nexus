@@ -263,6 +263,11 @@ export const PAGE_REGISTRY = {
         label: 'Button',
         examples: ['variants', 'sizes', 'with-icon', 'disabled'],
       },
+      {
+        slug: 'checkbox',
+        label: 'Checkbox',
+        examples: ['checked', 'indeterminate', 'disabled'],
+      },
     ],
   },
   theming: {
