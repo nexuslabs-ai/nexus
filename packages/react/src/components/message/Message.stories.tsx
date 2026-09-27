@@ -1,3 +1,5 @@
+import * as React from 'react';
+
 import type { Meta, StoryObj } from '@storybook/react';
 import { CopyIcon, FileTextIcon, RefreshCcwIcon } from 'lucide-react';
 import { expect, userEvent, waitFor, within } from 'storybook/test';
@@ -288,14 +290,10 @@ export const AvatarAlignmentMatrix: Story = {
 const typingDotClassName =
   'nx:size-1.5 nx:animate-bounce nx:rounded-full nx:bg-muted-foreground';
 
-/**
- * A received turn followed by the sender's typing indicator. Typing is
- * transient status, not history, so it sits in a `role="status"` beside the
- * log rather than inside it. The dots are decorative; the footer carries the
- * same state as real text.
- */
-export const TypingIndicator: Story = {
-  render: () => (
+function TypingIndicatorExample() {
+  const [typing, setTyping] = React.useState(false);
+
+  return (
     <div className={cn(column, 'nx:flex nx:flex-col nx:gap-4')}>
       <MessageGroup announce>
         <Message>
@@ -314,42 +312,68 @@ export const TypingIndicator: Story = {
         </Message>
       </MessageGroup>
       <div role="status">
-        <Message>
-          <MessageAvatar placeholder />
-          <MessageContent>
-            <Bubble>
-              <BubbleContent>
-                <span
-                  aria-hidden="true"
-                  className="nx:flex nx:items-center nx:gap-1 nx:py-1"
-                >
-                  <span className={typingDotClassName} />
+        {typing && (
+          <Message>
+            <MessageAvatar placeholder />
+            <MessageContent>
+              <Bubble>
+                <BubbleContent>
                   <span
-                    className={cn(
-                      typingDotClassName,
-                      'nx:[animation-delay:150ms]'
-                    )}
-                  />
-                  <span
-                    className={cn(
-                      typingDotClassName,
-                      'nx:[animation-delay:300ms]'
-                    )}
-                  />
-                </span>
-              </BubbleContent>
-            </Bubble>
-            <MessageFooter>Ana Bianchi is typing&hellip;</MessageFooter>
-          </MessageContent>
-        </Message>
+                    aria-hidden="true"
+                    className="nx:flex nx:items-center nx:gap-1 nx:py-1"
+                  >
+                    <span className={typingDotClassName} />
+                    <span
+                      className={cn(
+                        typingDotClassName,
+                        'nx:[animation-delay:150ms]'
+                      )}
+                    />
+                    <span
+                      className={cn(
+                        typingDotClassName,
+                        'nx:[animation-delay:300ms]'
+                      )}
+                    />
+                  </span>
+                </BubbleContent>
+              </Bubble>
+              <MessageFooter>Ana Bianchi is typing&hellip;</MessageFooter>
+            </MessageContent>
+          </Message>
+        )}
       </div>
+      <Button
+        variant="outline"
+        className="nx:self-start"
+        onClick={() => setTyping((current) => !current)}
+      >
+        {typing ? 'Stop typing' : 'Start typing'}
+      </Button>
     </div>
-  ),
+  );
+}
+
+/**
+ * A received turn followed by the sender's typing indicator. Typing is
+ * transient status, not history, so it sits in a `role="status"` beside the
+ * log rather than inside it. A live region announces only changes made after
+ * it mounts, so the region stays mounted and empty, and only its children
+ * toggle. The dots are decorative; the footer carries the same state as real
+ * text.
+ */
+export const TypingIndicator: Story = {
+  render: () => <TypingIndicatorExample />,
   play: async ({ canvasElement }) => {
     const canvas = within(canvasElement);
     const log = canvas.getByRole('log');
     const status = canvas.getByRole('status');
 
+    await expect(status).toBeEmptyDOMElement();
+
+    await userEvent.click(canvas.getByRole('button', { name: 'Start typing' }));
+
+    await expect(canvas.getByRole('status')).toBe(status);
     await expect(
       within(status).getByText(/Ana Bianchi is typing/)
     ).toBeVisible();
@@ -374,6 +398,11 @@ export const TypingIndicator: Story = {
     for (const dot of dots) {
       await expect(getComputedStyle(dot).animationName).not.toBe('none');
     }
+
+    await userEvent.click(canvas.getByRole('button', { name: 'Stop typing' }));
+
+    await expect(canvas.getByRole('status')).toBe(status);
+    await expect(status).toBeEmptyDOMElement();
   },
 };
 
@@ -403,6 +432,49 @@ export const Announced: Story = {
 
     await expect(group).toHaveAttribute('role', 'log');
     await expect(group).not.toHaveAttribute('aria-relevant');
+  },
+};
+
+/**
+ * A reply still streaming into an announced group. The streaming turn carries
+ * `aria-busy` until the reply finishes, so assistive tech waits for the whole
+ * reply instead of reading out every chunk.
+ */
+export const Streaming: Story = {
+  render: () => (
+    <MessageGroup announce className={column}>
+      <Message align="end">
+        <MessageContent>
+          <Bubble>
+            <BubbleContent>Why did the nightly build fail?</BubbleContent>
+          </Bubble>
+          <MessageFooter>09:24</MessageFooter>
+        </MessageContent>
+      </Message>
+      <Message aria-busy="true">
+        <MessageAvatar>
+          <AvatarFallback>AI</AvatarFallback>
+        </MessageAvatar>
+        <MessageContent>
+          <MessageHeader>Assistant</MessageHeader>
+          <Bubble>
+            <BubbleContent>
+              The integration suite timed out waiting for
+            </BubbleContent>
+          </Bubble>
+        </MessageContent>
+      </Message>
+    </MessageGroup>
+  ),
+  play: async ({ canvasElement }) => {
+    const log = within(canvasElement).getByRole('log');
+    const turns = log.querySelectorAll<HTMLElement>(
+      ':scope > [data-slot="message"]'
+    );
+
+    await expect(turns).toHaveLength(2);
+    await expect(turns[0]).not.toHaveAttribute('aria-busy');
+    await expect(turns[1]).toHaveAttribute('aria-busy', 'true');
   },
 };
 
