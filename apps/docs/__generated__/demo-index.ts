@@ -67,6 +67,42 @@ export const demos = {
     id: "aspect-ratio/ratios",
     load: () => import("./demos/aspect-ratio/ratios"),
   },
+  "attachment/demo": {
+    id: "attachment/demo",
+    load: () => import("./demos/attachment/demo"),
+  },
+  "attachment/group": {
+    id: "attachment/group",
+    load: () => import("./demos/attachment/group"),
+  },
+  "attachment/sizes": {
+    id: "attachment/sizes",
+    load: () => import("./demos/attachment/sizes"),
+  },
+  "attachment/states": {
+    id: "attachment/states",
+    load: () => import("./demos/attachment/states"),
+  },
+  "avatar/demo": {
+    id: "avatar/demo",
+    load: () => import("./demos/avatar/demo"),
+  },
+  "avatar/group": {
+    id: "avatar/group",
+    load: () => import("./demos/avatar/group"),
+  },
+  "avatar/shapes": {
+    id: "avatar/shapes",
+    load: () => import("./demos/avatar/shapes"),
+  },
+  "avatar/sizes": {
+    id: "avatar/sizes",
+    load: () => import("./demos/avatar/sizes"),
+  },
+  "avatar/with-status": {
+    id: "avatar/with-status",
+    load: () => import("./demos/avatar/with-status"),
+  },
   "badge/demo": {
     id: "badge/demo",
     load: () => import("./demos/badge/demo"),
@@ -86,6 +122,34 @@ export const demos = {
   "badge/with-icon": {
     id: "badge/with-icon",
     load: () => import("./demos/badge/with-icon"),
+  },
+  "breadcrumb/demo": {
+    id: "breadcrumb/demo",
+    load: () => import("./demos/breadcrumb/demo"),
+  },
+  "breadcrumb/with-ellipsis": {
+    id: "breadcrumb/with-ellipsis",
+    load: () => import("./demos/breadcrumb/with-ellipsis"),
+  },
+  "breadcrumb/with-icons": {
+    id: "breadcrumb/with-icons",
+    load: () => import("./demos/breadcrumb/with-icons"),
+  },
+  "breadcrumb/with-menu": {
+    id: "breadcrumb/with-menu",
+    load: () => import("./demos/breadcrumb/with-menu"),
+  },
+  "bubble/demo": {
+    id: "bubble/demo",
+    load: () => import("./demos/bubble/demo"),
+  },
+  "bubble/variants": {
+    id: "bubble/variants",
+    load: () => import("./demos/bubble/variants"),
+  },
+  "bubble/with-reactions": {
+    id: "bubble/with-reactions",
+    load: () => import("./demos/bubble/with-reactions"),
   },
   "button/demo": {
     id: "button/demo",

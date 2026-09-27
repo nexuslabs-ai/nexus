@@ -217,7 +217,7 @@ export const PAGE_REGISTRY = {
         label: 'Navigation',
         components: ['DropdownMenu'],
         wireframe: {
-          lede: '[ DropdownMenu · (future) NavigationMenu · Breadcrumbs ]',
+          lede: '[ DropdownMenu · (future) NavigationMenu ]',
           blocks: [
             {
               type: 'placeholder',
@@ -230,9 +230,9 @@ export const PAGE_REGISTRY = {
       {
         slug: 'display',
         label: 'Display',
-        components: ['Avatar', 'Tooltip'],
+        components: ['Tooltip'],
         wireframe: {
-          lede: '[ Avatar · Tooltip ]',
+          lede: '[ Tooltip ]',
           blocks: [
             {
               type: 'placeholder',
@@ -279,9 +279,29 @@ export const PAGE_REGISTRY = {
         examples: ['ratios'],
       },
       {
+        slug: 'attachment',
+        label: 'Attachment',
+        examples: ['states', 'sizes', 'group'],
+      },
+      {
+        slug: 'avatar',
+        label: 'Avatar',
+        examples: ['sizes', 'shapes', 'with-status', 'group'],
+      },
+      {
         slug: 'badge',
         label: 'Badge',
         examples: ['variants', 'fills', 'with-icon', 'icon-only'],
+      },
+      {
+        slug: 'breadcrumb',
+        label: 'Breadcrumb',
+        examples: ['with-ellipsis', 'with-icons', 'with-menu'],
+      },
+      {
+        slug: 'bubble',
+        label: 'Bubble',
+        examples: ['variants', 'with-reactions'],
       },
       {
         slug: 'button',

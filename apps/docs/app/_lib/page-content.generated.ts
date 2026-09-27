@@ -37,7 +37,13 @@ export const PAGE_LOADERS: Record<string, ManifestPageLoader> = {
     import('../../content/components/alert-dialog.mdx'),
   '/components/aspect-ratio': () =>
     import('../../content/components/aspect-ratio.mdx'),
+  '/components/attachment': () =>
+    import('../../content/components/attachment.mdx'),
+  '/components/avatar': () => import('../../content/components/avatar.mdx'),
   '/components/badge': () => import('../../content/components/badge.mdx'),
+  '/components/breadcrumb': () =>
+    import('../../content/components/breadcrumb.mdx'),
+  '/components/bubble': () => import('../../content/components/bubble.mdx'),
   '/components/button': () => import('../../content/components/button.mdx'),
   '/theming/appearance': () => import('../../content/theming/appearance.mdx'),
   '/theming/multi-brand': () => import('../_pages/theming/multi-brand'),
@@ -130,7 +136,7 @@ export const PAGE_WIREFRAMES: Record<string, PageWireframe> = {
     ],
   },
   '/components/navigation': {
-    lede: '[ DropdownMenu · (future) NavigationMenu · Breadcrumbs ]',
+    lede: '[ DropdownMenu · (future) NavigationMenu ]',
     blocks: [
       {
         type: 'placeholder',
@@ -140,7 +146,7 @@ export const PAGE_WIREFRAMES: Record<string, PageWireframe> = {
     ],
   },
   '/components/display': {
-    lede: '[ Avatar · Tooltip ]',
+    lede: '[ Tooltip ]',
     blocks: [
       {
         type: 'placeholder',
