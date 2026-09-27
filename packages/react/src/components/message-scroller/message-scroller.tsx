@@ -52,13 +52,6 @@ function useMessageScroller() {
 }
 
 /**
- * Fades the transcript into whichever edge still hides content, so a turn never
- * hard-cuts at the frame or collides with the floating jump button.
- */
-const edgeFadeClassName =
-  'nx:[--edge-fade-start:0px] nx:[--edge-fade-end:0px] nx:group-data-[at-start=false]/message-scroller:[--edge-fade-start:2rem] nx:group-data-[at-end=false]/message-scroller:[--edge-fade-end:2rem] nx:[--edge-fade:linear-gradient(to_bottom,transparent,black_var(--edge-fade-start),black_calc(100%_-_var(--edge-fade-end)),transparent)] nx:[mask-image:var(--edge-fade)]';
-
-/**
  * MessageScrollerProps
  *
  * Props for the MessageScroller component.
@@ -101,36 +94,42 @@ function MessageScroller({
 }: MessageScrollerProps) {
   const viewportRef = React.useRef<HTMLDivElement | null>(null);
   const contentRef = React.useRef<HTMLDivElement | null>(null);
-  const atEndRef = React.useRef(true);
+  const pinnedRef = React.useRef(true);
 
   const [isScrollable, setIsScrollable] = React.useState(false);
   const [isAtEnd, setIsAtEnd] = React.useState(true);
   const [isAtStart, setIsAtStart] = React.useState(true);
 
-  // Sync with the viewport's scroll geometry — an external system, so an effect
-  // is the right tool. One subscription covers both the user scrolling and the
-  // content growing underneath them.
   React.useEffect(() => {
     const viewport = viewportRef.current;
     const content = contentRef.current;
 
     if (!viewport || !content) return;
 
-    const measure = () => {
-      const remaining =
-        viewport.scrollHeight - viewport.scrollTop - viewport.clientHeight;
-      const atEnd = remaining <= EDGE_THRESHOLD;
+    let lastScrollTop = 0;
 
-      atEndRef.current = atEnd;
-      setIsAtEnd(atEnd);
+    const isNearEnd = () =>
+      viewport.scrollHeight - viewport.scrollTop - viewport.clientHeight <=
+      EDGE_THRESHOLD;
+
+    const measure = () => {
+      lastScrollTop = viewport.scrollTop;
+      setIsAtEnd(isNearEnd());
       setIsAtStart(viewport.scrollTop <= EDGE_THRESHOLD);
       setIsScrollable(viewport.scrollHeight - viewport.clientHeight > 1);
     };
 
-    // Reading the ref rather than state keeps the pin decision current without
-    // resubscribing on every scroll.
+    // A scroll event can be dispatched after content has already grown, so it
+    // would measure the old position against the new height. Only an upward
+    // move releases the pin; reaching the end restores it.
+    const handleScroll = () => {
+      if (viewport.scrollTop < lastScrollTop) pinnedRef.current = false;
+      if (isNearEnd()) pinnedRef.current = true;
+      measure();
+    };
+
     const holdEnd = () => {
-      if (atEndRef.current) {
+      if (pinnedRef.current) {
         viewport.scrollTo({ top: viewport.scrollHeight, behavior: 'instant' });
       }
       measure();
@@ -138,30 +137,27 @@ function MessageScroller({
 
     const observer = new ResizeObserver(holdEnd);
 
-    // Open on the newest turn. This has to precede the first measure, or the
-    // stream reads as scrolled-away on mount and the observer then refuses to
-    // hold the end.
+    // Open on the newest turn.
     viewport.scrollTo({ top: viewport.scrollHeight, behavior: 'instant' });
     measure();
-    viewport.addEventListener('scroll', measure, { passive: true });
+    viewport.addEventListener('scroll', handleScroll, { passive: true });
     observer.observe(content);
     observer.observe(viewport);
 
     return () => {
-      viewport.removeEventListener('scroll', measure);
+      viewport.removeEventListener('scroll', handleScroll);
       observer.disconnect();
     };
   }, []);
 
-  const scrollTo = React.useCallback((top: number) => {
-    viewportRef.current?.scrollTo({ top });
+  const scrollToEnd = React.useCallback(() => {
+    const viewport = viewportRef.current;
+    viewport?.scrollTo({ top: viewport.scrollHeight });
   }, []);
 
-  const scrollToEnd = React.useCallback(() => {
-    scrollTo(viewportRef.current?.scrollHeight ?? 0);
-  }, [scrollTo]);
-
-  const scrollToStart = React.useCallback(() => scrollTo(0), [scrollTo]);
+  const scrollToStart = React.useCallback(() => {
+    viewportRef.current?.scrollTo({ top: 0 });
+  }, []);
 
   const value = React.useMemo(
     () => ({
@@ -183,7 +179,7 @@ function MessageScroller({
         data-at-start={isAtStart}
         data-at-end={isAtEnd}
         className={cn(
-          'nx:group/message-scroller nx:relative nx:flex nx:min-h-0 nx:w-full nx:flex-col nx:overflow-hidden',
+          'nx:relative nx:flex nx:min-h-0 nx:w-full nx:flex-col nx:overflow-hidden',
           className
         )}
         {...props}
@@ -217,7 +213,7 @@ function MessageScrollerViewport({
   className,
   ...props
 }: MessageScrollerViewportProps) {
-  const { viewportRef } = useMessageScroller();
+  const { viewportRef, isAtStart, isAtEnd } = useMessageScroller();
 
   return (
     <ScrollAreaPrimitive.Viewport
@@ -225,8 +221,9 @@ function MessageScrollerViewport({
       data-slot="message-scroller-viewport"
       tabIndex={0}
       className={cn(
-        'nx:size-full nx:min-h-0 nx:min-w-0 nx:overscroll-contain nx:scroll-smooth nx:rounded-[inherit] nx:[&>div]:h-full nx:focus-visible:outline-2 nx:focus-visible:outline-focus-default',
-        edgeFadeClassName,
+        'nx:size-full nx:min-h-0 nx:min-w-0 nx:overscroll-contain nx:scroll-smooth nx:rounded-[inherit] nx:*:h-full nx:focus-visible:outline-2 nx:focus-visible:outline-focus-default',
+        !isAtStart && 'nx:mask-t-from-90%',
+        !isAtEnd && 'nx:mask-b-from-90%',
         className
       )}
       {...props}
@@ -294,12 +291,12 @@ function MessageScrollerItem({
 }
 
 const messageScrollerButtonVariants = cva(
-  'nx:absolute nx:inset-x-0 nx:z-sticky nx:mx-auto nx:rounded-full nx:transition-[opacity,translate] nx:duration-fast nx:ease-enter nx:[&_svg]:size-4 nx:data-[active=false]:pointer-events-none nx:data-[active=false]:opacity-0',
+  'nx:absolute nx:inset-x-0 nx:z-sticky nx:mx-auto nx:rounded-full nx:transition-[color,background-color,border-color,scale,opacity] nx:duration-fast nx:ease-enter nx:[&_svg]:size-4 nx:data-[active=false]:opacity-0',
   {
     variants: {
       direction: {
-        start: 'nx:top-4 nx:data-[active=false]:-translate-y-1',
-        end: 'nx:bottom-4 nx:data-[active=false]:translate-y-1',
+        start: 'nx:top-4',
+        end: 'nx:bottom-4',
       },
     },
     defaultVariants: {
@@ -357,8 +354,7 @@ function MessageScrollerButton({
           ? 'Scroll to the latest message'
           : 'Scroll to the oldest message'
       }
-      aria-hidden={isActive ? undefined : true}
-      tabIndex={isActive ? undefined : -1}
+      inert={!isActive}
       variant={variant}
       size={size}
       onClick={direction === 'end' ? scrollToEnd : scrollToStart}

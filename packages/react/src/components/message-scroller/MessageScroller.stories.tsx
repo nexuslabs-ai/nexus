@@ -93,6 +93,11 @@ const viewportOf = (canvasElement: HTMLElement) =>
     '[data-slot="message-scroller-viewport"]'
   )!;
 
+const buttonOf = (canvasElement: HTMLElement) =>
+  canvasElement.querySelector<HTMLElement>(
+    '[data-slot="message-scroller-button"]'
+  )!;
+
 const atEnd = (viewport: HTMLElement) =>
   viewport.scrollHeight - viewport.scrollTop - viewport.clientHeight <= 24;
 
@@ -177,8 +182,8 @@ export const ScrolledAway: Story = {
 
     const name = 'Scroll to the latest message';
 
-    // Inactive: out of the tab order and out of the a11y tree.
-    await expect(canvas.queryByRole('button', { name })).toBeNull();
+    // Inactive: out of the tab order, the a11y tree, and pointer hit-testing.
+    await expect(buttonOf(canvasElement)).toHaveAttribute('inert');
 
     viewport.scrollTo({ top: 0, behavior: 'instant' });
 
@@ -190,8 +195,7 @@ export const ScrolledAway: Story = {
     });
 
     const button = canvas.getByRole('button', { name });
-    await expect(button).not.toHaveAttribute('aria-hidden');
-    await expect(button).not.toHaveAttribute('tabindex', '-1');
+    await expect(button).not.toHaveAttribute('inert');
 
     // The affordance is a circle, not a pill: a width utility on the root
     // would collapse the icon box onto its glyph.
@@ -209,7 +213,7 @@ export const ScrolledAway: Story = {
 
     // Back at the end, the affordance stands down again.
     await waitFor(async () => {
-      await expect(canvas.queryByRole('button', { name })).toBeNull();
+      await expect(buttonOf(canvasElement)).toHaveAttribute('inert');
     });
   },
 };
@@ -420,13 +424,13 @@ export const WithDataAttributes: Story = {
       await expect(root.querySelector(`[data-slot="${slot}"]`)).not.toBeNull();
     }
 
-    const button = root.querySelector<HTMLElement>(
-      '[data-slot="message-scroller-button"]'
-    )!;
-    await expect(button).toHaveAttribute('data-direction', 'end');
+    await expect(buttonOf(canvasElement)).toHaveAttribute(
+      'data-direction',
+      'end'
+    );
 
-    // The edge fade keys off these, so they carry both states rather than
-    // only marking the true one.
+    // Both states are emitted, not only the true one, so consumers can style
+    // either edge.
     await expect(root).toHaveAttribute('data-at-end', 'true');
     await expect(root).toHaveAttribute('data-at-start', 'false');
   },
