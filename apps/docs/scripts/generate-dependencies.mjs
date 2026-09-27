@@ -10,6 +10,14 @@ import path from 'node:path';
 import ts from 'typescript';
 
 import {
+  ALWAYS_INSTALLED,
+  COPIED_PREFIX,
+  DEMO_EXTENSION,
+  importSpecifiers,
+  isDemoName,
+  packageName,
+} from './examples.mjs';
+import {
   collectSourceFiles,
   componentSlugs,
   isModuleSource,
@@ -25,6 +33,7 @@ import {
 } from './roots.mjs';
 
 const outputDir = path.join(docsRoot, 'generated', 'dependencies');
+const examplesRoot = path.join(docsRoot, 'examples');
 
 function readManifest(packageDir) {
   return JSON.parse(
@@ -39,6 +48,7 @@ const runtimeRanges = new Map(
     ...reactManifest.dependencies,
   })
 );
+const docsDependencies = readManifest(docsRoot).dependencies;
 const reactTsconfig = path.join(reactRoot, 'tsconfig.json');
 const compilerOptions = ts.parseJsonConfigFileContent(
   ts.readConfigFile(reactTsconfig, ts.sys.readFile).config,
@@ -56,12 +66,6 @@ function publishedRange(name) {
   if (spec === '*') return version;
   if (spec === '^' || spec === '~') return `${spec}${version}`;
   return spec;
-}
-
-function packageName(specifier) {
-  const segments = specifier.split('/');
-  if (specifier.startsWith('@')) return segments.slice(0, 2).join('/');
-  return segments[0];
 }
 
 function toInstall(name) {
@@ -140,6 +144,45 @@ function colocatedStyles(files) {
   );
 }
 
+/** Packages the demos in `examples/{slug}/` import beyond the component's own. */
+function examplePackages(slug, componentPackages) {
+  const slugExamples = path.join(examplesRoot, slug);
+  if (!statSync(slugExamples, { throwIfNoEntry: false })?.isDirectory()) {
+    return [];
+  }
+
+  const names = readdirSync(slugExamples)
+    .filter((name) => name.endsWith(DEMO_EXTENSION) && isDemoName(name))
+    .flatMap((name) =>
+      importSpecifiers(readFileSync(path.join(slugExamples, name), 'utf8'))
+    )
+    .filter(
+      (specifier) =>
+        !specifier.startsWith('.') && !specifier.startsWith(COPIED_PREFIX)
+    )
+    .map(packageName);
+
+  return [...new Set(names)]
+    .filter(
+      (name) => !ALWAYS_INSTALLED.has(name) && !componentPackages.includes(name)
+    )
+    .sort()
+    .map((name) => {
+      const range = docsDependencies[name];
+      if (!range) {
+        throw new Error(
+          `dependencies JSON: examples/${slug}/ imports ${name}, which is not in apps/docs/package.json dependencies.`
+        );
+      }
+      if (range.startsWith('workspace:')) {
+        throw new Error(
+          `dependencies JSON: examples/${slug}/ imports workspace package ${name} — import Nexus code through @/ instead.`
+        );
+      }
+      return { name, range };
+    });
+}
+
 function walkSlug(slug) {
   const slugDir = path.join(componentsRoot, slug);
   const roots = collectSourceFiles(slugDir, isModuleSource);
@@ -147,11 +190,15 @@ function walkSlug(slug) {
 
   const walked = walk(roots);
   const needed = new Set([...walked.files, ...colocatedStyles(walked.files)]);
+  const packages = walked.packages.filter(
+    (name) => !ALWAYS_INSTALLED.has(name)
+  );
 
   return {
     slug,
     slugDir,
-    packages: walked.packages.filter((name) => name !== 'react'),
+    packages,
+    examples: examplePackages(slug, packages),
     files: [...needed],
   };
 }
@@ -173,10 +220,11 @@ function assertDeclaredPackages(walks) {
   );
 }
 
-function toEntry({ slug, slugDir, packages, files }) {
+function toEntry({ slug, slugDir, packages, examples, files }) {
   return {
     slug,
     install: packages.sort().map(toInstall),
+    examples,
     copy: files
       .filter((file) => !isUnder(file, slugDir))
       .map(toSrcPath)
