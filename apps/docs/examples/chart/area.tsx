@@ -24,14 +24,43 @@ const config = {
   desktop: {
     label: 'Desktop',
     color: 'var(--nx-color-chart-categorical-1)',
+    icon: DesktopSwatch,
   },
   mobile: {
     label: 'Mobile',
     color: 'var(--nx-color-chart-categorical-2)',
+    icon: MobileSwatch,
   },
 } satisfies ChartConfig;
 
 const shortMonth = (value: string) => value.slice(0, 3);
+
+function AreaSwatch({ color, dashed }: { color: string; dashed?: boolean }) {
+  return (
+    <svg viewBox="0 0 12 12" aria-hidden="true">
+      <rect
+        x={1}
+        y={1}
+        width={10}
+        height={10}
+        rx={2}
+        fill={color}
+        fillOpacity={0.4}
+        stroke={color}
+        strokeWidth={1.5}
+        strokeDasharray={dashed ? '3 2' : undefined}
+      />
+    </svg>
+  );
+}
+
+function DesktopSwatch() {
+  return <AreaSwatch color="var(--color-desktop)" />;
+}
+
+function MobileSwatch() {
+  return <AreaSwatch color="var(--color-mobile)" dashed />;
+}
 
 export default function ChartArea() {
   return (
@@ -45,7 +74,7 @@ export default function ChartArea() {
           tickMargin={8}
           tickFormatter={shortMonth}
         />
-        <ChartTooltip content={<ChartTooltipContent indicator="dot" />} />
+        <ChartTooltip content={<ChartTooltipContent />} />
         <ChartLegend content={<ChartLegendContent />} />
         <Area
           dataKey="desktop"

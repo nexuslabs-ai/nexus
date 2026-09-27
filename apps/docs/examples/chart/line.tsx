@@ -24,14 +24,40 @@ const config = {
   desktop: {
     label: 'Desktop',
     color: 'var(--nx-color-chart-categorical-1)',
+    icon: DesktopSwatch,
   },
   mobile: {
     label: 'Mobile',
     color: 'var(--nx-color-chart-categorical-2)',
+    icon: MobileSwatch,
   },
 } satisfies ChartConfig;
 
 const shortMonth = (value: string) => value.slice(0, 3);
+
+function LineSwatch({ color, dashed }: { color: string; dashed?: boolean }) {
+  return (
+    <svg viewBox="0 0 12 12" aria-hidden="true">
+      <line
+        x1={0}
+        y1={6}
+        x2={12}
+        y2={6}
+        stroke={color}
+        strokeWidth={2}
+        strokeDasharray={dashed ? '3 2' : undefined}
+      />
+    </svg>
+  );
+}
+
+function DesktopSwatch() {
+  return <LineSwatch color="var(--color-desktop)" />;
+}
+
+function MobileSwatch() {
+  return <LineSwatch color="var(--color-mobile)" dashed />;
+}
 
 export default function ChartLine() {
   return (
@@ -45,7 +71,7 @@ export default function ChartLine() {
           tickMargin={8}
           tickFormatter={shortMonth}
         />
-        <ChartTooltip content={<ChartTooltipContent indicator="line" />} />
+        <ChartTooltip content={<ChartTooltipContent />} />
         <ChartLegend content={<ChartLegendContent />} />
         <Line
           dataKey="desktop"

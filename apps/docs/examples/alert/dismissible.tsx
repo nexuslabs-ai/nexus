@@ -1,6 +1,7 @@
 'use client';
 
-import { useState } from 'react';
+import { useRef, useState } from 'react';
+import { flushSync } from 'react-dom';
 
 import { IconCircleCheck } from '@tabler/icons-react';
 
@@ -17,10 +18,22 @@ import { Button } from '@/components/button/button';
 
 export default function AlertDismissible() {
   const [open, setOpen] = useState(true);
+  const showRef = useRef<HTMLButtonElement>(null);
+  const closeRef = useRef<HTMLButtonElement>(null);
+
+  function dismiss() {
+    flushSync(() => setOpen(false));
+    showRef.current?.focus();
+  }
+
+  function show() {
+    flushSync(() => setOpen(true));
+    closeRef.current?.focus();
+  }
 
   if (!open) {
     return (
-      <Button variant="outline" onClick={() => setOpen(true)}>
+      <Button ref={showRef} variant="outline" onClick={show}>
         Show alert
       </Button>
     );
@@ -39,7 +52,7 @@ export default function AlertDismissible() {
       </AlertContent>
       <AlertActions>
         <Button variant="outline">Review</Button>
-        <AlertClose onClick={() => setOpen(false)} />
+        <AlertClose ref={closeRef} onClick={dismiss} />
       </AlertActions>
     </Alert>
   );

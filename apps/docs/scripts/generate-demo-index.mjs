@@ -133,6 +133,11 @@ function withoutExtension(file) {
   return file.replace(/\.tsx?$/, '');
 }
 
+/** The package name of a `name@range` install spec. */
+function installedName(spec) {
+  return spec.slice(0, spec.lastIndexOf('@'));
+}
+
 function readInstallBlocks() {
   if (!existsSync(DEPENDENCIES_DIR)) {
     throw new Error(
@@ -145,12 +150,12 @@ function readInstallBlocks() {
     file.endsWith('.json')
   );
   for (const file of dependencyFiles) {
-    const { slug, install, copy, files } = JSON.parse(
+    const { slug, componentBlock } = JSON.parse(
       readCanonical(path.join(DEPENDENCIES_DIR, file))
     );
     blocks.set(slug, {
-      packages: new Set(install.map(({ name }) => name)),
-      copied: new Set([...copy, ...files].map(withoutExtension)),
+      packages: new Set(componentBlock.packages.map(installedName)),
+      copied: new Set(componentBlock.copy.map(withoutExtension)),
     });
   }
   return blocks;

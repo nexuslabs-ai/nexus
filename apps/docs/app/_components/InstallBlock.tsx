@@ -36,7 +36,6 @@ export async function InstallBlock({ slug }: { slug: string }) {
   const hasExampleExtras =
     examplesBlock.packages.length > 0 ||
     examplesBlock.copy.length > 0 ||
-    examplesBlock.styles.length > 0 ||
     examplesBlock.assets.length > 0;
 
   return (

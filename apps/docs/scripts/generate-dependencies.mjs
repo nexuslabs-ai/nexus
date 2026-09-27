@@ -316,13 +316,10 @@ function toEntry(walked, walksBySlug) {
     walksBySlug
   );
   const previewPackages = preview.packages.map(({ name }) => name);
-  const { imported, own } = splitOwn(files, slugDir);
 
   return {
     slug,
-    install: [...packages].sort().map(toInstall),
-    copy: imported,
-    files: own,
+    componentBlock: toBlock(slugDir, packages.map(toInstall), files, []),
     installBlock: toBlock(
       slugDir,
       preview.packages,
