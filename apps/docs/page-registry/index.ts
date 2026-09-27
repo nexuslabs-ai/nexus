@@ -17,7 +17,11 @@ export type GuidePage = {
   examples?: never;
 };
 
-/** A `components/` page written as `<ComponentPage slug="{slug}" />`. */
+/**
+ * A component `@nexus_ds/react` exports. Once `components/{slug}.mdx` is
+ * written as `<ComponentPage slug="{slug}" />` it renders that page; until
+ * then it renders a placeholder.
+ */
 export type ComponentPageEntry = {
   slug: string;
   label: string;
@@ -25,7 +29,7 @@ export type ComponentPageEntry = {
    * Demo names under `examples/{slug}/`, shown first and in this order;
    * unlisted demos follow in name order.
    */
-  examples: string[];
+  examples?: string[];
   nested?: never;
   wireframe?: never;
 };
@@ -176,6 +180,10 @@ export const PAGE_REGISTRY = {
         examples: ['destructive-action', 'center'],
       },
       {
+        slug: 'appearance',
+        label: 'Appearance',
+      },
+      {
         slug: 'aspect-ratio',
         label: 'AspectRatio',
         examples: ['ratios'],
@@ -216,6 +224,10 @@ export const PAGE_REGISTRY = {
         examples: ['sizes', 'vertical', 'with-text', 'with-separator'],
       },
       {
+        slug: 'card',
+        label: 'Card',
+      },
+      {
         slug: 'carousel',
         label: 'Carousel',
         examples: ['vertical'],
@@ -224,6 +236,198 @@ export const PAGE_REGISTRY = {
         slug: 'chart',
         label: 'Chart',
         examples: ['area', 'line'],
+      },
+      {
+        slug: 'checkbox',
+        label: 'Checkbox',
+      },
+      {
+        slug: 'choice-card',
+        label: 'ChoiceCard',
+      },
+      {
+        slug: 'choice-row',
+        label: 'ChoiceRow',
+      },
+      {
+        slug: 'collapsible',
+        label: 'Collapsible',
+      },
+      {
+        slug: 'combobox',
+        label: 'Combobox',
+      },
+      {
+        slug: 'command',
+        label: 'Command',
+      },
+      {
+        slug: 'context-menu',
+        label: 'ContextMenu',
+      },
+      {
+        slug: 'date-picker',
+        label: 'DatePicker',
+      },
+      {
+        slug: 'dialog',
+        label: 'Dialog',
+      },
+      {
+        slug: 'drawer',
+        label: 'Drawer',
+      },
+      {
+        slug: 'dropdown-menu',
+        label: 'DropdownMenu',
+      },
+      {
+        slug: 'empty-state',
+        label: 'EmptyState',
+      },
+      {
+        slug: 'field',
+        label: 'Field',
+      },
+      {
+        slug: 'hide',
+        label: 'Hide',
+      },
+      {
+        slug: 'hover-card',
+        label: 'HoverCard',
+      },
+      {
+        slug: 'input',
+        label: 'Input',
+      },
+      {
+        slug: 'input-group',
+        label: 'InputGroup',
+      },
+      {
+        slug: 'input-otp',
+        label: 'InputOTP',
+      },
+      {
+        slug: 'item',
+        label: 'Item',
+      },
+      {
+        slug: 'kbd',
+        label: 'Kbd',
+      },
+      {
+        slug: 'label',
+        label: 'Label',
+      },
+      {
+        slug: 'marker',
+        label: 'Marker',
+      },
+      {
+        slug: 'menubar',
+        label: 'Menubar',
+      },
+      {
+        slug: 'multi-select',
+        label: 'MultiSelect',
+      },
+      {
+        slug: 'native-select',
+        label: 'NativeSelect',
+      },
+      {
+        slug: 'navigation-menu',
+        label: 'NavigationMenu',
+      },
+      {
+        slug: 'pagination',
+        label: 'Pagination',
+      },
+      {
+        slug: 'popover',
+        label: 'Popover',
+      },
+      {
+        slug: 'progress',
+        label: 'Progress',
+      },
+      {
+        slug: 'radio-group',
+        label: 'RadioGroup',
+      },
+      {
+        slug: 'resizable',
+        label: 'Resizable',
+      },
+      {
+        slug: 'scroll-area',
+        label: 'ScrollArea',
+      },
+      {
+        slug: 'select',
+        label: 'Select',
+      },
+      {
+        slug: 'separator',
+        label: 'Separator',
+      },
+      {
+        slug: 'sheet',
+        label: 'Sheet',
+      },
+      {
+        slug: 'show',
+        label: 'Show',
+      },
+      {
+        slug: 'sidebar',
+        label: 'Sidebar',
+      },
+      {
+        slug: 'skeleton',
+        label: 'Skeleton',
+      },
+      {
+        slug: 'slider',
+        label: 'Slider',
+      },
+      {
+        slug: 'sonner',
+        label: 'Sonner',
+      },
+      {
+        slug: 'spinner',
+        label: 'Spinner',
+      },
+      {
+        slug: 'switch',
+        label: 'Switch',
+      },
+      {
+        slug: 'table',
+        label: 'Table',
+      },
+      {
+        slug: 'tabs',
+        label: 'Tabs',
+      },
+      {
+        slug: 'textarea',
+        label: 'Textarea',
+      },
+      {
+        slug: 'toggle',
+        label: 'Toggle',
+      },
+      {
+        slug: 'toggle-group',
+        label: 'ToggleGroup',
+      },
+      {
+        slug: 'tooltip',
+        label: 'Tooltip',
       },
     ],
   },

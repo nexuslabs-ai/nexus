@@ -34,6 +34,7 @@ import prettier from 'prettier';
 
 import { DEMO_EXTENSION, isDemoName, PREVIEW_DEMO } from './examples.mjs';
 import { humanize } from './humanize.mjs';
+import { reactSrc, toRepoPath } from './roots.mjs';
 
 /** Nav metadata source, relative to the docs app root. */
 export const REGISTRY_FILE = 'page-registry/index.ts';
@@ -130,6 +131,45 @@ function assertLabelsAvoidTheCardJoiner(section) {
 }
 
 const COMPONENTS_SECTION = 'components';
+
+const EXPORTED_COMPONENT = /from '\.\/components\/([^/']+)/g;
+
+/** Every component `@nexus_ds/react` exports, by its folder slug. */
+function exportedComponentSlugs() {
+  const index = fs.readFileSync(path.join(reactSrc, 'index.ts'), 'utf8');
+  return new Set(
+    [...index.matchAll(EXPORTED_COMPONENT)].map(([, slug]) => slug)
+  );
+}
+
+function assertEveryExportedComponentIsListed(registered) {
+  const exported = exportedComponentSlugs();
+  const missing = [...exported].filter((slug) => !registered.includes(slug));
+  const unknown = registered.filter((slug) => !exported.has(slug));
+  if (missing.length === 0 && unknown.length === 0) return;
+
+  throw new Error(
+    [
+      `${REGISTRY_FILE} ${COMPONENTS_SECTION} must list exactly the components ${toRepoPath(path.join(reactSrc, 'index.ts'))} exports.`,
+      ...missing.map((slug) => `  missing: ${slug}`),
+      ...unknown.map((slug) => `  not exported: ${slug}`),
+    ].join('\n')
+  );
+}
+
+/** The body a component renders until its `components/{slug}.mdx` lands. */
+function componentWireframe(label) {
+  return {
+    lede: `[ ${label} — page coming soon ]`,
+    blocks: [
+      {
+        type: 'placeholder',
+        variant: 'storybook',
+        label: '[ Preview · Installation · Code · Props · Examples ]',
+      },
+    ],
+  };
+}
 
 function assertComponentPageIsOneLineMdx(docsRoot, kind, file, slug) {
   if (kind !== 'mdx') {
@@ -404,16 +444,21 @@ export async function buildPageManifest(docsRoot, formatOptions) {
       };
     }
 
-    if (!entry?.wireframe) {
+    const wireframe = isComponentPage
+      ? componentWireframe(base.label)
+      : entry?.wireframe;
+    if (!wireframe) {
       throw new Error(
         `${key} has no page file, so it renders its registry wireframe — give its registry entry a \`wireframe\`, or write the page.`
       );
     }
     return {
       page: { ...base, kind: 'placeholder', file: null },
-      wireframe: entry.wireframe,
+      wireframe,
     };
   }
+
+  assertEveryExportedComponentIsListed(orderedSlugs(COMPONENTS_SECTION));
 
   function orderedEntries(sectionSlug) {
     const entries = orderedSlugs(sectionSlug).map((slug) =>
