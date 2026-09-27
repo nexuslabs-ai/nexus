@@ -273,7 +273,7 @@ type ManifestPageBase = {
 
 export type GuideManifestPage = ManifestPageBase & {
   /** Components this group page covers, listed under it in the left rail. */
-  components?: readonly string[];
+  components?: readonly [string, ...string[]];
   /** Non-interactive headings listed under this page in the left rail. */
   nested?: readonly string[];
   examples?: never;
@@ -415,7 +415,7 @@ export async function buildPageManifest(docsRoot, formatOptions) {
       slug,
       label: entry?.label ?? humanize(slug),
     };
-    if (entry?.components?.length) {
+    if (entry?.components) {
       base.components = entry.components;
     }
     if (entry?.nested?.length) {
@@ -424,7 +424,7 @@ export async function buildPageManifest(docsRoot, formatOptions) {
 
     const source = sources.find((candidate) => candidate.pages.has(key));
     const isComponentPage =
-      sectionSlug === COMPONENTS_SECTION && !entry?.components?.length;
+      sectionSlug === COMPONENTS_SECTION && !entry?.components;
     const rendersExamples = isComponentPage && source !== undefined;
     if (entry?.examples?.length && !rendersExamples) {
       throw new Error(

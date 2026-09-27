@@ -13,7 +13,7 @@ export type GuidePage = {
   /** Optional in-page headings rendered inline in the left rail (non-interactive). */
   nested?: string[];
   /** Components a group page covers, rendered inline in the left rail (non-interactive). */
-  components?: string[];
+  components?: [string, ...string[]];
   /** Placeholder body, carried only while the page has no source file. */
   wireframe?: { lede: string; blocks: Block[] };
   examples?: never;
@@ -213,21 +213,6 @@ export const PAGE_REGISTRY = {
         },
       },
       {
-        slug: 'navigation',
-        label: 'Navigation',
-        components: ['DropdownMenu'],
-        wireframe: {
-          lede: '[ Moving between views · per-component Storybook page below ]',
-          blocks: [
-            {
-              type: 'placeholder',
-              variant: 'storybook',
-              label: '[ Storybook embed ]',
-            },
-          ],
-        },
-      },
-      {
         slug: 'display',
         label: 'Display',
         components: ['Badge', 'Avatar', 'Tooltip'],
@@ -272,6 +257,11 @@ export const PAGE_REGISTRY = {
         slug: 'dialog',
         label: 'Dialog',
         examples: ['with-form', 'prop-driven', 'scrollable-body'],
+      },
+      {
+        slug: 'dropdown-menu',
+        label: 'DropdownMenu',
+        examples: ['checkbox-items', 'radio-items', 'submenu'],
       },
     ],
   },
