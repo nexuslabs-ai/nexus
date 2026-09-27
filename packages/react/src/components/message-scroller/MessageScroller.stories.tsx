@@ -344,8 +344,8 @@ export const ScrollToStart: Story = {
       '[data-slot="message-scroller"]'
     )!;
 
-    // Leave a scroll range where the start button still arms (past 24px) but
-    // every position is within 24px of the end, the start, or both.
+    // Leave a scroll range short enough that its midpoint is near both edges,
+    // yet long enough that the start button still arms.
     const range = () => viewport.scrollHeight - viewport.clientHeight;
     root.style.height = `${root.offsetHeight + range() - 36}px`;
 
@@ -353,8 +353,6 @@ export const ScrollToStart: Story = {
       name: 'Scroll to the oldest message',
     });
     await waitFor(async () => {
-      await expect(range()).toBeGreaterThan(24);
-      await expect(range()).toBeLessThanOrEqual(48);
       await expect(atEnd(viewport)).toBe(true);
       await expect(start).toHaveAttribute('data-active', 'true');
     });
@@ -364,6 +362,10 @@ export const ScrollToStart: Story = {
     const midpoint = Math.floor(range() / 2);
     start.click();
     viewport.scrollTo({ top: midpoint, behavior: 'instant' });
+    await waitFor(async () => {
+      await expect(root).toHaveAttribute('data-at-start', 'true');
+      await expect(root).toHaveAttribute('data-at-end', 'true');
+    });
     await afterResizeObservers();
 
     await userEvent.click(canvas.getByRole('button', { name: 'Append turn' }));
