@@ -13,23 +13,28 @@ import {
   DropdownMenuTrigger,
 } from '@/components/dropdown-menu/dropdown-menu';
 
-const POSITIONS = ['Top', 'Bottom', 'Right'];
+const POSITIONS = [
+  { value: 'top', label: 'Top' },
+  { value: 'bottom', label: 'Bottom' },
+  { value: 'right', label: 'Right' },
+];
 
 export default function DropdownMenuRadioItems() {
-  const [position, setPosition] = useState('Bottom');
+  const [position, setPosition] = useState('bottom');
+  const selected = POSITIONS.find((option) => option.value === position);
 
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
-        <Button variant="outline">Panel: {position}</Button>
+        <Button variant="outline">Panel: {selected?.label}</Button>
       </DropdownMenuTrigger>
       <DropdownMenuContent className="nx:w-56">
         <DropdownMenuLabel>Panel position</DropdownMenuLabel>
         <DropdownMenuSeparator />
         <DropdownMenuRadioGroup value={position} onValueChange={setPosition}>
-          {POSITIONS.map((option) => (
-            <DropdownMenuRadioItem key={option} value={option}>
-              {option}
+          {POSITIONS.map(({ value, label }) => (
+            <DropdownMenuRadioItem key={value} value={value}>
+              {label}
             </DropdownMenuRadioItem>
           ))}
         </DropdownMenuRadioGroup>
