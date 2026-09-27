@@ -84,14 +84,14 @@ function toPublicPath(filePath) {
   return path.relative(publicRoot, filePath).split(path.sep).join('/');
 }
 
-/** `files` as sorted src paths: the ones outside `slugDir` apart from its own. */
+/** Sorted src paths of `files`, split into imports (outside `slugDir`) and the component's own. */
 function splitOwn(files, slugDir) {
-  const paths = (own) =>
-    [...files]
-      .filter((file) => isUnder(file, slugDir) === own)
-      .map(toSrcPath)
-      .sort();
-  return { imported: paths(false), own: paths(true) };
+  const imported = [];
+  const own = [];
+  for (const file of files) {
+    (isUnder(file, slugDir) ? own : imported).push(toSrcPath(file));
+  }
+  return { imported: imported.sort(), own: own.sort() };
 }
 
 function resolveRelative(importer, specifier) {
