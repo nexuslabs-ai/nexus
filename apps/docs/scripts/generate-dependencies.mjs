@@ -13,6 +13,7 @@ import {
   ALWAYS_INSTALLED,
   COPIED_PREFIX,
   DEMO_EXTENSION,
+  importedComponent,
   importSpecifiers,
   isDemoName,
   packageName,
@@ -144,18 +145,23 @@ function colocatedStyles(files) {
   );
 }
 
-/** Packages the demos in `examples/{slug}/` import beyond the component's own. */
-function examplePackages(slug, componentPackages) {
+/** Every import in the demos under `examples/{slug}/`. */
+function exampleSpecifiers(slug) {
   const slugExamples = path.join(examplesRoot, slug);
   if (!statSync(slugExamples, { throwIfNoEntry: false })?.isDirectory()) {
     return [];
   }
 
-  const names = readdirSync(slugExamples)
+  return readdirSync(slugExamples)
     .filter((name) => name.endsWith(DEMO_EXTENSION) && isDemoName(name))
     .flatMap((name) =>
       importSpecifiers(readFileSync(path.join(slugExamples, name), 'utf8'))
-    )
+    );
+}
+
+/** Packages the demos in `examples/{slug}/` import beyond the component's own. */
+function examplePackages(slug, specifiers, componentPackages) {
+  const names = specifiers
     .filter(
       (specifier) =>
         !specifier.startsWith('.') && !specifier.startsWith(COPIED_PREFIX)
@@ -183,6 +189,12 @@ function examplePackages(slug, componentPackages) {
     });
 }
 
+/** Other components the demos in `examples/{slug}/` import through `@/components/`. */
+function exampleComponentSlugs(slug, specifiers) {
+  const slugs = specifiers.map(importedComponent).filter(Boolean);
+  return [...new Set(slugs)].filter((other) => other !== slug).sort();
+}
+
 function walkSlug(slug) {
   const slugDir = path.join(componentsRoot, slug);
   const roots = collectSourceFiles(slugDir, isModuleSource);
@@ -193,12 +205,14 @@ function walkSlug(slug) {
   const packages = walked.packages.filter(
     (name) => !ALWAYS_INSTALLED.has(name)
   );
+  const specifiers = exampleSpecifiers(slug);
 
   return {
     slug,
     slugDir,
     packages,
-    examples: examplePackages(slug, packages),
+    examples: examplePackages(slug, specifiers, packages),
+    exampleComponents: exampleComponentSlugs(slug, specifiers),
     files: [...needed],
   };
 }
@@ -220,11 +234,37 @@ function assertDeclaredPackages(walks) {
   );
 }
 
-function toEntry({ slug, slugDir, packages, examples, files }) {
+function assertExampleComponentsExist(walks) {
+  const slugs = new Set(walks.map((walked) => walked.slug));
+  const offenders = walks.flatMap((walked) =>
+    walked.exampleComponents
+      .filter((other) => !slugs.has(other))
+      .map((other) => `  examples/${walked.slug}/: @/components/${other}`)
+  );
+
+  if (offenders.length === 0) return;
+
+  throw new Error(
+    [
+      'dependencies JSON: a demo imports a component that has no install block.',
+      ...offenders,
+    ].join('\n')
+  );
+}
+
+function toEntry({
+  slug,
+  slugDir,
+  packages,
+  examples,
+  exampleComponents,
+  files,
+}) {
   return {
     slug,
     install: packages.sort().map(toInstall),
     examples,
+    exampleComponents,
     copy: files
       .filter((file) => !isUnder(file, slugDir))
       .map(toSrcPath)
@@ -243,6 +283,7 @@ function toEntry({ slug, slugDir, packages, examples, files }) {
 const walks = componentSlugs().map(walkSlug).filter(Boolean);
 
 assertDeclaredPackages(walks);
+assertExampleComponentsExist(walks);
 
 const entries = walks.map(toEntry);
 

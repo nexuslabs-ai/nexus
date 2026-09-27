@@ -11,6 +11,8 @@ type Dependencies = {
   install: Package[];
   /** Packages the examples import beyond `install`. */
   examples: Package[];
+  /** Other components the examples import, whose blocks they paste beside. */
+  exampleComponents: string[];
   copy: string[];
   files: string[];
   styles: string[];
@@ -53,6 +55,7 @@ function isDependencies(value: unknown): value is Dependencies {
     value.install.every(isPackage) &&
     Array.isArray(value.examples) &&
     value.examples.every(isPackage) &&
+    isStringList(value.exampleComponents) &&
     isStringList(value.copy) &&
     isStringList(value.files) &&
     isStringList(value.styles)
@@ -75,7 +78,7 @@ export async function loadDependencies(slug: string): Promise<Dependencies> {
 
   if (!isDependencies(parsed)) {
     throw new Error(
-      `InstallBlock: ${filePath} needs install and examples lists of { name, range } and string arrays copy, files, styles — rerun \`pnpm --filter @nexus_ds/docs generate:dependencies\`.`
+      `InstallBlock: ${filePath} needs install and examples lists of { name, range } and string arrays exampleComponents, copy, files, styles — rerun \`pnpm --filter @nexus_ds/docs generate:dependencies\`.`
     );
   }
   return parsed;

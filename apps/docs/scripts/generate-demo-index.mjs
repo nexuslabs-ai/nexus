@@ -14,6 +14,7 @@ import {
   ALWAYS_INSTALLED,
   COPIED_PREFIX,
   DEMO_EXTENSION,
+  importedComponent,
   importSpecifiers,
   isDemoName,
   packageName,
@@ -28,8 +29,6 @@ const DEPENDENCIES_SCRIPT = path.join(
   'scripts',
   'generate-dependencies.mjs'
 );
-
-const COMPONENT_IMPORT = /^@\/components\/([^/]+)(?:\/|$)/;
 
 const INDEX_FILE = 'demo-index.ts';
 const MODULES_DIR = 'demos';
@@ -158,22 +157,15 @@ function readInstallBlocks() {
 }
 
 /**
- * A component's demos paste beside its own install block. A folder with no
- * block of its own, like `getting-started`, pastes beside the block of every
- * component it imports.
+ * A demo pastes beside its folder's install block, if the folder has one, plus
+ * the block of every other component it imports. A folder with no block of its
+ * own, like `getting-started`, must import at least one component.
  */
 function installSlugsFor(id, specifiers, blocks) {
   const folder = id.split('/')[0];
-  if (blocks.has(folder)) {
-    return [folder];
-  }
-
+  const imported = specifiers.map(importedComponent).filter(Boolean);
   const slugs = [
-    ...new Set(
-      specifiers
-        .map((specifier) => specifier.match(COMPONENT_IMPORT)?.[1])
-        .filter(Boolean)
-    ),
+    ...new Set(blocks.has(folder) ? [folder, ...imported] : imported),
   ];
   if (slugs.length === 0) {
     throw new Error(
