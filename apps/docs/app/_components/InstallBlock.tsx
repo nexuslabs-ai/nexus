@@ -3,7 +3,7 @@ import { type Block, loadDependencies } from '../_lib/dependencies';
 import { CodeBlock } from './CodeBlock';
 import { CodeSample } from './CodeSample';
 
-function BlockSamples({ packages, copy, styles }: Block) {
+function BlockSamples({ packages, copy, styles, assets }: Block) {
   return (
     <>
       {packages.length > 0 && (
@@ -22,6 +22,11 @@ function BlockSamples({ packages, copy, styles }: Block) {
           ].join('\n')}
         </CodeSample>
       )}
+      {assets.length > 0 && (
+        <CodeBlock>
+          <code>{assets.join('\n')}</code>
+        </CodeBlock>
+      )}
     </>
   );
 }
@@ -31,7 +36,8 @@ export async function InstallBlock({ slug }: { slug: string }) {
   const hasExampleExtras =
     examplesBlock.packages.length > 0 ||
     examplesBlock.copy.length > 0 ||
-    examplesBlock.styles.length > 0;
+    examplesBlock.styles.length > 0 ||
+    examplesBlock.assets.length > 0;
 
   return (
     <>

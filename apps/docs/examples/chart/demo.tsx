@@ -26,6 +26,7 @@ const config = {
   desktop: {
     label: 'Desktop',
     color: 'var(--nx-color-chart-categorical-1)',
+    icon: DesktopSwatch,
   },
   mobile: {
     label: 'Mobile',
@@ -46,6 +47,14 @@ function HatchPattern({ id }: { id: string }) {
         strokeWidth={1.5}
       />
     </pattern>
+  );
+}
+
+function DesktopSwatch() {
+  return (
+    <svg viewBox="0 0 12 12" aria-hidden="true">
+      <rect width={12} height={12} rx={2} fill="var(--color-desktop)" />
+    </svg>
   );
 }
 
@@ -79,7 +88,7 @@ export default function ChartDemo() {
           tickMargin={8}
           tickFormatter={shortMonth}
         />
-        <ChartTooltip content={<ChartTooltipContent indicator="dashed" />} />
+        <ChartTooltip content={<ChartTooltipContent />} />
         <ChartLegend content={<ChartLegendContent />} />
         <Bar dataKey="desktop" fill="var(--color-desktop)" radius={4} />
         <Bar dataKey="mobile" fill={`url(#${mobilePattern})`} radius={4} />

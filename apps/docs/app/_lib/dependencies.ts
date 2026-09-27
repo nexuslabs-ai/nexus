@@ -10,6 +10,8 @@ export type Block = {
   packages: string[];
   copy: string[];
   styles: string[];
+  /** Files the demos load from the app's `public/`. */
+  assets: string[];
 };
 
 type Dependencies = {
@@ -46,7 +48,8 @@ function isBlock(value: unknown): value is Block {
     isRecord(value) &&
     isStringList(value.packages) &&
     isStringList(value.copy) &&
-    isStringList(value.styles)
+    isStringList(value.styles) &&
+    isStringList(value.assets)
   );
 }
 
@@ -74,7 +77,7 @@ export async function loadDependencies(slug: string): Promise<Dependencies> {
 
   if (!isDependencies(parsed)) {
     throw new Error(
-      `InstallBlock: ${filePath} needs installBlock and examplesBlock, each with string arrays packages, copy, styles — rerun \`pnpm --filter @nexus_ds/docs generate:dependencies\`.`
+      `InstallBlock: ${filePath} needs installBlock and examplesBlock, each with string arrays packages, copy, styles, assets — rerun \`pnpm --filter @nexus_ds/docs generate:dependencies\`.`
     );
   }
   return parsed;

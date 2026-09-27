@@ -22,8 +22,19 @@ const COMPONENT_IMPORT = /^@\/components\/([^/]+)(?:\/|$)/;
  * The component slug an `@/components/{slug}` import pastes from, if any.
  * @param {string} specifier
  */
-export function importedComponent(specifier) {
+function importedComponent(specifier) {
   return specifier.match(COMPONENT_IMPORT)?.[1];
+}
+
+/**
+ * The components whose install blocks a demo pastes beside: its own folder's
+ * component, if it has one, plus every component it imports.
+ * @param {string[]} specifiers
+ * @param {string} [ownSlug]
+ */
+export function pastedComponents(specifiers, ownSlug) {
+  const imported = specifiers.map(importedComponent);
+  return [...new Set([ownSlug, ...imported].filter((slug) => slug != null))];
 }
 
 const IMPORT_PATTERNS = [

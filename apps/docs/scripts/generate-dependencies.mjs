@@ -13,10 +13,10 @@ import {
   ALWAYS_INSTALLED,
   COPIED_PREFIX,
   DEMO_EXTENSION,
-  importedComponent,
   importSpecifiers,
   isDemoName,
   packageName,
+  pastedComponents,
   PREVIEW_DEMO,
 } from './examples.mjs';
 import {
@@ -37,7 +37,7 @@ import {
 const outputDir = path.join(docsRoot, 'generated', 'dependencies');
 const examplesRoot = path.join(docsRoot, 'examples');
 const publicRoot = path.join(docsRoot, 'public');
-const PUBLIC_URL = /['"`](\/[\w./-]+)['"`]/g;
+const PUBLIC_URL = /['"`](\/[\w./-]+\.\w+)['"`]/g;
 
 function readManifest(packageDir) {
   return JSON.parse(
@@ -202,10 +202,17 @@ function demoPackages(slug, specifiers, componentPackages) {
 }
 
 /** Files under `public/` a demo references by root-relative URL, such as `/avatars/ada.svg`. */
-function publicAssets(source) {
-  return [...source.matchAll(PUBLIC_URL)]
-    .map(([, url]) => path.join(publicRoot, url))
-    .filter((file) => statSync(file, { throwIfNoEntry: false })?.isFile());
+function publicAssets(slug, source) {
+  return [...source.matchAll(PUBLIC_URL)].map(([, url]) => {
+    const file = path.join(publicRoot, url);
+    const isFile = statSync(file, { throwIfNoEntry: false })?.isFile();
+    if (!isFile || !isUnder(file, publicRoot)) {
+      throw new Error(
+        `dependencies JSON: examples/${slug}/ references ${url}, which is not a file under ${toRepoPath(publicRoot)}.`
+      );
+    }
+    return file;
+  });
 }
 
 /**
@@ -215,11 +222,7 @@ function publicAssets(source) {
  */
 function pasteNeeds(slug, sources, walksBySlug) {
   const specifiers = sources.flatMap(importSpecifiers);
-  const slugs = new Set([
-    slug,
-    ...specifiers.map(importedComponent).filter(Boolean),
-  ]);
-  const blocks = [...slugs].map((other) => {
+  const blocks = pastedComponents(specifiers, slug).map((other) => {
     const walked = walksBySlug.get(other);
     if (!walked) {
       throw new Error(
@@ -236,16 +239,24 @@ function pasteNeeds(slug, sources, walksBySlug) {
       ...demoPackages(slug, specifiers, componentPackages),
     ],
     files: new Set(blocks.flatMap(({ files }) => files)),
-    assets: new Set(sources.flatMap(publicAssets)),
+    assets: new Set(sources.flatMap((source) => publicAssets(slug, source))),
   };
 }
 
-function toBlock(packages, files, assets) {
-  const paths = [...files].map(toSrcPath).sort();
+/** The copy list names the files a component imports first and its own last. */
+function toBlock(slugDir, packages, files, assets) {
+  const paths = (own) =>
+    [...files]
+      .filter((file) => isUnder(file, slugDir) === own)
+      .map(toSrcPath)
+      .sort();
+  const copy = [...paths(false), ...paths(true)];
+
   return {
     packages: packages.map(({ name, range }) => `${name}@${range}`).sort(),
-    copy: [...paths, ...[...assets].map(toPublicPath).sort()],
-    styles: paths.filter((file) => file.endsWith('.css')),
+    copy,
+    styles: copy.filter((file) => file.endsWith('.css')).sort(),
+    assets: [...assets].map(toPublicPath).sort(),
   };
 }
 
@@ -302,7 +313,7 @@ function toEntry(walked, walksBySlug) {
 
   return {
     slug,
-    install: packages.sort().map(toInstall),
+    install: [...packages].sort().map(toInstall),
     copy: files
       .filter((file) => !isUnder(file, slugDir))
       .map(toSrcPath)
@@ -311,8 +322,14 @@ function toEntry(walked, walksBySlug) {
       .filter((file) => isUnder(file, slugDir))
       .map(toSrcPath)
       .sort(),
-    installBlock: toBlock(preview.packages, preview.files, preview.assets),
+    installBlock: toBlock(
+      slugDir,
+      preview.packages,
+      preview.files,
+      preview.assets
+    ),
     examplesBlock: toBlock(
+      slugDir,
       all.packages.filter(({ name }) => !previewPackages.includes(name)),
       [...all.files].filter((file) => !preview.files.has(file)),
       [...all.assets].filter((file) => !preview.assets.has(file))

@@ -14,10 +14,10 @@ import {
   ALWAYS_INSTALLED,
   COPIED_PREFIX,
   DEMO_EXTENSION,
-  importedComponent,
   importSpecifiers,
   isDemoName,
   packageName,
+  pastedComponents,
 } from './examples.mjs';
 import { docsRoot } from './roots.mjs';
 
@@ -163,10 +163,10 @@ function readInstallBlocks() {
  */
 function installSlugsFor(id, specifiers, blocks) {
   const folder = id.split('/')[0];
-  const imported = specifiers.map(importedComponent).filter(Boolean);
-  const slugs = [
-    ...new Set(blocks.has(folder) ? [folder, ...imported] : imported),
-  ];
+  const slugs = pastedComponents(
+    specifiers,
+    blocks.has(folder) ? folder : undefined
+  );
   if (slugs.length === 0) {
     throw new Error(
       `Demo ${id} imports no @/components/, and ${folder} has no install block of its own, so there is nothing to paste it beside. Import the component it demonstrates, or move it to examples/{slug}/.`
