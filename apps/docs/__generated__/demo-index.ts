@@ -39,6 +39,22 @@ export const demos = {
     id: "button/with-icon",
     load: () => import("./demos/button/with-icon"),
   },
+  "checkbox/checked": {
+    id: "checkbox/checked",
+    load: () => import("./demos/checkbox/checked"),
+  },
+  "checkbox/demo": {
+    id: "checkbox/demo",
+    load: () => import("./demos/checkbox/demo"),
+  },
+  "checkbox/disabled": {
+    id: "checkbox/disabled",
+    load: () => import("./demos/checkbox/disabled"),
+  },
+  "checkbox/indeterminate": {
+    id: "checkbox/indeterminate",
+    load: () => import("./demos/checkbox/indeterminate"),
+  },
   "getting-started/button-core-variants": {
     id: "getting-started/button-core-variants",
     load: () => import("./demos/getting-started/button-core-variants"),
