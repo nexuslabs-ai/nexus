@@ -212,6 +212,14 @@ export const PAGE_MANIFEST: readonly ManifestSection[] = [
         kind: 'mdx',
         file: 'content/components/button.mdx',
       },
+      {
+        route: '/components/checkbox',
+        slug: 'checkbox',
+        label: 'Checkbox',
+        examples: ['checked', 'indeterminate', 'disabled'],
+        kind: 'mdx',
+        file: 'content/components/checkbox.mdx',
+      },
     ],
   },
   {
