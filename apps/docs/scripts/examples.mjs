@@ -16,6 +16,27 @@ export const ALWAYS_INSTALLED = new Set(['react', 'react-dom']);
 /** Local imports a pasted demo resolves to files the install block copies. */
 export const COPIED_PREFIX = '@/';
 
+const COMPONENT_IMPORT = /^@\/components\/([^/]+)(?:\/|$)/;
+
+/**
+ * The component slug an `@/components/{slug}` import pastes from, if any.
+ * @param {string} specifier
+ */
+function importedComponent(specifier) {
+  return specifier.match(COMPONENT_IMPORT)?.[1];
+}
+
+/**
+ * The components whose install blocks a demo pastes beside: its own folder's
+ * component, if it has one, plus every component it imports.
+ * @param {string[]} specifiers
+ * @param {string} [ownSlug]
+ */
+export function pastedComponents(specifiers, ownSlug) {
+  const imported = specifiers.map(importedComponent);
+  return [...new Set([ownSlug, ...imported].filter((slug) => slug != null))];
+}
+
 const IMPORT_PATTERNS = [
   /^\s*(?:import|export)\s+(?:[^'";()]*?\s+from\s+)?['"]([^'"]+)['"]/gm,
   /\bimport\(\s*['"]([^'"]+)['"]/g,

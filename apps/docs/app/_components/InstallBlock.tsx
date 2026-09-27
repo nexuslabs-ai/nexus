@@ -1,31 +1,17 @@
-import { loadDependencies } from '../_lib/dependencies';
+import { type Block, loadDependencies } from '../_lib/dependencies';
 
 import { CodeBlock } from './CodeBlock';
 import { CodeSample } from './CodeSample';
 
-export async function InstallBlock({ slug }: { slug: string }) {
-  const { install, examples, copy, files, styles } =
-    await loadDependencies(slug);
-  const packages = install.map(({ name, range }) => `${name}@${range}`);
-  const examplePackages = examples.map(({ name, range }) => `${name}@${range}`);
-  const toCopy = [...copy, ...files];
-
+function BlockSamples({ packages, copy, styles, assets }: Block) {
   return (
     <>
       {packages.length > 0 && (
         <CodeSample lang="bash">{`npm install ${packages.join(' ')}`}</CodeSample>
       )}
-      {examplePackages.length > 0 && (
-        <CodeSample lang="bash">
-          {[
-            '# Only for the examples below',
-            `npm install ${examplePackages.join(' ')}`,
-          ].join('\n')}
-        </CodeSample>
-      )}
-      {toCopy.length > 0 && (
+      {copy.length > 0 && (
         <CodeBlock>
-          <code>{toCopy.join('\n')}</code>
+          <code>{copy.join('\n')}</code>
         </CodeBlock>
       )}
       {styles.length > 0 && (
@@ -35,6 +21,33 @@ export async function InstallBlock({ slug }: { slug: string }) {
             ...styles.map((file) => `@import '../${file}';`),
           ].join('\n')}
         </CodeSample>
+      )}
+      {assets.length > 0 && (
+        <CodeBlock>
+          <code>{assets.join('\n')}</code>
+        </CodeBlock>
+      )}
+    </>
+  );
+}
+
+export async function InstallBlock({ slug }: { slug: string }) {
+  const { installBlock, examplesBlock } = await loadDependencies(slug);
+  const hasExampleExtras =
+    examplesBlock.packages.length > 0 ||
+    examplesBlock.copy.length > 0 ||
+    examplesBlock.assets.length > 0;
+
+  return (
+    <>
+      <BlockSamples {...installBlock} />
+      {hasExampleExtras && (
+        <>
+          <p className="nx:typography-body-default nx:text-muted-foreground nx:mt-6 nx:mb-2">
+            Only for the examples below:
+          </p>
+          <BlockSamples {...examplesBlock} />
+        </>
       )}
     </>
   );

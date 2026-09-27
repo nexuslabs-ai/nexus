@@ -11,6 +11,98 @@ export interface Demo {
 }
 
 export const demos = {
+  "accordion/demo": {
+    id: "accordion/demo",
+    load: () => import("./demos/accordion/demo"),
+  },
+  "accordion/disabled": {
+    id: "accordion/disabled",
+    load: () => import("./demos/accordion/disabled"),
+  },
+  "accordion/floating": {
+    id: "accordion/floating",
+    load: () => import("./demos/accordion/floating"),
+  },
+  "accordion/multiple": {
+    id: "accordion/multiple",
+    load: () => import("./demos/accordion/multiple"),
+  },
+  "alert-dialog/center": {
+    id: "alert-dialog/center",
+    load: () => import("./demos/alert-dialog/center"),
+  },
+  "alert-dialog/demo": {
+    id: "alert-dialog/demo",
+    load: () => import("./demos/alert-dialog/demo"),
+  },
+  "alert-dialog/destructive-action": {
+    id: "alert-dialog/destructive-action",
+    load: () => import("./demos/alert-dialog/destructive-action"),
+  },
+  "alert/banner": {
+    id: "alert/banner",
+    load: () => import("./demos/alert/banner"),
+  },
+  "alert/demo": {
+    id: "alert/demo",
+    load: () => import("./demos/alert/demo"),
+  },
+  "alert/dismissible": {
+    id: "alert/dismissible",
+    load: () => import("./demos/alert/dismissible"),
+  },
+  "alert/variants": {
+    id: "alert/variants",
+    load: () => import("./demos/alert/variants"),
+  },
+  "alert/with-actions": {
+    id: "alert/with-actions",
+    load: () => import("./demos/alert/with-actions"),
+  },
+  "aspect-ratio/demo": {
+    id: "aspect-ratio/demo",
+    load: () => import("./demos/aspect-ratio/demo"),
+  },
+  "aspect-ratio/ratios": {
+    id: "aspect-ratio/ratios",
+    load: () => import("./demos/aspect-ratio/ratios"),
+  },
+  "attachment/demo": {
+    id: "attachment/demo",
+    load: () => import("./demos/attachment/demo"),
+  },
+  "attachment/group": {
+    id: "attachment/group",
+    load: () => import("./demos/attachment/group"),
+  },
+  "attachment/sizes": {
+    id: "attachment/sizes",
+    load: () => import("./demos/attachment/sizes"),
+  },
+  "attachment/states": {
+    id: "attachment/states",
+    load: () => import("./demos/attachment/states"),
+  },
+  "avatar/demo": {
+    id: "avatar/demo",
+    load: () => import("./demos/avatar/demo"),
+  },
+  "avatar/group": {
+    id: "avatar/group",
+    load: () => import("./demos/avatar/group"),
+  },
+  "avatar/shapes": {
+    id: "avatar/shapes",
+    load: () => import("./demos/avatar/shapes"),
+  },
+  "avatar/sizes": {
+    id: "avatar/sizes",
+    load: () => import("./demos/avatar/sizes"),
+  },
+  "avatar/with-status": {
+    id: "avatar/with-status",
+    load: () => import("./demos/avatar/with-status"),
+  },
   "badge/demo": {
     id: "badge/demo",
     load: () => import("./demos/badge/demo"),
@@ -31,6 +123,54 @@ export const demos = {
     id: "badge/with-icon",
     load: () => import("./demos/badge/with-icon"),
   },
+  "breadcrumb/demo": {
+    id: "breadcrumb/demo",
+    load: () => import("./demos/breadcrumb/demo"),
+  },
+  "breadcrumb/with-ellipsis": {
+    id: "breadcrumb/with-ellipsis",
+    load: () => import("./demos/breadcrumb/with-ellipsis"),
+  },
+  "breadcrumb/with-icons": {
+    id: "breadcrumb/with-icons",
+    load: () => import("./demos/breadcrumb/with-icons"),
+  },
+  "breadcrumb/with-menu": {
+    id: "breadcrumb/with-menu",
+    load: () => import("./demos/breadcrumb/with-menu"),
+  },
+  "bubble/demo": {
+    id: "bubble/demo",
+    load: () => import("./demos/bubble/demo"),
+  },
+  "bubble/variants": {
+    id: "bubble/variants",
+    load: () => import("./demos/bubble/variants"),
+  },
+  "bubble/with-reactions": {
+    id: "bubble/with-reactions",
+    load: () => import("./demos/bubble/with-reactions"),
+  },
+  "button-group/demo": {
+    id: "button-group/demo",
+    load: () => import("./demos/button-group/demo"),
+  },
+  "button-group/sizes": {
+    id: "button-group/sizes",
+    load: () => import("./demos/button-group/sizes"),
+  },
+  "button-group/vertical": {
+    id: "button-group/vertical",
+    load: () => import("./demos/button-group/vertical"),
+  },
+  "button-group/with-separator": {
+    id: "button-group/with-separator",
+    load: () => import("./demos/button-group/with-separator"),
+  },
+  "button-group/with-text": {
+    id: "button-group/with-text",
+    load: () => import("./demos/button-group/with-text"),
+  },
   "button/demo": {
     id: "button/demo",
     load: () => import("./demos/button/demo"),
@@ -50,6 +190,26 @@ export const demos = {
   "button/with-icon": {
     id: "button/with-icon",
     load: () => import("./demos/button/with-icon"),
+  },
+  "carousel/demo": {
+    id: "carousel/demo",
+    load: () => import("./demos/carousel/demo"),
+  },
+  "carousel/vertical": {
+    id: "carousel/vertical",
+    load: () => import("./demos/carousel/vertical"),
+  },
+  "chart/area": {
+    id: "chart/area",
+    load: () => import("./demos/chart/area"),
+  },
+  "chart/demo": {
+    id: "chart/demo",
+    load: () => import("./demos/chart/demo"),
+  },
+  "chart/line": {
+    id: "chart/line",
+    load: () => import("./demos/chart/line"),
   },
   "getting-started/button-core-variants": {
     id: "getting-started/button-core-variants",

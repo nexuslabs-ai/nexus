@@ -12,14 +12,15 @@ export type GuidePage = {
   label: string;
   /** Optional in-page headings rendered inline in the left rail (non-interactive). */
   nested?: string[];
-  /** Components a group page covers, rendered inline in the left rail (non-interactive). */
-  components?: string[];
   /** Placeholder body, carried only while the page has no source file. */
   wireframe?: { lede: string; blocks: Block[] };
-  examples?: never;
 };
 
-/** A `components/` page written as `<ComponentPage slug="{slug}" />`. */
+/**
+ * A component `@nexus_ds/react` exports. Once `components/{slug}.mdx` is
+ * written as `<ComponentPage slug="{slug}" />` it renders that page; until
+ * then it renders a placeholder.
+ */
 export type ComponentPageEntry = {
   slug: string;
   label: string;
@@ -27,22 +28,27 @@ export type ComponentPageEntry = {
    * Demo names under `examples/{slug}/`, shown first and in this order;
    * unlisted demos follow in name order.
    */
-  examples: string[];
-  nested?: never;
-  components?: never;
-  wireframe?: never;
+  examples?: string[];
 };
 
-export type RegistryPage = GuidePage | ComponentPageEntry;
-
-export type RegistrySection = {
+type SectionBase = {
   slug: string;
   title: string;
   href: string;
-  /** What the section is counted in on the home page. Defaults to pages. */
-  unit?: 'components';
-  pages: RegistryPage[];
 };
+
+export type GuideSection = SectionBase & {
+  unit?: never;
+  pages: GuidePage[];
+};
+
+export type ComponentsSection = SectionBase & {
+  /** What the section is counted in on the home page. Other sections count pages. */
+  unit: 'components';
+  pages: ComponentPageEntry[];
+};
+
+export type RegistrySection = GuideSection | ComponentsSection;
 
 export const PAGE_REGISTRY = {
   'getting-started': {
@@ -164,99 +170,38 @@ export const PAGE_REGISTRY = {
     unit: 'components',
     pages: [
       {
-        slug: 'inputs',
-        label: 'Inputs',
-        components: ['Input', 'Select', 'Switch', 'Tabs'],
-        wireframe: {
-          lede: '[ Interactive controls · per-component Storybook page below ]',
-          blocks: [
-            {
-              type: 'row',
-              blocks: [
-                {
-                  variant: 'storybook',
-                  label: '[ Storybook embed — selected component ]',
-                },
-                { variant: 'tall', label: '[ Variant matrix · props table ]' },
-              ],
-            },
-            { type: 'h2', text: '[ Per-component pages ]' },
-            {
-              type: 'placeholder',
-              label: '[ Index — Input · Select · Switch · Tabs ]',
-            },
-            {
-              type: 'placeholder',
-              variant: 'code',
-              label: '[ Code — JSX usage example ]',
-            },
-          ],
-        },
+        slug: 'accordion',
+        label: 'Accordion',
+        examples: ['floating', 'multiple', 'disabled'],
       },
       {
-        slug: 'containers',
-        label: 'Containers',
-        components: ['Card', 'Dialog', 'Accordion', 'Alert'],
-        wireframe: {
-          lede: '[ Card · Dialog · Accordion · Alert ]',
-          blocks: [
-            {
-              type: 'placeholder',
-              variant: 'storybook',
-              label: '[ Storybook embed ]',
-            },
-            {
-              type: 'placeholder',
-              label: '[ Composition patterns · slots / children ]',
-            },
-          ],
-        },
+        slug: 'alert',
+        label: 'Alert',
+        examples: ['variants', 'with-actions', 'dismissible', 'banner'],
       },
       {
-        slug: 'navigation',
-        label: 'Navigation',
-        components: ['DropdownMenu'],
-        wireframe: {
-          lede: '[ DropdownMenu · (future) NavigationMenu · Breadcrumbs ]',
-          blocks: [
-            {
-              type: 'placeholder',
-              variant: 'storybook',
-              label: '[ Storybook embed ]',
-            },
-          ],
-        },
+        slug: 'alert-dialog',
+        label: 'AlertDialog',
+        examples: ['destructive-action', 'center'],
       },
       {
-        slug: 'display',
-        label: 'Display',
-        components: ['Avatar', 'Tooltip'],
-        wireframe: {
-          lede: '[ Avatar · Tooltip ]',
-          blocks: [
-            {
-              type: 'placeholder',
-              variant: 'storybook',
-              label: '[ Storybook embed ]',
-            },
-          ],
-        },
+        slug: 'appearance',
+        label: 'Appearance',
       },
       {
-        slug: 'primitives',
-        label: 'Primitives',
-        components: ['Show / Hide', 'Slot'],
-        wireframe: {
-          lede: '[ Low-level building blocks: Show / Hide · Slot ]',
-          blocks: [
-            {
-              type: 'placeholder',
-              variant: 'code',
-              label: '[ Code — Show / Hide usage ]',
-            },
-            { type: 'placeholder', label: '[ API table ]' },
-          ],
-        },
+        slug: 'aspect-ratio',
+        label: 'AspectRatio',
+        examples: ['ratios'],
+      },
+      {
+        slug: 'attachment',
+        label: 'Attachment',
+        examples: ['states', 'sizes', 'group'],
+      },
+      {
+        slug: 'avatar',
+        label: 'Avatar',
+        examples: ['sizes', 'shapes', 'with-status', 'group'],
       },
       {
         slug: 'badge',
@@ -264,9 +209,230 @@ export const PAGE_REGISTRY = {
         examples: ['variants', 'fills', 'with-icon', 'icon-only'],
       },
       {
+        slug: 'breadcrumb',
+        label: 'Breadcrumb',
+        examples: ['with-ellipsis', 'with-icons', 'with-menu'],
+      },
+      {
+        slug: 'bubble',
+        label: 'Bubble',
+        examples: ['variants', 'with-reactions'],
+      },
+      {
         slug: 'button',
         label: 'Button',
         examples: ['variants', 'sizes', 'with-icon', 'disabled'],
+      },
+      {
+        slug: 'button-group',
+        label: 'ButtonGroup',
+        examples: ['sizes', 'vertical', 'with-text', 'with-separator'],
+      },
+      {
+        slug: 'card',
+        label: 'Card',
+      },
+      {
+        slug: 'carousel',
+        label: 'Carousel',
+        examples: ['vertical'],
+      },
+      {
+        slug: 'chart',
+        label: 'Chart',
+        examples: ['area', 'line'],
+      },
+      {
+        slug: 'checkbox',
+        label: 'Checkbox',
+      },
+      {
+        slug: 'choice-card',
+        label: 'ChoiceCard',
+      },
+      {
+        slug: 'choice-row',
+        label: 'ChoiceRow',
+      },
+      {
+        slug: 'collapsible',
+        label: 'Collapsible',
+      },
+      {
+        slug: 'combobox',
+        label: 'Combobox',
+      },
+      {
+        slug: 'command',
+        label: 'Command',
+      },
+      {
+        slug: 'context-menu',
+        label: 'ContextMenu',
+      },
+      {
+        slug: 'date-picker',
+        label: 'DatePicker',
+      },
+      {
+        slug: 'dialog',
+        label: 'Dialog',
+      },
+      {
+        slug: 'drawer',
+        label: 'Drawer',
+      },
+      {
+        slug: 'dropdown-menu',
+        label: 'DropdownMenu',
+      },
+      {
+        slug: 'empty-state',
+        label: 'EmptyState',
+      },
+      {
+        slug: 'field',
+        label: 'Field',
+      },
+      {
+        slug: 'hide',
+        label: 'Hide',
+      },
+      {
+        slug: 'hover-card',
+        label: 'HoverCard',
+      },
+      {
+        slug: 'input',
+        label: 'Input',
+      },
+      {
+        slug: 'input-group',
+        label: 'InputGroup',
+      },
+      {
+        slug: 'input-otp',
+        label: 'InputOTP',
+      },
+      {
+        slug: 'item',
+        label: 'Item',
+      },
+      {
+        slug: 'kbd',
+        label: 'Kbd',
+      },
+      {
+        slug: 'label',
+        label: 'Label',
+      },
+      {
+        slug: 'marker',
+        label: 'Marker',
+      },
+      {
+        slug: 'menubar',
+        label: 'Menubar',
+      },
+      {
+        slug: 'multi-select',
+        label: 'MultiSelect',
+      },
+      {
+        slug: 'native-select',
+        label: 'NativeSelect',
+      },
+      {
+        slug: 'navigation-menu',
+        label: 'NavigationMenu',
+      },
+      {
+        slug: 'pagination',
+        label: 'Pagination',
+      },
+      {
+        slug: 'popover',
+        label: 'Popover',
+      },
+      {
+        slug: 'progress',
+        label: 'Progress',
+      },
+      {
+        slug: 'radio-group',
+        label: 'RadioGroup',
+      },
+      {
+        slug: 'resizable',
+        label: 'Resizable',
+      },
+      {
+        slug: 'scroll-area',
+        label: 'ScrollArea',
+      },
+      {
+        slug: 'select',
+        label: 'Select',
+      },
+      {
+        slug: 'separator',
+        label: 'Separator',
+      },
+      {
+        slug: 'sheet',
+        label: 'Sheet',
+      },
+      {
+        slug: 'show',
+        label: 'Show',
+      },
+      {
+        slug: 'sidebar',
+        label: 'Sidebar',
+      },
+      {
+        slug: 'skeleton',
+        label: 'Skeleton',
+      },
+      {
+        slug: 'slider',
+        label: 'Slider',
+      },
+      {
+        slug: 'sonner',
+        label: 'Sonner',
+      },
+      {
+        slug: 'spinner',
+        label: 'Spinner',
+      },
+      {
+        slug: 'switch',
+        label: 'Switch',
+      },
+      {
+        slug: 'table',
+        label: 'Table',
+      },
+      {
+        slug: 'tabs',
+        label: 'Tabs',
+      },
+      {
+        slug: 'textarea',
+        label: 'Textarea',
+      },
+      {
+        slug: 'toggle',
+        label: 'Toggle',
+      },
+      {
+        slug: 'toggle-group',
+        label: 'ToggleGroup',
+      },
+      {
+        slug: 'tooltip',
+        label: 'Tooltip',
       },
     ],
   },
@@ -545,4 +711,6 @@ export const PAGE_REGISTRY = {
       },
     ],
   },
-} satisfies Record<string, RegistrySection>;
+} satisfies Record<string, RegistrySection> & {
+  components: ComponentsSection;
+};

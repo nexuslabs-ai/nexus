@@ -17,6 +17,7 @@ import {
   importSpecifiers,
   isDemoName,
   packageName,
+  pastedComponents,
 } from './examples.mjs';
 import { docsRoot } from './roots.mjs';
 
@@ -28,8 +29,6 @@ const DEPENDENCIES_SCRIPT = path.join(
   'scripts',
   'generate-dependencies.mjs'
 );
-
-const COMPONENT_IMPORT = /^@\/components\/([^/]+)(?:\/|$)/;
 
 const INDEX_FILE = 'demo-index.ts';
 const MODULES_DIR = 'demos';
@@ -134,6 +133,11 @@ function withoutExtension(file) {
   return file.replace(/\.tsx?$/, '');
 }
 
+/** The package name of a `name@range` install spec. */
+function installedName(spec) {
+  return spec.slice(0, spec.lastIndexOf('@'));
+}
+
 function readInstallBlocks() {
   if (!existsSync(DEPENDENCIES_DIR)) {
     throw new Error(
@@ -146,35 +150,28 @@ function readInstallBlocks() {
     file.endsWith('.json')
   );
   for (const file of dependencyFiles) {
-    const { slug, install, copy, files } = JSON.parse(
+    const { slug, componentBlock } = JSON.parse(
       readCanonical(path.join(DEPENDENCIES_DIR, file))
     );
     blocks.set(slug, {
-      packages: new Set(install.map(({ name }) => name)),
-      copied: new Set([...copy, ...files].map(withoutExtension)),
+      packages: new Set(componentBlock.packages.map(installedName)),
+      copied: new Set(componentBlock.copy.map(withoutExtension)),
     });
   }
   return blocks;
 }
 
 /**
- * A component's demos paste beside its own install block. A folder with no
- * block of its own, like `getting-started`, pastes beside the block of every
- * component it imports.
+ * A demo pastes beside its folder's install block, if the folder has one, plus
+ * the block of every other component it imports. A folder with no block of its
+ * own, like `getting-started`, must import at least one component.
  */
 function installSlugsFor(id, specifiers, blocks) {
   const folder = id.split('/')[0];
-  if (blocks.has(folder)) {
-    return [folder];
-  }
-
-  const slugs = [
-    ...new Set(
-      specifiers
-        .map((specifier) => specifier.match(COMPONENT_IMPORT)?.[1])
-        .filter(Boolean)
-    ),
-  ];
+  const slugs = pastedComponents(
+    specifiers,
+    blocks.has(folder) ? folder : undefined
+  );
   if (slugs.length === 0) {
     throw new Error(
       `Demo ${id} imports no @/components/, and ${folder} has no install block of its own, so there is nothing to paste it beside. Import the component it demonstrates, or move it to examples/{slug}/.`
