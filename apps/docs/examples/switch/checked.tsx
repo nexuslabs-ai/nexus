@@ -6,21 +6,21 @@ export default function SwitchChecked() {
   return (
     <div className="nx:flex nx:flex-col nx:gap-3">
       <div className="nx:flex nx:items-center nx:gap-2">
-        <Switch id="switch-checked-off" />
+        <Switch id="switch-checked-wifi" />
         <label
-          htmlFor="switch-checked-off"
+          htmlFor="switch-checked-wifi"
           className="nx:typography-label-default"
         >
-          Off
+          Wi-Fi
         </label>
       </div>
       <div className="nx:flex nx:items-center nx:gap-2">
-        <Switch id="switch-checked-on" defaultChecked />
+        <Switch id="switch-checked-bluetooth" defaultChecked />
         <label
-          htmlFor="switch-checked-on"
+          htmlFor="switch-checked-bluetooth"
           className="nx:typography-label-default"
         >
-          On
+          Bluetooth
         </label>
       </div>
     </div>

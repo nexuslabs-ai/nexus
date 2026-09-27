@@ -12,11 +12,17 @@ export default function SwitchWithDescription() {
         >
           Marketing emails
         </label>
-        <p className="nx:typography-body-default nx:text-muted-foreground">
+        <p
+          id="switch-with-description-marketing-description"
+          className="nx:typography-body-default nx:text-muted-foreground"
+        >
           Receive emails about new products and features.
         </p>
       </div>
-      <Switch id="switch-with-description-marketing" />
+      <Switch
+        id="switch-with-description-marketing"
+        aria-describedby="switch-with-description-marketing-description"
+      />
     </div>
   );
 }
