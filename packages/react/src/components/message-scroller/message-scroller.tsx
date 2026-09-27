@@ -132,11 +132,12 @@ function MessageScrollerProvider({ children }: MessageScrollerProviderProps) {
 
     // A scroll event can be dispatched after content has already grown, so it
     // would measure the old position against the new height. Only an upward
-    // move releases the pin; reaching the end restores it.
+    // move releases the pin; reaching the end restores it, except while
+    // `scrollToStart` is still animating away from the end.
     const handleScroll = () => {
       const { scrollTop } = viewport;
       if (scrollTop < lastScrollTop) pinnedRef.current = false;
-      if (scrollTop > lastScrollTop || scrollTop <= EDGE_THRESHOLD) {
+      if (scrollTop > lastScrollTop || scrollTop === 0) {
         leavingEndRef.current = false;
       }
       if (isNearEnd() && !leavingEndRef.current) pinnedRef.current = true;
@@ -174,7 +175,8 @@ function MessageScrollerProvider({ children }: MessageScrollerProviderProps) {
   }, [viewport]);
 
   const scrollToStart = React.useCallback(() => {
-    if (!viewport) return;
+    // Already at the start, no scroll event would follow to clear the flag.
+    if (!viewport || viewport.scrollTop === 0) return;
     pinnedRef.current = false;
     leavingEndRef.current = true;
     smoothScrollTo(viewport, 0);

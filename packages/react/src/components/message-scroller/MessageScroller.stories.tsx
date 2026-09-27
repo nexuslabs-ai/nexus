@@ -258,13 +258,13 @@ function Composer({ onAppend }: { onAppend: () => void }) {
   );
 }
 
-function AppendableStream() {
+function AppendableStream({ children }: { children?: React.ReactNode }) {
   const [count, setCount] = React.useState(10);
 
   return (
     <MessageScrollerProvider>
       <div className="nx:flex nx:flex-col nx:gap-3">
-        <Stream count={count} />
+        <Stream count={count}>{children}</Stream>
         <Composer onAppend={() => setCount((value) => value + 1)} />
       </div>
     </MessageScrollerProvider>
@@ -320,6 +320,45 @@ export const StreamingWhileScrolledAway: Story = {
     // point of the component: appended content must not yank the viewport.
     await expect(viewport.scrollTop).toBe(0);
     await expect(atEnd(viewport)).toBe(false);
+  },
+};
+
+export const ScrollToStart: Story = {
+  render: () => (
+    <AppendableStream>
+      <MessageScrollerButton direction="start" />
+    </AppendableStream>
+  ),
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+    const viewport = viewportOf(canvasElement);
+
+    await waitFor(async () => {
+      await expect(atEnd(viewport)).toBe(true);
+    });
+
+    await userEvent.click(
+      canvas.getByRole('button', { name: 'Scroll to the oldest message' })
+    );
+
+    await waitFor(
+      async () => {
+        await expect(viewport.scrollTop).toBe(0);
+      },
+      { timeout: 3000 }
+    );
+
+    await userEvent.click(canvas.getByRole('button', { name: 'Append turn' }));
+
+    await waitFor(async () => {
+      await expect(
+        canvas.getByText('Turn 11 in the transcript.')
+      ).toBeVisible();
+    });
+
+    // Jumping to the start unpins, so the new turn does not pull the reader
+    // back to the end.
+    await expect(viewport.scrollTop).toBe(0);
   },
 };
 
