@@ -192,9 +192,7 @@ function installSlugsFor(id, specifiers, blocks) {
   return slugs;
 }
 
-function checkDemoImports(id, source, blocks) {
-  const specifiers = importSpecifiers(source);
-  const slugs = installSlugsFor(id, specifiers, blocks);
+function checkDemoImports(id, specifiers, slugs, blocks) {
   const packages = new Set(
     slugs.flatMap((slug) => [...blocks.get(slug).packages])
   );
@@ -219,8 +217,6 @@ function checkDemoImports(id, source, blocks) {
       );
     }
   }
-
-  return slugs;
 }
 
 /** @returns {DemoFile[]} */
@@ -254,7 +250,9 @@ function collectDemos() {
         );
       }
       const source = readCanonical(file);
-      const installSlugs = checkDemoImports(id, source, installBlocks);
+      const specifiers = importSpecifiers(source);
+      const installSlugs = installSlugsFor(id, specifiers, installBlocks);
+      checkDemoImports(id, specifiers, installSlugs, installBlocks);
 
       return { id, source, installSlugs };
     })
