@@ -81,7 +81,17 @@ function toSrcPath(filePath) {
 }
 
 function toPublicPath(filePath) {
-  return path.relative(docsRoot, filePath).split(path.sep).join('/');
+  return path.relative(publicRoot, filePath).split(path.sep).join('/');
+}
+
+/** `files` as sorted src paths: the ones outside `slugDir` apart from its own. */
+function splitOwn(files, slugDir) {
+  const paths = (own) =>
+    [...files]
+      .filter((file) => isUnder(file, slugDir) === own)
+      .map(toSrcPath)
+      .sort();
+  return { imported: paths(false), own: paths(true) };
 }
 
 function resolveRelative(importer, specifier) {
@@ -245,17 +255,13 @@ function pasteNeeds(slug, sources, walksBySlug) {
 
 /** The copy list names the files a component imports first and its own last. */
 function toBlock(slugDir, packages, files, assets) {
-  const paths = (own) =>
-    [...files]
-      .filter((file) => isUnder(file, slugDir) === own)
-      .map(toSrcPath)
-      .sort();
-  const copy = [...paths(false), ...paths(true)];
+  const { imported, own } = splitOwn(files, slugDir);
+  const copy = [...imported, ...own];
 
   return {
     packages: packages.map(({ name, range }) => `${name}@${range}`).sort(),
     copy,
-    styles: copy.filter((file) => file.endsWith('.css')).sort(),
+    styles: copy.filter((file) => file.endsWith('.css')),
     assets: [...assets].map(toPublicPath).sort(),
   };
 }
@@ -310,18 +316,13 @@ function toEntry(walked, walksBySlug) {
     walksBySlug
   );
   const previewPackages = preview.packages.map(({ name }) => name);
+  const { imported, own } = splitOwn(files, slugDir);
 
   return {
     slug,
     install: [...packages].sort().map(toInstall),
-    copy: files
-      .filter((file) => !isUnder(file, slugDir))
-      .map(toSrcPath)
-      .sort(),
-    files: files
-      .filter((file) => isUnder(file, slugDir))
-      .map(toSrcPath)
-      .sort(),
+    copy: imported,
+    files: own,
     installBlock: toBlock(
       slugDir,
       preview.packages,
