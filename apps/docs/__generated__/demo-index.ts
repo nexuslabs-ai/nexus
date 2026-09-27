@@ -43,6 +43,26 @@ export const demos = {
     id: "getting-started/button-core-variants",
     load: () => import("./demos/getting-started/button-core-variants"),
   },
+  "switch/checked": {
+    id: "switch/checked",
+    load: () => import("./demos/switch/checked"),
+  },
+  "switch/demo": {
+    id: "switch/demo",
+    load: () => import("./demos/switch/demo"),
+  },
+  "switch/disabled": {
+    id: "switch/disabled",
+    load: () => import("./demos/switch/disabled"),
+  },
+  "switch/sizes": {
+    id: "switch/sizes",
+    load: () => import("./demos/switch/sizes"),
+  },
+  "switch/with-description": {
+    id: "switch/with-description",
+    load: () => import("./demos/switch/with-description"),
+  },
 } satisfies Record<string, Demo>;
 
 export type DemoId = keyof typeof demos;
