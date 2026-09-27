@@ -215,6 +215,9 @@ importers:
       '@nexus_ds/tailwind':
         specifier: workspace:*
         version: link:../../packages/tailwind
+      '@radix-ui/react-checkbox':
+        specifier: ^1.3.3
+        version: 1.3.3(@types/react-dom@19.2.3(@types/react@19.2.16))(@types/react@19.2.16)(react-dom@19.2.7(react@19.2.7))(react@19.2.7)
       '@shikijs/langs':
         specifier: 4.4.3
         version: 4.4.3

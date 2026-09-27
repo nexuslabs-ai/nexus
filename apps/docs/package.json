@@ -25,6 +25,7 @@
     "@nexus_ds/core": "workspace:*",
     "@nexus_ds/react": "workspace:*",
     "@nexus_ds/tailwind": "workspace:*",
+    "@radix-ui/react-checkbox": "^1.3.3",
     "@shikijs/langs": "4.4.3",
     "@tabler/icons-react": "^3.36.1",
     "next": "^15.1.6",
