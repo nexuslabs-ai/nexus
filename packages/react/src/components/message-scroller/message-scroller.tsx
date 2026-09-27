@@ -70,13 +70,12 @@ function useMessageScrollerNodes() {
   return context;
 }
 
-// Smooth only for this one call. A `scroll-behavior` on the viewport would
-// also animate every thumb drag, and `behavior: 'smooth'` in JS would ignore
-// the `reduceMotion` preference, which forces `scroll-behavior: auto !important`.
+// Inline, so `reduceMotion`'s `scroll-behavior: auto !important` still wins.
 function smoothScrollTo(viewport: HTMLElement, top: number) {
+  const previous = viewport.style.scrollBehavior;
   viewport.style.scrollBehavior = 'smooth';
   viewport.scrollTo({ top });
-  viewport.style.scrollBehavior = '';
+  viewport.style.scrollBehavior = previous;
 }
 
 /**
@@ -107,6 +106,9 @@ function MessageScrollerProvider({ children }: MessageScrollerProviderProps) {
   const [viewport, setViewport] = React.useState<HTMLDivElement | null>(null);
   const [content, setContent] = React.useState<HTMLDivElement | null>(null);
   const pinnedRef = React.useRef(true);
+  // Set while `scrollToStart` animates away from the end, whose first frames
+  // are still near enough to the end to re-pin.
+  const leavingEndRef = React.useRef(false);
 
   const [isScrollable, setIsScrollable] = React.useState(false);
   const [isAtEnd, setIsAtEnd] = React.useState(true);
@@ -132,8 +134,12 @@ function MessageScrollerProvider({ children }: MessageScrollerProviderProps) {
     // would measure the old position against the new height. Only an upward
     // move releases the pin; reaching the end restores it.
     const handleScroll = () => {
-      if (viewport.scrollTop < lastScrollTop) pinnedRef.current = false;
-      if (isNearEnd()) pinnedRef.current = true;
+      const { scrollTop } = viewport;
+      if (scrollTop < lastScrollTop) pinnedRef.current = false;
+      if (scrollTop > lastScrollTop || scrollTop <= EDGE_THRESHOLD) {
+        leavingEndRef.current = false;
+      }
+      if (isNearEnd() && !leavingEndRef.current) pinnedRef.current = true;
       measure();
     };
 
@@ -163,12 +169,14 @@ function MessageScrollerProvider({ children }: MessageScrollerProviderProps) {
   const scrollToEnd = React.useCallback(() => {
     if (!viewport) return;
     pinnedRef.current = true;
+    leavingEndRef.current = false;
     smoothScrollTo(viewport, viewport.scrollHeight);
   }, [viewport]);
 
   const scrollToStart = React.useCallback(() => {
     if (!viewport) return;
     pinnedRef.current = false;
+    leavingEndRef.current = true;
     smoothScrollTo(viewport, 0);
   }, [viewport]);
 
