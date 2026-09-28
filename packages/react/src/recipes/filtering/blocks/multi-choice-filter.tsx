@@ -45,7 +45,7 @@ export function MultiChoiceFilter({
   const addRef = React.useRef<HTMLButtonElement>(null);
   const operatorRef = React.useRef<HTMLButtonElement>(null);
   const restoreAdd = React.useRef(false);
-  const nextSnapshot = JSON.stringify([value, disabled, options]);
+  const nextSnapshot = JSON.stringify([value, disabled]);
   const [snapshot, setSnapshot] = React.useState(nextSnapshot);
   // External replacements invalidate unfinished edits instead of committing stale drafts.
   if (snapshot !== nextSnapshot) {
@@ -58,7 +58,8 @@ export function MultiChoiceFilter({
     ? applied.values
         .map(
           (item) =>
-            options.find((option) => option.value === item)?.label ?? item
+            options.find((option) => option.value === item)?.label ??
+            `${item} (unavailable)`
         )
         .join(', ')
     : 'Choose…';

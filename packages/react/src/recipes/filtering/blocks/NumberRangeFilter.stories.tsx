@@ -2,7 +2,7 @@ import * as React from 'react';
 
 import { Canvas, Source, Title } from '@storybook/addon-docs/blocks';
 import type { Meta, StoryObj } from '@storybook/react';
-import { expect, userEvent, within } from 'storybook/test';
+import { expect, userEvent, waitFor, within } from 'storybook/test';
 
 import operatorSource from '../filter-operator.tsx?raw';
 
@@ -132,7 +132,7 @@ export const Default: Story = {
   play: async ({ canvasElement }) => {
     const canvas = within(canvasElement);
     await userEvent.click(
-      canvas.getByRole('button', { name: 'Remove size filter' })
+      canvas.getByRole('button', { name: 'Remove Size filter' })
     );
     await expect(
       canvas.getByRole('button', { name: 'Add size filter' })
@@ -150,5 +150,92 @@ export const Disabled: Story = {
   play: async ({ canvasElement }) => {
     for (const button of within(canvasElement).getAllByRole('button'))
       await expect(button).toBeDisabled();
+  },
+};
+export const PendingOperator: Story = {
+  render: () => <Preview initialValue={{ operator: 'isEmpty' }} />,
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+    const page = within(canvasElement.ownerDocument.body);
+    const operator = canvas.getByRole('button', {
+      name: 'Change Size operator',
+    });
+    await userEvent.click(operator);
+    await userEvent.click(
+      page.getByRole('menuitemradio', { name: 'is between' })
+    );
+    await expect(
+      await page.findByRole('dialog', { name: 'Filter by size' })
+    ).toBeVisible();
+    await expect(operator).toHaveTextContent('is between');
+    await userEvent.keyboard('{Escape}');
+    await waitFor(() =>
+      expect(
+        page.queryByRole('dialog', { name: 'Filter by size' })
+      ).not.toBeInTheDocument()
+    );
+    await expect(operator).toHaveTextContent('is empty');
+    await waitFor(() => expect(operator).toHaveFocus());
+  },
+};
+export const ErrorOnlyForWrongRange: Story = {
+  render: () => <Preview initialValue={null} />,
+  play: async ({ canvasElement }) => {
+    const page = within(canvasElement.ownerDocument.body);
+    await userEvent.click(
+      within(canvasElement).getByRole('button', { name: 'Add size filter' })
+    );
+    const editor = within(
+      await page.findByRole('dialog', { name: 'Filter by size' })
+    );
+    const minimum = editor.getByRole('spinbutton', { name: 'Minimum' });
+    const maximum = editor.getByRole('spinbutton', { name: 'Maximum' });
+    const apply = editor.getByRole('button', { name: 'Apply' });
+    await expect(minimum).toHaveAccessibleDescription('');
+    await expect(minimum).toHaveAttribute('aria-invalid', 'false');
+    await expect(apply).toBeDisabled();
+    await userEvent.type(minimum, '10');
+    await expect(minimum).toHaveAccessibleDescription('');
+    await expect(minimum).toHaveAttribute('aria-invalid', 'false');
+    await expect(apply).toBeDisabled();
+    await userEvent.type(maximum, '5');
+    await expect(minimum).toHaveAccessibleDescription(
+      'Enter an ordered range from 0.'
+    );
+    await expect(minimum).toHaveAttribute('aria-invalid', 'true');
+    await expect(maximum).toHaveAttribute('aria-invalid', 'true');
+    await expect(apply).toBeDisabled();
+  },
+};
+export const ReapplySameRange: Story = {
+  render: () => <Preview />,
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+    const page = within(canvasElement.ownerDocument.body);
+    const operator = canvas.getByRole('button', {
+      name: 'Change Size operator',
+    });
+    await userEvent.click(operator);
+    await userEvent.click(
+      page.getByRole('menuitemradio', { name: 'is between' })
+    );
+    const editor = within(
+      await page.findByRole('dialog', { name: 'Filter by size' })
+    );
+    await userEvent.click(editor.getByRole('button', { name: 'Apply' }));
+    await waitFor(() =>
+      expect(
+        page.queryByRole('dialog', { name: 'Filter by size' })
+      ).not.toBeInTheDocument()
+    );
+    await userEvent.click(operator);
+    await expect(
+      await page.findByRole('menuitemradio', { name: 'is between' })
+    ).toBeVisible();
+    await userEvent.keyboard('{Escape}');
+    await waitFor(() => expect(operator).toHaveFocus());
+    await expect(
+      page.queryByRole('dialog', { name: 'Filter by size' })
+    ).not.toBeInTheDocument();
   },
 };

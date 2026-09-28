@@ -5,6 +5,10 @@ import type { Meta, StoryObj } from '@storybook/react';
 import { IconHash } from '@tabler/icons-react';
 import { expect, userEvent, waitFor, within } from 'storybook/test';
 
+import {
+  dispatchStoryEvent,
+  useStoryEvent,
+} from '../../../stories/support/filter-block-test-utils';
 import operatorSource from '../filter-operator.tsx?raw';
 
 import {
@@ -27,6 +31,8 @@ function Preview({
   const [value, setValue] = React.useState<NumberComparisonCondition | null>(
     initialValue
   );
+  const [upperBound, setUpperBound] = React.useState<number>();
+  useStoryEvent('story:tighten-bounds', () => setUpperBound(1000));
   return (
     <section
       aria-label="NumberComparisonFilter example"
@@ -38,6 +44,7 @@ function Preview({
         value={value}
         onChange={setValue}
         disabled={disabled}
+        upperBound={upperBound}
       />
       <output
         aria-label="Applied condition"
@@ -243,5 +250,27 @@ export const IncompleteDraft: Story = {
         canvas.getByRole('button', { name: /^Edit Amount:/ })
       ).toHaveFocus()
     );
+  },
+};
+export const BoundsChangeWhileOpen: Story = {
+  render: () => <Preview />,
+  play: async ({ canvasElement }) => {
+    const page = within(canvasElement.ownerDocument.body);
+    await userEvent.click(
+      within(canvasElement).getByRole('button', { name: 'Edit Amount: 500' })
+    );
+    const dialog = await page.findByRole('dialog', {
+      name: 'Filter by amount',
+    });
+    const editor = within(dialog);
+    const input = editor.getByRole('spinbutton', { name: 'Amount' });
+    await userEvent.clear(input);
+    await userEvent.type(input, '750');
+    dispatchStoryEvent('story:tighten-bounds');
+    await expect(
+      await editor.findByText('Allowed range: no minimum to 1000.')
+    ).toBeVisible();
+    await expect(dialog).toHaveAttribute('data-state', 'open');
+    await expect(input).toHaveValue(750);
   },
 };

@@ -5,6 +5,10 @@ import type { Meta, StoryObj } from '@storybook/react';
 import { IconUsers } from '@tabler/icons-react';
 import { expect, userEvent, waitFor, within } from 'storybook/test';
 
+import {
+  dispatchStoryEvent,
+  useStoryEvent,
+} from '../../../stories/support/filter-block-test-utils';
 import operatorSource from '../filter-operator.tsx?raw';
 
 import {
@@ -27,6 +31,17 @@ function Preview({
   const [value, setValue] = React.useState<MultiChoiceCondition | null>(
     initialValue
   );
+  const [options, setOptions] = React.useState([
+    { value: 'design', label: 'Design' },
+    { value: 'engineering', label: 'Engineering' },
+    { value: 'operations', label: 'Operations', disabled: true },
+  ]);
+  useStoryEvent('story:load-options', () =>
+    setOptions((current) => [
+      ...current,
+      { value: 'research', label: 'Research' },
+    ])
+  );
   return (
     <section
       aria-label="MultiChoiceFilter example"
@@ -38,11 +53,7 @@ function Preview({
         value={value}
         onChange={setValue}
         disabled={disabled}
-        options={[
-          { value: 'design', label: 'Design' },
-          { value: 'engineering', label: 'Engineering' },
-          { value: 'operations', label: 'Operations', disabled: true },
-        ]}
+        options={options}
       />
       <output
         aria-label="Applied condition"
@@ -249,5 +260,41 @@ export const OutsideDismissal: Story = {
       page.getByRole('checkbox', { name: 'Engineering' })
     ).not.toBeChecked();
     await userEvent.keyboard('{Escape}');
+  },
+};
+export const UnavailableOption: Story = {
+  render: () => (
+    <Preview
+      initialValue={{ operator: 'isAnyOf', values: ['design', 'retired-id'] }}
+    />
+  ),
+  play: async ({ canvasElement }) => {
+    await expect(
+      within(canvasElement).getByRole('button', {
+        name: 'Edit Team: Design, retired-id (unavailable)',
+      })
+    ).toBeInTheDocument();
+  },
+};
+export const OptionsLoadWhileOpen: Story = {
+  render: () => <Preview />,
+  play: async ({ canvasElement }) => {
+    const page = within(canvasElement.ownerDocument.body);
+    await userEvent.click(
+      within(canvasElement).getByRole('button', { name: 'Edit Team: Design' })
+    );
+    const dialog = await page.findByRole('dialog', { name: 'Filter by team' });
+    const editor = within(dialog);
+    await userEvent.click(
+      editor.getByRole('checkbox', { name: 'Engineering' })
+    );
+    dispatchStoryEvent('story:load-options');
+    await expect(
+      await editor.findByRole('checkbox', { name: 'Research' })
+    ).toBeVisible();
+    await expect(dialog).toHaveAttribute('data-state', 'open');
+    await expect(
+      editor.getByRole('checkbox', { name: 'Engineering' })
+    ).toBeChecked();
   },
 };

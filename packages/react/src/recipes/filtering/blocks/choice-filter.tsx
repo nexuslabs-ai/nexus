@@ -55,8 +55,10 @@ export function ChoiceFilter({
   const operatorRef = React.useRef<HTMLButtonElement>(null);
   const restoreAdd = React.useRef(false);
   const selected = value && 'value' in value ? value.value : '';
-  const selectedLabel =
-    options.find((option) => option.value === selected)?.label ?? selected;
+  const selectedLabel = selected
+    ? (options.find((option) => option.value === selected)?.label ??
+      `${selected} (unavailable)`)
+    : '';
   function focusAdd(node: HTMLButtonElement | null) {
     addRef.current = node;
     if (node && restoreAdd.current) {
@@ -145,8 +147,9 @@ export function ChoiceFilter({
             {('value' in value || pending) && (
               <DropdownMenuTrigger asChild>
                 <FilterConditionSegment
+                  className="nx:min-w-20"
                   disabled={disabled}
-                  aria-label={`Edit ${label}: ${selectedLabel || 'Choose'}`}
+                  aria-label={`Edit ${label}: ${selectedLabel || 'Choose…'}`}
                 >
                   {selectedLabel || 'Choose…'}
                 </FilterConditionSegment>
@@ -204,6 +207,10 @@ export function ChoiceEditor({
   onChange: (value: string) => void;
   disabled?: boolean;
 }) {
+  const listed =
+    value === '' || options.some((option) => option.value === value)
+      ? options
+      : [...options, { value, label: `${value} (unavailable)` }];
   function select(next: string) {
     if (disabled) return;
     if (
@@ -223,7 +230,7 @@ export function ChoiceEditor({
         <DropdownMenuRadioItem value="" disabled={disabled}>
           Any {label.toLowerCase()}
         </DropdownMenuRadioItem>
-        {options.map((option) => (
+        {listed.map((option) => (
           <DropdownMenuRadioItem
             key={option.value}
             value={option.value}

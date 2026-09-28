@@ -119,7 +119,7 @@ export const FileList: Story = {
     const canvas = within(canvasElement);
     const page = within(canvasElement.ownerDocument.body);
     await userEvent.click(
-      canvas.getByRole('button', { name: 'Edit Size is 100–500 KB' })
+      canvas.getByRole('button', { name: 'Edit Size: 100–500 KB' })
     );
     await userEvent.clear(page.getByLabelText('Maximum'));
     await userEvent.type(page.getByLabelText('Maximum'), '1000');
@@ -128,7 +128,7 @@ export const FileList: Story = {
     await expect(canvas.getByText('Brand guide.pdf')).toBeVisible();
     await waitFor(() =>
       expect(
-        canvas.getByRole('button', { name: 'Edit Size is 100–1000 KB' })
+        canvas.getByRole('button', { name: 'Edit Size: 100–1000 KB' })
       ).toHaveFocus()
     );
   },
@@ -139,7 +139,7 @@ export const DraftReset: Story = {
     const canvas = within(canvasElement);
     const page = within(canvasElement.ownerDocument.body);
     const trigger = canvas.getByRole('button', {
-      name: 'Edit Size is 100–500 KB',
+      name: 'Edit Size: 100–500 KB',
     });
     await userEvent.click(trigger);
     await userEvent.clear(page.getByLabelText('Maximum'));
@@ -171,7 +171,7 @@ export const RangeKeyboardAndRemoval: Story = {
     const canvas = within(canvasElement);
     const page = within(canvasElement.ownerDocument.body);
     await userEvent.click(
-      canvas.getByRole('button', { name: 'Edit Size is 100–500 KB' })
+      canvas.getByRole('button', { name: 'Edit Size: 100–500 KB' })
     );
     await userEvent.clear(page.getByLabelText('Minimum'));
     await userEvent.type(page.getByLabelText('Minimum'), '0');
@@ -184,10 +184,10 @@ export const RangeKeyboardAndRemoval: Story = {
     );
     await expect(canvas.getByRole('status')).toHaveTextContent('0 of 5 files');
     await userEvent.click(
-      canvas.getByRole('button', { name: 'Edit Size is 0–0 KB' })
+      canvas.getByRole('button', { name: 'Edit Size: 0–0 KB' })
     );
     await userEvent.click(
-      canvas.getByRole('button', { name: 'Remove size filter' })
+      canvas.getByRole('button', { name: 'Remove Size filter' })
     );
     await waitFor(() =>
       expect(page.queryByRole('dialog')).not.toBeInTheDocument()

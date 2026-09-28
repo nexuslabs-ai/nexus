@@ -22,6 +22,17 @@ export type NumberRangeCondition =
   | { operator: 'isEmpty' }
   | { operator: 'isNotEmpty' };
 
+export type NumberRangeFilterProps = {
+  label: string;
+  icon?: React.ReactNode;
+  unit?: string;
+  lowerBound?: number;
+  upperBound?: number;
+  disabled?: boolean;
+  value: NumberRangeCondition | null;
+  onChange: (value: NumberRangeCondition | null) => void;
+};
+
 export function NumberRangeFilter({
   label,
   icon,
@@ -31,16 +42,7 @@ export function NumberRangeFilter({
   disabled = false,
   value,
   onChange,
-}: {
-  label: string;
-  icon?: React.ReactNode;
-  unit?: string;
-  lowerBound?: number;
-  upperBound?: number;
-  disabled?: boolean;
-  value: NumberRangeCondition | null;
-  onChange: (value: NumberRangeCondition | null) => void;
-}) {
+}: NumberRangeFilterProps) {
   const operator = value?.operator ?? 'between';
   const range = value?.operator === 'between' ? value : null;
   const id = React.useId();
@@ -69,7 +71,8 @@ export function NumberRangeFilter({
     (lowerBound === undefined || Number(min) >= lowerBound) &&
     (upperBound === undefined || Number(max) <= upperBound) &&
     Number(max) >= Number(min);
-  const error = valid
+  const invalid = min !== '' && max !== '' && !valid;
+  const error = !invalid
     ? ''
     : `Enter an ordered range${lowerBound === undefined ? '' : ` from ${lowerBound}`}${upperBound === undefined ? '' : ` up to ${upperBound}`}.`;
   function changeOpen(next: boolean) {
@@ -87,11 +90,13 @@ export function NumberRangeFilter({
     if (!valid || disabled) return;
     onChange({ operator: 'between', min: Number(min), max: Number(max) });
     setOpen(false);
+    setPending(false);
   }
   function remove() {
     if (disabled) return;
     restoreAdd.current = true;
     setOpen(false);
+    setPending(false);
     onChange(null);
     setRemoved(true);
   }
@@ -120,8 +125,8 @@ export function NumberRangeFilter({
     onChange({ operator: next });
   }
   const summary = range
-    ? `${label} is ${range.min}–${range.max}${unit ? ` ${unit}` : ''}`
-    : label;
+    ? `${range.min}–${range.max}${unit ? ` ${unit}` : ''}`
+    : 'Choose…';
   return (
     <Popover open={open && !disabled} onOpenChange={changeOpen}>
       {value ? (
@@ -146,7 +151,7 @@ export function NumberRangeFilter({
                     }
                   : undefined
               }
-              value={operator}
+              value={pending ? 'between' : operator}
               options={['between', 'isEmpty', 'isNotEmpty']}
               onChange={changeOperator}
             />
@@ -155,18 +160,17 @@ export function NumberRangeFilter({
             {(!isValuelessOperator(operator) || pending) && (
               <PopoverTrigger asChild>
                 <FilterConditionSegment
+                  className="nx:min-w-20"
                   disabled={disabled}
-                  aria-label={`Edit ${summary}`}
+                  aria-label={`Edit ${label}: ${summary}`}
                 >
-                  {range
-                    ? `${range.min}–${range.max}${unit ? ` ${unit}` : ''}`
-                    : 'Choose…'}
+                  {summary}
                 </FilterConditionSegment>
               </PopoverTrigger>
             )}
             <FilterConditionRemove
               disabled={disabled}
-              aria-label={`Remove ${label.toLowerCase()} filter`}
+              aria-label={`Remove ${label} filter`}
               onClick={remove}
             />
           </div>
@@ -211,7 +215,7 @@ export function NumberRangeFilter({
                 value={min}
                 onChange={(event) => setMin(event.target.value)}
                 aria-describedby={`${id}-error`}
-                aria-invalid={!valid}
+                aria-invalid={invalid}
               />
             </div>
             <div className="nx:grid nx:gap-1">
@@ -226,7 +230,7 @@ export function NumberRangeFilter({
                 value={max}
                 onChange={(event) => setMax(event.target.value)}
                 aria-describedby={`${id}-error`}
-                aria-invalid={!valid}
+                aria-invalid={invalid}
               />
             </div>
             <p

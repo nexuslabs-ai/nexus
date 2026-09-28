@@ -50,12 +50,7 @@ export function NumberComparisonFilter({
   const addRef = React.useRef<HTMLButtonElement>(null);
   const operatorRef = React.useRef<HTMLButtonElement>(null);
   const restoreAdd = React.useRef(false);
-  const nextSnapshot = JSON.stringify([
-    value,
-    disabled,
-    lowerBound,
-    upperBound,
-  ]);
+  const nextSnapshot = JSON.stringify([value, disabled]);
   const [snapshot, setSnapshot] = React.useState(nextSnapshot);
   // External replacements invalidate unfinished edits instead of committing stale drafts.
   if (snapshot !== nextSnapshot) {

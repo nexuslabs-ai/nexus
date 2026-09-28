@@ -2,7 +2,7 @@ import * as React from 'react';
 
 import { Canvas, Source, Title } from '@storybook/addon-docs/blocks';
 import type { Meta, StoryObj } from '@storybook/react';
-import { expect, userEvent, within } from 'storybook/test';
+import { expect, userEvent, waitFor, within } from 'storybook/test';
 
 import operatorSource from '../filter-operator.tsx?raw';
 
@@ -156,5 +156,51 @@ export const Disabled: Story = {
   play: async ({ canvasElement }) => {
     for (const button of within(canvasElement).getAllByRole('button'))
       await expect(button).toBeDisabled();
+  },
+};
+export const UnavailableOption: Story = {
+  render: () => (
+    <Preview initialValue={{ operator: 'is', value: 'retired-id' }} />
+  ),
+  play: async ({ canvasElement }) => {
+    const page = within(canvasElement.ownerDocument.body);
+    const trigger = within(canvasElement).getByRole('button', {
+      name: 'Edit Status: retired-id (unavailable)',
+    });
+    await userEvent.click(trigger);
+    await expect(
+      await page.findByRole('menuitemradio', {
+        name: 'retired-id (unavailable)',
+      })
+    ).toHaveAttribute('aria-checked', 'true');
+    await userEvent.keyboard('{Escape}');
+    await waitFor(() => expect(trigger).toHaveFocus());
+  },
+};
+export const ChooseAfterEmptyOperator: Story = {
+  render: () => <Preview initialValue={{ operator: 'isEmpty' }} />,
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+    const page = within(canvasElement.ownerDocument.body);
+    await userEvent.click(
+      canvas.getByRole('button', { name: 'Change Status operator' })
+    );
+    await userEvent.click(page.getByRole('menuitemradio', { name: 'is' }));
+    await expect(
+      await page.findByRole('menuitemradio', { name: 'Active' })
+    ).toBeVisible();
+    await expect(
+      canvas.getByRole('button', {
+        name: 'Edit Status: Choose…',
+        hidden: true,
+      })
+    ).toBeInTheDocument();
+    await userEvent.keyboard('{Escape}');
+    await waitFor(() =>
+      expect(page.queryByRole('menu')).not.toBeInTheDocument()
+    );
+    await expect(
+      canvas.getByRole('button', { name: 'Change Status operator' })
+    ).toHaveFocus();
   },
 };
