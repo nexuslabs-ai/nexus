@@ -1,11 +1,16 @@
+import * as React from 'react';
+
 import type { Meta, StoryObj } from '@storybook/react';
 import { fn } from 'storybook/test';
 
+import { Button } from '../../../components/button';
 import {
   verifyFailure,
   verifyNarrow,
   verifyPending,
+  verifyRecordSwitch,
   verifySaveCancel,
+  verifyServerNormalized,
   verifyValidation,
 } from '../../../stories/support/settings-form-test-utils';
 
@@ -14,6 +19,47 @@ import layoutSource from './settings-layout.tsx?raw';
 import { TanStackSettingsForm } from './tanstack-settings-form';
 import blockSource from './tanstack-settings-form.tsx?raw';
 
+const priya = {
+  id: 'priya',
+  values: { name: 'Priya Shah', email: 'priya@example.com', updates: false },
+};
+const arjun = {
+  id: 'arjun',
+  values: { name: 'Arjun Mehta', email: 'arjun@example.com', updates: true },
+};
+function RecordSwitcher({
+  onSave,
+}: {
+  onSave: (values: SettingsValues) => Promise<SettingsValues>;
+}) {
+  const [record, setRecord] = React.useState(priya);
+  function loadNewerCopy() {
+    setRecord({
+      ...record,
+      values: { ...record.values, name: `${record.values.name} (refreshed)` },
+    });
+  }
+  function switchRecord() {
+    setRecord(record.id === 'priya' ? arjun : priya);
+  }
+  return (
+    <div className="nx:grid nx:gap-4">
+      <div className="nx:flex nx:gap-2">
+        <Button variant="outline" onClick={loadNewerCopy}>
+          Load a newer copy
+        </Button>
+        <Button variant="outline" onClick={switchRecord}>
+          Switch record
+        </Button>
+      </div>
+      <TanStackSettingsForm
+        key={record.id}
+        initialValues={record.values}
+        onSave={onSave}
+      />
+    </div>
+  );
+}
 const meta = {
   title: 'Blocks/TanStackSettingsForm',
   component: TanStackSettingsForm,
@@ -23,7 +69,7 @@ const meta = {
       email: 'priya@example.com',
       updates: false,
     },
-    onSave: fn(async (_values: SettingsValues) => {}),
+    onSave: fn(async (values: SettingsValues) => values),
   },
   argTypes: { onSave: { control: false } },
   decorators: [
@@ -55,8 +101,10 @@ export const Validation: Story = { play: verifyValidation };
 export const Saving: Story = {
   args: {
     onSave: fn(
-      (_values: SettingsValues) =>
-        new Promise<void>((resolve) => setTimeout(resolve, 1000))
+      (values: SettingsValues) =>
+        new Promise<SettingsValues>((resolve) =>
+          setTimeout(() => resolve(values), 1000)
+        )
     ),
   },
   play: verifyPending,
@@ -69,4 +117,9 @@ export const NarrowContainer: Story = {
     </div>
   ),
   play: verifyNarrow,
+};
+export const ServerNormalized: Story = { play: verifyServerNormalized };
+export const RecordSwitch: Story = {
+  render: (args) => <RecordSwitcher onSave={args.onSave} />,
+  play: verifyRecordSwitch,
 };

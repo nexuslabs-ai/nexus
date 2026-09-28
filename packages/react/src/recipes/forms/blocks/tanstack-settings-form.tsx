@@ -1,6 +1,7 @@
 'use client';
 
 import * as React from 'react';
+import { flushSync } from 'react-dom';
 
 import {
   useField,
@@ -25,6 +26,7 @@ import { Separator } from '../../../components/separator';
 
 import {
   failureMessage,
+  savedValues,
   type SettingsFormProps,
   SettingsLayout,
   trimmed,
@@ -37,24 +39,36 @@ export function TanStackSettingsForm({
   const id = React.useId();
   const nameRef = React.useRef<HTMLInputElement>(null);
   const emailRef = React.useRef<HTMLInputElement>(null);
+  const saveRef = React.useRef<HTMLButtonElement>(null);
   const submitting = React.useRef(false);
-  const [invalidField, setInvalidField] = React.useState<
-    'name' | 'email' | null
-  >(null);
+  const invalidField = React.useRef<HTMLInputElement | null>(null);
   const [saved, setSaved] = React.useState(initialValues);
+  const [pending, setPending] = React.useState(false);
   const [message, setMessage] = React.useState('');
   const [saveError, setSaveError] = React.useState('');
   const form = useTanStackForm({
     defaultValues: saved,
     onSubmit: async ({ value, formApi }) => {
-      const submitted = trimmed(value);
-      await onSave(submitted);
-      setSaved(submitted);
-      formApi.reset(submitted);
-      setMessage('Changes saved.');
+      setPending(true);
+      try {
+        const baseline = savedValues(await onSave(trimmed(value)));
+        formApi.reset(baseline);
+        flushSync(() => {
+          setSaved(baseline);
+          setMessage('Changes saved.');
+          setPending(false);
+        });
+        nameRef.current?.focus();
+      } catch {
+        flushSync(() => {
+          setSaveError(failureMessage);
+          setPending(false);
+        });
+        saveRef.current?.focus();
+      }
     },
     onSubmitInvalid: ({ value }) => {
-      setInvalidField(value.name.trim() ? 'email' : 'name');
+      invalidField.current = (value.name.trim() ? emailRef : nameRef).current;
     },
   });
   const name = useField({
@@ -76,13 +90,6 @@ export function TanStackSettingsForm({
   });
   const updates = useField({ form, name: 'updates' });
   const dirty = useStore(form.store, (state) => !state.isDefaultValue);
-  const pending = useStore(form.store, (state) => state.isSubmitting);
-  React.useEffect(() => {
-    if (!pending && invalidField) {
-      (invalidField === 'name' ? nameRef : emailRef).current?.focus();
-      setInvalidField(null);
-    }
-  }, [pending, invalidField]);
   const nameError = name.state.meta.errors[0];
   const emailError = email.state.meta.errors[0];
   function clearFeedback() {
@@ -110,9 +117,9 @@ export function TanStackSettingsForm({
     clearFeedback();
     try {
       await form.handleSubmit();
-    } catch {
-      setSaveError(failureMessage);
+      invalidField.current?.focus();
     } finally {
+      invalidField.current = null;
       submitting.current = false;
     }
   }
@@ -131,6 +138,7 @@ export function TanStackSettingsForm({
       error={saveError}
       onSubmit={submit}
       onCancel={cancelChanges}
+      saveRef={saveRef}
     >
       <FieldSet disabled={pending} className="nx:min-w-0">
         <FieldLegend>Personal details</FieldLegend>
@@ -143,7 +151,6 @@ export function TanStackSettingsForm({
               name={name.name}
               ref={nameRef}
               value={name.state.value}
-              onBlur={name.handleBlur}
               id={`${id}-name`}
               autoComplete="name"
               required
@@ -165,7 +172,6 @@ export function TanStackSettingsForm({
               name={email.name}
               ref={emailRef}
               value={email.state.value}
-              onBlur={email.handleBlur}
               id={`${id}-email`}
               type="email"
               autoComplete="email"
@@ -190,7 +196,6 @@ export function TanStackSettingsForm({
             <Checkbox
               name={updates.name}
               checked={updates.state.value}
-              onBlur={updates.handleBlur}
               id={`${id}-updates`}
               onCheckedChange={changeUpdates}
               disabled={pending}

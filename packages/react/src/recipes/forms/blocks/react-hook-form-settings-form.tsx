@@ -2,6 +2,7 @@
 
 import * as React from 'react';
 import { useController, useForm } from 'react-hook-form';
+import { flushSync } from 'react-dom';
 
 import { Checkbox } from '../../../components/checkbox';
 import {
@@ -20,6 +21,7 @@ import { Separator } from '../../../components/separator';
 
 import {
   failureMessage,
+  savedValues,
   type SettingsFormProps,
   SettingsLayout,
   type SettingsValues,
@@ -33,9 +35,11 @@ export function ReactHookFormSettingsForm({
   const id = React.useId();
   const nameRef = React.useRef<HTMLInputElement>(null);
   const emailRef = React.useRef<HTMLInputElement>(null);
+  const saveRef = React.useRef<HTMLButtonElement>(null);
   const submitting = React.useRef(false);
   const [message, setMessage] = React.useState('');
   const [saveError, setSaveError] = React.useState('');
+  const [pending, setPending] = React.useState(false);
   const form = useForm<SettingsValues>({
     defaultValues: initialValues,
     mode: 'onSubmit',
@@ -55,7 +59,7 @@ export function ReactHookFormSettingsForm({
     },
   });
   const updates = useController({ control: form.control, name: 'updates' });
-  const { isDirty: dirty, isSubmitting: pending } = form.formState;
+  const dirty = form.formState.isDirty;
   const nameError = name.fieldState.error?.message;
   const emailError = email.fieldState.error?.message;
   function clearFeedback() {
@@ -85,10 +89,22 @@ export function ReactHookFormSettingsForm({
     email.field.ref(node);
   }
   async function save(values: SettingsValues) {
-    const submitted = trimmed(values);
-    await onSave(submitted);
-    form.reset(submitted);
-    setMessage('Changes saved.');
+    setPending(true);
+    try {
+      const baseline = savedValues(await onSave(trimmed(values)));
+      form.reset(baseline);
+      flushSync(() => {
+        setMessage('Changes saved.');
+        setPending(false);
+      });
+      nameRef.current?.focus();
+    } catch {
+      flushSync(() => {
+        setSaveError(failureMessage);
+        setPending(false);
+      });
+      saveRef.current?.focus();
+    }
   }
   async function submit(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -97,8 +113,6 @@ export function ReactHookFormSettingsForm({
     clearFeedback();
     try {
       await form.handleSubmit(save)();
-    } catch {
-      setSaveError(failureMessage);
     } finally {
       submitting.current = false;
     }
@@ -118,6 +132,7 @@ export function ReactHookFormSettingsForm({
       error={saveError}
       onSubmit={submit}
       onCancel={cancelChanges}
+      saveRef={saveRef}
     >
       <FieldSet disabled={pending} className="nx:min-w-0">
         <FieldLegend>Personal details</FieldLegend>

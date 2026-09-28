@@ -4,12 +4,18 @@ import { Button } from '../../../components/button';
 import { FieldError } from '../../../components/field';
 
 export type SettingsValues = { name: string; email: string; updates: boolean };
-type Save = (values: SettingsValues) => Promise<void>;
-export type SettingsFormProps = { initialValues: SettingsValues; onSave: Save };
+export type SettingsFormProps = {
+  initialValues: SettingsValues;
+  onSave: (values: SettingsValues) => Promise<SettingsValues>;
+};
 export const failureMessage =
   'We could not save your changes. Your edits are still here. Try again.';
 export function trimmed(values: SettingsValues): SettingsValues {
   return { ...values, name: values.name.trim(), email: values.email.trim() };
+}
+/** Keeps only the form's fields from the record onSave resolves with. */
+export function savedValues({ name, email, updates }: SettingsValues) {
+  return { name, email, updates };
 }
 
 export function SettingsLayout({
@@ -21,6 +27,7 @@ export function SettingsLayout({
   error,
   onSubmit,
   onCancel,
+  saveRef,
 }: {
   children: React.ReactNode;
   label: string;
@@ -30,6 +37,7 @@ export function SettingsLayout({
   error: string;
   onSubmit: React.FormEventHandler<HTMLFormElement>;
   onCancel: () => void;
+  saveRef: React.Ref<HTMLButtonElement>;
 }) {
   const status = pending
     ? 'Saving changes…'
@@ -57,7 +65,12 @@ export function SettingsLayout({
         </p>
         <FieldError>{error}</FieldError>
         <div className="nx:flex nx:flex-wrap nx:gap-2">
-          <Button type="submit" loading={pending} disabled={!dirty}>
+          <Button
+            ref={saveRef}
+            type="submit"
+            loading={pending}
+            disabled={!dirty}
+          >
             Save changes
           </Button>
           <Button

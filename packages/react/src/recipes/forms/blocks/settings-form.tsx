@@ -1,6 +1,7 @@
 'use client';
 
 import * as React from 'react';
+import { flushSync } from 'react-dom';
 
 import { Button } from '../../../components/button';
 import { Checkbox } from '../../../components/checkbox';
@@ -21,13 +22,14 @@ import { Separator } from '../../../components/separator';
 export type SettingsValues = { name: string; email: string; updates: boolean };
 export type SettingsFormProps = {
   initialValues: SettingsValues;
-  onSave: (values: SettingsValues) => Promise<void>;
+  onSave: (values: SettingsValues) => Promise<SettingsValues>;
 };
 
 export function SettingsForm({ initialValues, onSave }: SettingsFormProps) {
   const id = React.useId();
   const nameRef = React.useRef<HTMLInputElement>(null);
   const emailRef = React.useRef<HTMLInputElement>(null);
+  const saveRef = React.useRef<HTMLButtonElement>(null);
   const [saved, setSaved] = React.useState<SettingsValues>(initialValues);
   const [draft, setDraft] = React.useState(saved);
   const [errors, setErrors] = React.useState<{ name?: string; email?: string }>(
@@ -90,17 +92,25 @@ export function SettingsForm({ initialValues, onSave }: SettingsFormProps) {
     savingRef.current = true;
     setPending(true);
     try {
-      await onSave(submitted);
-      setSaved(submitted);
-      setDraft(submitted);
-      setMessage('Changes saved.');
+      const { name, email, updates } = await onSave(submitted);
+      const baseline = { name, email, updates };
+      flushSync(() => {
+        setSaved(baseline);
+        setDraft(baseline);
+        setMessage('Changes saved.');
+        setPending(false);
+      });
+      nameRef.current?.focus();
     } catch {
-      setSaveError(
-        'We could not save your changes. Your edits are still here. Try again.'
-      );
+      flushSync(() => {
+        setSaveError(
+          'We could not save your changes. Your edits are still here. Try again.'
+        );
+        setPending(false);
+      });
+      saveRef.current?.focus();
     } finally {
       savingRef.current = false;
-      setPending(false);
     }
   }
   const status = pending
@@ -200,7 +210,12 @@ export function SettingsForm({ initialValues, onSave }: SettingsFormProps) {
         </p>
         <FieldError>{saveError}</FieldError>
         <div className="nx:flex nx:flex-wrap nx:gap-2">
-          <Button type="submit" loading={pending} disabled={!dirty}>
+          <Button
+            ref={saveRef}
+            type="submit"
+            loading={pending}
+            disabled={!dirty}
+          >
             Save changes
           </Button>
           <Button

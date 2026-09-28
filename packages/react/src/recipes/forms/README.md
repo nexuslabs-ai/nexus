@@ -28,9 +28,7 @@ integration owns its own validation and submission lifecycle.
     email: profile.email,
     updates: profile.updates,
   }}
-  onSave={async (values) => {
-    await saveProfile(profile.id, values);
-  }}
+  onSave={(values) => saveProfile(profile.id, values)}
 />
 ```
 
@@ -39,15 +37,15 @@ copied component for your application. `initialValues` seeds an editing session;
 changing it does not overwrite an in-progress draft. Use a record key when
 switching records, or deliberately remount after accepting a remote refresh.
 
-`onSave` must resolve only after persistence succeeds and reject on failure.
-If using `fetch`, check `response.ok` and throw for unsuccessful responses.
-Success establishes the submitted values as the new Cancel baseline. Failure
-preserves the draft for retry. Cancel restores the latest successful baseline
-and focuses the first field. Pending submission prevents duplicate saves.
+`onSave` must resolve with the saved record only after persistence succeeds, and
+reject on failure. If using `fetch`, check `response.ok` and throw for unsuccessful
+responses. The record it resolves with becomes the new baseline, so values the
+server normalised replace what was typed; only `name`, `email` and `updates` are
+kept. Failure preserves the draft for retry and moves focus to Save. Cancel
+restores the latest saved values and focuses the first field; a successful save
+also focuses the first field. Pending submission prevents duplicate saves.
 
-The recipes do not reconcile server-normalized values: adapt the save contract
-if your server returns canonical values that differ from the submission. The
-application also owns authorization, server validation, field-error mapping,
+The application owns authorization, server validation, field-error mapping,
 loading data, navigation guards and persistence. Replace the sample validation
 rules and fields to fit your data. Treat exception text as user-facing only when
 safe to display; otherwise map it to a useful message in your save callback.
