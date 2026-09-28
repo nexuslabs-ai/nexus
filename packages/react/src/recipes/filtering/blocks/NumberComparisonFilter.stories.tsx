@@ -77,6 +77,10 @@ function Preview({
 }
 const usage =
   "import { useState } from 'react';\nimport { NumberComparisonFilter, type NumberComparisonCondition } from './blocks/number-comparison-filter';\n\nexport function Example() {\n const [value, setValue] = useState<NumberComparisonCondition | null>({ operator: 'greaterThan', value: 500 });\n return <NumberComparisonFilter label=\"Amount\" value={value} onChange={setValue}  />;\n}";
+const valueShape = `type NumberComparisonCondition =
+  | { operator: 'is' | 'isNot' | 'greaterThan' | 'lessThan'; value: number }
+  | { operator: 'isEmpty' }
+  | { operator: 'isNotEmpty' };`;
 const meta = {
   title: 'Blocks/NumberComparisonFilter',
   component: Preview,
@@ -90,52 +94,130 @@ const meta = {
         <>
           <Title />
           <p>
-            Compare one finite number using equals, not equals, greater than or
-            less than. Signed decimals are supported; optional lowerBound and
-            upperBound constrain values. Unit is display text.
+            Compare one number: equals, not equals, greater than or less than.
+            The number is a draft until you press Apply.
           </p>
+          <h2>When to use it</h2>
+          <p>
+            Use it for a single threshold such as an amount or a count. For a
+            range with both ends, use NumberRangeFilter.
+          </p>
+          <h2>Minimal composition</h2>
           <Canvas of={Default} />
-          <h2>Use this block</h2>
-          <p>
-            Copy blocks/number-comparison-filter.tsx and filter-operator.tsx
-            from packages/react/src/recipes/filtering, keeping their relative
-            paths. The block imports Nexus components from @nexus_ds/react.
-            Include the copied files in your Tailwind source scan and use the
-            Nexus theme setup.
-          </p>
           <Source code={usage} language="tsx" />
-          <h2>State and behavior</h2>
+          <h2>Value and changes</h2>
           <p>
-            Pass the updated value back through onChange. Null means no
-            condition. Operator changes with an existing value apply
-            immediately; returning from an empty operator opens an editor and
-            commits only on Apply. Cancel, Escape and outside dismissal discard
-            drafts. External value changes close an unfinished editor. Removing
-            restores focus to the Add button.
+            <code>value</code> is controlled: pass the current condition and
+            update it in <code>onChange</code>. <code>null</code> means no
+            filter.
           </p>
+          <Source code={valueShape} language="tsx" />
+          <ul>
+            <li>
+              Apply, or Enter in the field, emits a finite number. Zero,
+              negatives and decimals work.
+            </li>
+            <li>
+              Optional <code>lowerBound</code> and <code>upperBound</code> are
+              inclusive; a value outside them cannot be applied.{' '}
+              <code>unit</code> is display text only.
+            </li>
+            <li>
+              Changing between comparison operators keeps the value and emits
+              immediately.
+            </li>
+            <li>
+              <em>Is empty</em> and <em>is not empty</em> emit immediately.
+            </li>
+            <li>
+              Switching from an empty operator waits for a number and Apply.
+            </li>
+            <li>
+              Pressing × emits <code>null</code>.
+            </li>
+          </ul>
           <p>
-            This uses the same FilterCondition field / operator / value / remove
-            parts as ChoiceFilter and NumberRangeFilter. Your application
-            supplies matching logic, data requests, URL persistence and
-            pagination. The JSON output below the example is for inspecting the
-            emitted condition, not product UI.
+            The block owns the open editor, the draft and a pending operator.
+            Bounds changing while the editor is open do not close it; the draft
+            is re-checked against the new bounds.
           </p>
-          <h2>States</h2>
+          <h2>States and dismissal</h2>
+          <p>
+            Cancel, Escape and clicking outside discard the draft; nothing is
+            emitted. Focus returns to the value you edited, to the operator when
+            you backed out of a pending operator, and to Add after you remove
+            the filter. Replacing the value from outside, or disabling the
+            block, closes an unfinished editor without emitting. An open
+            operator menu is not closed when the block is disabled.
+          </p>
+          <h3>Not applied</h3>
           <Canvas of={NotApplied} />
+          <h3>Empty operator</h3>
           <Canvas of={EmptyOperator} />
+          <h3>Narrow container</h3>
+          <Canvas of={NarrowContainer} />
+          <h3>Disabled</h3>
           <Canvas of={Disabled} />
-          <h2>Copy implementation</h2>
+          <h2>Delivery</h2>
+          <p>
+            Manual guidance until the generated catalog lands (#798). This is
+            copy-source, not a package export.
+          </p>
+          <ul>
+            <li>
+              Copy <code>blocks/number-comparison-filter.tsx</code>,{' '}
+              <code>filter-operator.tsx</code>, keeping the
+              <code>recipes/filtering</code> layout.
+            </li>
+            <li>
+              They import these Nexus component folders, which you need too:
+              <code>button</code>, <code>dropdown-menu</code>,{' '}
+              <code>filter-builder</code>, <code>filter-condition</code>,{' '}
+              <code>input</code>, <code>label</code>, <code>popover</code>. If
+              your copy lives elsewhere, update the relative imports.
+            </li>
+            <li>
+              No npm packages beyond those the Nexus components already use.
+            </li>
+            <li>
+              Include the copied files in your Tailwind source scan and use the
+              Nexus theme and styles setup.
+            </li>
+            <li>
+              Your application owns the options and data, matching, fetching,
+              loading and error states, and URL state. Lay several filters out
+              with <code>blocks/applied-filters.tsx</code>.
+            </li>
+          </ul>
+          <h2>Evidence and support boundary</h2>
+          <p>
+            Each behaviour above is tested on this page:{' '}
+            <code>AddFromNothing</code>, <code>ApplyAndCancel</code>,{' '}
+            <code>IncompleteDraft</code>, <code>DismissDiscardsDraft</code>,{' '}
+            <code>OperatorKeepsValue</code>,{' '}
+            <code>ValuelessOperatorCommits</code>,{' '}
+            <code>PendingOperatorApplies</code>,{' '}
+            <code>BoundsChangeWhileOpen</code>,{' '}
+            <code>ExternalReplaceWhileOpen</code>,{' '}
+            <code>DisabledWhileOpen</code>, <code>InsideParentForm</code>,{' '}
+            <code>InsideDialog</code>, <code>Disabled</code>.
+          </p>
+          <p>
+            Not supported: unit conversion and currency formatting. The
+            application decides how the comparison matches.
+          </p>
+          <h2>Implementation</h2>
           <details>
             <summary>blocks/number-comparison-filter.tsx</summary>
             <Source code={blockSource} language="tsx" />
           </details>
           <details>
-            <summary>filter-operator.tsx — required helper</summary>
+            <summary>filter-operator.tsx — required shared helper</summary>
             <Source code={operatorSource} language="tsx" />
           </details>
           <p>
             <a href="/?path=/docs/patterns-filtering--docs" target="_top">
-              Filtering pattern
+              See how this fits the Filtering pattern
             </a>
           </p>
         </>

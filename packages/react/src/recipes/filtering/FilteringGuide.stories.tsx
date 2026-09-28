@@ -1,8 +1,17 @@
+import * as React from 'react';
+
 import { Canvas, Source, Title } from '@storybook/addon-docs/blocks';
 import type { Meta, StoryObj } from '@storybook/react';
 import { expect, userEvent, waitFor, within } from 'storybook/test';
 
+import {
+  FilterBuilder,
+  type FilterGroup,
+  getFilterErrors,
+} from '../../components/filter-builder';
+
 import { AdvancedFiltering } from './advanced-filters';
+import { exampleFields } from './advanced-fixtures';
 import { AppliedFiltersExample } from './applied-filters-example';
 import appliedExampleSource from './applied-filters-example.tsx?raw';
 import rowSource from './blocks/applied-filters.tsx?raw';
@@ -13,6 +22,15 @@ import comparisonSource from './blocks/number-comparison-filter.tsx?raw';
 import rangeSource from './blocks/number-range-filter.tsx?raw';
 import textSource from './blocks/text-filter.tsx?raw';
 import operatorSource from './filter-operator.tsx?raw';
+import {
+  choiceRule,
+  dateRangeRule,
+  multiChoiceRule,
+  numberComparisonRule,
+  numberRangeRule,
+  textRule,
+} from './filter-rule-examples';
+import rulesSource from './filter-rule-examples.ts?raw';
 import { InvoiceFilteringExample } from './invoice-filtering';
 import invoiceSource from './invoice-filtering.tsx?raw';
 import { TeamDirectory } from './team-directory';
@@ -331,6 +349,44 @@ function BlockSource() {
     </details>
   );
 }
+const convertedRules = [
+  choiceRule('status-rule', 'status', { operator: 'is', value: 'active' }),
+  multiChoiceRule('team-rule', 'team', {
+    operator: 'isAnyOf',
+    values: ['design', 'engineering'],
+  }),
+  textRule('name-rule', 'name', { operator: 'startsWith', value: 'Ma' }),
+  numberComparisonRule('projects-rule', 'projects', {
+    operator: 'greaterThan',
+    value: 3,
+  }),
+  numberRangeRule('projects-range-rule', 'projects', {
+    operator: 'between',
+    min: 1,
+    max: 10,
+  }),
+  dateRangeRule('joined-rule', 'joined', {
+    operator: 'between',
+    from: new Date(2026, 8, 1),
+    to: new Date(2026, 8, 30),
+  }),
+].filter((rule) => rule !== null);
+function ConvertedRules() {
+  const [tree, setTree] = React.useState<FilterGroup>({
+    kind: 'group',
+    id: 'root',
+    conjunction: 'all',
+    children: convertedRules,
+  });
+  return (
+    <FilterBuilder
+      aria-label="Converted block conditions"
+      fields={exampleFields}
+      value={tree}
+      onValueChange={setTree}
+    />
+  );
+}
 const meta = {
   title: 'Patterns/Filtering',
   component: FilteringGuide,
@@ -489,5 +545,55 @@ export const InvoiceFiltering: Story = {
       canvas.getByRole('button', { name: 'Reset search and filters' })
     );
     await expect(count).toHaveTextContent('6 of 6');
+  },
+};
+export const BlockConditionsToRules: Story = {
+  name: 'Block conditions as FilterBuilder rules',
+  render: () => <ConvertedRules />,
+  parameters: { docs: { source: { code: rulesSource, language: 'tsx' } } },
+  play: async ({ canvasElement }) => {
+    await expect(convertedRules).toMatchObject([
+      { field: 'status', operator: 'is', value: 'active' },
+      { field: 'team', operator: 'isAnyOf', value: ['design', 'engineering'] },
+      { field: 'name', operator: 'startsWith', value: 'Ma' },
+      { field: 'projects', operator: 'greaterThan', value: '3' },
+      { field: 'projects', operator: 'between', value: ['1', '10'] },
+      {
+        field: 'joined',
+        operator: 'between',
+        value: ['2026-09-01', '2026-09-30'],
+      },
+    ]);
+    const root: FilterGroup = {
+      kind: 'group',
+      id: 'root',
+      conjunction: 'all',
+      children: convertedRules,
+    };
+    await expect(getFilterErrors(root, exampleFields)).toEqual([]);
+    await expect(
+      within(canvasElement).queryByText(
+        /Choose an available|Enter a|The start must|This operator takes/
+      )
+    ).not.toBeInTheDocument();
+    await expect(choiceRule('none', 'status', null)).toBeNull();
+    await expect(
+      textRule('empty', 'name', { operator: 'isEmpty' })
+    ).toMatchObject({ operator: 'isEmpty', value: '' });
+    const retired = choiceRule('retired', 'status', {
+      operator: 'is',
+      value: 'retired-id',
+    });
+    await expect(
+      getFilterErrors(
+        {
+          kind: 'group',
+          id: 'root',
+          conjunction: 'all',
+          children: retired ? [retired] : [],
+        },
+        exampleFields
+      )
+    ).toEqual([{ id: 'retired', message: 'Choose an available option.' }]);
   },
 };

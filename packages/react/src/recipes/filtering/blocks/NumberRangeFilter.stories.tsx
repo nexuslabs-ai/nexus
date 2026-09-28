@@ -72,6 +72,10 @@ function Preview({
 
 const usage =
   "import { useState } from 'react';\nimport {\n  NumberRangeFilter,\n  type NumberRangeCondition,\n} from './blocks/number-range-filter';\n\nexport function Example() {\n  const [value, setValue] = useState<NumberRangeCondition | null>({\n    operator: 'between',\n    min: 100,\n    max: 500,\n  });\n  return (\n    <NumberRangeFilter\n      label=\"Size\"\n      value={value}\n      onChange={setValue}\n      unit=\"KB\"\n      lowerBound={0}\n    />\n  );\n}\n";
+const valueShape = `type NumberRangeCondition =
+  | { operator: 'between'; min: number; max: number }
+  | { operator: 'isEmpty' }
+  | { operator: 'isNotEmpty' };`;
 const meta = {
   title: 'Blocks/NumberRangeFilter',
   component: Preview,
@@ -85,54 +89,114 @@ const meta = {
         <>
           <Title />
           <p>
-            Edit two bounds as a draft. Apply commits them together; Cancel,
-            Escape and outside dismissal discard edits.
+            Filter by a number between a minimum and a maximum. The range is a
+            draft until you press Apply.
           </p>
+          <h2>When to use it</h2>
+          <p>
+            Use it when both ends matter, such as a size or price band. For a
+            single threshold, use NumberComparisonFilter.
+          </p>
+          <h2>Minimal composition</h2>
           <Canvas of={Default} />
-          <p>
-            Built from FilterConditionField, FilterConditionSegment and
-            FilterConditionRemove: the shared field / operator / value / ×
-            structure. This block adds minimum/maximum inputs, validation and
-            Apply/Cancel.
-            <a
-              href="/?path=/docs/components-filtercondition--docs"
-              target="_top"
-            >
-              {' '}
-              See the shared anatomy.
-            </a>
-          </p>
-          <h2>Use this block</h2>
-          <p>
-            This is copy-source code, not a package export. Copy{' '}
-            <code>blocks/number-range-filter.tsx</code> and{' '}
-            <code>filter-operator.tsx</code> from{' '}
-            <code>packages/react/src/recipes/filtering</code>. Preserve their
-            relative paths. The block imports its components from{' '}
-            <code>@nexus_ds/react</code>.
-          </p>
           <Source code={usage} language="tsx" />
-          <h2>What your application owns</h2>
+          <h2>Value and changes</h2>
           <p>
-            Pass the current condition as value and update it in onChange. Null
-            means no filter. Your application supplies data, matching rules,
-            fetching and URL state. Include the copied files in Tailwind
-            scanning and use the existing Nexus theme and styles setup.
+            <code>value</code> is controlled: pass the current condition and
+            update it in <code>onChange</code>. <code>null</code> means no
+            filter.
           </p>
+          <Source code={valueShape} language="tsx" />
+          <ul>
+            <li>
+              Apply, or Enter in a field, emits both ends together. Both are
+              required, finite and ordered; signed decimals work.
+            </li>
+            <li>
+              Optional <code>lowerBound</code> and <code>upperBound</code> limit
+              the range. <code>unit</code> is display text only.
+            </li>
+            <li>
+              An error appears only when both ends are filled and the range is
+              wrong.
+            </li>
+            <li>
+              <em>Is empty</em> and <em>is not empty</em> emit immediately.
+            </li>
+            <li>
+              Switching from an empty operator to <em>is between</em> waits for
+              a valid range and Apply.
+            </li>
+            <li>
+              Pressing × emits <code>null</code>.
+            </li>
+          </ul>
           <p>
-            Bounds must be finite and ordered. Signed decimals work by default;
-            lowerBound and upperBound are optional limits. Unit is display text.
-            Returning from an empty operator asks for valid bounds before
-            committing.
+            The block owns the open editor, the draft and a pending operator.
           </p>
-          <h2>States</h2>
+          <h2>States and dismissal</h2>
+          <p>
+            Cancel, Escape and clicking outside discard the draft; nothing is
+            emitted. Focus returns to the value you edited, to the operator when
+            you backed out of a pending operator, and to Add after you remove
+            the filter. Replacing the value from outside, or disabling the
+            block, closes an unfinished editor without emitting. An open
+            operator menu is not closed when the block is disabled.
+          </p>
           <h3>Not applied</h3>
           <Canvas of={NotApplied} />
           <h3>Empty operator</h3>
           <Canvas of={EmptyOperator} />
           <h3>Disabled</h3>
           <Canvas of={Disabled} />
-          <h2>Copy the implementation</h2>
+          <h2>Delivery</h2>
+          <p>
+            Manual guidance until the generated catalog lands (#798). This is
+            copy-source, not a package export.
+          </p>
+          <ul>
+            <li>
+              Copy <code>blocks/number-range-filter.tsx</code>,{' '}
+              <code>filter-operator.tsx</code>, keeping the
+              <code>recipes/filtering</code> layout.
+            </li>
+            <li>
+              They import these Nexus component folders, which you need too:
+              <code>button</code>, <code>dropdown-menu</code>,{' '}
+              <code>filter-builder</code>, <code>filter-condition</code>,{' '}
+              <code>input</code>, <code>label</code>, <code>popover</code>. If
+              your copy lives elsewhere, update the relative imports.
+            </li>
+            <li>
+              No npm packages beyond those the Nexus components already use.
+            </li>
+            <li>
+              Include the copied files in your Tailwind source scan and use the
+              Nexus theme and styles setup.
+            </li>
+            <li>
+              Your application owns the options and data, matching, fetching,
+              loading and error states, and URL state. Lay several filters out
+              with <code>blocks/applied-filters.tsx</code>.
+            </li>
+          </ul>
+          <h2>Evidence and support boundary</h2>
+          <p>
+            Each behaviour above is tested on this page:{' '}
+            <code>AddFromNothing</code>, <code>SignedDecimalsAndCancel</code>,{' '}
+            <code>ErrorOnlyForWrongRange</code>,{' '}
+            <code>DismissDiscardsDraft</code>,{' '}
+            <code>ValuelessOperatorCommits</code>, <code>PendingOperator</code>,{' '}
+            <code>PendingOperatorApplies</code>, <code>ReapplySameRange</code>,{' '}
+            <code>ExternalReplaceWhileOpen</code>,{' '}
+            <code>DisabledWhileOpen</code>, <code>InsideParentForm</code>,{' '}
+            <code>Disabled</code>.
+          </p>
+          <p>
+            Not supported: unit conversion and open-ended ranges. The
+            application decides whether the ends are inclusive.
+          </p>
+          <h2>Implementation</h2>
           <details>
             <summary>blocks/number-range-filter.tsx</summary>
             <Source code={blockSource} language="tsx" />

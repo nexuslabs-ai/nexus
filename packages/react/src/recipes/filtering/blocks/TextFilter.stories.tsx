@@ -65,6 +65,10 @@ function Preview({
 }
 const usage =
   "import { useState } from 'react';\nimport { TextFilter, type TextCondition } from './blocks/text-filter';\n\nexport function Example() {\n const [value, setValue] = useState<TextCondition | null>({ operator: 'contains', value: 'design' });\n return <TextFilter label=\"Name\" value={value} onChange={setValue}  />;\n}";
+const valueShape = `type TextCondition =
+  | { operator: 'contains' | 'is' | 'isNot' | 'startsWith'; value: string }
+  | { operator: 'isEmpty' }
+  | { operator: 'isNotEmpty' };`;
 const meta = {
   title: 'Blocks/TextFilter',
   component: Preview,
@@ -78,52 +82,121 @@ const meta = {
         <>
           <Title />
           <p>
-            Choose contains, equals, not equals or starts with. Apply commits
-            trimmed, nonempty text. Matching rules such as case sensitivity
-            belong to the application.
+            Filter by text a record contains, starts with, or equals. The text
+            is a draft until you press Apply.
           </p>
+          <h2>When to use it</h2>
+          <p>
+            Use it for free-text fields such as names or titles. For a fixed set
+            of values, use ChoiceFilter or MultiChoiceFilter.
+          </p>
+          <h2>Minimal composition</h2>
           <Canvas of={Default} />
-          <h2>Use this block</h2>
-          <p>
-            Copy blocks/text-filter.tsx and filter-operator.tsx from
-            packages/react/src/recipes/filtering, keeping their relative paths.
-            The block imports Nexus components from @nexus_ds/react. Include the
-            copied files in your Tailwind source scan and use the Nexus theme
-            setup.
-          </p>
           <Source code={usage} language="tsx" />
-          <h2>State and behavior</h2>
+          <h2>Value and changes</h2>
           <p>
-            Pass the updated value back through onChange. Null means no
-            condition. Operator changes with an existing value apply
-            immediately; returning from an empty operator opens an editor and
-            commits only on Apply. Cancel, Escape and outside dismissal discard
-            drafts. External value changes close an unfinished editor. Removing
-            restores focus to the Add button.
+            <code>value</code> is controlled: pass the current condition and
+            update it in <code>onChange</code>. <code>null</code> means no
+            filter.
           </p>
+          <Source code={valueShape} language="tsx" />
+          <ul>
+            <li>
+              Apply, or Enter in the field, emits the trimmed text. Blank text
+              cannot be applied.
+            </li>
+            <li>
+              Changing between text operators keeps the text and emits
+              immediately.
+            </li>
+            <li>
+              <em>Is empty</em> and <em>is not empty</em> emit immediately.
+            </li>
+            <li>Switching from an empty operator waits for text and Apply.</li>
+            <li>
+              Pressing × emits <code>null</code>.
+            </li>
+          </ul>
           <p>
-            This uses the same FilterCondition field / operator / value / remove
-            parts as ChoiceFilter and NumberRangeFilter. Your application
-            supplies matching logic, data requests, URL persistence and
-            pagination. The JSON output below the example is for inspecting the
-            emitted condition, not product UI.
+            The block owns the open editor, the draft and a pending operator.
+            Applying never submits a surrounding form.
           </p>
-          <h2>States</h2>
+          <h2>States and dismissal</h2>
+          <p>
+            Cancel, Escape and clicking outside discard the draft; nothing is
+            emitted. Focus returns to the value you edited, to the operator when
+            you backed out of a pending operator, and to Add after you remove
+            the filter. Replacing the value from outside, or disabling the
+            block, closes an unfinished editor without emitting. An open
+            operator menu is not closed when the block is disabled.
+          </p>
+          <h3>Not applied</h3>
           <Canvas of={NotApplied} />
+          <h3>Empty operator</h3>
           <Canvas of={EmptyOperator} />
+          <h3>Narrow container</h3>
+          <Canvas of={NarrowContainer} />
+          <h3>Disabled</h3>
           <Canvas of={Disabled} />
-          <h2>Copy implementation</h2>
+          <h2>Delivery</h2>
+          <p>
+            Manual guidance until the generated catalog lands (#798). This is
+            copy-source, not a package export.
+          </p>
+          <ul>
+            <li>
+              Copy <code>blocks/text-filter.tsx</code>,{' '}
+              <code>filter-operator.tsx</code>, keeping the
+              <code>recipes/filtering</code> layout.
+            </li>
+            <li>
+              They import these Nexus component folders, which you need too:
+              <code>button</code>, <code>dropdown-menu</code>,{' '}
+              <code>filter-builder</code>, <code>filter-condition</code>,{' '}
+              <code>input</code>, <code>label</code>, <code>popover</code>. If
+              your copy lives elsewhere, update the relative imports.
+            </li>
+            <li>
+              No npm packages beyond those the Nexus components already use.
+            </li>
+            <li>
+              Include the copied files in your Tailwind source scan and use the
+              Nexus theme and styles setup.
+            </li>
+            <li>
+              Your application owns the options and data, matching, fetching,
+              loading and error states, and URL state. Lay several filters out
+              with <code>blocks/applied-filters.tsx</code>.
+            </li>
+          </ul>
+          <h2>Evidence and support boundary</h2>
+          <p>
+            Each behaviour above is tested on this page:{' '}
+            <code>AddFromNothing</code>, <code>ApplyAndCancel</code>,{' '}
+            <code>IncompleteDraft</code>, <code>DismissDiscardsDraft</code>,{' '}
+            <code>OperatorKeepsValue</code>,{' '}
+            <code>ValuelessOperatorCommits</code>,{' '}
+            <code>PendingOperatorApplies</code>,{' '}
+            <code>ExternalReplaceWhileOpen</code>,{' '}
+            <code>DisabledWhileOpen</code>, <code>InsideParentForm</code>,{' '}
+            <code>Disabled</code>.
+          </p>
+          <p>
+            Not supported: case sensitivity, normalization and query escaping.
+            The application decides how text matches.
+          </p>
+          <h2>Implementation</h2>
           <details>
             <summary>blocks/text-filter.tsx</summary>
             <Source code={blockSource} language="tsx" />
           </details>
           <details>
-            <summary>filter-operator.tsx — required helper</summary>
+            <summary>filter-operator.tsx — required shared helper</summary>
             <Source code={operatorSource} language="tsx" />
           </details>
           <p>
             <a href="/?path=/docs/patterns-filtering--docs" target="_top">
-              Filtering pattern
+              See how this fits the Filtering pattern
             </a>
           </p>
         </>
