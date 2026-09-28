@@ -1,4 +1,6 @@
-import { useState } from 'react'
+import { type ReactNode, useState } from 'react'
+
+import { NexusAppearanceProvider } from '~/components/nexus/components/appearance/provider'
 
 import { Button } from '~/components/ui/button'
 import {
@@ -8,8 +10,20 @@ import {
   CardHeader,
   CardTitle,
 } from '~/components/ui/card'
+import { NexusPanel } from '~/NexusPanel'
 
-export default function App() {
+function MaybeProvider({ enabled, children }: { enabled: boolean; children: ReactNode }) {
+  if (!enabled) return children
+  return <NexusAppearanceProvider storageKey={false}>{children}</NexusAppearanceProvider>
+}
+
+export default function App({
+  withNexus,
+  withProvider,
+}: {
+  withNexus: boolean
+  withProvider: boolean
+}) {
   const [dark, setDark] = useState(false)
 
   return (
@@ -73,6 +87,12 @@ export default function App() {
             />
           </article>
         </section>
+
+        {withNexus && (
+          <MaybeProvider enabled={withProvider}>
+            <NexusPanel />
+          </MaybeProvider>
+        )}
       </main>
     </div>
   )

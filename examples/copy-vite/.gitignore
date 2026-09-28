@@ -22,3 +22,9 @@ dist-ssr
 *.njsproj
 *.sln
 *.sw?
+
+# Committed: pins the fixture for reproducible installs (overrides examples/.gitignore).
+!package-lock.json
+
+# Installed from the local Nexus registry by `npm run nexus:add`; never committed.
+src/components/nexus/

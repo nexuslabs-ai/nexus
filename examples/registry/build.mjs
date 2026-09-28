@@ -33,7 +33,7 @@ const target = (srcPath) => `@components/nexus/${srcPath}`;
 function sourceFile(srcPath) {
   return {
     path: `packages/react/src/${srcPath}`,
-    type: 'registry:component',
+    type: 'registry:file',
     target: target(srcPath),
   };
 }
@@ -95,6 +95,25 @@ const stylesheet = {
   ],
 };
 
+// Records which source transforms the CLI applies: directive, leading
+// comment, a direct icon import, an @/ alias import and an @/ string.
+const transformProbe = {
+  name: 'transform-probe',
+  type: 'registry:component',
+  files: [
+    {
+      path: 'examples/registry/probe/transform-probe.tsx',
+      type: 'registry:component',
+      target: target('probe/as-component.tsx'),
+    },
+    {
+      path: 'examples/registry/probe/transform-probe.tsx',
+      type: 'registry:file',
+      target: target('probe/as-file.tsx'),
+    },
+  ],
+};
+
 // Negative control: a bare registryDependencies name resolves against the
 // default shadcn registry, not this one.
 const bareDependency = {
@@ -119,6 +138,7 @@ const registry = {
     ...COMPONENTS.map(componentItem),
     appearanceProvider,
     stylesheet,
+    transformProbe,
     bareDependency,
   ],
 };
