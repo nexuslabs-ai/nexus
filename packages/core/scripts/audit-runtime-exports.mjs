@@ -131,12 +131,22 @@ function decodedBundle(file) {
     .replace(/\\(['"`\\])/g, '$1');
 }
 
+// Descriptions may be templated over token names (`${family}-background`), so
+// match each by its longest run of prose between hyphenated names.
+function longestLiteralRun(prose) {
+  return prose
+    .split(/\S+-\S+/)
+    .map((run) => run.trim())
+    .reduce((longest, run) => (run.length > longest.length ? run : longest));
+}
+
 const runtimeColorProse = [
   ...new Set(
     catalogue
       .filter((token) => token.variants.some((variant) => variant.appearance))
       .map((token) => token.description)
       .filter(Boolean)
+      .map(longestLiteralRun)
   ),
 ];
 assert.ok(
