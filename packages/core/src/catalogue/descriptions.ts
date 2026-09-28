@@ -1,14 +1,7 @@
-const FOREGROUND_FAMILIES = [
-  'primary',
-  'secondary',
-  'error',
-  'information',
-  'success',
-  'warning',
-] as const;
+import { FAMILY_PAIRS } from '../lib/apca-pairs';
 
 const FOREGROUND_DESCRIPTIONS = Object.fromEntries(
-  FOREGROUND_FAMILIES.flatMap((family) => [
+  FAMILY_PAIRS.flatMap((family) => [
     [
       `${family}-foreground`,
       `Foreground on ${family}-background. The surface relationship defines this role, not text alone: text and icons share it, and contrasting control parts or indicators may use it on the same surface. Other pairings require contrast coverage.`,

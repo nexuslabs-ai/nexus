@@ -25,7 +25,7 @@ export interface ApcaPair {
   solveAs?: string;
 }
 
-const FAMILY_PAIRS = [
+export const FAMILY_PAIRS = [
   'primary',
   'secondary',
   'success',
