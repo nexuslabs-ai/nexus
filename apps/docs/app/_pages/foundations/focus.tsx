@@ -184,7 +184,7 @@ nx:aria-invalid:focus-visible:border-focus-error`}
           Primary, secondary, outline, ghost, destructive — they all focus in{' '}
           <code>focus-default</code>. Focus is a system signal (&ldquo;you are
           here&rdquo;), not a per-variant or status signal, so there is no
-          per-variant focus colour. <code>focus-default</code> shares the solved
+          per-variant focus colour. <code>focus-default</code> shares the solved{' '}
           <code>primary-subtle-foreground</code> colour, with focus surfaces
           included in its contrast checks. That is why the ring re-tints with
           the theme picker and component code never needs a brand-specific focus

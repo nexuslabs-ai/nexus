@@ -621,7 +621,7 @@ describe('status families', () => {
             theme[`--nx-color-${status}-subtle-foreground`]!,
             theme[`--nx-color-${status}-subtle`]!
           ),
-          `${status} text on subtle`
+          `${status} subtle foreground on subtle`
         ).toBeGreaterThanOrEqual(TIER_THRESHOLDS.ui);
       }
     }

@@ -1,13 +1,13 @@
 ---
 '@nexus_ds/core': minor
+'@nexus_ds/react': minor
 ---
 
 Breaking: rename border-active to border-focus, four normal status borders to
-status-border, and border-primary / border-primary-active to primary-border /
+`{status}-border`, and border-primary / border-primary-active to primary-border /
 primary-border-active, preserving their light/dark values and contrast
 relationships. Update runtime variables and consumer utilities together; there
-are no old-name aliases. All content-color token names and values remain
-unchanged, including the six family-subtle-foreground names.
+are no old-name aliases.
 
 | Before                  | After                   |
 | ----------------------- | ----------------------- |
