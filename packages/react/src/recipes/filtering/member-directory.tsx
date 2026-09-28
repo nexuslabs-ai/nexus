@@ -133,7 +133,15 @@ export function MemberDirectory({
           </Button>
         </div>
       )}
-      {data && data.total === 0 && (
+      {data && data.total === 0 && !filtered && (
+        <div className="nx:grid nx:justify-items-center nx:gap-2 nx:rounded-lg nx:border nx:border-border-default nx:px-4 nx:py-8 nx:text-center">
+          <h3 className="nx:typography-label-default">No members yet</h3>
+          <p className="nx:typography-body-default nx:text-muted-foreground">
+            Invite people to your teams to see them here.
+          </p>
+        </div>
+      )}
+      {data && data.total === 0 && filtered && (
         <div className="nx:grid nx:justify-items-center nx:gap-2 nx:rounded-lg nx:border nx:border-border-default nx:px-4 nx:py-8 nx:text-center">
           <h3 className="nx:typography-label-default">No matching members</h3>
           <p className="nx:typography-body-default nx:text-muted-foreground">
