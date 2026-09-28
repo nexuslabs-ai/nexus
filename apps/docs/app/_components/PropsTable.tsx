@@ -8,7 +8,11 @@ import {
   type PropEntry,
 } from '../_lib/props';
 
-import { slugify, SubsectionHeading } from './Heading';
+import {
+  slugify,
+  SUBSECTION_HEADING_CLASS,
+  SubsectionHeading,
+} from './Heading';
 import { InlineCode } from './InlineCode';
 import {
   Badge,
@@ -52,7 +56,7 @@ export async function PropsTable({
       {!component && (
         <SubsectionHeading
           id={propsHeadingId(entry.name)}
-          className="nx:typography-label-default nx:font-semibold nx:mt-6 nx:mb-2"
+          className={SUBSECTION_HEADING_CLASS}
         >
           {entry.name}
         </SubsectionHeading>

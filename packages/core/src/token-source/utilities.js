@@ -61,6 +61,15 @@ export function durationUtility(key) {
   };
 }
 
+/**
+ * The motion tokens emitted as Tailwind's `--default-transition-duration` and
+ * `--default-transition-timing-function`.
+ */
+export const DEFAULT_TRANSITION = /** @type {const} */ ({
+  duration: 'default',
+  ease: 'enter',
+});
+
 /** Semantic border tokens keyed by their utility alias, in emit order. */
 export const BORDER_COLOR_ALIAS_TOKENS = /** @type {const} */ ({
   default: 'border-default',

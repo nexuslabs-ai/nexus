@@ -549,13 +549,13 @@ export const WithDataAttributes: Story = {
 export const WithCustomClassName: Story = {
   args: {
     children: 'Custom Class',
-    className: 'custom-test-class',
+    className: 'nx:mt-2',
   },
   play: async ({ canvasElement }) => {
     const canvas = within(canvasElement);
     const button = canvas.getByRole('button');
 
-    await expect(button).toHaveClass('custom-test-class');
+    await expect(button).toHaveClass('nx:mt-2');
   },
 };
 

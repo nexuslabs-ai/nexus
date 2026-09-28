@@ -209,13 +209,13 @@ export const WithDataAttributes: Story = {
 export const WithCustomClassName: Story = {
   args: {
     children: 'Custom',
-    className: 'custom-test-class',
+    className: 'nx:mt-2',
   },
   play: async ({ canvasElement }) => {
     const canvas = within(canvasElement);
     const badge = canvas.getByText('Custom');
 
-    await expect(badge).toHaveClass('custom-test-class');
+    await expect(badge).toHaveClass('nx:mt-2');
   },
 };
 

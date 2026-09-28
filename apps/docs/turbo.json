@@ -3,6 +3,7 @@
   "extends": ["//"],
   "tasks": {
     "generate:demos": {
+      "dependsOn": ["generate:dependencies"],
       "outputs": ["__generated__/**"],
       "cache": false
     },
@@ -37,9 +38,12 @@
         "scripts/generate-page-manifest.mjs",
         "scripts/page-manifest.mjs",
         "scripts/roots.mjs",
+        "scripts/humanize.mjs",
+        "scripts/examples.mjs",
         "page-registry/**",
         "content/**",
         "app/_pages/**",
+        "examples/**",
         "$TURBO_ROOT$/.prettierrc"
       ],
       "outputs": [

@@ -10,7 +10,7 @@ export type TokenCategory =
 
 export interface SemanticTokenMeta {
   /** Bare token name, without the --nx-color- prefix. */
-  name: string;
+  name: SemanticColorName;
   category: TokenCategory;
 }
 
@@ -142,9 +142,20 @@ const ALPHA_TOKEN_NAMES = [
   'popover-backdrop',
 ] as const;
 
+/** Bare name of every semantic colour token, without the --nx-color- prefix. */
+export type SemanticColorName =
+  | (typeof SURFACE_TOKEN_NAMES)[number]
+  | (typeof TEXT_TOKEN_NAMES)[number]
+  | (typeof BORDER_TOKEN_NAMES)[number]
+  | (typeof BRAND_TOKEN_NAMES)[number]
+  | (typeof STATUS_TOKEN_NAMES)[number]
+  | (typeof CHART_TOKEN_NAMES)[number]
+  | (typeof FOCUS_TOKEN_NAMES)[number]
+  | (typeof ALPHA_TOKEN_NAMES)[number];
+
 function metas(
   category: TokenCategory,
-  names: readonly string[]
+  names: readonly SemanticColorName[]
 ): SemanticTokenMeta[] {
   return names.map((name) => ({ name, category }));
 }
