@@ -7,9 +7,22 @@ status-border, and border-primary / border-primary-active to primary-border /
 primary-border-active, preserving their light/dark values and contrast
 relationships. Update runtime variables and consumer utilities together; there
 are no old-name aliases. All content-color token names and values remain
-unchanged, including the six family-subtle-foreground names. See the
-[migration guide](https://github.com/nexuslabs-ai/nexus/blob/main/docs/migrations/approved-token-names.md)
-for the full rename map.
+unchanged, including the six family-subtle-foreground names.
+
+| Before                  | After                   |
+| ----------------------- | ----------------------- |
+| `border-active`         | `border-focus`          |
+| `border-error`          | `error-border`          |
+| `border-information`    | `information-border`    |
+| `border-success`        | `success-border`        |
+| `border-warning`        | `warning-border`        |
+| `border-primary`        | `primary-border`        |
+| `border-primary-active` | `primary-border-active` |
+
+The map applies to `--nx-color-*` variables, `--color-*` theme aliases and
+utilities (`nx:border-border-error` → `nx:border-error-border`).
+`nx:border-color-active` becomes `nx:border-color-focus`; the other
+`nx:border-color-*` aliases keep their names.
 
 CSS snapshots advance to version 7 to invalidate obsolete names. State-only
 cookies remain version 6 and retain preferences; server-rendered consumers should
