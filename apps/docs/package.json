@@ -40,7 +40,7 @@
   },
   "devDependencies": {
     "@mdx-js/mdx": "^3.1.1",
-    "@tailwindcss/postcss": "^4.1.18",
+    "@tailwindcss/postcss": "4.3.0",
     "concurrently": "^9.2.4",
     "@types/mdx": "^2.0.13",
     "@types/node": "^25.0.3",
@@ -50,7 +50,7 @@
     "postcss": "^8.4.49",
     "prettier": "^3.7.4",
     "react-docgen-typescript": "^2.4.0",
-    "tailwindcss": "^4.1.18",
+    "tailwindcss": "4.3.0",
     "typescript": "^5.9.3"
   }
 }

@@ -148,8 +148,11 @@ export const UtilityClasses: Story = {
         <thead>
           <tr className="nx:text-left nx:text-muted-foreground">
             <th className="nx:p-2">Series</th>
+            {/* audit-class-refs-ignore-next-line */}
             <th className="nx:p-2">nx:bg-chart-categorical-N</th>
+            {/* audit-class-refs-ignore-next-line */}
             <th className="nx:p-2">nx:text-chart-categorical-N</th>
+            {/* audit-class-refs-ignore-next-line */}
             <th className="nx:p-2">nx:border-chart-categorical-N</th>
           </tr>
         </thead>

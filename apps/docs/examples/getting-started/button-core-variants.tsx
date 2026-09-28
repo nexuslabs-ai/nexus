@@ -1,4 +1,6 @@
-import { Button } from '@nexus_ds/react';
+'use client';
+
+import { Button } from '@/components/button/button';
 
 export default function ButtonCoreVariants() {
   return (

@@ -26,9 +26,9 @@ export function ComponentPage({ slug }: { slug: string }) {
   const page = requireSection('components').pages.find(
     (entry) => entry.slug === slug
   );
-  if (!page) {
+  if (!page?.examples) {
     throw new Error(
-      `ComponentPage: no /components/${slug} page in the manifest — add apps/docs/content/components/${slug}.mdx.`
+      `ComponentPage: no /components/${slug} component page in the manifest — add apps/docs/content/components/${slug}.mdx.`
     );
   }
 
@@ -39,7 +39,7 @@ export function ComponentPage({ slug }: { slug: string }) {
     );
   }
 
-  const examples = examplesFor(slug, page.examples ?? []);
+  const examples = examplesFor(slug, page.examples);
 
   return (
     <>

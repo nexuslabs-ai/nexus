@@ -60,6 +60,7 @@ of the build, not of one import, so a second unprefixed import does not buy you
 a second, unprefixed utility layer: everything stays `nx:`. It emits preflight
 twice wherever you put it. Put it _after_ the Nexus import and it also
 re-injects Tailwind's default `@theme` on top of Nexus's resets, so
+{/* audit-class-refs-ignore-next-line */}
 `nx:bg-red-500` and a stock `nx:text-lg` come back alongside the tokens.
 
 Tailwind finds class names by scanning your project, so a pasted component's
@@ -238,20 +239,7 @@ lines to add to `app/globals.css`.
 
 Render it:
 
-```tsx
-import { Button } from '@/components/button/button';
-
-export default function Page() {
-  return (
-    <div className="nx:flex nx:flex-wrap nx:gap-3">
-      <Button>Primary</Button>
-      <Button variant="secondary">Secondary</Button>
-      <Button variant="outline">Outline</Button>
-      <Button variant="ghost">Ghost</Button>
-    </div>
-  );
-}
-```
+<ComponentSource id="getting-started/button-core-variants" />
 
 <ComponentPreview id="getting-started/button-core-variants" />
 
@@ -321,6 +309,8 @@ to parse and no rule runs: install `typescript-eslint` too and give the entry
 
 - **[Theme setup](/getting-started/theme-setup)** — pick a brand and surface
   tone, seed the theme from a cookie, wire Vite.
+- **[Create](/create)** — style real Nexus components live, then copy the
+  appearance into your project.
 - **[Foundations → Color](/foundations/color)** — how the palette is engineered
   (OKLCH + APCA).
 - **[Components](/components)** — the full catalog, each page with the source to

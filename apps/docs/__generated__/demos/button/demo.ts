@@ -3,4 +3,4 @@
 
 export { Component } from "./demo.client";
 
-export const source = "import { Button } from '@nexus_ds/react';\n\nexport default function ButtonDemo() {\n  return <Button>Button</Button>;\n}\n";
+export const source = "'use client';\n\nimport { Button } from '@/components/button/button';\n\nexport default function ButtonDemo() {\n  return <Button>Button</Button>;\n}\n";
