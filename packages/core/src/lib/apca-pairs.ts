@@ -25,7 +25,7 @@ export interface ApcaPair {
   solveAs?: string;
 }
 
-export const FAMILY_PAIRS = [
+export const COLOR_FAMILIES = [
   'primary',
   'secondary',
   'success',
@@ -93,7 +93,7 @@ export const APCA_PAIRS = [
   text('nav-foreground', 'nav-item-active', 'ui'),
   ink('error-subtle-foreground', 'background', 'ui'),
   ink('error-subtle-foreground', 'container', 'ui'),
-  ...FAMILY_PAIRS.flatMap((family) => [
+  ...COLOR_FAMILIES.flatMap((family) => [
     label(`${family}-foreground`, `${family}-background`, 'ui'),
     label(`${family}-foreground`, `${family}-background-hover`, 'ui'),
     label(`${family}-foreground`, `${family}-background-active`, 'ui'),
