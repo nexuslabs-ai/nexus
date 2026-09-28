@@ -123,7 +123,7 @@ function Avatar({
       className={cn(
         avatarVariants({ size: resolvedSize, shape: resolvedShape }),
         ring &&
-          'nx:ring-2 nx:ring-border-primary nx:ring-offset-2 nx:ring-offset-surface',
+          'nx:ring-2 nx:ring-primary-border nx:ring-offset-2 nx:ring-offset-surface',
         className
       )}
       {...props}
@@ -242,7 +242,6 @@ interface AvatarStatusProps
    * Visually-hidden text announced by assistive tech in place of the
    * colour-only dot. Defaults to the capitalised `status`. Pass `''` to opt
    * out when an adjacent text label already conveys presence.
-   * @default the capitalised `status` ('Online', 'Away', 'Busy', 'Offline')
    */
   label?: string;
 }

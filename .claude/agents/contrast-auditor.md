@@ -16,8 +16,8 @@ semantic color output against the shared pair table in
 Static semantic color JSON and the legacy Node contrast script no longer exist.
 Do not look for deleted static color JSON families when diagnosing failures. The
 source of truth is the runtime engine: `derive-theme.ts`,
-`appearance-model.ts`, `surface-ladder.ts`, `static-ramps.ts`,
-`token-registry.ts`, and `apca-pairs.ts`.
+`appearance-model.ts`, `surface-ladder.ts`, `primitive-palette.ts`,
+`semantic-palette-references.ts`, `token-registry.ts`, and `apca-pairs.ts`.
 
 ## Procedure
 
@@ -48,14 +48,14 @@ Vitest failure labels are emitted as:
 
 Use that label to open the runtime source that owns the failing token family:
 
-| Token family                 | Primary source                                                  |
-| ---------------------------- | --------------------------------------------------------------- |
-| surface, text, nav, disabled | `packages/core/src/lib/surface-ladder.ts` and `derive-theme.ts` |
-| primary, secondary           | `packages/core/src/lib/derive-theme.ts`                         |
-| status                       | `packages/core/src/lib/static-ramps.ts` and `derive-theme.ts`   |
-| chart                        | `packages/core/src/lib/derive-theme.ts`                         |
-| focus                        | `packages/core/src/lib/derive-theme.ts`                         |
-| APCA pair list               | `packages/core/src/lib/apca-pairs.ts`                           |
+| Token family                 | Primary source                                                               |
+| ---------------------------- | ---------------------------------------------------------------------------- |
+| surface, text, nav, disabled | `packages/core/src/lib/surface-ladder.ts` and `derive-theme.ts`              |
+| primary, secondary           | `packages/core/src/lib/derive-theme.ts`                                      |
+| status                       | `packages/core/src/lib/semantic-palette-references.ts` and `derive-theme.ts` |
+| chart                        | `packages/core/src/lib/semantic-palette-references.ts` and `derive-theme.ts` |
+| focus                        | `packages/core/src/lib/derive-theme.ts`                                      |
+| APCA pair list               | `packages/core/src/lib/apca-pairs.ts`                                        |
 
 Do not lower APCA thresholds to make a failure pass. Fix the semantic mapping,
 the runtime derivation, or the pair table if the pair itself is wrong.

@@ -11,36 +11,52 @@ export interface Demo {
 }
 
 export const demos = {
-  "badge-demo": {
-    id: "badge-demo",
-    load: () => import("./demos/badge-demo"),
+  "badge/demo": {
+    id: "badge/demo",
+    load: () => import("./demos/badge/demo"),
   },
-  "badge-variants": {
-    id: "badge-variants",
-    load: () => import("./demos/badge-variants"),
+  "badge/variants": {
+    id: "badge/variants",
+    load: () => import("./demos/badge/variants"),
   },
-  "button-demo": {
-    id: "button-demo",
-    load: () => import("./demos/button-demo"),
+  "button/demo": {
+    id: "button/demo",
+    load: () => import("./demos/button/demo"),
   },
-  "button-variants": {
-    id: "button-variants",
-    load: () => import("./demos/button-variants"),
+  "button/disabled": {
+    id: "button/disabled",
+    load: () => import("./demos/button/disabled"),
+  },
+  "button/sizes": {
+    id: "button/sizes",
+    load: () => import("./demos/button/sizes"),
+  },
+  "button/variants": {
+    id: "button/variants",
+    load: () => import("./demos/button/variants"),
+  },
+  "button/with-icon": {
+    id: "button/with-icon",
+    load: () => import("./demos/button/with-icon"),
+  },
+  "getting-started/button-core-variants": {
+    id: "getting-started/button-core-variants",
+    load: () => import("./demos/getting-started/button-core-variants"),
   },
 } satisfies Record<string, Demo>;
 
 export type DemoId = keyof typeof demos;
 
-const byId = new Map<string, Demo>(Object.entries(demos));
+export function isDemoId(id: string): id is DemoId {
+  return Object.hasOwn(demos, id);
+}
 
 export function getDemo(id: string): Demo {
-  const demo = byId.get(id);
-
-  if (!demo) {
+  if (!isDemoId(id)) {
     throw new Error(
       `Unknown demo id: ${id}. Add apps/docs/examples/${id}.tsx, or fix the id.`
     );
   }
 
-  return demo;
+  return demos[id];
 }

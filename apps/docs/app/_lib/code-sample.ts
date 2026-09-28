@@ -1,3 +1,4 @@
+import bash from '@shikijs/langs/bash';
 import css from '@shikijs/langs/css';
 import tsx from '@shikijs/langs/tsx';
 import { createHighlighterCore, type HighlighterCore } from 'shiki/core';
@@ -7,7 +8,7 @@ import { NEXUS_CODE_THEME } from '../../code-theme';
 
 import 'server-only';
 
-const LANGS = { css, tsx };
+const LANGS = { bash, css, tsx };
 
 export type CodeSampleLanguage = keyof typeof LANGS;
 

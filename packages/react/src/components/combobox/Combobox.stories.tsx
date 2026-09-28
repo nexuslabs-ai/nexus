@@ -361,7 +361,7 @@ export const EmptyResults: Story = {
       // aria-required-children flags the transient absence of option children
       // while the query matches nothing, which is expected here. All other a11y
       // rules stay enabled. Mirrors the Command Empty story.
-      config: { rules: [{ id: 'aria-required-children', enabled: false }] },
+      options: { rules: { 'aria-required-children': { enabled: false } } },
     },
   },
   play: async ({ canvasElement }) => {

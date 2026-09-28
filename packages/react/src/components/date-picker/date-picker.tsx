@@ -70,7 +70,7 @@ const staticDayPickerClassNames = {
     defaultClassNames.dropdowns
   ),
   dropdown_root: cn(
-    'nx:relative nx:rounded-md nx:border-default nx:border-border-default nx:shadow-xs nx:has-focus:border-border-active',
+    'nx:relative nx:rounded-md nx:border-default nx:border-border-default nx:shadow-xs nx:has-focus:border-border-focus',
     defaultClassNames.dropdown_root
   ),
   dropdown: cn(

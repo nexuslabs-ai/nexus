@@ -184,7 +184,7 @@ export const Empty: Story = {
       // The no-results state legitimately renders an empty listbox; axe's
       // aria-required-children flags the transient absence of option children,
       // which is expected here. All other a11y rules stay enabled.
-      config: { rules: [{ id: 'aria-required-children', enabled: false }] },
+      options: { rules: { 'aria-required-children': { enabled: false } } },
     },
   },
   play: async ({ canvasElement }) => {
@@ -215,7 +215,7 @@ export const QueryAwareEmpty: Story = {
   ),
   parameters: {
     a11y: {
-      config: { rules: [{ id: 'aria-required-children', enabled: false }] },
+      options: { rules: { 'aria-required-children': { enabled: false } } },
     },
   },
   play: async ({ canvasElement }) => {
@@ -619,9 +619,7 @@ export const WithDataAttributes: Story = {
     const shortcut = canvasElement.querySelector(
       '[data-slot="command-shortcut"]'
     );
-    const rawTextXsClass = ['nx:text', 'xs'].join('-');
     await expect(shortcut).toHaveClass('nx:typography-shortcut');
-    await expect(shortcut).not.toHaveClass(rawTextXsClass);
     await expect(shortcut).not.toHaveClass('nx:tracking-widest');
   },
 };

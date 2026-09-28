@@ -2,6 +2,17 @@ import fs from 'fs';
 import path from 'path';
 import { fileURLToPath, pathToFileURL } from 'url';
 
+import { formatTokenValue, resolveValue } from '../src/token-source/format.js';
+import {
+  SPACING_MODE_FILE_PATTERN,
+  splitSpacingTokens,
+} from '../src/token-source/spacing.js';
+import {
+  extractTokens,
+  isReference,
+  pathToCssVarPrefixed,
+} from '../src/token-source/tokens.js';
+
 import {
   CANONICAL_SPACING_DEFAULT_MODE,
   collectBorderwidthModes,
@@ -17,10 +28,8 @@ import {
   DEFAULT_CONFIG,
   discoverPrimitives,
   ensureDir,
-  extractTokens,
   filterDivergentDark,
   formatDistCssFiles,
-  formatTokenValue,
   generateAutofillUtilitiesCSS,
   generateBaseLayerCSS,
   generateBorderColorAliasUtilitiesCSS,
@@ -34,15 +43,10 @@ import {
   generateThemedModesCSS,
   generateTypographyUtilitiesCSS,
   getGoogleFontsImportFromTokens,
-  isReference,
   log,
   parseArgs,
   partitionThemedModes,
-  pathToCssVarPrefixed,
   readTokenFile,
-  resolveValue,
-  SPACING_MODE_FILE_PATTERN,
-  splitSpacingTokens,
 } from './utils.js';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
@@ -648,7 +652,7 @@ export async function generateTailwindPackage(
   const borderWidth = generateBorderWidthUtilitiesCSS(borderwidthTokens);
   if (borderWidth.css) {
     writeDistFile('borderwidth-utilities.css', borderWidth.css);
-    log.success(`Generated ${borderWidth.count} border width utilities`);
+    log.success(`Generated ${borderWidth.count} border width alias utilities`);
   }
 
   const borderColorAliases =
@@ -713,7 +717,7 @@ export async function generateTailwindPackage(
   }
   console.log(`   Engine semantic colors: ${lightSemanticTokens.length}`);
   console.log(`   Typography utilities: ${typography.count}`);
-  console.log(`   Border width utilities: ${borderWidth.count}`);
+  console.log(`   Border width alias utilities: ${borderWidth.count}`);
   console.log(`   Output: ${distDir}`);
 }
 
