@@ -1,16 +1,16 @@
 import { expect, type Mock, userEvent, waitFor, within } from 'storybook/test';
 
-import type { SaveProfile } from './profile-settings';
+import type { Values } from '../../recipes/forms/settings-layout';
 
-type ProfilePlayContext = {
+type SettingsPlayContext = {
   canvasElement: HTMLElement;
-  args: { onSave: Mock<SaveProfile> };
+  args: { onSave: Mock<(values: Values) => Promise<void>> };
 };
 
-export async function verifyProfileSaveCancel({
+export async function verifySaveCancel({
   canvasElement,
   args,
-}: ProfilePlayContext) {
+}: SettingsPlayContext) {
   const canvas = within(canvasElement);
   const name = canvas.getByRole('textbox', { name: 'Name' });
   const updates = canvas.getByRole('checkbox', { name: 'Product updates' });
@@ -47,10 +47,10 @@ export async function verifyProfileSaveCancel({
   await expect(save).toBeDisabled();
 }
 
-export async function verifyProfileValidation({
+export async function verifyValidation({
   canvasElement,
   args,
-}: ProfilePlayContext) {
+}: SettingsPlayContext) {
   const canvas = within(canvasElement);
   const name = canvas.getByRole('textbox', { name: 'Name' });
   const email = canvas.getByRole('textbox', { name: 'Email' });
@@ -80,10 +80,10 @@ export async function verifyProfileValidation({
   await expect(canvas.queryByRole('alert')).not.toBeInTheDocument();
 }
 
-export async function verifyProfilePending({
+export async function verifyPending({
   canvasElement,
   args,
-}: ProfilePlayContext) {
+}: SettingsPlayContext) {
   const canvas = within(canvasElement);
   let completeSave: () => void = () => {};
   const response = new Promise<void>((resolve) => {
@@ -102,19 +102,21 @@ export async function verifyProfilePending({
   await expect(canvas.getByRole('checkbox')).toBeDisabled();
   await expect(canvas.getByRole('button', { name: 'Cancel' })).toBeDisabled();
   await expect(save).toBeDisabled();
+  await userEvent.keyboard('{Enter}');
+  save.click();
+  await expect(args.onSave).toHaveBeenCalledTimes(1);
   completeSave();
   await waitFor(() =>
     expect(canvas.getByRole('status')).toHaveTextContent('Changes saved')
   );
-  await expect(args.onSave).toHaveBeenCalledTimes(1);
   await expect(name).toBeEnabled();
   await expect(save).toBeDisabled();
 }
 
-export async function verifyProfileSaveFailure({
+export async function verifyFailure({
   canvasElement,
   args,
-}: ProfilePlayContext) {
+}: SettingsPlayContext) {
   const canvas = within(canvasElement);
   const name = canvas.getByRole('textbox', { name: 'Name' });
   const save = canvas.getByRole('button', { name: 'Save changes' });
@@ -138,9 +140,9 @@ export async function verifyProfileSaveFailure({
   await expect(save).toBeDisabled();
 }
 
-export async function verifyProfileNarrowFit({
+export async function verifyNarrow({
   canvasElement,
-}: Pick<ProfilePlayContext, 'canvasElement'>) {
+}: Pick<SettingsPlayContext, 'canvasElement'>) {
   const canvas = within(canvasElement);
   await userEvent.clear(canvas.getByRole('textbox', { name: 'Name' }));
   await userEvent.click(canvas.getByRole('button', { name: 'Save changes' }));
