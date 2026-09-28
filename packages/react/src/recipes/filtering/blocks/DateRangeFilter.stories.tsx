@@ -3,8 +3,16 @@ import * as React from 'react';
 import { Canvas, Source, Title } from '@storybook/addon-docs/blocks';
 import type { Meta, StoryObj } from '@storybook/react';
 import { IconCalendar } from '@tabler/icons-react';
-import { expect, userEvent, waitFor, within } from 'storybook/test';
+import { expect, fn, userEvent, waitFor, within } from 'storybook/test';
 
+import {
+  dispatchStoryEvent,
+  expectEditorClosed,
+  expectFocus,
+  expectMenuClosed,
+  ParentForm,
+  useStoryEvent,
+} from '../../../stories/support/filter-block-test-utils';
 import operatorSource from '../filter-operator.tsx?raw';
 
 import { type DateRangeCondition, DateRangeFilter } from './date-range-filter';
@@ -15,16 +23,32 @@ const initial: DateRangeCondition = {
   from: new Date(2026, 8, 1),
   to: new Date(2026, 8, 10),
 };
+const replacement: DateRangeCondition = {
+  operator: 'between',
+  from: new Date(2026, 8, 2),
+  to: new Date(2026, 8, 3),
+};
 function Preview({
   initialValue = initial,
   disabled = false,
+  onChange,
 }: {
   initialValue?: DateRangeCondition | null;
   disabled?: boolean;
+  onChange?: (value: DateRangeCondition | null) => void;
 }) {
   const [value, setValue] = React.useState<DateRangeCondition | null>(
     initialValue
   );
+  const [isDisabled, setDisabled] = React.useState(disabled);
+  useStoryEvent('story:replace', () => setValue(replacement));
+  useStoryEvent('story:toggle-disabled', () =>
+    setDisabled((current) => !current)
+  );
+  function change(next: DateRangeCondition | null) {
+    setValue(next);
+    onChange?.(next);
+  }
   return (
     <section
       aria-label="DateRangeFilter example"
@@ -34,8 +58,8 @@ function Preview({
         label="Created"
         icon={<IconCalendar aria-hidden="true" />}
         value={value}
-        onChange={setValue}
-        disabled={disabled}
+        onChange={change}
+        disabled={isDisabled}
         today={new Date(2026, 8, 27)}
       />
       <output
@@ -52,6 +76,7 @@ const usage =
 const meta = {
   title: 'Blocks/DateRangeFilter',
   component: Preview,
+  args: { onChange: fn() },
   tags: ['autodocs'],
   parameters: {
     layout: 'centered',
@@ -194,4 +219,161 @@ export const NarrowContainer: Story = {
       <Preview />
     </div>
   ),
+};
+const lastSevenDays = {
+  operator: 'between',
+  from: new Date(2026, 8, 21),
+  to: new Date(2026, 8, 27),
+};
+export const AddFromNothing: Story = {
+  render: (args) => <Preview initialValue={null} onChange={args.onChange} />,
+  play: async ({ canvasElement, args }) => {
+    const page = within(canvasElement.ownerDocument.body);
+    await userEvent.click(
+      within(canvasElement).getByRole('button', { name: 'Add created filter' })
+    );
+    const editor = within(
+      await page.findByRole('dialog', { name: 'Filter by created' })
+    );
+    await expect(editor.getByRole('button', { name: 'Apply' })).toBeDisabled();
+    await userEvent.click(editor.getByRole('button', { name: 'Last 7 days' }));
+    await userEvent.click(editor.getByRole('button', { name: 'Apply' }));
+    await expect(args.onChange).toHaveBeenCalledTimes(1);
+    await expect(args.onChange).toHaveBeenLastCalledWith(lastSevenDays);
+    await expectEditorClosed(canvasElement, 'Filter by created');
+  },
+};
+export const ValuelessOperatorCommits: Story = {
+  render: (args) => <Preview onChange={args.onChange} />,
+  play: async ({ canvasElement, args }) => {
+    const page = within(canvasElement.ownerDocument.body);
+    await userEvent.click(
+      within(canvasElement).getByRole('button', {
+        name: 'Change Created operator',
+      })
+    );
+    await userEvent.click(
+      page.getByRole('menuitemradio', { name: 'is not empty' })
+    );
+    await expect(args.onChange).toHaveBeenLastCalledWith({
+      operator: 'isNotEmpty',
+    });
+    await expectMenuClosed(canvasElement);
+  },
+};
+export const PendingOperatorApplies: Story = {
+  render: (args) => (
+    <Preview initialValue={{ operator: 'isEmpty' }} onChange={args.onChange} />
+  ),
+  play: async ({ canvasElement, args }) => {
+    const page = within(canvasElement.ownerDocument.body);
+    await userEvent.click(
+      within(canvasElement).getByRole('button', {
+        name: 'Change Created operator',
+      })
+    );
+    await userEvent.click(
+      page.getByRole('menuitemradio', { name: 'is between' })
+    );
+    const editor = within(
+      await page.findByRole('dialog', { name: 'Filter by created' })
+    );
+    await expect(args.onChange).not.toHaveBeenCalled();
+    await userEvent.click(editor.getByRole('button', { name: 'Last 7 days' }));
+    await userEvent.click(editor.getByRole('button', { name: 'Apply' }));
+    await expect(args.onChange).toHaveBeenCalledTimes(1);
+    await expect(args.onChange).toHaveBeenLastCalledWith(lastSevenDays);
+  },
+};
+export const DismissDiscardsDraft: Story = {
+  render: (args) => <Preview onChange={args.onChange} />,
+  play: async ({ canvasElement, args }) => {
+    const canvas = within(canvasElement);
+    const page = within(canvasElement.ownerDocument.body);
+    const trigger = canvas.getByRole('button', { name: /^Edit Created:/ });
+    await userEvent.click(trigger);
+    await userEvent.click(
+      await page.findByRole('button', { name: 'Last 7 days' })
+    );
+    await userEvent.keyboard('{Escape}');
+    await expectEditorClosed(canvasElement, 'Filter by created');
+    await expectFocus(trigger);
+    await userEvent.click(trigger);
+    await userEvent.click(
+      await page.findByRole('button', { name: 'Last 7 days' })
+    );
+    await userEvent.click(canvas.getByLabelText('Applied condition'));
+    await expectEditorClosed(canvasElement, 'Filter by created');
+    await expect(args.onChange).not.toHaveBeenCalled();
+  },
+};
+export const ExternalReplaceWhileOpen: Story = {
+  render: (args) => <Preview onChange={args.onChange} />,
+  play: async ({ canvasElement, args }) => {
+    const canvas = within(canvasElement);
+    const page = within(canvasElement.ownerDocument.body);
+    const trigger = canvas.getByRole('button', { name: /^Edit Created:/ });
+    const before = trigger.getAttribute('aria-label');
+    await userEvent.click(trigger);
+    await userEvent.click(
+      await page.findByRole('button', { name: 'Last 7 days' })
+    );
+    dispatchStoryEvent('story:replace');
+    await expectEditorClosed(canvasElement, 'Filter by created');
+    await expect(
+      canvas.getByRole('button', { name: /^Edit Created:/ })
+    ).not.toHaveAttribute('aria-label', before);
+    await expect(args.onChange).not.toHaveBeenCalled();
+  },
+};
+export const DisabledWhileOpen: Story = {
+  render: (args) => <Preview onChange={args.onChange} />,
+  play: async ({ canvasElement, args }) => {
+    const canvas = within(canvasElement);
+    const page = within(canvasElement.ownerDocument.body);
+    await userEvent.click(
+      canvas.getByRole('button', { name: /^Edit Created:/ })
+    );
+    await userEvent.click(
+      await page.findByRole('button', { name: 'Last 7 days' })
+    );
+    dispatchStoryEvent('story:toggle-disabled');
+    await expectEditorClosed(canvasElement, 'Filter by created');
+    for (const button of canvas.getAllByRole('button'))
+      await expect(button).toBeDisabled();
+    dispatchStoryEvent('story:toggle-disabled');
+    await waitFor(() => expect(canvas.getAllByRole('button')[0]).toBeEnabled());
+    await expect(
+      page.queryByRole('dialog', { name: 'Filter by created' })
+    ).not.toBeInTheDocument();
+    await expect(args.onChange).not.toHaveBeenCalled();
+  },
+};
+export const InsideParentForm: Story = {
+  render: (args) => (
+    <ParentForm>
+      <Preview onChange={args.onChange} />
+    </ParentForm>
+  ),
+  play: async ({ canvasElement, args }) => {
+    const canvas = within(canvasElement);
+    const page = within(canvasElement.ownerDocument.body);
+    await userEvent.click(
+      canvas.getByRole('button', { name: /^Edit Created:/ })
+    );
+    await userEvent.click(
+      await page.findByRole('button', { name: 'Last 7 days' })
+    );
+    await userEvent.click(page.getByRole('button', { name: 'Apply' }));
+    await expect(args.onChange).toHaveBeenLastCalledWith(lastSevenDays);
+    await expect(canvas.getByLabelText('Parent submissions')).toHaveTextContent(
+      '0'
+    );
+    await userEvent.click(
+      canvas.getByRole('button', { name: 'Submit search' })
+    );
+    await expect(canvas.getByLabelText('Parent submissions')).toHaveTextContent(
+      '1'
+    );
+  },
 };

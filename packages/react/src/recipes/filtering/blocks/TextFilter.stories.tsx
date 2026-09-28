@@ -3,22 +3,45 @@ import * as React from 'react';
 import { Canvas, Source, Title } from '@storybook/addon-docs/blocks';
 import type { Meta, StoryObj } from '@storybook/react';
 import { IconLetterCase } from '@tabler/icons-react';
-import { expect, userEvent, waitFor, within } from 'storybook/test';
+import { expect, fn, userEvent, waitFor, within } from 'storybook/test';
 
+import {
+  dispatchStoryEvent,
+  expectEditorClosed,
+  expectFocus,
+  expectMenuClosed,
+  ParentForm,
+  useStoryEvent,
+} from '../../../stories/support/filter-block-test-utils';
 import operatorSource from '../filter-operator.tsx?raw';
 
 import { type TextCondition, TextFilter } from './text-filter';
 import blockSource from './text-filter.tsx?raw';
 
 const initial: TextCondition = { operator: 'contains', value: 'design' };
+const replacement: TextCondition = {
+  operator: 'contains',
+  value: 'operations',
+};
 function Preview({
   initialValue = initial,
   disabled = false,
+  onChange,
 }: {
   initialValue?: TextCondition | null;
   disabled?: boolean;
+  onChange?: (value: TextCondition | null) => void;
 }) {
   const [value, setValue] = React.useState<TextCondition | null>(initialValue);
+  const [isDisabled, setDisabled] = React.useState(disabled);
+  useStoryEvent('story:replace', () => setValue(replacement));
+  useStoryEvent('story:toggle-disabled', () =>
+    setDisabled((current) => !current)
+  );
+  function change(next: TextCondition | null) {
+    setValue(next);
+    onChange?.(next);
+  }
   return (
     <section
       aria-label="TextFilter example"
@@ -28,8 +51,8 @@ function Preview({
         label="Name"
         icon={<IconLetterCase aria-hidden="true" />}
         value={value}
-        onChange={setValue}
-        disabled={disabled}
+        onChange={change}
+        disabled={isDisabled}
       />
       <output
         aria-label="Applied condition"
@@ -45,6 +68,7 @@ const usage =
 const meta = {
   title: 'Blocks/TextFilter',
   component: Preview,
+  args: { onChange: fn() },
   tags: ['autodocs'],
   parameters: {
     layout: 'centered',
@@ -207,6 +231,189 @@ export const IncompleteDraft: Story = {
     );
     await waitFor(() =>
       expect(canvas.getByRole('button', { name: /^Edit Name:/ })).toHaveFocus()
+    );
+  },
+};
+export const AddFromNothing: Story = {
+  render: (args) => <Preview initialValue={null} onChange={args.onChange} />,
+  play: async ({ canvasElement, args }) => {
+    const page = within(canvasElement.ownerDocument.body);
+    await userEvent.click(
+      within(canvasElement).getByRole('button', { name: 'Add name filter' })
+    );
+    const editor = within(
+      await page.findByRole('dialog', { name: 'Filter by name' })
+    );
+    await expect(editor.getByRole('button', { name: 'Apply' })).toBeDisabled();
+    await userEvent.type(
+      editor.getByRole('textbox', { name: 'Name' }),
+      ' ops '
+    );
+    await userEvent.click(editor.getByRole('button', { name: 'Apply' }));
+    await expect(args.onChange).toHaveBeenCalledTimes(1);
+    await expect(args.onChange).toHaveBeenLastCalledWith({
+      operator: 'contains',
+      value: 'ops',
+    });
+    await expectEditorClosed(canvasElement, 'Filter by name');
+  },
+};
+export const OperatorKeepsValue: Story = {
+  render: (args) => <Preview onChange={args.onChange} />,
+  play: async ({ canvasElement, args }) => {
+    const page = within(canvasElement.ownerDocument.body);
+    await userEvent.click(
+      within(canvasElement).getByRole('button', {
+        name: 'Change Name operator',
+      })
+    );
+    await userEvent.click(page.getByRole('menuitemradio', { name: 'is' }));
+    await expect(args.onChange).toHaveBeenCalledTimes(1);
+    await expect(args.onChange).toHaveBeenLastCalledWith({
+      operator: 'is',
+      value: 'design',
+    });
+    await expectMenuClosed(canvasElement);
+  },
+};
+export const ValuelessOperatorCommits: Story = {
+  render: (args) => <Preview onChange={args.onChange} />,
+  play: async ({ canvasElement, args }) => {
+    const canvas = within(canvasElement);
+    const page = within(canvasElement.ownerDocument.body);
+    await userEvent.click(
+      canvas.getByRole('button', { name: 'Change Name operator' })
+    );
+    await userEvent.click(
+      page.getByRole('menuitemradio', { name: 'is empty' })
+    );
+    await expect(args.onChange).toHaveBeenLastCalledWith({
+      operator: 'isEmpty',
+    });
+    await expect(
+      canvas.queryByRole('button', { name: /^Edit Name/ })
+    ).not.toBeInTheDocument();
+    await expectMenuClosed(canvasElement);
+  },
+};
+export const PendingOperatorApplies: Story = {
+  render: (args) => (
+    <Preview initialValue={{ operator: 'isEmpty' }} onChange={args.onChange} />
+  ),
+  play: async ({ canvasElement, args }) => {
+    const canvas = within(canvasElement);
+    const page = within(canvasElement.ownerDocument.body);
+    await userEvent.click(
+      canvas.getByRole('button', { name: 'Change Name operator' })
+    );
+    await userEvent.click(
+      page.getByRole('menuitemradio', { name: 'starts with' })
+    );
+    const editor = within(
+      await page.findByRole('dialog', { name: 'Filter by name' })
+    );
+    await expect(args.onChange).not.toHaveBeenCalled();
+    await userEvent.type(editor.getByRole('textbox', { name: 'Name' }), 'Ma');
+    await userEvent.click(editor.getByRole('button', { name: 'Apply' }));
+    await expect(args.onChange).toHaveBeenCalledTimes(1);
+    await expect(args.onChange).toHaveBeenLastCalledWith({
+      operator: 'startsWith',
+      value: 'Ma',
+    });
+  },
+};
+export const DismissDiscardsDraft: Story = {
+  render: (args) => <Preview onChange={args.onChange} />,
+  play: async ({ canvasElement, args }) => {
+    const canvas = within(canvasElement);
+    const page = within(canvasElement.ownerDocument.body);
+    const trigger = canvas.getByRole('button', { name: 'Edit Name: design' });
+    await userEvent.click(trigger);
+    let input = await page.findByRole('textbox', { name: 'Name' });
+    await userEvent.type(input, ' draft');
+    await userEvent.keyboard('{Escape}');
+    await expectEditorClosed(canvasElement, 'Filter by name');
+    await expectFocus(trigger);
+    await userEvent.click(trigger);
+    input = await page.findByRole('textbox', { name: 'Name' });
+    await expect(input).toHaveValue('design');
+    await userEvent.type(input, ' draft');
+    await userEvent.click(canvas.getByLabelText('Applied condition'));
+    await expectEditorClosed(canvasElement, 'Filter by name');
+    await expect(args.onChange).not.toHaveBeenCalled();
+  },
+};
+export const ExternalReplaceWhileOpen: Story = {
+  render: (args) => <Preview onChange={args.onChange} />,
+  play: async ({ canvasElement, args }) => {
+    const canvas = within(canvasElement);
+    const page = within(canvasElement.ownerDocument.body);
+    await userEvent.click(
+      canvas.getByRole('button', { name: 'Edit Name: design' })
+    );
+    await userEvent.type(
+      await page.findByRole('textbox', { name: 'Name' }),
+      ' draft'
+    );
+    dispatchStoryEvent('story:replace');
+    await expectEditorClosed(canvasElement, 'Filter by name');
+    await expect(
+      canvas.getByRole('button', { name: 'Edit Name: operations' })
+    ).toBeInTheDocument();
+    await expect(args.onChange).not.toHaveBeenCalled();
+  },
+};
+export const DisabledWhileOpen: Story = {
+  render: (args) => <Preview onChange={args.onChange} />,
+  play: async ({ canvasElement, args }) => {
+    const canvas = within(canvasElement);
+    const page = within(canvasElement.ownerDocument.body);
+    await userEvent.click(
+      canvas.getByRole('button', { name: 'Edit Name: design' })
+    );
+    await userEvent.type(
+      await page.findByRole('textbox', { name: 'Name' }),
+      ' draft'
+    );
+    dispatchStoryEvent('story:toggle-disabled');
+    await expectEditorClosed(canvasElement, 'Filter by name');
+    for (const button of canvas.getAllByRole('button'))
+      await expect(button).toBeDisabled();
+    dispatchStoryEvent('story:toggle-disabled');
+    await waitFor(() => expect(canvas.getAllByRole('button')[0]).toBeEnabled());
+    await expect(
+      page.queryByRole('dialog', { name: 'Filter by name' })
+    ).not.toBeInTheDocument();
+    await expect(args.onChange).not.toHaveBeenCalled();
+  },
+};
+export const InsideParentForm: Story = {
+  render: (args) => (
+    <ParentForm>
+      <Preview onChange={args.onChange} />
+    </ParentForm>
+  ),
+  play: async ({ canvasElement, args }) => {
+    const canvas = within(canvasElement);
+    const page = within(canvasElement.ownerDocument.body);
+    await userEvent.click(
+      canvas.getByRole('button', { name: 'Edit Name: design' })
+    );
+    const input = await page.findByRole('textbox', { name: 'Name' });
+    await userEvent.clear(input);
+    await userEvent.type(input, 'Updated{Enter}');
+    await expect(args.onChange).toHaveBeenLastCalledWith({
+      operator: 'contains',
+      value: 'Updated',
+    });
+    await expect(canvas.getByLabelText('Parent submissions')).toHaveTextContent(
+      '0'
+    );
+    await userEvent.click(
+      canvas.getByRole('button', { name: 'Submit search' })
+    );
+    await expect(canvas.getByLabelText('Parent submissions')).toHaveTextContent(
+      '1'
     );
   },
 };

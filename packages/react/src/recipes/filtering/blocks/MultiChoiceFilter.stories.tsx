@@ -3,10 +3,14 @@ import * as React from 'react';
 import { Canvas, Source, Title } from '@storybook/addon-docs/blocks';
 import type { Meta, StoryObj } from '@storybook/react';
 import { IconUsers } from '@tabler/icons-react';
-import { expect, userEvent, waitFor, within } from 'storybook/test';
+import { expect, fn, userEvent, waitFor, within } from 'storybook/test';
 
 import {
   dispatchStoryEvent,
+  expectEditorClosed,
+  expectFocus,
+  expectMenuClosed,
+  ParentForm,
   useStoryEvent,
 } from '../../../stories/support/filter-block-test-utils';
 import operatorSource from '../filter-operator.tsx?raw';
@@ -21,12 +25,18 @@ const initial: MultiChoiceCondition = {
   operator: 'isAnyOf',
   values: ['design'],
 };
+const replacement: MultiChoiceCondition = {
+  operator: 'isAnyOf',
+  values: ['engineering'],
+};
 function Preview({
   initialValue = initial,
   disabled = false,
+  onChange,
 }: {
   initialValue?: MultiChoiceCondition | null;
   disabled?: boolean;
+  onChange?: (value: MultiChoiceCondition | null) => void;
 }) {
   const [value, setValue] = React.useState<MultiChoiceCondition | null>(
     initialValue
@@ -42,6 +52,15 @@ function Preview({
       { value: 'research', label: 'Research' },
     ])
   );
+  const [isDisabled, setDisabled] = React.useState(disabled);
+  useStoryEvent('story:replace', () => setValue(replacement));
+  useStoryEvent('story:toggle-disabled', () =>
+    setDisabled((current) => !current)
+  );
+  function change(next: MultiChoiceCondition | null) {
+    setValue(next);
+    onChange?.(next);
+  }
   return (
     <section
       aria-label="MultiChoiceFilter example"
@@ -51,8 +70,8 @@ function Preview({
         label="Team"
         icon={<IconUsers aria-hidden="true" />}
         value={value}
-        onChange={setValue}
-        disabled={disabled}
+        onChange={change}
+        disabled={isDisabled}
         options={options}
       />
       <output
@@ -69,6 +88,7 @@ const usage =
 const meta = {
   title: 'Blocks/MultiChoiceFilter',
   component: Preview,
+  args: { onChange: fn() },
   tags: ['autodocs'],
   parameters: {
     layout: 'centered',
@@ -296,5 +316,192 @@ export const OptionsLoadWhileOpen: Story = {
     await expect(
       editor.getByRole('checkbox', { name: 'Engineering' })
     ).toBeChecked();
+  },
+};
+export const AddFromNothing: Story = {
+  render: (args) => <Preview initialValue={null} onChange={args.onChange} />,
+  play: async ({ canvasElement, args }) => {
+    const page = within(canvasElement.ownerDocument.body);
+    await userEvent.click(
+      within(canvasElement).getByRole('button', { name: 'Add team filter' })
+    );
+    const editor = within(
+      await page.findByRole('dialog', { name: 'Filter by team' })
+    );
+    await expect(editor.getByRole('button', { name: 'Apply' })).toBeDisabled();
+    await expect(
+      editor.getByRole('checkbox', { name: 'Operations' })
+    ).toBeDisabled();
+    await userEvent.click(editor.getByRole('checkbox', { name: 'Design' }));
+    await userEvent.click(editor.getByRole('button', { name: 'Apply' }));
+    await expect(args.onChange).toHaveBeenCalledTimes(1);
+    await expect(args.onChange).toHaveBeenLastCalledWith({
+      operator: 'isAnyOf',
+      values: ['design'],
+    });
+    await expectEditorClosed(canvasElement, 'Filter by team');
+  },
+};
+export const OperatorKeepsValue: Story = {
+  render: (args) => <Preview onChange={args.onChange} />,
+  play: async ({ canvasElement, args }) => {
+    const page = within(canvasElement.ownerDocument.body);
+    await userEvent.click(
+      within(canvasElement).getByRole('button', {
+        name: 'Change Team operator',
+      })
+    );
+    await userEvent.click(
+      page.getByRole('menuitemradio', { name: 'is none of' })
+    );
+    await expect(args.onChange).toHaveBeenCalledTimes(1);
+    await expect(args.onChange).toHaveBeenLastCalledWith({
+      operator: 'isNoneOf',
+      values: ['design'],
+    });
+    await expectMenuClosed(canvasElement);
+  },
+};
+export const ValuelessOperatorCommits: Story = {
+  render: (args) => <Preview onChange={args.onChange} />,
+  play: async ({ canvasElement, args }) => {
+    const page = within(canvasElement.ownerDocument.body);
+    await userEvent.click(
+      within(canvasElement).getByRole('button', {
+        name: 'Change Team operator',
+      })
+    );
+    await userEvent.click(
+      page.getByRole('menuitemradio', { name: 'is empty' })
+    );
+    await expect(args.onChange).toHaveBeenLastCalledWith({
+      operator: 'isEmpty',
+    });
+    await expectMenuClosed(canvasElement);
+  },
+};
+export const PendingOperatorApplies: Story = {
+  render: (args) => (
+    <Preview initialValue={{ operator: 'isEmpty' }} onChange={args.onChange} />
+  ),
+  play: async ({ canvasElement, args }) => {
+    const page = within(canvasElement.ownerDocument.body);
+    await userEvent.click(
+      within(canvasElement).getByRole('button', {
+        name: 'Change Team operator',
+      })
+    );
+    await userEvent.click(
+      page.getByRole('menuitemradio', { name: 'is none of' })
+    );
+    const editor = within(
+      await page.findByRole('dialog', { name: 'Filter by team' })
+    );
+    await expect(args.onChange).not.toHaveBeenCalled();
+    await userEvent.click(
+      editor.getByRole('checkbox', { name: 'Engineering' })
+    );
+    await userEvent.click(editor.getByRole('button', { name: 'Apply' }));
+    await expect(args.onChange).toHaveBeenCalledTimes(1);
+    await expect(args.onChange).toHaveBeenLastCalledWith({
+      operator: 'isNoneOf',
+      values: ['engineering'],
+    });
+  },
+};
+export const DismissDiscardsDraft: Story = {
+  render: (args) => <Preview onChange={args.onChange} />,
+  play: async ({ canvasElement, args }) => {
+    const canvas = within(canvasElement);
+    const page = within(canvasElement.ownerDocument.body);
+    const trigger = canvas.getByRole('button', { name: 'Edit Team: Design' });
+    await userEvent.click(trigger);
+    await userEvent.click(
+      await page.findByRole('checkbox', { name: 'Engineering' })
+    );
+    await userEvent.keyboard('{Escape}');
+    await expectEditorClosed(canvasElement, 'Filter by team');
+    await expectFocus(trigger);
+    await userEvent.click(trigger);
+    await expect(
+      await page.findByRole('checkbox', { name: 'Engineering' })
+    ).not.toBeChecked();
+    await userEvent.click(page.getByRole('checkbox', { name: 'Engineering' }));
+    await userEvent.click(canvas.getByLabelText('Applied condition'));
+    await expectEditorClosed(canvasElement, 'Filter by team');
+    await expect(args.onChange).not.toHaveBeenCalled();
+  },
+};
+export const ExternalReplaceWhileOpen: Story = {
+  render: (args) => <Preview onChange={args.onChange} />,
+  play: async ({ canvasElement, args }) => {
+    const canvas = within(canvasElement);
+    const page = within(canvasElement.ownerDocument.body);
+    await userEvent.click(
+      canvas.getByRole('button', { name: 'Edit Team: Design' })
+    );
+    await userEvent.click(
+      await page.findByRole('checkbox', { name: 'Engineering' })
+    );
+    dispatchStoryEvent('story:replace');
+    await expectEditorClosed(canvasElement, 'Filter by team');
+    await expect(
+      canvas.getByRole('button', { name: 'Edit Team: Engineering' })
+    ).toBeInTheDocument();
+    await expect(args.onChange).not.toHaveBeenCalled();
+  },
+};
+export const DisabledWhileOpen: Story = {
+  render: (args) => <Preview onChange={args.onChange} />,
+  play: async ({ canvasElement, args }) => {
+    const canvas = within(canvasElement);
+    const page = within(canvasElement.ownerDocument.body);
+    await userEvent.click(
+      canvas.getByRole('button', { name: 'Edit Team: Design' })
+    );
+    await userEvent.click(
+      await page.findByRole('checkbox', { name: 'Engineering' })
+    );
+    dispatchStoryEvent('story:toggle-disabled');
+    await expectEditorClosed(canvasElement, 'Filter by team');
+    for (const button of canvas.getAllByRole('button'))
+      await expect(button).toBeDisabled();
+    dispatchStoryEvent('story:toggle-disabled');
+    await waitFor(() => expect(canvas.getAllByRole('button')[0]).toBeEnabled());
+    await expect(
+      page.queryByRole('dialog', { name: 'Filter by team' })
+    ).not.toBeInTheDocument();
+    await expect(args.onChange).not.toHaveBeenCalled();
+  },
+};
+export const InsideParentForm: Story = {
+  render: (args) => (
+    <ParentForm>
+      <Preview onChange={args.onChange} />
+    </ParentForm>
+  ),
+  play: async ({ canvasElement, args }) => {
+    const canvas = within(canvasElement);
+    const page = within(canvasElement.ownerDocument.body);
+    await userEvent.click(
+      canvas.getByRole('button', { name: 'Edit Team: Design' })
+    );
+    await userEvent.click(
+      await page.findByRole('checkbox', { name: 'Engineering' })
+    );
+    await userEvent.click(page.getByRole('button', { name: 'Apply' }));
+    await expect(args.onChange).toHaveBeenLastCalledWith({
+      operator: 'isAnyOf',
+      values: ['design', 'engineering'],
+    });
+    await expect(canvas.getByLabelText('Parent submissions')).toHaveTextContent(
+      '0'
+    );
+    await userEvent.click(
+      canvas.getByRole('button', { name: 'Submit search' })
+    );
+    await expect(canvas.getByLabelText('Parent submissions')).toHaveTextContent(
+      '1'
+    );
   },
 };

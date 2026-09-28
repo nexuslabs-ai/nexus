@@ -302,14 +302,14 @@ Both are local-data recipes, with clearing and empty results. Applications own r
 
 ### Verification and remaining handoff work
 
-Filtering contracts are checked by the block stories, `FilterBlocks.stories.tsx`, `FilteringAudit.stories.tsx`, the component stories, and `FilteringGuide.stories.tsx`.
+Each rule is checked on the block's own story page. `FilteringAudit.stories.tsx` keeps the narrow, density, corner and dark-mode checks across all six blocks.
 
 | Contract                                                                     | Evidence                                                                                             |
 | ---------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------- |
 | Immediate selection, operator changes, empty operators, disabled options     | ChoiceFilter and block-contract stories                                                              |
 | Draft values, Apply, Cancel, invalid/incomplete input                        | MultiChoiceFilter, NumberRangeFilter, NumberComparisonFilter, TextFilter and DateRangeFilter stories |
-| Escape, outside dismissal, removal and focus restoration                     | Block stories and DismissalAcrossEditors                                                             |
-| Controlled replacement and disabling an open editor                          | ExternalReset and DisabledWhileOpen audit stories                                                    |
+| Escape, outside dismissal, removal and focus restoration                     | Each block's `DismissDiscardsDraft` story                                                            |
+| Controlled replacement and disabling an open editor                          | Each block's `ExternalReplaceWhileOpen` and `DisabledWhileOpen` stories                              |
 | Long values and visible removal in narrow containers                         | NarrowLongContent and per-block narrow stories                                                       |
 | Six densities, five roundness settings and dark appearance                   | Audit appearance stories; compact controls are measured against the active spacing token             |
 | Nested rules, unavailable values, range validation, keyboard editing         | FilterBuilder stories                                                                                |

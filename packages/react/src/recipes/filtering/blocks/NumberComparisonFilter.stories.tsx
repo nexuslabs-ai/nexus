@@ -3,10 +3,15 @@ import * as React from 'react';
 import { Canvas, Source, Title } from '@storybook/addon-docs/blocks';
 import type { Meta, StoryObj } from '@storybook/react';
 import { IconHash } from '@tabler/icons-react';
-import { expect, userEvent, waitFor, within } from 'storybook/test';
+import { expect, fn, userEvent, waitFor, within } from 'storybook/test';
 
 import {
+  DialogHost,
   dispatchStoryEvent,
+  expectEditorClosed,
+  expectFocus,
+  expectMenuClosed,
+  ParentForm,
   useStoryEvent,
 } from '../../../stories/support/filter-block-test-utils';
 import operatorSource from '../filter-operator.tsx?raw';
@@ -21,18 +26,33 @@ const initial: NumberComparisonCondition = {
   operator: 'greaterThan',
   value: 500,
 };
+const replacement: NumberComparisonCondition = {
+  operator: 'greaterThan',
+  value: 100,
+};
 function Preview({
   initialValue = initial,
   disabled = false,
+  onChange,
 }: {
   initialValue?: NumberComparisonCondition | null;
   disabled?: boolean;
+  onChange?: (value: NumberComparisonCondition | null) => void;
 }) {
   const [value, setValue] = React.useState<NumberComparisonCondition | null>(
     initialValue
   );
   const [upperBound, setUpperBound] = React.useState<number>();
   useStoryEvent('story:tighten-bounds', () => setUpperBound(1000));
+  const [isDisabled, setDisabled] = React.useState(disabled);
+  useStoryEvent('story:replace', () => setValue(replacement));
+  useStoryEvent('story:toggle-disabled', () =>
+    setDisabled((current) => !current)
+  );
+  function change(next: NumberComparisonCondition | null) {
+    setValue(next);
+    onChange?.(next);
+  }
   return (
     <section
       aria-label="NumberComparisonFilter example"
@@ -42,8 +62,8 @@ function Preview({
         label="Amount"
         icon={<IconHash aria-hidden="true" />}
         value={value}
-        onChange={setValue}
-        disabled={disabled}
+        onChange={change}
+        disabled={isDisabled}
         upperBound={upperBound}
       />
       <output
@@ -60,6 +80,7 @@ const usage =
 const meta = {
   title: 'Blocks/NumberComparisonFilter',
   component: Preview,
+  args: { onChange: fn() },
   tags: ['autodocs'],
   parameters: {
     layout: 'centered',
@@ -272,5 +293,230 @@ export const BoundsChangeWhileOpen: Story = {
     ).toBeVisible();
     await expect(dialog).toHaveAttribute('data-state', 'open');
     await expect(input).toHaveValue(750);
+  },
+};
+export const AddFromNothing: Story = {
+  render: (args) => <Preview initialValue={null} onChange={args.onChange} />,
+  play: async ({ canvasElement, args }) => {
+    const page = within(canvasElement.ownerDocument.body);
+    await userEvent.click(
+      within(canvasElement).getByRole('button', { name: 'Add amount filter' })
+    );
+    const editor = within(
+      await page.findByRole('dialog', { name: 'Filter by amount' })
+    );
+    await expect(editor.getByRole('button', { name: 'Apply' })).toBeDisabled();
+    await userEvent.type(
+      editor.getByRole('spinbutton', { name: 'Amount' }),
+      '0'
+    );
+    await userEvent.click(editor.getByRole('button', { name: 'Apply' }));
+    await expect(args.onChange).toHaveBeenCalledTimes(1);
+    await expect(args.onChange).toHaveBeenLastCalledWith({
+      operator: 'greaterThan',
+      value: 0,
+    });
+    await expectEditorClosed(canvasElement, 'Filter by amount');
+  },
+};
+export const OperatorKeepsValue: Story = {
+  render: (args) => <Preview onChange={args.onChange} />,
+  play: async ({ canvasElement, args }) => {
+    const page = within(canvasElement.ownerDocument.body);
+    await userEvent.click(
+      within(canvasElement).getByRole('button', {
+        name: 'Change Amount operator',
+      })
+    );
+    await userEvent.click(
+      page.getByRole('menuitemradio', { name: 'is less than' })
+    );
+    await expect(args.onChange).toHaveBeenCalledTimes(1);
+    await expect(args.onChange).toHaveBeenLastCalledWith({
+      operator: 'lessThan',
+      value: 500,
+    });
+    await expectMenuClosed(canvasElement);
+  },
+};
+export const ValuelessOperatorCommits: Story = {
+  render: (args) => <Preview onChange={args.onChange} />,
+  play: async ({ canvasElement, args }) => {
+    const page = within(canvasElement.ownerDocument.body);
+    await userEvent.click(
+      within(canvasElement).getByRole('button', {
+        name: 'Change Amount operator',
+      })
+    );
+    await userEvent.click(
+      page.getByRole('menuitemradio', { name: 'is not empty' })
+    );
+    await expect(args.onChange).toHaveBeenLastCalledWith({
+      operator: 'isNotEmpty',
+    });
+    await expectMenuClosed(canvasElement);
+  },
+};
+export const PendingOperatorApplies: Story = {
+  render: (args) => (
+    <Preview initialValue={{ operator: 'isEmpty' }} onChange={args.onChange} />
+  ),
+  play: async ({ canvasElement, args }) => {
+    const page = within(canvasElement.ownerDocument.body);
+    await userEvent.click(
+      within(canvasElement).getByRole('button', {
+        name: 'Change Amount operator',
+      })
+    );
+    await userEvent.click(page.getByRole('menuitemradio', { name: 'is not' }));
+    const editor = within(
+      await page.findByRole('dialog', { name: 'Filter by amount' })
+    );
+    await expect(args.onChange).not.toHaveBeenCalled();
+    await userEvent.type(
+      editor.getByRole('spinbutton', { name: 'Amount' }),
+      '-7.5'
+    );
+    await userEvent.click(editor.getByRole('button', { name: 'Apply' }));
+    await expect(args.onChange).toHaveBeenCalledTimes(1);
+    await expect(args.onChange).toHaveBeenLastCalledWith({
+      operator: 'isNot',
+      value: -7.5,
+    });
+  },
+};
+export const DismissDiscardsDraft: Story = {
+  render: (args) => <Preview onChange={args.onChange} />,
+  play: async ({ canvasElement, args }) => {
+    const canvas = within(canvasElement);
+    const page = within(canvasElement.ownerDocument.body);
+    const trigger = canvas.getByRole('button', { name: 'Edit Amount: 500' });
+    await userEvent.click(trigger);
+    let input = await page.findByRole('spinbutton', { name: 'Amount' });
+    await userEvent.type(input, '9');
+    await userEvent.keyboard('{Escape}');
+    await expectEditorClosed(canvasElement, 'Filter by amount');
+    await expectFocus(trigger);
+    await userEvent.click(trigger);
+    input = await page.findByRole('spinbutton', { name: 'Amount' });
+    await expect(input).toHaveValue(500);
+    await userEvent.type(input, '9');
+    await userEvent.click(canvas.getByLabelText('Applied condition'));
+    await expectEditorClosed(canvasElement, 'Filter by amount');
+    await expect(args.onChange).not.toHaveBeenCalled();
+  },
+};
+export const ExternalReplaceWhileOpen: Story = {
+  render: (args) => <Preview onChange={args.onChange} />,
+  play: async ({ canvasElement, args }) => {
+    const canvas = within(canvasElement);
+    const page = within(canvasElement.ownerDocument.body);
+    await userEvent.click(
+      canvas.getByRole('button', { name: 'Edit Amount: 500' })
+    );
+    await userEvent.type(
+      await page.findByRole('spinbutton', { name: 'Amount' }),
+      '9'
+    );
+    dispatchStoryEvent('story:replace');
+    await expectEditorClosed(canvasElement, 'Filter by amount');
+    await expect(
+      canvas.getByRole('button', { name: 'Edit Amount: 100' })
+    ).toBeInTheDocument();
+    await expect(args.onChange).not.toHaveBeenCalled();
+  },
+};
+export const DisabledWhileOpen: Story = {
+  render: (args) => <Preview onChange={args.onChange} />,
+  play: async ({ canvasElement, args }) => {
+    const canvas = within(canvasElement);
+    const page = within(canvasElement.ownerDocument.body);
+    await userEvent.click(
+      canvas.getByRole('button', { name: 'Edit Amount: 500' })
+    );
+    await userEvent.type(
+      await page.findByRole('spinbutton', { name: 'Amount' }),
+      '9'
+    );
+    dispatchStoryEvent('story:toggle-disabled');
+    await expectEditorClosed(canvasElement, 'Filter by amount');
+    for (const button of canvas.getAllByRole('button'))
+      await expect(button).toBeDisabled();
+    dispatchStoryEvent('story:toggle-disabled');
+    await waitFor(() => expect(canvas.getAllByRole('button')[0]).toBeEnabled());
+    await expect(
+      page.queryByRole('dialog', { name: 'Filter by amount' })
+    ).not.toBeInTheDocument();
+    await expect(args.onChange).not.toHaveBeenCalled();
+  },
+};
+export const InsideParentForm: Story = {
+  render: (args) => (
+    <ParentForm>
+      <Preview onChange={args.onChange} />
+    </ParentForm>
+  ),
+  play: async ({ canvasElement, args }) => {
+    const canvas = within(canvasElement);
+    const page = within(canvasElement.ownerDocument.body);
+    await userEvent.click(
+      canvas.getByRole('button', { name: 'Edit Amount: 500' })
+    );
+    const input = await page.findByRole('spinbutton', { name: 'Amount' });
+    await userEvent.clear(input);
+    await userEvent.type(input, '42{Enter}');
+    await expect(args.onChange).toHaveBeenLastCalledWith({
+      operator: 'greaterThan',
+      value: 42,
+    });
+    await expect(canvas.getByLabelText('Parent submissions')).toHaveTextContent(
+      '0'
+    );
+    await userEvent.click(
+      canvas.getByRole('button', { name: 'Submit search' })
+    );
+    await expect(canvas.getByLabelText('Parent submissions')).toHaveTextContent(
+      '1'
+    );
+  },
+};
+export const InsideDialog: Story = {
+  render: (args) => (
+    <DialogHost>
+      <Preview onChange={args.onChange} />
+    </DialogHost>
+  ),
+  play: async ({ canvasElement, args }) => {
+    const page = within(canvasElement.ownerDocument.body);
+    await userEvent.click(
+      within(canvasElement).getByRole('button', {
+        name: 'Open filter settings',
+      })
+    );
+    const host = await page.findByRole('dialog', { name: 'Filter settings' });
+    await expect(host).toBeVisible();
+    const trigger = within(host).getByRole('button', {
+      name: 'Edit Amount: 500',
+    });
+    await userEvent.click(trigger);
+    await expect(
+      await page.findByRole('dialog', { name: 'Filter by amount' })
+    ).toBeVisible();
+    await userEvent.keyboard('{Escape}');
+    await expectEditorClosed(canvasElement, 'Filter by amount');
+    await expect(host).toHaveAttribute('data-state', 'open');
+    await expectFocus(trigger);
+    await userEvent.click(trigger);
+    await expect(
+      await page.findByRole('dialog', { name: 'Filter by amount' })
+    ).toBeVisible();
+    await userEvent.click(
+      within(host).getByRole('heading', { name: 'Filter settings' })
+    );
+    await expectEditorClosed(canvasElement, 'Filter by amount');
+    await expect(host).toHaveAttribute('data-state', 'open');
+    await userEvent.keyboard('{Escape}');
+    await waitFor(() => expect(host).toHaveAttribute('data-state', 'closed'));
+    await expect(args.onChange).not.toHaveBeenCalled();
   },
 };
