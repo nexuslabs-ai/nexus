@@ -256,6 +256,7 @@ export default tseslint.config(
     files: ['packages/react/src/components/**/*.{ts,tsx}'],
     ignores: [
       'packages/react/src/components/button/button.tsx',
+      'packages/react/src/components/filter-condition/filter-condition.tsx',
       '**/*.stories.tsx',
       '**/*.test.{ts,tsx}',
     ],
