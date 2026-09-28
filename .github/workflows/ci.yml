@@ -123,7 +123,7 @@ jobs:
           pnpm turbo build
           node scripts/audit-turbo-outputs.js --post-build
 
-      # Reads the built @nexus_ds/react stylesheet the console imports, so it
+      # Reads the built @nexus_ds/core runtime's token registry, so it
       # runs after the build rather than beside the token regeneration.
       - name: Tailwind class-ref audit
         run: pnpm --filter @nexus_ds/core audit:class-refs

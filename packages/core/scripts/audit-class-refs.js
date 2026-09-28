@@ -15,7 +15,6 @@ const TARGETS = [
     sources: 'packages/react/src',
   },
   { css: 'apps/docs/app/globals.css', sources: 'apps/docs' },
-  { css: 'apps/console/src/App.css', sources: 'apps/console/src' },
 ];
 
 // The primitive/unknown `--nx-color-*` ban applies only to component code:
