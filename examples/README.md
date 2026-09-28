@@ -18,6 +18,12 @@ app adopts the design system incrementally**.
 | `nextjs-consumer/` | Stock Next.js 15 (App Router) + Tailwind 4 app consuming `@acme/react`. |
 | `.generated/` | The exported `@acme` design system (gitignored — regenerated each run). |
 
+## Copy-and-own fixtures
+
+`copy-vite/` and `copy-next/` install Nexus **source** into host apps through a
+local shadcn registry (`registry/`) instead of consuming packages. Their
+contract, run steps and findings are in [`registry/README.md`](registry/README.md).
+
 ## Run it
 
 ```bash
