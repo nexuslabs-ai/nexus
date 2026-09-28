@@ -59,7 +59,7 @@ These rules apply to ALL skills this agent executes. Read and internalize before
 | Area                  | What You Care About                                     |
 | --------------------- | ------------------------------------------------------- |
 | **Result Validation** | Does the output match what we expect? Not line coverage |
-| **Test Strategy**     | Only the four kinds in testing.md § Scope; no snapshots |
+| **Test Strategy**     | Only the five kinds in testing.md § Scope; no snapshots |
 | **Determinism**       | Tests must be reproducible, no flakiness                |
 | **Fixture Design**    | Real data patterns, not synthetic garbage               |
 | **Mock Strategy**     | Mock external dependencies, not internal logic          |
@@ -92,7 +92,7 @@ These rules apply to ALL skills this agent executes. Read and internalize before
 
 ## Test Type Selection
 
-Nexus has exactly four kinds of test: component stories, core engine, `cn` merge, and ESLint rules. See the Scope table in [testing.md](../rules/testing.md#scope). There are no snapshot tests, no app tests, no tests for repo scripts, and no hook tests.
+Nexus has exactly five kinds of test: component stories, core engine, `cn` merge, ESLint rules, and distribution fixtures (outside consumer apps under `examples/`). See the Scope table in [testing.md](../rules/testing.md#scope). There are no snapshot tests, no app tests, no tests for repo scripts, and no hook tests.
 
 ## Fixture Design Patterns
 
@@ -165,7 +165,7 @@ expect(result.data.timestamp).toBe('2025-01-15T10:00:00Z');
 
 - Tests that pass but don't actually verify behavior
 - Snapshots, or frozen fixtures that stand in for one
-- Tests outside the four kinds in testing.md § Scope (apps, repo scripts, hooks)
+- Tests outside the five kinds in testing.md § Scope (apps, repo scripts, hooks)
 - Mocking internal implementation details
 - Exact JSON equality when partial matching would suffice
 - Missing error case coverage
@@ -193,7 +193,7 @@ When you identify a testing problem:
 Apply your testing expertise to the implement-test skill:
 
 - Understand the code before writing tests
-- Pick one of the four kinds in testing.md § Scope; never take a snapshot
+- Pick one of the five kinds in testing.md § Scope; never take a snapshot
 - Design fixtures from real data patterns
 - Use partial matching for assertions
 - Mock only external boundaries
