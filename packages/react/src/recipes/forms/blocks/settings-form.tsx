@@ -2,8 +2,8 @@
 
 import * as React from 'react';
 
-import { Button } from '../../components/button';
-import { Checkbox } from '../../components/checkbox';
+import { Button } from '../../../components/button';
+import { Checkbox } from '../../../components/checkbox';
 import {
   Field,
   FieldContent,
@@ -14,9 +14,9 @@ import {
   FieldLegend,
   FieldRequiredIndicator,
   FieldSet,
-} from '../../components/field';
-import { Input } from '../../components/input';
-import { Separator } from '../../components/separator';
+} from '../../../components/field';
+import { Input } from '../../../components/input';
+import { Separator } from '../../../components/separator';
 
 export type SettingsValues = { name: string; email: string; updates: boolean };
 export type SettingsFormProps = {

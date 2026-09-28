@@ -1,14 +1,14 @@
 import * as React from 'react';
 
-import { Button } from '../../components/button';
-import { FieldError } from '../../components/field';
+import { Button } from '../../../components/button';
+import { FieldError } from '../../../components/field';
 
-export type Values = { name: string; email: string; updates: boolean };
-type Save = (values: Values) => Promise<void>;
-export type Props = { initialValues: Values; onSave: Save };
+export type SettingsValues = { name: string; email: string; updates: boolean };
+type Save = (values: SettingsValues) => Promise<void>;
+export type SettingsFormProps = { initialValues: SettingsValues; onSave: Save };
 export const failureMessage =
   'We could not save your changes. Your edits are still here. Try again.';
-export function normalized(values: Values): Values {
+export function trimmed(values: SettingsValues): SettingsValues {
   return { ...values, name: values.name.trim(), email: values.email.trim() };
 }
 

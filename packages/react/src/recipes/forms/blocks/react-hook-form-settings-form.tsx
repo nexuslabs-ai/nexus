@@ -3,7 +3,7 @@
 import * as React from 'react';
 import { useController, useForm } from 'react-hook-form';
 
-import { Checkbox } from '../../components/checkbox';
+import { Checkbox } from '../../../components/checkbox';
 import {
   Field,
   FieldContent,
@@ -14,26 +14,29 @@ import {
   FieldLegend,
   FieldRequiredIndicator,
   FieldSet,
-} from '../../components/field';
-import { Input } from '../../components/input';
-import { Separator } from '../../components/separator';
+} from '../../../components/field';
+import { Input } from '../../../components/input';
+import { Separator } from '../../../components/separator';
 
 import {
   failureMessage,
-  normalized,
-  type Props,
+  type SettingsFormProps,
   SettingsLayout,
-  type Values,
+  type SettingsValues,
+  trimmed,
 } from './settings-layout';
 
-export function ReactHookFormExample({ initialValues, onSave }: Props) {
+export function ReactHookFormSettingsForm({
+  initialValues,
+  onSave,
+}: SettingsFormProps) {
   const id = React.useId();
   const nameRef = React.useRef<HTMLInputElement>(null);
   const emailRef = React.useRef<HTMLInputElement>(null);
   const submitting = React.useRef(false);
   const [message, setMessage] = React.useState('');
   const [saveError, setSaveError] = React.useState('');
-  const form = useForm<Values>({
+  const form = useForm<SettingsValues>({
     defaultValues: initialValues,
     mode: 'onSubmit',
     reValidateMode: 'onSubmit',
@@ -81,8 +84,8 @@ export function ReactHookFormExample({ initialValues, onSave }: Props) {
     emailRef.current = node;
     email.field.ref(node);
   }
-  async function save(values: Values) {
-    const submitted = normalized(values);
+  async function save(values: SettingsValues) {
+    const submitted = trimmed(values);
     await onSave(submitted);
     form.reset(submitted);
     setMessage('Changes saved.');

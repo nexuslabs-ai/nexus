@@ -1,10 +1,10 @@
 import { expect, type Mock, userEvent, waitFor, within } from 'storybook/test';
 
-import type { Values } from '../../recipes/forms/settings-layout';
+import type { SettingsValues } from '../../recipes/forms/blocks/settings-layout';
 
 type SettingsPlayContext = {
   canvasElement: HTMLElement;
-  args: { onSave: Mock<(values: Values) => Promise<void>> };
+  args: { onSave: Mock<(values: SettingsValues) => Promise<void>> };
 };
 
 export async function verifySaveCancel({

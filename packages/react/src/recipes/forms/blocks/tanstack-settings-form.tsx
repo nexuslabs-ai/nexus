@@ -8,7 +8,7 @@ import {
   useStore,
 } from '@tanstack/react-form';
 
-import { Checkbox } from '../../components/checkbox';
+import { Checkbox } from '../../../components/checkbox';
 import {
   Field,
   FieldContent,
@@ -19,18 +19,21 @@ import {
   FieldLegend,
   FieldRequiredIndicator,
   FieldSet,
-} from '../../components/field';
-import { Input } from '../../components/input';
-import { Separator } from '../../components/separator';
+} from '../../../components/field';
+import { Input } from '../../../components/input';
+import { Separator } from '../../../components/separator';
 
 import {
   failureMessage,
-  normalized,
-  type Props,
+  type SettingsFormProps,
   SettingsLayout,
+  trimmed,
 } from './settings-layout';
 
-export function TanStackFormExample({ initialValues, onSave }: Props) {
+export function TanStackSettingsForm({
+  initialValues,
+  onSave,
+}: SettingsFormProps) {
   const id = React.useId();
   const nameRef = React.useRef<HTMLInputElement>(null);
   const emailRef = React.useRef<HTMLInputElement>(null);
@@ -44,7 +47,7 @@ export function TanStackFormExample({ initialValues, onSave }: Props) {
   const form = useTanStackForm({
     defaultValues: saved,
     onSubmit: async ({ value, formApi }) => {
-      const submitted = normalized(value);
+      const submitted = trimmed(value);
       await onSave(submitted);
       setSaved(submitted);
       formApi.reset(submitted);
