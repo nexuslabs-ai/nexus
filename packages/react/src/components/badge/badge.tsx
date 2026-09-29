@@ -181,7 +181,8 @@ interface BadgeProps
   /**
    * Icon to display before the label.
    * Icon is automatically sized to 14px (3.5 spacing units).
-   * If the badge has no children, this renders as an icon-only badge.
+   * If the badge has no renderable children, this renders as an icon-only
+   * badge — blank strings, `false` / `null`, and empty fragments count as none.
    * Ignored when `isNumber` is true.
    * @example
    * ```tsx
@@ -193,7 +194,9 @@ interface BadgeProps
   /**
    * Icon to display after the label.
    * Icon is automatically sized to 14px (3.5 spacing units).
-   * If the badge has no children and no `leftIcon`, this renders as an icon-only badge.
+   * If the badge has no renderable children and no `leftIcon`, this renders as
+   * an icon-only badge — blank strings, `false` / `null`, and empty fragments
+   * count as none.
    * Ignored when `isNumber` is true.
    * @example
    * ```tsx

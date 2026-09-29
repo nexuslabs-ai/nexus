@@ -58,6 +58,8 @@ type Story = StoryObj<typeof Badge>;
 
 // `nx:h-6` / `nx:w-6` at `density: default`.
 const BADGE_SIZE_PX = 24;
+// `nx:size-3.5` icon slot.
+const BADGE_ICON_SIZE_PX = 14;
 
 // ============================================
 // VARIANT STORIES (Solid Fill)
@@ -343,8 +345,8 @@ export const WithBothIcons: Story = {
     for (const svg of svgs) {
       const rect = svg.getBoundingClientRect();
 
-      expect(Math.round(rect.width)).toBe(14);
-      expect(Math.round(rect.height)).toBe(14);
+      expect(Math.round(rect.width)).toBe(BADGE_ICON_SIZE_PX);
+      expect(Math.round(rect.height)).toBe(BADGE_ICON_SIZE_PX);
     }
   },
 };
@@ -373,8 +375,8 @@ export const IconOnly: Story = {
     expect(badge.textContent).toBe('');
     expect(Math.round(rect.height)).toBe(BADGE_SIZE_PX);
     expect(Math.round(rect.width)).toBeGreaterThanOrEqual(BADGE_SIZE_PX);
-    expect(Math.round(svgRect.width)).toBe(14);
-    expect(Math.round(svgRect.height)).toBe(14);
+    expect(Math.round(svgRect.width)).toBe(BADGE_ICON_SIZE_PX);
+    expect(Math.round(svgRect.height)).toBe(BADGE_ICON_SIZE_PX);
   },
 };
 
@@ -402,8 +404,8 @@ export const WithSvgLoader: Story = {
     await expect(spinner).toHaveAttribute('role', 'presentation');
     await expect(spinner).toHaveAttribute('aria-hidden', 'true');
     await expect(spinner).not.toHaveAttribute('aria-label');
-    expect(Math.round(rect.width)).toBe(14);
-    expect(Math.round(rect.height)).toBe(14);
+    expect(Math.round(rect.width)).toBe(BADGE_ICON_SIZE_PX);
+    expect(Math.round(rect.height)).toBe(BADGE_ICON_SIZE_PX);
   },
 };
 
@@ -521,12 +523,7 @@ export const IconOnlyWithConditionalLabel: Story = {
   render: () => (
     <div className="nx:flex nx:items-center nx:gap-2">
       {[false, '', ' ', <></>, <> </>].map((children, index) => (
-        <Badge
-          key={index}
-          data-testid="blank-label-badge"
-          leftIcon={<IconCheck />}
-          aria-label="Approved"
-        >
+        <Badge key={index} leftIcon={<IconCheck />} aria-label="Approved">
           {children}
         </Badge>
       ))}
@@ -539,13 +536,15 @@ export const IconOnlyWithConditionalLabel: Story = {
   ),
   play: async ({ canvasElement }) => {
     const canvas = within(canvasElement);
+    const iconOnlyBadges = canvas.getAllByRole('img', { name: 'Approved' });
+    const [zeroBadge, fragmentBadge] = canvas.getAllByTestId('label-badge');
 
-    for (const badge of canvas.getAllByTestId('blank-label-badge')) {
+    await expect(iconOnlyBadges).toHaveLength(5);
+    for (const badge of iconOnlyBadges)
       await expect(badge).toHaveAttribute('data-icon-only', 'true');
-      await expect(badge).toHaveAccessibleName('Approved');
-      await expect(badge).toHaveAttribute('role', 'img');
-    }
-    for (const badge of canvas.getAllByTestId('label-badge'))
+    await expect(zeroBadge).toHaveTextContent('0');
+    await expect(fragmentBadge).toHaveTextContent('Approved');
+    for (const badge of [zeroBadge, fragmentBadge])
       await expect(badge).not.toHaveAttribute('data-icon-only');
   },
 };
