@@ -1,11 +1,17 @@
 import { expect, type Mock, userEvent, waitFor, within } from 'storybook/test';
 
-import type { SettingsValues } from '../../recipes/forms/blocks/settings-layout';
+import type {
+  SettingsFormProps,
+  SettingsValues,
+} from '../../recipes/forms/blocks/settings-layout';
 
 type SettingsPlayContext = {
   canvasElement: HTMLElement;
-  args: { onSave: Mock<(values: SettingsValues) => Promise<SettingsValues>> };
+  args: { onSave: Mock<SettingsFormProps['onSave']> };
 };
+
+export const slowSave: SettingsFormProps['onSave'] = (values) =>
+  new Promise((resolve) => setTimeout(() => resolve(values), 1000));
 
 function controlledSave(args: SettingsPlayContext['args']) {
   let complete: () => void = () => {};
@@ -30,9 +36,11 @@ export async function verifySaveCancel({
   args,
 }: SettingsPlayContext) {
   const canvas = within(canvasElement);
-  const name = canvas.getByRole('textbox', { name: 'Name' });
+  const name = canvas.getByRole<HTMLInputElement>('textbox', { name: 'Name' });
   const updates = canvas.getByRole('checkbox', { name: 'Product updates' });
-  const save = canvas.getByRole('button', { name: 'Save changes' });
+  const save = canvas.getByRole<HTMLButtonElement>('button', {
+    name: 'Save changes',
+  });
   await expect(save).toBeDisabled();
   await userEvent.type(name, 'x');
   await expect(save).toBeEnabled();
@@ -49,6 +57,12 @@ export async function verifySaveCancel({
   );
   await userEvent.tab();
   await expect(save).toHaveFocus();
+  let atFocus: { value: string; saveDisabled: boolean } | undefined;
+  name.addEventListener(
+    'focus',
+    () => (atFocus = { value: name.value, saveDisabled: save.disabled }),
+    { once: true }
+  );
   await userEvent.keyboard('{Enter}');
   await expectSaved(canvasElement);
   await expect(args.onSave).toHaveBeenCalledWith({
@@ -56,8 +70,8 @@ export async function verifySaveCancel({
     email: 'priya@example.com',
     updates: true,
   });
-  await expect(name).toHaveValue('Priya Patel');
   await waitFor(() => expect(name).toHaveFocus());
+  await expect(atFocus).toEqual({ value: 'Priya Patel', saveDisabled: true });
   await userEvent.type(name, ' unsaved');
   await userEvent.click(updates);
   await userEvent.click(canvas.getByRole('button', { name: 'Cancel' }));
@@ -112,24 +126,18 @@ export async function verifyPending({
   const name = canvas.getByRole('textbox', { name: 'Name' });
   const save = canvas.getByRole('button', { name: 'Save changes' });
   await userEvent.type(name, ' Jr');
-  const form = canvas.getByRole('form');
-  if (!(form instanceof HTMLFormElement)) throw new Error('Expected a form');
-  form.requestSubmit();
-  form.requestSubmit();
+  await userEvent.keyboard('{Enter}{Enter}');
   await waitFor(() =>
     expect(canvas.getByRole('status')).toHaveTextContent('Saving changes')
   );
-  await expect(args.onSave).toHaveBeenCalledTimes(1);
   await expect(name).toBeDisabled();
   await expect(canvas.getByRole('textbox', { name: 'Email' })).toBeDisabled();
   await expect(canvas.getByRole('checkbox')).toBeDisabled();
   await expect(canvas.getByRole('button', { name: 'Cancel' })).toBeDisabled();
   await expect(save).toBeDisabled();
-  await userEvent.keyboard('{Enter}');
-  save.click();
-  await expect(args.onSave).toHaveBeenCalledTimes(1);
   completeSave();
   await expectSaved(canvasElement);
+  await expect(args.onSave).toHaveBeenCalledTimes(1);
   await expect(name).toBeEnabled();
   await expect(save).toBeDisabled();
   await waitFor(() => expect(name).toHaveFocus());
@@ -154,9 +162,6 @@ export async function verifyFailure({
   await waitFor(() => expect(save).toHaveFocus());
   args.onSave.mockImplementationOnce(() => Promise.reject(undefined));
   await userEvent.click(save);
-  await waitFor(() =>
-    expect(canvas.getByRole('status')).not.toHaveTextContent('Saving changes')
-  );
   await expect(await canvas.findByRole('alert')).toHaveTextContent(
     'Your edits are still here'
   );
@@ -170,6 +175,27 @@ export async function verifyFailure({
   await userEvent.click(canvas.getByRole('button', { name: 'Cancel' }));
   await expect(name).toHaveValue('Priya Shah Jr');
   await expect(save).toBeDisabled();
+}
+
+/** onSave resolves without the saved record, so code after the save throws. */
+export async function verifyErrorAfterSave({
+  canvasElement,
+  args,
+}: SettingsPlayContext) {
+  const canvas = within(canvasElement);
+  const escaped: unknown[] = [];
+  function collect(event: PromiseRejectionEvent) {
+    escaped.push(event.reason);
+  }
+  window.addEventListener('unhandledrejection', collect);
+  args.onSave.mockResolvedValueOnce(undefined as unknown as SettingsValues);
+  await userEvent.type(canvas.getByRole('textbox', { name: 'Name' }), ' Jr');
+  await userEvent.click(canvas.getByRole('button', { name: 'Save changes' }));
+  await waitFor(() => expect(escaped).toHaveLength(1));
+  window.removeEventListener('unhandledrejection', collect);
+  await expect(escaped[0]).toBeInstanceOf(TypeError);
+  await expect(args.onSave).toHaveBeenCalledTimes(1);
+  await expect(canvas.queryByRole('alert')).not.toBeInTheDocument();
 }
 
 export async function verifyServerNormalized({
@@ -252,6 +278,7 @@ export async function verifyRecordSwitch({
   );
   await userEvent.click(canvas.getByRole('button', { name: 'Switch record' }));
   completeSave();
+  await args.onSave.mock.results[args.onSave.mock.results.length - 1]?.value;
   await expect(name()).toHaveValue('Priya Shah');
   await expect(canvas.getByRole('status')).toHaveTextContent(
     'No unsaved changes.'

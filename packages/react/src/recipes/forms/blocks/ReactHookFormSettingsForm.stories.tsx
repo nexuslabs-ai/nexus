@@ -7,6 +7,8 @@ import { fn } from 'storybook/test';
 import { Button } from '../../../components/button';
 import { SettingsFormContract } from '../../../stories/support/settings-form-contract';
 import {
+  slowSave,
+  verifyErrorAfterSave,
   verifyFailure,
   verifyNarrow,
   verifyPending,
@@ -18,6 +20,7 @@ import {
 
 import { ReactHookFormSettingsForm } from './react-hook-form-settings-form';
 import blockSource from './react-hook-form-settings-form.tsx?raw';
+import fieldsSource from './settings-fields.tsx?raw';
 import type { SettingsValues } from './settings-layout';
 import layoutSource from './settings-layout.tsx?raw';
 
@@ -131,7 +134,8 @@ const meta = {
           <ul>
             <li>
               Copy <code>blocks/react-hook-form-settings-form.tsx</code>,{' '}
-              <code>blocks/settings-layout.tsx</code>, keeping the{' '}
+              <code>blocks/settings-layout.tsx</code> and{' '}
+              <code>blocks/settings-fields.tsx</code>, keeping the{' '}
               <code>recipes/forms</code> layout.
             </li>
             <li>
@@ -155,12 +159,13 @@ const meta = {
             Each behaviour above is tested on this page:{' '}
             <code>SaveAndCancel</code>, <code>Validation</code>,{' '}
             <code>Saving</code>, <code>SaveFailure</code>,{' '}
-            <code>ServerNormalized</code>, <code>RecordSwitch</code>,{' '}
-            <code>NarrowContainer</code>.
+            <code>ErrorAfterSave</code>, <code>ServerNormalized</code>,{' '}
+            <code>RecordSwitch</code>, <code>NarrowContainer</code>.
           </p>
           <p>
             Not supported: server-side field errors mapped onto fields, and
-            autosave. Map server errors in your <code>onSave</code>.
+            autosave. <code>onSave</code> can only resolve or reject, so showing
+            server errors on individual fields means editing the copied block.
           </p>
           <h2>Implementation</h2>
           <details>
@@ -170,6 +175,10 @@ const meta = {
           <details>
             <summary>blocks/settings-layout.tsx</summary>
             <Source code={layoutSource} language="tsx" />
+          </details>
+          <details>
+            <summary>blocks/settings-fields.tsx</summary>
+            <Source code={fieldsSource} language="tsx" />
           </details>
           <p>
             <a
@@ -192,17 +201,14 @@ export const Default: Story = {};
 export const SaveAndCancel: Story = { play: verifySaveCancel };
 export const Validation: Story = { play: verifyValidation };
 export const Saving: Story = {
-  args: {
-    onSave: fn(
-      (values: SettingsValues) =>
-        new Promise<SettingsValues>((resolve) =>
-          setTimeout(() => resolve(values), 1000)
-        )
-    ),
-  },
+  args: { onSave: fn(slowSave) },
   play: verifyPending,
 };
 export const SaveFailure: Story = { play: verifyFailure };
+export const ErrorAfterSave: Story = {
+  parameters: { test: { dangerouslyIgnoreUnhandledErrors: true } },
+  play: verifyErrorAfterSave,
+};
 export const NarrowContainer: Story = {
   render: (args) => (
     <div className="nx:w-full" style={{ maxWidth: 280 }}>

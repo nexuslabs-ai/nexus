@@ -14,14 +14,18 @@ Storybook pages that test them; this file only maps the source.
 **Blocks** — copy-source, not package exports. Copy only the block your app
 uses; the three are alternatives, not layers.
 
-| Files                                                                     | Block                                     | Extra dependency         |
-| ------------------------------------------------------------------------- | ----------------------------------------- | ------------------------ |
-| `blocks/settings-form.tsx`                                                | SettingsForm: plain React state, one file | None                     |
-| `blocks/react-hook-form-settings-form.tsx` + `blocks/settings-layout.tsx` | ReactHookFormSettingsForm                 | `react-hook-form` 7      |
-| `blocks/tanstack-settings-form.tsx` + `blocks/settings-layout.tsx`        | TanStackSettingsForm                      | `@tanstack/react-form` 1 |
+| Files                                      | Block                           | Extra dependency         |
+| ------------------------------------------ | ------------------------------- | ------------------------ |
+| `blocks/settings-form.tsx`                 | SettingsForm: plain React state | None                     |
+| `blocks/react-hook-form-settings-form.tsx` | ReactHookFormSettingsForm       | `react-hook-form` 7      |
+| `blocks/tanstack-settings-form.tsx`        | TanStackSettingsForm            | `@tanstack/react-form` 1 |
 
-`settings-layout.tsx` is the shell the two library blocks share: status text,
-the save error, Save and Cancel, and the `SettingsValues` type.
+Every block also needs `blocks/settings-layout.tsx` and
+`blocks/settings-fields.tsx`, which have no dependency beyond React and the
+Nexus components. `settings-layout.tsx` is the one contract module:
+`SettingsValues`, `SettingsFormProps`, the validation rules, trimming, the
+saved-record mapping, the failure copy and the status/Save/Cancel shell.
+`settings-fields.tsx` renders the fields from per-field bindings.
 
 **Examples**
 
@@ -34,8 +38,9 @@ files ship in the package `dist`.
 
 ## Application boundary
 
-Applications own loading the record, authorization, server validation and
-mapping server errors onto fields, navigation guards and persistence. `onSave`
+Applications own loading the record, authorization, server validation,
+navigation guards and persistence. `onSave` has no field-error channel, so
+showing server errors on individual fields means editing the copied block. `onSave`
 resolves with the saved record and rejects on failure; render the form with
 `key={record.id}` so switching records starts a fresh session.
 

@@ -8,11 +8,28 @@ export type SettingsFormProps = {
   initialValues: SettingsValues;
   onSave: (values: SettingsValues) => Promise<SettingsValues>;
 };
+
 export const failureMessage =
   'We could not save your changes. Your edits are still here. Try again.';
+
+// The WHATWG "valid email address" production, matching native type="email".
+const EMAIL_PATTERN =
+  /^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?(?:\.[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)*$/;
+
+export function validateName(value: string) {
+  return value.trim() ? undefined : 'Enter your name.';
+}
+
+export function validateEmail(value: string) {
+  return EMAIL_PATTERN.test(value.trim())
+    ? undefined
+    : 'Enter a valid email address.';
+}
+
 export function trimmed(values: SettingsValues): SettingsValues {
   return { ...values, name: values.name.trim(), email: values.email.trim() };
 }
+
 /** Keeps only the form's fields from the record onSave resolves with. */
 export function savedValues({ name, email, updates }: SettingsValues) {
   return { name, email, updates };

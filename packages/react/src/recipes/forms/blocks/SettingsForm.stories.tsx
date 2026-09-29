@@ -16,6 +16,8 @@ import {
 } from '../../../components/dialog';
 import { SettingsFormContract } from '../../../stories/support/settings-form-contract';
 import {
+  slowSave,
+  verifyErrorAfterSave,
   verifyFailure,
   verifyNarrow,
   verifyPending,
@@ -25,9 +27,11 @@ import {
   verifyValidation,
 } from '../../../stories/support/settings-form-test-utils';
 
+import fieldsSource from './settings-fields.tsx?raw';
 import { SettingsForm } from './settings-form';
 import blockSource from './settings-form.tsx?raw';
 import type { SettingsValues } from './settings-layout';
+import layoutSource from './settings-layout.tsx?raw';
 
 const priya = {
   id: 'priya',
@@ -97,8 +101,8 @@ const meta = {
         <>
           <Title />
           <p>
-            A settings form whose state lives in plain React: one self-contained
-            file with no form library.
+            A settings form whose state lives in plain React, with no form
+            library.
           </p>
           <h2>When to use it</h2>
           <p>
@@ -120,7 +124,8 @@ const meta = {
           <SettingsFormContract />
           <p>
             The form keeps its draft, errors, pending and saved values in React
-            state, and reads email validity from the browser.
+            state, and validates the draft values with the rules in{' '}
+            <code>settings-layout.tsx</code>.
           </p>
           <h2>States and dismissal</h2>
           <p>
@@ -139,7 +144,9 @@ const meta = {
           </p>
           <ul>
             <li>
-              Copy <code>blocks/settings-form.tsx</code>, keeping the{' '}
+              Copy <code>blocks/settings-form.tsx</code>,{' '}
+              <code>blocks/settings-layout.tsx</code> and{' '}
+              <code>blocks/settings-fields.tsx</code>, keeping the{' '}
               <code>recipes/forms</code> layout.
             </li>
             <li>
@@ -160,17 +167,27 @@ const meta = {
             Each behaviour above is tested on this page:{' '}
             <code>SaveAndCancel</code>, <code>Validation</code>,{' '}
             <code>Saving</code>, <code>SaveFailure</code>,{' '}
-            <code>ServerNormalized</code>, <code>RecordSwitch</code>,{' '}
-            <code>NarrowContainer</code>, <code>InsideDialog</code>.
+            <code>ErrorAfterSave</code>, <code>ServerNormalized</code>,{' '}
+            <code>RecordSwitch</code>, <code>NarrowContainer</code>,{' '}
+            <code>InsideDialog</code>.
           </p>
           <p>
             Not supported: server-side field errors mapped onto fields, and
-            autosave. Map server errors in your <code>onSave</code>.
+            autosave. <code>onSave</code> can only resolve or reject, so showing
+            server errors on individual fields means editing the copied block.
           </p>
           <h2>Implementation</h2>
           <details>
             <summary>blocks/settings-form.tsx</summary>
             <Source code={blockSource} language="tsx" />
+          </details>
+          <details>
+            <summary>blocks/settings-layout.tsx</summary>
+            <Source code={layoutSource} language="tsx" />
+          </details>
+          <details>
+            <summary>blocks/settings-fields.tsx</summary>
+            <Source code={fieldsSource} language="tsx" />
           </details>
           <p>
             <a
@@ -193,17 +210,14 @@ export const Default: Story = {};
 export const SaveAndCancel: Story = { play: verifySaveCancel };
 export const Validation: Story = { play: verifyValidation };
 export const Saving: Story = {
-  args: {
-    onSave: fn(
-      (values: SettingsValues) =>
-        new Promise<SettingsValues>((resolve) =>
-          setTimeout(() => resolve(values), 1000)
-        )
-    ),
-  },
+  args: { onSave: fn(slowSave) },
   play: verifyPending,
 };
 export const SaveFailure: Story = { play: verifyFailure };
+export const ErrorAfterSave: Story = {
+  parameters: { test: { dangerouslyIgnoreUnhandledErrors: true } },
+  play: verifyErrorAfterSave,
+};
 export const NarrowContainer: Story = {
   render: (args) => (
     <div className="nx:w-full" style={{ maxWidth: 280 }}>

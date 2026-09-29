@@ -27,6 +27,8 @@ export function SettingsFormContract() {
       <li>
         If <code>onSave</code> rejects, with or without an error, the edits
         stay, an error explains what happened and focus moves to Save to retry.
+        An error thrown after <code>onSave</code> resolves is not reported as a
+        failed save.
       </li>
       <li>
         Cancel restores the latest saved values and focuses the first field.
