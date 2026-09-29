@@ -9,7 +9,7 @@ import {
   useStore,
 } from '@tanstack/react-form';
 
-import { SettingsFields } from './settings-fields';
+import { SettingsFields } from '../settings-fields';
 import {
   failureMessage,
   savedValues,
@@ -19,7 +19,7 @@ import {
   trimmed,
   validateEmail,
   validateName,
-} from './settings-layout';
+} from '../settings-layout';
 
 export function TanStackSettingsForm({
   initialValues,
@@ -28,6 +28,7 @@ export function TanStackSettingsForm({
   const nameRef = React.useRef<HTMLInputElement>(null);
   const emailRef = React.useRef<HTMLInputElement>(null);
   const saveRef = React.useRef<HTMLButtonElement>(null);
+  const savingRef = React.useRef(false);
   const [saved, setSaved] = React.useState(initialValues);
   const [pending, setPending] = React.useState(false);
   const [message, setMessage] = React.useState('');
@@ -99,9 +100,14 @@ export function TanStackSettingsForm({
   }
   async function submit(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
-    if (form.state.isDefaultValue) return;
+    if (savingRef.current || form.state.isDefaultValue) return;
+    savingRef.current = true;
     clearFeedback();
-    await form.handleSubmit();
+    try {
+      await form.handleSubmit();
+    } finally {
+      savingRef.current = false;
+    }
     focusFirstInvalid();
   }
   function cancelChanges() {

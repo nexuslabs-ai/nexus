@@ -1,8 +1,7 @@
 # Forms and settings — file map
 
-Forms is the second family held to the recipes handoff checklist
-(`recipes/README.md`). Behaviour, the save contract and delivery live on the
-Storybook pages that test them; this file only maps the source.
+Behaviour, the save contract and delivery live on the Storybook pages that
+test them; this file only maps the source.
 
 | Where to read                 | What it covers                                                                               |
 | ----------------------------- | -------------------------------------------------------------------------------------------- |
@@ -20,12 +19,13 @@ uses; the three are alternatives, not layers.
 | `blocks/react-hook-form-settings-form.tsx` | ReactHookFormSettingsForm       | `react-hook-form` 7      |
 | `blocks/tanstack-settings-form.tsx`        | TanStackSettingsForm            | `@tanstack/react-form` 1 |
 
-Every block also needs `blocks/settings-layout.tsx` and
-`blocks/settings-fields.tsx`, which have no dependency beyond React and the
-Nexus components. `settings-layout.tsx` is the one contract module:
-`SettingsValues`, `SettingsFormProps`, the validation rules, trimming, the
-saved-record mapping, the failure copy and the status/Save/Cancel shell.
-`settings-fields.tsx` renders the fields from per-field bindings.
+**Helpers** — every block also needs both. They have no dependency beyond
+React and the Nexus components.
+
+| File                  | Holds                                                                                                                                                                       |
+| --------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `settings-layout.tsx` | The one contract module: `SettingsValues`, `SettingsFormProps`, the validation rules, trimming, the saved-record mapping, the failure copy and the status/Save/Cancel shell |
+| `settings-fields.tsx` | The fields, rendered from per-field bindings                                                                                                                                |
 
 **Examples**
 

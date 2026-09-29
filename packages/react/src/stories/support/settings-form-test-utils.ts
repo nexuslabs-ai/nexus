@@ -3,7 +3,7 @@ import { expect, type Mock, userEvent, waitFor, within } from 'storybook/test';
 import type {
   SettingsFormProps,
   SettingsValues,
-} from '../../recipes/forms/blocks/settings-layout';
+} from '../../recipes/forms/settings-layout';
 
 type SettingsPlayContext = {
   canvasElement: HTMLElement;
@@ -125,8 +125,10 @@ export async function verifyPending({
   const completeSave = controlledSave(args);
   const name = canvas.getByRole('textbox', { name: 'Name' });
   const save = canvas.getByRole('button', { name: 'Save changes' });
+  const form = canvas.getByRole<HTMLFormElement>('form');
   await userEvent.type(name, ' Jr');
-  await userEvent.keyboard('{Enter}{Enter}');
+  form.requestSubmit();
+  form.requestSubmit();
   await waitFor(() =>
     expect(canvas.getByRole('status')).toHaveTextContent('Saving changes')
   );
@@ -187,14 +189,20 @@ export async function verifyErrorAfterSave({
   function collect(event: PromiseRejectionEvent) {
     escaped.push(event.reason);
   }
-  window.addEventListener('unhandledrejection', collect);
   args.onSave.mockResolvedValueOnce(undefined as unknown as SettingsValues);
-  await userEvent.type(canvas.getByRole('textbox', { name: 'Name' }), ' Jr');
-  await userEvent.click(canvas.getByRole('button', { name: 'Save changes' }));
-  await waitFor(() => expect(escaped).toHaveLength(1));
-  window.removeEventListener('unhandledrejection', collect);
+  window.addEventListener('unhandledrejection', collect);
+  try {
+    await userEvent.type(canvas.getByRole('textbox', { name: 'Name' }), ' Jr');
+    await userEvent.click(canvas.getByRole('button', { name: 'Save changes' }));
+    await waitFor(() => expect(escaped).toHaveLength(1));
+  } finally {
+    window.removeEventListener('unhandledrejection', collect);
+  }
   await expect(escaped[0]).toBeInstanceOf(TypeError);
   await expect(args.onSave).toHaveBeenCalledTimes(1);
+  await expect(canvas.getByRole('textbox', { name: 'Name' })).toHaveValue(
+    'Priya Shah Jr'
+  );
   await expect(canvas.queryByRole('alert')).not.toBeInTheDocument();
 }
 

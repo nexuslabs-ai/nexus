@@ -4,7 +4,7 @@ import * as React from 'react';
 import { useController, useForm } from 'react-hook-form';
 import { flushSync } from 'react-dom';
 
-import { SettingsFields } from './settings-fields';
+import { SettingsFields } from '../settings-fields';
 import {
   failureMessage,
   savedValues,
@@ -14,7 +14,7 @@ import {
   trimmed,
   validateEmail,
   validateName,
-} from './settings-layout';
+} from '../settings-layout';
 
 export function ReactHookFormSettingsForm({
   initialValues,
@@ -22,6 +22,7 @@ export function ReactHookFormSettingsForm({
 }: SettingsFormProps) {
   const nameRef = React.useRef<HTMLInputElement>(null);
   const saveRef = React.useRef<HTMLButtonElement>(null);
+  const savingRef = React.useRef(false);
   const [message, setMessage] = React.useState('');
   const [saveError, setSaveError] = React.useState('');
   const [pending, setPending] = React.useState(false);
@@ -87,9 +88,14 @@ export function ReactHookFormSettingsForm({
   }
   async function submit(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
-    if (!dirty) return;
+    if (savingRef.current || !dirty) return;
+    savingRef.current = true;
     clearFeedback();
-    await form.handleSubmit(save)();
+    try {
+      await form.handleSubmit(save)();
+    } finally {
+      savingRef.current = false;
+    }
   }
   function cancelChanges() {
     form.reset();

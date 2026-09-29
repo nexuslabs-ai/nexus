@@ -26,12 +26,12 @@ import {
   verifyServerNormalized,
   verifyValidation,
 } from '../../../stories/support/settings-form-test-utils';
+import fieldsSource from '../settings-fields.tsx?raw';
+import type { SettingsValues } from '../settings-layout';
+import layoutSource from '../settings-layout.tsx?raw';
 
-import fieldsSource from './settings-fields.tsx?raw';
 import { SettingsForm } from './settings-form';
 import blockSource from './settings-form.tsx?raw';
-import type { SettingsValues } from './settings-layout';
-import layoutSource from './settings-layout.tsx?raw';
 
 const priya = {
   id: 'priya',
@@ -145,17 +145,29 @@ const meta = {
           <ul>
             <li>
               Copy <code>blocks/settings-form.tsx</code>,{' '}
-              <code>blocks/settings-layout.tsx</code> and{' '}
-              <code>blocks/settings-fields.tsx</code>, keeping the{' '}
+              <code>settings-layout.tsx</code> and{' '}
+              <code>settings-fields.tsx</code>, keeping the{' '}
               <code>recipes/forms</code> layout.
             </li>
             <li>
-              They import these Nexus component folders, which you need too:{' '}
-              <code>button</code>, <code>checkbox</code>, <code>field</code>,{' '}
-              <code>input</code>, <code>separator</code>. If your copy lives
-              elsewhere, update the relative imports.
+              They need these Nexus component folders, including the ones those
+              folders import: <code>button</code>, <code>button-group</code>,{' '}
+              <code>checkbox</code>, <code>field</code>, <code>input</code>,{' '}
+              <code>label</code>, <code>separator</code>, <code>spinner</code>,
+              plus <code>lib/icons.ts</code>, <code>lib/motion.ts</code> and{' '}
+              <code>lib/utils.ts</code>. If your copy lives elsewhere, update
+              the relative imports.
             </li>
-            <li>No npm packages beyond React and the Nexus components.</li>
+            <li>
+              Those folders use <code>@radix-ui/react-checkbox</code>,{' '}
+              <code>@radix-ui/react-label</code>,{' '}
+              <code>@radix-ui/react-separator</code>,{' '}
+              <code>@radix-ui/react-slot</code>,{' '}
+              <code>@tabler/icons-react</code>,{' '}
+              <code>class-variance-authority</code>, <code>clsx</code> and{' '}
+              <code>tailwind-merge</code>.
+            </li>
+            <li>The block itself needs no npm packages beyond React.</li>
             <li>
               Your application owns loading the record, authorization, server
               validation and field-error mapping, navigation guards and
@@ -182,11 +194,11 @@ const meta = {
             <Source code={blockSource} language="tsx" />
           </details>
           <details>
-            <summary>blocks/settings-layout.tsx</summary>
+            <summary>settings-layout.tsx</summary>
             <Source code={layoutSource} language="tsx" />
           </details>
           <details>
-            <summary>blocks/settings-fields.tsx</summary>
+            <summary>settings-fields.tsx</summary>
             <Source code={fieldsSource} language="tsx" />
           </details>
           <p>

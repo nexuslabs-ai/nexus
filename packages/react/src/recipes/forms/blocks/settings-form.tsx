@@ -3,7 +3,7 @@
 import * as React from 'react';
 import { flushSync } from 'react-dom';
 
-import { SettingsFields } from './settings-fields';
+import { SettingsFields } from '../settings-fields';
 import {
   failureMessage,
   savedValues,
@@ -13,7 +13,7 @@ import {
   trimmed,
   validateEmail,
   validateName,
-} from './settings-layout';
+} from '../settings-layout';
 
 type SettingsErrors = { name?: string; email?: string };
 
@@ -21,6 +21,7 @@ export function SettingsForm({ initialValues, onSave }: SettingsFormProps) {
   const nameRef = React.useRef<HTMLInputElement>(null);
   const emailRef = React.useRef<HTMLInputElement>(null);
   const saveRef = React.useRef<HTMLButtonElement>(null);
+  const savingRef = React.useRef(false);
   const [saved, setSaved] = React.useState<SettingsValues>(initialValues);
   const [draft, setDraft] = React.useState(saved);
   const [errors, setErrors] = React.useState<SettingsErrors>({});
@@ -59,7 +60,7 @@ export function SettingsForm({ initialValues, onSave }: SettingsFormProps) {
   }
   async function submit(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
-    if (!dirty) return;
+    if (savingRef.current || !dirty) return;
     const nextErrors = {
       name: validateName(draft.name),
       email: validateEmail(draft.email),
@@ -70,6 +71,7 @@ export function SettingsForm({ initialValues, onSave }: SettingsFormProps) {
       (nextErrors.name ? nameRef : emailRef).current?.focus();
       return;
     }
+    savingRef.current = true;
     setPending(true);
     let record: SettingsValues;
     try {
@@ -81,6 +83,8 @@ export function SettingsForm({ initialValues, onSave }: SettingsFormProps) {
       });
       saveRef.current?.focus();
       return;
+    } finally {
+      savingRef.current = false;
     }
     const baseline = savedValues(record);
     flushSync(() => {
