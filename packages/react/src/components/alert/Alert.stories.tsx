@@ -270,15 +270,31 @@ function AlertPlaygroundExample({
   variant,
 }: PlaygroundArgs) {
   const [visible, setVisible] = React.useState(true);
+  const restoreCloseFocus = React.useRef(false);
   const actions = layout === 'inline' ? actionsInline : actionsStack;
   const hasPrimaryAction = actions.includes('primary');
   const hasSecondaryAction = actions.includes('secondary');
   const hasCloseAction = actions.includes('close');
   const hasActions = actions !== 'none';
 
+  function resetAlert() {
+    restoreCloseFocus.current = true;
+    setVisible(true);
+  }
+
+  function focusResetButton(button: HTMLButtonElement | null) {
+    button?.focus();
+  }
+
+  function focusRestoredClose(button: HTMLButtonElement | null) {
+    if (!button || !restoreCloseFocus.current) return;
+    restoreCloseFocus.current = false;
+    button.focus();
+  }
+
   if (!visible) {
     return (
-      <Button variant="outline" onClick={() => setVisible(true)}>
+      <Button ref={focusResetButton} variant="outline" onClick={resetAlert}>
         Reset alert
       </Button>
     );
@@ -301,17 +317,26 @@ function AlertPlaygroundExample({
       {hasActions ? (
         <AlertActions>
           {hasPrimaryAction ? (
-            <Button size="sm" variant={primaryActionVariant}>
+            <Button
+              size="sm"
+              variant={fill === 'solid' ? 'outline' : primaryActionVariant}
+            >
               {primaryActionLabel}
             </Button>
           ) : null}
           {hasSecondaryAction ? (
-            <Button size="sm" variant={secondaryActionVariant}>
+            <Button
+              size="sm"
+              variant={fill === 'solid' ? 'outline' : secondaryActionVariant}
+            >
               {secondaryActionLabel}
             </Button>
           ) : null}
           {hasCloseAction ? (
-            <AlertClose onClick={() => setVisible(false)} />
+            <AlertClose
+              ref={focusRestoredClose}
+              onClick={() => setVisible(false)}
+            />
           ) : null}
         </AlertActions>
       ) : null}
@@ -506,7 +531,9 @@ export const Playground: PlaygroundStory = {
       name: 'primary variant (story only)',
       control: 'select',
       options: ['default', 'destructive', 'outline', 'secondary', 'ghost'],
-      description: 'Story-only primary Button variant.',
+      description:
+        'Story-only primary Button variant. Solid alerts use outline actions.',
+      if: { arg: 'fill', neq: 'solid' },
       table: {
         category: 'Controls',
       },
@@ -523,7 +550,9 @@ export const Playground: PlaygroundStory = {
       name: 'secondary variant (story only)',
       control: 'select',
       options: ['default', 'destructive', 'outline', 'secondary', 'ghost'],
-      description: 'Story-only secondary Button variant.',
+      description:
+        'Story-only secondary Button variant. Solid alerts use outline actions.',
+      if: { arg: 'fill', neq: 'solid' },
       table: {
         category: 'Controls',
       },
@@ -536,7 +565,7 @@ export const Playground: PlaygroundStory = {
     docs: {
       description: {
         story:
-          'Story-only controls render the recommended slot composition. They are not Alert props; production usage still composes icons, Button, AlertActions, and AlertClose as children. The visible action control changes by layout so stack omits AlertClose patterns while inline keeps them available. The copyable example includes dismissal state and a focus destination. Adjust its relative component imports to your copied Nexus paths and supply onManage from your application.',
+          'Story-only controls render the recommended slot composition. They are not Alert props; production usage still composes icons, Button, AlertActions, and AlertClose as children. Solid alerts use opaque outline buttons for both actions; variant controls apply to light and outlined alerts. The visible action control changes by layout so stack omits AlertClose patterns while inline keeps them available. The copyable example includes dismissal state and a focus destination. Adjust its relative component imports to your copied Nexus paths and supply onManage from your application.',
       },
       source: {
         code: `import { useState } from 'react';
@@ -592,6 +621,37 @@ export function StorageAlert({ onManage }: { onManage: () => void }) {
     await expect(actions).toBeInTheDocument();
     await expect(close).toBeInTheDocument();
     await expect(primaryAction).toBeInTheDocument();
+  },
+};
+
+export const PlaygroundSolidActions: PlaygroundStory = {
+  ...Playground,
+  tags: ['!autodocs', '!dev'],
+  args: {
+    ...Playground.args,
+    fill: 'solid',
+    actionsInline: 'primary + secondary + close',
+    primaryActionVariant: 'ghost',
+    secondaryActionVariant: 'ghost',
+  },
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+    for (const name of ['Manage', 'View details', 'Dismiss alert']) {
+      const button = canvas.getByRole('button', { name });
+      await expect(button).toHaveAttribute('data-variant', 'outline');
+      await expect(getComputedStyle(button).backgroundColor).not.toBe(
+        'rgba(0, 0, 0, 0)'
+      );
+    }
+    const close = canvas.getByRole('button', { name: 'Dismiss alert' });
+    close.focus();
+    await userEvent.keyboard('{Enter}');
+    const reset = await canvas.findByRole('button', { name: 'Reset alert' });
+    await expect(reset).toHaveFocus();
+    await userEvent.keyboard('{Enter}');
+    await expect(
+      await canvas.findByRole('button', { name: 'Dismiss alert' })
+    ).toHaveFocus();
   },
 };
 
