@@ -82,10 +82,20 @@ function errorMessage(code: FilterErrorCode, maxDepth: number) {
   return errorMessages[code];
 }
 
+function nodeIds(node: FilterGroup | FilterRule): string[] {
+  if (node.kind === 'rule') return [node.id];
+  return [node.id, ...node.children.flatMap(nodeIds)];
+}
+
+// Restored trees can already hold IDs from an earlier page load, so skip any in use.
 let nodeCount = 0;
-function createNodeId(prefix: string) {
-  nodeCount += 1;
-  return `${prefix}${nodeCount}`;
+function createNodeId(prefix: string, taken: ReadonlySet<string>) {
+  let id: string;
+  do {
+    nodeCount += 1;
+    id = `${prefix}${nodeCount}`;
+  } while (taken.has(id));
+  return id;
 }
 
 interface PickerProps<Value extends string> {
@@ -716,7 +726,7 @@ function FilterBuilder({
     (error) => !untouched.has(error.id)
   );
   function createId(kind: FilterRule['kind'] | FilterGroup['kind']) {
-    const id = createNodeId(idPrefix);
+    const id = createNodeId(idPrefix, new Set(nodeIds(value)));
     if (kind === 'rule') setUntouched((previous) => new Set(previous).add(id));
     return id;
   }
