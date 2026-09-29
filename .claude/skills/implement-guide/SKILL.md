@@ -172,12 +172,12 @@ The draft is a hypothesis. Before the user sees it, fan it out to a review counc
 
 Spawn all four in a single message so they run concurrently. Each receives the full draft plan and the task source, applies one lens, and verifies every claim against the actual source.
 
-| Lens                   | Agent                 | Attacks                                                                                                                                                                                                                                   |
-| ---------------------- | --------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| Codebase reality-check | `Explore`             | Do the files, APIs, helpers, and patterns the plan assumes actually exist and behave as claimed? Every claim about existing code is verified `file:line`.                                                                                 |
-| Architecture & ripple  | `principal-architect` | Integration points and callers/callees the plan ignores; whether the change respects the ripple-effect rule and the pre-production stage (delete, don't shim); whether the phase split is sound. (`ripple-effect.md`, `project-stage.md`) |
-| Simplicity & reuse     | `sde2`                | Over-engineering, speculative abstraction, a second copy of a helper that already exists, scope drifting past the issue. (`code-quality.md`)                                                                                              |
-| Edge cases & states    | `tester`              | Boundary inputs and failure modes the plan omits; missing loading / empty / error states; phases with no concrete verification step.                                                                                                      |
+| Lens                   | Agent                 | Attacks                                                                                                                                                                                                                                                                          |
+| ---------------------- | --------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Codebase reality-check | `Explore`             | Do the files, APIs, helpers, and patterns the plan assumes actually exist and behave as claimed? Every claim about existing code is verified `file:line`.                                                                                                                        |
+| Architecture & ripple  | `principal-architect` | Integration points and callers/callees the plan ignores; whether the change respects the ripple-effect rule and the pre-production stage (delete, don't shim; published APIs need a migration guide); whether the phase split is sound. (`ripple-effect.md`, `project-stage.md`) |
+| Simplicity & reuse     | `sde2`                | Over-engineering, speculative abstraction, a second copy of a helper that already exists, scope drifting past the issue. (`code-quality.md`)                                                                                                                                     |
+| Edge cases & states    | `tester`              | Boundary inputs and failure modes the plan omits; missing loading / empty / error states; phases with no concrete verification step.                                                                                                                                             |
 
 **Return contract** — each agent returns ONLY a findings list, no preamble, no restating the plan. Per finding:
 
@@ -293,7 +293,7 @@ _Diagnostic noise_
 _Pre-production hygiene_
 
 - _About to create a feature flag, backcompat shim, deprecation comment, `_unused` rename, or `// removed in X` marker?_
-  -> Don't. Delete instead of deprecate; rename in place instead of shim; remove unused exports entirely. There is no live deployment to protect. (`project-stage.md`)
+  -> Don't. Delete instead of deprecate; rename in place instead of shim; remove unused exports entirely. There is no live deployment to protect. The npm-published surface is the exception: it is a public API, so a breaking change needs a migration guide + a `minor` changeset while below 1.0. (`project-stage.md`)
 
 When a reflex fires and you're not certain of the spec, open the linked rule file. The reflex list above is the trigger; the rule file is the answer.
 
