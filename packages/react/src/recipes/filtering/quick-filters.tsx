@@ -1,6 +1,12 @@
 import * as React from 'react';
 
-import { IconFile, IconList, IconTag, IconUsers } from '@tabler/icons-react';
+import {
+  IconFile,
+  IconHash,
+  IconList,
+  IconTag,
+  IconUsers,
+} from '@tabler/icons-react';
 
 import { Button } from '../../components/button';
 import {
@@ -25,45 +31,29 @@ import {
 import { AppliedFilters } from './blocks/applied-filters';
 import { type ChoiceCondition, ChoiceFilter } from './blocks/choice-filter';
 import {
+  type NumberComparisonCondition,
+  NumberComparisonFilter,
+} from './blocks/number-comparison-filter';
+import {
   type NumberRangeCondition,
   NumberRangeFilter,
 } from './blocks/number-range-filter';
-import {
-  matchesProjects,
-  ProjectCondition,
-  type ProjectFilter,
-} from './project-condition';
+import { matchesChoice, Results } from './local-results';
 import { files, members, templates } from './quick-fixtures';
 
-function matchesChoice(actual: string, condition: ChoiceCondition | null) {
+function matchesProjects(
+  count: number,
+  condition: NumberComparisonCondition | null
+) {
   if (!condition) return true;
-  if (condition.operator === 'isEmpty') return actual === '';
-  if (condition.operator === 'isNotEmpty') return actual !== '';
-  if ('value' in condition)
-    return condition.operator === 'isNot'
-      ? actual !== condition.value
-      : actual === condition.value;
-  return false;
+  // Every member has a project count.
+  if (!('value' in condition)) return condition.operator === 'isNotEmpty';
+  if (condition.operator === 'greaterThan') return count > condition.value;
+  if (condition.operator === 'lessThan') return count < condition.value;
+  if (condition.operator === 'isNot') return count !== condition.value;
+  return count === condition.value;
 }
 
-function Results({
-  count,
-  total,
-  noun,
-}: {
-  count: number;
-  total: number;
-  noun: string;
-}) {
-  return (
-    <p
-      role="status"
-      className="nx:typography-body-small nx:text-muted-foreground"
-    >
-      {count} of {total} {noun}
-    </p>
-  );
-}
 function NoMatches() {
   return (
     <p className="nx:typography-body-default nx:text-muted-foreground">
@@ -85,7 +75,8 @@ export function TableFilters({
   const [team, setTeam] = React.useState<ChoiceCondition | null>(
     initiallyFiltered ? { operator: 'is', value: 'Design' } : null
   );
-  const [projects, setProjects] = React.useState<ProjectFilter>(null);
+  const [projects, setProjects] =
+    React.useState<NumberComparisonCondition | null>(null);
   const filtered = !!query || !!status || !!team || !!projects;
   const results = members.filter(
     (member) =>
@@ -148,7 +139,13 @@ export function TableFilters({
           }))}
           onChange={setTeam}
         />
-        <ProjectCondition value={projects} onChange={setProjects} />
+        <NumberComparisonFilter
+          label="Projects"
+          icon={<IconHash aria-hidden="true" />}
+          lowerBound={0}
+          value={projects}
+          onChange={setProjects}
+        />
       </AppliedFilters>
       <div className="nx:flex nx:items-center nx:justify-between nx:gap-3">
         <Results count={results.length} total={members.length} noun="members" />

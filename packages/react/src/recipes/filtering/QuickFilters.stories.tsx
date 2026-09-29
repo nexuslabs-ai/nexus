@@ -3,12 +3,8 @@ import * as React from 'react';
 import type { Meta, StoryObj } from '@storybook/react';
 import { expect, userEvent, waitFor, within } from 'storybook/test';
 
-import {
-  CardFilters,
-  FileFiltersExample,
-  TableFilters,
-} from '../../recipes/filtering/quick-filters';
-import recipeSource from '../../recipes/filtering/quick-filters.tsx?raw';
+import { CardFilters, FileFiltersExample, TableFilters } from './quick-filters';
+import recipeSource from './quick-filters.tsx?raw';
 const meta = {
   title: 'Internal/Filtering/Quick filters',
   tags: ['!dev', '!autodocs'],
@@ -267,37 +263,38 @@ export const ProjectCount: Story = {
   play: async ({ canvasElement }) => {
     const canvas = within(canvasElement);
     const page = within(canvasElement.ownerDocument.body);
-    await userEvent.click(canvas.getByRole('button', { name: /^Projects$/ }));
-    await userEvent.type(page.getByRole('spinbutton'), '-1');
-    await expect(page.getByRole('alert')).toHaveTextContent('whole number');
+    await userEvent.click(
+      canvas.getByRole('button', { name: 'Add projects filter' })
+    );
+    await userEvent.type(page.getByLabelText('Projects'), '-1');
     await expect(page.getByRole('button', { name: 'Apply' })).toBeDisabled();
-    await userEvent.clear(page.getByRole('spinbutton'));
-    await userEvent.type(page.getByRole('spinbutton'), '3');
+    await userEvent.clear(page.getByLabelText('Projects'));
+    await userEvent.type(page.getByLabelText('Projects'), '3');
     await expect(canvas.getByRole('status')).toHaveTextContent(
       '2 of 6 members'
     );
     await userEvent.click(page.getByRole('button', { name: 'Apply' }));
     await waitFor(() =>
       expect(
-        canvas.getByRole('button', { name: 'Edit Projects value' })
+        canvas.getByRole('button', { name: 'Edit Projects: 3' })
       ).toHaveFocus()
     );
     await expect(canvas.getByRole('status')).toHaveTextContent(
       '1 of 6 members'
     );
     await userEvent.click(
-      canvas.getByRole('button', { name: 'Edit Projects value' })
+      canvas.getByRole('button', { name: 'Edit Projects: 3' })
     );
-    await userEvent.clear(page.getByRole('spinbutton'));
-    await userEvent.type(page.getByRole('spinbutton'), '9');
+    await userEvent.clear(page.getByLabelText('Projects'));
+    await userEvent.type(page.getByLabelText('Projects'), '9');
     await userEvent.keyboard('{Escape}');
     await waitFor(() =>
       expect(page.queryByRole('dialog')).not.toBeInTheDocument()
     );
     await userEvent.click(
-      canvas.getByRole('button', { name: 'Edit Projects value' })
+      canvas.getByRole('button', { name: 'Edit Projects: 3' })
     );
-    await expect(page.getByRole('spinbutton')).toHaveValue(3);
+    await expect(page.getByLabelText('Projects')).toHaveValue(3);
     await userEvent.click(page.getByRole('button', { name: 'Cancel' }));
     await waitFor(() =>
       expect(page.queryByRole('dialog')).not.toBeInTheDocument()
@@ -305,9 +302,13 @@ export const ProjectCount: Story = {
     await userEvent.click(
       canvas.getByRole('button', { name: 'Remove Projects filter' })
     );
-    await expect(
-      canvas.getByRole('button', { name: /^Projects$/ })
-    ).toHaveFocus();
+    await waitFor(() =>
+      expect(
+        canvas.getByRole('button', { name: 'Add projects filter' })
+      ).toHaveFocus()
+    );
+    await userEvent.type(canvas.getByRole('searchbox'), 'a');
+    await expect(canvas.getByRole('searchbox')).toHaveFocus();
     await expect(canvas.getByRole('status')).toHaveTextContent(
       '2 of 6 members'
     );

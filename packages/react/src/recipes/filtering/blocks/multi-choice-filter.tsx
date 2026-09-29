@@ -2,13 +2,13 @@ import * as React from 'react';
 
 import { Button } from '../../../components/button';
 import { Checkbox } from '../../../components/checkbox';
+import { ChoiceRow } from '../../../components/choice-row';
 import {
   FilterCondition,
   FilterConditionField,
   FilterConditionRemove,
   FilterConditionSegment,
 } from '../../../components/filter-condition';
-import { Label } from '../../../components/label';
 import {
   Popover,
   PopoverContent,
@@ -259,10 +259,10 @@ export function MultiChoiceEditor({
       <legend className="nx:sr-only">{label}</legend>
       <div className="nx:max-h-64 nx:overflow-y-auto">
         {availableOptions.map((option, index) => (
-          <Label
+          <ChoiceRow
             key={option.value}
             htmlFor={`${id}-${index}`}
-            className="nx:flex nx:cursor-pointer nx:items-center nx:gap-2 nx:rounded-base nx:p-2 nx:hover:bg-control-background"
+            className="nx:not-has-[:disabled]:hover:bg-popover-hover"
           >
             <Checkbox
               id={`${id}-${index}`}
@@ -273,7 +273,7 @@ export function MultiChoiceEditor({
               }
             />
             {option.label}
-          </Label>
+          </ChoiceRow>
         ))}
         {!availableOptions.length && (
           <p className="nx:p-2 nx:typography-body-default nx:text-muted-foreground">

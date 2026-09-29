@@ -1,7 +1,7 @@
 import type {
   FilterOperator,
   FilterRule,
-} from '../../components/filter-builder';
+} from '../../components/filter-model';
 
 import type { ChoiceCondition } from './blocks/choice-filter';
 import type { DateRangeCondition } from './blocks/date-range-filter';

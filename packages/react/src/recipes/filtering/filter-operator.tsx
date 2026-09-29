@@ -7,11 +7,11 @@ import {
   DropdownMenuRadioItem,
   DropdownMenuTrigger,
 } from '../../components/dropdown-menu';
+import { FilterConditionSegment } from '../../components/filter-condition';
 import {
   type FilterOperator,
   filterOperatorLabels,
-} from '../../components/filter-builder';
-import { FilterConditionSegment } from '../../components/filter-condition';
+} from '../../components/filter-model';
 
 /** Recipe wiring; applications control the operator alongside the value. */
 export function ConditionOperator<Operator extends FilterOperator>({

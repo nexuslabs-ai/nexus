@@ -4,11 +4,11 @@ import { Canvas, Source, Title } from '@storybook/addon-docs/blocks';
 import type { Meta, StoryObj } from '@storybook/react';
 import { expect, fn, userEvent, waitFor, within } from 'storybook/test';
 
+import { FilterBuilder } from '../../components/filter-builder';
 import {
-  FilterBuilder,
   type FilterGroup,
   getFilterErrors,
-} from '../../components/filter-builder';
+} from '../../components/filter-model';
 
 import { AdvancedFiltering } from './advanced-filters';
 import { exampleFields } from './advanced-fixtures';
@@ -542,6 +542,6 @@ export const BlockConditionsToRules: Story = {
         },
         exampleFields
       )
-    ).toEqual([{ id: 'retired', message: 'Choose an available option.' }]);
+    ).toEqual([{ id: 'retired', code: 'unknownOption' }]);
   },
 };

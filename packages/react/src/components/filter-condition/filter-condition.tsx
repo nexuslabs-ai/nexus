@@ -57,7 +57,9 @@ function FilterConditionField({
   return (
     <span
       {...props}
+      data-slot="filter-condition-field"
       className={cn(
+        // eslint-disable-next-line no-restricted-syntax -- the start segment of a joined control whose other segments are Buttons follows the Button radius override
         'nx:inline-flex nx:h-(--nx-spacing-8) nx:shrink-0 nx:items-center nx:gap-2 nx:[&_svg]:size-3.5 nx:[&_svg]:shrink-0 nx:rounded-s-base nx:border-default nx:border-border-default nx:bg-container nx:px-2.5 nx:typography-label-default nx:text-muted-foreground',
         className
       )}

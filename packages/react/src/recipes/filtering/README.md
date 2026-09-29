@@ -30,21 +30,21 @@ the Nexus component folders it imports and any npm peer.
 **Examples** — runnable compositions shown on `Patterns/Filtering`. Replace the
 fixtures and local matching with your own query.
 
-| File                                            | Example                                                       |
-| ----------------------------------------------- | ------------------------------------------------------------- |
-| `team-directory.tsx` + `quick-fixtures.ts`      | Team directory: immediate updates                             |
-| `invoice-filtering.tsx`                         | Invoice list: Apply per filter                                |
-| `advanced-filters.tsx` + `advanced-fixtures.ts` | Grouped conditions with FilterBuilder                         |
-| `applied-filters-example.tsx`                   | A Filters panel with removable summaries                      |
-| `member-directory.tsx`                          | Result states: loading, empty collection, no matches, failure |
+| File                                                             | Example                                                       |
+| ---------------------------------------------------------------- | ------------------------------------------------------------- |
+| `team-directory.tsx` + `quick-fixtures.ts` + `local-results.tsx` | Team directory: immediate updates                             |
+| `invoice-filtering.tsx`                                          | Invoice list: Apply per filter                                |
+| `advanced-filters.tsx` + `advanced-fixtures.ts`                  | Grouped conditions with FilterBuilder                         |
+| `applied-filters-example.tsx`                                    | A Filters panel with removable summaries                      |
+| `member-directory.tsx`                                           | Result states: loading, empty collection, no matches, failure |
 
 **Internal** — kept for internal stories only; not part of the handoff.
 
-| File                                          | Used by                                     |
-| --------------------------------------------- | ------------------------------------------- |
-| `quick-filters.tsx` + `project-condition.tsx` | `Internal/Filtering/Quick filters`          |
-| `value-editors.tsx`                           | `Internal/Filtering/Value editors`          |
-| `member-query-url.ts`                         | `Internal/Filtering/Request and URL states` |
+| File                  | Used by                                     |
+| --------------------- | ------------------------------------------- |
+| `quick-filters.tsx`   | `Internal/Filtering/Quick filters`          |
+| `value-editors.tsx`   | `Internal/Filtering/Value editors`          |
+| `member-query-url.ts` | `Internal/Filtering/Request and URL states` |
 
 Do not copy `*.stories.tsx`; they hold tests and simulated services. None of
 these files ship in the package `dist`.

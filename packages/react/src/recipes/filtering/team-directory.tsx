@@ -17,39 +17,11 @@ import {
 
 import { AppliedFilters } from './blocks/applied-filters';
 import { type ChoiceCondition, ChoiceFilter } from './blocks/choice-filter';
+import { matchesChoice, Results } from './local-results';
 import { members } from './quick-fixtures';
 
 // Replace the fixture records and local results predicate with your data/query.
 // Status, team and query are applied state: every change updates results directly.
-function matchesChoice(actual: string, condition: ChoiceCondition | null) {
-  if (!condition) return true;
-  if (condition.operator === 'isEmpty') return actual === '';
-  if (condition.operator === 'isNotEmpty') return actual !== '';
-  if ('value' in condition)
-    return condition.operator === 'isNot'
-      ? actual !== condition.value
-      : actual === condition.value;
-  return false;
-}
-
-function Results({
-  count,
-  total,
-  noun,
-}: {
-  count: number;
-  total: number;
-  noun: string;
-}) {
-  return (
-    <p
-      role="status"
-      className="nx:typography-body-small nx:text-muted-foreground"
-    >
-      {count} of {total} {noun}
-    </p>
-  );
-}
 export function TeamDirectory({
   initiallyFiltered = false,
 }: {

@@ -250,6 +250,12 @@ export const UrlPersistence: Story = {
       expect(canvas.getByLabelText('Status')).toHaveValue('Invited')
     );
     await expect(await canvas.findByText('1 member')).toBeVisible();
+    const entries = window.history.length;
+    await userEvent.type(canvas.getByLabelText('Name'), 'Ma');
+    await expect(window.history.length).toBe(entries);
+    await expect(
+      new URL(window.location.href).searchParams.get('members.name')
+    ).toBe('Ma');
     const malformed = new URL(window.location.href);
     malformed.searchParams.set('members.page', '-3');
     malformed.searchParams.set('members.status', 'not-a-status');

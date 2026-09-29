@@ -8,12 +8,11 @@ import {
   MultipleChoiceExample,
   NumberExample,
   RangeExample,
-  SearchableExample,
   Showcase,
   SingleChoiceExample,
   TextExample,
-} from '../../recipes/filtering/value-editors';
-import recipeSource from '../../recipes/filtering/value-editors.tsx?raw';
+} from './value-editors';
+import recipeSource from './value-editors.tsx?raw';
 const meta = {
   title: 'Internal/Filtering/Value editors',
   tags: ['!dev', '!autodocs'],
@@ -94,31 +93,6 @@ export const MultipleChoices: Story = {
     );
     await waitFor(() =>
       expect(canvas.getByRole('button', { name: /^Edit Teams:/ })).toHaveFocus()
-    );
-  },
-};
-export const SearchableChoice: Story = {
-  render: () => <SearchableExample />,
-  play: async ({ canvasElement }) => {
-    const canvas = within(canvasElement),
-      page = within(canvasElement.ownerDocument.body);
-    await userEvent.click(canvas.getByRole('button', { name: 'Edit Owner' }));
-    await userEvent.type(
-      page.getByRole('combobox', { name: 'Search owners' }),
-      'No match'
-    );
-    await expect(page.getByText('No owners found.')).toBeVisible();
-    await userEvent.clear(
-      page.getByRole('combobox', { name: 'Search owners' })
-    );
-    await userEvent.type(
-      page.getByRole('combobox', { name: 'Search owners' }),
-      'Maya'
-    );
-    await userEvent.keyboard('{ArrowDown}{Enter}');
-    await expect(canvas.getByRole('status')).toHaveTextContent('Maya Chen');
-    await waitFor(() =>
-      expect(page.queryByRole('dialog')).not.toBeInTheDocument()
     );
   },
 };

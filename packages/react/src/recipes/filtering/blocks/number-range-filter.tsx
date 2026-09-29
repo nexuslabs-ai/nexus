@@ -1,13 +1,13 @@
 import * as React from 'react';
 
 import { Button } from '../../../components/button';
-import { isValuelessOperator } from '../../../components/filter-builder';
 import {
   FilterCondition,
   FilterConditionField,
   FilterConditionRemove,
   FilterConditionSegment,
 } from '../../../components/filter-condition';
+import { isValuelessOperator } from '../../../components/filter-model';
 import { Input } from '../../../components/input';
 import { Label } from '../../../components/label';
 import {
@@ -50,13 +50,10 @@ export function NumberRangeFilter({
   const [open, setOpen] = React.useState(false);
   const [min, setMin] = React.useState('');
   const [max, setMax] = React.useState('');
-  const [removed, setRemoved] = React.useState(false);
   const restoreAdd = React.useRef(false);
   const operatorRef = React.useRef<HTMLButtonElement>(null);
-  const [snapshot, setSnapshot] = React.useState(
-    JSON.stringify([value, disabled])
-  );
   const nextSnapshot = JSON.stringify([value, disabled]);
+  const [snapshot, setSnapshot] = React.useState(nextSnapshot);
   if (snapshot !== nextSnapshot) {
     setSnapshot(nextSnapshot);
     setOpen(false);
@@ -72,14 +69,13 @@ export function NumberRangeFilter({
     (upperBound === undefined || Number(max) <= upperBound) &&
     Number(max) >= Number(min);
   const invalid = min !== '' && max !== '' && !valid;
-  const error = !invalid
-    ? ''
-    : `Enter an ordered range${lowerBound === undefined ? '' : ` from ${lowerBound}`}${upperBound === undefined ? '' : ` up to ${upperBound}`}.`;
+  const error = invalid
+    ? `Enter an ordered range${lowerBound === undefined ? '' : ` from ${lowerBound}`}${upperBound === undefined ? '' : ` up to ${upperBound}`}.`
+    : '';
   function changeOpen(next: boolean) {
     if (next) {
       setMin(range ? String(range.min) : '');
       setMax(range ? String(range.max) : '');
-      setRemoved(false);
     }
     setOpen(next && !disabled);
     if (!next) setPending(false);
@@ -98,7 +94,6 @@ export function NumberRangeFilter({
     setOpen(false);
     setPending(false);
     onChange(null);
-    setRemoved(true);
   }
   function focusAdd(node: HTMLButtonElement | null) {
     addRef.current = node;
@@ -108,7 +103,7 @@ export function NumberRangeFilter({
     }
   }
   function restoreFocus(event: Event) {
-    if (removed || !value) {
+    if (!value) {
       event.preventDefault();
       addRef.current?.focus();
     } else if (value.operator !== 'between') {
