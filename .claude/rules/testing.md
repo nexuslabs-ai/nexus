@@ -26,7 +26,7 @@ A fixture is defined by what it is, not by its path:
 
 `examples/scripts/` and `examples/registry/` are repo scripts, and `examples/nextjs-consumer/` is the export route, which #798 retires. None of them is a fixture.
 
-**Isolation.** The root `.npmrc` sets `node-linker=hoisted`, so an app inside the repository silently resolves any package it forgot to declare from the repo-root `node_modules`. A fixture is therefore verified from a copy outside the repository, and nothing in it resolves back into the repository: no `workspace:` or `link:` specifier, no `file:` specifier that names a directory, and no import that reaches repo source. A `file:` specifier may name a packed tarball of a workspace package, such as the local `@nexus_ds/core` tarball that `examples/registry/build.mjs` packs. The copy installs it like any published package.
+**Isolation.** The root `.npmrc` sets `node-linker=hoisted`, so an app inside the repository silently resolves any package it forgot to declare from the repo-root `node_modules`. A fixture is therefore verified from a copy outside the repository, and nothing in it resolves back into the repository: no `workspace:` or `link:` specifier, no `file:` specifier that names a directory, and no import that reaches repo source. A `file:` specifier may name a packed tarball of a workspace package, provided the tarball is copied out alongside the fixture; the copy then installs it like any published package.
 
 **Checks.** Each fixture must pass `npm run typecheck` and `npm run build`. A computed-style probe loads the host alone and the host with Nexus in the same run, and compares the two. It never compares against a recorded baseline. Probes check that Nexus coexists with the host; component behaviour stays in stories.
 
@@ -115,10 +115,11 @@ pnpm test:unit          # Core engine, cn merge, ESLint rules
 pnpm test:storybook     # Every story's play function in a real browser
 ```
 
-`pnpm test` does not run distribution fixtures. Run each one from a copy outside the repository:
+`pnpm test` does not run distribution fixtures. Run each one from a copy outside the repository, delivering Nexus through the fixture's own route before checking it:
 
 ```bash
 npm ci
+npm run nexus:add   # the fixture's delivery step; see its README
 npm run typecheck
 npm run build
 ```

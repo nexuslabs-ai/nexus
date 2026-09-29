@@ -72,7 +72,7 @@ axe-core against it with `test: 'error'` so any violation fails.
 
 You don't write a separate `*.test.tsx` for a component. That's not a stylistic
 preference — the `unit` project's `include` list in `vitest.config.ts` is one
-glob per Vitest row of [`.claude/rules/testing.md`](.claude/rules/testing.md)
+glob per `unit`-project row of [`.claude/rules/testing.md`](.claude/rules/testing.md)
 § Scope, and a component test file matches none of them.
 
 Outside stories, three kinds of unit test exist, all under the `unit` project

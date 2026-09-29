@@ -29,7 +29,7 @@ export default defineConfig({
     // Use projects feature (Vitest 4)
     projects: [
       // Core engine, the `cn` merge, and ESLint rules - jsdom for the
-      // first-paint script tests. One glob per Vitest row of testing.md
+      // first-paint script tests. One glob per `unit`-project row of testing.md
       // § Scope; the stories row belongs to the `storybook` project below.
       {
         extends: true,
