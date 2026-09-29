@@ -1,23 +1,27 @@
 'use client';
 
 import * as React from 'react';
+import { flushSync } from 'react-dom';
 
-import { SettingsFields } from './settings-fields';
+import { SettingsFields } from '../settings-fields';
 import {
   failureMessage,
-  normalized,
+  savedValues,
   type SettingsFormProps,
   SettingsLayout,
   type SettingsValues,
+  trimmed,
   validateEmail,
   validateName,
-} from './settings-layout';
+} from '../settings-layout';
 
 type SettingsErrors = { name?: string; email?: string };
 
 export function SettingsForm({ initialValues, onSave }: SettingsFormProps) {
   const nameRef = React.useRef<HTMLInputElement>(null);
   const emailRef = React.useRef<HTMLInputElement>(null);
+  const saveRef = React.useRef<HTMLButtonElement>(null);
+  const savingRef = React.useRef(false);
   const [saved, setSaved] = React.useState<SettingsValues>(initialValues);
   const [draft, setDraft] = React.useState(saved);
   const [errors, setErrors] = React.useState<SettingsErrors>({});
@@ -56,7 +60,7 @@ export function SettingsForm({ initialValues, onSave }: SettingsFormProps) {
   }
   async function submit(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
-    if (!dirty) return;
+    if (savingRef.current || !dirty) return;
     const nextErrors = {
       name: validateName(draft.name),
       email: validateEmail(draft.email),
@@ -67,18 +71,29 @@ export function SettingsForm({ initialValues, onSave }: SettingsFormProps) {
       (nextErrors.name ? nameRef : emailRef).current?.focus();
       return;
     }
-    const submitted = normalized(draft);
+    savingRef.current = true;
     setPending(true);
+    let record: SettingsValues;
     try {
-      await onSave(submitted);
-      setSaved(submitted);
-      setDraft(submitted);
-      setMessage('Changes saved.');
+      record = await onSave(trimmed(draft));
     } catch {
-      setSaveError(failureMessage);
+      flushSync(() => {
+        setSaveError(failureMessage);
+        setPending(false);
+      });
+      saveRef.current?.focus();
+      return;
     } finally {
-      setPending(false);
+      savingRef.current = false;
     }
+    const baseline = savedValues(record);
+    flushSync(() => {
+      setSaved(baseline);
+      setDraft(baseline);
+      setMessage('Changes saved.');
+      setPending(false);
+    });
+    nameRef.current?.focus();
   }
 
   return (
@@ -90,6 +105,7 @@ export function SettingsForm({ initialValues, onSave }: SettingsFormProps) {
       error={saveError}
       onSubmit={submit}
       onCancel={cancelChanges}
+      saveRef={saveRef}
     >
       <SettingsFields
         pending={pending}

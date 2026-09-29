@@ -1,6 +1,7 @@
 'use client';
 
 import * as React from 'react';
+import { flushSync } from 'react-dom';
 
 import {
   useField,
@@ -8,33 +9,53 @@ import {
   useStore,
 } from '@tanstack/react-form';
 
-import { SettingsFields } from './settings-fields';
+import { SettingsFields } from '../settings-fields';
 import {
   failureMessage,
-  normalized,
+  savedValues,
   type SettingsFormProps,
   SettingsLayout,
+  type SettingsValues,
+  trimmed,
   validateEmail,
   validateName,
-} from './settings-layout';
+} from '../settings-layout';
 
-export function TanStackFormExample({
+export function TanStackSettingsForm({
   initialValues,
   onSave,
 }: SettingsFormProps) {
   const nameRef = React.useRef<HTMLInputElement>(null);
   const emailRef = React.useRef<HTMLInputElement>(null);
+  const saveRef = React.useRef<HTMLButtonElement>(null);
+  const savingRef = React.useRef(false);
   const [saved, setSaved] = React.useState(initialValues);
+  const [pending, setPending] = React.useState(false);
   const [message, setMessage] = React.useState('');
   const [saveError, setSaveError] = React.useState('');
   const form = useTanStackForm({
     defaultValues: saved,
     onSubmit: async ({ value, formApi }) => {
-      const submitted = normalized(value);
-      await onSave(submitted);
-      setSaved(submitted);
-      formApi.reset(submitted);
-      setMessage('Changes saved.');
+      setPending(true);
+      let record: SettingsValues;
+      try {
+        record = await onSave(trimmed(value));
+      } catch {
+        flushSync(() => {
+          setSaveError(failureMessage);
+          setPending(false);
+        });
+        saveRef.current?.focus();
+        return;
+      }
+      const baseline = savedValues(record);
+      flushSync(() => {
+        formApi.reset(baseline);
+        setSaved(baseline);
+        setMessage('Changes saved.');
+        setPending(false);
+      });
+      nameRef.current?.focus();
     },
   });
   const name = useField({
@@ -49,7 +70,6 @@ export function TanStackFormExample({
   });
   const updates = useField({ form, name: 'updates' });
   const dirty = useStore(form.store, (state) => !state.isDefaultValue);
-  const pending = useStore(form.store, (state) => state.isSubmitting);
   function clearFeedback() {
     setMessage('');
     setSaveError('');
@@ -78,13 +98,13 @@ export function TanStackFormExample({
   }
   async function submit(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
-    if (form.state.isDefaultValue) return;
+    if (savingRef.current || form.state.isDefaultValue) return;
+    savingRef.current = true;
     clearFeedback();
     try {
       await form.handleSubmit();
-    } catch {
-      setSaveError(failureMessage);
-      return;
+    } finally {
+      savingRef.current = false;
     }
     focusFirstInvalid();
   }
@@ -103,6 +123,7 @@ export function TanStackFormExample({
       error={saveError}
       onSubmit={submit}
       onCancel={cancelChanges}
+      saveRef={saveRef}
     >
       <SettingsFields
         pending={pending}
