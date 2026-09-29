@@ -540,12 +540,14 @@ export const IconOnlyWithConditionalLabel: Story = {
     const [zeroBadge, fragmentBadge] = canvas.getAllByTestId('label-badge');
 
     await expect(iconOnlyBadges).toHaveLength(5);
-    for (const badge of iconOnlyBadges)
+    for (const badge of iconOnlyBadges) {
       await expect(badge).toHaveAttribute('data-icon-only', 'true');
+    }
     await expect(zeroBadge).toHaveTextContent('0');
     await expect(fragmentBadge).toHaveTextContent('Approved');
-    for (const badge of [zeroBadge, fragmentBadge])
+    for (const badge of [zeroBadge, fragmentBadge]) {
       await expect(badge).not.toHaveAttribute('data-icon-only');
+    }
   },
 };
 
