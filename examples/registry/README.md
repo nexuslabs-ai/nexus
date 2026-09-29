@@ -159,27 +159,30 @@ Result:
 ### Variable names under `prefix(nx)`
 
 `prefix(nx)` renames every `@theme` variable, so Nexus's static scales land
-in the same `--nx-*` namespace as its runtime blocks. Compiled with the
-fixtures' Tailwind 4.3.3 (`vite build` output):
+in the same `--nx-*` namespace as its runtime blocks. #795 recorded this
+mapping at `f096bd331`; #796 changed the rows that read a runtime variable.
+Compiled with the fixtures' Tailwind 4.3.3 (`vite build` output):
 
 | Scale | Declaration in `nexus.css` | Emitted in `@layer theme` (`:root, :host`) | Utility | Runtime writer |
 | ----- | -------------------------- | ------------------------------------------ | ------- | -------------- |
-| Spacing | `@theme { --spacing-4: 16px }` | `--nx-spacing-4: 16px` | `nx:px-4` → `padding-inline: var(--nx-spacing-4)` | unlayered `:root, [data-density=…] { --nx-spacing-4 }`, same name |
-| Radius | `@theme { --radius-md: var(--nx-radius-md) }` | `--nx-radius-md: var(--nx-radius-md)`, a self-reference | `nx:rounded-md` → `border-radius: var(--nx-radius-md)` | unlayered `:root, [data-radius=…] { --nx-radius-md }`, same name |
-| Text | `@theme { --text-*: initial }`, nothing declared | nothing | `nx:typography-*` read `--nx-typography-*` | unlayered `:root` in `variables.css` |
-| Easing | `@theme { --ease-enter: var(--nx-motion-ease-enter) }` | `--nx-ease-enter: var(--nx-motion-ease-enter)` | `nx:ease-enter` → `var(--nx-ease-enter)` | none; resolves at `:root` |
+| Spacing | `@theme { --spacing-4: 16px }` | `--nx-spacing-4: 16px` | `nx:px-4` → `padding-inline: var(--nx-spacing-4)` | `[data-nexus-root], [data-nx-density=…] { --nx-spacing-4 }`, same name |
+| Radius | `@theme inline reference { --radius-md: var(--nx-radius-md) }` | nothing (#795: a `--nx-radius-md: var(--nx-radius-md)` self-reference) | `nx:rounded-md` → `border-radius: var(--nx-radius-md)` | `[data-nexus-root], [data-nx-radius=…] { --nx-radius-md }` |
+| Text | `@theme { --text-*: initial }`, nothing declared | nothing | `nx:typography-*` read `--nx-typography-*` | the root block in `variables.css` |
+| Easing | `@theme inline reference { --ease-move: var(--nx-motion-ease-move) }` | nothing (#795: `--nx-ease-move: var(--nx-motion-ease-move)`) | `nx:ease-move` → `var(--nx-motion-ease-move)` (#795: `var(--nx-ease-move)`) | the root block in `variables.css` |
 
 **Decision: one `--nx-*` namespace.** The collision is what makes runtime
-density and corners work: the runtime blocks are unlayered, so they beat
-the `@layer theme` declaration of the same name, and utilities read the
-winner. The spacing `@theme` values equal the `default` density, so they
-are only a static fallback. The radius entry is a cycle that is harmless
-only while the unlayered block matches `:root`; once #796 scopes runtime
-blocks to a root element, entries that reference another variable
-(radius, easing) move to `@theme inline` so utilities read the runtime
-variable directly. Host `@theme` names are unprefixed (`--spacing-gutter`,
-`--radius-panel`) and never meet `--nx-*`; the only host collision is
-Finding 1.
+density work: the runtime blocks set the same name on the root element, and
+utilities read it there. The spacing `@theme` values equal the `default`
+density, so they are only a static fallback. Every `@theme` entry that
+reads a runtime variable (colour, radius, easing, shadow, border width,
+default transition) is `@theme inline reference`: utilities read the
+runtime variable on the element, and nothing is declared on `:root`, where
+root-scoped variables do not exist. Before that change an embedded Dialog's
+`transition-timing-function` was `ease`, not the root's curve.
+`token-catalogue.test.ts` compiles `nexus.css` and fails if a `:root, :host`
+variable reads one that is not declared there. Host `@theme` names are
+unprefixed (`--spacing-gutter`, `--radius-panel`) and never meet `--nx-*`;
+the only host collision was Finding 1.
 
 ### `'use client'`
 
@@ -191,14 +194,15 @@ Component page.
 
 ## Findings
 
-Probed with `getComputedStyle` on production builds (`vite preview`,
-`next start`) against a `?no-nexus` baseline; `copy-vite` has
-`?nexus-first`, `?nexus-only` and `?provider` modes for the rows below.
-`probe/compare-styles.mjs` reads 17 properties on `<html>`, `<body>` and
-every `[data-probe]` element, opening Dialog and Popover for their
-portalled probes. Against `?no-nexus`, copy-vite changes 30 host
-properties with Nexus loaded after the host, 16 with `?nexus-first` and 70
-with `?provider`.
+Recorded on #795's tree (`f096bd331`) with `getComputedStyle` on
+production builds (`vite preview`, `next start`) against a `?no-nexus`
+baseline; `copy-vite` then had `?nexus-first`, `?nexus-only` and
+`?provider` modes. `probe/compare-styles.mjs` reads 17 properties on
+`<html>`, `<body>` and every `[data-probe]` element, opening Dialog and
+Popover for their portalled probes. Against `?no-nexus`, copy-vite changed
+30 host properties with Nexus loaded after the host, 16 with
+`?nexus-first` and 70 with `?provider`. A scoped-root prototype (the
+`probe/scope-prototype.mjs` edit, removed with #796) took the 30 to 0.
 
 | # | Finding | Owner |
 | - | ------- | ----- |
@@ -216,21 +220,59 @@ with `?provider`.
 
 ### Verified after #796
 
-Probed with `getComputedStyle` on the production builds:
+Re-run on 2026-09-29 from outside copies, with `probe/compare-styles.mjs`
+on `vite preview`:
 
-- **Host leaks: 27 → 0.** `copy-vite` with Nexus CSS loaded after the
-  host's and before it: every host property matches the `?no-nexus`
+- **Host leaks: 30 → 0.** With Nexus CSS loaded after the host's and
+  before it (`?nexus-first`), every host property matches the `?no-nexus`
   baseline.
-- **Nexus is load-order independent.** All 19 Nexus probes, including the
-  open Dialog and Popover and their borders, match between the two orders.
+- **Nexus is load-order independent.** All 14 Nexus probes, including the
+  open Dialog and Popover, match between the two orders.
+- **Runtime appearance.** The panel's `appearance-mode` control changes 42
+  Nexus probe properties and `appearance-density` changes 8, portals
+  included. No host element outside the root changes.
+- **Embedded easing.** The open Dialog's `transition-timing-function` is
+  the root's `--nx-motion-ease-move` curve (before `@theme inline
+  reference`: `ease`).
 - **Portals keep the root.** The Dialog carries the panel's key and mode,
   and follows a mode change while open.
 - **Defaults without runtime CSS.** A bare `data-nexus-root` /
   `data-nx-mode="dark"` element renders the primary Button with the dark
   default (#795 Finding 7 found it near-black).
 - **Host themes are ignored.** A host `.dark` ancestor or
-  `<html data-theme="dark">` (`?data-theme`) leaves Nexus light.
+  `<html data-theme="dark">` (`?data-theme`) leaves every Nexus probe
+  unchanged.
 - **Server-rendered appearance.** `copy-next` with a `dark` cookie serves
   `data-nx-mode="dark"` and the root's scoped `<style>` in the HTML, hydrates
   with no console warnings, and paints dark again after a reload.
-- **Class completeness.** Every `nx:` class the copied tree uses is emitted.
+- **Class completeness.** All 187 `nx:` classes each copied tree uses are
+  emitted, in both fixtures.
+
+## Probes
+
+`probe/` holds the harness behind these numbers. It runs from the
+repository (it uses the root Playwright) against a fixture copy served
+outside it:
+
+```bash
+# in the copy-vite copy
+npm run build && npx vite preview --port 4173
+
+# host leaks against the no-Nexus baseline: 0 and 0
+node examples/registry/probe/compare-styles.mjs 'http://localhost:4173/?no-nexus' http://localhost:4173/
+node examples/registry/probe/compare-styles.mjs 'http://localhost:4173/?no-nexus' 'http://localhost:4173/?nexus-first'
+
+# Nexus load order and host themes: 0 and 0
+node examples/registry/probe/compare-styles.mjs http://localhost:4173/ 'http://localhost:4173/?nexus-first' --probes nexus-
+node examples/registry/probe/compare-styles.mjs http://localhost:4173/ 'http://localhost:4173/?data-theme' --probes nexus-
+
+# runtime appearance: 42 and 8 Nexus properties
+node examples/registry/probe/compare-styles.mjs http://localhost:4173/ http://localhost:4173/ --probes nexus- --click-b appearance-mode
+node examples/registry/probe/compare-styles.mjs http://localhost:4173/ http://localhost:4173/ --probes nexus- --click-b appearance-density
+
+# class completeness (187 classes, none missing) against @nexus_ds/react's own build
+pnpm --filter @nexus_ds/react build
+node examples/registry/probe/class-completeness.mjs <copy>/dist/assets/nexus-*.css packages/react/dist/react.css <copy>/src/components/nexus
+```
+
+`transform-probe.tsx` is the source of the `transform-probe` registry item.

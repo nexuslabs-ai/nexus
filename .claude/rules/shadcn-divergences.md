@@ -61,6 +61,5 @@ that shadcn has no equivalent for.
 ## Adaptive by default
 
 Semantic tokens already carry their dark-mode value; a Nexus root in dark mode
-(`data-nx-mode="dark"`) swaps the value underneath them. `nx:dark:bg-primary-background` is a
-no-op. Reserve `dark:` for raw primitives, which should not appear in component
-code anyway.
+(`data-nx-mode="dark"`) swaps the value underneath them. Nexus has no `nx:dark:`
+variant: drop shadcn's `dark:` classes instead of translating them.

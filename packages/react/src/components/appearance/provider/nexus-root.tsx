@@ -7,6 +7,7 @@ import {
   useCallback,
   useId,
   useMemo,
+  useRef,
 } from 'react';
 
 import {
@@ -56,10 +57,16 @@ function NexusRoot({
   ...props
 }: NexusRootProps) {
   const key = useId();
-  const safeState = useMemo(
-    () => ({ ...sanitizeNexusAppearance(state), mode: state.mode }),
-    [state]
-  );
+  // Keyed on the state's content, so a caller passing a new object each render
+  // does not rebuild the CSS and context.
+  const stateKey = JSON.stringify(state);
+  const safeState = useMemo<NexusRootState>(() => {
+    const parsed: NexusRootState = JSON.parse(stateKey);
+    return {
+      ...sanitizeNexusAppearance(parsed),
+      mode: parsed.mode === 'dark' ? 'dark' : 'light',
+    };
+  }, [stateKey]);
   const attributes = useMemo(
     () => nexusRootAttributes(safeState, safeState.mode, key),
     [key, safeState]
@@ -69,14 +76,22 @@ function NexusRoot({
     [key, safeState]
   );
 
+  // Updates made before the host re-renders build on each other, not on the
+  // last rendered state.
+  const pendingRef = useRef<{
+    base: NexusRootState;
+    next: NexusAppearanceState;
+  } | null>(null);
   const setState = useCallback<Dispatch<SetStateAction<NexusAppearanceState>>>(
     (update) => {
       if (!onStateChange) return;
-      onStateChange(
-        sanitizeNexusAppearance(
-          typeof update === 'function' ? update(safeState) : update
-        )
+      const pending = pendingRef.current;
+      const previous = pending?.base === safeState ? pending.next : safeState;
+      const next = sanitizeNexusAppearance(
+        typeof update === 'function' ? update(previous) : update
       );
+      pendingRef.current = { base: safeState, next };
+      onStateChange(next);
     },
     [onStateChange, safeState]
   );
@@ -94,7 +109,7 @@ function NexusRoot({
     <NexusAppearanceContext.Provider value={appearance}>
       <NexusRootContext.Provider value={attributes}>
         <style nonce={nonce}>{`${themeCss}\n${prefsCss}`}</style>
-        <div {...attributes} {...props}>
+        <div {...props} {...attributes}>
           {children}
         </div>
       </NexusRootContext.Provider>

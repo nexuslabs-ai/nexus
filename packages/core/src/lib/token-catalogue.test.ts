@@ -1,3 +1,5 @@
+import { compile } from '@tailwindcss/node';
+import { Scanner } from '@tailwindcss/oxide';
 import { readFileSync } from 'node:fs';
 import { resolve } from 'node:path';
 import { describe, expect, it } from 'vitest';
@@ -226,7 +228,7 @@ describe('token catalogue', () => {
   });
 
   it('agrees with the generated runtime colour defaults in light and dark', () => {
-    const theme = blockDeclarations(nexusCss, '@theme inline');
+    const theme = blockDeclarations(nexusCss, '@theme inline reference');
     const light = blockDeclarations(nexusCss, ROOT);
     const dark = blockDeclarations(nexusCss, DARK_ROOT);
     for (const token of runtimeColors) {
@@ -262,9 +264,41 @@ describe('token catalogue', () => {
     expect(unscoped).toEqual([]);
   });
 
+  it('compiles no :root theme variable that reads a root-scoped variable', async () => {
+    const base = resolve(process.cwd(), 'packages/tailwind');
+    const candidates = new Scanner({
+      sources: [
+        {
+          base: resolve(process.cwd(), 'packages/react/src'),
+          pattern: '**/*',
+          negated: false,
+        },
+      ],
+    }).scan();
+    const compiler = await compile(generated('nexus.css'), {
+      base,
+      onDependency() {},
+    });
+    const compiled = compiler.build(candidates);
+    const declared = new Map(
+      [...compiled.matchAll(/:root, :host \{([^}]*)\}/g)].flatMap(
+        ([, body]) => [...customProperties(body!)]
+      )
+    );
+    const unresolved = [...declared].flatMap(([name, value]) =>
+      [...value.matchAll(/var\((--[\w-]+)/g)]
+        .map(([, reference]) => reference!)
+        .filter((reference) => reference === name || !declared.has(reference))
+        .map((reference) => `${name} -> ${reference}`)
+    );
+
+    expect(declared.size).toBeGreaterThan(20);
+    expect(unresolved).toEqual([]);
+  });
+
   it('declares no unprefixed --color-* outside @theme', () => {
     const outsideTheme = generated('nexus.css').replace(
-      /@theme(?: inline)? \{[\s\S]*?\n\}/g,
+      /@theme(?: inline reference)? \{[\s\S]*?\n\}/g,
       ''
     );
 
@@ -324,13 +358,23 @@ describe('token catalogue', () => {
   );
 
   it('agrees with every generated light and dark shadow preset block', () => {
-    const { modes } = cssModes('data-nx-shadow');
+    const { modes, root } = cssModes('data-nx-shadow');
+    // The root preset's dark values sit on the dark root itself, which also
+    // carries the dark colour defaults in another block.
+    const darkRootShadows = nexusBlocks.find(
+      ({ selectors, declarations }) =>
+        selectors.length === 1 &&
+        selectors[0] === DARK_ROOT &&
+        [...declarations.keys()].some((name) => name.startsWith('--nx-shadow-'))
+    )?.declarations;
     for (const preset of modes) {
       expect(modeBlock(`[data-nx-shadow='${preset}']`), preset).toEqual(
         cataloguePreset('shadow', { preset, mode: 'light' })
       );
       expect(
-        modeBlock(`${DARK_ROOT}[data-nx-shadow='${preset}']`),
+        preset === root
+          ? darkRootShadows
+          : modeBlock(`${DARK_ROOT}[data-nx-shadow='${preset}']`),
         preset
       ).toEqual(cataloguePreset('shadow', { preset, mode: 'dark' }));
     }
@@ -339,7 +383,7 @@ describe('token catalogue', () => {
   it('maps every @theme variable to the token it reads or declares', () => {
     const theme = new Map([
       ...blockDeclarations(nexusCss, '@theme'),
-      ...blockDeclarations(nexusCss, '@theme inline'),
+      ...blockDeclarations(nexusCss, '@theme inline reference'),
     ]);
     const aliased = catalogue.flatMap((token) =>
       aliasesOf(token, 'css-variable').map((alias) => ({ alias, token }))

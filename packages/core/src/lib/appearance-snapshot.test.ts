@@ -273,6 +273,7 @@ describe('Nexus root contract', () => {
 
   it('escapes the key inside the root selector', () => {
     expect(nexusRootScope('a"b\\c')).toBe('[data-nexus-root="a\\"b\\\\c"]');
+    expect(nexusRootScope('a\nb')).toBe('[data-nexus-root="a\\a b"]');
   });
 
   it('derives sanitized CSS for any root scope', () => {
@@ -425,6 +426,27 @@ describe('createNexusAppearanceBootstrapScript', () => {
     }${document.querySelector('style[data-nexus-appearance-prefs]')?.textContent}`;
     expect(injected).toBe(`${themeCss()}${prefsCss()}`);
     expect(injected).not.toContain(':root');
+  });
+
+  it('gives its styles the nonce of the script that runs it', () => {
+    const currentScript = vi
+      .spyOn(document, 'currentScript', 'get')
+      .mockReturnValue(
+        Object.assign(document.createElement('script'), {
+          nonce: 'first-paint',
+        })
+      );
+
+    new Function(createNexusAppearanceBootstrapScript())();
+    currentScript.mockRestore();
+
+    const styles = document.querySelectorAll<HTMLStyleElement>(
+      'style[data-nexus-appearance-theme], style[data-nexus-appearance-prefs]'
+    );
+    expect([...styles].map((style) => style.nonce)).toEqual([
+      'first-paint',
+      'first-paint',
+    ]);
   });
 
   it('falls back to the embedded default snapshot on empty storage', () => {

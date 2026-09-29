@@ -2,6 +2,7 @@
 
 import {
   deriveNexusAppearanceCss,
+  NEXUS_ROOT_ATTRIBUTE,
   type NexusAppearanceState,
   sanitizeNexusAppearance,
 } from '@nexus_ds/core';
@@ -33,7 +34,7 @@ function ExportFiles() {
   const { state } = useNexusAppearance();
   const { themeCss, prefsCss } = deriveNexusAppearanceCss(
     state,
-    '[data-nexus-root]'
+    `[${NEXUS_ROOT_ATTRIBUTE}]`
   );
   const files = [
     {

@@ -659,10 +659,7 @@ export function generateThemedModesCSS(modesByName, opts) {
     `${selectors.root},\n  [${attrName}="${defaultMode}"]`,
     modesByName[defaultMode].light
   );
-  css += writeModeBlock(
-    `${selectors.dark},\n  ${selectors.dark}[${attrName}="${defaultMode}"]`,
-    modesByName[defaultMode].dark
-  );
+  css += writeModeBlock(selectors.dark, modesByName[defaultMode].dark);
 
   for (const mode of otherModes) {
     css += writeModeBlock(`[${attrName}="${mode}"]`, modesByName[mode].light);
@@ -1176,16 +1173,6 @@ export function collectShadowTokens(tokensDir, primitiveMap) {
   return shadows;
 }
 
-/**
- * Selectors for the Nexus root, built from the engine's root contract so the
- * generated CSS and the runtime attributes cannot drift.
- *
- * @param {object} engine - The token engine (`@nexus_ds/core` runtime)
- * @returns {{ root: string, dark: string, attributeFor: Record<string, string> }}
- *   `root` matches any Nexus root, `dark` a root in dark mode, and
- *   `attributeFor` maps an appearance field (`corners`) to its attribute
- *   (`data-nx-radius`).
- */
 function defaultColorBlock(selector, tokens) {
   let block = `  ${selector} {\n`;
   for (const token of tokens.filter((token) =>
@@ -1196,6 +1183,17 @@ function defaultColorBlock(selector, tokens) {
   return `${block}  }\n`;
 }
 
+/**
+ * Selectors for the Nexus root, built from the engine's root contract so the
+ * generated CSS and the runtime attributes cannot drift.
+ *
+ * @param {object} engine - The token engine (`@nexus_ds/core` runtime)
+ * @returns {{ root: string, dark: string, attributeFor: Record<string, string>, layerOrder: string }}
+ *   `root` matches any Nexus root, `dark` a root in dark mode,
+ *   `attributeFor` maps an appearance field (`corners`) to its attribute
+ *   (`data-nx-radius`), and `layerOrder` is the `@layer` statement both the
+ *   generated CSS and the runtime `<style>` open with.
+ */
 export function nexusRootSelectors(engine) {
   const root = `[${engine.NEXUS_ROOT_ATTRIBUTE}]`;
   const attributeFor = Object.fromEntries(
@@ -1207,6 +1205,7 @@ export function nexusRootSelectors(engine) {
     root,
     dark: `${root}[${engine.NEXUS_MODE_ATTRIBUTE}='dark']`,
     attributeFor,
+    layerOrder: engine.NEXUS_LAYER_ORDER,
   };
 }
 
@@ -1226,7 +1225,7 @@ export function nexusRootSelectors(engine) {
  * @param {object[]} config.motionTokens - Array of { group, key, cssName, varRef } for duration/ease
  * @param {object[]} config.shadowTokens - Array of { cssName, value } for shadows
  * @param {object[]} [config.darkSemanticTokens] - Array of { cssName, value } for dark mode semantic tokens
- * @param {{ root: string, dark: string }} config.selectors - From `nexusRootSelectors`
+ * @param {{ root: string, dark: string, layerOrder: string }} config.selectors - From `nexusRootSelectors`
  * @returns {string} Generated CSS content
  */
 export function generateThemeCSS(config) {
@@ -1248,7 +1247,7 @@ export function generateThemeCSS(config) {
   } = config;
 
   let css = header;
-  css += `@layer theme, base, components, utilities;\n\n`;
+  css += `${selectors.layerOrder}\n\n`;
 
   // Google Fonts import
   if (googleFontsImport) {
@@ -1265,7 +1264,7 @@ export function generateThemeCSS(config) {
       css += `@import '${imp}';\n`;
     }
   }
-  css += `\n@custom-variant dark (&:where(${selectors.dark}, ${selectors.dark} *));\n\n`;
+  css += `\n`;
 
   // @theme block
   css += `@theme {\n`;
@@ -1282,32 +1281,6 @@ export function generateThemeCSS(config) {
   if (spacingTokens.length > 0) {
     css += `\n  /* Spacing tokens */\n`;
     for (const token of spacingTokens) {
-      css += `  --${token.cssName}: ${token.value};\n`;
-    }
-  }
-
-  // Radius tokens
-  if (radiusTokens.length > 0) {
-    css += `\n  /* Radius tokens */\n`;
-    for (const token of radiusTokens) {
-      css += `  --${token.cssName}: ${token.varRef};\n`;
-    }
-  }
-
-  // Motion tokens
-  if (motionTokens.length > 0) {
-    css += `\n  /* Motion tokens */\n`;
-    for (const token of motionTokens.filter(
-      (motionToken) => motionToken.group === 'ease'
-    )) {
-      css += `  --${token.cssName}: ${token.varRef};\n`;
-    }
-  }
-
-  // Shadow tokens
-  if (shadowTokens.length > 0) {
-    css += `\n  /* Shadow tokens */\n`;
-    for (const token of shadowTokens) {
       css += `  --${token.cssName}: ${token.value};\n`;
     }
   }
@@ -1330,6 +1303,21 @@ export function generateThemeCSS(config) {
 
   css += `}\n`;
 
+  // Every theme value that reads a runtime variable is `inline reference`:
+  // utilities read the runtime variable on the element itself, and nothing is
+  // declared on `:root`, where the root-scoped variables do not exist.
+  css += `\n@theme inline reference {\n`;
+  for (const token of radiusTokens) {
+    css += `  --${token.cssName}: ${token.varRef};\n`;
+  }
+  for (const token of motionTokens.filter((token) => token.group === 'ease')) {
+    css += `  --${token.cssName}: ${token.varRef};\n`;
+  }
+  for (const token of shadowTokens) {
+    css += `  --${token.cssName}: ${token.value};\n`;
+  }
+  css += `}\n`;
+
   // Inlined so a motion-mode override on any ancestor reaches them.
   const defaultDuration = motionTokens.find(
     (token) =>
@@ -1343,7 +1331,7 @@ export function generateThemeCSS(config) {
       `generateThemeCSS: motion tokens \`duration.${DEFAULT_TRANSITION.duration}\` and \`ease.${DEFAULT_TRANSITION.ease}\` are required — \`transition-control\` / \`transition-field\` read them as the default transition timing.`
     );
   }
-  css += `\n@theme inline {\n`;
+  css += `\n@theme inline reference {\n`;
   css += `  /* Default transition timing */\n`;
   css += `  --default-transition-duration: ${defaultDuration.varRef};\n`;
   css += `  --default-transition-timing-function: ${defaultEase.varRef};\n`;
@@ -1354,7 +1342,7 @@ export function generateThemeCSS(config) {
   // field's focus ring is a `border-default` inner edge plus an
   // `outline-default` outer edge, so both namespaces share each value.
   if (borderwidthTokens.length > 0) {
-    css += `\n@theme inline {\n`;
+    css += `\n@theme inline reference {\n`;
     css += `  /* Border and outline width tokens */\n`;
     for (const token of borderwidthTokens) {
       css += `  --border-width-${token.key}: ${token.varRef};\n`;
@@ -1369,7 +1357,7 @@ export function generateThemeCSS(config) {
   // fall back to the root's `--nx-default-color-*`. Inlined because Tailwind's
   // `prefix(nx)` would otherwise rename the @theme variable to the runtime name.
   if (semanticTokens.length > 0) {
-    css += `\n@theme inline {\n`;
+    css += `\n@theme inline reference {\n`;
     css += `  /* Semantic tokens */\n`;
     for (const token of semanticTokens) {
       const value = token.cssName.startsWith('color-')
