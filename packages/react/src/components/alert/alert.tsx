@@ -335,7 +335,7 @@ function AlertTitle({
     <Comp
       data-slot="alert-title"
       className={cn(
-        'nx:mb-1 nx:last:mb-0 nx:typography-label-default nx:group-data-[text-tone=neutral]/alert:text-foreground',
+        'nx:mb-0.5 nx:last:mb-0 nx:typography-label-default nx:group-data-[text-tone=neutral]/alert:text-foreground',
         className
       )}
       {...props}
