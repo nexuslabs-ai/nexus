@@ -32,6 +32,7 @@ export default defineConfig({
         '**/*.test.tsx',
         '**/*.stories.tsx',
         'src/stories/**',
+        'src/recipes/**',
       ],
       outDir: 'dist',
       beforeWriteFile: rewriteRootDeclaration,

@@ -35,8 +35,17 @@ export {
   IconCheck,
   IconCircleFilled,
   IconMinus,
+  IconPlus,
   IconPointFilled,
   IconX,
+} from '@tabler/icons-react';
+
+// Filter field types
+export {
+  IconCalendar,
+  IconHash,
+  IconLetterCase,
+  IconList,
 } from '@tabler/icons-react';
 
 // Search / input
