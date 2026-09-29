@@ -111,6 +111,11 @@ ruleTester.run('nx-class-conventions', rule, {
       errors: [{ messageId: 'darkVariant' }],
     },
     {
+      // `not-dark:` compiles to `@media not (prefers-color-scheme: dark)`.
+      code: "const c = 'nx:not-dark:p-4';",
+      errors: [{ messageId: 'darkVariant' }],
+    },
+    {
       code: "const c = 'nx:dark:bg-muted';",
       filename: '/repo/packages/react/src/components/card/Card.stories.tsx',
       errors: [{ messageId: 'darkVariant' }],

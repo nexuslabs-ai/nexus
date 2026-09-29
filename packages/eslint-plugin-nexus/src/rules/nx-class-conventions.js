@@ -47,7 +47,7 @@ const CHECKS = [
   },
   {
     messageId: 'darkVariant',
-    re: new RegExp(`nx:${NX_MODIFIER_CHAIN}dark:`),
+    re: new RegExp(`nx:${NX_MODIFIER_CHAIN}(?:not-)?dark:`),
   },
   {
     messageId: 'bannedAccent',
