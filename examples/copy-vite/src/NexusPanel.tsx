@@ -1,3 +1,8 @@
+import { useState } from 'react'
+
+import { DEFAULT_NEXUS_APPEARANCE } from '@nexus_ds/core'
+
+import { NexusRoot } from '~/components/nexus/components/appearance/provider'
 import { Button as HostButton } from '~/components/ui/button'
 import { Button } from '~/components/nexus/components/button'
 import {
@@ -26,8 +31,13 @@ import {
 import { Progress } from '~/components/nexus/components/progress'
 
 export function NexusPanel() {
+  const [mode, setMode] = useState<'light' | 'dark'>('light')
   return (
-    <section data-probe="nexus-panel" className="mt-6 grid gap-4 sm:grid-cols-2">
+    <NexusRoot
+      state={{ ...DEFAULT_NEXUS_APPEARANCE, mode }}
+      data-probe="nexus-panel"
+      className="mt-6 grid gap-4 sm:grid-cols-2"
+    >
       <Card data-probe="nexus-card">
         <CardHeader>
           <CardTitle>Nexus card</CardTitle>
@@ -49,6 +59,13 @@ export function NexusPanel() {
           </div>
         </CardContent>
         <CardFooter className="gap-2">
+          <Button
+            data-probe="nexus-mode-toggle"
+            variant="ghost"
+            onClick={() => setMode(mode === 'dark' ? 'light' : 'dark')}
+          >
+            Nexus {mode === 'dark' ? 'light' : 'dark'}
+          </Button>
           <Dialog>
             <DialogTrigger asChild>
               <Button data-probe="nexus-dialog-trigger" variant="secondary">
@@ -86,6 +103,6 @@ export function NexusPanel() {
           </Popover>
         </CardFooter>
       </Card>
-    </section>
+    </NexusRoot>
   )
 }
