@@ -181,8 +181,8 @@ type PlaygroundButtonVariant = NonNullable<
 >;
 type PlaygroundArgs = React.ComponentProps<typeof Alert> & {
   icon: PlaygroundIcon;
-  actionsInline: PlaygroundActions;
-  actionsStack: PlaygroundStackActions;
+  actionsInline?: PlaygroundActions;
+  actionsStack?: PlaygroundStackActions;
   title: string;
   description: string;
   primaryActionLabel: string;
@@ -224,8 +224,8 @@ function renderPlaygroundIcon(icon: PlaygroundIcon) {
 }
 
 function AlertPlaygroundExample({
-  actionsInline,
-  actionsStack,
+  actionsInline = 'none',
+  actionsStack = 'none',
   description,
   icon,
   layout,
@@ -534,6 +534,30 @@ export const Playground: PlaygroundStory = {
     await expect(actions).toBeInTheDocument();
     await expect(close).toBeInTheDocument();
     await expect(primaryAction).toBeInTheDocument();
+  },
+};
+
+export const ClearedActionControls: PlaygroundStory = {
+  ...Playground,
+  tags: ['!autodocs', '!dev'],
+  args: {
+    ...Playground.args,
+    actionsInline: undefined,
+    actionsStack: undefined,
+  },
+  render: (args) => (
+    <div className="nx:flex nx:w-full nx:flex-col nx:gap-4">
+      <AlertPlaygroundExample {...args} layout="inline" />
+      <AlertPlaygroundExample {...args} layout="stack" />
+    </div>
+  ),
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+    await expect(canvas.getAllByText('Storage almost full')).toHaveLength(2);
+    await expect(canvas.queryAllByRole('button')).toHaveLength(0);
+    await expect(
+      canvasElement.querySelectorAll('[data-slot="alert-actions"]')
+    ).toHaveLength(0);
   },
 };
 
