@@ -14,7 +14,8 @@ pnpm add @nexus_ds/core
 - `BRAND_COLOR_PRESETS`, `BrandColorPreset`, `findBrandColorPreset`, `DEFAULT_BRAND_COLOR`: brand color choices for appearance editors. Default is `DEFAULT_BRAND_COLOR`; Indigo, Blue, Violet, Rose, Orange, Amber, Green, and Teal use each family's authored 600 hex. Assign a preset's `color` to `brandColor`; `findBrandColorPreset(brandColor)` returns the preset an opaque saved color matches in any CSS notation the engine parses (`#4F46E5`, `4f46e5`, `rgb(79 70 229)`), ignoring surrounding whitespace, or `undefined` for a custom or unparseable color.
 - `createNexusThemeContract`, `deriveTheme`, `themeToCss`: derive a full token set from appearance state and render it to CSS.
 - `measureThemeContrast`, `ThemeContrastCheck`, `Mode`, `Tier`: measure a derived theme against every registered APCA pair. See [Contrast report](#contrast-report).
-- `createNexusAppearanceSnapshotFromState`, `createNexusAppearanceBootstrapScript`, `resolveFirstPaint`, `DEFAULT_STORAGE_KEY`: first-paint, no-flash bootstrap.
+- `nexusRootAttributes`, `nexusRootScope`, `deriveNexusAppearanceCss`: the attributes and runtime CSS for a Nexus root (`data-nexus-root`).
+- `createNexusAppearanceSnapshotFromState`, `createNexusAppearanceBootstrapScript`, `DEFAULT_STORAGE_KEY`: first-paint, no-flash bootstrap for a standalone app, whose root is `<html>`.
 
 ## Advanced / Engine Exports
 
@@ -73,16 +74,16 @@ const tokens = createTokenCatalogue();
 
 ## Non-React Shell Example
 
-Use the engine directly when a host shell owns DOM or native styling.
+Use the engine directly when a host shell owns DOM or native styling. Nexus
+styles apply inside an element marked with `data-nexus-root`; the runtime CSS
+targets that root by its key.
 
 ```ts
 import {
-  createNexusAppearanceSnapshotFromState,
-  createNexusThemeContract,
   DEFAULT_NEXUS_APPEARANCE,
-  deriveTheme,
-  resolveFirstPaint,
-  themeToCss,
+  deriveNexusAppearanceCss,
+  nexusRootAttributes,
+  nexusRootScope,
 } from '@nexus_ds/core';
 
 const state = {
@@ -90,21 +91,19 @@ const state = {
   brandColor: '#2563eb',
   surfaceTone: 'slate',
 };
-const snapshot = createNexusAppearanceSnapshotFromState(state);
-const firstPaint = resolveFirstPaint(snapshot, false);
-const themeStyle =
-  document.querySelector<HTMLStyleElement>('style[data-theme]') ??
-  document.head.appendChild(document.createElement('style'));
-themeStyle.dataset.theme = '';
+const root = document.querySelector<HTMLElement>('#app')!;
+for (const [name, value] of Object.entries(
+  nexusRootAttributes(state, 'light', 'app')
+)) {
+  root.setAttribute(name, value);
+}
 
-document.documentElement.classList.toggle(
-  'dark',
-  firstPaint.className === 'dark'
+const { themeCss, prefsCss } = deriveNexusAppearanceCss(
+  state,
+  nexusRootScope('app')
 );
-document.documentElement.style.colorScheme = firstPaint.colorScheme;
-themeStyle.textContent = themeToCss(
-  deriveTheme(createNexusThemeContract(snapshot.state))
-);
+const style = document.head.appendChild(document.createElement('style'));
+style.textContent = `${themeCss}\n${prefsCss}`;
 ```
 
 ## Token Architecture

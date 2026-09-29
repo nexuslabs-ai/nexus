@@ -2,6 +2,7 @@ import typographyTokens from '../../tokens/primitives/typography/typography-defa
 
 import { normalizeContrast } from './contrast';
 import type { ThemeDerivationInput, ThemeSeeds } from './derive-theme';
+import { NEXUS_LAYER_ORDER } from './nexus-root';
 import type { NexusSurfaceTone } from './palette';
 import { isColor } from './perceptual-ramp';
 
@@ -303,7 +304,16 @@ export function createNexusThemeContract(
   };
 }
 
-export function appearancePrefsToCss(prefs: NexusAppearancePrefs): string {
+/**
+ * Serialize user preferences to CSS for one Nexus root. The root's own
+ * declarations sit in `@layer base`, so a typography utility on a portalled
+ * surface that carries the root attribute still wins; the code-size, cursor and
+ * reduced-motion rules stay unlayered because they exist to override utilities.
+ */
+export function appearancePrefsToCss(
+  prefs: NexusAppearancePrefs,
+  scope: string
+): string {
   const uiPx = clampFontSize(
     prefs.uiFontSize,
     DEFAULT_NEXUS_APPEARANCE.prefs.uiFontSize
@@ -312,24 +322,29 @@ export function appearancePrefsToCss(prefs: NexusAppearancePrefs): string {
     prefs.codeFontSize,
     DEFAULT_NEXUS_APPEARANCE.prefs.codeFontSize
   );
+  const within = `:where(${scope}, ${scope} *)`;
   const blocks: string[] = [
-    `:root {
-  --nx-typography-family-font-sans: ${prefs.uiFont};
-  --nx-typography-family-font-mono: ${prefs.codeFont};
-  font-size: ${uiPx}px;
+    NEXUS_LAYER_ORDER,
+    `@layer base {
+  ${scope} {
+    --nx-typography-family-font-sans: ${prefs.uiFont};
+    --nx-typography-family-font-mono: ${prefs.codeFont};
+    font-size: ${uiPx}px;
+    -webkit-font-smoothing: ${prefs.fontSmoothing ? 'antialiased' : 'auto'};
+    -moz-osx-font-smoothing: ${prefs.fontSmoothing ? 'grayscale' : 'auto'};
 ${typographyScaleVariables(uiPx)}
+  }
 }`,
-    `code, pre, .nx\\:font-mono, .nx\\:typography-code-block, .nx\\:typography-code-inline { font-size: ${codePx}px; }`,
-    `html { -webkit-font-smoothing: ${prefs.fontSmoothing ? 'antialiased' : 'auto'}; -moz-osx-font-smoothing: ${prefs.fontSmoothing ? 'grayscale' : 'auto'}; }`,
+    `${within}:is(code, pre, .nx\\:font-mono, .nx\\:typography-code-block, .nx\\:typography-code-inline) { font-size: ${codePx}px; }`,
   ];
   if (prefs.pointerCursors) {
     blocks.push(
-      `button:not(:disabled), [role="button"], [role="tab"], [role="radio"], a[href], summary { cursor: pointer; }`
+      `${within}:is(button:not(:disabled), [role="button"], [role="tab"], [role="radio"], a[href], summary) { cursor: pointer; }`
     );
   }
   if (prefs.reduceMotion) {
     blocks.push(
-      `*, *::before, *::after { animation-duration: 0.01ms !important; animation-iteration-count: 1 !important; transition-duration: 0.01ms !important; scroll-behavior: auto !important; }`
+      `${within}, ${within}::before, ${within}::after { animation-duration: 0.01ms !important; animation-iteration-count: 1 !important; transition-duration: 0.01ms !important; scroll-behavior: auto !important; }`
     );
   }
   return blocks.join('\n');

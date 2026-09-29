@@ -16,6 +16,7 @@ import {
   DEFAULT_NEXUS_APPEARANCE,
 } from './appearance-model';
 import { contrastForPair } from './contrast';
+import { cssRules } from './css-rules.test-support';
 import {
   derivePrimary,
   deriveSurfaces,
@@ -24,6 +25,7 @@ import {
   type ThemeDerivationInput,
   themeToCss,
 } from './derive-theme';
+import { NEXUS_LAYER_ORDER, nexusRootScope } from './nexus-root';
 import { type NexusSurfaceTone, TIER_THRESHOLDS } from './palette';
 import { getPaletteRamp } from './primitive-palette';
 import { STATUS_PALETTE_FAMILIES } from './semantic-palette-references';
@@ -546,10 +548,16 @@ describe('deriveTheme', () => {
 });
 
 describe('themeToCss', () => {
-  it('emits :root and :root.dark blocks', () => {
-    const css = themeToCss(deriveTheme(CONTRACT));
-    expect(css).toMatch(/:root\s*\{/);
-    expect(css).toMatch(/:root\.dark\s*\{/);
+  const scope = nexusRootScope('embedded');
+
+  it('emits light on the root and dark on the root in dark mode, in the base layer', () => {
+    const css = themeToCss(deriveTheme(CONTRACT), scope);
+
+    expect(cssRules(css)).toEqual([
+      { selector: scope, within: ['@layer base'] },
+      { selector: `${scope}[data-nx-mode='dark']`, within: ['@layer base'] },
+    ]);
+    expect(css.startsWith(NEXUS_LAYER_ORDER)).toBe(true);
     expect(css).toContain('--nx-color-background:');
     expect(css).not.toContain('light-dark(');
   });

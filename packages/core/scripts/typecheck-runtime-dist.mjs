@@ -85,7 +85,9 @@ await writeFile(
   DEFAULT_STORAGE_KEY,
   deriveTheme,
   measureThemeContrast,
-  resolveFirstPaint,
+  NEXUS_DOCUMENT_ROOT_KEY,
+  nexusRootAttributes,
+  nexusRootScope,
   sanitizeNexusAppearance,
   themeToCss,
   type BrandColorPreset,
@@ -176,12 +178,18 @@ const state: NexusAppearanceState = sanitizeNexusAppearance({
 const snapshot = createNexusAppearanceSnapshotFromState(state);
 const serverSnapshot = createNexusAppearanceSnapshotFromCookie('', state);
 const theme = deriveTheme(createNexusThemeContract(state));
-const css: string = themeToCss(theme);
+const css: string = themeToCss(theme, nexusRootScope(NEXUS_DOCUMENT_ROOT_KEY));
 const bootstrap: string = createNexusAppearanceBootstrapScript({
   storageKey: DEFAULT_STORAGE_KEY,
   defaultSnapshot: snapshot,
 });
-const firstPaint = resolveFirstPaint(snapshot, true);
+const rootAttributes = nexusRootAttributes(
+  snapshot.state,
+  'dark',
+  NEXUS_DOCUMENT_ROOT_KEY
+);
+// @ts-expect-error the resolved mode is light or dark, never system.
+nexusRootAttributes(snapshot.state, 'system', NEXUS_DOCUMENT_ROOT_KEY);
 const checks: ThemeContrastCheck[] = measureThemeContrast(theme);
 const lc: number | undefined = checks[0]?.lc;
 const checkMode: Mode | undefined = checks[0]?.mode;
@@ -206,7 +214,7 @@ void snapshot;
 void serverSnapshot;
 void css;
 void bootstrap;
-void firstPaint.colorScheme;
+void rootAttributes['data-nx-mode'];
 void lc;
 void checkMode;
 void checkTier;

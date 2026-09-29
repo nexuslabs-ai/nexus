@@ -17,10 +17,11 @@ import {
   createNexusAppearanceSnapshotFromState,
   DEFAULT_NEXUS_APPEARANCE,
   DEFAULT_STORAGE_KEY,
-  NEXUS_APPEARANCE_DATA_ATTRS,
+  NEXUS_DOCUMENT_ROOT_KEY,
+  NEXUS_ROOT_ATTRIBUTES,
   type NexusAppearanceSnapshot,
   type NexusAppearanceState,
-  resolveFirstPaint,
+  nexusRootAttributes,
   sanitizeNexusAppearance,
   sanitizeNexusAppearanceSnapshot,
   serializeNexusAppearanceStateCookie,
@@ -194,11 +195,8 @@ function removeAppearanceArtifacts(): void {
     .querySelectorAll(`${THEME_STYLE_SELECTOR}, ${PREFS_STYLE_SELECTOR}`)
     .forEach((style) => style.remove());
 
-  const root = document.documentElement;
-  root.classList.remove('dark');
-  root.style.removeProperty('color-scheme');
-  for (const attr of NEXUS_APPEARANCE_DATA_ATTRS) {
-    root.removeAttribute(attr);
+  for (const attr of NEXUS_ROOT_ATTRIBUTES) {
+    document.documentElement.removeAttribute(attr);
   }
 }
 
@@ -236,9 +234,10 @@ export function NexusAppearanceProvider({
     () => createNexusAppearanceSnapshotFromState(activeState),
     [activeState]
   );
-  const firstPaint = useMemo(
-    () => resolveFirstPaint(activeSnapshot, resolvedMode === 'dark'),
-    [activeSnapshot, resolvedMode]
+  const rootAttributes = useMemo(
+    () =>
+      nexusRootAttributes(activeState, resolvedMode, NEXUS_DOCUMENT_ROOT_KEY),
+    [activeState, resolvedMode]
   );
 
   const internalStateRef = useRef(internalState);
@@ -297,12 +296,10 @@ export function NexusAppearanceProvider({
   useEffect(() => {
     if (!canUseDOM() || !mounted) return;
 
-    const root = document.documentElement;
-
-    for (const attr of NEXUS_APPEARANCE_DATA_ATTRS) {
-      root.setAttribute(attr, firstPaint.dataAttrs[attr]);
+    for (const [attr, value] of Object.entries(rootAttributes)) {
+      document.documentElement.setAttribute(attr, value);
     }
-  }, [firstPaint, mounted]);
+  }, [rootAttributes, mounted]);
 
   useEffect(() => {
     if (!canUseDOM() || !mounted) return;
@@ -331,12 +328,10 @@ export function NexusAppearanceProvider({
   useEffect(() => {
     if (!canUseDOM() || !mounted) return;
 
-    const root = document.documentElement;
-
-    root.classList.toggle('dark', firstPaint.className === 'dark');
-    root.style.colorScheme = firstPaint.colorScheme;
-    syncColorSchemeMeta(firstPaint.metaColorScheme);
-  }, [firstPaint, mounted]);
+    syncColorSchemeMeta(
+      activeState.mode === 'system' ? 'light dark' : activeState.mode
+    );
+  }, [activeState.mode, mounted]);
 
   useEffect(() => {
     if (!canUseDOM() || !mounted) return;
@@ -345,8 +340,8 @@ export function NexusAppearanceProvider({
       THEME_STYLE_SELECTOR,
       'data-nexus-appearance-theme'
     );
-    themeStyle.textContent = firstPaint.themeCss;
-  }, [firstPaint, mounted]);
+    themeStyle.textContent = activeSnapshot.themeCss;
+  }, [activeSnapshot, mounted]);
 
   useEffect(() => {
     if (!canUseDOM() || !mounted) return;
@@ -355,8 +350,8 @@ export function NexusAppearanceProvider({
       PREFS_STYLE_SELECTOR,
       'data-nexus-appearance-prefs'
     );
-    prefsStyle.textContent = firstPaint.prefsCss;
-  }, [firstPaint, mounted]);
+    prefsStyle.textContent = activeSnapshot.prefsCss;
+  }, [activeSnapshot, mounted]);
 
   useEffect(() => {
     if (!canUseDOM()) return;

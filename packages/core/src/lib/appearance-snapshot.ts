@@ -11,21 +11,18 @@ import {
   themeToCss,
   type TokenMap,
 } from './derive-theme';
+import {
+  NEXUS_APPEARANCE_ATTRIBUTE_FIELDS,
+  NEXUS_DOCUMENT_ROOT_KEY,
+  NEXUS_MODE_ATTRIBUTE,
+  NEXUS_ROOT_ATTRIBUTE,
+  nexusRootScope,
+} from './nexus-root';
 import type { Mode } from './palette';
 
-export const SNAPSHOT_VERSION = 7;
+export const SNAPSHOT_VERSION = 8;
 const STATE_COOKIE_VERSION = 6;
 const SNAPSHOT_CACHE_LIMIT = 50;
-
-export const NEXUS_APPEARANCE_DATA_ATTRS = [
-  'data-density',
-  'data-radius',
-  'data-shadow',
-  'data-borderwidth',
-] as const;
-
-export type NexusAppearanceDataAttr =
-  (typeof NEXUS_APPEARANCE_DATA_ATTRS)[number];
 
 export interface NexusAppearanceSnapshot {
   version: typeof SNAPSHOT_VERSION;
@@ -39,11 +36,7 @@ export interface NexusAppearanceStateCookie {
   state: NexusAppearanceState;
 }
 
-export interface NexusFirstPaintResolution {
-  className: '' | 'dark';
-  dataAttrs: Record<NexusAppearanceDataAttr, string>;
-  colorScheme: 'light' | 'dark';
-  metaColorScheme: 'light' | 'dark' | 'light dark';
+export interface NexusAppearanceCss {
   themeCss: string;
   prefsCss: string;
 }
@@ -93,16 +86,23 @@ function deriveModeCached(
   );
 }
 
-function deriveThemeCss(state: NexusAppearanceState): string {
-  const contract = createNexusThemeContract(state);
-  return themeToCss({
-    light: deriveModeCached(contract, 'light'),
-    dark: deriveModeCached(contract, 'dark'),
-  });
-}
-
-function derivePrefsCss(state: NexusAppearanceState): string {
-  return appearancePrefsToCss(state.prefs);
+/** Runtime theme and preference CSS for the Nexus root matched by `scope`. */
+export function deriveNexusAppearanceCss(
+  state: NexusAppearanceState,
+  scope: string
+): NexusAppearanceCss {
+  const sanitizedState = sanitizeNexusAppearance(state);
+  const contract = createNexusThemeContract(sanitizedState);
+  return {
+    themeCss: themeToCss(
+      {
+        light: deriveModeCached(contract, 'light'),
+        dark: deriveModeCached(contract, 'dark'),
+      },
+      scope
+    ),
+    prefsCss: appearancePrefsToCss(sanitizedState.prefs, scope),
+  };
 }
 
 export function createNexusAppearanceSnapshot(
@@ -127,14 +127,14 @@ export function createNexusAppearanceSnapshotFromState(
 
   if (cachedSnapshot) return cachedSnapshot;
 
+  const { themeCss, prefsCss } = deriveNexusAppearanceCss(
+    sanitizedState,
+    nexusRootScope(NEXUS_DOCUMENT_ROOT_KEY)
+  );
   return remember(
     cachedSnapshots,
     cacheKey,
-    createNexusAppearanceSnapshot(
-      sanitizedState,
-      deriveThemeCss(sanitizedState),
-      derivePrefsCss(sanitizedState)
-    )
+    createNexusAppearanceSnapshot(sanitizedState, themeCss, prefsCss)
   );
 }
 
@@ -216,30 +216,6 @@ export function sanitizeNexusAppearanceSnapshot(
   return createNexusAppearanceSnapshotFromState(state);
 }
 
-export function resolveFirstPaint(
-  snapshot: NexusAppearanceSnapshot,
-  systemPrefersDark: boolean
-): NexusFirstPaintResolution {
-  const { state } = snapshot;
-  const dark =
-    state.mode === 'dark' ||
-    (state.mode === 'system' && systemPrefersDark === true);
-
-  return {
-    className: dark ? 'dark' : '',
-    dataAttrs: {
-      'data-density': state.density,
-      'data-radius': state.corners,
-      'data-shadow': state.elevation,
-      'data-borderwidth': state.stroke,
-    },
-    colorScheme: dark ? 'dark' : 'light',
-    metaColorScheme: state.mode === 'system' ? 'light dark' : state.mode,
-    themeCss: snapshot.themeCss,
-    prefsCss: snapshot.prefsCss,
-  };
-}
-
 function escapeInlineScriptJson(value: unknown): string {
   return JSON.stringify(value)
     .replace(/</g, '\\u003C')
@@ -255,5 +231,5 @@ export function createNexusAppearanceBootstrapScript(
     ? sanitizeNexusAppearanceSnapshot(options.defaultSnapshot)
     : createDefaultNexusAppearanceSnapshot();
 
-  return `(function(){try{var k=${escapeInlineScriptJson(storageKey)};var f=${escapeInlineScriptJson(defaultSnapshot)};var s=f;try{if(k!==false){var r=window.localStorage&&window.localStorage.getItem(k);if(r){var p=JSON.parse(r);if(p&&p.version===f.version&&p.state&&typeof p.themeCss==="string"&&typeof p.prefsCss==="string"){s=p;}}}}catch(e){}var st=s.state||f.state;var m=st.mode==="dark"||st.mode==="light"||st.mode==="system"?st.mode:f.state.mode;var sys=false;try{sys=m==="system"&&window.matchMedia&&window.matchMedia("(prefers-color-scheme: dark)").matches;}catch(e){}var dark=m==="dark"||sys===true;var root=document.documentElement;root.classList.toggle("dark",dark);root.setAttribute("data-density",typeof st.density==="string"?st.density:f.state.density);root.setAttribute("data-radius",typeof st.corners==="string"?st.corners:f.state.corners);root.setAttribute("data-shadow",typeof st.elevation==="string"?st.elevation:f.state.elevation);root.setAttribute("data-borderwidth",typeof st.stroke==="string"?st.stroke:f.state.stroke);root.style.colorScheme=dark?"dark":"light";var meta=document.querySelector('meta[name="color-scheme"]');if(!meta){meta=document.createElement("meta");meta.setAttribute("name","color-scheme");document.head.appendChild(meta);}meta.setAttribute("content",m==="system"?"light dark":m);function upsert(attr,css){var list=document.querySelectorAll("style["+attr+"]");var el=list[0]||document.createElement("style");for(var i=1;i<list.length;i++){list[i].remove();}el.setAttribute(attr,"");el.textContent=css||"";if(!el.parentNode){document.head.appendChild(el);}}upsert("data-nexus-appearance-theme",s.themeCss);upsert("data-nexus-appearance-prefs",s.prefsCss);}catch(e){}})();`;
+  return `(function(){try{var k=${escapeInlineScriptJson(storageKey)};var f=${escapeInlineScriptJson(defaultSnapshot)};var a=${escapeInlineScriptJson(NEXUS_APPEARANCE_ATTRIBUTE_FIELDS)};var s=f;try{if(k!==false){var r=window.localStorage&&window.localStorage.getItem(k);if(r){var p=JSON.parse(r);if(p&&p.version===f.version&&p.state&&typeof p.themeCss==="string"&&typeof p.prefsCss==="string"){s=p;}}}}catch(e){}var st=s.state||f.state;var m=st.mode==="dark"||st.mode==="light"||st.mode==="system"?st.mode:f.state.mode;var sys=false;try{sys=m==="system"&&window.matchMedia&&window.matchMedia("(prefers-color-scheme: dark)").matches;}catch(e){}var root=document.documentElement;root.setAttribute(${escapeInlineScriptJson(NEXUS_ROOT_ATTRIBUTE)},${escapeInlineScriptJson(NEXUS_DOCUMENT_ROOT_KEY)});root.setAttribute(${escapeInlineScriptJson(NEXUS_MODE_ATTRIBUTE)},m==="dark"||sys===true?"dark":"light");for(var n in a){root.setAttribute(n,typeof st[a[n]]==="string"?st[a[n]]:f.state[a[n]]);}var meta=document.querySelector('meta[name="color-scheme"]');if(!meta){meta=document.createElement("meta");meta.setAttribute("name","color-scheme");document.head.appendChild(meta);}meta.setAttribute("content",m==="system"?"light dark":m);function upsert(attr,css){var list=document.querySelectorAll("style["+attr+"]");var el=list[0]||document.createElement("style");for(var i=1;i<list.length;i++){list[i].remove();}el.setAttribute(attr,"");el.textContent=css||"";if(!el.parentNode){document.head.appendChild(el);}}upsert("data-nexus-appearance-theme",s.themeCss);upsert("data-nexus-appearance-prefs",s.prefsCss);}catch(e){}})();`;
 }
