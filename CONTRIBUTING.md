@@ -72,14 +72,17 @@ axe-core against it with `test: 'error'` so any violation fails.
 
 You don't write a separate `*.test.tsx` for a component. That's not a stylistic
 preference — the `unit` project's `include` list in `vitest.config.ts` is one
-glob per non-story row of [`.claude/rules/testing.md`](.claude/rules/testing.md)
+glob per Vitest row of [`.claude/rules/testing.md`](.claude/rules/testing.md)
 § Scope, and a component test file matches none of them.
 
 Outside stories, three kinds of unit test exist, all under the `unit` project
 (jsdom): the core engine's behaviour (`packages/core/src/lib`), the Nexus `cn`
 merge (`packages/react/src/lib/utils.test.ts`), and the ESLint plugin's rules
-(`packages/eslint-plugin-nexus/__tests__`). Apps, repo scripts and hooks have no
-tests of their own, and nothing uses snapshots.
+(`packages/eslint-plugin-nexus/__tests__`). Outside Vitest, distribution
+fixtures — standalone consumer apps under repo-root `examples/` — check that
+Nexus delivered by copy or registry typechecks, builds and leaves the host app's
+styles intact. `pnpm test` does not run them; #798 wires them into CI. Apps,
+repo scripts and hooks have no tests of their own, and nothing uses snapshots.
 
 The spec lives in the rules, not here — what earns a test and what is
 deliberately out of scope in
