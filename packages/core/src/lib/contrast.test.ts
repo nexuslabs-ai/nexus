@@ -1,7 +1,7 @@
 import { oklch, parse } from 'culori';
 import { describe, expect, it } from 'vitest';
 
-import { APCA_PAIRS } from './apca-pairs';
+import { APCA_PAIRS, type ApcaPair } from './apca-pairs';
 import {
   BASE_TONE_OPTIONS,
   BASE_TONE_SEEDS,
@@ -33,6 +33,24 @@ const BRANDS = [
   '#00ff00',
   '#ff0000',
 ];
+// Alert compositions need these additional pairings, but must not change the
+// solver's inputs or the token values used by other components. Like the
+// existing status pairs in APCA_PAIRS, these short UI messages use the UI floor.
+const ALERT_COMPOSITION_PAIRS: ApcaPair[] = [
+  'information',
+  'success',
+  'warning',
+  'error',
+].flatMap((family) => [
+  { fg: 'foreground', bg: `${family}-subtle`, tier: 'ui', kind: 'text' },
+  {
+    fg: `${family}-subtle-foreground`,
+    bg: 'container',
+    tier: 'ui',
+    kind: 'text',
+  },
+]);
+
 const colors = (state: Partial<typeof DEFAULT_NEXUS_APPEARANCE>) =>
   deriveTheme(
     createNexusThemeContract({ ...DEFAULT_NEXUS_APPEARANCE, ...state })
@@ -65,7 +83,7 @@ describe('continuous contrast', () => {
                 map['--nx-color-background']
               );
             }
-            for (const pair of APCA_PAIRS) {
+            for (const pair of [...APCA_PAIRS, ...ALERT_COMPOSITION_PAIRS]) {
               const context = `${mode} ${surfaceTone} ${brandColor} ${contrast} ${pair.fg}/${pair.bg}`;
               const score = contrastForPair(map, pair);
               expect(score, context).toBeGreaterThanOrEqual(
