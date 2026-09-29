@@ -160,7 +160,7 @@ export const SignedRangeDraft: Story = {
     const canvas = within(canvasElement);
     const page = within(canvasElement.ownerDocument.body);
     await userEvent.click(
-      canvas.getByRole('button', { name: 'Edit Temperature is -10.5–12.5 °C' })
+      canvas.getByRole('button', { name: 'Edit Temperature: -10.5–12.5 °C' })
     );
     const minimum = await page.findByRole('spinbutton', { name: 'Minimum' });
     await userEvent.clear(minimum);
@@ -171,7 +171,7 @@ export const SignedRangeDraft: Story = {
     await userEvent.click(page.getByRole('button', { name: 'Cancel' }));
     await userEvent.click(
       await canvas.findByRole('button', {
-        name: 'Edit Temperature is -10.5–12.5 °C',
+        name: 'Edit Temperature: -10.5–12.5 °C',
       })
     );
     await expect(

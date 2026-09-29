@@ -6,35 +6,10 @@ import {
   IconHash,
   IconLetterCase,
   IconList,
-  IconUser,
   IconUsers,
 } from '@tabler/icons-react';
-import { IconCheck } from '@tabler/icons-react';
 
-import { Button } from '../../components/button';
-import {
-  Command,
-  CommandEmpty,
-  CommandInput,
-  CommandItem,
-  CommandList,
-} from '../../components/command';
-import {
-  type FilterOperator,
-  filterOperatorLabels,
-  isValuelessOperator,
-} from '../../components/filter-builder';
-import {
-  FilterCondition,
-  FilterConditionField,
-  FilterConditionRemove,
-  FilterConditionSegment,
-} from '../../components/filter-condition';
-import {
-  Popover,
-  PopoverContent,
-  PopoverTrigger,
-} from '../../components/popover';
+import { filterOperatorLabels } from '../../components/filter-model';
 
 import { type ChoiceCondition, ChoiceFilter } from './blocks/choice-filter';
 import {
@@ -54,7 +29,6 @@ import {
   NumberRangeFilter,
 } from './blocks/number-range-filter';
 import { type TextCondition, TextFilter } from './blocks/text-filter';
-import { ConditionOperator } from './filter-operator';
 
 function Example({
   title,
@@ -90,100 +64,6 @@ function Applied({ children }: { children: React.ReactNode }) {
     >
       Applied: {children}
     </p>
-  );
-}
-function Editor({
-  icon,
-  label,
-  summary,
-  operator,
-  operators,
-  onOperatorChange,
-  open,
-  onOpenChange,
-  onRemove,
-  children,
-}: {
-  icon: React.ReactNode;
-  label: string;
-  summary: string;
-  operator: FilterOperator;
-  operators: readonly [FilterOperator, ...FilterOperator[]];
-  onOperatorChange: (operator: FilterOperator) => void;
-  open: boolean;
-  onOpenChange: (open: boolean) => void;
-  onRemove: () => void;
-  children: React.ReactNode;
-}) {
-  const triggerRef = React.useRef<HTMLButtonElement>(null);
-  const operatorRef = React.useRef<HTMLButtonElement>(null);
-  const addRef = React.useRef<HTMLButtonElement>(null);
-  const [removed, setRemoved] = React.useState(false);
-  const restoreAfterRemove = React.useRef(false);
-  const absent = removed && !summary && !isValuelessOperator(operator);
-  const focusAdd = React.useCallback((node: HTMLButtonElement | null) => {
-    addRef.current = node;
-    if (node && restoreAfterRemove.current) {
-      restoreAfterRemove.current = false;
-      node.focus();
-    }
-  }, []);
-  function remove() {
-    restoreAfterRemove.current = true;
-    onOpenChange(false);
-    onRemove();
-    onOperatorChange(operators[0]);
-    setRemoved(true);
-  }
-  return (
-    <Popover open={open} onOpenChange={onOpenChange}>
-      {absent ? (
-        <PopoverTrigger asChild>
-          <Button ref={focusAdd} variant="outline" size="sm">
-            Add {label} filter
-          </Button>
-        </PopoverTrigger>
-      ) : (
-        <FilterCondition>
-          <FilterConditionField>
-            {icon}
-            {label}
-          </FilterConditionField>
-          <ConditionOperator
-            triggerRef={operatorRef}
-            label={label}
-            value={operator}
-            options={operators}
-            onChange={onOperatorChange}
-          />
-          {!isValuelessOperator(operator) && (
-            <PopoverTrigger asChild>
-              <FilterConditionSegment
-                ref={triggerRef}
-                aria-label={`Edit ${label}`}
-              >
-                {summary || 'Choose…'}
-              </FilterConditionSegment>
-            </PopoverTrigger>
-          )}
-          <FilterConditionRemove
-            aria-label={`Remove ${label} filter`}
-            onClick={remove}
-          />
-        </FilterCondition>
-      )}
-      <PopoverContent
-        onCloseAutoFocus={(event) => {
-          event.preventDefault();
-          (absent ? addRef.current : triggerRef.current)?.focus();
-        }}
-        aria-label={`Filter ${label}`}
-        align="start"
-        className="nx:w-72 nx:max-w-(--radix-popover-content-available-width) nx:overflow-hidden nx:p-0"
-      >
-        {children}
-      </PopoverContent>
-    </Popover>
   );
 }
 export function SingleChoiceExample() {
@@ -238,72 +118,6 @@ export function MultipleChoiceExample() {
         {value
           ? `${filterOperatorLabels[value.operator]}${'values' in value ? ` ${value.values.join(', ')}` : ''}`
           : 'Any team'}
-      </Applied>
-    </Example>
-  );
-}
-const owners = [
-  'Priya Shah',
-  'Alex Morgan',
-  'Maya Chen',
-  'Noor Ahmed',
-  'Sam Rivera',
-  'Leo Martin',
-  'Amara Okafor',
-  'Elena Garcia',
-];
-export function SearchableExample() {
-  const [operator, setOperator] = React.useState<FilterOperator>('is');
-  const [value, setValue] = React.useState('Priya Shah');
-  const [open, setOpen] = React.useState(false);
-  function select(value: string) {
-    setValue(value);
-    setOpen(false);
-  }
-  return (
-    <Example
-      title="Searchable choice"
-      description="Find a person in a longer list."
-    >
-      <Editor
-        label="Owner"
-        icon={<IconUser aria-hidden="true" />}
-        operator={operator}
-        operators={['is', 'isNot', 'isEmpty', 'isNotEmpty']}
-        onOperatorChange={setOperator}
-        summary={value}
-        open={open}
-        onOpenChange={setOpen}
-        onRemove={() => setValue('')}
-      >
-        <Command label="Search owners">
-          <CommandInput
-            aria-label="Search owners"
-            placeholder="Search owners…"
-          />
-          <CommandList className="nx:max-h-56 nx:p-1">
-            <CommandEmpty>No owners found.</CommandEmpty>
-            {owners.map((owner) => (
-              <CommandItem
-                key={owner}
-                value={owner}
-                onSelect={() => select(owner)}
-              >
-                {owner}
-                {value === owner && (
-                  <IconCheck
-                    aria-label="Current"
-                    className="nx:ml-auto nx:size-4 nx:shrink-0"
-                  />
-                )}
-              </CommandItem>
-            ))}
-          </CommandList>
-        </Command>
-      </Editor>
-      <Applied>
-        {filterOperatorLabels[operator]}
-        {!isValuelessOperator(operator) && ` ${value || 'Any owner'}`}
       </Applied>
     </Example>
   );
@@ -418,10 +232,9 @@ export function Showcase() {
           One condition. An editor that fits the value.
         </p>
       </header>
-      <div className="nx:divide-border-default">
+      <div>
         <SingleChoiceExample />
         <MultipleChoiceExample />
-        <SearchableExample />
         <NumberExample />
         <RangeExample />
         <DateExample />

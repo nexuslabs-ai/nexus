@@ -71,9 +71,9 @@ const meta = {
           <p>
             Copy blocks/number-comparison-filter.tsx and filter-operator.tsx
             from packages/react/src/recipes/filtering, keeping their relative
-            paths. The block imports Nexus components from @nexus_ds/react.
-            Include the copied files in your Tailwind source scan and use the
-            Nexus theme setup.
+            paths. The block imports Nexus components by relative path. Include
+            the copied files in your Tailwind source scan and use the Nexus
+            theme setup.
           </p>
           <Source code={usage} language="tsx" />
           <h2>State and behavior</h2>

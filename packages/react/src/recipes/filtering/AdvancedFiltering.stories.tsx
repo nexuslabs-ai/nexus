@@ -3,8 +3,8 @@ import * as React from 'react';
 import type { Meta, StoryObj } from '@storybook/react';
 import { expect, userEvent, within } from 'storybook/test';
 
-import { AdvancedFiltering } from '../../recipes/filtering/advanced-filters';
-import recipeSource from '../../recipes/filtering/advanced-filters.tsx?raw';
+import { AdvancedFiltering } from './advanced-filters';
+import recipeSource from './advanced-filters.tsx?raw';
 const meta = {
   title: 'Internal/Filtering/Grouped conditions',
   tags: ['!dev', '!autodocs'],

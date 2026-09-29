@@ -76,7 +76,7 @@ const meta = {
           <p>
             Copy blocks/multi-choice-filter.tsx and filter-operator.tsx from
             packages/react/src/recipes/filtering, keeping their relative paths.
-            The block imports Nexus components from @nexus_ds/react. Include the
+            The block imports Nexus components by relative path. Include the
             copied files in your Tailwind source scan and use the Nexus theme
             setup.
           </p>

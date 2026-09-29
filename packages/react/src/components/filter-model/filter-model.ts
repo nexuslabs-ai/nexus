@@ -38,9 +38,23 @@ export interface FilterGroup {
   conjunction: 'all' | 'any';
   children: (FilterRule | FilterGroup)[];
 }
+export type FilterErrorCode =
+  | 'duplicateId'
+  | 'unknownField'
+  | 'unknownOperator'
+  | 'unexpectedValue'
+  | 'valueShape'
+  | 'incompleteRange'
+  | 'missingValue'
+  | 'invalidNumber'
+  | 'invalidDate'
+  | 'unknownOption'
+  | 'reversedRange'
+  | 'tooDeep'
+  | 'emptyGroup';
 export interface FilterError {
   id: string;
-  message: string;
+  code: FilterErrorCode;
 }
 
 export const filterOperatorLabels: Record<FilterOperator, string> = {
@@ -109,39 +123,38 @@ function validDate(value: string) {
 export function getFilterRuleError(
   rule: FilterRule,
   fields: readonly FilterField[]
-): string | undefined {
+): FilterErrorCode | undefined {
   const field = fields.find((item) => item.id === rule.field);
-  if (!field) return 'Choose an available field.';
+  if (!field) return 'unknownField';
   if (!getFilterOperators(field).includes(rule.operator))
-    return 'Choose an available operator.';
+    return 'unknownOperator';
   if (isValuelessOperator(rule.operator))
-    return rule.value === '' ? undefined : 'This operator takes no value.';
+    return rule.value === '' ? undefined : 'unexpectedValue';
   const multiple = rule.operator === 'isAnyOf' || rule.operator === 'isNoneOf';
   const range = rule.operator === 'between';
-  if ((multiple || range) !== Array.isArray(rule.value))
-    return 'Choose a value for this operator.';
+  if ((multiple || range) !== Array.isArray(rule.value)) return 'valueShape';
   const values = Array.isArray(rule.value) ? rule.value : [rule.value];
-  if (range && values.length !== 2) return 'Enter both ends of the range.';
+  if (range && values.length !== 2) return 'incompleteRange';
   if (!values.length || values.some((value) => !value.trim()))
-    return 'Enter a value.';
+    return 'missingValue';
   if (
     field.type === 'number' &&
     values.some((value) => !Number.isFinite(Number(value)))
   )
-    return 'Enter a valid number.';
+    return 'invalidNumber';
   if (field.type === 'date' && values.some((value) => !validDate(value)))
-    return 'Enter a valid date.';
+    return 'invalidDate';
   if (
     field.type === 'choice' &&
     values.some(
       (value) => !field.options.some((option) => option.value === value)
     )
   )
-    return 'Choose an available option.';
+    return 'unknownOption';
   if (range) {
     const [start = '', end = ''] = values;
     if (field.type === 'number' ? Number(start) > Number(end) : start > end)
-      return 'The start must not be after the end.';
+      return 'reversedRange';
   }
   return undefined;
 }
@@ -155,26 +168,16 @@ export function getFilterErrors(
   const ids = new Set<string>();
   function visit(node: FilterGroup | FilterRule, depth: number) {
     if (!node.id || ids.has(node.id))
-      errors.push({
-        id: node.id,
-        message: 'Each condition and group needs a unique ID.',
-      });
+      errors.push({ id: node.id, code: 'duplicateId' });
     ids.add(node.id);
     if (node.kind === 'rule') {
-      const message = getFilterRuleError(node, fields);
-      if (message) errors.push({ id: node.id, message });
+      const code = getFilterRuleError(node, fields);
+      if (code) errors.push({ id: node.id, code });
       return;
     }
-    if (depth > maxDepth)
-      errors.push({
-        id: node.id,
-        message: `Use at most ${maxDepth} levels of nested groups.`,
-      });
+    if (depth > maxDepth) errors.push({ id: node.id, code: 'tooDeep' });
     if (depth > 0 && !node.children.length)
-      errors.push({
-        id: node.id,
-        message: 'Add a condition or remove this group.',
-      });
+      errors.push({ id: node.id, code: 'emptyGroup' });
     for (const child of node.children)
       visit(child, child.kind === 'group' ? depth + 1 : depth);
   }

@@ -87,8 +87,8 @@ const meta = {
             <code>blocks/choice-filter.tsx</code> and{' '}
             <code>filter-operator.tsx</code> from{' '}
             <code>packages/react/src/recipes/filtering</code>. Preserve their
-            relative paths. The block imports its components from{' '}
-            <code>@nexus_ds/react</code>.
+            relative paths. The block imports its components from the component
+            folders beside <code>recipes</code>.
           </p>
           <Source code={usage} language="tsx" />
           <h2>What your application owns</h2>

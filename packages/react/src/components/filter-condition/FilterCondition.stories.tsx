@@ -233,6 +233,11 @@ export const WithDataAttributes: Story = {
       'filter-condition-segment'
     );
     await expect(
+      canvas
+        .getByTestId('condition')
+        .querySelector('[data-slot="filter-condition-field"]')
+    ).toBeInTheDocument();
+    await expect(
       canvas.getByRole('button', { name: 'Remove Status filter' })
     ).toHaveAttribute('data-slot', 'filter-condition-remove');
   },

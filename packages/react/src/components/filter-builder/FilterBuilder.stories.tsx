@@ -1,20 +1,20 @@
 import * as React from 'react';
 
 import type { Meta, StoryObj } from '@storybook/react';
-import { expect, userEvent, waitFor, within } from 'storybook/test';
+import { expect, fn, userEvent, waitFor, within } from 'storybook/test';
 
 import {
   exampleFields,
   exampleTree,
 } from '../../recipes/filtering/advanced-fixtures';
 import { Button } from '../button';
-
-import { FilterBuilder } from './filter-builder';
 import {
   type FilterField,
   type FilterGroup,
   getFilterErrors,
-} from './filter-model';
+} from '../filter-model';
+
+import { FilterBuilder } from './filter-builder';
 const simple: FilterGroup = {
   kind: 'group',
   id: 'root',
@@ -34,21 +34,27 @@ function Demo({
   disabled = false,
   fields = exampleFields,
   maxDepth = 3,
+  onValueChange,
 }: {
   initial?: FilterGroup;
   disabled?: boolean;
-  fields?: FilterField[];
+  fields?: readonly FilterField[];
   maxDepth?: number;
+  onValueChange?: (value: FilterGroup) => void;
 }) {
   const [value, setValue] = React.useState(initial);
   const errors = getFilterErrors(value, fields, maxDepth);
+  function change(next: FilterGroup) {
+    setValue(next);
+    onValueChange?.(next);
+  }
   return (
     <div className="nx:grid nx:gap-4">
       <FilterBuilder
         data-example="controlled"
         fields={fields}
         value={value}
-        onValueChange={setValue}
+        onValueChange={change}
         disabled={disabled}
         maxDepth={maxDepth}
       />
@@ -69,7 +75,13 @@ function Demo({
 const meta = {
   title: 'Components/FilterBuilder',
   component: FilterBuilder,
-  args: { fields: exampleFields, value: exampleTree, onValueChange: () => {} },
+  args: {
+    fields: exampleFields,
+    value: exampleTree,
+    onValueChange: fn(),
+    disabled: false,
+    maxDepth: 3,
+  },
   parameters: {
     layout: 'padded',
     docs: {
@@ -86,11 +98,31 @@ const meta = {
       </main>
     ),
   ],
-  render: () => <Demo />,
+  render: (args) => (
+    <Demo
+      initial={args.value}
+      fields={args.fields}
+      disabled={args.disabled}
+      maxDepth={args.maxDepth}
+      onValueChange={args.onValueChange}
+    />
+  ),
 } satisfies Meta<typeof FilterBuilder>;
 export default meta;
 type Story = StoryObj<typeof meta>;
-export const Default: Story = {};
+export const Default: Story = {
+  play: async ({ args, canvasElement }) => {
+    const canvas = within(canvasElement),
+      page = within(canvasElement.ownerDocument.body);
+    await userEvent.click(
+      canvas.getByRole('combobox', { name: 'Filters match' })
+    );
+    await userEvent.click(page.getByRole('option', { name: 'Any' }));
+    await expect(args.onValueChange).toHaveBeenCalledWith(
+      expect.objectContaining({ conjunction: 'any' })
+    );
+  },
+};
 export const AllVariants: Story = {
   render: () => (
     <div className="nx:grid nx:gap-8">
@@ -123,8 +155,16 @@ export const Empty: Story = {
     );
     await expect(canvas.getByRole('combobox', { name: 'Field' })).toHaveFocus();
     await expect(canvas.getByRole('status')).toHaveTextContent('1 incomplete');
+    await expect(canvas.queryByText('Enter a value.')).not.toBeInTheDocument();
+    await userEvent.click(canvas.getByRole('combobox', { name: 'Field' }));
     await userEvent.click(
-      canvas.getByRole('button', { name: 'Remove Status condition' })
+      within(canvasElement.ownerDocument.body).getByRole('option', {
+        name: 'Team',
+      })
+    );
+    await expect(canvas.getByText('Enter a value.')).toBeVisible();
+    await userEvent.click(
+      canvas.getByRole('button', { name: 'Remove Team condition' })
     );
     await expect(
       canvas.getByRole('button', { name: 'Add condition' })

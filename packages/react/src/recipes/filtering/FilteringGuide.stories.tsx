@@ -68,10 +68,10 @@ function FilteringGuide() {
         <details>
           <summary>Copy this example and connect your data</summary>
           <p>
-            This example imports Nexus components from @nexus_ds/react. Replace
-            the paid and india state with your conditions and connect them to
-            your matching or fetching logic. The status text demonstrates state
-            only; it does not fetch invoices. Preserve focus handling when chips
+            This example imports Nexus components by relative path. Replace the
+            paid and india state with your conditions and connect them to your
+            matching or fetching logic. The status text demonstrates state only;
+            it does not fetch invoices. Preserve focus handling when chips
             disappear.
           </p>
           <p>
@@ -249,11 +249,10 @@ function FilteringGuide() {
             </li>
           </ul>
           <p>
-            The six value-type examples above use these blocks. The searchable
-            owner example is a separate custom composition. Copy their source
-            from <code>recipes/filtering/blocks</code>; import the underlying
-            components from <code>@nexus_ds/react</code>. Each edit emits a
-            complete condition. A removed condition is null.
+            The six value-type examples above use these blocks. Copy their
+            source from <code>recipes/filtering/blocks</code> together with the
+            component folders they import. Each edit emits a complete condition.
+            A removed condition is null.
           </p>
           <p>
             For grouped conditions, use FilterBuilder with controlled draft and

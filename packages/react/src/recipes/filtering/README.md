@@ -8,15 +8,16 @@ small result contexts; they are not different filtering APIs or required pages.
 
 | Layer      | Use                                                                                                                     | Delivery                                                                                                             |
 | ---------- | ----------------------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------- |
-| Components | FilterChip, FilterCondition parts, FilterBuilder                                                                        | Import from `@nexus_ds/react`. API documentation lives under Components.                                             |
+| Components | FilterChip, FilterCondition parts, FilterBuilder, filter model                                                          | Package exports; the recipes import their folders by relative path. API documentation lives under Components.        |
 | Blocks     | ChoiceFilter, MultiChoiceFilter, NumberRangeFilter, NumberComparisonFilter, TextFilter, DateRangeFilter, AppliedFilters | Copy the source below. Controlled compositions of Nexus components; no fixtures, fetching or Storybook dependencies. |
 | Pattern    | Timing, visibility, recovery and grouping guidance                                                                      | Follow the Filtering page; adapt a recipe only when its interaction fits the task.                                   |
 
 There is no packaged FilterBar, hidden query evaluator or required product page.
 
-`@nexus_ds/react` is the workspace import used by these examples, not a public
-package installation instruction. For source copying, redirect those imports to
-your app's Nexus components and include their helpers and Nexus styles. Standalone
+The recipes import Nexus components through relative paths
+(`../../components/*` from this directory, `../../../components/*` from
+`blocks/`). When copying, keep that structure or point those imports at your
+copies of the same component folders and their `lib/` helpers. Standalone
 installation and theme isolation belong to the separate adoption work.
 
 Storybook exposes all six filter blocks under **Blocks**, with working examples, states, usage and copyable implementation. The Filtering pattern links to each. AppliedFilters remains a layout helper.
@@ -154,15 +155,14 @@ or backend query validity.
 
 ## Supporting examples and exact source dependencies
 
-| Example                                     | Copy together                                                                                                                                                                        |
-| ------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| Quick filters above a table, cards or files | `quick-filters.tsx`, `quick-fixtures.ts`, `project-condition.tsx`, `blocks/choice-filter.tsx`, `blocks/number-range-filter.tsx`, `blocks/applied-filters.tsx`, `filter-operator.tsx` |
-| Other value editors                         | `value-editors.tsx`, all six block files, `filter-operator.tsx`                                                                                                                      |
-| Grouped conditions                          | `advanced-filters.tsx`, `advanced-fixtures.ts`                                                                                                                                       |
+| Example                                     | Copy together                                                                                                                                                                                                           |
+| ------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Quick filters above a table, cards or files | `quick-filters.tsx`, `quick-fixtures.ts`, `local-results.tsx`, `blocks/choice-filter.tsx`, `blocks/number-comparison-filter.tsx`, `blocks/number-range-filter.tsx`, `blocks/applied-filters.tsx`, `filter-operator.tsx` |
+| Other value editors                         | `value-editors.tsx`, all six block files, `filter-operator.tsx`                                                                                                                                                         |
+| Grouped conditions                          | `advanced-filters.tsx`, `advanced-fixtures.ts`                                                                                                                                                                          |
 
 The value-editor showcase composes the six dedicated blocks documented above.
-Searchable choice remains an example rather than a dedicated block. Applications
-choose timezone, boundary and serialization rules.
+Applications choose timezone, boundary and serialization rules.
 
 `member-directory.tsx`, `member-query-url.ts` and their internal stories are existing
 optional integration simulations. They are not prerequisites, a recommended new page,
@@ -171,12 +171,12 @@ tests and simulated services. None of these source recipes is shipped in package
 
 ## Setup and application boundary
 
-Use React 19 and a Nexus package build exporting FilterCondition and FilterBuilder.
-The blocks require only React and `@nexus_ds/react`. Examples additionally use
+Use React 19. The blocks require only React and the Nexus component folders they import
+(including `components/filter-model` for operator labels). Examples additionally use
 `@tabler/icons-react`; date examples require the optional `react-day-picker` v9 peer.
 
-Use your existing Nexus token/styles setup (`@nexus_ds/tailwind`,
-`@nexus_ds/react/styles.css`, and AppearanceProvider where applicable). Include the
+Use your existing Nexus token/styles setup (`@nexus_ds/tailwind` and
+AppearanceProvider where applicable). Include the
 copied source directory in Tailwind v4 scanning. Component CSS does not supply theme
 tokens or generate the copied block's utilities by itself.
 
@@ -240,8 +240,7 @@ across conditions. The application owns applied queries and fetching.
 Multi-choice is not inherently batch-only: instant checkboxes are appropriate when
 each selection is independent and updates are inexpensive. Our supplied block
 deliberately uses a draft checklist. None of these blocks commits on dismissal.
-The value-type showcase renders the six real blocks; searchable owner remains a
-custom Command composition, explicitly identified separately.
+The value-type showcase renders the six real blocks.
 
 Choose live versus draft behavior from the interaction, not the field type or
 backend architecture. Live updates suit complete, reversible selections with

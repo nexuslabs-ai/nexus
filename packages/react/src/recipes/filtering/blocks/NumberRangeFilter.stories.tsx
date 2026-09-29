@@ -81,8 +81,8 @@ const meta = {
             <code>blocks/number-range-filter.tsx</code> and{' '}
             <code>filter-operator.tsx</code> from{' '}
             <code>packages/react/src/recipes/filtering</code>. Preserve their
-            relative paths. The block imports its components from{' '}
-            <code>@nexus_ds/react</code>.
+            relative paths. The block imports its components from the component
+            folders beside <code>recipes</code>.
           </p>
           <Source code={usage} language="tsx" />
           <h2>What your application owns</h2>
@@ -132,7 +132,7 @@ export const Default: Story = {
   play: async ({ canvasElement }) => {
     const canvas = within(canvasElement);
     await userEvent.click(
-      canvas.getByRole('button', { name: 'Remove size filter' })
+      canvas.getByRole('button', { name: 'Remove Size filter' })
     );
     await expect(
       canvas.getByRole('button', { name: 'Add size filter' })

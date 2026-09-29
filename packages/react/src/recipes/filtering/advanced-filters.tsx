@@ -1,10 +1,8 @@
 import * as React from 'react';
 
 import { Button } from '../../components/button';
-import {
-  FilterBuilder,
-  getFilterErrors,
-} from '../../components/filter-builder';
+import { FilterBuilder } from '../../components/filter-builder';
+import { getFilterErrors } from '../../components/filter-model';
 import {
   Table,
   TableBody,
@@ -71,7 +69,7 @@ export function AdvancedFiltering() {
               className="nx:typography-body-small nx:text-muted-foreground"
             >
               {errors.length
-                ? 'Complete the highlighted conditions'
+                ? 'Complete every condition to apply'
                 : dirty
                   ? 'Unapplied changes'
                   : ''}

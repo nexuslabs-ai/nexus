@@ -40,7 +40,13 @@ export function useMemberQueryUrl() {
   }, []);
   function changeQuery(next: MemberQuery) {
     const url = writeMemberQuery(new URL(window.location.href), next);
-    if (url.href !== window.location.href)
+    // Typing refines the current entry; discrete choices get their own Back step.
+    const typing =
+      next.name !== query.name &&
+      next.status === query.status &&
+      next.team === query.team;
+    if (typing) window.history.replaceState(null, '', url);
+    else if (url.href !== window.location.href)
       window.history.pushState(null, '', url);
     setQuery(readMemberQuery(url));
   }

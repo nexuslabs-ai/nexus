@@ -2,17 +2,29 @@ import * as React from 'react';
 
 import {
   IconCalendar,
+  IconChevronDown,
   IconHash,
   IconLetterCase,
   IconList,
   IconPlus,
-} from '@tabler/icons-react';
-
-import { IconChevronDown, IconX } from '../../lib/icons';
+  IconX,
+} from '../../lib/icons';
 import { cn } from '../../lib/utils';
 import { Button } from '../button';
 import { Checkbox } from '../checkbox';
 import { ChoiceRow } from '../choice-row';
+import {
+  emptyFilterValue,
+  type FilterErrorCode,
+  type FilterField,
+  type FilterGroup,
+  type FilterOperator,
+  filterOperatorLabels,
+  type FilterRule,
+  getFilterErrors,
+  getFilterOperators,
+  isValuelessOperator,
+} from '../filter-model/filter-model';
 import { Input } from '../input';
 import { Popover, PopoverContent, PopoverTrigger } from '../popover';
 import {
@@ -22,19 +34,6 @@ import {
   SelectTrigger,
   SelectValue,
 } from '../select';
-
-import {
-  emptyFilterValue,
-  type FilterField,
-  type FilterGroup,
-  type FilterOperator,
-  filterOperatorLabels,
-  type FilterOption,
-  type FilterRule,
-  getFilterErrors,
-  getFilterOperators,
-  isValuelessOperator,
-} from './filter-model';
 
 const fieldIcons: Record<FilterField['type'], React.ReactNode> = {
   text: (
@@ -63,19 +62,45 @@ const fieldIcons: Record<FilterField['type'], React.ReactNode> = {
   ),
 };
 
-interface PickerProps {
+const errorMessages: Record<Exclude<FilterErrorCode, 'tooDeep'>, string> = {
+  duplicateId: 'Each condition and group needs a unique ID.',
+  unknownField: 'Choose an available field.',
+  unknownOperator: 'Choose an available operator.',
+  unexpectedValue: 'This operator takes no value.',
+  valueShape: 'Choose a value for this operator.',
+  incompleteRange: 'Enter both ends of the range.',
+  missingValue: 'Enter a value.',
+  invalidNumber: 'Enter a valid number.',
+  invalidDate: 'Enter a valid date.',
+  unknownOption: 'Choose an available option.',
+  reversedRange: 'The start must not be after the end.',
+  emptyGroup: 'Add a condition or remove this group.',
+};
+function errorMessage(code: FilterErrorCode, maxDepth: number) {
+  if (code === 'tooDeep')
+    return `Use at most ${maxDepth} levels of nested groups.`;
+  return errorMessages[code];
+}
+
+let nodeCount = 0;
+function createNodeId(prefix: string) {
+  nodeCount += 1;
+  return `${prefix}${nodeCount}`;
+}
+
+interface PickerProps<Value extends string> {
   className?: string;
   leading?: React.ReactNode;
   label: string;
-  value: string;
-  options: readonly FilterOption[];
-  onValueChange: (value: string) => void;
+  value: Value;
+  options: readonly { value: Value; label: string }[];
+  onValueChange: (value: Value) => void;
   disabled?: boolean;
   invalid?: boolean;
   describedBy?: string;
   triggerRef?: React.Ref<HTMLButtonElement>;
 }
-function Picker({
+function Picker<Value extends string>({
   label,
   value,
   options,
@@ -86,10 +111,14 @@ function Picker({
   triggerRef,
   className,
   leading,
-}: PickerProps) {
+}: PickerProps<Value>) {
   const available = options.some((option) => option.value === value);
+  function select(next: string) {
+    const option = options.find((item) => item.value === next);
+    if (option) onValueChange(option.value);
+  }
   return (
-    <Select value={value} onValueChange={onValueChange} disabled={disabled}>
+    <Select value={value} onValueChange={select} disabled={disabled}>
       <SelectTrigger
         ref={triggerRef}
         aria-label={label}
@@ -183,7 +212,11 @@ function MultipleValues({
         </div>
         <div className="nx:max-h-48 nx:overflow-y-auto nx:p-1">
           {options.map((option, index) => (
-            <ChoiceRow key={option.value} htmlFor={`${id}-${index}`}>
+            <ChoiceRow
+              key={option.value}
+              htmlFor={`${id}-${index}`}
+              className="nx:not-has-[:disabled]:hover:bg-popover-hover"
+            >
               <Checkbox
                 id={`${id}-${index}`}
                 checked={value.includes(option.value)}
@@ -249,7 +282,7 @@ function RuleValue({
       />
     );
   }
-  const type = field.type === 'text' ? 'text' : field.type;
+  const type = field.type;
   if (rule.operator === 'between') {
     const values = Array.isArray(rule.value) ? rule.value : ['', ''];
     function changeStart(event: React.ChangeEvent<HTMLInputElement>) {
@@ -339,8 +372,7 @@ function FilterRuleEditor({
       value: emptyFilterValue(operator),
     });
   }
-  function changeOperator(next: string) {
-    const operator = next as FilterOperator;
+  function changeOperator(operator: FilterOperator) {
     const empty = emptyFilterValue(operator);
     const previousEmpty = emptyFilterValue(value.operator);
     const sameShape =
@@ -441,6 +473,8 @@ interface GroupEditorProps {
   maxDepth: number;
   errors: ReturnType<typeof getFilterErrors>;
   label: string;
+  createId: (kind: FilterRule['kind'] | FilterGroup['kind']) => string;
+  onRuleEdited: (id: string) => void;
 }
 function GroupEditor({
   value,
@@ -452,18 +486,20 @@ function GroupEditor({
   maxDepth,
   errors,
   label,
+  createId,
+  onRuleEdited,
 }: GroupEditorProps) {
   const addRef = React.useRef<HTMLButtonElement>(null);
   const focusId = React.useRef<string | null>(null);
   const firstField = fields.find((field) => getFilterOperators(field).length);
-  const groupError = errors.find((error) => error.id === value.id)?.message;
+  const groupError = errors.find((error) => error.id === value.id)?.code;
   function newRule(): FilterRule {
     const operator = firstField
       ? (getFilterOperators(firstField)[0] ?? 'is')
       : 'is';
     return {
       kind: 'rule',
-      id: crypto.randomUUID(),
+      id: createId('rule'),
       field: firstField?.id ?? '',
       operator,
       value: emptyFilterValue(operator),
@@ -477,7 +513,7 @@ function GroupEditor({
   function addGroup() {
     const group: FilterGroup = {
       kind: 'group',
-      id: crypto.randomUUID(),
+      id: createId('group'),
       conjunction: 'any',
       children: [newRule()],
     };
@@ -485,6 +521,7 @@ function GroupEditor({
     onValueChange({ ...value, children: [...value.children, group] });
   }
   function replace(next: FilterGroup | FilterRule) {
+    if (next.kind === 'rule') onRuleEdited(next.id);
     onValueChange({
       ...value,
       children: value.children.map((child) =>
@@ -498,6 +535,10 @@ function GroupEditor({
       children: value.children.filter((child) => child.id !== id),
     });
     addRef.current?.focus();
+  }
+  function ruleError(id: string) {
+    const code = errors.find((error) => error.id === id)?.code;
+    return code && errorMessage(code, maxDepth);
   }
   function focusNewGroup(node: HTMLDivElement | null) {
     if (!node || focusId.current !== node.dataset.nodeId) return;
@@ -529,8 +570,8 @@ function GroupEditor({
                 { value: 'all', label: 'All' },
                 { value: 'any', label: 'Any' },
               ]}
-              onValueChange={(next) =>
-                onValueChange({ ...value, conjunction: next as 'all' | 'any' })
+              onValueChange={(conjunction) =>
+                onValueChange({ ...value, conjunction })
               }
               disabled={disabled}
             />
@@ -582,6 +623,8 @@ function GroupEditor({
                   maxDepth={maxDepth}
                   errors={errors}
                   label={`${label} group ${index + 1}`}
+                  createId={createId}
+                  onRuleEdited={onRuleEdited}
                 />
               ) : (
                 <FilterRuleEditor
@@ -590,7 +633,7 @@ function GroupEditor({
                   onValueChange={replace}
                   onRemove={() => remove(child.id)}
                   disabled={disabled}
-                  error={errors.find((error) => error.id === child.id)?.message}
+                  error={ruleError(child.id)}
                   focusRef={(node) => {
                     if (node && focusId.current === child.id) {
                       node.focus();
@@ -612,7 +655,7 @@ function GroupEditor({
       </div>
       {groupError && (
         <p className="nx:mt-2 nx:typography-body-small nx:text-error-subtle-foreground">
-          {groupError}
+          {errorMessage(groupError, maxDepth)}
         </p>
       )}
       <div className="nx:mt-3 nx:flex nx:flex-wrap nx:gap-1">
@@ -664,7 +707,27 @@ function FilterBuilder({
   'aria-label': label = 'Filters',
   ...props
 }: FilterBuilderProps) {
-  const errors = getFilterErrors(value, fields, maxDepth);
+  const idPrefix = React.useId();
+  const [untouched, setUntouched] = React.useState<ReadonlySet<string>>(
+    () => new Set()
+  );
+  // A newly added rule stays quiet until it is edited; the application still sees its errors.
+  const errors = getFilterErrors(value, fields, maxDepth).filter(
+    (error) => !untouched.has(error.id)
+  );
+  function createId(kind: FilterRule['kind'] | FilterGroup['kind']) {
+    const id = createNodeId(idPrefix);
+    if (kind === 'rule') setUntouched((previous) => new Set(previous).add(id));
+    return id;
+  }
+  function markEdited(id: string) {
+    if (!untouched.has(id)) return;
+    setUntouched((previous) => {
+      const next = new Set(previous);
+      next.delete(id);
+      return next;
+    });
+  }
   return (
     <div
       data-slot="filter-builder"
@@ -684,6 +747,8 @@ function FilterBuilder({
         maxDepth={maxDepth}
         errors={errors}
         label={label}
+        createId={createId}
+        onRuleEdited={markEdited}
       />
     </div>
   );

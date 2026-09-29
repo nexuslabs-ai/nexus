@@ -41,10 +41,8 @@ export function ChoiceFilter({
 }: ChoiceFilterProps) {
   const [open, setOpen] = React.useState(false);
   const [pending, setPending] = React.useState<'is' | 'isNot' | null>(null);
-  const [snapshot, setSnapshot] = React.useState(
-    JSON.stringify([value, disabled])
-  );
   const nextSnapshot = JSON.stringify([value, disabled]);
+  const [snapshot, setSnapshot] = React.useState(nextSnapshot);
   // A controlled replacement invalidates an unfinished operator/value edit.
   if (snapshot !== nextSnapshot) {
     setSnapshot(nextSnapshot);
