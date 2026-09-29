@@ -35,15 +35,16 @@ This skill works with multiple input types:
 
 ## Package-Specific Testing Patterns
 
-Nexus tests only four kinds of thing — see `.claude/rules/testing.md` § Scope. Based on what you're testing:
+Nexus tests only five kinds of thing — see `.claude/rules/testing.md` § Scope. Based on what you're testing:
 
-| Target               | Detect By                                            | Testing Approach                                                    |
-| -------------------- | ---------------------------------------------------- | ------------------------------------------------------------------- |
-| React components     | `packages/react/src/components/`                     | Story-first: play functions in `*.stories.tsx`                      |
-| Core engine          | `packages/core/src/lib/`                             | Vitest behaviour tests — thresholds and invariants, never snapshots |
-| `cn` merge           | `packages/react/src/lib/utils.ts`                    | Vitest, in `utils.test.ts`                                          |
-| ESLint rules         | `packages/eslint-plugin-nexus/`                      | `RuleTester` valid/invalid cases in `__tests__/`                    |
-| Apps, scripts, hooks | `apps/`, `scripts/`, `packages/*/scripts/`, `hooks/` | No tests — stop and tell the user                                   |
+| Target                | Detect By                                                                   | Testing Approach                                                                             |
+| --------------------- | --------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------- |
+| React components      | `packages/react/src/components/`                                            | Story-first: play functions in `*.stories.tsx`                                               |
+| Core engine           | `packages/core/src/lib/`                                                    | Vitest behaviour tests — thresholds and invariants, never snapshots                          |
+| `cn` merge            | `packages/react/src/lib/utils.ts`                                           | Vitest, in `utils.test.ts`                                                                   |
+| ESLint rules          | `packages/eslint-plugin-nexus/`                                             | `RuleTester` valid/invalid cases in `__tests__/`                                             |
+| Distribution fixtures | A repo-root `examples/` app that meets `testing.md` § Distribution fixtures | Standalone consumer app: typecheck, production build, computed-style probes; never snapshots |
+| Apps, scripts, hooks  | `apps/`, `scripts/`, `packages/*/scripts/`, `hooks/`                        | No tests — stop and tell the user                                                            |
 
 ## Base Rules
 
