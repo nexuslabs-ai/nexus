@@ -5,14 +5,12 @@ import { Switch } from '../../switch';
 
 import { NexusAppearanceSettingRow } from './setting-row';
 
-const DESCRIPTION = 'Shorten animations and transitions across the interface.';
-
 const meta: Meta<typeof NexusAppearanceSettingRow> = {
   title: 'Appearance/SettingRow',
   component: NexusAppearanceSettingRow,
   args: {
     label: 'Reduce motion',
-    description: DESCRIPTION,
+    description: 'Shorten animations and transitions across the interface.',
     children: <Switch aria-label="Reduce motion" />,
   },
   decorators: [
@@ -41,7 +39,12 @@ export const Default: Story = {
 export const WithoutDescription: Story = {
   args: { description: undefined },
   play: async ({ canvasElement }) => {
-    await expect(within(canvasElement).queryByText(DESCRIPTION)).toBeNull();
+    const row = canvasElement.querySelector(
+      '[data-slot="appearance-setting-row"]'
+    );
+
+    await expect(row).toBeInTheDocument();
+    await expect(row?.querySelector('p')).toBeNull();
   },
 };
 
