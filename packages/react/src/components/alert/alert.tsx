@@ -1,3 +1,5 @@
+'use client';
+
 import * as React from 'react';
 
 import { Slot } from '@radix-ui/react-slot';
@@ -7,31 +9,119 @@ import { IconX } from '../../lib/icons';
 import { cn } from '../../lib/utils';
 import { Button } from '../button';
 
-const alertVariants = cva('nx:group/alert nx:grid nx:w-full nx:px-6 nx:py-4', {
+const alertVariants = cva('nx:group/alert nx:grid nx:w-full nx:px-5 nx:py-4', {
   variants: {
     variant: {
-      default: 'nx:border-border-default nx:bg-container nx:text-foreground',
-      destructive:
-        'nx:border-error-border nx:bg-error-subtle nx:text-error-subtle-foreground',
-      success:
-        'nx:border-success-border nx:bg-success-subtle nx:text-success-subtle-foreground',
-      information:
-        'nx:border-information-border nx:bg-information-subtle nx:text-information-subtle-foreground',
-      warning:
-        'nx:border-warning-border nx:bg-warning-subtle nx:text-warning-subtle-foreground',
+      default: '',
+      destructive: '',
+      success: '',
+      information: '',
+      warning: '',
     },
+    fill: { light: '', outline: '', solid: '' },
     presentation: {
       card: 'nx:rounded-md nx:border-default',
       banner: 'nx:rounded-none nx:border-b-default',
     },
     layout: {
       stack:
-        'nx:grid-cols-[auto_minmax(0,1fr)] nx:items-start nx:has-[>[data-slot=alert-icon]]:gap-x-4 nx:*:data-[slot=alert-title]:col-start-2 nx:*:data-[slot=alert-description]:col-start-2 nx:*:data-[slot=alert-content]:col-start-2 nx:*:data-[slot=alert-actions]:col-start-2',
+        'nx:grid-cols-[auto_minmax(0,1fr)] nx:items-start nx:has-[>[data-slot=alert-icon]]:gap-x-3 nx:*:data-[slot=alert-title]:col-start-2 nx:*:data-[slot=alert-description]:col-start-2 nx:*:data-[slot=alert-content]:col-start-2 nx:*:data-[slot=alert-actions]:col-start-2',
       inline:
-        'nx:@container/alert nx:relative nx:grid-cols-[minmax(0,1fr)_auto] nx:items-center nx:gap-x-4 nx:gap-y-1 nx:has-[>[data-slot=alert-icon]]:grid-cols-[auto_minmax(0,1fr)_auto]',
+        'nx:@container/alert nx:relative nx:grid-cols-[minmax(0,1fr)_auto] nx:items-center nx:gap-x-3 nx:gap-y-1 nx:has-[>[data-slot=alert-icon]]:grid-cols-[auto_minmax(0,1fr)_auto]',
     },
   },
+  compoundVariants: [
+    {
+      variant: 'default',
+      fill: 'light',
+      className: 'nx:border-border-default nx:bg-container nx:text-foreground',
+    },
+    {
+      variant: 'default',
+      fill: 'outline',
+      className: 'nx:border-border-default nx:bg-container nx:text-foreground',
+    },
+    {
+      variant: 'default',
+      fill: 'solid',
+      className:
+        'nx:border-secondary-background nx:bg-secondary-background nx:text-secondary-foreground',
+    },
+    {
+      variant: 'destructive',
+      fill: 'light',
+      className:
+        'nx:border-error-border nx:bg-error-subtle nx:text-error-subtle-foreground',
+    },
+    {
+      variant: 'destructive',
+      fill: 'outline',
+      className:
+        'nx:border-error-border nx:bg-container nx:text-error-subtle-foreground',
+    },
+    {
+      variant: 'destructive',
+      fill: 'solid',
+      className:
+        'nx:border-error-background nx:bg-error-background nx:text-error-foreground',
+    },
+    {
+      variant: 'success',
+      fill: 'light',
+      className:
+        'nx:border-success-border nx:bg-success-subtle nx:text-success-subtle-foreground',
+    },
+    {
+      variant: 'success',
+      fill: 'outline',
+      className:
+        'nx:border-success-border nx:bg-container nx:text-success-subtle-foreground',
+    },
+    {
+      variant: 'success',
+      fill: 'solid',
+      className:
+        'nx:border-success-background nx:bg-success-background nx:text-success-foreground',
+    },
+    {
+      variant: 'information',
+      fill: 'light',
+      className:
+        'nx:border-information-border nx:bg-information-subtle nx:text-information-subtle-foreground',
+    },
+    {
+      variant: 'information',
+      fill: 'outline',
+      className:
+        'nx:border-information-border nx:bg-container nx:text-information-subtle-foreground',
+    },
+    {
+      variant: 'information',
+      fill: 'solid',
+      className:
+        'nx:border-information-background nx:bg-information-background nx:text-information-foreground',
+    },
+    {
+      variant: 'warning',
+      fill: 'light',
+      className:
+        'nx:border-warning-border nx:bg-warning-subtle nx:text-warning-subtle-foreground',
+    },
+    {
+      variant: 'warning',
+      fill: 'outline',
+      className:
+        'nx:border-warning-border nx:bg-container nx:text-warning-subtle-foreground',
+    },
+    {
+      variant: 'warning',
+      fill: 'solid',
+      className:
+        'nx:border-warning-background nx:bg-warning-background nx:text-warning-foreground',
+    },
+  ],
   defaultVariants: {
+    fill: 'light',
     variant: 'default',
     presentation: 'card',
     layout: 'stack',
@@ -44,12 +134,22 @@ const alertVariants = cva('nx:group/alert nx:grid nx:w-full nx:px-6 nx:py-4', {
  * Props for the Alert component.
  */
 interface AlertProps
-  extends React.ComponentProps<'div'>, VariantProps<typeof alertVariants> {}
+  extends React.ComponentProps<'div'>, VariantProps<typeof alertVariants> {
+  /** Neutral message text on light/outline surfaces. Solid always uses its paired foreground. */
+  textTone?: 'status' | 'neutral';
+}
+
+const AlertFillContext = React.createContext<AlertProps['fill']>('light');
 
 /**
  * Alert
  *
  * Displays a callout for user attention with optional icon support.
+ * `fill` chooses light (default), outline, or solid treatment independently of status.
+ * `textTone="neutral"` uses normal foreground for title/description on light and
+ * outline surfaces; solid always retains the paired status foreground.
+ * On solid surfaces, use opaque Nexus Button variants such as outline for actions
+ * and links styled as buttons. AlertClose selects outline automatically.
  * Use for important messages, warnings, errors, or success confirmations.
  * Use `presentation="banner"` for the edge-to-edge banner treatment (squared
  * corners, bottom border only).
@@ -90,22 +190,28 @@ interface AlertProps
 function Alert({
   className,
   variant,
+  fill = 'light',
+  textTone = 'status',
   presentation,
   layout,
   ...props
 }: AlertProps) {
   return (
-    <div
-      data-slot="alert"
-      data-variant={variant ?? 'default'}
-      data-presentation={presentation ?? 'card'}
-      data-layout={layout ?? 'stack'}
-      className={cn(
-        alertVariants({ variant, presentation, layout }),
-        className
-      )}
-      {...props}
-    />
+    <AlertFillContext.Provider value={fill}>
+      <div
+        data-slot="alert"
+        data-variant={variant ?? 'default'}
+        data-fill={fill}
+        data-text-tone={fill === 'solid' ? 'status' : textTone}
+        data-presentation={presentation ?? 'card'}
+        data-layout={layout ?? 'stack'}
+        className={cn(
+          alertVariants({ variant, fill, presentation, layout }),
+          className
+        )}
+        {...props}
+      />
+    </AlertFillContext.Provider>
   );
 }
 
@@ -229,7 +335,7 @@ function AlertTitle({
     <Comp
       data-slot="alert-title"
       className={cn(
-        'nx:mb-1 nx:last:mb-0 nx:typography-label-default',
+        'nx:mb-1 nx:last:mb-0 nx:typography-label-default nx:group-data-[text-tone=neutral]/alert:text-foreground',
         className
       )}
       {...props}
@@ -263,7 +369,7 @@ function AlertDescription({ className, ...props }: AlertDescriptionProps) {
     <div
       data-slot="alert-description"
       className={cn(
-        'nx:typography-body-default nx:group-data-[variant=default]/alert:text-muted-foreground',
+        'nx:typography-body-default nx:group-data-[text-tone=status]/alert:group-data-[fill=light]/alert:group-data-[variant=default]/alert:text-muted-foreground nx:group-data-[text-tone=status]/alert:group-data-[fill=outline]/alert:group-data-[variant=default]/alert:text-muted-foreground nx:group-data-[text-tone=neutral]/alert:text-foreground',
         className
       )}
       {...props}
@@ -338,13 +444,15 @@ function AlertClose({
   type = 'button',
   ...props
 }: AlertCloseProps) {
+  const fill = React.useContext(AlertFillContext);
+
   return (
     <Button
-      variant="ghost"
+      variant={fill === 'solid' ? 'outline' : 'ghost'}
       size="icon-sm"
       data-slot="alert-close"
       className={cn(
-        'nx:shrink-0 nx:group-data-[layout=inline]/alert:absolute nx:group-data-[layout=inline]/alert:end-6 nx:group-data-[layout=inline]/alert:top-4 nx:group-data-[layout=inline]/alert:@lg/alert:static',
+        'nx:shrink-0 nx:group-data-[layout=inline]/alert:absolute nx:group-data-[layout=inline]/alert:end-5 nx:group-data-[layout=inline]/alert:top-4 nx:group-data-[layout=inline]/alert:@lg/alert:static',
         className
       )}
       type={type}

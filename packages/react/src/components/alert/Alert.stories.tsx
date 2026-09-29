@@ -8,10 +8,10 @@ import {
 } from '@storybook/addon-docs/blocks';
 import type { Meta, StoryObj } from '@storybook/react';
 import {
-  IconAlertCircle,
-  IconAlertTriangle,
-  IconCircleCheck,
-  IconInfoCircle,
+  IconAlertCircleFilled,
+  IconAlertTriangleFilled,
+  IconCircleCheckFilled,
+  IconInfoCircleFilled,
   IconX,
 } from '@tabler/icons-react';
 import { expect, userEvent, waitFor, within } from 'storybook/test';
@@ -63,6 +63,23 @@ const meta: Meta<typeof Alert> = {
             add an announcement role.
           </p>
           <Canvas of={AllVariants} />
+          <h2 id="surface-treatments">Surface treatments</h2>
+          <p>
+            Light is the default. Outline uses a neutral surface; solid uses the
+            status background and its paired foreground. Icons are composed from
+            Tabler filled icons; custom icons remain supported.
+          </p>
+          <Canvas of={Outlined} />
+          <Canvas of={Solid} />
+          <h2 id="neutral-message-text">Neutral message text</h2>
+          <p>
+            Use <code>{'textTone="neutral"'}</code> with light or outline to
+            keep message text neutral while the icon and frame convey status.
+            Solid ignores this option to preserve its paired foreground. For
+            actions on solid surfaces use opaque Nexus Buttons, such as outline;
+            avoid unverified ghost actions or bare links.
+          </p>
+          <Canvas of={NeutralText} />
           <h2 id="content">Content</h2>
           <h3 id="title-only">Title only</h3>
           <Canvas of={WithTitle} />
@@ -121,8 +138,23 @@ Nexus owns presentation and layout. Your application owns visibility, action han
     layout: 'stack',
     presentation: 'card',
     variant: 'default',
+    fill: 'light',
+    textTone: 'status',
   },
   argTypes: {
+    fill: {
+      control: 'select',
+      options: ['light', 'outline', 'solid'],
+      description: 'Surface treatment, independent of status.',
+      table: { category: 'Controls' },
+    },
+    textTone: {
+      control: 'select',
+      options: ['status', 'neutral'],
+      description:
+        'Message colour for light/outline. Solid always uses its paired foreground.',
+      table: { category: 'Controls' },
+    },
     variant: {
       control: 'select',
       options: ['default', 'information', 'destructive', 'success', 'warning'],
@@ -195,28 +227,28 @@ function renderPlaygroundIcon(icon: PlaygroundIcon) {
   if (icon === 'destructive') {
     return (
       <AlertIcon>
-        <IconAlertCircle />
+        <IconAlertCircleFilled />
       </AlertIcon>
     );
   }
   if (icon === 'success') {
     return (
       <AlertIcon>
-        <IconCircleCheck />
+        <IconCircleCheckFilled />
       </AlertIcon>
     );
   }
   if (icon === 'warning') {
     return (
       <AlertIcon>
-        <IconAlertTriangle />
+        <IconAlertTriangleFilled />
       </AlertIcon>
     );
   }
 
   return (
     <AlertIcon>
-      <IconInfoCircle />
+      <IconInfoCircleFilled />
     </AlertIcon>
   );
 }
@@ -228,6 +260,8 @@ function AlertPlaygroundExample({
   icon,
   layout,
   presentation,
+  fill,
+  textTone,
   primaryActionLabel,
   primaryActionVariant,
   secondaryActionLabel,
@@ -254,6 +288,8 @@ function AlertPlaygroundExample({
     <Alert
       layout={layout}
       presentation={presentation}
+      fill={fill}
+      textTone={textTone}
       variant={variant}
       className="nx:max-w-2xl"
     >
@@ -300,7 +336,7 @@ function DismissibleCloseButtonExample(
       {visible && (
         <Alert {...props} className="nx:max-w-xl">
           <AlertIcon>
-            <IconInfoCircle />
+            <IconInfoCircleFilled />
           </AlertIcon>
           <AlertContent>
             <AlertTitle>Invite ready</AlertTitle>
@@ -504,7 +540,7 @@ export const Playground: PlaygroundStory = {
       },
       source: {
         code: `import { useState } from 'react';
-import { IconInfoCircle } from '@tabler/icons-react';
+import { IconInfoCircleFilled } from '@tabler/icons-react';
 import { Button } from '../button';
 import {
   Alert, AlertActions, AlertClose, AlertContent,
@@ -524,7 +560,7 @@ export function StorageAlert({ onManage }: { onManage: () => void }) {
 
   return (
     <Alert variant="information" layout="inline">
-      <AlertIcon><IconInfoCircle /></AlertIcon>
+      <AlertIcon><IconInfoCircleFilled /></AlertIcon>
       <AlertContent>
         <AlertTitle>Storage almost full</AlertTitle>
         <AlertDescription>Uploads may fail soon.</AlertDescription>
@@ -660,7 +696,7 @@ export const BannerPresentation: Story = {
   render: (args) => (
     <Alert {...args} className="nx:max-w-md">
       <AlertIcon>
-        <IconInfoCircle />
+        <IconInfoCircleFilled />
       </AlertIcon>
       <AlertContent>
         <AlertTitle>Information</AlertTitle>
@@ -688,7 +724,7 @@ export const WithIcon: Story = {
   render: (args) => (
     <Alert {...args} className="nx:max-w-md">
       <AlertIcon>
-        <IconInfoCircle />
+        <IconInfoCircleFilled />
       </AlertIcon>
       <AlertContent>
         <AlertTitle>Information</AlertTitle>
@@ -708,7 +744,7 @@ export const DestructiveWithIcon: Story = {
   render: (args) => (
     <Alert {...args} className="nx:max-w-md">
       <AlertIcon>
-        <IconAlertCircle />
+        <IconAlertCircleFilled />
       </AlertIcon>
       <AlertContent>
         <AlertTitle>Error</AlertTitle>
@@ -728,7 +764,7 @@ export const InformationWithIcon: Story = {
   render: (args) => (
     <Alert {...args} className="nx:max-w-md">
       <AlertIcon>
-        <IconInfoCircle />
+        <IconInfoCircleFilled />
       </AlertIcon>
       <AlertContent>
         <AlertTitle>Information</AlertTitle>
@@ -755,7 +791,7 @@ export const DensityActionSizing: Story = {
         <div key={density} data-nx-density={density}>
           <Alert layout="inline" variant="information">
             <AlertIcon>
-              <IconInfoCircle />
+              <IconInfoCircleFilled />
             </AlertIcon>
             <AlertContent>
               <AlertTitle>Invitation ready</AlertTitle>
@@ -764,13 +800,13 @@ export const DensityActionSizing: Story = {
               </AlertDescription>
             </AlertContent>
             <AlertActions>
-              <Button size="sm" startIcon={<IconCircleCheck />}>
+              <Button size="sm" startIcon={<IconCircleCheckFilled />}>
                 Send
               </Button>
               <Button
                 size="sm"
                 variant="outline"
-                startIcon={<IconInfoCircle />}
+                startIcon={<IconInfoCircleFilled />}
               >
                 Review
               </Button>
@@ -804,7 +840,7 @@ export const SuccessWithIcon: Story = {
   render: (args) => (
     <Alert {...args} className="nx:max-w-md">
       <AlertIcon>
-        <IconCircleCheck />
+        <IconCircleCheckFilled />
       </AlertIcon>
       <AlertContent>
         <AlertTitle>Success</AlertTitle>
@@ -824,7 +860,7 @@ export const WarningWithIcon: Story = {
   render: (args) => (
     <Alert {...args} className="nx:max-w-md">
       <AlertIcon>
-        <IconAlertTriangle />
+        <IconAlertTriangleFilled />
       </AlertIcon>
       <AlertContent>
         <AlertTitle>Warning</AlertTitle>
@@ -952,7 +988,7 @@ function TextDismissExample(props: React.ComponentProps<typeof Alert>) {
       {visible && (
         <Alert {...props}>
           <AlertIcon>
-            <IconInfoCircle />
+            <IconInfoCircleFilled />
           </AlertIcon>
           <AlertContent>
             <AlertTitle>Import completed</AlertTitle>
@@ -1007,7 +1043,7 @@ export const CriticalNoClose: Story = {
   render: (args) => (
     <Alert {...args} className="nx:max-w-md">
       <AlertIcon>
-        <IconAlertCircle />
+        <IconAlertCircleFilled />
       </AlertIcon>
       <AlertContent>
         <AlertTitle>Payment failed</AlertTitle>
@@ -1028,7 +1064,7 @@ export const InlineAction: Story = {
   render: (args) => (
     <Alert {...args} className="nx:max-w-xl">
       <AlertIcon>
-        <IconAlertTriangle />
+        <IconAlertTriangleFilled />
       </AlertIcon>
       <AlertContent>
         <AlertTitle>Storage almost full</AlertTitle>
@@ -1050,7 +1086,7 @@ export const DescriptionLinkAction: Story = {
   render: (args) => (
     <Alert {...args} className="nx:max-w-md">
       <AlertIcon>
-        <IconInfoCircle />
+        <IconInfoCircleFilled />
       </AlertIcon>
       <AlertContent>
         <AlertTitle>Sync is paused</AlertTitle>
@@ -1076,7 +1112,7 @@ export const ActionsBelowDescription: Story = {
   render: (args) => (
     <Alert {...args} className="nx:max-w-md">
       <AlertIcon>
-        <IconAlertTriangle />
+        <IconAlertTriangleFilled />
       </AlertIcon>
       <AlertContent>
         <AlertTitle>Plan limit reached</AlertTitle>
@@ -1104,7 +1140,7 @@ export const InlineActionsWithClose: Story = {
     <div data-testid="reflow-host" style={{ width: 672, maxWidth: '100%' }}>
       <Alert {...args} className="nx:max-w-2xl">
         <AlertIcon>
-          <IconCircleCheck />
+          <IconCircleCheckFilled />
         </AlertIcon>
         <AlertContent>
           <AlertTitle>Deployment complete</AlertTitle>
@@ -1185,7 +1221,7 @@ export const RightToLeftClose: Story = {
     <div dir="rtl" className="nx:w-80 nx:max-w-full">
       <Alert layout="inline" variant="information">
         <AlertIcon>
-          <IconInfoCircle />
+          <IconInfoCircleFilled />
         </AlertIcon>
         <AlertContent>
           <AlertTitle>Workspace invitation ready for review</AlertTitle>
@@ -1225,7 +1261,7 @@ export const DisabledClose: Story = {
   render: (args) => (
     <Alert {...args} className="nx:max-w-2xl">
       <AlertIcon>
-        <IconCircleCheck />
+        <IconCircleCheckFilled />
       </AlertIcon>
       <AlertContent>
         <AlertTitle>Deployment complete</AlertTitle>
@@ -1262,7 +1298,7 @@ export const BannerInlineActions: Story = {
   render: (args) => (
     <Alert {...args} className="nx:max-w-3xl">
       <AlertIcon>
-        <IconInfoCircle />
+        <IconInfoCircleFilled />
       </AlertIcon>
       <AlertContent>
         <AlertTitle>New policy available</AlertTitle>
@@ -1289,7 +1325,7 @@ export const HelperBanner: Story = {
   render: (args) => (
     <Alert {...args} className="nx:max-w-3xl">
       <AlertIcon>
-        <IconInfoCircle />
+        <IconInfoCircleFilled />
       </AlertIcon>
       <AlertContent>
         <AlertDescription>
@@ -1323,7 +1359,7 @@ export const CustomCloseIconLabel: Story = {
   render: (args) => (
     <Alert {...args} className="nx:max-w-xl">
       <AlertIcon>
-        <IconInfoCircle />
+        <IconInfoCircleFilled />
       </AlertIcon>
       <AlertContent>
         <AlertTitle>Custom close icon</AlertTitle>
@@ -1385,7 +1421,7 @@ export const ActionSlotDataAttributes: Story = {
   render: (_args) => (
     <Alert variant="warning" layout="inline" className="nx:max-w-xl">
       <AlertIcon>
-        <IconAlertTriangle />
+        <IconAlertTriangleFilled />
       </AlertIcon>
       <AlertContent>
         <AlertTitle>Storage almost full</AlertTitle>
@@ -1479,7 +1515,7 @@ export const AllVariants: Story = {
         </div>
         <Alert className="nx:max-w-md">
           <AlertIcon>
-            <IconInfoCircle />
+            <IconInfoCircleFilled />
           </AlertIcon>
           <AlertContent>
             <AlertTitle>Default Alert</AlertTitle>
@@ -1496,7 +1532,7 @@ export const AllVariants: Story = {
         </div>
         <Alert variant="information" className="nx:max-w-md">
           <AlertIcon>
-            <IconInfoCircle />
+            <IconInfoCircleFilled />
           </AlertIcon>
           <AlertContent>
             <AlertTitle>Information Alert</AlertTitle>
@@ -1511,7 +1547,7 @@ export const AllVariants: Story = {
         </div>
         <Alert variant="destructive" className="nx:max-w-md">
           <AlertIcon>
-            <IconAlertCircle />
+            <IconAlertCircleFilled />
           </AlertIcon>
           <AlertContent>
             <AlertTitle>Destructive Alert</AlertTitle>
@@ -1528,7 +1564,7 @@ export const AllVariants: Story = {
         </div>
         <Alert variant="success" className="nx:max-w-md">
           <AlertIcon>
-            <IconCircleCheck />
+            <IconCircleCheckFilled />
           </AlertIcon>
           <AlertContent>
             <AlertTitle>Success Alert</AlertTitle>
@@ -1543,7 +1579,7 @@ export const AllVariants: Story = {
         </div>
         <Alert variant="warning" className="nx:max-w-md">
           <AlertIcon>
-            <IconAlertTriangle />
+            <IconAlertTriangleFilled />
           </AlertIcon>
           <AlertContent>
             <AlertTitle>Warning Alert</AlertTitle>
@@ -1568,7 +1604,7 @@ export const AllBannerVariants: Story = {
         </div>
         <Alert presentation="banner" className="nx:max-w-md">
           <AlertIcon>
-            <IconInfoCircle />
+            <IconInfoCircleFilled />
           </AlertIcon>
           <AlertContent>
             <AlertTitle>Default Alert</AlertTitle>
@@ -1589,7 +1625,7 @@ export const AllBannerVariants: Story = {
           className="nx:max-w-md"
         >
           <AlertIcon>
-            <IconInfoCircle />
+            <IconInfoCircleFilled />
           </AlertIcon>
           <AlertContent>
             <AlertTitle>Information Alert</AlertTitle>
@@ -1608,7 +1644,7 @@ export const AllBannerVariants: Story = {
           className="nx:max-w-md"
         >
           <AlertIcon>
-            <IconAlertCircle />
+            <IconAlertCircleFilled />
           </AlertIcon>
           <AlertContent>
             <AlertTitle>Destructive Alert</AlertTitle>
@@ -1625,7 +1661,7 @@ export const AllBannerVariants: Story = {
         </div>
         <Alert presentation="banner" variant="success" className="nx:max-w-md">
           <AlertIcon>
-            <IconCircleCheck />
+            <IconCircleCheckFilled />
           </AlertIcon>
           <AlertContent>
             <AlertTitle>Success Alert</AlertTitle>
@@ -1640,7 +1676,7 @@ export const AllBannerVariants: Story = {
         </div>
         <Alert presentation="banner" variant="warning" className="nx:max-w-md">
           <AlertIcon>
-            <IconAlertTriangle />
+            <IconAlertTriangleFilled />
           </AlertIcon>
           <AlertContent>
             <AlertTitle>Warning Alert</AlertTitle>
@@ -1685,3 +1721,132 @@ export const DefaultModeHeightPinned: Story = {
 // A11Y is tested automatically on ALL stories
 // via addon-a11y with test: 'error'
 // ============================================
+
+const statusExamples = [
+  {
+    variant: 'information',
+    title: 'Update available',
+    description: 'A new workspace version is ready.',
+    icon: IconInfoCircleFilled,
+  },
+  {
+    variant: 'success',
+    title: 'Changes saved',
+    description: 'Your workspace settings are up to date.',
+    icon: IconCircleCheckFilled,
+  },
+  {
+    variant: 'warning',
+    title: 'Storage almost full',
+    description: 'Remove unused files before your next upload.',
+    icon: IconAlertTriangleFilled,
+  },
+  {
+    variant: 'destructive',
+    title: 'Upload failed',
+    description: 'Check your connection and try again.',
+    icon: IconAlertCircleFilled,
+  },
+] as const;
+
+function TreatmentExamples(args: React.ComponentProps<typeof Alert>) {
+  return (
+    <div className="nx:flex nx:w-full nx:max-w-2xl nx:flex-col nx:gap-4">
+      {statusExamples.map(({ variant, title, description, icon: Icon }) => (
+        <Alert key={variant} {...args} variant={variant}>
+          <AlertIcon>
+            <Icon />
+          </AlertIcon>
+          <AlertContent>
+            <AlertTitle>{title}</AlertTitle>
+            <AlertDescription>{description}</AlertDescription>
+          </AlertContent>
+        </Alert>
+      ))}
+    </div>
+  );
+}
+
+export const Outlined: Story = {
+  args: { fill: 'outline' },
+  render: TreatmentExamples,
+};
+export const Solid: Story = {
+  args: { fill: 'solid' },
+  render: TreatmentExamples,
+};
+export const NeutralText: Story = {
+  args: { fill: 'light', textTone: 'neutral' },
+  render: TreatmentExamples,
+  play: async ({ canvasElement }) => {
+    const titles = [
+      ...canvasElement.querySelectorAll('[data-slot="alert-title"]'),
+    ];
+    const descriptions = [
+      ...canvasElement.querySelectorAll('[data-slot="alert-description"]'),
+    ];
+    const neutral = getComputedStyle(titles[0]!).color;
+    for (const text of [...titles, ...descriptions]) {
+      await expect(getComputedStyle(text).color).toBe(neutral);
+    }
+    for (const icon of canvasElement.querySelectorAll(
+      '[data-slot="alert-icon"]'
+    )) {
+      await expect(getComputedStyle(icon).color).not.toBe(neutral);
+    }
+  },
+};
+
+export const SolidDismissal: Story = {
+  args: {
+    fill: 'solid',
+    variant: 'information',
+    layout: 'inline',
+    textTone: 'neutral',
+  },
+  render: (args) => <SolidDismissalExample {...args} />,
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+    const close = canvas.getByRole('button', { name: 'Dismiss alert' });
+    const title = canvas.getByText('Update available');
+    const alert = title.closest('[data-slot="alert"]')!;
+    await expect(getComputedStyle(title).color).toBe(
+      getComputedStyle(alert).color
+    );
+    await expect(getComputedStyle(close).backgroundColor).not.toBe(
+      'rgba(0, 0, 0, 0)'
+    );
+    close.focus();
+    await userEvent.keyboard('{Enter}');
+    await expect(
+      canvas.queryByText('Update available')
+    ).not.toBeInTheDocument();
+    await expect(
+      canvas.getByRole('button', { name: 'Show alert' })
+    ).toHaveFocus();
+  },
+};
+
+function SolidDismissalExample(args: React.ComponentProps<typeof Alert>) {
+  const [visible, setVisible] = React.useState(true);
+  if (!visible)
+    return (
+      <Button ref={(node) => node?.focus()} onClick={() => setVisible(true)}>
+        Show alert
+      </Button>
+    );
+  return (
+    <Alert {...args}>
+      <AlertIcon>
+        <IconInfoCircleFilled />
+      </AlertIcon>
+      <AlertContent>
+        <AlertTitle>Update available</AlertTitle>
+        <AlertDescription>A new workspace version is ready.</AlertDescription>
+      </AlertContent>
+      <AlertActions>
+        <AlertClose onClick={() => setVisible(false)} />
+      </AlertActions>
+    </Alert>
+  );
+}
