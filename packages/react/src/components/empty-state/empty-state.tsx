@@ -30,12 +30,23 @@ interface EmptyStateProps extends React.ComponentProps<'div'> {
  * `EmptyStateContent` holds the call to action. Pass `bordered` to render the
  * dashed frame (e.g. to match a bordered skeleton slot).
  *
+ * Render after a successful request returns no content. Loading, errors and
+ * permission restrictions belong to the application, as do action callbacks,
+ * result announcements and focus after an action removes the empty state.
+ * No live-region role or automatic focus is added by this component.
+ *
+ * Use Title asChild to choose a heading level in the surrounding section.
+ * Hide decorative media with aria-hidden (or alt="" for images); provide text
+ * alternatives for informative media. Constrain illustrations to available
+ * width. Compose multiple actions in a wrapping flex row inside Content.
+ * The background can be overridden with className inside an existing surface.
+ *
  * @example
  * ```tsx
  * <EmptyState>
  *   <EmptyStateHeader>
  *     <EmptyStateMedia variant="icon">
- *       <IconInbox />
+ *       <IconInbox aria-hidden />
  *     </EmptyStateMedia>
  *     <EmptyStateTitle>No contacts yet</EmptyStateTitle>
  *     <EmptyStateDescription>

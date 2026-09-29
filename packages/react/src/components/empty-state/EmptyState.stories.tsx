@@ -1,8 +1,12 @@
+import { useId, useRef, useState } from 'react';
+
 import type { Meta, StoryObj } from '@storybook/react';
 import { IconUsers } from '@tabler/icons-react';
 import { expect, userEvent, within } from 'storybook/test';
 
 import { Button } from '../button';
+import { Input } from '../input';
+import { Label } from '../label';
 
 import {
   EmptyState,
@@ -16,30 +20,74 @@ import {
 const meta: Meta<typeof EmptyState> = {
   title: 'Components/EmptyState',
   component: EmptyState,
+  parameters: {
+    docs: {
+      description: {
+        component:
+          'Use EmptyState after a successful request returns no content. Omit actions for informational emptiness; offer creation for an empty collection and clear-search recovery for no matches. Loading, request failures and permission restrictions are separate application states. The application owns data, callbacks, announcements and focus. Use Title asChild for the appropriate heading level, hide decorative media, and constrain illustrations to their container. The default has a subtle background; bordered adds a dashed frame. Inside an existing surface, className can remove the background. These examples use local state, not a backend. Copy the render function and its React hooks along with the EmptyState parts; Search Recovery also uses Nexus Input and Label, and action examples use Nexus Button. Keep the Nexus cn helper and theme setup when copying component source.',
+      },
+    },
+  },
 };
 
 export default meta;
 type Story = StoryObj<typeof EmptyState>;
 
-// The canonical empty state: an icon medallion, a title, a description, and a
-// primary action.
 export const Default: Story = {
-  render: () => (
-    <EmptyState>
-      <EmptyStateHeader>
-        <EmptyStateMedia variant="icon">
-          <IconUsers aria-hidden />
-        </EmptyStateMedia>
-        <EmptyStateTitle>No contacts yet</EmptyStateTitle>
-        <EmptyStateDescription>
-          Add your first contact to start building your CRM.
-        </EmptyStateDescription>
-      </EmptyStateHeader>
-      <EmptyStateContent>
-        <Button>Add contact</Button>
-      </EmptyStateContent>
-    </EmptyState>
-  ),
+  render: function ContactCollection() {
+    const [created, setCreated] = useState(false);
+
+    if (created) {
+      return (
+        <section>
+          <h2
+            tabIndex={-1}
+            ref={(node) => node?.focus()}
+            className="nx:typography-heading-xxsmall"
+          >
+            Contacts
+          </h2>
+          <ul>
+            <li>Priya Shah</li>
+          </ul>
+        </section>
+      );
+    }
+
+    return (
+      <EmptyState>
+        <EmptyStateHeader>
+          <EmptyStateMedia variant="icon">
+            <IconUsers aria-hidden />
+          </EmptyStateMedia>
+          <EmptyStateTitle asChild>
+            <h2>No contacts yet</h2>
+          </EmptyStateTitle>
+          <EmptyStateDescription>
+            Add a sample contact to see this collection fill up.
+          </EmptyStateDescription>
+        </EmptyStateHeader>
+        <EmptyStateContent>
+          <Button type="button" onClick={() => setCreated(true)}>
+            Add sample contact
+          </Button>
+        </EmptyStateContent>
+      </EmptyState>
+    );
+  },
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+    await userEvent.tab();
+    await expect(
+      canvas.getByRole('button', { name: 'Add sample contact' })
+    ).toHaveFocus();
+    await userEvent.keyboard('{Enter}');
+    await expect(canvas.getByRole('listitem')).toHaveTextContent('Priya Shah');
+    await expect(
+      canvas.getByRole('heading', { name: 'Contacts' })
+    ).toHaveFocus();
+    await expect(canvas.queryByText('No contacts yet')).not.toBeInTheDocument();
+  },
 };
 
 // Header only — an empty state with no call to action.
@@ -50,9 +98,9 @@ export const WithoutAction: Story = {
         <EmptyStateMedia variant="icon">
           <IconUsers aria-hidden />
         </EmptyStateMedia>
-        <EmptyStateTitle>No results</EmptyStateTitle>
+        <EmptyStateTitle>You’re all caught up</EmptyStateTitle>
         <EmptyStateDescription>
-          Try adjusting your filters or search terms.
+          New notifications will appear here.
         </EmptyStateDescription>
       </EmptyStateHeader>
     </EmptyState>
@@ -231,4 +279,77 @@ export const AllVariants: Story = {
       </EmptyState>
     </div>
   ),
+};
+
+export const SearchRecovery: Story = {
+  render: function SearchRecoveryExample() {
+    const id = useId();
+    const search = useRef<HTMLInputElement>(null);
+    const [query, setQuery] = useState('Morgan');
+    const contacts = ['Priya Shah', 'Alex Chen'].filter((name) =>
+      name.toLowerCase().includes(query.trim().toLowerCase())
+    );
+
+    function clearSearch() {
+      setQuery('');
+      search.current?.focus();
+    }
+
+    return (
+      <section className="nx:flex nx:w-80 nx:max-w-full nx:flex-col nx:gap-4">
+        <h2 className="nx:typography-heading-xxsmall">Contacts</h2>
+        <Label htmlFor={id}>Search contacts</Label>
+        <Input
+          id={id}
+          ref={search}
+          value={query}
+          onChange={(event) => setQuery(event.target.value)}
+        />
+        <p role="status">{contacts.length} contacts found</p>
+        {contacts.length ? (
+          <ul>
+            {contacts.map((name) => (
+              <li key={name}>{name}</li>
+            ))}
+          </ul>
+        ) : (
+          <EmptyState className="nx:bg-transparent">
+            <EmptyStateHeader>
+              <EmptyStateTitle asChild>
+                <h3>No matching contacts</h3>
+              </EmptyStateTitle>
+              <EmptyStateDescription>
+                Try another name or clear your search.
+              </EmptyStateDescription>
+            </EmptyStateHeader>
+            <EmptyStateContent>
+              <Button type="button" onClick={clearSearch}>
+                Clear search
+              </Button>
+            </EmptyStateContent>
+          </EmptyState>
+        )}
+      </section>
+    );
+  },
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+    await expect(canvas.getByRole('status')).toHaveTextContent(
+      '0 contacts found'
+    );
+    await userEvent.click(canvas.getByRole('button', { name: 'Clear search' }));
+    await expect(canvas.getByLabelText('Search contacts')).toHaveValue('');
+    await expect(canvas.getByLabelText('Search contacts')).toHaveFocus();
+    await expect(canvas.getAllByRole('listitem')).toHaveLength(2);
+    await expect(
+      canvas.queryByText('No matching contacts')
+    ).not.toBeInTheDocument();
+    await userEvent.type(canvas.getByLabelText('Search contacts'), 'Morgan');
+    await userEvent.tab();
+    await userEvent.keyboard('{Enter}');
+    await expect(canvas.getByRole('status')).toHaveTextContent(
+      '2 contacts found'
+    );
+    await expect(canvas.getByLabelText('Search contacts')).toHaveFocus();
+  },
 };
