@@ -26,6 +26,12 @@ const FRAMEWORKS = [
   { value: 'qwik', label: 'Qwik' },
 ];
 
+/**
+ * Optical centering slack for the `+N` chip label. Sub-pixel text metrics drift
+ * ~0.5px; losing the chip's flex centering drifts ~2.5px.
+ */
+const MAX_LABEL_DRIFT_PX = 1;
+
 function Frameworks({
   placeholder = 'Select frameworks',
   triggerClassName = 'nx:w-80',
@@ -162,6 +168,17 @@ export const OverflowCollapse: Story = {
     // Six chips overflow the 256px field, so measurement collapses the excess
     // into a visible `+N` badge.
     await waitFor(() => expect(canvas.getByText(/^\+\d+$/)).toBeVisible());
+
+    const overflow = canvasElement.querySelector<HTMLElement>(
+      '[data-slot="multi-select-overflow"]'
+    )!;
+    const box = overflow.getBoundingClientRect();
+    const range = document.createRange();
+    range.selectNodeContents(overflow);
+    const label = range.getBoundingClientRect();
+    expect(
+      Math.abs((label.top + label.bottom) / 2 - (box.top + box.bottom) / 2)
+    ).toBeLessThan(MAX_LABEL_DRIFT_PX);
   },
 };
 
