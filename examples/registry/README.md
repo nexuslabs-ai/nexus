@@ -107,6 +107,9 @@ Result:
   Removing `@source` drops them (negative control).
 - `nx:` classes written **outside** `components/nexus/` are not emitted.
   Host code styles its own layout with host utilities.
+- The host must load Tailwind 4 Preflight (every Tailwind or shadcn app
+  does). The `nx:` prefix keeps class names apart, but Nexus relies on
+  Preflight to remove the browser's element defaults.
 - Never use the registry `css` / `cssVars` fields: they write into the
   host's stylesheet, which is a different Tailwind compilation without
   `prefix(nx)`.
@@ -137,7 +140,7 @@ Probed with `getComputedStyle` on production builds (`vite preview`,
 | 6 | **Skew between the stylesheet and components fails silently.** #809-era checkbox styles use `nx:…border-border-error`, which main's stylesheet no longer emits. Typecheck and build pass; the error borders vanish. Only a class-completeness check catches it — run `audit:class-refs` (#790) over the installed fixture trees in CI. | #798 |
 | 7 | **Nexus follows a host `.dark` ancestor.** The `.dark` token block and `@custom-variant dark (&:is(.dark *))` match any host `.dark`, so Nexus surfaces go dark with the host. Without the provider, the primary Button stays near-black in dark (its `--nx-color-primary-background` default exists only as a self-reference plus `.dark`). | #796 |
 | 8 | **Portals inherit from the host `<body>`.** Dialog and Popover render into `document.body`, so they take the host's font, size and line-height. Nexus also mixes fonts: Button sets its own family, Card text inherits the host's. | #796 |
-| 9 | **Nexus needs Preflight.** With host CSS removed (`?nexus-only`), CardTitle (`<h3>`) gains 18px UA margins, `box-sizing` falls back to `content-box`, text falls back to Times and Progress loses its border style. Both fixtures have Tailwind Preflight, so they render correctly today. | #796 decision |
+| 9 | **Nexus needs Preflight.** With host CSS removed (`?nexus-only`), CardTitle (`<h3>`) gains 18px UA margins, `box-sizing` falls back to `content-box`, text falls back to Times and Progress loses its border style. **Decision (2026-09-29): hosts must have Tailwind 4 Preflight**; Nexus ships none. Both fixtures have it. | Contract |
 | 10 | **shadcn 4.21.0 ships `cn` as an npm package** (`shadcn-ui/cn`); host `lib/utils.ts` is `export { cn } from "cn"`. Nexus's `cn` is a custom `tailwind-merge` config that knows `nx:`, so Nexus ships its own `lib/utils.ts` and never imports the host's. | Contract |
 
 ### Scoped-root prototype
