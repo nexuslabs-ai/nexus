@@ -5,6 +5,7 @@ import { cva, type VariantProps } from 'class-variance-authority';
 
 import { IconX } from '../../lib/icons';
 import { cn } from '../../lib/utils';
+import { Button } from '../button';
 
 const alertVariants = cva('nx:group/alert nx:grid nx:w-full nx:px-6 nx:py-4', {
   variants: {
@@ -176,7 +177,7 @@ function AlertContent({ className, ...props }: AlertContentProps) {
       className={cn(
         'nx:flex nx:min-w-0 nx:flex-col nx:wrap-anywhere',
         'nx:group-data-[layout=inline]/alert:col-span-2 nx:group-data-[layout=inline]/alert:@lg/alert:col-span-1',
-        'nx:group-data-[layout=inline]/alert:group-has-[[data-slot=alert-close]]/alert:pr-10 nx:group-data-[layout=inline]/alert:group-has-[[data-slot=alert-close]]/alert:@lg/alert:pr-0',
+        'nx:group-data-[layout=inline]/alert:group-has-[[data-slot=alert-close]]/alert:pe-10 nx:group-data-[layout=inline]/alert:group-has-[[data-slot=alert-close]]/alert:@lg/alert:pe-0',
         className
       )}
       {...props}
@@ -280,14 +281,14 @@ interface AlertActionsProps extends React.ComponentProps<'div'> {}
 /**
  * AlertActions
  *
- * Holds one or two alert CTAs. Use the existing Button component for actions.
+ * Holds one or two alert CTAs. Use Button size="sm" to match AlertClose.
  * In stack layout, use button actions only. For dismissal controls, use
  * `layout="inline"` so `AlertClose` sits in the trailing action area.
  *
  * @example
  * ```tsx
  * <AlertActions>
- *   <Button variant="outline">Manage</Button>
+ *   <Button size="sm" variant="outline">Manage</Button>
  *   <AlertClose onClick={() => setShow(false)} />
  * </AlertActions>
  * ```
@@ -338,16 +339,12 @@ function AlertClose({
   ...props
 }: AlertCloseProps) {
   return (
-    <button
+    <Button
+      variant="ghost"
+      size="icon-sm"
       data-slot="alert-close"
       className={cn(
-        'nx:inline-flex nx:size-8 nx:shrink-0 nx:items-center nx:justify-center nx:rounded-sm nx:text-muted-foreground',
-        'nx:group-data-[layout=inline]/alert:absolute nx:group-data-[layout=inline]/alert:end-6 nx:group-data-[layout=inline]/alert:top-4 nx:group-data-[layout=inline]/alert:@lg/alert:static',
-        'nx:transition-control nx:hover:bg-container-hover nx:hover:text-foreground',
-        'nx:focus-visible:bg-container-hover nx:focus-visible:text-foreground',
-        'nx:focus-visible:outline-2 nx:focus-visible:outline-focus-default',
-        'nx:disabled:pointer-events-none nx:disabled:text-disabled-foreground',
-        'nx:[&_svg]:size-4 nx:[&_svg]:shrink-0',
+        'nx:shrink-0 nx:group-data-[layout=inline]/alert:absolute nx:group-data-[layout=inline]/alert:end-6 nx:group-data-[layout=inline]/alert:top-4 nx:group-data-[layout=inline]/alert:@lg/alert:static',
         className
       )}
       type={type}
@@ -359,7 +356,7 @@ function AlertClose({
           <span className="nx:sr-only">Dismiss alert</span>
         </>
       )}
-    </button>
+    </Button>
   );
 }
 

@@ -34,7 +34,8 @@ export default meta;
 type Story = StoryObj<typeof EmptyState>;
 
 export const Default: Story = {
-  render: function ContactCollection() {
+  args: { bordered: false },
+  render: function ContactCollection(args) {
     const [created, setCreated] = useState(false);
 
     if (created) {
@@ -55,7 +56,7 @@ export const Default: Story = {
     }
 
     return (
-      <EmptyState>
+      <EmptyState {...args}>
         <EmptyStateHeader>
           <EmptyStateMedia variant="icon">
             <IconUsers aria-hidden />
@@ -92,6 +93,7 @@ export const Default: Story = {
 
 // Header only — an empty state with no call to action.
 export const WithoutAction: Story = {
+  parameters: { controls: { disable: true } },
   render: () => (
     <EmptyState>
       <EmptyStateHeader>
@@ -108,6 +110,7 @@ export const WithoutAction: Story = {
 };
 
 export const TitleAsHeading: Story = {
+  parameters: { controls: { disable: true } },
   render: () => (
     <section aria-labelledby="empty-state-section-heading">
       <EmptyState>
@@ -140,6 +143,7 @@ export const TitleAsHeading: Story = {
 // Every structural part carries a data-slot hook; the media advertises its
 // variant.
 export const WithDataAttributes: Story = {
+  parameters: { controls: { disable: true } },
   render: () => (
     <EmptyState>
       <EmptyStateHeader>
@@ -178,6 +182,7 @@ export const WithDataAttributes: Story = {
 // Long copy stresses the centered text-balance wrapping; an inline link in the
 // description exercises the [&>a] anchor hooks — the only story that does.
 export const LongCopyWithLink: Story = {
+  parameters: { controls: { disable: true } },
   render: () => (
     <EmptyState>
       <EmptyStateHeader>
@@ -218,6 +223,7 @@ export const LongCopyWithLink: Story = {
 
 // The `bordered` prop renders the dashed frame and advertises via data-bordered.
 export const Bordered: Story = {
+  parameters: { controls: { disable: true } },
   render: () => (
     <EmptyState bordered>
       <EmptyStateHeader>
@@ -246,6 +252,7 @@ export const Bordered: Story = {
 // with an action, and the borderless default wrapper holding a larger glyph.
 // Reused by the per-base variant generator.
 export const AllVariants: Story = {
+  parameters: { controls: { disable: true } },
   render: () => (
     <div className="nx:flex nx:flex-col nx:gap-6">
       <EmptyState bordered>
@@ -282,6 +289,7 @@ export const AllVariants: Story = {
 };
 
 export const SearchRecovery: Story = {
+  parameters: { controls: { disable: true } },
   render: function SearchRecoveryExample() {
     const id = useId();
     const search = useRef<HTMLInputElement>(null);
@@ -351,5 +359,16 @@ export const SearchRecovery: Story = {
       '2 contacts found'
     );
     await expect(canvas.getByLabelText('Search contacts')).toHaveFocus();
+  },
+};
+
+export const ControlledBorder: Story = {
+  ...Default,
+  tags: ['!autodocs', '!dev'],
+  args: { bordered: true },
+  play: async ({ canvasElement }) => {
+    const root = canvasElement.querySelector('[data-slot="empty-state"]');
+    await expect(root).toHaveAttribute('data-bordered', 'true');
+    await expect(root).toHaveStyle({ borderStyle: 'dashed' });
   },
 };

@@ -91,11 +91,9 @@ const meta: Meta<typeof Alert> = {
           <h3 id="custom-close-icon">Custom close icon</h3>
           <Canvas of={CustomCloseIconLabel} />
           <p>
-            Give custom icon-only controls an accessible name. Text children can
-            supply their own name.
+            Give custom icon-only controls an accessible name. Use Nexus Button
+            for a visible text dismissal action.
           </p>
-          <h3 id="text-close-label">Text close label</h3>
-          <Canvas of={TextCloseLabel} />
           <h2 id="banners">Banners</h2>
           <p>
             The banner treatment has square corners and a bottom border. Its
@@ -267,10 +265,12 @@ function AlertPlaygroundExample({
       {hasActions ? (
         <AlertActions>
           {hasPrimaryAction ? (
-            <Button variant={primaryActionVariant}>{primaryActionLabel}</Button>
+            <Button size="sm" variant={primaryActionVariant}>
+              {primaryActionLabel}
+            </Button>
           ) : null}
           {hasSecondaryAction ? (
-            <Button variant={secondaryActionVariant}>
+            <Button size="sm" variant={secondaryActionVariant}>
               {secondaryActionLabel}
             </Button>
           ) : null}
@@ -339,7 +339,9 @@ export const Default: Story = {
         </AlertDescription>
       </AlertContent>
       <AlertActions>
-        <Button variant="outline">View details</Button>
+        <Button size="sm" variant="outline">
+          View details
+        </Button>
       </AlertActions>
     </Alert>
   ),
@@ -498,22 +500,42 @@ export const Playground: PlaygroundStory = {
     docs: {
       description: {
         story:
-          'Story-only controls render the recommended slot composition. They are not Alert props; production usage still composes icons, Button, AlertActions, and AlertClose as children. The visible action control changes by layout so stack omits AlertClose patterns while inline keeps them available.',
+          'Story-only controls render the recommended slot composition. They are not Alert props; production usage still composes icons, Button, AlertActions, and AlertClose as children. The visible action control changes by layout so stack omits AlertClose patterns while inline keeps them available. The copyable example includes dismissal state and a focus destination. Adjust its relative component imports to your copied Nexus paths and supply onManage from your application.',
       },
       source: {
-        code: `<Alert variant="information" layout="inline">
-  <AlertIcon>
-    <IconInfoCircle />
-  </AlertIcon>
-  <AlertContent>
-    <AlertTitle>Storage almost full</AlertTitle>
-    <AlertDescription>Uploads may fail soon.</AlertDescription>
-  </AlertContent>
-  <AlertActions>
-    <Button variant="outline">Manage</Button>
-    <AlertClose onClick={() => setVisible(false)} />
-  </AlertActions>
-</Alert>`,
+        code: `import { useState } from 'react';
+import { IconInfoCircle } from '@tabler/icons-react';
+import { Button } from '../button';
+import {
+  Alert, AlertActions, AlertClose, AlertContent,
+  AlertDescription, AlertIcon, AlertTitle,
+} from './alert';
+
+export function StorageAlert({ onManage }: { onManage: () => void }) {
+  const [visible, setVisible] = useState(true);
+
+  if (!visible) {
+    return (
+      <Button ref={(node) => node?.focus()} onClick={onManage}>
+        Manage storage
+      </Button>
+    );
+  }
+
+  return (
+    <Alert variant="information" layout="inline">
+      <AlertIcon><IconInfoCircle /></AlertIcon>
+      <AlertContent>
+        <AlertTitle>Storage almost full</AlertTitle>
+        <AlertDescription>Uploads may fail soon.</AlertDescription>
+      </AlertContent>
+      <AlertActions>
+        <Button size="sm" variant="outline" onClick={onManage}>Manage</Button>
+        <AlertClose onClick={() => setVisible(false)} />
+      </AlertActions>
+    </Alert>
+  );
+}`,
       },
     },
   },
@@ -718,6 +740,62 @@ export const InformationWithIcon: Story = {
   ),
 };
 
+export const DensityActionSizing: Story = {
+  tags: ['!autodocs', '!dev'],
+  render: () => (
+    <div className="nx:flex nx:w-full nx:flex-col nx:gap-4">
+      {[
+        'tight',
+        'compact',
+        'default',
+        'comfortable',
+        'relaxed',
+        'spacious',
+      ].map((density) => (
+        <div key={density} data-nx-density={density}>
+          <Alert layout="inline" variant="information">
+            <AlertIcon>
+              <IconInfoCircle />
+            </AlertIcon>
+            <AlertContent>
+              <AlertTitle>Invitation ready</AlertTitle>
+              <AlertDescription>
+                Review the invitation before sending.
+              </AlertDescription>
+            </AlertContent>
+            <AlertActions>
+              <Button size="sm" startIcon={<IconCircleCheck />}>
+                Send
+              </Button>
+              <Button
+                size="sm"
+                variant="outline"
+                startIcon={<IconInfoCircle />}
+              >
+                Review
+              </Button>
+              <AlertClose />
+            </AlertActions>
+          </Alert>
+        </div>
+      ))}
+    </div>
+  ),
+  play: async ({ canvasElement }) => {
+    await expect(
+      canvasElement.querySelectorAll('[data-slot="alert"]')
+    ).toHaveLength(6);
+    for (const alert of canvasElement.querySelectorAll('[data-slot="alert"]')) {
+      const close = alert.querySelector('[data-slot="alert-close"]')!;
+      for (const button of alert.querySelectorAll('[data-slot="button"]')) {
+        await expect(button.getBoundingClientRect().height).toBe(
+          close.getBoundingClientRect().height
+        );
+      }
+    }
+  },
+};
+
 export const SuccessWithIcon: Story = {
   tags: ['!autodocs', '!dev'],
   args: {
@@ -883,7 +961,7 @@ function TextDismissExample(props: React.ComponentProps<typeof Alert>) {
             </AlertDescription>
           </AlertContent>
           <AlertActions>
-            <Button type="button" variant="ghost" onClick={dismiss}>
+            <Button size="sm" type="button" variant="ghost" onClick={dismiss}>
               Dismiss
             </Button>
           </AlertActions>
@@ -957,7 +1035,9 @@ export const InlineAction: Story = {
         <AlertDescription>Uploads may fail soon.</AlertDescription>
       </AlertContent>
       <AlertActions>
-        <Button variant="outline">Manage</Button>
+        <Button size="sm" variant="outline">
+          Manage
+        </Button>
       </AlertActions>
     </Alert>
   ),
@@ -1006,8 +1086,10 @@ export const ActionsBelowDescription: Story = {
         </AlertDescription>
       </AlertContent>
       <AlertActions>
-        <Button>Upgrade</Button>
-        <Button variant="outline">View usage</Button>
+        <Button size="sm">Upgrade</Button>
+        <Button size="sm" variant="outline">
+          View usage
+        </Button>
       </AlertActions>
     </Alert>
   ),
@@ -1031,7 +1113,9 @@ export const InlineActionsWithClose: Story = {
           </AlertDescription>
         </AlertContent>
         <AlertActions>
-          <Button variant="outline">View release</Button>
+          <Button size="sm" variant="outline">
+            View release
+          </Button>
           <AlertClose />
         </AlertActions>
       </Alert>
@@ -1095,6 +1179,43 @@ export const InlineActionsWithClose: Story = {
   },
 };
 
+export const RightToLeftClose: Story = {
+  tags: ['!autodocs', '!dev'],
+  render: () => (
+    <div dir="rtl" className="nx:w-80 nx:max-w-full">
+      <Alert layout="inline" variant="information">
+        <AlertIcon>
+          <IconInfoCircle />
+        </AlertIcon>
+        <AlertContent>
+          <AlertTitle>Workspace invitation ready for review</AlertTitle>
+          <AlertDescription>
+            Review the invitation before sending it to your team.
+          </AlertDescription>
+        </AlertContent>
+        <AlertActions>
+          <AlertClose />
+        </AlertActions>
+      </Alert>
+    </div>
+  ),
+  play: async ({ canvasElement }) => {
+    const close = within(canvasElement).getByRole('button', {
+      name: 'Dismiss alert',
+    });
+    const content = canvasElement.querySelector<HTMLElement>(
+      '[data-slot="alert-content"]'
+    )!;
+    await expect(close).toHaveAttribute('data-size', 'icon-sm');
+    await expect(close).toHaveAttribute('data-variant', 'ghost');
+    await expect(close.getBoundingClientRect().right).toBeLessThanOrEqual(
+      content.getBoundingClientRect().left +
+        parseFloat(getComputedStyle(content).paddingLeft)
+    );
+    await expect(parseFloat(getComputedStyle(content).paddingRight)).toBe(0);
+  },
+};
+
 export const DisabledClose: Story = {
   tags: ['!autodocs', '!dev'],
   args: {
@@ -1113,7 +1234,9 @@ export const DisabledClose: Story = {
         </AlertDescription>
       </AlertContent>
       <AlertActions>
-        <Button variant="outline">View release</Button>
+        <Button size="sm" variant="outline">
+          View release
+        </Button>
         <AlertClose disabled />
       </AlertActions>
     </Alert>
@@ -1148,7 +1271,9 @@ export const BannerInlineActions: Story = {
         </AlertDescription>
       </AlertContent>
       <AlertActions>
-        <Button variant="outline">Review</Button>
+        <Button size="sm" variant="outline">
+          Review
+        </Button>
         <AlertClose />
       </AlertActions>
     </Alert>
@@ -1222,38 +1347,6 @@ export const CustomCloseIconLabel: Story = {
   },
 };
 
-export const TextCloseLabel: Story = {
-  args: {
-    layout: 'inline',
-    variant: 'information',
-  },
-  render: (args) => (
-    <Alert {...args} className="nx:max-w-xl">
-      <AlertIcon>
-        <IconInfoCircle />
-      </AlertIcon>
-      <AlertContent>
-        <AlertTitle>Text close control</AlertTitle>
-        <AlertDescription>
-          Text children self-label, so the button keeps its visible name.
-        </AlertDescription>
-      </AlertContent>
-      <AlertActions>
-        <AlertClose className="nx:size-auto nx:px-2 nx:typography-label-small">
-          Close
-        </AlertClose>
-      </AlertActions>
-    </Alert>
-  ),
-  play: async ({ canvasElement }) => {
-    const canvas = within(canvasElement);
-    const close = canvas.getByRole('button', { name: 'Close' });
-
-    await expect(close).toBeInTheDocument();
-    await expect(close).not.toHaveAttribute('aria-label');
-  },
-};
-
 // ============================================
 // DATA ATTRIBUTES TESTS
 // ============================================
@@ -1299,7 +1392,9 @@ export const ActionSlotDataAttributes: Story = {
         <AlertDescription>Uploads may fail soon.</AlertDescription>
       </AlertContent>
       <AlertActions>
-        <Button variant="outline">Manage</Button>
+        <Button size="sm" variant="outline">
+          Manage
+        </Button>
         <AlertClose />
       </AlertActions>
     </Alert>
@@ -1459,6 +1554,7 @@ export const AllVariants: Story = {
     </div>
   ),
   parameters: {
+    controls: { disable: true },
     layout: 'padded',
   },
 };
@@ -1555,6 +1651,7 @@ export const AllBannerVariants: Story = {
     </div>
   ),
   parameters: {
+    controls: { disable: true },
     layout: 'padded',
   },
 };
