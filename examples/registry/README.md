@@ -36,10 +36,10 @@ registry output so the core pack's `../registry/.generated/` path still
 resolves, and run it there:
 
 ```bash
-mkdir -p "$TMPDIR/nexus-fixtures/registry"
-cp -R examples/registry/.generated "$TMPDIR/nexus-fixtures/registry/"
-cp -R examples/copy-vite "$TMPDIR/nexus-fixtures/"
-cd "$TMPDIR/nexus-fixtures/copy-vite"
+dir=$(mktemp -d) && mkdir "$dir/registry"
+cp -R examples/registry/.generated "$dir/registry/"
+cp -R examples/copy-vite "$dir/"
+cd "$dir/copy-vite"
 npm ci
 npm run nexus:add
 npm run typecheck
