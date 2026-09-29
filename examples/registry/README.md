@@ -31,7 +31,7 @@ python3 -m http.server 4400 -d examples/registry/.generated
 Then copy each fixture out of the repository and run it there:
 
 ```bash
-cp -R examples/copy-vite "$TMPDIR/copy-vite" && cd "$TMPDIR/copy-vite"
+dir=$(mktemp -d) && cp -R examples/copy-vite "$dir/" && cd "$dir/copy-vite"
 npm ci
 npm run nexus:add
 npm run typecheck

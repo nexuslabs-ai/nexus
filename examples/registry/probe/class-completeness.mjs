@@ -12,7 +12,14 @@ if (!treeDir) {
 
 const escapeClass = (name) =>
   [...name].map((c) => (/[\w-]/.test(c) || c.charCodeAt(0) > 127 ? c : `\\${c}`)).join('');
-const emits = (css, name) => css.includes(`.${escapeClass(name)}`);
+const continuesClass = (c) => c !== undefined && (/[\w\\-]/.test(c) || c.charCodeAt(0) > 127);
+const emits = (css, name) => {
+  const selector = `.${escapeClass(name)}`;
+  for (let at = css.indexOf(selector); at !== -1; at = css.indexOf(selector, at + 1)) {
+    if (!continuesClass(css[at + selector.length])) return true;
+  }
+  return false;
+};
 
 const fixtureCss = readFileSync(fixtureCssPath, 'utf8');
 const oracleCss = readFileSync(oracleCssPath, 'utf8');
