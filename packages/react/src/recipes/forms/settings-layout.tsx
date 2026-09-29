@@ -3,12 +3,30 @@ import * as React from 'react';
 import { Button } from '../../components/button';
 import { FieldError } from '../../components/field';
 
-export type Values = { name: string; email: string; updates: boolean };
-type Save = (values: Values) => Promise<void>;
-export type Props = { initialValues: Values; onSave: Save };
+export type SettingsValues = { name: string; email: string; updates: boolean };
+export type SettingsFormProps = {
+  initialValues: SettingsValues;
+  onSave: (values: SettingsValues) => Promise<void>;
+};
+
 export const failureMessage =
   'We could not save your changes. Your edits are still here. Try again.';
-export function normalized(values: Values): Values {
+
+// The WHATWG "valid email address" production, matching native type="email".
+const EMAIL_PATTERN =
+  /^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?(?:\.[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)*$/;
+
+export function validateName(value: string) {
+  return value.trim() ? undefined : 'Enter your name.';
+}
+
+export function validateEmail(value: string) {
+  return EMAIL_PATTERN.test(value.trim())
+    ? undefined
+    : 'Enter a valid email address.';
+}
+
+export function normalized(values: SettingsValues): SettingsValues {
   return { ...values, name: values.name.trim(), email: values.email.trim() };
 }
 

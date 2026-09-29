@@ -6,17 +6,19 @@ initial values and a save callback from your application.
 
 ## Choose one implementation
 
-| Need                                                  | Copy                                            | Additional dependency       |
-| ----------------------------------------------------- | ----------------------------------------------- | --------------------------- |
-| A small settings form with local React state          | `settings-form.tsx`                             | None beyond Nexus and React |
-| Your app uses React Hook Form                         | `react-hook-form.tsx` and `settings-layout.tsx` | `react-hook-form` 7         |
-| Your app uses TanStack Form                           | `tanstack-form.tsx` and `settings-layout.tsx`   | `@tanstack/react-form` 1    |
-| Read-only details or temporarily unavailable settings | `settings-display.tsx`                          | None beyond Nexus and React |
+| Need                                                  | Copy                                                                   | Additional dependency       |
+| ----------------------------------------------------- | ---------------------------------------------------------------------- | --------------------------- |
+| A small settings form with local React state          | `settings-form.tsx`, `settings-layout.tsx` and `settings-fields.tsx`   | None beyond Nexus and React |
+| Your app uses React Hook Form                         | `react-hook-form.tsx`, `settings-layout.tsx` and `settings-fields.tsx` | `react-hook-form` 7         |
+| Your app uses TanStack Form                           | `tanstack-form.tsx`, `settings-layout.tsx` and `settings-fields.tsx`   | `@tanstack/react-form` 1    |
+| Read-only details or temporarily unavailable settings | `settings-display.tsx`                                                 | None beyond Nexus and React |
 
 Do not combine the three editable forms. They demonstrate the same interaction
 using different state owners. Keep only the implementation your application uses.
-The shared layout contains presentation and simple value normalization; each
-integration owns its own validation and submission lifecycle.
+`settings-layout.tsx` holds the shared contract (`SettingsValues`,
+`SettingsFormProps`), the validation rules, value normalization and the
+status/Save/Cancel shell. `settings-fields.tsx` renders the fields from
+per-field bindings. Each form owns its own state and submission lifecycle.
 
 ## Connect application data
 
@@ -58,7 +60,8 @@ The relative imports assume this repository's `recipes/forms` and `components`
 layout. When copying into an app, update those paths to its Nexus components;
 include their helpers and Nexus styles. This is source reuse inside the current
 Nexus setup, not a claim that a standalone installer is complete. External
-installation and theme isolation are tracked by the separate adoption work.
+installation and theme isolation are tracked in
+[#794](https://github.com/nexuslabs-ai/nexus/issues/794).
 
 `Patterns/Forms and Settings` shows local state, read-only and disabled examples.
 `Patterns/Form Integrations` shows the two library integrations. Their stories

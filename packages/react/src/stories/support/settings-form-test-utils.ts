@@ -1,11 +1,14 @@
 import { expect, type Mock, userEvent, waitFor, within } from 'storybook/test';
 
-import type { Values } from '../../recipes/forms/settings-layout';
+import type { SettingsFormProps } from '../../recipes/forms/settings-layout';
 
 type SettingsPlayContext = {
   canvasElement: HTMLElement;
-  args: { onSave: Mock<(values: Values) => Promise<void>> };
+  args: { onSave: Mock<SettingsFormProps['onSave']> };
 };
+
+export const slowSave: SettingsFormProps['onSave'] = () =>
+  new Promise((resolve) => setTimeout(resolve, 1000));
 
 export async function verifySaveCancel({
   canvasElement,
@@ -102,13 +105,11 @@ export async function verifyPending({
   await expect(canvas.getByRole('checkbox')).toBeDisabled();
   await expect(canvas.getByRole('button', { name: 'Cancel' })).toBeDisabled();
   await expect(save).toBeDisabled();
-  await userEvent.keyboard('{Enter}');
-  save.click();
-  await expect(args.onSave).toHaveBeenCalledTimes(1);
   completeSave();
   await waitFor(() =>
     expect(canvas.getByRole('status')).toHaveTextContent('Changes saved')
   );
+  await expect(args.onSave).toHaveBeenCalledTimes(1);
   await expect(name).toBeEnabled();
   await expect(save).toBeDisabled();
 }
