@@ -76,12 +76,10 @@ export function TanStackSettingsForm({
   }
   function changeName(event: React.ChangeEvent<HTMLInputElement>) {
     name.handleChange(event.target.value);
-    name.setErrorMap({ onSubmit: undefined });
     clearFeedback();
   }
   function changeEmail(event: React.ChangeEvent<HTMLInputElement>) {
     email.handleChange(event.target.value);
-    email.setErrorMap({ onSubmit: undefined });
     clearFeedback();
   }
   function changeUpdates(checked: boolean) {
