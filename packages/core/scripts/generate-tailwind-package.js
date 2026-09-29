@@ -44,6 +44,7 @@ import {
   generateTypographyUtilitiesCSS,
   getGoogleFontsImportFromTokens,
   log,
+  nexusRootSelectors,
   parseArgs,
   partitionThemedModes,
   readTokenFile,
@@ -63,7 +64,7 @@ async function loadDistRuntimeEngine() {
 /**
  * Get primitive file paths based on discovered structure and config.
  * For themed categories (mode names matching `${base}-{light|dark}`), returns
- * both light and dark paths so the bundled output can emit a `.dark` override
+ * both light and dark paths so the bundled output can emit a dark-root override
  * block in variables.css.
  */
 function getPrimitiveFiles(discovered, config) {
@@ -171,11 +172,14 @@ function assertTokenEngine(engine) {
     typeof engine.createNexusThemeContract !== 'function' ||
     typeof engine.isColor !== 'function' ||
     !engine.DEFAULT_NEXUS_APPEARANCE ||
+    !engine.NEXUS_APPEARANCE_ATTRIBUTE_FIELDS ||
+    typeof engine.NEXUS_ROOT_ATTRIBUTE !== 'string' ||
+    typeof engine.NEXUS_MODE_ATTRIBUTE !== 'string' ||
     !Array.isArray(engine.BASE_TONE_OPTIONS) ||
     !Array.isArray(engine.SEMANTIC_TOKEN_REGISTRY)
   ) {
     throw new Error(
-      'generateTailwindPackage: token engine must provide deriveTheme, createNexusThemeContract, isColor, DEFAULT_NEXUS_APPEARANCE, BASE_TONE_OPTIONS, and SEMANTIC_TOKEN_REGISTRY.'
+      'generateTailwindPackage: token engine must provide deriveTheme, createNexusThemeContract, isColor, DEFAULT_NEXUS_APPEARANCE, NEXUS_APPEARANCE_ATTRIBUTE_FIELDS, NEXUS_ROOT_ATTRIBUTE, NEXUS_MODE_ATTRIBUTE, BASE_TONE_OPTIONS, and SEMANTIC_TOKEN_REGISTRY.'
     );
   }
 
@@ -286,7 +290,7 @@ function loadTokensWithNxPrefix(filePath, primitiveMap, tokenList, category) {
 /**
  * Load dark themed primitive tokens into a separate list. The light-side
  * primitiveMap is the canonical resolution map, so dark tokens do not write
- * to it; they only contribute the `.dark` override declarations. References
+ * to it; they only contribute the dark-root override declarations. References
  * are stored raw and resolved against the fully-populated primitiveMap by
  * `resolveDarkReferences` after all primitive categories have loaded.
  */
@@ -354,7 +358,7 @@ function resolveCrossPrimitiveReferences(tokenList, primitiveMap) {
 
 /**
  * Process all primitive tokens with --nx-* prefix.
- * Returns light tokens (for `:root`), dark tokens (for `.dark` override block),
+ * Returns light tokens (for the root), dark tokens (for the dark-root block),
  * the resolved primitive map, and the chosen mode per category for logging.
  */
 function processPrimitivesWithNxPrefix(discovered, config) {
@@ -415,17 +419,21 @@ function groupByCategory(tokens) {
 }
 
 /**
- * Generate variables.css with --nx-* prefixed primitives.
- * Themed dark variants emit into a `.dark` block that overrides `:root` when
- * an ancestor carries the `.dark` class (matching the @custom-variant selector
- * used in nexus.css).
+ * Generate variables.css with --nx-* prefixed primitives on the Nexus root,
+ * in `@layer theme`. Themed dark variants apply on a root in dark mode.
  */
-function generateVariablesCSS(primitiveTokens, divergentDark, usedModes) {
+function generateVariablesCSS(
+  primitiveTokens,
+  divergentDark,
+  usedModes,
+  selectors
+) {
   let css = `/* ===== NEXUS DESIGN SYSTEM - PRIMITIVE VARIABLES ===== */\n`;
   css += `/* Auto-generated - DO NOT EDIT */\n`;
   css += `/* All primitives use --nx-* prefix for namespace isolation */\n\n`;
 
-  css += `:root {\n`;
+  css += `@layer theme {\n`;
+  css += `${selectors.root} {\n`;
   const lightCategories = groupByCategory(primitiveTokens);
   for (const [category, tokens] of Object.entries(lightCategories)) {
     if (tokens.length === 0) continue;
@@ -439,7 +447,7 @@ function generateVariablesCSS(primitiveTokens, divergentDark, usedModes) {
   css += `}\n`;
 
   if (divergentDark.length > 0) {
-    css += `\n.dark {\n`;
+    css += `\n${selectors.dark} {\n`;
     const darkCategories = groupByCategory(divergentDark);
     for (const [category, tokens] of Object.entries(darkCategories)) {
       if (tokens.length === 0) continue;
@@ -454,6 +462,7 @@ function generateVariablesCSS(primitiveTokens, divergentDark, usedModes) {
     }
     css += `}\n`;
   }
+  css += `}\n`;
 
   return css;
 }
@@ -461,10 +470,10 @@ function generateVariablesCSS(primitiveTokens, divergentDark, usedModes) {
 /**
  * Generate nexus.css using shared generateThemeCSS function.
  *
- * `spacingDefault` controls which mode lands under `:root, [data-density="X"]`
- * (i.e. which mode applies when no `data-density` attribute is set). All six
- * modes still ship in the bundle either way — the other five emit as plain
- * `[data-density="X"]` blocks. The @theme numeric subset always comes from the
+ * `spacingDefault` controls which mode lands under
+ * `[data-nexus-root], [data-nx-density="X"]` (i.e. which mode applies when no
+ * `data-nx-density` attribute is set). All six modes still ship in the bundle
+ * either way — the other five emit as plain `[data-nx-density="X"]` blocks. The @theme numeric subset always comes from the
  * canonical default baseline because @theme drives Tailwind's utility codegen
  * (build-time); the cascade flip happens at runtime via the per-mode blocks.
  */
@@ -475,7 +484,8 @@ function generateNexusCSS(
   usedModes,
   spacingModes,
   spacingDefault,
-  runtimeModes
+  runtimeModes,
+  selectors
 ) {
   // Get Google Fonts import
   const typographyMode = usedModes.typography || 'default';
@@ -493,7 +503,7 @@ function generateNexusCSS(
 
   // Per-mode spacing — default numerics seed @theme for Tailwind's spacing-utility
   // codegen (nx:p-*, nx:m-*, nx:gap-*, nx:h-*, nx:w-*). The per-mode override
-  // blocks live outside @theme in `:root, [data-density="X"]` form (see below);
+  // blocks live outside @theme in `[data-nexus-root], [data-nx-density="X"]` form;
   // role tokens are not registered in @theme — they're consumed by the
   // separately-emitted spacing-utilities.css.
   const { numeric: defaultSpacingNumeric } = splitSpacingTokens(
@@ -518,9 +528,11 @@ function generateNexusCSS(
 /* Auto-generated - DO NOT EDIT */
 /* Uses nx: prefix for all utility classes */
 /*
- * Uses @theme for static scales and @theme inline for semantic colours so
- * generated utilities can fall back statically while accepting runtime
- * --nx-color-* overrides from NexusAppearanceProvider.
+ * Styles apply inside an element marked data-nexus-root; nothing here targets
+ * :root, html, body or the host's own classes. Ships no Preflight: the host
+ * must load Tailwind 4 Preflight. Colour utilities read the runtime
+ * --nx-color-* value (NexusRoot / NexusAppearanceProvider) and fall back to
+ * the root's --nx-default-color-*.
  */
 
 `;
@@ -550,39 +562,43 @@ function generateNexusCSS(
     zIndexTokens,
     breakpointTokens,
     darkSemanticTokens,
-    darkSelector: '.dark',
-    prefixDarkVars: true, // Use --nx-color-* for dark mode overrides
+    selectors,
   });
 
-  // Per-mode spacing override blocks (`:root, [data-density="<default>"]` for
-  // the consumer-chosen default + plain `[data-density="X"]` for the others).
-  // Lives outside @theme so the cascade can pick the active mode at runtime
-  // via the `data-density` attribute on any ancestor.
-  css += generateSpacingModesCSS(spacingModes, { defaultMode: spacingDefault });
+  // Per-mode override blocks: the default mode on any root, the others through
+  // the root attribute on any ancestor. Outside @theme so the cascade picks
+  // the active mode at runtime.
+  const { attributeFor } = selectors;
+  css += generateSpacingModesCSS(spacingModes, {
+    defaultMode: spacingDefault,
+    attrName: attributeFor.density,
+    selectors,
+  });
   css += generateSpacingModesCSS(runtimeModes.radiusModes, {
     defaultMode: usedModes.radius || DEFAULT_CONFIG.radius,
-    attrName: 'data-radius',
+    attrName: attributeFor.corners,
+    selectors,
     commentLabel: 'RADIUS',
     duplicateValuePrefix: null,
   });
   css += generateThemedModesCSS(runtimeModes.shadowModes, {
     defaultMode: usedModes.shadow || DEFAULT_CONFIG.shadow,
-    attrName: 'data-shadow',
+    attrName: attributeFor.elevation,
+    selectors,
     commentLabel: 'SHADOW',
   });
   css += generateSpacingModesCSS(runtimeModes.borderwidthModes, {
     defaultMode: usedModes.borderwidth || DEFAULT_CONFIG.borderwidth,
-    attrName: 'data-borderwidth',
+    attrName: attributeFor.stroke,
+    selectors,
     commentLabel: 'BORDER WIDTH',
     duplicateValuePrefix: null,
   });
 
-  css += generateNativeBrowserUIThemeCSS();
+  css += generateNativeBrowserUIThemeCSS(selectors);
   css += generateAutofillUtilitiesCSS();
   css += generateSurfaceUtilitiesCSS();
-
-  // Add base layer
-  css += generateBaseLayerCSS();
+  css += generateBaseLayerCSS(selectors);
 
   return css;
 }
@@ -633,10 +649,12 @@ export async function generateTailwindPackage(
     primitiveTokens,
     darkPrimitiveTokens
   );
+  const selectors = nexusRootSelectors(tokenEngine);
   const variablesCSS = generateVariablesCSS(
     primitiveTokens,
     divergentDark,
-    usedModes
+    usedModes,
+    selectors
   );
   writeDistFile('variables.css', variablesCSS);
 
@@ -684,7 +702,7 @@ export async function generateTailwindPackage(
   writeDistFile('motion-utilities.css', motionUtilities.css);
   log.success(`Generated ${motionUtilities.count} motion duration utilities`);
 
-  // `spacingDefault` controls which mode lands under `:root, [data-density="X"]`.
+  // `spacingDefault` controls which mode lands under `[data-nexus-root], [data-nx-density="X"]`.
   // Falls back to the canonical baseline so older config objects without the
   // key (or hand-rolled test fixtures) still produce a valid build.
   const spacingDefault =
@@ -701,7 +719,8 @@ export async function generateTailwindPackage(
     usedModes,
     spacingModes,
     spacingDefault,
-    runtimeModes
+    runtimeModes,
+    selectors
   );
   writeDistFile('nexus.css', nexusCSS);
 

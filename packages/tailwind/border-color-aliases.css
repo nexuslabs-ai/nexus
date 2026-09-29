@@ -1,69 +1,99 @@
 /* Border Color Alias Utilities */
 
 @utility border-color-default {
-  border-color: var(--nx-color-border-default, oklch(0.1448 0 0 / 0.0884));
+  border-color: var(
+    --nx-color-border-default,
+    var(--nx-default-color-border-default)
+  );
 }
 
 @utility border-color-default-alpha {
   border-color: var(
     --nx-color-border-default-alpha,
-    oklch(0.13 0.003 70 / 0.0884)
+    var(--nx-default-color-border-default-alpha)
   );
 }
 
 @utility border-color-focus {
-  border-color: var(--nx-color-border-focus, oklch(0.7876 0.002 70));
+  border-color: var(
+    --nx-color-border-focus,
+    var(--nx-default-color-border-focus)
+  );
 }
 
 @utility border-color-disabled {
-  border-color: var(--nx-color-border-disabled, oklch(0.1448 0 0 / 0.0884));
+  border-color: var(
+    --nx-color-border-disabled,
+    var(--nx-default-color-border-disabled)
+  );
 }
 
 @utility border-color-warning {
-  border-color: var(--nx-color-warning-border, oklch(0.91 0.0819 70.697));
+  border-color: var(
+    --nx-color-warning-border,
+    var(--nx-default-color-warning-border)
+  );
 }
 
 @utility border-color-warning-active {
   border-color: var(
     --nx-color-border-warning-active,
-    oklch(0.78 0.1803 55.934)
+    var(--nx-default-color-border-warning-active)
   );
 }
 
 @utility border-color-success {
-  border-color: var(--nx-color-success-border, oklch(0.925 0.1596 139.892));
+  border-color: var(
+    --nx-color-success-border,
+    var(--nx-default-color-success-border)
+  );
 }
 
 @utility border-color-success-active {
   border-color: var(
     --nx-color-border-success-active,
-    oklch(0.79 0.2864 140.349)
+    var(--nx-default-color-border-success-active)
   );
 }
 
 @utility border-color-error {
-  border-color: var(--nx-color-error-border, oklch(0.885 0.0747 27.394));
+  border-color: var(
+    --nx-color-error-border,
+    var(--nx-default-color-error-border)
+  );
 }
 
 @utility border-color-error-active {
-  border-color: var(--nx-color-border-error-active, oklch(0.704 0.2267 27.842));
+  border-color: var(
+    --nx-color-border-error-active,
+    var(--nx-default-color-border-error-active)
+  );
 }
 
 @utility border-color-information {
-  border-color: var(--nx-color-information-border, oklch(0.882 0.0612 253.613));
+  border-color: var(
+    --nx-color-information-border,
+    var(--nx-default-color-information-border)
+  );
 }
 
 @utility border-color-information-active {
   border-color: var(
     --nx-color-border-information-active,
-    oklch(0.707 0.1599 255.225)
+    var(--nx-default-color-border-information-active)
   );
 }
 
 @utility border-color-primary {
-  border-color: var(--nx-color-primary-border, oklch(0.87 0 0));
+  border-color: var(
+    --nx-color-primary-border,
+    var(--nx-default-color-primary-border)
+  );
 }
 
 @utility border-color-primary-active {
-  border-color: var(--nx-color-primary-border-active, oklch(0.66 0 0));
+  border-color: var(
+    --nx-color-primary-border-active,
+    var(--nx-default-color-primary-border-active)
+  );
 }

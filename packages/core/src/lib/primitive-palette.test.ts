@@ -16,8 +16,10 @@ const variablesCss = readFileSync(
 );
 
 function emittedPrimitiveShades(css: string): Map<string, Map<string, string>> {
-  const rootBlock = /:root\s*\{([^}]*)\}/.exec(css)?.[1];
-  if (rootBlock === undefined) throw new Error('variables.css has no :root');
+  const rootBlock = /\[data-nexus-root\]\s*\{([^}]*)\}/.exec(css)?.[1];
+  if (rootBlock === undefined) {
+    throw new Error('variables.css has no [data-nexus-root] block');
+  }
   const families = new Map<string, Map<string, string>>();
   for (const [, family, shade, value] of rootBlock.matchAll(
     /--nx-color-([a-z]+)-(\d+):\s*([^;]+);/g

@@ -1,6 +1,8 @@
 /* Nexus design tokens + Tailwind utilities (nx: prefix).
    @nexus_ds/tailwind is the SINGLE source of token definitions. */
 @import '@nexus_ds/tailwind';
+/* The docs app is the host: Nexus ships no Preflight. */
+@import 'tailwindcss/preflight.css' layer(base);
 /* Animations used by Dialog / Dropdown / Select / Tooltip */
 @import 'tw-animate-css';
 

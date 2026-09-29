@@ -121,7 +121,7 @@ export function discoverPrimitives(primitivesDir) {
 
 /**
  * Find the per-mode spacing files in `semantic/`. Their values are direct px
- * (no `{N}` refs) and emit per-mode `[data-density="X"]` blocks via
+ * (no `{N}` refs) and emit per-mode `[data-nx-density="X"]` blocks via
  * `collectSpacingTokens`. Every other semantic file is read by a collector
  * that names it directly.
  *
@@ -188,7 +188,7 @@ export function partitionThemedModes(modes) {
 /**
  * Return dark tokens whose value diverges from the light token sharing the same
  * cssName. Dark tokens identical to their light counterpart would emit redundant
- * `.dark` (or `html.dark`) overrides; filtering keeps the override block honest.
+ * dark-root overrides; filtering keeps the override block honest.
  */
 export function filterDivergentDark(lightTokens, darkTokens) {
   const lightByName = new Map(lightTokens.map((t) => [t.cssName, t.value]));
@@ -448,7 +448,7 @@ export function generateBorderColorAliasUtilitiesCSS(tokens) {
 
   for (const { token, name } of borderColorTokens) {
     css += `@utility border-color-${name} {\n`;
-    const value = `var(--nx-${token.cssName}, ${token.value})`;
+    const value = `var(--nx-${token.cssName}, var(--nx-default-${token.cssName}))`;
     css += `  border-color: ${value};\n`;
     css += `}\n\n`;
   }
@@ -539,11 +539,23 @@ export function collectSpacingTokens(semanticDir) {
   return result;
 }
 
+// Per-mode blocks declare already-prefixed names (`--nx-spacing-N`): Tailwind's
+// `prefix(nx)` rewrites variables only inside @theme, and compiled utilities
+// read the prefixed form.
+function writeModeBlock(selector, tokens) {
+  let block = `\n  ${selector} {\n`;
+  for (const token of tokens) {
+    block += `    --nx-${token.cssName}: ${token.value};\n`;
+  }
+  return `${block}  }\n`;
+}
+
 /**
- * Emit per-mode `[data-density="X"]` CSS blocks for spacing.
+ * Emit per-mode `[data-nx-density="X"]` CSS blocks for spacing, in `@layer theme`.
  *
- * The selected default mode is published under `:root, [data-density="<mode>"]`
- * so any document with no `data-density` attribute still resolves to it. The
+ * The selected default mode is published under
+ * `[data-nexus-root], [data-nx-density="<mode>"]` so a root with no
+ * `data-nx-density` attribute still resolves to it. The
  * remaining five modes emit in alphabetical order for cross-platform
  * determinism (filesystem order isn't portable; sorting locks it).
  *
@@ -552,25 +564,20 @@ export function collectSpacingTokens(semanticDir) {
  * non-default modes ≈ 300 lines) and the explicitness is the point: a reader
  * sees the full per-mode contract in one place.
  *
- * Variable names are emitted already-prefixed (`--nx-spacing-N`,
- * `--nx-container-p`, …). Tailwind v4's `prefix(nx)` rewrites variables
- * inside `@theme` but does NOT rewrite variables declared in `:root` /
- * attribute-selector blocks, so writing the prefixed form here is what makes
- * mode-switching actually override the utility's `var(--nx-spacing-N)`
- * reference. (Mirrors `prefixDarkVars: true` in the `.dark` block.)
- *
  * @param {Record<string, {cssName: string, value: string}[]>} modesByName
- * @param {object} [opts]
+ * @param {object} opts
  * @param {string} [opts.defaultMode=CANONICAL_SPACING_DEFAULT_MODE]
- * @param {string} [opts.attrName='data-density']
+ * @param {string} opts.attrName - The root attribute that selects the mode
+ * @param {{ root: string }} opts.selectors - From `nexusRootSelectors`
  * @param {string} [opts.commentLabel='SPACING']
  * @param {string} [opts.duplicateValuePrefix='spacing-']
  * @returns {string} CSS string with all per-mode blocks
  */
-export function generateSpacingModesCSS(modesByName, opts = {}) {
+export function generateSpacingModesCSS(modesByName, opts) {
   const {
     defaultMode = CANONICAL_SPACING_DEFAULT_MODE,
-    attrName = 'data-density',
+    attrName,
+    selectors,
     commentLabel = 'SPACING',
     duplicateValuePrefix = 'spacing-',
   } = opts;
@@ -609,23 +616,15 @@ export function generateSpacingModesCSS(modesByName, opts = {}) {
 
   let css = `\n/* ===== PER-MODE ${commentLabel} (mode swap via [${attrName}="X"] on any ancestor) ===== */\n`;
 
-  // Per-mode blocks live OUTSIDE @theme — Tailwind v4's `prefix(nx)` only
-  // rewrites variables declared inside @theme, so we add the `nx-` prefix
-  // here so the declarations actually override the `var(--nx-spacing-*)` /
-  // `var(--nx-container-*)` etc. references in compiled utilities.
-  const writeBlock = (selector, tokens) => {
-    let block = `${selector} {\n`;
-    for (const token of tokens) {
-      block += `  --nx-${token.cssName}: ${token.value};\n`;
-    }
-    block += `}\n`;
-    return block;
-  };
-
-  css += `\n${writeBlock(`:root,\n[${attrName}="${defaultMode}"]`, modesByName[defaultMode])}`;
+  css += `@layer theme {\n`;
+  css += writeModeBlock(
+    `${selectors.root},\n  [${attrName}="${defaultMode}"]`,
+    modesByName[defaultMode]
+  );
   for (const mode of otherModes) {
-    css += `\n${writeBlock(`[${attrName}="${mode}"]`, modesByName[mode])}`;
+    css += writeModeBlock(`[${attrName}="${mode}"]`, modesByName[mode]);
   }
+  css += `}\n`;
 
   return css;
 }
@@ -638,10 +637,11 @@ export function generateSpacingModesCSS(modesByName, opts = {}) {
  * @param {string} opts.defaultMode
  * @param {string} opts.attrName
  * @param {string} opts.commentLabel
+ * @param {{ root: string, dark: string }} opts.selectors - From `nexusRootSelectors`
  * @returns {string} CSS string with all per-mode light + dark blocks
  */
 export function generateThemedModesCSS(modesByName, opts) {
-  const { defaultMode, attrName, commentLabel } = opts;
+  const { defaultMode, attrName, commentLabel, selectors } = opts;
 
   const allModes = Object.keys(modesByName);
   if (!allModes.includes(defaultMode)) {
@@ -650,26 +650,28 @@ export function generateThemedModesCSS(modesByName, opts) {
     );
   }
 
-  const writeBlock = (selector, tokens) => {
-    let block = `${selector} {\n`;
-    for (const token of tokens) {
-      block += `  --nx-${token.cssName}: ${token.value};\n`;
-    }
-    block += `}\n`;
-    return block;
-  };
-
   const otherModes = allModes.filter((m) => m !== defaultMode).sort();
 
-  let css = `\n/* ===== PER-MODE ${commentLabel} (mode swap via [${attrName}="X"] on any ancestor) ===== */\n`;
+  let css = `\n/* ===== PER-MODE ${commentLabel} (light via [${attrName}="X"] on any ancestor; dark on the dark root itself) ===== */\n`;
 
-  css += `\n${writeBlock(`:root,\n[${attrName}="${defaultMode}"]`, modesByName[defaultMode].light)}`;
-  css += `\n${writeBlock(`.dark,\n.dark[${attrName}="${defaultMode}"],\n.dark [${attrName}="${defaultMode}"]`, modesByName[defaultMode].dark)}`;
+  css += `@layer theme {\n`;
+  css += writeModeBlock(
+    `${selectors.root},\n  [${attrName}="${defaultMode}"]`,
+    modesByName[defaultMode].light
+  );
+  css += writeModeBlock(
+    `${selectors.dark},\n  ${selectors.dark}[${attrName}="${defaultMode}"]`,
+    modesByName[defaultMode].dark
+  );
 
   for (const mode of otherModes) {
-    css += `\n${writeBlock(`[${attrName}="${mode}"]`, modesByName[mode].light)}`;
-    css += `\n${writeBlock(`.dark[${attrName}="${mode}"],\n.dark [${attrName}="${mode}"]`, modesByName[mode].dark)}`;
+    css += writeModeBlock(`[${attrName}="${mode}"]`, modesByName[mode].light);
+    css += writeModeBlock(
+      `${selectors.dark}[${attrName}="${mode}"]`,
+      modesByName[mode].dark
+    );
   }
+  css += `}\n`;
 
   return css;
 }
@@ -1175,6 +1177,40 @@ export function collectShadowTokens(tokensDir, primitiveMap) {
 }
 
 /**
+ * Selectors for the Nexus root, built from the engine's root contract so the
+ * generated CSS and the runtime attributes cannot drift.
+ *
+ * @param {object} engine - The token engine (`@nexus_ds/core` runtime)
+ * @returns {{ root: string, dark: string, attributeFor: Record<string, string> }}
+ *   `root` matches any Nexus root, `dark` a root in dark mode, and
+ *   `attributeFor` maps an appearance field (`corners`) to its attribute
+ *   (`data-nx-radius`).
+ */
+function defaultColorBlock(selector, tokens) {
+  let block = `  ${selector} {\n`;
+  for (const token of tokens.filter((token) =>
+    token.cssName.startsWith('color-')
+  )) {
+    block += `    --nx-default-${token.cssName}: ${token.value};\n`;
+  }
+  return `${block}  }\n`;
+}
+
+export function nexusRootSelectors(engine) {
+  const root = `[${engine.NEXUS_ROOT_ATTRIBUTE}]`;
+  const attributeFor = Object.fromEntries(
+    Object.entries(engine.NEXUS_APPEARANCE_ATTRIBUTE_FIELDS).map(
+      ([attribute, field]) => [field, attribute]
+    )
+  );
+  return {
+    root,
+    dark: `${root}[${engine.NEXUS_MODE_ATTRIBUTE}='dark']`,
+    attributeFor,
+  };
+}
+
+/**
  * Generate @theme CSS block for Tailwind
  * This is the shared function used by generate-tailwind-package.js
  *
@@ -1190,8 +1226,7 @@ export function collectShadowTokens(tokensDir, primitiveMap) {
  * @param {object[]} config.motionTokens - Array of { group, key, cssName, varRef } for duration/ease
  * @param {object[]} config.shadowTokens - Array of { cssName, value } for shadows
  * @param {object[]} [config.darkSemanticTokens] - Array of { cssName, value } for dark mode semantic tokens
- * @param {string} [config.darkSelector='.dark'] - CSS selector for dark mode
- * @param {boolean} [config.prefixDarkVars=false] - Whether to add nx- prefix to dark mode vars
+ * @param {{ root: string, dark: string }} config.selectors - From `nexusRootSelectors`
  * @returns {string} Generated CSS content
  */
 export function generateThemeCSS(config) {
@@ -1209,11 +1244,11 @@ export function generateThemeCSS(config) {
     zIndexTokens = [],
     breakpointTokens = [],
     darkSemanticTokens = [],
-    darkSelector = '.dark',
-    prefixDarkVars = false,
+    selectors,
   } = config;
 
   let css = header;
+  css += `@layer theme, base, components, utilities;\n\n`;
 
   // Google Fonts import
   if (googleFontsImport) {
@@ -1224,12 +1259,13 @@ export function generateThemeCSS(config) {
   // Imports
   for (const imp of imports) {
     if (imp === 'tailwindcss') {
-      css += `@import 'tailwindcss' prefix(${tailwindPrefix});\n`;
+      css += `@import 'tailwindcss/theme.css' layer(theme) prefix(${tailwindPrefix});\n`;
+      css += `@import 'tailwindcss/utilities.css' layer(utilities) prefix(${tailwindPrefix});\n`;
     } else {
       css += `@import '${imp}';\n`;
     }
   }
-  css += `\n@custom-variant dark (&:is(.dark *));\n\n`;
+  css += `\n@custom-variant dark (&:where(${selectors.dark}, ${selectors.dark} *));\n\n`;
 
   // @theme block
   css += `@theme {\n`;
@@ -1314,7 +1350,7 @@ export function generateThemeCSS(config) {
   css += `}\n`;
 
   // Inlined so every border and outline utility reads `--nx-borderwidth-*` on
-  // the element itself, where a `[data-borderwidth]` ancestor has set it. A
+  // the element itself, where a `[data-nx-borderwidth]` ancestor has set it. A
   // field's focus ring is a `border-default` inner edge plus an
   // `outline-default` outer edge, so both namespaces share each value.
   if (borderwidthTokens.length > 0) {
@@ -1329,38 +1365,24 @@ export function generateThemeCSS(config) {
     css += `}\n`;
   }
 
-  // Semantic colour utilities need their fallback expression inlined into the
-  // generated utility, otherwise Tailwind's `prefix(nx)` rewrites the @theme
-  // variable to the same `--nx-color-*` name that the runtime provider owns.
+  // Semantic colour utilities read the runtime `--nx-color-*` value first and
+  // fall back to the root's `--nx-default-color-*`. Inlined because Tailwind's
+  // `prefix(nx)` would otherwise rename the @theme variable to the runtime name.
   if (semanticTokens.length > 0) {
     css += `\n@theme inline {\n`;
     css += `  /* Semantic tokens */\n`;
     for (const token of semanticTokens) {
       const value = token.cssName.startsWith('color-')
-        ? `var(--nx-${token.cssName}, ${token.value})`
+        ? `var(--nx-${token.cssName}, var(--nx-default-${token.cssName}))`
         : token.value;
       css += `  --${token.cssName}: ${value};\n`;
     }
     css += `}\n`;
 
-    css += `\n/* ===== RUNTIME COLOR ALIASES ===== */\n`;
-    css += `:root {\n`;
-    for (const token of semanticTokens.filter((token) =>
-      token.cssName.startsWith('color-')
-    )) {
-      css += `  --${token.cssName}: var(--nx-${token.cssName}, ${token.value});\n`;
-    }
-    css += `}\n`;
-  }
-
-  // Dark mode block (if provided)
-  if (darkSemanticTokens.length > 0) {
-    css += `\n/* ===== DARK MODE ===== */\n`;
-    css += `${darkSelector} {\n`;
-    for (const token of darkSemanticTokens) {
-      const varName = prefixDarkVars ? `nx-${token.cssName}` : token.cssName;
-      css += `  --${varName}: ${token.value};\n`;
-    }
+    css += `\n/* ===== DEFAULT COLORS ===== */\n`;
+    css += `@layer theme {\n`;
+    css += defaultColorBlock(selectors.root, semanticTokens);
+    css += defaultColorBlock(selectors.dark, darkSemanticTokens);
     css += `}\n`;
   }
 
@@ -1373,19 +1395,15 @@ export function generateThemeCSS(config) {
  *
  * @returns {string} CSS native browser UI rules
  */
-export function generateNativeBrowserUIThemeCSS() {
+export function generateNativeBrowserUIThemeCSS(selectors) {
   return `
 /* ===== NATIVE BROWSER UI THEME ===== */
 @layer base {
-  :root {
-    color-scheme: light dark;
-  }
-
-  :root:not(.dark) {
+  ${selectors.root} {
     color-scheme: light;
   }
 
-  .dark {
+  ${selectors.dark} {
     color-scheme: dark;
   }
 }
@@ -1471,19 +1489,23 @@ export function generateSurfaceUtilitiesCSS() {
  *
  * @returns {string} CSS @layer base block
  */
-export function generateBaseLayerCSS() {
+export function generateBaseLayerCSS(selectors) {
+  const { root } = selectors;
   return `
 /* ===== BASE LAYER ===== */
 @layer base {
-  *,
-  ::before,
-  ::after {
-    border-color: var(--color-border-default);
+  ${root},
+  ${root}::before,
+  ${root}::after,
+  ${root} *,
+  ${root} ::before,
+  ${root} ::after {
+    border-color: var(--nx-color-border-default, var(--nx-default-color-border-default));
   }
 
-  body {
-    background-color: var(--color-background);
-    color: var(--color-foreground);
+  ${root} {
+    color: var(--nx-color-foreground, var(--nx-default-color-foreground));
+    font-family: var(--nx-typography-family-font-sans);
   }
 }
 `;

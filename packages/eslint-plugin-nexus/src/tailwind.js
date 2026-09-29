@@ -42,11 +42,7 @@ export function nexusTailwindClassesConfig(options) {
       'better-tailwindcss': { entryPoint, selectors: tailwindClassSelectors },
     },
     rules: {
-      // `dark` is the hook for the `@custom-variant dark` in nexus.css.
-      'better-tailwindcss/no-unknown-classes': [
-        'error',
-        { ignore: ['^dark$'] },
-      ],
+      'better-tailwindcss/no-unknown-classes': 'error',
     },
   };
 }

@@ -721,8 +721,9 @@ export const EdgeCases: Story = {
 };
 
 export const Dark: Story = {
+  globals: { mode: 'dark' },
   render: () => (
-    <div className="dark nx:grid nx:w-96 nx:max-w-full nx:gap-3 nx:rounded-md nx:bg-background nx:p-4 nx:text-foreground">
+    <div className="nx:grid nx:w-96 nx:max-w-full nx:gap-3 nx:rounded-md nx:bg-background nx:p-4 nx:text-foreground">
       <CheckboxChoiceCard
         id="choice-card-dark"
         defaultChecked

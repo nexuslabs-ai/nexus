@@ -2,10 +2,12 @@
  * shipped src/index.css is utilities-only by design (tokens come from the
  * consumer's @nexus_ds/tailwind), so Storybook layers the two the same way a
  * consumer does — tokens from @nexus_ds/tailwind, then the shipped utilities,
- * tw-animate-css, and component keyframes from src/index.css. Imported via CSS
+ * tw-animate-css, and component keyframes from src/index.css. Storybook is the
+ * host here, so it loads Tailwind's Preflight itself. Imported via CSS
  * @import (not a JS import) so the Rollup production build can resolve
  * @nexus_ds/tailwind, whose package entry is a .css. */
 @import '@nexus_ds/tailwind';
+@import 'tailwindcss/preflight.css' layer(base);
 @import '../src/index.css';
 
 @source inline('nx:text-xs');
