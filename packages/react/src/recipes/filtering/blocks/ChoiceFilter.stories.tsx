@@ -162,8 +162,8 @@ const meta = {
               folders import: <code>button</code>, <code>button-group</code>,{' '}
               <code>dropdown-menu</code>, <code>filter-condition</code>,{' '}
               <code>filter-model</code>, <code>overlay-layout</code>,{' '}
-              <code>spinner</code> and <code>lib/</code>. If your copy lives
-              elsewhere, update the relative imports.
+              <code>separator</code>, <code>spinner</code> and <code>lib/</code>
+              . If your copy lives elsewhere, update the relative imports.
             </li>
             <li>
               No npm packages beyond those the Nexus components already use.

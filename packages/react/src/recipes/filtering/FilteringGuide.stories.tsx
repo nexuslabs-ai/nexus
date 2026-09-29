@@ -344,6 +344,35 @@ export const GroupedConditions: Story = {
 export const PanelSummaries: Story = {
   name: 'Panel with applied summaries',
   render: () => <AppliedFiltersExample />,
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+    const page = within(canvasElement.ownerDocument.body);
+    const paid = canvas.getByRole('button', {
+      name: 'Remove status filter: Paid',
+    });
+    paid.focus();
+    await userEvent.keyboard('{Enter}');
+    await expect(
+      canvas.getByRole('button', { name: 'Remove country filter: India' })
+    ).toHaveFocus();
+    await expect(canvas.getByRole('status')).toHaveTextContent(
+      'any status from India'
+    );
+    await userEvent.keyboard('{Enter}');
+    await expect(canvas.getByRole('button', { name: 'Filters' })).toHaveFocus();
+    await expect(
+      canvas.getByRole('group', { name: 'Applied filters' })
+    ).toHaveTextContent('None');
+    await userEvent.click(canvas.getByRole('button', { name: 'Filters' }));
+    await userEvent.click(page.getByRole('checkbox', { name: 'Status: Paid' }));
+    await userEvent.keyboard('{Escape}');
+    await expect(
+      canvas.getByRole('button', { name: 'Remove status filter: Paid' })
+    ).toBeVisible();
+    await expect(canvas.getByRole('status')).toHaveTextContent(
+      'paid invoices from all countries'
+    );
+  },
 };
 export const LoadingResults: StoryObj<typeof ResultState> = {
   name: 'Loading results',
@@ -500,9 +529,6 @@ export const InvoiceFiltering: Story = {
 export const BlockConditionsToRules: Story = {
   name: 'Block conditions as FilterBuilder rules',
   render: () => <ConvertedRules />,
-  parameters: {
-    docs: { source: { code: choiceExampleSource, language: 'tsx' } },
-  },
   play: async ({ canvasElement }) => {
     await expect(convertedRules).toMatchObject([
       { field: 'status', operator: 'is', value: 'active' },
