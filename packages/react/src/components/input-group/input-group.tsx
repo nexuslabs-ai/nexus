@@ -33,7 +33,7 @@ const inputGroupVariants = cva(
     'nx:has-[[data-slot=input-group-control]:focus-visible]:outline-default nx:has-[[data-slot=input-group-control]:focus-visible]:outline-focus-default nx:has-[[data-slot=input-group-control]:focus-visible]:border-focus-default',
     // Error: an invalid control reddens the border; an invalid focused
     // control switches the ring to the error colour (matches Input).
-    'nx:has-[[data-slot][aria-invalid=true]]:border-border-error',
+    'nx:has-[[data-slot][aria-invalid=true]]:border-error-border',
     'nx:has-[[data-slot=input-group-control][aria-invalid=true]:focus-visible]:outline-focus-error nx:has-[[data-slot=input-group-control][aria-invalid=true]:focus-visible]:border-focus-error',
   ],
   {
@@ -249,7 +249,9 @@ function InputGroupInput({ className, ...props }: InputGroupInputProps) {
     <Input
       data-slot="input-group-control"
       className={cn(
-        'nx:flex-1 nx:rounded-none nx:border-0 nx:bg-transparent nx:enabled:hover:bg-transparent nx:focus-visible:outline-none',
+        'nx:flex-1 nx:rounded-none nx:border-0 nx:focus-visible:outline-none',
+        'nx:bg-transparent nx:enabled:hover:bg-transparent nx:disabled:bg-transparent',
+        'nx:autofill-bg-transparent nx:enabled:hover:autofill-bg-transparent nx:disabled:autofill-bg-transparent',
         className
       )}
       {...props}
@@ -278,7 +280,9 @@ function InputGroupTextarea({ className, ...props }: InputGroupTextareaProps) {
     <Textarea
       data-slot="input-group-control"
       className={cn(
-        'nx:flex-1 nx:resize-none nx:rounded-none nx:border-0 nx:bg-transparent nx:enabled:hover:bg-transparent nx:py-3 nx:focus-visible:outline-none',
+        'nx:flex-1 nx:resize-none nx:rounded-none nx:border-0 nx:py-3 nx:focus-visible:outline-none',
+        'nx:bg-transparent nx:enabled:hover:bg-transparent nx:disabled:bg-transparent',
+        'nx:autofill-bg-transparent nx:enabled:hover:autofill-bg-transparent nx:disabled:autofill-bg-transparent',
         className
       )}
       {...props}

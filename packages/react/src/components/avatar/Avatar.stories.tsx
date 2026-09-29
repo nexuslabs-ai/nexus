@@ -586,23 +586,61 @@ export const OnContainerSurface: Story = {
     docs: {
       description: {
         story:
-          'Avatars on a `container` surface (e.g. a card). The separator and status rings read `--avatar-surface` — set here to the container colour — so they match the card instead of leaving a `background`-coloured halo.',
+          'Avatars on a `container` surface (e.g. a card) set on the page `background`, in dark mode where the two differ. The card declares its surface with `surface-container`, so the separator, status, and emphasis-ring offset match it instead of leaving a `background`-coloured halo.',
       },
     },
   },
+  globals: { mode: 'dark' },
   render: (_args) => (
-    <div className="nx:rounded-xl nx:bg-container nx:p-6 nx:[--avatar-surface:var(--nx-color-container)]">
-      <AvatarGroup max={4} role="group" aria-label="Team on a card">
-        {TEAM.map((person, index) => (
-          <TeamAvatar
-            key={person.name}
-            person={person}
-            status={STATUS_VALUES[index % STATUS_VALUES.length]}
-          />
-        ))}
-      </AvatarGroup>
+    <div data-testid="page" className="nx:bg-background nx:p-6">
+      <div
+        data-testid="card"
+        className="nx:flex nx:items-center nx:gap-6 nx:rounded-xl nx:bg-container nx:p-6 nx:surface-container"
+      >
+        <AvatarGroup max={4} role="group" aria-label="Team on a card">
+          {TEAM.map((person, index) => (
+            <TeamAvatar
+              key={person.name}
+              person={person}
+              status={STATUS_VALUES[index % STATUS_VALUES.length]}
+            />
+          ))}
+        </AvatarGroup>
+        <Avatar ring data-testid="ring-avatar">
+          <AvatarFallback>AL</AvatarFallback>
+        </Avatar>
+      </div>
     </div>
   ),
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+    const card = canvas.getByTestId('card');
+    const styleOf = (element: Element) => window.getComputedStyle(element);
+
+    await waitFor(() => expect(document.documentElement).toHaveClass('dark'));
+    const surface = styleOf(card).backgroundColor;
+    // Only a surface that differs from `background` can catch a ring that
+    // fell back to `background`.
+    await expect(surface).not.toBe(
+      styleOf(canvas.getByTestId('page')).backgroundColor
+    );
+
+    const rings = card.querySelectorAll<HTMLElement>(
+      '[data-slot="avatar"]:not([data-ring]), [data-slot="avatar-status"]'
+    );
+    await expect(rings.length).toBeGreaterThan(0);
+    for (const ring of rings) {
+      await expect(styleOf(ring).getPropertyValue('--tw-ring-color')).toBe(
+        surface
+      );
+    }
+
+    await expect(
+      styleOf(canvas.getByTestId('ring-avatar')).getPropertyValue(
+        '--tw-ring-offset-color'
+      )
+    ).toBe(surface);
+  },
 };
 
 // ============================================

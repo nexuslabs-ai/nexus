@@ -104,17 +104,17 @@ const joinedItem = {
   horizontal: [
     'nx:first:rounded-s-md nx:last:rounded-e-md',
     'nx:[[data-slot=toggle-group-item]:not([data-variant=default])+&]:border-s-0',
-    'nx:[&:not([aria-invalid=true]:not(:disabled)):not([data-variant=outline-primary][data-state=on]:not(:disabled)):has(+[data-variant=outline-primary][data-state=off]:not([aria-invalid=true]):not(:disabled):hover)]:border-e-border-primary',
-    'nx:[&:not([aria-invalid=true]:not(:disabled)):has(+[data-variant=outline-primary][data-state=on]:not([aria-invalid=true]):not(:disabled))]:border-e-border-primary-active',
-    'nx:[&:not([aria-invalid=true]:not(:disabled)):has(+:is([data-variant=outline],[data-variant=outline-primary][data-state=off])[aria-invalid=true]:not(:disabled))]:border-e-border-error',
+    'nx:[&:not([aria-invalid=true]:not(:disabled)):not([data-variant=outline-primary][data-state=on]:not(:disabled)):has(+[data-variant=outline-primary][data-state=off]:not([aria-invalid=true]):not(:disabled):hover)]:border-e-primary-border',
+    'nx:[&:not([aria-invalid=true]:not(:disabled)):has(+[data-variant=outline-primary][data-state=on]:not([aria-invalid=true]):not(:disabled))]:border-e-primary-border-active',
+    'nx:[&:not([aria-invalid=true]:not(:disabled)):has(+:is([data-variant=outline],[data-variant=outline-primary][data-state=off])[aria-invalid=true]:not(:disabled))]:border-e-error-border',
     'nx:[&:has(+[data-variant=outline-primary][data-state=on][aria-invalid=true]:not(:disabled))]:border-e-border-error-active',
   ],
   vertical: [
     'nx:first:rounded-t-md nx:last:rounded-b-md',
     'nx:[[data-slot=toggle-group-item]:not([data-variant=default])+&]:border-t-0',
-    'nx:[&:not([aria-invalid=true]:not(:disabled)):not([data-variant=outline-primary][data-state=on]:not(:disabled)):has(+[data-variant=outline-primary][data-state=off]:not([aria-invalid=true]):not(:disabled):hover)]:border-b-border-primary',
-    'nx:[&:not([aria-invalid=true]:not(:disabled)):has(+[data-variant=outline-primary][data-state=on]:not([aria-invalid=true]):not(:disabled))]:border-b-border-primary-active',
-    'nx:[&:not([aria-invalid=true]:not(:disabled)):has(+:is([data-variant=outline],[data-variant=outline-primary][data-state=off])[aria-invalid=true]:not(:disabled))]:border-b-border-error',
+    'nx:[&:not([aria-invalid=true]:not(:disabled)):not([data-variant=outline-primary][data-state=on]:not(:disabled)):has(+[data-variant=outline-primary][data-state=off]:not([aria-invalid=true]):not(:disabled):hover)]:border-b-primary-border',
+    'nx:[&:not([aria-invalid=true]:not(:disabled)):has(+[data-variant=outline-primary][data-state=on]:not([aria-invalid=true]):not(:disabled))]:border-b-primary-border-active',
+    'nx:[&:not([aria-invalid=true]:not(:disabled)):has(+:is([data-variant=outline],[data-variant=outline-primary][data-state=off])[aria-invalid=true]:not(:disabled))]:border-b-error-border',
     'nx:[&:has(+[data-variant=outline-primary][data-state=on][aria-invalid=true]:not(:disabled))]:border-b-border-error-active',
   ],
 } as const;

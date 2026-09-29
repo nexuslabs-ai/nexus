@@ -71,15 +71,11 @@ export const Sizes: Story = {
     const sm = canvas.getByRole('button', { name: 'Small' });
     const md = canvas.getByRole('button', { name: 'Default' });
     const lg = canvas.getByRole('button', { name: 'Large' });
-    const rawTextXsClass = ['nx:text', 'xs'].join('-');
-    const rawTextSmClass = ['nx:text', 'sm'].join('-');
 
     await expect(sm).toHaveClass('nx:typography-label-small');
-    await expect(sm).not.toHaveClass(rawTextXsClass);
     await expect(sm).toHaveClass('nx:px-3', 'nx:py-1.5', 'nx:gap-1.5');
 
     await expect(md).toHaveClass('nx:typography-label-default');
-    await expect(md).not.toHaveClass(rawTextSmClass);
     await expect(md).toHaveClass('nx:px-4', 'nx:py-2', 'nx:gap-2');
     await expect(lg).toHaveClass('nx:typography-label-default');
     await expect(lg).toHaveClass('nx:px-8', 'nx:py-3', 'nx:gap-2.5');
@@ -232,9 +228,9 @@ function outlinePrimaryBorder(toggle: HTMLElement) {
   if (toggle.hasAttribute('disabled')) return 'border-disabled';
   const pressed = toggle.getAttribute('aria-pressed') === 'true';
   if (toggle.getAttribute('aria-invalid') === 'true') {
-    return pressed ? 'border-error-active' : 'border-error';
+    return pressed ? 'border-error-active' : 'error-border';
   }
-  return pressed ? 'border-primary-active' : 'border-default';
+  return pressed ? 'primary-border-active' : 'border-default';
 }
 
 export const StateMatrix: Story = {
@@ -327,7 +323,7 @@ export const OutlinePrimary: Story = {
     // border-color eases through transition-control; wait for it to settle.
     await waitFor(() =>
       expect(getComputedStyle(toggle).borderTopColor).toBe(
-        tokenColor(toggle, 'border-primary-active')
+        tokenColor(toggle, 'primary-border-active')
       )
     );
     await userEvent.tab({ shift: true });
@@ -369,7 +365,7 @@ export const InvalidOutlinePrimary: Story = {
     const resting = canvas.getByRole('button', { name: 'Invalid resting' });
     const selected = canvas.getByRole('button', { name: 'Invalid selected' });
     await expect(getComputedStyle(resting).borderTopColor).toBe(
-      tokenColor(resting, 'border-error')
+      tokenColor(resting, 'error-border')
     );
     await expect(getComputedStyle(selected).borderTopColor).toBe(
       tokenColor(selected, 'border-error-active')

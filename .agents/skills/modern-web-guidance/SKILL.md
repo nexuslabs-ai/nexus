@@ -21,6 +21,37 @@ description: |
 
 A skill to search for specific web development use cases and retrieve their corresponding best practice guides.
 
+## Nexus integration (repository policy takes precedence)
+
+Apply this guidance through Nexus components, semantic tokens, and `nx:` utilities.
+
+Nexus's browser support policy is
+`../../../.claude/rules/no-environment-branching.md`. Read it before applying
+any guide's Baseline, browser-support, or fallback recommendation. That rule
+overrides this skill's generic fallback advice: choose a simpler primitive
+instead of adding banned environment branches. Do not reintroduce a browser-floor registry.
+
+For a substantial UI change — one that introduces a layout, interaction, or
+browser-platform decision — record a compact guidance note in the plan or PR:
+
+- **Source:** search query and retrieved guide IDs, or exact bundled guide paths.
+- **Decision:** the applicable pattern and any Nexus-policy override.
+- **Verification:** how the implementation was checked against the guidance.
+
+For a text-only edit or removal that introduces no layout, interaction, or
+platform decision, an existing relevant guide can be reused; a new search is
+unnecessary. Do not describe reading this skill alone as consulting a guide.
+In Nexus, this substantial-UI-change threshold narrows both the frontmatter's
+"MANDATORY: Execute FIRST for all HTML/CSS and clientside JS tasks" trigger and
+the "When to use" list below.
+
+If the CLI cannot run, record the actual failure and read the relevant Markdown
+under `guides/` using file search. The bundled collection does not require npm or
+network access. If no bundled guide fits, use official platform/library sources
+and identify that fallback. Never report a failed lookup as a successful check.
+
+See `UPSTREAM.md` for snapshot provenance and refresh instructions.
+
 ## When to use
 
 Must use this skill:
@@ -36,7 +67,7 @@ Must use this skill:
 Search with an action-oriented query summarizing what you want to achieve using the `search` command. Run `modern-web-guidance` directly with `npx`.
 
 ```sh
-npx -y modern-web-guidance@latest search "<query>" --skill-version 2026_05_16-c5e7870
+npx -y modern-web-guidance@latest search "<query>" --skill-version 2026_09_04-7de96777
 ```
 
 **Example Output**:
@@ -78,17 +109,29 @@ Once you have a relevant `id` from the search results, call this script using th
 npx -y modern-web-guidance@latest retrieve "<id>"
 ```
 
+If the output is truncated, you must repeat the command but redirect to a file and read that file.
+
 **Example Output**:
 `The markdown content of the guide describing implementation steps...`
 
-## Using npx
+---
 
+### Step 3. Verify Guidance Compliance
+
+When generating or modifying code, cross-check the implementation against the retrieved guide before concluding:
+
+- **Applicable Guidance & Fallbacks**: Ensure the relevant modern patterns and necessary fallback strategies from the guide are correctly applied, without forcing unrequested features. Nexus's browser support policy overrides fallback advice; see Nexus integration above.
+- **Task Fulfillment**: Confirm that the implementation fully satisfies the user's request.
+
+## Using npx / pnpx
+
+- Prefer `pnpx` over `npx` if `pnpm` is available (note: `pnpx` does not use the `-y` flag).
+- When requesting tool permissions, allowlist `npx -y modern-web-guidance@latest *` specifically (or `pnpx modern-web-guidance@latest *`), never bare `npx *` or `pnpx *`.
 - IMPORTANT: on Windows, using `npx` may fail. Use `npx.cmd ...` instead.
-- Network access is required for fetching npm packages needed by the task.
-- If the `npx -y modern-web-guidance…` command hangs, you may be offline. Try running again in offline
-  mode: `npx --offline …`.
-- The `--skill-version` flag is used to determine if this SKILL.md is out of date. If it is, a warning
-  message is logged to stderr.
+- Fetching and running `modern-web-guidance` requires outbound network access. If running in a sandboxed, permission-gated, or approval-based environment (e.g., Codex, Claude Code), **proactively request approval/allowlisting for the command with network access BEFORE executing it the first time**, avoiding sandbox network timeouts.
+- In sandboxed environments where `~/.npm` is read-only or restricted, set `NPM_CONFIG_CACHE=/tmp/npm-cache`.
+- If the command hangs due to being offline, try running again in offline mode: `npx --offline …`.
+- The `--skill-version` flag is used to determine if this SKILL.md is out of date. If it is, a warning message is logged to stderr.
 
 ## Guidelines
 
@@ -98,7 +141,7 @@ npx -y modern-web-guidance@latest retrieve "<id>"
 
 ## Interpreting Browser Support & Fallbacks
 
-- **Default Behavior**: All guides assume **Baseline Widely available** features are safe to use without fallbacks. For features that are not Baseline widely available, you **MUST** follow the fallback recommendations in the guide, unless the user has specified a custom browser support policy.
+- **Default Behavior**: All guides assume **Baseline Widely available** features are safe to use without fallbacks. For features that are not Baseline widely available, you **MUST** follow the fallback recommendations in the guide, unless the user or project has specified a custom browser support policy. Nexus has; see Nexus integration above.
 - **Custom Policies**: If the user has already defined explicit browser support requirements, use the browser compatibility data in the guide to determine if a fallback can be safely ignored.
   - For Baseline YYYY targets, a feature satisfies this target if its "Baseline since" date is <= YYYY.
   - **Policy Examples**:

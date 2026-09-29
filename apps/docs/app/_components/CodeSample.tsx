@@ -3,7 +3,7 @@ import { type CodeSampleLanguage, highlightSample } from '../_lib/code-sample';
 import { CodeBlock } from './CodeBlock';
 
 /**
- * Hand-written code sample on a `_pages` route. Tokenised by the same theme the
+ * A code string rendered outside an MDX fence. Tokenised by the same theme the
  * MDX fences use, then handed to the same `pre` those fences render through, so
  * a sample and a fence get the same surface and the same copy control.
  */

@@ -10,9 +10,8 @@ export type TokenCategory =
 
 export interface SemanticTokenMeta {
   /** Bare token name, without the --nx-color- prefix. */
-  name: string;
+  name: SemanticColorName;
   category: TokenCategory;
-  description?: string;
 }
 
 const SURFACE_TOKEN_NAMES = [
@@ -35,7 +34,7 @@ const SURFACE_TOKEN_NAMES = [
   'nav-item-active',
   'nav-border',
   'disabled',
-  'border-active',
+  'border-focus',
 ] as const;
 
 const TEXT_TOKEN_NAMES = [
@@ -65,8 +64,8 @@ const BRAND_TOKEN_NAMES = [
   'primary-subtle-foreground',
   'primary-subtle-hover',
   'primary-subtle-active',
-  'border-primary',
-  'border-primary-active',
+  'primary-border',
+  'primary-border-active',
   'secondary-background',
   'secondary-background-hover',
   'secondary-background-active',
@@ -88,7 +87,7 @@ const STATUS_TOKEN_NAMES = [
   'success-subtle-foreground',
   'success-subtle-hover',
   'success-subtle-active',
-  'border-success',
+  'success-border',
   'border-success-active',
   'warning-background',
   'warning-background-hover',
@@ -99,7 +98,7 @@ const STATUS_TOKEN_NAMES = [
   'warning-subtle-foreground',
   'warning-subtle-hover',
   'warning-subtle-active',
-  'border-warning',
+  'warning-border',
   'border-warning-active',
   'error-background',
   'error-background-hover',
@@ -110,7 +109,7 @@ const STATUS_TOKEN_NAMES = [
   'error-subtle-foreground',
   'error-subtle-hover',
   'error-subtle-active',
-  'border-error',
+  'error-border',
   'border-error-active',
   'information-background',
   'information-background-hover',
@@ -121,7 +120,7 @@ const STATUS_TOKEN_NAMES = [
   'information-subtle-foreground',
   'information-subtle-hover',
   'information-subtle-active',
-  'border-information',
+  'information-border',
   'border-information-active',
 ] as const;
 
@@ -143,24 +142,22 @@ const ALPHA_TOKEN_NAMES = [
   'popover-backdrop',
 ] as const;
 
-const DESCRIPTIONS: Partial<Record<string, string>> = {
-  'muted-extralight':
-    'Quietest muted surface — sits between background and muted for barely-there fills (empty states, subtle panels).',
-  'muted-foreground':
-    "It's a gray that softens contrast so primary content stands forward.",
-  'muted-foreground-subtle':
-    'Tertiary text tier below muted-foreground - helper text, captions, divider labels.',
-};
+/** Bare name of every semantic colour token, without the --nx-color- prefix. */
+export type SemanticColorName =
+  | (typeof SURFACE_TOKEN_NAMES)[number]
+  | (typeof TEXT_TOKEN_NAMES)[number]
+  | (typeof BORDER_TOKEN_NAMES)[number]
+  | (typeof BRAND_TOKEN_NAMES)[number]
+  | (typeof STATUS_TOKEN_NAMES)[number]
+  | (typeof CHART_TOKEN_NAMES)[number]
+  | (typeof FOCUS_TOKEN_NAMES)[number]
+  | (typeof ALPHA_TOKEN_NAMES)[number];
 
 function metas(
   category: TokenCategory,
-  names: readonly string[]
+  names: readonly SemanticColorName[]
 ): SemanticTokenMeta[] {
-  return names.map((name) => ({
-    name,
-    category,
-    ...(DESCRIPTIONS[name] ? { description: DESCRIPTIONS[name] } : {}),
-  }));
+  return names.map((name) => ({ name, category }));
 }
 
 export const SEMANTIC_TOKEN_REGISTRY: readonly SemanticTokenMeta[] = [

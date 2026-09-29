@@ -43,7 +43,10 @@ export * from './components/input-otp';
 export * from './components/item';
 export * from './components/kbd';
 export * from './components/label';
+export * from './components/marker';
 export * from './components/menubar';
+export * from './components/message';
+export * from './components/message-scroller';
 export * from './components/multi-select';
 export * from './components/native-select';
 export * from './components/navigation-menu';
@@ -72,6 +75,7 @@ export * from './components/tooltip';
 
 // Appearance (editor UI — provider is published separately via ./appearance subentry)
 export * from './components/appearance/appearance-settings';
+export * from './components/appearance/brand-color-field';
 export * from './components/appearance/color-field';
 export * from './components/appearance/config-preview';
 export * from './components/appearance/setting-row';

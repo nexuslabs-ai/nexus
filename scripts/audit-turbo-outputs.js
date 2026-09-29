@@ -24,9 +24,11 @@ export function auditTurboOutputs(options = {}) {
     problems.push({
       code: 'missing-outputs',
       task: task.taskId,
-      message:
-        'Package has a `build` script but declares no `outputs`. A cache hit ' +
-        'would restore nothing. Add an `outputs` array to the package turbo.json.',
+      message: sentences(
+        'Task declares no `outputs`, so nothing states which files it is responsible for emitting.',
+        isCached(task) && 'A cache hit would restore nothing.',
+        'Add an `outputs` array to the package turbo.json.'
+      ),
     });
   }
 
@@ -52,10 +54,10 @@ export function auditEmittedOutputs(options = {}) {
         problems.push({
           code: 'unanchored-outputs',
           task: task.taskId,
-          message:
-            `Declared output \`${glob}\` starts with a wildcard, so this audit ` +
-            `cannot resolve a directory to check. Anchor it under a literal ` +
-            `directory in ${directory}/turbo.json.`,
+          message: sentences(
+            `Declared output \`${glob}\` starts with a wildcard, so this audit cannot resolve a directory to check.`,
+            `Anchor it under a literal directory in ${directory}/turbo.json.`
+          ),
         });
         continue;
       }
@@ -66,15 +68,24 @@ export function auditEmittedOutputs(options = {}) {
       problems.push({
         code: 'unmatched-outputs',
         task: task.taskId,
-        message:
-          `Declared output \`${glob}\` emitted no files under \`${checked}\`. ` +
-          `A cache hit would restore an empty artifact. Fix the glob in ` +
-          `${directory}/turbo.json.`,
+        message: sentences(
+          `Declared output \`${glob}\` emitted no files under \`${checked}\`.`,
+          isCached(task) && 'A cache hit would restore an empty artifact.',
+          `Fix the glob in ${directory}/turbo.json.`
+        ),
       });
     }
   }
 
   return { ok: problems.length === 0, problems };
+}
+
+function sentences(...parts) {
+  return parts.filter(Boolean).join(' ');
+}
+
+function isCached(task) {
+  return task.resolvedTaskDefinition?.cache !== false;
 }
 
 function literalPrefix(glob) {
@@ -104,8 +115,10 @@ function resolveTasks(options) {
 
   if (!Array.isArray(tasks) || (tasks.length === 0 && !filtered)) {
     throw new Error(
-      'turbo reported no `build` tasks. The `--dry=json` payload shape has ' +
-        'changed, so the audit cannot verify any output declaration.'
+      sentences(
+        'turbo reported no `build` tasks.',
+        'The `--dry=json` payload shape has changed, so the audit cannot verify any output declaration.'
+      )
     );
   }
 

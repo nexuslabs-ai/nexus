@@ -8,7 +8,11 @@ const meta: Meta<typeof NexusAppearanceConfigPreview> = {
   title: 'Appearance/ConfigPreview',
   component: NexusAppearanceConfigPreview,
   args: {
-    state: { ...DEFAULT_NEXUS_APPEARANCE, lightContrast: 72, darkContrast: 40 },
+    state: {
+      ...DEFAULT_NEXUS_APPEARANCE,
+      lightContrast: 37,
+      darkContrast: 82,
+    },
     resolvedMode: 'light',
   },
 };
@@ -21,8 +25,8 @@ export const Default: Story = {};
 export const ObjectShapeRegression: Story = {
   play: async ({ canvasElement }) => {
     const canvas = within(canvasElement);
-    await expect(canvas.getByText('lightContrast: 72,')).toBeInTheDocument();
-    await expect(canvas.getByText('darkContrast: 40,')).toBeInTheDocument();
+    await expect(canvas.getByText('lightContrast: 37,')).toBeInTheDocument();
+    await expect(canvas.getByText('darkContrast: 82,')).toBeInTheDocument();
     await expect(
       canvas.queryByText(/\[object Object\]/)
     ).not.toBeInTheDocument();

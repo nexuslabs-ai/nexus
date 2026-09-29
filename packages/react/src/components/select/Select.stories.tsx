@@ -143,7 +143,7 @@ export const InvalidTrigger: Story = {
     const trigger = canvas.getByRole('combobox', { name: 'Invalid select' });
 
     await expect(trigger).toHaveAttribute('aria-invalid', 'true');
-    await expect(trigger).toHaveClass('nx:aria-invalid:border-border-error');
+    await expect(trigger).toHaveClass('nx:aria-invalid:border-error-border');
     await expect(trigger).toHaveClass(
       'nx:aria-invalid:focus-visible:outline-focus-error'
     );
@@ -234,7 +234,7 @@ export const BorderlessStates: Story = {
     );
 
     await expect(invalid).toHaveAttribute('aria-invalid', 'true');
-    await expect(invalid).toHaveClass('nx:aria-invalid:border-border-error');
+    await expect(invalid).toHaveClass('nx:aria-invalid:border-error-border');
     // The stroke is a real border now, so a borderless field keeps a
     // transparent one and the invalid state recolours it in place.
     const restStyles = window.getComputedStyle(empty);

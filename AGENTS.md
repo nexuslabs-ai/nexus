@@ -16,6 +16,20 @@ does not index:
 | shadcn/ui adaptation            | [`shadcn-divergences.md`](.claude/rules/shadcn-divergences.md) |
 | Third-party API lookups         | [`docs-mcp.md`](.claude/rules/docs-mcp.md)                     |
 
+**Browser Support:** Nexus does no feature detection and no OS, browser,
+preference, or input-device queries.
+[`no-environment-branching.md`](.claude/rules/no-environment-branching.md) is
+authoritative over any guide's fallback advice and sets which features Nexus may
+use; `prefers-color-scheme` is the one exception.
+
+**Modern Web Guidance:** for a substantial UI change — one that introduces a
+layout, interaction, or browser-platform decision — search and retrieve
+guidance with the
+[`modern-web-guidance`](.agents/skills/modern-web-guidance/SKILL.md) skill, then
+record the guide source, the decision, and how it was verified in the plan or
+PR. The skill's Nexus integration section covers the offline fallback and when
+prior guidance can be reused.
+
 Workspace layout, setup, and the full command reference are in
 [`CONTRIBUTING.md`](CONTRIBUTING.md). Day to day:
 

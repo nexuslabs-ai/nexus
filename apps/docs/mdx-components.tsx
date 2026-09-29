@@ -2,7 +2,18 @@ import { cn } from '@nexus_ds/react/utils';
 import type { MDXComponents } from 'mdx/types';
 
 import { CodeBlock } from './app/_components/CodeBlock';
+import { ComponentPage } from './app/_components/ComponentPage';
+import { ComponentPreview } from './app/_components/ComponentPreview';
+import { ComponentSource } from './app/_components/ComponentSource';
+import {
+  PAGE_HEADING_CLASS,
+  SECTION_HEADING_CLASS,
+  SUBSECTION_HEADING_CLASS,
+} from './app/_components/Heading';
+import { InlineCode } from './app/_components/InlineCode';
+import { InstallBlock } from './app/_components/InstallBlock';
 import * as Nexus from './app/_components/nexus';
+import { PropsTable } from './app/_components/PropsTable';
 
 /**
  * Required by @next/mdx in the App Router. Maps Markdown-rendered HTML to
@@ -14,29 +25,17 @@ export function useMDXComponents(components: MDXComponents): MDXComponents {
   return {
     // children rendered explicitly so jsx-a11y can see the element has content.
     h1: ({ children, className, ...props }) => (
-      <h1
-        className={cn('nx:typography-heading-large nx:mb-2', className)}
-        {...props}
-      >
+      <h1 className={cn(PAGE_HEADING_CLASS, className)} {...props}>
         {children}
       </h1>
     ),
     h2: ({ children, className, ...props }) => (
-      <h2
-        className={cn('nx:typography-heading-small nx:mt-8 nx:mb-3', className)}
-        {...props}
-      >
+      <h2 className={cn(SECTION_HEADING_CLASS, className)} {...props}>
         {children}
       </h2>
     ),
     h3: ({ children, className, ...props }) => (
-      <h3
-        className={cn(
-          'nx:typography-label-default nx:font-semibold nx:mt-6 nx:mb-2',
-          className
-        )}
-        {...props}
-      >
+      <h3 className={cn(SUBSECTION_HEADING_CLASS, className)} {...props}>
         {children}
       </h3>
     ),
@@ -87,15 +86,7 @@ export function useMDXComponents(components: MDXComponents): MDXComponents {
         {children}
       </a>
     ),
-    code: ({ className, ...props }) => (
-      <code
-        className={cn(
-          'nx:font-mono nx:typography-code-inline nx:bg-muted nx:px-1 nx:py-0.5 nx:rounded-sm',
-          className
-        )}
-        {...props}
-      />
-    ),
+    code: InlineCode,
     pre: CodeBlock,
     table: ({ className, ...props }) => (
       <div
@@ -143,6 +134,11 @@ export function useMDXComponents(components: MDXComponents): MDXComponents {
         {...props}
       />
     ),
+    ComponentPage,
+    ComponentPreview,
+    ComponentSource,
+    InstallBlock,
+    PropsTable,
     // live @nexus_ds/react components, usable in MDX without an import
     ...Nexus,
     // caller-provided overrides win

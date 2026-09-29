@@ -1,7 +1,9 @@
 import { oklch, parse } from 'culori';
 import { describe, expect, it } from 'vitest';
 
-import { PERCEPTUAL_L_GRID, SHADES } from './palette';
+import { PERCEPTUAL_L_GRID } from '../token-source/perceptual-grid';
+
+import { SHADES } from './palette';
 import { isColor, pinnedOklch, rampFromSeed } from './perceptual-ramp';
 
 function lOf(oklchStr: string): number {

@@ -2,21 +2,7 @@ import path from 'node:path';
 
 import ts from 'typescript';
 
-import { repoRoot } from './roots.mjs';
-
-export function toRepoPath(absolutePath) {
-  return path.relative(repoRoot, absolutePath).split(path.sep).join('/');
-}
-
-export function isUnder(filePath, directory) {
-  const relative = path.relative(directory, filePath);
-  return (
-    relative !== '' &&
-    relative !== '..' &&
-    !relative.startsWith(`..${path.sep}`) &&
-    !path.isAbsolute(relative)
-  );
-}
+import { isUnder, toRepoPath } from './roots.mjs';
 
 export function toSlugFolder(relativePath) {
   if (path.isAbsolute(relativePath)) return null;
@@ -28,20 +14,124 @@ export function toSlugFolder(relativePath) {
   return segments[0];
 }
 
-export function isComponentSource(filePath) {
-  const name = path.basename(filePath);
-  if (!/\.tsx?$/.test(name)) return false;
-  if (/\.(?:stories|test)\.tsx?$/.test(name)) return false;
-  return !/^index\.tsx?$/.test(name);
+// docgen reports a `cva` variant key as a PropItem with no declarations and no parent.
+function isSynthesized(prop) {
+  return (prop.declarations ?? []).length === 0 && !prop.parent;
 }
 
-// `cva` variant keys are synthesized members with no declaration and no parent.
 export function isOwnProp(prop) {
-  const declarations = prop.declarations ?? [];
-  if (declarations.length === 0) return !prop.parent;
-  return declarations.some(
+  if (isSynthesized(prop)) return true;
+  return (prop.declarations ?? []).some(
     (declaration) => !declaration.fileName.includes('node_modules')
   );
+}
+
+function branches(type) {
+  return type.isUnion() ? type.types : [type];
+}
+
+function hasStringIndex(checker, propsType) {
+  return branches(propsType).some((branch) =>
+    checker
+      .getIndexInfosOfType(branch)
+      .some((info) => (info.keyType.flags & ts.TypeFlags.String) !== 0)
+  );
+}
+
+// Matches `cva` however it is imported or re-bound: by the declaration its call resolves to.
+function isCvaCall(checker, node) {
+  if (!ts.isCallExpression(node)) return false;
+
+  const declaration = checker.getResolvedSignature(node)?.getDeclaration();
+  const variable = declaration?.parent;
+  return (
+    variable !== undefined &&
+    ts.isVariableDeclaration(variable) &&
+    ts.isIdentifier(variable.name) &&
+    variable.name.text === 'cva' &&
+    variable.getSourceFile().fileName.includes('/class-variance-authority/')
+  );
+}
+
+function variantKeyDeclarations(checker, node) {
+  if (!isCvaCall(checker, node)) return [];
+
+  const config = node.arguments[1];
+  if (!config) return [];
+
+  const variants = checker.getTypeAtLocation(config).getProperty('variants');
+  if (!variants) return [];
+
+  return checker
+    .getNonNullableType(checker.getTypeOfSymbol(variants))
+    .getProperties()
+    .flatMap((key) => key.declarations ?? []);
+}
+
+// The declarations of every key in a `cva()` config's `variants`, however the config is written.
+export function cvaVariantKeys(checker, sourceFiles) {
+  const keys = new Set();
+
+  function visit(node) {
+    for (const declaration of variantKeyDeclarations(checker, node)) {
+      keys.add(declaration);
+    }
+    ts.forEachChild(node, visit);
+  }
+
+  for (const sourceFile of sourceFiles) visit(sourceFile);
+
+  if (keys.size === 0) {
+    throw new Error(
+      'props JSON: no cva() call with `variants` resolved to the `cva` declared in class-variance-authority/dist/index.d.ts, so no variant key would be checked. Update isCvaCall in apps/docs/scripts/props-contract.mjs to match the installed class-variance-authority.'
+    );
+  }
+
+  return keys;
+}
+
+function variantKeyProblem(member, documentedProps) {
+  const documented = documentedProps[member.name];
+  if (!documented) return 'missing from the docgen output';
+
+  return documented.type.name.split(' | ').includes('string')
+    ? `widened to ${documented.type.name} in the docgen output`
+    : null;
+}
+
+// Checks each props type the checker resolves against the docgen output for it.
+export function propsContractProblems(
+  checker,
+  variantKeys,
+  name,
+  symbol,
+  documentedProps
+) {
+  const declaration = symbol.declarations[0];
+  const type = checker.getTypeOfSymbolAtLocation(symbol, declaration);
+
+  const problems = [
+    ...checker.getSignaturesOfType(type, ts.SignatureKind.Call),
+    ...checker.getSignaturesOfType(type, ts.SignatureKind.Construct),
+  ]
+    .flatMap((signature) => signature.parameters.slice(0, 1))
+    .map((props) => checker.getTypeOfSymbolAtLocation(props, declaration))
+    .flatMap((propsType) => {
+      if (hasStringIndex(checker, propsType)) {
+        return [`${name}: accepts arbitrary string-keyed props`];
+      }
+
+      return checker
+        .getPropertiesOfType(propsType)
+        .filter((member) => variantKeys.has(member.declarations?.[0]))
+        .flatMap((member) => {
+          const problem = variantKeyProblem(member, documentedProps);
+          return problem ? [`${name}.${member.name}: ${problem}`] : [];
+        });
+    });
+
+  // A class component resolves the same props through each `React.Component` constructor overload.
+  return [...new Set(problems)];
 }
 
 // Only a type export keeps the alias flag; a value export resolves through it.
@@ -92,7 +182,7 @@ function isRenderable(checker, symbol) {
     );
 }
 
-function resolveAlias(checker, symbol) {
+export function resolveAlias(checker, symbol) {
   if ((symbol.flags & ts.SymbolFlags.Alias) === 0) return symbol;
   try {
     return checker.getAliasedSymbol(symbol);

@@ -20,6 +20,23 @@ const EMITTED_CSS = EMITTING_ROOTS.flatMap((root) => {
     .map((entry) => fs.readFileSync(path.join(dir, entry), 'utf8'));
 });
 
+/** Every border side and divide axis Tailwind builds from a `--border-width-*` theme key. */
+const BORDER_WIDTH_GROUPS = [
+  'border-w',
+  'border-w-x',
+  'border-w-y',
+  'border-w-t',
+  'border-w-r',
+  'border-w-b',
+  'border-w-l',
+  'border-w-s',
+  'border-w-e',
+  'border-w-bs',
+  'border-w-be',
+  'divide-x',
+  'divide-y',
+] as const satisfies readonly (keyof typeof NEXUS_CLASS_GROUPS)[];
+
 /**
  * Namespaces where a Nexus `@theme` key reaches `cn()` through a built-in
  * tailwind-merge group. Each sentinel is a literal member of that group, so a
@@ -66,6 +83,17 @@ const THEME_NAMESPACES = [
       utility.replace(/^outline-/, '')
     ),
   },
+  ...BORDER_WIDTH_GROUPS.map((group) => {
+    const utility = group.replace(/^border-w/, 'border');
+    return {
+      cssKey: 'border-width',
+      utility,
+      sentinel: `nx:${utility}-2`,
+      registered: NEXUS_CLASS_GROUPS[group]
+        .filter((name) => !name.startsWith('border-width-'))
+        .map((name) => name.slice(`${utility}-`.length)),
+    };
+  }),
 ];
 
 /** CSS property a `typography-*` composite can declare, mapped to its owning class group. */
@@ -87,6 +115,34 @@ function emittedThemeTokens(cssKey: string) {
 }
 
 describe('cn', () => {
+  it.each(['primary', 'error', 'information', 'success', 'warning'])(
+    'keeps border widths while merging renamed %s colors and aliases',
+    (family) => {
+      const named = `nx:border-${family}-border`;
+      const alias = `nx:border-color-${family}`;
+      expect(cn('nx:border-thick', named, alias)).toBe(
+        `nx:border-thick ${alias}`
+      );
+      expect(cn('nx:border-thick', alias, named)).toBe(
+        `nx:border-thick ${named}`
+      );
+    }
+  );
+
+  it('merges focused border colors without removing their width or another state', () => {
+    expect(
+      cn(
+        'nx:border-default nx:border-error-border',
+        'nx:focus-within:border-border-focus'
+      )
+    ).toBe(
+      'nx:border-default nx:border-error-border nx:focus-within:border-border-focus'
+    );
+    expect(
+      cn('nx:border-thick nx:border-border-focus', 'nx:border-color-focus')
+    ).toBe('nx:border-thick nx:border-color-focus');
+  });
+
   it.each([
     ['radius base', 'nx:rounded-base', 'nx:rounded-md'],
     ['ease enter', 'nx:ease-enter', 'nx:ease-linear'],
@@ -120,6 +176,11 @@ describe('cn', () => {
       'nx:gap-layout-stack',
     ],
     ['border width', 'nx:border-thin nx:border-thick', 'nx:border-thick'],
+    [
+      'logical border width',
+      'nx:border-e-default nx:border-e-[2px]',
+      'nx:border-e-[2px]',
+    ],
     ['outline width', 'nx:outline-thin nx:outline-thick', 'nx:outline-thick'],
     [
       'border color',
@@ -140,6 +201,16 @@ describe('cn', () => {
       'transition',
       'nx:transition-control nx:transition-field',
       'nx:transition-field',
+    ],
+    [
+      'autofill surface',
+      'nx:autofill-bg-container nx:autofill-bg-background',
+      'nx:autofill-bg-background',
+    ],
+    [
+      'autofill text',
+      'nx:autofill-text-foreground nx:autofill-text-disabled-foreground',
+      'nx:autofill-text-disabled-foreground',
     ],
   ])('uses last-wins merging for the %s group', (_group, input, expected) => {
     expect(cn(input)).toBe(expected);
@@ -217,18 +288,26 @@ describe('cn', () => {
         .map(([, utility]) => utility)
         .filter((utility): utility is string => utility !== undefined)
     );
-    const registeredUtilities = new Set(
-      Object.values(NEXUS_CLASS_GROUPS).flat()
-    );
+    // A `{ prefix: [validator] }` entry registers `prefix-*` and every static
+    // `prefix-<value>` utility beside it.
+    const registeredUtilities = Object.values(NEXUS_CLASS_GROUPS).flat();
+    const isRegistered = (utility: string) =>
+      registeredUtilities.some((entry) =>
+        typeof entry === 'string'
+          ? entry === utility
+          : Object.keys(entry).some((prefix) =>
+              utility.startsWith(`${prefix}-`)
+            )
+      );
 
     expect(emittedUtilities.length).toBeGreaterThan(0);
     expect(
-      emittedUtilities.filter((utility) => !registeredUtilities.has(utility))
+      emittedUtilities.filter((utility) => !isRegistered(utility))
     ).toEqual([]);
   });
 
   it.each(THEME_NAMESPACES)(
-    'merges every emitted $cssKey theme token',
+    'merges every emitted $cssKey theme token as $utility',
     ({ cssKey, utility, sentinel }) => {
       for (const token of emittedThemeTokens(cssKey)) {
         expect(cn(`nx:${utility}-${token}`, sentinel)).toBe(sentinel);
@@ -237,7 +316,7 @@ describe('cn', () => {
   );
 
   it.each(THEME_NAMESPACES)(
-    'finds every registered $cssKey token in the scanned CSS',
+    'finds every registered $utility $cssKey token in the scanned CSS',
     ({ cssKey, registered }) => {
       expect(emittedThemeTokens(cssKey)).toEqual(
         expect.arrayContaining([...registered])

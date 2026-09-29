@@ -23,7 +23,7 @@ export function NexusAppearanceSettingRow({
           </p>
         ) : null}
       </div>
-      <div className="nx:shrink-0">{children}</div>
+      <div className="nx:min-w-0 nx:max-w-full nx:shrink-0">{children}</div>
     </div>
   );
 }
