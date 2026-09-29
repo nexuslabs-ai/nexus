@@ -12,7 +12,7 @@ release) and #798 (catalog + CI) build on it.
 | [`../copy-next`](../copy-next) | A fresh app: Next 16 App Router, default `@/` alias, `rsc: true` |
 
 Pinned: Node 24.12.0, npm 11.6.2, shadcn 4.21.0, Tailwind 4.3.3, Vite 8.3.1,
-Next 16.3.6, `@nexus_ds/core` 0.4.0 from npm. Both fixtures install with npm
+Next 16.3.6, `@nexus_ds/core` from npm at the version in `packages/core/package.json`. Both fixtures install with npm
 and commit their lockfile, so neither resolves the pnpm workspace. The
 findings were recorded against `main` at `a5176e306`; the recipe probe
 (Findings 5 and 6) used the #809 tree at `466db93b6`.

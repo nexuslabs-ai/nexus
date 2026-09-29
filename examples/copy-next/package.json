@@ -10,7 +10,7 @@
     "typecheck": "tsc --noEmit -p ."
   },
   "dependencies": {
-    "@nexus_ds/core": "^0.4.0",
+    "@nexus_ds/core": "^0.5.0",
     "@radix-ui/react-dialog": "^1.1.23",
     "@radix-ui/react-popover": "^1.1.23",
     "@radix-ui/react-progress": "^1.1.16",

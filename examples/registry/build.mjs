@@ -28,6 +28,10 @@ const NO_PREFLIGHT = [
   "@source './';",
 ].join('\n');
 
+const coreVersion = JSON.parse(
+  readFileSync(path.join(repoRoot, 'packages/core/package.json'), 'utf8')
+).version;
+
 const target = (srcPath) => `@components/nexus/${srcPath}`;
 
 function sourceFile(srcPath) {
@@ -53,7 +57,7 @@ function componentItem(slug) {
 const appearanceProvider = {
   name: 'appearance-provider',
   type: 'registry:component',
-  dependencies: ['@nexus_ds/core@0.4.0'],
+  dependencies: [`@nexus_ds/core@${coreVersion}`],
   files: ['factory.tsx', 'index.ts', 'provider.tsx', 'script.tsx', 'server.ts']
     .map((name) => `components/appearance/provider/${name}`)
     .map(sourceFile),
