@@ -8,7 +8,7 @@
     "build": "tsc -b && vite build",
     "lint": "oxlint",
     "preview": "vite preview",
-    "nexus:add": "shadcn add @nexus/styles @nexus/button @nexus/card @nexus/dialog @nexus/popover @nexus/progress @nexus/appearance-provider --yes --overwrite",
+    "nexus:add": "rm -rf src/components/nexus && shadcn add @nexus/button @nexus/card @nexus/dialog @nexus/popover @nexus/progress @nexus/appearance-provider --yes",
     "typecheck": "tsc -b"
   },
   "dependencies": {

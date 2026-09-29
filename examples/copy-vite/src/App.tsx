@@ -10,11 +10,17 @@ import {
   CardHeader,
   CardTitle,
 } from '~/components/ui/card'
+import { AppearanceControls } from '~/AppearanceControls'
 import { NexusPanel } from '~/NexusPanel'
 
 function MaybeProvider({ enabled, children }: { enabled: boolean; children: ReactNode }) {
   if (!enabled) return children
-  return <NexusAppearanceProvider storageKey={false}>{children}</NexusAppearanceProvider>
+  return (
+    <NexusAppearanceProvider storageKey={false}>
+      <AppearanceControls />
+      {children}
+    </NexusAppearanceProvider>
+  )
 }
 
 export default function App({

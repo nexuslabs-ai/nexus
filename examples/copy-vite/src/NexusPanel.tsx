@@ -27,7 +27,7 @@ import { Progress } from '~/components/nexus/components/progress'
 
 export function NexusPanel() {
   return (
-    <section data-probe="nexus-panel" className="mt-6 grid gap-4 sm:grid-cols-2">
+    <section data-nexus-root="" data-probe="nexus-panel" className="mt-6 grid gap-4 sm:grid-cols-2">
       <Card data-probe="nexus-card">
         <CardHeader>
           <CardTitle>Nexus card</CardTitle>
@@ -55,7 +55,7 @@ export function NexusPanel() {
                 Open dialog
               </Button>
             </DialogTrigger>
-            <DialogContent data-probe="nexus-dialog">
+            <DialogContent data-nexus-root="" data-probe="nexus-dialog">
               <DialogHeader>
                 <DialogTitle>Nexus dialog</DialogTitle>
                 <DialogDescription>Portalled to document.body.</DialogDescription>
@@ -77,7 +77,7 @@ export function NexusPanel() {
                 Open popover
               </Button>
             </PopoverTrigger>
-            <PopoverContent data-probe="nexus-popover">
+            <PopoverContent data-nexus-root="" data-probe="nexus-popover">
               <p data-probe="nexus-popover-text">Popover content</p>
               <HostButton data-probe="host-button-in-nexus-popover" size="sm">
                 Host

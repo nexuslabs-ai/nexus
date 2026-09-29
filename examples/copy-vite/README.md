@@ -7,4 +7,5 @@ contract, how to run it and the findings.
 
 Probe modes on `npm run preview`: `?no-nexus` (host only), `?nexus-first`
 (Nexus CSS before the host's), `?nexus-only` (no host CSS) and `?provider`
-(mounts `NexusAppearanceProvider`).
+(mounts `NexusAppearanceProvider` with runtime mode and density
+controls).
