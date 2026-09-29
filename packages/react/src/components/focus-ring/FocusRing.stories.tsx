@@ -24,7 +24,7 @@ import { SidebarInput } from '../sidebar';
 import { Textarea } from '../textarea';
 
 const meta: Meta = {
-  title: 'Components/FocusRing',
+  title: 'Tokens/Focus Ring',
   parameters: {
     layout: 'padded',
   },
