@@ -21,6 +21,8 @@ import {
   NumberComparisonFilter,
 } from './number-comparison-filter';
 import blockSource from './number-comparison-filter.tsx?raw';
+import { NumberComparisonFilterExample } from './number-comparison-filter-example';
+import exampleSource from './number-comparison-filter-example.tsx?raw';
 
 const initial: NumberComparisonCondition = {
   operator: 'greaterThan',
@@ -75,8 +77,6 @@ function Preview({
     </section>
   );
 }
-const usage =
-  "import { useState } from 'react';\nimport { NumberComparisonFilter, type NumberComparisonCondition } from './blocks/number-comparison-filter';\n\nexport function Example() {\n const [value, setValue] = useState<NumberComparisonCondition | null>({ operator: 'greaterThan', value: 500 });\n return <NumberComparisonFilter label=\"Amount\" value={value} onChange={setValue}  />;\n}";
 const valueShape = `type NumberComparisonCondition =
   | { operator: 'is' | 'isNot' | 'greaterThan' | 'lessThan'; value: number }
   | { operator: 'isEmpty' }
@@ -104,7 +104,7 @@ const meta = {
           </p>
           <h2>Minimal composition</h2>
           <Canvas of={Default} />
-          <Source code={usage} language="tsx" />
+          <Source code={exampleSource} language="tsx" />
           <h2>Value and changes</h2>
           <p>
             <code>value</code> is controlled: pass the current condition and
@@ -165,16 +165,18 @@ const meta = {
           </p>
           <ul>
             <li>
-              Copy <code>blocks/number-comparison-filter.tsx</code>,{' '}
-              <code>filter-operator.tsx</code>, keeping the
+              Copy <code>blocks/number-comparison-filter.tsx</code> and{' '}
+              <code>filter-operator.tsx</code>, keeping the{' '}
               <code>recipes/filtering</code> layout.
             </li>
             <li>
-              They import these Nexus component folders, which you need too:
-              <code>button</code>, <code>dropdown-menu</code>,{' '}
-              <code>filter-builder</code>, <code>filter-condition</code>,{' '}
-              <code>input</code>, <code>label</code>, <code>popover</code>. If
-              your copy lives elsewhere, update the relative imports.
+              They need these Nexus component folders, including the ones those
+              folders import: <code>button</code>, <code>button-group</code>,{' '}
+              <code>dropdown-menu</code>, <code>filter-condition</code>,{' '}
+              <code>filter-model</code>, <code>input</code>, <code>label</code>,{' '}
+              <code>overlay-layout</code>, <code>popover</code>,{' '}
+              <code>spinner</code> and <code>lib/</code>. If your copy lives
+              elsewhere, update the relative imports.
             </li>
             <li>
               No npm packages beyond those the Nexus components already use.
@@ -190,18 +192,7 @@ const meta = {
             </li>
           </ul>
           <h2>Evidence and support boundary</h2>
-          <p>
-            Each behaviour above is tested on this page:{' '}
-            <code>AddFromNothing</code>, <code>ApplyAndCancel</code>,{' '}
-            <code>IncompleteDraft</code>, <code>DismissDiscardsDraft</code>,{' '}
-            <code>OperatorKeepsValue</code>,{' '}
-            <code>ValuelessOperatorCommits</code>,{' '}
-            <code>PendingOperatorApplies</code>,{' '}
-            <code>BoundsChangeWhileOpen</code>,{' '}
-            <code>ExternalReplaceWhileOpen</code>,{' '}
-            <code>DisabledWhileOpen</code>, <code>InsideParentForm</code>,{' '}
-            <code>InsideDialog</code>, <code>Disabled</code>.
-          </p>
+          <p>The stories on this page test each behaviour above.</p>
           <p>
             Not supported: unit conversion and currency formatting. The
             application decides how the comparison matches.
@@ -227,7 +218,10 @@ const meta = {
 } satisfies Meta<typeof Preview>;
 export default meta;
 type Story = StoryObj<typeof meta>;
-export const Default: Story = { render: () => <Preview /> };
+export const Default: Story = {
+  render: () => <NumberComparisonFilterExample />,
+  parameters: { docs: { source: { code: exampleSource } } },
+};
 export const NotApplied: Story = {
   render: () => <Preview initialValue={null} />,
 };
@@ -368,13 +362,15 @@ export const BoundsChangeWhileOpen: Story = {
     const editor = within(dialog);
     const input = editor.getByRole('spinbutton', { name: 'Amount' });
     await userEvent.clear(input);
-    await userEvent.type(input, '750');
+    await userEvent.type(input, '1500');
+    await expect(editor.getByRole('button', { name: 'Apply' })).toBeEnabled();
     dispatchStoryEvent('story:tighten-bounds');
     await expect(
       await editor.findByText('Allowed range: no minimum to 1000.')
     ).toBeVisible();
+    await expect(editor.getByRole('button', { name: 'Apply' })).toBeDisabled();
     await expect(dialog).toHaveAttribute('data-state', 'open');
-    await expect(input).toHaveValue(750);
+    await expect(input).toHaveValue(1500);
   },
 };
 export const AddFromNothing: Story = {
@@ -525,7 +521,11 @@ export const DisabledWhileOpen: Story = {
     for (const button of canvas.getAllByRole('button'))
       await expect(button).toBeDisabled();
     dispatchStoryEvent('story:toggle-disabled');
-    await waitFor(() => expect(canvas.getAllByRole('button')[0]).toBeEnabled());
+    await waitFor(() =>
+      expect(
+        canvas.getByRole('button', { name: 'Edit Amount: 500' })
+      ).toBeEnabled()
+    );
     await expect(
       page.queryByRole('dialog', { name: 'Filter by amount' })
     ).not.toBeInTheDocument();

@@ -15,6 +15,8 @@ import operatorSource from '../filter-operator.tsx?raw';
 
 import { type ChoiceCondition, ChoiceFilter } from './choice-filter';
 import blockSource from './choice-filter.tsx?raw';
+import { ChoiceFilterExample } from './choice-filter-example';
+import exampleSource from './choice-filter-example.tsx?raw';
 
 const replacement: ChoiceCondition = { operator: 'is', value: 'suspended' };
 function Preview({
@@ -64,8 +66,6 @@ function Preview({
   );
 }
 
-const usage =
-  "import { useState } from 'react';\nimport {\n  ChoiceFilter,\n  type ChoiceCondition,\n} from './blocks/choice-filter';\n\nexport function Example() {\n  const [value, setValue] = useState<ChoiceCondition | null>({\n    operator: 'is',\n    value: 'active',\n  });\n  return (\n    <ChoiceFilter\n      label=\"Status\"\n      value={value}\n      onChange={setValue}\n      options={[\n        { value: 'active', label: 'Active' },\n        { value: 'invited', label: 'Invited' },\n        { value: 'suspended', label: 'Suspended' },\n      ]}\n    />\n  );\n}\n";
 const valueShape = `type ChoiceCondition =
   | { operator: 'is' | 'isNot'; value: string }
   | { operator: 'isEmpty' }
@@ -95,7 +95,7 @@ const meta = {
           </p>
           <h2>Minimal composition</h2>
           <Canvas of={Default} />
-          <Source code={usage} language="tsx" />
+          <Source code={exampleSource} language="tsx" />
           <h2>Value and changes</h2>
           <p>
             <code>value</code> is controlled: pass the current condition and
@@ -153,15 +153,17 @@ const meta = {
           </p>
           <ul>
             <li>
-              Copy <code>blocks/choice-filter.tsx</code>,{' '}
-              <code>filter-operator.tsx</code>, keeping the
+              Copy <code>blocks/choice-filter.tsx</code> and{' '}
+              <code>filter-operator.tsx</code>, keeping the{' '}
               <code>recipes/filtering</code> layout.
             </li>
             <li>
-              They import these Nexus component folders, which you need too:
-              <code>button</code>, <code>dropdown-menu</code>,{' '}
-              <code>filter-builder</code>, <code>filter-condition</code>. If
-              your copy lives elsewhere, update the relative imports.
+              They need these Nexus component folders, including the ones those
+              folders import: <code>button</code>, <code>button-group</code>,{' '}
+              <code>dropdown-menu</code>, <code>filter-condition</code>,{' '}
+              <code>filter-model</code>, <code>overlay-layout</code>,{' '}
+              <code>spinner</code> and <code>lib/</code>. If your copy lives
+              elsewhere, update the relative imports.
             </li>
             <li>
               No npm packages beyond those the Nexus components already use.
@@ -177,18 +179,7 @@ const meta = {
             </li>
           </ul>
           <h2>Evidence and support boundary</h2>
-          <p>
-            Each behaviour above is tested on this page:{' '}
-            <code>SelectCommits</code>, <code>AddFromNothing</code>,{' '}
-            <code>OperatorKeepsValue</code>,{' '}
-            <code>ValuelessOperatorCommits</code>,{' '}
-            <code>PendingOperatorApplies</code>,{' '}
-            <code>ChooseAfterEmptyOperator</code>, <code>AnyRemovesFilter</code>
-            , <code>UnavailableOption</code>,{' '}
-            <code>ExternalReplaceWhileOpen</code>,{' '}
-            <code>DisabledWhileOpen</code>, <code>InsideDialog</code>,{' '}
-            <code>Disabled</code>.
-          </p>
+          <p>The stories on this page test each behaviour above.</p>
           <p>
             Not supported: searching options, selecting several values, and
             loading states while options are fetched. The application decides
@@ -216,8 +207,8 @@ const meta = {
 export default meta;
 type Story = StoryObj<typeof meta>;
 export const Default: Story = {
-  render: () => <Preview />,
-  parameters: { docs: { source: { code: usage } } },
+  render: () => <ChoiceFilterExample />,
+  parameters: { docs: { source: { code: exampleSource } } },
   play: async ({ canvasElement }) => {
     const canvas = within(canvasElement);
     await userEvent.click(
@@ -259,6 +250,9 @@ export const UnavailableOption: Story = {
         name: 'retired-id (unavailable)',
       })
     ).toHaveAttribute('aria-checked', 'true');
+    await expect(
+      page.getByRole('menuitemradio', { name: 'retired-id (unavailable)' })
+    ).toHaveAttribute('aria-disabled', 'true');
     await userEvent.click(page.getByRole('menuitemradio', { name: 'Active' }));
     await expect(args.onChange).toHaveBeenLastCalledWith({
       operator: 'is',
@@ -443,7 +437,11 @@ export const DisabledWhileOpen: Story = {
     for (const button of canvas.getAllByRole('button'))
       await expect(button).toBeDisabled();
     dispatchStoryEvent('story:toggle-disabled');
-    await waitFor(() => expect(canvas.getAllByRole('button')[0]).toBeEnabled());
+    await waitFor(() =>
+      expect(
+        canvas.getByRole('button', { name: 'Edit Status: Active' })
+      ).toBeEnabled()
+    );
     await expect(page.queryByRole('menu')).not.toBeInTheDocument();
     await expect(args.onChange).not.toHaveBeenCalled();
   },

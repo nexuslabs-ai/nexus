@@ -19,6 +19,8 @@ import {
   NumberRangeFilter,
 } from './number-range-filter';
 import blockSource from './number-range-filter.tsx?raw';
+import { NumberRangeFilterExample } from './number-range-filter-example';
+import exampleSource from './number-range-filter-example.tsx?raw';
 
 const replacement: NumberRangeCondition = {
   operator: 'between',
@@ -70,8 +72,6 @@ function Preview({
   );
 }
 
-const usage =
-  "import { useState } from 'react';\nimport {\n  NumberRangeFilter,\n  type NumberRangeCondition,\n} from './blocks/number-range-filter';\n\nexport function Example() {\n  const [value, setValue] = useState<NumberRangeCondition | null>({\n    operator: 'between',\n    min: 100,\n    max: 500,\n  });\n  return (\n    <NumberRangeFilter\n      label=\"Size\"\n      value={value}\n      onChange={setValue}\n      unit=\"KB\"\n      lowerBound={0}\n    />\n  );\n}\n";
 const valueShape = `type NumberRangeCondition =
   | { operator: 'between'; min: number; max: number }
   | { operator: 'isEmpty' }
@@ -99,7 +99,7 @@ const meta = {
           </p>
           <h2>Minimal composition</h2>
           <Canvas of={Default} />
-          <Source code={usage} language="tsx" />
+          <Source code={exampleSource} language="tsx" />
           <h2>Value and changes</h2>
           <p>
             <code>value</code> is controlled: pass the current condition and
@@ -156,16 +156,18 @@ const meta = {
           </p>
           <ul>
             <li>
-              Copy <code>blocks/number-range-filter.tsx</code>,{' '}
-              <code>filter-operator.tsx</code>, keeping the
+              Copy <code>blocks/number-range-filter.tsx</code> and{' '}
+              <code>filter-operator.tsx</code>, keeping the{' '}
               <code>recipes/filtering</code> layout.
             </li>
             <li>
-              They import these Nexus component folders, which you need too:
-              <code>button</code>, <code>dropdown-menu</code>,{' '}
-              <code>filter-builder</code>, <code>filter-condition</code>,{' '}
-              <code>input</code>, <code>label</code>, <code>popover</code>. If
-              your copy lives elsewhere, update the relative imports.
+              They need these Nexus component folders, including the ones those
+              folders import: <code>button</code>, <code>button-group</code>,{' '}
+              <code>dropdown-menu</code>, <code>filter-condition</code>,{' '}
+              <code>filter-model</code>, <code>input</code>, <code>label</code>,{' '}
+              <code>overlay-layout</code>, <code>popover</code>,{' '}
+              <code>spinner</code> and <code>lib/</code>. If your copy lives
+              elsewhere, update the relative imports.
             </li>
             <li>
               No npm packages beyond those the Nexus components already use.
@@ -181,17 +183,7 @@ const meta = {
             </li>
           </ul>
           <h2>Evidence and support boundary</h2>
-          <p>
-            Each behaviour above is tested on this page:{' '}
-            <code>AddFromNothing</code>, <code>SignedDecimalsAndCancel</code>,{' '}
-            <code>ErrorOnlyForWrongRange</code>,{' '}
-            <code>DismissDiscardsDraft</code>,{' '}
-            <code>ValuelessOperatorCommits</code>, <code>PendingOperator</code>,{' '}
-            <code>PendingOperatorApplies</code>, <code>ReapplySameRange</code>,{' '}
-            <code>ExternalReplaceWhileOpen</code>,{' '}
-            <code>DisabledWhileOpen</code>, <code>InsideParentForm</code>,{' '}
-            <code>Disabled</code>.
-          </p>
+          <p>The stories on this page test each behaviour above.</p>
           <p>
             Not supported: unit conversion and open-ended ranges. The
             application decides whether the ends are inclusive.
@@ -218,8 +210,8 @@ const meta = {
 export default meta;
 type Story = StoryObj<typeof meta>;
 export const Default: Story = {
-  render: () => <Preview />,
-  parameters: { docs: { source: { code: usage } } },
+  render: () => <NumberRangeFilterExample />,
+  parameters: { docs: { source: { code: exampleSource } } },
   play: async ({ canvasElement }) => {
     const canvas = within(canvasElement);
     await userEvent.click(
@@ -525,7 +517,11 @@ export const DisabledWhileOpen: Story = {
     for (const button of canvas.getAllByRole('button'))
       await expect(button).toBeDisabled();
     dispatchStoryEvent('story:toggle-disabled');
-    await waitFor(() => expect(canvas.getAllByRole('button')[0]).toBeEnabled());
+    await waitFor(() =>
+      expect(
+        canvas.getByRole('button', { name: 'Edit Size: 100–500 KB' })
+      ).toBeEnabled()
+    );
     await expect(
       page.queryByRole('dialog', { name: 'Filter by size' })
     ).not.toBeInTheDocument();

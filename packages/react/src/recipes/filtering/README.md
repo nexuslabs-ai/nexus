@@ -15,17 +15,17 @@ them; this file only maps the source.
 **Blocks** — copy-source, not package exports. Each block page lists its files,
 the Nexus component folders it imports and any npm peer.
 
-| File                                  | Block or helper                                                     |
-| ------------------------------------- | ------------------------------------------------------------------- |
-| `blocks/choice-filter.tsx`            | ChoiceFilter, and ChoiceEditor for your own menu                    |
-| `blocks/multi-choice-filter.tsx`      | MultiChoiceFilter, and MultiChoiceEditor for your own popover       |
-| `blocks/text-filter.tsx`              | TextFilter                                                          |
-| `blocks/number-comparison-filter.tsx` | NumberComparisonFilter                                              |
-| `blocks/number-range-filter.tsx`      | NumberRangeFilter                                                   |
-| `blocks/date-range-filter.tsx`        | DateRangeFilter (needs the `react-day-picker` v9 peer)              |
-| `blocks/applied-filters.tsx`          | AppliedFilters: a wrapping row; owns layout only                    |
-| `filter-operator.tsx`                 | The operator menu every block uses                                  |
-| `filter-rule-examples.ts`             | One function per block converting its value to a FilterBuilder rule |
+| File                                  | Block or helper                                                        |
+| ------------------------------------- | ---------------------------------------------------------------------- |
+| `blocks/choice-filter.tsx`            | ChoiceFilter, and ChoiceEditor for your own menu                       |
+| `blocks/multi-choice-filter.tsx`      | MultiChoiceFilter, and MultiChoiceEditor for your own popover          |
+| `blocks/text-filter.tsx`              | TextFilter                                                             |
+| `blocks/number-comparison-filter.tsx` | NumberComparisonFilter                                                 |
+| `blocks/number-range-filter.tsx`      | NumberRangeFilter                                                      |
+| `blocks/date-range-filter.tsx`        | DateRangeFilter (needs the `react-day-picker` v9 peer)                 |
+| `blocks/applied-filters.tsx`          | AppliedFilters: a wrapping row; owns layout only                       |
+| `filter-operator.tsx`                 | The operator menu every block uses                                     |
+| `blocks/*-example.tsx`                | Each block's minimal composition and its FilterBuilder rule conversion |
 
 **Examples** — runnable compositions shown on `Patterns/Filtering`. Replace the
 fixtures and local matching with your own query.

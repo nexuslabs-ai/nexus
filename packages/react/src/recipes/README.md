@@ -33,7 +33,8 @@ page and pattern page follows this checklist, in this order.
 
 ## 5. Delivery
 
-- The files to copy, and the component folders they import.
+- The files to copy, and every component folder they need, including the
+  folders those folders import, plus `lib/`.
 - npm dependencies, including optional peers.
 - What the application is responsible for: data, permissions, query evaluation,
   loading and error handling, URL state.

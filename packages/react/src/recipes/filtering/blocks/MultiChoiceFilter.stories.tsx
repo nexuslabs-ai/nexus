@@ -20,6 +20,8 @@ import {
   MultiChoiceFilter,
 } from './multi-choice-filter';
 import blockSource from './multi-choice-filter.tsx?raw';
+import { MultiChoiceFilterExample } from './multi-choice-filter-example';
+import exampleSource from './multi-choice-filter-example.tsx?raw';
 
 const initial: MultiChoiceCondition = {
   operator: 'isAnyOf',
@@ -83,8 +85,6 @@ function Preview({
     </section>
   );
 }
-const usage =
-  'import { useState } from \'react\';\nimport { MultiChoiceFilter, type MultiChoiceCondition } from \'./blocks/multi-choice-filter\';\n\nexport function Example() {\n const [value, setValue] = useState<MultiChoiceCondition | null>({ operator: \'isAnyOf\', values: [\'design\'] });\n return <MultiChoiceFilter label="Team" value={value} onChange={setValue} options={[{ value: "design", label: "Design" }, { value: "engineering", label: "Engineering" }, { value: "operations", label: "Operations", disabled: true }]} />;\n}';
 const valueShape = `type MultiChoiceCondition =
   | { operator: 'isAnyOf' | 'isNoneOf'; values: string[] }
   | { operator: 'isEmpty' }
@@ -113,7 +113,7 @@ const meta = {
           </p>
           <h2>Minimal composition</h2>
           <Canvas of={Default} />
-          <Source code={usage} language="tsx" />
+          <Source code={exampleSource} language="tsx" />
           <h2>Value and changes</h2>
           <p>
             <code>value</code> is controlled: pass the current condition and
@@ -175,17 +175,19 @@ const meta = {
           </p>
           <ul>
             <li>
-              Copy <code>blocks/multi-choice-filter.tsx</code>,{' '}
-              <code>filter-operator.tsx</code>, keeping the
+              Copy <code>blocks/multi-choice-filter.tsx</code> and{' '}
+              <code>filter-operator.tsx</code>, keeping the{' '}
               <code>recipes/filtering</code> layout.
             </li>
             <li>
-              They import these Nexus component folders, which you need too:
-              <code>button</code>, <code>checkbox</code>,{' '}
-              <code>dropdown-menu</code>, <code>filter-builder</code>,{' '}
-              <code>filter-condition</code>, <code>label</code>,{' '}
-              <code>popover</code>. If your copy lives elsewhere, update the
-              relative imports.
+              They need these Nexus component folders, including the ones those
+              folders import: <code>button</code>, <code>button-group</code>,{' '}
+              <code>checkbox</code>, <code>choice-row</code>,{' '}
+              <code>dropdown-menu</code>, <code>filter-condition</code>,{' '}
+              <code>filter-model</code>, <code>label</code>,{' '}
+              <code>overlay-layout</code>, <code>popover</code>,{' '}
+              <code>spinner</code> and <code>lib/</code>. If your copy lives
+              elsewhere, update the relative imports.
             </li>
             <li>
               No npm packages beyond those the Nexus components already use.
@@ -201,18 +203,7 @@ const meta = {
             </li>
           </ul>
           <h2>Evidence and support boundary</h2>
-          <p>
-            Each behaviour above is tested on this page:{' '}
-            <code>AddFromNothing</code>, <code>ApplyAndCancel</code>,{' '}
-            <code>IncompleteDraft</code>, <code>OutsideDismissal</code>,{' '}
-            <code>DismissDiscardsDraft</code>, <code>OperatorKeepsValue</code>,{' '}
-            <code>ValuelessOperatorCommits</code>,{' '}
-            <code>PendingOperatorApplies</code>,{' '}
-            <code>OptionsLoadWhileOpen</code>, <code>UnavailableOption</code>,{' '}
-            <code>ExternalReplaceWhileOpen</code>,{' '}
-            <code>DisabledWhileOpen</code>, <code>InsideParentForm</code>,{' '}
-            <code>Disabled</code>.
-          </p>
+          <p>The stories on this page test each behaviour above.</p>
           <p>
             Not supported: searching options and applying each checkbox
             immediately. The application decides how a record with several
@@ -239,7 +230,10 @@ const meta = {
 } satisfies Meta<typeof Preview>;
 export default meta;
 type Story = StoryObj<typeof meta>;
-export const Default: Story = { render: () => <Preview /> };
+export const Default: Story = {
+  render: () => <MultiChoiceFilterExample />,
+  parameters: { docs: { source: { code: exampleSource } } },
+};
 export const NotApplied: Story = {
   render: () => <Preview initialValue={null} />,
 };
@@ -335,26 +329,6 @@ export const IncompleteDraft: Story = {
   },
 };
 
-export const OutsideDismissal: Story = {
-  play: async ({ canvasElement }) => {
-    const canvas = within(canvasElement);
-    const page = within(canvasElement.ownerDocument.body);
-    const output = canvas.getByLabelText('Applied condition');
-    const before = output.textContent ?? '';
-    await userEvent.click(canvas.getByRole('button', { name: /^Edit Team:/ }));
-    await userEvent.click(page.getByRole('checkbox', { name: 'Engineering' }));
-    await userEvent.click(output);
-    await waitFor(() =>
-      expect(page.queryByRole('dialog')).not.toBeInTheDocument()
-    );
-    await expect(output).toHaveTextContent(before);
-    await userEvent.click(canvas.getByRole('button', { name: /^Edit Team:/ }));
-    await expect(
-      page.getByRole('checkbox', { name: 'Engineering' })
-    ).not.toBeChecked();
-    await userEvent.keyboard('{Escape}');
-  },
-};
 export const UnavailableOption: Story = {
   render: () => (
     <Preview
@@ -502,6 +476,12 @@ export const DismissDiscardsDraft: Story = {
     await userEvent.click(page.getByRole('checkbox', { name: 'Engineering' }));
     await userEvent.click(canvas.getByLabelText('Applied condition'));
     await expectEditorClosed(canvasElement, 'Filter by team');
+    await userEvent.click(trigger);
+    await expect(
+      await page.findByRole('checkbox', { name: 'Engineering' })
+    ).not.toBeChecked();
+    await userEvent.keyboard('{Escape}');
+    await expectEditorClosed(canvasElement, 'Filter by team');
     await expect(args.onChange).not.toHaveBeenCalled();
   },
 };
@@ -540,7 +520,11 @@ export const DisabledWhileOpen: Story = {
     for (const button of canvas.getAllByRole('button'))
       await expect(button).toBeDisabled();
     dispatchStoryEvent('story:toggle-disabled');
-    await waitFor(() => expect(canvas.getAllByRole('button')[0]).toBeEnabled());
+    await waitFor(() =>
+      expect(
+        canvas.getByRole('button', { name: 'Edit Team: Design' })
+      ).toBeEnabled()
+    );
     await expect(
       page.queryByRole('dialog', { name: 'Filter by team' })
     ).not.toBeInTheDocument();

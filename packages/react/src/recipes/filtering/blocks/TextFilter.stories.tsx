@@ -17,6 +17,8 @@ import operatorSource from '../filter-operator.tsx?raw';
 
 import { type TextCondition, TextFilter } from './text-filter';
 import blockSource from './text-filter.tsx?raw';
+import { TextFilterExample } from './text-filter-example';
+import exampleSource from './text-filter-example.tsx?raw';
 
 const initial: TextCondition = { operator: 'contains', value: 'design' };
 const replacement: TextCondition = {
@@ -63,8 +65,6 @@ function Preview({
     </section>
   );
 }
-const usage =
-  "import { useState } from 'react';\nimport { TextFilter, type TextCondition } from './blocks/text-filter';\n\nexport function Example() {\n const [value, setValue] = useState<TextCondition | null>({ operator: 'contains', value: 'design' });\n return <TextFilter label=\"Name\" value={value} onChange={setValue}  />;\n}";
 const valueShape = `type TextCondition =
   | { operator: 'contains' | 'is' | 'isNot' | 'startsWith'; value: string }
   | { operator: 'isEmpty' }
@@ -92,7 +92,7 @@ const meta = {
           </p>
           <h2>Minimal composition</h2>
           <Canvas of={Default} />
-          <Source code={usage} language="tsx" />
+          <Source code={exampleSource} language="tsx" />
           <h2>Value and changes</h2>
           <p>
             <code>value</code> is controlled: pass the current condition and
@@ -145,16 +145,18 @@ const meta = {
           </p>
           <ul>
             <li>
-              Copy <code>blocks/text-filter.tsx</code>,{' '}
-              <code>filter-operator.tsx</code>, keeping the
+              Copy <code>blocks/text-filter.tsx</code> and{' '}
+              <code>filter-operator.tsx</code>, keeping the{' '}
               <code>recipes/filtering</code> layout.
             </li>
             <li>
-              They import these Nexus component folders, which you need too:
-              <code>button</code>, <code>dropdown-menu</code>,{' '}
-              <code>filter-builder</code>, <code>filter-condition</code>,{' '}
-              <code>input</code>, <code>label</code>, <code>popover</code>. If
-              your copy lives elsewhere, update the relative imports.
+              They need these Nexus component folders, including the ones those
+              folders import: <code>button</code>, <code>button-group</code>,{' '}
+              <code>dropdown-menu</code>, <code>filter-condition</code>,{' '}
+              <code>filter-model</code>, <code>input</code>, <code>label</code>,{' '}
+              <code>overlay-layout</code>, <code>popover</code>,{' '}
+              <code>spinner</code> and <code>lib/</code>. If your copy lives
+              elsewhere, update the relative imports.
             </li>
             <li>
               No npm packages beyond those the Nexus components already use.
@@ -170,17 +172,7 @@ const meta = {
             </li>
           </ul>
           <h2>Evidence and support boundary</h2>
-          <p>
-            Each behaviour above is tested on this page:{' '}
-            <code>AddFromNothing</code>, <code>ApplyAndCancel</code>,{' '}
-            <code>IncompleteDraft</code>, <code>DismissDiscardsDraft</code>,{' '}
-            <code>OperatorKeepsValue</code>,{' '}
-            <code>ValuelessOperatorCommits</code>,{' '}
-            <code>PendingOperatorApplies</code>,{' '}
-            <code>ExternalReplaceWhileOpen</code>,{' '}
-            <code>DisabledWhileOpen</code>, <code>InsideParentForm</code>,{' '}
-            <code>Disabled</code>.
-          </p>
+          <p>The stories on this page test each behaviour above.</p>
           <p>
             Not supported: case sensitivity, normalization and query escaping.
             The application decides how text matches.
@@ -206,7 +198,10 @@ const meta = {
 } satisfies Meta<typeof Preview>;
 export default meta;
 type Story = StoryObj<typeof meta>;
-export const Default: Story = { render: () => <Preview /> };
+export const Default: Story = {
+  render: () => <TextFilterExample />,
+  parameters: { docs: { source: { code: exampleSource } } },
+};
 export const NotApplied: Story = {
   render: () => <Preview initialValue={null} />,
 };
@@ -453,7 +448,11 @@ export const DisabledWhileOpen: Story = {
     for (const button of canvas.getAllByRole('button'))
       await expect(button).toBeDisabled();
     dispatchStoryEvent('story:toggle-disabled');
-    await waitFor(() => expect(canvas.getAllByRole('button')[0]).toBeEnabled());
+    await waitFor(() =>
+      expect(
+        canvas.getByRole('button', { name: 'Edit Name: design' })
+      ).toBeEnabled()
+    );
     await expect(
       page.queryByRole('dialog', { name: 'Filter by name' })
     ).not.toBeInTheDocument();

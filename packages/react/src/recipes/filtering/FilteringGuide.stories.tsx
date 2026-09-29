@@ -15,15 +15,13 @@ import { exampleFields } from './advanced-fixtures';
 import { AppliedFiltersExample } from './applied-filters-example';
 import appliedExampleSource from './applied-filters-example.tsx?raw';
 import appliedFiltersSource from './blocks/applied-filters.tsx?raw';
-import {
-  choiceRule,
-  dateRangeRule,
-  multiChoiceRule,
-  numberComparisonRule,
-  numberRangeRule,
-  textRule,
-} from './filter-rule-examples';
-import rulesSource from './filter-rule-examples.ts?raw';
+import { choiceRule } from './blocks/choice-filter-example';
+import choiceExampleSource from './blocks/choice-filter-example.tsx?raw';
+import { dateRangeRule } from './blocks/date-range-filter-example';
+import { multiChoiceRule } from './blocks/multi-choice-filter-example';
+import { numberComparisonRule } from './blocks/number-comparison-filter-example';
+import { numberRangeRule } from './blocks/number-range-filter-example';
+import { textRule } from './blocks/text-filter-example';
 import { InvoiceFilteringExample } from './invoice-filtering';
 import invoiceSource from './invoice-filtering.tsx?raw';
 import {
@@ -179,9 +177,13 @@ const meta = {
             block’s numeric bounds.
           </p>
           <Canvas of={BlockConditionsToRules} />
+          <p>
+            Each block’s example file, <code>blocks/*-example.tsx</code>,
+            exports that block’s conversion next to its minimal composition:
+          </p>
           <details>
-            <summary>filter-rule-examples.ts</summary>
-            <Source code={rulesSource} language="tsx" />
+            <summary>blocks/choice-filter-example.tsx</summary>
+            <Source code={choiceExampleSource} language="tsx" />
           </details>
           <h2>3. Start from a minimal example</h2>
           <p>
@@ -498,7 +500,9 @@ export const InvoiceFiltering: Story = {
 export const BlockConditionsToRules: Story = {
   name: 'Block conditions as FilterBuilder rules',
   render: () => <ConvertedRules />,
-  parameters: { docs: { source: { code: rulesSource, language: 'tsx' } } },
+  parameters: {
+    docs: { source: { code: choiceExampleSource, language: 'tsx' } },
+  },
   play: async ({ canvasElement }) => {
     await expect(convertedRules).toMatchObject([
       { field: 'status', operator: 'is', value: 'active' },
@@ -520,9 +524,7 @@ export const BlockConditionsToRules: Story = {
     };
     await expect(getFilterErrors(root, exampleFields)).toEqual([]);
     await expect(
-      within(canvasElement).queryByText(
-        /Choose an available|Enter a|The start must|This operator takes/
-      )
+      canvasElement.querySelector('[aria-invalid="true"]')
     ).not.toBeInTheDocument();
     await expect(choiceRule('none', 'status', null)).toBeNull();
     await expect(

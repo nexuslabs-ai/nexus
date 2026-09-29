@@ -17,6 +17,8 @@ import operatorSource from '../filter-operator.tsx?raw';
 
 import { type DateRangeCondition, DateRangeFilter } from './date-range-filter';
 import blockSource from './date-range-filter.tsx?raw';
+import { DateRangeFilterExample } from './date-range-filter-example';
+import exampleSource from './date-range-filter-example.tsx?raw';
 
 const initial: DateRangeCondition = {
   operator: 'between',
@@ -71,8 +73,6 @@ function Preview({
     </section>
   );
 }
-const usage =
-  "import { useState } from 'react';\nimport { DateRangeFilter, type DateRangeCondition } from './blocks/date-range-filter';\n\nexport function Example() {\n const [value, setValue] = useState<DateRangeCondition | null>({ operator: 'between', from: new Date(2026, 8, 1), to: new Date(2026, 8, 10) });\n return <DateRangeFilter label=\"Created\" value={value} onChange={setValue} />;\n}";
 const valueShape = `type DateRangeCondition =
   | { operator: 'between'; from: Date; to: Date }
   | { operator: 'isEmpty' }
@@ -100,7 +100,7 @@ const meta = {
           </p>
           <h2>Minimal composition</h2>
           <Canvas of={Default} />
-          <Source code={usage} language="tsx" />
+          <Source code={exampleSource} language="tsx" />
           <h2>Value and changes</h2>
           <p>
             <code>value</code> is controlled: pass the current condition and
@@ -157,16 +157,18 @@ const meta = {
           </p>
           <ul>
             <li>
-              Copy <code>blocks/date-range-filter.tsx</code>,{' '}
-              <code>filter-operator.tsx</code>, keeping the
+              Copy <code>blocks/date-range-filter.tsx</code> and{' '}
+              <code>filter-operator.tsx</code>, keeping the{' '}
               <code>recipes/filtering</code> layout.
             </li>
             <li>
-              They import these Nexus component folders, which you need too:
-              <code>button</code>, <code>date-picker</code>,{' '}
-              <code>dropdown-menu</code>, <code>filter-builder</code>,{' '}
-              <code>filter-condition</code>, <code>popover</code>. If your copy
-              lives elsewhere, update the relative imports.
+              They need these Nexus component folders, including the ones those
+              folders import: <code>button</code>, <code>button-group</code>,{' '}
+              <code>date-picker</code>, <code>dropdown-menu</code>,{' '}
+              <code>filter-condition</code>, <code>filter-model</code>,{' '}
+              <code>overlay-layout</code>, <code>popover</code>,{' '}
+              <code>spinner</code> and <code>lib/</code>. If your copy lives
+              elsewhere, update the relative imports.
             </li>
             <li>
               The date picker needs the optional <code>react-day-picker</code>{' '}
@@ -183,16 +185,7 @@ const meta = {
             </li>
           </ul>
           <h2>Evidence and support boundary</h2>
-          <p>
-            Each behaviour above is tested on this page:{' '}
-            <code>AddFromNothing</code>, <code>ApplyAndCancel</code>,{' '}
-            <code>DismissDiscardsDraft</code>,{' '}
-            <code>ValuelessOperatorCommits</code>,{' '}
-            <code>PendingOperatorApplies</code>,{' '}
-            <code>ExternalReplaceWhileOpen</code>,{' '}
-            <code>DisabledWhileOpen</code>, <code>InsideParentForm</code>,{' '}
-            <code>Disabled</code>.
-          </p>
+          <p>The stories on this page test each behaviour above.</p>
           <p>
             Not supported: time of day, timezone conversion and relative ranges
             that keep moving. The application decides whether the end date is
@@ -219,7 +212,10 @@ const meta = {
 } satisfies Meta<typeof Preview>;
 export default meta;
 type Story = StoryObj<typeof meta>;
-export const Default: Story = { render: () => <Preview /> };
+export const Default: Story = {
+  render: () => <DateRangeFilterExample />,
+  parameters: { docs: { source: { code: exampleSource } } },
+};
 export const NotApplied: Story = {
   render: () => <Preview initialValue={null} />,
 };
@@ -389,17 +385,19 @@ export const ExternalReplaceWhileOpen: Story = {
   play: async ({ canvasElement, args }) => {
     const canvas = within(canvasElement);
     const page = within(canvasElement.ownerDocument.body);
-    const trigger = canvas.getByRole('button', { name: /^Edit Created:/ });
-    const before = trigger.getAttribute('aria-label');
-    await userEvent.click(trigger);
+    await userEvent.click(
+      canvas.getByRole('button', { name: /^Edit Created:/ })
+    );
     await userEvent.click(
       await page.findByRole('button', { name: 'Last 7 days' })
     );
     dispatchStoryEvent('story:replace');
     await expectEditorClosed(canvasElement, 'Filter by created');
     await expect(
-      canvas.getByRole('button', { name: /^Edit Created:/ })
-    ).not.toHaveAttribute('aria-label', before);
+      canvas.getByRole('button', {
+        name: `Edit Created: ${replacement.from.toLocaleDateString()} – ${replacement.to.toLocaleDateString()}`,
+      })
+    ).toBeVisible();
     await expect(args.onChange).not.toHaveBeenCalled();
   },
 };
@@ -419,7 +417,11 @@ export const DisabledWhileOpen: Story = {
     for (const button of canvas.getAllByRole('button'))
       await expect(button).toBeDisabled();
     dispatchStoryEvent('story:toggle-disabled');
-    await waitFor(() => expect(canvas.getAllByRole('button')[0]).toBeEnabled());
+    await waitFor(() =>
+      expect(
+        canvas.getByRole('button', { name: /^Edit Created:/ })
+      ).toBeEnabled()
+    );
     await expect(
       page.queryByRole('dialog', { name: 'Filter by created' })
     ).not.toBeInTheDocument();

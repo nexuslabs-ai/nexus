@@ -30,6 +30,13 @@ export type ChoiceFilterProps = {
   disabled?: boolean;
 };
 
+function optionLabel(options: readonly ChoiceOption[], value: string) {
+  return (
+    options.find((option) => option.value === value)?.label ??
+    `${value} (unavailable)`
+  );
+}
+
 /** Copy-source block. The application owns condition state and option IDs. */
 export function ChoiceFilter({
   label,
@@ -53,10 +60,7 @@ export function ChoiceFilter({
   const operatorRef = React.useRef<HTMLButtonElement>(null);
   const restoreAdd = React.useRef(false);
   const selected = value && 'value' in value ? value.value : '';
-  const selectedLabel = selected
-    ? (options.find((option) => option.value === selected)?.label ??
-      `${selected} (unavailable)`)
-    : '';
+  const selectedLabel = selected ? optionLabel(options, selected) : '';
   function focusAdd(node: HTMLButtonElement | null) {
     addRef.current = node;
     if (node && restoreAdd.current) {
@@ -208,7 +212,10 @@ export function ChoiceEditor({
   const listed =
     value === '' || options.some((option) => option.value === value)
       ? options
-      : [...options, { value, label: `${value} (unavailable)` }];
+      : [
+          ...options,
+          { value, label: optionLabel(options, value), disabled: true },
+        ];
   function select(next: string) {
     if (disabled) return;
     if (
