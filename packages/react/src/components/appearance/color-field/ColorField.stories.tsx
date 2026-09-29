@@ -111,7 +111,7 @@ export const KeyboardInteraction: Story = {
 };
 
 function ExternallyChangedField(props: NexusAppearanceColorFieldProps) {
-  const [value, setValue] = useState(BLUE);
+  const [value, setValue] = useState(props.value);
   return (
     <div className="nx:flex nx:flex-col nx:items-start nx:gap-3">
       <NexusAppearanceColorField {...props} value={value} />
@@ -130,8 +130,10 @@ export const ExternalValueChange: Story = {
 
     await userEvent.clear(hex);
     await userEvent.type(hex, '#12');
-    await userEvent.click(canvas.getByRole('button', { name: 'Use red' }));
+    await expect(hex).toHaveValue('#12');
+    await fireEvent.click(canvas.getByRole('button', { name: 'Use red' }));
 
+    await expect(hex).toHaveFocus();
     await expect(hex).toHaveValue(RED);
   },
 };
@@ -148,7 +150,7 @@ export const AllVariants: Story = {
   render: (args) => (
     <div className="nx:flex nx:flex-col nx:gap-4">
       <ControlledField {...args} label="Brand" value={BLUE} />
-      <ControlledField {...args} label="Error" value={RED} />
+      <ControlledField {...args} label="Red" value={RED} />
       <ControlledField {...args} label="Unset" value="" />
     </div>
   ),

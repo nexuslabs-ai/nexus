@@ -11,10 +11,7 @@ const meta: Meta<typeof NexusThemeQuickControl> = {
   component: NexusThemeQuickControl,
   decorators: [
     (Story) => (
-      <NexusAppearanceProvider
-        storageKey={false}
-        defaultState={{ ...DEFAULT_NEXUS_APPEARANCE, mode: 'light' }}
-      >
+      <NexusAppearanceProvider storageKey={false}>
         <Story />
       </NexusAppearanceProvider>
     ),
@@ -83,11 +80,22 @@ export const KeyboardInteraction: Story = {
     await userEvent.tab();
     await expect(trigger).toHaveFocus();
     await userEvent.keyboard('{Enter}');
-    await expect(
+    const control = within(
       await within(document.body).findByRole('dialog', {
         name: 'Theme quick control',
       })
-    ).toBeVisible();
+    );
+    const light = control.getByRole('radio', { name: 'Light' });
+    const dark = control.getByRole('radio', { name: 'Dark' });
+
+    await waitFor(() => expect(light).toHaveFocus());
+    await expect(light).toHaveAttribute('data-state', 'on');
+
+    await userEvent.keyboard('{ArrowRight}');
+    await expect(dark).toHaveFocus();
+    await userEvent.keyboard('{Enter}');
+    await expect(dark).toHaveAttribute('data-state', 'on');
+    await expect(light).toHaveAttribute('data-state', 'off');
 
     await closeControl(canvasElement);
     await waitFor(() => expect(trigger).toHaveFocus());
@@ -110,7 +118,7 @@ export const SurfaceTone: Story = {
     await expect(
       control
         .getAllByRole('button', { name: /^Surface tone: / })
-        .filter((swatch) => swatch.getAttribute('aria-pressed') === 'true')
+        .filter((button) => button.getAttribute('aria-pressed') === 'true')
     ).toHaveLength(1);
 
     await closeControl(canvasElement);
