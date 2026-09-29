@@ -147,6 +147,16 @@ function badgeShapeClasses(
   return 'nx:typography-label-default nx:px-2.5';
 }
 
+function hasRenderableChildren(children: React.ReactNode): boolean {
+  return React.Children.toArray(children).some((child) => {
+    if (typeof child === 'string') return child.trim().length > 0;
+    if (!React.isValidElement<{ children?: React.ReactNode }>(child))
+      return true;
+    if (child.type !== React.Fragment) return true;
+    return hasRenderableChildren(child.props.children);
+  });
+}
+
 interface BadgeProps
   extends React.ComponentProps<'span'>, VariantProps<typeof badgeVariants> {
   /**
@@ -213,9 +223,10 @@ function Badge({
   children,
   ...props
 }: BadgeProps) {
-  const hasChildren = React.Children.toArray(children).length > 0;
   const isIconOnly =
-    !isNumber && !hasChildren && Boolean(leftIcon || rightIcon);
+    !isNumber &&
+    !hasRenderableChildren(children) &&
+    Boolean(leftIcon || rightIcon);
   const iconOnlyIcon = leftIcon ?? rightIcon;
   const showLeftIcon = leftIcon && !isNumber && !isIconOnly;
   const showRightIcon = rightIcon && !isNumber && !isIconOnly;
