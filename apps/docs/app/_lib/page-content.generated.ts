@@ -153,7 +153,7 @@ export const PAGE_WIREFRAMES: Record<string, PageWireframe> = {
     ],
   },
   '/theming/density-modes': {
-    lede: '[ Spacing density via data-density ]',
+    lede: '[ Spacing density via data-nx-density ]',
     blocks: [
       {
         type: 'placeholder',
@@ -164,7 +164,7 @@ export const PAGE_WIREFRAMES: Record<string, PageWireframe> = {
       {
         type: 'placeholder',
         variant: 'code',
-        label: '[ Code — data-density attribute pattern ]',
+        label: '[ Code — data-nx-density attribute pattern ]',
       },
     ],
   },
@@ -174,7 +174,7 @@ export const PAGE_WIREFRAMES: Record<string, PageWireframe> = {
       {
         type: 'placeholder',
         variant: 'code',
-        label: '[ Code — :root override pattern ]',
+        label: '[ Code — Nexus root override pattern ]',
       },
       {
         type: 'placeholder',

@@ -610,7 +610,7 @@ export const OnContainerSurface: Story = {
     const styleOf = (element: Element) => window.getComputedStyle(element);
 
     await waitFor(() =>
-      expect(canvasElement.closest('[data-nexus-root]')).toHaveAttribute(
+      expect(canvasElement.querySelector('[data-nexus-root]')).toHaveAttribute(
         'data-nx-mode',
         'dark'
       )

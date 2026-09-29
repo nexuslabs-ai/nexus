@@ -282,7 +282,7 @@ export const PAGE_REGISTRY = {
         slug: 'density-modes',
         label: 'Density modes',
         wireframe: {
-          lede: '[ Spacing density via data-density ]',
+          lede: '[ Spacing density via data-nx-density ]',
           blocks: [
             {
               type: 'placeholder',
@@ -293,7 +293,7 @@ export const PAGE_REGISTRY = {
             {
               type: 'placeholder',
               variant: 'code',
-              label: '[ Code — data-density attribute pattern ]',
+              label: '[ Code — data-nx-density attribute pattern ]',
             },
           ],
         },
@@ -307,7 +307,7 @@ export const PAGE_REGISTRY = {
             {
               type: 'placeholder',
               variant: 'code',
-              label: '[ Code — :root override pattern ]',
+              label: '[ Code — Nexus root override pattern ]',
             },
             {
               type: 'placeholder',

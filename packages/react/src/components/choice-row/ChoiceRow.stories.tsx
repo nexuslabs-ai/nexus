@@ -339,7 +339,7 @@ export const Dark: Story = {
   ),
   play: async ({ canvasElement }) => {
     await waitFor(() =>
-      expect(canvasElement.closest('[data-nexus-root]')).toHaveAttribute(
+      expect(canvasElement.querySelector('[data-nexus-root]')).toHaveAttribute(
         'data-nx-mode',
         'dark'
       )

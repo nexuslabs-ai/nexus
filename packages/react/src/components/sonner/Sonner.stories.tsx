@@ -201,7 +201,9 @@ export const FollowsRootMode: Story = {
   render: () => <ModeSwitchingToaster />,
   play: async ({ canvasElement }) => {
     const canvas = within(canvasElement);
-    const root = canvasElement.querySelector('[data-nexus-root]')!;
+    const root = canvasElement.querySelector(
+      '[data-nexus-root] [data-nexus-root]'
+    )!;
     await userEvent.click(canvas.getByRole('button', { name: 'Show toast' }));
     const toaster = await waitFor(() => {
       const element = document.body.querySelector('[data-sonner-toaster]');

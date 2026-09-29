@@ -72,7 +72,9 @@ export const BrandPresets: Story = {
     await expect(
       canvas.getByText(`brandColor: "${preset.color}",`)
     ).toBeInTheDocument();
-    const root = canvasElement.querySelector('[data-nexus-root]')!;
+    const root = canvasElement.querySelector(
+      '[data-nexus-root] [data-nexus-root]'
+    )!;
     const expected = deriveNexusAppearanceCss(
       { ...DEFAULT_NEXUS_APPEARANCE, brandColor: preset.color },
       nexusRootScope(root.getAttribute('data-nexus-root')!)
@@ -262,7 +264,17 @@ const DARK_QUERY = '(prefers-color-scheme: dark)';
 let systemDark = false;
 let systemMedia: MediaQueryList;
 
+// `system` resolution belongs to the standalone provider: an embedded root takes
+// an already-resolved mode from its host.
 export const SystemContrast: Story = {
+  render: () => (
+    <NexusAppearanceProvider
+      storageKey={false}
+      defaultState={DEFAULT_NEXUS_APPEARANCE}
+    >
+      <NexusAppearanceSettings />
+    </NexusAppearanceProvider>
+  ),
   beforeEach: () => {
     const originalMatchMedia = window.matchMedia;
     const events = new EventTarget();

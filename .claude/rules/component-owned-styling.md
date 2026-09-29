@@ -6,13 +6,15 @@ supplies the vocabulary — tokens and utilities — and never targets a compone
 
 ## What the Theme May Define
 
-- **Tokens** — `@theme` scales, `:root` / `.dark` custom properties, and
-  runtime mode blocks keyed on document-level attributes (`[data-density]`).
+- **Tokens** — `@theme` scales, custom properties on the Nexus root
+  (`[data-nexus-root]`, dark on `[data-nx-mode='dark']`), and runtime mode
+  blocks keyed on the root's attributes (`[data-nx-density]`).
 - **Utilities** — `@utility` definitions, named for what they do, not who uses
   them (`autofill-bg-*`, not `input-autofill`). State lives in the component's
   class (`nx:disabled:autofill-bg-disabled`), not inside the utility.
-- **Document-level base styles** — `color-scheme`, `body` defaults, the global
-  default `border-color`.
+- **Root-level base styles** — `color-scheme`, the root's text colour and
+  font, and the default `border-color` inside the root. Nothing targets
+  `:root`, `html`, `body` or the host page: Nexus applies only inside a root.
 
 ## What the Theme Must Not Define
 

@@ -136,10 +136,10 @@ All tokens follow the [Design Tokens Community Group](https://tr.designtokens.or
 
 - Contextual meanings that reference primitives (and per-mode direct values for spacing)
 - Semantic **color** is engine-derived (`deriveTheme`), not authored here; `tokens/semantic/` now holds only spacing, breakpoints, and z-index
-- Output: Tailwind v4 `@theme` block (semantic color via `@theme inline`, accepting runtime `--nx-color-*` overrides) + per-mode `[data-density="X"]` blocks
-- Example: `--color-background: var(--nx-color-background, oklch(1 0 0))` (engine color floor), `--nx-spacing-4: 16px`
+- Output: Tailwind v4 `@theme` block (semantic color via `@theme inline`, accepting runtime `--nx-color-*` overrides) + per-mode `[data-nx-density="X"]` blocks, all scoped to the Nexus root (`[data-nexus-root]`)
+- Example: `--color-background: var(--nx-color-background, var(--nx-default-color-background))` (engine color floor on the root), `--nx-spacing-4: 16px`
 
-> **Spacing is two-tier, not three.** Unlike color/radius/shadow/typography, spacing has no `--nx-size-*` primitive layer — `semantic/spacing-{mode}.json` files carry direct px values, and the build emits per-mode `[data-density="X"]` blocks plus role utilities (`nx:p-container`, `nx:gap-layout-section`, …). Mode swap is runtime via the `data-density` attribute on `<html>`.
+> **Spacing is two-tier, not three.** Unlike color/radius/shadow/typography, spacing has no `--nx-size-*` primitive layer — `semantic/spacing-{mode}.json` files carry direct px values, and the build emits per-mode `[data-nx-density="X"]` blocks plus role utilities (`nx:p-container`, `nx:gap-layout-section`, …). Mode swap is runtime via the `data-nx-density` attribute on the Nexus root or any element inside it.
 
 **Component** (future)
 
@@ -150,21 +150,25 @@ All tokens follow the [Design Tokens Community Group](https://tr.designtokens.or
 
 Color tokens don't ship the values stored on disk. Source files hold hex. Build and runtime share authored-palette conversion: chromatic families use their hue-specific lightness curves and P3 cusp chroma; neutral families use the flat lightness grid and source chroma. Both preserve each authored shade's hue. Runtime semantic text/surface pairs are checked against the registered APCA constraints in CI.
 
-Generated global CSS sets the native browser UI policy alongside the tokens: `:root` advertises light/dark support, `.dark` pins native controls and scrollbars to dark, and the light root stays light when `.dark` is absent.
+Generated CSS sets the native browser UI policy on each Nexus root: `color-scheme: light`, or `dark` on a root with `data-nx-mode="dark"`. Nothing targets `:root`, `html` or `body`.
 
 ## Reference Resolution
 
 Semantic **color** is produced by the engine (`deriveTheme`), not authored as
-JSON. The build bakes each derived value into `nexus.css` as a `@theme inline`
-fallback that still accepts a runtime override:
+JSON. The build bakes each derived value into `nexus.css` as a default on the
+Nexus root, and the `@theme inline` entry reads the runtime value first:
 
 ```css
---color-background: var(--nx-color-background, oklch(1 0 0));
+--color-background: var(
+  --nx-color-background,
+  var(--nx-default-color-background)
+);
 ```
 
 The `--color-*` name is the Tailwind v4 `@theme` key that generates the utility
-(`nx:bg-background`); the `--nx-color-*` fallback is the runtime override the
-appearance provider injects. Non-color families (spacing, radius, shadow,
+(`nx:bg-background`); `--nx-color-*` is the runtime value `NexusRoot` or the
+appearance provider injects, and `--nx-default-color-*` is the static light or
+dark default declared on `[data-nexus-root]`. Non-color families (spacing, radius, shadow,
 borderwidth, …) still use DTCG `{reference}` syntax, resolved to `var(--nx-*)`
 at build time.
 

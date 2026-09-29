@@ -10,7 +10,12 @@ import { expect, userEvent, waitFor, within } from 'storybook/test';
 
 import { Button } from '../../button';
 import { Popover, PopoverContent, PopoverTrigger } from '../../popover';
-import { Tooltip, TooltipContent, TooltipTrigger } from '../../tooltip';
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from '../../tooltip';
 
 import { NexusRoot, type NexusRootState } from './nexus-root';
 import { NexusAppearanceProvider } from './provider';
@@ -37,9 +42,12 @@ const meta: Meta<typeof NexusRoot> = {
 export default meta;
 type Story = StoryObj<typeof NexusRoot>;
 
+/** The story's own root, inside the Storybook decorator's root. */
 function rootIn(canvasElement: HTMLElement): HTMLElement {
-  const root = canvasElement.querySelector<HTMLElement>('[data-nexus-root]');
-  if (!root) throw new Error('Missing a Nexus root');
+  const root = canvasElement.querySelector<HTMLElement>(
+    '[data-nexus-root] [data-nexus-root]'
+  );
+  if (!root) throw new Error('Missing the story root');
   return root;
 }
 
@@ -278,12 +286,14 @@ export const PortalTypography: Story = {
   },
   render: () => (
     <NexusRoot state={LIGHT}>
-      <Tooltip open>
-        <TooltipTrigger asChild>
-          <Button variant="outline">Trigger</Button>
-        </TooltipTrigger>
-        <TooltipContent data-probe="tooltip">Tooltip text</TooltipContent>
-      </Tooltip>
+      <TooltipProvider>
+        <Tooltip open>
+          <TooltipTrigger asChild>
+            <Button variant="outline">Trigger</Button>
+          </TooltipTrigger>
+          <TooltipContent data-probe="tooltip">Tooltip text</TooltipContent>
+        </Tooltip>
+      </TooltipProvider>
       <span data-probe="reference" className="nx:typography-body-small">
         Reference
       </span>
