@@ -46,6 +46,10 @@ const CHECKS = [
     re: /[a-z][a-z0-9_-]*:nx:|\]:nx:/,
   },
   {
+    messageId: 'darkVariant',
+    re: new RegExp(`nx:${NX_MODIFIER_CHAIN}dark:`),
+  },
+  {
     messageId: 'bannedAccent',
     re: new RegExp(`nx:${NX_MODIFIER_CHAIN}(?:bg|text)-accent\\b`),
   },
@@ -255,12 +259,14 @@ export default {
     type: 'problem',
     docs: {
       description:
-        'Enforce nx: Tailwind class conventions — correct prefix order, no banned `accent` token, complete semantic token paths, no raw primitive colors, no raw named font-size utilities, and no ring-fading `transition-colors` on a focus-ring surface.',
+        'Enforce nx: Tailwind class conventions — correct prefix order, no `dark:` variant, no banned `accent` token, complete semantic token paths, no raw primitive colors, no raw named font-size utilities, and no ring-fading `transition-colors` on a focus-ring surface.',
     },
     schema: [],
     messages: {
       prefixOrder:
         'Wrong nx: prefix order — `nx:` must come BEFORE all modifiers (e.g. `nx:hover:bg-*`, not `hover:nx:bg-*`).',
+      darkVariant:
+        "No `dark:` variant — semantic tokens already carry their dark value, and Tailwind's built-in `dark:` follows `prefers-color-scheme`, not the Nexus root's `data-nx-mode`. Drop the class.",
       bannedAccent:
         'Banned `accent` token — Nexus has no `accent`; use `background-hover` / `container-hover` / `popover-hover` (see shadcn-divergences.md).',
       incompletePath:

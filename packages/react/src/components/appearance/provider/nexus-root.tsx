@@ -76,8 +76,9 @@ function NexusRoot({
     [key, safeState]
   );
 
-  // Updates made before the host re-renders build on each other, not on the
-  // last rendered state.
+  // Updates made in the same tick build on each other, not on the last
+  // rendered state. The chain ends with the tick, so an update the host
+  // rejected does not ride along with the next one.
   const pendingRef = useRef<{
     base: NexusRootState;
     next: NexusAppearanceState;
@@ -90,7 +91,11 @@ function NexusRoot({
       const next = sanitizeNexusAppearance(
         typeof update === 'function' ? update(previous) : update
       );
-      pendingRef.current = { base: safeState, next };
+      const entry = { base: safeState, next };
+      pendingRef.current = entry;
+      queueMicrotask(() => {
+        if (pendingRef.current === entry) pendingRef.current = null;
+      });
       onStateChange(next);
     },
     [onStateChange, safeState]

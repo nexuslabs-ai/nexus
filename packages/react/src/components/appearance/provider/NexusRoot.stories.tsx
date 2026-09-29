@@ -3,10 +3,11 @@ import { useState } from 'react';
 import {
   DEFAULT_NEXUS_APPEARANCE,
   deriveNexusAppearanceCss,
+  type NexusAppearanceState,
   nexusRootScope,
 } from '@nexus_ds/core';
 import type { Meta, StoryObj } from '@storybook/react';
-import { expect, userEvent, waitFor, within } from 'storybook/test';
+import { expect, fn, userEvent, waitFor, within } from 'storybook/test';
 
 import { Button } from '../../button';
 import { Popover, PopoverContent, PopoverTrigger } from '../../popover';
@@ -17,7 +18,11 @@ import {
   TooltipTrigger,
 } from '../../tooltip';
 
-import { NexusRoot, type NexusRootState } from './nexus-root';
+import {
+  NexusRoot,
+  type NexusRootProps,
+  type NexusRootState,
+} from './nexus-root';
 import { NexusAppearanceProvider, useNexusAppearance } from './provider';
 
 const LIGHT: NexusRootState = { ...DEFAULT_NEXUS_APPEARANCE, mode: 'light' };
@@ -373,6 +378,78 @@ export const BatchedStateChanges: Story = {
     const root = rootIn(canvasElement);
 
     await expect(root).toHaveAttribute('data-nx-density', 'compact');
+    await expect(root).toHaveAttribute('data-nx-radius', 'round');
+  },
+};
+
+function DensityAndCornerEdits() {
+  const { setState } = useNexusAppearance();
+  return (
+    <>
+      <Button
+        onClick={() =>
+          setState((current) => ({ ...current, density: 'compact' }))
+        }
+      >
+        Compact
+      </Button>
+      <Button
+        onClick={() =>
+          setState((current) => ({ ...current, corners: 'round' }))
+        }
+      >
+        Round
+      </Button>
+    </>
+  );
+}
+
+// Accepts compact density only with round corners, like a host enforcing its
+// own constraint; a rejected update leaves the state untouched.
+function RejectingRoot({
+  onStateChange,
+}: Pick<NexusRootProps, 'onStateChange'>) {
+  const [state, setState] = useState<NexusRootState>(LIGHT);
+
+  function acceptOrReject(next: NexusAppearanceState) {
+    onStateChange?.(next);
+    if (next.density === 'compact' && next.corners !== 'round') return;
+    setState({ ...next, mode: state.mode });
+  }
+
+  return (
+    <NexusRoot state={state} onStateChange={acceptOrReject}>
+      <DensityAndCornerEdits />
+    </NexusRoot>
+  );
+}
+
+export const RejectedUpdateDoesNotCarryForward: Story = {
+  parameters: {
+    docs: {
+      description: {
+        story:
+          'An update the host rejects is dropped: the next update, in a later event, builds on the rendered state.',
+      },
+    },
+  },
+  args: { onStateChange: fn() },
+  render: (args) => <RejectingRoot onStateChange={args.onStateChange} />,
+  play: async ({ canvasElement, args }) => {
+    const canvas = within(canvasElement);
+    await userEvent.click(canvas.getByRole('button', { name: 'Compact' }));
+    await userEvent.click(canvas.getByRole('button', { name: 'Round' }));
+    const root = rootIn(canvasElement);
+
+    await expect(args.onStateChange).toHaveBeenNthCalledWith(
+      1,
+      expect.objectContaining({ density: 'compact', corners: 'square' })
+    );
+    await expect(args.onStateChange).toHaveBeenNthCalledWith(
+      2,
+      expect.objectContaining({ density: 'default', corners: 'round' })
+    );
+    await expect(root).toHaveAttribute('data-nx-density', 'default');
     await expect(root).toHaveAttribute('data-nx-radius', 'round');
   },
 };

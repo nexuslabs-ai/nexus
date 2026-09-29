@@ -62,4 +62,6 @@ that shadcn has no equivalent for.
 
 Semantic tokens already carry their dark-mode value; a Nexus root in dark mode
 (`data-nx-mode="dark"`) swaps the value underneath them. Nexus has no `nx:dark:`
-variant: drop shadcn's `dark:` classes instead of translating them.
+variant — Tailwind's built-in one follows `prefers-color-scheme`, not the root, and
+`nx-class-conventions` reports it: drop shadcn's `dark:` classes instead of
+translating them.
