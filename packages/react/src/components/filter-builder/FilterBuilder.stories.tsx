@@ -3,10 +3,6 @@ import * as React from 'react';
 import type { Meta, StoryObj } from '@storybook/react';
 import { expect, fn, userEvent, waitFor, within } from 'storybook/test';
 
-import {
-  exampleFields,
-  exampleTree,
-} from '../../recipes/filtering/advanced-fixtures';
 import { Button } from '../button';
 import {
   type FilterField,
@@ -15,6 +11,66 @@ import {
 } from '../filter-model';
 
 import { FilterBuilder } from './filter-builder';
+const exampleFields: FilterField[] = [
+  {
+    id: 'status',
+    label: 'Status',
+    type: 'choice',
+    options: [
+      { value: 'active', label: 'Active' },
+      { value: 'invited', label: 'Invited' },
+      { value: 'suspended', label: 'Suspended' },
+    ],
+  },
+  {
+    id: 'team',
+    label: 'Team',
+    type: 'choice',
+    options: [
+      { value: 'design', label: 'Design' },
+      { value: 'engineering', label: 'Engineering' },
+      { value: 'operations', label: 'Operations' },
+    ],
+  },
+  { id: 'name', label: 'Name', type: 'text' },
+  { id: 'projects', label: 'Projects', type: 'number' },
+  { id: 'joined', label: 'Joined', type: 'date' },
+];
+const exampleTree: FilterGroup = {
+  kind: 'group',
+  id: 'root',
+  conjunction: 'all',
+  children: [
+    {
+      kind: 'rule',
+      id: 'status-rule',
+      field: 'status',
+      operator: 'is',
+      value: 'active',
+    },
+    {
+      kind: 'group',
+      id: 'team-group',
+      conjunction: 'any',
+      children: [
+        {
+          kind: 'rule',
+          id: 'team-rule',
+          field: 'team',
+          operator: 'is',
+          value: 'design',
+        },
+        {
+          kind: 'rule',
+          id: 'projects-rule',
+          field: 'projects',
+          operator: 'greaterThan',
+          value: '3',
+        },
+      ],
+    },
+  ],
+};
 const simple: FilterGroup = {
   kind: 'group',
   id: 'root',
@@ -172,6 +228,75 @@ export const Empty: Story = {
     await expect(canvas.getByRole('status')).toHaveTextContent(
       'Ready to apply'
     );
+  },
+};
+function RestoredIdsDemo() {
+  const [value, setValue] = React.useState<FilterGroup>({
+    kind: 'group',
+    id: 'root',
+    conjunction: 'all',
+    children: [],
+  });
+  // Swaps the probe rule for a saved one holding the ID the next Add would generate, as a tree saved on an earlier page load can.
+  function restoreSavedTree() {
+    const [probe] = value.children;
+    const nextId = (probe?.id ?? '').replace(/\d+$/, (count) =>
+      String(Number(count) + 1)
+    );
+    setValue({
+      ...value,
+      children: [
+        {
+          kind: 'rule',
+          id: nextId,
+          field: 'status',
+          operator: 'is',
+          value: 'active',
+        },
+      ],
+    });
+  }
+  return (
+    <div className="nx:grid nx:gap-4">
+      <FilterBuilder
+        fields={exampleFields}
+        value={value}
+        onValueChange={setValue}
+      />
+      <Button variant="outline" onClick={restoreSavedTree}>
+        Restore saved filters
+      </Button>
+    </div>
+  );
+}
+export const RestoredIdsStayUnique: Story = {
+  render: () => <RestoredIdsDemo />,
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+    function nodeIds() {
+      return Array.from(
+        canvasElement.querySelectorAll<HTMLElement>('[data-node-id]'),
+        (node) => node.dataset.nodeId
+      );
+    }
+    await userEvent.click(
+      canvas.getByRole('button', { name: 'Add condition' })
+    );
+    await userEvent.click(
+      canvas.getByRole('button', { name: 'Restore saved filters' })
+    );
+    const [restoredId] = nodeIds();
+    await userEvent.click(
+      canvas.getByRole('button', { name: 'Add condition' })
+    );
+    const ids = nodeIds();
+    await expect(ids).toHaveLength(2);
+    await expect(new Set(ids).size).toBe(2);
+    await expect(ids[0]).toBe(restoredId);
+    await userEvent.click(
+      canvas.getAllByRole('button', { name: 'Remove Status condition' })[0]!
+    );
+    await expect(nodeIds()).toEqual([ids[1]]);
   },
 };
 export const OperatorAndFieldChanges: Story = {

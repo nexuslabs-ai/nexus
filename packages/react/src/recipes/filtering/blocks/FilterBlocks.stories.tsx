@@ -258,6 +258,9 @@ export const EmptyToRange: Story = {
     await expect(
       await page.findByRole('spinbutton', { name: 'Minimum' })
     ).toBeVisible();
+    await expect(
+      canvas.getByRole('button', { name: 'Change Temperature operator' })
+    ).toHaveTextContent('is between');
     await expect(canvas.getByLabelText('Range state')).toHaveTextContent(
       '{"operator":"isEmpty"}'
     );

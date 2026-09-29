@@ -232,14 +232,12 @@ export function Showcase() {
           One condition. An editor that fits the value.
         </p>
       </header>
-      <div>
-        <SingleChoiceExample />
-        <MultipleChoiceExample />
-        <NumberExample />
-        <RangeExample />
-        <DateExample />
-        <TextExample />
-      </div>
+      <SingleChoiceExample />
+      <MultipleChoiceExample />
+      <NumberExample />
+      <RangeExample />
+      <DateExample />
+      <TextExample />
     </div>
   );
 }
