@@ -1,8 +1,11 @@
+'use client';
+
 import * as React from 'react';
 
 import * as DialogPrimitive from '@radix-ui/react-dialog';
 
 import { IconX } from '../../lib/icons';
+import { useNexusRootAttributes } from '../../lib/nexus-root-context';
 import { cn } from '../../lib/utils';
 import {
   containsComposedSlot,
@@ -87,8 +90,10 @@ interface DialogOverlayProps extends React.ComponentProps<
  * Semi-transparent overlay behind the dialog content.
  */
 function DialogOverlay({ className, ...props }: DialogOverlayProps) {
+  const rootAttributes = useNexusRootAttributes();
   return (
     <DialogPrimitive.Overlay
+      {...rootAttributes}
       data-slot="dialog-overlay"
       className={cn(overlayScrimVariants(), className)}
       {...props}
@@ -158,6 +163,7 @@ function DialogContent({
   showCloseButton = true,
   ...props
 }: DialogContentProps) {
+  const rootAttributes = useNexusRootAttributes();
   const showGeneratedHeader =
     !containsComposedSlot(children, DialogHeader) &&
     (title != null || description != null);
@@ -168,6 +174,7 @@ function DialogContent({
     <DialogPortal>
       <DialogOverlay />
       <DialogPrimitive.Content
+        {...rootAttributes}
         data-slot="dialog-content"
         data-variant={defaultOverlayLayout.variant}
         data-orientation={defaultOverlayLayout.buttonOrientation}

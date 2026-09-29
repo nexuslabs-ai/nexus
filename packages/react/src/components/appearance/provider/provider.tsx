@@ -17,14 +17,18 @@ import {
   createNexusAppearanceSnapshotFromState,
   DEFAULT_NEXUS_APPEARANCE,
   DEFAULT_STORAGE_KEY,
-  NEXUS_APPEARANCE_DATA_ATTRS,
+  NEXUS_DOCUMENT_ROOT_KEY,
+  NEXUS_ROOT_ATTRIBUTES,
   type NexusAppearanceSnapshot,
   type NexusAppearanceState,
-  resolveFirstPaint,
+  type NexusResolvedMode,
+  nexusRootAttributes,
   sanitizeNexusAppearance,
   sanitizeNexusAppearanceSnapshot,
   serializeNexusAppearanceStateCookie,
 } from '@nexus_ds/core';
+
+import { NexusRootContext } from '../../../lib/nexus-root-context';
 
 const COLOR_SCHEME_QUERY = '(prefers-color-scheme: dark)';
 const THEME_STYLE_SELECTOR = 'style[data-nexus-appearance-theme]';
@@ -33,7 +37,6 @@ const DEFAULT_COOKIE_PATH = '/';
 const DEFAULT_COOKIE_SAME_SITE = 'Lax';
 export const NEXUS_APPEARANCE_COOKIE_MAX_AGE_SECONDS = 60 * 60 * 24 * 365;
 
-export type NexusResolvedAppearanceMode = 'light' | 'dark';
 export type NexusAppearanceCookieSameSite = 'Lax' | 'Strict' | 'None';
 
 export interface NexusAppearanceCookieOptions {
@@ -47,14 +50,17 @@ export interface NexusAppearanceCookieOptions {
 export interface NexusAppearanceContextValue {
   state: NexusAppearanceState;
   setState: Dispatch<SetStateAction<NexusAppearanceState>>;
-  resolvedMode: NexusResolvedAppearanceMode;
+  resolvedMode: NexusResolvedMode;
   mounted: boolean;
-  reset: () => void;
 }
 
+/**
+ * Props for the standalone provider, whose Nexus root is `<html>`. It owns the
+ * appearance state, resolves `system` mode, and can persist to storage and a
+ * cookie. To scope Nexus to part of a page, use `NexusRoot` instead.
+ */
 export interface NexusAppearanceProviderProps {
   children: ReactNode;
-  state?: NexusAppearanceState;
   defaultState?: NexusAppearanceState;
   onStateChange?: (state: NexusAppearanceState) => void;
   /**
@@ -75,9 +81,11 @@ export interface NexusAppearanceProviderProps {
    */
   cookieWriteKey?: string | false;
   cookieOptions?: NexusAppearanceCookieOptions;
+  /** Nonce for the injected `<style>` elements under a strict `style-src` policy. */
+  nonce?: string;
 }
 
-const NexusAppearanceContext =
+export const NexusAppearanceContext =
   createContext<NexusAppearanceContextValue | null>(null);
 
 const canUseDOM = (): boolean =>
@@ -86,7 +94,7 @@ const canUseDOM = (): boolean =>
 function resolveAppearanceMode(
   mode: NexusAppearanceState['mode'],
   systemPrefersDark = false
-): NexusResolvedAppearanceMode {
+): NexusResolvedMode {
   if (mode === 'dark') return 'dark';
   if (mode === 'light') return 'light';
   return systemPrefersDark ? 'dark' : 'light';
@@ -170,7 +178,11 @@ function syncColorSchemeMeta(content: 'light' | 'dark' | 'light dark'): void {
   }
 }
 
-function upsertStyle(selector: string, attribute: string): HTMLStyleElement {
+function upsertStyle(
+  selector: string,
+  attribute: string,
+  nonce: string | undefined
+): HTMLStyleElement {
   const styles = Array.from(
     document.querySelectorAll<HTMLStyleElement>(selector)
   );
@@ -181,6 +193,7 @@ function upsertStyle(selector: string, attribute: string): HTMLStyleElement {
   }
 
   style.setAttribute(attribute, '');
+  if (nonce) style.nonce = nonce;
 
   if (!style.parentNode) {
     document.head.appendChild(style);
@@ -189,16 +202,15 @@ function upsertStyle(selector: string, attribute: string): HTMLStyleElement {
   return style;
 }
 
-function removeAppearanceArtifacts(): void {
+// Server-rendered root attributes stay on <html>; only the ones this provider
+// added are removed when it unmounts.
+function removeAppearanceArtifacts(addedAttributes: readonly string[]): void {
   document
     .querySelectorAll(`${THEME_STYLE_SELECTOR}, ${PREFS_STYLE_SELECTOR}`)
     .forEach((style) => style.remove());
 
-  const root = document.documentElement;
-  root.classList.remove('dark');
-  root.style.removeProperty('color-scheme');
-  for (const attr of NEXUS_APPEARANCE_DATA_ATTRS) {
-    root.removeAttribute(attr);
+  for (const attr of addedAttributes) {
+    document.documentElement.removeAttribute(attr);
   }
 }
 
@@ -213,83 +225,64 @@ function nextAppearanceState(
 
 export function NexusAppearanceProvider({
   children,
-  state,
   defaultState,
   onStateChange,
   storageKey = DEFAULT_STORAGE_KEY,
   cookieWriteKey = false,
   cookieOptions,
+  nonce,
 }: NexusAppearanceProviderProps) {
-  const isControlled = state !== undefined;
   const initialState = useMemo(
     () => sanitizeNexusAppearance(defaultState ?? DEFAULT_NEXUS_APPEARANCE),
     [defaultState]
   );
-  const [internalState, setInternalState] =
+  const [activeState, setActiveState] =
     useState<NexusAppearanceState>(initialState);
-  const activeState = state ?? internalState;
   const [mounted, setMounted] = useState(false);
-  const [resolvedMode, setResolvedMode] = useState<NexusResolvedAppearanceMode>(
-    () => resolveAppearanceMode(activeState.mode)
+  const [resolvedMode, setResolvedMode] = useState<NexusResolvedMode>(() =>
+    resolveAppearanceMode(activeState.mode)
   );
   const activeSnapshot = useMemo(
     () => createNexusAppearanceSnapshotFromState(activeState),
     [activeState]
   );
-  const firstPaint = useMemo(
-    () => resolveFirstPaint(activeSnapshot, resolvedMode === 'dark'),
-    [activeSnapshot, resolvedMode]
+  const rootAttributes = useMemo(
+    () =>
+      nexusRootAttributes(activeState, resolvedMode, NEXUS_DOCUMENT_ROOT_KEY),
+    [activeState, resolvedMode]
   );
 
-  const internalStateRef = useRef(internalState);
+  const activeStateRef = useRef(activeState);
 
   useEffect(() => {
     if (!canUseDOM()) return;
 
-    if (isControlled) {
-      setResolvedMode(
-        resolveAppearanceMode((state ?? initialState).mode, systemPrefersDark())
-      );
-      setMounted(true);
-      return;
-    }
-
     const nextState = readStoredState(storageKey, initialState);
-    internalStateRef.current = nextState;
-    setInternalState(nextState);
+    activeStateRef.current = nextState;
+    setActiveState(nextState);
     setResolvedMode(resolveAppearanceMode(nextState.mode, systemPrefersDark()));
     setMounted(true);
-  }, [initialState, isControlled, state, storageKey]);
+  }, [initialState, storageKey]);
 
   const setState = useCallback<Dispatch<SetStateAction<NexusAppearanceState>>>(
     (update) => {
-      if (isControlled) {
-        onStateChange?.(nextAppearanceState(update, activeState));
-        return;
-      }
-      const next = nextAppearanceState(update, internalStateRef.current);
-      internalStateRef.current = next;
-      setInternalState(next);
+      const next = nextAppearanceState(update, activeStateRef.current);
+      activeStateRef.current = next;
+      setActiveState(next);
       onStateChange?.(next);
     },
-    [activeState, isControlled, onStateChange]
+    [onStateChange]
   );
 
-  const reset = useCallback(() => {
-    setState(initialState);
-  }, [initialState, setState]);
-
   useEffect(() => {
-    if (mounted && !isControlled) {
-      writeStoredSnapshot(storageKey, activeSnapshot);
-      writeStateCookie(cookieWriteKey, activeState, cookieOptions);
-    }
+    if (!mounted) return;
+    writeStoredSnapshot(storageKey, activeSnapshot);
+    writeStateCookie(cookieWriteKey, activeState, cookieOptions);
   }, [
     activeSnapshot,
     activeState,
     cookieWriteKey,
     cookieOptions,
-    isControlled,
     mounted,
     storageKey,
   ]);
@@ -297,12 +290,10 @@ export function NexusAppearanceProvider({
   useEffect(() => {
     if (!canUseDOM() || !mounted) return;
 
-    const root = document.documentElement;
-
-    for (const attr of NEXUS_APPEARANCE_DATA_ATTRS) {
-      root.setAttribute(attr, firstPaint.dataAttrs[attr]);
+    for (const [attr, value] of Object.entries(rootAttributes)) {
+      document.documentElement.setAttribute(attr, value);
     }
-  }, [firstPaint, mounted]);
+  }, [rootAttributes, mounted]);
 
   useEffect(() => {
     if (!canUseDOM() || !mounted) return;
@@ -331,47 +322,53 @@ export function NexusAppearanceProvider({
   useEffect(() => {
     if (!canUseDOM() || !mounted) return;
 
-    const root = document.documentElement;
-
-    root.classList.toggle('dark', firstPaint.className === 'dark');
-    root.style.colorScheme = firstPaint.colorScheme;
-    syncColorSchemeMeta(firstPaint.metaColorScheme);
-  }, [firstPaint, mounted]);
+    syncColorSchemeMeta(
+      activeState.mode === 'system' ? 'light dark' : activeState.mode
+    );
+  }, [activeState.mode, mounted]);
 
   useEffect(() => {
     if (!canUseDOM() || !mounted) return;
 
     const themeStyle = upsertStyle(
       THEME_STYLE_SELECTOR,
-      'data-nexus-appearance-theme'
+      'data-nexus-appearance-theme',
+      nonce
     );
-    themeStyle.textContent = firstPaint.themeCss;
-  }, [firstPaint, mounted]);
+    themeStyle.textContent = activeSnapshot.themeCss;
+  }, [activeSnapshot, mounted, nonce]);
 
   useEffect(() => {
     if (!canUseDOM() || !mounted) return;
 
     const prefsStyle = upsertStyle(
       PREFS_STYLE_SELECTOR,
-      'data-nexus-appearance-prefs'
+      'data-nexus-appearance-prefs',
+      nonce
     );
-    prefsStyle.textContent = firstPaint.prefsCss;
-  }, [firstPaint, mounted]);
+    prefsStyle.textContent = activeSnapshot.prefsCss;
+  }, [activeSnapshot, mounted, nonce]);
 
   useEffect(() => {
     if (!canUseDOM()) return;
 
-    return removeAppearanceArtifacts;
+    const root = document.documentElement;
+    const addedAttributes = NEXUS_ROOT_ATTRIBUTES.filter(
+      (attr) => !root.hasAttribute(attr)
+    );
+    return () => removeAppearanceArtifacts(addedAttributes);
   }, []);
 
   const value = useMemo<NexusAppearanceContextValue>(
-    () => ({ state: activeState, setState, resolvedMode, mounted, reset }),
-    [activeState, mounted, reset, resolvedMode, setState]
+    () => ({ state: activeState, setState, resolvedMode, mounted }),
+    [activeState, mounted, resolvedMode, setState]
   );
 
   return (
     <NexusAppearanceContext.Provider value={value}>
-      {children}
+      <NexusRootContext.Provider value={rootAttributes}>
+        {children}
+      </NexusRootContext.Provider>
     </NexusAppearanceContext.Provider>
   );
 }
@@ -381,7 +378,7 @@ export function useNexusAppearance(): NexusAppearanceContextValue {
 
   if (!context) {
     throw new Error(
-      'useNexusAppearance must be used within <NexusAppearanceProvider>'
+      'useNexusAppearance must be used within <NexusRoot> or <NexusAppearanceProvider>'
     );
   }
 

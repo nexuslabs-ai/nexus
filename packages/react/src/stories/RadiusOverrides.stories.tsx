@@ -19,7 +19,7 @@ const meta = {
     docs: {
       description: {
         component:
-          'Scoped --nx-radius-base overrides currently affect Button. Input and SelectTrigger use --nx-radius-md. A nested data-radius preset replaces inherited values; an inline override wins over a preset on the same element. See theming/radius-overrides in Nexus docs.',
+          'Scoped --nx-radius-base overrides currently affect Button. Input and SelectTrigger use --nx-radius-md. A nested data-nx-radius preset replaces inherited values; an inline override wins over a preset on the same element. See theming/radius-overrides in Nexus docs.',
       },
     },
   },
@@ -30,7 +30,7 @@ type Story = StoryObj<typeof meta>;
 
 export const ScopeAndPrecedence: Story = {
   render: () => (
-    <div data-radius="round" className="nx:grid nx:gap-4">
+    <div data-nx-radius="round" className="nx:grid nx:gap-4">
       <div style={pillRadius} className="nx:grid nx:gap-4">
         <Button variant="outline">Pill button</Button>
         <Input aria-label="Unchanged input" placeholder="Still round" />
@@ -45,10 +45,10 @@ export const ScopeAndPrecedence: Story = {
         <div style={nestedRadius}>
           <Button variant="outline">Nested override</Button>
         </div>
-        <div data-radius="smooth">
+        <div data-nx-radius="smooth">
           <Button variant="outline">Nested preset</Button>
         </div>
-        <div data-radius="round" style={pillRadius}>
+        <div data-nx-radius="round" style={pillRadius}>
           <Button variant="outline">Inline beats preset</Button>
           <Input aria-label="Preset medium" placeholder="Still round" />
         </div>

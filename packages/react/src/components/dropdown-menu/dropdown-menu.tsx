@@ -1,3 +1,5 @@
+'use client';
+
 import * as React from 'react';
 
 import * as DropdownMenuPrimitive from '@radix-ui/react-dropdown-menu';
@@ -5,6 +7,7 @@ import { cva, type VariantProps } from 'class-variance-authority';
 
 import { IconCheck, IconChevronRight, IconCircleFilled } from '../../lib/icons';
 import { selectionIndicatorMotionClassName } from '../../lib/motion';
+import { useNexusRootAttributes } from '../../lib/nexus-root-context';
 import { cn } from '../../lib/utils';
 import {
   overlayFloatingTransitionClassName,
@@ -129,8 +132,10 @@ function DropdownMenuSubContent({
   className,
   ...props
 }: DropdownMenuSubContentProps) {
+  const rootAttributes = useNexusRootAttributes();
   return (
     <DropdownMenuPrimitive.SubContent
+      {...rootAttributes}
       data-slot="dropdown-menu-sub-content"
       className={cn(
         'nx:z-popover nx:min-w-32 nx:overflow-hidden',
@@ -171,9 +176,11 @@ function DropdownMenuContent({
   sideOffset = 4,
   ...props
 }: DropdownMenuContentProps) {
+  const rootAttributes = useNexusRootAttributes();
   return (
     <DropdownMenuPrimitive.Portal>
       <DropdownMenuPrimitive.Content
+        {...rootAttributes}
         data-slot="dropdown-menu-content"
         sideOffset={sideOffset}
         className={cn(

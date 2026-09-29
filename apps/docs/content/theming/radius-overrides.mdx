@@ -1,7 +1,7 @@
 # Radius overrides
 
 Use the appearance **corners** setting to choose a radius preset for the whole
-theme. For a smaller area, set `data-radius` on a wrapper. To change the radius
+theme. For a smaller area, set `data-nx-radius` on a wrapper. To change the radius
 used by buttons within that area, override `--nx-radius-base`.
 
 Button currently uses `nx:rounded-base`, which reads `--nx-radius-base`.
@@ -41,7 +41,7 @@ const pillButtons: RadiusStyle = { '--nx-radius-base': '9999px' };
 
 export function RoundedActions() {
   return (
-    <div data-radius="round" style={pillButtons}>
+    <div data-nx-radius="round" style={pillButtons}>
       <Button>Save changes</Button>
       <Input aria-label="Name" />
       <Select>
@@ -61,16 +61,17 @@ available. Removing the override restores the inherited preset value.
 
 ## Nested scopes and precedence
 
-| Placement                                                             | Result                                                                                         |
-| --------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------- |
-| Override on a wrapper                                                 | Descendant consumers inherit it; siblings outside the wrapper do not.                          |
-| Nested wrapper without a preset or override                           | Keeps inheriting the outer override.                                                           |
-| Nested wrapper with its own override                                  | Its descendants receive the nested value.                                                      |
-| Nested `data-radius="smooth"`                                         | Declares fresh preset values, replacing an inherited override; Button returns to `8px`.        |
-| `data-radius="round"` and an inline base override on the same wrapper | The inline override wins over the preset's normal selector declaration. Medium remains `12px`. |
+| Placement                                                                | Result                                                                                         |
+| ------------------------------------------------------------------------ | ---------------------------------------------------------------------------------------------- |
+| Override on a wrapper                                                    | Descendant consumers inherit it; siblings outside the wrapper do not.                          |
+| Nested wrapper without a preset or override                              | Keeps inheriting the outer override.                                                           |
+| Nested wrapper with its own override                                     | Its descendants receive the nested value.                                                      |
+| Nested `data-nx-radius="smooth"`                                         | Declares fresh preset values, replacing an inherited override; Button returns to `8px`.        |
+| `data-nx-radius="round"` and an inline base override on the same wrapper | The inline override wins over the preset's normal selector declaration. Medium remains `12px`. |
 
 These scopes follow the actual DOM ancestry. Content rendered into a portal
-outside the wrapper does not inherit the wrapper's variables.
+outside the wrapper does not inherit the wrapper's variables: a portal carries
+its Nexus root's attributes, not a wrapper's.
 
 ButtonGroup still removes the touching corners of adjacent children, in both
 horizontal and vertical groups. In a group of only Buttons, the override rounds

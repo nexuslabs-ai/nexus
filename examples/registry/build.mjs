@@ -1,6 +1,8 @@
-// Builds the spike registry for #795 from the docs dependency closures.
+// Builds the fixture registry (#795, #796) from the docs dependency closures.
 // Output lands in examples/registry/.generated (gitignored); serve it with
 // `python3 -m http.server 4400 -d examples/registry/.generated`.
+// The fixtures install @nexus_ds/core from a pack of the local package; pass
+// --npm-core to pin the published version instead.
 import { execFileSync } from 'node:child_process';
 import {
   mkdirSync,
@@ -21,10 +23,10 @@ const providerDir = 'components/appearance/provider';
 
 const COMPONENTS = ['button', 'card', 'dialog', 'popover', 'progress'];
 const STYLES_DEPENDENCY = '@nexus/styles';
-const FULL_TAILWIND = "@import 'tailwindcss' prefix(nx);";
-const NO_PREFLIGHT = [
-  '@layer theme, base, components, utilities;',
-  "@import 'tailwindcss/theme.css' layer(theme) prefix(nx);",
+// The package entry scans the whole app; a copied entry scans only its own tree.
+const PACKAGE_UTILITIES =
+  "@import 'tailwindcss/utilities.css' layer(utilities) prefix(nx);";
+const COPIED_UTILITIES = [
   "@import 'tailwindcss/utilities.css' layer(utilities) prefix(nx) source(none);",
   "@source './';",
 ].join('\n');
@@ -32,6 +34,22 @@ const NO_PREFLIGHT = [
 const coreVersion = JSON.parse(
   readFileSync(path.join(repoRoot, 'packages/core/package.json'), 'utf8')
 ).version;
+
+function coreDependency() {
+  if (process.argv.includes('--npm-core')) {
+    return `@nexus_ds/core@${coreVersion}`;
+  }
+  execFileSync('pnpm', ['--filter', '@nexus_ds/core', 'build'], {
+    cwd: repoRoot,
+    stdio: 'inherit',
+  });
+  execFileSync(
+    'pnpm',
+    ['--filter', '@nexus_ds/core', 'pack', '--pack-destination', outDir],
+    { cwd: repoRoot, stdio: 'inherit' }
+  );
+  return `@nexus_ds/core@file:../registry/.generated/nexus_ds-core-${coreVersion}.tgz`;
+}
 
 const target = (srcPath) => `@components/nexus/${srcPath}`;
 
@@ -57,29 +75,31 @@ function componentItem(closure) {
   };
 }
 
-function appearanceProviderItem() {
+function appearanceProviderItem(core) {
   const files = readdirSync(path.join(repoRoot, 'packages/react/src', providerDir))
     .filter((name) => !name.includes('.stories.'))
-    .sort();
+    .map((name) => `${providerDir}/${name}`);
   return {
     name: 'appearance-provider',
     type: 'registry:component',
     registryDependencies: [STYLES_DEPENDENCY],
-    dependencies: [`@nexus_ds/core@${coreVersion}`],
-    files: files.map((name) => sourceFile(`${providerDir}/${name}`)),
+    dependencies: [core],
+    files: [...files, 'lib/nexus-root-context.ts'].sort().map(sourceFile),
   };
 }
 
 function stylesheetItem(componentStyles) {
   const nexusCss = readFileSync(path.join(tailwindDir, 'nexus.css'), 'utf8');
-  if (!nexusCss.includes(FULL_TAILWIND)) {
-    throw new Error(`packages/tailwind/nexus.css no longer contains ${FULL_TAILWIND}`);
+  if (!nexusCss.includes(PACKAGE_UTILITIES)) {
+    throw new Error(
+      `packages/tailwind/nexus.css no longer contains ${PACKAGE_UTILITIES}`
+    );
   }
   const tailwindParts = [...nexusCss.matchAll(/^@import '\.\/(.+)';$/gm)].map(
     ([, name]) => name
   );
   const entry = [
-    nexusCss.replace(FULL_TAILWIND, NO_PREFLIGHT),
+    nexusCss.replace(PACKAGE_UTILITIES, COPIED_UTILITIES),
     "@import 'tw-animate-css';",
     ...componentStyles.map((srcPath) => `@import './${srcPath}';`),
     '',
@@ -151,7 +171,7 @@ const registry = {
   homepage: 'https://github.com/nexuslabs-ai/nexus',
   items: [
     ...closures.map(componentItem),
-    appearanceProviderItem(),
+    appearanceProviderItem(coreDependency()),
     stylesheetItem(componentStyles),
     transformProbe,
     bareDependency,

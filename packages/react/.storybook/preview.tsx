@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useMemo } from 'react';
 
 import {
   BASE_TONE_OPTIONS,
@@ -8,13 +8,14 @@ import {
   ELEVATION_OPTIONS,
   type NexusAppearanceMode,
   type NexusAppearanceState,
+  type NexusResolvedMode,
   sanitizeNexusAppearance,
   STROKE_OPTIONS,
 } from '@nexus_ds/core';
 import type { Decorator, Preview } from '@storybook/react-vite';
 import { useGlobals } from 'storybook/preview-api';
 
-import { NexusAppearanceProvider } from '../src/components/appearance/provider';
+import { NexusRoot } from '../src/components/appearance/provider';
 
 // Storybook needs the full token set to render. The shipped component CSS
 // (src/index.css) is utilities-only by design — tokens come from the consumer's
@@ -168,16 +169,6 @@ function globalsFromAppearanceState(
   };
 }
 
-function appearanceStatesEqual(
-  a: NexusAppearanceState,
-  b: NexusAppearanceState
-): boolean {
-  const aGlobals = globalsFromAppearanceState(a);
-  const bGlobals = globalsFromAppearanceState(b);
-
-  return APPEARANCE_GLOBAL_KEYS.every((key) => aGlobals[key] === bGlobals[key]);
-}
-
 function toolbarItems<
   const T extends readonly { value: string; label: string }[],
 >(options: T) {
@@ -187,55 +178,47 @@ function toolbarItems<
   }));
 }
 
+// Storybook is the host, so it resolves `system` for its Nexus root.
+function resolveMode(mode: NexusAppearanceMode): NexusResolvedMode {
+  if (mode !== 'system') return mode;
+  return window.matchMedia('(prefers-color-scheme: dark)').matches
+    ? 'dark'
+    : 'light';
+}
+
 const AppearanceDecorator: Decorator = (Story, context) => {
   const [globals, updateGlobals] = useGlobals();
   const isDocs = context.viewMode === 'docs';
-  const globalsState = useMemo(
+  const state = useMemo(
     () => appearanceStateFromGlobals(globals as Record<string, unknown>),
     [globals]
   );
-  const [appearanceState, setAppearanceState] = useState(globalsState);
 
-  useEffect(() => {
-    setAppearanceState((current) =>
-      appearanceStatesEqual(current, globalsState) ? current : globalsState
-    );
-  }, [globalsState]);
+  function handleStateChange(nextState: NexusAppearanceState) {
+    const nextGlobals = globalsFromAppearanceState(nextState);
+    const changedGlobals: Partial<
+      Record<AppearanceGlobalKey, string | number | boolean>
+    > = {};
 
-  const handleStateChange = useCallback(
-    (nextState: NexusAppearanceState) => {
-      setAppearanceState(nextState);
-
-      const nextGlobals = globalsFromAppearanceState(nextState);
-      const changedGlobals: Partial<
-        Record<AppearanceGlobalKey, string | number | boolean>
-      > = {};
-
-      for (const key of APPEARANCE_GLOBAL_KEYS) {
-        if (globals[key] !== nextGlobals[key]) {
-          changedGlobals[key] = nextGlobals[key];
-        }
+    for (const key of APPEARANCE_GLOBAL_KEYS) {
+      if (globals[key] !== nextGlobals[key]) {
+        changedGlobals[key] = nextGlobals[key];
       }
+    }
 
-      if (Object.keys(changedGlobals).length > 0) {
-        updateGlobals(changedGlobals);
-      }
-    },
-    [globals, updateGlobals]
-  );
+    if (Object.keys(changedGlobals).length > 0) {
+      updateGlobals(changedGlobals);
+    }
+  }
 
   return (
-    <NexusAppearanceProvider
-      state={appearanceState}
-      storageKey={false}
+    <NexusRoot
+      state={{ ...state, mode: resolveMode(state.mode) }}
       onStateChange={handleStateChange}
+      className={`nx:flex nx:items-center nx:justify-center nx:bg-background nx:text-foreground ${isDocs ? 'nx:py-12' : 'nx:min-h-svh'}`}
     >
-      <div
-        className={`nx:flex nx:items-center nx:justify-center nx:bg-background nx:text-foreground ${isDocs ? 'nx:py-12' : 'nx:min-h-svh'}`}
-      >
-        <Story />
-      </div>
-    </NexusAppearanceProvider>
+      <Story />
+    </NexusRoot>
   );
 };
 

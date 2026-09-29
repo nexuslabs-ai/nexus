@@ -7,7 +7,8 @@ import { SectionHeading } from '../../_components/Heading';
  *
  * The bars reference the runtime `--nx-spacing-N` var inline, so they rescale
  * the moment the Size control in the theme picker swaps the active density via
- * the `data-density` attribute on `<html>`. Role-token rows are static spec.
+ * the `data-nx-density` attribute on the Nexus root (`<html>` here). Role-token
+ * rows are static spec.
  *
  * Source: packages/core/tokens/ (spacing modes).
  */
@@ -50,7 +51,7 @@ const MODES: { mode: string; archetype: string }[] = [
   { mode: 'tight', archetype: 'Tighter utility scale' },
   {
     mode: 'default ★',
-    archetype: 'Bundled :root default and @theme numeric baseline',
+    archetype: 'Bundled root default and @theme numeric baseline',
   },
   { mode: 'comfortable', archetype: 'Density variant' },
   { mode: 'spacious', archetype: 'Density variant' },
@@ -63,11 +64,12 @@ export default function Spacing() {
       <p className="nx:typography-body-default nx:text-muted-foreground nx:mt-2 nx:mb-8 nx:max-w-[64ch]">
         A 4px-based scale, exposed as named steps only — there is no base{' '}
         <code>--spacing</code> token. All six density modes ship in every build
-        and swap at runtime through the <code>data-density</code> attribute on{' '}
-        <code>&lt;html&gt;</code> — the &ldquo;Size&rdquo; control in the theme
-        picker (bottom-right) — cascading to every <code>nx:p-*</code> and{' '}
-        <code>nx:gap-*</code> utility at once. The bars below read the live var,
-        so swap the control and watch them rescale.
+        and swap at runtime through the <code>data-nx-density</code> attribute
+        on the Nexus root (<code>&lt;html&gt;</code> here) — the
+        &ldquo;Size&rdquo; control in the theme picker (bottom-right) —
+        cascading to every <code>nx:p-*</code> and <code>nx:gap-*</code> utility
+        at once. The bars below read the live var, so swap the control and watch
+        them rescale.
       </p>
 
       {/* ── The scale ───────────────────────────────────────── */}

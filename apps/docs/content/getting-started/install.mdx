@@ -52,14 +52,14 @@ export default {
 };
 ```
 
-Do not add an `@import "tailwindcss"` of your own — including the one a
-`create-next-app` scaffold leaves at the top of `globals.css`. The Nexus token
-CSS imports Tailwind itself, as `@import 'tailwindcss' prefix(nx)`, and that
-prefix is where `nx:bg-primary-background` comes from. `prefix()` is a property
-of the build, not of one import, so a second unprefixed import does not buy you
-a second, unprefixed utility layer: everything stays `nx:`. It emits preflight
-twice wherever you put it. Put it _after_ the Nexus import and it also
-re-injects Tailwind's default `@theme` on top of Nexus's resets, so
+Do not add an `@import "tailwindcss"` of your own to the same file — including
+the one a `create-next-app` scaffold leaves at the top of `globals.css`. The
+Nexus token CSS imports Tailwind's theme and utilities itself, with
+`prefix(nx)`, and that prefix is where `nx:bg-primary-background` comes from.
+`prefix()` is a property of the build, not of one import, so a second
+unprefixed import does not buy you a second, unprefixed utility layer:
+everything stays `nx:`. Put it _after_ the Nexus import and it also re-injects
+Tailwind's default `@theme` on top of Nexus's resets, so
 {/* audit-class-refs-ignore-next-line */}
 `nx:bg-red-500` and a stock `nx:text-lg` come back alongside the tokens.
 
@@ -74,8 +74,8 @@ Copy the token CSS into your app. Seven files, one entry point:
 
 ```
 styles/nexus/
-├── nexus.css                 # entry — imports Tailwind with prefix(nx), then the six below
-├── variables.css             # the --nx-* values, and their .dark overrides
+├── nexus.css                 # entry — Tailwind's theme and utilities with prefix(nx), then the six below
+├── variables.css             # the --nx-* values on the Nexus root, and their dark-mode overrides
 ├── typography-utilities.css
 ├── borderwidth-utilities.css
 ├── border-color-aliases.css
@@ -83,8 +83,10 @@ styles/nexus/
 └── spacing-utilities.css
 ```
 
-Import the entry point from your app's CSS entry point, followed by the
-animation utilities some components use for their enter and exit states:
+Import the entry point from your app's CSS entry point, then Tailwind's
+Preflight — Nexus ships none, and its components assume the browser defaults
+are reset — and the animation utilities some components use for their enter and
+exit states:
 
 ```bash
 npm install tw-animate-css
@@ -93,11 +95,14 @@ npm install tw-animate-css
 ```css
 /* app/globals.css */
 @import '../styles/nexus/nexus.css';
+@import 'tailwindcss/preflight.css' layer(base);
 @import 'tw-animate-css';
 ```
 
 `nexus.css` is the whole token surface: the `nx:` utilities, the semantic color
-tokens, and the typography, spacing, radius, and motion scales.
+tokens, and the typography, spacing, radius, and motion scales. Every one of
+them applies inside a Nexus root — an element marked `data-nexus-root` — and
+nothing outside it. Step 3 sets that root up.
 
 This decides how you write Tailwind everywhere in the app, not just inside
 pasted components: once `nexus.css` is your Tailwind entry point, `nx:flex`
@@ -110,10 +115,11 @@ To add project tokens, put your own `@theme` block in `globals.css` after the
 import — `nexus.css` is generated output stamped `DO NOT EDIT`, and pasting a
 newer copy over it would drop anything you added there.
 
-This assumes a greenfield app. Adding Nexus to one that already has unprefixed
-Tailwind utilities needs a separate nx entry point rather than a single shared
-one; that setup is being designed in
-[#604](https://github.com/nexuslabs-ai/nexus/issues/604).
+This assumes a greenfield app. An app that already has unprefixed Tailwind keeps
+its own entry point: import `nexus.css` from a separate stylesheet, so it builds
+as its own Tailwind entry, and wrap the part of the page that uses Nexus in
+`NexusRoot` (step 3). The app's styles never reach inside the root's tokens,
+and Nexus's never reach outside it.
 
 Then declare the native color scheme, so the browser themes scrollbars, form
 controls, and the page canvas before any JavaScript runs:
@@ -126,17 +132,23 @@ export const viewport: Viewport = { colorScheme: 'light dark' };
 ```
 
 Next renders that as `<meta name="color-scheme" content="light dark" />`; outside
-Next, write the tag itself. `nexus.css` emits the matching CSS policy — `:root`
-advertises both schemes, `:root:not(.dark)` pins light, and `.dark` pins dark —
-so native UI follows the app's theme instead of the operating system's.
+Next, write the tag itself. `nexus.css` sets `color-scheme` on each Nexus root —
+light, or dark when the root carries `data-nx-mode="dark"` — so native UI
+follows the app's theme instead of the operating system's.
 
 ## Step 3: The appearance provider
 
 The provider is what turns the token layer into a live theme. It derives the
-`--nx-*` values from a single appearance state, toggles `.dark`, and sets the
-`data-density` / `data-radius` / `data-shadow` / `data-borderwidth` attributes
-the token CSS keys off. Its companion script does that same work inline in
-`<head>`, before hydration, so there is no flash of the wrong theme.
+`--nx-*` values from a single appearance state and makes `<html>` the Nexus
+root: it sets `data-nexus-root`, `data-nx-mode`, and the `data-nx-density` /
+`data-nx-radius` / `data-nx-shadow` / `data-nx-borderwidth` attributes the token
+CSS keys off. Its companion script does that same work inline in `<head>`,
+before hydration, so there is no flash of the wrong theme.
+
+To scope Nexus to part of a page instead — an existing app, or one panel —
+render `NexusRoot` around that part. It takes the appearance from you, with
+`mode` already resolved to `light` or `dark`, and renders its own root element
+and styles; it writes nothing to `<html>`, storage, or cookies.
 
 The engine behind it is a published package:
 
@@ -148,7 +160,8 @@ The React wiring is copy/own like the components. Copy the provider in:
 
 ```
 components/appearance/provider/
-├── index.ts      # client surface — createNexusAppearance, NexusAppearanceProvider, useNexusAppearance
+├── index.ts      # client surface — createNexusAppearance, NexusAppearanceProvider, NexusRoot, useNexusAppearance
+├── nexus-root.tsx
 ├── provider.tsx
 ├── factory.tsx
 ├── script.tsx

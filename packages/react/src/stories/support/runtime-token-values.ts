@@ -1,19 +1,25 @@
 import { useEffect, useMemo, useState } from 'react';
 
+import { nexusRootScope } from '@nexus_ds/core';
+
 import { useNexusAppearance } from '../../components/appearance/provider';
+import { useNexusRootAttributes } from '../../lib/nexus-root-context';
 
 export function useRuntimeTokenValues(
   tokenNames: readonly string[]
 ): Record<string, string> {
   const { mounted, resolvedMode, state } = useNexusAppearance();
+  const rootKey = useNexusRootAttributes()['data-nexus-root'];
   const tokenKey = tokenNames.join('\n');
   const [values, setValues] = useState<Record<string, string>>({});
 
   useEffect(() => {
-    if (!mounted || typeof window === 'undefined') return;
+    if (!mounted || rootKey === undefined) return;
 
     const frame = window.requestAnimationFrame(() => {
-      const styles = window.getComputedStyle(document.documentElement);
+      const root = document.querySelector(nexusRootScope(rootKey));
+      if (!root) return;
+      const styles = window.getComputedStyle(root);
       const nextValues: Record<string, string> = {};
 
       for (const tokenName of tokenNames) {
@@ -24,7 +30,7 @@ export function useRuntimeTokenValues(
     });
 
     return () => window.cancelAnimationFrame(frame);
-  }, [mounted, resolvedMode, state, tokenKey, tokenNames]);
+  }, [mounted, resolvedMode, rootKey, state, tokenKey, tokenNames]);
 
   return useMemo(() => values, [values]);
 }

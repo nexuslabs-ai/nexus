@@ -1,3 +1,5 @@
+import { compile } from '@tailwindcss/node';
+import { Scanner } from '@tailwindcss/oxide';
 import { readFileSync } from 'node:fs';
 import { resolve } from 'node:path';
 import { describe, expect, it } from 'vitest';
@@ -9,6 +11,7 @@ import type {
   CatalogueToken,
 } from '../catalogue/types';
 
+import { cssRules, selectorListItems } from './css-rules.test-support';
 import type { Mode } from './palette';
 
 const catalogue = createTokenCatalogue();
@@ -25,11 +28,18 @@ const primitives = authored.filter((token) =>
 
 /** The attribute that swaps each moded family at runtime. */
 const MODE_ATTRIBUTES: Partial<Record<CatalogueFamily, string>> = {
-  spacing: 'data-density',
-  radius: 'data-radius',
-  borderwidth: 'data-borderwidth',
-  shadow: 'data-shadow',
+  spacing: 'data-nx-density',
+  radius: 'data-nx-radius',
+  borderwidth: 'data-nx-borderwidth',
+  shadow: 'data-nx-shadow',
 };
+
+const ROOT = '[data-nexus-root]';
+const DARK_ROOT = "[data-nexus-root][data-nx-mode='dark']";
+
+/** The static default a runtime colour falls back to. */
+const defaultName = (name: string) =>
+  name.replace(/^--nx-color-/, '--nx-default-color-');
 
 /** Hand-written utilities in the generated files that no token feeds. */
 const STATIC_UTILITIES = [
@@ -54,8 +64,16 @@ function generated(file: string): string {
   );
 }
 
-const nexusCss = generated('nexus.css');
-const variablesCss = generated('variables.css');
+/** The CSS with its `@layer` wrappers removed, so layered rules read as top-level. */
+function unlayered(css: string): string {
+  return css.replace(
+    /\n@layer [\w-]+ \{\n([\s\S]*?)\n\}\n/g,
+    (_, body: string) => `\n${body.replace(/^ {2}/gm, '')}\n`
+  );
+}
+
+const nexusCss = unlayered(generated('nexus.css'));
+const variablesCss = unlayered(generated('variables.css'));
 
 /** Undo prettier's line wrapping so a value compares as one line. */
 const collapse = (value: string) =>
@@ -102,7 +120,7 @@ function modeBlock(selector: string): Map<string, string> {
   return block.declarations;
 }
 
-/** Modes the generated CSS declares for an attribute, and the one on `:root`. */
+/** Modes the generated CSS declares for an attribute, and the one on the root. */
 function cssModes(attribute: string) {
   const pattern = new RegExp(`^\\[${attribute}='([\\w-]+)'\\]$`);
   const modes = nexusBlocks.flatMap(({ selectors }) =>
@@ -110,13 +128,13 @@ function cssModes(attribute: string) {
   );
   const rootBlock = nexusBlocks.find(
     ({ selectors }) =>
-      selectors.includes(':root') &&
+      selectors.includes(ROOT) &&
       selectors.some((selector) => pattern.test(selector))
   );
   const root = rootBlock?.selectors
     .map((selector) => selector.match(pattern)?.[1])
     .find((mode) => mode !== undefined);
-  if (!root) throw new Error(`no :root block for ${attribute}`);
+  if (!root) throw new Error(`no root block for ${attribute}`);
   return { modes: [...new Set(modes)].sort(), root };
 }
 
@@ -167,7 +185,7 @@ function familyTokens(family: CatalogueFamily): CatalogueToken[] {
   return authored.filter((token) => token.family === family);
 }
 
-/** The variant `:root` carries: the root preset, in light for shadows. */
+/** The variant the root carries: the root preset, in light for shadows. */
 function rootVariant(token: CatalogueToken): VariantKey {
   const attribute = MODE_ATTRIBUTES[token.family];
   if (!attribute || token.variants.length === 1) return token.variants[0]!;
@@ -209,22 +227,86 @@ describe('token catalogue', () => {
     expect(byName.has('--nx-color-border-active')).toBe(false);
   });
 
-  it('agrees with the generated runtime colour fallbacks and dark overrides', () => {
-    const theme = blockDeclarations(nexusCss, '@theme inline');
-    const dark = blockDeclarations(nexusCss, '.dark');
+  it('agrees with the generated runtime colour defaults in light and dark', () => {
+    const theme = blockDeclarations(nexusCss, '@theme inline reference');
+    const light = blockDeclarations(nexusCss, ROOT);
+    const dark = blockDeclarations(nexusCss, DARK_ROOT);
     for (const token of runtimeColors) {
       const alias = only(aliasesOf(token, 'css-variable'));
+      const fallback = defaultName(token.name);
       expect(theme.get(alias), alias).toBe(
-        `var(${token.name}, ${variantValue(token, { preset: null, mode: 'light' })})`
+        `var(${token.name}, var(${fallback}))`
       );
-      expect(dark.get(token.name), token.name).toBe(
+      expect(light.get(fallback), fallback).toBe(
+        variantValue(token, { preset: null, mode: 'light' })
+      );
+      expect(dark.get(fallback), fallback).toBe(
         variantValue(token, { preset: null, mode: 'dark' })
       );
     }
   });
 
+  it('scopes every generated rule to a Nexus root', () => {
+    const rules = ['variables.css', 'nexus.css', ...UTILITY_FILES].flatMap(
+      (file) => cssRules(generated(file))
+    );
+    const unscoped = rules
+      .filter(
+        ({ within }) =>
+          !within.some((at) => /^@(?:utility|keyframes)\b/.test(at))
+      )
+      .flatMap(({ selector }) => selectorListItems(selector))
+      .filter(
+        (item) => !item.startsWith(ROOT) && !item.startsWith('[data-nx-')
+      );
+
+    expect(rules.length).toBeGreaterThan(20);
+    expect(unscoped).toEqual([]);
+  });
+
+  it('compiles no :root theme variable that reads a root-scoped variable', async () => {
+    const base = resolve(process.cwd(), 'packages/tailwind');
+    const candidates = new Scanner({
+      sources: [
+        {
+          base: resolve(process.cwd(), 'packages/react/src'),
+          pattern: '**/*',
+          negated: false,
+        },
+      ],
+    }).scan();
+    const compiler = await compile(generated('nexus.css'), {
+      base,
+      onDependency() {},
+    });
+    const compiled = compiler.build(candidates);
+    const declared = new Map(
+      [...compiled.matchAll(/:root, :host \{([^}]*)\}/g)].flatMap(
+        ([, body]) => [...customProperties(body!)]
+      )
+    );
+    const unresolved = [...declared].flatMap(([name, value]) =>
+      [...value.matchAll(/var\((--[\w-]+)/g)]
+        .map(([, reference]) => reference!)
+        .filter((reference) => reference === name || !declared.has(reference))
+        .map((reference) => `${name} -> ${reference}`)
+    );
+
+    expect(declared.size).toBeGreaterThan(20);
+    expect(unresolved).toEqual([]);
+  });
+
+  it('declares no unprefixed --color-* outside @theme', () => {
+    const outsideTheme = generated('nexus.css').replace(
+      /@theme(?: inline reference)? \{[\s\S]*?\n\}/g,
+      ''
+    );
+
+    expect(outsideTheme).not.toMatch(/^\s*--color-[\w-]+:/m);
+  });
+
   it('declares exactly the primitives in variables.css, in their root mode', () => {
-    const root = blockDeclarations(variablesCss, ':root');
+    const root = blockDeclarations(variablesCss, ROOT);
     expect([...root.keys()].sort()).toEqual(
       primitives.map((token) => token.name).sort()
     );
@@ -236,9 +318,9 @@ describe('token catalogue', () => {
   });
 
   it('overrides only the diverging dark shadow primitives in variables.css', () => {
-    const light = blockDeclarations(variablesCss, ':root');
-    const dark = blockDeclarations(variablesCss, '.dark');
-    const { root } = cssModes('data-shadow');
+    const light = blockDeclarations(variablesCss, ROOT);
+    const dark = blockDeclarations(variablesCss, DARK_ROOT);
+    const { root } = cssModes('data-nx-shadow');
     const rootDark: VariantKey = { preset: root, mode: 'dark' };
     const diverging = familyTokens('shadow').filter(
       (token) =>
@@ -276,21 +358,32 @@ describe('token catalogue', () => {
   );
 
   it('agrees with every generated light and dark shadow preset block', () => {
-    const { modes } = cssModes('data-shadow');
+    const { modes, root } = cssModes('data-nx-shadow');
+    // The root preset's dark values sit on the dark root itself, which also
+    // carries the dark colour defaults in another block.
+    const darkRootShadows = nexusBlocks.find(
+      ({ selectors, declarations }) =>
+        selectors.length === 1 &&
+        selectors[0] === DARK_ROOT &&
+        [...declarations.keys()].some((name) => name.startsWith('--nx-shadow-'))
+    )?.declarations;
     for (const preset of modes) {
-      expect(modeBlock(`[data-shadow='${preset}']`), preset).toEqual(
+      expect(modeBlock(`[data-nx-shadow='${preset}']`), preset).toEqual(
         cataloguePreset('shadow', { preset, mode: 'light' })
       );
-      expect(modeBlock(`.dark[data-shadow='${preset}']`), preset).toEqual(
-        cataloguePreset('shadow', { preset, mode: 'dark' })
-      );
+      expect(
+        preset === root
+          ? darkRootShadows
+          : modeBlock(`${DARK_ROOT}[data-nx-shadow='${preset}']`),
+        preset
+      ).toEqual(cataloguePreset('shadow', { preset, mode: 'dark' }));
     }
   });
 
   it('maps every @theme variable to the token it reads or declares', () => {
     const theme = new Map([
       ...blockDeclarations(nexusCss, '@theme'),
-      ...blockDeclarations(nexusCss, '@theme inline'),
+      ...blockDeclarations(nexusCss, '@theme inline reference'),
     ]);
     const aliased = catalogue.flatMap((token) =>
       aliasesOf(token, 'css-variable').map((alias) => ({ alias, token }))
@@ -338,7 +431,9 @@ describe('token catalogue', () => {
     const properties = catalogue.flatMap((token) =>
       token.variants.flatMap((variant) =>
         variant.declarations
-          .map(({ property }) => property)
+          .map(({ property }) =>
+            runtimeColors.includes(token) ? defaultName(property) : property
+          )
           .filter((property) => property.startsWith('--'))
       )
     );

@@ -324,8 +324,9 @@ export const EdgeCases: Story = {
 };
 
 export const Dark: Story = {
+  globals: { mode: 'dark' },
   render: () => (
-    <div className="dark nx:w-80 nx:rounded-md nx:bg-background nx:p-4 nx:text-foreground">
+    <div className="nx:w-80 nx:rounded-md nx:bg-background nx:p-4 nx:text-foreground">
       <ChoiceRow htmlFor="choice-dark">
         <Checkbox
           id="choice-dark"
@@ -336,6 +337,14 @@ export const Dark: Story = {
       </ChoiceRow>
     </div>
   ),
+  play: async ({ canvasElement }) => {
+    await waitFor(() =>
+      expect(canvasElement.querySelector('[data-nexus-root]')).toHaveAttribute(
+        'data-nx-mode',
+        'dark'
+      )
+    );
+  },
 };
 
 export const AllVariants: Story = {

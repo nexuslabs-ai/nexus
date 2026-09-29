@@ -8,6 +8,7 @@ import {
   contrastTarget,
   normalizeContrast,
 } from './contrast';
+import { NEXUS_LAYER_ORDER, NEXUS_MODE_ATTRIBUTE } from './nexus-root';
 import { formatOklch } from './oklch-format';
 import {
   type Mode,
@@ -449,12 +450,16 @@ export function deriveTheme(input: ThemeDerivationInput): DerivedTheme {
 
 function block(selector: string, map: TokenMap): string {
   const body = Object.entries(map)
-    .map(([key, value]) => `  ${key}: ${value};`)
+    .map(([key, value]) => `    ${key}: ${value};`)
     .join('\n');
-  return `${selector} {\n${body}\n}`;
+  return `  ${selector} {\n${body}\n  }`;
 }
 
-/** Serialize a derived theme to CSS text — light on `:root`, dark on `:root.dark`. */
-export function themeToCss(derived: DerivedTheme): string {
-  return `${block(':root', derived.light)}\n${block(':root.dark', derived.dark)}\n`;
+/**
+ * Serialize a derived theme to CSS text for one Nexus root: light on `scope`,
+ * dark on `scope[data-nx-mode='dark']`, inside `@layer base` so it beats the
+ * generated defaults (`@layer theme`) whatever order the stylesheets load in.
+ */
+export function themeToCss(derived: DerivedTheme, scope: string): string {
+  return `${NEXUS_LAYER_ORDER}\n@layer base {\n${block(scope, derived.light)}\n${block(`${scope}[${NEXUS_MODE_ATTRIBUTE}='dark']`, derived.dark)}\n}\n`;
 }

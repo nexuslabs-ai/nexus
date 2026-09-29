@@ -105,7 +105,9 @@ cookie again during client hydration. When `storageKey` is enabled,
 `storageKey={false}` when you want the client to hydrate from the server
 snapshot/default state without localStorage persistence.
 
-Under a strict CSP, pass a nonce to `<NexusAppearanceScript nonce={nonce} />`.
+Under a strict CSP, pass the same nonce to `<NexusAppearanceScript nonce={nonce} />`
+and `<NexusAppearanceProvider nonce={nonce}>`. The script gives the styles it
+injects its own nonce; the provider sets it on the styles it keeps up to date.
 
 ## Vite
 

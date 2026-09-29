@@ -6,6 +6,12 @@ import App from './App.tsx'
 const params = new URLSearchParams(window.location.search)
 const withNexus = !params.has('no-nexus')
 
+// A host that marks its own dark theme on <html>, as next-themes does.
+if (params.has('data-theme')) {
+  document.documentElement.dataset.theme = 'dark'
+  document.documentElement.style.colorScheme = 'dark'
+}
+
 if (!withNexus) {
   await import('./index.css')
 } else if (params.has('nexus-only')) {
@@ -20,6 +26,6 @@ if (!withNexus) {
 
 createRoot(document.getElementById('root')!).render(
   <StrictMode>
-    <App withNexus={withNexus} withProvider={params.has('provider')} />
+    <App withNexus={withNexus} />
   </StrictMode>,
 )

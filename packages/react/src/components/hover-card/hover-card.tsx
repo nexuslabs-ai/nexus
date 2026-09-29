@@ -1,7 +1,10 @@
+'use client';
+
 import * as React from 'react';
 
 import * as HoverCardPrimitive from '@radix-ui/react-hover-card';
 
+import { useNexusRootAttributes } from '../../lib/nexus-root-context';
 import { cn } from '../../lib/utils';
 import {
   overlayFloatingTransitionClassName,
@@ -86,9 +89,11 @@ function HoverCardContent({
   sideOffset = 4,
   ...props
 }: HoverCardContentProps) {
+  const rootAttributes = useNexusRootAttributes();
   return (
     <HoverCardPrimitive.Portal>
       <HoverCardPrimitive.Content
+        {...rootAttributes}
         data-slot="hover-card-content"
         align={align}
         sideOffset={sideOffset}

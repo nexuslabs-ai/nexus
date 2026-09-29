@@ -176,38 +176,30 @@ export const ImageHairline: Story = {
   },
 };
 
-export const ImageHairlineLightDark: Story = {
+export const ImageHairlineShapes: Story = {
   render: () => (
-    <div className="nx:grid nx:grid-cols-2 nx:gap-4">
-      <div className="nx:flex nx:items-center nx:gap-3 nx:rounded-md nx:bg-background nx:p-4">
-        <Avatar>
-          <AvatarImage src={AVATAR_URL} alt="Ada Lovelace" />
-          <AvatarFallback>AL</AvatarFallback>
-        </Avatar>
-        <Avatar shape="rounded">
-          <AvatarFallback>JD</AvatarFallback>
-        </Avatar>
-      </div>
-      <div className="dark nx:flex nx:items-center nx:gap-3 nx:rounded-md nx:bg-background nx:p-4">
-        <Avatar>
-          <AvatarImage src={AVATAR_URL} alt="Ada Lovelace" />
-          <AvatarFallback>AL</AvatarFallback>
-        </Avatar>
-        <Avatar shape="rounded">
-          <AvatarFallback>JD</AvatarFallback>
-        </Avatar>
-      </div>
+    <div className="nx:flex nx:items-center nx:gap-3 nx:rounded-md nx:bg-background nx:p-4">
+      <Avatar>
+        <AvatarImage src={AVATAR_URL} alt="Ada Lovelace" />
+        <AvatarFallback>AL</AvatarFallback>
+      </Avatar>
+      <Avatar shape="rounded">
+        <AvatarFallback>JD</AvatarFallback>
+      </Avatar>
     </div>
   ),
   play: async ({ canvasElement }) => {
     const avatars = canvasElement.querySelectorAll('[data-slot="avatar"]');
 
-    await expect(avatars).toHaveLength(4);
+    await expect(avatars).toHaveLength(2);
     expectAvatarHairline(avatars.item(0));
     expectAvatarHairline(avatars.item(1));
-    expectAvatarHairline(avatars.item(2));
-    expectAvatarHairline(avatars.item(3));
   },
+};
+
+export const ImageHairlineShapesDark: Story = {
+  ...ImageHairlineShapes,
+  globals: { mode: 'dark' },
 };
 
 export const WithFallback: Story = {
@@ -617,7 +609,12 @@ export const OnContainerSurface: Story = {
     const card = canvas.getByTestId('card');
     const styleOf = (element: Element) => window.getComputedStyle(element);
 
-    await waitFor(() => expect(document.documentElement).toHaveClass('dark'));
+    await waitFor(() =>
+      expect(canvasElement.querySelector('[data-nexus-root]')).toHaveAttribute(
+        'data-nx-mode',
+        'dark'
+      )
+    );
     const surface = styleOf(card).backgroundColor;
     // Only a surface that differs from `background` can catch a ring that
     // fell back to `background`.

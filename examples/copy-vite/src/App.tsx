@@ -1,6 +1,6 @@
-import { type ReactNode, useState } from 'react'
+import { useState } from 'react'
 
-import { NexusAppearanceProvider } from '~/components/nexus/components/appearance/provider'
+import { Button as NexusButton } from '~/components/nexus/components/button'
 
 import { Button } from '~/components/ui/button'
 import {
@@ -10,26 +10,9 @@ import {
   CardHeader,
   CardTitle,
 } from '~/components/ui/card'
-import { AppearanceControls } from '~/AppearanceControls'
 import { NexusPanel } from '~/NexusPanel'
 
-function MaybeProvider({ enabled, children }: { enabled: boolean; children: ReactNode }) {
-  if (!enabled) return children
-  return (
-    <NexusAppearanceProvider storageKey={false}>
-      <AppearanceControls />
-      {children}
-    </NexusAppearanceProvider>
-  )
-}
-
-export default function App({
-  withNexus,
-  withProvider,
-}: {
-  withNexus: boolean
-  withProvider: boolean
-}) {
+export default function App({ withNexus }: { withNexus: boolean }) {
   const [dark, setDark] = useState(false)
 
   return (
@@ -95,9 +78,19 @@ export default function App({
         </section>
 
         {withNexus && (
-          <MaybeProvider enabled={withProvider}>
+          <>
             <NexusPanel />
-          </MaybeProvider>
+            <div
+              data-nexus-root=""
+              data-nx-mode="dark"
+              data-probe="nexus-bare-dark-root"
+              className="mt-6 p-4"
+            >
+              <NexusButton data-probe="nexus-bare-dark-button">
+                Static dark defaults
+              </NexusButton>
+            </div>
+          </>
         )}
       </main>
     </div>

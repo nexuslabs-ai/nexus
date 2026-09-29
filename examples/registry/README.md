@@ -1,10 +1,11 @@
-# Copy-and-own fixtures — contract and findings (#795)
+# Copy-and-own fixtures — contract and findings (#795, #796)
 
 Two disposable host apps prove that Nexus source can be copied into a
 project someone else owns, through a shadcn registry or by hand, and still
 compile, build and leave the host alone. This file is the contract those
-fixtures pin and the evidence behind it. #796 (CSS scoping), #797 (core
-release) and #798 (catalog + CI) build on it.
+fixtures pin and the evidence behind it. #795 recorded the findings; #796
+scoped Nexus to a root element and fixed the host leaks; #797 (core release)
+and #798 (catalog + CI) build on it.
 
 | Fixture | Host shape |
 | ------- | ---------- |
@@ -12,14 +13,16 @@ release) and #798 (catalog + CI) build on it.
 | [`../copy-next`](../copy-next) | A fresh app: Next 16 App Router, default `@/` alias, `rsc: true` |
 
 Pinned: Node 24.12.0, npm 11.6.2, shadcn 4.21.0, Tailwind 4.3.3, Vite 8.3.1,
-Next 16.3.6, `@nexus_ds/core` from npm at the version in `packages/core/package.json`. Both fixtures install with npm
-and commit their lockfile. Run them only from a copy **outside the
-repository**: the root `.npmrc` sets `node-linker=hoisted`, so an in-tree
-fixture silently resolves any package it lacks from the monorepo's
-`node_modules` (and copy-next picks up the root `@types`). The findings
-were recorded against `main` at `a5176e306`; the recipe probe (Findings 5
-and 6) used the #809 tree at `466db93b6`. The probe numbers below were
-re-run from outside copies on 2026-09-29.
+Next 16.3.6. `@nexus_ds/core` installs from a pack of the local package
+(`registry/.generated/nexus_ds-core-<version>.tgz`), so the fixtures test
+the current source; `node examples/registry/build.mjs --npm-core` pins the
+published version instead. Both fixtures install with npm and commit their
+lockfile. Run them only from a copy **outside the repository**: the root
+`.npmrc` sets `node-linker=hoisted`, so an in-tree fixture silently
+resolves any package it lacks from the monorepo's `node_modules` (and
+copy-next picks up the root `@types`). The findings were recorded against
+`main` at `a5176e306`; the recipe probe (Findings 5 and 6) used the #809
+tree at `466db93b6`.
 
 ## Run it
 
@@ -28,10 +31,15 @@ node examples/registry/build.mjs
 python3 -m http.server 4400 -d examples/registry/.generated
 ```
 
-Then copy each fixture out of the repository and run it there:
+Then copy each fixture out of the repository, next to a copy of the
+registry output so the core pack's `../registry/.generated/` path still
+resolves, and run it there:
 
 ```bash
-dir=$(mktemp -d) && cp -R examples/copy-vite "$dir/" && cd "$dir/copy-vite"
+dir=$(mktemp -d) && mkdir "$dir/registry"
+cp -R examples/registry/.generated "$dir/registry/"
+cp -R examples/copy-vite "$dir/"
+cd "$dir/copy-vite"
 npm ci
 npm run nexus:add
 npm run typecheck
@@ -39,16 +47,36 @@ npm run build
 ```
 
 `build.mjs` clears `.generated/`, regenerates the docs dependency
-closures, writes the no-Preflight stylesheet entry and runs `shadcn build`.
-`nexus:add` deletes the installed `components/nexus/` tree (gitignored) and
-installs every item from the registry without `--overwrite`, so a file
-dropped from a closure disappears instead of lingering. It also runs
-`npm install` for the closures' dependencies: while the committed ranges
-cover them, `package.json` and `package-lock.json` stay unchanged (hashes
-match in both fixtures); a closure that adds or raises a dependency
-rewrites both. #798's CI lockfile check owns catching that.
+closures, packs the local core, writes the copied stylesheet entry and runs
+`shadcn build`. `nexus:add` deletes the installed `components/nexus/` tree
+(gitignored) and installs every item from the registry without
+`--overwrite`, so a file dropped from a closure disappears instead of
+lingering. It also runs `npm install` for the closures' dependencies: while
+the committed ranges cover them, `package.json` and `package-lock.json`
+stay unchanged (hashes match in both fixtures); a closure that adds or
+raises a dependency rewrites both. #798's CI lockfile check owns catching
+that.
 
 ## Contract
+
+### Nexus root
+
+Nexus styles apply only inside an element marked `data-nexus-root`:
+
+- **Embedded** (both fixtures): `NexusRoot` renders the root element with
+  `data-nexus-root="<key>"`, `data-nx-mode` and `data-nx-density` /
+  `-radius` / `-shadow` / `-borderwidth`, plus a `<style>` scoped to that key.
+  The host passes the appearance with `mode` already resolved to `light` or
+  `dark`; the root writes nothing to `<html>`, storage, cookies or meta.
+  `copy-next` renders it on the server from a host-owned cookie, so the first
+  paint is already in the right mode.
+- **Standalone** (the docs site): `NexusAppearanceProvider` and its
+  bootstrap script make `<html>` the root, keyed `document`.
+- Portalled surfaces (Dialog, Popover, menus, tooltips, Sonner's toaster)
+  copy the nearest root's attributes, so they keep its tokens and mode.
+- A root without runtime CSS still renders: the generated CSS declares
+  `--nx-default-color-*` on every root, light and dark, and utilities read
+  `var(--nx-color-X, var(--nx-default-color-X))`.
 
 ### Item shape
 
@@ -99,11 +127,11 @@ is the fallback.
 ### Stylesheet
 
 The `styles` item delivers `components/nexus/nexus.css`: the generated
-theme with `@import 'tailwindcss' prefix(nx)` replaced by
+theme, which already imports only Tailwind's theme and utilities with
+`prefix(nx)` (no Preflight), with the utilities import narrowed to the copied
+tree:
 
 ```css
-@layer theme, base, components, utilities;
-@import 'tailwindcss/theme.css' layer(theme) prefix(nx);
 @import 'tailwindcss/utilities.css' layer(utilities) prefix(nx) source(none);
 @source './';
 ```
@@ -131,109 +159,116 @@ Result:
 ### Variable names under `prefix(nx)`
 
 `prefix(nx)` renames every `@theme` variable, so Nexus's static scales land
-in the same `--nx-*` namespace as its runtime blocks. Compiled with the
-fixtures' Tailwind 4.3.3 (`vite build` output):
+in the same `--nx-*` namespace as its runtime blocks. #795 recorded this
+mapping at `f096bd331`; #796 changed the rows that read a runtime variable.
+Compiled with the fixtures' Tailwind 4.3.3 (`vite build` output):
 
 | Scale | Declaration in `nexus.css` | Emitted in `@layer theme` (`:root, :host`) | Utility | Runtime writer |
 | ----- | -------------------------- | ------------------------------------------ | ------- | -------------- |
-| Spacing | `@theme { --spacing-4: 16px }` | `--nx-spacing-4: 16px` | `nx:px-4` → `padding-inline: var(--nx-spacing-4)` | unlayered `:root, [data-density=…] { --nx-spacing-4 }`, same name |
-| Radius | `@theme { --radius-md: var(--nx-radius-md) }` | `--nx-radius-md: var(--nx-radius-md)`, a self-reference | `nx:rounded-md` → `border-radius: var(--nx-radius-md)` | unlayered `:root, [data-radius=…] { --nx-radius-md }`, same name |
-| Text | `@theme { --text-*: initial }`, nothing declared | nothing | `nx:typography-*` read `--nx-typography-*` | unlayered `:root` in `variables.css` |
-| Easing | `@theme { --ease-enter: var(--nx-motion-ease-enter) }` | `--nx-ease-enter: var(--nx-motion-ease-enter)` | `nx:ease-enter` → `var(--nx-ease-enter)` | none; resolves at `:root` |
+| Spacing | `@theme { --spacing-4: 16px }` | `--nx-spacing-4: 16px` | `nx:px-4` → `padding-inline: var(--nx-spacing-4)` | `[data-nexus-root], [data-nx-density=…] { --nx-spacing-4 }`, same name |
+| Radius | `@theme inline reference { --radius-md: var(--nx-radius-md) }` | nothing (#795: a `--nx-radius-md: var(--nx-radius-md)` self-reference) | `nx:rounded-md` → `border-radius: var(--nx-radius-md)` | `[data-nexus-root], [data-nx-radius=…] { --nx-radius-md }` |
+| Text | `@theme { --text-*: initial }`, nothing declared | nothing | `nx:typography-*` read `--nx-typography-*` | the root block in `variables.css` |
+| Easing | `@theme inline reference { --ease-move: var(--nx-motion-ease-move) }` | nothing (#795: `--nx-ease-move: var(--nx-motion-ease-move)`) | `nx:ease-move` → `var(--nx-motion-ease-move)` (#795: `var(--nx-ease-move)`) | the root block in `variables.css` |
 
 **Decision: one `--nx-*` namespace.** The collision is what makes runtime
-density and corners work: the runtime blocks are unlayered, so they beat
-the `@layer theme` declaration of the same name, and utilities read the
-winner. The spacing `@theme` values equal the `default` density, so they
-are only a static fallback. The radius entry is a cycle that is harmless
-only while the unlayered block matches `:root`; once #796 scopes runtime
-blocks to a root element, entries that reference another variable
-(radius, easing) move to `@theme inline` so utilities read the runtime
-variable directly. Host `@theme` names are unprefixed (`--spacing-gutter`,
-`--radius-panel`) and never meet `--nx-*`; the only host collision is
-Finding 1.
+density work: the runtime blocks set the same name on the root element, and
+utilities read it there. The spacing `@theme` values equal the `default`
+density, so they are only a static fallback. Every `@theme` entry that
+reads a runtime variable (colour, radius, easing, shadow, border width,
+default transition) is `@theme inline reference`: utilities read the
+runtime variable on the element, and nothing is declared on `:root`, where
+root-scoped variables do not exist. Before that change an embedded Dialog's
+`transition-timing-function` was `ease`, not the root's curve.
+`token-catalogue.test.ts` compiles `nexus.css` and fails if a `:root, :host`
+variable reads one that is not declared there. Host `@theme` names are
+unprefixed (`--spacing-gutter`, `--radius-panel`) and never meet `--nx-*`;
+the only host collision was Finding 1.
 
 ### `'use client'`
 
-Importing Nexus straight into a Server Component fails at prerender in
-`components/button/button.tsx`, `components/button-group/button-group-context.ts`
-and `components/dialog/dialog.tsx`. Adding the directive to those three
-makes a Server Component page build and run (Dialog and Popover open,
-Progress animates). Card, Popover and Progress are server-safe because
-Radix ships its own directives. `copy-next` keeps a client boundary
-(`app/nexus-demo.tsx`) until #796 adds them.
+#795 found that importing Nexus straight into a Server Component failed at
+prerender in `button.tsx`, `button-group-context.ts` and `dialog.tsx`. #796
+added the directive to those three and to every overlay that now reads the
+root context, so `copy-next` imports Nexus straight into its Server
+Component page.
 
 ## Findings
 
-Probed with `getComputedStyle` on production builds (`vite preview`,
-`next start`) against a `?no-nexus` baseline; `copy-vite` has
-`?nexus-first`, `?nexus-only` and `?provider` modes for the rows below.
-`probe/compare-styles.mjs` reads 17 properties on `<html>`, `<body>` and
-every `[data-probe]` element, opening Dialog and Popover for their
-portalled probes. Against `?no-nexus`, copy-vite changes 30 host
-properties with Nexus loaded after the host, 16 with `?nexus-first` and 70
-with `?provider`.
+Recorded on #795's tree (`f096bd331`) with `getComputedStyle` on
+production builds (`vite preview`, `next start`) against a `?no-nexus`
+baseline; `copy-vite` then had `?nexus-first`, `?nexus-only` and
+`?provider` modes. `probe/compare-styles.mjs` reads 17 properties on
+`<html>`, `<body>` and every `[data-probe]` element, opening Dialog and
+Popover for their portalled probes. Against `?no-nexus`, copy-vite changed
+30 host properties with Nexus loaded after the host, 16 with
+`?nexus-first` and 70 with `?provider`. A scoped-root prototype (the
+`probe/scope-prototype.mjs` edit, removed with #796) took the 30 to 0.
 
 | # | Finding | Owner |
 | - | ------- | ----- |
-| 1 | **Unprefixed `--color-*` aliases clobber host tokens.** Nexus declares 107 `--color-*` on `:root`, unlayered. A host with non-inline `@theme` tokens of the same name (`--color-success-foreground`) loses them in either load order — the host's "Saved" text turns white. Only three Nexus rules read the aliases (the base border, body color, body background); utilities read `--nx-color-*` with inline fallbacks. | #796 |
-| 2 | **Global base rules leak by load order.** Nexus's `*, ::before, ::after { border-color }` and `body { color; background }` share `@layer base` with the host's; whichever stylesheet loads last wins. Nexus last: every host border and the host body text change. | #796 |
-| 3 | **`color-scheme` is global.** `:root:not(.dark) { color-scheme: light }` switches a host that declares none from `normal` to `light`, which restyles its form controls and scrollbars. | #796 |
-| 4 | **The appearance provider rewrites the host document.** It sets `data-density` / `data-radius` / `data-shadow` / `data-borderwidth` and an inline `color-scheme` on `<html>`, adds two `<style>` tags and a `color-scheme` meta, toggles `html.dark`, and its prefs style sets `:root { font-size: 14px }` — which rescales every host `rem` (host text 16 → 14px, padding 20 → 17.5px, radii shrink). | #796 |
+| 1 | **Unprefixed `--color-*` aliases clobber host tokens.** Nexus declares 107 `--color-*` on `:root`, unlayered. A host with non-inline `@theme` tokens of the same name (`--color-success-foreground`) loses them in either load order — the host's "Saved" text turns white. Only three Nexus rules read the aliases (the base border, body color, body background); utilities read `--nx-color-*` with inline fallbacks. | Fixed in #796 |
+| 2 | **Global base rules leak by load order.** Nexus's `*, ::before, ::after { border-color }` and `body { color; background }` share `@layer base` with the host's; whichever stylesheet loads last wins. Nexus last: every host border and the host body text change. | Fixed in #796 |
+| 3 | **`color-scheme` is global.** `:root:not(.dark) { color-scheme: light }` switches a host that declares none from `normal` to `light`, which restyles its form controls and scrollbars. | Fixed in #796 |
+| 4 | **The appearance provider rewrites the host document.** It sets `data-density` / `data-radius` / `data-shadow` / `data-borderwidth` and an inline `color-scheme` on `<html>`, adds two `<style>` tags and a `color-scheme` meta, toggles `html.dark`, and its prefs style sets `:root { font-size: 14px }` — which rescales every host `rem` (host text 16 → 14px, padding 20 → 17.5px, radii shrink). | Fixed in #796 |
 | 5 | **Shared files skew across revisions.** An item built from #809's tree ships a `lib/utils.ts` that differs from main's (a pre-#765 token name), so installing it next to main's items stops at an overwrite prompt. | #798 |
 | 6 | **Skew between the stylesheet and components fails silently.** #809-era checkbox styles use `nx:…border-border-error`, which main's stylesheet no longer emits. Typecheck and build pass; the error borders vanish. Only a class-completeness check catches it — run `audit:class-refs` (#790) over the installed fixture trees in CI. | #798 |
-| 7 | **Nexus follows a host `.dark` ancestor.** The `.dark` token block and `@custom-variant dark (&:is(.dark *))` match any host `.dark`, so Nexus surfaces go dark with the host. Without the provider, the primary Button stays near-black in dark (its `--nx-color-primary-background` default exists only as a self-reference plus `.dark`). | #796 |
-| 8 | **Portals inherit from the host `<body>`.** Dialog and Popover render into `document.body`, so they take the host's font, size and line-height. Nexus also mixes fonts: Button sets its own family, Card text inherits the host's. | #796 |
+| 7 | **Nexus follows a host `.dark` ancestor.** The `.dark` token block and `@custom-variant dark (&:is(.dark *))` match any host `.dark`, so Nexus surfaces go dark with the host. Without the provider, the primary Button stays near-black in dark (its `--nx-color-primary-background` default exists only as a self-reference plus `.dark`). | Fixed in #796 |
+| 8 | **Portals inherit from the host `<body>`.** Dialog and Popover render into `document.body`, so they take the host's font, size and line-height. Nexus also mixes fonts: Button sets its own family, Card text inherits the host's. | Fixed in #796 |
 | 9 | **Nexus needs Preflight.** With host CSS removed (`?nexus-only`), CardTitle (`<h3>`) gains 18px UA margins, `box-sizing` falls back to `content-box`, text falls back to Times and Progress loses its border style. **Decision (2026-09-29): hosts must have Tailwind 4 Preflight**; Nexus ships none. Both fixtures have it. | Contract |
 | 10 | **shadcn 4.21.0 ships `cn` as an npm package** (`shadcn-ui/cn`); host `lib/utils.ts` is `export { cn } from "cn"`. Nexus's `cn` is a custom `tailwind-merge` config that knows `nx:`, so Nexus ships its own `lib/utils.ts` and never imports the host's. | Contract |
 | 11 | **Runtime appearance reaches `nx:` utilities.** Under `?provider`, the `appearance-mode` control changes 42 Nexus probe properties (every surface, text and border colour, including the open Dialog and Popover) and `appearance-density` changes 8 (button padding 12 → 10px, Dialog and Popover padding). Both also carry Finding 4's host side effects. | Contract |
 
-### Scoped-root prototype
+### Verified after #796
 
-`probe/scope-prototype.mjs` edits the installed `nexus.css` in `copy-vite`.
-It removes every host leak from Findings 1–3 (30 changed host properties →
-0). Of the 12 Nexus probes, only the root element changes: it takes Nexus's
-foreground instead of inheriting the host's. The edits:
+Re-run on 2026-09-29 from outside copies, with `probe/compare-styles.mjs`
+on `vite preview`:
 
-- delete the unprefixed `--color-*` alias block;
-- scope the base rules to `:where([data-nexus-root], [data-nexus-root] *, …)`
-  and `color-scheme` to `[data-nexus-root]`;
-- give the base rules an explicit default: `--nx-color-border-default` is
-  declared nowhere, because Nexus defaults exist only as inline fallbacks.
-  #796 needs a Nexus-owned default namespace, so utilities read
-  `var(--nx-color-X, var(--nx-default-color-X))` and the provider's
-  `:root` overrides still win. Declaring `--nx-color-*` on the root
-  element instead would shadow them;
-- put `data-nexus-root` on portal content (Dialog, Popover); otherwise
-  portalled surfaces lose Nexus text color and `color-scheme`. The fixture
-  marks the panel, `DialogContent` and `PopoverContent`.
-
-Finding 4 (the provider) and Finding 7 (dark coupling) need component and
-provider changes, not stylesheet edits.
+- **Host leaks: 30 → 0.** With Nexus CSS loaded after the host's and
+  before it (`?nexus-first`), every host property matches the `?no-nexus`
+  baseline.
+- **Nexus is load-order independent.** All 14 Nexus probes, including the
+  open Dialog and Popover, match between the two orders.
+- **Runtime appearance.** The panel's `appearance-mode` control changes 42
+  Nexus probe properties and `appearance-density` changes 8, portals
+  included. No host element outside the root changes.
+- **Embedded easing.** The open Dialog's `transition-timing-function` is
+  the root's `--nx-motion-ease-move` curve (before `@theme inline
+  reference`: `ease`).
+- **Portals keep the root.** The Dialog carries the panel's key and mode,
+  and follows a mode change while open.
+- **Defaults without runtime CSS.** A bare `data-nexus-root` /
+  `data-nx-mode="dark"` element renders the primary Button with the dark
+  default (#795 Finding 7 found it near-black).
+- **Host themes are ignored.** A host `.dark` ancestor or
+  `<html data-theme="dark">` (`?data-theme`) leaves every Nexus probe
+  unchanged.
+- **Server-rendered appearance.** `copy-next` with a `dark` cookie serves
+  `data-nx-mode="dark"` and the root's scoped `<style>` in the HTML, hydrates
+  with no console warnings, and paints dark again after a reload.
+- **Class completeness.** All 187 `nx:` classes each copied tree uses are
+  emitted, in both fixtures.
 
 ## Probes
 
-`probe/` holds the harness behind the numbers above, so #796 can re-run
-the baseline. It runs from the repository (it uses the root Playwright)
-against a fixture copy served outside it:
+`probe/` holds the harness behind these numbers. It runs from the
+repository (it uses the root Playwright) against a fixture copy served
+outside it:
 
 ```bash
-# in the fixture copy
+# in the copy-vite copy
 npm run build && npx vite preview --port 4173
 
-# host leaks against the no-Nexus baseline (30 / 16 / 70)
+# host leaks against the no-Nexus baseline: 0 and 0
 node examples/registry/probe/compare-styles.mjs 'http://localhost:4173/?no-nexus' http://localhost:4173/
 node examples/registry/probe/compare-styles.mjs 'http://localhost:4173/?no-nexus' 'http://localhost:4173/?nexus-first'
-node examples/registry/probe/compare-styles.mjs 'http://localhost:4173/?no-nexus' 'http://localhost:4173/?provider'
 
-# runtime appearance (Finding 11): 42 / 8 Nexus properties
-node examples/registry/probe/compare-styles.mjs 'http://localhost:4173/?provider' 'http://localhost:4173/?provider' --probes nexus- --click-b appearance-mode
-node examples/registry/probe/compare-styles.mjs 'http://localhost:4173/?provider' 'http://localhost:4173/?provider' --probes nexus- --click-b appearance-density
+# Nexus load order and host themes: 0 and 0
+node examples/registry/probe/compare-styles.mjs http://localhost:4173/ 'http://localhost:4173/?nexus-first' --probes nexus-
+node examples/registry/probe/compare-styles.mjs http://localhost:4173/ 'http://localhost:4173/?data-theme' --probes nexus-
 
-# scoped-root prototype: build a second copy, serve it on 4174, then expect 0 host / 1 Nexus change
-node examples/registry/probe/scope-prototype.mjs <copy>/src/components/nexus/nexus.css
-node examples/registry/probe/compare-styles.mjs 'http://localhost:4173/?no-nexus' http://localhost:4174/
-node examples/registry/probe/compare-styles.mjs http://localhost:4173/ http://localhost:4174/ --probes nexus-
+# runtime appearance: 42 and 8 Nexus properties
+node examples/registry/probe/compare-styles.mjs http://localhost:4173/ http://localhost:4173/ --probes nexus- --click-b appearance-mode
+node examples/registry/probe/compare-styles.mjs http://localhost:4173/ http://localhost:4173/ --probes nexus- --click-b appearance-density
 
 # class completeness (187 classes, none missing) against @nexus_ds/react's own build
 pnpm --filter @nexus_ds/react build

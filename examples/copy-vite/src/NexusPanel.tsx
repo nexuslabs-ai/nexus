@@ -1,3 +1,11 @@
+import { useState } from 'react'
+
+import { DEFAULT_NEXUS_APPEARANCE } from '@nexus_ds/core'
+
+import {
+  NexusRoot,
+  type NexusRootState,
+} from '~/components/nexus/components/appearance/provider'
 import { Button as HostButton } from '~/components/ui/button'
 import { Button } from '~/components/nexus/components/button'
 import {
@@ -26,8 +34,31 @@ import {
 import { Progress } from '~/components/nexus/components/progress'
 
 export function NexusPanel() {
+  const [appearance, setAppearance] = useState<NexusRootState>({
+    ...DEFAULT_NEXUS_APPEARANCE,
+    mode: 'light',
+  })
+
+  function toggleMode() {
+    setAppearance((current) => ({
+      ...current,
+      mode: current.mode === 'dark' ? 'light' : 'dark',
+    }))
+  }
+
+  function toggleDensity() {
+    setAppearance((current) => ({
+      ...current,
+      density: current.density === 'compact' ? 'default' : 'compact',
+    }))
+  }
+
   return (
-    <section data-nexus-root="" data-probe="nexus-panel" className="mt-6 grid gap-4 sm:grid-cols-2">
+    <NexusRoot
+      state={appearance}
+      data-probe="nexus-panel"
+      className="mt-6 grid gap-4 sm:grid-cols-2"
+    >
       <Card data-probe="nexus-card">
         <CardHeader>
           <CardTitle>Nexus card</CardTitle>
@@ -49,13 +80,19 @@ export function NexusPanel() {
           </div>
         </CardContent>
         <CardFooter className="gap-2">
+          <Button data-probe="appearance-mode" variant="ghost" onClick={toggleMode}>
+            Nexus {appearance.mode === 'dark' ? 'light' : 'dark'}
+          </Button>
+          <Button data-probe="appearance-density" variant="ghost" onClick={toggleDensity}>
+            Density: {appearance.density}
+          </Button>
           <Dialog>
             <DialogTrigger asChild>
               <Button data-probe="nexus-dialog-trigger" variant="secondary">
                 Open dialog
               </Button>
             </DialogTrigger>
-            <DialogContent data-nexus-root="" data-probe="nexus-dialog">
+            <DialogContent data-probe="nexus-dialog">
               <DialogHeader>
                 <DialogTitle>Nexus dialog</DialogTitle>
                 <DialogDescription>Portalled to document.body.</DialogDescription>
@@ -77,7 +114,7 @@ export function NexusPanel() {
                 Open popover
               </Button>
             </PopoverTrigger>
-            <PopoverContent data-nexus-root="" data-probe="nexus-popover">
+            <PopoverContent data-probe="nexus-popover">
               <p data-probe="nexus-popover-text">Popover content</p>
               <HostButton data-probe="host-button-in-nexus-popover" size="sm">
                 Host
@@ -86,6 +123,6 @@ export function NexusPanel() {
           </Popover>
         </CardFooter>
       </Card>
-    </section>
+    </NexusRoot>
   )
 }

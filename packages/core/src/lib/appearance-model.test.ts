@@ -19,7 +19,9 @@ import {
   sanitizeNexusAppearancePrefs,
   STROKE_OPTIONS,
 } from './appearance-model';
+import { cssRules, selectorListItems } from './css-rules.test-support';
 import { deriveTheme } from './derive-theme';
+import { nexusRootScope } from './nexus-root';
 
 describe('appearance model', () => {
   it('uses the agreed package defaults', () => {
@@ -385,6 +387,9 @@ describe('createNexusThemeContract', () => {
 
 describe('appearancePrefsToCss', () => {
   const prefs = DEFAULT_NEXUS_APPEARANCE.prefs;
+  const scope = nexusRootScope('embedded');
+  const nested = `${scope} [data-nexus-root]:not(${scope})`;
+  const within = `:where(${scope}, ${scope} *):where(:not(${nested}, ${nested} *))`;
   const typographyVarPattern =
     /--nx-typography-(?:size|line-height)-[a-z0-9]+:\s*[^;]+;/g;
 
@@ -405,13 +410,16 @@ describe('appearancePrefsToCss', () => {
   });
 
   it('emits font variables, clamped root size, code size, and smoothing', () => {
-    const css = appearancePrefsToCss({
-      ...prefs,
-      uiFont: 'Inter',
-      codeFont: 'JetBrains Mono',
-      uiFontSize: 99,
-      codeFontSize: 0,
-    });
+    const css = appearancePrefsToCss(
+      {
+        ...prefs,
+        uiFont: 'Inter',
+        codeFont: 'JetBrains Mono',
+        uiFontSize: 99,
+        codeFontSize: 0,
+      },
+      scope
+    );
 
     expect(css).toContain('--nx-typography-family-font-sans: Inter;');
     expect(css).toContain('--nx-typography-family-font-mono: JetBrains Mono;');
@@ -420,23 +428,29 @@ describe('appearancePrefsToCss', () => {
     expect(css).toContain('--nx-typography-line-height-xxs: 27.4286px;');
     expect(css).toContain('--nx-typography-line-height-sm: 45.7143px;');
     expect(css).toContain(
-      'code, pre, .nx\\:font-mono, .nx\\:typography-code-block, .nx\\:typography-code-inline { font-size: 12px; }'
+      `${within}:is(code, pre, .nx\\:font-mono, .nx\\:typography-code-block, .nx\\:typography-code-inline) { font-size: 12px; }`
     );
     expect(css).toContain('-webkit-font-smoothing: antialiased');
   });
 
   it('pairs -moz-osx-font-smoothing with the -webkit property', () => {
-    const on = appearancePrefsToCss({
-      ...prefs,
-      fontSmoothing: true,
-    });
+    const on = appearancePrefsToCss(
+      {
+        ...prefs,
+        fontSmoothing: true,
+      },
+      scope
+    );
     expect(on).toContain('-webkit-font-smoothing: antialiased');
     expect(on).toContain('-moz-osx-font-smoothing: grayscale');
 
-    const off = appearancePrefsToCss({
-      ...prefs,
-      fontSmoothing: false,
-    });
+    const off = appearancePrefsToCss(
+      {
+        ...prefs,
+        fontSmoothing: false,
+      },
+      scope
+    );
     expect(off).toContain('-webkit-font-smoothing: auto');
     expect(off).toContain('-moz-osx-font-smoothing: auto');
   });
@@ -447,26 +461,54 @@ describe('appearancePrefsToCss', () => {
       'utf8'
     );
 
-    expect(typographyDeclarations(appearancePrefsToCss(prefs))).toEqual(
+    expect(typographyDeclarations(appearancePrefsToCss(prefs, scope))).toEqual(
       typographyDeclarations(generatedCss)
     );
   });
 
-  it('emits the reduced-motion block only when reduceMotion is on', () => {
-    expect(appearancePrefsToCss({ ...prefs, reduceMotion: true })).toContain(
-      'transition-duration: 0.01ms'
+  it('scopes every rule to the root', () => {
+    const rules = cssRules(
+      appearancePrefsToCss(
+        { ...prefs, pointerCursors: true, reduceMotion: true },
+        scope
+      )
     );
+    const unscoped = rules
+      .flatMap((rule) => selectorListItems(rule.selector))
+      .filter((item) => !item.startsWith(scope) && !item.startsWith(within));
+
+    expect(rules.length).toBeGreaterThanOrEqual(4);
+    expect(unscoped).toEqual([]);
+  });
+
+  it('layers the root declarations and leaves the utility overrides unlayered', () => {
+    const rules = cssRules(
+      appearancePrefsToCss({ ...prefs, pointerCursors: true }, scope)
+    );
+
+    expect(rules.find((rule) => rule.selector === scope)?.within).toEqual([
+      '@layer base',
+    ]);
     expect(
-      appearancePrefsToCss({ ...prefs, reduceMotion: false })
+      rules.filter((rule) => rule.selector !== scope).map((rule) => rule.within)
+    ).toEqual([[], []]);
+  });
+
+  it('emits the reduced-motion block only when reduceMotion is on', () => {
+    expect(
+      appearancePrefsToCss({ ...prefs, reduceMotion: true }, scope)
+    ).toContain('transition-duration: 0.01ms');
+    expect(
+      appearancePrefsToCss({ ...prefs, reduceMotion: false }, scope)
     ).not.toContain('0.01ms');
   });
 
   it('emits the pointer cursor rule only when pointer cursors are enabled', () => {
-    expect(appearancePrefsToCss({ ...prefs, pointerCursors: true })).toContain(
-      'cursor: pointer'
-    );
     expect(
-      appearancePrefsToCss({ ...prefs, pointerCursors: false })
+      appearancePrefsToCss({ ...prefs, pointerCursors: true }, scope)
+    ).toContain('cursor: pointer');
+    expect(
+      appearancePrefsToCss({ ...prefs, pointerCursors: false }, scope)
     ).not.toContain('cursor: pointer');
   });
 });

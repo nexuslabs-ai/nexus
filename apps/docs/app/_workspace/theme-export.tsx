@@ -1,8 +1,10 @@
 'use client';
 
 import {
-  createNexusAppearanceSnapshotFromState,
+  deriveNexusAppearanceCss,
+  NEXUS_ROOT_ATTRIBUTE,
   type NexusAppearanceState,
+  sanitizeNexusAppearance,
 } from '@nexus_ds/core';
 import {
   Button,
@@ -30,11 +32,17 @@ export const appearance = ${JSON.stringify(state, null, 2)} satisfies NexusAppea
 /** Rendered only while the dialog is open, so the export is built on demand. */
 function ExportFiles() {
   const { state } = useNexusAppearance();
-  const snapshot = createNexusAppearanceSnapshotFromState(state);
+  const { themeCss, prefsCss } = deriveNexusAppearanceCss(
+    state,
+    `[${NEXUS_ROOT_ATTRIBUTE}]`
+  );
   const files = [
-    { name: 'nexus-appearance.ts', code: configurationSource(snapshot.state) },
-    { name: 'theme.css', code: snapshot.themeCss },
-    { name: 'preferences.css', code: snapshot.prefsCss },
+    {
+      name: 'nexus-appearance.ts',
+      code: configurationSource(sanitizeNexusAppearance(state)),
+    },
+    { name: 'theme.css', code: themeCss },
+    { name: 'preferences.css', code: prefsCss },
   ];
 
   return files.map((file) => (
@@ -58,8 +66,8 @@ export function ThemeExport() {
           <DialogTitle>Use this theme</DialogTitle>
           <DialogDescription>
             Pass the configuration to NexusAppearanceProvider and
-            NexusAppearanceScript as their default state. The style sheets are
-            the CSS they apply for it.
+            NexusAppearanceScript as their default state, or to NexusRoot. The
+            style sheets are the CSS they apply for it, for any Nexus root.
           </DialogDescription>
         </DialogHeader>
         <DialogBody className="nx:space-y-4">

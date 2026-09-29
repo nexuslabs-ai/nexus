@@ -1,3 +1,5 @@
+'use client';
+
 import * as React from 'react';
 
 import * as MenubarPrimitive from '@radix-ui/react-menubar';
@@ -5,6 +7,7 @@ import { cva, type VariantProps } from 'class-variance-authority';
 
 import { IconCheck, IconChevronRight, IconCircleFilled } from '../../lib/icons';
 import { selectionIndicatorMotionClassName } from '../../lib/motion';
+import { useNexusRootAttributes } from '../../lib/nexus-root-context';
 import { cn } from '../../lib/utils';
 import {
   overlayFloatingTransitionClassName,
@@ -177,8 +180,10 @@ interface MenubarSubContentProps extends React.ComponentProps<
  * The content container for a submenu.
  */
 function MenubarSubContent({ className, ...props }: MenubarSubContentProps) {
+  const rootAttributes = useNexusRootAttributes();
   return (
     <MenubarPrimitive.SubContent
+      {...rootAttributes}
       data-slot="menubar-sub-content"
       className={cn(
         'nx:z-popover nx:min-w-32 nx:overflow-hidden',
@@ -221,9 +226,11 @@ function MenubarContent({
   sideOffset = 8,
   ...props
 }: MenubarContentProps) {
+  const rootAttributes = useNexusRootAttributes();
   return (
     <MenubarPrimitive.Portal>
       <MenubarPrimitive.Content
+        {...rootAttributes}
         data-slot="menubar-content"
         align={align}
         alignOffset={alignOffset}

@@ -12,7 +12,7 @@ Requires `jsonc-eslint-parser`. Wired in the root `eslint.config.js` to target s
 
 ### `@nexus_ds/nx-class-conventions`
 
-Enforces the `nx:` Tailwind-class conventions from `.claude/rules/shadcn-divergences.md` on class strings (string + single-quasi template literals): correct prefix order (`nx:` before every modifier, not `hover:nx:…`), no banned `accent` token, complete semantic token paths (`-background` / `-foreground` / `-subtle`), and no raw primitive colors (`nx:bg-blue-500`). Ported from the former `.claude/hooks/lint-nx-prefix.mjs` so the checks run in `pnpm lint` and the pre-commit hook. Wired for `packages/react/src/**` and `apps/**` `.tsx`.
+Enforces the `nx:` Tailwind-class conventions from `.claude/rules/shadcn-divergences.md` on class strings (string + single-quasi template literals): correct prefix order (`nx:` before every modifier, not `hover:nx:…`), no `nx:dark:` variant, no banned `accent` token, complete semantic token paths (`-background` / `-foreground` / `-subtle`), and no raw primitive colors (`nx:bg-blue-500`). Ported from the former `.claude/hooks/lint-nx-prefix.mjs` so the checks run in `pnpm lint` and the pre-commit hook. Wired for `packages/react/src/**` and `apps/**` `.tsx`.
 
 One check reads a whole class-string scope rather than a single literal: `nx:transition-colors` beside a ring-painting `focus-visible:outline-*` class fades the focus ring in, because Tailwind expands `transition-colors` to a list carrying `outline-color`. Only a width or a colour paints a ring, so `outline-none`, `outline-hidden`, `outline-0`, `outline-offset-*` and the style keywords (`outline-solid` / `dashed` / `dotted` / `double`) are exempt. Use `nx:transition-control` / `nx:transition-field` instead — see `/foundations/focus`.
 

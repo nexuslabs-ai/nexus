@@ -1,3 +1,4 @@
+import { NEXUS_DOCUMENT_ROOT_KEY, nexusRootAttributes } from '@nexus_ds/core';
 import { NexusAppearanceProvider } from '@nexus_ds/react/appearance';
 import { NexusAppearanceScript } from '@nexus_ds/react/appearance/server';
 import type { Metadata } from 'next';
@@ -24,10 +25,11 @@ export default function RootLayout({
     <html
       lang="en"
       className="nx:scroll-pt-(--docs-scroll-offset) nx:scroll-pb-(--docs-panel-offset)"
-      data-density={DOCS_APPEARANCE_DEFAULT_STATE.density}
-      data-radius={DOCS_APPEARANCE_DEFAULT_STATE.corners}
-      data-shadow={DOCS_APPEARANCE_DEFAULT_STATE.elevation}
-      data-borderwidth={DOCS_APPEARANCE_DEFAULT_STATE.stroke}
+      {...nexusRootAttributes(
+        DOCS_APPEARANCE_DEFAULT_STATE,
+        'light',
+        NEXUS_DOCUMENT_ROOT_KEY
+      )}
       suppressHydrationWarning
     >
       <head>

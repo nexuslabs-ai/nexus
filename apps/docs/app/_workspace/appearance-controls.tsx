@@ -9,6 +9,7 @@ import {
   ELEVATION_OPTIONS,
   type NexusAppearancePrefs,
   type NexusAppearanceState,
+  type NexusResolvedMode,
   STROKE_OPTIONS,
 } from '@nexus_ds/core';
 import {
@@ -20,7 +21,6 @@ import {
   Slider,
   Switch,
 } from '@nexus_ds/react';
-import type { NexusResolvedAppearanceMode } from '@nexus_ds/react/appearance';
 
 import { THEME_MODE_OPTIONS } from '../_lib/appearance-controls';
 
@@ -86,7 +86,7 @@ function ContrastField({
   value,
   onChange,
 }: {
-  mode: NexusResolvedAppearanceMode;
+  mode: NexusResolvedMode;
   value: number;
   onChange: (value: number) => void;
 }) {
@@ -235,7 +235,7 @@ export function AppearanceControls({
   onGestureStart,
 }: {
   state: NexusAppearanceState;
-  resolvedMode: NexusResolvedAppearanceMode;
+  resolvedMode: NexusResolvedMode;
   onChange: (
     patch: Partial<NexusAppearanceState>,
     group?: keyof NexusAppearanceState

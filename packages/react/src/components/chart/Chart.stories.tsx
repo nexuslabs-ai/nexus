@@ -269,7 +269,7 @@ export const AxisTicksTabular: Story = {
 
 export const DynamicStyleGuard: Story = {
   render: () => (
-    <div className="nx:w-[600px] nx:max-w-full">
+    <div data-testid="chart-scene" className="nx:w-[600px] nx:max-w-full">
       <ChartContainer config={guardedConfig}>
         <BarChart accessibilityLayer data={data}>
           <Bar dataKey="safe" fill="var(--color-safe)" radius={4} />
@@ -284,7 +284,9 @@ export const DynamicStyleGuard: Story = {
     const style = chart?.getAttribute('style') || '';
 
     await expect(chart).toBeInTheDocument();
-    await expect(canvasElement.querySelector('style')).not.toBeInTheDocument();
+    await expect(
+      within(canvasElement).getByTestId('chart-scene').querySelector('style')
+    ).not.toBeInTheDocument();
     await expect(style).toContain('--color-safe');
     await expect(style).not.toContain(unsafeKey);
     await expect(style).not.toContain('background');

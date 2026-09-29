@@ -22,10 +22,10 @@ function addDays(date: Date, days: number) {
   return next;
 }
 
-// Resolve a spacing token to px from :root so cell-size assertions track the
-// active spacing mode instead of hardcoding the default-mode value.
+// Resolve a spacing token to px on the story's Nexus root so cell-size
+// assertions track the active spacing mode instead of hardcoding its value.
 function resolveSpacingPx(canvasElement: HTMLElement, varName: string) {
-  const root = canvasElement.ownerDocument.documentElement;
+  const root = canvasElement.querySelector('[data-nexus-root]')!;
   return Math.round(
     parseFloat(getComputedStyle(root).getPropertyValue(varName))
   );

@@ -1,3 +1,5 @@
+'use client';
+
 import * as React from 'react';
 
 import * as ContextMenuPrimitive from '@radix-ui/react-context-menu';
@@ -5,6 +7,7 @@ import { cva, type VariantProps } from 'class-variance-authority';
 
 import { IconCheck, IconChevronRight, IconCircleFilled } from '../../lib/icons';
 import { selectionIndicatorMotionClassName } from '../../lib/motion';
+import { useNexusRootAttributes } from '../../lib/nexus-root-context';
 import { cn } from '../../lib/utils';
 import {
   overlayFloatingTransitionClassName,
@@ -129,8 +132,10 @@ function ContextMenuSubContent({
   className,
   ...props
 }: ContextMenuSubContentProps) {
+  const rootAttributes = useNexusRootAttributes();
   return (
     <ContextMenuPrimitive.SubContent
+      {...rootAttributes}
       data-slot="context-menu-sub-content"
       className={cn(
         'nx:z-popover nx:min-w-32 nx:overflow-hidden',
@@ -167,9 +172,11 @@ interface ContextMenuContentProps extends React.ComponentProps<
  * ```
  */
 function ContextMenuContent({ className, ...props }: ContextMenuContentProps) {
+  const rootAttributes = useNexusRootAttributes();
   return (
     <ContextMenuPrimitive.Portal>
       <ContextMenuPrimitive.Content
+        {...rootAttributes}
         data-slot="context-menu-content"
         className={cn(
           'nx:z-popover nx:max-h-(--radix-context-menu-content-available-height)',

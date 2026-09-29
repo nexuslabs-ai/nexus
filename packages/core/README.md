@@ -14,7 +14,8 @@ pnpm add @nexus_ds/core
 - `BRAND_COLOR_PRESETS`, `BrandColorPreset`, `findBrandColorPreset`, `DEFAULT_BRAND_COLOR`: brand color choices for appearance editors. Default is `DEFAULT_BRAND_COLOR`; Indigo, Blue, Violet, Rose, Orange, Amber, Green, and Teal use each family's authored 600 hex. Assign a preset's `color` to `brandColor`; `findBrandColorPreset(brandColor)` returns the preset an opaque saved color matches in any CSS notation the engine parses (`#4F46E5`, `4f46e5`, `rgb(79 70 229)`), ignoring surrounding whitespace, or `undefined` for a custom or unparseable color.
 - `createNexusThemeContract`, `deriveTheme`, `themeToCss`: derive a full token set from appearance state and render it to CSS.
 - `measureThemeContrast`, `ThemeContrastCheck`, `Mode`, `Tier`: measure a derived theme against every registered APCA pair. See [Contrast report](#contrast-report).
-- `createNexusAppearanceSnapshotFromState`, `createNexusAppearanceBootstrapScript`, `resolveFirstPaint`, `DEFAULT_STORAGE_KEY`: first-paint, no-flash bootstrap.
+- `nexusRootAttributes`, `nexusRootScope`, `deriveNexusAppearanceCss`: the attributes and runtime CSS for a Nexus root (`data-nexus-root`).
+- `createNexusAppearanceSnapshotFromState`, `createNexusAppearanceBootstrapScript`, `DEFAULT_STORAGE_KEY`: first-paint, no-flash bootstrap for a standalone app, whose root is `<html>`.
 
 ## Advanced / Engine Exports
 
@@ -73,16 +74,16 @@ const tokens = createTokenCatalogue();
 
 ## Non-React Shell Example
 
-Use the engine directly when a host shell owns DOM or native styling.
+Use the engine directly when a host shell owns DOM or native styling. Nexus
+styles apply inside an element marked with `data-nexus-root`; the runtime CSS
+targets that root by its key.
 
 ```ts
 import {
-  createNexusAppearanceSnapshotFromState,
-  createNexusThemeContract,
   DEFAULT_NEXUS_APPEARANCE,
-  deriveTheme,
-  resolveFirstPaint,
-  themeToCss,
+  deriveNexusAppearanceCss,
+  nexusRootAttributes,
+  nexusRootScope,
 } from '@nexus_ds/core';
 
 const state = {
@@ -90,21 +91,19 @@ const state = {
   brandColor: '#2563eb',
   surfaceTone: 'slate',
 };
-const snapshot = createNexusAppearanceSnapshotFromState(state);
-const firstPaint = resolveFirstPaint(snapshot, false);
-const themeStyle =
-  document.querySelector<HTMLStyleElement>('style[data-theme]') ??
-  document.head.appendChild(document.createElement('style'));
-themeStyle.dataset.theme = '';
+const root = document.querySelector<HTMLElement>('#app')!;
+for (const [name, value] of Object.entries(
+  nexusRootAttributes(state, 'light', 'app')
+)) {
+  root.setAttribute(name, value);
+}
 
-document.documentElement.classList.toggle(
-  'dark',
-  firstPaint.className === 'dark'
+const { themeCss, prefsCss } = deriveNexusAppearanceCss(
+  state,
+  nexusRootScope('app')
 );
-document.documentElement.style.colorScheme = firstPaint.colorScheme;
-themeStyle.textContent = themeToCss(
-  deriveTheme(createNexusThemeContract(snapshot.state))
-);
+const style = document.head.appendChild(document.createElement('style'));
+style.textContent = `${themeCss}\n${prefsCss}`;
 ```
 
 ## Token Architecture
@@ -137,10 +136,10 @@ All tokens follow the [Design Tokens Community Group](https://tr.designtokens.or
 
 - Contextual meanings that reference primitives (and per-mode direct values for spacing)
 - Semantic **color** is engine-derived (`deriveTheme`), not authored here; `tokens/semantic/` now holds only spacing, breakpoints, and z-index
-- Output: Tailwind v4 `@theme` block (semantic color via `@theme inline`, accepting runtime `--nx-color-*` overrides) + per-mode `[data-density="X"]` blocks
-- Example: `--color-background: var(--nx-color-background, oklch(1 0 0))` (engine color floor), `--nx-spacing-4: 16px`
+- Output: Tailwind v4 `@theme` block (semantic color via `@theme inline`, accepting runtime `--nx-color-*` overrides) + per-mode `[data-nx-density="X"]` blocks, all scoped to the Nexus root (`[data-nexus-root]`)
+- Example: `--color-background: var(--nx-color-background, var(--nx-default-color-background))` (engine color floor on the root), `--nx-spacing-4: 16px`
 
-> **Spacing is two-tier, not three.** Unlike color/radius/shadow/typography, spacing has no `--nx-size-*` primitive layer — `semantic/spacing-{mode}.json` files carry direct px values, and the build emits per-mode `[data-density="X"]` blocks plus role utilities (`nx:p-container`, `nx:gap-layout-section`, …). Mode swap is runtime via the `data-density` attribute on `<html>`.
+> **Spacing is two-tier, not three.** Unlike color/radius/shadow/typography, spacing has no `--nx-size-*` primitive layer — `semantic/spacing-{mode}.json` files carry direct px values, and the build emits per-mode `[data-nx-density="X"]` blocks plus role utilities (`nx:p-container`, `nx:gap-layout-section`, …). Mode swap is runtime via the `data-nx-density` attribute on the Nexus root or any element inside it.
 
 **Component** (future)
 
@@ -151,21 +150,25 @@ All tokens follow the [Design Tokens Community Group](https://tr.designtokens.or
 
 Color tokens don't ship the values stored on disk. Source files hold hex. Build and runtime share authored-palette conversion: chromatic families use their hue-specific lightness curves and P3 cusp chroma; neutral families use the flat lightness grid and source chroma. Both preserve each authored shade's hue. Runtime semantic text/surface pairs are checked against the registered APCA constraints in CI.
 
-Generated global CSS sets the native browser UI policy alongside the tokens: `:root` advertises light/dark support, `.dark` pins native controls and scrollbars to dark, and the light root stays light when `.dark` is absent.
+Generated CSS sets the native browser UI policy on each Nexus root: `color-scheme: light`, or `dark` on a root with `data-nx-mode="dark"`. Nothing targets `:root`, `html` or `body`.
 
 ## Reference Resolution
 
 Semantic **color** is produced by the engine (`deriveTheme`), not authored as
-JSON. The build bakes each derived value into `nexus.css` as a `@theme inline`
-fallback that still accepts a runtime override:
+JSON. The build bakes each derived value into `nexus.css` as a default on the
+Nexus root, and the `@theme inline` entry reads the runtime value first:
 
 ```css
---color-background: var(--nx-color-background, oklch(1 0 0));
+--color-background: var(
+  --nx-color-background,
+  var(--nx-default-color-background)
+);
 ```
 
 The `--color-*` name is the Tailwind v4 `@theme` key that generates the utility
-(`nx:bg-background`); the `--nx-color-*` fallback is the runtime override the
-appearance provider injects. Non-color families (spacing, radius, shadow,
+(`nx:bg-background`); `--nx-color-*` is the runtime value `NexusRoot` or the
+appearance provider injects, and `--nx-default-color-*` is the static light or
+dark default declared on `[data-nexus-root]`. Non-color families (spacing, radius, shadow,
 borderwidth, …) still use DTCG `{reference}` syntax, resolved to `var(--nx-*)`
 at build time.
 

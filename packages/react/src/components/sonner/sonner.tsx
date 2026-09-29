@@ -1,3 +1,5 @@
+'use client';
+
 import * as React from 'react';
 
 import { toast, Toaster as Sonner, type ToasterProps, useSonner } from 'sonner';
@@ -9,32 +11,7 @@ import {
   IconInfoCircle,
   IconLoader2,
 } from '../../lib/icons';
-
-/**
- * Track the active theme by observing the `.dark` class on the document root
- * (where Nexus toggles dark mode) via MutationObserver, keeping sonner's own
- * `theme` in sync with the design system.
- */
-function subscribeToTheme(notify: () => void) {
-  const observer = new MutationObserver(notify);
-  observer.observe(document.documentElement, {
-    attributes: true,
-    attributeFilter: ['class'],
-  });
-  return () => observer.disconnect();
-}
-
-function getThemeSnapshot(): 'light' | 'dark' {
-  return document.documentElement.classList.contains('dark') ? 'dark' : 'light';
-}
-
-function useToasterTheme(): 'light' | 'dark' {
-  return React.useSyncExternalStore(
-    subscribeToTheme,
-    getThemeSnapshot,
-    () => 'light'
-  );
-}
+import { useNexusRootAttributes } from '../../lib/nexus-root-context';
 
 /** Tabler icons in place of sonner's bundled set, matching Nexus iconography. */
 const toasterIcons = {
@@ -45,37 +22,40 @@ const toasterIcons = {
   loading: <IconLoader2 className="nx:size-4 nx:animate-spin" />,
 };
 
+const color = (name: string) =>
+  `var(--nx-color-${name}, var(--nx-default-color-${name}))`;
+
 /**
  * Sonner reads these custom properties off the toaster container to colour each
  * toast; map every one to its Nexus semantic token. The `-bg`/`-text`/`-border`
  * triples for success/error/warning/info apply when `richColors` is enabled.
  */
 const toasterThemeVars = {
-  '--normal-bg': 'var(--nx-color-container)',
-  '--normal-text': 'var(--nx-color-foreground)',
-  '--normal-border': 'var(--nx-color-border-default)',
+  '--normal-bg': color('container'),
+  '--normal-text': color('foreground'),
+  '--normal-border': color('border-default'),
   '--border-radius': 'var(--nx-radius-md)',
-  '--success-bg': 'var(--nx-color-success-background)',
-  '--success-text': 'var(--nx-color-success-foreground)',
-  '--success-border': 'var(--nx-color-success-border)',
-  '--info-bg': 'var(--nx-color-information-background)',
-  '--info-text': 'var(--nx-color-information-foreground)',
-  '--info-border': 'var(--nx-color-information-border)',
-  '--warning-bg': 'var(--nx-color-warning-background)',
-  '--warning-text': 'var(--nx-color-warning-foreground)',
-  '--warning-border': 'var(--nx-color-warning-border)',
-  '--error-bg': 'var(--nx-color-error-background)',
-  '--error-text': 'var(--nx-color-error-foreground)',
-  '--error-border': 'var(--nx-color-error-border)',
+  '--success-bg': color('success-background'),
+  '--success-text': color('success-foreground'),
+  '--success-border': color('success-border'),
+  '--info-bg': color('information-background'),
+  '--info-text': color('information-foreground'),
+  '--info-border': color('information-border'),
+  '--warning-bg': color('warning-background'),
+  '--warning-text': color('warning-foreground'),
+  '--warning-border': color('warning-border'),
+  '--error-bg': color('error-background'),
+  '--error-text': color('error-foreground'),
+  '--error-border': color('error-border'),
 };
 
 /**
  * Toaster
  *
  * Renders toast notifications, themed to Nexus tokens and riding the Nexus
- * toast layer (z-index 100). Mount once near the root of your app, then call
- * `toast(...)` (re-exported here) from anywhere. The active theme follows the
- * `.dark` class automatically.
+ * toast layer (z-index 100). Mount once inside your Nexus root, then call
+ * `toast(...)` (re-exported here) from anywhere. Sonner renders in place, so
+ * the toaster sits inside the root and follows its light or dark mode.
  *
  * @example
  * ```tsx
@@ -92,11 +72,11 @@ const toasterThemeVars = {
  * ```
  */
 function Toaster({ style, ...props }: ToasterProps) {
-  const theme = useToasterTheme();
+  const { 'data-nx-mode': mode } = useNexusRootAttributes();
   return (
     <div data-slot="toaster">
       <Sonner
-        theme={theme}
+        theme={mode === 'dark' ? 'dark' : 'light'}
         icons={toasterIcons}
         style={
           {

@@ -5,9 +5,11 @@
  * composite @utility / @custom-variant definitions) without outputting any
  * `--color-*` / `--nx-color-*` variables. Consumers supply the tokens by
  * importing `@nexus_ds/tailwind`; that way importing this file can never re-define
- * (and thus override / stale-out) a consumer's tokens.
+ * (and thus override / stale-out) a consumer's tokens. Like @nexus_ds/tailwind
+ * it ships no Preflight: the host provides it.
  */
-@import 'tailwindcss' prefix(nx);
+@layer theme, base, components, utilities;
+@import 'tailwindcss/utilities.css' layer(utilities) prefix(nx);
 @reference '@nexus_ds/tailwind';
 @import 'tw-animate-css';
 @import './components/progress/progress.css';

@@ -368,7 +368,10 @@ export const SizeMeasurements: Story = {
 // The filled range keeps interior edges sharp and rounds only at true track boundaries.
 export const RangeEdgeRadii: Story = {
   render: () => (
-    <div data-radius="round" className="nx:flex nx:w-64 nx:flex-col nx:gap-8">
+    <div
+      data-nx-radius="round"
+      className="nx:flex nx:w-64 nx:flex-col nx:gap-8"
+    >
       <Slider
         defaultValue={[50]}
         max={100}
@@ -430,7 +433,7 @@ export const CornerModes: Story = {
       {(['square', 'subtle', 'round'] as const).map((radius) => (
         <div
           key={radius}
-          data-radius={radius}
+          data-nx-radius={radius}
           data-testid={`radius-${radius}`}
           className="nx:grid nx:gap-2"
         >

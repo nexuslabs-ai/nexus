@@ -408,6 +408,54 @@ export const ClickInteraction: Story = {
   },
 };
 
+const STORY_COOKIE = 'nexus-story-sidebar';
+
+function expireCookie(name: string) {
+  document.cookie = `${name}=; path=/; max-age=0`;
+}
+
+export const NoCookieByDefault: Story = {
+  render: () => (
+    <SidebarProvider>
+      <DemoSidebar />
+      <DemoInset />
+    </SidebarProvider>
+  ),
+  play: async ({ canvasElement }) => {
+    const before = document.cookie;
+    const trigger = canvasElement.querySelector<HTMLButtonElement>(
+      '[data-slot="sidebar-trigger"]'
+    );
+
+    await userEvent.click(trigger!);
+    await expect(document.cookie).toBe(before);
+    await userEvent.click(trigger!);
+  },
+};
+
+export const CookiePersistence: Story = {
+  beforeEach: () => {
+    expireCookie(STORY_COOKIE);
+    return () => expireCookie(STORY_COOKIE);
+  },
+  render: () => (
+    <SidebarProvider cookieName={STORY_COOKIE}>
+      <DemoSidebar />
+      <DemoInset />
+    </SidebarProvider>
+  ),
+  play: async ({ canvasElement }) => {
+    const trigger = canvasElement.querySelector<HTMLButtonElement>(
+      '[data-slot="sidebar-trigger"]'
+    );
+
+    await userEvent.click(trigger!);
+    await expect(document.cookie).toContain(`${STORY_COOKIE}=false`);
+    await userEvent.click(trigger!);
+    await expect(document.cookie).toContain(`${STORY_COOKIE}=true`);
+  },
+};
+
 export const KeyboardInteraction: Story = {
   render: () => (
     <SidebarProvider>

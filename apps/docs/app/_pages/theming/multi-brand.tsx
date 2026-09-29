@@ -21,7 +21,7 @@ const DIMENSIONS: { dim: string; options: string; swap: string }[] = [
   {
     dim: 'Spacing (density)',
     options: '6 modes — compact · default · comfortable · …',
-    swap: 'data-density attr',
+    swap: 'data-nx-density attr',
   },
   { dim: 'Shadow', options: '5 modes', swap: '<link> swap' },
   {
@@ -34,7 +34,7 @@ const DIMENSIONS: { dim: string; options: string; swap: string }[] = [
     options: '3 designs (normal · fine · strong)',
     swap: '<link> swap',
   },
-  { dim: 'Dark mode', options: 'light · dark', swap: '.dark class' },
+  { dim: 'Dark mode', options: 'light · dark', swap: 'data-nx-mode attr' },
 ];
 
 const SWATCHES = [
@@ -110,15 +110,15 @@ export default function MultiBrand() {
           — each mode is a small CSS file that redefines the{' '}
           <code className="nx:typography-code-inline">--nx-*</code> variables.
           Spacing density swaps via a{' '}
-          <code className="nx:typography-code-inline">data-density</code>{' '}
-          attribute on{' '}
-          <code className="nx:typography-code-inline">&lt;html&gt;</code> (so
-          one attribute rescales every{' '}
+          <code className="nx:typography-code-inline">data-nx-density</code>{' '}
+          attribute on the Nexus root (so one attribute rescales every{' '}
           <code className="nx:typography-code-inline">nx:p-*</code> utility),
-          and dark mode toggles the{' '}
-          <code className="nx:typography-code-inline">.dark</code> class.
-          Because every surface reads the tokens, all three cascade with zero
-          component JavaScript.
+          and dark mode sets{' '}
+          <code className="nx:typography-code-inline">
+            data-nx-mode=&quot;dark&quot;
+          </code>{' '}
+          on the root. Because every surface reads the tokens, all three cascade
+          with zero component JavaScript.
         </p>
       </section>
 
@@ -160,13 +160,13 @@ export default function MultiBrand() {
           surface.
         </p>
         <CodeSample lang="css">
-          {`/* loaded after @nexus_ds/tailwind */
-:root {
+          {`/* any stylesheet: unlayered rules win over Nexus defaults */
+[data-nexus-root] {
   --nx-color-primary-background: oklch(0.55 0.2 145); /* your brand */
 }
 
 /* density on a subtree */
-<section data-density="compact"> … compact … </section>`}
+<section data-nx-density="compact"> … compact … </section>`}
         </CodeSample>
       </section>
 

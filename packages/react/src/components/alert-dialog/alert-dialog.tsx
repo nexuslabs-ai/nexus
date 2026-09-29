@@ -1,8 +1,11 @@
+'use client';
+
 import * as React from 'react';
 
 import * as AlertDialogPrimitive from '@radix-ui/react-alert-dialog';
 import type { VariantProps } from 'class-variance-authority';
 
+import { useNexusRootAttributes } from '../../lib/nexus-root-context';
 import { cn } from '../../lib/utils';
 import { buttonVariants } from '../button';
 import {
@@ -83,8 +86,10 @@ interface AlertDialogOverlayProps extends React.ComponentProps<
  * not dismiss the dialog — that is the defining behaviour of an alert dialog.
  */
 function AlertDialogOverlay({ className, ...props }: AlertDialogOverlayProps) {
+  const rootAttributes = useNexusRootAttributes();
   return (
     <AlertDialogPrimitive.Overlay
+      {...rootAttributes}
       data-slot="alert-dialog-overlay"
       className={cn(overlayScrimVariants(), className)}
       {...props}
@@ -136,12 +141,14 @@ function AlertDialogContent({
   variant = 'default',
   ...props
 }: AlertDialogContentProps) {
+  const rootAttributes = useNexusRootAttributes();
   const buttonOrientation = resolveOverlayButtonOrientation(variant);
 
   return (
     <AlertDialogPortal>
       <AlertDialogOverlay />
       <AlertDialogPrimitive.Content
+        {...rootAttributes}
         data-slot="alert-dialog-content"
         data-variant={variant}
         data-orientation={buttonOrientation}
