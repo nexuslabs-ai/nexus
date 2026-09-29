@@ -1,5 +1,11 @@
 import * as React from 'react';
 
+import {
+  Canvas,
+  Controls,
+  Description,
+  Title,
+} from '@storybook/addon-docs/blocks';
 import type { Meta, StoryObj } from '@storybook/react';
 import {
   IconAlertCircle,
@@ -29,15 +35,86 @@ const meta: Meta<typeof Alert> = {
   parameters: {
     layout: 'padded',
     docs: {
+      page: () => (
+        <>
+          <Title />
+          <Description />
+          <h2 id="playground">Playground</h2>
+          <p>
+            Explore the composition here. These controls change this example
+            only; icon, text and action controls assemble children rather than
+            adding Alert props.
+          </p>
+          <Canvas of={Playground} />
+          <Controls of={Playground} />
+          <h2 id="layouts">Layouts</h2>
+          <p>
+            Stack places actions below the message. Inline places them beside it
+            when space permits and below it in narrow containers. The title and
+            description stay together.
+          </p>
+          <h3 id="stack-layout">Stack layout</h3>
+          <Canvas of={Default} />
+          <h3 id="inline-layout">Inline layout</h3>
+          <Canvas of={InlineContent} />
+          <h2 id="status-colours">Status colours</h2>
+          <p>
+            Choose the message meaning independently of layout. Colour does not
+            add an announcement role.
+          </p>
+          <Canvas of={AllVariants} />
+          <h2 id="content">Content</h2>
+          <h3 id="title-only">Title only</h3>
+          <Canvas of={WithTitle} />
+          <h3 id="description-only">Description only</h3>
+          <Canvas of={WithDescription} />
+          <h3 id="semantic-heading">Semantic heading</h3>
+          <Canvas of={TitleAsHeading} />
+          <h3 id="long-message">Long message</h3>
+          <Canvas of={LongContent} />
+          <h3 id="link-in-the-message">Link in the message</h3>
+          <Canvas of={DescriptionLinkAction} />
+          <h2 id="actions">Actions</h2>
+          <p>
+            Nexus renders the controls. Your application owns their effects,
+            alert visibility and focus after dismissal. Action buttons below are
+            composition examples unless explicitly demonstrated as dismissible.
+          </p>
+          <h3 id="actions-below-the-message">Actions below the message</h3>
+          <Canvas of={ActionsBelowDescription} />
+          <h3 id="inline-action-and-close">Inline action and close</h3>
+          <Canvas of={InlineActionsWithClose} />
+          <h3 id="dismiss-with-an-icon">Dismiss with an icon</h3>
+          <Canvas of={DismissibleCloseButton} />
+          <h3 id="dismiss-with-text">Dismiss with text</h3>
+          <Canvas of={TextDismissAction} />
+          <h3 id="custom-close-icon">Custom close icon</h3>
+          <Canvas of={CustomCloseIconLabel} />
+          <p>
+            Give custom icon-only controls an accessible name. Text children can
+            supply their own name.
+          </p>
+          <h3 id="text-close-label">Text close label</h3>
+          <Canvas of={TextCloseLabel} />
+          <h2 id="banners">Banners</h2>
+          <p>
+            The banner treatment has square corners and a bottom border. Its
+            parent determines placement; it is not automatically sticky or
+            page-wide.
+          </p>
+          <h3 id="banner-with-actions">Banner with actions</h3>
+          <Canvas of={BannerInlineActions} />
+          <h3 id="short-helper-message">Short helper message</h3>
+          <Canvas of={HelperBanner} />
+          <h3 id="banner-colours">Banner colours</h3>
+          <Canvas of={AllBannerVariants} />
+        </>
+      ),
       description: {
         component: `
-Alert is a composable callout for status, warning, error, success, or informational messages. The root controls status, presentation, and layout; icons, content, actions, and dismissal are composed with children.
+Use Alert for an informational message, warning, error or success confirmation. Compose its icon, title, description and optional actions as children.
 
-Action pattern rules:
-- Stack layout: valid with no actions, one button action, or two button actions.
-- Stack layout: do not use AlertClose because the close icon is not an approved below-message placement.
-- Inline layout: valid with close-only, one or two button actions, or button action(s) plus AlertClose.
-- Dismissal stays consumer-controlled. AlertClose only renders the control; it does not remove the alert by itself.
+Nexus owns presentation and layout. Your application owns visibility, action handlers, focus after dismissal and announcement timing. Alerts are passive by default; supply a role when an announcement is needed.
         `,
       },
     },
@@ -67,7 +144,8 @@ Action pattern rules:
     layout: {
       control: 'select',
       options: ['stack', 'inline'],
-      description: 'The alert content/action arrangement',
+      description:
+        'Action placement: stack below the message; inline beside it when space permits. Title and description remain grouped. Narrow inline alerts move actions below.',
       table: {
         category: 'Controls',
       },
@@ -210,23 +288,40 @@ function DismissibleCloseButtonExample(
 ) {
   const [visible, setVisible] = React.useState(true);
 
-  if (!visible) return <div data-testid="dismissed-alert" />;
+  const continueButton = React.useRef<HTMLButtonElement>(null);
+
+  function dismiss() {
+    setVisible(false);
+    continueButton.current?.focus();
+  }
 
   return (
-    <Alert {...props} className="nx:max-w-xl">
-      <AlertIcon>
-        <IconInfoCircle />
-      </AlertIcon>
-      <AlertContent>
-        <AlertTitle>Invite ready</AlertTitle>
-        <AlertDescription>
-          The workspace invitation can now be sent.
-        </AlertDescription>
-      </AlertContent>
-      <AlertActions>
-        <AlertClose onClick={() => setVisible(false)} />
-      </AlertActions>
-    </Alert>
+    <div className="nx:flex nx:w-full nx:max-w-xl nx:flex-col nx:items-start nx:gap-4">
+      {visible && (
+        <Alert {...props} className="nx:max-w-xl">
+          <AlertIcon>
+            <IconInfoCircle />
+          </AlertIcon>
+          <AlertContent>
+            <AlertTitle>Invite ready</AlertTitle>
+            <AlertDescription>
+              The workspace invitation can now be sent.
+            </AlertDescription>
+          </AlertContent>
+          <AlertActions>
+            <AlertClose onClick={dismiss} />
+          </AlertActions>
+        </Alert>
+      )}
+      <Button
+        ref={continueButton}
+        type="button"
+        variant="outline"
+        onClick={() => setVisible(true)}
+      >
+        Review invitation
+      </Button>
+    </div>
   );
 }
 
@@ -236,13 +331,54 @@ function DismissibleCloseButtonExample(
 
 export const Default: Story = {
   render: (args) => (
-    <Alert {...args} className="nx:max-w-md">
-      <AlertTitle>Heads up!</AlertTitle>
-      <AlertDescription>
-        You can add components and dependencies to your app using the CLI.
-      </AlertDescription>
+    <Alert {...args} className="nx:max-w-2xl">
+      <AlertContent>
+        <AlertTitle>Heads up!</AlertTitle>
+        <AlertDescription>
+          You can add components and dependencies to your app using the CLI.
+        </AlertDescription>
+      </AlertContent>
+      <AlertActions>
+        <Button variant="outline">View details</Button>
+      </AlertActions>
     </Alert>
   ),
+  play: async ({ canvasElement, args }) => {
+    const title = canvasElement.querySelector<HTMLElement>(
+      '[data-slot="alert-title"]'
+    )!;
+    const description = canvasElement.querySelector<HTMLElement>(
+      '[data-slot="alert-description"]'
+    )!;
+    await expect(
+      description.getBoundingClientRect().top
+    ).toBeGreaterThanOrEqual(title.getBoundingClientRect().bottom);
+    const content = canvasElement.querySelector<HTMLElement>(
+      '[data-slot="alert-content"]'
+    )!;
+    const actions = canvasElement.querySelector<HTMLElement>(
+      '[data-slot="alert-actions"]'
+    )!;
+    if (args.layout === 'stack') {
+      await expect(actions.getBoundingClientRect().top).toBeGreaterThanOrEqual(
+        content.getBoundingClientRect().bottom
+      );
+    } else if (getComputedStyle(actions).gridRowStart === 'auto') {
+      await expect(actions.getBoundingClientRect().left).toBeGreaterThanOrEqual(
+        content.getBoundingClientRect().right
+      );
+    }
+    await expect(title.scrollWidth).toBeLessThanOrEqual(title.clientWidth);
+    await expect(description.scrollWidth).toBeLessThanOrEqual(
+      description.clientWidth
+    );
+  },
+};
+
+export const InlineContent: Story = {
+  name: 'Inline Layout',
+  ...Default,
+  args: { layout: 'inline' },
 };
 
 export const Playground: PlaygroundStory = {
@@ -402,62 +538,75 @@ export const Playground: PlaygroundStory = {
 };
 
 export const Destructive: Story = {
+  tags: ['!autodocs', '!dev'],
   args: {
     variant: 'destructive',
   },
   render: (args) => (
     <Alert {...args} className="nx:max-w-md">
-      <AlertTitle>Error</AlertTitle>
-      <AlertDescription>
-        Your session has expired. Please log in again.
-      </AlertDescription>
+      <AlertContent>
+        <AlertTitle>Error</AlertTitle>
+        <AlertDescription>
+          Your session has expired. Please log in again.
+        </AlertDescription>
+      </AlertContent>
     </Alert>
   ),
 };
 
 export const Information: Story = {
+  tags: ['!autodocs', '!dev'],
   args: {
     variant: 'information',
   },
   render: (args) => (
     <Alert {...args} className="nx:max-w-md">
-      <AlertTitle>Information</AlertTitle>
-      <AlertDescription>
-        New workspace invitations are available for review.
-      </AlertDescription>
+      <AlertContent>
+        <AlertTitle>Information</AlertTitle>
+        <AlertDescription>
+          New workspace invitations are available for review.
+        </AlertDescription>
+      </AlertContent>
     </Alert>
   ),
 };
 
 export const Success: Story = {
+  tags: ['!autodocs', '!dev'],
   args: {
     variant: 'success',
   },
   render: (args) => (
     <Alert {...args} className="nx:max-w-md">
-      <AlertTitle>Success</AlertTitle>
-      <AlertDescription>
-        Your changes have been saved successfully.
-      </AlertDescription>
+      <AlertContent>
+        <AlertTitle>Success</AlertTitle>
+        <AlertDescription>
+          Your changes have been saved successfully.
+        </AlertDescription>
+      </AlertContent>
     </Alert>
   ),
 };
 
 export const Warning: Story = {
+  tags: ['!autodocs', '!dev'],
   args: {
     variant: 'warning',
   },
   render: (args) => (
     <Alert {...args} className="nx:max-w-md">
-      <AlertTitle>Warning</AlertTitle>
-      <AlertDescription>
-        Your account is about to expire. Please renew your subscription.
-      </AlertDescription>
+      <AlertContent>
+        <AlertTitle>Warning</AlertTitle>
+        <AlertDescription>
+          Your account is about to expire. Please renew your subscription.
+        </AlertDescription>
+      </AlertContent>
     </Alert>
   ),
 };
 
 export const BannerPresentation: Story = {
+  tags: ['!autodocs', '!dev'],
   args: {
     presentation: 'banner',
     variant: 'information',
@@ -467,10 +616,12 @@ export const BannerPresentation: Story = {
       <AlertIcon>
         <IconInfoCircle />
       </AlertIcon>
-      <AlertTitle>Information</AlertTitle>
-      <AlertDescription>
-        New workspace invitations are available for review.
-      </AlertDescription>
+      <AlertContent>
+        <AlertTitle>Information</AlertTitle>
+        <AlertDescription>
+          New workspace invitations are available for review.
+        </AlertDescription>
+      </AlertContent>
     </Alert>
   ),
   play: async ({ canvasElement }) => {
@@ -487,20 +638,24 @@ export const BannerPresentation: Story = {
 // ============================================
 
 export const WithIcon: Story = {
+  tags: ['!autodocs', '!dev'],
   render: (args) => (
     <Alert {...args} className="nx:max-w-md">
       <AlertIcon>
         <IconInfoCircle />
       </AlertIcon>
-      <AlertTitle>Information</AlertTitle>
-      <AlertDescription>
-        This is an informational alert with an icon.
-      </AlertDescription>
+      <AlertContent>
+        <AlertTitle>Information</AlertTitle>
+        <AlertDescription>
+          This is an informational alert with an icon.
+        </AlertDescription>
+      </AlertContent>
     </Alert>
   ),
 };
 
 export const DestructiveWithIcon: Story = {
+  tags: ['!autodocs', '!dev'],
   args: {
     variant: 'destructive',
   },
@@ -509,15 +664,18 @@ export const DestructiveWithIcon: Story = {
       <AlertIcon>
         <IconAlertCircle />
       </AlertIcon>
-      <AlertTitle>Error</AlertTitle>
-      <AlertDescription>
-        Something went wrong. Please try again later.
-      </AlertDescription>
+      <AlertContent>
+        <AlertTitle>Error</AlertTitle>
+        <AlertDescription>
+          Something went wrong. Please try again later.
+        </AlertDescription>
+      </AlertContent>
     </Alert>
   ),
 };
 
 export const InformationWithIcon: Story = {
+  tags: ['!autodocs', '!dev'],
   args: {
     variant: 'information',
   },
@@ -526,15 +684,18 @@ export const InformationWithIcon: Story = {
       <AlertIcon>
         <IconInfoCircle />
       </AlertIcon>
-      <AlertTitle>Information</AlertTitle>
-      <AlertDescription>
-        New workspace invitations are available for review.
-      </AlertDescription>
+      <AlertContent>
+        <AlertTitle>Information</AlertTitle>
+        <AlertDescription>
+          New workspace invitations are available for review.
+        </AlertDescription>
+      </AlertContent>
     </Alert>
   ),
 };
 
 export const SuccessWithIcon: Story = {
+  tags: ['!autodocs', '!dev'],
   args: {
     variant: 'success',
   },
@@ -543,15 +704,18 @@ export const SuccessWithIcon: Story = {
       <AlertIcon>
         <IconCircleCheck />
       </AlertIcon>
-      <AlertTitle>Success</AlertTitle>
-      <AlertDescription>
-        Your payment was processed successfully.
-      </AlertDescription>
+      <AlertContent>
+        <AlertTitle>Success</AlertTitle>
+        <AlertDescription>
+          Your payment was processed successfully.
+        </AlertDescription>
+      </AlertContent>
     </Alert>
   ),
 };
 
 export const WarningWithIcon: Story = {
+  tags: ['!autodocs', '!dev'],
   args: {
     variant: 'warning',
   },
@@ -560,10 +724,12 @@ export const WarningWithIcon: Story = {
       <AlertIcon>
         <IconAlertTriangle />
       </AlertIcon>
-      <AlertTitle>Warning</AlertTitle>
-      <AlertDescription>
-        Your storage is almost full. Consider upgrading your plan.
-      </AlertDescription>
+      <AlertContent>
+        <AlertTitle>Warning</AlertTitle>
+        <AlertDescription>
+          Your storage is almost full. Consider upgrading your plan.
+        </AlertDescription>
+      </AlertContent>
     </Alert>
   ),
 };
@@ -575,7 +741,9 @@ export const WarningWithIcon: Story = {
 export const WithTitle: Story = {
   render: (args) => (
     <Alert {...args} className="nx:max-w-md">
-      <AlertTitle>This is just a title</AlertTitle>
+      <AlertContent>
+        <AlertTitle>This is just a title</AlertTitle>
+      </AlertContent>
     </Alert>
   ),
 };
@@ -583,12 +751,14 @@ export const WithTitle: Story = {
 export const TitleAsHeading: Story = {
   render: (args) => (
     <Alert {...args} className="nx:max-w-md">
-      <AlertTitle asChild>
-        <h2>Semantic heading</h2>
-      </AlertTitle>
-      <AlertDescription>
-        Use this pattern when the alert title belongs in the page outline.
-      </AlertDescription>
+      <AlertContent>
+        <AlertTitle asChild>
+          <h2 id="semantic-heading">Semantic heading</h2>
+        </AlertTitle>
+        <AlertDescription>
+          Use this pattern when the alert title belongs in the page outline.
+        </AlertDescription>
+      </AlertContent>
     </Alert>
   ),
   play: async ({ canvasElement }) => {
@@ -615,17 +785,20 @@ export const WithDescription: Story = {
 export const LongContent: Story = {
   render: (args) => (
     <Alert {...args} className="nx:max-w-md">
-      <AlertTitle>Important Information</AlertTitle>
-      <AlertDescription>
-        <p>
-          Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do
-          eiusmod tempor incididunt ut labore et dolore magna aliqua.
-        </p>
-        <p className="nx:mt-2">
-          Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris
-          nisi ut aliquip ex ea commodo consequat.
-        </p>
-      </AlertDescription>
+      <AlertContent>
+        <AlertTitle>Important Information</AlertTitle>
+        <AlertDescription>
+          <p>
+            Your workspace is approaching its storage limit. Existing files
+            remain available, but new uploads will pause when the limit is
+            reached.
+          </p>
+          <p className="nx:mt-2">
+            Remove files you no longer need or ask a workspace administrator to
+            increase your storage before starting another upload.
+          </p>
+        </AlertDescription>
+      </AlertContent>
     </Alert>
   ),
 };
@@ -647,7 +820,16 @@ export const DismissibleCloseButton: Story = {
 
     await expect(alert).toBeInTheDocument();
     await expect(alert).toHaveAttribute('data-layout', 'inline');
-    await userEvent.click(close);
+    const title = canvas.getByText('Invite ready');
+    await expect(title.getBoundingClientRect().height).toBeLessThanOrEqual(
+      parseFloat(getComputedStyle(title).lineHeight) * 2
+    );
+    await userEvent.tab();
+    await expect(close).toHaveFocus();
+    await userEvent.keyboard('{Enter}');
+    await expect(
+      canvas.getByRole('button', { name: 'Review invitation' })
+    ).toHaveFocus();
     await waitFor(() => {
       expect(
         canvasElement.querySelector('[data-slot="alert"]')
@@ -656,30 +838,67 @@ export const DismissibleCloseButton: Story = {
   },
 };
 
+function TextDismissExample(props: React.ComponentProps<typeof Alert>) {
+  const [visible, setVisible] = React.useState(true);
+  const reviewButton = React.useRef<HTMLButtonElement>(null);
+  function dismiss() {
+    setVisible(false);
+    reviewButton.current?.focus();
+  }
+  return (
+    <div className="nx:flex nx:w-full nx:max-w-xl nx:flex-col nx:items-start nx:gap-4">
+      {visible && (
+        <Alert {...props}>
+          <AlertIcon>
+            <IconInfoCircle />
+          </AlertIcon>
+          <AlertContent>
+            <AlertTitle>Import completed</AlertTitle>
+            <AlertDescription>
+              Review the imported contacts before publishing them.
+            </AlertDescription>
+          </AlertContent>
+          <AlertActions>
+            <Button type="button" variant="ghost" onClick={dismiss}>
+              Dismiss
+            </Button>
+          </AlertActions>
+        </Alert>
+      )}
+      <Button
+        ref={reviewButton}
+        type="button"
+        variant="outline"
+        onClick={() => setVisible(true)}
+      >
+        Review imported contacts
+      </Button>
+    </div>
+  );
+}
+
 export const TextDismissAction: Story = {
-  args: {
-    layout: 'inline',
-    variant: 'information',
+  args: { layout: 'inline', variant: 'information' },
+  render: (args) => <TextDismissExample {...args} />,
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+    await userEvent.tab();
+    await expect(canvas.getByRole('button', { name: 'Dismiss' })).toHaveFocus();
+    await userEvent.keyboard('{Enter}');
+    await expect(
+      canvas.queryByText('Import completed')
+    ).not.toBeInTheDocument();
+    const review = canvas.getByRole('button', {
+      name: 'Review imported contacts',
+    });
+    await expect(review).toHaveFocus();
+    await userEvent.keyboard('{Enter}');
+    await expect(canvas.getByText('Import completed')).toBeInTheDocument();
   },
-  render: (args) => (
-    <Alert {...args} className="nx:max-w-xl">
-      <AlertIcon>
-        <IconInfoCircle />
-      </AlertIcon>
-      <AlertContent>
-        <AlertTitle>Import completed</AlertTitle>
-        <AlertDescription>
-          Review the imported contacts before publishing them.
-        </AlertDescription>
-      </AlertContent>
-      <AlertActions>
-        <Button variant="ghost">Dismiss</Button>
-      </AlertActions>
-    </Alert>
-  ),
 };
 
 export const CriticalNoClose: Story = {
+  tags: ['!autodocs', '!dev'],
   args: {
     variant: 'destructive',
   },
@@ -688,15 +907,18 @@ export const CriticalNoClose: Story = {
       <AlertIcon>
         <IconAlertCircle />
       </AlertIcon>
-      <AlertTitle>Payment failed</AlertTitle>
-      <AlertDescription>
-        Update the billing method before the workspace is paused.
-      </AlertDescription>
+      <AlertContent>
+        <AlertTitle>Payment failed</AlertTitle>
+        <AlertDescription>
+          Update the billing method before the workspace is paused.
+        </AlertDescription>
+      </AlertContent>
     </Alert>
   ),
 };
 
 export const InlineAction: Story = {
+  tags: ['!autodocs', '!dev'],
   args: {
     layout: 'inline',
     variant: 'warning',
@@ -726,17 +948,19 @@ export const DescriptionLinkAction: Story = {
       <AlertIcon>
         <IconInfoCircle />
       </AlertIcon>
-      <AlertTitle>Sync is paused</AlertTitle>
-      <AlertDescription>
-        Reconnect the integration from{' '}
-        <a
-          className="nx:font-medium nx:text-primary-subtle-foreground nx:underline-offset-4 nx:hover:underline"
-          href="/settings"
-        >
-          workspace settings
-        </a>
-        .
-      </AlertDescription>
+      <AlertContent>
+        <AlertTitle>Sync is paused</AlertTitle>
+        <AlertDescription>
+          Reconnect the integration from{' '}
+          <a
+            className="nx:font-medium nx:text-primary-subtle-foreground nx:underline-offset-4 nx:hover:underline"
+            href="/settings"
+          >
+            workspace settings
+          </a>
+          .
+        </AlertDescription>
+      </AlertContent>
     </Alert>
   ),
 };
@@ -771,25 +995,84 @@ export const InlineActionsWithClose: Story = {
     variant: 'success',
   },
   render: (args) => (
-    <Alert {...args} className="nx:max-w-2xl">
-      <AlertIcon>
-        <IconCircleCheck />
-      </AlertIcon>
-      <AlertContent>
-        <AlertTitle>Deployment complete</AlertTitle>
-        <AlertDescription>
-          Version 2.4.0 is live in the production environment.
-        </AlertDescription>
-      </AlertContent>
-      <AlertActions>
-        <Button variant="outline">View release</Button>
-        <AlertClose />
-      </AlertActions>
-    </Alert>
+    <div data-testid="reflow-host" style={{ width: 672, maxWidth: '100%' }}>
+      <Alert {...args} className="nx:max-w-2xl">
+        <AlertIcon>
+          <IconCircleCheck />
+        </AlertIcon>
+        <AlertContent>
+          <AlertTitle>Deployment complete</AlertTitle>
+          <AlertDescription>
+            Version 2.4.0 is live in the production environment.
+          </AlertDescription>
+        </AlertContent>
+        <AlertActions>
+          <Button variant="outline">View release</Button>
+          <AlertClose />
+        </AlertActions>
+      </Alert>
+    </div>
   ),
+  play: async ({ canvasElement }) => {
+    const host = within(canvasElement).getByTestId('reflow-host');
+    const root = host.querySelector<HTMLElement>('[data-slot="alert"]')!;
+    const content = host.querySelector<HTMLElement>(
+      '[data-slot="alert-content"]'
+    )!;
+    const actions = host.querySelector<HTMLElement>(
+      '[data-slot="alert-actions"]'
+    )!;
+    const close = host.querySelector<HTMLElement>('[data-slot="alert-close"]')!;
+    const button = within(actions).getByRole('button', {
+      name: 'View release',
+    });
+    const icon = host.querySelector<HTMLElement>('[data-slot="alert-icon"]')!;
+    const title = host.querySelector<HTMLElement>('[data-slot="alert-title"]')!;
+    function expectIconAtTitle() {
+      const iconRect = icon.getBoundingClientRect();
+      const titleRect = title.getBoundingClientRect();
+      expect(iconRect.top).toBeGreaterThanOrEqual(titleRect.top);
+      expect(iconRect.bottom).toBeLessThanOrEqual(
+        titleRect.top + parseFloat(getComputedStyle(title).lineHeight)
+      );
+    }
+    const originalWidth = host.style.width;
+    try {
+      for (const width of [288, 358]) {
+        host.style.width = `${width}px`;
+        await waitFor(() => {
+          expectIconAtTitle();
+          expect(button.getBoundingClientRect().top).toBeGreaterThanOrEqual(
+            content.getBoundingClientRect().bottom
+          );
+          expect(content.scrollWidth).toBeLessThanOrEqual(content.clientWidth);
+          expect(root.scrollWidth).toBeLessThanOrEqual(root.clientWidth);
+          expect(close.getBoundingClientRect().right).toBeLessThanOrEqual(
+            root.getBoundingClientRect().right
+          );
+          expect(close.getBoundingClientRect().left).toBeGreaterThanOrEqual(
+            content.getBoundingClientRect().right -
+              parseFloat(getComputedStyle(content).paddingRight)
+          );
+        });
+      }
+      host.style.width = originalWidth;
+      if (host.clientWidth >= 672) {
+        await waitFor(() => {
+          expectIconAtTitle();
+          expect(actions.getBoundingClientRect().left).toBeGreaterThanOrEqual(
+            content.getBoundingClientRect().right
+          );
+        });
+      }
+    } finally {
+      host.style.width = originalWidth;
+    }
+  },
 };
 
 export const DisabledClose: Story = {
+  tags: ['!autodocs', '!dev'],
   args: {
     layout: 'inline',
     variant: 'success',
@@ -952,10 +1235,13 @@ export const TextCloseLabel: Story = {
 // ============================================
 
 export const WithDataAttributes: Story = {
+  tags: ['!autodocs', '!dev'],
   render: (_args) => (
     <Alert variant="destructive" className="nx:max-w-md">
-      <AlertTitle>Test Alert</AlertTitle>
-      <AlertDescription>Testing data attributes.</AlertDescription>
+      <AlertContent>
+        <AlertTitle>Test Alert</AlertTitle>
+        <AlertDescription>Testing data attributes.</AlertDescription>
+      </AlertContent>
     </Alert>
   ),
   play: async ({ canvasElement }) => {
@@ -978,6 +1264,7 @@ export const WithDataAttributes: Story = {
 };
 
 export const ActionSlotDataAttributes: Story = {
+  tags: ['!autodocs', '!dev'],
   render: (_args) => (
     <Alert variant="warning" layout="inline" className="nx:max-w-xl">
       <AlertIcon>
@@ -1009,10 +1296,13 @@ export const ActionSlotDataAttributes: Story = {
 };
 
 export const DefaultDataAttributes: Story = {
+  tags: ['!autodocs', '!dev'],
   render: (_args) => (
     <Alert className="nx:max-w-md">
-      <AlertTitle>Default Alert</AlertTitle>
-      <AlertDescription>Testing default variant.</AlertDescription>
+      <AlertContent>
+        <AlertTitle>Default Alert</AlertTitle>
+        <AlertDescription>Testing default variant.</AlertDescription>
+      </AlertContent>
     </Alert>
   ),
   play: async ({ canvasElement }) => {
@@ -1027,19 +1317,24 @@ export const DefaultDataAttributes: Story = {
 };
 
 export const RolePassThrough: Story = {
+  tags: ['!autodocs', '!dev'],
   render: (_args) => (
     <div className="nx:flex nx:flex-col nx:gap-4">
       <Alert role="alert" variant="destructive" className="nx:max-w-md">
-        <AlertTitle>Session expired</AlertTitle>
-        <AlertDescription>
-          Sign in again before continuing this task.
-        </AlertDescription>
+        <AlertContent>
+          <AlertTitle>Session expired</AlertTitle>
+          <AlertDescription>
+            Sign in again before continuing this task.
+          </AlertDescription>
+        </AlertContent>
       </Alert>
       <Alert role="status" variant="information" className="nx:max-w-md">
-        <AlertTitle>Changes saved</AlertTitle>
-        <AlertDescription>
-          Your workspace settings were updated.
-        </AlertDescription>
+        <AlertContent>
+          <AlertTitle>Changes saved</AlertTitle>
+          <AlertDescription>
+            Your workspace settings were updated.
+          </AlertDescription>
+        </AlertContent>
       </Alert>
     </div>
   ),
@@ -1067,10 +1362,12 @@ export const AllVariants: Story = {
           <AlertIcon>
             <IconInfoCircle />
           </AlertIcon>
-          <AlertTitle>Default Alert</AlertTitle>
-          <AlertDescription>
-            This is a default informational alert.
-          </AlertDescription>
+          <AlertContent>
+            <AlertTitle>Default Alert</AlertTitle>
+            <AlertDescription>
+              This is a default informational alert.
+            </AlertDescription>
+          </AlertContent>
         </Alert>
       </div>
 
@@ -1082,8 +1379,10 @@ export const AllVariants: Story = {
           <AlertIcon>
             <IconInfoCircle />
           </AlertIcon>
-          <AlertTitle>Information Alert</AlertTitle>
-          <AlertDescription>This is an informational alert.</AlertDescription>
+          <AlertContent>
+            <AlertTitle>Information Alert</AlertTitle>
+            <AlertDescription>This is an informational alert.</AlertDescription>
+          </AlertContent>
         </Alert>
       </div>
 
@@ -1095,10 +1394,12 @@ export const AllVariants: Story = {
           <AlertIcon>
             <IconAlertCircle />
           </AlertIcon>
-          <AlertTitle>Destructive Alert</AlertTitle>
-          <AlertDescription>
-            This is a destructive/error alert.
-          </AlertDescription>
+          <AlertContent>
+            <AlertTitle>Destructive Alert</AlertTitle>
+            <AlertDescription>
+              This is a destructive/error alert.
+            </AlertDescription>
+          </AlertContent>
         </Alert>
       </div>
 
@@ -1110,8 +1411,10 @@ export const AllVariants: Story = {
           <AlertIcon>
             <IconCircleCheck />
           </AlertIcon>
-          <AlertTitle>Success Alert</AlertTitle>
-          <AlertDescription>This is a success alert.</AlertDescription>
+          <AlertContent>
+            <AlertTitle>Success Alert</AlertTitle>
+            <AlertDescription>This is a success alert.</AlertDescription>
+          </AlertContent>
         </Alert>
       </div>
 
@@ -1123,8 +1426,10 @@ export const AllVariants: Story = {
           <AlertIcon>
             <IconAlertTriangle />
           </AlertIcon>
-          <AlertTitle>Warning Alert</AlertTitle>
-          <AlertDescription>This is a warning alert.</AlertDescription>
+          <AlertContent>
+            <AlertTitle>Warning Alert</AlertTitle>
+            <AlertDescription>This is a warning alert.</AlertDescription>
+          </AlertContent>
         </Alert>
       </div>
     </div>
@@ -1145,10 +1450,12 @@ export const AllBannerVariants: Story = {
           <AlertIcon>
             <IconInfoCircle />
           </AlertIcon>
-          <AlertTitle>Default Alert</AlertTitle>
-          <AlertDescription>
-            This is a default informational alert.
-          </AlertDescription>
+          <AlertContent>
+            <AlertTitle>Default Alert</AlertTitle>
+            <AlertDescription>
+              This is a default informational alert.
+            </AlertDescription>
+          </AlertContent>
         </Alert>
       </div>
 
@@ -1164,8 +1471,10 @@ export const AllBannerVariants: Story = {
           <AlertIcon>
             <IconInfoCircle />
           </AlertIcon>
-          <AlertTitle>Information Alert</AlertTitle>
-          <AlertDescription>This is an informational alert.</AlertDescription>
+          <AlertContent>
+            <AlertTitle>Information Alert</AlertTitle>
+            <AlertDescription>This is an informational alert.</AlertDescription>
+          </AlertContent>
         </Alert>
       </div>
 
@@ -1181,10 +1490,12 @@ export const AllBannerVariants: Story = {
           <AlertIcon>
             <IconAlertCircle />
           </AlertIcon>
-          <AlertTitle>Destructive Alert</AlertTitle>
-          <AlertDescription>
-            This is a destructive/error alert.
-          </AlertDescription>
+          <AlertContent>
+            <AlertTitle>Destructive Alert</AlertTitle>
+            <AlertDescription>
+              This is a destructive/error alert.
+            </AlertDescription>
+          </AlertContent>
         </Alert>
       </div>
 
@@ -1196,8 +1507,10 @@ export const AllBannerVariants: Story = {
           <AlertIcon>
             <IconCircleCheck />
           </AlertIcon>
-          <AlertTitle>Success Alert</AlertTitle>
-          <AlertDescription>This is a success alert.</AlertDescription>
+          <AlertContent>
+            <AlertTitle>Success Alert</AlertTitle>
+            <AlertDescription>This is a success alert.</AlertDescription>
+          </AlertContent>
         </Alert>
       </div>
 
@@ -1209,8 +1522,10 @@ export const AllBannerVariants: Story = {
           <AlertIcon>
             <IconAlertTriangle />
           </AlertIcon>
-          <AlertTitle>Warning Alert</AlertTitle>
-          <AlertDescription>This is a warning alert.</AlertDescription>
+          <AlertContent>
+            <AlertTitle>Warning Alert</AlertTitle>
+            <AlertDescription>This is a warning alert.</AlertDescription>
+          </AlertContent>
         </Alert>
       </div>
     </div>
@@ -1221,6 +1536,7 @@ export const AllBannerVariants: Story = {
 };
 
 export const DefaultModeHeightPinned: Story = {
+  tags: ['!autodocs', '!dev'],
   parameters: {
     a11y: { test: 'off' },
     docs: {

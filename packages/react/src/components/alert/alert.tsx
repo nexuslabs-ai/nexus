@@ -27,7 +27,7 @@ const alertVariants = cva('nx:group/alert nx:grid nx:w-full nx:px-6 nx:py-4', {
       stack:
         'nx:grid-cols-[auto_minmax(0,1fr)] nx:items-start nx:has-[>[data-slot=alert-icon]]:gap-x-4 nx:*:data-[slot=alert-title]:col-start-2 nx:*:data-[slot=alert-description]:col-start-2 nx:*:data-[slot=alert-content]:col-start-2 nx:*:data-[slot=alert-actions]:col-start-2',
       inline:
-        'nx:grid-cols-[minmax(0,1fr)_auto] nx:items-center nx:gap-x-4 nx:gap-y-1 nx:has-[>[data-slot=alert-icon]]:grid-cols-[auto_minmax(0,1fr)_auto]',
+        'nx:@container/alert nx:relative nx:grid-cols-[minmax(0,1fr)_auto] nx:items-center nx:gap-x-4 nx:gap-y-1 nx:has-[>[data-slot=alert-icon]]:grid-cols-[auto_minmax(0,1fr)_auto]',
     },
   },
   defaultVariants: {
@@ -53,7 +53,9 @@ interface AlertProps
  * Use `presentation="banner"` for the edge-to-edge banner treatment (squared
  * corners, bottom border only).
  * Use `layout="inline"` with `AlertContent` and `AlertActions` when the alert
- * has trailing controls.
+ * has trailing controls. Below 32rem of content width, inline button actions
+ * move below the message while the close control stays at the top end.
+ * This responds to the alert container, not the viewport.
  * In the default stack layout, use no actions or button actions only; avoid
  * rendering `AlertClose` below the message. Use `layout="inline"` for
  * dismissal controls.
@@ -138,6 +140,7 @@ function AlertIcon({ className, ...props }: AlertIconProps) {
       className={cn(
         'nx:flex nx:[&>svg]:size-4',
         'nx:group-data-[layout=stack]/alert:translate-y-0.5',
+        'nx:group-data-[layout=inline]/alert:group-has-[[data-slot=alert-title]]/alert:self-start nx:group-data-[layout=inline]/alert:group-has-[[data-slot=alert-title]]/alert:translate-y-0.5',
         className
       )}
       {...props}
@@ -170,7 +173,12 @@ function AlertContent({ className, ...props }: AlertContentProps) {
   return (
     <div
       data-slot="alert-content"
-      className={cn('nx:flex nx:min-w-0 nx:flex-col', className)}
+      className={cn(
+        'nx:flex nx:min-w-0 nx:flex-col nx:wrap-anywhere',
+        'nx:group-data-[layout=inline]/alert:col-span-2 nx:group-data-[layout=inline]/alert:@lg/alert:col-span-1',
+        'nx:group-data-[layout=inline]/alert:group-has-[[data-slot=alert-close]]/alert:pr-10 nx:group-data-[layout=inline]/alert:group-has-[[data-slot=alert-close]]/alert:@lg/alert:pr-0',
+        className
+      )}
       {...props}
     />
   );
@@ -290,7 +298,10 @@ function AlertActions({ className, ...props }: AlertActionsProps) {
       data-slot="alert-actions"
       className={cn(
         'nx:mt-3 nx:flex nx:flex-wrap nx:items-center nx:gap-2',
-        'nx:group-data-[layout=inline]/alert:mt-0 nx:group-data-[layout=inline]/alert:self-center',
+        'nx:group-data-[layout=inline]/alert:col-start-1 nx:group-data-[layout=inline]/alert:col-end-[-1] nx:group-data-[layout=inline]/alert:row-start-2',
+        'nx:group-data-[layout=inline]/alert:group-has-[>[data-slot=alert-icon]]/alert:col-start-2 nx:group-data-[layout=inline]/alert:group-has-[>[data-slot=alert-icon]]/alert:@lg/alert:col-auto',
+        'nx:group-data-[layout=inline]/alert:@lg/alert:col-auto nx:group-data-[layout=inline]/alert:@lg/alert:row-auto nx:group-data-[layout=inline]/alert:@lg/alert:mt-0',
+        'nx:group-data-[layout=inline]/alert:has-[[data-slot=alert-close]:only-child]:mt-0 nx:group-data-[layout=inline]/alert:self-center',
         className
       )}
       {...props}
@@ -309,7 +320,8 @@ interface AlertCloseProps extends React.ComponentProps<'button'> {}
  * AlertClose
  *
  * A styled close control for alerts. Dismissal is consumer-controlled: wire
- * `onClick` to app state when the alert should be removed. The default renders a
+ * `onClick` to app state when the alert should be removed. The application
+ * also chooses a logical focus destination if removing the focused control. The default renders a
  * close icon with a visually-hidden "Dismiss alert" label. If you pass custom
  * children, give them their own accessible name — visible text self-labels;
  * supply `aria-label` for an icon-only child.
@@ -330,6 +342,7 @@ function AlertClose({
       data-slot="alert-close"
       className={cn(
         'nx:inline-flex nx:size-8 nx:shrink-0 nx:items-center nx:justify-center nx:rounded-sm nx:text-muted-foreground',
+        'nx:group-data-[layout=inline]/alert:absolute nx:group-data-[layout=inline]/alert:end-6 nx:group-data-[layout=inline]/alert:top-4 nx:group-data-[layout=inline]/alert:@lg/alert:static',
         'nx:transition-control nx:hover:bg-container-hover nx:hover:text-foreground',
         'nx:focus-visible:bg-container-hover nx:focus-visible:text-foreground',
         'nx:focus-visible:outline-2 nx:focus-visible:outline-focus-default',
