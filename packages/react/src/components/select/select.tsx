@@ -1,3 +1,5 @@
+'use client';
+
 import * as React from 'react';
 
 import * as SelectPrimitive from '@radix-ui/react-select';
@@ -5,6 +7,7 @@ import { cva, type VariantProps } from 'class-variance-authority';
 
 import { IconCheck, IconChevronDown, IconChevronUp } from '../../lib/icons';
 import { selectionIndicatorMotionClassName } from '../../lib/motion';
+import { useNexusRootAttributes } from '../../lib/nexus-root-context';
 import { cn } from '../../lib/utils';
 import {
   overlayFloatingTransitionClassName,
@@ -191,9 +194,11 @@ function SelectContent({
   position = 'popper',
   ...props
 }: SelectContentProps) {
+  const rootAttributes = useNexusRootAttributes();
   return (
     <SelectPrimitive.Portal>
       <SelectPrimitive.Content
+        {...rootAttributes}
         data-slot="select-content"
         className={cn(
           'nx:relative nx:z-popover nx:max-h-96 nx:min-w-32 nx:overflow-hidden',

@@ -24,7 +24,6 @@ import {
   TooltipTrigger,
 } from '../tooltip';
 
-const SIDEBAR_COOKIE_NAME = 'sidebar_state';
 const SIDEBAR_COOKIE_MAX_AGE = 60 * 60 * 24 * 7;
 const SIDEBAR_WIDTH = '16rem';
 const SIDEBAR_WIDTH_NARROW = '18rem';
@@ -86,20 +85,26 @@ function useSidebar() {
 interface SidebarProviderProps extends React.ComponentProps<'div'> {
   /**
    * Whether the sidebar starts open when uncontrolled.
-   *
-   * When uncontrolled, the provider persists the open state to a `sidebar_state`
-   * cookie. It does not read the cookie back — restore across reloads by reading
-   * it server-side and passing the result here.
    * @default true
+   */
+  defaultOpen?: boolean;
+  /**
+   * Cookie the uncontrolled open state persists to. Omit to write no cookie.
+   * The provider does not read it back — restore across reloads by reading it
+   * server-side and passing the result as `defaultOpen`.
    * @example
    * ```tsx
    * // Server Component (e.g. Next.js app/layout.tsx)
    * const store = await cookies();
    * const defaultOpen = store.get('sidebar_state')?.value !== 'false';
-   * return <SidebarProvider defaultOpen={defaultOpen}>{children}</SidebarProvider>;
+   * return (
+   *   <SidebarProvider cookieName="sidebar_state" defaultOpen={defaultOpen}>
+   *     {children}
+   *   </SidebarProvider>
+   * );
    * ```
    */
-  defaultOpen?: boolean;
+  cookieName?: string;
   /**
    * Controlled open state. Pair with `onOpenChange` to control externally.
    */
@@ -113,8 +118,8 @@ interface SidebarProviderProps extends React.ComponentProps<'div'> {
 /**
  * SidebarProvider
  *
- * Owns the sidebar's open state, the `Ctrl/Cmd+B` keyboard shortcut, and cookie
- * persistence. Wrap your app shell in it; every sidebar part reads its context.
+ * Owns the sidebar's open state, the `Ctrl/Cmd+B` keyboard shortcut, and
+ * optional cookie persistence. Wrap your app shell in it; every sidebar part reads its context.
  * Renders a `TooltipProvider` so collapsed-icon tooltips work out of the box.
  *
  * @example
@@ -127,6 +132,7 @@ interface SidebarProviderProps extends React.ComponentProps<'div'> {
  */
 function SidebarProvider({
   defaultOpen = true,
+  cookieName,
   open: openProp,
   onOpenChange: setOpenProp,
   className,
@@ -149,10 +155,10 @@ function SidebarProvider({
       }
 
       _setOpen(openState);
-      // Persist non-sensitive uncontrolled open state for server-side restore.
-      document.cookie = `${SIDEBAR_COOKIE_NAME}=${openState}; path=/; max-age=${SIDEBAR_COOKIE_MAX_AGE}; SameSite=Lax`;
+      if (!cookieName) return;
+      document.cookie = `${cookieName}=${openState}; path=/; max-age=${SIDEBAR_COOKIE_MAX_AGE}; SameSite=Lax`;
     },
-    [setOpenProp, open]
+    [cookieName, setOpenProp, open]
   );
 
   const toggleSidebar = React.useCallback(() => {

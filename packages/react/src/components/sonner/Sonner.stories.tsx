@@ -1,6 +1,10 @@
+import { useState } from 'react';
+
+import { DEFAULT_NEXUS_APPEARANCE } from '@nexus_ds/core';
 import type { Meta, StoryObj } from '@storybook/react';
 import { expect, userEvent, waitFor, within } from 'storybook/test';
 
+import { NexusRoot } from '../appearance/provider';
 import { Button } from '../button';
 
 import { toast, Toaster } from './sonner';
@@ -173,6 +177,50 @@ export const ToastLayer: Story = {
       expect(toaster).not.toBeNull();
       expect(getComputedStyle(toaster as HTMLElement).zIndex).toBe('100');
     });
+  },
+};
+
+function ModeSwitchingToaster() {
+  const [mode, setMode] = useState<'light' | 'dark'>('light');
+  return (
+    <NexusRoot state={{ ...DEFAULT_NEXUS_APPEARANCE, mode }}>
+      <Button onClick={() => toast('Event has been created')}>
+        Show toast
+      </Button>
+      <Button variant="outline" onClick={() => setMode('dark')}>
+        Go dark
+      </Button>
+      <Toaster />
+    </NexusRoot>
+  );
+}
+
+// The toaster takes the nearest root's mode and attributes, and follows a mode
+// change while a toast is visible.
+export const FollowsRootMode: Story = {
+  render: () => <ModeSwitchingToaster />,
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+    const root = canvasElement.querySelector('[data-nexus-root]')!;
+    await userEvent.click(canvas.getByRole('button', { name: 'Show toast' }));
+    const toaster = await waitFor(() => {
+      const element = document.body.querySelector('[data-sonner-toaster]');
+      expect(element).not.toBeNull();
+      return element!;
+    });
+    const wrapper = canvasElement.querySelector('[data-slot="toaster"]');
+
+    await expect(toaster).toHaveAttribute('data-sonner-theme', 'light');
+    await expect(wrapper).toHaveAttribute(
+      'data-nexus-root',
+      root.getAttribute('data-nexus-root')!
+    );
+
+    await userEvent.click(canvas.getByRole('button', { name: 'Go dark' }));
+    await waitFor(() =>
+      expect(toaster).toHaveAttribute('data-sonner-theme', 'dark')
+    );
+    await expect(wrapper).toHaveAttribute('data-nx-mode', 'dark');
   },
 };
 

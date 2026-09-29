@@ -6,29 +6,46 @@ import {
   createNexusAppearanceSnapshotFromState,
   DEFAULT_NEXUS_APPEARANCE,
   DENSITY_OPTIONS,
+  deriveNexusAppearanceCss,
   ELEVATION_OPTIONS,
+  type NexusAppearanceState,
+  nexusRootScope,
 } from '@nexus_ds/core';
 import type { Meta, StoryObj } from '@storybook/react';
 import { expect, userEvent, waitFor, within } from 'storybook/test';
 
 import { Button } from '../../button';
-import { NexusAppearanceProvider } from '../provider';
+import {
+  NexusAppearanceProvider,
+  NexusRoot,
+  type NexusRootState,
+} from '../provider';
 
 import { NexusAppearanceSettings } from './appearance-settings';
+
+const resolveForStory = (next: NexusAppearanceState): NexusRootState => ({
+  ...next,
+  mode: next.mode === 'dark' ? 'dark' : 'light',
+});
+
+function EmbeddedAppearanceSettings() {
+  const [state, setState] = useState<NexusRootState>(() =>
+    resolveForStory(DEFAULT_NEXUS_APPEARANCE)
+  );
+  return (
+    <NexusRoot
+      state={state}
+      onStateChange={(next) => setState(resolveForStory(next))}
+    >
+      <NexusAppearanceSettings />
+    </NexusRoot>
+  );
+}
 
 const meta: Meta<typeof NexusAppearanceSettings> = {
   title: 'Appearance/AppearanceSettings',
   component: NexusAppearanceSettings,
-  render: () => (
-    <NexusAppearanceProvider
-      storageKey={false}
-      defaultState={{
-        ...DEFAULT_NEXUS_APPEARANCE,
-      }}
-    >
-      <NexusAppearanceSettings />
-    </NexusAppearanceProvider>
-  ),
+  render: () => <EmbeddedAppearanceSettings />,
 };
 
 export default meta;
@@ -55,15 +72,15 @@ export const BrandPresets: Story = {
     await expect(
       canvas.getByText(`brandColor: "${preset.color}",`)
     ).toBeInTheDocument();
-    const expected = createNexusAppearanceSnapshotFromState({
-      ...DEFAULT_NEXUS_APPEARANCE,
-      brandColor: preset.color,
-    });
+    const root = canvasElement.querySelector('[data-nexus-root]')!;
+    const expected = deriveNexusAppearanceCss(
+      { ...DEFAULT_NEXUS_APPEARANCE, brandColor: preset.color },
+      nexusRootScope(root.getAttribute('data-nexus-root')!)
+    );
     await waitFor(() => {
-      expect(
-        document.querySelector('style[data-nexus-appearance-theme]')
-          ?.textContent
-      ).toBe(expected.themeCss);
+      expect(root.previousElementSibling?.textContent).toContain(
+        expected.themeCss
+      );
     });
   },
 };

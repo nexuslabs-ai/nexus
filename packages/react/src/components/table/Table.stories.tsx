@@ -878,7 +878,7 @@ export const Grid: Story = {
 // tightens to ~36px for dense data.
 export const Density: Story = {
   render: () => (
-    <div data-density="compact" className="nx:flex nx:flex-col nx:gap-6">
+    <div data-nx-density="compact" className="nx:flex nx:flex-col nx:gap-6">
       {(['comfortable', 'compact'] as const).map((density) => (
         <Table key={density} density={density}>
           <TableHeader>
@@ -914,9 +914,9 @@ export const Density: Story = {
     );
 
     await expect(comfyTable).toBeInTheDocument();
-    await expect(comfyTable).not.toHaveAttribute('data-density');
+    await expect(comfyTable).not.toHaveAttribute('data-nx-density');
     await expect(compactTable).toBeInTheDocument();
-    await expect(compactTable).not.toHaveAttribute('data-density');
+    await expect(compactTable).not.toHaveAttribute('data-nx-density');
     await expect(comfyCell).toBeInTheDocument();
     await expect(comfyCell).toHaveClass('nx:py-3');
     await expect(compactCell).toBeInTheDocument();

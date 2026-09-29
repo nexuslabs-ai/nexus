@@ -1,9 +1,12 @@
+'use client';
+
 import * as React from 'react';
 
 import * as DialogPrimitive from '@radix-ui/react-dialog';
 import { cva, type VariantProps } from 'class-variance-authority';
 
 import { IconX } from '../../lib/icons';
+import { useNexusRootAttributes } from '../../lib/nexus-root-context';
 import { cn } from '../../lib/utils';
 import {
   overlayBodyClassName,
@@ -74,8 +77,10 @@ interface SheetOverlayProps extends React.ComponentProps<
  * Semi-transparent overlay behind the sheet content.
  */
 function SheetOverlay({ className, ...props }: SheetOverlayProps) {
+  const rootAttributes = useNexusRootAttributes();
   return (
     <DialogPrimitive.Overlay
+      {...rootAttributes}
       data-slot="sheet-overlay"
       className={cn(
         'nx:fixed nx:inset-0 nx:z-modal nx:bg-overlay',
@@ -164,10 +169,12 @@ function SheetContent({
   showCloseButton = true,
   ...props
 }: SheetContentProps) {
+  const rootAttributes = useNexusRootAttributes();
   return (
     <SheetPortal>
       <SheetOverlay />
       <DialogPrimitive.Content
+        {...rootAttributes}
         data-slot="sheet-content"
         data-side={side}
         className={cn(sheetContentVariants({ side }), className)}

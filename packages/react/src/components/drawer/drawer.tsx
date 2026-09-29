@@ -1,7 +1,10 @@
+'use client';
+
 import * as React from 'react';
 
 import { Drawer as DrawerPrimitive } from 'vaul';
 
+import { useNexusRootAttributes } from '../../lib/nexus-root-context';
 import { cn } from '../../lib/utils';
 import {
   overlayBodyClassName,
@@ -73,8 +76,10 @@ interface DrawerOverlayProps extends React.ComponentProps<
  * Semi-transparent scrim behind the drawer content.
  */
 function DrawerOverlay({ className, ...props }: DrawerOverlayProps) {
+  const rootAttributes = useNexusRootAttributes();
   return (
     <DrawerPrimitive.Overlay
+      {...rootAttributes}
       data-slot="drawer-overlay"
       className={cn(
         'nx:fixed nx:inset-0 nx:z-modal nx:bg-overlay',
@@ -118,10 +123,12 @@ function DrawerContent({
   showHandle = true,
   ...props
 }: DrawerContentProps) {
+  const rootAttributes = useNexusRootAttributes();
   return (
     <DrawerPortal>
       <DrawerOverlay />
       <DrawerPrimitive.Content
+        {...rootAttributes}
         data-slot="drawer-content"
         className={cn(
           'nx:group/drawer-content nx:fixed nx:z-modal nx:flex nx:h-auto nx:flex-col nx:overflow-hidden nx:bg-container nx:shadow-lg',

@@ -1,7 +1,10 @@
+'use client';
+
 import * as React from 'react';
 
 import * as TooltipPrimitive from '@radix-ui/react-tooltip';
 
+import { useNexusRootAttributes } from '../../lib/nexus-root-context';
 import { cn } from '../../lib/utils';
 import {
   overlayFloatingTransitionClassName,
@@ -72,9 +75,11 @@ function TooltipContent({
   sideOffset = 4,
   ...props
 }: TooltipContentProps) {
+  const rootAttributes = useNexusRootAttributes();
   return (
     <TooltipPrimitive.Portal>
       <TooltipPrimitive.Content
+        {...rootAttributes}
         data-slot="tooltip-content"
         sideOffset={sideOffset}
         className={cn(

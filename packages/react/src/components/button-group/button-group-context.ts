@@ -1,3 +1,5 @@
+'use client';
+
 import * as React from 'react';
 
 /** Size shared from a ButtonGroup to its members. */

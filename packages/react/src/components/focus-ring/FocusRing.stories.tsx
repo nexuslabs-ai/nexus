@@ -58,7 +58,7 @@ const TRANSPARENT = 'rgba(0, 0, 0, 0)';
 /**
  * Every field surface draws its boundary with a real border and completes the
  * focus ring with an `outline-default` outer edge — the same borderwidth token
- * the border reads, so a `[data-borderwidth]` swap moves both halves.
+ * the border reads, so a `[data-nx-borderwidth]` swap moves both halves.
  * `expectedRestBorderColor` is transparent for `variant="borderless"` — the
  * border is still there, just invisible, which is what keeps the two variants
  * the same size.
@@ -324,7 +324,7 @@ async function expectOtpSlotsOverlapByBorder(scene: HTMLElement) {
 
 /**
  * Bug 1 from #726: the boundary was a hardcoded 1px shadow, so the
- * `[data-borderwidth]` appearance mode moved `MultiSelectTrigger` and
+ * `[data-nx-borderwidth]` appearance mode moved `MultiSelectTrigger` and
  * `Sidebar` but left every real field behind. A real border tracks it, and so
  * does the focus ring's outer half — `outline-default` reads the same
  * borderwidth token as `border-default`.
@@ -335,7 +335,7 @@ export const FieldBorderWidthModes: Story = {
       {BORDER_WIDTH_MODES.map(({ mode }) => (
         <div
           key={mode}
-          data-borderwidth={mode}
+          data-nx-borderwidth={mode}
           data-testid={`borderwidth-${mode}`}
           className="nx:flex nx:w-[420px] nx:flex-col nx:gap-3"
         >

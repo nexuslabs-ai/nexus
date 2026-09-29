@@ -1,7 +1,10 @@
+'use client';
+
 import * as React from 'react';
 
 import * as PopoverPrimitive from '@radix-ui/react-popover';
 
+import { useNexusRootAttributes } from '../../lib/nexus-root-context';
 import { cn } from '../../lib/utils';
 import {
   overlayFloatingTransitionClassName,
@@ -68,9 +71,11 @@ function PopoverContent({
   sideOffset = 4,
   ...props
 }: PopoverContentProps) {
+  const rootAttributes = useNexusRootAttributes();
   return (
     <PopoverPrimitive.Portal>
       <PopoverPrimitive.Content
+        {...rootAttributes}
         data-slot="popover-content"
         align={align}
         sideOffset={sideOffset}
