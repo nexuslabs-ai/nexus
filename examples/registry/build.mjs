@@ -4,7 +4,13 @@
 // The fixtures install @nexus_ds/core from a pack of the local package; pass
 // --npm-core to pin the published version instead.
 import { execFileSync } from 'node:child_process';
-import { mkdirSync, readFileSync, writeFileSync } from 'node:fs';
+import {
+  mkdirSync,
+  readdirSync,
+  readFileSync,
+  rmSync,
+  writeFileSync,
+} from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 
@@ -12,16 +18,11 @@ const registryDir = path.dirname(fileURLToPath(import.meta.url));
 const repoRoot = path.resolve(registryDir, '..', '..');
 const outDir = path.join(registryDir, '.generated');
 const depsDir = path.join(repoRoot, 'apps/docs/generated/dependencies');
+const tailwindDir = path.join(repoRoot, 'packages/tailwind');
+const providerDir = 'components/appearance/provider';
 
 const COMPONENTS = ['button', 'card', 'dialog', 'popover', 'progress'];
-const TAILWIND_PARTS = [
-  'variables.css',
-  'typography-utilities.css',
-  'borderwidth-utilities.css',
-  'border-color-aliases.css',
-  'motion-utilities.css',
-  'spacing-utilities.css',
-];
+const STYLES_DEPENDENCY = '@nexus/styles';
 // The package entry scans the whole app; a copied entry scans only its own tree.
 const PACKAGE_UTILITIES =
   "@import 'tailwindcss/utilities.css' layer(utilities) prefix(nx);";
@@ -60,74 +61,70 @@ function sourceFile(srcPath) {
   };
 }
 
-function componentItem(slug) {
-  const deps = JSON.parse(
-    readFileSync(path.join(depsDir, `${slug}.json`), 'utf8')
-  );
+function readClosure(slug) {
+  return JSON.parse(readFileSync(path.join(depsDir, `${slug}.json`), 'utf8'));
+}
+
+function componentItem(closure) {
   return {
-    name: slug,
+    name: closure.slug,
     type: 'registry:component',
-    dependencies: deps.install.map(({ name, range }) => `${name}@${range}`),
-    files: [...deps.files, ...deps.copy].sort().map(sourceFile),
+    registryDependencies: [STYLES_DEPENDENCY],
+    dependencies: closure.install.map(({ name, range }) => `${name}@${range}`),
+    files: [...closure.files, ...closure.copy].sort().map(sourceFile),
   };
 }
 
-function appearanceProvider(core) {
+function appearanceProviderItem(core) {
+  const files = readdirSync(path.join(repoRoot, 'packages/react/src', providerDir))
+    .filter((name) => !name.includes('.stories.'))
+    .map((name) => `${providerDir}/${name}`);
   return {
     name: 'appearance-provider',
     type: 'registry:component',
+    registryDependencies: [STYLES_DEPENDENCY],
     dependencies: [core],
-    files: [
-      ...[
-        'factory.tsx',
-        'index.ts',
-        'nexus-root.tsx',
-        'provider.tsx',
-        'script.tsx',
-        'server.ts',
-      ].map((name) => `components/appearance/provider/${name}`),
-      'lib/nexus-root-context.ts',
-    ].map(sourceFile),
+    files: [...files, 'lib/nexus-root-context.ts'].sort().map(sourceFile),
   };
 }
 
-function writeStylesheet() {
-  const nexusCss = readFileSync(
-    path.join(repoRoot, 'packages/tailwind/nexus.css'),
-    'utf8'
-  );
+function stylesheetItem(componentStyles) {
+  const nexusCss = readFileSync(path.join(tailwindDir, 'nexus.css'), 'utf8');
   if (!nexusCss.includes(PACKAGE_UTILITIES)) {
     throw new Error(
       `packages/tailwind/nexus.css no longer contains ${PACKAGE_UTILITIES}`
     );
   }
+  const tailwindParts = [...nexusCss.matchAll(/^@import '\.\/(.+)';$/gm)].map(
+    ([, name]) => name
+  );
   const entry = [
     nexusCss.replace(PACKAGE_UTILITIES, COPIED_UTILITIES),
     "@import 'tw-animate-css';",
-    "@import './components/progress/progress.css';",
+    ...componentStyles.map((srcPath) => `@import './${srcPath}';`),
     '',
   ].join('\n');
   writeFileSync(path.join(outDir, 'nexus.css'), entry);
-}
 
-const stylesheet = {
-  name: 'styles',
-  type: 'registry:file',
-  dependencies: ['tw-animate-css@^1.4.0'],
-  files: [
-    {
-      path: path.relative(repoRoot, path.join(outDir, 'nexus.css')),
-      type: 'registry:file',
-      target: target('nexus.css'),
-    },
-    ...TAILWIND_PARTS.map((name) => ({
-      path: `packages/tailwind/${name}`,
-      type: 'registry:file',
-      target: target(name),
-    })),
-    sourceFile('components/progress/progress.css'),
-  ],
-};
+  return {
+    name: 'styles',
+    type: 'registry:file',
+    dependencies: ['tw-animate-css@^1.4.0'],
+    files: [
+      {
+        path: path.relative(repoRoot, path.join(outDir, 'nexus.css')),
+        type: 'registry:file',
+        target: target('nexus.css'),
+      },
+      ...tailwindParts.map((name) => ({
+        path: path.relative(repoRoot, path.join(tailwindDir, name)),
+        type: 'registry:file',
+        target: target(name),
+      })),
+      ...componentStyles.map(sourceFile),
+    ],
+  };
+}
 
 // Records which source transforms the CLI applies: directive, leading
 // comment, a direct icon import, an @/ alias import and an @/ string.
@@ -157,21 +154,25 @@ const bareDependency = {
   files: [],
 };
 
+rmSync(outDir, { recursive: true, force: true });
 mkdirSync(outDir, { recursive: true });
 execFileSync('node', ['apps/docs/scripts/generate-dependencies.mjs'], {
   cwd: repoRoot,
   stdio: 'inherit',
 });
-writeStylesheet();
+const closures = COMPONENTS.map(readClosure);
+const componentStyles = [
+  ...new Set(closures.flatMap((closure) => closure.styles)),
+].sort();
 
 const registry = {
   $schema: 'https://ui.shadcn.com/schema/registry.json',
   name: 'nexus',
   homepage: 'https://github.com/nexuslabs-ai/nexus',
   items: [
-    ...COMPONENTS.map(componentItem),
-    appearanceProvider(coreDependency()),
-    stylesheet,
+    ...closures.map(componentItem),
+    appearanceProviderItem(coreDependency()),
+    stylesheetItem(componentStyles),
     transformProbe,
     bareDependency,
   ],
