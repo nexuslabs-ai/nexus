@@ -1559,7 +1559,7 @@ export const LiveRegionAnnouncements: Story = {
 
 // Canonical product-table recipe: filter + sortable header + row selection +
 // pagination + empty state, assembled over the Table primitives. State is plain
-// useState (TanStack Table in production; see the console adapter note below);
+// useState (TanStack Table in production; see the adapter note below);
 // no @tanstack/react-table dependency enters the package.
 interface RecipeRow {
   invoice: string;
@@ -2171,6 +2171,5 @@ export const DataTableStatesRecipe: Story = {
 
 // These recipe stories show the assembled shell, focused sortable headers,
 // selection, pagination, and state rows over the Table primitives with plain
-// React state. The production version wires TanStack Table over the same markup
-// in apps/console/src/components/data-table.tsx; the engine stays a consumer
-// dependency, out of the published bundle.
+// React state. A production app wires TanStack Table over the same markup; the
+// engine stays a consumer dependency, out of the published bundle.

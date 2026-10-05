@@ -2,8 +2,6 @@ import { oklch, parse } from 'culori';
 
 import primitiveColors from '../../tokens/primitives/color.json';
 
-import perceptualGrid from './perceptual-grid.json';
-
 export const SHADES = [
   '50',
   '100',
@@ -43,10 +41,6 @@ export type Mode = 'light' | 'dark';
 
 /** Surface tone families a Nexus theme can be seeded with. */
 export type NexusSurfaceTone = 'stone' | 'neutral' | 'zinc' | 'slate' | 'gray';
-
-export const PERCEPTUAL_L_GRID: Record<Shade, number> = Object.freeze(
-  perceptualGrid as Record<Shade, number>
-);
 
 export interface PaletteReference {
   c: number;
