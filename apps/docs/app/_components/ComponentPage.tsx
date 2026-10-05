@@ -16,7 +16,7 @@ import {
 import { InstallBlock } from './InstallBlock';
 import { PropsTable } from './PropsTable';
 
-type Example = { id: DemoId; name: string };
+type Example = { id: DemoId; name: string; alsoInstall: readonly string[] };
 
 /**
  * `examples/{slug}/demo.tsx` is the Preview and Code; every other demo in that
@@ -39,6 +39,7 @@ export function ComponentPage({ slug }: { slug: string }) {
     );
   }
 
+  const mainSlugs = [slug, ...demos[previewId].alsoInstall];
   const examples = examplesFor(slug, page.examples);
 
   return (
@@ -49,7 +50,7 @@ export function ComponentPage({ slug }: { slug: string }) {
       <SectionHeading className={SECTION_HEADING_CLASS}>
         Installation
       </SectionHeading>
-      <InstallBlock slug={slug} />
+      <InstallBlock slugs={mainSlugs} />
 
       <SectionHeading className={SECTION_HEADING_CLASS}>Code</SectionHeading>
       <ComponentSource id={previewId} />
@@ -62,7 +63,7 @@ export function ComponentPage({ slug }: { slug: string }) {
           Examples
         </SectionHeading>
       )}
-      {examples.map(({ id, name }) => (
+      {examples.map(({ id, name, alsoInstall }) => (
         <section key={id}>
           <SubsectionHeading
             id={`example-${slugify(name)}`}
@@ -71,6 +72,15 @@ export function ComponentPage({ slug }: { slug: string }) {
             {humanize(name)}
           </SubsectionHeading>
           <ComponentPreview id={id} />
+          <InstallBlock
+            slugs={alsoInstall}
+            besides={mainSlugs}
+            intro={
+              <p className="nx:typography-body-default nx:text-muted-foreground">
+                This example also needs:
+              </p>
+            }
+          />
           <ComponentSource id={id} />
         </section>
       ))}
@@ -93,6 +103,6 @@ function examplesFor(slug: string, order: readonly string[]): Example[] {
         `ComponentPage: no demo ${id} in the demo index — run \`pnpm --filter @nexus_ds/docs generate:demos\`.`
       );
     }
-    return { id, name };
+    return { id, name, alsoInstall: demos[id].alsoInstall };
   });
 }
