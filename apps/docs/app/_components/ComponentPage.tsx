@@ -39,6 +39,7 @@ export function ComponentPage({ slug }: { slug: string }) {
     );
   }
 
+  const mainSlugs = [slug, ...demos[previewId].alsoInstall];
   const examples = examplesFor(slug, page.examples);
 
   return (
@@ -49,7 +50,7 @@ export function ComponentPage({ slug }: { slug: string }) {
       <SectionHeading className={SECTION_HEADING_CLASS}>
         Installation
       </SectionHeading>
-      <InstallBlock slugs={[slug, ...demos[previewId].alsoInstall]} />
+      <InstallBlock slugs={mainSlugs} />
 
       <SectionHeading className={SECTION_HEADING_CLASS}>Code</SectionHeading>
       <ComponentSource id={previewId} />
@@ -71,14 +72,15 @@ export function ComponentPage({ slug }: { slug: string }) {
             {humanize(name)}
           </SubsectionHeading>
           <ComponentPreview id={id} />
-          {alsoInstall.length > 0 && (
-            <>
+          <InstallBlock
+            slugs={alsoInstall}
+            besides={mainSlugs}
+            intro={
               <p className="nx:typography-body-default nx:text-muted-foreground">
                 This example also needs:
               </p>
-              <InstallBlock slugs={alsoInstall} besides={[slug]} />
-            </>
-          )}
+            }
+          />
           <ComponentSource id={id} />
         </section>
       ))}

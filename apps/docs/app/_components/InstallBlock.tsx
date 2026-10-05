@@ -1,3 +1,5 @@
+import type { ReactNode } from 'react';
+
 import { type Dependencies, loadDependencies } from '../_lib/dependencies';
 
 import { CodeBlock } from './CodeBlock';
@@ -22,9 +24,11 @@ function missing(
 export async function InstallBlock({
   slugs,
   besides = [],
+  intro,
 }: {
   slugs: readonly string[];
   besides?: readonly string[];
+  intro?: ReactNode;
 }) {
   const [needed, installed] = await Promise.all([
     Promise.all(slugs.map((slug) => loadDependencies(slug))),
@@ -33,9 +37,11 @@ export async function InstallBlock({
   const packages = missing(packagesOf, needed, installed);
   const toCopy = missing(filesOf, needed, installed);
   const styles = missing(stylesOf, needed, installed);
+  if (packages.length + toCopy.length + styles.length === 0) return null;
 
   return (
     <>
+      {intro}
       {packages.length > 0 && (
         <CodeSample lang="bash">{`npm install ${packages.join(' ')}`}</CodeSample>
       )}
