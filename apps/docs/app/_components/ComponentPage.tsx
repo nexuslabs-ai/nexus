@@ -1,4 +1,9 @@
-import { type DemoId, demos, isDemoId } from '../../__generated__/demo-index';
+import {
+  type Demo,
+  type DemoId,
+  demos,
+  isDemoId,
+} from '../../__generated__/demo-index';
 import { PREVIEW_DEMO } from '../../scripts/examples.mjs';
 import { humanize } from '../../scripts/humanize.mjs';
 import { requireSection } from '../_lib/manifest';
@@ -39,7 +44,7 @@ export function ComponentPage({ slug }: { slug: string }) {
     );
   }
 
-  const previewAlsoInstall = demos[previewId].alsoInstall;
+  const preview: Demo = demos[previewId];
   const examples = examplesFor(slug, page.examples);
 
   return (
@@ -52,8 +57,9 @@ export function ComponentPage({ slug }: { slug: string }) {
       </SectionHeading>
       <InstallBlock slugs={[slug]} />
       <InstallBlock
-        slugs={previewAlsoInstall}
+        slugs={preview.alsoInstall}
         besides={[slug]}
+        alsoPackages={preview.packages}
         caption="The code below also uses:"
       />
 
@@ -79,7 +85,10 @@ export function ComponentPage({ slug }: { slug: string }) {
           <ComponentPreview id={id} />
           <InstallBlock
             slugs={demos[id].alsoInstall}
-            besides={[slug, ...previewAlsoInstall]}
+            besides={[slug, ...preview.alsoInstall]}
+            alsoPackages={demos[id].packages.filter(
+              (spec) => !preview.packages.includes(spec)
+            )}
             caption="This example also needs:"
           />
           <ComponentSource id={id} />

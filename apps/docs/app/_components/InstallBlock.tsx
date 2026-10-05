@@ -10,31 +10,33 @@ const packagesOf: ListOf = ({ install }) =>
 const filesOf: ListOf = ({ copy, files }) => [...copy, ...files];
 const stylesOf: ListOf = ({ styles }) => styles;
 
-function missing(
-  pick: ListOf,
-  needed: Dependencies[],
-  installed: Dependencies[]
-) {
-  const have = new Set(installed.flatMap(pick));
-  return [...new Set(needed.flatMap(pick))].filter((item) => !have.has(item));
+function missing(needed: string[], installed: string[]) {
+  const have = new Set(installed);
+  return [...new Set(needed)].filter((item) => !have.has(item));
 }
 
 export async function InstallBlock({
   slugs,
   besides = [],
+  alsoPackages = [],
   caption,
 }: {
   slugs: readonly string[];
   besides?: readonly string[];
+  /** `name@range` packages to install beyond what `slugs` install. */
+  alsoPackages?: readonly string[];
   caption?: string;
 }) {
   const [needed, installed] = await Promise.all([
     Promise.all(slugs.map((slug) => loadDependencies(slug))),
     Promise.all(besides.map((slug) => loadDependencies(slug))),
   ]);
-  const packages = missing(packagesOf, needed, installed);
-  const toCopy = missing(filesOf, needed, installed);
-  const styles = missing(stylesOf, needed, installed);
+  const packages = missing(
+    [...needed.flatMap(packagesOf), ...alsoPackages],
+    installed.flatMap(packagesOf)
+  );
+  const toCopy = missing(needed.flatMap(filesOf), installed.flatMap(filesOf));
+  const styles = missing(needed.flatMap(stylesOf), installed.flatMap(stylesOf));
   if (packages.length + toCopy.length + styles.length === 0) {
     return null;
   }

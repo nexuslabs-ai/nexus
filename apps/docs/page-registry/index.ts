@@ -215,9 +215,9 @@ export const PAGE_REGISTRY = {
       {
         slug: 'display',
         label: 'Display',
-        components: ['Badge', 'Avatar', 'Tooltip'],
+        components: ['Avatar', 'Tooltip'],
         wireframe: {
-          lede: '[ Badge · Avatar · Tooltip ]',
+          lede: '[ Avatar · Tooltip ]',
           blocks: [
             {
               type: 'placeholder',
@@ -242,6 +242,11 @@ export const PAGE_REGISTRY = {
             { type: 'placeholder', label: '[ API table ]' },
           ],
         },
+      },
+      {
+        slug: 'badge',
+        label: 'Badge',
+        examples: ['variants', 'fills', 'with-icon', 'icon-only'],
       },
       {
         slug: 'button',
