@@ -39,18 +39,24 @@
   transition-property: color, background-color, border-color;
   transition-timing-function: var(
     --tw-ease,
-    var(--default-transition-timing-function)
+    --theme(--default-transition-timing-function)
   );
-  transition-duration: var(--tw-duration, var(--default-transition-duration));
+  transition-duration: var(
+    --tw-duration,
+    --theme(--default-transition-duration)
+  );
 }
 
 @utility transition-field {
   transition-property: color, background-color;
   transition-timing-function: var(
     --tw-ease,
-    var(--default-transition-timing-function)
+    --theme(--default-transition-timing-function)
   );
-  transition-duration: var(--tw-duration, var(--default-transition-duration));
+  transition-duration: var(
+    --tw-duration,
+    --theme(--default-transition-duration)
+  );
 }
 
 @keyframes overlay-presence-exit {

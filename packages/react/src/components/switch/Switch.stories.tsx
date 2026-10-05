@@ -108,7 +108,7 @@ export const Invalid: Story = {
     await expect(switchEl).toHaveAccessibleDescription(
       'This setting must be enabled to continue.'
     );
-    await expect(switchEl).toHaveClass('nx:aria-invalid:border-border-error');
+    await expect(switchEl).toHaveClass('nx:aria-invalid:border-error-border');
     await expect(switchEl).toHaveClass(
       'nx:aria-invalid:focus-visible:outline-focus-error'
     );

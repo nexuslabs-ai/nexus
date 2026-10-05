@@ -169,7 +169,8 @@ function readInstallBlocks() {
 
 /**
  * A demo pastes beside its folder's block, if the folder is a component, and
- * beside each imported component's block that no other one already copies.
+ * beside each imported component's block that no block kept before it
+ * already copies — largest first, so a block is dropped for one that is listed.
  */
 function installSlugsFor(id, specifiers, blocks) {
   const folder = id.split('/')[0];
@@ -189,18 +190,19 @@ function installSlugsFor(id, specifiers, blocks) {
     }
   }
 
-  const all = own ? [own, ...imported] : imported;
-  const coveredByAnother = (slug) =>
-    all.some(
-      (other) =>
-        other !== slug &&
-        blocks
-          .get(slug)
-          .files.every((file) => blocks.get(other).copied.has(file))
+  const kept = own ? [own] : [];
+  const extra = [];
+  const largestFirst = imported
+    .filter((slug) => slug !== own)
+    .sort((a, b) => blocks.get(b).copied.size - blocks.get(a).copied.size);
+  for (const slug of largestFirst) {
+    const covered = kept.some((other) =>
+      blocks.get(slug).files.every((file) => blocks.get(other).copied.has(file))
     );
-  const extra = imported.filter(
-    (slug) => slug !== own && !coveredByAnother(slug)
-  );
+    if (covered) continue;
+    kept.push(slug);
+    extra.push(slug);
+  }
 
   if (!own && extra.length === 0) {
     throw new Error(

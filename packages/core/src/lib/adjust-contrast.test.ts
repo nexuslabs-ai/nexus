@@ -2,8 +2,10 @@ import { APCAcontrast, sRGBtoY } from 'apca-w3';
 import { clampChroma, converter, oklch, parse } from 'culori';
 import { describe, expect, it } from 'vitest';
 
+import { PERCEPTUAL_L_GRID } from '../token-source/perceptual-grid';
+
 import { adjustContrast } from './adjust-contrast';
-import { PALETTE_KEYS, PERCEPTUAL_L_GRID, TIER_THRESHOLDS } from './palette';
+import { PALETTE_KEYS, TIER_THRESHOLDS } from './palette';
 
 const toRgb = converter('rgb');
 const GRID_L_VALUES = Object.values(PERCEPTUAL_L_GRID);

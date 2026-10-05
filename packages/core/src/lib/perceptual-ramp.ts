@@ -1,7 +1,9 @@
 import { clampChroma, type Oklch, oklch, parse } from 'culori';
 
+import { PERCEPTUAL_L_GRID } from '../token-source/perceptual-grid';
+
 import { formatOklch } from './oklch-format';
-import { PERCEPTUAL_L_GRID, type Shade, SHADES } from './palette';
+import { type Shade, SHADES } from './palette';
 
 // emit ships P3 chroma (browsers gamut-map at render); sit just inside the cusp.
 const EMIT_GAMUT = 'p3';
