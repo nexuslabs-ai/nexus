@@ -94,29 +94,17 @@ function ToggleGroup({
   );
 }
 
-// A bordered item after another bordered item drops its leading border, so the
-// pair's shared edge is the first item's trailing border. That edge takes the
-// next item's hover / selected / invalid colour unless the first item is
-// itself invalid; a selected invalid next item wins even then, and hover never
-// replaces a selected first item's colour. Each rule matches a distinct
-// next-item state, so no two rules compete.
+// Joined bordered items overlap by one stroke, so each pair shares a single
+// edge. Whichever item stacks higher paints that edge: focus, then selected
+// invalid, invalid, selected, hover; equal items fall back to DOM order, so
+// the later one wins. Focus uses an arbitrary variant because Tailwind sorts
+// those after the `aria-*` / `data-*` rungs it has to beat.
 const joinedItem = {
-  horizontal: [
-    'nx:first:rounded-s-md nx:last:rounded-e-md',
-    'nx:[[data-slot=toggle-group-item]:not([data-variant=default])+&]:border-s-0',
-    'nx:[&:not([aria-invalid=true]:not(:disabled)):not([data-variant=outline-primary][data-state=on]:not(:disabled)):has(+[data-variant=outline-primary][data-state=off]:not([aria-invalid=true]):not(:disabled):hover)]:border-e-primary-border',
-    'nx:[&:not([aria-invalid=true]:not(:disabled)):has(+[data-variant=outline-primary][data-state=on]:not([aria-invalid=true]):not(:disabled))]:border-e-primary-border-active',
-    'nx:[&:not([aria-invalid=true]:not(:disabled)):has(+:is([data-variant=outline],[data-variant=outline-primary][data-state=off])[aria-invalid=true]:not(:disabled))]:border-e-error-border',
-    'nx:[&:has(+[data-variant=outline-primary][data-state=on][aria-invalid=true]:not(:disabled))]:border-e-border-error-active',
-  ],
-  vertical: [
-    'nx:first:rounded-t-md nx:last:rounded-b-md',
-    'nx:[[data-slot=toggle-group-item]:not([data-variant=default])+&]:border-t-0',
-    'nx:[&:not([aria-invalid=true]:not(:disabled)):not([data-variant=outline-primary][data-state=on]:not(:disabled)):has(+[data-variant=outline-primary][data-state=off]:not([aria-invalid=true]):not(:disabled):hover)]:border-b-primary-border',
-    'nx:[&:not([aria-invalid=true]:not(:disabled)):has(+[data-variant=outline-primary][data-state=on]:not([aria-invalid=true]):not(:disabled))]:border-b-primary-border-active',
-    'nx:[&:not([aria-invalid=true]:not(:disabled)):has(+:is([data-variant=outline],[data-variant=outline-primary][data-state=off])[aria-invalid=true]:not(:disabled))]:border-b-error-border',
-    'nx:[&:has(+[data-variant=outline-primary][data-state=on][aria-invalid=true]:not(:disabled))]:border-b-border-error-active',
-  ],
+  base: 'nx:relative nx:rounded-none nx:hover:z-10 nx:data-[state=on]:z-20 nx:aria-invalid:z-30 nx:aria-invalid:data-[state=on]:z-40 nx:[&:focus-visible]:z-50',
+  horizontal:
+    'nx:first:rounded-s-md nx:last:rounded-e-md nx:[[data-slot=toggle-group-item]:not([data-variant=default])+&:not([data-variant=default])]:-ms-px',
+  vertical:
+    'nx:first:rounded-t-md nx:last:rounded-b-md nx:[[data-slot=toggle-group-item]:not([data-variant=default])+&:not([data-variant=default])]:-mt-px',
 } as const;
 
 /**
@@ -152,10 +140,7 @@ function ToggleGroupItem({
       className={cn(
         toggleVariants({ variant: resolvedVariant, size: resolvedSize }),
         'nx:min-w-0 nx:shrink-0',
-        joined && [
-          'nx:rounded-none nx:focus-visible:relative nx:focus-visible:z-10',
-          joinedItem[context.orientation],
-        ],
+        joined && [joinedItem.base, joinedItem[context.orientation]],
         className
       )}
       {...props}

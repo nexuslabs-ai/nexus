@@ -154,6 +154,9 @@ const GEOMETRY_LAYOUTS = [
   { name: 'Vertical RTL', dir: 'rtl', orientation: 'vertical' },
 ] as const;
 
+const stackLevel = (item: HTMLElement) =>
+  Number.parseInt(getComputedStyle(item).zIndex, 10) || 0;
+
 export const GeometryMatrix: Story = {
   render: () => (
     <div className="nx:flex nx:flex-wrap nx:items-start nx:gap-8">
@@ -209,28 +212,28 @@ export const GeometryMatrix: Story = {
           : rtl
             ? before.left - after.right
             : after.left - before.right;
-        const expected = joined
-          ? 0
-          : Number.parseFloat(getComputedStyle(group).gap);
+        // Two bordered neighbours overlap by one stroke to share an edge; a
+        // borderless item sits flush against its neighbour.
+        const overlapped =
+          item.dataset.variant !== 'default' &&
+          previous.dataset.variant !== 'default';
+        const expected = !joined
+          ? Number.parseFloat(getComputedStyle(group).gap)
+          : overlapped
+            ? -stroke
+            : 0;
         await expect(gap).toBeCloseTo(expected, 2);
-        if (item.dataset.variant === 'default') continue;
-        // A bordered item drops its leading border only against a bordered
-        // neighbour; next to a borderless item it keeps its own edge.
-        const collapsed = joined && previous.dataset.variant !== 'default';
-        const leading = vertical
-          ? getComputedStyle(item).borderTopWidth
-          : getComputedStyle(item).borderInlineStartWidth;
-        await expect(leading).toBe(collapsed ? '0px' : `${stroke}px`);
       }
       if (joined) {
         for (const item of items) {
           item.focus();
           await expect(item).toHaveFocus();
-          await expect(getComputedStyle(item).zIndex).toBe('10');
           for (const neighbor of items.filter(
             (candidate) => candidate !== item
           )) {
-            await expect(getComputedStyle(neighbor).zIndex).toBe('auto');
+            await expect(stackLevel(item)).toBeGreaterThan(
+              stackLevel(neighbor)
+            );
           }
         }
       }
@@ -241,7 +244,6 @@ export const GeometryMatrix: Story = {
 interface SharedEdgeCase {
   name: string;
   variant: 'outline' | 'outline-primary';
-  spacing: number;
   leading: { invalid?: boolean; pressed?: boolean };
   trailing: { invalid?: boolean; pressed?: boolean; disabled?: boolean };
   owner: 'own' | 'next';
@@ -251,7 +253,6 @@ const SHARED_EDGE_CASES: readonly SharedEdgeCase[] = [
   {
     name: 'rest',
     variant: 'outline-primary',
-    spacing: 0,
     leading: {},
     trailing: {},
     owner: 'own',
@@ -259,7 +260,6 @@ const SHARED_EDGE_CASES: readonly SharedEdgeCase[] = [
   {
     name: 'leading selected',
     variant: 'outline-primary',
-    spacing: 0,
     leading: { pressed: true },
     trailing: {},
     owner: 'own',
@@ -267,7 +267,6 @@ const SHARED_EDGE_CASES: readonly SharedEdgeCase[] = [
   {
     name: 'selected',
     variant: 'outline-primary',
-    spacing: 0,
     leading: {},
     trailing: { pressed: true },
     owner: 'next',
@@ -275,7 +274,6 @@ const SHARED_EDGE_CASES: readonly SharedEdgeCase[] = [
   {
     name: 'invalid',
     variant: 'outline-primary',
-    spacing: 0,
     leading: {},
     trailing: { invalid: true },
     owner: 'next',
@@ -283,7 +281,6 @@ const SHARED_EDGE_CASES: readonly SharedEdgeCase[] = [
   {
     name: 'invalid selected',
     variant: 'outline-primary',
-    spacing: 0,
     leading: {},
     trailing: { invalid: true, pressed: true },
     owner: 'next',
@@ -291,7 +288,6 @@ const SHARED_EDGE_CASES: readonly SharedEdgeCase[] = [
   {
     name: 'disabled selected',
     variant: 'outline-primary',
-    spacing: 0,
     leading: {},
     trailing: { disabled: true, pressed: true },
     owner: 'own',
@@ -299,7 +295,6 @@ const SHARED_EDGE_CASES: readonly SharedEdgeCase[] = [
   {
     name: 'own invalid',
     variant: 'outline-primary',
-    spacing: 0,
     leading: { invalid: true },
     trailing: { pressed: true },
     owner: 'own',
@@ -307,23 +302,20 @@ const SHARED_EDGE_CASES: readonly SharedEdgeCase[] = [
   {
     name: 'both invalid selected',
     variant: 'outline-primary',
-    spacing: 0,
     leading: { invalid: true },
     trailing: { invalid: true, pressed: true },
     owner: 'next',
   },
   {
-    name: 'spaced',
+    name: 'own invalid selected',
     variant: 'outline-primary',
-    spacing: 2,
-    leading: {},
-    trailing: { pressed: true },
+    leading: { invalid: true, pressed: true },
+    trailing: { invalid: true },
     owner: 'own',
   },
   {
     name: 'outline selected',
     variant: 'outline',
-    spacing: 0,
     leading: {},
     trailing: { pressed: true },
     owner: 'own',
@@ -331,7 +323,6 @@ const SHARED_EDGE_CASES: readonly SharedEdgeCase[] = [
   {
     name: 'outline invalid',
     variant: 'outline',
-    spacing: 0,
     leading: {},
     trailing: { invalid: true },
     owner: 'next',
@@ -339,7 +330,6 @@ const SHARED_EDGE_CASES: readonly SharedEdgeCase[] = [
   {
     name: 'outline invalid selected',
     variant: 'outline',
-    spacing: 0,
     leading: {},
     trailing: { invalid: true, pressed: true },
     owner: 'next',
@@ -347,7 +337,6 @@ const SHARED_EDGE_CASES: readonly SharedEdgeCase[] = [
   {
     name: 'outline disabled invalid',
     variant: 'outline',
-    spacing: 0,
     leading: {},
     trailing: { invalid: true, disabled: true },
     owner: 'own',
@@ -355,40 +344,13 @@ const SHARED_EDGE_CASES: readonly SharedEdgeCase[] = [
   {
     name: 'outline own invalid',
     variant: 'outline',
-    spacing: 0,
     leading: { invalid: true },
     trailing: { pressed: true },
     owner: 'own',
   },
-  {
-    name: 'outline spaced',
-    variant: 'outline',
-    spacing: 2,
-    leading: {},
-    trailing: { invalid: true },
-    owner: 'own',
-  },
 ];
 
-// Synthetic hover events do not set CSS `:hover`, so the hover rule is
-// asserted by class, and its state guards by matching the rule's selector
-// with `:hover` dropped.
-const HOVER_SHARED_EDGE = {
-  horizontal:
-    'nx:[&:not([aria-invalid=true]:not(:disabled)):not([data-variant=outline-primary][data-state=on]:not(:disabled)):has(+[data-variant=outline-primary][data-state=off]:not([aria-invalid=true]):not(:disabled):hover)]:border-e-primary-border',
-  vertical:
-    'nx:[&:not([aria-invalid=true]:not(:disabled)):not([data-variant=outline-primary][data-state=on]:not(:disabled)):has(+[data-variant=outline-primary][data-state=off]:not([aria-invalid=true]):not(:disabled):hover)]:border-b-primary-border',
-} as const;
-
-const matchesHoverRule = (item: HTMLElement, hoverClass: string) =>
-  item.matches(
-    hoverClass
-      .slice('nx:['.length, hoverClass.lastIndexOf(']:'))
-      .replace('&', '')
-      .replace(':hover', '')
-  );
-
-// Pins the shared-edge colour rules on `joinedItem` in toggle-group.tsx.
+// Pins which item paints the shared edge of a joined pair.
 export const JoinedSharedEdge: Story = {
   render: () => (
     <div className="nx:flex nx:flex-wrap nx:items-start nx:gap-8">
@@ -400,7 +362,6 @@ export const JoinedSharedEdge: Story = {
               key={label}
               type="multiple"
               variant={edgeCase.variant}
-              spacing={edgeCase.spacing}
               dir={layout.dir}
               orientation={layout.orientation}
               defaultValue={(['leading', 'trailing'] as const).filter(
@@ -443,35 +404,23 @@ export const JoinedSharedEdge: Story = {
           : getComputedStyle(item).borderInlineEndColor;
       const item = (label: string, position: 'leading' | 'trailing') =>
         canvas.getByRole('button', { name: `${label} ${position}` });
-      const selected = end(item(`${layout.name} selected`, 'trailing'));
-      const hoverEdge = HOVER_SHARED_EDGE[layout.orientation];
-      await expect(item(`${layout.name} selected`, 'leading')).toHaveClass(
-        hoverEdge
+      await expect(item(`${layout.name} rest`, 'trailing')).toHaveClass(
+        'nx:hover:z-10'
       );
-      await expect(item(`${layout.name} spaced`, 'leading')).not.toHaveClass(
-        hoverEdge
-      );
-      await expect(
-        matchesHoverRule(item(`${layout.name} rest`, 'leading'), hoverEdge)
-      ).toBe(true);
-      await expect(
-        matchesHoverRule(
-          item(`${layout.name} leading selected`, 'leading'),
-          hoverEdge
-        )
-      ).toBe(false);
       for (const edgeCase of SHARED_EDGE_CASES) {
         const label = `${layout.name} ${edgeCase.name}`;
         const leading = item(label, 'leading');
         const trailing = item(label, 'trailing');
+        const seam =
+          stackLevel(trailing) >= stackLevel(leading)
+            ? start(trailing)
+            : end(leading);
         if (edgeCase.owner === 'next') {
-          await expect(end(trailing), label).not.toBe(start(leading));
-          await expect(end(leading), label).toBe(end(trailing));
+          await expect(start(trailing), label).not.toBe(end(leading));
+          await expect(seam, label).toBe(start(trailing));
           continue;
         }
-        await expect(end(leading), label).toBe(start(leading));
-        if (edgeCase.leading.pressed) continue;
-        await expect(start(leading), label).not.toBe(selected);
+        await expect(seam, label).toBe(end(leading));
       }
     }
   },
