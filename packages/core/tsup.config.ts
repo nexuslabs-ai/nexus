@@ -2,7 +2,11 @@ import { defineConfig } from 'tsup';
 
 export default defineConfig([
   {
-    entry: { index: 'src/index.ts', palette: 'src/palette.ts' },
+    entry: {
+      index: 'src/index.ts',
+      palette: 'src/palette.ts',
+      catalogue: 'src/catalogue.ts',
+    },
     format: ['cjs', 'esm'],
     outDir: 'dist/runtime',
     dts: true,

@@ -91,6 +91,8 @@ await writeFile(
   type BrandColorPreset,
   type Mode,
   type NexusAppearanceState,
+  type SemanticColorName,
+  type SurfaceToken,
   type ThemeContrastCheck,
   type Tier,
 } from '@nexus_ds/core';
@@ -103,6 +105,15 @@ import {
   type PrimitivePaletteRamp,
   type Shade,
 } from '@nexus_ds/core/palette';
+import {
+  createTokenCatalogue,
+  DARK_SURFACE_LADDER,
+  LIGHT_SURFACE_LADDER,
+  SURFACE_TOKENS,
+  type CatalogueToken,
+  type CatalogueTokenName,
+  type ShadeAnchor,
+} from '@nexus_ds/core/catalogue';
 
 const preset: BrandColorPreset | undefined = BRAND_COLOR_PRESETS[0];
 if (preset) {
@@ -130,6 +141,31 @@ void green;
 void palettes;
 void shades;
 
+const catalogue: readonly CatalogueToken[] = createTokenCatalogue();
+const catalogued = catalogue[0];
+if (catalogued) {
+  const name: CatalogueTokenName = catalogued.name;
+  const variant = catalogued.variants[0];
+  const themeMode: Mode | null | undefined = variant?.mode;
+  const filePreset: string | null | undefined = variant?.preset;
+  const file: string | undefined = variant?.source?.file;
+  const appearanceMode: string | undefined = variant?.appearance?.mode;
+  // @ts-expect-error catalogue variants are immutable.
+  catalogued.variants.push(catalogued.variants[0]);
+  if (variant?.appearance) {
+    // @ts-expect-error a variant's appearance is immutable.
+    variant.appearance.prefs.uiFontSize = 16;
+  }
+  void name;
+  void themeMode;
+  void filePreset;
+  void file;
+  void appearanceMode;
+}
+// @ts-expect-error canonical names are in the --nx-* scheme.
+const aliasName: CatalogueTokenName = '--color-background';
+void aliasName;
+
 const state: NexusAppearanceState = sanitizeNexusAppearance({
   ...DEFAULT_NEXUS_APPEARANCE,
   mode: 'system',
@@ -153,6 +189,16 @@ const checkTier: Tier | undefined = checks[0]?.tier;
 // @ts-expect-error contrast checks are typed records.
 checks[0]?.notAContrastCheckField;
 
+const surface: SurfaceToken = SURFACE_TOKENS[0];
+const lightAnchor: ShadeAnchor = LIGHT_SURFACE_LADDER[surface];
+const darkAnchor: ShadeAnchor = DARK_SURFACE_LADDER[surface];
+// @ts-expect-error the surface ladders are keyed by surface tokens only.
+void LIGHT_SURFACE_LADDER['primary-background'];
+
+const colorName: SemanticColorName = 'popover-alpha';
+// @ts-expect-error semantic colour names are the registry's literal names.
+const unknownColorName: SemanticColorName = 'not-a-color-token';
+
 // @ts-expect-error proves the public state is not any.
 state.notARealNexusAppearanceField;
 
@@ -164,6 +210,10 @@ void firstPaint.colorScheme;
 void lc;
 void checkMode;
 void checkTier;
+void lightAnchor;
+void darkAnchor;
+void colorName;
+void unknownColorName;
 `
 );
 
