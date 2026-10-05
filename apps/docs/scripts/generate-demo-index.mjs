@@ -49,6 +49,8 @@ import type { ComponentType } from 'react';
 export interface Demo {
   /** Path under apps/docs/examples/ without the .tsx extension. */
   id: string;
+  /** Install blocks the demo needs beyond its folder's own. */
+  alsoInstall: readonly string[];
   /** Loads the demo's component and its own source text together. */
   load: () => Promise<{ Component: ComponentType; source: string }>;
 }
@@ -75,6 +77,7 @@ export function getDemo(id: string): Demo {
  * @typedef {object} DemoFile
  * @property {string} id Path under examples/ without the .tsx extension.
  * @property {string} source The demo file's full contents.
+ * @property {string[]} alsoInstall Install blocks it needs beyond its folder's.
  */
 
 function walk(dir) {
@@ -151,6 +154,7 @@ function readInstallBlocks() {
     );
     blocks.set(slug, {
       packages: new Set(install.map(({ name }) => name)),
+      files: files.map(withoutExtension),
       copied: new Set([...copy, ...files].map(withoutExtension)),
     });
   }
@@ -158,41 +162,51 @@ function readInstallBlocks() {
 }
 
 /**
- * A component's demos paste beside its own install block. A folder with no
- * block of its own, like `getting-started`, pastes beside the block of every
- * component it imports.
+ * A demo pastes beside its folder's block, if the folder is a component, and
+ * beside each imported component's block that no block kept before it
+ * already copies — largest first, so a block is dropped for one that is listed.
  */
 function installSlugsFor(id, specifiers, blocks) {
   const folder = id.split('/')[0];
-  if (blocks.has(folder)) {
-    return [folder];
-  }
-
-  const slugs = [
+  const own = blocks.has(folder) ? folder : undefined;
+  const imported = [
     ...new Set(
       specifiers
         .map((specifier) => specifier.match(COMPONENT_IMPORT)?.[1])
         .filter(Boolean)
     ),
   ];
-  if (slugs.length === 0) {
-    throw new Error(
-      `Demo ${id} imports no @/components/, and ${folder} has no install block of its own, so there is nothing to paste it beside. Import the component it demonstrates, or move it to examples/{slug}/.`
-    );
-  }
-  for (const slug of slugs) {
+  for (const slug of imported) {
     if (!blocks.has(slug)) {
       throw new Error(
         `Demo ${id} imports @/components/${slug}, but there is no ${slug} install block for it.`
       );
     }
   }
-  return slugs;
+
+  const kept = own ? [own] : [];
+  const extra = [];
+  const largestFirst = imported
+    .filter((slug) => slug !== own)
+    .sort((a, b) => blocks.get(b).copied.size - blocks.get(a).copied.size);
+  for (const slug of largestFirst) {
+    const covered = kept.some((other) =>
+      blocks.get(slug).files.every((file) => blocks.get(other).copied.has(file))
+    );
+    if (covered) continue;
+    kept.push(slug);
+    extra.push(slug);
+  }
+
+  if (!own && extra.length === 0) {
+    throw new Error(
+      `Demo ${id} imports no @/components/, and ${folder} has no install block of its own, so there is nothing to paste it beside. Import the component it demonstrates, or move it to examples/{slug}/.`
+    );
+  }
+  return { own, extra };
 }
 
-function assertImportsInstalled(id, source, blocks) {
-  const specifiers = importSpecifiers(source);
-  const slugs = installSlugsFor(id, specifiers, blocks);
+function assertImportsInstalled(id, specifiers, slugs, blocks) {
   const ownBlock = blocks.has(id.split('/')[0]);
   const packages = new Set(
     slugs.flatMap((slug) => [...blocks.get(slug).packages])
@@ -253,9 +267,16 @@ function collectDemos() {
         );
       }
       const source = readCanonical(file);
-      assertImportsInstalled(id, source, installBlocks);
+      const specifiers = importSpecifiers(source);
+      const { own, extra } = installSlugsFor(id, specifiers, installBlocks);
+      assertImportsInstalled(
+        id,
+        specifiers,
+        own ? [own, ...extra] : extra,
+        installBlocks
+      );
 
-      return { id, source };
+      return { id, source, alsoInstall: extra };
     })
     .sort((a, b) => (a.id < b.id ? -1 : a.id > b.id ? 1 : 0));
 }
@@ -289,6 +310,7 @@ function renderDemoIndex(demos) {
       [
         `  ${JSON.stringify(demo.id)}: {`,
         `    id: ${JSON.stringify(demo.id)},`,
+        `    alsoInstall: ${JSON.stringify(demo.alsoInstall)},`,
         `    load: () => import(${JSON.stringify(`./${MODULES_DIR}/${demo.id}`)}),`,
         `  },`,
       ].join('\n')

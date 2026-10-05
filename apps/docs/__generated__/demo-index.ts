@@ -6,6 +6,8 @@ import type { ComponentType } from 'react';
 export interface Demo {
   /** Path under apps/docs/examples/ without the .tsx extension. */
   id: string;
+  /** Install blocks the demo needs beyond its folder's own. */
+  alsoInstall: readonly string[];
   /** Loads the demo's component and its own source text together. */
   load: () => Promise<{ Component: ComponentType; source: string }>;
 }
@@ -13,47 +15,153 @@ export interface Demo {
 export const demos = {
   "badge/demo": {
     id: "badge/demo",
+    alsoInstall: [],
     load: () => import("./demos/badge/demo"),
   },
   "badge/fills": {
     id: "badge/fills",
+    alsoInstall: [],
     load: () => import("./demos/badge/fills"),
   },
   "badge/icon-only": {
     id: "badge/icon-only",
+    alsoInstall: [],
     load: () => import("./demos/badge/icon-only"),
   },
   "badge/variants": {
     id: "badge/variants",
+    alsoInstall: [],
     load: () => import("./demos/badge/variants"),
   },
   "badge/with-icon": {
     id: "badge/with-icon",
+    alsoInstall: [],
     load: () => import("./demos/badge/with-icon"),
   },
   "button/demo": {
     id: "button/demo",
+    alsoInstall: [],
     load: () => import("./demos/button/demo"),
   },
   "button/disabled": {
     id: "button/disabled",
+    alsoInstall: [],
     load: () => import("./demos/button/disabled"),
   },
   "button/sizes": {
     id: "button/sizes",
+    alsoInstall: [],
     load: () => import("./demos/button/sizes"),
   },
   "button/variants": {
     id: "button/variants",
+    alsoInstall: [],
     load: () => import("./demos/button/variants"),
   },
   "button/with-icon": {
     id: "button/with-icon",
+    alsoInstall: [],
     load: () => import("./demos/button/with-icon"),
+  },
+  "card/content-only": {
+    id: "card/content-only",
+    alsoInstall: [],
+    load: () => import("./demos/card/content-only"),
+  },
+  "card/demo": {
+    id: "card/demo",
+    alsoInstall: ["button"],
+    load: () => import("./demos/card/demo"),
+  },
+  "card/footer-actions": {
+    id: "card/footer-actions",
+    alsoInstall: ["button"],
+    load: () => import("./demos/card/footer-actions"),
+  },
+  "card/header-with-action": {
+    id: "card/header-with-action",
+    alsoInstall: ["button"],
+    load: () => import("./demos/card/header-with-action"),
+  },
+  "card/sign-in-form": {
+    id: "card/sign-in-form",
+    alsoInstall: ["button","input","label"],
+    load: () => import("./demos/card/sign-in-form"),
+  },
+  "dialog/demo": {
+    id: "dialog/demo",
+    alsoInstall: ["button"],
+    load: () => import("./demos/dialog/demo"),
+  },
+  "dialog/prop-driven": {
+    id: "dialog/prop-driven",
+    alsoInstall: ["button"],
+    load: () => import("./demos/dialog/prop-driven"),
+  },
+  "dialog/scrollable-body": {
+    id: "dialog/scrollable-body",
+    alsoInstall: ["button"],
+    load: () => import("./demos/dialog/scrollable-body"),
+  },
+  "dialog/with-form": {
+    id: "dialog/with-form",
+    alsoInstall: ["button","input","label"],
+    load: () => import("./demos/dialog/with-form"),
+  },
+  "dropdown-menu/checkbox-items": {
+    id: "dropdown-menu/checkbox-items",
+    alsoInstall: ["button"],
+    load: () => import("./demos/dropdown-menu/checkbox-items"),
+  },
+  "dropdown-menu/demo": {
+    id: "dropdown-menu/demo",
+    alsoInstall: ["button"],
+    load: () => import("./demos/dropdown-menu/demo"),
+  },
+  "dropdown-menu/radio-items": {
+    id: "dropdown-menu/radio-items",
+    alsoInstall: ["button"],
+    load: () => import("./demos/dropdown-menu/radio-items"),
+  },
+  "dropdown-menu/submenu": {
+    id: "dropdown-menu/submenu",
+    alsoInstall: ["button"],
+    load: () => import("./demos/dropdown-menu/submenu"),
   },
   "getting-started/button-core-variants": {
     id: "getting-started/button-core-variants",
+    alsoInstall: ["button"],
     load: () => import("./demos/getting-started/button-core-variants"),
+  },
+  "input/demo": {
+    id: "input/demo",
+    alsoInstall: [],
+    load: () => import("./demos/input/demo"),
+  },
+  "input/disabled": {
+    id: "input/disabled",
+    alsoInstall: [],
+    load: () => import("./demos/input/disabled"),
+  },
+  "input/invalid": {
+    id: "input/invalid",
+    alsoInstall: ["field"],
+    load: () => import("./demos/input/invalid"),
+  },
+  "input/sizes": {
+    id: "input/sizes",
+    alsoInstall: [],
+    load: () => import("./demos/input/sizes"),
+  },
+  "input/variants": {
+    id: "input/variants",
+    alsoInstall: [],
+    load: () => import("./demos/input/variants"),
+  },
+  "input/with-label": {
+    id: "input/with-label",
+    alsoInstall: ["label"],
+    load: () => import("./demos/input/with-label"),
   },
 } satisfies Record<string, Demo>;
 

@@ -39,6 +39,7 @@ export function ComponentPage({ slug }: { slug: string }) {
     );
   }
 
+  const previewAlsoInstall = demos[previewId].alsoInstall;
   const examples = examplesFor(slug, page.examples);
 
   return (
@@ -49,7 +50,12 @@ export function ComponentPage({ slug }: { slug: string }) {
       <SectionHeading className={SECTION_HEADING_CLASS}>
         Installation
       </SectionHeading>
-      <InstallBlock slug={slug} />
+      <InstallBlock slugs={[slug]} />
+      <InstallBlock
+        slugs={previewAlsoInstall}
+        besides={[slug]}
+        caption="The code below also uses:"
+      />
 
       <SectionHeading className={SECTION_HEADING_CLASS}>Code</SectionHeading>
       <ComponentSource id={previewId} />
@@ -71,6 +77,11 @@ export function ComponentPage({ slug }: { slug: string }) {
             {humanize(name)}
           </SubsectionHeading>
           <ComponentPreview id={id} />
+          <InstallBlock
+            slugs={demos[id].alsoInstall}
+            besides={[slug, ...previewAlsoInstall]}
+            caption="This example also needs:"
+          />
           <ComponentSource id={id} />
         </section>
       ))}

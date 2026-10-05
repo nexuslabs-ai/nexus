@@ -13,7 +13,7 @@ export type GuidePage = {
   /** Optional in-page headings rendered inline in the left rail (non-interactive). */
   nested?: string[];
   /** Components a group page covers, rendered inline in the left rail (non-interactive). */
-  components?: string[];
+  components?: [string, ...string[]];
   /** Placeholder body, carried only while the page has no source file. */
   wireframe?: { lede: string; blocks: Block[] };
   examples?: never;
@@ -166,7 +166,7 @@ export const PAGE_REGISTRY = {
       {
         slug: 'inputs',
         label: 'Inputs',
-        components: ['Input', 'Select', 'Switch', 'Tabs'],
+        components: ['Select', 'Switch', 'Tabs'],
         wireframe: {
           lede: '[ Interactive controls · per-component Storybook page below ]',
           blocks: [
@@ -183,7 +183,7 @@ export const PAGE_REGISTRY = {
             { type: 'h2', text: '[ Per-component pages ]' },
             {
               type: 'placeholder',
-              label: '[ Index — Input · Select · Switch · Tabs ]',
+              label: '[ Index — per-component pages ]',
             },
             {
               type: 'placeholder',
@@ -196,9 +196,9 @@ export const PAGE_REGISTRY = {
       {
         slug: 'containers',
         label: 'Containers',
-        components: ['Card', 'Dialog', 'Accordion', 'Alert'],
+        components: ['Accordion', 'Alert'],
         wireframe: {
-          lede: '[ Card · Dialog · Accordion · Alert ]',
+          lede: '[ Accordion · Alert ]',
           blocks: [
             {
               type: 'placeholder',
@@ -208,21 +208,6 @@ export const PAGE_REGISTRY = {
             {
               type: 'placeholder',
               label: '[ Composition patterns · slots / children ]',
-            },
-          ],
-        },
-      },
-      {
-        slug: 'navigation',
-        label: 'Navigation',
-        components: ['DropdownMenu'],
-        wireframe: {
-          lede: '[ DropdownMenu · (future) NavigationMenu · Breadcrumbs ]',
-          blocks: [
-            {
-              type: 'placeholder',
-              variant: 'storybook',
-              label: '[ Storybook embed ]',
             },
           ],
         },
@@ -267,6 +252,31 @@ export const PAGE_REGISTRY = {
         slug: 'button',
         label: 'Button',
         examples: ['variants', 'sizes', 'with-icon', 'disabled'],
+      },
+      {
+        slug: 'input',
+        label: 'Input',
+        examples: ['variants', 'sizes', 'with-label', 'invalid', 'disabled'],
+      },
+      {
+        slug: 'dialog',
+        label: 'Dialog',
+        examples: ['with-form', 'prop-driven', 'scrollable-body'],
+      },
+      {
+        slug: 'card',
+        label: 'Card',
+        examples: [
+          'header-with-action',
+          'content-only',
+          'footer-actions',
+          'sign-in-form',
+        ],
+      },
+      {
+        slug: 'dropdown-menu',
+        label: 'DropdownMenu',
+        examples: ['checkbox-items', 'radio-items', 'submenu'],
       },
     ],
   },

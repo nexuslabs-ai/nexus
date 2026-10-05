@@ -10,7 +10,7 @@ type ManifestPageBase = {
 
 export type GuideManifestPage = ManifestPageBase & {
   /** Components this group page covers, listed under it in the left rail. */
-  components?: readonly string[];
+  components?: readonly [string, ...string[]];
   /** Non-interactive headings listed under this page in the left rail. */
   nested?: readonly string[];
   examples?: never;
@@ -168,7 +168,7 @@ export const PAGE_MANIFEST: readonly ManifestSection[] = [
         route: '/components/inputs',
         slug: 'inputs',
         label: 'Inputs',
-        components: ['Input', 'Select', 'Switch', 'Tabs'],
+        components: ['Select', 'Switch', 'Tabs'],
         kind: 'placeholder',
         file: null,
       },
@@ -176,15 +176,7 @@ export const PAGE_MANIFEST: readonly ManifestSection[] = [
         route: '/components/containers',
         slug: 'containers',
         label: 'Containers',
-        components: ['Card', 'Dialog', 'Accordion', 'Alert'],
-        kind: 'placeholder',
-        file: null,
-      },
-      {
-        route: '/components/navigation',
-        slug: 'navigation',
-        label: 'Navigation',
-        components: ['DropdownMenu'],
+        components: ['Accordion', 'Alert'],
         kind: 'placeholder',
         file: null,
       },
@@ -219,6 +211,43 @@ export const PAGE_MANIFEST: readonly ManifestSection[] = [
         examples: ['variants', 'sizes', 'with-icon', 'disabled'],
         kind: 'mdx',
         file: 'content/components/button.mdx',
+      },
+      {
+        route: '/components/card',
+        slug: 'card',
+        label: 'Card',
+        examples: [
+          'header-with-action',
+          'content-only',
+          'footer-actions',
+          'sign-in-form',
+        ],
+        kind: 'mdx',
+        file: 'content/components/card.mdx',
+      },
+      {
+        route: '/components/dialog',
+        slug: 'dialog',
+        label: 'Dialog',
+        examples: ['with-form', 'prop-driven', 'scrollable-body'],
+        kind: 'mdx',
+        file: 'content/components/dialog.mdx',
+      },
+      {
+        route: '/components/dropdown-menu',
+        slug: 'dropdown-menu',
+        label: 'DropdownMenu',
+        examples: ['checkbox-items', 'radio-items', 'submenu'],
+        kind: 'mdx',
+        file: 'content/components/dropdown-menu.mdx',
+      },
+      {
+        route: '/components/input',
+        slug: 'input',
+        label: 'Input',
+        examples: ['variants', 'sizes', 'with-label', 'invalid', 'disabled'],
+        kind: 'mdx',
+        file: 'content/components/input.mdx',
       },
     ],
   },

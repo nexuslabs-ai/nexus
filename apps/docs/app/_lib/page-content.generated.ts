@@ -32,6 +32,11 @@ export const PAGE_LOADERS: Record<string, ManifestPageLoader> = {
   '/foundations/responsive': () => import('../_pages/foundations/responsive'),
   '/components/badge': () => import('../../content/components/badge.mdx'),
   '/components/button': () => import('../../content/components/button.mdx'),
+  '/components/card': () => import('../../content/components/card.mdx'),
+  '/components/dialog': () => import('../../content/components/dialog.mdx'),
+  '/components/dropdown-menu': () =>
+    import('../../content/components/dropdown-menu.mdx'),
+  '/components/input': () => import('../../content/components/input.mdx'),
   '/theming/appearance': () => import('../../content/theming/appearance.mdx'),
   '/theming/multi-brand': () => import('../_pages/theming/multi-brand'),
   '/theming/radius-overrides': () =>
@@ -97,10 +102,7 @@ export const PAGE_WIREFRAMES: Record<string, PageWireframe> = {
         ],
       },
       { type: 'h2', text: '[ Per-component pages ]' },
-      {
-        type: 'placeholder',
-        label: '[ Index — Input · Select · Switch · Tabs ]',
-      },
+      { type: 'placeholder', label: '[ Index — per-component pages ]' },
       {
         type: 'placeholder',
         variant: 'code',
@@ -109,7 +111,7 @@ export const PAGE_WIREFRAMES: Record<string, PageWireframe> = {
     ],
   },
   '/components/containers': {
-    lede: '[ Card · Dialog · Accordion · Alert ]',
+    lede: '[ Accordion · Alert ]',
     blocks: [
       {
         type: 'placeholder',
@@ -119,16 +121,6 @@ export const PAGE_WIREFRAMES: Record<string, PageWireframe> = {
       {
         type: 'placeholder',
         label: '[ Composition patterns · slots / children ]',
-      },
-    ],
-  },
-  '/components/navigation': {
-    lede: '[ DropdownMenu · (future) NavigationMenu · Breadcrumbs ]',
-    blocks: [
-      {
-        type: 'placeholder',
-        variant: 'storybook',
-        label: '[ Storybook embed ]',
       },
     ],
   },
