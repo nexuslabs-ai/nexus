@@ -12,6 +12,7 @@ import type {
 import type { Mode } from './palette';
 
 const catalogue = createTokenCatalogue();
+const byName = new Map(catalogue.map((token) => [token.name, token]));
 const runtimeColors = catalogue.filter((token) =>
   token.variants.some((variant) => variant.appearance)
 );
@@ -188,6 +189,26 @@ function cataloguePreset(family: CatalogueFamily, key: VariantKey) {
 }
 
 describe('token catalogue', () => {
+  it('keeps family border utilities while exposing the renamed focus alias', () => {
+    for (const family of [
+      'primary',
+      'error',
+      'information',
+      'success',
+      'warning',
+    ]) {
+      const token = byName.get(`--nx-color-${family}-border`)!;
+      expect(aliasesOf(token, 'utility')).toEqual([
+        `nx:border-color-${family}`,
+      ]);
+      expect(byName.has(`--nx-color-border-${family}`)).toBe(false);
+    }
+    expect(
+      aliasesOf(byName.get('--nx-color-border-focus')!, 'utility')
+    ).toEqual(['nx:border-color-focus']);
+    expect(byName.has('--nx-color-border-active')).toBe(false);
+  });
+
   it('agrees with the generated runtime colour fallbacks and dark overrides', () => {
     const theme = blockDeclarations(nexusCss, '@theme inline');
     const dark = blockDeclarations(nexusCss, '.dark');

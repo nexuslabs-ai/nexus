@@ -212,6 +212,10 @@ export function deriveFamily(
 ): TokenMap {
   const dark = mode === 'dark';
   const p = `--nx-color-${name}`;
+  const activeBorderToken =
+    name in STATUS_PALETTE_FAMILIES
+      ? `--nx-color-border-${name}-active`
+      : `${p}-border-active`;
   return {
     [`${p}-background`]: ramp['600'],
     [`${p}-background-hover`]: ramp['700'],
@@ -221,8 +225,8 @@ export function deriveFamily(
     [`${p}-subtle-foreground`]: dark ? ramp['300'] : ramp['600'],
     [`${p}-subtle-hover`]: dark ? ramp['900'] : ramp['100'],
     [`${p}-subtle-active`]: dark ? ramp['800'] : ramp['200'],
-    [`--nx-color-border-${name}`]: dark ? ramp['700'] : ramp['200'],
-    [`--nx-color-border-${name}-active`]: dark ? ramp['500'] : ramp['400'],
+    [`${p}-border`]: dark ? ramp['700'] : ramp['200'],
+    [activeBorderToken]: dark ? ramp['500'] : ramp['400'],
   };
 }
 
