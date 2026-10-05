@@ -196,9 +196,9 @@ export const PAGE_REGISTRY = {
       {
         slug: 'containers',
         label: 'Containers',
-        components: ['Card', 'Accordion', 'Alert'],
+        components: ['Accordion', 'Alert'],
         wireframe: {
-          lede: '[ Card · Accordion · Alert ]',
+          lede: '[ Accordion · Alert ]',
           blocks: [
             {
               type: 'placeholder',
@@ -272,6 +272,16 @@ export const PAGE_REGISTRY = {
         slug: 'dialog',
         label: 'Dialog',
         examples: ['with-form', 'prop-driven', 'scrollable-body'],
+      },
+      {
+        slug: 'card',
+        label: 'Card',
+        examples: [
+          'header-with-action',
+          'content-only',
+          'footer-actions',
+          'sign-in-form',
+        ],
       },
     ],
   },
