@@ -1,4 +1,3 @@
-import { execFileSync } from 'node:child_process';
 import {
   existsSync,
   mkdirSync,
@@ -10,26 +9,23 @@ import {
 } from 'node:fs';
 import path from 'node:path';
 
-import {
-  ALWAYS_INSTALLED,
-  COPIED_PREFIX,
-  DEMO_EXTENSION,
-  importSpecifiers,
-  isDemoName,
-  packageName,
-} from './examples.mjs';
+import { DEMO_EXTENSION, isDemoName } from './examples.mjs';
 import { docsRoot } from './roots.mjs';
 
 const EXAMPLES_DIR = path.join(docsRoot, 'examples');
 const GENERATED_DIR = path.join(docsRoot, '__generated__');
 const DEPENDENCIES_DIR = path.join(docsRoot, 'generated', 'dependencies');
-const DEPENDENCIES_SCRIPT = path.join(
-  docsRoot,
-  'scripts',
-  'generate-dependencies.mjs'
-);
 
+const COPIED_PREFIX = '@/';
+const IMPORT_PATTERNS = [
+  /^\s*(?:import|export)\s+(?:[^'";()]*?\s+from\s+)?['"]([^'"]+)['"]/gm,
+  /\bimport\(\s*['"]([^'"]+)['"]/g,
+];
 const COMPONENT_IMPORT = /^@\/components\/([^/]+)(?:\/|$)/;
+const ALWAYS_INSTALLED = new Set(['react', 'react-dom']);
+const DOCS_DEPENDENCIES = JSON.parse(
+  readFileSync(path.join(docsRoot, 'package.json'), 'utf8')
+).dependencies;
 
 const INDEX_FILE = 'demo-index.ts';
 const MODULES_DIR = 'demos';
@@ -51,6 +47,8 @@ export interface Demo {
   id: string;
   /** Install blocks the demo needs beyond its folder's own. */
   alsoInstall: readonly string[];
+  /** \`name@range\` packages it imports that none of its install blocks install. */
+  packages: readonly string[];
   /** Loads the demo's component and its own source text together. */
   load: () => Promise<{ Component: ComponentType; source: string }>;
 }
@@ -78,6 +76,7 @@ export function getDemo(id: string): Demo {
  * @property {string} id Path under examples/ without the .tsx extension.
  * @property {string} source The demo file's full contents.
  * @property {string[]} alsoInstall Install blocks it needs beyond its folder's.
+ * @property {string[]} packages `name@range` packages none of its blocks install.
  */
 
 function walk(dir) {
@@ -133,8 +132,21 @@ function boundarySpecifier(id) {
   return `./${path.posix.basename(id)}${BOUNDARY_SUFFIX}`;
 }
 
+function packageName(specifier) {
+  const segments = specifier.split('/');
+  return specifier.startsWith('@')
+    ? segments.slice(0, 2).join('/')
+    : segments[0];
+}
+
 function withoutExtension(file) {
   return file.replace(/\.tsx?$/, '');
+}
+
+function importSpecifiers(source) {
+  return IMPORT_PATTERNS.flatMap((pattern) =>
+    [...source.matchAll(pattern)].map(([, specifier]) => specifier)
+  );
 }
 
 function readInstallBlocks() {
@@ -153,7 +165,7 @@ function readInstallBlocks() {
       readCanonical(path.join(DEPENDENCIES_DIR, file))
     );
     blocks.set(slug, {
-      packages: new Set(install.map(({ name }) => name)),
+      packages: new Map(install.map(({ name, range }) => [name, range])),
       files: files.map(withoutExtension),
       copied: new Set([...copy, ...files].map(withoutExtension)),
     });
@@ -206,15 +218,21 @@ function installSlugsFor(id, specifiers, blocks) {
   return { own, extra };
 }
 
-function assertImportsInstalled(id, specifiers, slugs, blocks) {
-  const ownBlock = blocks.has(id.split('/')[0]);
+/** Checks the demo pastes beside `slugs`; returns the packages none of them install. */
+function demoPackages(id, specifiers, slugs, blocks) {
   const packages = new Set(
-    slugs.flatMap((slug) => [...blocks.get(slug).packages])
+    slugs.flatMap((slug) => [...blocks.get(slug).packages.keys()])
   );
   const copied = new Set(slugs.flatMap((slug) => [...blocks.get(slug).copied]));
   const blockNames = slugs.join(' + ');
 
+  const extra = new Set();
   for (const specifier of specifiers) {
+    if (specifier.startsWith('.')) {
+      throw new Error(
+        `Demo ${id} imports ${specifier}, which does not resolve once pasted. Import a file the ${blockNames} install block copies through ${COPIED_PREFIX}, or a package.`
+      );
+    }
     if (specifier.startsWith(COPIED_PREFIX)) {
       const file = specifier.slice(COPIED_PREFIX.length);
       if (!copied.has(file) && !copied.has(`${file}/index`)) {
@@ -224,16 +242,33 @@ function assertImportsInstalled(id, specifiers, slugs, blocks) {
       }
       continue;
     }
-    // generate:dependencies checks the packages of a component's own demos.
-    if (ownBlock) continue;
 
     const name = packageName(specifier);
-    if (!ALWAYS_INSTALLED.has(name) && !packages.has(name)) {
-      throw new Error(
-        `Demo ${id} imports ${name}, but the ${blockNames} install block does not install it. Use a package the block lists: ${[...packages].join(', ') || 'none'}.`
-      );
-    }
+    if (!ALWAYS_INSTALLED.has(name) && !packages.has(name)) extra.add(name);
   }
+
+  return [...extra]
+    .sort()
+    .map((name) => `${name}@${packageRange(id, name, blocks)}`);
+}
+
+// A component's published range wins, so one package shows one range everywhere.
+function packageRange(id, name, blocks) {
+  const block = [...blocks.values()].find(({ packages }) => packages.has(name));
+  if (block) return block.packages.get(name);
+
+  const range = DOCS_DEPENDENCIES[name];
+  if (!range) {
+    throw new Error(
+      `Demo ${id} imports ${name}, which apps/docs/package.json does not list in dependencies.`
+    );
+  }
+  if (range.startsWith('workspace:')) {
+    throw new Error(
+      `Demo ${id} imports workspace package ${name} — import Nexus code through ${COPIED_PREFIX} instead.`
+    );
+  }
+  return range;
 }
 
 /** @returns {DemoFile[]} */
@@ -269,14 +304,14 @@ function collectDemos() {
       const source = readCanonical(file);
       const specifiers = importSpecifiers(source);
       const { own, extra } = installSlugsFor(id, specifiers, installBlocks);
-      assertImportsInstalled(
+      const packages = demoPackages(
         id,
         specifiers,
         own ? [own, ...extra] : extra,
         installBlocks
       );
 
-      return { id, source, alsoInstall: extra };
+      return { id, source, alsoInstall: extra, packages };
     })
     .sort((a, b) => (a.id < b.id ? -1 : a.id > b.id ? 1 : 0));
 }
@@ -311,6 +346,7 @@ function renderDemoIndex(demos) {
         `  ${JSON.stringify(demo.id)}: {`,
         `    id: ${JSON.stringify(demo.id)},`,
         `    alsoInstall: ${JSON.stringify(demo.alsoInstall)},`,
+        `    packages: ${JSON.stringify(demo.packages)},`,
         `    load: () => import(${JSON.stringify(`./${MODULES_DIR}/${demo.id}`)}),`,
         `  },`,
       ].join('\n')
@@ -361,7 +397,6 @@ function generateAndLog() {
 
 function regenerateQuietly() {
   try {
-    execFileSync(process.execPath, [DEPENDENCIES_SCRIPT], { stdio: 'inherit' });
     generateAndLog();
   } catch (error) {
     console.error(`demo-index: ${error.message}`);
