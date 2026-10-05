@@ -33,6 +33,8 @@ export const PAGE_LOADERS: Record<string, ManifestPageLoader> = {
   '/components/button': () => import('../../content/components/button.mdx'),
   '/components/card': () => import('../../content/components/card.mdx'),
   '/components/dialog': () => import('../../content/components/dialog.mdx'),
+  '/components/dropdown-menu': () =>
+    import('../../content/components/dropdown-menu.mdx'),
   '/components/input': () => import('../../content/components/input.mdx'),
   '/theming/appearance': () => import('../../content/theming/appearance.mdx'),
   '/theming/multi-brand': () => import('../_pages/theming/multi-brand'),
@@ -118,16 +120,6 @@ export const PAGE_WIREFRAMES: Record<string, PageWireframe> = {
       {
         type: 'placeholder',
         label: '[ Composition patterns · slots / children ]',
-      },
-    ],
-  },
-  '/components/navigation': {
-    lede: '[ DropdownMenu · (future) NavigationMenu · Breadcrumbs ]',
-    blocks: [
-      {
-        type: 'placeholder',
-        variant: 'storybook',
-        label: '[ Storybook embed ]',
       },
     ],
   },
