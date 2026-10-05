@@ -153,6 +153,23 @@ const GEOMETRY_LAYOUTS = [
   ...LAYOUTS,
   { name: 'Vertical RTL', dir: 'rtl', orientation: 'vertical' },
 ] as const;
+// The overlap follows the border-width token, so a non-default stroke mode
+// must still share exactly one edge.
+const STROKE_LAYOUTS = [
+  ...GEOMETRY_LAYOUTS,
+  {
+    name: 'LTR strong',
+    dir: 'ltr',
+    orientation: 'horizontal',
+    borderwidth: 'strong',
+  },
+  {
+    name: 'Vertical strong',
+    dir: 'ltr',
+    orientation: 'vertical',
+    borderwidth: 'strong',
+  },
+] as const;
 
 const stackLevel = (item: HTMLElement) =>
   Number.parseInt(getComputedStyle(item).zIndex, 10) || 0;
@@ -160,7 +177,7 @@ const stackLevel = (item: HTMLElement) =>
 export const GeometryMatrix: Story = {
   render: () => (
     <div className="nx:flex nx:flex-wrap nx:items-start nx:gap-8">
-      {GEOMETRY_LAYOUTS.flatMap((layout) =>
+      {STROKE_LAYOUTS.flatMap((layout) =>
         [0, 2].flatMap((spacing) =>
           MIXES.map((variants, mix) => (
             <ToggleGroup
@@ -170,6 +187,9 @@ export const GeometryMatrix: Story = {
               spacing={spacing}
               dir={layout.dir}
               orientation={layout.orientation}
+              data-borderwidth={
+                'borderwidth' in layout ? layout.borderwidth : undefined
+              }
               defaultValue={['0', '1']}
               aria-label={`${layout.name} spacing ${spacing} mix ${mix}`}
             >
@@ -178,6 +198,7 @@ export const GeometryMatrix: Story = {
                   key={index}
                   value={String(index)}
                   variant={variant}
+                  aria-invalid={index === 1}
                   aria-label={`${layout.name} ${spacing} ${mix} ${index}`}
                 >
                   <IconBold />
@@ -191,7 +212,7 @@ export const GeometryMatrix: Story = {
   ),
   play: async ({ canvasElement }) => {
     const groups = within(canvasElement).getAllByRole('group');
-    await expect(groups).toHaveLength(40);
+    await expect(groups).toHaveLength(60);
     for (const group of groups) {
       const items = within(group).getAllByRole('button');
       const vertical = group.dataset.orientation === 'vertical';
@@ -200,6 +221,7 @@ export const GeometryMatrix: Story = {
       const stroke = Number.parseFloat(
         getComputedStyle(group).getPropertyValue('--nx-borderwidth-default')
       );
+      await expect(stroke).toBe(group.dataset.borderwidth === 'strong' ? 2 : 1);
       for (const [index, item] of items.entries()) {
         if (index === 0) continue;
         const previous = items[index - 1];
@@ -225,6 +247,7 @@ export const GeometryMatrix: Story = {
         await expect(gap).toBeCloseTo(expected, 2);
       }
       if (joined) {
+        await expect(getComputedStyle(group).isolation).toBe('isolate');
         for (const item of items) {
           item.focus();
           await expect(item).toHaveFocus();
@@ -288,7 +311,7 @@ const SHARED_EDGE_CASES: readonly SharedEdgeCase[] = [
   {
     name: 'disabled selected',
     variant: 'outline-primary',
-    leading: {},
+    leading: { pressed: true },
     trailing: { disabled: true, pressed: true },
     owner: 'own',
   },
@@ -337,7 +360,7 @@ const SHARED_EDGE_CASES: readonly SharedEdgeCase[] = [
   {
     name: 'outline disabled invalid',
     variant: 'outline',
-    leading: {},
+    leading: { invalid: true },
     trailing: { invalid: true, disabled: true },
     owner: 'own',
   },
@@ -405,7 +428,7 @@ export const JoinedSharedEdge: Story = {
       const item = (label: string, position: 'leading' | 'trailing') =>
         canvas.getByRole('button', { name: `${label} ${position}` });
       await expect(item(`${layout.name} rest`, 'trailing')).toHaveClass(
-        'nx:hover:z-10'
+        'nx:not-disabled:hover:z-10'
       );
       for (const edgeCase of SHARED_EDGE_CASES) {
         const label = `${layout.name} ${edgeCase.name}`;
