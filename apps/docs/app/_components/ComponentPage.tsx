@@ -49,7 +49,7 @@ export function ComponentPage({ slug }: { slug: string }) {
       <SectionHeading className={SECTION_HEADING_CLASS}>
         Installation
       </SectionHeading>
-      <InstallBlock slugs={[slug]} />
+      <InstallBlock slugs={[slug, ...demos[previewId].alsoInstall]} />
 
       <SectionHeading className={SECTION_HEADING_CLASS}>Code</SectionHeading>
       <ComponentSource id={previewId} />
