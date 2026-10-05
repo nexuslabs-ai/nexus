@@ -5,7 +5,7 @@ import { cva, type VariantProps } from 'class-variance-authority';
 import { cn } from '../../lib/utils';
 
 const badgeVariants = cva(
-  'nx:inline-flex nx:items-center nx:justify-center nx:gap-1 nx:rounded-md nx:whitespace-nowrap nx:transition-colors nx:w-fit',
+  'nx:inline-flex nx:box-border nx:h-6 nx:w-fit nx:items-center nx:justify-center nx:gap-1 nx:rounded-md nx:border-default nx:border-transparent nx:whitespace-nowrap nx:transition-colors',
   {
     variants: {
       variant: {
@@ -92,37 +92,37 @@ const badgeVariants = cva(
         variant: 'default',
         fill: 'outline',
         className:
-          'nx:border-default nx:border-border-primary nx:bg-primary-subtle nx:text-primary-subtle-foreground',
+          'nx:border-primary-border nx:bg-primary-subtle nx:text-primary-subtle-foreground',
       },
       {
         variant: 'secondary',
         fill: 'outline',
         className:
-          'nx:border-default nx:border-border-default nx:bg-secondary-subtle nx:text-secondary-subtle-foreground',
+          'nx:border-border-default nx:bg-secondary-subtle nx:text-secondary-subtle-foreground',
       },
       {
         variant: 'error',
         fill: 'outline',
         className:
-          'nx:border-default nx:border-border-error nx:bg-error-subtle nx:text-error-subtle-foreground',
+          'nx:border-error-border nx:bg-error-subtle nx:text-error-subtle-foreground',
       },
       {
         variant: 'warning',
         fill: 'outline',
         className:
-          'nx:border-default nx:border-border-warning nx:bg-warning-subtle nx:text-warning-subtle-foreground',
+          'nx:border-warning-border nx:bg-warning-subtle nx:text-warning-subtle-foreground',
       },
       {
         variant: 'success',
         fill: 'outline',
         className:
-          'nx:border-default nx:border-border-success nx:bg-success-subtle nx:text-success-subtle-foreground',
+          'nx:border-success-border nx:bg-success-subtle nx:text-success-subtle-foreground',
       },
       {
         variant: 'information',
         fill: 'outline',
         className:
-          'nx:border-default nx:border-border-information nx:bg-information-subtle nx:text-information-subtle-foreground',
+          'nx:border-information-border nx:bg-information-subtle nx:text-information-subtle-foreground',
       },
     ],
     defaultVariants: {
@@ -141,11 +141,20 @@ function badgeShapeClasses(
   isCaps: boolean
 ) {
   if (isNumber)
-    return 'nx:min-h-6 nx:min-w-6 nx:rounded-full nx:px-1.5 nx:py-0 nx:typography-label-caps nx:tabular-nums';
-  if (isIconOnly) return 'nx:h-6 nx:min-w-6 nx:p-0';
-  if (isCaps)
-    return 'nx:min-h-6 nx:typography-label-caps nx:uppercase nx:px-2 nx:py-1';
-  return 'nx:typography-label-default nx:px-2.5 nx:py-1';
+    return 'nx:min-w-6 nx:rounded-full nx:px-1.5 nx:typography-label-caps nx:tabular-nums';
+  if (isIconOnly) return 'nx:w-6 nx:p-0';
+  if (isCaps) return 'nx:typography-label-caps nx:uppercase nx:px-2';
+  return 'nx:typography-label-default nx:px-2.5';
+}
+
+function hasRenderableChildren(children: React.ReactNode): boolean {
+  return React.Children.toArray(children).some((child) => {
+    if (typeof child === 'string') return child.trim().length > 0;
+    if (!React.isValidElement<{ children?: React.ReactNode }>(child))
+      return true;
+    if (child.type !== React.Fragment) return true;
+    return hasRenderableChildren(child.props.children);
+  });
 }
 
 interface BadgeProps
@@ -172,7 +181,8 @@ interface BadgeProps
   /**
    * Icon to display before the label.
    * Icon is automatically sized to 14px (3.5 spacing units).
-   * If the badge has no children, this renders as an icon-only badge.
+   * If the badge has no renderable children, this renders as an icon-only
+   * badge — blank strings, `false` / `null`, and empty fragments count as none.
    * Ignored when `isNumber` is true.
    * @example
    * ```tsx
@@ -184,7 +194,9 @@ interface BadgeProps
   /**
    * Icon to display after the label.
    * Icon is automatically sized to 14px (3.5 spacing units).
-   * If the badge has no children and no `leftIcon`, this renders as an icon-only badge.
+   * If the badge has no renderable children and no `leftIcon`, this renders as
+   * an icon-only badge — blank strings, `false` / `null`, and empty fragments
+   * count as none.
    * Ignored when `isNumber` is true.
    * @example
    * ```tsx
@@ -214,9 +226,10 @@ function Badge({
   children,
   ...props
 }: BadgeProps) {
-  const hasChildren = React.Children.count(children) > 0;
   const isIconOnly =
-    !isNumber && !hasChildren && Boolean(leftIcon || rightIcon);
+    !isNumber &&
+    !hasRenderableChildren(children) &&
+    Boolean(leftIcon || rightIcon);
   const iconOnlyIcon = leftIcon ?? rightIcon;
   const showLeftIcon = leftIcon && !isNumber && !isIconOnly;
   const showRightIcon = rightIcon && !isNumber && !isIconOnly;
