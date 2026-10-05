@@ -48,6 +48,26 @@ export const demos = {
     alsoInstall: [],
     load: () => import("./demos/button/with-icon"),
   },
+  "dialog/demo": {
+    id: "dialog/demo",
+    alsoInstall: ["button"],
+    load: () => import("./demos/dialog/demo"),
+  },
+  "dialog/prop-driven": {
+    id: "dialog/prop-driven",
+    alsoInstall: ["button"],
+    load: () => import("./demos/dialog/prop-driven"),
+  },
+  "dialog/scrollable-body": {
+    id: "dialog/scrollable-body",
+    alsoInstall: ["button"],
+    load: () => import("./demos/dialog/scrollable-body"),
+  },
+  "dialog/with-form": {
+    id: "dialog/with-form",
+    alsoInstall: ["button","input","label"],
+    load: () => import("./demos/dialog/with-form"),
+  },
   "getting-started/button-core-variants": {
     id: "getting-started/button-core-variants",
     alsoInstall: ["button"],
