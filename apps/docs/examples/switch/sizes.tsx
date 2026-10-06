@@ -1,5 +1,6 @@
 'use client';
 
+import { Label } from '@/components/label/label';
 import { Switch } from '@/components/switch/switch';
 
 export default function SwitchSizes() {
@@ -7,21 +8,11 @@ export default function SwitchSizes() {
     <div className="nx:flex nx:flex-col nx:gap-3">
       <div className="nx:flex nx:items-center nx:gap-2">
         <Switch id="switch-sizes-sm" size="sm" />
-        <label
-          htmlFor="switch-sizes-sm"
-          className="nx:typography-label-default"
-        >
-          Small
-        </label>
+        <Label htmlFor="switch-sizes-sm">Small</Label>
       </div>
       <div className="nx:flex nx:items-center nx:gap-2">
         <Switch id="switch-sizes-default" size="default" />
-        <label
-          htmlFor="switch-sizes-default"
-          className="nx:typography-label-default"
-        >
-          Default
-        </label>
+        <Label htmlFor="switch-sizes-default">Default</Label>
       </div>
     </div>
   );

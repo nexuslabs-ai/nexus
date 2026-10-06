@@ -3,4 +3,4 @@
 
 export { Component } from "./demo.client";
 
-export const source = "'use client';\n\nimport { Switch } from '@/components/switch/switch';\n\nexport default function SwitchDemo() {\n  return (\n    <div className=\"nx:flex nx:items-center nx:gap-2\">\n      <Switch id=\"switch-demo-airplane\" />\n      <label\n        htmlFor=\"switch-demo-airplane\"\n        className=\"nx:typography-label-default\"\n      >\n        Airplane mode\n      </label>\n    </div>\n  );\n}\n";
+export const source = "'use client';\n\nimport { Label } from '@/components/label/label';\nimport { Switch } from '@/components/switch/switch';\n\nexport default function SwitchDemo() {\n  return (\n    <div className=\"nx:flex nx:items-center nx:gap-2\">\n      <Switch id=\"switch-demo-airplane\" />\n      <Label htmlFor=\"switch-demo-airplane\">Airplane mode</Label>\n    </div>\n  );\n}\n";
