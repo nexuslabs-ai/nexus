@@ -18,7 +18,9 @@ import {
 } from '../src/token-source/tokens.js';
 import {
   BORDER_COLOR_ALIAS_NAMES,
+  borderColorAliasName,
   borderWidthAliasUtilities,
+  DEFAULT_TRANSITION,
   durationUtility,
 } from '../src/token-source/utilities.js';
 
@@ -417,18 +419,6 @@ export function generateBorderWidthUtilitiesCSS(tokens) {
   return { css, count: rules.length };
 }
 
-const BORDER_COLOR_ALIAS_NAME_SET = new Set(BORDER_COLOR_ALIAS_NAMES);
-
-function getBorderColorAliasName(cssName) {
-  const prefix = 'color-border-';
-  if (!cssName.startsWith(prefix)) {
-    return null;
-  }
-
-  const name = cssName.slice(prefix.length);
-  return BORDER_COLOR_ALIAS_NAME_SET.has(name) ? name : null;
-}
-
 /**
  * Generate border color alias utility CSS from semantic color tokens.
  * Creates @utility rules with border-color-{name} patterns for every
@@ -439,7 +429,10 @@ function getBorderColorAliasName(cssName) {
  */
 export function generateBorderColorAliasUtilitiesCSS(tokens) {
   const borderColorTokens = (tokens ?? [])
-    .map((token) => ({ token, name: getBorderColorAliasName(token.cssName) }))
+    .map((token) => ({
+      token,
+      name: borderColorAliasName(token.cssName.replace(/^color-/, '')),
+    }))
     .filter(({ name }) => name !== null)
     .sort(
       (a, b) =>
@@ -1107,13 +1100,13 @@ export function generateMotionUtilitiesCSS(motionTokens) {
   // landing it with the keypress.
   css += `@utility transition-control {\n`;
   css += `  transition-property: color, background-color, border-color;\n`;
-  css += `  transition-timing-function: var(--tw-ease, var(--default-transition-timing-function));\n`;
-  css += `  transition-duration: var(--tw-duration, var(--default-transition-duration));\n`;
+  css += `  transition-timing-function: var(--tw-ease, --theme(--default-transition-timing-function));\n`;
+  css += `  transition-duration: var(--tw-duration, --theme(--default-transition-duration));\n`;
   css += `}\n\n`;
   css += `@utility transition-field {\n`;
   css += `  transition-property: color, background-color;\n`;
-  css += `  transition-timing-function: var(--tw-ease, var(--default-transition-timing-function));\n`;
-  css += `  transition-duration: var(--tw-duration, var(--default-transition-duration));\n`;
+  css += `  transition-timing-function: var(--tw-ease, --theme(--default-transition-timing-function));\n`;
+  css += `  transition-duration: var(--tw-duration, --theme(--default-transition-duration));\n`;
   css += `}\n\n`;
 
   // Static "presence bridge" (not token-derived): a non-visual animation whose only
@@ -1299,6 +1292,25 @@ export function generateThemeCSS(config) {
     }
   }
 
+  css += `}\n`;
+
+  // Inlined so a motion-mode override on any ancestor reaches them.
+  const defaultDuration = motionTokens.find(
+    (token) =>
+      token.group === 'duration' && token.key === DEFAULT_TRANSITION.duration
+  );
+  const defaultEase = motionTokens.find(
+    (token) => token.group === 'ease' && token.key === DEFAULT_TRANSITION.ease
+  );
+  if (!defaultDuration || !defaultEase) {
+    throw new Error(
+      `generateThemeCSS: motion tokens \`duration.${DEFAULT_TRANSITION.duration}\` and \`ease.${DEFAULT_TRANSITION.ease}\` are required — \`transition-control\` / \`transition-field\` read them as the default transition timing.`
+    );
+  }
+  css += `\n@theme inline {\n`;
+  css += `  /* Default transition timing */\n`;
+  css += `  --default-transition-duration: ${defaultDuration.varRef};\n`;
+  css += `  --default-transition-timing-function: ${defaultEase.varRef};\n`;
   css += `}\n`;
 
   // Inlined so every border and outline utility reads `--nx-borderwidth-*` on

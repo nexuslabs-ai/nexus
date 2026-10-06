@@ -8,7 +8,7 @@ import {
   CardHeader,
   CardTitle,
 } from '../_components/nexus';
-import { countComponents, describeSize } from '../_lib/home-counts';
+import { describeSize } from '../_lib/home-counts';
 import { CARD_JOINER, PAGE_MANIFEST, requireSection } from '../_lib/manifest';
 
 const BLUE_RAMP = [50, 100, 200, 300, 400, 500, 600, 700, 800, 900, 950];
@@ -16,7 +16,7 @@ const BASE_CHIPS = ['slate', 'stone', 'neutral', 'gray', 'zinc'];
 
 const STATS = [
   { n: String(BASE_CHIPS.length), l: 'Bases' },
-  { n: String(countComponents(requireSection('components'))), l: 'Components' },
+  { n: String(requireSection('components').pages.length), l: 'Components' },
   { n: '2', l: 'Themes' },
   { n: '100%', l: 'Tokenized' },
 ];
@@ -97,7 +97,7 @@ export default function Home() {
             href={a.href}
             className="nx:no-underline nx:text-inherit"
           >
-            <Card className="nx:h-full nx:hover:border-border-primary nx:transition-colors">
+            <Card className="nx:h-full nx:hover:border-primary-border nx:transition-colors">
               <CardHeader>
                 <CardTitle className="nx:typography-heading-xsmall">
                   {a.title}
@@ -120,7 +120,7 @@ export default function Home() {
             href={s.href}
             className="nx:no-underline nx:text-inherit"
           >
-            <Card className="nx:h-full nx:hover:border-border-primary nx:transition-colors">
+            <Card className="nx:h-full nx:hover:border-primary-border nx:transition-colors">
               <CardHeader>
                 <div className="nx:font-mono nx:text-[10px] nx:uppercase nx:tracking-wider nx:text-muted-foreground-subtle nx:mb-1">
                   {s.count}

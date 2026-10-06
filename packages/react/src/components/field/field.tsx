@@ -172,7 +172,7 @@ function FieldLabel({
       className={cn(
         'nx:group/field-label nx:peer/field-label nx:flex nx:w-fit nx:gap-2 nx:group-data-[disabled=true]/field:text-disabled-foreground',
         'nx:has-[>[data-slot=field]]:w-full nx:has-[>[data-slot=field]]:flex-col nx:has-[>[data-slot=field]]:rounded-md nx:has-[>[data-slot=field]]:border-default nx:*:data-[slot=field]:p-4',
-        'nx:has-data-[state=checked]:border-border-primary nx:has-data-[state=checked]:bg-primary-subtle',
+        'nx:has-data-[state=checked]:border-primary-border nx:has-data-[state=checked]:bg-primary-subtle',
         className
       )}
       {...props}
