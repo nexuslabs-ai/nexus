@@ -23,6 +23,9 @@ const IMPORT_PATTERNS = [
 ];
 const COMPONENT_IMPORT = /^@\/components\/([^/]+)(?:\/|$)/;
 const ALWAYS_INSTALLED = new Set(['react', 'react-dom']);
+const DOCS_DEPENDENCIES = JSON.parse(
+  readFileSync(path.join(docsRoot, 'package.json'), 'utf8')
+).dependencies;
 
 const INDEX_FILE = 'demo-index.ts';
 const MODULES_DIR = 'demos';
@@ -42,8 +45,10 @@ import type { ComponentType } from 'react';
 export interface Demo {
   /** Path under apps/docs/examples/ without the .tsx extension. */
   id: string;
-  /** The install blocks the demo pastes beside, its folder's own first. */
-  installSlugs: readonly string[];
+  /** Install blocks the demo needs beyond its folder's own. */
+  alsoInstall: readonly string[];
+  /** \`name@range\` packages it imports that none of its install blocks install. */
+  packages: readonly string[];
   /** Loads the demo's component and its own source text together. */
   load: () => Promise<{ Component: ComponentType; source: string }>;
 }
@@ -70,7 +75,8 @@ export function getDemo(id: string): Demo {
  * @typedef {object} DemoFile
  * @property {string} id Path under examples/ without the .tsx extension.
  * @property {string} source The demo file's full contents.
- * @property {string[]} installSlugs The install blocks the demo pastes beside.
+ * @property {string[]} alsoInstall Install blocks it needs beyond its folder's.
+ * @property {string[]} packages `name@range` packages none of its blocks install.
  */
 
 function walk(dir) {
@@ -159,7 +165,8 @@ function readInstallBlocks() {
       readCanonical(path.join(DEPENDENCIES_DIR, file))
     );
     blocks.set(slug, {
-      packages: new Set(install.map(({ name }) => name)),
+      packages: new Map(install.map(({ name, range }) => [name, range])),
+      files: files.map(withoutExtension),
       copied: new Set([...copy, ...files].map(withoutExtension)),
     });
   }
@@ -167,39 +174,65 @@ function readInstallBlocks() {
 }
 
 /**
- * A demo pastes beside its folder's install block, when the folder has one,
- * plus the block of every component it imports.
+ * A demo pastes beside its folder's block, if the folder is a component, and
+ * beside each imported component's block that no block kept before it
+ * already copies — largest first, so a block is dropped for one that is listed.
  */
 function installSlugsFor(id, specifiers, blocks) {
   const folder = id.split('/')[0];
-  const own = blocks.has(folder) ? [folder] : [];
-  const imported = specifiers
-    .map((specifier) => specifier.match(COMPONENT_IMPORT)?.[1])
-    .filter(Boolean);
-  const slugs = [...new Set([...own, ...imported])];
-  if (slugs.length === 0) {
-    throw new Error(
-      `Demo ${id} imports no @/components/, and ${folder} has no install block of its own, so there is nothing to paste it beside. Import the component it demonstrates, or move it to examples/{slug}/.`
-    );
-  }
-  for (const slug of slugs) {
+  const own = blocks.has(folder) ? folder : undefined;
+  const imported = [
+    ...new Set(
+      specifiers
+        .map((specifier) => specifier.match(COMPONENT_IMPORT)?.[1])
+        .filter(Boolean)
+    ),
+  ];
+  for (const slug of imported) {
     if (!blocks.has(slug)) {
       throw new Error(
         `Demo ${id} imports @/components/${slug}, but there is no ${slug} install block for it.`
       );
     }
   }
-  return slugs;
+
+  const kept = own ? [own] : [];
+  const extra = [];
+  const largestFirst = imported
+    .filter((slug) => slug !== own)
+    .sort((a, b) => blocks.get(b).copied.size - blocks.get(a).copied.size);
+  for (const slug of largestFirst) {
+    const covered = kept.some((other) =>
+      blocks.get(slug).files.every((file) => blocks.get(other).copied.has(file))
+    );
+    if (covered) continue;
+    kept.push(slug);
+    extra.push(slug);
+  }
+
+  if (!own && extra.length === 0) {
+    throw new Error(
+      `Demo ${id} imports no @/components/, and ${folder} has no install block of its own, so there is nothing to paste it beside. Import the component it demonstrates, or move it to examples/{slug}/.`
+    );
+  }
+  return { own, extra };
 }
 
-function checkDemoImports(id, specifiers, slugs, blocks) {
+/** Checks the demo pastes beside `slugs`; returns the packages none of them install. */
+function demoPackages(id, specifiers, slugs, blocks) {
   const packages = new Set(
-    slugs.flatMap((slug) => [...blocks.get(slug).packages])
+    slugs.flatMap((slug) => [...blocks.get(slug).packages.keys()])
   );
   const copied = new Set(slugs.flatMap((slug) => [...blocks.get(slug).copied]));
   const blockNames = slugs.join(' + ');
 
+  const extra = new Set();
   for (const specifier of specifiers) {
+    if (specifier.startsWith('.')) {
+      throw new Error(
+        `Demo ${id} imports ${specifier}, which does not resolve once pasted. Import a file the ${blockNames} install block copies through ${COPIED_PREFIX}, or a package.`
+      );
+    }
     if (specifier.startsWith(COPIED_PREFIX)) {
       const file = specifier.slice(COPIED_PREFIX.length);
       if (!copied.has(file) && !copied.has(`${file}/index`)) {
@@ -211,12 +244,31 @@ function checkDemoImports(id, specifiers, slugs, blocks) {
     }
 
     const name = packageName(specifier);
-    if (!ALWAYS_INSTALLED.has(name) && !packages.has(name)) {
-      throw new Error(
-        `Demo ${id} imports ${name}, but the ${blockNames} install block does not install it. Use a package the block lists: ${[...packages].join(', ') || 'none'}.`
-      );
-    }
+    if (!ALWAYS_INSTALLED.has(name) && !packages.has(name)) extra.add(name);
   }
+
+  return [...extra]
+    .sort()
+    .map((name) => `${name}@${packageRange(id, name, blocks)}`);
+}
+
+// A component's published range wins, so one package shows one range everywhere.
+function packageRange(id, name, blocks) {
+  const block = [...blocks.values()].find(({ packages }) => packages.has(name));
+  if (block) return block.packages.get(name);
+
+  const range = DOCS_DEPENDENCIES[name];
+  if (!range) {
+    throw new Error(
+      `Demo ${id} imports ${name}, which apps/docs/package.json does not list in dependencies.`
+    );
+  }
+  if (range.startsWith('workspace:')) {
+    throw new Error(
+      `Demo ${id} imports workspace package ${name} — import Nexus code through ${COPIED_PREFIX} instead.`
+    );
+  }
+  return range;
 }
 
 /** @returns {DemoFile[]} */
@@ -251,10 +303,15 @@ function collectDemos() {
       }
       const source = readCanonical(file);
       const specifiers = importSpecifiers(source);
-      const installSlugs = installSlugsFor(id, specifiers, installBlocks);
-      checkDemoImports(id, specifiers, installSlugs, installBlocks);
+      const { own, extra } = installSlugsFor(id, specifiers, installBlocks);
+      const packages = demoPackages(
+        id,
+        specifiers,
+        own ? [own, ...extra] : extra,
+        installBlocks
+      );
 
-      return { id, source, installSlugs };
+      return { id, source, alsoInstall: extra, packages };
     })
     .sort((a, b) => (a.id < b.id ? -1 : a.id > b.id ? 1 : 0));
 }
@@ -288,7 +345,8 @@ function renderDemoIndex(demos) {
       [
         `  ${JSON.stringify(demo.id)}: {`,
         `    id: ${JSON.stringify(demo.id)},`,
-        `    installSlugs: ${JSON.stringify(demo.installSlugs)},`,
+        `    alsoInstall: ${JSON.stringify(demo.alsoInstall)},`,
+        `    packages: ${JSON.stringify(demo.packages)},`,
         `    load: () => import(${JSON.stringify(`./${MODULES_DIR}/${demo.id}`)}),`,
         `  },`,
       ].join('\n')

@@ -7,9 +7,13 @@ import { cn } from '../../lib/utils';
 import { toggleVariants } from '../toggle';
 
 const ToggleGroupContext = React.createContext<
-  VariantProps<typeof toggleVariants> & { spacing?: number }
+  VariantProps<typeof toggleVariants> & {
+    spacing: number;
+    orientation: 'horizontal' | 'vertical';
+  }
 >({
   spacing: 0,
+  orientation: 'horizontal',
 });
 
 /**
@@ -36,8 +40,12 @@ type ToggleGroupProps = React.ComponentProps<typeof ToggleGroupPrimitive.Root> &
  * ToggleGroup
  *
  * A set of related `ToggleGroupItem`s sharing `variant` / `size` via context.
- * `type="single"` behaves like a radio group; `type="multiple"` allows several
- * items pressed at once.
+ * `type="single"` behaves like a radio group, except that the selected item can
+ * be cleared back to an empty value; `type="multiple"` allows several items
+ * pressed at once.
+ *
+ * `aria-invalid` on the group does not style its items — mark the individual
+ * `ToggleGroupItem`s invalid and describe the error with your own text.
  *
  * @example
  * ```tsx
@@ -56,30 +64,50 @@ function ToggleGroup({
   variant,
   size,
   spacing = 0,
+  orientation = 'horizontal',
   children,
   ...props
 }: ToggleGroupProps) {
   return (
     <ToggleGroupPrimitive.Root
-      data-slot="toggle-group"
-      data-variant={variant ?? 'default'}
-      data-size={size ?? 'default'}
-      data-spacing={spacing}
+      orientation={orientation}
       // Spacing-scale gap via the runtime spacing var (Nexus resets the base
       // --spacing, so Tailwind's --spacing() function is unavailable here).
       style={spacing ? { gap: `var(--nx-spacing-${spacing})` } : undefined}
       className={cn(
-        'nx:flex nx:w-fit nx:items-center nx:rounded-md',
+        'nx:flex nx:w-fit nx:items-center nx:rounded-md nx:data-[orientation=vertical]:flex-col nx:data-[orientation=vertical]:items-stretch',
+        spacing === 0 && 'nx:isolate',
         className
       )}
       {...props}
+      data-slot="toggle-group"
+      data-variant={variant ?? 'default'}
+      data-size={size ?? 'default'}
+      data-spacing={spacing}
+      data-orientation={orientation}
     >
-      <ToggleGroupContext.Provider value={{ variant, size, spacing }}>
+      <ToggleGroupContext.Provider
+        value={{ variant, size, spacing, orientation }}
+      >
         {children}
       </ToggleGroupContext.Provider>
     </ToggleGroupPrimitive.Root>
   );
 }
+
+// Joined bordered items overlap by one stroke, so each pair shares a single
+// edge. Whichever item stacks higher paints that edge: focus, then selected
+// invalid, invalid, selected, hover; equal items fall back to DOM order, so
+// the later one wins. Disabled items never climb, so they never claim an
+// edge. The focus rung repeats its class to outrank the (0,4,0)
+// selected-invalid rung by specificity rather than by emit order.
+const joinedItem = {
+  base: 'nx:relative nx:rounded-none nx:not-disabled:hover:z-10 nx:not-disabled:data-[state=on]:z-20 nx:not-disabled:aria-invalid:z-30 nx:not-disabled:aria-invalid:data-[state=on]:z-40 nx:[&&&&:focus-visible]:z-50',
+  horizontal:
+    'nx:first:rounded-s-md nx:last:rounded-e-md nx:[[data-slot=toggle-group-item]:not([data-variant=default])+&:not([data-variant=default])]:-ms-(--nx-borderwidth-default)',
+  vertical:
+    'nx:first:rounded-t-md nx:last:rounded-b-md nx:[[data-slot=toggle-group-item]:not([data-variant=default])+&:not([data-variant=default])]:-mt-(--nx-borderwidth-default)',
+} as const;
 
 /**
  * ToggleGroupItemProps
@@ -107,22 +135,22 @@ function ToggleGroupItem({
   const context = React.useContext(ToggleGroupContext);
   const resolvedVariant = variant ?? context.variant ?? 'default';
   const resolvedSize = size ?? context.size ?? 'default';
+  const joined = context.spacing === 0;
 
   return (
     <ToggleGroupPrimitive.Item
+      className={cn(
+        toggleVariants({ variant: resolvedVariant, size: resolvedSize }),
+        'nx:min-w-0 nx:shrink-0',
+        joined && [joinedItem.base, joinedItem[context.orientation]],
+        className
+      )}
+      {...props}
       data-slot="toggle-group-item"
       data-variant={resolvedVariant}
       data-size={resolvedSize}
       data-spacing={context.spacing}
-      className={cn(
-        toggleVariants({ variant: resolvedVariant, size: resolvedSize }),
-        'nx:min-w-0 nx:shrink-0',
-        // When joined (spacing=0): drop inner rounding/borders so items share
-        // edges; round only the group's ends.
-        'nx:data-[spacing=0]:rounded-none nx:data-[spacing=0]:first:rounded-l-md nx:data-[spacing=0]:last:rounded-r-md nx:data-[spacing=0]:data-[variant=outline]:border-l-0 nx:data-[spacing=0]:data-[variant=outline]:first:border-l-default',
-        className
-      )}
-      {...props}
+      data-orientation={context.orientation}
     >
       {children}
     </ToggleGroupPrimitive.Item>

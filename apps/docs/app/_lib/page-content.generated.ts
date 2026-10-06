@@ -30,8 +30,33 @@ export const PAGE_LOADERS: Record<string, ManifestPageLoader> = {
   '/foundations/focus': () => import('../_pages/foundations/focus'),
   '/foundations/layering': () => import('../_pages/foundations/layering'),
   '/foundations/responsive': () => import('../_pages/foundations/responsive'),
+  '/components/accordion': () =>
+    import('../../content/components/accordion.mdx'),
+  '/components/alert': () => import('../../content/components/alert.mdx'),
+  '/components/alert-dialog': () =>
+    import('../../content/components/alert-dialog.mdx'),
+  '/components/aspect-ratio': () =>
+    import('../../content/components/aspect-ratio.mdx'),
+  '/components/attachment': () =>
+    import('../../content/components/attachment.mdx'),
+  '/components/avatar': () => import('../../content/components/avatar.mdx'),
+  '/components/badge': () => import('../../content/components/badge.mdx'),
+  '/components/breadcrumb': () =>
+    import('../../content/components/breadcrumb.mdx'),
+  '/components/bubble': () => import('../../content/components/bubble.mdx'),
   '/components/button': () => import('../../content/components/button.mdx'),
+  '/components/button-group': () =>
+    import('../../content/components/button-group.mdx'),
+  '/components/card': () => import('../../content/components/card.mdx'),
+  '/components/carousel': () => import('../../content/components/carousel.mdx'),
+  '/components/chart': () => import('../../content/components/chart.mdx'),
   '/components/checkbox': () => import('../../content/components/checkbox.mdx'),
+  '/components/dialog': () => import('../../content/components/dialog.mdx'),
+  '/components/dropdown-menu': () =>
+    import('../../content/components/dropdown-menu.mdx'),
+  '/components/input': () => import('../../content/components/input.mdx'),
+  '/components/select': () => import('../../content/components/select.mdx'),
+  '/components/tabs': () => import('../../content/components/tabs.mdx'),
   '/theming/appearance': () => import('../../content/theming/appearance.mdx'),
   '/theming/multi-brand': () => import('../_pages/theming/multi-brand'),
   '/theming/radius-overrides': () =>
@@ -83,74 +108,454 @@ export const PAGE_WIREFRAMES: Record<string, PageWireframe> = {
       },
     ],
   },
-  '/components/inputs': {
-    lede: '[ Interactive controls · per-component Storybook page below ]',
-    blocks: [
-      {
-        type: 'row',
-        blocks: [
-          {
-            variant: 'storybook',
-            label: '[ Storybook embed — selected component ]',
-          },
-          { variant: 'tall', label: '[ Variant matrix · props table ]' },
-        ],
-      },
-      { type: 'h2', text: '[ Per-component pages ]' },
-      {
-        type: 'placeholder',
-        label: '[ Index — Input · Select · Switch · Tabs ]',
-      },
-      {
-        type: 'placeholder',
-        variant: 'code',
-        label: '[ Code — JSX usage example ]',
-      },
-    ],
-  },
-  '/components/containers': {
-    lede: '[ Card · Dialog · Accordion · Alert ]',
+  '/components/appearance': {
+    lede: '[ Appearance — page coming soon ]',
     blocks: [
       {
         type: 'placeholder',
         variant: 'storybook',
-        label: '[ Storybook embed ]',
-      },
-      {
-        type: 'placeholder',
-        label: '[ Composition patterns · slots / children ]',
+        label: '[ Preview · Installation · Code · Props · Examples ]',
       },
     ],
   },
-  '/components/navigation': {
-    lede: '[ DropdownMenu · (future) NavigationMenu · Breadcrumbs ]',
+  '/components/choice-card': {
+    lede: '[ ChoiceCard — page coming soon ]',
     blocks: [
       {
         type: 'placeholder',
         variant: 'storybook',
-        label: '[ Storybook embed ]',
+        label: '[ Preview · Installation · Code · Props · Examples ]',
       },
     ],
   },
-  '/components/display': {
-    lede: '[ Badge · Avatar · Tooltip ]',
+  '/components/choice-row': {
+    lede: '[ ChoiceRow — page coming soon ]',
     blocks: [
       {
         type: 'placeholder',
         variant: 'storybook',
-        label: '[ Storybook embed ]',
+        label: '[ Preview · Installation · Code · Props · Examples ]',
       },
     ],
   },
-  '/components/primitives': {
-    lede: '[ Low-level building blocks: Show / Hide · Slot ]',
+  '/components/collapsible': {
+    lede: '[ Collapsible — page coming soon ]',
     blocks: [
       {
         type: 'placeholder',
-        variant: 'code',
-        label: '[ Code — Show / Hide usage ]',
+        variant: 'storybook',
+        label: '[ Preview · Installation · Code · Props · Examples ]',
       },
-      { type: 'placeholder', label: '[ API table ]' },
+    ],
+  },
+  '/components/combobox': {
+    lede: '[ Combobox — page coming soon ]',
+    blocks: [
+      {
+        type: 'placeholder',
+        variant: 'storybook',
+        label: '[ Preview · Installation · Code · Props · Examples ]',
+      },
+    ],
+  },
+  '/components/command': {
+    lede: '[ Command — page coming soon ]',
+    blocks: [
+      {
+        type: 'placeholder',
+        variant: 'storybook',
+        label: '[ Preview · Installation · Code · Props · Examples ]',
+      },
+    ],
+  },
+  '/components/context-menu': {
+    lede: '[ ContextMenu — page coming soon ]',
+    blocks: [
+      {
+        type: 'placeholder',
+        variant: 'storybook',
+        label: '[ Preview · Installation · Code · Props · Examples ]',
+      },
+    ],
+  },
+  '/components/date-picker': {
+    lede: '[ DatePicker — page coming soon ]',
+    blocks: [
+      {
+        type: 'placeholder',
+        variant: 'storybook',
+        label: '[ Preview · Installation · Code · Props · Examples ]',
+      },
+    ],
+  },
+  '/components/drawer': {
+    lede: '[ Drawer — page coming soon ]',
+    blocks: [
+      {
+        type: 'placeholder',
+        variant: 'storybook',
+        label: '[ Preview · Installation · Code · Props · Examples ]',
+      },
+    ],
+  },
+  '/components/empty-state': {
+    lede: '[ EmptyState — page coming soon ]',
+    blocks: [
+      {
+        type: 'placeholder',
+        variant: 'storybook',
+        label: '[ Preview · Installation · Code · Props · Examples ]',
+      },
+    ],
+  },
+  '/components/field': {
+    lede: '[ Field — page coming soon ]',
+    blocks: [
+      {
+        type: 'placeholder',
+        variant: 'storybook',
+        label: '[ Preview · Installation · Code · Props · Examples ]',
+      },
+    ],
+  },
+  '/components/hide': {
+    lede: '[ Hide — page coming soon ]',
+    blocks: [
+      {
+        type: 'placeholder',
+        variant: 'storybook',
+        label: '[ Preview · Installation · Code · Props · Examples ]',
+      },
+    ],
+  },
+  '/components/hover-card': {
+    lede: '[ HoverCard — page coming soon ]',
+    blocks: [
+      {
+        type: 'placeholder',
+        variant: 'storybook',
+        label: '[ Preview · Installation · Code · Props · Examples ]',
+      },
+    ],
+  },
+  '/components/input-group': {
+    lede: '[ InputGroup — page coming soon ]',
+    blocks: [
+      {
+        type: 'placeholder',
+        variant: 'storybook',
+        label: '[ Preview · Installation · Code · Props · Examples ]',
+      },
+    ],
+  },
+  '/components/input-otp': {
+    lede: '[ InputOTP — page coming soon ]',
+    blocks: [
+      {
+        type: 'placeholder',
+        variant: 'storybook',
+        label: '[ Preview · Installation · Code · Props · Examples ]',
+      },
+    ],
+  },
+  '/components/item': {
+    lede: '[ Item — page coming soon ]',
+    blocks: [
+      {
+        type: 'placeholder',
+        variant: 'storybook',
+        label: '[ Preview · Installation · Code · Props · Examples ]',
+      },
+    ],
+  },
+  '/components/kbd': {
+    lede: '[ Kbd — page coming soon ]',
+    blocks: [
+      {
+        type: 'placeholder',
+        variant: 'storybook',
+        label: '[ Preview · Installation · Code · Props · Examples ]',
+      },
+    ],
+  },
+  '/components/label': {
+    lede: '[ Label — page coming soon ]',
+    blocks: [
+      {
+        type: 'placeholder',
+        variant: 'storybook',
+        label: '[ Preview · Installation · Code · Props · Examples ]',
+      },
+    ],
+  },
+  '/components/marker': {
+    lede: '[ Marker — page coming soon ]',
+    blocks: [
+      {
+        type: 'placeholder',
+        variant: 'storybook',
+        label: '[ Preview · Installation · Code · Props · Examples ]',
+      },
+    ],
+  },
+  '/components/menubar': {
+    lede: '[ Menubar — page coming soon ]',
+    blocks: [
+      {
+        type: 'placeholder',
+        variant: 'storybook',
+        label: '[ Preview · Installation · Code · Props · Examples ]',
+      },
+    ],
+  },
+  '/components/message': {
+    lede: '[ Message — page coming soon ]',
+    blocks: [
+      {
+        type: 'placeholder',
+        variant: 'storybook',
+        label: '[ Preview · Installation · Code · Props · Examples ]',
+      },
+    ],
+  },
+  '/components/message-scroller': {
+    lede: '[ MessageScroller — page coming soon ]',
+    blocks: [
+      {
+        type: 'placeholder',
+        variant: 'storybook',
+        label: '[ Preview · Installation · Code · Props · Examples ]',
+      },
+    ],
+  },
+  '/components/multi-select': {
+    lede: '[ MultiSelect — page coming soon ]',
+    blocks: [
+      {
+        type: 'placeholder',
+        variant: 'storybook',
+        label: '[ Preview · Installation · Code · Props · Examples ]',
+      },
+    ],
+  },
+  '/components/native-select': {
+    lede: '[ NativeSelect — page coming soon ]',
+    blocks: [
+      {
+        type: 'placeholder',
+        variant: 'storybook',
+        label: '[ Preview · Installation · Code · Props · Examples ]',
+      },
+    ],
+  },
+  '/components/navigation-menu': {
+    lede: '[ NavigationMenu — page coming soon ]',
+    blocks: [
+      {
+        type: 'placeholder',
+        variant: 'storybook',
+        label: '[ Preview · Installation · Code · Props · Examples ]',
+      },
+    ],
+  },
+  '/components/pagination': {
+    lede: '[ Pagination — page coming soon ]',
+    blocks: [
+      {
+        type: 'placeholder',
+        variant: 'storybook',
+        label: '[ Preview · Installation · Code · Props · Examples ]',
+      },
+    ],
+  },
+  '/components/popover': {
+    lede: '[ Popover — page coming soon ]',
+    blocks: [
+      {
+        type: 'placeholder',
+        variant: 'storybook',
+        label: '[ Preview · Installation · Code · Props · Examples ]',
+      },
+    ],
+  },
+  '/components/progress': {
+    lede: '[ Progress — page coming soon ]',
+    blocks: [
+      {
+        type: 'placeholder',
+        variant: 'storybook',
+        label: '[ Preview · Installation · Code · Props · Examples ]',
+      },
+    ],
+  },
+  '/components/radio-group': {
+    lede: '[ RadioGroup — page coming soon ]',
+    blocks: [
+      {
+        type: 'placeholder',
+        variant: 'storybook',
+        label: '[ Preview · Installation · Code · Props · Examples ]',
+      },
+    ],
+  },
+  '/components/resizable': {
+    lede: '[ Resizable — page coming soon ]',
+    blocks: [
+      {
+        type: 'placeholder',
+        variant: 'storybook',
+        label: '[ Preview · Installation · Code · Props · Examples ]',
+      },
+    ],
+  },
+  '/components/scroll-area': {
+    lede: '[ ScrollArea — page coming soon ]',
+    blocks: [
+      {
+        type: 'placeholder',
+        variant: 'storybook',
+        label: '[ Preview · Installation · Code · Props · Examples ]',
+      },
+    ],
+  },
+  '/components/separator': {
+    lede: '[ Separator — page coming soon ]',
+    blocks: [
+      {
+        type: 'placeholder',
+        variant: 'storybook',
+        label: '[ Preview · Installation · Code · Props · Examples ]',
+      },
+    ],
+  },
+  '/components/sheet': {
+    lede: '[ Sheet — page coming soon ]',
+    blocks: [
+      {
+        type: 'placeholder',
+        variant: 'storybook',
+        label: '[ Preview · Installation · Code · Props · Examples ]',
+      },
+    ],
+  },
+  '/components/show': {
+    lede: '[ Show — page coming soon ]',
+    blocks: [
+      {
+        type: 'placeholder',
+        variant: 'storybook',
+        label: '[ Preview · Installation · Code · Props · Examples ]',
+      },
+    ],
+  },
+  '/components/sidebar': {
+    lede: '[ Sidebar — page coming soon ]',
+    blocks: [
+      {
+        type: 'placeholder',
+        variant: 'storybook',
+        label: '[ Preview · Installation · Code · Props · Examples ]',
+      },
+    ],
+  },
+  '/components/skeleton': {
+    lede: '[ Skeleton — page coming soon ]',
+    blocks: [
+      {
+        type: 'placeholder',
+        variant: 'storybook',
+        label: '[ Preview · Installation · Code · Props · Examples ]',
+      },
+    ],
+  },
+  '/components/slider': {
+    lede: '[ Slider — page coming soon ]',
+    blocks: [
+      {
+        type: 'placeholder',
+        variant: 'storybook',
+        label: '[ Preview · Installation · Code · Props · Examples ]',
+      },
+    ],
+  },
+  '/components/sonner': {
+    lede: '[ Sonner — page coming soon ]',
+    blocks: [
+      {
+        type: 'placeholder',
+        variant: 'storybook',
+        label: '[ Preview · Installation · Code · Props · Examples ]',
+      },
+    ],
+  },
+  '/components/spinner': {
+    lede: '[ Spinner — page coming soon ]',
+    blocks: [
+      {
+        type: 'placeholder',
+        variant: 'storybook',
+        label: '[ Preview · Installation · Code · Props · Examples ]',
+      },
+    ],
+  },
+  '/components/switch': {
+    lede: '[ Switch — page coming soon ]',
+    blocks: [
+      {
+        type: 'placeholder',
+        variant: 'storybook',
+        label: '[ Preview · Installation · Code · Props · Examples ]',
+      },
+    ],
+  },
+  '/components/table': {
+    lede: '[ Table — page coming soon ]',
+    blocks: [
+      {
+        type: 'placeholder',
+        variant: 'storybook',
+        label: '[ Preview · Installation · Code · Props · Examples ]',
+      },
+    ],
+  },
+  '/components/textarea': {
+    lede: '[ Textarea — page coming soon ]',
+    blocks: [
+      {
+        type: 'placeholder',
+        variant: 'storybook',
+        label: '[ Preview · Installation · Code · Props · Examples ]',
+      },
+    ],
+  },
+  '/components/toggle': {
+    lede: '[ Toggle — page coming soon ]',
+    blocks: [
+      {
+        type: 'placeholder',
+        variant: 'storybook',
+        label: '[ Preview · Installation · Code · Props · Examples ]',
+      },
+    ],
+  },
+  '/components/toggle-group': {
+    lede: '[ ToggleGroup — page coming soon ]',
+    blocks: [
+      {
+        type: 'placeholder',
+        variant: 'storybook',
+        label: '[ Preview · Installation · Code · Props · Examples ]',
+      },
+    ],
+  },
+  '/components/tooltip': {
+    lede: '[ Tooltip — page coming soon ]',
+    blocks: [
+      {
+        type: 'placeholder',
+        variant: 'storybook',
+        label: '[ Preview · Installation · Code · Props · Examples ]',
+      },
     ],
   },
   '/theming/density-modes': {

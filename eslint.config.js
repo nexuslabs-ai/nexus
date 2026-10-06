@@ -250,10 +250,6 @@ export default tseslint.config(
     files: ['apps/docs/**/*.{ts,tsx}'],
     entryPoint: repoPath('apps/docs/app/globals.css'),
   }),
-  nexusTailwindClassesConfig({
-    files: ['apps/console/src/**/*.{ts,tsx}'],
-    entryPoint: repoPath('apps/console/src/App.css'),
-  }),
 
   // Only Button consumes --nx-radius-base (documented in theming/radius-overrides).
   {

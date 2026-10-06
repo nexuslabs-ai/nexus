@@ -1,13 +1,13 @@
 import type { Meta, StoryObj } from '@storybook/react';
 import {
-  BookOpenCheckIcon,
-  CheckIcon,
-  FileTextIcon,
-  GitBranchIcon,
-  PencilIcon,
-  RotateCcwIcon,
-  SearchIcon,
-} from 'lucide-react';
+  IconBook,
+  IconCheck,
+  IconFileText,
+  IconGitBranch,
+  IconPencil,
+  IconRotate,
+  IconSearch,
+} from '@tabler/icons-react';
 import { expect, fn, userEvent, within } from 'storybook/test';
 
 import { Spinner } from '../spinner';
@@ -63,19 +63,19 @@ export const Border: Story = {
     <div className={stack}>
       <Marker variant="border">
         <MarkerIcon>
-          <GitBranchIcon />
+          <IconGitBranch />
         </MarkerIcon>
         <MarkerContent>Switched to release-candidate</MarkerContent>
       </Marker>
       <Marker variant="border">
         <MarkerIcon>
-          <SearchIcon />
+          <IconSearch />
         </MarkerIcon>
         <MarkerContent>Reviewed 8 related files</MarkerContent>
       </Marker>
       <Marker variant="border">
         <MarkerIcon>
-          <FileTextIcon />
+          <IconFileText />
         </MarkerIcon>
         <MarkerContent>Opened implementation notes</MarkerContent>
       </Marker>
@@ -88,19 +88,19 @@ export const WithIcon: Story = {
     <div className={stack}>
       <Marker>
         <MarkerIcon>
-          <PencilIcon />
+          <IconPencil />
         </MarkerIcon>
         <MarkerContent>Edited 2 minutes ago</MarkerContent>
       </Marker>
       <Marker variant="separator">
         <MarkerIcon>
-          <SearchIcon />
+          <IconSearch />
         </MarkerIcon>
         <MarkerContent>Explored 4 files</MarkerContent>
       </Marker>
       <Marker variant="border">
         <MarkerIcon>
-          <BookOpenCheckIcon />
+          <IconBook />
         </MarkerIcon>
         <MarkerContent>Syncing completed</MarkerContent>
       </Marker>
@@ -179,7 +179,7 @@ export const InContext: Story = {
       <div className={row}>Reviewed the token audit</div>
       <Marker>
         <MarkerIcon>
-          <PencilIcon />
+          <IconPencil />
         </MarkerIcon>
         <MarkerContent>Edited 2 minutes ago</MarkerContent>
       </Marker>
@@ -213,7 +213,7 @@ export const AsChildLink: Story = {
     <Marker asChild>
       <a href="#pull-request">
         <MarkerIcon>
-          <GitBranchIcon />
+          <IconGitBranch />
         </MarkerIcon>
         <MarkerContent>View the pull request</MarkerContent>
       </a>
@@ -240,7 +240,7 @@ export const Disabled: StoryObj<MarkerProps & { onRevert: () => void }> = {
       <Marker asChild>
         <button type="button" onClick={args.onRevert}>
           <MarkerIcon>
-            <RotateCcwIcon />
+            <IconRotate />
           </MarkerIcon>
           <MarkerContent>Revert this change</MarkerContent>
         </button>
@@ -248,7 +248,7 @@ export const Disabled: StoryObj<MarkerProps & { onRevert: () => void }> = {
       <Marker asChild>
         <button type="button" disabled onClick={args.onRevert}>
           <MarkerIcon>
-            <RotateCcwIcon />
+            <IconRotate />
           </MarkerIcon>
           <MarkerContent>Delete this draft</MarkerContent>
         </button>
@@ -256,7 +256,7 @@ export const Disabled: StoryObj<MarkerProps & { onRevert: () => void }> = {
       <Marker asChild>
         <a href="#pull-request" aria-disabled="true" tabIndex={-1}>
           <MarkerIcon>
-            <GitBranchIcon />
+            <IconGitBranch />
           </MarkerIcon>
           <MarkerContent>View the pull request</MarkerContent>
         </a>
@@ -311,7 +311,7 @@ export const ClickInteraction: StoryObj<
     <Marker asChild>
       <button type="button" onClick={args.onRevert}>
         <MarkerIcon>
-          <RotateCcwIcon />
+          <IconRotate />
         </MarkerIcon>
         <MarkerContent>Revert this change</MarkerContent>
       </button>
@@ -361,7 +361,7 @@ export const WithDataAttributes: Story = {
   render: () => (
     <Marker variant="separator">
       <MarkerIcon>
-        <CheckIcon />
+        <IconCheck />
       </MarkerIcon>
       <MarkerContent>Today</MarkerContent>
     </Marker>
@@ -394,7 +394,7 @@ export const AllVariants: Story = {
           </Marker>
           <Marker variant={variant}>
             <MarkerIcon>
-              <CheckIcon />
+              <IconCheck />
             </MarkerIcon>
             <MarkerContent>Today, with an icon</MarkerContent>
           </Marker>

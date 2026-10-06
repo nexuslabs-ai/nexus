@@ -1,7 +1,7 @@
 import * as React from 'react';
 
 import type { Meta, StoryObj } from '@storybook/react';
-import { CopyIcon, FileTextIcon, RefreshCcwIcon } from 'lucide-react';
+import { IconCopy, IconFileText, IconRefresh } from '@tabler/icons-react';
 import { expect, userEvent, waitFor, within } from 'storybook/test';
 
 import { cn } from '../../lib/utils';
@@ -689,7 +689,7 @@ export const WithActions: Story = {
                     variant="ghost"
                     aria-label="Copy reply"
                   >
-                    <CopyIcon />
+                    <IconCopy />
                   </Button>
                 </TooltipTrigger>
                 <TooltipContent>Copy</TooltipContent>
@@ -701,7 +701,7 @@ export const WithActions: Story = {
                     variant="ghost"
                     aria-label="Regenerate reply"
                   >
-                    <RefreshCcwIcon />
+                    <IconRefresh />
                   </Button>
                 </TooltipTrigger>
                 <TooltipContent>Regenerate</TooltipContent>
@@ -729,7 +729,7 @@ export const WithActions: Story = {
                     variant="ghost"
                     aria-label="Copy message"
                   >
-                    <CopyIcon />
+                    <IconCopy />
                   </Button>
                 </TooltipTrigger>
                 <TooltipContent>Copy</TooltipContent>
@@ -741,7 +741,7 @@ export const WithActions: Story = {
                     variant="ghost"
                     aria-label="Retry sending"
                   >
-                    <RefreshCcwIcon />
+                    <IconRefresh />
                   </Button>
                 </TooltipTrigger>
                 <TooltipContent>Retry</TooltipContent>
@@ -827,7 +827,7 @@ export const WithAttachment: Story = {
           <MessageHeader>Ana Bianchi</MessageHeader>
           <Attachment>
             <AttachmentMedia>
-              <FileTextIcon />
+              <IconFileText />
             </AttachmentMedia>
             <AttachmentContent>
               <AttachmentTitle>sales-dashboard.pdf</AttachmentTitle>
@@ -844,7 +844,7 @@ export const WithAttachment: Story = {
         <MessageContent>
           <Attachment>
             <AttachmentMedia>
-              <FileTextIcon />
+              <IconFileText />
             </AttachmentMedia>
             <AttachmentContent>
               <AttachmentTitle>contrast-audit.log</AttachmentTitle>
@@ -999,7 +999,7 @@ export const ComposedScene: Story = {
           </Bubble>
           <Attachment>
             <AttachmentMedia>
-              <FileTextIcon />
+              <IconFileText />
             </AttachmentMedia>
             <AttachmentContent>
               <AttachmentTitle>contrast-audit.log</AttachmentTitle>
