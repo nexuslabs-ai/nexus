@@ -2,7 +2,7 @@
 
 A **live integration bed** for the external-consumer story: it publishes an
 exported design system to a local registry and consumes it from a stock
-Next.js 15 + Tailwind 4 app. It's the thing `apps/console` (all-in on Nexus via
+Next.js 15 + Tailwind 4 app. It's the thing `apps/docs` (all-in on Nexus via
 workspace links) can't prove, and it's the reference for **how a real downstream
 app adopts the design system incrementally**.
 

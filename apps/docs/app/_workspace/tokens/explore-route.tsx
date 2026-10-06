@@ -220,7 +220,7 @@ function AboutCatalogue({ index }: { index: TokenIndex }) {
     .find((variant) => variant.appearance)?.appearance;
   return (
     <details className="nx:space-y-4">
-      <summary className="nx:typography-label-small nx:cursor-pointer nx:py-3 nx:focus-visible:outline-2 nx:focus-visible:outline-focus-default nx:focus-visible:outline-offset-(--focus-offset)">
+      <summary className="nx:typography-label-small nx:cursor-pointer nx:py-3 nx:focus-visible:outline-2 nx:focus-visible:outline-focus-default">
         About this catalogue
       </summary>
       <p className="nx:typography-body-small nx:text-muted-foreground">

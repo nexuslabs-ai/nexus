@@ -5,27 +5,6 @@
 // `pnpm lint` and the pre-commit hook for every contributor — not only on
 // in-session Claude edits.
 
-// The 13 live typography composites emitted as `@utility typography-*` by
-// packages/tailwind/typography-utilities.css; any other `nx:…typography-*` is
-// dead — it renders nothing (e.g. the `label-large` / `body-xsmall` tiers dropped
-// by the #459 trim). A drift guard in the rule's test fails if this list and the
-// emitted set diverge, so it can't silently rot.
-export const LIVE_TYPOGRAPHY = [
-  'body-default',
-  'body-small',
-  'code-block',
-  'code-inline',
-  'heading-large',
-  'heading-medium',
-  'heading-small',
-  'heading-xsmall',
-  'heading-xxsmall',
-  'label-caps',
-  'label-default',
-  'label-small',
-  'shortcut',
-];
-
 export const RAW_FONT_WEIGHTS = [
   'thin',
   'extralight',
@@ -108,12 +87,6 @@ const CHECKS = [
       `nx:${NX_MODIFIER_CHAIN}tracking-(?:${RAW_LETTER_SPACINGS.join('|')}|\\[)`
     ),
     runtimeOnly: true,
-  },
-  {
-    messageId: 'deadTypography',
-    re: new RegExp(
-      `nx:${NX_MODIFIER_CHAIN}typography-(?!(?:${LIVE_TYPOGRAPHY.join('|')})\\b)[\\w-]+`
-    ),
   },
 ];
 
@@ -304,8 +277,6 @@ export default {
         'Raw Tailwind letter-spacing utility — use a typography composite such as `nx:typography-label-caps` instead of `nx:tracking-*`.',
       ringFadingTransition:
         'Ring-fading transition — `nx:transition-colors` includes `outline-color`, so this focus ring fades in instead of landing with the keypress. Use `nx:transition-control` (or `nx:transition-field` on a field surface).',
-      deadTypography:
-        'Unknown typography composite — this `nx:typography-*` utility is not emitted by typography-utilities.css and renders nothing. Use a live tier (e.g. `nx:typography-body-default`, `nx:typography-label-default`).',
     },
   },
   create(context) {

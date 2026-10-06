@@ -74,7 +74,7 @@ function ThemePanel() {
   return (
     <aside
       ref={panelRef}
-      className="nx:fixed nx:bottom-6 nx:right-6 nx:z-popover nx:w-[300px] nx:max-h-[calc(100svh_-_2*var(--nx-spacing-6))] nx:overflow-y-auto nx:bg-popover nx:text-popover-foreground nx:border nx:border-border-default nx:rounded-lg nx:shadow-lg"
+      className="nx:fixed nx:bottom-6 nx:right-6 nx:z-sticky nx:w-[300px] nx:max-h-[calc(100svh_-_2*var(--nx-spacing-6))] nx:overflow-y-auto nx:bg-popover nx:text-popover-foreground nx:border nx:border-border-default nx:rounded-lg nx:shadow-lg"
     >
       <Button
         variant="ghost"
