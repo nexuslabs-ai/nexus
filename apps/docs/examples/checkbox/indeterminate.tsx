@@ -11,8 +11,13 @@ export default function CheckboxIndeterminate() {
   const [email, setEmail] = React.useState(true);
   const [sms, setSms] = React.useState(false);
 
-  const allState: CheckedState =
-    email && sms ? true : email || sms ? 'indeterminate' : false;
+  const allSelected = email && sms;
+  const someSelected = email || sms;
+  const allState: CheckedState = allSelected
+    ? true
+    : someSelected
+      ? 'indeterminate'
+      : false;
 
   function toggleAll(checked: CheckedState) {
     setEmail(checked === true);
