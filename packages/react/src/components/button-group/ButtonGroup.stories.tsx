@@ -1,12 +1,6 @@
 import { Canvas, Description, Title } from '@storybook/addon-docs/blocks';
 import type { Meta, StoryObj } from '@storybook/react';
-import {
-  IconBold,
-  IconChevronDown,
-  IconItalic,
-  IconLink,
-  IconUnderline,
-} from '@tabler/icons-react';
+import { IconChevronDown } from '@tabler/icons-react';
 import { expect, userEvent, waitFor, within } from 'storybook/test';
 
 import { expectNativePress } from '../../stories/support/native-press';
@@ -64,8 +58,11 @@ const meta: Meta<typeof ButtonGroup> = {
           <Canvas of={RightToLeft} />
           <h2 id="addons">Labels and separators</h2>
           <p>
-            ButtonGroupText supplies an addon; ButtonGroupSeparator divides
-            related clusters. Use InputGroup for a field with addons.
+            A text addon can show how many items an action affects. A separator
+            divides related commands, such as history and clipboard actions.
+            These are composition examples; the application supplies the count
+            and action handlers. Use ToggleGroup for persistent formatting
+            choices and InputGroup for an editable field with addons.
           </p>
           <Canvas of={WithText} />
           <Canvas of={WithSeparator} />
@@ -178,49 +175,59 @@ export const Vertical: Story = {
   },
 };
 
-// A text addon as a leading prefix.
+// The selection count supplies context for the adjacent bulk actions.
 export const WithText: Story = {
+  name: 'Selection actions',
   render: () => (
-    <ButtonGroup>
-      <ButtonGroupText>https://</ButtonGroupText>
-      <Button variant="outline">nexus.dev</Button>
+    <ButtonGroup aria-label="Actions for 3 selected items">
+      <ButtonGroupText>3 selected</ButtonGroupText>
+      <Button variant="outline">Archive</Button>
+      <Button variant="error-outline">Delete</Button>
     </ButtonGroup>
   ),
   play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+    const group = canvas.getByRole('group', {
+      name: 'Actions for 3 selected items',
+    });
+    await expect(within(group).getByText('3 selected')).toHaveAttribute(
+      'data-slot',
+      'button-group-text'
+    );
+    await expect(within(group).getAllByRole('button')).toHaveLength(2);
     await expect(
-      canvasElement.querySelector('[data-slot="button-group-text"]')
-    ).toBeInTheDocument();
+      within(group).getByRole('button', { name: 'Archive' })
+    ).toBeEnabled();
+    await expect(
+      within(group).getByRole('button', { name: 'Delete' })
+    ).toBeEnabled();
   },
 };
 
-// A separator divides sub-groups in a toolbar of borderless (ghost) controls —
-// the rule is the only division, so it reads clearly. In a row of bordered
-// (outline) buttons the per-button borders sit in the same color and hide it.
+// Ghost controls let the separator distinguish history from clipboard commands.
 export const WithSeparator: Story = {
+  name: 'Command clusters',
   render: () => (
-    <ButtonGroup>
-      <Button variant="ghost" size="icon" aria-label="Bold">
-        <IconBold />
-      </Button>
-      <Button variant="ghost" size="icon" aria-label="Italic">
-        <IconItalic />
-      </Button>
-      <Button variant="ghost" size="icon" aria-label="Underline">
-        <IconUnderline />
-      </Button>
+    <ButtonGroup aria-label="Editing commands">
+      <Button variant="ghost">Undo</Button>
+      <Button variant="ghost">Redo</Button>
       <ButtonGroupSeparator />
-      <Button variant="ghost" size="icon" aria-label="Add link">
-        <IconLink />
-      </Button>
+      <Button variant="ghost">Copy</Button>
+      <Button variant="ghost">Paste</Button>
     </ButtonGroup>
   ),
   play: async ({ canvasElement }) => {
-    const separator = canvasElement.querySelector(
+    const canvas = within(canvasElement);
+    const group = canvas.getByRole('group', { name: 'Editing commands' });
+    const separator = group.querySelector(
       '[data-slot="button-group-separator"]'
     );
-
-    await expect(separator).toBeInTheDocument();
     await expect(separator).toHaveAttribute('data-orientation', 'vertical');
+    for (const name of ['Undo', 'Redo', 'Copy', 'Paste']) {
+      const button = within(group).getByRole('button', { name });
+      await expect(button).toBeEnabled();
+      await expect(button).not.toHaveAttribute('aria-pressed');
+    }
   },
 };
 
@@ -591,10 +598,10 @@ export const AllVariants: Story = {
         <Button variant="outline">Week</Button>
         <Button variant="outline">Month</Button>
       </ButtonGroup>
-      <ButtonGroup>
-        <ButtonGroupText>https://</ButtonGroupText>
-        <Button variant="outline">nexus.dev</Button>
-        <Button variant="outline">Go</Button>
+      <ButtonGroup aria-label="Actions for 3 selected items">
+        <ButtonGroupText>3 selected</ButtonGroupText>
+        <Button variant="outline">Archive</Button>
+        <Button variant="error-outline">Delete</Button>
       </ButtonGroup>
       <ButtonGroup orientation="vertical" size="sm">
         <Button variant="outline">Top</Button>
