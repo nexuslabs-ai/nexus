@@ -122,6 +122,7 @@
       "prettier --write"
     ],
     "apps/docs/examples/**/*.tsx": [
+      "node apps/docs/scripts/generate-dependencies.mjs",
       "node apps/docs/scripts/generate-demo-index.mjs",
       "git add apps/docs/__generated__"
     ],

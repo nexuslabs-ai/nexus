@@ -2,8 +2,8 @@
 
 import {
   IconAlertTriangle,
+  IconArrowUpRight,
   IconCircleCheck,
-  IconTrendingUp,
 } from '@tabler/icons-react';
 
 import { Badge } from '@/components/badge/badge';
@@ -17,7 +17,7 @@ export default function BadgeWithIcon() {
       <Badge variant="warning" fill="light" leftIcon={<IconAlertTriangle />}>
         Pending
       </Badge>
-      <Badge variant="information" rightIcon={<IconTrendingUp />}>
+      <Badge variant="information" rightIcon={<IconArrowUpRight />}>
         Trending
       </Badge>
     </div>

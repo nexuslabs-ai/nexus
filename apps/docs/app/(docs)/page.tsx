@@ -8,7 +8,7 @@ import {
   CardHeader,
   CardTitle,
 } from '../_components/nexus';
-import { countComponents, describeSize } from '../_lib/home-counts';
+import { describeSize } from '../_lib/home-counts';
 import { CARD_JOINER, PAGE_MANIFEST, requireSection } from '../_lib/manifest';
 
 const BLUE_RAMP = [50, 100, 200, 300, 400, 500, 600, 700, 800, 900, 950];
@@ -16,7 +16,7 @@ const BASE_CHIPS = ['slate', 'stone', 'neutral', 'gray', 'zinc'];
 
 const STATS = [
   { n: String(BASE_CHIPS.length), l: 'Bases' },
-  { n: String(countComponents(requireSection('components'))), l: 'Components' },
+  { n: String(requireSection('components').pages.length), l: 'Components' },
   { n: '2', l: 'Themes' },
   { n: '100%', l: 'Tokenized' },
 ];

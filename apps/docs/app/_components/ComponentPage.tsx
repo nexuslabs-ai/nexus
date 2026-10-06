@@ -6,7 +6,7 @@ import {
 } from '../../__generated__/demo-index';
 import { PREVIEW_DEMO } from '../../scripts/examples.mjs';
 import { humanize } from '../../scripts/humanize.mjs';
-import { requireSection } from '../_lib/manifest';
+import { requireComponentsSection } from '../_lib/manifest';
 
 import { ComponentPreview } from './ComponentPreview';
 import { ComponentSource } from './ComponentSource';
@@ -28,10 +28,10 @@ type Example = { id: DemoId; name: string };
  * folder is an example, registry `examples` first, then the rest by name.
  */
 export function ComponentPage({ slug }: { slug: string }) {
-  const page = requireSection('components').pages.find(
+  const page = requireComponentsSection().pages.find(
     (entry) => entry.slug === slug
   );
-  if (!page?.examples) {
+  if (page?.kind !== 'mdx') {
     throw new Error(
       `ComponentPage: no /components/${slug} component page in the manifest — add apps/docs/content/components/${slug}.mdx.`
     );
