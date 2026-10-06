@@ -56,6 +56,7 @@ export const PAGE_LOADERS: Record<string, ManifestPageLoader> = {
     import('../../content/components/dropdown-menu.mdx'),
   '/components/input': () => import('../../content/components/input.mdx'),
   '/components/select': () => import('../../content/components/select.mdx'),
+  '/components/switch': () => import('../../content/components/switch.mdx'),
   '/components/tabs': () => import('../../content/components/tabs.mdx'),
   '/theming/appearance': () => import('../../content/theming/appearance.mdx'),
   '/theming/multi-brand': () => import('../_pages/theming/multi-brand'),
@@ -490,16 +491,6 @@ export const PAGE_WIREFRAMES: Record<string, PageWireframe> = {
   },
   '/components/spinner': {
     lede: '[ Spinner — page coming soon ]',
-    blocks: [
-      {
-        type: 'placeholder',
-        variant: 'storybook',
-        label: '[ Preview · Installation · Code · Props · Examples ]',
-      },
-    ],
-  },
-  '/components/switch': {
-    lede: '[ Switch — page coming soon ]',
     blocks: [
       {
         type: 'placeholder',

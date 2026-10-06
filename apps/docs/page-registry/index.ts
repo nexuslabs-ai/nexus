@@ -435,6 +435,7 @@ export const PAGE_REGISTRY = {
       {
         slug: 'switch',
         label: 'Switch',
+        examples: ['sizes', 'checked', 'disabled', 'with-description'],
       },
       {
         slug: 'table',

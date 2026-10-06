@@ -620,8 +620,9 @@ export const PAGE_MANIFEST: readonly ManifestSection[] = [
         route: '/components/switch',
         slug: 'switch',
         label: 'Switch',
-        kind: 'placeholder',
-        file: null,
+        examples: ['sizes', 'checked', 'disabled', 'with-description'],
+        kind: 'mdx',
+        file: 'content/components/switch.mdx',
       },
       {
         route: '/components/table',

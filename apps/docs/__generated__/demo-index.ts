@@ -501,6 +501,36 @@ export const demos = {
     packages: [],
     load: () => import("./demos/select/variants"),
   },
+  "switch/checked": {
+    id: "switch/checked",
+    alsoInstall: ["label"],
+    packages: [],
+    load: () => import("./demos/switch/checked"),
+  },
+  "switch/demo": {
+    id: "switch/demo",
+    alsoInstall: ["label"],
+    packages: [],
+    load: () => import("./demos/switch/demo"),
+  },
+  "switch/disabled": {
+    id: "switch/disabled",
+    alsoInstall: ["label"],
+    packages: [],
+    load: () => import("./demos/switch/disabled"),
+  },
+  "switch/sizes": {
+    id: "switch/sizes",
+    alsoInstall: ["label"],
+    packages: [],
+    load: () => import("./demos/switch/sizes"),
+  },
+  "switch/with-description": {
+    id: "switch/with-description",
+    alsoInstall: ["label"],
+    packages: [],
+    load: () => import("./demos/switch/with-description"),
+  },
   "tabs/demo": {
     id: "tabs/demo",
     alsoInstall: [],
