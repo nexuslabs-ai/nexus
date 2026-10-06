@@ -124,6 +124,17 @@
         "letterSpacing": "{letterspacing.wide}"
       },
       "$description": "Compact eyebrow and section labels, tuned for all-caps; apply uppercase at the call site"
+    },
+    "compact": {
+      "$type": "typography",
+      "$value": {
+        "fontFamily": "{family.font-sans}",
+        "fontSize": "{size.compact}",
+        "fontWeight": "{weight.medium}",
+        "lineHeight": "{line-height.sm}",
+        "letterSpacing": "{letterspacing.normal}"
+      },
+      "$description": "Compact control labels between small and default typography; independent of density"
     }
   },
   "code": {

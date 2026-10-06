@@ -12,12 +12,12 @@ import {
 } from './button-group-context';
 
 const buttonGroupVariants = cva(
-  'nx:flex nx:w-fit nx:items-stretch nx:*:focus-visible:relative nx:*:focus-visible:z-10',
+  'nx:flex nx:w-fit nx:items-stretch nx:[&>[data-slot=button]:active]:scale-100 nx:*:focus-visible:relative nx:*:focus-visible:z-10',
   {
     variants: {
       orientation: {
         horizontal:
-          'nx:[&>*:not(:first-child)]:rounded-l-none nx:[&>*:not(:first-child)]:border-l-0 nx:[&>*:not(:last-child)]:rounded-r-none',
+          'nx:[&>*:not(:first-child)]:rounded-s-none nx:[&>*:not(:first-child)]:border-s-0 nx:[&>*:not(:last-child)]:rounded-e-none',
         vertical:
           'nx:flex-col nx:[&>*:not(:first-child)]:rounded-t-none nx:[&>*:not(:first-child)]:border-t-0 nx:[&>*:not(:last-child)]:rounded-b-none',
       },
@@ -29,13 +29,15 @@ const buttonGroupVariants = cva(
 );
 
 const buttonGroupTextVariants = cva(
-  'nx:flex nx:items-center nx:gap-2 nx:rounded-md nx:border-default nx:border-border-default nx:bg-control-background nx:shadow-xs nx:transition-control nx:duration-fast nx:focus-visible:outline-2 nx:focus-visible:outline-focus-default nx:[&_svg]:pointer-events-none nx:[&_svg]:size-4',
+  'nx:flex nx:items-center nx:gap-2 nx:rounded-md nx:border-default nx:border-border-default nx:bg-control-background nx:shadow-xs nx:transition-control nx:duration-fast nx:focus-visible:outline-2 nx:focus-visible:outline-focus-default nx:[&_svg]:pointer-events-none',
   {
     variants: {
       size: {
-        sm: 'nx:h-8 nx:px-2.5 nx:typography-label-default',
-        default: 'nx:h-10 nx:px-3 nx:typography-label-default',
-        lg: 'nx:h-12 nx:px-3.5 nx:typography-label-default',
+        xs: 'nx:h-7 nx:px-2 nx:typography-label-small nx:[&_svg]:size-icon-xs',
+        sm: 'nx:h-8 nx:px-2.5 nx:typography-label-compact nx:[&_svg]:size-icon-sm',
+        default:
+          'nx:h-10 nx:px-3 nx:typography-label-default nx:[&_svg]:size-icon-default',
+        lg: 'nx:h-12 nx:px-3.5 nx:typography-label-default nx:[&_svg]:size-icon-default',
       },
     },
     defaultVariants: {

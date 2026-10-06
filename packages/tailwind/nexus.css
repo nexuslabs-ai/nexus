@@ -18,6 +18,7 @@
 @import './borderwidth-utilities.css';
 @import './border-color-aliases.css';
 @import './motion-utilities.css';
+@import './icon-utilities.css';
 @import './spacing-utilities.css';
 
 @custom-variant dark (&:where([data-nexus-root][data-nx-mode='dark'], [data-nexus-root][data-nx-mode='dark'] *));

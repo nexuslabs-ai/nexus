@@ -2,6 +2,7 @@ import borderwidthFine from '../../tokens/primitives/borderwidth/borderwidth-fin
 import borderwidthNormal from '../../tokens/primitives/borderwidth/borderwidth-normal.json';
 import borderwidthStrong from '../../tokens/primitives/borderwidth/borderwidth-strong.json';
 import color from '../../tokens/primitives/color.json';
+import icon from '../../tokens/primitives/icon.json';
 import motionSnappy from '../../tokens/primitives/motion/motion-snappy.json';
 import radiusExtraRound from '../../tokens/primitives/radius/radius-extra-round.json';
 import radiusRound from '../../tokens/primitives/radius/radius-round.json';
@@ -39,6 +40,7 @@ export const TOKEN_FILES = {
   'primitives/borderwidth/borderwidth-normal.json': borderwidthNormal,
   'primitives/borderwidth/borderwidth-strong.json': borderwidthStrong,
   'primitives/color.json': color,
+  'primitives/icon.json': icon,
   'primitives/motion/motion-snappy.json': motionSnappy,
   'primitives/radius/radius-extra-round.json': radiusExtraRound,
   'primitives/radius/radius-round.json': radiusRound,

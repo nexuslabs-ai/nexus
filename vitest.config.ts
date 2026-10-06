@@ -60,6 +60,33 @@ export default defineConfig({
             enabled: true,
             provider: playwright(),
             headless: true,
+            commands: {
+              async measureButtonPress({ page, iframe }, selector: string) {
+                const target = iframe.locator(selector);
+                await target.hover();
+                await page.mouse.down();
+                try {
+                  await target.evaluate(async (element) => {
+                    await Promise.all(
+                      element
+                        .getAnimations()
+                        .map((animation) => animation.finished)
+                    );
+                  });
+                  return await target.evaluate((element) => {
+                    const rect = element.getBoundingClientRect();
+                    return {
+                      active: element.matches(':active'),
+                      scale: getComputedStyle(element).scale,
+                      width: rect.width,
+                      height: rect.height,
+                    };
+                  });
+                } finally {
+                  await page.mouse.up();
+                }
+              },
+            },
             instances: [{ browser: 'chromium' }],
           },
           setupFiles: [

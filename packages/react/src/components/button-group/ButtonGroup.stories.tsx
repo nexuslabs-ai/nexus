@@ -1,3 +1,4 @@
+import { Canvas, Description, Title } from '@storybook/addon-docs/blocks';
 import type { Meta, StoryObj } from '@storybook/react';
 import {
   IconBold,
@@ -6,8 +7,9 @@ import {
   IconLink,
   IconUnderline,
 } from '@tabler/icons-react';
-import { expect, within } from 'storybook/test';
+import { expect, userEvent, waitFor, within } from 'storybook/test';
 
+import { expectNativePress } from '../../stories/support/native-press';
 import { expectHeightPinned } from '../../stories/support/story-height-test-utils';
 import { Button } from '../button';
 import {
@@ -34,19 +36,71 @@ import {
 const meta: Meta<typeof ButtonGroup> = {
   title: 'Components/ButtonGroup',
   component: ButtonGroup,
+  parameters: {
+    docs: {
+      page: () => (
+        <>
+          <Title />
+          <Description />
+          <h2 id="joined-actions">Joined actions</h2>
+          <p>
+            Use a group for related actions with shared borders. It is not a
+            selection control or toolbar: buttons retain normal Tab navigation.
+            Use ToggleGroup for persistent selection.
+          </p>
+          <Canvas of={Default} />
+          <h2 id="sizes">Sizes</h2>
+          <p>
+            The group size is inherited by Button and ButtonGroupText, including
+            buttons inside trigger wrappers. Set matching icon-only sizes
+            explicitly. An explicit child size overrides inheritance.
+          </p>
+          <Canvas of={ExtraSmall} />
+          <Canvas of={Small} />
+          <Canvas of={Default} />
+          <Canvas of={Large} />
+          <h2 id="orientation">Orientation</h2>
+          <Canvas of={Vertical} />
+          <Canvas of={RightToLeft} />
+          <h2 id="addons">Labels and separators</h2>
+          <p>
+            ButtonGroupText supplies an addon; ButtonGroupSeparator divides
+            related clusters. Use InputGroup for a field with addons.
+          </p>
+          <Canvas of={WithText} />
+          <Canvas of={WithSeparator} />
+          <h2 id="compositions">Compositions</h2>
+          <p>
+            Use Nexus menu and select triggers for split actions. The
+            application owns selected values and action effects.
+          </p>
+          <Canvas of={SplitButton} />
+          <Canvas of={WithSelectTrigger} />
+          <h2 id="destructive-actions">Destructive actions</h2>
+          <Canvas of={ErrorOutlineGroup} />
+        </>
+      ),
+      description: {
+        component:
+          'Joins related buttons into one control. Members keep their full size when pressed and use colour feedback; standalone Buttons shrink to 98%. Native press geometry is verified in the Vitest browser runner.',
+      },
+    },
+  },
 };
 
 export default meta;
 type Story = StoryObj<typeof ButtonGroup>;
 
 const BUTTON_GROUP_SIZE_HEIGHTS = {
+  xs: 28,
   sm: 32,
   default: 40,
   lg: 48,
 } as const;
 
 const BUTTON_GROUP_TEXT_SIZE_CLASSES = {
-  sm: ['nx:h-8', 'nx:px-2.5', 'nx:typography-label-default'],
+  xs: ['nx:h-7', 'nx:px-2', 'nx:typography-label-small'],
+  sm: ['nx:h-8', 'nx:px-2.5', 'nx:typography-label-compact'],
   default: ['nx:h-10', 'nx:px-3', 'nx:typography-label-default'],
   lg: ['nx:h-12', 'nx:px-3.5', 'nx:typography-label-default'],
 } as const;
@@ -60,6 +114,27 @@ export const Default: Story = {
       <Button variant="outline">Month</Button>
     </ButtonGroup>
   ),
+};
+
+export const ExtraSmall: Story = {
+  render: () => (
+    <ButtonGroup size="xs" aria-label="Extra small actions">
+      <ButtonGroupText>Actions</ButtonGroupText>
+      <Button variant="outline">Save</Button>
+      <Button variant="outline" size="icon-xs" aria-label="More actions">
+        <IconChevronDown />
+      </Button>
+    </ButtonGroup>
+  ),
+  play: async ({ canvasElement }) => {
+    const buttons = within(canvasElement).getAllByRole('button');
+    for (const button of buttons) {
+      await expect(
+        button.getBoundingClientRect().height
+      ).toBeGreaterThanOrEqual(24);
+    }
+    await expect(buttons[0]).toHaveAttribute('data-size', 'xs');
+  },
 };
 
 export const Small: Story = {
@@ -153,6 +228,7 @@ export const WithSeparator: Story = {
 // with no `orientation` prop so it exercises the default — a regression guard
 // for the default `data-orientation` emit.
 export const WithDataAttributes: Story = {
+  tags: ['!autodocs', '!dev'],
   render: () => (
     <ButtonGroup>
       <Button variant="outline">One</Button>
@@ -169,6 +245,7 @@ export const WithDataAttributes: Story = {
 };
 
 export const SizeAlignment: Story = {
+  tags: ['!autodocs', '!dev'],
   parameters: {
     a11y: { test: 'off' },
     docs: {
@@ -251,6 +328,7 @@ export const SizeAlignment: Story = {
 // Compatibility sentinel: raw input layouts should generally use InputGroup,
 // but ButtonGroup must not mutate or break non-Button children.
 export const MixedChildren: Story = {
+  tags: ['!autodocs', '!dev'],
   render: () => (
     <ButtonGroup size="lg" aria-label="mixed button-shaped controls">
       <ButtonGroupText data-testid="button-group-mixed-text">
@@ -297,6 +375,7 @@ export const MixedChildren: Story = {
 // ButtonGroupText composes with a custom element via asChild — here a link
 // addon — keeping the addon styling and data-slot hook.
 export const AsChild: Story = {
+  tags: ['!autodocs', '!dev'],
   render: () => (
     <ButtonGroup>
       <ButtonGroupText asChild>
@@ -377,10 +456,23 @@ export const SplitButton: Story = {
     );
     await expect(trigger).toBeInTheDocument();
     await expect(trigger).toHaveAttribute('data-slot', 'button');
+    const menuButton = within(canvasElement).getByRole('button', {
+      name: 'Deployment options',
+    });
+    menuButton.focus();
+    await userEvent.keyboard('{Enter}');
+    await expect(
+      await within(document.body).findByRole('menuitem', {
+        name: 'Deploy to staging',
+      })
+    ).toBeVisible();
+    await userEvent.keyboard('{Escape}');
+    await waitFor(() => expect(menuButton).toHaveFocus());
   },
 };
 
 export const TierAPolishEvidence: Story = {
+  tags: ['!autodocs', '!dev'],
   parameters: {
     docs: {
       description: {
@@ -454,6 +546,7 @@ export const TierAPolishEvidence: Story = {
 // group, yet it inherits the group size — the case the old cloneElement walk
 // over direct children missed.
 export const NestedTriggerInheritsSize: Story = {
+  tags: ['!autodocs', '!dev'],
   render: () => (
     <ButtonGroup size="sm">
       <Button data-testid="nested-direct">Deploy</Button>
@@ -510,4 +603,59 @@ export const AllVariants: Story = {
       </ButtonGroup>
     </div>
   ),
+};
+
+export const ErrorOutlineGroup: Story = {
+  render: () => (
+    <ButtonGroup aria-label="Project actions">
+      <Button variant="outline">Archive</Button>
+      <Button variant="error-outline">Delete</Button>
+    </ButtonGroup>
+  ),
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+    const archive = canvas.getByRole('button', { name: 'Archive' });
+    const remove = canvas.getByRole('button', { name: 'Delete' });
+    const before = remove.offsetWidth;
+    await expect(archive.getBoundingClientRect().right).toBe(
+      remove.getBoundingClientRect().left
+    );
+    await expectNativePress(
+      '[data-slot=button-group] [data-variant=error-outline]',
+      1
+    );
+    await expect(archive.getBoundingClientRect().right).toBe(
+      remove.getBoundingClientRect().left
+    );
+    await expect(remove.offsetWidth).toBe(before);
+  },
+};
+
+export const RightToLeft: Story = {
+  render: () => (
+    <ButtonGroup
+      dir="rtl"
+      aria-label="Document actions"
+      className="nx:rounded-md"
+    >
+      <Button variant="outline">First</Button>
+      <Button variant="outline">Middle</Button>
+      <Button variant="error-outline">Last</Button>
+    </ButtonGroup>
+  ),
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+    const first = canvas.getByRole('button', { name: 'First' });
+    const middle = canvas.getByRole('button', { name: 'Middle' });
+    const last = canvas.getByRole('button', { name: 'Last' });
+    await expect(first.getBoundingClientRect().left).toBe(
+      middle.getBoundingClientRect().right
+    );
+    await expect(middle.getBoundingClientRect().left).toBe(
+      last.getBoundingClientRect().right
+    );
+    await expect(getComputedStyle(first).borderLeftWidth).not.toBe('0px');
+    await expect(getComputedStyle(middle).borderRightWidth).toBe('0px');
+    await expect(getComputedStyle(last).borderRightWidth).toBe('0px');
+  },
 };

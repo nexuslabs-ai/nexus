@@ -1,8 +1,17 @@
+import { DEFAULT_NEXUS_APPEARANCE } from '@nexus_ds/core';
+import {
+  Canvas,
+  Controls,
+  Description,
+  Title,
+} from '@storybook/addon-docs/blocks';
 import type { Meta, StoryObj } from '@storybook/react';
 import { IconArrowRight, IconRocket, IconStar } from '@tabler/icons-react';
 import { expect, fn, userEvent, within } from 'storybook/test';
 
+import { expectNativePress } from '../../stories/support/native-press';
 import { expectHeightPinned } from '../../stories/support/story-height-test-utils';
+import { NexusRoot } from '../appearance/provider';
 
 import { Button } from './button';
 
@@ -11,13 +20,72 @@ const meta: Meta<typeof Button> = {
   component: Button,
   parameters: {
     docs: {
+      page: () => (
+        <>
+          <Title />
+          <Description />
+          <h2 id="playground">Playground</h2>
+          <p>
+            Change the variant, size and state here. Examples demonstrate
+            presentation; your application owns action handlers and loading
+            state.
+          </p>
+          <Canvas of={Default} />
+          <Controls of={Default} />
+          <h2 id="variants">Variants</h2>
+          <p>
+            Use default for the main action, outline or secondary for supporting
+            actions, and ghost or link for low emphasis. Destructive is filled;
+            error-outline is bordered; error is borderless.
+          </p>
+          <Canvas of={AllVariants} />
+          <h2 id="sizes-and-icons">Sizes and icons</h2>
+          <p>
+            XS, Small, Default and Large use 12/13/14/14px text and
+            12/14/16/16px icons. Density adjusts geometry, not these text or
+            icon sizes. Shared density-scale corrections are tracked separately
+            in PR #817.
+          </p>
+          <Canvas of={SizePairs} />
+          <p>
+            Use one decorative startIcon or endIcon. Icon-only sizes require an
+            accessible name.
+          </p>
+          <Canvas of={StartIconSlot} />
+          <Canvas of={EndIconSlot} />
+          <h2 id="disabled-and-loading">Disabled and loading</h2>
+          <p>
+            Disabled controls are subdued. Loading retains variant colours,
+            blocks repeated activation and preserves the accessible label and
+            occupied width while showing a spinner. These comparisons explicitly
+            render light and dark themes.
+          </p>
+          <Canvas of={DisabledAndLoadingThemes} />
+          <h2 id="links">Links</h2>
+          <p>
+            Use asChild with an anchor for navigation. Compose its content
+            inside the anchor; the loading spinner and icon-slot props apply to
+            native buttons only. Disabled links are removed from keyboard focus
+            and activation is blocked.
+          </p>
+          <Canvas of={AsLink} />
+          <h2 id="press-feedback">Press feedback</h2>
+          <p>
+            Standalone buttons compress to 0.98 while pressed. Joined group
+            members retain their size to keep borders connected. Both use
+            existing active colours.
+          </p>
+          <Canvas of={PressFeedback} />
+        </>
+      ),
       description: {
         component:
-          'Use Button for concise visible action labels. Use exactly one decorative icon slot when needed; loading buttons render spinner-only visually and do not support icon slots. Icon-only buttons must provide an accessible name with `aria-label` or `aria-labelledby`.',
+          'Use Button for concise visible action labels. Use exactly one decorative icon slot when needed; loading buttons render spinner-only visually while preserving their label and icon space. Icon-only buttons must provide an accessible name with `aria-label` or `aria-labelledby`.',
       },
     },
   },
   args: {
+    children: 'Save changes',
     onClick: fn(), // Spy function for testing
   },
   argTypes: {
@@ -26,6 +94,7 @@ const meta: Meta<typeof Button> = {
       options: [
         'default',
         'error',
+        'error-outline',
         'destructive',
         'outline',
         'dashed',
@@ -37,8 +106,18 @@ const meta: Meta<typeof Button> = {
     },
     size: {
       control: 'select',
-      options: ['default', 'sm', 'lg', 'icon-sm', 'icon', 'icon-lg'],
-      description: 'The size of the button',
+      options: [
+        'xs',
+        'sm',
+        'default',
+        'lg',
+        'icon-xs',
+        'icon-sm',
+        'icon',
+        'icon-lg',
+      ],
+      description:
+        'Paired sizes: xs / icon-xs, sm / icon-sm, default / icon, lg / icon-lg. Density adjusts spacing and height. Text and icons remain stable: XS 12px/12px, Small 13px/14px, Default and Large 14px/16px.',
     },
     startIcon: {
       control: false,
@@ -53,8 +132,9 @@ const meta: Meta<typeof Button> = {
       description: 'Whether the button is disabled',
     },
     asChild: {
-      control: 'boolean',
-      description: 'Render as child element (for composition)',
+      control: false,
+      description:
+        'Render as child element (for composition); see the Links example',
     },
   },
 };
@@ -73,6 +153,7 @@ export const Default: Story = {
 };
 
 export const Primary: Story = {
+  tags: ['!autodocs', '!dev'],
   args: {
     variant: 'default',
     children: 'Primary',
@@ -80,6 +161,7 @@ export const Primary: Story = {
 };
 
 export const Secondary: Story = {
+  tags: ['!autodocs', '!dev'],
   args: {
     variant: 'secondary',
     children: 'Secondary',
@@ -87,6 +169,7 @@ export const Secondary: Story = {
 };
 
 export const Destructive: Story = {
+  tags: ['!autodocs', '!dev'],
   args: {
     variant: 'destructive',
     children: 'Delete',
@@ -94,6 +177,7 @@ export const Destructive: Story = {
 };
 
 export const Error: Story = {
+  tags: ['!autodocs', '!dev'],
   parameters: {
     docs: {
       description: {
@@ -108,7 +192,21 @@ export const Error: Story = {
   },
 };
 
+export const ErrorOutline: Story = {
+  tags: ['!autodocs', '!dev'],
+  args: { variant: 'error-outline', children: 'Delete project' },
+  parameters: {
+    docs: {
+      description: {
+        story:
+          'An outlined destructive action with existing error border, text and interaction tokens. Use destructive for a filled, high-emphasis action; error for a borderless action.',
+      },
+    },
+  },
+};
+
 export const Outline: Story = {
+  tags: ['!autodocs', '!dev'],
   args: {
     variant: 'outline',
     children: 'Outline',
@@ -116,6 +214,7 @@ export const Outline: Story = {
 };
 
 export const Dashed: Story = {
+  tags: ['!autodocs', '!dev'],
   args: {
     variant: 'dashed',
     children: 'Dashed',
@@ -123,6 +222,7 @@ export const Dashed: Story = {
 };
 
 export const Ghost: Story = {
+  tags: ['!autodocs', '!dev'],
   args: {
     variant: 'ghost',
     children: 'Ghost',
@@ -130,6 +230,7 @@ export const Ghost: Story = {
 };
 
 export const Link: Story = {
+  tags: ['!autodocs', '!dev'],
   render: () => (
     <Button variant="link" data-testid="button-link">
       Link
@@ -152,7 +253,13 @@ export const Link: Story = {
 // SIZE STORIES
 // ============================================
 
+export const ExtraSmall: Story = {
+  tags: ['!autodocs', '!dev'],
+  args: { size: 'xs', children: 'Extra small' },
+};
+
 export const Small: Story = {
+  tags: ['!autodocs', '!dev'],
   args: {
     size: 'sm',
     children: 'Small',
@@ -160,6 +267,7 @@ export const Small: Story = {
 };
 
 export const Large: Story = {
+  tags: ['!autodocs', '!dev'],
   args: {
     size: 'lg',
     children: 'Large',
@@ -167,6 +275,7 @@ export const Large: Story = {
 };
 
 export const IconSize: Story = {
+  tags: ['!autodocs', '!dev'],
   args: {
     size: 'icon',
     children: <IconStar />,
@@ -183,6 +292,7 @@ export const IconSize: Story = {
 };
 
 export const IconSmallSize: Story = {
+  tags: ['!autodocs', '!dev'],
   args: {
     size: 'icon-sm',
     children: <IconStar />,
@@ -198,6 +308,7 @@ export const IconSmallSize: Story = {
 };
 
 export const IconLargeSize: Story = {
+  tags: ['!autodocs', '!dev'],
   args: {
     size: 'icon-lg',
     children: <IconStar />,
@@ -212,32 +323,82 @@ export const IconLargeSize: Story = {
   },
 };
 
-export const IconOnlySizes: Story = {
+export const SizePairs: Story = {
+  parameters: {
+    docs: {
+      description: {
+        story:
+          'Extra small, small, default and large each pair a text button with an equally tall square icon button. Each row also shows an icon with a label and its loading state. Use the density toolbar to compare spacing. Text sizes are 12/13/14/14px and icon/spinner sizes are 12/14/16/16px. Density changes the surrounding space, not these sizes.',
+      },
+    },
+  },
   render: () => (
-    <div className="nx:flex nx:items-center nx:gap-2">
-      <Button size="icon-sm" aria-label="Small icon">
-        <IconStar />
-      </Button>
-      <Button size="icon" aria-label="Default icon">
-        <IconStar />
-      </Button>
-      <Button size="icon-lg" aria-label="Large icon">
-        <IconStar />
-      </Button>
+    <div className="nx:flex nx:flex-col nx:gap-6">
+      {(
+        [
+          ['xs', 'icon-xs', 'Extra small'],
+          ['sm', 'icon-sm', 'Small'],
+          ['default', 'icon', 'Default'],
+          ['lg', 'icon-lg', 'Large'],
+        ] as const
+      ).map(([size, iconSize, label]) => (
+        <div
+          key={size}
+          role="group"
+          aria-label={`${label} buttons`}
+          className="nx:flex nx:flex-wrap nx:items-center nx:gap-2"
+        >
+          <Button size={size} variant="outline">
+            {label}
+          </Button>
+          <Button
+            size={iconSize}
+            variant="outline"
+            aria-label={`${label} next`}
+          >
+            <IconArrowRight />
+          </Button>
+          <Button size={size} variant="outline" startIcon={<IconArrowRight />}>
+            Continue
+          </Button>
+          <Button size={size} variant="outline" endIcon={<IconArrowRight />}>
+            Continue
+          </Button>
+          <Button
+            size={size}
+            variant="outline"
+            endIcon={<IconArrowRight />}
+            loading
+          >
+            Continue
+          </Button>
+        </div>
+      ))}
     </div>
   ),
   play: async ({ canvasElement }) => {
-    const canvas = within(canvasElement);
-
-    await expect(
-      canvas.getByRole('button', { name: 'Small icon' })
-    ).toHaveClass('nx:size-8');
-    await expect(
-      canvas.getByRole('button', { name: 'Default icon' })
-    ).toHaveClass('nx:size-10');
-    await expect(
-      canvas.getByRole('button', { name: 'Large icon' })
-    ).toHaveClass('nx:size-12');
+    for (const group of within(canvasElement).getAllByRole('group')) {
+      const [text, icon, leading, withIcon, loading] =
+        within(group).getAllByRole('button');
+      if (!text || !icon || !leading || !withIcon || !loading)
+        throw new globalThis.Error(
+          'Each size pair must include all five button examples.'
+        );
+      const height = text.getBoundingClientRect().height;
+      for (const button of [icon, leading, withIcon, loading]) {
+        await expect(button.getBoundingClientRect().height).toBeCloseTo(
+          height,
+          2
+        );
+      }
+      await expect(icon.getBoundingClientRect().width).toBeCloseTo(height, 2);
+      await expect(loading.getBoundingClientRect().width).toBeCloseTo(
+        withIcon.getBoundingClientRect().width,
+        2
+      );
+      await expect(icon).toHaveAccessibleName();
+      await expect(loading).toBeDisabled();
+    }
   },
 };
 
@@ -246,6 +407,7 @@ export const IconOnlySizes: Story = {
 // ============================================
 
 export const Disabled: Story = {
+  tags: ['!autodocs', '!dev'],
   args: {
     disabled: true,
     children: 'Disabled',
@@ -265,6 +427,7 @@ export const Disabled: Story = {
 };
 
 export const Loading: Story = {
+  tags: ['!autodocs', '!dev'],
   args: {
     loading: true,
     children: 'Submitting',
@@ -295,6 +458,7 @@ export const Loading: Story = {
 };
 
 export const LoadingPreservesDefaultWidth: Story = {
+  tags: ['!autodocs', '!dev'],
   render: () => (
     <div className="nx:flex nx:items-center nx:gap-2 nx:p-10 nx:bg-background">
       <Button data-testid="button-ready">Save changes</Button>
@@ -324,6 +488,7 @@ export const LoadingPreservesDefaultWidth: Story = {
 };
 
 export const TextButtonsStayContentWidth: Story = {
+  tags: ['!autodocs', '!dev'],
   parameters: {
     a11y: { test: 'off' },
     docs: {
@@ -366,6 +531,7 @@ export const TextButtonsStayContentWidth: Story = {
 };
 
 export const ManualBusyState: Story = {
+  tags: ['!autodocs', '!dev'],
   args: {
     'aria-busy': true,
     children: 'Processing',
@@ -381,6 +547,7 @@ export const ManualBusyState: Story = {
 };
 
 export const LoadingWithVariants: Story = {
+  tags: ['!autodocs', '!dev'],
   render: (_args) => (
     <div className="nx:flex nx:flex-wrap nx:items-center nx:gap-2">
       <Button loading variant="default">
@@ -410,6 +577,7 @@ export const LoadingWithVariants: Story = {
 // ============================================
 
 export const ClickInteraction: Story = {
+  tags: ['!autodocs', '!dev'],
   args: {
     children: 'Click me',
   },
@@ -428,6 +596,7 @@ export const ClickInteraction: Story = {
 };
 
 export const KeyboardInteraction: Story = {
+  tags: ['!autodocs', '!dev'],
   args: {
     children: 'Press Enter',
   },
@@ -458,6 +627,7 @@ export const KeyboardInteraction: Story = {
  * that makes it true.
  */
 export const FocusGapShowsSurfaceBehind: Story = {
+  tags: ['!autodocs', '!dev'],
   render: () => (
     <div className="nx:bg-background nx:p-6">
       <div className="nx:bg-muted nx:rounded-md nx:p-6">
@@ -468,6 +638,7 @@ export const FocusGapShowsSurfaceBehind: Story = {
 };
 
 export const FocusManagement: Story = {
+  tags: ['!autodocs', '!dev'],
   args: {
     children: 'Focus me',
   },
@@ -497,21 +668,70 @@ export const FocusManagement: Story = {
   },
 };
 
-export const PressScale: Story = {
+export const PressFeedback: Story = {
+  parameters: {
+    docs: {
+      description: {
+        story:
+          'Press feedback uses the existing duration-faster token (100ms) and ease-enter curve. Standalone buttons compress to 98%; joined ButtonGroup buttons keep their full size. Active colours use each variant’s existing tokens. Activation remains on click, and loading or disabled buttons do not compress.',
+      },
+    },
+  },
   render: () => (
-    <div>
-      <Button>Default</Button>
-      <Button variant="link">Link</Button>
+    <div className="nx:flex nx:flex-wrap nx:gap-2">
+      {(
+        [
+          'default',
+          'secondary',
+          'outline',
+          'error-outline',
+          'error',
+          'destructive',
+          'dashed',
+          'ghost',
+          'link',
+        ] as const
+      ).map((variant) => (
+        <Button key={variant} variant={variant}>
+          {variant}
+        </Button>
+      ))}
     </div>
   ),
   play: async ({ canvasElement }) => {
-    const [primary, link] = canvasElement.querySelectorAll(
-      '[data-slot="button"]'
-    );
+    for (const button of within(canvasElement).getAllByRole('button')) {
+      await expectNativePress(
+        `[data-slot=button][data-variant=${button.dataset.variant}]`,
+        0.98
+      );
+    }
+  },
+};
 
-    await expect(primary).toHaveClass('nx:active:scale-[0.96]');
-    await expect(link).toHaveClass('nx:active:scale-100');
-    await expect(link).not.toHaveClass('nx:active:scale-[0.96]');
+export const ErrorOutlineInteraction: Story = {
+  tags: ['!autodocs', '!dev'],
+  args: { ...ErrorOutline.args },
+  play: async ({ canvasElement, args }) => {
+    const button = within(canvasElement).getByRole('button', {
+      name: 'Delete project',
+    });
+    await userEvent.tab();
+    await expect(button).toHaveFocus();
+    await userEvent.keyboard('{Enter}');
+    await expect(args.onClick).toHaveBeenCalledTimes(1);
+    await userEvent.keyboard(' ');
+    await expect(args.onClick).toHaveBeenCalledTimes(2);
+    await expect(getComputedStyle(button).borderTopStyle).toBe('solid');
+  },
+};
+
+export const ErrorOutlineDisabled: Story = {
+  tags: ['!autodocs', '!dev'],
+  args: { ...ErrorOutline.args, disabled: true },
+  play: async ({ canvasElement, args }) => {
+    const button = within(canvasElement).getByRole('button');
+    await expect(button).toBeDisabled();
+    await expect(args.onClick).not.toHaveBeenCalled();
   },
 };
 
@@ -520,6 +740,7 @@ export const PressScale: Story = {
 // ============================================
 
 export const WithDataAttributes: Story = {
+  tags: ['!autodocs', '!dev'],
   render: () => (
     <div className="nx:flex nx:flex-wrap nx:gap-2">
       <Button>Default attrs</Button>
@@ -547,6 +768,7 @@ export const WithDataAttributes: Story = {
 };
 
 export const WithCustomClassName: Story = {
+  tags: ['!autodocs', '!dev'],
   args: {
     children: 'Custom Class',
     className: 'nx:mt-2',
@@ -560,6 +782,7 @@ export const WithCustomClassName: Story = {
 };
 
 export const WithAriaLabel: Story = {
+  tags: ['!autodocs', '!dev'],
   args: {
     children: '×',
     'aria-label': 'Close dialog',
@@ -573,6 +796,7 @@ export const WithAriaLabel: Story = {
 };
 
 export const DefaultType: Story = {
+  tags: ['!autodocs', '!dev'],
   args: {
     children: 'Button',
   },
@@ -586,6 +810,7 @@ export const DefaultType: Story = {
 };
 
 export const SubmitType: Story = {
+  tags: ['!autodocs', '!dev'],
   args: {
     children: 'Submit',
     type: 'submit',
@@ -619,6 +844,7 @@ export const AsLink: Story = {
 };
 
 export const AsChildWithStringChild: Story = {
+  tags: ['!autodocs', '!dev'],
   render: () => <Button asChild>Plain text child</Button>,
   play: async ({ canvasElement }) => {
     const canvas = within(canvasElement);
@@ -631,30 +857,50 @@ export const AsChildWithStringChild: Story = {
   },
 };
 
+const disabledChildClick = fn();
+const disabledChildCapture = fn();
+
 export const DisabledAsLink: Story = {
+  tags: ['!autodocs', '!dev'],
   args: {
+    onClick: fn(),
     disabled: true,
     children: 'Disabled link',
   },
   render: ({ children, ...args }) => (
     <Button {...args} asChild>
-      <a href="#disabled-as-link">{children}</a>
+      <a
+        href="#disabled-as-link"
+        onClick={disabledChildClick}
+        onClickCapture={disabledChildCapture}
+      >
+        {children}
+      </a>
     </Button>
   ),
-  play: async ({ canvasElement }) => {
+  play: async ({ canvasElement, args }) => {
+    disabledChildClick.mockClear();
+    disabledChildCapture.mockClear();
     const canvas = within(canvasElement);
     const link = canvas.getByRole('link');
 
-    // asChild disabled is best-effort: an <a> ignores native `disabled`, so
-    // non-interactivity comes from aria-disabled + tabIndex=-1 + the
-    // aria-disabled:pointer-events-none class (no JS click guard).
     await expect(link).not.toHaveAttribute('disabled');
     await expect(link).not.toHaveAttribute('type');
     await expect(link).toHaveAttribute('aria-disabled', 'true');
     await expect(link).toHaveAttribute('tabindex', '-1');
     await expect(link).toHaveClass('nx:aria-disabled:pointer-events-none');
     await expect(link).toHaveClass('nx:aria-disabled:opacity-100');
-    await expect(link).toHaveClass('nx:aria-disabled:bg-primary-disabled');
+    await expect(link).toHaveClass(
+      'nx:aria-disabled:not-data-[loading=true]:bg-disabled'
+    );
+    const initialHash = window.location.hash;
+    link.click();
+    link.focus();
+    await userEvent.keyboard('{Enter}');
+    await expect(args.onClick).not.toHaveBeenCalled();
+    await expect(disabledChildClick).not.toHaveBeenCalled();
+    await expect(disabledChildCapture).not.toHaveBeenCalled();
+    await expect(window.location.hash).toBe(initialHash);
   },
 };
 
@@ -697,6 +943,7 @@ export const EndIconSlot: Story = {
 };
 
 export const LoadingUsesSpinnerOnly: Story = {
+  tags: ['!autodocs', '!dev'],
   args: {
     loading: true,
     startIcon: <IconRocket />,
@@ -714,10 +961,10 @@ export const LoadingUsesSpinnerOnly: Story = {
     await expect(button).toHaveAttribute('aria-busy', 'true');
     await expect(
       button.querySelector('[data-slot="button-start-icon"]')
-    ).not.toBeInTheDocument();
+    ).toBeInTheDocument();
     await expect(
       button.querySelector('[data-slot="button-end-icon"]')
-    ).not.toBeInTheDocument();
+    ).toBeInTheDocument();
     await expect(
       button.querySelector('[data-slot="spinner"]')
     ).toBeInTheDocument();
@@ -733,117 +980,37 @@ export const LoadingUsesSpinnerOnly: Story = {
 // ============================================
 
 export const AllVariants: Story = {
-  render: (_args) => (
-    <div className="nx:flex nx:flex-col nx:gap-6">
-      <div>
-        <h3 className="nx:text-foreground nx:mb-2 nx:typography-label-default">
-          Variants
-        </h3>
-        <div className="nx:flex nx:flex-wrap nx:items-center nx:gap-2">
-          <Button variant="default">Default</Button>
-          <Button variant="secondary">Secondary</Button>
-          <Button variant="error">Error</Button>
-          <Button variant="destructive">Destructive</Button>
-          <Button variant="outline">Outline</Button>
-          <Button variant="dashed">Dashed</Button>
-          <Button variant="ghost">Ghost</Button>
-          <Button variant="link">Link</Button>
-        </div>
-      </div>
-      <div>
-        <h3 className="nx:text-foreground nx:mb-2 nx:typography-label-default">
-          Sizes
-        </h3>
-        <div className="nx:flex nx:items-center nx:gap-2">
-          <Button size="sm">Small</Button>
-          <Button size="default">Default</Button>
-          <Button size="lg">Large</Button>
-          <Button size="icon-sm" aria-label="Small icon">
-            <IconStar />
-          </Button>
-          <Button size="icon" aria-label="Icon">
-            <IconStar />
-          </Button>
-          <Button size="icon-lg" aria-label="Large icon">
-            <IconStar />
-          </Button>
-        </div>
-      </div>
-      <div>
-        <h3 className="nx:text-foreground nx:mb-2 nx:typography-label-default">
-          Icon slots
-        </h3>
-        <div className="nx:flex nx:flex-wrap nx:items-center nx:gap-2">
-          <Button startIcon={<IconRocket />}>Start icon</Button>
-          <Button endIcon={<IconArrowRight />}>End icon</Button>
-        </div>
-      </div>
-      <div>
-        <h3 className="nx:text-foreground nx:mb-2 nx:typography-label-default">
-          Disabled
-        </h3>
-        <div className="nx:flex nx:flex-wrap nx:items-center nx:gap-2">
-          <Button variant="default" disabled>
-            Default
-          </Button>
-          <Button variant="secondary" disabled>
-            Secondary
-          </Button>
-          <Button variant="error" disabled>
-            Error
-          </Button>
-          <Button variant="destructive" disabled>
-            Destructive
-          </Button>
-          <Button variant="outline" disabled>
-            Outline
-          </Button>
-          <Button variant="dashed" disabled>
-            Dashed
-          </Button>
-          <Button variant="ghost" disabled>
-            Ghost
-          </Button>
-          <Button variant="link" disabled>
-            Link
-          </Button>
-        </div>
-      </div>
-      <div>
-        <h3 className="nx:text-foreground nx:mb-2 nx:typography-label-default">
-          Loading
-        </h3>
-        <div className="nx:flex nx:flex-wrap nx:items-center nx:gap-2">
-          <Button variant="default" loading>
-            Default
-          </Button>
-          <Button variant="secondary" loading>
-            Secondary
-          </Button>
-          <Button variant="error" loading>
-            Error
-          </Button>
-          <Button variant="destructive" loading>
-            Destructive
-          </Button>
-          <Button variant="outline" loading>
-            Outline
-          </Button>
-          <Button variant="dashed" loading>
-            Dashed
-          </Button>
-        </div>
-      </div>
+  render: () => (
+    <div className="nx:flex nx:flex-wrap nx:items-center nx:gap-2">
+      {(
+        [
+          'default',
+          'secondary',
+          'outline',
+          'dashed',
+          'ghost',
+          'link',
+          'destructive',
+          'error-outline',
+          'error',
+        ] as const
+      ).map((variant) => (
+        <Button key={variant} variant={variant}>
+          {variant}
+        </Button>
+      ))}
     </div>
   ),
 };
 
 export const VariantClassesMatchFigmaTokens: Story = {
+  tags: ['!autodocs', '!dev'],
   render: () => (
     <div className="nx:flex nx:flex-wrap nx:items-center nx:gap-2">
       <Button variant="default">Default</Button>
       <Button variant="secondary">Secondary</Button>
       <Button variant="error">Error</Button>
+      <Button variant="error-outline">Error outline</Button>
       <Button variant="destructive">Destructive</Button>
       <Button variant="outline">Outline</Button>
       <Button variant="dashed">Dashed</Button>
@@ -882,6 +1049,7 @@ export const VariantClassesMatchFigmaTokens: Story = {
 };
 
 export const BorderedVariantsKeepFixedHeight: Story = {
+  tags: ['!autodocs', '!dev'],
   render: () => (
     <div className="nx:flex nx:flex-col nx:gap-4 nx:p-10 nx:bg-background">
       <div className="nx:flex nx:items-center nx:gap-2">
@@ -921,6 +1089,7 @@ export const BorderedVariantsKeepFixedHeight: Story = {
 };
 
 export const DefaultModeHeightPinned: Story = {
+  tags: ['!autodocs', '!dev'],
   parameters: {
     a11y: { test: 'off' },
     docs: {
@@ -944,3 +1113,294 @@ export const DefaultModeHeightPinned: Story = {
 // A11Y is tested automatically on ALL stories
 // via addon-a11y with test: 'error'
 // ============================================
+
+export const DisabledAndLoadingThemes: Story = {
+  parameters: {
+    docs: {
+      description: {
+        story:
+          'Compare normal, disabled and loading states. Disabled surfaces use the neutral disabled tokens. Loading retains the normal variant colours while blocking repeat activation; its spinner replaces the visible label without changing the accessible name.',
+      },
+    },
+  },
+  render: () => (
+    <div className="nx:flex nx:w-full nx:flex-col nx:gap-4">
+      {(['light', 'dark'] as const).map((mode) => (
+        <NexusRoot
+          key={mode}
+          data-testid="button-state-theme"
+          state={{ ...DEFAULT_NEXUS_APPEARANCE, mode }}
+          className="nx:overflow-x-auto nx:rounded-base nx:bg-background nx:p-4 nx:text-foreground"
+        >
+          <span
+            data-testid="disabled-reference"
+            className="nx:sr-only nx:bg-disabled nx:text-disabled-foreground"
+          />
+          <table className="nx:w-full nx:text-start nx:typography-label-default">
+            <caption className="nx:pb-3 nx:text-start">
+              {mode === 'light' ? 'Light' : 'Dark'} appearance
+            </caption>
+            <thead>
+              <tr>
+                {['Variant', 'Normal', 'Disabled', 'Loading'].map((label) => (
+                  <th
+                    key={label}
+                    scope="col"
+                    className="nx:p-2 nx:text-start nx:font-medium nx:text-muted-foreground"
+                  >
+                    {label}
+                  </th>
+                ))}
+              </tr>
+            </thead>
+            <tbody>
+              {(
+                [
+                  'default',
+                  'secondary',
+                  'destructive',
+                  'error-outline',
+                  'outline',
+                  'dashed',
+                  'ghost',
+                  'error',
+                  'link',
+                ] as const
+              ).map((variant) => (
+                <tr key={variant} data-testid="button-state-row">
+                  <th
+                    scope="row"
+                    className="nx:p-2 nx:text-start nx:font-medium"
+                  >
+                    {variant}
+                  </th>
+                  <td className="nx:p-2">
+                    <Button variant={variant}>Save changes</Button>
+                  </td>
+                  <td className="nx:p-2">
+                    <Button variant={variant} disabled>
+                      Save changes
+                    </Button>
+                  </td>
+                  <td className="nx:p-2">
+                    <Button variant={variant} loading>
+                      Save changes
+                    </Button>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </NexusRoot>
+      ))}
+    </div>
+  ),
+  play: async ({ canvasElement }) => {
+    const roots = canvasElement.querySelectorAll(
+      '[data-testid="button-state-theme"]'
+    );
+    await expect(roots).toHaveLength(2);
+    for (const root of roots) {
+      const reference = getComputedStyle(
+        root.querySelector('[data-testid="disabled-reference"]')!
+      );
+      for (const row of root.querySelectorAll(
+        '[data-testid="button-state-row"]'
+      )) {
+        const buttons = within(row as HTMLElement).getAllByRole('button');
+        const normal = buttons[0]!;
+        const disabled = buttons[1]!;
+        const loading = buttons[2]!;
+        await expect(disabled).toBeDisabled();
+        await expect(loading).toBeDisabled();
+        await expect(loading).toHaveAttribute('aria-busy', 'true');
+        await expect(loading).toHaveAccessibleName('Save changes');
+        await expect(getComputedStyle(disabled).color).toBe(reference.color);
+        if (!['ghost', 'error', 'link'].includes(disabled.dataset.variant!)) {
+          await expect(getComputedStyle(disabled).backgroundColor).toBe(
+            reference.backgroundColor
+          );
+        }
+        for (const property of [
+          'color',
+          'backgroundColor',
+          'borderTopColor',
+        ] as const) {
+          await expect(getComputedStyle(loading)[property]).toBe(
+            getComputedStyle(normal)[property]
+          );
+        }
+        const spinner = loading.querySelector('[data-slot="spinner"]')!;
+        await expect(spinner).toBeVisible();
+        await expect(getComputedStyle(spinner).color).toBe(
+          getComputedStyle(normal).color
+        );
+      }
+    }
+  },
+};
+
+export const LoadingPreservesIconWidth: Story = {
+  tags: ['!autodocs', '!dev'],
+  render: () => (
+    <div className="nx:flex nx:flex-col nx:gap-4">
+      {(
+        [
+          'xs',
+          'sm',
+          'default',
+          'lg',
+          'icon-xs',
+          'icon-sm',
+          'icon',
+          'icon-lg',
+        ] as const
+      ).map((size) => (
+        <div
+          key={size}
+          data-testid="loading-width-row"
+          className="nx:flex nx:items-center nx:gap-2"
+        >
+          <Button
+            size={size}
+            aria-label="Launch"
+            startIcon={size.startsWith('icon') ? undefined : <IconRocket />}
+          >
+            {size.startsWith('icon') ? <IconRocket /> : 'Launch'}
+          </Button>
+          <Button
+            size={size}
+            aria-label="Launch"
+            loading
+            startIcon={size.startsWith('icon') ? undefined : <IconRocket />}
+          >
+            {size.startsWith('icon') ? <IconRocket /> : 'Launch'}
+          </Button>
+        </div>
+      ))}
+      <div
+        data-testid="loading-width-row"
+        className="nx:flex nx:items-center nx:gap-2"
+      >
+        <Button endIcon={<IconArrowRight />}>Continue</Button>
+        <Button endIcon={<IconArrowRight />} loading>
+          Continue
+        </Button>
+      </div>
+      <div
+        data-testid="loading-width-row"
+        className="nx:flex nx:items-center nx:gap-2"
+      >
+        <Button className="nx:gap-4" startIcon={<IconRocket />}>
+          Launch
+        </Button>
+        <Button className="nx:gap-4" startIcon={<IconRocket />} loading>
+          Launch
+        </Button>
+      </div>
+    </div>
+  ),
+  play: async ({ canvasElement }) => {
+    for (const row of within(canvasElement).getAllByTestId(
+      'loading-width-row'
+    )) {
+      const [ready, loading] = within(row).getAllByRole('button');
+      await expect(loading!.offsetWidth).toBe(ready!.offsetWidth);
+      await expect(loading!.offsetHeight).toBe(ready!.offsetHeight);
+      await expect(loading!).toBeDisabled();
+      await expect(
+        loading!.querySelector('[data-slot="spinner"]')
+      ).toBeVisible();
+    }
+  },
+};
+
+export const SizeDensityContract: Story = {
+  tags: ['!autodocs', '!dev'],
+  parameters: {
+    docs: {
+      description: {
+        story:
+          'All six densities use the same text and icon mapping. Density changes button geometry only. Each row includes the matching icon-only and loading buttons.',
+      },
+    },
+  },
+  render: () => (
+    <div className="nx:flex nx:flex-col nx:gap-4">
+      {(
+        [
+          'tight',
+          'compact',
+          'default',
+          'comfortable',
+          'relaxed',
+          'spacious',
+        ] as const
+      ).map((density) => (
+        <NexusRoot
+          key={density}
+          state={{ ...DEFAULT_NEXUS_APPEARANCE, mode: 'light', density }}
+          className="nx:flex nx:flex-col nx:gap-2"
+        >
+          <span className="nx:typography-label-default">{density}</span>
+          {(
+            [
+              ['xs', 'icon-xs', 12, 12],
+              ['sm', 'icon-sm', 13, 14],
+              ['default', 'icon', 14, 16],
+              ['lg', 'icon-lg', 14, 16],
+            ] as const
+          ).map(([size, iconSize, font, icon]) => (
+            <div
+              key={size}
+              data-testid="size-density-row"
+              data-font={font}
+              data-icon={icon}
+              className="nx:flex nx:flex-wrap nx:items-center nx:gap-2"
+            >
+              <Button size={size} variant="outline" startIcon={<IconStar />}>
+                {size}
+              </Button>
+              <Button
+                size={iconSize}
+                variant="outline"
+                aria-label={`${size} star`}
+              >
+                <IconStar />
+              </Button>
+              <Button
+                size={size}
+                variant="outline"
+                startIcon={<IconStar />}
+                loading
+              >
+                {size}
+              </Button>
+            </div>
+          ))}
+        </NexusRoot>
+      ))}
+    </div>
+  ),
+  play: async ({ canvasElement }) => {
+    for (const row of within(canvasElement).getAllByTestId(
+      'size-density-row'
+    )) {
+      for (const svg of row.querySelectorAll('svg')) {
+        await expect(parseFloat(getComputedStyle(svg).width)).toBe(
+          Number(row.dataset.icon)
+        );
+        await expect(parseFloat(getComputedStyle(svg).height)).toBe(
+          Number(row.dataset.icon)
+        );
+      }
+      for (const button of row.querySelectorAll(
+        'button:not([data-icon-only])'
+      )) {
+        await expect(getComputedStyle(button).fontSize).toBe(
+          `${row.dataset.font}px`
+        );
+      }
+    }
+  },
+};

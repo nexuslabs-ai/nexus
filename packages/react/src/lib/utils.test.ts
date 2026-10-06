@@ -144,6 +144,9 @@ describe('cn', () => {
   });
 
   it.each([
+    ['icon extra small', 'nx:size-icon-xs', 'nx:size-4'],
+    ['icon small', 'nx:size-icon-sm', 'nx:size-4'],
+    ['icon default', 'nx:size-icon-default', 'nx:size-4'],
     ['radius base', 'nx:rounded-base', 'nx:rounded-md'],
     ['ease enter', 'nx:ease-enter', 'nx:ease-linear'],
     ['ease exit', 'nx:ease-exit', 'nx:ease-linear'],

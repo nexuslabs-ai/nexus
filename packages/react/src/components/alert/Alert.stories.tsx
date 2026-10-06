@@ -1344,7 +1344,9 @@ export const DisabledClose: Story = {
     await expect(close).toBeDisabled();
 
     // Disabled close uses a semantic text token at full opacity (not a fade).
-    await expect(close).toHaveClass('nx:disabled:text-disabled-foreground');
+    await expect(close).toHaveClass(
+      'nx:disabled:not-data-[loading=true]:text-disabled-foreground'
+    );
     await expect(getComputedStyle(close).opacity).toBe('1');
   },
 };

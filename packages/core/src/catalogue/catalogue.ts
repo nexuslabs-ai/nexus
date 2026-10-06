@@ -44,12 +44,19 @@ import type {
 
 type PrimitiveFamily = Extract<
   CatalogueFamily,
-  'borderwidth' | 'color' | 'motion' | 'radius' | 'shadow' | 'typography'
+  | 'borderwidth'
+  | 'color'
+  | 'icon'
+  | 'motion'
+  | 'radius'
+  | 'shadow'
+  | 'typography'
 >;
 
 const PRIMITIVE_FAMILIES: readonly PrimitiveFamily[] = [
   'borderwidth',
   'color',
+  'icon',
   'motion',
   'radius',
   'shadow',
@@ -261,6 +268,7 @@ function primitiveAliases(
   path: readonly string[]
 ): CatalogueAlias[] {
   const key = path.join('-');
+  if (family === 'icon') return [utility(`size-icon-${path[path.length - 1]}`)];
   if (family === 'radius') return [cssVariable(`--radius-${key}`)];
   if (family === 'borderwidth') {
     return [

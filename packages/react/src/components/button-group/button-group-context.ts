@@ -3,7 +3,7 @@
 import * as React from 'react';
 
 /** Size shared from a ButtonGroup to its members. */
-type ButtonGroupSize = 'sm' | 'default' | 'lg';
+type ButtonGroupSize = 'xs' | 'sm' | 'default' | 'lg';
 
 /**
  * A ButtonGroup broadcasts its `size` through this context; `Button` and
