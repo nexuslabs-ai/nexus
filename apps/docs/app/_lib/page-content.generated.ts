@@ -50,6 +50,7 @@ export const PAGE_LOADERS: Record<string, ManifestPageLoader> = {
   '/components/card': () => import('../../content/components/card.mdx'),
   '/components/carousel': () => import('../../content/components/carousel.mdx'),
   '/components/chart': () => import('../../content/components/chart.mdx'),
+  '/components/checkbox': () => import('../../content/components/checkbox.mdx'),
   '/components/dialog': () => import('../../content/components/dialog.mdx'),
   '/components/dropdown-menu': () =>
     import('../../content/components/dropdown-menu.mdx'),
@@ -109,16 +110,6 @@ export const PAGE_WIREFRAMES: Record<string, PageWireframe> = {
   },
   '/components/appearance': {
     lede: '[ Appearance — page coming soon ]',
-    blocks: [
-      {
-        type: 'placeholder',
-        variant: 'storybook',
-        label: '[ Preview · Installation · Code · Props · Examples ]',
-      },
-    ],
-  },
-  '/components/checkbox': {
-    lede: '[ Checkbox — page coming soon ]',
     blocks: [
       {
         type: 'placeholder',

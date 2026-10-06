@@ -345,6 +345,30 @@ export const demos = {
     packages: [],
     load: () => import("./demos/chart/line"),
   },
+  "checkbox/checked": {
+    id: "checkbox/checked",
+    alsoInstall: ["label"],
+    packages: [],
+    load: () => import("./demos/checkbox/checked"),
+  },
+  "checkbox/demo": {
+    id: "checkbox/demo",
+    alsoInstall: ["label"],
+    packages: [],
+    load: () => import("./demos/checkbox/demo"),
+  },
+  "checkbox/disabled": {
+    id: "checkbox/disabled",
+    alsoInstall: ["label"],
+    packages: [],
+    load: () => import("./demos/checkbox/disabled"),
+  },
+  "checkbox/indeterminate": {
+    id: "checkbox/indeterminate",
+    alsoInstall: ["label"],
+    packages: [],
+    load: () => import("./demos/checkbox/indeterminate"),
+  },
   "dialog/demo": {
     id: "dialog/demo",
     alsoInstall: ["button"],

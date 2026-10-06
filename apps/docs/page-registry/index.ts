@@ -251,6 +251,7 @@ export const PAGE_REGISTRY = {
       {
         slug: 'checkbox',
         label: 'Checkbox',
+        examples: ['checked', 'indeterminate', 'disabled'],
       },
       {
         slug: 'choice-card',

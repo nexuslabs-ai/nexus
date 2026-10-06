@@ -307,8 +307,9 @@ export const PAGE_MANIFEST: readonly ManifestSection[] = [
         route: '/components/checkbox',
         slug: 'checkbox',
         label: 'Checkbox',
-        kind: 'placeholder',
-        file: null,
+        examples: ['checked', 'indeterminate', 'disabled'],
+        kind: 'mdx',
+        file: 'content/components/checkbox.mdx',
       },
       {
         route: '/components/choice-card',
