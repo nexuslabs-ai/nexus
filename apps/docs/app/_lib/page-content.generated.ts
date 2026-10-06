@@ -54,6 +54,7 @@ export const PAGE_LOADERS: Record<string, ManifestPageLoader> = {
   '/components/dropdown-menu': () =>
     import('../../content/components/dropdown-menu.mdx'),
   '/components/input': () => import('../../content/components/input.mdx'),
+  '/components/select': () => import('../../content/components/select.mdx'),
   '/theming/appearance': () => import('../../content/theming/appearance.mdx'),
   '/theming/multi-brand': () => import('../_pages/theming/multi-brand'),
   '/theming/radius-overrides': () =>
@@ -417,16 +418,6 @@ export const PAGE_WIREFRAMES: Record<string, PageWireframe> = {
   },
   '/components/scroll-area': {
     lede: '[ ScrollArea — page coming soon ]',
-    blocks: [
-      {
-        type: 'placeholder',
-        variant: 'storybook',
-        label: '[ Preview · Installation · Code · Props · Examples ]',
-      },
-    ],
-  },
-  '/components/select': {
-    lede: '[ Select — page coming soon ]',
     blocks: [
       {
         type: 'placeholder',

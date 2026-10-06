@@ -390,6 +390,14 @@ export const PAGE_REGISTRY = {
       {
         slug: 'select',
         label: 'Select',
+        examples: [
+          'variants',
+          'sizes',
+          'placeholder',
+          'groups',
+          'disabled',
+          'invalid',
+        ],
       },
       {
         slug: 'separator',

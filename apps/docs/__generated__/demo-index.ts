@@ -435,6 +435,48 @@ export const demos = {
     packages: [],
     load: () => import("./demos/input/with-label"),
   },
+  "select/demo": {
+    id: "select/demo",
+    alsoInstall: [],
+    packages: [],
+    load: () => import("./demos/select/demo"),
+  },
+  "select/disabled": {
+    id: "select/disabled",
+    alsoInstall: [],
+    packages: [],
+    load: () => import("./demos/select/disabled"),
+  },
+  "select/groups": {
+    id: "select/groups",
+    alsoInstall: [],
+    packages: [],
+    load: () => import("./demos/select/groups"),
+  },
+  "select/invalid": {
+    id: "select/invalid",
+    alsoInstall: [],
+    packages: [],
+    load: () => import("./demos/select/invalid"),
+  },
+  "select/placeholder": {
+    id: "select/placeholder",
+    alsoInstall: [],
+    packages: [],
+    load: () => import("./demos/select/placeholder"),
+  },
+  "select/sizes": {
+    id: "select/sizes",
+    alsoInstall: [],
+    packages: [],
+    load: () => import("./demos/select/sizes"),
+  },
+  "select/variants": {
+    id: "select/variants",
+    alsoInstall: [],
+    packages: [],
+    load: () => import("./demos/select/variants"),
+  },
 } satisfies Record<string, Demo>;
 
 export type DemoId = keyof typeof demos;

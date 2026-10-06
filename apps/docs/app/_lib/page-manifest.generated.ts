@@ -548,8 +548,16 @@ export const PAGE_MANIFEST: readonly ManifestSection[] = [
         route: '/components/select',
         slug: 'select',
         label: 'Select',
-        kind: 'placeholder',
-        file: null,
+        examples: [
+          'variants',
+          'sizes',
+          'placeholder',
+          'groups',
+          'disabled',
+          'invalid',
+        ],
+        kind: 'mdx',
+        file: 'content/components/select.mdx',
       },
       {
         route: '/components/separator',

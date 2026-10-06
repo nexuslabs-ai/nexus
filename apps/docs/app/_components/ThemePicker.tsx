@@ -177,7 +177,8 @@ function ModeRow({
       <Select value={value} onValueChange={onChange}>
         <SelectTrigger
           id={id}
-          className="nx:w-[120px] nx:h-8 nx:typography-label-small nx:capitalize"
+          size="sm"
+          className="nx:w-[120px] nx:typography-label-small nx:capitalize"
         >
           <SelectValue />
         </SelectTrigger>
