@@ -1,0 +1,188 @@
+{
+  "packages/react/src/components/choice-card/choice-card.tsx": {
+    "changedSpacingSteps": ["3", "4"]
+  },
+  "packages/react/src/components/tabs/tabs.tsx": {
+    "changedSpacingSteps": ["3", "4"]
+  },
+  "packages/react/src/components/sidebar/sidebar.tsx": {
+    "changedSpacingSteps": ["12", "2.5", "3", "3.5", "4", "5", "7", "8"]
+  },
+  "packages/react/src/components/kbd/kbd.tsx": {
+    "changedSpacingSteps": ["3", "5"]
+  },
+  "packages/react/src/components/drawer/drawer.tsx": {
+    "changedSpacingSteps": ["24", "3", "4", "6"]
+  },
+  "packages/react/src/components/pagination/pagination.tsx": {
+    "changedSpacingSteps": ["10", "4"]
+  },
+  "packages/react/src/components/tooltip/tooltip.tsx": {
+    "changedSpacingSteps": ["3"]
+  },
+  "packages/react/src/components/input-otp/input-otp.tsx": {
+    "changedSpacingSteps": ["10", "2.5", "4"]
+  },
+  "packages/react/src/components/card/card.tsx": {
+    "changedSpacingSteps": ["4", "6"]
+  },
+  "packages/react/src/components/navigation-menu/navigation-menu.tsx": {
+    "changedSpacingSteps": ["2.5", "3", "4"]
+  },
+  "packages/react/src/components/menubar/menubar.tsx": {
+    "changedSpacingSteps": ["3.5", "32", "4", "48", "8"]
+  },
+  "packages/react/src/components/native-select/native-select.tsx": {
+    "changedSpacingSteps": ["2.5", "3", "3.5", "4", "9"]
+  },
+  "packages/react/src/components/input/input.tsx": {
+    "changedSpacingSteps": ["10", "12", "2.5", "3", "3.5", "8"]
+  },
+  "packages/react/src/components/alert/alert.tsx": {
+    "changedSpacingSteps": ["10", "3", "4", "5"]
+  },
+  "packages/react/src/components/accordion/accordion.tsx": {
+    "changedSpacingSteps": ["4"]
+  },
+  "packages/react/src/components/appearance/theme-quick-control/theme-quick-control.tsx": {
+    "changedSpacingSteps": ["3", "5", "72", "9"]
+  },
+  "packages/react/src/components/appearance/config-preview/config-preview.tsx": {
+    "changedSpacingSteps": ["3"]
+  },
+  "packages/react/src/components/appearance/brand-color-field/brand-color-field.tsx": {
+    "changedSpacingSteps": ["3", "36"]
+  },
+  "packages/react/src/components/appearance/color-field/color-field.tsx": {
+    "changedSpacingSteps": ["28", "7"]
+  },
+  "packages/react/src/components/appearance/setting-row/setting-row.tsx": {
+    "changedSpacingSteps": ["3", "4", "44"]
+  },
+  "packages/react/src/components/appearance/appearance-settings/appearance-settings.tsx": {
+    "changedSpacingSteps": ["20", "4", "44", "48", "56", "6"]
+  },
+  "packages/react/src/components/skeleton/skeleton.tsx": {
+    "changedSpacingSteps": ["12", "4", "48"]
+  },
+  "packages/react/src/components/attachment/attachment.tsx": {
+    "changedSpacingSteps": ["2.5", "3", "32", "8"]
+  },
+  "packages/react/src/components/separator/separator.tsx": {
+    "changedSpacingSteps": ["3", "5"]
+  },
+  "packages/react/src/components/chart/chart.tsx": {
+    "changedSpacingSteps": ["2.5", "3", "32"]
+  },
+  "packages/react/src/components/hover-card/hover-card.tsx": {
+    "changedSpacingSteps": ["64"]
+  },
+  "packages/react/src/components/multi-select/multi-select.tsx": {
+    "changedSpacingSteps": ["10", "3", "4", "40", "56"]
+  },
+  "packages/react/src/components/checkbox/checkbox.tsx": {
+    "changedSpacingSteps": ["3.5", "4"]
+  },
+  "packages/react/src/components/dropdown-menu/dropdown-menu.tsx": {
+    "changedSpacingSteps": ["3.5", "32", "4", "8"]
+  },
+  "packages/react/src/components/slider/slider.tsx": {
+    "changedSpacingSteps": ["4", "44", "5", "8"]
+  },
+  "packages/react/src/components/message/message.tsx": {
+    "changedSpacingSteps": ["3", "4"]
+  },
+  "packages/react/src/components/empty-state/empty-state.tsx": {
+    "changedSpacingSteps": ["10", "4", "6"]
+  },
+  "packages/react/src/components/spinner/spinner.tsx": {
+    "changedSpacingSteps": ["4", "6"]
+  },
+  "packages/react/src/components/field/field.tsx": {
+    "changedSpacingSteps": ["3", "4", "5", "6", "7"]
+  },
+  "packages/react/src/components/carousel/carousel.tsx": {
+    "changedSpacingSteps": ["12", "4"]
+  },
+  "packages/react/src/components/bubble/bubble.tsx": {
+    "changedSpacingSteps": ["3", "4"]
+  },
+  "packages/react/src/components/combobox/combobox.tsx": {
+    "changedSpacingSteps": ["48"]
+  },
+  "packages/react/src/components/context-menu/context-menu.tsx": {
+    "changedSpacingSteps": ["3.5", "32", "4", "8"]
+  },
+  "packages/react/src/components/toggle/toggle.tsx": {
+    "changedSpacingSteps": ["2.5", "3", "4", "8"]
+  },
+  "packages/react/src/components/dialog/dialog.tsx": {
+    "changedSpacingSteps": ["4", "6"]
+  },
+  "packages/react/src/components/popover/popover.tsx": {
+    "changedSpacingSteps": ["72"]
+  },
+  "packages/react/src/components/input-group/input-group.tsx": {
+    "changedSpacingSteps": ["10", "12", "2.5", "3", "3.5", "4", "6", "8"]
+  },
+  "packages/react/src/components/sonner/sonner.tsx": {
+    "changedSpacingSteps": ["4"]
+  },
+  "packages/react/src/components/textarea/textarea.tsx": {
+    "changedSpacingSteps": ["16", "3"]
+  },
+  "packages/react/src/components/button/button.tsx": {
+    "changedSpacingSteps": ["10", "12", "2.5", "3", "3.5", "7", "8"]
+  },
+  "packages/react/src/components/date-picker/date-picker.tsx": {
+    "changedSpacingSteps": ["3", "3.5", "4", "8"]
+  },
+  "packages/react/src/components/choice-row/choice-row.tsx": {
+    "changedSpacingSteps": ["8"]
+  },
+  "packages/react/src/components/scroll-area/scroll-area.tsx": {
+    "changedSpacingSteps": ["2.5", "4", "64", "72", "96"]
+  },
+  "packages/react/src/components/table/table.tsx": {
+    "changedSpacingSteps": ["2.5", "3", "4", "96"]
+  },
+  "packages/react/src/components/item/item.tsx": {
+    "changedSpacingSteps": ["10", "2.5", "3", "4", "8"]
+  },
+  "packages/react/src/components/avatar/avatar.tsx": {
+    "changedSpacingSteps": ["10", "12", "14", "16", "20", "24", "5", "6", "8"]
+  },
+  "packages/react/src/components/switch/switch.tsx": {
+    "changedSpacingSteps": ["4", "5", "9"]
+  },
+  "packages/react/src/components/resizable/resizable.tsx": {
+    "changedSpacingSteps": ["2.5", "3", "4"]
+  },
+  "packages/react/src/components/command/command.tsx": {
+    "changedSpacingSteps": ["2.5", "3", "4", "6"]
+  },
+  "packages/react/src/components/radio-group/radio-group.tsx": {
+    "changedSpacingSteps": ["2.5", "4"]
+  },
+  "packages/react/src/components/select/select.tsx": {
+    "changedSpacingSteps": ["10", "3", "3.5", "32", "4", "8", "96"]
+  },
+  "packages/react/src/components/breadcrumb/breadcrumb.tsx": {
+    "changedSpacingSteps": ["3.5", "4", "5"]
+  },
+  "packages/react/src/components/message-scroller/message-scroller.tsx": {
+    "changedSpacingSteps": ["4", "6", "96"]
+  },
+  "packages/react/src/components/marker/marker.tsx": {
+    "changedSpacingSteps": ["4"]
+  },
+  "packages/react/src/components/sheet/sheet.tsx": {
+    "changedSpacingSteps": ["3", "4", "6"]
+  },
+  "packages/react/src/components/button-group/button-group.tsx": {
+    "changedSpacingSteps": ["10", "12", "2.5", "3", "3.5", "7", "8"]
+  },
+  "packages/react/src/components/badge/badge.tsx": {
+    "changedSpacingSteps": ["2.5", "3.5", "6"]
+  }
+}

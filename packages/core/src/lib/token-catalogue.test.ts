@@ -417,3 +417,53 @@ describe('token catalogue', () => {
     }
   });
 });
+
+describe('density spacing order', () => {
+  const densities = [
+    'tight',
+    'compact',
+    'default',
+    'comfortable',
+    'relaxed',
+    'spacious',
+  ];
+  const spacing = catalogue.filter((token) => token.family === 'spacing');
+
+  it('never reduces spacing when moving to a more spacious density', () => {
+    for (const token of spacing) {
+      let previous = 0;
+      for (const density of densities) {
+        const variant = token.variants.find(
+          (value) => value.preset === density
+        );
+        expect(variant, `${token.name} ${density}`).toBeDefined();
+        const value = Number.parseFloat(variant!.declarations[0]!.value);
+        expect(value, `${token.name} ${density}`).toBeGreaterThanOrEqual(
+          previous
+        );
+        previous = value;
+      }
+    }
+  });
+
+  it('keeps numeric spacing steps strictly increasing within each density', () => {
+    const numeric = spacing
+      .filter((token) => /^--nx-spacing-[0-9_]+$/.test(token.name))
+      .sort(
+        (a, b) =>
+          Number(a.name.replace('--nx-spacing-', '').replace('_', '.')) -
+          Number(b.name.replace('--nx-spacing-', '').replace('_', '.'))
+      );
+    for (const density of densities) {
+      let previous = -1;
+      for (const token of numeric) {
+        const variant = token.variants.find(
+          (value) => value.preset === density
+        )!;
+        const value = Number.parseFloat(variant.declarations[0]!.value);
+        expect(value, `${token.name} ${density}`).toBeGreaterThan(previous);
+        previous = value;
+      }
+    }
+  });
+});
