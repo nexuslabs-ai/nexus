@@ -55,6 +55,7 @@ export const PAGE_LOADERS: Record<string, ManifestPageLoader> = {
     import('../../content/components/dropdown-menu.mdx'),
   '/components/input': () => import('../../content/components/input.mdx'),
   '/components/select': () => import('../../content/components/select.mdx'),
+  '/components/tabs': () => import('../../content/components/tabs.mdx'),
   '/theming/appearance': () => import('../../content/theming/appearance.mdx'),
   '/theming/multi-brand': () => import('../_pages/theming/multi-brand'),
   '/theming/radius-overrides': () =>
@@ -518,16 +519,6 @@ export const PAGE_WIREFRAMES: Record<string, PageWireframe> = {
   },
   '/components/table': {
     lede: '[ Table — page coming soon ]',
-    blocks: [
-      {
-        type: 'placeholder',
-        variant: 'storybook',
-        label: '[ Preview · Installation · Code · Props · Examples ]',
-      },
-    ],
-  },
-  '/components/tabs': {
-    lede: '[ Tabs — page coming soon ]',
     blocks: [
       {
         type: 'placeholder',

@@ -477,6 +477,30 @@ export const demos = {
     packages: [],
     load: () => import("./demos/select/variants"),
   },
+  "tabs/demo": {
+    id: "tabs/demo",
+    alsoInstall: [],
+    packages: [],
+    load: () => import("./demos/tabs/demo"),
+  },
+  "tabs/disabled": {
+    id: "tabs/disabled",
+    alsoInstall: [],
+    packages: [],
+    load: () => import("./demos/tabs/disabled"),
+  },
+  "tabs/sizes": {
+    id: "tabs/sizes",
+    alsoInstall: [],
+    packages: [],
+    load: () => import("./demos/tabs/sizes"),
+  },
+  "tabs/variants": {
+    id: "tabs/variants",
+    alsoInstall: [],
+    packages: [],
+    load: () => import("./demos/tabs/variants"),
+  },
 } satisfies Record<string, Demo>;
 
 export type DemoId = keyof typeof demos;

@@ -442,6 +442,7 @@ export const PAGE_REGISTRY = {
       {
         slug: 'tabs',
         label: 'Tabs',
+        examples: ['variants', 'sizes', 'disabled'],
       },
       {
         slug: 'textarea',

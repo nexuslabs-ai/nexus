@@ -633,8 +633,9 @@ export const PAGE_MANIFEST: readonly ManifestSection[] = [
         route: '/components/tabs',
         slug: 'tabs',
         label: 'Tabs',
-        kind: 'placeholder',
-        file: null,
+        examples: ['variants', 'sizes', 'disabled'],
+        kind: 'mdx',
+        file: 'content/components/tabs.mdx',
       },
       {
         route: '/components/textarea',
