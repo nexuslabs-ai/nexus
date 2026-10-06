@@ -1,3 +1,5 @@
+import { useState } from 'react';
+
 import { Canvas, Description, Title } from '@storybook/addon-docs/blocks';
 import type { Meta, StoryObj } from '@storybook/react';
 import { IconChevronDown } from '@tabler/icons-react';
@@ -36,13 +38,23 @@ const meta: Meta<typeof ButtonGroup> = {
         <>
           <Title />
           <Description />
-          <h2 id="joined-actions">Joined actions</h2>
+          <h2 id="joined-actions">One action with alternatives</h2>
           <p>
             Use a group for related actions with shared borders. It is not a
             selection control or toolbar: buttons retain normal Tab navigation.
             Use ToggleGroup for persistent selection.
           </p>
-          <Canvas of={Default} />
+          <p>
+            The main button sends and archives a conversation; the arrow opens
+            alternative send actions. This example does not send email.
+          </p>
+          <Canvas of={SplitButton} />
+          <h2 id="calendar-navigation">Calendar navigation</h2>
+          <p>
+            Move between months or return to the current month. These are
+            commands, not persistent view choices such as Week or Month.
+          </p>
+          <Canvas of={CalendarNavigation} />
           <h2 id="sizes">Sizes</h2>
           <p>
             The group size is inherited by Button and ButtonGroupText, including
@@ -56,25 +68,25 @@ const meta: Meta<typeof ButtonGroup> = {
           <h2 id="orientation">Orientation</h2>
           <Canvas of={Vertical} />
           <Canvas of={RightToLeft} />
-          <h2 id="addons">Labels and separators</h2>
-          <p>
-            A text addon can show how many items an action affects. A separator
-            divides related commands, such as history and clipboard actions.
-            These are composition examples; the application supplies the count
-            and action handlers. Use ToggleGroup for persistent formatting
-            choices and InputGroup for an editable field with addons.
-          </p>
-          <Canvas of={WithText} />
-          <Canvas of={WithSeparator} />
           <h2 id="compositions">Compositions</h2>
           <p>
             Use Nexus menu and select triggers for split actions. The
             application owns selected values and action effects.
           </p>
-          <Canvas of={SplitButton} />
           <Canvas of={WithSelectTrigger} />
           <h2 id="destructive-actions">Destructive actions</h2>
           <Canvas of={ErrorOutlineGroup} />
+          <h2 id="addons">Supporting API examples</h2>
+          <p>
+            Use these optional parts only when the surrounding product needs
+            them. A text addon can show how many items an action affects. A
+            separator divides related commands, such as history and clipboard
+            actions. These are composition examples; the application supplies
+            the count and action handlers. Use ToggleGroup for persistent
+            formatting choices and InputGroup for an editable field with addons.
+          </p>
+          <Canvas of={WithText} />
+          <Canvas of={WithSeparator} />
         </>
       ),
       description: {
@@ -102,13 +114,60 @@ const BUTTON_GROUP_TEXT_SIZE_CLASSES = {
   lg: ['nx:h-12', 'nx:px-3.5', 'nx:typography-label-default'],
 } as const;
 
+function CalendarNavigationExample() {
+  const [today] = useState(() => new Date());
+  const [month, setMonth] = useState(
+    () => new Date(today.getFullYear(), today.getMonth(), 1)
+  );
+  const previousMonth = () =>
+    setMonth((value) => new Date(value.getFullYear(), value.getMonth() - 1, 1));
+  const nextMonth = () =>
+    setMonth((value) => new Date(value.getFullYear(), value.getMonth() + 1, 1));
+  const resetMonth = () =>
+    setMonth(new Date(today.getFullYear(), today.getMonth(), 1));
+  return (
+    <div className="nx:flex nx:flex-col nx:items-start nx:gap-3">
+      <span role="status" className="nx:typography-label-default">
+        {month.toLocaleDateString('en-US', { month: 'long', year: 'numeric' })}
+      </span>
+      <ButtonGroup aria-label="Calendar navigation">
+        <Button variant="outline" onClick={previousMonth}>
+          Previous
+        </Button>
+        <Button variant="outline" onClick={resetMonth}>
+          Today
+        </Button>
+        <Button variant="outline" onClick={nextMonth}>
+          Next
+        </Button>
+      </ButtonGroup>
+    </div>
+  );
+}
+
+export const CalendarNavigation: Story = {
+  render: () => <CalendarNavigationExample />,
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+    const current = canvas.getByRole('status').textContent;
+    await userEvent.click(canvas.getByRole('button', { name: 'Previous' }));
+    await expect(canvas.getByRole('status').textContent).not.toBe(current);
+    await userEvent.click(canvas.getByRole('button', { name: 'Next' }));
+    await expect(canvas.getByRole('status').textContent).toBe(current);
+    await userEvent.click(canvas.getByRole('button', { name: 'Next' }));
+    await expect(canvas.getByRole('status').textContent).not.toBe(current);
+    await userEvent.click(canvas.getByRole('button', { name: 'Today' }));
+    await expect(canvas.getByRole('status').textContent).toBe(current);
+  },
+};
+
 // Three outline buttons joined into one horizontal cluster.
 export const Default: Story = {
   render: () => (
     <ButtonGroup>
-      <Button variant="outline">Day</Button>
-      <Button variant="outline">Week</Button>
-      <Button variant="outline">Month</Button>
+      <Button variant="outline">Copy</Button>
+      <Button variant="outline">Paste</Button>
+      <Button variant="outline">Duplicate</Button>
     </ButtonGroup>
   ),
 };
@@ -137,9 +196,9 @@ export const ExtraSmall: Story = {
 export const Small: Story = {
   render: () => (
     <ButtonGroup size="sm">
-      <ButtonGroupText>View:</ButtonGroupText>
-      <Button variant="outline">Day</Button>
-      <Button variant="outline">Week</Button>
+      <ButtonGroupText>Edit:</ButtonGroupText>
+      <Button variant="outline">Copy</Button>
+      <Button variant="outline">Paste</Button>
     </ButtonGroup>
   ),
 };
@@ -147,9 +206,9 @@ export const Small: Story = {
 export const Large: Story = {
   render: () => (
     <ButtonGroup size="lg">
-      <ButtonGroupText>View:</ButtonGroupText>
-      <Button variant="outline">Day</Button>
-      <Button variant="outline">Week</Button>
+      <ButtonGroupText>Edit:</ButtonGroupText>
+      <Button variant="outline">Copy</Button>
+      <Button variant="outline">Paste</Button>
     </ButtonGroup>
   ),
 };
@@ -439,17 +498,17 @@ export const WithSelectTrigger: Story = {
 // other button-shaped control.
 export const SplitButton: Story = {
   render: () => (
-    <ButtonGroup>
-      <Button>Deploy</Button>
+    <ButtonGroup aria-label="Send email">
+      <Button>Send &amp; archive</Button>
       <DropdownMenu>
         <DropdownMenuTrigger asChild>
-          <Button size="icon" aria-label="Deployment options">
+          <Button size="icon" aria-label="Send options">
             <IconChevronDown />
           </Button>
         </DropdownMenuTrigger>
         <DropdownMenuContent align="end">
-          <DropdownMenuItem>Deploy to staging</DropdownMenuItem>
-          <DropdownMenuItem>Deploy to production</DropdownMenuItem>
+          <DropdownMenuItem>Send only</DropdownMenuItem>
+          <DropdownMenuItem>Send later</DropdownMenuItem>
         </DropdownMenuContent>
       </DropdownMenu>
     </ButtonGroup>
@@ -464,13 +523,13 @@ export const SplitButton: Story = {
     await expect(trigger).toBeInTheDocument();
     await expect(trigger).toHaveAttribute('data-slot', 'button');
     const menuButton = within(canvasElement).getByRole('button', {
-      name: 'Deployment options',
+      name: 'Send options',
     });
     menuButton.focus();
     await userEvent.keyboard('{Enter}');
     await expect(
       await within(document.body).findByRole('menuitem', {
-        name: 'Deploy to staging',
+        name: 'Send only',
       })
     ).toBeVisible();
     await userEvent.keyboard('{Escape}');
@@ -594,9 +653,9 @@ export const AllVariants: Story = {
   render: () => (
     <div className="nx:flex nx:flex-col nx:items-start nx:gap-4">
       <ButtonGroup>
-        <Button variant="outline">Day</Button>
-        <Button variant="outline">Week</Button>
-        <Button variant="outline">Month</Button>
+        <Button variant="outline">Copy</Button>
+        <Button variant="outline">Paste</Button>
+        <Button variant="outline">Duplicate</Button>
       </ButtonGroup>
       <ButtonGroup aria-label="Actions for 3 selected items">
         <ButtonGroupText>3 selected</ButtonGroupText>
@@ -647,7 +706,7 @@ export const RightToLeft: Story = {
     >
       <Button variant="outline">First</Button>
       <Button variant="outline">Middle</Button>
-      <Button variant="error-outline">Last</Button>
+      <Button variant="outline">Last</Button>
     </ButtonGroup>
   ),
   play: async ({ canvasElement }) => {
