@@ -1,3 +1,5 @@
+import { cache } from 'react';
+
 import { readdir, readFile } from 'node:fs/promises';
 import path from 'node:path';
 
@@ -5,20 +7,13 @@ import 'server-only';
 
 const DEPENDENCIES_DIR = path.join(process.cwd(), 'generated', 'dependencies');
 
-export type Block = {
-  /** `name@range` specs to install. */
-  packages: string[];
-  copy: string[];
-  styles: string[];
-  /** Files the demos load from the app's `public/`. */
-  assets: string[];
-};
+type Package = { name: string; range: string };
 
-type Dependencies = {
-  /** Everything the component and its preview demo need. */
-  installBlock: Block;
-  /** What the other demos need beyond `installBlock`. */
-  examplesBlock: Block;
+export type Dependencies = {
+  install: Package[];
+  copy: string[];
+  files: string[];
+  styles: string[];
 };
 
 async function listDependencyFiles() {
@@ -43,42 +38,45 @@ function isStringList(value: unknown): value is string[] {
   );
 }
 
-function isBlock(value: unknown): value is Block {
+function isPackage(value: unknown): value is Package {
   return (
     isRecord(value) &&
-    isStringList(value.packages) &&
-    isStringList(value.copy) &&
-    isStringList(value.styles) &&
-    isStringList(value.assets)
+    typeof value.name === 'string' &&
+    typeof value.range === 'string'
   );
 }
 
 function isDependencies(value: unknown): value is Dependencies {
   return (
     isRecord(value) &&
-    isBlock(value.installBlock) &&
-    isBlock(value.examplesBlock)
+    Array.isArray(value.install) &&
+    value.install.every(isPackage) &&
+    isStringList(value.copy) &&
+    isStringList(value.files) &&
+    isStringList(value.styles)
   );
 }
 
-export async function loadDependencies(slug: string): Promise<Dependencies> {
-  const fileNames = await listDependencyFiles();
-  const fileName = `${slug}.json`;
+export const loadDependencies = cache(
+  async (slug: string): Promise<Dependencies> => {
+    const fileNames = await listDependencyFiles();
+    const fileName = `${slug}.json`;
 
-  if (!fileNames.includes(fileName)) {
-    const known = fileNames.map((name) => path.basename(name, '.json'));
-    throw new Error(
-      `InstallBlock: unknown slug "${slug}". Known slugs: ${known.join(', ')}.`
-    );
+    if (!fileNames.includes(fileName)) {
+      const known = fileNames.map((name) => path.basename(name, '.json'));
+      throw new Error(
+        `InstallBlock: unknown slug "${slug}". Known slugs: ${known.join(', ')}.`
+      );
+    }
+
+    const filePath = path.join(DEPENDENCIES_DIR, fileName);
+    const parsed: unknown = JSON.parse(await readFile(filePath, 'utf8'));
+
+    if (!isDependencies(parsed)) {
+      throw new Error(
+        `InstallBlock: ${filePath} needs an install list of { name, range } and string arrays copy, files, styles — rerun \`pnpm --filter @nexus_ds/docs generate:dependencies\`.`
+      );
+    }
+    return parsed;
   }
-
-  const filePath = path.join(DEPENDENCIES_DIR, fileName);
-  const parsed: unknown = JSON.parse(await readFile(filePath, 'utf8'));
-
-  if (!isDependencies(parsed)) {
-    throw new Error(
-      `InstallBlock: ${filePath} needs installBlock and examplesBlock, each with string arrays packages, copy, styles, assets — rerun \`pnpm --filter @nexus_ds/docs generate:dependencies\`.`
-    );
-  }
-  return parsed;
-}
+);

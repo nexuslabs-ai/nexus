@@ -1,17 +1,59 @@
-import { type Block, loadDependencies } from '../_lib/dependencies';
+import { type Dependencies, loadDependencies } from '../_lib/dependencies';
 
 import { CodeBlock } from './CodeBlock';
 import { CodeSample } from './CodeSample';
 
-function BlockSamples({ packages, copy, styles, assets }: Block) {
+type ListOf = (dependencies: Dependencies) => string[];
+
+const packagesOf: ListOf = ({ install }) =>
+  install.map(({ name, range }) => `${name}@${range}`);
+const filesOf: ListOf = ({ copy, files }) => [...copy, ...files];
+const stylesOf: ListOf = ({ styles }) => styles;
+
+function missing(needed: string[], installed: string[]) {
+  const have = new Set(installed);
+  return [...new Set(needed)].filter((item) => !have.has(item));
+}
+
+export async function InstallBlock({
+  slugs,
+  besides = [],
+  alsoPackages = [],
+  caption,
+}: {
+  slugs: readonly string[];
+  besides?: readonly string[];
+  /** `name@range` packages to install beyond what `slugs` install. */
+  alsoPackages?: readonly string[];
+  caption?: string;
+}) {
+  const [needed, installed] = await Promise.all([
+    Promise.all(slugs.map((slug) => loadDependencies(slug))),
+    Promise.all(besides.map((slug) => loadDependencies(slug))),
+  ]);
+  const packages = missing(
+    [...needed.flatMap(packagesOf), ...alsoPackages],
+    installed.flatMap(packagesOf)
+  );
+  const toCopy = missing(needed.flatMap(filesOf), installed.flatMap(filesOf));
+  const styles = missing(needed.flatMap(stylesOf), installed.flatMap(stylesOf));
+  if (packages.length + toCopy.length + styles.length === 0) {
+    return null;
+  }
+
   return (
     <>
+      {caption && (
+        <p className="nx:typography-body-default nx:text-muted-foreground">
+          {caption}
+        </p>
+      )}
       {packages.length > 0 && (
         <CodeSample lang="bash">{`npm install ${packages.join(' ')}`}</CodeSample>
       )}
-      {copy.length > 0 && (
+      {toCopy.length > 0 && (
         <CodeBlock>
-          <code>{copy.join('\n')}</code>
+          <code>{toCopy.join('\n')}</code>
         </CodeBlock>
       )}
       {styles.length > 0 && (
@@ -21,33 +63,6 @@ function BlockSamples({ packages, copy, styles, assets }: Block) {
             ...styles.map((file) => `@import '../${file}';`),
           ].join('\n')}
         </CodeSample>
-      )}
-      {assets.length > 0 && (
-        <CodeBlock>
-          <code>{assets.join('\n')}</code>
-        </CodeBlock>
-      )}
-    </>
-  );
-}
-
-export async function InstallBlock({ slug }: { slug: string }) {
-  const { installBlock, examplesBlock } = await loadDependencies(slug);
-  const hasExampleExtras =
-    examplesBlock.packages.length > 0 ||
-    examplesBlock.copy.length > 0 ||
-    examplesBlock.assets.length > 0;
-
-  return (
-    <>
-      <BlockSamples {...installBlock} />
-      {hasExampleExtras && (
-        <>
-          <p className="nx:typography-body-default nx:text-muted-foreground nx:mt-6 nx:mb-2">
-            Only for the examples below:
-          </p>
-          <BlockSamples {...examplesBlock} />
-        </>
       )}
     </>
   );

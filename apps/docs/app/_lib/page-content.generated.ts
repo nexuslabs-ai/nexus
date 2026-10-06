@@ -47,8 +47,13 @@ export const PAGE_LOADERS: Record<string, ManifestPageLoader> = {
   '/components/button': () => import('../../content/components/button.mdx'),
   '/components/button-group': () =>
     import('../../content/components/button-group.mdx'),
+  '/components/card': () => import('../../content/components/card.mdx'),
   '/components/carousel': () => import('../../content/components/carousel.mdx'),
   '/components/chart': () => import('../../content/components/chart.mdx'),
+  '/components/dialog': () => import('../../content/components/dialog.mdx'),
+  '/components/dropdown-menu': () =>
+    import('../../content/components/dropdown-menu.mdx'),
+  '/components/input': () => import('../../content/components/input.mdx'),
   '/theming/appearance': () => import('../../content/theming/appearance.mdx'),
   '/theming/multi-brand': () => import('../_pages/theming/multi-brand'),
   '/theming/radius-overrides': () =>
@@ -102,16 +107,6 @@ export const PAGE_WIREFRAMES: Record<string, PageWireframe> = {
   },
   '/components/appearance': {
     lede: '[ Appearance — page coming soon ]',
-    blocks: [
-      {
-        type: 'placeholder',
-        variant: 'storybook',
-        label: '[ Preview · Installation · Code · Props · Examples ]',
-      },
-    ],
-  },
-  '/components/card': {
-    lede: '[ Card — page coming soon ]',
     blocks: [
       {
         type: 'placeholder',
@@ -200,28 +195,8 @@ export const PAGE_WIREFRAMES: Record<string, PageWireframe> = {
       },
     ],
   },
-  '/components/dialog': {
-    lede: '[ Dialog — page coming soon ]',
-    blocks: [
-      {
-        type: 'placeholder',
-        variant: 'storybook',
-        label: '[ Preview · Installation · Code · Props · Examples ]',
-      },
-    ],
-  },
   '/components/drawer': {
     lede: '[ Drawer — page coming soon ]',
-    blocks: [
-      {
-        type: 'placeholder',
-        variant: 'storybook',
-        label: '[ Preview · Installation · Code · Props · Examples ]',
-      },
-    ],
-  },
-  '/components/dropdown-menu': {
-    lede: '[ DropdownMenu — page coming soon ]',
     blocks: [
       {
         type: 'placeholder',
@@ -262,16 +237,6 @@ export const PAGE_WIREFRAMES: Record<string, PageWireframe> = {
   },
   '/components/hover-card': {
     lede: '[ HoverCard — page coming soon ]',
-    blocks: [
-      {
-        type: 'placeholder',
-        variant: 'storybook',
-        label: '[ Preview · Installation · Code · Props · Examples ]',
-      },
-    ],
-  },
-  '/components/input': {
-    lede: '[ Input — page coming soon ]',
     blocks: [
       {
         type: 'placeholder',
@@ -342,6 +307,26 @@ export const PAGE_WIREFRAMES: Record<string, PageWireframe> = {
   },
   '/components/menubar': {
     lede: '[ Menubar — page coming soon ]',
+    blocks: [
+      {
+        type: 'placeholder',
+        variant: 'storybook',
+        label: '[ Preview · Installation · Code · Props · Examples ]',
+      },
+    ],
+  },
+  '/components/message': {
+    lede: '[ Message — page coming soon ]',
+    blocks: [
+      {
+        type: 'placeholder',
+        variant: 'storybook',
+        label: '[ Preview · Installation · Code · Props · Examples ]',
+      },
+    ],
+  },
+  '/components/message-scroller': {
+    lede: '[ MessageScroller — page coming soon ]',
     blocks: [
       {
         type: 'placeholder',

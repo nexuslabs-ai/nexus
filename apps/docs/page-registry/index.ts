@@ -231,6 +231,12 @@ export const PAGE_REGISTRY = {
       {
         slug: 'card',
         label: 'Card',
+        examples: [
+          'header-with-action',
+          'content-only',
+          'footer-actions',
+          'sign-in-form',
+        ],
       },
       {
         slug: 'carousel',
@@ -277,6 +283,7 @@ export const PAGE_REGISTRY = {
       {
         slug: 'dialog',
         label: 'Dialog',
+        examples: ['with-form', 'prop-driven', 'scrollable-body'],
       },
       {
         slug: 'drawer',
@@ -285,6 +292,7 @@ export const PAGE_REGISTRY = {
       {
         slug: 'dropdown-menu',
         label: 'DropdownMenu',
+        examples: ['checkbox-items', 'radio-items', 'submenu'],
       },
       {
         slug: 'empty-state',
@@ -305,6 +313,7 @@ export const PAGE_REGISTRY = {
       {
         slug: 'input',
         label: 'Input',
+        examples: ['variants', 'sizes', 'with-label', 'invalid', 'disabled'],
       },
       {
         slug: 'input-group',
@@ -333,6 +342,14 @@ export const PAGE_REGISTRY = {
       {
         slug: 'menubar',
         label: 'Menubar',
+      },
+      {
+        slug: 'message',
+        label: 'Message',
+      },
+      {
+        slug: 'message-scroller',
+        label: 'MessageScroller',
       },
       {
         slug: 'multi-select',

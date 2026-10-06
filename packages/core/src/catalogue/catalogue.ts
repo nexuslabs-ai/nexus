@@ -24,8 +24,9 @@ import {
   tokenReferences,
 } from '../token-source/tokens';
 import {
-  BORDER_COLOR_ALIAS_NAMES,
+  borderColorAliasName,
   borderWidthAliasUtilities,
+  DEFAULT_TRANSITION,
   durationUtility,
 } from '../token-source/utilities';
 
@@ -59,7 +60,6 @@ const Z_INDEX_FILE: TokenFile = 'semantic/z-index.json';
 const BREAKPOINTS_FILE: TokenFile = 'semantic/breakpoints.json';
 const TYPOGRAPHY_STYLES_FILE: TokenFile = 'styles/typography.json';
 const SHADOW_STYLES_FILE: TokenFile = 'styles/shadows.json';
-const BORDER_COLOR_ALIASES = new Set<string>(BORDER_COLOR_ALIAS_NAMES);
 const SINGLE_SOURCE = { mode: null, preset: null } as const;
 
 /** A `PrimitiveLookup` that also carries each target's canonical name. */
@@ -271,8 +271,20 @@ function primitiveAliases(
   }
   if (family !== 'motion') return [];
   const [group, motionKey = ''] = path;
-  if (group === 'duration') return [utility(durationUtility(motionKey).name)];
-  if (group === 'ease') return [cssVariable(`--ease-${motionKey}`)];
+  if (group === 'duration') {
+    const aliases = [utility(durationUtility(motionKey).name)];
+    if (motionKey === DEFAULT_TRANSITION.duration) {
+      aliases.push(cssVariable('--default-transition-duration'));
+    }
+    return aliases;
+  }
+  if (group === 'ease') {
+    const aliases = [cssVariable(`--ease-${motionKey}`)];
+    if (motionKey === DEFAULT_TRANSITION.ease) {
+      aliases.push(cssVariable('--default-transition-timing-function'));
+    }
+    return aliases;
+  }
   return [];
 }
 
@@ -373,10 +385,8 @@ function runtimeAppearance(mode: Mode): NexusAppearanceState {
 
 function runtimeColorAliases(name: string): CatalogueAlias[] {
   const aliases = [cssVariable(`--color-${name}`)];
-  const borderName = name.startsWith('border-')
-    ? name.slice('border-'.length)
-    : null;
-  if (borderName !== null && BORDER_COLOR_ALIASES.has(borderName)) {
+  const borderName = borderColorAliasName(name);
+  if (borderName !== null) {
     aliases.push(utility(`border-color-${borderName}`));
   }
   return aliases;
