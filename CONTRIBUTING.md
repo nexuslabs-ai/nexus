@@ -22,12 +22,11 @@ That's the whole first-time setup. It also wires the Husky pre-commit hook, whic
 
 Pick the surface you're working on — each is one `make` command that turbo orchestrates (parallel servers, prefixed logs, one Ctrl-C stops all):
 
-| Command        | Brings up                                                                                   |
-| -------------- | ------------------------------------------------------------------------------------------- |
-| `make dev`     | **Storybook** — the component catalog + interaction tests. The 90% surface.                 |
-| `make console` | the console app **+ a live `@nexus_ds/react` watcher** (component edits show up in the app) |
-| `make docs`    | the docs site **+ live `@nexus_ds/react`**                                                  |
-| `make dev-all` | everything: console + docs + storybook + all package watchers                               |
+| Command        | Brings up                                                                   |
+| -------------- | --------------------------------------------------------------------------- |
+| `make dev`     | **Storybook** — the component catalog + interaction tests. The 90% surface. |
+| `make docs`    | the docs site **+ live `@nexus_ds/react`**                                  |
+| `make dev-all` | everything: docs + storybook + all package watchers                         |
 
 > **The docs site's generated inputs come from the turbo graph**, not from its package scripts: `apps/docs/turbo.json` puts `generate:manifest` (the page manifest and its loader map) and `generate:props` (the per-component props JSON that `PropsTable` reads) ahead of both `build` and `dev`. `make build` and `make docs` get both. `PropsTable` reads the props JSON on each request, so after changing a component's props or JSDoc during `make docs`, rerun `pnpm --filter @nexus_ds/docs generate:props` and reload — no restart. A bare `pnpm --filter @nexus_ds/docs dev` runs neither: it serves whatever `app/_lib/*.generated.ts` is committed, and whatever `generated/props/` a previous run left behind — absent on a clean checkout, stale after that.
 
@@ -55,7 +54,7 @@ The pre-commit hook already formats and `nx:`-lints staged files, so you rarely 
 | Group        | Targets                                                         |
 | ------------ | --------------------------------------------------------------- |
 | **Setup**    | `setup` · `fresh` (clean + install + build) · `clean`           |
-| **Dev**      | `dev` · `console` · `docs` · `dev-all`                          |
+| **Dev**      | `dev` · `docs` · `dev-all`                                      |
 | **Build**    | `build` · `tokens` (regenerate token CSS from `@nexus_ds/core`) |
 | **Quality**  | `lint` · `typecheck` · `audit` · `verify`                       |
 | **Docs MCP** | `up` · `down` · `serve` · `publish`                             |
@@ -153,7 +152,7 @@ Releases are driven by [changesets](https://github.com/changesets/changesets) an
 | `@nexus_ds/eslint-plugin` | **npm**    | Lint guardrails consumers install and use                               |
 | `@nexus_ds/tailwind`      | copy/own   | Generated token CSS — consumers regenerate with their own token choices |
 | `@nexus_ds/react`         | copy/own   | Components are copied and owned; delivered by the export tool (#541)    |
-| `@nexus_ds/console/docs`  | private    | Apps                                                                    |
+| `@nexus_ds/docs`          | private    | App                                                                     |
 
 Everything lives under the `@nexus_ds` scope — the published packages on npm and the ESLint plugin's **rule namespace** (rules are referenced as `@nexus_ds/*`, e.g. `@nexus_ds/no-render-prop-types`). The rule namespace is a flat-config key the plugin registers, independent of the npm package name; it is kept in lockstep with the scope so the repo reads consistently.
 

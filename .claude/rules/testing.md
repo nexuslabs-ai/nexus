@@ -19,7 +19,7 @@ Components are tested only through stories — see [testing-react.md](testing-re
 ## What We Don't Test
 
 - **No snapshot tests.** No `toMatchSnapshot` / `toMatchInlineSnapshot`, and no frozen output fixtures compared with `toEqual`. Assert the property that matters — a contrast floor, a merge result, a reported lint error — not the exact output.
-- **No app tests.** `apps/console` and `apps/docs` are demo surfaces, not the design system.
+- **No app tests.** `apps/docs` is a demo surface, not the design system.
 - **No tests for repo scripts.** Audits and generators in `scripts/` and `packages/*/scripts/` get no tests of their own: the ones CI runs prove themselves by running, and a freshness check covers generated output. The rest — `scripts/export.mjs` among them — are reviewed, not gated.
 - **No hook tests.** A hook is covered by the stories of the components that use it.
 

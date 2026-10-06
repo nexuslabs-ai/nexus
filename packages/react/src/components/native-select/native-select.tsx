@@ -10,7 +10,7 @@ const nativeSelectVariants = cva(
     'nx:box-border nx:w-full nx:min-w-0 nx:appearance-none nx:rounded-md nx:border-default',
     'nx:text-foreground nx:autofill-text-foreground nx:transition-field',
     'nx:focus-visible:outline-default nx:focus-visible:outline-focus-default nx:focus-visible:border-focus-default',
-    'nx:aria-invalid:border-border-error nx:aria-invalid:focus-visible:outline-focus-error nx:aria-invalid:focus-visible:border-focus-error',
+    'nx:aria-invalid:border-error-border nx:aria-invalid:focus-visible:outline-focus-error nx:aria-invalid:focus-visible:border-focus-error',
     'nx:disabled:cursor-not-allowed nx:disabled:bg-disabled nx:disabled:autofill-bg-disabled nx:disabled:text-disabled-foreground nx:disabled:autofill-text-disabled-foreground',
   ],
   {

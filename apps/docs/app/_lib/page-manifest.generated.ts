@@ -8,46 +8,61 @@ type ManifestPageBase = {
   label: string;
 };
 
+type PlaceholderPage = {
+  /** No page file yet; the body is `PAGE_WIREFRAMES[route]`. */
+  kind: 'placeholder';
+  file: null;
+};
+
 export type GuideManifestPage = ManifestPageBase & {
-  /** Components this group page covers, listed under it in the left rail. */
-  components?: readonly string[];
   /** Non-interactive headings listed under this page in the left rail. */
   nested?: readonly string[];
-  examples?: never;
 } & (
     | {
         kind: 'mdx' | 'component';
         /** Source file relative to `apps/docs`; the module is `PAGE_LOADERS[route]`. */
         file: string;
       }
-    | {
-        /** No page file yet; the body is `PAGE_WIREFRAMES[route]`. */
-        kind: 'placeholder';
-        file: null;
-      }
+    | PlaceholderPage
   );
 
-/** A written `components/{slug}.mdx` that renders `<ComponentPage slug="{slug}" />`. */
+/**
+ * A component `@nexus_ds/react` exports. Once `components/{slug}.mdx` is
+ * written it renders `<ComponentPage slug="{slug}" />`; until then, a placeholder.
+ */
 export type ComponentManifestPage = ManifestPageBase & {
-  /** Example demo names the page shows first, in this order. */
-  examples: readonly string[];
-  components?: never;
   nested?: never;
-  kind: 'mdx';
-  /** Source file relative to `apps/docs`; the module is `PAGE_LOADERS[route]`. */
-  file: string;
-};
+} & (
+    | {
+        kind: 'mdx';
+        /** Source file relative to `apps/docs`; the module is `PAGE_LOADERS[route]`. */
+        file: string;
+        /** Example demo names the page shows first, in this order. */
+        examples: readonly string[];
+      }
+    | PlaceholderPage
+  );
 
 export type ManifestPage = GuideManifestPage | ComponentManifestPage;
 
-export type ManifestSection = {
+type ManifestSectionBase = {
   slug: string;
   title: string;
   href: string;
-  /** What the section is counted in on the home page. Defaults to pages. */
-  unit?: 'components';
-  pages: readonly ManifestPage[];
 };
+
+export type GuideManifestSection = ManifestSectionBase & {
+  unit?: never;
+  pages: readonly GuideManifestPage[];
+};
+
+export type ComponentsManifestSection = ManifestSectionBase & {
+  /** What the section is counted in on the home page. Other sections count pages. */
+  unit: 'components';
+  pages: readonly ComponentManifestPage[];
+};
+
+export type ManifestSection = GuideManifestSection | ComponentsManifestSection;
 
 /** The separator the home page's section cards join a section's page labels with. */
 export const CARD_JOINER = ' · ';
@@ -165,44 +180,83 @@ export const PAGE_MANIFEST: readonly ManifestSection[] = [
     unit: 'components',
     pages: [
       {
-        route: '/components/inputs',
-        slug: 'inputs',
-        label: 'Inputs',
-        components: ['Input', 'Select', 'Tabs'],
+        route: '/components/accordion',
+        slug: 'accordion',
+        label: 'Accordion',
+        examples: ['floating', 'multiple', 'disabled'],
+        kind: 'mdx',
+        file: 'content/components/accordion.mdx',
+      },
+      {
+        route: '/components/alert',
+        slug: 'alert',
+        label: 'Alert',
+        examples: ['variants', 'with-actions', 'dismissible', 'banner'],
+        kind: 'mdx',
+        file: 'content/components/alert.mdx',
+      },
+      {
+        route: '/components/alert-dialog',
+        slug: 'alert-dialog',
+        label: 'AlertDialog',
+        examples: ['destructive-action', 'center'],
+        kind: 'mdx',
+        file: 'content/components/alert-dialog.mdx',
+      },
+      {
+        route: '/components/appearance',
+        slug: 'appearance',
+        label: 'Appearance',
         kind: 'placeholder',
         file: null,
       },
       {
-        route: '/components/containers',
-        slug: 'containers',
-        label: 'Containers',
-        components: ['Card', 'Dialog', 'Accordion', 'Alert'],
-        kind: 'placeholder',
-        file: null,
+        route: '/components/aspect-ratio',
+        slug: 'aspect-ratio',
+        label: 'AspectRatio',
+        examples: ['ratios'],
+        kind: 'mdx',
+        file: 'content/components/aspect-ratio.mdx',
       },
       {
-        route: '/components/navigation',
-        slug: 'navigation',
-        label: 'Navigation',
-        components: ['DropdownMenu'],
-        kind: 'placeholder',
-        file: null,
+        route: '/components/attachment',
+        slug: 'attachment',
+        label: 'Attachment',
+        examples: ['states', 'sizes', 'group'],
+        kind: 'mdx',
+        file: 'content/components/attachment.mdx',
       },
       {
-        route: '/components/display',
-        slug: 'display',
-        label: 'Display',
-        components: ['Badge', 'Avatar', 'Tooltip'],
-        kind: 'placeholder',
-        file: null,
+        route: '/components/avatar',
+        slug: 'avatar',
+        label: 'Avatar',
+        examples: ['sizes', 'shapes', 'with-status', 'group'],
+        kind: 'mdx',
+        file: 'content/components/avatar.mdx',
       },
       {
-        route: '/components/primitives',
-        slug: 'primitives',
-        label: 'Primitives',
-        components: ['Show / Hide', 'Slot'],
-        kind: 'placeholder',
-        file: null,
+        route: '/components/badge',
+        slug: 'badge',
+        label: 'Badge',
+        examples: ['variants', 'fills', 'with-icon', 'icon-only'],
+        kind: 'mdx',
+        file: 'content/components/badge.mdx',
+      },
+      {
+        route: '/components/breadcrumb',
+        slug: 'breadcrumb',
+        label: 'Breadcrumb',
+        examples: ['with-ellipsis', 'with-icons', 'with-menu'],
+        kind: 'mdx',
+        file: 'content/components/breadcrumb.mdx',
+      },
+      {
+        route: '/components/bubble',
+        slug: 'bubble',
+        label: 'Bubble',
+        examples: ['variants', 'with-reactions'],
+        kind: 'mdx',
+        file: 'content/components/bubble.mdx',
       },
       {
         route: '/components/button',
@@ -213,12 +267,405 @@ export const PAGE_MANIFEST: readonly ManifestSection[] = [
         file: 'content/components/button.mdx',
       },
       {
+        route: '/components/button-group',
+        slug: 'button-group',
+        label: 'ButtonGroup',
+        examples: ['sizes', 'vertical', 'with-text', 'with-separator'],
+        kind: 'mdx',
+        file: 'content/components/button-group.mdx',
+      },
+      {
+        route: '/components/card',
+        slug: 'card',
+        label: 'Card',
+        examples: [
+          'header-with-action',
+          'content-only',
+          'footer-actions',
+          'sign-in-form',
+        ],
+        kind: 'mdx',
+        file: 'content/components/card.mdx',
+      },
+      {
+        route: '/components/carousel',
+        slug: 'carousel',
+        label: 'Carousel',
+        examples: ['vertical'],
+        kind: 'mdx',
+        file: 'content/components/carousel.mdx',
+      },
+      {
+        route: '/components/chart',
+        slug: 'chart',
+        label: 'Chart',
+        examples: ['area', 'line'],
+        kind: 'mdx',
+        file: 'content/components/chart.mdx',
+      },
+      {
+        route: '/components/checkbox',
+        slug: 'checkbox',
+        label: 'Checkbox',
+        examples: ['checked', 'indeterminate', 'disabled'],
+        kind: 'mdx',
+        file: 'content/components/checkbox.mdx',
+      },
+      {
+        route: '/components/choice-card',
+        slug: 'choice-card',
+        label: 'ChoiceCard',
+        kind: 'placeholder',
+        file: null,
+      },
+      {
+        route: '/components/choice-row',
+        slug: 'choice-row',
+        label: 'ChoiceRow',
+        kind: 'placeholder',
+        file: null,
+      },
+      {
+        route: '/components/collapsible',
+        slug: 'collapsible',
+        label: 'Collapsible',
+        kind: 'placeholder',
+        file: null,
+      },
+      {
+        route: '/components/combobox',
+        slug: 'combobox',
+        label: 'Combobox',
+        kind: 'placeholder',
+        file: null,
+      },
+      {
+        route: '/components/command',
+        slug: 'command',
+        label: 'Command',
+        kind: 'placeholder',
+        file: null,
+      },
+      {
+        route: '/components/context-menu',
+        slug: 'context-menu',
+        label: 'ContextMenu',
+        kind: 'placeholder',
+        file: null,
+      },
+      {
+        route: '/components/date-picker',
+        slug: 'date-picker',
+        label: 'DatePicker',
+        kind: 'placeholder',
+        file: null,
+      },
+      {
+        route: '/components/dialog',
+        slug: 'dialog',
+        label: 'Dialog',
+        examples: ['with-form', 'prop-driven', 'scrollable-body'],
+        kind: 'mdx',
+        file: 'content/components/dialog.mdx',
+      },
+      {
+        route: '/components/drawer',
+        slug: 'drawer',
+        label: 'Drawer',
+        kind: 'placeholder',
+        file: null,
+      },
+      {
+        route: '/components/dropdown-menu',
+        slug: 'dropdown-menu',
+        label: 'DropdownMenu',
+        examples: ['checkbox-items', 'radio-items', 'submenu'],
+        kind: 'mdx',
+        file: 'content/components/dropdown-menu.mdx',
+      },
+      {
+        route: '/components/empty-state',
+        slug: 'empty-state',
+        label: 'EmptyState',
+        kind: 'placeholder',
+        file: null,
+      },
+      {
+        route: '/components/field',
+        slug: 'field',
+        label: 'Field',
+        kind: 'placeholder',
+        file: null,
+      },
+      {
+        route: '/components/hide',
+        slug: 'hide',
+        label: 'Hide',
+        kind: 'placeholder',
+        file: null,
+      },
+      {
+        route: '/components/hover-card',
+        slug: 'hover-card',
+        label: 'HoverCard',
+        kind: 'placeholder',
+        file: null,
+      },
+      {
+        route: '/components/input',
+        slug: 'input',
+        label: 'Input',
+        examples: ['variants', 'sizes', 'with-label', 'invalid', 'disabled'],
+        kind: 'mdx',
+        file: 'content/components/input.mdx',
+      },
+      {
+        route: '/components/input-group',
+        slug: 'input-group',
+        label: 'InputGroup',
+        kind: 'placeholder',
+        file: null,
+      },
+      {
+        route: '/components/input-otp',
+        slug: 'input-otp',
+        label: 'InputOTP',
+        kind: 'placeholder',
+        file: null,
+      },
+      {
+        route: '/components/item',
+        slug: 'item',
+        label: 'Item',
+        kind: 'placeholder',
+        file: null,
+      },
+      {
+        route: '/components/kbd',
+        slug: 'kbd',
+        label: 'Kbd',
+        kind: 'placeholder',
+        file: null,
+      },
+      {
+        route: '/components/label',
+        slug: 'label',
+        label: 'Label',
+        kind: 'placeholder',
+        file: null,
+      },
+      {
+        route: '/components/marker',
+        slug: 'marker',
+        label: 'Marker',
+        kind: 'placeholder',
+        file: null,
+      },
+      {
+        route: '/components/menubar',
+        slug: 'menubar',
+        label: 'Menubar',
+        kind: 'placeholder',
+        file: null,
+      },
+      {
+        route: '/components/message',
+        slug: 'message',
+        label: 'Message',
+        kind: 'placeholder',
+        file: null,
+      },
+      {
+        route: '/components/message-scroller',
+        slug: 'message-scroller',
+        label: 'MessageScroller',
+        kind: 'placeholder',
+        file: null,
+      },
+      {
+        route: '/components/multi-select',
+        slug: 'multi-select',
+        label: 'MultiSelect',
+        kind: 'placeholder',
+        file: null,
+      },
+      {
+        route: '/components/native-select',
+        slug: 'native-select',
+        label: 'NativeSelect',
+        kind: 'placeholder',
+        file: null,
+      },
+      {
+        route: '/components/navigation-menu',
+        slug: 'navigation-menu',
+        label: 'NavigationMenu',
+        kind: 'placeholder',
+        file: null,
+      },
+      {
+        route: '/components/pagination',
+        slug: 'pagination',
+        label: 'Pagination',
+        kind: 'placeholder',
+        file: null,
+      },
+      {
+        route: '/components/popover',
+        slug: 'popover',
+        label: 'Popover',
+        kind: 'placeholder',
+        file: null,
+      },
+      {
+        route: '/components/progress',
+        slug: 'progress',
+        label: 'Progress',
+        kind: 'placeholder',
+        file: null,
+      },
+      {
+        route: '/components/radio-group',
+        slug: 'radio-group',
+        label: 'RadioGroup',
+        kind: 'placeholder',
+        file: null,
+      },
+      {
+        route: '/components/resizable',
+        slug: 'resizable',
+        label: 'Resizable',
+        kind: 'placeholder',
+        file: null,
+      },
+      {
+        route: '/components/scroll-area',
+        slug: 'scroll-area',
+        label: 'ScrollArea',
+        kind: 'placeholder',
+        file: null,
+      },
+      {
+        route: '/components/select',
+        slug: 'select',
+        label: 'Select',
+        examples: [
+          'variants',
+          'sizes',
+          'placeholder',
+          'groups',
+          'disabled',
+          'invalid',
+        ],
+        kind: 'mdx',
+        file: 'content/components/select.mdx',
+      },
+      {
+        route: '/components/separator',
+        slug: 'separator',
+        label: 'Separator',
+        kind: 'placeholder',
+        file: null,
+      },
+      {
+        route: '/components/sheet',
+        slug: 'sheet',
+        label: 'Sheet',
+        kind: 'placeholder',
+        file: null,
+      },
+      {
+        route: '/components/show',
+        slug: 'show',
+        label: 'Show',
+        kind: 'placeholder',
+        file: null,
+      },
+      {
+        route: '/components/sidebar',
+        slug: 'sidebar',
+        label: 'Sidebar',
+        kind: 'placeholder',
+        file: null,
+      },
+      {
+        route: '/components/skeleton',
+        slug: 'skeleton',
+        label: 'Skeleton',
+        kind: 'placeholder',
+        file: null,
+      },
+      {
+        route: '/components/slider',
+        slug: 'slider',
+        label: 'Slider',
+        kind: 'placeholder',
+        file: null,
+      },
+      {
+        route: '/components/sonner',
+        slug: 'sonner',
+        label: 'Sonner',
+        kind: 'placeholder',
+        file: null,
+      },
+      {
+        route: '/components/spinner',
+        slug: 'spinner',
+        label: 'Spinner',
+        kind: 'placeholder',
+        file: null,
+      },
+      {
         route: '/components/switch',
         slug: 'switch',
         label: 'Switch',
         examples: ['sizes', 'checked', 'disabled', 'with-description'],
         kind: 'mdx',
         file: 'content/components/switch.mdx',
+      },
+      {
+        route: '/components/table',
+        slug: 'table',
+        label: 'Table',
+        kind: 'placeholder',
+        file: null,
+      },
+      {
+        route: '/components/tabs',
+        slug: 'tabs',
+        label: 'Tabs',
+        examples: ['variants', 'sizes', 'disabled'],
+        kind: 'mdx',
+        file: 'content/components/tabs.mdx',
+      },
+      {
+        route: '/components/textarea',
+        slug: 'textarea',
+        label: 'Textarea',
+        kind: 'placeholder',
+        file: null,
+      },
+      {
+        route: '/components/toggle',
+        slug: 'toggle',
+        label: 'Toggle',
+        kind: 'placeholder',
+        file: null,
+      },
+      {
+        route: '/components/toggle-group',
+        slug: 'toggle-group',
+        label: 'ToggleGroup',
+        kind: 'placeholder',
+        file: null,
+      },
+      {
+        route: '/components/tooltip',
+        slug: 'tooltip',
+        label: 'Tooltip',
+        kind: 'placeholder',
+        file: null,
       },
     ],
   },

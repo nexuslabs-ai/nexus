@@ -1,3 +1,5 @@
+import { cache } from 'react';
+
 import { readdir, readFile } from 'node:fs/promises';
 import path from 'node:path';
 
@@ -7,7 +9,7 @@ const DEPENDENCIES_DIR = path.join(process.cwd(), 'generated', 'dependencies');
 
 type Package = { name: string; range: string };
 
-type Dependencies = {
+export type Dependencies = {
   install: Package[];
   copy: string[];
   files: string[];
@@ -55,24 +57,26 @@ function isDependencies(value: unknown): value is Dependencies {
   );
 }
 
-export async function loadDependencies(slug: string): Promise<Dependencies> {
-  const fileNames = await listDependencyFiles();
-  const fileName = `${slug}.json`;
+export const loadDependencies = cache(
+  async (slug: string): Promise<Dependencies> => {
+    const fileNames = await listDependencyFiles();
+    const fileName = `${slug}.json`;
 
-  if (!fileNames.includes(fileName)) {
-    const known = fileNames.map((name) => path.basename(name, '.json'));
-    throw new Error(
-      `InstallBlock: unknown slug "${slug}". Known slugs: ${known.join(', ')}.`
-    );
+    if (!fileNames.includes(fileName)) {
+      const known = fileNames.map((name) => path.basename(name, '.json'));
+      throw new Error(
+        `InstallBlock: unknown slug "${slug}". Known slugs: ${known.join(', ')}.`
+      );
+    }
+
+    const filePath = path.join(DEPENDENCIES_DIR, fileName);
+    const parsed: unknown = JSON.parse(await readFile(filePath, 'utf8'));
+
+    if (!isDependencies(parsed)) {
+      throw new Error(
+        `InstallBlock: ${filePath} needs an install list of { name, range } and string arrays copy, files, styles — rerun \`pnpm --filter @nexus_ds/docs generate:dependencies\`.`
+      );
+    }
+    return parsed;
   }
-
-  const filePath = path.join(DEPENDENCIES_DIR, fileName);
-  const parsed: unknown = JSON.parse(await readFile(filePath, 'utf8'));
-
-  if (!isDependencies(parsed)) {
-    throw new Error(
-      `InstallBlock: ${filePath} needs an install list of { name, range } and string arrays copy, files, styles — rerun \`pnpm --filter @nexus_ds/docs generate:dependencies\`.`
-    );
-  }
-  return parsed;
-}
+);
