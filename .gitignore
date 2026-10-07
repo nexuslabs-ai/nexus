@@ -13,6 +13,9 @@ storybook-static
 # Turbo
 .turbo
 
+# Wrangler (local dev/deploy state)
+.wrangler
+
 # Testing
 coverage
 

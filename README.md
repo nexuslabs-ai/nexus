@@ -10,7 +10,7 @@ Storybook hosts the component catalog and runs both visual docs and interaction 
 
 ## Prerequisites
 
-- **Node** ≥ 20.19.0 (see `.nvmrc`)
+- **Node** ≥ 22 (see `.nvmrc`)
 - **pnpm** — pinned via `packageManager: pnpm@10.12.1`
 - **Docker Desktop** — for the docs-MCP server (optional)
 

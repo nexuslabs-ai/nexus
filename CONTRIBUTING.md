@@ -6,7 +6,7 @@ Project overview lives in [`README.md`](README.md). This is the day-to-day handb
 
 ## Prerequisites
 
-- **Node** ≥ 20.19.0 (see `.nvmrc`)
+- **Node** ≥ 22 (see `.nvmrc`)
 - **pnpm** — pinned via `packageManager` in `package.json` (`pnpm@10.12.1`)
 - **Docker Desktop** — for the docs-MCP server only (recommended, not required to build the library)
 
