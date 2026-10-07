@@ -527,7 +527,11 @@ export const TextButtonsStayContentWidth: Story = {
       Math.round(longButton.getBoundingClientRect().width)
     ).toBeGreaterThan(Math.round(shortButton.getBoundingClientRect().width));
     await expect(iconButton).toHaveClass('nx:size-10');
-    expect(Math.round(iconButton.getBoundingClientRect().width)).toBe(40);
+    expect(Math.round(iconButton.getBoundingClientRect().width)).toBe(
+      parseFloat(
+        getComputedStyle(iconButton).getPropertyValue('--nx-spacing-10')
+      )
+    );
   },
 };
 
@@ -1050,6 +1054,7 @@ export const VariantClassesMatchFigmaTokens: Story = {
 };
 
 export const BorderedVariantsKeepFixedHeight: Story = {
+  globals: { density: 'default' },
   tags: ['!autodocs', '!dev'],
   render: () => (
     <div className="nx:flex nx:flex-col nx:gap-4 nx:p-10 nx:bg-background">
@@ -1090,6 +1095,7 @@ export const BorderedVariantsKeepFixedHeight: Story = {
 };
 
 export const DefaultModeHeightPinned: Story = {
+  globals: { density: 'default' },
   tags: ['!autodocs', '!dev'],
   parameters: {
     a11y: { test: 'off' },
@@ -1212,6 +1218,11 @@ export const DisabledAndLoadingThemes: Story = {
         const normal = buttons[0]!;
         const disabled = buttons[1]!;
         const loading = buttons[2]!;
+        await Promise.all(
+          buttons.flatMap((button) =>
+            button.getAnimations().map((animation) => animation.finished)
+          )
+        );
         await expect(disabled).toBeDisabled();
         await expect(loading).toBeDisabled();
         await expect(loading).toHaveAttribute('aria-busy', 'true');
@@ -1355,6 +1366,8 @@ export const SizeDensityContract: Story = {
             <div
               key={size}
               data-testid="size-density-row"
+              data-density={density}
+              data-size={size}
               data-font={font}
               data-icon={icon}
               className="nx:flex nx:flex-wrap nx:items-center nx:gap-2"
@@ -1387,6 +1400,22 @@ export const SizeDensityContract: Story = {
     for (const row of within(canvasElement).getAllByTestId(
       'size-density-row'
     )) {
+      const densityIndex = [
+        'tight',
+        'compact',
+        'default',
+        'comfortable',
+        'relaxed',
+        'spacious',
+      ].indexOf(row.dataset.density!);
+      const defaultHeight = { xs: 28, sm: 32, default: 40, lg: 48 }[
+        row.dataset.size as 'xs' | 'sm' | 'default' | 'lg'
+      ];
+      for (const button of row.querySelectorAll('button')) {
+        await expect(Math.round(button.getBoundingClientRect().height)).toBe(
+          defaultHeight + [-4, -2, 0, 2, 4, 6][densityIndex]!
+        );
+      }
       for (const svg of row.querySelectorAll('svg')) {
         await expect(parseFloat(getComputedStyle(svg).width)).toBe(
           Number(row.dataset.icon)

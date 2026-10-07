@@ -1,6 +1,6 @@
 # Shared density-scale review (draft)
 
-This PR isolates the shared density changes from the uncommitted Button/ButtonGroup work. It is not ready to merge. Findings below must be resolved in this PR before marking it ready; they are not deferred to unspecified follow-up work.
+This PR isolates the shared density changes above the committed Button/ButtonGroup stack. It is not ready to merge. Findings below must be resolved in this PR before marking it ready; they are not deferred to unspecified follow-up work.
 
 ## Decision and scope
 
@@ -36,12 +36,12 @@ Representative examples for all 68 component/appearance Storybook families were 
 
 ## Findings and merge gates
 
-- [ ] **Switch checked-thumb alignment regression.** `packages/react/src/components/switch/switch.tsx` uses `h-5 w-9` for its default track and `size-4 translate-x-4` for its thumb. At Comfortable, the new track is 38px wide, with a 16px thumb, 16px travel and 2px borders. The checked right inset is 4px rather than the matching 2px. Before the change the track was 36px. Anchor checked travel to actual available track space using the existing styling vocabulary; add a story assertion across density and RTL. Do not silently distort the approved height scale to accommodate the switch.
-- [ ] **Density-sensitive icon consumers.** Badge still uses numeric spacing for glyphs; its icon stories expect 14px but measured 12px at Tight/Compact and 16px at Spacious. This coupling predates the new scale, but the patch changes which values those glyphs inherit. Decide and document whether each affected glyph should track density or use an approved fixed icon token. Do not import the uncommitted Button icon-token addition implicitly.
-- [ ] **Default-only measurement assertions.** Accordion, Alert, Badge, Button, ButtonGroup, Card, Select, Slider and Tooltip contain assertions assuming Default geometry. Default-only stories must explicitly select Default; stories intended to cover density must assert the chosen density contract. Do not relax meaningful layout assertions merely to turn the suite green.
-- [ ] **Full-suite pointer/colour reliability.** Isolated successes do not erase full-suite native-pointer timeouts or colour-string comparison races. Reproduce with an intentional concurrency configuration and verify the final suite.
+- [x] **Switch checked-thumb alignment.** Replaced fixed travel distances with track-relative logical positioning. Both sizes are tested across six densities, checked/unchecked and LTR/RTL.
+- [ ] **Density-sensitive icon consumers.** Badge and Alert now use the approved fixed icon tokens from #818. Other numeric glyph consumers (including menus, sidebar, standalone Spinner and pagination) still need an explicit role-by-role decision; this PR has not silently migrated them.
+- [x] **Default-only measurement assertions.** Explicitly scope Default contracts; use resolved spacing tokens for density-aware Button, Slider and Tooltip assertions. Add multi-density Button height and fixed-glyph checks.
+- [x] **Full-suite pointer/colour reliability.** Serialize browser story files, release native pointer hover after press tests, and wait for finite colour transitions before comparing final colours.
 - [ ] **Complete remaining visual checks.** Open states, settled charts, dark theme, narrow containers and RTL need final coverage on the isolated branch. Fix confirmed regressions in this PR.
-- [ ] **Coordinate appearance work.** PR #814 / issue #796 changes root selectors and appearance ownership. Reconcile generated CSS and rerun density evidence after that branch lands. This draft targets main to avoid importing unrelated Button/Alert work.
+- [ ] **Coordinate appearance work.** PR #814 / issue #796 changes root selectors and appearance ownership. Reconcile generated CSS and rerun density evidence after that branch lands. The approved merge order is #814 → #816 → #818 → #817. This draft is rebased onto #818; generated CSS is rebuilt from that appearance-aware source.
 
 ## Reproduction
 
@@ -58,3 +58,19 @@ Against main base `abc5dc8b8885f93c6936ff9fb6c41a4c498aa00e`: Core build and Tai
 ## Release
 
 A major core changeset records the intentional breaking visual change to existing shared values. Do not hardcode a release version: publish the version produced by Changesets, accounting for other pending releases. Confirm the release classification when this draft becomes ready.
+
+## Integration verification (2026-10-07)
+
+Rebased the density commit onto #818 at `f285d10e5`, excluding unrelated newer-main commits. The pre-rebase branch and local-fix stash are retained as recovery points. This changes dependency order, not the approved numeric scale.
+
+Component fixes: Switch anchors thumb travel to the actual track using logical positioning, including RTL; Badge uses the existing 14px icon token; Alert uses the existing 16px icon token. No new token definitions were added by these fixes.
+
+Stories: Default-only measurement stories explicitly select Default. Density-aware assertions resolve current spacing values. Button verifies its full size/height progression; Badge checks fixed icons across six roots; Alert's old density attributes are replaced with real NexusRoot scopes; Switch checks both sizes and directions across all densities. The Storybook runner serializes files because native pointer commands share a browser pointer, and colour comparisons wait for finite button transitions to settle.
+
+Modern Web Guidance: retrieved `css` guidance using `modern-web-guidance` (skill version `2026_09_04-7de96777`), particularly logical properties and token use. Decision: logical track anchoring with existing utilities; verification: Switch geometry assertions across six densities and LTR/RTL plus rendered inspection. No environment queries introduced.
+
+Rebased Core build, generated CSS, all 16 catalogue tests, repository typecheck and focused ESLint passed. Final six-density suite results are recorded in the PR update after completion. The prior 997-story run was on the pre-rebase merged checkout; it is not the count for this base.
+
+The audit JSON was moved out of `tokens/` into `packages/core/docs/density-review/` so it is not treated as an unregistered token document.
+
+Visual checks on this base: Switch six-density matrix in both directions; settled area/bar charts in dark Spacious mode; open Dialog in dark Spacious at desktop and 375px viewport; Alert six-density action layout at 375px. Remaining broad dark/narrow/open-state checks and other glyph consumers remain merge gates. Passing Storybook tests is not full visual or contrast certification.

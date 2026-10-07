@@ -56,6 +56,7 @@ export default defineConfig({
         root: path.resolve(__dirname, 'packages/react'),
         test: {
           name: 'storybook',
+          fileParallelism: false,
           browser: {
             enabled: true,
             provider: playwright(),
@@ -84,6 +85,7 @@ export default defineConfig({
                   });
                 } finally {
                   await page.mouse.up();
+                  await page.mouse.move(0, 0);
                 }
               },
             },

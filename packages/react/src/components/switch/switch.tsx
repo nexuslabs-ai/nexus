@@ -7,7 +7,7 @@ import { cn } from '../../lib/utils';
 
 const switchVariants = cva(
   [
-    'nx:peer nx:inline-flex nx:shrink-0 nx:cursor-pointer nx:items-center',
+    'nx:peer nx:relative nx:inline-flex nx:shrink-0 nx:cursor-pointer nx:items-center',
     'nx:rounded-full nx:border-thick nx:border-border-default',
     'nx:transition-control',
     'nx:focus-visible:outline-2 nx:focus-visible:outline-focus-default',
@@ -32,16 +32,16 @@ const switchVariants = cva(
 
 const switchThumbVariants = cva(
   [
-    'nx:pointer-events-none nx:block nx:rounded-full',
-    'nx:bg-control-thumb nx:transition-[background-color,transform]',
+    'nx:pointer-events-none nx:absolute nx:start-0 nx:top-1/2 nx:-translate-y-1/2 nx:block nx:rounded-full',
+    'nx:bg-control-thumb nx:transition-[background-color,inset-inline-start,translate]',
     'nx:data-[state=checked]:bg-primary-foreground',
-    'nx:data-[state=unchecked]:translate-x-0',
+    'nx:data-[state=unchecked]:translate-x-0 nx:data-[state=checked]:start-full nx:data-[state=checked]:-translate-x-full nx:rtl:data-[state=checked]:translate-x-full',
   ],
   {
     variants: {
       size: {
-        default: 'nx:size-4 nx:data-[state=checked]:translate-x-4',
-        sm: 'nx:size-[14px] nx:data-[state=checked]:translate-x-[14px]',
+        default: 'nx:size-4',
+        sm: 'nx:size-[14px]',
       },
     },
     defaultVariants: {

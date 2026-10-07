@@ -133,7 +133,7 @@ const badgeVariants = cva(
 );
 
 const badgeIconClasses =
-  'nx:flex nx:items-center nx:justify-center nx:size-3.5 nx:[&>svg]:size-3.5';
+  'nx:flex nx:items-center nx:justify-center nx:size-icon-sm nx:[&>svg]:size-icon-sm';
 
 function badgeShapeClasses(
   isNumber: boolean,
@@ -171,7 +171,7 @@ interface BadgeProps
 
   /**
    * Icon to display before the label.
-   * Icon is automatically sized to 14px (3.5 spacing units).
+   * Icon is automatically sized to 14px using the density-independent small icon token.
    * If the badge has no children, this renders as an icon-only badge.
    * Ignored when `isNumber` is true.
    * @example
@@ -183,7 +183,7 @@ interface BadgeProps
 
   /**
    * Icon to display after the label.
-   * Icon is automatically sized to 14px (3.5 spacing units).
+   * Icon is automatically sized to 14px using the density-independent small icon token.
    * If the badge has no children and no `leftIcon`, this renders as an icon-only badge.
    * Ignored when `isNumber` is true.
    * @example

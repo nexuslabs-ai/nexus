@@ -1,5 +1,6 @@
 import * as React from 'react';
 
+import { DEFAULT_NEXUS_APPEARANCE } from '@nexus_ds/core';
 import {
   Canvas,
   Controls,
@@ -17,6 +18,7 @@ import {
 import { expect, userEvent, waitFor, within } from 'storybook/test';
 
 import { expectHeightPinned } from '../../stories/support/story-height-test-utils';
+import { NexusRoot } from '../appearance/provider';
 import { Button } from '../button';
 
 import {
@@ -840,15 +842,20 @@ export const DensityActionSizing: Story = {
   tags: ['!autodocs', '!dev'],
   render: () => (
     <div className="nx:flex nx:w-full nx:flex-col nx:gap-4">
-      {[
-        'tight',
-        'compact',
-        'default',
-        'comfortable',
-        'relaxed',
-        'spacious',
-      ].map((density) => (
-        <div key={density} data-nx-density={density}>
+      {(
+        [
+          'tight',
+          'compact',
+          'default',
+          'comfortable',
+          'relaxed',
+          'spacious',
+        ] as const
+      ).map((density) => (
+        <NexusRoot
+          key={density}
+          state={{ ...DEFAULT_NEXUS_APPEARANCE, mode: 'light', density }}
+        >
           <Alert layout="inline" variant="information">
             <AlertIcon>
               <IconInfoCircleFilled />
@@ -873,7 +880,7 @@ export const DensityActionSizing: Story = {
               <AlertClose />
             </AlertActions>
           </Alert>
-        </div>
+        </NexusRoot>
       ))}
     </div>
   ),
@@ -882,6 +889,11 @@ export const DensityActionSizing: Story = {
       canvasElement.querySelectorAll('[data-slot="alert"]')
     ).toHaveLength(6);
     for (const alert of canvasElement.querySelectorAll('[data-slot="alert"]')) {
+      await expect(
+        alert
+          .querySelector('[data-slot="alert-icon"] svg')!
+          .getBoundingClientRect().width
+      ).toBe(16);
       const close = alert.querySelector('[data-slot="alert-close"]')!;
       for (const button of alert.querySelectorAll('[data-slot="button"]')) {
         await expect(button.getBoundingClientRect().height).toBe(
@@ -1755,6 +1767,7 @@ export const AllBannerVariants: Story = {
 };
 
 export const DefaultModeHeightPinned: Story = {
+  globals: { density: 'default' },
   tags: ['!autodocs', '!dev'],
   parameters: {
     a11y: { test: 'off' },
