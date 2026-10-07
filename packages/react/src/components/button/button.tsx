@@ -19,7 +19,7 @@ const buttonVariants = cva(
         error:
           'nx:text-error-subtle-foreground nx:hover:bg-error-subtle-hover nx:active:bg-error-subtle-active nx:disabled:not-data-[loading=true]:text-disabled-foreground nx:aria-disabled:not-data-[loading=true]:text-disabled-foreground',
         'error-outline':
-          'nx:border-error-border nx:bg-container nx:text-error-subtle-foreground nx:hover:bg-error-subtle-hover nx:active:bg-error-subtle-active nx:disabled:not-data-[loading=true]:border-border-disabled nx:disabled:not-data-[loading=true]:bg-disabled nx:disabled:not-data-[loading=true]:text-disabled-foreground nx:aria-disabled:not-data-[loading=true]:border-border-disabled nx:aria-disabled:not-data-[loading=true]:bg-disabled nx:aria-disabled:not-data-[loading=true]:text-disabled-foreground',
+          'nx:border-current nx:bg-container nx:text-error-subtle-foreground nx:hover:bg-error-subtle-hover nx:active:bg-error-subtle-active nx:disabled:not-data-[loading=true]:border-border-disabled nx:disabled:not-data-[loading=true]:bg-disabled nx:disabled:not-data-[loading=true]:text-disabled-foreground nx:aria-disabled:not-data-[loading=true]:border-border-disabled nx:aria-disabled:not-data-[loading=true]:bg-disabled nx:aria-disabled:not-data-[loading=true]:text-disabled-foreground',
         destructive:
           'nx:bg-error-background nx:text-error-foreground nx:hover:bg-error-background-hover nx:active:bg-error-background-active nx:disabled:not-data-[loading=true]:bg-disabled nx:disabled:not-data-[loading=true]:text-disabled-foreground nx:aria-disabled:not-data-[loading=true]:bg-disabled nx:aria-disabled:not-data-[loading=true]:text-disabled-foreground',
         outline:

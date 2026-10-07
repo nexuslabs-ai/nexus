@@ -315,8 +315,8 @@ const seedFill = (l: number, c: number, h: number): string =>
   formatOklch(clampChroma({ mode: 'oklch', l, c, h }, 'oklch', FILL_GAMUT));
 
 function hoverFillTarget(baseL: number): number {
-  if (baseL <= PRIMARY_DARK_ENDPOINT_LIFT_FLOOR) {
-    return endpointL('900');
+  if (baseL < 0.5) {
+    return Math.max(baseL + PRIMARY_HOVER_STEP, endpointL('800'));
   }
   if (baseL >= PRIMARY_LIGHT_ENDPOINT_CEIL) return endpointL('100');
   return towardMid(baseL, PRIMARY_HOVER_STEP);

@@ -254,7 +254,18 @@ describe('derivePrimary', () => {
 });
 
 describe('primary fills after contrast solving', () => {
-  const PRIMARY_SEEDS = ['#1b2a4a', '#0a0a0a', '#2563eb', '#339cff', '#7c3aed'];
+  const PRIMARY_SEEDS = [
+    '#000000',
+    '#171717',
+    '#0b1730',
+    '#200b30',
+    '#1b2a4a',
+    '#0a0a0a',
+    '#2563eb',
+    '#339cff',
+    '#7c3aed',
+    '#15803d',
+  ];
   const FILLS = [
     '--nx-color-primary-background',
     '--nx-color-primary-background-hover',
@@ -267,6 +278,21 @@ describe('primary fills after contrast solving', () => {
       dark: { ...CONTRACT.dark, accent },
       contrast: { light: contrast, dark: contrast },
     });
+
+  it('keeps dark-brand hover visibly lighter without replacing its hue', () => {
+    for (const seed of ['#000000', '#171717', '#0b1730', '#200b30']) {
+      const map = themeFor(seed).light;
+      const base = map['--nx-color-primary-background'];
+      const hover = map['--nx-color-primary-background-hover'];
+      expect(lOf(hover)).toBeGreaterThan(lOf(base));
+      expect(lOf(hover)).toBeGreaterThanOrEqual(
+        lOf(getPaletteRamp('neutral')['800']) - 0.0001
+      );
+      if (seed !== '#000000' && seed !== '#171717') {
+        expect(hOf(hover)).toBeCloseTo(hOf(base), 0);
+      }
+    }
+  });
 
   it('keeps the shared label legible on the base, hover, and active fills', () => {
     for (const seed of PRIMARY_SEEDS) {

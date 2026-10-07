@@ -12,6 +12,7 @@ import { expect, fn, userEvent, within } from 'storybook/test';
 import { expectNativePress } from '../../stories/support/native-press';
 import { expectHeightPinned } from '../../stories/support/story-height-test-utils';
 import { NexusRoot } from '../appearance/provider';
+import { ButtonGroup } from '../button-group';
 
 import { Button } from './button';
 
@@ -1424,4 +1425,65 @@ export const AriaDisabledActivation: Story = {
     await expect(args.onClick).not.toHaveBeenCalled();
     await expect(args.onClickCapture).not.toHaveBeenCalled();
   },
+};
+
+export const PrimaryHoverComparison: Story = {
+  parameters: {
+    docs: {
+      description: {
+        story:
+          'Brand seeds are comparison inputs. Normal and Hover are pinned previews of the existing primary background tokens; Try hover remains interactive. No theme tokens are overridden.',
+      },
+    },
+  },
+  render: () => (
+    <div className="nx:flex nx:flex-wrap nx:items-start nx:gap-4">
+      {(['light', 'dark'] as const).map((mode) => (
+        <div key={mode} className="nx:flex nx:flex-col nx:gap-2">
+          {(
+            [
+              ['Black', '#000000'],
+              ['Charcoal', '#171717'],
+              ['Deep blue', '#0b1730'],
+              ['Deep violet', '#200b30'],
+              ['Blue', '#2563eb'],
+              ['Violet', '#7c3aed'],
+              ['Green', '#15803d'],
+            ] as const
+          ).map(([name, brandColor]) => (
+            <NexusRoot
+              key={name}
+              state={{ ...DEFAULT_NEXUS_APPEARANCE, mode, brandColor }}
+              className="nx:flex nx:flex-col nx:gap-3 nx:bg-background nx:p-4 nx:text-foreground"
+            >
+              <span className="nx:typography-label-default">
+                {name} · {mode}
+              </span>
+              <div className="nx:flex nx:flex-wrap nx:items-center nx:gap-3">
+                <Button className="nx:pointer-events-none" tabIndex={-1}>
+                  Normal
+                </Button>
+                <Button
+                  className="nx:pointer-events-none nx:bg-primary-background-hover"
+                  tabIndex={-1}
+                >
+                  Hover
+                </Button>
+                <Button
+                  className="nx:pointer-events-none nx:bg-primary-background-active"
+                  tabIndex={-1}
+                >
+                  Pressed
+                </Button>
+                <ButtonGroup aria-label={`${name} ${mode} live hover`}>
+                  <Button>Try hover</Button>
+                  <Button>More</Button>
+                </ButtonGroup>
+              </div>
+            </NexusRoot>
+          ))}
+        </div>
+      ))}
+    </div>
+  ),
 };
