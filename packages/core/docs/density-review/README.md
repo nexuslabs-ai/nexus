@@ -69,7 +69,7 @@ Stories: Default-only measurement stories explicitly select Default. Density-awa
 
 Modern Web Guidance: retrieved `css` guidance using `modern-web-guidance` (skill version `2026_09_04-7de96777`), particularly logical properties and token use. Decision: logical track anchoring with existing utilities; verification: Switch geometry assertions across six densities and LTR/RTL plus rendered inspection. No environment queries introduced.
 
-Rebased Core build, generated CSS, all 16 catalogue tests, repository typecheck and focused ESLint passed. Final six-density suite results are recorded in the PR update after completion. The prior 997-story run was on the pre-rebase merged checkout; it is not the count for this base.
+Rebased Core build, generated CSS, all 16 catalogue tests, repository typecheck and focused ESLint passed. All six density runs passed: 78 Storybook files and 980 stories per density (5,880 executions). The latest Alert matrix was included from Default onward and explicitly exercises all six densities. All 654 unit tests passed, including the token manifest, generated CSS parity and theme contrast invariants. Full repository lint, typecheck and changed-file formatting passed. The prior 997-story run was on the pre-rebase merged checkout; it is not the count for this base.
 
 The audit JSON was moved out of `tokens/` into `packages/core/docs/density-review/` so it is not treated as an unregistered token document.
 
