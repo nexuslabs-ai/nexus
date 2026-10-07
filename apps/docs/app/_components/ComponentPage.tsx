@@ -8,8 +8,8 @@ import { PREVIEW_DEMO } from '../../scripts/examples.mjs';
 import { humanize } from '../../scripts/humanize.mjs';
 import { requireComponentsSection } from '../_lib/manifest';
 
-import { ComponentPreview } from './ComponentPreview';
-import { ComponentSource } from './ComponentSource';
+import { ComponentDemo } from './ComponentDemo';
+import { ComponentInstallation } from './ComponentInstallation';
 import {
   PAGE_HEADING_CLASS,
   SECTION_HEADING_CLASS,
@@ -24,7 +24,7 @@ import { PropsTable } from './PropsTable';
 type Example = { id: DemoId; name: string };
 
 /**
- * `examples/{slug}/demo.tsx` is the Preview and Code; every other demo in that
+ * `examples/{slug}/demo.tsx` is the preview at the top; every other demo in that
  * folder is an example, registry `examples` first, then the rest by name.
  */
 export function ComponentPage({ slug }: { slug: string }) {
@@ -50,24 +50,18 @@ export function ComponentPage({ slug }: { slug: string }) {
   return (
     <>
       <h1 className={PAGE_HEADING_CLASS}>{page.label}</h1>
-      <ComponentPreview id={previewId} />
-
-      <SectionHeading className={SECTION_HEADING_CLASS}>
-        Installation
-      </SectionHeading>
-      <InstallBlock slugs={[slug]} />
+      <ComponentDemo id={previewId} />
       <InstallBlock
         slugs={preview.alsoInstall}
         besides={[slug]}
         alsoPackages={preview.packages}
-        caption="The code below also uses:"
+        caption="This example also needs:"
       />
 
-      <SectionHeading className={SECTION_HEADING_CLASS}>Code</SectionHeading>
-      <ComponentSource id={previewId} />
-
-      <SectionHeading className={SECTION_HEADING_CLASS}>Props</SectionHeading>
-      <PropsTable slug={slug} />
+      <SectionHeading className={SECTION_HEADING_CLASS}>
+        Installation
+      </SectionHeading>
+      <ComponentInstallation slug={slug} />
 
       {examples.length > 0 && (
         <SectionHeading className={SECTION_HEADING_CLASS}>
@@ -82,7 +76,7 @@ export function ComponentPage({ slug }: { slug: string }) {
           >
             {humanize(name)}
           </SubsectionHeading>
-          <ComponentPreview id={id} />
+          <ComponentDemo id={id} />
           <InstallBlock
             slugs={demos[id].alsoInstall}
             besides={[slug, ...preview.alsoInstall]}
@@ -91,9 +85,11 @@ export function ComponentPage({ slug }: { slug: string }) {
             )}
             caption="This example also needs:"
           />
-          <ComponentSource id={id} />
         </section>
       ))}
+
+      <SectionHeading className={SECTION_HEADING_CLASS}>Props</SectionHeading>
+      <PropsTable slug={slug} />
     </>
   );
 }
