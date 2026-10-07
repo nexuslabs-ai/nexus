@@ -483,7 +483,7 @@ jobs:
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
-          head=$(gh api "repos/$GITHUB_REPOSITORY/commits/main" --jq .sha)
+          head=$(gh api "repos/$GITHUB_REPOSITORY/git/ref/heads/main" --jq .object.sha)
           if [ "$head" = "$GITHUB_SHA" ]; then
             echo "latest=true" >> "$GITHUB_OUTPUT"
           else
