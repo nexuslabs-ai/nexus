@@ -4,6 +4,7 @@ import { expect, userEvent, waitFor, within } from 'storybook/test';
 import { expectImmediateItemMotion } from '../../stories/support/motion-test-utils';
 import { expectInterruptibleOverlayMotion } from '../../stories/support/overlay-motion-test-utils';
 import { expectHeightPinned } from '../../stories/support/story-height-test-utils';
+import { Input } from '../input';
 import { NativeSelect, NativeSelectOption } from '../native-select';
 
 import {
@@ -471,8 +472,43 @@ export const WithSeparators: Story = {
 };
 
 // ============================================
-// WIDTH STORIES
+// SIZE AND WIDTH STORIES
 // ============================================
+
+const SIZES = ['sm', 'default', 'lg'] as const;
+
+export const Sizes: Story = {
+  render: (_args) => (
+    <div className="nx:flex nx:w-[420px] nx:flex-col nx:gap-3">
+      {SIZES.map((size) => (
+        <div key={size} className="nx:flex nx:items-center nx:gap-3">
+          <Select>
+            <SelectTrigger size={size} aria-label={`${size} select`}>
+              <SelectValue placeholder={size} />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="apple">Apple</SelectItem>
+            </SelectContent>
+          </Select>
+          <Input size={size} placeholder={size} aria-label={`${size} input`} />
+        </div>
+      ))}
+    </div>
+  ),
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+    const height = (element: HTMLElement) =>
+      Math.round(element.getBoundingClientRect().height);
+
+    for (const size of SIZES) {
+      const trigger = canvas.getByRole('combobox', { name: `${size} select` });
+      const input = canvas.getByRole('textbox', { name: `${size} input` });
+
+      await expect(trigger).toHaveAttribute('data-size', size);
+      await expect(height(trigger)).toBe(height(input));
+    }
+  },
+};
 
 export const SmallWidth: Story = {
   render: (_args) => (
@@ -772,17 +808,15 @@ export const WithDataAttributes: Story = {
   play: async ({ canvasElement }) => {
     const canvas = within(canvasElement);
 
-    // Check trigger data-slot
     const trigger = canvas.getByRole('combobox');
     await expect(trigger).toHaveAttribute('data-slot', 'select-trigger');
+    await expect(trigger).toHaveAttribute('data-size', 'default');
     await expect(trigger).toHaveAttribute('data-variant', 'bordered');
     await expect(trigger).toHaveClass('nx:bg-container');
     await expect(trigger).toHaveClass('nx:enabled:hover:bg-container-hover');
 
-    // Open the select
     await userEvent.click(trigger);
 
-    // Wait for content and check data-slots
     await waitFor(() => {
       expect(
         document.querySelector('[data-slot="select-content"]')
@@ -798,7 +832,6 @@ export const WithDataAttributes: Story = {
       ).toBeInTheDocument();
     });
 
-    // Close
     await userEvent.keyboard('{Escape}');
   },
 };
@@ -848,6 +881,33 @@ export const AllVariants: Story = {
               </SelectContent>
             </Select>
           </div>
+        </div>
+      </div>
+
+      <div>
+        <h3 className="nx:text-foreground nx:mb-4 nx:typography-label-default">
+          Sizes
+        </h3>
+        <div className="nx:flex nx:flex-col nx:gap-4">
+          {SIZES.map((size) => (
+            <div key={size} className="nx:flex nx:items-center nx:gap-4">
+              <span className="nx:typography-label-small nx:text-muted-foreground nx:w-24">
+                {size}
+              </span>
+              <Select>
+                <SelectTrigger
+                  size={size}
+                  className="nx:w-[180px]"
+                  aria-label={`${size} size select`}
+                >
+                  <SelectValue placeholder="Select option" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="option1">Option 1</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+          ))}
         </div>
       </div>
 

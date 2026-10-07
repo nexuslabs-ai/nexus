@@ -5,18 +5,22 @@ on:
     branches: [main]
   pull_request:
     # Run on PRs targeting any branch
+  workflow_dispatch:
 
+# The newest pending run replaces older ones; an in-progress main run is never
+# cancelled.
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
-  cancel-in-progress: true
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
 
 permissions:
   contents: read
 
 # Branch protection on `main` requires only the `CI Status` aggregator job
-# (defined at the bottom of this file). Every other job runs on every push and
-# pull request. Nothing is path-filtered and nothing is skippable, so the gate
-# cannot go green on a change no job looked at.
+# (defined near the bottom of this file). Every check job runs on every push
+# and pull request. Nothing is path-filtered and nothing is skippable, so the
+# gate cannot go green on a change no job looked at. The deploy jobs after the
+# aggregator run only on main (push or manual dispatch), once it passes.
 
 jobs:
   # format-check and lint run full-tree to mirror local `pnpm lint` /
@@ -145,6 +149,15 @@ jobs:
         run: |
           pnpm turbo build --filter=@nexus_ds/docs
           pnpm --filter @nexus_ds/docs audit:csp
+
+      - name: Upload docs site
+        if: (github.event_name == 'push' || github.event_name == 'workflow_dispatch') && github.ref == 'refs/heads/main'
+        uses: actions/upload-artifact@v4
+        with:
+          name: docs-site
+          path: apps/docs/out
+          retention-days: 7
+          if-no-files-found: error
 
       - name: Upload build artifacts
         uses: actions/upload-artifact@v4
@@ -449,3 +462,74 @@ jobs:
         run: |
           echo "::error::One or more required jobs failed or were cancelled."
           exit 1
+
+  # ============================================
+  # Deploy — main only, after the aggregator passes
+  # ============================================
+  # Each deploy job publishes the exact artifact CI built and checked above.
+
+  # A re-run of an older main run would publish over a newer deploy, so deploy
+  # only while this commit is still main's head.
+  deploy-gate:
+    name: Deploy Gate
+    runs-on: ubuntu-latest
+    needs: ci-status
+    if: (github.event_name == 'push' || github.event_name == 'workflow_dispatch') && github.ref == 'refs/heads/main'
+    outputs:
+      latest: ${{ steps.head.outputs.latest }}
+    steps:
+      - name: Check this commit is main's head
+        id: head
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          head=$(gh api "repos/$GITHUB_REPOSITORY/git/ref/heads/main" --jq .object.sha)
+          if [ "$head" = "$GITHUB_SHA" ]; then
+            echo "latest=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "::notice::Skipping deploy: main is at ${head::7}, not ${GITHUB_SHA::7}. Use wrangler rollback to publish an older version."
+          fi
+
+  deploy-docs:
+    name: Deploy Docs
+    runs-on: ubuntu-latest
+    needs: deploy-gate
+    if: needs.deploy-gate.outputs.latest == 'true'
+    environment:
+      name: docs
+      url: https://nexusui.so
+    steps:
+      - name: Checkout
+        uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4.3.1
+
+      - name: Deploy
+        uses: ./.github/actions/deploy-cloudflare
+        with:
+          artifact: docs-site
+          config: apps/docs/wrangler.jsonc
+          assets-dir: apps/docs/out
+          host: nexusui.so
+          api-token: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          account-id: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+
+  deploy-storybook:
+    name: Deploy Storybook
+    runs-on: ubuntu-latest
+    needs: deploy-gate
+    if: needs.deploy-gate.outputs.latest == 'true'
+    environment:
+      name: storybook
+      url: https://storybook.nexusui.so
+    steps:
+      - name: Checkout
+        uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4.3.1
+
+      - name: Deploy
+        uses: ./.github/actions/deploy-cloudflare
+        with:
+          artifact: storybook-static
+          config: packages/react/wrangler.jsonc
+          assets-dir: packages/react/storybook-static
+          host: storybook.nexusui.so
+          api-token: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          account-id: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}

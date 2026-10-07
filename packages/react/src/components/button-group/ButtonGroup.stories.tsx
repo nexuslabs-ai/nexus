@@ -287,7 +287,7 @@ export const MixedChildren: Story = {
 
     await expect(text).toHaveAttribute('data-size', 'lg');
     await expect(input).toHaveAttribute('data-size', 'default');
-    await expect(selectTrigger).not.toHaveAttribute('data-size');
+    await expect(selectTrigger).toHaveAttribute('data-size', 'default');
     await expect(
       canvas.getByTestId('button-group-mixed-button')
     ).toHaveAttribute('data-size', 'lg');
