@@ -80,3 +80,17 @@ export const loadDependencies = cache(
     return parsed;
   }
 );
+
+const REACT_SRC = path.join(
+  process.cwd(),
+  '..',
+  '..',
+  'packages',
+  'react',
+  'src'
+);
+
+/** Reads a file the dependencies JSON lists, by its path under `packages/react/src/`. */
+export const loadReactSource = cache((file: string) =>
+  readFile(path.join(REACT_SRC, file), 'utf8')
+);
