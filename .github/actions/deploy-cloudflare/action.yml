@@ -1,12 +1,15 @@
 name: 'Deploy to Cloudflare'
-description: 'Stamps version.txt into a built assets directory, deploys it with the pinned workspace wrangler, and waits until the edge serves the new commit. Expects pnpm and workspace dependencies to be installed by an earlier step.'
+description: 'Downloads a built site artifact, stamps version.txt into it, deploys it with the pinned workspace wrangler, and waits until the edge serves the new commit.'
 
 inputs:
+  artifact:
+    description: 'Name of the workflow artifact holding the built site.'
+    required: true
   config:
     description: 'Path to the wrangler.jsonc of the Worker to deploy, relative to the repository root.'
     required: true
   assets-dir:
-    description: 'The assets directory named in that wrangler.jsonc, relative to the repository root.'
+    description: 'The assets directory named in that wrangler.jsonc, relative to the repository root. The artifact is downloaded here.'
     required: true
   host:
     description: 'Custom domain the Worker serves, used to verify the deploy.'
@@ -21,6 +24,25 @@ inputs:
 runs:
   using: composite
   steps:
+    - name: Install pnpm
+      uses: pnpm/action-setup@fc06bc1257f339d1d5d8b3a19a8cae5388b55320 # v4.4.0
+
+    - name: Setup Node
+      uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4.4.0
+      with:
+        node-version-file: '.nvmrc'
+        cache: 'pnpm'
+
+    - name: Install dependencies
+      shell: bash
+      run: pnpm install --frozen-lockfile
+
+    - name: Download site
+      uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 # v4.3.0
+      with:
+        name: ${{ inputs.artifact }}
+        path: ${{ inputs.assets-dir }}
+
     - name: Stamp version
       shell: bash
       env:
