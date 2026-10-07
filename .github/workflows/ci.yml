@@ -6,17 +6,20 @@ on:
   pull_request:
     # Run on PRs targeting any branch
 
+# A newer push cancels an older PR run. Runs on main are never cancelled, so a
+# deploy job is never interrupted mid-upload; they queue instead.
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
-  cancel-in-progress: true
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
 
 permissions:
   contents: read
 
 # Branch protection on `main` requires only the `CI Status` aggregator job
-# (defined at the bottom of this file). Every other job runs on every push and
-# pull request. Nothing is path-filtered and nothing is skippable, so the gate
-# cannot go green on a change no job looked at.
+# (defined near the bottom of this file). Every check job runs on every push
+# and pull request. Nothing is path-filtered and nothing is skippable, so the
+# gate cannot go green on a change no job looked at. The deploy jobs after the
+# aggregator run only on pushes to main, once it passes.
 
 jobs:
   # format-check and lint run full-tree to mirror local `pnpm lint` /
@@ -145,6 +148,14 @@ jobs:
         run: |
           pnpm turbo build --filter=@nexus_ds/docs
           pnpm --filter @nexus_ds/docs audit:csp
+
+      - name: Upload docs site
+        uses: actions/upload-artifact@v4
+        with:
+          name: docs-site
+          path: apps/docs/out
+          retention-days: 1
+          if-no-files-found: error
 
       - name: Upload build artifacts
         uses: actions/upload-artifact@v4
@@ -449,3 +460,52 @@ jobs:
         run: |
           echo "::error::One or more required jobs failed or were cancelled."
           exit 1
+
+  # ============================================
+  # Deploy — main only, after the aggregator passes
+  # ============================================
+  # Each job publishes the exact artifact CI built and checked above.
+
+  deploy-docs:
+    name: Deploy Docs
+    runs-on: ubuntu-latest
+    needs: ci-status
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    environment:
+      name: docs
+      url: https://nexusui.so
+    steps:
+      - name: Checkout
+        uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4.3.1
+
+      - name: Deploy
+        uses: ./.github/actions/deploy-cloudflare
+        with:
+          artifact: docs-site
+          config: apps/docs/wrangler.jsonc
+          assets-dir: apps/docs/out
+          host: nexusui.so
+          api-token: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          account-id: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+
+  deploy-storybook:
+    name: Deploy Storybook
+    runs-on: ubuntu-latest
+    needs: ci-status
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    environment:
+      name: storybook
+      url: https://storybook.nexusui.so
+    steps:
+      - name: Checkout
+        uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4.3.1
+
+      - name: Deploy
+        uses: ./.github/actions/deploy-cloudflare
+        with:
+          artifact: storybook-static
+          config: packages/react/wrangler.jsonc
+          assets-dir: packages/react/storybook-static
+          host: storybook.nexusui.so
+          api-token: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          account-id: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
