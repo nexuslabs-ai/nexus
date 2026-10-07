@@ -45,6 +45,6 @@ export const SECURITY_HEADERS: Record<string, string> = {
   'Content-Security-Policy-Report-Only': CONTENT_SECURITY_POLICY_REPORT_ONLY,
   'Referrer-Policy': 'strict-origin-when-cross-origin',
   'X-Content-Type-Options': 'nosniff',
-  'X-Frame-Options': 'SAMEORIGIN',
+  'X-Frame-Options': 'DENY',
   'Permissions-Policy': PERMISSIONS_POLICY,
 };

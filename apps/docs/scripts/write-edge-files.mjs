@@ -31,6 +31,8 @@ const headersLines = [
   ...Object.entries(SECURITY_HEADERS).map(
     ([name, value]) => `  ${name}: ${value}`
   ),
+  '/_next/static/*',
+  '  Cache-Control: public, max-age=31536000, immutable',
 ];
 
 const overlong = headersLines.find(

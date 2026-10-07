@@ -2,10 +2,7 @@
   "$schema": "../../node_modules/wrangler/config-schema.json",
   "name": "nexus-storybook",
   "compatibility_date": "2026-10-01",
-  "assets": {
-    "directory": "./storybook-static",
-    "html_handling": "none",
-  },
+  "assets": { "directory": "./storybook-static" },
   "routes": [{ "pattern": "storybook.nexusui.so", "custom_domain": true }],
   "workers_dev": false,
   "preview_urls": false,

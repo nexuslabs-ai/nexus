@@ -36,10 +36,12 @@ runs:
         COMMIT_MESSAGE: ${{ github.event.head_commit.message }}
       run: |
         # wrangler truncates --message at byte 380 and rejects the deploy when
-        # that byte lands mid-UTF-8 sequence, so pass only the subject line.
+        # that byte lands mid-UTF-8 sequence, so pass only the subject line,
+        # capped at 95 characters (95 x 4 bytes <= 380 under C.UTF-8).
         # https://github.com/cloudflare/workers-sdk/issues/11749
         subject="${COMMIT_MESSAGE%%$'\n'*}"
         subject="${subject%$'\r'}"
+        subject="${subject:0:95}"
         pnpm exec wrangler deploy --config "$CONFIG" --message "${subject:-Deploy $GITHUB_SHA}"
 
     - name: Verify edge serves this commit

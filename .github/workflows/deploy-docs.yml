@@ -17,6 +17,7 @@ on:
       - 'turbo.json'
       - 'tsconfig.base.json'
       - '.npmrc'
+      - '.prettierrc'
       - '.nvmrc'
       - '.github/actions/deploy-cloudflare/**'
       - '.github/workflows/deploy-docs.yml'
@@ -53,6 +54,14 @@ jobs:
 
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
+
+      - name: Restore turbo cache
+        uses: actions/cache@0057852bfaa89a56745cba8c7296529d2fc39830 # v4.3.0
+        with:
+          path: .turbo
+          key: turbo-${{ runner.os }}-${{ github.sha }}
+          restore-keys: |
+            turbo-${{ runner.os }}-
 
       - name: Build docs
         run: pnpm turbo build --filter=@nexus_ds/docs
