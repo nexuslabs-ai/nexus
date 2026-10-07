@@ -4,69 +4,9 @@ import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 
 import { MDX_OPTIONS } from './mdx-options';
-import { DOCS_APPEARANCE_BOOTSTRAP_CSP_HASH } from './theme-csp';
-
-const SCRIPT_SRC = [
-  "'self'",
-  DOCS_APPEARANCE_BOOTSTRAP_CSP_HASH,
-  "'report-sample'",
-  process.env.NODE_ENV === 'development' ? "'unsafe-eval'" : null,
-]
-  .filter(Boolean)
-  .join(' ');
-
-const CONNECT_SRC = [
-  "'self'",
-  process.env.NODE_ENV === 'development' ? 'ws:' : null,
-]
-  .filter(Boolean)
-  .join(' ');
-
-const CONTENT_SECURITY_POLICY_REPORT_ONLY = [
-  "default-src 'self'",
-  `script-src ${SCRIPT_SRC}`,
-  "style-src 'self' 'unsafe-inline'",
-  "img-src 'self' data: blob:",
-  "font-src 'self'",
-  `connect-src ${CONNECT_SRC}`,
-  "object-src 'none'",
-  "base-uri 'none'",
-  "form-action 'self'",
-  "frame-ancestors 'none'",
-].join('; ');
-
-const PERMISSIONS_POLICY = [
-  'camera=()',
-  'geolocation=()',
-  'microphone=()',
-  'payment=()',
-  'usb=()',
-].join(', ');
-
-const SECURITY_HEADERS = [
-  {
-    key: 'Content-Security-Policy-Report-Only',
-    value: CONTENT_SECURITY_POLICY_REPORT_ONLY,
-  },
-  {
-    key: 'Referrer-Policy',
-    value: 'strict-origin-when-cross-origin',
-  },
-  {
-    key: 'X-Content-Type-Options',
-    value: 'nosniff',
-  },
-  {
-    key: 'X-Frame-Options',
-    value: 'SAMEORIGIN',
-  },
-  {
-    key: 'Permissions-Policy',
-    value: PERMISSIONS_POLICY,
-  },
-];
 
 const nextConfig: NextConfig = {
+  output: 'export',
   transpilePackages: ['@nexus_ds/react'],
   // let .md/.mdx resolve as modules (for content imported by the dynamic route)
   pageExtensions: ['ts', 'tsx', 'js', 'jsx', 'md', 'mdx'],
@@ -74,14 +14,6 @@ const nextConfig: NextConfig = {
   // a nested .claude/worktrees/* checkout and pick the parent repo's lockfile.
   turbopack: {
     root: path.join(path.dirname(fileURLToPath(import.meta.url)), '..', '..'),
-  },
-  async headers() {
-    return [
-      {
-        source: '/:path*',
-        headers: SECURITY_HEADERS,
-      },
-    ];
   },
 };
 

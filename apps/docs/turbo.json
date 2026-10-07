@@ -60,7 +60,7 @@
         "generate:demos"
       ],
       "inputs": ["$TURBO_DEFAULT$", "$TURBO_ROOT$/package.json"],
-      "outputs": [".next/**", "!.next/cache/**", "next-env.d.ts"]
+      "outputs": ["out/**", "next-env.d.ts"]
     },
     "dev": {
       "dependsOn": [

@@ -1,0 +1,76 @@
+name: Deploy Docs
+
+# Publishes the static export of apps/docs to https://nexusui.so on Cloudflare
+# Workers static assets. Standalone from ci.yml: this is a post-merge push:main
+# workflow, not a PR check. ci.yml builds the docs and runs audit:csp on PRs,
+# which is where a broken build is caught.
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'apps/docs/**'
+      - 'packages/**'
+      - 'package.json'
+      - 'pnpm-lock.yaml'
+      - 'pnpm-workspace.yaml'
+      - 'turbo.json'
+      - 'tsconfig.base.json'
+      - '.npmrc'
+      - '.prettierrc'
+      - '.nvmrc'
+      - '.github/actions/deploy-cloudflare/**'
+      - '.github/workflows/deploy-docs.yml'
+  workflow_dispatch:
+
+concurrency:
+  group: deploy-docs
+  cancel-in-progress: false
+
+permissions:
+  contents: read
+
+jobs:
+  deploy:
+    name: Build and Deploy
+    runs-on: ubuntu-latest
+    # workflow_dispatch accepts any ref; the published site only ever tracks main.
+    if: github.ref == 'refs/heads/main'
+    environment:
+      name: docs
+      url: https://nexusui.so
+    steps:
+      - name: Checkout
+        uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4.3.1
+
+      - name: Install pnpm
+        uses: pnpm/action-setup@fc06bc1257f339d1d5d8b3a19a8cae5388b55320 # v4.4.0
+
+      - name: Setup Node
+        uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4.4.0
+        with:
+          node-version-file: '.nvmrc'
+          cache: 'pnpm'
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Restore turbo cache (read-only)
+        uses: actions/cache/restore@0057852bfaa89a56745cba8c7296529d2fc39830 # v4.3.0
+        with:
+          path: .turbo
+          key: turbo-${{ runner.os }}-${{ github.sha }}
+          restore-keys: |
+            turbo-${{ runner.os }}-
+
+      - name: Build docs
+        run: pnpm turbo build --filter=@nexus_ds/docs
+
+      - name: Deploy
+        uses: ./.github/actions/deploy-cloudflare
+        with:
+          config: apps/docs/wrangler.jsonc
+          assets-dir: apps/docs/out
+          host: nexusui.so
+          api-token: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          account-id: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}

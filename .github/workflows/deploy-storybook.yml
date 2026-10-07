@@ -1,33 +1,33 @@
 name: Deploy Storybook
 
-# Publishes the static Storybook build to GitHub Pages
-# (https://nexuslabs-ai.github.io/nexus/), the URL the docs footer links to.
-# Standalone from ci.yml: this is a post-merge push:main workflow, not a PR
-# check, so it is not part of the `CI Status` branch-protection aggregator.
-# ci.yml still builds Storybook on PRs, which is where a broken build is caught.
-#
-# One-time repo setup: Settings > Pages > Source: "GitHub Actions". The
-# `actions/configure-pages` `enablement` input cannot do this for us — it
-# requires a token other than GITHUB_TOKEN.
+# Publishes the static Storybook build to https://storybook.nexusui.so on
+# Cloudflare Workers static assets. Standalone from ci.yml: this is a
+# post-merge push:main workflow, not a PR check, so it is not part of the
+# `CI Status` branch-protection aggregator. ci.yml still builds Storybook on
+# PRs, which is where a broken build is caught.
 
 on:
   push:
     branches: [main]
     paths:
       - 'packages/**'
+      - 'package.json'
       - 'pnpm-lock.yaml'
+      - 'pnpm-workspace.yaml'
+      - 'tsconfig.base.json'
+      - '.npmrc'
+      - '.nvmrc'
       - '.github/actions/build-storybook/**'
+      - '.github/actions/deploy-cloudflare/**'
       - '.github/workflows/deploy-storybook.yml'
   workflow_dispatch:
 
 concurrency:
-  group: pages
+  group: deploy-storybook
   cancel-in-progress: false
 
 permissions:
   contents: read
-  pages: write
-  id-token: write
 
 jobs:
   deploy:
@@ -36,20 +36,20 @@ jobs:
     # workflow_dispatch accepts any ref; the published site only ever tracks main.
     if: github.ref == 'refs/heads/main'
     environment:
-      name: github-pages
-      url: ${{ steps.deployment.outputs.page_url }}
+      name: storybook
+      url: https://storybook.nexusui.so
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4.3.1
 
       - name: Build Storybook
         uses: ./.github/actions/build-storybook
 
-      - name: Upload Pages artifact
-        uses: actions/upload-pages-artifact@v3
+      - name: Deploy
+        uses: ./.github/actions/deploy-cloudflare
         with:
-          path: packages/react/storybook-static
-
-      - name: Deploy to GitHub Pages
-        id: deployment
-        uses: actions/deploy-pages@v4
+          config: packages/react/wrangler.jsonc
+          assets-dir: packages/react/storybook-static
+          host: storybook.nexusui.so
+          api-token: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          account-id: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
