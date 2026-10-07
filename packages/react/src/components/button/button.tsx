@@ -214,6 +214,8 @@ function Button({
   const groupSize = React.useContext(ButtonGroupSizeContext);
   const semanticSize = size ?? groupSize ?? 'default';
   const isDisabled = disabled || loading;
+  const blocked =
+    isDisabled || ariaDisabled === true || ariaDisabled === 'true';
   const iconOnly = isIconButtonSize(semanticSize);
 
   const sharedProps = {
@@ -231,8 +233,6 @@ function Button({
     asChild &&
     React.isValidElement<React.HTMLAttributes<HTMLElement>>(children)
   ) {
-    const blocked =
-      isDisabled || ariaDisabled === true || ariaDisabled === 'true';
     const child = blocked
       ? React.cloneElement(children, {
           'aria-disabled': true,
@@ -267,6 +267,11 @@ function Button({
       type={type}
       disabled={isDisabled}
       tabIndex={tabIndex}
+      onClickCapture={blocked ? preventActivation : props.onClickCapture}
+      onAuxClickCapture={blocked ? preventActivation : props.onAuxClickCapture}
+      onKeyDownCapture={
+        blocked ? preventKeyboardActivation : props.onKeyDownCapture
+      }
     >
       <ButtonContent loading={loading} startIcon={startIcon} endIcon={endIcon}>
         {children}

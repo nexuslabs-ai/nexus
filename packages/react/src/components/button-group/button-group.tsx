@@ -1,6 +1,5 @@
 import * as React from 'react';
 
-import { Slot } from '@radix-ui/react-slot';
 import { cva, type VariantProps } from 'class-variance-authority';
 
 import { cn } from '../../lib/utils';
@@ -29,7 +28,7 @@ const buttonGroupVariants = cva(
 );
 
 const buttonGroupTextVariants = cva(
-  'nx:flex nx:items-center nx:gap-2 nx:rounded-md nx:border-default nx:border-border-default nx:bg-control-background nx:shadow-xs nx:transition-control nx:duration-fast nx:focus-visible:outline-2 nx:focus-visible:outline-focus-default nx:[&_svg]:pointer-events-none',
+  'nx:flex nx:items-center nx:gap-2 nx:rounded-md nx:border-default nx:border-border-default nx:bg-control-background nx:shadow-xs nx:[&_svg]:pointer-events-none',
   {
     variants: {
       size: {
@@ -68,7 +67,7 @@ interface ButtonGroupProps
  * ButtonGroup
  *
  * A visually-joined cluster of button-shaped controls — Buttons, a
- * `DropdownMenu` or `Select` trigger, a link via `<ButtonGroupText asChild>`,
+ * `DropdownMenu` or `Select` trigger, a link via `<Button asChild>`,
  * plus `ButtonGroupText` and `ButtonGroupSeparator` addons — sharing borders
  * and outer rounding so adjacent children lose their touching corners and the
  * seam between them. Lay out horizontally (default) or vertically with
@@ -81,9 +80,9 @@ interface ButtonGroupProps
  * @example
  * ```tsx
  * <ButtonGroup>
- *   <Button variant="outline">Day</Button>
- *   <Button variant="outline">Week</Button>
- *   <Button variant="outline">Month</Button>
+ *   <Button variant="outline">Previous</Button>
+ *   <Button variant="outline">Today</Button>
+ *   <Button variant="outline">Next</Button>
  * </ButtonGroup>
  * ```
  */
@@ -117,12 +116,6 @@ function ButtonGroup({
  */
 interface ButtonGroupTextProps extends React.ComponentProps<'div'> {
   /**
-   * Render as the child element via Radix Slot, keeping the addon styling.
-   * @default false
-   */
-  asChild?: boolean;
-
-  /**
    * Addon size. Inherits from ButtonGroup when omitted.
    * @default "default"
    */
@@ -135,26 +128,15 @@ interface ButtonGroupTextProps extends React.ComponentProps<'div'> {
  * A non-interactive label or addon inside a group — a leading prefix, a unit, a
  * count. Matches the buttons' height, border, and elevation.
  */
-function ButtonGroupText({
-  className,
-  asChild = false,
-  size,
-  ...props
-}: ButtonGroupTextProps) {
-  const Comp = asChild ? Slot : 'div';
+function ButtonGroupText({ className, size, ...props }: ButtonGroupTextProps) {
   const contextSize = React.useContext(ButtonGroupSizeContext);
   const resolvedSize = size ?? contextSize ?? 'default';
 
   return (
-    <Comp
+    <div
       data-slot="button-group-text"
       data-size={resolvedSize}
-      className={cn(
-        buttonGroupTextVariants({ size: resolvedSize }),
-        asChild &&
-          'nx:cursor-pointer nx:hover:bg-container-hover nx:active:bg-container-active',
-        className
-      )}
+      className={cn(buttonGroupTextVariants({ size: resolvedSize }), className)}
       {...props}
     />
   );
@@ -172,8 +154,14 @@ interface ButtonGroupSeparatorProps extends React.ComponentProps<
 /**
  * ButtonGroupSeparator
  *
- * A divider between sub-clusters in a group; stretches to the group's full
- * cross-axis. Defaults to a vertical rule for the common horizontal group.
+ * A full-length divider between actions or sub-clusters. Overlaps the next control
+ * so filled surfaces remain joined. Defaults to a vertical rule.
+ * The following control owns the fill under the divider, so its variant
+ * selects the colour, including in mixed groups and RTL. Default/destructive
+ * use their decorative on-solid tokens; other variants use the neutral border.
+ * Use horizontal orientation in vertical groups. Omit this divider between
+ * outlined buttons, which already have border seams.
+ * Decorative by default and does not add a keyboard stop.
  */
 function ButtonGroupSeparator({
   className,
@@ -185,7 +173,10 @@ function ButtonGroupSeparator({
       data-slot="button-group-separator"
       orientation={orientation}
       className={cn(
-        'nx:relative nx:self-stretch nx:data-[orientation=vertical]:h-auto',
+        'nx:relative nx:z-10 nx:self-stretch nx:pointer-events-none',
+        'nx:data-[orientation=vertical]:h-auto nx:data-[orientation=vertical]:-me-px',
+        'nx:data-[orientation=horizontal]:w-auto nx:data-[orientation=horizontal]:-mb-px',
+        'nx:has-[+[data-variant=default]]:bg-primary-border-on-solid nx:has-[+[data-variant=destructive]]:bg-error-border-on-solid',
         className
       )}
       {...props}

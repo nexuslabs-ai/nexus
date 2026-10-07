@@ -1404,3 +1404,24 @@ export const SizeDensityContract: Story = {
     }
   },
 };
+
+export const AriaDisabledActivation: Story = {
+  tags: ['!autodocs', '!dev'],
+  args: {
+    children: 'Unavailable action',
+    'aria-disabled': true,
+    onClick: fn(),
+    onClickCapture: fn(),
+  },
+  play: async ({ canvasElement, args }) => {
+    const button = within(canvasElement).getByRole('button');
+    button.focus();
+    await expect(button).toHaveFocus();
+    await expect(button).not.toBeDisabled();
+    await userEvent.keyboard('{Enter}');
+    await userEvent.keyboard(' ');
+    button.click();
+    await expect(args.onClick).not.toHaveBeenCalled();
+    await expect(args.onClickCapture).not.toHaveBeenCalled();
+  },
+};

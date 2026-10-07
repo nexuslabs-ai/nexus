@@ -432,7 +432,18 @@ export function deriveThemeMode(
     ...seedOklch(popover),
     alpha: 0.94 + (0.06 * contrast) / 100,
   });
-  return constrainColors(map, mode, contrast);
+  const resolved = constrainColors(map, mode, contrast);
+  // Decorative dividers on solid fills use the resolved contrasting ink, not
+  // the subtle-surface border ramp. Alpha preserves the fill underneath.
+  for (const family of ['primary', 'error'] as const) {
+    const ink = resolved[`--nx-color-${family}-foreground`];
+    if (!ink) throw new Error(`Missing ${family} foreground`);
+    resolved[`--nx-color-${family}-border-on-solid`] = formatOklch({
+      ...seedOklch(ink),
+      alpha: 0.24,
+    });
+  }
+  return resolved;
 }
 
 /**

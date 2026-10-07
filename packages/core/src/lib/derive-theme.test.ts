@@ -41,7 +41,7 @@ function hOf(oklchStr: string | undefined): number {
 const toRgb = converter('rgb');
 const oklabDelta = differenceEuclidean('oklab');
 const COLORBLIND_DELTA_E = 0.02;
-const RUNTIME_SEMANTIC_COLOR_COUNT = 107;
+const RUNTIME_SEMANTIC_COLOR_COUNT = 109;
 const VISION_TYPES = [
   'normal',
   'deuteranopia',
@@ -756,6 +756,38 @@ describe('derived colorblind distinguishability', () => {
 });
 
 describe('alpha and translucent colors', () => {
+  it.each(['#000000', '#ffffff', '#2563eb', '#ffff00'])(
+    'keeps decorative solid-fill dividers translucent and distinct for brand %s',
+    (brandColor) => {
+      const theme = deriveTheme(
+        createNexusThemeContract({
+          ...DEFAULT_NEXUS_APPEARANCE,
+          brandColor,
+        })
+      );
+      for (const map of [theme.light, theme.dark]) {
+        for (const family of ['primary', 'error']) {
+          const divider = map[`--nx-color-${family}-border-on-solid`]!;
+          const foreground = map[`--nx-color-${family}-foreground`]!;
+          expect(alphaOf(divider)).toBeGreaterThan(0);
+          expect(alphaOf(divider)).toBeLessThan(1);
+          expect(lOf(divider)).toBe(lOf(foreground));
+          for (const state of ['', '-hover', '-active']) {
+            const fill = map[`--nx-color-${family}-background${state}`]!;
+            const composite = rgbString(
+              compositeOver(
+                toSrgbInts(divider),
+                alphaOf(divider),
+                toSrgbInts(fill)
+              )
+            );
+            expect(oklabDelta(composite, fill)).toBeGreaterThan(0.02);
+          }
+        }
+      }
+    }
+  );
+
   const at = (contrast: number) =>
     deriveTheme({
       surfaceTone: 'slate',
