@@ -186,12 +186,14 @@ function parseTsx(fileName, source) {
   );
 }
 
-function isExported(statement) {
+function isNamedExport(statement) {
+  if (!ts.canHaveModifiers(statement)) return false;
+  const kinds = (ts.getModifiers(statement) ?? []).map(
+    (modifier) => modifier.kind
+  );
   return (
-    ts.canHaveModifiers(statement) &&
-    (ts.getModifiers(statement) ?? []).some(
-      (modifier) => modifier.kind === ts.SyntaxKind.ExportKeyword
-    )
+    kinds.includes(ts.SyntaxKind.ExportKeyword) &&
+    !kinds.includes(ts.SyntaxKind.DefaultKeyword)
   );
 }
 
@@ -202,7 +204,7 @@ function exportedNamesOf(statement) {
       ? clause.elements.map((element) => element.name.text)
       : [];
   }
-  if (!isExported(statement)) return [];
+  if (!isNamedExport(statement)) return [];
   if (ts.isVariableStatement(statement)) {
     return statement.declarationList.declarations
       .map((declaration) => declaration.name)
@@ -236,9 +238,9 @@ function componentImportsIn(file, body) {
       const bindings = statement.importClause?.namedBindings;
       if (
         !componentSlug ||
-        statement.importClause.name ||
         !bindings ||
-        !ts.isNamedImports(bindings)
+        !ts.isNamedImports(bindings) ||
+        statement.importClause.name
       ) {
         throw new Error(
           `${file} imports from ${specifier}; a component snippet takes named imports from @/components/{slug}/{slug}.`
