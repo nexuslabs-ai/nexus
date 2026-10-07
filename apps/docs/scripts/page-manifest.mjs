@@ -32,6 +32,7 @@ import { pathToFileURL } from 'node:url';
 
 import { createJiti } from 'jiti';
 import prettier from 'prettier';
+import ts from 'typescript';
 
 import { DEMO_EXTENSION, isDemoName, PREVIEW_DEMO } from './examples.mjs';
 import { humanize } from './humanize.mjs';
@@ -172,27 +173,86 @@ function componentWireframe(label) {
   };
 }
 
-const COMPONENT_IMPORT =
-  /import\s*\{([^}]*)\}\s*from\s*'@\/components\/([^/']+)\/\2'/g;
-const EXPORT_LIST = /export\s*\{([^}]*)\}/g;
-const EXPORT_DECLARATION =
-  /export\s+(?:type|interface|const|function|class)\s+(\w+)/g;
+const TSX_FENCE = /```tsx\r?\n([\s\S]*?)```/g;
+const COMPONENT_SPECIFIER = /^@\/components\/([^/]+)\/\1$/;
 
-function namesIn(list) {
-  return list
-    .split(',')
-    .map((name) => name.trim().replace(/^type\s+/, ''))
-    .filter(Boolean);
+function parseTsx(fileName, source) {
+  return ts.createSourceFile(
+    fileName,
+    source,
+    ts.ScriptTarget.Latest,
+    false,
+    ts.ScriptKind.TSX
+  );
+}
+
+function isExported(statement) {
+  return (
+    ts.canHaveModifiers(statement) &&
+    (ts.getModifiers(statement) ?? []).some(
+      (modifier) => modifier.kind === ts.SyntaxKind.ExportKeyword
+    )
+  );
+}
+
+function exportedNamesOf(statement) {
+  if (ts.isExportDeclaration(statement)) {
+    const clause = statement.exportClause;
+    return clause && ts.isNamedExports(clause)
+      ? clause.elements.map((element) => element.name.text)
+      : [];
+  }
+  if (!isExported(statement)) return [];
+  if (ts.isVariableStatement(statement)) {
+    return statement.declarationList.declarations
+      .map((declaration) => declaration.name)
+      .filter(ts.isIdentifier)
+      .map((name) => name.text);
+  }
+  return statement.name ? [statement.name.text] : [];
 }
 
 function componentExports(componentSlug) {
   const file = path.join(componentsRoot, componentSlug, `${componentSlug}.tsx`);
-  if (!fs.existsSync(file)) return new Set();
-  const source = fs.readFileSync(file, 'utf8');
-  return new Set([
-    ...[...source.matchAll(EXPORT_LIST)].flatMap(([, list]) => namesIn(list)),
-    ...[...source.matchAll(EXPORT_DECLARATION)].map(([, name]) => name),
-  ]);
+  if (!fs.existsSync(file)) {
+    throw new Error(
+      `@/components/${componentSlug}/${componentSlug} has no source file at ${toRepoPath(file)}.`
+    );
+  }
+  const source = parseTsx(file, fs.readFileSync(file, 'utf8'));
+  return new Set(source.statements.flatMap(exportedNamesOf));
+}
+
+/** Named imports from `@/components/…` in the page's `tsx` code fences. */
+function componentImportsIn(file, body) {
+  const imports = [];
+  for (const [, code] of body.matchAll(TSX_FENCE)) {
+    for (const statement of parseTsx(file, code).statements) {
+      if (!ts.isImportDeclaration(statement)) continue;
+      const specifier = statement.moduleSpecifier.text;
+      if (!specifier.startsWith('@/components/')) continue;
+
+      const componentSlug = COMPONENT_SPECIFIER.exec(specifier)?.[1];
+      const bindings = statement.importClause?.namedBindings;
+      if (
+        !componentSlug ||
+        statement.importClause.name ||
+        !bindings ||
+        !ts.isNamedImports(bindings)
+      ) {
+        throw new Error(
+          `${file} imports from ${specifier}; a component snippet takes named imports from @/components/{slug}/{slug}.`
+        );
+      }
+      imports.push({
+        componentSlug,
+        names: bindings.elements.map(
+          (element) => (element.propertyName ?? element.name).text
+        ),
+      });
+    }
+  }
+  return imports;
 }
 
 function assertComponentPageWrapsItsProse(docsRoot, kind, file, slug) {
@@ -210,9 +270,9 @@ function assertComponentPageWrapsItsProse(docsRoot, kind, file, slug) {
     );
   }
 
-  for (const [, list, componentSlug] of body.matchAll(COMPONENT_IMPORT)) {
+  for (const { componentSlug, names } of componentImportsIn(file, body)) {
     const exported = componentExports(componentSlug);
-    const unknown = namesIn(list).filter((name) => !exported.has(name));
+    const unknown = names.filter((name) => !exported.has(name));
     if (unknown.length > 0) {
       throw new Error(
         `${file} imports ${unknown.join(', ')} from @/components/${componentSlug}/${componentSlug}, which does not export ${unknown.length === 1 ? 'it' : 'them'}.`
