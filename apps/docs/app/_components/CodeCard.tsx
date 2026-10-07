@@ -22,10 +22,13 @@ export function CodeCard({
   className,
   children,
   ...props
-}: React.ComponentProps<'figure'> & {
+}: {
   /** Line count of the code inside, which decides whether it collapses at all. */
   lines: number;
   header: React.ReactNode;
+  className?: string;
+  children: React.ReactNode;
+  [dataAttribute: `data-${string}`]: string | undefined;
 }) {
   const cardRef = React.useRef<HTMLElement>(null);
 
