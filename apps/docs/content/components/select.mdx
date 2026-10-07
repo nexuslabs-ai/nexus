@@ -1,1 +1,38 @@
-<ComponentPage slug="select" />
+<ComponentPage slug="select">
+
+## Usage
+
+```tsx
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/select/select';
+```
+
+```tsx
+<Select>
+  <SelectTrigger aria-label="Fruit">
+    <SelectValue placeholder="Select a fruit" />
+  </SelectTrigger>
+  <SelectContent>
+    <SelectItem value="apple">Apple</SelectItem>
+    <SelectItem value="banana">Banana</SelectItem>
+    <SelectItem value="orange">Orange</SelectItem>
+  </SelectContent>
+</Select>
+```
+
+## Composition
+
+```text
+Select
+├── SelectTrigger
+│   └── SelectValue
+└── SelectContent
+    └── SelectItem
+```
+
+</ComponentPage>

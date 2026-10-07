@@ -1,1 +1,45 @@
-<ComponentPage slug="card" />
+<ComponentPage slug="card">
+
+## Usage
+
+```tsx
+import {
+  Card,
+  CardAction,
+  CardContent,
+  CardDescription,
+  CardFooter,
+  CardHeader,
+  CardTitle,
+} from '@/components/card/card';
+```
+
+```tsx
+<Card>
+  <CardHeader>
+    <CardTitle>Card title</CardTitle>
+    <CardDescription>Card description</CardDescription>
+    <CardAction>Card action</CardAction>
+  </CardHeader>
+  <CardContent>
+    <p>Card content</p>
+  </CardContent>
+  <CardFooter>
+    <p>Card footer</p>
+  </CardFooter>
+</Card>
+```
+
+## Composition
+
+```text
+Card
+├── CardHeader
+│   ├── CardTitle
+│   ├── CardDescription
+│   └── CardAction
+├── CardContent
+└── CardFooter
+```
+
+</ComponentPage>

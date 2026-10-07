@@ -1,1 +1,52 @@
-<ComponentPage slug="alert-dialog" />
+<ComponentPage slug="alert-dialog">
+
+## Usage
+
+```tsx
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from '@/components/alert-dialog/alert-dialog';
+```
+
+```tsx
+<AlertDialog>
+  <AlertDialogTrigger>Open</AlertDialogTrigger>
+  <AlertDialogContent>
+    <AlertDialogHeader>
+      <AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
+      <AlertDialogDescription>
+        This action cannot be undone.
+      </AlertDialogDescription>
+    </AlertDialogHeader>
+    <AlertDialogFooter>
+      <AlertDialogCancel>Cancel</AlertDialogCancel>
+      <AlertDialogAction>Continue</AlertDialogAction>
+    </AlertDialogFooter>
+  </AlertDialogContent>
+</AlertDialog>
+```
+
+## Composition
+
+```text
+AlertDialog
+├── AlertDialogTrigger
+└── AlertDialogContent
+    ├── AlertDialogHeader
+    │   ├── AlertDialogTitle
+    │   └── AlertDialogDescription
+    ├── AlertDialogBody
+    └── AlertDialogFooter
+        ├── AlertDialogCancel
+        └── AlertDialogAction
+```
+
+</ComponentPage>

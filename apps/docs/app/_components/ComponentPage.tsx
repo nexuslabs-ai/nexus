@@ -1,3 +1,5 @@
+import type { ReactNode } from 'react';
+
 import {
   type Demo,
   type DemoId,
@@ -26,8 +28,15 @@ type Example = { id: DemoId; name: string };
 /**
  * `examples/{slug}/demo.tsx` is the preview at the top; every other demo in that
  * folder is an example, registry `examples` first, then the rest by name.
+ * `children` is the page's own prose — its Usage and Composition sections.
  */
-export function ComponentPage({ slug }: { slug: string }) {
+export function ComponentPage({
+  slug,
+  children,
+}: {
+  slug: string;
+  children?: ReactNode;
+}) {
   const page = requireComponentsSection().pages.find(
     (entry) => entry.slug === slug
   );
@@ -62,6 +71,8 @@ export function ComponentPage({ slug }: { slug: string }) {
         Installation
       </SectionHeading>
       <ComponentInstallation slug={slug} />
+
+      {children}
 
       {examples.length > 0 && (
         <SectionHeading className={SECTION_HEADING_CLASS}>

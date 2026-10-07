@@ -1,1 +1,44 @@
-<ComponentPage slug="dropdown-menu" />
+<ComponentPage slug="dropdown-menu">
+
+## Usage
+
+```tsx
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuGroup,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from '@/components/dropdown-menu/dropdown-menu';
+```
+
+```tsx
+<DropdownMenu>
+  <DropdownMenuTrigger>Open</DropdownMenuTrigger>
+  <DropdownMenuContent>
+    <DropdownMenuLabel>My account</DropdownMenuLabel>
+    <DropdownMenuSeparator />
+    <DropdownMenuGroup>
+      <DropdownMenuItem>Profile</DropdownMenuItem>
+      <DropdownMenuItem>Billing</DropdownMenuItem>
+      <DropdownMenuItem>Settings</DropdownMenuItem>
+    </DropdownMenuGroup>
+  </DropdownMenuContent>
+</DropdownMenu>
+```
+
+## Composition
+
+```text
+DropdownMenu
+├── DropdownMenuTrigger
+└── DropdownMenuContent
+    ├── DropdownMenuLabel
+    ├── DropdownMenuSeparator
+    └── DropdownMenuGroup
+        └── DropdownMenuItem
+```
+
+</ComponentPage>

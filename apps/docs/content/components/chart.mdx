@@ -1,1 +1,45 @@
-<ComponentPage slug="chart" />
+<ComponentPage slug="chart">
+
+## Usage
+
+```tsx
+import { Bar, BarChart } from 'recharts';
+
+import {
+  type ChartConfig,
+  ChartContainer,
+  ChartLegend,
+  ChartLegendContent,
+  ChartTooltip,
+  ChartTooltipContent,
+} from '@/components/chart/chart';
+```
+
+```tsx
+const config = {
+  desktop: {
+    label: 'Desktop',
+    color: 'var(--nx-color-chart-categorical-1)',
+  },
+} satisfies ChartConfig;
+
+<ChartContainer config={config}>
+  <BarChart data={data}>
+    <ChartTooltip content={<ChartTooltipContent />} />
+    <ChartLegend content={<ChartLegendContent />} />
+    <Bar dataKey="desktop" fill="var(--color-desktop)" radius={4} />
+  </BarChart>
+</ChartContainer>;
+```
+
+## Composition
+
+```text
+ChartContainer
+└── BarChart (Recharts)
+    ├── ChartTooltip   content={<ChartTooltipContent />}
+    ├── ChartLegend    content={<ChartLegendContent />}
+    └── Bar (Recharts)
+```
+
+</ComponentPage>

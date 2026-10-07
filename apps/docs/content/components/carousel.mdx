@@ -1,1 +1,37 @@
-<ComponentPage slug="carousel" />
+<ComponentPage slug="carousel">
+
+## Usage
+
+```tsx
+import {
+  Carousel,
+  CarouselContent,
+  CarouselItem,
+  CarouselNext,
+  CarouselPrevious,
+} from '@/components/carousel/carousel';
+```
+
+```tsx
+<Carousel aria-label="Featured slides">
+  <CarouselContent>
+    <CarouselItem aria-label="Slide 1 of 3">...</CarouselItem>
+    <CarouselItem aria-label="Slide 2 of 3">...</CarouselItem>
+    <CarouselItem aria-label="Slide 3 of 3">...</CarouselItem>
+  </CarouselContent>
+  <CarouselPrevious />
+  <CarouselNext />
+</Carousel>
+```
+
+## Composition
+
+```text
+Carousel
+├── CarouselContent
+│   └── CarouselItem
+├── CarouselPrevious
+└── CarouselNext
+```
+
+</ComponentPage>

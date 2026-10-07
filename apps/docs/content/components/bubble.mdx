@@ -1,1 +1,24 @@
-<ComponentPage slug="bubble" />
+<ComponentPage slug="bubble">
+
+## Usage
+
+```tsx
+import { Bubble, BubbleContent } from '@/components/bubble/bubble';
+```
+
+```tsx
+<Bubble align="start">
+  <BubbleContent>How do I rotate the signing key?</BubbleContent>
+</Bubble>
+```
+
+## Composition
+
+```text
+BubbleGroup
+└── Bubble
+    ├── BubbleContent
+    └── BubbleReactions
+```
+
+</ComponentPage>

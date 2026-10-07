@@ -1,1 +1,34 @@
-<ComponentPage slug="tabs" />
+<ComponentPage slug="tabs">
+
+## Usage
+
+```tsx
+import {
+  Tabs,
+  TabsContent,
+  TabsList,
+  TabsTrigger,
+} from '@/components/tabs/tabs';
+```
+
+```tsx
+<Tabs defaultValue="account">
+  <TabsList aria-label="Account settings">
+    <TabsTrigger value="account">Account</TabsTrigger>
+    <TabsTrigger value="password">Password</TabsTrigger>
+  </TabsList>
+  <TabsContent value="account">Update your name and email address.</TabsContent>
+  <TabsContent value="password">Change your password here.</TabsContent>
+</Tabs>
+```
+
+## Composition
+
+```text
+Tabs
+├── TabsList
+│   └── TabsTrigger
+└── TabsContent
+```
+
+</ComponentPage>

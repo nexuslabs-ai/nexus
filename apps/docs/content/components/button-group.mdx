@@ -1,1 +1,27 @@
-<ComponentPage slug="button-group" />
+<ComponentPage slug="button-group">
+
+## Usage
+
+```tsx
+import { Button } from '@/components/button/button';
+import { ButtonGroup } from '@/components/button-group/button-group';
+```
+
+```tsx
+<ButtonGroup>
+  <Button variant="outline">Day</Button>
+  <Button variant="outline">Week</Button>
+  <Button variant="outline">Month</Button>
+</ButtonGroup>
+```
+
+## Composition
+
+```text
+ButtonGroup
+├── Button
+├── ButtonGroupText
+└── ButtonGroupSeparator
+```
+
+</ComponentPage>

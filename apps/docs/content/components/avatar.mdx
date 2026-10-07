@@ -1,1 +1,30 @@
-<ComponentPage slug="avatar" />
+<ComponentPage slug="avatar">
+
+## Usage
+
+```tsx
+import {
+  Avatar,
+  AvatarFallback,
+  AvatarImage,
+} from '@/components/avatar/avatar';
+```
+
+```tsx
+<Avatar>
+  <AvatarImage src="/avatars/ada.svg" alt="Ada Lovelace" />
+  <AvatarFallback>AL</AvatarFallback>
+</Avatar>
+```
+
+## Composition
+
+```text
+AvatarGroup
+└── Avatar
+    ├── AvatarImage
+    ├── AvatarFallback
+    └── AvatarStatus
+```
+
+</ComponentPage>

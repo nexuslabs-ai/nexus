@@ -1,1 +1,37 @@
-<ComponentPage slug="attachment" />
+<ComponentPage slug="attachment">
+
+## Usage
+
+```tsx
+import {
+  Attachment,
+  AttachmentContent,
+  AttachmentDescription,
+  AttachmentTitle,
+} from '@/components/attachment/attachment';
+```
+
+```tsx
+<Attachment>
+  <AttachmentContent>
+    <AttachmentTitle>report.pdf</AttachmentTitle>
+    <AttachmentDescription>2.4 MB</AttachmentDescription>
+  </AttachmentContent>
+</Attachment>
+```
+
+## Composition
+
+```text
+AttachmentGroup
+└── Attachment
+    ├── AttachmentTrigger
+    ├── AttachmentMedia
+    ├── AttachmentContent
+    │   ├── AttachmentTitle
+    │   ├── AttachmentDescription
+    │   └── AttachmentProgress
+    └── AttachmentActions
+```
+
+</ComponentPage>
