@@ -2,7 +2,7 @@ import type { ReactNode } from 'react';
 
 import { loadDependencies, loadReactSource } from '../_lib/dependencies';
 
-import { CodeSample, FramedCodeSample } from './CodeSample';
+import { CodeSample, CodeSampleCard } from './CodeSample';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from './nexus';
 
 type Step = { title: string; body?: ReactNode };
@@ -48,7 +48,7 @@ export async function ComponentInstallation({ slug }: { slug: string }) {
     });
   }
   steps.push({
-    title: 'Update the import paths to match your project setup.',
+    title: 'Keep each file at the path shown above it.',
     body: (
       <p className="nx:typography-body-default nx:text-muted-foreground">
         Each path above is relative to <code>packages/react/src/</code>. Keep it
@@ -96,13 +96,15 @@ export async function ComponentInstallation({ slug }: { slug: string }) {
 
 function SourceFile({ path, source }: { path: string; source: string }) {
   return (
-    <figure className="nx:mb-4 nx:overflow-hidden nx:rounded-md nx:border nx:border-border-default nx:bg-container">
-      <figcaption className="nx:px-4 nx:py-2 nx:border-b nx:border-border-default nx:typography-code-inline nx:text-muted-foreground">
-        {path}
-      </figcaption>
-      <FramedCodeSample lang={path.endsWith('.css') ? 'css' : 'tsx'}>
-        {source}
-      </FramedCodeSample>
-    </figure>
+    <CodeSampleCard
+      className="nx:mb-4"
+      lang={path.endsWith('.css') ? 'css' : 'tsx'}
+      code={source}
+      header={
+        <figcaption className="nx:px-4 nx:py-2 nx:border-b nx:border-border-default nx:typography-code-inline nx:text-muted-foreground">
+          {path}
+        </figcaption>
+      }
+    />
   );
 }

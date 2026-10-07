@@ -1,7 +1,9 @@
+import type { ComponentProps } from 'react';
+
 import { type CodeSampleLanguage, highlightSample } from '../_lib/code-sample';
 
 import { CodeBlock } from './CodeBlock';
-import { CodeCollapsible } from './CodeCollapsible';
+import { CodeCard } from './CodeCard';
 
 /**
  * A code string rendered outside an MDX fence. Tokenised by the same theme the
@@ -24,22 +26,20 @@ export async function CodeSample({
   );
 }
 
-/**
- * A `CodeSample` for the inside of a bordered `bg-container` card, collapsed
- * to its first lines when it is long.
- */
-export function FramedCodeSample({
+/** A `CodeSample` attached beneath `header` in a `CodeCard`. */
+export function CodeSampleCard({
   lang,
-  children,
-}: {
+  code,
+  ...props
+}: Omit<ComponentProps<typeof CodeCard>, 'lines' | 'children'> & {
   lang: CodeSampleLanguage;
-  children: string;
+  code: string;
 }) {
   return (
-    <CodeCollapsible lines={children.trimEnd().split('\n').length}>
+    <CodeCard lines={code.trimEnd().split('\n').length} {...props}>
       <CodeSample lang={lang} framed>
-        {children}
+        {code}
       </CodeSample>
-    </CodeCollapsible>
+    </CodeCard>
   );
 }

@@ -3,11 +3,11 @@ import { cache } from 'react';
 import { readdir, readFile } from 'node:fs/promises';
 import path from 'node:path';
 
-import { reactSrc } from '../../scripts/roots.mjs';
+import { docsRoot, reactSrc } from '../../scripts/roots.mjs';
 
 import 'server-only';
 
-const DEPENDENCIES_DIR = path.join(process.cwd(), 'generated', 'dependencies');
+const DEPENDENCIES_DIR = path.join(docsRoot, 'generated', 'dependencies');
 
 type Package = { name: string; range: string };
 
