@@ -6,23 +6,32 @@ import { cn } from '@nexus_ds/react/utils';
 
 import { Button } from './nexus';
 
+/** Blocks this short show whole; `nx:max-h-32` clips longer ones to about three lines. */
+const COLLAPSE_AFTER_LINES = 6;
+
 /**
  * Clips a code block to its first few lines behind a fade, with a centred
  * toggle that reveals the rest and hides it again. The caller's frame owns the
  * border and the `bg-container` surface the fade blends into.
  */
-export function CodeCollapsible({ children }: { children: React.ReactNode }) {
+export function CodeCollapsible({
+  lines,
+  children,
+}: {
+  /** Line count of the code inside, which decides whether it collapses at all. */
+  lines: number;
+  children: React.ReactNode;
+}) {
   const [open, setOpen] = React.useState(false);
   const rootRef = React.useRef<HTMLDivElement>(null);
   const regionId = React.useId();
 
+  if (lines <= COLLAPSE_AFTER_LINES) return children;
+
   const handleToggle = () => {
-    setOpen(!open);
-    // Collapsing a long block from below would leave the reader past its end.
-    const root = rootRef.current;
-    if (open && root && root.getBoundingClientRect().top < 0) {
-      root.scrollIntoView({ block: 'start' });
-    }
+    const collapsing = open;
+    setOpen(!collapsing);
+    if (collapsing) returnToCard(rootRef.current);
   };
 
   return (
@@ -57,4 +66,20 @@ export function CodeCollapsible({ children }: { children: React.ReactNode }) {
       </div>
     </div>
   );
+}
+
+/**
+ * Collapsing a long block from below would leave the reader past its end, so
+ * bring the framing card back under the sticky header when its top is hidden.
+ */
+function returnToCard(root: HTMLElement | null) {
+  const card = root?.parentElement;
+  if (!card) return;
+
+  const headerOffset =
+    parseFloat(getComputedStyle(document.documentElement).scrollPaddingTop) ||
+    0;
+  if (card.getBoundingClientRect().top < headerOffset) {
+    card.scrollIntoView({ block: 'start' });
+  }
 }

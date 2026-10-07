@@ -3,12 +3,6 @@ import { type CodeSampleLanguage, highlightSample } from '../_lib/code-sample';
 import { CodeBlock } from './CodeBlock';
 import { CodeCollapsible } from './CodeCollapsible';
 
-/** Samples this short show whole; longer ones collapse behind a toggle. */
-const COLLAPSE_AFTER_LINES = 6;
-
-/** Drops the block's own border so it sits flush inside a framing card. */
-const FRAMED_CLASS = 'nx:rounded-none nx:border-0';
-
 /**
  * A code string rendered outside an MDX fence. Tokenised by the same theme the
  * MDX fences use, then handed to the same `pre` those fences render through, so
@@ -16,20 +10,17 @@ const FRAMED_CLASS = 'nx:rounded-none nx:border-0';
  */
 export async function CodeSample({
   lang,
-  className,
+  framed,
   children,
 }: {
   lang: CodeSampleLanguage;
-  className?: string;
+  framed?: boolean;
   children: string;
 }) {
   const html = await highlightSample(lang, children);
 
   return (
-    <CodeBlock
-      className={className}
-      dangerouslySetInnerHTML={{ __html: html }}
-    />
+    <CodeBlock framed={framed} dangerouslySetInnerHTML={{ __html: html }} />
   );
 }
 
@@ -44,14 +35,11 @@ export function FramedCodeSample({
   lang: CodeSampleLanguage;
   children: string;
 }) {
-  const sample = (
-    <CodeSample lang={lang} className={FRAMED_CLASS}>
-      {children}
-    </CodeSample>
+  return (
+    <CodeCollapsible lines={children.trimEnd().split('\n').length}>
+      <CodeSample lang={lang} framed>
+        {children}
+      </CodeSample>
+    </CodeCollapsible>
   );
-  if (children.trimEnd().split('\n').length <= COLLAPSE_AFTER_LINES) {
-    return sample;
-  }
-
-  return <CodeCollapsible>{sample}</CodeCollapsible>;
 }

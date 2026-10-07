@@ -49,6 +49,13 @@ export async function ComponentInstallation({ slug }: { slug: string }) {
   }
   steps.push({
     title: 'Update the import paths to match your project setup.',
+    body: (
+      <p className="nx:typography-body-default nx:text-muted-foreground">
+        Each path above is relative to <code>packages/react/src/</code>. Keep it
+        as it is under your <code>@/</code> root and the relative imports
+        between the files resolve without an edit.
+      </p>
+    ),
   });
 
   return (
@@ -57,6 +64,7 @@ export async function ComponentInstallation({ slug }: { slug: string }) {
         <TabsTrigger value="command">Command</TabsTrigger>
         <TabsTrigger value="manual">Manual</TabsTrigger>
       </TabsList>
+      {/* TODO(#798): replace with the registry install command. */}
       <TabsContent value="command">
         <p className="nx:py-4 nx:typography-body-default nx:text-muted-foreground">
           Coming soon.

@@ -3,6 +3,8 @@ import { cache } from 'react';
 import { readdir, readFile } from 'node:fs/promises';
 import path from 'node:path';
 
+import { reactSrc } from '../../scripts/roots.mjs';
+
 import 'server-only';
 
 const DEPENDENCIES_DIR = path.join(process.cwd(), 'generated', 'dependencies');
@@ -22,7 +24,7 @@ async function listDependencyFiles() {
   } catch (error) {
     if ((error as NodeJS.ErrnoException).code !== 'ENOENT') throw error;
     throw new Error(
-      `InstallBlock: no ${DEPENDENCIES_DIR} — run \`pnpm --filter @nexus_ds/docs generate:dependencies\`.`,
+      `dependencies: no ${DEPENDENCIES_DIR} — run \`pnpm --filter @nexus_ds/docs generate:dependencies\`.`,
       { cause: error }
     );
   }
@@ -65,7 +67,7 @@ export const loadDependencies = cache(
     if (!fileNames.includes(fileName)) {
       const known = fileNames.map((name) => path.basename(name, '.json'));
       throw new Error(
-        `InstallBlock: unknown slug "${slug}". Known slugs: ${known.join(', ')}.`
+        `dependencies: unknown slug "${slug}". Known slugs: ${known.join(', ')}.`
       );
     }
 
@@ -74,23 +76,22 @@ export const loadDependencies = cache(
 
     if (!isDependencies(parsed)) {
       throw new Error(
-        `InstallBlock: ${filePath} needs an install list of { name, range } and string arrays copy, files, styles — rerun \`pnpm --filter @nexus_ds/docs generate:dependencies\`.`
+        `dependencies: ${filePath} needs an install list of { name, range } and string arrays copy, files, styles — rerun \`pnpm --filter @nexus_ds/docs generate:dependencies\`.`
       );
     }
     return parsed;
   }
 );
 
-const REACT_SRC = path.join(
-  process.cwd(),
-  '..',
-  '..',
-  'packages',
-  'react',
-  'src'
-);
-
 /** Reads a file the dependencies JSON lists, by its path under `packages/react/src/`. */
-export const loadReactSource = cache((file: string) =>
-  readFile(path.join(REACT_SRC, file), 'utf8')
-);
+export const loadReactSource = cache(async (file: string) => {
+  try {
+    return await readFile(path.join(reactSrc, file), 'utf8');
+  } catch (error) {
+    if ((error as NodeJS.ErrnoException).code !== 'ENOENT') throw error;
+    throw new Error(
+      `dependencies: ${file} is listed but missing from ${reactSrc} — rerun \`pnpm --filter @nexus_ds/docs generate:dependencies\`.`,
+      { cause: error }
+    );
+  }
+});

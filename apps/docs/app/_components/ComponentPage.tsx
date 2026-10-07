@@ -24,7 +24,7 @@ import { PropsTable } from './PropsTable';
 type Example = { id: DemoId; name: string };
 
 /**
- * `examples/{slug}/demo.tsx` is the Preview and Code; every other demo in that
+ * `examples/{slug}/demo.tsx` is the preview at the top; every other demo in that
  * folder is an example, registry `examples` first, then the rest by name.
  */
 export function ComponentPage({ slug }: { slug: string }) {
