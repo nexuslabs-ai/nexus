@@ -151,7 +151,7 @@ jobs:
           pnpm --filter @nexus_ds/docs audit:csp
 
       - name: Upload docs site
-        if: github.event_name != 'pull_request' && github.ref == 'refs/heads/main'
+        if: (github.event_name == 'push' || github.event_name == 'workflow_dispatch') && github.ref == 'refs/heads/main'
         uses: actions/upload-artifact@v4
         with:
           name: docs-site
@@ -466,13 +466,35 @@ jobs:
   # ============================================
   # Deploy — main only, after the aggregator passes
   # ============================================
-  # Each job publishes the exact artifact CI built and checked above.
+  # Each deploy job publishes the exact artifact CI built and checked above.
+
+  # A re-run of an older main run would publish over a newer deploy, so deploy
+  # only while this commit is still main's head.
+  deploy-gate:
+    name: Deploy Gate
+    runs-on: ubuntu-latest
+    needs: ci-status
+    if: (github.event_name == 'push' || github.event_name == 'workflow_dispatch') && github.ref == 'refs/heads/main'
+    outputs:
+      latest: ${{ steps.head.outputs.latest }}
+    steps:
+      - name: Check this commit is main's head
+        id: head
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          head=$(gh api "repos/$GITHUB_REPOSITORY/commits/main" --jq .sha)
+          if [ "$head" = "$GITHUB_SHA" ]; then
+            echo "latest=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "::notice::Skipping deploy: main is at ${head::7}, not ${GITHUB_SHA::7}. Use wrangler rollback to publish an older version."
+          fi
 
   deploy-docs:
     name: Deploy Docs
     runs-on: ubuntu-latest
-    needs: ci-status
-    if: github.event_name != 'pull_request' && github.ref == 'refs/heads/main'
+    needs: deploy-gate
+    if: needs.deploy-gate.outputs.latest == 'true'
     environment:
       name: docs
       url: https://nexusui.so
@@ -493,8 +515,8 @@ jobs:
   deploy-storybook:
     name: Deploy Storybook
     runs-on: ubuntu-latest
-    needs: ci-status
-    if: github.event_name != 'pull_request' && github.ref == 'refs/heads/main'
+    needs: deploy-gate
+    if: needs.deploy-gate.outputs.latest == 'true'
     environment:
       name: storybook
       url: https://storybook.nexusui.so
