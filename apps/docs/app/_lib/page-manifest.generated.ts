@@ -28,7 +28,7 @@ export type GuideManifestPage = ManifestPageBase & {
 
 /**
  * A component `@nexus_ds/react` exports. Once `components/{slug}.mdx` is
- * written it renders `<ComponentPage slug="{slug}" />`; until then, a placeholder.
+ * written it renders `<ComponentPage slug="{slug}">…</ComponentPage>`; until then, a placeholder.
  */
 export type ComponentManifestPage = ManifestPageBase & {
   nested?: never;

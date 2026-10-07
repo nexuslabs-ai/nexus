@@ -28,7 +28,7 @@ type Example = { id: DemoId; name: string };
 /**
  * `examples/{slug}/demo.tsx` is the preview at the top; every other demo in that
  * folder is an example, registry `examples` first, then the rest by name.
- * `children` is the page's own prose — its Usage and Composition sections.
+ * `children` is the page's own prose, rendered between Installation and Examples.
  */
 export function ComponentPage({
   slug,

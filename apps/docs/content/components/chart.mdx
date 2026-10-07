@@ -16,20 +16,28 @@ import {
 ```
 
 ```tsx
+const data = [
+  { month: 'January', desktop: 186 },
+  { month: 'February', desktop: 305 },
+  { month: 'March', desktop: 237 },
+];
+
 const config = {
   desktop: {
     label: 'Desktop',
     color: 'var(--nx-color-chart-categorical-1)',
   },
 } satisfies ChartConfig;
+```
 
+```tsx
 <ChartContainer config={config}>
   <BarChart data={data}>
     <ChartTooltip content={<ChartTooltipContent />} />
     <ChartLegend content={<ChartLegendContent />} />
     <Bar dataKey="desktop" fill="var(--color-desktop)" radius={4} />
   </BarChart>
-</ChartContainer>;
+</ChartContainer>
 ```
 
 ## Composition

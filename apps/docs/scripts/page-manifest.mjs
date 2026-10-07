@@ -5,8 +5,9 @@
  *   - `page-registry/` — section and page order, labels, and the
  *     `wireframe` a page renders until its own file lands
  *   - `content/{section}/{slug}.mdx` — MDX pages; a component page (every
- *     page under `components/`) is exactly
- *     `<ComponentPage slug="{slug}" />`
+ *     page under `components/`) is its prose wrapped in
+ *     `<ComponentPage slug="{slug}">…</ComponentPage>`, and imports only
+ *     names its `@/components/{slug}/{slug}` sources export
  *   - `examples/{slug}/{name}.tsx` — checked against a component page's
  *     registry `examples` order
  *   - `app/_pages/{section}/{slug}.tsx` — hand-built pages
@@ -34,7 +35,7 @@ import prettier from 'prettier';
 
 import { DEMO_EXTENSION, isDemoName, PREVIEW_DEMO } from './examples.mjs';
 import { humanize } from './humanize.mjs';
-import { reactSrc, toRepoPath } from './roots.mjs';
+import { componentsRoot, reactSrc, toRepoPath } from './roots.mjs';
 
 /** Nav metadata source, relative to the docs app root. */
 export const REGISTRY_FILE = 'page-registry/index.ts';
@@ -171,18 +172,52 @@ function componentWireframe(label) {
   };
 }
 
-function assertComponentPageIsOneLineMdx(docsRoot, kind, file, slug) {
+const COMPONENT_IMPORT =
+  /import\s*\{([^}]*)\}\s*from\s*'@\/components\/([^/']+)\/\2'/g;
+const EXPORT_LIST = /export\s*\{([^}]*)\}/g;
+const EXPORT_DECLARATION =
+  /export\s+(?:type|interface|const|function|class)\s+(\w+)/g;
+
+function namesIn(list) {
+  return list
+    .split(',')
+    .map((name) => name.trim().replace(/^type\s+/, ''))
+    .filter(Boolean);
+}
+
+function componentExports(componentSlug) {
+  const file = path.join(componentsRoot, componentSlug, `${componentSlug}.tsx`);
+  if (!fs.existsSync(file)) return new Set();
+  const source = fs.readFileSync(file, 'utf8');
+  return new Set([
+    ...[...source.matchAll(EXPORT_LIST)].flatMap(([, list]) => namesIn(list)),
+    ...[...source.matchAll(EXPORT_DECLARATION)].map(([, name]) => name),
+  ]);
+}
+
+function assertComponentPageWrapsItsProse(docsRoot, kind, file, slug) {
+  const open = `<ComponentPage slug="${slug}">`;
+  const close = '</ComponentPage>';
   if (kind !== 'mdx') {
     throw new Error(
-      `${file} is a component page, so it must be content/${COMPONENTS_SECTION}/${slug}.mdx containing <ComponentPage slug="${slug}" />.`
+      `${file} is a component page, so it must be content/${COMPONENTS_SECTION}/${slug}.mdx wrapped in ${open}…${close}.`
     );
   }
-  const expected = `<ComponentPage slug="${slug}" />`;
   const body = fs.readFileSync(path.join(docsRoot, file), 'utf8').trim();
-  if (body !== expected) {
+  if (!body.startsWith(open) || !body.endsWith(close)) {
     throw new Error(
-      `${file} must contain exactly ${expected} — a component page names its component and nothing else; ComponentPage renders the rest.`
+      `${file} must open with ${open} and close with ${close} — ComponentPage renders the page and places the prose between them after Installation.`
     );
+  }
+
+  for (const [, list, componentSlug] of body.matchAll(COMPONENT_IMPORT)) {
+    const exported = componentExports(componentSlug);
+    const unknown = namesIn(list).filter((name) => !exported.has(name));
+    if (unknown.length > 0) {
+      throw new Error(
+        `${file} imports ${unknown.join(', ')} from @/components/${componentSlug}/${componentSlug}, which does not export ${unknown.length === 1 ? 'it' : 'them'}.`
+      );
+    }
   }
 }
 
@@ -290,7 +325,7 @@ export type GuideManifestPage = ManifestPageBase & {
 
 /**
  * A component \`@nexus_ds/react\` exports. Once \`components/{slug}.mdx\` is
- * written it renders \`<ComponentPage slug="{slug}" />\`; until then, a placeholder.
+ * written it renders \`<ComponentPage slug="{slug}">…</ComponentPage>\`; until then, a placeholder.
  */
 export type ComponentManifestPage = ManifestPageBase & {
   nested?: never;
@@ -450,7 +485,7 @@ export async function buildPageManifest(docsRoot, formatOptions) {
     if (source) {
       const file = source.pages.get(key);
       if (isComponentPage) {
-        assertComponentPageIsOneLineMdx(docsRoot, source.kind, file, slug);
+        assertComponentPageWrapsItsProse(docsRoot, source.kind, file, slug);
       }
       if (entry?.wireframe) {
         throw new Error(

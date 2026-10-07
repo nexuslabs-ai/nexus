@@ -18,8 +18,8 @@ export type GuidePage = {
 
 /**
  * A component `@nexus_ds/react` exports. Once `components/{slug}.mdx` is
- * written as `<ComponentPage slug="{slug}" />` it renders that page; until
- * then it renders a placeholder.
+ * written as `<ComponentPage slug="{slug}">…</ComponentPage>` it renders that
+ * page; until then it renders a placeholder.
  */
 export type ComponentPageEntry = {
   slug: string;
