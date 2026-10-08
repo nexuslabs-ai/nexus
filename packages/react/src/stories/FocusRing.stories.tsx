@@ -1,8 +1,8 @@
 import type { Meta, StoryObj } from '@storybook/react';
 import { expect, within } from 'storybook/test';
 
-import { Checkbox } from '../checkbox';
-import { Input } from '../input';
+import { Checkbox } from '../components/checkbox';
+import { Input } from '../components/input';
 import {
   InputGroup,
   InputGroupAddon,
@@ -10,21 +10,21 @@ import {
   InputGroupInput,
   InputGroupText,
   InputGroupTextarea,
-} from '../input-group';
-import { InputOTP, InputOTPGroup, InputOTPSlot } from '../input-otp';
-import { NativeSelect, NativeSelectOption } from '../native-select';
+} from '../components/input-group';
+import { InputOTP, InputOTPGroup, InputOTPSlot } from '../components/input-otp';
+import { NativeSelect, NativeSelectOption } from '../components/native-select';
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from '../select';
-import { SidebarInput } from '../sidebar';
-import { Textarea } from '../textarea';
+} from '../components/select';
+import { SidebarInput } from '../components/sidebar';
+import { Textarea } from '../components/textarea';
 
 const meta: Meta = {
-  title: 'Components/FocusRing',
+  title: 'Tokens/Focus Ring',
   parameters: {
     layout: 'padded',
   },

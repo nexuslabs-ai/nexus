@@ -2,6 +2,7 @@
   "name": "design-system",
   "version": "0.0.0",
   "private": true,
+  "license": "MIT",
   "type": "module",
   "scripts": {
     "build": "turbo run build",
