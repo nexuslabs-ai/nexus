@@ -69,6 +69,7 @@ export default meta;
 type Story = StoryObj<typeof MultiSelect>;
 
 export const Default: Story = {
+  tags: ['docs'],
   render: () => <Frameworks />,
 };
 
@@ -92,6 +93,7 @@ export const Controlled: Story = {
 };
 
 export const Grouped: Story = {
+  tags: ['docs'],
   render: () => (
     <MultiSelect defaultValues={['react']}>
       <MultiSelectTrigger aria-label="Frameworks" className="nx:w-80">
@@ -117,6 +119,7 @@ export const Grouped: Story = {
 };
 
 export const WrapChips: Story = {
+  tags: ['docs'],
   render: () => (
     <MultiSelect defaultValues={['react', 'vue', 'svelte', 'angular', 'solid']}>
       <MultiSelectTrigger aria-label="Frameworks" className="nx:w-72">
@@ -140,6 +143,7 @@ export const WrapChips: Story = {
 };
 
 export const OverflowCollapse: Story = {
+  tags: ['docs'],
   render: () => (
     <MultiSelect
       defaultValues={['react', 'vue', 'svelte', 'angular', 'solid', 'qwik']}
@@ -183,6 +187,7 @@ export const OverflowCollapse: Story = {
 };
 
 export const Disabled: Story = {
+  tags: ['docs'],
   render: () => (
     <MultiSelect defaultValues={['react']}>
       <MultiSelectTrigger aria-label="Frameworks" disabled className="nx:w-80">
@@ -209,6 +214,7 @@ export const Disabled: Story = {
 };
 
 export const WithDisabledOption: Story = {
+  tags: ['docs'],
   render: () => (
     <MultiSelect>
       <MultiSelectTrigger aria-label="Frameworks" className="nx:w-80">
@@ -242,6 +248,7 @@ export const WithDisabledOption: Story = {
 };
 
 export const InvalidField: Story = {
+  tags: ['docs'],
   render: () => (
     <Field data-invalid>
       <FieldLabel>Frameworks</FieldLabel>

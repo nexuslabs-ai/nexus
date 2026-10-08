@@ -34,6 +34,7 @@ type Story = StoryObj<typeof Select>;
 // ============================================
 
 export const Default: Story = {
+  tags: ['docs'],
   render: (_args) => (
     <Select>
       <SelectTrigger className="nx:w-[180px]" aria-label="Select a fruit">
@@ -51,6 +52,7 @@ export const Default: Story = {
 };
 
 export const WithDefaultValue: Story = {
+  tags: ['docs'],
   render: (_args) => (
     <Select defaultValue="banana">
       <SelectTrigger className="nx:w-[180px]" aria-label="Select a fruit">
@@ -124,6 +126,7 @@ export const Disabled: Story = {
 };
 
 export const InvalidTrigger: Story = {
+  tags: ['docs'],
   render: () => (
     <Select defaultValue="apple">
       <SelectTrigger
@@ -152,6 +155,7 @@ export const InvalidTrigger: Story = {
 };
 
 export const WithDisabledItems: Story = {
+  tags: ['docs'],
   render: (_args) => (
     <Select>
       <SelectTrigger className="nx:w-[180px]" aria-label="Select an option">
@@ -427,6 +431,7 @@ export const RichItemFutureBoundary: Story = {
 // ============================================
 
 export const WithGroups: Story = {
+  tags: ['docs'],
   render: (_args) => (
     <Select>
       <SelectTrigger className="nx:w-[200px]" aria-label="Select a food">
@@ -478,6 +483,7 @@ export const WithSeparators: Story = {
 const SIZES = ['sm', 'default', 'lg'] as const;
 
 export const Sizes: Story = {
+  tags: ['docs'],
   render: (_args) => (
     <div className="nx:flex nx:w-[420px] nx:flex-col nx:gap-3">
       {SIZES.map((size) => (

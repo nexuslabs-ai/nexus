@@ -18,6 +18,8 @@ export function collectHeadings(article: HTMLElement): TocEntry[] {
     if (!heading.id || !text || seen.has(heading.id)) continue;
     // remark-gfm appends a hidden "Footnotes" heading no page author wrote.
     if (heading.closest('[data-footnotes]')) continue;
+    // A demo's own headings belong to the example, not to the page's outline.
+    if (heading.closest('[data-slot="component-demo"]')) continue;
 
     seen.add(heading.id);
     entries.push({

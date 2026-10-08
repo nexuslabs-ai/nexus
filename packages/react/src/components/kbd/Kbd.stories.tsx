@@ -14,6 +14,7 @@ type Story = StoryObj<typeof Kbd>;
 
 // A single keycap next to a two-key chord composed with KbdGroup.
 export const Default: Story = {
+  tags: ['docs'],
   render: () => (
     <div className="nx:flex nx:items-center nx:gap-4">
       <Kbd>⌘</Kbd>
@@ -28,6 +29,7 @@ export const Default: Story = {
 // Single modifier keys render as square-ish caps (min-width floor); wider
 // labels grow to fit.
 export const SingleKeys: Story = {
+  tags: ['docs'],
   render: () => (
     <div className="nx:flex nx:items-center nx:gap-2">
       <Kbd>⌘</Kbd>
@@ -42,6 +44,7 @@ export const SingleKeys: Story = {
 
 // Existing child composition supports chords that use a literal separator.
 export const SeparatedChord: Story = {
+  tags: ['docs'],
   render: () => (
     <KbdGroup className="nx:gap-2">
       <Kbd>⌘</Kbd>
@@ -53,6 +56,7 @@ export const SeparatedChord: Story = {
 
 // SVG children inherit the keycap icon sizing hook.
 export const WithIcon: Story = {
+  tags: ['docs'],
   render: () => (
     <Kbd>
       <IconSearch aria-hidden />K

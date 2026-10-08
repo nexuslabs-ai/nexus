@@ -1,7 +1,7 @@
-import { readdirSync, writeFileSync } from 'node:fs';
+import { readdirSync, readFileSync, writeFileSync } from 'node:fs';
 import path from 'node:path';
 
-import { componentsRoot } from './roots.mjs';
+import { componentsRoot, reactSrc } from './roots.mjs';
 
 export function isModuleSource(filePath) {
   const name = path.basename(filePath);
@@ -21,6 +21,16 @@ export function componentSlugs() {
     .filter((entry) => entry.isDirectory())
     .map((entry) => entry.name)
     .sort();
+}
+
+const EXPORTED_COMPONENT = /from '\.\/components\/([^/']+)/g;
+
+/** Every component `@nexus_ds/react` exports, by its folder slug, sorted. */
+export function exportedComponentSlugs() {
+  const index = readFileSync(path.join(reactSrc, 'index.ts'), 'utf8');
+  return [
+    ...new Set([...index.matchAll(EXPORTED_COMPONENT)].map(([, slug]) => slug)),
+  ].sort();
 }
 
 export function collectSourceFiles(dir, include) {

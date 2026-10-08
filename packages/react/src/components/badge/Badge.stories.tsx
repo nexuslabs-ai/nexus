@@ -66,6 +66,7 @@ const BADGE_ICON_SIZE_PX = 14;
 // ============================================
 
 export const Default: Story = {
+  tags: ['docs'],
   args: {
     children: 'Badge',
   },
@@ -320,6 +321,7 @@ export const WithLeftIcon: Story = {
 };
 
 export const WithRightIcon: Story = {
+  tags: ['docs'],
   args: {
     children: 'Dismiss',
     variant: 'secondary',
@@ -352,6 +354,7 @@ export const WithBothIcons: Story = {
 };
 
 export const IconOnly: Story = {
+  tags: ['docs'],
   globals: { density: 'default' },
   args: {
     variant: 'success',
@@ -410,6 +413,7 @@ export const WithSvgLoader: Story = {
 };
 
 export const StatusWithIcons: Story = {
+  tags: ['docs'],
   parameters: {
     docs: {
       description: {
@@ -556,6 +560,7 @@ export const IconOnlyWithConditionalLabel: Story = {
 // ============================================
 
 export const AllVariants: Story = {
+  tags: ['docs'],
   render: (_args) => (
     <div className="nx:flex nx:flex-col nx:gap-8">
       {/* Solid Fill - Caps */}

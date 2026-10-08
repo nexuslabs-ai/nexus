@@ -2,7 +2,7 @@ import { type DemoId, getDemo } from '../../__generated__/demo-index';
 
 import { CodeSampleCard } from './CodeSample';
 
-/** One demo from `apps/docs/examples/` on a stage, with its source attached below. */
+/** One docs story on a stage, with its generated source attached below. */
 export async function ComponentDemo({ id }: { id: DemoId }) {
   const { Component, source } = await getDemo(id).load();
 

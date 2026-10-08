@@ -1,13 +1,13 @@
 import {
+  type ComponentDocs,
   type Demo,
   type DemoId,
   demos,
-  isDemoId,
+  getComponentDocs,
 } from '../../__generated__/demo-index';
-import { PREVIEW_DEMO } from '../../scripts/examples.mjs';
-import { humanize } from '../../scripts/humanize.mjs';
-import { requireComponentsSection } from '../_lib/manifest';
+import type { ManifestPage } from '../_lib/manifest';
 
+import { CodeSample } from './CodeSample';
 import { ComponentDemo } from './ComponentDemo';
 import { ComponentInstallation } from './ComponentInstallation';
 import {
@@ -21,31 +21,20 @@ import {
 import { InstallBlock } from './InstallBlock';
 import { PropsTable } from './PropsTable';
 
-type Example = { id: DemoId; name: string };
+type ComponentManifestPage = Extract<ManifestPage, { kind: 'generated' }>;
 
 /**
- * `examples/{slug}/demo.tsx` is the preview at the top; every other demo in that
- * folder is an example, registry `examples` first, then the rest by name.
+ * Every section comes from the component's stories tagged `docs`: the first is
+ * the preview at the top, Usage and Composition come from all of them, and the
+ * rest are its examples, in story order.
  */
-export function ComponentPage({ slug }: { slug: string }) {
-  const page = requireComponentsSection().pages.find(
-    (entry) => entry.slug === slug
-  );
-  if (page?.kind !== 'mdx') {
-    throw new Error(
-      `ComponentPage: no /components/${slug} component page in the manifest — add apps/docs/content/components/${slug}.mdx.`
-    );
-  }
-
-  const previewId = `${slug}/${PREVIEW_DEMO}`;
-  if (!isDemoId(previewId)) {
-    throw new Error(
-      `ComponentPage: "${slug}" has no preview demo — add apps/docs/examples/${previewId}.tsx.`
-    );
-  }
+export function ComponentPage({ page }: { page: ComponentManifestPage }) {
+  const { slug } = page;
+  const docs = getComponentDocs(slug);
+  const previewId = docs.preview;
+  if (!previewId) return <PreviewlessComponentPage page={page} docs={docs} />;
 
   const preview: Demo = demos[previewId];
-  const examples = examplesFor(slug, page.examples);
 
   return (
     <>
@@ -63,29 +52,25 @@ export function ComponentPage({ slug }: { slug: string }) {
       </SectionHeading>
       <ComponentInstallation slug={slug} />
 
-      {examples.length > 0 && (
+      <SectionHeading className={SECTION_HEADING_CLASS}>Usage</SectionHeading>
+      <CodeSample lang="tsx">{docs.imports}</CodeSample>
+
+      {docs.composition && (
+        <>
+          <SectionHeading className={SECTION_HEADING_CLASS}>
+            Composition
+          </SectionHeading>
+          <CodeSample lang="text">{docs.composition}</CodeSample>
+        </>
+      )}
+
+      {docs.examples.length > 0 && (
         <SectionHeading className={SECTION_HEADING_CLASS}>
           Examples
         </SectionHeading>
       )}
-      {examples.map(({ id, name }) => (
-        <section key={id}>
-          <SubsectionHeading
-            id={`example-${slugify(name)}`}
-            className={SUBSECTION_HEADING_CLASS}
-          >
-            {humanize(name)}
-          </SubsectionHeading>
-          <ComponentDemo id={id} />
-          <InstallBlock
-            slugs={demos[id].alsoInstall}
-            besides={[slug, ...preview.alsoInstall]}
-            alsoPackages={demos[id].packages.filter(
-              (spec) => !preview.packages.includes(spec)
-            )}
-            caption="This example also needs:"
-          />
-        </section>
+      {docs.examples.map((id) => (
+        <Example key={id} id={id} slug={slug} previewId={previewId} />
       ))}
 
       <SectionHeading className={SECTION_HEADING_CLASS}>Props</SectionHeading>
@@ -94,21 +79,61 @@ export function ComponentPage({ slug }: { slug: string }) {
   );
 }
 
-function examplesFor(slug: string, order: readonly string[]): Example[] {
-  const prefix = `${slug}/`;
-  const names = Object.keys(demos)
-    .filter((id) => id.startsWith(prefix))
-    .map((id) => id.slice(prefix.length))
-    .filter((name) => name !== PREVIEW_DEMO);
-  const ordered = [...order, ...names.filter((name) => !order.includes(name))];
+function Example({
+  id,
+  slug,
+  previewId,
+}: {
+  id: DemoId;
+  slug: string;
+  previewId: DemoId;
+}) {
+  const { title, alsoInstall, packages }: Demo = demos[id];
+  const preview: Demo = demos[previewId];
 
-  return ordered.map((name) => {
-    const id = `${prefix}${name}`;
-    if (!isDemoId(id)) {
-      throw new Error(
-        `ComponentPage: no demo ${id} in the demo index — run \`pnpm --filter @nexus_ds/docs generate:demos\`.`
-      );
-    }
-    return { id, name };
-  });
+  return (
+    <section>
+      <SubsectionHeading
+        id={`example-${slugify(title)}`}
+        className={SUBSECTION_HEADING_CLASS}
+      >
+        {title}
+      </SubsectionHeading>
+      <ComponentDemo id={id} />
+      <InstallBlock
+        slugs={alsoInstall}
+        besides={[slug, ...preview.alsoInstall]}
+        alsoPackages={packages.filter(
+          (spec) => !preview.packages.includes(spec)
+        )}
+        caption="This example also needs:"
+      />
+    </section>
+  );
+}
+
+/** Installation, Usage and Props only, for a component that can't render a preview here. */
+function PreviewlessComponentPage({
+  page,
+  docs,
+}: {
+  page: ComponentManifestPage;
+  docs: ComponentDocs;
+}) {
+  return (
+    <>
+      <h1 className={PAGE_HEADING_CLASS}>{page.label}</h1>
+
+      <SectionHeading className={SECTION_HEADING_CLASS}>
+        Installation
+      </SectionHeading>
+      <ComponentInstallation slug={page.slug} />
+
+      <SectionHeading className={SECTION_HEADING_CLASS}>Usage</SectionHeading>
+      <CodeSample lang="tsx">{docs.imports}</CodeSample>
+
+      <SectionHeading className={SECTION_HEADING_CLASS}>Props</SectionHeading>
+      <PropsTable slug={page.slug} />
+    </>
+  );
 }

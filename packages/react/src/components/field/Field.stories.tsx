@@ -28,6 +28,7 @@ type Story = StoryObj<typeof Field>;
 
 // A label + control + helper text — the canonical vertical field.
 export const Default: Story = {
+  tags: ['docs'],
   render: () => (
     <div className="nx:w-80">
       <Field>
@@ -52,6 +53,7 @@ export const Default: Story = {
 
 // The three orientations: vertical, horizontal, and container-responsive.
 export const Orientations: Story = {
+  tags: ['docs'],
   render: () => (
     <FieldGroup className="nx:w-80">
       <Field orientation="vertical">
@@ -75,6 +77,7 @@ export const Orientations: Story = {
 
 // Both legend emphases: the larger fieldset `legend` and the label-sized one.
 export const LegendVariants: Story = {
+  tags: ['docs'],
   render: () => (
     <div className="nx:flex nx:w-80 nx:flex-col nx:gap-6">
       <FieldSet>
@@ -98,6 +101,7 @@ export const LegendVariants: Story = {
 
 // An invalid field with an error message wired via the errors prop.
 export const WithError: Story = {
+  tags: ['docs'],
   render: () => (
     <div className="nx:w-80">
       <Field data-invalid="true">
@@ -167,6 +171,7 @@ export const MultipleErrors: Story = {
 
 // A divider between groups of fields, with centered content.
 export const WithSeparator: Story = {
+  tags: ['docs'],
   render: () => (
     <div className="nx:w-80 nx:rounded-lg nx:border nx:border-border-default nx:bg-container nx:p-6">
       <FieldGroup>
@@ -185,6 +190,7 @@ export const WithSeparator: Story = {
 };
 
 export const RequiredAndOptionalIndicators: Story = {
+  tags: ['docs'],
   render: () => (
     <FieldGroup className="nx:w-80">
       <Field>
@@ -327,6 +333,7 @@ export const KeyboardInteraction: Story = {
 
 // A disabled field: data-disabled dims the label and the control is disabled.
 export const Disabled: Story = {
+  tags: ['docs'],
   render: () => (
     <div className="nx:w-80">
       <Field data-disabled="true">

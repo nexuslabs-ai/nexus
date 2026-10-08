@@ -1,4 +1,5 @@
 import {
+  cpSync,
   existsSync,
   mkdirSync,
   readdirSync,
@@ -9,12 +10,29 @@ import {
 } from 'node:fs';
 import path from 'node:path';
 
-import { DEMO_EXTENSION, isDemoName } from './examples.mjs';
-import { docsRoot } from './roots.mjs';
+import { componentUsage, entryUsage } from './component-usage.mjs';
+import {
+  DOCS_TAG,
+  docsStoryModule,
+  PREVIEWLESS_COMPONENTS,
+  readDocsStories,
+} from './docs-stories.mjs';
+import { resolveFormatOptions } from './page-manifest.mjs';
+import { componentSlugs, exportedComponentSlugs } from './react-sources.mjs';
+import { componentsRoot, docsRoot, reactRoot } from './roots.mjs';
 
-const EXAMPLES_DIR = path.join(docsRoot, 'examples');
 const GENERATED_DIR = path.join(docsRoot, '__generated__');
 const DEPENDENCIES_DIR = path.join(docsRoot, 'generated', 'dependencies');
+const PROPS_DIR = path.join(docsRoot, 'generated', 'props');
+
+/** Images docs stories load by URL, served from Storybook's public dir and copied to the docs app's. */
+const STORY_ASSETS_SOURCE = path.join(
+  reactRoot,
+  '.storybook',
+  'public',
+  'avatars'
+);
+const STORY_ASSETS_TARGET = path.join(docsRoot, 'public', 'avatars');
 
 const COPIED_PREFIX = '@/';
 const IMPORT_PATTERNS = [
@@ -43,14 +61,27 @@ ${REGENERATE_HINT}
 import type { ComponentType } from 'react';
 
 export interface Demo {
-  /** Path under apps/docs/examples/ without the .tsx extension. */
+  /** \`{slug}/{story}\` for a story tagged \`docs\`. */
   id: string;
-  /** Install blocks the demo needs beyond its folder's own. */
+  /** The story's name, as the example's heading. */
+  title: string;
+  /** Install blocks the demo needs beyond its component's own. */
   alsoInstall: readonly string[];
   /** \`name@range\` packages it imports that none of its install blocks install. */
   packages: readonly string[];
   /** Loads the demo's component and its own source text together. */
   load: () => Promise<{ Component: ComponentType; source: string }>;
+}
+
+export interface ComponentDocs {
+  /** The first docs story; null for a page that shows Installation, Usage and Props only. */
+  preview: DemoId | null;
+  /** The rest of the docs stories, in file order. */
+  examples: readonly DemoId[];
+  /** Imports every part the demos render, or every part the component exports without a preview. */
+  imports: string;
+  /** How those parts nest across the demos, as a text tree; null for one part. */
+  composition: string | null;
 }
 `;
 
@@ -63,19 +94,34 @@ export function isDemoId(id: string): id is DemoId {
 export function getDemo(id: string): Demo {
   if (!isDemoId(id)) {
     throw new Error(
-      \`Unknown demo id: \${id}. Add apps/docs/examples/\${id}.tsx, or fix the id.\`
+      \`Unknown demo id: \${id}. Tag the story \\\`docs\\\`, or fix the id.\`
     );
   }
 
   return demos[id];
 }
+
+export function getComponentDocs(slug: string): ComponentDocs {
+  const docs = Object.hasOwn(componentDocs, slug)
+    ? componentDocs[slug]
+    : undefined;
+  if (!docs) {
+    throw new Error(
+      \`No component docs for \${slug} — @nexus_ds/react does not export it. Run \\\`pnpm --filter @nexus_ds/docs generate:demos\\\`.\`
+    );
+  }
+
+  return docs;
+}
 `;
 
 /**
  * @typedef {object} DemoFile
- * @property {string} id Path under examples/ without the .tsx extension.
- * @property {string} source The demo file's full contents.
- * @property {string[]} alsoInstall Install blocks it needs beyond its folder's.
+ * @property {string} id `{slug}/{story}`.
+ * @property {string} slug The component the story belongs to.
+ * @property {string} title The example's heading.
+ * @property {string} source The generated module's full contents.
+ * @property {string[]} alsoInstall Install blocks it needs beyond its component's.
  * @property {string[]} packages `name@range` packages none of its blocks install.
  */
 
@@ -120,11 +166,6 @@ function pruneOrphans(keep) {
   }
 
   pruneEmptyDirs(GENERATED_DIR);
-}
-
-// Two levels out of `__generated__/demos/`, plus one per directory in the id.
-function exampleSpecifier(id) {
-  return `${'../'.repeat(id.split('/').length + 1)}examples/${id}`;
 }
 
 // The boundary sits beside its module, so the id's directory drops away.
@@ -212,7 +253,7 @@ function installSlugsFor(id, specifiers, blocks) {
 
   if (!own && extra.length === 0) {
     throw new Error(
-      `Demo ${id} imports no @/components/, and ${folder} has no install block of its own, so there is nothing to paste it beside. Import the component it demonstrates, or move it to examples/{slug}/.`
+      `Demo ${id} imports no @/components/, and ${folder} has no install block of its own, so there is nothing to paste it beside. Import the component it demonstrates.`
     );
   }
   return { own, extra };
@@ -271,60 +312,158 @@ function packageRange(id, name, blocks) {
   return range;
 }
 
-/** @returns {DemoFile[]} */
-function collectDemos() {
-  if (!existsSync(EXAMPLES_DIR)) {
-    throw new Error(`Missing demo directory: ${EXAMPLES_DIR}`);
+/**
+ * The docs stories under `slug`, or the problem with them: every exported
+ * component with a preview needs one, and a component without a page or
+ * preview must have none.
+ * @param {string} slug
+ * @param {Set<string>} exported
+ */
+function docsStoriesFor(slug, exported) {
+  const stories = readDocsStories(slug);
+  const folder = `packages/react/src/components/${slug}/`;
+  if (!exported.has(slug) && stories.length > 0) {
+    throw new Error(
+      `${folder} has stories tagged \`${DOCS_TAG}\`, but @nexus_ds/react does not export it, so it has no page — drop the tag.`
+    );
   }
-
-  const installBlocks = readInstallBlocks();
-  return walk(EXAMPLES_DIR)
-    .filter((file) => file.endsWith(DEMO_EXTENSION))
-    .map((file) => ({
-      file,
-      id: path
-        .relative(EXAMPLES_DIR, file)
-        .split(path.sep)
-        .join('/')
-        .slice(0, -DEMO_EXTENSION.length),
-    }))
-    .filter(({ id }) => id.split('/').every(isDemoName))
-    .map(({ file, id }) => {
-      // `foo.client.tsx` would claim the module path `foo.tsx`'s boundary owns.
-      if (id.includes('.')) {
-        throw new Error(
-          `Demo id cannot contain a dot: ${id}. Rename ${path.relative(EXAMPLES_DIR, file)}.`
-        );
-      }
-      if (id.split('/').length !== 2) {
-        throw new Error(
-          `Demo ${id} must live at apps/docs/examples/{folder}/{name}.tsx — a component's demos go in examples/{slug}/.`
-        );
-      }
-      const source = readCanonical(file);
-      const specifiers = importSpecifiers(source);
-      const { own, extra } = installSlugsFor(id, specifiers, installBlocks);
-      const packages = demoPackages(
-        id,
-        specifiers,
-        own ? [own, ...extra] : extra,
-        installBlocks
-      );
-
-      return { id, source, alsoInstall: extra, packages };
-    })
-    .sort((a, b) => (a.id < b.id ? -1 : a.id > b.id ? 1 : 0));
+  const previewless = PREVIEWLESS_COMPONENTS.get(slug);
+  if (previewless && stories.length > 0) {
+    throw new Error(
+      `${folder} has stories tagged \`${DOCS_TAG}\`, but its page shows no demos (${previewless}) — drop the tag.`
+    );
+  }
+  if (exported.has(slug) && !previewless && stories.length === 0) {
+    throw new Error(
+      `${folder} needs a story tagged \`${DOCS_TAG}\` for its page — add \`tags: ['${DOCS_TAG}']\` to the story that should be its preview.`
+    );
+  }
+  return stories;
 }
 
-/** @param {DemoFile} demo */
-function renderDemoBoundary(demo) {
-  return `'use client';
+/**
+ * Every story tagged `docs`, as a checked, paste-ready module — component by
+ * component, in story order. Collects every story's problem before failing.
+ * @param {Set<string>} exported
+ * @returns {Promise<DemoFile[]>}
+ */
+async function collectDemos(exported) {
+  const installBlocks = readInstallBlocks();
+  const formatOptions = await resolveFormatOptions(docsRoot);
+  const demos = [];
+  const problems = [];
 
-${GENERATED_BY}
-${REGENERATE_HINT}
+  for (const slug of componentSlugs()) {
+    let stories = [];
+    try {
+      stories = docsStoriesFor(slug, exported);
+    } catch (error) {
+      problems.push(error.message);
+    }
+    for (const story of stories) {
+      try {
+        const { id, title, source } = await docsStoryModule(
+          story,
+          formatOptions
+        );
+        const specifiers = importSpecifiers(source);
+        const { own, extra } = installSlugsFor(id, specifiers, installBlocks);
+        const packages = demoPackages(
+          id,
+          specifiers,
+          own ? [own, ...extra] : extra,
+          installBlocks
+        );
+        demos.push({ id, slug, title, source, alsoInstall: extra, packages });
+      } catch (error) {
+        problems.push(error.message);
+      }
+    }
+  }
 
-export { default as Component } from ${JSON.stringify(exampleSpecifier(demo.id))};
-`;
+  problems.push(...sharedIds(demos));
+  if (problems.length > 0) {
+    throw new Error(
+      [
+        `${problems.length} docs ${problems.length === 1 ? 'story needs' : 'stories need'} a fix:`,
+        ...problems.map((problem) => `  - ${problem}`),
+      ].join('\n')
+    );
+  }
+  return demos;
+}
+
+const LITERAL_ID = /(?<![\w-])id="([^"]+)"/g;
+
+/**
+ * A component's docs stories render on one page, so a literal `id` two of them
+ * share would point every label at the first.
+ * @param {DemoFile[]} demos
+ */
+function sharedIds(demos) {
+  const owners = new Map();
+  for (const demo of demos) {
+    for (const [, id] of demo.source.matchAll(LITERAL_ID)) {
+      const key = `${demo.slug}#${id}`;
+      owners.set(key, (owners.get(key) ?? new Set()).add(demo.id));
+    }
+  }
+  return [...owners]
+    .filter(([, ids]) => ids.size > 1)
+    .map(
+      ([key, ids]) =>
+        `${[...ids].join(', ')} each render id="${key.split('#')[1]}" on the ${key.split('#')[0]} page — give each its own id, e.g. with React.useId.`
+    );
+}
+
+/**
+ * @typedef {{ preview: string | null; examples: string[]; imports: string; composition: string | null }} ComponentDocs
+ */
+
+/**
+ * A page without a preview: Usage from every part the component exports.
+ * @param {string} slug
+ * @returns {ComponentDocs}
+ */
+function previewlessDocs(slug) {
+  const propsFile = path.join(PROPS_DIR, `${slug}.json`);
+  if (!existsSync(propsFile)) {
+    throw new Error(
+      `Missing ${path.relative(docsRoot, propsFile)} — run \`pnpm --filter @nexus_ds/docs generate:props\` first.`
+    );
+  }
+  const { components } = JSON.parse(readCanonical(propsFile));
+  return {
+    preview: null,
+    examples: [],
+    imports: entryUsage(components),
+    composition: null,
+  };
+}
+
+/**
+ * Each exported component's page: its preview, examples, Usage and
+ * Composition, from its docs stories — or, for a previewless component,
+ * Usage from every part it exports.
+ * @param {string[]} exported
+ * @param {DemoFile[]} demos
+ * @returns {Map<string, ComponentDocs>}
+ */
+function collectComponentDocs(exported, demos) {
+  return new Map(
+    exported.map((slug) => {
+      if (PREVIEWLESS_COMPONENTS.has(slug)) {
+        return [slug, previewlessDocs(slug)];
+      }
+      const own = demos.filter((demo) => demo.slug === slug);
+      const [preview, ...examples] = own.map((demo) => demo.id);
+      const sources = own.map((demo) => ({
+        fileName: `${demo.id}.tsx`,
+        source: demo.source,
+      }));
+      return [slug, { preview, examples, ...componentUsage(slug, sources) }];
+    })
+  );
 }
 
 /** @param {DemoFile} demo */
@@ -332,19 +471,23 @@ function renderDemoModule(demo) {
   return `${GENERATED_BY}
 ${REGENERATE_HINT}
 
-export { Component } from ${JSON.stringify(boundarySpecifier(demo.id))};
+export { default as Component } from ${JSON.stringify(boundarySpecifier(demo.id))};
 
 export const source = ${JSON.stringify(demo.source)};
 `;
 }
 
-/** @param {DemoFile[]} demos */
-function renderDemoIndex(demos) {
+/**
+ * @param {DemoFile[]} demos
+ * @param {Map<string, ComponentDocs>} componentDocs
+ */
+function renderDemoIndex(demos, componentDocs) {
   const entries = demos
     .map((demo) =>
       [
         `  ${JSON.stringify(demo.id)}: {`,
         `    id: ${JSON.stringify(demo.id)},`,
+        `    title: ${JSON.stringify(demo.title)},`,
         `    alsoInstall: ${JSON.stringify(demo.alsoInstall)},`,
         `    packages: ${JSON.stringify(demo.packages)},`,
         `    load: () => import(${JSON.stringify(`./${MODULES_DIR}/${demo.id}`)}),`,
@@ -352,32 +495,56 @@ function renderDemoIndex(demos) {
       ].join('\n')
     )
     .join('\n');
-
   const literal = entries ? `{\n${entries}\n}` : '{}';
+
+  const docsEntries = [...componentDocs]
+    .map(([slug, { preview, examples, imports, composition }]) =>
+      [
+        `  ${JSON.stringify(slug)}: {`,
+        `    preview: ${JSON.stringify(preview)},`,
+        `    examples: ${JSON.stringify(examples)},`,
+        `    imports: ${JSON.stringify(imports)},`,
+        `    composition: ${JSON.stringify(composition)},`,
+        `  },`,
+      ].join('\n')
+    )
+    .join('\n');
+  const docsLiteral = docsEntries ? `{\n${docsEntries}\n}` : '{}';
 
   return `${INDEX_HEADER}
 export const demos = ${literal} satisfies Record<string, Demo>;
 
+const componentDocs: Record<string, ComponentDocs> = ${docsLiteral};
+
 ${INDEX_FOOTER}`;
 }
 
-function generateDemoIndex() {
-  const demos = collectDemos();
+function copyStoryAssets() {
+  rmSync(STORY_ASSETS_TARGET, { recursive: true, force: true });
+  cpSync(STORY_ASSETS_SOURCE, STORY_ASSETS_TARGET, { recursive: true });
+}
+
+async function generateDemoIndex() {
+  const exported = exportedComponentSlugs();
+  const demos = await collectDemos(new Set(exported));
   const modulesDir = path.join(GENERATED_DIR, MODULES_DIR);
   const indexFile = path.join(GENERATED_DIR, INDEX_FILE);
 
-  writeIfChanged(indexFile, renderDemoIndex(demos));
+  writeIfChanged(
+    indexFile,
+    renderDemoIndex(demos, collectComponentDocs(exported, demos))
+  );
 
   const keep = new Set([indexFile]);
   for (const demo of demos) {
     const moduleFile = path.join(modulesDir, `${demo.id}.ts`);
     const boundaryFile = path.join(
       path.dirname(moduleFile),
-      `${boundarySpecifier(demo.id)}.ts`
+      `${boundarySpecifier(demo.id)}.tsx`
     );
 
     writeIfChanged(moduleFile, renderDemoModule(demo));
-    writeIfChanged(boundaryFile, renderDemoBoundary(demo));
+    writeIfChanged(boundaryFile, demo.source);
     keep.add(moduleFile);
     keep.add(boundaryFile);
   }
@@ -387,40 +554,41 @@ function generateDemoIndex() {
   return demos;
 }
 
-function generateAndLog() {
-  const demos = generateDemoIndex();
+async function generateAndLog() {
+  const demos = await generateDemoIndex();
   const plural = demos.length === 1 ? 'demo' : 'demos';
   console.log(
     `demo-index: ${demos.length} ${plural} -> ${path.relative(docsRoot, GENERATED_DIR)}`
   );
 }
 
-function regenerateQuietly() {
+async function regenerateQuietly() {
   try {
-    generateAndLog();
+    await generateAndLog();
   } catch (error) {
     console.error(`demo-index: ${error.message}`);
   }
 }
 
-function watchExamples() {
-  const relativeExamples = path.relative(docsRoot, EXAMPLES_DIR);
+function watchStories() {
+  const relativeComponents = path.relative(docsRoot, componentsRoot);
 
   regenerateQuietly();
 
   let watcher;
   try {
-    watcher = watch(EXAMPLES_DIR, { recursive: true });
+    watcher = watch(componentsRoot, { recursive: true });
   } catch (error) {
     console.error(
-      `demo-index: cannot watch ${relativeExamples} — ${error.message}`
+      `demo-index: cannot watch ${relativeComponents} — ${error.message}`
     );
     process.exitCode = 1;
     return;
   }
 
   let pending;
-  watcher.on('change', () => {
+  watcher.on('change', (_event, fileName) => {
+    if (!String(fileName).endsWith('.stories.tsx')) return;
     clearTimeout(pending);
     pending = setTimeout(regenerateQuietly, WATCH_DEBOUNCE_MS);
   });
@@ -430,11 +598,25 @@ function watchExamples() {
     watcher.close();
   });
 
-  console.log(`demo-index: watching ${relativeExamples}`);
+  console.log(`demo-index: watching ${relativeComponents} stories`);
+}
+
+try {
+  copyStoryAssets();
+} catch (error) {
+  console.error(
+    `demo-index: cannot copy ${path.relative(docsRoot, STORY_ASSETS_SOURCE)} — ${error.message}`
+  );
+  process.exit(1);
 }
 
 if (process.argv.includes('--watch')) {
-  watchExamples();
+  watchStories();
 } else {
-  generateAndLog();
+  try {
+    await generateAndLog();
+  } catch (error) {
+    console.error(`demo-index: ${error.message}`);
+    process.exitCode = 1;
+  }
 }
