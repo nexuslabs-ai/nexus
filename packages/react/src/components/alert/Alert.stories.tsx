@@ -1,5 +1,6 @@
 import * as React from 'react';
 
+import { DEFAULT_NEXUS_APPEARANCE, DENSITY_OPTIONS } from '@nexus_ds/core';
 import {
   Canvas,
   Controls,
@@ -17,6 +18,7 @@ import {
 import { expect, userEvent, waitFor, within } from 'storybook/test';
 
 import { expectHeightPinned } from '../../stories/support/story-height-test-utils';
+import { NexusRoot } from '../appearance/provider';
 import { Button } from '../button';
 
 import {
@@ -936,6 +938,43 @@ export const DensityActionSizing: Story = {
           close.getBoundingClientRect().height
         );
       }
+    }
+  },
+};
+
+export const CloseKeepsTitleRow: Story = {
+  tags: ['!autodocs', '!dev'],
+  render: () => (
+    <div className="nx:flex nx:w-full nx:flex-col nx:gap-4">
+      {DENSITY_OPTIONS.map(({ value }) => (
+        <NexusRoot
+          key={value}
+          state={{ ...DEFAULT_NEXUS_APPEARANCE, mode: 'light', density: value }}
+          className="nx:flex nx:flex-col nx:gap-2"
+        >
+          <Alert layout="stack" aria-label={`${value} with close`}>
+            <AlertContent>
+              <AlertTitle>Changes saved</AlertTitle>
+            </AlertContent>
+            <AlertClose />
+          </Alert>
+          <Alert layout="stack" aria-label={`${value} without close`}>
+            <AlertContent>
+              <AlertTitle>Changes saved</AlertTitle>
+            </AlertContent>
+          </Alert>
+        </NexusRoot>
+      ))}
+    </div>
+  ),
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+    for (const { value } of DENSITY_OPTIONS) {
+      const withClose = canvas.getByLabelText(`${value} with close`);
+      const withoutClose = canvas.getByLabelText(`${value} without close`);
+      await expect(withClose.getBoundingClientRect().height).toBe(
+        withoutClose.getBoundingClientRect().height
+      );
     }
   },
 };
