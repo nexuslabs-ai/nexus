@@ -420,7 +420,7 @@ function AlertClose({
       size="icon-sm"
       data-slot="alert-close"
       className={cn(
-        'nx:col-start-4 nx:row-start-1 nx:ms-2 nx:-my-1.5 nx:self-start nx:group-data-[layout=inline]/alert:@lg/alert:self-center',
+        'nx:col-start-4 nx:row-start-1 nx:ms-2 nx:-my-[calc((var(--nx-spacing-8)-var(--nx-typography-line-height-sm))/2)] nx:self-start nx:group-data-[layout=inline]/alert:@lg/alert:self-center',
         className
       )}
       type={type}
