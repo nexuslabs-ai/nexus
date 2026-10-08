@@ -8,8 +8,8 @@ import { cva, type VariantProps } from 'class-variance-authority';
 import { IconX } from '../../lib/icons';
 import { cn } from '../../lib/utils';
 import { Button } from '../button';
+import { ButtonSizeContext } from '../button/button-size-context';
 import { ButtonVariantContext } from '../button/button-variant-context';
-import { ButtonGroupSizeContext } from '../button-group/button-group-context';
 
 const alertVariants = cva(
   'nx:group/alert nx:grid nx:w-full nx:grid-cols-[auto_minmax(0,1fr)_auto_auto] nx:px-5 nx:py-4',
@@ -371,13 +371,13 @@ function AlertActions({ className, children, ...props }: AlertActionsProps) {
       )}
       {...props}
     >
-      <ButtonGroupSizeContext.Provider value="sm">
+      <ButtonSizeContext.Provider value="sm">
         <ButtonVariantContext.Provider
           value={fill === 'solid' ? 'outline' : undefined}
         >
           {children}
         </ButtonVariantContext.Provider>
-      </ButtonGroupSizeContext.Provider>
+      </ButtonSizeContext.Provider>
     </div>
   );
 }
