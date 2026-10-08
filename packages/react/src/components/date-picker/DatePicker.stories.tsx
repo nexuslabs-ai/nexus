@@ -194,7 +194,7 @@ export const Default: Story = {
   },
 };
 
-// Today uses the red inner-circle treatment.
+// Today renders an `error-background` inner circle with `error-foreground` text.
 export const Today: Story = {
   decorators: [inCard],
   render: () => (

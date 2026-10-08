@@ -9,7 +9,12 @@ import {
   CardTitle,
 } from '../_components/nexus';
 import { describeSize } from '../_lib/home-counts';
-import { CARD_JOINER, PAGE_MANIFEST, requireSection } from '../_lib/manifest';
+import {
+  CARD_JOINER,
+  PAGE_MANIFEST,
+  requirePage,
+  requireSection,
+} from '../_lib/manifest';
 
 const BLUE_RAMP = [50, 100, 200, 300, 400, 500, 600, 700, 800, 900, 950];
 const BASE_CHIPS = ['slate', 'stone', 'neutral', 'gray', 'zinc'];
@@ -25,12 +30,12 @@ const AUDIENCES = [
   {
     title: 'Engineer',
     desc: 'Install, wire your theme, and ship your first component in minutes.',
-    href: '/getting-started/install',
+    href: requirePage('/getting-started/install').route,
   },
   {
     title: 'AI agent',
     desc: 'llms.txt, a mirror of the rules, and authoring conventions agents can parse.',
-    href: '/agents',
+    href: requireSection('agents').href,
   },
 ];
 
@@ -65,10 +70,14 @@ export default function Home() {
         </p>
         <div className="nx:mt-8 nx:flex nx:flex-wrap nx:gap-3 nx:justify-center">
           <Button asChild>
-            <Link href="/getting-started">Get started</Link>
+            <Link href={requireSection('getting-started').href}>
+              Get started
+            </Link>
           </Button>
           <Button asChild variant="outline">
-            <Link href="/components">Browse components</Link>
+            <Link href={requireSection('components').href}>
+              Browse components
+            </Link>
           </Button>
         </div>
         <dl className="nx:mt-16 nx:flex nx:flex-wrap nx:justify-center nx:gap-x-10 nx:gap-y-5 nx:border-t nx:border-border-default nx:pt-8 nx:max-w-[36rem] nx:mx-auto">
