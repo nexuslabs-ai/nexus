@@ -37,7 +37,10 @@ export const NEXUS_LAYER_ORDER = '@layer theme, base, components, utilities;';
 
 /** Selector for the Nexus root with the given key. */
 export function nexusRootScope(key: string): string {
-  return `[${NEXUS_ROOT_ATTRIBUTE}="${key.replace(/["\\]/g, '\\$&')}"]`;
+  const value = key
+    .replace(/["\\]/g, '\\$&')
+    .replace(/[\n\r\f]/g, (c) => `\\${c.charCodeAt(0).toString(16)} `);
+  return `[${NEXUS_ROOT_ATTRIBUTE}="${value}"]`;
 }
 
 /** The attributes a Nexus root renders for an appearance. */

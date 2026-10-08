@@ -24,14 +24,14 @@ const toasterIcons = {
   ),
 };
 
+const color = (name: string) =>
+  `var(--nx-color-${name}, var(--nx-default-color-${name}))`;
+
 /**
  * Sonner reads these custom properties off the toaster container to colour each
  * toast; map every one to its Nexus semantic token. The `-bg`/`-text`/`-border`
  * triples for success/error/warning/info apply when `richColors` is enabled.
  */
-const color = (name: string) =>
-  `var(--nx-color-${name}, var(--nx-default-color-${name}))`;
-
 const toasterThemeVars = {
   '--normal-bg': color('container'),
   '--normal-text': color('foreground'),
@@ -56,8 +56,8 @@ const toasterThemeVars = {
  *
  * Renders toast notifications, themed to Nexus tokens and riding the Nexus
  * toast layer (z-index 100). Mount once inside your Nexus root, then call
- * `toast(...)` (re-exported here) from anywhere. The toaster carries the
- * nearest root's appearance, including its light or dark mode.
+ * `toast(...)` (re-exported here) from anywhere. Sonner renders in place, so
+ * the toaster sits inside the root and follows its light or dark mode.
  *
  * @example
  * ```tsx
@@ -74,11 +74,11 @@ const toasterThemeVars = {
  * ```
  */
 function Toaster({ style, ...props }: ToasterProps) {
-  const rootAttributes = useNexusRootAttributes();
+  const { 'data-nx-mode': mode } = useNexusRootAttributes();
   return (
-    <div {...rootAttributes} data-slot="toaster">
+    <div data-slot="toaster">
       <Sonner
-        theme={rootAttributes['data-nx-mode'] === 'dark' ? 'dark' : 'light'}
+        theme={mode === 'dark' ? 'dark' : 'light'}
         icons={toasterIcons}
         style={
           {

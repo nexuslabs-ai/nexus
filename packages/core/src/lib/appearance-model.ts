@@ -2,7 +2,7 @@ import typographyTokens from '../../tokens/primitives/typography/typography-defa
 
 import { normalizeContrast } from './contrast';
 import type { ThemeDerivationInput, ThemeSeeds } from './derive-theme';
-import { NEXUS_LAYER_ORDER } from './nexus-root';
+import { NEXUS_LAYER_ORDER, NEXUS_ROOT_ATTRIBUTE } from './nexus-root';
 import type { NexusSurfaceTone } from './palette';
 import { isColor } from './perceptual-ramp';
 
@@ -322,7 +322,8 @@ export function appearancePrefsToCss(
     prefs.codeFontSize,
     DEFAULT_NEXUS_APPEARANCE.prefs.codeFontSize
   );
-  const within = `:where(${scope}, ${scope} *)`;
+  const nested = `${scope} [${NEXUS_ROOT_ATTRIBUTE}]:not(${scope})`;
+  const within = `:where(${scope}, ${scope} *):where(:not(${nested}, ${nested} *))`;
   const blocks: string[] = [
     NEXUS_LAYER_ORDER,
     `@layer base {

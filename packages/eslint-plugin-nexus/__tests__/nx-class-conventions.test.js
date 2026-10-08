@@ -29,6 +29,10 @@ ruleTester.run('nx-class-conventions', rule, {
     'const c = `nx:p-4 ${cond} nx:gap-2`;',
     // Non-nx classes are ignored.
     "const c = 'flex items-center gap-2';",
+    // A host's own unprefixed `dark:` classes are its Tailwind, not Nexus's.
+    "const c = 'bg-background dark:bg-input/30';",
+    // `dark` inside a utility or variant name is not the `dark:` variant.
+    "const c = 'nx:bg-surface-dark nx:group-dark:p-4';",
     // Text alignment, wrapping, arbitrary values, and colours are not font-size
     // utilities and must stay legal.
     "const c = 'nx:text-center';",
@@ -98,6 +102,24 @@ ruleTester.run('nx-class-conventions', rule, {
     },
   ],
   invalid: [
+    {
+      code: "const c = 'nx:dark:bg-primary-background';",
+      errors: [{ messageId: 'darkVariant' }],
+    },
+    {
+      code: "const c = 'nx:p-4 nx:hover:dark:text-foreground';",
+      errors: [{ messageId: 'darkVariant' }],
+    },
+    {
+      // `not-dark:` compiles to `@media not (prefers-color-scheme: dark)`.
+      code: "const c = 'nx:not-dark:p-4';",
+      errors: [{ messageId: 'darkVariant' }],
+    },
+    {
+      code: "const c = 'nx:dark:bg-muted';",
+      filename: '/repo/packages/react/src/components/card/Card.stories.tsx',
+      errors: [{ messageId: 'darkVariant' }],
+    },
     {
       code: "const c = 'hover:nx:bg-primary-background';",
       errors: [{ messageId: 'prefixOrder' }],

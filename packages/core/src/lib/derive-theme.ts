@@ -8,7 +8,7 @@ import {
   contrastTarget,
   normalizeContrast,
 } from './contrast';
-import { NEXUS_LAYER_ORDER } from './nexus-root';
+import { NEXUS_LAYER_ORDER, NEXUS_MODE_ATTRIBUTE } from './nexus-root';
 import { formatOklch } from './oklch-format';
 import {
   type Mode,
@@ -476,5 +476,5 @@ function block(selector: string, map: TokenMap): string {
  * generated defaults (`@layer theme`) whatever order the stylesheets load in.
  */
 export function themeToCss(derived: DerivedTheme, scope: string): string {
-  return `${NEXUS_LAYER_ORDER}\n@layer base {\n${block(scope, derived.light)}\n${block(`${scope}[data-nx-mode='dark']`, derived.dark)}\n}\n`;
+  return `${NEXUS_LAYER_ORDER}\n@layer base {\n${block(scope, derived.light)}\n${block(`${scope}[${NEXUS_MODE_ATTRIBUTE}='dark']`, derived.dark)}\n}\n`;
 }

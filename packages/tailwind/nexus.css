@@ -21,8 +21,6 @@
 @import './icon-utilities.css';
 @import './spacing-utilities.css';
 
-@custom-variant dark (&:where([data-nexus-root][data-nx-mode='dark'], [data-nexus-root][data-nx-mode='dark'] *));
-
 @theme {
   /* Reset default Tailwind namespaces to enforce semantic tokens only */
   --color-*: initial;
@@ -68,7 +66,23 @@
   --spacing-2_5: 10px;
   --spacing-3_5: 14px;
 
-  /* Radius tokens */
+  /* Z-index tokens */
+  --z-index-overlay: 10;
+  --z-index-sticky: 30;
+  --z-index-modal: 50;
+  --z-index-popover: 70;
+  --z-index-toast: 100;
+  --z-index-max: 9999;
+
+  /* Breakpoint tokens */
+  --breakpoint-sm: 40rem;
+  --breakpoint-md: 48rem;
+  --breakpoint-lg: 64rem;
+  --breakpoint-xl: 80rem;
+  --breakpoint-2xl: 96rem;
+}
+
+@theme inline reference {
   --radius-base: var(--nx-radius-base);
   --radius-sm: var(--nx-radius-sm);
   --radius-md: var(--nx-radius-md);
@@ -78,14 +92,10 @@
   --radius-3xl: var(--nx-radius-3xl);
   --radius-4xl: var(--nx-radius-4xl);
   --radius-full: var(--nx-radius-full);
-
-  /* Motion tokens */
   --ease-linear: var(--nx-motion-ease-linear);
   --ease-enter: var(--nx-motion-ease-enter);
   --ease-exit: var(--nx-motion-ease-exit);
   --ease-move: var(--nx-motion-ease-move);
-
-  /* Shadow tokens */
   --shadow-2xs: var(--nx-shadow-2xs-layer-1-x) var(--nx-shadow-2xs-layer-1-y)
     var(--nx-shadow-2xs-layer-1-blur) var(--nx-shadow-2xs-layer-1-spread)
     var(--nx-shadow-2xs-layer-1-color);
@@ -133,30 +143,15 @@
   --shadow-inner: inset var(--nx-shadow-inner-layer-1-x)
     var(--nx-shadow-inner-layer-1-y) var(--nx-shadow-inner-layer-1-blur)
     var(--nx-shadow-inner-layer-1-spread) var(--nx-shadow-inner-layer-1-color);
-
-  /* Z-index tokens */
-  --z-index-overlay: 10;
-  --z-index-sticky: 30;
-  --z-index-modal: 50;
-  --z-index-popover: 70;
-  --z-index-toast: 100;
-  --z-index-max: 9999;
-
-  /* Breakpoint tokens */
-  --breakpoint-sm: 40rem;
-  --breakpoint-md: 48rem;
-  --breakpoint-lg: 64rem;
-  --breakpoint-xl: 80rem;
-  --breakpoint-2xl: 96rem;
 }
 
-@theme inline {
+@theme inline reference {
   /* Default transition timing */
   --default-transition-duration: var(--nx-motion-duration-default);
   --default-transition-timing-function: var(--nx-motion-ease-enter);
 }
 
-@theme inline {
+@theme inline reference {
   /* Border and outline width tokens */
   --border-width-thin: var(--nx-borderwidth-thin);
   --border-width-default: var(--nx-borderwidth-default);
@@ -166,7 +161,7 @@
   --outline-width-thick: var(--nx-borderwidth-thick);
 }
 
-@theme inline {
+@theme inline reference {
   /* Semantic tokens */
   --color-background: var(
     --nx-color-background,
@@ -1218,8 +1213,7 @@
     --nx-shadow-inner-layer-1-color: oklch(0 0 0 / 0.0392);
   }
 
-  [data-nexus-root][data-nx-mode='dark'],
-  [data-nexus-root][data-nx-mode='dark'][data-nx-shadow='quiet'] {
+  [data-nexus-root][data-nx-mode='dark'] {
     --nx-shadow-2xs-layer-1-x: 0px;
     --nx-shadow-2xs-layer-1-y: 1px;
     --nx-shadow-2xs-layer-1-blur: 3px;

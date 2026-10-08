@@ -81,6 +81,8 @@ export interface NexusAppearanceProviderProps {
    */
   cookieWriteKey?: string | false;
   cookieOptions?: NexusAppearanceCookieOptions;
+  /** Nonce for the injected `<style>` elements under a strict `style-src` policy. */
+  nonce?: string;
 }
 
 export const NexusAppearanceContext =
@@ -176,7 +178,11 @@ function syncColorSchemeMeta(content: 'light' | 'dark' | 'light dark'): void {
   }
 }
 
-function upsertStyle(selector: string, attribute: string): HTMLStyleElement {
+function upsertStyle(
+  selector: string,
+  attribute: string,
+  nonce: string | undefined
+): HTMLStyleElement {
   const styles = Array.from(
     document.querySelectorAll<HTMLStyleElement>(selector)
   );
@@ -187,6 +193,7 @@ function upsertStyle(selector: string, attribute: string): HTMLStyleElement {
   }
 
   style.setAttribute(attribute, '');
+  if (nonce) style.nonce = nonce;
 
   if (!style.parentNode) {
     document.head.appendChild(style);
@@ -223,6 +230,7 @@ export function NexusAppearanceProvider({
   storageKey = DEFAULT_STORAGE_KEY,
   cookieWriteKey = false,
   cookieOptions,
+  nonce,
 }: NexusAppearanceProviderProps) {
   const initialState = useMemo(
     () => sanitizeNexusAppearance(defaultState ?? DEFAULT_NEXUS_APPEARANCE),
@@ -324,20 +332,22 @@ export function NexusAppearanceProvider({
 
     const themeStyle = upsertStyle(
       THEME_STYLE_SELECTOR,
-      'data-nexus-appearance-theme'
+      'data-nexus-appearance-theme',
+      nonce
     );
     themeStyle.textContent = activeSnapshot.themeCss;
-  }, [activeSnapshot, mounted]);
+  }, [activeSnapshot, mounted, nonce]);
 
   useEffect(() => {
     if (!canUseDOM() || !mounted) return;
 
     const prefsStyle = upsertStyle(
       PREFS_STYLE_SELECTOR,
-      'data-nexus-appearance-prefs'
+      'data-nexus-appearance-prefs',
+      nonce
     );
     prefsStyle.textContent = activeSnapshot.prefsCss;
-  }, [activeSnapshot, mounted]);
+  }, [activeSnapshot, mounted, nonce]);
 
   useEffect(() => {
     if (!canUseDOM()) return;
