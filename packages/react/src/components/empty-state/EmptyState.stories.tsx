@@ -313,7 +313,10 @@ export const SearchRecovery: Story = {
           value={query}
           onChange={(event) => setQuery(event.target.value)}
         />
-        <p role="status">{contacts.length} contacts found</p>
+        <p role="status">
+          {contacts.length} {contacts.length === 1 ? 'contact' : 'contacts'}{' '}
+          found
+        </p>
         {contacts.length ? (
           <ul>
             {contacts.map((name) => (
@@ -359,6 +362,10 @@ export const SearchRecovery: Story = {
       '2 contacts found'
     );
     await expect(canvas.getByLabelText('Search contacts')).toHaveFocus();
+    await userEvent.type(canvas.getByLabelText('Search contacts'), 'Priya');
+    await expect(canvas.getByRole('status')).toHaveTextContent(
+      '1 contact found'
+    );
   },
 };
 
