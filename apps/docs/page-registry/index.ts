@@ -10,8 +10,6 @@ import type { Block } from './blocks';
 export type GuidePage = {
   slug: string;
   label: string;
-  /** Optional in-page headings rendered inline in the left rail (non-interactive). */
-  nested?: string[];
   /** Placeholder body, carried only while the page has no source file. */
   wireframe?: { lede: string; blocks: Block[] };
 };
@@ -100,12 +98,6 @@ export const PAGE_REGISTRY = {
       {
         slug: 'color',
         label: 'Color',
-        nested: [
-          'How color works',
-          'Palette & shades',
-          'Surfaces',
-          'Accessibility',
-        ],
       },
       {
         slug: 'typography',

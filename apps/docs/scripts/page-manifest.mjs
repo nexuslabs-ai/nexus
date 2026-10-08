@@ -208,10 +208,8 @@ type PlaceholderPage = {
   file: null;
 };
 
-export type GuideManifestPage = ManifestPageBase & {
-  /** Non-interactive headings listed under this page in the left rail. */
-  nested?: readonly string[];
-} & (
+export type GuideManifestPage = ManifestPageBase &
+  (
     | {
         kind: 'mdx' | 'component';
         /** Source file relative to \`apps/docs\`; the module is \`PAGE_LOADERS[route]\`. */
@@ -225,7 +223,6 @@ export type GuideManifestPage = ManifestPageBase & {
  * \`getComponentDocs(slug)\` entry, generated from its stories tagged \`docs\`.
  */
 export type ComponentManifestPage = ManifestPageBase & {
-  nested?: never;
   kind: 'generated';
 };
 
@@ -355,9 +352,6 @@ export async function buildPageManifest(docsRoot, formatOptions) {
       slug,
       label: entry?.label ?? humanize(slug),
     };
-    if (entry?.nested?.length) {
-      base.nested = entry.nested;
-    }
 
     const source = sources.find((candidate) => candidate.pages.has(key));
     if (source) {
