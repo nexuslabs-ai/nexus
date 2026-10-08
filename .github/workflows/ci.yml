@@ -133,7 +133,8 @@ jobs:
         run: pnpm --filter @nexus_ds/core audit:class-refs
 
       # The build step's docs JSON and page manifest may be a turbo cache
-      # restore; regenerating them outside turbo catches a stale cache entry or nondeterministic output.
+      # restore; regenerating them outside turbo catches a stale cache
+      # entry or nondeterministic output.
       - name: Check docs generated inputs match a fresh regeneration
         run: |
           set -euo pipefail
