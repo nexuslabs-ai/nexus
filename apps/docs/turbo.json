@@ -67,13 +67,14 @@
         "^build",
         "generate:manifest",
         "generate:props",
-        "generate:dependencies"
+        "generate:dependencies",
+        "generate:demos"
       ],
       "cache": false,
       "persistent": true
     },
     "typecheck": {
-      "dependsOn": ["^build", "generate:demos"]
+      "dependsOn": ["^build", "generate:manifest", "generate:demos"]
     }
   }
 }

@@ -35,6 +35,7 @@ export default tseslint.config(
       '**/coverage/**',
       '**/generated/**',
       '**/__generated__/**',
+      '**/*.generated.ts',
       '**/storybook-static/**',
       '**/build/**',
       '**/out/**',
