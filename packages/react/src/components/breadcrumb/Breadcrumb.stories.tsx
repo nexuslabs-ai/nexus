@@ -347,7 +347,7 @@ export const WithEllipsis: Story = {
   },
 };
 
-// Figma supports optional item icons and trailing dropdown affordances. The
+// Items support optional icons and trailing dropdown affordances. The
 // chevron is a real menu trigger next to the link, not an interactive control
 // nested inside the anchor.
 export const WithIcons: Story = {

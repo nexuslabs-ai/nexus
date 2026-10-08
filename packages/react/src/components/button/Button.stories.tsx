@@ -843,7 +843,7 @@ export const AllVariants: Story = {
   ),
 };
 
-export const VariantClassesMatchFigmaTokens: Story = {
+export const VariantClassesMatchTokens: Story = {
   render: () => (
     <div className="nx:flex nx:flex-wrap nx:items-center nx:gap-2">
       <Button variant="default">Default</Button>

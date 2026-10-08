@@ -73,25 +73,6 @@ export const PAGE_REGISTRY = {
         },
       },
       {
-        slug: 'designers',
-        label: 'For designers',
-        wireframe: {
-          lede: '[ Open the Figma library · use the variables · sync via Code Connect ]',
-          blocks: [
-            {
-              type: 'placeholder',
-              label:
-                '[ External-link list — Figma library, Code Connect docs ]',
-            },
-            {
-              type: 'placeholder',
-              variant: 'diagram',
-              label: '[ Diagram — code ↔ Figma parity flow ]',
-            },
-          ],
-        },
-      },
-      {
         slug: 'agents',
         label: 'For AI agents',
         wireframe: {
@@ -240,25 +221,6 @@ export const PAGE_REGISTRY = {
         },
       },
       {
-        slug: 'code-connect',
-        label: 'Figma Code Connect',
-        wireframe: {
-          lede: '[ Mapping Figma components to code · maintaining .figma.ts ]',
-          blocks: [
-            {
-              type: 'placeholder',
-              variant: 'code',
-              label: '[ Code — example .figma.ts ]',
-            },
-            {
-              type: 'placeholder',
-              variant: 'diagram',
-              label: '[ Diagram — Figma ↔ code parity ]',
-            },
-          ],
-        },
-      },
-      {
         slug: 'eslint',
         label: 'ESLint plugin',
         wireframe: {
@@ -281,7 +243,7 @@ export const PAGE_REGISTRY = {
         slug: 'audits',
         label: 'Token audits',
         wireframe: {
-          lede: '[ figma-parity · APCA contrast · spacing-modes ]',
+          lede: '[ APCA contrast · spacing-modes ]',
           blocks: [
             {
               type: 'placeholder',

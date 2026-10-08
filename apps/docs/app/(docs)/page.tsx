@@ -23,11 +23,6 @@ const STATS = [
 
 const AUDIENCES = [
   {
-    title: 'Designer',
-    desc: 'Figma library, design tokens, and Code Connect — kept in lockstep with code.',
-    href: '/getting-started/designers',
-  },
-  {
     title: 'Engineer',
     desc: 'Install, wire your theme, and ship your first component in minutes.',
     href: '/getting-started/install',
@@ -90,7 +85,7 @@ export default function Home() {
 
       {/* Audience cards */}
       <h2 className="nx:typography-heading-small nx:mt-4 nx:mb-3">I am a…</h2>
-      <div className="nx:grid nx:grid-cols-1 nx:md:grid-cols-3 nx:gap-4">
+      <div className="nx:grid nx:grid-cols-1 nx:md:grid-cols-2 nx:gap-4">
         {AUDIENCES.map((a) => (
           <Link
             key={a.title}
