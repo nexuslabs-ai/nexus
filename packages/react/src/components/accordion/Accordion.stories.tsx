@@ -784,7 +784,7 @@ export const AccordionExpandedItemDefaultHeightPinned: Story = {
     docs: {
       description: {
         story:
-          'Pin on the expanded item anatomy: one body-small content line should keep the open item close to the 88px Figma baseline.',
+          'Pin on the expanded item anatomy: one body-small content line should keep the open item at 88–89px.',
       },
     },
   },

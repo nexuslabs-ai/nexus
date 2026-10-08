@@ -537,7 +537,7 @@ export const VisualStateTokens: Story = {
     docs: {
       description: {
         story:
-          'Token sentinel for the corrected Figma node 843:71944 visual-state pass. The primitive remains a native input, while hover and disabled visuals map to Nexus semantic state tokens.',
+          'Pins the hover and disabled state classes to Nexus semantic tokens. The primitive remains a native input.',
       },
     },
   },

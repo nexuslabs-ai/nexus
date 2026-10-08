@@ -194,7 +194,7 @@ export const Default: Story = {
   },
 };
 
-// Today uses the Figma red inner-circle treatment.
+// Today renders an `error-background` inner circle with `error-foreground` text.
 export const Today: Story = {
   decorators: [inCard],
   render: () => (
@@ -468,7 +468,7 @@ export const UnavailableDays: Story = {
   },
 };
 
-// First day of week — Monday-first (matches the Figma reference). Pass a date-fns
+// First day of week — Monday-first. Pass a date-fns
 // `locale` instead to derive both the first day and weekday names per region.
 // (Weekday label format itself is locale/formatter-driven and out of scope here.)
 export const WeekStartsMonday: Story = {
