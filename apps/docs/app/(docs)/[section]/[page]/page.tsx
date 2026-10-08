@@ -1,6 +1,7 @@
 import { notFound } from 'next/navigation';
 
 import { Breadcrumb } from '../../../_components/Breadcrumb';
+import { ComponentPage } from '../../../_components/ComponentPage';
 import { PageWireframeView } from '../../../_components/PageWireframeView';
 import {
   getSection,
@@ -36,19 +37,21 @@ export default async function Page({
           { label: page.label },
         ]}
       />
-      {page.kind === 'placeholder' ? (
-        <PageWireframeView page={page} />
-      ) : (
-        <PageBody page={page} />
-      )}
+      <PageContent page={page} />
     </>
   );
 }
 
-async function PageBody({
+function PageContent({ page }: { page: ManifestPage }) {
+  if (page.kind === 'placeholder') return <PageWireframeView page={page} />;
+  if (page.kind === 'generated') return <ComponentPage page={page} />;
+  return <WrittenPage page={page} />;
+}
+
+async function WrittenPage({
   page,
 }: {
-  page: Exclude<ManifestPage, { kind: 'placeholder' }>;
+  page: Extract<ManifestPage, { kind: 'mdx' | 'component' }>;
 }) {
   const loadPage = PAGE_LOADERS[page.route];
   if (!loadPage) {

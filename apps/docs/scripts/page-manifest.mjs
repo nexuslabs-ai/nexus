@@ -4,17 +4,14 @@
  * Sources:
  *   - `page-registry/` — section and page order, labels, and the
  *     `wireframe` a page renders until its own file lands
- *   - `content/{section}/{slug}.mdx` — MDX pages; a component page (under
- *     `components/`, not a group page) is exactly
- *     `<ComponentPage slug="{slug}" />`
- *   - `examples/{slug}/{name}.tsx` — checked against a component page's
- *     registry `examples` order
+ *   - `content/{section}/{slug}.mdx` — MDX pages
  *   - `app/_pages/{section}/{slug}.tsx` — hand-built pages
+ *   - `@nexus_ds/react`'s exports — one `components/` page per exported
+ *     component, generated from its stories tagged `docs`
  *
  * A page's route is its path on disk, so adding a page means adding a file.
  * Pages the registry does not list are appended to their section in slug
- * order. In `components/`, component pages follow the group pages in label
- * order, wherever the registry lists them. Routes are exactly two levels
+ * order. `components/` is sorted by label. Routes are exactly two levels
  * deep and a slug is one path segment; a file anywhere else fails the
  * generator. Entries prefixed with `_` are skipped, so a page-local island
  * can sit beside the page that uses it.
@@ -32,8 +29,10 @@ import { pathToFileURL } from 'node:url';
 import { createJiti } from 'jiti';
 import prettier from 'prettier';
 
-import { DEMO_EXTENSION, isDemoName, PREVIEW_DEMO } from './examples.mjs';
-import { humanize } from './humanize.mjs';
+import { DOCS_TAG } from './docs-stories.mjs';
+import { humanize, pascal } from './humanize.mjs';
+import { exportedComponentSlugs } from './react-sources.mjs';
+import { reactSrc } from './roots.mjs';
 
 /** Nav metadata source, relative to the docs app root. */
 export const REGISTRY_FILE = 'page-registry/index.ts';
@@ -117,15 +116,6 @@ function assertOneSourcePerRoute(sources) {
   }
 }
 
-/** Folds a label or a slug to one identity — `DropdownMenu` and `dropdown-menu` both give `dropdownmenu`. */
-function comparisonKey(value) {
-  return value.toLowerCase().replace(/[^a-z0-9]/g, '');
-}
-
-function railLabelsOf(page) {
-  return [...(page.components ?? []), ...(page.nested ?? [])];
-}
-
 const CARD_JOINER = ' · ';
 
 function assertLabelsAvoidTheCardJoiner(section) {
@@ -138,97 +128,38 @@ function assertLabelsAvoidTheCardJoiner(section) {
   }
 }
 
-function assertComponentsDeclareTheirUnit(section) {
-  if (section.unit === 'components') return;
-  for (const page of section.pages) {
-    if (page.components) {
-      throw new Error(
-        `${section.slug}/${page.slug} lists components, but ${section.slug} is not counted in components — add \`unit: 'components'\` to the section, or move the labels to \`nested\`.`
-      );
-    }
-  }
-}
-
-function assertRailLabelsHaveNoPage(section) {
-  const pageFor = new Map();
-  for (const page of section.pages) {
-    pageFor.set(comparisonKey(page.slug), page.slug);
-    pageFor.set(comparisonKey(page.label), page.slug);
-  }
-
-  for (const page of section.pages) {
-    for (const label of railLabelsOf(page)) {
-      const existing = pageFor.get(comparisonKey(label));
-      if (existing !== undefined) {
-        throw new Error(
-          `${section.slug} lists "${label}" as a rail label under ${page.slug}, but ${section.slug}/${existing} is now a page — drop the rail label.`
-        );
-      }
-    }
-  }
-}
-
 const COMPONENTS_SECTION = 'components';
 
-function assertComponentPageIsOneLineMdx(docsRoot, kind, file, slug) {
-  if (kind !== 'mdx') {
-    throw new Error(
-      `${file} is a component page, so it must be content/${COMPONENTS_SECTION}/${slug}.mdx containing <ComponentPage slug="${slug}" />.`
-    );
+/** A component's name as its own source spells it (`InputOTP`), else its slug in PascalCase. */
+function componentLabel(slug) {
+  const name = pascal(slug);
+  const dir = path.join(reactSrc, 'components', slug);
+  const source = fs
+    .readdirSync(dir)
+    .filter((file) => file.endsWith('.tsx') && !file.endsWith('.stories.tsx'))
+    .map((file) => fs.readFileSync(path.join(dir, file), 'utf8'))
+    .join('\n');
+  const spelled = source
+    .match(/\b[A-Z][A-Za-z0-9]*\b/g)
+    ?.find((word) => word.toLowerCase() === name.toLowerCase());
+  return spelled ?? name;
+}
+
+function assertNoWrittenComponentPages(sources) {
+  for (const source of sources) {
+    for (const [key, file] of source.pages) {
+      if (!key.startsWith(`${COMPONENTS_SECTION}/`)) continue;
+      throw new Error(
+        `${file} is a component page, but component pages are generated from the component's stories tagged \`${DOCS_TAG}\` — delete the file.`
+      );
+    }
   }
-  const expected = `<ComponentPage slug="${slug}" />`;
-  const body = fs.readFileSync(path.join(docsRoot, file), 'utf8').trim();
-  if (body !== expected) {
-    throw new Error(
-      `${file} must contain exactly ${expected} — a component page names its component and nothing else; ComponentPage renders the rest.`
-    );
-  }
 }
 
-function byGroupThenComponentLabel(entries) {
-  const groups = entries.filter(({ page }) => page.components);
-  const components = entries
-    .filter(({ page }) => !page.components)
-    .sort((a, b) => a.page.label.localeCompare(b.page.label, 'en'));
-  return [...groups, ...components];
-}
-
-function demoNamesIn(docsRoot, slug) {
-  const dir = path.join(docsRoot, 'examples', slug);
-  if (!fs.existsSync(dir)) return [];
-  return fs
-    .readdirSync(dir, { withFileTypes: true })
-    .filter(
-      (entry) => !entry.isDirectory() && entry.name.endsWith(DEMO_EXTENSION)
-    )
-    .map((entry) => entry.name.slice(0, -DEMO_EXTENSION.length))
-    .filter(isDemoName)
-    .sort();
-}
-
-function assertExamplesExist(docsRoot, key, slug, examples) {
-  const available = demoNamesIn(docsRoot, slug).filter(
-    (name) => name !== PREVIEW_DEMO
+function byLabel(entries) {
+  return entries.toSorted((a, b) =>
+    a.page.label.localeCompare(b.page.label, 'en')
   );
-  const seen = new Set();
-  for (const name of examples) {
-    if (name === PREVIEW_DEMO) {
-      throw new Error(
-        `${key} lists "${PREVIEW_DEMO}" in its registry \`examples\`, but that demo is the page's Preview and Code — drop it from the list.`
-      );
-    }
-    if (seen.has(name)) {
-      throw new Error(
-        `${key} lists "${name}" twice in its registry \`examples\`.`
-      );
-    }
-    seen.add(name);
-    if (!available.includes(name)) {
-      throw new Error(
-        `${key} lists "${name}" in its registry \`examples\`, but examples/${slug}/ has no demo by that name. Its examples: ${available.join(', ') || 'none'}.`
-      );
-    }
-  }
 }
 
 /** Import specifier for a docs-root-relative file, as seen from the content module. */
@@ -271,46 +202,50 @@ type ManifestPageBase = {
   label: string;
 };
 
-export type GuideManifestPage = ManifestPageBase & {
-  /** Components this group page covers, listed under it in the left rail. */
-  components?: readonly string[];
-  /** Non-interactive headings listed under this page in the left rail. */
-  nested?: readonly string[];
-  examples?: never;
-} & (
+type PlaceholderPage = {
+  /** No page file yet; the body is \`PAGE_WIREFRAMES[route]\`. */
+  kind: 'placeholder';
+  file: null;
+};
+
+export type GuideManifestPage = ManifestPageBase &
+  (
     | {
         kind: 'mdx' | 'component';
         /** Source file relative to \`apps/docs\`; the module is \`PAGE_LOADERS[route]\`. */
         file: string;
       }
-    | {
-        /** No page file yet; the body is \`PAGE_WIREFRAMES[route]\`. */
-        kind: 'placeholder';
-        file: null;
-      }
+    | PlaceholderPage
   );
 
-/** A written \`components/{slug}.mdx\` that renders \`<ComponentPage slug="{slug}" />\`. */
+/**
+ * A component \`@nexus_ds/react\` exports. Its page body is its
+ * \`getComponentDocs(slug)\` entry, generated from its stories tagged \`docs\`.
+ */
 export type ComponentManifestPage = ManifestPageBase & {
-  /** Example demo names the page shows first, in this order. */
-  examples: readonly string[];
-  components?: never;
-  nested?: never;
-  kind: 'mdx';
-  /** Source file relative to \`apps/docs\`; the module is \`PAGE_LOADERS[route]\`. */
-  file: string;
+  kind: 'generated';
 };
 
 export type ManifestPage = GuideManifestPage | ComponentManifestPage;
 
-export type ManifestSection = {
+type ManifestSectionBase = {
   slug: string;
   title: string;
   href: string;
-  /** What the section is counted in on the home page. Defaults to pages. */
-  unit?: 'components';
-  pages: readonly ManifestPage[];
 };
+
+export type GuideManifestSection = ManifestSectionBase & {
+  unit?: never;
+  pages: readonly GuideManifestPage[];
+};
+
+export type ComponentsManifestSection = ManifestSectionBase & {
+  /** What the section is counted in on the home page. Other sections count pages. */
+  unit: 'components';
+  pages: readonly ComponentManifestPage[];
+};
+
+export type ManifestSection = GuideManifestSection | ComponentsManifestSection;
 
 /** The separator the home page's section cards join a section's page labels with. */
 export const CARD_JOINER = ${JSON.stringify(CARD_JOINER)};
@@ -388,12 +323,14 @@ export async function buildPageManifest(docsRoot, formatOptions) {
   const sectionFor = (slug) =>
     Object.hasOwn(PAGE_REGISTRY, slug) ? PAGE_REGISTRY[slug] : undefined;
   const pagesOf = (slug) => sectionFor(slug)?.pages ?? [];
+  const isComponentsSection = (slug) => sectionFor(slug)?.unit === 'components';
 
   const sources = SOURCES.map((source) => ({
     ...source,
     pages: collectPages(docsRoot, source),
   }));
   assertOneSourcePerRoute(sources);
+  assertNoWrittenComponentPages(sources);
   const keysOnDisk = sources.flatMap((source) => [...source.pages.keys()]);
 
   /** Registry order first, then slugs that exist only on disk, in slug order. */
@@ -415,32 +352,10 @@ export async function buildPageManifest(docsRoot, formatOptions) {
       slug,
       label: entry?.label ?? humanize(slug),
     };
-    if (entry?.components?.length) {
-      base.components = entry.components;
-    }
-    if (entry?.nested?.length) {
-      base.nested = entry.nested;
-    }
 
     const source = sources.find((candidate) => candidate.pages.has(key));
-    const isComponentPage =
-      sectionSlug === COMPONENTS_SECTION && !entry?.components?.length;
-    const rendersExamples = isComponentPage && source !== undefined;
-    if (entry?.examples?.length && !rendersExamples) {
-      throw new Error(
-        `${key} has registry \`examples\`, but only a written component page under ${COMPONENTS_SECTION}/ renders examples — drop the list.`
-      );
-    }
-    if (rendersExamples) {
-      base.examples = entry?.examples ?? [];
-      assertExamplesExist(docsRoot, key, slug, base.examples);
-    }
-
     if (source) {
       const file = source.pages.get(key);
-      if (isComponentPage) {
-        assertComponentPageIsOneLineMdx(docsRoot, source.kind, file, slug);
-      }
       if (entry?.wireframe) {
         throw new Error(
           `${key} is written at ${file}, so its registry wireframe can never render — drop the \`wireframe\` from its registry entry.`
@@ -463,13 +378,24 @@ export async function buildPageManifest(docsRoot, formatOptions) {
     };
   }
 
+  function buildComponentPage(slug) {
+    return {
+      page: {
+        route: `/${COMPONENTS_SECTION}/${slug}`,
+        slug,
+        label: componentLabel(slug),
+        kind: 'generated',
+      },
+    };
+  }
+
   function orderedEntries(sectionSlug) {
-    const entries = orderedSlugs(sectionSlug).map((slug) =>
+    if (isComponentsSection(sectionSlug)) {
+      return byLabel(exportedComponentSlugs().map(buildComponentPage));
+    }
+    return orderedSlugs(sectionSlug).map((slug) =>
       buildPage(sectionSlug, slug)
     );
-    return sectionSlug === COMPONENTS_SECTION
-      ? byGroupThenComponentLabel(entries)
-      : entries;
   }
 
   /** Sections that exist only on disk, appended after the registry's own. */
@@ -495,8 +421,6 @@ export async function buildPageManifest(docsRoot, formatOptions) {
     pages: section.entries.map((entry) => entry.page),
   }));
   manifest.forEach(assertLabelsAvoidTheCardJoiner);
-  manifest.forEach(assertComponentsDeclareTheirUnit);
-  manifest.forEach(assertRailLabelsHaveNoPage);
 
   const entries = built.flatMap((section) => section.entries);
   const loaders = [];

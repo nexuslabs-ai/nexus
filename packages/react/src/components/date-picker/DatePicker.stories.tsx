@@ -1,7 +1,7 @@
 import * as React from 'react';
 import type { DateRange } from 'react-day-picker';
 
-import type { Meta, StoryObj } from '@storybook/react';
+import type { Decorator, Meta, StoryObj } from '@storybook/react';
 import { IconClock } from '@tabler/icons-react';
 import { expect, userEvent, waitFor, within } from 'storybook/test';
 
@@ -56,24 +56,19 @@ const PRESETS = [
   { label: 'In 2 weeks', days: 14 },
 ];
 
+// The grid is a borderless primitive built to sit inside a Card or Popover: it
+// goes transparent in `[data-slot=card-content]`, so the Card is its surface.
+const inCard: Decorator = (Story) => (
+  <Card className="nx:w-fit">
+    <CardContent className="nx:p-0">
+      <Story />
+    </CardContent>
+  </Card>
+);
+
 const meta: Meta<typeof DatePicker> = {
   title: 'Components/DatePicker',
   component: DatePicker,
-  // The grid is a borderless primitive built to sit inside a Card/Popover — it
-  // goes transparent via `in-data-[slot=card-content]`, so the Card supplies the
-  // surface. WithPresets opts out (`parameters.inCard: false`) with its own Card.
-  decorators: [
-    (Story, context) =>
-      context.parameters?.inCard === false ? (
-        <Story />
-      ) : (
-        <Card className="nx:w-fit">
-          <CardContent className="nx:p-0">
-            <Story />
-          </CardContent>
-        </Card>
-      ),
-  ],
   argTypes: {
     cellSize: {
       control: 'select',
@@ -149,6 +144,7 @@ type Story = StoryObj<typeof DatePicker>;
 
 // Playground story for Storybook Controls.
 export const Controls: Story = {
+  decorators: [inCard],
   args: {
     mode: 'single',
     defaultMonth: REFERENCE_MONTH,
@@ -166,6 +162,8 @@ export const Controls: Story = {
 
 // Single-date selection — the default mode.
 export const Default: Story = {
+  tags: ['docs'],
+  decorators: [inCard],
   render: () => (
     <DatePicker
       mode="single"
@@ -196,8 +194,9 @@ export const Default: Story = {
   },
 };
 
-// Today uses the Figma red inner-circle treatment.
+// Today renders an `error-background` inner circle with `error-foreground` text.
 export const Today: Story = {
+  decorators: [inCard],
   render: () => (
     <DatePicker
       mode="single"
@@ -216,6 +215,7 @@ export const Today: Story = {
 
 // Large cells use the `large` preset (spacing-12, 48px under the default mode).
 export const LargeCells: Story = {
+  decorators: [inCard],
   render: () => (
     <DatePicker
       mode="single"
@@ -244,6 +244,7 @@ export const LargeCells: Story = {
 // Secondary content inside the native day button via renderDayContent; the
 // `xlarge` preset gives the extra row room.
 export const CustomDayContent: Story = {
+  decorators: [inCard],
   render: () => (
     <DatePicker
       mode="single"
@@ -280,6 +281,8 @@ export const CustomDayContent: Story = {
 
 // Range selection — the connected rail spans start → middle → end.
 export const Range: Story = {
+  tags: ['docs'],
+  decorators: [inCard],
   render: () => (
     <DatePicker
       mode="range"
@@ -292,7 +295,6 @@ export const Range: Story = {
 // Range hover-preview: while a range is half-selected, hovering paints a
 // tentative rail (the `preview` modifier) from the start to the hovered day.
 export const RangeHoverPreview: Story = {
-  parameters: { inCard: false },
   render: function RangeHoverPreviewStory() {
     const [range, setRange] = React.useState<DateRange | undefined>({
       from: new Date(2025, 0, 8),
@@ -343,6 +345,8 @@ export const RangeHoverPreview: Story = {
 
 // Multiple discrete dates.
 export const Multiple: Story = {
+  tags: ['docs'],
+  decorators: [inCard],
   render: () => (
     <DatePicker
       mode="multiple"
@@ -358,6 +362,7 @@ export const Multiple: Story = {
 
 // Adjacent multiple dates remain discrete fixed-size selections, not a range rail.
 export const MultipleAdjacent: Story = {
+  decorators: [inCard],
   render: () => (
     <DatePicker
       mode="multiple"
@@ -398,6 +403,8 @@ export const MultipleAdjacent: Story = {
 
 // Month / year dropdown caption instead of the static label.
 export const DropdownCaption: Story = {
+  tags: ['docs'],
+  decorators: [inCard],
   render: () => (
     <DatePicker
       mode="single"
@@ -410,6 +417,8 @@ export const DropdownCaption: Story = {
 
 // Specific days disabled — dimmed and non-interactive.
 export const DisabledDays: Story = {
+  tags: ['docs'],
+  decorators: [inCard],
   render: () => (
     <DatePicker
       mode="single"
@@ -435,6 +444,7 @@ export const DisabledDays: Story = {
 // disabled. `unavailable` styles the cell; pair it with `disabled` to also block
 // selection (Spectrum's unavailable-vs-disabled distinction).
 export const UnavailableDays: Story = {
+  decorators: [inCard],
   render: () => {
     const booked = [new Date(2025, 0, 20), new Date(2025, 0, 21)];
     return (
@@ -458,10 +468,11 @@ export const UnavailableDays: Story = {
   },
 };
 
-// First day of week — Monday-first (matches the Figma reference). Pass a date-fns
+// First day of week — Monday-first. Pass a date-fns
 // `locale` instead to derive both the first day and weekday names per region.
 // (Weekday label format itself is locale/formatter-driven and out of scope here.)
 export const WeekStartsMonday: Story = {
+  decorators: [inCard],
   render: () => (
     <DatePicker
       mode="single"
@@ -481,6 +492,7 @@ export const WeekStartsMonday: Story = {
 
 // Week numbers exercise the dedicated week-number typography path.
 export const WeekNumbers: Story = {
+  decorators: [inCard],
   render: () => (
     <DatePicker
       mode="single"
@@ -493,6 +505,7 @@ export const WeekNumbers: Story = {
 
 // Clicking a day selects it (data-selected-single flips true).
 export const ClickInteraction: Story = {
+  decorators: [inCard],
   render: () => <DatePicker mode="single" defaultMonth={REFERENCE_MONTH} />,
   play: async ({ canvasElement }) => {
     const canvas = within(canvasElement);
@@ -506,6 +519,7 @@ export const ClickInteraction: Story = {
 
 // Arrow keys move the roving focus across the day grid.
 export const KeyboardInteraction: Story = {
+  decorators: [inCard],
   render: () => <DatePicker mode="single" defaultMonth={REFERENCE_MONTH} />,
   play: async ({ canvasElement }) => {
     const canvas = within(canvasElement);
@@ -517,6 +531,7 @@ export const KeyboardInteraction: Story = {
 
 // data-slot identifies the root; each day button carries data-day.
 export const WithDataAttributes: Story = {
+  decorators: [inCard],
   render: () => <DatePicker mode="single" defaultMonth={REFERENCE_MONTH} />,
   play: async ({ canvasElement }) => {
     await expect(
@@ -538,7 +553,6 @@ export const WithDataAttributes: Story = {
 // "Today" / "selected" status, and renders `footer` in an aria-live region so the
 // current selection is announced (additive to rdp's month-change announcement).
 export const Accessibility: Story = {
-  parameters: { inCard: false },
   render: function AccessibilityStory() {
     const [date, setDate] = React.useState<Date | undefined>(
       new Date(2025, 0, 15)
@@ -586,7 +600,7 @@ export const Accessibility: Story = {
 // pattern). The grid goes transparent inside CardContent via its
 // `in-data-[slot=card-content]` hook, so the Card supplies the surface.
 export const WithPresets: Story = {
-  parameters: { inCard: false },
+  tags: ['docs'],
   render: function WithPresetsStory() {
     const [date, setDate] = React.useState<Date | undefined>(REFERENCE_TODAY);
     const [month, setMonth] = React.useState<Date>(REFERENCE_MONTH);
@@ -630,7 +644,6 @@ export const WithPresets: Story = {
 // CalendarWithTime). The time fields use Field + InputGroup with a trailing
 // clock addon; the consumer supplies the icon (here from @tabler/icons-react).
 export const WithTime: Story = {
-  parameters: { inCard: false },
   render: function WithTimeStory() {
     const [date, setDate] = React.useState<Date | undefined>(
       new Date(2025, 0, 12)
@@ -692,6 +705,7 @@ export const WithTime: Story = {
 // Single (today border + a selected day) beside a range (the connected rail).
 // Reused by the per-base variant generator across 5 bases × 2 themes.
 export const AllVariants: Story = {
+  decorators: [inCard],
   render: () => (
     <div className="nx:flex nx:flex-wrap nx:gap-2">
       <DatePicker

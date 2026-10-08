@@ -12,7 +12,10 @@ export function NexusAppearanceSettingRow({
   children,
 }: NexusAppearanceSettingRowProps) {
   return (
-    <div className="nx:flex nx:flex-wrap nx:items-center nx:justify-between nx:gap-4 nx:py-3">
+    <div
+      data-slot="appearance-setting-row"
+      className="nx:flex nx:flex-wrap nx:items-center nx:justify-between nx:gap-4 nx:py-3"
+    >
       <div className="nx:min-w-44 nx:space-y-0.5">
         <span className="nx:typography-label-default nx:text-foreground">
           {label}

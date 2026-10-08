@@ -13,17 +13,30 @@ type Story = StoryObj<typeof Spinner>;
 
 // The default spinner — a 16px glyph rotating in the current text color.
 export const Default: Story = {
+  tags: ['docs'],
   render: () => <Spinner />,
 };
 
 // Sized with nx:size-* utilities; the glyph inherits currentColor, so it tints
 // with nx:text-*.
 export const Sizes: Story = {
+  tags: ['docs'],
   render: () => (
     <div className="nx:flex nx:items-center nx:gap-4 nx:text-foreground">
       <Spinner className="nx:size-4" />
       <Spinner className="nx:size-6" />
       <Spinner className="nx:size-8 nx:text-primary-subtle-foreground" />
+    </div>
+  ),
+};
+
+// Beside the text it describes; a loading Button uses its own `loading` prop.
+export const WithText: Story = {
+  tags: ['docs'],
+  render: () => (
+    <div className="nx:flex nx:items-center nx:gap-2 nx:typography-body-default nx:text-muted-foreground">
+      <Spinner className="nx:size-4" />
+      Loading results…
     </div>
   ),
 };

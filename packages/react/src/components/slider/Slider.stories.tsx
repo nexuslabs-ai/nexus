@@ -85,6 +85,7 @@ function formatQualityValue(value: number) {
 
 // A single-value segmented slider with a caret thumb.
 export const Default: Story = {
+  tags: ['docs'],
   render: () => (
     <Slider defaultValue={[50]} max={100} step={1} aria-label="Volume" />
   ),
@@ -112,6 +113,7 @@ export const BareDefault: Story = {
 
 // A Fluid-inspired row with a larger segmented control surface.
 export const Comfortable: Story = {
+  tags: ['docs'],
   render: () => (
     <Slider
       size="comfortable"
@@ -125,6 +127,7 @@ export const Comfortable: Story = {
 
 // Reference-style control rows with inline label and value text.
 export const ControlRows: Story = {
+  tags: ['docs'],
   render: () => (
     <div className="nx:grid nx:w-full nx:gap-6">
       <SliderControlRow
@@ -165,6 +168,7 @@ export const ControlRows: Story = {
 
 // Two thumbs define a range.
 export const Range: Story = {
+  tags: ['docs'],
   render: () => (
     <Slider
       defaultValue={[25, 75]}
@@ -191,6 +195,7 @@ export const Range: Story = {
 
 // Larger step increments snap the thumb.
 export const Steps: Story = {
+  tags: ['docs'],
   render: () => (
     <Slider defaultValue={[40]} max={100} step={10} aria-label="Brightness" />
   ),
@@ -232,6 +237,7 @@ export const ExplicitMarkers: Story = {
 
 // Vertical orientation.
 export const Vertical: Story = {
+  tags: ['docs'],
   render: () => (
     <div className="nx:flex nx:h-48 nx:justify-center">
       <Slider
@@ -565,6 +571,7 @@ export const KeyboardInteraction: Story = {
 
 // A disabled slider does not respond to interaction.
 export const Disabled: Story = {
+  tags: ['docs'],
   render: () => (
     <Slider disabled defaultValue={[50]} max={100} aria-label="Volume" />
   ),

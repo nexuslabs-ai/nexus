@@ -17,14 +17,68 @@ export default meta;
 type Story = StoryObj<typeof Toaster>;
 
 export const Default: Story = {
-  render: () => (
-    <>
-      <Button variant="outline" onClick={() => toast('Event has been created')}>
-        Show toast
-      </Button>
-      <Toaster />
-    </>
-  ),
+  tags: ['docs'],
+  render: () => {
+    const showUndoToast = () =>
+      toast('File deleted', {
+        action: { label: 'Undo', onClick: () => toast('File restored') },
+      });
+    const showPromiseToast = () =>
+      toast.promise(
+        new Promise<void>((resolve) => {
+          setTimeout(resolve, 1500);
+        }),
+        {
+          loading: 'Saving…',
+          success: 'Settings saved',
+          error: 'Could not save',
+        }
+      );
+
+    return (
+      <>
+        <div className="nx:flex nx:flex-wrap nx:gap-2">
+          <Button
+            variant="outline"
+            onClick={() => toast('Event has been created')}
+          >
+            Default
+          </Button>
+          <Button
+            variant="outline"
+            onClick={() => toast.success('Changes saved')}
+          >
+            Success
+          </Button>
+          <Button
+            variant="outline"
+            onClick={() => toast.error('Something went wrong')}
+          >
+            Error
+          </Button>
+          <Button
+            variant="outline"
+            onClick={() => toast.warning('Your session is about to expire')}
+          >
+            Warning
+          </Button>
+          <Button
+            variant="outline"
+            onClick={() => toast.info('A new version is available')}
+          >
+            Info
+          </Button>
+          <Button variant="outline" onClick={showUndoToast}>
+            With action
+          </Button>
+          <Button variant="outline" onClick={showPromiseToast}>
+            Promise
+          </Button>
+        </div>
+        <Toaster richColors />
+      </>
+    );
+  },
 };
 
 export const Success: Story = {
