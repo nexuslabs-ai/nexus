@@ -17,4 +17,14 @@ const ButtonGroupSizeContext = React.createContext<ButtonGroupSize | undefined>(
   undefined
 );
 
-export { type ButtonGroupSize, ButtonGroupSizeContext };
+/**
+ * True inside a ButtonGroup. Its members share borders, so a Button there skips
+ * press compression to keep the seams joined.
+ */
+const ButtonGroupJoinedContext = React.createContext(false);
+
+export {
+  ButtonGroupJoinedContext,
+  type ButtonGroupSize,
+  ButtonGroupSizeContext,
+};

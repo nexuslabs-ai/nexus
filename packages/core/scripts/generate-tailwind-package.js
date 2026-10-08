@@ -664,7 +664,7 @@ export async function generateTailwindPackage(
   );
   const iconUtilities = iconTokens.map(({ path: tokenPath }) => {
     const key = tokenPath.join('-');
-    return `@utility size-icon-${tokenPath.at(-1)} {
+    return `@utility size-icon-${key} {
   width: var(--nx-icon-${key});
   height: var(--nx-icon-${key});
 }`;

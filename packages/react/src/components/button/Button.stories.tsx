@@ -1,3 +1,5 @@
+import type { FormEvent } from 'react';
+
 import { DEFAULT_NEXUS_APPEARANCE } from '@nexus_ds/core';
 import {
   Canvas,
@@ -13,6 +15,12 @@ import { expectNativePress } from '../../stories/support/native-press';
 import { expectHeightPinned } from '../../stories/support/story-height-test-utils';
 import { NexusRoot } from '../appearance/provider';
 import { ButtonGroup } from '../button-group';
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from '../dropdown-menu';
 
 import { Button } from './button';
 
@@ -398,7 +406,7 @@ export const SizePairs: Story = {
         2
       );
       await expect(icon).toHaveAccessibleName();
-      await expect(loading).toBeDisabled();
+      await expect(loading).toHaveAttribute('aria-disabled', 'true');
     }
   },
 };
@@ -440,8 +448,9 @@ export const Loading: Story = {
       '[data-slot="button-loading-label"]'
     );
 
-    // Loading button should be disabled
-    await expect(button).toBeDisabled();
+    // Loading stays focusable; the capture guard blocks activation.
+    await expect(button).not.toBeDisabled();
+    await expect(button).not.toHaveAttribute('data-disabled');
     await expect(button).toHaveAttribute('aria-busy', 'true');
     await expect(button).toHaveAttribute('aria-disabled', 'true');
     await expect(button).toHaveAttribute('data-loading', 'true');
@@ -453,7 +462,11 @@ export const Loading: Story = {
     await expect(loadingLabel).toHaveTextContent('Submitting');
     await expect(button).toHaveAccessibleName('Submitting');
 
-    // Click should not trigger onClick
+    button.focus();
+    await expect(button).toHaveFocus();
+    await userEvent.keyboard('{Enter}');
+    await userEvent.keyboard(' ');
+    button.click();
     await expect(args.onClick).not.toHaveBeenCalled();
   },
 };
@@ -894,10 +907,9 @@ export const DisabledAsLink: Story = {
     await expect(link).toHaveAttribute('aria-disabled', 'true');
     await expect(link).toHaveAttribute('tabindex', '-1');
     await expect(link).toHaveClass('nx:aria-disabled:pointer-events-none');
-    await expect(link).toHaveClass('nx:aria-disabled:opacity-100');
-    await expect(link).toHaveClass(
-      'nx:aria-disabled:not-data-[loading=true]:bg-disabled'
-    );
+    await expect(getComputedStyle(link).opacity).toBe('1');
+    await expect(link).toHaveAttribute('data-disabled', 'true');
+    await expect(link).toHaveClass('nx:data-disabled:bg-disabled');
     const initialHash = window.location.hash;
     link.click();
     link.focus();
@@ -962,7 +974,7 @@ export const LoadingUsesSpinnerOnly: Story = {
       '[data-slot="button-loading-label"]'
     );
 
-    await expect(button).toBeDisabled();
+    await expect(button).toHaveAttribute('aria-disabled', 'true');
     await expect(button).toHaveAttribute('aria-busy', 'true');
     await expect(
       button.querySelector('[data-slot="button-start-icon"]')
@@ -1224,7 +1236,7 @@ export const DisabledAndLoadingThemes: Story = {
           )
         );
         await expect(disabled).toBeDisabled();
-        await expect(loading).toBeDisabled();
+        await expect(loading).toHaveAttribute('aria-disabled', 'true');
         await expect(loading).toHaveAttribute('aria-busy', 'true');
         await expect(loading).toHaveAccessibleName('Save changes');
         await expect(getComputedStyle(disabled).color).toBe(reference.color);
@@ -1319,7 +1331,7 @@ export const LoadingPreservesIconWidth: Story = {
       const [ready, loading] = within(row).getAllByRole('button');
       await expect(loading!.offsetWidth).toBe(ready!.offsetWidth);
       await expect(loading!.offsetHeight).toBe(ready!.offsetHeight);
-      await expect(loading!).toBeDisabled();
+      await expect(loading!).toHaveAttribute('aria-disabled', 'true');
       await expect(
         loading!.querySelector('[data-slot="spinner"]')
       ).toBeVisible();
@@ -1453,6 +1465,73 @@ export const AriaDisabledActivation: Story = {
     button.click();
     await expect(args.onClick).not.toHaveBeenCalled();
     await expect(args.onClickCapture).not.toHaveBeenCalled();
+  },
+};
+
+const loadingSubmit = fn((event: FormEvent) => event.preventDefault());
+
+// Loading no longer sets native `disabled`, so the capture guard alone must stop
+// implicit submission (Enter in a field clicks the form's default button).
+export const LoadingBlocksFormSubmit: Story = {
+  tags: ['!autodocs', '!dev'],
+  render: () => (
+    <form onSubmit={loadingSubmit} className="nx:flex nx:gap-2">
+      <input aria-label="Email" className="nx:border-default" />
+      <Button type="submit" loading>
+        Subscribe
+      </Button>
+    </form>
+  ),
+  play: async ({ canvasElement }) => {
+    loadingSubmit.mockClear();
+    const canvas = within(canvasElement);
+    await userEvent.type(canvas.getByRole('textbox'), 'a@b.co{Enter}');
+    canvas.getByRole('button', { name: 'Subscribe' }).click();
+    await expect(loadingSubmit).not.toHaveBeenCalled();
+  },
+};
+
+// Radix opens a menu on keydown, before any click, so only the keydown guard
+// keeps an aria-disabled trigger closed.
+export const AriaDisabledMenuTrigger: Story = {
+  tags: ['!autodocs', '!dev'],
+  render: () => (
+    <DropdownMenu>
+      <DropdownMenuTrigger asChild>
+        <Button aria-disabled>Export</Button>
+      </DropdownMenuTrigger>
+      <DropdownMenuContent>
+        <DropdownMenuItem>CSV</DropdownMenuItem>
+      </DropdownMenuContent>
+    </DropdownMenu>
+  ),
+  play: async ({ canvasElement }) => {
+    const trigger = within(canvasElement).getByRole('button', {
+      name: 'Export',
+    });
+    trigger.focus();
+    await userEvent.keyboard('{Enter}');
+    await userEvent.keyboard(' ');
+    await expect(trigger).toHaveAttribute('aria-expanded', 'false');
+    await expect(
+      within(document.body).queryByRole('menuitem', { name: 'CSV' })
+    ).not.toBeInTheDocument();
+  },
+};
+
+export const AsChildIgnoresLoading: Story = {
+  tags: ['!autodocs', '!dev'],
+  render: () => (
+    <Button asChild loading>
+      <a href="#as-child-loading">Open docs</a>
+    </Button>
+  ),
+  play: async ({ canvasElement }) => {
+    const link = within(canvasElement).getByRole('link', { name: 'Open docs' });
+    await expect(link).not.toHaveAttribute('data-loading');
+    await expect(link).not.toHaveAttribute('aria-busy');
+    await expect(link).not.toHaveAttribute('aria-disabled');
+    await expect(link).not.toHaveAttribute('tabindex');
   },
 };
 

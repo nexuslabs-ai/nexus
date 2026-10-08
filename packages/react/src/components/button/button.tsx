@@ -6,42 +6,48 @@ import { Slot } from '@radix-ui/react-slot';
 import { cva, type VariantProps } from 'class-variance-authority';
 
 import { cn } from '../../lib/utils';
-import { ButtonGroupSizeContext } from '../button-group/button-group-context';
+import {
+  ButtonGroupJoinedContext,
+  ButtonGroupSizeContext,
+} from '../button-group/button-group-context';
 import { Spinner } from '../spinner';
 
+import { ButtonVariantContext } from './button-variant-context';
+
 const buttonVariants = cva(
-  'nx:inline-flex nx:box-border nx:cursor-pointer nx:items-center nx:justify-center nx:rounded-base nx:border-default nx:border-transparent nx:whitespace-nowrap nx:transition-[color,background-color,border-color,scale] nx:duration-faster nx:ease-enter nx:scale-100 nx:active:scale-98 nx:disabled:active:scale-100 nx:aria-disabled:active:scale-100 nx:focus-visible:outline-2 nx:focus-visible:outline-focus-default nx:focus-visible:outline-offset-2 nx:disabled:pointer-events-none nx:disabled:cursor-default nx:disabled:opacity-100 nx:aria-disabled:pointer-events-none nx:aria-disabled:cursor-default nx:aria-disabled:opacity-100 nx:[&_svg]:pointer-events-none nx:[&_svg]:shrink-0',
+  'nx:inline-flex nx:box-border nx:cursor-pointer nx:items-center nx:justify-center nx:rounded-base nx:border-default nx:border-transparent nx:whitespace-nowrap nx:transition-[color,background-color,border-color,scale] nx:duration-faster nx:ease-enter nx:active:scale-98 nx:focus-visible:outline-2 nx:focus-visible:outline-focus-default nx:focus-visible:outline-offset-2 nx:aria-disabled:pointer-events-none nx:aria-disabled:cursor-default nx:data-disabled:text-disabled-foreground nx:[&_svg]:pointer-events-none nx:[&_svg]:shrink-0',
   {
     variants: {
       variant: {
         default:
-          'nx:bg-primary-background nx:text-primary-foreground nx:hover:bg-primary-background-hover nx:active:bg-primary-background-active nx:disabled:not-data-[loading=true]:bg-disabled nx:disabled:not-data-[loading=true]:text-disabled-foreground nx:aria-disabled:not-data-[loading=true]:bg-disabled nx:aria-disabled:not-data-[loading=true]:text-disabled-foreground',
+          'nx:bg-primary-background nx:text-primary-foreground nx:hover:bg-primary-background-hover nx:active:bg-primary-background-active nx:data-disabled:bg-disabled',
         error:
-          'nx:text-error-subtle-foreground nx:hover:bg-error-subtle-hover nx:active:bg-error-subtle-active nx:disabled:not-data-[loading=true]:text-disabled-foreground nx:aria-disabled:not-data-[loading=true]:text-disabled-foreground',
+          'nx:text-error-subtle-foreground nx:hover:bg-error-subtle-hover nx:active:bg-error-subtle-active',
         'error-outline':
-          'nx:border-current nx:bg-container nx:text-error-subtle-foreground nx:hover:bg-error-subtle-hover nx:active:bg-error-subtle-active nx:disabled:not-data-[loading=true]:border-border-disabled nx:disabled:not-data-[loading=true]:bg-disabled nx:disabled:not-data-[loading=true]:text-disabled-foreground nx:aria-disabled:not-data-[loading=true]:border-border-disabled nx:aria-disabled:not-data-[loading=true]:bg-disabled nx:aria-disabled:not-data-[loading=true]:text-disabled-foreground',
+          'nx:border-current nx:bg-container nx:text-error-subtle-foreground nx:hover:bg-error-subtle-hover nx:active:bg-error-subtle-active nx:data-disabled:border-border-disabled nx:data-disabled:bg-disabled',
         destructive:
-          'nx:bg-error-background nx:text-error-foreground nx:hover:bg-error-background-hover nx:active:bg-error-background-active nx:disabled:not-data-[loading=true]:bg-disabled nx:disabled:not-data-[loading=true]:text-disabled-foreground nx:aria-disabled:not-data-[loading=true]:bg-disabled nx:aria-disabled:not-data-[loading=true]:text-disabled-foreground',
+          'nx:bg-error-background nx:text-error-foreground nx:hover:bg-error-background-hover nx:active:bg-error-background-active nx:data-disabled:bg-disabled',
         outline:
-          'nx:border-default nx:border-border-default nx:bg-container nx:text-foreground nx:hover:bg-container-hover nx:active:bg-container-active nx:disabled:not-data-[loading=true]:border-border-disabled nx:disabled:not-data-[loading=true]:bg-disabled nx:disabled:not-data-[loading=true]:text-disabled-foreground nx:aria-disabled:not-data-[loading=true]:border-border-disabled nx:aria-disabled:not-data-[loading=true]:bg-disabled nx:aria-disabled:not-data-[loading=true]:text-disabled-foreground',
+          'nx:border-default nx:border-border-default nx:bg-container nx:text-foreground nx:hover:bg-container-hover nx:active:bg-container-active nx:data-disabled:border-border-disabled nx:data-disabled:bg-disabled',
         dashed:
-          'nx:border-default nx:border-dashed nx:border-border-default nx:bg-container nx:text-foreground nx:hover:bg-container-hover nx:active:bg-container-active nx:disabled:not-data-[loading=true]:border-border-disabled nx:disabled:not-data-[loading=true]:bg-disabled nx:disabled:not-data-[loading=true]:text-disabled-foreground nx:aria-disabled:not-data-[loading=true]:border-border-disabled nx:aria-disabled:not-data-[loading=true]:bg-disabled nx:aria-disabled:not-data-[loading=true]:text-disabled-foreground',
+          'nx:border-default nx:border-dashed nx:border-border-default nx:bg-container nx:text-foreground nx:hover:bg-container-hover nx:active:bg-container-active nx:data-disabled:border-border-disabled nx:data-disabled:bg-disabled',
         secondary:
-          'nx:bg-secondary-background nx:text-secondary-foreground nx:hover:bg-secondary-background-hover nx:active:bg-secondary-background-active nx:disabled:not-data-[loading=true]:bg-disabled nx:disabled:not-data-[loading=true]:text-disabled-foreground nx:aria-disabled:not-data-[loading=true]:bg-disabled nx:aria-disabled:not-data-[loading=true]:text-disabled-foreground',
+          'nx:bg-secondary-background nx:text-secondary-foreground nx:hover:bg-secondary-background-hover nx:active:bg-secondary-background-active nx:data-disabled:bg-disabled',
         ghost:
-          'nx:text-foreground nx:hover:bg-container-hover nx:active:bg-container-active nx:disabled:not-data-[loading=true]:text-disabled-foreground nx:aria-disabled:not-data-[loading=true]:text-disabled-foreground',
-        link: 'nx:border-0 nx:text-primary-subtle-foreground nx:underline-offset-4 nx:hover:underline nx:disabled:not-data-[loading=true]:text-disabled-foreground nx:aria-disabled:not-data-[loading=true]:text-disabled-foreground',
+          'nx:text-foreground nx:hover:bg-container-hover nx:active:bg-container-active',
+        link: 'nx:border-0 nx:text-primary-subtle-foreground nx:underline-offset-4 nx:hover:underline',
       },
       size: {
-        xs: 'nx:h-7 nx:px-2 nx:gap-1 nx:typography-label-small nx:[&_svg]:size-icon-xs',
-        sm: 'nx:h-8 nx:px-2.5 nx:gap-2 nx:typography-label-compact nx:[&_svg]:size-icon-sm',
+        xs: 'nx:h-7 nx:px-2 nx:gap-1 nx:typography-label-small nx:[&_svg]:size-icon-glyph-xs',
+        sm: 'nx:h-8 nx:px-2.5 nx:gap-2 nx:typography-label-compact nx:[&_svg]:size-icon-glyph-sm',
         default:
-          'nx:h-10 nx:px-3 nx:gap-2 nx:typography-label-default nx:[&_svg]:size-icon-default',
-        lg: 'nx:h-12 nx:px-3.5 nx:gap-2 nx:typography-label-default nx:[&_svg]:size-icon-default',
-        'icon-xs': 'nx:size-7 nx:gap-0 nx:p-0 nx:[&_svg]:size-icon-xs',
-        'icon-sm': 'nx:size-8 nx:gap-0 nx:p-0 nx:[&_svg]:size-icon-sm',
-        icon: 'nx:size-10 nx:gap-0 nx:p-0 nx:[&_svg]:size-icon-default',
-        'icon-lg': 'nx:size-12 nx:gap-0 nx:p-0 nx:[&_svg]:size-icon-default',
+          'nx:h-10 nx:px-3 nx:gap-2 nx:typography-label-default nx:[&_svg]:size-icon-glyph-default',
+        lg: 'nx:h-12 nx:px-3.5 nx:gap-2 nx:typography-label-default nx:[&_svg]:size-icon-glyph-default',
+        'icon-xs': 'nx:size-7 nx:gap-0 nx:p-0 nx:[&_svg]:size-icon-glyph-xs',
+        'icon-sm': 'nx:size-8 nx:gap-0 nx:p-0 nx:[&_svg]:size-icon-glyph-sm',
+        icon: 'nx:size-10 nx:gap-0 nx:p-0 nx:[&_svg]:size-icon-glyph-default',
+        'icon-lg':
+          'nx:size-12 nx:gap-0 nx:p-0 nx:[&_svg]:size-icon-glyph-default',
       },
     },
     compoundVariants: [
@@ -87,9 +93,9 @@ interface ButtonProps
   asChild?: boolean;
 
   /**
-   * Shows a loading indicator and blocks interaction while retaining the variant colours.
-   * While loading, the
-   * spinner replaces all visible content and any icon slots are hidden.
+   * Shows a spinner in place of the visible content and blocks activation
+   * while keeping the variant colours, focus and accessible name. Ignored
+   * with `asChild`.
    * @default false
    * @example
    * ```tsx
@@ -187,16 +193,21 @@ function preventKeyboardActivation(event: React.KeyboardEvent) {
   if (event.key === 'Enter' || event.key === ' ') preventActivation(event);
 }
 
+const activationGuards = {
+  onClickCapture: preventActivation,
+  onKeyDownCapture: preventKeyboardActivation,
+};
+
 /**
  * Native `<button>` by default. With `asChild`, the consumer's element renders
- * through Radix `Slot` with button styling and its own content untouched. A
- * non-button element ignores native `disabled`, so the disabled state there is
- * guarded during event capture, before child activation handlers can run.
+ * through Radix `Slot` with button styling and its own content untouched.
+ * Disabled, `aria-disabled` and loading buttons block activation during event
+ * capture, before the element's or a wrapping trigger's handlers run.
  */
 function Button({
   asChild = false,
   className,
-  variant = 'default',
+  variant,
   size,
   loading = false,
   disabled,
@@ -212,33 +223,45 @@ function Button({
   // Inherit the enclosing ButtonGroup's size when no explicit size is set, so a
   // Button nested inside a trigger wrapper (a split button) still picks it up.
   const groupSize = React.useContext(ButtonGroupSizeContext);
+  const joined = React.useContext(ButtonGroupJoinedContext);
+  const contextVariant = React.useContext(ButtonVariantContext);
   const semanticSize = size ?? groupSize ?? 'default';
-  const isDisabled = disabled || loading;
-  const blocked =
-    isDisabled || ariaDisabled === true || ariaDisabled === 'true';
-  const iconOnly = isIconButtonSize(semanticSize);
+  const semanticVariant = variant ?? contextVariant ?? 'default';
+  const slotted =
+    asChild &&
+    React.isValidElement<React.HTMLAttributes<HTMLElement>>(children);
+  const busy = loading && !slotted;
+  const unavailable =
+    disabled || ariaDisabled === true || ariaDisabled === 'true';
+  const blocked = unavailable || busy;
 
   const sharedProps = {
     'data-slot': 'button',
-    'data-variant': variant,
+    'data-variant': semanticVariant,
     'data-size': semanticSize,
-    'data-icon-only': iconOnly || undefined,
-    'data-loading': loading || undefined,
-    className: cn(buttonVariants({ variant, size: semanticSize, className })),
-    'aria-busy': loading || ariaBusy || undefined,
-    'aria-disabled': isDisabled || ariaDisabled || undefined,
+    'data-icon-only': isIconButtonSize(semanticSize) || undefined,
+    'data-loading': busy || undefined,
+    className: cn(
+      buttonVariants({ variant: semanticVariant, size: semanticSize }),
+      joined && 'nx:active:scale-100',
+      className
+    ),
+    'aria-busy': busy || ariaBusy || undefined,
+    'aria-disabled': blocked || undefined,
+  };
+  // Spread after consumer props: a wrapping trigger can pass these keys as
+  // undefined, which must not clear the Button's own state.
+  const stateProps = {
+    'data-disabled': (unavailable && !busy) || undefined,
+    ...(blocked && activationGuards),
   };
 
-  if (
-    asChild &&
-    React.isValidElement<React.HTMLAttributes<HTMLElement>>(children)
-  ) {
+  if (slotted) {
+    // Slot runs the child's handlers before its own, so a blocked child loses
+    // its capture handlers rather than running ahead of the guard.
     const child = blocked
       ? React.cloneElement(children, {
-          'aria-disabled': true,
-          tabIndex: -1,
           onClickCapture: undefined,
-          onAuxClickCapture: undefined,
           onKeyDownCapture: undefined,
         })
       : children;
@@ -246,14 +269,8 @@ function Button({
       <Slot
         {...sharedProps}
         {...props}
+        {...stateProps}
         tabIndex={blocked ? -1 : tabIndex}
-        onClickCapture={blocked ? preventActivation : props.onClickCapture}
-        onAuxClickCapture={
-          blocked ? preventActivation : props.onAuxClickCapture
-        }
-        onKeyDownCapture={
-          blocked ? preventKeyboardActivation : props.onKeyDownCapture
-        }
       >
         {child}
       </Slot>
@@ -264,16 +281,12 @@ function Button({
     <button
       {...sharedProps}
       {...props}
+      {...stateProps}
       type={type}
-      disabled={isDisabled}
+      disabled={disabled}
       tabIndex={tabIndex}
-      onClickCapture={blocked ? preventActivation : props.onClickCapture}
-      onAuxClickCapture={blocked ? preventActivation : props.onAuxClickCapture}
-      onKeyDownCapture={
-        blocked ? preventKeyboardActivation : props.onKeyDownCapture
-      }
     >
-      <ButtonContent loading={loading} startIcon={startIcon} endIcon={endIcon}>
+      <ButtonContent loading={busy} startIcon={startIcon} endIcon={endIcon}>
         {children}
       </ButtonContent>
     </button>
