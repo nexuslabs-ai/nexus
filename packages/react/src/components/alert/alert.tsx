@@ -1,3 +1,5 @@
+'use client';
+
 import * as React from 'react';
 
 import { Slot } from '@radix-ui/react-slot';
@@ -5,60 +7,121 @@ import { cva, type VariantProps } from 'class-variance-authority';
 
 import { IconX } from '../../lib/icons';
 import { cn } from '../../lib/utils';
+import { Button } from '../button';
+import { ButtonSizeContext } from '../button/button-size-context';
+import { ButtonVariantContext } from '../button/button-variant-context';
 
-const alertVariants = cva('nx:group/alert nx:grid nx:w-full nx:px-6 nx:py-4', {
-  variants: {
-    variant: {
-      default: 'nx:border-border-default nx:bg-container nx:text-foreground',
-      destructive:
-        'nx:border-error-border nx:bg-error-subtle nx:text-error-subtle-foreground',
-      success:
-        'nx:border-success-border nx:bg-success-subtle nx:text-success-subtle-foreground',
-      information:
-        'nx:border-information-border nx:bg-information-subtle nx:text-information-subtle-foreground',
-      warning:
-        'nx:border-warning-border nx:bg-warning-subtle nx:text-warning-subtle-foreground',
+const alertVariants = cva(
+  'nx:group/alert nx:grid nx:w-full nx:grid-cols-[auto_minmax(0,1fr)_auto_auto] nx:px-5 nx:py-4',
+  {
+    variants: {
+      variant: {
+        default: 'nx:border-border-default nx:bg-container nx:text-foreground',
+        destructive:
+          'nx:border-error-border nx:bg-error-subtle nx:text-error-subtle-foreground',
+        success:
+          'nx:border-success-border nx:bg-success-subtle nx:text-success-subtle-foreground',
+        information:
+          'nx:border-information-border nx:bg-information-subtle nx:text-information-subtle-foreground',
+        warning:
+          'nx:border-warning-border nx:bg-warning-subtle nx:text-warning-subtle-foreground',
+      },
+      fill: {
+        light: '',
+        none: 'nx:bg-container',
+        solid: 'nx:border-transparent',
+      },
+      presentation: {
+        card: 'nx:rounded-md nx:border-default',
+        banner: 'nx:rounded-none nx:border-b-default',
+      },
+      layout: {
+        stack: 'nx:items-start',
+        inline: 'nx:@container/alert nx:items-center nx:gap-y-1',
+      },
     },
-    presentation: {
-      card: 'nx:rounded-md nx:border-default',
-      banner: 'nx:rounded-none nx:border-b-default',
+    compoundVariants: [
+      {
+        variant: 'default',
+        fill: 'solid',
+        className: 'nx:bg-secondary-background nx:text-secondary-foreground',
+      },
+      {
+        variant: 'destructive',
+        fill: 'solid',
+        className: 'nx:bg-error-background nx:text-error-foreground',
+      },
+      {
+        variant: 'success',
+        fill: 'solid',
+        className: 'nx:bg-success-background nx:text-success-foreground',
+      },
+      {
+        variant: 'information',
+        fill: 'solid',
+        className:
+          'nx:bg-information-background nx:text-information-foreground',
+      },
+      {
+        variant: 'warning',
+        fill: 'solid',
+        className: 'nx:bg-warning-background nx:text-warning-foreground',
+      },
+    ],
+    defaultVariants: {
+      fill: 'light',
+      variant: 'default',
+      presentation: 'card',
+      layout: 'stack',
     },
-    layout: {
-      stack:
-        'nx:grid-cols-[auto_minmax(0,1fr)] nx:items-start nx:has-[>[data-slot=alert-icon]]:gap-x-4 nx:*:data-[slot=alert-title]:col-start-2 nx:*:data-[slot=alert-description]:col-start-2 nx:*:data-[slot=alert-content]:col-start-2 nx:*:data-[slot=alert-actions]:col-start-2',
-      inline:
-        'nx:grid-cols-[minmax(0,1fr)_auto] nx:items-center nx:gap-x-4 nx:gap-y-1 nx:has-[>[data-slot=alert-icon]]:grid-cols-[auto_minmax(0,1fr)_auto]',
-    },
-  },
-  defaultVariants: {
-    variant: 'default',
-    presentation: 'card',
-    layout: 'stack',
-  },
-});
+  }
+);
+
+type AlertFill = NonNullable<VariantProps<typeof alertVariants>['fill']>;
 
 /**
  * AlertProps
  *
  * Props for the Alert component.
  */
-interface AlertProps
-  extends React.ComponentProps<'div'>, VariantProps<typeof alertVariants> {}
+type AlertProps = React.ComponentProps<'div'> &
+  Omit<VariantProps<typeof alertVariants>, 'fill'> &
+  (
+    | {
+        fill?: Exclude<AlertFill, 'solid'> | null;
+        /** Neutral title and description text on light and none fills. */
+        textTone?: 'status' | 'neutral';
+      }
+    | { fill: 'solid'; textTone?: never }
+  );
+
+const AlertFillContext = React.createContext<AlertFill>('light');
 
 /**
  * Alert
  *
  * Displays a callout for user attention with optional icon support.
  * Use for important messages, warnings, errors, or success confirmations.
+ *
+ * `fill` sets the surface independently of status: `light` (default) tints it
+ * with the status colour, `none` keeps the neutral container surface with a
+ * status border and text, and `solid` uses the status background with its
+ * paired foreground. The `default` variant has no tint, so its `light` and
+ * `none` fills match. `textTone="neutral"` keeps title and description in the
+ * normal foreground on light and none fills; solid takes no `textTone`.
+ *
  * Use `presentation="banner"` for the edge-to-edge banner treatment (squared
  * corners, bottom border only).
+ *
  * Use `layout="inline"` with `AlertContent` and `AlertActions` when the alert
- * has trailing controls.
- * In the default stack layout, use no actions or button actions only; avoid
- * rendering `AlertClose` below the message. Use `layout="inline"` for
- * dismissal controls.
- * Alerts are passive by default; pass `role="alert"` for urgent dynamic
- * messages or `role="status"` for polite status updates.
+ * has trailing controls. Below 32rem of its own width, inline actions move
+ * below the message. The inline alert measures its own width, so give it a
+ * definite one: it fills a block parent, but inside a shrink-to-fit parent
+ * (`inline-block`, `w-fit`, a non-growing flex item) set its width.
+ *
+ * `AlertClose` is a direct child of Alert and sits at the top end in either
+ * layout. Alerts are passive by default; pass `role="alert"` for urgent
+ * dynamic messages or `role="status"` for polite status updates.
  *
  * @example
  * ```tsx
@@ -87,22 +150,30 @@ interface AlertProps
 function Alert({
   className,
   variant,
+  fill,
+  textTone = 'status',
   presentation,
   layout,
   ...props
 }: AlertProps) {
+  const resolvedFill = fill ?? 'light';
+
   return (
-    <div
-      data-slot="alert"
-      data-variant={variant ?? 'default'}
-      data-presentation={presentation ?? 'card'}
-      data-layout={layout ?? 'stack'}
-      className={cn(
-        alertVariants({ variant, presentation, layout }),
-        className
-      )}
-      {...props}
-    />
+    <AlertFillContext.Provider value={resolvedFill}>
+      <div
+        data-slot="alert"
+        data-variant={variant ?? 'default'}
+        data-fill={resolvedFill}
+        data-text-tone={resolvedFill === 'solid' ? 'status' : textTone}
+        data-presentation={presentation ?? 'card'}
+        data-layout={layout ?? 'stack'}
+        className={cn(
+          alertVariants({ variant, fill: resolvedFill, presentation, layout }),
+          className
+        )}
+        {...props}
+      />
+    </AlertFillContext.Provider>
   );
 }
 
@@ -136,8 +207,9 @@ function AlertIcon({ className, ...props }: AlertIconProps) {
       data-slot="alert-icon"
       aria-hidden="true"
       className={cn(
-        'nx:flex nx:[&>svg]:size-4',
+        'nx:me-3 nx:flex nx:[&>svg]:size-4',
         'nx:group-data-[layout=stack]/alert:translate-y-0.5',
+        'nx:group-data-[layout=inline]/alert:group-has-[[data-slot=alert-title]]/alert:self-start nx:group-data-[layout=inline]/alert:group-has-[[data-slot=alert-title]]/alert:translate-y-0.5',
         className
       )}
       {...props}
@@ -156,7 +228,7 @@ interface AlertContentProps extends React.ComponentProps<'div'> {}
  * AlertContent
  *
  * Wraps alert title and description. Required in `layout="inline"` so the
- * content fills the first grid column beside `AlertActions`.
+ * title and description share one grid cell beside `AlertActions`.
  *
  * @example
  * ```tsx
@@ -170,7 +242,10 @@ function AlertContent({ className, ...props }: AlertContentProps) {
   return (
     <div
       data-slot="alert-content"
-      className={cn('nx:flex nx:min-w-0 nx:flex-col', className)}
+      className={cn(
+        'nx:col-start-2 nx:flex nx:min-w-0 nx:flex-col nx:wrap-anywhere',
+        className
+      )}
       {...props}
     />
   );
@@ -220,7 +295,7 @@ function AlertTitle({
     <Comp
       data-slot="alert-title"
       className={cn(
-        'nx:mb-1 nx:last:mb-0 nx:typography-label-default',
+        'nx:col-start-2 nx:mb-0.5 nx:last:mb-0 nx:typography-label-default nx:group-data-[text-tone=neutral]/alert:text-foreground',
         className
       )}
       {...props}
@@ -254,7 +329,7 @@ function AlertDescription({ className, ...props }: AlertDescriptionProps) {
     <div
       data-slot="alert-description"
       className={cn(
-        'nx:typography-body-default nx:group-data-[variant=default]/alert:text-muted-foreground',
+        'nx:col-start-2 nx:typography-body-default nx:group-data-[text-tone=status]/alert:group-data-[variant=default]/alert:not-group-data-[fill=solid]/alert:text-muted-foreground nx:group-data-[text-tone=neutral]/alert:text-foreground',
         className
       )}
       {...props}
@@ -272,29 +347,38 @@ interface AlertActionsProps extends React.ComponentProps<'div'> {}
 /**
  * AlertActions
  *
- * Holds one or two alert CTAs. Use the existing Button component for actions.
- * In stack layout, use button actions only. For dismissal controls, use
- * `layout="inline"` so `AlertClose` sits in the trailing action area.
+ * Holds one or two alert CTAs. Buttons inside default to size `sm`, matching
+ * AlertClose, and to the opaque `outline` variant on solid alerts; an explicit
+ * `size` or `variant` on a Button wins.
  *
  * @example
  * ```tsx
  * <AlertActions>
  *   <Button variant="outline">Manage</Button>
- *   <AlertClose onClick={() => setShow(false)} />
  * </AlertActions>
  * ```
  */
-function AlertActions({ className, ...props }: AlertActionsProps) {
+function AlertActions({ className, children, ...props }: AlertActionsProps) {
+  const fill = React.useContext(AlertFillContext);
+
   return (
     <div
       data-slot="alert-actions"
       className={cn(
-        'nx:mt-3 nx:flex nx:flex-wrap nx:items-center nx:gap-2',
-        'nx:group-data-[layout=inline]/alert:mt-0 nx:group-data-[layout=inline]/alert:self-center',
+        'nx:col-start-2 nx:col-end-[-1] nx:mt-3 nx:flex nx:flex-wrap nx:items-center nx:gap-2',
+        'nx:group-data-[layout=inline]/alert:@lg/alert:col-start-3 nx:group-data-[layout=inline]/alert:@lg/alert:col-end-auto nx:group-data-[layout=inline]/alert:@lg/alert:ms-3 nx:group-data-[layout=inline]/alert:@lg/alert:mt-0',
         className
       )}
       {...props}
-    />
+    >
+      <ButtonSizeContext.Provider value="sm">
+        <ButtonVariantContext.Provider
+          value={fill === 'solid' ? 'outline' : undefined}
+        >
+          {children}
+        </ButtonVariantContext.Provider>
+      </ButtonSizeContext.Provider>
+    </div>
   );
 }
 
@@ -308,11 +392,14 @@ interface AlertCloseProps extends React.ComponentProps<'button'> {}
 /**
  * AlertClose
  *
- * A styled close control for alerts. Dismissal is consumer-controlled: wire
- * `onClick` to app state when the alert should be removed. The default renders a
- * close icon with a visually-hidden "Dismiss alert" label. If you pass custom
- * children, give them their own accessible name — visible text self-labels;
- * supply `aria-label` for an icon-only child.
+ * A styled close control for alerts. Render it as a direct child of `Alert`,
+ * after `AlertActions`; it sits at the top end of the alert in either layout.
+ * Dismissal is consumer-controlled: wire `onClick` to app state when the alert
+ * should be removed. The application also chooses a logical focus destination
+ * if removing the focused control. The default renders a close icon with a
+ * visually-hidden "Dismiss alert" label. If you pass custom children, give
+ * them their own accessible name — visible text self-labels; supply
+ * `aria-label` for an icon-only child.
  *
  * @example
  * ```tsx
@@ -325,16 +412,15 @@ function AlertClose({
   type = 'button',
   ...props
 }: AlertCloseProps) {
+  const fill = React.useContext(AlertFillContext);
+
   return (
-    <button
+    <Button
+      variant={fill === 'solid' ? 'outline' : 'ghost'}
+      size="icon-sm"
       data-slot="alert-close"
       className={cn(
-        'nx:inline-flex nx:size-8 nx:shrink-0 nx:items-center nx:justify-center nx:rounded-sm nx:text-muted-foreground',
-        'nx:transition-control nx:hover:bg-container-hover nx:hover:text-foreground',
-        'nx:focus-visible:bg-container-hover nx:focus-visible:text-foreground',
-        'nx:focus-visible:outline-2 nx:focus-visible:outline-focus-default',
-        'nx:disabled:pointer-events-none nx:disabled:text-disabled-foreground',
-        'nx:[&_svg]:size-4 nx:[&_svg]:shrink-0',
+        'nx:col-start-4 nx:row-start-1 nx:ms-2 nx:-my-[calc((var(--nx-spacing-8)-var(--nx-typography-line-height-sm))/2)] nx:self-start nx:group-data-[layout=inline]/alert:@lg/alert:self-center',
         className
       )}
       type={type}
@@ -346,7 +432,7 @@ function AlertClose({
           <span className="nx:sr-only">Dismiss alert</span>
         </>
       )}
-    </button>
+    </Button>
   );
 }
 

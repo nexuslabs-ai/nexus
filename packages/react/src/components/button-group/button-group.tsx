@@ -4,12 +4,14 @@ import { Slot } from '@radix-ui/react-slot';
 import { cva, type VariantProps } from 'class-variance-authority';
 
 import { cn } from '../../lib/utils';
+import {
+  type ButtonContextSize,
+  ButtonSizeContext,
+} from '../button/button-size-context';
 import { Separator } from '../separator';
 
-import {
-  type ButtonGroupSize,
-  ButtonGroupSizeContext,
-} from './button-group-context';
+/** Size shared from a ButtonGroup to its members. */
+type ButtonGroupSize = ButtonContextSize;
 
 const buttonGroupVariants = cva(
   'nx:flex nx:w-fit nx:items-stretch nx:*:focus-visible:relative nx:*:focus-visible:z-10',
@@ -93,7 +95,7 @@ function ButtonGroup({
   ...props
 }: ButtonGroupProps) {
   return (
-    <ButtonGroupSizeContext.Provider value={size}>
+    <ButtonSizeContext.Provider value={size}>
       <div
         role="group"
         data-slot="button-group"
@@ -104,7 +106,7 @@ function ButtonGroup({
       >
         {children}
       </div>
-    </ButtonGroupSizeContext.Provider>
+    </ButtonSizeContext.Provider>
   );
 }
 
@@ -140,7 +142,7 @@ function ButtonGroupText({
   ...props
 }: ButtonGroupTextProps) {
   const Comp = asChild ? Slot : 'div';
-  const contextSize = React.useContext(ButtonGroupSizeContext);
+  const contextSize = React.useContext(ButtonSizeContext);
   const resolvedSize = size ?? contextSize ?? 'default';
 
   return (

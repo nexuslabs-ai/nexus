@@ -6,8 +6,10 @@ import { Slot } from '@radix-ui/react-slot';
 import { cva, type VariantProps } from 'class-variance-authority';
 
 import { cn } from '../../lib/utils';
-import { ButtonGroupSizeContext } from '../button-group/button-group-context';
 import { Spinner } from '../spinner';
+
+import { ButtonSizeContext } from './button-size-context';
+import { ButtonVariantContext } from './button-variant-context';
 
 const buttonVariants = cva(
   'nx:inline-flex nx:box-border nx:cursor-pointer nx:items-center nx:justify-center nx:rounded-base nx:border-default nx:border-transparent nx:whitespace-nowrap nx:transition-[color,background-color,border-color,scale] nx:active:scale-[0.96] nx:focus-visible:outline-2 nx:focus-visible:outline-focus-default nx:focus-visible:outline-offset-2 nx:disabled:pointer-events-none nx:disabled:cursor-default nx:disabled:opacity-100 nx:aria-disabled:pointer-events-none nx:aria-disabled:cursor-default nx:aria-disabled:opacity-100 nx:[&_svg]:pointer-events-none nx:[&_svg]:size-3.5 nx:[&_svg]:shrink-0',
@@ -172,7 +174,7 @@ function ButtonContent({
 function Button({
   asChild = false,
   className,
-  variant = 'default',
+  variant,
   size,
   loading = false,
   disabled,
@@ -185,20 +187,28 @@ function Button({
   'aria-disabled': ariaDisabled,
   ...props
 }: ButtonProps) {
-  // Inherit the enclosing ButtonGroup's size when no explicit size is set, so a
+  // Inherit the enclosing container's size when no explicit size is set, so a
   // Button nested inside a trigger wrapper (a split button) still picks it up.
-  const groupSize = React.useContext(ButtonGroupSizeContext);
-  const semanticSize = size ?? groupSize ?? 'default';
+  const contextSize = React.useContext(ButtonSizeContext);
+  const contextVariant = React.useContext(ButtonVariantContext);
+  const semanticSize = size ?? contextSize ?? 'default';
+  const semanticVariant = variant ?? contextVariant ?? 'default';
   const isDisabled = disabled || loading;
   const iconOnly = isIconButtonSize(semanticSize);
 
   const sharedProps = {
     'data-slot': 'button',
-    'data-variant': variant,
+    'data-variant': semanticVariant,
     'data-size': semanticSize,
     'data-icon-only': iconOnly || undefined,
     'data-loading': loading || undefined,
-    className: cn(buttonVariants({ variant, size: semanticSize, className })),
+    className: cn(
+      buttonVariants({
+        variant: semanticVariant,
+        size: semanticSize,
+        className,
+      })
+    ),
     'aria-busy': loading || ariaBusy || undefined,
     'aria-disabled': isDisabled || ariaDisabled || undefined,
   };

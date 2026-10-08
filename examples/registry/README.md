@@ -187,7 +187,8 @@ the only host collision was Finding 1.
 ### `'use client'`
 
 #795 found that importing Nexus straight into a Server Component failed at
-prerender in `button.tsx`, `button-group-context.ts` and `dialog.tsx`. #796
+prerender in `button.tsx`, `button-group-context.ts` (now
+`button/button-size-context.ts`) and `dialog.tsx`. #796
 added the directive to those three and to every overlay that now reads the
 root context, so `copy-next` imports Nexus straight into its Server
 Component page.
