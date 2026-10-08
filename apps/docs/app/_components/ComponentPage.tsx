@@ -2,12 +2,14 @@ import {
   type Demo,
   type DemoId,
   demos,
+  getComponentSnippets,
   isDemoId,
 } from '../../__generated__/demo-index';
-import { PREVIEW_DEMO } from '../../scripts/examples.mjs';
+import { orderExamples, PREVIEW_DEMO } from '../../scripts/examples.mjs';
 import { humanize } from '../../scripts/humanize.mjs';
-import { requireComponentsSection } from '../_lib/manifest';
+import type { ManifestPage } from '../_lib/manifest';
 
+import { CodeSample } from './CodeSample';
 import { ComponentDemo } from './ComponentDemo';
 import { ComponentInstallation } from './ComponentInstallation';
 import {
@@ -24,19 +26,16 @@ import { PropsTable } from './PropsTable';
 type Example = { id: DemoId; name: string };
 
 /**
- * `examples/{slug}/demo.tsx` is the preview at the top; every other demo in that
- * folder is an example, registry `examples` first, then the rest by name.
+ * Every section comes from `examples/{slug}/`: `demo.tsx` is the preview at the
+ * top, Usage and Composition are generated from all of its demos, and every
+ * other demo is an example, in `orderExamples` order.
  */
-export function ComponentPage({ slug }: { slug: string }) {
-  const page = requireComponentsSection().pages.find(
-    (entry) => entry.slug === slug
-  );
-  if (page?.kind !== 'mdx') {
-    throw new Error(
-      `ComponentPage: no /components/${slug} component page in the manifest — add apps/docs/content/components/${slug}.mdx.`
-    );
-  }
-
+export function ComponentPage({
+  page,
+}: {
+  page: Extract<ManifestPage, { kind: 'generated' }>;
+}) {
+  const { slug } = page;
   const previewId = `${slug}/${PREVIEW_DEMO}`;
   if (!isDemoId(previewId)) {
     throw new Error(
@@ -45,7 +44,8 @@ export function ComponentPage({ slug }: { slug: string }) {
   }
 
   const preview: Demo = demos[previewId];
-  const examples = examplesFor(slug, page.examples);
+  const snippets = getComponentSnippets(slug);
+  const examples = examplesFor(slug);
 
   return (
     <>
@@ -62,6 +62,18 @@ export function ComponentPage({ slug }: { slug: string }) {
         Installation
       </SectionHeading>
       <ComponentInstallation slug={slug} />
+
+      <SectionHeading className={SECTION_HEADING_CLASS}>Usage</SectionHeading>
+      <CodeSample lang="tsx">{snippets.imports}</CodeSample>
+
+      {snippets.composition && (
+        <>
+          <SectionHeading className={SECTION_HEADING_CLASS}>
+            Composition
+          </SectionHeading>
+          <CodeSample lang="text">{snippets.composition}</CodeSample>
+        </>
+      )}
 
       {examples.length > 0 && (
         <SectionHeading className={SECTION_HEADING_CLASS}>
@@ -94,15 +106,14 @@ export function ComponentPage({ slug }: { slug: string }) {
   );
 }
 
-function examplesFor(slug: string, order: readonly string[]): Example[] {
+function examplesFor(slug: string): Example[] {
   const prefix = `${slug}/`;
   const names = Object.keys(demos)
     .filter((id) => id.startsWith(prefix))
     .map((id) => id.slice(prefix.length))
     .filter((name) => name !== PREVIEW_DEMO);
-  const ordered = [...order, ...names.filter((name) => !order.includes(name))];
 
-  return ordered.map((name) => {
+  return orderExamples(names).map((name) => {
     const id = `${prefix}${name}`;
     if (!isDemoId(id)) {
       throw new Error(

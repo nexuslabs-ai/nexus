@@ -4,17 +4,14 @@
  * Sources:
  *   - `page-registry/` — section and page order, labels, and the
  *     `wireframe` a page renders until its own file lands
- *   - `content/{section}/{slug}.mdx` — MDX pages; a component page (every
- *     page under `components/`) is exactly
- *     `<ComponentPage slug="{slug}" />`
- *   - `examples/{slug}/{name}.tsx` — checked against a component page's
- *     registry `examples` order
+ *   - `content/{section}/{slug}.mdx` — MDX pages
  *   - `app/_pages/{section}/{slug}.tsx` — hand-built pages
+ *   - `@nexus_ds/react`'s exports — one `components/` page per exported
+ *     component, generated from `examples/{slug}/` once its preview demo exists
  *
  * A page's route is its path on disk, so adding a page means adding a file.
  * Pages the registry does not list are appended to their section in slug
- * order. `components/` is sorted by label, wherever the registry lists a
- * page. Routes are exactly two levels
+ * order. `components/` is sorted by label. Routes are exactly two levels
  * deep and a slug is one path segment; a file anywhere else fails the
  * generator. Entries prefixed with `_` are skipped, so a page-local island
  * can sit beside the page that uses it.
@@ -34,7 +31,7 @@ import prettier from 'prettier';
 
 import { DEMO_EXTENSION, isDemoName, PREVIEW_DEMO } from './examples.mjs';
 import { humanize } from './humanize.mjs';
-import { reactSrc, toRepoPath } from './roots.mjs';
+import { reactSrc } from './roots.mjs';
 
 /** Nav metadata source, relative to the docs app root. */
 export const REGISTRY_FILE = 'page-registry/index.ts';
@@ -142,22 +139,36 @@ function exportedComponentSlugs() {
   );
 }
 
-function assertEveryExportedComponentIsListed(registered) {
-  const exported = exportedComponentSlugs();
-  const missing = [...exported].filter((slug) => !registered.includes(slug));
-  const unknown = registered.filter((slug) => !exported.has(slug));
-  if (missing.length === 0 && unknown.length === 0) return;
-
-  throw new Error(
-    [
-      `${REGISTRY_FILE} ${COMPONENTS_SECTION} must list exactly the components ${toRepoPath(path.join(reactSrc, 'index.ts'))} exports.`,
-      ...missing.map((slug) => `  missing: ${slug}`),
-      ...unknown.map((slug) => `  not exported: ${slug}`),
-    ].join('\n')
-  );
+/** A component's name as its own source spells it (`InputOTP`), else its slug in PascalCase. */
+function componentLabel(slug) {
+  const pascal = slug
+    .split('-')
+    .map((word) => word[0].toUpperCase() + word.slice(1))
+    .join('');
+  const dir = path.join(reactSrc, 'components', slug);
+  const source = fs
+    .readdirSync(dir)
+    .filter((file) => file.endsWith('.tsx') && !file.endsWith('.stories.tsx'))
+    .map((file) => fs.readFileSync(path.join(dir, file), 'utf8'))
+    .join('\n');
+  const spelled = source
+    .match(/\b[A-Z][A-Za-z0-9]*\b/g)
+    ?.find((word) => word.toLowerCase() === pascal.toLowerCase());
+  return spelled ?? pascal;
 }
 
-/** The body a component renders until its `components/{slug}.mdx` lands. */
+function assertNoWrittenComponentPages(sources) {
+  for (const source of sources) {
+    for (const [key, file] of source.pages) {
+      if (!key.startsWith(`${COMPONENTS_SECTION}/`)) continue;
+      throw new Error(
+        `${file} is a component page, but component pages are generated from examples/${key.slice(COMPONENTS_SECTION.length + 1)}/ — delete the file.`
+      );
+    }
+  }
+}
+
+/** The body a component renders until its `examples/{slug}/demo.tsx` lands. */
 function componentWireframe(label) {
   return {
     lede: `[ ${label} — page coming soon ]`,
@@ -169,21 +180,6 @@ function componentWireframe(label) {
       },
     ],
   };
-}
-
-function assertComponentPageIsOneLineMdx(docsRoot, kind, file, slug) {
-  if (kind !== 'mdx') {
-    throw new Error(
-      `${file} is a component page, so it must be content/${COMPONENTS_SECTION}/${slug}.mdx containing <ComponentPage slug="${slug}" />.`
-    );
-  }
-  const expected = `<ComponentPage slug="${slug}" />`;
-  const body = fs.readFileSync(path.join(docsRoot, file), 'utf8').trim();
-  if (body !== expected) {
-    throw new Error(
-      `${file} must contain exactly ${expected} — a component page names its component and nothing else; ComponentPage renders the rest.`
-    );
-  }
 }
 
 function byLabel(entries) {
@@ -203,31 +199,6 @@ function demoNamesIn(docsRoot, slug) {
     .map((entry) => entry.name.slice(0, -DEMO_EXTENSION.length))
     .filter(isDemoName)
     .sort();
-}
-
-function assertExamplesExist(docsRoot, key, slug, examples) {
-  const available = demoNamesIn(docsRoot, slug).filter(
-    (name) => name !== PREVIEW_DEMO
-  );
-  const seen = new Set();
-  for (const name of examples) {
-    if (name === PREVIEW_DEMO) {
-      throw new Error(
-        `${key} lists "${PREVIEW_DEMO}" in its registry \`examples\`, but that demo is the page's Preview and Code — drop it from the list.`
-      );
-    }
-    if (seen.has(name)) {
-      throw new Error(
-        `${key} lists "${name}" twice in its registry \`examples\`.`
-      );
-    }
-    seen.add(name);
-    if (!available.includes(name)) {
-      throw new Error(
-        `${key} lists "${name}" in its registry \`examples\`, but examples/${slug}/ has no demo by that name. Its examples: ${available.join(', ') || 'none'}.`
-      );
-    }
-  }
 }
 
 /** Import specifier for a docs-root-relative file, as seen from the content module. */
@@ -289,21 +260,12 @@ export type GuideManifestPage = ManifestPageBase & {
   );
 
 /**
- * A component \`@nexus_ds/react\` exports. Once \`components/{slug}.mdx\` is
- * written it renders \`<ComponentPage slug="{slug}" />\`; until then, a placeholder.
+ * A component \`@nexus_ds/react\` exports. Once \`examples/{slug}/demo.tsx\`
+ * exists its page is generated from \`examples/{slug}/\`; until then, a placeholder.
  */
 export type ComponentManifestPage = ManifestPageBase & {
   nested?: never;
-} & (
-    | {
-        kind: 'mdx';
-        /** Source file relative to \`apps/docs\`; the module is \`PAGE_LOADERS[route]\`. */
-        file: string;
-        /** Example demo names the page shows first, in this order. */
-        examples: readonly string[];
-      }
-    | PlaceholderPage
-  );
+} & ({ kind: 'generated' } | PlaceholderPage);
 
 export type ManifestPage = GuideManifestPage | ComponentManifestPage;
 
@@ -409,6 +371,7 @@ export async function buildPageManifest(docsRoot, formatOptions) {
     pages: collectPages(docsRoot, source),
   }));
   assertOneSourcePerRoute(sources);
+  assertNoWrittenComponentPages(sources);
   const keysOnDisk = sources.flatMap((source) => [...source.pages.keys()]);
 
   /** Registry order first, then slugs that exist only on disk, in slug order. */
@@ -435,23 +398,8 @@ export async function buildPageManifest(docsRoot, formatOptions) {
     }
 
     const source = sources.find((candidate) => candidate.pages.has(key));
-    const isComponentPage = isComponentsSection(sectionSlug);
-    const rendersExamples = isComponentPage && source !== undefined;
-    if (entry?.examples?.length && !rendersExamples) {
-      throw new Error(
-        `${key} has registry \`examples\`, but only a written component page under ${COMPONENTS_SECTION}/ renders examples — drop the list.`
-      );
-    }
-    if (rendersExamples) {
-      base.examples = entry?.examples ?? [];
-      assertExamplesExist(docsRoot, key, slug, base.examples);
-    }
-
     if (source) {
       const file = source.pages.get(key);
-      if (isComponentPage) {
-        assertComponentPageIsOneLineMdx(docsRoot, source.kind, file, slug);
-      }
       if (entry?.wireframe) {
         throw new Error(
           `${key} is written at ${file}, so its registry wireframe can never render — drop the \`wireframe\` from its registry entry.`
@@ -463,27 +411,36 @@ export async function buildPageManifest(docsRoot, formatOptions) {
       };
     }
 
-    const wireframe = isComponentPage
-      ? componentWireframe(base.label)
-      : entry?.wireframe;
-    if (!wireframe) {
+    if (!entry?.wireframe) {
       throw new Error(
         `${key} has no page file, so it renders its registry wireframe — give its registry entry a \`wireframe\`, or write the page.`
       );
     }
     return {
       page: { ...base, kind: 'placeholder', file: null },
-      wireframe,
+      wireframe: entry.wireframe,
     };
   }
 
-  assertEveryExportedComponentIsListed(orderedSlugs(COMPONENTS_SECTION));
+  function buildComponentPage(slug) {
+    const label = componentLabel(slug);
+    const base = { route: `/${COMPONENTS_SECTION}/${slug}`, slug, label };
+    if (demoNamesIn(docsRoot, slug).includes(PREVIEW_DEMO)) {
+      return { page: { ...base, kind: 'generated' } };
+    }
+    return {
+      page: { ...base, kind: 'placeholder', file: null },
+      wireframe: componentWireframe(label),
+    };
+  }
 
   function orderedEntries(sectionSlug) {
-    const entries = orderedSlugs(sectionSlug).map((slug) =>
+    if (isComponentsSection(sectionSlug)) {
+      return byLabel([...exportedComponentSlugs()].map(buildComponentPage));
+    }
+    return orderedSlugs(sectionSlug).map((slug) =>
       buildPage(sectionSlug, slug)
     );
-    return isComponentsSection(sectionSlug) ? byLabel(entries) : entries;
   }
 
   /** Sections that exist only on disk, appended after the registry's own. */

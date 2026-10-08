@@ -9,7 +9,13 @@ import {
 } from 'node:fs';
 import path from 'node:path';
 
-import { DEMO_EXTENSION, isDemoName } from './examples.mjs';
+import { componentUsage } from './component-usage.mjs';
+import {
+  DEMO_EXTENSION,
+  isDemoName,
+  orderExamples,
+  PREVIEW_DEMO,
+} from './examples.mjs';
 import { docsRoot } from './roots.mjs';
 
 const EXAMPLES_DIR = path.join(docsRoot, 'examples');
@@ -52,6 +58,13 @@ export interface Demo {
   /** Loads the demo's component and its own source text together. */
   load: () => Promise<{ Component: ComponentType; source: string }>;
 }
+
+export interface ComponentSnippets {
+  /** Imports every part the component's demos render. */
+  imports: string;
+  /** How those parts nest across the demos, as a text tree; null for one part. */
+  composition: string | null;
+}
 `;
 
 const INDEX_FOOTER = `export type DemoId = keyof typeof demos;
@@ -68,6 +81,19 @@ export function getDemo(id: string): Demo {
   }
 
   return demos[id];
+}
+
+export function getComponentSnippets(slug: string): ComponentSnippets {
+  const snippets = Object.hasOwn(componentSnippets, slug)
+    ? componentSnippets[slug]
+    : undefined;
+  if (!snippets) {
+    throw new Error(
+      \`No component snippets for \${slug}. Add apps/docs/examples/\${slug}/${PREVIEW_DEMO}${DEMO_EXTENSION}.\`
+    );
+  }
+
+  return snippets;
 }
 `;
 
@@ -316,6 +342,34 @@ function collectDemos() {
     .sort((a, b) => (a.id < b.id ? -1 : a.id > b.id ? 1 : 0));
 }
 
+/**
+ * Usage and Composition for every folder with a preview demo — that is, for
+ * every component page.
+ * @param {DemoFile[]} demos
+ */
+function collectComponentSnippets(demos) {
+  const snippets = new Map();
+  const previews = demos.filter(({ id }) => id.endsWith(`/${PREVIEW_DEMO}`));
+  for (const preview of previews) {
+    const slug = preview.id.split('/')[0];
+    const examples = new Map(
+      demos
+        .filter(({ id }) => id.startsWith(`${slug}/`) && id !== preview.id)
+        .map((demo) => [demo.id.split('/')[1], demo])
+    );
+    const ordered = [
+      preview,
+      ...orderExamples([...examples.keys()]).map((name) => examples.get(name)),
+    ];
+    const sources = ordered.map((demo) => ({
+      fileName: `${demo.id}${DEMO_EXTENSION}`,
+      source: demo.source,
+    }));
+    snippets.set(slug, componentUsage(slug, sources));
+  }
+  return snippets;
+}
+
 /** @param {DemoFile} demo */
 function renderDemoBoundary(demo) {
   return `'use client';
@@ -338,8 +392,11 @@ export const source = ${JSON.stringify(demo.source)};
 `;
 }
 
-/** @param {DemoFile[]} demos */
-function renderDemoIndex(demos) {
+/**
+ * @param {DemoFile[]} demos
+ * @param {Map<string, { imports: string; composition: string | null }>} snippets
+ */
+function renderDemoIndex(demos, snippets) {
   const entries = demos
     .map((demo) =>
       [
@@ -355,8 +412,22 @@ function renderDemoIndex(demos) {
 
   const literal = entries ? `{\n${entries}\n}` : '{}';
 
+  const snippetEntries = [...snippets]
+    .map(([slug, { imports, composition }]) =>
+      [
+        `  ${JSON.stringify(slug)}: {`,
+        `    imports: ${JSON.stringify(imports)},`,
+        `    composition: ${JSON.stringify(composition)},`,
+        `  },`,
+      ].join('\n')
+    )
+    .join('\n');
+  const snippetLiteral = snippetEntries ? `{\n${snippetEntries}\n}` : '{}';
+
   return `${INDEX_HEADER}
 export const demos = ${literal} satisfies Record<string, Demo>;
+
+const componentSnippets: Record<string, ComponentSnippets> = ${snippetLiteral};
 
 ${INDEX_FOOTER}`;
 }
@@ -366,7 +437,10 @@ function generateDemoIndex() {
   const modulesDir = path.join(GENERATED_DIR, MODULES_DIR);
   const indexFile = path.join(GENERATED_DIR, INDEX_FILE);
 
-  writeIfChanged(indexFile, renderDemoIndex(demos));
+  writeIfChanged(
+    indexFile,
+    renderDemoIndex(demos, collectComponentSnippets(demos))
+  );
 
   const keep = new Set([indexFile]);
   for (const demo of demos) {
