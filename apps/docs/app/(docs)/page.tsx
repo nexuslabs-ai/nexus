@@ -30,7 +30,7 @@ const AUDIENCES = [
   {
     title: 'Engineer',
     desc: 'Install, wire your theme, and ship your first component in minutes.',
-    href: requirePage('/getting-started/install').route,
+    href: requirePage('getting-started', 'install').route,
   },
   {
     title: 'AI agent',
