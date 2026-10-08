@@ -601,7 +601,14 @@ function watchStories() {
   console.log(`demo-index: watching ${relativeComponents} stories`);
 }
 
-copyStoryAssets();
+try {
+  copyStoryAssets();
+} catch (error) {
+  console.error(
+    `demo-index: cannot copy ${path.relative(docsRoot, STORY_ASSETS_SOURCE)} — ${error.message}`
+  );
+  process.exit(1);
+}
 
 if (process.argv.includes('--watch')) {
   watchStories();
