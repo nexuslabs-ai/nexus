@@ -59,6 +59,7 @@ const jobRuns = Array.from({ length: 28 }, (_, i) => ({
 // Vertical is the default — a fixed-height viewport scrolls its overflowing
 // content and surfaces the auto-rendered vertical ScrollBar on hover.
 export const Default: Story = {
+  tags: ['docs'],
   render: () => (
     <ScrollArea className="nx:h-48 nx:w-72 nx:rounded-md nx:border-default nx:border-border-default">
       <div className="nx:flex nx:flex-col nx:gap-3 nx:p-4 nx:typography-label-default nx:text-foreground">
@@ -75,6 +76,7 @@ export const Default: Story = {
 
 // A scrollable list of discrete rows.
 export const VerticalList: Story = {
+  tags: ['docs'],
   render: () => (
     <ScrollArea className="nx:h-72 nx:w-56 nx:rounded-md nx:border-default nx:border-border-default">
       <div className="nx:p-4">
@@ -99,6 +101,7 @@ export const VerticalList: Story = {
 // Horizontal scrolling — add a `<ScrollBar orientation="horizontal" />` after
 // the content. The content lays out in a `nx:w-max` flex row so it overflows.
 export const HorizontalRow: Story = {
+  tags: ['docs'],
   render: () => (
     <ScrollArea className="nx:w-96 nx:rounded-md nx:border-default nx:border-border-default nx:whitespace-nowrap">
       <div className="nx:flex nx:w-max nx:gap-4 nx:p-4">
@@ -124,6 +127,7 @@ export const HorizontalRow: Story = {
 // auto-rendered; the horizontal one is added as a child, and the Corner fills
 // where they meet.
 export const Both: Story = {
+  tags: ['docs'],
   render: () => (
     <ScrollArea className="nx:h-72 nx:w-96 nx:rounded-md nx:border-default nx:border-border-default">
       <div className="nx:w-max nx:p-4">
@@ -132,7 +136,7 @@ export const Both: Story = {
             {Array.from({ length: 15 }, (_, col) => (
               <div
                 key={col}
-                className="nx:flex nx:size-12 nx:shrink-0 nx:items-center nx:justify-center nx:rounded nx:bg-muted nx:typography-label-small nx:text-muted-foreground"
+                className="nx:flex nx:size-12 nx:shrink-0 nx:items-center nx:justify-center nx:rounded-sm nx:bg-muted nx:typography-label-small nx:text-muted-foreground"
               >
                 {row * 15 + col}
               </div>
@@ -147,6 +151,7 @@ export const Both: Story = {
 
 // Dense panels should not rely on hover to reveal that more content exists.
 export const VisibleAffordance: Story = {
+  tags: ['docs'],
   parameters: {
     docs: {
       description: {
@@ -214,6 +219,7 @@ export const VisibleAffordance: Story = {
 // Inside a Card — a bounded scroll region keeps a long list from stretching the
 // card. The ScrollArea takes its height from a utility, not the content.
 export const InCard: Story = {
+  tags: ['docs'],
   render: () => (
     <Card className="nx:w-80">
       <CardHeader>
@@ -321,7 +327,7 @@ export const AllVariants: Story = {
                 {Array.from({ length: 10 }, (_, col) => (
                   <div
                     key={col}
-                    className="nx:flex nx:size-10 nx:shrink-0 nx:items-center nx:justify-center nx:rounded nx:bg-muted nx:typography-label-small nx:text-muted-foreground"
+                    className="nx:flex nx:size-10 nx:shrink-0 nx:items-center nx:justify-center nx:rounded-sm nx:bg-muted nx:typography-label-small nx:text-muted-foreground"
                   >
                     {row * 10 + col}
                   </div>

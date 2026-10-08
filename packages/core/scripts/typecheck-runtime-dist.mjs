@@ -9,6 +9,7 @@ const packageRoot = path.resolve(scriptDir, '..');
 const repoRoot = path.resolve(packageRoot, '../..');
 const probeDir = path.join(packageRoot, '.runtime-dist-typecheck');
 const probePath = path.join(probeDir, 'probe.ts');
+const commonJsProbePath = path.join(probeDir, 'probe.cts');
 const tsconfigPath = path.join(probeDir, 'tsconfig.json');
 const tscBin = path.join(repoRoot, 'node_modules', 'typescript', 'bin', 'tsc');
 const packageJsonPath = path.join(packageRoot, 'package.json');
@@ -75,6 +76,7 @@ await mkdir(probeDir, { recursive: true });
 await writeFile(
   probePath,
   `import {
+  BRAND_COLOR_PRESETS,
   createNexusAppearanceBootstrapScript,
   createNexusAppearanceSnapshotFromCookie,
   createNexusAppearanceSnapshotFromState,
@@ -82,11 +84,87 @@ await writeFile(
   DEFAULT_NEXUS_APPEARANCE,
   DEFAULT_STORAGE_KEY,
   deriveTheme,
+  measureThemeContrast,
   resolveFirstPaint,
   sanitizeNexusAppearance,
   themeToCss,
+  type BrandColorPreset,
+  type Mode,
   type NexusAppearanceState,
+  type SemanticColorName,
+  type SurfaceToken,
+  type ThemeContrastCheck,
+  type Tier,
 } from '@nexus_ds/core';
+import {
+  getPaletteRamp,
+  getPaletteShade,
+  PRIMITIVE_PALETTE_NAMES,
+  SHADES,
+  type PrimitivePaletteName,
+  type PrimitivePaletteRamp,
+  type Shade,
+} from '@nexus_ds/core/palette';
+import {
+  createTokenCatalogue,
+  DARK_SURFACE_LADDER,
+  LIGHT_SURFACE_LADDER,
+  SURFACE_TOKENS,
+  type CatalogueToken,
+  type CatalogueTokenName,
+  type ShadeAnchor,
+} from '@nexus_ds/core/catalogue';
+
+const preset: BrandColorPreset | undefined = BRAND_COLOR_PRESETS[0];
+if (preset) {
+  const seed: string = preset.color;
+  // @ts-expect-error public preset colors are immutable.
+  preset.color = '#000000';
+  // @ts-expect-error the preset catalog is immutable.
+  BRAND_COLOR_PRESETS.push(preset);
+  void seed;
+}
+
+const palettes: readonly PrimitivePaletteName[] = PRIMITIVE_PALETTE_NAMES;
+const shades: readonly Shade[] = SHADES;
+const palette: PrimitivePaletteName = 'green';
+const shade: Shade = '600';
+const ramp: PrimitivePaletteRamp = getPaletteRamp(palette);
+const green: string = getPaletteShade(palette, shade);
+// @ts-expect-error public ramps are immutable.
+ramp['600'] = '#000000';
+// @ts-expect-error singleton colors are not shade ramps.
+getPaletteRamp('white');
+// @ts-expect-error only authored shades are accepted.
+getPaletteShade('green', '999');
+void green;
+void palettes;
+void shades;
+
+const catalogue: readonly CatalogueToken[] = createTokenCatalogue();
+const catalogued = catalogue[0];
+if (catalogued) {
+  const name: CatalogueTokenName = catalogued.name;
+  const variant = catalogued.variants[0];
+  const themeMode: Mode | null | undefined = variant?.mode;
+  const filePreset: string | null | undefined = variant?.preset;
+  const file: string | undefined = variant?.source?.file;
+  const appearanceMode: string | undefined = variant?.appearance?.mode;
+  // @ts-expect-error catalogue variants are immutable.
+  catalogued.variants.push(catalogued.variants[0]);
+  if (variant?.appearance) {
+    // @ts-expect-error a variant's appearance is immutable.
+    variant.appearance.prefs.uiFontSize = 16;
+  }
+  void name;
+  void themeMode;
+  void filePreset;
+  void file;
+  void appearanceMode;
+}
+// @ts-expect-error canonical names are in the --nx-* scheme.
+const aliasName: CatalogueTokenName = '--color-background';
+void aliasName;
 
 const state: NexusAppearanceState = sanitizeNexusAppearance({
   ...DEFAULT_NEXUS_APPEARANCE,
@@ -97,12 +175,29 @@ const state: NexusAppearanceState = sanitizeNexusAppearance({
 
 const snapshot = createNexusAppearanceSnapshotFromState(state);
 const serverSnapshot = createNexusAppearanceSnapshotFromCookie('', state);
-const css: string = themeToCss(deriveTheme(createNexusThemeContract(state)));
+const theme = deriveTheme(createNexusThemeContract(state));
+const css: string = themeToCss(theme);
 const bootstrap: string = createNexusAppearanceBootstrapScript({
   storageKey: DEFAULT_STORAGE_KEY,
   defaultSnapshot: snapshot,
 });
 const firstPaint = resolveFirstPaint(snapshot, true);
+const checks: ThemeContrastCheck[] = measureThemeContrast(theme);
+const lc: number | undefined = checks[0]?.lc;
+const checkMode: Mode | undefined = checks[0]?.mode;
+const checkTier: Tier | undefined = checks[0]?.tier;
+// @ts-expect-error contrast checks are typed records.
+checks[0]?.notAContrastCheckField;
+
+const surface: SurfaceToken = SURFACE_TOKENS[0];
+const lightAnchor: ShadeAnchor = LIGHT_SURFACE_LADDER[surface];
+const darkAnchor: ShadeAnchor = DARK_SURFACE_LADDER[surface];
+// @ts-expect-error the surface ladders are keyed by surface tokens only.
+void LIGHT_SURFACE_LADDER['primary-background'];
+
+const colorName: SemanticColorName = 'popover-alpha';
+// @ts-expect-error semantic colour names are the registry's literal names.
+const unknownColorName: SemanticColorName = 'not-a-color-token';
 
 // @ts-expect-error proves the public state is not any.
 state.notARealNexusAppearanceField;
@@ -112,8 +207,17 @@ void serverSnapshot;
 void css;
 void bootstrap;
 void firstPaint.colorScheme;
+void lc;
+void checkMode;
+void checkTier;
+void lightAnchor;
+void darkAnchor;
+void colorName;
+void unknownColorName;
 `
 );
+
+await writeFile(commonJsProbePath, await readFile(probePath, 'utf8'));
 
 await writeFile(
   tsconfigPath,
@@ -122,15 +226,15 @@ await writeFile(
       compilerOptions: {
         target: 'ES2020',
         lib: ['ES2020', 'DOM'],
-        module: 'ESNext',
-        moduleResolution: 'bundler',
+        module: 'NodeNext',
+        moduleResolution: 'NodeNext',
         strict: true,
         noEmit: true,
         esModuleInterop: true,
         skipLibCheck: true,
         forceConsistentCasingInFileNames: true,
       },
-      include: ['probe.ts'],
+      include: ['probe.ts', 'probe.cts'],
     },
     null,
     2

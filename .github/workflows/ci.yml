@@ -5,18 +5,22 @@ on:
     branches: [main]
   pull_request:
     # Run on PRs targeting any branch
+  workflow_dispatch:
 
+# The newest pending run replaces older ones; an in-progress main run is never
+# cancelled.
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
-  cancel-in-progress: true
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
 
 permissions:
   contents: read
 
 # Branch protection on `main` requires only the `CI Status` aggregator job
-# (defined at the bottom of this file). Every other job runs on every push and
-# pull request. Nothing is path-filtered and nothing is skippable, so the gate
-# cannot go green on a change no job looked at.
+# (defined near the bottom of this file). Every check job runs on every push
+# and pull request. Nothing is path-filtered and nothing is skippable, so the
+# gate cannot go green on a change no job looked at. The deploy jobs after the
+# aggregator run only on main (push or manual dispatch), once it passes.
 
 jobs:
   # format-check and lint run full-tree to mirror local `pnpm lint` /
@@ -123,15 +127,26 @@ jobs:
           pnpm turbo build
           node scripts/audit-turbo-outputs.js --post-build
 
-      # The build step's props JSON may be a turbo cache restore; regenerating
-      # it outside turbo catches a stale cache entry or nondeterministic output.
-      - name: Check props JSON matches a fresh regeneration
+      # Reads the built @nexus_ds/core runtime's token registry, so it
+      # runs after the build rather than beside the token regeneration.
+      - name: Tailwind class-ref audit
+        run: pnpm --filter @nexus_ds/core audit:class-refs
+
+      # The build step's docs JSON and page manifest may be a turbo cache
+      # restore; regenerating them outside turbo catches a stale cache
+      # entry or nondeterministic output.
+      - name: Check docs generated inputs match a fresh regeneration
         run: |
           set -euo pipefail
-          cp -r apps/docs/generated/props "$RUNNER_TEMP/props-build"
+          mkdir "$RUNNER_TEMP/docs-generated-build"
+          cp -r apps/docs/generated apps/docs/app/_lib/*.generated.ts "$RUNNER_TEMP/docs-generated-build"
           pnpm --filter @nexus_ds/docs generate:props
-          if ! diff -r "$RUNNER_TEMP/props-build" apps/docs/generated/props; then
-            echo "::error::The props JSON differs from the build step's copy: either generate:props in apps/docs/turbo.json is missing an input the generator reads, or the generator's output is nondeterministic."
+          pnpm --filter @nexus_ds/docs generate:dependencies
+          pnpm --filter @nexus_ds/docs generate:manifest
+          mkdir "$RUNNER_TEMP/docs-generated-fresh"
+          cp -r apps/docs/generated apps/docs/app/_lib/*.generated.ts "$RUNNER_TEMP/docs-generated-fresh"
+          if ! diff -r "$RUNNER_TEMP/docs-generated-build" "$RUNNER_TEMP/docs-generated-fresh"; then
+            echo "::error::The docs generated inputs differ from the build step's copy: either a generate:* task in apps/docs/turbo.json is missing an input its generator reads, or the generator's output is nondeterministic."
             exit 1
           fi
 
@@ -139,6 +154,15 @@ jobs:
         run: |
           pnpm turbo build --filter=@nexus_ds/docs
           pnpm --filter @nexus_ds/docs audit:csp
+
+      - name: Upload docs site
+        if: (github.event_name == 'push' || github.event_name == 'workflow_dispatch') && github.ref == 'refs/heads/main'
+        uses: actions/upload-artifact@v4
+        with:
+          name: docs-site
+          path: apps/docs/out
+          retention-days: 7
+          if-no-files-found: error
 
       - name: Upload build artifacts
         uses: actions/upload-artifact@v4
@@ -222,35 +246,6 @@ jobs:
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
 
-      - name: Regenerate docs page manifest
-        run: pnpm --filter @nexus_ds/docs generate:manifest
-
-      - name: Check docs page manifest freshness
-        # `git status --porcelain` (not `git diff`) so untracked new files also fail.
-        run: |
-          set -euo pipefail
-          DIRTY=$(git status --porcelain -- apps/docs/app/_lib)
-          if [ -n "$DIRTY" ]; then
-            echo "::error::Docs page manifest is stale. Affected paths:"
-            echo "$DIRTY"
-            echo "::error::Run 'pnpm --filter @nexus_ds/docs generate:manifest' and commit the result."
-            exit 1
-          fi
-
-      - name: Regenerate docs demo index
-        run: pnpm --filter @nexus_ds/docs generate:demos
-
-      - name: Check docs demo index freshness
-        run: |
-          set -euo pipefail
-          DIRTY=$(git status --porcelain -- apps/docs/__generated__)
-          if [ -n "$DIRTY" ]; then
-            echo "::error::Docs demo index is stale. Affected paths:"
-            echo "$DIRTY"
-            echo "::error::Run 'pnpm --filter @nexus_ds/docs generate:demos' and commit the result."
-            exit 1
-          fi
-
       - name: Run unit tests
         run: pnpm test:unit
 
@@ -287,9 +282,6 @@ jobs:
       - name: Check canonical step set freshness
         run: pnpm --filter @nexus_ds/eslint-plugin refresh:canonical-set --check
 
-      - name: Build @nexus_ds/core
-        run: pnpm --filter @nexus_ds/core build
-
       - name: Regenerate token outputs (tailwind)
         id: regen
         run: |
@@ -316,11 +308,7 @@ jobs:
 
       - name: Color-blind audit
         if: ${{ !cancelled() && steps.regen.conclusion == 'success' }}
-        run: pnpm --filter @nexus_ds/core audit:colorblind
-
-      - name: Tailwind class-ref audit
-        if: ${{ !cancelled() && steps.regen.conclusion == 'success' }}
-        run: pnpm --filter @nexus_ds/core audit:class-refs
+        run: pnpm audit:colorblind
 
       - name: Token-mode codename audit
         if: ${{ !cancelled() && steps.regen.conclusion == 'success' }}
@@ -448,3 +436,74 @@ jobs:
         run: |
           echo "::error::One or more required jobs failed or were cancelled."
           exit 1
+
+  # ============================================
+  # Deploy — main only, after the aggregator passes
+  # ============================================
+  # Each deploy job publishes the exact artifact CI built and checked above.
+
+  # A re-run of an older main run would publish over a newer deploy, so deploy
+  # only while this commit is still main's head.
+  deploy-gate:
+    name: Deploy Gate
+    runs-on: ubuntu-latest
+    needs: ci-status
+    if: (github.event_name == 'push' || github.event_name == 'workflow_dispatch') && github.ref == 'refs/heads/main'
+    outputs:
+      latest: ${{ steps.head.outputs.latest }}
+    steps:
+      - name: Check this commit is main's head
+        id: head
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          head=$(gh api "repos/$GITHUB_REPOSITORY/git/ref/heads/main" --jq .object.sha)
+          if [ "$head" = "$GITHUB_SHA" ]; then
+            echo "latest=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "::notice::Skipping deploy: main is at ${head::7}, not ${GITHUB_SHA::7}. Use wrangler rollback to publish an older version."
+          fi
+
+  deploy-docs:
+    name: Deploy Docs
+    runs-on: ubuntu-latest
+    needs: deploy-gate
+    if: needs.deploy-gate.outputs.latest == 'true'
+    environment:
+      name: docs
+      url: https://nexusui.so
+    steps:
+      - name: Checkout
+        uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4.3.1
+
+      - name: Deploy
+        uses: ./.github/actions/deploy-cloudflare
+        with:
+          artifact: docs-site
+          config: apps/docs/wrangler.jsonc
+          assets-dir: apps/docs/out
+          host: nexusui.so
+          api-token: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          account-id: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+
+  deploy-storybook:
+    name: Deploy Storybook
+    runs-on: ubuntu-latest
+    needs: deploy-gate
+    if: needs.deploy-gate.outputs.latest == 'true'
+    environment:
+      name: storybook
+      url: https://storybook.nexusui.so
+    steps:
+      - name: Checkout
+        uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4.3.1
+
+      - name: Deploy
+        uses: ./.github/actions/deploy-cloudflare
+        with:
+          artifact: storybook-static
+          config: packages/react/wrangler.jsonc
+          assets-dir: packages/react/storybook-static
+          host: storybook.nexusui.so
+          api-token: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          account-id: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}

@@ -7,25 +7,35 @@
 
 import type { Block } from './blocks';
 
-export type RegistryPage = {
+export type GuidePage = {
   slug: string;
   label: string;
-  /** Optional in-page headings rendered inline in the left rail (non-interactive). */
-  nested?: string[];
-  /** Components a group page covers, rendered inline in the left rail (non-interactive). */
-  components?: string[];
   /** Placeholder body, carried only while the page has no source file. */
   wireframe?: { lede: string; blocks: Block[] };
 };
 
-export type RegistrySection = {
+type SectionBase = {
   slug: string;
   title: string;
   href: string;
-  /** What the section is counted in on the home page. Defaults to pages. */
-  unit?: 'components';
-  pages: RegistryPage[];
 };
+
+export type GuideSection = SectionBase & {
+  unit?: never;
+  pages: GuidePage[];
+};
+
+/**
+ * Its pages are not listed here: there is one per component `@nexus_ds/react`
+ * exports, generated from its stories tagged `docs` (see `scripts/page-manifest.mjs`).
+ */
+export type ComponentsSection = SectionBase & {
+  /** What the section is counted in on the home page. Other sections count pages. */
+  unit: 'components';
+  pages?: never;
+};
+
+export type RegistrySection = GuideSection | ComponentsSection;
 
 export const PAGE_REGISTRY = {
   'getting-started': {
@@ -61,25 +71,6 @@ export const PAGE_REGISTRY = {
         },
       },
       {
-        slug: 'designers',
-        label: 'For designers',
-        wireframe: {
-          lede: '[ Open the Figma library · use the variables · sync via Code Connect ]',
-          blocks: [
-            {
-              type: 'placeholder',
-              label:
-                '[ External-link list — Figma library, Code Connect docs ]',
-            },
-            {
-              type: 'placeholder',
-              variant: 'diagram',
-              label: '[ Diagram — code ↔ Figma parity flow ]',
-            },
-          ],
-        },
-      },
-      {
         slug: 'agents',
         label: 'For AI agents',
         wireframe: {
@@ -107,12 +98,6 @@ export const PAGE_REGISTRY = {
       {
         slug: 'color',
         label: 'Color',
-        nested: [
-          'How color works',
-          'Palette & shades',
-          'Surfaces',
-          'Accessibility',
-        ],
       },
       {
         slug: 'typography',
@@ -145,103 +130,6 @@ export const PAGE_REGISTRY = {
     title: 'Components',
     href: '/components',
     unit: 'components',
-    pages: [
-      {
-        slug: 'inputs',
-        label: 'Inputs',
-        components: ['Button', 'Input', 'Select', 'Switch', 'Tabs'],
-        wireframe: {
-          lede: '[ Interactive controls · per-component Storybook page below ]',
-          blocks: [
-            {
-              type: 'row',
-              blocks: [
-                {
-                  variant: 'storybook',
-                  label: '[ Storybook embed — selected component ]',
-                },
-                { variant: 'tall', label: '[ Variant matrix · props table ]' },
-              ],
-            },
-            { type: 'h2', text: '[ Per-component pages ]' },
-            {
-              type: 'placeholder',
-              label: '[ Index — Button · Input · Select · Switch · Tabs ]',
-            },
-            {
-              type: 'placeholder',
-              variant: 'code',
-              label: '[ Code — JSX usage example ]',
-            },
-          ],
-        },
-      },
-      {
-        slug: 'containers',
-        label: 'Containers',
-        components: ['Card', 'Dialog', 'Accordion', 'Alert'],
-        wireframe: {
-          lede: '[ Card · Dialog · Accordion · Alert ]',
-          blocks: [
-            {
-              type: 'placeholder',
-              variant: 'storybook',
-              label: '[ Storybook embed ]',
-            },
-            {
-              type: 'placeholder',
-              label: '[ Composition patterns · slots / children ]',
-            },
-          ],
-        },
-      },
-      {
-        slug: 'navigation',
-        label: 'Navigation',
-        components: ['DropdownMenu'],
-        wireframe: {
-          lede: '[ DropdownMenu · (future) NavigationMenu · Breadcrumbs ]',
-          blocks: [
-            {
-              type: 'placeholder',
-              variant: 'storybook',
-              label: '[ Storybook embed ]',
-            },
-          ],
-        },
-      },
-      {
-        slug: 'display',
-        label: 'Display',
-        components: ['Badge', 'Avatar', 'Tooltip'],
-        wireframe: {
-          lede: '[ Badge · Avatar · Tooltip ]',
-          blocks: [
-            {
-              type: 'placeholder',
-              variant: 'storybook',
-              label: '[ Storybook embed ]',
-            },
-          ],
-        },
-      },
-      {
-        slug: 'primitives',
-        label: 'Primitives',
-        components: ['Show / Hide', 'Slot'],
-        wireframe: {
-          lede: '[ Low-level building blocks: Show / Hide · Slot ]',
-          blocks: [
-            {
-              type: 'placeholder',
-              variant: 'code',
-              label: '[ Code — Show / Hide usage ]',
-            },
-            { type: 'placeholder', label: '[ API table ]' },
-          ],
-        },
-      },
-    ],
   },
   theming: {
     slug: 'theming',
@@ -294,6 +182,10 @@ export const PAGE_REGISTRY = {
           ],
         },
       },
+      {
+        slug: 'radius-overrides',
+        label: 'Radius overrides',
+      },
     ],
   },
   tools: {
@@ -321,25 +213,6 @@ export const PAGE_REGISTRY = {
         },
       },
       {
-        slug: 'code-connect',
-        label: 'Figma Code Connect',
-        wireframe: {
-          lede: '[ Mapping Figma components to code · maintaining .figma.ts ]',
-          blocks: [
-            {
-              type: 'placeholder',
-              variant: 'code',
-              label: '[ Code — example .figma.ts ]',
-            },
-            {
-              type: 'placeholder',
-              variant: 'diagram',
-              label: '[ Diagram — Figma ↔ code parity ]',
-            },
-          ],
-        },
-      },
-      {
         slug: 'eslint',
         label: 'ESLint plugin',
         wireframe: {
@@ -362,7 +235,7 @@ export const PAGE_REGISTRY = {
         slug: 'audits',
         label: 'Token audits',
         wireframe: {
-          lede: '[ figma-parity · APCA contrast · spacing-modes ]',
+          lede: '[ APCA contrast · spacing-modes ]',
           blocks: [
             {
               type: 'placeholder',
@@ -514,4 +387,6 @@ export const PAGE_REGISTRY = {
       },
     ],
   },
-} satisfies Record<string, RegistrySection>;
+} satisfies Record<string, RegistrySection> & {
+  components: ComponentsSection;
+};

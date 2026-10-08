@@ -1,11 +1,12 @@
 import { APCAcontrast, sRGBtoY } from 'apca-w3';
 import { clampChroma, converter, type Oklch, oklch, parse } from 'culori';
 
+import { PERCEPTUAL_L_GRID } from '../token-source/perceptual-grid';
+
 import { formatOklch } from './oklch-format';
 import {
   getPaletteReference,
   type PaletteKey,
-  PERCEPTUAL_L_GRID,
   type Shade,
   SHADES,
   type Tier,

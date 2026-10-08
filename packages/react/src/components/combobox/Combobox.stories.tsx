@@ -150,17 +150,10 @@ const meta: Meta<typeof Combobox> = {
 export default meta;
 type Story = StoryObj<typeof Combobox>;
 
-export const Default: Story = {
-  render: () => <ComboboxExample />,
-};
-
-export const WithSelection: Story = {
-  render: () => <ComboboxExample defaultValue="next" />,
-};
-
 // Raw composition holding open + value state at the call site — the canonical
 // controlled usage, and the composition example the pattern is built around.
 export const Controlled: Story = {
+  tags: ['docs'],
   render: function ControlledStory() {
     const [open, setOpen] = React.useState(false);
     const [value, setValue] = React.useState('astro');
@@ -207,7 +200,17 @@ export const Controlled: Story = {
   },
 };
 
+export const Default: Story = {
+  tags: ['docs'],
+  render: () => <ComboboxExample />,
+};
+
+export const WithSelection: Story = {
+  render: () => <ComboboxExample defaultValue="next" />,
+};
+
 export const Sizes: Story = {
+  tags: ['docs'],
   render: () => (
     <div className="nx:flex nx:w-64 nx:flex-col nx:gap-3">
       <ComboboxExample
@@ -226,10 +229,12 @@ export const Sizes: Story = {
 };
 
 export const Grouped: Story = {
+  tags: ['docs'],
   render: () => <ComboboxExample items={groupedFrameworks} />,
 };
 
 export const WithDisabledOption: Story = {
+  tags: ['docs'],
   render: () => (
     <ComboboxExample
       items={[
@@ -252,6 +257,7 @@ export const LongLabelsNarrowField: Story = {
 };
 
 export const Disabled: Story = {
+  tags: ['docs'],
   render: () => <ComboboxExample disabled defaultValue="next" />,
   play: async ({ canvasElement }) => {
     const canvas = within(canvasElement);
@@ -268,6 +274,7 @@ export const Disabled: Story = {
 };
 
 export const InvalidField: Story = {
+  tags: ['docs'],
   render: () => (
     <Field data-invalid>
       <FieldLabel htmlFor="framework-invalid">Framework</FieldLabel>
@@ -361,7 +368,7 @@ export const EmptyResults: Story = {
       // aria-required-children flags the transient absence of option children
       // while the query matches nothing, which is expected here. All other a11y
       // rules stay enabled. Mirrors the Command Empty story.
-      config: { rules: [{ id: 'aria-required-children', enabled: false }] },
+      options: { rules: { 'aria-required-children': { enabled: false } } },
     },
   },
   play: async ({ canvasElement }) => {

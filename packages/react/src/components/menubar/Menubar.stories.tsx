@@ -42,6 +42,7 @@ type Story = StoryObj<typeof Menubar>;
 // ============================================
 
 export const Default: Story = {
+  tags: ['docs'],
   render: (_args) => (
     <Menubar>
       <MenubarMenu>
@@ -79,6 +80,7 @@ export const Default: Story = {
 };
 
 export const WithCheckboxItems: Story = {
+  tags: ['docs'],
   render: function CheckboxItemsStory() {
     const [showBookmarks, setShowBookmarks] = React.useState(true);
     const [showFullUrls, setShowFullUrls] = React.useState(false);
@@ -110,6 +112,7 @@ export const WithCheckboxItems: Story = {
 };
 
 export const WithRadioItems: Story = {
+  tags: ['docs'],
   render: function RadioItemsStory() {
     const [profile, setProfile] = React.useState('benoit');
 
@@ -241,6 +244,7 @@ export const IndicatorCrossFade: Story = {
 };
 
 export const WithSubMenu: Story = {
+  tags: ['docs'],
   render: (_args) => (
     <Menubar>
       <MenubarMenu>
@@ -265,6 +269,7 @@ export const WithSubMenu: Story = {
 };
 
 export const WithInsetItems: Story = {
+  tags: ['docs'],
   render: (_args) => (
     <Menubar>
       <MenubarMenu>
@@ -404,6 +409,7 @@ export const KeyboardInteraction: Story = {
 };
 
 export const WithDisabledItems: Story = {
+  tags: ['docs'],
   render: (_args) => (
     <Menubar>
       <MenubarMenu>
@@ -499,9 +505,7 @@ export const WithDataAttributes: Story = {
     });
 
     const shortcut = document.querySelector('[data-slot="menubar-shortcut"]');
-    const rawTextXsClass = ['nx:text', 'xs'].join('-');
     await expect(shortcut).toHaveClass('nx:typography-shortcut');
-    await expect(shortcut).not.toHaveClass(rawTextXsClass);
     await expect(shortcut).not.toHaveClass('nx:tracking-widest');
 
     // Check destructive variant

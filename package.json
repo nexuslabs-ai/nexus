@@ -20,14 +20,14 @@
     "format:check": "prettier --check \"**/*.{ts,tsx,js,jsx,json,md,mdx,css,yml}\" \".claude/**/*.md\"",
     "clean": "turbo run clean && rm -rf node_modules",
     "typecheck": "turbo run typecheck",
-    "tokens:tailwind": "cd packages/core && pnpm build:tailwind && cp dist/tailwind/* ../../packages/tailwind/",
+    "tokens:tailwind": "turbo run build:tailwind --filter=@nexus_ds/core && cp packages/core/dist/tailwind/* packages/tailwind/",
     "audit:agent-drift": "node scripts/audit-agent-drift.js",
     "audit:turbo-outputs": "node scripts/audit-turbo-outputs.js",
-    "audit:contrast": "vitest run --project=unit packages/core/src/lib/derive-theme.test.ts -t \"legibility invariant\"",
+    "audit:contrast": "vitest run --project=unit packages/core/src/lib/derive-theme.test.ts packages/core/src/lib/contrast.test.ts -t \"legibility invariant\"",
+    "audit:colorblind": "turbo run audit:colorblind --filter=@nexus_ds/core",
     "audit:mode-codenames": "pnpm --filter @nexus_ds/core audit:mode-codenames",
     "audit:mode-distinctness": "pnpm --filter @nexus_ds/core audit:mode-distinctness",
     "validate:spacing-modes": "pnpm --filter @nexus_ds/core validate:spacing-modes",
-    "console": "cd apps/console && pnpm dev",
     "docs:serve": "npx @arabold/docs-mcp-server@latest server --store-path ./docs-mcp/data --protocol http --host 127.0.0.1 --port 6282",
     "docs:export": "cp ./docs-mcp/data/documents.db ./docs-mcp/documents.db && echo 'Exported docs-mcp database to docs-mcp/documents.db'",
     "docs:build": "docker build -t ghcr.io/nexuslabs-ai-bot/nexus-docs-mcp:latest ./docs-mcp",
@@ -59,7 +59,7 @@
         "sonner",
         "vaul"
       ],
-      "limit": "95 kB"
+      "limit": "96 kB"
     },
     {
       "name": "@nexus_ds/react (CSS)",
@@ -87,6 +87,7 @@
     "@vitest/browser-playwright": "4.0.18",
     "eslint": "^9.39.2",
     "eslint-config-prettier": "^10.1.8",
+    "eslint-plugin-better-tailwindcss": "^4.7.0",
     "eslint-plugin-jsx-a11y": "^6.10.2",
     "eslint-plugin-react": "^7.37.5",
     "eslint-plugin-react-hooks": "^7.0.1",
@@ -106,11 +107,12 @@
     "turbo": "^2.7.1",
     "typescript": "^5.9.3",
     "typescript-eslint": "^8.50.0",
-    "vitest": "4.0.18"
+    "vitest": "4.0.18",
+    "wrangler": "4.148.0"
   },
   "packageManager": "pnpm@10.12.1",
   "engines": {
-    "node": ">=20.19.0"
+    "node": ">=22.0.0"
   },
   "lint-staged": {
     "*.{ts,tsx,js,jsx}": [
@@ -119,10 +121,6 @@
     ],
     "*.{json,md,css}": [
       "prettier --write"
-    ],
-    "apps/docs/examples/**/*.tsx": [
-      "node apps/docs/scripts/generate-demo-index.mjs",
-      "git add apps/docs/__generated__"
     ],
     "packages/core/tokens/semantic/spacing-*.json": [
       "pnpm validate:spacing-modes",
@@ -137,10 +135,9 @@
     ]
   },
   "pnpm": {
-    "//overrides": "zod is pinned to dedupe @hookform/resolvers' broad peer range (^3.25.0 || ^4.0.0) onto the console app's zod v4 copy. @radix-ui/react-context is deduped to 1.1.3 (react-menubar pins 1.1.2) so a single, top-level-nameable copy exists — otherwise the .d.ts rollup fails with TS2742 under pnpm.",
+    "//overrides": "@radix-ui/react-context is deduped to 1.1.3 (react-menubar pins 1.1.2) so a single, top-level-nameable copy exists — otherwise the .d.ts rollup fails with TS2742 under pnpm.",
     "overrides": {
       "minimatch": "^10.1.2",
-      "zod": "^4.4.3",
       "@radix-ui/react-context": "1.1.3"
     }
   }

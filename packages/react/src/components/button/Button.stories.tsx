@@ -67,6 +67,7 @@ type Story = StoryObj<typeof Button>;
 // ============================================
 
 export const Default: Story = {
+  tags: ['docs'],
   args: {
     children: 'Button',
   },
@@ -213,6 +214,7 @@ export const IconLargeSize: Story = {
 };
 
 export const IconOnlySizes: Story = {
+  tags: ['docs'],
   render: () => (
     <div className="nx:flex nx:items-center nx:gap-2">
       <Button size="icon-sm" aria-label="Small icon">
@@ -549,13 +551,13 @@ export const WithDataAttributes: Story = {
 export const WithCustomClassName: Story = {
   args: {
     children: 'Custom Class',
-    className: 'custom-test-class',
+    className: 'nx:mt-2',
   },
   play: async ({ canvasElement }) => {
     const canvas = within(canvasElement);
     const button = canvas.getByRole('button');
 
-    await expect(button).toHaveClass('custom-test-class');
+    await expect(button).toHaveClass('nx:mt-2');
   },
 };
 
@@ -663,6 +665,7 @@ export const DisabledAsLink: Story = {
 // ============================================
 
 export const StartIconSlot: Story = {
+  tags: ['docs'],
   args: {
     startIcon: <IconRocket data-testid="start-icon" />,
     children: 'Launch',
@@ -680,6 +683,7 @@ export const StartIconSlot: Story = {
 };
 
 export const EndIconSlot: Story = {
+  tags: ['docs'],
   args: {
     endIcon: <IconArrowRight data-testid="end-icon" />,
     children: 'Continue',
@@ -733,6 +737,7 @@ export const LoadingUsesSpinnerOnly: Story = {
 // ============================================
 
 export const AllVariants: Story = {
+  tags: ['docs'],
   render: (_args) => (
     <div className="nx:flex nx:flex-col nx:gap-6">
       <div>
@@ -838,7 +843,7 @@ export const AllVariants: Story = {
   ),
 };
 
-export const VariantClassesMatchFigmaTokens: Story = {
+export const VariantClassesMatchTokens: Story = {
   render: () => (
     <div className="nx:flex nx:flex-wrap nx:items-center nx:gap-2">
       <Button variant="default">Default</Button>

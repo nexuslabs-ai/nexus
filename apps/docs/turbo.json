@@ -3,7 +3,8 @@
   "extends": ["//"],
   "tasks": {
     "generate:demos": {
-      "outputs": ["__generated__/**"],
+      "dependsOn": ["generate:dependencies", "generate:props"],
+      "outputs": ["__generated__/**", "public/avatars/**"],
       "cache": false
     },
     "generate:props": {
@@ -11,7 +12,9 @@
       "inputs": [
         "scripts/generate-props.mjs",
         "scripts/props-contract.mjs",
+        "scripts/props-entries.mjs",
         "scripts/react-entry-points.mjs",
+        "scripts/react-sources.mjs",
         "scripts/roots.mjs",
         "$TURBO_ROOT$/packages/react/src/**",
         "$TURBO_ROOT$/packages/react/package.json",
@@ -19,14 +22,30 @@
       ],
       "outputs": ["generated/props/**"]
     },
+    "generate:dependencies": {
+      "inputs": [
+        "scripts/generate-dependencies.mjs",
+        "scripts/react-sources.mjs",
+        "scripts/roots.mjs",
+        "$TURBO_ROOT$/packages/react/src/**",
+        "$TURBO_ROOT$/packages/react/package.json",
+        "$TURBO_ROOT$/packages/react/tsconfig.json"
+      ],
+      "outputs": ["generated/dependencies/**"]
+    },
     "generate:manifest": {
       "inputs": [
         "scripts/generate-page-manifest.mjs",
         "scripts/page-manifest.mjs",
         "scripts/roots.mjs",
+        "scripts/humanize.mjs",
+        "scripts/docs-stories.mjs",
+        "scripts/react-sources.mjs",
         "page-registry/**",
         "content/**",
         "app/_pages/**",
+        "$TURBO_ROOT$/packages/react/src/index.ts",
+        "$TURBO_ROOT$/packages/react/src/components/**/*.tsx",
         "$TURBO_ROOT$/.prettierrc"
       ],
       "outputs": [
@@ -39,18 +58,25 @@
         "^build",
         "generate:manifest",
         "generate:props",
+        "generate:dependencies",
         "generate:demos"
       ],
       "inputs": ["$TURBO_DEFAULT$", "$TURBO_ROOT$/package.json"],
-      "outputs": [".next/**", "!.next/cache/**", "next-env.d.ts"]
+      "outputs": ["out/**", "next-env.d.ts"]
     },
     "dev": {
-      "dependsOn": ["^build", "generate:manifest"],
+      "dependsOn": [
+        "^build",
+        "generate:manifest",
+        "generate:props",
+        "generate:dependencies",
+        "generate:demos"
+      ],
       "cache": false,
       "persistent": true
     },
     "typecheck": {
-      "dependsOn": ["^build", "generate:demos"]
+      "dependsOn": ["^build", "generate:manifest", "generate:demos"]
     }
   }
 }

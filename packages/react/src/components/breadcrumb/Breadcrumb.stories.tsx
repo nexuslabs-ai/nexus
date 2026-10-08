@@ -268,6 +268,7 @@ export const Playground: StoryObj<PlaygroundArgs> = {
 
 // A three-level trail ending on the current page.
 export const Default: Story = {
+  tags: ['docs'],
   render: () => (
     <Breadcrumb>
       <BreadcrumbList>
@@ -289,6 +290,7 @@ export const Default: Story = {
 
 // A long trail collapsed with an ellipsis standing in for the middle.
 export const WithEllipsis: Story = {
+  tags: ['docs'],
   render: () => (
     <Breadcrumb>
       <BreadcrumbList>
@@ -345,10 +347,11 @@ export const WithEllipsis: Story = {
   },
 };
 
-// Figma supports optional item icons and trailing dropdown affordances. The
+// Items support optional icons and trailing dropdown affordances. The
 // chevron is a real menu trigger next to the link, not an interactive control
 // nested inside the anchor.
 export const WithIcons: Story = {
+  tags: ['docs'],
   render: () => (
     <Breadcrumb>
       <BreadcrumbList>

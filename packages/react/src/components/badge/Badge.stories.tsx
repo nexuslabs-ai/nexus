@@ -11,7 +11,7 @@ import { expect, within } from 'storybook/test';
 
 import { Spinner } from '../spinner';
 
-import { Badge } from './badge';
+import { Badge, type BadgeProps } from './badge';
 
 const meta: Meta<typeof Badge> = {
   title: 'Components/Badge',
@@ -56,11 +56,17 @@ const meta: Meta<typeof Badge> = {
 export default meta;
 type Story = StoryObj<typeof Badge>;
 
+// `nx:h-6` / `nx:w-6` at `density: default`.
+const BADGE_SIZE_PX = 24;
+// `nx:size-3.5` icon slot.
+const BADGE_ICON_SIZE_PX = 14;
+
 // ============================================
 // VARIANT STORIES (Solid Fill)
 // ============================================
 
 export const Default: Story = {
+  tags: ['docs'],
   args: {
     children: 'Badge',
   },
@@ -173,7 +179,7 @@ export const Caps: Story = {
     const rect = badge.getBoundingClientRect();
 
     await expect(badge).toHaveAttribute('data-caps', 'true');
-    expect(Math.round(rect.height)).toBe(24);
+    expect(Math.round(rect.height)).toBe(BADGE_SIZE_PX);
   },
 };
 
@@ -181,6 +187,88 @@ export const Sentence: Story = {
   args: {
     isCaps: false,
     children: 'Label',
+  },
+};
+
+// ============================================
+// GEOMETRY
+// ============================================
+
+const GEOMETRY_VARIANTS = [
+  'default',
+  'secondary',
+  'error',
+  'warning',
+  'success',
+  'information',
+] as const;
+const GEOMETRY_FILLS = ['solid', 'light', 'outline'] as const;
+const GEOMETRY_SHAPES: ReadonlyArray<{
+  shape: string;
+  isSquare: boolean;
+  props: BadgeProps;
+}> = [
+  { shape: 'caps', isSquare: false, props: { children: 'Label' } },
+  {
+    shape: 'sentence',
+    isSquare: false,
+    props: { isCaps: false, children: 'Label' },
+  },
+  {
+    shape: 'icon + label',
+    isSquare: false,
+    props: { isCaps: false, leftIcon: <IconCheck />, children: 'Label' },
+  },
+  {
+    shape: 'icon-only',
+    isSquare: true,
+    props: { leftIcon: <IconCheck />, 'aria-label': 'Approved' },
+  },
+  { shape: 'number', isSquare: true, props: { isNumber: true, children: 8 } },
+];
+
+export const Geometry: Story = {
+  tags: ['!autodocs'],
+  globals: { density: 'default', stroke: 'strong' },
+  render: () => (
+    <div className="nx:flex nx:flex-col nx:items-start nx:gap-2">
+      {GEOMETRY_VARIANTS.flatMap((variant) =>
+        GEOMETRY_FILLS.map((fill) => (
+          <div
+            key={`${variant}-${fill}`}
+            className="nx:flex nx:items-center nx:gap-2"
+          >
+            {GEOMETRY_SHAPES.map(({ shape, isSquare, props }) => (
+              <Badge
+                key={shape}
+                data-shape={shape}
+                data-square={isSquare || undefined}
+                variant={variant}
+                fill={fill}
+                {...props}
+              />
+            ))}
+          </div>
+        ))
+      )}
+    </div>
+  ),
+  play: async ({ canvasElement }) => {
+    const badges = canvasElement.querySelectorAll<HTMLElement>(
+      '[data-slot="badge"]'
+    );
+
+    await expect(badges).toHaveLength(
+      GEOMETRY_VARIANTS.length * GEOMETRY_FILLS.length * GEOMETRY_SHAPES.length
+    );
+    for (const badge of badges) {
+      const rect = badge.getBoundingClientRect();
+      const label = `${badge.dataset.variant} / ${badge.dataset.fill} / ${badge.dataset.shape}`;
+
+      expect(Math.round(rect.height), label).toBe(BADGE_SIZE_PX);
+      if (badge.hasAttribute('data-square'))
+        expect(Math.round(rect.width), label).toBe(BADGE_SIZE_PX);
+    }
   },
 };
 
@@ -209,13 +297,13 @@ export const WithDataAttributes: Story = {
 export const WithCustomClassName: Story = {
   args: {
     children: 'Custom',
-    className: 'custom-test-class',
+    className: 'nx:mt-2',
   },
   play: async ({ canvasElement }) => {
     const canvas = within(canvasElement);
     const badge = canvas.getByText('Custom');
 
-    await expect(badge).toHaveClass('custom-test-class');
+    await expect(badge).toHaveClass('nx:mt-2');
   },
 };
 
@@ -233,6 +321,7 @@ export const WithLeftIcon: Story = {
 };
 
 export const WithRightIcon: Story = {
+  tags: ['docs'],
   args: {
     children: 'Dismiss',
     variant: 'secondary',
@@ -258,13 +347,14 @@ export const WithBothIcons: Story = {
     for (const svg of svgs) {
       const rect = svg.getBoundingClientRect();
 
-      expect(Math.round(rect.width)).toBe(14);
-      expect(Math.round(rect.height)).toBe(14);
+      expect(Math.round(rect.width)).toBe(BADGE_ICON_SIZE_PX);
+      expect(Math.round(rect.height)).toBe(BADGE_ICON_SIZE_PX);
     }
   },
 };
 
 export const IconOnly: Story = {
+  tags: ['docs'],
   globals: { density: 'default' },
   args: {
     variant: 'success',
@@ -286,10 +376,10 @@ export const IconOnly: Story = {
 
     await expect(badge).toHaveAttribute('data-icon-only', 'true');
     expect(badge.textContent).toBe('');
-    expect(Math.round(rect.height)).toBe(24);
-    expect(Math.round(rect.width)).toBeGreaterThanOrEqual(24);
-    expect(Math.round(svgRect.width)).toBe(14);
-    expect(Math.round(svgRect.height)).toBe(14);
+    expect(Math.round(rect.height)).toBe(BADGE_SIZE_PX);
+    expect(Math.round(rect.width)).toBeGreaterThanOrEqual(BADGE_SIZE_PX);
+    expect(Math.round(svgRect.width)).toBe(BADGE_ICON_SIZE_PX);
+    expect(Math.round(svgRect.height)).toBe(BADGE_ICON_SIZE_PX);
   },
 };
 
@@ -317,12 +407,13 @@ export const WithSvgLoader: Story = {
     await expect(spinner).toHaveAttribute('role', 'presentation');
     await expect(spinner).toHaveAttribute('aria-hidden', 'true');
     await expect(spinner).not.toHaveAttribute('aria-label');
-    expect(Math.round(rect.width)).toBe(14);
-    expect(Math.round(rect.height)).toBe(14);
+    expect(Math.round(rect.width)).toBe(BADGE_ICON_SIZE_PX);
+    expect(Math.round(rect.height)).toBe(BADGE_ICON_SIZE_PX);
   },
 };
 
 export const StatusWithIcons: Story = {
+  tags: ['docs'],
   parameters: {
     docs: {
       description: {
@@ -393,8 +484,8 @@ export const NumberBadgeHighValue: Story = {
     const rect = badge.getBoundingClientRect();
 
     await expect(badge).toHaveAttribute('data-number', 'true');
-    expect(Math.round(rect.height)).toBe(24);
-    expect(Math.round(rect.width)).toBeGreaterThan(24);
+    expect(Math.round(rect.height)).toBe(BADGE_SIZE_PX);
+    expect(Math.round(rect.width)).toBeGreaterThan(BADGE_SIZE_PX);
   },
 };
 
@@ -432,11 +523,44 @@ export const LongContent: Story = {
   },
 };
 
+export const IconOnlyWithConditionalLabel: Story = {
+  render: () => (
+    <div className="nx:flex nx:items-center nx:gap-2">
+      {[false, '', ' ', <></>, <> </>].map((children, index) => (
+        <Badge key={index} leftIcon={<IconCheck />} aria-label="Approved">
+          {children}
+        </Badge>
+      ))}
+      {[0, <>Approved</>].map((children, index) => (
+        <Badge key={index} data-testid="label-badge" leftIcon={<IconCheck />}>
+          {children}
+        </Badge>
+      ))}
+    </div>
+  ),
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+    const iconOnlyBadges = canvas.getAllByRole('img', { name: 'Approved' });
+    const [zeroBadge, fragmentBadge] = canvas.getAllByTestId('label-badge');
+
+    await expect(iconOnlyBadges).toHaveLength(5);
+    for (const badge of iconOnlyBadges) {
+      await expect(badge).toHaveAttribute('data-icon-only', 'true');
+    }
+    await expect(zeroBadge).toHaveTextContent('0');
+    await expect(fragmentBadge).toHaveTextContent('Approved');
+    for (const badge of [zeroBadge, fragmentBadge]) {
+      await expect(badge).not.toHaveAttribute('data-icon-only');
+    }
+  },
+};
+
 // ============================================
 // ALL VARIANTS GRID (visual reference)
 // ============================================
 
 export const AllVariants: Story = {
+  tags: ['docs'],
   render: (_args) => (
     <div className="nx:flex nx:flex-col nx:gap-8">
       {/* Solid Fill - Caps */}

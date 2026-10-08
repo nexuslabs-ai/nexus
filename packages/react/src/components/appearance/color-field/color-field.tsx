@@ -44,18 +44,19 @@ export function NexusAppearanceColorField({
   return (
     <div className="nx:flex nx:items-center nx:gap-2">
       <div className="nx:relative nx:size-7 nx:shrink-0">
-        <div
-          className="nx:size-full nx:rounded-full nx:border-default nx:border-border-default"
-          style={{
-            backgroundColor: normalizedValue ?? 'transparent',
-          }}
-        />
         <input
           type="color"
           value={committedHex}
           onChange={(event) => commit(event.target.value)}
           aria-label={label}
-          className="nx:absolute nx:inset-0 nx:cursor-pointer nx:opacity-0"
+          className="nx:peer nx:absolute nx:inset-0 nx:cursor-pointer nx:opacity-0"
+        />
+        <div
+          aria-hidden="true"
+          className="nx:size-full nx:rounded-full nx:border-default nx:border-border-default nx:peer-focus-visible:outline-2 nx:peer-focus-visible:outline-focus-default nx:peer-focus-visible:outline-offset-2"
+          style={{
+            backgroundColor: normalizedValue ?? 'transparent',
+          }}
         />
       </div>
       <Input

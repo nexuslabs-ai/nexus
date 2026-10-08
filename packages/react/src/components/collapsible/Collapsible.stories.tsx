@@ -20,6 +20,7 @@ type Story = StoryObj<typeof Collapsible>;
 
 // A trigger composed with a ghost Button, toggling a content region.
 export const Default: Story = {
+  tags: ['docs'],
   render: () => (
     <Collapsible className="nx:flex nx:w-72 nx:flex-col">
       <div className="nx:flex nx:flex-col nx:gap-2">
@@ -55,6 +56,7 @@ export const Default: Story = {
 
 // Open by default, showing the revealed content region.
 export const Open: Story = {
+  tags: ['docs'],
   render: () => (
     <Collapsible defaultOpen className="nx:flex nx:w-72 nx:flex-col">
       <CollapsibleTrigger asChild>
@@ -129,6 +131,7 @@ export const KeyboardInteraction: Story = {
 
 // A disabled collapsible: the trigger cannot toggle the content.
 export const Disabled: Story = {
+  tags: ['docs'],
   args: { onOpenChange: fn() },
   render: (args) => (
     <Collapsible

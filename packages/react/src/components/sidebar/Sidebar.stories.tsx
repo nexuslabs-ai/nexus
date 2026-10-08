@@ -228,6 +228,69 @@ export const Expanded: Story = {
   ),
 };
 
+/**
+ * Visual grid reference for every `SidebarMenuButton` variant, size, and the
+ * `asChild` composition. Uses `collapsible="none"` and a bounded height so the
+ * panel sits inline (not viewport-fixed).
+ */
+export const AllVariants: Story = {
+  tags: ['docs'],
+  render: () => (
+    <div className="nx:h-96 nx:w-full nx:overflow-hidden nx:rounded-lg nx:border-default nx:border-border-default">
+      <SidebarProvider style={{ minHeight: 'unset', height: '100%' }}>
+        <Sidebar collapsible="none">
+          <SidebarHeader>
+            <SidebarMenu>
+              <SidebarMenuItem>
+                <SidebarMenuButton size="lg">
+                  <IconLayoutGrid />
+                  <span>Acme Inc</span>
+                </SidebarMenuButton>
+              </SidebarMenuItem>
+            </SidebarMenu>
+          </SidebarHeader>
+          <SidebarContent>
+            <SidebarGroup>
+              <SidebarGroupLabel>Variants</SidebarGroupLabel>
+              <SidebarGroupContent>
+                <SidebarMenu>
+                  <SidebarMenuItem>
+                    <SidebarMenuButton isActive>
+                      <IconHome />
+                      <span>Active</span>
+                    </SidebarMenuButton>
+                  </SidebarMenuItem>
+                  <SidebarMenuItem>
+                    <SidebarMenuButton variant="outline">
+                      <IconInbox />
+                      <span>Outline</span>
+                    </SidebarMenuButton>
+                  </SidebarMenuItem>
+                  <SidebarMenuItem>
+                    <SidebarMenuButton size="sm">
+                      <IconCalendar />
+                      <span>Small</span>
+                    </SidebarMenuButton>
+                  </SidebarMenuItem>
+                  <SidebarMenuItem>
+                    <SidebarMenuButton asChild>
+                      <a href="https://example.com">
+                        <IconSettings />
+                        <span>As link</span>
+                      </a>
+                    </SidebarMenuButton>
+                  </SidebarMenuItem>
+                </SidebarMenu>
+              </SidebarGroupContent>
+            </SidebarGroup>
+          </SidebarContent>
+        </Sidebar>
+        <DemoInset />
+      </SidebarProvider>
+    </div>
+  ),
+};
+
 export const Collapsed: Story = {
   name: 'Collapsed (icon)',
   render: () => (
@@ -241,59 +304,62 @@ export const Collapsed: Story = {
 };
 
 export const WithSubmenu: Story = {
+  tags: ['docs'],
   render: () => (
-    <SidebarProvider>
-      <Sidebar>
-        <SidebarContent>
-          <SidebarGroup>
-            <SidebarGroupLabel>Projects</SidebarGroupLabel>
-            <SidebarGroupContent>
-              <SidebarMenu>
-                <SidebarMenuItem>
-                  <SidebarMenuButton isActive>
-                    <IconFolder />
-                    <span>Design System</span>
-                    <IconChevronRight className="nx:ml-auto" />
-                  </SidebarMenuButton>
-                  <SidebarMenuSub>
-                    <SidebarMenuSubItem>
-                      <SidebarMenuSubButton href="#tokens" isActive>
-                        Tokens
-                      </SidebarMenuSubButton>
-                    </SidebarMenuSubItem>
-                    <SidebarMenuSubItem>
-                      <SidebarMenuSubButton href="#components">
-                        Components
-                      </SidebarMenuSubButton>
-                    </SidebarMenuSubItem>
-                    <SidebarMenuSubItem>
-                      <SidebarMenuSubButton href="#documentation">
-                        Documentation
-                      </SidebarMenuSubButton>
-                    </SidebarMenuSubItem>
-                  </SidebarMenuSub>
-                </SidebarMenuItem>
-              </SidebarMenu>
-            </SidebarGroupContent>
-          </SidebarGroup>
-          <SidebarSeparator />
-          <SidebarGroup>
-            <SidebarGroupContent>
-              <SidebarMenu>
-                <SidebarMenuItem>
-                  <SidebarMenuButton>
-                    <IconInbox />
-                    <span>Inbox</span>
-                  </SidebarMenuButton>
-                </SidebarMenuItem>
-              </SidebarMenu>
-            </SidebarGroupContent>
-          </SidebarGroup>
-        </SidebarContent>
-        <SidebarRail />
-      </Sidebar>
-      <DemoInset />
-    </SidebarProvider>
+    <div className="nx:h-96 nx:w-full nx:overflow-hidden nx:rounded-lg nx:border-default nx:border-border-default">
+      <SidebarProvider style={{ minHeight: 'unset', height: '100%' }}>
+        <Sidebar collapsible="none">
+          <SidebarContent>
+            <SidebarGroup>
+              <SidebarGroupLabel>Projects</SidebarGroupLabel>
+              <SidebarGroupContent>
+                <SidebarMenu>
+                  <SidebarMenuItem>
+                    <SidebarMenuButton isActive>
+                      <IconFolder />
+                      <span>Design System</span>
+                      <IconChevronRight className="nx:ml-auto" />
+                    </SidebarMenuButton>
+                    <SidebarMenuSub>
+                      <SidebarMenuSubItem>
+                        <SidebarMenuSubButton href="#tokens" isActive>
+                          Tokens
+                        </SidebarMenuSubButton>
+                      </SidebarMenuSubItem>
+                      <SidebarMenuSubItem>
+                        <SidebarMenuSubButton href="#components">
+                          Components
+                        </SidebarMenuSubButton>
+                      </SidebarMenuSubItem>
+                      <SidebarMenuSubItem>
+                        <SidebarMenuSubButton href="#documentation">
+                          Documentation
+                        </SidebarMenuSubButton>
+                      </SidebarMenuSubItem>
+                    </SidebarMenuSub>
+                  </SidebarMenuItem>
+                </SidebarMenu>
+              </SidebarGroupContent>
+            </SidebarGroup>
+            <SidebarSeparator />
+            <SidebarGroup>
+              <SidebarGroupContent>
+                <SidebarMenu>
+                  <SidebarMenuItem>
+                    <SidebarMenuButton>
+                      <IconInbox />
+                      <span>Inbox</span>
+                    </SidebarMenuButton>
+                  </SidebarMenuItem>
+                </SidebarMenu>
+              </SidebarGroupContent>
+            </SidebarGroup>
+          </SidebarContent>
+          <SidebarRail />
+        </Sidebar>
+        <DemoInset />
+      </SidebarProvider>
+    </div>
   ),
 };
 
@@ -682,68 +748,6 @@ export const StylingContracts: Story = {
 };
 
 /**
- * Visual grid reference for every `SidebarMenuButton` variant, size, and the
- * `asChild` composition. Uses `collapsible="none"` and a bounded height so the
- * panel sits inline (not viewport-fixed).
- */
-export const AllVariants: Story = {
-  render: () => (
-    <div className="nx:h-96 nx:w-full nx:overflow-hidden nx:rounded-lg nx:border-default nx:border-border-default">
-      <SidebarProvider style={{ minHeight: 'unset', height: '100%' }}>
-        <Sidebar collapsible="none">
-          <SidebarHeader>
-            <SidebarMenu>
-              <SidebarMenuItem>
-                <SidebarMenuButton size="lg">
-                  <IconLayoutGrid />
-                  <span>Acme Inc</span>
-                </SidebarMenuButton>
-              </SidebarMenuItem>
-            </SidebarMenu>
-          </SidebarHeader>
-          <SidebarContent>
-            <SidebarGroup>
-              <SidebarGroupLabel>Variants</SidebarGroupLabel>
-              <SidebarGroupContent>
-                <SidebarMenu>
-                  <SidebarMenuItem>
-                    <SidebarMenuButton isActive>
-                      <IconHome />
-                      <span>Active</span>
-                    </SidebarMenuButton>
-                  </SidebarMenuItem>
-                  <SidebarMenuItem>
-                    <SidebarMenuButton variant="outline">
-                      <IconInbox />
-                      <span>Outline</span>
-                    </SidebarMenuButton>
-                  </SidebarMenuItem>
-                  <SidebarMenuItem>
-                    <SidebarMenuButton size="sm">
-                      <IconCalendar />
-                      <span>Small</span>
-                    </SidebarMenuButton>
-                  </SidebarMenuItem>
-                  <SidebarMenuItem>
-                    <SidebarMenuButton asChild>
-                      <a href="https://example.com">
-                        <IconSettings />
-                        <span>As link</span>
-                      </a>
-                    </SidebarMenuButton>
-                  </SidebarMenuItem>
-                </SidebarMenu>
-              </SidebarGroupContent>
-            </SidebarGroup>
-          </SidebarContent>
-        </Sidebar>
-        <DemoInset />
-      </SidebarProvider>
-    </div>
-  ),
-};
-
-/**
  * The kitchen-sink view: a workspace switcher + search in the header, two
  * labelled groups with a group action, menu items carrying badges, a row
  * action, two nested sub-menus (each with an active child), a separator, and
@@ -888,76 +892,78 @@ export const Complex: Story = {
  * size too.
  */
 export const Compact: Story = {
-  name: 'Compact (small size)',
+  tags: ['docs'],
   render: () => (
-    <SidebarProvider>
-      <Sidebar>
-        <SidebarHeader>
-          <SidebarInput aria-label="Search" placeholder="Search…" />
-        </SidebarHeader>
-        <SidebarContent>
-          <SidebarGroup>
-            <SidebarGroupLabel>Platform</SidebarGroupLabel>
-            <SidebarGroupContent>
-              <SidebarMenu>
-                {NAV_ITEMS.map((item) => {
-                  const Icon = item.icon;
-                  return (
-                    <SidebarMenuItem key={item.title}>
-                      <SidebarMenuButton
-                        size="sm"
-                        tooltip={item.title}
-                        isActive={item.title === 'Home'}
-                      >
-                        <Icon />
-                        <span>{item.title}</span>
-                      </SidebarMenuButton>
-                      {item.badge && (
-                        <SidebarMenuBadge>{item.badge}</SidebarMenuBadge>
-                      )}
-                    </SidebarMenuItem>
-                  );
-                })}
-                <SidebarMenuItem>
-                  <SidebarMenuButton size="sm" tooltip="Projects">
-                    <IconFolder />
-                    <span>Projects</span>
-                    <IconChevronRight className="nx:ml-auto" />
-                  </SidebarMenuButton>
-                  <SidebarMenuSub>
-                    <SidebarMenuSubItem>
-                      <SidebarMenuSubButton href="#overview" size="sm">
-                        Overview
-                      </SidebarMenuSubButton>
-                    </SidebarMenuSubItem>
-                    <SidebarMenuSubItem>
-                      <SidebarMenuSubButton href="#mobile" size="sm" isActive>
-                        Mobile App
-                      </SidebarMenuSubButton>
-                    </SidebarMenuSubItem>
-                  </SidebarMenuSub>
-                </SidebarMenuItem>
-              </SidebarMenu>
-            </SidebarGroupContent>
-          </SidebarGroup>
-        </SidebarContent>
-        <SidebarFooter>
-          <SidebarMenu>
-            <SidebarMenuItem>
-              <SidebarMenuButton size="sm" tooltip="Account">
-                <IconUser />
-                <span>Account</span>
-              </SidebarMenuButton>
-            </SidebarMenuItem>
-          </SidebarMenu>
-        </SidebarFooter>
-        <SidebarRail />
-      </Sidebar>
-      <DemoInset>
-        Compact rows use the small size (12px body-small) for denser,
-        information-heavy sidebars.
-      </DemoInset>
-    </SidebarProvider>
+    <div className="nx:h-96 nx:w-full nx:overflow-hidden nx:rounded-lg nx:border-default nx:border-border-default">
+      <SidebarProvider style={{ minHeight: 'unset', height: '100%' }}>
+        <Sidebar collapsible="none">
+          <SidebarHeader>
+            <SidebarInput aria-label="Search" placeholder="Search…" />
+          </SidebarHeader>
+          <SidebarContent>
+            <SidebarGroup>
+              <SidebarGroupLabel>Platform</SidebarGroupLabel>
+              <SidebarGroupContent>
+                <SidebarMenu>
+                  {NAV_ITEMS.map((item) => {
+                    const Icon = item.icon;
+                    return (
+                      <SidebarMenuItem key={item.title}>
+                        <SidebarMenuButton
+                          size="sm"
+                          tooltip={item.title}
+                          isActive={item.title === 'Home'}
+                        >
+                          <Icon />
+                          <span>{item.title}</span>
+                        </SidebarMenuButton>
+                        {item.badge && (
+                          <SidebarMenuBadge>{item.badge}</SidebarMenuBadge>
+                        )}
+                      </SidebarMenuItem>
+                    );
+                  })}
+                  <SidebarMenuItem>
+                    <SidebarMenuButton size="sm" tooltip="Projects">
+                      <IconFolder />
+                      <span>Projects</span>
+                      <IconChevronRight className="nx:ml-auto" />
+                    </SidebarMenuButton>
+                    <SidebarMenuSub>
+                      <SidebarMenuSubItem>
+                        <SidebarMenuSubButton href="#overview" size="sm">
+                          Overview
+                        </SidebarMenuSubButton>
+                      </SidebarMenuSubItem>
+                      <SidebarMenuSubItem>
+                        <SidebarMenuSubButton href="#mobile" size="sm" isActive>
+                          Mobile App
+                        </SidebarMenuSubButton>
+                      </SidebarMenuSubItem>
+                    </SidebarMenuSub>
+                  </SidebarMenuItem>
+                </SidebarMenu>
+              </SidebarGroupContent>
+            </SidebarGroup>
+          </SidebarContent>
+          <SidebarFooter>
+            <SidebarMenu>
+              <SidebarMenuItem>
+                <SidebarMenuButton size="sm" tooltip="Account">
+                  <IconUser />
+                  <span>Account</span>
+                </SidebarMenuButton>
+              </SidebarMenuItem>
+            </SidebarMenu>
+          </SidebarFooter>
+          <SidebarRail />
+        </Sidebar>
+        <DemoInset>
+          Compact rows use the small size (12px body-small) for denser,
+          information-heavy sidebars.
+        </DemoInset>
+      </SidebarProvider>
+    </div>
   ),
 };
 
@@ -968,37 +974,39 @@ export const Compact: Story = {
  * `p-2` that `SidebarGroup` normally supplies is moved onto `SidebarContent`.
  */
 export const Flat: Story = {
-  name: 'Flat (no groups)',
+  tags: ['docs'],
   render: () => (
-    <SidebarProvider>
-      <Sidebar>
-        <SidebarContent className="nx:p-2">
-          <SidebarMenu>
-            {NAV_ITEMS.map((item) => {
-              const Icon = item.icon;
-              return (
-                <SidebarMenuItem key={item.title}>
-                  <SidebarMenuButton
-                    tooltip={item.title}
-                    isActive={item.title === 'Home'}
-                  >
-                    <Icon />
-                    <span>{item.title}</span>
-                  </SidebarMenuButton>
-                  {item.badge && (
-                    <SidebarMenuBadge>{item.badge}</SidebarMenuBadge>
-                  )}
-                </SidebarMenuItem>
-              );
-            })}
-          </SidebarMenu>
-        </SidebarContent>
-        <SidebarRail />
-      </Sidebar>
-      <DemoInset>
-        Flat structure — no SidebarGroup/-Label/-Content, just a SidebarMenu of
-        buttons.
-      </DemoInset>
-    </SidebarProvider>
+    <div className="nx:h-96 nx:w-full nx:overflow-hidden nx:rounded-lg nx:border-default nx:border-border-default">
+      <SidebarProvider style={{ minHeight: 'unset', height: '100%' }}>
+        <Sidebar collapsible="none">
+          <SidebarContent className="nx:p-2">
+            <SidebarMenu>
+              {NAV_ITEMS.map((item) => {
+                const Icon = item.icon;
+                return (
+                  <SidebarMenuItem key={item.title}>
+                    <SidebarMenuButton
+                      tooltip={item.title}
+                      isActive={item.title === 'Home'}
+                    >
+                      <Icon />
+                      <span>{item.title}</span>
+                    </SidebarMenuButton>
+                    {item.badge && (
+                      <SidebarMenuBadge>{item.badge}</SidebarMenuBadge>
+                    )}
+                  </SidebarMenuItem>
+                );
+              })}
+            </SidebarMenu>
+          </SidebarContent>
+          <SidebarRail />
+        </Sidebar>
+        <DemoInset>
+          Flat structure — no SidebarGroup/-Label/-Content, just a SidebarMenu
+          of buttons.
+        </DemoInset>
+      </SidebarProvider>
+    </div>
   ),
 };

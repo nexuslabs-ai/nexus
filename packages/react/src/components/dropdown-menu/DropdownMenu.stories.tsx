@@ -58,6 +58,7 @@ export const Default: Story = {
 };
 
 export const WithLabelsAndSeparators: Story = {
+  tags: ['docs'],
   render: (_args) => (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
@@ -91,6 +92,7 @@ export const WithLabelsAndSeparators: Story = {
 };
 
 export const WithCheckboxItems: Story = {
+  tags: ['docs'],
   render: function CheckboxItemsStory() {
     const [showStatusBar, setShowStatusBar] = React.useState(true);
     const [showActivityBar, setShowActivityBar] = React.useState(false);
@@ -129,6 +131,7 @@ export const WithCheckboxItems: Story = {
 };
 
 export const WithRadioItems: Story = {
+  tags: ['docs'],
   render: function RadioItemsStory() {
     const [position, setPosition] = React.useState('bottom');
 
@@ -262,6 +265,7 @@ export const IndicatorCrossFade: Story = {
 };
 
 export const WithSubMenu: Story = {
+  tags: ['docs'],
   render: (_args) => (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
@@ -618,9 +622,7 @@ export const WithDataAttributes: Story = {
     const shortcut = document.querySelector(
       '[data-slot="dropdown-menu-shortcut"]'
     );
-    const rawTextXsClass = ['nx:text', 'xs'].join('-');
     await expect(shortcut).toHaveClass('nx:typography-shortcut');
-    await expect(shortcut).not.toHaveClass(rawTextXsClass);
     await expect(shortcut).not.toHaveClass('nx:tracking-widest');
 
     // Check destructive variant

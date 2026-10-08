@@ -6,11 +6,11 @@ Token-driven design system for product UI. Three layers compose into one consuma
 - **`@nexus_ds/tailwind`** — Tailwind CSS theme generated from the tokens. All utilities are namespaced with the `nx:` prefix.
 - **`@nexus_ds/react`** — React components built on Radix UI primitives and the Tailwind layer. Variants via CVA; data-attribute test surface.
 
-A console app exercises the tokens visually; Storybook hosts the component catalog and runs both visual docs and interaction tests against the real components. The catalog is published from `main` at **<https://nexuslabs-ai.github.io/nexus/>**.
+Storybook hosts the component catalog and runs both visual docs and interaction tests against the real components. The catalog is published from `main` at **<https://storybook.nexusui.so>**.
 
 ## Prerequisites
 
-- **Node** ≥ 20.19.0 (see `.nvmrc`)
+- **Node** ≥ 22 (see `.nvmrc`)
 - **pnpm** — pinned via `packageManager: pnpm@10.12.1`
 - **Docker Desktop** — for the docs-MCP server (optional)
 
@@ -30,7 +30,6 @@ make dev          # Storybook — the component catalog & dev surface
 | `packages/core`     | Internal design tokens and theme definitions (not published)  |
 | `packages/tailwind` | Tailwind CSS theme with `nx:` prefix                          |
 | `packages/react`    | React components built with Radix UI and Tailwind CSS         |
-| `apps/console`      | Theme/token exploration UI                                    |
 | `apps/docs`         | Documentation site (Next.js — IA shell + live theme explorer) |
 
 ## Where to learn more

@@ -18,13 +18,18 @@ const COPY_STATUS = {
 
 type CopyStatus = keyof typeof COPY_STATUS;
 
-// Every docs code block — MDX fence and hand-written `CodeSample` alike —
+// Every docs code block — MDX fence and `CodeSample` alike —
 // renders through here, so this is the one code-block surface. `bg-container`
 // is the surface the syntax colours are APCA-gated against; `pe-14` keeps the
 // copy control clear of the code; the `code` resets undo the inline-code
 // styling the MDX `code` override applies inside a fence.
 const PRE_CLASS =
   'nx:typography-code-block nx:bg-container nx:border nx:border-border-default nx:rounded-md nx:p-4 nx:pe-14 nx:overflow-x-auto nx:focus-visible:outline-2 nx:focus-visible:outline-focus-default nx:[&_code]:bg-transparent nx:[&_code]:p-0 nx:[&_code]:typography-code-block';
+
+// Inside a card the block sits flush, so its outline is inset to survive the
+// card's `overflow-hidden`.
+const FRAMED_PRE_CLASS =
+  'nx:rounded-none nx:border-0 nx:focus-visible:-outline-offset-2';
 
 const BUTTON_CLASS =
   'nx:absolute nx:top-2 nx:end-2 nx:data-[copy-status=copied]:text-success-subtle-foreground nx:data-[copy-status=failed]:text-error-subtle-foreground';
@@ -33,8 +38,12 @@ const BUTTON_CLASS =
 export function CodeBlock({
   children,
   className,
+  framed = false,
   ...props
-}: Omit<React.ComponentProps<'pre'>, 'tabIndex' | 'ref'>) {
+}: Omit<React.ComponentProps<'pre'>, 'tabIndex' | 'ref'> & {
+  /** Sits flush inside a bordered card instead of standing on its own. */
+  framed?: boolean;
+}) {
   const preRef = React.useRef<HTMLPreElement>(null);
   const timerRef = React.useRef<number | undefined>(undefined);
   const [status, setStatus] = React.useState<CopyStatus>('idle');
@@ -68,9 +77,9 @@ export function CodeBlock({
   };
 
   return (
-    <div className="nx:relative nx:mb-4">
+    <div className={cn('nx:relative', !framed && 'nx:mb-4')}>
       <pre
-        className={cn(PRE_CLASS, className)}
+        className={cn(PRE_CLASS, framed && FRAMED_PRE_CLASS, className)}
         {...props}
         ref={preRef}
         // Below the spread so an injected `tabIndex` cannot replace this one.

@@ -6,3 +6,4 @@ onlyBuiltDependencies:
   - esbuild
   - msw
   - sharp
+  - workerd
