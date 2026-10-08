@@ -1,6 +1,8 @@
 'use client';
 
 // Client runtime Appearance surface. Server-safe script helpers are exported from ./server.
+export type { NexusRootAttributes } from '../../../lib/nexus-root-context';
+export { useNexusRootAttributes } from '../../../lib/nexus-root-context';
 export type { CreateNexusAppearanceOptions } from './factory';
 export { createNexusAppearance } from './factory';
 export type { NexusRootProps, NexusRootState } from './nexus-root';

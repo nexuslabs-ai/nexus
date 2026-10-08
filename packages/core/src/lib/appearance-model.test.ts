@@ -388,7 +388,8 @@ describe('createNexusThemeContract', () => {
 describe('appearancePrefsToCss', () => {
   const prefs = DEFAULT_NEXUS_APPEARANCE.prefs;
   const scope = nexusRootScope('embedded');
-  const within = `:where(${scope}, ${scope} *)`;
+  const nested = `${scope} [data-nexus-root]:not(${scope})`;
+  const within = `:where(${scope}, ${scope} *):where(:not(${nested}, ${nested} *))`;
   const typographyVarPattern =
     /--nx-typography-(?:size|line-height)-[a-z0-9]+:\s*[^;]+;/g;
 

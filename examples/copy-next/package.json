@@ -6,8 +6,8 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "nexus:add": "shadcn add @nexus/styles @nexus/button @nexus/card @nexus/dialog @nexus/popover @nexus/progress @nexus/appearance-provider --yes --overwrite",
-    "typecheck": "tsc --noEmit -p ."
+    "nexus:add": "rm -rf components/nexus && shadcn add @nexus/button @nexus/card @nexus/dialog @nexus/popover @nexus/progress @nexus/appearance-provider --yes",
+    "typecheck": "next typegen && tsc --noEmit -p ."
   },
   "dependencies": {
     "@nexus_ds/core": "file:../registry/.generated/nexus_ds-core-0.5.0.tgz",

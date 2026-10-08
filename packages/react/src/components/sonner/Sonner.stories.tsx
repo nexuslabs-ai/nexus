@@ -195,8 +195,8 @@ function ModeSwitchingToaster() {
   );
 }
 
-// The toaster takes the nearest root's mode and attributes, and follows a mode
-// change while a toast is visible.
+// The toaster renders inside the nearest root, takes its mode, and follows a
+// mode change while a toast is visible.
 export const FollowsRootMode: Story = {
   render: () => <ModeSwitchingToaster />,
   play: async ({ canvasElement }) => {
@@ -210,19 +210,14 @@ export const FollowsRootMode: Story = {
       expect(element).not.toBeNull();
       return element!;
     });
-    const wrapper = canvasElement.querySelector('[data-slot="toaster"]');
 
+    await expect(root).toContainElement(toaster as HTMLElement);
     await expect(toaster).toHaveAttribute('data-sonner-theme', 'light');
-    await expect(wrapper).toHaveAttribute(
-      'data-nexus-root',
-      root.getAttribute('data-nexus-root')!
-    );
 
     await userEvent.click(canvas.getByRole('button', { name: 'Go dark' }));
     await waitFor(() =>
       expect(toaster).toHaveAttribute('data-sonner-theme', 'dark')
     );
-    await expect(wrapper).toHaveAttribute('data-nx-mode', 'dark');
   },
 };
 
