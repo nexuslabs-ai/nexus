@@ -40,4 +40,8 @@ export {
   TableHeader,
   TableRow,
   TableRowHeader,
+  Tabs,
+  TabsContent,
+  TabsList,
+  TabsTrigger,
 } from '@nexus_ds/react';

@@ -52,6 +52,7 @@ const topDelta = (a: Element, b: Element) =>
 // ============================================
 
 export const Default: Story = {
+  tags: ['docs'],
   render: () => (
     <MessageGroup className={column}>
       <Message>
@@ -73,6 +74,7 @@ export const Default: Story = {
 };
 
 export const Alignment: Story = {
+  tags: ['docs'],
   render: () => (
     <MessageGroup className={column}>
       <Message align="start">
@@ -142,6 +144,7 @@ export const Alignment: Story = {
 };
 
 export const WithoutAvatar: Story = {
+  tags: ['docs'],
   render: () => (
     <MessageGroup className={column}>
       <Message>
@@ -363,6 +366,7 @@ function TypingIndicatorExample() {
  * text.
  */
 export const TypingIndicator: Story = {
+  tags: ['docs'],
   render: () => <TypingIndicatorExample />,
   play: async ({ canvasElement }) => {
     const canvas = within(canvasElement);
@@ -589,6 +593,7 @@ export const WithAvatar: Story = {
  * The avatar sits on the first turn because the rail is top-anchored.
  */
 export const GroupedTurns: Story = {
+  tags: ['docs'],
   render: () => (
     <MessageGroup className={column}>
       <Message>
@@ -667,6 +672,7 @@ export const GroupedTurns: Story = {
 };
 
 export const WithActions: Story = {
+  tags: ['docs'],
   render: () => (
     <TooltipProvider delayDuration={0}>
       <MessageGroup className={column}>
@@ -817,6 +823,7 @@ export const WithActions: Story = {
 };
 
 export const WithAttachment: Story = {
+  tags: ['docs'],
   render: () => (
     <MessageGroup className={column}>
       <Message>

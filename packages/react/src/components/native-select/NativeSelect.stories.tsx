@@ -19,6 +19,7 @@ type Story = StoryObj<typeof NativeSelect>;
 
 // A basic select with a styled closed trigger; the open list is OS-rendered.
 export const Default: Story = {
+  tags: ['docs'],
   render: () => (
     <NativeSelect aria-label="Plan" defaultValue="pro">
       <NativeSelectOption value="free">Free</NativeSelectOption>
@@ -30,6 +31,7 @@ export const Default: Story = {
 
 // Both sizes: the default control height and the dense `sm`.
 export const Sizes: Story = {
+  tags: ['docs'],
   render: () => (
     <div className="nx:flex nx:flex-col nx:gap-3">
       <NativeSelect size="default" aria-label="Default size" defaultValue="pro">
@@ -46,6 +48,7 @@ export const Sizes: Story = {
 
 // Grouped options via optgroup.
 export const WithOptGroups: Story = {
+  tags: ['docs'],
   render: () => (
     <NativeSelect aria-label="Timezone" defaultValue="pst">
       <NativeSelectOptGroup label="Americas">
@@ -62,6 +65,7 @@ export const WithOptGroups: Story = {
 
 // Invalid state — error boundary + error focus ring.
 export const Invalid: Story = {
+  tags: ['docs'],
   render: () => (
     <NativeSelect aria-label="Plan" aria-invalid defaultValue="free">
       <NativeSelectOption value="free">Free</NativeSelectOption>
@@ -72,6 +76,7 @@ export const Invalid: Story = {
 
 // Disabled — semantic disabled tokens on the select and chevron.
 export const Disabled: Story = {
+  tags: ['docs'],
   render: () => (
     <NativeSelect aria-label="Plan" defaultValue="free" disabled>
       <NativeSelectOption value="free">Free</NativeSelectOption>
