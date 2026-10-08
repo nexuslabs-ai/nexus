@@ -3,8 +3,8 @@
   "extends": ["//"],
   "tasks": {
     "generate:demos": {
-      "dependsOn": ["generate:dependencies"],
-      "outputs": ["__generated__/**"],
+      "dependsOn": ["generate:dependencies", "generate:props"],
+      "outputs": ["__generated__/**", "public/avatars/**"],
       "cache": false
     },
     "generate:props": {
@@ -39,11 +39,13 @@
         "scripts/page-manifest.mjs",
         "scripts/roots.mjs",
         "scripts/humanize.mjs",
-        "scripts/examples.mjs",
+        "scripts/docs-stories.mjs",
+        "scripts/react-sources.mjs",
         "page-registry/**",
         "content/**",
         "app/_pages/**",
-        "examples/**",
+        "$TURBO_ROOT$/packages/react/src/index.ts",
+        "$TURBO_ROOT$/packages/react/src/components/**/*.tsx",
         "$TURBO_ROOT$/.prettierrc"
       ],
       "outputs": [
@@ -67,13 +69,14 @@
         "^build",
         "generate:manifest",
         "generate:props",
-        "generate:dependencies"
+        "generate:dependencies",
+        "generate:demos"
       ],
       "cache": false,
       "persistent": true
     },
     "typecheck": {
-      "dependsOn": ["^build", "generate:demos"]
+      "dependsOn": ["^build", "generate:manifest", "generate:demos"]
     }
   }
 }

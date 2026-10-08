@@ -37,7 +37,35 @@ export const Default: Story = {
   },
 };
 
+export const WithLabel: Story = {
+  tags: ['docs'],
+  render: function WithLabelStory(args) {
+    const termsId = React.useId();
+
+    return (
+      <div className="nx:flex nx:items-center nx:gap-2">
+        <Checkbox {...args} id={termsId} />
+        <Label htmlFor={termsId}>Accept terms and conditions</Label>
+      </div>
+    );
+  },
+  play: async ({ canvasElement, args }) => {
+    const canvas = within(canvasElement);
+    const checkbox = canvas.getByRole('checkbox', {
+      name: 'Accept terms and conditions',
+    });
+    const label = canvas.getByText('Accept terms and conditions');
+
+    await expect(checkbox).not.toBeChecked();
+
+    await userEvent.click(label);
+    await expect(checkbox).toBeChecked();
+    await expect(args.onCheckedChange).toHaveBeenCalledWith(true);
+  },
+};
+
 export const Checked: Story = {
+  tags: ['docs'],
   args: {
     'aria-label': 'Checked option',
     defaultChecked: true,
@@ -59,6 +87,7 @@ export const Checked: Story = {
 };
 
 export const Indeterminate: Story = {
+  tags: ['docs'],
   args: {
     'aria-label': 'Indeterminate option',
     checked: 'indeterminate',
@@ -94,6 +123,7 @@ export const IndicatorCrossFade: Story = {
 };
 
 export const Disabled: Story = {
+  tags: ['docs'],
   args: {
     'aria-label': 'Disabled checkbox',
     disabled: true,
@@ -126,32 +156,6 @@ export const SurfaceTokens: Story = {
     await expect(box).toHaveClass(
       'nx:enabled:data-[state=unchecked]:active:bg-container-active'
     );
-  },
-};
-
-export const WithLabel: Story = {
-  render: function WithLabelStory(args) {
-    const termsId = React.useId();
-
-    return (
-      <div className="nx:flex nx:items-center nx:gap-2">
-        <Checkbox {...args} id={termsId} />
-        <Label htmlFor={termsId}>Accept terms and conditions</Label>
-      </div>
-    );
-  },
-  play: async ({ canvasElement, args }) => {
-    const canvas = within(canvasElement);
-    const checkbox = canvas.getByRole('checkbox', {
-      name: 'Accept terms and conditions',
-    });
-    const label = canvas.getByText('Accept terms and conditions');
-
-    await expect(checkbox).not.toBeChecked();
-
-    await userEvent.click(label);
-    await expect(checkbox).toBeChecked();
-    await expect(args.onCheckedChange).toHaveBeenCalledWith(true);
   },
 };
 

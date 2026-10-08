@@ -36,6 +36,7 @@ const slideItems = [1, 2, 3, 4, 5].map((n) => (
 
 // A basic horizontal carousel.
 export const Default: Story = {
+  tags: ['docs'],
   render: () => (
     <Carousel className="nx:w-full" aria-label="Image carousel">
       <CarouselContent>{slideItems}</CarouselContent>
@@ -47,6 +48,7 @@ export const Default: Story = {
 
 // Vertical orientation — the content viewport needs an explicit height.
 export const Vertical: Story = {
+  tags: ['docs'],
   render: () => (
     <Carousel
       orientation="vertical"

@@ -47,6 +47,7 @@ async function waitForIndicatorReady(indicator: HTMLElement) {
 // ============================================
 
 export const Default: Story = {
+  tags: ['docs'],
   render: (_args) => (
     <Tabs defaultValue="account" className="nx:w-[400px]">
       <TabsList>
@@ -82,6 +83,7 @@ export const Default: Story = {
 // ============================================
 
 export const UnderlineVariant: Story = {
+  tags: ['docs'],
   render: (_args) => (
     <Tabs defaultValue="account" className="nx:w-[400px]">
       <TabsList variant="underline">
@@ -132,6 +134,7 @@ export const UnderlineVariant: Story = {
 // ============================================
 
 export const SmallSize: Story = {
+  tags: ['docs'],
   render: (_args) => (
     <Tabs defaultValue="tab1" className="nx:w-[400px]">
       <TabsList size="sm">
@@ -160,6 +163,7 @@ export const SmallSize: Story = {
 };
 
 export const LargeSize: Story = {
+  tags: ['docs'],
   render: (_args) => (
     <Tabs defaultValue="tab1" className="nx:w-[500px]">
       <TabsList size="lg">
@@ -277,6 +281,7 @@ export const ThreeTabs: Story = {
 };
 
 export const WithDisabledTab: Story = {
+  tags: ['docs'],
   render: (_args) => (
     <Tabs defaultValue="account" className="nx:w-[400px]">
       <TabsList>
