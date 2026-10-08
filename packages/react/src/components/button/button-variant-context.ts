@@ -6,7 +6,7 @@ import type { ButtonProps } from './button';
 
 /**
  * A container broadcasts a default Button `variant` through this context, the
- * way ButtonGroupSizeContext broadcasts size. An explicit `variant` on the
+ * way ButtonSizeContext broadcasts size. An explicit `variant` on the
  * Button wins over the context's.
  */
 const ButtonVariantContext =

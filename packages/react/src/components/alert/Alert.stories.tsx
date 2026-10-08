@@ -896,15 +896,11 @@ export const DensityActionSizing: Story = {
   tags: ['!autodocs', '!dev'],
   render: () => (
     <div className="nx:flex nx:w-full nx:flex-col nx:gap-4">
-      {[
-        'tight',
-        'compact',
-        'default',
-        'comfortable',
-        'relaxed',
-        'spacious',
-      ].map((density) => (
-        <div key={density} data-nx-density={density}>
+      {DENSITY_OPTIONS.map(({ value }) => (
+        <NexusRoot
+          key={value}
+          state={{ ...DEFAULT_NEXUS_APPEARANCE, mode: 'light', density: value }}
+        >
           <Alert layout="inline" variant="information">
             <AlertIcon>
               <IconInfoCircleFilled />
@@ -923,14 +919,14 @@ export const DensityActionSizing: Story = {
             </AlertActions>
             <AlertClose />
           </Alert>
-        </div>
+        </NexusRoot>
       ))}
     </div>
   ),
   play: async ({ canvasElement }) => {
     await expect(
       canvasElement.querySelectorAll('[data-slot="alert"]')
-    ).toHaveLength(6);
+    ).toHaveLength(DENSITY_OPTIONS.length);
     for (const alert of canvasElement.querySelectorAll('[data-slot="alert"]')) {
       const close = alert.querySelector('[data-slot="alert-close"]')!;
       for (const button of alert.querySelectorAll('[data-slot="button"]')) {
