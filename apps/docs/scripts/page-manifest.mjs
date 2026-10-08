@@ -7,7 +7,7 @@
  *   - `content/{section}/{slug}.mdx` — MDX pages
  *   - `app/_pages/{section}/{slug}.tsx` — hand-built pages
  *   - `@nexus_ds/react`'s exports — one `components/` page per exported
- *     component, generated from `examples/{slug}/` once its preview demo exists
+ *     component, generated from its stories tagged `docs`
  *
  * A page's route is its path on disk, so adding a page means adding a file.
  * Pages the registry does not list are appended to their section in slug
@@ -29,7 +29,11 @@ import { pathToFileURL } from 'node:url';
 import { createJiti } from 'jiti';
 import prettier from 'prettier';
 
-import { DEMO_EXTENSION, isDemoName, PREVIEW_DEMO } from './examples.mjs';
+import {
+  DOCS_TAG,
+  PREVIEWLESS_COMPONENTS,
+  readDocsStories,
+} from './docs-stories.mjs';
 import { humanize } from './humanize.mjs';
 import { reactSrc } from './roots.mjs';
 
@@ -162,43 +166,31 @@ function assertNoWrittenComponentPages(sources) {
     for (const [key, file] of source.pages) {
       if (!key.startsWith(`${COMPONENTS_SECTION}/`)) continue;
       throw new Error(
-        `${file} is a component page, but component pages are generated from examples/${key.slice(COMPONENTS_SECTION.length + 1)}/ — delete the file.`
+        `${file} is a component page, but component pages are generated from the component's stories tagged \`${DOCS_TAG}\` — delete the file.`
       );
     }
   }
 }
 
-/** The body a component renders until its `examples/{slug}/demo.tsx` lands. */
-function componentWireframe(label) {
-  return {
-    lede: `[ ${label} — page coming soon ]`,
-    blocks: [
-      {
-        type: 'placeholder',
-        variant: 'storybook',
-        label: '[ Preview · Installation · Code · Props · Examples ]',
-      },
-    ],
-  };
+function assertEveryComponentHasDocsStories(slugs) {
+  const missing = slugs.filter(
+    (slug) =>
+      !PREVIEWLESS_COMPONENTS.has(slug) && readDocsStories(slug).length === 0
+  );
+  if (missing.length === 0) return;
+
+  throw new Error(
+    [
+      `Every component @nexus_ds/react exports needs a story tagged \`${DOCS_TAG}\` for its page — add \`tags: ['${DOCS_TAG}']\` to the story that should be its preview:`,
+      ...missing.map((slug) => `  packages/react/src/components/${slug}/`),
+    ].join('\n')
+  );
 }
 
 function byLabel(entries) {
   return entries.toSorted((a, b) =>
     a.page.label.localeCompare(b.page.label, 'en')
   );
-}
-
-function demoNamesIn(docsRoot, slug) {
-  const dir = path.join(docsRoot, 'examples', slug);
-  if (!fs.existsSync(dir)) return [];
-  return fs
-    .readdirSync(dir, { withFileTypes: true })
-    .filter(
-      (entry) => !entry.isDirectory() && entry.name.endsWith(DEMO_EXTENSION)
-    )
-    .map((entry) => entry.name.slice(0, -DEMO_EXTENSION.length))
-    .filter(isDemoName)
-    .sort();
 }
 
 /** Import specifier for a docs-root-relative file, as seen from the content module. */
@@ -260,12 +252,15 @@ export type GuideManifestPage = ManifestPageBase & {
   );
 
 /**
- * A component \`@nexus_ds/react\` exports. Once \`examples/{slug}/demo.tsx\`
- * exists its page is generated from \`examples/{slug}/\`; until then, a placeholder.
+ * A component \`@nexus_ds/react\` exports. Its page is generated from its
+ * stories tagged \`docs\`.
  */
 export type ComponentManifestPage = ManifestPageBase & {
   nested?: never;
-} & ({ kind: 'generated' } | PlaceholderPage);
+  kind: 'generated';
+  /** False for a component whose page shows Installation, Usage and Props only. */
+  preview: boolean;
+};
 
 export type ManifestPage = GuideManifestPage | ComponentManifestPage;
 
@@ -423,20 +418,22 @@ export async function buildPageManifest(docsRoot, formatOptions) {
   }
 
   function buildComponentPage(slug) {
-    const label = componentLabel(slug);
-    const base = { route: `/${COMPONENTS_SECTION}/${slug}`, slug, label };
-    if (demoNamesIn(docsRoot, slug).includes(PREVIEW_DEMO)) {
-      return { page: { ...base, kind: 'generated' } };
-    }
     return {
-      page: { ...base, kind: 'placeholder', file: null },
-      wireframe: componentWireframe(label),
+      page: {
+        route: `/${COMPONENTS_SECTION}/${slug}`,
+        slug,
+        label: componentLabel(slug),
+        kind: 'generated',
+        preview: !PREVIEWLESS_COMPONENTS.has(slug),
+      },
     };
   }
 
   function orderedEntries(sectionSlug) {
     if (isComponentsSection(sectionSlug)) {
-      return byLabel([...exportedComponentSlugs()].map(buildComponentPage));
+      const slugs = [...exportedComponentSlugs()];
+      assertEveryComponentHasDocsStories(slugs);
+      return byLabel(slugs.map(buildComponentPage));
     }
     return orderedSlugs(sectionSlug).map((slug) =>
       buildPage(sectionSlug, slug)

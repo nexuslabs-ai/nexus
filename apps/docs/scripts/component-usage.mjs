@@ -1,8 +1,9 @@
 // @ts-check
 import ts from 'typescript';
 
-/** `printWidth` in the repo's `.prettierrc`. */
-const PRINT_WIDTH = 80;
+import { importStatement } from './import-statement.mjs';
+
+const PATH_SEPARATOR = ' > ';
 
 /** Where a component page's demos import the component's parts from. */
 function componentModule(slug) {
@@ -37,8 +38,43 @@ function jsxTagName(node) {
 }
 
 /**
- * Adds the parts one demo renders to `parts`, and each part's nearest part
- * ancestor → part to `nesting`, both in the order they first appear.
+ * The module's file-local declarations by name — helper components, render
+ * functions and data constants a demo can render through.
+ * @param {ts.SourceFile} file
+ */
+function localDeclarations(file) {
+  const locals = new Map();
+  for (const statement of file.statements) {
+    if (ts.isFunctionDeclaration(statement) && statement.name) {
+      locals.set(statement.name.text, statement);
+    }
+    if (ts.isVariableStatement(statement)) {
+      for (const declaration of statement.declarationList.declarations) {
+        if (ts.isIdentifier(declaration.name) && declaration.initializer) {
+          locals.set(declaration.name.text, declaration.initializer);
+        }
+      }
+    }
+  }
+  return locals;
+}
+
+/** @param {ts.SourceFile} file */
+function defaultExport(file) {
+  return file.statements.find(
+    (statement) =>
+      ts.isFunctionDeclaration(statement) &&
+      (ts.getModifiers(statement) ?? []).some(
+        (modifier) => modifier.kind === ts.SyntaxKind.DefaultKeyword
+      )
+  );
+}
+
+/**
+ * Adds the parts one demo renders to `parts`, and each part to `nesting` under
+ * the path of parts it renders inside, both in the order they first appear. Walks
+ * from the demo's default export through the helpers it renders, so a part
+ * inside a helper still nests under the part that renders the helper.
  * @param {{ fileName: string; source: string }} demo
  * @param {string} module
  * @param {string[]} parts
@@ -53,69 +89,62 @@ function collectParts(demo, module, parts, nesting) {
     ts.ScriptKind.TSX
   );
   const imported = partImports(file, module);
+  const locals = localDeclarations(file);
+  /** @type {Set<string>} */
+  const entered = new Set();
 
   /**
    * @param {ts.Node} node
-   * @param {string | undefined} parent
+   * @param {string[]} path the parts this node renders inside, outermost first
    */
-  function visit(node, parent) {
+  function visit(node, path) {
     const tag = jsxTagName(node);
     const part = tag === undefined ? undefined : imported.get(tag);
-    if (part) {
+    let inner = path;
+    // A part inside itself (a submenu in a submenu) adds no new level.
+    if (part && !path.includes(part)) {
       if (!parts.includes(part)) parts.push(part);
-      if (parent) {
-        const children = nesting.get(parent) ?? [];
-        if (!children.includes(part)) children.push(part);
-        nesting.set(parent, children);
-      }
+      const key = path.join(PATH_SEPARATOR);
+      const children = nesting.get(key) ?? [];
+      if (!children.includes(part)) children.push(part);
+      nesting.set(key, children);
+      inner = [...path, part];
     }
-    ts.forEachChild(node, (child) => visit(child, part ?? parent));
+    if (
+      ts.isIdentifier(node) &&
+      locals.has(node.text) &&
+      !entered.has(node.text)
+    ) {
+      entered.add(node.text);
+      visit(locals.get(node.text), path);
+      entered.delete(node.text);
+    }
+    ts.forEachChild(node, (child) => visit(child, inner));
   }
 
-  visit(file, undefined);
+  visit(defaultExport(file) ?? file, []);
 }
 
-/**
- * @param {string[]} parts
- * @param {string} module
- */
-function renderImport(parts, module) {
-  const oneLine = `import { ${parts.join(', ')} } from '${module}';`;
-  if (oneLine.length <= PRINT_WIDTH) return oneLine;
-  return `import {\n${parts.map((part) => `  ${part},`).join('\n')}\n} from '${module}';`;
-}
-
-/**
- * @param {string[]} parts
- * @param {Map<string, string[]>} nesting
- */
-function renderTree(parts, nesting) {
-  const nested = new Set([...nesting.values()].flat());
+/** @param {Map<string, string[]>} nesting */
+function renderTree(nesting) {
   const lines = [];
 
   /**
-   * @param {string} part
+   * @param {string[]} path
    * @param {string} indent
-   * @param {string[]} ancestors
    */
-  function drawChildren(part, indent, ancestors) {
-    // A part can sit inside itself (a submenu in a submenu); draw that once.
-    const children = (nesting.get(part) ?? []).filter(
-      (child) => !ancestors.includes(child)
-    );
+  function drawChildren(path, indent) {
+    const children = nesting.get(path.join(PATH_SEPARATOR)) ?? [];
     children.forEach((child, index) => {
       const last = index === children.length - 1;
       lines.push(`${indent}${last ? '└── ' : '├── '}${child}`);
-      drawChildren(child, `${indent}${last ? '    ' : '│   '}`, [
-        ...ancestors,
-        child,
-      ]);
+      drawChildren([...path, child], `${indent}${last ? '    ' : '│   '}`);
     });
   }
 
-  for (const root of parts.filter((part) => !nested.has(part))) {
+  for (const root of nesting.get('') ?? []) {
     lines.push(root);
-    drawChildren(root, '', [root]);
+    drawChildren([root], '');
   }
   return lines.join('\n');
 }
@@ -137,14 +166,14 @@ export function componentUsage(slug, demos) {
 
   if (parts.length === 0) {
     throw new Error(
-      `examples/${slug}/ renders no part imported from ${module}, so its page has no Usage — render the component from ${module}.`
+      `The ${slug} stories tagged docs render no part of ${slug}, so its page has no Usage — tag a story that renders the component.`
     );
   }
   return {
-    imports: renderImport(
+    imports: importStatement(
       parts.toSorted((a, b) => a.localeCompare(b, 'en')),
       module
     ),
-    composition: parts.length > 1 ? renderTree(parts, nesting) : null,
+    composition: parts.length > 1 ? renderTree(nesting) : null,
   };
 }

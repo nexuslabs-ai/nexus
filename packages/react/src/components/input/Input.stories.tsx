@@ -1,7 +1,10 @@
+import * as React from 'react';
+
 import type { Meta, StoryObj } from '@storybook/react';
 import { expect, fn, userEvent, within } from 'storybook/test';
 
 import { unpairedAutofillClasses } from '../../stories/support/autofill-pairing';
+import { Label } from '../label';
 
 import { Input } from './input';
 
@@ -77,7 +80,34 @@ export const WithPlaceholder: Story = {
   },
 };
 
+// ============================================
+// TYPE STORIES
+// ============================================
+
+export const TypeEmail: Story = {
+  tags: ['docs'],
+  args: {
+    type: 'email',
+    placeholder: 'email@example.com',
+  },
+};
+
+export const WithLabel: Story = {
+  tags: ['docs'],
+  render: function WithLabelStory() {
+    const inputId = React.useId();
+
+    return (
+      <div className="nx:grid nx:gap-1.5">
+        <Label htmlFor={inputId}>Full name</Label>
+        <Input id={inputId} placeholder="Ada Lovelace" />
+      </div>
+    );
+  },
+};
+
 export const Disabled: Story = {
+  tags: ['docs'],
   args: {
     placeholder: 'Disabled input',
     disabled: true,
@@ -93,6 +123,7 @@ export const DisabledWithValue: Story = {
 };
 
 export const Invalid: Story = {
+  tags: ['docs'],
   args: {
     defaultValue: 'invalid@',
     'aria-invalid': true,
@@ -391,17 +422,6 @@ export const WarningVsError: Story = {
   },
 };
 
-// ============================================
-// TYPE STORIES
-// ============================================
-
-export const TypeEmail: Story = {
-  args: {
-    type: 'email',
-    placeholder: 'email@example.com',
-  },
-};
-
 export const TypePassword: Story = {
   args: {
     type: 'password',
@@ -584,6 +604,7 @@ export const WithDataAttributes: Story = {
 // ============================================
 
 export const AllVariants: Story = {
+  tags: ['docs'],
   render: (_args) => (
     <div className="nx:flex nx:flex-col nx:gap-8 nx:w-[400px]">
       <div>

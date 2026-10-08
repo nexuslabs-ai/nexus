@@ -99,9 +99,12 @@ const meta: Meta<typeof InputOTP> = {
 export default meta;
 type Story = StoryObj<typeof meta>;
 
-export const Default: Story = {};
+export const Default: Story = {
+  tags: ['docs'],
+};
 
 export const WithSeparator: Story = {
+  tags: ['docs'],
   render: (args) => (
     <InputOTP {...args}>
       <InputOTPGroup>
@@ -132,6 +135,7 @@ export const WithSeparator: Story = {
 };
 
 export const Disabled: Story = {
+  tags: ['docs'],
   args: {
     disabled: true,
   },

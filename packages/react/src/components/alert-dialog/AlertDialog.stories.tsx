@@ -44,6 +44,7 @@ type Story = StoryObj<typeof AlertDialog>;
 // ============================================
 
 export const Default: Story = {
+  tags: ['docs'],
   render: (_args) => (
     <AlertDialog>
       <AlertDialogTrigger asChild>
@@ -67,6 +68,7 @@ export const Default: Story = {
 };
 
 export const Destructive: Story = {
+  tags: ['docs'],
   render: (_args) => (
     <AlertDialog>
       <AlertDialogTrigger asChild>
@@ -246,6 +248,7 @@ export const ViewportBoundContent: Story = {
 };
 
 export const Centered: Story = {
+  tags: ['docs'],
   render: (_args) => (
     <AlertDialog>
       <AlertDialogTrigger asChild>

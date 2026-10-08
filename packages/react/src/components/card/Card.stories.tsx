@@ -1,9 +1,12 @@
+import * as React from 'react';
+
 import type { Meta, StoryObj } from '@storybook/react';
 import { expect, within } from 'storybook/test';
 
 import { expectHeightPinned } from '../../stories/support/story-height-test-utils';
 import { Button } from '../button';
 import { Input } from '../input';
+import { Label } from '../label';
 
 import {
   Card,
@@ -31,6 +34,7 @@ type Story = StoryObj<typeof Card>;
 // ============================================
 
 export const Default: Story = {
+  tags: ['docs'],
   render: (_args) => (
     <Card className="nx:w-[350px]">
       <CardHeader>
@@ -109,6 +113,7 @@ export const TitleAsHeading: Story = {
 };
 
 export const WithAction: Story = {
+  tags: ['docs'],
   render: (_args) => (
     <Card className="nx:w-[350px]">
       <CardHeader>
@@ -128,6 +133,7 @@ export const WithAction: Story = {
 };
 
 export const WithFooter: Story = {
+  tags: ['docs'],
   render: (_args) => (
     <Card className="nx:w-[350px]">
       <CardHeader>
@@ -150,6 +156,7 @@ export const WithFooter: Story = {
 // ============================================
 
 export const ContentOnly: Story = {
+  tags: ['docs'],
   render: (_args) => (
     <Card className="nx:w-[350px]">
       <CardContent className="nx:pt-6">
@@ -222,45 +229,53 @@ export const MediaCard: Story = {
 // ============================================
 
 export const LoginCard: Story = {
-  render: (_args) => (
-    <Card className="nx:w-[350px]">
-      <CardHeader>
-        <CardTitle>Login</CardTitle>
-        <CardDescription>
-          Enter your credentials to access your account.
-        </CardDescription>
-      </CardHeader>
-      <CardContent>
-        <div className="nx:flex nx:flex-col nx:gap-4">
-          <div className="nx:flex nx:flex-col nx:gap-2">
-            <label
-              htmlFor="email"
-              className="nx:typography-label-default nx:text-foreground"
-            >
-              Email
-            </label>
-            <Input id="email" type="email" placeholder="Enter your email" />
-          </div>
-          <div className="nx:flex nx:flex-col nx:gap-2">
-            <label
-              htmlFor="password"
-              className="nx:typography-label-default nx:text-foreground"
-            >
-              Password
-            </label>
-            <Input
-              id="password"
-              type="password"
-              placeholder="Enter your password"
-            />
-          </div>
-        </div>
-      </CardContent>
-      <CardFooter>
-        <Button className="nx:w-full">Sign In</Button>
-      </CardFooter>
-    </Card>
-  ),
+  tags: ['docs'],
+  render: function LoginCardStory() {
+    const emailId = React.useId();
+    const passwordId = React.useId();
+
+    return (
+      <form
+        className="nx:w-full nx:max-w-sm"
+        onSubmit={(event) => event.preventDefault()}
+      >
+        <Card>
+          <CardHeader>
+            <CardTitle>Sign in</CardTitle>
+            <CardDescription>
+              Enter your email and password to continue.
+            </CardDescription>
+          </CardHeader>
+          <CardContent className="nx:grid nx:gap-4">
+            <div className="nx:grid nx:gap-1.5">
+              <Label htmlFor={emailId}>Email</Label>
+              <Input
+                id={emailId}
+                type="email"
+                autoComplete="email"
+                placeholder="you@example.com"
+                required
+              />
+            </div>
+            <div className="nx:grid nx:gap-1.5">
+              <Label htmlFor={passwordId}>Password</Label>
+              <Input
+                id={passwordId}
+                type="password"
+                autoComplete="current-password"
+                required
+              />
+            </div>
+          </CardContent>
+          <CardFooter>
+            <Button type="submit" className="nx:w-full">
+              Sign in
+            </Button>
+          </CardFooter>
+        </Card>
+      </form>
+    );
+  },
 };
 
 export const BorderedFooter: Story = {

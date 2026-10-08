@@ -2,12 +2,11 @@ import {
   type Demo,
   type DemoId,
   demos,
-  getComponentSnippets,
-  isDemoId,
+  getComponentDocs,
 } from '../../__generated__/demo-index';
-import { orderExamples, PREVIEW_DEMO } from '../../scripts/examples.mjs';
-import { humanize } from '../../scripts/humanize.mjs';
+import { importStatement } from '../../scripts/import-statement.mjs';
 import type { ManifestPage } from '../_lib/manifest';
+import { type ComponentEntry, loadComponentDocs } from '../_lib/props';
 
 import { CodeSample } from './CodeSample';
 import { ComponentDemo } from './ComponentDemo';
@@ -23,29 +22,25 @@ import {
 import { InstallBlock } from './InstallBlock';
 import { PropsTable } from './PropsTable';
 
-type Example = { id: DemoId; name: string };
+type ComponentManifestPage = Extract<ManifestPage, { kind: 'generated' }>;
 
 /**
- * Every section comes from `examples/{slug}/`: `demo.tsx` is the preview at the
- * top, Usage and Composition are generated from all of its demos, and every
- * other demo is an example, in `orderExamples` order.
+ * Every section comes from the component's stories tagged `docs`: the first is
+ * the preview at the top, Usage and Composition come from all of them, and the
+ * rest are its examples, in story order.
  */
-export function ComponentPage({
-  page,
-}: {
-  page: Extract<ManifestPage, { kind: 'generated' }>;
-}) {
+export function ComponentPage({ page }: { page: ComponentManifestPage }) {
+  if (!page.preview) return <PreviewlessComponentPage page={page} />;
+
   const { slug } = page;
-  const previewId = `${slug}/${PREVIEW_DEMO}`;
-  if (!isDemoId(previewId)) {
+  const docs = getComponentDocs(slug);
+  const [previewId, ...exampleIds] = docs.demos;
+  if (!previewId) {
     throw new Error(
-      `ComponentPage: "${slug}" has no preview demo — add apps/docs/examples/${previewId}.tsx.`
+      `ComponentPage: "${slug}" has no docs stories — tag one of its stories \`docs\`.`
     );
   }
-
   const preview: Demo = demos[previewId];
-  const snippets = getComponentSnippets(slug);
-  const examples = examplesFor(slug);
 
   return (
     <>
@@ -64,40 +59,24 @@ export function ComponentPage({
       <ComponentInstallation slug={slug} />
 
       <SectionHeading className={SECTION_HEADING_CLASS}>Usage</SectionHeading>
-      <CodeSample lang="tsx">{snippets.imports}</CodeSample>
+      <CodeSample lang="tsx">{docs.imports}</CodeSample>
 
-      {snippets.composition && (
+      {docs.composition && (
         <>
           <SectionHeading className={SECTION_HEADING_CLASS}>
             Composition
           </SectionHeading>
-          <CodeSample lang="text">{snippets.composition}</CodeSample>
+          <CodeSample lang="text">{docs.composition}</CodeSample>
         </>
       )}
 
-      {examples.length > 0 && (
+      {exampleIds.length > 0 && (
         <SectionHeading className={SECTION_HEADING_CLASS}>
           Examples
         </SectionHeading>
       )}
-      {examples.map(({ id, name }) => (
-        <section key={id}>
-          <SubsectionHeading
-            id={`example-${slugify(name)}`}
-            className={SUBSECTION_HEADING_CLASS}
-          >
-            {humanize(name)}
-          </SubsectionHeading>
-          <ComponentDemo id={id} />
-          <InstallBlock
-            slugs={demos[id].alsoInstall}
-            besides={[slug, ...preview.alsoInstall]}
-            alsoPackages={demos[id].packages.filter(
-              (spec) => !preview.packages.includes(spec)
-            )}
-            caption="This example also needs:"
-          />
-        </section>
+      {exampleIds.map((id) => (
+        <Example key={id} id={id} slug={slug} previewId={previewId} />
       ))}
 
       <SectionHeading className={SECTION_HEADING_CLASS}>Props</SectionHeading>
@@ -106,20 +85,76 @@ export function ComponentPage({
   );
 }
 
-function examplesFor(slug: string): Example[] {
-  const prefix = `${slug}/`;
-  const names = Object.keys(demos)
-    .filter((id) => id.startsWith(prefix))
-    .map((id) => id.slice(prefix.length))
-    .filter((name) => name !== PREVIEW_DEMO);
+function Example({
+  id,
+  slug,
+  previewId,
+}: {
+  id: DemoId;
+  slug: string;
+  previewId: DemoId;
+}) {
+  const { title, alsoInstall, packages }: Demo = demos[id];
+  const preview: Demo = demos[previewId];
 
-  return orderExamples(names).map((name) => {
-    const id = `${prefix}${name}`;
-    if (!isDemoId(id)) {
-      throw new Error(
-        `ComponentPage: no demo ${id} in the demo index — run \`pnpm --filter @nexus_ds/docs generate:demos\`.`
-      );
-    }
-    return { id, name };
-  });
+  return (
+    <section>
+      <SubsectionHeading
+        id={`example-${slugify(title)}`}
+        className={SUBSECTION_HEADING_CLASS}
+      >
+        {title}
+      </SubsectionHeading>
+      <ComponentDemo id={id} />
+      <InstallBlock
+        slugs={alsoInstall}
+        besides={[slug, ...preview.alsoInstall]}
+        alsoPackages={packages.filter(
+          (spec) => !preview.packages.includes(spec)
+        )}
+        caption="This example also needs:"
+      />
+    </section>
+  );
+}
+
+/** Installation, Usage and Props only, for a component that can't render a preview here. */
+async function PreviewlessComponentPage({
+  page,
+}: {
+  page: ComponentManifestPage;
+}) {
+  const entries = await loadComponentDocs(page.slug);
+
+  return (
+    <>
+      <h1 className={PAGE_HEADING_CLASS}>{page.label}</h1>
+
+      <SectionHeading className={SECTION_HEADING_CLASS}>
+        Installation
+      </SectionHeading>
+      <ComponentInstallation slug={page.slug} />
+
+      <SectionHeading className={SECTION_HEADING_CLASS}>Usage</SectionHeading>
+      <CodeSample lang="tsx">{importsByFile(entries)}</CodeSample>
+
+      <SectionHeading className={SECTION_HEADING_CLASS}>Props</SectionHeading>
+      <PropsTable slug={page.slug} />
+    </>
+  );
+}
+
+// `packages/react/src/components/x/x.tsx` → `@/components/x/x`, one import per file.
+function importsByFile(entries: readonly ComponentEntry[]) {
+  const byModule = new Map<string, string[]>();
+  for (const { name, sourcePath } of entries) {
+    const module = sourcePath
+      .replace(/^packages\/react\/src\//, '@/')
+      .replace(/\.tsx?$/, '');
+    byModule.set(module, [...(byModule.get(module) ?? []), name]);
+  }
+  return [...byModule]
+    .sort(([a], [b]) => a.localeCompare(b, 'en'))
+    .map(([module, names]) => importStatement(names.toSorted(), module))
+    .join('\n');
 }

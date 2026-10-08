@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useId, useState } from 'react';
 
 import type { Meta, StoryObj } from '@storybook/react';
 import {
@@ -13,6 +13,7 @@ import { expect, fn, userEvent, waitFor, within } from 'storybook/test';
 
 import { Button } from '../button';
 import { Input } from '../input';
+import { Label } from '../label';
 
 import { ToggleGroup, ToggleGroupItem } from './toggle-group';
 
@@ -27,6 +28,7 @@ type Story = StoryObj<typeof ToggleGroup>;
 // Single-select permits one selected item or an empty selection.
 // Also guards invariant #3 — data-variant / data-size are emitted on the default.
 export const Default: Story = {
+  tags: ['docs'],
   render: () => (
     <ToggleGroup type="single" defaultValue="left">
       <ToggleGroupItem value="left" aria-label="Align left">
@@ -52,6 +54,7 @@ export const Default: Story = {
 
 // Multiple-select: any number of items pressed at once.
 export const Multiple: Story = {
+  tags: ['docs'],
   render: () => (
     <ToggleGroup type="multiple" defaultValue={['bold']}>
       <ToggleGroupItem value="bold" aria-label="Bold">
@@ -69,6 +72,7 @@ export const Multiple: Story = {
 
 // The outline variant, applied to the whole group via context.
 export const Outline: Story = {
+  tags: ['docs'],
   render: () => (
     <ToggleGroup type="single" variant="outline" defaultValue="left">
       <ToggleGroupItem value="left" aria-label="Align left">
@@ -86,6 +90,7 @@ export const Outline: Story = {
 
 // Joined (spacing 0, segmented) vs separated (spacing 2, individual pills).
 export const Spacing: Story = {
+  tags: ['docs'],
   render: () => (
     <div className="nx:flex nx:flex-col nx:gap-4">
       <ToggleGroup type="single" variant="outline" defaultValue="left">
@@ -747,47 +752,52 @@ export const EmptyAndSingle: Story = {
 };
 
 export const FormattingSettings: Story = {
-  render: () => (
-    <section
-      className="nx:flex nx:max-w-full nx:flex-col nx:gap-6"
-      aria-label="Formatting settings"
-    >
-      <div className="nx:flex nx:flex-col nx:gap-2">
-        <label htmlFor="formatting-title">Document title</label>
-        <Input id="formatting-title" defaultValue="Assessment instructions" />
-      </div>
-      <div className="nx:flex nx:flex-wrap nx:items-center nx:gap-4">
-        <ToggleGroup
-          type="multiple"
-          variant="outline-primary"
-          defaultValue={['bold']}
-          aria-label="Text formatting"
-        >
-          <ToggleGroupItem value="bold" aria-label="Bold">
-            <IconBold />
-          </ToggleGroupItem>
-          <ToggleGroupItem value="italic" aria-label="Italic">
-            <IconItalic />
-          </ToggleGroupItem>
-          <ToggleGroupItem value="underline" aria-label="Underline">
-            <IconUnderline />
-          </ToggleGroupItem>
-        </ToggleGroup>
-        <Button variant="outline">Reset formatting</Button>
-        <Button>Save settings</Button>
-      </div>
-      <ToggleGroup
-        type="single"
-        variant="outline-primary"
-        spacing={2}
-        aria-label="Paragraph style"
-        className="nx:flex-wrap"
+  tags: ['docs'],
+  render: function FormattingSettingsStory() {
+    const titleId = useId();
+
+    return (
+      <section
+        className="nx:flex nx:max-w-full nx:flex-col nx:gap-6"
+        aria-label="Formatting settings"
       >
-        <ToggleGroupItem value="body">Body text</ToggleGroupItem>
-        <ToggleGroupItem value="heading">Section heading</ToggleGroupItem>
-      </ToggleGroup>
-    </section>
-  ),
+        <div className="nx:flex nx:flex-col nx:gap-2">
+          <Label htmlFor={titleId}>Document title</Label>
+          <Input id={titleId} defaultValue="Assessment instructions" />
+        </div>
+        <div className="nx:flex nx:flex-wrap nx:items-center nx:gap-4">
+          <ToggleGroup
+            type="multiple"
+            variant="outline-primary"
+            defaultValue={['bold']}
+            aria-label="Text formatting"
+          >
+            <ToggleGroupItem value="bold" aria-label="Bold">
+              <IconBold />
+            </ToggleGroupItem>
+            <ToggleGroupItem value="italic" aria-label="Italic">
+              <IconItalic />
+            </ToggleGroupItem>
+            <ToggleGroupItem value="underline" aria-label="Underline">
+              <IconUnderline />
+            </ToggleGroupItem>
+          </ToggleGroup>
+          <Button variant="outline">Reset formatting</Button>
+          <Button>Save settings</Button>
+        </div>
+        <ToggleGroup
+          type="single"
+          variant="outline-primary"
+          spacing={2}
+          aria-label="Paragraph style"
+          className="nx:flex-wrap"
+        >
+          <ToggleGroupItem value="body">Body text</ToggleGroupItem>
+          <ToggleGroupItem value="heading">Section heading</ToggleGroupItem>
+        </ToggleGroup>
+      </section>
+    );
+  },
 };
 
 // Clicking an item selects it (and deselects the previously selected one).
@@ -844,6 +854,7 @@ export const KeyboardInteraction: Story = {
 
 // A disabled group disables all its items.
 export const Disabled: Story = {
+  tags: ['docs'],
   render: () => (
     <ToggleGroup type="single" defaultValue="left" disabled>
       <ToggleGroupItem value="left" aria-label="Align left">

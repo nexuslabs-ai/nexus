@@ -29,7 +29,7 @@ export type GuideSection = SectionBase & {
 
 /**
  * Its pages are not listed here: there is one per component `@nexus_ds/react`
- * exports, generated from `examples/{slug}/` (see `scripts/page-manifest.mjs`).
+ * exports, generated from its stories tagged `docs` (see `scripts/page-manifest.mjs`).
  */
 export type ComponentsSection = SectionBase & {
   /** What the section is counted in on the home page. Other sections count pages. */

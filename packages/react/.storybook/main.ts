@@ -7,7 +7,10 @@ const config: StorybookConfig = {
     '@storybook/addon-a11y',
     '@storybook/addon-vitest',
   ],
-  staticDirs: ['./public'],
+  staticDirs: [
+    './public',
+    { from: '../../../apps/docs/public/avatars', to: '/avatars' },
+  ],
   framework: {
     name: '@storybook/react-vite',
     options: {},

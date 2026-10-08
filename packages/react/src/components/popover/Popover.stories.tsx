@@ -34,6 +34,7 @@ type Story = StoryObj<typeof Popover>;
 // ============================================
 
 export const Default: Story = {
+  tags: ['docs'],
   render: (_args) => (
     <Popover>
       <PopoverTrigger asChild>
@@ -49,6 +50,7 @@ export const Default: Story = {
 };
 
 export const WithForm: Story = {
+  tags: ['docs'],
   // Named function + useId so the label/input pairs are uniquely associated.
   render: function WithFormStory() {
     const widthId = React.useId();
@@ -94,6 +96,7 @@ export const WithForm: Story = {
 };
 
 export const Placements: Story = {
+  tags: ['docs'],
   render: (_args) => (
     <div className="nx:flex nx:flex-wrap nx:gap-4">
       {(['top', 'right', 'bottom', 'left'] as const).map((side) => (
@@ -121,6 +124,7 @@ export const Placements: Story = {
 };
 
 export const WithAnchor: Story = {
+  tags: ['docs'],
   render: (_args) => (
     <Popover>
       <PopoverAnchor asChild>
