@@ -1,4 +1,15 @@
+import { DEFAULT_NEXUS_APPEARANCE, type NexusDensity } from '@nexus_ds/core';
 import type { Meta, StoryObj } from '@storybook/react';
+import { IconCommand, IconInbox, IconStar } from '@tabler/icons-react';
+import { expect, within } from 'storybook/test';
+
+import { NexusRoot } from '../components/appearance/provider';
+import { Checkbox } from '../components/checkbox';
+import { EmptyStateMedia } from '../components/empty-state';
+import { Kbd } from '../components/kbd';
+import { RadioGroup, RadioGroupItem } from '../components/radio-group';
+import { Spinner } from '../components/spinner';
+import { Toggle } from '../components/toggle';
 
 import {
   tokenValue,
@@ -107,11 +118,11 @@ function NumericStory() {
         </h2>
         <p className="nx:text-muted-foreground nx:typography-body-default nx:max-w-2xl">
           Live `--nx-spacing-*` variables consumed through Tailwind utilities
-          like `nx:p-4` or `nx:gap-2`. Numeric steps from 24px upward use
-          offsets of −4, −2, 0, +2, +4 and +6px across Tight through Spacious.
-          Smaller steps can remain equal between adjacent densities; spacing
-          never decreases as density becomes more spacious. The Density toolbar
-          changes the active runtime values.
+          like `nx:p-4` or `nx:gap-2`. Steps up to 8px are fixed. From step 3
+          the density offset ramps in, reaching −4, −2, 0, +2, +4 and +6px
+          across Tight through Spacious at 24px and holding there for every
+          larger step. Icons use the fixed `size-icon-glyph-*` sizes and never
+          follow density. The Density toolbar changes the active runtime values.
         </p>
       </div>
       <section className="nx:flex nx:flex-col nx:gap-1">
@@ -213,4 +224,65 @@ export const ActiveMode: Story = {
       </section>
     </div>
   ),
+};
+
+const GLYPH_DENSITIES = [
+  'tight',
+  'spacious',
+] as const satisfies readonly NexusDensity[];
+
+export const GlyphsIgnoreDensity: Story = {
+  tags: ['!autodocs', '!dev'],
+  parameters: {
+    docs: {
+      description: {
+        story:
+          'Icons keep their fixed glyph size while the surrounding spacing follows density. Each glyph renders identically in Tight and Spacious.',
+      },
+    },
+  },
+  render: () => (
+    <div className="nx:flex nx:flex-col nx:gap-6 nx:p-10 nx:bg-background">
+      {GLYPH_DENSITIES.map((density) => (
+        <NexusRoot
+          key={density}
+          state={{ ...DEFAULT_NEXUS_APPEARANCE, mode: 'light', density }}
+          data-testid={`glyphs-${density}`}
+          className="nx:flex nx:items-center nx:gap-4"
+        >
+          <Kbd>
+            <IconCommand />K
+          </Kbd>
+          <Checkbox defaultChecked aria-label={`${density} checkbox`} />
+          <RadioGroup defaultValue="on" aria-label={`${density} radio`}>
+            <RadioGroupItem value="on" aria-label={`${density} radio item`} />
+          </RadioGroup>
+          <Spinner />
+          <Toggle aria-label={`${density} toggle`}>
+            <IconStar />
+          </Toggle>
+          <EmptyStateMedia variant="icon">
+            <IconInbox />
+          </EmptyStateMedia>
+        </NexusRoot>
+      ))}
+    </div>
+  ),
+  play: async ({ canvasElement }) => {
+    const [tight, spacious] = GLYPH_DENSITIES.map((density) =>
+      within(canvasElement).getByTestId(`glyphs-${density}`)
+    );
+    const spacing = (root: HTMLElement) =>
+      parseFloat(getComputedStyle(root).getPropertyValue('--nx-spacing-4'));
+    await expect(spacing(spacious!)).toBeGreaterThan(spacing(tight!));
+
+    const glyphs = (root: HTMLElement) =>
+      [...root.querySelectorAll('svg')].map((svg) => {
+        const { width, height } = svg.getBoundingClientRect();
+        return { width, height };
+      });
+    const tightGlyphs = glyphs(tight!);
+    await expect(tightGlyphs).toHaveLength(7);
+    await expect(glyphs(spacious!)).toEqual(tightGlyphs);
+  },
 };

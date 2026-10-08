@@ -23,7 +23,7 @@
     },
     "3": {
       "$value": {
-        "value": 10,
+        "value": 11,
         "unit": "px"
       },
       "$type": "dimension"
@@ -37,7 +37,7 @@
     },
     "5": {
       "$value": {
-        "value": 18,
+        "value": 17,
         "unit": "px"
       },
       "$type": "dimension"
@@ -226,14 +226,14 @@
     },
     "2_5": {
       "$value": {
-        "value": 9,
+        "value": 10,
         "unit": "px"
       },
       "$type": "dimension"
     },
     "3_5": {
       "$value": {
-        "value": 12,
+        "value": 13,
         "unit": "px"
       },
       "$type": "dimension"

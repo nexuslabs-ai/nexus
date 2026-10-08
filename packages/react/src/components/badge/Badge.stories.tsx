@@ -1,4 +1,4 @@
-import { DEFAULT_NEXUS_APPEARANCE } from '@nexus_ds/core';
+import { DEFAULT_NEXUS_APPEARANCE, DENSITY_OPTIONS } from '@nexus_ds/core';
 import type { Meta, StoryObj } from '@storybook/react';
 import {
   IconAlertCircle,
@@ -706,24 +706,11 @@ export const AllVariants: Story = {
   },
 };
 
-// ============================================
-// A11Y is tested automatically on ALL stories
-// via addon-a11y with test: 'error'
-// ============================================
-
 export const DensityIcons: Story = {
+  tags: ['!autodocs', '!dev'],
   render: () => (
     <div className="nx:grid nx:gap-3">
-      {(
-        [
-          'tight',
-          'compact',
-          'default',
-          'comfortable',
-          'relaxed',
-          'spacious',
-        ] as const
-      ).map((density) => (
+      {DENSITY_OPTIONS.map(({ value: density }) => (
         <NexusRoot
           key={density}
           state={{ ...DEFAULT_NEXUS_APPEARANCE, mode: 'light', density }}
@@ -738,9 +725,14 @@ export const DensityIcons: Story = {
   play: async ({ canvasElement }) => {
     const badges = within(canvasElement).getAllByTestId('density-badge');
     for (const badge of badges) {
-      expect(badge.querySelector('svg')!.getBoundingClientRect().width).toBe(
-        14
-      );
+      await expect(
+        badge.querySelector('svg')!.getBoundingClientRect().width
+      ).toBe(14);
     }
   },
 };
+
+// ============================================
+// A11Y is tested automatically on ALL stories
+// via addon-a11y with test: 'error'
+// ============================================

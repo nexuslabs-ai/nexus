@@ -1,15 +1,15 @@
 {
   "spacing": {
     "off-3": {
-      "$value": { "value": 13, "unit": "px" },
+      "$value": { "value": 9, "unit": "px" },
       "$type": "dimension"
     },
     "off-5": {
-      "$value": { "value": 17, "unit": "px" },
+      "$value": { "value": 21, "unit": "px" },
       "$type": "dimension"
     },
     "off-7": {
-      "$value": { "value": 23, "unit": "px" },
+      "$value": { "value": 27, "unit": "px" },
       "$type": "dimension"
     }
   }

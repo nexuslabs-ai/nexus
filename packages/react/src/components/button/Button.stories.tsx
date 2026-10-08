@@ -1,6 +1,6 @@
 import type { FormEvent } from 'react';
 
-import { DEFAULT_NEXUS_APPEARANCE } from '@nexus_ds/core';
+import { DEFAULT_NEXUS_APPEARANCE, DENSITY_OPTIONS } from '@nexus_ds/core';
 import {
   Canvas,
   Controls,
@@ -1351,16 +1351,7 @@ export const SizeDensityContract: Story = {
   },
   render: () => (
     <div className="nx:flex nx:flex-col nx:gap-4">
-      {(
-        [
-          'tight',
-          'compact',
-          'default',
-          'comfortable',
-          'relaxed',
-          'spacious',
-        ] as const
-      ).map((density) => (
+      {DENSITY_OPTIONS.map(({ value: density }) => (
         <NexusRoot
           key={density}
           state={{ ...DEFAULT_NEXUS_APPEARANCE, mode: 'light', density }}
@@ -1369,17 +1360,68 @@ export const SizeDensityContract: Story = {
           <span className="nx:typography-label-default">{density}</span>
           {(
             [
-              ['xs', 'icon-xs', 12, 12],
-              ['sm', 'icon-sm', 13, 14],
-              ['default', 'icon', 14, 16],
-              ['lg', 'icon-lg', 14, 16],
+              [
+                'xs',
+                'icon-xs',
+                12,
+                12,
+                {
+                  tight: 24,
+                  compact: 26,
+                  default: 28,
+                  comfortable: 30,
+                  relaxed: 32,
+                  spacious: 34,
+                },
+              ],
+              [
+                'sm',
+                'icon-sm',
+                13,
+                14,
+                {
+                  tight: 28,
+                  compact: 30,
+                  default: 32,
+                  comfortable: 34,
+                  relaxed: 36,
+                  spacious: 38,
+                },
+              ],
+              [
+                'default',
+                'icon',
+                14,
+                16,
+                {
+                  tight: 36,
+                  compact: 38,
+                  default: 40,
+                  comfortable: 42,
+                  relaxed: 44,
+                  spacious: 46,
+                },
+              ],
+              [
+                'lg',
+                'icon-lg',
+                14,
+                16,
+                {
+                  tight: 44,
+                  compact: 46,
+                  default: 48,
+                  comfortable: 50,
+                  relaxed: 52,
+                  spacious: 54,
+                },
+              ],
             ] as const
-          ).map(([size, iconSize, font, icon]) => (
+          ).map(([size, iconSize, font, icon, heights]) => (
             <div
               key={size}
               data-testid="size-density-row"
-              data-density={density}
-              data-size={size}
+              data-height={heights[density]}
               data-font={font}
               data-icon={icon}
               className="nx:flex nx:flex-wrap nx:items-center nx:gap-2"
@@ -1412,20 +1454,9 @@ export const SizeDensityContract: Story = {
     for (const row of within(canvasElement).getAllByTestId(
       'size-density-row'
     )) {
-      const densityIndex = [
-        'tight',
-        'compact',
-        'default',
-        'comfortable',
-        'relaxed',
-        'spacious',
-      ].indexOf(row.dataset.density!);
-      const defaultHeight = { xs: 28, sm: 32, default: 40, lg: 48 }[
-        row.dataset.size as 'xs' | 'sm' | 'default' | 'lg'
-      ];
       for (const button of row.querySelectorAll('button')) {
         await expect(Math.round(button.getBoundingClientRect().height)).toBe(
-          defaultHeight + [-4, -2, 0, 2, 4, 6][densityIndex]!
+          Number(row.dataset.height)
         );
       }
       for (const svg of row.querySelectorAll('svg')) {

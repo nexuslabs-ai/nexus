@@ -261,16 +261,13 @@ export const Vertical: Story = {
       Number.parseFloat(getComputedStyle(range).borderTopLeftRadius)
     ).toBe(0);
     await expect(thumb).toHaveAttribute('data-orientation', 'vertical');
-    await expect(getComputedStyle(thumb).height).toBe(
-      getComputedStyle(thumb).getPropertyValue('--nx-spacing-5').trim()
-    );
-    await expect(getComputedStyle(thumb).width).toBe(
-      getComputedStyle(thumb).getPropertyValue('--nx-spacing-5').trim()
-    );
+    const thumbSize = getComputedStyle(thumb)
+      .getPropertyValue('--nx-spacing-5')
+      .trim();
+    await expect(getComputedStyle(thumb).height).toBe(thumbSize);
+    await expect(getComputedStyle(thumb).width).toBe(thumbSize);
     await expect(thumbHandleStyle.height).toBe('2px');
-    await expect(thumbHandleStyle.width).toBe(
-      getComputedStyle(thumb).getPropertyValue('--nx-spacing-5').trim()
-    );
+    await expect(thumbHandleStyle.width).toBe(thumbSize);
   },
 };
 

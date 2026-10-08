@@ -1,6 +1,6 @@
 import * as React from 'react';
 
-import { DEFAULT_NEXUS_APPEARANCE } from '@nexus_ds/core';
+import { DEFAULT_NEXUS_APPEARANCE, DENSITY_OPTIONS } from '@nexus_ds/core';
 import type { Meta, StoryObj } from '@storybook/react';
 import { expect, fn, userEvent, waitFor, within } from 'storybook/test';
 
@@ -492,18 +492,10 @@ export const AllVariants: Story = {
 };
 
 export const DensityAlignment: Story = {
+  tags: ['!autodocs', '!dev'],
   render: () => (
     <div className="nx:grid nx:gap-4">
-      {(
-        [
-          'tight',
-          'compact',
-          'default',
-          'comfortable',
-          'relaxed',
-          'spacious',
-        ] as const
-      ).map((density) => (
+      {DENSITY_OPTIONS.map(({ value: density }) => (
         <NexusRoot
           key={density}
           state={{ ...DEFAULT_NEXUS_APPEARANCE, mode: 'light', density }}
@@ -531,6 +523,11 @@ export const DensityAlignment: Story = {
       const thumb = control.querySelector('[data-slot="switch-thumb"]')!;
       const rtl = getComputedStyle(control).direction === 'rtl';
       const border = parseFloat(getComputedStyle(control).borderLeftWidth);
+      await expect(
+        getComputedStyle(thumb)
+          .transitionProperty.split(', ')
+          .filter((property) => property !== 'background-color')
+      ).toEqual(['translate']);
       const assertPosition = (checked: boolean) => {
         const trackRect = control.getBoundingClientRect();
         const thumbRect = thumb.getBoundingClientRect();
@@ -551,7 +548,6 @@ export const DensityAlignment: Story = {
       await userEvent.click(control);
       await expect(control).toHaveAttribute('data-state', 'checked');
       await waitFor(() => assertPosition(true));
-      assertPosition(true);
     }
   },
 };

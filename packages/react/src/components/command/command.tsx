@@ -147,7 +147,7 @@ function CommandInput({ className, ...props }: CommandInputProps) {
       data-slot="command-input-wrapper"
       className="nx:flex nx:items-center nx:border-b-default nx:border-border-default nx:px-3 nx:focus-within:border-border-focus"
     >
-      <IconSearch className="nx:mr-2 nx:size-4 nx:shrink-0 nx:opacity-50" />
+      <IconSearch className="nx:mr-2 nx:size-icon-glyph-default nx:shrink-0 nx:opacity-50" />
       <CommandPrimitive.Input
         data-slot="command-input"
         className={cn(
@@ -351,7 +351,7 @@ function CommandItem({ className, ...props }: CommandItemProps) {
         'nx:gap-3 nx:px-3 nx:py-2.5',
         'nx:data-[selected=true]:bg-popover-hover nx:data-[selected=true]:text-popover-foreground',
         'nx:data-[disabled=true]:pointer-events-none nx:data-[disabled=true]:text-disabled-foreground',
-        'nx:[&_svg]:pointer-events-none nx:[&_svg]:size-4 nx:[&_svg]:shrink-0',
+        'nx:[&_svg]:pointer-events-none nx:[&_svg]:size-icon-glyph-default nx:[&_svg]:shrink-0',
         className
       )}
       {...props}

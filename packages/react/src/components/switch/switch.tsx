@@ -7,7 +7,7 @@ import { cn } from '../../lib/utils';
 
 const switchVariants = cva(
   [
-    'nx:peer nx:relative nx:inline-flex nx:shrink-0 nx:cursor-pointer nx:items-center',
+    'nx:peer nx:@container nx:relative nx:inline-flex nx:shrink-0 nx:cursor-pointer',
     'nx:rounded-full nx:border-thick nx:border-border-default',
     'nx:transition-control',
     'nx:focus-visible:outline-2 nx:focus-visible:outline-focus-default',
@@ -33,9 +33,9 @@ const switchVariants = cva(
 const switchThumbVariants = cva(
   [
     'nx:pointer-events-none nx:absolute nx:start-0 nx:top-1/2 nx:-translate-y-1/2 nx:block nx:rounded-full',
-    'nx:bg-control-thumb nx:transition-[background-color,inset-inline-start,translate]',
+    'nx:bg-control-thumb nx:transition-[background-color,translate]',
     'nx:data-[state=checked]:bg-primary-foreground',
-    'nx:data-[state=unchecked]:translate-x-0 nx:data-[state=checked]:start-full nx:data-[state=checked]:-translate-x-full nx:rtl:data-[state=checked]:translate-x-full',
+    'nx:data-[state=checked]:translate-x-[calc(100cqi-100%)] nx:rtl:data-[state=checked]:-translate-x-[calc(100cqi-100%)]',
   ],
   {
     variants: {

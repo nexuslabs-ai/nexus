@@ -23,21 +23,21 @@
     },
     "3": {
       "$value": {
-        "value": 12,
+        "value": 13,
         "unit": "px"
       },
       "$type": "dimension"
     },
     "4": {
       "$value": {
-        "value": 16,
+        "value": 17,
         "unit": "px"
       },
       "$type": "dimension"
     },
     "5": {
       "$value": {
-        "value": 20,
+        "value": 22,
         "unit": "px"
       },
       "$type": "dimension"
@@ -226,14 +226,14 @@
     },
     "2_5": {
       "$value": {
-        "value": 10,
+        "value": 11,
         "unit": "px"
       },
       "$type": "dimension"
     },
     "3_5": {
       "$value": {
-        "value": 14,
+        "value": 15,
         "unit": "px"
       },
       "$type": "dimension"

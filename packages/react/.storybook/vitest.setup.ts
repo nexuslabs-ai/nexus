@@ -16,12 +16,7 @@ if (density && !DENSITY_OPTIONS.some((option) => option.value === density)) {
 const annotations = setProjectAnnotations([
   a11yAddonAnnotations,
   projectAnnotations,
-  {
-    initialGlobals: {
-      ...projectAnnotations.default.initialGlobals,
-      ...(density ? { density } : {}),
-    },
-  },
+  ...(density ? [{ initialGlobals: { density } }] : []),
 ]);
 
 beforeAll(annotations.beforeAll);

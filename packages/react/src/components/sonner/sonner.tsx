@@ -15,11 +15,13 @@ import { useNexusRootAttributes } from '../../lib/nexus-root-context';
 
 /** Tabler icons in place of sonner's bundled set, matching Nexus iconography. */
 const toasterIcons = {
-  success: <IconCircleCheck className="nx:size-4" />,
-  info: <IconInfoCircle className="nx:size-4" />,
-  warning: <IconAlertTriangle className="nx:size-4" />,
-  error: <IconAlertCircle className="nx:size-4" />,
-  loading: <IconLoader2 className="nx:size-4 nx:animate-spin" />,
+  success: <IconCircleCheck className="nx:size-icon-glyph-default" />,
+  info: <IconInfoCircle className="nx:size-icon-glyph-default" />,
+  warning: <IconAlertTriangle className="nx:size-icon-glyph-default" />,
+  error: <IconAlertCircle className="nx:size-icon-glyph-default" />,
+  loading: (
+    <IconLoader2 className="nx:size-icon-glyph-default nx:animate-spin" />
+  ),
 };
 
 /**

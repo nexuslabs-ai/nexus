@@ -30,14 +30,14 @@
     },
     "4": {
       "$value": {
-        "value": 18,
+        "value": 19,
         "unit": "px"
       },
       "$type": "dimension"
     },
     "5": {
       "$value": {
-        "value": 22,
+        "value": 25,
         "unit": "px"
       },
       "$type": "dimension"
@@ -233,7 +233,7 @@
     },
     "3_5": {
       "$value": {
-        "value": 16,
+        "value": 17,
         "unit": "px"
       },
       "$type": "dimension"

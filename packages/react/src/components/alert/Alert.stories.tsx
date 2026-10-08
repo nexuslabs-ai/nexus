@@ -1,6 +1,6 @@
 import * as React from 'react';
 
-import { DEFAULT_NEXUS_APPEARANCE } from '@nexus_ds/core';
+import { DEFAULT_NEXUS_APPEARANCE, DENSITY_OPTIONS } from '@nexus_ds/core';
 import {
   Canvas,
   Controls,
@@ -896,16 +896,7 @@ export const DensityActionSizing: Story = {
   tags: ['!autodocs', '!dev'],
   render: () => (
     <div className="nx:flex nx:w-full nx:flex-col nx:gap-4">
-      {(
-        [
-          'tight',
-          'compact',
-          'default',
-          'comfortable',
-          'relaxed',
-          'spacious',
-        ] as const
-      ).map((density) => (
+      {DENSITY_OPTIONS.map(({ value: density }) => (
         <NexusRoot
           key={density}
           state={{ ...DEFAULT_NEXUS_APPEARANCE, mode: 'light', density }}
