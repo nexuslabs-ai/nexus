@@ -29,12 +29,9 @@ import { pathToFileURL } from 'node:url';
 import { createJiti } from 'jiti';
 import prettier from 'prettier';
 
-import {
-  DOCS_TAG,
-  PREVIEWLESS_COMPONENTS,
-  readDocsStories,
-} from './docs-stories.mjs';
-import { humanize } from './humanize.mjs';
+import { DOCS_TAG } from './docs-stories.mjs';
+import { humanize, pascal } from './humanize.mjs';
+import { exportedComponentSlugs } from './react-sources.mjs';
 import { reactSrc } from './roots.mjs';
 
 /** Nav metadata source, relative to the docs app root. */
@@ -133,22 +130,9 @@ function assertLabelsAvoidTheCardJoiner(section) {
 
 const COMPONENTS_SECTION = 'components';
 
-const EXPORTED_COMPONENT = /from '\.\/components\/([^/']+)/g;
-
-/** Every component `@nexus_ds/react` exports, by its folder slug. */
-function exportedComponentSlugs() {
-  const index = fs.readFileSync(path.join(reactSrc, 'index.ts'), 'utf8');
-  return new Set(
-    [...index.matchAll(EXPORTED_COMPONENT)].map(([, slug]) => slug)
-  );
-}
-
 /** A component's name as its own source spells it (`InputOTP`), else its slug in PascalCase. */
 function componentLabel(slug) {
-  const pascal = slug
-    .split('-')
-    .map((word) => word[0].toUpperCase() + word.slice(1))
-    .join('');
+  const name = pascal(slug);
   const dir = path.join(reactSrc, 'components', slug);
   const source = fs
     .readdirSync(dir)
@@ -157,8 +141,8 @@ function componentLabel(slug) {
     .join('\n');
   const spelled = source
     .match(/\b[A-Z][A-Za-z0-9]*\b/g)
-    ?.find((word) => word.toLowerCase() === pascal.toLowerCase());
-  return spelled ?? pascal;
+    ?.find((word) => word.toLowerCase() === name.toLowerCase());
+  return spelled ?? name;
 }
 
 function assertNoWrittenComponentPages(sources) {
@@ -170,21 +154,6 @@ function assertNoWrittenComponentPages(sources) {
       );
     }
   }
-}
-
-function assertEveryComponentHasDocsStories(slugs) {
-  const missing = slugs.filter(
-    (slug) =>
-      !PREVIEWLESS_COMPONENTS.has(slug) && readDocsStories(slug).length === 0
-  );
-  if (missing.length === 0) return;
-
-  throw new Error(
-    [
-      `Every component @nexus_ds/react exports needs a story tagged \`${DOCS_TAG}\` for its page — add \`tags: ['${DOCS_TAG}']\` to the story that should be its preview:`,
-      ...missing.map((slug) => `  packages/react/src/components/${slug}/`),
-    ].join('\n')
-  );
 }
 
 function byLabel(entries) {
@@ -252,14 +221,12 @@ export type GuideManifestPage = ManifestPageBase & {
   );
 
 /**
- * A component \`@nexus_ds/react\` exports. Its page is generated from its
- * stories tagged \`docs\`.
+ * A component \`@nexus_ds/react\` exports. Its page body is its
+ * \`getComponentDocs(slug)\` entry, generated from its stories tagged \`docs\`.
  */
 export type ComponentManifestPage = ManifestPageBase & {
   nested?: never;
   kind: 'generated';
-  /** False for a component whose page shows Installation, Usage and Props only. */
-  preview: boolean;
 };
 
 export type ManifestPage = GuideManifestPage | ComponentManifestPage;
@@ -424,16 +391,13 @@ export async function buildPageManifest(docsRoot, formatOptions) {
         slug,
         label: componentLabel(slug),
         kind: 'generated',
-        preview: !PREVIEWLESS_COMPONENTS.has(slug),
       },
     };
   }
 
   function orderedEntries(sectionSlug) {
     if (isComponentsSection(sectionSlug)) {
-      const slugs = [...exportedComponentSlugs()];
-      assertEveryComponentHasDocsStories(slugs);
-      return byLabel(slugs.map(buildComponentPage));
+      return byLabel(exportedComponentSlugs().map(buildComponentPage));
     }
     return orderedSlugs(sectionSlug).map((slug) =>
       buildPage(sectionSlug, slug)

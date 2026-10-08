@@ -3,8 +3,8 @@
   "extends": ["//"],
   "tasks": {
     "generate:demos": {
-      "dependsOn": ["generate:dependencies"],
-      "outputs": ["__generated__/**"],
+      "dependsOn": ["generate:dependencies", "generate:props"],
+      "outputs": ["__generated__/**", "public/avatars/**"],
       "cache": false
     },
     "generate:props": {

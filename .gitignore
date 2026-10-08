@@ -71,4 +71,5 @@ opencode.json
 # Docs build inputs, written by the `@nexus_ds/docs#generate:*` tasks
 apps/docs/generated/
 apps/docs/__generated__/
+apps/docs/public/avatars/
 apps/docs/app/_lib/*.generated.ts

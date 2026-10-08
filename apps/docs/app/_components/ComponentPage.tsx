@@ -1,12 +1,11 @@
 import {
+  type ComponentDocs,
   type Demo,
   type DemoId,
   demos,
   getComponentDocs,
 } from '../../__generated__/demo-index';
-import { importStatement } from '../../scripts/import-statement.mjs';
 import type { ManifestPage } from '../_lib/manifest';
-import { type ComponentEntry, loadComponentDocs } from '../_lib/props';
 
 import { CodeSample } from './CodeSample';
 import { ComponentDemo } from './ComponentDemo';
@@ -30,16 +29,11 @@ type ComponentManifestPage = Extract<ManifestPage, { kind: 'generated' }>;
  * rest are its examples, in story order.
  */
 export function ComponentPage({ page }: { page: ComponentManifestPage }) {
-  if (!page.preview) return <PreviewlessComponentPage page={page} />;
-
   const { slug } = page;
   const docs = getComponentDocs(slug);
-  const [previewId, ...exampleIds] = docs.demos;
-  if (!previewId) {
-    throw new Error(
-      `ComponentPage: "${slug}" has no docs stories — tag one of its stories \`docs\`.`
-    );
-  }
+  const previewId = docs.preview;
+  if (!previewId) return <PreviewlessComponentPage page={page} docs={docs} />;
+
   const preview: Demo = demos[previewId];
 
   return (
@@ -70,12 +64,12 @@ export function ComponentPage({ page }: { page: ComponentManifestPage }) {
         </>
       )}
 
-      {exampleIds.length > 0 && (
+      {docs.examples.length > 0 && (
         <SectionHeading className={SECTION_HEADING_CLASS}>
           Examples
         </SectionHeading>
       )}
-      {exampleIds.map((id) => (
+      {docs.examples.map((id) => (
         <Example key={id} id={id} slug={slug} previewId={previewId} />
       ))}
 
@@ -119,13 +113,13 @@ function Example({
 }
 
 /** Installation, Usage and Props only, for a component that can't render a preview here. */
-async function PreviewlessComponentPage({
+function PreviewlessComponentPage({
   page,
+  docs,
 }: {
   page: ComponentManifestPage;
+  docs: ComponentDocs;
 }) {
-  const entries = await loadComponentDocs(page.slug);
-
   return (
     <>
       <h1 className={PAGE_HEADING_CLASS}>{page.label}</h1>
@@ -136,25 +130,10 @@ async function PreviewlessComponentPage({
       <ComponentInstallation slug={page.slug} />
 
       <SectionHeading className={SECTION_HEADING_CLASS}>Usage</SectionHeading>
-      <CodeSample lang="tsx">{importsByFile(entries)}</CodeSample>
+      <CodeSample lang="tsx">{docs.imports}</CodeSample>
 
       <SectionHeading className={SECTION_HEADING_CLASS}>Props</SectionHeading>
       <PropsTable slug={page.slug} />
     </>
   );
-}
-
-// `packages/react/src/components/x/x.tsx` → `@/components/x/x`, one import per file.
-function importsByFile(entries: readonly ComponentEntry[]) {
-  const byModule = new Map<string, string[]>();
-  for (const { name, sourcePath } of entries) {
-    const module = sourcePath
-      .replace(/^packages\/react\/src\//, '@/')
-      .replace(/\.tsx?$/, '');
-    byModule.set(module, [...(byModule.get(module) ?? []), name]);
-  }
-  return [...byModule]
-    .sort(([a], [b]) => a.localeCompare(b, 'en'))
-    .map(([module, names]) => importStatement(names.toSorted(), module))
-    .join('\n');
 }

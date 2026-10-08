@@ -1,4 +1,5 @@
 import {
+  cpSync,
   existsSync,
   mkdirSync,
   readdirSync,
@@ -9,14 +10,29 @@ import {
 } from 'node:fs';
 import path from 'node:path';
 
-import { componentUsage } from './component-usage.mjs';
-import { docsStoryModule, readDocsStories } from './docs-stories.mjs';
+import { componentUsage, entryUsage } from './component-usage.mjs';
+import {
+  DOCS_TAG,
+  docsStoryModule,
+  PREVIEWLESS_COMPONENTS,
+  readDocsStories,
+} from './docs-stories.mjs';
 import { resolveFormatOptions } from './page-manifest.mjs';
-import { componentSlugs } from './react-sources.mjs';
-import { componentsRoot, docsRoot } from './roots.mjs';
+import { componentSlugs, exportedComponentSlugs } from './react-sources.mjs';
+import { componentsRoot, docsRoot, reactRoot } from './roots.mjs';
 
 const GENERATED_DIR = path.join(docsRoot, '__generated__');
 const DEPENDENCIES_DIR = path.join(docsRoot, 'generated', 'dependencies');
+const PROPS_DIR = path.join(docsRoot, 'generated', 'props');
+
+/** Images docs stories load by URL, served from Storybook's public dir and copied to the docs app's. */
+const STORY_ASSETS_SOURCE = path.join(
+  reactRoot,
+  '.storybook',
+  'public',
+  'avatars'
+);
+const STORY_ASSETS_TARGET = path.join(docsRoot, 'public', 'avatars');
 
 const COPIED_PREFIX = '@/';
 const IMPORT_PATTERNS = [
@@ -58,9 +74,11 @@ export interface Demo {
 }
 
 export interface ComponentDocs {
-  /** The component's docs stories in file order; the first is the preview. */
-  demos: readonly DemoId[];
-  /** Imports every part the demos render. */
+  /** The first docs story; null for a page that shows Installation, Usage and Props only. */
+  preview: DemoId | null;
+  /** The rest of the docs stories, in file order. */
+  examples: readonly DemoId[];
+  /** Imports every part the demos render, or every part the component exports without a preview. */
   imports: string;
   /** How those parts nest across the demos, as a text tree; null for one part. */
   composition: string | null;
@@ -89,7 +107,7 @@ export function getComponentDocs(slug: string): ComponentDocs {
     : undefined;
   if (!docs) {
     throw new Error(
-      \`No docs stories for \${slug}. Tag its stories \\\`docs\\\`.\`
+      \`No component docs for \${slug} — @nexus_ds/react does not export it. Run \\\`pnpm --filter @nexus_ds/docs generate:demos\\\`.\`
     );
   }
 
@@ -295,11 +313,41 @@ function packageRange(id, name, blocks) {
 }
 
 /**
+ * The docs stories under `slug`, or the problem with them: every exported
+ * component with a preview needs one, and a component without a page or
+ * preview must have none.
+ * @param {string} slug
+ * @param {Set<string>} exported
+ */
+function docsStoriesFor(slug, exported) {
+  const stories = readDocsStories(slug);
+  const folder = `packages/react/src/components/${slug}/`;
+  if (!exported.has(slug) && stories.length > 0) {
+    throw new Error(
+      `${folder} has stories tagged \`${DOCS_TAG}\`, but @nexus_ds/react does not export it, so it has no page — drop the tag.`
+    );
+  }
+  const previewless = PREVIEWLESS_COMPONENTS.get(slug);
+  if (previewless && stories.length > 0) {
+    throw new Error(
+      `${folder} has stories tagged \`${DOCS_TAG}\`, but its page shows no demos (${previewless}) — drop the tag.`
+    );
+  }
+  if (exported.has(slug) && !previewless && stories.length === 0) {
+    throw new Error(
+      `${folder} needs a story tagged \`${DOCS_TAG}\` for its page — add \`tags: ['${DOCS_TAG}']\` to the story that should be its preview.`
+    );
+  }
+  return stories;
+}
+
+/**
  * Every story tagged `docs`, as a checked, paste-ready module — component by
  * component, in story order. Collects every story's problem before failing.
+ * @param {Set<string>} exported
  * @returns {Promise<DemoFile[]>}
  */
-async function collectDemos() {
+async function collectDemos(exported) {
   const installBlocks = readInstallBlocks();
   const formatOptions = await resolveFormatOptions(docsRoot);
   const demos = [];
@@ -308,7 +356,7 @@ async function collectDemos() {
   for (const slug of componentSlugs()) {
     let stories = [];
     try {
-      stories = readDocsStories(slug);
+      stories = docsStoriesFor(slug, exported);
     } catch (error) {
       problems.push(error.message);
     }
@@ -345,7 +393,7 @@ async function collectDemos() {
   return demos;
 }
 
-const LITERAL_ID = /\bid="([^"]+)"/g;
+const LITERAL_ID = /(?<![\w-])id="([^"]+)"/g;
 
 /**
  * A component's docs stories render on one page, so a literal `id` two of them
@@ -357,35 +405,54 @@ function sharedIds(demos) {
   for (const demo of demos) {
     for (const [, id] of demo.source.matchAll(LITERAL_ID)) {
       const key = `${demo.slug}#${id}`;
-      owners.set(key, [...(owners.get(key) ?? []), demo.id]);
+      owners.set(key, (owners.get(key) ?? new Set()).add(demo.id));
     }
   }
   return [...owners]
-    .filter(([, ids]) => ids.length > 1)
+    .filter(([, ids]) => ids.size > 1)
     .map(
       ([key, ids]) =>
-        `${ids.join(' and ')} both render id="${key.split('#')[1]}" on the ${key.split('#')[0]} page — give each its own id, e.g. with React.useId.`
+        `${[...ids].join(', ')} each render id="${key.split('#')[1]}" on the ${key.split('#')[0]} page — give each its own id, e.g. with React.useId.`
     );
 }
 
 /**
- * The preview-first story order, Usage and Composition for every component
- * with docs stories.
- * @param {DemoFile[]} demos
+ * @typedef {{ preview: string | null; examples: string[]; imports: string; composition: string | null }} ComponentDocs
  */
-function collectComponentDocs(demos) {
-  const docs = new Map();
-  for (const demo of demos) {
-    const entry = docs.get(demo.slug) ?? { demos: [], sources: [] };
-    entry.demos.push(demo.id);
-    entry.sources.push({ fileName: `${demo.id}.tsx`, source: demo.source });
-    docs.set(demo.slug, entry);
-  }
+
+/**
+ * Each exported component's page: its preview, examples, Usage and
+ * Composition, from its docs stories — or, for a component without a
+ * preview, Usage from every part it exports.
+ * @param {string[]} exported
+ * @param {DemoFile[]} demos
+ * @returns {Map<string, ComponentDocs>}
+ */
+function collectComponentDocs(exported, demos) {
   return new Map(
-    [...docs].map(([slug, { demos: ids, sources }]) => [
-      slug,
-      { demos: ids, ...componentUsage(slug, sources) },
-    ])
+    exported.map((slug) => {
+      const own = demos.filter((demo) => demo.slug === slug);
+      if (own.length === 0) {
+        const { components } = JSON.parse(
+          readCanonical(path.join(PROPS_DIR, `${slug}.json`))
+        );
+        return [
+          slug,
+          {
+            preview: null,
+            examples: [],
+            imports: entryUsage(components),
+            composition: null,
+          },
+        ];
+      }
+      const [preview, ...examples] = own.map((demo) => demo.id);
+      const sources = own.map((demo) => ({
+        fileName: `${demo.id}.tsx`,
+        source: demo.source,
+      }));
+      return [slug, { preview, examples, ...componentUsage(slug, sources) }];
+    })
   );
 }
 
@@ -402,7 +469,7 @@ export const source = ${JSON.stringify(demo.source)};
 
 /**
  * @param {DemoFile[]} demos
- * @param {Map<string, { demos: string[]; imports: string; composition: string | null }>} componentDocs
+ * @param {Map<string, ComponentDocs>} componentDocs
  */
 function renderDemoIndex(demos, componentDocs) {
   const entries = demos
@@ -421,10 +488,11 @@ function renderDemoIndex(demos, componentDocs) {
   const literal = entries ? `{\n${entries}\n}` : '{}';
 
   const docsEntries = [...componentDocs]
-    .map(([slug, { demos: ids, imports, composition }]) =>
+    .map(([slug, { preview, examples, imports, composition }]) =>
       [
         `  ${JSON.stringify(slug)}: {`,
-        `    demos: ${JSON.stringify(ids)},`,
+        `    preview: ${JSON.stringify(preview)},`,
+        `    examples: ${JSON.stringify(examples)},`,
         `    imports: ${JSON.stringify(imports)},`,
         `    composition: ${JSON.stringify(composition)},`,
         `  },`,
@@ -441,15 +509,22 @@ const componentDocs: Record<string, ComponentDocs> = ${docsLiteral};
 ${INDEX_FOOTER}`;
 }
 
+function copyStoryAssets() {
+  rmSync(STORY_ASSETS_TARGET, { recursive: true, force: true });
+  cpSync(STORY_ASSETS_SOURCE, STORY_ASSETS_TARGET, { recursive: true });
+}
+
 async function generateDemoIndex() {
-  const demos = await collectDemos();
+  const exported = exportedComponentSlugs();
+  const demos = await collectDemos(new Set(exported));
   const modulesDir = path.join(GENERATED_DIR, MODULES_DIR);
   const indexFile = path.join(GENERATED_DIR, INDEX_FILE);
 
   writeIfChanged(
     indexFile,
-    renderDemoIndex(demos, collectComponentDocs(demos))
+    renderDemoIndex(demos, collectComponentDocs(exported, demos))
   );
+  copyStoryAssets();
 
   const keep = new Set([indexFile]);
   for (const demo of demos) {

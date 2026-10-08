@@ -1,9 +1,21 @@
 // @ts-check
 import ts from 'typescript';
 
-import { importStatement } from './import-statement.mjs';
-
 const PATH_SEPARATOR = ' > ';
+
+/** `printWidth` in the repo's `.prettierrc`. */
+const PRINT_WIDTH = 80;
+
+/**
+ * `import { … } from '…';` laid out the way prettier would print it.
+ * @param {readonly string[]} names
+ * @param {string} module
+ */
+function importStatement(names, module) {
+  const oneLine = `import { ${names.join(', ')} } from '${module}';`;
+  if (oneLine.length <= PRINT_WIDTH) return oneLine;
+  return `import {\n${names.map((name) => `  ${name},`).join('\n')}\n} from '${module}';`;
+}
 
 /** Where a component page's demos import the component's parts from. */
 function componentModule(slug) {
@@ -176,4 +188,25 @@ export function componentUsage(slug, demos) {
     ),
     composition: parts.length > 1 ? renderTree(nesting) : null,
   };
+}
+
+/**
+ * Usage for a page without demos: every part the component exports, one
+ * import per source file — `packages/react/src/components/x/x.tsx` →
+ * `@/components/x/x`.
+ * @param {readonly { name: string; sourcePath: string }[]} entries
+ */
+export function entryUsage(entries) {
+  /** @type {Map<string, string[]>} */
+  const byModule = new Map();
+  for (const { name, sourcePath } of entries) {
+    const module = sourcePath
+      .replace(/^packages\/react\/src\//, '@/')
+      .replace(/\.tsx?$/, '');
+    byModule.set(module, [...(byModule.get(module) ?? []), name]);
+  }
+  return [...byModule]
+    .sort(([a], [b]) => a.localeCompare(b, 'en'))
+    .map(([module, names]) => importStatement(names.toSorted(), module))
+    .join('\n');
 }

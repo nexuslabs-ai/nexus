@@ -4,7 +4,7 @@ import type { Meta, StoryObj } from '@storybook/react';
 import { IconBold, IconItalic } from '@tabler/icons-react';
 import { expect, fn, userEvent, waitFor, within } from 'storybook/test';
 
-import { Toggle, type ToggleProps } from './toggle';
+import { Toggle } from './toggle';
 
 const meta: Meta<typeof Toggle> = {
   title: 'Components/Toggle',
@@ -385,16 +385,13 @@ export const InvalidOutlinePrimary: Story = {
   },
 };
 
-function ControlledToggle(args: ToggleProps) {
+function ControlledBold() {
   const [pressed, setPressed] = useState(false);
   return (
     <Toggle
-      {...args}
+      variant="outline-primary"
       pressed={pressed}
-      onPressedChange={(next) => {
-        setPressed(next);
-        args.onPressedChange?.(next);
-      }}
+      onPressedChange={setPressed}
     >
       Controlled bold
     </Toggle>
@@ -403,9 +400,8 @@ function ControlledToggle(args: ToggleProps) {
 
 export const Controlled: Story = {
   tags: ['docs'],
-  args: { variant: 'outline-primary', onPressedChange: fn() },
-  render: (args) => <ControlledToggle {...args} />,
-  play: async ({ canvasElement, args }) => {
+  render: () => <ControlledBold />,
+  play: async ({ canvasElement }) => {
     const toggle = within(canvasElement).getByRole('button', {
       name: 'Controlled bold',
     });
@@ -413,7 +409,6 @@ export const Controlled: Story = {
     await expect(toggle).toHaveAttribute('aria-pressed', 'true');
     await userEvent.click(toggle);
     await expect(toggle).toHaveAttribute('aria-pressed', 'false');
-    await expect(args.onPressedChange).toHaveBeenCalledTimes(2);
   },
 };
 

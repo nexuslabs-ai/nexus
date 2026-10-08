@@ -15,7 +15,7 @@ import path from 'node:path';
 import prettier from 'prettier';
 import ts from 'typescript';
 
-import { humanize } from './humanize.mjs';
+import { humanize, pascal } from './humanize.mjs';
 import { collectSourceFiles } from './react-sources.mjs';
 import { componentsRoot, isUnder, reactSrc, toRepoPath } from './roots.mjs';
 
@@ -114,8 +114,8 @@ function hasExportModifier(statement) {
  *   imports: Map<string, ImportBinding>;
  *   declarations: Map<string, ts.Statement>;
  *   stories: { name: string; object: ts.ObjectLiteralExpression }[];
- *   meta: ts.ObjectLiteralExpression | undefined;
- *   metaName: string | undefined;
+ *   meta: ts.ObjectLiteralExpression;
+ *   metaName: string;
  * }} StoriesFile
  */
 
@@ -171,7 +171,8 @@ function parseStoriesFile(filePath) {
       continue;
     }
     if (ts.isExportAssignment(statement)) {
-      metaName = statement.expression.getText();
+      const exported = unwrap(statement.expression);
+      if (exported && ts.isIdentifier(exported)) metaName = exported.text;
       continue;
     }
     if (ts.isVariableStatement(statement)) {
@@ -204,18 +205,13 @@ function parseStoriesFile(filePath) {
     }
   }
 
-  const metaObject = metaName ? unwrap(initializers.get(metaName)) : undefined;
-  return {
-    path: filePath,
-    imports,
-    declarations,
-    stories,
-    meta:
-      metaObject && ts.isObjectLiteralExpression(metaObject)
-        ? metaObject
-        : undefined,
-    metaName,
-  };
+  const meta = metaName ? unwrap(initializers.get(metaName)) : undefined;
+  if (!metaName || !meta || !ts.isObjectLiteralExpression(meta)) {
+    throw new Error(
+      `${toRepoPath(filePath)}: its default export is not a variable holding the meta object — declare \`const meta = { … }\` and \`export default meta;\`.`
+    );
+  }
+  return { path: filePath, imports, declarations, stories, meta, metaName };
 }
 
 /**
@@ -234,7 +230,7 @@ export function readDocsStories(slug) {
 
   return files.flatMap((filePath) => {
     const file = parseStoriesFile(filePath);
-    if (file.meta && tagsOf(file.meta).includes(DOCS_TAG)) {
+    if (tagsOf(file.meta).includes(DOCS_TAG)) {
       throw new Error(
         `${toRepoPath(filePath)}: meta is tagged \`${DOCS_TAG}\` — tag the stories a component page should show, not the whole file.`
       );
@@ -253,15 +249,8 @@ function kebab(name) {
     .toLowerCase();
 }
 
-function pascal(slug) {
-  return slug
-    .split('-')
-    .map((word) => word[0].toUpperCase() + word.slice(1))
-    .join('');
-}
-
 /** @param {DocsStory} story */
-export function docsStoryId(story) {
+function docsStoryId(story) {
   return `${story.slug}/${kebab(story.name)}`;
 }
 
@@ -313,8 +302,8 @@ function isDropped(value, file) {
   );
 }
 
-const ESCAPE_IN_JSX_STRING = /["\\\n]/;
-const ESCAPE_IN_JSX_TEXT = /[{}<>]/;
+const ESCAPE_IN_JSX_STRING = /["&\\\n]/;
+const ESCAPE_IN_JSX_TEXT = /[{}<>&]/;
 
 /**
  * The JSX attribute an arg becomes, or '' when it has no value to show.
@@ -425,8 +414,14 @@ function fromRender(render, args, file, where) {
     argsName = parameter.text;
   }
 
-  /** @param {string} key */
-  const valueOf = (key, fallback) => args.get(key) ?? fallback;
+  /**
+   * @param {string} key
+   * @param {ts.Node} [fallback] the destructuring default
+   */
+  const valueOf = (key, fallback) => {
+    const value = args.get(key);
+    return isDropped(value, file) ? fallback : value;
+  };
 
   /**
    * @param {ts.Node} use the identifier or `args.x` access
@@ -456,6 +451,66 @@ function fromRender(render, args, file, where) {
     );
   }
 
+  /**
+   * `{...args}` as the attributes it sets, plus `args.children` as the
+   * element's children when the element has none of its own — as in React,
+   * an attribute after the spread and JSX children win over args.
+   * @param {ts.JsxSpreadAttribute} spread
+   */
+  function spreadArgs(spread) {
+    const attributes = spread.parent.properties;
+    const position = attributes.indexOf(spread);
+    /** @param {readonly ts.JsxAttributeLike[]} list */
+    const namesIn = (list) =>
+      new Set(
+        list
+          .filter(ts.isJsxAttribute)
+          .map((attribute) => attribute.name.getText())
+      );
+    const setAfter = namesIn(attributes.slice(position + 1));
+    const overridden = [...namesIn(attributes.slice(0, position))].find(
+      (name) => args.has(name) && !setAfter.has(name)
+    );
+    if (overridden) {
+      throw new Error(
+        `${where} its render sets \`${overridden}\` before \`{...${argsName}}\`, so the arg overrides it — set it after the spread, or drop it from args.`
+      );
+    }
+
+    const replacement = spreadText(
+      new Map([...args].filter(([name]) => !setAfter.has(name))),
+      file
+    );
+    edits.push([
+      replacement ? spread.getStart() : spread.getFullStart(),
+      spread.getEnd(),
+      replacement,
+    ]);
+
+    const children = childText(args.get('children'), file);
+    if (!children) return;
+    const element = spread.parent.parent;
+    if (ts.isJsxSelfClosingElement(element)) {
+      edits.push([
+        element.getEnd() - '/>'.length,
+        element.getEnd(),
+        `>${children}</${element.tagName.getText()}>`,
+      ]);
+      return;
+    }
+    const { children: ownChildren, closingElement } = element.parent;
+    const hasOwnChildren = ownChildren.some(
+      (child) => !(ts.isJsxText(child) && child.containsOnlyTriviaWhiteSpaces)
+    );
+    if (!hasOwnChildren) {
+      edits.push([
+        closingElement.getStart(),
+        closingElement.getStart(),
+        children,
+      ]);
+    }
+  }
+
   /** @param {ts.Node} node */
   function visit(node) {
     if (argsName) {
@@ -472,12 +527,7 @@ function fromRender(render, args, file, where) {
         ts.isIdentifier(node.expression) &&
         node.expression.text === argsName
       ) {
-        const replacement = spreadText(args, file);
-        edits.push([
-          replacement ? node.getStart() : node.getFullStart(),
-          node.getEnd(),
-          replacement,
-        ]);
+        spreadArgs(node);
         return;
       }
       if (ts.isIdentifier(node) && node.text === argsName) {
@@ -546,7 +596,12 @@ function asExpression(rendered, where) {
     ts.forEachChild(node, count);
   };
   statements.forEach(count);
-  if (!last || !ts.isReturnStatement(last) || !last.expression || returns > 1) {
+  if (!last || !ts.isReturnStatement(last) || !last.expression) {
+    throw new Error(
+      `${where} its render doesn't end in a \`return\`, so its decorator has nothing to wrap — end the render by returning its JSX.`
+    );
+  }
+  if (returns > 1) {
     throw new Error(
       `${where} its render returns from more than one place, so its decorator has nothing single to wrap — end the render in one \`return\`.`
     );
@@ -677,9 +732,7 @@ function decoratorList(node) {
 function renderStory(story, where) {
   const { file } = story;
   const props = propertiesOf(story.object, where);
-  const metaProps = file.meta
-    ? propertiesOf(file.meta, `${toRepoPath(file.path)}: meta`)
-    : new Map();
+  const metaProps = propertiesOf(file.meta, `${toRepoPath(file.path)}: meta`);
   for (const key of ['beforeEach', 'loaders']) {
     if (props.has(key) || metaProps.has(key)) {
       throw new Error(
