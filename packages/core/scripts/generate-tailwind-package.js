@@ -175,11 +175,12 @@ function assertTokenEngine(engine) {
     !engine.NEXUS_APPEARANCE_ATTRIBUTE_FIELDS ||
     typeof engine.NEXUS_ROOT_ATTRIBUTE !== 'string' ||
     typeof engine.NEXUS_MODE_ATTRIBUTE !== 'string' ||
+    typeof engine.NEXUS_LAYER_ORDER !== 'string' ||
     !Array.isArray(engine.BASE_TONE_OPTIONS) ||
     !Array.isArray(engine.SEMANTIC_TOKEN_REGISTRY)
   ) {
     throw new Error(
-      'generateTailwindPackage: token engine must provide deriveTheme, createNexusThemeContract, isColor, DEFAULT_NEXUS_APPEARANCE, NEXUS_APPEARANCE_ATTRIBUTE_FIELDS, NEXUS_ROOT_ATTRIBUTE, NEXUS_MODE_ATTRIBUTE, BASE_TONE_OPTIONS, and SEMANTIC_TOKEN_REGISTRY.'
+      'generateTailwindPackage: token engine must provide deriveTheme, createNexusThemeContract, isColor, DEFAULT_NEXUS_APPEARANCE, NEXUS_APPEARANCE_ATTRIBUTE_FIELDS, NEXUS_ROOT_ATTRIBUTE, NEXUS_MODE_ATTRIBUTE, NEXUS_LAYER_ORDER, BASE_TONE_OPTIONS, and SEMANTIC_TOKEN_REGISTRY.'
     );
   }
 

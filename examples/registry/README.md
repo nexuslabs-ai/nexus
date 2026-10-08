@@ -13,12 +13,16 @@ and #798 (catalog + CI) build on it.
 | [`../copy-next`](../copy-next) | A fresh app: Next 16 App Router, default `@/` alias, `rsc: true` |
 
 Pinned: Node 24.12.0, npm 11.6.2, shadcn 4.21.0, Tailwind 4.3.3, Vite 8.3.1,
-Next 16.3.6. `@nexus_ds/core` installs from a pack of the local package, so
-the fixtures test the current source; `node examples/registry/build.mjs
---npm-core` pins the published version instead. Both fixtures install with
-npm and commit their lockfile, so neither resolves the pnpm workspace. The
-findings were recorded against `main` at `a5176e306`; the recipe probe
-(Findings 5 and 6) used the #809 tree at `466db93b6`.
+Next 16.3.6. `@nexus_ds/core` installs from a pack of the local package
+(`registry/.generated/nexus_ds-core-<version>.tgz`), so the fixtures test
+the current source; `node examples/registry/build.mjs --npm-core` pins the
+published version instead. Both fixtures install with npm and commit their
+lockfile. Run them only from a copy **outside the repository**: the root
+`.npmrc` sets `node-linker=hoisted`, so an in-tree fixture silently
+resolves any package it lacks from the monorepo's `node_modules` (and
+copy-next picks up the root `@types`). The findings were recorded against
+`main` at `a5176e306`; the recipe probe (Findings 5 and 6) used the #809
+tree at `466db93b6`.
 
 ## Run it
 
@@ -27,18 +31,31 @@ node examples/registry/build.mjs
 python3 -m http.server 4400 -d examples/registry/.generated
 ```
 
-Then, in `examples/copy-vite` or `examples/copy-next`:
+Then copy each fixture out of the repository, next to a copy of the
+registry output so the core pack's `../registry/.generated/` path still
+resolves, and run it there:
 
 ```bash
-npm install
+dir=$(mktemp -d) && mkdir "$dir/registry"
+cp -R examples/registry/.generated "$dir/registry/"
+cp -R examples/copy-vite "$dir/"
+cd "$dir/copy-vite"
+npm ci
 npm run nexus:add
+npm run typecheck
 npm run build
 ```
 
-`build.mjs` regenerates the docs dependency closures, packs the local core,
-writes the copied stylesheet entry and runs `shadcn build`. The installed
-`components/nexus/` tree is gitignored: every run reinstalls from the
-current source, so the fixtures never hold a second copy that drifts.
+`build.mjs` clears `.generated/`, regenerates the docs dependency
+closures, packs the local core, writes the copied stylesheet entry and runs
+`shadcn build`. `nexus:add` deletes the installed `components/nexus/` tree
+(gitignored) and installs every item from the registry without
+`--overwrite`, so a file dropped from a closure disappears instead of
+lingering. It also runs `npm install` for the closures' dependencies: while
+the committed ranges cover them, `package.json` and `package-lock.json`
+stay unchanged (hashes match in both fixtures); a closure that adds or
+raises a dependency rewrites both. #798's CI lockfile check owns catching
+that.
 
 ## Contract
 
@@ -76,14 +93,14 @@ Nexus styles apply only inside an element marked `data-nexus-root`:
 - Nexus source uses **relative imports only**. A `registry:file` with an
   `@/` import fails to typecheck in a `~/` host (probe item
   `transform-probe`).
-- **Inline closures, no `registryDependencies`.** Each item carries every
-  file it imports; shared files such as `lib/utils.ts` arrive identical
-  from every item and are skipped. A bare name
-  (`registryDependencies: ["utils"]`) resolves to the default shadcn
-  registry and targets the host's own `lib/utils.ts` (item
-  `button-bare-dependency`). Namespaced `@nexus/…` dependencies would
-  work but add a second resolution path with no benefit while closures
-  are small.
+- **Inline closures; `@nexus/styles` is the only registry dependency.**
+  Each item carries every file it imports; shared files such as
+  `lib/utils.ts` arrive identical from every item and are skipped. Every
+  item declares `registryDependencies: ["@nexus/styles"]` (#798), so
+  installing any item brings the stylesheet. Dependencies are always
+  namespaced: a bare name (`registryDependencies: ["utils"]`) resolves to
+  the default shadcn registry and targets the host's own `lib/utils.ts`
+  (item `button-bare-dependency`).
 - npm dependencies come from the closure with `@nexus_ds/react`'s declared
   ranges. `@nexus_ds/core` is the only Nexus package a copied tree
   installs; `@nexus_ds/react` never resolves in either fixture.
@@ -103,7 +120,7 @@ is the fallback.
 | Situation | CLI behaviour (4.21.0) |
 | --------- | ---------------------- |
 | Incoming file identical to the installed one | Skipped silently |
-| Differs, `--yes` without `--overwrite` | Prompts anyway; non-TTY stdin answers No, the edit is kept, and **files earlier in the item have already been written** |
+| Differs, `--yes` without `--overwrite` | Prompts anyway; non-TTY stdin answers No, the edit is kept, and **files earlier in the item have already been written**. `nexus:add` clears the tree first, so the fixtures never reach this path |
 | Differs, `--overwrite` | Replaced silently |
 | Host files outside `components/nexus/` | Never touched (hashes before and after match in both fixtures) |
 
@@ -119,14 +136,17 @@ tree:
 @source './';
 ```
 
-plus `tw-animate-css` and every component's co-located CSS
-(`progress.css`), because a fixed entry cannot `@import` a file the host
-may not have installed. The host imports it after its own stylesheet.
+plus `tw-animate-css` and the co-located CSS from every closure's
+`styles` (today `progress.css`), because a fixed entry cannot `@import` a
+file the host may not have installed. The tailwind parts come from
+`nexus.css`'s own `@import` list. The host imports it after its own stylesheet.
 Result:
 
 - Two CSS chunks, each emitted once. The Nexus chunk has no Preflight and
-  no host classes; every one of the 187 `nx:` classes the copied tree uses is emitted.
-  Removing `@source` drops them (negative control).
+  no host classes; every one of the 187 `nx:` classes the copied tree uses
+  is emitted, in both fixtures (`probe/class-completeness.mjs`). Removing
+  `@source` drops them; pointing the check at the host chunk reports them
+  missing (negative controls).
 - `nx:` classes written **outside** `components/nexus/` are not emitted.
   Host code styles its own layout with host utilities.
 - The host must load Tailwind 4 Preflight (every Tailwind or shadcn app
@@ -135,6 +155,34 @@ Result:
 - Never use the registry `css` / `cssVars` fields: they write into the
   host's stylesheet, which is a different Tailwind compilation without
   `prefix(nx)`.
+
+### Variable names under `prefix(nx)`
+
+`prefix(nx)` renames every `@theme` variable, so Nexus's static scales land
+in the same `--nx-*` namespace as its runtime blocks. #795 recorded this
+mapping at `f096bd331`; #796 changed the rows that read a runtime variable.
+Compiled with the fixtures' Tailwind 4.3.3 (`vite build` output):
+
+| Scale | Declaration in `nexus.css` | Emitted in `@layer theme` (`:root, :host`) | Utility | Runtime writer |
+| ----- | -------------------------- | ------------------------------------------ | ------- | -------------- |
+| Spacing | `@theme { --spacing-4: 16px }` | `--nx-spacing-4: 16px` | `nx:px-4` → `padding-inline: var(--nx-spacing-4)` | `[data-nexus-root], [data-nx-density=…] { --nx-spacing-4 }`, same name |
+| Radius | `@theme inline reference { --radius-md: var(--nx-radius-md) }` | nothing (#795: a `--nx-radius-md: var(--nx-radius-md)` self-reference) | `nx:rounded-md` → `border-radius: var(--nx-radius-md)` | `[data-nexus-root], [data-nx-radius=…] { --nx-radius-md }` |
+| Text | `@theme { --text-*: initial }`, nothing declared | nothing | `nx:typography-*` read `--nx-typography-*` | the root block in `variables.css` |
+| Easing | `@theme inline reference { --ease-move: var(--nx-motion-ease-move) }` | nothing (#795: `--nx-ease-move: var(--nx-motion-ease-move)`) | `nx:ease-move` → `var(--nx-motion-ease-move)` (#795: `var(--nx-ease-move)`) | the root block in `variables.css` |
+
+**Decision: one `--nx-*` namespace.** The collision is what makes runtime
+density work: the runtime blocks set the same name on the root element, and
+utilities read it there. The spacing `@theme` values equal the `default`
+density, so they are only a static fallback. Every `@theme` entry that
+reads a runtime variable (colour, radius, easing, shadow, border width,
+default transition) is `@theme inline reference`: utilities read the
+runtime variable on the element, and nothing is declared on `:root`, where
+root-scoped variables do not exist. Before that change an embedded Dialog's
+`transition-timing-function` was `ease`, not the root's curve.
+`token-catalogue.test.ts` compiles `nexus.css` and fails if a `:root, :host`
+variable reads one that is not declared there. Host `@theme` names are
+unprefixed (`--spacing-gutter`, `--radius-panel`) and never meet `--nx-*`;
+the only host collision was Finding 1.
 
 ### `'use client'`
 
@@ -146,9 +194,15 @@ Component page.
 
 ## Findings
 
-Probed with `getComputedStyle` on production builds (`vite preview`,
-`next start`) against a `?no-nexus` baseline; `copy-vite` has
-`?nexus-first`, `?nexus-only` and `?provider` modes for the rows below.
+Recorded on #795's tree (`f096bd331`) with `getComputedStyle` on
+production builds (`vite preview`, `next start`) against a `?no-nexus`
+baseline; `copy-vite` then had `?nexus-first`, `?nexus-only` and
+`?provider` modes. `probe/compare-styles.mjs` reads 17 properties on
+`<html>`, `<body>` and every `[data-probe]` element, opening Dialog and
+Popover for their portalled probes. Against `?no-nexus`, copy-vite changed
+30 host properties with Nexus loaded after the host, 16 with
+`?nexus-first` and 70 with `?provider`. A scoped-root prototype (the
+`probe/scope-prototype.mjs` edit, removed with #796) took the 30 to 0.
 
 | # | Finding | Owner |
 | - | ------- | ----- |
@@ -162,24 +216,63 @@ Probed with `getComputedStyle` on production builds (`vite preview`,
 | 8 | **Portals inherit from the host `<body>`.** Dialog and Popover render into `document.body`, so they take the host's font, size and line-height. Nexus also mixes fonts: Button sets its own family, Card text inherits the host's. | Fixed in #796 |
 | 9 | **Nexus needs Preflight.** With host CSS removed (`?nexus-only`), CardTitle (`<h3>`) gains 18px UA margins, `box-sizing` falls back to `content-box`, text falls back to Times and Progress loses its border style. **Decision (2026-09-29): hosts must have Tailwind 4 Preflight**; Nexus ships none. Both fixtures have it. | Contract |
 | 10 | **shadcn 4.21.0 ships `cn` as an npm package** (`shadcn-ui/cn`); host `lib/utils.ts` is `export { cn } from "cn"`. Nexus's `cn` is a custom `tailwind-merge` config that knows `nx:`, so Nexus ships its own `lib/utils.ts` and never imports the host's. | Contract |
+| 11 | **Runtime appearance reaches `nx:` utilities.** Under `?provider`, the `appearance-mode` control changes 42 Nexus probe properties (every surface, text and border colour, including the open Dialog and Popover) and `appearance-density` changes 8 (button padding 12 → 10px, Dialog and Popover padding). Both also carry Finding 4's host side effects. | Contract |
 
 ### Verified after #796
 
-Probed with `getComputedStyle` on the production builds:
+Re-run on 2026-09-29 from outside copies, with `probe/compare-styles.mjs`
+on `vite preview`:
 
-- **Host leaks: 27 → 0.** `copy-vite` with Nexus CSS loaded after the
-  host's and before it: every host property matches the `?no-nexus`
+- **Host leaks: 30 → 0.** With Nexus CSS loaded after the host's and
+  before it (`?nexus-first`), every host property matches the `?no-nexus`
   baseline.
-- **Nexus is load-order independent.** All 19 Nexus probes, including the
-  open Dialog and Popover and their borders, match between the two orders.
+- **Nexus is load-order independent.** All 14 Nexus probes, including the
+  open Dialog and Popover, match between the two orders.
+- **Runtime appearance.** The panel's `appearance-mode` control changes 42
+  Nexus probe properties and `appearance-density` changes 8, portals
+  included. No host element outside the root changes.
+- **Embedded easing.** The open Dialog's `transition-timing-function` is
+  the root's `--nx-motion-ease-move` curve (before `@theme inline
+  reference`: `ease`).
 - **Portals keep the root.** The Dialog carries the panel's key and mode,
   and follows a mode change while open.
 - **Defaults without runtime CSS.** A bare `data-nexus-root` /
   `data-nx-mode="dark"` element renders the primary Button with the dark
   default (#795 Finding 7 found it near-black).
 - **Host themes are ignored.** A host `.dark` ancestor or
-  `<html data-theme="dark">` (`?data-theme`) leaves Nexus light.
+  `<html data-theme="dark">` (`?data-theme`) leaves every Nexus probe
+  unchanged.
 - **Server-rendered appearance.** `copy-next` with a `dark` cookie serves
   `data-nx-mode="dark"` and the root's scoped `<style>` in the HTML, hydrates
   with no console warnings, and paints dark again after a reload.
-- **Class completeness.** Every `nx:` class the copied tree uses is emitted.
+- **Class completeness.** All 187 `nx:` classes each copied tree uses are
+  emitted, in both fixtures.
+
+## Probes
+
+`probe/` holds the harness behind these numbers. It runs from the
+repository (it uses the root Playwright) against a fixture copy served
+outside it:
+
+```bash
+# in the copy-vite copy
+npm run build && npx vite preview --port 4173
+
+# host leaks against the no-Nexus baseline: 0 and 0
+node examples/registry/probe/compare-styles.mjs 'http://localhost:4173/?no-nexus' http://localhost:4173/
+node examples/registry/probe/compare-styles.mjs 'http://localhost:4173/?no-nexus' 'http://localhost:4173/?nexus-first'
+
+# Nexus load order and host themes: 0 and 0
+node examples/registry/probe/compare-styles.mjs http://localhost:4173/ 'http://localhost:4173/?nexus-first' --probes nexus-
+node examples/registry/probe/compare-styles.mjs http://localhost:4173/ 'http://localhost:4173/?data-theme' --probes nexus-
+
+# runtime appearance: 42 and 8 Nexus properties
+node examples/registry/probe/compare-styles.mjs http://localhost:4173/ http://localhost:4173/ --probes nexus- --click-b appearance-mode
+node examples/registry/probe/compare-styles.mjs http://localhost:4173/ http://localhost:4173/ --probes nexus- --click-b appearance-density
+
+# class completeness (187 classes, none missing) against @nexus_ds/react's own build
+pnpm --filter @nexus_ds/react build
+node examples/registry/probe/class-completeness.mjs <copy>/dist/assets/nexus-*.css packages/react/dist/react.css <copy>/src/components/nexus
+```
+
+`transform-probe.tsx` is the source of the `transform-probe` registry item.

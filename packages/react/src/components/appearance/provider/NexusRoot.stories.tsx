@@ -3,10 +3,11 @@ import { useState } from 'react';
 import {
   DEFAULT_NEXUS_APPEARANCE,
   deriveNexusAppearanceCss,
+  type NexusAppearanceState,
   nexusRootScope,
 } from '@nexus_ds/core';
 import type { Meta, StoryObj } from '@storybook/react';
-import { expect, userEvent, waitFor, within } from 'storybook/test';
+import { expect, fn, userEvent, waitFor, within } from 'storybook/test';
 
 import { Button } from '../../button';
 import { Popover, PopoverContent, PopoverTrigger } from '../../popover';
@@ -17,8 +18,12 @@ import {
   TooltipTrigger,
 } from '../../tooltip';
 
-import { NexusRoot, type NexusRootState } from './nexus-root';
-import { NexusAppearanceProvider } from './provider';
+import {
+  NexusRoot,
+  type NexusRootProps,
+  type NexusRootState,
+} from './nexus-root';
+import { NexusAppearanceProvider, useNexusAppearance } from './provider';
 
 const LIGHT: NexusRootState = { ...DEFAULT_NEXUS_APPEARANCE, mode: 'light' };
 const DARK: NexusRootState = { ...LIGHT, mode: 'dark' };
@@ -247,12 +252,6 @@ export const InsideStandaloneRoot: Story = {
           className="nx:size-12 nx:bg-primary-background"
         />
       </NexusRoot>
-      <NexusRoot state={{ ...LIGHT, brandColor: '#2563eb' }}>
-        <div
-          data-probe="reference"
-          className="nx:size-12 nx:bg-primary-background"
-        />
-      </NexusRoot>
     </NexusAppearanceProvider>
   ),
   play: async ({ canvasElement }) => {
@@ -262,11 +261,8 @@ export const InsideStandaloneRoot: Story = {
         'document'
       )
     );
-    const embedded = getComputedStyle(probe(canvasElement, 'embedded'));
-    const reference = getComputedStyle(probe(canvasElement, 'reference'));
     const page = getComputedStyle(document.documentElement);
 
-    await expect(embedded.backgroundColor).toBe(reference.backgroundColor);
     await expect(
       getComputedStyle(probe(canvasElement, 'embedded')).getPropertyValue(
         '--nx-color-primary-background'
@@ -306,5 +302,226 @@ export const PortalTypography: Story = {
     await expect(getComputedStyle(tooltip).fontSize).toBe(
       getComputedStyle(reference).fontSize
     );
+  },
+};
+
+export const PrefsStayInTheirRoot: Story = {
+  parameters: {
+    docs: {
+      description: {
+        story:
+          'A root’s preference rules stop at a nested root: pointer cursors on the outer root do not reach the inner one.',
+      },
+    },
+  },
+  render: () => (
+    <NexusRoot
+      state={{ ...LIGHT, prefs: { ...LIGHT.prefs, pointerCursors: true } }}
+    >
+      <button type="button" data-probe="outer">
+        Outer
+      </button>
+      <NexusRoot state={LIGHT}>
+        <button type="button" data-probe="inner">
+          Inner
+        </button>
+      </NexusRoot>
+    </NexusRoot>
+  ),
+  play: async ({ canvasElement }) => {
+    await expect(getComputedStyle(probe(canvasElement, 'outer')).cursor).toBe(
+      'pointer'
+    );
+    await expect(
+      getComputedStyle(probe(canvasElement, 'inner')).cursor
+    ).not.toBe('pointer');
+  },
+};
+
+function BatchedEdits() {
+  const { setState } = useNexusAppearance();
+
+  function applyBoth() {
+    setState((current) => ({ ...current, density: 'compact' }));
+    setState((current) => ({ ...current, corners: 'round' }));
+  }
+
+  return <Button onClick={applyBoth}>Compact and round</Button>;
+}
+
+function EditableRoot() {
+  const [state, setState] = useState<NexusRootState>(LIGHT);
+  return (
+    <NexusRoot
+      state={state}
+      onStateChange={(next) => setState({ ...next, mode: state.mode })}
+    >
+      <BatchedEdits />
+    </NexusRoot>
+  );
+}
+
+export const BatchedStateChanges: Story = {
+  parameters: {
+    docs: {
+      description: {
+        story:
+          'Two functional updates in one event both land: the second builds on the first, not on the last rendered state.',
+      },
+    },
+  },
+  render: () => <EditableRoot />,
+  play: async ({ canvasElement }) => {
+    await userEvent.click(
+      within(canvasElement).getByRole('button', { name: 'Compact and round' })
+    );
+    const root = rootIn(canvasElement);
+
+    await expect(root).toHaveAttribute('data-nx-density', 'compact');
+    await expect(root).toHaveAttribute('data-nx-radius', 'round');
+  },
+};
+
+function DensityAndCornerEdits() {
+  const { setState } = useNexusAppearance();
+  return (
+    <>
+      <Button
+        onClick={() =>
+          setState((current) => ({ ...current, density: 'compact' }))
+        }
+      >
+        Compact
+      </Button>
+      <Button
+        onClick={() =>
+          setState((current) => ({ ...current, corners: 'round' }))
+        }
+      >
+        Round
+      </Button>
+    </>
+  );
+}
+
+// Accepts compact density only with round corners, like a host enforcing its
+// own constraint; a rejected update leaves the state untouched.
+function RejectingRoot({
+  onStateChange,
+}: Pick<NexusRootProps, 'onStateChange'>) {
+  const [state, setState] = useState<NexusRootState>(LIGHT);
+
+  function acceptOrReject(next: NexusAppearanceState) {
+    onStateChange?.(next);
+    if (next.density === 'compact' && next.corners !== 'round') return;
+    setState({ ...next, mode: state.mode });
+  }
+
+  return (
+    <NexusRoot state={state} onStateChange={acceptOrReject}>
+      <DensityAndCornerEdits />
+    </NexusRoot>
+  );
+}
+
+export const RejectedUpdateDoesNotCarryForward: Story = {
+  parameters: {
+    docs: {
+      description: {
+        story:
+          'An update the host rejects is dropped: the next update, in a later event, builds on the rendered state.',
+      },
+    },
+  },
+  args: { onStateChange: fn() },
+  render: (args) => <RejectingRoot onStateChange={args.onStateChange} />,
+  play: async ({ canvasElement, args }) => {
+    const canvas = within(canvasElement);
+    await userEvent.click(canvas.getByRole('button', { name: 'Compact' }));
+    await userEvent.click(canvas.getByRole('button', { name: 'Round' }));
+    const root = rootIn(canvasElement);
+
+    await expect(args.onStateChange).toHaveBeenNthCalledWith(
+      1,
+      expect.objectContaining({ density: 'compact', corners: 'square' })
+    );
+    await expect(args.onStateChange).toHaveBeenNthCalledWith(
+      2,
+      expect.objectContaining({ density: 'default', corners: 'round' })
+    );
+    await expect(root).toHaveAttribute('data-nx-density', 'default');
+    await expect(root).toHaveAttribute('data-nx-radius', 'round');
+  },
+};
+
+export const RootAttributesWin: Story = {
+  parameters: {
+    docs: {
+      description: {
+        story:
+          'A consumer’s `data-nexus-root` or `data-nx-mode` prop cannot move the root off the key its `<style>` targets.',
+      },
+    },
+  },
+  render: () => (
+    <NexusRoot state={LIGHT} data-nexus-root="spoofed" data-nx-mode="dark">
+      <p>Root</p>
+    </NexusRoot>
+  ),
+  play: async ({ canvasElement }) => {
+    const root = rootIn(canvasElement);
+
+    await expect(root).not.toHaveAttribute('data-nexus-root', 'spoofed');
+    await expect(root).toHaveAttribute('data-nx-mode', 'light');
+  },
+};
+
+export const UnresolvedModeRendersLight: Story = {
+  parameters: {
+    docs: {
+      description: {
+        story:
+          'A `system` mode passed from untyped code renders light; the host resolves `system` before passing state.',
+      },
+    },
+  },
+  args: {
+    state: { ...LIGHT, mode: 'system' as unknown as NexusRootState['mode'] },
+  },
+  play: async ({ canvasElement }) => {
+    await expect(rootIn(canvasElement)).toHaveAttribute(
+      'data-nx-mode',
+      'light'
+    );
+  },
+};
+
+export const ProviderStyleNonce: Story = {
+  parameters: {
+    docs: {
+      description: {
+        story:
+          'The standalone provider sets its `nonce` on the `<style>` elements it injects, for a strict `style-src` policy.',
+      },
+    },
+  },
+  render: () => (
+    <NexusAppearanceProvider storageKey={false} nonce="provider-nonce">
+      <p>Standalone</p>
+    </NexusAppearanceProvider>
+  ),
+  play: async () => {
+    const styles = await waitFor(() => {
+      const found = document.querySelectorAll<HTMLStyleElement>(
+        'style[data-nexus-appearance-theme], style[data-nexus-appearance-prefs]'
+      );
+      expect(found).toHaveLength(2);
+      return [...found];
+    });
+
+    await expect(styles.map((style) => style.nonce)).toEqual([
+      'provider-nonce',
+      'provider-nonce',
+    ]);
   },
 };

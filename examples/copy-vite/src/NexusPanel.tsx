@@ -2,7 +2,10 @@ import { useState } from 'react'
 
 import { DEFAULT_NEXUS_APPEARANCE } from '@nexus_ds/core'
 
-import { NexusRoot } from '~/components/nexus/components/appearance/provider'
+import {
+  NexusRoot,
+  type NexusRootState,
+} from '~/components/nexus/components/appearance/provider'
 import { Button as HostButton } from '~/components/ui/button'
 import { Button } from '~/components/nexus/components/button'
 import {
@@ -31,10 +34,28 @@ import {
 import { Progress } from '~/components/nexus/components/progress'
 
 export function NexusPanel() {
-  const [mode, setMode] = useState<'light' | 'dark'>('light')
+  const [appearance, setAppearance] = useState<NexusRootState>({
+    ...DEFAULT_NEXUS_APPEARANCE,
+    mode: 'light',
+  })
+
+  function toggleMode() {
+    setAppearance((current) => ({
+      ...current,
+      mode: current.mode === 'dark' ? 'light' : 'dark',
+    }))
+  }
+
+  function toggleDensity() {
+    setAppearance((current) => ({
+      ...current,
+      density: current.density === 'compact' ? 'default' : 'compact',
+    }))
+  }
+
   return (
     <NexusRoot
-      state={{ ...DEFAULT_NEXUS_APPEARANCE, mode }}
+      state={appearance}
       data-probe="nexus-panel"
       className="mt-6 grid gap-4 sm:grid-cols-2"
     >
@@ -59,12 +80,11 @@ export function NexusPanel() {
           </div>
         </CardContent>
         <CardFooter className="gap-2">
-          <Button
-            data-probe="nexus-mode-toggle"
-            variant="ghost"
-            onClick={() => setMode(mode === 'dark' ? 'light' : 'dark')}
-          >
-            Nexus {mode === 'dark' ? 'light' : 'dark'}
+          <Button data-probe="appearance-mode" variant="ghost" onClick={toggleMode}>
+            Nexus {appearance.mode === 'dark' ? 'light' : 'dark'}
+          </Button>
+          <Button data-probe="appearance-density" variant="ghost" onClick={toggleDensity}>
+            Density: {appearance.density}
           </Button>
           <Dialog>
             <DialogTrigger asChild>
