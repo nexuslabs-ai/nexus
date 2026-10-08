@@ -54,11 +54,11 @@ const meta: Meta<typeof Toolbar> = {
   component: Toolbar,
   decorators: [
     (Story) => (
-      <main className="nx:w-full nx:max-w-3xl nx:p-4">
+      <div className="nx:w-full nx:max-w-3xl nx:p-4">
         <TooltipProvider>
           <Story />
         </TooltipProvider>
-      </main>
+      </div>
     ),
   ],
   parameters: {
@@ -170,6 +170,7 @@ function EditorToolbar({ className }: { className?: string } = {}) {
 }
 
 export const Default: Story = {
+  tags: ['docs'],
   render: () => <EditorToolbar />,
   play: async ({ canvasElement }) => {
     const canvas = within(canvasElement);
@@ -216,6 +217,7 @@ function FileToolbar() {
 }
 
 export const FileActions: Story = {
+  tags: ['docs'],
   render: () => <FileToolbar />,
   play: async ({ canvasElement }) => {
     const canvas = within(canvasElement);
@@ -265,6 +267,7 @@ function CalendarToolbar() {
 }
 
 export const Calendar: Story = {
+  tags: ['docs'],
   render: () => <CalendarToolbar />,
   play: async ({ canvasElement }) => {
     const canvas = within(canvasElement);
@@ -340,6 +343,7 @@ export const KeyboardAndDisabled: Story = {
 };
 
 export const Vertical: Story = {
+  tags: ['docs'],
   render: () => (
     <Toolbar orientation="vertical" aria-label="Drawing actions">
       <ToolbarButton>Select</ToolbarButton>
@@ -471,6 +475,7 @@ export const NarrowCompositions: Story = {
 };
 
 export const DisabledToggles: Story = {
+  tags: ['docs'],
   render: () => (
     <Toolbar aria-label="Formatting availability">
       <ToolbarButton>Undo</ToolbarButton>
@@ -762,6 +767,7 @@ function SelectionExample() {
 }
 
 export const Inline: Story = {
+  tags: ['docs'],
   render: () => <InlineExample />,
   play: async ({ canvasElement }) => {
     const canvas = within(canvasElement);
@@ -776,6 +782,7 @@ export const Inline: Story = {
   },
 };
 export const Attached: Story = {
+  tags: ['docs'],
   render: () => <AttachedExample />,
   play: async ({ canvasElement }) => {
     const canvas = within(canvasElement);
@@ -808,6 +815,7 @@ export const Attached: Story = {
   },
 };
 export const Selection: Story = {
+  tags: ['docs'],
   render: () => <SelectionExample />,
   play: async ({ canvasElement }) => {
     const canvas = within(canvasElement);
