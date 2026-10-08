@@ -421,9 +421,30 @@ function sharedIds(demos) {
  */
 
 /**
+ * A page without a preview: Usage from every part the component exports.
+ * @param {string} slug
+ * @returns {ComponentDocs}
+ */
+function previewlessDocs(slug) {
+  const propsFile = path.join(PROPS_DIR, `${slug}.json`);
+  if (!existsSync(propsFile)) {
+    throw new Error(
+      `Missing ${path.relative(docsRoot, propsFile)} — run \`pnpm --filter @nexus_ds/docs generate:props\` first.`
+    );
+  }
+  const { components } = JSON.parse(readCanonical(propsFile));
+  return {
+    preview: null,
+    examples: [],
+    imports: entryUsage(components),
+    composition: null,
+  };
+}
+
+/**
  * Each exported component's page: its preview, examples, Usage and
- * Composition, from its docs stories — or, for a component without a
- * preview, Usage from every part it exports.
+ * Composition, from its docs stories — or, for a previewless component,
+ * Usage from every part it exports.
  * @param {string[]} exported
  * @param {DemoFile[]} demos
  * @returns {Map<string, ComponentDocs>}
@@ -431,21 +452,10 @@ function sharedIds(demos) {
 function collectComponentDocs(exported, demos) {
   return new Map(
     exported.map((slug) => {
-      const own = demos.filter((demo) => demo.slug === slug);
-      if (own.length === 0) {
-        const { components } = JSON.parse(
-          readCanonical(path.join(PROPS_DIR, `${slug}.json`))
-        );
-        return [
-          slug,
-          {
-            preview: null,
-            examples: [],
-            imports: entryUsage(components),
-            composition: null,
-          },
-        ];
+      if (PREVIEWLESS_COMPONENTS.has(slug)) {
+        return [slug, previewlessDocs(slug)];
       }
+      const own = demos.filter((demo) => demo.slug === slug);
       const [preview, ...examples] = own.map((demo) => demo.id);
       const sources = own.map((demo) => ({
         fileName: `${demo.id}.tsx`,
@@ -524,7 +534,6 @@ async function generateDemoIndex() {
     indexFile,
     renderDemoIndex(demos, collectComponentDocs(exported, demos))
   );
-  copyStoryAssets();
 
   const keep = new Set([indexFile]);
   for (const demo of demos) {
@@ -591,6 +600,8 @@ function watchStories() {
 
   console.log(`demo-index: watching ${relativeComponents} stories`);
 }
+
+copyStoryAssets();
 
 if (process.argv.includes('--watch')) {
   watchStories();

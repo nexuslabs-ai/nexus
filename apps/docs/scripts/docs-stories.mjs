@@ -487,6 +487,7 @@ function fromRender(render, args, file, where) {
       replacement,
     ]);
 
+    if (setAfter.has('children')) return;
     const children = childText(args.get('children'), file);
     if (!children) return;
     const element = spread.parent.parent;
