@@ -52,16 +52,8 @@ import {
 const meta: Meta<typeof Toolbar> = {
   title: 'Components/Toolbar',
   component: Toolbar,
-  decorators: [
-    (Story) => (
-      <div className="nx:w-full nx:max-w-3xl nx:p-4">
-        <TooltipProvider>
-          <Story />
-        </TooltipProvider>
-      </div>
-    ),
-  ],
   parameters: {
+    layout: 'padded',
     docs: {
       description: {
         component:
@@ -73,99 +65,101 @@ const meta: Meta<typeof Toolbar> = {
 export default meta;
 type Story = StoryObj<typeof Toolbar>;
 
-function EditorToolbar({ className }: { className?: string } = {}) {
+function EditorToolbar() {
   const previewId = React.useId();
   const [formatting, setFormatting] = React.useState<string[]>([]);
   return (
-    <div className="nx:grid nx:gap-4">
-      <Toolbar aria-label="Text formatting" className={className}>
-        <Tooltip>
-          <TooltipTrigger asChild>
-            <span className="nx:inline-flex">
-              <ToolbarButton
-                size="icon-sm"
-                aria-label="Undo formatting"
-                onClick={() => setFormatting([])}
-                className="nx:text-muted-foreground"
-              >
-                <IconArrowBackUp aria-hidden="true" />
-              </ToolbarButton>
-            </span>
-          </TooltipTrigger>
-          <TooltipContent>Reset formatting</TooltipContent>
-        </Tooltip>
-        <ToolbarSeparator className="nx:data-[orientation=vertical]:h-4" />
-        <ToolbarToggleGroup
-          type="multiple"
-          value={formatting}
-          onValueChange={setFormatting}
-          aria-label="Text style"
+    <TooltipProvider>
+      <div className="nx:grid nx:gap-4">
+        <Toolbar aria-label="Text formatting">
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <span className="nx:inline-flex">
+                <ToolbarButton
+                  size="icon-sm"
+                  aria-label="Undo formatting"
+                  onClick={() => setFormatting([])}
+                  className="nx:text-muted-foreground"
+                >
+                  <IconArrowBackUp aria-hidden="true" />
+                </ToolbarButton>
+              </span>
+            </TooltipTrigger>
+            <TooltipContent>Reset formatting</TooltipContent>
+          </Tooltip>
+          <ToolbarSeparator className="nx:data-[orientation=vertical]:h-4" />
+          <ToolbarToggleGroup
+            type="multiple"
+            value={formatting}
+            onValueChange={setFormatting}
+            aria-label="Text style"
+          >
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <span className="nx:inline-flex">
+                  <ToolbarToggleItem
+                    value="bold"
+                    aria-label="Bold"
+                    size="icon-sm"
+                  >
+                    <IconBold aria-hidden="true" />
+                  </ToolbarToggleItem>
+                </span>
+              </TooltipTrigger>
+              <TooltipContent>Bold</TooltipContent>
+            </Tooltip>
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <span className="nx:inline-flex">
+                  <ToolbarToggleItem
+                    value="italic"
+                    aria-label="Italic"
+                    size="icon-sm"
+                  >
+                    <IconItalic aria-hidden="true" />
+                  </ToolbarToggleItem>
+                </span>
+              </TooltipTrigger>
+              <TooltipContent>Italic</TooltipContent>
+            </Tooltip>
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <span className="nx:inline-flex">
+                  <ToolbarToggleItem
+                    value="underline"
+                    aria-label="Underline"
+                    size="icon-sm"
+                  >
+                    <IconUnderline aria-hidden="true" />
+                  </ToolbarToggleItem>
+                </span>
+              </TooltipTrigger>
+              <TooltipContent>Underline</TooltipContent>
+            </Tooltip>
+          </ToolbarToggleGroup>
+          <ToolbarSeparator className="nx:data-[orientation=vertical]:h-4" />
+          <ToolbarLink
+            className="nx:text-muted-foreground"
+            href={`#${previewId}`}
+          >
+            Preview
+          </ToolbarLink>
+        </Toolbar>
+        <p
+          id={previewId}
+          className="nx:typography-body-default nx:text-muted-foreground"
+          style={{
+            fontWeight: formatting.includes('bold') ? 700 : undefined,
+            fontStyle: formatting.includes('italic') ? 'italic' : undefined,
+            textDecoration: formatting.includes('underline')
+              ? 'underline'
+              : undefined,
+          }}
         >
-          <Tooltip>
-            <TooltipTrigger asChild>
-              <span className="nx:inline-flex">
-                <ToolbarToggleItem
-                  value="bold"
-                  aria-label="Bold"
-                  size="icon-sm"
-                >
-                  <IconBold aria-hidden="true" />
-                </ToolbarToggleItem>
-              </span>
-            </TooltipTrigger>
-            <TooltipContent>Bold</TooltipContent>
-          </Tooltip>
-          <Tooltip>
-            <TooltipTrigger asChild>
-              <span className="nx:inline-flex">
-                <ToolbarToggleItem
-                  value="italic"
-                  aria-label="Italic"
-                  size="icon-sm"
-                >
-                  <IconItalic aria-hidden="true" />
-                </ToolbarToggleItem>
-              </span>
-            </TooltipTrigger>
-            <TooltipContent>Italic</TooltipContent>
-          </Tooltip>
-          <Tooltip>
-            <TooltipTrigger asChild>
-              <span className="nx:inline-flex">
-                <ToolbarToggleItem
-                  value="underline"
-                  aria-label="Underline"
-                  size="icon-sm"
-                >
-                  <IconUnderline aria-hidden="true" />
-                </ToolbarToggleItem>
-              </span>
-            </TooltipTrigger>
-            <TooltipContent>Underline</TooltipContent>
-          </Tooltip>
-        </ToolbarToggleGroup>
-        <ToolbarSeparator className="nx:data-[orientation=vertical]:h-4" />
-        <ToolbarLink
-          className="nx:text-muted-foreground"
-          href={`#${previewId}`}
-        >
-          Preview
-        </ToolbarLink>
-      </Toolbar>
-      <p
-        id={previewId}
-        className="nx:typography-body-default nx:text-muted-foreground"
-        style={{
-          fontWeight: formatting.includes('bold') ? 700 : undefined,
-          fontStyle: formatting.includes('italic') ? 'italic' : undefined,
-          textDecoration: formatting.includes('underline')
-            ? 'underline'
-            : undefined,
-        }}
-      >
-        Select formatting to update this preview.
-      </p>
-    </div>
+          Select formatting to update this preview.
+        </p>
+      </div>
+    </TooltipProvider>
   );
 }
 
@@ -562,94 +556,96 @@ function AttachedExample() {
     'Good tools stay close to the work. Draft your next idea here.'
   );
   return (
-    <section className="nx:grid nx:gap-3">
-      <h2 className="nx:typography-heading-small">Draft a note</h2>
-      <div className="nx:rounded-lg nx:border-default nx:border-border-default nx:bg-container">
-        <Toolbar
-          aria-label="Note formatting"
-          className="nx:w-full nx:rounded-none nx:rounded-t-lg nx:border-0 nx:border-b-default nx:border-border-default nx:shadow-none nx:bg-background nx:p-2"
-        >
-          <ToolbarToggleGroup
-            type="multiple"
-            value={formatting}
-            onValueChange={setFormatting}
-            aria-label="Note style"
+    <TooltipProvider>
+      <section className="nx:grid nx:gap-3">
+        <h2 className="nx:typography-heading-small">Draft a note</h2>
+        <div className="nx:rounded-lg nx:border-default nx:border-border-default nx:bg-container">
+          <Toolbar
+            aria-label="Note formatting"
+            className="nx:w-full nx:rounded-none nx:rounded-t-lg nx:border-0 nx:border-b-default nx:border-border-default nx:shadow-none nx:bg-background nx:p-2"
           >
-            <Tooltip>
-              <TooltipTrigger asChild>
-                <span className="nx:inline-flex">
-                  <ToolbarToggleItem
-                    value="bold"
-                    size="icon-sm"
-                    aria-label="Bold note"
-                  >
-                    <span className="nx:font-bold">B</span>
-                  </ToolbarToggleItem>
-                </span>
-              </TooltipTrigger>
-              <TooltipContent>Bold</TooltipContent>
-            </Tooltip>
-            <Tooltip>
-              <TooltipTrigger asChild>
-                <span className="nx:inline-flex">
-                  <ToolbarToggleItem
-                    value="italic"
-                    size="icon-sm"
-                    aria-label="Italic note"
-                  >
-                    <span className="nx:italic">I</span>
-                  </ToolbarToggleItem>
-                </span>
-              </TooltipTrigger>
-              <TooltipContent>Italic</TooltipContent>
-            </Tooltip>
-            <Tooltip>
-              <TooltipTrigger asChild>
-                <span className="nx:inline-flex">
-                  <ToolbarToggleItem
-                    value="underline"
-                    size="icon-sm"
-                    aria-label="Underline note"
-                  >
-                    <span className="nx:underline">U</span>
-                  </ToolbarToggleItem>
-                </span>
-              </TooltipTrigger>
-              <TooltipContent>Underline</TooltipContent>
-            </Tooltip>
-          </ToolbarToggleGroup>
-          <ToolbarSeparator />
-          <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-              <ToolbarButton>
-                More <IconChevronDown aria-hidden="true" />
-              </ToolbarButton>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent>
-              <DropdownMenuItem onSelect={() => setFormatting([])}>
-                Clear formatting
-              </DropdownMenuItem>
-            </DropdownMenuContent>
-          </DropdownMenu>
-        </Toolbar>
-        <textarea
-          aria-label="Note"
-          value={text}
-          onChange={(event) => setText(event.target.value)}
-          className="nx:block nx:min-h-32 nx:w-full nx:resize-y nx:rounded-b-lg nx:bg-transparent nx:p-4 nx:typography-body-default nx:text-foreground nx:focus-visible:outline-2 nx:focus-visible:outline-focus-default"
-          style={{
-            fontWeight: formatting.includes('bold') ? 700 : undefined,
-            fontStyle: formatting.includes('italic') ? 'italic' : undefined,
-            textDecoration: formatting.includes('underline')
-              ? 'underline'
-              : undefined,
-          }}
-        />
-      </div>
-      <p className="nx:typography-body-small nx:text-muted-foreground">
-        Formatting applies to the whole note in this example.
-      </p>
-    </section>
+            <ToolbarToggleGroup
+              type="multiple"
+              value={formatting}
+              onValueChange={setFormatting}
+              aria-label="Note style"
+            >
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <span className="nx:inline-flex">
+                    <ToolbarToggleItem
+                      value="bold"
+                      size="icon-sm"
+                      aria-label="Bold note"
+                    >
+                      <span className="nx:font-bold">B</span>
+                    </ToolbarToggleItem>
+                  </span>
+                </TooltipTrigger>
+                <TooltipContent>Bold</TooltipContent>
+              </Tooltip>
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <span className="nx:inline-flex">
+                    <ToolbarToggleItem
+                      value="italic"
+                      size="icon-sm"
+                      aria-label="Italic note"
+                    >
+                      <span className="nx:italic">I</span>
+                    </ToolbarToggleItem>
+                  </span>
+                </TooltipTrigger>
+                <TooltipContent>Italic</TooltipContent>
+              </Tooltip>
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <span className="nx:inline-flex">
+                    <ToolbarToggleItem
+                      value="underline"
+                      size="icon-sm"
+                      aria-label="Underline note"
+                    >
+                      <span className="nx:underline">U</span>
+                    </ToolbarToggleItem>
+                  </span>
+                </TooltipTrigger>
+                <TooltipContent>Underline</TooltipContent>
+              </Tooltip>
+            </ToolbarToggleGroup>
+            <ToolbarSeparator />
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <ToolbarButton>
+                  More <IconChevronDown aria-hidden="true" />
+                </ToolbarButton>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent>
+                <DropdownMenuItem onSelect={() => setFormatting([])}>
+                  Clear formatting
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
+          </Toolbar>
+          <textarea
+            aria-label="Note"
+            value={text}
+            onChange={(event) => setText(event.target.value)}
+            className="nx:block nx:min-h-32 nx:w-full nx:resize-y nx:rounded-b-lg nx:bg-transparent nx:p-4 nx:typography-body-default nx:text-foreground nx:focus-visible:outline-2 nx:focus-visible:outline-focus-default"
+            style={{
+              fontWeight: formatting.includes('bold') ? 700 : undefined,
+              fontStyle: formatting.includes('italic') ? 'italic' : undefined,
+              textDecoration: formatting.includes('underline')
+                ? 'underline'
+                : undefined,
+            }}
+          />
+        </div>
+        <p className="nx:typography-body-small nx:text-muted-foreground">
+          Formatting applies to the whole note.
+        </p>
+      </section>
+    </TooltipProvider>
   );
 }
 
@@ -671,7 +667,7 @@ function SelectionExample() {
   }
   function archiveSelection() {
     setMessage(
-      `${selected.length} document${selected.length === 1 ? '' : 's'} archived in this demo.`
+      `${selected.length} document${selected.length === 1 ? '' : 's'} archived.`
     );
     setArchived((current) => [...current, ...selected]);
     setSelected([]);
@@ -684,85 +680,87 @@ function SelectionExample() {
     setMessage('');
   }
   return (
-    <section className="nx:grid nx:gap-4">
-      <div>
-        <h2
-          ref={headingRef}
-          tabIndex={-1}
-          className="nx:typography-heading-small nx:focus-visible:outline-2 nx:focus-visible:outline-focus-default"
-        >
-          Select documents
-        </h2>
-        <p className="nx:typography-body-default nx:text-muted-foreground">
-          Actions appear when documents are selected.
-        </p>
-      </div>
-      <div className="nx:rounded-lg nx:border-default nx:border-border-default nx:bg-container nx:p-3">
-        {selectionFiles
-          .filter((name) => !archived.includes(name))
-          .map((name, index) => (
-            <Label
-              htmlFor={selectionId + name}
-              key={name}
-              className="nx:flex nx:min-h-10 nx:cursor-pointer nx:items-center nx:gap-3 nx:px-2 nx:typography-body-default"
-            >
-              <Checkbox
-                id={selectionId + name}
-                ref={index === 0 ? firstCheckbox : undefined}
-                checked={selected.includes(name)}
-                onCheckedChange={(checked) =>
-                  toggleSelection(name, checked === true)
-                }
-              />
-              {name}
-            </Label>
-          ))}
-        {archived.length === selectionFiles.length && (
-          <p className="nx:p-2 nx:typography-body-default nx:text-muted-foreground">
-            No documents remaining.
-          </p>
-        )}
-      </div>
-      <div className="nx:flex nx:min-h-16 nx:justify-center">
-        {selected.length > 0 && (
-          <Toolbar
-            aria-label="Selected document actions"
-            className="nx:h-fit nx:justify-center nx:gap-0 nx:bg-popover nx:p-0"
+    <TooltipProvider>
+      <section className="nx:grid nx:gap-4">
+        <div>
+          <h2
+            ref={headingRef}
+            tabIndex={-1}
+            className="nx:typography-heading-small nx:focus-visible:outline-2 nx:focus-visible:outline-focus-default"
           >
-            <Tooltip>
-              <TooltipTrigger asChild>
-                <ToolbarButton
-                  size="icon-sm"
-                  aria-label="Clear selection"
-                  className="nx:text-muted-foreground"
-                  onClick={clearSelection}
-                >
-                  <IconX aria-hidden="true" />
-                </ToolbarButton>
-              </TooltipTrigger>
-              <TooltipContent>Clear selection</TooltipContent>
-            </Tooltip>
-            <span
-              className="nx:px-2 nx:typography-label-default nx:whitespace-nowrap"
-              aria-live="polite"
+            Select documents
+          </h2>
+          <p className="nx:typography-body-default nx:text-muted-foreground">
+            Actions appear when documents are selected.
+          </p>
+        </div>
+        <div className="nx:rounded-lg nx:border-default nx:border-border-default nx:bg-container nx:p-3">
+          {selectionFiles
+            .filter((name) => !archived.includes(name))
+            .map((name, index) => (
+              <Label
+                htmlFor={`${selectionId}-${index}`}
+                key={name}
+                className="nx:flex nx:min-h-10 nx:cursor-pointer nx:items-center nx:gap-3 nx:px-2 nx:typography-body-default"
+              >
+                <Checkbox
+                  id={`${selectionId}-${index}`}
+                  ref={index === 0 ? firstCheckbox : undefined}
+                  checked={selected.includes(name)}
+                  onCheckedChange={(checked) =>
+                    toggleSelection(name, checked === true)
+                  }
+                />
+                {name}
+              </Label>
+            ))}
+          {archived.length === selectionFiles.length && (
+            <p className="nx:p-2 nx:typography-body-default nx:text-muted-foreground">
+              No documents remaining.
+            </p>
+          )}
+        </div>
+        <div className="nx:flex nx:min-h-16 nx:justify-center">
+          {selected.length > 0 && (
+            <Toolbar
+              aria-label="Selected document actions"
+              className="nx:h-fit nx:justify-center nx:gap-0 nx:bg-popover nx:p-0"
             >
-              {selected.length} selected
-            </span>
-            <ToolbarSeparator className="nx:self-stretch nx:data-[orientation=vertical]:h-auto" />
-            <ToolbarButton onClick={archiveSelection}>
-              <IconArchive aria-hidden="true" />
-              Archive
-            </ToolbarButton>
-          </Toolbar>
-        )}
-      </div>
-      <p
-        role="status"
-        className="nx:typography-body-small nx:text-muted-foreground"
-      >
-        {message}
-      </p>
-    </section>
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <ToolbarButton
+                    size="icon-sm"
+                    aria-label="Clear selection"
+                    className="nx:text-muted-foreground"
+                    onClick={clearSelection}
+                  >
+                    <IconX aria-hidden="true" />
+                  </ToolbarButton>
+                </TooltipTrigger>
+                <TooltipContent>Clear selection</TooltipContent>
+              </Tooltip>
+              <span
+                className="nx:px-2 nx:typography-label-default nx:whitespace-nowrap"
+                aria-live="polite"
+              >
+                {selected.length} selected
+              </span>
+              <ToolbarSeparator className="nx:self-stretch nx:data-[orientation=vertical]:h-auto" />
+              <ToolbarButton onClick={archiveSelection}>
+                <IconArchive aria-hidden="true" />
+                Archive
+              </ToolbarButton>
+            </Toolbar>
+          )}
+        </div>
+        <p
+          role="status"
+          className="nx:typography-body-small nx:text-muted-foreground"
+        >
+          {message}
+        </p>
+      </section>
+    </TooltipProvider>
   );
 }
 
@@ -830,7 +828,7 @@ export const Selection: Story = {
     await expect(canvas.getByText('1 selected')).toBeVisible();
     await userEvent.click(canvas.getByRole('button', { name: 'Archive' }));
     await expect(canvas.getByRole('status')).toHaveTextContent(
-      '1 document archived in this demo.'
+      '1 document archived.'
     );
     await expect(canvas.queryByRole('toolbar')).not.toBeInTheDocument();
   },
@@ -864,7 +862,9 @@ export const VisualDirections: Story = {
               Individual surfaces, spacing-only groups.
             </p>
           </div>
-          <EditorToolbar className="nx:gap-2 nx:border-transparent nx:bg-background nx:shadow-none nx:[&_[data-slot=toolbar-separator]]:hidden nx:[&_[data-slot=toolbar-button]]:bg-container nx:[&_[data-slot=toolbar-button]]:border-border-default nx:[&_[data-slot=toolbar-toggle-item]]:bg-container nx:[&_[data-slot=toolbar-toggle-item]]:border-border-default" />
+          <div className="nx:[&_[data-slot=toolbar]]:gap-2 nx:[&_[data-slot=toolbar]]:border-transparent nx:[&_[data-slot=toolbar]]:bg-background nx:[&_[data-slot=toolbar]]:shadow-none nx:[&_[data-slot=toolbar-separator]]:hidden nx:[&_[data-slot=toolbar-button]]:bg-container nx:[&_[data-slot=toolbar-button]]:border-border-default nx:[&_[data-slot=toolbar-toggle-item]]:bg-container nx:[&_[data-slot=toolbar-toggle-item]]:border-border-default">
+            <EditorToolbar />
+          </div>
         </section>
       </div>
     </div>
@@ -941,81 +941,83 @@ function DrawingTools() {
     if (value) setTool(value);
   }
   return (
-    <section className="nx:grid nx:content-start nx:gap-4">
-      <div>
-        <h2 className="nx:typography-heading-small">Drawing tools</h2>
-        <p className="nx:typography-body-small nx:text-muted-foreground">
-          A quiet rail with one active tool.
-        </p>
-      </div>
-      <div className="nx:flex nx:min-h-40 nx:items-start nx:gap-6">
-        <Toolbar
-          orientation="vertical"
-          aria-label="Canvas tools"
-          className="nx:shrink-0"
-        >
-          <ToolbarToggleGroup
-            type="single"
-            value={tool}
-            onValueChange={changeTool}
-            aria-label="Active drawing tool"
+    <TooltipProvider>
+      <section className="nx:grid nx:content-start nx:gap-4">
+        <div>
+          <h2 className="nx:typography-heading-small">Drawing tools</h2>
+          <p className="nx:typography-body-small nx:text-muted-foreground">
+            A quiet rail with one active tool.
+          </p>
+        </div>
+        <div className="nx:flex nx:min-h-40 nx:items-start nx:gap-6">
+          <Toolbar
+            orientation="vertical"
+            aria-label="Canvas tools"
+            className="nx:shrink-0"
           >
-            <Tooltip>
-              <TooltipTrigger asChild>
-                <span className="nx:inline-flex">
-                  <ToolbarToggleItem
-                    value="select"
-                    size="icon-sm"
-                    aria-label="Select"
-                  >
-                    <IconPointer aria-hidden="true" />
-                  </ToolbarToggleItem>
-                </span>
-              </TooltipTrigger>
-              <TooltipContent side="right">Select</TooltipContent>
-            </Tooltip>
-            <Tooltip>
-              <TooltipTrigger asChild>
-                <span className="nx:inline-flex">
-                  <ToolbarToggleItem
-                    value="draw"
-                    size="icon-sm"
-                    aria-label="Draw"
-                  >
-                    <IconPencil aria-hidden="true" />
-                  </ToolbarToggleItem>
-                </span>
-              </TooltipTrigger>
-              <TooltipContent side="right">Draw</TooltipContent>
-            </Tooltip>
-            <Tooltip>
-              <TooltipTrigger asChild>
-                <span className="nx:inline-flex">
-                  <ToolbarToggleItem
-                    value="erase"
-                    size="icon-sm"
-                    aria-label="Erase"
-                  >
-                    <IconEraser aria-hidden="true" />
-                  </ToolbarToggleItem>
-                </span>
-              </TooltipTrigger>
-              <TooltipContent side="right">Erase</TooltipContent>
-            </Tooltip>
-          </ToolbarToggleGroup>
-        </Toolbar>
-        <p
-          role="status"
-          className="nx:py-2 nx:typography-body-small nx:text-muted-foreground"
-        >
-          {tool === 'select'
-            ? 'Select objects'
-            : tool === 'draw'
-              ? 'Draw a stroke'
-              : 'Erase a stroke'}
-        </p>
-      </div>
-    </section>
+            <ToolbarToggleGroup
+              type="single"
+              value={tool}
+              onValueChange={changeTool}
+              aria-label="Active drawing tool"
+            >
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <span className="nx:inline-flex">
+                    <ToolbarToggleItem
+                      value="select"
+                      size="icon-sm"
+                      aria-label="Select"
+                    >
+                      <IconPointer aria-hidden="true" />
+                    </ToolbarToggleItem>
+                  </span>
+                </TooltipTrigger>
+                <TooltipContent side="right">Select</TooltipContent>
+              </Tooltip>
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <span className="nx:inline-flex">
+                    <ToolbarToggleItem
+                      value="draw"
+                      size="icon-sm"
+                      aria-label="Draw"
+                    >
+                      <IconPencil aria-hidden="true" />
+                    </ToolbarToggleItem>
+                  </span>
+                </TooltipTrigger>
+                <TooltipContent side="right">Draw</TooltipContent>
+              </Tooltip>
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <span className="nx:inline-flex">
+                    <ToolbarToggleItem
+                      value="erase"
+                      size="icon-sm"
+                      aria-label="Erase"
+                    >
+                      <IconEraser aria-hidden="true" />
+                    </ToolbarToggleItem>
+                  </span>
+                </TooltipTrigger>
+                <TooltipContent side="right">Erase</TooltipContent>
+              </Tooltip>
+            </ToolbarToggleGroup>
+          </Toolbar>
+          <p
+            role="status"
+            className="nx:py-2 nx:typography-body-small nx:text-muted-foreground"
+          >
+            {tool === 'select'
+              ? 'Select objects'
+              : tool === 'draw'
+                ? 'Draw a stroke'
+                : 'Erase a stroke'}
+          </p>
+        </div>
+      </section>
+    </TooltipProvider>
   );
 }
 
