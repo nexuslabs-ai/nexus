@@ -1,5 +1,11 @@
 # @nexus_ds/core
 
+## 0.5.1
+
+### Patch Changes
+
+- bf903a4: Ship the MIT licence file (Copyright (c) 2026 Nexus Labs) with the package.
+
 ## 0.5.0
 
 ### Minor Changes
