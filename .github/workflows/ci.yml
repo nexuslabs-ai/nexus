@@ -132,16 +132,20 @@ jobs:
       - name: Tailwind class-ref audit
         run: pnpm --filter @nexus_ds/core audit:class-refs
 
-      # The build step's docs JSON may be a turbo cache restore; regenerating
-      # it outside turbo catches a stale cache entry or nondeterministic output.
-      - name: Check docs JSON matches a fresh regeneration
+      # The build step's docs JSON and page manifest may be a turbo cache
+      # restore; regenerating them outside turbo catches a stale cache entry or nondeterministic output.
+      - name: Check docs generated inputs match a fresh regeneration
         run: |
           set -euo pipefail
-          cp -r apps/docs/generated "$RUNNER_TEMP/docs-generated-build"
+          mkdir "$RUNNER_TEMP/docs-generated-build"
+          cp -r apps/docs/generated apps/docs/app/_lib/*.generated.ts "$RUNNER_TEMP/docs-generated-build"
           pnpm --filter @nexus_ds/docs generate:props
           pnpm --filter @nexus_ds/docs generate:dependencies
-          if ! diff -r "$RUNNER_TEMP/docs-generated-build" apps/docs/generated; then
-            echo "::error::The docs JSON differs from the build step's copy: either a generate:* task in apps/docs/turbo.json is missing an input its generator reads, or the generator's output is nondeterministic."
+          pnpm --filter @nexus_ds/docs generate:manifest
+          mkdir "$RUNNER_TEMP/docs-generated-fresh"
+          cp -r apps/docs/generated apps/docs/app/_lib/*.generated.ts "$RUNNER_TEMP/docs-generated-fresh"
+          if ! diff -r "$RUNNER_TEMP/docs-generated-build" "$RUNNER_TEMP/docs-generated-fresh"; then
+            echo "::error::The docs generated inputs differ from the build step's copy: either a generate:* task in apps/docs/turbo.json is missing an input its generator reads, or the generator's output is nondeterministic."
             exit 1
           fi
 
@@ -240,37 +244,6 @@ jobs:
 
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
-
-      - name: Regenerate docs page manifest
-        run: pnpm --filter @nexus_ds/docs generate:manifest
-
-      - name: Check docs page manifest freshness
-        # `git status --porcelain` (not `git diff`) so untracked new files also fail.
-        run: |
-          set -euo pipefail
-          DIRTY=$(git status --porcelain -- apps/docs/app/_lib)
-          if [ -n "$DIRTY" ]; then
-            echo "::error::Docs page manifest is stale. Affected paths:"
-            echo "$DIRTY"
-            echo "::error::Run 'pnpm --filter @nexus_ds/docs generate:manifest' and commit the result."
-            exit 1
-          fi
-
-      - name: Regenerate docs demo index
-        run: |
-          pnpm --filter @nexus_ds/docs generate:dependencies
-          pnpm --filter @nexus_ds/docs generate:demos
-
-      - name: Check docs demo index freshness
-        run: |
-          set -euo pipefail
-          DIRTY=$(git status --porcelain -- apps/docs/__generated__)
-          if [ -n "$DIRTY" ]; then
-            echo "::error::Docs demo index is stale. Affected paths:"
-            echo "$DIRTY"
-            echo "::error::Run 'pnpm --filter @nexus_ds/docs generate:demos' and commit the result."
-            exit 1
-          fi
 
       - name: Run unit tests
         run: pnpm test:unit
