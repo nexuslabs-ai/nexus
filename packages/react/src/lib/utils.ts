@@ -24,7 +24,7 @@ export const NEXUS_THEME_SCALES = {
  * each one extends, so a conflicting pair collapses to last-wins in `cn()`.
  */
 export const NEXUS_CLASS_GROUPS = {
-  size: ['size-icon-xs', 'size-icon-sm', 'size-icon-default'],
+  size: ['size-icon-glyph-xs', 'size-icon-glyph-sm', 'size-icon-glyph-default'],
   animate: ['animate-overlay-presence-exit'],
   duration: [
     'duration-0',

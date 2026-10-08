@@ -52,6 +52,13 @@
       },
       "$type": "dimension"
     },
+    "xs-plus": {
+      "$value": {
+        "value": 13,
+        "unit": "px"
+      },
+      "$type": "dimension"
+    },
     "sm": {
       "$value": {
         "value": 14,
@@ -132,13 +139,6 @@
     "9xl": {
       "$value": {
         "value": 128,
-        "unit": "px"
-      },
-      "$type": "dimension"
-    },
-    "compact": {
-      "$value": {
-        "value": 13,
         "unit": "px"
       },
       "$type": "dimension"

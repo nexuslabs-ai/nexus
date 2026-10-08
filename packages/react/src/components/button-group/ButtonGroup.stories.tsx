@@ -1,4 +1,3 @@
-import { DEFAULT_NEXUS_APPEARANCE } from '@nexus_ds/core';
 import {
   ArgTypes,
   Canvas,
@@ -9,9 +8,12 @@ import type { Meta, StoryObj } from '@storybook/react';
 import { IconChevronDown } from '@tabler/icons-react';
 import { expect, userEvent, waitFor, within } from 'storybook/test';
 
+import { CalendarNavigationExample } from '../../stories/examples/calendar-navigation-example';
+import CalendarNavigationExampleSource from '../../stories/examples/calendar-navigation-example.tsx?raw';
+import { ReplyExample } from '../../stories/examples/reply-example';
+import ReplyExampleSource from '../../stories/examples/reply-example.tsx?raw';
 import { expectNativePress } from '../../stories/support/native-press';
 import { expectHeightPinned } from '../../stories/support/story-height-test-utils';
-import { NexusRoot } from '../appearance/provider';
 import { Button } from '../button';
 import {
   DropdownMenu,
@@ -27,16 +29,13 @@ import {
   SelectTrigger,
   SelectValue,
 } from '../select';
+import { Toggle } from '../toggle';
 
 import {
   ButtonGroup,
   ButtonGroupSeparator,
   ButtonGroupText,
 } from './button-group';
-import { CalendarNavigationExample } from './calendar-navigation-example';
-import CalendarNavigationExampleSource from './calendar-navigation-example.tsx?raw';
-import { ReplyExample } from './reply-example';
-import ReplyExampleSource from './reply-example.tsx?raw';
 
 const meta: Meta<typeof ButtonGroup> = {
   title: 'Components/ButtonGroup',
@@ -824,40 +823,6 @@ export const RightToLeft: Story = {
   },
 };
 
-// Theme regression reference stays out of the main usage guide.
-export const SolidSeparatorThemes: Story = {
-  tags: ['!autodocs', '!dev'],
-  render: () => (
-    <div className="nx:flex nx:flex-col nx:gap-4">
-      {(['light', 'dark'] as const).map((mode) => (
-        <div key={mode} className="nx:flex nx:flex-wrap nx:gap-4">
-          {(['#000000', '#2563eb', '#ffffff'] as const).map((brandColor) => (
-            <NexusRoot
-              key={brandColor}
-              state={{ ...DEFAULT_NEXUS_APPEARANCE, mode, brandColor }}
-              className="nx:flex nx:flex-col nx:items-start nx:gap-3 nx:bg-background nx:p-4 nx:text-foreground"
-            >
-              <span className="nx:typography-label-small">
-                {mode} · {brandColor}
-              </span>
-              {(['default', 'destructive'] as const).map((variant) => (
-                <ButtonGroup
-                  key={variant}
-                  aria-label={`${mode} ${brandColor} ${variant}`}
-                >
-                  <Button variant={variant}>Action</Button>
-                  <ButtonGroupSeparator />
-                  <Button variant={variant}>More</Button>
-                </ButtonGroup>
-              ))}
-            </NexusRoot>
-          ))}
-        </div>
-      ))}
-    </div>
-  ),
-};
-
 export const MixedSeparatorSurfaces: Story = {
   globals: { mode: 'dark' },
   tags: ['!autodocs', '!dev'],
@@ -902,10 +867,25 @@ export const MixedSeparatorSurfaces: Story = {
           ))}
         </div>
       ))}
+      <ButtonGroup aria-label="secondary to toggle">
+        <Button variant="secondary">Bold</Button>
+        <ButtonGroupSeparator />
+        <Toggle aria-label="Italic">I</Toggle>
+      </ButtonGroup>
     </div>
   ),
   play: async ({ canvasElement }) => {
     const canvas = within(canvasElement);
+    const neutral = (label: string) =>
+      getComputedStyle(
+        canvas
+          .getByRole('group', { name: label })
+          .querySelector('[data-slot="button-group-separator"]')!
+      ).backgroundColor;
+    // Toggle also renders data-variant="default"; it must keep the neutral rule.
+    await expect(neutral('secondary to toggle')).toBe(
+      neutral('horizontal ltr secondary to secondary')
+    );
     for (const orientation of ['horizontal', 'vertical']) {
       for (const dir of ['ltr', 'rtl']) {
         const dividerColour = (pair: string) => {
@@ -924,6 +904,13 @@ export const MixedSeparatorSurfaces: Story = {
           dividerColour('default to default')
         );
         await expect(dividerColour('default to secondary')).toBe(
+          dividerColour('secondary to secondary')
+        );
+        // Solid fills take their on-solid divider, not the neutral border.
+        await expect(dividerColour('default to default')).not.toBe(
+          dividerColour('secondary to secondary')
+        );
+        await expect(dividerColour('destructive to destructive')).not.toBe(
           dividerColour('secondary to secondary')
         );
       }

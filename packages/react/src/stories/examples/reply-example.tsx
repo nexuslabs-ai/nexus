@@ -2,22 +2,24 @@ import { useState } from 'react';
 
 import { IconChevronDown } from '@tabler/icons-react';
 
-import { Button } from '../button';
+import { Button } from '../../components/button';
+import {
+  ButtonGroup,
+  ButtonGroupSeparator,
+} from '../../components/button-group';
 import {
   Card,
   CardContent,
   CardDescription,
   CardHeader,
   CardTitle,
-} from '../card';
+} from '../../components/card';
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
-} from '../dropdown-menu';
-
-import { ButtonGroup, ButtonGroupSeparator } from './button-group';
+} from '../../components/dropdown-menu';
 
 export function ReplyExample() {
   const [result, setResult] = useState('Demo only — no email will be sent.');

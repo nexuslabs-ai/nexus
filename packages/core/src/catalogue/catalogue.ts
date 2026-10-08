@@ -268,7 +268,7 @@ function primitiveAliases(
   path: readonly string[]
 ): CatalogueAlias[] {
   const key = path.join('-');
-  if (family === 'icon') return [utility(`size-icon-${path[path.length - 1]}`)];
+  if (family === 'icon') return [utility(`size-icon-${key}`)];
   if (family === 'radius') return [cssVariable(`--radius-${key}`)];
   if (family === 'borderwidth') {
     return [

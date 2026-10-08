@@ -1,7 +1,14 @@
 import * as React from 'react';
 
+import { DEFAULT_NEXUS_APPEARANCE } from '@nexus_ds/core';
 import type { Meta, StoryObj } from '@storybook/react';
 import { expect, fn, userEvent, within } from 'storybook/test';
+
+import {
+  expectLegiblePrimaryHover,
+  PRIMARY_HOVER_BRANDS,
+} from '../../stories/support/primary-hover';
+import { NexusRoot } from '../appearance/provider';
 
 import { Switch } from './switch';
 
@@ -488,3 +495,34 @@ export const AllVariants: Story = {
 // A11Y is tested automatically on ALL stories
 // via addon-a11y with test: 'error'
 // ============================================
+
+// Evidence for the derived primary hover: a real pointer hover on dark, near-black
+// and mid brands still changes the fill and keeps its ink legible.
+export const PrimaryHoverAcrossBrands: Story = {
+  tags: ['!autodocs', '!dev'],
+  render: () => (
+    <div className="nx:flex nx:flex-wrap nx:gap-4">
+      {(['light', 'dark'] as const).flatMap((mode) =>
+        PRIMARY_HOVER_BRANDS.map((brandColor) => (
+          <NexusRoot
+            key={`${mode}-${brandColor}`}
+            state={{ ...DEFAULT_NEXUS_APPEARANCE, mode, brandColor }}
+            className="nx:bg-background nx:p-4"
+          >
+            <Switch defaultChecked aria-label={`${mode} ${brandColor}`} />
+          </NexusRoot>
+        ))
+      )}
+    </div>
+  ),
+  play: async ({ canvasElement }) => {
+    for (const control of within(canvasElement).getAllByRole('switch')) {
+      await expectLegiblePrimaryHover(
+        control,
+        () =>
+          getComputedStyle(control.querySelector('[data-slot="switch-thumb"]')!)
+            .backgroundColor
+      );
+    }
+  },
+};

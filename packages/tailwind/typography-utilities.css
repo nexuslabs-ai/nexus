@@ -97,7 +97,7 @@
 
 @utility typography-label-compact {
   font-family: var(--nx-typography-family-font-sans);
-  font-size: var(--nx-typography-size-compact);
+  font-size: var(--nx-typography-size-xs-plus);
   font-weight: var(--nx-typography-weight-medium);
   line-height: var(--nx-typography-line-height-sm);
   letter-spacing: var(--nx-typography-letterspacing-normal);

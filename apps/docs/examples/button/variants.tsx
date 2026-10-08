@@ -8,6 +8,7 @@ export default function ButtonVariants() {
       <Button variant="default">Default</Button>
       <Button variant="secondary">Secondary</Button>
       <Button variant="error">Error</Button>
+      <Button variant="error-outline">Error outline</Button>
       <Button variant="destructive">Destructive</Button>
       <Button variant="outline">Outline</Button>
       <Button variant="dashed">Dashed</Button>

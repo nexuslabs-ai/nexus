@@ -456,6 +456,7 @@
       'Liberation Mono', monospace;
     --nx-typography-size-xxs: 11px;
     --nx-typography-size-xs: 12px;
+    --nx-typography-size-xs-plus: 13px;
     --nx-typography-size-sm: 14px;
     --nx-typography-size-base: 16px;
     --nx-typography-size-lg: 18px;
@@ -468,7 +469,6 @@
     --nx-typography-size-7xl: 72px;
     --nx-typography-size-8xl: 96px;
     --nx-typography-size-9xl: 128px;
-    --nx-typography-size-compact: 13px;
     --nx-typography-weight-thin: 100;
     --nx-typography-weight-extralight: 200;
     --nx-typography-weight-light: 300;

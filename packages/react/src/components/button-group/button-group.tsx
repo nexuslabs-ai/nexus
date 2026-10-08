@@ -6,12 +6,13 @@ import { cn } from '../../lib/utils';
 import { Separator } from '../separator';
 
 import {
+  ButtonGroupJoinedContext,
   type ButtonGroupSize,
   ButtonGroupSizeContext,
 } from './button-group-context';
 
 const buttonGroupVariants = cva(
-  'nx:flex nx:w-fit nx:items-stretch nx:[&>[data-slot=button]:active]:scale-100 nx:*:focus-visible:relative nx:*:focus-visible:z-10',
+  'nx:flex nx:w-fit nx:items-stretch nx:*:focus-visible:relative nx:*:focus-visible:z-10',
   {
     variants: {
       orientation: {
@@ -32,11 +33,11 @@ const buttonGroupTextVariants = cva(
   {
     variants: {
       size: {
-        xs: 'nx:h-7 nx:px-2 nx:typography-label-small nx:[&_svg]:size-icon-xs',
-        sm: 'nx:h-8 nx:px-2.5 nx:typography-label-compact nx:[&_svg]:size-icon-sm',
+        xs: 'nx:h-7 nx:px-2 nx:typography-label-small nx:[&_svg]:size-icon-glyph-xs',
+        sm: 'nx:h-8 nx:px-2.5 nx:typography-label-compact nx:[&_svg]:size-icon-glyph-sm',
         default:
-          'nx:h-10 nx:px-3 nx:typography-label-default nx:[&_svg]:size-icon-default',
-        lg: 'nx:h-12 nx:px-3.5 nx:typography-label-default nx:[&_svg]:size-icon-default',
+          'nx:h-10 nx:px-3 nx:typography-label-default nx:[&_svg]:size-icon-glyph-default',
+        lg: 'nx:h-12 nx:px-3.5 nx:typography-label-default nx:[&_svg]:size-icon-glyph-default',
       },
     },
     defaultVariants: {
@@ -95,16 +96,18 @@ function ButtonGroup({
 }: ButtonGroupProps) {
   return (
     <ButtonGroupSizeContext.Provider value={size}>
-      <div
-        role="group"
-        data-slot="button-group"
-        data-orientation={orientation}
-        data-size={size}
-        className={cn(buttonGroupVariants({ orientation }), className)}
-        {...props}
-      >
-        {children}
-      </div>
+      <ButtonGroupJoinedContext.Provider value>
+        <div
+          role="group"
+          data-slot="button-group"
+          data-orientation={orientation}
+          data-size={size}
+          className={cn(buttonGroupVariants({ orientation }), className)}
+          {...props}
+        >
+          {children}
+        </div>
+      </ButtonGroupJoinedContext.Provider>
     </ButtonGroupSizeContext.Provider>
   );
 }
@@ -176,7 +179,7 @@ function ButtonGroupSeparator({
         'nx:relative nx:z-10 nx:self-stretch nx:pointer-events-none',
         'nx:data-[orientation=vertical]:h-auto nx:data-[orientation=vertical]:-me-px',
         'nx:data-[orientation=horizontal]:w-auto nx:data-[orientation=horizontal]:-mb-px',
-        'nx:has-[+[data-variant=default]]:bg-primary-border-on-solid nx:has-[+[data-variant=destructive]]:bg-error-border-on-solid',
+        'nx:has-[+[data-slot=button][data-variant=default]]:bg-primary-border-on-solid nx:has-[+[data-slot=button][data-variant=destructive]]:bg-error-border-on-solid',
         className
       )}
       {...props}

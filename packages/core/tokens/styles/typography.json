@@ -129,7 +129,7 @@
       "$type": "typography",
       "$value": {
         "fontFamily": "{family.font-sans}",
-        "fontSize": "{size.compact}",
+        "fontSize": "{size.xs-plus}",
         "fontWeight": "{weight.medium}",
         "lineHeight": "{line-height.sm}",
         "letterSpacing": "{letterspacing.normal}"
