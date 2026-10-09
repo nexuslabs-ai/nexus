@@ -9,7 +9,7 @@ import {
   IconUsers,
 } from '@tabler/icons-react';
 
-import { filterOperatorLabels } from '../../components/filter-model';
+import { filterOperatorLabels } from '../../lib/filter-model';
 
 import { type ChoiceCondition, ChoiceFilter } from './blocks/choice-filter';
 import {

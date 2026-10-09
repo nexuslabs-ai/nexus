@@ -6,6 +6,18 @@ export {
   CHART_CATEGORICAL_SERIES,
   type ChartCategoricalIndex,
 } from './lib/chart';
+export {
+  type FilterError,
+  type FilterErrorCode,
+  type FilterField,
+  type FilterGroup,
+  type FilterOperator,
+  filterOperatorLabels,
+  type FilterOption,
+  type FilterRule,
+  getFilterErrors,
+  isValuelessOperator,
+} from './lib/filter-model';
 
 // Components
 export * from './components/accordion';
@@ -38,7 +50,6 @@ export * from './components/field';
 export * from './components/filter-builder';
 export * from './components/filter-chip';
 export * from './components/filter-condition';
-export * from './components/filter-model';
 export * from './components/hide';
 export * from './components/hover-card';
 export * from './components/input';
@@ -75,6 +86,7 @@ export * from './components/tabs';
 export * from './components/textarea';
 export * from './components/toggle';
 export * from './components/toggle-group';
+export * from './components/toolbar';
 export * from './components/tooltip';
 
 // Appearance (editor UI — provider is published separately via ./appearance subentry)

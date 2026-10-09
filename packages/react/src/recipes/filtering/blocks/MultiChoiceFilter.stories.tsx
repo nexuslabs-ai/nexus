@@ -184,10 +184,10 @@ const meta = {
               folders import: <code>button</code>, <code>button-group</code>,{' '}
               <code>checkbox</code>, <code>choice-row</code>,{' '}
               <code>dropdown-menu</code>, <code>filter-condition</code>,{' '}
-              <code>filter-model</code>, <code>label</code>,{' '}
-              <code>overlay-layout</code>, <code>popover</code>,{' '}
-              <code>separator</code>, <code>spinner</code> and <code>lib/</code>
-              . If your copy lives elsewhere, update the relative imports.
+              <code>label</code>, <code>overlay-layout</code>,{' '}
+              <code>popover</code>, <code>separator</code>, <code>spinner</code>{' '}
+              and <code>lib/</code>. If your copy lives elsewhere, update the
+              relative imports.
             </li>
             <li>
               No npm packages beyond those the Nexus components already use.
@@ -231,6 +231,7 @@ const meta = {
 export default meta;
 type Story = StoryObj<typeof meta>;
 export const Default: Story = {
+  tags: ['docs'],
   render: () => <MultiChoiceFilterExample />,
   parameters: { docs: { source: { code: exampleSource } } },
 };

@@ -1,6 +1,6 @@
 import { useState } from 'react';
 
-import type { FilterRule } from '../../../components/filter-model';
+import type { FilterRule } from '../../../lib/filter-model';
 
 import { type ChoiceCondition, ChoiceFilter } from './choice-filter';
 

@@ -35,9 +35,11 @@ export default tseslint.config(
       '**/coverage/**',
       '**/generated/**',
       '**/__generated__/**',
+      '**/*.generated.ts',
       '**/storybook-static/**',
       '**/build/**',
       '**/out/**',
+      '**/.wrangler/**',
       // Standalone consumer examples — self-contained repos with their own
       // toolchains, outside this workspace. Not linted by the monorepo config.
       'examples/**',
@@ -276,31 +278,7 @@ export default tseslint.config(
   },
 
   {
-    files: ['apps/docs/examples/**/*.tsx'],
-    rules: {
-      'no-restricted-imports': [
-        'error',
-        {
-          patterns: [
-            {
-              group: ['@nexus_ds/react', '@nexus_ds/react/*'],
-              message:
-                'Import the copied file under `@/` (e.g. `@/components/button/button`) — the install block lists it, @nexus_ds/react is not in a pasting app.',
-            },
-            {
-              group: ['@/components/appearance', '@/components/appearance/*'],
-              message:
-                'The docs shell provides appearance from @nexus_ds/react, so a demo importing it from `@/` gets a second context and throws.',
-            },
-          ],
-        },
-      ],
-    },
-  },
-
-  {
     files: ['apps/docs/**/*.{ts,tsx,js,mjs}'],
-    ignores: ['apps/docs/examples/**'],
     rules: {
       'no-restricted-imports': [
         'error',
@@ -309,7 +287,25 @@ export default tseslint.config(
             {
               group: ['@/*'],
               message:
-                '`@/` resolves to packages/react/src for the paste-ready demos only — import @nexus_ds/react here.',
+                '`@/` resolves to packages/react/src for the generated, paste-ready docs code only — import @nexus_ds/react here.',
+            },
+          ],
+        },
+      ],
+    },
+  },
+
+  {
+    files: ['apps/docs/app/_pages/patterns/**/*.tsx'],
+    rules: {
+      'no-restricted-imports': [
+        'error',
+        {
+          patterns: [
+            {
+              regex: '^@/(?!recipes/)',
+              message:
+                'A pattern page imports its examples from `@/recipes/`, which @nexus_ds/react does not export — import components from @nexus_ds/react.',
             },
           ],
         },

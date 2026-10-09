@@ -5,10 +5,7 @@ import type { Meta, StoryObj } from '@storybook/react';
 import { expect, fn, userEvent, waitFor, within } from 'storybook/test';
 
 import { FilterBuilder } from '../../components/filter-builder';
-import {
-  type FilterGroup,
-  getFilterErrors,
-} from '../../components/filter-model';
+import { type FilterGroup, getFilterErrors } from '../../lib/filter-model';
 
 import { AdvancedFiltering } from './advanced-filters';
 import { exampleFields } from './advanced-fixtures';

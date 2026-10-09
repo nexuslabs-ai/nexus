@@ -2,7 +2,7 @@ import type {
   FilterField,
   FilterGroup,
   FilterRule,
-} from '../../components/filter-model';
+} from '../../lib/filter-model';
 
 export const exampleFields: FilterField[] = [
   {

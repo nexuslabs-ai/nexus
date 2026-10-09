@@ -165,10 +165,10 @@ const meta = {
               They need these Nexus component folders, including the ones those
               folders import: <code>button</code>, <code>button-group</code>,{' '}
               <code>date-picker</code>, <code>dropdown-menu</code>,{' '}
-              <code>filter-condition</code>, <code>filter-model</code>,{' '}
-              <code>overlay-layout</code>, <code>popover</code>,{' '}
-              <code>separator</code>, <code>spinner</code> and <code>lib/</code>
-              . If your copy lives elsewhere, update the relative imports.
+              <code>filter-condition</code>, <code>overlay-layout</code>,{' '}
+              <code>popover</code>, <code>separator</code>, <code>spinner</code>{' '}
+              and <code>lib/</code>. If your copy lives elsewhere, update the
+              relative imports.
             </li>
             <li>
               The date picker needs the optional <code>react-day-picker</code>{' '}
@@ -213,6 +213,7 @@ const meta = {
 export default meta;
 type Story = StoryObj<typeof meta>;
 export const Default: Story = {
+  tags: ['docs'],
   render: () => <DateRangeFilterExample />,
   parameters: { docs: { source: { code: exampleSource } } },
 };

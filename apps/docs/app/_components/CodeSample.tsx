@@ -1,6 +1,9 @@
+import type { ComponentProps } from 'react';
+
 import { type CodeSampleLanguage, highlightSample } from '../_lib/code-sample';
 
 import { CodeBlock } from './CodeBlock';
+import { CodeCard } from './CodeCard';
 
 /**
  * A code string rendered outside an MDX fence. Tokenised by the same theme the
@@ -9,12 +12,34 @@ import { CodeBlock } from './CodeBlock';
  */
 export async function CodeSample({
   lang,
+  framed,
   children,
 }: {
   lang: CodeSampleLanguage;
+  framed?: boolean;
   children: string;
 }) {
   const html = await highlightSample(lang, children);
 
-  return <CodeBlock dangerouslySetInnerHTML={{ __html: html }} />;
+  return (
+    <CodeBlock framed={framed} dangerouslySetInnerHTML={{ __html: html }} />
+  );
+}
+
+/** A `CodeSample` attached beneath `header` in a `CodeCard`. */
+export function CodeSampleCard({
+  lang,
+  code,
+  ...props
+}: Omit<ComponentProps<typeof CodeCard>, 'lines' | 'children'> & {
+  lang: CodeSampleLanguage;
+  code: string;
+}) {
+  return (
+    <CodeCard lines={code.trimEnd().split('\n').length} {...props}>
+      <CodeSample lang={lang} framed>
+        {code}
+      </CodeSample>
+    </CodeCard>
+  );
 }

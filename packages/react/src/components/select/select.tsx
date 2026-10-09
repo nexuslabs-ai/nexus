@@ -3,6 +3,7 @@ import * as React from 'react';
 import * as SelectPrimitive from '@radix-ui/react-select';
 import { cva, type VariantProps } from 'class-variance-authority';
 
+import { fieldSizeVariants } from '../../lib/field-size';
 import { IconCheck, IconChevronDown, IconChevronUp } from '../../lib/icons';
 import { selectionIndicatorMotionClassName } from '../../lib/motion';
 import { cn } from '../../lib/utils';
@@ -49,7 +50,6 @@ const selectTriggerVariants = cva(
   [
     'nx:group/select-trigger nx:flex nx:box-border nx:w-full nx:items-center nx:justify-between nx:gap-2',
     'nx:rounded-md nx:border-default nx:transition-field',
-    'nx:h-10 nx:px-3 nx:py-0 nx:typography-body-default',
     'nx:whitespace-nowrap',
     'nx:data-[placeholder]:text-muted-foreground',
     'nx:focus-visible:outline-default nx:focus-visible:outline-focus-default nx:focus-visible:border-focus-default',
@@ -59,6 +59,7 @@ const selectTriggerVariants = cva(
   ],
   {
     variants: {
+      size: fieldSizeVariants,
       variant: {
         bordered:
           'nx:border-border-default nx:bg-container nx:enabled:hover:bg-container-hover nx:disabled:border-border-disabled',
@@ -67,6 +68,7 @@ const selectTriggerVariants = cva(
       },
     },
     defaultVariants: {
+      size: 'default',
       variant: 'bordered',
     },
   }
@@ -99,14 +101,16 @@ interface SelectTriggerProps
 function SelectTrigger({
   className,
   children,
+  size,
   variant,
   ...props
 }: SelectTriggerProps) {
   return (
     <SelectPrimitive.Trigger
       data-slot="select-trigger"
+      data-size={size ?? 'default'}
       data-variant={variant ?? 'bordered'}
-      className={cn(selectTriggerVariants({ variant, className }))}
+      className={cn(selectTriggerVariants({ size, variant, className }))}
       {...props}
     >
       {children}

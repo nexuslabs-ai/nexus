@@ -24,6 +24,7 @@ type Story = StoryObj<typeof EmptyState>;
 // The canonical empty state: an icon medallion, a title, a description, and a
 // primary action.
 export const Default: Story = {
+  tags: ['docs'],
   render: () => (
     <EmptyState>
       <EmptyStateHeader>
@@ -44,6 +45,7 @@ export const Default: Story = {
 
 // Header only — an empty state with no call to action.
 export const WithoutAction: Story = {
+  tags: ['docs'],
   render: () => (
     <EmptyState>
       <EmptyStateHeader>
@@ -60,6 +62,7 @@ export const WithoutAction: Story = {
 };
 
 export const TitleAsHeading: Story = {
+  tags: ['docs'],
   render: () => (
     <section aria-labelledby="empty-state-section-heading">
       <EmptyState>
@@ -170,6 +173,7 @@ export const LongCopyWithLink: Story = {
 
 // The `bordered` prop renders the dashed frame and advertises via data-bordered.
 export const Bordered: Story = {
+  tags: ['docs'],
   render: () => (
     <EmptyState bordered>
       <EmptyStateHeader>
@@ -198,6 +202,7 @@ export const Bordered: Story = {
 // with an action, and the borderless default wrapper holding a larger glyph.
 // Reused by the per-base variant generator.
 export const AllVariants: Story = {
+  tags: ['docs'],
   render: () => (
     <div className="nx:flex nx:flex-col nx:gap-6">
       <EmptyState bordered>

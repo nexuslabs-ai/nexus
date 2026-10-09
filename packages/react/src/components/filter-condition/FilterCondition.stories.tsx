@@ -32,9 +32,9 @@ function ConditionExample({
   operator?: string;
   value?: string;
   disabled?: boolean;
-  onOperatorClick: () => void;
-  onValueClick: () => void;
-  onRemove: () => void;
+  onOperatorClick?: () => void;
+  onValueClick?: () => void;
+  onRemove?: () => void;
 }) {
   return (
     <FilterCondition data-testid="condition">
@@ -178,7 +178,7 @@ const meta = {
 } satisfies Meta<typeof ConditionExample>;
 export default meta;
 type Story = StoryObj<typeof meta>;
-export const Default: Story = {};
+export const Default: Story = { tags: ['docs'] };
 export const Anatomy: Story = {};
 export const ClickInteraction: Story = {
   play: async ({ canvasElement, args }) => {
