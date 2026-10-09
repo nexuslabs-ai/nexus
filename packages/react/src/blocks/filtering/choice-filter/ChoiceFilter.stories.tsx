@@ -12,6 +12,7 @@ import {
   useStoryEvent,
 } from '../../../stories/support/filter-block-test-utils';
 import operatorSource from '../filter-operator.tsx?raw';
+import editorSource from '../use-condition-editor.ts?raw';
 
 import { type ChoiceCondition, ChoiceFilter } from './choice-filter';
 import blockSource from './choice-filter.tsx?raw';
@@ -154,7 +155,8 @@ const meta = {
           <ul>
             <li>
               Copy <code>blocks/filtering/choice-filter/choice-filter.tsx</code>{' '}
-              and <code>blocks/filtering/filter-operator.tsx</code>, keeping the{' '}
+              , <code>blocks/filtering/filter-operator.tsx</code> and{' '}
+              <code>blocks/filtering/use-condition-editor.ts</code>, keeping the{' '}
               <code>blocks/filtering</code> layout.
             </li>
             <li>
@@ -195,6 +197,12 @@ const meta = {
               blocks/filtering/filter-operator.tsx — required shared helper
             </summary>
             <Source code={operatorSource} language="tsx" />
+          </details>
+          <details>
+            <summary>
+              blocks/filtering/use-condition-editor.ts — required shared helper
+            </summary>
+            <Source code={editorSource} language="tsx" />
           </details>
           <p>
             <a href="/?path=/docs/patterns-filtering--docs" target="_top">

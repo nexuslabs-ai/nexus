@@ -15,6 +15,7 @@ import {
   FilterConditionSegment,
 } from '../../../components/filter-condition';
 import { ConditionOperator } from '../filter-operator';
+import { useConditionEditor } from '../use-condition-editor';
 
 export type ChoiceCondition =
   | { operator: 'is' | 'isNot'; value: string }
@@ -46,78 +47,32 @@ export function ChoiceFilter({
   onChange,
   disabled = false,
 }: ChoiceFilterProps) {
-  const [open, setOpen] = React.useState(false);
-  const [pending, setPending] = React.useState<'is' | 'isNot' | null>(null);
-  const nextSnapshot = JSON.stringify([value, disabled]);
-  const [snapshot, setSnapshot] = React.useState(nextSnapshot);
-  // A controlled replacement invalidates an unfinished operator/value edit.
-  if (snapshot !== nextSnapshot) {
-    setSnapshot(nextSnapshot);
-    setOpen(false);
-    setPending(null);
-  }
-  const addRef = React.useRef<HTMLButtonElement>(null);
-  const operatorRef = React.useRef<HTMLButtonElement>(null);
-  const restoreAdd = React.useRef(false);
-  const selected = value && 'value' in value ? value.value : '';
+  const {
+    applied,
+    open,
+    pending,
+    changeOpen,
+    changeOperator,
+    commit,
+    openPending,
+    remove,
+    focusAdd,
+    operatorRef,
+    restoreFocus,
+  } = useConditionEditor({ value, onChange, disabled });
+  const selected = applied?.value ?? '';
   const selectedLabel = selected ? optionLabel(options, selected) : '';
-  function focusAdd(node: HTMLButtonElement | null) {
-    addRef.current = node;
-    if (node && restoreAdd.current) {
-      restoreAdd.current = false;
-      node.focus();
-    }
-  }
-  function remove() {
-    if (disabled) return;
-    restoreAdd.current = true;
-    setOpen(false);
-    setPending(null);
-    onChange(null);
-  }
-  function changeOperator(operator: ChoiceCondition['operator']) {
-    if (disabled) return;
-    if (operator === 'isEmpty' || operator === 'isNotEmpty') {
-      onChange({ operator });
-      return;
-    }
-    if (value && 'value' in value) {
-      onChange({ operator, value: value.value });
-      return;
-    }
-    // Never publish an incomplete condition. Cancelling keeps the applied operator.
-    setPending(operator);
-  }
   function select(id: string) {
-    if (disabled) return;
     if (id === '') {
       remove();
       return;
     }
     const option = options.find((item) => item.value === id && !item.disabled);
     if (!option) return;
-    onChange({
-      operator: pending ?? (value?.operator === 'isNot' ? 'isNot' : 'is'),
-      value: id,
-    });
-    setPending(null);
-    setOpen(false);
-  }
-  function changeOpen(next: boolean) {
-    setOpen(next && !disabled);
-    if (!next) setPending(null);
-  }
-  function restoreFocus(event: Event) {
-    if (restoreAdd.current || !value) {
-      event.preventDefault();
-      addRef.current?.focus();
-    } else if (!('value' in value)) {
-      event.preventDefault();
-      operatorRef.current?.focus();
-    }
+    commit({ operator: pending ?? applied?.operator ?? 'is', value: id });
   }
   return (
-    <DropdownMenu open={open && !disabled} onOpenChange={changeOpen}>
+    <DropdownMenu open={open} onOpenChange={changeOpen}>
       {value ? (
         <FilterCondition className="nx:flex-wrap nx:gap-y-1">
           <div className="nx:inline-flex nx:max-w-full nx:min-w-0">
@@ -135,18 +90,11 @@ export function ChoiceFilter({
               options={['is', 'isNot', 'isEmpty', 'isNotEmpty']}
               onChange={changeOperator}
               disabled={disabled}
-              onCloseAutoFocus={
-                pending
-                  ? (event) => {
-                      event.preventDefault();
-                      setOpen(true);
-                    }
-                  : undefined
-              }
+              onCloseAutoFocus={openPending}
             />
           </div>
           <div className="nx:inline-flex nx:max-w-full nx:min-w-0 nx:border-s-default nx:border-border-default nx:-ms-(--nx-borderwidth-default)">
-            {('value' in value || pending) && (
+            {(applied || pending) && (
               <DropdownMenuTrigger asChild>
                 <FilterConditionSegment
                   className="nx:min-w-20"

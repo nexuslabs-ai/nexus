@@ -1,6 +1,11 @@
 import * as React from 'react';
 
-import { emptyMemberQuery, type MemberQuery } from './member-directory';
+import {
+  emptyMemberQuery,
+  type MemberQuery,
+  memberStatuses,
+  memberTeams,
+} from './member-directory';
 
 export function readMemberQuery(url: URL): MemberQuery {
   const status = url.searchParams.get('members.status') ?? '';
@@ -8,8 +13,8 @@ export function readMemberQuery(url: URL): MemberQuery {
   const page = Number(url.searchParams.get('members.page') ?? 1);
   return {
     name: (url.searchParams.get('members.name') ?? '').slice(0, 200),
-    status: ['Active', 'Invited'].includes(status) ? status : '',
-    team: ['Design', 'Engineering', 'Operations'].includes(team) ? team : '',
+    status: memberStatuses.find((item) => item === status) ?? '',
+    team: memberTeams.find((item) => item === team) ?? '',
     page: Number.isSafeInteger(page) && page > 0 ? page : 1,
   };
 }
@@ -24,20 +29,37 @@ export function writeMemberQuery(url: URL, query: MemberQuery): URL {
   return next;
 }
 
-// Mount once per document. Router applications should use their router's search-parameter API.
+// pushState and replaceState fire no event, so writes notify subscribers directly.
+const listeners = new Set<() => void>();
+function subscribe(listener: () => void) {
+  listeners.add(listener);
+  window.addEventListener('popstate', listener);
+  return () => {
+    listeners.delete(listener);
+    window.removeEventListener('popstate', listener);
+  };
+}
+function getSearch() {
+  return window.location.search;
+}
+function getServerSearch() {
+  return null;
+}
+
+// Router applications should use their router's search-parameter API.
 export function useMemberQueryUrl() {
-  const [query, setQuery] = React.useState<MemberQuery>(() =>
-    typeof window === 'undefined'
-      ? emptyMemberQuery
-      : readMemberQuery(new URL(window.location.href))
+  const search = React.useSyncExternalStore(
+    subscribe,
+    getSearch,
+    getServerSearch
   );
-  React.useEffect(() => {
-    function restore() {
-      setQuery(readMemberQuery(new URL(window.location.href)));
-    }
-    window.addEventListener('popstate', restore);
-    return () => window.removeEventListener('popstate', restore);
-  }, []);
+  const query = React.useMemo(
+    () =>
+      search === null
+        ? emptyMemberQuery
+        : readMemberQuery(new URL(window.location.href)),
+    [search]
+  );
   function changeQuery(next: MemberQuery) {
     const url = writeMemberQuery(new URL(window.location.href), next);
     // Typing refines the current entry; discrete choices get their own Back step.
@@ -48,7 +70,7 @@ export function useMemberQueryUrl() {
     if (typing) window.history.replaceState(null, '', url);
     else if (url.href !== window.location.href)
       window.history.pushState(null, '', url);
-    setQuery(readMemberQuery(url));
+    for (const listener of listeners) listener();
   }
   return [query, changeQuery] as const;
 }

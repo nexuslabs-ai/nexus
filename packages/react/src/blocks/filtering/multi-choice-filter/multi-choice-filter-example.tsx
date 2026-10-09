@@ -33,6 +33,11 @@ export function multiChoiceRule(
   condition: MultiChoiceCondition | null
 ): FilterRule | null {
   if (!condition) return null;
-  const value = 'values' in condition ? [...condition.values] : '';
-  return { kind: 'rule', id, field, operator: condition.operator, value };
+  const rule = { kind: 'rule', id, field } as const;
+  if (!('values' in condition)) return { ...rule, ...condition, value: '' };
+  return {
+    ...rule,
+    operator: condition.operator,
+    value: [...condition.values],
+  };
 }

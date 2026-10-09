@@ -15,6 +15,7 @@ import {
   PopoverTrigger,
 } from '../../../components/popover';
 import { ConditionOperator } from '../filter-operator';
+import { useConditionEditor } from '../use-condition-editor';
 
 export type MultiChoiceCondition =
   | { operator: 'isAnyOf' | 'isNoneOf'; values: string[] }
@@ -36,23 +37,25 @@ export function MultiChoiceFilter({
   disabled = false,
   options,
 }: MultiChoiceFilterProps) {
-  const applied = value && 'values' in value ? value : null;
-  const [open, setOpen] = React.useState(false);
-  const [pending, setPending] = React.useState<'isAnyOf' | 'isNoneOf' | null>(
-    null
-  );
   const [draft, setDraft] = React.useState<string[]>([]);
-  const addRef = React.useRef<HTMLButtonElement>(null);
-  const operatorRef = React.useRef<HTMLButtonElement>(null);
-  const restoreAdd = React.useRef(false);
-  const nextSnapshot = JSON.stringify([value, disabled]);
-  const [snapshot, setSnapshot] = React.useState(nextSnapshot);
-  // External replacements invalidate unfinished edits instead of committing stale drafts.
-  if (snapshot !== nextSnapshot) {
-    setSnapshot(nextSnapshot);
-    setOpen(false);
-    setPending(null);
-  }
+  const {
+    applied,
+    open,
+    pending,
+    changeOpen,
+    changeOperator,
+    commit,
+    openPending,
+    remove,
+    focusAdd,
+    operatorRef,
+    restoreFocus,
+  } = useConditionEditor({
+    value,
+    onChange,
+    disabled,
+    onOpen: (current) => setDraft(current ? [...current.values] : []),
+  });
   const valid = draft.length > 0;
   const summary = applied
     ? applied.values
@@ -64,64 +67,14 @@ export function MultiChoiceFilter({
         .join(', ')
     : 'Choose…';
   const operator = pending ?? applied?.operator ?? 'isAnyOf';
-  function changeOpen(next: boolean) {
-    if (disabled && next) return;
-    if (next) {
-      setDraft(applied ? [...applied.values] : []);
-    }
-    setOpen(next);
-    if (!next) setPending(null);
-  }
-  function changeOperator(next: MultiChoiceCondition['operator']) {
-    if (disabled) return;
-    if (next === 'isEmpty' || next === 'isNotEmpty') {
-      onChange({ operator: next });
-      return;
-    }
-    if (applied) {
-      onChange({ ...applied, operator: next });
-      return;
-    }
-    setPending(next);
-  }
-  function openPending(event: Event) {
-    if (!pending) return;
-    event.preventDefault();
-    changeOpen(true);
-  }
   function apply(event: React.FormEvent) {
     event.preventDefault();
     event.stopPropagation();
-    if (!valid || disabled) return;
-    onChange({ operator, values: [...new Set(draft)] });
-    setOpen(false);
-    setPending(null);
-  }
-  function remove() {
-    if (disabled) return;
-    restoreAdd.current = true;
-    setOpen(false);
-    setPending(null);
-    onChange(null);
-  }
-  function focusAdd(node: HTMLButtonElement | null) {
-    addRef.current = node;
-    if (node && restoreAdd.current) {
-      restoreAdd.current = false;
-      node.focus();
-    }
-  }
-  function restoreFocus(event: Event) {
-    if (!value) {
-      event.preventDefault();
-      addRef.current?.focus();
-    } else if (!applied) {
-      event.preventDefault();
-      operatorRef.current?.focus();
-    }
+    if (!valid) return;
+    commit({ operator, values: [...new Set(draft)] });
   }
   return (
-    <Popover open={open && !disabled} onOpenChange={changeOpen}>
+    <Popover open={open} onOpenChange={changeOpen}>
       {value ? (
         <FilterCondition className="nx:flex-wrap nx:gap-y-1">
           <div className="nx:inline-flex nx:max-w-full nx:min-w-0">

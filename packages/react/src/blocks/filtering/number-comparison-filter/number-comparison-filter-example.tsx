@@ -24,6 +24,7 @@ export function numberComparisonRule(
   condition: NumberComparisonCondition | null
 ): FilterRule | null {
   if (!condition) return null;
-  const value = 'value' in condition ? String(condition.value) : '';
-  return { kind: 'rule', id, field, operator: condition.operator, value };
+  const rule = { kind: 'rule', id, field } as const;
+  if (!('value' in condition)) return { ...rule, ...condition, value: '' };
+  return { ...rule, ...condition, value: String(condition.value) };
 }

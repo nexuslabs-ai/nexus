@@ -14,8 +14,8 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from '../../../components/popover';
-import { isValuelessOperator } from '../../../lib/filter-model';
 import { ConditionOperator } from '../filter-operator';
+import { useConditionEditor } from '../use-condition-editor';
 
 export type NumberRangeCondition =
   | { operator: 'between'; min: number; max: number }
@@ -43,23 +43,22 @@ export function NumberRangeFilter({
   value,
   onChange,
 }: NumberRangeFilterProps) {
-  const operator = value?.operator ?? 'between';
-  const range = value?.operator === 'between' ? value : null;
   const id = React.useId();
-  const [pending, setPending] = React.useState(false);
-  const [open, setOpen] = React.useState(false);
   const [min, setMin] = React.useState('');
   const [max, setMax] = React.useState('');
-  const restoreAdd = React.useRef(false);
-  const operatorRef = React.useRef<HTMLButtonElement>(null);
-  const nextSnapshot = JSON.stringify([value, disabled]);
-  const [snapshot, setSnapshot] = React.useState(nextSnapshot);
-  if (snapshot !== nextSnapshot) {
-    setSnapshot(nextSnapshot);
-    setOpen(false);
-    setPending(false);
-  }
-  const addRef = React.useRef<HTMLButtonElement>(null);
+  const {
+    applied,
+    open,
+    pending,
+    changeOpen,
+    changeOperator,
+    commit,
+    openPending,
+    remove,
+    focusAdd,
+    operatorRef,
+    restoreFocus,
+  } = useConditionEditor({ value, onChange, disabled, onOpen: seedDraft });
   const valid =
     min !== '' &&
     max !== '' &&
@@ -72,58 +71,21 @@ export function NumberRangeFilter({
   const error = invalid
     ? `Enter an ordered range${lowerBound === undefined ? '' : ` from ${lowerBound}`}${upperBound === undefined ? '' : ` up to ${upperBound}`}.`
     : '';
-  function changeOpen(next: boolean) {
-    if (next) {
-      setMin(range ? String(range.min) : '');
-      setMax(range ? String(range.max) : '');
-    }
-    setOpen(next && !disabled);
-    if (!next) setPending(false);
+  function seedDraft(current: { min: number; max: number } | null) {
+    setMin(current ? String(current.min) : '');
+    setMax(current ? String(current.max) : '');
   }
   function apply(event: React.FormEvent) {
     event.preventDefault();
     event.stopPropagation();
-    if (!valid || disabled) return;
-    onChange({ operator: 'between', min: Number(min), max: Number(max) });
-    setOpen(false);
-    setPending(false);
+    if (!valid) return;
+    commit({ operator: 'between', min: Number(min), max: Number(max) });
   }
-  function remove() {
-    if (disabled) return;
-    restoreAdd.current = true;
-    setOpen(false);
-    setPending(false);
-    onChange(null);
-  }
-  function focusAdd(node: HTMLButtonElement | null) {
-    addRef.current = node;
-    if (node && restoreAdd.current) {
-      restoreAdd.current = false;
-      node.focus();
-    }
-  }
-  function restoreFocus(event: Event) {
-    if (!value) {
-      event.preventDefault();
-      addRef.current?.focus();
-    } else if (value.operator !== 'between') {
-      event.preventDefault();
-      operatorRef.current?.focus();
-    }
-  }
-  function changeOperator(next: NumberRangeCondition['operator']) {
-    if (disabled) return;
-    if (next === 'between') {
-      setPending(true);
-      return;
-    }
-    onChange({ operator: next });
-  }
-  const summary = range
-    ? `${range.min}–${range.max}${unit ? ` ${unit}` : ''}`
+  const summary = applied
+    ? `${applied.min}–${applied.max}${unit ? ` ${unit}` : ''}`
     : 'Choose…';
   return (
-    <Popover open={open && !disabled} onOpenChange={changeOpen}>
+    <Popover open={open} onOpenChange={changeOpen}>
       {value ? (
         <FilterCondition className="nx:flex-wrap nx:gap-y-1">
           <div className="nx:inline-flex nx:max-w-full nx:min-w-0">
@@ -138,21 +100,14 @@ export function NumberRangeFilter({
               label={label}
               disabled={disabled}
               triggerRef={operatorRef}
-              onCloseAutoFocus={
-                pending
-                  ? (event) => {
-                      event.preventDefault();
-                      changeOpen(true);
-                    }
-                  : undefined
-              }
-              value={pending ? 'between' : operator}
+              onCloseAutoFocus={openPending}
+              value={pending ?? value.operator}
               options={['between', 'isEmpty', 'isNotEmpty']}
               onChange={changeOperator}
             />
           </div>
           <div className="nx:inline-flex nx:max-w-full nx:min-w-0 nx:border-s-default nx:border-border-default nx:-ms-(--nx-borderwidth-default)">
-            {(!isValuelessOperator(operator) || pending) && (
+            {(applied || pending) && (
               <PopoverTrigger asChild>
                 <FilterConditionSegment
                   className="nx:min-w-20"

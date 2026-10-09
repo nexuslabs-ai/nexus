@@ -239,9 +239,10 @@ const meta = {
             <p>
               Copy team-directory.tsx, quick-fixtures.ts,
               blocks/filtering/choice-filter/choice-filter.tsx,
-              blocks/filtering/applied-filters.tsx and
-              blocks/filtering/filter-operator.tsx. Replace the fixture records
-              and the local results predicate with your query.
+              blocks/filtering/applied-filters.tsx,
+              blocks/filtering/filter-operator.tsx and
+              blocks/filtering/use-condition-editor.ts. Replace the fixture
+              records and the local results predicate with your query.
             </p>
             <Source code={teamSource} language="tsx" />
           </details>
@@ -256,10 +257,11 @@ const meta = {
             <summary>Copy the invoice list</summary>
             <p>
               Copy invoice-filtering.tsx,
-              blocks/filtering/multi-choice-filter/multi-choice-filter.tsx and
-              blocks/filtering/filter-operator.tsx. Connect the applied filters
-              and search to your query. An empty selection means no restriction
-              for that field.
+              blocks/filtering/multi-choice-filter/multi-choice-filter.tsx,
+              blocks/filtering/filter-operator.tsx and
+              blocks/filtering/use-condition-editor.ts. Connect the applied
+              filters and search to your query. An empty selection means no
+              restriction for that field.
             </p>
             <Source code={invoiceSource} language="tsx" />
           </details>

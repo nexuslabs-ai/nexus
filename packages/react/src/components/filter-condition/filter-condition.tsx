@@ -17,38 +17,6 @@ function FilterCondition({ className, ...props }: React.ComponentProps<'div'>) {
   );
 }
 
-interface FilterConditionTriggerProps extends Omit<
-  React.ComponentProps<'button'>,
-  'children' | 'type'
-> {
-  children: string;
-}
-
-function FilterConditionTrigger({
-  children,
-  className,
-  ...props
-}: FilterConditionTriggerProps) {
-  return (
-    <button
-      {...props}
-      type="button"
-      data-slot="filter-condition-trigger"
-      className={cn(
-        buttonVariants({ variant: 'outline', size: 'sm' }),
-        'nx:h-(--nx-spacing-8) nx:min-w-0 nx:justify-start nx:rounded-e-none nx:active:scale-100 nx:focus-visible:relative nx:focus-visible:z-10',
-        className
-      )}
-    >
-      <span className="nx:min-w-0 nx:truncate">{children}</span>
-      <IconChevronDown
-        aria-hidden="true"
-        className="nx:text-muted-foreground"
-      />
-    </button>
-  );
-}
-
 function FilterConditionField({
   children,
   className,
@@ -128,6 +96,4 @@ export {
   FilterConditionRemove,
   type FilterConditionRemoveProps,
   FilterConditionSegment,
-  FilterConditionTrigger,
-  type FilterConditionTriggerProps,
 };

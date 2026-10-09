@@ -30,6 +30,8 @@ export type MemberResults =
   | { state: 'loading' }
   | { state: 'error'; message: string }
   | { state: 'ready'; data: MemberPage };
+export const memberStatuses = ['Active', 'Invited'] as const;
+export const memberTeams = ['Design', 'Engineering', 'Operations'] as const;
 export const emptyMemberQuery: MemberQuery = {
   name: '',
   status: '',
@@ -84,8 +86,11 @@ export function MemberDirectory({
             onChange={(event) => changeFilter('status', event.target.value)}
           >
             <option value="">All statuses</option>
-            <option value="Active">Active</option>
-            <option value="Invited">Invited</option>
+            {memberStatuses.map((status) => (
+              <option key={status} value={status}>
+                {status}
+              </option>
+            ))}
           </NativeSelect>
         </div>
         <div className="nx:grid nx:gap-2">
@@ -96,9 +101,11 @@ export function MemberDirectory({
             onChange={(event) => changeFilter('team', event.target.value)}
           >
             <option value="">All teams</option>
-            <option value="Design">Design</option>
-            <option value="Engineering">Engineering</option>
-            <option value="Operations">Operations</option>
+            {memberTeams.map((team) => (
+              <option key={team} value={team}>
+                {team}
+              </option>
+            ))}
           </NativeSelect>
         </div>
       </div>

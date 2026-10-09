@@ -31,9 +31,12 @@ export function numberRangeRule(
   condition: NumberRangeCondition | null
 ): FilterRule | null {
   if (!condition) return null;
-  const value =
-    condition.operator === 'between'
-      ? [String(condition.min), String(condition.max)]
-      : '';
-  return { kind: 'rule', id, field, operator: condition.operator, value };
+  const rule = { kind: 'rule', id, field } as const;
+  if (condition.operator !== 'between')
+    return { ...rule, ...condition, value: '' };
+  return {
+    ...rule,
+    operator: 'between',
+    value: [String(condition.min), String(condition.max)],
+  };
 }

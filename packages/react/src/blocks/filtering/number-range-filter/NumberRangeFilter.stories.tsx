@@ -13,6 +13,7 @@ import {
   useStoryEvent,
 } from '../../../stories/support/filter-block-test-utils';
 import operatorSource from '../filter-operator.tsx?raw';
+import editorSource from '../use-condition-editor.ts?raw';
 
 import {
   type NumberRangeCondition,
@@ -160,7 +161,8 @@ const meta = {
               <code>
                 blocks/filtering/number-range-filter/number-range-filter.tsx
               </code>{' '}
-              and <code>blocks/filtering/filter-operator.tsx</code>, keeping the{' '}
+              , <code>blocks/filtering/filter-operator.tsx</code> and{' '}
+              <code>blocks/filtering/use-condition-editor.ts</code>, keeping the{' '}
               <code>blocks/filtering</code> layout.
             </li>
             <li>
@@ -203,6 +205,12 @@ const meta = {
               blocks/filtering/filter-operator.tsx — required shared helper
             </summary>
             <Source code={operatorSource} language="tsx" />
+          </details>
+          <details>
+            <summary>
+              blocks/filtering/use-condition-editor.ts — required shared helper
+            </summary>
+            <Source code={editorSource} language="tsx" />
           </details>
           <p>
             <a href="/?path=/docs/patterns-filtering--docs" target="_top">
@@ -310,24 +318,20 @@ export const ReapplySameRange: Story = {
     await userEvent.click(
       page.getByRole('menuitemradio', { name: 'is between' })
     );
-    const editor = within(
-      await page.findByRole('dialog', { name: 'Filter by size' })
-    );
-    await userEvent.click(editor.getByRole('button', { name: 'Apply' }));
-    await waitFor(() =>
-      expect(
-        page.queryByRole('dialog', { name: 'Filter by size' })
-      ).not.toBeInTheDocument()
-    );
-    await userEvent.click(operator);
-    await expect(
-      await page.findByRole('menuitemradio', { name: 'is between' })
-    ).toBeVisible();
-    await userEvent.keyboard('{Escape}');
     await waitFor(() => expect(operator).toHaveFocus());
     await expect(
       page.queryByRole('dialog', { name: 'Filter by size' })
     ).not.toBeInTheDocument();
+    const summary = canvas.getByRole('button', {
+      name: 'Edit Size: 100–500 KB',
+    });
+    await userEvent.click(summary);
+    const editor = within(
+      await page.findByRole('dialog', { name: 'Filter by size' })
+    );
+    await userEvent.click(editor.getByRole('button', { name: 'Apply' }));
+    await expectEditorClosed(canvasElement, 'Filter by size');
+    await waitFor(() => expect(summary).toHaveFocus());
   },
 };
 export const AddFromNothing: Story = {

@@ -14,6 +14,7 @@ import {
   useStoryEvent,
 } from '../../../stories/support/filter-block-test-utils';
 import operatorSource from '../filter-operator.tsx?raw';
+import editorSource from '../use-condition-editor.ts?raw';
 
 import { type DateRangeCondition, DateRangeFilter } from './date-range-filter';
 import blockSource from './date-range-filter.tsx?raw';
@@ -22,13 +23,13 @@ import exampleSource from './date-range-filter-example.tsx?raw';
 
 const initial: DateRangeCondition = {
   operator: 'between',
-  from: new Date(2026, 8, 1),
-  to: new Date(2026, 8, 10),
+  from: '2026-09-01',
+  to: '2026-09-10',
 };
 const replacement: DateRangeCondition = {
   operator: 'between',
-  from: new Date(2026, 8, 2),
-  to: new Date(2026, 8, 3),
+  from: '2026-09-02',
+  to: '2026-09-03',
 };
 function Preview({
   initialValue = initial,
@@ -74,7 +75,7 @@ function Preview({
   );
 }
 const valueShape = `type DateRangeCondition =
-  | { operator: 'between'; from: Date; to: Date }
+  | { operator: 'between'; from: string; to: string }
   | { operator: 'isEmpty' }
   | { operator: 'isNotEmpty' };`;
 const meta = {
@@ -130,8 +131,9 @@ const meta = {
           </ul>
           <p>
             The block owns the open editor, the draft and a pending operator.
-            Pass valid Date objects; rebuild them after reading URL or JSON
-            state.
+            <code>from</code> and <code>to</code> are calendar days (
+            <code>YYYY-MM-DD</code>), so URL and JSON state keep the same day in
+            every timezone.
           </p>
           <h2>States and dismissal</h2>
           <p>
@@ -161,7 +163,8 @@ const meta = {
               <code>
                 blocks/filtering/date-range-filter/date-range-filter.tsx
               </code>{' '}
-              and <code>blocks/filtering/filter-operator.tsx</code>, keeping the{' '}
+              , <code>blocks/filtering/filter-operator.tsx</code> and{' '}
+              <code>blocks/filtering/use-condition-editor.ts</code>, keeping the{' '}
               <code>blocks/filtering</code> layout.
             </li>
             <li>
@@ -206,6 +209,12 @@ const meta = {
               blocks/filtering/filter-operator.tsx — required shared helper
             </summary>
             <Source code={operatorSource} language="tsx" />
+          </details>
+          <details>
+            <summary>
+              blocks/filtering/use-condition-editor.ts — required shared helper
+            </summary>
+            <Source code={editorSource} language="tsx" />
           </details>
           <p>
             <a href="/?path=/docs/patterns-filtering--docs" target="_top">
@@ -303,8 +312,8 @@ export const NarrowContainer: Story = {
 };
 const lastSevenDays = {
   operator: 'between',
-  from: new Date(2026, 8, 21),
-  to: new Date(2026, 8, 27),
+  from: '2026-09-21',
+  to: '2026-09-27',
 };
 export const AddFromNothing: Story = {
   render: (args) => <Preview initialValue={null} onChange={args.onChange} />,
@@ -403,7 +412,7 @@ export const ExternalReplaceWhileOpen: Story = {
     await expectEditorClosed(canvasElement, 'Filter by created');
     await expect(
       canvas.getByRole('button', {
-        name: `Edit Created: ${replacement.from.toLocaleDateString()} – ${replacement.to.toLocaleDateString()}`,
+        name: `Edit Created: ${new Date(2026, 8, 2).toLocaleDateString()} – ${new Date(2026, 8, 3).toLocaleDateString()}`,
       })
     ).toBeVisible();
     await expect(args.onChange).not.toHaveBeenCalled();

@@ -16,6 +16,7 @@ import {
 import {
   type DateRangeCondition,
   DateRangeFilter,
+  toCalendarDay,
 } from '../../blocks/filtering/date-range-filter/date-range-filter';
 import {
   type MultiChoiceCondition,
@@ -182,7 +183,11 @@ export function DateExample({ today }: { today?: Date } = {}) {
     const to = today ?? new Date();
     const from = new Date(to);
     from.setDate(from.getDate() - 6);
-    return { operator: 'between', from, to };
+    return {
+      operator: 'between',
+      from: toCalendarDay(from),
+      to: toCalendarDay(to),
+    };
   });
   return (
     <Example
@@ -198,7 +203,7 @@ export function DateExample({ today }: { today?: Date } = {}) {
       />
       <Applied>
         {value
-          ? `${filterOperatorLabels[value.operator]}${'from' in value ? ` ${value.from.toLocaleDateString()} – ${value.to.toLocaleDateString()}` : ''}`
+          ? `${filterOperatorLabels[value.operator]}${'from' in value ? ` ${value.from} – ${value.to}` : ''}`
           : 'Any date'}
       </Applied>
     </Example>

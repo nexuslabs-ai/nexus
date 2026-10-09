@@ -249,17 +249,6 @@ const preview: Preview = {
           'Components',
           'Appearance',
           'Blocks',
-          [
-            'Filtering',
-            [
-              'ChoiceFilter',
-              'MultiChoiceFilter',
-              'TextFilter',
-              'NumberComparisonFilter',
-              'NumberRangeFilter',
-              'DateRangeFilter',
-            ],
-          ],
           'Patterns',
           'Primitives',
           'Tokens',

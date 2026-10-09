@@ -15,6 +15,7 @@ import {
   PopoverTrigger,
 } from '../../../components/popover';
 import { ConditionOperator } from '../filter-operator';
+import { useConditionEditor } from '../use-condition-editor';
 
 export type NumberComparisonCondition =
   | { operator: 'is' | 'isNot' | 'greaterThan' | 'lessThan'; value: number }
@@ -40,24 +41,26 @@ export function NumberComparisonFilter({
   lowerBound,
   upperBound,
 }: NumberComparisonFilterProps) {
-  const applied = value && 'value' in value ? value : null;
-  const [open, setOpen] = React.useState(false);
-  const [pending, setPending] = React.useState<
-    'is' | 'isNot' | 'greaterThan' | 'lessThan' | null
-  >(null);
   const [draft, setDraft] = React.useState('');
   const id = React.useId();
-  const addRef = React.useRef<HTMLButtonElement>(null);
-  const operatorRef = React.useRef<HTMLButtonElement>(null);
-  const restoreAdd = React.useRef(false);
-  const nextSnapshot = JSON.stringify([value, disabled]);
-  const [snapshot, setSnapshot] = React.useState(nextSnapshot);
-  // External replacements invalidate unfinished edits instead of committing stale drafts.
-  if (snapshot !== nextSnapshot) {
-    setSnapshot(nextSnapshot);
-    setOpen(false);
-    setPending(null);
-  }
+  const {
+    applied,
+    open,
+    pending,
+    changeOpen,
+    changeOperator,
+    commit,
+    openPending,
+    remove,
+    focusAdd,
+    operatorRef,
+    restoreFocus,
+  } = useConditionEditor({
+    value,
+    onChange,
+    disabled,
+    onOpen: (current) => setDraft(current ? String(current.value) : ''),
+  });
   const valid =
     draft.trim() !== '' &&
     Number.isFinite(Number(draft)) &&
@@ -67,65 +70,14 @@ export function NumberComparisonFilter({
     ? `${applied.value}${unit ? ` ${unit}` : ''}`
     : 'Choose…';
   const operator = pending ?? applied?.operator ?? 'greaterThan';
-
-  function changeOpen(next: boolean) {
-    if (disabled && next) return;
-    if (next) {
-      setDraft(applied ? String(applied.value) : '');
-    }
-    setOpen(next);
-    if (!next) setPending(null);
-  }
-  function changeOperator(next: NumberComparisonCondition['operator']) {
-    if (disabled) return;
-    if (next === 'isEmpty' || next === 'isNotEmpty') {
-      onChange({ operator: next });
-      return;
-    }
-    if (applied) {
-      onChange({ ...applied, operator: next });
-      return;
-    }
-    setPending(next);
-  }
-  function openPending(event: Event) {
-    if (!pending) return;
-    event.preventDefault();
-    changeOpen(true);
-  }
   function apply(event: React.FormEvent) {
     event.preventDefault();
     event.stopPropagation();
-    if (!valid || disabled) return;
-    onChange({ operator, value: Number(draft) });
-    setOpen(false);
-    setPending(null);
-  }
-  function remove() {
-    if (disabled) return;
-    restoreAdd.current = true;
-    setOpen(false);
-    setPending(null);
-    onChange(null);
-  }
-  function focusAdd(node: HTMLButtonElement | null) {
-    addRef.current = node;
-    if (node && restoreAdd.current) {
-      restoreAdd.current = false;
-      node.focus();
-    }
-  }
-  function restoreFocus(event: Event) {
-    if (!value) {
-      event.preventDefault();
-      addRef.current?.focus();
-    } else if (!applied) {
-      event.preventDefault();
-      operatorRef.current?.focus();
-    }
+    if (!valid) return;
+    commit({ operator, value: Number(draft) });
   }
   return (
-    <Popover open={open && !disabled} onOpenChange={changeOpen}>
+    <Popover open={open} onOpenChange={changeOpen}>
       {value ? (
         <FilterCondition className="nx:flex-wrap nx:gap-y-1">
           <div className="nx:inline-flex nx:max-w-full nx:min-w-0">

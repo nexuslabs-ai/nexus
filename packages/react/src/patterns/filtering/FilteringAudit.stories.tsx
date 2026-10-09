@@ -57,8 +57,8 @@ function Audit({ narrow = false }: { narrow?: boolean }) {
   });
   const [date, setDate] = React.useState<DateRangeCondition | null>({
     operator: 'between',
-    from: new Date(2026, 8, 1),
-    to: new Date(2026, 8, 20),
+    from: '2026-09-01',
+    to: '2026-09-20',
   });
   return (
     <div className="nx:grid nx:w-full nx:max-w-3xl nx:min-w-0 nx:gap-4">

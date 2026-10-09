@@ -1,3 +1,17 @@
+/**
+ * The meaning every evaluator of a rule follows — the blocks' conditions,
+ * FilterBuilder trees and the application's own queries:
+ *
+ * - Text comparisons (`is`, `isNot`, `contains`, `startsWith`, `isAnyOf`,
+ *   `isNoneOf`) ignore case.
+ * - Numbers compare numerically; dates compare as `YYYY-MM-DD` calendar days.
+ * - `between` includes both ends. `greaterThan`, `lessThan`, `before` and
+ *   `after` exclude the operand.
+ * - `isEmpty` matches a record with no value: missing, an empty string or an
+ *   empty list. `isNotEmpty` is its negation.
+ * - `isNot` and `isNoneOf` are the negations of `is` and `isAnyOf`, so they
+ *   also match records with no value.
+ */
 export type FilterOperator =
   | 'is'
   | 'isNot'
@@ -25,13 +39,26 @@ export type FilterField = {
   | { type: 'text' | 'number' | 'date' }
   | { type: 'choice'; options: readonly FilterOption[] }
 );
-export interface FilterRule {
-  kind: 'rule';
-  id: string;
-  field: string;
-  operator: FilterOperator;
-  value: string | string[];
-}
+type ValuelessOperator = 'isEmpty' | 'isNotEmpty';
+type ListOperator = 'isAnyOf' | 'isNoneOf';
+type FilterValue<Operator extends FilterOperator> =
+  Operator extends ValuelessOperator
+    ? ''
+    : Operator extends ListOperator
+      ? string[]
+      : Operator extends 'between'
+        ? [string, string]
+        : string;
+/** Numeric and date operands stay strings, so a rule can hold an unfinished draft. */
+export type FilterRule = {
+  [Operator in FilterOperator]: {
+    kind: 'rule';
+    id: string;
+    field: string;
+    operator: Operator;
+    value: FilterValue<Operator>;
+  };
+}[FilterOperator];
 export interface FilterGroup {
   kind: 'group';
   id: string;
@@ -103,13 +130,52 @@ export function getFilterOperators(
     ? compatible.filter((operator) => field.operators?.includes(operator))
     : compatible;
 }
-export function isValuelessOperator(operator: FilterOperator) {
+export function isValuelessOperator(
+  operator: FilterOperator
+): operator is ValuelessOperator {
   return operator === 'isEmpty' || operator === 'isNotEmpty';
 }
-export function emptyFilterValue(operator: FilterOperator): string | string[] {
-  if (operator === 'between') return ['', ''];
-  if (operator === 'isAnyOf' || operator === 'isNoneOf') return [];
-  return '';
+function isListOperator(operator: FilterOperator): operator is ListOperator {
+  return operator === 'isAnyOf' || operator === 'isNoneOf';
+}
+export function emptyFilterRule(
+  id: string,
+  field: string,
+  operator: FilterOperator
+): FilterRule {
+  const rule = { kind: 'rule', id, field } as const;
+  if (isValuelessOperator(operator)) return { ...rule, operator, value: '' };
+  if (isListOperator(operator)) return { ...rule, operator, value: [] };
+  if (operator === 'between') return { ...rule, operator, value: ['', ''] };
+  return { ...rule, operator, value: '' };
+}
+/** Keeps the value when the new operator takes the same shape of value; otherwise starts empty. */
+export function changeFilterOperator(
+  rule: FilterRule,
+  operator: FilterOperator
+): FilterRule {
+  const next = { kind: 'rule', id: rule.id, field: rule.field } as const;
+  if (isValuelessOperator(operator)) return { ...next, operator, value: '' };
+  if (isListOperator(operator))
+    return {
+      ...next,
+      operator,
+      value:
+        rule.operator === 'isAnyOf' || rule.operator === 'isNoneOf'
+          ? rule.value
+          : [],
+    };
+  if (operator === 'between')
+    return {
+      ...next,
+      operator,
+      value: rule.operator === 'between' ? rule.value : ['', ''],
+    };
+  return {
+    ...next,
+    operator,
+    value: typeof rule.value === 'string' ? rule.value : '',
+  };
 }
 function validDate(value: string) {
   if (!/^\d{4}-\d{2}-\d{2}$/.test(value) || value.startsWith('0000'))
@@ -130,7 +196,7 @@ export function getFilterRuleError(
     return 'unknownOperator';
   if (isValuelessOperator(rule.operator))
     return rule.value === '' ? undefined : 'unexpectedValue';
-  const multiple = rule.operator === 'isAnyOf' || rule.operator === 'isNoneOf';
+  const multiple = isListOperator(rule.operator);
   const range = rule.operator === 'between';
   if ((multiple || range) !== Array.isArray(rule.value)) return 'valueShape';
   const values = Array.isArray(rule.value) ? rule.value : [rule.value];

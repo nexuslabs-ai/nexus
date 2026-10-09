@@ -14,9 +14,11 @@ import {
   PopoverTrigger,
 } from '../../../components/popover';
 import { ConditionOperator } from '../filter-operator';
+import { useConditionEditor } from '../use-condition-editor';
 
+/** `from` and `to` are calendar days (`YYYY-MM-DD`), so JSON and URLs keep the same day in every timezone. */
 export type DateRangeCondition =
-  | { operator: 'between'; from: Date; to: Date }
+  | { operator: 'between'; from: string; to: string }
   | { operator: 'isEmpty' | 'isNotEmpty' };
 export type DateRangeFilterProps = {
   label: string;
@@ -27,6 +29,16 @@ export type DateRangeFilterProps = {
   today?: Date;
 };
 
+export function toCalendarDay(date: Date) {
+  const month = String(date.getMonth() + 1).padStart(2, '0');
+  const day = String(date.getDate()).padStart(2, '0');
+  return `${date.getFullYear()}-${month}-${day}`;
+}
+function fromCalendarDay(day: string) {
+  const [year = 0, month = 1, date = 1] = day.split('-').map(Number);
+  return new Date(year, month - 1, date);
+}
+
 export function DateRangeFilter({
   label,
   icon,
@@ -35,36 +47,40 @@ export function DateRangeFilter({
   disabled = false,
   today = new Date(),
 }: DateRangeFilterProps) {
-  const applied = value && 'from' in value ? value : null;
-  const [open, setOpen] = React.useState(false);
-  const [pending, setPending] = React.useState<'between' | null>(null);
   const [draft, setDraft] = React.useState<
     { from: Date | undefined; to?: Date } | undefined
   >();
-
-  const addRef = React.useRef<HTMLButtonElement>(null);
-  const operatorRef = React.useRef<HTMLButtonElement>(null);
-  const restoreAdd = React.useRef(false);
-  const nextSnapshot = JSON.stringify([value, disabled]);
-  const [snapshot, setSnapshot] = React.useState(nextSnapshot);
-  // External replacements invalidate unfinished edits instead of committing stale drafts.
-  if (snapshot !== nextSnapshot) {
-    setSnapshot(nextSnapshot);
-    setOpen(false);
-    setPending(null);
-  }
-  const [month, setMonth] = React.useState(applied?.from ?? today);
-  const valid = Boolean(
-    draft?.from &&
-    draft.to &&
-    Number.isFinite(draft.from.getTime()) &&
-    Number.isFinite(draft.to.getTime()) &&
-    draft.from <= draft.to
+  const {
+    applied,
+    open,
+    pending,
+    changeOpen,
+    changeOperator,
+    commit,
+    openPending,
+    remove,
+    focusAdd,
+    operatorRef,
+    restoreFocus,
+  } = useConditionEditor({ value, onChange, disabled, onOpen: seedDraft });
+  const [month, setMonth] = React.useState(
+    applied ? fromCalendarDay(applied.from) : today
   );
+  const valid = Boolean(draft?.from && draft.to && draft.from <= draft.to);
   const summary = applied
-    ? `${applied.from.toLocaleDateString()} – ${applied.to.toLocaleDateString()}`
+    ? `${fromCalendarDay(applied.from).toLocaleDateString()} – ${fromCalendarDay(applied.to).toLocaleDateString()}`
     : 'Choose…';
-  const operator = pending ?? applied?.operator ?? 'between';
+  function seedDraft(current: { from: string; to: string } | null) {
+    setMonth(current ? fromCalendarDay(current.from) : today);
+    setDraft(
+      current
+        ? {
+            from: fromCalendarDay(current.from),
+            to: fromCalendarDay(current.to),
+          }
+        : undefined
+    );
+  }
   function preset(days: number) {
     const to = new Date(today.getFullYear(), today.getMonth(), today.getDate());
     const from = new Date(to);
@@ -72,73 +88,18 @@ export function DateRangeFilter({
     setDraft({ from, to });
     setMonth(from);
   }
-  function changeOpen(next: boolean) {
-    if (disabled && next) return;
-    if (next) {
-      setMonth(applied?.from ?? today);
-      setDraft(
-        applied
-          ? { from: new Date(applied.from), to: new Date(applied.to) }
-          : undefined
-      );
-    }
-    setOpen(next);
-    if (!next) setPending(null);
-  }
-  function changeOperator(next: DateRangeCondition['operator']) {
-    if (disabled) return;
-    if (next === 'isEmpty' || next === 'isNotEmpty') {
-      onChange({ operator: next });
-      return;
-    }
-    if (applied) {
-      onChange({ ...applied, operator: next });
-      return;
-    }
-    setPending(next);
-  }
-  function openPending(event: Event) {
-    if (!pending) return;
-    event.preventDefault();
-    changeOpen(true);
-  }
   function apply(event: React.FormEvent) {
     event.preventDefault();
     event.stopPropagation();
-    if (!valid || disabled || !draft?.from || !draft.to) return;
-    onChange({
-      operator,
-      from: new Date(draft.from),
-      to: new Date(draft.to),
+    if (!valid || !draft?.from || !draft.to) return;
+    commit({
+      operator: 'between',
+      from: toCalendarDay(draft.from),
+      to: toCalendarDay(draft.to),
     });
-    setOpen(false);
-    setPending(null);
-  }
-  function remove() {
-    if (disabled) return;
-    restoreAdd.current = true;
-    setOpen(false);
-    setPending(null);
-    onChange(null);
-  }
-  function focusAdd(node: HTMLButtonElement | null) {
-    addRef.current = node;
-    if (node && restoreAdd.current) {
-      restoreAdd.current = false;
-      node.focus();
-    }
-  }
-  function restoreFocus(event: Event) {
-    if (!value) {
-      event.preventDefault();
-      addRef.current?.focus();
-    } else if (!applied) {
-      event.preventDefault();
-      operatorRef.current?.focus();
-    }
   }
   return (
-    <Popover open={open && !disabled} onOpenChange={changeOpen}>
+    <Popover open={open} onOpenChange={changeOpen}>
       {value ? (
         <FilterCondition className="nx:flex-wrap nx:gap-y-1">
           <div className="nx:inline-flex nx:max-w-full nx:min-w-0">

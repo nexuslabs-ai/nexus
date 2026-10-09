@@ -137,9 +137,7 @@ export const DateRange: Story = {
     await userEvent.click(page.getByRole('button', { name: 'Today' }));
     await expect(page.getByRole('dialog')).toBeVisible();
     await userEvent.click(page.getByRole('button', { name: 'Apply' }));
-    await expect(canvas.getByRole('status')).toHaveTextContent(
-      new Date(2026, 8, 25).toLocaleDateString()
-    );
+    await expect(canvas.getByRole('status')).toHaveTextContent('2026-09-25');
     await waitFor(() =>
       expect(page.queryByRole('dialog')).not.toBeInTheDocument()
     );
@@ -171,7 +169,7 @@ export const CustomDateRange: Story = {
     await expect(canvas.getByRole('status')).toHaveTextContent('Any date');
     await userEvent.click(page.getByRole('button', { name: 'Apply' }));
     await expect(canvas.getByRole('status')).toHaveTextContent(
-      `${new Date(2026, 8, 8).toLocaleDateString()} – ${new Date(2026, 8, 10).toLocaleDateString()}`
+      '2026-09-08 – 2026-09-10'
     );
     await waitFor(() =>
       expect(
@@ -252,7 +250,7 @@ export const DatePresetDraft: Story = {
     await userEvent.click(page.getByRole('button', { name: 'Today' }));
     await userEvent.click(page.getByRole('button', { name: 'Cancel' }));
     await expect(canvas.getByRole('status')).toHaveTextContent(
-      `${new Date(2026, 8, 26).toLocaleDateString()} – ${new Date(2026, 9, 2).toLocaleDateString()}`
+      '2026-09-26 – 2026-10-02'
     );
     await userEvent.click(
       canvas.getByRole('button', { name: /^Edit Created:/ })
@@ -260,7 +258,7 @@ export const DatePresetDraft: Story = {
     await userEvent.click(page.getByRole('button', { name: 'Today' }));
     await userEvent.click(page.getByRole('button', { name: 'Apply' }));
     await expect(canvas.getByRole('status')).toHaveTextContent(
-      `${new Date(2026, 9, 2).toLocaleDateString()} – ${new Date(2026, 9, 2).toLocaleDateString()}`
+      '2026-10-02 – 2026-10-02'
     );
     await userEvent.click(
       canvas.getByRole('button', { name: /^Edit Created:/ })
@@ -268,7 +266,7 @@ export const DatePresetDraft: Story = {
     await userEvent.click(page.getByRole('button', { name: 'Last 7 days' }));
     await userEvent.click(page.getByRole('button', { name: 'Apply' }));
     await expect(canvas.getByRole('status')).toHaveTextContent(
-      `${new Date(2026, 8, 26).toLocaleDateString()} – ${new Date(2026, 9, 2).toLocaleDateString()}`
+      '2026-09-26 – 2026-10-02'
     );
   },
 };

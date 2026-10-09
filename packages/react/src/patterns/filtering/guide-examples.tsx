@@ -34,8 +34,8 @@ export const convertedRules = [
   }),
   dateRangeRule('joined-rule', 'joined', {
     operator: 'between',
-    from: new Date(2026, 8, 1),
-    to: new Date(2026, 8, 30),
+    from: '2026-09-01',
+    to: '2026-09-30',
   }),
 ].filter((rule) => rule !== null);
 export function ConvertedRules() {

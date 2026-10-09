@@ -1,7 +1,8 @@
 import * as React from 'react';
 
 import {
-  emptyFilterValue,
+  changeFilterOperator,
+  emptyFilterRule,
   type FilterErrorCode,
   type FilterField,
   type FilterGroup,
@@ -256,60 +257,49 @@ function RuleValue({
 }: {
   field: FilterField;
   rule: FilterRule;
-  onValueChange: (value: string | string[]) => void;
+  onValueChange: (rule: FilterRule) => void;
   disabled?: boolean;
   errorId?: string;
   invalid: boolean;
 }) {
-  if (isValuelessOperator(rule.operator))
+  if (rule.operator === 'isEmpty' || rule.operator === 'isNotEmpty')
     return (
       <span className="nx:self-center nx:typography-body-small nx:text-muted-foreground">
         No value needed
       </span>
     );
-  if (field.type === 'choice') {
-    if (rule.operator === 'isAnyOf' || rule.operator === 'isNoneOf')
-      return (
-        <MultipleValues
-          field={field}
-          value={Array.isArray(rule.value) ? rule.value : []}
-          onValueChange={onValueChange}
-          disabled={disabled}
-          invalid={invalid}
-          describedBy={errorId}
-        />
-      );
+  if (rule.operator === 'isAnyOf' || rule.operator === 'isNoneOf') {
+    if (field.type !== 'choice') return null;
     return (
-      <Picker
-        className="nx:w-full nx:bg-container"
-        label={`${field.label} value`}
-        options={field.options}
-        value={typeof rule.value === 'string' ? rule.value : ''}
-        onValueChange={onValueChange}
+      <MultipleValues
+        field={field}
+        value={rule.value}
+        onValueChange={(value) => onValueChange({ ...rule, value })}
         disabled={disabled}
         invalid={invalid}
         describedBy={errorId}
       />
     );
   }
-  const type = field.type;
   if (rule.operator === 'between') {
-    const values = Array.isArray(rule.value) ? rule.value : ['', ''];
+    if (field.type === 'choice') return null;
+    const range = rule;
+    const [start, end] = range.value;
     function changeStart(event: React.ChangeEvent<HTMLInputElement>) {
-      onValueChange([event.target.value, values[1] ?? '']);
+      onValueChange({ ...range, value: [event.target.value, end] });
     }
     function changeEnd(event: React.ChangeEvent<HTMLInputElement>) {
-      onValueChange([values[0] ?? '', event.target.value]);
+      onValueChange({ ...range, value: [start, event.target.value] });
     }
     return (
       <div className="nx:flex nx:min-w-0 nx:max-w-full nx:flex-wrap nx:items-center nx:gap-2 nx:@lg/rule:flex-nowrap nx:@lg/rule:gap-0 nx:@lg/rule:[&>input]:flex-1 nx:@lg/rule:[&>input:first-child]:rounded-e-none">
         <Input
           size="sm"
-          type={type}
-          step={type === 'number' ? 'any' : undefined}
+          type={field.type}
+          step={field.type === 'number' ? 'any' : undefined}
           aria-label={`${field.label} start`}
           placeholder="From"
-          value={values[0] ?? ''}
+          value={start}
           onChange={changeStart}
           disabled={disabled}
           aria-invalid={invalid}
@@ -318,11 +308,11 @@ function RuleValue({
         />
         <Input
           size="sm"
-          type={type}
-          step={type === 'number' ? 'any' : undefined}
+          type={field.type}
+          step={field.type === 'number' ? 'any' : undefined}
           aria-label={`${field.label} end`}
           placeholder="To"
-          value={values[1] ?? ''}
+          value={end}
           onChange={changeEnd}
           disabled={disabled}
           aria-invalid={invalid}
@@ -332,15 +322,30 @@ function RuleValue({
       </div>
     );
   }
+  if (field.type === 'choice')
+    return (
+      <Picker
+        className="nx:w-full nx:bg-container"
+        label={`${field.label} value`}
+        options={field.options}
+        value={rule.value}
+        onValueChange={(value) => onValueChange({ ...rule, value })}
+        disabled={disabled}
+        invalid={invalid}
+        describedBy={errorId}
+      />
+    );
   return (
     <Input
       size="sm"
-      type={type}
-      step={type === 'number' ? 'any' : undefined}
+      type={field.type}
+      step={field.type === 'number' ? 'any' : undefined}
       aria-label={`${field.label} value`}
-      placeholder={type === 'date' ? undefined : 'Enter a value…'}
-      value={typeof rule.value === 'string' ? rule.value : ''}
-      onChange={(event) => onValueChange(event.target.value)}
+      placeholder={field.type === 'date' ? undefined : 'Enter a value…'}
+      value={rule.value}
+      onChange={(event) =>
+        onValueChange({ ...rule, value: event.target.value })
+      }
       disabled={disabled}
       aria-invalid={invalid}
       aria-describedby={errorId}
@@ -375,28 +380,10 @@ function FilterRuleEditor({
     if (!nextField) return;
     const operator = getFilterOperators(nextField)[0];
     if (!operator) return;
-    onValueChange({
-      ...value,
-      field: fieldId,
-      operator,
-      value: emptyFilterValue(operator),
-    });
+    onValueChange(emptyFilterRule(value.id, fieldId, operator));
   }
   function changeOperator(operator: FilterOperator) {
-    const empty = emptyFilterValue(operator);
-    const previousEmpty = emptyFilterValue(value.operator);
-    const sameShape =
-      Array.isArray(empty) === Array.isArray(previousEmpty) &&
-      (!Array.isArray(empty) || empty.length === previousEmpty.length);
-    const keepValue =
-      sameShape &&
-      !isValuelessOperator(operator) &&
-      !isValuelessOperator(value.operator);
-    onValueChange({
-      ...value,
-      operator,
-      value: keepValue ? value.value : empty,
-    });
+    onValueChange(changeFilterOperator(value, operator));
   }
   return (
     <div
@@ -441,9 +428,7 @@ function FilterRuleEditor({
               <RuleValue
                 field={field}
                 rule={value}
-                onValueChange={(next) =>
-                  onValueChange({ ...value, value: next })
-                }
+                onValueChange={onValueChange}
                 disabled={disabled}
                 errorId={error ? errorId : undefined}
                 invalid={!!error}
@@ -507,13 +492,7 @@ function GroupEditor({
     const operator = firstField
       ? (getFilterOperators(firstField)[0] ?? 'is')
       : 'is';
-    return {
-      kind: 'rule',
-      id: createId('rule'),
-      field: firstField?.id ?? '',
-      operator,
-      value: emptyFilterValue(operator),
-    };
+    return emptyFilterRule(createId('rule'), firstField?.id ?? '', operator);
   }
   function addRule() {
     const rule = newRule();
