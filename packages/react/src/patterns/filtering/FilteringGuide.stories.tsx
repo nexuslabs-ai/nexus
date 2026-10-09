@@ -281,10 +281,10 @@ function FilteringGuide() {
         </p>
         <p>
           Blocks live in <code>packages/react/src/blocks</code>; this pattern
-          lives in <code>packages/react/src/patterns/filtering</code>. Its
-          README lists the exact files, dependencies and integration inputs.
-          Stories retain the loading, retry, URL and keyboard checks as internal
-          verification, rather than separate pattern categories.
+          lives in <code>packages/react/src/patterns/filtering</code>. The page
+          for each block lists the exact files it needs. Stories retain the
+          loading, retry, URL and keyboard checks as internal verification,
+          rather than separate pattern categories.
         </p>
         <p className="nx:text-muted-foreground">
           These examples use local demonstration data. The blocks and examples
