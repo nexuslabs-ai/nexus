@@ -167,6 +167,7 @@ const meta = {
 export default meta;
 type Story = StoryObj<typeof meta>;
 export const Default: Story = {
+  tags: ['docs'],
   play: async ({ args, canvasElement }) => {
     const canvas = within(canvasElement),
       page = within(canvasElement.ownerDocument.body);

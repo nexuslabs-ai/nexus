@@ -38,7 +38,6 @@ export * from './components/field';
 export * from './components/filter-builder';
 export * from './components/filter-chip';
 export * from './components/filter-condition';
-export * from './components/filter-model';
 export * from './components/hide';
 export * from './components/hover-card';
 export * from './components/input';
