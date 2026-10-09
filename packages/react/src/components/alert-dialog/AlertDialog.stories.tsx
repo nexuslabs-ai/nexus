@@ -613,6 +613,51 @@ export const WithDataAttributes: Story = {
   },
 };
 
+export const DisabledActions: Story = {
+  tags: ['!autodocs', '!dev'],
+  render: (_args) => (
+    <AlertDialog defaultOpen>
+      <AlertDialogContent>
+        <AlertDialogHeader>
+          <AlertDialogTitle>Delete project?</AlertDialogTitle>
+          <AlertDialogDescription>
+            Deleting is unavailable while the export runs.
+          </AlertDialogDescription>
+        </AlertDialogHeader>
+        <AlertDialogFooter>
+          <AlertDialogCancel disabled>Cancel</AlertDialogCancel>
+          <AlertDialogAction variant="destructive" disabled>
+            Delete
+          </AlertDialogAction>
+        </AlertDialogFooter>
+      </AlertDialogContent>
+    </AlertDialog>
+  ),
+  play: async () => {
+    const dialog = await within(document.body).findByRole('alertdialog');
+    const probe = document.createElement('span');
+    probe.className =
+      'nx:bg-disabled nx:text-disabled-foreground nx:border-border-disabled';
+    dialog.append(probe);
+    const disabled = getComputedStyle(probe);
+
+    for (const name of ['Cancel', 'Delete']) {
+      const control = within(dialog).getByRole('button', { name });
+      await expect(control).toBeDisabled();
+      await expect(control).toHaveAttribute('aria-disabled', 'true');
+      await expect(control).toHaveAttribute('data-disabled', 'true');
+      const style = getComputedStyle(control);
+      await expect(style.backgroundColor).toBe(disabled.backgroundColor);
+      await expect(style.color).toBe(disabled.color);
+    }
+    await expect(
+      getComputedStyle(within(dialog).getByRole('button', { name: 'Cancel' }))
+        .borderColor
+    ).toBe(disabled.borderColor);
+    probe.remove();
+  },
+};
+
 // ============================================
 // ALL VARIANTS GRID
 // ============================================
