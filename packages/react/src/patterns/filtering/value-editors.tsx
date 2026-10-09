@@ -9,26 +9,31 @@ import {
   IconUsers,
 } from '@tabler/icons-react';
 
-import { filterOperatorLabels } from '../../lib/filter-model';
-
-import { type ChoiceCondition, ChoiceFilter } from './blocks/choice-filter';
+import {
+  type ChoiceCondition,
+  ChoiceFilter,
+} from '../../blocks/choice-filter/choice-filter';
 import {
   type DateRangeCondition,
   DateRangeFilter,
-} from './blocks/date-range-filter';
+} from '../../blocks/date-range-filter/date-range-filter';
 import {
   type MultiChoiceCondition,
   MultiChoiceFilter,
-} from './blocks/multi-choice-filter';
+} from '../../blocks/multi-choice-filter/multi-choice-filter';
 import {
   type NumberComparisonCondition,
   NumberComparisonFilter,
-} from './blocks/number-comparison-filter';
+} from '../../blocks/number-comparison-filter/number-comparison-filter';
 import {
   type NumberRangeCondition,
   NumberRangeFilter,
-} from './blocks/number-range-filter';
-import { type TextCondition, TextFilter } from './blocks/text-filter';
+} from '../../blocks/number-range-filter/number-range-filter';
+import {
+  type TextCondition,
+  TextFilter,
+} from '../../blocks/text-filter/text-filter';
+import { filterOperatorLabels } from '../../lib/filter-model';
 
 function Example({
   title,

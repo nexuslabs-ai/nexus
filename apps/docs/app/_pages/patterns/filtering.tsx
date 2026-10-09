@@ -15,10 +15,10 @@ import {
 
 /**
  * Patterns → Filtering. Server component — the browse → add → choose → see
- * matches → edit/remove flow, with the recipe examples as client islands.
+ * matches → edit/remove flow, with the pattern's examples as client islands.
  * Block source lives on each block's page, not here.
  *
- * Source: packages/react/src/recipes/filtering/.
+ * Source: packages/react/src/patterns/filtering/.
  */
 
 const BLOCKS: { slug: string; name: string; summary: string }[] = [
@@ -264,7 +264,7 @@ export default function Filtering() {
         </ul>
         <p className={BODY_CLASS}>
           Wrap the controls and your Add/Clear actions in AppliedFilters (
-          <InlineCode>recipes/filtering/blocks/applied-filters.tsx</InlineCode>
+          <InlineCode>blocks/applied-filters/applied-filters.tsx</InlineCode>
           ). It owns layout, not query state.
         </p>
         <p className={BODY_CLASS}>
@@ -275,7 +275,7 @@ export default function Filtering() {
           Back or Forward.
         </p>
         <p className="nx:typography-body-default nx:text-muted-foreground nx:max-w-[64ch]">
-          These examples use local demonstration data. The recipes remain
+          These examples use local demonstration data. The blocks remain
           experimental: block contracts and interaction checks support developer
           handoff; production adoption is separate evidence.
         </p>

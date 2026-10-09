@@ -8,6 +8,19 @@ import {
   IconUsers,
 } from '@tabler/icons-react';
 
+import { AppliedFilters } from '../../blocks/applied-filters/applied-filters';
+import {
+  type ChoiceCondition,
+  ChoiceFilter,
+} from '../../blocks/choice-filter/choice-filter';
+import {
+  type NumberComparisonCondition,
+  NumberComparisonFilter,
+} from '../../blocks/number-comparison-filter/number-comparison-filter';
+import {
+  type NumberRangeCondition,
+  NumberRangeFilter,
+} from '../../blocks/number-range-filter/number-range-filter';
 import { Button } from '../../components/button';
 import {
   Card,
@@ -28,16 +41,6 @@ import {
   TableRow,
 } from '../../components/table';
 
-import { AppliedFilters } from './blocks/applied-filters';
-import { type ChoiceCondition, ChoiceFilter } from './blocks/choice-filter';
-import {
-  type NumberComparisonCondition,
-  NumberComparisonFilter,
-} from './blocks/number-comparison-filter';
-import {
-  type NumberRangeCondition,
-  NumberRangeFilter,
-} from './blocks/number-range-filter';
 import { matchesChoice, Results } from './local-results';
 import { files, members, templates } from './quick-fixtures';
 

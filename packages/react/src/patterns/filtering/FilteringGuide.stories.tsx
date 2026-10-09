@@ -2,17 +2,18 @@ import { Canvas, Source, Title } from '@storybook/addon-docs/blocks';
 import type { Meta, StoryObj } from '@storybook/react';
 import { expect, userEvent, waitFor, within } from 'storybook/test';
 
+import rowSource from '../../blocks/applied-filters/applied-filters.tsx?raw';
+import choiceSource from '../../blocks/choice-filter/choice-filter.tsx?raw';
+import dateSource from '../../blocks/date-range-filter/date-range-filter.tsx?raw';
+import operatorSource from '../../blocks/filter-operator/filter-operator.tsx?raw';
+import multiSource from '../../blocks/multi-choice-filter/multi-choice-filter.tsx?raw';
+import comparisonSource from '../../blocks/number-comparison-filter/number-comparison-filter.tsx?raw';
+import rangeSource from '../../blocks/number-range-filter/number-range-filter.tsx?raw';
+import textSource from '../../blocks/text-filter/text-filter.tsx?raw';
+
 import { AdvancedFiltering } from './advanced-filters';
 import { AppliedFiltersExample } from './applied-filters-example';
 import appliedExampleSource from './applied-filters-example.tsx?raw';
-import rowSource from './blocks/applied-filters.tsx?raw';
-import choiceSource from './blocks/choice-filter.tsx?raw';
-import dateSource from './blocks/date-range-filter.tsx?raw';
-import multiSource from './blocks/multi-choice-filter.tsx?raw';
-import comparisonSource from './blocks/number-comparison-filter.tsx?raw';
-import rangeSource from './blocks/number-range-filter.tsx?raw';
-import textSource from './blocks/text-filter.tsx?raw';
-import operatorSource from './filter-operator.tsx?raw';
 import { InvoiceFilteringExample } from './invoice-filtering';
 import invoiceSource from './invoice-filtering.tsx?raw';
 import { TeamDirectory } from './team-directory';
@@ -250,7 +251,7 @@ function FilteringGuide() {
           </ul>
           <p>
             The six value-type examples above use these blocks. Copy their
-            source from <code>recipes/filtering/blocks</code> together with the
+            source from <code>packages/react/src/blocks</code> together with the
             component folders they import. Each edit emits a complete condition.
             A removed condition is null.
           </p>
@@ -270,16 +271,16 @@ function FilteringGuide() {
           Back or Forward.
         </p>
         <p>
-          Copyable source lives in{' '}
-          <code>packages/react/src/recipes/filtering</code>. Its README lists
-          the exact files, dependencies and integration inputs. Stories retain
-          the loading, retry, URL and keyboard checks as internal verification,
-          rather than separate pattern categories.
+          Blocks live in <code>packages/react/src/blocks</code>; this pattern
+          lives in <code>packages/react/src/patterns/filtering</code>. Its
+          README lists the exact files, dependencies and integration inputs.
+          Stories retain the loading, retry, URL and keyboard checks as internal
+          verification, rather than separate pattern categories.
         </p>
         <p className="nx:text-muted-foreground">
-          These examples use local demonstration data. The recipes remain
-          experimental. Block contracts and interaction checks support developer
-          handoff; production adoption is separate evidence.
+          These examples use local demonstration data. The blocks and examples
+          remain experimental. Block contracts and interaction checks support
+          developer handoff; production adoption is separate evidence.
         </p>
       </section>
     </article>
@@ -293,38 +294,44 @@ function BlockSource() {
       </summary>
       <p className="nx:my-3">
         Copy only what you need. All six filter blocks require the shared
-        filter-operator.tsx file. AppliedFilters stands alone. Preserve the
-        blocks folder or update relative imports. Include copied files in your
-        Tailwind source scan.
+        blocks/filter-operator/filter-operator.tsx file. AppliedFilters stands
+        alone. Preserve the blocks folder or update relative imports. Include
+        copied files in your Tailwind source scan.
       </p>
       <h3 className="nx:typography-label-default">
         applied-filters-example.tsx
       </h3>
       <Source code={appliedExampleSource} language="tsx" />
-      <h3 className="nx:typography-label-default">blocks/choice-filter.tsx</h3>
+      <h3 className="nx:typography-label-default">
+        blocks/choice-filter/choice-filter.tsx
+      </h3>
       <Source code={choiceSource} language="tsx" />
       <h3 className="nx:typography-label-default">
-        blocks/number-range-filter.tsx
+        blocks/number-range-filter/number-range-filter.tsx
       </h3>
       <Source code={rangeSource} language="tsx" />
       <h3 className="nx:typography-label-default">
-        blocks/multi-choice-filter.tsx
+        blocks/multi-choice-filter/multi-choice-filter.tsx
       </h3>
       <Source code={multiSource} language="tsx" />
       <h3 className="nx:typography-label-default">
-        blocks/date-range-filter.tsx
+        blocks/date-range-filter/date-range-filter.tsx
       </h3>
       <Source code={dateSource} language="tsx" />
-      <h3 className="nx:typography-label-default">blocks/text-filter.tsx</h3>
+      <h3 className="nx:typography-label-default">
+        blocks/text-filter/text-filter.tsx
+      </h3>
       <Source code={textSource} language="tsx" />
       <h3 className="nx:typography-label-default">
-        blocks/number-comparison-filter.tsx
+        blocks/number-comparison-filter/number-comparison-filter.tsx
       </h3>
       <Source code={comparisonSource} language="tsx" />
-      <h3 className="nx:typography-label-default">filter-operator.tsx</h3>
+      <h3 className="nx:typography-label-default">
+        blocks/filter-operator/filter-operator.tsx
+      </h3>
       <Source code={operatorSource} language="tsx" />
       <h3 className="nx:typography-label-default">
-        blocks/applied-filters.tsx
+        blocks/applied-filters/applied-filters.tsx
       </h3>
       <Source code={rowSource} language="tsx" />
     </details>
@@ -351,11 +358,12 @@ const meta = {
             <summary>Copy team directory and connect your data</summary>
             <p>
               Copy team-directory.tsx, quick-fixtures.ts,
-              blocks/choice-filter.tsx, blocks/applied-filters.tsx and
-              filter-operator.tsx. Replace members with your records. Status,
-              team and query are applied state; connect them to your query
-              instead of the local results predicate. Handle loading and request
-              errors in your application.
+              blocks/choice-filter/choice-filter.tsx,
+              blocks/applied-filters/applied-filters.tsx and
+              blocks/filter-operator/filter-operator.tsx. Replace members with
+              your records. Status, team and query are applied state; connect
+              them to your query instead of the local results predicate. Handle
+              loading and request errors in your application.
             </p>
             <Source code={teamSource} language="tsx" />
           </details>
@@ -370,11 +378,13 @@ const meta = {
           <details>
             <summary>Copy invoice list and connect your data</summary>
             <p>
-              Copy invoice-filtering.tsx, blocks/multi-choice-filter.tsx and
-              filter-operator.tsx. Replace invoices with your records. Each
-              editor keeps a draft; submit commits it to filters. Connect
-              filters and search to your query. Escape or outside click discards
-              the draft. Empty selections mean no restriction.
+              Copy invoice-filtering.tsx,
+              blocks/multi-choice-filter/multi-choice-filter.tsx and
+              blocks/filter-operator/filter-operator.tsx. Replace invoices with
+              your records. Each editor keeps a draft; submit commits it to
+              filters. Connect filters and search to your query. Escape or
+              outside click discards the draft. Empty selections mean no
+              restriction.
             </p>
             <Source code={invoiceSource} language="tsx" />
           </details>

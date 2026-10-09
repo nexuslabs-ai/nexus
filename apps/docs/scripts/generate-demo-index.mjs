@@ -100,7 +100,7 @@ export interface ComponentDocs {
 export interface BlockDocs {
   /** The block's one story tagged \`docs\`. */
   preview: DemoId;
-  /** Files to copy, by path under \`packages/react/src/\`: the block first, then the recipe files it imports. */
+  /** Files to copy, by path under \`packages/react/src/\`: the block first, then the helper files it imports. */
   files: readonly string[];
   /** Component folders those files import, each installed from its own page. */
   components: readonly string[];
@@ -140,7 +140,7 @@ export function getBlockDocs(slug: string): BlockDocs {
   const docs = Object.hasOwn(blockDocs, slug) ? blockDocs[slug] : undefined;
   if (!docs) {
     throw new Error(
-      \`No block docs for \${slug} — there is no recipes/{recipe}/blocks/\${slug}.tsx with stories. Run \\\`pnpm --filter @nexus_ds/docs generate:demos\\\`.\`
+      \`No block docs for \${slug} — there is no blocks/\${slug}/ folder with stories. Run \\\`pnpm --filter @nexus_ds/docs generate:demos\\\`.\`
     );
   }
 

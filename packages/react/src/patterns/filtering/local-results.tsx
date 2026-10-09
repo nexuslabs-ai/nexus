@@ -1,4 +1,4 @@
-import type { ChoiceCondition } from './blocks/choice-filter';
+import type { ChoiceCondition } from '../../blocks/choice-filter/choice-filter';
 
 // Local-data stand-ins for the application's query and result count.
 export function matchesChoice(

@@ -2,6 +2,11 @@ import * as React from 'react';
 
 import { IconList, IconUsers } from '@tabler/icons-react';
 
+import { AppliedFilters } from '../../blocks/applied-filters/applied-filters';
+import {
+  type ChoiceCondition,
+  ChoiceFilter,
+} from '../../blocks/choice-filter/choice-filter';
 import { Button } from '../../components/button';
 import { Input } from '../../components/input';
 import { Label } from '../../components/label';
@@ -15,8 +20,6 @@ import {
   TableRow,
 } from '../../components/table';
 
-import { AppliedFilters } from './blocks/applied-filters';
-import { type ChoiceCondition, ChoiceFilter } from './blocks/choice-filter';
 import { matchesChoice, Results } from './local-results';
 import { members } from './quick-fixtures';
 

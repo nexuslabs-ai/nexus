@@ -3,14 +3,16 @@ import * as React from 'react';
 import type { Meta, StoryObj } from '@storybook/react';
 import { expect, userEvent, waitFor, within } from 'storybook/test';
 
-import { Button } from '../../../components/button';
-
-import { AppliedFilters } from './applied-filters';
-import { type ChoiceCondition, ChoiceFilter } from './choice-filter';
+import { AppliedFilters } from '../../blocks/applied-filters/applied-filters';
+import {
+  type ChoiceCondition,
+  ChoiceFilter,
+} from '../../blocks/choice-filter/choice-filter';
 import {
   type NumberRangeCondition,
   NumberRangeFilter,
-} from './number-range-filter';
+} from '../../blocks/number-range-filter/number-range-filter';
+import { Button } from '../../components/button';
 
 function ContractHarness({
   disabled = false,

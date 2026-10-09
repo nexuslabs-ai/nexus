@@ -1,51 +1,51 @@
 import * as React from 'react';
 
-import { Button } from '../../../components/button';
-import { DatePicker } from '../../../components/date-picker';
+import { Button } from '../../components/button';
+import { Checkbox } from '../../components/checkbox';
+import { ChoiceRow } from '../../components/choice-row';
 import {
   FilterCondition,
   FilterConditionField,
   FilterConditionRemove,
   FilterConditionSegment,
-} from '../../../components/filter-condition';
+} from '../../components/filter-condition';
 import {
   Popover,
   PopoverContent,
   PopoverTrigger,
-} from '../../../components/popover';
-import { ConditionOperator } from '../filter-operator';
+} from '../../components/popover';
+import { ConditionOperator } from '../filter-operator/filter-operator';
 
-export type DateRangeCondition =
-  | { operator: 'between'; from: Date; to: Date }
+export type MultiChoiceCondition =
+  | { operator: 'isAnyOf' | 'isNoneOf'; values: string[] }
   | { operator: 'isEmpty' | 'isNotEmpty' };
-export type DateRangeFilterProps = {
+export type MultiChoiceFilterProps = {
   label: string;
   icon?: React.ReactNode;
-  value: DateRangeCondition | null;
-  onChange: (value: DateRangeCondition | null) => void;
+  value: MultiChoiceCondition | null;
+  onChange: (value: MultiChoiceCondition | null) => void;
   disabled?: boolean;
-  today?: Date;
+  options: readonly { value: string; label: string; disabled?: boolean }[];
 };
 
-export function DateRangeFilter({
+export function MultiChoiceFilter({
   label,
   icon,
   value,
   onChange,
   disabled = false,
-  today = new Date(),
-}: DateRangeFilterProps) {
-  const applied = value && 'from' in value ? value : null;
+  options,
+}: MultiChoiceFilterProps) {
+  const applied = value && 'values' in value ? value : null;
   const [open, setOpen] = React.useState(false);
-  const [pending, setPending] = React.useState<'between' | null>(null);
-  const [draft, setDraft] = React.useState<
-    { from: Date | undefined; to?: Date } | undefined
-  >();
-
+  const [pending, setPending] = React.useState<'isAnyOf' | 'isNoneOf' | null>(
+    null
+  );
+  const [draft, setDraft] = React.useState<string[]>([]);
   const addRef = React.useRef<HTMLButtonElement>(null);
   const operatorRef = React.useRef<HTMLButtonElement>(null);
   const restoreAdd = React.useRef(false);
-  const nextSnapshot = JSON.stringify([value, disabled]);
+  const nextSnapshot = JSON.stringify([value, disabled, options]);
   const [snapshot, setSnapshot] = React.useState(nextSnapshot);
   // External replacements invalidate unfinished edits instead of committing stale drafts.
   if (snapshot !== nextSnapshot) {
@@ -53,39 +53,25 @@ export function DateRangeFilter({
     setOpen(false);
     setPending(null);
   }
-  const [month, setMonth] = React.useState(applied?.from ?? today);
-  const valid = Boolean(
-    draft?.from &&
-    draft.to &&
-    Number.isFinite(draft.from.getTime()) &&
-    Number.isFinite(draft.to.getTime()) &&
-    draft.from <= draft.to
-  );
+  const valid = draft.length > 0;
   const summary = applied
-    ? `${applied.from.toLocaleDateString()} – ${applied.to.toLocaleDateString()}`
+    ? applied.values
+        .map(
+          (item) =>
+            options.find((option) => option.value === item)?.label ?? item
+        )
+        .join(', ')
     : 'Choose…';
-  const operator = pending ?? applied?.operator ?? 'between';
-  function preset(days: number) {
-    const to = new Date(today.getFullYear(), today.getMonth(), today.getDate());
-    const from = new Date(to);
-    from.setDate(from.getDate() - days + 1);
-    setDraft({ from, to });
-    setMonth(from);
-  }
+  const operator = pending ?? applied?.operator ?? 'isAnyOf';
   function changeOpen(next: boolean) {
     if (disabled && next) return;
     if (next) {
-      setMonth(applied?.from ?? today);
-      setDraft(
-        applied
-          ? { from: new Date(applied.from), to: new Date(applied.to) }
-          : undefined
-      );
+      setDraft(applied ? [...applied.values] : []);
     }
     setOpen(next);
     if (!next) setPending(null);
   }
-  function changeOperator(next: DateRangeCondition['operator']) {
+  function changeOperator(next: MultiChoiceCondition['operator']) {
     if (disabled) return;
     if (next === 'isEmpty' || next === 'isNotEmpty') {
       onChange({ operator: next });
@@ -105,12 +91,8 @@ export function DateRangeFilter({
   function apply(event: React.FormEvent) {
     event.preventDefault();
     event.stopPropagation();
-    if (!valid || disabled || !draft?.from || !draft.to) return;
-    onChange({
-      operator,
-      from: new Date(draft.from),
-      to: new Date(draft.to),
-    });
+    if (!valid || disabled) return;
+    onChange({ operator, values: [...new Set(draft)] });
     setOpen(false);
     setPending(null);
   }
@@ -154,7 +136,7 @@ export function DateRangeFilter({
               triggerRef={operatorRef}
               disabled={disabled}
               value={pending ?? value.operator}
-              options={['between', 'isEmpty', 'isNotEmpty']}
+              options={['isAnyOf', 'isNoneOf', 'isEmpty', 'isNotEmpty']}
               onChange={changeOperator}
               onCloseAutoFocus={openPending}
             />
@@ -199,39 +181,13 @@ export function DateRangeFilter({
         className="nx:w-72 nx:max-w-(--radix-popover-content-available-width) nx:max-h-(--radix-popover-content-available-height) nx:overflow-y-auto nx:p-0"
       >
         <form onSubmit={apply}>
-          <div className="nx:grid nx:grid-cols-2 nx:gap-2 nx:border-b nx:border-border-default nx:p-3">
-            <Button
-              type="button"
-              size="sm"
-              className="nx:h-(--nx-spacing-8)"
-              variant="outline"
-              disabled={disabled}
-              onClick={() => preset(1)}
-            >
-              Today
-            </Button>
-            <Button
-              type="button"
-              size="sm"
-              className="nx:h-(--nx-spacing-8)"
-              variant="outline"
-              disabled={disabled}
-              onClick={() => preset(7)}
-            >
-              Last 7 days
-            </Button>
-          </div>
-          <div className="nx:flex nx:justify-center nx:overflow-x-auto nx:p-3">
-            <DatePicker
-              mode="range"
-              month={month}
-              onMonthChange={setMonth}
-              today={today}
-              selected={draft}
-              onSelect={setDraft}
-              disabled={disabled}
-            />
-          </div>
+          <MultiChoiceEditor
+            label={label}
+            value={draft}
+            options={options}
+            onChange={setDraft}
+            disabled={disabled}
+          />
           <div className="nx:flex nx:items-center nx:justify-between nx:gap-2 nx:border-t nx:border-border-default nx:bg-control-background/20 nx:p-3">
             <Button
               type="button"
@@ -254,5 +210,76 @@ export function DateRangeFilter({
         </form>
       </PopoverContent>
     </Popover>
+  );
+}
+
+/** Controlled checklist with no commit controls. An empty list means no selected options; the owner maps it to its condition model. */
+export function MultiChoiceEditor({
+  label,
+  value,
+  options,
+  onChange,
+  disabled = false,
+}: {
+  label: string;
+  value: readonly string[];
+  options: MultiChoiceFilterProps['options'];
+  onChange: (value: string[]) => void;
+  disabled?: boolean;
+}) {
+  const id = React.useId();
+  const availableOptions = [
+    ...options,
+    ...value
+      .filter((item) => !options.some((option) => option.value === item))
+      .map((item) => ({
+        value: item,
+        label: `${item} (unavailable)`,
+        disabled: false,
+      })),
+  ];
+  function toggle(item: string, checked: boolean) {
+    if (
+      disabled ||
+      options.some((option) => option.value === item && option.disabled)
+    )
+      return;
+    onChange(
+      checked
+        ? [...new Set([...value, item])]
+        : value.filter((entry) => entry !== item)
+    );
+  }
+  return (
+    <fieldset
+      disabled={disabled}
+      className="nx:m-0 nx:min-w-0 nx:border-0 nx:p-1"
+    >
+      <legend className="nx:sr-only">{label}</legend>
+      <div className="nx:max-h-64 nx:overflow-y-auto">
+        {availableOptions.map((option, index) => (
+          <ChoiceRow
+            key={option.value}
+            htmlFor={`${id}-${index}`}
+            className="nx:not-has-[:disabled]:hover:bg-popover-hover"
+          >
+            <Checkbox
+              id={`${id}-${index}`}
+              checked={value.includes(option.value)}
+              disabled={disabled || option.disabled}
+              onCheckedChange={(checked) =>
+                toggle(option.value, checked === true)
+              }
+            />
+            {option.label}
+          </ChoiceRow>
+        ))}
+        {!availableOptions.length && (
+          <p className="nx:p-2 nx:typography-body-default nx:text-muted-foreground">
+            No options available
+          </p>
+        )}
+      </div>
+    </fieldset>
   );
 }

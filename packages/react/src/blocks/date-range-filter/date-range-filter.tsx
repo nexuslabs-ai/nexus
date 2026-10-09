@@ -1,61 +1,51 @@
 import * as React from 'react';
 
-import { Button } from '../../../components/button';
+import { Button } from '../../components/button';
+import { DatePicker } from '../../components/date-picker';
 import {
   FilterCondition,
   FilterConditionField,
   FilterConditionRemove,
   FilterConditionSegment,
-} from '../../../components/filter-condition';
-import { Input } from '../../../components/input';
-import { Label } from '../../../components/label';
+} from '../../components/filter-condition';
 import {
   Popover,
   PopoverContent,
   PopoverTrigger,
-} from '../../../components/popover';
-import { ConditionOperator } from '../filter-operator';
+} from '../../components/popover';
+import { ConditionOperator } from '../filter-operator/filter-operator';
 
-export type NumberComparisonCondition =
-  | { operator: 'is' | 'isNot' | 'greaterThan' | 'lessThan'; value: number }
+export type DateRangeCondition =
+  | { operator: 'between'; from: Date; to: Date }
   | { operator: 'isEmpty' | 'isNotEmpty' };
-export type NumberComparisonFilterProps = {
+export type DateRangeFilterProps = {
   label: string;
   icon?: React.ReactNode;
-  value: NumberComparisonCondition | null;
-  onChange: (value: NumberComparisonCondition | null) => void;
+  value: DateRangeCondition | null;
+  onChange: (value: DateRangeCondition | null) => void;
   disabled?: boolean;
-  unit?: string;
-  lowerBound?: number;
-  upperBound?: number;
+  today?: Date;
 };
 
-export function NumberComparisonFilter({
+export function DateRangeFilter({
   label,
   icon,
   value,
   onChange,
   disabled = false,
-  unit,
-  lowerBound,
-  upperBound,
-}: NumberComparisonFilterProps) {
-  const applied = value && 'value' in value ? value : null;
+  today = new Date(),
+}: DateRangeFilterProps) {
+  const applied = value && 'from' in value ? value : null;
   const [open, setOpen] = React.useState(false);
-  const [pending, setPending] = React.useState<
-    'is' | 'isNot' | 'greaterThan' | 'lessThan' | null
-  >(null);
-  const [draft, setDraft] = React.useState('');
-  const id = React.useId();
+  const [pending, setPending] = React.useState<'between' | null>(null);
+  const [draft, setDraft] = React.useState<
+    { from: Date | undefined; to?: Date } | undefined
+  >();
+
   const addRef = React.useRef<HTMLButtonElement>(null);
   const operatorRef = React.useRef<HTMLButtonElement>(null);
   const restoreAdd = React.useRef(false);
-  const nextSnapshot = JSON.stringify([
-    value,
-    disabled,
-    lowerBound,
-    upperBound,
-  ]);
+  const nextSnapshot = JSON.stringify([value, disabled]);
   const [snapshot, setSnapshot] = React.useState(nextSnapshot);
   // External replacements invalidate unfinished edits instead of committing stale drafts.
   if (snapshot !== nextSnapshot) {
@@ -63,25 +53,39 @@ export function NumberComparisonFilter({
     setOpen(false);
     setPending(null);
   }
-  const valid =
-    draft.trim() !== '' &&
-    Number.isFinite(Number(draft)) &&
-    (lowerBound === undefined || Number(draft) >= lowerBound) &&
-    (upperBound === undefined || Number(draft) <= upperBound);
+  const [month, setMonth] = React.useState(applied?.from ?? today);
+  const valid = Boolean(
+    draft?.from &&
+    draft.to &&
+    Number.isFinite(draft.from.getTime()) &&
+    Number.isFinite(draft.to.getTime()) &&
+    draft.from <= draft.to
+  );
   const summary = applied
-    ? `${applied.value}${unit ? ` ${unit}` : ''}`
+    ? `${applied.from.toLocaleDateString()} – ${applied.to.toLocaleDateString()}`
     : 'Choose…';
-  const operator = pending ?? applied?.operator ?? 'greaterThan';
-
+  const operator = pending ?? applied?.operator ?? 'between';
+  function preset(days: number) {
+    const to = new Date(today.getFullYear(), today.getMonth(), today.getDate());
+    const from = new Date(to);
+    from.setDate(from.getDate() - days + 1);
+    setDraft({ from, to });
+    setMonth(from);
+  }
   function changeOpen(next: boolean) {
     if (disabled && next) return;
     if (next) {
-      setDraft(applied ? String(applied.value) : '');
+      setMonth(applied?.from ?? today);
+      setDraft(
+        applied
+          ? { from: new Date(applied.from), to: new Date(applied.to) }
+          : undefined
+      );
     }
     setOpen(next);
     if (!next) setPending(null);
   }
-  function changeOperator(next: NumberComparisonCondition['operator']) {
+  function changeOperator(next: DateRangeCondition['operator']) {
     if (disabled) return;
     if (next === 'isEmpty' || next === 'isNotEmpty') {
       onChange({ operator: next });
@@ -101,8 +105,12 @@ export function NumberComparisonFilter({
   function apply(event: React.FormEvent) {
     event.preventDefault();
     event.stopPropagation();
-    if (!valid || disabled) return;
-    onChange({ operator, value: Number(draft) });
+    if (!valid || disabled || !draft?.from || !draft.to) return;
+    onChange({
+      operator,
+      from: new Date(draft.from),
+      to: new Date(draft.to),
+    });
     setOpen(false);
     setPending(null);
   }
@@ -146,14 +154,7 @@ export function NumberComparisonFilter({
               triggerRef={operatorRef}
               disabled={disabled}
               value={pending ?? value.operator}
-              options={[
-                'is',
-                'isNot',
-                'greaterThan',
-                'lessThan',
-                'isEmpty',
-                'isNotEmpty',
-              ]}
+              options={['between', 'isEmpty', 'isNotEmpty']}
               onChange={changeOperator}
               onCloseAutoFocus={openPending}
             />
@@ -198,30 +199,38 @@ export function NumberComparisonFilter({
         className="nx:w-72 nx:max-w-(--radix-popover-content-available-width) nx:max-h-(--radix-popover-content-available-height) nx:overflow-y-auto nx:p-0"
       >
         <form onSubmit={apply}>
-          <div className="nx:grid nx:gap-2 nx:p-3">
-            <Label htmlFor={id}>
-              {label}
-              {unit ? ` (${unit})` : ''}
-            </Label>
-            <Input
-              id={id}
-              type="number"
-              step="any"
-              min={lowerBound}
-              max={upperBound}
-              value={draft}
+          <div className="nx:grid nx:grid-cols-2 nx:gap-2 nx:border-b nx:border-border-default nx:p-3">
+            <Button
+              type="button"
+              size="sm"
+              className="nx:h-(--nx-spacing-8)"
+              variant="outline"
               disabled={disabled}
-              onChange={(event) => setDraft(event.target.value)}
-              aria-describedby={`${id}-hint`}
-            />
-            <p
-              id={`${id}-hint`}
-              className="nx:typography-body-small nx:text-muted-foreground"
+              onClick={() => preset(1)}
             >
-              {lowerBound !== undefined || upperBound !== undefined
-                ? `Allowed range: ${lowerBound ?? 'no minimum'} to ${upperBound ?? 'no maximum'}.`
-                : 'Enter a number. Decimals and negative values are allowed.'}
-            </p>
+              Today
+            </Button>
+            <Button
+              type="button"
+              size="sm"
+              className="nx:h-(--nx-spacing-8)"
+              variant="outline"
+              disabled={disabled}
+              onClick={() => preset(7)}
+            >
+              Last 7 days
+            </Button>
+          </div>
+          <div className="nx:flex nx:justify-center nx:overflow-x-auto nx:p-3">
+            <DatePicker
+              mode="range"
+              month={month}
+              onMonthChange={setMonth}
+              today={today}
+              selected={draft}
+              onSelect={setDraft}
+              disabled={disabled}
+            />
           </div>
           <div className="nx:flex nx:items-center nx:justify-between nx:gap-2 nx:border-t nx:border-border-default nx:bg-control-background/20 nx:p-3">
             <Button

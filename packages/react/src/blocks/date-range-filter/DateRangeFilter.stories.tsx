@@ -2,34 +2,41 @@ import * as React from 'react';
 
 import { Canvas, Source, Title } from '@storybook/addon-docs/blocks';
 import type { Meta, StoryObj } from '@storybook/react';
-import { IconLetterCase } from '@tabler/icons-react';
+import { IconCalendar } from '@tabler/icons-react';
 import { expect, userEvent, waitFor, within } from 'storybook/test';
 
-import operatorSource from '../filter-operator.tsx?raw';
+import operatorSource from '../filter-operator/filter-operator.tsx?raw';
 
-import { type TextCondition, TextFilter } from './text-filter';
-import blockSource from './text-filter.tsx?raw';
+import { type DateRangeCondition, DateRangeFilter } from './date-range-filter';
+import blockSource from './date-range-filter.tsx?raw';
 
-const initial: TextCondition = { operator: 'contains', value: 'design' };
+const initial: DateRangeCondition = {
+  operator: 'between',
+  from: new Date(2026, 8, 1),
+  to: new Date(2026, 8, 10),
+};
 function Preview({
   initialValue = initial,
   disabled = false,
 }: {
-  initialValue?: TextCondition | null;
+  initialValue?: DateRangeCondition | null;
   disabled?: boolean;
 }) {
-  const [value, setValue] = React.useState<TextCondition | null>(initialValue);
+  const [value, setValue] = React.useState<DateRangeCondition | null>(
+    initialValue
+  );
   return (
     <section
-      aria-label="TextFilter example"
+      aria-label="DateRangeFilter example"
       className="nx:grid nx:w-full nx:min-w-0 nx:max-w-xl nx:justify-items-start nx:gap-4 nx:p-4"
     >
-      <TextFilter
-        label="Name"
-        icon={<IconLetterCase aria-hidden="true" />}
+      <DateRangeFilter
+        label="Created"
+        icon={<IconCalendar aria-hidden="true" />}
         value={value}
         onChange={setValue}
         disabled={disabled}
+        today={new Date(2026, 8, 27)}
       />
       <output
         aria-label="Applied condition"
@@ -41,9 +48,9 @@ function Preview({
   );
 }
 const usage =
-  "import { useState } from 'react';\nimport { TextFilter, type TextCondition } from './blocks/text-filter';\n\nexport function Example() {\n const [value, setValue] = useState<TextCondition | null>({ operator: 'contains', value: 'design' });\n return <TextFilter label=\"Name\" value={value} onChange={setValue}  />;\n}";
+  "import { useState } from 'react';\nimport { DateRangeFilter, type DateRangeCondition } from '@/blocks/date-range-filter/date-range-filter';\n\nexport function Example() {\n const [value, setValue] = useState<DateRangeCondition | null>({ operator: 'between', from: new Date(2026, 8, 1), to: new Date(2026, 8, 10) });\n return <DateRangeFilter label=\"Created\" value={value} onChange={setValue} />;\n}";
 const meta = {
-  title: 'Blocks/TextFilter',
+  title: 'Blocks/DateRangeFilter',
   component: Preview,
   tags: ['autodocs'],
   parameters: {
@@ -54,18 +61,19 @@ const meta = {
         <>
           <Title />
           <p>
-            Choose contains, equals, not equals or starts with. Apply commits
-            trimmed, nonempty text. Matching rules such as case sensitivity
-            belong to the application.
+            Choose dates or a Today / Last 7 days preset, then Apply. Presets
+            include today and resolve to fixed dates when applied. Values are
+            local calendar Date objects; the application owns timezone
+            conversion and inclusive end-date query semantics.
           </p>
           <Canvas of={Default} />
           <h2>Use this block</h2>
           <p>
-            Copy blocks/text-filter.tsx and filter-operator.tsx from
-            packages/react/src/recipes/filtering, keeping their relative paths.
-            The block imports Nexus components by relative path. Include the
-            copied files in your Tailwind source scan and use the Nexus theme
-            setup.
+            Copy blocks/date-range-filter/date-range-filter.tsx and
+            blocks/filter-operator/filter-operator.tsx from packages/react/src,
+            keeping their relative paths. The block imports Nexus components by
+            relative path. Include the copied files in your Tailwind source scan
+            and use the Nexus theme setup.
           </p>
           <Source code={usage} language="tsx" />
           <h2>State and behavior</h2>
@@ -90,11 +98,13 @@ const meta = {
           <Canvas of={Disabled} />
           <h2>Copy implementation</h2>
           <details>
-            <summary>blocks/text-filter.tsx</summary>
+            <summary>blocks/date-range-filter/date-range-filter.tsx</summary>
             <Source code={blockSource} language="tsx" />
           </details>
           <details>
-            <summary>filter-operator.tsx — required helper</summary>
+            <summary>
+              blocks/filter-operator/filter-operator.tsx — required helper
+            </summary>
             <Source code={operatorSource} language="tsx" />
           </details>
           <p>
@@ -122,10 +132,10 @@ export const EmptyOperator: Story = {
     const canvas = within(canvasElement);
     const page = within(canvasElement.ownerDocument.body);
     await userEvent.click(
-      canvas.getByRole('button', { name: 'Change Name operator' })
+      canvas.getByRole('button', { name: 'Change Created operator' })
     );
     await userEvent.click(
-      page.getByRole('menuitemradio', { name: 'contains' })
+      page.getByRole('menuitemradio', { name: 'is between' })
     );
     await expect(await page.findByRole('dialog')).toBeVisible();
     await userEvent.keyboard('{Escape}');
@@ -134,7 +144,7 @@ export const EmptyOperator: Story = {
     );
     await waitFor(() =>
       expect(
-        canvas.getByRole('button', { name: 'Change Name operator' })
+        canvas.getByRole('button', { name: 'Change Created operator' })
       ).toHaveFocus()
     );
   },
@@ -151,12 +161,10 @@ export const ApplyAndCancel: Story = {
     const canvas = within(canvasElement);
     const page = within(canvasElement.ownerDocument.body);
     const before = canvas.getByLabelText('Applied condition').textContent ?? '';
-    await userEvent.click(canvas.getByRole('button', { name: /^Edit Name:/ }));
-    await userEvent.clear(page.getByRole('textbox', { name: 'Name' }));
-    await userEvent.type(
-      page.getByRole('textbox', { name: 'Name' }),
-      'research'
+    await userEvent.click(
+      canvas.getByRole('button', { name: /^Edit Created:/ })
     );
+    await userEvent.click(page.getByRole('button', { name: 'Last 7 days' }));
     await expect(canvas.getByLabelText('Applied condition')).toHaveTextContent(
       before
     );
@@ -164,22 +172,20 @@ export const ApplyAndCancel: Story = {
     await expect(canvas.getByLabelText('Applied condition')).toHaveTextContent(
       before
     );
-    await userEvent.click(canvas.getByRole('button', { name: /^Edit Name:/ }));
-    await userEvent.clear(page.getByRole('textbox', { name: 'Name' }));
-    await userEvent.type(
-      page.getByRole('textbox', { name: 'Name' }),
-      'research'
-    );
-    await userEvent.click(page.getByRole('button', { name: 'Apply' }));
-    await expect(canvas.getByLabelText('Applied condition')).toHaveTextContent(
-      'research'
-    );
     await userEvent.click(
-      canvas.getByRole('button', { name: 'Remove Name filter' })
+      canvas.getByRole('button', { name: /^Edit Created:/ })
+    );
+    await userEvent.click(page.getByRole('button', { name: 'Last 7 days' }));
+    await userEvent.click(page.getByRole('button', { name: 'Apply' }));
+    await expect(
+      canvas.getByLabelText('Applied condition')
+    ).not.toHaveTextContent(before);
+    await userEvent.click(
+      canvas.getByRole('button', { name: 'Remove Created filter' })
     );
     await waitFor(() =>
       expect(
-        canvas.getByRole('button', { name: 'Add name filter' })
+        canvas.getByRole('button', { name: 'Add created filter' })
       ).toHaveFocus()
     );
     await expect(canvas.getByLabelText('Applied condition')).toHaveTextContent(
@@ -193,23 +199,4 @@ export const NarrowContainer: Story = {
       <Preview />
     </div>
   ),
-};
-
-export const IncompleteDraft: Story = {
-  play: async ({ canvasElement }) => {
-    const canvas = within(canvasElement);
-    const page = within(canvasElement.ownerDocument.body);
-    const before = canvas.getByLabelText('Applied condition').textContent ?? '';
-    await userEvent.click(canvas.getByRole('button', { name: /^Edit Name:/ }));
-    await userEvent.clear(page.getByRole('textbox', { name: 'Name' }));
-    await userEvent.type(page.getByRole('textbox', { name: 'Name' }), '   ');
-    await expect(page.getByRole('button', { name: 'Apply' })).toBeDisabled();
-    await userEvent.keyboard('{Escape}');
-    await expect(canvas.getByLabelText('Applied condition')).toHaveTextContent(
-      before
-    );
-    await waitFor(() =>
-      expect(canvas.getByRole('button', { name: /^Edit Name:/ })).toHaveFocus()
-    );
-  },
 };

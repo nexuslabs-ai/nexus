@@ -1,20 +1,20 @@
 import * as React from 'react';
 
-import { Button } from '../../../components/button';
+import { Button } from '../../components/button';
 import {
   FilterCondition,
   FilterConditionField,
   FilterConditionRemove,
   FilterConditionSegment,
-} from '../../../components/filter-condition';
-import { Input } from '../../../components/input';
-import { Label } from '../../../components/label';
+} from '../../components/filter-condition';
+import { Input } from '../../components/input';
+import { Label } from '../../components/label';
 import {
   Popover,
   PopoverContent,
   PopoverTrigger,
-} from '../../../components/popover';
-import { ConditionOperator } from '../filter-operator';
+} from '../../components/popover';
+import { ConditionOperator } from '../filter-operator/filter-operator';
 
 export type TextCondition =
   | { operator: 'contains' | 'is' | 'isNot' | 'startsWith'; value: string }

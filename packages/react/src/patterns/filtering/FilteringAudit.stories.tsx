@@ -3,26 +3,35 @@ import * as React from 'react';
 import type { Meta, StoryObj } from '@storybook/react';
 import { expect, userEvent, waitFor, within } from 'storybook/test';
 
-import { Button } from '../../../components/button';
-import { FilterBuilder } from '../../../components/filter-builder';
-import { FilterChip } from '../../../components/filter-chip';
-import { exampleFields, exampleTree } from '../advanced-fixtures';
-
-import { type ChoiceCondition, ChoiceFilter } from './choice-filter';
-import { type DateRangeCondition, DateRangeFilter } from './date-range-filter';
+import {
+  type ChoiceCondition,
+  ChoiceFilter,
+} from '../../blocks/choice-filter/choice-filter';
+import {
+  type DateRangeCondition,
+  DateRangeFilter,
+} from '../../blocks/date-range-filter/date-range-filter';
 import {
   type MultiChoiceCondition,
   MultiChoiceFilter,
-} from './multi-choice-filter';
+} from '../../blocks/multi-choice-filter/multi-choice-filter';
 import {
   type NumberComparisonCondition,
   NumberComparisonFilter,
-} from './number-comparison-filter';
+} from '../../blocks/number-comparison-filter/number-comparison-filter';
 import {
   type NumberRangeCondition,
   NumberRangeFilter,
-} from './number-range-filter';
-import { type TextCondition, TextFilter } from './text-filter';
+} from '../../blocks/number-range-filter/number-range-filter';
+import {
+  type TextCondition,
+  TextFilter,
+} from '../../blocks/text-filter/text-filter';
+import { Button } from '../../components/button';
+import { FilterBuilder } from '../../components/filter-builder';
+import { FilterChip } from '../../components/filter-chip';
+
+import { exampleFields, exampleTree } from './advanced-fixtures';
 
 function Audit({ narrow = false }: { narrow?: boolean }) {
   const [tree, setTree] = React.useState(exampleTree);

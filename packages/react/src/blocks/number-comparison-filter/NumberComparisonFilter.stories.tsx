@@ -5,7 +5,7 @@ import type { Meta, StoryObj } from '@storybook/react';
 import { IconHash } from '@tabler/icons-react';
 import { expect, userEvent, waitFor, within } from 'storybook/test';
 
-import operatorSource from '../filter-operator.tsx?raw';
+import operatorSource from '../filter-operator/filter-operator.tsx?raw';
 
 import {
   type NumberComparisonCondition,
@@ -49,7 +49,7 @@ function Preview({
   );
 }
 const usage =
-  "import { useState } from 'react';\nimport { NumberComparisonFilter, type NumberComparisonCondition } from './blocks/number-comparison-filter';\n\nexport function Example() {\n const [value, setValue] = useState<NumberComparisonCondition | null>({ operator: 'greaterThan', value: 500 });\n return <NumberComparisonFilter label=\"Amount\" value={value} onChange={setValue}  />;\n}";
+  "import { useState } from 'react';\nimport { NumberComparisonFilter, type NumberComparisonCondition } from '@/blocks/number-comparison-filter/number-comparison-filter';\n\nexport function Example() {\n const [value, setValue] = useState<NumberComparisonCondition | null>({ operator: 'greaterThan', value: 500 });\n return <NumberComparisonFilter label=\"Amount\" value={value} onChange={setValue}  />;\n}";
 const meta = {
   title: 'Blocks/NumberComparisonFilter',
   component: Preview,
@@ -69,11 +69,11 @@ const meta = {
           <Canvas of={Default} />
           <h2>Use this block</h2>
           <p>
-            Copy blocks/number-comparison-filter.tsx and filter-operator.tsx
-            from packages/react/src/recipes/filtering, keeping their relative
-            paths. The block imports Nexus components by relative path. Include
-            the copied files in your Tailwind source scan and use the Nexus
-            theme setup.
+            Copy blocks/number-comparison-filter/number-comparison-filter.tsx
+            and blocks/filter-operator/filter-operator.tsx from
+            packages/react/src, keeping their relative paths. The block imports
+            Nexus components by relative path. Include the copied files in your
+            Tailwind source scan and use the Nexus theme setup.
           </p>
           <Source code={usage} language="tsx" />
           <h2>State and behavior</h2>
@@ -98,11 +98,15 @@ const meta = {
           <Canvas of={Disabled} />
           <h2>Copy implementation</h2>
           <details>
-            <summary>blocks/number-comparison-filter.tsx</summary>
+            <summary>
+              blocks/number-comparison-filter/number-comparison-filter.tsx
+            </summary>
             <Source code={blockSource} language="tsx" />
           </details>
           <details>
-            <summary>filter-operator.tsx — required helper</summary>
+            <summary>
+              blocks/filter-operator/filter-operator.tsx — required helper
+            </summary>
             <Source code={operatorSource} language="tsx" />
           </details>
           <p>

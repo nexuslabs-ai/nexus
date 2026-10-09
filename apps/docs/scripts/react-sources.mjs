@@ -2,7 +2,7 @@ import { existsSync, readdirSync, readFileSync, writeFileSync } from 'node:fs';
 import path from 'node:path';
 
 import { pascal } from './humanize.mjs';
-import { componentsRoot, reactSrc, recipesRoot } from './roots.mjs';
+import { blocksRoot, componentsRoot, reactSrc } from './roots.mjs';
 
 export function isModuleSource(filePath) {
   const name = path.basename(filePath);
@@ -39,28 +39,20 @@ export function exportedComponentSlugs() {
  */
 
 /**
- * Every copy-source block: a `recipes/{recipe}/blocks/{slug}.tsx` with a
- * `{Slug}.stories.tsx` beside it, sorted by slug.
+ * Every copy-source block: a `blocks/{slug}/` folder holding `{slug}.tsx` and
+ * `{Slug}.stories.tsx`, sorted by slug. A folder without stories is a helper
+ * the blocks share, not a block.
  * @returns {BlockSource[]}
  */
 export function blockSources() {
-  return readdirSync(recipesRoot, { withFileTypes: true })
+  return readdirSync(blocksRoot, { withFileTypes: true })
     .filter((entry) => entry.isDirectory())
-    .flatMap((recipe) => {
-      const dir = path.join(recipesRoot, recipe.name, 'blocks');
-      if (!existsSync(dir)) return [];
-      return readdirSync(dir)
-        .filter((file) => isComponentSource(file))
-        .map((file) => {
-          const slug = file.replace(/\.tsx?$/, '');
-          return {
-            slug,
-            source: path.join(dir, file),
-            stories: path.join(dir, `${pascal(slug)}.stories.tsx`),
-          };
-        })
-        .filter((block) => existsSync(block.stories));
-    })
+    .map(({ name: slug }) => ({
+      slug,
+      source: path.join(blocksRoot, slug, `${slug}.tsx`),
+      stories: path.join(blocksRoot, slug, `${pascal(slug)}.stories.tsx`),
+    }))
+    .filter((block) => existsSync(block.stories))
     .sort((a, b) => a.slug.localeCompare(b.slug, 'en'));
 }
 

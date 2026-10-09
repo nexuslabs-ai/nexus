@@ -133,7 +133,7 @@ const meta = {
       story: { inline: false, height: 620 },
       description: {
         component:
-          'Experimental recipe: a member directory with simple, implicit matching. Copy member-directory.tsx; connect query, results and retry to your application loader. Stories simulate asynchronous requests with local data, including loading, failure, pagination and stale responses. They are not a live backend integration. URL persistence is an optional separate recipe; open that story in its own tab to inspect its URL. See src/recipes/filtering/README.md for exact files and setup.',
+          'Experimental recipe: a member directory with simple, implicit matching. Copy member-directory.tsx; connect query, results and retry to your application loader. Stories simulate asynchronous requests with local data, including loading, failure, pagination and stale responses. They are not a live backend integration. URL persistence is an optional separate recipe; open that story in its own tab to inspect its URL. See src/patterns/filtering/README.md for exact files and setup.',
       },
     },
   },

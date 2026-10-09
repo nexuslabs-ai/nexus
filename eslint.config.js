@@ -303,9 +303,9 @@ export default tseslint.config(
         {
           patterns: [
             {
-              regex: '^@/(?!recipes/)',
+              regex: '^@/(?!patterns/)',
               message:
-                'A pattern page imports its examples from `@/recipes/`, which @nexus_ds/react does not export — import components from @nexus_ds/react.',
+                'A pattern page imports its examples from `@/patterns/`, which @nexus_ds/react does not export — import components from @nexus_ds/react.',
             },
           ],
         },

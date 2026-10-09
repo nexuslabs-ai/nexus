@@ -2,6 +2,7 @@ import * as React from 'react';
 
 import { IconChevronDown, IconSearch } from '@tabler/icons-react';
 
+import { MultiChoiceEditor } from '../../blocks/multi-choice-filter/multi-choice-filter';
 import { Button } from '../../components/button';
 import { Input } from '../../components/input';
 import {
@@ -17,8 +18,6 @@ import {
   TableHeader,
   TableRow,
 } from '../../components/table';
-
-import { MultiChoiceEditor } from './blocks/multi-choice-filter';
 
 type Filters = { statuses: string[]; countries: string[] };
 const empty: Filters = { statuses: [], countries: [] };

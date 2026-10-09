@@ -8,7 +8,7 @@
  *   - `app/_pages/{section}/{slug}.tsx` — hand-built pages
  *   - `@nexus_ds/react`'s exports — one `components/` page per exported
  *     component, generated from its stories tagged `docs`
- *   - `recipes/{recipe}/blocks/` — one `blocks/` page per block with stories,
+ *   - `blocks/` — one `blocks/` page per block folder with stories,
  *     generated from its story tagged `docs`
  *
  * A page's route is its path on disk, so adding a page means adding a file.
@@ -236,7 +236,7 @@ export type ComponentManifestPage = ManifestPageBase & {
 };
 
 /**
- * A copy-source block under \`recipes/{recipe}/blocks/\`. Its page body is its
+ * A copy-source block under \`blocks/{slug}/\`. Its page body is its
  * \`getBlockDocs(slug)\` entry, generated from its story tagged \`docs\`.
  */
 export type BlockManifestPage = ManifestPageBase & {
