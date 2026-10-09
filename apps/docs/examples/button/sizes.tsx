@@ -7,9 +7,13 @@ import { Button } from '@/components/button/button';
 export default function ButtonSizes() {
   return (
     <div className="nx:flex nx:flex-wrap nx:items-center nx:gap-2">
+      <Button size="xs">Extra small</Button>
       <Button size="sm">Small</Button>
       <Button size="default">Default</Button>
       <Button size="lg">Large</Button>
+      <Button size="icon-xs" aria-label="Favorite (extra small)">
+        <IconStar />
+      </Button>
       <Button size="icon-sm" aria-label="Favorite (small)">
         <IconStar />
       </Button>

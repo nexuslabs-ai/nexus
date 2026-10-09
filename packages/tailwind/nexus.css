@@ -18,6 +18,7 @@
 @import './borderwidth-utilities.css';
 @import './border-color-aliases.css';
 @import './motion-utilities.css';
+@import './icon-utilities.css';
 @import './spacing-utilities.css';
 
 @theme {
@@ -317,6 +318,10 @@
     --nx-color-primary-border,
     var(--nx-default-color-primary-border)
   );
+  --color-primary-border-on-solid: var(
+    --nx-color-primary-border-on-solid,
+    var(--nx-default-color-primary-border-on-solid)
+  );
   --color-primary-border-active: var(
     --nx-color-primary-border-active,
     var(--nx-default-color-primary-border-active)
@@ -485,6 +490,10 @@
     --nx-color-error-border,
     var(--nx-default-color-error-border)
   );
+  --color-error-border-on-solid: var(
+    --nx-color-error-border-on-solid,
+    var(--nx-default-color-error-border-on-solid)
+  );
   --color-border-error-active: var(
     --nx-color-border-error-active,
     var(--nx-default-color-border-error-active)
@@ -615,7 +624,7 @@
     --nx-default-color-border-disabled: oklch(0.1448 0 0 / 0.0884);
     --nx-default-color-border-hairline: oklch(0.1448 0 0 / 0.0941);
     --nx-default-color-primary-background: oklch(0.1448 0 0);
-    --nx-default-color-primary-background-hover: oklch(0.207 0 0);
+    --nx-default-color-primary-background-hover: oklch(0.297 0 0);
     --nx-default-color-primary-background-active: oklch(0.118 0 0);
     --nx-default-color-primary-foreground: oklch(1 0 0);
     --nx-default-color-primary-disabled: oklch(0.765 0 0);
@@ -624,6 +633,7 @@
     --nx-default-color-primary-subtle-hover: oklch(0.945 0 0);
     --nx-default-color-primary-subtle-active: oklch(0.87 0 0);
     --nx-default-color-primary-border: oklch(0.87 0 0);
+    --nx-default-color-primary-border-on-solid: oklch(1 0 0 / 0.24);
     --nx-default-color-primary-border-active: oklch(0.66 0 0);
     --nx-default-color-secondary-background: oklch(0.945 0 0);
     --nx-default-color-secondary-background-hover: oklch(0.87 0 0);
@@ -666,6 +676,7 @@
     --nx-default-color-error-subtle-hover: oklch(0.936 0.0399 27.342);
     --nx-default-color-error-subtle-active: oklch(0.885 0.0747 27.394);
     --nx-default-color-error-border: oklch(0.885 0.0747 27.394);
+    --nx-default-color-error-border-on-solid: oklch(1 0 0 / 0.24);
     --nx-default-color-border-error-active: oklch(0.704 0.2267 27.842);
     --nx-default-color-information-background: oklch(0.546 0.2205 255.276);
     --nx-default-color-information-background-hover: oklch(0.488 0.197 255.267);
@@ -737,6 +748,7 @@
     --nx-default-color-primary-subtle-hover: oklch(0.207 0 0);
     --nx-default-color-primary-subtle-active: oklch(0.297 0 0);
     --nx-default-color-primary-border: oklch(0.385 0 0);
+    --nx-default-color-primary-border-on-solid: oklch(0 0 0 / 0.24);
     --nx-default-color-primary-border-active: oklch(0.553 0 0);
     --nx-default-color-secondary-background: oklch(0.207 0 0);
     --nx-default-color-secondary-background-hover: oklch(0.385 0 0);
@@ -779,6 +791,7 @@
     --nx-default-color-error-subtle-hover: oklch(0.34 0.1487 28.057);
     --nx-default-color-error-subtle-active: oklch(0.42 0.1838 28.144);
     --nx-default-color-error-border: oklch(0.505 0.2209 27.946);
+    --nx-default-color-error-border-on-solid: oklch(1 0 0 / 0.24);
     --nx-default-color-border-error-active: oklch(0.637 0.2786 27.978);
     --nx-default-color-information-background: oklch(0.546 0.2205 255.276);
     --nx-default-color-information-background-hover: oklch(0.488 0.197 255.267);

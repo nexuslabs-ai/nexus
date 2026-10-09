@@ -3,6 +3,8 @@ import { playwright } from '@vitest/browser-playwright';
 import path from 'path';
 import { defineConfig } from 'vitest/config';
 
+import { forcePseudoState } from './packages/react/src/stories/support/force-pseudo-state-command';
+
 export default defineConfig({
   resolve: {
     alias: [
@@ -56,10 +58,12 @@ export default defineConfig({
         root: path.resolve(__dirname, 'packages/react'),
         test: {
           name: 'storybook',
+          fileParallelism: false,
           browser: {
             enabled: true,
             provider: playwright(),
             headless: true,
+            commands: { forcePseudoState },
             instances: [{ browser: 'chromium' }],
           },
           setupFiles: [

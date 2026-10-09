@@ -286,6 +286,8 @@ const PRIMARY_LIGHT_ENDPOINT_CEIL = 0.99;
 const PRIMARY_DARK_HONOR_FLOOR = 0.45;
 const PRIMARY_DARK_LIFT_EXPONENT = 1.6;
 const PRIMARY_HOVER_STEP = 0.05;
+// Fills below mid-grey count as dark for hover and active stepping.
+const FILL_MID_LIGHTNESS = 0.5;
 const PRIMARY_ACTIVE_STEP = 0.1;
 const PRIMARY_ACTIVE_DARK_FILL_STEP = 0.03;
 // Endpoint brand interactions follow the same authored Neutral palette as secondary fills.
@@ -309,14 +311,16 @@ function primaryFillLightness(seedL: number, mode: Mode): number {
 // Hover/active nudge the fill toward mid-grey so the state change reads at any
 // fill lightness: dark fills lighten, light fills darken.
 const towardMid = (l: number, step: number): number =>
-  clamp01(l < 0.5 ? l + step : l - step);
+  clamp01(l < FILL_MID_LIGHTNESS ? l + step : l - step);
 
 const seedFill = (l: number, c: number, h: number): string =>
   formatOklch(clampChroma({ mode: 'oklch', l, c, h }, 'oklch', FILL_GAMUT));
 
 function hoverFillTarget(baseL: number): number {
-  if (baseL <= PRIMARY_DARK_ENDPOINT_LIFT_FLOOR) {
-    return endpointL('900');
+  // A dark fill's hover floors at neutral-800 so near-black brands still
+  // show a visible hover step.
+  if (baseL < FILL_MID_LIGHTNESS) {
+    return Math.max(baseL + PRIMARY_HOVER_STEP, endpointL('800'));
   }
   if (baseL >= PRIMARY_LIGHT_ENDPOINT_CEIL) return endpointL('100');
   return towardMid(baseL, PRIMARY_HOVER_STEP);
@@ -328,7 +332,7 @@ function activeFillTarget(baseL: number): number {
   }
   if (baseL >= PRIMARY_LIGHT_ENDPOINT_CEIL) return endpointL('200');
   return clamp01(
-    baseL < 0.5
+    baseL < FILL_MID_LIGHTNESS
       ? baseL - PRIMARY_ACTIVE_DARK_FILL_STEP
       : baseL - PRIMARY_ACTIVE_STEP
   );
@@ -432,7 +436,18 @@ export function deriveThemeMode(
     ...seedOklch(popover),
     alpha: 0.94 + (0.06 * contrast) / 100,
   });
-  return constrainColors(map, mode, contrast);
+  const resolved = constrainColors(map, mode, contrast);
+  // Decorative dividers on solid fills use the resolved contrasting ink, not
+  // the subtle-surface border ramp. Alpha preserves the fill underneath.
+  for (const family of ['primary', 'error'] as const) {
+    const ink = resolved[`--nx-color-${family}-foreground`];
+    if (!ink) throw new Error(`Missing ${family} foreground`);
+    resolved[`--nx-color-${family}-border-on-solid`] = formatOklch({
+      ...seedOklch(ink),
+      alpha: 0.24,
+    });
+  }
+  return resolved;
 }
 
 /**

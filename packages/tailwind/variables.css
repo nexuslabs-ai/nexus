@@ -342,6 +342,11 @@
     --nx-color-black-a900: oklch(0.1448 0 0 / 0.9098);
     --nx-color-black-a950: oklch(0.1448 0 0 / 0.9569);
 
+    /* icon */
+    --nx-icon-glyph-xs: 12px;
+    --nx-icon-glyph-sm: 14px;
+    --nx-icon-glyph-default: 16px;
+
     /* motion (snappy) */
     --nx-motion-duration-0: 0ms;
     --nx-motion-duration-faster: 100ms;
@@ -451,6 +456,7 @@
       'Liberation Mono', monospace;
     --nx-typography-size-xxs: 11px;
     --nx-typography-size-xs: 12px;
+    --nx-typography-size-xs-plus: 13px;
     --nx-typography-size-sm: 14px;
     --nx-typography-size-base: 16px;
     --nx-typography-size-lg: 18px;

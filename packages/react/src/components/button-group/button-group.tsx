@@ -1,6 +1,5 @@
 import * as React from 'react';
 
-import { Slot } from '@radix-ui/react-slot';
 import { cva, type VariantProps } from 'class-variance-authority';
 
 import { cn } from '../../lib/utils';
@@ -9,6 +8,8 @@ import {
   ButtonSizeContext,
 } from '../button/button-size-context';
 import { Separator } from '../separator';
+
+import { ButtonGroupJoinedContext } from './button-group-context';
 
 /** Size shared from a ButtonGroup to its members. */
 type ButtonGroupSize = ButtonContextSize;
@@ -19,7 +20,7 @@ const buttonGroupVariants = cva(
     variants: {
       orientation: {
         horizontal:
-          'nx:[&>*:not(:first-child)]:rounded-l-none nx:[&>*:not(:first-child)]:border-l-0 nx:[&>*:not(:last-child)]:rounded-r-none',
+          'nx:[&>*:not(:first-child)]:rounded-s-none nx:[&>*:not(:first-child)]:border-s-0 nx:[&>*:not(:last-child)]:rounded-e-none',
         vertical:
           'nx:flex-col nx:[&>*:not(:first-child)]:rounded-t-none nx:[&>*:not(:first-child)]:border-t-0 nx:[&>*:not(:last-child)]:rounded-b-none',
       },
@@ -31,13 +32,15 @@ const buttonGroupVariants = cva(
 );
 
 const buttonGroupTextVariants = cva(
-  'nx:flex nx:items-center nx:gap-2 nx:rounded-md nx:border-default nx:border-border-default nx:bg-control-background nx:shadow-xs nx:transition-control nx:duration-fast nx:focus-visible:outline-2 nx:focus-visible:outline-focus-default nx:[&_svg]:pointer-events-none nx:[&_svg]:size-4',
+  'nx:flex nx:items-center nx:gap-2 nx:rounded-md nx:border-default nx:border-border-default nx:bg-control-background nx:shadow-xs nx:[&_svg]:pointer-events-none',
   {
     variants: {
       size: {
-        sm: 'nx:h-8 nx:px-2.5 nx:typography-label-default',
-        default: 'nx:h-10 nx:px-3 nx:typography-label-default',
-        lg: 'nx:h-12 nx:px-3.5 nx:typography-label-default',
+        xs: 'nx:h-7 nx:px-2 nx:typography-label-small nx:[&_svg]:size-icon-glyph-xs',
+        sm: 'nx:h-8 nx:px-2.5 nx:typography-label-compact nx:[&_svg]:size-icon-glyph-sm',
+        default:
+          'nx:h-10 nx:px-3 nx:typography-label-default nx:[&_svg]:size-icon-glyph-default',
+        lg: 'nx:h-12 nx:px-3.5 nx:typography-label-default nx:[&_svg]:size-icon-glyph-default',
       },
     },
     defaultVariants: {
@@ -68,7 +71,7 @@ interface ButtonGroupProps
  * ButtonGroup
  *
  * A visually-joined cluster of button-shaped controls — Buttons, a
- * `DropdownMenu` or `Select` trigger, a link via `<ButtonGroupText asChild>`,
+ * `DropdownMenu` or `Select` trigger, a link via `<Button asChild>`,
  * plus `ButtonGroupText` and `ButtonGroupSeparator` addons — sharing borders
  * and outer rounding so adjacent children lose their touching corners and the
  * seam between them. Lay out horizontally (default) or vertically with
@@ -81,9 +84,9 @@ interface ButtonGroupProps
  * @example
  * ```tsx
  * <ButtonGroup>
- *   <Button variant="outline">Day</Button>
- *   <Button variant="outline">Week</Button>
- *   <Button variant="outline">Month</Button>
+ *   <Button variant="outline">Previous</Button>
+ *   <Button variant="outline">Today</Button>
+ *   <Button variant="outline">Next</Button>
  * </ButtonGroup>
  * ```
  */
@@ -96,16 +99,18 @@ function ButtonGroup({
 }: ButtonGroupProps) {
   return (
     <ButtonSizeContext.Provider value={size}>
-      <div
-        role="group"
-        data-slot="button-group"
-        data-orientation={orientation}
-        data-size={size}
-        className={cn(buttonGroupVariants({ orientation }), className)}
-        {...props}
-      >
-        {children}
-      </div>
+      <ButtonGroupJoinedContext.Provider value>
+        <div
+          role="group"
+          data-slot="button-group"
+          data-orientation={orientation}
+          data-size={size}
+          className={cn(buttonGroupVariants({ orientation }), className)}
+          {...props}
+        >
+          {children}
+        </div>
+      </ButtonGroupJoinedContext.Provider>
     </ButtonSizeContext.Provider>
   );
 }
@@ -116,12 +121,6 @@ function ButtonGroup({
  * Props for the ButtonGroupText component.
  */
 interface ButtonGroupTextProps extends React.ComponentProps<'div'> {
-  /**
-   * Render as the child element via Radix Slot, keeping the addon styling.
-   * @default false
-   */
-  asChild?: boolean;
-
   /**
    * Addon size. Inherits from ButtonGroup when omitted.
    * @default "default"
@@ -135,26 +134,15 @@ interface ButtonGroupTextProps extends React.ComponentProps<'div'> {
  * A non-interactive label or addon inside a group — a leading prefix, a unit, a
  * count. Matches the buttons' height, border, and elevation.
  */
-function ButtonGroupText({
-  className,
-  asChild = false,
-  size,
-  ...props
-}: ButtonGroupTextProps) {
-  const Comp = asChild ? Slot : 'div';
+function ButtonGroupText({ className, size, ...props }: ButtonGroupTextProps) {
   const contextSize = React.useContext(ButtonSizeContext);
   const resolvedSize = size ?? contextSize ?? 'default';
 
   return (
-    <Comp
+    <div
       data-slot="button-group-text"
       data-size={resolvedSize}
-      className={cn(
-        buttonGroupTextVariants({ size: resolvedSize }),
-        asChild &&
-          'nx:cursor-pointer nx:hover:bg-container-hover nx:active:bg-container-active',
-        className
-      )}
+      className={cn(buttonGroupTextVariants({ size: resolvedSize }), className)}
       {...props}
     />
   );
@@ -172,8 +160,14 @@ interface ButtonGroupSeparatorProps extends React.ComponentProps<
 /**
  * ButtonGroupSeparator
  *
- * A divider between sub-clusters in a group; stretches to the group's full
- * cross-axis. Defaults to a vertical rule for the common horizontal group.
+ * A full-length divider between actions or sub-clusters. Overlaps the next control
+ * so filled surfaces remain joined. Defaults to a vertical rule.
+ * The following control owns the fill under the divider, so its variant
+ * selects the colour, including in mixed groups and RTL. Default/destructive
+ * use their decorative on-solid tokens; other variants use the neutral border.
+ * Use horizontal orientation in vertical groups. Omit this divider between
+ * outlined buttons, which already have border seams.
+ * Decorative by default and does not add a keyboard stop.
  */
 function ButtonGroupSeparator({
   className,
@@ -185,7 +179,10 @@ function ButtonGroupSeparator({
       data-slot="button-group-separator"
       orientation={orientation}
       className={cn(
-        'nx:relative nx:self-stretch nx:data-[orientation=vertical]:h-auto',
+        'nx:relative nx:z-10 nx:self-stretch nx:pointer-events-none',
+        'nx:data-[orientation=vertical]:h-auto nx:data-[orientation=vertical]:-me-px',
+        'nx:data-[orientation=horizontal]:w-auto nx:data-[orientation=horizontal]:-mb-px',
+        'nx:has-[+[data-slot=button][data-variant=default]]:bg-primary-border-on-solid nx:has-[+[data-slot=button][data-variant=destructive]]:bg-error-border-on-solid',
         className
       )}
       {...props}

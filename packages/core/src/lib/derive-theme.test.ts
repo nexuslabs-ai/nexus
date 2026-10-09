@@ -41,7 +41,7 @@ function hOf(oklchStr: string | undefined): number {
 const toRgb = converter('rgb');
 const oklabDelta = differenceEuclidean('oklab');
 const COLORBLIND_DELTA_E = 0.02;
-const RUNTIME_SEMANTIC_COLOR_COUNT = 107;
+const RUNTIME_SEMANTIC_COLOR_COUNT = 109;
 const VISION_TYPES = [
   'normal',
   'deuteranopia',
@@ -254,7 +254,18 @@ describe('derivePrimary', () => {
 });
 
 describe('primary fills after contrast solving', () => {
-  const PRIMARY_SEEDS = ['#1b2a4a', '#0a0a0a', '#2563eb', '#339cff', '#7c3aed'];
+  const PRIMARY_SEEDS = [
+    '#000000',
+    '#171717',
+    '#0b1730',
+    '#200b30',
+    '#1b2a4a',
+    '#0a0a0a',
+    '#2563eb',
+    '#339cff',
+    '#7c3aed',
+    '#15803d',
+  ];
   const FILLS = [
     '--nx-color-primary-background',
     '--nx-color-primary-background-hover',
@@ -267,6 +278,21 @@ describe('primary fills after contrast solving', () => {
       dark: { ...CONTRACT.dark, accent },
       contrast: { light: contrast, dark: contrast },
     });
+
+  it('keeps dark-brand hover visibly lighter without replacing its hue', () => {
+    for (const seed of ['#000000', '#171717', '#0b1730', '#200b30']) {
+      const map = themeFor(seed).light;
+      const base = map['--nx-color-primary-background'];
+      const hover = map['--nx-color-primary-background-hover'];
+      expect(lOf(hover)).toBeGreaterThan(lOf(base));
+      expect(lOf(hover)).toBeGreaterThanOrEqual(
+        lOf(getPaletteRamp('neutral')['800']) - 0.0001
+      );
+      if (seed !== '#000000' && seed !== '#171717') {
+        expect(hOf(hover)).toBeCloseTo(hOf(base), 0);
+      }
+    }
+  });
 
   it('keeps the shared label legible on the base, hover, and active fills', () => {
     for (const seed of PRIMARY_SEEDS) {
@@ -756,6 +782,38 @@ describe('derived colorblind distinguishability', () => {
 });
 
 describe('alpha and translucent colors', () => {
+  it.each(['#000000', '#ffffff', '#2563eb', '#ffff00'])(
+    'keeps decorative solid-fill dividers translucent and distinct for brand %s',
+    (brandColor) => {
+      const theme = deriveTheme(
+        createNexusThemeContract({
+          ...DEFAULT_NEXUS_APPEARANCE,
+          brandColor,
+        })
+      );
+      for (const map of [theme.light, theme.dark]) {
+        for (const family of ['primary', 'error']) {
+          const divider = map[`--nx-color-${family}-border-on-solid`]!;
+          const foreground = map[`--nx-color-${family}-foreground`]!;
+          expect(alphaOf(divider)).toBeGreaterThan(0);
+          expect(alphaOf(divider)).toBeLessThan(1);
+          expect(lOf(divider)).toBe(lOf(foreground));
+          for (const state of ['', '-hover', '-active']) {
+            const fill = map[`--nx-color-${family}-background${state}`]!;
+            const composite = rgbString(
+              compositeOver(
+                toSrgbInts(divider),
+                alphaOf(divider),
+                toSrgbInts(fill)
+              )
+            );
+            expect(oklabDelta(composite, fill)).toBeGreaterThan(0.02);
+          }
+        }
+      }
+    }
+  );
+
   const at = (contrast: number) =>
     deriveTheme({
       surfaceTone: 'slate',

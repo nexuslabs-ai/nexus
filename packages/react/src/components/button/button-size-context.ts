@@ -3,7 +3,7 @@
 import * as React from 'react';
 
 /** Text-button size a container can broadcast to the Buttons inside it. */
-type ButtonContextSize = 'sm' | 'default' | 'lg';
+type ButtonContextSize = 'xs' | 'sm' | 'default' | 'lg';
 
 /**
  * A container — ButtonGroup, AlertActions — broadcasts a default Button `size`

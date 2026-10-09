@@ -1,13 +1,18 @@
-import type { Meta, StoryObj } from '@storybook/react';
 import {
-  IconBold,
-  IconChevronDown,
-  IconItalic,
-  IconLink,
-  IconUnderline,
-} from '@tabler/icons-react';
-import { expect, within } from 'storybook/test';
+  ArgTypes,
+  Canvas,
+  Description,
+  Title,
+} from '@storybook/addon-docs/blocks';
+import type { Meta, StoryObj } from '@storybook/react';
+import { IconChevronDown } from '@tabler/icons-react';
+import { expect, userEvent, waitFor, within } from 'storybook/test';
 
+import { CalendarNavigationExample } from '../../stories/examples/calendar-navigation-example';
+import CalendarNavigationExampleSource from '../../stories/examples/calendar-navigation-example.tsx?raw';
+import { ReplyExample } from '../../stories/examples/reply-example';
+import ReplyExampleSource from '../../stories/examples/reply-example.tsx?raw';
+import { expectNativePress } from '../../stories/support/native-press';
 import { expectHeightPinned } from '../../stories/support/story-height-test-utils';
 import { Button } from '../button';
 import {
@@ -24,6 +29,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from '../select';
+import { Toggle } from '../toggle';
 
 import {
   ButtonGroup,
@@ -34,50 +40,245 @@ import {
 const meta: Meta<typeof ButtonGroup> = {
   title: 'Components/ButtonGroup',
   component: ButtonGroup,
+  parameters: {
+    docs: {
+      page: () => (
+        <>
+          <Title />
+          <Description />
+          <h2 id="split-action">Send a reply</h2>
+          <p>
+            Keep a frequent action one click away, with alternatives in the
+            adjoining menu. Try the buttons: feedback is simulated and no email
+            is sent.
+          </p>
+          <Canvas of={SplitButton} />
+          <h2 id="navigation">Browse a calendar</h2>
+          <p>
+            Previous, Today and Next act on the same calendar. The month changes
+            below; there is no selected button.
+          </p>
+          <Canvas of={CalendarNavigation} />
+          <h2 id="sizes">Size comparison</h2>
+          <p>
+            Set size on the group to size its Button and text-addon children
+            together. Explicit child sizes override it; icon-only buttons need
+            their matching icon size.
+          </p>
+          <Canvas of={SizeComparison} />
+          <h2 id="separators">Separators</h2>
+          <p>
+            Use ButtonGroupSeparator between filled buttons when each action
+            needs a visible boundary, or between clusters of ghost actions.
+            Outline, error-outline and dashed buttons already have border seams;
+            an extra separator is usually unnecessary. Present link buttons
+            separately, without a ButtonGroupSeparator.
+          </p>
+          <p>
+            The full-length separator overlaps the following button and uses
+            that button’s fill: primary-border-on-solid for default,
+            error-border-on-solid for destructive, and border-default otherwise.
+            The on-solid tokens are decorative dividers at 24% opacity, not
+            focus indicators or required control boundaries. For a vertical
+            group, set the separator orientation to horizontal.
+          </p>
+          <Canvas of={SeparatorVariants} />
+          <h2 id="vertical">Vertical groups</h2>
+          <p>
+            Use a vertical group for related commands in a narrow side panel.
+            This composition shows history and clipboard commands separated by a
+            horizontal rule. Buttons use normal Tab navigation; application code
+            supplies the action handlers.
+          </p>
+          <Canvas of={Vertical} />
+          <h2 id="api">API</h2>
+          <ArgTypes />
+          <p>
+            ButtonGroupText adds non-interactive context. ButtonGroupSeparator
+            divides command clusters. Use these parts only when the product
+            needs them. Buttons keep normal Tab navigation; application code
+            owns their effects.
+          </p>
+        </>
+      ),
+      description: {
+        component:
+          'Visually joins closely related actions. Use a split action or navigation cluster when the shared boundary helps explain the relationship. Ordinary adjacent actions can remain separate. Use ToggleGroup for persistent choices and InputGroup for editable fields.',
+      },
+    },
+  },
 };
 
 export default meta;
 type Story = StoryObj<typeof ButtonGroup>;
 
 const BUTTON_GROUP_SIZE_HEIGHTS = {
+  xs: 28,
   sm: 32,
   default: 40,
   lg: 48,
 } as const;
 
 const BUTTON_GROUP_TEXT_SIZE_CLASSES = {
-  sm: ['nx:h-8', 'nx:px-2.5', 'nx:typography-label-default'],
+  xs: ['nx:h-7', 'nx:px-2', 'nx:typography-label-small'],
+  sm: ['nx:h-8', 'nx:px-2.5', 'nx:typography-label-compact'],
   default: ['nx:h-10', 'nx:px-3', 'nx:typography-label-default'],
   lg: ['nx:h-12', 'nx:px-3.5', 'nx:typography-label-default'],
 } as const;
 
+export const SizeComparison: Story = {
+  render: () => (
+    <div className="nx:flex nx:flex-wrap nx:items-end nx:gap-6">
+      {(['xs', 'sm', 'default', 'lg'] as const).map((size) => (
+        <div key={size} className="nx:flex nx:flex-col nx:items-start nx:gap-2">
+          <span className="nx:typography-label-small nx:text-muted-foreground">
+            {size}
+          </span>
+          <ButtonGroup size={size} aria-label={`${size} history commands`}>
+            <Button variant="outline">Undo</Button>
+            <Button variant="outline">Redo</Button>
+          </ButtonGroup>
+        </div>
+      ))}
+    </div>
+  ),
+};
+
+/** Appearance reference; these buttons do not execute product actions. */
+export const SeparatorVariants: Story = {
+  name: 'Separator variants',
+  parameters: {
+    docs: {
+      description: {
+        story:
+          'Appearance reference only. Filled and ghost-style pairs use full-length separators. Bordered pairs use their existing border seam.',
+      },
+    },
+  },
+  render: () => (
+    <div className="nx:flex nx:flex-wrap nx:items-start nx:gap-6">
+      {(
+        [
+          'default',
+          'secondary',
+          'destructive',
+          'error',
+          'outline',
+          'error-outline',
+          'dashed',
+          'ghost',
+        ] as const
+      ).map((variant) => (
+        <div
+          key={variant}
+          className="nx:flex nx:flex-col nx:items-start nx:gap-2"
+        >
+          <span className="nx:typography-label-small nx:text-muted-foreground">
+            {variant}
+          </span>
+          <ButtonGroup aria-label={`${variant} separator appearance`}>
+            <Button variant={variant}>Action</Button>
+            {!['outline', 'error-outline', 'dashed'].includes(variant) && (
+              <ButtonGroupSeparator />
+            )}
+            <Button variant={variant}>More</Button>
+          </ButtonGroup>
+        </div>
+      ))}
+    </div>
+  ),
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+    for (const group of canvas.getAllByRole('group')) {
+      const first = within(group).getByRole('button', { name: 'Action' });
+      const second = within(group).getByRole('button', { name: 'More' });
+      const firstBounds = first.getBoundingClientRect();
+      const secondBounds = second.getBoundingClientRect();
+      await expect(firstBounds.right).toBe(secondBounds.left);
+      const divider = group.querySelector(
+        '[data-slot="button-group-separator"]'
+      );
+      if (divider) {
+        const bounds = divider.getBoundingClientRect();
+        await expect(bounds.top).toBe(firstBounds.top);
+        await expect(bounds.bottom).toBe(firstBounds.bottom);
+        await expect(divider).toHaveAttribute('role', 'none');
+      }
+    }
+  },
+};
+
+export const CalendarNavigation: Story = {
+  render: () => <CalendarNavigationExample />,
+  parameters: {
+    docs: { source: { type: 'code', code: CalendarNavigationExampleSource } },
+  },
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+    const current = canvas.getByRole('status').textContent;
+    await userEvent.click(canvas.getByRole('button', { name: 'Previous' }));
+    await expect(canvas.getByRole('status').textContent).not.toBe(current);
+    await userEvent.click(canvas.getByRole('button', { name: 'Next' }));
+    await expect(canvas.getByRole('status').textContent).toBe(current);
+    await userEvent.click(canvas.getByRole('button', { name: 'Next' }));
+    await expect(canvas.getByRole('status').textContent).not.toBe(current);
+    await userEvent.click(canvas.getByRole('button', { name: 'Today' }));
+    await expect(canvas.getByRole('status').textContent).toBe(current);
+  },
+};
+
 // Three outline buttons joined into one horizontal cluster.
 export const Default: Story = {
+  tags: ['!autodocs', '!dev'],
   render: () => (
     <ButtonGroup>
-      <Button variant="outline">Day</Button>
-      <Button variant="outline">Week</Button>
-      <Button variant="outline">Month</Button>
+      <Button variant="outline">Copy</Button>
+      <Button variant="outline">Paste</Button>
+      <Button variant="outline">Duplicate</Button>
     </ButtonGroup>
   ),
 };
 
+export const ExtraSmall: Story = {
+  tags: ['!autodocs', '!dev'],
+  render: () => (
+    <ButtonGroup size="xs" aria-label="Extra small actions">
+      <ButtonGroupText>Actions</ButtonGroupText>
+      <Button variant="outline">Save</Button>
+      <Button variant="outline" size="icon-xs" aria-label="More actions">
+        <IconChevronDown />
+      </Button>
+    </ButtonGroup>
+  ),
+  play: async ({ canvasElement }) => {
+    const buttons = within(canvasElement).getAllByRole('button');
+    for (const button of buttons) {
+      await expect(
+        button.getBoundingClientRect().height
+      ).toBeGreaterThanOrEqual(24);
+    }
+    await expect(buttons[0]).toHaveAttribute('data-size', 'xs');
+  },
+};
+
 export const Small: Story = {
+  tags: ['!autodocs', '!dev'],
   render: () => (
     <ButtonGroup size="sm">
-      <ButtonGroupText>View:</ButtonGroupText>
-      <Button variant="outline">Day</Button>
-      <Button variant="outline">Week</Button>
+      <ButtonGroupText>Edit:</ButtonGroupText>
+      <Button variant="outline">Copy</Button>
+      <Button variant="outline">Paste</Button>
     </ButtonGroup>
   ),
 };
 
 export const Large: Story = {
+  tags: ['!autodocs', '!dev'],
   render: () => (
     <ButtonGroup size="lg">
-      <ButtonGroupText>View:</ButtonGroupText>
-      <Button variant="outline">Day</Button>
-      <Button variant="outline">Week</Button>
+      <ButtonGroupText>Edit:</ButtonGroupText>
+      <Button variant="outline">Copy</Button>
+      <Button variant="outline">Paste</Button>
     </ButtonGroup>
   ),
 };
@@ -85,16 +286,28 @@ export const Large: Story = {
 // Vertical orientation stacks the cluster.
 export const Vertical: Story = {
   render: () => (
-    <ButtonGroup orientation="vertical" size="sm">
-      <Button variant="outline">Top</Button>
-      <Button variant="outline">Middle</Button>
-      <Button variant="outline">Bottom</Button>
+    <ButtonGroup
+      orientation="vertical"
+      size="sm"
+      aria-label="Document commands"
+    >
+      <Button variant="ghost">Undo</Button>
+      <Button variant="ghost">Redo</Button>
+      <ButtonGroupSeparator orientation="horizontal" />
+      <Button variant="ghost">Copy</Button>
+      <Button variant="ghost">Paste</Button>
     </ButtonGroup>
   ),
   play: async ({ canvasElement }) => {
     const group = canvasElement.querySelector('[data-slot="button-group"]');
     await expect(group).toHaveAttribute('data-orientation', 'vertical');
     await expect(group).toHaveAttribute('data-size', 'sm');
+    const divider = group?.querySelector(
+      '[data-slot="button-group-separator"]'
+    );
+    await expect(divider).toHaveAttribute('data-orientation', 'horizontal');
+    const dividerBounds = divider!.getBoundingClientRect();
+    await expect(dividerBounds.width).toBeGreaterThan(dividerBounds.height);
 
     const canvas = within(canvasElement);
     for (const button of canvas.getAllByRole('button')) {
@@ -103,49 +316,61 @@ export const Vertical: Story = {
   },
 };
 
-// A text addon as a leading prefix.
+// The selection count supplies context for the adjacent bulk actions.
 export const WithText: Story = {
+  tags: ['!autodocs', '!dev'],
+  name: 'Selection actions',
   render: () => (
-    <ButtonGroup>
-      <ButtonGroupText>https://</ButtonGroupText>
-      <Button variant="outline">nexus.dev</Button>
+    <ButtonGroup aria-label="Actions for 3 selected items">
+      <ButtonGroupText>3 selected</ButtonGroupText>
+      <Button variant="outline">Archive</Button>
+      <Button variant="error-outline">Delete</Button>
     </ButtonGroup>
   ),
   play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+    const group = canvas.getByRole('group', {
+      name: 'Actions for 3 selected items',
+    });
+    await expect(within(group).getByText('3 selected')).toHaveAttribute(
+      'data-slot',
+      'button-group-text'
+    );
+    await expect(within(group).getAllByRole('button')).toHaveLength(2);
     await expect(
-      canvasElement.querySelector('[data-slot="button-group-text"]')
-    ).toBeInTheDocument();
+      within(group).getByRole('button', { name: 'Archive' })
+    ).toBeEnabled();
+    await expect(
+      within(group).getByRole('button', { name: 'Delete' })
+    ).toBeEnabled();
   },
 };
 
-// A separator divides sub-groups in a toolbar of borderless (ghost) controls —
-// the rule is the only division, so it reads clearly. In a row of bordered
-// (outline) buttons the per-button borders sit in the same color and hide it.
+// Ghost controls let the separator distinguish history from clipboard commands.
 export const WithSeparator: Story = {
+  tags: ['!autodocs', '!dev'],
+  name: 'Command clusters',
   render: () => (
-    <ButtonGroup>
-      <Button variant="ghost" size="icon" aria-label="Bold">
-        <IconBold />
-      </Button>
-      <Button variant="ghost" size="icon" aria-label="Italic">
-        <IconItalic />
-      </Button>
-      <Button variant="ghost" size="icon" aria-label="Underline">
-        <IconUnderline />
-      </Button>
+    <ButtonGroup aria-label="Editing commands">
+      <Button variant="ghost">Undo</Button>
+      <Button variant="ghost">Redo</Button>
       <ButtonGroupSeparator />
-      <Button variant="ghost" size="icon" aria-label="Add link">
-        <IconLink />
-      </Button>
+      <Button variant="ghost">Copy</Button>
+      <Button variant="ghost">Paste</Button>
     </ButtonGroup>
   ),
   play: async ({ canvasElement }) => {
-    const separator = canvasElement.querySelector(
+    const canvas = within(canvasElement);
+    const group = canvas.getByRole('group', { name: 'Editing commands' });
+    const separator = group.querySelector(
       '[data-slot="button-group-separator"]'
     );
-
-    await expect(separator).toBeInTheDocument();
     await expect(separator).toHaveAttribute('data-orientation', 'vertical');
+    for (const name of ['Undo', 'Redo', 'Copy', 'Paste']) {
+      const button = within(group).getByRole('button', { name });
+      await expect(button).toBeEnabled();
+      await expect(button).not.toHaveAttribute('aria-pressed');
+    }
   },
 };
 
@@ -153,6 +378,7 @@ export const WithSeparator: Story = {
 // with no `orientation` prop so it exercises the default — a regression guard
 // for the default `data-orientation` emit.
 export const WithDataAttributes: Story = {
+  tags: ['!autodocs', '!dev'],
   render: () => (
     <ButtonGroup>
       <Button variant="outline">One</Button>
@@ -169,6 +395,7 @@ export const WithDataAttributes: Story = {
 };
 
 export const SizeAlignment: Story = {
+  tags: ['!autodocs', '!dev'],
   parameters: {
     a11y: { test: 'off' },
     docs: {
@@ -251,6 +478,7 @@ export const SizeAlignment: Story = {
 // Compatibility sentinel: raw input layouts should generally use InputGroup,
 // but ButtonGroup must not mutate or break non-Button children.
 export const MixedChildren: Story = {
+  tags: ['!autodocs', '!dev'],
   render: () => (
     <ButtonGroup size="lg" aria-label="mixed button-shaped controls">
       <ButtonGroupText data-testid="button-group-mixed-text">
@@ -294,25 +522,27 @@ export const MixedChildren: Story = {
   },
 };
 
-// ButtonGroupText composes with a custom element via asChild — here a link
-// addon — keeping the addon styling and data-slot hook.
+// Navigation composes through Button, alongside action buttons.
 export const AsChild: Story = {
+  tags: ['!autodocs', '!dev'],
   render: () => (
     <ButtonGroup>
-      <ButtonGroupText asChild>
+      <Button asChild variant="outline">
         <a href="https://example.com">Docs</a>
-      </ButtonGroupText>
+      </Button>
       <Button variant="outline">Open</Button>
     </ButtonGroup>
   ),
   play: async ({ canvasElement }) => {
     const link = within(canvasElement).getByRole('link', { name: 'Docs' });
     await expect(link.tagName).toBe('A');
-    await expect(link).toHaveAttribute('data-slot', 'button-group-text');
+    await expect(link).toHaveAttribute('data-slot', 'button');
     await expect(link).toHaveClass('nx:focus-visible:outline-2');
     await expect(link).toHaveClass('nx:focus-visible:outline-focus-default');
-    await expect(link).toHaveClass('nx:transition-control');
-    await expect(link).toHaveClass('nx:duration-fast');
+    await expect(link).toHaveClass(
+      'nx:transition-[color,background-color,border-color,scale]'
+    );
+    await expect(link).toHaveClass('nx:duration-faster');
     await expect(link).toHaveClass('nx:hover:bg-container-hover');
     await expect(link).toHaveClass('nx:active:bg-container-active');
   },
@@ -321,6 +551,7 @@ export const AsChild: Story = {
 // A Select trigger joins the group as a button-shaped control, sharing the
 // seam with the adjacent button.
 export const WithSelectTrigger: Story = {
+  tags: ['!autodocs', '!dev'],
   render: () => (
     <ButtonGroup>
       <Button variant="outline">Filter</Button>
@@ -352,22 +583,8 @@ export const WithSelectTrigger: Story = {
 // trigger renders as a button via asChild, so it joins the seam like any
 // other button-shaped control.
 export const SplitButton: Story = {
-  render: () => (
-    <ButtonGroup>
-      <Button>Deploy</Button>
-      <DropdownMenu>
-        <DropdownMenuTrigger asChild>
-          <Button size="icon" aria-label="Deployment options">
-            <IconChevronDown />
-          </Button>
-        </DropdownMenuTrigger>
-        <DropdownMenuContent align="end">
-          <DropdownMenuItem>Deploy to staging</DropdownMenuItem>
-          <DropdownMenuItem>Deploy to production</DropdownMenuItem>
-        </DropdownMenuContent>
-      </DropdownMenu>
-    </ButtonGroup>
-  ),
+  render: () => <ReplyExample />,
+  parameters: { docs: { source: { type: 'code', code: ReplyExampleSource } } },
   play: async ({ canvasElement }) => {
     // The DropdownMenu trigger composes onto a Button via asChild, so it lands
     // in the group as a button-shaped control (data-slot=button) that opens a
@@ -377,24 +594,53 @@ export const SplitButton: Story = {
     );
     await expect(trigger).toBeInTheDocument();
     await expect(trigger).toHaveAttribute('data-slot', 'button');
+    const menuButton = within(canvasElement).getByRole('button', {
+      name: 'Send options',
+    });
+    menuButton.focus();
+    await userEvent.keyboard('{Enter}');
+    await expect(
+      await within(document.body).findByRole('menuitem', {
+        name: 'Send only',
+      })
+    ).toBeVisible();
+    await userEvent.keyboard('{Escape}');
+    await waitFor(() => expect(menuButton).toHaveFocus());
+    const canvas = within(canvasElement);
+    await userEvent.click(
+      canvas.getByRole('button', { name: 'Send & archive' })
+    );
+    await expect(canvas.getByRole('status')).toHaveTextContent(
+      'Demo: reply sent and conversation archived.'
+    );
+    menuButton.focus();
+    await userEvent.keyboard('{Enter}');
+    await userEvent.click(
+      await within(document.body).findByRole('menuitem', { name: 'Send only' })
+    );
+    await waitFor(() => expect(menuButton).toHaveFocus());
+    await expect(canvas.getByRole('status')).toHaveTextContent(
+      'Conversation stays in the inbox.'
+    );
   },
 };
 
 export const TierAPolishEvidence: Story = {
+  tags: ['!autodocs', '!dev'],
   parameters: {
     docs: {
       description: {
         story:
-          'ButtonGroup Tier-A polish contract: focus-visible addon links, tokenized color motion, inherited loading/disabled button states, and vertical density evidence.',
+          'ButtonGroup Tier-A polish contract: focus-visible Button links, tokenized color motion, inherited loading/disabled button states, and vertical density evidence.',
       },
     },
   },
   render: () => (
     <div className="nx:flex nx:flex-col nx:items-start nx:gap-4 nx:bg-background nx:p-10">
       <ButtonGroup aria-label="document actions">
-        <ButtonGroupText asChild>
+        <Button asChild variant="outline">
           <a href="https://example.com/docs">Docs</a>
-        </ButtonGroupText>
+        </Button>
         <Button variant="outline">Open</Button>
         <Button variant="outline" loading>
           Saving
@@ -404,10 +650,14 @@ export const TierAPolishEvidence: Story = {
         </Button>
       </ButtonGroup>
 
-      <ButtonGroup orientation="vertical" size="sm" aria-label="format density">
-        <Button variant="outline">Bold</Button>
-        <Button variant="outline">Italic</Button>
-        <Button variant="outline">Underline</Button>
+      <ButtonGroup
+        orientation="vertical"
+        size="sm"
+        aria-label="history commands"
+      >
+        <Button variant="outline">Undo</Button>
+        <Button variant="outline">Redo</Button>
+        <Button variant="outline">Restore</Button>
       </ButtonGroup>
     </div>
   ),
@@ -417,7 +667,7 @@ export const TierAPolishEvidence: Story = {
       name: 'document actions',
     });
     const verticalGroup = canvas.getByRole('group', {
-      name: 'format density',
+      name: 'history commands',
     });
     const link = canvas.getByRole('link', { name: 'Docs' });
     const loadingButton = canvas.getByRole('button', { name: 'Saving' });
@@ -434,8 +684,10 @@ export const TierAPolishEvidence: Story = {
       await expect(button).toHaveAttribute('data-size', 'sm');
     }
 
-    await expect(link).toHaveClass('nx:transition-control');
-    await expect(link).toHaveClass('nx:duration-fast');
+    await expect(link).toHaveClass(
+      'nx:transition-[color,background-color,border-color,scale]'
+    );
+    await expect(link).toHaveClass('nx:duration-faster');
     await expect(link).toHaveClass('nx:focus-visible:outline-2');
     await expect(link).toHaveClass('nx:hover:bg-container-hover');
     await expect(link).toHaveClass('nx:active:bg-container-active');
@@ -454,6 +706,7 @@ export const TierAPolishEvidence: Story = {
 // group, yet it inherits the group size — the case the old cloneElement walk
 // over direct children missed.
 export const NestedTriggerInheritsSize: Story = {
+  tags: ['!autodocs', '!dev'],
   render: () => (
     <ButtonGroup size="sm">
       <Button data-testid="nested-direct">Deploy</Button>
@@ -491,17 +744,18 @@ export const NestedTriggerInheritsSize: Story = {
 // Both orientations plus a text addon and a separator. Reused by the per-base
 // variant generator.
 export const AllVariants: Story = {
+  tags: ['!autodocs', '!dev'],
   render: () => (
     <div className="nx:flex nx:flex-col nx:items-start nx:gap-4">
       <ButtonGroup>
-        <Button variant="outline">Day</Button>
-        <Button variant="outline">Week</Button>
-        <Button variant="outline">Month</Button>
+        <Button variant="outline">Copy</Button>
+        <Button variant="outline">Paste</Button>
+        <Button variant="outline">Duplicate</Button>
       </ButtonGroup>
-      <ButtonGroup>
-        <ButtonGroupText>https://</ButtonGroupText>
-        <Button variant="outline">nexus.dev</Button>
-        <Button variant="outline">Go</Button>
+      <ButtonGroup aria-label="Actions for 3 selected items">
+        <ButtonGroupText>3 selected</ButtonGroupText>
+        <Button variant="outline">Archive</Button>
+        <Button variant="error-outline">Delete</Button>
       </ButtonGroup>
       <ButtonGroup orientation="vertical" size="sm">
         <Button variant="outline">Top</Button>
@@ -510,4 +764,156 @@ export const AllVariants: Story = {
       </ButtonGroup>
     </div>
   ),
+};
+
+export const ErrorOutlineGroup: Story = {
+  tags: ['!autodocs', '!dev'],
+  render: () => (
+    <ButtonGroup aria-label="Project actions">
+      <Button variant="outline">Archive</Button>
+      <Button variant="error-outline">Delete</Button>
+    </ButtonGroup>
+  ),
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+    const archive = canvas.getByRole('button', { name: 'Archive' });
+    const remove = canvas.getByRole('button', { name: 'Delete' });
+    const before = remove.offsetWidth;
+    await expect(archive.getBoundingClientRect().right).toBe(
+      remove.getBoundingClientRect().left
+    );
+    await expectNativePress(
+      '[data-slot=button-group] [data-variant=error-outline]',
+      1
+    );
+    await expect(archive.getBoundingClientRect().right).toBe(
+      remove.getBoundingClientRect().left
+    );
+    await expect(remove.offsetWidth).toBe(before);
+  },
+};
+
+export const RightToLeft: Story = {
+  tags: ['!autodocs', '!dev'],
+  render: () => (
+    <ButtonGroup
+      dir="rtl"
+      aria-label="Document actions"
+      className="nx:rounded-md"
+    >
+      <Button variant="outline">First</Button>
+      <Button variant="outline">Middle</Button>
+      <Button variant="outline">Last</Button>
+    </ButtonGroup>
+  ),
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+    const first = canvas.getByRole('button', { name: 'First' });
+    const middle = canvas.getByRole('button', { name: 'Middle' });
+    const last = canvas.getByRole('button', { name: 'Last' });
+    await expect(first.getBoundingClientRect().left).toBe(
+      middle.getBoundingClientRect().right
+    );
+    await expect(middle.getBoundingClientRect().left).toBe(
+      last.getBoundingClientRect().right
+    );
+    await expect(getComputedStyle(first).borderLeftWidth).not.toBe('0px');
+    await expect(getComputedStyle(middle).borderRightWidth).toBe('0px');
+    await expect(getComputedStyle(last).borderRightWidth).toBe('0px');
+  },
+};
+
+export const MixedSeparatorSurfaces: Story = {
+  globals: { mode: 'dark' },
+  tags: ['!autodocs', '!dev'],
+  render: () => (
+    <div className="nx:flex nx:flex-wrap nx:items-start nx:gap-4">
+      {(['horizontal', 'vertical'] as const).map((orientation) => (
+        <div
+          key={orientation}
+          className="nx:flex nx:flex-wrap nx:items-start nx:gap-4"
+        >
+          {(['ltr', 'rtl'] as const).map((dir) => (
+            <div
+              key={dir}
+              dir={dir}
+              className="nx:flex nx:flex-wrap nx:items-start nx:gap-4"
+            >
+              {(
+                [
+                  ['default', 'default'],
+                  ['destructive', 'destructive'],
+                  ['secondary', 'secondary'],
+                  ['default', 'destructive'],
+                  ['destructive', 'default'],
+                  ['default', 'secondary'],
+                ] as const
+              ).map(([first, next]) => (
+                <ButtonGroup
+                  key={`${first}-${next}`}
+                  orientation={orientation}
+                  aria-label={`${orientation} ${dir} ${first} to ${next}`}
+                >
+                  <Button variant={first}>Action</Button>
+                  <ButtonGroupSeparator
+                    orientation={
+                      orientation === 'horizontal' ? 'vertical' : 'horizontal'
+                    }
+                  />
+                  <Button variant={next}>More</Button>
+                </ButtonGroup>
+              ))}
+            </div>
+          ))}
+        </div>
+      ))}
+      <ButtonGroup aria-label="secondary to toggle">
+        <Button variant="secondary">Bold</Button>
+        <ButtonGroupSeparator />
+        <Toggle aria-label="Italic">I</Toggle>
+      </ButtonGroup>
+    </div>
+  ),
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+    const neutral = (label: string) =>
+      getComputedStyle(
+        canvas
+          .getByRole('group', { name: label })
+          .querySelector('[data-slot="button-group-separator"]')!
+      ).backgroundColor;
+    // Toggle also renders data-variant="default"; it must keep the neutral rule.
+    await expect(neutral('secondary to toggle')).toBe(
+      neutral('horizontal ltr secondary to secondary')
+    );
+    for (const orientation of ['horizontal', 'vertical']) {
+      for (const dir of ['ltr', 'rtl']) {
+        const dividerColour = (pair: string) => {
+          const group = canvas.getByRole('group', {
+            name: `${orientation} ${dir} ${pair}`,
+          });
+          const divider = group.querySelector(
+            '[data-slot="button-group-separator"]'
+          )!;
+          return getComputedStyle(divider).backgroundColor;
+        };
+        await expect(dividerColour('default to destructive')).toBe(
+          dividerColour('destructive to destructive')
+        );
+        await expect(dividerColour('destructive to default')).toBe(
+          dividerColour('default to default')
+        );
+        await expect(dividerColour('default to secondary')).toBe(
+          dividerColour('secondary to secondary')
+        );
+        // Solid fills take their on-solid divider, not the neutral border.
+        await expect(dividerColour('default to default')).not.toBe(
+          dividerColour('secondary to secondary')
+        );
+        await expect(dividerColour('destructive to destructive')).not.toBe(
+          dividerColour('secondary to secondary')
+        );
+      }
+    }
+  },
 };
