@@ -191,7 +191,7 @@ export function NumberRangeFilter({
               {error}
             </p>
           </div>
-          <div className="nx:flex nx:justify-between nx:gap-2 nx:border-t nx:border-border-default nx:bg-control-background/20 nx:p-3">
+          <div className="nx:flex nx:justify-between nx:gap-2 nx:border-t nx:border-border-default nx:bg-muted-extralight nx:p-3">
             <Button
               type="button"
               variant="ghost"

@@ -136,7 +136,7 @@ function Picker<Value extends string>({
         aria-invalid={invalid}
         aria-describedby={describedBy}
         className={cn(
-          'nx:h-(--nx-spacing-8) nx:w-auto nx:min-w-0 nx:max-w-full nx:px-2.5 nx:[&>span]:flex-1 nx:[&>span]:text-left',
+          'nx:h-(--nx-spacing-8) nx:w-auto nx:min-w-0 nx:max-w-full nx:px-2.5 nx:[&>span]:flex-1 nx:[&>span]:text-start',
           className
         )}
       >
@@ -283,14 +283,11 @@ function RuleValue({
   }
   if (rule.operator === 'between') {
     if (field.type === 'choice') return null;
-    const range = rule;
-    const [start, end] = range.value;
-    function changeStart(event: React.ChangeEvent<HTMLInputElement>) {
-      onValueChange({ ...range, value: [event.target.value, end] });
-    }
-    function changeEnd(event: React.ChangeEvent<HTMLInputElement>) {
-      onValueChange({ ...range, value: [start, event.target.value] });
-    }
+    const [start, end] = rule.value;
+    const changeStart = (event: React.ChangeEvent<HTMLInputElement>) =>
+      onValueChange({ ...rule, value: [event.target.value, end] });
+    const changeEnd = (event: React.ChangeEvent<HTMLInputElement>) =>
+      onValueChange({ ...rule, value: [start, event.target.value] });
     return (
       <div className="nx:flex nx:min-w-0 nx:max-w-full nx:flex-wrap nx:items-center nx:gap-2 nx:@lg/rule:flex-nowrap nx:@lg/rule:gap-0 nx:@lg/rule:[&>input]:flex-1 nx:@lg/rule:[&>input:first-child]:rounded-e-none">
         <Input
@@ -542,7 +539,7 @@ function GroupEditor({
       className={cn(
         'nx:min-w-0',
         depth > 0 &&
-          'nx:rounded-md nx:border-default nx:border-border-default nx:bg-control-background/20 nx:p-3'
+          'nx:rounded-md nx:border-default nx:border-border-default nx:bg-muted-extralight nx:p-3'
       )}
     >
       <div className="nx:mb-3 nx:flex nx:items-center nx:gap-2">

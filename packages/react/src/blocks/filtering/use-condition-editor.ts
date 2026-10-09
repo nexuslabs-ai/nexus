@@ -1,12 +1,17 @@
 import * as React from 'react';
 
+import {
+  type FilterOperator,
+  isValuelessOperator,
+} from '../../lib/filter-model';
+
 type ValuelessCondition = { operator: 'isEmpty' | 'isNotEmpty' };
 type AppliedCondition<Condition> = Exclude<Condition, ValuelessCondition>;
 
-function isApplied<Condition extends { operator: string }>(
+function isApplied<Condition extends { operator: FilterOperator }>(
   value: Condition
 ): value is AppliedCondition<Condition> {
-  return value.operator !== 'isEmpty' && value.operator !== 'isNotEmpty';
+  return !isValuelessOperator(value.operator);
 }
 
 /**
@@ -15,14 +20,17 @@ function isApplied<Condition extends { operator: string }>(
  * the editor applies. A controlled replacement closes the editor and drops the
  * pending operator. Removing returns focus to the add button.
  */
-export function useConditionEditor<Condition extends { operator: string }>({
+export function useConditionEditor<
+  Condition extends { operator: FilterOperator },
+>({
   value,
   onChange,
   disabled,
   onOpen,
 }: {
   value: Condition | null;
-  onChange: (value: Condition | null) => void;
+  /** Typed to receive the valueless variant, so every block's condition must include it. */
+  onChange: (value: NoInfer<Condition> | ValuelessCondition | null) => void;
   disabled: boolean;
   /** Seeds the editor's draft from the applied condition each time it opens. */
   onOpen?: (applied: AppliedCondition<Condition> | null) => void;
@@ -57,8 +65,9 @@ export function useConditionEditor<Condition extends { operator: string }>({
   }
   function changeOperator(next: Condition['operator']) {
     if (disabled) return;
-    if (next === 'isEmpty' || next === 'isNotEmpty') {
-      onChange({ operator: next } as Condition);
+    if (isValuelessOperator(next)) {
+      setPending(null);
+      onChange({ operator: next });
       return;
     }
     if (applied) {

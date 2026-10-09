@@ -125,7 +125,7 @@ export function TeamDirectory({
                 Team
               </TableHead>
               <TableHead>Status</TableHead>
-              <TableHead className="nx:text-right">Projects</TableHead>
+              <TableHead className="nx:text-end">Projects</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
@@ -166,7 +166,7 @@ export function TeamDirectory({
                     {member.status}
                   </span>
                 </TableCell>
-                <TableCell className="nx:text-right nx:tabular-nums">
+                <TableCell className="nx:text-end nx:tabular-nums">
                   {member.projects}
                 </TableCell>
               </TableRow>

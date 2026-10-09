@@ -2,8 +2,9 @@
  * The meaning every evaluator of a rule follows — the blocks' conditions,
  * FilterBuilder trees and the application's own queries:
  *
- * - Text comparisons (`is`, `isNot`, `contains`, `startsWith`, `isAnyOf`,
- *   `isNoneOf`) ignore case.
+ * - Text comparisons (`is`, `isNot`, `contains`, `startsWith`) ignore case.
+ * - Choice values (`is`, `isNot`, `isAnyOf`, `isNoneOf` on a choice field)
+ *   compare option values exactly.
  * - Numbers compare numerically; dates compare as `YYYY-MM-DD` calendar days.
  * - `between` includes both ends. `greaterThan`, `lessThan`, `before` and
  *   `after` exclude the operand.
@@ -154,30 +155,21 @@ export function changeFilterOperator(
   rule: FilterRule,
   operator: FilterOperator
 ): FilterRule {
-  const next = { kind: 'rule', id: rule.id, field: rule.field } as const;
-  if (isValuelessOperator(operator)) return { ...next, operator, value: '' };
-  if (isListOperator(operator))
-    return {
-      ...next,
-      operator,
-      value:
-        rule.operator === 'isAnyOf' || rule.operator === 'isNoneOf'
-          ? rule.value
-          : [],
-    };
-  if (operator === 'between')
-    return {
-      ...next,
-      operator,
-      value: rule.operator === 'between' ? rule.value : ['', ''],
-    };
-  return {
-    ...next,
-    operator,
-    value: typeof rule.value === 'string' ? rule.value : '',
-  };
+  const next = emptyFilterRule(rule.id, rule.field, operator);
+  if (next.operator === 'isEmpty' || next.operator === 'isNotEmpty')
+    return next;
+  if (next.operator === 'between')
+    return rule.operator === 'between' ? { ...next, value: rule.value } : next;
+  if (next.operator === 'isAnyOf' || next.operator === 'isNoneOf')
+    return rule.operator === 'isAnyOf' || rule.operator === 'isNoneOf'
+      ? { ...next, value: rule.value }
+      : next;
+  return typeof rule.value === 'string' ? { ...next, value: rule.value } : next;
 }
-function validDate(value: string) {
+/** Plain decimal notation; `Number()` alone also accepts `0x10` and `0b1`. */
+const decimalNumber = /^[+-]?(\d+\.?\d*|\.\d+)(e[+-]?\d+)?$/i;
+/** A real `YYYY-MM-DD` calendar day. */
+export function isCalendarDay(value: string) {
   if (!/^\d{4}-\d{2}-\d{2}$/.test(value) || value.startsWith('0000'))
     return false;
   const parsed = new Date(`${value}T00:00:00Z`);
@@ -205,10 +197,10 @@ export function getFilterRuleError(
     return 'missingValue';
   if (
     field.type === 'number' &&
-    values.some((value) => !Number.isFinite(Number(value)))
+    values.some((value) => !decimalNumber.test(value.trim()))
   )
     return 'invalidNumber';
-  if (field.type === 'date' && values.some((value) => !validDate(value)))
+  if (field.type === 'date' && values.some((value) => !isCalendarDay(value)))
     return 'invalidDate';
   if (
     field.type === 'choice' &&

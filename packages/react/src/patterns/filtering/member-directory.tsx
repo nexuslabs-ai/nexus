@@ -13,10 +13,12 @@ import {
   TableRow,
 } from '../../components/table';
 
+export const memberStatuses = ['Active', 'Invited'] as const;
+export const memberTeams = ['Design', 'Engineering', 'Operations'] as const;
 export type MemberQuery = {
   name: string;
-  status: string;
-  team: string;
+  status: (typeof memberStatuses)[number] | '';
+  team: (typeof memberTeams)[number] | '';
   page: number;
 };
 export type Member = { id: string; name: string; team: string; status: string };
@@ -30,8 +32,13 @@ export type MemberResults =
   | { state: 'loading' }
   | { state: 'error'; message: string }
   | { state: 'ready'; data: MemberPage };
-export const memberStatuses = ['Active', 'Invited'] as const;
-export const memberTeams = ['Design', 'Engineering', 'Operations'] as const;
+/** Narrows untrusted input — a URL parameter or a select's value — to an allowed value, or `''` for none. */
+export function pickAllowed<Value extends string>(
+  allowed: readonly Value[],
+  value: string
+): Value | '' {
+  return allowed.find((item) => item === value) ?? '';
+}
 export const emptyMemberQuery: MemberQuery = {
   name: '',
   status: '',
@@ -52,8 +59,8 @@ export function MemberDirectory({
 }) {
   const id = React.useId();
   const filtered = Boolean(query.name || query.status || query.team);
-  function changeFilter(key: 'name' | 'status' | 'team', value: string) {
-    onQueryChange({ ...query, [key]: value, page: 1 });
+  function changeFilter(change: Partial<MemberQuery>) {
+    onQueryChange({ ...query, ...change, page: 1 });
   }
   const data = results.state === 'ready' ? results.data : null;
   return (
@@ -75,7 +82,7 @@ export function MemberDirectory({
             type="search"
             placeholder="Search members…"
             value={query.name}
-            onChange={(event) => changeFilter('name', event.target.value)}
+            onChange={(event) => changeFilter({ name: event.target.value })}
           />
         </div>
         <div className="nx:grid nx:gap-2">
@@ -83,7 +90,11 @@ export function MemberDirectory({
           <NativeSelect
             id={`${id}-status`}
             value={query.status}
-            onChange={(event) => changeFilter('status', event.target.value)}
+            onChange={(event) =>
+              changeFilter({
+                status: pickAllowed(memberStatuses, event.target.value),
+              })
+            }
           >
             <option value="">All statuses</option>
             {memberStatuses.map((status) => (
@@ -98,7 +109,11 @@ export function MemberDirectory({
           <NativeSelect
             id={`${id}-team`}
             value={query.team}
-            onChange={(event) => changeFilter('team', event.target.value)}
+            onChange={(event) =>
+              changeFilter({
+                team: pickAllowed(memberTeams, event.target.value),
+              })
+            }
           >
             <option value="">All teams</option>
             {memberTeams.map((team) => (

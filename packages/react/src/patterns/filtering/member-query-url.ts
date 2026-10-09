@@ -5,16 +5,18 @@ import {
   type MemberQuery,
   memberStatuses,
   memberTeams,
+  pickAllowed,
 } from './member-directory';
 
 export function readMemberQuery(url: URL): MemberQuery {
-  const status = url.searchParams.get('members.status') ?? '';
-  const team = url.searchParams.get('members.team') ?? '';
   const page = Number(url.searchParams.get('members.page') ?? 1);
   return {
     name: (url.searchParams.get('members.name') ?? '').slice(0, 200),
-    status: memberStatuses.find((item) => item === status) ?? '',
-    team: memberTeams.find((item) => item === team) ?? '',
+    status: pickAllowed(
+      memberStatuses,
+      url.searchParams.get('members.status') ?? ''
+    ),
+    team: pickAllowed(memberTeams, url.searchParams.get('members.team') ?? ''),
     page: Number.isSafeInteger(page) && page > 0 ? page : 1,
   };
 }

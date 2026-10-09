@@ -91,9 +91,7 @@ function countryLabel(value: string) {
   return countries.find((option) => option.value === value)?.label ?? value;
 }
 function statusLabel(value: string) {
-  return (
-    statuses.find((option) => option.value === value)?.label ?? 'Any status'
-  );
+  return statuses.find((option) => option.value === value)?.label ?? value;
 }
 function matching(filters: Filters, search: string) {
   const query = search.trim().toLowerCase();
@@ -184,11 +182,13 @@ function InvoiceChoiceFilter({
 export function InvoiceFilteringExample() {
   const [applied, setApplied] = React.useState<Filters>(empty);
   const [search, setSearch] = React.useState('');
+  const searchRef = React.useRef<HTMLInputElement>(null);
   const rows = matching(applied, search);
   const hasFilters =
     applied.statuses.length > 0 || applied.countries.length > 0;
   function clear() {
     setApplied(empty);
+    searchRef.current?.focus();
   }
   function reset() {
     clear();
@@ -217,6 +217,7 @@ export function InvoiceFilteringExample() {
             className="nx:pointer-events-none nx:absolute nx:start-2.5 nx:top-1/2 nx:size-4 nx:-translate-y-1/2 nx:text-muted-foreground"
           />
           <Input
+            ref={searchRef}
             aria-label="Search invoices"
             type="search"
             size="sm"
@@ -257,7 +258,7 @@ export function InvoiceFilteringExample() {
         >
           {rows.length} of {invoices.length} invoices
         </p>
-        <div className="nx:min-w-0 nx:rounded-base nx:border nx:border-border-default">
+        <div className="nx:min-w-0 nx:rounded-lg nx:border nx:border-border-default">
           <Table>
             <TableHeader>
               <TableRow>

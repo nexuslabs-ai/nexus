@@ -726,7 +726,7 @@ async function regenerateQuietly() {
   }
 }
 
-function watchStories() {
+function watchSources() {
   const relativeSrc = path.relative(docsRoot, reactSrc);
 
   regenerateQuietly();
@@ -742,7 +742,8 @@ function watchStories() {
 
   let pending;
   watcher.on('change', (_event, fileName) => {
-    if (!String(fileName).endsWith('.stories.tsx')) return;
+    // Block pages list the files a block imports, so any source edit can change them.
+    if (!/\.tsx?$/.test(String(fileName))) return;
     clearTimeout(pending);
     pending = setTimeout(regenerateQuietly, WATCH_DEBOUNCE_MS);
   });
@@ -752,7 +753,7 @@ function watchStories() {
     watcher.close();
   });
 
-  console.log(`demo-index: watching ${relativeSrc} stories`);
+  console.log(`demo-index: watching ${relativeSrc} sources`);
 }
 
 try {
@@ -765,7 +766,7 @@ try {
 }
 
 if (process.argv.includes('--watch')) {
-  watchStories();
+  watchSources();
 } else {
   try {
     await generateAndLog();

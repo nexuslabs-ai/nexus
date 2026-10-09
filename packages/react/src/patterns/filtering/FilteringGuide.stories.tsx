@@ -460,6 +460,9 @@ export const InvoiceFiltering: Story = {
     await userEvent.click(
       canvas.getByRole('button', { name: 'Clear filters' })
     );
+    await expect(
+      canvas.getByRole('searchbox', { name: 'Search invoices' })
+    ).toHaveFocus();
     await userEvent.type(
       canvas.getByRole('searchbox', { name: 'Search invoices' }),
       'missing'

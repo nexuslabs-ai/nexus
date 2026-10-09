@@ -16,6 +16,7 @@ import {
 import {
   type DateRangeCondition,
   DateRangeFilter,
+  formatCalendarDay,
   toCalendarDay,
 } from '../../blocks/filtering/date-range-filter/date-range-filter';
 import {
@@ -203,7 +204,7 @@ export function DateExample({ today }: { today?: Date } = {}) {
       />
       <Applied>
         {value
-          ? `${filterOperatorLabels[value.operator]}${'from' in value ? ` ${value.from} – ${value.to}` : ''}`
+          ? `${filterOperatorLabels[value.operator]}${'from' in value ? ` ${formatCalendarDay(value.from)} – ${formatCalendarDay(value.to)}` : ''}`
           : 'Any date'}
       </Applied>
     </Example>
@@ -233,7 +234,7 @@ export function TextExample() {
     </Example>
   );
 }
-export function Showcase() {
+export function Showcase({ today }: { today?: Date }) {
   return (
     <div className="nx:@container/editors nx:mx-auto nx:w-full nx:min-w-0 nx:max-w-3xl">
       <header className="nx:mb-3">
@@ -246,7 +247,7 @@ export function Showcase() {
       <MultipleChoiceExample />
       <NumberExample />
       <RangeExample />
-      <DateExample />
+      <DateExample today={today} />
       <TextExample />
     </div>
   );

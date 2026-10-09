@@ -109,7 +109,7 @@ export function AdvancedFiltering() {
                 <TableHead>Name</TableHead>
                 <TableHead>Status</TableHead>
                 <TableHead>Team</TableHead>
-                <TableHead className="nx:text-right">Projects</TableHead>
+                <TableHead className="nx:text-end">Projects</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
@@ -122,7 +122,7 @@ export function AdvancedFiltering() {
                     {member.status}
                   </TableCell>
                   <TableCell className="nx:capitalize">{member.team}</TableCell>
-                  <TableCell className="nx:text-right">
+                  <TableCell className="nx:text-end">
                     {member.projects}
                   </TableCell>
                 </TableRow>

@@ -1,4 +1,5 @@
 import * as React from 'react';
+import type { DateRange } from 'react-day-picker';
 
 import { Button } from '../../../components/button';
 import { DatePicker } from '../../../components/date-picker';
@@ -13,6 +14,7 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from '../../../components/popover';
+import { isCalendarDay } from '../../../lib/filter-model';
 import { ConditionOperator } from '../filter-operator';
 import { useConditionEditor } from '../use-condition-editor';
 
@@ -38,6 +40,21 @@ function fromCalendarDay(day: string) {
   const [year = 0, month = 1, date = 1] = day.split('-').map(Number);
   return new Date(year, month - 1, date);
 }
+export function formatCalendarDay(day: string) {
+  return fromCalendarDay(day).toLocaleDateString();
+}
+/** A malformed controlled range reads as no range rather than "Invalid Date". */
+function toDateRange(
+  condition: { from: string; to: string } | null
+): DateRange | undefined {
+  if (!condition) return undefined;
+  if (!isCalendarDay(condition.from) || !isCalendarDay(condition.to))
+    return undefined;
+  return {
+    from: fromCalendarDay(condition.from),
+    to: fromCalendarDay(condition.to),
+  };
+}
 
 export function DateRangeFilter({
   label,
@@ -47,9 +64,7 @@ export function DateRangeFilter({
   disabled = false,
   today = new Date(),
 }: DateRangeFilterProps) {
-  const [draft, setDraft] = React.useState<
-    { from: Date | undefined; to?: Date } | undefined
-  >();
+  const [draft, setDraft] = React.useState<DateRange | undefined>();
   const {
     applied,
     open,
@@ -63,23 +78,17 @@ export function DateRangeFilter({
     operatorRef,
     restoreFocus,
   } = useConditionEditor({ value, onChange, disabled, onOpen: seedDraft });
-  const [month, setMonth] = React.useState(
-    applied ? fromCalendarDay(applied.from) : today
-  );
+  const appliedRange = toDateRange(applied);
+  const [month, setMonth] = React.useState(appliedRange?.from ?? today);
   const valid = Boolean(draft?.from && draft.to && draft.from <= draft.to);
-  const summary = applied
-    ? `${fromCalendarDay(applied.from).toLocaleDateString()} – ${fromCalendarDay(applied.to).toLocaleDateString()}`
-    : 'Choose…';
+  const summary =
+    applied && appliedRange
+      ? `${formatCalendarDay(applied.from)} – ${formatCalendarDay(applied.to)}`
+      : 'Choose…';
   function seedDraft(current: { from: string; to: string } | null) {
-    setMonth(current ? fromCalendarDay(current.from) : today);
-    setDraft(
-      current
-        ? {
-            from: fromCalendarDay(current.from),
-            to: fromCalendarDay(current.to),
-          }
-        : undefined
-    );
+    const range = toDateRange(current);
+    setMonth(range?.from ?? today);
+    setDraft(range);
   }
   function preset(days: number) {
     const to = new Date(today.getFullYear(), today.getMonth(), today.getDate());
@@ -193,7 +202,7 @@ export function DateRangeFilter({
               disabled={disabled}
             />
           </div>
-          <div className="nx:flex nx:items-center nx:justify-between nx:gap-2 nx:border-t nx:border-border-default nx:bg-control-background/20 nx:p-3">
+          <div className="nx:flex nx:items-center nx:justify-between nx:gap-2 nx:border-t nx:border-border-default nx:bg-muted-extralight nx:p-3">
             <Button
               type="button"
               size="sm"

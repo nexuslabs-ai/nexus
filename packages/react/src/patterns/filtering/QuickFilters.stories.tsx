@@ -3,12 +3,14 @@ import * as React from 'react';
 import type { Meta, StoryObj } from '@storybook/react';
 import { expect, userEvent, waitFor, within } from 'storybook/test';
 
-import { CardFilters, FileFiltersExample, TableFilters } from './quick-filters';
+import { CardFilters, FileFiltersExample } from './quick-filters';
 import recipeSource from './quick-filters.tsx?raw';
+import { TeamDirectory } from './team-directory';
 const meta = {
   title: 'Internal/Filtering/Quick filters',
   tags: ['!dev', '!autodocs'],
-  component: TableFilters,
+  component: TeamDirectory,
+  args: { initiallyFiltered: true },
   decorators: [
     (Story) => (
       <main className="nx:w-full nx:min-w-0 nx:max-w-3xl nx:p-4">
@@ -26,7 +28,7 @@ const meta = {
       },
     },
   },
-} satisfies Meta<typeof TableFilters>;
+} satisfies Meta<typeof TeamDirectory>;
 export default meta;
 type Story = StoryObj<typeof meta>;
 export const TableView: Story = {
@@ -209,7 +211,7 @@ export const EmptyResults: Story = {
 export const NarrowContainers: Story = {
   render: () => (
     <div className="nx:grid nx:w-full nx:max-w-72 nx:gap-10">
-      <TableFilters />
+      <TeamDirectory initiallyFiltered />
       <CardFilters />
       <FileFiltersExample />
     </div>
@@ -224,7 +226,7 @@ export const NarrowContainers: Story = {
 export const AllVariants: Story = {
   render: () => (
     <div className="nx:grid nx:gap-12">
-      <TableFilters />
+      <TeamDirectory initiallyFiltered />
       <CardFilters />
       <FileFiltersExample />
     </div>
@@ -232,7 +234,7 @@ export const AllVariants: Story = {
 };
 
 export const OperatorChanges: Story = {
-  render: () => <TableFilters />,
+  render: () => <TeamDirectory initiallyFiltered />,
   play: async ({ canvasElement }) => {
     const canvas = within(canvasElement);
     const page = within(canvasElement.ownerDocument.body);
@@ -255,62 +257,5 @@ export const OperatorChanges: Story = {
       await canvas.findByRole('button', { name: 'Clear all' })
     );
     await expect(canvas.getByText('6 of 6 members')).toBeVisible();
-  },
-};
-
-export const ProjectCount: Story = {
-  name: 'Table with draft filter',
-  play: async ({ canvasElement }) => {
-    const canvas = within(canvasElement);
-    const page = within(canvasElement.ownerDocument.body);
-    await userEvent.click(
-      canvas.getByRole('button', { name: 'Add projects filter' })
-    );
-    await userEvent.type(page.getByLabelText('Projects'), '-1');
-    await expect(page.getByRole('button', { name: 'Apply' })).toBeDisabled();
-    await userEvent.clear(page.getByLabelText('Projects'));
-    await userEvent.type(page.getByLabelText('Projects'), '3');
-    await expect(canvas.getByRole('status')).toHaveTextContent(
-      '2 of 6 members'
-    );
-    await userEvent.click(page.getByRole('button', { name: 'Apply' }));
-    await waitFor(() =>
-      expect(
-        canvas.getByRole('button', { name: 'Edit Projects: 3' })
-      ).toHaveFocus()
-    );
-    await expect(canvas.getByRole('status')).toHaveTextContent(
-      '1 of 6 members'
-    );
-    await userEvent.click(
-      canvas.getByRole('button', { name: 'Edit Projects: 3' })
-    );
-    await userEvent.clear(page.getByLabelText('Projects'));
-    await userEvent.type(page.getByLabelText('Projects'), '9');
-    await userEvent.keyboard('{Escape}');
-    await waitFor(() =>
-      expect(page.queryByRole('dialog')).not.toBeInTheDocument()
-    );
-    await userEvent.click(
-      canvas.getByRole('button', { name: 'Edit Projects: 3' })
-    );
-    await expect(page.getByLabelText('Projects')).toHaveValue(3);
-    await userEvent.click(page.getByRole('button', { name: 'Cancel' }));
-    await waitFor(() =>
-      expect(page.queryByRole('dialog')).not.toBeInTheDocument()
-    );
-    await userEvent.click(
-      canvas.getByRole('button', { name: 'Remove Projects filter' })
-    );
-    await waitFor(() =>
-      expect(
-        canvas.getByRole('button', { name: 'Add projects filter' })
-      ).toHaveFocus()
-    );
-    await userEvent.type(canvas.getByRole('searchbox'), 'a');
-    await expect(canvas.getByRole('searchbox')).toHaveFocus();
-    await expect(canvas.getByRole('status')).toHaveTextContent(
-      '2 of 6 members'
-    );
   },
 };

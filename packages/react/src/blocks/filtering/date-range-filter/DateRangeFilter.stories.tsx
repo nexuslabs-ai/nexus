@@ -259,6 +259,23 @@ export const EmptyOperator: Story = {
     );
   },
 };
+export const MalformedValue: Story = {
+  render: () => (
+    <Preview
+      initialValue={{ operator: 'between', from: '2026-02-31', to: 'soon' }}
+    />
+  ),
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+    const page = within(canvasElement.ownerDocument.body);
+    const trigger = canvas.getByRole('button', {
+      name: 'Edit Created: Choose…',
+    });
+    await expect(trigger).toHaveTextContent('Choose…');
+    await userEvent.click(trigger);
+    await expect(page.getByRole('button', { name: 'Apply' })).toBeDisabled();
+  },
+};
 export const Disabled: Story = {
   render: () => <Preview disabled />,
   play: async ({ canvasElement }) => {

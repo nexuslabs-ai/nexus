@@ -3,6 +3,8 @@ import * as React from 'react';
 import type { Meta, StoryObj } from '@storybook/react';
 import { expect, userEvent, waitFor, within } from 'storybook/test';
 
+import { formatCalendarDay } from '../../blocks/filtering/date-range-filter/date-range-filter';
+
 import {
   DateExample,
   MultipleChoiceExample,
@@ -17,6 +19,7 @@ const meta = {
   title: 'Internal/Filtering/Value editors',
   tags: ['!dev', '!autodocs'],
   component: Showcase,
+  args: { today: new Date(2026, 8, 25) },
   decorators: [
     (Story) => (
       <main className="nx:w-full nx:min-w-0 nx:max-w-5xl nx:p-4">
@@ -137,7 +140,9 @@ export const DateRange: Story = {
     await userEvent.click(page.getByRole('button', { name: 'Today' }));
     await expect(page.getByRole('dialog')).toBeVisible();
     await userEvent.click(page.getByRole('button', { name: 'Apply' }));
-    await expect(canvas.getByRole('status')).toHaveTextContent('2026-09-25');
+    await expect(canvas.getByRole('status')).toHaveTextContent(
+      formatCalendarDay('2026-09-25')
+    );
     await waitFor(() =>
       expect(page.queryByRole('dialog')).not.toBeInTheDocument()
     );
@@ -169,7 +174,7 @@ export const CustomDateRange: Story = {
     await expect(canvas.getByRole('status')).toHaveTextContent('Any date');
     await userEvent.click(page.getByRole('button', { name: 'Apply' }));
     await expect(canvas.getByRole('status')).toHaveTextContent(
-      '2026-09-08 – 2026-09-10'
+      `${formatCalendarDay('2026-09-08')} – ${formatCalendarDay('2026-09-10')}`
     );
     await waitFor(() =>
       expect(
@@ -250,7 +255,7 @@ export const DatePresetDraft: Story = {
     await userEvent.click(page.getByRole('button', { name: 'Today' }));
     await userEvent.click(page.getByRole('button', { name: 'Cancel' }));
     await expect(canvas.getByRole('status')).toHaveTextContent(
-      '2026-09-26 – 2026-10-02'
+      `${formatCalendarDay('2026-09-26')} – ${formatCalendarDay('2026-10-02')}`
     );
     await userEvent.click(
       canvas.getByRole('button', { name: /^Edit Created:/ })
@@ -258,7 +263,7 @@ export const DatePresetDraft: Story = {
     await userEvent.click(page.getByRole('button', { name: 'Today' }));
     await userEvent.click(page.getByRole('button', { name: 'Apply' }));
     await expect(canvas.getByRole('status')).toHaveTextContent(
-      '2026-10-02 – 2026-10-02'
+      `${formatCalendarDay('2026-10-02')} – ${formatCalendarDay('2026-10-02')}`
     );
     await userEvent.click(
       canvas.getByRole('button', { name: /^Edit Created:/ })
@@ -266,7 +271,7 @@ export const DatePresetDraft: Story = {
     await userEvent.click(page.getByRole('button', { name: 'Last 7 days' }));
     await userEvent.click(page.getByRole('button', { name: 'Apply' }));
     await expect(canvas.getByRole('status')).toHaveTextContent(
-      '2026-09-26 – 2026-10-02'
+      `${formatCalendarDay('2026-09-26')} – ${formatCalendarDay('2026-10-02')}`
     );
   },
 };

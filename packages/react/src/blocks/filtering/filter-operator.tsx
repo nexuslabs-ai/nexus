@@ -31,6 +31,12 @@ export function ConditionOperator<Operator extends FilterOperator>({
   options: readonly Operator[];
   onChange: (value: Operator) => void;
 }) {
+  // Radix also fires for the item that is already selected.
+  function select(next: string) {
+    const operator = options.find((option) => option === next);
+    if (disabled || !operator || operator === value) return;
+    onChange(operator);
+  }
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
@@ -49,10 +55,7 @@ export function ConditionOperator<Operator extends FilterOperator>({
         aria-label={`${label} operators`}
         onCloseAutoFocus={onCloseAutoFocus}
       >
-        <DropdownMenuRadioGroup
-          value={value}
-          onValueChange={(next) => !disabled && onChange(next as Operator)}
-        >
+        <DropdownMenuRadioGroup value={value} onValueChange={select}>
           {options.map((operator) => (
             <DropdownMenuRadioItem
               key={operator}
