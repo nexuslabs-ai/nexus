@@ -11,6 +11,7 @@ import type {
   CatalogueToken,
 } from '../catalogue/types';
 
+import { DENSITY_OPTIONS } from './appearance-model';
 import { cssRules, selectorListItems } from './css-rules.test-support';
 import type { Mode } from './palette';
 
@@ -458,6 +459,80 @@ describe('token catalogue', () => {
         ),
         utility
       ).toEqual(utilities.get(utility));
+    }
+  });
+});
+
+describe('density spacing order', () => {
+  const densities = DENSITY_OPTIONS.map((option) => option.value);
+  const spacing = catalogue.filter((token) => token.family === 'spacing');
+  const px = (token: CatalogueToken, density: string) => {
+    const variant = token.variants.find((value) => value.preset === density);
+    expect(variant, `${token.name} ${density}`).toBeDefined();
+    return Number.parseFloat(variant!.declarations[0]!.value);
+  };
+  const step = (n: number) => byName.get(`--nx-spacing-${n}`)!;
+  // Steps 0–2 are density-invariant; the density offset ramps in over 3–6.
+  const RAMP = [3, 4, 5, 6];
+
+  it('never reduces spacing when moving to a more spacious density', () => {
+    for (const token of spacing) {
+      let previous = 0;
+      for (const density of densities) {
+        const value = px(token, density);
+        expect(value, `${token.name} ${density}`).toBeGreaterThanOrEqual(
+          previous
+        );
+        previous = value;
+      }
+    }
+  });
+
+  it('keeps numeric spacing steps strictly increasing within each density', () => {
+    const numeric = spacing
+      .filter((token) => /^--nx-spacing-[0-9_]+$/.test(token.name))
+      .sort(
+        (a, b) =>
+          Number(a.name.replace('--nx-spacing-', '').replace('_', '.')) -
+          Number(b.name.replace('--nx-spacing-', '').replace('_', '.'))
+      );
+    for (const density of densities) {
+      let previous = -1;
+      for (const token of numeric) {
+        const value = px(token, density);
+        expect(value, `${token.name} ${density}`).toBeGreaterThan(previous);
+        previous = value;
+      }
+    }
+  });
+
+  it('changes step-to-step gaps by at most 1px through the density ramp', () => {
+    for (const density of densities) {
+      const gaps = [2, ...RAMP].map(
+        (n) => px(step(n + 1), density) - px(step(n), density)
+      );
+      for (let i = 1; i < gaps.length; i++) {
+        expect(
+          Math.abs(gaps[i]! - gaps[i - 1]!),
+          `${density} gaps ${gaps.join(',')}`
+        ).toBeLessThanOrEqual(1);
+      }
+    }
+  });
+
+  it('keeps neighbouring densities apart at each ramp step', () => {
+    for (const n of RAMP) {
+      const values = densities.map((density) => px(step(n), density));
+      for (let i = 0; i < values.length - 1; i++) {
+        // Step 3 carries only 3px of ramp across six densities, so a pair may
+        // share a value there, but never three in a row.
+        const neighbour = n === 3 ? i + 2 : i + 1;
+        if (neighbour >= values.length) continue;
+        expect(
+          values[neighbour],
+          `--nx-spacing-${n} ${densities[i]}→${densities[neighbour]}`
+        ).toBeGreaterThan(values[i]!);
+      }
     }
   });
 });

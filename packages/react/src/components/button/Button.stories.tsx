@@ -1,6 +1,6 @@
 import type { FormEvent } from 'react';
 
-import { DEFAULT_NEXUS_APPEARANCE } from '@nexus_ds/core';
+import { DEFAULT_NEXUS_APPEARANCE, DENSITY_OPTIONS } from '@nexus_ds/core';
 import {
   Canvas,
   Controls,
@@ -540,7 +540,11 @@ export const TextButtonsStayContentWidth: Story = {
       Math.round(longButton.getBoundingClientRect().width)
     ).toBeGreaterThan(Math.round(shortButton.getBoundingClientRect().width));
     await expect(iconButton).toHaveClass('nx:size-10');
-    expect(Math.round(iconButton.getBoundingClientRect().width)).toBe(40);
+    expect(Math.round(iconButton.getBoundingClientRect().width)).toBe(
+      parseFloat(
+        getComputedStyle(iconButton).getPropertyValue('--nx-spacing-10')
+      )
+    );
   },
 };
 
@@ -1061,6 +1065,7 @@ export const VariantClassesMatchFigmaTokens: Story = {
 };
 
 export const BorderedVariantsKeepFixedHeight: Story = {
+  globals: { density: 'default' },
   tags: ['!autodocs', '!dev'],
   render: () => (
     <div className="nx:flex nx:flex-col nx:gap-4 nx:p-10 nx:bg-background">
@@ -1101,6 +1106,7 @@ export const BorderedVariantsKeepFixedHeight: Story = {
 };
 
 export const DefaultModeHeightPinned: Story = {
+  globals: { density: 'default' },
   tags: ['!autodocs', '!dev'],
   parameters: {
     a11y: { test: 'off' },
@@ -1223,6 +1229,11 @@ export const DisabledAndLoadingThemes: Story = {
         const normal = buttons[0]!;
         const disabled = buttons[1]!;
         const loading = buttons[2]!;
+        await Promise.all(
+          buttons.flatMap((button) =>
+            button.getAnimations().map((animation) => animation.finished)
+          )
+        );
         await expect(disabled).toBeDisabled();
         await expect(loading).toHaveAttribute('aria-disabled', 'true');
         await expect(loading).toHaveAttribute('aria-busy', 'true');
@@ -1339,16 +1350,7 @@ export const SizeDensityContract: Story = {
   },
   render: () => (
     <div className="nx:flex nx:flex-col nx:gap-4">
-      {(
-        [
-          'tight',
-          'compact',
-          'default',
-          'comfortable',
-          'relaxed',
-          'spacious',
-        ] as const
-      ).map((density) => (
+      {DENSITY_OPTIONS.map(({ value: density }) => (
         <NexusRoot
           key={density}
           state={{ ...DEFAULT_NEXUS_APPEARANCE, mode: 'light', density }}
@@ -1357,15 +1359,68 @@ export const SizeDensityContract: Story = {
           <span className="nx:typography-label-default">{density}</span>
           {(
             [
-              ['xs', 'icon-xs', 12, 12],
-              ['sm', 'icon-sm', 13, 14],
-              ['default', 'icon', 14, 16],
-              ['lg', 'icon-lg', 14, 16],
+              [
+                'xs',
+                'icon-xs',
+                12,
+                12,
+                {
+                  tight: 24,
+                  compact: 26,
+                  default: 28,
+                  comfortable: 30,
+                  relaxed: 32,
+                  spacious: 34,
+                },
+              ],
+              [
+                'sm',
+                'icon-sm',
+                13,
+                14,
+                {
+                  tight: 28,
+                  compact: 30,
+                  default: 32,
+                  comfortable: 34,
+                  relaxed: 36,
+                  spacious: 38,
+                },
+              ],
+              [
+                'default',
+                'icon',
+                14,
+                16,
+                {
+                  tight: 36,
+                  compact: 38,
+                  default: 40,
+                  comfortable: 42,
+                  relaxed: 44,
+                  spacious: 46,
+                },
+              ],
+              [
+                'lg',
+                'icon-lg',
+                14,
+                16,
+                {
+                  tight: 44,
+                  compact: 46,
+                  default: 48,
+                  comfortable: 50,
+                  relaxed: 52,
+                  spacious: 54,
+                },
+              ],
             ] as const
-          ).map(([size, iconSize, font, icon]) => (
+          ).map(([size, iconSize, font, icon, heights]) => (
             <div
               key={size}
               data-testid="size-density-row"
+              data-height={heights[density]}
               data-font={font}
               data-icon={icon}
               className="nx:flex nx:flex-wrap nx:items-center nx:gap-2"
@@ -1398,6 +1453,11 @@ export const SizeDensityContract: Story = {
     for (const row of within(canvasElement).getAllByTestId(
       'size-density-row'
     )) {
+      for (const button of row.querySelectorAll('button')) {
+        await expect(Math.round(button.getBoundingClientRect().height)).toBe(
+          Number(row.dataset.height)
+        );
+      }
       for (const svg of row.querySelectorAll('svg')) {
         await expect(parseFloat(getComputedStyle(svg).width)).toBe(
           Number(row.dataset.icon)

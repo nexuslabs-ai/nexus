@@ -7,7 +7,7 @@ import { cn } from '../../lib/utils';
 
 const switchVariants = cva(
   [
-    'nx:peer nx:inline-flex nx:shrink-0 nx:cursor-pointer nx:items-center',
+    'nx:peer nx:@container nx:relative nx:box-content nx:inline-flex nx:shrink-0 nx:cursor-pointer',
     'nx:rounded-full nx:border-thick nx:border-border-default',
     'nx:transition-control',
     'nx:focus-visible:outline-2 nx:focus-visible:outline-focus-default',
@@ -20,28 +20,8 @@ const switchVariants = cva(
   {
     variants: {
       size: {
-        default: 'nx:h-5 nx:w-9',
-        sm: 'nx:h-[18px] nx:w-[32px]',
-      },
-    },
-    defaultVariants: {
-      size: 'default',
-    },
-  }
-);
-
-const switchThumbVariants = cva(
-  [
-    'nx:pointer-events-none nx:block nx:rounded-full',
-    'nx:bg-control-thumb nx:transition-[background-color,transform]',
-    'nx:data-[state=checked]:bg-primary-foreground',
-    'nx:data-[state=unchecked]:translate-x-0',
-  ],
-  {
-    variants: {
-      size: {
-        default: 'nx:size-4 nx:data-[state=checked]:translate-x-4',
-        sm: 'nx:size-[14px] nx:data-[state=checked]:translate-x-[14px]',
+        default: 'nx:h-4 nx:w-8',
+        sm: 'nx:h-[14px] nx:w-[28px]',
       },
     },
     defaultVariants: {
@@ -91,7 +71,12 @@ function Switch({ className, size, ...props }: SwitchProps) {
     >
       <SwitchPrimitive.Thumb
         data-slot="switch-thumb"
-        className={switchThumbVariants({ size })}
+        className={cn(
+          'nx:pointer-events-none nx:absolute nx:start-0 nx:top-0 nx:aspect-square nx:h-full nx:rounded-full',
+          'nx:bg-control-thumb nx:transition-[background-color,translate]',
+          'nx:data-[state=checked]:bg-primary-foreground',
+          'nx:data-[state=checked]:translate-x-[calc(100cqi-100%)] nx:rtl:data-[state=checked]:-translate-x-[calc(100cqi-100%)]'
+        )}
       />
     </SwitchPrimitive.Root>
   );

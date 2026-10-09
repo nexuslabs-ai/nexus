@@ -186,7 +186,7 @@ function SheetContent({
             data-slot="sheet-close-button"
             className={overlayCloseButtonClassName}
           >
-            <IconX className="nx:size-4" />
+            <IconX className="nx:size-icon-glyph-default" />
             <span className="nx:sr-only">Close</span>
           </DialogPrimitive.Close>
         )}

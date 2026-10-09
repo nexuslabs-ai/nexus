@@ -129,7 +129,7 @@ const itemMediaVariants = cva(
     variants: {
       variant: {
         default: 'nx:bg-transparent',
-        icon: 'nx:size-8 nx:rounded-sm nx:border-default nx:border-border-default nx:bg-muted nx:[&_svg]:size-4',
+        icon: 'nx:size-8 nx:rounded-sm nx:border-default nx:border-border-default nx:bg-muted nx:[&_svg]:size-icon-glyph-default',
         image:
           'nx:relative nx:size-10 nx:overflow-hidden nx:rounded-sm nx:[&_img]:size-full nx:[&_img]:object-cover nx:after:pointer-events-none nx:after:absolute nx:after:inset-0 nx:after:rounded-[inherit] nx:after:outline nx:after:outline-1 nx:after:-outline-offset-1 nx:after:outline-border-hairline',
       },

@@ -6,7 +6,7 @@ import { cva, type VariantProps } from 'class-variance-authority';
 import { cn } from '../../lib/utils';
 
 const markerVariants = cva(
-  "nx:group/marker nx:flex nx:min-h-4 nx:items-center nx:gap-2 nx:text-left nx:typography-body-small nx:text-muted-foreground nx:transition-control nx:duration-faster nx:focus-visible:outline-2 nx:focus-visible:outline-focus-default nx:disabled:pointer-events-none nx:disabled:text-disabled-foreground nx:aria-disabled:pointer-events-none nx:aria-disabled:text-disabled-foreground nx:[&_svg:not([class*='size-'])]:size-4 nx:[&_svg]:shrink-0 nx:[a]:hover:text-foreground nx:[button]:cursor-pointer nx:[button]:hover:text-foreground",
+  "nx:group/marker nx:flex nx:min-h-4 nx:items-center nx:gap-2 nx:text-left nx:typography-body-small nx:text-muted-foreground nx:transition-control nx:duration-faster nx:focus-visible:outline-2 nx:focus-visible:outline-focus-default nx:disabled:pointer-events-none nx:disabled:text-disabled-foreground nx:aria-disabled:pointer-events-none nx:aria-disabled:text-disabled-foreground nx:[&_svg:not([class*='size-'])]:size-icon-glyph-default nx:[&_svg]:shrink-0 nx:[a]:hover:text-foreground nx:[button]:cursor-pointer nx:[button]:hover:text-foreground",
   {
     variants: {
       variant: {
@@ -115,7 +115,7 @@ function MarkerIcon({ className, ...props }: MarkerIconProps) {
       data-slot="marker-icon"
       aria-hidden="true"
       className={cn(
-        'nx:inline-flex nx:size-4 nx:shrink-0 nx:items-center nx:justify-center',
+        'nx:inline-flex nx:size-icon-glyph-default nx:shrink-0 nx:items-center nx:justify-center',
         className
       )}
       {...props}

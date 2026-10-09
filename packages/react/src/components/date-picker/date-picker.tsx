@@ -207,7 +207,7 @@ function DatePicker({
           caption_label: cn(
             'nx:typography-label-default nx:select-none',
             captionLayout !== 'label' &&
-              'nx:flex nx:h-8 nx:items-center nx:gap-1 nx:rounded-md nx:pr-1 nx:pl-2 nx:[&>svg]:size-3.5 nx:[&>svg]:text-muted-foreground',
+              'nx:flex nx:h-8 nx:items-center nx:gap-1 nx:rounded-md nx:pr-1 nx:pl-2 nx:[&>svg]:size-icon-glyph-sm nx:[&>svg]:text-muted-foreground',
             defaultClassNames.caption_label
           ),
           day: cn(
@@ -236,7 +236,7 @@ function DatePicker({
               return (
                 <IconChevronLeft
                   className={cn(
-                    'nx:size-4 nx:text-muted-foreground',
+                    'nx:size-icon-glyph-default nx:text-muted-foreground',
                     className
                   )}
                   {...props}
@@ -248,7 +248,7 @@ function DatePicker({
               return (
                 <IconChevronRight
                   className={cn(
-                    'nx:size-4 nx:text-muted-foreground',
+                    'nx:size-icon-glyph-default nx:text-muted-foreground',
                     className
                   )}
                   {...props}
@@ -258,7 +258,7 @@ function DatePicker({
 
             return (
               <IconChevronDown
-                className={cn('nx:size-4', className)}
+                className={cn('nx:size-icon-glyph-default', className)}
                 {...props}
               />
             );

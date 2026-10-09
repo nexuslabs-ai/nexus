@@ -896,10 +896,10 @@ export const DensityActionSizing: Story = {
   tags: ['!autodocs', '!dev'],
   render: () => (
     <div className="nx:flex nx:w-full nx:flex-col nx:gap-4">
-      {DENSITY_OPTIONS.map(({ value }) => (
+      {DENSITY_OPTIONS.map(({ value: density }) => (
         <NexusRoot
-          key={value}
-          state={{ ...DEFAULT_NEXUS_APPEARANCE, mode: 'light', density: value }}
+          key={density}
+          state={{ ...DEFAULT_NEXUS_APPEARANCE, mode: 'light', density }}
         >
           <Alert layout="inline" variant="information">
             <AlertIcon>
@@ -928,6 +928,11 @@ export const DensityActionSizing: Story = {
       canvasElement.querySelectorAll('[data-slot="alert"]')
     ).toHaveLength(DENSITY_OPTIONS.length);
     for (const alert of canvasElement.querySelectorAll('[data-slot="alert"]')) {
+      await expect(
+        alert
+          .querySelector('[data-slot="alert-icon"] svg')!
+          .getBoundingClientRect().width
+      ).toBe(16);
       const close = alert.querySelector('[data-slot="alert-close"]')!;
       for (const button of alert.querySelectorAll('[data-slot="button"]')) {
         await expect(button.getBoundingClientRect().height).toBe(
@@ -1833,6 +1838,7 @@ export const AllBannerVariants: Story = {
 };
 
 export const DefaultModeHeightPinned: Story = {
+  globals: { density: 'default' },
   tags: ['!autodocs', '!dev'],
   parameters: {
     a11y: { test: 'off' },

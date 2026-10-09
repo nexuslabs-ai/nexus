@@ -40,7 +40,8 @@
     "clean": "rm -rf dist",
     "typecheck": "tsc --noEmit",
     "storybook": "storybook dev -p 6006",
-    "build-storybook": "storybook build"
+    "build-storybook": "storybook build",
+    "test:storybook:densities": "node scripts/test-storybook-densities.mjs"
   },
   "devDependencies": {
     "@storybook/addon-a11y": "^10.1.10",

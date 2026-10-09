@@ -1,8 +1,8 @@
 import * as React from 'react';
 
-import { DEFAULT_NEXUS_APPEARANCE } from '@nexus_ds/core';
+import { DEFAULT_NEXUS_APPEARANCE, DENSITY_OPTIONS } from '@nexus_ds/core';
 import type { Meta, StoryObj } from '@storybook/react';
-import { expect, fn, userEvent, within } from 'storybook/test';
+import { expect, fn, userEvent, waitFor, within } from 'storybook/test';
 
 import {
   expectLegiblePrimaryHover,
@@ -488,6 +488,72 @@ export const AllVariants: Story = {
   },
   parameters: {
     layout: 'padded',
+  },
+};
+
+export const DensityAlignment: Story = {
+  tags: ['!autodocs', '!dev'],
+  render: () => (
+    <div className="nx:grid nx:gap-4">
+      {DENSITY_OPTIONS.map(({ value: density }) => (
+        <NexusRoot
+          key={density}
+          state={{ ...DEFAULT_NEXUS_APPEARANCE, mode: 'light', density }}
+          className="nx:grid nx:gap-2"
+        >
+          <span>{density}</span>
+          {(['ltr', 'rtl'] as const).map((dir) => (
+            <div key={dir} dir={dir} className="nx:flex nx:gap-3">
+              {(['default', 'sm'] as const).map((size) => (
+                <Switch
+                  key={size}
+                  size={size}
+                  aria-label={`${density} ${dir} ${size}`}
+                />
+              ))}
+            </div>
+          ))}
+        </NexusRoot>
+      ))}
+    </div>
+  ),
+  play: async ({ canvasElement }) => {
+    const switches = within(canvasElement).getAllByRole('switch');
+    for (const control of switches) {
+      const thumb = control.querySelector('[data-slot="switch-thumb"]')!;
+      const rtl = getComputedStyle(control).direction === 'rtl';
+      const border = parseFloat(getComputedStyle(control).borderLeftWidth);
+      await expect(
+        getComputedStyle(thumb)
+          .transitionProperty.split(', ')
+          .filter((property) => property !== 'background-color')
+      ).toEqual(['translate']);
+      const assertPosition = (checked: boolean) => {
+        const trackRect = control.getBoundingClientRect();
+        const thumbRect = thumb.getBoundingClientRect();
+        const onRight = checked !== rtl;
+        const inlineInset = onRight
+          ? trackRect.right - thumbRect.right
+          : thumbRect.left - trackRect.left;
+        expect(Math.abs(inlineInset - border)).toBeLessThanOrEqual(0.5);
+        expect(
+          Math.abs(thumbRect.top - trackRect.top - border)
+        ).toBeLessThanOrEqual(0.5);
+        expect(
+          Math.abs(thumbRect.height - control.clientHeight)
+        ).toBeLessThanOrEqual(0.5);
+      };
+      if (control.dataset.size === 'default') {
+        const sm = control.parentElement!.querySelector('[data-size="sm"]')!;
+        await expect(
+          control.getBoundingClientRect().height
+        ).toBeGreaterThanOrEqual(sm.getBoundingClientRect().height);
+      }
+      assertPosition(false);
+      await userEvent.click(control);
+      await expect(control).toHaveAttribute('data-state', 'checked');
+      await waitFor(() => assertPosition(true));
+    }
   },
 };
 

@@ -361,7 +361,7 @@ function MessageScrollerItem({
 }
 
 const messageScrollerButtonVariants = cva(
-  'nx:absolute nx:inset-x-0 nx:z-sticky nx:mx-auto nx:rounded-full nx:[&_svg]:size-4 nx:data-[active=false]:invisible',
+  'nx:absolute nx:inset-x-0 nx:z-sticky nx:mx-auto nx:rounded-full nx:[&_svg]:size-icon-glyph-default nx:data-[active=false]:invisible',
   {
     variants: {
       direction: {

@@ -157,7 +157,7 @@ function InputOTPSeparator({ className, ...props }: InputOTPSeparatorProps) {
       className={cn('nx:flex nx:items-center', className)}
       {...props}
     >
-      <IconPointFilled className="nx:size-2.5 nx:text-muted-foreground" />
+      <IconPointFilled className="nx:size-[10px] nx:text-muted-foreground" />
     </div>
   );
 }

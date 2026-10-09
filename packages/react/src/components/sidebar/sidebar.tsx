@@ -664,7 +664,7 @@ function SidebarGroupLabel({
     <Comp
       data-slot="sidebar-group-label"
       className={cn(
-        'nx:flex nx:h-8 nx:shrink-0 nx:items-center nx:rounded-md nx:px-2 nx:typography-label-small nx:text-nav-muted-foreground nx:transition-[margin,opacity] nx:duration-default nx:ease-linear nx:focus-visible:outline-2 nx:focus-visible:outline-focus-default nx:[&>svg]:size-4 nx:[&>svg]:shrink-0',
+        'nx:flex nx:h-8 nx:shrink-0 nx:items-center nx:rounded-md nx:px-2 nx:typography-label-small nx:text-nav-muted-foreground nx:transition-[margin,opacity] nx:duration-default nx:ease-linear nx:focus-visible:outline-2 nx:focus-visible:outline-focus-default nx:[&>svg]:size-icon-glyph-default nx:[&>svg]:shrink-0',
         'nx:group-data-[collapsible=icon]:-mt-8 nx:group-data-[collapsible=icon]:opacity-0',
         className
       )}
@@ -703,7 +703,7 @@ function SidebarGroupAction({
     <Comp
       data-slot="sidebar-group-action"
       className={cn(
-        'nx:absolute nx:top-3.5 nx:right-3 nx:flex nx:aspect-square nx:w-5 nx:items-center nx:justify-center nx:rounded-md nx:p-0 nx:text-nav-foreground nx:hover:bg-nav-item-hover nx:focus-visible:outline-2 nx:focus-visible:outline-focus-default nx:[&>svg]:size-4 nx:[&>svg]:shrink-0',
+        'nx:absolute nx:top-3.5 nx:right-3 nx:flex nx:aspect-square nx:w-5 nx:items-center nx:justify-center nx:rounded-md nx:p-0 nx:text-nav-foreground nx:hover:bg-nav-item-hover nx:focus-visible:outline-2 nx:focus-visible:outline-focus-default nx:[&>svg]:size-icon-glyph-default nx:[&>svg]:shrink-0',
         'nx:group-data-[collapsible=icon]:hidden',
         className
       )}
@@ -795,7 +795,7 @@ const sidebarMenuButtonVariants = cva(
     'nx:disabled:pointer-events-none nx:disabled:text-disabled-foreground nx:aria-disabled:pointer-events-none nx:aria-disabled:text-disabled-foreground',
     'nx:data-[active=true]:bg-nav-item-active nx:data-[active=true]:text-nav-foreground',
     'nx:data-[state=open]:hover:bg-nav-item-hover',
-    'nx:[&>span:last-child]:truncate nx:[&>svg]:size-4 nx:[&>svg]:shrink-0'
+    'nx:[&>span:last-child]:truncate nx:[&>svg]:size-icon-glyph-default nx:[&>svg]:shrink-0'
   ),
   {
     variants: {
@@ -936,7 +936,7 @@ function SidebarMenuAction({
     <Comp
       data-slot="sidebar-menu-action"
       className={cn(
-        'nx:absolute nx:top-1.5 nx:right-1 nx:flex nx:aspect-square nx:w-5 nx:items-center nx:justify-center nx:rounded-md nx:p-0 nx:text-nav-foreground nx:hover:bg-nav-item-hover nx:focus-visible:outline-2 nx:focus-visible:outline-focus-default nx:[&>svg]:size-4 nx:[&>svg]:shrink-0',
+        'nx:absolute nx:top-1.5 nx:right-1 nx:flex nx:aspect-square nx:w-5 nx:items-center nx:justify-center nx:rounded-md nx:p-0 nx:text-nav-foreground nx:hover:bg-nav-item-hover nx:focus-visible:outline-2 nx:focus-visible:outline-focus-default nx:[&>svg]:size-icon-glyph-default nx:[&>svg]:shrink-0',
         'nx:peer-data-[size=sm]/menu-button:top-1',
         'nx:peer-data-[size=default]/menu-button:top-1.5',
         'nx:peer-data-[size=lg]/menu-button:top-2.5',
@@ -1130,7 +1130,7 @@ function SidebarMenuSubButton({
       data-active={isActive}
       aria-current={isActive ? 'page' : undefined}
       className={cn(
-        'nx:flex nx:h-7 nx:min-w-0 nx:-translate-x-px nx:items-center nx:gap-2 nx:overflow-hidden nx:rounded-md nx:px-2 nx:text-nav-muted-foreground nx:hover:bg-nav-item-hover nx:focus-visible:outline-2 nx:focus-visible:outline-focus-default nx:active:bg-nav-item-active nx:disabled:pointer-events-none nx:disabled:text-disabled-foreground nx:aria-disabled:pointer-events-none nx:aria-disabled:text-disabled-foreground nx:[&>span:last-child]:truncate nx:[&>svg]:size-4 nx:[&>svg]:shrink-0',
+        'nx:flex nx:h-7 nx:min-w-0 nx:-translate-x-px nx:items-center nx:gap-2 nx:overflow-hidden nx:rounded-md nx:px-2 nx:text-nav-muted-foreground nx:hover:bg-nav-item-hover nx:focus-visible:outline-2 nx:focus-visible:outline-focus-default nx:active:bg-nav-item-active nx:disabled:pointer-events-none nx:disabled:text-disabled-foreground nx:aria-disabled:pointer-events-none nx:aria-disabled:text-disabled-foreground nx:[&>span:last-child]:truncate nx:[&>svg]:size-icon-glyph-default nx:[&>svg]:shrink-0',
         'nx:data-[active=true]:bg-nav-item-active nx:data-[active=true]:text-nav-foreground',
         size === 'sm' && 'nx:typography-body-small',
         size === 'md' && 'nx:typography-body-default',

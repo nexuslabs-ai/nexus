@@ -340,7 +340,7 @@ export const TooltipContentUsesNumericSpacing: Story = {
     docs: {
       description: {
         story:
-          'Regression sentinel — verifies `TooltipContent` keeps its intended numeric padding (`px-3` / `py-1.5`) at the resolved pixel values via `getComputedStyle`. Because the content is portaled, the assertion sees document-level mode resolution — default, where `px-3` is 12px and `py-1.5` is 6px.',
+          'Regression sentinel — verifies `TooltipContent` keeps its intended numeric padding (`px-3` / `py-1.5`) at the resolved pixel values via `getComputedStyle`. The assertion compares padding against the resolved spacing tokens inside the portal appearance scope at the selected density.',
       },
     },
   },
@@ -371,10 +371,18 @@ export const TooltipContentUsesNumericSpacing: Story = {
       });
 
       const styles = getComputedStyle(tooltip);
-      expect(styles.paddingLeft).toBe('12px');
-      expect(styles.paddingRight).toBe('12px');
-      expect(styles.paddingTop).toBe('6px');
-      expect(styles.paddingBottom).toBe('6px');
+      expect(styles.paddingLeft).toBe(
+        styles.getPropertyValue('--nx-spacing-3').trim()
+      );
+      expect(styles.paddingRight).toBe(
+        styles.getPropertyValue('--nx-spacing-3').trim()
+      );
+      expect(styles.paddingTop).toBe(
+        styles.getPropertyValue('--nx-spacing-1_5').trim()
+      );
+      expect(styles.paddingBottom).toBe(
+        styles.getPropertyValue('--nx-spacing-1_5').trim()
+      );
     } finally {
       await userEvent.unhover(trigger);
       await waitFor(() => {

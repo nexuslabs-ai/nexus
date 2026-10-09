@@ -1,3 +1,4 @@
+import { DEFAULT_NEXUS_APPEARANCE, DENSITY_OPTIONS } from '@nexus_ds/core';
 import type { Meta, StoryObj } from '@storybook/react';
 import {
   IconAlertCircle,
@@ -9,6 +10,7 @@ import {
 } from '@tabler/icons-react';
 import { expect, within } from 'storybook/test';
 
+import { NexusRoot } from '../appearance/provider';
 import { Spinner } from '../spinner';
 
 import { Badge } from './badge';
@@ -701,6 +703,32 @@ export const AllVariants: Story = {
   ),
   parameters: {
     layout: 'padded',
+  },
+};
+
+export const DensityIcons: Story = {
+  tags: ['!autodocs', '!dev'],
+  render: () => (
+    <div className="nx:grid nx:gap-3">
+      {DENSITY_OPTIONS.map(({ value: density }) => (
+        <NexusRoot
+          key={density}
+          state={{ ...DEFAULT_NEXUS_APPEARANCE, mode: 'light', density }}
+        >
+          <Badge leftIcon={<IconCheck />} data-testid="density-badge">
+            {density}
+          </Badge>
+        </NexusRoot>
+      ))}
+    </div>
+  ),
+  play: async ({ canvasElement }) => {
+    const badges = within(canvasElement).getAllByTestId('density-badge');
+    for (const badge of badges) {
+      await expect(
+        badge.querySelector('svg')!.getBoundingClientRect().width
+      ).toBe(14);
+    }
   },
 };
 

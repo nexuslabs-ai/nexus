@@ -261,15 +261,19 @@ export const Vertical: Story = {
       Number.parseFloat(getComputedStyle(range).borderTopLeftRadius)
     ).toBe(0);
     await expect(thumb).toHaveAttribute('data-orientation', 'vertical');
-    await expect(getComputedStyle(thumb).height).toBe('20px');
-    await expect(getComputedStyle(thumb).width).toBe('20px');
+    const thumbSize = getComputedStyle(thumb)
+      .getPropertyValue('--nx-spacing-5')
+      .trim();
+    await expect(getComputedStyle(thumb).height).toBe(thumbSize);
+    await expect(getComputedStyle(thumb).width).toBe(thumbSize);
     await expect(thumbHandleStyle.height).toBe('2px');
-    await expect(thumbHandleStyle.width).toBe('20px');
+    await expect(thumbHandleStyle.width).toBe(thumbSize);
   },
 };
 
 // Standard keeps a 20px hit thumb; both sizes render a caret, not a circle.
 export const SizeMeasurements: Story = {
+  globals: { density: 'default' },
   render: () => (
     <div className="nx:flex nx:w-64 nx:flex-col nx:gap-8">
       <Slider
