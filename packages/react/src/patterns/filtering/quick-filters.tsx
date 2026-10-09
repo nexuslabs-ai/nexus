@@ -87,13 +87,7 @@ export function CardFilters() {
           }))}
           onChange={setFormat}
         />
-        <Button
-          ref={clearRef}
-          type="button"
-          variant="ghost"
-          size="sm"
-          onClick={clear}
-        >
+        <Button ref={clearRef} variant="ghost" size="sm" onClick={clear}>
           Clear all
         </Button>
       </AppliedFilters>
@@ -170,7 +164,7 @@ export function FileFiltersExample() {
           value={size}
           onChange={setSize}
         />
-        <Button type="button" size="sm" variant="ghost" onClick={clear}>
+        <Button size="sm" variant="ghost" onClick={clear}>
           Clear all
         </Button>
       </AppliedFilters>

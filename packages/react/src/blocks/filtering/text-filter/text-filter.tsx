@@ -116,7 +116,6 @@ export function TextFilter({
         <PopoverTrigger asChild>
           <Button
             ref={focusAdd}
-            type="button"
             size="sm"
             className="nx:h-(--nx-spacing-8)"
             variant="outline"
@@ -144,7 +143,6 @@ export function TextFilter({
           </div>
           <div className="nx:flex nx:items-center nx:justify-between nx:gap-2 nx:border-t nx:border-border-default nx:bg-muted-extralight nx:p-3">
             <Button
-              type="button"
               size="sm"
               className="nx:h-(--nx-spacing-8)"
               variant="ghost"

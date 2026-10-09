@@ -487,6 +487,13 @@ export const InvalidExternalValues: Story = {
             operator: 'is',
             value: '0x10',
           },
+          {
+            kind: 'rule',
+            id: 'overflow',
+            field: 'projects',
+            operator: 'is',
+            value: '1e999',
+          },
         ],
       }}
     />
@@ -495,7 +502,7 @@ export const InvalidExternalValues: Story = {
     const canvas = within(canvasElement);
     await expect(canvas.getByText('Choose an available field.')).toBeVisible();
     await expect(canvas.getByText('Enter a valid date.')).toBeVisible();
-    await expect(canvas.getByText('Enter a valid number.')).toBeVisible();
+    await expect(canvas.getAllByText('Enter a valid number.')).toHaveLength(2);
     await expect(
       canvas.getByText('Use at most 0 levels of nested groups.')
     ).toBeVisible();

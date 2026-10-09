@@ -40,7 +40,7 @@ export type FilterField = {
   | { type: 'text' | 'number' | 'date' }
   | { type: 'choice'; options: readonly FilterOption[] }
 );
-type ValuelessOperator = 'isEmpty' | 'isNotEmpty';
+export type ValuelessOperator = 'isEmpty' | 'isNotEmpty';
 type ListOperator = 'isAnyOf' | 'isNoneOf';
 type FilterValue<Operator extends FilterOperator> =
   Operator extends ValuelessOperator
@@ -197,7 +197,10 @@ export function getFilterRuleError(
     return 'missingValue';
   if (
     field.type === 'number' &&
-    values.some((value) => !decimalNumber.test(value.trim()))
+    values.some(
+      (value) =>
+        !decimalNumber.test(value.trim()) || !Number.isFinite(Number(value))
+    )
   )
     return 'invalidNumber';
   if (field.type === 'date' && values.some((value) => !isCalendarDay(value)))

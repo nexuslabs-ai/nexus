@@ -120,7 +120,6 @@ export function ChoiceFilter({
             variant="outline"
             size="sm"
             className="nx:h-(--nx-spacing-8)"
-            type="button"
           >
             Add {label.toLowerCase()} filter
           </Button>

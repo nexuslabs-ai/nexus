@@ -17,6 +17,7 @@ export {
   type FilterRule,
   getFilterErrors,
   isValuelessOperator,
+  type ValuelessOperator,
 } from './lib/filter-model';
 
 // Components

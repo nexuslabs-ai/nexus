@@ -130,7 +130,6 @@ export function NumberRangeFilter({
           <Button
             disabled={disabled}
             ref={focusAdd}
-            type="button"
             size="sm"
             className="nx:h-(--nx-spacing-8)"
             variant="outline"
@@ -193,7 +192,6 @@ export function NumberRangeFilter({
           </div>
           <div className="nx:flex nx:justify-between nx:gap-2 nx:border-t nx:border-border-default nx:bg-muted-extralight nx:p-3">
             <Button
-              type="button"
               variant="ghost"
               size="sm"
               className="nx:h-(--nx-spacing-8)"

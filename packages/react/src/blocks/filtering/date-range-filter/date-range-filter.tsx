@@ -152,7 +152,6 @@ export function DateRangeFilter({
         <PopoverTrigger asChild>
           <Button
             ref={focusAdd}
-            type="button"
             size="sm"
             className="nx:h-(--nx-spacing-8)"
             variant="outline"
@@ -171,7 +170,6 @@ export function DateRangeFilter({
         <form onSubmit={apply}>
           <div className="nx:grid nx:grid-cols-2 nx:gap-2 nx:border-b nx:border-border-default nx:p-3">
             <Button
-              type="button"
               size="sm"
               className="nx:h-(--nx-spacing-8)"
               variant="outline"
@@ -181,7 +179,6 @@ export function DateRangeFilter({
               Today
             </Button>
             <Button
-              type="button"
               size="sm"
               className="nx:h-(--nx-spacing-8)"
               variant="outline"
@@ -204,7 +201,6 @@ export function DateRangeFilter({
           </div>
           <div className="nx:flex nx:items-center nx:justify-between nx:gap-2 nx:border-t nx:border-border-default nx:bg-muted-extralight nx:p-3">
             <Button
-              type="button"
               size="sm"
               className="nx:h-(--nx-spacing-8)"
               variant="ghost"

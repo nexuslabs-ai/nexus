@@ -103,7 +103,6 @@ export function TeamDirectory({
       <div className="nx:flex nx:items-center nx:justify-between nx:gap-3">
         <Results count={results.length} total={members.length} noun="members" />
         <Button
-          type="button"
           size="sm"
           className="nx:h-(--nx-spacing-8)"
           variant="ghost"

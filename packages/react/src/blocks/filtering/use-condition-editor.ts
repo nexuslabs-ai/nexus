@@ -3,9 +3,10 @@ import * as React from 'react';
 import {
   type FilterOperator,
   isValuelessOperator,
+  type ValuelessOperator,
 } from '../../lib/filter-model';
 
-type ValuelessCondition = { operator: 'isEmpty' | 'isNotEmpty' };
+type ValuelessCondition = { operator: ValuelessOperator };
 type AppliedCondition<Condition> = Exclude<Condition, ValuelessCondition>;
 
 function isApplied<Condition extends { operator: FilterOperator }>(
