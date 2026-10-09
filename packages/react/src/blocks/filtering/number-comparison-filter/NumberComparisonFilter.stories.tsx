@@ -3,8 +3,17 @@ import * as React from 'react';
 import { Canvas, Source, Title } from '@storybook/addon-docs/blocks';
 import type { Meta, StoryObj } from '@storybook/react';
 import { IconHash } from '@tabler/icons-react';
-import { expect, userEvent, waitFor, within } from 'storybook/test';
+import { expect, fn, userEvent, waitFor, within } from 'storybook/test';
 
+import {
+  DialogHost,
+  dispatchStoryEvent,
+  expectEditorClosed,
+  expectFocus,
+  expectMenuClosed,
+  ParentForm,
+  useStoryEvent,
+} from '../../../stories/support/filter-block-test-utils';
 import operatorSource from '../filter-operator.tsx?raw';
 
 import {
@@ -12,21 +21,40 @@ import {
   NumberComparisonFilter,
 } from './number-comparison-filter';
 import blockSource from './number-comparison-filter.tsx?raw';
+import { NumberComparisonFilterExample } from './number-comparison-filter-example';
+import exampleSource from './number-comparison-filter-example.tsx?raw';
 
 const initial: NumberComparisonCondition = {
   operator: 'greaterThan',
   value: 500,
 };
+const replacement: NumberComparisonCondition = {
+  operator: 'greaterThan',
+  value: 100,
+};
 function Preview({
   initialValue = initial,
   disabled = false,
+  onChange,
 }: {
   initialValue?: NumberComparisonCondition | null;
   disabled?: boolean;
+  onChange?: (value: NumberComparisonCondition | null) => void;
 }) {
   const [value, setValue] = React.useState<NumberComparisonCondition | null>(
     initialValue
   );
+  const [upperBound, setUpperBound] = React.useState<number>();
+  useStoryEvent('story:tighten-bounds', () => setUpperBound(1000));
+  const [isDisabled, setDisabled] = React.useState(disabled);
+  useStoryEvent('story:replace', () => setValue(replacement));
+  useStoryEvent('story:toggle-disabled', () =>
+    setDisabled((current) => !current)
+  );
+  function change(next: NumberComparisonCondition | null) {
+    setValue(next);
+    onChange?.(next);
+  }
   return (
     <section
       aria-label="NumberComparisonFilter example"
@@ -36,8 +64,9 @@ function Preview({
         label="Amount"
         icon={<IconHash aria-hidden="true" />}
         value={value}
-        onChange={setValue}
-        disabled={disabled}
+        onChange={change}
+        disabled={isDisabled}
+        upperBound={upperBound}
       />
       <output
         aria-label="Applied condition"
@@ -48,11 +77,14 @@ function Preview({
     </section>
   );
 }
-const usage =
-  "import { useState } from 'react';\nimport { NumberComparisonFilter, type NumberComparisonCondition } from '@/blocks/filtering/number-comparison-filter/number-comparison-filter';\n\nexport function Example() {\n const [value, setValue] = useState<NumberComparisonCondition | null>({ operator: 'greaterThan', value: 500 });\n return <NumberComparisonFilter label=\"Amount\" value={value} onChange={setValue}  />;\n}";
+const valueShape = `type NumberComparisonCondition =
+  | { operator: 'is' | 'isNot' | 'greaterThan' | 'lessThan'; value: number }
+  | { operator: 'isEmpty' }
+  | { operator: 'isNotEmpty' };`;
 const meta = {
   title: 'Blocks/Filtering/NumberComparisonFilter',
   component: Preview,
+  args: { onChange: fn() },
   tags: ['autodocs'],
   parameters: {
     layout: 'centered',
@@ -62,42 +94,113 @@ const meta = {
         <>
           <Title />
           <p>
-            Compare one finite number using equals, not equals, greater than or
-            less than. Signed decimals are supported; optional lowerBound and
-            upperBound constrain values. Unit is display text.
+            Compare one number: equals, not equals, greater than or less than.
+            The number is a draft until you press Apply.
           </p>
+          <h2>When to use it</h2>
+          <p>
+            Use it for a single threshold such as an amount or a count. For a
+            range with both ends, use NumberRangeFilter.
+          </p>
+          <h2>Minimal composition</h2>
           <Canvas of={Default} />
-          <h2>Use this block</h2>
+          <Source code={exampleSource} language="tsx" />
+          <h2>Value and changes</h2>
           <p>
-            Copy
-            blocks/filtering/number-comparison-filter/number-comparison-filter.tsx
-            and blocks/filtering/filter-operator.tsx from packages/react/src,
-            keeping their relative paths. The block imports Nexus components by
-            relative path. Include the copied files in your Tailwind source scan
-            and use the Nexus theme setup.
+            <code>value</code> is controlled: pass the current condition and
+            update it in <code>onChange</code>. <code>null</code> means no
+            filter.
           </p>
-          <Source code={usage} language="tsx" />
-          <h2>State and behavior</h2>
+          <Source code={valueShape} language="tsx" />
+          <ul>
+            <li>
+              Apply, or Enter in the field, emits a finite number. Zero,
+              negatives and decimals work.
+            </li>
+            <li>
+              Optional <code>lowerBound</code> and <code>upperBound</code> are
+              inclusive; a value outside them cannot be applied.{' '}
+              <code>unit</code> is display text only.
+            </li>
+            <li>
+              Changing between comparison operators keeps the value and emits
+              immediately.
+            </li>
+            <li>
+              <em>Is empty</em> and <em>is not empty</em> emit immediately.
+            </li>
+            <li>
+              Switching from an empty operator waits for a number and Apply.
+            </li>
+            <li>
+              Pressing × emits <code>null</code>.
+            </li>
+          </ul>
           <p>
-            Pass the updated value back through onChange. Null means no
-            condition. Operator changes with an existing value apply
-            immediately; returning from an empty operator opens an editor and
-            commits only on Apply. Cancel, Escape and outside dismissal discard
-            drafts. External value changes close an unfinished editor. Removing
-            restores focus to the Add button.
+            The block owns the open editor, the draft and a pending operator.
+            Bounds changing while the editor is open do not close it; the draft
+            is re-checked against the new bounds.
           </p>
+          <h2>States and dismissal</h2>
           <p>
-            This uses the same FilterCondition field / operator / value / remove
-            parts as ChoiceFilter and NumberRangeFilter. Your application
-            supplies matching logic, data requests, URL persistence and
-            pagination. The JSON output below the example is for inspecting the
-            emitted condition, not product UI.
+            Cancel, Escape and clicking outside discard the draft; nothing is
+            emitted. Focus returns to the value you edited, to the operator when
+            you backed out of a pending operator, and to Add after you remove
+            the filter. Replacing the value from outside, or disabling the
+            block, closes an unfinished editor without emitting. An open
+            operator menu is not closed when the block is disabled.
           </p>
-          <h2>States</h2>
+          <h3>Not applied</h3>
           <Canvas of={NotApplied} />
+          <h3>Empty operator</h3>
           <Canvas of={EmptyOperator} />
+          <h3>Narrow container</h3>
+          <Canvas of={NarrowContainer} />
+          <h3>Disabled</h3>
           <Canvas of={Disabled} />
-          <h2>Copy implementation</h2>
+          <h2>Delivery</h2>
+          <p>
+            Manual guidance until the generated catalog lands (#798). This is
+            copy-source, not a package export.
+          </p>
+          <ul>
+            <li>
+              Copy{' '}
+              <code>
+                blocks/filtering/number-comparison-filter/number-comparison-filter.tsx
+              </code>{' '}
+              and <code>blocks/filtering/filter-operator.tsx</code>, keeping the{' '}
+              <code>blocks/filtering</code> layout.
+            </li>
+            <li>
+              They need these Nexus component folders, including the ones those
+              folders import: <code>button</code>, <code>button-group</code>,{' '}
+              <code>dropdown-menu</code>, <code>filter-condition</code>,{' '}
+              <code>input</code>, <code>label</code>,{' '}
+              <code>overlay-layout</code>, <code>popover</code>,{' '}
+              <code>separator</code>, <code>spinner</code> and <code>lib/</code>
+              . If your copy lives elsewhere, update the relative imports.
+            </li>
+            <li>
+              No npm packages beyond those the Nexus components already use.
+            </li>
+            <li>
+              Include the copied files in your Tailwind source scan and use the
+              Nexus theme and styles setup.
+            </li>
+            <li>
+              Your application owns the options and data, matching, fetching,
+              loading and error states, and URL state. Lay several filters out
+              with <code>blocks/filtering/applied-filters.tsx</code>.
+            </li>
+          </ul>
+          <h2>Evidence and support boundary</h2>
+          <p>The stories on this page test each behaviour above.</p>
+          <p>
+            Not supported: unit conversion and currency formatting. The
+            application decides how the comparison matches.
+          </p>
+          <h2>Implementation</h2>
           <details>
             <summary>
               blocks/filtering/number-comparison-filter/number-comparison-filter.tsx
@@ -106,13 +209,13 @@ const meta = {
           </details>
           <details>
             <summary>
-              blocks/filtering/filter-operator.tsx — required helper
+              blocks/filtering/filter-operator.tsx — required shared helper
             </summary>
             <Source code={operatorSource} language="tsx" />
           </details>
           <p>
             <a href="/?path=/docs/patterns-filtering--docs" target="_top">
-              Filtering pattern
+              See how this fits the Filtering pattern
             </a>
           </p>
         </>
@@ -124,7 +227,8 @@ export default meta;
 type Story = StoryObj<typeof meta>;
 export const Default: Story = {
   tags: ['docs'],
-  render: () => <Preview />,
+  render: () => <NumberComparisonFilterExample />,
+  parameters: { docs: { source: { code: exampleSource } } },
 };
 export const NotApplied: Story = {
   render: () => <Preview initialValue={null} />,
@@ -251,5 +355,258 @@ export const IncompleteDraft: Story = {
         canvas.getByRole('button', { name: /^Edit Amount:/ })
       ).toHaveFocus()
     );
+  },
+};
+export const BoundsChangeWhileOpen: Story = {
+  render: () => <Preview />,
+  play: async ({ canvasElement }) => {
+    const page = within(canvasElement.ownerDocument.body);
+    await userEvent.click(
+      within(canvasElement).getByRole('button', { name: 'Edit Amount: 500' })
+    );
+    const dialog = await page.findByRole('dialog', {
+      name: 'Filter by amount',
+    });
+    const editor = within(dialog);
+    const input = editor.getByRole('spinbutton', { name: 'Amount' });
+    await userEvent.clear(input);
+    await userEvent.type(input, '1500');
+    await expect(editor.getByRole('button', { name: 'Apply' })).toBeEnabled();
+    dispatchStoryEvent('story:tighten-bounds');
+    await expect(
+      await editor.findByText('Allowed range: no minimum to 1000.')
+    ).toBeVisible();
+    await expect(editor.getByRole('button', { name: 'Apply' })).toBeDisabled();
+    await expect(dialog).toHaveAttribute('data-state', 'open');
+    await expect(input).toHaveValue(1500);
+  },
+};
+export const AddFromNothing: Story = {
+  render: (args) => <Preview initialValue={null} onChange={args.onChange} />,
+  play: async ({ canvasElement, args }) => {
+    const page = within(canvasElement.ownerDocument.body);
+    await userEvent.click(
+      within(canvasElement).getByRole('button', { name: 'Add amount filter' })
+    );
+    const editor = within(
+      await page.findByRole('dialog', { name: 'Filter by amount' })
+    );
+    await expect(editor.getByRole('button', { name: 'Apply' })).toBeDisabled();
+    await userEvent.type(
+      editor.getByRole('spinbutton', { name: 'Amount' }),
+      '0'
+    );
+    await userEvent.click(editor.getByRole('button', { name: 'Apply' }));
+    await expect(args.onChange).toHaveBeenCalledTimes(1);
+    await expect(args.onChange).toHaveBeenLastCalledWith({
+      operator: 'greaterThan',
+      value: 0,
+    });
+    await expectEditorClosed(canvasElement, 'Filter by amount');
+  },
+};
+export const OperatorKeepsValue: Story = {
+  render: (args) => <Preview onChange={args.onChange} />,
+  play: async ({ canvasElement, args }) => {
+    const page = within(canvasElement.ownerDocument.body);
+    await userEvent.click(
+      within(canvasElement).getByRole('button', {
+        name: 'Change Amount operator',
+      })
+    );
+    await userEvent.click(
+      page.getByRole('menuitemradio', { name: 'is less than' })
+    );
+    await expect(args.onChange).toHaveBeenCalledTimes(1);
+    await expect(args.onChange).toHaveBeenLastCalledWith({
+      operator: 'lessThan',
+      value: 500,
+    });
+    await expectMenuClosed(canvasElement);
+  },
+};
+export const ValuelessOperatorCommits: Story = {
+  render: (args) => <Preview onChange={args.onChange} />,
+  play: async ({ canvasElement, args }) => {
+    const page = within(canvasElement.ownerDocument.body);
+    await userEvent.click(
+      within(canvasElement).getByRole('button', {
+        name: 'Change Amount operator',
+      })
+    );
+    await userEvent.click(
+      page.getByRole('menuitemradio', { name: 'is not empty' })
+    );
+    await expect(args.onChange).toHaveBeenLastCalledWith({
+      operator: 'isNotEmpty',
+    });
+    await expectMenuClosed(canvasElement);
+  },
+};
+export const PendingOperatorApplies: Story = {
+  render: (args) => (
+    <Preview initialValue={{ operator: 'isEmpty' }} onChange={args.onChange} />
+  ),
+  play: async ({ canvasElement, args }) => {
+    const page = within(canvasElement.ownerDocument.body);
+    await userEvent.click(
+      within(canvasElement).getByRole('button', {
+        name: 'Change Amount operator',
+      })
+    );
+    await userEvent.click(page.getByRole('menuitemradio', { name: 'is not' }));
+    const editor = within(
+      await page.findByRole('dialog', { name: 'Filter by amount' })
+    );
+    await expect(args.onChange).not.toHaveBeenCalled();
+    await userEvent.type(
+      editor.getByRole('spinbutton', { name: 'Amount' }),
+      '-7.5'
+    );
+    await userEvent.click(editor.getByRole('button', { name: 'Apply' }));
+    await expect(args.onChange).toHaveBeenCalledTimes(1);
+    await expect(args.onChange).toHaveBeenLastCalledWith({
+      operator: 'isNot',
+      value: -7.5,
+    });
+  },
+};
+export const DismissDiscardsDraft: Story = {
+  render: (args) => <Preview onChange={args.onChange} />,
+  play: async ({ canvasElement, args }) => {
+    const canvas = within(canvasElement);
+    const page = within(canvasElement.ownerDocument.body);
+    const trigger = canvas.getByRole('button', { name: 'Edit Amount: 500' });
+    await userEvent.click(trigger);
+    let input = await page.findByRole('spinbutton', { name: 'Amount' });
+    await userEvent.type(input, '9');
+    await userEvent.keyboard('{Escape}');
+    await expectEditorClosed(canvasElement, 'Filter by amount');
+    await expectFocus(trigger);
+    await userEvent.click(trigger);
+    input = await page.findByRole('spinbutton', { name: 'Amount' });
+    await expect(input).toHaveValue(500);
+    await userEvent.type(input, '9');
+    await userEvent.click(canvas.getByLabelText('Applied condition'));
+    await expectEditorClosed(canvasElement, 'Filter by amount');
+    await expect(args.onChange).not.toHaveBeenCalled();
+  },
+};
+export const ExternalReplaceWhileOpen: Story = {
+  render: (args) => <Preview onChange={args.onChange} />,
+  play: async ({ canvasElement, args }) => {
+    const canvas = within(canvasElement);
+    const page = within(canvasElement.ownerDocument.body);
+    await userEvent.click(
+      canvas.getByRole('button', { name: 'Edit Amount: 500' })
+    );
+    await userEvent.type(
+      await page.findByRole('spinbutton', { name: 'Amount' }),
+      '9'
+    );
+    dispatchStoryEvent('story:replace');
+    await expectEditorClosed(canvasElement, 'Filter by amount');
+    await expect(
+      canvas.getByRole('button', { name: 'Edit Amount: 100' })
+    ).toBeInTheDocument();
+    await expect(args.onChange).not.toHaveBeenCalled();
+  },
+};
+export const DisabledWhileOpen: Story = {
+  render: (args) => <Preview onChange={args.onChange} />,
+  play: async ({ canvasElement, args }) => {
+    const canvas = within(canvasElement);
+    const page = within(canvasElement.ownerDocument.body);
+    await userEvent.click(
+      canvas.getByRole('button', { name: 'Edit Amount: 500' })
+    );
+    await userEvent.type(
+      await page.findByRole('spinbutton', { name: 'Amount' }),
+      '9'
+    );
+    dispatchStoryEvent('story:toggle-disabled');
+    await expectEditorClosed(canvasElement, 'Filter by amount');
+    for (const button of canvas.getAllByRole('button'))
+      await expect(button).toBeDisabled();
+    dispatchStoryEvent('story:toggle-disabled');
+    await waitFor(() =>
+      expect(
+        canvas.getByRole('button', { name: 'Edit Amount: 500' })
+      ).toBeEnabled()
+    );
+    await expect(
+      page.queryByRole('dialog', { name: 'Filter by amount' })
+    ).not.toBeInTheDocument();
+    await expect(args.onChange).not.toHaveBeenCalled();
+  },
+};
+export const InsideParentForm: Story = {
+  render: (args) => (
+    <ParentForm>
+      <Preview onChange={args.onChange} />
+    </ParentForm>
+  ),
+  play: async ({ canvasElement, args }) => {
+    const canvas = within(canvasElement);
+    const page = within(canvasElement.ownerDocument.body);
+    await userEvent.click(
+      canvas.getByRole('button', { name: 'Edit Amount: 500' })
+    );
+    const input = await page.findByRole('spinbutton', { name: 'Amount' });
+    await userEvent.clear(input);
+    await userEvent.type(input, '42{Enter}');
+    await expect(args.onChange).toHaveBeenLastCalledWith({
+      operator: 'greaterThan',
+      value: 42,
+    });
+    await expect(canvas.getByLabelText('Parent submissions')).toHaveTextContent(
+      '0'
+    );
+    await userEvent.click(
+      canvas.getByRole('button', { name: 'Submit search' })
+    );
+    await expect(canvas.getByLabelText('Parent submissions')).toHaveTextContent(
+      '1'
+    );
+  },
+};
+export const InsideDialog: Story = {
+  render: (args) => (
+    <DialogHost>
+      <Preview onChange={args.onChange} />
+    </DialogHost>
+  ),
+  play: async ({ canvasElement, args }) => {
+    const page = within(canvasElement.ownerDocument.body);
+    await userEvent.click(
+      within(canvasElement).getByRole('button', {
+        name: 'Open filter settings',
+      })
+    );
+    const host = await page.findByRole('dialog', { name: 'Filter settings' });
+    await expect(host).toBeVisible();
+    const trigger = within(host).getByRole('button', {
+      name: 'Edit Amount: 500',
+    });
+    await userEvent.click(trigger);
+    await expect(
+      await page.findByRole('dialog', { name: 'Filter by amount' })
+    ).toBeVisible();
+    await userEvent.keyboard('{Escape}');
+    await expectEditorClosed(canvasElement, 'Filter by amount');
+    await expect(host).toHaveAttribute('data-state', 'open');
+    await expectFocus(trigger);
+    await userEvent.click(trigger);
+    await expect(
+      await page.findByRole('dialog', { name: 'Filter by amount' })
+    ).toBeVisible();
+    await userEvent.click(
+      within(host).getByRole('heading', { name: 'Filter settings' })
+    );
+    await expectEditorClosed(canvasElement, 'Filter by amount');
+    await expect(host).toHaveAttribute('data-state', 'open');
+    await userEvent.keyboard('{Escape}');
+    await waitFor(() => expect(host).toHaveAttribute('data-state', 'closed'));
+    await expect(args.onChange).not.toHaveBeenCalled();
   },
 };

@@ -102,21 +102,65 @@ const meta = {
           <Source code={anatomySource} language="tsx" />
           <h2>Use a working block</h2>
           <p>
-            <a
-              href="/?path=/docs/blocks-filtering-choicefilter--docs"
-              target="_top"
-            >
-              ChoiceFilter
-            </a>{' '}
-            adds a choice menu and immediate updates.{' '}
-            <a
-              href="/?path=/docs/blocks-filtering-numberrangefilter--docs"
-              target="_top"
-            >
-              NumberRangeFilter
-            </a>{' '}
-            adds draft bounds, validation and Apply/Cancel.
+            Six copyable blocks build on this anatomy. Each adds its own editor
+            and decides when a change applies.
           </p>
+          <ul>
+            <li>
+              <a
+                href="/?path=/docs/blocks-filtering-choicefilter--docs"
+                target="_top"
+              >
+                ChoiceFilter
+              </a>
+              : one value from a short list, applied immediately.
+            </li>
+            <li>
+              <a
+                href="/?path=/docs/blocks-filtering-multichoicefilter--docs"
+                target="_top"
+              >
+                MultiChoiceFilter
+              </a>
+              : several values, applied with Apply.
+            </li>
+            <li>
+              <a
+                href="/?path=/docs/blocks-filtering-textfilter--docs"
+                target="_top"
+              >
+                TextFilter
+              </a>
+              : text a record contains, starts with or equals.
+            </li>
+            <li>
+              <a
+                href="/?path=/docs/blocks-filtering-numbercomparisonfilter--docs"
+                target="_top"
+              >
+                NumberComparisonFilter
+              </a>
+              : one number compared with a threshold.
+            </li>
+            <li>
+              <a
+                href="/?path=/docs/blocks-filtering-numberrangefilter--docs"
+                target="_top"
+              >
+                NumberRangeFilter
+              </a>
+              : a number between a minimum and a maximum.
+            </li>
+            <li>
+              <a
+                href="/?path=/docs/blocks-filtering-daterangefilter--docs"
+                target="_top"
+              >
+                DateRangeFilter
+              </a>
+              : a range of calendar days.
+            </li>
+          </ul>
           <h2>Compose a custom editor</h2>
           <p>
             Use these parts directly for an editor the blocks do not provide,

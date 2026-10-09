@@ -30,6 +30,13 @@ export type ChoiceFilterProps = {
   disabled?: boolean;
 };
 
+function optionLabel(options: readonly ChoiceOption[], value: string) {
+  return (
+    options.find((option) => option.value === value)?.label ??
+    `${value} (unavailable)`
+  );
+}
+
 /** Copy-source block. The application owns condition state and option IDs. */
 export function ChoiceFilter({
   label,
@@ -53,8 +60,7 @@ export function ChoiceFilter({
   const operatorRef = React.useRef<HTMLButtonElement>(null);
   const restoreAdd = React.useRef(false);
   const selected = value && 'value' in value ? value.value : '';
-  const selectedLabel =
-    options.find((option) => option.value === selected)?.label ?? selected;
+  const selectedLabel = selected ? optionLabel(options, selected) : '';
   function focusAdd(node: HTMLButtonElement | null) {
     addRef.current = node;
     if (node && restoreAdd.current) {
@@ -143,8 +149,9 @@ export function ChoiceFilter({
             {('value' in value || pending) && (
               <DropdownMenuTrigger asChild>
                 <FilterConditionSegment
+                  className="nx:min-w-20"
                   disabled={disabled}
-                  aria-label={`Edit ${label}: ${selectedLabel || 'Choose'}`}
+                  aria-label={`Edit ${label}: ${selectedLabel || 'Choose…'}`}
                 >
                   {selectedLabel || 'Choose…'}
                 </FilterConditionSegment>
@@ -202,6 +209,13 @@ export function ChoiceEditor({
   onChange: (value: string) => void;
   disabled?: boolean;
 }) {
+  const listed =
+    value === '' || options.some((option) => option.value === value)
+      ? options
+      : [
+          ...options,
+          { value, label: optionLabel(options, value), disabled: true },
+        ];
   function select(next: string) {
     if (disabled) return;
     if (
@@ -221,7 +235,7 @@ export function ChoiceEditor({
         <DropdownMenuRadioItem value="" disabled={disabled}>
           Any {label.toLowerCase()}
         </DropdownMenuRadioItem>
-        {options.map((option) => (
+        {listed.map((option) => (
           <DropdownMenuRadioItem
             key={option.value}
             value={option.value}

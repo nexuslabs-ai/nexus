@@ -3,8 +3,16 @@ import * as React from 'react';
 import { Canvas, Source, Title } from '@storybook/addon-docs/blocks';
 import type { Meta, StoryObj } from '@storybook/react';
 import { IconUsers } from '@tabler/icons-react';
-import { expect, userEvent, waitFor, within } from 'storybook/test';
+import { expect, fn, userEvent, waitFor, within } from 'storybook/test';
 
+import {
+  dispatchStoryEvent,
+  expectEditorClosed,
+  expectFocus,
+  expectMenuClosed,
+  ParentForm,
+  useStoryEvent,
+} from '../../../stories/support/filter-block-test-utils';
 import operatorSource from '../filter-operator.tsx?raw';
 
 import {
@@ -12,21 +20,49 @@ import {
   MultiChoiceFilter,
 } from './multi-choice-filter';
 import blockSource from './multi-choice-filter.tsx?raw';
+import { MultiChoiceFilterExample } from './multi-choice-filter-example';
+import exampleSource from './multi-choice-filter-example.tsx?raw';
 
 const initial: MultiChoiceCondition = {
   operator: 'isAnyOf',
   values: ['design'],
 };
+const replacement: MultiChoiceCondition = {
+  operator: 'isAnyOf',
+  values: ['engineering'],
+};
 function Preview({
   initialValue = initial,
   disabled = false,
+  onChange,
 }: {
   initialValue?: MultiChoiceCondition | null;
   disabled?: boolean;
+  onChange?: (value: MultiChoiceCondition | null) => void;
 }) {
   const [value, setValue] = React.useState<MultiChoiceCondition | null>(
     initialValue
   );
+  const [options, setOptions] = React.useState([
+    { value: 'design', label: 'Design' },
+    { value: 'engineering', label: 'Engineering' },
+    { value: 'operations', label: 'Operations', disabled: true },
+  ]);
+  useStoryEvent('story:load-options', () =>
+    setOptions((current) => [
+      ...current,
+      { value: 'research', label: 'Research' },
+    ])
+  );
+  const [isDisabled, setDisabled] = React.useState(disabled);
+  useStoryEvent('story:replace', () => setValue(replacement));
+  useStoryEvent('story:toggle-disabled', () =>
+    setDisabled((current) => !current)
+  );
+  function change(next: MultiChoiceCondition | null) {
+    setValue(next);
+    onChange?.(next);
+  }
   return (
     <section
       aria-label="MultiChoiceFilter example"
@@ -36,13 +72,9 @@ function Preview({
         label="Team"
         icon={<IconUsers aria-hidden="true" />}
         value={value}
-        onChange={setValue}
-        disabled={disabled}
-        options={[
-          { value: 'design', label: 'Design' },
-          { value: 'engineering', label: 'Engineering' },
-          { value: 'operations', label: 'Operations', disabled: true },
-        ]}
+        onChange={change}
+        disabled={isDisabled}
+        options={options}
       />
       <output
         aria-label="Applied condition"
@@ -53,11 +85,14 @@ function Preview({
     </section>
   );
 }
-const usage =
-  'import { useState } from \'react\';\nimport { MultiChoiceFilter, type MultiChoiceCondition } from \'@/blocks/filtering/multi-choice-filter/multi-choice-filter\';\n\nexport function Example() {\n const [value, setValue] = useState<MultiChoiceCondition | null>({ operator: \'isAnyOf\', values: [\'design\'] });\n return <MultiChoiceFilter label="Team" value={value} onChange={setValue} options={[{ value: "design", label: "Design" }, { value: "engineering", label: "Engineering" }, { value: "operations", label: "Operations", disabled: true }]} />;\n}';
+const valueShape = `type MultiChoiceCondition =
+  | { operator: 'isAnyOf' | 'isNoneOf'; values: string[] }
+  | { operator: 'isEmpty' }
+  | { operator: 'isNotEmpty' };`;
 const meta = {
   title: 'Blocks/Filtering/MultiChoiceFilter',
   component: Preview,
+  args: { onChange: fn() },
   tags: ['autodocs'],
   parameters: {
     layout: 'centered',
@@ -67,54 +102,117 @@ const meta = {
         <>
           <Title />
           <p>
-            Choose several options. Changes stay in the editor until Apply. An
-            empty selection cannot be applied; remove the filter to allow all
-            values.
+            Filter by several values from a list. Choices are a draft until you
+            press Apply.
           </p>
+          <h2>When to use it</h2>
+          <p>
+            Use it when a record can match any, or none, of several values and
+            people want to review the set before results change. For one cheap
+            choice, use ChoiceFilter.
+          </p>
+          <h2>Minimal composition</h2>
           <Canvas of={Default} />
-          <h2>Use this block</h2>
+          <Source code={exampleSource} language="tsx" />
+          <h2>Value and changes</h2>
           <p>
-            Copy blocks/filtering/multi-choice-filter/multi-choice-filter.tsx
-            and blocks/filtering/filter-operator.tsx from packages/react/src,
-            keeping their relative paths. The block imports Nexus components by
-            relative path. Include the copied files in your Tailwind source scan
-            and use the Nexus theme setup.
+            <code>value</code> is controlled: pass the current condition and
+            update it in <code>onChange</code>. <code>null</code> means no
+            filter.
           </p>
-          <Source code={usage} language="tsx" />
-          <h2>Choose who owns Apply</h2>
+          <Source code={valueShape} language="tsx" />
+          <ul>
+            <li>
+              Apply emits the checked IDs, without duplicates. At least one is
+              required.
+            </li>
+            <li>Checking a box only edits the draft.</li>
+            <li>
+              Changing between <em>is any of</em> and <em>is none of</em> keeps
+              the values and emits immediately.
+            </li>
+            <li>
+              <em>Is empty</em> and <em>is not empty</em> emit immediately.
+            </li>
+            <li>
+              Switching from an empty operator waits for a checked value and
+              Apply.
+            </li>
+            <li>
+              Pressing × emits <code>null</code>.
+            </li>
+          </ul>
           <p>
-            MultiChoiceFilter is the standalone draft composition. The same file
-            exports MultiChoiceEditor, a controlled checklist without a popover
-            or footer. Connect that editor to applied state for live filtering,
-            or a panel draft for one shared Apply. An empty editor selection is
-            valid; its owner decides whether that means no condition.
+            The block owns the open editor, the draft and a pending operator.
+            Options loading while the editor is open do not close it or reset
+            the draft. MultiChoiceEditor is also exported for use inside your
+            own popover and Apply footer.
           </p>
+          <h2>States and dismissal</h2>
           <p>
-            <a href="/?path=/docs/patterns-filtering--docs" target="_top">
-              See individual filters with Apply
-            </a>
+            Cancel, Escape and clicking outside discard the draft; nothing is
+            emitted. Focus returns to the value you edited, to the operator when
+            you backed out of a pending operator, and to Add after you remove
+            the filter. Replacing the value from outside, or disabling the
+            block, closes an unfinished editor without emitting. An open
+            operator menu is not closed when the block is disabled. Unknown IDs
+            stay visible as “(unavailable)” and can be unchecked.
           </p>
-          <h2>State and behavior</h2>
-          <p>
-            Pass the updated value back through onChange. Null means no
-            condition. Operator changes with an existing value apply
-            immediately; returning from an empty operator opens an editor and
-            commits only on Apply. Cancel, Escape and outside dismissal discard
-            drafts. External value changes close an unfinished editor. Removing
-            restores focus to the Add button.
-          </p>
-          <p>
-            This uses the same FilterCondition field / operator / value / remove
-            parts as ChoiceFilter and NumberRangeFilter. Your application
-            supplies matching logic, data requests, URL persistence and
-            pagination. The JSON output below the example is for inspecting the
-            emitted condition, not product UI.
-          </p>
-          <h2>States</h2>
+          <h3>Not applied</h3>
           <Canvas of={NotApplied} />
+          <h3>Empty operator</h3>
           <Canvas of={EmptyOperator} />
+          <h3>Unavailable value</h3>
+          <Canvas of={UnavailableOption} />
+          <h3>Narrow container</h3>
+          <Canvas of={NarrowContainer} />
+          <h3>Disabled</h3>
           <Canvas of={Disabled} />
-          <h2>Copy implementation</h2>
+          <h2>Delivery</h2>
+          <p>
+            Manual guidance until the generated catalog lands (#798). This is
+            copy-source, not a package export.
+          </p>
+          <ul>
+            <li>
+              Copy{' '}
+              <code>
+                blocks/filtering/multi-choice-filter/multi-choice-filter.tsx
+              </code>{' '}
+              and <code>blocks/filtering/filter-operator.tsx</code>, keeping the{' '}
+              <code>blocks/filtering</code> layout.
+            </li>
+            <li>
+              They need these Nexus component folders, including the ones those
+              folders import: <code>button</code>, <code>button-group</code>,{' '}
+              <code>checkbox</code>, <code>choice-row</code>,{' '}
+              <code>dropdown-menu</code>, <code>filter-condition</code>,{' '}
+              <code>label</code>, <code>overlay-layout</code>,{' '}
+              <code>popover</code>, <code>separator</code>, <code>spinner</code>{' '}
+              and <code>lib/</code>. If your copy lives elsewhere, update the
+              relative imports.
+            </li>
+            <li>
+              No npm packages beyond those the Nexus components already use.
+            </li>
+            <li>
+              Include the copied files in your Tailwind source scan and use the
+              Nexus theme and styles setup.
+            </li>
+            <li>
+              Your application owns the options and data, matching, fetching,
+              loading and error states, and URL state. Lay several filters out
+              with <code>blocks/filtering/applied-filters.tsx</code>.
+            </li>
+          </ul>
+          <h2>Evidence and support boundary</h2>
+          <p>The stories on this page test each behaviour above.</p>
+          <p>
+            Not supported: searching options and applying each checkbox
+            immediately. The application decides how a record with several
+            values matches.
+          </p>
+          <h2>Implementation</h2>
           <details>
             <summary>
               blocks/filtering/multi-choice-filter/multi-choice-filter.tsx
@@ -123,13 +221,13 @@ const meta = {
           </details>
           <details>
             <summary>
-              blocks/filtering/filter-operator.tsx — required helper
+              blocks/filtering/filter-operator.tsx — required shared helper
             </summary>
             <Source code={operatorSource} language="tsx" />
           </details>
           <p>
             <a href="/?path=/docs/patterns-filtering--docs" target="_top">
-              Filtering pattern
+              See how this fits the Filtering pattern
             </a>
           </p>
         </>
@@ -141,7 +239,8 @@ export default meta;
 type Story = StoryObj<typeof meta>;
 export const Default: Story = {
   tags: ['docs'],
-  render: () => <Preview />,
+  render: () => <MultiChoiceFilterExample />,
+  parameters: { docs: { source: { code: exampleSource } } },
 };
 export const NotApplied: Story = {
   render: () => <Preview initialValue={null} />,
@@ -238,23 +337,236 @@ export const IncompleteDraft: Story = {
   },
 };
 
-export const OutsideDismissal: Story = {
+export const UnavailableOption: Story = {
+  render: () => (
+    <Preview
+      initialValue={{ operator: 'isAnyOf', values: ['design', 'retired-id'] }}
+    />
+  ),
   play: async ({ canvasElement }) => {
+    await expect(
+      within(canvasElement).getByRole('button', {
+        name: 'Edit Team: Design, retired-id (unavailable)',
+      })
+    ).toBeInTheDocument();
+  },
+};
+export const OptionsLoadWhileOpen: Story = {
+  render: () => <Preview />,
+  play: async ({ canvasElement }) => {
+    const page = within(canvasElement.ownerDocument.body);
+    await userEvent.click(
+      within(canvasElement).getByRole('button', { name: 'Edit Team: Design' })
+    );
+    const dialog = await page.findByRole('dialog', { name: 'Filter by team' });
+    const editor = within(dialog);
+    await userEvent.click(
+      editor.getByRole('checkbox', { name: 'Engineering' })
+    );
+    dispatchStoryEvent('story:load-options');
+    await expect(
+      await editor.findByRole('checkbox', { name: 'Research' })
+    ).toBeVisible();
+    await expect(dialog).toHaveAttribute('data-state', 'open');
+    await expect(
+      editor.getByRole('checkbox', { name: 'Engineering' })
+    ).toBeChecked();
+  },
+};
+export const AddFromNothing: Story = {
+  render: (args) => <Preview initialValue={null} onChange={args.onChange} />,
+  play: async ({ canvasElement, args }) => {
+    const page = within(canvasElement.ownerDocument.body);
+    await userEvent.click(
+      within(canvasElement).getByRole('button', { name: 'Add team filter' })
+    );
+    const editor = within(
+      await page.findByRole('dialog', { name: 'Filter by team' })
+    );
+    await expect(editor.getByRole('button', { name: 'Apply' })).toBeDisabled();
+    await expect(
+      editor.getByRole('checkbox', { name: 'Operations' })
+    ).toBeDisabled();
+    await userEvent.click(editor.getByRole('checkbox', { name: 'Design' }));
+    await userEvent.click(editor.getByRole('button', { name: 'Apply' }));
+    await expect(args.onChange).toHaveBeenCalledTimes(1);
+    await expect(args.onChange).toHaveBeenLastCalledWith({
+      operator: 'isAnyOf',
+      values: ['design'],
+    });
+    await expectEditorClosed(canvasElement, 'Filter by team');
+  },
+};
+export const OperatorKeepsValue: Story = {
+  render: (args) => <Preview onChange={args.onChange} />,
+  play: async ({ canvasElement, args }) => {
+    const page = within(canvasElement.ownerDocument.body);
+    await userEvent.click(
+      within(canvasElement).getByRole('button', {
+        name: 'Change Team operator',
+      })
+    );
+    await userEvent.click(
+      page.getByRole('menuitemradio', { name: 'is none of' })
+    );
+    await expect(args.onChange).toHaveBeenCalledTimes(1);
+    await expect(args.onChange).toHaveBeenLastCalledWith({
+      operator: 'isNoneOf',
+      values: ['design'],
+    });
+    await expectMenuClosed(canvasElement);
+  },
+};
+export const ValuelessOperatorCommits: Story = {
+  render: (args) => <Preview onChange={args.onChange} />,
+  play: async ({ canvasElement, args }) => {
+    const page = within(canvasElement.ownerDocument.body);
+    await userEvent.click(
+      within(canvasElement).getByRole('button', {
+        name: 'Change Team operator',
+      })
+    );
+    await userEvent.click(
+      page.getByRole('menuitemradio', { name: 'is empty' })
+    );
+    await expect(args.onChange).toHaveBeenLastCalledWith({
+      operator: 'isEmpty',
+    });
+    await expectMenuClosed(canvasElement);
+  },
+};
+export const PendingOperatorApplies: Story = {
+  render: (args) => (
+    <Preview initialValue={{ operator: 'isEmpty' }} onChange={args.onChange} />
+  ),
+  play: async ({ canvasElement, args }) => {
+    const page = within(canvasElement.ownerDocument.body);
+    await userEvent.click(
+      within(canvasElement).getByRole('button', {
+        name: 'Change Team operator',
+      })
+    );
+    await userEvent.click(
+      page.getByRole('menuitemradio', { name: 'is none of' })
+    );
+    const editor = within(
+      await page.findByRole('dialog', { name: 'Filter by team' })
+    );
+    await expect(args.onChange).not.toHaveBeenCalled();
+    await userEvent.click(
+      editor.getByRole('checkbox', { name: 'Engineering' })
+    );
+    await userEvent.click(editor.getByRole('button', { name: 'Apply' }));
+    await expect(args.onChange).toHaveBeenCalledTimes(1);
+    await expect(args.onChange).toHaveBeenLastCalledWith({
+      operator: 'isNoneOf',
+      values: ['engineering'],
+    });
+  },
+};
+export const DismissDiscardsDraft: Story = {
+  render: (args) => <Preview onChange={args.onChange} />,
+  play: async ({ canvasElement, args }) => {
     const canvas = within(canvasElement);
     const page = within(canvasElement.ownerDocument.body);
-    const output = canvas.getByLabelText('Applied condition');
-    const before = output.textContent ?? '';
-    await userEvent.click(canvas.getByRole('button', { name: /^Edit Team:/ }));
-    await userEvent.click(page.getByRole('checkbox', { name: 'Engineering' }));
-    await userEvent.click(output);
-    await waitFor(() =>
-      expect(page.queryByRole('dialog')).not.toBeInTheDocument()
+    const trigger = canvas.getByRole('button', { name: 'Edit Team: Design' });
+    await userEvent.click(trigger);
+    await userEvent.click(
+      await page.findByRole('checkbox', { name: 'Engineering' })
     );
-    await expect(output).toHaveTextContent(before);
-    await userEvent.click(canvas.getByRole('button', { name: /^Edit Team:/ }));
+    await userEvent.keyboard('{Escape}');
+    await expectEditorClosed(canvasElement, 'Filter by team');
+    await expectFocus(trigger);
+    await userEvent.click(trigger);
     await expect(
-      page.getByRole('checkbox', { name: 'Engineering' })
+      await page.findByRole('checkbox', { name: 'Engineering' })
+    ).not.toBeChecked();
+    await userEvent.click(page.getByRole('checkbox', { name: 'Engineering' }));
+    await userEvent.click(canvas.getByLabelText('Applied condition'));
+    await expectEditorClosed(canvasElement, 'Filter by team');
+    await userEvent.click(trigger);
+    await expect(
+      await page.findByRole('checkbox', { name: 'Engineering' })
     ).not.toBeChecked();
     await userEvent.keyboard('{Escape}');
+    await expectEditorClosed(canvasElement, 'Filter by team');
+    await expect(args.onChange).not.toHaveBeenCalled();
+  },
+};
+export const ExternalReplaceWhileOpen: Story = {
+  render: (args) => <Preview onChange={args.onChange} />,
+  play: async ({ canvasElement, args }) => {
+    const canvas = within(canvasElement);
+    const page = within(canvasElement.ownerDocument.body);
+    await userEvent.click(
+      canvas.getByRole('button', { name: 'Edit Team: Design' })
+    );
+    await userEvent.click(
+      await page.findByRole('checkbox', { name: 'Engineering' })
+    );
+    dispatchStoryEvent('story:replace');
+    await expectEditorClosed(canvasElement, 'Filter by team');
+    await expect(
+      canvas.getByRole('button', { name: 'Edit Team: Engineering' })
+    ).toBeInTheDocument();
+    await expect(args.onChange).not.toHaveBeenCalled();
+  },
+};
+export const DisabledWhileOpen: Story = {
+  render: (args) => <Preview onChange={args.onChange} />,
+  play: async ({ canvasElement, args }) => {
+    const canvas = within(canvasElement);
+    const page = within(canvasElement.ownerDocument.body);
+    await userEvent.click(
+      canvas.getByRole('button', { name: 'Edit Team: Design' })
+    );
+    await userEvent.click(
+      await page.findByRole('checkbox', { name: 'Engineering' })
+    );
+    dispatchStoryEvent('story:toggle-disabled');
+    await expectEditorClosed(canvasElement, 'Filter by team');
+    for (const button of canvas.getAllByRole('button'))
+      await expect(button).toBeDisabled();
+    dispatchStoryEvent('story:toggle-disabled');
+    await waitFor(() =>
+      expect(
+        canvas.getByRole('button', { name: 'Edit Team: Design' })
+      ).toBeEnabled()
+    );
+    await expect(
+      page.queryByRole('dialog', { name: 'Filter by team' })
+    ).not.toBeInTheDocument();
+    await expect(args.onChange).not.toHaveBeenCalled();
+  },
+};
+export const InsideParentForm: Story = {
+  render: (args) => (
+    <ParentForm>
+      <Preview onChange={args.onChange} />
+    </ParentForm>
+  ),
+  play: async ({ canvasElement, args }) => {
+    const canvas = within(canvasElement);
+    const page = within(canvasElement.ownerDocument.body);
+    await userEvent.click(
+      canvas.getByRole('button', { name: 'Edit Team: Design' })
+    );
+    await userEvent.click(
+      await page.findByRole('checkbox', { name: 'Engineering' })
+    );
+    await userEvent.click(page.getByRole('button', { name: 'Apply' }));
+    await expect(args.onChange).toHaveBeenLastCalledWith({
+      operator: 'isAnyOf',
+      values: ['design', 'engineering'],
+    });
+    await expect(canvas.getByLabelText('Parent submissions')).toHaveTextContent(
+      '0'
+    );
+    await userEvent.click(
+      canvas.getByRole('button', { name: 'Submit search' })
+    );
+    await expect(canvas.getByLabelText('Parent submissions')).toHaveTextContent(
+      '1'
+    );
   },
 };

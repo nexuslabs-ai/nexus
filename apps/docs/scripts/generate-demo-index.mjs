@@ -100,7 +100,7 @@ export interface ComponentDocs {
 export interface BlockDocs {
   /** The block's one story tagged \`docs\`. */
   preview: DemoId;
-  /** Files to copy, by path under \`packages/react/src/\`: the block first, then the helper files it imports. */
+  /** Files to copy, by path under \`packages/react/src/\`: its example or the block first, then the files it imports. */
   files: readonly string[];
   /** Component folders those files import, each installed from its own page. */
   components: readonly string[];
@@ -544,8 +544,9 @@ function collectComponentDocs(exported, demos) {
  */
 
 /**
- * The block's source, then every non-component file it reaches through
- * relative imports, then the component folders those files import.
+ * The block's minimal example (`{slug}-example.tsx`) if it has one, else its
+ * source, then every non-component file that reaches through relative
+ * imports, then the component folders those files import.
  * @param {import('./react-sources.mjs').BlockSource} block
  * @returns {Omit<BlockDocs, 'preview'>}
  */
@@ -572,7 +573,11 @@ function blockFiles(block) {
       visit(target);
     }
   };
-  visit(block.source);
+  const example = path.join(
+    path.dirname(block.source),
+    `${block.slug}-example.tsx`
+  );
+  visit(existsSync(example) ? example : block.source);
 
   return {
     files: [...files].map((file) =>
