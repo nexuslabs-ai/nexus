@@ -532,18 +532,23 @@ export const DensityAlignment: Story = {
         const trackRect = control.getBoundingClientRect();
         const thumbRect = thumb.getBoundingClientRect();
         const onRight = checked !== rtl;
-        const inset = onRight
+        const inlineInset = onRight
           ? trackRect.right - thumbRect.right
           : thumbRect.left - trackRect.left;
-        expect(Math.abs(inset - border)).toBeLessThanOrEqual(1);
+        expect(Math.abs(inlineInset - border)).toBeLessThanOrEqual(0.5);
         expect(
-          Math.abs(
-            thumbRect.top +
-              thumbRect.bottom -
-              (trackRect.top + trackRect.bottom)
-          )
-        ).toBeLessThanOrEqual(1);
+          Math.abs(thumbRect.top - trackRect.top - border)
+        ).toBeLessThanOrEqual(0.5);
+        expect(
+          Math.abs(thumbRect.height - control.clientHeight)
+        ).toBeLessThanOrEqual(0.5);
       };
+      if (control.dataset.size === 'default') {
+        const sm = control.parentElement!.querySelector('[data-size="sm"]')!;
+        await expect(
+          control.getBoundingClientRect().height
+        ).toBeGreaterThanOrEqual(sm.getBoundingClientRect().height);
+      }
       assertPosition(false);
       await userEvent.click(control);
       await expect(control).toHaveAttribute('data-state', 'checked');

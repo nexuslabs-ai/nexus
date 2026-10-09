@@ -284,5 +284,20 @@ export const GlyphsIgnoreDensity: Story = {
     const tightGlyphs = glyphs(tight!);
     await expect(tightGlyphs).toHaveLength(7);
     await expect(glyphs(spacious!)).toEqual(tightGlyphs);
+
+    for (const control of canvasElement.querySelectorAll<HTMLElement>(
+      '[data-slot="checkbox"], [data-slot="radio-group-item"]'
+    )) {
+      const glyph = control.querySelector('svg')!.getBoundingClientRect();
+      const box = control.getBoundingClientRect();
+      const top = box.top + control.clientTop;
+      const left = box.left + control.clientLeft;
+      await expect(glyph.top).toBeGreaterThanOrEqual(top);
+      await expect(glyph.left).toBeGreaterThanOrEqual(left);
+      await expect(glyph.bottom).toBeLessThanOrEqual(
+        top + control.clientHeight
+      );
+      await expect(glyph.right).toBeLessThanOrEqual(left + control.clientWidth);
+    }
   },
 };
