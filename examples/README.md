@@ -7,7 +7,8 @@ workspace links) can't prove, and it's the reference for **how a real downstream
 app adopts the design system incrementally**.
 
 > Not part of the pnpm workspace; excluded from the monorepo's turbo / eslint /
-> prettier. Each folder is a self-contained downstream repo.
+> prettier. Each app folder is a self-contained downstream repo; `registry/`
+> is not — it builds from monorepo sources.
 
 ## Layout
 
@@ -17,6 +18,15 @@ app adopts the design system incrementally**.
 | `scripts/setup.mjs` | Orchestrates: Verdaccio → `pnpm export` → publish `@acme/*` → `npm install` the app → generate the IntelliSense file. |
 | `nextjs-consumer/` | Stock Next.js 15 (App Router) + Tailwind 4 app consuming `@acme/react`. |
 | `.generated/` | The exported `@acme` design system (gitignored — regenerated each run). |
+| `copy-vite/` | Existing Vite app that installs Nexus source through the local shadcn registry. |
+| `copy-next/` | Fresh Next.js App Router app that installs Nexus source the same way. |
+| `registry/` | Builds the local shadcn registry from monorepo sources, plus the probe harness. Not a standalone repo. |
+
+## Copy-and-own fixtures
+
+`copy-vite/` and `copy-next/` install Nexus **source** into host apps through a
+local shadcn registry (`registry/`) instead of consuming packages. Their
+contract, run steps and findings are in [`registry/README.md`](registry/README.md).
 
 ## Run it
 
