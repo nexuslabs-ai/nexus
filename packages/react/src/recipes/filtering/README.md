@@ -172,7 +172,7 @@ tests and simulated services. None of these source recipes is shipped in package
 ## Setup and application boundary
 
 Use React 19. The blocks require only React and the Nexus component folders they import
-(including `components/filter-model` for operator labels). Examples additionally use
+(including `lib/filter-model` for operator labels). Examples additionally use
 `@tabler/icons-react`; date examples require the optional `react-day-picker` v9 peer.
 
 Use your existing Nexus token/styles setup (`@nexus_ds/tailwind` and

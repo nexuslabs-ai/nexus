@@ -8,10 +8,12 @@
  *   - `app/_pages/{section}/{slug}.tsx` — hand-built pages
  *   - `@nexus_ds/react`'s exports — one `components/` page per exported
  *     component, generated from its stories tagged `docs`
+ *   - `recipes/{recipe}/blocks/` — one `blocks/` page per block with stories,
+ *     generated from its story tagged `docs`
  *
  * A page's route is its path on disk, so adding a page means adding a file.
  * Pages the registry does not list are appended to their section in slug
- * order. `components/` is sorted by label. Routes are exactly two levels
+ * order. `components/` and `blocks/` are sorted by label. Routes are exactly two levels
  * deep and a slug is one path segment; a file anywhere else fails the
  * generator. Entries prefixed with `_` are skipped, so a page-local island
  * can sit beside the page that uses it.
@@ -31,7 +33,7 @@ import prettier from 'prettier';
 
 import { DOCS_TAG } from './docs-stories.mjs';
 import { humanize, pascal } from './humanize.mjs';
-import { exportedComponentSlugs } from './react-sources.mjs';
+import { blockSources, exportedComponentSlugs } from './react-sources.mjs';
 import { reactSrc } from './roots.mjs';
 
 /** Nav metadata source, relative to the docs app root. */
@@ -129,6 +131,7 @@ function assertLabelsAvoidTheCardJoiner(section) {
 }
 
 const COMPONENTS_SECTION = 'components';
+const BLOCKS_SECTION = 'blocks';
 
 /** A component's name as its own source spells it (`InputOTP`), else its slug in PascalCase. */
 function componentLabel(slug) {
@@ -145,13 +148,19 @@ function componentLabel(slug) {
   return spelled ?? name;
 }
 
-function assertNoWrittenComponentPages(sources) {
+function assertNoWrittenGeneratedPages(sources) {
   for (const source of sources) {
     for (const [key, file] of source.pages) {
-      if (!key.startsWith(`${COMPONENTS_SECTION}/`)) continue;
-      throw new Error(
-        `${file} is a component page, but component pages are generated from the component's stories tagged \`${DOCS_TAG}\` — delete the file.`
-      );
+      if (key.startsWith(`${COMPONENTS_SECTION}/`)) {
+        throw new Error(
+          `${file} is a component page, but component pages are generated from the component's stories tagged \`${DOCS_TAG}\` — delete the file.`
+        );
+      }
+      if (key.startsWith(`${BLOCKS_SECTION}/`)) {
+        throw new Error(
+          `${file} is a block page, but block pages are generated from the block's story tagged \`${DOCS_TAG}\` — delete the file.`
+        );
+      }
     }
   }
 }
@@ -226,7 +235,18 @@ export type ComponentManifestPage = ManifestPageBase & {
   kind: 'generated';
 };
 
-export type ManifestPage = GuideManifestPage | ComponentManifestPage;
+/**
+ * A copy-source block under \`recipes/{recipe}/blocks/\`. Its page body is its
+ * \`getBlockDocs(slug)\` entry, generated from its story tagged \`docs\`.
+ */
+export type BlockManifestPage = ManifestPageBase & {
+  kind: 'block';
+};
+
+export type ManifestPage =
+  | GuideManifestPage
+  | ComponentManifestPage
+  | BlockManifestPage;
 
 type ManifestSectionBase = {
   slug: string;
@@ -245,7 +265,15 @@ export type ComponentsManifestSection = ManifestSectionBase & {
   pages: readonly ComponentManifestPage[];
 };
 
-export type ManifestSection = GuideManifestSection | ComponentsManifestSection;
+export type BlocksManifestSection = ManifestSectionBase & {
+  unit: 'blocks';
+  pages: readonly BlockManifestPage[];
+};
+
+export type ManifestSection =
+  | GuideManifestSection
+  | ComponentsManifestSection
+  | BlocksManifestSection;
 
 /** The separator the home page's section cards join a section's page labels with. */
 export const CARD_JOINER = ${JSON.stringify(CARD_JOINER)};
@@ -324,13 +352,14 @@ export async function buildPageManifest(docsRoot, formatOptions) {
     Object.hasOwn(PAGE_REGISTRY, slug) ? PAGE_REGISTRY[slug] : undefined;
   const pagesOf = (slug) => sectionFor(slug)?.pages ?? [];
   const isComponentsSection = (slug) => sectionFor(slug)?.unit === 'components';
+  const isBlocksSection = (slug) => sectionFor(slug)?.unit === 'blocks';
 
   const sources = SOURCES.map((source) => ({
     ...source,
     pages: collectPages(docsRoot, source),
   }));
   assertOneSourcePerRoute(sources);
-  assertNoWrittenComponentPages(sources);
+  assertNoWrittenGeneratedPages(sources);
   const keysOnDisk = sources.flatMap((source) => [...source.pages.keys()]);
 
   /** Registry order first, then slugs that exist only on disk, in slug order. */
@@ -389,9 +418,23 @@ export async function buildPageManifest(docsRoot, formatOptions) {
     };
   }
 
+  function buildBlockPage({ slug }) {
+    return {
+      page: {
+        route: `/${BLOCKS_SECTION}/${slug}`,
+        slug,
+        label: pascal(slug),
+        kind: 'block',
+      },
+    };
+  }
+
   function orderedEntries(sectionSlug) {
     if (isComponentsSection(sectionSlug)) {
       return byLabel(exportedComponentSlugs().map(buildComponentPage));
+    }
+    if (isBlocksSection(sectionSlug)) {
+      return byLabel(blockSources().map(buildBlockPage));
     }
     return orderedSlugs(sectionSlug).map((slug) =>
       buildPage(sectionSlug, slug)

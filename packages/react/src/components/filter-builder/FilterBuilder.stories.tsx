@@ -3,12 +3,12 @@ import * as React from 'react';
 import type { Meta, StoryObj } from '@storybook/react';
 import { expect, fn, userEvent, waitFor, within } from 'storybook/test';
 
-import { Button } from '../button';
 import {
   type FilterField,
   type FilterGroup,
   getFilterErrors,
-} from '../filter-model';
+} from '../../lib/filter-model';
+import { Button } from '../button';
 
 import { FilterBuilder } from './filter-builder';
 const exampleFields: FilterField[] = [
@@ -149,9 +149,9 @@ const meta = {
   },
   decorators: [
     (Story) => (
-      <main className="nx:mx-auto nx:w-full nx:max-w-5xl nx:p-4">
+      <div className="nx:mx-auto nx:w-full nx:max-w-5xl nx:p-4">
         <Story />
-      </main>
+      </div>
     ),
   ],
   render: (args) => (

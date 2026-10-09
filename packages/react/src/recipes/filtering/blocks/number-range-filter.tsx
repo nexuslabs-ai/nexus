@@ -7,7 +7,6 @@ import {
   FilterConditionRemove,
   FilterConditionSegment,
 } from '../../../components/filter-condition';
-import { isValuelessOperator } from '../../../components/filter-model';
 import { Input } from '../../../components/input';
 import { Label } from '../../../components/label';
 import {
@@ -15,6 +14,7 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from '../../../components/popover';
+import { isValuelessOperator } from '../../../lib/filter-model';
 import { ConditionOperator } from '../filter-operator';
 
 export type NumberRangeCondition =

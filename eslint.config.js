@@ -295,6 +295,24 @@ export default tseslint.config(
     },
   },
 
+  {
+    files: ['apps/docs/app/_pages/patterns/**/*.tsx'],
+    rules: {
+      'no-restricted-imports': [
+        'error',
+        {
+          patterns: [
+            {
+              regex: '^@/(?!recipes/)',
+              message:
+                'A pattern page imports its examples from `@/recipes/`, which @nexus_ds/react does not export — import components from @nexus_ds/react.',
+            },
+          ],
+        },
+      ],
+    },
+  },
+
   // Tests and stories assert known fixture invariants (queried elements, seeded
   // array indices), so non-null assertions are idiomatic there. Keep the rule
   // on production source only.

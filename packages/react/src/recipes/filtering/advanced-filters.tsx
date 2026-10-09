@@ -2,7 +2,6 @@ import * as React from 'react';
 
 import { Button } from '../../components/button';
 import { FilterBuilder } from '../../components/filter-builder';
-import { getFilterErrors } from '../../components/filter-model';
 import {
   Table,
   TableBody,
@@ -11,6 +10,7 @@ import {
   TableHeader,
   TableRow,
 } from '../../components/table';
+import { getFilterErrors } from '../../lib/filter-model';
 
 import {
   exampleFields,

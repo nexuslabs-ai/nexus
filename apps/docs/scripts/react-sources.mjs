@@ -1,7 +1,8 @@
-import { readdirSync, readFileSync, writeFileSync } from 'node:fs';
+import { existsSync, readdirSync, readFileSync, writeFileSync } from 'node:fs';
 import path from 'node:path';
 
-import { componentsRoot, reactSrc } from './roots.mjs';
+import { pascal } from './humanize.mjs';
+import { componentsRoot, reactSrc, recipesRoot } from './roots.mjs';
 
 export function isModuleSource(filePath) {
   const name = path.basename(filePath);
@@ -31,6 +32,36 @@ export function exportedComponentSlugs() {
   return [
     ...new Set([...index.matchAll(EXPORTED_COMPONENT)].map(([, slug]) => slug)),
   ].sort();
+}
+
+/**
+ * @typedef {{ slug: string; source: string; stories: string }} BlockSource
+ */
+
+/**
+ * Every copy-source block: a `recipes/{recipe}/blocks/{slug}.tsx` with a
+ * `{Slug}.stories.tsx` beside it, sorted by slug.
+ * @returns {BlockSource[]}
+ */
+export function blockSources() {
+  return readdirSync(recipesRoot, { withFileTypes: true })
+    .filter((entry) => entry.isDirectory())
+    .flatMap((recipe) => {
+      const dir = path.join(recipesRoot, recipe.name, 'blocks');
+      if (!existsSync(dir)) return [];
+      return readdirSync(dir)
+        .filter((file) => isComponentSource(file))
+        .map((file) => {
+          const slug = file.replace(/\.tsx?$/, '');
+          return {
+            slug,
+            source: path.join(dir, file),
+            stories: path.join(dir, `${pascal(slug)}.stories.tsx`),
+          };
+        })
+        .filter((block) => existsSync(block.stories));
+    })
+    .sort((a, b) => a.slug.localeCompare(b.slug, 'en'));
 }
 
 export function collectSourceFiles(dir, include) {

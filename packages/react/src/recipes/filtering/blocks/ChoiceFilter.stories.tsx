@@ -133,6 +133,7 @@ const meta = {
 export default meta;
 type Story = StoryObj<typeof meta>;
 export const Default: Story = {
+  tags: ['docs'],
   render: () => <Preview />,
   parameters: { docs: { source: { code: usage } } },
   play: async ({ canvasElement }) => {

@@ -11,7 +11,7 @@ import { FilterConditionSegment } from '../../components/filter-condition';
 import {
   type FilterOperator,
   filterOperatorLabels,
-} from '../../components/filter-model';
+} from '../../lib/filter-model';
 
 /** Recipe wiring; applications control the operator alongside the value. */
 export function ConditionOperator<Operator extends FilterOperator>({

@@ -12,14 +12,27 @@ import path from 'node:path';
 
 import { componentUsage, entryUsage } from './component-usage.mjs';
 import {
+  componentStoryFiles,
   DOCS_TAG,
   docsStoryModule,
   PREVIEWLESS_COMPONENTS,
   readDocsStories,
+  resolveModule,
 } from './docs-stories.mjs';
 import { resolveFormatOptions } from './page-manifest.mjs';
-import { componentSlugs, exportedComponentSlugs } from './react-sources.mjs';
-import { componentsRoot, docsRoot, reactRoot } from './roots.mjs';
+import {
+  blockSources,
+  componentSlugs,
+  exportedComponentSlugs,
+} from './react-sources.mjs';
+import {
+  componentsRoot,
+  docsRoot,
+  isUnder,
+  reactRoot,
+  reactSrc,
+  toRepoPath,
+} from './roots.mjs';
 
 const GENERATED_DIR = path.join(docsRoot, '__generated__');
 const DEPENDENCIES_DIR = path.join(docsRoot, 'generated', 'dependencies');
@@ -83,6 +96,15 @@ export interface ComponentDocs {
   /** How those parts nest across the demos, as a text tree; null for one part. */
   composition: string | null;
 }
+
+export interface BlockDocs {
+  /** The block's one story tagged \`docs\`. */
+  preview: DemoId;
+  /** Files to copy, by path under \`packages/react/src/\`: the block first, then the recipe files it imports. */
+  files: readonly string[];
+  /** Component folders those files import, each installed from its own page. */
+  components: readonly string[];
+}
 `;
 
 const INDEX_FOOTER = `export type DemoId = keyof typeof demos;
@@ -108,6 +130,17 @@ export function getComponentDocs(slug: string): ComponentDocs {
   if (!docs) {
     throw new Error(
       \`No component docs for \${slug} — @nexus_ds/react does not export it. Run \\\`pnpm --filter @nexus_ds/docs generate:demos\\\`.\`
+    );
+  }
+
+  return docs;
+}
+
+export function getBlockDocs(slug: string): BlockDocs {
+  const docs = Object.hasOwn(blockDocs, slug) ? blockDocs[slug] : undefined;
+  if (!docs) {
+    throw new Error(
+      \`No block docs for \${slug} — there is no recipes/{recipe}/blocks/\${slug}.tsx with stories. Run \\\`pnpm --filter @nexus_ds/docs generate:demos\\\`.\`
     );
   }
 
@@ -320,7 +353,7 @@ function packageRange(id, name, blocks) {
  * @param {Set<string>} exported
  */
 function docsStoriesFor(slug, exported) {
-  const stories = readDocsStories(slug);
+  const stories = readDocsStories(slug, componentStoryFiles(slug));
   const folder = `packages/react/src/components/${slug}/`;
   if (!exported.has(slug) && stories.length > 0) {
     throw new Error(
@@ -342,8 +375,30 @@ function docsStoriesFor(slug, exported) {
 }
 
 /**
+ * A block's page previews exactly one story, so it needs exactly one tagged
+ * `docs`, and its slug must not collide with a component's demo ids.
+ * @param {import('./react-sources.mjs').BlockSource} block
+ */
+function blockDocsStories(block) {
+  const where = toRepoPath(block.stories);
+  if (componentSlugs().includes(block.slug)) {
+    throw new Error(
+      `${where}: block ${block.slug} shares its slug with a component folder — rename the block.`
+    );
+  }
+  const stories = readDocsStories(block.slug, [block.stories]);
+  if (stories.length !== 1) {
+    throw new Error(
+      `${where} has ${stories.length} stories tagged \`${DOCS_TAG}\` — its block page shows one preview, so tag exactly one.`
+    );
+  }
+  return stories;
+}
+
+/**
  * Every story tagged `docs`, as a checked, paste-ready module — component by
- * component, in story order. Collects every story's problem before failing.
+ * component, then block by block, in story order. Collects every story's
+ * problem before failing.
  * @param {Set<string>} exported
  * @returns {Promise<DemoFile[]>}
  */
@@ -378,6 +433,24 @@ async function collectDemos(exported) {
       } catch (error) {
         problems.push(error.message);
       }
+    }
+  }
+
+  // A block page shows its files to copy instead of install blocks.
+  for (const block of blockSources()) {
+    try {
+      const [story] = blockDocsStories(block);
+      const { id, title, source } = await docsStoryModule(story, formatOptions);
+      demos.push({
+        id,
+        slug: block.slug,
+        title,
+        source,
+        alsoInstall: [],
+        packages: [],
+      });
+    } catch (error) {
+      problems.push(error.message);
     }
   }
 
@@ -466,6 +539,64 @@ function collectComponentDocs(exported, demos) {
   );
 }
 
+/**
+ * @typedef {{ preview: string; files: string[]; components: string[] }} BlockDocs
+ */
+
+/**
+ * The block's source, then every non-component file it reaches through
+ * relative imports, then the component folders those files import.
+ * @param {import('./react-sources.mjs').BlockSource} block
+ * @returns {Omit<BlockDocs, 'preview'>}
+ */
+function blockFiles(block) {
+  const files = new Set();
+  const components = new Set();
+  const visit = (file) => {
+    if (files.has(file)) return;
+    files.add(file);
+    for (const specifier of importSpecifiers(readCanonical(file))) {
+      if (!specifier.startsWith('.')) continue;
+      const target = resolveModule(path.resolve(path.dirname(file), specifier));
+      if (!target || !isUnder(target, reactSrc)) {
+        throw new Error(
+          `${toRepoPath(file)} imports ${specifier}, which is not a file under packages/react/src — a block page can't list it.`
+        );
+      }
+      if (isUnder(target, componentsRoot)) {
+        components.add(
+          path.relative(componentsRoot, target).split(path.sep)[0]
+        );
+        continue;
+      }
+      visit(target);
+    }
+  };
+  visit(block.source);
+
+  return {
+    files: [...files].map((file) =>
+      path.relative(reactSrc, file).split(path.sep).join('/')
+    ),
+    components: [...components].sort(),
+  };
+}
+
+/**
+ * Each block's page: its one docs story and the files to copy.
+ * @param {DemoFile[]} demos
+ * @returns {Map<string, BlockDocs>}
+ */
+function collectBlockDocs(demos) {
+  return new Map(
+    blockSources().map((block) => {
+      const preview = demos.find((demo) => demo.slug === block.slug);
+      if (!preview) throw new Error(`Block ${block.slug} has no preview demo.`);
+      return [block.slug, { preview: preview.id, ...blockFiles(block) }];
+    })
+  );
+}
+
 /** @param {DemoFile} demo */
 function renderDemoModule(demo) {
   return `${GENERATED_BY}
@@ -480,8 +611,9 @@ export const source = ${JSON.stringify(demo.source)};
 /**
  * @param {DemoFile[]} demos
  * @param {Map<string, ComponentDocs>} componentDocs
+ * @param {Map<string, BlockDocs>} blockDocs
  */
-function renderDemoIndex(demos, componentDocs) {
+function renderDemoIndex(demos, componentDocs, blockDocs) {
   const entries = demos
     .map((demo) =>
       [
@@ -511,10 +643,25 @@ function renderDemoIndex(demos, componentDocs) {
     .join('\n');
   const docsLiteral = docsEntries ? `{\n${docsEntries}\n}` : '{}';
 
+  const blockEntries = [...blockDocs]
+    .map(([slug, { preview, files, components }]) =>
+      [
+        `  ${JSON.stringify(slug)}: {`,
+        `    preview: ${JSON.stringify(preview)},`,
+        `    files: ${JSON.stringify(files)},`,
+        `    components: ${JSON.stringify(components)},`,
+        `  },`,
+      ].join('\n')
+    )
+    .join('\n');
+  const blocksLiteral = blockEntries ? `{\n${blockEntries}\n}` : '{}';
+
   return `${INDEX_HEADER}
 export const demos = ${literal} satisfies Record<string, Demo>;
 
 const componentDocs: Record<string, ComponentDocs> = ${docsLiteral};
+
+const blockDocs: Record<string, BlockDocs> = ${blocksLiteral};
 
 ${INDEX_FOOTER}`;
 }
@@ -532,7 +679,11 @@ async function generateDemoIndex() {
 
   writeIfChanged(
     indexFile,
-    renderDemoIndex(demos, collectComponentDocs(exported, demos))
+    renderDemoIndex(
+      demos,
+      collectComponentDocs(exported, demos),
+      collectBlockDocs(demos)
+    )
   );
 
   const keep = new Set([indexFile]);
@@ -571,17 +722,15 @@ async function regenerateQuietly() {
 }
 
 function watchStories() {
-  const relativeComponents = path.relative(docsRoot, componentsRoot);
+  const relativeSrc = path.relative(docsRoot, reactSrc);
 
   regenerateQuietly();
 
   let watcher;
   try {
-    watcher = watch(componentsRoot, { recursive: true });
+    watcher = watch(reactSrc, { recursive: true });
   } catch (error) {
-    console.error(
-      `demo-index: cannot watch ${relativeComponents} — ${error.message}`
-    );
+    console.error(`demo-index: cannot watch ${relativeSrc} — ${error.message}`);
     process.exitCode = 1;
     return;
   }
@@ -598,7 +747,7 @@ function watchStories() {
     watcher.close();
   });
 
-  console.log(`demo-index: watching ${relativeComponents} stories`);
+  console.log(`demo-index: watching ${relativeSrc} stories`);
 }
 
 try {

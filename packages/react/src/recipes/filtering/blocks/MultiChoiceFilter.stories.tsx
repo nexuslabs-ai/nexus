@@ -135,7 +135,10 @@ const meta = {
 } satisfies Meta<typeof Preview>;
 export default meta;
 type Story = StoryObj<typeof meta>;
-export const Default: Story = { render: () => <Preview /> };
+export const Default: Story = {
+  tags: ['docs'],
+  render: () => <Preview />,
+};
 export const NotApplied: Story = {
   render: () => <Preview initialValue={null} />,
 };

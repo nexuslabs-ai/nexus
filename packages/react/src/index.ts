@@ -6,6 +6,18 @@ export {
   CHART_CATEGORICAL_SERIES,
   type ChartCategoricalIndex,
 } from './lib/chart';
+export {
+  type FilterError,
+  type FilterErrorCode,
+  type FilterField,
+  type FilterGroup,
+  type FilterOperator,
+  filterOperatorLabels,
+  type FilterOption,
+  type FilterRule,
+  getFilterErrors,
+  isValuelessOperator,
+} from './lib/filter-model';
 
 // Components
 export * from './components/accordion';

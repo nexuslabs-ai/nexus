@@ -1,6 +1,18 @@
 import * as React from 'react';
 
 import {
+  emptyFilterValue,
+  type FilterErrorCode,
+  type FilterField,
+  type FilterGroup,
+  type FilterOperator,
+  filterOperatorLabels,
+  type FilterRule,
+  getFilterErrors,
+  getFilterOperators,
+  isValuelessOperator,
+} from '../../lib/filter-model';
+import {
   IconCalendar,
   IconChevronDown,
   IconHash,
@@ -13,18 +25,6 @@ import { cn } from '../../lib/utils';
 import { Button } from '../button';
 import { Checkbox } from '../checkbox';
 import { ChoiceRow } from '../choice-row';
-import {
-  emptyFilterValue,
-  type FilterErrorCode,
-  type FilterField,
-  type FilterGroup,
-  type FilterOperator,
-  filterOperatorLabels,
-  type FilterRule,
-  getFilterErrors,
-  getFilterOperators,
-  isValuelessOperator,
-} from '../filter-model/filter-model';
 import { Input } from '../input';
 import { Popover, PopoverContent, PopoverTrigger } from '../popover';
 import {

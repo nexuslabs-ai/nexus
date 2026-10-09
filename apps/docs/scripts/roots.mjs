@@ -10,6 +10,7 @@ export const repoRoot = path.resolve(docsRoot, '..', '..');
 export const reactRoot = path.join(repoRoot, 'packages', 'react');
 export const reactSrc = path.join(reactRoot, 'src');
 export const componentsRoot = path.join(reactSrc, 'components');
+export const recipesRoot = path.join(reactSrc, 'recipes');
 
 export function toRepoPath(absolutePath) {
   return path.relative(repoRoot, absolutePath).split(path.sep).join('/');

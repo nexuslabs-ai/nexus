@@ -94,7 +94,7 @@ export async function ComponentInstallation({ slug }: { slug: string }) {
   );
 }
 
-function SourceFile({ path, source }: { path: string; source: string }) {
+export function SourceFile({ path, source }: { path: string; source: string }) {
   return (
     <CodeSampleCard
       className="nx:mb-4"
