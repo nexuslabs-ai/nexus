@@ -45,6 +45,7 @@ type Story = StoryObj<typeof ContextMenu>;
 // ============================================
 
 export const Default: Story = {
+  tags: ['docs'],
   render: (_args) => (
     <ContextMenu>
       <ContextMenuTrigger className={triggerClass}>
@@ -60,6 +61,7 @@ export const Default: Story = {
 };
 
 export const WithLabelsAndSeparators: Story = {
+  tags: ['docs'],
   render: (_args) => (
     <ContextMenu>
       <ContextMenuTrigger className={triggerClass}>
@@ -93,6 +95,7 @@ export const WithLabelsAndSeparators: Story = {
 };
 
 export const WithCheckboxItems: Story = {
+  tags: ['docs'],
   render: function CheckboxItemsStory() {
     const [showBookmarks, setShowBookmarks] = React.useState(true);
     const [showFullUrls, setShowFullUrls] = React.useState(false);
@@ -124,6 +127,7 @@ export const WithCheckboxItems: Story = {
 };
 
 export const WithRadioItems: Story = {
+  tags: ['docs'],
   render: function RadioItemsStory() {
     const [person, setPerson] = React.useState('pedro');
 
@@ -257,6 +261,7 @@ export const IndicatorCrossFade: Story = {
 };
 
 export const WithSubMenu: Story = {
+  tags: ['docs'],
   render: (_args) => (
     <ContextMenu>
       <ContextMenuTrigger className={triggerClass}>
@@ -293,6 +298,7 @@ export const WithSubMenu: Story = {
 };
 
 export const WithDestructiveItem: Story = {
+  tags: ['docs'],
   render: (_args) => (
     <ContextMenu>
       <ContextMenuTrigger className={triggerClass}>

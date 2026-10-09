@@ -2,6 +2,7 @@
   "name": "design-system",
   "version": "0.0.0",
   "private": true,
+  "license": "MIT",
   "type": "module",
   "scripts": {
     "build": "turbo run build",
@@ -107,11 +108,12 @@
     "turbo": "^2.7.1",
     "typescript": "^5.9.3",
     "typescript-eslint": "^8.50.0",
-    "vitest": "4.0.18"
+    "vitest": "4.0.18",
+    "wrangler": "4.148.0"
   },
   "packageManager": "pnpm@10.12.1",
   "engines": {
-    "node": ">=20.19.0"
+    "node": ">=22.0.0"
   },
   "lint-staged": {
     "*.{ts,tsx,js,jsx}": [
@@ -120,10 +122,6 @@
     ],
     "*.{json,md,css}": [
       "prettier --write"
-    ],
-    "apps/docs/examples/**/*.tsx": [
-      "node apps/docs/scripts/generate-demo-index.mjs",
-      "git add apps/docs/__generated__"
     ],
     "packages/core/tokens/semantic/spacing-*.json": [
       "pnpm validate:spacing-modes",

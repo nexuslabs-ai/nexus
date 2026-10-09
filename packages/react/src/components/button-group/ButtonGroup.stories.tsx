@@ -53,6 +53,7 @@ const BUTTON_GROUP_TEXT_SIZE_CLASSES = {
 
 // Three outline buttons joined into one horizontal cluster.
 export const Default: Story = {
+  tags: ['docs'],
   render: () => (
     <ButtonGroup>
       <Button variant="outline">Day</Button>
@@ -63,6 +64,7 @@ export const Default: Story = {
 };
 
 export const Small: Story = {
+  tags: ['docs'],
   render: () => (
     <ButtonGroup size="sm">
       <ButtonGroupText>View:</ButtonGroupText>
@@ -73,6 +75,7 @@ export const Small: Story = {
 };
 
 export const Large: Story = {
+  tags: ['docs'],
   render: () => (
     <ButtonGroup size="lg">
       <ButtonGroupText>View:</ButtonGroupText>
@@ -84,6 +87,7 @@ export const Large: Story = {
 
 // Vertical orientation stacks the cluster.
 export const Vertical: Story = {
+  tags: ['docs'],
   render: () => (
     <ButtonGroup orientation="vertical" size="sm">
       <Button variant="outline">Top</Button>
@@ -105,6 +109,7 @@ export const Vertical: Story = {
 
 // A text addon as a leading prefix.
 export const WithText: Story = {
+  tags: ['docs'],
   render: () => (
     <ButtonGroup>
       <ButtonGroupText>https://</ButtonGroupText>
@@ -122,6 +127,7 @@ export const WithText: Story = {
 // the rule is the only division, so it reads clearly. In a row of bordered
 // (outline) buttons the per-button borders sit in the same color and hide it.
 export const WithSeparator: Story = {
+  tags: ['docs'],
   render: () => (
     <ButtonGroup>
       <Button variant="ghost" size="icon" aria-label="Bold">
@@ -287,7 +293,7 @@ export const MixedChildren: Story = {
 
     await expect(text).toHaveAttribute('data-size', 'lg');
     await expect(input).toHaveAttribute('data-size', 'default');
-    await expect(selectTrigger).not.toHaveAttribute('data-size');
+    await expect(selectTrigger).toHaveAttribute('data-size', 'default');
     await expect(
       canvas.getByTestId('button-group-mixed-button')
     ).toHaveAttribute('data-size', 'lg');

@@ -1,5 +1,13 @@
 # @nexus_ds/docs
 
+## 0.0.7
+
+### Patch Changes
+
+- Updated dependencies [bf903a4]
+  - @nexus_ds/core@0.5.1
+  - @nexus_ds/react@0.2.1
+
 ## 0.0.6
 
 ### Patch Changes

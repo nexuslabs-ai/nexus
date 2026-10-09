@@ -32,6 +32,7 @@ type Story = StoryObj<typeof Progress>;
 
 // A typical mid-task bar.
 export const Default: Story = {
+  tags: ['docs'],
   args: { value: 60 },
 };
 
@@ -66,6 +67,7 @@ export const Full: Story = {
 
 // Value omitted while the total is unknown — the indicator runs the sweep.
 export const Indeterminate: Story = {
+  tags: ['docs'],
   args: { 'aria-label': 'Loading' },
   play: async ({ canvasElement }) => {
     const canvas = within(canvasElement);
@@ -113,6 +115,7 @@ export const WithDataAttributes: Story = {
 // ============================================
 
 export const AllVariants: Story = {
+  tags: ['docs'],
   render: () => (
     <div className="nx:flex nx:flex-col nx:gap-6">
       {[0, 25, 50, 75, 100].map((pct) => (

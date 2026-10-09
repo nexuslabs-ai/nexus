@@ -1,0 +1,12 @@
+{
+  "$schema": "../../node_modules/wrangler/config-schema.json",
+  "name": "nexus-docs",
+  "compatibility_date": "2026-10-01",
+  "assets": {
+    "directory": "./out",
+    "not_found_handling": "404-page",
+  },
+  "routes": [{ "pattern": "nexusui.so", "custom_domain": true }],
+  "workers_dev": false,
+  "preview_urls": false,
+}
