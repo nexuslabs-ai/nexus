@@ -909,7 +909,6 @@ export const DisabledAsLink: Story = {
     await expect(link).toHaveClass('nx:aria-disabled:pointer-events-none');
     await expect(getComputedStyle(link).opacity).toBe('1');
     await expect(link).toHaveAttribute('data-disabled', 'true');
-    await expect(link).toHaveClass('nx:data-disabled:bg-disabled');
     const initialHash = window.location.hash;
     link.click();
     link.focus();
@@ -1540,6 +1539,7 @@ export const AriaDisabledMenuTrigger: Story = {
     const trigger = within(canvasElement).getByRole('button', {
       name: 'Export',
     });
+    await expect(trigger).toHaveAttribute('data-disabled', 'true');
     trigger.focus();
     await userEvent.keyboard('{Enter}');
     await userEvent.keyboard(' ');

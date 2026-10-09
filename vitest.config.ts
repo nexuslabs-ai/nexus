@@ -3,7 +3,7 @@ import { playwright } from '@vitest/browser-playwright';
 import path from 'path';
 import { defineConfig } from 'vitest/config';
 
-import { measureButtonPress } from './packages/react/src/stories/support/measure-button-press';
+import { forcePseudoState } from './packages/react/src/stories/support/force-pseudo-state-command';
 
 export default defineConfig({
   resolve: {
@@ -63,7 +63,7 @@ export default defineConfig({
             enabled: true,
             provider: playwright(),
             headless: true,
-            commands: { measureButtonPress },
+            commands: { forcePseudoState },
             instances: [{ browser: 'chromium' }],
           },
           setupFiles: [

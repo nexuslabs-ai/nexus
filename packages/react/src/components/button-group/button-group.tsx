@@ -3,13 +3,16 @@ import * as React from 'react';
 import { cva, type VariantProps } from 'class-variance-authority';
 
 import { cn } from '../../lib/utils';
+import {
+  type ButtonContextSize,
+  ButtonSizeContext,
+} from '../button/button-size-context';
 import { Separator } from '../separator';
 
-import {
-  ButtonGroupJoinedContext,
-  type ButtonGroupSize,
-  ButtonGroupSizeContext,
-} from './button-group-context';
+import { ButtonGroupJoinedContext } from './button-group-context';
+
+/** Size shared from a ButtonGroup to its members. */
+type ButtonGroupSize = ButtonContextSize;
 
 const buttonGroupVariants = cva(
   'nx:flex nx:w-fit nx:items-stretch nx:*:focus-visible:relative nx:*:focus-visible:z-10',
@@ -95,7 +98,7 @@ function ButtonGroup({
   ...props
 }: ButtonGroupProps) {
   return (
-    <ButtonGroupSizeContext.Provider value={size}>
+    <ButtonSizeContext.Provider value={size}>
       <ButtonGroupJoinedContext.Provider value>
         <div
           role="group"
@@ -108,7 +111,7 @@ function ButtonGroup({
           {children}
         </div>
       </ButtonGroupJoinedContext.Provider>
-    </ButtonGroupSizeContext.Provider>
+    </ButtonSizeContext.Provider>
   );
 }
 
@@ -132,7 +135,7 @@ interface ButtonGroupTextProps extends React.ComponentProps<'div'> {
  * count. Matches the buttons' height, border, and elevation.
  */
 function ButtonGroupText({ className, size, ...props }: ButtonGroupTextProps) {
-  const contextSize = React.useContext(ButtonGroupSizeContext);
+  const contextSize = React.useContext(ButtonSizeContext);
   const resolvedSize = size ?? contextSize ?? 'default';
 
   return (

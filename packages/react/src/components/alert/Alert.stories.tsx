@@ -926,7 +926,7 @@ export const DensityActionSizing: Story = {
   play: async ({ canvasElement }) => {
     await expect(
       canvasElement.querySelectorAll('[data-slot="alert"]')
-    ).toHaveLength(6);
+    ).toHaveLength(DENSITY_OPTIONS.length);
     for (const alert of canvasElement.querySelectorAll('[data-slot="alert"]')) {
       await expect(
         alert

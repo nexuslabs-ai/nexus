@@ -557,7 +557,7 @@ export const DensityAlignment: Story = {
 // via addon-a11y with test: 'error'
 // ============================================
 
-// Evidence for the derived primary hover: a real pointer hover on dark, near-black
+// Evidence for the derived primary hover: a forced `:hover` on dark, near-black
 // and mid brands still changes the fill and keeps its ink legible.
 export const PrimaryHoverAcrossBrands: Story = {
   tags: ['!autodocs', '!dev'],
