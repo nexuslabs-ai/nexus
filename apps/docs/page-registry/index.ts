@@ -35,7 +35,16 @@ export type ComponentsSection = SectionBase & {
   pages?: never;
 };
 
-export type RegistrySection = GuideSection | ComponentsSection;
+/**
+ * Its pages are not listed here: there is one per block under
+ * `blocks/{family}/{slug}/`, generated from its story tagged `docs`.
+ */
+export type BlocksSection = SectionBase & {
+  unit: 'blocks';
+  pages?: never;
+};
+
+export type RegistrySection = GuideSection | ComponentsSection | BlocksSection;
 
 export const PAGE_REGISTRY = {
   'getting-started': {
@@ -130,6 +139,23 @@ export const PAGE_REGISTRY = {
     title: 'Components',
     href: '/components',
     unit: 'components',
+  },
+  blocks: {
+    slug: 'blocks',
+    title: 'Blocks',
+    href: '/blocks',
+    unit: 'blocks',
+  },
+  patterns: {
+    slug: 'patterns',
+    title: 'Patterns',
+    href: '/patterns',
+    pages: [
+      {
+        slug: 'filtering',
+        label: 'Filtering',
+      },
+    ],
   },
   theming: {
     slug: 'theming',

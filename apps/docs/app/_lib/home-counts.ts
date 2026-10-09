@@ -8,6 +8,8 @@ export function describeSize(section: ManifestSection): string {
   switch (section.unit) {
     case 'components':
       return plural(section.pages.length, 'component');
+    case 'blocks':
+      return plural(section.pages.length, 'block');
     case undefined:
       return plural(section.pages.length, 'page');
   }

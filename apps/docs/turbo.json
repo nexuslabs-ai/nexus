@@ -46,6 +46,8 @@
         "app/_pages/**",
         "$TURBO_ROOT$/packages/react/src/index.ts",
         "$TURBO_ROOT$/packages/react/src/components/**/*.tsx",
+        "$TURBO_ROOT$/packages/react/src/blocks/**",
+        "$TURBO_ROOT$/packages/react/src/lib/**",
         "$TURBO_ROOT$/.prettierrc"
       ],
       "outputs": [

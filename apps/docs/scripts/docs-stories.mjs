@@ -219,15 +219,22 @@ function parseStoriesFile(filePath) {
  */
 
 /**
- * Every story under `components/{slug}/` tagged `docs`, in file order.
+ * Every `*.stories.tsx` under `components/{slug}/`, sorted.
  * @param {string} slug
- * @returns {DocsStory[]}
  */
-export function readDocsStories(slug) {
-  const files = collectSourceFiles(path.join(componentsRoot, slug), (file) =>
+export function componentStoryFiles(slug) {
+  return collectSourceFiles(path.join(componentsRoot, slug), (file) =>
     file.endsWith('.stories.tsx')
   ).sort();
+}
 
+/**
+ * Every story in `files` tagged `docs`, in file order, for the page `slug`.
+ * @param {string} slug
+ * @param {string[]} files
+ * @returns {DocsStory[]}
+ */
+export function readDocsStories(slug, files) {
   return files.flatMap((filePath) => {
     const file = parseStoriesFile(filePath);
     if (tagsOf(file.meta).includes(DOCS_TAG)) {
@@ -815,7 +822,7 @@ function identifiersIn(text) {
   return names;
 }
 
-function resolveModule(basePath) {
+export function resolveModule(basePath) {
   const candidates = [
     `${basePath}.tsx`,
     `${basePath}.ts`,

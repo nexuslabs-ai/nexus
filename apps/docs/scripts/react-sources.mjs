@@ -1,7 +1,8 @@
-import { readdirSync, readFileSync, writeFileSync } from 'node:fs';
+import { existsSync, readdirSync, readFileSync, writeFileSync } from 'node:fs';
 import path from 'node:path';
 
-import { componentsRoot, reactSrc } from './roots.mjs';
+import { pascal } from './humanize.mjs';
+import { blocksRoot, componentsRoot, reactSrc } from './roots.mjs';
 
 export function isModuleSource(filePath) {
   const name = path.basename(filePath);
@@ -31,6 +32,41 @@ export function exportedComponentSlugs() {
   return [
     ...new Set([...index.matchAll(EXPORTED_COMPONENT)].map(([, slug]) => slug)),
   ].sort();
+}
+
+/**
+ * @typedef {{ family: string; slug: string; source: string; stories: string }} BlockSource
+ */
+
+/**
+ * Every copy-source block: a `blocks/{family}/{slug}/` folder holding
+ * `{slug}.tsx` and `{Slug}.stories.tsx`, sorted by family then slug. Files
+ * directly in a family folder are helpers its blocks share.
+ * @returns {BlockSource[]}
+ */
+export function blockSources() {
+  return subfolders(blocksRoot)
+    .flatMap((family) =>
+      subfolders(path.join(blocksRoot, family)).map((slug) => ({
+        family,
+        slug,
+        source: path.join(blocksRoot, family, slug, `${slug}.tsx`),
+        stories: path.join(
+          blocksRoot,
+          family,
+          slug,
+          `${pascal(slug)}.stories.tsx`
+        ),
+      }))
+    )
+    .filter((block) => existsSync(block.stories));
+}
+
+function subfolders(dir) {
+  return readdirSync(dir, { withFileTypes: true })
+    .filter((entry) => entry.isDirectory())
+    .map((entry) => entry.name)
+    .sort();
 }
 
 export function collectSourceFiles(dir, include) {

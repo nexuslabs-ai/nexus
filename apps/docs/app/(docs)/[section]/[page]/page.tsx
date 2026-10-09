@@ -1,5 +1,6 @@
 import { notFound } from 'next/navigation';
 
+import { BlockPage } from '../../../_components/BlockPage';
 import { Breadcrumb } from '../../../_components/Breadcrumb';
 import { ComponentPage } from '../../../_components/ComponentPage';
 import { PageWireframeView } from '../../../_components/PageWireframeView';
@@ -34,6 +35,7 @@ export default async function Page({
         items={[
           { label: 'Home', href: '/' },
           { label: section.title, href: section.href },
+          ...('group' in page ? [{ label: page.group }] : []),
           { label: page.label },
         ]}
       />
@@ -45,6 +47,7 @@ export default async function Page({
 function PageContent({ page }: { page: ManifestPage }) {
   if (page.kind === 'placeholder') return <PageWireframeView page={page} />;
   if (page.kind === 'generated') return <ComponentPage page={page} />;
+  if (page.kind === 'block') return <BlockPage page={page} />;
   return <WrittenPage page={page} />;
 }
 

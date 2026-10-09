@@ -253,7 +253,8 @@ export default tseslint.config(
     entryPoint: repoPath('apps/docs/app/globals.css'),
   }),
 
-  // Only Button consumes --nx-radius-base (documented in theming/radius-overrides).
+  // Button consumes --nx-radius-base; FilterConditionField opts in with a
+  // line-scoped disable (both documented in theming/radius-overrides).
   {
     files: ['packages/react/src/components/**/*.{ts,tsx}'],
     ignores: [
@@ -287,6 +288,24 @@ export default tseslint.config(
               group: ['@/*'],
               message:
                 '`@/` resolves to packages/react/src for the generated, paste-ready docs code only — import @nexus_ds/react here.',
+            },
+          ],
+        },
+      ],
+    },
+  },
+
+  {
+    files: ['apps/docs/app/_pages/patterns/**/*.tsx'],
+    rules: {
+      'no-restricted-imports': [
+        'error',
+        {
+          patterns: [
+            {
+              regex: '^@/(?!patterns/)',
+              message:
+                'A pattern page imports its examples from `@/patterns/`, which @nexus_ds/react does not export — import components from @nexus_ds/react.',
             },
           ],
         },
