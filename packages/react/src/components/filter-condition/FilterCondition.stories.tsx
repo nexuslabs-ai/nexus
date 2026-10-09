@@ -102,11 +102,17 @@ const meta = {
           <Source code={anatomySource} language="tsx" />
           <h2>Use a working block</h2>
           <p>
-            <a href="/?path=/docs/blocks-choicefilter--docs" target="_top">
+            <a
+              href="/?path=/docs/blocks-filtering-choicefilter--docs"
+              target="_top"
+            >
               ChoiceFilter
             </a>{' '}
             adds a choice menu and immediate updates.{' '}
-            <a href="/?path=/docs/blocks-numberrangefilter--docs" target="_top">
+            <a
+              href="/?path=/docs/blocks-filtering-numberrangefilter--docs"
+              target="_top"
+            >
               NumberRangeFilter
             </a>{' '}
             adds draft bounds, validation and Apply/Cancel.

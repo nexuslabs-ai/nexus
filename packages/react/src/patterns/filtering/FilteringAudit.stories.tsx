@@ -6,27 +6,27 @@ import { expect, userEvent, waitFor, within } from 'storybook/test';
 import {
   type ChoiceCondition,
   ChoiceFilter,
-} from '../../blocks/choice-filter/choice-filter';
+} from '../../blocks/filtering/choice-filter/choice-filter';
 import {
   type DateRangeCondition,
   DateRangeFilter,
-} from '../../blocks/date-range-filter/date-range-filter';
+} from '../../blocks/filtering/date-range-filter/date-range-filter';
 import {
   type MultiChoiceCondition,
   MultiChoiceFilter,
-} from '../../blocks/multi-choice-filter/multi-choice-filter';
+} from '../../blocks/filtering/multi-choice-filter/multi-choice-filter';
 import {
   type NumberComparisonCondition,
   NumberComparisonFilter,
-} from '../../blocks/number-comparison-filter/number-comparison-filter';
+} from '../../blocks/filtering/number-comparison-filter/number-comparison-filter';
 import {
   type NumberRangeCondition,
   NumberRangeFilter,
-} from '../../blocks/number-range-filter/number-range-filter';
+} from '../../blocks/filtering/number-range-filter/number-range-filter';
 import {
   type TextCondition,
   TextFilter,
-} from '../../blocks/text-filter/text-filter';
+} from '../../blocks/filtering/text-filter/text-filter';
 import { Button } from '../../components/button';
 import { FilterBuilder } from '../../components/filter-builder';
 import { FilterChip } from '../../components/filter-chip';

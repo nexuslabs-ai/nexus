@@ -140,7 +140,7 @@ export function getBlockDocs(slug: string): BlockDocs {
   const docs = Object.hasOwn(blockDocs, slug) ? blockDocs[slug] : undefined;
   if (!docs) {
     throw new Error(
-      \`No block docs for \${slug} — there is no blocks/\${slug}/ folder with stories. Run \\\`pnpm --filter @nexus_ds/docs generate:demos\\\`.\`
+      \`No block docs for \${slug} — there is no blocks/{family}/\${slug}/ folder with stories. Run \\\`pnpm --filter @nexus_ds/docs generate:demos\\\`.\`
     );
   }
 

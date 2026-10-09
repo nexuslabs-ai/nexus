@@ -35,25 +35,38 @@ export function exportedComponentSlugs() {
 }
 
 /**
- * @typedef {{ slug: string; source: string; stories: string }} BlockSource
+ * @typedef {{ family: string; slug: string; source: string; stories: string }} BlockSource
  */
 
 /**
- * Every copy-source block: a `blocks/{slug}/` folder holding `{slug}.tsx` and
- * `{Slug}.stories.tsx`, sorted by slug. A folder without stories is a helper
- * the blocks share, not a block.
+ * Every copy-source block: a `blocks/{family}/{slug}/` folder holding
+ * `{slug}.tsx` and `{Slug}.stories.tsx`, sorted by family then slug. Files
+ * directly in a family folder are helpers its blocks share.
  * @returns {BlockSource[]}
  */
 export function blockSources() {
-  return readdirSync(blocksRoot, { withFileTypes: true })
+  return subfolders(blocksRoot)
+    .flatMap((family) =>
+      subfolders(path.join(blocksRoot, family)).map((slug) => ({
+        family,
+        slug,
+        source: path.join(blocksRoot, family, slug, `${slug}.tsx`),
+        stories: path.join(
+          blocksRoot,
+          family,
+          slug,
+          `${pascal(slug)}.stories.tsx`
+        ),
+      }))
+    )
+    .filter((block) => existsSync(block.stories));
+}
+
+function subfolders(dir) {
+  return readdirSync(dir, { withFileTypes: true })
     .filter((entry) => entry.isDirectory())
-    .map(({ name: slug }) => ({
-      slug,
-      source: path.join(blocksRoot, slug, `${slug}.tsx`),
-      stories: path.join(blocksRoot, slug, `${pascal(slug)}.stories.tsx`),
-    }))
-    .filter((block) => existsSync(block.stories))
-    .sort((a, b) => a.slug.localeCompare(b.slug, 'en'));
+    .map((entry) => entry.name)
+    .sort();
 }
 
 export function collectSourceFiles(dir, include) {

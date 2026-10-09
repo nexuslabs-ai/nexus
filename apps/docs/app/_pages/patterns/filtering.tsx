@@ -264,7 +264,7 @@ export default function Filtering() {
         </ul>
         <p className={BODY_CLASS}>
           Wrap the controls and your Add/Clear actions in AppliedFilters (
-          <InlineCode>blocks/applied-filters/applied-filters.tsx</InlineCode>
+          <InlineCode>blocks/filtering/applied-filters.tsx</InlineCode>
           ). It owns layout, not query state.
         </p>
         <p className={BODY_CLASS}>

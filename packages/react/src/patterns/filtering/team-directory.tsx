@@ -2,11 +2,11 @@ import * as React from 'react';
 
 import { IconList, IconUsers } from '@tabler/icons-react';
 
-import { AppliedFilters } from '../../blocks/applied-filters/applied-filters';
+import { AppliedFilters } from '../../blocks/filtering/applied-filters';
 import {
   type ChoiceCondition,
   ChoiceFilter,
-} from '../../blocks/choice-filter/choice-filter';
+} from '../../blocks/filtering/choice-filter/choice-filter';
 import { Button } from '../../components/button';
 import { Input } from '../../components/input';
 import { Label } from '../../components/label';

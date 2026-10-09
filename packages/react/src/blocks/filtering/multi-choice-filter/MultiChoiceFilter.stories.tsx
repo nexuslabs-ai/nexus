@@ -2,34 +2,47 @@ import * as React from 'react';
 
 import { Canvas, Source, Title } from '@storybook/addon-docs/blocks';
 import type { Meta, StoryObj } from '@storybook/react';
-import { IconLetterCase } from '@tabler/icons-react';
+import { IconUsers } from '@tabler/icons-react';
 import { expect, userEvent, waitFor, within } from 'storybook/test';
 
-import operatorSource from '../filter-operator/filter-operator.tsx?raw';
+import operatorSource from '../filter-operator.tsx?raw';
 
-import { type TextCondition, TextFilter } from './text-filter';
-import blockSource from './text-filter.tsx?raw';
+import {
+  type MultiChoiceCondition,
+  MultiChoiceFilter,
+} from './multi-choice-filter';
+import blockSource from './multi-choice-filter.tsx?raw';
 
-const initial: TextCondition = { operator: 'contains', value: 'design' };
+const initial: MultiChoiceCondition = {
+  operator: 'isAnyOf',
+  values: ['design'],
+};
 function Preview({
   initialValue = initial,
   disabled = false,
 }: {
-  initialValue?: TextCondition | null;
+  initialValue?: MultiChoiceCondition | null;
   disabled?: boolean;
 }) {
-  const [value, setValue] = React.useState<TextCondition | null>(initialValue);
+  const [value, setValue] = React.useState<MultiChoiceCondition | null>(
+    initialValue
+  );
   return (
     <section
-      aria-label="TextFilter example"
+      aria-label="MultiChoiceFilter example"
       className="nx:grid nx:w-full nx:min-w-0 nx:max-w-xl nx:justify-items-start nx:gap-4 nx:p-4"
     >
-      <TextFilter
-        label="Name"
-        icon={<IconLetterCase aria-hidden="true" />}
+      <MultiChoiceFilter
+        label="Team"
+        icon={<IconUsers aria-hidden="true" />}
         value={value}
         onChange={setValue}
         disabled={disabled}
+        options={[
+          { value: 'design', label: 'Design' },
+          { value: 'engineering', label: 'Engineering' },
+          { value: 'operations', label: 'Operations', disabled: true },
+        ]}
       />
       <output
         aria-label="Applied condition"
@@ -41,9 +54,9 @@ function Preview({
   );
 }
 const usage =
-  "import { useState } from 'react';\nimport { TextFilter, type TextCondition } from '@/blocks/text-filter/text-filter';\n\nexport function Example() {\n const [value, setValue] = useState<TextCondition | null>({ operator: 'contains', value: 'design' });\n return <TextFilter label=\"Name\" value={value} onChange={setValue}  />;\n}";
+  'import { useState } from \'react\';\nimport { MultiChoiceFilter, type MultiChoiceCondition } from \'@/blocks/filtering/multi-choice-filter/multi-choice-filter\';\n\nexport function Example() {\n const [value, setValue] = useState<MultiChoiceCondition | null>({ operator: \'isAnyOf\', values: [\'design\'] });\n return <MultiChoiceFilter label="Team" value={value} onChange={setValue} options={[{ value: "design", label: "Design" }, { value: "engineering", label: "Engineering" }, { value: "operations", label: "Operations", disabled: true }]} />;\n}';
 const meta = {
-  title: 'Blocks/TextFilter',
+  title: 'Blocks/Filtering/MultiChoiceFilter',
   component: Preview,
   tags: ['autodocs'],
   parameters: {
@@ -54,20 +67,33 @@ const meta = {
         <>
           <Title />
           <p>
-            Choose contains, equals, not equals or starts with. Apply commits
-            trimmed, nonempty text. Matching rules such as case sensitivity
-            belong to the application.
+            Choose several options. Changes stay in the editor until Apply. An
+            empty selection cannot be applied; remove the filter to allow all
+            values.
           </p>
           <Canvas of={Default} />
           <h2>Use this block</h2>
           <p>
-            Copy blocks/text-filter/text-filter.tsx and
-            blocks/filter-operator/filter-operator.tsx from packages/react/src,
+            Copy blocks/filtering/multi-choice-filter/multi-choice-filter.tsx
+            and blocks/filtering/filter-operator.tsx from packages/react/src,
             keeping their relative paths. The block imports Nexus components by
             relative path. Include the copied files in your Tailwind source scan
             and use the Nexus theme setup.
           </p>
           <Source code={usage} language="tsx" />
+          <h2>Choose who owns Apply</h2>
+          <p>
+            MultiChoiceFilter is the standalone draft composition. The same file
+            exports MultiChoiceEditor, a controlled checklist without a popover
+            or footer. Connect that editor to applied state for live filtering,
+            or a panel draft for one shared Apply. An empty editor selection is
+            valid; its owner decides whether that means no condition.
+          </p>
+          <p>
+            <a href="/?path=/docs/patterns-filtering--docs" target="_top">
+              See individual filters with Apply
+            </a>
+          </p>
           <h2>State and behavior</h2>
           <p>
             Pass the updated value back through onChange. Null means no
@@ -90,12 +116,14 @@ const meta = {
           <Canvas of={Disabled} />
           <h2>Copy implementation</h2>
           <details>
-            <summary>blocks/text-filter/text-filter.tsx</summary>
+            <summary>
+              blocks/filtering/multi-choice-filter/multi-choice-filter.tsx
+            </summary>
             <Source code={blockSource} language="tsx" />
           </details>
           <details>
             <summary>
-              blocks/filter-operator/filter-operator.tsx — required helper
+              blocks/filtering/filter-operator.tsx — required helper
             </summary>
             <Source code={operatorSource} language="tsx" />
           </details>
@@ -124,10 +152,10 @@ export const EmptyOperator: Story = {
     const canvas = within(canvasElement);
     const page = within(canvasElement.ownerDocument.body);
     await userEvent.click(
-      canvas.getByRole('button', { name: 'Change Name operator' })
+      canvas.getByRole('button', { name: 'Change Team operator' })
     );
     await userEvent.click(
-      page.getByRole('menuitemradio', { name: 'contains' })
+      page.getByRole('menuitemradio', { name: 'is any of' })
     );
     await expect(await page.findByRole('dialog')).toBeVisible();
     await userEvent.keyboard('{Escape}');
@@ -136,7 +164,7 @@ export const EmptyOperator: Story = {
     );
     await waitFor(() =>
       expect(
-        canvas.getByRole('button', { name: 'Change Name operator' })
+        canvas.getByRole('button', { name: 'Change Team operator' })
       ).toHaveFocus()
     );
   },
@@ -153,12 +181,8 @@ export const ApplyAndCancel: Story = {
     const canvas = within(canvasElement);
     const page = within(canvasElement.ownerDocument.body);
     const before = canvas.getByLabelText('Applied condition').textContent ?? '';
-    await userEvent.click(canvas.getByRole('button', { name: /^Edit Name:/ }));
-    await userEvent.clear(page.getByRole('textbox', { name: 'Name' }));
-    await userEvent.type(
-      page.getByRole('textbox', { name: 'Name' }),
-      'research'
-    );
+    await userEvent.click(canvas.getByRole('button', { name: /^Edit Team:/ }));
+    await userEvent.click(page.getByRole('checkbox', { name: 'Engineering' }));
     await expect(canvas.getByLabelText('Applied condition')).toHaveTextContent(
       before
     );
@@ -166,22 +190,18 @@ export const ApplyAndCancel: Story = {
     await expect(canvas.getByLabelText('Applied condition')).toHaveTextContent(
       before
     );
-    await userEvent.click(canvas.getByRole('button', { name: /^Edit Name:/ }));
-    await userEvent.clear(page.getByRole('textbox', { name: 'Name' }));
-    await userEvent.type(
-      page.getByRole('textbox', { name: 'Name' }),
-      'research'
-    );
+    await userEvent.click(canvas.getByRole('button', { name: /^Edit Team:/ }));
+    await userEvent.click(page.getByRole('checkbox', { name: 'Engineering' }));
     await userEvent.click(page.getByRole('button', { name: 'Apply' }));
     await expect(canvas.getByLabelText('Applied condition')).toHaveTextContent(
-      'research'
+      '"engineering"'
     );
     await userEvent.click(
-      canvas.getByRole('button', { name: 'Remove Name filter' })
+      canvas.getByRole('button', { name: 'Remove Team filter' })
     );
     await waitFor(() =>
       expect(
-        canvas.getByRole('button', { name: 'Add name filter' })
+        canvas.getByRole('button', { name: 'Add team filter' })
       ).toHaveFocus()
     );
     await expect(canvas.getByLabelText('Applied condition')).toHaveTextContent(
@@ -202,16 +222,39 @@ export const IncompleteDraft: Story = {
     const canvas = within(canvasElement);
     const page = within(canvasElement.ownerDocument.body);
     const before = canvas.getByLabelText('Applied condition').textContent ?? '';
-    await userEvent.click(canvas.getByRole('button', { name: /^Edit Name:/ }));
-    await userEvent.clear(page.getByRole('textbox', { name: 'Name' }));
-    await userEvent.type(page.getByRole('textbox', { name: 'Name' }), '   ');
+    await userEvent.click(canvas.getByRole('button', { name: /^Edit Team:/ }));
+    await userEvent.click(page.getByRole('checkbox', { name: 'Design' }));
+    await expect(
+      page.getByRole('checkbox', { name: 'Operations' })
+    ).toBeDisabled();
     await expect(page.getByRole('button', { name: 'Apply' })).toBeDisabled();
     await userEvent.keyboard('{Escape}');
     await expect(canvas.getByLabelText('Applied condition')).toHaveTextContent(
       before
     );
     await waitFor(() =>
-      expect(canvas.getByRole('button', { name: /^Edit Name:/ })).toHaveFocus()
+      expect(canvas.getByRole('button', { name: /^Edit Team:/ })).toHaveFocus()
     );
+  },
+};
+
+export const OutsideDismissal: Story = {
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+    const page = within(canvasElement.ownerDocument.body);
+    const output = canvas.getByLabelText('Applied condition');
+    const before = output.textContent ?? '';
+    await userEvent.click(canvas.getByRole('button', { name: /^Edit Team:/ }));
+    await userEvent.click(page.getByRole('checkbox', { name: 'Engineering' }));
+    await userEvent.click(output);
+    await waitFor(() =>
+      expect(page.queryByRole('dialog')).not.toBeInTheDocument()
+    );
+    await expect(output).toHaveTextContent(before);
+    await userEvent.click(canvas.getByRole('button', { name: /^Edit Team:/ }));
+    await expect(
+      page.getByRole('checkbox', { name: 'Engineering' })
+    ).not.toBeChecked();
+    await userEvent.keyboard('{Escape}');
   },
 };

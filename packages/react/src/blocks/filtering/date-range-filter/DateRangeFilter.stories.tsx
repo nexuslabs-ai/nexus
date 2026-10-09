@@ -2,42 +2,41 @@ import * as React from 'react';
 
 import { Canvas, Source, Title } from '@storybook/addon-docs/blocks';
 import type { Meta, StoryObj } from '@storybook/react';
-import { IconHash } from '@tabler/icons-react';
+import { IconCalendar } from '@tabler/icons-react';
 import { expect, userEvent, waitFor, within } from 'storybook/test';
 
-import operatorSource from '../filter-operator/filter-operator.tsx?raw';
+import operatorSource from '../filter-operator.tsx?raw';
 
-import {
-  type NumberComparisonCondition,
-  NumberComparisonFilter,
-} from './number-comparison-filter';
-import blockSource from './number-comparison-filter.tsx?raw';
+import { type DateRangeCondition, DateRangeFilter } from './date-range-filter';
+import blockSource from './date-range-filter.tsx?raw';
 
-const initial: NumberComparisonCondition = {
-  operator: 'greaterThan',
-  value: 500,
+const initial: DateRangeCondition = {
+  operator: 'between',
+  from: new Date(2026, 8, 1),
+  to: new Date(2026, 8, 10),
 };
 function Preview({
   initialValue = initial,
   disabled = false,
 }: {
-  initialValue?: NumberComparisonCondition | null;
+  initialValue?: DateRangeCondition | null;
   disabled?: boolean;
 }) {
-  const [value, setValue] = React.useState<NumberComparisonCondition | null>(
+  const [value, setValue] = React.useState<DateRangeCondition | null>(
     initialValue
   );
   return (
     <section
-      aria-label="NumberComparisonFilter example"
+      aria-label="DateRangeFilter example"
       className="nx:grid nx:w-full nx:min-w-0 nx:max-w-xl nx:justify-items-start nx:gap-4 nx:p-4"
     >
-      <NumberComparisonFilter
-        label="Amount"
-        icon={<IconHash aria-hidden="true" />}
+      <DateRangeFilter
+        label="Created"
+        icon={<IconCalendar aria-hidden="true" />}
         value={value}
         onChange={setValue}
         disabled={disabled}
+        today={new Date(2026, 8, 27)}
       />
       <output
         aria-label="Applied condition"
@@ -49,9 +48,9 @@ function Preview({
   );
 }
 const usage =
-  "import { useState } from 'react';\nimport { NumberComparisonFilter, type NumberComparisonCondition } from '@/blocks/number-comparison-filter/number-comparison-filter';\n\nexport function Example() {\n const [value, setValue] = useState<NumberComparisonCondition | null>({ operator: 'greaterThan', value: 500 });\n return <NumberComparisonFilter label=\"Amount\" value={value} onChange={setValue}  />;\n}";
+  "import { useState } from 'react';\nimport { DateRangeFilter, type DateRangeCondition } from '@/blocks/filtering/date-range-filter/date-range-filter';\n\nexport function Example() {\n const [value, setValue] = useState<DateRangeCondition | null>({ operator: 'between', from: new Date(2026, 8, 1), to: new Date(2026, 8, 10) });\n return <DateRangeFilter label=\"Created\" value={value} onChange={setValue} />;\n}";
 const meta = {
-  title: 'Blocks/NumberComparisonFilter',
+  title: 'Blocks/Filtering/DateRangeFilter',
   component: Preview,
   tags: ['autodocs'],
   parameters: {
@@ -62,18 +61,19 @@ const meta = {
         <>
           <Title />
           <p>
-            Compare one finite number using equals, not equals, greater than or
-            less than. Signed decimals are supported; optional lowerBound and
-            upperBound constrain values. Unit is display text.
+            Choose dates or a Today / Last 7 days preset, then Apply. Presets
+            include today and resolve to fixed dates when applied. Values are
+            local calendar Date objects; the application owns timezone
+            conversion and inclusive end-date query semantics.
           </p>
           <Canvas of={Default} />
           <h2>Use this block</h2>
           <p>
-            Copy blocks/number-comparison-filter/number-comparison-filter.tsx
-            and blocks/filter-operator/filter-operator.tsx from
-            packages/react/src, keeping their relative paths. The block imports
-            Nexus components by relative path. Include the copied files in your
-            Tailwind source scan and use the Nexus theme setup.
+            Copy blocks/filtering/date-range-filter/date-range-filter.tsx and
+            blocks/filtering/filter-operator.tsx from packages/react/src,
+            keeping their relative paths. The block imports Nexus components by
+            relative path. Include the copied files in your Tailwind source scan
+            and use the Nexus theme setup.
           </p>
           <Source code={usage} language="tsx" />
           <h2>State and behavior</h2>
@@ -99,13 +99,13 @@ const meta = {
           <h2>Copy implementation</h2>
           <details>
             <summary>
-              blocks/number-comparison-filter/number-comparison-filter.tsx
+              blocks/filtering/date-range-filter/date-range-filter.tsx
             </summary>
             <Source code={blockSource} language="tsx" />
           </details>
           <details>
             <summary>
-              blocks/filter-operator/filter-operator.tsx — required helper
+              blocks/filtering/filter-operator.tsx — required helper
             </summary>
             <Source code={operatorSource} language="tsx" />
           </details>
@@ -134,10 +134,10 @@ export const EmptyOperator: Story = {
     const canvas = within(canvasElement);
     const page = within(canvasElement.ownerDocument.body);
     await userEvent.click(
-      canvas.getByRole('button', { name: 'Change Amount operator' })
+      canvas.getByRole('button', { name: 'Change Created operator' })
     );
     await userEvent.click(
-      page.getByRole('menuitemradio', { name: 'is greater than' })
+      page.getByRole('menuitemradio', { name: 'is between' })
     );
     await expect(await page.findByRole('dialog')).toBeVisible();
     await userEvent.keyboard('{Escape}');
@@ -146,7 +146,7 @@ export const EmptyOperator: Story = {
     );
     await waitFor(() =>
       expect(
-        canvas.getByRole('button', { name: 'Change Amount operator' })
+        canvas.getByRole('button', { name: 'Change Created operator' })
       ).toHaveFocus()
     );
   },
@@ -164,13 +164,9 @@ export const ApplyAndCancel: Story = {
     const page = within(canvasElement.ownerDocument.body);
     const before = canvas.getByLabelText('Applied condition').textContent ?? '';
     await userEvent.click(
-      canvas.getByRole('button', { name: /^Edit Amount:/ })
+      canvas.getByRole('button', { name: /^Edit Created:/ })
     );
-    await userEvent.clear(page.getByRole('spinbutton', { name: 'Amount' }));
-    await userEvent.type(
-      page.getByRole('spinbutton', { name: 'Amount' }),
-      '-12.5'
-    );
+    await userEvent.click(page.getByRole('button', { name: 'Last 7 days' }));
     await expect(canvas.getByLabelText('Applied condition')).toHaveTextContent(
       before
     );
@@ -179,23 +175,19 @@ export const ApplyAndCancel: Story = {
       before
     );
     await userEvent.click(
-      canvas.getByRole('button', { name: /^Edit Amount:/ })
+      canvas.getByRole('button', { name: /^Edit Created:/ })
     );
-    await userEvent.clear(page.getByRole('spinbutton', { name: 'Amount' }));
-    await userEvent.type(
-      page.getByRole('spinbutton', { name: 'Amount' }),
-      '-12.5'
-    );
+    await userEvent.click(page.getByRole('button', { name: 'Last 7 days' }));
     await userEvent.click(page.getByRole('button', { name: 'Apply' }));
-    await expect(canvas.getByLabelText('Applied condition')).toHaveTextContent(
-      '-12.5'
-    );
+    await expect(
+      canvas.getByLabelText('Applied condition')
+    ).not.toHaveTextContent(before);
     await userEvent.click(
-      canvas.getByRole('button', { name: 'Remove Amount filter' })
+      canvas.getByRole('button', { name: 'Remove Created filter' })
     );
     await waitFor(() =>
       expect(
-        canvas.getByRole('button', { name: 'Add amount filter' })
+        canvas.getByRole('button', { name: 'Add created filter' })
       ).toHaveFocus()
     );
     await expect(canvas.getByLabelText('Applied condition')).toHaveTextContent(
@@ -209,46 +201,4 @@ export const NarrowContainer: Story = {
       <Preview />
     </div>
   ),
-  play: async ({ canvasElement }) => {
-    const canvas = within(canvasElement);
-    const value = canvas.getByRole('button', { name: /^Edit Amount:/ });
-    const remove = canvas.getByRole('button', { name: 'Remove Amount filter' });
-    const root = value.closest('[data-slot="filter-condition"]')!;
-    const bounds = root.getBoundingClientRect();
-    await expect(root.scrollWidth).toBeLessThanOrEqual(root.clientWidth);
-    for (const button of [value, remove]) {
-      await expect(button.getBoundingClientRect().right).toBeLessThanOrEqual(
-        bounds.right + 1
-      );
-    }
-    await userEvent.click(value);
-    await expect(
-      within(canvasElement.ownerDocument.body).getByRole('spinbutton', {
-        name: 'Amount',
-      })
-    ).toHaveValue(500);
-    await userEvent.keyboard('{Escape}');
-  },
-};
-
-export const IncompleteDraft: Story = {
-  play: async ({ canvasElement }) => {
-    const canvas = within(canvasElement);
-    const page = within(canvasElement.ownerDocument.body);
-    const before = canvas.getByLabelText('Applied condition').textContent ?? '';
-    await userEvent.click(
-      canvas.getByRole('button', { name: /^Edit Amount:/ })
-    );
-    await userEvent.clear(page.getByRole('spinbutton', { name: 'Amount' }));
-    await expect(page.getByRole('button', { name: 'Apply' })).toBeDisabled();
-    await userEvent.keyboard('{Escape}');
-    await expect(canvas.getByLabelText('Applied condition')).toHaveTextContent(
-      before
-    );
-    await waitFor(() =>
-      expect(
-        canvas.getByRole('button', { name: /^Edit Amount:/ })
-      ).toHaveFocus()
-    );
-  },
 };

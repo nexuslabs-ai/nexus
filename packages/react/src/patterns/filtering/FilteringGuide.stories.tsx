@@ -2,14 +2,14 @@ import { Canvas, Source, Title } from '@storybook/addon-docs/blocks';
 import type { Meta, StoryObj } from '@storybook/react';
 import { expect, userEvent, waitFor, within } from 'storybook/test';
 
-import rowSource from '../../blocks/applied-filters/applied-filters.tsx?raw';
-import choiceSource from '../../blocks/choice-filter/choice-filter.tsx?raw';
-import dateSource from '../../blocks/date-range-filter/date-range-filter.tsx?raw';
-import operatorSource from '../../blocks/filter-operator/filter-operator.tsx?raw';
-import multiSource from '../../blocks/multi-choice-filter/multi-choice-filter.tsx?raw';
-import comparisonSource from '../../blocks/number-comparison-filter/number-comparison-filter.tsx?raw';
-import rangeSource from '../../blocks/number-range-filter/number-range-filter.tsx?raw';
-import textSource from '../../blocks/text-filter/text-filter.tsx?raw';
+import rowSource from '../../blocks/filtering/applied-filters.tsx?raw';
+import choiceSource from '../../blocks/filtering/choice-filter/choice-filter.tsx?raw';
+import dateSource from '../../blocks/filtering/date-range-filter/date-range-filter.tsx?raw';
+import operatorSource from '../../blocks/filtering/filter-operator.tsx?raw';
+import multiSource from '../../blocks/filtering/multi-choice-filter/multi-choice-filter.tsx?raw';
+import comparisonSource from '../../blocks/filtering/number-comparison-filter/number-comparison-filter.tsx?raw';
+import rangeSource from '../../blocks/filtering/number-range-filter/number-range-filter.tsx?raw';
+import textSource from '../../blocks/filtering/text-filter/text-filter.tsx?raw';
 
 import { AdvancedFiltering } from './advanced-filters';
 import { AppliedFiltersExample } from './applied-filters-example';
@@ -194,7 +194,10 @@ function FilteringGuide() {
           </h3>
           <ul className="nx:list-disc nx:space-y-2 nx:ps-5">
             <li>
-              <a href="/?path=/docs/blocks-choicefilter--docs" target="_top">
+              <a
+                href="/?path=/docs/blocks-filtering-choicefilter--docs"
+                target="_top"
+              >
                 <strong>ChoiceFilter</strong>
               </a>
               : a labelled field, independent operator, choice menu and removal.
@@ -203,7 +206,7 @@ function FilteringGuide() {
             </li>
             <li>
               <a
-                href="/?path=/docs/blocks-numberrangefilter--docs"
+                href="/?path=/docs/blocks-filtering-numberrangefilter--docs"
                 target="_top"
               >
                 <strong>NumberRangeFilter</strong>
@@ -213,7 +216,7 @@ function FilteringGuide() {
             </li>
             <li>
               <a
-                href="/?path=/docs/blocks-multichoicefilter--docs"
+                href="/?path=/docs/blocks-filtering-multichoicefilter--docs"
                 target="_top"
               >
                 <strong>MultiChoiceFilter</strong>
@@ -222,13 +225,19 @@ function FilteringGuide() {
               draft checklist.
             </li>
             <li>
-              <a href="/?path=/docs/blocks-daterangefilter--docs" target="_top">
+              <a
+                href="/?path=/docs/blocks-filtering-daterangefilter--docs"
+                target="_top"
+              >
                 <strong>DateRangeFilter</strong>
               </a>
               : a calendar, Today / Last 7 days presets, and a draft date range.
             </li>
             <li>
-              <a href="/?path=/docs/blocks-textfilter--docs" target="_top">
+              <a
+                href="/?path=/docs/blocks-filtering-textfilter--docs"
+                target="_top"
+              >
                 <strong>TextFilter</strong>
               </a>
               : contains, is, is not and starts with operators with a draft text
@@ -236,7 +245,7 @@ function FilteringGuide() {
             </li>
             <li>
               <a
-                href="/?path=/docs/blocks-numbercomparisonfilter--docs"
+                href="/?path=/docs/blocks-filtering-numbercomparisonfilter--docs"
                 target="_top"
               >
                 <strong>NumberComparisonFilter</strong>
@@ -294,44 +303,44 @@ function BlockSource() {
       </summary>
       <p className="nx:my-3">
         Copy only what you need. All six filter blocks require the shared
-        blocks/filter-operator/filter-operator.tsx file. AppliedFilters stands
-        alone. Preserve the blocks folder or update relative imports. Include
-        copied files in your Tailwind source scan.
+        blocks/filtering/filter-operator.tsx file. AppliedFilters stands alone.
+        Preserve the blocks folder or update relative imports. Include copied
+        files in your Tailwind source scan.
       </p>
       <h3 className="nx:typography-label-default">
         applied-filters-example.tsx
       </h3>
       <Source code={appliedExampleSource} language="tsx" />
       <h3 className="nx:typography-label-default">
-        blocks/choice-filter/choice-filter.tsx
+        blocks/filtering/choice-filter/choice-filter.tsx
       </h3>
       <Source code={choiceSource} language="tsx" />
       <h3 className="nx:typography-label-default">
-        blocks/number-range-filter/number-range-filter.tsx
+        blocks/filtering/number-range-filter/number-range-filter.tsx
       </h3>
       <Source code={rangeSource} language="tsx" />
       <h3 className="nx:typography-label-default">
-        blocks/multi-choice-filter/multi-choice-filter.tsx
+        blocks/filtering/multi-choice-filter/multi-choice-filter.tsx
       </h3>
       <Source code={multiSource} language="tsx" />
       <h3 className="nx:typography-label-default">
-        blocks/date-range-filter/date-range-filter.tsx
+        blocks/filtering/date-range-filter/date-range-filter.tsx
       </h3>
       <Source code={dateSource} language="tsx" />
       <h3 className="nx:typography-label-default">
-        blocks/text-filter/text-filter.tsx
+        blocks/filtering/text-filter/text-filter.tsx
       </h3>
       <Source code={textSource} language="tsx" />
       <h3 className="nx:typography-label-default">
-        blocks/number-comparison-filter/number-comparison-filter.tsx
+        blocks/filtering/number-comparison-filter/number-comparison-filter.tsx
       </h3>
       <Source code={comparisonSource} language="tsx" />
       <h3 className="nx:typography-label-default">
-        blocks/filter-operator/filter-operator.tsx
+        blocks/filtering/filter-operator.tsx
       </h3>
       <Source code={operatorSource} language="tsx" />
       <h3 className="nx:typography-label-default">
-        blocks/applied-filters/applied-filters.tsx
+        blocks/filtering/applied-filters.tsx
       </h3>
       <Source code={rowSource} language="tsx" />
     </details>
@@ -358,12 +367,12 @@ const meta = {
             <summary>Copy team directory and connect your data</summary>
             <p>
               Copy team-directory.tsx, quick-fixtures.ts,
-              blocks/choice-filter/choice-filter.tsx,
-              blocks/applied-filters/applied-filters.tsx and
-              blocks/filter-operator/filter-operator.tsx. Replace members with
-              your records. Status, team and query are applied state; connect
-              them to your query instead of the local results predicate. Handle
-              loading and request errors in your application.
+              blocks/filtering/choice-filter/choice-filter.tsx,
+              blocks/filtering/applied-filters.tsx and
+              blocks/filtering/filter-operator.tsx. Replace members with your
+              records. Status, team and query are applied state; connect them to
+              your query instead of the local results predicate. Handle loading
+              and request errors in your application.
             </p>
             <Source code={teamSource} language="tsx" />
           </details>
@@ -379,12 +388,11 @@ const meta = {
             <summary>Copy invoice list and connect your data</summary>
             <p>
               Copy invoice-filtering.tsx,
-              blocks/multi-choice-filter/multi-choice-filter.tsx and
-              blocks/filter-operator/filter-operator.tsx. Replace invoices with
-              your records. Each editor keeps a draft; submit commits it to
-              filters. Connect filters and search to your query. Escape or
-              outside click discards the draft. Empty selections mean no
-              restriction.
+              blocks/filtering/multi-choice-filter/multi-choice-filter.tsx and
+              blocks/filtering/filter-operator.tsx. Replace invoices with your
+              records. Each editor keeps a draft; submit commits it to filters.
+              Connect filters and search to your query. Escape or outside click
+              discards the draft. Empty selections mean no restriction.
             </p>
             <Source code={invoiceSource} language="tsx" />
           </details>

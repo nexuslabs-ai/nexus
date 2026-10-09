@@ -37,7 +37,7 @@ export type ComponentsSection = SectionBase & {
 
 /**
  * Its pages are not listed here: there is one per block under
- * `blocks/{slug}/`, generated from its story tagged `docs`.
+ * `blocks/{family}/{slug}/`, generated from its story tagged `docs`.
  */
 export type BlocksSection = SectionBase & {
   unit: 'blocks';

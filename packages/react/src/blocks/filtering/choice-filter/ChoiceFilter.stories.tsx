@@ -4,7 +4,7 @@ import { Canvas, Source, Title } from '@storybook/addon-docs/blocks';
 import type { Meta, StoryObj } from '@storybook/react';
 import { expect, userEvent, within } from 'storybook/test';
 
-import operatorSource from '../filter-operator/filter-operator.tsx?raw';
+import operatorSource from '../filter-operator.tsx?raw';
 
 import { type ChoiceCondition, ChoiceFilter } from './choice-filter';
 import blockSource from './choice-filter.tsx?raw';
@@ -45,9 +45,9 @@ function Preview({
 }
 
 const usage =
-  "import { useState } from 'react';\nimport {\n  ChoiceFilter,\n  type ChoiceCondition,\n} from '@/blocks/choice-filter/choice-filter';\n\nexport function Example() {\n  const [value, setValue] = useState<ChoiceCondition | null>({\n    operator: 'is',\n    value: 'active',\n  });\n  return (\n    <ChoiceFilter\n      label=\"Status\"\n      value={value}\n      onChange={setValue}\n      options={[\n        { value: 'active', label: 'Active' },\n        { value: 'invited', label: 'Invited' },\n        { value: 'suspended', label: 'Suspended' },\n      ]}\n    />\n  );\n}\n";
+  "import { useState } from 'react';\nimport {\n  ChoiceFilter,\n  type ChoiceCondition,\n} from '@/blocks/filtering/choice-filter/choice-filter';\n\nexport function Example() {\n  const [value, setValue] = useState<ChoiceCondition | null>({\n    operator: 'is',\n    value: 'active',\n  });\n  return (\n    <ChoiceFilter\n      label=\"Status\"\n      value={value}\n      onChange={setValue}\n      options={[\n        { value: 'active', label: 'Active' },\n        { value: 'invited', label: 'Invited' },\n        { value: 'suspended', label: 'Suspended' },\n      ]}\n    />\n  );\n}\n";
 const meta = {
-  title: 'Blocks/ChoiceFilter',
+  title: 'Blocks/Filtering/ChoiceFilter',
   component: Preview,
   tags: ['autodocs'],
   parameters: {
@@ -84,8 +84,8 @@ const meta = {
           <h2>Use this block</h2>
           <p>
             This is copy-source code, not a package export. Copy{' '}
-            <code>blocks/choice-filter/choice-filter.tsx</code> and{' '}
-            <code>blocks/filter-operator/filter-operator.tsx</code> from{' '}
+            <code>blocks/filtering/choice-filter/choice-filter.tsx</code> and{' '}
+            <code>blocks/filtering/filter-operator.tsx</code> from{' '}
             <code>packages/react/src</code>. Preserve their relative paths. The
             block imports its components from the component folders beside{' '}
             <code>blocks</code>.
@@ -113,13 +113,12 @@ const meta = {
           <Canvas of={Disabled} />
           <h2>Copy the implementation</h2>
           <details>
-            <summary>blocks/choice-filter/choice-filter.tsx</summary>
+            <summary>blocks/filtering/choice-filter/choice-filter.tsx</summary>
             <Source code={blockSource} language="tsx" />
           </details>
           <details>
             <summary>
-              blocks/filter-operator/filter-operator.tsx — required shared
-              helper
+              blocks/filtering/filter-operator.tsx — required shared helper
             </summary>
             <Source code={operatorSource} language="tsx" />
           </details>

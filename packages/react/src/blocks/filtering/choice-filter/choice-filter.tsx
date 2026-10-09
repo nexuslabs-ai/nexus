@@ -1,20 +1,20 @@
 import * as React from 'react';
 
-import { Button } from '../../components/button';
+import { Button } from '../../../components/button';
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuRadioGroup,
   DropdownMenuRadioItem,
   DropdownMenuTrigger,
-} from '../../components/dropdown-menu';
+} from '../../../components/dropdown-menu';
 import {
   FilterCondition,
   FilterConditionField,
   FilterConditionRemove,
   FilterConditionSegment,
-} from '../../components/filter-condition';
-import { ConditionOperator } from '../filter-operator/filter-operator';
+} from '../../../components/filter-condition';
+import { ConditionOperator } from '../filter-operator';
 
 export type ChoiceCondition =
   | { operator: 'is' | 'isNot'; value: string }

@@ -3,15 +3,15 @@ import * as React from 'react';
 import type { Meta, StoryObj } from '@storybook/react';
 import { expect, userEvent, waitFor, within } from 'storybook/test';
 
-import { AppliedFilters } from '../../blocks/applied-filters/applied-filters';
+import { AppliedFilters } from '../../blocks/filtering/applied-filters';
 import {
   type ChoiceCondition,
   ChoiceFilter,
-} from '../../blocks/choice-filter/choice-filter';
+} from '../../blocks/filtering/choice-filter/choice-filter';
 import {
   type NumberRangeCondition,
   NumberRangeFilter,
-} from '../../blocks/number-range-filter/number-range-filter';
+} from '../../blocks/filtering/number-range-filter/number-range-filter';
 import { Button } from '../../components/button';
 
 function ContractHarness({

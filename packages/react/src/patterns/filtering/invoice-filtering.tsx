@@ -2,7 +2,7 @@ import * as React from 'react';
 
 import { IconChevronDown, IconSearch } from '@tabler/icons-react';
 
-import { MultiChoiceEditor } from '../../blocks/multi-choice-filter/multi-choice-filter';
+import { MultiChoiceEditor } from '../../blocks/filtering/multi-choice-filter/multi-choice-filter';
 import { Button } from '../../components/button';
 import { Input } from '../../components/input';
 import {

@@ -35,6 +35,7 @@ export default async function Page({
         items={[
           { label: 'Home', href: '/' },
           { label: section.title, href: section.href },
+          ...('group' in page ? [{ label: page.group }] : []),
           { label: page.label },
         ]}
       />

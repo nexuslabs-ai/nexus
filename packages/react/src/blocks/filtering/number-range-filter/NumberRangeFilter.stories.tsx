@@ -4,7 +4,7 @@ import { Canvas, Source, Title } from '@storybook/addon-docs/blocks';
 import type { Meta, StoryObj } from '@storybook/react';
 import { expect, userEvent, within } from 'storybook/test';
 
-import operatorSource from '../filter-operator/filter-operator.tsx?raw';
+import operatorSource from '../filter-operator.tsx?raw';
 
 import {
   type NumberRangeCondition,
@@ -45,9 +45,9 @@ function Preview({
 }
 
 const usage =
-  "import { useState } from 'react';\nimport {\n  NumberRangeFilter,\n  type NumberRangeCondition,\n} from '@/blocks/number-range-filter/number-range-filter';\n\nexport function Example() {\n  const [value, setValue] = useState<NumberRangeCondition | null>({\n    operator: 'between',\n    min: 100,\n    max: 500,\n  });\n  return (\n    <NumberRangeFilter\n      label=\"Size\"\n      value={value}\n      onChange={setValue}\n      unit=\"KB\"\n      lowerBound={0}\n    />\n  );\n}\n";
+  "import { useState } from 'react';\nimport {\n  NumberRangeFilter,\n  type NumberRangeCondition,\n} from '@/blocks/filtering/number-range-filter/number-range-filter';\n\nexport function Example() {\n  const [value, setValue] = useState<NumberRangeCondition | null>({\n    operator: 'between',\n    min: 100,\n    max: 500,\n  });\n  return (\n    <NumberRangeFilter\n      label=\"Size\"\n      value={value}\n      onChange={setValue}\n      unit=\"KB\"\n      lowerBound={0}\n    />\n  );\n}\n";
 const meta = {
-  title: 'Blocks/NumberRangeFilter',
+  title: 'Blocks/Filtering/NumberRangeFilter',
   component: Preview,
   tags: ['autodocs'],
   parameters: {
@@ -78,8 +78,10 @@ const meta = {
           <h2>Use this block</h2>
           <p>
             This is copy-source code, not a package export. Copy{' '}
-            <code>blocks/number-range-filter/number-range-filter.tsx</code> and{' '}
-            <code>blocks/filter-operator/filter-operator.tsx</code> from{' '}
+            <code>
+              blocks/filtering/number-range-filter/number-range-filter.tsx
+            </code>{' '}
+            and <code>blocks/filtering/filter-operator.tsx</code> from{' '}
             <code>packages/react/src</code>. Preserve their relative paths. The
             block imports its components from the component folders beside{' '}
             <code>blocks</code>.
@@ -108,14 +110,13 @@ const meta = {
           <h2>Copy the implementation</h2>
           <details>
             <summary>
-              blocks/number-range-filter/number-range-filter.tsx
+              blocks/filtering/number-range-filter/number-range-filter.tsx
             </summary>
             <Source code={blockSource} language="tsx" />
           </details>
           <details>
             <summary>
-              blocks/filter-operator/filter-operator.tsx — required shared
-              helper
+              blocks/filtering/filter-operator.tsx — required shared helper
             </summary>
             <Source code={operatorSource} language="tsx" />
           </details>

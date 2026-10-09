@@ -8,7 +8,7 @@
  *   - `app/_pages/{section}/{slug}.tsx` — hand-built pages
  *   - `@nexus_ds/react`'s exports — one `components/` page per exported
  *     component, generated from its stories tagged `docs`
- *   - `blocks/` — one `blocks/` page per block folder with stories,
+ *   - `blocks/{family}/` — one `blocks/` page per block folder with stories,
  *     generated from its story tagged `docs`
  *
  * A page's route is its path on disk, so adding a page means adding a file.
@@ -236,11 +236,13 @@ export type ComponentManifestPage = ManifestPageBase & {
 };
 
 /**
- * A copy-source block under \`blocks/{slug}/\`. Its page body is its
+ * A copy-source block under \`blocks/{family}/{slug}/\`. Its page body is its
  * \`getBlockDocs(slug)\` entry, generated from its story tagged \`docs\`.
  */
 export type BlockManifestPage = ManifestPageBase & {
   kind: 'block';
+  /** The block's family folder, as the rail's group heading. */
+  group: string;
 };
 
 export type ManifestPage =
@@ -418,13 +420,14 @@ export async function buildPageManifest(docsRoot, formatOptions) {
     };
   }
 
-  function buildBlockPage({ slug }) {
+  function buildBlockPage({ family, slug }) {
     return {
       page: {
         route: `/${BLOCKS_SECTION}/${slug}`,
         slug,
         label: pascal(slug),
         kind: 'block',
+        group: humanize(family),
       },
     };
   }
@@ -434,7 +437,8 @@ export async function buildPageManifest(docsRoot, formatOptions) {
       return byLabel(exportedComponentSlugs().map(buildComponentPage));
     }
     if (isBlocksSection(sectionSlug)) {
-      return byLabel(blockSources().map(buildBlockPage));
+      // blockSources() is sorted by family, so each group stays contiguous.
+      return blockSources().map(buildBlockPage);
     }
     return orderedSlugs(sectionSlug).map((slug) =>
       buildPage(sectionSlug, slug)

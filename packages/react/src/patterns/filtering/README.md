@@ -14,9 +14,10 @@ small result contexts; they are not different filtering APIs or required pages.
 
 There is no packaged FilterBar, hidden query evaluator or required product page.
 
-Blocks live in `packages/react/src/blocks/{block}/`, one folder per block, and
-this pattern's examples live beside this README in `patterns/filtering/`. Both
-import Nexus components through relative paths (`../../components/*`). When
+Blocks live in `packages/react/src/blocks/filtering/`, one folder per block with
+the shared `filter-operator.tsx` and `applied-filters.tsx` beside them, and this
+pattern's examples live beside this README in `patterns/filtering/`. Both import
+Nexus components through relative paths. When
 copying, keep that structure or point those imports at your copies of the same
 component folders and their `lib/` helpers. Standalone
 installation and theme isolation belong to the separate adoption work.
@@ -27,15 +28,15 @@ Storybook and the docs site expose all six filter blocks under **Blocks**, with 
 
 Paths are relative to `packages/react/src/`. Preserve this structure or update relative imports.
 
-| Block                  | Copy these files                                                                                             | Contract                                                                                            |
-| ---------------------- | ------------------------------------------------------------------------------------------------------------ | --------------------------------------------------------------------------------------------------- |
-| ChoiceFilter           | `blocks/choice-filter/choice-filter.tsx`, `blocks/filter-operator/filter-operator.tsx`                       | `label`, optional `icon`, `value`, `options`, `onChange`, optional `disabled`                       |
-| NumberRangeFilter      | `blocks/number-range-filter/number-range-filter.tsx`, `blocks/filter-operator/filter-operator.tsx`           | `label`, optional `icon`/`unit`/`lowerBound`/`upperBound`, `value`, `onChange`, optional `disabled` |
-| MultiChoiceFilter      | `blocks/multi-choice-filter/multi-choice-filter.tsx`, `blocks/filter-operator/filter-operator.tsx`           | Option IDs in `values: string[]`; `isAnyOf` / `isNoneOf`; draft checklist                           |
-| DateRangeFilter        | `blocks/date-range-filter/date-range-filter.tsx`, `blocks/filter-operator/filter-operator.tsx`               | `from: Date`, `to: Date`; `between`; optional reference `today`                                     |
-| TextFilter             | `blocks/text-filter/text-filter.tsx`, `blocks/filter-operator/filter-operator.tsx`                           | `value: string`; `contains` / `is` / `isNot` / `startsWith`                                         |
-| NumberComparisonFilter | `blocks/number-comparison-filter/number-comparison-filter.tsx`, `blocks/filter-operator/filter-operator.tsx` | `value: number`; `is` / `isNot` / `greaterThan` / `lessThan`; optional unit and bounds              |
-| AppliedFilters         | `blocks/applied-filters/applied-filters.tsx`                                                                 | `children`, optional accessible `label`; wraps controls as space allows                             |
+| Block                  | Copy these files                                                                                                 | Contract                                                                                            |
+| ---------------------- | ---------------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------- |
+| ChoiceFilter           | `blocks/filtering/choice-filter/choice-filter.tsx`, `blocks/filtering/filter-operator.tsx`                       | `label`, optional `icon`, `value`, `options`, `onChange`, optional `disabled`                       |
+| NumberRangeFilter      | `blocks/filtering/number-range-filter/number-range-filter.tsx`, `blocks/filtering/filter-operator.tsx`           | `label`, optional `icon`/`unit`/`lowerBound`/`upperBound`, `value`, `onChange`, optional `disabled` |
+| MultiChoiceFilter      | `blocks/filtering/multi-choice-filter/multi-choice-filter.tsx`, `blocks/filtering/filter-operator.tsx`           | Option IDs in `values: string[]`; `isAnyOf` / `isNoneOf`; draft checklist                           |
+| DateRangeFilter        | `blocks/filtering/date-range-filter/date-range-filter.tsx`, `blocks/filtering/filter-operator.tsx`               | `from: Date`, `to: Date`; `between`; optional reference `today`                                     |
+| TextFilter             | `blocks/filtering/text-filter/text-filter.tsx`, `blocks/filtering/filter-operator.tsx`                           | `value: string`; `contains` / `is` / `isNot` / `startsWith`                                         |
+| NumberComparisonFilter | `blocks/filtering/number-comparison-filter/number-comparison-filter.tsx`, `blocks/filtering/filter-operator.tsx` | `value: number`; `is` / `isNot` / `greaterThan` / `lessThan`; optional unit and bounds              |
+| AppliedFilters         | `blocks/filtering/applied-filters.tsx`                                                                           | `children`, optional accessible `label`; wraps controls as space allows                             |
 
 `value` is controlled: the caller must pass the updated value back after `onChange`.
 `null` means absent. Removal emits `null`. The blocks never evaluate records or write
@@ -47,11 +48,11 @@ button and decide what it clears. It uses a group, not toolbar keyboard navigati
 ```tsx
 import { useState } from 'react';
 import { Button } from '../../components/button';
-import { AppliedFilters } from '@/blocks/applied-filters/applied-filters';
+import { AppliedFilters } from '@/blocks/filtering/applied-filters';
 import {
   ChoiceFilter,
   type ChoiceCondition,
-} from '@/blocks/choice-filter/choice-filter';
+} from '@/blocks/filtering/choice-filter/choice-filter';
 
 export function StatusFilters() {
   const [status, setStatus] = useState<ChoiceCondition | null>(null);
@@ -161,11 +162,11 @@ or backend query validity.
 
 Example files sit beside this README; block paths are relative to `packages/react/src/`.
 
-| Example                                     | Copy together                                                                                                                                                                                                                                                                                                             |
-| ------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| Quick filters above a table, cards or files | `quick-filters.tsx`, `quick-fixtures.ts`, `local-results.tsx`, `blocks/choice-filter/choice-filter.tsx`, `blocks/number-comparison-filter/number-comparison-filter.tsx`, `blocks/number-range-filter/number-range-filter.tsx`, `blocks/applied-filters/applied-filters.tsx`, `blocks/filter-operator/filter-operator.tsx` |
-| Other value editors                         | `value-editors.tsx`, all six block files, `blocks/filter-operator/filter-operator.tsx`                                                                                                                                                                                                                                    |
-| Grouped conditions                          | `advanced-filters.tsx`, `advanced-fixtures.ts`                                                                                                                                                                                                                                                                            |
+| Example                                     | Copy together                                                                                                                                                                                                                                                                                                                               |
+| ------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Quick filters above a table, cards or files | `quick-filters.tsx`, `quick-fixtures.ts`, `local-results.tsx`, `blocks/filtering/choice-filter/choice-filter.tsx`, `blocks/filtering/number-comparison-filter/number-comparison-filter.tsx`, `blocks/filtering/number-range-filter/number-range-filter.tsx`, `blocks/filtering/applied-filters.tsx`, `blocks/filtering/filter-operator.tsx` |
+| Other value editors                         | `value-editors.tsx`, all six block files, `blocks/filtering/filter-operator.tsx`                                                                                                                                                                                                                                                            |
+| Grouped conditions                          | `advanced-filters.tsx`, `advanced-fixtures.ts`                                                                                                                                                                                                                                                                                              |
 
 The value-editor showcase composes the six dedicated blocks documented above.
 Applications choose timezone, boundary and serialization rules.
@@ -259,12 +260,12 @@ Apply-on-dismissal is a separate policy, not another name for live filtering.
 
 ### Reuse the choice editors with different commit policies
 
-`ChoiceEditor` is exported from `blocks/choice-filter/choice-filter.tsx`. It is a controlled
+`ChoiceEditor` is exported from `blocks/filtering/choice-filter/choice-filter.tsx`. It is a controlled
 radio menu and requires Nexus DropdownMenuContent around it. ChoiceFilter already
 supplies that shell and emits complete conditions through onChange. Give it applied
 state for live results, or the parent panel's draft state for a shared Apply.
 
-`MultiChoiceEditor` is exported from `blocks/multi-choice-filter/multi-choice-filter.tsx`. It receives
+`MultiChoiceEditor` is exported from `blocks/filtering/multi-choice-filter/multi-choice-filter.tsx`. It receives
 option IDs in `value`, options, label, disabled and onChange. It owns neither a
 popover nor Apply/Cancel. MultiChoiceFilter composes it with the existing local
 draft/footer. `invoice-filtering.tsx` composes the checklist into a compact,
@@ -272,8 +273,8 @@ individual filter popover with its own Apply button. Empty selection means no
 restriction for that field in this recipe. The standalone MultiChoiceFilter
 still requires a nonempty selection before Apply.
 
-Copy `invoice-filtering.tsx`, `blocks/multi-choice-filter/multi-choice-filter.tsx` and
-`blocks/filter-operator/filter-operator.tsx`. Replace the six local records and matching function with
+Copy `invoice-filtering.tsx`, `blocks/filtering/multi-choice-filter/multi-choice-filter.tsx` and
+`blocks/filtering/filter-operator.tsx`. Replace the six local records and matching function with
 your data integration. The recipe is copy-source, not a package export.
 
 ### Evidence and adaptation boundary
@@ -300,8 +301,8 @@ is made that its visuals reproduce Linear. No apply-on-close behavior is added.
 
 ### Focused product examples
 
-- **Team directory** (`patterns-filtering--team-filtering`): Status, Team and search update results immediately, with no Apply button. Copy `team-directory.tsx`, `quick-fixtures.ts`, `blocks/choice-filter/choice-filter.tsx`, `blocks/applied-filters/applied-filters.tsx` and `blocks/filter-operator/filter-operator.tsx`. Replace fixture records and the local `results` predicate with your data/query.
-- **Invoice list** (`patterns-filtering--invoice-filtering`): each checklist keeps its own draft until Apply. Outside dismissal discards that draft. Copy `invoice-filtering.tsx`, `blocks/multi-choice-filter/multi-choice-filter.tsx` and `blocks/filter-operator/filter-operator.tsx`; connect applied `filters` and search to your query.
+- **Team directory** (`patterns-filtering--team-filtering`): Status, Team and search update results immediately, with no Apply button. Copy `team-directory.tsx`, `quick-fixtures.ts`, `blocks/filtering/choice-filter/choice-filter.tsx`, `blocks/filtering/applied-filters.tsx` and `blocks/filtering/filter-operator.tsx`. Replace fixture records and the local `results` predicate with your data/query.
+- **Invoice list** (`patterns-filtering--invoice-filtering`): each checklist keeps its own draft until Apply. Outside dismissal discards that draft. Copy `invoice-filtering.tsx`, `blocks/filtering/multi-choice-filter/multi-choice-filter.tsx` and `blocks/filtering/filter-operator.tsx`; connect applied `filters` and search to your query.
 
 Both are local-data recipes, with clearing and empty results. Applications own remote loading, errors and request cancellation. These examples intentionally have no interaction-policy toggle.
 
