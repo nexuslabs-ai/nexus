@@ -46,6 +46,7 @@ function ProfileDetails() {
 }
 
 export const Default: Story = {
+  tags: ['docs'],
   render: () => <ProfileDetails />,
   play: async ({ canvasElement }) => {
     const list = canvasElement.querySelector('dl');
@@ -61,6 +62,7 @@ export const Default: Story = {
 };
 
 export const FileMetadata: Story = {
+  tags: ['docs'],
   render: () => (
     <DescriptionList>
       <DescriptionListItem>
@@ -84,6 +86,7 @@ export const FileMetadata: Story = {
 };
 
 export const Configuration: Story = {
+  tags: ['docs'],
   render: () => (
     <DescriptionList>
       <DescriptionListItem>
@@ -214,6 +217,7 @@ function ActionExample({
 }
 
 export const ClickToEdit: Story = {
+  tags: ['docs'],
   render: () => <ActionExample activation="click" />,
 };
 export const ClickToEditEmpty: Story = {

@@ -62,9 +62,13 @@ async function clickWithoutFocusingTarget(target: HTMLElement) {
   await fireEvent.click(target);
 }
 
-export const Default: Story = { render: () => <Example /> };
+export const Default: Story = {
+  tags: ['docs'],
+  render: () => <Example />,
+};
 
 export const ClickActivation: Story = {
+  tags: ['docs'],
   render: () => <Example activation="click" value="" emptyText="Add a name" />,
   play: async ({ canvasElement }) => {
     const canvas = within(canvasElement);
@@ -116,6 +120,7 @@ export const CommitInteraction: Story = {
 };
 
 export const Required: Story = {
+  tags: ['docs'],
   render: () => <Example required requiredMessage="Enter a name." />,
   play: async ({ canvasElement }) => {
     const canvas = within(canvasElement);
@@ -134,6 +139,7 @@ export const Required: Story = {
 };
 
 export const ReadOnly: Story = {
+  tags: ['docs'],
   render: () => <ReadOnlyExample value="" />,
   play: async ({ canvasElement }) => {
     const canvas = within(canvasElement);
