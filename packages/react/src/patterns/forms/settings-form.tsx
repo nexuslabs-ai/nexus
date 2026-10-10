@@ -6,6 +6,7 @@ import { SettingsFields } from './settings-fields';
 import {
   FAILURE_MESSAGE,
   normalize,
+  restoreDroppedFocus,
   type SettingsFormProps,
   SettingsLayout,
   type SettingsValues,
@@ -77,12 +78,12 @@ export function SettingsForm({
       setSaved(submitted);
       setDraft(submitted);
       setMessage('Changes saved.');
-      nameRef.current?.focus();
     } catch {
       setSaveError(FAILURE_MESSAGE);
     } finally {
       setPending(false);
     }
+    restoreDroppedFocus(nameRef.current);
   }
 
   return (

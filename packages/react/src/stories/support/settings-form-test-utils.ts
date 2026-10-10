@@ -136,7 +136,7 @@ export async function verifyFailure({
     'Your edits are still here'
   );
   await expect(name).toHaveValue('Priya Shah Jr');
-  await expect(save).toHaveFocus();
+  await expect(name).toHaveFocus();
   await expect(save).toBeEnabled();
   await userEvent.click(save);
   await waitFor(() =>

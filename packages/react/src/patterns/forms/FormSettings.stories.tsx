@@ -71,7 +71,7 @@ export const Saving: Story = {
     docs: {
       description: {
         story:
-          'Simulates a one-second save. Fields are read-only and Save is busy until it completes, so edits cannot race with the submitted values and focus stays where it was.',
+          'Simulates a one-second save. Fields are read-only and Save is busy until it completes, so edits cannot race with the submitted values. If focus was on Save, it returns to Name when the save settles.',
       },
     },
   },

@@ -7,6 +7,7 @@ import { SettingsFields } from './settings-fields';
 import {
   FAILURE_MESSAGE,
   normalize,
+  restoreDroppedFocus,
   type SettingsFormProps,
   SettingsLayout,
   type SettingsValues,
@@ -70,11 +71,11 @@ export function ReactHookFormExample({
     }
     form.reset(submitted);
     setMessage('Changes saved.');
-    nameRef.current?.focus();
   }
-  function submit(event: React.FormEvent<HTMLFormElement>) {
+  async function submit(event: React.FormEvent<HTMLFormElement>) {
     setMessage('');
-    return form.handleSubmit(save)(event);
+    await form.handleSubmit(save)(event);
+    restoreDroppedFocus(nameRef.current);
   }
   function cancelChanges() {
     form.reset();

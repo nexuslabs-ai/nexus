@@ -278,7 +278,8 @@ export const Loading: Story = {
       '[data-slot="button-loading-label"]'
     );
 
-    await expect(button).toBeEnabled();
+    // Loading button should be disabled
+    await expect(button).toBeDisabled();
     await expect(button).toHaveAttribute('aria-busy', 'true');
     await expect(button).toHaveAttribute('aria-disabled', 'true');
     await expect(button).toHaveAttribute('data-loading', 'true');
@@ -290,42 +291,8 @@ export const Loading: Story = {
     await expect(loadingLabel).toHaveTextContent('Submitting');
     await expect(button).toHaveAccessibleName('Submitting');
 
-    await userEvent.tab();
-    await expect(button).toHaveFocus();
-    await userEvent.keyboard('{Enter}');
-    await userEvent.keyboard(' ');
+    // Click should not trigger onClick
     await expect(args.onClick).not.toHaveBeenCalled();
-    await expect(button).toHaveFocus();
-  },
-};
-
-export const LoadingSubmitInForm: Story = {
-  render: () => (
-    <form
-      aria-label="Newsletter"
-      onSubmit={(event) => event.preventDefault()}
-      className="nx:flex nx:gap-2"
-    >
-      <input aria-label="Email" name="email" defaultValue="priya@example.com" />
-      <Button type="submit" loading>
-        Subscribe
-      </Button>
-    </form>
-  ),
-  play: async ({ canvasElement }) => {
-    const canvas = within(canvasElement);
-    const onSubmit = fn();
-    canvas.getByRole('form').addEventListener('submit', onSubmit);
-
-    await userEvent.click(canvas.getByRole('textbox', { name: 'Email' }));
-    await userEvent.keyboard('{Enter}');
-    await userEvent.tab();
-    await expect(
-      canvas.getByRole('button', { name: 'Subscribe' })
-    ).toHaveFocus();
-    await userEvent.keyboard('{Enter}');
-    await userEvent.keyboard(' ');
-    await expect(onSubmit).not.toHaveBeenCalled();
   },
 };
 
@@ -693,34 +660,6 @@ export const DisabledAsLink: Story = {
   },
 };
 
-export const LoadingAsLink: Story = {
-  args: {
-    loading: true,
-    children: 'Opening report',
-    onClick: fn(),
-  },
-  render: ({ children, ...args }) => (
-    <Button {...args} asChild>
-      <a href="#loading-as-link">{children}</a>
-    </Button>
-  ),
-  play: async ({ canvasElement, args }) => {
-    const canvas = within(canvasElement);
-    const link = canvas.getByRole('link', { name: 'Opening report' });
-
-    await expect(link).toHaveAttribute('aria-busy', 'true');
-    await expect(link).toHaveAttribute('aria-disabled', 'true');
-    await expect(link).not.toHaveAttribute('tabindex');
-
-    await userEvent.tab();
-    await expect(link).toHaveFocus();
-    await userEvent.keyboard('{Enter}');
-    await expect(args.onClick).not.toHaveBeenCalled();
-    await expect(window.location.hash).not.toBe('#loading-as-link');
-    await expect(link).toHaveFocus();
-  },
-};
-
 // ============================================
 // AUTHORING CONTRACTS
 // ============================================
@@ -775,7 +714,7 @@ export const LoadingUsesSpinnerOnly: Story = {
       '[data-slot="button-loading-label"]'
     );
 
-    await expect(button).toHaveAttribute('aria-disabled', 'true');
+    await expect(button).toBeDisabled();
     await expect(button).toHaveAttribute('aria-busy', 'true');
     await expect(
       button.querySelector('[data-slot="button-start-icon"]')

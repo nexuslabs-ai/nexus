@@ -62,8 +62,8 @@ interface ButtonProps
   /**
    * When true, the button renders as its child element (via Radix Slot),
    * applying button styling to e.g. an `<a>` while leaving the child's own
-   * content untouched — compose icons inside the child. The loading spinner
-   * and the `startIcon` / `endIcon` slots render on the native `<button>` only.
+   * content untouched — compose icons inside the child. `loading` and the
+   * `startIcon` / `endIcon` slots apply to the native `<button>` only.
    * @default false
    * @example
    * ```tsx
@@ -75,10 +75,8 @@ interface ButtonProps
   asChild?: boolean;
 
   /**
-   * Shows a loading indicator and blocks activation. The button stays
-   * focusable (`aria-disabled`, not native `disabled`), so focus is not lost
-   * while an action it started is pending. While loading, the spinner replaces
-   * all visible content and any icon slots are hidden.
+   * Shows a loading indicator and disables the button. While loading, the
+   * spinner replaces all visible content and any icon slots are hidden.
    * @default false
    * @example
    * ```tsx
@@ -181,7 +179,6 @@ function Button({
   endIcon,
   type = 'button',
   tabIndex,
-  onClick,
   'aria-busy': ariaBusy,
   'aria-disabled': ariaDisabled,
   ...props
@@ -192,16 +189,6 @@ function Button({
   const semanticSize = size ?? groupSize ?? 'default';
   const isDisabled = disabled || loading;
   const iconOnly = isIconButtonSize(semanticSize);
-
-  function handleClick(event: React.MouseEvent<HTMLButtonElement>) {
-    if (loading) {
-      // Also cancels a submit button's form submission, including implicit
-      // submission from Enter in a text field.
-      event.preventDefault();
-      return;
-    }
-    onClick?.(event);
-  }
 
   const sharedProps = {
     'data-slot': 'button',
@@ -216,12 +203,7 @@ function Button({
 
   if (asChild && React.isValidElement(children))
     return (
-      <Slot
-        {...sharedProps}
-        {...props}
-        onClick={handleClick}
-        tabIndex={disabled ? -1 : tabIndex}
-      >
+      <Slot {...sharedProps} {...props} tabIndex={isDisabled ? -1 : tabIndex}>
         {children}
       </Slot>
     );
@@ -231,9 +213,8 @@ function Button({
       {...sharedProps}
       {...props}
       type={type}
-      disabled={disabled}
+      disabled={isDisabled}
       tabIndex={tabIndex}
-      onClick={handleClick}
     >
       <ButtonContent loading={loading} startIcon={startIcon} endIcon={endIcon}>
         {children}

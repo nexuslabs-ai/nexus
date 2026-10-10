@@ -8,6 +8,7 @@ import { SettingsFields } from './settings-fields';
 import {
   FAILURE_MESSAGE,
   normalize,
+  restoreDroppedFocus,
   type SettingsFormProps,
   SettingsLayout,
   validateEmail,
@@ -34,7 +35,6 @@ export function TanStackFormExample({
       setSaved(submitted);
       formApi.reset(submitted);
       setMessage('Changes saved.');
-      nameRef.current?.focus();
     },
   });
   const name = useField({
@@ -84,6 +84,7 @@ export function TanStackFormExample({
     } catch {
       setSaveError(FAILURE_MESSAGE);
     }
+    restoreDroppedFocus(nameRef.current);
   }
   function cancelChanges() {
     form.reset();
