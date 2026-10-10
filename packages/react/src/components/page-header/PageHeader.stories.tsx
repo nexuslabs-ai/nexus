@@ -64,6 +64,7 @@ function ReportHeader({
   );
 }
 export const Default: Story = {
+  tags: ['docs'],
   render: () => <ReportHeader />,
   play: async ({ canvasElement }) => {
     await expect(
@@ -122,6 +123,7 @@ export const TitleOnly: Story = {
   ),
 };
 export const SectionHeader: Story = {
+  tags: ['docs'],
   render: () => (
     <section aria-labelledby="settings-title">
       <PageHeader>
@@ -336,10 +338,17 @@ function TabbedHeader({
   );
 }
 
-export const Compact: Story = { render: () => <CompactHeader /> };
+export const Compact: Story = {
+  tags: ['docs'],
+  render: () => <CompactHeader />,
+};
 export const Standard: Story = { render: () => <ReportHeader /> };
-export const Detail: Story = { render: () => <DetailHeader /> };
+export const Detail: Story = {
+  tags: ['docs'],
+  render: () => <DetailHeader />,
+};
 export const WithTabs: Story = {
+  tags: ['docs'],
   render: () => <TabbedHeader />,
   play: async ({ canvasElement }) => {
     const canvas = within(canvasElement);
@@ -354,6 +363,7 @@ export const WithTabs: Story = {
   },
 };
 export const LargeHeading: Story = {
+  tags: ['docs'],
   render: () => (
     <PageHeader>
       <PageHeaderContent>
