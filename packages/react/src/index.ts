@@ -66,6 +66,7 @@ export * from './components/message-scroller';
 export * from './components/multi-select';
 export * from './components/native-select';
 export * from './components/navigation-menu';
+export * from './components/page-header';
 export * from './components/pagination';
 export * from './components/popover';
 export * from './components/progress';
