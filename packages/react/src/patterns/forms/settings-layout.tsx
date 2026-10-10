@@ -41,15 +41,14 @@ export function pickSettings({
   return { name, email, updates };
 }
 
-// A click-started save leaves focus on Save, which is disabled while loading
-// and again once nothing is unsaved, or on <body> if the browser dropped it.
-// Move it to the field once the save settles; leave it if the user moved on.
+// A loading Save is natively disabled, so a click-started save leaves focus on
+// <body> or the disabled Save. Put it back once the save settles; leave it if
+// the user moved on.
 export function restoreDroppedFocus(field: HTMLInputElement | null) {
   const active = document.activeElement;
-  const onOwnControl =
-    field?.form?.contains(active) &&
-    active?.matches(':disabled, [type="submit"]');
-  if (active === document.body || onOwnControl) field?.focus();
+  const onOwnDisabled =
+    field?.form?.contains(active) && active?.matches(':disabled');
+  if (active === document.body || onOwnDisabled) field?.focus();
 }
 
 export function SettingsLayout({
