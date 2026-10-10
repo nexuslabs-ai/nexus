@@ -1,7 +1,10 @@
+import * as React from 'react';
+
 import type { Meta, StoryObj } from '@storybook/react';
 import { expect, fn, userEvent, within } from 'storybook/test';
 
 import { unpairedAutofillClasses } from '../../stories/support/autofill-pairing';
+import { Label } from '../label';
 
 import { Input } from './input';
 
@@ -31,7 +34,7 @@ const meta: Meta<typeof Input> = {
     },
     variant: {
       control: 'select',
-      options: ['bordered', 'borderless'],
+      options: ['bordered', 'borderless', 'ghost'],
       description: 'The visual treatment of the input',
     },
     type: {
@@ -52,6 +55,37 @@ const meta: Meta<typeof Input> = {
 
 export default meta;
 type Story = StoryObj<typeof Input>;
+
+// Play functions can't put an element in a real `:hover` state, so this reads
+// the border colours that `:hover` rules would apply to the element if it were
+// hovered. Nested rules resolve `&` against their parent selector.
+function hoverBorderColors(element: Element) {
+  const unescapedHover = /(?<!\\):hover/g;
+  const colors: string[] = [];
+
+  function visit(rules: CSSRuleList, parent: string) {
+    for (const rule of rules) {
+      const selector =
+        rule instanceof CSSStyleRule
+          ? rule.selectorText.replace(/(?<!\\)&/g, `:is(${parent})`)
+          : parent;
+      const color =
+        (rule instanceof CSSStyleRule ||
+          rule instanceof CSSNestedDeclarations) &&
+        rule.style.getPropertyValue('border-color');
+      const unhovered = selector.replace(unescapedHover, '');
+      if (color && unhovered !== selector && element.matches(unhovered)) {
+        colors.push(color);
+      }
+      if (rule instanceof CSSGroupingRule || rule instanceof CSSStyleRule) {
+        visit(rule.cssRules, selector);
+      }
+    }
+  }
+
+  for (const sheet of document.styleSheets) visit(sheet.cssRules, '');
+  return colors;
+}
 
 // ============================================
 // BASIC STORIES
@@ -77,7 +111,34 @@ export const WithPlaceholder: Story = {
   },
 };
 
+// ============================================
+// TYPE STORIES
+// ============================================
+
+export const TypeEmail: Story = {
+  tags: ['docs'],
+  args: {
+    type: 'email',
+    placeholder: 'email@example.com',
+  },
+};
+
+export const WithLabel: Story = {
+  tags: ['docs'],
+  render: function WithLabelStory() {
+    const inputId = React.useId();
+
+    return (
+      <div className="nx:grid nx:gap-1.5">
+        <Label htmlFor={inputId}>Full name</Label>
+        <Input id={inputId} placeholder="Ada Lovelace" />
+      </div>
+    );
+  },
+};
+
 export const Disabled: Story = {
+  tags: ['docs'],
   args: {
     placeholder: 'Disabled input',
     disabled: true,
@@ -93,6 +154,7 @@ export const DisabledWithValue: Story = {
 };
 
 export const Invalid: Story = {
+  tags: ['docs'],
   args: {
     defaultValue: 'invalid@',
     'aria-invalid': true,
@@ -160,7 +222,7 @@ export const BorderlessStates: Story = {
     await expect(readOnly).not.toBeDisabled();
 
     await expect(invalid).toHaveAttribute('aria-invalid', 'true');
-    await expect(invalid).toHaveClass('nx:aria-invalid:border-border-error');
+    await expect(invalid).toHaveClass('nx:aria-invalid:border-error-border');
     // The stroke is a real border now, so a borderless field keeps a
     // transparent one and the invalid state recolours it in place.
     const restStyles = window.getComputedStyle(empty);
@@ -181,6 +243,57 @@ export const BorderlessStates: Story = {
     await expect(disabled).not.toHaveClass(
       'nx:disabled:border-border-disabled'
     );
+  },
+};
+
+export const GhostStates: Story = {
+  render: () => (
+    <div className="nx:flex nx:w-[400px] nx:flex-col nx:gap-3">
+      <Input
+        data-testid="input-ghost-filled"
+        variant="ghost"
+        defaultValue="Quarterly planning"
+        aria-label="Filled ghost input"
+      />
+      <Input
+        data-testid="input-ghost-invalid"
+        variant="ghost"
+        defaultValue="invalid@"
+        aria-invalid
+        aria-label="Invalid ghost input"
+      />
+      <Input
+        data-testid="input-ghost-disabled"
+        variant="ghost"
+        placeholder="Disabled"
+        disabled
+      />
+    </div>
+  ),
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+    const filled = canvas.getByTestId('input-ghost-filled');
+    const invalid = canvas.getByTestId('input-ghost-invalid');
+
+    await expect(filled).toHaveAttribute('data-variant', 'ghost');
+    const rest = window.getComputedStyle(filled);
+    await expect(rest.borderTopColor).toBe('rgba(0, 0, 0, 0)');
+    await expect(rest.backgroundColor).toBe('rgba(0, 0, 0, 0)');
+
+    await expect(hoverBorderColors(filled)).toEqual([
+      expect.stringMatching(/^var\(\s*--nx-color-border-default,/),
+    ]);
+
+    await expect(window.getComputedStyle(invalid).borderTopColor).not.toBe(
+      'rgba(0, 0, 0, 0)'
+    );
+    await expect(hoverBorderColors(invalid)).toHaveLength(0);
+
+    filled.focus();
+    await expect(filled).toHaveFocus();
+    await expect(hoverBorderColors(filled)).toHaveLength(0);
+
+    await expect(canvas.getByTestId('input-ghost-disabled')).toBeDisabled();
   },
 };
 
@@ -337,7 +450,7 @@ export const WarningVsError: Story = {
           aria-label="Warning budget"
           aria-describedby="input-warning-message"
           defaultValue="95"
-          className="nx:border-border-warning"
+          className="nx:border-warning-border"
         />
         <p
           id="input-warning-message"
@@ -388,17 +501,6 @@ export const WarningVsError: Story = {
       'aria-errormessage',
       'input-error-message'
     );
-  },
-};
-
-// ============================================
-// TYPE STORIES
-// ============================================
-
-export const TypeEmail: Story = {
-  args: {
-    type: 'email',
-    placeholder: 'email@example.com',
   },
 };
 
@@ -517,7 +619,7 @@ export const VisualStateTokens: Story = {
     docs: {
       description: {
         story:
-          'Token sentinel for the corrected Figma node 843:71944 visual-state pass. The primitive remains a native input, while hover and disabled visuals map to Nexus semantic state tokens.',
+          'Pins the hover and disabled state classes to Nexus semantic tokens. The primitive remains a native input.',
       },
     },
   },
@@ -584,6 +686,7 @@ export const WithDataAttributes: Story = {
 // ============================================
 
 export const AllVariants: Story = {
+  tags: ['docs'],
   render: (_args) => (
     <div className="nx:flex nx:flex-col nx:gap-8 nx:w-[400px]">
       <div>
@@ -628,6 +731,12 @@ export const AllVariants: Story = {
               borderless
             </span>
             <Input variant="borderless" placeholder="Borderless input" />
+          </div>
+          <div className="nx:flex nx:items-center nx:gap-4">
+            <span className="nx:typography-label-small nx:text-muted-foreground nx:w-20">
+              ghost
+            </span>
+            <Input variant="ghost" placeholder="Ghost input" />
           </div>
         </div>
       </div>

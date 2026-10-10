@@ -1,5 +1,90 @@
 # @nexus_ds/react
 
+## 0.2.1
+
+### Patch Changes
+
+- Updated dependencies [bf903a4]
+  - @nexus_ds/core@0.5.1
+
+## 0.2.0
+
+### Minor Changes
+
+- e54ef4b: Add `BRAND_COLOR_PRESETS` and `findBrandColorPreset` to `@nexus_ds/core`, seeded from the authored palettes, and a reusable preset/custom color field in Appearance settings. Preserve saved brand colors and the existing theme derivation. Keep controls usable in narrow layouts and make native color-picker keyboard focus visible.
+- ea9a2e5: Add the `Marker` primitive for inline annotations and labelled dividers.
+
+  `Marker` renders a low-emphasis annotation row — an optional `MarkerIcon` plus
+  `MarkerContent` — for lists, feeds, and message streams. `variant="separator"`
+  centres the label between two rules; `variant="border"` rests the row above a
+  bottom rule. The label stays real text in reading order, so it is announced
+  where it appears; use `Separator` for a purely decorative rule with no label.
+
+  `asChild` composes the row onto different semantics — a heading for a labelled
+  section, or a link / button for an actionable row.
+
+- a5176e3: Breaking: rename border-active to border-focus, four normal status borders to
+  `{status}-border`, and border-primary / border-primary-active to primary-border /
+  primary-border-active, preserving their light/dark values and contrast
+  relationships. Update runtime variables and consumer utilities together; there
+  are no old-name aliases.
+
+  | Before                  | After                   |
+  | ----------------------- | ----------------------- |
+  | `border-active`         | `border-focus`          |
+  | `border-error`          | `error-border`          |
+  | `border-information`    | `information-border`    |
+  | `border-success`        | `success-border`        |
+  | `border-warning`        | `warning-border`        |
+  | `border-primary`        | `primary-border`        |
+  | `border-primary-active` | `primary-border-active` |
+
+  The map applies to `--nx-color-*` variables, `--color-*` theme aliases and
+  utilities (`nx:border-border-error` → `nx:border-error-border`).
+  `nx:border-color-active` becomes `nx:border-color-focus`; the other
+  `nx:border-color-*` aliases keep their names.
+
+  CSS snapshots advance to version 7 to invalidate obsolete names. State-only
+  cookies remain version 6 and retain preferences; server-rendered consumers should
+  pass the cookie-derived snapshot to the bootstrap for the saved first paint.
+
+### Patch Changes
+
+- 3ed37ed: Add the `shadow-md` tier to the emitted Tailwind theme; its primitives already
+  existed in every shadow mode, so `nx:shadow-md` now renders instead of emitting
+  nothing. Emit `--default-transition-duration` and
+  `--default-transition-timing-function` from `--nx-motion-duration-default` and
+  `--nx-motion-ease-enter`, and point `transition-control` / `transition-field` at
+  them: every `nx:transition-*` utility now shares one default (200ms, enter
+  easing) instead of Tailwind's 150ms, and the two ring-safe transitions are no
+  longer instant without an explicit `duration-*` class.
+
+  `@nexus_ds/eslint-plugin`: `nx-class-conventions` drops its `deadTypography`
+  check. Its replacement is the new `nexusTailwindClassesConfig({ files,
+entryPoint })` helper in the new `@nexus_ds/eslint-plugin/tailwind` subpath, which wires
+  `eslint-plugin-better-tailwindcss`'s `no-unknown-classes` (an optional peer
+  dependency, needed only for that subpath) against your stylesheet: it reports any class that emits no CSS,
+  including a missing `nx:` prefix.
+
+  `@nexus_ds/react`: NavigationMenu content now slides 1.5rem on enter and exit;
+  it previously computed its offset from an undefined `--spacing` and did not
+  slide. Its transform origin is now `top` (was the invalid `top-center`).
+
+- Updated dependencies [7aa577c]
+- Updated dependencies [15c901b]
+- Updated dependencies [e54ef4b]
+- Updated dependencies [416a7a0]
+- Updated dependencies [5a3ea89]
+- Updated dependencies [716c029]
+- Updated dependencies [3ed37ed]
+- Updated dependencies [48f0bc6]
+- Updated dependencies [a4fde03]
+- Updated dependencies [a5176e3]
+- Updated dependencies [8f9cbfa]
+- Updated dependencies [2b3f20c]
+- Updated dependencies [48cec83]
+  - @nexus_ds/core@0.5.0
+
 ## 0.1.1
 
 ### Patch Changes

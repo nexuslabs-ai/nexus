@@ -6,6 +6,19 @@ export {
   CHART_CATEGORICAL_SERIES,
   type ChartCategoricalIndex,
 } from './lib/chart';
+export {
+  type FilterError,
+  type FilterErrorCode,
+  type FilterField,
+  type FilterGroup,
+  type FilterOperator,
+  filterOperatorLabels,
+  type FilterOption,
+  type FilterRule,
+  getFilterErrors,
+  isValuelessOperator,
+  type ValuelessOperator,
+} from './lib/filter-model';
 
 // Components
 export * from './components/accordion';
@@ -35,6 +48,9 @@ export * from './components/drawer';
 export * from './components/dropdown-menu';
 export * from './components/empty-state';
 export * from './components/field';
+export * from './components/filter-builder';
+export * from './components/filter-chip';
+export * from './components/filter-condition';
 export * from './components/hide';
 export * from './components/hover-card';
 export * from './components/input';
@@ -50,6 +66,7 @@ export * from './components/message-scroller';
 export * from './components/multi-select';
 export * from './components/native-select';
 export * from './components/navigation-menu';
+export * from './components/page-header';
 export * from './components/pagination';
 export * from './components/popover';
 export * from './components/progress';
@@ -71,6 +88,7 @@ export * from './components/tabs';
 export * from './components/textarea';
 export * from './components/toggle';
 export * from './components/toggle-group';
+export * from './components/toolbar';
 export * from './components/tooltip';
 
 // Appearance (editor UI — provider is published separately via ./appearance subentry)
@@ -81,4 +99,3 @@ export * from './components/appearance/config-preview';
 export * from './components/appearance/setting-row';
 export * from './components/appearance/theme-quick-control';
 export * from './components/description-list';
-export * from './components/inline-edit';

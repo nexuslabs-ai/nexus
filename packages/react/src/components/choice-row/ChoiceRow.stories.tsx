@@ -73,6 +73,7 @@ function NotificationsRadioGroup() {
 }
 
 export const Default: Story = {
+  tags: ['docs'],
   render: () => (
     <div className="nx:w-80">
       <ChoiceRow htmlFor="choice-default">
@@ -95,6 +96,7 @@ export const Default: Story = {
 };
 
 export const WithRadioGroup: Story = {
+  tags: ['docs'],
   render: () => <NotificationsRadioGroup />,
   play: async ({ canvasElement }) => {
     const canvas = within(canvasElement);
@@ -161,6 +163,7 @@ export const KeyboardInteraction: Story = {
 };
 
 export const Disabled: Story = {
+  tags: ['docs'],
   render: () => (
     <div className="nx:w-80">
       <ChoiceRow htmlFor="choice-disabled">
@@ -194,6 +197,7 @@ export const Disabled: Story = {
 };
 
 export const WithDescription: Story = {
+  tags: ['docs'],
   render: () => (
     <div className="nx:w-96 nx:max-w-full">
       <ChoiceRow htmlFor="choice-description">

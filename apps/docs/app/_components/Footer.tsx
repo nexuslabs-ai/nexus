@@ -1,5 +1,5 @@
 const FOOTER_LINKS: { label: string; href: `https://${string}` }[] = [
-  { label: 'Storybook', href: 'https://nexuslabs-ai.github.io/nexus/' },
+  { label: 'Storybook', href: 'https://storybook.nexusui.so' },
   { label: 'GitHub', href: 'https://github.com/nexuslabs-ai/nexus' },
 ];
 

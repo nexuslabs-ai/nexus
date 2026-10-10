@@ -101,8 +101,7 @@ export const Palettes: Story = {
           Chips render the OKLCH values available at runtime. Lightness per
           shade is fixed by the perceptual L grid; hue and chroma flow through
           from the source hex. Vivid mid-range shades (yellow, cyan, fuchsia,
-          violet) may show reduced chroma where the pinned L sits outside sRGB —
-          compare against the Figma source if a shade looks off.
+          violet) may show reduced chroma where the pinned L sits outside sRGB.
         </p>
       </div>
 

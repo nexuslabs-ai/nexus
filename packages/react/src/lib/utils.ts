@@ -147,7 +147,7 @@ export const NEXUS_CLASS_GROUPS = {
   'border-color': [
     'border-color-default',
     'border-color-default-alpha',
-    'border-color-active',
+    'border-color-focus',
     'border-color-disabled',
     'border-color-warning',
     'border-color-warning-active',

@@ -60,6 +60,15 @@ const TEAM = STARTER_AVATARS;
 // Default single-avatar fixture (Ada) for the size / shape / state stories.
 const AVATAR_URL = STARTER_AVATARS[0].src;
 
+// The same portraits by URL, for the stories a docs page shows as copyable code.
+const PORTRAITS = [
+  { name: 'Ada Lovelace', initials: 'AL', src: '/avatars/ada.svg' },
+  { name: 'Grace Hopper', initials: 'GH', src: '/avatars/grace.svg' },
+  { name: 'Katherine Johnson', initials: 'KJ', src: '/avatars/katherine.svg' },
+  { name: 'Mary Jackson', initials: 'MJ', src: '/avatars/mary.svg' },
+  { name: 'Dorothy Vaughan', initials: 'DV', src: '/avatars/dorothy.svg' },
+];
+
 // Deliberately wide (2:1) source so CroppedImage can demonstrate object-fit: cover.
 const WIDE_AVATAR_URL = `data:image/svg+xml;charset=utf-8,${encodeURIComponent(`
   <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 180 90">
@@ -89,7 +98,7 @@ function TeamAvatar({
   person,
   status,
 }: {
-  person: (typeof TEAM)[number];
+  person: { name: string; initials: string; src: string };
   status?: (typeof STATUS_VALUES)[number];
 }) {
   return (
@@ -106,6 +115,7 @@ function TeamAvatar({
 // ============================================
 
 export const Default: Story = {
+  tags: ['docs'],
   args: {
     size: 'md',
     shape: 'circle',
@@ -113,7 +123,7 @@ export const Default: Story = {
   },
   render: (args) => (
     <Avatar {...args}>
-      <AvatarImage src={AVATAR_URL} alt="Ada Lovelace" />
+      <AvatarImage src="/avatars/ada.svg" alt="Ada Lovelace" />
       <AvatarFallback>AL</AvatarFallback>
     </Avatar>
   ),
@@ -457,11 +467,12 @@ export const WithStatus: Story = {
 };
 
 export const StatusVariants: Story = {
+  tags: ['docs'],
   render: (_args) => (
     <div className="nx:flex nx:items-center nx:gap-4">
       {STATUS_VALUES.map((status, index) => (
         <Avatar key={status} size="lg">
-          <AvatarFallback>{TEAM[index]?.initials ?? 'NA'}</AvatarFallback>
+          <AvatarFallback>{PORTRAITS[index]?.initials ?? 'NA'}</AvatarFallback>
           <AvatarStatus status={status} />
         </Avatar>
       ))}
@@ -515,9 +526,10 @@ export const Group: Story = {
 };
 
 export const GroupWithMax: Story = {
+  tags: ['docs'],
   render: (_args) => (
     <AvatarGroup max={3} role="group" aria-label="Project team">
-      {TEAM.map((person, index) => (
+      {PORTRAITS.map((person, index) => (
         <TeamAvatar
           key={person.name}
           person={person}
@@ -696,6 +708,7 @@ export const FallbackDataAttributes: Story = {
 // ============================================
 
 export const AllSizes: Story = {
+  tags: ['docs'],
   render: (_args) => (
     <div className="nx:flex nx:flex-col nx:gap-8">
       <div>
@@ -709,7 +722,10 @@ export const AllSizes: Story = {
               className="nx:flex nx:flex-col nx:items-center nx:gap-2"
             >
               <Avatar size={size}>
-                <AvatarImage src={AVATAR_URL} alt={`Ada Lovelace ${size}`} />
+                <AvatarImage
+                  src="/avatars/ada.svg"
+                  alt={`Ada Lovelace ${size}`}
+                />
                 <AvatarFallback>{avatarLabel(size)}</AvatarFallback>
               </Avatar>
               <span className="nx:typography-label-small nx:text-muted-foreground">
@@ -727,7 +743,7 @@ export const AllSizes: Story = {
         <div className="nx:flex nx:items-center nx:gap-4">
           <div className="nx:flex nx:flex-col nx:items-center nx:gap-2">
             <Avatar size="xl" shape="circle">
-              <AvatarImage src={AVATAR_URL} alt="Ada Lovelace circle" />
+              <AvatarImage src="/avatars/ada.svg" alt="Ada Lovelace circle" />
               <AvatarFallback>AL</AvatarFallback>
             </Avatar>
             <span className="nx:typography-label-small nx:text-muted-foreground">
@@ -736,7 +752,7 @@ export const AllSizes: Story = {
           </div>
           <div className="nx:flex nx:flex-col nx:items-center nx:gap-2">
             <Avatar size="xl" shape="rounded">
-              <AvatarImage src={AVATAR_URL} alt="Ada Lovelace rounded" />
+              <AvatarImage src="/avatars/ada.svg" alt="Ada Lovelace rounded" />
               <AvatarFallback>AL</AvatarFallback>
             </Avatar>
             <span className="nx:typography-label-small nx:text-muted-foreground">
@@ -778,12 +794,12 @@ export const AllSizes: Story = {
         </h3>
         <div className="nx:flex nx:flex-wrap nx:items-center nx:gap-6">
           <Avatar size="xl" ring>
-            <AvatarImage src={AVATAR_URL} alt="Ada Lovelace selected" />
+            <AvatarImage src="/avatars/ada.svg" alt="Ada Lovelace selected" />
             <AvatarFallback>AL</AvatarFallback>
             <AvatarStatus status="online" />
           </Avatar>
           <AvatarGroup max={3}>
-            {TEAM.map((person, index) => (
+            {PORTRAITS.map((person, index) => (
               <TeamAvatar
                 key={person.name}
                 person={person}

@@ -35,6 +35,7 @@ const row =
 // ============================================
 
 export const Default: Story = {
+  tags: ['docs'],
   render: () => (
     <Marker>
       <MarkerContent>Edited 2 minutes ago</MarkerContent>
@@ -43,6 +44,7 @@ export const Default: Story = {
 };
 
 export const Separator: Story = {
+  tags: ['docs'],
   render: () => (
     <div className={stack}>
       <Marker variant="separator">
@@ -59,6 +61,7 @@ export const Separator: Story = {
 };
 
 export const Border: Story = {
+  tags: ['docs'],
   render: () => (
     <div className={stack}>
       <Marker variant="border">
@@ -84,6 +87,7 @@ export const Border: Story = {
 };
 
 export const WithIcon: Story = {
+  tags: ['docs'],
   render: () => (
     <div className={stack}>
       <Marker>
@@ -113,6 +117,7 @@ export const WithIcon: Story = {
  * reaches assistive tech without stealing focus.
  */
 export const Status: Story = {
+  tags: ['docs'],
   render: () => (
     <div className={stack}>
       <Marker role="status">
@@ -169,6 +174,7 @@ export const WithLink: Story = {
 // ============================================
 
 export const InContext: Story = {
+  tags: ['docs'],
   render: () => (
     <div className="nx:flex nx:w-full nx:max-w-sm nx:flex-col nx:gap-3">
       <div className={row}>Rewrote the onboarding copy</div>
@@ -209,6 +215,7 @@ export const AsChild: Story = {
 };
 
 export const AsChildLink: Story = {
+  tags: ['docs'],
   render: () => (
     <Marker asChild>
       <a href="#pull-request">

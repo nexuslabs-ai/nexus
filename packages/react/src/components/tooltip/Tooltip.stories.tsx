@@ -34,11 +34,19 @@ const meta: Meta<typeof Tooltip> = {
 export default meta;
 type Story = StoryObj<typeof Tooltip>;
 
+const SIDES = [
+  { side: 'top', label: 'Top' },
+  { side: 'right', label: 'Right' },
+  { side: 'bottom', label: 'Bottom' },
+  { side: 'left', label: 'Left' },
+] as const;
+
 // ============================================
 // BASIC STORIES
 // ============================================
 
 export const Default: Story = {
+  tags: ['docs'],
   render: (_args) => (
     <Tooltip>
       <TooltipTrigger asChild>
@@ -103,7 +111,26 @@ export const SideLeft: Story = {
   ),
 };
 
+export const Sides: Story = {
+  tags: ['docs'],
+  render: (_args) => (
+    <div className="nx:flex nx:flex-wrap nx:gap-4">
+      {SIDES.map(({ side, label }) => (
+        <Tooltip key={side}>
+          <TooltipTrigger asChild>
+            <Button variant="outline">{label}</Button>
+          </TooltipTrigger>
+          <TooltipContent side={side}>
+            <p>Tooltip on the {side}</p>
+          </TooltipContent>
+        </Tooltip>
+      ))}
+    </div>
+  ),
+};
+
 export const WithLongContent: Story = {
+  tags: ['docs'],
   render: (_args) => (
     <Tooltip>
       <TooltipTrigger asChild>
@@ -120,6 +147,7 @@ export const WithLongContent: Story = {
 };
 
 export const WithCustomOffset: Story = {
+  tags: ['docs'],
   render: (_args) => (
     <Tooltip>
       <TooltipTrigger asChild>

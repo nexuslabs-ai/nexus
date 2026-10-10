@@ -50,6 +50,7 @@ type Story = StoryObj<typeof Accordion>;
 // ============================================
 
 export const Default: Story = {
+  tags: ['docs'],
   render: ({ variant }) => (
     <Accordion
       type="single"
@@ -110,6 +111,7 @@ export const Stacked: Story = {
 };
 
 export const Multiple: Story = {
+  tags: ['docs'],
   render: ({ variant }) => (
     <Accordion
       type="multiple"
@@ -140,6 +142,7 @@ export const Multiple: Story = {
 };
 
 export const Floating: Story = {
+  tags: ['docs'],
   args: {
     variant: 'floating',
   },
@@ -274,6 +277,7 @@ export const Disabled: Story = {
 };
 
 export const DisabledItem: Story = {
+  tags: ['docs'],
   render: ({ variant }) => (
     <Accordion
       type="single"
@@ -780,7 +784,7 @@ export const AccordionExpandedItemDefaultHeightPinned: Story = {
     docs: {
       description: {
         story:
-          'Pin on the expanded item anatomy: one body-small content line should keep the open item close to the 88px Figma baseline.',
+          'Pin on the expanded item anatomy: one body-small content line should keep the open item at 88–89px.',
       },
     },
   },

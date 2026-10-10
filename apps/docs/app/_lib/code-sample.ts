@@ -10,7 +10,8 @@ import 'server-only';
 
 const LANGS = { bash, css, tsx };
 
-export type CodeSampleLanguage = keyof typeof LANGS;
+// Shiki renders `text` unhighlighted without loading a grammar for it.
+export type CodeSampleLanguage = keyof typeof LANGS | 'text';
 
 let highlighter: Promise<HighlighterCore> | undefined;
 

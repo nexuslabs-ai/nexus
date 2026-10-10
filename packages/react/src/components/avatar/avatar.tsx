@@ -123,7 +123,7 @@ function Avatar({
       className={cn(
         avatarVariants({ size: resolvedSize, shape: resolvedShape }),
         ring &&
-          'nx:ring-2 nx:ring-border-primary nx:ring-offset-2 nx:ring-offset-surface',
+          'nx:ring-2 nx:ring-primary-border nx:ring-offset-2 nx:ring-offset-surface',
         className
       )}
       {...props}

@@ -126,6 +126,7 @@ function CommandRichItem({
 // ============================================
 
 export const Default: Story = {
+  tags: ['docs'],
   render: () => (
     <Command label="Command menu" className={paletteClass}>
       <CommandInput placeholder="Type a command or search..." />
@@ -142,6 +143,7 @@ export const Default: Story = {
 };
 
 export const Grouped: Story = {
+  tags: ['docs'],
   render: () => (
     <Command label="Command menu" className={paletteClass}>
       <CommandInput placeholder="Type a command or search..." />
@@ -230,6 +232,7 @@ export const QueryAwareEmpty: Story = {
 };
 
 export const AsyncLoading: Story = {
+  tags: ['docs'],
   render: () => (
     <Command label="Async command menu" className={paletteClass}>
       <CommandInput placeholder="Search commands..." />
@@ -265,6 +268,7 @@ export const AsyncLoading: Story = {
 };
 
 export const RichItems: Story = {
+  tags: ['docs'],
   render: () => (
     <Command label="Project command menu" className={paletteClass}>
       <CommandInput placeholder="Search project commands..." />

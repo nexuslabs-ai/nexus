@@ -43,6 +43,7 @@ function PanelBody({ label }: { label: string }) {
 
 // Two horizontal panels with a visible grip handle.
 export const Default: Story = {
+  tags: ['docs'],
   render: () => (
     <ResizablePanelGroup
       orientation="horizontal"
@@ -62,6 +63,7 @@ export const Default: Story = {
 
 // Vertical split — the handle flips to a horizontal divider.
 export const Vertical: Story = {
+  tags: ['docs'],
   render: () => (
     <ResizablePanelGroup
       orientation="vertical"
@@ -81,6 +83,7 @@ export const Vertical: Story = {
 
 // Three panels with two handles.
 export const ThreePanels: Story = {
+  tags: ['docs'],
   render: () => (
     <ResizablePanelGroup
       orientation="horizontal"

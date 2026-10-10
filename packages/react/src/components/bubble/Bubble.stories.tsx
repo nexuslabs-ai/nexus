@@ -140,6 +140,7 @@ export const Destructive: Story = {
 // ============================================
 
 export const Alignment: Story = {
+  tags: ['docs'],
   render: () => (
     <BubbleGroup className={column}>
       <Bubble align="start">
@@ -207,6 +208,7 @@ export const RightToLeft: Story = {
 // ============================================
 
 export const WithReactions: Story = {
+  tags: ['docs'],
   render: () => (
     <BubbleGroup className={column}>
       <Bubble align="start">
@@ -1006,6 +1008,7 @@ export const ShowMore: Story = {
 // ============================================
 
 export const AllVariants: Story = {
+  tags: ['docs'],
   render: () => (
     <div className="nx:flex nx:flex-col nx:gap-6">
       {VARIANTS.map((variant) => (

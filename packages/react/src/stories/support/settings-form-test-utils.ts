@@ -3,16 +3,20 @@ import { expect, type Mock, userEvent, waitFor, within } from 'storybook/test';
 import type {
   SettingsFormProps,
   SettingsValues,
-} from '../../recipes/forms/settings-layout';
+} from '../../patterns/forms/settings-layout';
 
 type SettingsPlayContext = {
   canvasElement: HTMLElement;
   args: { onSave: Mock<SettingsFormProps['onSave']> };
 };
 
+// Layout widths can round to the next pixel, so allow one when checking overflow.
+const SUBPIXEL_TOLERANCE = 1;
+
 export const slowSave: SettingsFormProps['onSave'] = (values) =>
   new Promise((resolve) => setTimeout(() => resolve(values), 1000));
 
+/** Holds the next save open until the returned function is called. */
 function controlledSave(args: SettingsPlayContext['args']) {
   let complete: () => void = () => {};
   args.onSave.mockImplementationOnce(
@@ -36,11 +40,9 @@ export async function verifySaveCancel({
   args,
 }: SettingsPlayContext) {
   const canvas = within(canvasElement);
-  const name = canvas.getByRole<HTMLInputElement>('textbox', { name: 'Name' });
+  const name = canvas.getByRole('textbox', { name: 'Name' });
   const updates = canvas.getByRole('checkbox', { name: 'Product updates' });
-  const save = canvas.getByRole<HTMLButtonElement>('button', {
-    name: 'Save changes',
-  });
+  const save = canvas.getByRole('button', { name: 'Save changes' });
   await expect(save).toBeDisabled();
   await userEvent.type(name, 'x');
   await expect(save).toBeEnabled();
@@ -55,23 +57,15 @@ export async function verifySaveCancel({
   await expect(canvas.getByRole('status')).toHaveTextContent(
     'You have unsaved changes.'
   );
-  await userEvent.tab();
-  await expect(save).toHaveFocus();
-  let atFocus: { value: string; saveDisabled: boolean } | undefined;
-  name.addEventListener(
-    'focus',
-    () => (atFocus = { value: name.value, saveDisabled: save.disabled }),
-    { once: true }
-  );
-  await userEvent.keyboard('{Enter}');
+  await userEvent.click(save);
   await expectSaved(canvasElement);
   await expect(args.onSave).toHaveBeenCalledWith({
     name: 'Priya Patel',
     email: 'priya@example.com',
     updates: true,
   });
-  await waitFor(() => expect(name).toHaveFocus());
-  await expect(atFocus).toEqual({ value: 'Priya Patel', saveDisabled: true });
+  await expect(name).toHaveValue('Priya Patel');
+  await expect(name).toHaveFocus();
   await userEvent.type(name, ' unsaved');
   await userEvent.click(updates);
   await userEvent.click(canvas.getByRole('button', { name: 'Cancel' }));
@@ -92,6 +86,7 @@ export async function verifyValidation({
   await userEvent.clear(name);
   await userEvent.type(name, '   ');
   await userEvent.clear(email);
+  await userEvent.type(email, 'invalid');
   await userEvent.keyboard('{Enter}');
   await waitFor(() => expect(name).toHaveFocus());
   await expect(name).toHaveAccessibleDescription(/Enter your name/);
@@ -124,25 +119,28 @@ export async function verifyPending({
   const canvas = within(canvasElement);
   const completeSave = controlledSave(args);
   const name = canvas.getByRole('textbox', { name: 'Name' });
+  const email = canvas.getByRole('textbox', { name: 'Email' });
   const save = canvas.getByRole('button', { name: 'Save changes' });
-  const form = canvas.getByRole<HTMLFormElement>('form');
   await userEvent.type(name, ' Jr');
-  form.requestSubmit();
-  form.requestSubmit();
+  await userEvent.keyboard('{Enter}');
   await waitFor(() =>
     expect(canvas.getByRole('status')).toHaveTextContent('Saving changes')
   );
-  await expect(name).toBeDisabled();
-  await expect(canvas.getByRole('textbox', { name: 'Email' })).toBeDisabled();
+  await expect(name).toHaveAttribute('readonly');
+  await expect(name).toHaveFocus();
+  await expect(email).toHaveAttribute('readonly');
   await expect(canvas.getByRole('checkbox')).toBeDisabled();
   await expect(canvas.getByRole('button', { name: 'Cancel' })).toBeDisabled();
-  await expect(save).toBeDisabled();
+  await expect(save).toHaveAttribute('aria-disabled', 'true');
+  await userEvent.keyboard('{Enter}');
+  await userEvent.tab();
+  await expect(email).toHaveFocus();
   completeSave();
   await expectSaved(canvasElement);
   await expect(args.onSave).toHaveBeenCalledTimes(1);
-  await expect(name).toBeEnabled();
+  await expect(name).not.toHaveAttribute('readonly');
+  await expect(email).toHaveFocus();
   await expect(save).toBeDisabled();
-  await waitFor(() => expect(name).toHaveFocus());
 }
 
 export async function verifyFailure({
@@ -159,9 +157,8 @@ export async function verifyFailure({
     'Your edits are still here'
   );
   await expect(name).toHaveValue('Priya Shah Jr');
-  await expect(name).toBeEnabled();
+  await expect(name).toHaveFocus();
   await expect(save).toBeEnabled();
-  await waitFor(() => expect(save).toHaveFocus());
   args.onSave.mockImplementationOnce(() => Promise.reject(undefined));
   await userEvent.click(save);
   await expect(await canvas.findByRole('alert')).toHaveTextContent(
@@ -173,6 +170,7 @@ export async function verifyFailure({
   await userEvent.click(save);
   await expectSaved(canvasElement);
   await expect(canvas.queryByRole('alert')).not.toBeInTheDocument();
+  await expect(name).toHaveFocus();
   await userEvent.type(name, ' unsaved');
   await userEvent.click(canvas.getByRole('button', { name: 'Cancel' }));
   await expect(name).toHaveValue('Priya Shah Jr');
@@ -185,6 +183,7 @@ export async function verifyErrorAfterSave({
   args,
 }: SettingsPlayContext) {
   const canvas = within(canvasElement);
+  const name = canvas.getByRole('textbox', { name: 'Name' });
   const escaped: unknown[] = [];
   function collect(event: PromiseRejectionEvent) {
     escaped.push(event.reason);
@@ -192,7 +191,7 @@ export async function verifyErrorAfterSave({
   args.onSave.mockResolvedValueOnce(undefined as unknown as SettingsValues);
   window.addEventListener('unhandledrejection', collect);
   try {
-    await userEvent.type(canvas.getByRole('textbox', { name: 'Name' }), ' Jr');
+    await userEvent.type(name, ' Jr');
     await userEvent.click(canvas.getByRole('button', { name: 'Save changes' }));
     await waitFor(() => expect(escaped).toHaveLength(1));
   } finally {
@@ -200,9 +199,8 @@ export async function verifyErrorAfterSave({
   }
   await expect(escaped[0]).toBeInstanceOf(TypeError);
   await expect(args.onSave).toHaveBeenCalledTimes(1);
-  await expect(canvas.getByRole('textbox', { name: 'Name' })).toHaveValue(
-    'Priya Shah Jr'
-  );
+  await expect(name).toHaveValue('Priya Shah Jr');
+  await expect(name).not.toHaveAttribute('readonly');
   await expect(canvas.queryByRole('alert')).not.toBeInTheDocument();
 }
 
@@ -214,14 +212,11 @@ export async function verifyServerNormalized({
   const name = canvas.getByRole('textbox', { name: 'Name' });
   const email = canvas.getByRole('textbox', { name: 'Email' });
   const save = canvas.getByRole('button', { name: 'Save changes' });
-  args.onSave.mockImplementationOnce(async (values) => {
-    const persisted = {
-      ...values,
-      email: values.email.toLowerCase(),
-      id: 'user-42',
-    };
-    return persisted;
-  });
+  args.onSave.mockImplementationOnce(async (values) => ({
+    ...values,
+    email: values.email.toLowerCase(),
+    id: 'user-42',
+  }));
   await userEvent.clear(email);
   await userEvent.type(email, 'PRIYA@Example.com');
   await userEvent.click(save);
@@ -247,10 +242,7 @@ export async function verifyServerNormalized({
   });
 }
 
-/**
- * Needs a harness with "Load a newer copy" (same record, new initialValues)
- * and "Switch record" (keyed remount) buttons around the form.
- */
+/** Needs the `RecordSwitchControls` harness from `settings-form-scenes`. */
 export async function verifyRecordSwitch({
   canvasElement,
   args,
@@ -258,6 +250,7 @@ export async function verifyRecordSwitch({
   const canvas = within(canvasElement);
   const name = () => canvas.getByRole('textbox', { name: 'Name' });
   const save = () => canvas.getByRole('button', { name: 'Save changes' });
+  const switchRecord = canvas.getByRole('button', { name: 'Switch record' });
   await userEvent.type(name(), ' draft');
   await userEvent.click(
     canvas.getByRole('button', { name: 'Load a newer copy' })
@@ -271,7 +264,7 @@ export async function verifyRecordSwitch({
   await waitFor(() =>
     expect(name()).toHaveAccessibleDescription(/Enter your name/)
   );
-  await userEvent.click(canvas.getByRole('button', { name: 'Switch record' }));
+  await userEvent.click(switchRecord);
   await expect(name()).toHaveValue('Arjun Mehta');
   await expect(name()).not.toHaveAccessibleDescription(/Enter your name/);
   await expect(canvas.getByRole('status')).toHaveTextContent(
@@ -284,14 +277,39 @@ export async function verifyRecordSwitch({
   await waitFor(() =>
     expect(canvas.getByRole('status')).toHaveTextContent('Saving changes')
   );
-  await userEvent.click(canvas.getByRole('button', { name: 'Switch record' }));
+  await userEvent.click(switchRecord);
+  const lateSave = args.onSave.mock.results[0]?.value;
   completeSave();
-  await args.onSave.mock.results[args.onSave.mock.results.length - 1]?.value;
+  await lateSave;
   await expect(name()).toHaveValue('Priya Shah');
   await expect(canvas.getByRole('status')).toHaveTextContent(
     'No unsaved changes.'
   );
   await expect(canvas.queryByRole('alert')).not.toBeInTheDocument();
+}
+
+/** Needs the `EditProfileDialog` harness from `settings-form-scenes`. */
+export async function verifyInsideDialog({
+  canvasElement,
+  args,
+}: SettingsPlayContext) {
+  const page = within(canvasElement.ownerDocument.body);
+  const trigger = within(canvasElement).getByRole('button', {
+    name: 'Edit profile',
+  });
+  await userEvent.click(trigger);
+  const dialog = within(
+    await page.findByRole('dialog', { name: 'Edit profile' })
+  );
+  const name = dialog.getByRole('textbox', { name: 'Name' });
+  await userEvent.type(name, ' Jr{Enter}');
+  await waitFor(() =>
+    expect(dialog.getByRole('status')).toHaveTextContent('Changes saved')
+  );
+  await expect(args.onSave).toHaveBeenCalledTimes(1);
+  await expect(name).toHaveFocus();
+  await userEvent.keyboard('{Escape}');
+  await waitFor(() => expect(trigger).toHaveFocus());
 }
 
 export async function verifyNarrow({
@@ -302,5 +320,7 @@ export async function verifyNarrow({
   await userEvent.click(canvas.getByRole('button', { name: 'Save changes' }));
   await expect(await canvas.findByRole('alert')).toBeVisible();
   const form = canvas.getByRole('form');
-  await expect(form.scrollWidth).toBeLessThanOrEqual(form.clientWidth + 1);
+  await expect(form.scrollWidth).toBeLessThanOrEqual(
+    form.clientWidth + SUBPIXEL_TOLERANCE
+  );
 }

@@ -161,6 +161,7 @@ function HandleToggleExample() {
 
 // A bottom drawer (vaul's default direction) with the drag handle.
 export const Default: Story = {
+  tags: ['docs'],
   render: () => (
     <Drawer>
       <DrawerTrigger asChild>
@@ -216,6 +217,7 @@ export const Right: Story = {
 
 // A longer body keeps actions visible while only the content region scrolls.
 export const ScrollableContent: Story = {
+  tags: ['docs'],
   render: () => (
     <Drawer>
       <DrawerTrigger asChild>
@@ -297,6 +299,7 @@ export const ScrollableContent: Story = {
 
 // Header actions can provide an explicit close affordance without changing API.
 export const WithHeaderActions: Story = {
+  tags: ['docs'],
   render: () => (
     <Drawer direction="right">
       <DrawerTrigger asChild>
@@ -792,6 +795,7 @@ export const HiddenHandleNonDismissible: Story = {
 // A trigger per direction. Reused by the per-base variant generator; the static
 // grid shows the closed triggers (portal content only renders when open).
 export const AllVariants: Story = {
+  tags: ['docs'],
   render: () => (
     <div className="nx:flex nx:flex-wrap nx:gap-4">
       {DIRECTIONS.map((direction) => (

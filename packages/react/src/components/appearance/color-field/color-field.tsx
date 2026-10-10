@@ -42,7 +42,10 @@ export function NexusAppearanceColorField({
   const resetDraft = () => setDraft(value);
 
   return (
-    <div className="nx:flex nx:items-center nx:gap-2">
+    <div
+      data-slot="appearance-color-field"
+      className="nx:flex nx:items-center nx:gap-2"
+    >
       <div className="nx:relative nx:size-7 nx:shrink-0">
         <input
           type="color"

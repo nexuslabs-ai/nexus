@@ -134,7 +134,45 @@ export const Default: Story = {
   },
 };
 
+// ============================================
+// SHOWCASE
+// ============================================
+
+export const AllVariants: Story = {
+  tags: ['docs'],
+  render: () => (
+    <MessageScrollerProvider>
+      <MessageScroller className={frame}>
+        <MessageScrollerViewport>
+          <MessageScrollerContent>
+            {Array.from({ length: 14 }, (_, index) => (
+              <MessageScrollerItem key={index}>
+                <Turn index={index} />
+              </MessageScrollerItem>
+            ))}
+          </MessageScrollerContent>
+        </MessageScrollerViewport>
+        <MessageScrollerButton direction="start" />
+        <MessageScrollerButton direction="end" />
+      </MessageScroller>
+    </MessageScrollerProvider>
+  ),
+  play: async ({ canvasElement }) => {
+    const root = canvasElement.querySelector<HTMLElement>(
+      '[data-slot="message-scroller"]'
+    )!;
+    const buttons = root.querySelectorAll<HTMLElement>(
+      '[data-slot="message-scroller-button"]'
+    );
+
+    await expect(buttons).toHaveLength(2);
+    await expect(buttons[0]).toHaveAttribute('data-direction', 'start');
+    await expect(buttons[1]).toHaveAttribute('data-direction', 'end');
+  },
+};
+
 export const EmptyStream: Story = {
+  tags: ['docs'],
   render: () => (
     <MessageScrollerProvider>
       <MessageScroller className={frame}>
@@ -322,6 +360,7 @@ export const StreamingWhileScrolledAway: Story = {
 };
 
 export const ScrollToStart: Story = {
+  tags: ['docs'],
   render: () => (
     <AppendableStream>
       <MessageScrollerButton direction="start" />
@@ -372,6 +411,7 @@ export const ScrollToStart: Story = {
 };
 
 export const SendFromComposer: Story = {
+  tags: ['docs'],
   render: () => <AppendableStream />,
   play: async ({ canvasElement }) => {
     const canvas = within(canvasElement);
@@ -566,41 +606,5 @@ export const WithDataAttributes: Story = {
       await expect(root).toHaveAttribute('data-at-end', 'true');
       await expect(root).toHaveAttribute('data-at-start', 'false');
     });
-  },
-};
-
-// ============================================
-// SHOWCASE
-// ============================================
-
-export const AllVariants: Story = {
-  render: () => (
-    <MessageScrollerProvider>
-      <MessageScroller className={frame}>
-        <MessageScrollerViewport>
-          <MessageScrollerContent>
-            {Array.from({ length: 14 }, (_, index) => (
-              <MessageScrollerItem key={index}>
-                <Turn index={index} />
-              </MessageScrollerItem>
-            ))}
-          </MessageScrollerContent>
-        </MessageScrollerViewport>
-        <MessageScrollerButton direction="start" />
-        <MessageScrollerButton direction="end" />
-      </MessageScroller>
-    </MessageScrollerProvider>
-  ),
-  play: async ({ canvasElement }) => {
-    const root = canvasElement.querySelector<HTMLElement>(
-      '[data-slot="message-scroller"]'
-    )!;
-    const buttons = root.querySelectorAll<HTMLElement>(
-      '[data-slot="message-scroller-button"]'
-    );
-
-    await expect(buttons).toHaveLength(2);
-    await expect(buttons[0]).toHaveAttribute('data-direction', 'start');
-    await expect(buttons[1]).toHaveAttribute('data-direction', 'end');
   },
 };

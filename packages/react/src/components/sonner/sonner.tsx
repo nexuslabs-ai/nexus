@@ -57,16 +57,16 @@ const toasterThemeVars = {
   '--border-radius': 'var(--nx-radius-md)',
   '--success-bg': 'var(--nx-color-success-background)',
   '--success-text': 'var(--nx-color-success-foreground)',
-  '--success-border': 'var(--nx-color-border-success)',
+  '--success-border': 'var(--nx-color-success-border)',
   '--info-bg': 'var(--nx-color-information-background)',
   '--info-text': 'var(--nx-color-information-foreground)',
-  '--info-border': 'var(--nx-color-border-information)',
+  '--info-border': 'var(--nx-color-information-border)',
   '--warning-bg': 'var(--nx-color-warning-background)',
   '--warning-text': 'var(--nx-color-warning-foreground)',
-  '--warning-border': 'var(--nx-color-border-warning)',
+  '--warning-border': 'var(--nx-color-warning-border)',
   '--error-bg': 'var(--nx-color-error-background)',
   '--error-text': 'var(--nx-color-error-foreground)',
-  '--error-border': 'var(--nx-color-border-error)',
+  '--error-border': 'var(--nx-color-error-border)',
 };
 
 /**

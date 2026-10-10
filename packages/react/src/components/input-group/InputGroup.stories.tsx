@@ -24,6 +24,7 @@ type Story = StoryObj<typeof InputGroup>;
 
 // A search field: a leading icon addon and the input.
 export const Default: Story = {
+  tags: ['docs'],
   render: () => (
     <InputGroup className="nx:w-80">
       <InputGroupAddon>
@@ -36,6 +37,7 @@ export const Default: Story = {
 
 // A trailing button addon.
 export const WithButton: Story = {
+  tags: ['docs'],
   render: () => (
     <InputGroup className="nx:w-80">
       <InputGroupInput aria-label="Email" placeholder="you@example.com" />
@@ -48,6 +50,7 @@ export const WithButton: Story = {
 
 // A text prefix addon.
 export const WithText: Story = {
+  tags: ['docs'],
   render: () => (
     <InputGroup className="nx:w-80">
       <InputGroupAddon>
@@ -60,16 +63,17 @@ export const WithText: Story = {
 
 // Addons at each alignment — inline start/end and stacked block start/end.
 export const Alignments: Story = {
+  tags: ['docs'],
   render: () => (
     <div className="nx:flex nx:w-80 nx:flex-col nx:gap-3">
       <InputGroup>
         <InputGroupAddon align="inline-start">
           <IconMail aria-hidden />
         </InputGroupAddon>
-        <InputGroupInput aria-label="Inline start" placeholder="inline-start" />
+        <InputGroupInput aria-label="Email" placeholder="you@example.com" />
       </InputGroup>
       <InputGroup>
-        <InputGroupInput aria-label="Inline end" placeholder="inline-end" />
+        <InputGroupInput aria-label="Search" placeholder="Search projects" />
         <InputGroupAddon align="inline-end">
           <InputGroupButton size="icon-xs" aria-label="Clear">
             <IconX aria-hidden />
@@ -80,10 +84,13 @@ export const Alignments: Story = {
         <InputGroupAddon align="block-start">
           <InputGroupText>Bio</InputGroupText>
         </InputGroupAddon>
-        <InputGroupInput aria-label="Bio" placeholder="block-start" />
+        <InputGroupInput aria-label="Bio" placeholder="A few words about you" />
       </InputGroup>
       <InputGroup>
-        <InputGroupInput aria-label="With counter" placeholder="block-end" />
+        <InputGroupInput
+          aria-label="Status"
+          placeholder="What are you working on?"
+        />
         <InputGroupAddon align="block-end">
           <InputGroupText>0 / 200</InputGroupText>
         </InputGroupAddon>
@@ -130,6 +137,7 @@ export const ButtonSizes: Story = {
 
 // A textarea with a stacked footer addon.
 export const WithTextarea: Story = {
+  tags: ['docs'],
   render: () => (
     <InputGroup className="nx:w-80">
       <InputGroupTextarea aria-label="Message" placeholder="Your message…" />
@@ -298,6 +306,7 @@ export const KeyboardInteraction: Story = {
 
 // A disabled control + button; the group dims its addons via data-disabled.
 export const Disabled: Story = {
+  tags: ['docs'],
   render: () => (
     <InputGroup className="nx:w-80" data-disabled="true">
       <InputGroupInput
@@ -389,7 +398,7 @@ export const BorderlessStates: Story = {
       canvas.getByRole('textbox', { name: 'Invalid borderless email' })
     ).toHaveAttribute('aria-invalid', 'true');
     await expect(invalid).toHaveClass(
-      'nx:has-[[data-slot][aria-invalid=true]]:border-border-error'
+      'nx:has-[[data-slot][aria-invalid=true]]:border-error-border'
     );
     const invalidStyles = window.getComputedStyle(invalid);
     await expect(
@@ -468,7 +477,7 @@ export const StateMatrix: Story = {
         <span className="nx:typography-label-default nx:text-foreground">
           Warning
         </span>
-        <InputGroup className="nx:border-border-warning">
+        <InputGroup className="nx:border-warning-border">
           <InputGroupInput
             aria-label="Warning email"
             aria-describedby="state-warning-message"
@@ -593,28 +602,34 @@ export const BorderlessHoverSurface: Story = {
 
 // The three sizes — sm / default (implicit) / lg — match standalone Input.
 export const Sizes: Story = {
+  tags: ['docs'],
   render: () => (
     <div className="nx:flex nx:w-80 nx:flex-col nx:gap-3">
       <InputGroup>
         <InputGroupAddon>
           <IconSearch aria-hidden />
         </InputGroupAddon>
-        <InputGroupInput size="sm" aria-label="Small" placeholder="sm" />
-      </InputGroup>
-      <InputGroup>
-        <InputGroupAddon>
-          <IconSearch aria-hidden />
-        </InputGroupAddon>
         <InputGroupInput
-          aria-label="Default"
-          placeholder="default (implicit)"
+          size="sm"
+          aria-label="Search, small"
+          placeholder="Search"
         />
       </InputGroup>
       <InputGroup>
         <InputGroupAddon>
           <IconSearch aria-hidden />
         </InputGroupAddon>
-        <InputGroupInput size="lg" aria-label="Large" placeholder="lg" />
+        <InputGroupInput aria-label="Search, default" placeholder="Search" />
+      </InputGroup>
+      <InputGroup>
+        <InputGroupAddon>
+          <IconSearch aria-hidden />
+        </InputGroupAddon>
+        <InputGroupInput
+          size="lg"
+          aria-label="Search, large"
+          placeholder="Search"
+        />
       </InputGroup>
     </div>
   ),

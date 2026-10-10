@@ -23,16 +23,25 @@ const label = 'nx:text-muted-foreground nx:mb-1 nx:block';
 // ============================================
 
 export const Default: Story = {
+  tags: ['docs'],
   render: () => (
-    <Show above="lg" as="div">
-      <div className={box}>
-        Visible when the viewport is <strong>lg</strong> (≥ 64rem) or wider.
-      </div>
-    </Show>
+    <div className="nx:flex nx:flex-col nx:gap-2">
+      <Show above="lg" as="div">
+        <div className={box}>
+          Visible when the viewport is <strong>lg</strong> (≥ 64rem) or wider.
+        </div>
+      </Show>
+      <Show below="lg" as="div">
+        <div className={box}>
+          Visible when the viewport is narrower than <strong>lg</strong>.
+        </div>
+      </Show>
+    </div>
   ),
 };
 
 export const AllAxes: Story = {
+  tags: ['docs'],
   render: () => (
     <div className="nx:flex nx:flex-col nx:gap-4">
       <div>
@@ -167,7 +176,7 @@ export const FlexParent: Story = {
         <Show containerAbove="md" data-testid="wrap">
           <div
             data-testid="item-b"
-            className="nx:rounded-md nx:border-default nx:border-border-primary"
+            className="nx:rounded-md nx:border-default nx:border-primary-border"
             style={{ width: 48, height: 48 }}
           />
         </Show>

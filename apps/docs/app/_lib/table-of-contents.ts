@@ -1,3 +1,5 @@
+import { getScrollOffset } from './scroll-offset';
+
 export const DOCS_ARTICLE_ID = 'docs-article';
 
 export type TocEntry = {
@@ -16,6 +18,8 @@ export function collectHeadings(article: HTMLElement): TocEntry[] {
     if (!heading.id || !text || seen.has(heading.id)) continue;
     // remark-gfm appends a hidden "Footnotes" heading no page author wrote.
     if (heading.closest('[data-footnotes]')) continue;
+    // A demo's own headings belong to the example, not to the page's outline.
+    if (heading.closest('[data-slot="component-demo"]')) continue;
 
     seen.add(heading.id);
     entries.push({
@@ -41,7 +45,7 @@ export function getActiveHeadingId(entries: TocEntry[]): string | null {
 
   // scroll-padding-top is where an anchor jump lands, so a clicked entry stays
   // active; 1px of tolerance because that jump ends on a fractional pixel.
-  const offset = parseFloat(getComputedStyle(root).scrollPaddingTop) || 0;
+  const offset = getScrollOffset();
   const active = entries.findLast((entry) => {
     const top = document.getElementById(entry.id)?.getBoundingClientRect().top;
     return top !== undefined && top - offset <= 1;

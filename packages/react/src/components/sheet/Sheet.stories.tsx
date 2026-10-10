@@ -1,3 +1,5 @@
+import * as React from 'react';
+
 import type { Meta, StoryObj } from '@storybook/react';
 import { expect, userEvent, waitFor, within } from 'storybook/test';
 
@@ -7,6 +9,7 @@ import {
 } from '../../stories/support/overlay-motion-test-utils';
 import { Button } from '../button';
 import { Input } from '../input';
+import { Label } from '../label';
 
 import {
   Sheet,
@@ -46,6 +49,7 @@ const SIDES = ['top', 'right', 'bottom', 'left'] as const;
 // ============================================
 
 export const Default: Story = {
+  tags: ['docs'],
   render: (_args) => (
     <Sheet>
       <SheetTrigger asChild>
@@ -134,47 +138,47 @@ export const Bottom: Story = {
 };
 
 export const WithForm: Story = {
-  render: (_args) => (
-    <Sheet>
-      <SheetTrigger asChild>
-        <Button>Edit Profile</Button>
-      </SheetTrigger>
-      <SheetContent>
-        <SheetHeader>
-          <SheetTitle>Edit Profile</SheetTitle>
-          <SheetDescription>
-            Update your profile here, then save when you are done.
-          </SheetDescription>
-        </SheetHeader>
-        <SheetBody className="nx:grid nx:gap-4">
-          <div className="nx:grid nx:gap-1.5">
-            <label htmlFor="sheet-name" className="nx:typography-label-default">
-              Name
-            </label>
-            <Input id="sheet-name" defaultValue="John Doe" />
-          </div>
-          <div className="nx:grid nx:gap-1.5">
-            <label
-              htmlFor="sheet-username"
-              className="nx:typography-label-default"
-            >
-              Username
-            </label>
-            <Input id="sheet-username" defaultValue="@johndoe" />
-          </div>
-        </SheetBody>
-        <SheetFooter>
-          <SheetClose asChild>
-            <Button variant="outline">Cancel</Button>
-          </SheetClose>
-          <Button type="submit">Save changes</Button>
-        </SheetFooter>
-      </SheetContent>
-    </Sheet>
-  ),
+  tags: ['docs'],
+  render: function WithFormStory() {
+    const nameId = React.useId();
+    const usernameId = React.useId();
+
+    return (
+      <Sheet>
+        <SheetTrigger asChild>
+          <Button>Edit Profile</Button>
+        </SheetTrigger>
+        <SheetContent>
+          <SheetHeader>
+            <SheetTitle>Edit Profile</SheetTitle>
+            <SheetDescription>
+              Update your profile here, then save when you are done.
+            </SheetDescription>
+          </SheetHeader>
+          <SheetBody className="nx:grid nx:gap-4">
+            <div className="nx:grid nx:gap-1.5">
+              <Label htmlFor={nameId}>Name</Label>
+              <Input id={nameId} defaultValue="John Doe" />
+            </div>
+            <div className="nx:grid nx:gap-1.5">
+              <Label htmlFor={usernameId}>Username</Label>
+              <Input id={usernameId} defaultValue="@johndoe" />
+            </div>
+          </SheetBody>
+          <SheetFooter>
+            <SheetClose asChild>
+              <Button variant="outline">Cancel</Button>
+            </SheetClose>
+            <Button type="submit">Save changes</Button>
+          </SheetFooter>
+        </SheetContent>
+      </Sheet>
+    );
+  },
 };
 
 export const ScrollableContent: Story = {
+  tags: ['docs'],
   render: (_args) => (
     <Sheet>
       <SheetTrigger asChild>
@@ -482,6 +486,7 @@ export const WithDataAttributes: Story = {
 // ============================================
 
 export const AllVariants: Story = {
+  tags: ['docs'],
   render: (_args) => (
     <div className="nx:flex nx:flex-wrap nx:gap-4">
       {SIDES.map((side) => (

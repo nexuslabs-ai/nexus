@@ -60,7 +60,7 @@ function Checkbox({ className, ...props }: CheckboxProps) {
         'nx:rounded-sm nx:border-default nx:border-border-default nx:bg-container',
         'nx:transition-control',
         'nx:focus-visible:outline-2 nx:focus-visible:outline-focus-default',
-        'nx:aria-invalid:border-border-error nx:aria-invalid:focus-visible:outline-focus-error',
+        'nx:aria-invalid:border-error-border nx:aria-invalid:focus-visible:outline-focus-error',
         'nx:disabled:cursor-not-allowed nx:disabled:border-border-disabled nx:disabled:bg-disabled',
         'nx:enabled:data-[state=unchecked]:hover:bg-container-hover nx:enabled:data-[state=unchecked]:active:bg-container-active',
         'nx:data-[state=checked]:border-primary-background nx:data-[state=checked]:bg-primary-background nx:data-[state=checked]:text-primary-foreground',
@@ -72,12 +72,12 @@ function Checkbox({ className, ...props }: CheckboxProps) {
         'nx:data-[state=checked]:disabled:border-primary-disabled nx:data-[state=checked]:disabled:bg-primary-disabled',
         'nx:data-[state=indeterminate]:disabled:border-primary-disabled nx:data-[state=indeterminate]:disabled:bg-primary-disabled',
         // Invalid + checked/indeterminate: aria-invalid is the single authoring hook.
-        'nx:aria-invalid:data-[state=checked]:border-border-error nx:aria-invalid:data-[state=checked]:bg-error-background nx:aria-invalid:data-[state=checked]:text-error-foreground',
-        'nx:aria-invalid:data-[state=indeterminate]:border-border-error nx:aria-invalid:data-[state=indeterminate]:bg-error-background nx:aria-invalid:data-[state=indeterminate]:text-error-foreground',
-        'nx:enabled:aria-invalid:data-[state=checked]:hover:border-border-error nx:enabled:aria-invalid:data-[state=checked]:hover:bg-error-background-hover',
-        'nx:enabled:aria-invalid:data-[state=checked]:active:border-border-error nx:enabled:aria-invalid:data-[state=checked]:active:bg-error-background-active',
-        'nx:enabled:aria-invalid:data-[state=indeterminate]:hover:border-border-error nx:enabled:aria-invalid:data-[state=indeterminate]:hover:bg-error-background-hover',
-        'nx:enabled:aria-invalid:data-[state=indeterminate]:active:border-border-error nx:enabled:aria-invalid:data-[state=indeterminate]:active:bg-error-background-active',
+        'nx:aria-invalid:data-[state=checked]:border-error-border nx:aria-invalid:data-[state=checked]:bg-error-background nx:aria-invalid:data-[state=checked]:text-error-foreground',
+        'nx:aria-invalid:data-[state=indeterminate]:border-error-border nx:aria-invalid:data-[state=indeterminate]:bg-error-background nx:aria-invalid:data-[state=indeterminate]:text-error-foreground',
+        'nx:enabled:aria-invalid:data-[state=checked]:hover:border-error-border nx:enabled:aria-invalid:data-[state=checked]:hover:bg-error-background-hover',
+        'nx:enabled:aria-invalid:data-[state=checked]:active:border-error-border nx:enabled:aria-invalid:data-[state=checked]:active:bg-error-background-active',
+        'nx:enabled:aria-invalid:data-[state=indeterminate]:hover:border-error-border nx:enabled:aria-invalid:data-[state=indeterminate]:hover:bg-error-background-hover',
+        'nx:enabled:aria-invalid:data-[state=indeterminate]:active:border-error-border nx:enabled:aria-invalid:data-[state=indeterminate]:active:bg-error-background-active',
         className
       )}
       {...props}

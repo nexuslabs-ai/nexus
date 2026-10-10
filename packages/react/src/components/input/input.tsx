@@ -2,6 +2,7 @@ import * as React from 'react';
 
 import { cva, type VariantProps } from 'class-variance-authority';
 
+import { fieldSizeVariants } from '../../lib/field-size';
 import { cn } from '../../lib/utils';
 
 const inputVariants = cva(
@@ -11,21 +12,19 @@ const inputVariants = cva(
     'nx:file:border-0 nx:file:bg-transparent nx:file:typography-label-default nx:file:text-foreground nx:disabled:file:text-disabled-foreground',
     'nx:placeholder:text-muted-foreground',
     'nx:focus-visible:outline-default nx:focus-visible:outline-focus-default nx:focus-visible:border-focus-default',
-    'nx:aria-invalid:border-border-error nx:aria-invalid:focus-visible:outline-focus-error nx:aria-invalid:focus-visible:border-focus-error',
+    'nx:aria-invalid:border-error-border nx:aria-invalid:focus-visible:outline-focus-error nx:aria-invalid:focus-visible:border-focus-error',
     'nx:disabled:cursor-not-allowed nx:disabled:bg-disabled nx:disabled:autofill-bg-disabled nx:disabled:text-disabled-foreground nx:disabled:autofill-text-disabled-foreground nx:disabled:placeholder:text-disabled-foreground',
   ],
   {
     variants: {
-      size: {
-        default: 'nx:h-10 nx:px-3 nx:py-0 nx:typography-body-default',
-        sm: 'nx:h-8 nx:px-2.5 nx:py-0 nx:typography-body-small',
-        lg: 'nx:h-12 nx:px-3.5 nx:py-0 nx:typography-body-default',
-      },
+      size: fieldSizeVariants,
       variant: {
         bordered:
           'nx:border-border-default nx:bg-container nx:autofill-bg-container nx:enabled:hover:bg-container-hover nx:enabled:hover:autofill-bg-container-hover nx:disabled:border-border-disabled',
         borderless:
           'nx:border-transparent nx:bg-control-background nx:autofill-bg-control-background nx:enabled:hover:bg-control-background-hover nx:enabled:hover:autofill-bg-control-background-hover',
+        ghost:
+          'nx:border-transparent nx:bg-transparent nx:autofill-bg-transparent nx:enabled:hover:not-aria-invalid:not-focus-visible:border-border-default',
       },
     },
     defaultVariants: {
@@ -52,7 +51,9 @@ interface InputProps
  * Supports different sizes and all native input attributes. The
  * `variant="bordered"` treatment is the default; use `variant="borderless"` to
  * remove the resting field stroke while keeping a tonal control fill for
- * resting affordance.
+ * resting affordance. `variant="ghost"` has neither stroke nor fill at rest, so
+ * the field reads as the text around it; the stroke returns on hover, focus
+ * and invalid.
  *
  * Browsers repaint an autofilled field with their own surface and text colour,
  * so each `bg-*` / `text-*` class is paired with an `autofill-bg-*` /

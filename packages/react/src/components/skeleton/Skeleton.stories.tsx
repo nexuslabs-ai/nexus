@@ -25,28 +25,10 @@ export const Default: Story = {
   },
 };
 
-// A circular placeholder for an avatar or icon.
-export const Circle: Story = {
-  args: {
-    className: 'nx:size-12 nx:rounded-full',
-  },
-};
-
-// Stacked lines for a paragraph; the last line is shorter to mimic a ragged
-// final row of text.
-export const TextLines: Story = {
-  render: () => (
-    <div className="nx:flex nx:flex-col nx:gap-2">
-      <Skeleton className="nx:h-4 nx:w-full" />
-      <Skeleton className="nx:h-4 nx:w-full" />
-      <Skeleton className="nx:h-4 nx:w-4/5" />
-    </div>
-  ),
-};
-
 // A composed "card is loading" layout: a media block over an avatar circle
 // with heading and subtitle lines.
 export const CardSkeleton: Story = {
+  tags: ['docs'],
   render: () => (
     <div className="nx:flex nx:w-80 nx:flex-col nx:gap-4">
       <Skeleton className="nx:h-40 nx:w-full nx:rounded-lg" />
@@ -57,6 +39,27 @@ export const CardSkeleton: Story = {
           <Skeleton className="nx:h-3 nx:w-3/4" />
         </div>
       </div>
+    </div>
+  ),
+};
+
+// A circular placeholder for an avatar or icon.
+export const Circle: Story = {
+  tags: ['docs'],
+  args: {
+    className: 'nx:size-12 nx:rounded-full',
+  },
+};
+
+// Stacked lines for a paragraph; the last line is shorter to mimic a ragged
+// final row of text.
+export const TextLines: Story = {
+  tags: ['docs'],
+  render: () => (
+    <div className="nx:flex nx:flex-col nx:gap-2">
+      <Skeleton className="nx:h-4 nx:w-full" />
+      <Skeleton className="nx:h-4 nx:w-full" />
+      <Skeleton className="nx:h-4 nx:w-4/5" />
     </div>
   ),
 };

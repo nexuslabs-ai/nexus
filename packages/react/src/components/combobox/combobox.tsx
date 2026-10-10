@@ -101,7 +101,7 @@ function ComboboxTrigger({
         variant={variant}
         className={cn(
           'nx:w-full nx:justify-between',
-          'nx:aria-invalid:border-border-error nx:aria-invalid:focus-visible:outline-focus-error',
+          'nx:aria-invalid:border-error-border nx:aria-invalid:focus-visible:outline-focus-error',
           className
         )}
         {...props}
