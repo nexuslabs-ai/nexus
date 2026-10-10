@@ -101,7 +101,7 @@ export function SettingsForm({
       onCancel={cancelChanges}
     >
       <SettingsFields
-        pending={pending}
+        submitting={pending}
         nameField={{
           name: 'name',
           ref: nameRef,

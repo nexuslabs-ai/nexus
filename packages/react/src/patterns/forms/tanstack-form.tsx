@@ -113,7 +113,7 @@ export function TanStackFormExample({
       onCancel={cancelChanges}
     >
       <SettingsFields
-        pending={submitting}
+        submitting={submitting}
         nameField={{
           name: name.name,
           ref: nameRef,

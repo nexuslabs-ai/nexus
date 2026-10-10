@@ -99,7 +99,7 @@ export function ReactHookFormExample({
       onCancel={cancelChanges}
     >
       <SettingsFields
-        pending={submitting}
+        submitting={submitting}
         nameField={{
           ...name.field,
           ref: attachName,
