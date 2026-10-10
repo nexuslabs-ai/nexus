@@ -34,7 +34,7 @@ const meta: Meta<typeof Input> = {
     },
     variant: {
       control: 'select',
-      options: ['bordered', 'borderless'],
+      options: ['bordered', 'borderless', 'ghost'],
       description: 'The visual treatment of the input',
     },
     type: {
@@ -55,6 +55,37 @@ const meta: Meta<typeof Input> = {
 
 export default meta;
 type Story = StoryObj<typeof Input>;
+
+// Play functions can't put an element in a real `:hover` state, so this reads
+// the border colours that `:hover` rules would apply to the element if it were
+// hovered. Nested rules resolve `&` against their parent selector.
+function hoverBorderColors(element: Element) {
+  const unescapedHover = /(?<!\\):hover/g;
+  const colors: string[] = [];
+
+  function visit(rules: CSSRuleList, parent: string) {
+    for (const rule of rules) {
+      const selector =
+        rule instanceof CSSStyleRule
+          ? rule.selectorText.replace(/(?<!\\)&/g, `:is(${parent})`)
+          : parent;
+      const color =
+        (rule instanceof CSSStyleRule ||
+          rule instanceof CSSNestedDeclarations) &&
+        rule.style.getPropertyValue('border-color');
+      const unhovered = selector.replace(unescapedHover, '');
+      if (color && unhovered !== selector && element.matches(unhovered)) {
+        colors.push(color);
+      }
+      if (rule instanceof CSSGroupingRule || rule instanceof CSSStyleRule) {
+        visit(rule.cssRules, selector);
+      }
+    }
+  }
+
+  for (const sheet of document.styleSheets) visit(sheet.cssRules, '');
+  return colors;
+}
 
 // ============================================
 // BASIC STORIES
@@ -212,6 +243,57 @@ export const BorderlessStates: Story = {
     await expect(disabled).not.toHaveClass(
       'nx:disabled:border-border-disabled'
     );
+  },
+};
+
+export const GhostStates: Story = {
+  render: () => (
+    <div className="nx:flex nx:w-[400px] nx:flex-col nx:gap-3">
+      <Input
+        data-testid="input-ghost-filled"
+        variant="ghost"
+        defaultValue="Quarterly planning"
+        aria-label="Filled ghost input"
+      />
+      <Input
+        data-testid="input-ghost-invalid"
+        variant="ghost"
+        defaultValue="invalid@"
+        aria-invalid
+        aria-label="Invalid ghost input"
+      />
+      <Input
+        data-testid="input-ghost-disabled"
+        variant="ghost"
+        placeholder="Disabled"
+        disabled
+      />
+    </div>
+  ),
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+    const filled = canvas.getByTestId('input-ghost-filled');
+    const invalid = canvas.getByTestId('input-ghost-invalid');
+
+    await expect(filled).toHaveAttribute('data-variant', 'ghost');
+    const rest = window.getComputedStyle(filled);
+    await expect(rest.borderTopColor).toBe('rgba(0, 0, 0, 0)');
+    await expect(rest.backgroundColor).toBe('rgba(0, 0, 0, 0)');
+
+    await expect(hoverBorderColors(filled)).toEqual([
+      expect.stringMatching(/^var\(\s*--nx-color-border-default,/),
+    ]);
+
+    await expect(window.getComputedStyle(invalid).borderTopColor).not.toBe(
+      'rgba(0, 0, 0, 0)'
+    );
+    await expect(hoverBorderColors(invalid)).toHaveLength(0);
+
+    filled.focus();
+    await expect(filled).toHaveFocus();
+    await expect(hoverBorderColors(filled)).toHaveLength(0);
+
+    await expect(canvas.getByTestId('input-ghost-disabled')).toBeDisabled();
   },
 };
 
@@ -649,6 +731,12 @@ export const AllVariants: Story = {
               borderless
             </span>
             <Input variant="borderless" placeholder="Borderless input" />
+          </div>
+          <div className="nx:flex nx:items-center nx:gap-4">
+            <span className="nx:typography-label-small nx:text-muted-foreground nx:w-20">
+              ghost
+            </span>
+            <Input variant="ghost" placeholder="Ghost input" />
           </div>
         </div>
       </div>

@@ -23,6 +23,8 @@ const inputVariants = cva(
           'nx:border-border-default nx:bg-container nx:autofill-bg-container nx:enabled:hover:bg-container-hover nx:enabled:hover:autofill-bg-container-hover nx:disabled:border-border-disabled',
         borderless:
           'nx:border-transparent nx:bg-control-background nx:autofill-bg-control-background nx:enabled:hover:bg-control-background-hover nx:enabled:hover:autofill-bg-control-background-hover',
+        ghost:
+          'nx:border-transparent nx:bg-transparent nx:autofill-bg-transparent nx:enabled:hover:not-aria-invalid:not-focus-visible:border-border-default',
       },
     },
     defaultVariants: {
@@ -49,7 +51,9 @@ interface InputProps
  * Supports different sizes and all native input attributes. The
  * `variant="bordered"` treatment is the default; use `variant="borderless"` to
  * remove the resting field stroke while keeping a tonal control fill for
- * resting affordance.
+ * resting affordance. `variant="ghost"` has neither stroke nor fill at rest, so
+ * the field reads as the text around it; the stroke returns on hover, focus
+ * and invalid.
  *
  * Browsers repaint an autofilled field with their own surface and text colour,
  * so each `bg-*` / `text-*` class is paired with an `autofill-bg-*` /
