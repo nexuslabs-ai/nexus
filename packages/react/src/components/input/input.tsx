@@ -24,7 +24,7 @@ const inputVariants = cva(
         borderless:
           'nx:border-transparent nx:bg-control-background nx:autofill-bg-control-background nx:enabled:hover:bg-control-background-hover nx:enabled:hover:autofill-bg-control-background-hover',
         ghost:
-          'nx:border-transparent nx:bg-transparent nx:autofill-bg-transparent nx:enabled:hover:border-border-default',
+          'nx:border-transparent nx:bg-transparent nx:autofill-bg-transparent nx:enabled:hover:not-aria-invalid:not-focus-visible:border-border-default',
       },
     },
     defaultVariants: {

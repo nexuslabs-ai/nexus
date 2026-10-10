@@ -56,6 +56,35 @@ const meta: Meta<typeof Input> = {
 export default meta;
 type Story = StoryObj<typeof Input>;
 
+// Play functions can't put an element in a real `:hover` state, so this reads
+// the border colours that `:hover` rules would apply to the element if it were
+// hovered. Nested rules resolve `&` against their parent selector.
+function hoverBorderColors(element: Element) {
+  const unescapedHover = /(?<!\\):hover/g;
+  const colors: string[] = [];
+
+  function visit(rules: CSSRuleList, parent: string) {
+    for (const rule of rules) {
+      const selector =
+        rule instanceof CSSStyleRule
+          ? rule.selectorText.replace(/(?<!\\)&/g, `:is(${parent})`)
+          : parent;
+      const color =
+        (rule instanceof CSSStyleRule ||
+          rule instanceof CSSNestedDeclarations) &&
+        rule.style.getPropertyValue('border-color');
+      const unhovered = selector.replace(unescapedHover, '');
+      if (color && unhovered !== selector && element.matches(unhovered)) {
+        colors.push(color);
+      }
+      if ('cssRules' in rule) visit(rule.cssRules as CSSRuleList, selector);
+    }
+  }
+
+  for (const sheet of document.styleSheets) visit(sheet.cssRules, '');
+  return colors;
+}
+
 // ============================================
 // BASIC STORIES
 // ============================================
@@ -249,11 +278,17 @@ export const GhostStates: Story = {
     await expect(rest.borderTopColor).toBe('rgba(0, 0, 0, 0)');
     await expect(rest.backgroundColor).toBe('rgba(0, 0, 0, 0)');
 
-    await expect(filled).toHaveClass('nx:enabled:hover:border-border-default');
+    await expect(hoverBorderColors(filled)).not.toHaveLength(0);
 
     await expect(window.getComputedStyle(invalid).borderTopColor).not.toBe(
       'rgba(0, 0, 0, 0)'
     );
+    await expect(hoverBorderColors(invalid)).toHaveLength(0);
+
+    filled.focus();
+    await expect(filled).toHaveFocus();
+    await expect(hoverBorderColors(filled)).toHaveLength(0);
+
     await expect(canvas.getByTestId('input-ghost-disabled')).toBeDisabled();
   },
 };

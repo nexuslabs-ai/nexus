@@ -17,20 +17,6 @@ import blockSource from './inline-edit.tsx?raw';
 import { InlineEditExample } from './inline-edit-example';
 import exampleSource from './inline-edit-example.tsx?raw';
 
-const propsShape = `value: string;
-label: string;
-onCommit: (value: string) => void | Promise<void>;
-editing?: boolean;
-onEditingChange?: (editing: boolean) => void;
-readOnly?: boolean;
-error?: ReactNode;
-activation?: 'pencil' | 'click';
-blurBehavior?: 'keep-open' | 'save' | 'cancel';
-required?: boolean;
-requiredMessage?: string;
-emptyText?: string;
-placeholder?: string;`;
-
 const meta: Meta<typeof InlineEdit> = {
   title: 'Blocks/Editing/InlineEdit',
   component: InlineEdit,
@@ -60,7 +46,6 @@ const meta: Meta<typeof InlineEdit> = {
             <code>value</code> is controlled: pass the saved value and update it
             in <code>onCommit</code>.
           </p>
-          <Source code={propsShape} language="tsx" />
           <ul>
             <li>
               Enter or Save emits the trimmed draft through{' '}
