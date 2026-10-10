@@ -77,7 +77,9 @@ function hoverBorderColors(element: Element) {
       if (color && unhovered !== selector && element.matches(unhovered)) {
         colors.push(color);
       }
-      if ('cssRules' in rule) visit(rule.cssRules as CSSRuleList, selector);
+      if (rule instanceof CSSGroupingRule || rule instanceof CSSStyleRule) {
+        visit(rule.cssRules, selector);
+      }
     }
   }
 
@@ -278,7 +280,9 @@ export const GhostStates: Story = {
     await expect(rest.borderTopColor).toBe('rgba(0, 0, 0, 0)');
     await expect(rest.backgroundColor).toBe('rgba(0, 0, 0, 0)');
 
-    await expect(hoverBorderColors(filled)).not.toHaveLength(0);
+    await expect(hoverBorderColors(filled)).toEqual([
+      expect.stringMatching(/^var\(\s*--nx-color-border-default,/),
+    ]);
 
     await expect(window.getComputedStyle(invalid).borderTopColor).not.toBe(
       'rgba(0, 0, 0, 0)'
