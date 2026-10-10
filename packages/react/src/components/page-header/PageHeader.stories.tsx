@@ -1,4 +1,4 @@
-import type { ReactNode } from 'react';
+import { type ReactNode, useId } from 'react';
 
 import type { Meta, StoryObj } from '@storybook/react';
 import { expect, fn, userEvent, within } from 'storybook/test';
@@ -18,7 +18,9 @@ import {
   PageHeaderActions,
   PageHeaderContent,
   PageHeaderDescription,
+  PageHeaderMeta,
   PageHeaderTitle,
+  PageHeaderTitleRow,
 } from './page-header';
 
 const meta: Meta<typeof PageHeader> = {
@@ -35,7 +37,7 @@ const meta: Meta<typeof PageHeader> = {
     docs: {
       description: {
         component:
-          'Shared page and section anatomy. Compact, standard, and detail are compositions, not component variants. Title defaults to an h1 at heading-medium, the everyday size; LargeHeading opts into heading-large with className. Use asChild to choose the heading level for the document hierarchy. Compose content and actions as needed. Action behavior belongs to the application. Actions wrap below content in narrow containers. Place page headers inside main and section headers inside their section.',
+          'Shared page and section anatomy. Compact, standard, and detail are compositions, not component variants. Title defaults to an h1 at heading-medium, the everyday size; LargeHeading opts into heading-large with className. Use asChild to choose the heading level for the document hierarchy. Compose metadata, a title row for inline status, content, and actions as needed. Action behavior belongs to the application. Actions wrap below content in narrow containers. Place page headers inside main and section headers inside their section.',
       },
     },
   },
@@ -79,7 +81,10 @@ export const WithDataAttributes: Story = {
   render: () => (
     <PageHeader data-testid="header">
       <PageHeaderContent data-testid="content">
-        <PageHeaderTitle data-testid="title">Activity report</PageHeaderTitle>
+        <PageHeaderMeta data-testid="meta">Workspace</PageHeaderMeta>
+        <PageHeaderTitleRow data-testid="title-row">
+          <PageHeaderTitle data-testid="title">Activity report</PageHeaderTitle>
+        </PageHeaderTitleRow>
         <PageHeaderDescription data-testid="description">
           Review activity for the selected period.
         </PageHeaderDescription>
@@ -98,6 +103,14 @@ export const WithDataAttributes: Story = {
     await expect(canvas.getByTestId('content')).toHaveAttribute(
       'data-slot',
       'page-header-content'
+    );
+    await expect(canvas.getByTestId('meta')).toHaveAttribute(
+      'data-slot',
+      'page-header-meta'
+    );
+    await expect(canvas.getByTestId('title-row')).toHaveAttribute(
+      'data-slot',
+      'page-header-title-row'
     );
     await expect(canvas.getByTestId('title')).toHaveAttribute(
       'data-slot',
@@ -122,14 +135,15 @@ export const TitleOnly: Story = {
     </PageHeader>
   ),
 };
-export const SectionHeader: Story = {
-  tags: ['docs'],
-  render: () => (
-    <section aria-labelledby="settings-title">
+function NotificationSettingsSection() {
+  const titleId = useId();
+
+  return (
+    <section aria-labelledby={titleId}>
       <PageHeader>
         <PageHeaderContent>
           <PageHeaderTitle asChild>
-            <h2 id="settings-title">Notification settings</h2>
+            <h2 id={titleId}>Notification settings</h2>
           </PageHeaderTitle>
           <PageHeaderDescription>
             Choose which updates you receive.
@@ -140,7 +154,11 @@ export const SectionHeader: Story = {
         </PageHeaderActions>
       </PageHeader>
     </section>
-  ),
+  );
+}
+export const SectionHeader: Story = {
+  tags: ['docs'],
+  render: () => <NotificationSettingsSection />,
   play: async ({ canvasElement }) => {
     await expect(
       within(canvasElement).getByRole('heading', {
@@ -150,11 +168,33 @@ export const SectionHeader: Story = {
     ).toHaveAttribute('data-slot', 'page-header-title');
   },
 };
+const longDescription =
+  'A longer description that must wrap without pushing actions outside the available space.';
+function LongContentHeader() {
+  return (
+    <PageHeader>
+      <PageHeaderContent>
+        <PageHeaderTitle>
+          RegionalDisasterRecoveryConfigurationReview
+        </PageHeaderTitle>
+        <PageHeaderDescription>{longDescription}</PageHeaderDescription>
+      </PageHeaderContent>
+      <PageHeaderActions>
+        <Button variant="outline">Download report</Button>
+        <Button>Share report</Button>
+        <Button variant="outline">Archive</Button>
+      </PageHeaderActions>
+    </PageHeader>
+  );
+}
 export const ContainerLayouts: Story = {
   render: () => (
     <div className="nx:grid nx:gap-8">
       <section style={{ width: 280 }} data-testid="narrow">
         <ReportHeader />
+      </section>
+      <section style={{ width: 460 }} data-testid="medium">
+        <LongContentHeader />
       </section>
       <section style={{ width: 720 }} data-testid="wide">
         <ReportHeader />
@@ -177,6 +217,18 @@ export const ContainerLayouts: Story = {
       narrow.clientWidth + 1
     );
 
+    const medium = canvas.getByTestId('medium');
+    const mediumContent = within(medium)
+      .getByText(longDescription)
+      .getBoundingClientRect();
+    const mediumAction = within(medium)
+      .getByRole('button', { name: 'Download report' })
+      .getBoundingClientRect();
+    await expect(mediumAction.top).toBeGreaterThanOrEqual(mediumContent.bottom);
+    await expect(medium.scrollWidth).toBeLessThanOrEqual(
+      medium.clientWidth + 1
+    );
+
     const wide = canvas.getByTestId('wide');
     const wideContent = within(wide)
       .getByText(description)
@@ -191,22 +243,7 @@ export const ContainerLayouts: Story = {
 export const LongContent: Story = {
   render: () => (
     <section style={{ width: 280 }}>
-      <PageHeader>
-        <PageHeaderContent>
-          <PageHeaderTitle>
-            RegionalDisasterRecoveryConfigurationReview
-          </PageHeaderTitle>
-          <PageHeaderDescription>
-            A longer description that must wrap without pushing actions outside
-            the available space.
-          </PageHeaderDescription>
-        </PageHeaderContent>
-        <PageHeaderActions>
-          <Button variant="outline">Download report</Button>
-          <Button>Share report</Button>
-          <Button variant="outline">Archive</Button>
-        </PageHeaderActions>
-      </PageHeader>
+      <LongContentHeader />
     </section>
   ),
   play: async ({ canvasElement }) => {
@@ -269,13 +306,11 @@ function DetailHeader({
     <div className="nx:grid nx:gap-6">
       <PageHeader>
         <PageHeaderContent>
-          <p className="nx:typography-label-small nx:text-muted-foreground">
-            PO-0001 · Project 254
-          </p>
-          <div className="nx:flex nx:flex-wrap nx:items-center nx:gap-2">
+          <PageHeaderMeta>PO-0001 · Project 254</PageHeaderMeta>
+          <PageHeaderTitleRow>
             {title}
             <Badge variant="secondary">Sent</Badge>
-          </div>
+          </PageHeaderTitleRow>
           <PageHeaderDescription>
             Office furniture for the Riverside workspace.
           </PageHeaderDescription>
@@ -342,7 +377,6 @@ export const Compact: Story = {
   tags: ['docs'],
   render: () => <CompactHeader />,
 };
-export const Standard: Story = { render: () => <ReportHeader /> };
 export const Detail: Story = {
   tags: ['docs'],
   render: () => <DetailHeader />,
@@ -371,7 +405,7 @@ export const LargeHeading: Story = {
           Workspace overview
         </PageHeaderTitle>
         <PageHeaderDescription>
-          A larger title for pages that need stronger emphasis.
+          Track usage, members, and billing across your workspace.
         </PageHeaderDescription>
       </PageHeaderContent>
     </PageHeader>
