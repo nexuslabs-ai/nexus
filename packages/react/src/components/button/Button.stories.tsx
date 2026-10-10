@@ -278,8 +278,7 @@ export const Loading: Story = {
       '[data-slot="button-loading-label"]'
     );
 
-    // Loading button should be disabled
-    await expect(button).toBeDisabled();
+    await expect(button).toBeEnabled();
     await expect(button).toHaveAttribute('aria-busy', 'true');
     await expect(button).toHaveAttribute('aria-disabled', 'true');
     await expect(button).toHaveAttribute('data-loading', 'true');
@@ -291,8 +290,12 @@ export const Loading: Story = {
     await expect(loadingLabel).toHaveTextContent('Submitting');
     await expect(button).toHaveAccessibleName('Submitting');
 
-    // Click should not trigger onClick
+    await userEvent.tab();
+    await expect(button).toHaveFocus();
+    await userEvent.keyboard('{Enter}');
+    await userEvent.keyboard(' ');
     await expect(args.onClick).not.toHaveBeenCalled();
+    await expect(button).toHaveFocus();
   },
 };
 
@@ -714,7 +717,7 @@ export const LoadingUsesSpinnerOnly: Story = {
       '[data-slot="button-loading-label"]'
     );
 
-    await expect(button).toBeDisabled();
+    await expect(button).toHaveAttribute('aria-disabled', 'true');
     await expect(button).toHaveAttribute('aria-busy', 'true');
     await expect(
       button.querySelector('[data-slot="button-start-icon"]')

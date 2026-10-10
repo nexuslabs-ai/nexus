@@ -2,16 +2,12 @@
 
 import * as React from 'react';
 
-import {
-  useField,
-  useForm as useTanStackForm,
-  useStore,
-} from '@tanstack/react-form';
+import { useField, useForm, useStore } from '@tanstack/react-form';
 
 import { SettingsFields } from './settings-fields';
 import {
-  failureMessage,
-  normalized,
+  FAILURE_MESSAGE,
+  normalize,
   type SettingsFormProps,
   SettingsLayout,
   validateEmail,
@@ -19,18 +15,21 @@ import {
 } from './settings-layout';
 
 export function TanStackFormExample({
+  title,
   initialValues,
   onSave,
 }: SettingsFormProps) {
   const nameRef = React.useRef<HTMLInputElement>(null);
   const emailRef = React.useRef<HTMLInputElement>(null);
+  // useForm re-applies defaultValues every render; keep them at the last save.
   const [saved, setSaved] = React.useState(initialValues);
   const [message, setMessage] = React.useState('');
   const [saveError, setSaveError] = React.useState('');
-  const form = useTanStackForm({
+  const form = useForm({
     defaultValues: saved,
+    onSubmitInvalid: focusFirstInvalid,
     onSubmit: async ({ value, formApi }) => {
-      const submitted = normalized(value);
+      const submitted = normalize(value);
       await onSave(submitted);
       setSaved(submitted);
       formApi.reset(submitted);
@@ -78,15 +77,12 @@ export function TanStackFormExample({
   }
   async function submit(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
-    if (form.state.isDefaultValue) return;
     clearFeedback();
     try {
       await form.handleSubmit();
     } catch {
-      setSaveError(failureMessage);
-      return;
+      setSaveError(FAILURE_MESSAGE);
     }
-    focusFirstInvalid();
   }
   function cancelChanges() {
     form.reset();
@@ -96,7 +92,7 @@ export function TanStackFormExample({
   }
   return (
     <SettingsLayout
-      label="Profile settings with TanStack Form"
+      title={title}
       pending={pending}
       dirty={dirty}
       message={message}

@@ -5,11 +5,12 @@ import { FieldError } from '../../components/field';
 
 export type SettingsValues = { name: string; email: string; updates: boolean };
 export type SettingsFormProps = {
+  title: string;
   initialValues: SettingsValues;
   onSave: (values: SettingsValues) => Promise<void>;
 };
 
-export const failureMessage =
+export const FAILURE_MESSAGE =
   'We could not save your changes. Your edits are still here. Try again.';
 
 // The WHATWG "valid email address" production, matching native type="email".
@@ -26,13 +27,13 @@ export function validateEmail(value: string) {
     : 'Enter a valid email address.';
 }
 
-export function normalized(values: SettingsValues): SettingsValues {
+export function normalize(values: SettingsValues): SettingsValues {
   return { ...values, name: values.name.trim(), email: values.email.trim() };
 }
 
 export function SettingsLayout({
   children,
-  label,
+  title,
   pending,
   dirty,
   message,
@@ -41,7 +42,7 @@ export function SettingsLayout({
   onCancel,
 }: {
   children: React.ReactNode;
-  label: string;
+  title: string;
   pending: boolean;
   dirty: boolean;
   message: string;
@@ -49,18 +50,21 @@ export function SettingsLayout({
   onSubmit: React.FormEventHandler<HTMLFormElement>;
   onCancel: () => void;
 }) {
+  const titleId = React.useId();
   const status = pending
     ? 'Saving changes…'
     : message || (dirty ? 'You have unsaved changes.' : 'No unsaved changes.');
   return (
     <form
-      aria-label={label}
+      aria-labelledby={titleId}
       noValidate
       onSubmit={onSubmit}
       className="nx:grid nx:w-full nx:min-w-0 nx:gap-layout-section"
     >
       <div>
-        <h2 className="nx:typography-heading-small">Profile settings</h2>
+        <h2 id={titleId} className="nx:typography-heading-small">
+          {title}
+        </h2>
         <p className="nx:mt-1 nx:typography-body-default nx:text-muted-foreground">
           Update your details and preferences. Changes apply when you save.
         </p>

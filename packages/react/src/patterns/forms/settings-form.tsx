@@ -4,8 +4,8 @@ import * as React from 'react';
 
 import { SettingsFields } from './settings-fields';
 import {
-  failureMessage,
-  normalized,
+  FAILURE_MESSAGE,
+  normalize,
   type SettingsFormProps,
   SettingsLayout,
   type SettingsValues,
@@ -15,7 +15,11 @@ import {
 
 type SettingsErrors = { name?: string; email?: string };
 
-export function SettingsForm({ initialValues, onSave }: SettingsFormProps) {
+export function SettingsForm({
+  title,
+  initialValues,
+  onSave,
+}: SettingsFormProps) {
   const nameRef = React.useRef<HTMLInputElement>(null);
   const emailRef = React.useRef<HTMLInputElement>(null);
   const [saved, setSaved] = React.useState<SettingsValues>(initialValues);
@@ -56,7 +60,6 @@ export function SettingsForm({ initialValues, onSave }: SettingsFormProps) {
   }
   async function submit(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
-    if (!dirty) return;
     const nextErrors = {
       name: validateName(draft.name),
       email: validateEmail(draft.email),
@@ -67,7 +70,7 @@ export function SettingsForm({ initialValues, onSave }: SettingsFormProps) {
       (nextErrors.name ? nameRef : emailRef).current?.focus();
       return;
     }
-    const submitted = normalized(draft);
+    const submitted = normalize(draft);
     setPending(true);
     try {
       await onSave(submitted);
@@ -75,7 +78,7 @@ export function SettingsForm({ initialValues, onSave }: SettingsFormProps) {
       setDraft(submitted);
       setMessage('Changes saved.');
     } catch {
-      setSaveError(failureMessage);
+      setSaveError(FAILURE_MESSAGE);
     } finally {
       setPending(false);
     }
@@ -83,7 +86,7 @@ export function SettingsForm({ initialValues, onSave }: SettingsFormProps) {
 
   return (
     <SettingsLayout
-      label="Profile settings"
+      title={title}
       pending={pending}
       dirty={dirty}
       message={message}

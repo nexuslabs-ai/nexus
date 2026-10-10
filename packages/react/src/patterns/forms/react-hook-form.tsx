@@ -5,8 +5,8 @@ import { useController, useForm } from 'react-hook-form';
 
 import { SettingsFields } from './settings-fields';
 import {
-  failureMessage,
-  normalized,
+  FAILURE_MESSAGE,
+  normalize,
   type SettingsFormProps,
   SettingsLayout,
   type SettingsValues,
@@ -15,12 +15,12 @@ import {
 } from './settings-layout';
 
 export function ReactHookFormExample({
+  title,
   initialValues,
   onSave,
 }: SettingsFormProps) {
   const nameRef = React.useRef<HTMLInputElement>(null);
   const [message, setMessage] = React.useState('');
-  const [saveError, setSaveError] = React.useState('');
   const form = useForm<SettingsValues>({
     defaultValues: initialValues,
     mode: 'onSubmit',
@@ -37,10 +37,10 @@ export function ReactHookFormExample({
     rules: { validate: validateEmail },
   });
   const updates = useController({ control: form.control, name: 'updates' });
-  const { isDirty: dirty, isSubmitting: pending } = form.formState;
+  const { isDirty: dirty, isSubmitting: pending, errors } = form.formState;
   function clearFeedback() {
     setMessage('');
-    setSaveError('');
+    form.clearErrors('root.server');
   }
   function changeName(event: React.ChangeEvent<HTMLInputElement>) {
     name.field.onChange(event);
@@ -61,34 +61,32 @@ export function ReactHookFormExample({
     name.field.ref(node);
   }
   async function save(values: SettingsValues) {
-    const submitted = normalized(values);
-    await onSave(submitted);
+    const submitted = normalize(values);
+    try {
+      await onSave(submitted);
+    } catch {
+      form.setError('root.server', { message: FAILURE_MESSAGE });
+      return;
+    }
     form.reset(submitted);
     setMessage('Changes saved.');
   }
-  async function submit(event: React.FormEvent<HTMLFormElement>) {
-    event.preventDefault();
-    if (!dirty) return;
-    clearFeedback();
-    try {
-      await form.handleSubmit(save)();
-    } catch {
-      setSaveError(failureMessage);
-    }
+  function submit(event: React.FormEvent<HTMLFormElement>) {
+    setMessage('');
+    return form.handleSubmit(save)(event);
   }
   function cancelChanges() {
     form.reset();
-    setSaveError('');
     setMessage('Changes discarded.');
     nameRef.current?.focus();
   }
   return (
     <SettingsLayout
-      label="Profile settings with React Hook Form"
+      title={title}
       pending={pending}
       dirty={dirty}
       message={message}
-      error={saveError}
+      error={errors.root?.server?.message ?? ''}
       onSubmit={submit}
       onCancel={cancelChanges}
     >

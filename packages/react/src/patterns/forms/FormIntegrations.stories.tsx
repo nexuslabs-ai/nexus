@@ -38,6 +38,7 @@ const meta = {
   title: 'Patterns/Form Integrations',
   component: ReactHookFormExample,
   args: {
+    title: 'Profile settings',
     initialValues: {
       name: 'Priya Shah',
       email: 'priya@example.com',
@@ -131,18 +132,14 @@ export const AllVariants: Story = {
   render: (args) => (
     <div className="nx:@container nx:w-full">
       <div className="nx:grid nx:gap-10 nx:@2xl:grid-cols-2">
-        <section className="nx:min-w-0">
-          <p className="nx:mb-4 nx:typography-label-default nx:text-muted-foreground">
-            React Hook Form
-          </p>
-          <ReactHookFormExample {...args} />
-        </section>
-        <section className="nx:min-w-0">
-          <p className="nx:mb-4 nx:typography-label-default nx:text-muted-foreground">
-            TanStack Form
-          </p>
-          <TanStackFormExample {...args} />
-        </section>
+        <ReactHookFormExample
+          {...args}
+          title="Profile settings with React Hook Form"
+        />
+        <TanStackFormExample
+          {...args}
+          title="Profile settings with TanStack Form"
+        />
       </div>
     </div>
   ),

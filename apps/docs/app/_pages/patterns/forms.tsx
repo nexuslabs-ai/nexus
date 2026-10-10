@@ -22,31 +22,45 @@ import {
  * Source: packages/react/src/patterns/forms/.
  */
 
-const IMPLEMENTATIONS: { need: string; copy: string; dependency: string }[] = [
+const FORM_COMPONENTS =
+  'button, button-group/button-group-context.ts, checkbox, field, input, label, separator, spinner and lib/';
+
+const IMPLEMENTATIONS: {
+  need: string;
+  copy: string;
+  components: string;
+  dependency: string;
+}[] = [
   {
     need: 'A small settings form with local React state',
     copy: 'settings-form.tsx, settings-layout.tsx and settings-fields.tsx',
+    components: FORM_COMPONENTS,
     dependency: 'None beyond Nexus and React',
   },
   {
     need: 'Your app uses React Hook Form',
     copy: 'react-hook-form.tsx, settings-layout.tsx and settings-fields.tsx',
+    components: FORM_COMPONENTS,
     dependency: 'react-hook-form 7',
   },
   {
     need: 'Your app uses TanStack Form',
     copy: 'tanstack-form.tsx, settings-layout.tsx and settings-fields.tsx',
+    components: FORM_COMPONENTS,
     dependency: '@tanstack/react-form 1',
   },
   {
     need: 'Read-only details or temporarily unavailable settings',
     copy: 'settings-display.tsx',
+    components:
+      'checkbox, description-list, field, input, label, separator and lib/',
     dependency: 'None beyond Nexus and React',
   },
 ];
 
 const CONNECT_SAMPLE = `<SettingsForm
   key={profile.id}
+  title="Profile settings"
   initialValues={{
     name: profile.name,
     email: profile.email,
@@ -93,6 +107,7 @@ export default function Forms() {
               <tr className="nx:text-left nx:border-b nx:border-border-default">
                 <th className="nx:py-2 nx:pr-4">Need</th>
                 <th className="nx:py-2 nx:pr-4">Copy</th>
+                <th className="nx:py-2 nx:pr-4">Component folders</th>
                 <th className="nx:py-2">Additional dependency</th>
               </tr>
             </thead>
@@ -104,12 +119,17 @@ export default function Forms() {
                 >
                   <td className="nx:py-2 nx:pr-4 nx:font-medium">{row.need}</td>
                   <td className="nx:py-2 nx:pr-4">{row.copy}</td>
+                  <td className="nx:py-2 nx:pr-4">{row.components}</td>
                   <td className="nx:py-2">{row.dependency}</td>
                 </tr>
               ))}
             </tbody>
           </table>
         </div>
+        <p className={BODY_CLASS}>
+          Manual guidance: the component folders are listed by hand and include
+          the folders they import.
+        </p>
         <p className={BODY_CLASS}>
           Do not combine the three editable forms; keep only the one your
           application uses. <InlineCode>settings-layout.tsx</InlineCode> holds
@@ -129,7 +149,8 @@ export default function Forms() {
           <CodeSample lang="tsx">{CONNECT_SAMPLE}</CodeSample>
         </div>
         <p className={BODY_CLASS}>
-          All three forms take the same props.{' '}
+          All three forms take the same props. <InlineCode>title</InlineCode>{' '}
+          names the form; give each form on a page a distinct one.{' '}
           <InlineCode>initialValues</InlineCode> seeds an editing session;
           changing it does not overwrite an in-progress draft. Use a record{' '}
           <InlineCode>key</InlineCode> when switching records, or deliberately
@@ -228,9 +249,9 @@ export default function Forms() {
         </SectionHeading>
         <ul className="nx:mb-4 nx:list-disc nx:space-y-2 nx:ps-5 nx:typography-body-default nx:max-w-[64ch]">
           <li>
-            Authorization, server validation, field-error mapping, loading data,
-            navigation guards and persistence. Replace the sample validation
-            rules and fields to fit your data.
+            Authorization, server validation, loading data, navigation guards
+            and persistence. Replace the sample validation rules and fields to
+            fit your data.
           </li>
           <li>
             Server-normalized values: the forms do not reconcile them, so adapt
@@ -238,8 +259,10 @@ export default function Forms() {
             differ from the submission.
           </li>
           <li>
-            Error text: treat exception messages as user-facing only when they
-            are safe to show; otherwise map them in your save callback.
+            Error text: a rejected save always shows the recipe’s fixed failure
+            message, and the exception text is never displayed. To show server
+            messages or map server errors onto fields, edit the recipe’s submit
+            handler.
           </li>
           <li>
             The source lives in{' '}

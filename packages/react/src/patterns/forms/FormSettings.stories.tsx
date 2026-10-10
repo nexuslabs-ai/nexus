@@ -16,6 +16,7 @@ import displaySource from './settings-display.tsx?raw';
 import fieldsSource from './settings-fields.tsx?raw';
 import { SettingsForm } from './settings-form';
 import formSource from './settings-form.tsx?raw';
+import type { SettingsValues } from './settings-layout';
 import layoutSource from './settings-layout.tsx?raw';
 
 const settingsSource =
@@ -29,12 +30,13 @@ const meta = {
   title: 'Patterns/Forms and Settings',
   component: SettingsForm,
   args: {
+    title: 'Profile settings',
     initialValues: {
       name: 'Priya Shah',
       email: 'priya@example.com',
       updates: false,
     },
-    onSave: fn(async () => {}),
+    onSave: fn(async (_values: SettingsValues) => {}),
   },
   argTypes: { onSave: { control: false } },
   decorators: [
@@ -69,7 +71,7 @@ export const Saving: Story = {
     docs: {
       description: {
         story:
-          'Simulates a one-second save. Fields and actions are disabled until it completes; edits cannot race with the submitted values.',
+          'Simulates a one-second save. Fields are read-only and Save is busy until it completes, so edits cannot race with the submitted values and focus stays where it was.',
       },
     },
   },

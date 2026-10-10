@@ -7,6 +7,9 @@ type SettingsPlayContext = {
   args: { onSave: Mock<SettingsFormProps['onSave']> };
 };
 
+// Layout widths can round to the next pixel, so allow one when checking overflow.
+const SUBPIXEL_TOLERANCE = 1;
+
 export const slowSave: SettingsFormProps['onSave'] = () =>
   new Promise((resolve) => setTimeout(resolve, 1000));
 
@@ -100,17 +103,22 @@ export async function verifyPending({
   await waitFor(() =>
     expect(canvas.getByRole('status')).toHaveTextContent('Saving changes')
   );
-  await expect(name).toBeDisabled();
-  await expect(canvas.getByRole('textbox', { name: 'Email' })).toBeDisabled();
+  await expect(name).toHaveAttribute('readonly');
+  await expect(name).toHaveFocus();
+  await expect(canvas.getByRole('textbox', { name: 'Email' })).toHaveAttribute(
+    'readonly'
+  );
   await expect(canvas.getByRole('checkbox')).toBeDisabled();
   await expect(canvas.getByRole('button', { name: 'Cancel' })).toBeDisabled();
-  await expect(save).toBeDisabled();
+  await expect(save).toHaveAttribute('aria-disabled', 'true');
+  await userEvent.keyboard('{Enter}');
   completeSave();
   await waitFor(() =>
     expect(canvas.getByRole('status')).toHaveTextContent('Changes saved')
   );
   await expect(args.onSave).toHaveBeenCalledTimes(1);
-  await expect(name).toBeEnabled();
+  await expect(name).not.toHaveAttribute('readonly');
+  await expect(name).toHaveFocus();
   await expect(save).toBeDisabled();
 }
 
@@ -128,7 +136,7 @@ export async function verifyFailure({
     'Your edits are still here'
   );
   await expect(name).toHaveValue('Priya Shah Jr');
-  await expect(name).toBeEnabled();
+  await expect(save).toHaveFocus();
   await expect(save).toBeEnabled();
   await userEvent.click(save);
   await waitFor(() =>
@@ -149,5 +157,7 @@ export async function verifyNarrow({
   await userEvent.click(canvas.getByRole('button', { name: 'Save changes' }));
   await expect(await canvas.findByRole('alert')).toBeVisible();
   const form = canvas.getByRole('form');
-  await expect(form.scrollWidth).toBeLessThanOrEqual(form.clientWidth + 1);
+  await expect(form.scrollWidth).toBeLessThanOrEqual(
+    form.clientWidth + SUBPIXEL_TOLERANCE
+  );
 }

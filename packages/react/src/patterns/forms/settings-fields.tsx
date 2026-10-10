@@ -46,10 +46,10 @@ export function SettingsFields({
   const id = React.useId();
   return (
     <>
-      <FieldSet disabled={pending} className="nx:min-w-0">
+      <FieldSet className="nx:min-w-0">
         <FieldLegend>Personal details</FieldLegend>
         <FieldGroup className="nx:gap-container">
-          <Field data-invalid={!!nameField.error} data-disabled={pending}>
+          <Field data-invalid={!!nameField.error}>
             <FieldLabel htmlFor={`${id}-name`}>
               Name <FieldRequiredIndicator />
             </FieldLabel>
@@ -62,7 +62,7 @@ export function SettingsFields({
               value={nameField.value}
               onChange={nameField.onChange}
               onBlur={nameField.onBlur}
-              disabled={pending}
+              readOnly={pending}
               aria-invalid={!!nameField.error}
               aria-describedby={`${id}-name-help${nameField.error ? ` ${id}-name-error` : ''}`}
             />
@@ -71,7 +71,7 @@ export function SettingsFields({
             </FieldDescription>
             <FieldError id={`${id}-name-error`}>{nameField.error}</FieldError>
           </Field>
-          <Field data-invalid={!!emailField.error} data-disabled={pending}>
+          <Field data-invalid={!!emailField.error}>
             <FieldLabel htmlFor={`${id}-email`}>
               Email <FieldRequiredIndicator />
             </FieldLabel>
@@ -85,7 +85,7 @@ export function SettingsFields({
               value={emailField.value}
               onChange={emailField.onChange}
               onBlur={emailField.onBlur}
-              disabled={pending}
+              readOnly={pending}
               aria-invalid={!!emailField.error}
               aria-describedby={`${id}-email-help${emailField.error ? ` ${id}-email-error` : ''}`}
             />
@@ -97,7 +97,7 @@ export function SettingsFields({
         </FieldGroup>
       </FieldSet>
       <Separator />
-      <FieldSet disabled={pending} className="nx:min-w-0">
+      <FieldSet className="nx:min-w-0">
         <FieldLegend>Preferences</FieldLegend>
         <FieldGroup>
           <Field orientation="horizontal" data-disabled={pending}>

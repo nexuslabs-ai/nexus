@@ -21,13 +21,31 @@ function demoSave() {
 }
 
 export function LocalStateExample() {
-  return <SettingsForm initialValues={PROFILE} onSave={demoSave} />;
+  return (
+    <SettingsForm
+      title="Profile settings"
+      initialValues={PROFILE}
+      onSave={demoSave}
+    />
+  );
 }
 
 export function HookFormExample() {
-  return <ReactHookFormExample initialValues={PROFILE} onSave={demoSave} />;
+  return (
+    <ReactHookFormExample
+      title="Profile settings with React Hook Form"
+      initialValues={PROFILE}
+      onSave={demoSave}
+    />
+  );
 }
 
 export function TanStackExample() {
-  return <TanStackFormExample initialValues={PROFILE} onSave={demoSave} />;
+  return (
+    <TanStackFormExample
+      title="Profile settings with TanStack Form"
+      initialValues={PROFILE}
+      onSave={demoSave}
+    />
+  );
 }
