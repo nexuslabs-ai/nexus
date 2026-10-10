@@ -155,6 +155,10 @@ export const PAGE_REGISTRY = {
         slug: 'filtering',
         label: 'Filtering',
       },
+      {
+        slug: 'forms',
+        label: 'Forms',
+      },
     ],
   },
   theming: {
