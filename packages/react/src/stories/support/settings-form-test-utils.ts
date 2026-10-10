@@ -97,6 +97,7 @@ export async function verifyPending({
   });
   args.onSave.mockImplementationOnce(() => response);
   const name = canvas.getByRole('textbox', { name: 'Name' });
+  const email = canvas.getByRole('textbox', { name: 'Email' });
   const save = canvas.getByRole('button', { name: 'Save changes' });
   await userEvent.type(name, ' Jr');
   await userEvent.keyboard('{Enter}');
@@ -105,20 +106,20 @@ export async function verifyPending({
   );
   await expect(name).toHaveAttribute('readonly');
   await expect(name).toHaveFocus();
-  await expect(canvas.getByRole('textbox', { name: 'Email' })).toHaveAttribute(
-    'readonly'
-  );
+  await expect(email).toHaveAttribute('readonly');
   await expect(canvas.getByRole('checkbox')).toBeDisabled();
   await expect(canvas.getByRole('button', { name: 'Cancel' })).toBeDisabled();
   await expect(save).toHaveAttribute('aria-disabled', 'true');
   await userEvent.keyboard('{Enter}');
+  await userEvent.tab();
+  await expect(email).toHaveFocus();
   completeSave();
   await waitFor(() =>
     expect(canvas.getByRole('status')).toHaveTextContent('Changes saved')
   );
   await expect(args.onSave).toHaveBeenCalledTimes(1);
   await expect(name).not.toHaveAttribute('readonly');
-  await expect(name).toHaveFocus();
+  await expect(email).toHaveFocus();
   await expect(save).toBeDisabled();
 }
 

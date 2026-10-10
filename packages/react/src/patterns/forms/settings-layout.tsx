@@ -31,10 +31,12 @@ export function normalize(values: SettingsValues): SettingsValues {
   return { ...values, name: values.name.trim(), email: values.email.trim() };
 }
 
-// A loading Save is natively disabled, so a click-started save drops focus to
-// <body>. Put it back once the save settles; leave it if the user moved on.
+// A loading Save is natively disabled, so a click-started save leaves focus on
+// <body> or the disabled Save. Put it back once the save settles; leave it if
+// the user moved on.
 export function restoreDroppedFocus(field: HTMLInputElement | null) {
-  if (document.activeElement === document.body) field?.focus();
+  const active = document.activeElement;
+  if (active === document.body || active?.matches(':disabled')) field?.focus();
 }
 
 export function SettingsLayout({
