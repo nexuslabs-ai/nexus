@@ -114,10 +114,7 @@ function PageHeaderTitleRow({ className, ...props }: PageHeaderTitleRowProps) {
   return (
     <div
       data-slot="page-header-title-row"
-      className={cn(
-        'nx:flex nx:min-w-0 nx:flex-wrap nx:items-center nx:gap-2',
-        className
-      )}
+      className={cn('nx:flex nx:flex-wrap nx:items-center nx:gap-2', className)}
       {...props}
     />
   );
