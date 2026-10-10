@@ -77,6 +77,7 @@ export function SettingsForm({
       setSaved(submitted);
       setDraft(submitted);
       setMessage('Changes saved.');
+      nameRef.current?.focus();
     } catch {
       setSaveError(FAILURE_MESSAGE);
     } finally {

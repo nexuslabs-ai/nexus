@@ -34,6 +34,7 @@ export function TanStackFormExample({
       setSaved(submitted);
       formApi.reset(submitted);
       setMessage('Changes saved.');
+      nameRef.current?.focus();
     },
   });
   const name = useField({

@@ -62,8 +62,8 @@ interface ButtonProps
   /**
    * When true, the button renders as its child element (via Radix Slot),
    * applying button styling to e.g. an `<a>` while leaving the child's own
-   * content untouched — compose icons inside the child. `loading` and the
-   * `startIcon` / `endIcon` slots apply to the native `<button>` only.
+   * content untouched — compose icons inside the child. The loading spinner
+   * and the `startIcon` / `endIcon` slots render on the native `<button>` only.
    * @default false
    * @example
    * ```tsx
@@ -219,8 +219,8 @@ function Button({
       <Slot
         {...sharedProps}
         {...props}
-        onClick={onClick}
-        tabIndex={isDisabled ? -1 : tabIndex}
+        onClick={handleClick}
+        tabIndex={disabled ? -1 : tabIndex}
       >
         {children}
       </Slot>

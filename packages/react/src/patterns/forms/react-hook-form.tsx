@@ -70,6 +70,7 @@ export function ReactHookFormExample({
     }
     form.reset(submitted);
     setMessage('Changes saved.');
+    nameRef.current?.focus();
   }
   function submit(event: React.FormEvent<HTMLFormElement>) {
     setMessage('');

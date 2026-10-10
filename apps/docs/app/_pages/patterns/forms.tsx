@@ -127,10 +127,6 @@ export default function Forms() {
           </table>
         </div>
         <p className={BODY_CLASS}>
-          Manual guidance: the component folders are listed by hand and include
-          the folders they import.
-        </p>
-        <p className={BODY_CLASS}>
           Do not combine the three editable forms; keep only the one your
           application uses. <InlineCode>settings-layout.tsx</InlineCode> holds
           the shared contract, validation rules, value normalization and the

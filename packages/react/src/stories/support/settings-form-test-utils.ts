@@ -143,6 +143,7 @@ export async function verifyFailure({
     expect(canvas.getByRole('status')).toHaveTextContent('Changes saved')
   );
   await expect(canvas.queryByRole('alert')).not.toBeInTheDocument();
+  await expect(name).toHaveFocus();
   await userEvent.type(name, ' unsaved');
   await userEvent.click(canvas.getByRole('button', { name: 'Cancel' }));
   await expect(name).toHaveValue('Priya Shah Jr');
