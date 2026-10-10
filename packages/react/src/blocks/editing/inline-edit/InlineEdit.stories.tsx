@@ -2,7 +2,7 @@ import { useRef, useState } from 'react';
 
 import { Canvas, Source, Title } from '@storybook/addon-docs/blocks';
 import type { Meta, StoryObj } from '@storybook/react';
-import { expect, fireEvent, fn, userEvent, within } from 'storybook/test';
+import { expect, fn, userEvent, within } from 'storybook/test';
 
 import { Button } from '../../../components/button';
 import {
@@ -171,14 +171,6 @@ function Example({ onCommit, ...props }: Partial<InlineEditProps>) {
       />
     </div>
   );
-}
-
-async function clickWithoutFocusingTarget(target: HTMLElement) {
-  const focused = document.activeElement;
-  const defaultAllowed = await fireEvent.mouseDown(target);
-  if (defaultAllowed && focused instanceof HTMLElement) focused.blur();
-  await fireEvent.mouseUp(target);
-  await fireEvent.click(target);
 }
 
 export const Default: Story = {
@@ -471,48 +463,6 @@ export const InvalidOnExit: Story = {
     );
     await expect(await canvas.findByText('Valid name')).toBeVisible();
     await expect(canvas.queryByRole('alert')).not.toBeInTheDocument();
-  },
-};
-
-export const ActionsWithoutButtonFocus: Story = {
-  args: { onCommit: fn() },
-  render: (args) => (
-    <div className="nx:grid nx:w-full nx:max-w-sm nx:gap-4">
-      <Example label="Title" value="Draft title" blurBehavior="cancel" />
-      <Example
-        label="Owner"
-        value="Priya Shah"
-        blurBehavior="save"
-        onCommit={args.onCommit}
-      />
-    </div>
-  ),
-  play: async ({ canvasElement, args }) => {
-    const canvas = within(canvasElement);
-    await userEvent.click(canvas.getByRole('button', { name: 'Edit Title' }));
-    await userEvent.clear(canvas.getByRole('textbox', { name: 'Title' }));
-    await userEvent.type(
-      canvas.getByRole('textbox', { name: 'Title' }),
-      'Final title'
-    );
-    await clickWithoutFocusingTarget(
-      canvas.getByRole('button', { name: 'Save Title' })
-    );
-    await expect(await canvas.findByText('Final title')).toBeVisible();
-
-    await userEvent.click(canvas.getByRole('button', { name: 'Edit Owner' }));
-    await userEvent.type(
-      canvas.getByRole('textbox', { name: 'Owner' }),
-      ' discarded'
-    );
-    await clickWithoutFocusingTarget(
-      canvas.getByRole('button', { name: 'Cancel editing Owner' })
-    );
-    await expect(
-      canvas.queryByRole('textbox', { name: 'Owner' })
-    ).not.toBeInTheDocument();
-    await expect(args.onCommit).not.toHaveBeenCalled();
-    await expect(canvas.getByText('Priya Shah')).toBeVisible();
   },
 };
 

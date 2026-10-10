@@ -41,15 +41,19 @@ export interface InlineEditProps extends Omit<
   placeholder?: string;
 }
 
-const inlineEditInset =
-  'nx:-ms-[calc(var(--nx-spacing-2_5)+var(--nx-borderwidth-default))] nx:border-default nx:px-2.5';
+// Pulls the field's padding and border outside the text, so editing text sits
+// where the display text did.
+const alignWithText =
+  'nx:-ms-[calc(var(--nx-spacing-2_5)+var(--nx-borderwidth-default))]';
 
 function focusInput(input: HTMLInputElement | null) {
   input?.focus();
 }
 
-function keepInputFocus(event: React.MouseEvent) {
-  event.preventDefault();
+// The trigger mounts in the same commit that removes the editor, so it is
+// only attached once that commit finishes.
+function focusAfterCommit(target: React.RefObject<HTMLElement | null>) {
+  queueMicrotask(() => target.current?.focus());
 }
 
 function InlineEditValue({
@@ -83,7 +87,7 @@ interface InlineEditEditorProps {
   placeholder?: string;
   onCommit: InlineEditCommit;
   onClose: () => void;
-  focusReturn: React.RefObject<boolean>;
+  trigger: React.RefObject<HTMLButtonElement | null>;
 }
 
 function InlineEditEditor({
@@ -96,40 +100,22 @@ function InlineEditEditor({
   placeholder,
   onCommit,
   onClose,
-  focusReturn,
+  trigger,
 }: InlineEditEditorProps) {
   const [draft, setDraft] = React.useState(value);
   const [missing, setMissing] = React.useState(false);
   const [pending, setPending] = React.useState(false);
   const group = React.useRef<HTMLDivElement>(null);
-  const active = React.useRef(true);
   const errorId = React.useId();
   const message = missing ? requiredMessage : error;
   const invalid = Boolean(message);
 
-  React.useEffect(() => {
-    active.current = true;
-    return () => {
-      active.current = false;
-    };
-  }, []);
-
   React.useLayoutEffect(() => {
     const node = group.current;
     return () => {
-      focusReturn.current = Boolean(node?.contains(document.activeElement));
+      if (node?.contains(document.activeElement)) focusAfterCommit(trigger);
     };
-  }, [focusReturn]);
-
-  function settle() {
-    if (!active.current) return;
-    setPending(false);
-    onClose();
-  }
-
-  function retry() {
-    if (active.current) setPending(false);
-  }
+  }, [trigger]);
 
   function commit() {
     if (pending) return;
@@ -139,7 +125,14 @@ function InlineEditEditor({
       return;
     }
     setPending(true);
-    new Promise<void>((resolve) => resolve(onCommit(next))).then(settle, retry);
+    new Promise<void>((resolve) => resolve(onCommit(next))).then(
+      () => {
+        setPending(false);
+        // A null ref means the editor closed while saving; don't close its successor.
+        if (group.current) onClose();
+      },
+      () => setPending(false)
+    );
   }
 
   function cancel() {
@@ -186,10 +179,7 @@ function InlineEditEditor({
           ref={focusInput}
           size="sm"
           variant="ghost"
-          className={cn(
-            inlineEditInset,
-            'nx:min-w-0 nx:typography-body-default'
-          )}
+          className={cn(alignWithText, 'nx:typography-body-default')}
           aria-label={label}
           aria-invalid={invalid || undefined}
           aria-describedby={invalid ? errorId : undefined}
@@ -200,17 +190,13 @@ function InlineEditEditor({
           onChange={handleChange}
           onKeyDown={handleKeyDown}
         />
-        <div
-          data-slot="inline-edit-actions"
-          className="nx:flex nx:shrink-0 nx:gap-1"
-        >
+        <div data-slot="inline-edit-actions" className="nx:flex nx:gap-1">
           <Button
             type="button"
             variant="ghost"
             size="icon-sm"
             aria-label={`Save ${label}`}
             title={`Save ${label}`}
-            onMouseDown={keepInputFocus}
             onClick={commit}
           >
             <IconCheck
@@ -224,7 +210,6 @@ function InlineEditEditor({
             size="icon-sm"
             aria-label={`Cancel editing ${label}`}
             title="Cancel editing"
-            onMouseDown={keepInputFocus}
             onClick={cancel}
           >
             <IconX
@@ -241,27 +226,25 @@ function InlineEditEditor({
 
 interface InlineEditTriggerProps {
   label: string;
-  focusRef: React.RefCallback<HTMLButtonElement>;
-  onOpen: () => void;
+  ref: React.Ref<HTMLButtonElement>;
+  onClick: () => void;
   children: React.ReactNode;
 }
 
 function InlineEditClickTrigger({
   label,
-  focusRef,
-  onOpen,
   children,
+  ...props
 }: InlineEditTriggerProps) {
   return (
     <button
-      ref={focusRef}
       type="button"
       data-slot="inline-edit-trigger"
       className={cn(
-        inlineEditInset,
-        'nx:flex nx:min-h-8 nx:w-full nx:cursor-pointer nx:items-center nx:rounded-md nx:border-transparent nx:text-start nx:typography-body-default nx:text-foreground nx:transition-control nx:duration-fast nx:hover:bg-container-hover nx:active:bg-container-active nx:focus-visible:outline-2 nx:focus-visible:outline-focus-default nx:focus-visible:outline-offset-2'
+        alignWithText,
+        'nx:flex nx:min-h-8 nx:w-full nx:cursor-pointer nx:items-center nx:rounded-md nx:border-default nx:border-transparent nx:px-2.5 nx:text-start nx:hover:bg-container-hover nx:active:bg-container-active nx:focus-visible:outline-2 nx:focus-visible:outline-focus-default nx:focus-visible:outline-offset-2'
       )}
-      onClick={onOpen}
+      {...props}
     >
       <span className="nx:sr-only">{`Edit ${label} `}</span>
       {children}
@@ -271,23 +254,20 @@ function InlineEditClickTrigger({
 
 function InlineEditPencilTrigger({
   label,
-  focusRef,
-  onOpen,
   children,
+  ...props
 }: InlineEditTriggerProps) {
   return (
     <div className="nx:flex nx:items-center nx:gap-2">
       {children}
       <Button
-        ref={focusRef}
         type="button"
         variant="ghost"
         size="icon-sm"
         data-slot="inline-edit-trigger"
-        className="nx:shrink-0"
         aria-label={`Edit ${label}`}
         title={`Edit ${label}`}
-        onClick={onOpen}
+        {...props}
       >
         <IconPencil aria-hidden="true" className="nx:text-muted-foreground" />
       </Button>
@@ -310,7 +290,7 @@ export function InlineEdit({
   activation = 'pencil',
   blurBehavior = 'keep-open',
   required = false,
-  requiredMessage,
+  requiredMessage = `${label} is required.`,
   emptyText = 'Not provided',
   placeholder,
   className,
@@ -318,63 +298,15 @@ export function InlineEdit({
 }: InlineEditProps) {
   const [uncontrolledEditing, setUncontrolledEditing] = React.useState(false);
   const editing = !readOnly && (editingProp ?? uncontrolledEditing);
-  const restoreFocus = React.useRef(false);
-
-  React.useLayoutEffect(() => {
-    restoreFocus.current = false;
-  });
+  const trigger = React.useRef<HTMLButtonElement>(null);
+  const Trigger =
+    activation === 'click' ? InlineEditClickTrigger : InlineEditPencilTrigger;
+  const display = <InlineEditValue value={value} emptyText={emptyText} />;
 
   function setEditing(next: boolean) {
     if (editingProp === undefined) setUncontrolledEditing(next);
     onEditingChange?.(next);
   }
-
-  function open() {
-    setEditing(true);
-  }
-
-  function close() {
-    setEditing(false);
-  }
-
-  function focusTrigger(button: HTMLButtonElement | null) {
-    if (!button || !restoreFocus.current) return;
-    button.focus();
-  }
-
-  const display = <InlineEditValue value={value} emptyText={emptyText} />;
-  const trigger =
-    activation === 'click' ? (
-      <InlineEditClickTrigger
-        label={label}
-        focusRef={focusTrigger}
-        onOpen={open}
-      >
-        {display}
-      </InlineEditClickTrigger>
-    ) : (
-      <InlineEditPencilTrigger
-        label={label}
-        focusRef={focusTrigger}
-        onOpen={open}
-      >
-        {display}
-      </InlineEditPencilTrigger>
-    );
-  const editor = (
-    <InlineEditEditor
-      value={value}
-      label={label}
-      error={error}
-      blurBehavior={blurBehavior}
-      required={required}
-      requiredMessage={requiredMessage ?? `${label} is required.`}
-      placeholder={placeholder}
-      onCommit={onCommit}
-      onClose={close}
-      focusReturn={restoreFocus}
-    />
-  );
 
   return (
     <div
@@ -385,7 +317,26 @@ export function InlineEdit({
       className={cn('nx:min-w-0 nx:typography-body-default', className)}
       {...props}
     >
-      {readOnly ? display : editing ? editor : trigger}
+      {readOnly && display}
+      {editing && (
+        <InlineEditEditor
+          value={value}
+          label={label}
+          error={error}
+          blurBehavior={blurBehavior}
+          required={required}
+          requiredMessage={requiredMessage}
+          placeholder={placeholder}
+          onCommit={onCommit}
+          onClose={() => setEditing(false)}
+          trigger={trigger}
+        />
+      )}
+      {!readOnly && !editing && (
+        <Trigger ref={trigger} label={label} onClick={() => setEditing(true)}>
+          {display}
+        </Trigger>
+      )}
     </div>
   );
 }
