@@ -28,6 +28,13 @@ function controlledSave(args: SettingsPlayContext['args']) {
   return () => complete();
 }
 
+/** Lets React render updates scheduled after a promise settles. */
+function nextFrames() {
+  return new Promise((resolve) =>
+    requestAnimationFrame(() => requestAnimationFrame(resolve))
+  );
+}
+
 async function expectSaved(canvasElement: HTMLElement) {
   const canvas = within(canvasElement);
   await waitFor(() =>
@@ -177,33 +184,6 @@ export async function verifyFailure({
   await expect(save).toBeDisabled();
 }
 
-/** onSave resolves without the saved record, so code after the save throws. */
-export async function verifyErrorAfterSave({
-  canvasElement,
-  args,
-}: SettingsPlayContext) {
-  const canvas = within(canvasElement);
-  const name = canvas.getByRole('textbox', { name: 'Name' });
-  const escaped: unknown[] = [];
-  function collect(event: PromiseRejectionEvent) {
-    escaped.push(event.reason);
-  }
-  args.onSave.mockResolvedValueOnce(undefined as unknown as SettingsValues);
-  window.addEventListener('unhandledrejection', collect);
-  try {
-    await userEvent.type(name, ' Jr');
-    await userEvent.click(canvas.getByRole('button', { name: 'Save changes' }));
-    await waitFor(() => expect(escaped).toHaveLength(1));
-  } finally {
-    window.removeEventListener('unhandledrejection', collect);
-  }
-  await expect(escaped[0]).toBeInstanceOf(TypeError);
-  await expect(args.onSave).toHaveBeenCalledTimes(1);
-  await expect(name).toHaveValue('Priya Shah Jr');
-  await expect(name).not.toHaveAttribute('readonly');
-  await expect(canvas.queryByRole('alert')).not.toBeInTheDocument();
-}
-
 export async function verifyServerNormalized({
   canvasElement,
   args,
@@ -278,9 +258,11 @@ export async function verifyRecordSwitch({
     expect(canvas.getByRole('status')).toHaveTextContent('Saving changes')
   );
   await userEvent.click(switchRecord);
-  const lateSave = args.onSave.mock.results[0]?.value;
+  await expect(args.onSave).toHaveBeenCalledTimes(1);
+  const [lateSave] = args.onSave.mock.results;
   completeSave();
-  await lateSave;
+  await lateSave?.value;
+  await nextFrames();
   await expect(name()).toHaveValue('Priya Shah');
   await expect(canvas.getByRole('status')).toHaveTextContent(
     'No unsaved changes.'

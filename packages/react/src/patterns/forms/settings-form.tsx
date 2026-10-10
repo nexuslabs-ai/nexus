@@ -6,8 +6,8 @@ import { SettingsFields } from './settings-fields';
 import {
   FAILURE_MESSAGE,
   normalize,
+  pickSettings,
   restoreDroppedFocus,
-  savedValues,
   type SettingsFormProps,
   SettingsLayout,
   type SettingsValues,
@@ -83,7 +83,7 @@ export function SettingsForm({
       setPending(false);
       restoreDroppedFocus(nameRef.current);
     }
-    const baseline = savedValues(record);
+    const baseline = pickSettings(record);
     setSaved(baseline);
     setDraft(baseline);
     setMessage('Changes saved.');
@@ -92,6 +92,7 @@ export function SettingsForm({
   return (
     <SettingsLayout
       title={title}
+      submitting={pending}
       pending={pending}
       dirty={dirty}
       message={message}

@@ -33,7 +33,11 @@ export function normalize(values: SettingsValues): SettingsValues {
 }
 
 /** Keeps only the form's fields from the record onSave resolves with. */
-export function savedValues({ name, email, updates }: SettingsValues) {
+export function pickSettings({
+  name,
+  email,
+  updates,
+}: SettingsValues): SettingsValues {
   return { name, email, updates };
 }
 
@@ -42,13 +46,16 @@ export function savedValues({ name, email, updates }: SettingsValues) {
 // Move it to the field once the save settles; leave it if the user moved on.
 export function restoreDroppedFocus(field: HTMLInputElement | null) {
   const active = document.activeElement;
-  if (active === document.body || active?.matches(':disabled, [type="submit"]'))
-    field?.focus();
+  const onOwnControl =
+    field?.form?.contains(active) &&
+    active?.matches(':disabled, [type="submit"]');
+  if (active === document.body || onOwnControl) field?.focus();
 }
 
 export function SettingsLayout({
   children,
   title,
+  submitting,
   pending,
   dirty,
   message,
@@ -58,6 +65,9 @@ export function SettingsLayout({
 }: {
   children: React.ReactNode;
   title: string;
+  /** Locks Save and Cancel for the whole submission, validation included. */
+  submitting: boolean;
+  /** True only while onSave runs; drives the "Saving changes" status. */
   pending: boolean;
   dirty: boolean;
   message: string;
@@ -94,13 +104,13 @@ export function SettingsLayout({
         </p>
         <FieldError>{error}</FieldError>
         <div className="nx:flex nx:flex-wrap nx:gap-2">
-          <Button type="submit" loading={pending} disabled={!dirty}>
+          <Button type="submit" loading={submitting} disabled={!dirty}>
             Save changes
           </Button>
           <Button
             type="button"
             variant="outline"
-            disabled={!dirty || pending}
+            disabled={!dirty || submitting}
             onClick={onCancel}
           >
             Cancel

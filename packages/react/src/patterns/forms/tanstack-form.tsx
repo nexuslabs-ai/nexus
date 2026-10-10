@@ -8,8 +8,8 @@ import { SettingsFields } from './settings-fields';
 import {
   FAILURE_MESSAGE,
   normalize,
+  pickSettings,
   restoreDroppedFocus,
-  savedValues,
   type SettingsFormProps,
   SettingsLayout,
   type SettingsValues,
@@ -38,13 +38,14 @@ export function TanStackFormExample({
       try {
         record = await onSave(normalize(value));
       } catch {
+        // Returning resolves onSubmit, so TanStack still sets isSubmitSuccessful.
         setSaveError(FAILURE_MESSAGE);
         return;
       } finally {
         setPending(false);
         restoreDroppedFocus(nameRef.current);
       }
-      const baseline = savedValues(record);
+      const baseline = pickSettings(record);
       setSaved(baseline);
       formApi.reset(baseline);
       setMessage('Changes saved.');
@@ -62,6 +63,7 @@ export function TanStackFormExample({
   });
   const updates = useField({ form, name: 'updates' });
   const dirty = useSelector(form.store, (state) => !state.isDefaultValue);
+  const submitting = useSelector(form.store, (state) => state.isSubmitting);
   function clearFeedback() {
     setMessage('');
     setSaveError('');
@@ -102,6 +104,7 @@ export function TanStackFormExample({
   return (
     <SettingsLayout
       title={title}
+      submitting={submitting}
       pending={pending}
       dirty={dirty}
       message={message}
@@ -110,7 +113,7 @@ export function TanStackFormExample({
       onCancel={cancelChanges}
     >
       <SettingsFields
-        pending={pending}
+        pending={submitting}
         nameField={{
           name: name.name,
           ref: nameRef,

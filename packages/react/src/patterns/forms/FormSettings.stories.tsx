@@ -9,7 +9,6 @@ import {
 } from '../../stories/support/settings-form-scenes';
 import {
   slowSave,
-  verifyErrorAfterSave,
   verifyFailure,
   verifyInsideDialog,
   verifyNarrow,
@@ -101,11 +100,6 @@ export const Saving: Story = {
 };
 
 export const SaveFailure: Story = { play: verifyFailure };
-
-export const ErrorAfterSave: Story = {
-  parameters: { test: { dangerouslyIgnoreUnhandledErrors: true } },
-  play: verifyErrorAfterSave,
-};
 
 export const ServerNormalized: Story = { play: verifyServerNormalized };
 

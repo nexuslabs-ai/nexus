@@ -155,7 +155,11 @@ export default function Forms() {
           only after persistence succeeds, and reject on failure. With{' '}
           <InlineCode>fetch</InlineCode>, check{' '}
           <InlineCode>response.ok</InlineCode> and throw for unsuccessful
-          responses. The record it resolves with becomes the new Cancel
+          responses. <InlineCode>response.json()</InlineCode> is untyped, so
+          parse the body into the <InlineCode>SettingsValues</InlineCode> shape
+          before resolving; an envelope such as{' '}
+          <InlineCode>{'{ data: … }'}</InlineCode> would otherwise become the
+          baseline unchecked. The record it resolves with becomes the new Cancel
           baseline, so values your server normalized replace what was typed;
           fields the form does not edit are ignored. Failure keeps the draft for
           retry. Cancel restores the latest saved values and focuses the first

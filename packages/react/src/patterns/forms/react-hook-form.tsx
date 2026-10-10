@@ -7,8 +7,8 @@ import { SettingsFields } from './settings-fields';
 import {
   FAILURE_MESSAGE,
   normalize,
+  pickSettings,
   restoreDroppedFocus,
-  savedValues,
   type SettingsFormProps,
   SettingsLayout,
   type SettingsValues,
@@ -40,7 +40,7 @@ export function ReactHookFormExample({
     rules: { validate: validateEmail },
   });
   const updates = useController({ control: form.control, name: 'updates' });
-  const { isDirty: dirty, errors } = form.formState;
+  const { isDirty: dirty, isSubmitting: submitting, errors } = form.formState;
   function clearFeedback() {
     setMessage('');
     form.clearErrors('root.server');
@@ -75,7 +75,7 @@ export function ReactHookFormExample({
       setPending(false);
       restoreDroppedFocus(nameRef.current);
     }
-    form.reset(savedValues(record));
+    form.reset(pickSettings(record));
     setMessage('Changes saved.');
   }
   async function submit(event: React.FormEvent<HTMLFormElement>) {
@@ -90,6 +90,7 @@ export function ReactHookFormExample({
   return (
     <SettingsLayout
       title={title}
+      submitting={submitting}
       pending={pending}
       dirty={dirty}
       message={message}
@@ -98,7 +99,7 @@ export function ReactHookFormExample({
       onCancel={cancelChanges}
     >
       <SettingsFields
-        pending={pending}
+        pending={submitting}
         nameField={{
           ...name.field,
           ref: attachName,

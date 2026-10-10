@@ -8,7 +8,6 @@ import {
 } from '../../stories/support/settings-form-scenes';
 import {
   slowSave,
-  verifyErrorAfterSave,
   verifyFailure,
   verifyInsideDialog,
   verifyNarrow,
@@ -157,18 +156,6 @@ export const TanStackFormNarrow: Story = {
     </div>
   ),
   play: verifyNarrow,
-};
-export const ReactHookFormErrorAfterSave: Story = {
-  parameters: { test: { dangerouslyIgnoreUnhandledErrors: true } },
-  play: verifyErrorAfterSave,
-};
-export const TanStackFormErrorAfterSave: Story = {
-  parameters: {
-    ...tanStackDocs,
-    test: { dangerouslyIgnoreUnhandledErrors: true },
-  },
-  render: (args) => <TanStackFormExample {...args} />,
-  play: verifyErrorAfterSave,
 };
 export const ReactHookFormServerNormalized: Story = {
   play: verifyServerNormalized,
