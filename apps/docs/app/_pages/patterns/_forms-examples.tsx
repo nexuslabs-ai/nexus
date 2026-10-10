@@ -16,8 +16,10 @@ const PROFILE: SettingsValues = {
   updates: false,
 };
 
-function demoSave() {
-  return new Promise<void>((resolve) => setTimeout(resolve, 800));
+function demoSave(values: SettingsValues) {
+  return new Promise<SettingsValues>((resolve) =>
+    setTimeout(() => resolve(values), 800)
+  );
 }
 
 export function LocalStateExample() {

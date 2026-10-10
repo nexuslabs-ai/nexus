@@ -8,9 +8,11 @@ import { SettingsFields } from './settings-fields';
 import {
   FAILURE_MESSAGE,
   normalize,
+  pickSettings,
   restoreDroppedFocus,
   type SettingsFormProps,
   SettingsLayout,
+  type SettingsValues,
   validateEmail,
   validateName,
 } from './settings-layout';
@@ -24,16 +26,28 @@ export function TanStackFormExample({
   const emailRef = React.useRef<HTMLInputElement>(null);
   // useForm re-applies defaultValues every render; keep them at the last save.
   const [saved, setSaved] = React.useState(initialValues);
+  const [pending, setPending] = React.useState(false);
   const [message, setMessage] = React.useState('');
   const [saveError, setSaveError] = React.useState('');
   const form = useForm({
     defaultValues: saved,
     onSubmitInvalid: focusFirstInvalid,
     onSubmit: async ({ value, formApi }) => {
-      const submitted = normalize(value);
-      await onSave(submitted);
-      setSaved(submitted);
-      formApi.reset(submitted);
+      setPending(true);
+      let record: SettingsValues;
+      try {
+        record = await onSave(normalize(value));
+      } catch {
+        // Returning resolves onSubmit, so TanStack still sets isSubmitSuccessful.
+        setSaveError(FAILURE_MESSAGE);
+        return;
+      } finally {
+        setPending(false);
+        restoreDroppedFocus(nameRef.current);
+      }
+      const baseline = pickSettings(record);
+      setSaved(baseline);
+      formApi.reset(baseline);
       setMessage('Changes saved.');
     },
   });
@@ -49,7 +63,7 @@ export function TanStackFormExample({
   });
   const updates = useField({ form, name: 'updates' });
   const dirty = useSelector(form.store, (state) => !state.isDefaultValue);
-  const pending = useSelector(form.store, (state) => state.isSubmitting);
+  const submitting = useSelector(form.store, (state) => state.isSubmitting);
   function clearFeedback() {
     setMessage('');
     setSaveError('');
@@ -79,12 +93,7 @@ export function TanStackFormExample({
   async function submit(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
     clearFeedback();
-    try {
-      await form.handleSubmit();
-    } catch {
-      setSaveError(FAILURE_MESSAGE);
-    }
-    restoreDroppedFocus(nameRef.current);
+    await form.handleSubmit();
   }
   function cancelChanges() {
     form.reset();
@@ -95,6 +104,7 @@ export function TanStackFormExample({
   return (
     <SettingsLayout
       title={title}
+      submitting={submitting}
       pending={pending}
       dirty={dirty}
       message={message}
@@ -103,7 +113,7 @@ export function TanStackFormExample({
       onCancel={cancelChanges}
     >
       <SettingsFields
-        pending={pending}
+        submitting={submitting}
         nameField={{
           name: name.name,
           ref: nameRef,

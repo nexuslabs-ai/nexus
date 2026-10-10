@@ -3,11 +3,19 @@ import { expect, fn, within } from 'storybook/test';
 
 import { Separator } from '../../components/separator';
 import {
+  EditProfileDialog,
+  RecordSwitchControls,
+  useRecordSwitch,
+} from '../../stories/support/settings-form-scenes';
+import {
   slowSave,
   verifyFailure,
+  verifyInsideDialog,
   verifyNarrow,
   verifyPending,
+  verifyRecordSwitch,
   verifySaveCancel,
+  verifyServerNormalized,
   verifyValidation,
 } from '../../stories/support/settings-form-test-utils';
 
@@ -16,7 +24,7 @@ import displaySource from './settings-display.tsx?raw';
 import fieldsSource from './settings-fields.tsx?raw';
 import { SettingsForm } from './settings-form';
 import formSource from './settings-form.tsx?raw';
-import type { SettingsValues } from './settings-layout';
+import type { SettingsFormProps, SettingsValues } from './settings-layout';
 import layoutSource from './settings-layout.tsx?raw';
 
 const settingsSource =
@@ -25,6 +33,19 @@ const settingsSource =
   layoutSource +
   '\n\n// settings-fields.tsx\n' +
   fieldsSource;
+
+function SettingsFormWithRecordSwitch(props: SettingsFormProps) {
+  const { record, loadNewerCopy, switchRecord } = useRecordSwitch();
+  return (
+    <>
+      <RecordSwitchControls
+        onLoadNewerCopy={loadNewerCopy}
+        onSwitchRecord={switchRecord}
+      />
+      <SettingsForm {...props} key={record.id} initialValues={record.values} />
+    </>
+  );
+}
 
 const meta = {
   title: 'Patterns/Forms and Settings',
@@ -36,7 +57,7 @@ const meta = {
       email: 'priya@example.com',
       updates: false,
     },
-    onSave: fn(async (_values: SettingsValues) => {}),
+    onSave: fn(async (values: SettingsValues) => values),
   },
   argTypes: { onSave: { control: false } },
   decorators: [
@@ -51,7 +72,7 @@ const meta = {
       source: { code: settingsSource, language: 'tsx', type: 'code' },
       description: {
         component:
-          'A copyable composition of existing Nexus components, not a new form framework. Use Field for a label, control, help and error; FieldSet + FieldLegend for related fields; and native form submission for Save. Wire htmlFor, required, aria-invalid and aria-describedby explicitly. Copy patterns/forms/settings-form.tsx with settings-layout.tsx and settings-fields.tsx, and supply initialValues and an async onSave. The form owns draft, validation, pending, saved and error states locally. Use a record key to remount when switching records. Cancel restores the latest saved values. Checkboxes participate in Save; switches are for immediate changes. The demo callback does not persist data. Applications own validation rules, authorization, API errors, navigation guards and persistence. Section and field spacing use density-aware layout tokens. See https://www.w3.org/WAI/tutorials/forms/ and https://react.dev/reference/react-dom/components/form.',
+          'A copyable composition of existing Nexus components, not a new form framework. Use Field for a label, control, help and error; FieldSet + FieldLegend for related fields; and native form submission for Save. Wire htmlFor, required, aria-invalid and aria-describedby explicitly. Copy patterns/forms/settings-form.tsx with settings-layout.tsx and settings-fields.tsx, and supply initialValues and an async onSave that resolves with the saved record; that record becomes the Cancel baseline, so server-normalized values replace what was typed. The form owns draft, validation, pending, saved and error states locally. Use a record key to remount when switching records. Cancel restores the latest saved values. Checkboxes participate in Save; switches are for immediate changes. The demo callback does not persist data. Applications own validation rules, authorization, API errors, navigation guards and persistence. Section and field spacing use density-aware layout tokens. See https://www.w3.org/WAI/tutorials/forms/ and https://react.dev/reference/react-dom/components/form.',
       },
     },
   },
@@ -79,6 +100,22 @@ export const Saving: Story = {
 };
 
 export const SaveFailure: Story = { play: verifyFailure };
+
+export const ServerNormalized: Story = { play: verifyServerNormalized };
+
+export const RecordSwitch: Story = {
+  render: (args) => <SettingsFormWithRecordSwitch {...args} />,
+  play: verifyRecordSwitch,
+};
+
+export const InsideDialog: Story = {
+  render: (args) => (
+    <EditProfileDialog>
+      <SettingsForm {...args} />
+    </EditProfileDialog>
+  ),
+  play: verifyInsideDialog,
+};
 
 export const NarrowContainer: Story = {
   render: (args) => (

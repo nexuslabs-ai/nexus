@@ -7,7 +7,8 @@ export type SettingsValues = { name: string; email: string; updates: boolean };
 export type SettingsFormProps = {
   title: string;
   initialValues: SettingsValues;
-  onSave: (values: SettingsValues) => Promise<void>;
+  /** Resolves with the saved record, which becomes the new Cancel baseline. */
+  onSave: (values: SettingsValues) => Promise<SettingsValues>;
 };
 
 export const FAILURE_MESSAGE =
@@ -31,17 +32,29 @@ export function normalize(values: SettingsValues): SettingsValues {
   return { ...values, name: values.name.trim(), email: values.email.trim() };
 }
 
+/** Keeps only the form's fields from the record onSave resolves with. */
+export function pickSettings({
+  name,
+  email,
+  updates,
+}: SettingsValues): SettingsValues {
+  return { name, email, updates };
+}
+
 // A loading Save is natively disabled, so a click-started save leaves focus on
 // <body> or the disabled Save. Put it back once the save settles; leave it if
 // the user moved on.
 export function restoreDroppedFocus(field: HTMLInputElement | null) {
   const active = document.activeElement;
-  if (active === document.body || active?.matches(':disabled')) field?.focus();
+  const onOwnDisabled =
+    field?.form?.contains(active) && active?.matches(':disabled');
+  if (active === document.body || onOwnDisabled) field?.focus();
 }
 
 export function SettingsLayout({
   children,
   title,
+  submitting,
   pending,
   dirty,
   message,
@@ -51,6 +64,9 @@ export function SettingsLayout({
 }: {
   children: React.ReactNode;
   title: string;
+  /** Locks Save and Cancel for the whole submission, validation included. */
+  submitting: boolean;
+  /** True only while onSave runs; drives the "Saving changes" status. */
   pending: boolean;
   dirty: boolean;
   message: string;
@@ -87,13 +103,13 @@ export function SettingsLayout({
         </p>
         <FieldError>{error}</FieldError>
         <div className="nx:flex nx:flex-wrap nx:gap-2">
-          <Button type="submit" loading={pending} disabled={!dirty}>
+          <Button type="submit" loading={submitting} disabled={!dirty}>
             Save changes
           </Button>
           <Button
             type="button"
             variant="outline"
-            disabled={!dirty || pending}
+            disabled={!dirty || submitting}
             onClick={onCancel}
           >
             Cancel

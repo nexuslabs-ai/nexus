@@ -7,6 +7,7 @@ import { SettingsFields } from './settings-fields';
 import {
   FAILURE_MESSAGE,
   normalize,
+  pickSettings,
   restoreDroppedFocus,
   type SettingsFormProps,
   SettingsLayout,
@@ -22,6 +23,7 @@ export function ReactHookFormExample({
 }: SettingsFormProps) {
   const nameRef = React.useRef<HTMLInputElement>(null);
   const [message, setMessage] = React.useState('');
+  const [pending, setPending] = React.useState(false);
   const form = useForm<SettingsValues>({
     defaultValues: initialValues,
     mode: 'onSubmit',
@@ -38,7 +40,7 @@ export function ReactHookFormExample({
     rules: { validate: validateEmail },
   });
   const updates = useController({ control: form.control, name: 'updates' });
-  const { isDirty: dirty, isSubmitting: pending, errors } = form.formState;
+  const { isDirty: dirty, isSubmitting: submitting, errors } = form.formState;
   function clearFeedback() {
     setMessage('');
     form.clearErrors('root.server');
@@ -62,20 +64,23 @@ export function ReactHookFormExample({
     name.field.ref(node);
   }
   async function save(values: SettingsValues) {
-    const submitted = normalize(values);
+    setPending(true);
+    let record: SettingsValues;
     try {
-      await onSave(submitted);
+      record = await onSave(normalize(values));
     } catch {
       form.setError('root.server', { message: FAILURE_MESSAGE });
       return;
+    } finally {
+      setPending(false);
+      restoreDroppedFocus(nameRef.current);
     }
-    form.reset(submitted);
+    form.reset(pickSettings(record));
     setMessage('Changes saved.');
   }
   async function submit(event: React.FormEvent<HTMLFormElement>) {
     setMessage('');
     await form.handleSubmit(save)(event);
-    restoreDroppedFocus(nameRef.current);
   }
   function cancelChanges() {
     form.reset();
@@ -85,6 +90,7 @@ export function ReactHookFormExample({
   return (
     <SettingsLayout
       title={title}
+      submitting={submitting}
       pending={pending}
       dirty={dirty}
       message={message}
@@ -93,7 +99,7 @@ export function ReactHookFormExample({
       onCancel={cancelChanges}
     >
       <SettingsFields
-        pending={pending}
+        submitting={submitting}
         nameField={{
           ...name.field,
           ref: attachName,

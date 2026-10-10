@@ -36,12 +36,12 @@ export function SettingsFields({
   nameField,
   emailField,
   updatesField,
-  pending,
+  submitting,
 }: {
   nameField: SettingsTextBinding;
   emailField: SettingsTextBinding;
   updatesField: SettingsCheckboxBinding;
-  pending: boolean;
+  submitting: boolean;
 }) {
   const id = React.useId();
   return (
@@ -62,7 +62,7 @@ export function SettingsFields({
               value={nameField.value}
               onChange={nameField.onChange}
               onBlur={nameField.onBlur}
-              readOnly={pending}
+              readOnly={submitting}
               aria-invalid={!!nameField.error}
               aria-describedby={`${id}-name-help${nameField.error ? ` ${id}-name-error` : ''}`}
             />
@@ -85,7 +85,7 @@ export function SettingsFields({
               value={emailField.value}
               onChange={emailField.onChange}
               onBlur={emailField.onBlur}
-              readOnly={pending}
+              readOnly={submitting}
               aria-invalid={!!emailField.error}
               aria-describedby={`${id}-email-help${emailField.error ? ` ${id}-email-error` : ''}`}
             />
@@ -100,7 +100,7 @@ export function SettingsFields({
       <FieldSet className="nx:min-w-0">
         <FieldLegend>Preferences</FieldLegend>
         <FieldGroup>
-          <Field orientation="horizontal" data-disabled={pending}>
+          <Field orientation="horizontal" data-disabled={submitting}>
             <Checkbox
               ref={updatesField.ref}
               id={`${id}-updates`}
@@ -110,7 +110,7 @@ export function SettingsFields({
                 updatesField.onCheckedChange(checked === true)
               }
               onBlur={updatesField.onBlur}
-              disabled={pending}
+              disabled={submitting}
               aria-describedby={`${id}-updates-help`}
             />
             <FieldContent>

@@ -6,6 +6,7 @@ import { SettingsFields } from './settings-fields';
 import {
   FAILURE_MESSAGE,
   normalize,
+  pickSettings,
   restoreDroppedFocus,
   type SettingsFormProps,
   SettingsLayout,
@@ -71,24 +72,27 @@ export function SettingsForm({
       (nextErrors.name ? nameRef : emailRef).current?.focus();
       return;
     }
-    const submitted = normalize(draft);
     setPending(true);
+    let record: SettingsValues;
     try {
-      await onSave(submitted);
-      setSaved(submitted);
-      setDraft(submitted);
-      setMessage('Changes saved.');
+      record = await onSave(normalize(draft));
     } catch {
       setSaveError(FAILURE_MESSAGE);
+      return;
     } finally {
       setPending(false);
+      restoreDroppedFocus(nameRef.current);
     }
-    restoreDroppedFocus(nameRef.current);
+    const baseline = pickSettings(record);
+    setSaved(baseline);
+    setDraft(baseline);
+    setMessage('Changes saved.');
   }
 
   return (
     <SettingsLayout
       title={title}
+      submitting={pending}
       pending={pending}
       dirty={dirty}
       message={message}
@@ -97,7 +101,7 @@ export function SettingsForm({
       onCancel={cancelChanges}
     >
       <SettingsFields
-        pending={pending}
+        submitting={pending}
         nameField={{
           name: 'name',
           ref: nameRef,

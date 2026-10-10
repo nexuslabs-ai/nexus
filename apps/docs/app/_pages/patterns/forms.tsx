@@ -66,9 +66,7 @@ const CONNECT_SAMPLE = `<SettingsForm
     email: profile.email,
     updates: profile.updates,
   }}
-  onSave={async (values) => {
-    await saveProfile(profile.id, values);
-  }}
+  onSave={(values) => saveProfile(profile.id, values)}
 />`;
 
 const BODY_CLASS = 'nx:typography-body-default nx:mb-4 nx:max-w-[64ch]';
@@ -153,12 +151,19 @@ export default function Forms() {
           remount after accepting a remote refresh.
         </p>
         <p className={BODY_CLASS}>
-          <InlineCode>onSave</InlineCode> must resolve only after persistence
-          succeeds and reject on failure. With <InlineCode>fetch</InlineCode>,
-          check <InlineCode>response.ok</InlineCode> and throw for unsuccessful
-          responses. Success makes the submitted values the new Cancel baseline;
-          failure keeps the draft for retry. Cancel restores the latest saved
-          values and focuses the first field. A pending save blocks duplicates.
+          <InlineCode>onSave</InlineCode> must resolve with the saved record
+          only after persistence succeeds, and reject on failure. With{' '}
+          <InlineCode>fetch</InlineCode>, check{' '}
+          <InlineCode>response.ok</InlineCode> and throw for unsuccessful
+          responses. <InlineCode>response.json()</InlineCode> is untyped, so
+          parse the body into the <InlineCode>SettingsValues</InlineCode> shape
+          before resolving; an envelope such as{' '}
+          <InlineCode>{'{ data: … }'}</InlineCode> would otherwise become the
+          baseline unchecked. The record it resolves with becomes the new Cancel
+          baseline, so values your server normalized replace what was typed;
+          fields the form does not edit are ignored. Failure keeps the draft for
+          retry. Cancel restores the latest saved values and focuses the first
+          field. A pending save blocks duplicates.
         </p>
       </section>
 
@@ -248,11 +253,6 @@ export default function Forms() {
             Authorization, server validation, loading data, navigation guards
             and persistence. Replace the sample validation rules and fields to
             fit your data.
-          </li>
-          <li>
-            Server-normalized values: the forms do not reconcile them, so adapt
-            the save contract if your server returns canonical values that
-            differ from the submission.
           </li>
           <li>
             Error text: a rejected save always shows the recipe’s fixed failure

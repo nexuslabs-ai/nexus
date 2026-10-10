@@ -2,18 +2,26 @@ import type { Meta, StoryObj } from '@storybook/react';
 import { fn } from 'storybook/test';
 
 import {
+  EditProfileDialog,
+  RecordSwitchControls,
+  useRecordSwitch,
+} from '../../stories/support/settings-form-scenes';
+import {
   slowSave,
   verifyFailure,
+  verifyInsideDialog,
   verifyNarrow,
   verifyPending,
+  verifyRecordSwitch,
   verifySaveCancel,
+  verifyServerNormalized,
   verifyValidation,
 } from '../../stories/support/settings-form-test-utils';
 
 import { ReactHookFormExample } from './react-hook-form';
 import hookFormSource from './react-hook-form.tsx?raw';
 import fieldsSource from './settings-fields.tsx?raw';
-import type { SettingsValues } from './settings-layout';
+import type { SettingsFormProps, SettingsValues } from './settings-layout';
 import layoutSource from './settings-layout.tsx?raw';
 import { TanStackFormExample } from './tanstack-form';
 import tanStackSource from './tanstack-form.tsx?raw';
@@ -23,6 +31,40 @@ const sharedSource =
   layoutSource +
   '\n\n// settings-fields.tsx\n' +
   fieldsSource;
+
+function ReactHookFormWithRecordSwitch(props: SettingsFormProps) {
+  const { record, loadNewerCopy, switchRecord } = useRecordSwitch();
+  return (
+    <>
+      <RecordSwitchControls
+        onLoadNewerCopy={loadNewerCopy}
+        onSwitchRecord={switchRecord}
+      />
+      <ReactHookFormExample
+        {...props}
+        key={record.id}
+        initialValues={record.values}
+      />
+    </>
+  );
+}
+
+function TanStackFormWithRecordSwitch(props: SettingsFormProps) {
+  const { record, loadNewerCopy, switchRecord } = useRecordSwitch();
+  return (
+    <>
+      <RecordSwitchControls
+        onLoadNewerCopy={loadNewerCopy}
+        onSwitchRecord={switchRecord}
+      />
+      <TanStackFormExample
+        {...props}
+        key={record.id}
+        initialValues={record.values}
+      />
+    </>
+  );
+}
 
 const tanStackDocs = {
   docs: {
@@ -44,7 +86,7 @@ const meta = {
       email: 'priya@example.com',
       updates: false,
     },
-    onSave: fn(async (_values: SettingsValues) => {}),
+    onSave: fn(async (values: SettingsValues) => values),
   },
   argTypes: { onSave: { control: false } },
   decorators: [
@@ -63,7 +105,7 @@ const meta = {
       },
       description: {
         component:
-          'The same Nexus form with two interchangeable form-management libraries. These recipes live in ordinary source files; Storybook imports the same implementation. Copy the chosen integration with settings-layout.tsx and settings-fields.tsx, and install only that form library. Both validate on submit, clear a field error when edited, focus the first invalid field, preserve edits on save failure, and restore the latest saved values on Cancel. React Hook Form uses useForm/useController; TanStack uses useForm/useField with subscriptions. TanStack unsaved state uses !isDefaultValue rather than historical isDirty. Both reset the saved baseline after success. onSave is application-owned; no backend persistence is included. Applications provide initialValues and onSave. Remount with a record key when switching records. The existing Forms and Settings recipe demonstrates plain React.',
+          'The same Nexus form with two interchangeable form-management libraries. These recipes live in ordinary source files; Storybook imports the same implementation. Copy the chosen integration with settings-layout.tsx and settings-fields.tsx, and install only that form library. Both validate on submit, clear a field error when edited, focus the first invalid field, preserve edits on save failure, and restore the latest saved values on Cancel. React Hook Form uses useForm/useController; TanStack uses useForm/useField with subscriptions. TanStack unsaved state uses !isDefaultValue rather than historical isDirty. Both reset the saved baseline to the record onSave resolves with, so server-normalized values replace what was typed. Saving changes shows only while onSave is running, not during validation. onSave is application-owned; no backend persistence is included. Applications provide initialValues and onSave. Remount with a record key when switching records. The existing Forms and Settings recipe demonstrates plain React.',
       },
     },
   },
@@ -114,6 +156,40 @@ export const TanStackFormNarrow: Story = {
     </div>
   ),
   play: verifyNarrow,
+};
+export const ReactHookFormServerNormalized: Story = {
+  play: verifyServerNormalized,
+};
+export const TanStackFormServerNormalized: Story = {
+  parameters: tanStackDocs,
+  render: (args) => <TanStackFormExample {...args} />,
+  play: verifyServerNormalized,
+};
+export const ReactHookFormRecordSwitch: Story = {
+  render: (args) => <ReactHookFormWithRecordSwitch {...args} />,
+  play: verifyRecordSwitch,
+};
+export const TanStackFormRecordSwitch: Story = {
+  parameters: tanStackDocs,
+  render: (args) => <TanStackFormWithRecordSwitch {...args} />,
+  play: verifyRecordSwitch,
+};
+export const ReactHookFormInsideDialog: Story = {
+  render: (args) => (
+    <EditProfileDialog>
+      <ReactHookFormExample {...args} />
+    </EditProfileDialog>
+  ),
+  play: verifyInsideDialog,
+};
+export const TanStackFormInsideDialog: Story = {
+  parameters: tanStackDocs,
+  render: (args) => (
+    <EditProfileDialog>
+      <TanStackFormExample {...args} />
+    </EditProfileDialog>
+  ),
+  play: verifyInsideDialog,
 };
 export const AllVariants: Story = {
   parameters: {
