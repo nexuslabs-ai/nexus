@@ -2,7 +2,7 @@
 
 import * as React from 'react';
 
-import { useField, useForm, useStore } from '@tanstack/react-form';
+import { useField, useForm, useSelector } from '@tanstack/react-form';
 
 import { SettingsFields } from './settings-fields';
 import {
@@ -48,8 +48,8 @@ export function TanStackFormExample({
     validators: { onSubmit: ({ value }) => validateEmail(value) },
   });
   const updates = useField({ form, name: 'updates' });
-  const dirty = useStore(form.store, (state) => !state.isDefaultValue);
-  const pending = useStore(form.store, (state) => state.isSubmitting);
+  const dirty = useSelector(form.store, (state) => !state.isDefaultValue);
+  const pending = useSelector(form.store, (state) => state.isSubmitting);
   function clearFeedback() {
     setMessage('');
     setSaveError('');
