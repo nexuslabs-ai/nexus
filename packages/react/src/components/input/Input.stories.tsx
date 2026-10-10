@@ -34,7 +34,7 @@ const meta: Meta<typeof Input> = {
     },
     variant: {
       control: 'select',
-      options: ['bordered', 'borderless'],
+      options: ['bordered', 'borderless', 'ghost'],
       description: 'The visual treatment of the input',
     },
     type: {
@@ -212,6 +212,49 @@ export const BorderlessStates: Story = {
     await expect(disabled).not.toHaveClass(
       'nx:disabled:border-border-disabled'
     );
+  },
+};
+
+export const GhostStates: Story = {
+  render: () => (
+    <div className="nx:flex nx:w-[400px] nx:flex-col nx:gap-3">
+      <Input
+        data-testid="input-ghost-filled"
+        variant="ghost"
+        defaultValue="Quarterly planning"
+        aria-label="Filled ghost input"
+      />
+      <Input
+        data-testid="input-ghost-invalid"
+        variant="ghost"
+        defaultValue="invalid@"
+        aria-invalid
+        aria-label="Invalid ghost input"
+      />
+      <Input
+        data-testid="input-ghost-disabled"
+        variant="ghost"
+        placeholder="Disabled"
+        disabled
+      />
+    </div>
+  ),
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+    const filled = canvas.getByTestId('input-ghost-filled');
+    const invalid = canvas.getByTestId('input-ghost-invalid');
+
+    await expect(filled).toHaveAttribute('data-variant', 'ghost');
+    const rest = window.getComputedStyle(filled);
+    await expect(rest.borderTopColor).toBe('rgba(0, 0, 0, 0)');
+    await expect(rest.backgroundColor).toBe('rgba(0, 0, 0, 0)');
+
+    await expect(filled).toHaveClass('nx:enabled:hover:border-border-default');
+
+    await expect(window.getComputedStyle(invalid).borderTopColor).not.toBe(
+      'rgba(0, 0, 0, 0)'
+    );
+    await expect(canvas.getByTestId('input-ghost-disabled')).toBeDisabled();
   },
 };
 
@@ -649,6 +692,12 @@ export const AllVariants: Story = {
               borderless
             </span>
             <Input variant="borderless" placeholder="Borderless input" />
+          </div>
+          <div className="nx:flex nx:items-center nx:gap-4">
+            <span className="nx:typography-label-small nx:text-muted-foreground nx:w-20">
+              ghost
+            </span>
+            <Input variant="ghost" placeholder="Ghost input" />
           </div>
         </div>
       </div>

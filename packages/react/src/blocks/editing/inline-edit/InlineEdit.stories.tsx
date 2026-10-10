@@ -1,32 +1,159 @@
 import { useRef, useState } from 'react';
 
+import { Canvas, Source, Title } from '@storybook/addon-docs/blocks';
 import type { Meta, StoryObj } from '@storybook/react';
 import { expect, fireEvent, fn, userEvent, within } from 'storybook/test';
 
-import { Button } from '../button';
+import { Button } from '../../../components/button';
+import {
+  DescriptionList,
+  DescriptionListDescription,
+  DescriptionListItem,
+  DescriptionListTerm,
+} from '../../../components/description-list';
 
 import { InlineEdit, type InlineEditProps } from './inline-edit';
+import blockSource from './inline-edit.tsx?raw';
+import { InlineEditExample } from './inline-edit-example';
+import exampleSource from './inline-edit-example.tsx?raw';
+
+const propsShape = `value: string;
+label: string;
+onCommit: (value: string) => void | Promise<void>;
+editing?: boolean;
+onEditingChange?: (editing: boolean) => void;
+readOnly?: boolean;
+error?: ReactNode;
+activation?: 'pencil' | 'click';
+blurBehavior?: 'keep-open' | 'save' | 'cancel';
+required?: boolean;
+requiredMessage?: string;
+emptyText?: string;
+placeholder?: string;`;
 
 const meta: Meta<typeof InlineEdit> = {
-  title: 'Components/InlineEdit',
+  title: 'Blocks/Editing/InlineEdit',
   component: InlineEdit,
+  tags: ['autodocs'],
   parameters: {
+    layout: 'centered',
+    controls: { disable: true },
     docs: {
-      description: {
-        component:
-          'Single-line text editing with pencil or click activation. The consumer owns the committed value, persistence, and any error. `onCommit` receives the trimmed draft; return a promise to keep the editor open until it settles — rejecting keeps the draft open for the consumer to show `error`. `editing` / `onEditingChange` control when the editor is open. Enter saves, Escape cancels, and blurBehavior selects keep-open (default), save, or cancel when focus leaves the entire editor. Exiting never steals focus from the next control. Optional values can be cleared; required values show `requiredMessage`. Read-only values have no editing controls.',
-      },
+      page: () => (
+        <>
+          <Title />
+          <p>
+            Edit a single line of text in place. The value reads as text until
+            you open the editor, then saves with Enter or Save.
+          </p>
+          <h2>When to use it</h2>
+          <p>
+            Use it for one field on a detail view, such as a name or title,
+            where a whole form would be heavy. For several related fields, or
+            anything longer than one line, use a form with Field and Input.
+          </p>
+          <h2>Minimal composition</h2>
+          <Canvas of={Default} />
+          <Source code={exampleSource} language="tsx" />
+          <h2>Value and changes</h2>
+          <p>
+            <code>value</code> is controlled: pass the saved value and update it
+            in <code>onCommit</code>.
+          </p>
+          <Source code={propsShape} language="tsx" />
+          <ul>
+            <li>
+              Enter or Save emits the trimmed draft through{' '}
+              <code>onCommit</code>. Escape and Cancel emit nothing.
+            </li>
+            <li>
+              Return a promise from <code>onCommit</code> to keep the editor
+              open until it settles. Resolving closes the editor; rejecting, or
+              throwing, keeps the draft open so you can show <code>error</code>{' '}
+              and the user can retry.
+            </li>
+            <li>
+              While a save is pending the input is read-only and Escape, Cancel
+              and leaving the editor do nothing.
+            </li>
+            <li>
+              <code>required</code> blocks an empty save and shows{' '}
+              <code>requiredMessage</code> until the user types.
+            </li>
+          </ul>
+          <p>
+            The block owns the draft and, unless you pass <code>editing</code>,
+            whether the editor is open. Your application owns the saved value,
+            persistence and any save error.
+          </p>
+          <h2>States and dismissal</h2>
+          <p>
+            <code>blurBehavior</code> decides what happens when focus leaves the
+            whole editor: keep it open (the default), save, or cancel. Closing
+            returns focus to the edit trigger only when focus was still inside
+            the editor, so it never takes focus from the next control. A
+            controlled close while a save is pending discards that save&apos;s
+            result.
+          </p>
+          <h3>Click activation</h3>
+          <Canvas of={ClickActivation} />
+          <h3>Required</h3>
+          <Canvas of={Required} />
+          <h3>Read only</h3>
+          <Canvas of={ReadOnly} />
+          <h3>In a description list</h3>
+          <Canvas of={InDescriptionList} />
+          <h2>Delivery</h2>
+          <p>
+            Manual guidance until the generated catalog lands (#798). This is
+            copy-source, not a package export.
+          </p>
+          <ul>
+            <li>
+              Copy <code>blocks/editing/inline-edit/inline-edit.tsx</code>.
+            </li>
+            <li>
+              It needs these Nexus component folders, including the ones those
+              folders import: <code>button</code>, <code>button-group</code>,{' '}
+              <code>field</code>, <code>input</code>, <code>label</code>,{' '}
+              <code>separator</code>, <code>spinner</code> and <code>lib/</code>
+              . If your copy lives elsewhere, update the relative imports.
+            </li>
+            <li>
+              <code>@tabler/icons-react</code>, which the Nexus components
+              already use.
+            </li>
+            <li>
+              Include the copied file in your Tailwind source scan and use the
+              Nexus theme and styles setup.
+            </li>
+            <li>
+              Your application owns the value, saving, validation beyond
+              required, permissions (<code>readOnly</code>) and error copy.
+            </li>
+          </ul>
+          <h2>Evidence and support boundary</h2>
+          <p>The stories on this page test each behaviour above.</p>
+          <p>
+            Not supported: multi-line text, rich text, and non-text values such
+            as dates or selects. Edit those in a form.
+          </p>
+          <h2>Implementation</h2>
+          <details>
+            <summary>blocks/editing/inline-edit/inline-edit.tsx</summary>
+            <Source code={blockSource} language="tsx" />
+          </details>
+        </>
+      ),
     },
   },
 };
 export default meta;
 type Story = StoryObj<typeof InlineEdit>;
 
-type ExampleProps = Partial<Omit<InlineEditProps, 'readOnly' | 'onCommit'>> & {
-  onCommit?: (value: string) => void;
-};
+function ignoreCommit() {}
 
-function Example({ onCommit, ...props }: ExampleProps) {
+function Example({ onCommit, ...props }: Partial<InlineEditProps>) {
   const [value, setValue] = useState(props.value ?? 'Priya Shah');
 
   function handleCommit(next: string) {
@@ -46,14 +173,6 @@ function Example({ onCommit, ...props }: ExampleProps) {
   );
 }
 
-function ReadOnlyExample({ value = 'Priya Shah' }: { value?: string }) {
-  return (
-    <div className="nx:w-full nx:max-w-sm">
-      <InlineEdit readOnly label="Name" value={value} />
-    </div>
-  );
-}
-
 async function clickWithoutFocusingTarget(target: HTMLElement) {
   const focused = document.activeElement;
   const defaultAllowed = await fireEvent.mouseDown(target);
@@ -64,11 +183,11 @@ async function clickWithoutFocusingTarget(target: HTMLElement) {
 
 export const Default: Story = {
   tags: ['docs'],
-  render: () => <Example />,
+  render: () => <InlineEditExample />,
+  parameters: { docs: { source: { code: exampleSource } } },
 };
 
 export const ClickActivation: Story = {
-  tags: ['docs'],
   render: () => <Example activation="click" value="" emptyText="Add a name" />,
   play: async ({ canvasElement }) => {
     const canvas = within(canvasElement);
@@ -120,7 +239,6 @@ export const CommitInteraction: Story = {
 };
 
 export const Required: Story = {
-  tags: ['docs'],
   render: () => <Example required requiredMessage="Enter a name." />,
   play: async ({ canvasElement }) => {
     const canvas = within(canvasElement);
@@ -139,8 +257,7 @@ export const Required: Story = {
 };
 
 export const ReadOnly: Story = {
-  tags: ['docs'],
-  render: () => <ReadOnlyExample value="" />,
+  render: () => <Example readOnly value="" />,
   play: async ({ canvasElement }) => {
     const canvas = within(canvasElement);
     await expect(canvas.getByText('Not provided')).toBeVisible();
@@ -152,23 +269,51 @@ export const ReadOnly: Story = {
 export const WithDataAttributes: Story = {
   render: () => (
     <div className="nx:grid nx:w-full nx:max-w-sm nx:gap-4">
-      <Example />
+      <Example required />
       <Example activation="click" />
-      <ReadOnlyExample />
+      <Example readOnly />
     </div>
   ),
   play: async ({ canvasElement }) => {
-    const roots = canvasElement.querySelectorAll('[data-slot="inline-edit"]');
+    const roots = canvasElement.querySelectorAll<HTMLElement>(
+      '[data-slot="inline-edit"]'
+    );
     await expect(roots).toHaveLength(3);
-    await expect(roots[0]).toHaveAttribute('data-activation', 'pencil');
-    await expect(roots[1]).toHaveAttribute('data-activation', 'click');
-    await expect(roots[0]).not.toHaveAttribute('data-readonly');
-    await expect(roots[2]).toHaveAttribute('data-readonly', 'true');
+    const [pencil, click, readOnly] = Array.from(roots);
+    await expect(pencil).toHaveAttribute('data-activation', 'pencil');
+    await expect(click).toHaveAttribute('data-activation', 'click');
+    await expect(pencil).not.toHaveAttribute('data-readonly');
+    await expect(readOnly).toHaveAttribute('data-readonly', 'true');
     for (const root of roots) {
+      await expect(root).not.toHaveAttribute('data-editing');
       await expect(
         root.querySelector('[data-slot="inline-edit-value"]')
       ).toHaveTextContent('Priya Shah');
     }
+    await expect(
+      pencil!.querySelector('[data-slot="inline-edit-trigger"]')
+    ).not.toBeNull();
+    await expect(
+      click!.querySelector('[data-slot="inline-edit-trigger"]')
+    ).not.toBeNull();
+    await expect(
+      readOnly!.querySelector('[data-slot="inline-edit-trigger"]')
+    ).toBeNull();
+
+    const canvas = within(pencil!);
+    await userEvent.click(canvas.getByRole('button', { name: 'Edit Name' }));
+    await expect(pencil).toHaveAttribute('data-editing', 'true');
+    await expect(
+      pencil!.querySelector('[data-slot="inline-edit-editor"]')
+    ).not.toBeNull();
+    await expect(
+      pencil!.querySelector('[data-slot="inline-edit-actions"]')
+    ).not.toBeNull();
+    await userEvent.clear(canvas.getByRole('textbox'));
+    await userEvent.keyboard('{Enter}');
+    await expect(
+      pencil!.querySelector('[data-slot="field-error"]')
+    ).toHaveTextContent('Name is required.');
   },
 };
 
@@ -196,8 +341,8 @@ export const AllVariants: Story = {
       <Example activation="click" value="" />
       <Example />
       <Example value="" />
-      <ReadOnlyExample />
-      <ReadOnlyExample value="" />
+      <Example readOnly />
+      <Example readOnly value="" />
     </div>
   ),
 };
@@ -425,6 +570,11 @@ export const AsyncCommit: Story = {
     await expect(input).toHaveAttribute('readonly');
     await userEvent.keyboard('{Escape}');
     await expect(input).toBeInTheDocument();
+    await userEvent.click(
+      canvas.getByRole('button', { name: 'Cancel editing Name' })
+    );
+    await expect(input).toBeInTheDocument();
+    await expect(group).toHaveAttribute('aria-busy', 'true');
 
     await userEvent.click(
       canvas.getByRole('button', { name: 'Finish saving' })
@@ -434,6 +584,68 @@ export const AsyncCommit: Story = {
     await expect(
       canvas.getByRole('button', { name: 'Finish saving' })
     ).toHaveFocus();
+  },
+};
+
+function ReopenWhilePendingExample() {
+  const [value, setValue] = useState('Priya Shah');
+  const [editing, setEditing] = useState(false);
+  const finishSave = useRef<() => void>(undefined);
+
+  async function handleCommit(next: string) {
+    await new Promise<void>((resolve) => {
+      finishSave.current = resolve;
+    });
+    setValue(next);
+  }
+
+  return (
+    <div className="nx:grid nx:w-full nx:max-w-sm nx:gap-4">
+      <InlineEdit
+        label="Name"
+        value={value}
+        editing={editing}
+        onEditingChange={setEditing}
+        onCommit={handleCommit}
+      />
+      <Button variant="outline" onClick={() => setEditing(false)}>
+        Close
+      </Button>
+      <Button variant="outline" onClick={() => setEditing(true)}>
+        Rename
+      </Button>
+      <Button variant="outline" onClick={() => finishSave.current?.()}>
+        Finish saving
+      </Button>
+    </div>
+  );
+}
+
+export const ReopenWhilePending: Story = {
+  render: () => <ReopenWhilePendingExample />,
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+    await userEvent.click(canvas.getByRole('button', { name: 'Edit Name' }));
+    await userEvent.clear(canvas.getByRole('textbox', { name: 'Name' }));
+    await userEvent.type(
+      canvas.getByRole('textbox', { name: 'Name' }),
+      'Priya Sharma{Enter}'
+    );
+    await expect(
+      canvas.getByRole('group', { name: 'Edit Name' })
+    ).toHaveAttribute('aria-busy', 'true');
+    await userEvent.click(canvas.getByRole('button', { name: 'Close' }));
+    await expect(canvas.queryByRole('textbox')).not.toBeInTheDocument();
+
+    await userEvent.click(canvas.getByRole('button', { name: 'Rename' }));
+    const input = canvas.getByRole('textbox', { name: 'Name' });
+    await userEvent.type(input, ' Rao');
+    await userEvent.click(
+      canvas.getByRole('button', { name: 'Finish saving' })
+    );
+    await expect(input).toBeInTheDocument();
+    await expect(input).toHaveValue('Priya Shah Rao');
+    await expect(input).not.toHaveAttribute('readonly');
   },
 };
 
@@ -564,7 +776,7 @@ function ExternalCloseExample() {
         editing={editing}
         blurBehavior="cancel"
         onEditingChange={handleEditingChange}
-        onCommit={fn()}
+        onCommit={ignoreCommit}
       />
       <Button variant="outline">Elsewhere</Button>
       <Button
@@ -601,7 +813,6 @@ export const ExternalCloseReturnsFocus: Story = {
 function LockExample() {
   const [editing, setEditing] = useState(false);
   const [locked, setLocked] = useState(false);
-  const access = locked ? { readOnly: true as const } : { onCommit: fn() };
 
   function lock() {
     setEditing(false);
@@ -614,8 +825,9 @@ function LockExample() {
         label="Name"
         value="Priya Shah"
         editing={editing}
+        readOnly={locked}
         onEditingChange={setEditing}
-        {...access}
+        onCommit={ignoreCommit}
       />
       <Button
         variant="outline"
@@ -684,6 +896,121 @@ export const StableEditingTypography: Story = {
         );
       }
       await userEvent.keyboard('{Escape}');
+    }
+  },
+};
+
+function ProfileName({
+  activation = 'pencil',
+  initialValue = 'Priya Shah',
+  readOnly = false,
+}: {
+  activation?: InlineEditProps['activation'];
+  initialValue?: string;
+  readOnly?: boolean;
+}) {
+  const [name, setName] = useState(initialValue);
+  return (
+    <DescriptionList>
+      <DescriptionListItem>
+        <DescriptionListTerm>Name</DescriptionListTerm>
+        <DescriptionListDescription>
+          <InlineEdit
+            label="Name"
+            value={name}
+            onCommit={setName}
+            activation={activation}
+            readOnly={readOnly}
+            placeholder="Enter a name"
+          />
+        </DescriptionListDescription>
+      </DescriptionListItem>
+    </DescriptionList>
+  );
+}
+
+export const InDescriptionList: Story = {
+  render: () => <ProfileName />,
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+    await userEvent.tab();
+    await expect(
+      canvas.getByRole('button', { name: 'Edit Name' })
+    ).toHaveFocus();
+    await userEvent.keyboard('{Enter}');
+    const input = canvas.getByRole('textbox', { name: 'Name' });
+    await expect(input).toHaveFocus();
+    await userEvent.clear(input);
+    await userEvent.type(input, 'Priya Sharma{Enter}');
+    await expect(
+      canvas.getByText('Priya Sharma', { exact: true })
+    ).toHaveTextContent('Priya Sharma');
+    await expect(
+      canvas.getByRole('button', { name: 'Edit Name' })
+    ).toHaveFocus();
+    await userEvent.keyboard('{Enter}');
+    await userEvent.clear(canvas.getByRole('textbox', { name: 'Name' }));
+    await userEvent.keyboard('{Escape}');
+    await expect(
+      canvas.getByText('Priya Sharma', { exact: true })
+    ).toHaveTextContent('Priya Sharma');
+    await expect(
+      canvas.getByRole('button', { name: 'Edit Name' })
+    ).toHaveFocus();
+    await userEvent.click(canvas.getByRole('button', { name: 'Edit Name' }));
+    await userEvent.clear(canvas.getByRole('textbox', { name: 'Name' }));
+    await userEvent.type(
+      canvas.getByRole('textbox', { name: 'Name' }),
+      'Priya Shah'
+    );
+    await userEvent.click(canvas.getByRole('button', { name: 'Save Name' }));
+    await expect(
+      canvas.getByText('Priya Shah', { exact: true })
+    ).toHaveTextContent('Priya Shah');
+    await userEvent.click(canvas.getByRole('button', { name: 'Edit Name' }));
+    await userEvent.click(
+      canvas.getByRole('button', { name: 'Cancel editing Name' })
+    );
+    await expect(canvas.queryByRole('textbox')).not.toBeInTheDocument();
+  },
+};
+
+export const DescriptionListAlignment: Story = {
+  render: () => (
+    <div className="nx:grid nx:w-full nx:max-w-3xl nx:gap-8">
+      <ProfileName />
+      <ProfileName initialValue="" />
+      <ProfileName activation="click" />
+      <ProfileName activation="click" initialValue="" />
+      <ProfileName readOnly />
+      <ProfileName readOnly initialValue="" />
+    </div>
+  ),
+  play: async ({ canvasElement }) => {
+    const list = canvasElement.querySelector('dl')!;
+    const showcase = list.parentElement!;
+    const availableWidth =
+      showcase.parentElement!.getBoundingClientRect().width;
+    const maximumWidth = Number.parseFloat(getComputedStyle(showcase).maxWidth);
+    await expect(showcase.getBoundingClientRect().width).toBeCloseTo(
+      Math.min(availableWidth, maximumWidth),
+      0
+    );
+    for (const item of canvasElement.querySelectorAll(
+      '[data-slot="description-list-item"]'
+    )) {
+      const term = item.querySelector('dt')!;
+      const value = item.querySelector('[data-slot="inline-edit-value"]')!;
+      const termRange = document.createRange();
+      termRange.selectNodeContents(term);
+      const valueRange = document.createRange();
+      valueRange.selectNodeContents(value);
+      await expect(
+        Math.abs(
+          termRange.getBoundingClientRect().top -
+            valueRange.getBoundingClientRect().top
+        )
+      ).toBeLessThan(1);
     }
   },
 };

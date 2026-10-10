@@ -60,7 +60,7 @@
         "sonner",
         "vaul"
       ],
-      "limit": "105 kB"
+      "limit": "100 kB"
     },
     {
       "name": "@nexus_ds/react (CSS)",
