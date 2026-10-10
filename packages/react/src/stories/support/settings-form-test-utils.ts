@@ -1,6 +1,6 @@
 import { expect, type Mock, userEvent, waitFor, within } from 'storybook/test';
 
-import type { SettingsFormProps } from '../../recipes/forms/settings-layout';
+import type { SettingsFormProps } from '../../patterns/forms/settings-layout';
 
 type SettingsPlayContext = {
   canvasElement: HTMLElement;

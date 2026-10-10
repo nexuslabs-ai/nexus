@@ -1,14 +1,6 @@
 import type { Meta, StoryObj } from '@storybook/react';
 import { fn } from 'storybook/test';
 
-import { ReactHookFormExample } from '../recipes/forms/react-hook-form';
-import hookFormSource from '../recipes/forms/react-hook-form.tsx?raw';
-import fieldsSource from '../recipes/forms/settings-fields.tsx?raw';
-import type { SettingsValues } from '../recipes/forms/settings-layout';
-import layoutSource from '../recipes/forms/settings-layout.tsx?raw';
-import { TanStackFormExample } from '../recipes/forms/tanstack-form';
-import tanStackSource from '../recipes/forms/tanstack-form.tsx?raw';
-
 import {
   slowSave,
   verifyFailure,
@@ -16,7 +8,15 @@ import {
   verifyPending,
   verifySaveCancel,
   verifyValidation,
-} from './support/settings-form-test-utils';
+} from '../../stories/support/settings-form-test-utils';
+
+import { ReactHookFormExample } from './react-hook-form';
+import hookFormSource from './react-hook-form.tsx?raw';
+import fieldsSource from './settings-fields.tsx?raw';
+import type { SettingsValues } from './settings-layout';
+import layoutSource from './settings-layout.tsx?raw';
+import { TanStackFormExample } from './tanstack-form';
+import tanStackSource from './tanstack-form.tsx?raw';
 
 const sharedSource =
   '\n\n// settings-layout.tsx\n' +

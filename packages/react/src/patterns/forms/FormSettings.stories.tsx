@@ -1,17 +1,7 @@
 import type { Meta, StoryObj } from '@storybook/react';
 import { expect, fn, within } from 'storybook/test';
 
-import { Separator } from '../components/separator';
-import {
-  DisabledSettings,
-  ReadOnlyDetails,
-} from '../recipes/forms/settings-display';
-import displaySource from '../recipes/forms/settings-display.tsx?raw';
-import fieldsSource from '../recipes/forms/settings-fields.tsx?raw';
-import { SettingsForm } from '../recipes/forms/settings-form';
-import formSource from '../recipes/forms/settings-form.tsx?raw';
-import layoutSource from '../recipes/forms/settings-layout.tsx?raw';
-
+import { Separator } from '../../components/separator';
 import {
   slowSave,
   verifyFailure,
@@ -19,7 +9,14 @@ import {
   verifyPending,
   verifySaveCancel,
   verifyValidation,
-} from './support/settings-form-test-utils';
+} from '../../stories/support/settings-form-test-utils';
+
+import { DisabledSettings, ReadOnlyDetails } from './settings-display';
+import displaySource from './settings-display.tsx?raw';
+import fieldsSource from './settings-fields.tsx?raw';
+import { SettingsForm } from './settings-form';
+import formSource from './settings-form.tsx?raw';
+import layoutSource from './settings-layout.tsx?raw';
 
 const settingsSource =
   formSource +
@@ -52,7 +49,7 @@ const meta = {
       source: { code: settingsSource, language: 'tsx', type: 'code' },
       description: {
         component:
-          'A copyable composition of existing Nexus components, not a new form framework. Use Field for a label, control, help and error; FieldSet + FieldLegend for related fields; and native form submission for Save. Wire htmlFor, required, aria-invalid and aria-describedby explicitly. Copy recipes/forms/settings-form.tsx with settings-layout.tsx and settings-fields.tsx, and supply initialValues and an async onSave. The form owns draft, validation, pending, saved and error states locally. Use a record key to remount when switching records. Cancel restores the latest saved values. Checkboxes participate in Save; switches are for immediate changes. The demo callback does not persist data. Applications own validation rules, authorization, API errors, navigation guards and persistence. Section and field spacing use density-aware layout tokens. See https://www.w3.org/WAI/tutorials/forms/ and https://react.dev/reference/react-dom/components/form.',
+          'A copyable composition of existing Nexus components, not a new form framework. Use Field for a label, control, help and error; FieldSet + FieldLegend for related fields; and native form submission for Save. Wire htmlFor, required, aria-invalid and aria-describedby explicitly. Copy patterns/forms/settings-form.tsx with settings-layout.tsx and settings-fields.tsx, and supply initialValues and an async onSave. The form owns draft, validation, pending, saved and error states locally. Use a record key to remount when switching records. Cancel restores the latest saved values. Checkboxes participate in Save; switches are for immediate changes. The demo callback does not persist data. Applications own validation rules, authorization, API errors, navigation guards and persistence. Section and field spacing use density-aware layout tokens. See https://www.w3.org/WAI/tutorials/forms/ and https://react.dev/reference/react-dom/components/form.',
       },
     },
   },

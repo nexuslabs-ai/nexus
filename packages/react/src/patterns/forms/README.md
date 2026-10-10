@@ -56,7 +56,7 @@ safe to display; otherwise map it to a useful message in your save callback.
 
 ## Source and Storybook
 
-The relative imports assume this repository's `recipes/forms` and `components`
+The relative imports assume this repository's `patterns/forms` and `components`
 layout. When copying into an app, update those paths to its Nexus components;
 include their helpers and Nexus styles. This is source reuse inside the current
 Nexus setup, not a claim that a standalone installer is complete. External

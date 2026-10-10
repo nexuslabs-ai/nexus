@@ -34,7 +34,6 @@ export default defineConfig({
         'src/stories/**',
         'src/blocks/**',
         'src/patterns/**',
-        'src/recipes/**',
       ],
       outDir: 'dist',
       beforeWriteFile: rewriteRootDeclaration,
