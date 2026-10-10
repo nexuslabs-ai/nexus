@@ -34,7 +34,7 @@ const SURFACE_TOKEN_NAMES = [
   'nav-item-active',
   'nav-border',
   'disabled',
-  'border-active',
+  'border-focus',
 ] as const;
 
 const TEXT_TOKEN_NAMES = [
@@ -64,8 +64,8 @@ const BRAND_TOKEN_NAMES = [
   'primary-subtle-foreground',
   'primary-subtle-hover',
   'primary-subtle-active',
-  'border-primary',
-  'border-primary-active',
+  'primary-border',
+  'primary-border-active',
   'secondary-background',
   'secondary-background-hover',
   'secondary-background-active',
@@ -87,7 +87,7 @@ const STATUS_TOKEN_NAMES = [
   'success-subtle-foreground',
   'success-subtle-hover',
   'success-subtle-active',
-  'border-success',
+  'success-border',
   'border-success-active',
   'warning-background',
   'warning-background-hover',
@@ -98,7 +98,7 @@ const STATUS_TOKEN_NAMES = [
   'warning-subtle-foreground',
   'warning-subtle-hover',
   'warning-subtle-active',
-  'border-warning',
+  'warning-border',
   'border-warning-active',
   'error-background',
   'error-background-hover',
@@ -109,7 +109,7 @@ const STATUS_TOKEN_NAMES = [
   'error-subtle-foreground',
   'error-subtle-hover',
   'error-subtle-active',
-  'border-error',
+  'error-border',
   'border-error-active',
   'information-background',
   'information-background-hover',
@@ -120,7 +120,7 @@ const STATUS_TOKEN_NAMES = [
   'information-subtle-foreground',
   'information-subtle-hover',
   'information-subtle-active',
-  'border-information',
+  'information-border',
   'border-information-active',
 ] as const;
 

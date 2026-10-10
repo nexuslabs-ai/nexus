@@ -32,6 +32,7 @@ type Story = StoryObj<typeof RadioGroup>;
 // ============================================
 
 export const Default: Story = {
+  tags: ['docs'],
   render: (args) => (
     <RadioGroup {...args} defaultValue="comfortable" aria-label="Density">
       <div className="nx:flex nx:items-center nx:gap-2">
@@ -51,6 +52,7 @@ export const Default: Story = {
 };
 
 export const VerticalWithLabels: Story = {
+  tags: ['docs'],
   render: (args) => (
     <RadioGroup {...args} defaultValue="starter" aria-label="Plan">
       <div className="nx:flex nx:items-start nx:gap-3">
@@ -93,6 +95,7 @@ export const VerticalWithLabels: Story = {
 };
 
 export const Horizontal: Story = {
+  tags: ['docs'],
   render: (args) => (
     <RadioGroup
       {...args}
@@ -135,6 +138,7 @@ export const SurfaceTokens: Story = {
 // ============================================
 
 export const Disabled: Story = {
+  tags: ['docs'],
   render: (args) => (
     <RadioGroup
       {...args}
@@ -172,6 +176,7 @@ export const Disabled: Story = {
 };
 
 export const Invalid: Story = {
+  tags: ['docs'],
   render: (args) => (
     <RadioGroup {...args} defaultValue="card" aria-label="Payment method">
       <div className="nx:flex nx:items-center nx:gap-2">
@@ -194,13 +199,13 @@ export const Invalid: Story = {
     await expect(card).toHaveAttribute('data-state', 'checked');
 
     // Unchecked invalid → base error border + error focus ring.
-    await expect(paypal).toHaveClass('nx:aria-invalid:border-border-error');
+    await expect(paypal).toHaveClass('nx:aria-invalid:border-error-border');
     await expect(paypal).toHaveClass(
       'nx:aria-invalid:focus-visible:outline-focus-error'
     );
     // Checked invalid → combinatorial override outranks the checked primary border.
     await expect(card).toHaveClass(
-      'nx:aria-invalid:data-[state=checked]:border-border-error'
+      'nx:aria-invalid:data-[state=checked]:border-error-border'
     );
 
     // Checked invalid also reddens the selection dot — the item drives the

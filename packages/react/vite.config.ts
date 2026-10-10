@@ -32,6 +32,8 @@ export default defineConfig({
         '**/*.test.tsx',
         '**/*.stories.tsx',
         'src/stories/**',
+        'src/blocks/**',
+        'src/patterns/**',
         'src/recipes/**',
       ],
       outDir: 'dist',

@@ -1,0 +1,42 @@
+import { useState } from 'react';
+
+import type { FilterRule } from '../../../lib/filter-model';
+
+import {
+  type NumberRangeCondition,
+  NumberRangeFilter,
+} from './number-range-filter';
+
+export function NumberRangeFilterExample() {
+  const [value, setValue] = useState<NumberRangeCondition | null>({
+    operator: 'between',
+    min: 100,
+    max: 500,
+  });
+  return (
+    <NumberRangeFilter
+      label="Size"
+      value={value}
+      onChange={setValue}
+      unit="KB"
+      lowerBound={0}
+    />
+  );
+}
+
+/** Converts this block's condition to a FilterBuilder rule; null adds no rule. */
+export function numberRangeRule(
+  id: string,
+  field: string,
+  condition: NumberRangeCondition | null
+): FilterRule | null {
+  if (!condition) return null;
+  const rule = { kind: 'rule', id, field } as const;
+  if (condition.operator !== 'between')
+    return { ...rule, ...condition, value: '' };
+  return {
+    ...rule,
+    operator: 'between',
+    value: [String(condition.min), String(condition.max)],
+  };
+}

@@ -243,6 +243,18 @@ const preview: Preview = {
   // Enable autodocs for all stories globally
   tags: ['autodocs'],
   parameters: {
+    options: {
+      storySort: {
+        order: [
+          'Components',
+          'Appearance',
+          'Blocks',
+          'Patterns',
+          'Primitives',
+          'Tokens',
+        ],
+      },
+    },
     // Enable Table of Contents for docs pages
     docs: {
       toc: {

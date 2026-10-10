@@ -2,9 +2,7 @@ import { cn } from '@nexus_ds/react/utils';
 import type { MDXComponents } from 'mdx/types';
 
 import { CodeBlock } from './app/_components/CodeBlock';
-import { ComponentPage } from './app/_components/ComponentPage';
-import { ComponentPreview } from './app/_components/ComponentPreview';
-import { ComponentSource } from './app/_components/ComponentSource';
+import { ComponentDemo } from './app/_components/ComponentDemo';
 import {
   PAGE_HEADING_CLASS,
   SECTION_HEADING_CLASS,
@@ -134,9 +132,7 @@ export function useMDXComponents(components: MDXComponents): MDXComponents {
         {...props}
       />
     ),
-    ComponentPage,
-    ComponentPreview,
-    ComponentSource,
+    ComponentDemo,
     InstallBlock,
     PropsTable,
     // live @nexus_ds/react components, usable in MDX without an import

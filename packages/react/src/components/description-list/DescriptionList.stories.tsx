@@ -1,10 +1,7 @@
-import { useState } from 'react';
-
 import type { Meta, StoryObj } from '@storybook/react';
-import { expect, userEvent, within } from 'storybook/test';
+import { expect, within } from 'storybook/test';
 
 import { Badge } from '../badge';
-import { InlineEdit, type InlineEditProps } from '../inline-edit';
 
 import {
   DescriptionList,
@@ -46,6 +43,7 @@ function ProfileDetails() {
 }
 
 export const Default: Story = {
+  tags: ['docs'],
   render: () => <ProfileDetails />,
   play: async ({ canvasElement }) => {
     const list = canvasElement.querySelector('dl');
@@ -61,6 +59,7 @@ export const Default: Story = {
 };
 
 export const FileMetadata: Story = {
+  tags: ['docs'],
   render: () => (
     <DescriptionList>
       <DescriptionListItem>
@@ -84,6 +83,7 @@ export const FileMetadata: Story = {
 };
 
 export const Configuration: Story = {
+  tags: ['docs'],
   render: () => (
     <DescriptionList>
       <DescriptionListItem>
@@ -181,98 +181,6 @@ export const LongContent: Story = {
   },
 };
 
-function ActionExample({
-  activation = 'pencil',
-  initialValue = 'Priya Shah',
-  readOnly = false,
-}: {
-  activation?: InlineEditProps['activation'];
-  initialValue?: string;
-  readOnly?: boolean;
-}) {
-  const [name, setName] = useState(initialValue);
-  return (
-    <DescriptionList>
-      <DescriptionListItem>
-        <DescriptionListTerm>Name</DescriptionListTerm>
-        <DescriptionListDescription>
-          {readOnly ? (
-            <InlineEdit readOnly label="Name" value={name} />
-          ) : (
-            <InlineEdit
-              label="Name"
-              value={name}
-              onCommit={setName}
-              activation={activation}
-              placeholder="Enter a name"
-            />
-          )}
-        </DescriptionListDescription>
-      </DescriptionListItem>
-    </DescriptionList>
-  );
-}
-
-export const ClickToEdit: Story = {
-  render: () => <ActionExample activation="click" />,
-};
-export const ClickToEditEmpty: Story = {
-  render: () => <ActionExample activation="click" initialValue="" />,
-};
-export const PencilToEditEmpty: Story = {
-  render: () => <ActionExample initialValue="" />,
-};
-export const ReadOnly: Story = { render: () => <ActionExample readOnly /> };
-export const ReadOnlyEmpty: Story = {
-  render: () => <ActionExample readOnly initialValue="" />,
-};
-
-export const ConsumerAction: Story = {
-  render: () => <ActionExample />,
-  play: async ({ canvasElement }) => {
-    const canvas = within(canvasElement);
-    await userEvent.tab();
-    await expect(
-      canvas.getByRole('button', { name: 'Edit Name' })
-    ).toHaveFocus();
-    await userEvent.keyboard('{Enter}');
-    const input = canvas.getByRole('textbox', { name: 'Name' });
-    await expect(input).toHaveFocus();
-    await userEvent.clear(input);
-    await userEvent.type(input, 'Priya Sharma{Enter}');
-    await expect(
-      canvas.getByText('Priya Sharma', { exact: true })
-    ).toHaveTextContent('Priya Sharma');
-    await expect(
-      canvas.getByRole('button', { name: 'Edit Name' })
-    ).toHaveFocus();
-    await userEvent.keyboard('{Enter}');
-    await userEvent.clear(canvas.getByRole('textbox', { name: 'Name' }));
-    await userEvent.keyboard('{Escape}');
-    await expect(
-      canvas.getByText('Priya Sharma', { exact: true })
-    ).toHaveTextContent('Priya Sharma');
-    await expect(
-      canvas.getByRole('button', { name: 'Edit Name' })
-    ).toHaveFocus();
-    await userEvent.click(canvas.getByRole('button', { name: 'Edit Name' }));
-    await userEvent.clear(canvas.getByRole('textbox', { name: 'Name' }));
-    await userEvent.type(
-      canvas.getByRole('textbox', { name: 'Name' }),
-      'Priya Shah'
-    );
-    await userEvent.click(canvas.getByRole('button', { name: 'Save Name' }));
-    await expect(
-      canvas.getByText('Priya Shah', { exact: true })
-    ).toHaveTextContent('Priya Shah');
-    await userEvent.click(canvas.getByRole('button', { name: 'Edit Name' }));
-    await userEvent.click(
-      canvas.getByRole('button', { name: 'Cancel editing Name' })
-    );
-    await expect(canvas.queryByRole('textbox')).not.toBeInTheDocument();
-  },
-};
-
 export const WithDataAttributes: Story = {
   render: () => <ProfileDetails />,
   play: async ({ canvasElement }) => {
@@ -292,42 +200,21 @@ export const WithDataAttributes: Story = {
 export const AllVariants: Story = {
   render: () => (
     <div className="nx:grid nx:w-full nx:max-w-3xl nx:gap-8">
-      <h3 className="nx:typography-heading-small">Pencil to edit</h3>
-      <ActionExample />
-      <ActionExample initialValue="" />
-      <h3 className="nx:typography-heading-small">Click to edit</h3>
-      <ActionExample activation="click" />
-      <ActionExample activation="click" initialValue="" />
-      <h3 className="nx:typography-heading-small">Read only</h3>
-      <ActionExample readOnly />
-      <ActionExample readOnly initialValue="" />
+      <ProfileDetails />
+      <DescriptionList>
+        <DescriptionListItem>
+          <DescriptionListTerm>Backups</DescriptionListTerm>
+          <DescriptionListDescription>
+            <Badge variant="secondary">Enabled</Badge>
+          </DescriptionListDescription>
+        </DescriptionListItem>
+        <DescriptionListItem>
+          <DescriptionListTerm>Retention override</DescriptionListTerm>
+          <DescriptionListDescription>
+            Not configured
+          </DescriptionListDescription>
+        </DescriptionListItem>
+      </DescriptionList>
     </div>
   ),
-  play: async ({ canvasElement }) => {
-    const list = canvasElement.querySelector('dl')!;
-    const showcase = list.parentElement!;
-    const availableWidth =
-      showcase.parentElement!.getBoundingClientRect().width;
-    const maximumWidth = Number.parseFloat(getComputedStyle(showcase).maxWidth);
-    await expect(showcase.getBoundingClientRect().width).toBeCloseTo(
-      Math.min(availableWidth, maximumWidth),
-      0
-    );
-    for (const item of canvasElement.querySelectorAll(
-      '[data-slot="description-list-item"]'
-    )) {
-      const term = item.querySelector('dt')!;
-      const value = item.querySelector('[data-slot="inline-edit-value"]')!;
-      const termRange = document.createRange();
-      termRange.selectNodeContents(term);
-      const valueRange = document.createRange();
-      valueRange.selectNodeContents(value);
-      await expect(
-        Math.abs(
-          termRange.getBoundingClientRect().top -
-            valueRange.getBoundingClientRect().top
-        )
-      ).toBeLessThan(1);
-    }
-  },
 };

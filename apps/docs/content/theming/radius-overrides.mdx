@@ -6,6 +6,9 @@ used by buttons within that area, override `--nx-radius-base`.
 
 Button currently uses `nx:rounded-base`, which reads `--nx-radius-base`.
 Input and SelectTrigger use `nx:rounded-md`, which reads `--nx-radius-md`.
+FilterConditionField also uses `nx:rounded-s-base`: it is the start segment of
+a joined control whose other segments are Buttons, so its outer corner follows
+the same override.
 The generic `base` name describes a token, not permanent ownership by Button:
 any consumer of that token inside the scope receives the override.
 

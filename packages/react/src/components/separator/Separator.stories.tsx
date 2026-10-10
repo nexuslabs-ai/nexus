@@ -21,20 +21,8 @@ type Story = StoryObj<typeof Separator>;
 // Horizontal is the default orientation — a full-width 1px rule.
 export const Default: Story = {};
 
-export const Vertical: Story = {
-  // A vertical rule stretches to its parent's height — the row sets `nx:h-5`.
-  render: () => (
-    <div className="nx:flex nx:h-5 nx:items-center nx:gap-3 nx:typography-label-default nx:text-foreground">
-      <span>Docs</span>
-      <Separator orientation="vertical" />
-      <span>Source</span>
-      <Separator orientation="vertical" />
-      <span>Issues</span>
-    </div>
-  ),
-};
-
 export const InContext: Story = {
+  tags: ['docs'],
   render: () => (
     <div className="nx:max-w-xs nx:rounded-lg nx:border-default nx:border-border-default nx:bg-container nx:p-4">
       <div className="nx:flex nx:flex-col nx:gap-1">
@@ -53,6 +41,20 @@ export const InContext: Story = {
         <Separator orientation="vertical" />
         <span>Source</span>
       </div>
+    </div>
+  ),
+};
+
+export const Vertical: Story = {
+  tags: ['docs'],
+  // A vertical rule stretches to its parent's height — the row sets `nx:h-5`.
+  render: () => (
+    <div className="nx:flex nx:h-5 nx:items-center nx:gap-3 nx:typography-label-default nx:text-foreground">
+      <span>Docs</span>
+      <Separator orientation="vertical" />
+      <span>Source</span>
+      <Separator orientation="vertical" />
+      <span>Issues</span>
     </div>
   ),
 };

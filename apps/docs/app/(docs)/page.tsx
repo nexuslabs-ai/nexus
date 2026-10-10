@@ -8,34 +8,34 @@ import {
   CardHeader,
   CardTitle,
 } from '../_components/nexus';
-import { countComponents, describeSize } from '../_lib/home-counts';
-import { CARD_JOINER, PAGE_MANIFEST, requireSection } from '../_lib/manifest';
+import { describeSize } from '../_lib/home-counts';
+import {
+  CARD_JOINER,
+  PAGE_MANIFEST,
+  requirePage,
+  requireSection,
+} from '../_lib/manifest';
 
 const BLUE_RAMP = [50, 100, 200, 300, 400, 500, 600, 700, 800, 900, 950];
 const BASE_CHIPS = ['slate', 'stone', 'neutral', 'gray', 'zinc'];
 
 const STATS = [
   { n: String(BASE_CHIPS.length), l: 'Bases' },
-  { n: String(countComponents(requireSection('components'))), l: 'Components' },
+  { n: String(requireSection('components').pages.length), l: 'Components' },
   { n: '2', l: 'Themes' },
   { n: '100%', l: 'Tokenized' },
 ];
 
 const AUDIENCES = [
   {
-    title: 'Designer',
-    desc: 'Figma library, design tokens, and Code Connect — kept in lockstep with code.',
-    href: '/getting-started/designers',
-  },
-  {
     title: 'Engineer',
     desc: 'Install, wire your theme, and ship your first component in minutes.',
-    href: '/getting-started/install',
+    href: requirePage('getting-started', 'install').route,
   },
   {
     title: 'AI agent',
     desc: 'llms.txt, a mirror of the rules, and authoring conventions agents can parse.',
-    href: '/agents',
+    href: requireSection('agents').href,
   },
 ];
 
@@ -70,10 +70,14 @@ export default function Home() {
         </p>
         <div className="nx:mt-8 nx:flex nx:flex-wrap nx:gap-3 nx:justify-center">
           <Button asChild>
-            <Link href="/getting-started">Get started</Link>
+            <Link href={requireSection('getting-started').href}>
+              Get started
+            </Link>
           </Button>
           <Button asChild variant="outline">
-            <Link href="/components">Browse components</Link>
+            <Link href={requireSection('components').href}>
+              Browse components
+            </Link>
           </Button>
         </div>
         <dl className="nx:mt-16 nx:flex nx:flex-wrap nx:justify-center nx:gap-x-10 nx:gap-y-5 nx:border-t nx:border-border-default nx:pt-8 nx:max-w-[36rem] nx:mx-auto">
@@ -90,14 +94,14 @@ export default function Home() {
 
       {/* Audience cards */}
       <h2 className="nx:typography-heading-small nx:mt-4 nx:mb-3">I am a…</h2>
-      <div className="nx:grid nx:grid-cols-1 nx:md:grid-cols-3 nx:gap-4">
+      <div className="nx:grid nx:grid-cols-1 nx:md:grid-cols-2 nx:gap-4">
         {AUDIENCES.map((a) => (
           <Link
             key={a.title}
             href={a.href}
             className="nx:no-underline nx:text-inherit"
           >
-            <Card className="nx:h-full nx:hover:border-border-primary nx:transition-colors">
+            <Card className="nx:h-full nx:hover:border-primary-border nx:transition-colors">
               <CardHeader>
                 <CardTitle className="nx:typography-heading-xsmall">
                   {a.title}
@@ -120,7 +124,7 @@ export default function Home() {
             href={s.href}
             className="nx:no-underline nx:text-inherit"
           >
-            <Card className="nx:h-full nx:hover:border-border-primary nx:transition-colors">
+            <Card className="nx:h-full nx:hover:border-primary-border nx:transition-colors">
               <CardHeader>
                 <div className="nx:font-mono nx:text-[10px] nx:uppercase nx:tracking-wider nx:text-muted-foreground-subtle nx:mb-1">
                   {s.count}

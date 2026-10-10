@@ -3,6 +3,8 @@ import * as React from 'react';
 import type { Meta, StoryObj } from '@storybook/react';
 import { expect, fn, userEvent, within } from 'storybook/test';
 
+import { Label } from '../label';
+
 import { Switch } from './switch';
 
 const meta: Meta<typeof Switch> = {
@@ -29,7 +31,22 @@ export const Default: Story = {
   },
 };
 
+export const WithLabel: Story = {
+  tags: ['docs'],
+  render: function WithLabelStory() {
+    const switchId = React.useId();
+
+    return (
+      <div className="nx:flex nx:items-center nx:gap-2">
+        <Switch id={switchId} />
+        <Label htmlFor={switchId}>Airplane mode</Label>
+      </div>
+    );
+  },
+};
+
 export const Checked: Story = {
+  tags: ['docs'],
   args: {
     'aria-label': 'Toggle switch',
     defaultChecked: true,
@@ -37,6 +54,7 @@ export const Checked: Story = {
 };
 
 export const Disabled: Story = {
+  tags: ['docs'],
   args: {
     'aria-label': 'Toggle switch',
     disabled: true,
@@ -108,7 +126,7 @@ export const Invalid: Story = {
     await expect(switchEl).toHaveAccessibleDescription(
       'This setting must be enabled to continue.'
     );
-    await expect(switchEl).toHaveClass('nx:aria-invalid:border-border-error');
+    await expect(switchEl).toHaveClass('nx:aria-invalid:border-error-border');
     await expect(switchEl).toHaveClass(
       'nx:aria-invalid:focus-visible:outline-focus-error'
     );
@@ -123,6 +141,7 @@ export const Invalid: Story = {
 // ============================================
 
 export const Small: Story = {
+  tags: ['docs'],
   args: {
     size: 'sm',
     'aria-label': 'Toggle switch',
@@ -138,20 +157,6 @@ export const Small: Story = {
     await expect(switchEl).toHaveAttribute('data-state', 'checked');
     await expect(args.onCheckedChange).toHaveBeenCalledWith(true);
   },
-};
-
-export const WithLabel: Story = {
-  render: (_args) => (
-    <div className="nx:flex nx:items-center nx:gap-2">
-      <Switch id="airplane-mode" />
-      <label
-        htmlFor="airplane-mode"
-        className="nx:typography-label-default nx:leading-none nx:peer-disabled:cursor-not-allowed nx:peer-disabled:text-disabled-foreground"
-      >
-        Airplane Mode
-      </label>
-    </div>
-  ),
 };
 
 export const WithLabelAndDescription: Story = {
@@ -172,22 +177,26 @@ export const WithLabelAndDescription: Story = {
 };
 
 export const LabelOnLeft: Story = {
-  render: (_args) => (
-    <div className="nx:flex nx:items-center nx:justify-between nx:gap-4 nx:rounded-lg nx:border-default nx:border-border-default nx:p-4">
-      <div className="nx:space-y-0.5">
-        <label
-          htmlFor="marketing"
-          className="nx:typography-label-default nx:leading-none"
-        >
-          Marketing emails
-        </label>
-        <p className="nx:typography-body-default nx:text-muted-foreground">
-          Receive emails about new products and features.
-        </p>
+  tags: ['docs'],
+  render: function LabelOnLeftStory() {
+    const switchId = React.useId();
+    const descriptionId = React.useId();
+
+    return (
+      <div className="nx:flex nx:items-center nx:justify-between nx:gap-4 nx:rounded-lg nx:border-default nx:border-border-default nx:p-4">
+        <div className="nx:space-y-0.5">
+          <Label htmlFor={switchId}>Marketing emails</Label>
+          <p
+            id={descriptionId}
+            className="nx:typography-body-default nx:text-muted-foreground"
+          >
+            Receive emails about new products and features.
+          </p>
+        </div>
+        <Switch id={switchId} aria-describedby={descriptionId} />
       </div>
-      <Switch id="marketing" />
-    </div>
-  ),
+    );
+  },
 };
 
 // ============================================

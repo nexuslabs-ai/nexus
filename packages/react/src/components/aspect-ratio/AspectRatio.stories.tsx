@@ -23,6 +23,7 @@ function Placeholder({ label }: { label: string }) {
 // A 16:9 box — the most common media ratio. AspectRatio fills its parent's
 // width, so wrap it in a sized container.
 export const Default: Story = {
+  tags: ['docs'],
   render: () => (
     <div className="nx:w-80">
       <AspectRatio ratio={16 / 9}>
@@ -34,6 +35,7 @@ export const Default: Story = {
 
 // Common ratios side by side.
 export const Ratios: Story = {
+  tags: ['docs'],
   render: () => (
     <div className="nx:flex nx:items-start nx:gap-4">
       <div className="nx:w-40">

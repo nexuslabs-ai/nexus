@@ -8,4 +8,7 @@
 @import '@nexus_ds/tailwind';
 @import '../src/index.css';
 
+@source '.';
+@source '../src';
+
 @source inline('nx:text-xs');
