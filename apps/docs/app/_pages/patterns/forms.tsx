@@ -78,7 +78,10 @@ const LINK_CLASS =
 
 function Example({ children }: { children: ReactNode }) {
   return (
-    <div className="nx:mb-4 nx:min-w-0 nx:max-w-2xl nx:rounded-lg nx:border nx:border-border-default nx:p-4">
+    <div
+      data-md-skip
+      className="nx:mb-4 nx:min-w-0 nx:max-w-2xl nx:rounded-lg nx:border nx:border-border-default nx:p-4"
+    >
       {children}
     </div>
   );
@@ -89,10 +92,10 @@ export default function Forms() {
     <>
       <h1 className="nx:typography-heading-large">Forms</h1>
       <p className="nx:typography-body-default nx:text-muted-foreground nx:mt-2 nx:mb-8 nx:max-w-[64ch]">
-        A settings form built from existing Nexus components, not another form
-        framework. Field carries a label, control, help and error; FieldSet and
-        FieldLegend group related fields; native form submission drives Save.
-        The same interaction ships three ways, one per state owner.
+        Build a settings form from Nexus components. Field holds a label, a
+        control, help text and an error. FieldSet and FieldLegend group related
+        fields. The form comes in three versions: plain React state, React Hook
+        Form and TanStack Form.
       </p>
 
       <section className="nx:mb-12">
@@ -125,13 +128,10 @@ export default function Forms() {
           </table>
         </div>
         <p className={BODY_CLASS}>
-          Do not combine the three editable forms; keep only the one your
-          application uses. <InlineCode>settings-layout.tsx</InlineCode> holds
-          the shared contract, validation rules, value normalization and the
-          status, Save and Cancel shell.{' '}
-          <InlineCode>settings-fields.tsx</InlineCode> renders the fields from
-          per-field bindings. Each form owns its own state and submission
-          lifecycle.
+          Copy only the version your app uses.{' '}
+          <InlineCode>settings-layout.tsx</InlineCode> holds the shared types,
+          validation rules, and the status, Save and Cancel buttons.{' '}
+          <InlineCode>settings-fields.tsx</InlineCode> renders the fields.
         </p>
       </section>
 
@@ -142,28 +142,36 @@ export default function Forms() {
         <div className="nx:mb-4">
           <CodeSample lang="tsx">{CONNECT_SAMPLE}</CodeSample>
         </div>
+        <p className={BODY_CLASS}>All three versions take the same props:</p>
+        <ul className="nx:mb-4 nx:list-disc nx:space-y-2 nx:ps-5 nx:typography-body-default nx:max-w-[64ch]">
+          <li>
+            <InlineCode>title</InlineCode> names the form. Give each form on a
+            page its own title.
+          </li>
+          <li>
+            <InlineCode>initialValues</InlineCode> sets the starting values.
+            Changing it later doesn&rsquo;t overwrite what the user is typing.
+            To load a different record, change the form&rsquo;s{' '}
+            <InlineCode>key</InlineCode>.
+          </li>
+          <li>
+            <InlineCode>onSave</InlineCode> saves the values. It must resolve
+            with the saved record, or reject if the save fails.
+          </li>
+        </ul>
         <p className={BODY_CLASS}>
-          All three forms take the same props. <InlineCode>title</InlineCode>{' '}
-          names the form; give each form on a page a distinct one.{' '}
-          <InlineCode>initialValues</InlineCode> seeds an editing session;
-          changing it does not overwrite an in-progress draft. Use a record{' '}
-          <InlineCode>key</InlineCode> when switching records, or deliberately
-          remount after accepting a remote refresh.
+          With <InlineCode>fetch</InlineCode>, throw when{' '}
+          <InlineCode>response.ok</InlineCode> is false. Parse the response into
+          the <InlineCode>SettingsValues</InlineCode> shape before you resolve.
+          If your API wraps the record, like{' '}
+          <InlineCode>{'{ data: … }'}</InlineCode>, unwrap it first.
         </p>
         <p className={BODY_CLASS}>
-          <InlineCode>onSave</InlineCode> must resolve with the saved record
-          only after persistence succeeds, and reject on failure. With{' '}
-          <InlineCode>fetch</InlineCode>, check{' '}
-          <InlineCode>response.ok</InlineCode> and throw for unsuccessful
-          responses. <InlineCode>response.json()</InlineCode> is untyped, so
-          parse the body into the <InlineCode>SettingsValues</InlineCode> shape
-          before resolving; an envelope such as{' '}
-          <InlineCode>{'{ data: … }'}</InlineCode> would otherwise become the
-          baseline unchecked. The record it resolves with becomes the new Cancel
-          baseline, so values your server normalized replace what was typed;
-          fields the form does not edit are ignored. Failure keeps the draft for
-          retry. Cancel restores the latest saved values and focuses the first
-          field. A pending save blocks duplicates.
+          After a save, the form shows the record you resolved with, so changes
+          your server made replace what the user typed. Fields the form
+          doesn&rsquo;t edit are ignored. If the save fails, the user&rsquo;s
+          edits stay so they can retry. Cancel restores the last saved values.
+          Save is blocked while a save is running.
         </p>
       </section>
 
@@ -172,9 +180,9 @@ export default function Forms() {
           3. Local state
         </SectionHeading>
         <p className={BODY_CLASS}>
-          Edit a field to enable Save. Clear the name or enter an invalid email
-          and submit to see validation. Checkboxes participate in Save; switches
-          are for changes that apply immediately.
+          Edit a field to enable Save. To see validation, clear the name or
+          enter an invalid email, then save. Checkboxes are saved with Save. Use
+          a switch only for a change that applies immediately.
         </p>
         <Example>
           <LocalStateExample />
@@ -186,9 +194,9 @@ export default function Forms() {
           4. Form libraries
         </SectionHeading>
         <p className={BODY_CLASS}>
-          Both validate on submit, clear a field error when it is edited, focus
-          the first invalid field, keep edits when a save fails, and restore the
-          latest saved values on Cancel.
+          Both versions behave like the local-state form. They validate on save,
+          focus the first invalid field, and clear an error when the field is
+          edited.
         </p>
         <SubsectionHeading className={SUBSECTION_CLASS}>
           React Hook Form
@@ -205,9 +213,8 @@ export default function Forms() {
         </SubsectionHeading>
         <p className={BODY_CLASS}>
           Uses <InlineCode>useForm</InlineCode> and{' '}
-          <InlineCode>useField</InlineCode> with subscriptions. Unsaved state
-          reads <InlineCode>!isDefaultValue</InlineCode> rather than the
-          historical <InlineCode>isDirty</InlineCode>.
+          <InlineCode>useField</InlineCode>. It detects unsaved changes with{' '}
+          <InlineCode>!isDefaultValue</InlineCode>.
         </p>
         <Example>
           <TanStackExample />
@@ -226,8 +233,9 @@ export default function Forms() {
           <Link href="/components/description-list" className={LINK_CLASS}>
             DescriptionList
           </Link>{' '}
-          when values are information rather than editable controls. Explain who
-          can change them, and keep empty values explicit.
+          for values the user can read but not edit. Say who can change them,
+          and show empty values as &ldquo;Not provided&rdquo; instead of leaving
+          them blank.
         </p>
         <Example>
           <ReadOnlyDetails name="Priya Shah" email="priya@example.com" />
@@ -236,8 +244,9 @@ export default function Forms() {
           Temporarily unavailable
         </SubsectionHeading>
         <p className={BODY_CLASS}>
-          Disabled controls are temporarily unavailable. Give a visible reason
-          and connect it with <InlineCode>aria-describedby</InlineCode>.
+          Disable a control only when it&rsquo;s temporarily unavailable. Show
+          the reason, and link it with <InlineCode>aria-describedby</InlineCode>
+          .
         </p>
         <Example>
           <DisabledSettings address="24 Riverside Road" />
@@ -250,25 +259,23 @@ export default function Forms() {
         </SectionHeading>
         <ul className="nx:mb-4 nx:list-disc nx:space-y-2 nx:ps-5 nx:typography-body-default nx:max-w-[64ch]">
           <li>
-            Authorization, server validation, loading data, navigation guards
-            and persistence. Replace the sample validation rules and fields to
-            fit your data.
+            Permissions, server validation, loading data, leave-page warnings
+            and saving. Replace the sample fields and validation rules with your
+            own.
           </li>
           <li>
-            Error text: a rejected save always shows the recipe’s fixed failure
-            message, and the exception text is never displayed. To show server
-            messages or map server errors onto fields, edit the recipe’s submit
+            Error messages. A failed save shows a fixed message, never the
+            error&rsquo;s own text. To show server errors, edit the submit
             handler.
           </li>
           <li>
             The source lives in{' '}
-            <InlineCode>packages/react/src/patterns/forms</InlineCode>. Its
-            relative imports assume this repository’s layout; update them to
-            your Nexus components when copying.
+            <InlineCode>packages/react/src/patterns/forms</InlineCode>. Update
+            its imports to point at your copied components.
           </li>
         </ul>
         <p className="nx:typography-body-default nx:text-muted-foreground nx:max-w-[64ch]">
-          The save callback on this page waits briefly and persists nothing.
+          The forms on this page don&rsquo;t save anything.
         </p>
       </section>
     </>

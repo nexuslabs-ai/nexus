@@ -1,3 +1,5 @@
+import Link from 'next/link';
+
 import { ColorScales } from '../../_components/ColorScales';
 import { SectionHeading } from '../../_components/Heading';
 
@@ -145,18 +147,22 @@ const APCA_TIERS: { pair: string; lc: string; covers: string }[] = [
   },
 ];
 
+// How the Appearance contrast fields move each target (derive-theme contrast sweep).
+const CONTRAST_RANGES: { target: string; low: string; high: string }[] = [
+  { target: 'Body text', low: 'Lc 75', high: 'Lc 90' },
+  { target: 'UI labels', low: 'Lc 60', high: 'Lc 75' },
+  { target: 'Incidental text', low: 'Lc 45', high: 'Lc 60' },
+  { target: 'Light-mode border opacity', low: '6%', high: '11.68%' },
+];
+
 export default function ColorShowcase() {
   return (
     <>
       <h1 className="nx:typography-heading-large">Color</h1>
       <p className="nx:typography-body-default nx:text-muted-foreground nx:mt-2 nx:mb-8 nx:max-w-[64ch]">
-        Engineered, not picked. Every color is stored as hex, converted to OKLCH
-        at build time, with its lightness pinned to a perceptual grid. The five
-        neutral bases share one grid — the same shade step is equally light in
-        every base — while each chromatic hue follows its own lightness curve,
-        centred where that hue is most vivid, and takes its chroma at the edge
-        of the Display-P3 gamut. Contrast is then gated by APCA before it can
-        ship.
+        Components use semantic color tokens, like{' '}
+        <code>primary-background</code>. Each token picks a shade from a
+        palette, and every text color is checked for contrast before it ships.
       </p>
 
       {/* ── The palettes (+ shared CVD preview) ─────────────── */}
@@ -165,13 +171,12 @@ export default function ColorShowcase() {
           The palettes
         </SectionHeading>
         <p className="nx:typography-body-default nx:text-muted-foreground nx:mb-4 nx:max-w-[64ch]">
-          Start with the five neutral bases — eleven shades each. Read{' '}
-          <em>down</em> any column: every base&rsquo;s <code>500</code> sits at
-          the same perceptual lightness, only hue and chroma differ. Below are
-          the chromatic hues brand and status are built from — these each follow
-          their own lightness curve, so a vivid yellow can stay light while red
-          runs deep — then the full reference. One color-vision filter applies
-          to them all.
+          There are five neutral palettes with eleven shades each. A shade
+          number means the same lightness in every neutral palette, so every{' '}
+          <code>500</code> looks equally light. Brand and status colors come
+          from the chromatic palettes. Each hue has its own lightness curve, so
+          yellow stays light and red runs deep. The color-vision filter shows
+          every palette as someone with color blindness sees it.
         </p>
         <ColorScales />
       </section>
@@ -182,31 +187,24 @@ export default function ColorShowcase() {
           Live tokens
         </SectionHeading>
         <p className="nx:typography-body-default nx:text-muted-foreground nx:mb-4 nx:max-w-[64ch]">
-          Semantic surface/foreground pairs — the real tokens components use.
-          Open the theme picker (bottom-right) and swap the base or dark mode:
-          every pair re-resolves live, and each clears the APCA gate by
-          construction.
+          These are the tokens components use. Change the theme with the picker
+          in the bottom-right corner, and every pair updates.
         </p>
         <p className="nx:typography-body-default nx:text-muted-foreground nx:mb-4 nx:max-w-[64ch]">
-          <strong>
-            Foreground describes its relationship to a surface; text describes
-            one application.
-          </strong>{' '}
-          The relationship comes first when naming a token. Text and icons share
-          that color; a foreground can also paint a control part or indicator on
-          the same surface. For example, <code>primary-foreground</code> colors
-          both a button&rsquo;s label and a checked switch&rsquo;s knob on{' '}
-          <code>primary-background</code>. Likewise,{' '}
-          <code>error-subtle-foreground</code> colors the message and icon on{' '}
-          <code>error-subtle</code>.
+          A foreground token names the surface it sits on, not what it paints.{' '}
+          <code>primary-foreground</code> colors anything on{' '}
+          <code>primary-background</code>: a button&rsquo;s label, or a checked
+          switch&rsquo;s knob. <code>error-subtle-foreground</code> colors the
+          message and icon on <code>error-subtle</code>.
         </p>
         <p className="nx:typography-body-default nx:text-muted-foreground nx:mb-4 nx:max-w-[64ch]">
-          A foreground has a default background partner, not necessarily an
-          exclusive one. Use it on other surfaces only with contrast coverage
-          for the intended content tier. A token name alone does not guarantee
-          readability on every background or at every text size.
+          Each foreground is checked against its own background. If you use it
+          on a different surface, check the contrast yourself.
         </p>
-        <div className="nx:grid nx:grid-cols-2 nx:md:grid-cols-5 nx:gap-3">
+        <div
+          data-md-skip
+          className="nx:grid nx:grid-cols-2 nx:md:grid-cols-5 nx:gap-3"
+        >
           {SEMANTIC_PAIRS.map((pair) => (
             <div
               key={pair.label}
@@ -231,14 +229,12 @@ export default function ColorShowcase() {
           What each shade is for
         </SectionHeading>
         <p className="nx:typography-body-default nx:text-muted-foreground nx:mb-4 nx:max-w-[64ch]">
-          The shade number is a luminance coordinate, and each step maps to
-          specific semantic roles. The mapping is not a simple light/dark flip —
-          a shade lands at a different step in dark mode to hold the same
-          perceptual tier. Text and hairline borders are the exception:{' '}
-          <code>foreground</code>, <code>muted-foreground</code> and{' '}
-          <code>border.default</code> are alpha tokens — transparent black in
-          light, white in dark — so they composite onto any surface instead of
-          binding to a neutral shade.
+          The shade number is a lightness step. Each token uses a different step
+          in each mode, so it keeps the same visual weight on a dark background.
+          Text and thin borders don&rsquo;t use a shade. <code>foreground</code>
+          , <code>muted-foreground</code> and <code>border.default</code> are
+          semi-transparent black in light mode and white in dark mode, so they
+          work on any surface.
         </p>
         <div className="nx:overflow-x-auto">
           <table className="nx:w-full nx:min-w-[720px] nx:border-collapse nx:typography-label-default">
@@ -293,11 +289,16 @@ export default function ColorShowcase() {
           Accessibility
         </SectionHeading>
         <p className="nx:typography-body-default nx:text-muted-foreground nx:mb-4 nx:max-w-[64ch]">
-          Contrast is gated by APCA (not WCAG 2 ratios), with thresholds set per
-          intended use. A failing pair blocks the build — thresholds are not
-          negotiable per finding. The palette is also validated against
-          Viénot-simulated dichromacy in CI; the toggle above is the visual
-          preview of that test.
+          Nexus checks contrast with APCA, not WCAG 2 ratios. Each pair has a
+          minimum score for how it&rsquo;s used. If a pair falls below its
+          minimum, the build fails. CI also checks that the palettes stay
+          distinct for color-blind users.
+        </p>
+        <p className="nx:typography-body-default nx:text-muted-foreground nx:mb-4 nx:max-w-[64ch]">
+          Every foreground is checked against each surface it can sit on,
+          including hover, pressed and translucent states. If a brand or status
+          label can&rsquo;t reach its minimum, Nexus shifts that fill&rsquo;s
+          shade. Otherwise the fill keeps the brand color you chose.
         </p>
         <div className="nx:overflow-x-auto">
           <table className="nx:w-full nx:min-w-[560px] nx:border-collapse nx:typography-label-default">
@@ -330,6 +331,52 @@ export default function ColorShowcase() {
         </div>
       </section>
 
+      {/* ── Contrast setting ────────────────────────────────── */}
+      <section className="nx:mb-12">
+        <SectionHeading className="nx:typography-heading-small nx:mb-1">
+          Contrast setting
+        </SectionHeading>
+        <p className="nx:typography-body-default nx:text-muted-foreground nx:mb-4 nx:max-w-[64ch]">
+          The <code>lightContrast</code> and <code>darkContrast</code> fields in{' '}
+          <Link
+            href="/theming/appearance#contrast"
+            className="nx:text-primary-subtle-foreground nx:underline nx:underline-offset-2"
+          >
+            Appearance
+          </Link>{' '}
+          raise the minimums as they go from <code>0</code> to <code>100</code>.
+          When a target can&rsquo;t be reached, Nexus uses the highest contrast
+          possible. The minimums at <code>0</code> always apply.
+        </p>
+        <div className="nx:overflow-x-auto">
+          <table className="nx:w-full nx:min-w-[480px] nx:border-collapse nx:typography-label-default">
+            <thead>
+              <tr className="nx:border-b nx:border-border-default nx:text-left">
+                <th className="nx:py-2 nx:pr-3 nx:font-semibold">Target</th>
+                <th className="nx:py-2 nx:pr-3 nx:font-semibold">At 0</th>
+                <th className="nx:py-2 nx:font-semibold">At 100</th>
+              </tr>
+            </thead>
+            <tbody>
+              {CONTRAST_RANGES.map((row) => (
+                <tr
+                  key={row.target}
+                  className="nx:border-b nx:border-border-default"
+                >
+                  <td className="nx:py-2 nx:pr-3">{row.target}</td>
+                  <td className="nx:py-2 nx:pr-3 nx:font-mono nx:typography-label-small">
+                    {row.low}
+                  </td>
+                  <td className="nx:py-2 nx:font-mono nx:typography-label-small">
+                    {row.high}
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      </section>
+
       {/* ── How it works ────────────────────────────────────── */}
       <section>
         <SectionHeading className="nx:typography-heading-small nx:mb-4">
@@ -343,15 +390,15 @@ export default function ColorShowcase() {
             },
             {
               step: 'Convert to OKLCH',
-              body: 'At build time every hex value is converted to an oklch(…) value emitted into CSS.',
+              body: 'At build time, every hex value becomes an oklch(…) value in the CSS.',
             },
             {
               step: 'Pin the lightness',
-              body: 'Each shade’s L is overwritten by a perceptual grid — the neutral bases share one ladder, while each chromatic hue follows its own curve (yellow peaks light, red deep). Neutrals keep their source chroma; the re-pitched hues take it at the Display-P3 cusp.',
+              body: 'Each shade’s lightness is set from a perceptual grid. The neutral palettes share one grid. Each chromatic hue follows its own curve and takes the most vivid chroma Display-P3 allows.',
             },
             {
               step: 'Gate with APCA',
-              body: 'Every foreground/background pair is scored with APCA before merge. A failing pair blocks the build.',
+              body: 'Every foreground and background pair is scored with APCA. A failing pair blocks the build.',
             },
           ].map((item, i) => (
             <li

@@ -27,12 +27,8 @@ export default function Layering() {
     <>
       <h1 className="nx:typography-heading-large">Layering</h1>
       <p className="nx:typography-body-default nx:text-muted-foreground nx:mt-2 nx:mb-8 nx:max-w-[64ch]">
-        A 6-token z-index scale for stacking overlays. Shadow communicates{' '}
-        <em>perceived elevation</em>; z-index controls{' '}
-        <em>actual paint order</em>. They are independent axes — a higher
-        z-index does not imply a larger shadow, and the elevation shadows never
-        set stacking. Reach for a z-index token only when two positioned layers
-        can overlap.
+        Six z-index tokens decide which overlay paints on top. Use one only when
+        two positioned layers can overlap.
       </p>
 
       {/* ── The z-index scale ───────────────────────────────── */}
@@ -41,8 +37,8 @@ export default function Layering() {
           The z-index scale
         </SectionHeading>
         <p className="nx:typography-body-default nx:text-muted-foreground nx:mb-4 nx:max-w-[64ch]">
-          Six tokens, low to high. Utilities run <code>nx:z-overlay</code>{' '}
-          through <code>nx:z-max</code>.
+          From lowest to highest, <code>nx:z-overlay</code> to{' '}
+          <code>nx:z-max</code>:
         </p>
         <div className="nx:overflow-x-auto">
           <table className="nx:w-full nx:min-w-[480px] nx:border-collapse nx:typography-label-default">
@@ -81,11 +77,9 @@ export default function Layering() {
           Why popover sits above modal
         </SectionHeading>
         <p className="nx:typography-body-default nx:text-muted-foreground nx:mb-4 nx:max-w-[64ch]">
-          Popover (70) outranks modal (50) by design. A dropdown, select, or
-          tooltip opened <em>inside</em> a Dialog must paint above the dialog to
-          stay usable — so the floating-layer token deliberately sits above the
-          modal layer. This is the non-obvious ordering; do not
-          &ldquo;fix&rdquo; it by dropping popover below modal.
+          Popover (70) sits above modal (50) on purpose. A dropdown, select or
+          tooltip opened inside a Dialog has to paint above the Dialog. Keep
+          popover above modal.
         </p>
       </section>
 
@@ -95,13 +89,12 @@ export default function Layering() {
           Shadow vs z-index
         </SectionHeading>
         <p className="nx:typography-body-default nx:text-muted-foreground nx:mb-4 nx:max-w-[64ch]">
-          Shadow is perceived elevation; z-index is paint order. They are
-          independent — reach for a z-index token only when two positioned
-          layers can actually overlap. Radix portals append their content to{' '}
-          <code>document.body</code>, so a single overlay paints above page
-          content in DOM order on its own; z-index becomes load-bearing when two
-          overlay types stack (a select opened inside a dialog) or a consumer
-          ships a competing fixed element.
+          Shadow makes a surface look raised. z-index decides what paints on
+          top. The two are separate, so a higher z-index doesn&rsquo;t mean a
+          bigger shadow. Overlays render at the end of{' '}
+          <code>document.body</code>, so one overlay already paints above the
+          page. z-index matters when two overlays stack, like a select inside a
+          dialog, or when your app has its own fixed element.
         </p>
       </section>
     </>

@@ -1,45 +1,38 @@
 # Install
 
-Nexus components are copy/own: you paste a component's source into your app and
-it is yours from that moment. Nothing installs it, and no upstream change will
-ever reach it — editing a pasted component means editing your own file, and
-picking up a later fix means pasting the new version over it.
+Set up your app once, then copy in any Nexus component.
 
-A pasted component still reaches for four things that are not in the file it
-came from. Set those up once, in this order, and everything you paste afterwards
-works:
+Nexus components are copy and own: you paste a component's source into your
+app, and from then on it's your file. Edit it freely. To pick up a later fix,
+paste the new version over it.
 
-1. **Tailwind 4** — the setup the `nx:` prefix depends on.
-2. **The token CSS layer** — the tokens and utilities, plus the native
-   color-scheme policy.
-3. **The appearance provider** — what themes the components and paints before
-   hydration.
-4. **The `cn` helper** — the module every copied component imports.
+Every component needs four things set up first:
 
-The examples target a fresh Next 15 App Router app. Vite wiring lives in
-[Theme setup](/getting-started/theme-setup).
+1. **Tailwind 4**, which builds the `nx:` classes.
+2. **The token CSS**, which defines the colors, spacing and type scale.
+3. **The appearance provider**, which applies the theme and dark mode.
+4. **The `cn` helper**, which every component uses to merge classes.
 
-## Where the files come from
+These steps use a new Next.js 15 App Router app. On Vite, steps 1, 2 and 4 are
+the same. For step 3, follow [Theme setup](/getting-started/theme-setup#vite).
 
-Everything this page tells you to copy lives in the
-[Nexus repo](https://github.com/nexuslabs-ai/nexus), at these paths:
+## Where the files are
 
-| What                | Source in the repo                                   |
+Every file you copy comes from the
+[Nexus repo](https://github.com/nexuslabs-ai/nexus):
+
+| File                | Path in the repo                                     |
 | ------------------- | ---------------------------------------------------- |
-| Token CSS (step 2)  | `packages/tailwind/*.css`                            |
+| Token CSS           | `packages/tailwind/*.css`                            |
 | Appearance provider | `packages/react/src/components/appearance/provider/` |
 | `cn` helper         | `packages/react/src/lib/utils.ts`                    |
 | Components          | `packages/react/src/components/{name}/`              |
 
-Take the files by hand, as below. If instead you want a whole standalone design
-system of your own — the components and the generated token CSS forked into a
-publishable monorepo under your own scope, still depending on the published
-`@nexus_ds/core` for the runtime engine — clone the repo, run `pnpm install`,
-then `pnpm export --name=your-design-system`, and follow that scaffold rather
-than this page. The export builds `@nexus_ds/core` on the way through, so the
-install is not optional.
+To fork the whole design system into your own monorepo instead, clone the
+repo and run `pnpm install`, then `pnpm export --name=your-design-system`.
+Follow the generated scaffold instead of this page.
 
-## Step 1: Tailwind 4
+## Step 1: Install Tailwind 4
 
 ```bash
 npm install -D tailwindcss @tailwindcss/postcss postcss
@@ -52,30 +45,19 @@ export default {
 };
 ```
 
-Do not add an `@import "tailwindcss"` of your own — including the one a
-`create-next-app` scaffold leaves at the top of `globals.css`. The Nexus token
-CSS imports Tailwind itself, as `@import 'tailwindcss' prefix(nx)`, and that
-prefix is where `nx:bg-primary-background` comes from. `prefix()` is a property
-of the build, not of one import, so a second unprefixed import does not buy you
-a second, unprefixed utility layer: everything stays `nx:`. It emits preflight
-twice wherever you put it. Put it _after_ the Nexus import and it also
-re-injects Tailwind's default `@theme` on top of Nexus's resets, so
-{/* audit-class-refs-ignore-next-line */}
-`nx:bg-red-500` and a stock `nx:text-lg` come back alongside the tokens.
+Remove any `@import "tailwindcss"` from your CSS, including the one
+`create-next-app` adds to `globals.css`. The token CSS imports Tailwind for
+you, with the `nx:` prefix. A second import duplicates Tailwind's base styles
+and can bring back its default colors.
 
-Tailwind finds class names by scanning your project, so a pasted component's
-utilities are generated with no `@source` line: the file sits in your source
-tree like any other. `@source` is only for class names automatic detection
-cannot reach — `node_modules`, or files outside your project.
+## Step 2: Add the token CSS
 
-## Step 2: The token CSS layer
-
-Copy the token CSS into your app. Seven files, one entry point:
+Copy the seven files from `packages/tailwind/` into `styles/nexus/`:
 
 ```
 styles/nexus/
-├── nexus.css                 # entry — imports Tailwind with prefix(nx), then the six below
-├── variables.css             # the --nx-* values, and their .dark overrides
+├── nexus.css                 # entry point, imports the other six
+├── variables.css
 ├── typography-utilities.css
 ├── borderwidth-utilities.css
 ├── border-color-aliases.css
@@ -83,12 +65,13 @@ styles/nexus/
 └── spacing-utilities.css
 ```
 
-Import the entry point from your app's CSS entry point, followed by the
-animation utilities some components use for their enter and exit states:
+Install the animation utilities that some components use to open and close:
 
 ```bash
 npm install tw-animate-css
 ```
+
+Import both from your CSS entry point:
 
 ```css
 /* app/globals.css */
@@ -96,71 +79,57 @@ npm install tw-animate-css
 @import 'tw-animate-css';
 ```
 
-`nexus.css` is the whole token surface: the `nx:` utilities, the semantic color
-tokens, and the typography, spacing, radius, and motion scales.
+Every Tailwind class in your app now takes the `nx:` prefix: `nx:flex` works,
+`flex` does not. Only Nexus tokens are available, so Tailwind's default colors
+are gone.
+{/* audit-class-refs-ignore-next-line */}
+Instead of `nx:bg-red-500`, use a token class like `nx:bg-error-background`.
 
-This decides how you write Tailwind everywhere in the app, not just inside
-pasted components: once `nexus.css` is your Tailwind entry point, `nx:flex`
-exists and bare `flex` does not. Nexus also resets Tailwind's default scales
-(`--color-*`, `--spacing-*`, `--text-*` and the rest are set to `initial`),
-so the utilities you get are the token set, not Tailwind's stock palette.
-Write your own markup as `nx:` too.
+To add your own tokens, put a `@theme` block in `globals.css` after the
+imports. Don't edit `nexus.css`, because pasting a newer copy replaces it.
 
-To add project tokens, put your own `@theme` block in `globals.css` after the
-import — `nexus.css` is generated output stamped `DO NOT EDIT`, and pasting a
-newer copy over it would drop anything you added there.
+If your app already uses unprefixed Tailwind classes, this setup doesn't
+support it yet ([#604](https://github.com/nexuslabs-ai/nexus/issues/604)).
 
-This assumes a greenfield app. Adding Nexus to one that already has unprefixed
-Tailwind utilities needs a separate nx entry point rather than a single shared
-one; that setup is being designed in
-[#604](https://github.com/nexuslabs-ai/nexus/issues/604).
-
-Then declare the native color scheme, so the browser themes scrollbars, form
-controls, and the page canvas before any JavaScript runs:
+Then tell the browser the app supports both color schemes, so scrollbars and
+form controls match the theme:
 
 ```tsx
-// app/layout.tsx — step 3 fills the rest of this file in
+// app/layout.tsx (step 3 completes this file)
 import type { Viewport } from 'next';
 
 export const viewport: Viewport = { colorScheme: 'light dark' };
 ```
 
-Next renders that as `<meta name="color-scheme" content="light dark" />`; outside
-Next, write the tag itself. `nexus.css` emits the matching CSS policy — `:root`
-advertises both schemes, `:root:not(.dark)` pins light, and `.dark` pins dark —
-so native UI follows the app's theme instead of the operating system's.
+Outside Next.js, add `<meta name="color-scheme" content="light dark" />` to
+your `<head>`.
 
-## Step 3: The appearance provider
+## Step 3: Add the appearance provider
 
-The provider is what turns the token layer into a live theme. It derives the
-`--nx-*` values from a single appearance state, toggles `.dark`, and sets the
-`data-density` / `data-radius` / `data-shadow` / `data-borderwidth` attributes
-the token CSS keys off. Its companion script does that same work inline in
-`<head>`, before hydration, so there is no flash of the wrong theme.
+The provider applies the theme and saves the user's choices, like dark mode.
+Its script runs in `<head>`, so the page doesn't flash the wrong theme on load.
 
-The engine behind it is a published package:
+Install the theme engine:
 
 ```bash
 npm install @nexus_ds/core
 ```
 
-The React wiring is copy/own like the components. Copy the provider in:
+Copy the provider folder into `components/appearance/provider/`:
 
 ```
 components/appearance/provider/
-├── index.ts      # client surface — createNexusAppearance, NexusAppearanceProvider, useNexusAppearance
+├── index.ts      # NexusAppearanceProvider, useNexusAppearance, createNexusAppearance
 ├── provider.tsx
 ├── factory.tsx
 ├── script.tsx
-└── server.ts     # server-safe — NexusAppearanceScript
+└── server.ts     # NexusAppearanceScript (safe to import on the server)
 ```
 
-Then wire the script and the provider in the root layout — the same
-`app/layout.tsx` from step 2, now complete. Its `viewport` export is the one you
-already added, not a second one:
+Add the script and the provider to your root layout:
 
 ```tsx
-// app/layout.tsx — complete
+// app/layout.tsx
 import { DEFAULT_NEXUS_APPEARANCE } from '@nexus_ds/core';
 import type { Viewport } from 'next';
 
@@ -197,53 +166,40 @@ export default function RootLayout({
 }
 ```
 
-Both need the same `storageKey`: the provider persists the user's choice there,
-and the script restores it on the next load. Change what the app opens with by
-overriding fields on the default state — spread it and set `mode` to `'dark'` to
-open dark, or `brandColor` and `surfaceTone` to move the palette.
+Give the script and the provider the same `storageKey`. The provider saves the
+user's choices under that key, and the script reads them on the next load.
 
-[Theme setup](/getting-started/theme-setup) covers the rest: cookie-seeded SSR,
-Vite's `transformIndexHtml`, and the storage policies. It picks up from the
-layout above and shows only what changes, against these same copied modules.
+To change the starting theme, see [Theme setup](/getting-started/theme-setup).
 
-## Step 4: The `cn` helper
-
-Every Nexus component composes its classes through `cn`, so this file has to
-exist before the first paste:
+## Step 4: Add the `cn` helper
 
 ```bash
 npm install clsx tailwind-merge
 ```
 
-Copy `lib/utils.ts` in. It is `clsx` wrapped in a `tailwind-merge` instance
-configured with `prefix: 'nx'` and the Nexus custom utility groups. That
-configuration is what lets `<Button className="nx:bg-error-background" />`
-override the variant's own background instead of landing beside it in the class
-list and losing to source order.
+Copy `packages/react/src/lib/utils.ts` to `lib/utils.ts`.
 
-## Paste a component
+`cn` merges class names and resolves conflicts between `nx:` classes. That's
+what lets `<Button className="nx:bg-error-background" />` replace the button's
+own background.
 
-Setup is done. A component is never just its own file: it imports other Nexus
-files, and those import packages. Each component lists both, generated from its
-imports. For Button, install the packages, then copy the files — the ones it
-imports first, its own last:
+## Add your first component
+
+Each component lists the packages to install and the files to copy. Copy the
+files in the order shown. For Button:
 
 <InstallBlock slugs={['button']} />
 
-Every path is relative to `packages/react/src/` in the repo. Keep it as it is
-under your `@/` root, next to the `lib/utils.ts` from step 4, and the relative
-imports between the files — barrels included — resolve without an edit.
-Rerunning an install line or recopying `lib/utils.ts` changes nothing. A
-component with its own stylesheet, such as Progress, also lists the `@import`
-lines to add to `app/globals.css`.
+Paths are relative to `packages/react/src/` in the repo. Keep the same folder
+structure under your `@/` root, and the imports between files work without
+edits. If a component has its own stylesheet, like Progress, it also lists the
+`@import` lines to add to `app/globals.css`.
 
 Render it:
 
 <ComponentDemo id="button/default" />
 
-That is this page's own button, always styled — the checks below are for the
-ones in your app. To run the second one you need a way to switch modes, which is
-the provider's `state` and `setState`:
+To check dark mode, add a toggle that uses `useNexusAppearance`:
 
 ```tsx
 // components/mode-toggle.tsx
@@ -262,24 +218,19 @@ export function ModeToggle() {
 }
 ```
 
-Render it on the same page as the buttons. It flips off `resolvedMode` rather
-than `state.mode`, so it does the right thing from a `'system'` start.
+`resolvedMode` is the mode on screen, so the toggle also works when `mode` is
+`'system'`.
 
-Unstyled buttons mean the token import from step 2 never reached the page.
-Styled buttons that stay light when you toggle mean the provider from step 3 is
-not wrapping them.
+If the button has no styles, `nexus.css` isn't imported (step 2). If it stays
+light when you toggle, the provider isn't wrapping it (step 3).
 
-## Lint guardrails
+## (Optional) Add lint rules
 
-Optional. The conventions in a pasted component are now yours to keep, and the
-rules that enforce them publish to npm:
+The Nexus ESLint rules keep copied components following Nexus conventions:
 
 ```bash
 npm install -D @nexus_ds/eslint-plugin
 ```
-
-`nexusComponentConfig()` contributes plugins and rules only. Spread it into an
-entry of your own and append that to your existing config:
 
 ```js
 // eslint.config.mjs
@@ -296,20 +247,17 @@ const eslintConfig = [
 export default eslintConfig;
 ```
 
-That turns on `nx-class-conventions`, `no-render-prop-types`, and
-`no-multi-statement-jsx-handler` over the files you point it at. It relies on a
-TypeScript parser set earlier in the config, which a `create-next-app` scaffold
-provides through `next/core-web-vitals`. If yours sets none, every `.tsx` fails
-to parse and no rule runs: install `typescript-eslint` too and give the entry
-`languageOptions: { parser: tseslint.parser }`.
+This turns on `nx-class-conventions`, `no-render-prop-types` and
+`no-multi-statement-jsx-handler` for the files you list.
+
+The rules need a TypeScript parser. `create-next-app` sets one up through
+`next/core-web-vitals`. If your config has none, install `typescript-eslint` and
+add `languageOptions: { parser: tseslint.parser }` to the entry.
 
 ## Next steps
 
-- **[Theme setup](/getting-started/theme-setup)** — pick a brand and surface
-  tone, seed the theme from a cookie, wire Vite.
-- **[Create](/create)** — style real Nexus components live, then copy the
-  appearance into your project.
-- **[Foundations → Color](/foundations/color)** — how the palette is engineered
-  (OKLCH + APCA).
-- **[Components](/components)** — the full catalog, each page with the source to
-  copy.
+- **[Theme setup](/getting-started/theme-setup)**: set your brand color, load
+  the theme from a cookie, or set up Vite.
+- **[Create](/create)**: design a theme live, then copy it into your app.
+- **[Color](/foundations/color)**: how the palette is built.
+- **[Components](/components)**: every component, with its source to copy.

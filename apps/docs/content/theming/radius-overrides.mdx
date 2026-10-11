@@ -1,43 +1,34 @@
 # Radius overrides
 
-Use the appearance **corners** setting to choose a radius preset for the whole
-theme. For a smaller area, set `data-radius` on a wrapper. To change the radius
-used by buttons within that area, override `--nx-radius-base`.
+Change the corner radius for one part of the page, or for one kind of
+component.
 
-Button currently uses `nx:rounded-base`, which reads `--nx-radius-base`.
-Input and SelectTrigger use `nx:rounded-md`, which reads `--nx-radius-md`.
-FilterConditionField also uses `nx:rounded-s-base`: it is the start segment of
-a joined control whose other segments are Buttons, so its outer corner follows
-the same override.
-The generic `base` name describes a token, not permanent ownership by Button:
-any consumer of that token inside the scope receives the override.
+The `corners` field in [Appearance](/theming/appearance) sets the radius for
+the whole app. This page covers smaller scopes.
 
-Some components render Button with their own radius class, which replaces
-`rounded-base`. These ignore the override:
+## Set a radius preset for an area
 
-- InputGroupButton at sizes `xs`, `icon-xs` (`rounded-sm`) and `sm`
-  (`rounded-md`). Size `icon-sm` follows the override.
-- Carousel previous and next buttons (`rounded-full`).
-- DatePicker selected days: `rounded-md` at a range start and end,
-  `rounded-none` in the middle of a range, and `rounded-l-md` or
-  `rounded-r-md` on the outer side of any selected day at a week edge. A single
-  selected day away from a week edge, unselected days and the month navigation
-  buttons follow the override.
-
-## Rounded buttons, unchanged inputs
-
-Under `round`, both base and medium radii start at `12px`. This example changes
-base to `9999px`, leaving medium at `12px`.
-
-Use the component import paths from your installation. The local style type
-accepts this custom property without changing React's global types.
+Add `data-radius` to a wrapper. Everything inside it uses that preset:
 
 ```tsx
+<div data-radius="round">{/* … */}</div>
+```
+
+The values are the same as `corners`: `square`, `subtle`, `smooth`, `round`
+and `extra-round`.
+
+## Round only the buttons
+
+Set `--nx-radius-base` on a wrapper. Buttons read that variable, while inputs
+and select triggers read `--nx-radius-md`, so they keep their corners:
+
+```tsx
+// components/rounded-actions.tsx
 import type { CSSProperties } from 'react';
 
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Select, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { Button } from '@/components/button/button';
+import { Input } from '@/components/input/input';
+import { Select, SelectTrigger, SelectValue } from '@/components/select/select';
 
 type RadiusStyle = CSSProperties & { '--nx-radius-base': string };
 const pillButtons: RadiusStyle = { '--nx-radius-base': '9999px' };
@@ -57,32 +48,49 @@ export function RoundedActions() {
 }
 ```
 
-The example demonstrates the closed Select trigger; add SelectContent and
-SelectItem when providing choices. For one Button, put `style={pillButtons}`
-on that Button instead. Existing `className` and `style` customization remains
-available. Removing the override restores the inherited preset value.
+The buttons become pills. The input and the select trigger keep the `round`
+preset's `12px`.
 
-## Nested scopes and precedence
+To change one button, put `style={pillButtons}` on that button instead.
 
-| Placement                                                             | Result                                                                                         |
-| --------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------- |
-| Override on a wrapper                                                 | Descendant consumers inherit it; siblings outside the wrapper do not.                          |
-| Nested wrapper without a preset or override                           | Keeps inheriting the outer override.                                                           |
-| Nested wrapper with its own override                                  | Its descendants receive the nested value.                                                      |
-| Nested `data-radius="smooth"`                                         | Declares fresh preset values, replacing an inherited override; Button returns to `8px`.        |
-| `data-radius="round"` and an inline base override on the same wrapper | The inline override wins over the preset's normal selector declaration. Medium remains `12px`. |
+`RadiusStyle` adds the custom property to the `style` type, so you don't need
+to change React's global types.
 
-These scopes follow the actual DOM ancestry. Content rendered into a portal
-outside the wrapper does not inherit the wrapper's variables.
+## Which variable each component reads
 
-ButtonGroup still removes the touching corners of adjacent children, in both
-horizontal and vertical groups. In a group of only Buttons, the override rounds
-the outside corners while the joining edges stay square. ButtonGroupText, Input
-and SelectTrigger keep `rounded-md`, so a group mixing them with Buttons shows
-different outside corners at each end. Button rendered with `asChild` passes
-its styling to the child element as usual.
+| Variable           | Read by                                       |
+| ------------------ | --------------------------------------------- |
+| `--nx-radius-base` | Button, and the start of FilterConditionField |
+| `--nx-radius-md`   | Input, SelectTrigger, ButtonGroupText         |
 
-For the overall appearance model, see [Appearance](/theming/appearance).
-The **Tokens / Radius overrides / Scope And Precedence** Storybook story
-checks the computed corners for these examples, including unchanged Input and
-SelectTrigger corners.
+`--nx-radius-base` isn't reserved for Button. Anything inside the wrapper that
+uses `nx:rounded-base` picks up the override.
+
+Some components render a Button with a radius of their own. These keep their
+own radius:
+
+| Component        | Keeps                                                               |
+| ---------------- | ------------------------------------------------------------------- |
+| InputGroupButton | `rounded-sm` at sizes `xs` and `icon-xs`, `rounded-md` at size `sm` |
+| Carousel         | `rounded-full` on the previous and next buttons                     |
+| DatePicker       | Its own corners on selected days in a range or at a week edge       |
+
+## Nested wrappers
+
+| Inner wrapper                    | Result                                             |
+| -------------------------------- | -------------------------------------------------- |
+| No `data-radius` and no override | Inherits the outer override                        |
+| Its own `--nx-radius-base`       | Uses its own value                                 |
+| Its own `data-radius`            | Resets to that preset and drops the outer override |
+
+When `data-radius` and `--nx-radius-base` are on the same element, the
+`--nx-radius-base` value wins.
+
+Overrides follow the DOM tree. A popover or menu that renders in a portal sits
+outside your wrapper, so it doesn't get the override.
+
+## Button groups
+
+ButtonGroup squares off the edges where buttons touch. With an override, only
+the outer corners are rounded. In a group that mixes Buttons with an Input or
+ButtonGroupText, the two ends can have different corners.

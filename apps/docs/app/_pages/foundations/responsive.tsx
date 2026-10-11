@@ -75,14 +75,10 @@ export default function Responsive() {
     <>
       <h1 className="nx:typography-heading-large">Responsive</h1>
       <p className="nx:typography-body-default nx:text-muted-foreground nx:mt-2 nx:mb-8 nx:max-w-[64ch]">
-        Nexus is designed mobile-first and desktop-first — Narrow (mobile) and
-        Standard (desktop) are both first-class targets, neither a degradation
-        of the other. Author mobile-first: base styles are the mobile case, and
-        min-width prefixes layer on the wider tiers. Wide (≥1536px) gets extra
-        breathing room. Breakpoints are rem-based, so they track the
-        user&rsquo;s font-size preference — raise the base font and each
-        breakpoint fires at a narrower viewport, dropping the layout to a
-        roomier tier as the text enlarges.
+        Nexus is built for mobile and desktop equally. Write the mobile styles
+        first, without a prefix, then add wider screens with <code>nx:lg:</code>{' '}
+        and up. Breakpoints are in rem, so a user who enlarges their browser
+        font size gets the roomier layout sooner.
       </p>
 
       {/* ── Breakpoints ─────────────────────────────────────── */}
@@ -91,9 +87,9 @@ export default function Responsive() {
           Breakpoints
         </SectionHeading>
         <p className="nx:typography-body-default nx:text-muted-foreground nx:mb-4 nx:max-w-[64ch]">
-          Five Tailwind classes plus the unprefixed base, mapped onto the Narrow
-          / Standard / Wide labels. Components are tuned against two reference
-          widths — mobile ~390px and desktop ~1280px (<code>xl</code>).
+          Components are tuned at two widths: about 390px for mobile and about
+          1280px (<code>xl</code>) for desktop. Narrow, Standard and Wide are
+          labels for review, not classes.
         </p>
         <div className="nx:overflow-x-auto">
           <table className="nx:w-full nx:min-w-[560px] nx:border-collapse nx:typography-label-default">
@@ -138,18 +134,15 @@ export default function Responsive() {
           Show / Hide primitives
         </SectionHeading>
         <p className="nx:typography-body-default nx:text-muted-foreground nx:mb-4 nx:max-w-[64ch]">
-          The declarative <code>&lt;Show&gt;</code> / <code>&lt;Hide&gt;</code>{' '}
-          primitives from <code>@nexus_ds/react</code> express responsive
-          visibility. Provide exactly one axis: <code>above</code> /{' '}
-          <code>below</code> for the viewport, or <code>containerAbove</code> /{' '}
+          Use <code>&lt;Show&gt;</code> and <code>&lt;Hide&gt;</code> to show
+          content at some widths only. Pass one prop: <code>above</code> or{' '}
+          <code>below</code> for the viewport, or <code>containerAbove</code> or{' '}
           <code>containerBelow</code> for the nearest <code>@container</code>.
-          They toggle <code>display: contents</code> ↔{' '}
-          <code>display: none</code>, so children always render — only
-          visibility changes. Note the two breakpoint scales share names but
-          differ: viewport <code>md</code> = 48rem, container <code>md</code> =
-          28rem, so <code>above=&quot;md&quot;</code> and{' '}
-          <code>containerAbove=&quot;md&quot;</code> do not fire at the same
-          width.
+          The children always render. Only their visibility changes.
+        </p>
+        <p className="nx:typography-body-default nx:text-muted-foreground nx:mb-4 nx:max-w-[64ch]">
+          The viewport and container scales share names but not sizes. Viewport{' '}
+          <code>md</code> is 48rem and container <code>md</code> is 28rem.
         </p>
         <CodeSample lang="tsx">
           {`// Viewport axis — page-shell decision
@@ -170,11 +163,10 @@ export default function Responsive() {
           Which mechanism
         </SectionHeading>
         <p className="nx:typography-body-default nx:text-muted-foreground nx:mb-4 nx:max-w-[64ch]">
-          Components prefer <code>@container</code> — they adapt to their
-          parent&rsquo;s width, so they render consistently in a sidebar or a
-          hero. Viewport prefixes are reserved for page-shell decisions and
-          full-viewport overlays (Dialog), whose trigger is position relative to
-          the viewport.
+          Inside a component, use <code>@container</code>. The component then
+          adapts to its parent, so it looks right in a sidebar or a full-width
+          section. Use viewport prefixes for the page layout, and for overlays
+          that cover the screen, like Dialog.
         </p>
         <div className="nx:overflow-x-auto">
           <table className="nx:w-full nx:min-w-[480px] nx:border-collapse nx:typography-label-default">

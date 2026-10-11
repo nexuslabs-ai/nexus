@@ -33,8 +33,7 @@ const RECIPES: { name: string; members: string; ring: string }[] = [
 
 const NO_RING: { surface: string; instead: string }[] = [
   {
-    surface:
-      'Menu and overlay rows — DropdownMenuItem, SelectItem, CommandItem',
+    surface: 'Menu rows: DropdownMenuItem, SelectItem, CommandItem',
     instead: 'nx:focus:bg-popover-hover',
   },
   {
@@ -43,7 +42,7 @@ const NO_RING: { surface: string; instead: string }[] = [
   },
   {
     surface: 'Containers — Card, Dialog body, popover surface',
-    instead: 'nothing; the ring lives on the focusable children',
+    instead: 'No ring. The controls inside get it.',
   },
 ];
 
@@ -51,12 +50,12 @@ const TRANSITIONS: { utility: string; properties: string; use: string }[] = [
   {
     utility: 'nx:transition-control',
     properties: 'color, background-color, border-color',
-    use: 'Controls — the border is decoration, so it may fade. Button adds scale to the same list',
+    use: 'Controls. Button also transitions scale.',
   },
   {
     utility: 'nx:transition-field',
     properties: 'color, background-color',
-    use: 'Field surfaces — the border is half the ring, so it must not fade',
+    use: 'Fields. The border is half the ring, so it must not fade.',
   },
 ];
 
@@ -65,12 +64,11 @@ export default function Focus() {
     <>
       <h1 className="nx:typography-heading-large">Focus</h1>
       <p className="nx:typography-body-default nx:text-muted-foreground nx:mt-2 nx:mb-8 nx:max-w-[64ch]">
-        Every keyboard-reachable control paints the same ring: a real CSS{' '}
-        <code>outline</code> in the <code>focus-default</code> colour, shown
-        only for <code>:focus-visible</code>. Nothing is painted with{' '}
-        <code>box-shadow</code>, so the ring follows the corner radius, never
-        changes the box size, and never tints the surface underneath it. Tab
-        through the specimens below.
+        Every control you can reach with Tab shows the same focus ring. The ring
+        is a CSS <code>outline</code> in the <code>focus-default</code> color,
+        shown on <code>:focus-visible</code>. It follows the corner radius and
+        never changes the control&rsquo;s size. Press Tab to move through the
+        examples on this page.
       </p>
 
       {/* ── The three recipes ───────────────────────────────── */}
@@ -79,12 +77,14 @@ export default function Focus() {
           The three recipes
         </SectionHeading>
         <p className="nx:typography-body-default nx:text-muted-foreground nx:mb-4 nx:max-w-[64ch]">
-          Which recipe a component takes depends on what it <em>is</em>, not on
-          whether it happens to have a border. Checkbox and RadioGroupItem carry
-          real borders and still take the control recipe — the border is their
-          own decoration, not part of the ring.
+          Each component uses one of three ring recipes, based on what kind of
+          control it is. Checkbox and RadioGroupItem have borders, but they
+          still use the control recipe.
         </p>
-        <div className="nx:flex nx:flex-wrap nx:items-center nx:gap-6 nx:mb-6">
+        <div
+          data-md-skip
+          className="nx:flex nx:flex-wrap nx:items-center nx:gap-6 nx:mb-6"
+        >
           <Checkbox aria-label="Control recipe specimen" defaultChecked />
           <Switch aria-label="Control recipe specimen" defaultChecked />
           <Button>Button recipe</Button>
@@ -131,14 +131,11 @@ export default function Focus() {
           A field ring is two halves
         </SectionHeading>
         <p className="nx:typography-body-default nx:text-muted-foreground nx:mb-4 nx:max-w-[64ch]">
-          A field already has a border, so on focus that border recolours and
-          becomes the ring&rsquo;s inner half; the outline adds the outer half.{' '}
-          <code>outline-default</code> is the outline-width twin of{' '}
-          <code>border-default</code> — both are seeded from the same
-          borderwidth primitive — so swapping the picker&rsquo;s Border control
-          scales the whole ring instead of thickening only the inside of it. The
-          field keeps its border width at rest and focused, so focus never moves
-          the text.
+          On focus, a field&rsquo;s border changes color and forms the inner
+          half of the ring. The outline adds the outer half.{' '}
+          <code>outline-default</code> and <code>border-default</code> share one
+          width, so the whole ring scales with the Border setting. The border
+          width doesn&rsquo;t change on focus, so the text never moves.
         </p>
         <CodeSample lang="tsx">
           {`nx:border-default nx:border-border-default
@@ -147,20 +144,20 @@ nx:focus-visible:border-focus-default
 nx:disabled:border-border-disabled`}
         </CodeSample>
         <p className="nx:typography-body-default nx:text-muted-foreground nx:mt-4 nx:mb-4 nx:max-w-[64ch]">
-          <code>InputOTPSlot</code> takes the same two halves under{' '}
-          <code>data-[active=true]:</code> rather than{' '}
-          <code>focus-visible:</code>: one transparent input sits over the
-          slots, so the ring marks the slot the caret is in, on any focus. It
-          has no error state. Slots overlap their full borders by one border
-          width, so the active slot recolours all four of its sides without
-          moving the row.
+          <code>InputOTPSlot</code> uses the same two halves, but on{' '}
+          <code>data-[active=true]:</code> instead of{' '}
+          <code>focus-visible:</code>. The ring marks the slot with the caret.
+          InputOTPSlot has no error state.
         </p>
         <p className="nx:typography-body-default nx:text-muted-foreground nx:mt-4 nx:mb-4 nx:max-w-[64ch]">
-          An invalid field wires an always-on error border plus an
-          error-coloured ring on <em>both</em> properties. Tab into the field
-          below to see it.
+          An invalid field always shows an error border. On focus, both halves
+          of the ring turn the error color. Press Tab to focus this invalid
+          field:
         </p>
-        <div className="nx:flex nx:flex-wrap nx:items-center nx:gap-6 nx:mb-4">
+        <div
+          data-md-skip
+          className="nx:flex nx:flex-wrap nx:items-center nx:gap-6 nx:mb-4"
+        >
           <Input
             aria-invalid
             aria-label="Invalid field specimen"
@@ -181,14 +178,10 @@ nx:aria-invalid:focus-visible:border-focus-error`}
           One colour for every control
         </SectionHeading>
         <p className="nx:typography-body-default nx:text-muted-foreground nx:mb-4 nx:max-w-[64ch]">
-          Primary, secondary, outline, ghost, destructive — they all focus in{' '}
-          <code>focus-default</code>. Focus is a system signal (&ldquo;you are
-          here&rdquo;), not a per-variant or status signal, so there is no
-          per-variant focus colour. <code>focus-default</code> shares the solved{' '}
-          <code>primary-subtle-foreground</code> colour, with focus surfaces
-          included in its contrast checks. That is why the ring re-tints with
-          the theme picker and component code never needs a brand-specific focus
-          class. Only the error state differs, and it has its own token:{' '}
+          Every variant uses <code>focus-default</code>, including destructive
+          buttons. The ring says &ldquo;you are here&rdquo;, not what the
+          control does. <code>focus-default</code> follows the brand color, so
+          you never need a brand-specific focus class. Invalid fields use{' '}
           <code>focus-error</code>.
         </p>
       </section>
@@ -199,11 +192,11 @@ nx:aria-invalid:focus-visible:border-focus-error`}
           Container focus is a separate, neutral token
         </SectionHeading>
         <p className="nx:typography-body-default nx:text-muted-foreground nx:mb-4 nx:max-w-[64ch]">
-          <code>border-focus</code> is not a ring colour. It is the neutral grey
-          border a container takes while focus is somewhere inside it — the
-          Command search row and the DatePicker frame. It does not follow the
-          brand. A focused control always uses <code>focus-default</code>; reach
-          for <code>border-focus</code> only on the wrapper around it.
+          <code>border-focus</code> is the gray border a container shows while
+          something inside it has focus. Command&rsquo;s search row and
+          DatePicker&rsquo;s frame use it. It doesn&rsquo;t follow the brand.
+          Use <code>focus-default</code> on the focused control, and{' '}
+          <code>border-focus</code> only on the wrapper around it.
         </p>
         <CodeSample lang="tsx">
           {`nx:focus-within:border-border-focus   /* container: neutral */
@@ -217,11 +210,9 @@ nx:focus-visible:outline-focus-default /* control: brand */`}
           Where the ring does not go
         </SectionHeading>
         <p className="nx:typography-body-default nx:text-muted-foreground nx:mb-4 nx:max-w-[64ch]">
-          The dividing line is input modality. Anything a keyboard user reaches
-          with Tab gets the ring. Menu rows do not: Radix roving focus moves DOM
-          focus to the row under the pointer, so a ring would flash for mouse
-          users while giving them no steady indicator. Those rows tint from the
-          surface they sit on instead.
+          Anything you reach with Tab gets the ring. Menu rows don&rsquo;t,
+          because they take focus when the pointer moves over them, and a ring
+          would flash for mouse users. Menu rows change background instead.
         </p>
         <div className="nx:overflow-x-auto">
           <table className="nx:w-full nx:min-w-[480px] nx:border-collapse nx:typography-label-default">
@@ -253,33 +244,26 @@ nx:focus-visible:outline-focus-default /* control: brand */`}
       {/* ── Authoring a ring ────────────────────────────────── */}
       <section className="nx:mb-12">
         <SectionHeading className="nx:typography-heading-small nx:mb-1">
-          Two rules when you author one
+          Write your own focus styles
         </SectionHeading>
         <p className="nx:typography-body-default nx:text-muted-foreground nx:mb-4 nx:max-w-[64ch]">
           <strong className="nx:text-foreground">
             Never pair <code>nx:outline-none</code> with a focus-outline class
             on the same element.
           </strong>{' '}
-          Tailwind&rsquo;s <code>outline-none</code> sets{' '}
-          <code>--tw-outline-style: none</code>, and{' '}
-          <code>outline-&lt;n&gt;</code> emits{' '}
-          <code>outline-style: var(--tw-outline-style)</code> — so the ring
-          silently never paints. To suppress a nested control&rsquo;s own ring,
-          scope the suppression to the variant instead:{' '}
-          <code>nx:focus-visible:outline-none</code>.
+          <code>outline-none</code> hides every outline on the element, so the
+          ring never shows. To hide a nested control&rsquo;s ring, use{' '}
+          <code>nx:focus-visible:outline-none</code> instead.
         </p>
         <p className="nx:typography-body-default nx:text-muted-foreground nx:max-w-[64ch]">
           <strong className="nx:text-foreground">
             Never use <code>nx:transition-colors</code> on a surface that paints
             a ring.
           </strong>{' '}
-          Tailwind expands it to a list that includes <code>outline-color</code>
-          , so the ring fades in over the duration instead of landing with the
-          keypress. <code>pnpm lint</code> fails the pair wherever both land in
-          one class string or one <code>cva()</code> / <code>cn()</code> call;
-          two strings that only meet somewhere else pass, and the specimens on
-          these docs pages are the one surface the check skips. Nexus ships the
-          two ring-safe replacements — reach for those instead:
+          It animates <code>outline-color</code>, so the ring fades in instead
+          of appearing on the keypress. The Nexus ESLint rules flag the two
+          classes together in one class string or one <code>cva()</code> or{' '}
+          <code>cn()</code> call. Use one of these instead:
         </p>
         <div className="nx:overflow-x-auto nx:mt-4">
           <table className="nx:w-full nx:min-w-[480px] nx:border-collapse nx:typography-label-default">

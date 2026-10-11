@@ -120,7 +120,9 @@ Component pages are generated. Three sources feed them:
 | `parameters.docs.description.story`            | Example caption            | One sentence: the scenario and outcome |
 | JSDoc on a prop or on the `{Name}Props` member | Props table description    | A fragment of 12 words or fewer        |
 
-**Component description.** Use at most three sentences.
+**Component description.** Use at most three sentences. The page shows it
+under the heading. Wrap code in backticks. Lines starting with `- ` render as a
+list.
 
 ```
 {Name} {does what}. Use it for {situation}. For {other situation}, use {Other}.
@@ -133,7 +135,7 @@ When a component has several rules, give it a short bullet list (one rule
 per bullet) instead of one long sentence joined by semicolons.
 
 **Story description.** Write one sentence that names the scenario and the
-outcome.
+outcome. On a story tagged `docs`, it's the example's caption.
 
 > Keep the footer visible while the content scrolls.
 
@@ -156,6 +158,11 @@ Agents read docs as plain text, and readers land on one section from search.
   in the block.
 - **Use full paths in links and code**, not "the file from earlier".
 - **Repeat the noun at the start of each section**, not "it".
+
+At build time, `apps/docs/scripts/write-markdown.mjs` turns every page into
+Markdown at `{route}.md` and lists it in `/llms.txt`. The page's first paragraph
+becomes its `llms.txt` summary, so make that paragraph say what the page is.
+Put `data-md-skip` on a live preview or specimen that means nothing as text.
 
 ## Worked rewrites
 

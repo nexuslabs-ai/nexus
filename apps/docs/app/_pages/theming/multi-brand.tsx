@@ -1,41 +1,33 @@
+import Link from 'next/link';
+
 import { CodeSample } from '../../_components/CodeSample';
 import { SectionHeading } from '../../_components/Heading';
 import { Button } from '../../_components/nexus';
 
 /**
- * Theming → Multi-brand. The theming-model explainer (this is where
- * `/theming` lands). Server component; the live preview renders @nexus_ds/react
- * Buttons as a client island that re-themes via the picker. Documents the
- * dimensions, the two runtime swap mechanisms, consumer overrides, and the
- * humans/agents framing.
+ * Theming → Multi-brand. Server component; the live preview renders
+ * @nexus_ds/react Buttons as a client island that re-themes via the picker.
  *
- * Sources: packages/core/tokens/, shadcn-divergences.md.
+ * Sources: packages/core/src/lib/appearance-model.ts, packages/tailwind/nexus.css.
  */
 
-const DIMENSIONS: { dim: string; options: string; swap: string }[] = [
-  {
-    dim: 'Base',
-    options: 'slate · stone · neutral · gray · zinc',
-    swap: '<link> swap',
-  },
-  {
-    dim: 'Spacing (density)',
-    options: '6 modes — compact · default · comfortable · …',
-    swap: 'data-density attr',
-  },
-  { dim: 'Shadow', options: '5 modes', swap: '<link> swap' },
-  {
-    dim: 'Radius',
-    options: 'square · subtle · smooth · round · extra-round',
-    swap: '<link> swap',
-  },
-  {
-    dim: 'Border width',
-    options: '3 designs (normal · fine · strong)',
-    swap: '<link> swap',
-  },
-  { dim: 'Dark mode', options: 'light · dark', swap: '.dark class' },
+const SETTINGS: { field: string; sets: string; appliedAs: string }[] = [
+  { field: 'brandColor', sets: 'Primary color', appliedAs: 'CSS variables' },
+  { field: 'surfaceTone', sets: 'Background gray', appliedAs: 'CSS variables' },
+  { field: 'mode', sets: 'Light or dark', appliedAs: '.dark class' },
+  { field: 'density', sets: 'Spacing', appliedAs: 'data-density' },
+  { field: 'corners', sets: 'Corner radius', appliedAs: 'data-radius' },
+  { field: 'elevation', sets: 'Shadows', appliedAs: 'data-shadow' },
+  { field: 'stroke', sets: 'Border width', appliedAs: 'data-borderwidth' },
 ];
+
+const SWITCH_SAMPLE = `const { setState } = useNexusAppearance();
+
+setState((current) => ({ ...current, brandColor: '#7c3aed' }));`;
+
+const SCOPE_SAMPLE = `<section data-density="compact" data-radius="round">
+  {/* everything here is compact and rounded */}
+</section>`;
 
 const SWATCHES = [
   'primary-background',
@@ -49,45 +41,48 @@ export default function MultiBrand() {
     <>
       <h1 className="nx:typography-heading-large">Multi-brand theming</h1>
       <p className="nx:typography-body-default nx:text-muted-foreground nx:mt-2 nx:mb-8 nx:max-w-[64ch]">
-        Nexus theming is a set of independent dimensions, each a runtime mode
-        you can swap without a rebuild. Components never hard-code a color or a
-        size — they reference semantic tokens, so re-pointing a dimension
-        cascades to the whole tree at once. One source of truth, read the same
-        way by humans and agents.
+        Change any part of the theme at runtime, without a rebuild. Components
+        only use tokens, so one change restyles every component at once.
       </p>
 
-      {/* ── Dimensions ──────────────────────────────────────── */}
+      {/* ── Settings ────────────────────────────────────────── */}
       <section className="nx:mb-12">
         <SectionHeading className="nx:typography-heading-small nx:mb-1">
-          The dimensions
+          What you can change
         </SectionHeading>
         <p className="nx:typography-body-default nx:text-muted-foreground nx:mb-4 nx:max-w-[64ch]">
-          One base color axis plus five design-token axes and dark mode, each an
-          orthogonal runtime mode that combines freely. Brand color is a
-          separate runtime seed — any hex, resolved by the appearance engine —
-          not a fixed stylesheet; re-theme it via a consumer override (below).
+          Each setting is a field in
+          <Link
+            href="/theming/appearance"
+            className="nx:text-primary-subtle-foreground nx:underline nx:underline-offset-2"
+          >
+            Appearance
+          </Link>
+          . The provider applies it to <code>&lt;html&gt;</code>:
         </p>
         <div className="nx:overflow-x-auto">
-          <table className="nx:w-full nx:min-w-[560px] nx:border-collapse nx:typography-label-default">
+          <table className="nx:w-full nx:min-w-[480px] nx:border-collapse nx:typography-label-default">
             <thead>
               <tr className="nx:border-b nx:border-border-default nx:text-left">
-                <th className="nx:py-2 nx:pr-3 nx:font-semibold">Dimension</th>
-                <th className="nx:py-2 nx:pr-3 nx:font-semibold">Options</th>
-                <th className="nx:py-2 nx:font-semibold">How it swaps</th>
+                <th className="nx:py-2 nx:pr-3 nx:font-semibold">Field</th>
+                <th className="nx:py-2 nx:pr-3 nx:font-semibold">Sets</th>
+                <th className="nx:py-2 nx:font-semibold">Applied as</th>
               </tr>
             </thead>
             <tbody>
-              {DIMENSIONS.map((d) => (
+              {SETTINGS.map((s) => (
                 <tr
-                  key={d.dim}
+                  key={s.field}
                   className="nx:border-b nx:border-border-default"
                 >
-                  <td className="nx:py-2 nx:pr-3 nx:font-medium">{d.dim}</td>
+                  <td className="nx:py-2 nx:pr-3 nx:font-mono nx:typography-label-small">
+                    {s.field}
+                  </td>
                   <td className="nx:py-2 nx:pr-3 nx:text-muted-foreground">
-                    {d.options}
+                    {s.sets}
                   </td>
                   <td className="nx:py-2 nx:font-mono nx:typography-label-small nx:text-muted-foreground">
-                    {d.swap}
+                    {s.appliedAs}
                   </td>
                 </tr>
               ))}
@@ -96,42 +91,19 @@ export default function MultiBrand() {
         </div>
       </section>
 
-      {/* ── Mechanisms ──────────────────────────────────────── */}
-      <section className="nx:mb-12">
-        <SectionHeading className="nx:typography-heading-small nx:mb-1">
-          Two runtime mechanisms
-        </SectionHeading>
-        <p className="nx:typography-body-default nx:text-muted-foreground nx:mb-4 nx:max-w-[64ch]">
-          Colors and most design tokens swap by re-pointing a stylesheet
-          <code className="nx:typography-code-inline">
-            {' '}
-            &lt;link data-theme&gt;
-          </code>
-          — each mode is a small CSS file that redefines the{' '}
-          <code className="nx:typography-code-inline">--nx-*</code> variables.
-          Spacing density swaps via a{' '}
-          <code className="nx:typography-code-inline">data-density</code>{' '}
-          attribute on{' '}
-          <code className="nx:typography-code-inline">&lt;html&gt;</code> (so
-          one attribute rescales every{' '}
-          <code className="nx:typography-code-inline">nx:p-*</code> utility),
-          and dark mode toggles the{' '}
-          <code className="nx:typography-code-inline">.dark</code> class.
-          Because every surface reads the tokens, all three cascade with zero
-          component JavaScript.
-        </p>
-      </section>
-
       {/* ── Live ────────────────────────────────────────────── */}
       <section className="nx:mb-12">
         <SectionHeading className="nx:typography-heading-small nx:mb-1">
           See it live
         </SectionHeading>
         <p className="nx:typography-body-default nx:text-muted-foreground nx:mb-4 nx:max-w-[64ch]">
-          Open the theme picker (bottom-right) and swap the Base — these
-          components and swatches re-resolve instantly.
+          Change Base in the theme picker in the bottom-right corner. These
+          buttons and swatches update at once.
         </p>
-        <div className="nx:flex nx:flex-wrap nx:items-center nx:gap-3 nx:rounded-xl nx:border nx:border-border-default nx:bg-container nx:p-5">
+        <div
+          data-md-skip
+          className="nx:flex nx:flex-wrap nx:items-center nx:gap-3 nx:rounded-xl nx:border nx:border-border-default nx:bg-container nx:p-5"
+        >
           <Button>Primary</Button>
           <Button variant="secondary">Secondary</Button>
           <Button variant="outline">Outline</Button>
@@ -148,39 +120,39 @@ export default function MultiBrand() {
         </div>
       </section>
 
-      {/* ── Consumer overrides ──────────────────────────────── */}
+      {/* ── Switch brands ───────────────────────────────────── */}
       <section className="nx:mb-12">
         <SectionHeading className="nx:typography-heading-small nx:mb-1">
-          Re-theme as a consumer
+          Switch brands
         </SectionHeading>
         <p className="nx:typography-body-default nx:text-muted-foreground nx:mb-4 nx:max-w-[64ch]">
-          Override the token variables in a stylesheet loaded after Nexus, or
-          set a density mode on any subtree. No component changes — the cascade
-          does the rest. See <strong>Consumer overrides</strong> for the full
-          surface.
+          To switch brands, set <code>brandColor</code> with
+          <code>useNexusAppearance</code>. Nexus builds the new palette and
+          applies it to the whole app:
         </p>
-        <CodeSample lang="css">
-          {`/* loaded after @nexus_ds/tailwind */
-:root {
-  --nx-color-primary-background: oklch(0.55 0.2 145); /* your brand */
-}
-
-/* density on a subtree */
-<section data-density="compact"> … compact … </section>`}
-        </CodeSample>
+        <CodeSample lang="tsx">{SWITCH_SAMPLE}</CodeSample>
       </section>
 
-      {/* ── For agents ──────────────────────────────────────── */}
+      {/* ── Scope ───────────────────────────────────────────── */}
       <section className="nx:mb-12">
         <SectionHeading className="nx:typography-heading-small nx:mb-1">
-          For agents
+          Change one part of the page
         </SectionHeading>
-        <p className="nx:typography-body-default nx:text-muted-foreground nx:max-w-[64ch]">
-          The same dimensions are published as structured DTCG tokens, a{' '}
-          <code className="nx:typography-code-inline">llms.txt</code> manifest,
-          and a mirror of the authoring rules — so an agent re-themes by reading
-          the source of truth, not by scraping rendered CSS. See{' '}
-          <strong>For AI agents</strong>.
+        <p className="nx:typography-body-default nx:text-muted-foreground nx:mb-4 nx:max-w-[64ch]">
+          Put <code>data-density</code> or <code>data-radius</code> on any
+          element. Everything inside it uses that setting:
+        </p>
+        <CodeSample lang="tsx">{SCOPE_SAMPLE}</CodeSample>
+        <p className="nx:typography-body-default nx:text-muted-foreground nx:mt-4 nx:max-w-[64ch]">
+          Brand color and mode apply to the whole app. For finer control over
+          corners, see{' '}
+          <Link
+            href="/theming/radius-overrides"
+            className="nx:text-primary-subtle-foreground nx:underline nx:underline-offset-2"
+          >
+            Radius overrides
+          </Link>
+          .
         </p>
       </section>
     </>

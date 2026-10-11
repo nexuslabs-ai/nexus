@@ -61,13 +61,10 @@ export default function Spacing() {
     <>
       <h1 className="nx:typography-heading-large">Spacing</h1>
       <p className="nx:typography-body-default nx:text-muted-foreground nx:mt-2 nx:mb-8 nx:max-w-[64ch]">
-        A 4px-based scale, exposed as named steps only — there is no base{' '}
-        <code>--spacing</code> token. All six density modes ship in every build
-        and swap at runtime through the <code>data-density</code> attribute on{' '}
-        <code>&lt;html&gt;</code> — the &ldquo;Size&rdquo; control in the theme
-        picker (bottom-right) — cascading to every <code>nx:p-*</code> and{' '}
-        <code>nx:gap-*</code> utility at once. The bars below read the live var,
-        so swap the control and watch them rescale.
+        Spacing uses a scale of named steps, based on 4px. The density setting
+        scales every <code>nx:p-*</code> and <code>nx:gap-*</code> utility at
+        once. Change Size in the theme picker in the bottom-right corner to see
+        it.
       </p>
 
       {/* ── The scale ───────────────────────────────────────── */}
@@ -76,9 +73,9 @@ export default function Spacing() {
           The scale
         </SectionHeading>
         <p className="nx:typography-body-default nx:text-muted-foreground nx:mb-4 nx:max-w-[64ch]">
-          Fourteen steps from 2px to 128px. Each bar&rsquo;s width is the
-          runtime <code>--nx-spacing-N</code> var, so the whole ladder rescales
-          when the Size mode changes.
+          Fourteen steps, from 2px to 128px. Each bar uses its{' '}
+          <code>--nx-spacing-N</code> variable, so it resizes with the Size
+          setting. There is no base <code>--spacing</code> token.
         </p>
         <div className="nx:flex nx:flex-col nx:gap-2">
           {SCALE.map((step) => (
@@ -107,10 +104,9 @@ export default function Spacing() {
           Role tokens
         </SectionHeading>
         <p className="nx:typography-body-default nx:text-muted-foreground nx:mb-4 nx:max-w-[64ch]">
-          Components don&rsquo;t reach for raw steps — they consume these
-          semantic roles (e.g. a button&rsquo;s padding). Because the roles map
-          onto the active density mode, swapping Size rescales whole components,
-          not just bare utilities. Values shown are the default baseline.
+          Components use these role tokens, like a button&rsquo;s padding,
+          instead of raw steps. Roles follow the density setting too, so whole
+          components resize. Values are for the <code>default</code> density.
         </p>
         <div className="nx:overflow-x-auto">
           <table className="nx:w-full nx:min-w-[560px] nx:border-collapse nx:typography-label-default">
@@ -149,9 +145,9 @@ export default function Spacing() {
           Six density modes
         </SectionHeading>
         <p className="nx:typography-body-default nx:text-muted-foreground nx:mb-4 nx:max-w-[64ch]">
-          Every build ships all six. Swapping the &ldquo;Size&rdquo; control in
-          the theme picker rescales the whole page live. The{' '}
-          <code>default</code> mode is the bundled baseline.
+          All six are in every build. Set one with the <code>density</code>{' '}
+          field in Appearance, which sets <code>data-density</code> on{' '}
+          <code>&lt;html&gt;</code>. <code>default</code> is the starting value.
         </p>
         <div className="nx:overflow-x-auto">
           <table className="nx:w-full nx:min-w-[480px] nx:border-collapse nx:typography-label-default">
