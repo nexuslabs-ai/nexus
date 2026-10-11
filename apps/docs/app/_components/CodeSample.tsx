@@ -22,7 +22,11 @@ export async function CodeSample({
   const html = await highlightSample(lang, children);
 
   return (
-    <CodeBlock framed={framed} dangerouslySetInnerHTML={{ __html: html }} />
+    <CodeBlock
+      framed={framed}
+      data-language={lang}
+      dangerouslySetInnerHTML={{ __html: html }}
+    />
   );
 }
 

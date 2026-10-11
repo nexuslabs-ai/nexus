@@ -79,7 +79,7 @@ export function ColorScales() {
   const [cvd, setCvd] = useState<CvdMode>('normal');
 
   return (
-    <div>
+    <div data-md-skip>
       <div className="nx:flex nx:flex-wrap nx:gap-2 nx:mb-4">
         {CVD_MODES.map((mode) => (
           <Button

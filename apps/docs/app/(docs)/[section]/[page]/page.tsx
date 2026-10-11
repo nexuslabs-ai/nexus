@@ -38,6 +38,9 @@ export default async function Page({
           ...('group' in page ? [{ label: page.group }] : []),
           { label: page.label },
         ]}
+        markdownHref={
+          page.kind === 'placeholder' ? undefined : `${page.route}.md`
+        }
       />
       <PageContent page={page} />
     </>

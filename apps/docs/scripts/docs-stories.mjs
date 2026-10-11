@@ -90,6 +90,62 @@ function propertiesOf(object, where) {
   return properties;
 }
 
+/**
+ * `['a', 'b'].join(' ')` as its value, or null for any other expression.
+ * @param {ts.Node} node
+ * @returns {string | null}
+ */
+function joinedStrings(node) {
+  if (!ts.isCallExpression(node)) return null;
+  const callee = node.expression;
+  if (!ts.isPropertyAccessExpression(callee) || callee.name.text !== 'join') {
+    return null;
+  }
+  const array = unwrap(callee.expression);
+  const [separator] = node.arguments;
+  if (!array || !ts.isArrayLiteralExpression(array)) return null;
+  if (!separator || !ts.isStringLiteral(separator)) return null;
+  if (!array.elements.every(ts.isStringLiteral)) return null;
+  return array.elements.map((element) => element.text).join(separator.text);
+}
+
+/**
+ * `parameters.docs.description[kind]` on a meta or story, or null when unset.
+ * @param {ts.ObjectLiteralExpression} object
+ * @param {'component' | 'story'} kind
+ * @param {string} where
+ * @returns {string | null}
+ */
+function docsDescription(object, kind, where) {
+  let current = /** @type {ts.Node | undefined} */ (object);
+  for (const key of ['parameters', 'docs', 'description', kind]) {
+    current = unwrap(current);
+    if (!current || !ts.isObjectLiteralExpression(current)) return null;
+    const property = current.properties.find(
+      (candidate) =>
+        ts.isPropertyAssignment(candidate) &&
+        propertyKey(candidate.name) === key
+    );
+    current =
+      property && ts.isPropertyAssignment(property)
+        ? property.initializer
+        : undefined;
+  }
+  current = unwrap(current);
+  if (!current) return null;
+  if (
+    ts.isStringLiteral(current) ||
+    ts.isNoSubstitutionTemplateLiteral(current)
+  ) {
+    return current.text;
+  }
+  const joined = joinedStrings(current);
+  if (joined !== null) return joined;
+  throw new Error(
+    `${where} its \`docs.description.${kind}\` is not a string literal or a \`[…].join(…)\` of them.`
+  );
+}
+
 /** @param {ts.BindingName} name */
 function boundNames(name) {
   if (ts.isIdentifier(name)) return [name.text];
@@ -1020,6 +1076,8 @@ export async function docsStoryModule(story, formatOptions) {
   return {
     id: docsStoryId(story),
     title: docsStoryTitle(story),
+    description: docsDescription(story.object, 'story', where),
+    componentDescription: docsDescription(file.meta, 'component', where),
     source: await prettier.format(withoutTestIds(source), {
       ...formatOptions,
       filepath: `${story.name}.tsx`,

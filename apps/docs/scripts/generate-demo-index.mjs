@@ -78,6 +78,8 @@ export interface Demo {
   id: string;
   /** The story's name, as the example's heading. */
   title: string;
+  /** The story's \`docs.description.story\`, as the example's caption. */
+  description: string | null;
   /** Install blocks the demo needs beyond its component's own. */
   alsoInstall: readonly string[];
   /** \`name@range\` packages it imports that none of its install blocks install. */
@@ -87,6 +89,8 @@ export interface Demo {
 }
 
 export interface ComponentDocs {
+  /** The stories meta's \`docs.description.component\`, shown under the page heading. */
+  description: string | null;
   /** The first docs story; null for a page that shows Installation, Usage and Props only. */
   preview: DemoId | null;
   /** The rest of the docs stories, in file order. */
@@ -98,6 +102,8 @@ export interface ComponentDocs {
 }
 
 export interface BlockDocs {
+  /** The stories meta's \`docs.description.component\`, shown under the page heading. */
+  description: string | null;
   /** The block's one story tagged \`docs\`. */
   preview: DemoId;
   /** Files to copy, by path under \`packages/react/src/\`: its example or the block first, then the files it imports. */
@@ -153,6 +159,8 @@ export function getBlockDocs(slug: string): BlockDocs {
  * @property {string} id `{slug}/{story}`.
  * @property {string} slug The component the story belongs to.
  * @property {string} title The example's heading.
+ * @property {string | null} description The example's caption.
+ * @property {string | null} componentDescription Its stories meta's description.
  * @property {string} source The generated module's full contents.
  * @property {string[]} alsoInstall Install blocks it needs beyond its component's.
  * @property {string[]} packages `name@range` packages none of its blocks install.
@@ -417,10 +425,8 @@ async function collectDemos(exported) {
     }
     for (const story of stories) {
       try {
-        const { id, title, source } = await docsStoryModule(
-          story,
-          formatOptions
-        );
+        const { id, title, description, componentDescription, source } =
+          await docsStoryModule(story, formatOptions);
         const specifiers = importSpecifiers(source);
         const { own, extra } = installSlugsFor(id, specifiers, installBlocks);
         const packages = demoPackages(
@@ -429,7 +435,16 @@ async function collectDemos(exported) {
           own ? [own, ...extra] : extra,
           installBlocks
         );
-        demos.push({ id, slug, title, source, alsoInstall: extra, packages });
+        demos.push({
+          id,
+          slug,
+          title,
+          description,
+          componentDescription,
+          source,
+          alsoInstall: extra,
+          packages,
+        });
       } catch (error) {
         problems.push(error.message);
       }
@@ -440,11 +455,14 @@ async function collectDemos(exported) {
   for (const block of blockSources()) {
     try {
       const [story] = blockDocsStories(block);
-      const { id, title, source } = await docsStoryModule(story, formatOptions);
+      const { id, title, description, componentDescription, source } =
+        await docsStoryModule(story, formatOptions);
       demos.push({
         id,
         slug: block.slug,
         title,
+        description,
+        componentDescription,
         source,
         alsoInstall: [],
         packages: [],
@@ -490,7 +508,7 @@ function sharedIds(demos) {
 }
 
 /**
- * @typedef {{ preview: string | null; examples: string[]; imports: string; composition: string | null }} ComponentDocs
+ * @typedef {{ description: string | null; preview: string | null; examples: string[]; imports: string; composition: string | null }} ComponentDocs
  */
 
 /**
@@ -507,6 +525,7 @@ function previewlessDocs(slug) {
   }
   const { components } = JSON.parse(readCanonical(propsFile));
   return {
+    description: null,
     preview: null,
     examples: [],
     imports: entryUsage(components),
@@ -534,13 +553,21 @@ function collectComponentDocs(exported, demos) {
         fileName: `${demo.id}.tsx`,
         source: demo.source,
       }));
-      return [slug, { preview, examples, ...componentUsage(slug, sources) }];
+      return [
+        slug,
+        {
+          description: own[0].componentDescription,
+          preview,
+          examples,
+          ...componentUsage(slug, sources),
+        },
+      ];
     })
   );
 }
 
 /**
- * @typedef {{ preview: string; files: string[]; components: string[] }} BlockDocs
+ * @typedef {{ description: string | null; preview: string; files: string[]; components: string[] }} BlockDocs
  */
 
 /**
@@ -597,7 +624,14 @@ function collectBlockDocs(demos) {
     blockSources().map((block) => {
       const preview = demos.find((demo) => demo.slug === block.slug);
       if (!preview) throw new Error(`Block ${block.slug} has no preview demo.`);
-      return [block.slug, { preview: preview.id, ...blockFiles(block) }];
+      return [
+        block.slug,
+        {
+          description: preview.componentDescription,
+          preview: preview.id,
+          ...blockFiles(block),
+        },
+      ];
     })
   );
 }
@@ -625,6 +659,7 @@ function renderDemoIndex(demos, componentDocs, blockDocs) {
         `  ${JSON.stringify(demo.id)}: {`,
         `    id: ${JSON.stringify(demo.id)},`,
         `    title: ${JSON.stringify(demo.title)},`,
+        `    description: ${JSON.stringify(demo.description)},`,
         `    alsoInstall: ${JSON.stringify(demo.alsoInstall)},`,
         `    packages: ${JSON.stringify(demo.packages)},`,
         `    load: () => import(${JSON.stringify(`./${MODULES_DIR}/${demo.id}`)}),`,
@@ -635,9 +670,10 @@ function renderDemoIndex(demos, componentDocs, blockDocs) {
   const literal = entries ? `{\n${entries}\n}` : '{}';
 
   const docsEntries = [...componentDocs]
-    .map(([slug, { preview, examples, imports, composition }]) =>
+    .map(([slug, { description, preview, examples, imports, composition }]) =>
       [
         `  ${JSON.stringify(slug)}: {`,
+        `    description: ${JSON.stringify(description)},`,
         `    preview: ${JSON.stringify(preview)},`,
         `    examples: ${JSON.stringify(examples)},`,
         `    imports: ${JSON.stringify(imports)},`,
@@ -649,9 +685,10 @@ function renderDemoIndex(demos, componentDocs, blockDocs) {
   const docsLiteral = docsEntries ? `{\n${docsEntries}\n}` : '{}';
 
   const blockEntries = [...blockDocs]
-    .map(([slug, { preview, files, components }]) =>
+    .map(([slug, { description, preview, files, components }]) =>
       [
         `  ${JSON.stringify(slug)}: {`,
+        `    description: ${JSON.stringify(description)},`,
         `    preview: ${JSON.stringify(preview)},`,
         `    files: ${JSON.stringify(files)},`,
         `    components: ${JSON.stringify(components)},`,
