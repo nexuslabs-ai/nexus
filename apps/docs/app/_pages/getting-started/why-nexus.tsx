@@ -181,7 +181,7 @@ const KEEPS: { title: string; body: string }[] = [
     body: 'You get the source and you can edit it.',
   },
   {
-    title: 'Radix underneath.',
+    title: 'Radix primitives.',
     body: 'Accessibility, focus management and portals come from Radix primitives.',
   },
   {
@@ -218,7 +218,7 @@ const ACKNOWLEDGEMENTS: { name: string; href: string; role: string }[] = [
   {
     name: 'shadcn/ui',
     href: 'https://ui.shadcn.com',
-    role: 'The copy-and-own approach, and the starting point for many components',
+    role: 'The copy-and-own philosophy Nexus shares',
   },
   {
     name: 'Radix UI',
@@ -622,9 +622,9 @@ export default function WhyNexus() {
           Nexus and shadcn/ui
         </SectionHeading>
         <p className={BODY_CLASS}>
-          Nexus is built on shadcn/ui&rsquo;s idea that you own the component
-          source, and many Nexus components are adapted from shadcn/ui. Nexus
-          keeps that approach and replaces the token model underneath it.
+          Nexus shares shadcn/ui&rsquo;s philosophy that you own the component
+          source. Beyond that, Nexus takes its own path, starting with how
+          tokens are made.
         </p>
         <div className="nx:overflow-x-auto">
           <table className="nx:w-full nx:min-w-[640px] nx:border-collapse nx:typography-label-default">
@@ -652,7 +652,7 @@ export default function WhyNexus() {
           </table>
         </div>
         <SubsectionHeading className={SUBSECTION_CLASS}>
-          What Nexus keeps
+          What the two have in common
         </SubsectionHeading>
         <ul className="nx:mb-4 nx:list-disc nx:space-y-2 nx:ps-5 nx:typography-body-default nx:max-w-[64ch]">
           {KEEPS.map((item) => (
@@ -761,8 +761,8 @@ export default function WhyNexus() {
           Acknowledgements
         </SectionHeading>
         <p className={BODY_CLASS}>
-          Nexus stands on open-source work. Thank you to everyone who builds and
-          maintains these projects.
+          Nexus uses and learns from these open-source projects. Thank you to
+          everyone who builds and maintains them.
         </p>
         <ul className="nx:mb-4 nx:list-disc nx:space-y-2 nx:ps-5 nx:typography-body-default nx:max-w-[64ch]">
           {ACKNOWLEDGEMENTS.map((item) => (
