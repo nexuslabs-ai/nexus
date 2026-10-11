@@ -57,9 +57,10 @@ export default function Radius() {
     <>
       <h1 className="nx:typography-heading-large">Radius, borders & shadows</h1>
       <p className="nx:typography-body-default nx:text-muted-foreground nx:mt-2 nx:mb-8 nx:max-w-[64ch]">
-        Corner radius, border width and shadow are three separate settings.
-        Change Radius, Border or Shadow in the theme picker in the bottom-right
-        corner, and the matching examples update.
+        Corner radius, border width and shadow are three separate theme fields.
+        Change <code>corners</code> (Radius in the theme picker),{' '}
+        <code>stroke</code> (Border Width) or <code>elevation</code> (Shadow),
+        and the matching examples update.
       </p>
 
       {/* ── Radius ──────────────────────────────────────────── */}
@@ -68,7 +69,7 @@ export default function Radius() {
           Radius
         </SectionHeading>
         <p className="nx:typography-body-default nx:text-muted-foreground nx:mb-4 nx:max-w-[64ch]">
-          There are nine radius utilities. Eight follow the Radius setting.{' '}
+          Nexus has nine radius utilities. Eight follow <code>corners</code>.{' '}
           <code>full</code> is always 9999px.
         </p>
         <div data-md-skip className="nx:flex nx:flex-wrap nx:gap-6 nx:mb-6">
@@ -119,9 +120,10 @@ export default function Radius() {
           Border widths
         </SectionHeading>
         <p className="nx:typography-body-default nx:text-muted-foreground nx:mb-4 nx:max-w-[64ch]">
-          There are three border-width settings. This box uses{' '}
-          <code>--nx-borderwidth-thick</code>, so it changes with the Border
-          setting.
+          Each <code>stroke</code> mode sets three widths: thin, default and
+          thick. The sample box after the table uses{' '}
+          <code>--nx-borderwidth-thick</code>, so it changes with{' '}
+          <code>stroke</code>.
         </p>
         <div className="nx:overflow-x-auto nx:mb-6">
           <table className="nx:w-full nx:min-w-[360px] nx:border-collapse nx:typography-label-default">
@@ -178,9 +180,9 @@ export default function Radius() {
           Shadows
         </SectionHeading>
         <p className="nx:typography-body-default nx:text-muted-foreground nx:mb-4 nx:max-w-[64ch]">
-          There are seven shadow levels and an inset shadow, and all follow the
-          Shadow setting. Light and dark mode have separate shadows, because a
-          light-mode shadow disappears on a dark background.
+          Nexus has seven shadow levels and an inset shadow. All of them follow{' '}
+          <code>elevation</code>. Light and dark mode have separate shadows,
+          because a light-mode shadow disappears on a dark background.
         </p>
         <div data-md-skip className="nx:flex nx:flex-wrap nx:gap-6 nx:mb-6">
           {SHADOWS.map((s) => (

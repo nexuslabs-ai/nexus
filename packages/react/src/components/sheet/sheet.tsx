@@ -13,8 +13,6 @@ import {
 } from '../overlay-layout/overlay-layout';
 
 /**
- * Sheet
- *
  * Root of a panel that slides in from an edge of the viewport. Holds the open
  * state.
  *
@@ -39,29 +37,21 @@ import {
 const Sheet = DialogPrimitive.Root;
 
 /**
- * SheetTrigger
- *
  * Opens the sheet. Set `asChild` to render your own element.
  */
 const SheetTrigger = DialogPrimitive.Trigger;
 
 /**
- * SheetPortal
- *
  * Renders the sheet content into `document.body`.
  */
 const SheetPortal = DialogPrimitive.Portal;
 
 /**
- * SheetClose
- *
  * Closes the sheet. Set `asChild` to render your own element.
  */
 const SheetClose = DialogPrimitive.Close;
 
 /**
- * SheetOverlayProps
- *
  * Props for SheetOverlay.
  */
 interface SheetOverlayProps extends React.ComponentProps<
@@ -69,8 +59,6 @@ interface SheetOverlayProps extends React.ComponentProps<
 > {}
 
 /**
- * SheetOverlay
- *
  * Dimmed layer behind the sheet.
  */
 function SheetOverlay({ className, ...props }: SheetOverlayProps) {
@@ -127,8 +115,6 @@ const sheetContentVariants = cva(
 );
 
 /**
- * SheetContentProps
- *
  * Props for SheetContent.
  */
 interface SheetContentProps
@@ -143,8 +129,6 @@ interface SheetContentProps
 }
 
 /**
- * SheetContent
- *
  * The sliding panel, rendered in a portal with an overlay. `side` picks the
  * edge it slides from.
  *
@@ -189,15 +173,11 @@ function SheetContent({
 }
 
 /**
- * SheetHeaderProps
- *
  * Props for SheetHeader.
  */
 interface SheetHeaderProps extends React.ComponentProps<'div'> {}
 
 /**
- * SheetHeader
- *
  * Holds the title and description.
  *
  * @example
@@ -222,15 +202,11 @@ function SheetHeader({ className, ...props }: SheetHeaderProps) {
 }
 
 /**
- * SheetBodyProps
- *
  * Props for SheetBody.
  */
 interface SheetBodyProps extends React.ComponentProps<'div'> {}
 
 /**
- * SheetBody
- *
  * Main content between the header and footer. Its side padding matches
  * SheetHeader and SheetFooter.
  *
@@ -255,15 +231,11 @@ function SheetBody({ className, ...props }: SheetBodyProps) {
 }
 
 /**
- * SheetFooterProps
- *
  * Props for SheetFooter.
  */
 interface SheetFooterProps extends React.ComponentProps<'div'> {}
 
 /**
- * SheetFooter
- *
  * Holds the action buttons, pinned to the bottom of the panel.
  *
  * @example
@@ -288,8 +260,6 @@ function SheetFooter({ className, ...props }: SheetFooterProps) {
 }
 
 /**
- * SheetTitleProps
- *
  * Props for SheetTitle.
  */
 interface SheetTitleProps extends React.ComponentProps<
@@ -297,8 +267,6 @@ interface SheetTitleProps extends React.ComponentProps<
 > {}
 
 /**
- * SheetTitle
- *
  * Title of the sheet. Place it inside SheetHeader.
  *
  * @example
@@ -317,8 +285,6 @@ function SheetTitle({ className, ...props }: SheetTitleProps) {
 }
 
 /**
- * SheetDescriptionProps
- *
  * Props for SheetDescription.
  */
 interface SheetDescriptionProps extends React.ComponentProps<
@@ -326,8 +292,6 @@ interface SheetDescriptionProps extends React.ComponentProps<
 > {}
 
 /**
- * SheetDescription
- *
  * Supporting text under the title.
  *
  * @example

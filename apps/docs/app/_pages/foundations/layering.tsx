@@ -91,10 +91,13 @@ export default function Layering() {
         <p className="nx:typography-body-default nx:text-muted-foreground nx:mb-4 nx:max-w-[64ch]">
           Shadow makes a surface look raised. z-index decides what paints on
           top. The two are separate, so a higher z-index doesn&rsquo;t mean a
-          bigger shadow. Overlays render at the end of{' '}
-          <code>document.body</code>, so one overlay already paints above the
-          page. z-index matters when two overlays stack, like a select inside a
-          dialog, or when your app has its own fixed element.
+          bigger shadow.
+        </p>
+        <p className="nx:typography-body-default nx:text-muted-foreground nx:mb-4 nx:max-w-[64ch]">
+          Overlays render at the end of <code>document.body</code>, so one
+          overlay already paints above the page. z-index matters when two
+          overlays stack, like a select inside a dialog, or when your app has
+          its own fixed element.
         </p>
       </section>
     </>

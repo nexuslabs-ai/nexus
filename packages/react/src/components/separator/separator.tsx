@@ -5,8 +5,6 @@ import * as SeparatorPrimitive from '@radix-ui/react-separator';
 import { cn } from '../../lib/utils';
 
 /**
- * SeparatorProps
- *
  * Props for Separator.
  */
 interface SeparatorProps extends React.ComponentProps<
@@ -14,8 +12,6 @@ interface SeparatorProps extends React.ComponentProps<
 > {}
 
 /**
- * Separator
- *
  * Thin rule that divides content. A vertical separator fills its parent's
  * height, so give that parent a set height. Set `decorative={false}` to expose
  * the `separator` role to assistive tech.

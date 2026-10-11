@@ -13,8 +13,6 @@ import {
 } from '../overlay-layout/overlay-layout';
 
 /**
- * Select
- *
  * Root of the select. Holds the open state and the selected value.
  *
  * @example
@@ -33,15 +31,11 @@ import {
 const Select = SelectPrimitive.Root;
 
 /**
- * SelectGroup
- *
  * Groups related items.
  */
 const SelectGroup = SelectPrimitive.Group;
 
 /**
- * SelectValue
- *
  * Shows the selected value. Set `placeholder` for the empty state.
  */
 const SelectValue = SelectPrimitive.Value;
@@ -75,8 +69,6 @@ const selectTriggerVariants = cva(
 );
 
 /**
- * SelectTriggerProps
- *
  * Props for SelectTrigger.
  */
 interface SelectTriggerProps
@@ -85,8 +77,6 @@ interface SelectTriggerProps
     VariantProps<typeof selectTriggerVariants> {}
 
 /**
- * SelectTrigger
- *
  * Button that opens the dropdown. Set `variant="borderless"` to drop the border
  * and keep a tinted fill.
  *
@@ -121,8 +111,6 @@ function SelectTrigger({
 }
 
 /**
- * SelectScrollUpButton
- *
  * Scrolls the list up.
  */
 function SelectScrollUpButton({
@@ -144,8 +132,6 @@ function SelectScrollUpButton({
 }
 
 /**
- * SelectScrollDownButton
- *
  * Scrolls the list down.
  */
 function SelectScrollDownButton({
@@ -167,8 +153,6 @@ function SelectScrollDownButton({
 }
 
 /**
- * SelectContentProps
- *
  * Props for SelectContent.
  */
 interface SelectContentProps extends React.ComponentProps<
@@ -176,8 +160,6 @@ interface SelectContentProps extends React.ComponentProps<
 > {}
 
 /**
- * SelectContent
- *
  * Dropdown that holds the items.
  *
  * @example
@@ -229,8 +211,6 @@ function SelectContent({
 }
 
 /**
- * SelectLabelProps
- *
  * Props for SelectLabel.
  */
 interface SelectLabelProps extends React.ComponentProps<
@@ -238,8 +218,6 @@ interface SelectLabelProps extends React.ComponentProps<
 > {}
 
 /**
- * SelectLabel
- *
  * Label for a group of items.
  *
  * @example
@@ -261,8 +239,6 @@ function SelectLabel({ className, ...props }: SelectLabelProps) {
 }
 
 /**
- * SelectItemProps
- *
  * Props for SelectItem.
  */
 interface SelectItemProps extends React.ComponentProps<
@@ -270,8 +246,6 @@ interface SelectItemProps extends React.ComponentProps<
 > {}
 
 /**
- * SelectItem
- *
  * One option in the dropdown.
  *
  * @example
@@ -311,8 +285,6 @@ function SelectItem({ className, children, ...props }: SelectItemProps) {
 }
 
 /**
- * SelectSeparatorProps
- *
  * Props for SelectSeparator.
  */
 interface SelectSeparatorProps extends React.ComponentProps<
@@ -320,8 +292,6 @@ interface SelectSeparatorProps extends React.ComponentProps<
 > {}
 
 /**
- * SelectSeparator
- *
  * Divider between items or groups.
  *
  * @example

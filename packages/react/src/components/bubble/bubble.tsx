@@ -102,9 +102,8 @@ function Bubble({
  */
 interface BubbleContentProps extends React.ComponentProps<'div'> {
   /**
-   * Renders the child element instead, such as a `p`, or an `a` or `button` for an actionable message.
-   * A link with an `href` or an enabled button gets the pointer cursor. Give it its own accessible name.
-   * The bubble adds no hover or press style. Add one at the call site if you need it.
+   * Renders the child element instead, such as `p`, `a` or `button`.
+   * An actionable child gets the focus ring and pointer cursor.
    *
    * @default false
    * @example

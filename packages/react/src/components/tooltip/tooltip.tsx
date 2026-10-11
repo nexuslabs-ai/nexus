@@ -9,8 +9,6 @@ import {
 } from '../overlay-layout/overlay-layout';
 
 /**
- * TooltipProvider
- *
  * Required wrapper for tooltips. Place it at your app root or around the
  * components that use tooltips.
  *
@@ -24,8 +22,6 @@ import {
 const TooltipProvider = TooltipPrimitive.Provider;
 
 /**
- * Tooltip
- *
  * Root of one tooltip. Holds its open state, trigger and content.
  *
  * @example
@@ -39,15 +35,11 @@ const TooltipProvider = TooltipPrimitive.Provider;
 const Tooltip = TooltipPrimitive.Root;
 
 /**
- * TooltipTrigger
- *
  * Element that opens the tooltip on hover or focus.
  */
 const TooltipTrigger = TooltipPrimitive.Trigger;
 
 /**
- * TooltipContentProps
- *
  * Props for TooltipContent.
  */
 interface TooltipContentProps extends React.ComponentProps<
@@ -55,8 +47,6 @@ interface TooltipContentProps extends React.ComponentProps<
 > {}
 
 /**
- * TooltipContent
- *
  * Popup that shows the tooltip text. Position it with `side` and `align`.
  *
  * @example

@@ -16,8 +16,8 @@ import {
 
 /**
  * Patterns → Forms. Server component — choosing one implementation, wiring
- * application data, what the app owns, then read-only and disabled settings,
- * with the forms as client islands.
+ * application data, the example forms, read-only and disabled settings, then
+ * what the app owns, with the forms as client islands.
  *
  * Source: packages/react/src/patterns/forms/.
  */
@@ -58,16 +58,51 @@ const IMPLEMENTATIONS: {
   },
 ];
 
-const CONNECT_SAMPLE = `<SettingsForm
-  key={profile.id}
-  title="Profile settings"
-  initialValues={{
-    name: profile.name,
-    email: profile.email,
-    updates: profile.updates,
-  }}
-  onSave={(values) => saveProfile(profile.id, values)}
-/>`;
+const CONNECT_SAMPLE = `// app/settings/profile-settings.tsx
+'use client';
+
+import { SettingsForm } from '@/patterns/forms/settings-form';
+import type { SettingsValues } from '@/patterns/forms/settings-layout';
+
+import { saveProfile } from './save-profile';
+
+type Profile = SettingsValues & { id: string };
+
+export function ProfileSettings({ profile }: { profile: Profile }) {
+  return (
+    <SettingsForm
+      key={profile.id}
+      title="Profile settings"
+      initialValues={{
+        name: profile.name,
+        email: profile.email,
+        updates: profile.updates,
+      }}
+      onSave={(values) => saveProfile(profile.id, values)}
+    />
+  );
+}`;
+
+const FORM_PROPS: { prop: string; does: ReactNode }[] = [
+  {
+    prop: 'title',
+    does: 'Names the form. Give each form on a page its own title.',
+  },
+  {
+    prop: 'initialValues',
+    does: (
+      <>
+        Sets the starting values. Changing it later doesn&rsquo;t overwrite what
+        the user is typing. To load a different record, change the form&rsquo;s{' '}
+        <InlineCode>key</InlineCode>.
+      </>
+    ),
+  },
+  {
+    prop: 'onSave',
+    does: 'Saves the values. Must resolve with the saved record, or reject if the save fails.',
+  },
+];
 
 const BODY_CLASS = 'nx:typography-body-default nx:mb-4 nx:max-w-[64ch]';
 const SECTION_CLASS = 'nx:typography-heading-small nx:mb-3';
@@ -91,11 +126,13 @@ export default function Forms() {
   return (
     <>
       <h1 className="nx:typography-heading-large">Forms</h1>
-      <p className="nx:typography-body-default nx:text-muted-foreground nx:mt-2 nx:mb-8 nx:max-w-[64ch]">
-        Build a settings form from Nexus components. Field holds a label, a
-        control, help text and an error. FieldSet and FieldLegend group related
-        fields. The form comes in three versions: plain React state, React Hook
-        Form and TanStack Form.
+      <p className="nx:typography-body-default nx:text-muted-foreground nx:mt-2 nx:mb-4 nx:max-w-[64ch]">
+        Build a settings form from Nexus components. The form comes in three
+        versions: plain React state, React Hook Form and TanStack Form.
+      </p>
+      <p className="nx:typography-body-default nx:text-muted-foreground nx:mb-8 nx:max-w-[64ch]">
+        Field holds a label, a control, help text and an error. FieldSet and
+        FieldLegend group related fields.
       </p>
 
       <section className="nx:mb-12">
@@ -143,22 +180,29 @@ export default function Forms() {
           <CodeSample lang="tsx">{CONNECT_SAMPLE}</CodeSample>
         </div>
         <p className={BODY_CLASS}>All three versions take the same props:</p>
-        <ul className="nx:mb-4 nx:list-disc nx:space-y-2 nx:ps-5 nx:typography-body-default nx:max-w-[64ch]">
-          <li>
-            <InlineCode>title</InlineCode> names the form. Give each form on a
-            page its own title.
-          </li>
-          <li>
-            <InlineCode>initialValues</InlineCode> sets the starting values.
-            Changing it later doesn&rsquo;t overwrite what the user is typing.
-            To load a different record, change the form&rsquo;s{' '}
-            <InlineCode>key</InlineCode>.
-          </li>
-          <li>
-            <InlineCode>onSave</InlineCode> saves the values. It must resolve
-            with the saved record, or reject if the save fails.
-          </li>
-        </ul>
+        <div className="nx:mb-4 nx:overflow-x-auto">
+          <table className="nx:w-full nx:typography-body-small nx:border-collapse">
+            <thead>
+              <tr className="nx:text-left nx:border-b nx:border-border-default">
+                <th className="nx:py-2 nx:pr-4">Prop</th>
+                <th className="nx:py-2">Does</th>
+              </tr>
+            </thead>
+            <tbody>
+              {FORM_PROPS.map((row) => (
+                <tr
+                  key={row.prop}
+                  className="nx:align-top nx:border-b nx:border-border-default"
+                >
+                  <td className="nx:py-2 nx:pr-4">
+                    <InlineCode>{row.prop}</InlineCode>
+                  </td>
+                  <td className="nx:py-2">{row.does}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
         <p className={BODY_CLASS}>
           With <InlineCode>fetch</InlineCode>, throw when{' '}
           <InlineCode>response.ok</InlineCode> is false. Parse the response into
@@ -169,20 +213,24 @@ export default function Forms() {
         <p className={BODY_CLASS}>
           After a save, the form shows the record you resolved with, so changes
           your server made replace what the user typed. Fields the form
-          doesn&rsquo;t edit are ignored. If the save fails, the user&rsquo;s
-          edits stay so they can retry. Cancel restores the last saved values.
-          Save is blocked while a save is running.
+          doesn&rsquo;t edit are ignored.
+        </p>
+        <p className={BODY_CLASS}>
+          If the save fails, the user&rsquo;s edits stay so they can retry.
+          Cancel restores the last saved values. Save is blocked while a save is
+          running.
         </p>
       </section>
 
       <section className="nx:mb-12">
-        <SectionHeading className={SECTION_CLASS}>
-          3. Local state
-        </SectionHeading>
+        <SectionHeading className={SECTION_CLASS}>Local state</SectionHeading>
         <p className={BODY_CLASS}>
           Edit a field to enable Save. To see validation, clear the name or
-          enter an invalid email, then save. Checkboxes are saved with Save. Use
-          a switch only for a change that applies immediately.
+          enter an invalid email, then save.
+        </p>
+        <p className={BODY_CLASS}>
+          Checkboxes don&rsquo;t save until the user clicks Save. Use a switch
+          only for a change that applies immediately.
         </p>
         <Example>
           <LocalStateExample />
@@ -191,7 +239,7 @@ export default function Forms() {
 
       <section className="nx:mb-12">
         <SectionHeading className={SECTION_CLASS}>
-          4. Form libraries
+          Form libraries
         </SectionHeading>
         <p className={BODY_CLASS}>
           Both versions behave like the local-state form. They validate on save,
@@ -223,7 +271,7 @@ export default function Forms() {
 
       <section className="nx:mb-12">
         <SectionHeading className={SECTION_CLASS}>
-          5. Read-only and disabled
+          Read-only and disabled
         </SectionHeading>
         <SubsectionHeading className={SUBSECTION_CLASS}>
           Read-only details
@@ -245,8 +293,8 @@ export default function Forms() {
         </SubsectionHeading>
         <p className={BODY_CLASS}>
           Disable a control only when it&rsquo;s temporarily unavailable. Show
-          the reason, and link it with <InlineCode>aria-describedby</InlineCode>
-          .
+          the reason, and link the reason to the control with{' '}
+          <InlineCode>aria-describedby</InlineCode>.
         </p>
         <Example>
           <DisabledSettings address="24 Riverside Road" />
@@ -255,7 +303,7 @@ export default function Forms() {
 
       <section className="nx:mb-12">
         <SectionHeading className={SECTION_CLASS}>
-          6. What the application owns
+          What your app owns
         </SectionHeading>
         <ul className="nx:mb-4 nx:list-disc nx:space-y-2 nx:ps-5 nx:typography-body-default nx:max-w-[64ch]">
           <li>

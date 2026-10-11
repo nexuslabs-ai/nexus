@@ -12,8 +12,6 @@ import {
 } from '../overlay-layout/overlay-layout';
 
 /**
- * MenubarProps
- *
  * Props for the Menubar component.
  */
 interface MenubarProps extends React.ComponentProps<
@@ -21,8 +19,6 @@ interface MenubarProps extends React.ComponentProps<
 > {}
 
 /**
- * Menubar
- *
  * Horizontal bar of menus, like the menu bar in a desktop app.
  *
  * @example
@@ -51,43 +47,31 @@ function Menubar({ className, ...props }: MenubarProps) {
 }
 
 /**
- * MenubarMenu
- *
  * Groups a trigger with its content. One per top-level menu.
  */
 const MenubarMenu = MenubarPrimitive.Menu;
 
 /**
- * MenubarGroup
- *
  * Groups related menu items together.
  */
 const MenubarGroup = MenubarPrimitive.Group;
 
 /**
- * MenubarPortal
- *
  * Renders menu content in a portal on `document.body`.
  */
 const MenubarPortal = MenubarPrimitive.Portal;
 
 /**
- * MenubarRadioGroup
- *
  * Groups radio items together.
  */
 const MenubarRadioGroup = MenubarPrimitive.RadioGroup;
 
 /**
- * MenubarSub
- *
  * Contains a submenu.
  */
 const MenubarSub = MenubarPrimitive.Sub;
 
 /**
- * MenubarTriggerProps
- *
  * Props for the MenubarTrigger component.
  */
 interface MenubarTriggerProps extends React.ComponentProps<
@@ -95,8 +79,6 @@ interface MenubarTriggerProps extends React.ComponentProps<
 > {}
 
 /**
- * MenubarTrigger
- *
  * Top-level button in the bar. Opens its menu on click.
  */
 function MenubarTrigger({ className, ...props }: MenubarTriggerProps) {
@@ -116,8 +98,6 @@ function MenubarTrigger({ className, ...props }: MenubarTriggerProps) {
 }
 
 /**
- * MenubarSubTriggerProps
- *
  * Props for the MenubarSubTrigger component.
  */
 interface MenubarSubTriggerProps extends React.ComponentProps<
@@ -131,8 +111,6 @@ interface MenubarSubTriggerProps extends React.ComponentProps<
 }
 
 /**
- * MenubarSubTrigger
- *
  * Item that opens a submenu. Shows a chevron.
  */
 function MenubarSubTrigger({
@@ -163,8 +141,6 @@ function MenubarSubTrigger({
 }
 
 /**
- * MenubarSubContentProps
- *
  * Props for the MenubarSubContent component.
  */
 interface MenubarSubContentProps extends React.ComponentProps<
@@ -172,8 +148,6 @@ interface MenubarSubContentProps extends React.ComponentProps<
 > {}
 
 /**
- * MenubarSubContent
- *
  * Container for the items of a submenu.
  */
 function MenubarSubContent({ className, ...props }: MenubarSubContentProps) {
@@ -193,8 +167,6 @@ function MenubarSubContent({ className, ...props }: MenubarSubContentProps) {
 }
 
 /**
- * MenubarContentProps
- *
  * Props for the MenubarContent component.
  */
 interface MenubarContentProps extends React.ComponentProps<
@@ -202,8 +174,6 @@ interface MenubarContentProps extends React.ComponentProps<
 > {}
 
 /**
- * MenubarContent
- *
  * Container for the items of a menu. Opens below its trigger.
  *
  * @example
@@ -258,8 +228,6 @@ const menubarItemVariants = cva(
 );
 
 /**
- * MenubarItemProps
- *
  * Props for the MenubarItem component.
  */
 interface MenubarItemProps
@@ -274,8 +242,6 @@ interface MenubarItemProps
 }
 
 /**
- * MenubarItem
- *
  * Single action in a menu.
  *
  * @example
@@ -306,8 +272,6 @@ function MenubarItem({
 }
 
 /**
- * MenubarCheckboxItemProps
- *
  * Props for the MenubarCheckboxItem component.
  */
 interface MenubarCheckboxItemProps extends React.ComponentProps<
@@ -315,8 +279,6 @@ interface MenubarCheckboxItemProps extends React.ComponentProps<
 > {}
 
 /**
- * MenubarCheckboxItem
- *
  * Menu item that toggles on and off.
  *
  * @example
@@ -369,8 +331,6 @@ function MenubarCheckboxItem({
 }
 
 /**
- * MenubarRadioItemProps
- *
  * Props for the MenubarRadioItem component.
  */
 interface MenubarRadioItemProps extends React.ComponentProps<
@@ -378,8 +338,6 @@ interface MenubarRadioItemProps extends React.ComponentProps<
 > {}
 
 /**
- * MenubarRadioItem
- *
  * Menu item for picking one option from a `MenubarRadioGroup`.
  *
  * @example
@@ -430,8 +388,6 @@ function MenubarRadioItem({
 }
 
 /**
- * MenubarLabelProps
- *
  * Props for the MenubarLabel component.
  */
 interface MenubarLabelProps extends React.ComponentProps<
@@ -445,8 +401,6 @@ interface MenubarLabelProps extends React.ComponentProps<
 }
 
 /**
- * MenubarLabel
- *
  * Heading for a group of menu items.
  *
  * @example
@@ -470,8 +424,6 @@ function MenubarLabel({ className, inset, ...props }: MenubarLabelProps) {
 }
 
 /**
- * MenubarSeparatorProps
- *
  * Props for the MenubarSeparator component.
  */
 interface MenubarSeparatorProps extends React.ComponentProps<
@@ -479,8 +431,6 @@ interface MenubarSeparatorProps extends React.ComponentProps<
 > {}
 
 /**
- * MenubarSeparator
- *
  * Divider between menu items.
  */
 function MenubarSeparator({ className, ...props }: MenubarSeparatorProps) {
@@ -497,15 +447,11 @@ function MenubarSeparator({ className, ...props }: MenubarSeparatorProps) {
 }
 
 /**
- * MenubarShortcutProps
- *
  * Props for the MenubarShortcut component.
  */
 interface MenubarShortcutProps extends React.ComponentProps<'span'> {}
 
 /**
- * MenubarShortcut
- *
  * Keyboard shortcut hint at the end of an item.
  *
  * @example

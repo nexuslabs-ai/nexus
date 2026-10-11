@@ -14,20 +14,56 @@ import { Button } from '../../_components/nexus';
 const SETTINGS: { field: string; sets: string; appliedAs: string }[] = [
   { field: 'brandColor', sets: 'Primary color', appliedAs: 'CSS variables' },
   { field: 'surfaceTone', sets: 'Background gray', appliedAs: 'CSS variables' },
-  { field: 'mode', sets: 'Light or dark', appliedAs: '.dark class' },
+  { field: 'mode', sets: 'Light, dark or system', appliedAs: '.dark class' },
+  {
+    field: 'lightContrast',
+    sets: 'Text contrast in light mode',
+    appliedAs: 'CSS variables',
+  },
+  {
+    field: 'darkContrast',
+    sets: 'Text contrast in dark mode',
+    appliedAs: 'CSS variables',
+  },
   { field: 'density', sets: 'Spacing', appliedAs: 'data-density' },
   { field: 'corners', sets: 'Corner radius', appliedAs: 'data-radius' },
   { field: 'elevation', sets: 'Shadows', appliedAs: 'data-shadow' },
   { field: 'stroke', sets: 'Border width', appliedAs: 'data-borderwidth' },
+  {
+    field: 'prefs',
+    sets: 'Fonts, font sizes, motion and cursors',
+    appliedAs: '<style> element',
+  },
 ];
 
-const SWITCH_SAMPLE = `const { setState } = useNexusAppearance();
+const SWITCH_SAMPLE = `// components/brand-switch.tsx
+'use client';
 
-setState((current) => ({ ...current, brandColor: '#7c3aed' }));`;
+import { useNexusAppearance } from '@/components/appearance/provider';
 
-const SCOPE_SAMPLE = `<section data-density="compact" data-radius="round">
-  {/* everything here is compact and rounded */}
-</section>`;
+export function BrandSwitch() {
+  const { setState } = useNexusAppearance();
+
+  const switchToPurple = () =>
+    setState((current) => ({ ...current, brandColor: '#7c3aed' }));
+
+  return (
+    <button type="button" onClick={switchToPurple}>
+      Use the purple brand
+    </button>
+  );
+}`;
+
+const SCOPE_SAMPLE = `// components/compact-panel.tsx
+import type { ReactNode } from 'react';
+
+export function CompactPanel({ children }: { children: ReactNode }) {
+  return (
+    <section data-density="compact" data-radius="round">
+      {children}
+    </section>
+  );
+}`;
 
 const SWATCHES = [
   'primary-background',
@@ -48,17 +84,17 @@ export default function MultiBrand() {
       {/* ── Settings ────────────────────────────────────────── */}
       <section className="nx:mb-12">
         <SectionHeading className="nx:typography-heading-small nx:mb-1">
-          What you can change
+          Theme fields
         </SectionHeading>
         <p className="nx:typography-body-default nx:text-muted-foreground nx:mb-4 nx:max-w-[64ch]">
-          Each setting is a field in
+          Each setting is a field in{' '}
           <Link
             href="/theming/appearance"
             className="nx:text-primary-subtle-foreground nx:underline nx:underline-offset-2"
           >
             Appearance
           </Link>
-          . The provider applies it to <code>&lt;html&gt;</code>:
+          . The provider applies each field to the page:
         </p>
         <div className="nx:overflow-x-auto">
           <table className="nx:w-full nx:min-w-[480px] nx:border-collapse nx:typography-label-default">
@@ -97,7 +133,7 @@ export default function MultiBrand() {
           See it live
         </SectionHeading>
         <p className="nx:typography-body-default nx:text-muted-foreground nx:mb-4 nx:max-w-[64ch]">
-          Change Base in the theme picker in the bottom-right corner. These
+          Change <code>surfaceTone</code> (Base in the theme picker). The sample
           buttons and swatches update at once.
         </p>
         <div
@@ -126,7 +162,7 @@ export default function MultiBrand() {
           Switch brands
         </SectionHeading>
         <p className="nx:typography-body-default nx:text-muted-foreground nx:mb-4 nx:max-w-[64ch]">
-          To switch brands, set <code>brandColor</code> with
+          To switch brands, set <code>brandColor</code> with{' '}
           <code>useNexusAppearance</code>. Nexus builds the new palette and
           applies it to the whole app:
         </p>
@@ -139,12 +175,13 @@ export default function MultiBrand() {
           Change one part of the page
         </SectionHeading>
         <p className="nx:typography-body-default nx:text-muted-foreground nx:mb-4 nx:max-w-[64ch]">
-          Put <code>data-density</code> or <code>data-radius</code> on any
-          element. Everything inside it uses that setting:
+          Put <code>data-density</code>, <code>data-radius</code>,{' '}
+          <code>data-shadow</code> or <code>data-borderwidth</code> on any
+          element. Everything inside that element uses the setting:
         </p>
         <CodeSample lang="tsx">{SCOPE_SAMPLE}</CodeSample>
         <p className="nx:typography-body-default nx:text-muted-foreground nx:mt-4 nx:max-w-[64ch]">
-          Brand color and mode apply to the whole app. For finer control over
+          The other fields apply to the whole app. For finer control over
           corners, see{' '}
           <Link
             href="/theming/radius-overrides"

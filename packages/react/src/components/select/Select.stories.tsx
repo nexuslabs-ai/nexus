@@ -25,7 +25,7 @@ const meta: Meta<typeof Select> = {
     docs: {
       description: {
         component:
-          'Select lets users pick one option from a styled dropdown. Use it when options need groups, separators or disabled items. For native form submission and OS pickers with plain text options, use NativeSelect.',
+          'Select lets users pick one option from a styled dropdown. Use it when the list needs a styled trigger and menu that match the rest of the UI. For native form submission and OS pickers with plain text options, use NativeSelect.',
       },
     },
     layout: 'padded',
@@ -296,7 +296,7 @@ export const CapabilityLadder: Story = {
     docs: {
       description: {
         story:
-          'Use NativeSelect for native form submission and OS pickers, and Select for a styled list with groups, separators and disabled items. For search, use Combobox. For several values, use MultiSelect.',
+          'Use NativeSelect for OS pickers, Select for a styled list, Combobox for search and MultiSelect for several values.',
       },
     },
   },

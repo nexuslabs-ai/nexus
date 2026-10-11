@@ -55,7 +55,7 @@ export const Separator: Story = {
     docs: {
       description: {
         story:
-          'Centre the label between two rules to divide a feed by date or event.',
+          'Center the label between two rules to divide a feed by date or event.',
       },
     },
   },

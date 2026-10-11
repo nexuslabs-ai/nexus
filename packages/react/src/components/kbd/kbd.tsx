@@ -3,17 +3,14 @@ import * as React from 'react';
 import { cn } from '../../lib/utils';
 
 /**
- * KbdProps
- *
  * Props for the Kbd component.
  */
 interface KbdProps extends React.ComponentProps<'kbd'> {}
 
 /**
- * Kbd
- *
  * Key cap for one key of a shortcut, such as `⌘` or `Esc`. Put several
- * inside `KbdGroup` to show a combination.
+ * inside `KbdGroup` to show a combination. Kbd labels a shortcut but doesn't
+ * handle one.
  *
  * @example
  * ```tsx
@@ -39,15 +36,11 @@ function Kbd({ className, ...props }: KbdProps) {
 }
 
 /**
- * KbdGroupProps
- *
  * Props for the KbdGroup component.
  */
 interface KbdGroupProps extends React.ComponentProps<'kbd'> {}
 
 /**
- * KbdGroup
- *
  * Row of `Kbd` key caps shown as one combination, such as `⌘ K`.
  */
 function KbdGroup({ className, ...props }: KbdGroupProps) {

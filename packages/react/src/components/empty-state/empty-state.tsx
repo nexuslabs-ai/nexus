@@ -21,8 +21,6 @@ interface EmptyStateProps extends React.ComponentProps<'div'> {
 }
 
 /**
- * EmptyState
- *
  * A centered message for a list, table or record view with no content yet.
  * Shows an icon, a title, a short description and an optional action.
  *
@@ -72,8 +70,6 @@ function EmptyState({
 interface EmptyStateHeaderProps extends React.ComponentProps<'div'> {}
 
 /**
- * EmptyStateHeader
- *
  * Groups the media, title and description in a narrow centered column.
  */
 function EmptyStateHeader({ className, ...props }: EmptyStateHeaderProps) {
@@ -115,8 +111,6 @@ interface EmptyStateMediaProps
     VariantProps<typeof emptyStateMediaVariants> {}
 
 /**
- * EmptyStateMedia
- *
  * Holds the icon or illustration. The `icon` variant puts one icon on a muted
  * rounded tile. The `default` variant is an unstyled wrapper for a larger image.
  */
@@ -156,8 +150,6 @@ interface EmptyStateTitleProps extends React.ComponentProps<'div'> {
 }
 
 /**
- * EmptyStateTitle
- *
  * The headline that says what is missing. Renders a `div`, so use `asChild`
  * when the page outline needs a real heading.
  */
@@ -185,8 +177,6 @@ function EmptyStateTitle({
 interface EmptyStateDescriptionProps extends React.ComponentProps<'p'> {}
 
 /**
- * EmptyStateDescription
- *
  * Supporting text under the title. Links inside it are underlined.
  */
 function EmptyStateDescription({
@@ -213,8 +203,6 @@ function EmptyStateDescription({
 interface EmptyStateContentProps extends React.ComponentProps<'div'> {}
 
 /**
- * EmptyStateContent
- *
  * The action area under the header, usually one or two buttons.
  */
 function EmptyStateContent({ className, ...props }: EmptyStateContentProps) {

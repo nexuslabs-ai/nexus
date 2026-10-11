@@ -2,9 +2,7 @@
 
 Set your app's starting theme, and keep the user's choices across reloads.
 
-This page starts where [Install](/getting-started/install) ends. You should
-have the token CSS imported, the provider copied into
-`components/appearance/provider/`, and `@nexus_ds/core` installed.
+Start here after [Install](/getting-started/install).
 
 ## Set your default theme
 
@@ -92,20 +90,21 @@ falls back to `defaultAppearance`.
 
 The provider saves the theme in two places:
 
-| Prop             | Saves to       | Read by                                |
-| ---------------- | -------------- | -------------------------------------- |
-| `cookieWriteKey` | A cookie       | The server, on the next request        |
-| `storageKey`     | `localStorage` | The browser, after the page has loaded |
+| Prop             | Saves to       | Read by                                               |
+| ---------------- | -------------- | ----------------------------------------------------- |
+| `cookieWriteKey` | A cookie       | The server, on the next request                       |
+| `storageKey`     | `localStorage` | The head script before first paint, then the provider |
 
 When both are set, `localStorage` wins in the browser. To use only the cookie,
-set `storageKey={false}`.
+set `storageKey={false}` on both the script and the provider.
 
 If your app uses a strict Content Security Policy, pass a nonce:
 `<NexusAppearanceScript nonce={nonce} />`.
 
 ## Vite
 
-Vite has no server, so add the theme script to `index.html` at build time:
+Vite doesn't render on the server, so add the theme script to `index.html` at
+build time:
 
 ```ts
 // vite.config.ts
@@ -139,7 +138,8 @@ export default defineConfig({
 });
 ```
 
-Then wrap your app in the provider, with the same storage key:
+On Vite, copy the provider into `src/components/appearance/provider/`. Then wrap
+your app in the provider, with the same storage key:
 
 ```tsx
 // src/main.tsx
@@ -162,8 +162,6 @@ createRoot(document.getElementById('root')!).render(
   </NexusAppearanceProvider>
 );
 ```
-
-On Vite, the provider folder goes in `src/components/appearance/provider/`.
 
 Don't apply the theme in a `useEffect`. Effects run after the first paint, so
 the page would flash the default theme first.

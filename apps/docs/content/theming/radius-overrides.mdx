@@ -3,19 +3,24 @@
 Change the corner radius for one part of the page, or for one kind of
 component.
 
-The `corners` field in [Appearance](/theming/appearance) sets the radius for
-the whole app. This page covers smaller scopes.
+The `corners` field (the **Corners** picker) in
+[Appearance](/theming/appearance) sets the radius for the whole app.
 
-## Set a radius preset for an area
+## Set corners for an area
 
-Add `data-radius` to a wrapper. Everything inside it uses that preset:
+Add `data-radius` to a wrapper. Everything inside it uses that `corners` value:
 
 ```tsx
-<div data-radius="round">{/* … */}</div>
+// components/settings-panel.tsx
+import type { ReactNode } from 'react';
+
+export function SettingsPanel({ children }: { children: ReactNode }) {
+  return <div data-radius="round">{children}</div>;
+}
 ```
 
-The values are the same as `corners`: `square`, `subtle`, `smooth`, `round`
-and `extra-round`.
+`data-radius` takes the same values as `corners`: `square`, `subtle`, `smooth`,
+`round` and `extra-round`.
 
 ## Round only the buttons
 
@@ -49,7 +54,7 @@ export function RoundedActions() {
 ```
 
 The buttons become pills. The input and the select trigger keep the `round`
-preset's `12px`.
+value's `12px`.
 
 To change one button, put `style={pillButtons}` on that button instead.
 
@@ -58,33 +63,28 @@ to change React's global types.
 
 ## Which variable each component reads
 
-| Variable           | Read by                                       |
-| ------------------ | --------------------------------------------- |
-| `--nx-radius-base` | Button, and the start of FilterConditionField |
-| `--nx-radius-md`   | Input, SelectTrigger, ButtonGroupText         |
+| Variable           | Read by                                           |
+| ------------------ | ------------------------------------------------- |
+| `--nx-radius-base` | Button, and the start of FilterConditionField     |
+| `--nx-radius-md`   | Input, InputGroup, SelectTrigger, ButtonGroupText |
 
 `--nx-radius-base` isn't reserved for Button. Anything inside the wrapper that
 uses `nx:rounded-base` picks up the override.
 
-Some components render a Button with a radius of their own. These keep their
-own radius:
-
-| Component        | Keeps                                                               |
-| ---------------- | ------------------------------------------------------------------- |
-| InputGroupButton | `rounded-sm` at sizes `xs` and `icon-xs`, `rounded-md` at size `sm` |
-| Carousel         | `rounded-full` on the previous and next buttons                     |
-| DatePicker       | Its own corners on selected days in a range or at a week edge       |
+A component that sets its own radius, such as Carousel's arrows, keeps it. For
+the rest, check the
+[component source](https://github.com/nexuslabs-ai/nexus/tree/main/packages/react/src/components).
 
 ## Nested wrappers
 
-| Inner wrapper                    | Result                                             |
-| -------------------------------- | -------------------------------------------------- |
-| No `data-radius` and no override | Inherits the outer override                        |
-| Its own `--nx-radius-base`       | Uses its own value                                 |
-| Its own `data-radius`            | Resets to that preset and drops the outer override |
+| Inner wrapper                    | Result                                            |
+| -------------------------------- | ------------------------------------------------- |
+| No `data-radius` and no override | Inherits the outer override                       |
+| Its own `--nx-radius-base`       | Uses its own value                                |
+| Its own `data-radius`            | Resets to that value and drops the outer override |
 
-When `data-radius` and `--nx-radius-base` are on the same element, the
-`--nx-radius-base` value wins.
+When `data-radius` and an inline `--nx-radius-base` style are on the same
+element, the inline value wins.
 
 Overrides follow the DOM tree. A popover or menu that renders in a portal sits
 outside your wrapper, so it doesn't get the override.

@@ -1085,8 +1085,7 @@ export const AllVariants: Story = {
     layout: 'padded',
     docs: {
       description: {
-        story:
-          'Default, destructive, success, information and warning side by side.',
+        story: 'Compare the five status variants side by side.',
       },
     },
   },

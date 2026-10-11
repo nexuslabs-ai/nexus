@@ -81,12 +81,12 @@ const meta: Meta<typeof DatePicker> = {
     cellSize: {
       control: 'select',
       options: ['default', 'large', 'xlarge'],
-      description: 'Day-cell size: 32px, 48px or 56px',
+      description: 'Day-cell size: 32px, 48px or 56px.',
     },
     captionLayout: {
       control: 'select',
       options: ['label', 'dropdown', 'dropdown-months', 'dropdown-years'],
-      description: 'Static month label or month and year dropdowns',
+      description: 'Static month label or month and year dropdowns.',
     },
     buttonVariant: {
       control: 'select',
@@ -98,28 +98,29 @@ const meta: Meta<typeof DatePicker> = {
         'ghost',
         'link',
       ],
-      description: 'Button variant for the previous and next arrows',
+      description: 'Button variant for the previous and next arrows.',
     },
     showOutsideDays: {
       control: 'boolean',
-      description: 'Shows days from the previous and next months',
+      description: 'Shows days from the previous and next months.',
     },
     showWeekNumber: {
       control: 'boolean',
-      description: 'Shows a week-number column',
+      description: 'Shows a week-number column.',
     },
     fixedWeeks: {
       control: 'boolean',
-      description: 'Always shows six weeks',
+      description: 'Always shows six weeks.',
     },
     weekStartsOn: {
       control: 'select',
       options: [0, 1, 2, 3, 4, 5, 6],
-      description: 'First weekday, from 0 (Sunday) to 6 (Saturday)',
+      description:
+        'First weekday, from 0 (Sunday) to 6 (Saturday). A `locale` can set it.',
     },
     numberOfMonths: {
       control: 'number',
-      description: 'Months shown side by side',
+      description: 'Months shown side by side.',
     },
     className: { control: false },
     classNames: { control: false },
@@ -131,13 +132,13 @@ const meta: Meta<typeof DatePicker> = {
     mode: {
       control: false,
       description:
-        'Fixed per story, since each mode stores a different value shape',
+        'Fixed per story, since each mode stores a different value shape.',
     },
     modifiers: { control: false },
     onSelect: { control: false },
     renderDayContent: {
       control: false,
-      description: 'Function prop, shown in the CustomDayContent story',
+      description: 'Function prop, shown in the CustomDayContent story.',
     },
     selected: { control: false },
     styles: { control: false },
@@ -292,7 +293,7 @@ export const Range: Story = {
     docs: {
       description: {
         story:
-          'Set `mode="range"` to pick a start and end date joined by a rail.',
+          'Set `mode="range"` to pick a start and end date, with the days between highlighted.',
       },
     },
   },

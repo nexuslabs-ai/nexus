@@ -28,8 +28,6 @@ import {
 interface ComboboxProps extends React.ComponentProps<typeof Popover> {}
 
 /**
- * Combobox
- *
  * A searchable single-select field built from a Popover and a Command list.
  * Hold the selected value and the `open` state in your own component.
  *
@@ -78,8 +76,6 @@ function Combobox(props: ComboboxProps) {
 interface ComboboxTriggerProps extends ButtonProps {}
 
 /**
- * ComboboxTrigger
- *
  * The button that opens the popover and shows the current selection. Renders an
  * outline Button with a trailing selector icon.
  */
@@ -126,8 +122,6 @@ interface ComboboxContentProps extends PopoverContentProps {
 }
 
 /**
- * ComboboxContent
- *
  * The floating panel that holds the search field and options. Matches the
  * trigger width by default.
  */
@@ -168,8 +162,6 @@ interface ComboboxInputProps extends React.ComponentProps<
 > {}
 
 /**
- * ComboboxInput
- *
  * The search field. It is the element with `role="combobox"`.
  */
 function ComboboxInput({ className, ...props }: ComboboxInputProps) {
@@ -186,8 +178,6 @@ function ComboboxInput({ className, ...props }: ComboboxInputProps) {
 interface ComboboxListProps extends React.ComponentProps<typeof CommandList> {}
 
 /**
- * ComboboxList
- *
  * The scrollable list that holds options, groups and the empty state.
  */
 function ComboboxList({ className, ...props }: ComboboxListProps) {
@@ -206,8 +196,6 @@ interface ComboboxEmptyProps extends React.ComponentProps<
 > {}
 
 /**
- * ComboboxEmpty
- *
  * Shown when the search matches no options.
  */
 function ComboboxEmpty({ className, ...props }: ComboboxEmptyProps) {
@@ -230,8 +218,6 @@ interface ComboboxGroupProps extends React.ComponentProps<
 > {}
 
 /**
- * ComboboxGroup
- *
  * Groups related options under an optional `heading`.
  */
 function ComboboxGroup({ className, ...props }: ComboboxGroupProps) {
@@ -250,8 +236,6 @@ interface ComboboxSeparatorProps extends React.ComponentProps<
 > {}
 
 /**
- * ComboboxSeparator
- *
  * A decorative divider between groups or options.
  */
 function ComboboxSeparator({ className, ...props }: ComboboxSeparatorProps) {
@@ -278,8 +262,6 @@ interface ComboboxItemProps extends React.ComponentProps<typeof CommandItem> {
 }
 
 /**
- * ComboboxItem
- *
  * A selectable option. Search matches `value` and `keywords`, not the visible
  * text, so pass the label in `keywords`.
  *

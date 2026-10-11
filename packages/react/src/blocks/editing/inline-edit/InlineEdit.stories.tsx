@@ -27,7 +27,7 @@ const meta: Meta<typeof InlineEdit> = {
     docs: {
       description: {
         component:
-          'InlineEdit edits one line of text in place, saving with Enter or Save. Use it for a single field on a detail view, such as a name. For several fields or longer text, use a form with Field and Input.',
+          'InlineEdit edits one line of text in place, saving with Enter or Save. Use it for a single field on a detail view, such as a name. For several fields use a form with Field, and for longer text use Textarea.',
       },
       page: () => (
         <>

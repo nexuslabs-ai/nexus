@@ -52,7 +52,7 @@ export async function InstallBlock({
         <CodeSample lang="bash">{`npm install ${packages.join(' ')}`}</CodeSample>
       )}
       {toCopy.length > 0 && (
-        <CodeBlock>
+        <CodeBlock data-language="text">
           <code>{toCopy.join('\n')}</code>
         </CodeBlock>
       )}

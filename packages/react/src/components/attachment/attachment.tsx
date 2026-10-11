@@ -71,7 +71,7 @@ interface AttachmentProps
     Omit<ItemProps, 'asChild' | 'variant'>,
     VariantProps<typeof attachmentVariants> {
   /**
-   * Upload state. Sets the status screen readers announce. The border is dashed while `idle` and red on `error`.
+   * Upload state. Screen readers announce in-progress and error states, and `idle` or `error` change the border.
    * @default 'done'
    */
   state?: AttachmentState;

@@ -7,8 +7,6 @@ import { selectionIndicatorMotionClassName } from '../../lib/motion';
 import { cn } from '../../lib/utils';
 
 /**
- * RadioGroupProps
- *
  * Props for the RadioGroup component.
  */
 interface RadioGroupProps extends React.ComponentProps<
@@ -16,8 +14,6 @@ interface RadioGroupProps extends React.ComponentProps<
 > {}
 
 /**
- * RadioGroupItemProps
- *
  * Props for the RadioGroupItem component.
  */
 interface RadioGroupItemProps extends React.ComponentProps<
@@ -25,8 +21,6 @@ interface RadioGroupItemProps extends React.ComponentProps<
 > {}
 
 /**
- * RadioGroup
- *
  * Set of options where only one can be selected. Render one `RadioGroupItem`
  * per option, labelled with `Label` or wrapped in `ChoiceRow` or `ChoiceCard`.
  *
@@ -55,8 +49,6 @@ function RadioGroup({ className, ...props }: RadioGroupProps) {
 }
 
 /**
- * RadioGroupItem
- *
  * One option in a `RadioGroup`. Give it an `id` and a `Label` with a matching
  * `htmlFor`, or wrap it in `ChoiceRow` or `ChoiceCard`.
  */

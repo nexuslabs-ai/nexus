@@ -171,11 +171,14 @@ export default function ColorShowcase() {
           The palettes
         </SectionHeading>
         <p className="nx:typography-body-default nx:text-muted-foreground nx:mb-4 nx:max-w-[64ch]">
-          There are five neutral palettes with eleven shades each. A shade
+          Nexus has five neutral palettes, with eleven shades each. A shade
           number means the same lightness in every neutral palette, so every{' '}
-          <code>500</code> looks equally light. Brand and status colors come
-          from the chromatic palettes. Each hue has its own lightness curve, so
-          yellow stays light and red runs deep. The color-vision filter shows
+          <code>500</code> looks equally light.
+        </p>
+        <p className="nx:typography-body-default nx:text-muted-foreground nx:mb-4 nx:max-w-[64ch]">
+          Brand and status colors come from the chromatic palettes (the palettes
+          with a hue, like blue or red). Each hue has its own lightness curve,
+          so yellow stays light and red runs deep. The color-vision filter shows
           every palette as someone with color blindness sees it.
         </p>
         <ColorScales />
@@ -187,8 +190,8 @@ export default function ColorShowcase() {
           Live tokens
         </SectionHeading>
         <p className="nx:typography-body-default nx:text-muted-foreground nx:mb-4 nx:max-w-[64ch]">
-          These are the tokens components use. Change the theme with the picker
-          in the bottom-right corner, and every pair updates.
+          These are the tokens components use. Change the theme with the theme
+          picker, and every pair updates.
         </p>
         <p className="nx:typography-body-default nx:text-muted-foreground nx:mb-4 nx:max-w-[64ch]">
           A foreground token names the surface it sits on, not what it paints.{' '}
@@ -198,8 +201,8 @@ export default function ColorShowcase() {
           message and icon on <code>error-subtle</code>.
         </p>
         <p className="nx:typography-body-default nx:text-muted-foreground nx:mb-4 nx:max-w-[64ch]">
-          Each foreground is checked against its own background. If you use it
-          on a different surface, check the contrast yourself.
+          Each foreground is checked against the surfaces Nexus pairs it with.
+          On any other surface, check the contrast yourself.
         </p>
         <div
           data-md-skip
@@ -231,6 +234,8 @@ export default function ColorShowcase() {
         <p className="nx:typography-body-default nx:text-muted-foreground nx:mb-4 nx:max-w-[64ch]">
           The shade number is a lightness step. Each token uses a different step
           in each mode, so it keeps the same visual weight on a dark background.
+        </p>
+        <p className="nx:typography-body-default nx:text-muted-foreground nx:mb-4 nx:max-w-[64ch]">
           Text and thin borders don&rsquo;t use a shade. <code>foreground</code>
           , <code>muted-foreground</code> and <code>border.default</code> are
           semi-transparent black in light mode and white in dark mode, so they
@@ -289,10 +294,12 @@ export default function ColorShowcase() {
           Accessibility
         </SectionHeading>
         <p className="nx:typography-body-default nx:text-muted-foreground nx:mb-4 nx:max-w-[64ch]">
-          Nexus checks contrast with APCA, not WCAG 2 ratios. Each pair has a
-          minimum score for how it&rsquo;s used. If a pair falls below its
-          minimum, the build fails. CI also checks that the palettes stay
-          distinct for color-blind users.
+          Nexus checks contrast with APCA (a perceptual contrast score), not
+          WCAG 2 ratios. Each pair has a minimum score for how it&rsquo;s used.
+          If a pair falls below its minimum, the build fails.
+        </p>
+        <p className="nx:typography-body-default nx:text-muted-foreground nx:mb-4 nx:max-w-[64ch]">
+          CI also checks that the palettes stay distinct for color-blind users.
         </p>
         <p className="nx:typography-body-default nx:text-muted-foreground nx:mb-4 nx:max-w-[64ch]">
           Every foreground is checked against each surface it can sit on,

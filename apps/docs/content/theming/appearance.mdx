@@ -50,8 +50,7 @@ export function ModeButton() {
 }
 ```
 
-Build your own theme controls with this hook, so they fit your app's settings
-page.
+Use `useNexusAppearance` to build theme controls for your own settings page.
 
 ## Brand color
 
@@ -71,8 +70,9 @@ export const defaultAppearance = {
 } satisfies NexusAppearanceState;
 ```
 
-Nexus may adjust the shade slightly so button labels stay readable. The
-button you see can differ a little from the hex you entered.
+In light mode, the button uses your color, with very light colors darkened a
+little. In dark mode, dark brand colors get lighter so the button stays
+visible. A black brand becomes a white button in dark mode.
 
 To let users pick a brand color, copy the `appearance/brand-color-field`
 component:
@@ -100,7 +100,7 @@ export function BrandEditor() {
 ```
 
 The field offers nine presets (Default, Indigo, Blue, Violet, Rose, Orange,
-Amber, Green and Teal) and a hex input. A color that matches no preset shows as
+Amber, Green and Teal), a color picker and a hex input. A color that matches no preset shows as
 **Custom**.
 
 To build your own picker, `@nexus_ds/core` exports the presets:
@@ -111,8 +111,8 @@ To build your own picker, `@nexus_ds/core` exports the presets:
 | `BASE_TONE_OPTIONS`                | The surface tone list                                  |
 | `findBrandColorPreset(brandColor)` | The matching preset, or `undefined` for a custom color |
 
-`findBrandColorPreset` matches any CSS color format, such as `#4F46E5`,
-`4f46e5` or `rgb(79 70 229)`.
+`findBrandColorPreset` matches any opaque CSS color, such as `#4F46E5`,
+`4f46e5` or `rgb(79 70 229)`. A translucent color returns `undefined`.
 
 ## Surface tone
 
@@ -141,7 +141,7 @@ states are. Each runs from `0` to `100`, with `50` as the default.
 
 Each mode keeps its own value, so a user can raise contrast in dark mode only.
 For the contrast targets behind each value, see
-[Color](/foundations/color#accessibility).
+[Color](/foundations/color#contrast-setting).
 
 ## Save the theme
 

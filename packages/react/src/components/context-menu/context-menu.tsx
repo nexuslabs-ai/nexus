@@ -12,8 +12,6 @@ import {
 } from '../overlay-layout/overlay-layout';
 
 /**
- * ContextMenu
- *
  * Root component for the context menu. Opens when the trigger is right-clicked.
  *
  * @example
@@ -30,36 +28,26 @@ import {
 const ContextMenu = ContextMenuPrimitive.Root;
 
 /**
- * ContextMenuTrigger
- *
  * The area that opens the menu when right-clicked.
  */
 const ContextMenuTrigger = ContextMenuPrimitive.Trigger;
 
 /**
- * ContextMenuGroup
- *
  * Groups related menu items.
  */
 const ContextMenuGroup = ContextMenuPrimitive.Group;
 
 /**
- * ContextMenuPortal
- *
  * Renders the content into `document.body`.
  */
 const ContextMenuPortal = ContextMenuPrimitive.Portal;
 
 /**
- * ContextMenuSub
- *
  * Root of a submenu.
  */
 const ContextMenuSub = ContextMenuPrimitive.Sub;
 
 /**
- * ContextMenuRadioGroup
- *
  * Groups radio items so only one is checked.
  */
 const ContextMenuRadioGroup = ContextMenuPrimitive.RadioGroup;
@@ -73,15 +61,13 @@ interface ContextMenuSubTriggerProps extends React.ComponentProps<
   typeof ContextMenuPrimitive.SubTrigger
 > {
   /**
-   * Indents the trigger to line up with items that have a leading icon.
+   * Indents the trigger to line up with items that have a leading icon or check.
    * @default false
    */
   inset?: boolean;
 }
 
 /**
- * ContextMenuSubTrigger
- *
  * The item that opens a submenu. Shows a trailing chevron.
  */
 function ContextMenuSubTrigger({
@@ -121,8 +107,6 @@ interface ContextMenuSubContentProps extends React.ComponentProps<
 > {}
 
 /**
- * ContextMenuSubContent
- *
  * The panel that holds a submenu's items.
  */
 function ContextMenuSubContent({
@@ -154,8 +138,6 @@ interface ContextMenuContentProps extends React.ComponentProps<
 > {}
 
 /**
- * ContextMenuContent
- *
  * The menu panel. Opens at the cursor.
  *
  * @example
@@ -211,15 +193,13 @@ interface ContextMenuItemProps
     React.ComponentProps<typeof ContextMenuPrimitive.Item>,
     VariantProps<typeof contextMenuItemVariants> {
   /**
-   * Indents the item to line up with items that have a leading icon.
+   * Indents the item to line up with items that have a leading icon or check.
    * @default false
    */
   inset?: boolean;
 }
 
 /**
- * ContextMenuItem
- *
  * A single menu action.
  *
  * @example
@@ -259,8 +239,6 @@ interface ContextMenuCheckboxItemProps extends React.ComponentProps<
 > {}
 
 /**
- * ContextMenuCheckboxItem
- *
  * A menu item that toggles on and off.
  *
  * @example
@@ -322,8 +300,6 @@ interface ContextMenuRadioItemProps extends React.ComponentProps<
 > {}
 
 /**
- * ContextMenuRadioItem
- *
  * A menu item for picking one option from a ContextMenuRadioGroup.
  *
  * @example
@@ -382,15 +358,13 @@ interface ContextMenuLabelProps extends React.ComponentProps<
   typeof ContextMenuPrimitive.Label
 > {
   /**
-   * Indents the label to line up with items that have a leading icon.
+   * Indents the label to line up with items that have a leading icon or check.
    * @default false
    */
   inset?: boolean;
 }
 
 /**
- * ContextMenuLabel
- *
  * A heading for a group of menu items.
  *
  * @example
@@ -427,8 +401,6 @@ interface ContextMenuSeparatorProps extends React.ComponentProps<
 > {}
 
 /**
- * ContextMenuSeparator
- *
  * A divider between menu items.
  */
 function ContextMenuSeparator({
@@ -455,8 +427,6 @@ function ContextMenuSeparator({
 interface ContextMenuShortcutProps extends React.ComponentProps<'span'> {}
 
 /**
- * ContextMenuShortcut
- *
  * A keyboard shortcut hint, right-aligned in a ContextMenuItem.
  *
  * @example

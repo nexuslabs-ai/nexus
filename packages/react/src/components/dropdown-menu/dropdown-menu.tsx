@@ -12,8 +12,6 @@ import {
 } from '../overlay-layout/overlay-layout';
 
 /**
- * DropdownMenu
- *
  * Root component for the dropdown menu. Holds the open state.
  *
  * @example
@@ -30,36 +28,26 @@ import {
 const DropdownMenu = DropdownMenuPrimitive.Root;
 
 /**
- * DropdownMenuTrigger
- *
  * The button that opens and closes the menu.
  */
 const DropdownMenuTrigger = DropdownMenuPrimitive.Trigger;
 
 /**
- * DropdownMenuGroup
- *
  * Groups related menu items.
  */
 const DropdownMenuGroup = DropdownMenuPrimitive.Group;
 
 /**
- * DropdownMenuPortal
- *
  * Renders the content into `document.body`.
  */
 const DropdownMenuPortal = DropdownMenuPrimitive.Portal;
 
 /**
- * DropdownMenuSub
- *
  * Root of a submenu.
  */
 const DropdownMenuSub = DropdownMenuPrimitive.Sub;
 
 /**
- * DropdownMenuRadioGroup
- *
  * Groups radio items so only one is checked.
  */
 const DropdownMenuRadioGroup = DropdownMenuPrimitive.RadioGroup;
@@ -73,15 +61,13 @@ interface DropdownMenuSubTriggerProps extends React.ComponentProps<
   typeof DropdownMenuPrimitive.SubTrigger
 > {
   /**
-   * Indents the trigger to line up with items that have a leading icon.
+   * Indents the trigger to line up with items that have a leading icon or check.
    * @default false
    */
   inset?: boolean;
 }
 
 /**
- * DropdownMenuSubTrigger
- *
  * The item that opens a submenu. Shows a trailing chevron.
  */
 function DropdownMenuSubTrigger({
@@ -121,8 +107,6 @@ interface DropdownMenuSubContentProps extends React.ComponentProps<
 > {}
 
 /**
- * DropdownMenuSubContent
- *
  * The panel that holds a submenu's items.
  */
 function DropdownMenuSubContent({
@@ -154,8 +138,6 @@ interface DropdownMenuContentProps extends React.ComponentProps<
 > {}
 
 /**
- * DropdownMenuContent
- *
  * The menu panel. Opens next to the trigger in a portal.
  *
  * @example
@@ -216,15 +198,13 @@ interface DropdownMenuItemProps
     React.ComponentProps<typeof DropdownMenuPrimitive.Item>,
     VariantProps<typeof dropdownMenuItemVariants> {
   /**
-   * Indents the item to line up with items that have a leading icon.
+   * Indents the item to line up with items that have a leading icon or check.
    * @default false
    */
   inset?: boolean;
 }
 
 /**
- * DropdownMenuItem
- *
  * A single menu action.
  *
  * @example
@@ -264,8 +244,6 @@ interface DropdownMenuCheckboxItemProps extends React.ComponentProps<
 > {}
 
 /**
- * DropdownMenuCheckboxItem
- *
  * A menu item that toggles on and off.
  *
  * @example
@@ -327,8 +305,6 @@ interface DropdownMenuRadioItemProps extends React.ComponentProps<
 > {}
 
 /**
- * DropdownMenuRadioItem
- *
  * A menu item for picking one option from a DropdownMenuRadioGroup.
  *
  * @example
@@ -387,15 +363,13 @@ interface DropdownMenuLabelProps extends React.ComponentProps<
   typeof DropdownMenuPrimitive.Label
 > {
   /**
-   * Indents the label to line up with items that have a leading icon.
+   * Indents the label to line up with items that have a leading icon or check.
    * @default false
    */
   inset?: boolean;
 }
 
 /**
- * DropdownMenuLabel
- *
  * A heading for a group of menu items.
  *
  * @example
@@ -432,8 +406,6 @@ interface DropdownMenuSeparatorProps extends React.ComponentProps<
 > {}
 
 /**
- * DropdownMenuSeparator
- *
  * A divider between menu items.
  */
 function DropdownMenuSeparator({
@@ -460,8 +432,6 @@ function DropdownMenuSeparator({
 interface DropdownMenuShortcutProps extends React.ComponentProps<'span'> {}
 
 /**
- * DropdownMenuShortcut
- *
  * A keyboard shortcut hint, right-aligned in a DropdownMenuItem.
  *
  * @example

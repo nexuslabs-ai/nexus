@@ -6,8 +6,6 @@ import { cva } from 'class-variance-authority';
 import { cn } from '../../lib/utils';
 
 /**
- * ScrollAreaProps
- *
  * Props for ScrollArea, from the Radix ScrollArea Root. `type` sets when the
  * scrollbars show. `scrollHideDelay` sets how long they stay after scrolling.
  */
@@ -16,11 +14,10 @@ interface ScrollAreaProps extends React.ComponentProps<
 > {}
 
 /**
- * ScrollArea
- *
  * Scrollable region with custom scrollbars that look the same on every
  * platform. Renders a vertical scrollbar for you. For horizontal scrolling, add
- * `<ScrollBar orientation="horizontal" />` after the content.
+ * `<ScrollBar orientation="horizontal" />` after the content. `type` sets when
+ * the scrollbars show, `hover` by default.
  *
  * @example
  * ```tsx
@@ -65,8 +62,6 @@ function ScrollArea({ className, children, ...props }: ScrollAreaProps) {
 }
 
 /**
- * ScrollBarProps
- *
  * Props for ScrollBar, from the Radix Scrollbar. `orientation` picks the axis
  * the bar controls.
  */
@@ -92,8 +87,6 @@ const scrollBarVariants = cva(
 );
 
 /**
- * ScrollBar
- *
  * Scrollbar track and thumb for one axis. Render it only to add the horizontal
  * axis, as a child of ScrollArea after the content.
  *

@@ -12,9 +12,8 @@ import { unified } from 'unified';
 
 import { docsRoot } from './roots.mjs';
 
-const SITE_URL = 'https://nexusui.so';
 const ARTICLE_ID = 'docs-article';
-/** Elements that only make sense on screen: copy buttons and breadcrumbs. Decorative `aria-hidden` elements go too. */
+/** Elements that only make sense on screen: copy buttons and breadcrumbs. */
 const DROPPED_TAGS = new Set(['nav', 'button', 'script', 'style', 'svg']);
 /** `data-md-skip` marks a live preview the Markdown leaves out. */
 const SKIP_ATTRIBUTE = 'dataMdSkip';
@@ -43,7 +42,11 @@ function findById(node, id) {
   return undefined;
 }
 
-/** @param {any} node */
+/**
+ * Drops on-screen-only elements, `data-md-skip` previews and decorative
+ * `aria-hidden` elements, and labels each code block with its language.
+ * @param {any} node
+ */
 function prune(node) {
   if (!node.children) return;
   node.children = node.children.filter(
@@ -87,9 +90,14 @@ const processor = unified()
   .use(remarkGfm)
   .use(remarkStringify, { bullet: '-', fences: true, rule: '-' });
 
-/** The first paragraph after the heading, as a one-line summary. */
+/**
+ * The first paragraph between the page's `# ` heading and its first `## `, as
+ * one line.
+ * @param {string} markdown
+ */
 function summaryOf(markdown) {
-  const paragraph = markdown
+  const [intro] = markdown.split(/^## /m);
+  const paragraph = intro
     .split(/\n\s*\n/)
     .map((block) => block.trim())
     .find(
@@ -115,11 +123,12 @@ for (const section of PAGE_MANIFEST) {
 
     const summary = summaryOf(markdown);
     lines.push(
-      `- [${page.label}](${SITE_URL}${page.route}.md)${summary ? `: ${summary}` : ''}`
+      `- [${page.label}](${page.route}.md)${summary ? `: ${summary}` : ''}`
     );
   }
-  if (lines.length > 0)
+  if (lines.length > 0) {
     llmsSections.push(`## ${section.title}\n\n${lines.join('\n')}`);
+  }
 }
 
 const llms = `# Nexus

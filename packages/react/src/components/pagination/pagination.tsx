@@ -7,15 +7,11 @@ import { cn } from '../../lib/utils';
 import { type ButtonProps, buttonVariants } from '../button';
 
 /**
- * PaginationProps
- *
  * Props for the Pagination component.
  */
 interface PaginationProps extends React.ComponentProps<'nav'> {}
 
 /**
- * Pagination
- *
  * Page navigation for lists and tables, in a `navigation` landmark. Your app
  * works out which page numbers to show and owns any page-size control.
  *
@@ -59,15 +55,11 @@ function Pagination({ className, ...props }: PaginationProps) {
 }
 
 /**
- * PaginationContentProps
- *
  * Props for the PaginationContent component.
  */
 interface PaginationContentProps extends React.ComponentProps<'ul'> {}
 
 /**
- * PaginationContent
- *
  * `<ul>` that lays out the pagination items in a row.
  */
 function PaginationContent({ className, ...props }: PaginationContentProps) {
@@ -81,15 +73,11 @@ function PaginationContent({ className, ...props }: PaginationContentProps) {
 }
 
 /**
- * PaginationItemProps
- *
  * Props for the PaginationItem component.
  */
 interface PaginationItemProps extends React.ComponentProps<'li'> {}
 
 /**
- * PaginationItem
- *
  * One `<li>` in the pagination row.
  */
 function PaginationItem(props: PaginationItemProps) {
@@ -97,8 +85,6 @@ function PaginationItem(props: PaginationItemProps) {
 }
 
 /**
- * PaginationLinkProps
- *
  * Props for the PaginationLink component.
  */
 interface PaginationLinkProps
@@ -117,8 +103,6 @@ interface PaginationLinkProps
 }
 
 /**
- * PaginationLink
- *
  * Page number link styled as a `ghost` button, or `outline` for the current
  * page. Uses the square `icon` size unless you set `size`.
  *
@@ -154,8 +138,6 @@ function PaginationLink({
 }
 
 /**
- * PaginationPreviousProps
- *
  * Props for the PaginationPrevious component.
  */
 interface PaginationPreviousProps extends React.ComponentProps<
@@ -163,8 +145,6 @@ interface PaginationPreviousProps extends React.ComponentProps<
 > {}
 
 /**
- * PaginationPrevious
- *
  * Link to the previous page, with a left chevron and the label "Previous".
  * With `asChild`, pass a router link that has its own children.
  */
@@ -182,8 +162,6 @@ function PaginationPrevious({ children, ...props }: PaginationPreviousProps) {
 }
 
 /**
- * PaginationNextProps
- *
  * Props for the PaginationNext component.
  */
 interface PaginationNextProps extends React.ComponentProps<
@@ -191,8 +169,6 @@ interface PaginationNextProps extends React.ComponentProps<
 > {}
 
 /**
- * PaginationNext
- *
  * Link to the next page, with the label "Next" and a right chevron.
  * With `asChild`, pass a router link that has its own children.
  */
@@ -210,15 +186,11 @@ function PaginationNext({ children, ...props }: PaginationNextProps) {
 }
 
 /**
- * PaginationEllipsisProps
- *
  * Props for the PaginationEllipsis component.
  */
 interface PaginationEllipsisProps extends React.ComponentProps<'span'> {}
 
 /**
- * PaginationEllipsis
- *
  * Marker for skipped page numbers. Screen readers skip it.
  */
 function PaginationEllipsis({ className, ...props }: PaginationEllipsisProps) {

@@ -48,7 +48,7 @@ const TIMING: {
     timing: 'Whole set, on one Apply',
     when: 'Several conditions are edited together and results should change only once, such as a grouped query.',
     build: 'FilterBuilder, with draft and applied state',
-    example: 'Step 2 example',
+    example: 'Grouped conditions example',
   },
 ];
 
@@ -113,10 +113,10 @@ export default function Filtering() {
     <>
       <h1 className="nx:typography-heading-large">Filtering</h1>
       <p className="nx:typography-body-default nx:text-muted-foreground nx:mt-2 nx:mb-8 nx:max-w-[64ch]">
-        Let people narrow a list without losing their place. Keep the results
-        and every active filter visible, and make each filter easy to edit or
-        clear. Start with two decisions: when a change applies, and whether
-        filters can be grouped.
+        Build filters for a list from ChoiceFilter, FilterBuilder and the other
+        filter blocks and components. Keep the results and every active filter
+        visible, and make each filter easy to edit or clear. Start with two
+        decisions: when a change applies, and whether filters can be grouped.
       </p>
 
       <section className="nx:mb-12">
@@ -153,9 +153,13 @@ export default function Filtering() {
         <p className={BODY_CLASS}>
           Choose the timing by how the filter is used, not by its field type.
           Closing a filter never applies it. Cancel, Escape and clicking outside
-          all discard the draft. Changing the operator applies at once, unless
-          the new operator needs a value first. If a panel has its own Apply
-          button, don&rsquo;t add a second one inside it.
+          all discard the draft (the edits not yet applied).
+        </p>
+        <p className={BODY_CLASS}>
+          Changing the operator applies at once, unless the new operator needs a
+          value first. If a panel has its own Apply button, pass the
+          panel&rsquo;s draft to each filter. Don&rsquo;t add a second Apply
+          inside it.
         </p>
       </section>
 
@@ -164,12 +168,19 @@ export default function Filtering() {
           2. Decide flat or grouped
         </SectionHeading>
         <p className={BODY_CLASS}>
-          With flat filters, every condition must match. Use All and Any groups
-          only when people need a query like &ldquo;Active members who are in
-          Design or have more than three projects&rdquo;. Build grouped queries
-          with FilterBuilder. Keep the query as a draft until it&rsquo;s
-          applied, so results don&rsquo;t change mid-edit.
+          With flat filters, every condition must match. An All group matches
+          when every condition in it matches, and an Any group matches when at
+          least one does. Use groups only when people need a query like
+          &ldquo;Active members who are in Design or have more than three
+          projects&rdquo;.
         </p>
+        <p className={BODY_CLASS}>
+          Build grouped queries with FilterBuilder. Keep the query as a draft
+          until it&rsquo;s applied, so results don&rsquo;t change mid-edit.
+        </p>
+        <SubsectionHeading className={SUBSECTION_CLASS}>
+          Grouped conditions
+        </SubsectionHeading>
         <Example>
           <AdvancedFiltering />
         </Example>
@@ -220,9 +231,12 @@ export default function Filtering() {
         <p className={BODY_CLASS}>
           Keep active filters visible while results load or fail. Show a
           different message for an empty list, no matches and a failed request.
-          Retry keeps the filters. Show the total count across all pages, and go
-          back to page one when a filter changes. These examples use native
-          inputs, but the same states apply to the blocks.
+          Retry keeps the filters.
+        </p>
+        <p className={BODY_CLASS}>
+          Show the total count across all pages, and go back to page one when a
+          filter changes. The result-state examples use native inputs, but the
+          same states apply to the blocks.
         </p>
         <SubsectionHeading className={SUBSECTION_CLASS}>
           Loading
@@ -257,8 +271,48 @@ export default function Filtering() {
       </section>
 
       <section className="nx:mb-12">
+        <SectionHeading className={SECTION_CLASS}>Examples</SectionHeading>
+        <SubsectionHeading className={SUBSECTION_CLASS}>
+          Team directory: immediate updates
+        </SubsectionHeading>
+        <p className={BODY_CLASS}>
+          Choosing a status or team updates the table at once. The filters have
+          no Apply button.
+        </p>
+        <Example>
+          <TeamDirectory />
+        </Example>
+        <SubsectionHeading className={SUBSECTION_CLASS}>
+          Invoice list: Apply per filter
+        </SubsectionHeading>
+        <p className={BODY_CLASS}>
+          Each filter opens a checklist with its own Apply button. The trigger
+          shows the applied values. Escape or clicking outside discards the
+          changes.
+        </p>
+        <Example>
+          <InvoiceFilteringExample />
+        </Example>
+        <p className="nx:typography-body-default nx:text-muted-foreground nx:max-w-[64ch]">
+          These examples use sample data. The filtering blocks are experimental,
+          so test them with your own data before you ship.
+        </p>
+      </section>
+
+      <section className="nx:mb-12">
         <SectionHeading className={SECTION_CLASS}>
-          5. Where to go next
+          What your app owns
+        </SectionHeading>
+        <p className={BODY_CLASS}>
+          Your app owns the fields, permissions, values, filtering logic,
+          requests, pagination and URL state. Cancel outdated requests and
+          ignore late responses in your data layer.
+        </p>
+      </section>
+
+      <section className="nx:mb-12">
+        <SectionHeading className={SECTION_CLASS}>
+          Where to go next
         </SectionHeading>
         <ul className="nx:mb-4 nx:list-disc nx:space-y-2 nx:ps-5 nx:typography-body-default nx:max-w-[64ch]">
           <li>
@@ -281,41 +335,7 @@ export default function Filtering() {
             <InlineCode>packages/react/src/blocks/filtering</InlineCode> and{' '}
             <InlineCode>packages/react/src/patterns/filtering</InlineCode>.
           </li>
-          <li>
-            Your app owns the fields, permissions, values, filtering logic,
-            requests, pagination and URL state. Cancel outdated requests and
-            ignore late responses in your data layer.
-          </li>
         </ul>
-      </section>
-
-      <section className="nx:mb-12">
-        <SectionHeading className={SECTION_CLASS}>Examples</SectionHeading>
-        <SubsectionHeading className={SUBSECTION_CLASS}>
-          Team directory: immediate updates
-        </SubsectionHeading>
-        <p className={BODY_CLASS}>
-          Choosing a status or team updates the table at once. There&rsquo;s no
-          Apply button.
-        </p>
-        <Example>
-          <TeamDirectory />
-        </Example>
-        <SubsectionHeading className={SUBSECTION_CLASS}>
-          Invoice list: Apply per filter
-        </SubsectionHeading>
-        <p className={BODY_CLASS}>
-          Each filter opens a checklist with its own Apply button. The trigger
-          shows the applied values. Escape or clicking outside discards the
-          changes.
-        </p>
-        <Example>
-          <InvoiceFilteringExample />
-        </Example>
-        <p className="nx:typography-body-default nx:text-muted-foreground nx:max-w-[64ch]">
-          These examples use sample data. The filtering blocks are experimental,
-          so test them with your own data before you ship.
-        </p>
       </section>
     </>
   );

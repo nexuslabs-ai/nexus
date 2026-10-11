@@ -197,7 +197,7 @@ function AlertDialogHeader({
 interface AlertDialogBodyProps extends React.ComponentProps<'div'> {}
 
 /**
- * Holds extra content, aligned with the header and footer.
+ * Holds the main content, aligned with the header and footer. Scrolls when it overflows.
  *
  * @example
  * ```tsx

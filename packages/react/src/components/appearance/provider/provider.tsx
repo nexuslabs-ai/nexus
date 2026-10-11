@@ -58,13 +58,13 @@ export interface NexusAppearanceProviderProps {
   defaultState?: NexusAppearanceState;
   onStateChange?: (state: NexusAppearanceState) => void;
   /**
-   * localStorage key for the saved appearance. After mount, the saved value wins over the cookie and `defaultState`.
-   * Pass `false` to turn storage off.
+   * localStorage key for the saved appearance. The head script reads it before first paint and the provider after mount, overriding `defaultState`.
+   * Pass `false` to turn it off.
    */
   storageKey?: string | false;
   /**
-   * Cookie name the provider writes, so your server can render the saved appearance on the next request.
-   * The client never reads this cookie. It starts from localStorage, or from `defaultState` when nothing is stored.
+   * Cookie the provider writes so your server can render the saved appearance.
+   * The client never reads it.
    */
   cookieWriteKey?: string | false;
   cookieOptions?: NexusAppearanceCookieOptions;

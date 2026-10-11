@@ -52,8 +52,6 @@ const inputGroupVariants = cva(
 );
 
 /**
- * InputGroupProps
- *
  * Props for the InputGroup component.
  */
 interface InputGroupProps
@@ -62,11 +60,10 @@ interface InputGroupProps
     VariantProps<typeof inputGroupVariants> {}
 
 /**
- * InputGroup
- *
  * Frames an `InputGroupInput` or `InputGroupTextarea` with `InputGroupAddon`s
  * for icons, text, buttons or key hints. The group shows the control's focus
- * ring, invalid state and height.
+ * ring and invalid state. Inline groups match the control's height. Set
+ * `variant="borderless"` to drop the border and keep a tinted fill.
  *
  * @example
  * ```tsx
@@ -110,8 +107,6 @@ const inputGroupAddonVariants = cva(
 );
 
 /**
- * InputGroupAddonProps
- *
  * Props for the InputGroupAddon component.
  */
 interface InputGroupAddonProps
@@ -120,8 +115,6 @@ interface InputGroupAddonProps
     VariantProps<typeof inputGroupAddonVariants> {}
 
 /**
- * InputGroupAddon
- *
  * Slot for icons, text, buttons or key hints beside or above the control.
  * Set `align` to place it at the start, end, top or bottom.
  */
@@ -159,8 +152,6 @@ const inputGroupButtonVariants = cva(
 );
 
 /**
- * InputGroupButtonProps
- *
  * Props for the InputGroupButton component.
  */
 interface InputGroupButtonProps
@@ -169,10 +160,8 @@ interface InputGroupButtonProps
     VariantProps<typeof inputGroupButtonVariants> {}
 
 /**
- * InputGroupButton
- *
  * Compact button sized to fit inside an `InputGroupAddon`. Uses the `ghost`
- * variant unless you set one.
+ * variant and `xs` size unless you set them.
  */
 function InputGroupButton({
   className,
@@ -194,15 +183,11 @@ function InputGroupButton({
 }
 
 /**
- * InputGroupTextProps
- *
  * Props for the InputGroupText component.
  */
 interface InputGroupTextProps extends React.ComponentProps<'span'> {}
 
 /**
- * InputGroupText
- *
  * Addon text, such as a unit, label or prefix.
  */
 function InputGroupText({ className, ...props }: InputGroupTextProps) {
@@ -219,8 +204,6 @@ function InputGroupText({ className, ...props }: InputGroupTextProps) {
 }
 
 /**
- * InputGroupInputProps
- *
  * Props for the InputGroupInput component.
  */
 interface InputGroupInputProps extends Omit<
@@ -229,10 +212,8 @@ interface InputGroupInputProps extends Omit<
 > {}
 
 /**
- * InputGroupInput
- *
- * Text input for an `InputGroup`. The group draws its border, focus ring and
- * height.
+ * Text input for an `InputGroup`. The group supplies its border, focus ring
+ * and height.
  */
 function InputGroupInput({ className, ...props }: InputGroupInputProps) {
   return (
@@ -250,8 +231,6 @@ function InputGroupInput({ className, ...props }: InputGroupInputProps) {
 }
 
 /**
- * InputGroupTextareaProps
- *
  * Props for the InputGroupTextarea component.
  */
 interface InputGroupTextareaProps extends Omit<
@@ -260,9 +239,8 @@ interface InputGroupTextareaProps extends Omit<
 > {}
 
 /**
- * InputGroupTextarea
- *
- * Textarea for an `InputGroup`. The group draws its border and focus ring.
+ * Textarea for an `InputGroup`. The group supplies its border and focus
+ * ring.
  */
 function InputGroupTextarea({ className, ...props }: InputGroupTextareaProps) {
   return (

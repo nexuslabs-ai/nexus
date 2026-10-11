@@ -9,8 +9,6 @@ const useIsomorphicLayoutEffect =
   typeof window === 'undefined' ? React.useEffect : React.useLayoutEffect;
 
 /**
- * Tabs
- *
  * Root of the tabs. Holds the active tab, the list and the panels.
  *
  * @example
@@ -36,8 +34,6 @@ const TabsListContext = React.createContext<{
 }>({ variant: 'default', size: 'default' });
 
 /**
- * TabsListProps
- *
  * Props for TabsList.
  */
 interface TabsListProps extends Omit<
@@ -57,8 +53,6 @@ interface TabsListProps extends Omit<
 }
 
 /**
- * TabsList
- *
  * Row of tab triggers.
  *
  * @example
@@ -191,8 +185,6 @@ function TabsList({
 }
 
 /**
- * TabsTrigger variants
- *
  * CVA configuration for TabsTrigger styling.
  */
 const tabsTriggerVariants = cva(
@@ -208,7 +200,7 @@ const tabsTriggerVariants = cva(
   {
     variants: {
       /**
-       * Visual style variant
+       * Visual style.
        * @default "default"
        */
       variant: {
@@ -224,7 +216,7 @@ const tabsTriggerVariants = cva(
         ],
       },
       /**
-       * Size variant
+       * Size.
        * @default "default"
        */
       size: {
@@ -241,8 +233,6 @@ const tabsTriggerVariants = cva(
 );
 
 /**
- * TabsTriggerProps
- *
  * Props for TabsTrigger.
  */
 interface TabsTriggerProps extends React.ComponentProps<
@@ -250,8 +240,6 @@ interface TabsTriggerProps extends React.ComponentProps<
 > {}
 
 /**
- * TabsTrigger
- *
  * Tab button that shows its panel. Takes its style from the TabsList `variant`
  * and `size`.
  *
@@ -275,8 +263,6 @@ function TabsTrigger({ className, ...props }: TabsTriggerProps) {
 }
 
 /**
- * TabsContentProps
- *
  * Props for TabsContent.
  */
 interface TabsContentProps extends React.ComponentProps<
@@ -284,8 +270,6 @@ interface TabsContentProps extends React.ComponentProps<
 > {}
 
 /**
- * TabsContent
- *
  * Panel for one tab, shown only while that tab is active.
  *
  * @example

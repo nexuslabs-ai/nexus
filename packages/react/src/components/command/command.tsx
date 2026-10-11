@@ -19,8 +19,6 @@ import {
 interface CommandProps extends React.ComponentProps<typeof CommandPrimitive> {}
 
 /**
- * Command
- *
  * A searchable command palette with keyboard navigation. Pass a `label` or
  * `aria-label` so the search input has an accessible name.
  *
@@ -81,8 +79,6 @@ interface CommandDialogProps extends React.ComponentProps<typeof Dialog> {
 }
 
 /**
- * CommandDialog
- *
  * A command palette inside a modal Dialog, often opened with ⌘K. Control its
  * `open` state and bind it to a keyboard shortcut.
  *
@@ -133,8 +129,6 @@ interface CommandInputProps extends React.ComponentProps<
 > {}
 
 /**
- * CommandInput
- *
  * The search field, with a leading search icon.
  */
 function CommandInput({ className, ...props }: CommandInputProps) {
@@ -168,8 +162,6 @@ interface CommandListProps extends React.ComponentProps<
 > {}
 
 /**
- * CommandList
- *
  * Scrollable container for command groups and items.
  */
 function CommandList({ className, ...props }: CommandListProps) {
@@ -195,8 +187,6 @@ interface CommandEmptyProps extends React.ComponentProps<
 > {}
 
 /**
- * CommandEmpty
- *
  * Shown when the search matches no items.
  */
 function CommandEmpty({ className, ...props }: CommandEmptyProps) {
@@ -222,8 +212,6 @@ interface CommandLoadingProps extends React.ComponentProps<
 > {}
 
 /**
- * CommandLoading
- *
  * Shown while async results load. Place it outside CommandList, and pass
  * `progress` and `label` when progress is known.
  *
@@ -260,8 +248,6 @@ interface CommandGroupProps extends React.ComponentProps<
 > {}
 
 /**
- * CommandGroup
- *
  * Groups related items under an optional `heading`.
  *
  * @example
@@ -298,8 +284,6 @@ interface CommandSeparatorProps extends React.ComponentProps<
 > {}
 
 /**
- * CommandSeparator
- *
  * A decorative divider between groups or items. Screen readers skip it.
  */
 function CommandSeparator({ className, ...props }: CommandSeparatorProps) {
@@ -326,8 +310,6 @@ interface CommandItemProps extends React.ComponentProps<
 > {}
 
 /**
- * CommandItem
- *
  * A selectable command. The highlighted item gets `data-selected`, and a
  * disabled item gets `data-disabled`.
  *
@@ -361,8 +343,6 @@ function CommandItem({ className, ...props }: CommandItemProps) {
 interface CommandShortcutProps extends React.ComponentProps<'span'> {}
 
 /**
- * CommandShortcut
- *
  * A keyboard shortcut hint, right-aligned in a CommandItem.
  *
  * @example

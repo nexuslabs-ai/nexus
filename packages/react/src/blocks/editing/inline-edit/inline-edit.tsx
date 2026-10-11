@@ -18,8 +18,8 @@ export interface InlineEditProps extends Omit<
   value: string;
   label: string;
   /**
-   * Gets the trimmed draft. A returned promise keeps the editor open until it
-   * settles. A rejection keeps the draft open, so show `error` there.
+   * Gets the trimmed draft. Resolving closes the editor. Rejecting keeps the
+   * draft open so the user can retry, so pass `error`.
    */
   onCommit: InlineEditCommit;
   /** Opens the editor. Omit it to let InlineEdit manage this. */

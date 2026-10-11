@@ -5,8 +5,6 @@ import * as ProgressPrimitive from '@radix-ui/react-progress';
 import { cn } from '../../lib/utils';
 
 /**
- * ProgressProps
- *
  * Props for the Progress component.
  */
 interface ProgressProps extends React.ComponentProps<
@@ -14,8 +12,6 @@ interface ProgressProps extends React.ComponentProps<
 > {}
 
 /**
- * Progress
- *
  * Bar that shows task progress from `value` 0 to 100, or an animated bar
  * without `value`. Always pass an `aria-label` or `aria-labelledby`.
  *

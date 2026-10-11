@@ -43,7 +43,8 @@ function Breadcrumb(props: BreadcrumbProps) {
 interface BreadcrumbListProps extends React.ComponentProps<'ol'> {}
 
 /**
- * Ordered list that lays out the trail in one row. A trail wider than its container scrolls sideways, with keyboard focus.
+ * Ordered list that lays out the trail in one row. A trail wider than its container scrolls sideways.
+ * The list is focusable, so keyboard users can scroll it.
  */
 function BreadcrumbList({ className, ...props }: BreadcrumbListProps) {
   return (

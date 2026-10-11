@@ -60,8 +60,8 @@ function isIconButtonSize(size: ButtonSize) {
 interface ButtonProps
   extends React.ComponentProps<'button'>, VariantProps<typeof buttonVariants> {
   /**
-   * Renders the child element, such as an `<a>`, with button styles. Put icons inside the child.
-   * `loading`, `startIcon` and `endIcon` work only on the native button.
+   * Renders the child, such as an `<a>`, with button styles.
+   * The `loading` spinner and icon slots then don't render.
    * @default false
    * @example
    * ```tsx

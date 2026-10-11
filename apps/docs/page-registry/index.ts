@@ -374,17 +374,6 @@ export const PAGE_REGISTRY = {
       {
         slug: 'llms-txt',
         label: 'llms.txt',
-        wireframe: {
-          lede: '[ Point your model at one URL · machine-readable site map ]',
-          blocks: [
-            {
-              type: 'placeholder',
-              variant: 'code',
-              label: '[ Code — llms.txt preview ]',
-            },
-            { type: 'placeholder', label: '[ Download · copy link ]' },
-          ],
-        },
       },
       {
         slug: 'rules-mirror',

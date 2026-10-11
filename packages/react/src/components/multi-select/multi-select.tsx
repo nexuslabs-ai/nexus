@@ -103,8 +103,6 @@ interface MultiSelectProps {
 }
 
 /**
- * MultiSelect
- *
  * Searchable field for picking several options, shown as chips. For
  * searchable single selection, use `Combobox`.
  *
@@ -166,10 +164,9 @@ function MultiSelect({
 interface MultiSelectTriggerProps extends React.ComponentProps<'button'> {}
 
 /**
- * MultiSelectTrigger
- *
  * Field that shows the selected values, opens the list, and removes the last
- * value on Backspace. Needs an `aria-label` or a visible label from `Field`.
+ * value on Backspace or Delete. Needs an `aria-label` or a visible label from
+ * `Field`.
  */
 function MultiSelectTrigger({
   className,
@@ -239,8 +236,6 @@ interface MultiSelectValueProps extends Omit<
 }
 
 /**
- * MultiSelectValue
- *
  * Selected values inside the trigger, shown as removable chips. Chips that
  * don't fit become a `+N` badge unless they wrap.
  */
@@ -395,8 +390,6 @@ interface MultiSelectContentProps extends Omit<
 }
 
 /**
- * MultiSelectContent
- *
  * Searchable list of options, shown in a popover.
  */
 function MultiSelectContent({
@@ -447,8 +440,6 @@ interface MultiSelectItemProps extends Omit<
 }
 
 /**
- * MultiSelectItem
- *
  * Option with a checkbox, found by its `value`, `keywords` or plain-text
  * label. Give each option a unique `value`.
  */
@@ -504,8 +495,6 @@ interface MultiSelectGroupProps extends React.ComponentProps<
 > {}
 
 /**
- * MultiSelectGroup
- *
  * Groups related options under an optional `heading`.
  */
 function MultiSelectGroup(props: MultiSelectGroupProps) {
@@ -517,8 +506,6 @@ interface MultiSelectSeparatorProps extends React.ComponentProps<
 > {}
 
 /**
- * MultiSelectSeparator
- *
  * Divider between groups or options.
  */
 function MultiSelectSeparator(props: MultiSelectSeparatorProps) {

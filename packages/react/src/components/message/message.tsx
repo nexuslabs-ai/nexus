@@ -4,8 +4,6 @@ import { cn } from '../../lib/utils';
 import { Avatar } from '../avatar';
 
 /**
- * MessageGroupProps
- *
  * Props for the MessageGroup component.
  */
 interface MessageGroupProps extends React.ComponentProps<'div'> {
@@ -24,8 +22,6 @@ interface MessageGroupProps extends React.ComponentProps<'div'> {
 }
 
 /**
- * MessageGroup
- *
  * Vertical stack of conversation turns. It adds no list role, so add list
  * roles if the stack is a list.
  */
@@ -48,8 +44,6 @@ function MessageGroup({
 }
 
 /**
- * MessageProps
- *
  * Props for the Message component.
  */
 interface MessageProps extends React.ComponentProps<'div'> {
@@ -64,8 +58,6 @@ interface MessageProps extends React.ComponentProps<'div'> {
 }
 
 /**
- * Message
- *
  * Layout for one conversation turn, with an avatar beside the header, body
  * and footer. Put the body, usually a `Bubble` or `Attachment`, in
  * `MessageContent`.
@@ -103,8 +95,6 @@ function Message({ className, align = 'start', ...props }: MessageProps) {
 }
 
 /**
- * MessageAvatarProps
- *
  * Props for the MessageAvatar component.
  */
 interface MessageAvatarProps extends React.ComponentProps<typeof Avatar> {
@@ -122,8 +112,6 @@ interface MessageAvatarProps extends React.ComponentProps<typeof Avatar> {
 }
 
 /**
- * MessageAvatar
- *
  * Avatar of the speaker, pinned to the top of the turn. Takes the same
  * children and props as `Avatar`, and uses the `sm` size unless you set one.
  *
@@ -153,15 +141,11 @@ function MessageAvatar({
 }
 
 /**
- * MessageContentProps
- *
  * Props for the MessageContent component.
  */
 interface MessageContentProps extends React.ComponentProps<'div'> {}
 
 /**
- * MessageContent
- *
  * Column beside the avatar for the header, body and footer of the turn.
  * Aligns its children to the side set by `align` on `Message`.
  */
@@ -182,15 +166,11 @@ const messageMetaClassName =
   'nx:flex nx:max-w-full nx:items-center nx:gap-2 nx:px-4 nx:wrap-anywhere nx:typography-label-small nx:text-muted-foreground';
 
 /**
- * MessageHeaderProps
- *
  * Props for the MessageHeader component.
  */
 interface MessageHeaderProps extends React.ComponentProps<'div'> {}
 
 /**
- * MessageHeader
- *
  * Line above the turn for the speaker name, time or role.
  * Its text lines up with the text inside a `Bubble`.
  */
@@ -205,15 +185,11 @@ function MessageHeader({ className, ...props }: MessageHeaderProps) {
 }
 
 /**
- * MessageFooterProps
- *
  * Props for the MessageFooter component.
  */
 interface MessageFooterProps extends React.ComponentProps<'div'> {}
 
 /**
- * MessageFooter
- *
  * Line below the turn for delivery status, time or actions.
  */
 function MessageFooter({ className, ...props }: MessageFooterProps) {

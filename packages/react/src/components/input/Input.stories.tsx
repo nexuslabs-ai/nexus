@@ -36,25 +36,25 @@ const meta: Meta<typeof Input> = {
     size: {
       control: 'select',
       options: ['default', 'sm', 'lg'],
-      description: 'Field size',
+      description: 'Field size.',
     },
     variant: {
       control: 'select',
       options: ['bordered', 'borderless', 'ghost'],
-      description: 'Stroke and fill treatment',
+      description: 'Stroke and fill treatment.',
     },
     type: {
       control: 'select',
       options: ['text', 'email', 'password', 'number', 'search', 'tel', 'url'],
-      description: 'Native input type',
+      description: 'Native input type.',
     },
     disabled: {
       control: 'boolean',
-      description: 'Prevents interaction',
+      description: 'Prevents interaction.',
     },
     placeholder: {
       control: 'text',
-      description: 'Hint text shown while the field is empty',
+      description: 'Hint text shown while the field is empty.',
     },
   },
 };
@@ -401,7 +401,7 @@ export const ReadOnlyVsDisabled: Story = {
     docs: {
       description: {
         story:
-          'A read-only field stays focusable and submits with the form, while a disabled field does neither.',
+          'A read-only field stays focusable and submits with the form. A disabled field does neither. Read-only looks editable, so add helper text.',
       },
     },
   },
@@ -463,7 +463,7 @@ export const WarningVsError: Story = {
     docs: {
       description: {
         story:
-          'A warning never sets `aria-invalid`, while an error sets it and links its error message.',
+          "Don't set `aria-invalid` for a warning. For an error, set it and link the error message.",
       },
     },
   },

@@ -33,8 +33,6 @@ const toggleVariants = cva(
 );
 
 /**
- * ToggleProps
- *
  * Props for Toggle.
  */
 interface ToggleProps
@@ -43,8 +41,6 @@ interface ToggleProps
     VariantProps<typeof toggleVariants> {}
 
 /**
- * Toggle
- *
  * Button that stays on or off, such as Bold. For a set of related toggles, use
  * `ToggleGroup`.
  *

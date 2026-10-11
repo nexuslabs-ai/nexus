@@ -30,8 +30,6 @@ const textareaVariants = cva(
 );
 
 /**
- * TextareaProps
- *
  * Props for Textarea.
  */
 interface TextareaProps
@@ -40,8 +38,6 @@ interface TextareaProps
     VariantProps<typeof textareaVariants> {}
 
 /**
- * Textarea
- *
  * Multi-line text field styled like Input. Set the starting height with `rows`.
  * Set `variant="borderless"` to drop the border and keep a tinted fill.
  *

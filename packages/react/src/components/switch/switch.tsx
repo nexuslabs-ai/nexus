@@ -51,8 +51,6 @@ const switchThumbVariants = cva(
 );
 
 /**
- * SwitchProps
- *
  * Props for Switch.
  */
 interface SwitchProps
@@ -61,8 +59,6 @@ interface SwitchProps
     VariantProps<typeof switchVariants> {}
 
 /**
- * Switch
- *
  * On/off control for settings that apply at once, with no save step. Pair it
  * with a label so the label text is clickable too.
  *

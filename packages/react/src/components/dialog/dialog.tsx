@@ -24,8 +24,6 @@ const DialogLayoutContext =
   React.createContext<DialogLayoutContextValue>(defaultOverlayLayout);
 
 /**
- * Dialog
- *
  * Root component for the dialog. Holds the open state.
  *
  * @example
@@ -52,22 +50,16 @@ const DialogLayoutContext =
 const Dialog = DialogPrimitive.Root;
 
 /**
- * DialogTrigger
- *
  * Opens the dialog. Use `asChild` to render your own button.
  */
 const DialogTrigger = DialogPrimitive.Trigger;
 
 /**
- * DialogPortal
- *
  * Renders the dialog content into `document.body`.
  */
 const DialogPortal = DialogPrimitive.Portal;
 
 /**
- * DialogClose
- *
  * Closes the dialog. Use `asChild` to render your own button.
  */
 const DialogClose = DialogPrimitive.Close;
@@ -82,8 +74,6 @@ interface DialogOverlayProps extends React.ComponentProps<
 > {}
 
 /**
- * DialogOverlay
- *
  * Semi-transparent backdrop behind the dialog.
  */
 function DialogOverlay({ className, ...props }: DialogOverlayProps) {
@@ -112,9 +102,8 @@ interface DialogContentProps extends Omit<
   showCloseButton?: boolean;
 
   /**
-   * Title for a generated header, rendered before `children`. Ignored when a
-   * `DialogHeader` is a direct child or inside a Fragment. A header nested
-   * deeper isn't detected.
+   * Title for a generated header. Ignored when `DialogHeader` is a direct
+   * child or inside a Fragment.
    */
   title?: React.ReactNode;
 
@@ -132,8 +121,6 @@ interface DialogContentProps extends Omit<
 }
 
 /**
- * DialogContent
- *
  * The dialog panel. Renders in a portal above an overlay.
  *
  * @example
@@ -207,9 +194,8 @@ function DialogContent({
 interface DialogHeaderProps extends React.ComponentProps<'div'> {}
 
 /**
- * DialogHeader
- *
- * Holds the dialog title and description.
+ * Holds the dialog title and description. If `DialogContent` also gets a
+ * `title`, keep DialogHeader a direct child so only one header renders.
  *
  * @example
  * ```tsx
@@ -243,8 +229,6 @@ function DialogHeader({ className, ...props }: DialogHeaderProps) {
 interface DialogBodyProps extends React.ComponentProps<'div'> {}
 
 /**
- * DialogBody
- *
  * Holds the dialog's main content. Scrolls when the content overflows.
  *
  * @example
@@ -275,8 +259,6 @@ function DialogBody({ className, ...props }: DialogBodyProps) {
 interface DialogFooterProps extends React.ComponentProps<'div'> {}
 
 /**
- * DialogFooter
- *
  * Holds the dialog's action buttons. Stacks them on narrow screens and lines
  * them up in a row from the `sm` breakpoint.
  *
@@ -314,8 +296,6 @@ interface DialogTitleProps extends React.ComponentProps<
 > {}
 
 /**
- * DialogTitle
- *
  * The dialog's title. Place it inside DialogHeader.
  *
  * @example
@@ -343,8 +323,6 @@ interface DialogDescriptionProps extends React.ComponentProps<
 > {}
 
 /**
- * DialogDescription
- *
  * Supporting text that explains the dialog.
  *
  * @example

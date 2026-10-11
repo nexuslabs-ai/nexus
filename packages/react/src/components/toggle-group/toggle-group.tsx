@@ -17,8 +17,6 @@ const ToggleGroupContext = React.createContext<
 });
 
 /**
- * ToggleGroupProps
- *
  * Props for ToggleGroup.
  */
 // A `type` intersection (not an `interface extends`) because Radix's
@@ -36,8 +34,6 @@ type ToggleGroupProps = React.ComponentProps<typeof ToggleGroupPrimitive.Root> &
   };
 
 /**
- * ToggleGroup
- *
  * Set of related toggles that share `variant` and `size`. `type="single"` allows
  * one pressed item, which users can clear. `type="multiple"` allows several.
  *
@@ -107,8 +103,6 @@ const joinedItem = {
 } as const;
 
 /**
- * ToggleGroupItemProps
- *
  * Props for ToggleGroupItem.
  */
 interface ToggleGroupItemProps
@@ -117,8 +111,6 @@ interface ToggleGroupItemProps
     VariantProps<typeof toggleVariants> {}
 
 /**
- * ToggleGroupItem
- *
  * One toggle in a `ToggleGroup`. Takes `variant` and `size` from the group
  * unless set on the item.
  */

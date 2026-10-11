@@ -140,8 +140,6 @@ type DatePickerProps = React.ComponentProps<typeof DayPicker> & {
 };
 
 /**
- * DatePicker
- *
  * A calendar grid for picking one date, a range or several dates. Install
  * `react-day-picker` in your app first.
  *
@@ -281,8 +279,6 @@ function DatePicker({
 }
 
 /**
- * DatePickerDayButton
- *
  * The button for each day. Exposes selected and range state as `data-*`
  * attributes.
  */

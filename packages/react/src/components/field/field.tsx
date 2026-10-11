@@ -7,8 +7,6 @@ import { Label } from '../label';
 import { Separator } from '../separator';
 
 /**
- * FieldSet
- *
  * A `<fieldset>` that groups related fields. Add a `FieldLegend` as its caption.
  */
 function FieldSet({ className, ...props }: React.ComponentProps<'fieldset'>) {
@@ -39,8 +37,6 @@ interface FieldLegendProps extends React.ComponentProps<'legend'> {
 }
 
 /**
- * FieldLegend
- *
  * The caption for a `FieldSet`.
  */
 function FieldLegend({
@@ -62,8 +58,6 @@ function FieldLegend({
 }
 
 /**
- * FieldGroup
- *
  * A vertical stack of `Field`s. A `Field` with `responsive` orientation adapts
  * to this group's width.
  */
@@ -107,8 +101,6 @@ interface FieldProps
   extends React.ComponentProps<'div'>, VariantProps<typeof fieldVariants> {}
 
 /**
- * Field
- *
  * Lays out a label, control, description and error as one field. Works with
  * any form library.
  *
@@ -134,8 +126,6 @@ function Field({ className, orientation = 'vertical', ...props }: FieldProps) {
 }
 
 /**
- * FieldContent
- *
  * Wraps a label and description that sit beside the control, as in horizontal
  * and checkbox-card layouts.
  */
@@ -153,8 +143,6 @@ function FieldContent({ className, ...props }: React.ComponentProps<'div'>) {
 }
 
 /**
- * FieldLabel
- *
  * A field's label, built on `Label`.
  *
  * - For a simple inline label, use `Label`.
@@ -209,8 +197,6 @@ type FieldRequiredIndicatorProps = Omit<
 };
 
 /**
- * FieldRequiredIndicator
- *
  * Marks a field as required with `*`, or as optional with `fallback` text.
  * Screen readers skip the `*`, so set `required` or `aria-required` on the
  * control.
@@ -240,8 +226,6 @@ function FieldRequiredIndicator({
 }
 
 /**
- * FieldTitle
- *
  * A title for a field group or card that is not tied to one control. Renders a
  * `div`, not a `<label>`.
  */
@@ -259,8 +243,6 @@ function FieldTitle({ className, ...props }: React.ComponentProps<'div'>) {
 }
 
 /**
- * FieldDescription
- *
  * Helper text under a field's control.
  */
 function FieldDescription({ className, ...props }: React.ComponentProps<'p'>) {
@@ -278,8 +260,6 @@ function FieldDescription({ className, ...props }: React.ComponentProps<'p'>) {
 }
 
 /**
- * FieldSeparator
- *
  * A divider between fields, with optional centered content such as "OR".
  */
 function FieldSeparator({
@@ -324,8 +304,6 @@ interface FieldErrorProps extends React.ComponentProps<'div'> {
 }
 
 /**
- * FieldError
- *
  * The error message for a field. Renders nothing when there is no error.
  */
 function FieldError({

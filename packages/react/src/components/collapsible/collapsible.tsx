@@ -14,8 +14,6 @@ interface CollapsibleProps extends React.ComponentProps<
 > {}
 
 /**
- * Collapsible
- *
  * Shows and hides one content region. The trigger toggles the content open
  * and closed.
  *
@@ -43,8 +41,6 @@ interface CollapsibleTriggerProps extends React.ComponentProps<
 > {}
 
 /**
- * CollapsibleTrigger
- *
  * Toggles the collapsible. It has no styles, so wrap a `Button` with
  * `asChild` to give it an appearance.
  */
@@ -67,8 +63,6 @@ interface CollapsibleContentProps extends React.ComponentProps<
 > {}
 
 /**
- * CollapsibleContent
- *
  * The region shown while the collapsible is open. Its height animates open and
  * closed.
  *

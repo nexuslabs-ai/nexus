@@ -39,7 +39,7 @@ const meta: Meta<typeof Message> = {
     docs: {
       description: {
         component:
-          'Message lays out one conversation turn, with an avatar, a header, a body and a footer. Use it for chat and assistant threads, with Bubble or Attachment as the body. Message holds no chat state, so your app owns the messages and scrolling.',
+          'Message lays out one conversation turn, with an avatar, a header, a body and a footer. Use it for chat and assistant threads, with Bubble or Attachment as the body. Message holds no chat state, so your app owns the messages and MessageScroller handles scrolling.',
       },
     },
   },

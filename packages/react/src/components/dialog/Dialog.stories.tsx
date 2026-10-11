@@ -268,7 +268,7 @@ export const ViewportBoundContent: Story = {
     docs: {
       description: {
         story:
-          'Check on a narrow viewport that long DialogBody content scrolls while the close button stays pinned.',
+          'Manual check: on a narrow viewport, long DialogBody content scrolls while the close button stays pinned.',
       },
     },
   },

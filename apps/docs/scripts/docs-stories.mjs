@@ -91,6 +91,14 @@ function propertiesOf(object, where) {
 }
 
 /**
+ * @param {ts.Node} node
+ * @returns {node is ts.StringLiteral | ts.NoSubstitutionTemplateLiteral}
+ */
+function isPlainString(node) {
+  return ts.isStringLiteral(node) || ts.isNoSubstitutionTemplateLiteral(node);
+}
+
+/**
  * `['a', 'b'].join(' ')` as its value, or null for any other expression.
  * @param {ts.Node} node
  * @returns {string | null}
@@ -104,46 +112,42 @@ function joinedStrings(node) {
   const array = unwrap(callee.expression);
   const [separator] = node.arguments;
   if (!array || !ts.isArrayLiteralExpression(array)) return null;
-  if (!separator || !ts.isStringLiteral(separator)) return null;
-  if (!array.elements.every(ts.isStringLiteral)) return null;
+  if (!separator || !isPlainString(separator)) return null;
+  if (!array.elements.every(isPlainString)) return null;
   return array.elements.map((element) => element.text).join(separator.text);
 }
 
 /**
  * `parameters.docs.description[kind]` on a meta or story, or null when unset.
+ * Throws when a step on that path is not written inline.
  * @param {ts.ObjectLiteralExpression} object
  * @param {'component' | 'story'} kind
  * @param {string} where
  * @returns {string | null}
  */
 function docsDescription(object, kind, where) {
-  let current = /** @type {ts.Node | undefined} */ (object);
-  for (const key of ['parameters', 'docs', 'description', kind]) {
-    current = unwrap(current);
-    if (!current || !ts.isObjectLiteralExpression(current)) return null;
-    const property = current.properties.find(
-      (candidate) =>
-        ts.isPropertyAssignment(candidate) &&
-        propertyKey(candidate.name) === key
-    );
-    current =
-      property && ts.isPropertyAssignment(property)
-        ? property.initializer
-        : undefined;
-  }
-  current = unwrap(current);
-  if (!current) return null;
-  if (
-    ts.isStringLiteral(current) ||
-    ts.isNoSubstitutionTemplateLiteral(current)
-  ) {
-    return current.text;
-  }
-  const joined = joinedStrings(current);
-  if (joined !== null) return joined;
-  throw new Error(
-    `${where} its \`docs.description.${kind}\` is not a string literal or a \`[…].join(…)\` of them.`
+  const notInline = new Error(
+    `${where} its \`parameters.docs.description.${kind}\` is not written inline — use object literals, without spreads or shorthand, down to a string literal or a \`[…].join(…)\` of them.`
   );
+  /** @type {ts.Node | undefined} */
+  let current = object;
+  for (const key of ['parameters', 'docs', 'description', kind]) {
+    const level = unwrap(current);
+    if (!level || !ts.isObjectLiteralExpression(level)) throw notInline;
+    if (level.properties.some(ts.isSpreadAssignment)) throw notInline;
+    const property = level.properties.find(
+      (candidate) =>
+        !ts.isSpreadAssignment(candidate) && propertyKey(candidate.name) === key
+    );
+    if (!property) return null;
+    if (!ts.isPropertyAssignment(property)) throw notInline;
+    current = property.initializer;
+  }
+  const value = /** @type {ts.Node} */ (unwrap(current));
+  if (isPlainString(value)) return value.text;
+  const joined = joinedStrings(value);
+  if (joined !== null) return joined;
+  throw notInline;
 }
 
 /** @param {ts.BindingName} name */
@@ -304,6 +308,30 @@ export function readDocsStories(slug, files) {
   });
 }
 
+/**
+ * The page description for `slug`: the meta's `docs.description.component` in
+ * `{Slug}.stories.tsx`, else in the first of `files` that has one.
+ * @param {string} slug
+ * @param {string[]} files
+ * @returns {string | null}
+ */
+export function componentDescription(slug, files) {
+  const ownName = `${pascal(slug)}.stories.tsx`;
+  const own = files.find((filePath) => path.basename(filePath) === ownName);
+  const ordered = own
+    ? [own, ...files.filter((filePath) => filePath !== own)]
+    : files;
+  for (const filePath of ordered) {
+    const description = docsDescription(
+      parseStoriesFile(filePath).meta,
+      'component',
+      `${toRepoPath(filePath)}: the meta describes the ${slug} page, but`
+    );
+    if (description !== null) return description;
+  }
+  return null;
+}
+
 /** `DefaultOpen` → `default-open`. */
 function kebab(name) {
   return name
@@ -377,10 +405,7 @@ const ESCAPE_IN_JSX_TEXT = /[{}<>&]/;
 function attributeText(name, value, file) {
   if (isDropped(value, file)) return '';
   const node = /** @type {ts.Node} */ (unwrap(value));
-  if (
-    (ts.isStringLiteral(node) || ts.isNoSubstitutionTemplateLiteral(node)) &&
-    !ESCAPE_IN_JSX_STRING.test(node.text)
-  ) {
+  if (isPlainString(node) && !ESCAPE_IN_JSX_STRING.test(node.text)) {
     return `${name}="${node.text}"`;
   }
   if (node.kind === ts.SyntaxKind.TrueKeyword) return name;
@@ -394,10 +419,7 @@ function attributeText(name, value, file) {
 function childText(value, file) {
   if (isDropped(value, file)) return '';
   const node = /** @type {ts.Node} */ (unwrap(value));
-  if (
-    (ts.isStringLiteral(node) || ts.isNoSubstitutionTemplateLiteral(node)) &&
-    !ESCAPE_IN_JSX_TEXT.test(node.text)
-  ) {
+  if (isPlainString(node) && !ESCAPE_IN_JSX_TEXT.test(node.text)) {
     return node.text;
   }
   if (ts.isJsxElement(node) || ts.isJsxSelfClosingElement(node)) {
@@ -1077,7 +1099,6 @@ export async function docsStoryModule(story, formatOptions) {
     id: docsStoryId(story),
     title: docsStoryTitle(story),
     description: docsDescription(story.object, 'story', where),
-    componentDescription: docsDescription(file.meta, 'component', where),
     source: await prettier.format(withoutTestIds(source), {
       ...formatOptions,
       filepath: `${story.name}.tsx`,

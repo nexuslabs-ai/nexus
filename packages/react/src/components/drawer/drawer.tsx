@@ -9,8 +9,6 @@ import {
 } from '../overlay-layout/overlay-layout';
 
 /**
- * Drawer
- *
  * Root for a drawer that slides in from a screen edge and drags to dismiss.
  * Install `vaul` in your app first.
  *
@@ -37,22 +35,16 @@ import {
 const Drawer = DrawerPrimitive.Root;
 
 /**
- * DrawerTrigger
- *
  * Opens the drawer. Use `asChild` to render your own button.
  */
 const DrawerTrigger = DrawerPrimitive.Trigger;
 
 /**
- * DrawerPortal
- *
  * Renders the drawer content into `document.body`.
  */
 const DrawerPortal = DrawerPrimitive.Portal;
 
 /**
- * DrawerClose
- *
  * Closes the drawer. Use `asChild` to render your own button.
  */
 const DrawerClose = DrawerPrimitive.Close;
@@ -67,8 +59,6 @@ interface DrawerOverlayProps extends React.ComponentProps<
 > {}
 
 /**
- * DrawerOverlay
- *
  * Semi-transparent backdrop behind the drawer.
  */
 function DrawerOverlay({ className, ...props }: DrawerOverlayProps) {
@@ -104,8 +94,6 @@ interface DrawerContentProps extends React.ComponentProps<
 }
 
 /**
- * DrawerContent
- *
  * The sliding panel. Renders in a portal above an overlay. Set `direction` on
  * the root to pick the edge, which is `bottom` by default.
  */
@@ -150,8 +138,6 @@ function DrawerContent({
 interface DrawerHeaderProps extends React.ComponentProps<'div'> {}
 
 /**
- * DrawerHeader
- *
  * Holds the drawer title and description.
  */
 function DrawerHeader({ className, ...props }: DrawerHeaderProps) {
@@ -175,8 +161,6 @@ function DrawerHeader({ className, ...props }: DrawerHeaderProps) {
 interface DrawerBodyProps extends React.ComponentProps<'div'> {}
 
 /**
- * DrawerBody
- *
  * Holds the drawer's main content between the header and footer. Scrolls when
  * the content overflows.
  */
@@ -201,8 +185,6 @@ function DrawerBody({ className, ...props }: DrawerBodyProps) {
 interface DrawerFooterProps extends React.ComponentProps<'div'> {}
 
 /**
- * DrawerFooter
- *
  * Holds the drawer's action buttons at the bottom of the panel.
  */
 function DrawerFooter({ className, ...props }: DrawerFooterProps) {
@@ -228,8 +210,6 @@ interface DrawerTitleProps extends React.ComponentProps<
 > {}
 
 /**
- * DrawerTitle
- *
  * The drawer's title. Required, because screen readers use it to name the
  * drawer.
  */
@@ -253,8 +233,6 @@ interface DrawerDescriptionProps extends React.ComponentProps<
 > {}
 
 /**
- * DrawerDescription
- *
  * Supporting text that explains the drawer.
  */
 function DrawerDescription({ className, ...props }: DrawerDescriptionProps) {

@@ -166,7 +166,7 @@ interface BadgeProps
   isCaps?: boolean;
 
   /**
-   * Renders a round count badge. Pass the number as children.
+   * Renders a round count badge from its children and ignores icons.
    * Add an `aria-label` such as "8 unread", because a bare number lacks context.
    * @default false
    * @example
@@ -178,8 +178,7 @@ interface BadgeProps
   isNumber?: boolean;
 
   /**
-   * Icon before the label, sized to 14px. Without children, the badge is icon-only.
-   * Ignored with `isNumber`.
+   * Icon before the label, sized to 14px. Without children, it shows alone.
    * @example
    * ```tsx
    * <Badge leftIcon={<IconCheck />}>Verified</Badge>
@@ -188,8 +187,7 @@ interface BadgeProps
   leftIcon?: React.ReactNode;
 
   /**
-   * Icon after the label, sized to 14px. Without children or `leftIcon`, the badge is icon-only.
-   * Ignored with `isNumber`.
+   * Icon after the label, sized to 14px. Without children or `leftIcon`, it shows alone.
    * @example
    * ```tsx
    * <Badge rightIcon={<IconX />}>Dismiss</Badge>

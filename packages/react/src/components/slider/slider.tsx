@@ -89,8 +89,6 @@ function isRangeBoundary(value: number | undefined, boundary: number) {
 }
 
 /**
- * SliderProps
- *
  * Props for Slider.
  */
 interface SliderProps extends React.ComponentProps<
@@ -121,8 +119,6 @@ interface SliderProps extends React.ComponentProps<
 }
 
 /**
- * Slider
- *
  * Picks a value or a range. Renders one thumb per value, so `[50]` gives one
  * thumb and `[25, 75]` gives a range.
  *

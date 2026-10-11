@@ -70,8 +70,6 @@ const toasterThemeVars = {
 };
 
 /**
- * Toaster
- *
  * Renders toast notifications. Mount it once near your app root, then call
  * `toast()` from anywhere. It follows the `.dark` class for dark mode.
  *

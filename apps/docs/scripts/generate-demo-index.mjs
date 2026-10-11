@@ -12,6 +12,7 @@ import path from 'node:path';
 
 import { componentUsage, entryUsage } from './component-usage.mjs';
 import {
+  componentDescription,
   componentStoryFiles,
   DOCS_TAG,
   docsStoryModule,
@@ -160,7 +161,6 @@ export function getBlockDocs(slug: string): BlockDocs {
  * @property {string} slug The component the story belongs to.
  * @property {string} title The example's heading.
  * @property {string | null} description The example's caption.
- * @property {string | null} componentDescription Its stories meta's description.
  * @property {string} source The generated module's full contents.
  * @property {string[]} alsoInstall Install blocks it needs beyond its component's.
  * @property {string[]} packages `name@range` packages none of its blocks install.
@@ -425,8 +425,10 @@ async function collectDemos(exported) {
     }
     for (const story of stories) {
       try {
-        const { id, title, description, componentDescription, source } =
-          await docsStoryModule(story, formatOptions);
+        const { id, title, description, source } = await docsStoryModule(
+          story,
+          formatOptions
+        );
         const specifiers = importSpecifiers(source);
         const { own, extra } = installSlugsFor(id, specifiers, installBlocks);
         const packages = demoPackages(
@@ -440,7 +442,6 @@ async function collectDemos(exported) {
           slug,
           title,
           description,
-          componentDescription,
           source,
           alsoInstall: extra,
           packages,
@@ -455,14 +456,15 @@ async function collectDemos(exported) {
   for (const block of blockSources()) {
     try {
       const [story] = blockDocsStories(block);
-      const { id, title, description, componentDescription, source } =
-        await docsStoryModule(story, formatOptions);
+      const { id, title, description, source } = await docsStoryModule(
+        story,
+        formatOptions
+      );
       demos.push({
         id,
         slug: block.slug,
         title,
         description,
-        componentDescription,
         source,
         alsoInstall: [],
         packages: [],
@@ -514,7 +516,7 @@ function sharedIds(demos) {
 /**
  * A page without a preview: Usage from every part the component exports.
  * @param {string} slug
- * @returns {ComponentDocs}
+ * @returns {Omit<ComponentDocs, 'description'>}
  */
 function previewlessDocs(slug) {
   const propsFile = path.join(PROPS_DIR, `${slug}.json`);
@@ -525,7 +527,6 @@ function previewlessDocs(slug) {
   }
   const { components } = JSON.parse(readCanonical(propsFile));
   return {
-    description: null,
     preview: null,
     examples: [],
     imports: entryUsage(components),
@@ -544,8 +545,9 @@ function previewlessDocs(slug) {
 function collectComponentDocs(exported, demos) {
   return new Map(
     exported.map((slug) => {
+      const description = componentDescription(slug, componentStoryFiles(slug));
       if (PREVIEWLESS_COMPONENTS.has(slug)) {
-        return [slug, previewlessDocs(slug)];
+        return [slug, { description, ...previewlessDocs(slug) }];
       }
       const own = demos.filter((demo) => demo.slug === slug);
       const [preview, ...examples] = own.map((demo) => demo.id);
@@ -556,7 +558,7 @@ function collectComponentDocs(exported, demos) {
       return [
         slug,
         {
-          description: own[0].componentDescription,
+          description,
           preview,
           examples,
           ...componentUsage(slug, sources),
@@ -627,7 +629,7 @@ function collectBlockDocs(demos) {
       return [
         block.slug,
         {
-          description: preview.componentDescription,
+          description: componentDescription(block.slug, [block.stories]),
           preview: preview.id,
           ...blockFiles(block),
         },

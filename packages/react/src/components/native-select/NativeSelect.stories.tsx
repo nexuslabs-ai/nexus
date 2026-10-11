@@ -16,7 +16,7 @@ const meta: Meta<typeof NativeSelect> = {
     docs: {
       description: {
         component:
-          'NativeSelect styles the browser `<select>`, so mobile users get the system picker. Use it for dense forms and long, plain lists. For options with icons or descriptions, use Select.',
+          'NativeSelect styles the browser `<select>`, so mobile users get the system picker. Use it for dense forms and long, plain lists. For a styled dropdown use Select, and for search use Combobox.',
       },
     },
   },
@@ -235,7 +235,7 @@ export const ReadOnlyBoundary: Story = {
     docs: {
       description: {
         story:
-          '`<select>` has no read-only state. Use `disabled` for an unavailable select. If a locked value must still submit with the form, show it as text with a hidden input.',
+          '`<select>` has no read-only state, so use `disabled`, or show a locked value as text with a hidden input if it must submit.',
       },
     },
   },

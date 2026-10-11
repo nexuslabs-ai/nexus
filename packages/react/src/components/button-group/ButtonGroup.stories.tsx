@@ -435,7 +435,7 @@ export const TierAPolishEvidence: Story = {
     docs: {
       description: {
         story:
-          'A group with an addon link, loading and disabled buttons, next to a small vertical group.',
+          'Mix an addon link with loading and disabled buttons in one group, beside a small vertical group.',
       },
     },
   },

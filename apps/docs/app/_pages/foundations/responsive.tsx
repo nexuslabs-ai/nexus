@@ -76,9 +76,10 @@ export default function Responsive() {
       <h1 className="nx:typography-heading-large">Responsive</h1>
       <p className="nx:typography-body-default nx:text-muted-foreground nx:mt-2 nx:mb-8 nx:max-w-[64ch]">
         Nexus is built for mobile and desktop equally. Write the mobile styles
-        first, without a prefix, then add wider screens with <code>nx:lg:</code>{' '}
-        and up. Breakpoints are in rem, so a user who enlarges their browser
-        font size gets the roomier layout sooner.
+        first, without a prefix, then add styles for wider screens with{' '}
+        <code>nx:sm:</code>, <code>nx:md:</code>, <code>nx:lg:</code> and up.
+        Breakpoints are in rem, so a user who enlarges their browser font size
+        gets the roomier layout at a narrower window width.
       </p>
 
       {/* ── Breakpoints ─────────────────────────────────────── */}
@@ -138,6 +139,8 @@ export default function Responsive() {
           content at some widths only. Pass one prop: <code>above</code> or{' '}
           <code>below</code> for the viewport, or <code>containerAbove</code> or{' '}
           <code>containerBelow</code> for the nearest <code>@container</code>.
+        </p>
+        <p className="nx:typography-body-default nx:text-muted-foreground nx:mb-4 nx:max-w-[64ch]">
           The children always render. Only their visibility changes.
         </p>
         <p className="nx:typography-body-default nx:text-muted-foreground nx:mb-4 nx:max-w-[64ch]">

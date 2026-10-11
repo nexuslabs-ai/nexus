@@ -4,8 +4,6 @@ import { IconGripVertical } from '../../lib/icons';
 import { cn } from '../../lib/utils';
 
 /**
- * ResizablePanelGroup
- *
  * Holds a set of resizable panels. `orientation` sets the split axis.
  * Install the optional peer dependency `react-resizable-panels` in your app.
  *
@@ -32,8 +30,6 @@ function ResizablePanelGroup({
 }
 
 /**
- * ResizablePanel
- *
  * One panel inside a `ResizablePanelGroup`.
  */
 function ResizablePanel({ ...props }: ResizablePrimitive.PanelProps) {
@@ -41,8 +37,6 @@ function ResizablePanel({ ...props }: ResizablePrimitive.PanelProps) {
 }
 
 /**
- * ResizableHandle
- *
  * Divider between two panels, resized by drag or keyboard. Give each handle an
  * `aria-label`.
  */

@@ -45,13 +45,11 @@ interface InputProps
     VariantProps<typeof inputVariants> {}
 
 /**
- * Input
- *
  * A one-line text field. Accepts every native input attribute.
  *
  * - `bordered` has a stroke and a fill.
  * - `borderless` drops the stroke and keeps a tonal fill.
- * - `ghost` has no stroke or fill until hover, focus or an invalid value.
+ * - `ghost` has no fill. Its stroke shows only on hover, focus or an invalid value.
  *
  * Browsers repaint autofilled fields with their own colors. On a custom
  * surface, pair each `bg-*` or `text-*` class with its `autofill-bg-*` or

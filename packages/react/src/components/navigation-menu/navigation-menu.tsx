@@ -13,8 +13,6 @@ import {
 } from '../overlay-layout/overlay-layout';
 
 /**
- * NavigationMenuProps
- *
  * Props for the NavigationMenu component.
  */
 interface NavigationMenuProps extends React.ComponentProps<
@@ -29,8 +27,6 @@ interface NavigationMenuProps extends React.ComponentProps<
 }
 
 /**
- * NavigationMenu
- *
  * Top-level site navigation with flyout panels. Flyouts adapt to the width
  * of the menu, not the viewport.
  *
@@ -69,8 +65,6 @@ function NavigationMenu({
 }
 
 /**
- * NavigationMenuListProps
- *
  * Props for the NavigationMenuList component.
  */
 interface NavigationMenuListProps extends React.ComponentProps<
@@ -78,8 +72,6 @@ interface NavigationMenuListProps extends React.ComponentProps<
 > {}
 
 /**
- * NavigationMenuList
- *
  * Horizontal list of top-level navigation items.
  */
 function NavigationMenuList({ className, ...props }: NavigationMenuListProps) {
@@ -96,8 +88,6 @@ function NavigationMenuList({ className, ...props }: NavigationMenuListProps) {
 }
 
 /**
- * NavigationMenuItemProps
- *
  * Props for the NavigationMenuItem component.
  */
 interface NavigationMenuItemProps extends React.ComponentProps<
@@ -105,8 +95,6 @@ interface NavigationMenuItemProps extends React.ComponentProps<
 > {}
 
 /**
- * NavigationMenuItem
- *
  * One top-level navigation item, with its trigger and content.
  */
 function NavigationMenuItem({ className, ...props }: NavigationMenuItemProps) {
@@ -124,8 +112,6 @@ const navigationMenuTriggerStyle = cva(
 );
 
 /**
- * NavigationMenuTriggerProps
- *
  * Props for the NavigationMenuTrigger component.
  */
 interface NavigationMenuTriggerProps extends React.ComponentProps<
@@ -133,8 +119,6 @@ interface NavigationMenuTriggerProps extends React.ComponentProps<
 > {}
 
 /**
- * NavigationMenuTrigger
- *
  * Button that opens the item's flyout. Its chevron turns while open.
  */
 function NavigationMenuTrigger({
@@ -158,8 +142,6 @@ function NavigationMenuTrigger({
 }
 
 /**
- * NavigationMenuContentProps
- *
  * Props for the NavigationMenuContent component.
  */
 interface NavigationMenuContentProps extends React.ComponentProps<
@@ -167,8 +149,6 @@ interface NavigationMenuContentProps extends React.ComponentProps<
 > {}
 
 /**
- * NavigationMenuContent
- *
  * Flyout panel for a navigation item. Stacks at full width in a narrow menu
  * and floats over the page in a wider one.
  */
@@ -200,8 +180,6 @@ function NavigationMenuContent({
 }
 
 /**
- * NavigationMenuViewportProps
- *
  * Props for the NavigationMenuViewport component.
  */
 interface NavigationMenuViewportProps extends React.ComponentProps<
@@ -209,8 +187,6 @@ interface NavigationMenuViewportProps extends React.ComponentProps<
 > {}
 
 /**
- * NavigationMenuViewport
- *
  * Shared panel that shows the open item's content. Fits the content in a
  * wide menu and spans the full width in a narrow one.
  */
@@ -236,8 +212,6 @@ function NavigationMenuViewport({
 }
 
 /**
- * NavigationMenuLinkProps
- *
  * Props for the NavigationMenuLink component.
  */
 interface NavigationMenuLinkProps extends React.ComponentProps<
@@ -245,8 +219,6 @@ interface NavigationMenuLinkProps extends React.ComponentProps<
 > {}
 
 /**
- * NavigationMenuLink
- *
  * Link inside a flyout panel.
  */
 function NavigationMenuLink({ className, ...props }: NavigationMenuLinkProps) {
@@ -267,8 +239,6 @@ function NavigationMenuLink({ className, ...props }: NavigationMenuLinkProps) {
 }
 
 /**
- * NavigationMenuIndicatorProps
- *
  * Props for the NavigationMenuIndicator component.
  */
 interface NavigationMenuIndicatorProps extends React.ComponentProps<
@@ -276,8 +246,6 @@ interface NavigationMenuIndicatorProps extends React.ComponentProps<
 > {}
 
 /**
- * NavigationMenuIndicator
- *
  * Small arrow from the open trigger to its flyout.
  */
 function NavigationMenuIndicator({

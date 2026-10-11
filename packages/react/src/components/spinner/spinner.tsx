@@ -4,17 +4,13 @@ import { IconLoader2 } from '../../lib/icons';
 import { cn } from '../../lib/utils';
 
 /**
- * SpinnerProps
- *
  * Props for Spinner.
  */
 interface SpinnerProps extends React.ComponentProps<'svg'> {}
 
 /**
- * Spinner
- *
- * Rotating loading indicator with `role="status"` and an `aria-label` of
- * "Loading". Size it with `nx:size-*` and color it with `nx:text-*`.
+ * Rotating loading indicator with `role="status"` and a default `aria-label`
+ * of "Loading". Size it with `nx:size-*` and color it with `nx:text-*`.
  *
  * @example
  * ```tsx

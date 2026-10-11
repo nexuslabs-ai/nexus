@@ -61,10 +61,10 @@ export default function Spacing() {
     <>
       <h1 className="nx:typography-heading-large">Spacing</h1>
       <p className="nx:typography-body-default nx:text-muted-foreground nx:mt-2 nx:mb-8 nx:max-w-[64ch]">
-        Spacing uses a scale of named steps, based on 4px. The density setting
-        scales every <code>nx:p-*</code> and <code>nx:gap-*</code> utility at
-        once. Change Size in the theme picker in the bottom-right corner to see
-        it.
+        Spacing uses a scale of named steps, based on 4px. The{' '}
+        <code>density</code> field scales every <code>nx:p-*</code> and{' '}
+        <code>nx:gap-*</code> utility at once. Change <code>density</code> (Size
+        in the theme picker) to see it.
       </p>
 
       {/* ── The scale ───────────────────────────────────────── */}
@@ -74,8 +74,8 @@ export default function Spacing() {
         </SectionHeading>
         <p className="nx:typography-body-default nx:text-muted-foreground nx:mb-4 nx:max-w-[64ch]">
           Fourteen steps, from 2px to 128px. Each bar uses its{' '}
-          <code>--nx-spacing-N</code> variable, so it resizes with the Size
-          setting. There is no base <code>--spacing</code> token.
+          <code>--nx-spacing-N</code> variable, so it resizes with{' '}
+          <code>density</code>. Nexus has no base <code>--spacing</code> token.
         </p>
         <div className="nx:flex nx:flex-col nx:gap-2">
           {SCALE.map((step) => (
@@ -105,7 +105,7 @@ export default function Spacing() {
         </SectionHeading>
         <p className="nx:typography-body-default nx:text-muted-foreground nx:mb-4 nx:max-w-[64ch]">
           Components use these role tokens, like a button&rsquo;s padding,
-          instead of raw steps. Roles follow the density setting too, so whole
+          instead of raw steps. Roles follow <code>density</code> too, so whole
           components resize. Values are for the <code>default</code> density.
         </p>
         <div className="nx:overflow-x-auto">

@@ -5,15 +5,11 @@ import { Slot } from '@radix-ui/react-slot';
 import { cn } from '../../lib/utils';
 
 /**
- * PageHeaderProps
- *
  * Props for the PageHeader component.
  */
 interface PageHeaderProps extends React.ComponentProps<'header'> {}
 
 /**
- * PageHeader
- *
  * Title block of a page or section, with optional description, metadata and
  * primary actions. Actions sit beside the title and wrap below it when space
  * runs out.
@@ -47,15 +43,11 @@ function PageHeader({ className, ...props }: PageHeaderProps) {
 }
 
 /**
- * PageHeaderContentProps
- *
  * Props for the PageHeaderContent component.
  */
 interface PageHeaderContentProps extends React.ComponentProps<'div'> {}
 
 /**
- * PageHeaderContent
- *
  * Stack of metadata, title and description. Fills the row and keeps a
  * minimum width, so actions wrap below it instead of squeezing it.
  */
@@ -73,15 +65,11 @@ function PageHeaderContent({ className, ...props }: PageHeaderContentProps) {
 }
 
 /**
- * PageHeaderMetaProps
- *
  * Props for the PageHeaderMeta component.
  */
 interface PageHeaderMetaProps extends React.ComponentProps<'p'> {}
 
 /**
- * PageHeaderMeta
- *
  * Short line above the title, such as a record ID or parent project.
  */
 function PageHeaderMeta({ className, ...props }: PageHeaderMetaProps) {
@@ -98,15 +86,11 @@ function PageHeaderMeta({ className, ...props }: PageHeaderMetaProps) {
 }
 
 /**
- * PageHeaderTitleRowProps
- *
  * Props for the PageHeaderTitleRow component.
  */
 interface PageHeaderTitleRowProps extends React.ComponentProps<'div'> {}
 
 /**
- * PageHeaderTitleRow
- *
  * Row that puts a status, such as a Badge, beside the title. The status
  * wraps below the title when space runs out.
  */
@@ -121,8 +105,6 @@ function PageHeaderTitleRow({ className, ...props }: PageHeaderTitleRowProps) {
 }
 
 /**
- * PageHeaderTitleProps
- *
  * Props for the PageHeaderTitle component.
  */
 interface PageHeaderTitleProps extends React.ComponentProps<'h1'> {
@@ -142,8 +124,6 @@ interface PageHeaderTitleProps extends React.ComponentProps<'h1'> {
 }
 
 /**
- * PageHeaderTitle
- *
  * Title of the page or section, rendered as an `h1`. Use `asChild` to change
  * the heading level and `className` to change the size.
  */
@@ -167,15 +147,11 @@ function PageHeaderTitle({
 }
 
 /**
- * PageHeaderDescriptionProps
- *
  * Props for the PageHeaderDescription component.
  */
 interface PageHeaderDescriptionProps extends React.ComponentProps<'p'> {}
 
 /**
- * PageHeaderDescription
- *
  * Supporting text under the title.
  */
 function PageHeaderDescription({
@@ -195,15 +171,11 @@ function PageHeaderDescription({
 }
 
 /**
- * PageHeaderActionsProps
- *
  * Props for the PageHeaderActions component.
  */
 interface PageHeaderActionsProps extends React.ComponentProps<'div'> {}
 
 /**
- * PageHeaderActions
- *
  * Primary actions of the page. Buttons wrap onto more lines when they don't
  * fit.
  */

@@ -24,8 +24,6 @@ function useTableContext() {
 }
 
 /**
- * TableProps
- *
  * Props for Table.
  */
 interface TableProps extends React.ComponentProps<'table'> {
@@ -73,8 +71,6 @@ interface TableProps extends React.ComponentProps<'table'> {
 }
 
 /**
- * Table
- *
  * Data table with a header, body and optional footer. Wide tables scroll
  * sideways inside their own container. `TableRow`s hold `TableHead` or
  * `TableCell` cells.
@@ -139,15 +135,11 @@ function Table({
 }
 
 /**
- * TableHeaderProps
- *
  * Props for TableHeader.
  */
 interface TableHeaderProps extends React.ComponentProps<'thead'> {}
 
 /**
- * TableHeader
- *
  * `<thead>` that holds the column-header rows.
  */
 function TableHeader({ className, ...props }: TableHeaderProps) {
@@ -155,15 +147,11 @@ function TableHeader({ className, ...props }: TableHeaderProps) {
 }
 
 /**
- * TableBodyProps
- *
  * Props for TableBody.
  */
 interface TableBodyProps extends React.ComponentProps<'tbody'> {}
 
 /**
- * TableBody
- *
  * `<tbody>` that holds the data rows.
  */
 function TableBody({ className, ...props }: TableBodyProps) {
@@ -177,8 +165,6 @@ function TableBody({ className, ...props }: TableBodyProps) {
 }
 
 /**
- * TableFooterProps
- *
  * Props for TableFooter.
  */
 interface TableFooterProps extends React.ComponentProps<'tfoot'> {}
@@ -198,8 +184,6 @@ const tableFooterVariants = cva(
 );
 
 /**
- * TableFooter
- *
  * `<tfoot>` for a summary or totals row, on a muted fill.
  */
 function TableFooter({ className, ...props }: TableFooterProps) {
@@ -214,8 +198,6 @@ function TableFooter({ className, ...props }: TableFooterProps) {
 }
 
 /**
- * TableRowProps
- *
  * Props for TableRow.
  */
 interface TableRowProps extends React.ComponentProps<'tr'> {}
@@ -235,8 +217,6 @@ const tableRowVariants = cva(
 );
 
 /**
- * TableRow
- *
  * Table row that highlights on hover. Set `data-state="selected"` to mark it
  * as selected.
  */
@@ -252,8 +232,6 @@ function TableRow({ className, ...props }: TableRowProps) {
 }
 
 /**
- * TableHeadProps
- *
  * Props for TableHead.
  */
 interface TableHeadProps extends React.ComponentProps<'th'> {}
@@ -280,8 +258,6 @@ const tableHeadVariants = cva(
 );
 
 /**
- * TableHead
- *
  * Column-header cell (`<th>`) in muted text.
  */
 function TableHead({ className, ...props }: TableHeadProps) {
@@ -301,8 +277,6 @@ function TableHead({ className, ...props }: TableHeadProps) {
 }
 
 /**
- * TableCellProps
- *
  * Props for TableCell.
  */
 interface TableCellProps extends React.ComponentProps<'td'> {}
@@ -323,8 +297,6 @@ const tableCellVariants = cva('nx:px-2 nx:align-middle nx:whitespace-nowrap', {
 });
 
 /**
- * TableCell
- *
  * Data cell (`<td>`).
  */
 function TableCell({ className, ...props }: TableCellProps) {
@@ -342,15 +314,11 @@ const tableSelectionCellClassName =
   'nx:w-0 nx:pe-0 nx:*:[[role=checkbox]]:translate-y-0.5';
 
 /**
- * TableSelectionHeadProps
- *
  * Props for TableSelectionHead.
  */
 interface TableSelectionHeadProps extends TableHeadProps {}
 
 /**
- * TableSelectionHead
- *
  * First header cell, for your select-all Checkbox. Pair it with a
  * `TableSelectionCell` in each body row.
  */
@@ -365,15 +333,11 @@ function TableSelectionHead({ className, ...props }: TableSelectionHeadProps) {
 }
 
 /**
- * TableSelectionCellProps
- *
  * Props for TableSelectionCell.
  */
 interface TableSelectionCellProps extends TableCellProps {}
 
 /**
- * TableSelectionCell
- *
  * Cell for your row Checkbox. Set the row's `data-state="selected"` from the
  * same selection state.
  */
@@ -388,15 +352,11 @@ function TableSelectionCell({ className, ...props }: TableSelectionCellProps) {
 }
 
 /**
- * TableRowHeaderProps
- *
  * Props for TableRowHeader.
  */
 interface TableRowHeaderProps extends React.ComponentProps<'th'> {}
 
 /**
- * TableRowHeader
- *
  * Cell that names its row, such as an invoice number (`<th scope="row">`).
  * Screen readers use it to announce which row a cell belongs to.
  */
@@ -417,15 +377,11 @@ function TableRowHeader({ className, ...props }: TableRowHeaderProps) {
 }
 
 /**
- * TableCaptionProps
- *
  * Props for TableCaption.
  */
 interface TableCaptionProps extends React.ComponentProps<'caption'> {}
 
 /**
- * TableCaption
- *
  * Caption that describes the table, shown below it.
  */
 function TableCaption({ className, ...props }: TableCaptionProps) {

@@ -34,8 +34,6 @@ const nativeSelectVariants = cva(
 );
 
 /**
- * NativeSelectProps
- *
  * Props for the NativeSelect component.
  */
 interface NativeSelectProps
@@ -44,10 +42,9 @@ interface NativeSelectProps
     VariantProps<typeof nativeSelectVariants> {}
 
 /**
- * NativeSelect
- *
- * Styled native `<select>` that opens the system picker on mobile. For
- * options with icons or descriptions, use `Select`.
+ * Styled native `<select>` that opens the system picker on mobile. Set
+ * `variant="borderless"` to drop the border and keep a tinted fill. For a
+ * styled dropdown, use `Select`. For search, use `Combobox`.
  *
  * @example
  * ```tsx
@@ -85,8 +82,6 @@ function NativeSelect({
 }
 
 /**
- * NativeSelectOption
- *
  * `<option>` for `NativeSelect`. Stays readable in light and dark themes.
  */
 function NativeSelectOption({
@@ -103,8 +98,6 @@ function NativeSelectOption({
 }
 
 /**
- * NativeSelectOptGroup
- *
  * `<optgroup>` for grouping `NativeSelect` options.
  */
 function NativeSelectOptGroup({

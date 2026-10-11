@@ -23,15 +23,14 @@ const markerVariants = cva(
 );
 
 /**
- * MarkerProps
- *
  * Props for the Marker component.
  */
 interface MarkerProps
   extends React.ComponentProps<'div'>, VariantProps<typeof markerVariants> {
   /**
    * Renders the child element, such as a heading, link or button, with Marker
-   * styles. A `disabled` or `aria-disabled` child ignores the pointer and dims.
+   * styles. A link or button child gets hover styles with no extra classes. A
+   * `disabled` or `aria-disabled` child ignores the pointer and dims.
    *
    * @default false
    * @example
@@ -45,10 +44,9 @@ interface MarkerProps
 }
 
 /**
- * Marker
- *
  * Quiet annotation row with an optional icon, for lists, feeds and message
- * streams. For a decorative rule with no label, use `Separator`.
+ * streams. `separator` centers the label between two rules, and `border` adds
+ * a rule underneath. For a decorative rule with no label, use `Separator`.
  *
  * @example
  * ```tsx
@@ -86,15 +84,11 @@ function Marker({
 }
 
 /**
- * MarkerIconProps
- *
  * Props for the MarkerIcon component.
  */
 interface MarkerIconProps extends React.ComponentProps<'span'> {}
 
 /**
- * MarkerIcon
- *
  * Decorative leading icon. Screen readers skip it, so put the meaning in
  * `MarkerContent`.
  */
@@ -113,16 +107,12 @@ function MarkerIcon({ className, ...props }: MarkerIconProps) {
 }
 
 /**
- * MarkerContentProps
- *
  * Props for the MarkerContent component.
  */
 interface MarkerContentProps extends React.ComponentProps<'span'> {}
 
 /**
- * MarkerContent
- *
- * Label text of the Marker. With `variant="separator"`, the text centres
+ * Label text of the Marker. With `variant="separator"`, the text centers
  * between the two rules.
  */
 function MarkerContent({ className, ...props }: MarkerContentProps) {

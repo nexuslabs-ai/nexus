@@ -261,7 +261,7 @@ export const ScrollableContent: Story = {
     docs: {
       description: {
         story:
-          'Long DrawerBody content scrolls, and dragging the handle or frame still dismisses the drawer on touch devices.',
+          'Manual check: on a touch device, scroll DrawerBody, then drag the handle or frame to dismiss the drawer.',
       },
     },
   },

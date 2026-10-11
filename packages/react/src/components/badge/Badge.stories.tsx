@@ -849,7 +849,7 @@ export const AllVariants: Story = {
     layout: 'padded',
     docs: {
       description: {
-        story: 'Compare every variant and fill in caps and sentence case.',
+        story: 'Compare every `variant` and `fill` in caps and sentence case.',
       },
     },
   },

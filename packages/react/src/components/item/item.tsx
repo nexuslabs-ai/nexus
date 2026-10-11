@@ -7,8 +7,6 @@ import { cn } from '../../lib/utils';
 import { Separator } from '../separator';
 
 /**
- * ItemGroup
- *
  * Vertical stack of related `Item`s, divided by `ItemSeparator`. It adds no
  * list role, so add `role="list"` and `role="listitem"` if the group is a list.
  */
@@ -23,8 +21,6 @@ function ItemGroup({ className, ...props }: React.ComponentProps<'div'>) {
 }
 
 /**
- * ItemSeparator
- *
  * Horizontal rule between items in an `ItemGroup`.
  */
 function ItemSeparator({
@@ -63,22 +59,19 @@ const itemVariants = cva(
 );
 
 /**
- * ItemProps
- *
  * Props for the Item component.
  */
 interface ItemProps
   extends React.ComponentProps<'div'>, VariantProps<typeof itemVariants> {
   /**
-   * Renders the child element, such as a link, with the item styling.
+   * Renders the child element, such as a link, with the item styling. A link
+   * child gets hover styles with no extra classes.
    * @default false
    */
   asChild?: boolean;
 }
 
 /**
- * Item
- *
  * Row with media, a title, a description and actions. Build it from
  * `ItemMedia`, `ItemContent`, `ItemTitle`, `ItemDescription` and `ItemActions`.
  *
@@ -136,16 +129,12 @@ const itemMediaVariants = cva(
 );
 
 /**
- * ItemMediaProps
- *
  * Props for the ItemMedia component.
  */
 interface ItemMediaProps
   extends React.ComponentProps<'div'>, VariantProps<typeof itemMediaVariants> {}
 
 /**
- * ItemMedia
- *
  * Leading visual of an item. `icon` adds a muted rounded tile, and `image`
  * crops its `<img>` to a square thumbnail.
  */
@@ -165,15 +154,11 @@ function ItemMedia({
 }
 
 /**
- * ItemContentProps
- *
  * Props for the ItemContent component.
  */
 interface ItemContentProps extends React.ComponentProps<'div'> {}
 
 /**
- * ItemContent
- *
  * Column for the title and description. Grows to fill the row.
  */
 function ItemContent({ className, ...props }: ItemContentProps) {
@@ -193,15 +178,11 @@ function ItemContent({ className, ...props }: ItemContentProps) {
 }
 
 /**
- * ItemTitleProps
- *
  * Props for the ItemTitle component.
  */
 interface ItemTitleProps extends React.ComponentProps<'div'> {}
 
 /**
- * ItemTitle
- *
  * Primary label of the item.
  */
 function ItemTitle({ className, ...props }: ItemTitleProps) {
@@ -218,15 +199,11 @@ function ItemTitle({ className, ...props }: ItemTitleProps) {
 }
 
 /**
- * ItemDescriptionProps
- *
  * Props for the ItemDescription component.
  */
 interface ItemDescriptionProps extends React.ComponentProps<'p'> {}
 
 /**
- * ItemDescription
- *
  * Supporting text under the title. Cuts off after two lines and underlines
  * links.
  */
@@ -246,15 +223,11 @@ function ItemDescription({ className, ...props }: ItemDescriptionProps) {
 }
 
 /**
- * ItemActionsProps
- *
  * Props for the ItemActions component.
  */
 interface ItemActionsProps extends React.ComponentProps<'div'> {}
 
 /**
- * ItemActions
- *
  * Trailing controls of the row, usually one or two buttons.
  */
 function ItemActions({ className, ...props }: ItemActionsProps) {
@@ -268,8 +241,6 @@ function ItemActions({ className, ...props }: ItemActionsProps) {
 }
 
 /**
- * ItemHeader
- *
  * Full-width row above the media and content, such as a label and a value.
  */
 function ItemHeader({ className, ...props }: React.ComponentProps<'div'>) {
@@ -286,8 +257,6 @@ function ItemHeader({ className, ...props }: React.ComponentProps<'div'>) {
 }
 
 /**
- * ItemFooter
- *
  * Full-width row below the media and content.
  */
 function ItemFooter({ className, ...props }: React.ComponentProps<'div'>) {

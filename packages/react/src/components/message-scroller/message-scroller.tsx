@@ -32,8 +32,6 @@ const MessageScrollerNodesContext =
   React.createContext<MessageScrollerNodesContextValue | null>(null);
 
 /**
- * useMessageScroller
- *
  * Reads or changes the scroll position from anywhere inside a
  * `MessageScrollerProvider`. Works outside the scroller too, such as in a
  * composer's send button.
@@ -76,8 +74,6 @@ function smoothScrollTo(viewport: HTMLElement, top: number) {
 }
 
 /**
- * MessageScrollerProviderProps
- *
  * Props for the MessageScrollerProvider component.
  */
 interface MessageScrollerProviderProps {
@@ -85,8 +81,6 @@ interface MessageScrollerProviderProps {
 }
 
 /**
- * MessageScrollerProvider
- *
  * Holds the scroll state of the stream. Wrap it around the `MessageScroller`
  * and any control that reads or changes the scroll, such as a composer.
  *
@@ -194,8 +188,6 @@ function MessageScrollerProvider({ children }: MessageScrollerProviderProps) {
 }
 
 /**
- * MessageScrollerProps
- *
  * Props for the MessageScroller component.
  */
 interface MessageScrollerProps extends React.ComponentProps<
@@ -203,8 +195,6 @@ interface MessageScrollerProps extends React.ComponentProps<
 > {}
 
 /**
- * MessageScroller
- *
  * Scroll container that keeps the latest turn in view until the reader
  * scrolls up. To announce new turns, set `announce` on `MessageGroup`.
  *
@@ -252,8 +242,6 @@ function MessageScroller({
 }
 
 /**
- * MessageScrollerViewportProps
- *
  * Props for the MessageScrollerViewport component.
  */
 interface MessageScrollerViewportProps extends React.ComponentProps<
@@ -261,8 +249,6 @@ interface MessageScrollerViewportProps extends React.ComponentProps<
 > {}
 
 /**
- * MessageScrollerViewport
- *
  * Scrolling region of the stream, focusable so keyboard users can scroll it.
  * Scrolling past its end does not scroll the page behind it.
  */
@@ -292,15 +278,11 @@ function MessageScrollerViewport({
 }
 
 /**
- * MessageScrollerContentProps
- *
  * Props for the MessageScrollerContent component.
  */
 interface MessageScrollerContentProps extends React.ComponentProps<'div'> {}
 
 /**
- * MessageScrollerContent
- *
  * Column of turns inside the viewport. A short stream starts at the top.
  */
 function MessageScrollerContent({
@@ -325,15 +307,11 @@ function MessageScrollerContent({
 }
 
 /**
- * MessageScrollerItemProps
- *
  * Props for the MessageScrollerItem component.
  */
 interface MessageScrollerItemProps extends React.ComponentProps<'div'> {}
 
 /**
- * MessageScrollerItem
- *
  * One entry in the stream. Wrap each turn in one so it never shrinks.
  */
 function MessageScrollerItem({
@@ -365,8 +343,6 @@ const messageScrollerButtonVariants = cva(
 );
 
 /**
- * MessageScrollerButtonProps
- *
  * Props for the MessageScrollerButton component.
  */
 interface MessageScrollerButtonProps
@@ -375,8 +351,6 @@ interface MessageScrollerButtonProps
     VariantProps<typeof messageScrollerButtonVariants> {}
 
 /**
- * MessageScrollerButton
- *
  * Button that jumps to the latest turn, or the oldest with `direction="start"`.
  * It appears once the reader scrolls away from that end.
  *

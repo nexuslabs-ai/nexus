@@ -2,35 +2,8 @@
 
 Set up your app once, then copy in any Nexus component.
 
-Nexus components are copy and own: you paste a component's source into your
-app, and from then on it's your file. Edit it freely. To pick up a later fix,
-paste the new version over it.
-
-Every component needs four things set up first:
-
-1. **Tailwind 4**, which builds the `nx:` classes.
-2. **The token CSS**, which defines the colors, spacing and type scale.
-3. **The appearance provider**, which applies the theme and dark mode.
-4. **The `cn` helper**, which every component uses to merge classes.
-
-These steps use a new Next.js 15 App Router app. On Vite, steps 1, 2 and 4 are
-the same. For step 3, follow [Theme setup](/getting-started/theme-setup#vite).
-
-## Where the files are
-
-Every file you copy comes from the
-[Nexus repo](https://github.com/nexuslabs-ai/nexus):
-
-| File                | Path in the repo                                     |
-| ------------------- | ---------------------------------------------------- |
-| Token CSS           | `packages/tailwind/*.css`                            |
-| Appearance provider | `packages/react/src/components/appearance/provider/` |
-| `cn` helper         | `packages/react/src/lib/utils.ts`                    |
-| Components          | `packages/react/src/components/{name}/`              |
-
-To fork the whole design system into your own monorepo instead, clone the
-repo and run `pnpm install`, then `pnpm export --name=your-design-system`.
-Follow the generated scaffold instead of this page.
+Copied components are your files: edit them freely, and paste a newer version
+to update.
 
 ## Step 1: Install Tailwind 4
 
@@ -45,6 +18,9 @@ export default {
 };
 ```
 
+Tailwind 4 builds the `nx:` classes. These steps use a Next.js 15 App Router
+app.
+
 Remove any `@import "tailwindcss"` from your CSS, including the one
 `create-next-app` adds to `globals.css`. The token CSS imports Tailwind for
 you, with the `nx:` prefix. A second import duplicates Tailwind's base styles
@@ -52,7 +28,9 @@ and can bring back its default colors.
 
 ## Step 2: Add the token CSS
 
-Copy the seven files from `packages/tailwind/` into `styles/nexus/`:
+The token CSS defines the colors, spacing and type scale. Copy the seven files
+from `packages/tailwind/` in the
+[Nexus repo](https://github.com/nexuslabs-ai/nexus) into `styles/nexus/`:
 
 ```
 styles/nexus/
@@ -88,8 +66,8 @@ Instead of `nx:bg-red-500`, use a token class like `nx:bg-error-background`.
 To add your own tokens, put a `@theme` block in `globals.css` after the
 imports. Don't edit `nexus.css`, because pasting a newer copy replaces it.
 
-If your app already uses unprefixed Tailwind classes, this setup doesn't
-support it yet ([#604](https://github.com/nexuslabs-ai/nexus/issues/604)).
+If your app already uses unprefixed Tailwind classes, this setup won't work
+with them.
 
 Then tell the browser the app supports both color schemes, so scrollbars and
 form controls match the theme:
@@ -108,6 +86,9 @@ your `<head>`.
 
 The provider applies the theme and saves the user's choices, like dark mode.
 Its script runs in `<head>`, so the page doesn't flash the wrong theme on load.
+
+If you use Vite, follow [Theme setup](/getting-started/theme-setup#vite) for
+this step instead. Steps 1, 2 and 4 are the same on Vite.
 
 Install the theme engine:
 
@@ -191,7 +172,7 @@ files in the order shown. For Button:
 <InstallBlock slugs={['button']} />
 
 Paths are relative to `packages/react/src/` in the repo. Keep the same folder
-structure under your `@/` root, and the imports between files work without
+structure under your `@/` import alias, and the imports between files work without
 edits. If a component has its own stylesheet, like Progress, it also lists the
 `@import` lines to add to `app/globals.css`.
 
@@ -253,6 +234,24 @@ This turns on `nx-class-conventions`, `no-render-prop-types` and
 The rules need a TypeScript parser. `create-next-app` sets one up through
 `next/core-web-vitals`. If your config has none, install `typescript-eslint` and
 add `languageOptions: { parser: tseslint.parser }` to the entry.
+
+## Where the files are
+
+Every file you copy comes from the
+[Nexus repo](https://github.com/nexuslabs-ai/nexus):
+
+| File                | Path in the repo                                     |
+| ------------------- | ---------------------------------------------------- |
+| Token CSS           | `packages/tailwind/*.css`                            |
+| Appearance provider | `packages/react/src/components/appearance/provider/` |
+| `cn` helper         | `packages/react/src/lib/utils.ts`                    |
+| Components          | `packages/react/src/components/{name}/`              |
+
+## Fork the whole design system
+
+If you want the whole design system in your own monorepo, skip this page. Clone
+the repo, run `pnpm install`, then run `pnpm export --name=your-design-system`
+and follow the generated scaffold.
 
 ## Next steps
 

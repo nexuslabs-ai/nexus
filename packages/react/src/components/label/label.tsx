@@ -5,15 +5,11 @@ import * as LabelPrimitive from '@radix-ui/react-label';
 import { cn } from '../../lib/utils';
 
 /**
- * LabelProps
- *
  * Props for the Label component.
  */
 interface LabelProps extends React.ComponentProps<typeof LabelPrimitive.Root> {}
 
 /**
- * Label
- *
  * Accessible name for a form control, linked by setting `htmlFor` to the
  * control's `id`. Dims when an earlier sibling with the `nx:peer` class is
  * disabled.
