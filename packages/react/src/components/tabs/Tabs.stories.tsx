@@ -19,6 +19,12 @@ const meta: Meta<typeof Tabs> = {
   title: 'Components/Tabs',
   component: Tabs,
   parameters: {
+    docs: {
+      description: {
+        component:
+          'Tabs switch between panels of related content in one place. Use them to split a view into sections that users visit one at a time.',
+      },
+    },
     layout: 'padded',
   },
 };
@@ -84,6 +90,14 @@ export const Default: Story = {
 
 export const UnderlineVariant: Story = {
   tags: ['docs'],
+  parameters: {
+    docs: {
+      description: {
+        story:
+          'Set `variant="underline"` on TabsList for a line under the active tab.',
+      },
+    },
+  },
   render: (_args) => (
     <Tabs defaultValue="account" className="nx:w-[400px]">
       <TabsList variant="underline">
@@ -135,6 +149,13 @@ export const UnderlineVariant: Story = {
 
 export const SmallSize: Story = {
   tags: ['docs'],
+  parameters: {
+    docs: {
+      description: {
+        story: 'Set `size="sm"` on TabsList for compact tabs.',
+      },
+    },
+  },
   render: (_args) => (
     <Tabs defaultValue="tab1" className="nx:w-[400px]">
       <TabsList size="sm">
@@ -164,6 +185,13 @@ export const SmallSize: Story = {
 
 export const LargeSize: Story = {
   tags: ['docs'],
+  parameters: {
+    docs: {
+      description: {
+        story: 'Set `size="lg"` on TabsList for roomier tabs.',
+      },
+    },
+  },
   render: (_args) => (
     <Tabs defaultValue="tab1" className="nx:w-[500px]">
       <TabsList size="lg">
@@ -282,6 +310,14 @@ export const ThreeTabs: Story = {
 
 export const WithDisabledTab: Story = {
   tags: ['docs'],
+  parameters: {
+    docs: {
+      description: {
+        story:
+          'Disable a TabsTrigger so users can see the tab but not open it.',
+      },
+    },
+  },
   render: (_args) => (
     <Tabs defaultValue="account" className="nx:w-[400px]">
       <TabsList>
@@ -653,8 +689,7 @@ export const TabsTriggerDefaultModeHeightPinned: Story = {
     a11y: { test: 'off' },
     docs: {
       description: {
-        story:
-          'Regression sentinel: pins the `default` `TabsTrigger` height in default mode.',
+        story: 'Pins the `TabsTrigger` height at the default size.',
       },
     },
   },

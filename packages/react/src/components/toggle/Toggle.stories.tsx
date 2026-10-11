@@ -9,6 +9,14 @@ import { Toggle } from './toggle';
 const meta: Meta<typeof Toggle> = {
   title: 'Components/Toggle',
   component: Toggle,
+  parameters: {
+    docs: {
+      description: {
+        component:
+          'Toggle is a button that stays pressed until clicked again, such as Bold. Icon-only toggles need an `aria-label`. For a set of related toggles, use ToggleGroup.',
+      },
+    },
+  },
 };
 
 export default meta;
@@ -34,6 +42,14 @@ export const Default: Story = {
 // Borderless, bordered and transparent stroke-only variants.
 export const Variants: Story = {
   tags: ['docs'],
+  parameters: {
+    docs: {
+      description: {
+        story:
+          'Pick `default`, `outline` or `outline-primary` for the border style.',
+      },
+    },
+  },
   render: () => (
     <div className="nx:flex nx:gap-3">
       <Toggle variant="default" aria-label="Bold">
@@ -56,6 +72,13 @@ export const Variants: Story = {
 // The three sizes.
 export const Sizes: Story = {
   tags: ['docs'],
+  parameters: {
+    docs: {
+      description: {
+        story: 'Set `size` to `sm`, `default` or `lg`.',
+      },
+    },
+  },
   render: () => (
     <div className="nx:flex nx:items-center nx:gap-3">
       <Toggle size="sm" aria-label="Small">
@@ -88,6 +111,13 @@ export const Sizes: Story = {
 // A toggle with text alongside the icon, shown pressed.
 export const WithText: Story = {
   tags: ['docs'],
+  parameters: {
+    docs: {
+      description: {
+        story: 'Put an icon and a text label in the same toggle.',
+      },
+    },
+  },
   render: () => (
     <Toggle aria-label="Bold" defaultPressed>
       <IconBold />
@@ -135,6 +165,13 @@ export const KeyboardInteraction: Story = {
 // A disabled toggle does not respond to clicks.
 export const Disabled: Story = {
   tags: ['docs'],
+  parameters: {
+    docs: {
+      description: {
+        story: 'A disabled toggle shows muted colors and ignores clicks.',
+      },
+    },
+  },
   args: { onPressedChange: fn() },
   render: (args) => (
     <Toggle aria-label="Bold" disabled onPressedChange={args.onPressedChange}>
@@ -400,6 +437,13 @@ function ControlledBold() {
 
 export const Controlled: Story = {
   tags: ['docs'],
+  parameters: {
+    docs: {
+      description: {
+        story: 'Drive the pressed state with `pressed` and `onPressedChange`.',
+      },
+    },
+  },
   render: () => <ControlledBold />,
   play: async ({ canvasElement }) => {
     const toggle = within(canvasElement).getByRole('button', {

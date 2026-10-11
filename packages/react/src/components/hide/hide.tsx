@@ -7,20 +7,17 @@ import {
 import { cn } from '../../lib/utils';
 
 /**
- * The inverse of `<Show>`: renders its children only when a responsive condition
- * is **not** met, via a CSS `display` toggle (`contents` ↔ `none`). Children
- * always render to the DOM; only their visibility changes (no mount / unmount).
+ * Hides its children while a width condition matches. The opposite of `<Show>`.
+ * Children stay mounted, and only their CSS `display` changes.
  *
- * Provide **exactly one** axis (enforced at compile time):
- * - `above` / `below` — viewport min / max width (scale: `sm` 40rem … `2xl` 96rem).
- * - `containerAbove` / `containerBelow` — the nearest `@container` ancestor's
- *   min / max width (Tailwind's container scale: `sm` 24rem … `2xl` 42rem —
- *   smaller than the viewport scale for the same name).
+ * Set exactly one of these props:
+ * - `above` / `below`: viewport min or max width (`sm` 40rem to `2xl` 96rem).
+ * - `containerAbove` / `containerBelow`: min or max width of the nearest
+ *   container (`sm` 24rem to `2xl` 42rem).
  *
- * Container axes require an ancestor with `container-type` (e.g. a parent
- * carrying the `nx:@container` utility). v1 queries the nearest *unnamed*
- * container only; for a specific named container, fall back to raw
- * `nx:@container/{name}/{bp}:` utilities.
+ * Container props need an unnamed container ancestor, such as a parent with
+ * `nx:@container`. For a named container, use `nx:@container/{name}/{bp}:`
+ * utilities.
  *
  * @experimental Inferred from Atlassian's `<Show>` / `<Hide>`; the API may change before stable.
  * @example

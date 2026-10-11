@@ -86,6 +86,10 @@ const meta = {
     layout: 'centered',
     controls: { disable: true },
     docs: {
+      description: {
+        component:
+          'NumberRangeFilter filters by a number between a minimum and a maximum. Use it when both ends matter, such as a price band. For a single threshold, use NumberComparisonFilter.',
+      },
       page: () => (
         <>
           <Title />

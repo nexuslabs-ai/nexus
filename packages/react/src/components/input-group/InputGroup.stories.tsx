@@ -17,6 +17,14 @@ import {
 const meta: Meta<typeof InputGroup> = {
   title: 'Components/InputGroup',
   component: InputGroup,
+  parameters: {
+    docs: {
+      description: {
+        component:
+          'InputGroup frames an input or textarea with icons, text, buttons or key hints in one field. Use it for search boxes, URL prefixes and inline actions. For a plain field, use Input.',
+      },
+    },
+  },
 };
 
 export default meta;
@@ -38,6 +46,13 @@ export const Default: Story = {
 // A trailing button addon.
 export const WithButton: Story = {
   tags: ['docs'],
+  parameters: {
+    docs: {
+      description: {
+        story: "Add a trailing button for an action on the field's value.",
+      },
+    },
+  },
   render: () => (
     <InputGroup className="nx:w-80">
       <InputGroupInput aria-label="Email" placeholder="you@example.com" />
@@ -51,6 +66,14 @@ export const WithButton: Story = {
 // A text prefix addon.
 export const WithText: Story = {
   tags: ['docs'],
+  parameters: {
+    docs: {
+      description: {
+        story:
+          'Show a fixed text prefix, such as a URL scheme, before the input.',
+      },
+    },
+  },
   render: () => (
     <InputGroup className="nx:w-80">
       <InputGroupAddon>
@@ -64,6 +87,13 @@ export const WithText: Story = {
 // Addons at each alignment — inline start/end and stacked block start/end.
 export const Alignments: Story = {
   tags: ['docs'],
+  parameters: {
+    docs: {
+      description: {
+        story: 'Place addons at the start, end, top or bottom of the field.',
+      },
+    },
+  },
   render: () => (
     <div className="nx:flex nx:w-80 nx:flex-col nx:gap-3">
       <InputGroup>
@@ -138,6 +168,11 @@ export const ButtonSizes: Story = {
 // A textarea with a stacked footer addon.
 export const WithTextarea: Story = {
   tags: ['docs'],
+  parameters: {
+    docs: {
+      description: { story: 'Pair a textarea with a footer addon below it.' },
+    },
+  },
   render: () => (
     <InputGroup className="nx:w-80">
       <InputGroupTextarea aria-label="Message" placeholder="Your message…" />
@@ -307,6 +342,14 @@ export const KeyboardInteraction: Story = {
 // A disabled control + button; the group dims its addons via data-disabled.
 export const Disabled: Story = {
   tags: ['docs'],
+  parameters: {
+    docs: {
+      description: {
+        story:
+          'Set `data-disabled="true"` on the group to dim its addons along with the disabled control.',
+      },
+    },
+  },
   render: () => (
     <InputGroup className="nx:w-80" data-disabled="true">
       <InputGroupInput
@@ -426,7 +469,7 @@ export const StateMatrix: Story = {
     docs: {
       description: {
         story:
-          'Form-field state guidance using current APIs only. Default, read-only, disabled, error, warning, and loading are composed in stories; warning remains advisory and does not use `aria-invalid`, while loading uses InputGroup plus Spinner rather than adding a loading prop.',
+          'Compose every field state from InputGroup parts, with no `aria-invalid` on warning and a Spinner addon for loading.',
       },
     },
   },
@@ -603,6 +646,13 @@ export const BorderlessHoverSurface: Story = {
 // The three sizes — sm / default (implicit) / lg — match standalone Input.
 export const Sizes: Story = {
   tags: ['docs'],
+  parameters: {
+    docs: {
+      description: {
+        story: 'Match the height of a standalone Input at each control size.',
+      },
+    },
+  },
   render: () => (
     <div className="nx:flex nx:w-80 nx:flex-col nx:gap-3">
       <InputGroup>

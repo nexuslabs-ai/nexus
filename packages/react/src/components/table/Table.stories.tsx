@@ -37,6 +37,12 @@ const meta: Meta<typeof Table> = {
   title: 'Components/Table',
   component: Table,
   parameters: {
+    docs: {
+      description: {
+        component:
+          'Table shows rows of data in columns. Use it for records users scan and compare, such as invoices. Sorting, selection and pagination logic stay in your app.',
+      },
+    },
     layout: 'padded',
   },
 };
@@ -110,6 +116,13 @@ export const Default: Story = {
 // muted fill and medium weight set it apart from the data rows.
 export const WithFooter: Story = {
   tags: ['docs'],
+  parameters: {
+    docs: {
+      description: {
+        story: 'Add a TableFooter row for totals, on a muted fill.',
+      },
+    },
+  },
   render: () => (
     <Table>
       <TableHeader>
@@ -245,6 +258,14 @@ function SelectionTableDemo({
 // in-flow column. Every checkbox is visible without hovering its row.
 export const SelectableRows: Story = {
   tags: ['docs'],
+  parameters: {
+    docs: {
+      description: {
+        story:
+          'Put a Checkbox in each row with TableSelectionHead and TableSelectionCell.',
+      },
+    },
+  },
   render: () => <SelectionTableDemo />,
   play: async ({ canvasElement }) => {
     const canvas = within(canvasElement);
@@ -418,6 +439,13 @@ export const SelectionGridSeparator: Story = {
 // accessible names; a real app would wire these to edit/delete handlers.
 export const WithActions: Story = {
   tags: ['docs'],
+  parameters: {
+    docs: {
+      description: {
+        story: 'Add a trailing column of row actions with text buttons.',
+      },
+    },
+  },
   render: () => (
     <Table>
       <TableHeader>
@@ -592,7 +620,7 @@ export const RawTextSizeReset: Story = {
     docs: {
       description: {
         story:
-          'Regression sentinel: a runtime raw named text-size utility no longer applies font-size, while a typography composite still resolves its intended size.',
+          'A raw Tailwind font-size utility sets no font size, while a typography utility still does.',
       },
     },
   },
@@ -763,6 +791,14 @@ export const AriaSortIndicator: Story = {
 // stripe — a selected even row shows the selection tint, not the stripe.
 export const Striped: Story = {
   tags: ['docs'],
+  parameters: {
+    docs: {
+      description: {
+        story:
+          'Set `striped` to tint every other row, with hover and selection on top.',
+      },
+    },
+  },
   render: () => (
     <Table striped>
       <TableHeader>
@@ -933,6 +969,14 @@ export const Density: Story = {
 // column headers stay visible.
 export const StickyHeader: Story = {
   tags: ['docs'],
+  parameters: {
+    docs: {
+      description: {
+        story:
+          'Set `stickyHeader` and a max height so the header stays visible while rows scroll.',
+      },
+    },
+  },
   render: () => (
     <Table stickyHeader containerClassName="nx:max-h-64">
       <TableHeader>
@@ -1236,6 +1280,14 @@ function SortableHeaderDemo() {
 
 export const SortableHeader: Story = {
   tags: ['docs'],
+  parameters: {
+    docs: {
+      description: {
+        story:
+          'Put a button in a TableHead and set `aria-sort` from your sort state.',
+      },
+    },
+  },
   render: () => <SortableHeaderDemo />,
   play: async ({ canvasElement }) => {
     const header = canvasElement.querySelector('[aria-sort]');

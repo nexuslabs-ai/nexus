@@ -8,6 +8,14 @@ import { NexusAppearanceSettingRow } from './setting-row';
 const meta: Meta<typeof NexusAppearanceSettingRow> = {
   title: 'Appearance/SettingRow',
   component: NexusAppearanceSettingRow,
+  parameters: {
+    docs: {
+      description: {
+        component:
+          'NexusAppearanceSettingRow pairs a setting label and optional description with its control. Use it for each row of an appearance settings panel.',
+      },
+    },
+  },
   args: {
     label: 'Reduce motion',
     description: 'Shorten animations and transitions across the interface.',

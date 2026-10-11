@@ -34,6 +34,14 @@ import {
 const meta: Meta<typeof ButtonGroup> = {
   title: 'Components/ButtonGroup',
   component: ButtonGroup,
+  parameters: {
+    docs: {
+      description: {
+        component:
+          'ButtonGroup joins related buttons into one cluster with shared borders. Use it for a set of related actions or a split button. For an input with addons, use InputGroup.',
+      },
+    },
+  },
 };
 
 export default meta;
@@ -65,6 +73,13 @@ export const Default: Story = {
 
 export const Small: Story = {
   tags: ['docs'],
+  parameters: {
+    docs: {
+      description: {
+        story: 'Set `size="sm"` to shrink every member of the group.',
+      },
+    },
+  },
   render: () => (
     <ButtonGroup size="sm">
       <ButtonGroupText>View:</ButtonGroupText>
@@ -76,6 +91,13 @@ export const Small: Story = {
 
 export const Large: Story = {
   tags: ['docs'],
+  parameters: {
+    docs: {
+      description: {
+        story: 'Set `size="lg"` to enlarge every member of the group.',
+      },
+    },
+  },
   render: () => (
     <ButtonGroup size="lg">
       <ButtonGroupText>View:</ButtonGroupText>
@@ -88,6 +110,13 @@ export const Large: Story = {
 // Vertical orientation stacks the cluster.
 export const Vertical: Story = {
   tags: ['docs'],
+  parameters: {
+    docs: {
+      description: {
+        story: 'Stack the buttons with `orientation="vertical"`.',
+      },
+    },
+  },
   render: () => (
     <ButtonGroup orientation="vertical" size="sm">
       <Button variant="outline">Top</Button>
@@ -110,6 +139,13 @@ export const Vertical: Story = {
 // A text addon as a leading prefix.
 export const WithText: Story = {
   tags: ['docs'],
+  parameters: {
+    docs: {
+      description: {
+        story: 'Add a text prefix with ButtonGroupText.',
+      },
+    },
+  },
   render: () => (
     <ButtonGroup>
       <ButtonGroupText>https://</ButtonGroupText>
@@ -128,6 +164,14 @@ export const WithText: Story = {
 // (outline) buttons the per-button borders sit in the same color and hide it.
 export const WithSeparator: Story = {
   tags: ['docs'],
+  parameters: {
+    docs: {
+      description: {
+        story:
+          'Divide ghost buttons into sub-groups with ButtonGroupSeparator.',
+      },
+    },
+  },
   render: () => (
     <ButtonGroup>
       <Button variant="ghost" size="icon" aria-label="Bold">
@@ -180,7 +224,7 @@ export const SizeAlignment: Story = {
     docs: {
       description: {
         story:
-          'Default-mode height sentinel for ButtonGroup size propagation. Text addons use `h-8` / `h-10` / `h-12` without Button min-widths, while direct Button children receive the matching semantic size.',
+          'At default density, each group size gives text addons and Button children the same height.',
       },
     },
   },
@@ -391,7 +435,7 @@ export const TierAPolishEvidence: Story = {
     docs: {
       description: {
         story:
-          'ButtonGroup Tier-A polish contract: focus-visible addon links, tokenized color motion, inherited loading/disabled button states, and vertical density evidence.',
+          'A group with an addon link, loading and disabled buttons, next to a small vertical group.',
       },
     },
   },

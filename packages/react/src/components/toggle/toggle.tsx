@@ -35,7 +35,7 @@ const toggleVariants = cva(
 /**
  * ToggleProps
  *
- * Props for the Toggle component.
+ * Props for Toggle.
  */
 interface ToggleProps
   extends
@@ -45,8 +45,8 @@ interface ToggleProps
 /**
  * Toggle
  *
- * A two-state button that is either on or off — e.g. a formatting control
- * (Bold / Italic). For a set of related toggles, use `ToggleGroup`.
+ * Button that stays on or off, such as Bold. For a set of related toggles, use
+ * `ToggleGroup`.
  *
  * @example
  * ```tsx

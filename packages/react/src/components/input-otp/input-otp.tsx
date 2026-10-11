@@ -8,27 +8,23 @@ import { cn } from '../../lib/utils';
 /**
  * InputOTPProps
  *
- * Props for the InputOTP root — the underlying `input-otp` props (so
- * `maxLength`, `value`, `onChange`, `onComplete`, and `pattern` are all
- * available), composed with `children` instead of `input-otp`'s `render`
- * prop. `className` styles the (transparent) input element;
- * `containerClassName` styles the wrapper that lays out the slots.
+ * Every `input-otp` prop except `render`, with slots passed as `children`.
+ * `className` styles the transparent input and `containerClassName` the slot
+ * wrapper.
  */
 type InputOTPProps = Omit<
   React.ComponentProps<typeof OTPInput>,
   'render' | 'children'
 > & {
-  /** The OTP slots — `InputOTPGroup` / `InputOTPSlot` / `InputOTPSeparator`. */
+  /** `InputOTPGroup`, `InputOTPSlot` and `InputOTPSeparator` elements. */
   children?: React.ReactNode;
 };
 
 /**
  * InputOTP
  *
- * A one-time-code field that renders each character in its own slot, with
- * caret tracking and paste support. Compose it with `InputOTPGroup`,
- * `InputOTPSlot`, and `InputOTPSeparator`; each slot reads its character and
- * active state from context by `index`.
+ * One-time code field that shows each character in its own slot. Build it
+ * from `InputOTPGroup`, `InputOTPSlot` and `InputOTPSeparator`.
  *
  * @example
  * ```tsx
@@ -76,8 +72,8 @@ interface InputOTPGroupProps extends React.ComponentProps<'div'> {}
 /**
  * InputOTPGroup
  *
- * Groups a run of adjacent slots. Use multiple groups with an
- * `InputOTPSeparator` between them for split layouts (e.g. 3-3).
+ * Row of adjacent slots. For a split code such as 3-3, put an
+ * `InputOTPSeparator` between two groups.
  */
 function InputOTPGroup({ className, ...props }: InputOTPGroupProps) {
   return (
@@ -96,8 +92,7 @@ function InputOTPGroup({ className, ...props }: InputOTPGroupProps) {
  */
 interface InputOTPSlotProps extends React.ComponentProps<'div'> {
   /**
-   * The slot's position within the OTP input. Used to read this slot's
-   * character, caret, and active state from context.
+   * Position of the slot in the code, starting at 0.
    */
   index: number;
 }
@@ -105,8 +100,8 @@ interface InputOTPSlotProps extends React.ComponentProps<'div'> {
 /**
  * InputOTPSlot
  *
- * Renders one character cell — its character, a blinking fake caret when the
- * cursor sits in it, and a visual focus boundary while it is the active slot.
+ * One character cell. Shows a blinking caret and a focus ring while it is the
+ * active slot.
  */
 function InputOTPSlot({ index, className, ...props }: InputOTPSlotProps) {
   const inputOTPContext = React.useContext(OTPInputContext);
@@ -147,7 +142,7 @@ interface InputOTPSeparatorProps extends React.ComponentProps<'div'> {}
 /**
  * InputOTPSeparator
  *
- * A decorative dot placed between OTP groups in split layouts.
+ * Decorative dot between two `InputOTPGroup`s. Screen readers skip it.
  */
 function InputOTPSeparator({ className, ...props }: InputOTPSeparatorProps) {
   return (

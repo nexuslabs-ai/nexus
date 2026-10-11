@@ -34,6 +34,12 @@ const meta: Meta<typeof ContextMenu> = {
   component: ContextMenu,
   parameters: {
     layout: 'padded',
+    docs: {
+      description: {
+        component:
+          'ContextMenu shows a menu of actions when the user right-clicks an area. Use it for actions on a specific item or region. For a menu opened by a button, use DropdownMenu.',
+      },
+    },
   },
 };
 
@@ -62,6 +68,14 @@ export const Default: Story = {
 
 export const WithLabelsAndSeparators: Story = {
   tags: ['docs'],
+  parameters: {
+    docs: {
+      description: {
+        story:
+          'Split items into sections with ContextMenuLabel headings and ContextMenuSeparator dividers.',
+      },
+    },
+  },
   render: (_args) => (
     <ContextMenu>
       <ContextMenuTrigger className={triggerClass}>
@@ -96,6 +110,14 @@ export const WithLabelsAndSeparators: Story = {
 
 export const WithCheckboxItems: Story = {
   tags: ['docs'],
+  parameters: {
+    docs: {
+      description: {
+        story:
+          'Use ContextMenuCheckboxItem for settings that toggle on and off.',
+      },
+    },
+  },
   render: function CheckboxItemsStory() {
     const [showBookmarks, setShowBookmarks] = React.useState(true);
     const [showFullUrls, setShowFullUrls] = React.useState(false);
@@ -128,6 +150,14 @@ export const WithCheckboxItems: Story = {
 
 export const WithRadioItems: Story = {
   tags: ['docs'],
+  parameters: {
+    docs: {
+      description: {
+        story:
+          'Use ContextMenuRadioItem inside a ContextMenuRadioGroup to pick one option.',
+      },
+    },
+  },
   render: function RadioItemsStory() {
     const [person, setPerson] = React.useState('pedro');
 
@@ -262,6 +292,13 @@ export const IndicatorCrossFade: Story = {
 
 export const WithSubMenu: Story = {
   tags: ['docs'],
+  parameters: {
+    docs: {
+      description: {
+        story: 'Nest a ContextMenuSub to open a second menu from an item.',
+      },
+    },
+  },
   render: (_args) => (
     <ContextMenu>
       <ContextMenuTrigger className={triggerClass}>
@@ -299,6 +336,14 @@ export const WithSubMenu: Story = {
 
 export const WithDestructiveItem: Story = {
   tags: ['docs'],
+  parameters: {
+    docs: {
+      description: {
+        story:
+          'Set `variant="destructive"` on an item for actions like Delete.',
+      },
+    },
+  },
   render: (_args) => (
     <ContextMenu>
       <ContextMenuTrigger className={triggerClass}>

@@ -23,7 +23,7 @@ interface MenubarProps extends React.ComponentProps<
 /**
  * Menubar
  *
- * Root component — a horizontal bar of menus (desktop-app style).
+ * Horizontal bar of menus, like the menu bar in a desktop app.
  *
  * @example
  * ```tsx
@@ -67,7 +67,7 @@ const MenubarGroup = MenubarPrimitive.Group;
 /**
  * MenubarPortal
  *
- * Portals the content to the body.
+ * Renders menu content in a portal on `document.body`.
  */
 const MenubarPortal = MenubarPrimitive.Portal;
 
@@ -97,7 +97,7 @@ interface MenubarTriggerProps extends React.ComponentProps<
 /**
  * MenubarTrigger
  *
- * A top-level menu trigger in the bar. Opens its menu on click.
+ * Top-level button in the bar. Opens its menu on click.
  */
 function MenubarTrigger({ className, ...props }: MenubarTriggerProps) {
   return (
@@ -133,7 +133,7 @@ interface MenubarSubTriggerProps extends React.ComponentProps<
 /**
  * MenubarSubTrigger
  *
- * The trigger for a submenu. Renders a chevron to indicate a submenu.
+ * Item that opens a submenu. Shows a chevron.
  */
 function MenubarSubTrigger({
   className,
@@ -174,7 +174,7 @@ interface MenubarSubContentProps extends React.ComponentProps<
 /**
  * MenubarSubContent
  *
- * The content container for a submenu.
+ * Container for the items of a submenu.
  */
 function MenubarSubContent({ className, ...props }: MenubarSubContentProps) {
   return (
@@ -204,7 +204,7 @@ interface MenubarContentProps extends React.ComponentProps<
 /**
  * MenubarContent
  *
- * The menu content container. Anchors below its trigger.
+ * Container for the items of a menu. Opens below its trigger.
  *
  * @example
  * ```tsx
@@ -276,7 +276,7 @@ interface MenubarItemProps
 /**
  * MenubarItem
  *
- * An individual menu item.
+ * Single action in a menu.
  *
  * @example
  * ```tsx
@@ -317,7 +317,7 @@ interface MenubarCheckboxItemProps extends React.ComponentProps<
 /**
  * MenubarCheckboxItem
  *
- * A menu item that can be checked/unchecked.
+ * Menu item that toggles on and off.
  *
  * @example
  * ```tsx
@@ -380,7 +380,7 @@ interface MenubarRadioItemProps extends React.ComponentProps<
 /**
  * MenubarRadioItem
  *
- * A radio menu item for exclusive selection.
+ * Menu item for picking one option from a `MenubarRadioGroup`.
  *
  * @example
  * ```tsx
@@ -447,7 +447,7 @@ interface MenubarLabelProps extends React.ComponentProps<
 /**
  * MenubarLabel
  *
- * A label for a group of menu items.
+ * Heading for a group of menu items.
  *
  * @example
  * ```tsx
@@ -481,7 +481,7 @@ interface MenubarSeparatorProps extends React.ComponentProps<
 /**
  * MenubarSeparator
  *
- * A visual divider between menu items.
+ * Divider between menu items.
  */
 function MenubarSeparator({ className, ...props }: MenubarSeparatorProps) {
   return (
@@ -506,7 +506,7 @@ interface MenubarShortcutProps extends React.ComponentProps<'span'> {}
 /**
  * MenubarShortcut
  *
- * Displays a keyboard shortcut hint.
+ * Keyboard shortcut hint at the end of an item.
  *
  * @example
  * ```tsx

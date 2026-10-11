@@ -9,6 +9,12 @@ const meta: Meta<typeof Toaster> = {
   title: 'Components/Sonner',
   component: Toaster,
   parameters: {
+    docs: {
+      description: {
+        component:
+          'Toaster shows short, temporary notifications. Mount it once near your app root, then call `toast()` from anywhere. For a message that stays on the page, use Alert.',
+      },
+    },
     layout: 'centered',
   },
 };

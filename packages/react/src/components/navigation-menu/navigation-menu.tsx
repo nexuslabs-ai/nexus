@@ -21,8 +21,8 @@ interface NavigationMenuProps extends React.ComponentProps<
   typeof NavigationMenuPrimitive.Root
 > {
   /**
-   * Render the shared flyout viewport panel beneath the menu. Set `false` to
-   * render each item's content inline under its own trigger instead.
+   * Shows every flyout in one shared panel under the menu. Set `false` to
+   * show each flyout under its own trigger.
    * @default true
    */
   viewport?: boolean;
@@ -31,9 +31,8 @@ interface NavigationMenuProps extends React.ComponentProps<
 /**
  * NavigationMenu
  *
- * Root component for top-level site navigation with flyout panels.
- * Declares the `navmenu` container so the flyout positioning adapts to the
- * menu's own width (see NavigationMenuContent / NavigationMenuViewport).
+ * Top-level site navigation with flyout panels. Flyouts adapt to the width
+ * of the menu, not the viewport.
  *
  * @example
  * ```tsx
@@ -81,7 +80,7 @@ interface NavigationMenuListProps extends React.ComponentProps<
 /**
  * NavigationMenuList
  *
- * The horizontal list of top-level navigation items.
+ * Horizontal list of top-level navigation items.
  */
 function NavigationMenuList({ className, ...props }: NavigationMenuListProps) {
   return (
@@ -108,7 +107,7 @@ interface NavigationMenuItemProps extends React.ComponentProps<
 /**
  * NavigationMenuItem
  *
- * A single top-level navigation item (trigger + content).
+ * One top-level navigation item, with its trigger and content.
  */
 function NavigationMenuItem({ className, ...props }: NavigationMenuItemProps) {
   return (
@@ -136,8 +135,7 @@ interface NavigationMenuTriggerProps extends React.ComponentProps<
 /**
  * NavigationMenuTrigger
  *
- * A top-level trigger that opens its flyout content. Renders a chevron that
- * rotates when open.
+ * Button that opens the item's flyout. Its chevron turns while open.
  */
 function NavigationMenuTrigger({
   className,
@@ -171,8 +169,8 @@ interface NavigationMenuContentProps extends React.ComponentProps<
 /**
  * NavigationMenuContent
  *
- * The flyout panel for a navigation item. Below the `navmenu` container's `md`
- * width it stacks in-flow (full width); at/above it becomes an absolute panel.
+ * Flyout panel for a navigation item. Stacks at full width in a narrow menu
+ * and floats over the page in a wider one.
  */
 function NavigationMenuContent({
   className,
@@ -213,9 +211,8 @@ interface NavigationMenuViewportProps extends React.ComponentProps<
 /**
  * NavigationMenuViewport
  *
- * The shared flyout container that holds the active item's content. Sized to
- * the Radix-measured content width at/above the `navmenu` container's `md`
- * width; full-width below it.
+ * Shared panel that shows the open item's content. Fits the content in a
+ * wide menu and spans the full width in a narrow one.
  */
 function NavigationMenuViewport({
   className,
@@ -250,7 +247,7 @@ interface NavigationMenuLinkProps extends React.ComponentProps<
 /**
  * NavigationMenuLink
  *
- * A navigable link inside a flyout panel.
+ * Link inside a flyout panel.
  */
 function NavigationMenuLink({ className, ...props }: NavigationMenuLinkProps) {
   return (
@@ -281,7 +278,7 @@ interface NavigationMenuIndicatorProps extends React.ComponentProps<
 /**
  * NavigationMenuIndicator
  *
- * A small arrow that points from the active trigger to its flyout.
+ * Small arrow from the open trigger to its flyout.
  */
 function NavigationMenuIndicator({
   className,

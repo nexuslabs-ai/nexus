@@ -13,6 +13,14 @@ import {
 const meta: Meta<typeof Collapsible> = {
   title: 'Components/Collapsible',
   component: Collapsible,
+  parameters: {
+    docs: {
+      description: {
+        component:
+          'Collapsible shows and hides one content region. Use it for a single expandable section. For a stacked set of sections, use Accordion.',
+      },
+    },
+  },
 };
 
 export default meta;
@@ -57,6 +65,13 @@ export const Default: Story = {
 // Open by default, showing the revealed content region.
 export const Open: Story = {
   tags: ['docs'],
+  parameters: {
+    docs: {
+      description: {
+        story: 'Set `defaultOpen` to show the content on first render.',
+      },
+    },
+  },
   render: () => (
     <Collapsible defaultOpen className="nx:flex nx:w-72 nx:flex-col">
       <CollapsibleTrigger asChild>
@@ -132,6 +147,13 @@ export const KeyboardInteraction: Story = {
 // A disabled collapsible: the trigger cannot toggle the content.
 export const Disabled: Story = {
   tags: ['docs'],
+  parameters: {
+    docs: {
+      description: {
+        story: 'Set `disabled` so the trigger cannot toggle the content.',
+      },
+    },
+  },
   args: { onOpenChange: fn() },
   render: (args) => (
     <Collapsible

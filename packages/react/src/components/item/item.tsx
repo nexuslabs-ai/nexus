@@ -9,9 +9,8 @@ import { Separator } from '../separator';
 /**
  * ItemGroup
  *
- * A vertical stack of related `Item`s, divided by `ItemSeparator`. No ARIA
- * `list` role is imposed — `Item` is also used standalone, so list/listitem
- * semantics are the consumer's to add when the grouping is truly a list.
+ * Vertical stack of related `Item`s, divided by `ItemSeparator`. It adds no
+ * list role, so add `role="list"` and `role="listitem"` if the group is a list.
  */
 function ItemGroup({ className, ...props }: React.ComponentProps<'div'>) {
   return (
@@ -26,7 +25,7 @@ function ItemGroup({ className, ...props }: React.ComponentProps<'div'>) {
 /**
  * ItemSeparator
  *
- * A flush horizontal rule between items in an `ItemGroup`.
+ * Horizontal rule between items in an `ItemGroup`.
  */
 function ItemSeparator({
   className,
@@ -71,8 +70,7 @@ const itemVariants = cva(
 interface ItemProps
   extends React.ComponentProps<'div'>, VariantProps<typeof itemVariants> {
   /**
-   * Render as the child element via Radix Slot — e.g. an `<a>` or router link —
-   * keeping the item styling.
+   * Renders the child element, such as a link, with the item styling.
    * @default false
    */
   asChild?: boolean;
@@ -81,11 +79,8 @@ interface ItemProps
 /**
  * Item
  *
- * A flexible list row — media (icon / image) + title + description + actions.
- * Compose with `ItemMedia`, `ItemContent`, `ItemTitle`, `ItemDescription`, and
- * `ItemActions`; group rows with `ItemGroup` divided by `ItemSeparator`. The
- * `outline` and `muted` variants give the row a visible surface; size `sm` is a
- * denser row. When rendered `asChild` as a link it gains hover + focus affordances.
+ * Row with media, a title, a description and actions. Build it from
+ * `ItemMedia`, `ItemContent`, `ItemTitle`, `ItemDescription` and `ItemActions`.
  *
  * @example
  * ```tsx
@@ -151,9 +146,8 @@ interface ItemMediaProps
 /**
  * ItemMedia
  *
- * The leading visual of an item. `icon` renders a muted rounded medallion;
- * `image` a square thumbnail that cover-fits its `<img>`; `default` is an
- * unstyled wrapper.
+ * Leading visual of an item. `icon` adds a muted rounded tile, and `image`
+ * crops its `<img>` to a square thumbnail.
  */
 function ItemMedia({
   className,
@@ -180,7 +174,7 @@ interface ItemContentProps extends React.ComponentProps<'div'> {}
 /**
  * ItemContent
  *
- * The middle column — title and description — that grows to fill the row.
+ * Column for the title and description. Grows to fill the row.
  */
 function ItemContent({ className, ...props }: ItemContentProps) {
   return (
@@ -208,7 +202,7 @@ interface ItemTitleProps extends React.ComponentProps<'div'> {}
 /**
  * ItemTitle
  *
- * The item's primary label.
+ * Primary label of the item.
  */
 function ItemTitle({ className, ...props }: ItemTitleProps) {
   return (
@@ -233,7 +227,8 @@ interface ItemDescriptionProps extends React.ComponentProps<'p'> {}
 /**
  * ItemDescription
  *
- * Supporting copy beneath the title; clamps to two lines, anchors underlined.
+ * Supporting text under the title. Cuts off after two lines and underlines
+ * links.
  */
 function ItemDescription({ className, ...props }: ItemDescriptionProps) {
   return (
@@ -260,7 +255,7 @@ interface ItemActionsProps extends React.ComponentProps<'div'> {}
 /**
  * ItemActions
  *
- * The trailing controls of a row — typically one or two buttons.
+ * Trailing controls of the row, usually one or two buttons.
  */
 function ItemActions({ className, ...props }: ItemActionsProps) {
   return (
@@ -275,7 +270,7 @@ function ItemActions({ className, ...props }: ItemActionsProps) {
 /**
  * ItemHeader
  *
- * A full-width row above the media/content — e.g. a label and a meta value.
+ * Full-width row above the media and content, such as a label and a value.
  */
 function ItemHeader({ className, ...props }: React.ComponentProps<'div'>) {
   return (
@@ -293,7 +288,7 @@ function ItemHeader({ className, ...props }: React.ComponentProps<'div'>) {
 /**
  * ItemFooter
  *
- * A full-width row below the media/content.
+ * Full-width row below the media and content.
  */
 function ItemFooter({ className, ...props }: React.ComponentProps<'div'>) {
   return (

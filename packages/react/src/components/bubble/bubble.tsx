@@ -13,11 +13,7 @@ import { cn } from '../../lib/utils';
 interface BubbleGroupProps extends React.ComponentProps<'div'> {}
 
 /**
- * BubbleGroup
- *
- * A vertical stack of consecutive `Bubble`s. No ARIA `list` role is imposed —
- * `Bubble` is also used standalone, so log/list semantics are the consumer's to
- * add when the stack is genuinely one.
+ * Vertical stack of consecutive bubbles. It adds no list role, so add list or log semantics when the stack needs them.
  */
 function BubbleGroup({ className, ...props }: BubbleGroupProps) {
   return (
@@ -63,25 +59,12 @@ interface BubbleProps
   extends React.ComponentProps<'div'>, VariantProps<typeof bubbleVariants> {}
 
 /**
- * Bubble
+ * One message in a conversation. It holds no chat state, speaker or timestamp.
+ * Put the text in `BubbleContent` and stack turns with `BubbleGroup`.
  *
- * A single conversational turn — a surface that carries one speaker's message.
- * Presentational only: it holds no chat state, no speaker identity, and no
- * timestamp logic. Compose it with `BubbleContent` for the message body and
- * `BubbleReactions` for a reaction pill; stack turns with `BubbleGroup`.
+ * With `BubbleReactions`, use a flex or grid parent such as `BubbleGroup`, so facing reaction pills don't touch.
  *
- * A `BubbleReactions` pill overhangs the surface, and the bubble reserves that
- * overhang with a margin — so give it a parent that does not collapse margins.
- * A flex or grid stack does (`BubbleGroup` is flex). In a plain block parent
- * the reservation collapses against the parent's own edge and against the
- * neighbouring turn's, so two facing pills get one 12px band between them
- * instead of two and end up meeting.
- *
- * `align` has no default, so a bubble sits wherever its parent puts it — the
- * natural start edge of a `BubbleGroup`, or an inline-end column that aligns
- * its own children. Set it to override that. It is logical, not physical, so
- * an overridden turn still flips end-to-end under `dir="rtl"` with no
- * direction provider.
+ * `align` has no default, so the parent sets the position. `align` is logical, so `end` flips under `dir="rtl"`.
  *
  * @example
  * ```tsx
@@ -119,19 +102,9 @@ function Bubble({
  */
 interface BubbleContentProps extends React.ComponentProps<'div'> {
   /**
-   * Render as the child element instead of a `div`, merging BubbleContent's
-   * styles onto it. Use when the message body needs different semantics — a
-   * `p` for prose, or an `a` / `button` when the whole turn is actionable.
-   *
-   * An interactive child takes the design-system focus ring and the pointer
-   * cursor, and still owns its own accessible name. Both are withheld from a
-   * body that cannot be actioned — an `a` with no `href`, a disabled
-   * `button`, or anything carrying `aria-disabled`.
-   *
-   * The turn itself carries no hover tint or press cue: the surface stays
-   * still and the affordance reads from the body — the underline on a link,
-   * the label on a button. Add one at the call site if a product surface needs
-   * it.
+   * Renders the child element instead, such as a `p`, or an `a` or `button` for an actionable message.
+   * A link with an `href` or an enabled button gets the pointer cursor. Give it its own accessible name.
+   * The bubble adds no hover or press style. Add one at the call site if you need it.
    *
    * @default false
    * @example
@@ -145,22 +118,9 @@ interface BubbleContentProps extends React.ComponentProps<'div'> {
 }
 
 /**
- * BubbleContent
- *
- * The message body, and the part that carries the bubble's padding — so when
- * `asChild` makes it an `a` or a `button`, the hit target and the focus ring
- * that traces it cover the whole surface instead of a box inset within it.
- *
- * Long words, URLs, and nested `pre` blocks wrap rather than widen the bubble.
- * Anchors that can navigate are underlined, whether the body itself is the
- * link or the link sits inside its text; an `a` with no `href` is not.
- *
- * Restyling any of this needs the `!` modifier —
- * `<a href="…" className="nx:no-underline!">` — whether the target is the
- * body's own anchor, a nested one, or a nested `pre`. The rules reaching
- * nested `a` / `pre` are `:where()`-ed, so they tie a utility class on
- * specificity and win on source order; the rule for the body's own anchor is
- * not, so it outranks one outright.
+ * Message body. It holds the padding, so an `a` or `button` body fills the whole bubble.
+ * Long words, URLs and `pre` blocks wrap. Links with an `href` are underlined.
+ * To restyle links or `pre` blocks, use the `!` modifier, such as `nx:no-underline!`.
  */
 function BubbleContent({
   className,
@@ -212,11 +172,8 @@ interface BubbleReactionsProps
     VariantProps<typeof bubbleReactionsVariants> {}
 
 /**
- * BubbleReactions
- *
- * A reaction pill overhanging one corner of the bubble. `side` picks the
- * horizontal edge; `align` picks the inline edge and is logical, so `start`
- * resolves to the right under `dir="rtl"`.
+ * Reaction pill overhanging a corner of the bubble. `side` picks top or bottom.
+ * `align` is logical, so `start` sits on the right under `dir="rtl"`.
  *
  * @example
  * ```tsx

@@ -16,6 +16,14 @@ import {
 const meta: Meta<typeof EmptyState> = {
   title: 'Components/EmptyState',
   component: EmptyState,
+  parameters: {
+    docs: {
+      description: {
+        component:
+          'EmptyState explains why a list, table or record view has no content yet. Give it an icon, a title, a short description and an optional action.',
+      },
+    },
+  },
 };
 
 export default meta;
@@ -46,6 +54,13 @@ export const Default: Story = {
 // Header only — an empty state with no call to action.
 export const WithoutAction: Story = {
   tags: ['docs'],
+  parameters: {
+    docs: {
+      description: {
+        story: 'Leave out EmptyStateContent when there is no action to offer.',
+      },
+    },
+  },
   render: () => (
     <EmptyState>
       <EmptyStateHeader>
@@ -63,6 +78,14 @@ export const WithoutAction: Story = {
 
 export const TitleAsHeading: Story = {
   tags: ['docs'],
+  parameters: {
+    docs: {
+      description: {
+        story:
+          'Use `asChild` on EmptyStateTitle to render a real `h2` that names its section.',
+      },
+    },
+  },
   render: () => (
     <section aria-labelledby="empty-state-section-heading">
       <EmptyState>
@@ -174,6 +197,13 @@ export const LongCopyWithLink: Story = {
 // The `bordered` prop renders the dashed frame and advertises via data-bordered.
 export const Bordered: Story = {
   tags: ['docs'],
+  parameters: {
+    docs: {
+      description: {
+        story: 'Set `bordered` to add a dashed frame around the empty state.',
+      },
+    },
+  },
   render: () => (
     <EmptyState bordered>
       <EmptyStateHeader>
@@ -203,6 +233,14 @@ export const Bordered: Story = {
 // Reused by the per-base variant generator.
 export const AllVariants: Story = {
   tags: ['docs'],
+  parameters: {
+    docs: {
+      description: {
+        story:
+          'Compare the `icon` and `default` media variants, with and without a frame.',
+      },
+    },
+  },
   render: () => (
     <div className="nx:flex nx:flex-col nx:gap-6">
       <EmptyState bordered>

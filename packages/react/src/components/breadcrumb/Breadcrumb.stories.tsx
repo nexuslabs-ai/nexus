@@ -23,6 +23,14 @@ import {
 const meta: Meta<typeof Breadcrumb> = {
   title: 'Components/Breadcrumb',
   component: Breadcrumb,
+  parameters: {
+    docs: {
+      description: {
+        component:
+          "Breadcrumb shows where the current page sits in your app's hierarchy. Use it on pages two or more levels deep. For top-level navigation, use NavigationMenu or Sidebar.",
+      },
+    },
+  },
 };
 
 export default meta;
@@ -171,28 +179,27 @@ export const Playground: StoryObj<PlaygroundArgs> = {
     itemCount: {
       control: 'select',
       options: [2, 3, 4],
-      description: 'Number of breadcrumb items to render',
+      description: 'Number of items.',
     },
     showIcons: {
       control: 'boolean',
-      description: 'Show leading icons in each breadcrumb segment',
+      description: 'Shows a leading icon in each segment.',
     },
     iconOnly: {
       control: 'boolean',
-      description:
-        'Render items as icons only while preserving accessible names',
+      description: 'Shows icons only and keeps accessible names.',
     },
     showMenus: {
       control: 'boolean',
-      description: 'Show dropdown menu triggers next to breadcrumb segments',
+      description: 'Shows a menu trigger beside each segment.',
     },
     collapseMiddle: {
       control: 'boolean',
-      description: 'Collapse middle items into the ellipsis dropdown',
+      description: 'Collapses middle items into the ellipsis menu.',
     },
     constrainedWidth: {
       control: 'boolean',
-      description: 'Render inside a narrow container to preview truncation',
+      description: 'Renders in a narrow container to show truncation.',
     },
   },
   render: ({
@@ -291,6 +298,13 @@ export const Default: Story = {
 // A long trail collapsed with an ellipsis standing in for the middle.
 export const WithEllipsis: Story = {
   tags: ['docs'],
+  parameters: {
+    docs: {
+      description: {
+        story: 'Collapse the middle of a long trail into an ellipsis menu.',
+      },
+    },
+  },
   render: () => (
     <Breadcrumb>
       <BreadcrumbList>
@@ -352,6 +366,13 @@ export const WithEllipsis: Story = {
 // nested inside the anchor.
 export const WithIcons: Story = {
   tags: ['docs'],
+  parameters: {
+    docs: {
+      description: {
+        story: 'Add icons to segments and a menu trigger for alternate paths.',
+      },
+    },
+  },
   render: () => (
     <Breadcrumb>
       <BreadcrumbList>

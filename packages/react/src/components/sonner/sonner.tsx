@@ -72,10 +72,8 @@ const toasterThemeVars = {
 /**
  * Toaster
  *
- * Renders toast notifications, themed to Nexus tokens and riding the Nexus
- * toast layer (z-index 100). Mount once near the root of your app, then call
- * `toast(...)` (re-exported here) from anywhere. The active theme follows the
- * `.dark` class automatically.
+ * Renders toast notifications. Mount it once near your app root, then call
+ * `toast()` from anywhere. It follows the `.dark` class for dark mode.
  *
  * @example
  * ```tsx

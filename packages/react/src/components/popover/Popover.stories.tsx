@@ -23,6 +23,12 @@ const meta: Meta<typeof Popover> = {
   component: Popover,
   parameters: {
     layout: 'padded',
+    docs: {
+      description: {
+        component:
+          'Popover opens a floating panel next to a trigger. Use it for short forms and extra controls. For a hover hint, use Tooltip, and for a list of actions, use DropdownMenu.',
+      },
+    },
   },
 };
 
@@ -51,6 +57,13 @@ export const Default: Story = {
 
 export const WithForm: Story = {
   tags: ['docs'],
+  parameters: {
+    docs: {
+      description: {
+        story: 'Put a small form with labelled inputs inside the popover.',
+      },
+    },
+  },
   // Named function + useId so the label/input pairs are uniquely associated.
   render: function WithFormStory() {
     const widthId = React.useId();
@@ -97,6 +110,14 @@ export const WithForm: Story = {
 
 export const Placements: Story = {
   tags: ['docs'],
+  parameters: {
+    docs: {
+      description: {
+        story:
+          'Set `side` and `align` on PopoverContent to place it around the trigger.',
+      },
+    },
+  },
   render: (_args) => (
     <div className="nx:flex nx:flex-wrap nx:gap-4">
       {(['top', 'right', 'bottom', 'left'] as const).map((side) => (
@@ -125,6 +146,14 @@ export const Placements: Story = {
 
 export const WithAnchor: Story = {
   tags: ['docs'],
+  parameters: {
+    docs: {
+      description: {
+        story:
+          'Wrap another element in PopoverAnchor to position the popover against it instead of the trigger.',
+      },
+    },
+  },
   render: (_args) => (
     <Popover>
       <PopoverAnchor asChild>

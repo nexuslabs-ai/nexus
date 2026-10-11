@@ -24,11 +24,8 @@ const AlertDialogLayoutContext =
   React.createContext<AlertDialogLayoutContextValue>(defaultOverlayLayout);
 
 /**
- * AlertDialog
- *
- * Root component for an alert dialog — a modal that interrupts the user and
- * forces an explicit choice. Unlike Dialog, it cannot be dismissed by clicking
- * the overlay and has no close (X) button; the user must pick an action.
+ * Modal that makes the user confirm or cancel before continuing.
+ * Clicking the overlay doesn't close it, and it has no close (X) button.
  *
  * @example
  * ```tsx
@@ -54,16 +51,12 @@ const AlertDialogLayoutContext =
 const AlertDialog = AlertDialogPrimitive.Root;
 
 /**
- * AlertDialogTrigger
- *
- * Button that opens the alert dialog. Use `asChild` to render as your own component.
+ * Opens the alert dialog. Pass `asChild` to render your own button.
  */
 const AlertDialogTrigger = AlertDialogPrimitive.Trigger;
 
 /**
- * AlertDialogPortal
- *
- * Portals the alert dialog content to document.body.
+ * Renders the alert dialog into `document.body`.
  */
 const AlertDialogPortal = AlertDialogPrimitive.Portal;
 
@@ -77,10 +70,7 @@ interface AlertDialogOverlayProps extends React.ComponentProps<
 > {}
 
 /**
- * AlertDialogOverlay
- *
- * Semi-transparent overlay behind the alert dialog content. Clicking it does
- * not dismiss the dialog — that is the defining behaviour of an alert dialog.
+ * Dimmed backdrop behind the alert dialog. Clicking it doesn't close the dialog.
  */
 function AlertDialogOverlay({ className, ...props }: AlertDialogOverlayProps) {
   return (
@@ -101,21 +91,16 @@ interface AlertDialogContentProps extends React.ComponentProps<
   typeof AlertDialogPrimitive.Content
 > {
   /**
-   * Layout variant for the alert dialog content.
-   *
-   * `default` keeps the header left-aligned and footer actions horizontal.
-   * `center` centers the header and stacks full-width footer actions.
+   * Layout. `default` left-aligns the header and puts actions in a row.
+   * `center` centers the header and stacks full-width actions.
    * @default "default"
    */
   variant?: AlertDialogVariant;
 }
 
 /**
- * AlertDialogContent
- *
- * The main content container for the alert dialog. Renders inside a portal with
- * an overlay. There is no close button — close via AlertDialogAction or
- * AlertDialogCancel.
+ * Dialog panel, rendered in a portal over the overlay.
+ * It has no close button. AlertDialogAction and AlertDialogCancel close it.
  *
  * @example
  * ```tsx
@@ -173,9 +158,7 @@ interface AlertDialogHeaderProps
     VariantProps<typeof overlayHeaderVariants> {}
 
 /**
- * AlertDialogHeader
- *
- * Container for alert dialog title and description. Provides consistent spacing.
+ * Holds the title and description.
  *
  * @example
  * ```tsx
@@ -214,10 +197,7 @@ function AlertDialogHeader({
 interface AlertDialogBodyProps extends React.ComponentProps<'div'> {}
 
 /**
- * AlertDialogBody
- *
- * Container for the alert dialog's body content. Insets content horizontally to
- * align with the header and footer.
+ * Holds extra content, aligned with the header and footer.
  *
  * @example
  * ```tsx
@@ -247,9 +227,7 @@ function AlertDialogBody({ className, ...props }: AlertDialogBodyProps) {
 interface AlertDialogFooterProps extends React.ComponentProps<'div'> {}
 
 /**
- * AlertDialogFooter
- *
- * Container for alert dialog action buttons. Stacks on mobile, inline on desktop.
+ * Holds the action buttons. They stack on narrow screens and sit in a row from `sm` up.
  *
  * @example
  * ```tsx
@@ -285,9 +263,7 @@ interface AlertDialogTitleProps extends React.ComponentProps<
 > {}
 
 /**
- * AlertDialogTitle
- *
- * The title of the alert dialog. Should be used within AlertDialogHeader.
+ * Dialog title. Place it inside AlertDialogHeader.
  *
  * @example
  * ```tsx
@@ -314,9 +290,7 @@ interface AlertDialogDescriptionProps extends React.ComponentProps<
 > {}
 
 /**
- * AlertDialogDescription
- *
- * Supporting text that explains the consequence of the action.
+ * Explains the result of the action.
  *
  * @example
  * ```tsx
@@ -344,9 +318,7 @@ function AlertDialogDescription({
 /**
  * AlertDialogActionProps
  *
- * Props for the AlertDialogAction component. Inherits the `variant` / `size`
- * props from `buttonVariants` so the confirming action can be styled like any
- * Button — typically `default` (primary) or `destructive`.
+ * Props for AlertDialogAction. Takes Button's `variant` and `size`.
  */
 interface AlertDialogActionProps
   extends
@@ -354,11 +326,8 @@ interface AlertDialogActionProps
     VariantProps<typeof buttonVariants> {}
 
 /**
- * AlertDialogAction
- *
- * The confirming action. Composes `buttonVariants` and closes the dialog when
- * clicked. Defaults to the primary button; pass `variant="destructive"` for a
- * destructive confirmation.
+ * Confirm button. Closes the dialog on click.
+ * Renders a primary Button. Pass `variant="destructive"` for a destructive action.
  *
  * @example
  * ```tsx
@@ -385,8 +354,7 @@ function AlertDialogAction({
 /**
  * AlertDialogCancelProps
  *
- * Props for the AlertDialogCancel component. Inherits the `variant` / `size`
- * props from `buttonVariants`; defaults to the `outline` button.
+ * Props for AlertDialogCancel. Takes Button's `variant` and `size`.
  */
 interface AlertDialogCancelProps
   extends
@@ -394,10 +362,7 @@ interface AlertDialogCancelProps
     VariantProps<typeof buttonVariants> {}
 
 /**
- * AlertDialogCancel
- *
- * The dismissing action. Composes `buttonVariants` and closes the dialog when
- * clicked. Defaults to the `outline` button.
+ * Cancel button, styled as an `outline` Button. Closes the dialog on click.
  *
  * @example
  * ```tsx

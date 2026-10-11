@@ -9,6 +9,14 @@ import { NexusThemeQuickControl } from './theme-quick-control';
 const meta: Meta<typeof NexusThemeQuickControl> = {
   title: 'Appearance/ThemeQuickControl',
   component: NexusThemeQuickControl,
+  parameters: {
+    docs: {
+      description: {
+        component:
+          'NexusThemeQuickControl is an icon button that opens a popover for mode, surface tone and brand color. Render it inside NexusAppearanceProvider. For every setting, use NexusAppearanceSettings.',
+      },
+    },
+  },
   decorators: [
     (Story) => (
       <NexusAppearanceProvider storageKey={false}>

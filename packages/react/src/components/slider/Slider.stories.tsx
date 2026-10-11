@@ -10,6 +10,14 @@ import { Slider, type SliderProps } from './slider';
 const meta: Meta<typeof Slider> = {
   title: 'Components/Slider',
   component: Slider,
+  parameters: {
+    docs: {
+      description: {
+        component:
+          'Slider sets a number, or a range with two thumbs, by dragging along a track or with the arrow keys. Use it for settings such as volume or brightness. Give each slider an `aria-label` or `aria-labelledby`.',
+      },
+    },
+  },
   decorators: [
     (Story) => (
       <div className="nx:w-96">
@@ -114,6 +122,13 @@ export const BareDefault: Story = {
 // A Fluid-inspired row with a larger segmented control surface.
 export const Comfortable: Story = {
   tags: ['docs'],
+  parameters: {
+    docs: {
+      description: {
+        story: 'Set `size="comfortable"` for a taller rail and thumb.',
+      },
+    },
+  },
   render: () => (
     <Slider
       size="comfortable"
@@ -128,6 +143,13 @@ export const Comfortable: Story = {
 // Reference-style control rows with inline label and value text.
 export const ControlRows: Story = {
   tags: ['docs'],
+  parameters: {
+    docs: {
+      description: {
+        story: 'Overlay a label and the current value on a comfortable slider.',
+      },
+    },
+  },
   render: () => (
     <div className="nx:grid nx:w-full nx:gap-6">
       <SliderControlRow
@@ -169,6 +191,13 @@ export const ControlRows: Story = {
 // Two thumbs define a range.
 export const Range: Story = {
   tags: ['docs'],
+  parameters: {
+    docs: {
+      description: {
+        story: 'Pass two values to select a range between two thumbs.',
+      },
+    },
+  },
   render: () => (
     <Slider
       defaultValue={[25, 75]}
@@ -196,6 +225,13 @@ export const Range: Story = {
 // Larger step increments snap the thumb.
 export const Steps: Story = {
   tags: ['docs'],
+  parameters: {
+    docs: {
+      description: {
+        story: 'Set `step` so the thumb snaps to fixed increments.',
+      },
+    },
+  },
   render: () => (
     <Slider defaultValue={[40]} max={100} step={10} aria-label="Brightness" />
   ),
@@ -238,6 +274,14 @@ export const ExplicitMarkers: Story = {
 // Vertical orientation.
 export const Vertical: Story = {
   tags: ['docs'],
+  parameters: {
+    docs: {
+      description: {
+        story:
+          'Set `orientation="vertical"` inside a parent with a set height.',
+      },
+    },
+  },
   render: () => (
     <div className="nx:flex nx:h-48 nx:justify-center">
       <Slider
@@ -572,6 +616,13 @@ export const KeyboardInteraction: Story = {
 // A disabled slider does not respond to interaction.
 export const Disabled: Story = {
   tags: ['docs'],
+  parameters: {
+    docs: {
+      description: {
+        story: 'A disabled slider uses muted colors and ignores input.',
+      },
+    },
+  },
   render: () => (
     <Slider disabled defaultValue={[50]} max={100} aria-label="Volume" />
   ),

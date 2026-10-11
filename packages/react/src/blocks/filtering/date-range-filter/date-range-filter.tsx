@@ -18,7 +18,7 @@ import { isCalendarDay } from '../../../lib/filter-model';
 import { ConditionOperator } from '../filter-operator';
 import { useConditionEditor } from '../use-condition-editor';
 
-/** `from` and `to` are calendar days (`YYYY-MM-DD`), so JSON and URLs keep the same day in every timezone. */
+/** `from` and `to` are calendar days (`YYYY-MM-DD`), so stored and shared values keep the same day in every timezone. */
 export type DateRangeCondition =
   | { operator: 'between'; from: string; to: string }
   | { operator: 'isEmpty' | 'isNotEmpty' };

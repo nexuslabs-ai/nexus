@@ -25,9 +25,7 @@ type AccordionProps = React.ComponentProps<typeof AccordionPrimitive.Root> &
   VariantProps<typeof accordionVariants>;
 
 /**
- * Accordion Root
- *
- * Container for accordion items. Supports single or multiple expanded items.
+ * Stacks sections that expand and collapse. `type` sets whether one or several open at once.
  *
  * @example
  * ```tsx
@@ -55,9 +53,7 @@ function Accordion({
 }
 
 /**
- * AccordionItem
- *
- * Individual accordion section containing a trigger and content.
+ * One section, holding an AccordionTrigger and an AccordionContent.
  */
 interface AccordionItemProps extends React.ComponentProps<
   typeof AccordionPrimitive.Item
@@ -79,10 +75,7 @@ function AccordionItem({ className, ...props }: AccordionItemProps) {
 }
 
 /**
- * AccordionTrigger
- *
- * Button that toggles the expanded state of an accordion item.
- * Includes a chevron icon that rotates when expanded.
+ * Button that opens and closes its item. Its chevron flips when the item is open.
  */
 interface AccordionTriggerProps extends React.ComponentProps<
   typeof AccordionPrimitive.Trigger
@@ -119,10 +112,7 @@ function AccordionTrigger({
 }
 
 /**
- * AccordionContent
- *
- * Collapsible content area for an accordion item.
- * Animates open/close with height transition.
+ * Content of an item. Its height animates as the item opens and closes.
  */
 interface AccordionContentProps extends React.ComponentProps<
   typeof AccordionPrimitive.Content

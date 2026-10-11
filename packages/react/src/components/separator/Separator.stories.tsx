@@ -7,6 +7,12 @@ const meta: Meta<typeof Separator> = {
   title: 'Components/Separator',
   component: Separator,
   parameters: {
+    docs: {
+      description: {
+        component:
+          'Separator draws a thin rule between groups of content. Use `orientation="vertical"` inside a flex row with a set height. Set `decorative={false}` when the rule marks a real boundary that screen readers should announce.',
+      },
+    },
     layout: 'padded',
   },
 };
@@ -47,6 +53,14 @@ export const InContext: Story = {
 
 export const Vertical: Story = {
   tags: ['docs'],
+  parameters: {
+    docs: {
+      description: {
+        story:
+          'Divide inline links with vertical rules inside a row of fixed height.',
+      },
+    },
+  },
   // A vertical rule stretches to its parent's height — the row sets `nx:h-5`.
   render: () => (
     <div className="nx:flex nx:h-5 nx:items-center nx:gap-3 nx:typography-label-default nx:text-foreground">

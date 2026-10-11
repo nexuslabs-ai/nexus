@@ -14,9 +14,9 @@ interface PageHeaderProps extends React.ComponentProps<'header'> {}
 /**
  * PageHeader
  *
- * The title block of a page or section: a title, an optional description and
- * metadata, and the page's primary actions. Actions sit beside the content
- * while there is room and wrap below it when there is not.
+ * Title block of a page or section, with optional description, metadata and
+ * primary actions. Actions sit beside the title and wrap below it when space
+ * runs out.
  *
  * @example
  * ```tsx
@@ -56,8 +56,8 @@ interface PageHeaderContentProps extends React.ComponentProps<'div'> {}
 /**
  * PageHeaderContent
  *
- * Stacks the metadata, title, and description. It grows to fill the row and
- * keeps a minimum width, so actions wrap below it before they squeeze it.
+ * Stack of metadata, title and description. Fills the row and keeps a
+ * minimum width, so actions wrap below it instead of squeezing it.
  */
 function PageHeaderContent({ className, ...props }: PageHeaderContentProps) {
   return (
@@ -82,7 +82,7 @@ interface PageHeaderMetaProps extends React.ComponentProps<'p'> {}
 /**
  * PageHeaderMeta
  *
- * A short eyebrow line above the title, such as a record ID or parent project.
+ * Short line above the title, such as a record ID or parent project.
  */
 function PageHeaderMeta({ className, ...props }: PageHeaderMetaProps) {
   return (
@@ -107,8 +107,8 @@ interface PageHeaderTitleRowProps extends React.ComponentProps<'div'> {}
 /**
  * PageHeaderTitleRow
  *
- * Places inline status, such as a Badge, beside the title and wraps it below
- * the title when the row runs out of space.
+ * Row that puts a status, such as a Badge, beside the title. The status
+ * wraps below the title when space runs out.
  */
 function PageHeaderTitleRow({ className, ...props }: PageHeaderTitleRowProps) {
   return (
@@ -127,8 +127,8 @@ function PageHeaderTitleRow({ className, ...props }: PageHeaderTitleRowProps) {
  */
 interface PageHeaderTitleProps extends React.ComponentProps<'h1'> {
   /**
-   * Render the title styles on a child element. Use this when the header
-   * needs a different heading level in the page outline.
+   * Renders the child element with the title styles. Use it to change the
+   * heading level.
    *
    * @default false
    * @example
@@ -144,8 +144,8 @@ interface PageHeaderTitleProps extends React.ComponentProps<'h1'> {
 /**
  * PageHeaderTitle
  *
- * The page or section title. Renders an `h1` at `heading-medium`; use
- * `asChild` to change the heading level and `className` to change the size.
+ * Title of the page or section, rendered as an `h1`. Use `asChild` to change
+ * the heading level and `className` to change the size.
  */
 function PageHeaderTitle({
   asChild = false,
@@ -176,7 +176,7 @@ interface PageHeaderDescriptionProps extends React.ComponentProps<'p'> {}
 /**
  * PageHeaderDescription
  *
- * Supporting copy beneath the title.
+ * Supporting text under the title.
  */
 function PageHeaderDescription({
   className,
@@ -204,8 +204,8 @@ interface PageHeaderActionsProps extends React.ComponentProps<'div'> {}
 /**
  * PageHeaderActions
  *
- * The page's primary actions. Buttons wrap within the group when it is
- * narrower than their combined width.
+ * Primary actions of the page. Buttons wrap onto more lines when they don't
+ * fit.
  */
 function PageHeaderActions({ className, ...props }: PageHeaderActionsProps) {
   return (

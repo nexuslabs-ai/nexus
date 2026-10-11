@@ -19,6 +19,14 @@ import { NexusAppearanceSettings } from './appearance-settings';
 const meta: Meta<typeof NexusAppearanceSettings> = {
   title: 'Appearance/AppearanceSettings',
   component: NexusAppearanceSettings,
+  parameters: {
+    docs: {
+      description: {
+        component:
+          'NexusAppearanceSettings is a full settings panel for theme, typography, layout feel and interaction preferences. Render it inside NexusAppearanceProvider. For a compact popover, use NexusThemeQuickControl.',
+      },
+    },
+  },
   render: () => (
     <NexusAppearanceProvider
       storageKey={false}

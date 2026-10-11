@@ -32,7 +32,7 @@ const textareaVariants = cva(
 /**
  * TextareaProps
  *
- * Props for the Textarea component.
+ * Props for Textarea.
  */
 interface TextareaProps
   extends
@@ -42,12 +42,8 @@ interface TextareaProps
 /**
  * Textarea
  *
- * A multi-line text input. Mirrors Input's surface, focus, and `aria-invalid`
- * treatment and accepts all native textarea attributes. Use `rows` (or a
- * `min-height` override via `className`) to set the initial height. The
- * `variant="bordered"` treatment is the default; use `variant="borderless"` to
- * remove the resting field stroke while keeping a tonal control fill for
- * resting affordance.
+ * Multi-line text field styled like Input. Set the starting height with `rows`.
+ * Set `variant="borderless"` to drop the border and keep a tinted fill.
  *
  * @example
  * ```tsx

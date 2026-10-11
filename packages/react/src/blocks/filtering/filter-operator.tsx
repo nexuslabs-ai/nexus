@@ -13,7 +13,7 @@ import {
   filterOperatorLabels,
 } from '../../lib/filter-model';
 
-/** Recipe wiring; applications control the operator alongside the value. */
+/** Dropdown that picks a condition's operator. Your app controls the operator along with the value. */
 export function ConditionOperator<Operator extends FilterOperator>({
   label,
   value,

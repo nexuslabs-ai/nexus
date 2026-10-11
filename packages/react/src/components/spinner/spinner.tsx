@@ -6,18 +6,15 @@ import { cn } from '../../lib/utils';
 /**
  * SpinnerProps
  *
- * Props for the Spinner component.
+ * Props for Spinner.
  */
 interface SpinnerProps extends React.ComponentProps<'svg'> {}
 
 /**
  * Spinner
  *
- * A loading indicator — a continuously rotating glyph for full-page loads,
- * "loading more…" rows, overlays on cards and tables, and Suspense fallbacks.
- * Announces itself to assistive tech via `role="status"` and an `aria-label`.
- * Size it with a `nx:size-*` class; it draws in `currentColor`, so recolour
- * with `nx:text-*`.
+ * Rotating loading indicator with `role="status"` and an `aria-label` of
+ * "Loading". Size it with `nx:size-*` and color it with `nx:text-*`.
  *
  * @example
  * ```tsx

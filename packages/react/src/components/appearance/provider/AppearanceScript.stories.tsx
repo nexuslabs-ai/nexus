@@ -14,6 +14,14 @@ import {
 const meta: Meta<NexusAppearanceScriptProps> = {
   title: 'Appearance/AppearanceScript',
   component: NexusAppearanceScript,
+  parameters: {
+    docs: {
+      description: {
+        component:
+          "NexusAppearanceScript applies the saved appearance before the first paint, so the page doesn't flash the wrong theme. Render it in the `<head>` of your server-rendered document. Pass `nonce` when your Content Security Policy requires one.",
+      },
+    },
+  },
   args: { storageKey: false },
 };
 

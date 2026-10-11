@@ -31,13 +31,11 @@ const meta: Meta<typeof Alert> = {
     docs: {
       description: {
         component: `
-Alert is a composable callout for status, warning, error, success, or informational messages. The root controls status, presentation, and layout; icons, content, actions, and dismissal are composed with children.
+Alert shows a status message inside the page. Use it for information, success, warning and error messages. Compose the icon, text, actions and close button as children.
 
-Action pattern rules:
-- Stack layout: valid with no actions, one button action, or two button actions.
-- Stack layout: do not use AlertClose because the close icon is not an approved below-message placement.
-- Inline layout: valid with close-only, one or two button actions, or button action(s) plus AlertClose.
-- Dismissal stays consumer-controlled. AlertClose only renders the control; it does not remove the alert by itself.
+- Stack layout: use no actions, or one or two Button actions. Leave out AlertClose.
+- Inline layout: use AlertClose alone, one or two Button actions, or Buttons plus AlertClose.
+- AlertClose doesn't remove the alert. Remove it in your own \`onClick\` handler.
         `,
       },
     },
@@ -51,7 +49,7 @@ Action pattern rules:
     variant: {
       control: 'select',
       options: ['default', 'information', 'destructive', 'success', 'warning'],
-      description: 'The visual style variant',
+      description: 'Status color.',
       table: {
         category: 'Controls',
       },
@@ -59,7 +57,7 @@ Action pattern rules:
     presentation: {
       control: 'select',
       options: ['card', 'banner'],
-      description: 'The alert presentation style',
+      description: 'Rounded card, or edge-to-edge banner.',
       table: {
         category: 'Controls',
       },
@@ -67,7 +65,7 @@ Action pattern rules:
     layout: {
       control: 'select',
       options: ['stack', 'inline'],
-      description: 'The alert content/action arrangement',
+      description: 'Actions under the text, or inline at the end.',
       table: {
         category: 'Controls',
       },
@@ -272,8 +270,7 @@ export const Playground: PlaygroundStory = {
         'primary + secondary',
         'primary + secondary + close',
       ],
-      description:
-        'Story-only inline action pattern. Inline permits close-only, one action, two actions, and close combinations.',
+      description: 'Story only. Action pattern for the inline layout.',
       table: {
         category: 'Controls',
       },
@@ -287,7 +284,7 @@ export const Playground: PlaygroundStory = {
       control: 'select',
       options: ['none', 'primary', 'primary + secondary'],
       description:
-        'Story-only stack action pattern. AlertClose is intentionally omitted because the close icon should not sit below the message.',
+        'Story only. Action pattern for the stack layout, without AlertClose.',
       table: {
         category: 'Controls',
       },
@@ -300,22 +297,21 @@ export const Playground: PlaygroundStory = {
       name: 'icon (story only)',
       control: 'select',
       options: ['none', 'information', 'warning', 'success', 'destructive'],
-      description:
-        'Story-only control that renders an icon child before AlertContent.',
+      description: 'Story only. Renders an AlertIcon before AlertContent.',
       table: {
         category: 'Controls',
       },
     },
     title: {
       control: 'text',
-      description: 'Story-only alert title text.',
+      description: 'Story only. Title text.',
       table: {
         category: 'Controls',
       },
     },
     description: {
       control: 'text',
-      description: 'Story-only alert description text.',
+      description: 'Story only. Description text.',
       table: {
         category: 'Controls',
       },
@@ -323,7 +319,7 @@ export const Playground: PlaygroundStory = {
     primaryActionLabel: {
       name: 'primary label (story only)',
       control: 'text',
-      description: 'Story-only primary Button children.',
+      description: 'Story only. Primary Button label.',
       table: {
         category: 'Controls',
       },
@@ -332,7 +328,7 @@ export const Playground: PlaygroundStory = {
       name: 'primary variant (story only)',
       control: 'select',
       options: ['default', 'destructive', 'outline', 'secondary', 'ghost'],
-      description: 'Story-only primary Button variant.',
+      description: 'Story only. Primary Button variant.',
       table: {
         category: 'Controls',
       },
@@ -340,7 +336,7 @@ export const Playground: PlaygroundStory = {
     secondaryActionLabel: {
       name: 'secondary label (story only)',
       control: 'text',
-      description: 'Story-only secondary Button children.',
+      description: 'Story only. Secondary Button label.',
       table: {
         category: 'Controls',
       },
@@ -349,7 +345,7 @@ export const Playground: PlaygroundStory = {
       name: 'secondary variant (story only)',
       control: 'select',
       options: ['default', 'destructive', 'outline', 'secondary', 'ghost'],
-      description: 'Story-only secondary Button variant.',
+      description: 'Story only. Secondary Button variant.',
       table: {
         category: 'Controls',
       },
@@ -362,7 +358,7 @@ export const Playground: PlaygroundStory = {
     docs: {
       description: {
         story:
-          'Story-only controls render the recommended slot composition. They are not Alert props; production usage still composes icons, Button, AlertActions, and AlertClose as children. The visible action control changes by layout so stack omits AlertClose patterns while inline keeps them available.',
+          'Story-only controls build the recommended children, because Alert takes its icon, actions and AlertClose as children, not props.',
       },
       source: {
         code: `<Alert variant="information" layout="inline">
@@ -478,6 +474,14 @@ export const WithIcon: Story = {
 
 export const BannerPresentation: Story = {
   tags: ['docs'],
+  parameters: {
+    docs: {
+      description: {
+        story:
+          'Show a full-width banner with square corners and a bottom border.',
+      },
+    },
+  },
   args: {
     presentation: 'banner',
     variant: 'information',
@@ -638,6 +642,13 @@ export const LongContent: Story = {
 
 export const DismissibleCloseButton: Story = {
   tags: ['docs'],
+  parameters: {
+    docs: {
+      description: {
+        story: 'Remove the alert from state when the reader clicks AlertClose.',
+      },
+    },
+  },
   args: {
     layout: 'inline',
     variant: 'information',
@@ -746,6 +757,14 @@ export const DescriptionLinkAction: Story = {
 
 export const ActionsBelowDescription: Story = {
   tags: ['docs'],
+  parameters: {
+    docs: {
+      description: {
+        story:
+          'Place two Button actions under the message in the stack layout.',
+      },
+    },
+  },
   args: {
     variant: 'warning',
   },
@@ -1062,6 +1081,15 @@ export const RolePassThrough: Story = {
 
 export const AllVariants: Story = {
   tags: ['docs'],
+  parameters: {
+    layout: 'padded',
+    docs: {
+      description: {
+        story:
+          'Default, destructive, success, information and warning side by side.',
+      },
+    },
+  },
   render: (_args) => (
     <div className="nx:flex nx:flex-col nx:gap-6">
       <div>
@@ -1134,9 +1162,6 @@ export const AllVariants: Story = {
       </div>
     </div>
   ),
-  parameters: {
-    layout: 'padded',
-  },
 };
 
 export const AllBannerVariants: Story = {
@@ -1222,6 +1247,11 @@ export const AllBannerVariants: Story = {
   ),
   parameters: {
     layout: 'padded',
+    docs: {
+      description: {
+        story: 'Compare every status color in card and banner presentation.',
+      },
+    },
   },
 };
 
@@ -1231,7 +1261,7 @@ export const DefaultModeHeightPinned: Story = {
     docs: {
       description: {
         story:
-          'Pin on the stays-numeric outcome: in default mode, an Alert with a single 40px fixed-height child renders at exactly 74px (= border 1 × 2 + `p-4` 16 × 2 + child 40). If a future PR migrates `p-4` to `p-container`, default rendering shifts to 90px (= 2 + 24 × 2 + 40) and this test fails — the regression signal is that Alert was promoted out of the document scale into the container scale.',
+          'At default density, an Alert with one 40px child is exactly 74px tall: 1px borders plus 16px padding top and bottom.',
       },
     },
   },

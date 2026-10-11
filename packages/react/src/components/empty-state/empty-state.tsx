@@ -12,8 +12,8 @@ import { cn } from '../../lib/utils';
  */
 interface EmptyStateProps extends React.ComponentProps<'div'> {
   /**
-   * Render the dashed frame around the empty state — use it to match a
-   * bordered skeleton slot so a loading→empty swap doesn't reflow.
+   * Adds a dashed frame. Match a bordered skeleton so swapping from loading
+   * doesn't shift the layout.
    *
    * @default false
    */
@@ -23,12 +23,8 @@ interface EmptyStateProps extends React.ComponentProps<'div'> {
 /**
  * EmptyState
  *
- * A centered empty-state region for list, table, and record views with no
- * content yet — an icon, a title, a short description, and an optional action.
- * Compose with the sub-components: `EmptyStateHeader` groups the
- * `EmptyStateMedia` (icon), `EmptyStateTitle`, and `EmptyStateDescription`;
- * `EmptyStateContent` holds the call to action. Pass `bordered` to render the
- * dashed frame (e.g. to match a bordered skeleton slot).
+ * A centered message for a list, table or record view with no content yet.
+ * Shows an icon, a title, a short description and an optional action.
  *
  * @example
  * ```tsx
@@ -78,7 +74,7 @@ interface EmptyStateHeaderProps extends React.ComponentProps<'div'> {}
 /**
  * EmptyStateHeader
  *
- * Groups the media, title, and description in a narrow centered column.
+ * Groups the media, title and description in a narrow centered column.
  */
 function EmptyStateHeader({ className, ...props }: EmptyStateHeaderProps) {
   return (
@@ -121,9 +117,8 @@ interface EmptyStateMediaProps
 /**
  * EmptyStateMedia
  *
- * Holds the empty-state's icon or illustration. The `icon` variant renders a
- * muted rounded medallion sized for a single glyph; `default` is an unstyled
- * wrapper for a larger illustration.
+ * Holds the icon or illustration. The `icon` variant puts one icon on a muted
+ * rounded tile. The `default` variant is an unstyled wrapper for a larger image.
  */
 function EmptyStateMedia({
   className,
@@ -147,8 +142,7 @@ function EmptyStateMedia({
  */
 interface EmptyStateTitleProps extends React.ComponentProps<'div'> {
   /**
-   * Render the title styles on a child element. Use this when the empty-state
-   * title should participate in the page outline as a real heading.
+   * Applies the title styles to a child element, such as an `h2` heading.
    *
    * @default false
    * @example
@@ -164,9 +158,8 @@ interface EmptyStateTitleProps extends React.ComponentProps<'div'> {
 /**
  * EmptyStateTitle
  *
- * The headline of the empty state — what is missing. Renders as a `div` by
- * default; use `asChild` to apply empty-state title styling to a semantic
- * heading when the page outline needs one.
+ * The headline that says what is missing. Renders a `div`, so use `asChild`
+ * when the page outline needs a real heading.
  */
 function EmptyStateTitle({
   asChild = false,
@@ -194,7 +187,7 @@ interface EmptyStateDescriptionProps extends React.ComponentProps<'p'> {}
 /**
  * EmptyStateDescription
  *
- * Supporting copy beneath the title; anchors inside are underlined.
+ * Supporting text under the title. Links inside it are underlined.
  */
 function EmptyStateDescription({
   className,
@@ -222,7 +215,7 @@ interface EmptyStateContentProps extends React.ComponentProps<'div'> {}
 /**
  * EmptyStateContent
  *
- * The action area below the header — typically one or two buttons.
+ * The action area under the header, usually one or two buttons.
  */
 function EmptyStateContent({ className, ...props }: EmptyStateContentProps) {
   return (

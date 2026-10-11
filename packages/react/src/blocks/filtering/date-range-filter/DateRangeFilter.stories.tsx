@@ -87,6 +87,10 @@ const meta = {
     layout: 'centered',
     controls: { disable: true },
     docs: {
+      description: {
+        component:
+          'DateRangeFilter filters by a range of calendar days, applied when users press Apply. Use it for created, updated or due dates. Presets cover common ranges, and the calendar covers the rest.',
+      },
       page: () => (
         <>
           <Title />

@@ -6,6 +6,14 @@ import { Spinner } from './spinner';
 const meta: Meta<typeof Spinner> = {
   title: 'Components/Spinner',
   component: Spinner,
+  parameters: {
+    docs: {
+      description: {
+        component:
+          'Spinner shows that something is loading. Use it for page loads, "loading more" rows and Suspense fallbacks. For a loading Button, use its `loading` prop.',
+      },
+    },
+  },
 };
 
 export default meta;
@@ -21,6 +29,14 @@ export const Default: Story = {
 // with nx:text-*.
 export const Sizes: Story = {
   tags: ['docs'],
+  parameters: {
+    docs: {
+      description: {
+        story:
+          'Size the spinner with `nx:size-*` and tint it with `nx:text-*`.',
+      },
+    },
+  },
   render: () => (
     <div className="nx:flex nx:items-center nx:gap-4 nx:text-foreground">
       <Spinner className="nx:size-4" />
@@ -33,6 +49,13 @@ export const Sizes: Story = {
 // Beside the text it describes; a loading Button uses its own `loading` prop.
 export const WithText: Story = {
   tags: ['docs'],
+  parameters: {
+    docs: {
+      description: {
+        story: 'Place the spinner beside text that says what is loading.',
+      },
+    },
+  },
   render: () => (
     <div className="nx:flex nx:items-center nx:gap-2 nx:typography-body-default nx:text-muted-foreground">
       <Spinner className="nx:size-4" />

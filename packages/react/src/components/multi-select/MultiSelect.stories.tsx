@@ -62,7 +62,15 @@ function Frameworks({
 const meta: Meta<typeof MultiSelect> = {
   title: 'Components/MultiSelect',
   component: MultiSelect,
-  parameters: { layout: 'padded' },
+  parameters: {
+    layout: 'padded',
+    docs: {
+      description: {
+        component:
+          'MultiSelect lets the user search a list and pick several options, shown as chips. Use it for tags, filters and other choices with several answers. For one option, use Combobox or Select.',
+      },
+    },
+  },
 };
 
 export default meta;
@@ -94,6 +102,14 @@ export const Controlled: Story = {
 
 export const Grouped: Story = {
   tags: ['docs'],
+  parameters: {
+    docs: {
+      description: {
+        story:
+          'Sort options under headings with MultiSelectGroup and a separator.',
+      },
+    },
+  },
   render: () => (
     <MultiSelect defaultValues={['react']}>
       <MultiSelectTrigger aria-label="Frameworks" className="nx:w-80">
@@ -120,6 +136,14 @@ export const Grouped: Story = {
 
 export const WrapChips: Story = {
   tags: ['docs'],
+  parameters: {
+    docs: {
+      description: {
+        story:
+          'Set `overflowBehavior="wrap"` to wrap every chip onto more lines.',
+      },
+    },
+  },
   render: () => (
     <MultiSelect defaultValues={['react', 'vue', 'svelte', 'angular', 'solid']}>
       <MultiSelectTrigger aria-label="Frameworks" className="nx:w-72">
@@ -144,6 +168,14 @@ export const WrapChips: Story = {
 
 export const OverflowCollapse: Story = {
   tags: ['docs'],
+  parameters: {
+    docs: {
+      description: {
+        story:
+          'Set `overflowBehavior="cutoff"` to show chips that don\'t fit as a `+N` badge.',
+      },
+    },
+  },
   render: () => (
     <MultiSelect
       defaultValues={['react', 'vue', 'svelte', 'angular', 'solid', 'qwik']}
@@ -188,6 +220,14 @@ export const OverflowCollapse: Story = {
 
 export const Disabled: Story = {
   tags: ['docs'],
+  parameters: {
+    docs: {
+      description: {
+        story:
+          'Disable the trigger to show the selection without letting anyone change it.',
+      },
+    },
+  },
   render: () => (
     <MultiSelect defaultValues={['react']}>
       <MultiSelectTrigger aria-label="Frameworks" disabled className="nx:w-80">
@@ -215,6 +255,14 @@ export const Disabled: Story = {
 
 export const WithDisabledOption: Story = {
   tags: ['docs'],
+  parameters: {
+    docs: {
+      description: {
+        story:
+          'Disable one option so it shows in the list but cannot be picked.',
+      },
+    },
+  },
   render: () => (
     <MultiSelect>
       <MultiSelectTrigger aria-label="Frameworks" className="nx:w-80">
@@ -249,6 +297,14 @@ export const WithDisabledOption: Story = {
 
 export const InvalidField: Story = {
   tags: ['docs'],
+  parameters: {
+    docs: {
+      description: {
+        story:
+          'Set `aria-invalid` on the trigger inside an invalid Field to show the error state.',
+      },
+    },
+  },
   render: () => (
     <Field data-invalid>
       <FieldLabel>Frameworks</FieldLabel>

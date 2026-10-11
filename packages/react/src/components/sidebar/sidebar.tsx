@@ -61,8 +61,8 @@ const SidebarContext = React.createContext<SidebarContextProps | null>(null);
 /**
  * useSidebar
  *
- * Reads the sidebar context (open state, narrow-tier state, and the toggle helper).
- * Must be called within a `SidebarProvider`; throws otherwise.
+ * Reads the sidebar state and the `toggleSidebar` helper. Call it inside a
+ * `SidebarProvider`, or it throws.
  *
  * @example
  * ```tsx
@@ -81,15 +81,13 @@ function useSidebar() {
 /**
  * SidebarProviderProps
  *
- * Props for the SidebarProvider component.
+ * Props for SidebarProvider.
  */
 interface SidebarProviderProps extends React.ComponentProps<'div'> {
   /**
-   * Whether the sidebar starts open when uncontrolled.
-   *
-   * When uncontrolled, the provider persists the open state to a `sidebar_state`
-   * cookie. It does not read the cookie back — restore across reloads by reading
-   * it server-side and passing the result here.
+   * Opens the sidebar on first render when uncontrolled. The open state is saved
+   * to a `sidebar_state` cookie. Read that cookie on the server and pass it here
+   * to restore it.
    * @default true
    * @example
    * ```tsx
@@ -101,11 +99,11 @@ interface SidebarProviderProps extends React.ComponentProps<'div'> {
    */
   defaultOpen?: boolean;
   /**
-   * Controlled open state. Pair with `onOpenChange` to control externally.
+   * Controlled open state. Pair it with `onOpenChange`.
    */
   open?: boolean;
   /**
-   * Called when the open state changes (in controlled mode).
+   * Called when the open state changes in controlled mode.
    */
   onOpenChange?: (open: boolean) => void;
 }
@@ -113,9 +111,8 @@ interface SidebarProviderProps extends React.ComponentProps<'div'> {
 /**
  * SidebarProvider
  *
- * Owns the sidebar's open state, the `Ctrl/Cmd+B` keyboard shortcut, and cookie
- * persistence. Wrap your app shell in it; every sidebar part reads its context.
- * Renders a `TooltipProvider` so collapsed-icon tooltips work out of the box.
+ * Holds the open state and the `Ctrl/Cmd+B` shortcut. Wrap your app shell in
+ * it. It includes a `TooltipProvider` for collapsed-icon tooltips.
  *
  * @example
  * ```tsx
@@ -220,22 +217,22 @@ function SidebarProvider({
 /**
  * SidebarProps
  *
- * Props for the Sidebar component.
+ * Props for Sidebar.
  */
 interface SidebarProps extends React.ComponentProps<'div'> {
   /**
-   * Which edge the sidebar docks to.
+   * Edge the sidebar docks to.
    * @default 'left'
    */
   side?: 'left' | 'right';
   /**
-   * Visual treatment: flush `sidebar`, detached `floating`, or `inset` (pairs
-   * with `SidebarInset` for a card-like main region).
+   * Visual style. `inset` pairs with `SidebarInset` to show the main region as a
+   * card.
    * @default 'sidebar'
    */
   variant?: 'sidebar' | 'floating' | 'inset';
   /**
-   * Collapse behaviour: slide `offcanvas`, shrink to an `icon` rail, or `none`.
+   * How it collapses: slides off screen, shrinks to an icon rail, or never.
    * @default 'offcanvas'
    */
   collapsible?: 'offcanvas' | 'icon' | 'none';
@@ -244,9 +241,8 @@ interface SidebarProps extends React.ComponentProps<'div'> {
 /**
  * Sidebar
  *
- * The sidebar panel. In the Narrow tier (below `md`) it renders as a Sheet
- * drawer; at or above `md` it docks to the chosen `side` and collapses per the
- * `collapsible` mode.
+ * The sidebar panel. Below `md` it opens as a Sheet. From `md` up it docks to
+ * `side` and collapses as `collapsible` sets.
  *
  * @example
  * ```tsx
@@ -371,15 +367,15 @@ function Sidebar({
 /**
  * SidebarTriggerProps
  *
- * Props for the SidebarTrigger component.
+ * Props for SidebarTrigger.
  */
 interface SidebarTriggerProps extends React.ComponentProps<typeof Button> {}
 
 /**
  * SidebarTrigger
  *
- * Icon button that toggles the sidebar. Place it in your top bar or sidebar
- * header. Also reachable via `Ctrl/Cmd+B`.
+ * Icon button that opens and closes the sidebar. Place it in your top bar or
+ * sidebar header.
  */
 function SidebarTrigger({ className, onClick, ...props }: SidebarTriggerProps) {
   const { toggleSidebar } = useSidebar();
@@ -407,15 +403,14 @@ function SidebarTrigger({ className, onClick, ...props }: SidebarTriggerProps) {
 /**
  * SidebarRailProps
  *
- * Props for the SidebarRail component.
+ * Props for SidebarRail.
  */
 interface SidebarRailProps extends React.ComponentProps<'button'> {}
 
 /**
  * SidebarRail
  *
- * Thin hit-target along the sidebar's inner edge that toggles it on click —
- * a quick affordance for collapsing/expanding without leaving the panel.
+ * Thin strip on the sidebar's inner edge that toggles the sidebar on click.
  */
 function SidebarRail({ className, ...props }: SidebarRailProps) {
   const { toggleSidebar } = useSidebar();
@@ -444,17 +439,15 @@ function SidebarRail({ className, ...props }: SidebarRailProps) {
 /**
  * SidebarInsetProps
  *
- * Props for the SidebarInset component.
+ * Props for SidebarInset.
  */
 interface SidebarInsetProps extends React.ComponentProps<'main'> {}
 
 /**
  * SidebarInset
  *
- * The main content region beside the sidebar. With `variant="inset"` it floats
- * as a rounded card; otherwise it fills the remaining width. `min-w-0` lets a
- * wide child (e.g. a data table) scroll inside its own container instead of
- * forcing the inset — and the page — wider than the viewport.
+ * Main content region beside the sidebar. With `variant="inset"` it shows as a
+ * rounded card. Wide children such as tables scroll inside it.
  */
 function SidebarInset({ className, ...props }: SidebarInsetProps) {
   return (
@@ -473,14 +466,14 @@ function SidebarInset({ className, ...props }: SidebarInsetProps) {
 /**
  * SidebarInputProps
  *
- * Props for the SidebarInput component.
+ * Props for SidebarInput.
  */
 interface SidebarInputProps extends React.ComponentProps<typeof Input> {}
 
 /**
  * SidebarInput
  *
- * An `Input` pre-styled to sit inside the sidebar (e.g. a filter field).
+ * `Input` styled for the sidebar, such as a filter field.
  */
 function SidebarInput({ className, ...props }: SidebarInputProps) {
   return (
@@ -498,14 +491,14 @@ function SidebarInput({ className, ...props }: SidebarInputProps) {
 /**
  * SidebarHeaderProps
  *
- * Props for the SidebarHeader component.
+ * Props for SidebarHeader.
  */
 interface SidebarHeaderProps extends React.ComponentProps<'div'> {}
 
 /**
  * SidebarHeader
  *
- * Top region of the sidebar — typically the brand mark or a workspace switcher.
+ * Top of the sidebar, for a logo or a workspace switcher.
  */
 function SidebarHeader({ className, ...props }: SidebarHeaderProps) {
   return (
@@ -520,14 +513,14 @@ function SidebarHeader({ className, ...props }: SidebarHeaderProps) {
 /**
  * SidebarFooterProps
  *
- * Props for the SidebarFooter component.
+ * Props for SidebarFooter.
  */
 interface SidebarFooterProps extends React.ComponentProps<'div'> {}
 
 /**
  * SidebarFooter
  *
- * Bottom region of the sidebar — typically a user menu or sign-out control.
+ * Bottom of the sidebar, for a user menu or sign-out button.
  */
 function SidebarFooter({ className, ...props }: SidebarFooterProps) {
   return (
@@ -542,7 +535,7 @@ function SidebarFooter({ className, ...props }: SidebarFooterProps) {
 /**
  * SidebarSeparatorProps
  *
- * Props for the SidebarSeparator component.
+ * Props for SidebarSeparator.
  */
 interface SidebarSeparatorProps extends React.ComponentProps<
   typeof Separator
@@ -551,7 +544,7 @@ interface SidebarSeparatorProps extends React.ComponentProps<
 /**
  * SidebarSeparator
  *
- * A `Separator` inset to align with the sidebar's content padding.
+ * `Separator` inset to line up with the sidebar's content.
  */
 function SidebarSeparator({ className, ...props }: SidebarSeparatorProps) {
   return (
@@ -569,17 +562,15 @@ function SidebarSeparator({ className, ...props }: SidebarSeparatorProps) {
 /**
  * SidebarContentProps
  *
- * Props for the SidebarContent component.
+ * Props for SidebarContent.
  */
 interface SidebarContentProps extends React.ComponentProps<'nav'> {}
 
 /**
  * SidebarContent
  *
- * The sidebar's scrollable nav region holding its groups and menus. Renders as a
- * `<nav>` landmark, named via `aria-label` (default "Sidebar"), so assistive tech
- * can jump to it — pass a distinct `aria-label` when a page has more than one
- * navigation. Hides overflow when collapsed to the icon rail.
+ * Scrollable `<nav>` landmark that holds the groups and menus. Its `aria-label`
+ * defaults to "Sidebar". Give each `<nav>` on a page a distinct `aria-label`.
  */
 function SidebarContent({
   className,
@@ -606,14 +597,14 @@ function SidebarContent({
 /**
  * SidebarGroupProps
  *
- * Props for the SidebarGroup component.
+ * Props for SidebarGroup.
  */
 interface SidebarGroupProps extends React.ComponentProps<'div'> {}
 
 /**
  * SidebarGroup
  *
- * A labelled section of the sidebar, grouping related menu items.
+ * Labelled section that groups related menu items.
  */
 function SidebarGroup({ className, ...props }: SidebarGroupProps) {
   return (
@@ -631,11 +622,11 @@ function SidebarGroup({ className, ...props }: SidebarGroupProps) {
 /**
  * SidebarGroupLabelProps
  *
- * Props for the SidebarGroupLabel component.
+ * Props for SidebarGroupLabel.
  */
 interface SidebarGroupLabelProps extends React.ComponentProps<'div'> {
   /**
-   * Render as the child element via Radix `Slot` (e.g. an accessible heading).
+   * Renders the child element instead, such as a heading.
    * @default false
    */
   asChild?: boolean;
@@ -644,8 +635,7 @@ interface SidebarGroupLabelProps extends React.ComponentProps<'div'> {
 /**
  * SidebarGroupLabel
  *
- * The heading above a `SidebarGroup`. Fades out when the sidebar collapses to
- * the icon rail.
+ * Heading of a `SidebarGroup`. Fades out on the icon rail.
  */
 function SidebarGroupLabel({
   className,
@@ -670,11 +660,11 @@ function SidebarGroupLabel({
 /**
  * SidebarGroupActionProps
  *
- * Props for the SidebarGroupAction component.
+ * Props for SidebarGroupAction.
  */
 interface SidebarGroupActionProps extends React.ComponentProps<'button'> {
   /**
-   * Render as the child element via Radix `Slot`.
+   * Renders the child element instead.
    * @default false
    */
   asChild?: boolean;
@@ -683,8 +673,7 @@ interface SidebarGroupActionProps extends React.ComponentProps<'button'> {
 /**
  * SidebarGroupAction
  *
- * A small action button pinned to a group's top-right (e.g. "add" next to a
- * group label). Hidden when collapsed to the icon rail.
+ * Small button at a group's top-right, such as "Add". Hidden on the icon rail.
  */
 function SidebarGroupAction({
   className,
@@ -709,14 +698,14 @@ function SidebarGroupAction({
 /**
  * SidebarGroupContentProps
  *
- * Props for the SidebarGroupContent component.
+ * Props for SidebarGroupContent.
  */
 interface SidebarGroupContentProps extends React.ComponentProps<'div'> {}
 
 /**
  * SidebarGroupContent
  *
- * Wrapper for the body of a `SidebarGroup` (usually a `SidebarMenu`).
+ * Body of a `SidebarGroup`, usually a `SidebarMenu`.
  */
 function SidebarGroupContent({
   className,
@@ -734,14 +723,14 @@ function SidebarGroupContent({
 /**
  * SidebarMenuProps
  *
- * Props for the SidebarMenu component.
+ * Props for SidebarMenu.
  */
 interface SidebarMenuProps extends React.ComponentProps<'ul'> {}
 
 /**
  * SidebarMenu
  *
- * The `<ul>` holding a group's navigation items.
+ * `<ul>` that holds a group's nav items.
  */
 function SidebarMenu({ className, ...props }: SidebarMenuProps) {
   return (
@@ -759,15 +748,15 @@ function SidebarMenu({ className, ...props }: SidebarMenuProps) {
 /**
  * SidebarMenuItemProps
  *
- * Props for the SidebarMenuItem component.
+ * Props for SidebarMenuItem.
  */
 interface SidebarMenuItemProps extends React.ComponentProps<'li'> {}
 
 /**
  * SidebarMenuItem
  *
- * A single `<li>` in a `SidebarMenu`; wraps a `SidebarMenuButton` plus optional
- * action/badge/sub-menu.
+ * One `<li>` in a `SidebarMenu`. Holds a `SidebarMenuButton` and an optional
+ * action, badge or submenu.
  */
 function SidebarMenuItem({ className, ...props }: SidebarMenuItemProps) {
   return (
@@ -815,25 +804,24 @@ const sidebarMenuButtonVariants = cva(
 /**
  * SidebarMenuButtonProps
  *
- * Props for the SidebarMenuButton component.
+ * Props for SidebarMenuButton.
  */
 interface SidebarMenuButtonProps
   extends
     React.ComponentProps<'button'>,
     VariantProps<typeof sidebarMenuButtonVariants> {
   /**
-   * Render as the child element via Radix `Slot` (e.g. an `<a>` or router link).
+   * Renders the child element instead, such as a router link.
    * @default false
    */
   asChild?: boolean;
   /**
-   * Marks the item as the current page; styles it as selected.
+   * Marks the item as the current page.
    * @default false
    */
   isActive?: boolean;
   /**
-   * Tooltip shown only when the sidebar is collapsed to the icon rail. Pass a
-   * string for label-only, or `TooltipContent` props for full control.
+   * Tooltip shown only on the icon rail. A string or `TooltipContent` props.
    */
   tooltip?: string | React.ComponentProps<typeof TooltipContent>;
 }
@@ -841,8 +829,8 @@ interface SidebarMenuButtonProps
 /**
  * SidebarMenuButton
  *
- * The primary clickable nav item. When the sidebar collapses to icons, an
- * optional `tooltip` surfaces the label on hover.
+ * Main clickable nav item. On the icon rail, `tooltip` shows the label on
+ * hover.
  *
  * @example
  * ```tsx
@@ -898,16 +886,16 @@ function SidebarMenuButton({
 /**
  * SidebarMenuActionProps
  *
- * Props for the SidebarMenuAction component.
+ * Props for SidebarMenuAction.
  */
 interface SidebarMenuActionProps extends React.ComponentProps<'button'> {
   /**
-   * Render as the child element via Radix `Slot`.
+   * Renders the child element instead.
    * @default false
    */
   asChild?: boolean;
   /**
-   * Reveal the action only on hover/focus of the menu item (vs. always shown).
+   * Shows the action only on hover or focus of the menu item.
    * @default false
    */
   showOnHover?: boolean;
@@ -916,7 +904,7 @@ interface SidebarMenuActionProps extends React.ComponentProps<'button'> {
 /**
  * SidebarMenuAction
  *
- * A secondary action pinned to a menu item's right edge (e.g. a "more" button).
+ * Secondary button on a menu item's right edge, such as "More".
  */
 function SidebarMenuAction({
   className,
@@ -947,14 +935,14 @@ function SidebarMenuAction({
 /**
  * SidebarMenuBadgeProps
  *
- * Props for the SidebarMenuBadge component.
+ * Props for SidebarMenuBadge.
  */
 interface SidebarMenuBadgeProps extends React.ComponentProps<'div'> {}
 
 /**
  * SidebarMenuBadge
  *
- * A count or status pill aligned to a menu item's right edge.
+ * Count or status pill on a menu item's right edge.
  */
 function SidebarMenuBadge({ className, ...props }: SidebarMenuBadgeProps) {
   return (
@@ -976,11 +964,11 @@ function SidebarMenuBadge({ className, ...props }: SidebarMenuBadgeProps) {
 /**
  * SidebarMenuSkeletonProps
  *
- * Props for the SidebarMenuSkeleton component.
+ * Props for SidebarMenuSkeleton.
  */
 interface SidebarMenuSkeletonProps extends React.ComponentProps<'div'> {
   /**
-   * Render a leading icon-sized skeleton block alongside the text bar.
+   * Adds an icon-sized block before the text bar.
    * @default false
    */
   showIcon?: boolean;
@@ -989,7 +977,7 @@ interface SidebarMenuSkeletonProps extends React.ComponentProps<'div'> {
 /**
  * SidebarMenuSkeleton
  *
- * Loading placeholder for a menu row. Render a cluster while nav data loads.
+ * Placeholder for a menu row while nav data loads.
  */
 function SidebarMenuSkeleton({
   className,
@@ -1034,15 +1022,15 @@ function SidebarMenuSkeleton({
 /**
  * SidebarMenuSubProps
  *
- * Props for the SidebarMenuSub component.
+ * Props for SidebarMenuSub.
  */
 interface SidebarMenuSubProps extends React.ComponentProps<'ul'> {}
 
 /**
  * SidebarMenuSub
  *
- * The `<ul>` for a nested submenu, drawn with a left guide rule. Hidden when
- * collapsed to the icon rail.
+ * `<ul>` for a nested submenu, with a guide line on the left. Hidden on the
+ * icon rail.
  */
 function SidebarMenuSub({ className, ...props }: SidebarMenuSubProps) {
   return (
@@ -1061,14 +1049,14 @@ function SidebarMenuSub({ className, ...props }: SidebarMenuSubProps) {
 /**
  * SidebarMenuSubItemProps
  *
- * Props for the SidebarMenuSubItem component.
+ * Props for SidebarMenuSubItem.
  */
 interface SidebarMenuSubItemProps extends React.ComponentProps<'li'> {}
 
 /**
  * SidebarMenuSubItem
  *
- * A single `<li>` within a `SidebarMenuSub`.
+ * One `<li>` in a `SidebarMenuSub`.
  */
 function SidebarMenuSubItem({ className, ...props }: SidebarMenuSubItemProps) {
   return (
@@ -1083,11 +1071,11 @@ function SidebarMenuSubItem({ className, ...props }: SidebarMenuSubItemProps) {
 /**
  * SidebarMenuSubButtonProps
  *
- * Props for the SidebarMenuSubButton component.
+ * Props for SidebarMenuSubButton.
  */
 interface SidebarMenuSubButtonProps extends React.ComponentProps<'a'> {
   /**
-   * Render as the child element via Radix `Slot` (e.g. a router link).
+   * Renders the child element instead, such as a router link.
    * @default false
    */
   asChild?: boolean;
@@ -1097,7 +1085,7 @@ interface SidebarMenuSubButtonProps extends React.ComponentProps<'a'> {
    */
   size?: 'sm' | 'md';
   /**
-   * Marks the sub-item as the current page; styles it as selected.
+   * Marks the sub-item as the current page.
    * @default false
    */
   isActive?: boolean;
@@ -1106,7 +1094,7 @@ interface SidebarMenuSubButtonProps extends React.ComponentProps<'a'> {
 /**
  * SidebarMenuSubButton
  *
- * A clickable item inside a submenu, rendered as an `<a>` by default.
+ * Clickable item in a submenu. Renders an `<a>` by default.
  */
 function SidebarMenuSubButton({
   asChild = false,

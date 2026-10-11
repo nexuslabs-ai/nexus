@@ -79,6 +79,10 @@ const meta = {
     layout: 'centered',
     controls: { disable: true },
     docs: {
+      description: {
+        component:
+          'TextFilter filters by text a record contains, starts with or equals. Use it for free-text fields such as names or titles. For a fixed set of values, use ChoiceFilter or MultiChoiceFilter.',
+      },
       page: () => (
         <>
           <Title />

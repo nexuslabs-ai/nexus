@@ -47,18 +47,15 @@ interface InputProps
 /**
  * Input
  *
- * A text input field for collecting user data.
- * Supports different sizes and all native input attributes. The
- * `variant="bordered"` treatment is the default; use `variant="borderless"` to
- * remove the resting field stroke while keeping a tonal control fill for
- * resting affordance. `variant="ghost"` has neither stroke nor fill at rest, so
- * the field reads as the text around it; the stroke returns on hover, focus
- * and invalid.
+ * A one-line text field. Accepts every native input attribute.
  *
- * Browsers repaint an autofilled field with their own surface and text colour,
- * so each `bg-*` / `text-*` class is paired with an `autofill-bg-*` /
- * `autofill-text-*` class of the same token. A field on a custom surface pairs
- * its own the same way.
+ * - `bordered` has a stroke and a fill.
+ * - `borderless` drops the stroke and keeps a tonal fill.
+ * - `ghost` has no stroke or fill until hover, focus or an invalid value.
+ *
+ * Browsers repaint autofilled fields with their own colors. On a custom
+ * surface, pair each `bg-*` or `text-*` class with its `autofill-bg-*` or
+ * `autofill-text-*` match.
  *
  * @example
  * ```tsx

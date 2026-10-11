@@ -36,10 +36,8 @@ const meta: Meta<typeof Dialog> = {
     layout: 'padded',
     docs: {
       description: {
-        component: [
-          'Use Dialog for general modal tasks that temporarily interrupt the page and can be dismissed without forcing a choice.',
-          'Use AlertDialog when the user must explicitly confirm or cancel a consequential action, Sheet for deterministic edge panels such as settings or filters, and Drawer for gesture-driven mobile-style panels with drag-to-dismiss behavior.',
-        ].join(' '),
+        component:
+          'Dialog opens a modal for a task that interrupts the page. The user can dismiss it without making a choice.\n\n- If the user must confirm or cancel a consequential action, use AlertDialog.\n- For a panel at the screen edge, such as settings or filters, use Sheet.\n- For a mobile-style panel with drag-to-dismiss, use Drawer.',
       },
     },
   },
@@ -84,6 +82,13 @@ export const Default: Story = {
 
 export const WithDescription: Story = {
   tags: ['docs'],
+  parameters: {
+    docs: {
+      description: {
+        story: 'Add a DialogDescription and a short form to edit a profile.',
+      },
+    },
+  },
   render: function WithDescriptionStory() {
     const nameId = React.useId();
     const usernameId = React.useId();
@@ -189,6 +194,14 @@ export const CustomCloseButton: Story = {
 
 export const ScrollableContent: Story = {
   tags: ['docs'],
+  parameters: {
+    docs: {
+      description: {
+        story:
+          'Long DialogBody content scrolls while the header and footer stay in place.',
+      },
+    },
+  },
   render: (_args) => (
     <Dialog>
       <DialogTrigger asChild>
@@ -255,7 +268,7 @@ export const ViewportBoundContent: Story = {
     docs: {
       description: {
         story:
-          'Manual check: on a narrow/mobile viewport, long DialogBody content should scroll while the close button remains pinned in the content frame.',
+          'Check on a narrow viewport that long DialogBody content scrolls while the close button stays pinned.',
       },
     },
   },
@@ -300,6 +313,14 @@ export const ViewportBoundContent: Story = {
 
 export const PropDrivenContent: Story = {
   tags: ['docs'],
+  parameters: {
+    docs: {
+      description: {
+        story:
+          'Pass `title`, `description` and `body` to DialogContent instead of composing the header and body.',
+      },
+    },
+  },
   render: (_args) => (
     <Dialog>
       <DialogTrigger asChild>

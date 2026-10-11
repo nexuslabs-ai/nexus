@@ -30,11 +30,8 @@ const meta: Meta<typeof Drawer> = {
     layout: 'padded',
     docs: {
       description: {
-        component: [
-          'Use Drawer for gesture-driven mobile-style panels, especially bottom drawers that can be dragged to dismiss.',
-          'Use Sheet for deterministic side panels, Dialog for centered modal tasks, and AlertDialog for choice-forcing confirmations.',
-          'DrawerContent showHandle defaults to true. Set it to false to remove the visual handle and its spacing; it does not change Vaul dragging or root dismissal settings.',
-        ].join(' '),
+        component:
+          'Drawer slides in a panel from a screen edge that the user can drag to dismiss. Use it for mobile-style panels, especially bottom drawers. Install `vaul` in your app to use it.\n\n- For a side panel without drag gestures, use Sheet.\n- For a centered modal task, use Dialog.\n- For a confirmation that forces a choice, use AlertDialog.\n- Set `showHandle={false}` on DrawerContent to remove the handle and its spacing. Dragging and dismissal stay the same.',
       },
     },
   },
@@ -264,7 +261,7 @@ export const ScrollableContent: Story = {
     docs: {
       description: {
         story:
-          'Manual check: on a touch device, scroll DrawerBody, then drag from the handle or frame; Vaul should still dismiss because DrawerContent is not the scroll container.',
+          'Long DrawerBody content scrolls, and dragging the handle or frame still dismisses the drawer on touch devices.',
       },
     },
   },
@@ -300,6 +297,13 @@ export const ScrollableContent: Story = {
 // Header actions can provide an explicit close affordance without changing API.
 export const WithHeaderActions: Story = {
   tags: ['docs'],
+  parameters: {
+    docs: {
+      description: {
+        story: 'Place a close button in DrawerHeader next to the title.',
+      },
+    },
+  },
   render: () => (
     <Drawer direction="right">
       <DrawerTrigger asChild>
@@ -796,6 +800,13 @@ export const HiddenHandleNonDismissible: Story = {
 // grid shows the closed triggers (portal content only renders when open).
 export const AllVariants: Story = {
   tags: ['docs'],
+  parameters: {
+    docs: {
+      description: {
+        story: 'Set `direction` on the root to open the drawer from any edge.',
+      },
+    },
+  },
   render: () => (
     <div className="nx:flex nx:flex-wrap nx:gap-4">
       {DIRECTIONS.map((direction) => (

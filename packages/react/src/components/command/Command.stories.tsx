@@ -33,6 +33,12 @@ const meta: Meta<typeof Command> = {
   component: Command,
   parameters: {
     layout: 'padded',
+    docs: {
+      description: {
+        component:
+          'Command is a searchable list of actions with keyboard navigation. Use it for command palettes and quick search. For picking a form value, use Combobox.',
+      },
+    },
   },
 };
 
@@ -144,6 +150,14 @@ export const Default: Story = {
 
 export const Grouped: Story = {
   tags: ['docs'],
+  parameters: {
+    docs: {
+      description: {
+        story:
+          'Sort commands into CommandGroup sections with headings and separators.',
+      },
+    },
+  },
   render: () => (
     <Command label="Command menu" className={paletteClass}>
       <CommandInput placeholder="Type a command or search..." />
@@ -233,6 +247,13 @@ export const QueryAwareEmpty: Story = {
 
 export const AsyncLoading: Story = {
   tags: ['docs'],
+  parameters: {
+    docs: {
+      description: {
+        story: 'Show CommandLoading outside CommandList while results load.',
+      },
+    },
+  },
   render: () => (
     <Command label="Async command menu" className={paletteClass}>
       <CommandInput placeholder="Search commands..." />
@@ -269,6 +290,13 @@ export const AsyncLoading: Story = {
 
 export const RichItems: Story = {
   tags: ['docs'],
+  parameters: {
+    docs: {
+      description: {
+        story: 'Give each item an icon, a description and a trailing hint.',
+      },
+    },
+  },
   render: () => (
     <Command label="Project command menu" className={paletteClass}>
       <CommandInput placeholder="Search project commands..." />

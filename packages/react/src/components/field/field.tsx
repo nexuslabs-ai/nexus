@@ -9,8 +9,7 @@ import { Separator } from '../separator';
 /**
  * FieldSet
  *
- * A `<fieldset>` grouping related fields — pair with `FieldLegend` for the
- * group's caption.
+ * A `<fieldset>` that groups related fields. Add a `FieldLegend` as its caption.
  */
 function FieldSet({ className, ...props }: React.ComponentProps<'fieldset'>) {
   return (
@@ -32,8 +31,7 @@ function FieldSet({ className, ...props }: React.ComponentProps<'fieldset'>) {
  */
 interface FieldLegendProps extends React.ComponentProps<'legend'> {
   /**
-   * Caption emphasis. `legend` is the larger fieldset caption; `label` matches
-   * a field label's size.
+   * Caption size. `legend` is larger, and `label` matches a field label.
    *
    * @default 'legend'
    */
@@ -66,8 +64,8 @@ function FieldLegend({
 /**
  * FieldGroup
  *
- * A vertical stack of `Field`s. Declares the `field-group` container so a
- * `Field`'s `responsive` orientation can adapt to the group's width.
+ * A vertical stack of `Field`s. A `Field` with `responsive` orientation adapts
+ * to this group's width.
  */
 function FieldGroup({ className, ...props }: React.ComponentProps<'div'>) {
   return (
@@ -111,8 +109,8 @@ interface FieldProps
 /**
  * Field
  *
- * The labeled-field layout primitive — composes a label, control, description,
- * and error with their a11y wiring, decoupled from any form library.
+ * Lays out a label, control, description and error as one field. Works with
+ * any form library.
  *
  * @example
  * ```tsx
@@ -138,8 +136,8 @@ function Field({ className, orientation = 'vertical', ...props }: FieldProps) {
 /**
  * FieldContent
  *
- * Wraps a control's label + description when they sit beside the control (the
- * horizontal / checkbox-card layouts).
+ * Wraps a label and description that sit beside the control, as in horizontal
+ * and checkbox-card layouts.
  */
 function FieldContent({ className, ...props }: React.ComponentProps<'div'>) {
   return (
@@ -157,10 +155,11 @@ function FieldContent({ className, ...props }: React.ComponentProps<'div'>) {
 /**
  * FieldLabel
  *
- * A field's label (wraps `Label`). Use `Label` for simple inline labels,
- * `ChoiceRow` for compact checkbox/radio options, and `ChoiceCard` for rich
- * checkbox/radio option cards. `FieldLabel + Field` remains the lower-level
- * field layout composition when a field needs custom structure.
+ * A field's label, built on `Label`.
+ *
+ * - For a simple inline label, use `Label`.
+ * - For compact checkbox or radio options, use `ChoiceRow`.
+ * - For rich checkbox or radio option cards, use `ChoiceCard`.
  */
 function FieldLabel({
   className,
@@ -190,10 +189,8 @@ type FieldRequiredIndicatorProps = Omit<
   'aria-hidden'
 > & {
   /**
-   * Optional-field content to render instead of the required marker. This
-   * remains readable by assistive tech and takes precedence over `children`.
-   * Required semantics still belong on the control via `required` or
-   * `aria-required`.
+   * Text for an optional field, shown instead of the `*`. Screen readers read
+   * it, and it overrides `children`.
    *
    * @example
    * ```tsx
@@ -214,8 +211,9 @@ type FieldRequiredIndicatorProps = Omit<
 /**
  * FieldRequiredIndicator
  *
- * A label affordance for required or optional fields. Renders `*` by default
- * with `aria-hidden`, or renders `fallback` as readable optional text.
+ * Marks a field as required with `*`, or as optional with `fallback` text.
+ * Screen readers skip the `*`, so set `required` or `aria-required` on the
+ * control.
  */
 function FieldRequiredIndicator({
   className,
@@ -244,8 +242,8 @@ function FieldRequiredIndicator({
 /**
  * FieldTitle
  *
- * A non-`<label>` title for a field group or card (use when the title isn't
- * bound to a single control via `htmlFor`).
+ * A title for a field group or card that is not tied to one control. Renders a
+ * `div`, not a `<label>`.
  */
 function FieldTitle({ className, ...props }: React.ComponentProps<'div'>) {
   return (
@@ -263,7 +261,7 @@ function FieldTitle({ className, ...props }: React.ComponentProps<'div'>) {
 /**
  * FieldDescription
  *
- * Helper text below a field's control.
+ * Helper text under a field's control.
  */
 function FieldDescription({ className, ...props }: React.ComponentProps<'p'>) {
   return (
@@ -282,7 +280,7 @@ function FieldDescription({ className, ...props }: React.ComponentProps<'p'>) {
 /**
  * FieldSeparator
  *
- * A divider between fields, optionally with centered content (e.g. "OR").
+ * A divider between fields, with optional centered content such as "OR".
  */
 function FieldSeparator({
   children,
@@ -319,8 +317,8 @@ function FieldSeparator({
  */
 interface FieldErrorProps extends React.ComponentProps<'div'> {
   /**
-   * Validation errors to render. Deduplicated by message; a single error shows
-   * inline, multiple render as a list. Ignored when `children` is provided.
+   * Validation errors to show. Duplicate messages show once, and several render
+   * as a list. Ignored when `children` is set.
    */
   errors?: Array<{ message?: string } | undefined>;
 }
@@ -328,7 +326,7 @@ interface FieldErrorProps extends React.ComponentProps<'div'> {
 /**
  * FieldError
  *
- * The error message(s) for a field. Renders nothing when there's no content.
+ * The error message for a field. Renders nothing when there is no error.
  */
 function FieldError({
   className,

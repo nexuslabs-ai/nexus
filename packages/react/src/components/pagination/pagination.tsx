@@ -16,15 +16,8 @@ interface PaginationProps extends React.ComponentProps<'nav'> {}
 /**
  * Pagination
  *
- * Page navigation for list and table views, wrapped in the `navigation`
- * landmark. Compose with the sub-components: `PaginationContent` lays out a row
- * of `PaginationItem`s, each holding a `PaginationLink` (page number),
- * `PaginationPrevious` / `PaginationNext` (edge controls), or
- * `PaginationEllipsis` (overflow indicator).
- *
- * This is the structural primitive only — page-number generation and any
- * page-size control are the consumer's concern (compose them with `Select` and
- * your own paging state).
+ * Page navigation for lists and tables, in a `navigation` landmark. Your app
+ * works out which page numbers to show and owns any page-size control.
  *
  * @example
  * ```tsx
@@ -75,7 +68,7 @@ interface PaginationContentProps extends React.ComponentProps<'ul'> {}
 /**
  * PaginationContent
  *
- * The `<ul>` that lays the pagination items out in a horizontal row.
+ * `<ul>` that lays out the pagination items in a row.
  */
 function PaginationContent({ className, ...props }: PaginationContentProps) {
   return (
@@ -97,7 +90,7 @@ interface PaginationItemProps extends React.ComponentProps<'li'> {}
 /**
  * PaginationItem
  *
- * A single `<li>` slot in the pagination row.
+ * One `<li>` in the pagination row.
  */
 function PaginationItem(props: PaginationItemProps) {
   return <li data-slot="pagination-item" {...props} />;
@@ -111,16 +104,13 @@ function PaginationItem(props: PaginationItemProps) {
 interface PaginationLinkProps
   extends React.ComponentProps<'a'>, Pick<ButtonProps, 'size'> {
   /**
-   * Marks this link as the current page — applies the `outline` button
-   * treatment and sets `aria-current="page"`.
+   * Marks the link as the current page and sets `aria-current="page"`.
    * @default false
    */
   isActive?: boolean;
   /**
-   * Render as the child element via Radix Slot — e.g. a framework router link
-   * (`next/link`, TanStack Router `Link`) — keeping the pagination-link
-   * styling. The router link renders its own `<a>`, so this avoids the nested
-   * `<a><a>` that wrapping would produce.
+   * Renders the child element, such as a router `Link`, with the link styles.
+   * Use it instead of wrapping, which would nest one `<a>` in another.
    * @default false
    */
   asChild?: boolean;
@@ -129,10 +119,8 @@ interface PaginationLinkProps
 /**
  * PaginationLink
  *
- * A page link styled with the button system. The active page uses the
- * `outline` variant; the rest use `ghost`. Defaults to the square `icon` size,
- * suited to single page numbers. Pass `asChild` to route through a framework
- * link instead of the native `<a>`.
+ * Page number link styled as a `ghost` button, or `outline` for the current
+ * page. Uses the square `icon` size unless you set `size`.
  *
  * @example
  * ```tsx
@@ -177,9 +165,8 @@ interface PaginationPreviousProps extends React.ComponentProps<
 /**
  * PaginationPrevious
  *
- * The "previous page" edge control — a left chevron and label. Defaults to that
- * content; pass `asChild` with a router link (carrying its own children) to
- * route through it.
+ * Link to the previous page, with a left chevron and the label "Previous".
+ * With `asChild`, pass a router link that has its own children.
  */
 function PaginationPrevious({ children, ...props }: PaginationPreviousProps) {
   return (
@@ -206,9 +193,8 @@ interface PaginationNextProps extends React.ComponentProps<
 /**
  * PaginationNext
  *
- * The "next page" edge control — a label and right chevron. Defaults to that
- * content; pass `asChild` with a router link (carrying its own children) to
- * route through it.
+ * Link to the next page, with the label "Next" and a right chevron.
+ * With `asChild`, pass a router link that has its own children.
  */
 function PaginationNext({ children, ...props }: PaginationNextProps) {
   return (
@@ -233,7 +219,7 @@ interface PaginationEllipsisProps extends React.ComponentProps<'span'> {}
 /**
  * PaginationEllipsis
  *
- * A non-interactive overflow indicator standing in for skipped page numbers.
+ * Marker for skipped page numbers. Screen readers skip it.
  */
 function PaginationEllipsis({ className, ...props }: PaginationEllipsisProps) {
   return (

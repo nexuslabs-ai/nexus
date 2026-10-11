@@ -37,6 +37,12 @@ const meta: Meta<typeof MessageScroller> = {
   component: MessageScroller,
   parameters: {
     layout: 'padded',
+    docs: {
+      description: {
+        component:
+          'MessageScroller scrolls a message stream and keeps the latest turn in view. Use it for chat and assistant threads that grow as new turns arrive. For other scrolling content, use ScrollArea.',
+      },
+    },
   },
 };
 
@@ -173,6 +179,14 @@ export const AllVariants: Story = {
 
 export const EmptyStream: Story = {
   tags: ['docs'],
+  parameters: {
+    docs: {
+      description: {
+        story:
+          'Show an EmptyState inside the scroller before the first message, with the jump button hidden.',
+      },
+    },
+  },
   render: () => (
     <MessageScrollerProvider>
       <MessageScroller className={frame}>
@@ -361,6 +375,14 @@ export const StreamingWhileScrolledAway: Story = {
 
 export const ScrollToStart: Story = {
   tags: ['docs'],
+  parameters: {
+    docs: {
+      description: {
+        story:
+          'Add a `direction="start"` button that jumps to the oldest turn.',
+      },
+    },
+  },
   render: () => (
     <AppendableStream>
       <MessageScrollerButton direction="start" />
@@ -412,6 +434,14 @@ export const ScrollToStart: Story = {
 
 export const SendFromComposer: Story = {
   tags: ['docs'],
+  parameters: {
+    docs: {
+      description: {
+        story:
+          'Call `scrollToEnd` from `useMessageScroller` in a composer to jump to the new turn on send.',
+      },
+    },
+  },
   render: () => <AppendableStream />,
   play: async ({ canvasElement }) => {
     const canvas = within(canvasElement);

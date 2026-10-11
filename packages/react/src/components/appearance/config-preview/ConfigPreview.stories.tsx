@@ -7,6 +7,14 @@ import { NexusAppearanceConfigPreview } from './config-preview';
 const meta: Meta<typeof NexusAppearanceConfigPreview> = {
   title: 'Appearance/ConfigPreview',
   component: NexusAppearanceConfigPreview,
+  parameters: {
+    docs: {
+      description: {
+        component:
+          'NexusAppearanceConfigPreview prints an appearance state as a code object. Use it to show the values a settings panel produces.',
+      },
+    },
+  },
   args: {
     state: {
       ...DEFAULT_NEXUS_APPEARANCE,

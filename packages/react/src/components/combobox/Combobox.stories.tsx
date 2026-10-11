@@ -144,6 +144,12 @@ const meta: Meta<typeof Combobox> = {
   component: Combobox,
   parameters: {
     layout: 'padded',
+    docs: {
+      description: {
+        component:
+          'Combobox lets the user search a list and pick one option. Use it for lists too long to scan. For a short list without search, use Select.',
+      },
+    },
   },
 };
 
@@ -202,6 +208,13 @@ export const Controlled: Story = {
 
 export const Default: Story = {
   tags: ['docs'],
+  parameters: {
+    docs: {
+      description: {
+        story: 'Open the trigger, type to filter the options, and pick one.',
+      },
+    },
+  },
   render: () => <ComboboxExample />,
 };
 
@@ -211,6 +224,13 @@ export const WithSelection: Story = {
 
 export const Sizes: Story = {
   tags: ['docs'],
+  parameters: {
+    docs: {
+      description: {
+        story: 'Set `size` on the trigger to `sm`, the default, or `lg`.',
+      },
+    },
+  },
   render: () => (
     <div className="nx:flex nx:w-64 nx:flex-col nx:gap-3">
       <ComboboxExample
@@ -230,11 +250,26 @@ export const Sizes: Story = {
 
 export const Grouped: Story = {
   tags: ['docs'],
+  parameters: {
+    docs: {
+      description: {
+        story:
+          'Wrap options in ComboboxGroup with a `heading` to sort them into labeled groups.',
+      },
+    },
+  },
   render: () => <ComboboxExample items={groupedFrameworks} />,
 };
 
 export const WithDisabledOption: Story = {
   tags: ['docs'],
+  parameters: {
+    docs: {
+      description: {
+        story: 'Set `disabled` on an item so it shows but cannot be picked.',
+      },
+    },
+  },
   render: () => (
     <ComboboxExample
       items={[
@@ -258,6 +293,13 @@ export const LongLabelsNarrowField: Story = {
 
 export const Disabled: Story = {
   tags: ['docs'],
+  parameters: {
+    docs: {
+      description: {
+        story: 'Set `disabled` on the trigger so the popover cannot open.',
+      },
+    },
+  },
   render: () => <ComboboxExample disabled defaultValue="next" />,
   play: async ({ canvasElement }) => {
     const canvas = within(canvasElement);
@@ -275,6 +317,14 @@ export const Disabled: Story = {
 
 export const InvalidField: Story = {
   tags: ['docs'],
+  parameters: {
+    docs: {
+      description: {
+        story:
+          'Set `aria-invalid` and place the combobox in a Field to show an error.',
+      },
+    },
+  },
   render: () => (
     <Field data-invalid>
       <FieldLabel htmlFor="framework-invalid">Framework</FieldLabel>

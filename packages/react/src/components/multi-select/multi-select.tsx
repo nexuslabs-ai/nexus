@@ -97,7 +97,7 @@ interface MultiSelectProps {
    */
   defaultValues?: string[];
   /**
-   * Called with the next selected values whenever selection changes.
+   * Called with the new selected values when the selection changes.
    */
   onValuesChange?: (values: string[]) => void;
 }
@@ -105,10 +105,8 @@ interface MultiSelectProps {
 /**
  * MultiSelect
  *
- * A searchable multiple-selection field. cmdk (via `Command`) owns filtering and
- * keyboard navigation; this component adds the selected-value model and the chip
- * trigger, reading option labels from its own children so chips stay labeled
- * while the list is closed. For searchable single selection, use `Combobox`.
+ * Searchable field for picking several options, shown as chips. For
+ * searchable single selection, use `Combobox`.
  *
  * @example
  * ```tsx
@@ -170,10 +168,8 @@ interface MultiSelectTriggerProps extends React.ComponentProps<'button'> {}
 /**
  * MultiSelectTrigger
  *
- * The field surface. Renders the selected value(s) plus a chevron and toggles
- * the popover. Pass an `aria-label` (or a visible label via `Field`) so the
- * combobox has an accessible name. Backspace / Delete removes the last selected
- * value, so keyboard users can clear chips without reopening the list.
+ * Field that shows the selected values, opens the list, and removes the last
+ * value on Backspace. Needs an `aria-label` or a visible label from `Field`.
  */
 function MultiSelectTrigger({
   className,
@@ -228,15 +224,15 @@ interface MultiSelectValueProps extends Omit<
    */
   placeholder?: React.ReactNode;
   /**
-   * Render each selected value as a removable chip.
+   * Shows each selected value as a removable chip.
    * @default true
    */
   clickToRemove?: boolean;
   /**
-   * How chips behave when they exceed the field width:
-   * - `wrap` — always wrap onto multiple lines.
-   * - `wrap-when-open` — wrap while the popover is open, collapse to `+N` when closed.
-   * - `cutoff` — always collapse overflow into a `+N` badge.
+   * What chips do when they overflow the field:
+   * - `wrap`: wrap onto more lines.
+   * - `wrap-when-open`: wrap while the list is open, show `+N` when closed.
+   * - `cutoff`: always show the extra chips as a `+N` badge.
    * @default 'wrap-when-open'
    */
   overflowBehavior?: 'wrap' | 'wrap-when-open' | 'cutoff';
@@ -245,10 +241,8 @@ interface MultiSelectValueProps extends Omit<
 /**
  * MultiSelectValue
  *
- * Renders the selected values inside the trigger as removable chips. When chips
- * exceed the field width they collapse into a measured `+N` badge (unless
- * wrapping). A selected value with no collected label falls back to its raw
- * value so a non-empty selection never shows the placeholder.
+ * Selected values inside the trigger, shown as removable chips. Chips that
+ * don't fit become a `+N` badge unless they wrap.
  */
 function MultiSelectValue({
   className,
@@ -403,8 +397,7 @@ interface MultiSelectContentProps extends Omit<
 /**
  * MultiSelectContent
  *
- * The searchable option list, rendered in a Popover so Radix owns focus,
- * dismissal, and open/close motion.
+ * Searchable list of options, shown in a popover.
  */
 function MultiSelectContent({
   children,
@@ -444,12 +437,11 @@ interface MultiSelectItemProps extends Omit<
 > {
   value: string;
   /**
-   * Label for the trigger chip when it differs from the option content (e.g. the
-   * option renders an icon + text but the chip should show text only).
+   * Chip text when it differs from the option content, such as an icon option.
    */
   badgeLabel?: React.ReactNode;
   /**
-   * Called with the value after it is toggled.
+   * Called with the option's value after it is toggled.
    */
   onSelect?: (value: string) => void;
 }
@@ -457,10 +449,8 @@ interface MultiSelectItemProps extends Omit<
 /**
  * MultiSelectItem
  *
- * A selectable option with a checkbox indicator. cmdk filters on `value` +
- * `keywords`, so `value` is forwarded to disambiguate duplicate labels and
- * icon-only content, and string children seed `keywords` so typing the label
- * matches.
+ * Option with a checkbox, found by its `value`, `keywords` or plain-text
+ * label. Give each option a unique `value`.
  */
 function MultiSelectItem({
   value,
@@ -529,7 +519,7 @@ interface MultiSelectSeparatorProps extends React.ComponentProps<
 /**
  * MultiSelectSeparator
  *
- * A visual divider between groups or options.
+ * Divider between groups or options.
  */
 function MultiSelectSeparator(props: MultiSelectSeparatorProps) {
   return <CommandSeparator data-slot="multi-select-separator" {...props} />;

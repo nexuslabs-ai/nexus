@@ -32,6 +32,12 @@ const meta: Meta<typeof DropdownMenu> = {
   component: DropdownMenu,
   parameters: {
     layout: 'padded',
+    docs: {
+      description: {
+        component:
+          'DropdownMenu opens a list of actions from a button. Use it for a short list of actions or options. For picking a form value, use Select.',
+      },
+    },
   },
 };
 
@@ -93,6 +99,14 @@ export const WithLabelsAndSeparators: Story = {
 
 export const WithCheckboxItems: Story = {
   tags: ['docs'],
+  parameters: {
+    docs: {
+      description: {
+        story:
+          'Use DropdownMenuCheckboxItem for settings that toggle on and off.',
+      },
+    },
+  },
   render: function CheckboxItemsStory() {
     const [showStatusBar, setShowStatusBar] = React.useState(true);
     const [showActivityBar, setShowActivityBar] = React.useState(false);
@@ -132,6 +146,14 @@ export const WithCheckboxItems: Story = {
 
 export const WithRadioItems: Story = {
   tags: ['docs'],
+  parameters: {
+    docs: {
+      description: {
+        story:
+          'Use DropdownMenuRadioItem inside a DropdownMenuRadioGroup to pick one option.',
+      },
+    },
+  },
   render: function RadioItemsStory() {
     const [position, setPosition] = React.useState('bottom');
 
@@ -266,6 +288,13 @@ export const IndicatorCrossFade: Story = {
 
 export const WithSubMenu: Story = {
   tags: ['docs'],
+  parameters: {
+    docs: {
+      description: {
+        story: 'Nest a DropdownMenuSub to open a second menu from an item.',
+      },
+    },
+  },
   render: (_args) => (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>

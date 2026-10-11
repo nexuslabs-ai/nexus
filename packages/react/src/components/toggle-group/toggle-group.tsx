@@ -19,7 +19,7 @@ const ToggleGroupContext = React.createContext<
 /**
  * ToggleGroupProps
  *
- * Props for the ToggleGroup component.
+ * Props for ToggleGroup.
  */
 // A `type` intersection (not an `interface extends`) because Radix's
 // ToggleGroup.Root props are a discriminated union (single | multiple) —
@@ -27,9 +27,8 @@ const ToggleGroupContext = React.createContext<
 type ToggleGroupProps = React.ComponentProps<typeof ToggleGroupPrimitive.Root> &
   VariantProps<typeof toggleVariants> & {
     /**
-     * Gap between items, in spacing-scale units. `0` (default) joins the items
-     * into a segmented control — shared borders, only the ends rounded; a
-     * positive value separates them into individual pills.
+     * Gap between items, in spacing-scale units. `0` joins them into one
+     * segmented control. A larger value splits them into separate pills.
      *
      * @default 0
      */
@@ -39,13 +38,11 @@ type ToggleGroupProps = React.ComponentProps<typeof ToggleGroupPrimitive.Root> &
 /**
  * ToggleGroup
  *
- * A set of related `ToggleGroupItem`s sharing `variant` / `size` via context.
- * `type="single"` behaves like a radio group, except that the selected item can
- * be cleared back to an empty value; `type="multiple"` allows several items
- * pressed at once.
+ * Set of related toggles that share `variant` and `size`. `type="single"` allows
+ * one pressed item, which users can clear. `type="multiple"` allows several.
  *
- * `aria-invalid` on the group does not style its items — mark the individual
- * `ToggleGroupItem`s invalid and describe the error with your own text.
+ * `aria-invalid` on the group does not style its items. Set it on each
+ * `ToggleGroupItem` and describe the error in your own text.
  *
  * @example
  * ```tsx
@@ -112,7 +109,7 @@ const joinedItem = {
 /**
  * ToggleGroupItemProps
  *
- * Props for the ToggleGroupItem component.
+ * Props for ToggleGroupItem.
  */
 interface ToggleGroupItemProps
   extends
@@ -122,8 +119,8 @@ interface ToggleGroupItemProps
 /**
  * ToggleGroupItem
  *
- * A single item within a `ToggleGroup`. Inherits `variant` / `size` from the
- * group unless overridden.
+ * One toggle in a `ToggleGroup`. Takes `variant` and `size` from the group
+ * unless set on the item.
  */
 function ToggleGroupItem({
   className,

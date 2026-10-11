@@ -30,10 +30,8 @@ const meta: Meta<typeof Sheet> = {
     layout: 'padded',
     docs: {
       description: {
-        component: [
-          'Use Sheet for deterministic edge panels such as settings, filters, navigation, or supporting forms tied to a viewport side.',
-          'Use Dialog for centered modal tasks, AlertDialog for choice-forcing confirmations, and Drawer for gesture-driven mobile-style panels with drag-to-dismiss behavior.',
-        ].join(' '),
+        component:
+          'Sheet slides a panel in from one edge of the viewport. Use it for settings, filters, navigation or supporting forms. For a centered task use Dialog, for a forced choice use AlertDialog, and for drag-to-dismiss use Drawer.',
       },
     },
   },
@@ -139,6 +137,14 @@ export const Bottom: Story = {
 
 export const WithForm: Story = {
   tags: ['docs'],
+  parameters: {
+    docs: {
+      description: {
+        story:
+          'Put a short form in the sheet with Save and Cancel actions in the footer.',
+      },
+    },
+  },
   render: function WithFormStory() {
     const nameId = React.useId();
     const usernameId = React.useId();
@@ -179,6 +185,14 @@ export const WithForm: Story = {
 
 export const ScrollableContent: Story = {
   tags: ['docs'],
+  parameters: {
+    docs: {
+      description: {
+        story:
+          'Long content scrolls inside SheetBody while the header and footer stay in place.',
+      },
+    },
+  },
   render: (_args) => (
     <Sheet>
       <SheetTrigger asChild>
@@ -253,7 +267,7 @@ export const ViewportUnitContract: Story = {
     docs: {
       description: {
         story:
-          'Manual check: on a narrow/mobile viewport, long SheetBody content should scroll while the frame and close button stay fixed to the selected edge.',
+          'On a narrow viewport, long SheetBody content scrolls while the frame and close button stay fixed to the edge.',
       },
     },
   },
@@ -515,6 +529,11 @@ export const AllVariants: Story = {
   ),
   parameters: {
     layout: 'padded',
+    docs: {
+      description: {
+        story: 'Open a sheet from each of the four edges.',
+      },
+    },
   },
 };
 

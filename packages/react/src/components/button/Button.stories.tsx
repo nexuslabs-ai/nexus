@@ -12,8 +12,13 @@ const meta: Meta<typeof Button> = {
   parameters: {
     docs: {
       description: {
-        component:
-          'Use Button for concise visible action labels. Use exactly one decorative icon slot when needed; loading buttons render spinner-only visually and do not support icon slots. Icon-only buttons must provide an accessible name with `aria-label` or `aria-labelledby`.',
+        component: `
+Button triggers an action. Use it for short, visible labels.
+
+- Use one decorative icon slot at most: \`startIcon\` or \`endIcon\`.
+- A loading button shows only a spinner and hides its icons.
+- Icon-only buttons need \`aria-label\` or \`aria-labelledby\`.
+        `,
       },
     },
   },
@@ -33,28 +38,28 @@ const meta: Meta<typeof Button> = {
         'ghost',
         'link',
       ],
-      description: 'The visual style variant',
+      description: 'Visual style.',
     },
     size: {
       control: 'select',
       options: ['default', 'sm', 'lg', 'icon-sm', 'icon', 'icon-lg'],
-      description: 'The size of the button',
+      description: 'Height, or a square icon-only size.',
     },
     startIcon: {
       control: false,
-      description: 'Decorative icon rendered before the button label',
+      description: 'Decorative icon before the label.',
     },
     endIcon: {
       control: false,
-      description: 'Decorative icon rendered after the button label',
+      description: 'Decorative icon after the label.',
     },
     disabled: {
       control: 'boolean',
-      description: 'Whether the button is disabled',
+      description: 'Prevents interaction.',
     },
     asChild: {
       control: 'boolean',
-      description: 'Render as child element (for composition)',
+      description: 'Renders the child element instead.',
     },
   },
 };
@@ -99,7 +104,7 @@ export const Error: Story = {
     docs: {
       description: {
         story:
-          'Low-emphasis destructive action: transparent at rest (a destructive-tinted ghost) with subtle error fills on hover/active. Use for secondary or in-context destructive actions; reach for the solid `destructive` variant for the primary destructive action in a view.',
+          'Use `error` for a low-emphasis destructive action, and `destructive` for the main destructive action in a view.',
       },
     },
   },
@@ -215,6 +220,13 @@ export const IconLargeSize: Story = {
 
 export const IconOnlySizes: Story = {
   tags: ['docs'],
+  parameters: {
+    docs: {
+      description: {
+        story: 'Show the three icon-only sizes, each named with `aria-label`.',
+      },
+    },
+  },
   render: () => (
     <div className="nx:flex nx:items-center nx:gap-2">
       <Button size="icon-sm" aria-label="Small icon">
@@ -331,7 +343,7 @@ export const TextButtonsStayContentWidth: Story = {
     docs: {
       description: {
         story:
-          'Decision sentinel: labeled Buttons do not carry a min-width floor. Text buttons remain content-width, while icon-only buttons keep their dedicated square size so width rules cannot leak between the two contracts.',
+          'Text buttons fit their content, while icon-only buttons keep a fixed square size.',
       },
     },
   },
@@ -666,6 +678,13 @@ export const DisabledAsLink: Story = {
 
 export const StartIconSlot: Story = {
   tags: ['docs'],
+  parameters: {
+    docs: {
+      description: {
+        story: 'Add a decorative icon before the label with `startIcon`.',
+      },
+    },
+  },
   args: {
     startIcon: <IconRocket data-testid="start-icon" />,
     children: 'Launch',
@@ -684,6 +703,13 @@ export const StartIconSlot: Story = {
 
 export const EndIconSlot: Story = {
   tags: ['docs'],
+  parameters: {
+    docs: {
+      description: {
+        story: 'Add a decorative icon after the label with `endIcon`.',
+      },
+    },
+  },
   args: {
     endIcon: <IconArrowRight data-testid="end-icon" />,
     children: 'Continue',
@@ -738,6 +764,14 @@ export const LoadingUsesSpinnerOnly: Story = {
 
 export const AllVariants: Story = {
   tags: ['docs'],
+  parameters: {
+    docs: {
+      description: {
+        story:
+          'Compare every variant, size, icon slot, disabled and loading state.',
+      },
+    },
+  },
   render: (_args) => (
     <div className="nx:flex nx:flex-col nx:gap-6">
       <div>
@@ -930,8 +964,7 @@ export const DefaultModeHeightPinned: Story = {
     a11y: { test: 'off' },
     docs: {
       description: {
-        story:
-          'Pin on the fixed-height outcome: in default mode, a default Button renders at exactly 40px via `h-10`.',
+        story: 'At default density, a default Button is exactly 40px tall.',
       },
     },
   },

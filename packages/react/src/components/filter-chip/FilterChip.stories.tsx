@@ -15,7 +15,7 @@ const meta = {
     docs: {
       description: {
         component:
-          'A removal-only button representing an applied filter. Clicking the label or × removes the filter; it does not open an editor or toggle a choice. Supply a full accessible removal label. Consumers own filter values and move focus to the next chip, previous chip, or a stable filter control after removal. Long labels truncate visually but retain their full accessible name. One compact size uses the density-aware h-8 token; change the Storybook density setting to see it adapt. Use it in an applied-filter row when filters are chosen elsewhere, such as a menu or panel. For example: Applied filters: [Status: Paid ×] [Country: India ×]. Use Badge for passive metadata. Use FilterCondition with a Popover when the summary should edit and a separate button should remove.',
+          'FilterChip is a button that removes an applied filter. Use it in a row of applied filters chosen in a menu or panel. For passive metadata use Badge, and for a condition the user edits use FilterCondition.\n\n- Clicking the label or × removes the filter. It never opens an editor or toggles a choice.\n- Give it a full `aria-label`, such as "Remove status filter: Paid".\n- Your app owns the filter values. After removal, move focus to the next chip, the previous chip or a stable filter control.\n- Long labels truncate on screen but keep their full accessible name.\n- It has one compact size that follows the density setting.',
       },
     },
   },

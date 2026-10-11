@@ -116,27 +116,24 @@ const staticDayPickerClassNames = {
 /**
  * DatePickerProps
  *
- * Props for the DatePicker component — the full `react-day-picker` prop surface
- * plus `buttonVariant` for the nav arrows.
+ * Props for the DatePicker component. Accepts every `react-day-picker` prop,
+ * plus the props listed here.
  */
 type DatePickerProps = React.ComponentProps<typeof DayPicker> & {
   /**
-   * Button variant for the previous / next navigation arrows.
+   * Button variant for the previous and next month arrows.
    * @default 'ghost'
    */
   buttonVariant?: React.ComponentProps<typeof Button>['variant'];
   /**
-   * Day-cell size preset: `default` (32px), `large` (48px), `xlarge` (56px).
-   * For an arbitrary size, override `--cell-size` via `className`.
+   * Day-cell size: `default` is 32px, `large` 48px, `xlarge` 56px. For another
+   * size, set `--cell-size` through `className`.
    * @default 'default'
    */
   cellSize?: DatePickerCellSize;
   /**
-   * Custom content rendered inside each day button while preserving
-   * react-day-picker's native button semantics and keyboard behavior.
-   *
-   * A render callback (not a `children` slot) because react-day-picker owns
-   * the per-day render loop, so per-day content cannot be passed as children.
+   * Custom content inside each day button. The button keeps its keyboard
+   * behavior.
    */
   // eslint-disable-next-line @nexus_ds/no-render-prop-types -- react-day-picker owns the per-day render loop; per-day content can't be a children slot
   renderDayContent?: (props: DatePickerDayContentProps) => React.ReactNode;
@@ -145,9 +142,8 @@ type DatePickerProps = React.ComponentProps<typeof DayPicker> & {
 /**
  * DatePicker
  *
- * Date-grid date picker (react-day-picker). Supports single / range / multiple
- * selection. `react-day-picker` is an optional peer dependency — install it
- * in the consuming app.
+ * A calendar grid for picking one date, a range or several dates. Install
+ * `react-day-picker` in your app first.
  *
  * @example
  * ```tsx
@@ -287,8 +283,8 @@ function DatePicker({
 /**
  * DatePickerDayButton
  *
- * The button rendered for each day. Reflects range / selected modifiers via
- * `data-*` attributes and shows the keyboard-focus ring on the focused day.
+ * The button for each day. Exposes selected and range state as `data-*`
+ * attributes.
  */
 function DatePickerDayButton({
   className,

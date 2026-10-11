@@ -60,10 +60,8 @@ function isIconButtonSize(size: ButtonSize) {
 interface ButtonProps
   extends React.ComponentProps<'button'>, VariantProps<typeof buttonVariants> {
   /**
-   * When true, the button renders as its child element (via Radix Slot),
-   * applying button styling to e.g. an `<a>` while leaving the child's own
-   * content untouched — compose icons inside the child. `loading` and the
-   * `startIcon` / `endIcon` slots apply to the native `<button>` only.
+   * Renders the child element, such as an `<a>`, with button styles. Put icons inside the child.
+   * `loading`, `startIcon` and `endIcon` work only on the native button.
    * @default false
    * @example
    * ```tsx
@@ -75,8 +73,7 @@ interface ButtonProps
   asChild?: boolean;
 
   /**
-   * Shows a loading indicator and disables the button. While loading, the
-   * spinner replaces all visible content and any icon slots are hidden.
+   * Disables the button and shows a spinner in place of its content.
    * @default false
    * @example
    * ```tsx
@@ -86,16 +83,12 @@ interface ButtonProps
   loading?: boolean;
 
   /**
-   * Decorative icon rendered before the button label. Use either `startIcon`
-   * or `endIcon`, not both. Hidden while `loading` (the spinner replaces all
-   * content).
+   * Decorative icon before the label. Use `startIcon` or `endIcon`, not both.
    */
   startIcon?: React.ReactNode;
 
   /**
-   * Decorative icon rendered after the button label. Use either `endIcon`
-   * or `startIcon`, not both. Hidden while `loading` (the spinner replaces all
-   * content).
+   * Decorative icon after the label. Use `endIcon` or `startIcon`, not both.
    */
   endIcon?: React.ReactNode;
 }
@@ -161,11 +154,8 @@ function ButtonContent({
 }
 
 /**
- * Native `<button>` by default. With `asChild`, the consumer's element renders
- * through Radix `Slot` with button styling and its own content untouched. A
- * non-button element ignores native `disabled`, so the disabled state there is
- * best-effort: `aria-disabled`, `tabIndex={-1}`, and the
- * `aria-disabled:pointer-events-none` class block real interaction.
+ * Triggers an action. Renders a native `<button>`, or the child element with `asChild`.
+ * A non-button child ignores `disabled`, so Button sets `aria-disabled` and removes it from the tab order.
  */
 function Button({
   asChild = false,

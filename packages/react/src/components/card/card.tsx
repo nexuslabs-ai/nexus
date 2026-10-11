@@ -12,13 +12,8 @@ import { cn } from '../../lib/utils';
 interface CardProps extends React.ComponentProps<'div'> {}
 
 /**
- * Card
- *
- * A container component for grouping related content and actions.
- * Use for displaying information in a visually distinct section.
- *
- * Content is clipped to the rounded corners; pass `nx:overflow-visible` via
- * `className` for content that must overhang the edge.
+ * Groups related content and actions in a bordered section.
+ * Content is clipped to the rounded corners. Add `nx:overflow-visible` for content that overhangs the edge.
  *
  * @example
  * ```tsx
@@ -57,14 +52,8 @@ function Card({ className, ...props }: CardProps) {
 interface CardHeaderProps extends React.ComponentProps<'div'> {}
 
 /**
- * CardHeader
- *
- * Container for the card's header content including title, description, and actions.
- *
- * Children lay out in a two-column grid: a flexible content column and an
- * auto-width column on the right reserved for `CardAction`. `CardTitle` and
- * `CardDescription` place themselves in the content column; a custom child
- * should add `nx:col-start-1` to join it.
+ * Holds the title, description and `CardAction`.
+ * `CardAction` sits in a right-hand column. Add `nx:col-start-1` to a custom child so it lines up with the title.
  *
  * @example
  * ```tsx
@@ -94,8 +83,7 @@ function CardHeader({ className, ...props }: CardHeaderProps) {
  */
 interface CardTitleProps extends React.ComponentProps<'h3'> {
   /**
-   * Render the title styles on a child element. Use this when the card title
-   * needs a different heading level in the page outline.
+   * Applies the title styles to the child element, such as a different heading level.
    *
    * @default false
    * @example
@@ -109,11 +97,7 @@ interface CardTitleProps extends React.ComponentProps<'h3'> {
 }
 
 /**
- * CardTitle
- *
- * The primary heading of a card. Renders as an `h3` by default; use `asChild`
- * to apply card title styling to another heading level when the page outline
- * needs one.
+ * Card heading. Renders an `h3`, or another heading level through `asChild`.
  *
  * @example
  * ```tsx
@@ -150,9 +134,7 @@ function CardTitle({
 interface CardDescriptionProps extends React.ComponentProps<'p'> {}
 
 /**
- * CardDescription
- *
- * Supporting text that provides additional context for the card.
+ * Supporting text under the title.
  *
  * @example
  * ```tsx
@@ -180,10 +162,7 @@ function CardDescription({ className, ...props }: CardDescriptionProps) {
 interface CardActionProps extends React.ComponentProps<'div'> {}
 
 /**
- * CardAction
- *
- * Container for action elements (buttons, badges) in the card header.
- * Placed in the header action column beside the title and description.
+ * Holds header actions, such as buttons or badges, beside the title.
  *
  * @example
  * ```tsx
@@ -216,9 +195,7 @@ function CardAction({ className, ...props }: CardActionProps) {
 interface CardContentProps extends React.ComponentProps<'div'> {}
 
 /**
- * CardContent
- *
- * The main content area of a card.
+ * Main content area.
  *
  * @example
  * ```tsx
@@ -245,9 +222,7 @@ function CardContent({ className, ...props }: CardContentProps) {
 interface CardFooterProps extends React.ComponentProps<'div'> {}
 
 /**
- * CardFooter
- *
- * Container for footer content and actions at the bottom of a card.
+ * Holds actions and content at the bottom of the card.
  *
  * @example
  * ```tsx

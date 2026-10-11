@@ -23,6 +23,12 @@ const meta: Meta<typeof Card> = {
   component: Card,
   parameters: {
     layout: 'padded',
+    docs: {
+      description: {
+        component:
+          'Card groups related content and actions in a bordered section. Use it for dashboards, settings sections and forms. For a plain list row, use Item.',
+      },
+    },
   },
 };
 
@@ -114,6 +120,13 @@ export const TitleAsHeading: Story = {
 
 export const WithAction: Story = {
   tags: ['docs'],
+  parameters: {
+    docs: {
+      description: {
+        story: 'Put a header action beside the title with CardAction.',
+      },
+    },
+  },
   render: (_args) => (
     <Card className="nx:w-[350px]">
       <CardHeader>
@@ -134,6 +147,13 @@ export const WithAction: Story = {
 
 export const WithFooter: Story = {
   tags: ['docs'],
+  parameters: {
+    docs: {
+      description: {
+        story: 'Place action buttons at the bottom with CardFooter.',
+      },
+    },
+  },
   render: (_args) => (
     <Card className="nx:w-[350px]">
       <CardHeader>
@@ -157,6 +177,13 @@ export const WithFooter: Story = {
 
 export const ContentOnly: Story = {
   tags: ['docs'],
+  parameters: {
+    docs: {
+      description: {
+        story: 'Use a card with content only, without a header or footer.',
+      },
+    },
+  },
   render: (_args) => (
     <Card className="nx:w-[350px]">
       <CardContent className="nx:pt-6">
@@ -230,6 +257,13 @@ export const MediaCard: Story = {
 
 export const LoginCard: Story = {
   tags: ['docs'],
+  parameters: {
+    docs: {
+      description: {
+        story: 'Wrap a sign-in form in a card with a header and footer.',
+      },
+    },
+  },
   render: function LoginCardStory() {
     const emailId = React.useId();
     const passwordId = React.useId();
@@ -574,7 +608,8 @@ export const DefaultModeHeightPinned: Story = {
     a11y: { test: 'off' },
     docs: {
       description: {
-        story: 'Regression sentinel: pins the Card height in default mode.',
+        story:
+          'At default density, a card with one 40px child is exactly 66px tall.',
       },
     },
   },

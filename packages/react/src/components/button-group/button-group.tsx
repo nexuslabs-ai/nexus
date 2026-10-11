@@ -54,27 +54,15 @@ interface ButtonGroupProps
     React.ComponentProps<'div'>,
     VariantProps<typeof buttonGroupVariants> {
   /**
-   * Size shared with ButtonGroupText and any Button member that doesn't set its
-   * own size. Inherited through context, so a Button nested inside a trigger
-   * wrapper (a split button) picks it up too.
+   * Size for ButtonGroupText and any Button without its own `size`. It also reaches a Button inside a trigger wrapper, as in a split button.
    * @default "default"
    */
   size?: ButtonGroupSize;
 }
 
 /**
- * ButtonGroup
- *
- * A visually-joined cluster of button-shaped controls — Buttons, a
- * `DropdownMenu` or `Select` trigger, a link via `<ButtonGroupText asChild>`,
- * plus `ButtonGroupText` and `ButtonGroupSeparator` addons — sharing borders
- * and outer rounding so adjacent children lose their touching corners and the
- * seam between them. Lay out horizontally (default) or vertically with
- * `orientation`.
- *
- * For an input or textarea with leading/trailing addons in one shared-focus
- * field, reach for `InputGroup` instead — composing inputs is its job, not
- * this one's.
+ * Joins Buttons, menu or select triggers, `ButtonGroupText` and `ButtonGroupSeparator` into one cluster with shared borders.
+ * Set `orientation="vertical"` to stack them. For an input with addons, use `InputGroup`.
  *
  * @example
  * ```tsx
@@ -115,7 +103,7 @@ function ButtonGroup({
  */
 interface ButtonGroupTextProps extends React.ComponentProps<'div'> {
   /**
-   * Render as the child element via Radix Slot, keeping the addon styling.
+   * Renders the child element instead, such as a link.
    * @default false
    */
   asChild?: boolean;
@@ -128,10 +116,7 @@ interface ButtonGroupTextProps extends React.ComponentProps<'div'> {
 }
 
 /**
- * ButtonGroupText
- *
- * A non-interactive label or addon inside a group — a leading prefix, a unit, a
- * count. Matches the buttons' height, border, and elevation.
+ * Label or addon in a group, such as a prefix, unit or count. Matches the buttons' height and border.
  */
 function ButtonGroupText({
   className,
@@ -168,10 +153,7 @@ interface ButtonGroupSeparatorProps extends React.ComponentProps<
 > {}
 
 /**
- * ButtonGroupSeparator
- *
- * A divider between sub-clusters in a group; stretches to the group's full
- * cross-axis. Defaults to a vertical rule for the common horizontal group.
+ * Divider between sub-groups that spans the whole group. Vertical by default.
  */
 function ButtonGroupSeparator({
   className,

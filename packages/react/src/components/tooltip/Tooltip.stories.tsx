@@ -27,6 +27,12 @@ const meta: Meta<typeof Tooltip> = {
     ),
   ],
   parameters: {
+    docs: {
+      description: {
+        component:
+          'Tooltip shows a short hint when users hover over or focus a trigger. Use it for brief labels, such as the name of an icon button. Wrap your app in `TooltipProvider` so tooltips work.',
+      },
+    },
     layout: 'padded',
   },
 };
@@ -113,6 +119,14 @@ export const SideLeft: Story = {
 
 export const Sides: Story = {
   tags: ['docs'],
+  parameters: {
+    docs: {
+      description: {
+        story:
+          'Set `side` on TooltipContent to open the tooltip on any of four sides.',
+      },
+    },
+  },
   render: (_args) => (
     <div className="nx:flex nx:flex-wrap nx:gap-4">
       {SIDES.map(({ side, label }) => (
@@ -131,6 +145,14 @@ export const Sides: Story = {
 
 export const WithLongContent: Story = {
   tags: ['docs'],
+  parameters: {
+    docs: {
+      description: {
+        story:
+          'Cap the width with a class so long text wraps onto several lines.',
+      },
+    },
+  },
   render: (_args) => (
     <Tooltip>
       <TooltipTrigger asChild>
@@ -148,6 +170,14 @@ export const WithLongContent: Story = {
 
 export const WithCustomOffset: Story = {
   tags: ['docs'],
+  parameters: {
+    docs: {
+      description: {
+        story:
+          'Set `sideOffset` to change the gap between trigger and tooltip.',
+      },
+    },
+  },
   render: (_args) => (
     <Tooltip>
       <TooltipTrigger asChild>
@@ -368,7 +398,7 @@ export const TooltipContentUsesNumericSpacing: Story = {
     docs: {
       description: {
         story:
-          'Regression sentinel — verifies `TooltipContent` keeps its intended numeric padding (`px-3` / `py-1.5`) at the resolved pixel values via `getComputedStyle`. Because the content is portaled, the assertion sees document-level mode resolution — default, where `px-3` is 12px and `py-1.5` is 6px.',
+          'TooltipContent keeps 12px side padding and 6px top and bottom padding at the default density.',
       },
     },
   },
@@ -420,7 +450,7 @@ export const TooltipContentUsesTypographyComposite: Story = {
     docs: {
       description: {
         story:
-          'Regression sentinel — verifies `TooltipContent` carries the canonical `nx:typography-body-small` composite (replacing raw `text-xs`). `toHaveClass` is sufficient here because `typography-*` composites are invisible to the tailwind-merge conflict groups, so the class cannot be silently collapsed under a consumer override. The content is portaled, so the assertion queries `document`.',
+          'TooltipContent sets its text size with `nx:typography-body-small`.',
       },
     },
   },

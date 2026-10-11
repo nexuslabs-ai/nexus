@@ -18,7 +18,7 @@ const meta: Meta<typeof RadioGroup> = {
     docs: {
       description: {
         component:
-          'RadioGroup and RadioGroupItem provide primitive single-select behavior. Pair items with Label for simple inline labels, ChoiceRow for compact option rows, and ChoiceCard for rich title/description option cards.',
+          'RadioGroup lets the user pick one option from a short, visible list. For a long list, use Select.\n\n- For a plain text label, pair each RadioGroupItem with Label.\n- For a compact clickable row, wrap each item in ChoiceRow.\n- For a card with a title and description, wrap each item in ChoiceCard.',
       },
     },
   },
@@ -53,6 +53,14 @@ export const Default: Story = {
 
 export const VerticalWithLabels: Story = {
   tags: ['docs'],
+  parameters: {
+    docs: {
+      description: {
+        story:
+          'Add a short description under each label when options need more context.',
+      },
+    },
+  },
   render: (args) => (
     <RadioGroup {...args} defaultValue="starter" aria-label="Plan">
       <div className="nx:flex nx:items-start nx:gap-3">
@@ -96,6 +104,14 @@ export const VerticalWithLabels: Story = {
 
 export const Horizontal: Story = {
   tags: ['docs'],
+  parameters: {
+    docs: {
+      description: {
+        story:
+          'Set `orientation="horizontal"` and a flex layout to lay options out in a row.',
+      },
+    },
+  },
   render: (args) => (
     <RadioGroup
       {...args}
@@ -139,6 +155,11 @@ export const SurfaceTokens: Story = {
 
 export const Disabled: Story = {
   tags: ['docs'],
+  parameters: {
+    docs: {
+      description: { story: 'Disable the group so no option can be selected.' },
+    },
+  },
   render: (args) => (
     <RadioGroup
       {...args}
@@ -177,6 +198,14 @@ export const Disabled: Story = {
 
 export const Invalid: Story = {
   tags: ['docs'],
+  parameters: {
+    docs: {
+      description: {
+        story:
+          'Set `aria-invalid` on each item to show the error border and focus ring.',
+      },
+    },
+  },
   render: (args) => (
     <RadioGroup {...args} defaultValue="card" aria-label="Payment method">
       <div className="nx:flex nx:items-center nx:gap-2">

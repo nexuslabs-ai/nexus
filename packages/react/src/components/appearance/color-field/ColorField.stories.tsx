@@ -35,6 +35,14 @@ function ControlledField({
 const meta: Meta<typeof NexusAppearanceColorField> = {
   title: 'Appearance/ColorField',
   component: NexusAppearanceColorField,
+  parameters: {
+    docs: {
+      description: {
+        component:
+          'NexusAppearanceColorField picks a color with a swatch and a hex input. It calls `onChange` only with a valid six-digit hex value. For brand presets, use NexusAppearanceBrandColorField.',
+      },
+    },
+  },
   args: { label: 'Accent color', value: BLUE, onChange: fn() },
   render: (args) => <ControlledField key={args.value} {...args} />,
 };

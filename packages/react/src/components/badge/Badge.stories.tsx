@@ -16,6 +16,14 @@ import { Badge, type BadgeProps } from './badge';
 const meta: Meta<typeof Badge> = {
   title: 'Components/Badge',
   component: Badge,
+  parameters: {
+    docs: {
+      description: {
+        component:
+          "Badge labels an item with a short status, category or count. It is not interactive. Pair a status color with text or an icon, because color alone doesn't carry meaning.",
+      },
+    },
+  },
   argTypes: {
     variant: {
       control: 'select',
@@ -27,28 +35,28 @@ const meta: Meta<typeof Badge> = {
         'success',
         'information',
       ],
-      description: 'The visual style variant',
+      description: 'Color role.',
     },
     fill: {
       control: 'select',
       options: ['solid', 'light', 'outline'],
-      description: 'The fill style (solid, light/surface, or outline)',
+      description: 'Solid, light tint or outline.',
     },
     isCaps: {
       control: 'boolean',
-      description: 'Use uppercase text with wider letter-spacing',
+      description: 'Uppercase text with wider letter spacing.',
     },
     isNumber: {
       control: 'boolean',
-      description: 'Render as circular number badge (pass number as children)',
+      description: 'Round count badge. Pass the number as children.',
     },
     leftIcon: {
       control: false,
-      description: 'Icon to display before the label',
+      description: 'Icon before the label.',
     },
     rightIcon: {
       control: false,
-      description: 'Icon to display after the label',
+      description: 'Icon after the label.',
     },
   },
 };
@@ -322,6 +330,13 @@ export const WithLeftIcon: Story = {
 
 export const WithRightIcon: Story = {
   tags: ['docs'],
+  parameters: {
+    docs: {
+      description: {
+        story: 'Add a trailing icon with `rightIcon`.',
+      },
+    },
+  },
   args: {
     children: 'Dismiss',
     variant: 'secondary',
@@ -355,6 +370,13 @@ export const WithBothIcons: Story = {
 
 export const IconOnly: Story = {
   tags: ['docs'],
+  parameters: {
+    docs: {
+      description: {
+        story: 'Show only an icon, named for screen readers with `aria-label`.',
+      },
+    },
+  },
   globals: { density: 'default' },
   args: {
     variant: 'success',
@@ -418,7 +440,7 @@ export const StatusWithIcons: Story = {
     docs: {
       description: {
         story:
-          "Recommended (not enforced): don't rely on color alone for status — pair a status `variant` with clear text and/or a leading icon. The icons here are a suggested set.",
+          'Pair each status color with text and a suggested icon, so status never relies on color alone.',
       },
     },
   },
@@ -825,6 +847,11 @@ export const AllVariants: Story = {
   ),
   parameters: {
     layout: 'padded',
+    docs: {
+      description: {
+        story: 'Compare every variant and fill in caps and sentence case.',
+      },
+    },
   },
 };
 

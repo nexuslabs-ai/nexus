@@ -21,10 +21,8 @@ interface CommandProps extends React.ComponentProps<typeof CommandPrimitive> {}
 /**
  * Command
  *
- * Root component for a searchable command palette, built on cmdk. cmdk owns the
- * filtering and keyboard navigation. Pass a `label` (or `aria-label`) so the
- * search input has an accessible name — a bare `<Command>` leaves the combobox
- * unnamed.
+ * A searchable command palette with keyboard navigation. Pass a `label` or
+ * `aria-label` so the search input has an accessible name.
  *
  * @example
  * ```tsx
@@ -57,28 +55,26 @@ function Command({ className, ...props }: CommandProps) {
 /**
  * CommandDialogProps
  *
- * Props for the CommandDialog component. Inherits the Dialog root props
- * (`open`, `onOpenChange`, `defaultOpen`, `modal`, …).
+ * Props for the CommandDialog component. Accepts the Dialog root props, such as
+ * `open` and `onOpenChange`.
  */
 interface CommandDialogProps extends React.ComponentProps<typeof Dialog> {
   /**
-   * Accessible title for the dialog, rendered visually hidden. Also labels the
-   * command input.
+   * Visually hidden dialog title. Also labels the search input.
    * @default 'Command Palette'
    */
   title?: string;
   /**
-   * Accessible description for the dialog, rendered visually hidden.
+   * Visually hidden dialog description.
    * @default 'Search for a command to run...'
    */
   description?: string;
   /**
-   * Class names forwarded to the underlying DialogContent.
+   * Class names for the DialogContent.
    */
   className?: string;
   /**
-   * Whether to show the dialog's close button. Command palettes conventionally
-   * rely on Escape / click-outside, so this is off by default.
+   * Shows the dialog's close button. Escape and clicking outside close it either way.
    * @default false
    */
   showCloseButton?: boolean;
@@ -87,8 +83,8 @@ interface CommandDialogProps extends React.ComponentProps<typeof Dialog> {
 /**
  * CommandDialog
  *
- * A command palette rendered inside a modal Dialog (the ⌘K pattern). Wire it to
- * a keyboard shortcut and control its open state.
+ * A command palette inside a modal Dialog, often opened with ⌘K. Control its
+ * `open` state and bind it to a keyboard shortcut.
  *
  * @example
  * ```tsx
@@ -139,7 +135,7 @@ interface CommandInputProps extends React.ComponentProps<
 /**
  * CommandInput
  *
- * The search field. A leading search icon sits in a bottom-bordered bar.
+ * The search field, with a leading search icon.
  */
 function CommandInput({ className, ...props }: CommandInputProps) {
   return (
@@ -201,7 +197,7 @@ interface CommandEmptyProps extends React.ComponentProps<
 /**
  * CommandEmpty
  *
- * Rendered by cmdk when the query matches no items.
+ * Shown when the search matches no items.
  */
 function CommandEmpty({ className, ...props }: CommandEmptyProps) {
   return (
@@ -228,8 +224,8 @@ interface CommandLoadingProps extends React.ComponentProps<
 /**
  * CommandLoading
  *
- * Rendered while asynchronous command results are loading. Pass `progress` and
- * `label` when you can estimate loading state for assistive technology.
+ * Shown while async results load. Place it outside CommandList, and pass
+ * `progress` and `label` when progress is known.
  *
  * @example
  * ```tsx
@@ -304,9 +300,7 @@ interface CommandSeparatorProps extends React.ComponentProps<
 /**
  * CommandSeparator
  *
- * A purely visual divider between groups or items. Marked `aria-hidden` because
- * the listbox role only owns options and groups — the groups carry the semantic
- * boundary, so the rule is decorative.
+ * A decorative divider between groups or items. Screen readers skip it.
  */
 function CommandSeparator({ className, ...props }: CommandSeparatorProps) {
   return (
@@ -334,8 +328,8 @@ interface CommandItemProps extends React.ComponentProps<
 /**
  * CommandItem
  *
- * A selectable command. The active item (pointer or keyboard) is marked by cmdk
- * with `data-selected`; disabled items carry `data-disabled`.
+ * A selectable command. The highlighted item gets `data-selected`, and a
+ * disabled item gets `data-disabled`.
  *
  * @example
  * ```tsx
@@ -369,7 +363,7 @@ interface CommandShortcutProps extends React.ComponentProps<'span'> {}
 /**
  * CommandShortcut
  *
- * Displays a keyboard shortcut hint, right-aligned within a CommandItem.
+ * A keyboard shortcut hint, right-aligned in a CommandItem.
  *
  * @example
  * ```tsx

@@ -23,7 +23,7 @@ const meta: Meta<typeof ChoiceCard> = {
     docs: {
       description: {
         component:
-          'Use ChoiceCard for rich checkbox or radio choices with a title and description. The card is a native label surface wired with htmlFor, while the nested Checkbox or RadioGroupItem remains the only interactive control. Use Label for simple inline controls and ChoiceRow for compact options.',
+          'ChoiceCard is a clickable card for a checkbox or radio choice with a title and description. The nested Checkbox or RadioGroupItem stays the only control. For a simple inline label use Label, and for compact options use ChoiceRow.',
       },
     },
   },
@@ -265,6 +265,13 @@ export const Default: Story = {
 
 export const WithRadioGroup: Story = {
   tags: ['docs'],
+  parameters: {
+    docs: {
+      description: {
+        story: 'Pick one plan from a RadioGroup of cards.',
+      },
+    },
+  },
   args: {
     variant: 'bordered',
   },
@@ -292,6 +299,14 @@ export const WithRadioGroup: Story = {
 
 export const TrailingControl: Story = {
   tags: ['docs'],
+  parameters: {
+    docs: {
+      description: {
+        story:
+          'Put the content first to move the checkbox to the trailing edge.',
+      },
+    },
+  },
   args: {
     variant: 'bordered',
   },
@@ -326,6 +341,14 @@ export const TrailingControl: Story = {
 
 export const Disabled: Story = {
   tags: ['docs'],
+  parameters: {
+    docs: {
+      description: {
+        story:
+          'Disable the nested control to lock the choice and dim the card.',
+      },
+    },
+  },
   render: () => (
     <div className="nx:grid nx:w-96 nx:max-w-full nx:gap-3">
       <CheckboxChoiceCard
@@ -420,6 +443,14 @@ export const Disabled: Story = {
 
 export const Invalid: Story = {
   tags: ['docs'],
+  parameters: {
+    docs: {
+      description: {
+        story:
+          'Set `aria-invalid` on the nested control to give the card an error border.',
+      },
+    },
+  },
   render: () => (
     <div className="nx:grid nx:w-96 nx:max-w-full nx:gap-3">
       <CheckboxChoiceCard
@@ -487,6 +518,14 @@ export const Invalid: Story = {
 
 export const Indeterminate: Story = {
   tags: ['docs'],
+  parameters: {
+    docs: {
+      description: {
+        story:
+          'Show a partly selected checkbox card with `checked="indeterminate"`.',
+      },
+    },
+  },
   render: () => (
     <div className="nx:grid nx:w-96 nx:max-w-full nx:gap-3">
       <CheckboxChoiceCard
@@ -748,6 +787,14 @@ export const Dark: Story = {
 
 export const AllVariants: Story = {
   tags: ['docs'],
+  parameters: {
+    docs: {
+      description: {
+        story:
+          'Compare bordered and borderless cards for checkboxes and radios.',
+      },
+    },
+  },
   render: () => (
     <div className="nx:grid nx:w-[min(100%,56rem)] nx:grid-cols-1 nx:gap-6 nx:md:grid-cols-2">
       <div className="nx:grid nx:gap-3">

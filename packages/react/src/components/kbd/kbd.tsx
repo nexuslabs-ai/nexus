@@ -12,10 +12,8 @@ interface KbdProps extends React.ComponentProps<'kbd'> {}
 /**
  * Kbd
  *
- * A keyboard-key indicator for documenting shortcuts — one keycap per key
- * (`⌘`, `Esc`, `Enter`). Compose several inside `KbdGroup` to show a chord
- * (`⌘ K`). Non-interactive by design (`pointer-events-none`): it labels a
- * shortcut, it does not handle one.
+ * Key cap for one key of a shortcut, such as `⌘` or `Esc`. Put several
+ * inside `KbdGroup` to show a combination.
  *
  * @example
  * ```tsx
@@ -50,7 +48,7 @@ interface KbdGroupProps extends React.ComponentProps<'kbd'> {}
 /**
  * KbdGroup
  *
- * Lays out a row of `Kbd` keycaps as one chord (e.g. `⌘ K`).
+ * Row of `Kbd` key caps shown as one combination, such as `⌘ K`.
  */
 function KbdGroup({ className, ...props }: KbdGroupProps) {
   return (

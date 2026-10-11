@@ -11,8 +11,8 @@ import {
 /**
  * TooltipProvider
  *
- * Wraps your app to provide tooltip context. Required for tooltips to work.
- * Place this at the root of your application or around components using tooltips.
+ * Required wrapper for tooltips. Place it at your app root or around the
+ * components that use tooltips.
  *
  * @example
  * ```tsx
@@ -26,7 +26,7 @@ const TooltipProvider = TooltipPrimitive.Provider;
 /**
  * Tooltip
  *
- * The root component that manages tooltip state. Contains the trigger and content.
+ * Root of one tooltip. Holds its open state, trigger and content.
  *
  * @example
  * ```tsx
@@ -41,14 +41,14 @@ const Tooltip = TooltipPrimitive.Root;
 /**
  * TooltipTrigger
  *
- * The element that triggers the tooltip on hover or focus.
+ * Element that opens the tooltip on hover or focus.
  */
 const TooltipTrigger = TooltipPrimitive.Trigger;
 
 /**
  * TooltipContentProps
  *
- * Props for the TooltipContent component.
+ * Props for TooltipContent.
  */
 interface TooltipContentProps extends React.ComponentProps<
   typeof TooltipPrimitive.Content
@@ -57,8 +57,7 @@ interface TooltipContentProps extends React.ComponentProps<
 /**
  * TooltipContent
  *
- * The popup content that appears when the tooltip is triggered.
- * Supports positioning via `side` and `align` props.
+ * Popup that shows the tooltip text. Position it with `side` and `align`.
  *
  * @example
  * ```tsx

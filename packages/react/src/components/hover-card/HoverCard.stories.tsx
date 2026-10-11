@@ -13,6 +13,14 @@ import { HoverCard, HoverCardContent, HoverCardTrigger } from './hover-card';
 const meta: Meta<typeof HoverCard> = {
   title: 'Components/HoverCard',
   component: HoverCard,
+  parameters: {
+    docs: {
+      description: {
+        component:
+          'HoverCard shows a preview card when the user hovers or focuses a trigger. Use it for profile and link previews. For content opened by a click, use Popover.',
+      },
+    },
+  },
 };
 
 export default meta;
@@ -50,6 +58,13 @@ export const Default: Story = {
 // A richer preview: avatar, bio and join date.
 export const ProfileCard: Story = {
   tags: ['docs'],
+  parameters: {
+    docs: {
+      description: {
+        story: 'Show an avatar, bio and join date in a wider preview card.',
+      },
+    },
+  },
   render: () => (
     <HoverCard>
       <HoverCardTrigger asChild>
@@ -81,6 +96,14 @@ export const ProfileCard: Story = {
 // `side` opens the card on any edge of its trigger.
 export const Placement: Story = {
   tags: ['docs'],
+  parameters: {
+    docs: {
+      description: {
+        story:
+          'Set `side` on HoverCardContent to open the card on any edge of the trigger.',
+      },
+    },
+  },
   render: () => (
     <div className="nx:flex nx:flex-wrap nx:gap-4">
       {SIDES.map(({ side, label }) => (

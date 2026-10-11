@@ -160,15 +160,14 @@ function hasRenderableChildren(children: React.ReactNode): boolean {
 interface BadgeProps
   extends React.ComponentProps<'span'>, VariantProps<typeof badgeVariants> {
   /**
-   * When true, uses uppercase text with wider letter-spacing.
+   * Uppercase text with wider letter spacing.
    * @default true
    */
   isCaps?: boolean;
 
   /**
-   * When true, renders as a circular number badge.
-   * Pass the number as children. A bare count is ambiguous to assistive tech —
-   * pass an `aria-label` for context (e.g. `aria-label="8 unread"`).
+   * Renders a round count badge. Pass the number as children.
+   * Add an `aria-label` such as "8 unread", because a bare number lacks context.
    * @default false
    * @example
    * ```tsx
@@ -179,11 +178,8 @@ interface BadgeProps
   isNumber?: boolean;
 
   /**
-   * Icon to display before the label.
-   * Icon is automatically sized to 14px (3.5 spacing units).
-   * If the badge has no renderable children, this renders as an icon-only
-   * badge — blank strings, `false` / `null`, and empty fragments count as none.
-   * Ignored when `isNumber` is true.
+   * Icon before the label, sized to 14px. Without children, the badge is icon-only.
+   * Ignored with `isNumber`.
    * @example
    * ```tsx
    * <Badge leftIcon={<IconCheck />}>Verified</Badge>
@@ -192,12 +188,8 @@ interface BadgeProps
   leftIcon?: React.ReactNode;
 
   /**
-   * Icon to display after the label.
-   * Icon is automatically sized to 14px (3.5 spacing units).
-   * If the badge has no renderable children and no `leftIcon`, this renders as
-   * an icon-only badge — blank strings, `false` / `null`, and empty fragments
-   * count as none.
-   * Ignored when `isNumber` is true.
+   * Icon after the label, sized to 14px. Without children or `leftIcon`, the badge is icon-only.
+   * Ignored with `isNumber`.
    * @example
    * ```tsx
    * <Badge rightIcon={<IconX />}>Dismiss</Badge>
@@ -207,13 +199,11 @@ interface BadgeProps
 }
 
 /**
- * Status / label chip — a non-interactive `<span>`.
+ * Non-interactive status or label chip.
  *
- * Accessibility: status is conveyed by color, so don't rely on color alone —
- * pair a status `variant` with text or a leading icon. Icon-only badges set
- * `role="img"`, so pass `aria-label`, `aria-labelledby`, or `title` to name
- * them. The badge is not a live region; if its status or count updates, wrap it
- * in `aria-live="polite"`.
+ * Pair a status `variant` with text or an icon, because color alone doesn't carry meaning.
+ * Icon-only badges need `aria-label`, `aria-labelledby` or `title`.
+ * If the badge updates, wrap it in `aria-live="polite"` so screen readers hear the change.
  */
 function Badge({
   className,

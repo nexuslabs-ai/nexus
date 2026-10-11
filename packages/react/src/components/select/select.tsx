@@ -15,7 +15,7 @@ import {
 /**
  * Select
  *
- * Root component for the select. Controls open/close state and value.
+ * Root of the select. Holds the open state and the selected value.
  *
  * @example
  * ```tsx
@@ -35,14 +35,14 @@ const Select = SelectPrimitive.Root;
 /**
  * SelectGroup
  *
- * Groups related select items together.
+ * Groups related items.
  */
 const SelectGroup = SelectPrimitive.Group;
 
 /**
  * SelectValue
  *
- * Displays the selected value. Use `placeholder` for empty state.
+ * Shows the selected value. Set `placeholder` for the empty state.
  */
 const SelectValue = SelectPrimitive.Value;
 
@@ -77,7 +77,7 @@ const selectTriggerVariants = cva(
 /**
  * SelectTriggerProps
  *
- * Props for the SelectTrigger component.
+ * Props for SelectTrigger.
  */
 interface SelectTriggerProps
   extends
@@ -87,9 +87,8 @@ interface SelectTriggerProps
 /**
  * SelectTrigger
  *
- * Button that opens the select dropdown. The `variant="bordered"` treatment is
- * the default; use `variant="borderless"` to remove the resting field stroke
- * while keeping a tonal control fill for resting affordance.
+ * Button that opens the dropdown. Set `variant="borderless"` to drop the border
+ * and keep a tinted fill.
  *
  * @example
  * ```tsx
@@ -124,7 +123,7 @@ function SelectTrigger({
 /**
  * SelectScrollUpButton
  *
- * Button to scroll up in the select content.
+ * Scrolls the list up.
  */
 function SelectScrollUpButton({
   className,
@@ -147,7 +146,7 @@ function SelectScrollUpButton({
 /**
  * SelectScrollDownButton
  *
- * Button to scroll down in the select content.
+ * Scrolls the list down.
  */
 function SelectScrollDownButton({
   className,
@@ -170,7 +169,7 @@ function SelectScrollDownButton({
 /**
  * SelectContentProps
  *
- * Props for the SelectContent component.
+ * Props for SelectContent.
  */
 interface SelectContentProps extends React.ComponentProps<
   typeof SelectPrimitive.Content
@@ -179,7 +178,7 @@ interface SelectContentProps extends React.ComponentProps<
 /**
  * SelectContent
  *
- * The dropdown content container for select items.
+ * Dropdown that holds the items.
  *
  * @example
  * ```tsx
@@ -232,7 +231,7 @@ function SelectContent({
 /**
  * SelectLabelProps
  *
- * Props for the SelectLabel component.
+ * Props for SelectLabel.
  */
 interface SelectLabelProps extends React.ComponentProps<
   typeof SelectPrimitive.Label
@@ -241,7 +240,7 @@ interface SelectLabelProps extends React.ComponentProps<
 /**
  * SelectLabel
  *
- * Label for a group of select items.
+ * Label for a group of items.
  *
  * @example
  * ```tsx
@@ -264,7 +263,7 @@ function SelectLabel({ className, ...props }: SelectLabelProps) {
 /**
  * SelectItemProps
  *
- * Props for the SelectItem component.
+ * Props for SelectItem.
  */
 interface SelectItemProps extends React.ComponentProps<
   typeof SelectPrimitive.Item
@@ -273,7 +272,7 @@ interface SelectItemProps extends React.ComponentProps<
 /**
  * SelectItem
  *
- * Individual selectable option in the select dropdown.
+ * One option in the dropdown.
  *
  * @example
  * ```tsx
@@ -314,7 +313,7 @@ function SelectItem({ className, children, ...props }: SelectItemProps) {
 /**
  * SelectSeparatorProps
  *
- * Props for the SelectSeparator component.
+ * Props for SelectSeparator.
  */
 interface SelectSeparatorProps extends React.ComponentProps<
   typeof SelectPrimitive.Separator
@@ -323,7 +322,7 @@ interface SelectSeparatorProps extends React.ComponentProps<
 /**
  * SelectSeparator
  *
- * Visual divider between select items or groups.
+ * Divider between items or groups.
  *
  * @example
  * ```tsx

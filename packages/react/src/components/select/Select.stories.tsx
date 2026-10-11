@@ -22,6 +22,12 @@ const meta: Meta<typeof Select> = {
   title: 'Components/Select',
   component: Select,
   parameters: {
+    docs: {
+      description: {
+        component:
+          'Select lets users pick one option from a styled dropdown. Use it when options need groups, separators or disabled items. For native form submission and OS pickers with plain text options, use NativeSelect.',
+      },
+    },
     layout: 'padded',
   },
 };
@@ -53,6 +59,14 @@ export const Default: Story = {
 
 export const WithDefaultValue: Story = {
   tags: ['docs'],
+  parameters: {
+    docs: {
+      description: {
+        story:
+          'Open with an option already selected by setting `defaultValue`.',
+      },
+    },
+  },
   render: (_args) => (
     <Select defaultValue="banana">
       <SelectTrigger className="nx:w-[180px]" aria-label="Select a fruit">
@@ -127,6 +141,13 @@ export const Disabled: Story = {
 
 export const InvalidTrigger: Story = {
   tags: ['docs'],
+  parameters: {
+    docs: {
+      description: {
+        story: 'Set `aria-invalid` on the trigger to show an error border.',
+      },
+    },
+  },
   render: () => (
     <Select defaultValue="apple">
       <SelectTrigger
@@ -156,6 +177,13 @@ export const InvalidTrigger: Story = {
 
 export const WithDisabledItems: Story = {
   tags: ['docs'],
+  parameters: {
+    docs: {
+      description: {
+        story: 'Disable single items so users can see but not pick them.',
+      },
+    },
+  },
   render: (_args) => (
     <Select>
       <SelectTrigger className="nx:w-[180px]" aria-label="Select an option">
@@ -268,7 +296,7 @@ export const CapabilityLadder: Story = {
     docs: {
       description: {
         story:
-          'Capability ladder: use NativeSelect for native form submission and OS pickers with simple text options; use Select for a styled trigger/listbox with groups, separators, and disabled items. Future Combobox and MultiSelect remain roadmap-only boundaries and are not implemented here.',
+          'Use NativeSelect for native form submission and OS pickers, and Select for a styled list with groups, separators and disabled items. For search, use Combobox. For several values, use MultiSelect.',
       },
     },
   },
@@ -335,7 +363,7 @@ export const ReadOnlyBoundary: Story = {
     docs: {
       description: {
         story:
-          'Select has disabled state today, but no first-class read-only state. Use disabled when users cannot interact and the value should not behave like an editable control. If a locked value still needs to submit with a form, render a display-only value plus a hidden input.',
+          'Select has no read-only state, so use `disabled`, or show the value as text with a hidden input if it must submit.',
       },
     },
   },
@@ -393,7 +421,7 @@ export const RichItemFutureBoundary: Story = {
     docs: {
       description: {
         story:
-          'Current Select items are text-first options with disabled support. Rich item affordances such as description, icon/avatar, metadata, and disabled reason belong to a future compositional-slot API, not render props, and are intentionally not implemented in this PR.',
+          'Select items hold plain text and support `disabled`, but not descriptions, icons, avatars or metadata.',
       },
     },
   },
@@ -432,6 +460,14 @@ export const RichItemFutureBoundary: Story = {
 
 export const WithGroups: Story = {
   tags: ['docs'],
+  parameters: {
+    docs: {
+      description: {
+        story:
+          'Group items under labels and divide the groups with a separator.',
+      },
+    },
+  },
   render: (_args) => (
     <Select>
       <SelectTrigger className="nx:w-[200px]" aria-label="Select a food">
@@ -484,6 +520,14 @@ const SIZES = ['sm', 'default', 'lg'] as const;
 
 export const Sizes: Story = {
   tags: ['docs'],
+  parameters: {
+    docs: {
+      description: {
+        story:
+          'Each trigger size matches the height of an Input at the same size.',
+      },
+    },
+  },
   render: (_args) => (
     <div className="nx:flex nx:w-[420px] nx:flex-col nx:gap-3">
       {SIZES.map((size) => (
@@ -1075,7 +1119,7 @@ export const DefaultModeHeightPinned: Story = {
     docs: {
       description: {
         story:
-          'Regression sentinel: pins the `SelectTrigger` height in default mode to the default single-line control scale.',
+          'Pins the `SelectTrigger` height at the default single-line control size.',
       },
     },
   },

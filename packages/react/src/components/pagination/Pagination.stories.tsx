@@ -18,6 +18,12 @@ const meta: Meta<typeof Pagination> = {
   component: Pagination,
   parameters: {
     layout: 'padded',
+    docs: {
+      description: {
+        component:
+          'Pagination links to the pages of a long list or table. Use it when results are split across pages. Your app decides which page numbers to show.',
+      },
+    },
   },
 };
 
@@ -63,6 +69,13 @@ export const Default: Story = {
 // A short pager with no overflow — every page fits, so no ellipsis is needed.
 export const FewPages: Story = {
   tags: ['docs'],
+  parameters: {
+    docs: {
+      description: {
+        story: 'Show every page number when they all fit, with no ellipsis.',
+      },
+    },
+  },
   render: () => (
     <Pagination>
       <PaginationContent>
@@ -273,6 +286,14 @@ export const EllipsisFootprint: Story = {
 // bare <a> here stands in for that router link.
 export const AsChild: Story = {
   tags: ['docs'],
+  parameters: {
+    docs: {
+      description: {
+        story:
+          "Pass `asChild` to render each link as your router's link component.",
+      },
+    },
+  },
   render: () => (
     <Pagination>
       <PaginationContent>
