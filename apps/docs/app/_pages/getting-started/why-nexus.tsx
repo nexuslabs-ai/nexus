@@ -214,6 +214,89 @@ const LINT_RULES: { rule: string; catches: string }[] = [
   },
 ];
 
+const ACKNOWLEDGEMENTS: { name: string; href: string; role: string }[] = [
+  {
+    name: 'shadcn/ui',
+    href: 'https://ui.shadcn.com',
+    role: 'The copy-and-own approach, and the starting point for many components',
+  },
+  {
+    name: 'Radix UI',
+    href: 'https://www.radix-ui.com',
+    role: 'Accessible primitives under most components',
+  },
+  {
+    name: 'Tailwind CSS',
+    href: 'https://tailwindcss.com',
+    role: 'Styling and the nx: utilities',
+  },
+  {
+    name: 'CVA',
+    href: 'https://cva.style',
+    role: 'Component variants',
+  },
+  {
+    name: 'clsx and tailwind-merge',
+    href: 'https://github.com/dcastil/tailwind-merge',
+    role: 'Class joining and conflict merging in cn()',
+  },
+  {
+    name: 'cmdk',
+    href: 'https://cmdk.paco.me',
+    role: 'Command and Combobox',
+  },
+  {
+    name: 'Vaul',
+    href: 'https://vaul.emilkowal.ski',
+    role: 'Drawer',
+  },
+  {
+    name: 'Sonner',
+    href: 'https://sonner.emilkowal.ski',
+    role: 'Toasts',
+  },
+  {
+    name: 'input-otp',
+    href: 'https://input-otp.rodz.dev',
+    role: 'InputOTP',
+  },
+  {
+    name: 'React Day Picker',
+    href: 'https://daypicker.dev',
+    role: 'DatePicker',
+  },
+  {
+    name: 'Embla Carousel',
+    href: 'https://www.embla-carousel.com',
+    role: 'Carousel',
+  },
+  {
+    name: 'react-resizable-panels',
+    href: 'https://github.com/bvaughn/react-resizable-panels',
+    role: 'Resizable',
+  },
+  {
+    name: 'Recharts',
+    href: 'https://recharts.org',
+    role: 'Chart',
+  },
+  {
+    name: 'APCA',
+    href: 'https://git.apcacontrast.com',
+    role: 'The contrast model behind the CI checks',
+  },
+  {
+    name: 'culori',
+    href: 'https://culorijs.org',
+    role: 'Color conversion and OKLCH math in the engine',
+  },
+  {
+    name: 'Tabler Icons',
+    href: 'https://tabler.io/icons',
+    role: 'Icons',
+  },
+];
+
 const BODY_CLASS =
   'nx:typography-body-default nx:text-muted-foreground nx:mb-4 nx:max-w-[64ch]';
 const SECTION_CLASS = 'nx:typography-heading-small nx:mb-1';
@@ -539,8 +622,9 @@ export default function WhyNexus() {
           Nexus and shadcn/ui
         </SectionHeading>
         <p className={BODY_CLASS}>
-          Nexus takes shadcn/ui&rsquo;s best idea, that you own the component
-          source. It replaces shadcn/ui&rsquo;s token model.
+          Nexus is built on shadcn/ui&rsquo;s idea that you own the component
+          source, and many Nexus components are adapted from shadcn/ui. Nexus
+          keeps that approach and replaces the token model underneath it.
         </p>
         <div className="nx:overflow-x-auto">
           <table className="nx:w-full nx:min-w-[640px] nx:border-collapse nx:typography-label-default">
@@ -669,6 +753,27 @@ export default function WhyNexus() {
           </Link>
           .
         </p>
+      </section>
+
+      {/* ── Acknowledgements ────────────────────────────────── */}
+      <section className="nx:mb-12">
+        <SectionHeading className={SECTION_CLASS}>
+          Acknowledgements
+        </SectionHeading>
+        <p className={BODY_CLASS}>
+          Nexus stands on open-source work. Thank you to everyone who builds and
+          maintains these projects.
+        </p>
+        <ul className="nx:mb-4 nx:list-disc nx:space-y-2 nx:ps-5 nx:typography-body-default nx:max-w-[64ch]">
+          {ACKNOWLEDGEMENTS.map((item) => (
+            <li key={item.name}>
+              <a href={item.href} className={LINK_CLASS}>
+                {item.name}
+              </a>
+              : {item.role}.
+            </li>
+          ))}
+        </ul>
       </section>
     </>
   );
