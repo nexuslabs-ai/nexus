@@ -53,6 +53,14 @@ export const PAGE_REGISTRY = {
     href: '/getting-started',
     pages: [
       {
+        slug: 'introduction',
+        label: 'Introduction',
+      },
+      {
+        slug: 'why-nexus',
+        label: 'Why Nexus',
+      },
+      {
         slug: 'install',
         label: 'Install',
       },
