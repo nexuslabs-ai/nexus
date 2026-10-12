@@ -1,6 +1,3 @@
 node_modules
 dist
 *.tgz
-
-# Committed: pins the package for reproducible installs (overrides examples/.gitignore).
-!package-lock.json
