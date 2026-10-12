@@ -327,6 +327,7 @@ export function appearancePrefsToCss(prefs: NexusAppearancePrefs): string {
   if (prefs.reduceMotion) {
     for (const step of MOTION_DURATION_STEPS)
       variables.push(`--nx-motion-duration-${step}: 0ms;`);
+    variables.push('--nx-scroll-behavior: auto;');
   }
   return [
     `:root {\n${variables.map((line) => `  ${line}`).join('\n')}\n${typographyScaleVariables(uiPx)}\n}`,

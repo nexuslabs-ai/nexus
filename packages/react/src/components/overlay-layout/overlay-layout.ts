@@ -88,9 +88,10 @@ const overlayPanelTransitionClassName = [
 
 const overlayContentVariants = cva(
   [
-    'nx:fixed nx:left-1/2 nx:top-1/2 nx:z-modal nx:flex nx:w-full nx:max-w-lg nx:flex-col',
+    // Centred with margins, not a translate: a transform would make this the
+    // containing block for fixed-position popups a dialog holds.
+    'nx:fixed nx:inset-0 nx:z-modal nx:m-auto nx:flex nx:h-fit nx:w-full nx:max-w-lg nx:flex-col',
     'nx:max-h-[calc(100svh-2rem)] nx:overflow-hidden',
-    'nx:-translate-x-1/2 nx:-translate-y-1/2',
     'nx:gap-4 nx:border-default nx:border-border-default nx:bg-container nx:py-6 nx:shadow-lg',
     overlayContentTransitionClassName,
     'nx:sm:rounded-lg',

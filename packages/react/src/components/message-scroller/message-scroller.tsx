@@ -69,12 +69,13 @@ function useMessageScrollerNodes() {
   return context;
 }
 
-// Inline, so `reduceMotion`'s `scroll-behavior: auto !important` still wins.
+// The reduceMotion preference sets --nx-scroll-behavior to `auto`.
 function smoothScrollTo(viewport: HTMLElement, top: number) {
-  const previous = viewport.style.scrollBehavior;
-  viewport.style.scrollBehavior = 'smooth';
-  viewport.scrollTo({ top });
-  viewport.style.scrollBehavior = previous;
+  const reduced =
+    getComputedStyle(viewport)
+      .getPropertyValue('--nx-scroll-behavior')
+      .trim() === 'auto';
+  viewport.scrollTo({ top, behavior: reduced ? 'auto' : 'smooth' });
 }
 
 /**

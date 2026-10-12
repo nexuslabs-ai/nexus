@@ -480,6 +480,7 @@ describe('appearancePrefsToCss', () => {
     for (const step of Object.keys(motionTokens.duration)) {
       expect(on).toContain(`--nx-motion-duration-${step}: 0ms;`);
     }
+    expect(on).toContain('--nx-scroll-behavior: auto;');
     expect(
       appearancePrefsToCss({ ...prefs, reduceMotion: false })
     ).not.toContain('--nx-motion-duration');
