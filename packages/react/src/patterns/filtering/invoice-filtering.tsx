@@ -1,3 +1,5 @@
+'use client';
+
 import * as React from 'react';
 
 import { IconChevronDown, IconSearch } from '@tabler/icons-react';

@@ -1,3 +1,5 @@
+'use client';
+
 import * as React from 'react';
 
 import { IconList, IconUsers } from '@tabler/icons-react';
