@@ -330,7 +330,7 @@ function DialogTitle({ className, ...props }: DialogTitleProps) {
   return (
     <DialogPrimitive.Title
       data-slot="dialog-title"
-      className={cn('nx:typography-heading-xsmall', className)}
+      className={cn('nx:m-0 nx:typography-heading-xsmall', className)}
       {...props}
     />
   );
@@ -362,7 +362,7 @@ function DialogDescription({ className, ...props }: DialogDescriptionProps) {
     <DialogPrimitive.Description
       data-slot="dialog-description"
       className={cn(
-        'nx:typography-body-default nx:text-muted-foreground',
+        'nx:m-0 nx:typography-body-default nx:text-muted-foreground',
         className
       )}
       {...props}

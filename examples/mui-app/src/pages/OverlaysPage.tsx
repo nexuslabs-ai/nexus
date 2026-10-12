@@ -87,15 +87,17 @@ function MuiDialogWithNexusInside() {
   )
 }
 
+// A Nexus dialog blocks pointer events outside itself, so MUI popups opened
+// from inside it render in place instead of portalling to <body>.
 function MuiControlsForNexusDialog() {
   const [menuAnchor, setMenuAnchor] = useState<HTMLElement | null>(null)
   const [popoverAnchor, setPopoverAnchor] = useState<HTMLElement | null>(null)
 
   return (
-    <Stack data-check="host" spacing={2}>
+    <Stack data-check="host" spacing={2} sx={{ pt: 1 }}>
       <FormControl size="small" fullWidth>
         <InputLabel id="invite-role-label">Role</InputLabel>
-        <Select labelId="invite-role-label" label="Role" defaultValue="member">
+        <Select labelId="invite-role-label" label="Role" defaultValue="member" MenuProps={{ disablePortal: true }}>
           <MenuItem value="admin">Admin</MenuItem>
           <MenuItem value="member">Member</MenuItem>
           <MenuItem value="viewer">Viewer</MenuItem>
@@ -106,6 +108,7 @@ function MuiControlsForNexusDialog() {
           MUI popover
         </Button>
         <Popover
+          disablePortal
           anchorEl={popoverAnchor}
           open={popoverAnchor !== null}
           onClose={() => setPopoverAnchor(null)}
@@ -116,11 +119,11 @@ function MuiControlsForNexusDialog() {
         <Button variant="outlined" onClick={(event) => setMenuAnchor(event.currentTarget)}>
           MUI menu
         </Button>
-        <Menu anchorEl={menuAnchor} open={menuAnchor !== null} onClose={() => setMenuAnchor(null)}>
+        <Menu disablePortal anchorEl={menuAnchor} open={menuAnchor !== null} onClose={() => setMenuAnchor(null)}>
           <MenuItem onClick={() => setMenuAnchor(null)}>Copy invite link</MenuItem>
           <MenuItem onClick={() => setMenuAnchor(null)}>Resend email</MenuItem>
         </Menu>
-        <Tooltip title="3 seats left on your plan">
+        <Tooltip title="3 seats left on your plan" slotProps={{ popper: { disablePortal: true } }}>
           <Button>MUI tooltip</Button>
         </Tooltip>
       </Stack>

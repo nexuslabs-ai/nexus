@@ -9,24 +9,11 @@ import {
 } from '../overlay-layout/overlay-layout';
 
 /**
- * TooltipProvider
- *
- * Wraps your app to provide tooltip context. Required for tooltips to work.
- * Place this at the root of your application or around components using tooltips.
- *
- * @example
- * ```tsx
- * <TooltipProvider>
- *   <App />
- * </TooltipProvider>
- * ```
- */
-const TooltipProvider = TooltipPrimitive.Provider;
-
-/**
  * Tooltip
  *
  * The root component that manages tooltip state. Contains the trigger and content.
+ * It brings its own provider, so it works without any app-level setup; set
+ * `delayDuration` on it to change the open delay.
  *
  * @example
  * ```tsx
@@ -36,7 +23,13 @@ const TooltipProvider = TooltipPrimitive.Provider;
  * </Tooltip>
  * ```
  */
-const Tooltip = TooltipPrimitive.Root;
+function Tooltip(props: React.ComponentProps<typeof TooltipPrimitive.Root>) {
+  return (
+    <TooltipPrimitive.Provider>
+      <TooltipPrimitive.Root {...props} />
+    </TooltipPrimitive.Provider>
+  );
+}
 
 /**
  * TooltipTrigger
@@ -91,10 +84,4 @@ function TooltipContent({
   );
 }
 
-export {
-  Tooltip,
-  TooltipContent,
-  type TooltipContentProps,
-  TooltipProvider,
-  TooltipTrigger,
-};
+export { Tooltip, TooltipContent, type TooltipContentProps, TooltipTrigger };

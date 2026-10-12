@@ -2,7 +2,13 @@
 
 import * as React from 'react';
 
-import { toast, Toaster as Sonner, type ToasterProps, useSonner } from 'sonner';
+import {
+  type ExternalToast,
+  toast as sonnerToast,
+  Toaster as Sonner,
+  type ToasterProps,
+  useSonner,
+} from 'sonner';
 
 import {
   IconAlertCircle,
@@ -93,6 +99,46 @@ const toasterThemeVars = {
  * }
  * ```
  */
+// Nexus toasts render only in the Nexus Toaster, and a host app's own sonner
+// Toaster never shows them, so mounting both never doubles a toast.
+const NEXUS_TOASTER_ID = 'nexus';
+
+function inNexusToaster<Data extends object>(data?: Data) {
+  return { ...data, toasterId: NEXUS_TOASTER_ID };
+}
+
+type Message = Parameters<typeof sonnerToast.success>[0];
+
+const toast = Object.assign(
+  (message: Parameters<typeof sonnerToast>[0], data?: ExternalToast) =>
+    sonnerToast(message, inNexusToaster(data)),
+  {
+    success: (message: Message, data?: ExternalToast) =>
+      sonnerToast.success(message, inNexusToaster(data)),
+    info: (message: Message, data?: ExternalToast) =>
+      sonnerToast.info(message, inNexusToaster(data)),
+    warning: (message: Message, data?: ExternalToast) =>
+      sonnerToast.warning(message, inNexusToaster(data)),
+    error: (message: Message, data?: ExternalToast) =>
+      sonnerToast.error(message, inNexusToaster(data)),
+    message: (message: Message, data?: ExternalToast) =>
+      sonnerToast.message(message, inNexusToaster(data)),
+    loading: (message: Message, data?: ExternalToast) =>
+      sonnerToast.loading(message, inNexusToaster(data)),
+    custom: (
+      jsx: Parameters<typeof sonnerToast.custom>[0],
+      data?: ExternalToast
+    ) => sonnerToast.custom(jsx, inNexusToaster(data)),
+    promise: <ToastData,>(
+      promise: Parameters<typeof sonnerToast.promise<ToastData>>[0],
+      data?: Parameters<typeof sonnerToast.promise<ToastData>>[1]
+    ) => sonnerToast.promise(promise, inNexusToaster(data)),
+    dismiss: sonnerToast.dismiss,
+    getHistory: sonnerToast.getHistory,
+    getToasts: sonnerToast.getToasts,
+  }
+);
+
 function Toaster({ style, ...props }: ToasterProps) {
   const theme = useToasterTheme();
   return (
@@ -111,6 +157,7 @@ function Toaster({ style, ...props }: ToasterProps) {
           } as React.CSSProperties
         }
         {...props}
+        id={NEXUS_TOASTER_ID}
       />
     </div>
   );

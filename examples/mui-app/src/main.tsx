@@ -7,7 +7,6 @@ import { BrowserRouter } from 'react-router'
 import App from './App'
 import { APPEARANCE_STORAGE_KEY, defaultAppearance } from './appearance-state'
 import { createNexusAppearance } from './components/nexus/components/appearance/provider'
-import { TooltipProvider as NexusTooltipProvider } from './components/nexus/components/tooltip'
 
 import './nexus.css'
 
@@ -26,11 +25,9 @@ createRoot(document.getElementById('root')!).render(
     <ThemeProvider theme={theme}>
       <CssBaseline />
       <NexusAppearanceProvider>
-        <NexusTooltipProvider>
-          <BrowserRouter>
-            <App />
-          </BrowserRouter>
-        </NexusTooltipProvider>
+        <BrowserRouter>
+          <App />
+        </BrowserRouter>
       </NexusAppearanceProvider>
     </ThemeProvider>
   </StrictMode>,

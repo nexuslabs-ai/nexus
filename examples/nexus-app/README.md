@@ -9,7 +9,7 @@ Tailwind entry.
 | ---- | ---------- |
 | `components/`, `lib/`, `hooks/` | Nexus, copied from this repository by `npm run nexus:add`. Committed |
 | `styles/nexus/` | The Nexus token CSS |
-| `app/globals.css` | Imports the token CSS, `tw-animate-css` and the Progress keyframes |
+| `app/globals.css` | Imports Tailwind's Preflight, the token CSS, `tw-animate-css` and the Progress keyframes |
 | `app/lib/rhf-field.tsx` | The app's own react-hook-form field wrapper around Nexus `Label` |
 | `nexus.json` | Which Nexus components to copy |
 
@@ -42,12 +42,17 @@ then shows what changed for consumers.
 
 The same four steps as the Install page:
 
-1. Tailwind 4 through `@tailwindcss/postcss`, with no `@import "tailwindcss"`
-   of the app's own.
-2. The token CSS in `styles/nexus/`, imported from `app/globals.css`.
+1. Tailwind 4 through `@tailwindcss/postcss`, with no full `@import
+   "tailwindcss"` of the app's own.
+2. Tailwind's Preflight and the token CSS from `styles/nexus/`, imported from
+   `app/globals.css`. Nexus ships no reset, so the app brings one.
 3. `NexusAppearanceScript` in `<head>` and `NexusAppearanceProvider` around
-   the app, sharing one `storageKey`.
+   the app, sharing one `storageKey`. `<body>` carries
+   `nx:typography-body-default`, so page text follows the appearance settings.
 4. `lib/utils.ts` for `cn`.
+
+`npm run nexus:add` also installs `@nexus_ds/core` from `packages/core`, so the
+app runs this repository's engine.
 
 All of the app's own markup uses `nx:` utilities and Nexus tokens, such as
 `nx:text-muted-foreground` and `nx:typography-body-small`. Tailwind's default

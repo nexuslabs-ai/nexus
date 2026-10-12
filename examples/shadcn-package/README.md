@@ -31,7 +31,8 @@ npx vite preview
 
 After rebuilding `ui/`, delete the app's `node_modules/@acme/ui` and run
 `npm install`. npm does not reinstall a `file:` package whose version has not
-changed.
+changed. The same goes for `node_modules/@nexus_ds/core` after a change to
+`packages/core`.
 
 ## How the package ships Nexus
 
@@ -42,7 +43,9 @@ changed.
 | `@acme/ui/styles.css` | The shadcn Tailwind entry and tokens |
 | `@acme/ui/nexus.css` | The Nexus Tailwind entry |
 
-`tsc` compiles `src/` to `dist/`, keeping each file's `'use client'`. The CSS
+`tsc` compiles `src/` to `dist/`, keeping each file's `'use client'`.
+`@nexus_ds/core` is a peer dependency, so the app installs the one copy of the
+engine that the provider and its own code share. The CSS
 ships as source, and the app compiles it. Both entries end with
 `@source './'`: Tailwind skips `node_modules` when it scans for classes, so
 without that line the package's classes are never generated.
@@ -70,16 +73,6 @@ node examples/scripts/check.mjs examples/shadcn-package/app-via-package
 node examples/scripts/check.mjs examples/shadcn-package/app-direct
 ```
 
-Both report **2,058 host properties** across the three pages, and both build
+Both report **0 host properties** across the three pages, and both build
 byte-identical CSS. Delivering Nexus through the package or copying it into the
-app makes no difference to what leaks.
-
-| Host change | Cause |
-| ----------- | ----- |
-| The host font switches to Nexus's system stack on 402 elements | Nexus's Tailwind brings its own Preflight, and its `html { font-family }` loads after the host's. `shadcn-app` escapes this only because `next/font` sets the font with a class on `<html>` |
-| Text, padding and radii shrink (16 → 14px root) | `NexusAppearanceProvider` sets `:root { font-size: 14px }` |
-| Border colours change | Nexus's global `*, ::before, ::after { border-color }` |
-| Body text colour changes | Nexus's `body { color }` base rule |
-
-The rest matches `shadcn-app`: toasts show twice, Nexus's tooltip needs its own
-provider, and unprefixed classes on Nexus components lose.
+app makes no difference.

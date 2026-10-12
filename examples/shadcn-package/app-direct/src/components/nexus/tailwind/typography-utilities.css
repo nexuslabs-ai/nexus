@@ -7,6 +7,8 @@
   line-height: var(--nx-typography-line-height-3xl);
   letter-spacing: var(--nx-typography-letterspacing-tighter);
   text-wrap: balance;
+  -webkit-font-smoothing: var(--nx-font-smoothing-webkit, auto);
+  -moz-osx-font-smoothing: var(--nx-font-smoothing-moz, auto);
 }
 
 @utility typography-heading-medium {
@@ -16,6 +18,8 @@
   line-height: var(--nx-typography-line-height-2xl);
   letter-spacing: var(--nx-typography-letterspacing-tight);
   text-wrap: balance;
+  -webkit-font-smoothing: var(--nx-font-smoothing-webkit, auto);
+  -moz-osx-font-smoothing: var(--nx-font-smoothing-moz, auto);
 }
 
 @utility typography-heading-small {
@@ -25,6 +29,8 @@
   line-height: var(--nx-typography-line-height-xl);
   letter-spacing: var(--nx-typography-letterspacing-tight);
   text-wrap: balance;
+  -webkit-font-smoothing: var(--nx-font-smoothing-webkit, auto);
+  -moz-osx-font-smoothing: var(--nx-font-smoothing-moz, auto);
 }
 
 @utility typography-heading-xsmall {
@@ -34,6 +40,8 @@
   line-height: var(--nx-typography-line-height-lg);
   letter-spacing: var(--nx-typography-letterspacing-tight);
   text-wrap: balance;
+  -webkit-font-smoothing: var(--nx-font-smoothing-webkit, auto);
+  -moz-osx-font-smoothing: var(--nx-font-smoothing-moz, auto);
 }
 
 @utility typography-heading-xxsmall {
@@ -43,6 +51,8 @@
   line-height: var(--nx-typography-line-height-base);
   letter-spacing: var(--nx-typography-letterspacing-tight);
   text-wrap: balance;
+  -webkit-font-smoothing: var(--nx-font-smoothing-webkit, auto);
+  -moz-osx-font-smoothing: var(--nx-font-smoothing-moz, auto);
 }
 
 @utility typography-body-default {
@@ -52,6 +62,8 @@
   line-height: var(--nx-typography-line-height-sm);
   letter-spacing: var(--nx-typography-letterspacing-normal);
   text-wrap: pretty;
+  -webkit-font-smoothing: var(--nx-font-smoothing-webkit, auto);
+  -moz-osx-font-smoothing: var(--nx-font-smoothing-moz, auto);
 }
 
 @utility typography-body-small {
@@ -61,6 +73,8 @@
   line-height: var(--nx-typography-line-height-xs);
   letter-spacing: var(--nx-typography-letterspacing-normal);
   text-wrap: pretty;
+  -webkit-font-smoothing: var(--nx-font-smoothing-webkit, auto);
+  -moz-osx-font-smoothing: var(--nx-font-smoothing-moz, auto);
 }
 
 @utility typography-shortcut {
@@ -69,6 +83,8 @@
   font-weight: var(--nx-typography-weight-normal);
   line-height: var(--nx-typography-line-height-xs);
   letter-spacing: var(--nx-typography-letterspacing-widest);
+  -webkit-font-smoothing: var(--nx-font-smoothing-webkit, auto);
+  -moz-osx-font-smoothing: var(--nx-font-smoothing-moz, auto);
 }
 
 @utility typography-label-default {
@@ -77,6 +93,8 @@
   font-weight: var(--nx-typography-weight-medium);
   line-height: var(--nx-typography-line-height-sm);
   letter-spacing: var(--nx-typography-letterspacing-normal);
+  -webkit-font-smoothing: var(--nx-font-smoothing-webkit, auto);
+  -moz-osx-font-smoothing: var(--nx-font-smoothing-moz, auto);
 }
 
 @utility typography-label-small {
@@ -85,6 +103,8 @@
   font-weight: var(--nx-typography-weight-medium);
   line-height: var(--nx-typography-line-height-xs);
   letter-spacing: var(--nx-typography-letterspacing-normal);
+  -webkit-font-smoothing: var(--nx-font-smoothing-webkit, auto);
+  -moz-osx-font-smoothing: var(--nx-font-smoothing-moz, auto);
 }
 
 @utility typography-label-caps {
@@ -93,6 +113,8 @@
   font-weight: var(--nx-typography-weight-semibold);
   line-height: var(--nx-typography-line-height-xxs);
   letter-spacing: var(--nx-typography-letterspacing-wide);
+  -webkit-font-smoothing: var(--nx-font-smoothing-webkit, auto);
+  -moz-osx-font-smoothing: var(--nx-font-smoothing-moz, auto);
 }
 
 @utility typography-code-block {
@@ -101,6 +123,8 @@
   font-weight: var(--nx-typography-weight-normal);
   line-height: var(--nx-typography-line-height-sm);
   letter-spacing: 0px;
+  -webkit-font-smoothing: var(--nx-font-smoothing-webkit, auto);
+  -moz-osx-font-smoothing: var(--nx-font-smoothing-moz, auto);
 }
 
 @utility typography-code-inline {
@@ -109,4 +133,6 @@
   font-weight: var(--nx-typography-weight-semibold);
   line-height: normal;
   letter-spacing: 0px;
+  -webkit-font-smoothing: var(--nx-font-smoothing-webkit, auto);
+  -moz-osx-font-smoothing: var(--nx-font-smoothing-moz, auto);
 }

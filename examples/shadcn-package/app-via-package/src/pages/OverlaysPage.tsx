@@ -167,7 +167,7 @@ export function OverlaysPage() {
       <section data-check="host" className="grid gap-3">
         <h2 className="text-lg font-medium">Toasts</h2>
         <p className="text-sm text-muted-foreground">
-          The app mounts both Toasters. Both are built on the same sonner package.
+          The app mounts both Toasters. Each shows only its own system&apos;s toasts.
         </p>
         <div className="flex gap-3">
           <Button variant="outline" onClick={() => toast.success("Saved with the shadcn toast")}>

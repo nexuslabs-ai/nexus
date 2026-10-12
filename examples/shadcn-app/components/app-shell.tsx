@@ -29,28 +29,23 @@ const NAV = [
   { href: "/overlays", label: "Overlays", icon: LayersIcon },
 ]
 
-function HostThemeToggle() {
+// One switch drives both theme systems, so they never disagree about the
+// shared .dark class on <html>.
+function ThemeToggle() {
   const { resolvedTheme, setTheme } = useTheme()
+  const { setState } = useNexusAppearance()
   const dark = resolvedTheme === "dark"
 
-  return (
-    <Button variant="outline" size="sm" onClick={() => setTheme(dark ? "light" : "dark")}>
-      {dark ? <SunIcon /> : <MoonIcon />}
-      Host theme
-    </Button>
-  )
-}
-
-function NexusModeToggle() {
-  const { state, setState } = useNexusAppearance()
-
-  function toggleMode() {
-    setState((current) => ({ ...current, mode: current.mode === "dark" ? "light" : "dark" }))
+  function toggleTheme() {
+    const mode = dark ? "light" : "dark"
+    setTheme(mode)
+    setState((current) => ({ ...current, mode }))
   }
 
   return (
-    <Button variant="outline" size="sm" onClick={toggleMode}>
-      Nexus mode: {state.mode}
+    <Button variant="outline" size="sm" onClick={toggleTheme}>
+      {dark ? <SunIcon /> : <MoonIcon />}
+      {dark ? "Light" : "Dark"}
     </Button>
   )
 }
@@ -87,9 +82,8 @@ export function AppShell({ children }: { children: React.ReactNode }) {
           <SidebarTrigger />
           <Separator orientation="vertical" className="h-5" />
           <span className="text-sm text-muted-foreground">shadcn app with Nexus added</span>
-          <div className="ml-auto flex gap-2">
-            <HostThemeToggle />
-            <NexusModeToggle />
+          <div className="ml-auto">
+            <ThemeToggle />
           </div>
         </header>
         <main className="flex-1 p-6">{children}</main>

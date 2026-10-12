@@ -32,9 +32,18 @@ const NAV = [
   { to: '/overlays', label: 'Overlays', icon: <LayersIcon /> },
 ]
 
-function HostThemeToggle() {
+// One switch drives both theme systems, so they never disagree about the
+// shared .dark class on <html>.
+function ThemeToggle() {
   const { mode, setMode } = useColorScheme()
+  const { setState } = useNexusAppearance()
   const dark = mode === 'dark'
+
+  function toggleTheme() {
+    const next = dark ? 'light' : 'dark'
+    setMode(next)
+    setState((current) => ({ ...current, mode: next }))
+  }
 
   return (
     <Button
@@ -42,23 +51,9 @@ function HostThemeToggle() {
       variant="outlined"
       size="small"
       startIcon={dark ? <LightModeIcon /> : <DarkModeIcon />}
-      onClick={() => setMode(dark ? 'light' : 'dark')}
+      onClick={toggleTheme}
     >
-      MUI theme
-    </Button>
-  )
-}
-
-function NexusModeToggle() {
-  const { state, setState } = useNexusAppearance()
-
-  function toggleMode() {
-    setState((current) => ({ ...current, mode: current.mode === 'dark' ? 'light' : 'dark' }))
-  }
-
-  return (
-    <Button color="inherit" variant="outlined" size="small" onClick={toggleMode}>
-      Nexus mode: {state.mode}
+      {dark ? 'Light' : 'Dark'}
     </Button>
   )
 }
@@ -73,8 +68,7 @@ export default function App() {
           <Typography variant="h6" noWrap sx={{ flexGrow: 1 }}>
             Acme Console
           </Typography>
-          <HostThemeToggle />
-          <NexusModeToggle />
+          <ThemeToggle />
         </Toolbar>
       </AppBar>
       <Drawer

@@ -1,5 +1,5 @@
 import { DEFAULT_NEXUS_APPEARANCE } from '@nexus_ds/core';
-import type { Metadata, Viewport } from 'next';
+import type { Metadata } from 'next';
 import type { ReactNode } from 'react';
 
 import { NexusAppearanceProvider } from '@/components/appearance/provider';
@@ -16,15 +16,13 @@ export const metadata: Metadata = {
   description: 'A new Next.js app built entirely on copied Nexus components',
 };
 
-export const viewport: Viewport = { colorScheme: 'light dark' };
-
 export default function RootLayout({ children }: { children: ReactNode }) {
   return (
     <html lang="en" suppressHydrationWarning>
       <head>
         <NexusAppearanceScript storageKey={APPEARANCE_STORAGE_KEY} defaultState={DEFAULT_NEXUS_APPEARANCE} />
       </head>
-      <body className="nx:bg-background nx:text-foreground">
+      <body className="nx:bg-background nx:text-foreground nx:typography-body-default">
         <NexusAppearanceProvider storageKey={APPEARANCE_STORAGE_KEY} defaultState={DEFAULT_NEXUS_APPEARANCE}>
           <AppShell>{children}</AppShell>
         </NexusAppearanceProvider>

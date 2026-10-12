@@ -1,5 +1,4 @@
 import { TooltipProvider } from '@acme/ui'
-import { TooltipProvider as NexusTooltipProvider } from '@acme/ui/nexus'
 import { ThemeProvider } from 'next-themes'
 import { StrictMode } from 'react'
 import { createRoot } from 'react-dom/client'
@@ -16,11 +15,9 @@ createRoot(document.getElementById('root')!).render(
     <ThemeProvider attribute="class" defaultTheme="light" disableTransitionOnChange>
       <NexusAppearanceProvider>
         <TooltipProvider>
-          <NexusTooltipProvider>
-            <BrowserRouter>
-              <App />
-            </BrowserRouter>
-          </NexusTooltipProvider>
+          <BrowserRouter>
+            <App />
+          </BrowserRouter>
         </TooltipProvider>
       </NexusAppearanceProvider>
     </ThemeProvider>

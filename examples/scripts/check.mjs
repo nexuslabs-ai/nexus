@@ -15,7 +15,7 @@
 //                    and `npm ci && npm run build` these folders first (a local package)
 // usage: node examples/scripts/check.mjs examples/shadcn-app
 import { spawn, execFileSync } from 'node:child_process';
-import { cpSync, mkdtempSync, readFileSync, writeFileSync } from 'node:fs';
+import { cpSync, mkdtempSync, readdirSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import path from 'node:path';
 
@@ -66,10 +66,30 @@ const config = JSON.parse(readFileSync(path.join(appDir, 'nexus.json'), 'utf8'))
 const isNext = 'next' in JSON.parse(readFileSync(path.join(appDir, 'package.json'), 'utf8')).dependencies;
 const rootDir = path.resolve(appDir, config.root ?? '.');
 
+// A file: dependency that leaves the copied folder (packages/core) would not
+// resolve from the copy, so point it at the original folder.
+function pinOutsideFileDependencies(root) {
+  for (const file of readdirSync(root, { recursive: true })) {
+    if (!/(^|\/)package(-lock)?\.json$/.test(file)) continue;
+    const originalDir = path.dirname(path.join(rootDir, file));
+    const text = readFileSync(path.join(root, file), 'utf8').replace(/"file:([^"]+)"/g, (spec, relative) => {
+      const target = path.resolve(originalDir, relative);
+      return target.startsWith(rootDir + path.sep) ? spec : `"file:${target}"`;
+    });
+    writeFileSync(path.join(root, file), text);
+  }
+}
+
+// Every copy is deleted when the run ends: each one holds a full node_modules.
+const tempDirs = [];
+
 // Copies the root folder and returns the app's path inside the copy.
 function copyApp(label) {
-  const root = path.join(mkdtempSync(path.join(tmpdir(), `nexus-check-${label}-`)), path.basename(rootDir));
+  const tempDir = mkdtempSync(path.join(tmpdir(), `nexus-check-${label}-`));
+  tempDirs.push(tempDir);
+  const root = path.join(tempDir, path.basename(rootDir));
   cpSync(rootDir, root, { recursive: true, filter: (src) => !SKIP.has(path.basename(src)) });
+  pinOutsideFileDependencies(root);
   return path.join(root, path.relative(rootDir, appDir));
 }
 
@@ -167,44 +187,48 @@ async function snapshot(page, url) {
   return elements;
 }
 
-const before = copyApp('before');
-const after = copyApp('after');
-removeNexus(before);
-console.log('building the app without Nexus…');
-build(before);
-// A Vite app injects the first-paint script at build time, marked data-nexus-appearance.
-if (!isNext) {
-  const html = path.join(before, 'dist/index.html');
-  writeFileSync(html, readFileSync(html, 'utf8').replace(/<script data-nexus-appearance>.*?<\/script>/s, ''));
-}
-console.log('building the app with Nexus…');
-build(after);
-
-const servers = [await serve(before, 4174), await serve(after, 4173)];
-const browser = await chromium.launch();
-let total = 0;
 try {
-  const page = await browser.newPage({ colorScheme: 'light', viewport: { width: 1440, height: 1000 } });
-  for (const route of config.pages) {
-    const a = await snapshot(page, `http://localhost:4174${route}`);
-    const b = await snapshot(page, `http://localhost:4173${route}`);
-
-    // Group identical changes so one leak shows as one line, not one per element.
-    const groups = new Map();
-    for (const key of Object.keys(a).filter((key) => key in b)) {
-      for (const name of PROPERTIES) {
-        if (a[key][name] === b[key][name]) continue;
-        const change = `${name}: ${a[key][name]} → ${b[key][name]}`;
-        groups.set(change, (groups.get(change) ?? 0) + 1);
-        total += 1;
-      }
-    }
-    const count = [...groups.values()].reduce((sum, n) => sum + n, 0);
-    console.log(`\n${route}  ${count} host properties changed`);
-    for (const [change, n] of [...groups].sort((x, y) => y[1] - x[1])) console.log(`  ${String(n).padStart(4)} × ${change}`);
+  const before = copyApp('before');
+  const after = copyApp('after');
+  removeNexus(before);
+  console.log('building the app without Nexus…');
+  build(before);
+  // A Vite app injects the first-paint script at build time, marked data-nexus-appearance.
+  if (!isNext) {
+    const html = path.join(before, 'dist/index.html');
+    writeFileSync(html, readFileSync(html, 'utf8').replace(/<script data-nexus-appearance>.*?<\/script>/s, ''));
   }
+  console.log('building the app with Nexus…');
+  build(after);
+
+  const servers = [await serve(before, 4174), await serve(after, 4173)];
+  const browser = await chromium.launch();
+  let total = 0;
+  try {
+    const page = await browser.newPage({ colorScheme: 'light', viewport: { width: 1440, height: 1000 } });
+    for (const route of config.pages) {
+      const a = await snapshot(page, `http://localhost:4174${route}`);
+      const b = await snapshot(page, `http://localhost:4173${route}`);
+
+      // Group identical changes so one leak shows as one line, not one per element.
+      const groups = new Map();
+      for (const key of Object.keys(a).filter((key) => key in b)) {
+        for (const name of PROPERTIES) {
+          if (a[key][name] === b[key][name]) continue;
+          const change = `${name}: ${a[key][name]} → ${b[key][name]}`;
+          groups.set(change, (groups.get(change) ?? 0) + 1);
+          total += 1;
+        }
+      }
+      const count = [...groups.values()].reduce((sum, n) => sum + n, 0);
+      console.log(`\n${route}  ${count} host properties changed`);
+      for (const [change, n] of [...groups].sort((x, y) => y[1] - x[1])) console.log(`  ${String(n).padStart(4)} × ${change}`);
+    }
+  } finally {
+    await browser.close();
+    for (const server of servers) server.kill();
+  }
+  console.log(`\n${total} host properties changed in total`);
 } finally {
-  await browser.close();
-  for (const server of servers) server.kill();
+  for (const dir of tempDirs) rmSync(dir, { recursive: true, force: true });
 }
-console.log(`\n${total} host properties changed in total`);

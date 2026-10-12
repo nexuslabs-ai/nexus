@@ -1,7 +1,8 @@
 // Copies Nexus into an example app the way the Install docs page tells a
 // consumer to: component files from packages/react/src (each component's
 // dependency closure), the appearance provider, and the token CSS from
-// packages/tailwind — byte for byte.
+// packages/tailwind — byte for byte. Then rebuilds packages/core and
+// reinstalls it, since the app depends on it by file: path.
 //
 // Reads nexus.json from the current directory:
 //   components  slugs from apps/docs/generated/dependencies
@@ -9,7 +10,7 @@
 //   cssDir      where packages/tailwind/*.css lands, relative to the app
 // usage: node ../scripts/sync-nexus.mjs   (npm run nexus:add)
 import { execFileSync } from 'node:child_process';
-import { cpSync, mkdirSync, readFileSync, readdirSync, rmSync } from 'node:fs';
+import { cpSync, existsSync, mkdirSync, readFileSync, readdirSync, rmSync } from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 
@@ -52,6 +53,16 @@ for (const file of sourceFiles) {
 }
 mkdirSync(cssDest, { recursive: true });
 for (const file of cssFiles) cpSync(path.join(tailwindDir, file), path.join(cssDest, file));
+
+// The app installs @nexus_ds/core from packages/core, so the engine and the
+// copied components come from the same revision. npm keeps an installed file:
+// dependency whose version has not changed, so remove it before reinstalling.
+execFileSync('pnpm', ['--filter', '@nexus_ds/core', 'build'], { cwd: repoRoot, stdio: 'ignore' });
+const installedCore = path.join(appDir, 'node_modules/@nexus_ds/core');
+if (existsSync(installedCore)) {
+  rmSync(installedCore, { recursive: true });
+  execFileSync('npm', ['install', '--no-audit', '--no-fund'], { cwd: appDir, stdio: 'ignore' });
+}
 
 const install = new Map(closures.flatMap((closure) => closure.install.map(({ name, range }) => [name, range])));
 console.log(`${sourceFiles.size} source files → ${config.sourceDir}`);

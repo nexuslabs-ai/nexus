@@ -157,19 +157,6 @@ function writeStateCookie(
   }
 }
 
-function syncColorSchemeMeta(content: 'light' | 'dark' | 'light dark'): void {
-  const meta =
-    document.querySelector<HTMLMetaElement>('meta[name="color-scheme"]') ??
-    document.createElement('meta');
-
-  meta.setAttribute('name', 'color-scheme');
-  meta.setAttribute('content', content);
-
-  if (!meta.parentNode) {
-    document.head.appendChild(meta);
-  }
-}
-
 function upsertStyle(selector: string, attribute: string): HTMLStyleElement {
   const styles = Array.from(
     document.querySelectorAll<HTMLStyleElement>(selector)
@@ -196,7 +183,6 @@ function removeAppearanceArtifacts(): void {
 
   const root = document.documentElement;
   root.classList.remove('dark');
-  root.style.removeProperty('color-scheme');
   for (const attr of NEXUS_APPEARANCE_DATA_ATTRS) {
     root.removeAttribute(attr);
   }
@@ -331,11 +317,10 @@ export function NexusAppearanceProvider({
   useEffect(() => {
     if (!canUseDOM() || !mounted) return;
 
-    const root = document.documentElement;
-
-    root.classList.toggle('dark', firstPaint.className === 'dark');
-    root.style.colorScheme = firstPaint.colorScheme;
-    syncColorSchemeMeta(firstPaint.metaColorScheme);
+    document.documentElement.classList.toggle(
+      'dark',
+      firstPaint.className === 'dark'
+    );
   }, [firstPaint, mounted]);
 
   useEffect(() => {

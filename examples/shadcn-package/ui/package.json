@@ -25,11 +25,13 @@
     "typecheck": "tsc -p tsconfig.build.json --noEmit"
   },
   "peerDependencies": {
+    "@nexus_ds/core": "*",
     "react": "^19",
     "react-dom": "^19",
     "tailwindcss": "^4"
   },
   "devDependencies": {
+    "@nexus_ds/core": "file:../../../packages/core",
     "@types/react": "^19.2.18",
     "@types/react-dom": "^19.2.7",
     "react": "^19.2.8",
@@ -37,7 +39,6 @@
     "typescript": "~6.0.2"
   },
   "dependencies": {
-    "@nexus_ds/core": "^0.5.0",
     "@radix-ui/react-avatar": "^1.3.0",
     "@radix-ui/react-checkbox": "^1.4.0",
     "@radix-ui/react-dialog": "^1.3.0",

@@ -9,39 +9,48 @@ the ways a frontend team meets Nexus.
 
 | Example | The team | Where Nexus lives |
 | ------- | -------- | ----------------- |
-| [`nexus-app`](nexus-app) | Starts a new app on Nexus. Next.js, no other component library | The app |
+| [`nexus-app`](nexus-app) | Starts a new Next.js app on Nexus | The app |
 | [`shadcn-app`](shadcn-app) | Has a Next.js app built with shadcn/ui | The app, beside `components/ui` |
 | [`shadcn-package`](shadcn-package) | Has its own shadcn-based design-system package | The package (`app-via-package`), or the app beside the package (`app-direct`) |
 | [`mui-app`](mui-app) | Has a Vite app built with Material UI and no Tailwind | The app |
 
-Each coexistence example shows the same three pages: every component from both
-systems side by side, a settings page that mixes them, and each system's dialog
-holding the other's overlays.
+Each app installs `@nexus_ds/core` from `packages/core` (`file:` with
+`install-links`), so the examples always run this repository's engine.
 
 ## Shared scripts
 
 | Script | What it does |
 | ------ | ------------ |
-| `scripts/sync-nexus.mjs` | Copies Nexus into an app, as the Install page describes. Each app runs it as `npm run nexus:add`, driven by its `nexus.json` |
+| `scripts/sync-nexus.mjs` | Copies Nexus into an app as the Install page describes, then rebuilds and reinstalls `packages/core`. Each app runs it as `npm run nexus:add`, driven by its `nexus.json` |
 | `scripts/check.mjs` | Builds an app with and without Nexus and lists every host style that adding Nexus changed |
 
-After changing Nexus components or tokens, run `npm run nexus:add` in each app.
-`git diff` then shows exactly what changes for a consumer.
+After changing Nexus components, tokens or the engine, run `npm run nexus:add`
+in each app. `git diff` then shows exactly what changes for a consumer.
 
 ```bash
 node examples/scripts/check.mjs examples/shadcn-app
 ```
 
-## What the coexistence examples find
+## What they show
 
-| Finding | Seen in |
-| ------- | ------- |
-| `NexusAppearanceProvider` sets `:root { font-size: 14px }`, so every host `rem` shrinks by an eighth | All three |
-| Nexus's global `border-color`, `body { color }` and Preflight restyle host elements; Preflight replaces the host font unless a class on `<html>` sets it | All three |
-| Nexus controls overflow a shadcn dialog, whose `rem` width shrank with the 14px root | `shadcn-app`, `shadcn-package` |
-| Unprefixed classes on a Nexus component lose to its own `nx:` classes | `shadcn-app`, `shadcn-package` |
-| Nexus's Tooltip needs Nexus's `TooltipProvider`; both Toasters render every toast | `shadcn-app`, `shadcn-package` |
-| Nexus popups (z-index 70) open behind an MUI dialog (1300); a Nexus dialog sits under MUI's AppBar; MUI menus inside a Nexus dialog cannot be clicked | `mui-app` |
-| A package must ship its Tailwind entries with `@source`, because Tailwind skips `node_modules` | `shadcn-package` |
+Adding Nexus changes **0** of the host app's own styles in every coexistence
+example. Nexus emits only `nx:` utilities and `--nx-*` variables, and each
+component resets the browser defaults it relies on.
 
-Each example's README has its numbers and where to look.
+| App | Host properties changed |
+| --- | ----------------------- |
+| `shadcn-app` | 0 |
+| `mui-app` | 0 |
+| `shadcn-package/app-via-package` | 0 |
+| `shadcn-package/app-direct` | 0 |
+
+The apps also show the integration points a team has to wire:
+
+| Point | Where |
+| ----- | ----- |
+| One theme switch sets both systems, since they share the `.dark` class | Every coexistence app's header |
+| Each Toaster shows only its own system's toasts | `/overlays` |
+| Nexus overlay layers raised above MUI's | `mui-app/src/nexus.css` |
+| MUI popups inside a Nexus dialog render in place (`disablePortal`) | `mui-app` `/overlays` |
+| A package ships its Tailwind entries with `@source './'` | `shadcn-package/ui` |
+| `nx:` classes on Nexus components | Every page |

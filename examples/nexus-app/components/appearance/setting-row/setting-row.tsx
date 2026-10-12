@@ -21,7 +21,7 @@ export function NexusAppearanceSettingRow({
           {label}
         </span>
         {description ? (
-          <p className="nx:typography-body-small nx:text-muted-foreground">
+          <p className="nx:m-0 nx:typography-body-small nx:text-muted-foreground">
             {description}
           </p>
         ) : null}
