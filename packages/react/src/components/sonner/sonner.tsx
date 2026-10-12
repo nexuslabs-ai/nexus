@@ -1,3 +1,5 @@
+'use client';
+
 import * as React from 'react';
 
 import { toast, Toaster as Sonner, type ToasterProps, useSonner } from 'sonner';

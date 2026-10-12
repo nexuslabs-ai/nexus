@@ -1,3 +1,5 @@
+'use client';
+
 import { type KeyboardEvent, useState } from 'react';
 
 import {
