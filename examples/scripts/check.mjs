@@ -51,6 +51,9 @@ export function useNexusAppearance(): { state: State; setState: React.Dispatch<R
 export function NexusAppearanceScript(_props: Record<string, unknown>) {
   return null;
 }
+export function createNexusAppearance(_options: Record<string, unknown>) {
+  return { NexusAppearanceProvider };
+}
 `;
 const SCRIPT_STUB = `export function NexusAppearanceScript(_props: Record<string, unknown>) {
   return null;
@@ -135,13 +138,16 @@ async function snapshot(page, url) {
   const elements = await page.evaluate(readHostElements, PROPERTIES);
 
   const triggers = page.locator('[data-check-open]');
+  // Radix and MUI mark open overlays differently, so wait for the open and
+  // close transitions to finish rather than for a library-specific attribute.
   for (let index = 0; index < (await triggers.count()); index += 1) {
     await triggers.nth(index).click();
-    await page.waitForSelector('[data-state="open"][role="dialog"], [data-state="open"][role="menu"]');
+    await page.waitForTimeout(50);
     await page.evaluate(settle);
     Object.assign(elements, await page.evaluate(readHostElements, PROPERTIES));
     await page.keyboard.press('Escape');
-    await page.waitForSelector('[data-state="open"][role="dialog"], [data-state="open"][role="menu"]', { state: 'detached' });
+    await page.waitForTimeout(50);
+    await page.evaluate(settle);
   }
   return elements;
 }
@@ -151,6 +157,11 @@ const after = copyApp('after');
 removeNexus(before);
 console.log('building the app without Nexus…');
 build(before);
+// A Vite app injects the first-paint script at build time, marked data-nexus-appearance.
+if (!isNext) {
+  const html = path.join(before, 'dist/index.html');
+  writeFileSync(html, readFileSync(html, 'utf8').replace(/<script data-nexus-appearance>.*?<\/script>/s, ''));
+}
 console.log('building the app with Nexus…');
 build(after);
 
