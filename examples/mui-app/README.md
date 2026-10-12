@@ -56,12 +56,12 @@ From the repository root:
 node examples/scripts/check.mjs examples/mui-app
 ```
 
-Today: **1,752 host properties** change across the three pages.
+Today: **1,725 host properties** change across the three pages.
 
 | Host change | Cause |
 | ----------- | ----- |
 | MUI text, spacing and radii shrink (16 → 14px root) | `NexusAppearanceProvider` sets `:root { font-size: 14px }`. MUI sizes in `rem` |
-| 237 elements go from `border-style: none` to `solid` | Tailwind Preflight arrives with Nexus. MUI's `CssBaseline` never reset borders |
+| 378 elements go from `border-style: none` to `solid` | Tailwind Preflight arrives with Nexus. MUI's `CssBaseline` never reset borders |
 | Native buttons and inputs switch font | Preflight sets `font: inherit` on form controls |
 | Border colours change | Nexus's global `*, ::before, ::after { border-color }` |
 

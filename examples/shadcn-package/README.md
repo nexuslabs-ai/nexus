@@ -70,13 +70,13 @@ node examples/scripts/check.mjs examples/shadcn-package/app-via-package
 node examples/scripts/check.mjs examples/shadcn-package/app-direct
 ```
 
-Both report **2,082 host properties** across the three pages, and both build
+Both report **2,058 host properties** across the three pages, and both build
 byte-identical CSS. Delivering Nexus through the package or copying it into the
 app makes no difference to what leaks.
 
 | Host change | Cause |
 | ----------- | ----- |
-| The host font switches to Nexus's system stack on 235 elements | Nexus's Tailwind brings its own Preflight, and its `html { font-family }` loads after the host's. `shadcn-app` escapes this only because `next/font` sets the font with a class on `<html>` |
+| The host font switches to Nexus's system stack on 402 elements | Nexus's Tailwind brings its own Preflight, and its `html { font-family }` loads after the host's. `shadcn-app` escapes this only because `next/font` sets the font with a class on `<html>` |
 | Text, padding and radii shrink (16 → 14px root) | `NexusAppearanceProvider` sets `:root { font-size: 14px }` |
 | Border colours change | Nexus's global `*, ::before, ::after { border-color }` |
 | Body text colour changes | Nexus's `body { color }` base rule |

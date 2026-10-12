@@ -55,7 +55,7 @@ node examples/scripts/check.mjs examples/shadcn-app
 ```
 
 It builds the app with and without Nexus and lists every host style that
-changed. Today: **1,646 host properties** across the three pages.
+changed. Today: **1,623 host properties** across the three pages.
 
 | Host change | Cause |
 | ----------- | ----- |

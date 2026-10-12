@@ -3,8 +3,8 @@
 // Copies the app out of the repository twice: as it is, and as it was before
 // Nexus — its Nexus CSS entry emptied and the appearance provider reduced to a
 // pass-through. Builds and serves both, then compares 17 computed styles on
-// <html>, <body> and every element whose nearest [data-check] is "host",
-// page by page. Each [data-check-open] trigger is opened so portalled content
+// <html>, <body> and every element whose nearest [data-check] is "host" and
+// that no Nexus component rendered, page by page. Each [data-check-open] trigger is opened so portalled content
 // is read too.
 //
 // Reads `check` from the app's nexus.json, paths relative to the app:
@@ -88,7 +88,7 @@ function run(dir, args) {
 
 function build(dir) {
   for (const prepare of [...(config.prepare ?? []), '.']) {
-    run(path.join(dir, prepare), ['ci', '--no-audit', '--no-fund']);
+    run(path.join(dir, prepare), ['ci', '--prefer-offline', '--no-audit', '--no-fund']);
     run(path.join(dir, prepare), ['run', 'build']);
   }
 }
@@ -119,7 +119,19 @@ function readHostElements(properties) {
     }
     return parts.join('>') || 'html';
   };
-  const isHost = (element) => element.closest('[data-check]')?.dataset.check === 'host';
+  // A Nexus component renders nx: classes; anything it renders is not host UI,
+  // even inside a host section. A host-marked Nexus element still lets its
+  // children count, so a host input inside a Nexus dialog body is measured.
+  const isNexus = (node) => [...node.classList].some((name) => name.startsWith('nx:'));
+  const isHost = (element) => {
+    const scope = element.closest('[data-check]');
+    if (scope?.dataset.check !== 'host') return false;
+    if (element === scope) return !isNexus(element);
+    for (let node = element; node !== scope; node = node.parentElement) {
+      if (isNexus(node)) return false;
+    }
+    return true;
+  };
   const elements = [document.documentElement, document.body, ...[...document.body.querySelectorAll('*')].filter(isHost)];
   return Object.fromEntries(
     elements.map((element) => {
