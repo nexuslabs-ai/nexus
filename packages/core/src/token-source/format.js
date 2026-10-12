@@ -225,5 +225,17 @@ export function formatTypographyDeclarations(tokenPath, value, primitiveMap) {
     declarations.push({ property: 'text-wrap', value: 'pretty' });
   }
 
+  // The provider's fontSmoothing preference reaches Nexus text through these.
+  declarations.push(
+    {
+      property: '-webkit-font-smoothing',
+      value: 'var(--nx-font-smoothing-webkit, auto)',
+    },
+    {
+      property: '-moz-osx-font-smoothing',
+      value: 'var(--nx-font-smoothing-moz, auto)',
+    }
+  );
+
   return declarations;
 }

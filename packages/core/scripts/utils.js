@@ -1221,10 +1221,13 @@ export function generateThemeCSS(config) {
     css += `${googleFontsImport}\n\n`;
   }
 
-  // Imports
+  // Imports. Tailwind comes in without Preflight: Nexus emits only prefixed
+  // utilities and --nx-* variables, so it never restyles the host's elements.
   for (const imp of imports) {
     if (imp === 'tailwindcss') {
-      css += `@import 'tailwindcss' prefix(${tailwindPrefix});\n`;
+      css += `@layer theme, base, components, utilities;\n`;
+      css += `@import 'tailwindcss/theme.css' layer(theme) prefix(${tailwindPrefix});\n`;
+      css += `@import 'tailwindcss/utilities.css' layer(utilities) prefix(${tailwindPrefix});\n`;
     } else {
       css += `@import '${imp}';\n`;
     }
@@ -1342,15 +1345,6 @@ export function generateThemeCSS(config) {
       css += `  --${token.cssName}: ${value};\n`;
     }
     css += `}\n`;
-
-    css += `\n/* ===== RUNTIME COLOR ALIASES ===== */\n`;
-    css += `:root {\n`;
-    for (const token of semanticTokens.filter((token) =>
-      token.cssName.startsWith('color-')
-    )) {
-      css += `  --${token.cssName}: var(--nx-${token.cssName}, ${token.value});\n`;
-    }
-    css += `}\n`;
   }
 
   // Dark mode block (if provided)
@@ -1368,8 +1362,9 @@ export function generateThemeCSS(config) {
 }
 
 /**
- * Theme the browser-painted UI Nexus cannot style through utilities: the
- * color-scheme declaration.
+ * Theme the browser-painted UI Nexus cannot style through utilities: dark
+ * scrollbars and form controls under the shared `.dark` switch. Light is the
+ * browser default, so nothing is declared outside `.dark`.
  *
  * @returns {string} CSS native browser UI rules
  */
@@ -1377,14 +1372,6 @@ export function generateNativeBrowserUIThemeCSS() {
   return `
 /* ===== NATIVE BROWSER UI THEME ===== */
 @layer base {
-  :root {
-    color-scheme: light dark;
-  }
-
-  :root:not(.dark) {
-    color-scheme: light;
-  }
-
   .dark {
     color-scheme: dark;
   }
@@ -1441,6 +1428,22 @@ export function generateAutofillUtilitiesCSS() {
 }
 
 /**
+ * The interactive cursor. Interactive components carry `cursor-interactive`;
+ * the provider's pointerCursors preference sets --nx-cursor-interactive, so
+ * the host's own buttons and links keep their cursor.
+ *
+ * @returns {string} CSS @utility declaration
+ */
+export function generateCursorUtilitiesCSS() {
+  return `
+/* ===== CURSOR UTILITIES ===== */
+@utility cursor-interactive {
+  cursor: var(--nx-cursor-interactive, default);
+}
+`;
+}
+
+/**
  * Surface utilities: a wrapper declares the surface it paints with
  * `surface-*` beside its `bg-*` class (`nx:bg-container nx:surface-container`),
  * and descendants cut themselves out of it with `ring-surface` /
@@ -1462,29 +1465,6 @@ export function generateSurfaceUtilitiesCSS() {
 
 @utility ring-offset-surface {
   --tw-ring-offset-color: var(--nx-surface, --theme(--color-background));
-}
-`;
-}
-
-/**
- * Generate base layer CSS for body defaults
- *
- * @returns {string} CSS @layer base block
- */
-export function generateBaseLayerCSS() {
-  return `
-/* ===== BASE LAYER ===== */
-@layer base {
-  *,
-  ::before,
-  ::after {
-    border-color: var(--color-border-default);
-  }
-
-  body {
-    background-color: var(--color-background);
-    color: var(--color-foreground);
-  }
 }
 `;
 }

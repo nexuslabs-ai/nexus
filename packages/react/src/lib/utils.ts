@@ -43,6 +43,7 @@ export const NEXUS_CLASS_GROUPS = {
   surface: [{ surface: [validators.isAny] }],
   'ring-color': ['ring-surface'],
   'ring-offset-color': ['ring-offset-surface'],
+  cursor: ['cursor-interactive'],
   z: ['z-overlay', 'z-sticky', 'z-modal', 'z-popover', 'z-toast', 'z-max'],
   gap: ['gap-container', 'gap-layout-section', 'gap-layout-stack'],
   p: ['p-container'],
@@ -199,6 +200,7 @@ export const TYPOGRAPHY_CONFLICTS = [
   'leading',
   'tracking',
   'text-wrap',
+  'font-smoothing',
 ] satisfies DefaultClassGroupIds[];
 
 /** Tailwind-merge configured with `nx:` prefix and Nexus custom utility groups. */

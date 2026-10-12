@@ -2,6 +2,7 @@ import { readFileSync } from 'node:fs';
 import { resolve } from 'node:path';
 import { describe, expect, it } from 'vitest';
 
+import motionTokens from '../../tokens/primitives/motion/motion-snappy.json';
 import typographyTokens from '../../tokens/primitives/typography/typography-default.json';
 
 import {
@@ -404,7 +405,7 @@ describe('appearancePrefsToCss', () => {
     expect(nonPx).toEqual([]);
   });
 
-  it('emits font variables, clamped root size, code size, and smoothing', () => {
+  it('emits font variables, a clamped type scale, code size, and smoothing', () => {
     const css = appearancePrefsToCss({
       ...prefs,
       uiFont: 'Inter',
@@ -415,14 +416,36 @@ describe('appearancePrefsToCss', () => {
 
     expect(css).toContain('--nx-typography-family-font-sans: Inter;');
     expect(css).toContain('--nx-typography-family-font-mono: JetBrains Mono;');
-    expect(css).toContain('font-size: 32px;');
     expect(css).toContain('--nx-typography-size-sm: 32px;');
     expect(css).toContain('--nx-typography-line-height-xxs: 27.4286px;');
     expect(css).toContain('--nx-typography-line-height-sm: 45.7143px;');
     expect(css).toContain(
-      'code, pre, .nx\\:font-mono, .nx\\:typography-code-block, .nx\\:typography-code-inline { font-size: 12px; }'
+      '.nx\\:font-mono, .nx\\:typography-code-block, .nx\\:typography-code-inline { font-size: 12px; }'
     );
-    expect(css).toContain('-webkit-font-smoothing: antialiased');
+    expect(css).toContain('--nx-font-smoothing-webkit: antialiased;');
+  });
+
+  it('leaves the page font size alone', () => {
+    const rootBlock = appearancePrefsToCss(prefs).match(/:root \{[^}]*\}/)?.[0];
+    expect(rootBlock).toBeDefined();
+    expect(rootBlock).not.toMatch(/^\s*font-size:/m);
+  });
+
+  it('selects only :root and Nexus classes, never the host page', () => {
+    for (const enabled of [false, true]) {
+      const css = appearancePrefsToCss({
+        ...prefs,
+        pointerCursors: enabled,
+        reduceMotion: enabled,
+        fontSmoothing: enabled,
+      });
+      const selectors = [...css.matchAll(/([^{}]+)\{/g)].flatMap(
+        ([, list = '']) => list.split(',').map((selector) => selector.trim())
+      );
+      for (const selector of selectors) {
+        expect(selector, selector).toMatch(/^(:root|\.nx\\:)/);
+      }
+    }
   });
 
   it('pairs -moz-osx-font-smoothing with the -webkit property', () => {
@@ -430,15 +453,15 @@ describe('appearancePrefsToCss', () => {
       ...prefs,
       fontSmoothing: true,
     });
-    expect(on).toContain('-webkit-font-smoothing: antialiased');
-    expect(on).toContain('-moz-osx-font-smoothing: grayscale');
+    expect(on).toContain('--nx-font-smoothing-webkit: antialiased;');
+    expect(on).toContain('--nx-font-smoothing-moz: grayscale;');
 
     const off = appearancePrefsToCss({
       ...prefs,
       fontSmoothing: false,
     });
-    expect(off).toContain('-webkit-font-smoothing: auto');
-    expect(off).toContain('-moz-osx-font-smoothing: auto');
+    expect(off).toContain('--nx-font-smoothing-webkit: auto;');
+    expect(off).toContain('--nx-font-smoothing-moz: auto;');
   });
 
   it('keeps default runtime typography variables in parity with generated tokens', () => {
@@ -452,21 +475,22 @@ describe('appearancePrefsToCss', () => {
     );
   });
 
-  it('emits the reduced-motion block only when reduceMotion is on', () => {
-    expect(appearancePrefsToCss({ ...prefs, reduceMotion: true })).toContain(
-      'transition-duration: 0.01ms'
-    );
+  it('zeroes every motion duration only when reduceMotion is on', () => {
+    const on = appearancePrefsToCss({ ...prefs, reduceMotion: true });
+    for (const step of Object.keys(motionTokens.duration)) {
+      expect(on).toContain(`--nx-motion-duration-${step}: 0ms;`);
+    }
     expect(
       appearancePrefsToCss({ ...prefs, reduceMotion: false })
-    ).not.toContain('0.01ms');
+    ).not.toContain('--nx-motion-duration');
   });
 
-  it('emits the pointer cursor rule only when pointer cursors are enabled', () => {
+  it('sets the interactive cursor only when pointer cursors are enabled', () => {
     expect(appearancePrefsToCss({ ...prefs, pointerCursors: true })).toContain(
-      'cursor: pointer'
+      '--nx-cursor-interactive: pointer;'
     );
     expect(
       appearancePrefsToCss({ ...prefs, pointerCursors: false })
-    ).not.toContain('cursor: pointer');
+    ).not.toContain('--nx-cursor-interactive');
   });
 });
