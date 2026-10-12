@@ -1,0 +1,54 @@
+/**
+ * Internal Icons
+ *
+ * This barrel file re-exports icons used internally by the design system.
+ * These are hardcoded icons for component states (loading, validation, navigation).
+ *
+ * User-facing icons should be passed via props by consumers.
+ *
+ * @example
+ * ```tsx
+ * import { IconLoader2 } from './icons';
+ * ```
+ */
+
+// Loading states
+export { IconLoader2 } from '@tabler/icons-react';
+
+// Navigation
+export {
+  IconArrowDown,
+  IconArrowLeft,
+  IconArrowRight,
+  IconArrowUp,
+  IconChevronDown,
+  IconChevronLeft,
+  IconChevronRight,
+  IconChevronUp,
+  IconDots,
+  IconLayoutSidebar,
+  IconSelector,
+} from '@tabler/icons-react';
+
+// Actions
+export {
+  IconCheck,
+  IconCircleFilled,
+  IconMinus,
+  IconPointFilled,
+  IconX,
+} from '@tabler/icons-react';
+
+// Search / input
+export { IconSearch } from '@tabler/icons-react';
+
+// Alerts/Status
+export {
+  IconAlertCircle,
+  IconAlertTriangle,
+  IconCircleCheck,
+  IconInfoCircle,
+} from '@tabler/icons-react';
+
+// Layout
+export { IconGripVertical } from '@tabler/icons-react';

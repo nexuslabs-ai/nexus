@@ -26,6 +26,9 @@
   "cssDir": "src/components/nexus/tailwind",
   "check": {
     "cssEntry": "src/nexus.css",
+    "providerModules": [
+      "src/components/nexus/components/appearance/provider/index.ts"
+    ],
     "pages": [
       "/",
       "/settings",

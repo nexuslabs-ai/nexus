@@ -1,0 +1,6 @@
+@import './nexus/tailwind/nexus.css';
+@import 'tw-animate-css';
+@import './nexus/components/progress/progress.css';
+
+/* Tailwind skips node_modules, so point it at this package's own files. */
+@source './';

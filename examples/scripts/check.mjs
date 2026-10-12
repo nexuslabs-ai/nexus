@@ -7,7 +7,12 @@
 // page by page. Each [data-check-open] trigger is opened so portalled content
 // is read too.
 //
-// Reads `check` from the app's nexus.json: { "cssEntry": "app/nexus.css", "pages": ["/"] }
+// Reads `check` from the app's nexus.json, paths relative to the app:
+//   cssEntry         the CSS file that brings Nexus in; emptied for the baseline
+//   providerModules  modules that export the appearance provider; stubbed for the baseline
+//   pages            routes to compare
+//   root, prepare    optional: copy this ancestor folder instead of the app alone,
+//                    and `npm ci && npm run build` these folders first (a local package)
 // usage: node examples/scripts/check.mjs examples/shadcn-app
 import { spawn, execFileSync } from 'node:child_process';
 import { cpSync, mkdtempSync, readFileSync, writeFileSync } from 'node:fs';
@@ -55,26 +60,22 @@ export function createNexusAppearance(_options: Record<string, unknown>) {
   return { NexusAppearanceProvider };
 }
 `;
-const SCRIPT_STUB = `export function NexusAppearanceScript(_props: Record<string, unknown>) {
-  return null;
-}
-`;
 
 const appDir = path.resolve(process.argv[2] ?? '');
-const config = JSON.parse(readFileSync(path.join(appDir, 'nexus.json'), 'utf8'));
+const config = JSON.parse(readFileSync(path.join(appDir, 'nexus.json'), 'utf8')).check;
 const isNext = 'next' in JSON.parse(readFileSync(path.join(appDir, 'package.json'), 'utf8')).dependencies;
+const rootDir = path.resolve(appDir, config.root ?? '.');
 
+// Copies the root folder and returns the app's path inside the copy.
 function copyApp(label) {
-  const dir = path.join(mkdtempSync(path.join(tmpdir(), `nexus-check-${label}-`)), 'app');
-  cpSync(appDir, dir, { recursive: true, filter: (src) => !SKIP.has(path.basename(src)) });
-  return dir;
+  const root = path.join(mkdtempSync(path.join(tmpdir(), `nexus-check-${label}-`)), path.basename(rootDir));
+  cpSync(rootDir, root, { recursive: true, filter: (src) => !SKIP.has(path.basename(src)) });
+  return path.join(root, path.relative(rootDir, appDir));
 }
 
 function removeNexus(dir) {
-  const providerDir = path.join(dir, config.sourceDir, 'components/appearance/provider');
-  writeFileSync(path.join(dir, config.check.cssEntry), '');
-  writeFileSync(path.join(providerDir, 'index.ts'), PROVIDER_STUB);
-  writeFileSync(path.join(providerDir, 'server.ts'), SCRIPT_STUB);
+  writeFileSync(path.join(dir, config.cssEntry), '');
+  for (const module of config.providerModules) writeFileSync(path.join(dir, module), PROVIDER_STUB);
 }
 
 function run(dir, args) {
@@ -86,8 +87,10 @@ function run(dir, args) {
 }
 
 function build(dir) {
-  run(dir, ['ci', '--no-audit', '--no-fund']);
-  run(dir, ['run', 'build']);
+  for (const prepare of [...(config.prepare ?? []), '.']) {
+    run(path.join(dir, prepare), ['ci', '--no-audit', '--no-fund']);
+    run(path.join(dir, prepare), ['run', 'build']);
+  }
 }
 
 // Starts the production server and resolves once it prints its local URL.
@@ -170,7 +173,7 @@ const browser = await chromium.launch();
 let total = 0;
 try {
   const page = await browser.newPage({ colorScheme: 'light', viewport: { width: 1440, height: 1000 } });
-  for (const route of config.check.pages) {
+  for (const route of config.pages) {
     const a = await snapshot(page, `http://localhost:4174${route}`);
     const b = await snapshot(page, `http://localhost:4173${route}`);
 
