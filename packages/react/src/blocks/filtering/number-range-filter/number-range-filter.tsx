@@ -148,7 +148,7 @@ export function NumberRangeFilter({
       >
         <form onSubmit={apply}>
           <div className="nx:grid nx:grid-cols-2 nx:gap-3 nx:p-3">
-            <p className="nx:col-span-2 nx:typography-label-small">
+            <p className="nx:m-0 nx:col-span-2 nx:typography-label-small">
               {label}{' '}
               {unit && (
                 <span className="nx:text-muted-foreground">({unit})</span>
@@ -187,7 +187,7 @@ export function NumberRangeFilter({
             <p
               id={`${id}-error`}
               role="status"
-              className="nx:col-span-2 nx:typography-body-small nx:text-error-subtle-foreground nx:empty:hidden"
+              className="nx:m-0 nx:col-span-2 nx:typography-body-small nx:text-error-subtle-foreground nx:empty:hidden"
             >
               {error}
             </p>

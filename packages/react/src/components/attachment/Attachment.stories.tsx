@@ -17,12 +17,7 @@ import { expect, fn, userEvent, within } from 'storybook/test';
 
 import { Button } from '../button';
 import { Spinner } from '../spinner';
-import {
-  Tooltip,
-  TooltipContent,
-  TooltipProvider,
-  TooltipTrigger,
-} from '../tooltip';
+import { Tooltip, TooltipContent, TooltipTrigger } from '../tooltip';
 
 import {
   Attachment,
@@ -339,34 +334,32 @@ const LONG_NAME = 'quarterly-financial-report-with-appendices-final-v12.pdf';
 // card trigger revealing the full name.
 export const LongFileName: Story = {
   render: () => (
-    <TooltipProvider>
-      <Attachment className="nx:w-80">
-        <Tooltip>
-          <TooltipTrigger asChild>
-            <AttachmentTrigger>
-              <span className="nx:sr-only">Open {LONG_NAME}</span>
-            </AttachmentTrigger>
-          </TooltipTrigger>
-          <TooltipContent>{LONG_NAME}</TooltipContent>
-        </Tooltip>
-        <AttachmentMedia variant="icon">
-          <IconFileTypePdf />
-        </AttachmentMedia>
-        <AttachmentContent>
-          <AttachmentTitle>{LONG_NAME}</AttachmentTitle>
-          <AttachmentDescription>2.4 MB</AttachmentDescription>
-        </AttachmentContent>
-        <AttachmentActions>
-          <Button
-            variant="ghost"
-            size="icon-sm"
-            aria-label={`Remove ${LONG_NAME}`}
-          >
-            <IconX />
-          </Button>
-        </AttachmentActions>
-      </Attachment>
-    </TooltipProvider>
+    <Attachment className="nx:w-80">
+      <Tooltip>
+        <TooltipTrigger asChild>
+          <AttachmentTrigger>
+            <span className="nx:sr-only">Open {LONG_NAME}</span>
+          </AttachmentTrigger>
+        </TooltipTrigger>
+        <TooltipContent>{LONG_NAME}</TooltipContent>
+      </Tooltip>
+      <AttachmentMedia variant="icon">
+        <IconFileTypePdf />
+      </AttachmentMedia>
+      <AttachmentContent>
+        <AttachmentTitle>{LONG_NAME}</AttachmentTitle>
+        <AttachmentDescription>2.4 MB</AttachmentDescription>
+      </AttachmentContent>
+      <AttachmentActions>
+        <Button
+          variant="ghost"
+          size="icon-sm"
+          aria-label={`Remove ${LONG_NAME}`}
+        >
+          <IconX />
+        </Button>
+      </AttachmentActions>
+    </Attachment>
   ),
   play: async ({ canvasElement }) => {
     const canvas = within(canvasElement);

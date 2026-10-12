@@ -89,7 +89,7 @@ function PageHeaderMeta({ className, ...props }: PageHeaderMetaProps) {
     <p
       data-slot="page-header-meta"
       className={cn(
-        'nx:wrap-anywhere nx:typography-label-small nx:text-muted-foreground',
+        'nx:m-0 nx:wrap-anywhere nx:typography-label-small nx:text-muted-foreground',
         className
       )}
       {...props}
@@ -186,7 +186,7 @@ function PageHeaderDescription({
     <p
       data-slot="page-header-description"
       className={cn(
-        'nx:wrap-anywhere nx:typography-body-default nx:text-muted-foreground',
+        'nx:m-0 nx:wrap-anywhere nx:typography-body-default nx:text-muted-foreground',
         className
       )}
       {...props}

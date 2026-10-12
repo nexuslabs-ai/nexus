@@ -81,7 +81,10 @@ function PaginationContent({ className, ...props }: PaginationContentProps) {
   return (
     <ul
       data-slot="pagination-content"
-      className={cn('nx:flex nx:flex-row nx:items-center nx:gap-1', className)}
+      className={cn(
+        'nx:m-0 nx:flex nx:list-none nx:flex-row nx:items-center nx:gap-1 nx:p-0',
+        className
+      )}
       {...props}
     />
   );

@@ -270,7 +270,7 @@ function FieldDescription({ className, ...props }: React.ComponentProps<'p'>) {
     <p
       data-slot="field-description"
       className={cn(
-        'nx:typography-body-default nx:text-muted-foreground nx:group-has-data-[orientation=horizontal]/field:text-balance',
+        'nx:m-0 nx:typography-body-default nx:text-muted-foreground nx:group-has-data-[orientation=horizontal]/field:text-balance',
         'nx:[&>a]:underline nx:[&>a]:underline-offset-4 nx:[&>a:hover]:text-primary-subtle-foreground',
         className
       )}
@@ -375,7 +375,7 @@ function dedupeErrorMessages(errors: FieldErrorProps['errors']): string[] {
 /** Renders multiple validation messages as a bulleted list. */
 function FieldErrorList({ messages }: { messages: string[] }) {
   return (
-    <ul className="nx:ml-4 nx:flex nx:list-disc nx:flex-col nx:gap-1">
+    <ul className="nx:my-0 nx:ml-4 nx:flex nx:list-disc nx:flex-col nx:gap-1 nx:pl-0">
       {messages.map((message) => (
         <li key={message}>{message}</li>
       ))}

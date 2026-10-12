@@ -39,7 +39,7 @@ export function AdvancedFiltering() {
     <div className="nx:grid nx:gap-6">
       <header className="nx:flex nx:flex-wrap nx:items-start nx:justify-between nx:gap-3">
         <div>
-          <h2 className="nx:typography-heading-small">Team members</h2>
+          <h2 className="nx:m-0 nx:typography-heading-small">Team members</h2>
           <p className="nx:mt-1 nx:typography-body-default nx:text-muted-foreground">
             Filter your team by status, team or activity.
           </p>
@@ -68,7 +68,7 @@ export function AdvancedFiltering() {
           <div className="nx:flex nx:flex-wrap nx:items-center nx:gap-2">
             <p
               role="status"
-              className="nx:typography-body-small nx:text-muted-foreground"
+              className="nx:m-0 nx:typography-body-small nx:text-muted-foreground"
             >
               {errors.length
                 ? 'Complete every condition to apply'
@@ -96,7 +96,9 @@ export function AdvancedFiltering() {
       </form>
       <section aria-label="Matching members" className="nx:grid nx:gap-3">
         <div className="nx:flex nx:items-center nx:justify-between nx:gap-2">
-          <h3 className="nx:typography-label-default">Matching members</h3>
+          <h3 className="nx:m-0 nx:typography-label-default">
+            Matching members
+          </h3>
           <span
             className="nx:typography-body-small nx:text-muted-foreground"
             aria-live="polite"
@@ -133,7 +135,9 @@ export function AdvancedFiltering() {
           </Table>
           {!results.length && (
             <div className="nx:p-6 nx:text-center">
-              <p className="nx:typography-label-default">No matching members</p>
+              <p className="nx:m-0 nx:typography-label-default">
+                No matching members
+              </p>
               <p className="nx:mt-1 nx:typography-body-small nx:text-muted-foreground">
                 Change a condition or clear the filters to broaden your results.
               </p>

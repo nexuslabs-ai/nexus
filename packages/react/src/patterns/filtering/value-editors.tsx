@@ -54,7 +54,7 @@ function Example({
       className="nx:grid nx:min-w-0 nx:items-start nx:gap-4 nx:border-b nx:border-border-default nx:py-5 nx:last:border-b-0 nx:@xl/editors:grid-cols-[minmax(0,1fr)_minmax(0,1.25fr)]"
     >
       <div>
-        <h2 className="nx:typography-label-default">{title}</h2>
+        <h2 className="nx:m-0 nx:typography-label-default">{title}</h2>
         <p className="nx:mt-1 nx:typography-body-small nx:text-muted-foreground">
           {description}
         </p>
@@ -69,7 +69,7 @@ function Applied({ children }: { children: React.ReactNode }) {
   return (
     <p
       role="status"
-      className="nx:typography-body-small nx:text-muted-foreground"
+      className="nx:m-0 nx:typography-body-small nx:text-muted-foreground"
     >
       Applied: {children}
     </p>
@@ -240,7 +240,7 @@ export function Showcase({ today }: { today?: Date }) {
   return (
     <div className="nx:@container/editors nx:mx-auto nx:w-full nx:min-w-0 nx:max-w-3xl">
       <header className="nx:mb-3">
-        <h2 className="nx:typography-heading-small">Filter editors</h2>
+        <h2 className="nx:m-0 nx:typography-heading-small">Filter editors</h2>
         <p className="nx:mt-1 nx:typography-body-default nx:text-muted-foreground">
           One condition. An editor that fits the value.
         </p>

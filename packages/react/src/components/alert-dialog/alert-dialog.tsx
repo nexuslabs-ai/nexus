@@ -300,7 +300,7 @@ function AlertDialogTitle({ className, ...props }: AlertDialogTitleProps) {
   return (
     <AlertDialogPrimitive.Title
       data-slot="alert-dialog-title"
-      className={cn('nx:typography-heading-small', className)}
+      className={cn('nx:m-0 nx:typography-heading-small', className)}
       {...props}
     />
   );
@@ -335,7 +335,7 @@ function AlertDialogDescription({
     <AlertDialogPrimitive.Description
       data-slot="alert-dialog-description"
       className={cn(
-        'nx:typography-body-default nx:text-muted-foreground',
+        'nx:m-0 nx:typography-body-default nx:text-muted-foreground',
         className
       )}
       {...props}

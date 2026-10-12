@@ -5,6 +5,9 @@
  * tw-animate-css, and component keyframes from src/index.css. Imported via CSS
  * @import (not a JS import) so the Rollup production build can resolve
  * @nexus_ds/tailwind, whose package entry is a .css. */
+@layer theme, base, components, utilities;
+/* Nexus ships no reset; Storybook is a host and brings its own, like any app. */
+@import 'tailwindcss/preflight.css' layer(base);
 @import '@nexus_ds/tailwind';
 @import '../src/index.css';
 

@@ -311,7 +311,7 @@ function SheetTitle({ className, ...props }: SheetTitleProps) {
   return (
     <DialogPrimitive.Title
       data-slot="sheet-title"
-      className={cn('nx:typography-heading-xsmall', className)}
+      className={cn('nx:m-0 nx:typography-heading-xsmall', className)}
       {...props}
     />
   );
@@ -343,7 +343,7 @@ function SheetDescription({ className, ...props }: SheetDescriptionProps) {
     <DialogPrimitive.Description
       data-slot="sheet-description"
       className={cn(
-        'nx:typography-body-default nx:text-muted-foreground',
+        'nx:m-0 nx:typography-body-default nx:text-muted-foreground',
         className
       )}
       {...props}

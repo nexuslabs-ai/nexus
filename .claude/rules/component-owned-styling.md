@@ -11,8 +11,11 @@ supplies the vocabulary — tokens and utilities — and never targets a compone
 - **Utilities** — `@utility` definitions, named for what they do, not who uses
   them (`autofill-bg-*`, not `input-autofill`). State lives in the component's
   class (`nx:disabled:autofill-bg-disabled`), not inside the utility.
-- **Document-level base styles** — `color-scheme`, `body` defaults, the global
-  default `border-color`.
+- **`.dark { color-scheme: dark }`** — the one real property, under the `.dark`
+  switch Nexus shares with its host.
+
+Everything else the theme emits is an `nx:` utility or an `--nx-*` variable.
+That is what lets Nexus sit inside any app without restyling it.
 
 ## What the Theme Must Not Define
 
@@ -21,17 +24,29 @@ supplies the vocabulary — tokens and utilities — and never targets a compone
 - Selectors that match class names: `[class~='nx:…']`, `[class*=…]`.
 - State or pseudo-class rules for specific elements: `input:autofill`,
   `:has([data-slot=…])`.
-- Element rules for HTML Nexus does not render: `input[type='checkbox']`,
-  `progress`.
+- Element or universal rules: `*`, `html`, `body`, `button`, `code`. They reach
+  the host app's elements too.
+- Tailwind's Preflight. The host brings its own reset; Nexus needs only
+  `box-sizing: border-box` from it.
+- Unprefixed variables: `--color-*`, `--spacing-*`. A host may declare the same
+  names.
 
 Components must not work around this either: no arbitrary-property class that a
 consumer or another file has to set, and no component `.css` file that
 re-introduces slot selectors. A value that has to cross files is a utility.
 
+A component that renders a native element neutralizes that element's browser
+defaults in its own classes, because no reset is guaranteed: `nx:m-0` on
+`<p>` / `<h*>`, `nx:list-none nx:m-0 nx:p-0` on `<ul>` / `<ol>`, and a background,
+border, padding and colour on `<button>` (`nx:text-inherit` where it should
+match its parent).
+
 ## Enforcement
 
-Review only: reject any `data-slot`, `data-variant`, `class~=`, or
-component-element rule added to the `packages/core/scripts/` emitters or
-`packages/tailwind/*.css`. Separately, `registers every emitted custom utility`
+Review: reject any `data-slot`, `data-variant`, `class~=`, element, or
+universal rule added to the `packages/core/scripts/` emitters or
+`packages/tailwind/*.css`. `selects only :root and Nexus classes, never the host
+page` in `packages/core/src/lib/appearance-model.test.ts` guards the appearance
+preference CSS. Separately, `registers every emitted custom utility`
 in `packages/react/src/lib/utils.test.ts` fails when a new `@utility` is not
 registered with `cn()`.

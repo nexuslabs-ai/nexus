@@ -15,12 +15,7 @@ import {
 import { AvatarFallback } from '../avatar';
 import { Bubble, BubbleContent } from '../bubble';
 import { Button } from '../button';
-import {
-  Tooltip,
-  TooltipContent,
-  TooltipProvider,
-  TooltipTrigger,
-} from '../tooltip';
+import { Tooltip, TooltipContent, TooltipTrigger } from '../tooltip';
 
 import {
   Message,
@@ -674,89 +669,83 @@ export const GroupedTurns: Story = {
 export const WithActions: Story = {
   tags: ['docs'],
   render: () => (
-    <TooltipProvider delayDuration={0}>
-      <MessageGroup className={column}>
-        <Message>
-          <MessageAvatar>
-            <AvatarFallback>AI</AvatarFallback>
-          </MessageAvatar>
-          <MessageContent>
-            <Bubble>
-              <BubbleContent>
-                The audit passes once the four renamed tokens are rerouted.
-              </BubbleContent>
-            </Bubble>
-            <MessageFooter>
-              09:18
-              <Tooltip>
-                <TooltipTrigger asChild>
-                  <Button
-                    size="icon-sm"
-                    variant="ghost"
-                    aria-label="Copy reply"
-                  >
-                    <IconCopy />
-                  </Button>
-                </TooltipTrigger>
-                <TooltipContent>Copy</TooltipContent>
-              </Tooltip>
-              <Tooltip>
-                <TooltipTrigger asChild>
-                  <Button
-                    size="icon-sm"
-                    variant="ghost"
-                    aria-label="Regenerate reply"
-                  >
-                    <IconRefresh />
-                  </Button>
-                </TooltipTrigger>
-                <TooltipContent>Regenerate</TooltipContent>
-              </Tooltip>
-            </MessageFooter>
-          </MessageContent>
-        </Message>
-        <Message align="end">
-          <MessageAvatar>
-            <AvatarFallback>YOU</AvatarFallback>
-          </MessageAvatar>
-          <MessageContent>
-            <Bubble variant="destructive">
-              <BubbleContent>Rerun the contrast audit on main.</BubbleContent>
-            </Bubble>
-            <MessageFooter>
-              09:20 &middot;{' '}
-              <span className="nx:text-error-subtle-foreground">
-                Failed to send
-              </span>
-              <Tooltip>
-                <TooltipTrigger asChild>
-                  <Button
-                    size="icon-sm"
-                    variant="ghost"
-                    aria-label="Copy message"
-                  >
-                    <IconCopy />
-                  </Button>
-                </TooltipTrigger>
-                <TooltipContent>Copy</TooltipContent>
-              </Tooltip>
-              <Tooltip>
-                <TooltipTrigger asChild>
-                  <Button
-                    size="icon-sm"
-                    variant="ghost"
-                    aria-label="Retry sending"
-                  >
-                    <IconRefresh />
-                  </Button>
-                </TooltipTrigger>
-                <TooltipContent>Retry</TooltipContent>
-              </Tooltip>
-            </MessageFooter>
-          </MessageContent>
-        </Message>
-      </MessageGroup>
-    </TooltipProvider>
+    <MessageGroup className={column}>
+      <Message>
+        <MessageAvatar>
+          <AvatarFallback>AI</AvatarFallback>
+        </MessageAvatar>
+        <MessageContent>
+          <Bubble>
+            <BubbleContent>
+              The audit passes once the four renamed tokens are rerouted.
+            </BubbleContent>
+          </Bubble>
+          <MessageFooter>
+            09:18
+            <Tooltip delayDuration={0}>
+              <TooltipTrigger asChild>
+                <Button size="icon-sm" variant="ghost" aria-label="Copy reply">
+                  <IconCopy />
+                </Button>
+              </TooltipTrigger>
+              <TooltipContent>Copy</TooltipContent>
+            </Tooltip>
+            <Tooltip delayDuration={0}>
+              <TooltipTrigger asChild>
+                <Button
+                  size="icon-sm"
+                  variant="ghost"
+                  aria-label="Regenerate reply"
+                >
+                  <IconRefresh />
+                </Button>
+              </TooltipTrigger>
+              <TooltipContent>Regenerate</TooltipContent>
+            </Tooltip>
+          </MessageFooter>
+        </MessageContent>
+      </Message>
+      <Message align="end">
+        <MessageAvatar>
+          <AvatarFallback>YOU</AvatarFallback>
+        </MessageAvatar>
+        <MessageContent>
+          <Bubble variant="destructive">
+            <BubbleContent>Rerun the contrast audit on main.</BubbleContent>
+          </Bubble>
+          <MessageFooter>
+            09:20 &middot;{' '}
+            <span className="nx:text-error-subtle-foreground">
+              Failed to send
+            </span>
+            <Tooltip delayDuration={0}>
+              <TooltipTrigger asChild>
+                <Button
+                  size="icon-sm"
+                  variant="ghost"
+                  aria-label="Copy message"
+                >
+                  <IconCopy />
+                </Button>
+              </TooltipTrigger>
+              <TooltipContent>Copy</TooltipContent>
+            </Tooltip>
+            <Tooltip delayDuration={0}>
+              <TooltipTrigger asChild>
+                <Button
+                  size="icon-sm"
+                  variant="ghost"
+                  aria-label="Retry sending"
+                >
+                  <IconRefresh />
+                </Button>
+              </TooltipTrigger>
+              <TooltipContent>Retry</TooltipContent>
+            </Tooltip>
+          </MessageFooter>
+        </MessageContent>
+      </Message>
+    </MessageGroup>
   ),
   play: async ({ canvasElement }) => {
     const canvas = within(canvasElement);

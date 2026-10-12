@@ -240,7 +240,7 @@ function MultipleValues({
             </ChoiceRow>
           ))}
           {!options.length && (
-            <p className="nx:p-2 nx:typography-body-small nx:text-muted-foreground">
+            <p className="nx:m-0 nx:p-2 nx:typography-body-small nx:text-muted-foreground">
               No options found.
             </p>
           )}
@@ -634,7 +634,7 @@ function GroupEditor({
           </div>
         ))}
         {!value.children.length && (
-          <p className="nx:py-2 nx:typography-body-small nx:text-muted-foreground">
+          <p className="nx:m-0 nx:py-2 nx:typography-body-small nx:text-muted-foreground">
             {depth === 0
               ? 'No conditions. All results are included.'
               : 'Add a condition to this group.'}

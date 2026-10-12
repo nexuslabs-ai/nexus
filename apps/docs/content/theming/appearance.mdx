@@ -159,8 +159,12 @@ consuming app, so they can match that product's settings IA.
 ## First paint and persistence
 
 The first-paint script writes the derived theme CSS, preference CSS, `.dark`,
-`data-density`, `data-radius`, `data-shadow`, `data-borderwidth`, and native
-`color-scheme` before the first frame.
+`data-density`, `data-radius`, `data-shadow`, and `data-borderwidth` before the
+first frame.
+
+Preferences apply to Nexus components only. Reduce motion, pointer cursors, font
+smoothing and the font settings reach them through `--nx-*` variables, so the
+rest of the page keeps its own behavior.
 
 In Next, read `DEFAULT_COOKIE_KEY` on the server and pass
 `cookieStore.get(DEFAULT_COOKIE_KEY)?.value` into

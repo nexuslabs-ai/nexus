@@ -132,7 +132,7 @@ function CardTitle({
     <Comp
       data-slot="card-title"
       className={cn(
-        'nx:col-start-1 nx:min-w-0 nx:typography-heading-xsmall',
+        'nx:col-start-1 nx:m-0 nx:min-w-0 nx:typography-heading-xsmall',
         className
       )}
       {...props}
@@ -164,7 +164,7 @@ function CardDescription({ className, ...props }: CardDescriptionProps) {
     <p
       data-slot="card-description"
       className={cn(
-        'nx:col-start-1 nx:min-w-0 nx:typography-body-default nx:text-muted-foreground',
+        'nx:col-start-1 nx:m-0 nx:min-w-0 nx:typography-body-default nx:text-muted-foreground',
         className
       )}
       {...props}

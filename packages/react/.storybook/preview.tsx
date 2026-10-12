@@ -231,7 +231,7 @@ const AppearanceDecorator: Decorator = (Story, context) => {
       onStateChange={handleStateChange}
     >
       <div
-        className={`nx:flex nx:items-center nx:justify-center nx:bg-background nx:text-foreground ${isDocs ? 'nx:py-12' : 'nx:min-h-svh'}`}
+        className={`nx:flex nx:items-center nx:justify-center nx:bg-background nx:text-foreground nx:typography-body-default ${isDocs ? 'nx:py-12' : 'nx:min-h-svh'}`}
       >
         <Story />
       </div>

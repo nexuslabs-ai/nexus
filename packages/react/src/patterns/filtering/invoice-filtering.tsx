@@ -160,7 +160,7 @@ function InvoiceChoiceFilter({
         className="nx:w-64 nx:max-w-(--radix-popover-content-available-width) nx:max-h-(--radix-popover-content-available-height) nx:overflow-y-auto nx:p-0"
       >
         <form onSubmit={apply}>
-          <h3 className="nx:px-3 nx:pt-3 nx:pb-1 nx:typography-label-default">
+          <h3 className="nx:m-0 nx:px-3 nx:pt-3 nx:pb-1 nx:typography-label-default">
             Filter by {label.toLowerCase()}
           </h3>
           <MultiChoiceEditor
@@ -203,8 +203,8 @@ export function InvoiceFilteringExample() {
       className="nx:mx-auto nx:grid nx:w-full nx:min-w-0 nx:max-w-5xl nx:gap-5 nx:typography-body-default"
     >
       <header className="nx:grid nx:gap-1">
-        <h2 className="nx:typography-heading-medium">Invoices</h2>
-        <p className="nx:text-muted-foreground">
+        <h2 className="nx:m-0 nx:typography-heading-medium">Invoices</h2>
+        <p className="nx:m-0 nx:text-muted-foreground">
           Track payments and find invoices that need your attention.
         </p>
       </header>
@@ -256,7 +256,7 @@ export function InvoiceFilteringExample() {
         <p
           role="status"
           aria-label="Invoice count"
-          className="nx:typography-body-small nx:text-muted-foreground"
+          className="nx:m-0 nx:typography-body-small nx:text-muted-foreground"
         >
           {rows.length} of {invoices.length} invoices
         </p>
@@ -310,8 +310,10 @@ export function InvoiceFilteringExample() {
           </Table>
           {!rows.length && (
             <div className="nx:grid nx:justify-items-center nx:gap-2 nx:px-4 nx:py-10">
-              <h3 className="nx:typography-label-default">No invoices found</h3>
-              <p className="nx:text-muted-foreground">
+              <h3 className="nx:m-0 nx:typography-label-default">
+                No invoices found
+              </h3>
+              <p className="nx:m-0 nx:text-muted-foreground">
                 Try another search or remove a filter.
               </p>
               <Button

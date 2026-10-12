@@ -35,7 +35,7 @@ function matchesSize(size: number, condition: NumberRangeCondition | null) {
 
 function NoMatches() {
   return (
-    <p className="nx:typography-body-default nx:text-muted-foreground">
+    <p className="nx:m-0 nx:typography-body-default nx:text-muted-foreground">
       No matches. Remove a condition or clear all to see more results.
     </p>
   );
@@ -63,8 +63,8 @@ export function CardFilters() {
       className="nx:@container/templates nx:grid nx:min-w-0 nx:gap-4"
     >
       <div>
-        <h2 className="nx:typography-heading-small">Templates</h2>
-        <p className="nx:typography-body-default nx:text-muted-foreground">
+        <h2 className="nx:m-0 nx:typography-heading-small">Templates</h2>
+        <p className="nx:m-0 nx:typography-body-default nx:text-muted-foreground">
           Explore categories and formats with immediate feedback.
         </p>
       </div>
@@ -112,7 +112,9 @@ export function CardFilters() {
                 </CardDescription>
               </CardHeader>
               <CardContent>
-                <p className="nx:typography-body-default">{item.description}</p>
+                <p className="nx:m-0 nx:typography-body-default">
+                  {item.description}
+                </p>
               </CardContent>
             </Card>
           </li>
@@ -145,8 +147,8 @@ export function FileFiltersExample() {
       className="nx:grid nx:min-w-0 nx:gap-4"
     >
       <div>
-        <h2 className="nx:typography-heading-small">Shared files</h2>
-        <p className="nx:typography-body-default nx:text-muted-foreground">
+        <h2 className="nx:m-0 nx:typography-heading-small">Shared files</h2>
+        <p className="nx:m-0 nx:typography-body-default nx:text-muted-foreground">
           Type updates immediately. Finish both size limits, then Apply.
         </p>
       </div>

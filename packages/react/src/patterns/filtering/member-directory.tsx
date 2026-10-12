@@ -71,7 +71,7 @@ export function MemberDirectory({
       className="nx:@container/directory nx:grid nx:min-w-0 nx:gap-5"
     >
       <header>
-        <h2 className="nx:typography-heading-small">Team members</h2>
+        <h2 className="nx:m-0 nx:typography-heading-small">Team members</h2>
         <p className="nx:mt-1 nx:typography-body-default nx:text-muted-foreground">
           Find people across your teams.
         </p>
@@ -129,7 +129,7 @@ export function MemberDirectory({
       <div className="nx:flex nx:min-h-8 nx:items-center nx:justify-between nx:gap-3">
         <p
           role="status"
-          className="nx:typography-body-default nx:text-muted-foreground"
+          className="nx:m-0 nx:typography-body-default nx:text-muted-foreground"
         >
           {results.state === 'loading'
             ? 'Loading members…'
@@ -151,7 +151,7 @@ export function MemberDirectory({
           role="alert"
           className="nx:grid nx:justify-items-start nx:gap-3 nx:rounded-lg nx:border nx:border-border-default nx:p-5"
         >
-          <p className="nx:typography-body-default">{results.message}</p>
+          <p className="nx:m-0 nx:typography-body-default">{results.message}</p>
           <Button variant="outline" size="sm" onClick={onRetry}>
             Retry
           </Button>
@@ -159,16 +159,18 @@ export function MemberDirectory({
       )}
       {data && data.total === 0 && !filtered && (
         <div className="nx:grid nx:justify-items-center nx:gap-2 nx:rounded-lg nx:border nx:border-border-default nx:px-4 nx:py-8 nx:text-center">
-          <h3 className="nx:typography-label-default">No members yet</h3>
-          <p className="nx:typography-body-default nx:text-muted-foreground">
+          <h3 className="nx:m-0 nx:typography-label-default">No members yet</h3>
+          <p className="nx:m-0 nx:typography-body-default nx:text-muted-foreground">
             Invite people to your teams to see them here.
           </p>
         </div>
       )}
       {data && data.total === 0 && filtered && (
         <div className="nx:grid nx:justify-items-center nx:gap-2 nx:rounded-lg nx:border nx:border-border-default nx:px-4 nx:py-8 nx:text-center">
-          <h3 className="nx:typography-label-default">No matching members</h3>
-          <p className="nx:typography-body-default nx:text-muted-foreground">
+          <h3 className="nx:m-0 nx:typography-label-default">
+            No matching members
+          </h3>
+          <p className="nx:m-0 nx:typography-body-default nx:text-muted-foreground">
             Try another name or clear the filters.
           </p>
           <Button

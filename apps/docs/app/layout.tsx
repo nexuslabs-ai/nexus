@@ -37,7 +37,7 @@ export default function RootLayout({
           defaultState={DOCS_APPEARANCE_DEFAULT_STATE}
         />
       </head>
-      <body className="nx:bg-background nx:text-foreground nx:min-h-svh">
+      <body className="nx:min-h-svh nx:bg-background nx:text-foreground nx:typography-body-default">
         <NexusAppearanceProvider
           storageKey={DOCS_APPEARANCE_STORAGE_KEY}
           defaultState={DOCS_APPEARANCE_DEFAULT_STATE}

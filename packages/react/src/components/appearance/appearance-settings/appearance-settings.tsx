@@ -230,7 +230,7 @@ export function NexusAppearanceSettings() {
           </NexusAppearanceSettingRow>
 
           <p
-            className="nx:typography-body-small nx:text-muted-foreground"
+            className="nx:m-0 nx:typography-body-small nx:text-muted-foreground"
             role="status"
           >
             Editing {resolvedMode} appearance
