@@ -88,6 +88,17 @@ export const Interactive: Story = {
 
 ★ The canonical showcase name is `AllVariants`; per-component exceptions (e.g. Avatar uses `AllSizes`) are noted in the component's stories. The matrix is canonical by story **purpose**, not by literal name — a component whose idiom reads better as `OpenCloseInteraction` or `ExpandInteraction` satisfies the click-interaction row, and a pattern with nothing to disable (a modal frame) has no Disabled row to fill.
 
+## Docs Stories
+
+A component's docs page is generated from its stories tagged `docs` — there is no separate demo file. `pnpm --filter @nexus_ds/docs generate:demos` turns each one into the copy-pasteable code the page shows, and fails with a fix for anything it can't convert.
+
+- Tag with `tags: ['docs']`. The first tagged story is the page's preview; the rest are its examples, in file order. Reorder exports to change the order; don't rename them.
+- Every exported component needs at least one docs story.
+- Write it as code a reader would paste: real product copy, no test captions or prop names as text, no `!` assertions, no fixtures or `stories/support` helpers in the render.
+- Args reach the code only through JSX props, children and `{...args}`; the generator writes their values in and drops `fn()` spies.
+- A decorator is shown only if it is a plain `(Story) => <…><Story /></…>` wrapper.
+- It shares a page with the component's other docs stories: overlays start closed, literal ids stay unique across them (prefer `React.useId`), and nothing global is mounted twice.
+
 ## Play Function Patterns
 
 ### Click Testing

@@ -39,19 +39,8 @@ export async function PropsTable({
   component?: string;
 }) {
   const entries = await loadComponentDocs(slug, component);
-  const documented = entries.filter((entry) => entry.props.length > 0);
 
-  if (documented.length === 0) {
-    return (
-      <p className="nx:typography-body-default nx:text-muted-foreground nx:mb-4">
-        {component ? <InlineCode>{component}</InlineCode> : 'This component'}{' '}
-        adds no props of its own; it accepts the props of the element or
-        primitive it wraps.
-      </p>
-    );
-  }
-
-  return documented.map((entry) => (
+  return entries.map((entry) => (
     <section key={entry.name}>
       {!component && (
         <SubsectionHeading
@@ -61,7 +50,14 @@ export async function PropsTable({
           {entry.name}
         </SubsectionHeading>
       )}
-      <ComponentProps entry={entry} />
+      {entry.props.length > 0 ? (
+        <ComponentProps entry={entry} />
+      ) : (
+        <p className="nx:typography-body-default nx:text-muted-foreground nx:mb-4">
+          <InlineCode>{entry.name}</InlineCode> adds no props of its own; it
+          accepts the props of the element or primitive it wraps.
+        </p>
+      )}
     </section>
   ));
 }

@@ -129,6 +129,7 @@ function WordCounterTextarea() {
 // ============================================
 
 export const Default: Story = {
+  tags: ['docs'],
   args: {
     placeholder: 'Tell us about yourself...',
   },
@@ -142,6 +143,7 @@ export const WithValue: Story = {
 };
 
 export const Disabled: Story = {
+  tags: ['docs'],
   args: {
     placeholder: 'Cannot edit this',
     disabled: true,
@@ -162,6 +164,7 @@ export const Disabled: Story = {
 };
 
 export const Invalid: Story = {
+  tags: ['docs'],
   args: {
     defaultValue: 'Too short',
     'aria-invalid': true,
@@ -277,6 +280,7 @@ export const AutofillPairing: Story = {
 };
 
 export const WithLabel: Story = {
+  tags: ['docs'],
   render: (args) => (
     <div className="nx:flex nx:flex-col nx:gap-2">
       <Label htmlFor="textarea-bio">Bio</Label>
@@ -296,6 +300,7 @@ export const WithLabel: Story = {
 };
 
 export const CharacterCounter: Story = {
+  tags: ['docs'],
   parameters: {
     docs: {
       description: {

@@ -28,6 +28,7 @@ type Story = StoryObj<typeof Pagination>;
 // the current page active, and an ellipsis standing in for the pages skipped
 // before the last one.
 export const Default: Story = {
+  tags: ['docs'],
   render: () => (
     <Pagination>
       <PaginationContent>
@@ -61,6 +62,7 @@ export const Default: Story = {
 
 // A short pager with no overflow — every page fits, so no ellipsis is needed.
 export const FewPages: Story = {
+  tags: ['docs'],
   render: () => (
     <Pagination>
       <PaginationContent>
@@ -270,6 +272,7 @@ export const EllipsisFootprint: Story = {
 // renders its own <a>, so the styling merges onto it — no nested <a><a>. The
 // bare <a> here stands in for that router link.
 export const AsChild: Story = {
+  tags: ['docs'],
   render: () => (
     <Pagination>
       <PaginationContent>

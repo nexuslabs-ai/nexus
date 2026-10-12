@@ -1,8 +1,6 @@
 import { type ReactNode, useRef, useState } from 'react';
 
 import type { Meta, StoryObj } from '@storybook/react';
-import { expect, userEvent, within } from 'storybook/test';
-
 import {
   IconAlertCircle,
   IconChevronDown,
@@ -10,7 +8,9 @@ import {
   IconChevronRight,
   IconChevronUp,
   IconSearch,
-} from '../../lib/icons';
+} from '@tabler/icons-react';
+import { expect, userEvent, within } from 'storybook/test';
+
 import { Button } from '../button';
 import { Checkbox } from '../checkbox';
 import { Hide } from '../hide';
@@ -80,6 +80,7 @@ const invoices = [
 // A basic data table: caption, column headers, and rows of cells. The amount
 // column is right-aligned, as numeric columns usually are.
 export const Default: Story = {
+  tags: ['docs'],
   render: () => (
     <Table>
       <TableCaption>A list of your recent invoices.</TableCaption>
@@ -108,6 +109,7 @@ export const Default: Story = {
 // A footer holds a summary row — here, the total across all invoices. The
 // muted fill and medium weight set it apart from the data rows.
 export const WithFooter: Story = {
+  tags: ['docs'],
   render: () => (
     <Table>
       <TableHeader>
@@ -242,6 +244,7 @@ function SelectionTableDemo({
 // `TableSelectionHead` / `TableSelectionCell` hold the checkboxes in a leading
 // in-flow column. Every checkbox is visible without hovering its row.
 export const SelectableRows: Story = {
+  tags: ['docs'],
   render: () => <SelectionTableDemo />,
   play: async ({ canvasElement }) => {
     const canvas = within(canvasElement);
@@ -414,6 +417,7 @@ export const SelectionGridSeparator: Story = {
 // A trailing actions column with per-row controls. Text buttons carry their own
 // accessible names; a real app would wire these to edit/delete handlers.
 export const WithActions: Story = {
+  tags: ['docs'],
   render: () => (
     <Table>
       <TableHeader>
@@ -758,6 +762,7 @@ export const AriaSortIndicator: Story = {
 // Zebra striping tints alternating body rows. Selection and hover beat the
 // stripe — a selected even row shows the selection tint, not the stripe.
 export const Striped: Story = {
+  tags: ['docs'],
   render: () => (
     <Table striped>
       <TableHeader>
@@ -927,6 +932,7 @@ export const Density: Story = {
 // A pinned header: the body scrolls within a height-capped container while the
 // column headers stay visible.
 export const StickyHeader: Story = {
+  tags: ['docs'],
   render: () => (
     <Table stickyHeader containerClassName="nx:max-h-64">
       <TableHeader>
@@ -1229,6 +1235,7 @@ function SortableHeaderDemo() {
 }
 
 export const SortableHeader: Story = {
+  tags: ['docs'],
   render: () => <SortableHeaderDemo />,
   play: async ({ canvasElement }) => {
     const header = canvasElement.querySelector('[aria-sort]');

@@ -1,6 +1,9 @@
+import * as React from 'react';
+
 import type { Meta, StoryObj } from '@storybook/react';
 import { expect, userEvent, within } from 'storybook/test';
 
+import { Checkbox } from '../checkbox';
 import { Input } from '../input';
 
 import { Label } from './label';
@@ -26,6 +29,7 @@ type Story = StoryObj<typeof Label>;
 export const Default: Story = {};
 
 export const WithInput: Story = {
+  tags: ['docs'],
   render: () => (
     <div className="nx:flex nx:flex-col nx:gap-2">
       <Label htmlFor="email">Email</Label>
@@ -35,13 +39,18 @@ export const WithInput: Story = {
 };
 
 export const Disabled: Story = {
-  render: () => (
+  tags: ['docs'],
+  render: function DisabledStory() {
+    const checkboxId = React.useId();
+
     // The label dims when its `nx:peer` sibling control is disabled.
-    <div className="nx:flex nx:items-center nx:gap-2">
-      <input type="checkbox" id="terms" disabled className="nx:peer" />
-      <Label htmlFor="terms">Accept terms</Label>
-    </div>
-  ),
+    return (
+      <div className="nx:flex nx:items-center nx:gap-2">
+        <Checkbox id={checkboxId} disabled />
+        <Label htmlFor={checkboxId}>Accept terms</Label>
+      </div>
+    );
+  },
   play: async ({ canvasElement }) => {
     const canvas = within(canvasElement);
     const label = canvas.getByText('Accept terms');

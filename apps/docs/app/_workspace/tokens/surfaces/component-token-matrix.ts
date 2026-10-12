@@ -31,7 +31,7 @@ export const COMPONENT_TOKEN_MATRIX: readonly ComponentTokenEntry[] = [
       'primary-disabled',
     ],
     sourceFile: 'packages/react/src/components/button/button.tsx',
-    stories: ['Primary', 'Disabled', 'VariantClassesMatchFigmaTokens'],
+    stories: ['Primary', 'Disabled', 'VariantClassesMatchTokens'],
   },
   {
     component: 'Button',

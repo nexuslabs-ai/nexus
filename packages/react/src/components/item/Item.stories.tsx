@@ -37,6 +37,7 @@ function expectMediaHairline(element: Element | null) {
 
 // A standard row: icon media, title + description, and a trailing action.
 export const Default: Story = {
+  tags: ['docs'],
   render: () => (
     <Item variant="outline" className="nx:w-96">
       <ItemMedia variant="icon">
@@ -57,6 +58,7 @@ export const Default: Story = {
 
 // The three surface variants.
 export const Variants: Story = {
+  tags: ['docs'],
   render: () => (
     <div className="nx:flex nx:w-96 nx:flex-col nx:gap-3">
       <Item variant="default">
@@ -83,6 +85,7 @@ export const Variants: Story = {
 
 // Default vs the denser sm size.
 export const Sizes: Story = {
+  tags: ['docs'],
   render: () => (
     <div className="nx:flex nx:w-96 nx:flex-col nx:gap-3">
       <Item variant="outline" size="default">
@@ -101,6 +104,7 @@ export const Sizes: Story = {
 
 // The icon medallion and image thumbnail media variants.
 export const Media: Story = {
+  tags: ['docs'],
   render: () => (
     <div className="nx:flex nx:w-96 nx:flex-col nx:gap-3">
       <Item variant="outline">
@@ -145,6 +149,7 @@ export const MediaImageHairline: Story = {
 
 // A grouped list divided by separators.
 export const Grouped: Story = {
+  tags: ['docs'],
   render: () => (
     <ItemGroup className="nx:w-96">
       <Item>
@@ -164,6 +169,7 @@ export const Grouped: Story = {
 
 // Item composes with a custom element via asChild — here a whole-row link.
 export const AsChild: Story = {
+  tags: ['docs'],
   render: () => (
     <Item asChild variant="outline" className="nx:w-96">
       <a href="/files/report" data-testid="item-link">

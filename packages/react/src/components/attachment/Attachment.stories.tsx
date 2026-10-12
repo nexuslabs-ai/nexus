@@ -51,6 +51,7 @@ const THUMB =
 
 // A settled attachment: icon media, name + size, and a remove action.
 export const Default: Story = {
+  tags: ['docs'],
   render: () => (
     <Attachment className="nx:w-80">
       <AttachmentMedia variant="icon">
@@ -71,6 +72,7 @@ export const Default: Story = {
 
 // Every lifecycle state, top to bottom.
 export const States: Story = {
+  tags: ['docs'],
   render: () => (
     <div className="nx:flex nx:w-80 nx:flex-col nx:gap-3">
       <Attachment state="idle">
@@ -186,6 +188,7 @@ export const States: Story = {
 
 // The two densities, each showing its file type through the leading icon.
 export const Sizes: Story = {
+  tags: ['docs'],
   render: () => (
     <div className="nx:flex nx:w-80 nx:flex-col nx:gap-3">
       <Attachment size="default">
@@ -270,6 +273,7 @@ export const VerticalOrientation: Story = {
 
 // A composer strip — mixed file types scrolling horizontally.
 export const Grouped: Story = {
+  tags: ['docs'],
   render: () => (
     <AttachmentGroup aria-label="Attached files" className="nx:w-80">
       {[

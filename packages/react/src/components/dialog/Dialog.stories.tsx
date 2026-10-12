@@ -1,3 +1,5 @@
+import * as React from 'react';
+
 import type { Meta, StoryObj } from '@storybook/react';
 import { expect, userEvent, waitFor, within } from 'storybook/test';
 
@@ -13,6 +15,7 @@ import {
   DropdownMenuTrigger,
 } from '../dropdown-menu';
 import { Input } from '../input';
+import { Label } from '../label';
 
 import {
   Dialog,
@@ -50,6 +53,7 @@ type Story = StoryObj<typeof Dialog>;
 // ============================================
 
 export const Default: Story = {
+  tags: ['docs'],
   render: (_args) => (
     <Dialog>
       <DialogTrigger asChild>
@@ -79,52 +83,53 @@ export const Default: Story = {
 };
 
 export const WithDescription: Story = {
-  render: (_args) => (
-    <Dialog>
-      <DialogTrigger asChild>
-        <Button>Edit Profile</Button>
-      </DialogTrigger>
-      <DialogContent>
-        <DialogHeader>
-          <DialogTitle>Edit Profile</DialogTitle>
-          <DialogDescription>
-            Make changes to your profile here. Click save when you&apos;re done.
-          </DialogDescription>
-        </DialogHeader>
-        <DialogBody className="nx:grid nx:gap-4 nx:py-4">
-          <div className="nx:grid nx:grid-cols-4 nx:items-center nx:gap-4">
-            <label
-              htmlFor="name"
-              className="nx:text-right nx:typography-label-default"
-            >
-              Name
-            </label>
-            <Input
-              id="name"
-              defaultValue="John Doe"
-              className="nx:col-span-3"
-            />
-          </div>
-          <div className="nx:grid nx:grid-cols-4 nx:items-center nx:gap-4">
-            <label
-              htmlFor="username"
-              className="nx:text-right nx:typography-label-default"
-            >
-              Username
-            </label>
-            <Input
-              id="username"
-              defaultValue="@johndoe"
-              className="nx:col-span-3"
-            />
-          </div>
-        </DialogBody>
-        <DialogFooter>
-          <Button type="submit">Save changes</Button>
-        </DialogFooter>
-      </DialogContent>
-    </Dialog>
-  ),
+  tags: ['docs'],
+  render: function WithDescriptionStory() {
+    const nameId = React.useId();
+    const usernameId = React.useId();
+
+    return (
+      <Dialog>
+        <DialogTrigger asChild>
+          <Button>Edit Profile</Button>
+        </DialogTrigger>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Edit Profile</DialogTitle>
+            <DialogDescription>
+              Make changes to your profile here. Click save when you&apos;re
+              done.
+            </DialogDescription>
+          </DialogHeader>
+          <DialogBody className="nx:grid nx:gap-4 nx:py-4">
+            <div className="nx:grid nx:grid-cols-4 nx:items-center nx:gap-4">
+              <Label htmlFor={nameId} className="nx:justify-end">
+                Name
+              </Label>
+              <Input
+                id={nameId}
+                defaultValue="John Doe"
+                className="nx:col-span-3"
+              />
+            </div>
+            <div className="nx:grid nx:grid-cols-4 nx:items-center nx:gap-4">
+              <Label htmlFor={usernameId} className="nx:justify-end">
+                Username
+              </Label>
+              <Input
+                id={usernameId}
+                defaultValue="@johndoe"
+                className="nx:col-span-3"
+              />
+            </div>
+          </DialogBody>
+          <DialogFooter>
+            <Button type="submit">Save changes</Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+    );
+  },
 };
 
 export const NoCloseButton: Story = {
@@ -183,6 +188,7 @@ export const CustomCloseButton: Story = {
 };
 
 export const ScrollableContent: Story = {
+  tags: ['docs'],
   render: (_args) => (
     <Dialog>
       <DialogTrigger asChild>
@@ -293,6 +299,7 @@ export const ViewportBoundContent: Story = {
 };
 
 export const PropDrivenContent: Story = {
+  tags: ['docs'],
   render: (_args) => (
     <Dialog>
       <DialogTrigger asChild>

@@ -334,6 +334,8 @@ function MultiSelectValue({
     toggle(value);
   };
 
+  const isChipHidden = shouldWrap || overflowAmount === 0;
+
   return (
     <div
       data-slot="multi-select-value"
@@ -375,9 +377,7 @@ function MultiSelectValue({
         variant="secondary"
         fill="light"
         isCaps={false}
-        style={{
-          display: overflowAmount > 0 && !shouldWrap ? 'block' : 'none',
-        }}
+        style={{ display: isChipHidden ? 'none' : undefined }}
       >
         +{overflowAmount}
       </Badge>

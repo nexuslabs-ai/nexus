@@ -457,7 +457,27 @@ export const Warning: Story = {
   ),
 };
 
+// ============================================
+// WITH ICON STORIES
+// ============================================
+
+export const WithIcon: Story = {
+  tags: ['docs'],
+  render: (args) => (
+    <Alert {...args} className="nx:max-w-md">
+      <AlertIcon>
+        <IconInfoCircle />
+      </AlertIcon>
+      <AlertTitle>Information</AlertTitle>
+      <AlertDescription>
+        This is an informational alert with an icon.
+      </AlertDescription>
+    </Alert>
+  ),
+};
+
 export const BannerPresentation: Story = {
+  tags: ['docs'],
   args: {
     presentation: 'banner',
     variant: 'information',
@@ -480,24 +500,6 @@ export const BannerPresentation: Story = {
     await expect(alert).toHaveAttribute('data-variant', 'information');
     await expect(alert).toHaveAttribute('data-presentation', 'banner');
   },
-};
-
-// ============================================
-// WITH ICON STORIES
-// ============================================
-
-export const WithIcon: Story = {
-  render: (args) => (
-    <Alert {...args} className="nx:max-w-md">
-      <AlertIcon>
-        <IconInfoCircle />
-      </AlertIcon>
-      <AlertTitle>Information</AlertTitle>
-      <AlertDescription>
-        This is an informational alert with an icon.
-      </AlertDescription>
-    </Alert>
-  ),
 };
 
 export const DestructiveWithIcon: Story = {
@@ -635,6 +637,7 @@ export const LongContent: Story = {
 // ============================================
 
 export const DismissibleCloseButton: Story = {
+  tags: ['docs'],
   args: {
     layout: 'inline',
     variant: 'information',
@@ -742,6 +745,7 @@ export const DescriptionLinkAction: Story = {
 };
 
 export const ActionsBelowDescription: Story = {
+  tags: ['docs'],
   args: {
     variant: 'warning',
   },
@@ -1057,6 +1061,7 @@ export const RolePassThrough: Story = {
 // ============================================
 
 export const AllVariants: Story = {
+  tags: ['docs'],
   render: (_args) => (
     <div className="nx:flex nx:flex-col nx:gap-6">
       <div>

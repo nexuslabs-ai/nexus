@@ -339,7 +339,7 @@ export default function ColorShowcase() {
           {[
             {
               step: 'Store hex',
-              body: 'Tokens live as hex on disk — the only format Figma and Tokens Studio round-trip cleanly.',
+              body: 'Tokens live as hex on disk.',
             },
             {
               step: 'Convert to OKLCH',

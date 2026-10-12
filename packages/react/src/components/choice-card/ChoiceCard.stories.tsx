@@ -217,6 +217,7 @@ function RadioChoiceCard({
 }
 
 export const Default: Story = {
+  tags: ['docs'],
   args: {
     variant: 'bordered',
   },
@@ -263,6 +264,7 @@ export const Default: Story = {
 };
 
 export const WithRadioGroup: Story = {
+  tags: ['docs'],
   args: {
     variant: 'bordered',
   },
@@ -289,6 +291,7 @@ export const WithRadioGroup: Story = {
 };
 
 export const TrailingControl: Story = {
+  tags: ['docs'],
   args: {
     variant: 'bordered',
   },
@@ -322,6 +325,7 @@ export const TrailingControl: Story = {
 };
 
 export const Disabled: Story = {
+  tags: ['docs'],
   render: () => (
     <div className="nx:grid nx:w-96 nx:max-w-full nx:gap-3">
       <CheckboxChoiceCard
@@ -334,21 +338,21 @@ export const Disabled: Story = {
         id="choice-card-disabled-checked"
         disabled
         defaultChecked
-        title="Disabled selected"
-        description="Selected state does not override disabled styling."
+        title="Usage reports"
+        description="Always on for workspace admins."
       />
       <CheckboxChoiceCard
         id="choice-card-disabled-invalid"
         disabled
         invalid
-        title="Disabled invalid"
-        description="Invalid state does not override disabled styling."
+        title="Audit log export"
+        description="Unavailable until your billing details are fixed."
       />
       <RadioChoiceCard
         id="choice-card-disabled-radio"
         disabled
-        title="Disabled radio"
-        description="Radio disabled state styles the card shell."
+        title="Enterprise plan"
+        description="Contact sales to switch to this plan."
       />
     </div>
   ),
@@ -358,13 +362,13 @@ export const Disabled: Story = {
       name: 'Locked notifications',
     });
     const disabledChecked = canvas.getByRole('checkbox', {
-      name: 'Disabled selected',
+      name: 'Usage reports',
     });
     const disabledInvalid = canvas.getByRole('checkbox', {
-      name: 'Disabled invalid',
+      name: 'Audit log export',
     });
     const disabledRadio = canvas.getByRole('radio', {
-      name: 'Disabled radio',
+      name: 'Enterprise plan',
     });
     const disabledCard = getCardFor(canvasElement, 'choice-card-disabled');
     const disabledCheckedCard = getCardFor(
@@ -415,18 +419,19 @@ export const Disabled: Story = {
 };
 
 export const Invalid: Story = {
+  tags: ['docs'],
   render: () => (
     <div className="nx:grid nx:w-96 nx:max-w-full nx:gap-3">
       <CheckboxChoiceCard
         id="choice-card-invalid-unselected"
-        title="Optional alerts"
-        description="Unselected reference card."
+        title="Product updates"
+        description="News about features and improvements."
       />
       <CheckboxChoiceCard
         id="choice-card-invalid-selected"
         defaultChecked
-        title="Selected alerts"
-        description="Selected reference card."
+        title="Security alerts"
+        description="Sign-ins from new devices and password changes."
       />
       <CheckboxChoiceCard
         id="choice-card-invalid"
@@ -438,8 +443,8 @@ export const Invalid: Story = {
       <RadioChoiceCard
         id="choice-card-invalid-radio"
         invalid
-        title="Invalid radio"
-        description="Radio invalid state uses the error border."
+        title="Annual billing"
+        description="Choose a billing period to continue."
       />
     </div>
   ),
@@ -459,7 +464,7 @@ export const Invalid: Story = {
       'choice-card-invalid-radio'
     );
     const invalid = canvas.getByRole('checkbox', { name: 'Required policy' });
-    const invalidRadio = canvas.getByRole('radio', { name: 'Invalid radio' });
+    const invalidRadio = canvas.getByRole('radio', { name: 'Annual billing' });
 
     await expect(invalid).toBeChecked();
     await expect(invalid).toHaveAttribute('aria-invalid', 'true');
@@ -481,18 +486,19 @@ export const Invalid: Story = {
 };
 
 export const Indeterminate: Story = {
+  tags: ['docs'],
   render: () => (
     <div className="nx:grid nx:w-96 nx:max-w-full nx:gap-3">
       <CheckboxChoiceCard
         id="choice-card-indeterminate-unselected"
-        title="Unselected group"
-        description="Reference card with no selection."
+        title="Marketing"
+        description="Newsletters and event invitations."
       />
       <CheckboxChoiceCard
         id="choice-card-indeterminate-checked"
         defaultChecked
-        title="Selected group"
-        description="Reference card with selected styling."
+        title="Account"
+        description="Billing receipts and security notices."
       />
       <ChoiceCard htmlFor="choice-card-indeterminate">
         <Checkbox
@@ -503,10 +509,10 @@ export const Indeterminate: Story = {
         />
         <ChoiceCardContent>
           <ChoiceCardTitle id="choice-card-indeterminate-title">
-            Partial group
+            Product
           </ChoiceCardTitle>
           <ChoiceCardDescription id="choice-card-indeterminate-description">
-            Some nested settings are selected.
+            Some of these notifications are on.
           </ChoiceCardDescription>
         </ChoiceCardContent>
       </ChoiceCard>
@@ -527,7 +533,7 @@ export const Indeterminate: Story = {
       'choice-card-indeterminate'
     );
     const indeterminate = canvas.getByRole('checkbox', {
-      name: 'Partial group',
+      name: 'Product',
     });
 
     await expect(indeterminate).toHaveAttribute('data-state', 'indeterminate');
@@ -741,6 +747,7 @@ export const Dark: Story = {
 };
 
 export const AllVariants: Story = {
+  tags: ['docs'],
   render: () => (
     <div className="nx:grid nx:w-[min(100%,56rem)] nx:grid-cols-1 nx:gap-6 nx:md:grid-cols-2">
       <div className="nx:grid nx:gap-3">

@@ -30,6 +30,7 @@ type Story = StoryObj<typeof NavigationMenu>;
 // ============================================
 
 export const Default: Story = {
+  tags: ['docs'],
   render: (_args) => (
     <NavigationMenu>
       <NavigationMenuList>
@@ -72,6 +73,7 @@ export const Default: Story = {
 };
 
 export const WithSimpleLink: Story = {
+  tags: ['docs'],
   render: (_args) => (
     <NavigationMenu>
       <NavigationMenuList>
@@ -97,6 +99,7 @@ export const WithSimpleLink: Story = {
 };
 
 export const WithoutViewport: Story = {
+  tags: ['docs'],
   render: (_args) => (
     <NavigationMenu viewport={false}>
       <NavigationMenuList>
@@ -121,6 +124,7 @@ export const WithoutViewport: Story = {
 };
 
 export const WithIndicator: Story = {
+  tags: ['docs'],
   render: (_args) => (
     <NavigationMenu>
       <NavigationMenuList>
@@ -153,6 +157,7 @@ export const WithIndicator: Story = {
 };
 
 export const Disabled: Story = {
+  tags: ['docs'],
   render: (_args) => (
     <NavigationMenu>
       <NavigationMenuList>

@@ -184,16 +184,8 @@ export const Default: Story = {
   ),
 };
 
-export const AreaChartStory: Story = {
-  name: 'Area',
-  render: () => (
-    <div className="nx:w-[600px] nx:max-w-full">
-      <AreaExample />
-    </div>
-  ),
-};
-
 export const BarChartStory: Story = {
+  tags: ['docs'],
   name: 'Bar',
   render: () => (
     <div className="nx:w-[600px] nx:max-w-full">
@@ -202,7 +194,18 @@ export const BarChartStory: Story = {
   ),
 };
 
+export const AreaChartStory: Story = {
+  tags: ['docs'],
+  name: 'Area',
+  render: () => (
+    <div className="nx:w-[600px] nx:max-w-full">
+      <AreaExample />
+    </div>
+  ),
+};
+
 export const LineChartStory: Story = {
+  tags: ['docs'],
   name: 'Line',
   render: () => (
     <div className="nx:w-[600px] nx:max-w-full">

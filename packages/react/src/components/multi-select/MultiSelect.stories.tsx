@@ -26,6 +26,12 @@ const FRAMEWORKS = [
   { value: 'qwik', label: 'Qwik' },
 ];
 
+/**
+ * Optical centering slack for the `+N` chip label. Sub-pixel text metrics drift
+ * ~0.5px; losing the chip's flex centering drifts ~2.5px.
+ */
+const MAX_LABEL_DRIFT_PX = 1;
+
 function Frameworks({
   placeholder = 'Select frameworks',
   triggerClassName = 'nx:w-80',
@@ -63,6 +69,7 @@ export default meta;
 type Story = StoryObj<typeof MultiSelect>;
 
 export const Default: Story = {
+  tags: ['docs'],
   render: () => <Frameworks />,
 };
 
@@ -86,6 +93,7 @@ export const Controlled: Story = {
 };
 
 export const Grouped: Story = {
+  tags: ['docs'],
   render: () => (
     <MultiSelect defaultValues={['react']}>
       <MultiSelectTrigger aria-label="Frameworks" className="nx:w-80">
@@ -111,6 +119,7 @@ export const Grouped: Story = {
 };
 
 export const WrapChips: Story = {
+  tags: ['docs'],
   render: () => (
     <MultiSelect defaultValues={['react', 'vue', 'svelte', 'angular', 'solid']}>
       <MultiSelectTrigger aria-label="Frameworks" className="nx:w-72">
@@ -134,6 +143,7 @@ export const WrapChips: Story = {
 };
 
 export const OverflowCollapse: Story = {
+  tags: ['docs'],
   render: () => (
     <MultiSelect
       defaultValues={['react', 'vue', 'svelte', 'angular', 'solid', 'qwik']}
@@ -162,10 +172,22 @@ export const OverflowCollapse: Story = {
     // Six chips overflow the 256px field, so measurement collapses the excess
     // into a visible `+N` badge.
     await waitFor(() => expect(canvas.getByText(/^\+\d+$/)).toBeVisible());
+
+    const overflow = canvasElement.querySelector<HTMLElement>(
+      '[data-slot="multi-select-overflow"]'
+    )!;
+    const box = overflow.getBoundingClientRect();
+    const range = document.createRange();
+    range.selectNodeContents(overflow);
+    const label = range.getBoundingClientRect();
+    expect(
+      Math.abs((label.top + label.bottom) / 2 - (box.top + box.bottom) / 2)
+    ).toBeLessThan(MAX_LABEL_DRIFT_PX);
   },
 };
 
 export const Disabled: Story = {
+  tags: ['docs'],
   render: () => (
     <MultiSelect defaultValues={['react']}>
       <MultiSelectTrigger aria-label="Frameworks" disabled className="nx:w-80">
@@ -192,6 +214,7 @@ export const Disabled: Story = {
 };
 
 export const WithDisabledOption: Story = {
+  tags: ['docs'],
   render: () => (
     <MultiSelect>
       <MultiSelectTrigger aria-label="Frameworks" className="nx:w-80">
@@ -225,6 +248,7 @@ export const WithDisabledOption: Story = {
 };
 
 export const InvalidField: Story = {
+  tags: ['docs'],
   render: () => (
     <Field data-invalid>
       <FieldLabel>Frameworks</FieldLabel>

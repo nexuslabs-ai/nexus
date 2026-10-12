@@ -5,6 +5,7 @@ import {
   expectExitBeforeUnmount,
   expectInterruptibleOverlayMotion,
 } from '../../stories/support/overlay-motion-test-utils';
+import { Avatar, AvatarFallback, AvatarImage } from '../avatar';
 import { Button } from '../button';
 
 import { HoverCard, HoverCardContent, HoverCardTrigger } from './hover-card';
@@ -17,8 +18,16 @@ const meta: Meta<typeof HoverCard> = {
 export default meta;
 type Story = StoryObj<typeof HoverCard>;
 
+const SIDES = [
+  { side: 'top', label: 'Top' },
+  { side: 'right', label: 'Right' },
+  { side: 'bottom', label: 'Bottom' },
+  { side: 'left', label: 'Left' },
+] as const;
+
 // A profile-preview card revealed on hover.
 export const Default: Story = {
+  tags: ['docs'],
   render: () => (
     <HoverCard>
       <HoverCardTrigger asChild>
@@ -35,6 +44,56 @@ export const Default: Story = {
         </div>
       </HoverCardContent>
     </HoverCard>
+  ),
+};
+
+// A richer preview: avatar, bio and join date.
+export const ProfileCard: Story = {
+  tags: ['docs'],
+  render: () => (
+    <HoverCard>
+      <HoverCardTrigger asChild>
+        <Button variant="link">@ada</Button>
+      </HoverCardTrigger>
+      <HoverCardContent className="nx:w-80">
+        <div className="nx:flex nx:gap-4">
+          <Avatar>
+            <AvatarImage src="/avatars/ada.svg" alt="Ada Lovelace" />
+            <AvatarFallback>AL</AvatarFallback>
+          </Avatar>
+          <div className="nx:flex nx:flex-col nx:gap-1">
+            <p className="nx:typography-label-default nx:font-semibold nx:text-foreground">
+              Ada Lovelace
+            </p>
+            <p className="nx:typography-body-default nx:text-muted-foreground">
+              Wrote the first program for the Analytical Engine.
+            </p>
+            <p className="nx:typography-label-small nx:text-muted-foreground">
+              Joined December 1843
+            </p>
+          </div>
+        </div>
+      </HoverCardContent>
+    </HoverCard>
+  ),
+};
+
+// `side` opens the card on any edge of its trigger.
+export const Placement: Story = {
+  tags: ['docs'],
+  render: () => (
+    <div className="nx:flex nx:flex-wrap nx:gap-4">
+      {SIDES.map(({ side, label }) => (
+        <HoverCard key={side}>
+          <HoverCardTrigger asChild>
+            <Button variant="outline">{label}</Button>
+          </HoverCardTrigger>
+          <HoverCardContent side={side}>
+            Opens on the {side} of its trigger.
+          </HoverCardContent>
+        </HoverCard>
+      ))}
+    </div>
   ),
 };
 

@@ -228,7 +228,7 @@ files, and those import packages. Each component lists both, generated from its
 imports. For Button, install the packages, then copy the files — the ones it
 imports first, its own last:
 
-<InstallBlock slug="button" />
+<InstallBlock slugs={['button']} />
 
 Every path is relative to `packages/react/src/` in the repo. Keep it as it is
 under your `@/` root, next to the `lib/utils.ts` from step 4, and the relative
@@ -239,11 +239,9 @@ lines to add to `app/globals.css`.
 
 Render it:
 
-<ComponentSource id="getting-started/button-core-variants" />
+<ComponentDemo id="button/default" />
 
-<ComponentPreview id="getting-started/button-core-variants" />
-
-Those are this page's own buttons, always styled — the checks below are for the
+That is this page's own button, always styled — the checks below are for the
 ones in your app. To run the second one you need a way to switch modes, which is
 the provider's `state` and `setState`:
 
