@@ -36,7 +36,7 @@ Whatever brand color a user picks, the text stays readable.
 
 ## It fits next to your app
 
-Every Nexus class starts with `nx:`, and every Nexus variable starts with `--nx-`. Nexus styles apply only inside a Nexus root element. Your Tailwind config, your classes and your CSS stay yours.
+Every Nexus class starts with `nx:`, and every Nexus variable starts with `--nx-`. Nexus CSS defines nothing else, so your Tailwind config, classes and styles stay as they are. [Add Nexus to an existing app](/getting-started/install#add-nexus-to-an-existing-app) shows the setup.
 
 ## Built for people and agents
 
@@ -60,7 +60,7 @@ Nexus pays off when you have several products, several brands, or an app that mu
 Not in the usual sense. The components are copy-and-own source. The part you install from npm is the theme engine.
 
 **Do I need Tailwind?**
-Yes. Nexus needs Tailwind 4, with its Preflight base styles.
+Yes. Nexus builds its classes with Tailwind 4. Your app also needs a reset that sets `box-sizing: border-box`, such as Tailwind's Preflight or MUI's `CssBaseline`.
 
 **Does Nexus work outside React?**
 The engine does. It has no framework code, so any app can call it. The components are React only today.

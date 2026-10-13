@@ -17,12 +17,12 @@ const SETTINGS: { field: string; sets: string; appliedAs: string }[] = [
   { field: 'mode', sets: 'Light, dark or system', appliedAs: '.dark class' },
   {
     field: 'lightContrast',
-    sets: 'Text contrast in light mode',
+    sets: 'Text, border and hover contrast in light mode',
     appliedAs: 'CSS variables',
   },
   {
     field: 'darkContrast',
-    sets: 'Text contrast in dark mode',
+    sets: 'Text, border and hover contrast in dark mode',
     appliedAs: 'CSS variables',
   },
   { field: 'density', sets: 'Spacing', appliedAs: 'data-density' },

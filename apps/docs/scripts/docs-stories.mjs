@@ -144,10 +144,33 @@ function docsDescription(object, kind, where) {
     current = property.initializer;
   }
   const value = /** @type {ts.Node} */ (unwrap(current));
-  if (isPlainString(value)) return value.text;
-  const joined = joinedStrings(value);
-  if (joined !== null) return joined;
-  throw notInline;
+  const text = isPlainString(value) ? value.text : joinedStrings(value);
+  if (text === null) throw notInline;
+  const unsupported = unsupportedMarkdown(text);
+  if (unsupported) {
+    throw new Error(
+      `${where} its \`parameters.docs.description.${kind}\` uses ${unsupported}, which the docs page shows as raw text. Use paragraphs, \`- \` lists and \`code\` only.`
+    );
+  }
+  return text;
+}
+
+/**
+ * Names the first Markdown in `text` that DescriptionText doesn't render, or
+ * null. Code spans are skipped, so their contents can hold any characters.
+ * @param {string} text
+ */
+function unsupportedMarkdown(text) {
+  const prose = text.replace(/`[^`]*`/g, '');
+  if (/\*\*|__/.test(prose)) return 'bold';
+  if (/\[[^\]]*\]\([^)]*\)/.test(prose)) return 'a link';
+  if (/^\s*#{1,6}\s/m.test(prose)) return 'a heading';
+  if (/^\s*>/m.test(prose)) return 'a blockquote';
+  if (/^\s*(\d+\.|\*)\s/m.test(prose)) return 'a list marker other than `- `';
+  if (/(^|[\s(])[*_][^\s*_][^*_]*[*_](?=[\s.,;:!?)]|$)/m.test(prose)) {
+    return 'emphasis';
+  }
+  return null;
 }
 
 /** @param {ts.BindingName} name */

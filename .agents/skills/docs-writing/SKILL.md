@@ -16,7 +16,7 @@ user-invocable: false
 ## Purpose
 
 Turn what a reader needs to do into the shortest page that does it. The voice
-rules live in [`docs-voice.md`](../../rules/docs-voice.md). This skill adds the
+rules live in [`docs-voice.md`](../../../.claude/rules/docs-voice.md). This skill adds the
 page templates, a self-check, and worked rewrites.
 
 The voice is modelled on shadcn/ui and Base UI, plus Ant Design's fixed page

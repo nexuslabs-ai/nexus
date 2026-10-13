@@ -15,20 +15,29 @@ import { InlineCode } from '../../_components/InlineCode';
  * (TIER_THRESHOLDS), packages/core/tokens/, packages/eslint-plugin-nexus/src/rules/.
  */
 
-const PROBLEMS: { problem: string; detail: string; answer: string }[] = [
+const PROBLEMS: { problem: string; detail: string; answer: ReactNode }[] = [
   {
     problem: 'Adopting a library means rewriting your CSS config',
     detail:
       'Most libraries use unprefixed classes, so their theme has to join your Tailwind config. If your app already defines background or primary, you migrate before you render one button.',
-    answer:
-      'Every Nexus class starts with nx: and every variable with --nx-. Nexus styles apply only inside a Nexus root element, so your config and classes stay untouched.',
+    answer: (
+      <>
+        Every Nexus class starts with <InlineCode>nx:</InlineCode> and every
+        variable with <InlineCode>--nx-</InlineCode>. Nexus CSS defines nothing
+        else, so your config, classes and styles stay as they are.
+      </>
+    ),
   },
   {
     problem: 'Theming lives inside the components',
     detail:
       'Contrast rules, hover shades and dark-mode logic get written into React components. A second framework means writing all of it again.',
-    answer:
-      'All theming lives in @nexus_ds/core, which has no framework code. Components only read the tokens it produces.',
+    answer: (
+      <>
+        All theming lives in <InlineCode>@nexus_ds/core</InlineCode>, which has
+        no framework code. Components only read the tokens it produces.
+      </>
+    ),
   },
   {
     problem: 'Dark mode is a second theme, kept by hand',
@@ -56,7 +65,7 @@ const PROBLEMS: { problem: string; detail: string; answer: string }[] = [
     detail:
       'Owning component source is right. But when each app owns its own copy of the theme variables, the themes drift and no update path exists.',
     answer:
-      'Components stay copy-and-own. The tokens come from a versioned npm package, so every app updates its theme the same way.',
+      'Components stay copy-and-own. The engine that derives every token is a versioned npm package, so every app updates its theme the same way.',
   },
 ];
 
@@ -135,13 +144,13 @@ const PORT: { concern: string; shared: string; perFramework: string }[] = [
 const COMPARISON: { concern: string; shadcn: string; nexus: string }[] = [
   {
     concern: 'Class names',
-    shadcn: 'bg-background',
-    nexus: 'nx:bg-container',
+    shadcn: 'bg-primary',
+    nexus: 'nx:bg-primary-background',
   },
   {
     concern: 'Fitting into an existing app',
     shadcn: 'Its theme joins your Tailwind config',
-    nexus: 'Scoped to a Nexus root; your config is untouched',
+    nexus: 'Its own CSS entry, beside yours',
   },
   {
     concern: 'Who writes the tokens',
@@ -369,14 +378,14 @@ export default function WhyNexus() {
       <section className="nx:mb-12">
         <SectionHeading className={SECTION_CLASS}>The problems</SectionHeading>
         <ol className="nx:flex nx:flex-col nx:gap-4 nx:mt-4">
-          {PROBLEMS.map((item, index) => (
+          {PROBLEMS.map((item) => (
             <li
               key={item.problem}
               className="nx:grid nx:gap-2 nx:border-b nx:border-border-default nx:pb-4 nx:sm:grid-cols-2 nx:sm:gap-6"
             >
               <div>
                 <p className="nx:typography-label-default nx:font-semibold">
-                  {index + 1}. {item.problem}
+                  {item.problem}
                 </p>
                 <p className="nx:typography-body-small nx:text-muted-foreground nx:mt-1">
                   {item.detail}
