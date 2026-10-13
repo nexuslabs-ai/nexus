@@ -5,8 +5,8 @@ import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import type { ReactNode } from 'react';
 
-import { NexusThemeQuickControl } from '@/components/appearance/theme-quick-control';
-import { Separator } from '@/components/separator';
+import { NexusThemeQuickControl } from '@/components/appearance/theme-quick-control/theme-quick-control';
+import { Separator } from '@/components/separator/separator';
 import {
   Sidebar,
   SidebarContent,
@@ -22,8 +22,8 @@ import {
   SidebarProvider,
   SidebarRail,
   SidebarTrigger,
-} from '@/components/sidebar';
-import { Toaster } from '@/components/sonner';
+} from '@/components/sidebar/sidebar';
+import { Toaster } from '@/components/sonner/sonner';
 
 const NAV = [
   { href: '/', label: 'Dashboard', icon: IconLayoutDashboard },
