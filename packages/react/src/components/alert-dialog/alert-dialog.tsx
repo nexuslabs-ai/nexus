@@ -378,6 +378,8 @@ function AlertDialogAction({
       data-slot="alert-dialog-action"
       data-variant={variant}
       data-size={size}
+      aria-disabled={props.disabled || undefined}
+      data-disabled={props.disabled || undefined}
       className={cn(buttonVariants({ variant, size }), className)}
       {...props}
     />
@@ -417,6 +419,8 @@ function AlertDialogCancel({
       data-slot="alert-dialog-cancel"
       data-variant={variant}
       data-size={size}
+      aria-disabled={props.disabled || undefined}
+      data-disabled={props.disabled || undefined}
       className={cn(buttonVariants({ variant, size }), className)}
       {...props}
     />

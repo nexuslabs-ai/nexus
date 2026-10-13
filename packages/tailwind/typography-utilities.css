@@ -117,6 +117,16 @@
   -moz-osx-font-smoothing: var(--nx-font-smoothing-moz, auto);
 }
 
+@utility typography-label-compact {
+  font-family: var(--nx-typography-family-font-sans);
+  font-size: var(--nx-typography-size-xs-plus);
+  font-weight: var(--nx-typography-weight-medium);
+  line-height: var(--nx-typography-line-height-sm);
+  letter-spacing: var(--nx-typography-letterspacing-normal);
+  -webkit-font-smoothing: var(--nx-font-smoothing-webkit, auto);
+  -moz-osx-font-smoothing: var(--nx-font-smoothing-moz, auto);
+}
+
 @utility typography-code-block {
   font-family: var(--nx-typography-family-font-mono);
   font-size: var(--nx-typography-size-sm);

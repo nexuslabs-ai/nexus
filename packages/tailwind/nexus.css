@@ -15,6 +15,7 @@
 @import './borderwidth-utilities.css';
 @import './border-color-aliases.css';
 @import './motion-utilities.css';
+@import './icon-utilities.css';
 @import './spacing-utilities.css';
 
 @custom-variant dark (&:is(.dark *));
@@ -264,7 +265,7 @@
   );
   --color-primary-background-hover: var(
     --nx-color-primary-background-hover,
-    oklch(0.207 0 0)
+    oklch(0.297 0 0)
   );
   --color-primary-background-active: var(
     --nx-color-primary-background-active,
@@ -286,6 +287,10 @@
     oklch(0.87 0 0)
   );
   --color-primary-border: var(--nx-color-primary-border, oklch(0.87 0 0));
+  --color-primary-border-on-solid: var(
+    --nx-color-primary-border-on-solid,
+    oklch(1 0 0 / 0.24)
+  );
   --color-primary-border-active: var(
     --nx-color-primary-border-active,
     oklch(0.66 0 0)
@@ -442,6 +447,10 @@
     --nx-color-error-border,
     oklch(0.885 0.0747 27.394)
   );
+  --color-error-border-on-solid: var(
+    --nx-color-error-border-on-solid,
+    oklch(1 0 0 / 0.24)
+  );
   --color-border-error-active: var(
     --nx-color-border-error-active,
     oklch(0.704 0.2267 27.842)
@@ -571,6 +580,7 @@
   --nx-color-primary-subtle-hover: oklch(0.207 0 0);
   --nx-color-primary-subtle-active: oklch(0.297 0 0);
   --nx-color-primary-border: oklch(0.385 0 0);
+  --nx-color-primary-border-on-solid: oklch(0 0 0 / 0.24);
   --nx-color-primary-border-active: oklch(0.553 0 0);
   --nx-color-secondary-background: oklch(0.207 0 0);
   --nx-color-secondary-background-hover: oklch(0.385 0 0);
@@ -613,6 +623,7 @@
   --nx-color-error-subtle-hover: oklch(0.34 0.1487 28.057);
   --nx-color-error-subtle-active: oklch(0.42 0.1838 28.144);
   --nx-color-error-border: oklch(0.505 0.2209 27.946);
+  --nx-color-error-border-on-solid: oklch(1 0 0 / 0.24);
   --nx-color-border-error-active: oklch(0.637 0.2786 27.978);
   --nx-color-information-background: oklch(0.546 0.2205 255.276);
   --nx-color-information-background-hover: oklch(0.488 0.197 255.267);

@@ -43,13 +43,14 @@ export function pickSettings({
   return { name, email, updates };
 }
 
-// A loading Save is natively disabled, so a click-started save leaves focus on
-// <body> or the disabled Save. Put it back once the save settles; leave it if
-// the user moved on.
+// A loading Save blocks activation and a saved form disables it, so a
+// click-started save leaves focus on <body> or the blocked Save. Put it back
+// once the save settles; leave it if the user moved on.
 export function restoreDroppedFocus(field: HTMLInputElement | null) {
   const active = document.activeElement;
   const onOwnDisabled =
-    field?.form?.contains(active) && active?.matches(':disabled');
+    field?.form?.contains(active) &&
+    active?.matches(':disabled, [aria-disabled="true"]');
   if (active === document.body || onOwnDisabled) field?.focus();
 }
 
