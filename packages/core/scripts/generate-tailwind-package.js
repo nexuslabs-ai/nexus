@@ -538,6 +538,7 @@ function generateNexusCSS(
       './borderwidth-utilities.css',
       './border-color-aliases.css',
       './motion-utilities.css',
+      './icon-utilities.css',
       './spacing-utilities.css',
     ],
     tailwindPrefix: 'nx',
@@ -637,6 +638,24 @@ export async function generateTailwindPackage(
     usedModes
   );
   writeDistFile('variables.css', variablesCSS);
+
+  const iconTokens = extractTokens(
+    readTokenFile(path.join(PRIMITIVES_DIR, 'icon.json'))
+  );
+  const iconUtilities = iconTokens.map(({ path: tokenPath }) => {
+    const key = tokenPath.join('-');
+    return `@utility size-icon-${key} {
+  width: var(--nx-icon-${key});
+  height: var(--nx-icon-${key});
+}`;
+  });
+  writeDistFile(
+    'icon-utilities.css',
+    `/* Generated density-independent icon sizing. */
+
+${iconUtilities.join('\n\n')}
+`
+  );
 
   const typography = generateTypographyUtilitiesCSS(TOKENS_DIR, primitiveMap);
   if (typography.css) {

@@ -1,0 +1,28 @@
+{
+  "glyph": {
+    "xs": {
+      "$type": "dimension",
+      "$value": {
+        "value": 12,
+        "unit": "px"
+      },
+      "$description": "Extra-small icon and spinner dimensions; independent of density and typography scaling."
+    },
+    "sm": {
+      "$type": "dimension",
+      "$value": {
+        "value": 14,
+        "unit": "px"
+      },
+      "$description": "Small icon and spinner dimensions; independent of density and typography scaling."
+    },
+    "default": {
+      "$type": "dimension",
+      "$value": {
+        "value": 16,
+        "unit": "px"
+      },
+      "$description": "Default and large icon and spinner dimensions; independent of density and typography scaling."
+    }
+  }
+}

@@ -11,6 +11,7 @@ const FAMILY_LABELS: Record<CatalogueFamily, string> = {
   color: 'Color',
   typography: 'Typography',
   spacing: 'Spacing',
+  icon: 'Icon sizing',
   radius: 'Radius',
   borderwidth: 'Border width',
   shadow: 'Shadow',
