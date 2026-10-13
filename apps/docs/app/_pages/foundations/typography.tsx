@@ -126,10 +126,10 @@ export default function Typography() {
     <>
       <h1 className="nx:typography-heading-large">Typography</h1>
       <p className="nx:typography-body-default nx:text-muted-foreground nx:mt-2 nx:mb-8 nx:max-w-[64ch]">
-        One scale for the whole system. Every tier is a composite utility —
-        size, weight, line-height, and letter-spacing in one class — built on
-        the OS system font stack, with Georgia for editorial accents and the
-        system monospace stack for code.
+        One type scale covers the whole system. Each step is one class that sets
+        size, weight, line height and letter spacing. Text uses the system font,
+        with Georgia for editorial accents and the system monospace font for
+        code.
       </p>
 
       {/* ── The scale ───────────────────────────────────────── */}
@@ -138,9 +138,9 @@ export default function Typography() {
           The scale
         </SectionHeading>
         <p className="nx:typography-body-small nx:text-muted-foreground nx:mb-6 nx:max-w-[64ch]">
-          Twelve composite tiers across five groups. Most use normal (0)
-          letter-spacing; label-caps adds +0.8px for all-caps legibility, and
-          shortcut adds +1.6px for compact key-command hints.
+          Twelve steps in five groups. <code>label-caps</code> adds 0.8px letter
+          spacing so all-caps text stays readable. <code>shortcut</code> adds
+          1.6px for keyboard hints.
         </p>
         {SCALE.map((group) => (
           <div key={group.group} className="nx:mb-8">
@@ -170,7 +170,7 @@ export default function Typography() {
           Code
         </SectionHeading>
         <p className="nx:typography-body-small nx:text-muted-foreground nx:mb-4 nx:max-w-[64ch]">
-          Two monospace tiers — inline spans and fenced blocks.
+          Two monospace steps: one for inline code and one for code blocks.
         </p>
         <p className="nx:typography-body-default nx:mb-4">
           Reference a token inline with{' '}

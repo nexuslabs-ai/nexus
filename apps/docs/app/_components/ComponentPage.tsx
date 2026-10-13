@@ -10,6 +10,7 @@ import type { ManifestPage } from '../_lib/manifest';
 import { CodeSample } from './CodeSample';
 import { ComponentDemo } from './ComponentDemo';
 import { ComponentInstallation } from './ComponentInstallation';
+import { DescriptionText } from './DescriptionText';
 import {
   PAGE_HEADING_CLASS,
   SECTION_HEADING_CLASS,
@@ -39,6 +40,9 @@ export function ComponentPage({ page }: { page: ComponentManifestPage }) {
   return (
     <>
       <h1 className={PAGE_HEADING_CLASS}>{page.label}</h1>
+      {docs.description && (
+        <DescriptionText text={docs.description} className="nx:mb-6" />
+      )}
       <ComponentDemo id={previewId} />
       <InstallBlock
         slugs={preview.alsoInstall}
@@ -88,7 +92,7 @@ function Example({
   slug: string;
   previewId: DemoId;
 }) {
-  const { title, alsoInstall, packages }: Demo = demos[id];
+  const { title, description, alsoInstall, packages }: Demo = demos[id];
   const preview: Demo = demos[previewId];
 
   return (
@@ -99,6 +103,9 @@ function Example({
       >
         {title}
       </SubsectionHeading>
+      {description && (
+        <DescriptionText text={description} className="nx:mb-4" />
+      )}
       <ComponentDemo id={id} />
       <InstallBlock
         slugs={alsoInstall}
@@ -123,6 +130,9 @@ function PreviewlessComponentPage({
   return (
     <>
       <h1 className={PAGE_HEADING_CLASS}>{page.label}</h1>
+      {docs.description && (
+        <DescriptionText text={docs.description} className="nx:mb-6" />
+      )}
 
       <SectionHeading className={SECTION_HEADING_CLASS}>
         Installation

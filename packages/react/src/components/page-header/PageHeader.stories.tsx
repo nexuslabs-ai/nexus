@@ -37,7 +37,7 @@ const meta: Meta<typeof PageHeader> = {
     docs: {
       description: {
         component:
-          'Shared page and section anatomy. Compact, standard, and detail are compositions, not component variants. Title defaults to an h1 at heading-medium, the everyday size; LargeHeading opts into heading-large with className. Use asChild to choose the heading level for the document hierarchy. Compose metadata, a title row for inline status, content, and actions as needed. Action behavior belongs to the application. Actions wrap below content in narrow containers. Place page headers inside main and section headers inside their section.',
+          'PageHeader titles a page or section, with optional metadata, status, description and actions. Compact, standard and detail headers are compositions of the same parts, not variants.\n\n- The title renders an `h1`. Use `asChild` to pick another heading level.\n- For a larger title, add `className="nx:typography-heading-large"` to PageHeaderTitle.\n- Put page headers inside `main` and section headers inside their `section`.\n- Actions wrap below the content in narrow containers. Your app owns what they do.',
       },
     },
   },
@@ -158,6 +158,13 @@ function NotificationSettingsSection() {
 }
 export const SectionHeader: Story = {
   tags: ['docs'],
+  parameters: {
+    docs: {
+      description: {
+        story: 'Title a section inside a page with an `h2` through `asChild`.',
+      },
+    },
+  },
   render: () => <NotificationSettingsSection />,
   play: async ({ canvasElement }) => {
     await expect(
@@ -375,14 +382,37 @@ function TabbedHeader({
 
 export const Compact: Story = {
   tags: ['docs'],
+  parameters: {
+    docs: {
+      description: {
+        story: 'Pair a title with one small action for a dense page.',
+      },
+    },
+  },
   render: () => <CompactHeader />,
 };
 export const Detail: Story = {
   tags: ['docs'],
+  parameters: {
+    docs: {
+      description: {
+        story:
+          'Show a record with metadata, a status Badge in PageHeaderTitleRow and actions.',
+      },
+    },
+  },
   render: () => <DetailHeader />,
 };
 export const WithTabs: Story = {
   tags: ['docs'],
+  parameters: {
+    docs: {
+      description: {
+        story:
+          'Place Tabs under the header to switch between views of the page.',
+      },
+    },
+  },
   render: () => <TabbedHeader />,
   play: async ({ canvasElement }) => {
     const canvas = within(canvasElement);
@@ -398,6 +428,14 @@ export const WithTabs: Story = {
 };
 export const LargeHeading: Story = {
   tags: ['docs'],
+  parameters: {
+    docs: {
+      description: {
+        story:
+          'Add `nx:typography-heading-large` to the title for a larger heading.',
+      },
+    },
+  },
   render: () => (
     <PageHeader>
       <PageHeaderContent>

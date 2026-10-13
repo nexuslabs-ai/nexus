@@ -14,7 +14,10 @@ export async function ComponentDemo({ id }: { id: DemoId }) {
       lang="tsx"
       code={source}
       header={
-        <div className="nx:flex nx:min-h-44 nx:items-center nx:justify-center nx:p-8 nx:border-b nx:border-border-default nx:bg-background">
+        <div
+          data-md-skip
+          className="nx:flex nx:min-h-44 nx:items-center nx:justify-center nx:p-8 nx:border-b nx:border-border-default nx:bg-background"
+        >
           <Component />
         </div>
       }

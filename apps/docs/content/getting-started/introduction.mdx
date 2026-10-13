@@ -1,0 +1,75 @@
+# Introduction
+
+Nexus is a theme engine that ships React components, not a component library with a theme added on.
+
+You copy the components into your app and own them. The engine, `@nexus_ds/core`, produces every token those components use, from one appearance object. Change your brand color, density or corner style, and every component follows.
+
+## You own the components
+
+Every component is source code you paste into your project. Edit it like any other file. There is no package to wait on and no wrapper to fight.
+
+To update a component, paste the newer version over yours.
+
+## Inspired by shadcn/ui
+
+The idea that you should own your component source comes from [shadcn/ui](https://ui.shadcn.com). Nexus shares that philosophy, and we're grateful for the work that made it popular.
+
+Nexus is its own system, with its own theme engine, tokens and components. [Why Nexus](/getting-started/why-nexus#nexus-and-shadcn-ui) explains how the two differ. The open-source projects Nexus uses are listed in [Acknowledgements](/getting-started/why-nexus#acknowledgements).
+
+## One engine makes every token
+
+You don't write color values by hand. The engine builds the whole palette from your brand color and surface tone, including hover, pressed, disabled and dark-mode shades.
+
+Dark mode isn't a second list of colors to keep in sync. Light and dark come from the same function, so they can't drift apart.
+
+## Every part of the theme is a setting
+
+Color is one setting out of many. Density, corner radius, shadows, border width, type and motion are settings too.
+
+"Make this product denser" or "this brand needs square corners" is a one-line change, not a refactor. See [Appearance](/theming/appearance) for every field.
+
+## Contrast is checked, not eyeballed
+
+Every text and background pair has a minimum contrast score. CI checks every pair across many brand colors, surface tones and contrast settings. If any pair falls below its minimum, the build fails.
+
+Whatever brand color a user picks, the text stays readable.
+
+## It fits next to your app
+
+Every Nexus class starts with `nx:`, and every Nexus variable starts with `--nx-`. Nexus CSS defines nothing else, so your Tailwind config, classes and styles stay as they are. [Add Nexus to an existing app](/getting-started/install#add-nexus-to-an-existing-app) shows the setup.
+
+## Built for people and agents
+
+The docs are written in plain language, and every page is available as Markdown. Point an agent at [`/llms.txt`](/agents/llms-txt) to give it the whole site.
+
+The Nexus ESLint rules turn conventions into build errors. Someone who has never read the rules still can't break them.
+
+## When to use something else
+
+Nexus pays off when you have several products, several brands, or an app that must be re-themed per customer. For a smaller project, a simpler tool may fit better:
+
+- **One app, one theme.** A theme engine is overhead you won't get back. Use [shadcn/ui](https://ui.shadcn.com).
+- **You want a large ecosystem.** Most community blocks and registries target shadcn/ui's token names.
+- **You need a screen today.** Nexus asks you to adopt its token conventions first.
+
+[Why Nexus](/getting-started/why-nexus) explains each decision and compares Nexus with shadcn/ui.
+
+## FAQ
+
+**Is Nexus a component library?**
+Not in the usual sense. The components are copy-and-own source. The part you install from npm is the theme engine.
+
+**Do I need Tailwind?**
+Yes. Nexus builds its classes with Tailwind 4. Your app also needs a reset that sets `box-sizing: border-box`, such as Tailwind's Preflight or MUI's `CssBaseline`.
+
+**Does Nexus work outside React?**
+The engine does. It has no framework code, so any app can call it. The components are React only today.
+
+**Can I use my own brand colors?**
+Yes. Set `brandColor` to any CSS color, and Nexus builds the palette from it.
+
+## Next steps
+
+- **[Install](/getting-started/install)**: set up your app and copy in your first component.
+- **[Why Nexus](/getting-started/why-nexus)**: the problems Nexus solves, and how.
+- **[Create](/create)**: design a theme live, then copy it into your app.

@@ -57,10 +57,10 @@ export default function Radius() {
     <>
       <h1 className="nx:typography-heading-large">Radius, borders & shadows</h1>
       <p className="nx:typography-body-default nx:text-muted-foreground nx:mt-2 nx:mb-8 nx:max-w-[64ch]">
-        Three independent appearance axes, each a runtime mode swapped through
-        the theme picker (bottom-right). Corner radius, border width, and
-        elevation move separately — set the Radius, Border, and Shadow controls
-        and watch each specimen below re-render on its own axis.
+        Corner radius, border width and shadow are three separate theme fields.
+        Change <code>corners</code> (Radius in the theme picker),{' '}
+        <code>stroke</code> (Border Width) or <code>elevation</code> (Shadow),
+        and the matching examples update.
       </p>
 
       {/* ── Radius ──────────────────────────────────────────── */}
@@ -69,10 +69,10 @@ export default function Radius() {
           Radius
         </SectionHeading>
         <p className="nx:typography-body-default nx:text-muted-foreground nx:mb-4 nx:max-w-[64ch]">
-          Nine radius utilities. Eight react to the active Radius mode; full
-          stays pinned at 9999px. Swap the mode and the rest re-round.
+          Nexus has nine radius utilities. Eight follow <code>corners</code>.{' '}
+          <code>full</code> is always 9999px.
         </p>
-        <div className="nx:flex nx:flex-wrap nx:gap-6 nx:mb-6">
+        <div data-md-skip className="nx:flex nx:flex-wrap nx:gap-6 nx:mb-6">
           {RADII.map((r) => (
             <div
               key={r.label}
@@ -120,9 +120,10 @@ export default function Radius() {
           Border widths
         </SectionHeading>
         <p className="nx:typography-body-default nx:text-muted-foreground nx:mb-4 nx:max-w-[64ch]">
-          The picker offers three distinct border-width designs. The box below
-          sets its width from the runtime <code>--nx-borderwidth-thick</code>{' '}
-          var, so it thickens or thins as you swap the Border control.
+          Each <code>stroke</code> mode sets three widths: thin, default and
+          thick. The sample box after the table uses{' '}
+          <code>--nx-borderwidth-thick</code>, so it changes with{' '}
+          <code>stroke</code>.
         </p>
         <div className="nx:overflow-x-auto nx:mb-6">
           <table className="nx:w-full nx:min-w-[360px] nx:border-collapse nx:typography-label-default">
@@ -179,12 +180,11 @@ export default function Radius() {
           Shadows
         </SectionHeading>
         <p className="nx:typography-body-default nx:text-muted-foreground nx:mb-4 nx:max-w-[64ch]">
-          Seven elevation tiers plus an inset shadow, each reacting to the
-          active Shadow mode. Shadows are theme-split — tuned per light and
-          dark, since a drop-shadow that defines a card edge in light vanishes
-          against a near-black dark canvas.
+          Nexus has seven shadow levels and an inset shadow. All of them follow{' '}
+          <code>elevation</code>. Light and dark mode have separate shadows,
+          because a light-mode shadow disappears on a dark background.
         </p>
-        <div className="nx:flex nx:flex-wrap nx:gap-6 nx:mb-6">
+        <div data-md-skip className="nx:flex nx:flex-wrap nx:gap-6 nx:mb-6">
           {SHADOWS.map((s) => (
             <div
               key={s.label}

@@ -24,19 +24,14 @@ import {
 /**
  * ComboboxProps
  *
- * Props for the Combobox root. Inherits the Popover root props (`open`,
- * `onOpenChange`, `defaultOpen`, `modal`, …).
+ * Props for the Combobox root. Accepts the Popover root props, such as `open`
+ * and `onOpenChange`.
  */
 interface ComboboxProps extends React.ComponentProps<typeof Popover> {}
 
 /**
- * Combobox
- *
- * A searchable single-select field: a Popover trigger paired with the cmdk-powered
- * Command list. cmdk owns filtering, keyboard navigation, active-descendant
- * tracking, and ARIA — the combobox only composes the pieces. The selected
- * `value` and the popover `open` state are controlled at the call site; the
- * root owns no internal value, matching the composition (shadcn) model.
+ * A searchable single-select field built from a Popover and a Command list.
+ * Hold the selected value and the `open` state in your own component.
  *
  * @example
  * ```tsx
@@ -77,18 +72,14 @@ function Combobox(props: ComboboxProps) {
 /**
  * ComboboxTriggerProps
  *
- * Props for the ComboboxTrigger. Inherits Button props, so `size`, `disabled`,
- * and `aria-invalid` flow through to the underlying control.
+ * Props for the ComboboxTrigger. Accepts Button props, such as `size`,
+ * `disabled` and `aria-invalid`.
  */
 interface ComboboxTriggerProps extends ButtonProps {}
 
 /**
- * ComboboxTrigger
- *
- * The button that opens the popover, showing the current selection. Renders an
- * outline Button by default with a trailing selector affordance. Radix supplies
- * `aria-expanded` and focus return; the real combobox semantics live on the
- * ComboboxInput inside the popover.
+ * The button that opens the popover and shows the current selection. Renders an
+ * outline Button with a trailing selector icon.
  */
 function ComboboxTrigger({
   children,
@@ -122,24 +113,19 @@ function ComboboxTrigger({
 /**
  * ComboboxContentProps
  *
- * Props for the ComboboxContent. Inherits PopoverContent props.
+ * Props for the ComboboxContent. Accepts PopoverContent props.
  */
 interface ComboboxContentProps extends PopoverContentProps {
   /**
-   * Accessible name for the search field and its popup. cmdk applies it to the
-   * combobox input (via `aria-labelledby`), and it names the popover dialog. Set
-   * it to the field's purpose, e.g. the associated label text.
+   * Accessible name for the search field and popover. Use the field's label text.
    * @default 'Options'
    */
   label?: string;
 }
 
 /**
- * ComboboxContent
- *
- * The floating panel: a PopoverContent that hosts the Command. Matches the
- * trigger width by default and drops the popover's inner padding so the Command's
- * input bar and list own the spacing.
+ * The floating panel that holds the search field and options. Matches the
+ * trigger width by default.
  */
 function ComboboxContent({
   align = 'start',
@@ -178,10 +164,7 @@ interface ComboboxInputProps extends React.ComponentProps<
 > {}
 
 /**
- * ComboboxInput
- *
- * The search field. cmdk wires it as the actual `role="combobox"` control that
- * owns `aria-activedescendant`, `aria-controls`, and `aria-expanded`.
+ * The search field. It is the element with `role="combobox"`.
  */
 function ComboboxInput({ className, ...props }: ComboboxInputProps) {
   return (
@@ -197,9 +180,7 @@ function ComboboxInput({ className, ...props }: ComboboxInputProps) {
 interface ComboboxListProps extends React.ComponentProps<typeof CommandList> {}
 
 /**
- * ComboboxList
- *
- * The scrollable `role="listbox"` container for options, empty state, and groups.
+ * The scrollable list that holds options, groups and the empty state.
  */
 function ComboboxList({ className, ...props }: ComboboxListProps) {
   return (
@@ -217,9 +198,7 @@ interface ComboboxEmptyProps extends React.ComponentProps<
 > {}
 
 /**
- * ComboboxEmpty
- *
- * Rendered by cmdk when the query matches no options.
+ * Shown when the search matches no options.
  */
 function ComboboxEmpty({ className, ...props }: ComboboxEmptyProps) {
   return (
@@ -241,8 +220,6 @@ interface ComboboxGroupProps extends React.ComponentProps<
 > {}
 
 /**
- * ComboboxGroup
- *
  * Groups related options under an optional `heading`.
  */
 function ComboboxGroup({ className, ...props }: ComboboxGroupProps) {
@@ -261,8 +238,6 @@ interface ComboboxSeparatorProps extends React.ComponentProps<
 > {}
 
 /**
- * ComboboxSeparator
- *
  * A decorative divider between groups or options.
  */
 function ComboboxSeparator({ className, ...props }: ComboboxSeparatorProps) {
@@ -282,22 +257,18 @@ function ComboboxSeparator({ className, ...props }: ComboboxSeparatorProps) {
  */
 interface ComboboxItemProps extends React.ComponentProps<typeof CommandItem> {
   /**
-   * Marks this option as the current selection, showing the check indicator.
+   * Marks the option as the current selection with a check.
    * @default false
    */
   selected?: boolean;
 }
 
 /**
- * ComboboxItem
+ * A selectable option. Search matches `value` and `keywords`, not the visible
+ * text, so pass the label in `keywords`.
  *
- * A selectable option. cmdk marks the pointer/keyboard-active item with
- * `data-selected`; `selected` marks the chosen value with a trailing check.
- *
- * cmdk filters on each item's `value` + `keywords`, never its rendered children
- * — pass the visible label as a `keyword` so typing it matches. `onSelect`
- * receives the trimmed `value` (case preserved); compare it against the
- * option's `value` directly at the call site.
+ * `onSelect` receives the trimmed `value` with its case kept. The highlighted
+ * option gets `data-selected`, and `selected` adds the check.
  */
 function ComboboxItem({
   children,

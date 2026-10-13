@@ -79,12 +79,17 @@ const meta = {
     layout: 'centered',
     controls: { disable: true },
     docs: {
+      description: {
+        component:
+          'TextFilter filters records whose text contains, equals, does not equal or starts with a value, or is empty or not empty. Use it for free-text fields such as names or titles. For a fixed set of values, use ChoiceFilter or MultiChoiceFilter.',
+      },
       page: () => (
         <>
           <Title />
           <p>
-            Filter by text a record contains, starts with, or equals. The text
-            is a draft until you press Apply.
+            Filter records whose text contains, equals, does not equal or starts
+            with a value, or is empty or not empty. The text is a draft until
+            you press Apply.
           </p>
           <h2>When to use it</h2>
           <p>

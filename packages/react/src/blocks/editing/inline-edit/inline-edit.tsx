@@ -20,21 +20,20 @@ export interface InlineEditProps extends Omit<
   value: string;
   label: string;
   /**
-   * Receives the trimmed draft. Return a promise to keep the editor open
-   * until it settles: resolving closes the editor, rejecting keeps the draft
-   * open so the consumer can show `error` and the user can retry.
+   * Gets the trimmed draft. Resolving closes the editor. Rejecting keeps the
+   * draft open so the user can retry, so pass `error`.
    */
   onCommit: InlineEditCommit;
-  /** Whether the editor is open. Omit to let InlineEdit manage it. */
+  /** Opens the editor. Omit it to let InlineEdit manage this. */
   editing?: boolean;
   onEditingChange?: (editing: boolean) => void;
-  /** Renders the value without an edit trigger. */
+  /** Shows the value with no edit trigger. */
   readOnly?: boolean;
-  /** Consumer-owned validation or save error, shown while the editor is open. */
+  /** Validation or save error, shown while the editor is open. */
   error?: React.ReactNode;
-  /** `pencil` shows an edit button beside the value; `click` makes the value itself the edit button. */
+  /** `pencil` adds an edit button beside the value. `click` makes the value the button. */
   activation?: 'pencil' | 'click';
-  /** What happens when focus leaves the entire editor, including its actions. */
+  /** What happens when focus leaves the editor and its buttons. */
   blurBehavior?: InlineEditBlurBehavior;
   required?: boolean;
   /** Shown when a required value is saved empty. Defaults to `{label} is required.` */
@@ -278,8 +277,8 @@ function InlineEditPencilTrigger({
 }
 
 /**
- * A single-line editor. Consumers own the committed value, persistence, and
- * any save error; `editing` / `onEditingChange` control when the editor is open.
+ * Edits one line of text in place. Your app owns the saved value, saving and
+ * any error. `editing` and `onEditingChange` control when the editor is open.
  */
 export function InlineEdit({
   value,

@@ -34,8 +34,6 @@ const nativeSelectVariants = cva(
 );
 
 /**
- * NativeSelectProps
- *
  * Props for the NativeSelect component.
  */
 interface NativeSelectProps
@@ -44,14 +42,9 @@ interface NativeSelectProps
     VariantProps<typeof nativeSelectVariants> {}
 
 /**
- * NativeSelect
- *
- * A styled wrapper over the native `<select>` — on mobile it opens the OS
- * picker (iOS wheel / Android sheet), the preferred dense-form UX there. The
- * open list is OS-rendered. For rich options (icons, descriptions, grouping)
- * on desktop, use `Select`. The `variant="bordered"` treatment is the default;
- * use `variant="borderless"` to remove the resting field stroke while keeping a
- * tonal control fill for resting affordance.
+ * Styled native `<select>` that opens the system picker on mobile. Set
+ * `variant="borderless"` to drop the border and keep a tinted fill. For a
+ * styled dropdown, use `Select`. For search, use `Combobox`.
  *
  * @example
  * ```tsx
@@ -89,10 +82,7 @@ function NativeSelect({
 }
 
 /**
- * NativeSelectOption
- *
- * An `<option>` for `NativeSelect`. Uses the `Canvas` / `CanvasText` system
- * colors so the OS-rendered list stays legible in both light and dark themes.
+ * `<option>` for `NativeSelect`. Stays readable in light and dark themes.
  */
 function NativeSelectOption({
   className,
@@ -108,9 +98,7 @@ function NativeSelectOption({
 }
 
 /**
- * NativeSelectOptGroup
- *
- * An `<optgroup>` for grouping `NativeSelect` options.
+ * `<optgroup>` for grouping `NativeSelect` options.
  */
 function NativeSelectOptGroup({
   className,

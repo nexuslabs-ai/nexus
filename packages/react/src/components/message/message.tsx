@@ -4,17 +4,13 @@ import { cn } from '../../lib/utils';
 import { Avatar } from '../avatar';
 
 /**
- * MessageGroupProps
- *
  * Props for the MessageGroup component.
  */
 interface MessageGroupProps extends React.ComponentProps<'div'> {
   /**
-   * Announce turns as they arrive, for a live assistant or chat stream. Leave
-   * it off for a static transcript, and for one that pages or virtualises.
-   *
-   * Text streaming into an existing turn is announced too, so set `aria-busy`
-   * on that turn until the reply finishes — otherwise every chunk is read out.
+   * Announces new turns in a live chat. Leave it off for static, paged or
+   * virtualised transcripts, and set `aria-busy` on a turn while its reply
+   * streams.
    *
    * @default false
    * @example
@@ -26,11 +22,8 @@ interface MessageGroupProps extends React.ComponentProps<'div'> {
 }
 
 /**
- * MessageGroup
- *
- * A vertical stack of conversational turns. No ARIA `list` role is imposed —
- * `Message` is also used standalone, so list semantics are the consumer's to
- * add when the stack is genuinely one.
+ * Vertical stack of conversation turns. It adds no list role, so add list
+ * roles if the stack is a list.
  */
 function MessageGroup({
   className,
@@ -51,19 +44,13 @@ function MessageGroup({
 }
 
 /**
- * MessageProps
- *
  * Props for the Message component.
  */
 interface MessageProps extends React.ComponentProps<'div'> {
   /**
-   * Which side of the conversation the turn belongs to, and the only place it
-   * is declared — `MessageContent` aligns its own children to match, so a
-   * nested `Bubble` needs no `align` of its own.
-   *
-   * Logical, not physical: `end` reverses the row along the inline axis, so
-   * the avatar rail moves to the left under `dir="rtl"` and to the right under
-   * `dir="ltr"`.
+   * Side of the conversation the turn sits on, mirrored under `dir="rtl"`.
+   * `MessageContent` aligns its children to match, so a `Bubble` needs no
+   * `align`.
    *
    * @default 'start'
    */
@@ -71,16 +58,9 @@ interface MessageProps extends React.ComponentProps<'div'> {
 }
 
 /**
- * Message
- *
- * The layout scaffold for one conversational turn — an avatar rail beside a
- * content column carrying header, body, and footer. Presentational only: it
- * holds no chat state, no speaker identity, and no scroll behaviour. The turn's
- * body is whatever is composed inside `MessageContent`, typically `Bubble` or
- * `Attachment`.
- *
- * The row itself carries no role; `MessageGroup`'s `announce` decides whether
- * the conversation is announced.
+ * Layout for one conversation turn, with an avatar beside the header, body
+ * and footer. Put the body, usually a `Bubble` or `Attachment`, in
+ * `MessageContent`.
  *
  * @example
  * ```tsx
@@ -115,15 +95,12 @@ function Message({ className, align = 'start', ...props }: MessageProps) {
 }
 
 /**
- * MessageAvatarProps
- *
  * Props for the MessageAvatar component.
  */
 interface MessageAvatarProps extends React.ComponentProps<typeof Avatar> {
   /**
-   * Reserve the rail's width without painting anything. Use it on the
-   * continuation turns of a consecutive run so their bodies stay aligned with
-   * the first turn's, which shows the real avatar.
+   * Keeps the avatar's space but hides it. Use it on follow-up turns from the
+   * same speaker so their bodies line up with the first turn.
    *
    * @default false
    * @example
@@ -135,11 +112,8 @@ interface MessageAvatarProps extends React.ComponentProps<typeof Avatar> {
 }
 
 /**
- * MessageAvatar
- *
- * The turn's speaker portrait. Renders `Avatar`, so it takes `AvatarImage` and
- * `AvatarFallback` children and the full size and shape scale; it pins the
- * avatar to the top of the content column and defaults to the denser `sm` size.
+ * Avatar of the speaker, pinned to the top of the turn. Takes the same
+ * children and props as `Avatar`, and uses the `sm` size unless you set one.
  *
  * @example
  * ```tsx
@@ -167,19 +141,13 @@ function MessageAvatar({
 }
 
 /**
- * MessageContentProps
- *
  * Props for the MessageContent component.
  */
 interface MessageContentProps extends React.ComponentProps<'div'> {}
 
 /**
- * MessageContent
- *
- * The column beside the avatar holding the turn's header, body, and footer.
- *
- * Under `align="end"` it aligns its own direct children to the inline end, so
- * the turn's side is set once on `Message` rather than repeated on the body.
+ * Column beside the avatar for the header, body and footer of the turn.
+ * Aligns its children to the side set by `align` on `Message`.
  */
 function MessageContent({ className, ...props }: MessageContentProps) {
   return (
@@ -198,17 +166,13 @@ const messageMetaClassName =
   'nx:flex nx:max-w-full nx:items-center nx:gap-2 nx:px-4 nx:wrap-anywhere nx:typography-label-small nx:text-muted-foreground';
 
 /**
- * MessageHeaderProps
- *
  * Props for the MessageHeader component.
  */
 interface MessageHeaderProps extends React.ComponentProps<'div'> {}
 
 /**
- * MessageHeader
- *
- * The metadata line above the turn — speaker name, timestamp, or role label.
- * Its inline padding matches `Bubble`'s, so the text sits flush with the body.
+ * Line above the turn for the speaker name, time or role.
+ * Its text lines up with the text inside a `Bubble`.
  */
 function MessageHeader({ className, ...props }: MessageHeaderProps) {
   return (
@@ -221,16 +185,12 @@ function MessageHeader({ className, ...props }: MessageHeaderProps) {
 }
 
 /**
- * MessageFooterProps
- *
  * Props for the MessageFooter component.
  */
 interface MessageFooterProps extends React.ComponentProps<'div'> {}
 
 /**
- * MessageFooter
- *
- * The metadata line below the turn — delivery state, timestamp, or actions.
+ * Line below the turn for delivery status, time or actions.
  */
 function MessageFooter({ className, ...props }: MessageFooterProps) {
   return (

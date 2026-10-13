@@ -17,7 +17,7 @@ const meta: Meta<typeof DescriptionList> = {
     docs: {
       description: {
         component:
-          'Compose one term and description per item. Values, formatting, missing-value text and actions belong to the consumer. Put actions inside DescriptionListDescription. Rows stack in narrow containers and align in two columns when the list has enough room.',
+          'DescriptionList shows metadata as term and value pairs.\n\n- Wrap each term and its value in a DescriptionListItem.\n- Format values and missing-value text yourself.\n- Put actions inside DescriptionListDescription.\n- Rows stack in narrow containers and form two columns when the list has room.',
       },
     },
   },
@@ -60,6 +60,14 @@ export const Default: Story = {
 
 export const FileMetadata: Story = {
   tags: ['docs'],
+  parameters: {
+    docs: {
+      description: {
+        story:
+          'List file details, with a `time` element for the modified date.',
+      },
+    },
+  },
   render: () => (
     <DescriptionList>
       <DescriptionListItem>
@@ -84,6 +92,13 @@ export const FileMetadata: Story = {
 
 export const Configuration: Story = {
   tags: ['docs'],
+  parameters: {
+    docs: {
+      description: {
+        story: 'Mix plain text and a Badge to show settings and their status.',
+      },
+    },
+  },
   render: () => (
     <DescriptionList>
       <DescriptionListItem>

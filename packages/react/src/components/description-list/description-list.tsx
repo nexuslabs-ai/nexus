@@ -2,7 +2,7 @@ import * as React from 'react';
 
 import { cn } from '../../lib/utils';
 
-/** Metadata expressed as term/value rows. Place actions inside the description. */
+/** Shows metadata as term and value rows. Put actions inside the description. */
 function DescriptionList({ className, ...props }: React.ComponentProps<'dl'>) {
   return (
     <dl
@@ -16,7 +16,7 @@ function DescriptionList({ className, ...props }: React.ComponentProps<'dl'>) {
   );
 }
 
-/** Group one term and its description; rows adapt to the list's available width. */
+/** Groups one term and its description. Stacks until the list has room for two columns. */
 function DescriptionListItem({
   className,
   ...props

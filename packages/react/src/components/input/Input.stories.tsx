@@ -20,6 +20,12 @@ const meta: Meta<typeof Input> = {
   ],
   parameters: {
     layout: 'padded',
+    docs: {
+      description: {
+        component:
+          'Input collects one line of text. Give every input a visible label or an `aria-label`. For several lines of text, use Textarea.',
+      },
+    },
   },
   args: {
     onChange: fn(),
@@ -30,25 +36,25 @@ const meta: Meta<typeof Input> = {
     size: {
       control: 'select',
       options: ['default', 'sm', 'lg'],
-      description: 'The size of the input',
+      description: 'Field size.',
     },
     variant: {
       control: 'select',
       options: ['bordered', 'borderless', 'ghost'],
-      description: 'The visual treatment of the input',
+      description: 'Stroke and fill treatment.',
     },
     type: {
       control: 'select',
       options: ['text', 'email', 'password', 'number', 'search', 'tel', 'url'],
-      description: 'The type of the input',
+      description: 'Native input type.',
     },
     disabled: {
       control: 'boolean',
-      description: 'Whether the input is disabled',
+      description: 'Prevents interaction.',
     },
     placeholder: {
       control: 'text',
-      description: 'Placeholder text',
+      description: 'Hint text shown while the field is empty.',
     },
   },
 };
@@ -125,6 +131,13 @@ export const TypeEmail: Story = {
 
 export const WithLabel: Story = {
   tags: ['docs'],
+  parameters: {
+    docs: {
+      description: {
+        story: 'Link a Label to the input with `htmlFor` and a matching `id`.',
+      },
+    },
+  },
   render: function WithLabelStory() {
     const inputId = React.useId();
 
@@ -139,6 +152,13 @@ export const WithLabel: Story = {
 
 export const Disabled: Story = {
   tags: ['docs'],
+  parameters: {
+    docs: {
+      description: {
+        story: 'Set `disabled` to block editing and dim the field.',
+      },
+    },
+  },
   args: {
     placeholder: 'Disabled input',
     disabled: true,
@@ -155,6 +175,13 @@ export const DisabledWithValue: Story = {
 
 export const Invalid: Story = {
   tags: ['docs'],
+  parameters: {
+    docs: {
+      description: {
+        story: 'Set `aria-invalid` to show the error border.',
+      },
+    },
+  },
   args: {
     defaultValue: 'invalid@',
     'aria-invalid': true,
@@ -302,7 +329,7 @@ export const BorderlessSurfaceComparison: Story = {
     docs: {
       description: {
         story:
-          'Borderless inputs use the solid control-background surface with the matching control-background-hover state so the resting fill is backdrop-independent.',
+          'A borderless input keeps the same solid fill on any background.',
       },
     },
   },
@@ -374,7 +401,7 @@ export const ReadOnlyVsDisabled: Story = {
     docs: {
       description: {
         story:
-          'Read-only keeps the control focusable and submittable while preventing edits. Disabled removes the control from editing and native form submission. Input has no special read-only visual treatment today, so pair read-only fields with helper copy when the distinction matters.',
+          'A read-only field stays focusable and submits with the form. A disabled field does neither. Read-only looks editable, so add helper text.',
       },
     },
   },
@@ -436,7 +463,7 @@ export const WarningVsError: Story = {
     docs: {
       description: {
         story:
-          'Warning is advisory guidance and must not set `aria-invalid`. Error means the current value is invalid, so it uses `aria-invalid` and an error message relationship. First-class warning source semantics are intentionally left for a future iteration.',
+          "Don't set `aria-invalid` for a warning. For an error, set it and link the error message.",
       },
     },
   },
@@ -619,7 +646,7 @@ export const VisualStateTokens: Story = {
     docs: {
       description: {
         story:
-          'Pins the hover and disabled state classes to Nexus semantic tokens. The primitive remains a native input.',
+          'Hover and disabled states on the native input use Nexus semantic tokens.',
       },
     },
   },
@@ -808,6 +835,11 @@ export const AllVariants: Story = {
   ),
   parameters: {
     layout: 'padded',
+    docs: {
+      description: {
+        story: 'Compare every size, variant, state and type side by side.',
+      },
+    },
   },
 };
 

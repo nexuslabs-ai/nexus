@@ -11,16 +11,12 @@ import * as RechartsPrimitive from 'recharts';
 import { cn } from '../../lib/utils';
 
 /**
- * Per-series chart configuration. Each key matches a series `dataKey`; the
- * `color` is exposed as a `--color-{key}` CSS variable on the chart root so a
- * series can reference its colour with `fill="var(--color-{key})"`. Keys used
- * for generated color variables must contain only letters, numbers, `_`, or
- * `-`; other keys can still provide labels and icons.
+ * Label, icon and color for each series, keyed by the series `dataKey`.
+ * Each `color` becomes a `--color-{key}` variable, so a series can use `fill="var(--color-{key})"`.
+ * Keys with a `color` may use only letters, numbers, `_` and `-`.
  *
- * Nexus semantic tokens already adapt across light/dark, so there is no
- * `theme: { light, dark }` split. Point `color` at a Nexus chart token
- * (`var(--nx-color-chart-categorical-N)`) and it tracks the theme for you.
- * Treat `color` as trusted component CSS, not user-provided data.
+ * Set `color` to a chart token, such as `var(--nx-color-chart-categorical-1)`, so it follows light and dark mode.
+ * Treat `color` as trusted CSS, not user data.
  */
 export type ChartConfig = {
   [key: string]: {

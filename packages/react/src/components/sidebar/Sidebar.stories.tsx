@@ -51,6 +51,12 @@ const meta: Meta<typeof Sidebar> = {
   title: 'Components/Sidebar',
   component: Sidebar,
   parameters: {
+    docs: {
+      description: {
+        component:
+          "Sidebar is the app's main navigation panel. It collapses to an icon rail or off screen, and opens as a Sheet on narrow screens. Wrap the app shell in `SidebarProvider` and put the page content in `SidebarInset`.",
+      },
+    },
     layout: 'fullscreen',
   },
 };
@@ -229,9 +235,7 @@ export const Expanded: Story = {
 };
 
 /**
- * Visual grid reference for every `SidebarMenuButton` variant, size, and the
- * `asChild` composition. Uses `collapsible="none"` and a bounded height so the
- * panel sits inline (not viewport-fixed).
+ * Every `SidebarMenuButton` variant and size, plus an `asChild` link, in an inline panel.
  */
 export const AllVariants: Story = {
   tags: ['docs'],
@@ -305,6 +309,13 @@ export const Collapsed: Story = {
 
 export const WithSubmenu: Story = {
   tags: ['docs'],
+  parameters: {
+    docs: {
+      description: {
+        story: 'Nest pages under a menu item with `SidebarMenuSub`.',
+      },
+    },
+  },
   render: () => (
     <div className="nx:h-96 nx:w-full nx:overflow-hidden nx:rounded-lg nx:border-default nx:border-border-default">
       <SidebarProvider style={{ minHeight: 'unset', height: '100%' }}>
@@ -748,10 +759,7 @@ export const StylingContracts: Story = {
 };
 
 /**
- * The kitchen-sink view: a workspace switcher + search in the header, two
- * labelled groups with a group action, menu items carrying badges, a row
- * action, two nested sub-menus (each with an active child), a separator, and
- * an account footer — most of the sidebar's parts in one tree.
+ * A full sidebar that uses most parts together, from the workspace switcher to nested submenus.
  */
 export const Complex: Story = {
   name: 'Complex (kitchen sink)',
@@ -886,13 +894,16 @@ export const Complex: Story = {
   ),
 };
 
-/**
- * Every row at `size="sm"` — the compact option, rendering text at
- * `body-small` (12px) for information-dense sidebars. Sub-items use the small
- * size too.
- */
 export const Compact: Story = {
   tags: ['docs'],
+  parameters: {
+    docs: {
+      description: {
+        story:
+          'Set `size="sm"` on every row for a denser sidebar with 12px text.',
+      },
+    },
+  },
   render: () => (
     <div className="nx:h-96 nx:w-full nx:overflow-hidden nx:rounded-lg nx:border-default nx:border-border-default">
       <SidebarProvider style={{ minHeight: 'unset', height: '100%' }}>
@@ -967,14 +978,16 @@ export const Compact: Story = {
   ),
 };
 
-/**
- * The minimal shape: a flat `SidebarMenu` of buttons with no group wrapper or
- * label. `SidebarGroup`/`-Label`/`-Content` are dropped; the `SidebarMenu` /
- * `SidebarMenuItem` list stays (accessibility + badge/action anchoring). The
- * `p-2` that `SidebarGroup` normally supplies is moved onto `SidebarContent`.
- */
 export const Flat: Story = {
   tags: ['docs'],
+  parameters: {
+    docs: {
+      description: {
+        story:
+          'Skip the group parts and put `nx:p-2` on `SidebarContent` for a flat list of links.',
+      },
+    },
+  },
   render: () => (
     <div className="nx:h-96 nx:w-full nx:overflow-hidden nx:rounded-lg nx:border-default nx:border-border-default">
       <SidebarProvider style={{ minHeight: 'unset', height: '100%' }}>

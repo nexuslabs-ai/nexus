@@ -14,6 +14,12 @@ const meta: Meta<typeof Switch> = {
     onCheckedChange: fn(),
   },
   parameters: {
+    docs: {
+      description: {
+        component:
+          'Switch turns a setting on or off right away, with no save step. Pair it with a Label so the label text is clickable too. For a choice that waits for a Save button, use Checkbox.',
+      },
+    },
     layout: 'padded',
   },
 };
@@ -47,6 +53,13 @@ export const WithLabel: Story = {
 
 export const Checked: Story = {
   tags: ['docs'],
+  parameters: {
+    docs: {
+      description: {
+        story: 'Set `defaultChecked` to start the switch in the on position.',
+      },
+    },
+  },
   args: {
     'aria-label': 'Toggle switch',
     defaultChecked: true,
@@ -55,6 +68,13 @@ export const Checked: Story = {
 
 export const Disabled: Story = {
   tags: ['docs'],
+  parameters: {
+    docs: {
+      description: {
+        story: 'A disabled switch shows muted colors and ignores clicks.',
+      },
+    },
+  },
   args: {
     'aria-label': 'Toggle switch',
     disabled: true,
@@ -142,6 +162,13 @@ export const Invalid: Story = {
 
 export const Small: Story = {
   tags: ['docs'],
+  parameters: {
+    docs: {
+      description: {
+        story: 'Set `size="sm"` for dense rows.',
+      },
+    },
+  },
   args: {
     size: 'sm',
     'aria-label': 'Toggle switch',
@@ -178,6 +205,13 @@ export const WithLabelAndDescription: Story = {
 
 export const LabelOnLeft: Story = {
   tags: ['docs'],
+  parameters: {
+    docs: {
+      description: {
+        story: 'Put the label and description on the left of a settings row.',
+      },
+    },
+  },
   render: function LabelOnLeftStory() {
     const switchId = React.useId();
     const descriptionId = React.useId();

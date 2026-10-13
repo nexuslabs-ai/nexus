@@ -7,6 +7,14 @@ import { Kbd, KbdGroup } from './kbd';
 const meta: Meta<typeof Kbd> = {
   title: 'Components/Kbd',
   component: Kbd,
+  parameters: {
+    docs: {
+      description: {
+        component:
+          'Kbd shows a keyboard key, such as `Esc` or `⌘`. Use it to document shortcuts. For a key combination, wrap several Kbd elements in KbdGroup.',
+      },
+    },
+  },
 };
 
 export default meta;
@@ -30,6 +38,13 @@ export const Default: Story = {
 // labels grow to fit.
 export const SingleKeys: Story = {
   tags: ['docs'],
+  parameters: {
+    docs: {
+      description: {
+        story: 'Show single keys as caps that widen to fit longer labels.',
+      },
+    },
+  },
   render: () => (
     <div className="nx:flex nx:items-center nx:gap-2">
       <Kbd>⌘</Kbd>
@@ -45,6 +60,13 @@ export const SingleKeys: Story = {
 // Existing child composition supports chords that use a literal separator.
 export const SeparatedChord: Story = {
   tags: ['docs'],
+  parameters: {
+    docs: {
+      description: {
+        story: 'Put a literal `+` between keys inside a KbdGroup.',
+      },
+    },
+  },
   render: () => (
     <KbdGroup className="nx:gap-2">
       <Kbd>⌘</Kbd>
@@ -57,6 +79,13 @@ export const SeparatedChord: Story = {
 // SVG children inherit the keycap icon sizing hook.
 export const WithIcon: Story = {
   tags: ['docs'],
+  parameters: {
+    docs: {
+      description: {
+        story: 'Place an icon inside a key cap, sized to match the text.',
+      },
+    },
+  },
   render: () => (
     <Kbd>
       <IconSearch aria-hidden />K

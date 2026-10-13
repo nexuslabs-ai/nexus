@@ -3,19 +3,13 @@ import * as React from 'react';
 import { cn } from '../../lib/utils';
 
 /**
- * SkeletonProps
- *
- * Props for the Skeleton component.
+ * Props for Skeleton.
  */
 interface SkeletonProps extends React.ComponentProps<'div'> {}
 
 /**
- * Skeleton
- *
- * A pulsing placeholder block for loading states. Render one — or a cluster —
- * in place of content that hasn't arrived yet to hold the layout and signal
- * that something is coming. Shape and size come from consumer utilities:
- * `nx:h-*` / `nx:w-*` for a bar, `nx:size-* nx:rounded-full` for a circle.
+ * Pulsing placeholder that holds the layout while content loads. Set its shape
+ * with utilities, such as `nx:h-4 nx:w-48` or `nx:size-12 nx:rounded-full`.
  *
  * @example
  * ```tsx

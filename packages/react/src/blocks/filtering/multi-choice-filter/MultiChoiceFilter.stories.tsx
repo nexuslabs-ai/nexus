@@ -99,6 +99,10 @@ const meta = {
     layout: 'centered',
     controls: { disable: true },
     docs: {
+      description: {
+        component:
+          'MultiChoiceFilter filters by several values from a list, applied when users press Apply. Use it when a record can match any of several values. For one quick choice, use ChoiceFilter.',
+      },
       page: () => (
         <>
           <Title />

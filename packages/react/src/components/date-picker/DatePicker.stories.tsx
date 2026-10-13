@@ -69,17 +69,24 @@ const inCard: Decorator = (Story) => (
 const meta: Meta<typeof DatePicker> = {
   title: 'Components/DatePicker',
   component: DatePicker,
+  parameters: {
+    docs: {
+      description: {
+        component:
+          'DatePicker shows a calendar grid for picking one date, a range or several dates. Install `react-day-picker` in your app to use it.',
+      },
+    },
+  },
   argTypes: {
     cellSize: {
       control: 'select',
       options: ['default', 'large', 'xlarge'],
-      description:
-        'Day-cell size preset (default 32px / large 48px / xlarge 56px)',
+      description: 'Day-cell size: 32px, 48px or 56px.',
     },
     captionLayout: {
       control: 'select',
       options: ['label', 'dropdown', 'dropdown-months', 'dropdown-years'],
-      description: 'Month caption layout from react-day-picker',
+      description: 'Static month label or month and year dropdowns.',
     },
     buttonVariant: {
       control: 'select',
@@ -91,28 +98,29 @@ const meta: Meta<typeof DatePicker> = {
         'ghost',
         'link',
       ],
-      description: 'Button variant used for previous / next navigation',
+      description: 'Button variant for the previous and next arrows.',
     },
     showOutsideDays: {
       control: 'boolean',
-      description: 'Show days from the previous / next month in the grid',
+      description: 'Shows days from the previous and next months.',
     },
     showWeekNumber: {
       control: 'boolean',
-      description: 'Show the week-number column',
+      description: 'Shows a week-number column.',
     },
     fixedWeeks: {
       control: 'boolean',
-      description: 'Always render six weeks',
+      description: 'Always shows six weeks.',
     },
     weekStartsOn: {
       control: 'select',
       options: [0, 1, 2, 3, 4, 5, 6],
-      description: 'First day of week (0=Sun … 6=Sat); a `locale` can drive it',
+      description:
+        'First weekday, from 0 (Sunday) to 6 (Saturday). A `locale` can set it.',
     },
     numberOfMonths: {
       control: 'number',
-      description: 'Number of months to render',
+      description: 'Months shown side by side.',
     },
     className: { control: false },
     classNames: { control: false },
@@ -124,14 +132,13 @@ const meta: Meta<typeof DatePicker> = {
     mode: {
       control: false,
       description:
-        'Mode is fixed per story because each mode needs a different selected-value shape',
+        'Fixed per story, since each mode stores a different value shape.',
     },
     modifiers: { control: false },
     onSelect: { control: false },
     renderDayContent: {
       control: false,
-      description:
-        'Function prop; use the CustomDayContent story for the custom-cell variant',
+      description: 'Function prop, shown in the CustomDayContent story.',
     },
     selected: { control: false },
     styles: { control: false },
@@ -282,6 +289,14 @@ export const CustomDayContent: Story = {
 // Range selection — the connected rail spans start → middle → end.
 export const Range: Story = {
   tags: ['docs'],
+  parameters: {
+    docs: {
+      description: {
+        story:
+          'Set `mode="range"` to pick a start and end date, with the days between highlighted.',
+      },
+    },
+  },
   decorators: [inCard],
   render: () => (
     <DatePicker
@@ -346,6 +361,13 @@ export const RangeHoverPreview: Story = {
 // Multiple discrete dates.
 export const Multiple: Story = {
   tags: ['docs'],
+  parameters: {
+    docs: {
+      description: {
+        story: 'Set `mode="multiple"` to pick several separate dates.',
+      },
+    },
+  },
   decorators: [inCard],
   render: () => (
     <DatePicker
@@ -404,6 +426,14 @@ export const MultipleAdjacent: Story = {
 // Month / year dropdown caption instead of the static label.
 export const DropdownCaption: Story = {
   tags: ['docs'],
+  parameters: {
+    docs: {
+      description: {
+        story:
+          'Set `captionLayout="dropdown"` to jump between months and years from dropdowns.',
+      },
+    },
+  },
   decorators: [inCard],
   render: () => (
     <DatePicker
@@ -418,6 +448,14 @@ export const DropdownCaption: Story = {
 // Specific days disabled — dimmed and non-interactive.
 export const DisabledDays: Story = {
   tags: ['docs'],
+  parameters: {
+    docs: {
+      description: {
+        story:
+          'Pass dates to `disabled` so they show dimmed and cannot be picked.',
+      },
+    },
+  },
   decorators: [inCard],
   render: () => (
     <DatePicker
@@ -601,6 +639,13 @@ export const Accessibility: Story = {
 // `in-data-[slot=card-content]` hook, so the Card supplies the surface.
 export const WithPresets: Story = {
   tags: ['docs'],
+  parameters: {
+    docs: {
+      description: {
+        story: 'Add preset buttons in a Card footer to jump to common dates.',
+      },
+    },
+  },
   render: function WithPresetsStory() {
     const [date, setDate] = React.useState<Date | undefined>(REFERENCE_TODAY);
     const [month, setMonth] = React.useState<Date>(REFERENCE_MONTH);

@@ -72,6 +72,12 @@ const meta: Meta<typeof InputOTP> = {
   component: InputOTP,
   parameters: {
     layout: 'centered',
+    docs: {
+      description: {
+        component:
+          'InputOTP collects a one-time code, with one slot per character. Use it for verification and sign-in codes. For other short text, use Input.',
+      },
+    },
   },
   args: {
     maxLength: 6,
@@ -82,11 +88,11 @@ const meta: Meta<typeof InputOTP> = {
   argTypes: {
     maxLength: {
       control: 'number',
-      description: 'Number of character slots',
+      description: 'Number of characters in the code.',
     },
     disabled: {
       control: 'boolean',
-      description: 'Whether the field is disabled',
+      description: 'Prevents input.',
     },
   },
   render: (args) => (
@@ -105,6 +111,14 @@ export const Default: Story = {
 
 export const WithSeparator: Story = {
   tags: ['docs'],
+  parameters: {
+    docs: {
+      description: {
+        story:
+          'Split a six-digit code into two groups of three with a separator.',
+      },
+    },
+  },
   render: (args) => (
     <InputOTP {...args}>
       <InputOTPGroup>
@@ -136,6 +150,13 @@ export const WithSeparator: Story = {
 
 export const Disabled: Story = {
   tags: ['docs'],
+  parameters: {
+    docs: {
+      description: {
+        story: 'Dim every slot and block input while the field is disabled.',
+      },
+    },
+  },
   args: {
     disabled: true,
   },

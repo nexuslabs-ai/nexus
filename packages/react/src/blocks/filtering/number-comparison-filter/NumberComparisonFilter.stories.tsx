@@ -91,6 +91,10 @@ const meta = {
     layout: 'centered',
     controls: { disable: true },
     docs: {
+      description: {
+        component:
+          'NumberComparisonFilter compares one number with equals, not equals, greater than or less than. Use it for a single threshold, such as an amount. For a range with both ends, use NumberRangeFilter.',
+      },
       page: () => (
         <>
           <Title />

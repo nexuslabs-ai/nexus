@@ -8,6 +8,12 @@ const meta: Meta<typeof Progress> = {
   component: Progress,
   parameters: {
     layout: 'padded',
+    docs: {
+      description: {
+        component:
+          'Progress shows how far along a task is, such as an upload or a multi-step form. Leave out `value` for an animated bar while the total is unknown. Always give it an `aria-label` or `aria-labelledby`.',
+      },
+    },
   },
   // The bar is full-width, so every story gets a sized container; the label
   // gives the progressbar an accessible name for the automatic a11y checks.
@@ -68,6 +74,14 @@ export const Full: Story = {
 // Value omitted while the total is unknown — the indicator runs the sweep.
 export const Indeterminate: Story = {
   tags: ['docs'],
+  parameters: {
+    docs: {
+      description: {
+        story:
+          'Leave out `value` to show a sweeping bar while the total is unknown.',
+      },
+    },
+  },
   args: { 'aria-label': 'Loading' },
   play: async ({ canvasElement }) => {
     const canvas = within(canvasElement);
@@ -116,6 +130,11 @@ export const WithDataAttributes: Story = {
 
 export const AllVariants: Story = {
   tags: ['docs'],
+  parameters: {
+    docs: {
+      description: { story: 'Fill the bar at 0, 25, 50, 75 and 100 percent.' },
+    },
+  },
   render: () => (
     <div className="nx:flex nx:flex-col nx:gap-6">
       {[0, 25, 50, 75, 100].map((pct) => (

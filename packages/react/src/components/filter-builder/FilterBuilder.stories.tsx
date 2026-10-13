@@ -143,7 +143,7 @@ const meta = {
     docs: {
       description: {
         component:
-          'Packaged controlled editor for fields, operators, values and nested All/Any groups. Pass an editable rule tree and onValueChange; drafts can be incomplete. getFilterErrors validates built-in text, number, date and finite-choice fields. An empty root means no filters; empty nested groups are invalid. Root depth is zero; maxDepth defaults to three. Apply/Cancel, query execution, URLs, permissions and fetching belong to the application. Date values are calendar strings (YYYY-MM-DD), numbers are draft strings. IDs must be unique; field/option IDs must be nonempty. Restrict available operators per field using operators. The Filtering pattern demonstrates grouped conditions and the application boundary.',
+          'FilterBuilder edits filter conditions inside nested All and Any groups. Pass the tree as `value` and update it in `onValueChange`. For a row of applied filters, use FilterCondition or FilterChip.\n\n- Drafts can be incomplete. Call `getFilterErrors` to validate text, number, date and choice fields.\n- An empty root means no filters. An empty nested group is invalid.\n- The root is depth zero, and `maxDepth` defaults to 3.\n- Dates are `YYYY-MM-DD` strings. Numbers stay as draft strings.\n- Every ID must be unique. Field and option IDs must not be empty.\n- Set `operators` on a field to limit its operators.\n- Your app owns Apply and Cancel, running the query, URLs, permissions and fetching.\n- See the Filtering pattern for grouped conditions and where the app takes over.',
       },
     },
   },

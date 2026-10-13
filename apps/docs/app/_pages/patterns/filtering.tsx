@@ -35,20 +35,20 @@ const TIMING: {
     timing: 'Immediately',
     when: 'Each choice is complete, easy to undo and cheap to apply, such as picking one status.',
     build: 'ChoiceFilter',
-    example: 'Team directory, below',
+    example: 'Team directory example',
   },
   {
     timing: 'Per filter, on Apply',
     when: 'One condition needs several inputs or a review first, such as a range, a date span or several checked values.',
     build:
       'MultiChoiceFilter, TextFilter, NumberComparisonFilter, NumberRangeFilter, DateRangeFilter',
-    example: 'Invoice list, below',
+    example: 'Invoice list example',
   },
   {
     timing: 'Whole set, on one Apply',
     when: 'Several conditions are edited together and results should change only once, such as a grouped query.',
     build: 'FilterBuilder, with draft and applied state',
-    example: 'Grouped conditions, below',
+    example: 'Grouped conditions example',
   },
 ];
 
@@ -56,32 +56,32 @@ const BLOCKS: { slug: string; name: string; summary: string }[] = [
   {
     slug: 'choice-filter',
     name: 'ChoiceFilter',
-    summary: 'one value from a short list; applies immediately.',
+    summary: 'one value from a short list. Applies immediately.',
   },
   {
     slug: 'multi-choice-filter',
     name: 'MultiChoiceFilter',
-    summary: 'several values; applies with Apply.',
+    summary: 'several values. Applies with Apply.',
   },
   {
     slug: 'text-filter',
     name: 'TextFilter',
-    summary: 'text; applies with Apply.',
+    summary: 'text. Applies with Apply.',
   },
   {
     slug: 'number-comparison-filter',
     name: 'NumberComparisonFilter',
-    summary: 'one number against a threshold; applies with Apply.',
+    summary: 'one number against a threshold. Applies with Apply.',
   },
   {
     slug: 'number-range-filter',
     name: 'NumberRangeFilter',
-    summary: 'a number between two ends; applies with Apply.',
+    summary: 'a number between two ends. Applies with Apply.',
   },
   {
     slug: 'date-range-filter',
     name: 'DateRangeFilter',
-    summary: 'a range of calendar days; applies with Apply.',
+    summary: 'a range of calendar days. Applies with Apply.',
   },
 ];
 
@@ -99,7 +99,10 @@ const LINK_CLASS =
 
 function Example({ children }: { children: ReactNode }) {
   return (
-    <div className="nx:mb-4 nx:min-w-0 nx:rounded-lg nx:border nx:border-border-default nx:p-4">
+    <div
+      data-md-skip
+      className="nx:mb-4 nx:min-w-0 nx:rounded-lg nx:border nx:border-border-default nx:p-4"
+    >
       {children}
     </div>
   );
@@ -110,10 +113,10 @@ export default function Filtering() {
     <>
       <h1 className="nx:typography-heading-large">Filtering</h1>
       <p className="nx:typography-body-default nx:text-muted-foreground nx:mt-2 nx:mb-8 nx:max-w-[64ch]">
-        Filtering helps people narrow a collection without losing their place.
-        Keep the results in view, keep every active condition visible, and keep
-        editing or clearing within reach. Two decisions shape the whole
-        interaction; make them first.
+        Build filters for a list from ChoiceFilter, FilterBuilder and the other
+        filter blocks and components. Keep the results and every active filter
+        visible, and make each filter easy to edit or clear. Start with two
+        decisions: when a change applies, and whether filters can be grouped.
       </p>
 
       <section className="nx:mb-12">
@@ -148,12 +151,15 @@ export default function Filtering() {
           </table>
         </div>
         <p className={BODY_CLASS}>
-          Choose the timing from the interaction, not the field type. No block
-          applies a change when it is dismissed: Cancel, Escape and clicking
-          outside discard a draft. A complete operator change applies at once;
-          an operator that needs a missing value waits for it. When a
-          surrounding panel owns one Apply, feed its editors the panel draft
-          instead of nesting a second Apply.
+          Choose the timing by how the filter is used, not by its field type.
+          Closing a filter never applies it. Cancel, Escape and clicking outside
+          all discard the draft (the edits not yet applied).
+        </p>
+        <p className={BODY_CLASS}>
+          Changing the operator applies at once, unless the new operator needs a
+          value first. If a panel has its own Apply button, pass the
+          panel&rsquo;s draft to each filter. Don&rsquo;t add a second Apply
+          inside it.
         </p>
       </section>
 
@@ -162,22 +168,27 @@ export default function Filtering() {
           2. Decide flat or grouped
         </SectionHeading>
         <p className={BODY_CLASS}>
-          This is a separate decision from timing. Several flat filters mean
-          every condition must match. Reach for explicit All/Any groups only
-          when people need a query such as “Active members who are in Design or
-          have more than three projects”. Grouped queries use FilterBuilder;
-          keep the whole query as a draft so intermediate edits do not change
-          results.
+          With flat filters, every condition must match. An All group matches
+          when every condition in it matches, and an Any group matches when at
+          least one does. Use groups only when people need a query like
+          &ldquo;Active members who are in Design or have more than three
+          projects&rdquo;.
         </p>
+        <p className={BODY_CLASS}>
+          Build grouped queries with FilterBuilder. Keep the query as a draft
+          until it&rsquo;s applied, so results don&rsquo;t change mid-edit.
+        </p>
+        <SubsectionHeading className={SUBSECTION_CLASS}>
+          Grouped conditions
+        </SubsectionHeading>
         <Example>
           <AdvancedFiltering />
         </Example>
         <p className={BODY_CLASS}>
-          Moving from quick filters to a grouped query? Each block value
-          converts to one FilterBuilder rule. The conversion is explicit per
-          block, not a general engine, and FilterBuilder does not re-check a
-          block’s numeric bounds. Each block’s example file exports its
-          conversion next to its minimal composition.
+          To move from quick filters to a grouped query, convert each
+          block&rsquo;s value into one FilterBuilder rule. Each block&rsquo;s
+          example file exports its own conversion. FilterBuilder doesn&rsquo;t
+          re-check a block&rsquo;s number limits.
         </p>
         <Example>
           <ConvertedRules />
@@ -189,8 +200,7 @@ export default function Filtering() {
           3. Start from a minimal example
         </SectionHeading>
         <p className={BODY_CLASS}>
-          Each block page opens with a minimal controlled example and the files
-          to copy:
+          Each block page starts with a minimal example and the files to copy:
         </p>
         <ul className="nx:mb-4 nx:list-disc nx:space-y-2 nx:ps-5 nx:typography-body-default nx:max-w-[64ch]">
           {BLOCKS.map(({ slug, name, summary }) => (
@@ -204,10 +214,10 @@ export default function Filtering() {
         </ul>
         <p className={BODY_CLASS}>
           Lay several filters out with{' '}
-          <InlineCode>blocks/filtering/applied-filters.tsx</InlineCode>; it
-          wraps them as space allows and owns layout, not query state. When
-          editing lives in a Filters panel instead, show applied conditions as
-          removable summaries:
+          <InlineCode>blocks/filtering/applied-filters.tsx</InlineCode>. It
+          wraps filters onto new lines as needed, and holds no filter state. If
+          filters are edited in a separate panel, show the applied ones as
+          removable chips:
         </p>
         <Example>
           <AppliedFiltersExample />
@@ -219,11 +229,14 @@ export default function Filtering() {
           4. Show the result states
         </SectionHeading>
         <p className={BODY_CLASS}>
-          Keep active filters visible while results load or fail, and tell apart
-          an empty collection, no matches and a failed request. Retry keeps the
-          conditions. Show the count across all pages and reset pagination when
-          a condition changes. This directory uses native inputs rather than the
-          blocks; the states apply to either.
+          Keep active filters visible while results load or fail. Show a
+          different message for an empty list, no matches and a failed request.
+          Retry keeps the filters.
+        </p>
+        <p className={BODY_CLASS}>
+          Show the total count across all pages, and go back to page one when a
+          filter changes. The result-state examples use native inputs, but the
+          same states apply to the blocks.
         </p>
         <SubsectionHeading className={SUBSECTION_CLASS}>
           Loading
@@ -258,8 +271,48 @@ export default function Filtering() {
       </section>
 
       <section className="nx:mb-12">
+        <SectionHeading className={SECTION_CLASS}>Examples</SectionHeading>
+        <SubsectionHeading className={SUBSECTION_CLASS}>
+          Team directory: immediate updates
+        </SubsectionHeading>
+        <p className={BODY_CLASS}>
+          Choosing a status or team updates the table at once. The filters have
+          no Apply button.
+        </p>
+        <Example>
+          <TeamDirectory />
+        </Example>
+        <SubsectionHeading className={SUBSECTION_CLASS}>
+          Invoice list: Apply per filter
+        </SubsectionHeading>
+        <p className={BODY_CLASS}>
+          Each filter opens a checklist with its own Apply button. The trigger
+          shows the applied values. Escape or clicking outside discards the
+          changes.
+        </p>
+        <Example>
+          <InvoiceFilteringExample />
+        </Example>
+        <p className="nx:typography-body-default nx:text-muted-foreground nx:max-w-[64ch]">
+          These examples use sample data. The filtering blocks are experimental,
+          so test them with your own data before you ship.
+        </p>
+      </section>
+
+      <section className="nx:mb-12">
         <SectionHeading className={SECTION_CLASS}>
-          5. Where to go next
+          What your app owns
+        </SectionHeading>
+        <p className={BODY_CLASS}>
+          Your app owns the fields, permissions, values, filtering logic,
+          requests, pagination and URL state. Cancel outdated requests and
+          ignore late responses in your data layer.
+        </p>
+      </section>
+
+      <section className="nx:mb-12">
+        <SectionHeading className={SECTION_CLASS}>
+          Where to go next
         </SectionHeading>
         <ul className="nx:mb-4 nx:list-disc nx:space-y-2 nx:ps-5 nx:typography-body-default nx:max-w-[64ch]">
           <li>
@@ -282,42 +335,7 @@ export default function Filtering() {
             <InlineCode>packages/react/src/blocks/filtering</InlineCode> and{' '}
             <InlineCode>packages/react/src/patterns/filtering</InlineCode>.
           </li>
-          <li>
-            Applications own fields, permissions, values, query evaluation,
-            requests, pagination and URL state. Cancel obsolete requests and
-            ignore stale responses in your data layer.
-          </li>
         </ul>
-      </section>
-
-      <section className="nx:mb-12">
-        <SectionHeading className={SECTION_CLASS}>Examples</SectionHeading>
-        <SubsectionHeading className={SUBSECTION_CLASS}>
-          Team directory: immediate updates
-        </SubsectionHeading>
-        <p className={BODY_CLASS}>
-          Choosing a status or team updates the table at once. There is no Apply
-          button; closing a menu only closes it.
-        </p>
-        <Example>
-          <TeamDirectory />
-        </Example>
-        <SubsectionHeading className={SUBSECTION_CLASS}>
-          Invoice list: Apply per filter
-        </SubsectionHeading>
-        <p className={BODY_CLASS}>
-          Each field opens its own checklist and Apply button. Checking options
-          edits only that field’s draft; the trigger shows applied values.
-          Escape or clicking outside discards the draft.
-        </p>
-        <Example>
-          <InvoiceFilteringExample />
-        </Example>
-        <p className="nx:typography-body-default nx:text-muted-foreground nx:max-w-[64ch]">
-          These examples use local demonstration data. The blocks and examples
-          are experimental: their stories pin the interaction, but production
-          adoption needs its own evidence.
-        </p>
       </section>
     </>
   );

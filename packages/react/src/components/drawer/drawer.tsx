@@ -9,11 +9,8 @@ import {
 } from '../overlay-layout/overlay-layout';
 
 /**
- * Drawer
- *
- * Root for a gesture-driven drawer that slides in from a viewport edge with
- * drag-to-dismiss (built on vaul). `vaul` is an optional peer dependency —
- * install it in the consuming app.
+ * Root for a drawer that slides in from a screen edge and drags to dismiss.
+ * Install `vaul` in your app first.
  *
  * @example
  * ```tsx
@@ -38,23 +35,17 @@ import {
 const Drawer = DrawerPrimitive.Root;
 
 /**
- * DrawerTrigger
- *
- * Button that opens the drawer. Use `asChild` to render as your own component.
+ * Opens the drawer. Use `asChild` to render your own button.
  */
 const DrawerTrigger = DrawerPrimitive.Trigger;
 
 /**
- * DrawerPortal
- *
- * Portals the drawer content to document.body.
+ * Renders the drawer content into `document.body`.
  */
 const DrawerPortal = DrawerPrimitive.Portal;
 
 /**
- * DrawerClose
- *
- * Button that closes the drawer. Use `asChild` to render as your own component.
+ * Closes the drawer. Use `asChild` to render your own button.
  */
 const DrawerClose = DrawerPrimitive.Close;
 
@@ -68,9 +59,7 @@ interface DrawerOverlayProps extends React.ComponentProps<
 > {}
 
 /**
- * DrawerOverlay
- *
- * Semi-transparent scrim behind the drawer content.
+ * Semi-transparent backdrop behind the drawer.
  */
 function DrawerOverlay({ className, ...props }: DrawerOverlayProps) {
   return (
@@ -97,20 +86,16 @@ interface DrawerContentProps extends React.ComponentProps<
   typeof DrawerPrimitive.Content
 > {
   /**
-   * Whether to show the bottom-only visual handle. This is a static indicator,
-   * not vaul's gesture `Handle`, so it does not change dragging or the root's
-   * `dismissible` behavior.
+   * Shows the handle on bottom drawers. Hiding it does not change dragging or
+   * dismissal.
    * @default true
    */
   showHandle?: boolean;
 }
 
 /**
- * DrawerContent
- *
- * The sliding panel. Renders inside a portal with an overlay; vaul's `direction`
- * prop on the root picks which edge it slides from (defaults to `bottom`). The
- * visual handle shows only for the bottom direction unless `showHandle` is false.
+ * The sliding panel. Renders in a portal above an overlay. Set `direction` on
+ * the root to pick the edge, which is `bottom` by default.
  */
 function DrawerContent({
   className,
@@ -153,9 +138,7 @@ function DrawerContent({
 interface DrawerHeaderProps extends React.ComponentProps<'div'> {}
 
 /**
- * DrawerHeader
- *
- * Container for the drawer title and description.
+ * Holds the drawer title and description.
  */
 function DrawerHeader({ className, ...props }: DrawerHeaderProps) {
   return (
@@ -178,10 +161,8 @@ function DrawerHeader({ className, ...props }: DrawerHeaderProps) {
 interface DrawerBodyProps extends React.ComponentProps<'div'> {}
 
 /**
- * DrawerBody
- *
- * Container for the drawer's main content between the header and footer. Insets
- * its content horizontally to match the header and footer.
+ * Holds the drawer's main content between the header and footer. Scrolls when
+ * the content overflows.
  */
 function DrawerBody({ className, ...props }: DrawerBodyProps) {
   return (
@@ -204,9 +185,7 @@ function DrawerBody({ className, ...props }: DrawerBodyProps) {
 interface DrawerFooterProps extends React.ComponentProps<'div'> {}
 
 /**
- * DrawerFooter
- *
- * Container for the drawer action buttons. Pinned to the bottom of the panel.
+ * Holds the drawer's action buttons at the bottom of the panel.
  */
 function DrawerFooter({ className, ...props }: DrawerFooterProps) {
   return (
@@ -231,10 +210,8 @@ interface DrawerTitleProps extends React.ComponentProps<
 > {}
 
 /**
- * DrawerTitle
- *
- * The accessible title of the drawer. Required for screen-reader labelling —
- * vaul wires `aria-labelledby` to it.
+ * The drawer's title. Required, because screen readers use it to name the
+ * drawer.
  */
 function DrawerTitle({ className, ...props }: DrawerTitleProps) {
   return (
@@ -256,9 +233,7 @@ interface DrawerDescriptionProps extends React.ComponentProps<
 > {}
 
 /**
- * DrawerDescription
- *
- * Supporting text that provides additional context for the drawer.
+ * Supporting text that explains the drawer.
  */
 function DrawerDescription({ className, ...props }: DrawerDescriptionProps) {
   return (

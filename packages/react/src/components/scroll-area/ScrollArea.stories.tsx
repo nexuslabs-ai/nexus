@@ -10,6 +10,12 @@ const meta: Meta<typeof ScrollArea> = {
   component: ScrollArea,
   parameters: {
     layout: 'centered',
+    docs: {
+      description: {
+        component:
+          'ScrollArea gives a fixed-size region custom scrollbars that look the same on every platform. Use it for panels, lists and drawers with overflowing content. For a full page, let the browser scroll the page.',
+      },
+    },
   },
 };
 
@@ -77,6 +83,13 @@ export const Default: Story = {
 // A scrollable list of discrete rows.
 export const VerticalList: Story = {
   tags: ['docs'],
+  parameters: {
+    docs: {
+      description: {
+        story: 'Scroll a long list of rows inside a fixed height.',
+      },
+    },
+  },
   render: () => (
     <ScrollArea className="nx:h-72 nx:w-56 nx:rounded-md nx:border-default nx:border-border-default">
       <div className="nx:p-4">
@@ -102,6 +115,14 @@ export const VerticalList: Story = {
 // the content. The content lays out in a `nx:w-max` flex row so it overflows.
 export const HorizontalRow: Story = {
   tags: ['docs'],
+  parameters: {
+    docs: {
+      description: {
+        story:
+          'Add a horizontal `ScrollBar` to scroll a row of items sideways.',
+      },
+    },
+  },
   render: () => (
     <ScrollArea className="nx:w-96 nx:rounded-md nx:border-default nx:border-border-default nx:whitespace-nowrap">
       <div className="nx:flex nx:w-max nx:gap-4 nx:p-4">
@@ -128,6 +149,13 @@ export const HorizontalRow: Story = {
 // where they meet.
 export const Both: Story = {
   tags: ['docs'],
+  parameters: {
+    docs: {
+      description: {
+        story: 'Scroll a large grid on both axes with two scrollbars.',
+      },
+    },
+  },
   render: () => (
     <ScrollArea className="nx:h-72 nx:w-96 nx:rounded-md nx:border-default nx:border-border-default">
       <div className="nx:w-max nx:p-4">
@@ -156,7 +184,7 @@ export const VisibleAffordance: Story = {
     docs: {
       description: {
         story:
-          '`type="always"` pins the custom scrollbar chrome for dense panels where scrollability needs to be visible without hover.',
+          'Set `type="always"` so dense panels show their scrollbars without a hover.',
       },
     },
   },
@@ -220,6 +248,13 @@ export const VisibleAffordance: Story = {
 // card. The ScrollArea takes its height from a utility, not the content.
 export const InCard: Story = {
   tags: ['docs'],
+  parameters: {
+    docs: {
+      description: {
+        story: 'Keep a long list inside a Card from stretching the Card.',
+      },
+    },
+  },
   render: () => (
     <Card className="nx:w-80">
       <CardHeader>

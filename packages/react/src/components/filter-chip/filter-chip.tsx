@@ -9,11 +9,11 @@ interface FilterChipProps extends Omit<
   'children' | 'type'
 > {
   children: string;
-  /** Include the action, field and full value, e.g. "Remove status filter: Active". */
+  /** Names the action, field and full value, such as "Remove status filter: Active". */
   'aria-label': string;
 }
 
-/** An applied filter. Activating any part removes it; the consumer owns state and subsequent focus. */
+/** An applied filter that is removed when activated. Your app owns the filter state and where focus goes next. */
 function FilterChip({ children, className, ...props }: FilterChipProps) {
   return (
     <button

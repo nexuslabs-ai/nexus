@@ -6,6 +6,7 @@ import { type ManifestPage, requirePage } from '../_lib/manifest';
 
 import { ComponentDemo } from './ComponentDemo';
 import { SourceFile } from './ComponentInstallation';
+import { DescriptionText } from './DescriptionText';
 import {
   PAGE_HEADING_CLASS,
   SECTION_HEADING_CLASS,
@@ -22,7 +23,7 @@ const LINK_CLASS =
 
 /** A block's story tagged `docs` as the preview, then the files to copy. */
 export async function BlockPage({ page }: { page: BlockManifestPage }) {
-  const { preview, files, components } = getBlockDocs(page.slug);
+  const { description, preview, files, components } = getBlockDocs(page.slug);
   const sources = await Promise.all(
     files.map(async (path) => ({ path, source: await loadReactSource(path) }))
   );
@@ -30,18 +31,21 @@ export async function BlockPage({ page }: { page: BlockManifestPage }) {
   return (
     <>
       <h1 className={PAGE_HEADING_CLASS}>{page.label}</h1>
+      {description && (
+        <DescriptionText text={description} className="nx:mb-6" />
+      )}
       <ComponentDemo id={preview} />
 
       <SectionHeading className={SECTION_HEADING_CLASS}>Source</SectionHeading>
       <p className={BODY_CLASS}>
-        Blocks are not part of the package — copy them into your project. Each
-        path below is relative to <InlineCode>packages/react/src/</InlineCode>.
-        Keep it as it is under your <InlineCode>@/</InlineCode> root and the
-        relative imports between the files resolve without an edit.
+        Copy these files into your project. Paths are relative to{' '}
+        <InlineCode>packages/react/src/</InlineCode>. Keep the same folders
+        under your <InlineCode>@/</InlineCode> root, and the imports between
+        files work without edits.
       </p>
       {components.length > 0 && (
         <p className={BODY_CLASS}>
-          It builds on these components; install each from its page first:{' '}
+          Install these components first:{' '}
           {components.map((slug, index) => (
             <span key={slug}>
               {index > 0 && ', '}

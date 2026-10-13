@@ -6,27 +6,18 @@ import { cva } from 'class-variance-authority';
 import { cn } from '../../lib/utils';
 
 /**
- * ScrollAreaProps
- *
- * Props for the ScrollArea component. Inherits the Radix ScrollArea Root —
- * notably `type` (`'hover' | 'always' | 'scroll' | 'auto'`, default `'hover'`)
- * controls when the scrollbars surface, and `scrollHideDelay` tunes how long
- * they linger after scrolling stops.
+ * Props for ScrollArea, from the Radix ScrollArea Root. `type` sets when the
+ * scrollbars show. `scrollHideDelay` sets how long they stay after scrolling.
  */
 interface ScrollAreaProps extends React.ComponentProps<
   typeof ScrollAreaPrimitive.Root
 > {}
 
 /**
- * ScrollArea
- *
- * A viewport with cross-browser custom scrollbars, so a scrollable region reads
- * the same on every platform instead of inheriting the OS scrollbar. Radix keeps
- * scrolling native, while Nexus owns the visible track and thumb.
- *
- * Wraps its children in a measured viewport and renders a vertical scrollbar
- * for you. For horizontal (or both-axis) scrolling, add a
- * `<ScrollBar orientation="horizontal" />` as a child, after the content.
+ * Scrollable region with custom scrollbars that look the same on every
+ * platform. Renders a vertical scrollbar for you. For horizontal scrolling, add
+ * `<ScrollBar orientation="horizontal" />` after the content. `type` sets when
+ * the scrollbars show, `hover` by default.
  *
  * @example
  * ```tsx
@@ -71,11 +62,8 @@ function ScrollArea({ className, children, ...props }: ScrollAreaProps) {
 }
 
 /**
- * ScrollBarProps
- *
- * Props for the ScrollBar component. Inherits the Radix Scrollbar —
- * `orientation` (`'vertical' | 'horizontal'`, default `'vertical'`) picks the
- * axis the bar controls.
+ * Props for ScrollBar, from the Radix Scrollbar. `orientation` picks the axis
+ * the bar controls.
  */
 interface ScrollBarProps extends React.ComponentProps<
   typeof ScrollAreaPrimitive.ScrollAreaScrollbar
@@ -99,11 +87,8 @@ const scrollBarVariants = cva(
 );
 
 /**
- * ScrollBar
- *
- * The scrollbar track and its draggable thumb for one axis. ScrollArea renders
- * a vertical ScrollBar for you, so render this directly — as a child of
- * ScrollArea, after the content — only to add the horizontal axis.
+ * Scrollbar track and thumb for one axis. Render it only to add the horizontal
+ * axis, as a child of ScrollArea after the content.
  *
  * @example
  * ```tsx

@@ -1,31 +1,15 @@
 # Theme setup
 
-Nexus Appearance derives a full runtime theme from one state object, paints it
-before React hydrates, and persists the user's choices. Setup has two pieces: a
-provider and a first-paint script.
+Set your app's starting theme, and keep the user's choices across reloads.
 
-## Before you start
+Start here after [Install](/getting-started/install).
 
-This page continues from [Install](/getting-started/install), which leaves you
-with the token CSS in `styles/nexus/` imported from your CSS entry point, the
-appearance provider copied into `components/appearance/provider/`, and
-`@nexus_ds/core` installed.
+## Set your default theme
 
-The Next.js layout below replaces the one Install ends with: same file, but it
-becomes `async`, reads the appearance from a cookie, and swaps
-`DEFAULT_NEXUS_APPEARANCE` for the `defaultAppearance` and cookie helpers below.
-The Vite section is a separate track — take it instead of the Next.js one.
-
-## Pick a default appearance
-
-Customize the shipped default by changing state fields. Brand and surface tone
-are state fields, not factory arguments.
-
-This is what replaces the bare `DEFAULT_NEXUS_APPEARANCE` that Install passes to
-the provider and the script:
+Copy the default appearance and change the fields you want:
 
 ```ts
-// app/appearance-state.ts or src/appearance-state.ts
+// app/appearance-state.ts (Next.js) or src/appearance-state.ts (Vite)
 import {
   DEFAULT_NEXUS_APPEARANCE,
   type NexusAppearanceState,
@@ -38,14 +22,17 @@ export const defaultAppearance = {
 } satisfies NexusAppearanceState;
 ```
 
-Surface tones are `stone`, `neutral`, `zinc`, `slate`, and `gray`.
+`brandColor` sets the primary color. `surfaceTone` sets the gray used for
+backgrounds: `stone`, `neutral`, `zinc`, `slate` or `gray`. For every field,
+see [Appearance](/theming/appearance).
 
-## Next.js App Router
+Then follow the section for your framework.
 
-Read the cookie on the server, convert its raw string value into a snapshot, put
-the inline script in `<head>`, and render the provider in `<body>`. The second
-argument to `createNexusAppearanceSnapshotFromCookie` is the SSR fallback when
-the cookie is missing or invalid.
+## Next.js
+
+Replace the layout from Install with this one. It reads the user's saved
+theme from a cookie, so the server renders the right theme on the first
+request:
 
 ```tsx
 // app/layout.tsx
@@ -95,19 +82,26 @@ export default async function RootLayout({
 }
 ```
 
-The cookie seeds SSR and first paint. `cookieWriteKey` writes the active client state
-back to a cookie for the next server request; the provider does not read the
-cookie again during client hydration. When `storageKey` is enabled,
-`localStorage` becomes the client-side source of truth after hydration. Use
-`storageKey={false}` when you want the client to hydrate from the server
-snapshot/default state without localStorage persistence.
+If the cookie is missing or invalid, `createNexusAppearanceSnapshotFromCookie`
+falls back to `defaultAppearance`.
 
-Under a strict CSP, pass a nonce to `<NexusAppearanceScript nonce={nonce} />`.
+The provider saves the theme in two places:
+
+| Prop             | Saves to       | Read by                                               |
+| ---------------- | -------------- | ----------------------------------------------------- |
+| `cookieWriteKey` | A cookie       | The server, on the next request                       |
+| `storageKey`     | `localStorage` | The head script before first paint, then the provider |
+
+When both are set, `localStorage` wins in the browser. To use only the cookie,
+set `storageKey={false}` on both the script and the provider.
+
+If your app uses a strict Content Security Policy, pass a nonce:
+`<NexusAppearanceScript nonce={nonce} />`.
 
 ## Vite
 
-Vite has no server render, so inject the first-paint script at build time with
-`transformIndexHtml`. The bootstrap and provider must use the same storage key.
+Vite doesn't render on the server, so add the theme script to `index.html` at
+build time:
 
 ```ts
 // vite.config.ts
@@ -141,13 +135,15 @@ export default defineConfig({
 });
 ```
 
+On Vite, copy the provider into `src/components/appearance/provider/`. Then wrap
+your app in the provider, with the same storage key:
+
 ```tsx
 // src/main.tsx
 import { createRoot } from 'react-dom/client';
 
 import App from './App';
 import { defaultAppearance } from './appearance-state';
-// the provider folder from Install, under src/ for a Vite app
 import { createNexusAppearance } from './components/appearance/provider';
 
 import './index.css';
@@ -164,23 +160,15 @@ createRoot(document.getElementById('root')!).render(
 );
 ```
 
-Do not wait for a client effect to apply Appearance. The script needs to run
-before the first frame: in SSR `<head>` for Next, or in `transformIndexHtml` for
-Vite.
+Don't apply the theme in a `useEffect`. Effects run after the first paint, so
+the page would flash the default theme first.
 
 ## Check your setup
 
-Load the app and confirm each of these before moving on:
+- [ ] `nexus.css` is imported from your CSS entry point
+- [ ] The provider wraps your app, and the script is in `<head>`
+- [ ] Reloading in dark mode doesn't flash light first
+- [ ] The mode you pick is still set after a full reload
 
-- [ ] `styles/nexus/nexus.css` is imported from your CSS entry point
-- [ ] The provider wraps your tree, and the script runs in `<head>`
-- [ ] Reloading in dark mode produces no flash of the light theme[^flash]
-- [ ] Toggling the mode persists across a full page reload — `storageKey` does
-      this on its own; `cookieWriteKey` needs a server that re-seeds
-      `defaultState` from the cookie
-
-[^flash]:
-    If the script is already in `<head>` and the flash persists, check that
-    it and the provider were given the same `storageKey` — the script paints from
-    that key in `localStorage`, so a mismatch means it restores one state and the
-    provider hydrates another.
+If the page still flashes, check that the script and the provider use the
+same `storageKey`. With different keys, they load different themes.

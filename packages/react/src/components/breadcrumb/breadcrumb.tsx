@@ -13,13 +13,8 @@ import { cn } from '../../lib/utils';
 interface BreadcrumbProps extends React.ComponentProps<'nav'> {}
 
 /**
- * Breadcrumb
- *
- * A hierarchical navigation trail wrapped in the `navigation` landmark. Compose
- * with the sub-components: `BreadcrumbList` lays out a row of `BreadcrumbItem`s,
- * each holding a `BreadcrumbLink` (an ancestor) or `BreadcrumbPage` (the current
- * page); `BreadcrumbSeparator` divides them and `BreadcrumbEllipsis` reveals a
- * collapsed middle when composed with a menu.
+ * Navigation trail in a `nav` landmark, showing where the current page sits.
+ * Put `BreadcrumbLink` or `BreadcrumbPage` items in a `BreadcrumbList`, divided by `BreadcrumbSeparator`.
  *
  * @example
  * ```tsx
@@ -48,11 +43,8 @@ function Breadcrumb(props: BreadcrumbProps) {
 interface BreadcrumbListProps extends React.ComponentProps<'ol'> {}
 
 /**
- * BreadcrumbList
- *
- * The `<ol>` that lays the trail out in one horizontal row. When the trail is
- * wider than its container it becomes a keyboard-focusable horizontal scroll
- * region, so the current page can be scrolled into view instead of being clipped.
+ * Ordered list that lays out the trail in one row. A trail wider than its container scrolls sideways.
+ * The list is focusable, so keyboard users can scroll it.
  */
 function BreadcrumbList({ className, ...props }: BreadcrumbListProps) {
   return (
@@ -79,9 +71,7 @@ function BreadcrumbList({ className, ...props }: BreadcrumbListProps) {
 interface BreadcrumbItemProps extends React.ComponentProps<'li'> {}
 
 /**
- * BreadcrumbItem
- *
- * A single `<li>` slot in the trail.
+ * One `<li>` in the trail.
  */
 function BreadcrumbItem({ className, ...props }: BreadcrumbItemProps) {
   return (
@@ -103,19 +93,14 @@ function BreadcrumbItem({ className, ...props }: BreadcrumbItemProps) {
  */
 interface BreadcrumbLinkProps extends React.ComponentProps<'a'> {
   /**
-   * Render as the child element via Radix Slot — e.g. a router `<Link>` — while
-   * keeping the breadcrumb link styling.
+   * Renders the child element instead, such as a router `<Link>`.
    * @default false
    */
   asChild?: boolean;
 }
 
 /**
- * BreadcrumbLink
- *
- * A link to an ancestor page. It keeps the canonical focus ring since it is
- * reachable by keyboard. Wrap the label in a `<span>` so it truncates at the
- * 150px cap — both for plain text and when composing an icon with text.
+ * Link to an ancestor page. Wrap the label in a `<span>` so it truncates at 150px.
  */
 function BreadcrumbLink({ asChild, className, ...props }: BreadcrumbLinkProps) {
   const Comp = asChild ? Slot : 'a';
@@ -140,10 +125,7 @@ function BreadcrumbLink({ asChild, className, ...props }: BreadcrumbLinkProps) {
 interface BreadcrumbPageProps extends React.ComponentProps<'span'> {}
 
 /**
- * BreadcrumbPage
- *
- * The current page — non-interactive, announced via `aria-current="page"`. Wrap
- * the label in a `<span>` so it truncates at the 150px cap.
+ * Current page, marked with `aria-current="page"`. Wrap the label in a `<span>` so it truncates at 150px.
  */
 function BreadcrumbPage({ className, ...props }: BreadcrumbPageProps) {
   return (
@@ -167,11 +149,8 @@ function BreadcrumbPage({ className, ...props }: BreadcrumbPageProps) {
 interface BreadcrumbMenuTriggerProps extends React.ComponentProps<'button'> {}
 
 /**
- * BreadcrumbMenuTrigger
- *
- * An icon button for revealing alternate paths for the adjacent breadcrumb
- * segment. Compose it with `DropdownMenuTrigger asChild`; do not nest it inside
- * a `BreadcrumbLink`.
+ * Icon button that shows alternate paths for the segment beside it.
+ * Wrap it in `DropdownMenuTrigger asChild`. Don't nest it inside a `BreadcrumbLink`.
  */
 function BreadcrumbMenuTrigger({
   children,
@@ -206,10 +185,7 @@ function BreadcrumbMenuTrigger({
 interface BreadcrumbSeparatorProps extends React.ComponentProps<'li'> {}
 
 /**
- * BreadcrumbSeparator
- *
- * The divider between items — a slash by default; pass `children` to use a
- * different glyph.
+ * Divider between items, a slash by default. Pass `children` for a different glyph.
  */
 function BreadcrumbSeparator({
   children,
@@ -240,10 +216,8 @@ function BreadcrumbSeparator({
 interface BreadcrumbEllipsisProps extends React.ComponentProps<'button'> {}
 
 /**
- * BreadcrumbEllipsis
- *
- * Overflow trigger for a collapsed run of middle items. Compose it with
- * `DropdownMenuTrigger asChild` and put the hidden paths in the menu content.
+ * Button that stands in for collapsed middle items.
+ * Wrap it in `DropdownMenuTrigger asChild` and list the hidden pages in the menu.
  */
 function BreadcrumbEllipsis({
   className,

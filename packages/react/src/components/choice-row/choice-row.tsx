@@ -11,12 +11,8 @@ import { Label } from '../label';
 interface ChoiceRowProps extends React.ComponentProps<typeof Label> {}
 
 /**
- * ChoiceRow
- *
- * A compact label row for checkbox and radio choices. The row owns the
- * click/tap target through native `htmlFor`/`id` wiring, while the nested
- * Checkbox or RadioGroupItem remains the only interactive control and keeps
- * selected/focus semantics.
+ * Compact label row for a checkbox or radio choice.
+ * Set `htmlFor` to the nested control's `id`, so a click anywhere on the row toggles it.
  *
  * @example
  * ```tsx
@@ -42,9 +38,7 @@ function ChoiceRow({ className, ...props }: ChoiceRowProps) {
 }
 
 /**
- * ChoiceRowContent
- *
- * Optional vertical wrapper for title + description choice text.
+ * Optional wrapper that stacks the title and description.
  */
 function ChoiceRowContent({
   className,
@@ -63,10 +57,7 @@ function ChoiceRowContent({
 }
 
 /**
- * ChoiceRowTitle
- *
- * Visible choice label text. Use its `id` as the child control's
- * `aria-labelledby` target when the row also includes a description.
+ * Choice label. With a description, point the control's `aria-labelledby` at its `id`.
  */
 function ChoiceRowTitle({ className, ...props }: React.ComponentProps<'div'>) {
   return (
@@ -82,10 +73,7 @@ function ChoiceRowTitle({ className, ...props }: React.ComponentProps<'div'>) {
 }
 
 /**
- * ChoiceRowDescription
- *
- * Optional helper text for a choice. Pair its `id` with the child control's
- * `aria-describedby`.
+ * Optional helper text. Point the control's `aria-describedby` at its `id`.
  */
 function ChoiceRowDescription({
   className,

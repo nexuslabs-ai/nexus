@@ -682,7 +682,7 @@ interface FilterBuilderProps extends Omit<
   value: FilterGroup;
   onValueChange: (value: FilterGroup) => void;
   disabled?: boolean;
-  /** Root depth is zero. Controls creation; existing deeper groups remain visible and invalid. */
+  /** Limits how deep new groups go, with the root at zero. Deeper groups already in the tree show as invalid. */
   maxDepth?: number;
 }
 function FilterBuilder({

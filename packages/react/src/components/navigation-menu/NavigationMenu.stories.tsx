@@ -19,6 +19,12 @@ const meta: Meta<typeof NavigationMenu> = {
   component: NavigationMenu,
   parameters: {
     layout: 'padded',
+    docs: {
+      description: {
+        component:
+          'NavigationMenu shows top-level site links, with flyout panels for groups of pages. Use it for a website header. For app commands, use Menubar.',
+      },
+    },
   },
 };
 
@@ -74,6 +80,14 @@ export const Default: Story = {
 
 export const WithSimpleLink: Story = {
   tags: ['docs'],
+  parameters: {
+    docs: {
+      description: {
+        story:
+          'Style a plain link with `navigationMenuTriggerStyle()` to sit beside triggers.',
+      },
+    },
+  },
   render: (_args) => (
     <NavigationMenu>
       <NavigationMenuList>
@@ -100,6 +114,14 @@ export const WithSimpleLink: Story = {
 
 export const WithoutViewport: Story = {
   tags: ['docs'],
+  parameters: {
+    docs: {
+      description: {
+        story:
+          'Set `viewport={false}` to open each flyout under its own trigger.',
+      },
+    },
+  },
   render: (_args) => (
     <NavigationMenu viewport={false}>
       <NavigationMenuList>
@@ -125,6 +147,14 @@ export const WithoutViewport: Story = {
 
 export const WithIndicator: Story = {
   tags: ['docs'],
+  parameters: {
+    docs: {
+      description: {
+        story:
+          'Add NavigationMenuIndicator to point an arrow at the open flyout.',
+      },
+    },
+  },
   render: (_args) => (
     <NavigationMenu>
       <NavigationMenuList>
@@ -158,6 +188,11 @@ export const WithIndicator: Story = {
 
 export const Disabled: Story = {
   tags: ['docs'],
+  parameters: {
+    docs: {
+      description: { story: 'Disable a trigger so its flyout cannot open.' },
+    },
+  },
   render: (_args) => (
     <NavigationMenu>
       <NavigationMenuList>

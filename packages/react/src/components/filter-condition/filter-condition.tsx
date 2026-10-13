@@ -37,7 +37,7 @@ function FilterConditionField({
   );
 }
 
-/** An independently operable segment in a composed field / operator / value condition. */
+/** One clickable part of a condition, such as its operator or value. */
 function FilterConditionSegment({
   children,
   className,

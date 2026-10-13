@@ -29,6 +29,12 @@ export default async function Page({
   const page = section?.pages.find((entry) => entry.slug === pageSlug);
   if (!section || !page) notFound();
 
+  // The `.md` files are written after `next build`, so `next dev` has none.
+  const markdownHref =
+    process.env.NODE_ENV === 'production' && page.kind !== 'placeholder'
+      ? `${page.route}.md`
+      : undefined;
+
   return (
     <>
       <Breadcrumb
@@ -38,6 +44,7 @@ export default async function Page({
           ...('group' in page ? [{ label: page.group }] : []),
           { label: page.label },
         ]}
+        markdownHref={markdownHref}
       />
       <PageContent page={page} />
     </>

@@ -18,21 +18,27 @@ const meta: Meta<typeof Avatar> = {
   component: Avatar,
   parameters: {
     layout: 'padded',
+    docs: {
+      description: {
+        component:
+          "Avatar shows a person's profile image, with initials as the fallback. Use AvatarGroup to stack several people and AvatarStatus to show presence.",
+      },
+    },
   },
   argTypes: {
     size: {
       control: 'select',
       options: ['2xs', 'xs', 'sm', 'md', 'lg', 'xl', '2xl', '3xl', '4xl'],
-      description: 'The size of the avatar',
+      description: 'Diameter, from 20px (`2xs`) to 96px (`4xl`).',
     },
     shape: {
       control: 'select',
       options: ['circle', 'rounded'],
-      description: 'The shape of the avatar',
+      description: 'Circle or rounded square.',
     },
     ring: {
       control: 'boolean',
-      description: 'Adds a non-interactive emphasis ring',
+      description: 'Adds a non-interactive emphasis ring.',
     },
   },
 };
@@ -471,6 +477,13 @@ export const WithStatus: Story = {
 
 export const StatusVariants: Story = {
   tags: ['docs'],
+  parameters: {
+    docs: {
+      description: {
+        story: 'Show online, away, busy and offline presence dots.',
+      },
+    },
+  },
   render: (_args) => (
     <div className="nx:flex nx:items-center nx:gap-4">
       {STATUS_VALUES.map((status, index) => (
@@ -530,6 +543,13 @@ export const Group: Story = {
 
 export const GroupWithMax: Story = {
   tags: ['docs'],
+  parameters: {
+    docs: {
+      description: {
+        story: 'Collapse extra avatars into a +N tile with `max`.',
+      },
+    },
+  },
   render: (_args) => (
     <AvatarGroup max={3} role="group" aria-label="Project team">
       {PORTRAITS.map((person, index) => (
@@ -560,7 +580,7 @@ export const GroupSizes: Story = {
     docs: {
       description: {
         story:
-          'A group sizes its members — and the `+N` overflow tile — in one place via `size`, and the overlap scales with that size. Members inherit it through the `TeamAvatar` wrapper via the size context.',
+          'Set `size` on AvatarGroup to size every member and the +N tile together.',
       },
     },
   },
@@ -601,7 +621,7 @@ export const OnContainerSurface: Story = {
     docs: {
       description: {
         story:
-          'Avatars on a `container` surface (e.g. a card) set on the page `background`, in dark mode where the two differ. The card declares its surface with `surface-container`, so the separator, status, and emphasis-ring offset match it instead of leaving a `background`-coloured halo.',
+          'On a card in dark mode, `surface-container` makes the avatar rings match the card instead of the page.',
       },
     },
   },
@@ -816,6 +836,11 @@ export const AllSizes: Story = {
   ),
   parameters: {
     layout: 'padded',
+    docs: {
+      description: {
+        story: 'Compare every size, both shapes and the fallback states.',
+      },
+    },
   },
 };
 

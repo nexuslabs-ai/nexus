@@ -18,11 +18,9 @@ interface HoverCardProps extends React.ComponentProps<
 > {}
 
 /**
- * HoverCard
- *
- * A popover-style card revealed when the user hovers (or focuses) the trigger —
- * for rich previews (profile cards, link previews). Opens on hover intent, not
- * click; for click-driven content use `Popover`.
+ * A card that opens when the user hovers or focuses the trigger. Use it for
+ * previews such as profile or link cards. For content opened by a click, use
+ * `Popover`.
  *
  * @example
  * ```tsx
@@ -48,10 +46,8 @@ interface HoverCardTriggerProps extends React.ComponentProps<
 > {}
 
 /**
- * HoverCardTrigger
- *
- * The element that reveals the card on hover / focus. Use `asChild` to render
- * as your own element (a link, an avatar).
+ * The element that opens the card on hover or focus. Use `asChild` to render
+ * your own element, such as a link or avatar.
  */
 function HoverCardTrigger(props: HoverCardTriggerProps) {
   return (
@@ -69,9 +65,7 @@ interface HoverCardContentProps extends React.ComponentProps<
 > {}
 
 /**
- * HoverCardContent
- *
- * The floating card, anchored to the trigger and portaled to the body.
+ * The floating card. Anchors to the trigger and renders into `document.body`.
  *
  * @example
  * ```tsx

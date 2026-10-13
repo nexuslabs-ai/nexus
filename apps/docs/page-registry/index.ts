@@ -53,12 +53,24 @@ export const PAGE_REGISTRY = {
     href: '/getting-started',
     pages: [
       {
+        slug: 'introduction',
+        label: 'Introduction',
+      },
+      {
+        slug: 'why-nexus',
+        label: 'Why Nexus',
+      },
+      {
         slug: 'install',
         label: 'Install',
       },
       {
         slug: 'theme-setup',
         label: 'Theme setup',
+      },
+      {
+        slug: 'examples',
+        label: 'Examples',
       },
       {
         slug: 'first-component',
@@ -374,17 +386,6 @@ export const PAGE_REGISTRY = {
       {
         slug: 'llms-txt',
         label: 'llms.txt',
-        wireframe: {
-          lede: '[ Point your model at one URL · machine-readable site map ]',
-          blocks: [
-            {
-              type: 'placeholder',
-              variant: 'code',
-              label: '[ Code — llms.txt preview ]',
-            },
-            { type: 'placeholder', label: '[ Download · copy link ]' },
-          ],
-        },
       },
       {
         slug: 'rules-mirror',

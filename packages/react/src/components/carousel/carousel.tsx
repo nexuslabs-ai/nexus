@@ -16,22 +16,19 @@ type CarouselOptions = UseCarouselParameters[0];
 type CarouselPlugin = UseCarouselParameters[1];
 
 /**
- * CarouselProps
- *
- * `embla-carousel-react` is an optional peer dependency — install it in the
- * consuming app.
+ * Props for Carousel. Install the optional `embla-carousel-react` peer dependency in your app.
  */
 type CarouselProps = {
-  /** Embla options object (loop, align, dragFree, …). */
+  /** Embla options, such as `loop`, `align` or `dragFree`. */
   opts?: CarouselOptions;
-  /** Embla plugins (autoplay, wheel-gestures, …). */
+  /** Embla plugins, such as autoplay or wheel gestures. */
   plugins?: CarouselPlugin;
   /**
    * Scroll axis.
    * @default 'horizontal'
    */
   orientation?: 'horizontal' | 'vertical';
-  /** Receives the Embla API once initialised, for external control. */
+  /** Receives the Embla API after setup, for external control. */
   setApi?: (api: CarouselApi) => void;
 };
 
@@ -60,18 +57,11 @@ function useCarousel() {
 }
 
 /**
- * Carousel
+ * Slideshow built on Embla that scrolls horizontally or vertically.
+ * Put `CarouselItem`s in `CarouselContent`, and add `CarouselPrevious` and `CarouselNext`.
+ * Arrow keys along the scroll axis move between slides.
  *
- * Slideshow / horizontal (or vertical) scroller built on Embla. Compose with
- * `CarouselContent` + `CarouselItem`, and `CarouselPrevious` / `CarouselNext`
- * for the controls.
- *
- * Keyboard: a horizontal carousel scrolls with Left/Right arrows, a vertical
- * one with Up/Down (arrows for the other axis are ignored).
- *
- * Layout: the Previous / Next controls render just outside the content frame,
- * so give the carousel horizontal room (a `max-w-*` with auto margins, or
- * container padding) — otherwise they clip off-canvas at narrow / mobile widths.
+ * The Previous and Next buttons sit outside the frame. Leave horizontal room, such as padding, so they don't clip on narrow screens.
  *
  * @example
  * ```tsx

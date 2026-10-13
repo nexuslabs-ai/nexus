@@ -28,8 +28,9 @@ const meta: Meta<typeof AlertDialog> = {
     docs: {
       description: {
         component: [
-          'Use AlertDialog for consequential confirmations where the user must explicitly confirm or cancel before continuing.',
-          'Use Dialog for lower-stakes modal tasks, Sheet for deterministic edge panels such as settings or filters, and Drawer for gesture-driven mobile-style panels with drag-to-dismiss behavior.',
+          'AlertDialog makes the user confirm or cancel before an action with serious results, such as deleting data.',
+          'For lower-stakes modal tasks, use Dialog.',
+          'For edge panels, use Sheet, or Drawer for drag-to-dismiss.',
         ].join(' '),
       },
     },
@@ -69,6 +70,13 @@ export const Default: Story = {
 
 export const Destructive: Story = {
   tags: ['docs'],
+  parameters: {
+    docs: {
+      description: {
+        story: 'Confirm a permanent delete with a destructive action button.',
+      },
+    },
+  },
   render: (_args) => (
     <AlertDialog>
       <AlertDialogTrigger asChild>
@@ -205,7 +213,7 @@ export const ViewportBoundContent: Story = {
     docs: {
       description: {
         story:
-          'Manual check: on a narrow/mobile viewport, long AlertDialogBody content should scroll inside the Dialog-family viewport boundary.',
+          'Manual check: on a narrow viewport, long AlertDialogBody content scrolls inside the visible screen.',
       },
     },
   },
@@ -249,6 +257,14 @@ export const ViewportBoundContent: Story = {
 
 export const Centered: Story = {
   tags: ['docs'],
+  parameters: {
+    docs: {
+      description: {
+        story:
+          'Center the header and stack full-width actions with `variant="center"`.',
+      },
+    },
+  },
   render: (_args) => (
     <AlertDialog>
       <AlertDialogTrigger asChild>

@@ -12,6 +12,14 @@ import {
 const meta: Meta<typeof NativeSelect> = {
   title: 'Components/NativeSelect',
   component: NativeSelect,
+  parameters: {
+    docs: {
+      description: {
+        component:
+          'NativeSelect styles the browser `<select>`, so mobile users get the system picker. Use it for dense forms and long, plain lists. For a styled dropdown use Select, and for search use Combobox.',
+      },
+    },
+  },
 };
 
 export default meta;
@@ -32,6 +40,9 @@ export const Default: Story = {
 // Both sizes: the default control height and the dense `sm`.
 export const Sizes: Story = {
   tags: ['docs'],
+  parameters: {
+    docs: { description: { story: 'Use the `sm` size for dense forms.' } },
+  },
   render: () => (
     <div className="nx:flex nx:flex-col nx:gap-3">
       <NativeSelect size="default" aria-label="Default size" defaultValue="pro">
@@ -49,6 +60,13 @@ export const Sizes: Story = {
 // Grouped options via optgroup.
 export const WithOptGroups: Story = {
   tags: ['docs'],
+  parameters: {
+    docs: {
+      description: {
+        story: 'Group options under labels with NativeSelectOptGroup.',
+      },
+    },
+  },
   render: () => (
     <NativeSelect aria-label="Timezone" defaultValue="pst">
       <NativeSelectOptGroup label="Americas">
@@ -66,6 +84,13 @@ export const WithOptGroups: Story = {
 // Invalid state — error boundary + error focus ring.
 export const Invalid: Story = {
   tags: ['docs'],
+  parameters: {
+    docs: {
+      description: {
+        story: 'Set `aria-invalid` to show the error border and focus ring.',
+      },
+    },
+  },
   render: () => (
     <NativeSelect aria-label="Plan" aria-invalid defaultValue="free">
       <NativeSelectOption value="free">Free</NativeSelectOption>
@@ -77,6 +102,14 @@ export const Invalid: Story = {
 // Disabled — semantic disabled tokens on the select and chevron.
 export const Disabled: Story = {
   tags: ['docs'],
+  parameters: {
+    docs: {
+      description: {
+        story:
+          'Disable the select to dim it and its chevron and block changes.',
+      },
+    },
+  },
   render: () => (
     <NativeSelect aria-label="Plan" defaultValue="free" disabled>
       <NativeSelectOption value="free">Free</NativeSelectOption>
@@ -202,7 +235,7 @@ export const ReadOnlyBoundary: Story = {
     docs: {
       description: {
         story:
-          'NativeSelect wraps a native `select`, which has disabled but no native readOnly state. Use disabled when the control is unavailable. If a locked value must still submit with a form, render a display-only value and a hidden input instead of passing a readOnly prop.',
+          '`<select>` has no read-only state, so use `disabled`, or show a locked value as text with a hidden input if it must submit.',
       },
     },
   },

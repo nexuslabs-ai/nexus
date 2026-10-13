@@ -179,7 +179,7 @@ const meta = {
       ),
       description: {
         component:
-          'Separate field, operator, value and removal parts. Compose FilterConditionSegment with PopoverTrigger or DropdownMenuTrigger asChild. FilterCondition does not own open state, draft values, application timing or focus after removal. All parts use one compact, density-aware height (h-8). Change density to adjust the whole condition; there is no size prop. Editor inputs choose their own appropriate sizing. Native buttons preserve Enter/Space activation. The full summary remains accessible when visually truncated. See Patterns/Filtering for immediate and Apply-based recipes. Use FilterChip when the entire chip should only remove.',
+          'FilterCondition shows one filter as separate field, operator, value and remove parts. Use it when the user edits a filter from its summary. For a chip that only removes, use FilterChip.\n\n- Wrap each FilterConditionSegment in a PopoverTrigger or DropdownMenuTrigger with `asChild`.\n- Your app owns open state, draft values, when changes apply and focus after removal.\n- All parts share one compact height that follows density. There is no `size` prop.\n- Editor inputs set their own size.\n- Segments are native buttons, so Enter and Space activate them.\n- The full summary stays accessible when it truncates on screen.\n- See Patterns/Filtering for recipes that apply changes at once or on Apply.',
       },
     },
   },

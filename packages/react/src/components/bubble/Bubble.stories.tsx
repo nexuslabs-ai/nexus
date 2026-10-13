@@ -31,6 +31,12 @@ const meta: Meta<typeof Bubble> = {
   component: Bubble,
   parameters: {
     layout: 'padded',
+    docs: {
+      description: {
+        component:
+          'Bubble shows one message in a conversation. Use it as the body of a chat or assistant turn. For the avatar, header and footer around it, use Message.',
+      },
+    },
   },
 };
 
@@ -209,6 +215,13 @@ export const RightToLeft: Story = {
 
 export const WithReactions: Story = {
   tags: ['docs'],
+  parameters: {
+    docs: {
+      description: {
+        story: 'Pin a reaction pill to the corner of each bubble.',
+      },
+    },
+  },
   render: () => (
     <BubbleGroup className={column}>
       <Bubble align="start">
@@ -1009,6 +1022,13 @@ export const ShowMore: Story = {
 
 export const AllVariants: Story = {
   tags: ['docs'],
+  parameters: {
+    docs: {
+      description: {
+        story: 'Compare every variant aligned to the start and the end.',
+      },
+    },
+  },
   render: () => (
     <div className="nx:flex nx:flex-col nx:gap-6">
       {VARIANTS.map((variant) => (

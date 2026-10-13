@@ -1,0 +1,27 @@
+# llms.txt
+
+Point your AI agent at `/llms.txt` to give it every Nexus docs page as Markdown.
+
+## Fetch the index
+
+```bash
+curl https://nexusui.so/llms.txt
+```
+
+`/llms.txt` lists every docs page with content, by section. Each entry links to the page's
+Markdown and gives a one-line summary.
+
+## Read one page as Markdown
+
+Add `.md` to the URL of any page in `/llms.txt` to get that page as Markdown.
+
+```bash
+curl https://nexusui.so/getting-started/install.md
+```
+
+The Markdown keeps the page's text, tables and code. Live previews and copy
+buttons are left out, because they mean nothing as text.
+
+## Next steps
+
+- **[Install](/getting-started/install)**: set up an app for Nexus components

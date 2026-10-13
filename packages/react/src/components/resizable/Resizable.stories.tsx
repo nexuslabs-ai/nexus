@@ -12,6 +12,12 @@ const meta: Meta<typeof ResizablePanelGroup> = {
   component: ResizablePanelGroup,
   parameters: {
     layout: 'padded',
+    docs: {
+      description: {
+        component:
+          'Resizable splits an area into panels that users resize by dragging or with the keyboard. Use it for layouts like a sidebar beside an editor. Give every `ResizableHandle` an `aria-label`.',
+      },
+    },
   },
 };
 
@@ -64,6 +70,14 @@ export const Default: Story = {
 // Vertical split — the handle flips to a horizontal divider.
 export const Vertical: Story = {
   tags: ['docs'],
+  parameters: {
+    docs: {
+      description: {
+        story:
+          'Stack panels vertically, with a horizontal divider between them.',
+      },
+    },
+  },
   render: () => (
     <ResizablePanelGroup
       orientation="vertical"
@@ -84,6 +98,13 @@ export const Vertical: Story = {
 // Three panels with two handles.
 export const ThreePanels: Story = {
   tags: ['docs'],
+  parameters: {
+    docs: {
+      description: {
+        story: 'Split the area into three panels with two handles.',
+      },
+    },
+  },
   render: () => (
     <ResizablePanelGroup
       orientation="horizontal"

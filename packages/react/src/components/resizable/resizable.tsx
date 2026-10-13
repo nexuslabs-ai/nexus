@@ -4,11 +4,8 @@ import { IconGripVertical } from '../../lib/icons';
 import { cn } from '../../lib/utils';
 
 /**
- * ResizablePanelGroup
- *
- * Container for a set of resizable panels. `orientation` ("horizontal" |
- * "vertical") sets the split axis. `react-resizable-panels` is an optional peer
- * dependency — install it in the consuming app.
+ * Holds a set of resizable panels. `orientation` sets the split axis.
+ * Install the optional peer dependency `react-resizable-panels` in your app.
  *
  * @example
  * ```tsx
@@ -33,20 +30,15 @@ function ResizablePanelGroup({
 }
 
 /**
- * ResizablePanel
- *
- * A single panel within a `ResizablePanelGroup`.
+ * One panel inside a `ResizablePanelGroup`.
  */
 function ResizablePanel({ ...props }: ResizablePrimitive.PanelProps) {
   return <ResizablePrimitive.Panel data-slot="resizable-panel" {...props} />;
 }
 
 /**
- * ResizableHandle
- *
- * The draggable / keyboard-resizable divider between two panels. Pass
- * `withHandle` to render a visible grip. As a focusable splitter it should be
- * given an `aria-label`.
+ * Divider between two panels, resized by drag or keyboard. Give each handle an
+ * `aria-label`.
  */
 function ResizableHandle({
   withHandle,
@@ -54,7 +46,7 @@ function ResizableHandle({
   ...props
 }: ResizablePrimitive.SeparatorProps & {
   /**
-   * Render a visible grip affordance in the centre of the handle.
+   * Shows a grip in the centre of the handle.
    * @default false
    */
   withHandle?: boolean;

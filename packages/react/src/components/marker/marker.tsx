@@ -23,22 +23,14 @@ const markerVariants = cva(
 );
 
 /**
- * MarkerProps
- *
  * Props for the Marker component.
  */
 interface MarkerProps
   extends React.ComponentProps<'div'>, VariantProps<typeof markerVariants> {
   /**
-   * Render as the child element instead of a `div`, merging Marker's styles
-   * onto it. Use when the annotation needs different semantics — a heading for
-   * a labelled section, or a link / button for an actionable row.
-   *
-   * An `a` or `button` child is answered by the row itself — hover, the
-   * pointer cursor, and the design-system focus ring apply only when the child
-   * is interactive, so the call site needs no extra classes. A `disabled` or `aria-disabled` child is inert: the row
-   * drops pointer events, so neither the hover nor the cursor fires, and its
-   * foreground mutes to `text-disabled-foreground`.
+   * Renders the child element, such as a heading, link or button, with Marker
+   * styles. A link or button child gets hover styles with no extra classes. A
+   * `disabled` or `aria-disabled` child ignores the pointer and dims.
    *
    * @default false
    * @example
@@ -52,14 +44,9 @@ interface MarkerProps
 }
 
 /**
- * Marker
- *
- * A low-emphasis annotation row for lists, feeds, and message streams — an
- * optional icon plus muted text. `variant="separator"` centres the label
- * between two rules; `variant="border"` rests the row above a bottom rule.
- *
- * The label stays real text in reading order, so it is announced where it
- * appears. For a purely decorative rule with no label, use `Separator`.
+ * Quiet annotation row with an optional icon, for lists, feeds and message
+ * streams. `separator` centers the label between two rules, and `border` adds
+ * a rule underneath. For a decorative rule with no label, use `Separator`.
  *
  * @example
  * ```tsx
@@ -97,17 +84,13 @@ function Marker({
 }
 
 /**
- * MarkerIconProps
- *
  * Props for the MarkerIcon component.
  */
 interface MarkerIconProps extends React.ComponentProps<'span'> {}
 
 /**
- * MarkerIcon
- *
- * Decorative leading icon for a Marker. Hidden from assistive tech — the
- * meaning belongs in `MarkerContent`.
+ * Decorative leading icon. Screen readers skip it, so put the meaning in
+ * `MarkerContent`.
  */
 function MarkerIcon({ className, ...props }: MarkerIconProps) {
   return (
@@ -124,17 +107,13 @@ function MarkerIcon({ className, ...props }: MarkerIconProps) {
 }
 
 /**
- * MarkerContentProps
- *
  * Props for the MarkerContent component.
  */
 interface MarkerContentProps extends React.ComponentProps<'span'> {}
 
 /**
- * MarkerContent
- *
- * The Marker's label. Under `variant="separator"` its text centres while the
- * two rules take the remaining space.
+ * Label text of the Marker. With `variant="separator"`, the text centers
+ * between the two rules.
  */
 function MarkerContent({ className, ...props }: MarkerContentProps) {
   return (

@@ -29,13 +29,13 @@ const STATS = [
 const AUDIENCES = [
   {
     title: 'Engineer',
-    desc: 'Install, wire your theme, and ship your first component in minutes.',
+    desc: 'Set up your app, add the theme, and copy in your first component.',
     href: requirePage('getting-started', 'install').route,
   },
   {
     title: 'AI agent',
-    desc: 'llms.txt, a mirror of the rules, and authoring conventions agents can parse.',
-    href: requireSection('agents').href,
+    desc: 'Every page as Markdown, indexed in /llms.txt.',
+    href: requirePage('agents', 'llms-txt').route,
   },
 ];
 
@@ -64,9 +64,8 @@ export default function Home() {
           Design once. Ship every brand.
         </h1>
         <p className="nx:typography-body-default nx:text-muted-foreground nx:mt-5 nx:max-w-[36rem] nx:mx-auto nx:text-pretty">
-          A multi-brand design system tuned for perceptual consistency across
-          five bases — authored from a single source of truth by humans and
-          agents alike.
+          React components you copy into your app and own. Set your brand once,
+          and every component follows it.
         </p>
         <div className="nx:mt-8 nx:flex nx:flex-wrap nx:gap-3 nx:justify-center">
           <Button asChild>

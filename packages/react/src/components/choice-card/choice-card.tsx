@@ -38,8 +38,7 @@ const choiceCardVariants = cva(
 /**
  * ChoiceCardProps
  *
- * Props for the ChoiceCard component. `asChild` is intentionally omitted
- * because ChoiceCard depends on native label semantics through `htmlFor`.
+ * Props for ChoiceCard. It has no `asChild`, because it relies on a native label with `htmlFor`.
  */
 interface ChoiceCardProps
   extends
@@ -68,22 +67,13 @@ type ChoiceCardTitleProps = React.ComponentProps<'div'>;
 type ChoiceCardDescriptionProps = React.ComponentProps<'p'>;
 
 /**
- * ChoiceCard
+ * Label card for a checkbox or radio choice with a title and description.
+ * Set `htmlFor` to the nested control's `id`, so a click anywhere on the card toggles it.
  *
- * A rich label-owned card for checkbox and radio choices. The card owns the
- * click/tap target through native `htmlFor`/`id` wiring, while the nested
- * Checkbox or RadioGroupItem remains the only interactive control and source of
- * selected/focus/disabled/invalid semantics.
+ * `variant="borderless"` hides the frame and keeps the size. Put `ChoiceCardContent` first to move the control to the trailing edge.
  *
- * The default `variant="bordered"` gives the card a visible frame.
- * Use `variant="borderless"` for a quieter surface that keeps the same box
- * dimensions. Place `ChoiceCardContent` before the nested Checkbox or
- * RadioGroupItem when the control should appear at the trailing edge.
- *
- * When the card includes a description, wire the child control with
- * `aria-labelledby` pointing to `ChoiceCardTitle` and `aria-describedby`
- * pointing to `ChoiceCardDescription`. Without that explicit title wiring, the
- * native label would name the control with both title and description text.
+ * With a description, point the control's `aria-labelledby` at `ChoiceCardTitle` and `aria-describedby` at `ChoiceCardDescription`.
+ * Otherwise the description becomes part of the control's name.
  *
  * @example
  * ```tsx
@@ -114,9 +104,7 @@ function ChoiceCard({ className, variant, ...props }: ChoiceCardProps) {
 }
 
 /**
- * ChoiceCardContent
- *
- * Vertical wrapper for rich choice title and description text.
+ * Stacks the title and description.
  */
 function ChoiceCardContent({ className, ...props }: ChoiceCardContentProps) {
   return (
@@ -132,10 +120,7 @@ function ChoiceCardContent({ className, ...props }: ChoiceCardContentProps) {
 }
 
 /**
- * ChoiceCardTitle
- *
- * Visible choice label text. Use its `id` as the child control's
- * `aria-labelledby` target when the card also includes a description.
+ * Choice label. With a description, point the control's `aria-labelledby` at its `id`.
  */
 function ChoiceCardTitle({ className, ...props }: ChoiceCardTitleProps) {
   return (
@@ -153,10 +138,7 @@ function ChoiceCardTitle({ className, ...props }: ChoiceCardTitleProps) {
 }
 
 /**
- * ChoiceCardDescription
- *
- * Optional helper text for a choice. Pair its `id` with the child control's
- * `aria-describedby`.
+ * Optional helper text. Point the control's `aria-describedby` at its `id`.
  */
 function ChoiceCardDescription({
   className,

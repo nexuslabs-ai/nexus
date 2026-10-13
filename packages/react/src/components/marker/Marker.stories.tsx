@@ -19,6 +19,12 @@ const meta: Meta<typeof Marker> = {
   component: Marker,
   parameters: {
     layout: 'padded',
+    docs: {
+      description: {
+        component:
+          'Marker labels a point in a list, feed or message stream with muted text and an optional icon. Use it for dates, edit notes and progress updates. For a rule with no label, use Separator.',
+      },
+    },
   },
 };
 
@@ -45,6 +51,14 @@ export const Default: Story = {
 
 export const Separator: Story = {
   tags: ['docs'],
+  parameters: {
+    docs: {
+      description: {
+        story:
+          'Center the label between two rules to divide a feed by date or event.',
+      },
+    },
+  },
   render: () => (
     <div className={stack}>
       <Marker variant="separator">
@@ -62,6 +76,13 @@ export const Separator: Story = {
 
 export const Border: Story = {
   tags: ['docs'],
+  parameters: {
+    docs: {
+      description: {
+        story: 'Underline each row with a rule to separate steps in a log.',
+      },
+    },
+  },
   render: () => (
     <div className={stack}>
       <Marker variant="border">
@@ -88,6 +109,13 @@ export const Border: Story = {
 
 export const WithIcon: Story = {
   tags: ['docs'],
+  parameters: {
+    docs: {
+      description: {
+        story: 'Lead the label with a decorative icon in any variant.',
+      },
+    },
+  },
   render: () => (
     <div className={stack}>
       <Marker>
@@ -112,12 +140,16 @@ export const WithIcon: Story = {
   ),
 };
 
-/**
- * `role="status"` announces the row as it changes, so a live progress marker
- * reaches assistive tech without stealing focus.
- */
 export const Status: Story = {
   tags: ['docs'],
+  parameters: {
+    docs: {
+      description: {
+        story:
+          'Set `role="status"` so screen readers announce progress as it changes, without moving focus.',
+      },
+    },
+  },
   render: () => (
     <div className={stack}>
       <Marker role="status">
@@ -175,6 +207,13 @@ export const WithLink: Story = {
 
 export const InContext: Story = {
   tags: ['docs'],
+  parameters: {
+    docs: {
+      description: {
+        story: 'Place markers between message rows to show dates and edits.',
+      },
+    },
+  },
   render: () => (
     <div className="nx:flex nx:w-full nx:max-w-sm nx:flex-col nx:gap-3">
       <div className={row}>Rewrote the onboarding copy</div>
@@ -216,6 +255,14 @@ export const AsChild: Story = {
 
 export const AsChildLink: Story = {
   tags: ['docs'],
+  parameters: {
+    docs: {
+      description: {
+        story:
+          'Render the marker as a link with `asChild` to make the row clickable.',
+      },
+    },
+  },
   render: () => (
     <Marker asChild>
       <a href="#pull-request">
@@ -235,10 +282,8 @@ export const AsChildLink: Story = {
 };
 
 /**
- * A `disabled` or `aria-disabled` `asChild` child is inert — the row drops
- * pointer events, so neither the hover recolour nor the pointer cursor fires,
- * and its foreground mutes to `text-disabled-foreground`. The enabled row is
- * rendered alongside so the two are comparable.
+ * A disabled or `aria-disabled` child ignores the pointer and dims, shown
+ * beside an enabled row.
  */
 export const Disabled: StoryObj<MarkerProps & { onRevert: () => void }> = {
   args: { onRevert: fn() },

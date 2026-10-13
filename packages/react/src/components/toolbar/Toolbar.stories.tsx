@@ -56,8 +56,17 @@ const meta: Meta<typeof Toolbar> = {
     layout: 'padded',
     docs: {
       description: {
-        component:
-          'A contained group of related controls with one Tab stop. The shared defaults provide a theme-aware surface, border, corners, shadow, 2px padding and gaps. Selected toggles use a subtle primary background and primary text, so selection never changes their width. Override className only for intentional compositions such as attached or flush action bars. Arrow keys move between controls; Home/End reach the first/last control. Use ToolbarButton, ToolbarLink, and ToolbarToggleGroup/Item so every control shares the toolbar focus sequence. Button and link expose Nexus button variant/size styles (ghost/sm by default); toggles use matching sizes. These are Radix controls, not the full Button loading/icon-slot API. Use asChild for menu triggers, preserving native interactive semantics. Controls wrap in DOM order in narrow containers; horizontal arrow navigation continues across wrapped rows. Keep labels concise and choose secondary menu actions explicitly. Provide aria-label or aria-labelledby; use ordinary layout and Buttons for simple action rows that should keep separate Tab stops. Keep text fields outside the toolbar to avoid arrow-key conflicts. Inline, Attached, and Selection demonstrate compositions using this same API. Applications own commands, selection, visibility, placement, and persistence.',
+        component: [
+          'Toolbar groups related controls behind one Tab stop. Arrow keys move between controls, and Home and End jump to the first and last. For actions that each need their own Tab stop, use a row of Buttons.',
+          '',
+          '- Label the toolbar with `aria-label` or `aria-labelledby`.',
+          '- Build it from ToolbarButton, ToolbarLink, ToolbarToggleGroup and ToolbarToggleItem so every control joins the arrow-key order.',
+          '- ToolbarButton and ToolbarLink take Button `variant` and `size`, but not `loading` or icon slots.',
+          '- Use `asChild` to make a toolbar control a menu trigger.',
+          '- Keep text fields outside the toolbar, because arrow keys would conflict with typing.',
+          '- In narrow containers, controls wrap in DOM order and arrow keys still reach every row.',
+          '- Your app owns the commands, selection, visibility and placement.',
+        ].join('\n'),
       },
     },
   },
@@ -210,6 +219,14 @@ function FileToolbar() {
 
 export const FileActions: Story = {
   tags: ['docs'],
+  parameters: {
+    docs: {
+      description: {
+        story:
+          'Group file actions and move extra ones into a "More" dropdown menu.',
+      },
+    },
+  },
   render: () => <FileToolbar />,
   play: async ({ canvasElement }) => {
     const canvas = within(canvasElement);
@@ -260,6 +277,14 @@ function CalendarToolbar() {
 
 export const Calendar: Story = {
   tags: ['docs'],
+  parameters: {
+    docs: {
+      description: {
+        story:
+          'Pair previous and next buttons with a single-select view switcher.',
+      },
+    },
+  },
   render: () => <CalendarToolbar />,
   play: async ({ canvasElement }) => {
     const canvas = within(canvasElement);
@@ -336,6 +361,14 @@ export const KeyboardAndDisabled: Story = {
 
 export const Vertical: Story = {
   tags: ['docs'],
+  parameters: {
+    docs: {
+      description: {
+        story:
+          'Set `orientation="vertical"` to stack the controls in a column.',
+      },
+    },
+  },
   render: () => (
     <Toolbar orientation="vertical" aria-label="Drawing actions">
       <ToolbarButton>Select</ToolbarButton>
@@ -499,6 +532,14 @@ export const NarrowCompositions: Story = {
 
 export const DisabledToggles: Story = {
   tags: ['docs'],
+  parameters: {
+    docs: {
+      description: {
+        story:
+          'Disable a toggle group while the rest of the toolbar stays usable.',
+      },
+    },
+  },
   render: () => (
     <Toolbar aria-label="Formatting availability">
       <ToolbarButton>Undo</ToolbarButton>
@@ -791,6 +832,14 @@ function SelectionExample() {
 
 export const Inline: Story = {
   tags: ['docs'],
+  parameters: {
+    docs: {
+      description: {
+        story:
+          'Restyle the toolbar as a flush row above a list, with a view filter.',
+      },
+    },
+  },
   render: () => <InlineExample />,
   play: async ({ canvasElement }) => {
     const canvas = within(canvasElement);
@@ -806,6 +855,14 @@ export const Inline: Story = {
 };
 export const Attached: Story = {
   tags: ['docs'],
+  parameters: {
+    docs: {
+      description: {
+        story:
+          'Attach the toolbar to the top of a note field to format its text.',
+      },
+    },
+  },
   render: () => <AttachedExample />,
   play: async ({ canvasElement }) => {
     const canvas = within(canvasElement);
@@ -839,6 +896,13 @@ export const Attached: Story = {
 };
 export const Selection: Story = {
   tags: ['docs'],
+  parameters: {
+    docs: {
+      description: {
+        story: 'Show an action bar for the documents a user has selected.',
+      },
+    },
+  },
   render: () => <SelectionExample />,
   play: async ({ canvasElement }) => {
     const canvas = within(canvasElement);
@@ -864,7 +928,7 @@ export const VisualDirections: Story = {
     docs: {
       description: {
         story:
-          'Two visual compositions of the same Toolbar. Quiet strip uses subtle separators and one surface; distinct tools uses individual button surfaces and spacing-only grouping. Corners continue to follow the global theme.',
+          'Style the same Toolbar as a quiet strip with separators, or as separate tools grouped by spacing.',
       },
     },
   },
@@ -1049,7 +1113,7 @@ export const ActionDirections: Story = {
     docs: {
       description: {
         story:
-          'Three compositions using the existing Toolbar API: a compact selection bar, explicit overflow for file actions, and a single-select vertical tool rail. Commands are local demos; canvas drawing and file operations belong to the application. The drawing rail uses 2px padding and tool gaps; the action bars have no outer padding. Corners and surfaces follow the theme.',
+          'Build a compact selection bar, a file action bar with an overflow menu, and a vertical tool rail from the same parts.',
       },
     },
   },

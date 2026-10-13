@@ -80,6 +80,10 @@ const meta = {
     layout: 'centered',
     controls: { disable: true },
     docs: {
+      description: {
+        component:
+          'ChoiceFilter filters by one value from a short list and applies it at once. Use it for a few mutually exclusive options. To match several values, use MultiChoiceFilter.',
+      },
       page: () => (
         <>
           <Title />

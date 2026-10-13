@@ -21,6 +21,14 @@ import {
 const meta: Meta<typeof Field> = {
   title: 'Components/Field',
   component: Field,
+  parameters: {
+    docs: {
+      description: {
+        component:
+          'Field lays out a label, control, description and error as one form field. Use it for any labeled form control. For a group of related fields, wrap them in FieldSet or FieldGroup.',
+      },
+    },
+  },
 };
 
 export default meta;
@@ -54,6 +62,14 @@ export const Default: Story = {
 // The three orientations: vertical, horizontal, and container-responsive.
 export const Orientations: Story = {
   tags: ['docs'],
+  parameters: {
+    docs: {
+      description: {
+        story:
+          "Set `orientation` to `vertical`, `horizontal` or `responsive`, which follows the FieldGroup's width.",
+      },
+    },
+  },
   render: () => (
     <FieldGroup className="nx:w-80">
       <Field orientation="vertical">
@@ -78,6 +94,14 @@ export const Orientations: Story = {
 // Both legend emphases: the larger fieldset `legend` and the label-sized one.
 export const LegendVariants: Story = {
   tags: ['docs'],
+  parameters: {
+    docs: {
+      description: {
+        story:
+          'Caption a FieldSet with a FieldLegend in the `legend` or smaller `label` size.',
+      },
+    },
+  },
   render: () => (
     <div className="nx:flex nx:w-80 nx:flex-col nx:gap-6">
       <FieldSet>
@@ -102,6 +126,14 @@ export const LegendVariants: Story = {
 // An invalid field with an error message wired via the errors prop.
 export const WithError: Story = {
   tags: ['docs'],
+  parameters: {
+    docs: {
+      description: {
+        story:
+          'Set `data-invalid` on the Field and `aria-invalid` on the control, then link the FieldError with `aria-errormessage`.',
+      },
+    },
+  },
   render: () => (
     <div className="nx:w-80">
       <Field data-invalid="true">
@@ -172,6 +204,14 @@ export const MultipleErrors: Story = {
 // A divider between groups of fields, with centered content.
 export const WithSeparator: Story = {
   tags: ['docs'],
+  parameters: {
+    docs: {
+      description: {
+        story:
+          'Split alternative fields with a FieldSeparator that shows centered text.',
+      },
+    },
+  },
   render: () => (
     <div className="nx:w-80 nx:rounded-lg nx:border nx:border-border-default nx:bg-container nx:p-6">
       <FieldGroup>
@@ -191,6 +231,14 @@ export const WithSeparator: Story = {
 
 export const RequiredAndOptionalIndicators: Story = {
   tags: ['docs'],
+  parameters: {
+    docs: {
+      description: {
+        story:
+          'Mark a required field with FieldRequiredIndicator, or an optional one with its `fallback` text.',
+      },
+    },
+  },
   render: () => (
     <FieldGroup className="nx:w-80">
       <Field>
@@ -334,6 +382,14 @@ export const KeyboardInteraction: Story = {
 // A disabled field: data-disabled dims the label and the control is disabled.
 export const Disabled: Story = {
   tags: ['docs'],
+  parameters: {
+    docs: {
+      description: {
+        story:
+          'Set `data-disabled` on the Field and `disabled` on the control to dim the label.',
+      },
+    },
+  },
   render: () => (
     <div className="nx:w-80">
       <Field data-disabled="true">

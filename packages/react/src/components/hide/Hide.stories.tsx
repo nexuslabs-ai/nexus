@@ -7,6 +7,12 @@ const meta: Meta<typeof Hide> = {
   title: 'Primitives/Hide',
   component: Hide,
   parameters: {
+    docs: {
+      description: {
+        component:
+          'Hide removes its children from view above or below a viewport or container width. Use it for responsive visibility instead of toggling `nx:hidden` classes. To show content only at a width, use Show.',
+      },
+    },
     layout: 'padded',
   },
 };
@@ -42,6 +48,14 @@ export const Default: Story = {
 
 export const AllAxes: Story = {
   tags: ['docs'],
+  parameters: {
+    docs: {
+      description: {
+        story:
+          'Each of the four props hides its content at a different viewport or container width.',
+      },
+    },
+  },
   render: () => (
     <div className="nx:flex nx:flex-col nx:gap-4">
       <div>

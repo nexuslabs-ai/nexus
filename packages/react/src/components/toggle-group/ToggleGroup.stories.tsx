@@ -20,6 +20,14 @@ import { ToggleGroup, ToggleGroupItem } from './toggle-group';
 const meta: Meta<typeof ToggleGroup> = {
   title: 'Components/ToggleGroup',
   component: ToggleGroup,
+  parameters: {
+    docs: {
+      description: {
+        component:
+          'ToggleGroup is a set of related toggles, such as text alignment or Bold, Italic and Underline. Use `type="single"` for one choice or `type="multiple"` for several. Icon-only items need an `aria-label`.',
+      },
+    },
+  },
 };
 
 export default meta;
@@ -55,6 +63,14 @@ export const Default: Story = {
 // Multiple-select: any number of items pressed at once.
 export const Multiple: Story = {
   tags: ['docs'],
+  parameters: {
+    docs: {
+      description: {
+        story:
+          'Set `type="multiple"` to let users press several items at once.',
+      },
+    },
+  },
   render: () => (
     <ToggleGroup type="multiple" defaultValue={['bold']}>
       <ToggleGroupItem value="bold" aria-label="Bold">
@@ -73,6 +89,13 @@ export const Multiple: Story = {
 // The outline variant, applied to the whole group via context.
 export const Outline: Story = {
   tags: ['docs'],
+  parameters: {
+    docs: {
+      description: {
+        story: 'Set `variant="outline"` on the group to style every item.',
+      },
+    },
+  },
   render: () => (
     <ToggleGroup type="single" variant="outline" defaultValue="left">
       <ToggleGroupItem value="left" aria-label="Align left">
@@ -91,6 +114,14 @@ export const Outline: Story = {
 // Joined (spacing 0, segmented) vs separated (spacing 2, individual pills).
 export const Spacing: Story = {
   tags: ['docs'],
+  parameters: {
+    docs: {
+      description: {
+        story:
+          'Leave `spacing` at 0 for a joined control, or raise it for separate pills.',
+      },
+    },
+  },
   render: () => (
     <div className="nx:flex nx:flex-col nx:gap-4">
       <ToggleGroup type="single" variant="outline" defaultValue="left">
@@ -753,6 +784,14 @@ export const EmptyAndSingle: Story = {
 
 export const FormattingSettings: Story = {
   tags: ['docs'],
+  parameters: {
+    docs: {
+      description: {
+        story:
+          'Use toggle groups for text formatting and paragraph style inside a settings form.',
+      },
+    },
+  },
   render: function FormattingSettingsStory() {
     const titleId = useId();
 
@@ -855,6 +894,13 @@ export const KeyboardInteraction: Story = {
 // A disabled group disables all its items.
 export const Disabled: Story = {
   tags: ['docs'],
+  parameters: {
+    docs: {
+      description: {
+        story: 'Disable the group to disable every item in it.',
+      },
+    },
+  },
   render: () => (
     <ToggleGroup type="single" defaultValue="left" disabled>
       <ToggleGroupItem value="left" aria-label="Align left">

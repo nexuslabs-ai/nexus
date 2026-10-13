@@ -26,6 +26,14 @@ import {
 const meta: Meta<typeof ChartContainer> = {
   title: 'Components/Chart',
   component: ChartContainer,
+  parameters: {
+    docs: {
+      description: {
+        component:
+          'ChartContainer wraps a Recharts chart with Nexus colors, tooltips and legends. Use it for bar, area and line charts. Set the label and color of each series in `config`.',
+      },
+    },
+  },
 };
 
 export default meta;
@@ -196,6 +204,13 @@ export const BarChartStory: Story = {
 
 export const AreaChartStory: Story = {
   tags: ['docs'],
+  parameters: {
+    docs: {
+      description: {
+        story: 'Plot two series as areas, with a tooltip and a legend.',
+      },
+    },
+  },
   name: 'Area',
   render: () => (
     <div className="nx:w-[600px] nx:max-w-full">
@@ -206,6 +221,13 @@ export const AreaChartStory: Story = {
 
 export const LineChartStory: Story = {
   tags: ['docs'],
+  parameters: {
+    docs: {
+      description: {
+        story: 'Plot two series as lines, with a tooltip and a legend.',
+      },
+    },
+  },
   name: 'Line',
   render: () => (
     <div className="nx:w-[600px] nx:max-w-full">

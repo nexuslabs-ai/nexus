@@ -1,0 +1,45 @@
+# Examples
+
+Four real apps show Nexus added to a new app, a shadcn app, an MUI app and a
+company design-system package.
+
+## Pick the example closest to your app
+
+| Your app                                 | Example                                                                                     | Where Nexus lives                       |
+| ---------------------------------------- | ------------------------------------------------------------------------------------------- | --------------------------------------- |
+| A new Next.js app                        | [`nexus-app`](https://github.com/nexuslabs-ai/nexus/tree/main/examples/nexus-app)           | The app                                 |
+| A Next.js app built with shadcn/ui       | [`shadcn-app`](https://github.com/nexuslabs-ai/nexus/tree/main/examples/shadcn-app)         | Beside `components/ui`                  |
+| A shadcn-based design-system package     | [`shadcn-package`](https://github.com/nexuslabs-ai/nexus/tree/main/examples/shadcn-package) | In the package, or in the app beside it |
+| A Vite app with Material UI, no Tailwind | [`mui-app`](https://github.com/nexuslabs-ai/nexus/tree/main/examples/mui-app)               | The app                                 |
+
+Adding Nexus changes none of the host app's own styles in any example.
+
+## What each example shows
+
+| Setup step                                  | Where to look                       |
+| ------------------------------------------- | ----------------------------------- |
+| A separate Nexus CSS entry beside yours     | `shadcn-app/app/nexus.css`          |
+| One theme switch for both systems (`.dark`) | The header of every coexistence app |
+| Toasts from each system stay separate       | The `/overlays` page                |
+| Nexus overlays above MUI's layers           | `mui-app/src/nexus.css`             |
+| MUI popups inside a Nexus dialog            | The `mui-app` `/overlays` page      |
+| A package that ships Nexus (`@source './'`) | `shadcn-package/ui`                 |
+
+## Run an example
+
+```bash
+git clone https://github.com/nexuslabs-ai/nexus
+cd nexus/examples/shadcn-app
+npm ci
+npm run build
+npm start
+```
+
+Each example's README lists its pages and how it added Nexus.
+
+## Next steps
+
+- **[Install](/getting-started/install#add-nexus-to-an-existing-app)**: add
+  Nexus to your own app.
+- **[Theme setup](/getting-started/theme-setup)**: set your brand color and
+  starting theme.

@@ -12,9 +12,7 @@ import {
 } from '../overlay-layout/overlay-layout';
 
 /**
- * ContextMenu
- *
- * Root component for the context menu. Opens on right-click of its trigger.
+ * Root component for the context menu. Opens when the trigger is right-clicked.
  *
  * @example
  * ```tsx
@@ -30,37 +28,27 @@ import {
 const ContextMenu = ContextMenuPrimitive.Root;
 
 /**
- * ContextMenuTrigger
- *
- * The area that opens the context menu when right-clicked.
+ * The area that opens the menu when right-clicked.
  */
 const ContextMenuTrigger = ContextMenuPrimitive.Trigger;
 
 /**
- * ContextMenuGroup
- *
- * Groups related menu items together.
+ * Groups related menu items.
  */
 const ContextMenuGroup = ContextMenuPrimitive.Group;
 
 /**
- * ContextMenuPortal
- *
- * Portals the content to the body.
+ * Renders the content into `document.body`.
  */
 const ContextMenuPortal = ContextMenuPrimitive.Portal;
 
 /**
- * ContextMenuSub
- *
- * Contains a submenu.
+ * Root of a submenu.
  */
 const ContextMenuSub = ContextMenuPrimitive.Sub;
 
 /**
- * ContextMenuRadioGroup
- *
- * Groups radio items together.
+ * Groups radio items so only one is checked.
  */
 const ContextMenuRadioGroup = ContextMenuPrimitive.RadioGroup;
 
@@ -73,16 +61,14 @@ interface ContextMenuSubTriggerProps extends React.ComponentProps<
   typeof ContextMenuPrimitive.SubTrigger
 > {
   /**
-   * Indents the trigger to align with items that have a leading icon or checkbox.
+   * Indents the trigger to line up with items that have a leading icon or check.
    * @default false
    */
   inset?: boolean;
 }
 
 /**
- * ContextMenuSubTrigger
- *
- * The trigger for a submenu. Renders a chevron to indicate a submenu.
+ * The item that opens a submenu. Shows a trailing chevron.
  */
 function ContextMenuSubTrigger({
   className,
@@ -121,9 +107,7 @@ interface ContextMenuSubContentProps extends React.ComponentProps<
 > {}
 
 /**
- * ContextMenuSubContent
- *
- * The content container for a submenu.
+ * The panel that holds a submenu's items.
  */
 function ContextMenuSubContent({
   className,
@@ -154,9 +138,7 @@ interface ContextMenuContentProps extends React.ComponentProps<
 > {}
 
 /**
- * ContextMenuContent
- *
- * The context menu content container. Positions at the cursor.
+ * The menu panel. Opens at the cursor.
  *
  * @example
  * ```tsx
@@ -211,16 +193,14 @@ interface ContextMenuItemProps
     React.ComponentProps<typeof ContextMenuPrimitive.Item>,
     VariantProps<typeof contextMenuItemVariants> {
   /**
-   * Indents the item to align with items that have a leading icon or checkbox.
+   * Indents the item to line up with items that have a leading icon or check.
    * @default false
    */
   inset?: boolean;
 }
 
 /**
- * ContextMenuItem
- *
- * An individual menu item.
+ * A single menu action.
  *
  * @example
  * ```tsx
@@ -259,9 +239,7 @@ interface ContextMenuCheckboxItemProps extends React.ComponentProps<
 > {}
 
 /**
- * ContextMenuCheckboxItem
- *
- * A menu item that can be checked/unchecked.
+ * A menu item that toggles on and off.
  *
  * @example
  * ```tsx
@@ -322,9 +300,7 @@ interface ContextMenuRadioItemProps extends React.ComponentProps<
 > {}
 
 /**
- * ContextMenuRadioItem
- *
- * A radio menu item for exclusive selection.
+ * A menu item for picking one option from a ContextMenuRadioGroup.
  *
  * @example
  * ```tsx
@@ -382,16 +358,14 @@ interface ContextMenuLabelProps extends React.ComponentProps<
   typeof ContextMenuPrimitive.Label
 > {
   /**
-   * Indents the label to align with items that have a leading icon or checkbox.
+   * Indents the label to line up with items that have a leading icon or check.
    * @default false
    */
   inset?: boolean;
 }
 
 /**
- * ContextMenuLabel
- *
- * A label for a group of menu items.
+ * A heading for a group of menu items.
  *
  * @example
  * ```tsx
@@ -427,9 +401,7 @@ interface ContextMenuSeparatorProps extends React.ComponentProps<
 > {}
 
 /**
- * ContextMenuSeparator
- *
- * A visual divider between menu items.
+ * A divider between menu items.
  */
 function ContextMenuSeparator({
   className,
@@ -455,9 +427,7 @@ function ContextMenuSeparator({
 interface ContextMenuShortcutProps extends React.ComponentProps<'span'> {}
 
 /**
- * ContextMenuShortcut
- *
- * Displays a keyboard shortcut hint.
+ * A keyboard shortcut hint, right-aligned in a ContextMenuItem.
  *
  * @example
  * ```tsx

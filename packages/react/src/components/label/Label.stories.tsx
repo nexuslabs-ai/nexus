@@ -16,6 +16,12 @@ const meta: Meta<typeof Label> = {
   },
   parameters: {
     layout: 'padded',
+    docs: {
+      description: {
+        component:
+          "Label names a form control. Set `htmlFor` to the control's `id` so a click on the label focuses or toggles the control. Inside a Field, use FieldLabel.",
+      },
+    },
   },
 };
 
@@ -40,6 +46,13 @@ export const WithInput: Story = {
 
 export const Disabled: Story = {
   tags: ['docs'],
+  parameters: {
+    docs: {
+      description: {
+        story: 'Dim the label when the checkbox placed before it is disabled.',
+      },
+    },
+  },
   render: function DisabledStory() {
     const checkboxId = React.useId();
 

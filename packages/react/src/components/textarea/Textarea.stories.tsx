@@ -20,6 +20,12 @@ const meta: Meta<typeof Textarea> = {
   ],
   parameters: {
     layout: 'padded',
+    docs: {
+      description: {
+        component:
+          'Textarea takes multi-line text, such as notes or a bio. It accepts every native textarea attribute. For a single line, use Input.',
+      },
+    },
   },
   args: {
     onChange: fn(),
@@ -30,19 +36,19 @@ const meta: Meta<typeof Textarea> = {
     variant: {
       control: 'select',
       options: ['bordered', 'borderless'],
-      description: 'The visual treatment of the textarea',
+      description: 'Bordered, or borderless with a tinted fill.',
     },
     disabled: {
       control: 'boolean',
-      description: 'Whether the textarea is disabled',
+      description: 'Prevents editing.',
     },
     placeholder: {
       control: 'text',
-      description: 'Placeholder text',
+      description: 'Hint shown while empty.',
     },
     rows: {
       control: 'number',
-      description: 'Visible number of text lines',
+      description: 'Starting height, in lines of text.',
     },
   },
 };
@@ -144,6 +150,13 @@ export const WithValue: Story = {
 
 export const Disabled: Story = {
   tags: ['docs'],
+  parameters: {
+    docs: {
+      description: {
+        story: 'A disabled textarea shows muted colors and blocks editing.',
+      },
+    },
+  },
   args: {
     placeholder: 'Cannot edit this',
     disabled: true,
@@ -165,6 +178,14 @@ export const Disabled: Story = {
 
 export const Invalid: Story = {
   tags: ['docs'],
+  parameters: {
+    docs: {
+      description: {
+        story:
+          'Set `aria-invalid` to show an error border and error focus ring.',
+      },
+    },
+  },
   args: {
     defaultValue: 'Too short',
     'aria-invalid': true,
@@ -281,6 +302,13 @@ export const AutofillPairing: Story = {
 
 export const WithLabel: Story = {
   tags: ['docs'],
+  parameters: {
+    docs: {
+      description: {
+        story: 'Link a Label to the textarea with `htmlFor` and `id`.',
+      },
+    },
+  },
   render: (args) => (
     <div className="nx:flex nx:flex-col nx:gap-2">
       <Label htmlFor="textarea-bio">Bio</Label>
@@ -305,7 +333,7 @@ export const CharacterCounter: Story = {
     docs: {
       description: {
         story:
-          'Character counters are story-local composition: keep the count in local state and connect both helper text and counter with `aria-describedby`.',
+          'Keep a character count in local state and link the helper text and count with `aria-describedby`.',
       },
     },
   },
@@ -328,7 +356,7 @@ export const WordCounter: Story = {
     docs: {
       description: {
         story:
-          'Word counters follow the same pattern as character counters: local story state, visible count, and `aria-describedby` on the textarea.',
+          'Keep a word count in local state and link it to the textarea with `aria-describedby`.',
       },
     },
   },
@@ -351,7 +379,7 @@ export const ResizeGuidance: Story = {
     docs: {
       description: {
         story:
-          'Textarea accepts native textarea attributes and className overrides. Use `rows` for the initial height and `nx:resize-y` when standalone vertical resizing is useful; InputGroupTextarea keeps `resize-none` so the grouped frame stays stable.',
+          'Set `rows` for the starting height and add `nx:resize-y` to let users drag the height.',
       },
     },
   },

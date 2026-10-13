@@ -15,6 +15,7 @@ does not index:
 | Branches, commits, PRs, reviews | [`github.md`](.claude/rules/github.md)                         |
 | shadcn/ui adaptation            | [`shadcn-divergences.md`](.claude/rules/shadcn-divergences.md) |
 | Third-party API lookups         | [`docs-mcp.md`](.claude/rules/docs-mcp.md)                     |
+| Docs prose and page templates   | [`docs-voice.md`](.claude/rules/docs-voice.md)                 |
 
 **Browser Support:** Nexus does no feature detection and no OS, browser,
 preference, or input-device queries.

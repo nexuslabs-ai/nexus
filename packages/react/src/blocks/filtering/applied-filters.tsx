@@ -1,6 +1,6 @@
 import type * as React from 'react';
 
-/** Layout only. Compose conditions, Add controls and optional clear actions as children. */
+/** Row that lays out the filter conditions, Add buttons and clear actions you pass as children. */
 export function AppliedFilters({
   children,
   label = 'Filters',

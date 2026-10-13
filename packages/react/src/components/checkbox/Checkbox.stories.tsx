@@ -18,7 +18,7 @@ const meta: Meta<typeof Checkbox> = {
     docs: {
       description: {
         component:
-          'Checkbox is the atom for checked, unchecked, and indeterminate state. Pair it with Label for simple inline labels, ChoiceRow for compact option rows, and ChoiceCard for rich title/description option cards.',
+          'Checkbox selects one or more options, or toggles one setting. Its indeterminate state marks a partly selected group. Pair it with Label, or use ChoiceRow or ChoiceCard for richer option rows.',
       },
     },
   },
@@ -66,6 +66,13 @@ export const WithLabel: Story = {
 
 export const Checked: Story = {
   tags: ['docs'],
+  parameters: {
+    docs: {
+      description: {
+        story: 'Start checked with `defaultChecked`.',
+      },
+    },
+  },
   args: {
     'aria-label': 'Checked option',
     defaultChecked: true,
@@ -88,6 +95,14 @@ export const Checked: Story = {
 
 export const Indeterminate: Story = {
   tags: ['docs'],
+  parameters: {
+    docs: {
+      description: {
+        story:
+          'Show a minus for a partly selected group with `checked="indeterminate"`.',
+      },
+    },
+  },
   args: {
     'aria-label': 'Indeterminate option',
     checked: 'indeterminate',
@@ -124,6 +139,13 @@ export const IndicatorCrossFade: Story = {
 
 export const Disabled: Story = {
   tags: ['docs'],
+  parameters: {
+    docs: {
+      description: {
+        story: 'Disable the checkbox so it cannot be toggled.',
+      },
+    },
+  },
   args: {
     'aria-label': 'Disabled checkbox',
     disabled: true,

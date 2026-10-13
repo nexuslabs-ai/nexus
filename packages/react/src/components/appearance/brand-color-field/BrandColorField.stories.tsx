@@ -37,6 +37,14 @@ function ControlledField({
 const meta: Meta<typeof NexusAppearanceBrandColorField> = {
   title: 'Appearance/BrandColorField',
   component: NexusAppearanceBrandColorField,
+  parameters: {
+    docs: {
+      description: {
+        component:
+          'NexusAppearanceBrandColorField picks a brand color from a preset list or as a custom hex value. For a color without presets, use NexusAppearanceColorField.',
+      },
+    },
+  },
   args: { label: 'Brand color', value: DEFAULT_BRAND_COLOR, onChange: fn() },
   render: (args) => <ControlledField key={args.value} {...args} />,
 };

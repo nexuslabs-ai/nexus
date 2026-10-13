@@ -36,6 +36,12 @@ const meta: Meta<typeof Message> = {
   component: Message,
   parameters: {
     layout: 'padded',
+    docs: {
+      description: {
+        component:
+          'Message lays out one conversation turn, with an avatar, a header, a body and a footer. Use it for chat and assistant threads, with Bubble or Attachment as the body. Message holds no chat state, so your app owns the messages and MessageScroller handles scrolling.',
+      },
+    },
   },
 };
 
@@ -75,6 +81,14 @@ export const Default: Story = {
 
 export const Alignment: Story = {
   tags: ['docs'],
+  parameters: {
+    docs: {
+      description: {
+        story:
+          'Set `align="end"` on your own turns to place them on the opposite side.',
+      },
+    },
+  },
   render: () => (
     <MessageGroup className={column}>
       <Message align="start">
@@ -145,6 +159,14 @@ export const Alignment: Story = {
 
 export const WithoutAvatar: Story = {
   tags: ['docs'],
+  parameters: {
+    docs: {
+      description: {
+        story:
+          'Leave out MessageAvatar for a compact thread with no avatar column.',
+      },
+    },
+  },
   render: () => (
     <MessageGroup className={column}>
       <Message>
@@ -220,8 +242,8 @@ export const FooterOnly: Story = {
 };
 
 /**
- * The avatar must sit beside the turn in all four metadata combinations, at
- * one-line and wrapped metadata.
+ * Keep the avatar beside the turn for every header and footer combination,
+ * short or wrapped.
  */
 export const AvatarAlignmentMatrix: Story = {
   render: () => (
@@ -357,16 +379,16 @@ function TypingIndicatorExample() {
   );
 }
 
-/**
- * A received turn followed by the sender's typing indicator. Typing is
- * transient status, not history, so it sits in a `role="status"` beside the
- * log rather than inside it. A live region announces only changes made after
- * it mounts, so the region stays mounted and empty, and only its children
- * toggle. The dots are decorative; the footer carries the same state as real
- * text.
- */
 export const TypingIndicator: Story = {
   tags: ['docs'],
+  parameters: {
+    docs: {
+      description: {
+        story:
+          'Show typing in an always-mounted `role="status"` region next to the log, with the state also written in the footer.',
+      },
+    },
+  },
   render: () => <TypingIndicatorExample />,
   play: async ({ canvasElement }) => {
     const canvas = within(canvasElement);
@@ -440,9 +462,8 @@ export const Announced: Story = {
 };
 
 /**
- * A reply still streaming into an announced group. The streaming turn carries
- * `aria-busy` until the reply finishes, so assistive tech waits for the whole
- * reply instead of reading out every chunk.
+ * Set `aria-busy` on a streaming turn so screen readers wait for the whole
+ * reply.
  */
 export const Streaming: Story = {
   render: () => (
@@ -587,13 +608,16 @@ export const WithAvatar: Story = {
   },
 };
 
-/**
- * A consecutive run from one speaker shows the avatar once and reserves the
- * rail on the continuation turns, so every body stays on the same inline edge.
- * The avatar sits on the first turn because the rail is top-anchored.
- */
 export const GroupedTurns: Story = {
   tags: ['docs'],
+  parameters: {
+    docs: {
+      description: {
+        story:
+          'Show the avatar once per run of turns, with `placeholder` avatars keeping later turns aligned.',
+      },
+    },
+  },
   render: () => (
     <MessageGroup className={column}>
       <Message>
@@ -673,6 +697,14 @@ export const GroupedTurns: Story = {
 
 export const WithActions: Story = {
   tags: ['docs'],
+  parameters: {
+    docs: {
+      description: {
+        story:
+          "Put copy and retry icon buttons, each with an `aria-label` and a tooltip, in a turn's footer.",
+      },
+    },
+  },
   render: () => (
     <TooltipProvider delayDuration={0}>
       <MessageGroup className={column}>
@@ -824,6 +856,13 @@ export const WithActions: Story = {
 
 export const WithAttachment: Story = {
   tags: ['docs'],
+  parameters: {
+    docs: {
+      description: {
+        story: 'Use an Attachment as the body of a turn to share a file.',
+      },
+    },
+  },
   render: () => (
     <MessageGroup className={column}>
       <Message>

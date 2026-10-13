@@ -167,7 +167,7 @@ export function MultiChoiceFilter({
   );
 }
 
-/** Controlled checklist with no commit controls. An empty list means no selected options; the owner maps it to its condition model. */
+/** Controlled checklist without Apply or Cancel buttons. An empty list means nothing is selected, and your app maps it to a condition. */
 export function MultiChoiceEditor({
   label,
   value,

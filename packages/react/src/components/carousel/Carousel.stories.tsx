@@ -13,6 +13,14 @@ import {
 const meta: Meta<typeof Carousel> = {
   title: 'Components/Carousel',
   component: Carousel,
+  parameters: {
+    docs: {
+      description: {
+        component:
+          'Carousel shows a set of slides that readers move through one at a time. Use it for galleries and featured content. Install the `embla-carousel-react` peer dependency first.',
+      },
+    },
+  },
   decorators: [
     (Story) => (
       <div className="nx:mx-auto nx:w-full nx:max-w-xs">
@@ -49,6 +57,14 @@ export const Default: Story = {
 // Vertical orientation — the content viewport needs an explicit height.
 export const Vertical: Story = {
   tags: ['docs'],
+  parameters: {
+    docs: {
+      description: {
+        story:
+          'Scroll slides vertically, with a fixed height on CarouselContent.',
+      },
+    },
+  },
   render: () => (
     <Carousel
       orientation="vertical"

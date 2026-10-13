@@ -6,6 +6,14 @@ import { AspectRatio } from './aspect-ratio';
 const meta: Meta<typeof AspectRatio> = {
   title: 'Components/AspectRatio',
   component: AspectRatio,
+  parameters: {
+    docs: {
+      description: {
+        component:
+          'AspectRatio keeps its content at a fixed width-to-height ratio. Use it for images, video, embeds and maps. AspectRatio fills its parent width, so place it in a sized container.',
+      },
+    },
+  },
 };
 
 export default meta;
@@ -36,6 +44,13 @@ export const Default: Story = {
 // Common ratios side by side.
 export const Ratios: Story = {
   tags: ['docs'],
+  parameters: {
+    docs: {
+      description: {
+        story: 'Compare square, 4:3 and 16:9 boxes side by side.',
+      },
+    },
+  },
   render: () => (
     <div className="nx:flex nx:items-start nx:gap-4">
       <div className="nx:w-40">

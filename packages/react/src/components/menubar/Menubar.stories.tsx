@@ -31,6 +31,12 @@ const meta: Meta<typeof Menubar> = {
   component: Menubar,
   parameters: {
     layout: 'padded',
+    docs: {
+      description: {
+        component:
+          'Menubar shows a row of menus that stays on screen, like a desktop app. Use it for app-level commands grouped under File, Edit and View. For one menu on a button, use DropdownMenu.',
+      },
+    },
   },
 };
 
@@ -81,6 +87,11 @@ export const Default: Story = {
 
 export const WithCheckboxItems: Story = {
   tags: ['docs'],
+  parameters: {
+    docs: {
+      description: { story: 'Toggle settings on and off with checkbox items.' },
+    },
+  },
   render: function CheckboxItemsStory() {
     const [showBookmarks, setShowBookmarks] = React.useState(true);
     const [showFullUrls, setShowFullUrls] = React.useState(false);
@@ -113,6 +124,11 @@ export const WithCheckboxItems: Story = {
 
 export const WithRadioItems: Story = {
   tags: ['docs'],
+  parameters: {
+    docs: {
+      description: { story: 'Pick one option from a group with radio items.' },
+    },
+  },
   render: function RadioItemsStory() {
     const [profile, setProfile] = React.useState('benoit');
 
@@ -245,6 +261,13 @@ export const IndicatorCrossFade: Story = {
 
 export const WithSubMenu: Story = {
   tags: ['docs'],
+  parameters: {
+    docs: {
+      description: {
+        story: 'Nest related commands in a submenu that opens from an item.',
+      },
+    },
+  },
   render: (_args) => (
     <Menubar>
       <MenubarMenu>
@@ -270,6 +293,14 @@ export const WithSubMenu: Story = {
 
 export const WithInsetItems: Story = {
   tags: ['docs'],
+  parameters: {
+    docs: {
+      description: {
+        story:
+          'Indent items and labels with `inset` to line up with items that have icons.',
+      },
+    },
+  },
   render: (_args) => (
     <Menubar>
       <MenubarMenu>
@@ -410,6 +441,14 @@ export const KeyboardInteraction: Story = {
 
 export const WithDisabledItems: Story = {
   tags: ['docs'],
+  parameters: {
+    docs: {
+      description: {
+        story:
+          'Show unavailable commands as disabled items that cannot be selected.',
+      },
+    },
+  },
   render: (_args) => (
     <Menubar>
       <MenubarMenu>

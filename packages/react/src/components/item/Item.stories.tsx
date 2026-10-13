@@ -19,6 +19,14 @@ import {
 const meta: Meta<typeof Item> = {
   title: 'Components/Item',
   component: Item,
+  parameters: {
+    docs: {
+      description: {
+        component:
+          'Item lays out a row with media, a title, a description and actions. Use it for file lists, settings rows and search results. For tabular data, use Table.',
+      },
+    },
+  },
 };
 
 export default meta;
@@ -59,6 +67,13 @@ export const Default: Story = {
 // The three surface variants.
 export const Variants: Story = {
   tags: ['docs'],
+  parameters: {
+    docs: {
+      description: {
+        story: 'Pick a transparent, bordered or filled surface for the row.',
+      },
+    },
+  },
   render: () => (
     <div className="nx:flex nx:w-96 nx:flex-col nx:gap-3">
       <Item variant="default">
@@ -86,6 +101,9 @@ export const Variants: Story = {
 // Default vs the denser sm size.
 export const Sizes: Story = {
   tags: ['docs'],
+  parameters: {
+    docs: { description: { story: 'Use the `sm` size for a denser row.' } },
+  },
   render: () => (
     <div className="nx:flex nx:w-96 nx:flex-col nx:gap-3">
       <Item variant="outline" size="default">
@@ -105,6 +123,13 @@ export const Sizes: Story = {
 // The icon medallion and image thumbnail media variants.
 export const Media: Story = {
   tags: ['docs'],
+  parameters: {
+    docs: {
+      description: {
+        story: 'Lead the row with an icon tile or an image thumbnail.',
+      },
+    },
+  },
   render: () => (
     <div className="nx:flex nx:w-96 nx:flex-col nx:gap-3">
       <Item variant="outline">
@@ -150,6 +175,14 @@ export const MediaImageHairline: Story = {
 // A grouped list divided by separators.
 export const Grouped: Story = {
   tags: ['docs'],
+  parameters: {
+    docs: {
+      description: {
+        story:
+          'Stack related rows in an ItemGroup with separators between them.',
+      },
+    },
+  },
   render: () => (
     <ItemGroup className="nx:w-96">
       <Item>
@@ -170,6 +203,11 @@ export const Grouped: Story = {
 // Item composes with a custom element via asChild — here a whole-row link.
 export const AsChild: Story = {
   tags: ['docs'],
+  parameters: {
+    docs: {
+      description: { story: 'Render the whole row as a link with `asChild`.' },
+    },
+  },
   render: () => (
     <Item asChild variant="outline" className="nx:w-96">
       <a href="/files/report" data-testid="item-link">

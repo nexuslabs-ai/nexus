@@ -15,6 +15,12 @@ const meta: Meta<typeof Accordion> = {
   component: Accordion,
   parameters: {
     layout: 'padded',
+    docs: {
+      description: {
+        component:
+          'Accordion shows and hides stacked sections of content. Use it when readers need only some sections of a long page. For a single section, use Collapsible.',
+      },
+    },
   },
   args: {
     variant: 'stacked',
@@ -23,21 +29,20 @@ const meta: Meta<typeof Accordion> = {
     type: {
       control: 'select',
       options: ['single', 'multiple'],
-      description: 'Whether single or multiple items can be opened at once',
+      description: 'Lets one item or several items open at once.',
     },
     collapsible: {
       control: 'boolean',
-      description:
-        'When type is "single", allows closing content when clicking trigger of open item',
+      description: 'With `type="single"`, lets a click close the open item.',
     },
     disabled: {
       control: 'boolean',
-      description: 'Whether the accordion is disabled',
+      description: 'Prevents interaction with every item.',
     },
     variant: {
       control: 'select',
       options: ['stacked', 'floating'],
-      description: 'Visual treatment for accordion items',
+      description: 'Item style: divided rows or separate cards.',
     },
   },
 };
@@ -112,6 +117,13 @@ export const Stacked: Story = {
 
 export const Multiple: Story = {
   tags: ['docs'],
+  parameters: {
+    docs: {
+      description: {
+        story: 'Open several sections at once with `type="multiple"`.',
+      },
+    },
+  },
   render: ({ variant }) => (
     <Accordion
       type="multiple"
@@ -143,6 +155,13 @@ export const Multiple: Story = {
 
 export const Floating: Story = {
   tags: ['docs'],
+  parameters: {
+    docs: {
+      description: {
+        story: 'Show each section as a separate bordered card.',
+      },
+    },
+  },
   args: {
     variant: 'floating',
   },
@@ -278,6 +297,13 @@ export const Disabled: Story = {
 
 export const DisabledItem: Story = {
   tags: ['docs'],
+  parameters: {
+    docs: {
+      description: {
+        story: 'Disable one item so its section cannot open.',
+      },
+    },
+  },
   render: ({ variant }) => (
     <Accordion
       type="single"
@@ -709,7 +735,7 @@ export const AccordionTriggerDefaultHeightPinned: Story = {
     docs: {
       description: {
         story:
-          'Pin on the numeric-spacing outcome: in default mode, AccordionTrigger renders at exactly 52px (= `typography-label-default` line-height 20 + `py-4` 16 x 2).',
+          'At default density, AccordionTrigger is exactly 52px tall: a 20px label line plus 16px padding top and bottom.',
       },
     },
   },
@@ -744,7 +770,7 @@ export const AccordionFloatingTriggerDefaultHeightPinned: Story = {
     docs: {
       description: {
         story:
-          'Pin on the floating visual variant: the item chrome changes, but the AccordionTrigger remains exactly 52px in default mode.',
+          'In the floating variant, AccordionTrigger stays exactly 52px tall at default density.',
       },
     },
   },
@@ -783,8 +809,7 @@ export const AccordionExpandedItemDefaultHeightPinned: Story = {
     a11y: { test: 'off' },
     docs: {
       description: {
-        story:
-          'Pin on the expanded item anatomy: one body-small content line should keep the open item at 88–89px.',
+        story: 'An open item with one line of content is 88 to 89px tall.',
       },
     },
   },

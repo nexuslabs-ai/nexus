@@ -12,11 +12,7 @@ interface AspectRatioProps extends React.ComponentProps<
 > {}
 
 /**
- * AspectRatio
- *
- * Constrains its content to a fixed width:height ratio — media, embeds,
- * thumbnails, map tiles. Pass `ratio` (e.g. `16 / 9`); the single child fills
- * the resulting box.
+ * Keeps its child at a fixed width-to-height `ratio`, such as `16 / 9`. The child fills the box.
  *
  * @example
  * ```tsx

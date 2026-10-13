@@ -7,6 +7,12 @@ const meta: Meta<typeof Skeleton> = {
   title: 'Components/Skeleton',
   component: Skeleton,
   parameters: {
+    docs: {
+      description: {
+        component:
+          'Skeleton shows a pulsing placeholder where content is still loading. Use it to keep the layout steady until data arrives. For a short wait with no known layout, use Spinner.',
+      },
+    },
     layout: 'padded',
   },
 };
@@ -46,6 +52,13 @@ export const CardSkeleton: Story = {
 // A circular placeholder for an avatar or icon.
 export const Circle: Story = {
   tags: ['docs'],
+  parameters: {
+    docs: {
+      description: {
+        story: 'Use a round placeholder for an avatar or icon.',
+      },
+    },
+  },
   args: {
     className: 'nx:size-12 nx:rounded-full',
   },
@@ -55,6 +68,13 @@ export const Circle: Story = {
 // final row of text.
 export const TextLines: Story = {
   tags: ['docs'],
+  parameters: {
+    docs: {
+      description: {
+        story: 'Stack bars of different widths to stand in for a paragraph.',
+      },
+    },
+  },
   render: () => (
     <div className="nx:flex nx:flex-col nx:gap-2">
       <Skeleton className="nx:h-4 nx:w-full" />

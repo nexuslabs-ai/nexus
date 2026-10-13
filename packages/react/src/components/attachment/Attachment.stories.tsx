@@ -40,6 +40,14 @@ import {
 const meta: Meta<typeof Attachment> = {
   title: 'Components/Attachment',
   component: Attachment,
+  parameters: {
+    docs: {
+      description: {
+        component:
+          'Attachment shows one file with its preview, name, size and upload state. Use it in upload queues and message composers. For a general list row, use Item.',
+      },
+    },
+  },
 };
 
 export default meta;
@@ -73,6 +81,13 @@ export const Default: Story = {
 // Every lifecycle state, top to bottom.
 export const States: Story = {
   tags: ['docs'],
+  parameters: {
+    docs: {
+      description: {
+        story: 'Show each upload state, from empty drop target to done.',
+      },
+    },
+  },
   render: () => (
     <div className="nx:flex nx:w-80 nx:flex-col nx:gap-3">
       <Attachment state="idle">
@@ -189,6 +204,13 @@ export const States: Story = {
 // The two densities, each showing its file type through the leading icon.
 export const Sizes: Story = {
   tags: ['docs'],
+  parameters: {
+    docs: {
+      description: {
+        story: 'Compare the default and small sizes.',
+      },
+    },
+  },
   render: () => (
     <div className="nx:flex nx:w-80 nx:flex-col nx:gap-3">
       <Attachment size="default">
@@ -274,6 +296,13 @@ export const VerticalOrientation: Story = {
 // A composer strip — mixed file types scrolling horizontally.
 export const Grouped: Story = {
   tags: ['docs'],
+  parameters: {
+    docs: {
+      description: {
+        story: 'Scroll several attachments sideways in an AttachmentGroup.',
+      },
+    },
+  },
   render: () => (
     <AttachmentGroup aria-label="Attached files" className="nx:w-80">
       {[

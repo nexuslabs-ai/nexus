@@ -22,7 +22,7 @@ const meta: Meta<typeof ChoiceRow> = {
     docs: {
       description: {
         component:
-          'Use ChoiceRow for compact checkbox or radio choices where the whole row should be the click/tap target and the real Checkbox or RadioGroupItem remains the semantic control. Use Checkbox/RadioGroup with Label for simple inline controls. Use a roomier field or card composition for choices that need a title with helper text.',
+          'ChoiceRow makes a whole row the click target for a checkbox or radio choice. The nested Checkbox or RadioGroupItem stays the real control. For a simple inline label use Label, and for a roomier card use ChoiceCard.',
       },
     },
   },
@@ -97,6 +97,13 @@ export const Default: Story = {
 
 export const WithRadioGroup: Story = {
   tags: ['docs'],
+  parameters: {
+    docs: {
+      description: {
+        story: 'Pick one delivery speed from a RadioGroup of rows.',
+      },
+    },
+  },
   render: () => <NotificationsRadioGroup />,
   play: async ({ canvasElement }) => {
     const canvas = within(canvasElement);
@@ -164,6 +171,13 @@ export const KeyboardInteraction: Story = {
 
 export const Disabled: Story = {
   tags: ['docs'],
+  parameters: {
+    docs: {
+      description: {
+        story: 'Disable the nested control to lock the choice.',
+      },
+    },
+  },
   render: () => (
     <div className="nx:w-80">
       <ChoiceRow htmlFor="choice-disabled">
@@ -198,6 +212,14 @@ export const Disabled: Story = {
 
 export const WithDescription: Story = {
   tags: ['docs'],
+  parameters: {
+    docs: {
+      description: {
+        story:
+          'Add helper text with ChoiceRowDescription, wired through `aria-describedby`.',
+      },
+    },
+  },
   render: () => (
     <div className="nx:w-96 nx:max-w-full">
       <ChoiceRow htmlFor="choice-description">

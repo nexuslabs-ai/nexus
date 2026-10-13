@@ -40,7 +40,7 @@ function optionLabel(options: readonly ChoiceOption[], value: string) {
   );
 }
 
-/** Copy-source block. The application owns condition state and option IDs. */
+/** Filter that matches one option. Your app owns the condition state and option IDs. */
 export function ChoiceFilter({
   label,
   icon,
@@ -144,7 +144,7 @@ export function ChoiceFilter({
   );
 }
 
-/** Controlled menu editor. Compose inside DropdownMenuContent; the owner decides whether onChange edits a draft or applied state. */
+/** Controlled option list for DropdownMenuContent. Your `onChange` decides whether it edits a draft or the applied filter. */
 export function ChoiceEditor({
   label,
   value,

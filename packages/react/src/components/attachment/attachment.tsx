@@ -21,10 +21,7 @@ import {
 import { Progress, type ProgressProps } from '../progress';
 
 /**
- * AttachmentState
- *
- * The lifecycle of a single attachment, from an empty drop target through
- * upload and post-upload work to its resting state.
+ * Upload lifecycle of one attachment, from empty drop target to done.
  */
 type AttachmentState = 'idle' | 'uploading' | 'processing' | 'error' | 'done';
 
@@ -74,18 +71,13 @@ interface AttachmentProps
     Omit<ItemProps, 'asChild' | 'variant'>,
     VariantProps<typeof attachmentVariants> {
   /**
-   * The attachment's lifecycle state. Drives the border treatment (dashed while
-   * `idle`, error-coloured while `error`) and the text announced to assistive
-   * tech.
+   * Upload state. Screen readers announce in-progress and error states, and `idle` or `error` change the border.
    * @default 'done'
    */
   state?: AttachmentState;
 
   /**
-   * Overrides the assistive-tech status text for the current `state` — pass a
-   * localised string, or one that names the file. Ignored while the attachment
-   * is settled (`idle` / `done`), which announces nothing. Defaults to a
-   * built-in phrase per state, such as 'Uploading'.
+   * Replaces the built-in status text, such as 'Uploading'. Ignored while `idle` or `done`.
    * @example
    * ```tsx
    * <Attachment state="uploading" statusLabel="Uploading report.pdf" />
@@ -95,24 +87,9 @@ interface AttachmentProps
 }
 
 /**
- * Attachment
- *
- * A single file's preview — thumbnail or icon, name, size, and trailing
- * actions — with an upload lifecycle on top. Built on `Item`, and composed with
- * `AttachmentMedia`, `AttachmentContent`, `AttachmentTitle`,
- * `AttachmentDescription`, and `AttachmentActions`.
- *
- * The card is pinned to `Item`'s `outline` variant: the `idle` dashed border and
- * the `error` border are the state signal, and both need a visible border to
- * paint on.
- *
- * `orientation="horizontal"` is a row for lists and upload queues;
- * `orientation="vertical"` is a fixed-width tile for composer strips, where the
- * media fills the card width. Group several with `AttachmentGroup`.
- *
- * While uploading, processing, or failed, the current `state` is announced
- * through a visually hidden `role="status"` region, so progress is never
- * conveyed by animation alone.
+ * One file with its preview, name, size, actions and upload state.
+ * `orientation="horizontal"` is a row for lists. `orientation="vertical"` is a fixed-width tile for composer strips.
+ * Screen readers announce the state while uploading, processing or failed.
  *
  * @example
  * ```tsx
@@ -177,11 +154,7 @@ function Attachment({
 interface AttachmentMediaProps extends ItemMediaProps {}
 
 /**
- * AttachmentMedia
- *
- * The attachment's thumbnail or file-type icon. Adds the Attachment-specific
- * behaviour on top of `ItemMedia`: in a vertical tile it fills the card width
- * as a square, and it picks up the error tint when the card has failed.
+ * Thumbnail or file-type icon. Fills a vertical tile as a square and takes the error color on `error`.
  */
 function AttachmentMedia({ className, ...props }: AttachmentMediaProps) {
   return (
@@ -207,8 +180,7 @@ function AttachmentMedia({ className, ...props }: AttachmentMediaProps) {
  */
 interface AttachmentTitleProps extends ItemTitleProps {
   /**
-   * A badge or status icon pinned after the file name. It keeps `ItemTitle`'s
-   * `gap-2` spacing and its own width while the name truncates beside it.
+   * Badge or status icon after the file name. Keeps its width while the name truncates.
    *
    * @example
    * ```tsx
@@ -221,10 +193,7 @@ interface AttachmentTitleProps extends ItemTitleProps {
 }
 
 /**
- * AttachmentTitle
- *
- * The file name. Truncates to one line — file names are long and the card is
- * narrow — while `trailing` content keeps its full width beside it.
+ * File name, truncated to one line.
  */
 function AttachmentTitle({
   className,
@@ -252,9 +221,7 @@ function AttachmentTitle({
 interface AttachmentContentProps extends ItemContentProps {}
 
 /**
- * AttachmentContent
- *
- * The middle column of an attachment — title, description, and progress.
+ * Middle column for the title, description and progress.
  */
 function AttachmentContent(props: AttachmentContentProps) {
   return <ItemContent data-slot="attachment-content" {...props} />;
@@ -268,10 +235,7 @@ function AttachmentContent(props: AttachmentContentProps) {
 interface AttachmentDescriptionProps extends ItemDescriptionProps {}
 
 /**
- * AttachmentDescription
- *
- * The supporting line under the file name — size, progress, or the reason an
- * upload failed. Picks up the error tint when the card has failed.
+ * Line under the file name, such as size or an error reason. Takes the error color on `error`.
  */
 function AttachmentDescription({
   className,
@@ -297,11 +261,7 @@ function AttachmentDescription({
 interface AttachmentActionsProps extends ItemActionsProps {}
 
 /**
- * AttachmentActions
- *
- * The trailing controls of an attachment — typically a remove or retry button.
- * Lifts itself above `AttachmentTrigger`'s full-card overlay so its buttons stay
- * independently clickable.
+ * Trailing controls, such as remove or retry. They stay clickable above `AttachmentTrigger`.
  */
 function AttachmentActions({ className, ...props }: AttachmentActionsProps) {
   return (
@@ -320,9 +280,8 @@ type AttachmentGroupLabel =
 /**
  * AttachmentGroupProps
  *
- * Props for the AttachmentGroup component. The strip is a tab stop, so it must
- * carry an accessible name — exactly one of `aria-label` or `aria-labelledby`.
- * Reach for `aria-labelledby` when a visible heading already names the strip.
+ * Props for AttachmentGroup. The strip is a tab stop, so pass exactly one of `aria-label` or `aria-labelledby`.
+ * Use `aria-labelledby` when a visible heading names the strip.
  *
  * @example
  * ```tsx
@@ -337,15 +296,8 @@ type AttachmentGroupProps = Omit<
   AttachmentGroupLabel;
 
 /**
- * AttachmentGroup
- *
- * A horizontally scrolling strip of attachments, snapping each card to the
- * start edge. Defaults to `role="group"`, which stays overridable through
- * props — pass `role="list"`, plus `role="listitem"` on the children, when the
- * grouping is genuinely a list rather than a composer strip.
- *
- * The strip is itself keyboard-focusable so it can be scrolled by keyboard, and
- * it takes a required accessible name — `aria-label` or `aria-labelledby`.
+ * Horizontally scrolling strip of attachments. It is focusable for keyboard scrolling and needs `aria-label` or `aria-labelledby`.
+ * For a real list, pass `role="list"` and give each child `role="listitem"`.
  */
 function AttachmentGroup({ className, ...props }: AttachmentGroupProps) {
   return (
@@ -375,13 +327,8 @@ function AttachmentGroup({ className, ...props }: AttachmentGroupProps) {
 interface AttachmentProgressProps extends ProgressProps {}
 
 /**
- * AttachmentProgress
- *
- * The upload progress bar for an in-flight attachment, sized to sit inside
- * `AttachmentContent` beneath the description. Pass `value` for a determinate
- * upload and omit it while the total is unknown. Give it an `aria-label` that
- * names the file — several attachments uploading at once are otherwise
- * indistinguishable to a screen reader.
+ * Upload progress bar for `AttachmentContent`. Omit `value` while the total is unknown.
+ * Give it an `aria-label` that names the file, so screen readers can tell uploads apart.
  */
 function AttachmentProgress({
   className,
@@ -405,21 +352,15 @@ function AttachmentProgress({
  */
 interface AttachmentTriggerProps extends React.ComponentProps<'button'> {
   /**
-   * Render as the child element via Radix Slot — e.g. an `<a>` opening the
-   * file — keeping the full-card hit area.
+   * Renders the child element instead, such as an `<a>` that opens the file.
    * @default false
    */
   asChild?: boolean;
 }
 
 /**
- * AttachmentTrigger
- *
- * Makes the whole card activate one action — opening or previewing the file —
- * by stretching an invisible control across it. Use this instead of rendering
- * the card itself as a link, so that buttons inside `AttachmentActions` stay
- * valid and independently clickable. Needs a text label, visually hidden if the
- * card already shows the file name.
+ * Makes the whole card open or preview the file. Use it instead of a link around the card, so `AttachmentActions` stay clickable.
+ * Give it a text label, visually hidden if the card shows the file name.
  *
  * @example
  * ```tsx

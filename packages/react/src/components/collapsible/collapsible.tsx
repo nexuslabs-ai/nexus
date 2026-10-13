@@ -14,10 +14,8 @@ interface CollapsibleProps extends React.ComponentProps<
 > {}
 
 /**
- * Collapsible
- *
- * A single expand/collapse disclosure region. The trigger toggles a content
- * area that animates open and closed.
+ * Shows and hides one content region. The trigger toggles the content open
+ * and closed.
  *
  * @example
  * ```tsx
@@ -43,10 +41,8 @@ interface CollapsibleTriggerProps extends React.ComponentProps<
 > {}
 
 /**
- * CollapsibleTrigger
- *
- * The control that toggles the collapsible. Unstyled by design — compose it
- * with `asChild` around a `Button` (or any control) to give it an appearance.
+ * Toggles the collapsible. It has no styles, so wrap a `Button` with
+ * `asChild` to give it an appearance.
  */
 function CollapsibleTrigger(props: CollapsibleTriggerProps) {
   return (
@@ -67,15 +63,11 @@ interface CollapsibleContentProps extends React.ComponentProps<
 > {}
 
 /**
- * CollapsibleContent
+ * The region shown while the collapsible is open. Its height animates open and
+ * closed.
  *
- * The region revealed when the collapsible is open. Animates its height open /
- * closed via the `collapsible-down` / `collapsible-up` keyframes.
- *
- * Put any spacing that separates the content from the trigger **inside** this
- * element (e.g. an inner `nx:mt-2` wrapper), not as a flex `gap` on the parent.
- * A parent `gap` is rendered by the parent's layout, not the animated height, so
- * it snaps when the content collapses to height 0 — causing a visible stutter.
+ * Put spacing from the trigger inside this element, such as an inner `nx:mt-2`
+ * wrapper. A flex `gap` on the parent snaps when the content closes.
  */
 function CollapsibleContent({ className, ...props }: CollapsibleContentProps) {
   return (
