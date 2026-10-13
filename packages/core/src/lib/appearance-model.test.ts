@@ -475,15 +475,23 @@ describe('appearancePrefsToCss', () => {
     );
   });
 
-  it('zeroes every motion duration only when reduceMotion is on', () => {
+  it('stops motion only when reduceMotion is on', () => {
     const on = appearancePrefsToCss({ ...prefs, reduceMotion: true });
     for (const step of Object.keys(motionTokens.duration)) {
       expect(on).toContain(`--nx-motion-duration-${step}: 0ms;`);
     }
     expect(on).toContain('--nx-scroll-behavior: auto;');
-    expect(
-      appearancePrefsToCss({ ...prefs, reduceMotion: false })
-    ).not.toContain('--nx-motion-duration');
+    for (const animation of [
+      'spin',
+      'pulse',
+      'progress-indeterminate',
+      'caret-blink',
+    ]) {
+      expect(on).toContain(`--nx-animate-${animation}: none;`);
+    }
+    expect(appearancePrefsToCss({ ...prefs, reduceMotion: false })).not.toMatch(
+      /--nx-motion-duration|--nx-animate-/
+    );
   });
 
   it('sets the interactive cursor only when pointer cursors are enabled', () => {

@@ -17,7 +17,7 @@ function FieldSet({ className, ...props }: React.ComponentProps<'fieldset'>) {
     <fieldset
       data-slot="field-set"
       className={cn(
-        'nx:flex nx:flex-col nx:gap-6 nx:has-[>[data-slot=checkbox-group]]:gap-3 nx:has-[>[data-slot=radio-group]]:gap-3',
+        'nx:m-0 nx:flex nx:min-w-0 nx:flex-col nx:gap-6 nx:border-0 nx:p-0 nx:has-[>[data-slot=checkbox-group]]:gap-3 nx:has-[>[data-slot=radio-group]]:gap-3',
         className
       )}
       {...props}
@@ -55,7 +55,7 @@ function FieldLegend({
       data-slot="field-legend"
       data-variant={variant}
       className={cn(
-        'nx:mb-3 nx:data-[variant=legend]:typography-heading-xsmall nx:data-[variant=label]:typography-label-default',
+        'nx:mb-3 nx:p-0 nx:data-[variant=legend]:typography-heading-xsmall nx:data-[variant=label]:typography-label-default',
         className
       )}
       {...props}
@@ -271,7 +271,7 @@ function FieldDescription({ className, ...props }: React.ComponentProps<'p'>) {
       data-slot="field-description"
       className={cn(
         'nx:m-0 nx:typography-body-default nx:text-muted-foreground nx:group-has-data-[orientation=horizontal]/field:text-balance',
-        'nx:[&>a]:underline nx:[&>a]:underline-offset-4 nx:[&>a:hover]:text-primary-subtle-foreground',
+        'nx:[&>a]:text-inherit nx:[&>a]:underline nx:[&>a]:underline-offset-4 nx:[&>a:hover]:text-primary-subtle-foreground',
         className
       )}
       {...props}

@@ -72,7 +72,7 @@ export function MemberDirectory({
     >
       <header>
         <h2 className="nx:m-0 nx:typography-heading-small">Team members</h2>
-        <p className="nx:mt-1 nx:typography-body-default nx:text-muted-foreground">
+        <p className="nx:mt-1 nx:mb-0 nx:typography-body-default nx:text-muted-foreground">
           Find people across your teams.
         </p>
       </header>

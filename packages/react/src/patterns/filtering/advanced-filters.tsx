@@ -40,7 +40,7 @@ export function AdvancedFiltering() {
       <header className="nx:flex nx:flex-wrap nx:items-start nx:justify-between nx:gap-3">
         <div>
           <h2 className="nx:m-0 nx:typography-heading-small">Team members</h2>
-          <p className="nx:mt-1 nx:typography-body-default nx:text-muted-foreground">
+          <p className="nx:mt-1 nx:mb-0 nx:typography-body-default nx:text-muted-foreground">
             Filter your team by status, team or activity.
           </p>
         </div>
@@ -138,7 +138,7 @@ export function AdvancedFiltering() {
               <p className="nx:m-0 nx:typography-label-default">
                 No matching members
               </p>
-              <p className="nx:mt-1 nx:typography-body-small nx:text-muted-foreground">
+              <p className="nx:mt-1 nx:mb-0 nx:typography-body-small nx:text-muted-foreground">
                 Change a condition or clear the filters to broaden your results.
               </p>
             </div>
@@ -149,7 +149,7 @@ export function AdvancedFiltering() {
         <summary className="nx:cursor-pointer">
           View applied filter data
         </summary>
-        <pre className="nx:mt-2 nx:max-h-64 nx:overflow-auto nx:rounded-md nx:bg-muted nx:p-3">
+        <pre className="nx:mt-2 nx:mb-0 nx:max-h-64 nx:overflow-auto nx:rounded-md nx:bg-muted nx:p-3">
           {JSON.stringify(applied, null, 2)}
         </pre>
       </details>

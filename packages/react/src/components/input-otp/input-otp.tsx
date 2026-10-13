@@ -132,7 +132,10 @@ function InputOTPSlot({ index, className, ...props }: InputOTPSlotProps) {
       {char}
       {hasFakeCaret && (
         <div className="nx:pointer-events-none nx:absolute nx:inset-0 nx:flex nx:items-center nx:justify-center">
-          <div className="nx:h-4 nx:w-px nx:animate-caret-blink nx:bg-foreground" />
+          <div
+            data-slot="input-otp-caret"
+            className="nx:h-4 nx:w-px nx:animate-[var(--nx-animate-caret-blink,caret-blink_1.25s_ease-out_infinite)] nx:bg-foreground"
+          />
         </div>
       )}
     </div>

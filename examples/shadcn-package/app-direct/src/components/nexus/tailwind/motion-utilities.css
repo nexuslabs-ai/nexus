@@ -59,17 +59,17 @@
   );
 }
 
-@keyframes overlay-presence-exit {
+@keyframes nx-overlay-presence-exit {
   from {
-    --overlay-presence-phase: 0;
+    --nx-overlay-presence-phase: 0;
   }
   to {
-    --overlay-presence-phase: 1;
+    --nx-overlay-presence-phase: 1;
   }
 }
 
 @utility animate-overlay-presence-exit {
-  animation-name: overlay-presence-exit;
+  animation-name: nx-overlay-presence-exit;
   animation-duration: var(--tw-duration, var(--nx-motion-duration-fast));
   animation-timing-function: linear;
 }

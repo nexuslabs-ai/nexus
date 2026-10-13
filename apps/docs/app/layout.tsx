@@ -31,7 +31,6 @@ export default function RootLayout({
       suppressHydrationWarning
     >
       <head>
-        <meta name="color-scheme" content="light dark" />
         <NexusAppearanceScript
           storageKey={DOCS_APPEARANCE_STORAGE_KEY}
           defaultState={DOCS_APPEARANCE_DEFAULT_STATE}

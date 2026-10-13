@@ -30,6 +30,7 @@ That is what lets Nexus sit inside any app without restyling it.
   `box-sizing: border-box` from it.
 - Unprefixed variables: `--color-*`, `--spacing-*`. A host may declare the same
   names.
+- Unprefixed keyframe names. Name Nexus keyframes `nx-*`.
 
 Components must not work around this either: no arbitrary-property class that a
 consumer or another file has to set, and no component `.css` file that
@@ -37,16 +38,19 @@ re-introduces slot selectors. A value that has to cross files is a utility.
 
 A component that renders a native element neutralizes that element's browser
 defaults in its own classes, because no reset is guaranteed: `nx:m-0` on
-`<p>` / `<h*>`, `nx:list-none nx:m-0 nx:p-0` on `<ul>` / `<ol>`, and a background,
+`<p>` / `<h*>`, `nx:list-none nx:m-0 nx:p-0` on `<ul>` / `<ol>`, a background,
 border, padding and colour on `<button>` (`nx:text-inherit` where it should
-match its parent).
+match its parent), and `nx:no-underline` plus a colour on `<a>`. Storybook
+loads no Preflight, so a missing reset shows in the stories.
 
 ## Enforcement
 
-Review: reject any `data-slot`, `data-variant`, `class~=`, element, or
-universal rule added to the `packages/core/scripts/` emitters or
-`packages/tailwind/*.css`. `selects only :root and Nexus classes, never the host
+`packages/core/src/lib/generated-css-scope.test.ts` compiles `nexus.css` with
+every `nx:` class the components use, and fails on any rule that selects outside
+`nx:` classes and variable scopes, any global declaration that is not `--nx-*`,
+or an unprefixed keyframe. `selects only :root and Nexus classes, never the host
 page` in `packages/core/src/lib/appearance-model.test.ts` guards the appearance
-preference CSS. Separately, `registers every emitted custom utility`
+preference CSS. Review the rest: reject any `data-slot`, `data-variant` or
+`class~=` selector in the `packages/core/scripts/` emitters. Separately, `registers every emitted custom utility`
 in `packages/react/src/lib/utils.test.ts` fails when a new `@utility` is not
 registered with `cn()`.

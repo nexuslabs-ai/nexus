@@ -201,10 +201,13 @@ try {
   console.log('building the app with Nexus…');
   build(after);
 
-  const servers = [await serve(before, 4174), await serve(after, 4173)];
-  const browser = await chromium.launch();
+  const servers = [];
+  let browser;
   let total = 0;
   try {
+    servers.push(await serve(before, 4174));
+    servers.push(await serve(after, 4173));
+    browser = await chromium.launch();
     const page = await browser.newPage({ colorScheme: 'light', viewport: { width: 1440, height: 1000 } });
     for (const route of config.pages) {
       const a = await snapshot(page, `http://localhost:4174${route}`);
@@ -225,7 +228,7 @@ try {
       for (const [change, n] of [...groups].sort((x, y) => y[1] - x[1])) console.log(`  ${String(n).padStart(4)} × ${change}`);
     }
   } finally {
-    await browser.close();
+    await browser?.close();
     for (const server of servers) server.kill();
   }
   console.log(`\n${total} host properties changed in total`);

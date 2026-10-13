@@ -25,7 +25,7 @@ const config = JSON.parse(readFileSync(path.join(appDir, 'nexus.json'), 'utf8'))
 const sourceDest = path.join(appDir, config.sourceDir);
 const cssDest = path.join(appDir, config.cssDir);
 
-execFileSync('node', ['apps/docs/scripts/generate-dependencies.mjs'], { cwd: repoRoot });
+run('node', ['apps/docs/scripts/generate-dependencies.mjs'], repoRoot);
 
 const closures = config.components.map((slug) =>
   JSON.parse(readFileSync(path.join(depsDir, `${slug}.json`), 'utf8'))
@@ -57,11 +57,19 @@ for (const file of cssFiles) cpSync(path.join(tailwindDir, file), path.join(cssD
 // The app installs @nexus_ds/core from packages/core, so the engine and the
 // copied components come from the same revision. npm keeps an installed file:
 // dependency whose version has not changed, so remove it before reinstalling.
-execFileSync('pnpm', ['--filter', '@nexus_ds/core', 'build'], { cwd: repoRoot, stdio: 'ignore' });
+function run(command, args, cwd) {
+  try {
+    execFileSync(command, args, { cwd, stdio: 'pipe' });
+  } catch (error) {
+    throw new Error(`${command} ${args.join(' ')} failed in ${cwd}\n${error.stdout}\n${error.stderr}`);
+  }
+}
+
+run('pnpm', ['--filter', '@nexus_ds/core', 'build'], repoRoot);
 const installedCore = path.join(appDir, 'node_modules/@nexus_ds/core');
 if (existsSync(installedCore)) {
   rmSync(installedCore, { recursive: true });
-  execFileSync('npm', ['install', '--no-audit', '--no-fund'], { cwd: appDir, stdio: 'ignore' });
+  run('npm', ['install', '--no-audit', '--no-fund'], appDir);
 }
 
 const install = new Map(closures.flatMap((closure) => closure.install.map(({ name, range }) => [name, range])));

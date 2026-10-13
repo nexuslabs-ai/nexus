@@ -1762,5 +1762,5 @@
 
 /* ===== CURSOR UTILITIES ===== */
 @utility cursor-interactive {
-  cursor: var(--nx-cursor-interactive, default);
+  cursor: var(--nx-cursor-interactive, auto);
 }

@@ -220,7 +220,7 @@ const tabsTriggerVariants = cva(
           'nx:data-[state=active]:text-foreground',
         ],
         underline: [
-          'nx:rounded-none nx:border-b-thick nx:border-transparent',
+          'nx:rounded-none nx:border-0 nx:border-b-thick nx:border-transparent',
           'nx:bg-transparent',
           'nx:data-[state=active]:text-foreground',
         ],

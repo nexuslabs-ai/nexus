@@ -138,7 +138,7 @@ function Table({
           data-sticky-header={stickyHeader || undefined}
           data-striped={striped || undefined}
           className={cn(
-            'nx:w-full nx:caption-bottom nx:typography-body-default nx:[&[data-striped]_tbody_tr:nth-child(even):not(:hover):not([data-state=selected])]:bg-muted nx:[&[data-striped]_tfoot]:border-t-default nx:[&[data-striped]_tfoot]:border-border-default-alpha',
+            'nx:w-full nx:caption-bottom nx:border-collapse nx:typography-body-default nx:[&[data-striped]_tbody_tr:nth-child(even):not(:hover):not([data-state=selected])]:bg-muted nx:[&[data-striped]_tfoot]:border-t-default nx:[&[data-striped]_tfoot]:border-border-default-alpha',
             className
           )}
           {...props}

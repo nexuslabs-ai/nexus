@@ -6,7 +6,9 @@ import {
   type ExternalToast,
   toast as sonnerToast,
   Toaster as Sonner,
-  type ToasterProps,
+  type ToasterProps as SonnerToasterProps,
+  type ToastT,
+  type ToastToDismiss,
   useSonner,
 } from 'sonner';
 
@@ -77,34 +79,16 @@ const toasterThemeVars = {
   '--error-border': 'var(--nx-color-error-border)',
 };
 
-/**
- * Toaster
- *
- * Renders toast notifications, themed to Nexus tokens and riding the Nexus
- * toast layer (z-index 100). Mount once near the root of your app, then call
- * `toast(...)` (re-exported here) from anywhere. The active theme follows the
- * `.dark` class automatically.
- *
- * @example
- * ```tsx
- * import { Toaster, toast } from '@nexus_ds/react';
- *
- * function App() {
- *   return (
- *     <>
- *       <button onClick={() => toast('Saved')}>Save</button>
- *       <Toaster />
- *     </>
- *   );
- * }
- * ```
- */
 // Nexus toasts render only in the Nexus Toaster, and a host app's own sonner
 // Toaster never shows them, so mounting both never doubles a toast.
 const NEXUS_TOASTER_ID = 'nexus';
 
 function inNexusToaster<Data extends object>(data?: Data) {
   return { ...data, toasterId: NEXUS_TOASTER_ID };
+}
+
+function isNexusToast(entry: ToastT | ToastToDismiss) {
+  return 'toasterId' in entry && entry.toasterId === NEXUS_TOASTER_ID;
 }
 
 type Message = Parameters<typeof sonnerToast.success>[0];
@@ -133,12 +117,48 @@ const toast = Object.assign(
       promise: Parameters<typeof sonnerToast.promise<ToastData>>[0],
       data?: Parameters<typeof sonnerToast.promise<ToastData>>[1]
     ) => sonnerToast.promise(promise, inNexusToaster(data)),
-    dismiss: sonnerToast.dismiss,
-    getHistory: sonnerToast.getHistory,
-    getToasts: sonnerToast.getToasts,
+    // Without an id, dismisses every Nexus toast and leaves the host's alone.
+    dismiss: (id?: number | string) => {
+      if (id !== undefined) return sonnerToast.dismiss(id);
+      for (const entry of sonnerToast.getToasts().filter(isNexusToast)) {
+        sonnerToast.dismiss(entry.id);
+      }
+    },
+    getHistory: () => sonnerToast.getHistory().filter(isNexusToast),
+    getToasts: () => sonnerToast.getToasts().filter(isNexusToast),
   }
 );
 
+/** The Nexus toasts currently on screen. */
+function useNexusToasts() {
+  const { toasts } = useSonner();
+  return { toasts: toasts.filter(isNexusToast) };
+}
+
+type ToasterProps = Omit<SonnerToasterProps, 'id'>;
+
+/**
+ * Toaster
+ *
+ * Renders toast notifications, themed to Nexus tokens and riding the Nexus
+ * toast layer (z-index 100). Mount once near the root of your app, then call
+ * `toast(...)` (re-exported here) from anywhere. The active theme follows the
+ * `.dark` class automatically.
+ *
+ * @example
+ * ```tsx
+ * import { Toaster, toast } from '@nexus_ds/react';
+ *
+ * function App() {
+ *   return (
+ *     <>
+ *       <button onClick={() => toast('Saved')}>Save</button>
+ *       <Toaster />
+ *     </>
+ *   );
+ * }
+ * ```
+ */
 function Toaster({ style, ...props }: ToasterProps) {
   const theme = useToasterTheme();
   return (
@@ -163,5 +183,5 @@ function Toaster({ style, ...props }: ToasterProps) {
   );
 }
 
-export { toast, Toaster, useSonner };
+export { toast, Toaster, useNexusToasts as useSonner };
 export type { ToasterProps };

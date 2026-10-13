@@ -1,11 +1,11 @@
-/* Indeterminate sweep keyframe for the Progress indicator, registered the way
- * tw-animate-css registers its own (@theme inline so the named utility compiles
- * without emitting a :root var). Imported by src/index.css. */
-@theme inline {
-  --animate-progress-indeterminate: progress-indeterminate 1.5s ease-in-out
+/* Indeterminate sweep keyframe for the Progress indicator. The utility reads
+ * --nx-animate-progress-indeterminate, which the reduceMotion preference sets
+ * to none. Imported by src/index.css. */
+@theme {
+  --animate-progress-indeterminate: nx-progress-indeterminate 1.5s ease-in-out
     infinite;
 
-  @keyframes progress-indeterminate {
+  @keyframes nx-progress-indeterminate {
     from {
       transform: translateX(-100%);
     }

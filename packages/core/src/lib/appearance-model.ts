@@ -194,6 +194,15 @@ const clampFontSize = (value: unknown, fallback: number): number =>
 
 const MOTION_DURATION_STEPS = Object.keys(motionTokens.duration);
 
+// The looping animations Nexus components use; reduceMotion stops each one.
+const ENDLESS_ANIMATIONS = [
+  'spin',
+  'pulse',
+  'bounce',
+  'progress-indeterminate',
+  'caret-blink',
+];
+
 function formatPx(value: number): string {
   return `${Number(value.toFixed(4))}px`;
 }
@@ -328,6 +337,9 @@ export function appearancePrefsToCss(prefs: NexusAppearancePrefs): string {
     for (const step of MOTION_DURATION_STEPS)
       variables.push(`--nx-motion-duration-${step}: 0ms;`);
     variables.push('--nx-scroll-behavior: auto;');
+    for (const animation of ENDLESS_ANIMATIONS) {
+      variables.push(`--nx-animate-${animation}: none;`);
+    }
   }
   return [
     `:root {\n${variables.map((line) => `  ${line}`).join('\n')}\n${typographyScaleVariables(uiPx)}\n}`,

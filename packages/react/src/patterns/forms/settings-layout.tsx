@@ -91,7 +91,7 @@ export function SettingsLayout({
         <h2 id={titleId} className="nx:m-0 nx:typography-heading-small">
           {title}
         </h2>
-        <p className="nx:mt-1 nx:typography-body-default nx:text-muted-foreground">
+        <p className="nx:mt-1 nx:mb-0 nx:typography-body-default nx:text-muted-foreground">
           Update your details and preferences. Changes apply when you save.
         </p>
       </div>

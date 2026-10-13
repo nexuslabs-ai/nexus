@@ -13,6 +13,7 @@ const popoverSurfaceClassName = [
   'nx:bg-popover-alpha',
   'nx:backdrop-blur-md',
   'nx:text-popover-foreground',
+  'nx:typography-body-default',
   'nx:shadow-lg',
 ].join(' ');
 
@@ -22,6 +23,7 @@ const tooltipSurfaceClassName = [
   'nx:border-border-default',
   'nx:bg-popover',
   'nx:text-popover-foreground',
+  'nx:typography-body-default',
   'nx:shadow-lg',
 ].join(' ');
 

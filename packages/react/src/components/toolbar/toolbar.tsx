@@ -5,20 +5,24 @@ import type { VariantProps } from 'class-variance-authority';
 
 import { cn } from '../../lib/utils';
 import { buttonVariants } from '../button';
+import { TooltipProvider } from '../tooltip';
 
 type ToolbarProps = React.ComponentProps<typeof ToolbarPrimitive.Root>;
 
 /** Label the toolbar with aria-label or aria-labelledby. Controls wrap in DOM order. */
+// One tooltip group, so moving across the buttons skips the open delay.
 function Toolbar({ className, ...props }: ToolbarProps) {
   return (
-    <ToolbarPrimitive.Root
-      data-slot="toolbar"
-      className={cn(
-        'nx:flex nx:w-fit nx:max-w-full nx:min-w-0 nx:flex-wrap nx:items-center nx:gap-0.5 nx:rounded-lg nx:border-default nx:border-border-default nx:bg-container nx:p-0.5 nx:shadow-sm nx:data-[orientation=vertical]:flex-col nx:data-[orientation=vertical]:items-stretch',
-        className
-      )}
-      {...props}
-    />
+    <TooltipProvider>
+      <ToolbarPrimitive.Root
+        data-slot="toolbar"
+        className={cn(
+          'nx:flex nx:w-fit nx:max-w-full nx:min-w-0 nx:flex-wrap nx:items-center nx:gap-0.5 nx:rounded-lg nx:border-default nx:border-border-default nx:bg-container nx:p-0.5 nx:shadow-sm nx:data-[orientation=vertical]:flex-col nx:data-[orientation=vertical]:items-stretch',
+          className
+        )}
+        {...props}
+      />
+    </TooltipProvider>
   );
 }
 

@@ -32,7 +32,7 @@ export function ReadOnlyDetails({
     <section className="nx:grid nx:gap-container">
       <div>
         <h2 className="nx:m-0 nx:typography-heading-small">Account details</h2>
-        <p className="nx:mt-1 nx:typography-body-default nx:text-muted-foreground">
+        <p className="nx:mt-1 nx:mb-0 nx:typography-body-default nx:text-muted-foreground">
           These details are managed by your organization. Contact an
           administrator to change them.
         </p>

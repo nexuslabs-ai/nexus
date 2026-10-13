@@ -43,7 +43,7 @@ function ItemSeparator({
 }
 
 const itemVariants = cva(
-  'nx:group/item nx:flex nx:flex-wrap nx:items-center nx:rounded-md nx:border-default nx:border-transparent nx:typography-body-default nx:transition-control nx:duration-faster nx:focus-visible:outline-2 nx:focus-visible:outline-focus-default nx:[a]:hover:bg-background-hover',
+  'nx:text-inherit nx:no-underline nx:group/item nx:flex nx:flex-wrap nx:items-center nx:rounded-md nx:border-default nx:border-transparent nx:typography-body-default nx:transition-control nx:duration-faster nx:focus-visible:outline-2 nx:focus-visible:outline-focus-default nx:[a]:hover:bg-background-hover',
   {
     variants: {
       variant: {
@@ -242,7 +242,7 @@ function ItemDescription({ className, ...props }: ItemDescriptionProps) {
       // Structural hook — see ItemContent.
       data-item-part="description"
       className={cn(
-        'nx:m-0 nx:line-clamp-2 nx:typography-body-default nx:text-balance nx:text-muted-foreground nx:[&>a]:underline nx:[&>a]:underline-offset-4 nx:[&>a:hover]:text-primary-subtle-foreground',
+        'nx:m-0 nx:line-clamp-2 nx:typography-body-default nx:text-balance nx:text-muted-foreground nx:[&>a]:text-inherit nx:[&>a]:underline nx:[&>a]:underline-offset-4 nx:[&>a:hover]:text-primary-subtle-foreground',
         className
       )}
       {...props}

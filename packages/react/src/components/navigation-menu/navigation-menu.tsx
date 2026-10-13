@@ -88,7 +88,7 @@ function NavigationMenuList({ className, ...props }: NavigationMenuListProps) {
     <NavigationMenuPrimitive.List
       data-slot="navigation-menu-list"
       className={cn(
-        'nx:group nx:flex nx:flex-1 nx:list-none nx:items-center nx:justify-center nx:gap-1',
+        'nx:group nx:m-0 nx:flex nx:flex-1 nx:list-none nx:items-center nx:justify-center nx:gap-1 nx:p-0',
         className
       )}
       {...props}
@@ -185,7 +185,7 @@ function NavigationMenuContent({
         'nx:top-0 nx:left-0 nx:w-full nx:p-2 nx:pr-2.5',
         'nx:data-[motion=from-end]:slide-in-from-right-[1.5rem] nx:data-[motion=from-start]:slide-in-from-left-[1.5rem]',
         'nx:data-[motion=to-end]:slide-out-to-right-[1.5rem] nx:data-[motion=to-start]:slide-out-to-left-[1.5rem]',
-        'nx:data-[motion^=from-]:animate-in nx:data-[motion^=from-]:fade-in nx:data-[motion^=to-]:animate-out nx:data-[motion^=to-]:fade-out',
+        'nx:duration-fast nx:data-[motion^=from-]:animate-in nx:data-[motion^=from-]:fade-in nx:data-[motion^=to-]:animate-out nx:data-[motion^=to-]:fade-out',
         'nx:data-[motion^=from-]:duration-default nx:data-[motion^=from-]:ease-enter',
         'nx:data-[motion^=to-]:duration-fast nx:data-[motion^=to-]:ease-exit',
         'nx:@md/navmenu:absolute nx:@md/navmenu:w-auto',
@@ -257,7 +257,7 @@ function NavigationMenuLink({ className, ...props }: NavigationMenuLinkProps) {
     <NavigationMenuPrimitive.Link
       data-slot="navigation-menu-link"
       className={cn(
-        'nx:flex nx:flex-col nx:gap-1 nx:rounded-sm nx:p-2 nx:typography-body-default nx:transition-control',
+        'nx:flex nx:flex-col nx:gap-1 nx:rounded-sm nx:p-2 nx:text-inherit nx:no-underline nx:typography-body-default nx:transition-control',
         'nx:hover:bg-popover-hover nx:hover:text-popover-foreground',
         'nx:focus-visible:outline-2 nx:focus-visible:outline-focus-default',
         'nx:data-[active=true]:bg-popover-hover nx:data-[active=true]:text-popover-foreground',

@@ -11,7 +11,12 @@ import {
   CollapsibleTrigger,
 } from '../collapsible';
 import { Popover, PopoverContent, PopoverTrigger } from '../popover';
-import { Tooltip, TooltipContent, TooltipTrigger } from '../tooltip';
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from '../tooltip';
 
 import {
   Bubble,
@@ -829,27 +834,29 @@ const receiptIconClassName =
 
 export const WithTooltip: Story = {
   render: () => (
-    <BubbleGroup className={column}>
-      <Bubble
-        align="end"
-        variant="primary"
-        className="nx:flex nx:items-end nx:gap-2"
-      >
-        <BubbleContent>Deployed the release candidate.</BubbleContent>
-        <Tooltip delayDuration={0}>
-          <TooltipTrigger asChild>
-            <button
-              type="button"
-              aria-label="Delivery details"
-              className={receiptIconClassName}
-            >
-              <IconChecks />
-            </button>
-          </TooltipTrigger>
-          <TooltipContent>Read 09:15 &middot; 24 Aug 2026</TooltipContent>
-        </Tooltip>
-      </Bubble>
-    </BubbleGroup>
+    <TooltipProvider delayDuration={0}>
+      <BubbleGroup className={column}>
+        <Bubble
+          align="end"
+          variant="primary"
+          className="nx:flex nx:items-end nx:gap-2"
+        >
+          <BubbleContent>Deployed the release candidate.</BubbleContent>
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <button
+                type="button"
+                aria-label="Delivery details"
+                className={receiptIconClassName}
+              >
+                <IconChecks />
+              </button>
+            </TooltipTrigger>
+            <TooltipContent>Read 09:15 &middot; 24 Aug 2026</TooltipContent>
+          </Tooltip>
+        </Bubble>
+      </BubbleGroup>
+    </TooltipProvider>
   ),
   play: async ({ canvasElement }) => {
     const canvas = within(canvasElement);

@@ -1115,16 +1115,16 @@ export function generateMotionUtilitiesCSS(motionTokens) {
   // translate TRANSITIONS run the visible exit. It must NOT animate a transitioned
   // property (opacity/scale/translate) or it would override that transition, so it
   // animates an inert, unread custom property instead.
-  css += `@keyframes overlay-presence-exit {\n`;
+  css += `@keyframes nx-overlay-presence-exit {\n`;
   css += `  from {\n`;
-  css += `    --overlay-presence-phase: 0;\n`;
+  css += `    --nx-overlay-presence-phase: 0;\n`;
   css += `  }\n`;
   css += `  to {\n`;
-  css += `    --overlay-presence-phase: 1;\n`;
+  css += `    --nx-overlay-presence-phase: 1;\n`;
   css += `  }\n`;
   css += `}\n\n`;
   css += `@utility animate-overlay-presence-exit {\n`;
-  css += `  animation-name: overlay-presence-exit;\n`;
+  css += `  animation-name: nx-overlay-presence-exit;\n`;
   css += `  animation-duration: var(--tw-duration, var(--nx-motion-duration-fast));\n`;
   css += `  animation-timing-function: linear;\n`;
   css += `}\n\n`;
@@ -1430,7 +1430,8 @@ export function generateAutofillUtilitiesCSS() {
 /**
  * The interactive cursor. Interactive components carry `cursor-interactive`;
  * the provider's pointerCursors preference sets --nx-cursor-interactive, so
- * the host's own buttons and links keep their cursor.
+ * the host's own buttons and links keep their cursor. The `auto` fallback keeps
+ * the browser's pointer on links.
  *
  * @returns {string} CSS @utility declaration
  */
@@ -1438,7 +1439,7 @@ export function generateCursorUtilitiesCSS() {
   return `
 /* ===== CURSOR UTILITIES ===== */
 @utility cursor-interactive {
-  cursor: var(--nx-cursor-interactive, default);
+  cursor: var(--nx-cursor-interactive, auto);
 }
 `;
 }

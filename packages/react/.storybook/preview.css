@@ -6,10 +6,19 @@
  * @import (not a JS import) so the Rollup production build can resolve
  * @nexus_ds/tailwind, whose package entry is a .css. */
 @layer theme, base, components, utilities;
-/* Nexus ships no reset; Storybook is a host and brings its own, like any app. */
-@import 'tailwindcss/preflight.css' layer(base);
 @import '@nexus_ds/tailwind';
 @import '../src/index.css';
+
+/* Nexus ships no reset, and components reset the browser defaults they rely
+ * on. Storybook keeps only the border-box sizing every host reset provides,
+ * so a missing component reset shows here. */
+@layer base {
+  *,
+  ::before,
+  ::after {
+    box-sizing: border-box;
+  }
+}
 
 @source '.';
 @source '../src';

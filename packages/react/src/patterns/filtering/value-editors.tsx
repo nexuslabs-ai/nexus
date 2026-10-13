@@ -55,7 +55,7 @@ function Example({
     >
       <div>
         <h2 className="nx:m-0 nx:typography-label-default">{title}</h2>
-        <p className="nx:mt-1 nx:typography-body-small nx:text-muted-foreground">
+        <p className="nx:mt-1 nx:mb-0 nx:typography-body-small nx:text-muted-foreground">
           {description}
         </p>
       </div>
@@ -241,7 +241,7 @@ export function Showcase({ today }: { today?: Date }) {
     <div className="nx:@container/editors nx:mx-auto nx:w-full nx:min-w-0 nx:max-w-3xl">
       <header className="nx:mb-3">
         <h2 className="nx:m-0 nx:typography-heading-small">Filter editors</h2>
-        <p className="nx:mt-1 nx:typography-body-default nx:text-muted-foreground">
+        <p className="nx:mt-1 nx:mb-0 nx:typography-body-default nx:text-muted-foreground">
           One condition. An editor that fits the value.
         </p>
       </header>
