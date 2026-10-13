@@ -570,6 +570,7 @@ export const AllVariants: Story = {
 };
 
 export const DefaultModeHeightPinned: Story = {
+  globals: { density: 'default' },
   parameters: {
     a11y: { test: 'off' },
     docs: {

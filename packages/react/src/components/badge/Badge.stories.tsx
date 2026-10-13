@@ -1,3 +1,4 @@
+import { DENSITY_OPTIONS } from '@nexus_ds/core';
 import type { Meta, StoryObj } from '@storybook/react';
 import {
   IconAlertCircle,
@@ -825,6 +826,29 @@ export const AllVariants: Story = {
   ),
   parameters: {
     layout: 'padded',
+  },
+};
+
+export const DensityIcons: Story = {
+  tags: ['!autodocs', '!dev'],
+  render: () => (
+    <div className="nx:grid nx:gap-3">
+      {DENSITY_OPTIONS.map(({ value: density }) => (
+        <div key={density} data-density={density}>
+          <Badge leftIcon={<IconCheck />} data-testid="density-badge">
+            {density}
+          </Badge>
+        </div>
+      ))}
+    </div>
+  ),
+  play: async ({ canvasElement }) => {
+    const badges = within(canvasElement).getAllByTestId('density-badge');
+    for (const badge of badges) {
+      await expect(
+        badge.querySelector('svg')!.getBoundingClientRect().width
+      ).toBe(14);
+    }
   },
 };
 

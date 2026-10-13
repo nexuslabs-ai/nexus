@@ -704,6 +704,7 @@ export const AllVariants: Story = {
 };
 
 export const AccordionTriggerDefaultHeightPinned: Story = {
+  globals: { density: 'default' },
   parameters: {
     a11y: { test: 'off' },
     docs: {
@@ -739,6 +740,7 @@ export const AccordionTriggerDefaultHeightPinned: Story = {
 };
 
 export const AccordionFloatingTriggerDefaultHeightPinned: Story = {
+  globals: { density: 'default' },
   parameters: {
     a11y: { test: 'off' },
     docs: {
@@ -779,6 +781,7 @@ export const AccordionFloatingTriggerDefaultHeightPinned: Story = {
 };
 
 export const AccordionExpandedItemDefaultHeightPinned: Story = {
+  globals: { density: 'default' },
   parameters: {
     a11y: { test: 'off' },
     docs: {
