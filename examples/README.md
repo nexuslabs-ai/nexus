@@ -40,7 +40,7 @@ Adding Nexus changes **0** of the host app's own styles in every coexistence
 example. Nexus emits only `nx:` utilities and `--nx-*` variables, and each
 component resets the browser defaults it relies on.
 
-| App | Host properties changed |
+| App | Host changes |
 | --- | ----------------------- |
 | `shadcn-app` | 0 |
 | `mui-app` | 0 |

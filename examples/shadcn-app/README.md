@@ -59,7 +59,7 @@ node examples/scripts/check.mjs examples/shadcn-app
 ```
 
 It builds the app with and without Nexus and lists every host style that
-changed. Today: **0 host properties** across the three pages.
+changed. Today: **0 host changes** across the three pages.
 
 On Nexus components, the pages use `nx:` classes. An unprefixed class like
 `w-48` sets the same property as the component's own `nx:` class, and Nexus's

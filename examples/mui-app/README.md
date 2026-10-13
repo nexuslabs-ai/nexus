@@ -60,4 +60,4 @@ From the repository root:
 node examples/scripts/check.mjs examples/mui-app
 ```
 
-Today: **0 host properties** change across the three pages.
+Today: **0 host changes** across the three pages.

@@ -230,14 +230,14 @@ try {
         }
       }
       const count = [...groups.values()].reduce((sum, n) => sum + n, 0);
-      console.log(`\n${route}  ${count} host properties changed`);
+      console.log(`\n${route}  ${count} host changes`);
       for (const [change, n] of [...groups].sort((x, y) => y[1] - x[1])) console.log(`  ${String(n).padStart(4)} × ${change}`);
     }
   } finally {
     await browser?.close();
     for (const server of servers) server.kill();
   }
-  console.log(`\n${total} host properties changed in total`);
+  console.log(`\n${total} host changes in total`);
   if (total > 0) process.exitCode = 1;
 } finally {
   for (const dir of tempDirs) rmSync(dir, { recursive: true, force: true });

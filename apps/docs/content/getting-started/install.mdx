@@ -260,10 +260,15 @@ not wrapping them.
 ## Add Nexus to an existing app
 
 Nexus emits only `nx:` utilities and `--nx-*` variables, so it leaves your app's
-own styles alone. The one exception is `tw-animate-css`, which adds global
-`enter`, `exit`, `accordion-*`, `collapsible-*` and `caret-blink` keyframes and
-`--tw-*` properties. They are the same ones a shadcn app already has. Four
-things differ from a new app.
+own styles alone. There are two exceptions:
+
+- `.dark { color-scheme: dark }`. Nexus shares the `.dark` class with your app,
+  so in dark mode your scrollbars and form controls render dark too.
+- `tw-animate-css` adds global `enter`, `exit`, `accordion-*`, `collapsible-*`
+  and `caret-blink` keyframes and `--tw-*` properties, the same ones a shadcn
+  app already has.
+
+Four things differ from a new app.
 
 1. **Copy Nexus into its own folder**, such as `components/nexus/`. Your app
    likely has a `lib/utils.ts` already, and Nexus's would replace it. The

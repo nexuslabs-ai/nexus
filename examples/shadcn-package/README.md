@@ -73,6 +73,6 @@ node examples/scripts/check.mjs examples/shadcn-package/app-via-package
 node examples/scripts/check.mjs examples/shadcn-package/app-direct
 ```
 
-Both report **0 host properties** across the three pages, and both build
+Both report **0 host changes** across the three pages, and both build
 byte-identical CSS. Delivering Nexus through the package or copying it into the
 app makes no difference.
