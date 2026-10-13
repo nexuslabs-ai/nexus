@@ -286,6 +286,9 @@ On a Nexus component, write `nx:` classes. An unprefixed class sets the same
 property as the component's own `nx:` class, and Nexus's stylesheet loads later,
 so the component's class wins.
 
+Your own content placed inside a Nexus component inherits that component's text
+colour, font and line height, as it would inside any other element.
+
 If your design system is a package, ship the Nexus CSS entry from it and end the
 entry with `@source './';`. Tailwind skips `node_modules`, so without that line
 the package's classes are never generated.
