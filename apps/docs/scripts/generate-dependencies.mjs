@@ -13,6 +13,7 @@ import {
   collectSourceFiles,
   componentSlugs,
   isModuleSource,
+  linkedComponentSlug,
   writeJson,
 } from './react-sources.mjs';
 import {
@@ -173,10 +174,18 @@ function assertDeclaredPackages(walks) {
   );
 }
 
+function linkedComponents(slug, files) {
+  const slugs = files
+    .map(linkedComponentSlug)
+    .filter((linked) => linked && linked !== slug);
+  return [...new Set(slugs)].sort();
+}
+
 function toEntry({ slug, slugDir, packages, files }) {
   return {
     slug,
     install: packages.sort().map(toInstall),
+    components: linkedComponents(slug, files),
     copy: files
       .filter((file) => !isUnder(file, slugDir))
       .map(toSrcPath)

@@ -2,7 +2,7 @@ import { existsSync, readdirSync, readFileSync, writeFileSync } from 'node:fs';
 import path from 'node:path';
 
 import { pascal } from './humanize.mjs';
-import { blocksRoot, componentsRoot, reactSrc } from './roots.mjs';
+import { blocksRoot, componentsRoot, isUnder, reactSrc } from './roots.mjs';
 
 export function isModuleSource(filePath) {
   const name = path.basename(filePath);
@@ -32,6 +32,20 @@ export function exportedComponentSlugs() {
   return [
     ...new Set([...index.matchAll(EXPORTED_COMPONENT)].map(([, slug]) => slug)),
   ].sort();
+}
+
+/**
+ * The exported component whose own file `filePath` is
+ * (`components/button/button.tsx` → `button`), or null. A docs page links that
+ * component instead of listing its files.
+ */
+export function linkedComponentSlug(filePath) {
+  if (!isUnder(filePath, componentsRoot)) return null;
+  const [slug, name, ...nested] = path
+    .relative(componentsRoot, filePath)
+    .split(path.sep);
+  if (nested.length > 0 || name.replace(/\.tsx?$/, '') !== slug) return null;
+  return exportedComponentSlugs().includes(slug) ? slug : null;
 }
 
 /**

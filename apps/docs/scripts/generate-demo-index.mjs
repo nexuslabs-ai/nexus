@@ -25,9 +25,9 @@ import {
   blockSources,
   componentSlugs,
   exportedComponentSlugs,
+  linkedComponentSlug,
 } from './react-sources.mjs';
 import {
-  componentsRoot,
   docsRoot,
   isUnder,
   reactRoot,
@@ -574,8 +574,8 @@ function collectComponentDocs(exported, demos) {
 
 /**
  * The block's minimal example (`{slug}-example.tsx`) if it has one, else its
- * source, then every non-component file that reaches through relative
- * imports, then the component folders those files import.
+ * source, then every file that reaches through relative imports short of a
+ * linked component, then the components those files import directly.
  * @param {import('./react-sources.mjs').BlockSource} block
  * @returns {Omit<BlockDocs, 'preview'>}
  */
@@ -593,10 +593,9 @@ function blockFiles(block) {
           `${toRepoPath(file)} imports ${specifier}, which is not a file under packages/react/src — a block page can't list it.`
         );
       }
-      if (isUnder(target, componentsRoot)) {
-        components.add(
-          path.relative(componentsRoot, target).split(path.sep)[0]
-        );
+      const linked = linkedComponentSlug(target);
+      if (linked) {
+        components.add(linked);
         continue;
       }
       visit(target);

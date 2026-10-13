@@ -13,6 +13,7 @@ type Package = { name: string; range: string };
 
 export type Dependencies = {
   install: Package[];
+  components: string[];
   copy: string[];
   files: string[];
   styles: string[];
@@ -53,6 +54,7 @@ function isDependencies(value: unknown): value is Dependencies {
     isRecord(value) &&
     Array.isArray(value.install) &&
     value.install.every(isPackage) &&
+    isStringList(value.components) &&
     isStringList(value.copy) &&
     isStringList(value.files) &&
     isStringList(value.styles)
@@ -76,7 +78,7 @@ export const loadDependencies = cache(
 
     if (!isDependencies(parsed)) {
       throw new Error(
-        `dependencies: ${filePath} needs an install list of { name, range } and string arrays copy, files, styles — rerun \`pnpm --filter @nexus_ds/docs generate:dependencies\`.`
+        `dependencies: ${filePath} needs an install list of { name, range } and string arrays components, copy, files, styles — rerun \`pnpm --filter @nexus_ds/docs generate:dependencies\`.`
       );
     }
     return parsed;
