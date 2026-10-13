@@ -1,11 +1,9 @@
-import Link from 'next/link';
-
 import { getBlockDocs } from '../../__generated__/demo-index';
 import { loadReactSource } from '../_lib/dependencies';
-import { type ManifestPage, requirePage } from '../_lib/manifest';
+import type { ManifestPage } from '../_lib/manifest';
 
 import { ComponentDemo } from './ComponentDemo';
-import { SourceFile } from './ComponentInstallation';
+import { ComponentLinks, SourceFile } from './ComponentInstallation';
 import { DescriptionText } from './DescriptionText';
 import {
   PAGE_HEADING_CLASS,
@@ -18,8 +16,6 @@ type BlockManifestPage = Extract<ManifestPage, { kind: 'block' }>;
 
 const BODY_CLASS =
   'nx:mb-4 nx:typography-body-default nx:text-muted-foreground';
-const LINK_CLASS =
-  'nx:text-primary-subtle-foreground nx:underline nx:underline-offset-2';
 
 /** A block's story tagged `docs` as the preview, then the files to copy. */
 export async function BlockPage({ page }: { page: BlockManifestPage }) {
@@ -45,16 +41,7 @@ export async function BlockPage({ page }: { page: BlockManifestPage }) {
       </p>
       {components.length > 0 && (
         <p className={BODY_CLASS}>
-          Install these components first:{' '}
-          {components.map((slug, index) => (
-            <span key={slug}>
-              {index > 0 && ', '}
-              <Link href={`/components/${slug}`} className={LINK_CLASS}>
-                {requirePage('components', slug).label}
-              </Link>
-            </span>
-          ))}
-          .
+          Install these components first: <ComponentLinks slugs={components} />.
         </p>
       )}
       {sources.map(({ path, source }) => (

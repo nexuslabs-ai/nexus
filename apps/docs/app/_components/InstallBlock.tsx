@@ -1,19 +1,8 @@
-import { type Dependencies, loadDependencies } from '../_lib/dependencies';
+import { loadInstallPlan } from '../_lib/dependencies';
 
 import { CodeBlock } from './CodeBlock';
 import { CodeSample } from './CodeSample';
-
-type ListOf = (dependencies: Dependencies) => string[];
-
-const packagesOf: ListOf = ({ install }) =>
-  install.map(({ name, range }) => `${name}@${range}`);
-const filesOf: ListOf = ({ copy, files }) => [...copy, ...files];
-const stylesOf: ListOf = ({ styles }) => styles;
-
-function missing(needed: string[], installed: string[]) {
-  const have = new Set(installed);
-  return [...new Set(needed)].filter((item) => !have.has(item));
-}
+import { ComponentLinks } from './ComponentInstallation';
 
 export async function InstallBlock({
   slugs,
@@ -27,17 +16,15 @@ export async function InstallBlock({
   alsoPackages?: readonly string[];
   caption?: string;
 }) {
-  const [needed, installed] = await Promise.all([
-    Promise.all(slugs.map((slug) => loadDependencies(slug))),
-    Promise.all(besides.map((slug) => loadDependencies(slug))),
-  ]);
-  const packages = missing(
-    [...needed.flatMap(packagesOf), ...alsoPackages],
-    installed.flatMap(packagesOf)
+  const { components, packages, files, styles } = await loadInstallPlan(
+    slugs,
+    besides,
+    alsoPackages
   );
-  const toCopy = missing(needed.flatMap(filesOf), installed.flatMap(filesOf));
-  const styles = missing(needed.flatMap(stylesOf), installed.flatMap(stylesOf));
-  if (packages.length + toCopy.length + styles.length === 0) {
+  if (
+    components.length + packages.length + files.length + styles.length ===
+    0
+  ) {
     return null;
   }
 
@@ -48,12 +35,17 @@ export async function InstallBlock({
           {caption}
         </p>
       )}
+      {components.length > 0 && (
+        <p className="nx:typography-body-default nx:text-muted-foreground">
+          Install these components first: <ComponentLinks slugs={components} />.
+        </p>
+      )}
       {packages.length > 0 && (
         <CodeSample lang="bash">{`npm install ${packages.join(' ')}`}</CodeSample>
       )}
-      {toCopy.length > 0 && (
-        <CodeBlock data-language="text">
-          <code>{toCopy.join('\n')}</code>
+      {files.length > 0 && (
+        <CodeBlock>
+          <code>{files.join('\n')}</code>
         </CodeBlock>
       )}
       {styles.length > 0 && (
