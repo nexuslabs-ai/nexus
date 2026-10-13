@@ -92,7 +92,12 @@ export const APCA_PAIRS = [
   text('nav-foreground', 'nav-item-hover', 'ui'),
   text('nav-foreground', 'nav-item-active', 'ui'),
   ink('error-subtle-foreground', 'background', 'ui'),
-  ink('error-subtle-foreground', 'container', 'ui'),
+  ...(['error', 'success', 'warning', 'information'] as const).flatMap(
+    (family) => [
+      ink(`${family}-subtle-foreground`, 'container', 'ui'),
+      text('foreground', `${family}-subtle`, 'ui'),
+    ]
+  ),
   ...COLOR_FAMILIES.flatMap((family) => [
     label(`${family}-foreground`, `${family}-background`, 'ui'),
     label(`${family}-foreground`, `${family}-background-hover`, 'ui'),
