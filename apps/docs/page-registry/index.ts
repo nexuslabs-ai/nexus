@@ -69,6 +69,10 @@ export const PAGE_REGISTRY = {
         label: 'Theme setup',
       },
       {
+        slug: 'examples',
+        label: 'Examples',
+      },
+      {
         slug: 'first-component',
         label: 'Your first component',
         wireframe: {
