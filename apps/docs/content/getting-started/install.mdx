@@ -260,13 +260,16 @@ not wrapping them.
 ## Add Nexus to an existing app
 
 Nexus emits only `nx:` utilities and `--nx-*` variables, so it leaves your app's
-own styles alone. There are two exceptions:
+own styles alone. There are three exceptions:
 
 - `.dark { color-scheme: dark }`. Nexus shares the `.dark` class with your app,
   so in dark mode your scrollbars and form controls render dark too.
 - `tw-animate-css` adds global `enter`, `exit`, `accordion-*`, `collapsible-*`
   and `caret-blink` keyframes and `--tw-*` properties, the same ones a shadcn
   app already has.
+- Tailwind's own output for Nexus's utilities: its `spin`, `ping`, `pulse` and
+  `bounce` keyframes, and its `--tw-*` property registrations with their
+  `*, ::before, ::after, ::backdrop` defaults. Any Tailwind 4 app has the same.
 
 Four things differ from a new app.
 
