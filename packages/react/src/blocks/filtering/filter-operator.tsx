@@ -6,8 +6,8 @@ import {
   DropdownMenuRadioGroup,
   DropdownMenuRadioItem,
   DropdownMenuTrigger,
-} from '../../components/dropdown-menu';
-import { FilterConditionSegment } from '../../components/filter-condition';
+} from '../../components/dropdown-menu/dropdown-menu';
+import { FilterConditionSegment } from '../../components/filter-condition/filter-condition';
 import {
   type FilterOperator,
   filterOperatorLabels,

@@ -9,21 +9,21 @@ import {
 import { expect, within } from 'storybook/test';
 
 import { expectHeightPinned } from '../../stories/support/story-height-test-utils';
-import { Button } from '../button';
+import { Button } from '../button/button';
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
-} from '../dropdown-menu';
-import { Input } from '../input';
+} from '../dropdown-menu/dropdown-menu';
+import { Input } from '../input/input';
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from '../select';
+} from '../select/select';
 
 import {
   ButtonGroup,

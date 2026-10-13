@@ -27,8 +27,8 @@ import {
   type TextCondition,
   TextFilter,
 } from '../../blocks/filtering/text-filter/text-filter';
-import { FilterBuilder } from '../../components/filter-builder';
-import { FilterChip } from '../../components/filter-chip';
+import { FilterBuilder } from '../../components/filter-builder/filter-builder';
+import { FilterChip } from '../../components/filter-chip/filter-chip';
 
 import { exampleFields, exampleTree } from './advanced-fixtures';
 

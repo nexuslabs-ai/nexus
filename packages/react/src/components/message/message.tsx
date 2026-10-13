@@ -1,7 +1,7 @@
 import * as React from 'react';
 
 import { cn } from '../../lib/utils';
-import { Avatar } from '../avatar';
+import { Avatar } from '../avatar/avatar';
 
 /**
  * Props for the MessageGroup component.

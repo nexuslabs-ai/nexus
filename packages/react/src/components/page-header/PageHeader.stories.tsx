@@ -3,15 +3,15 @@ import { type ReactNode, useId } from 'react';
 import type { Meta, StoryObj } from '@storybook/react';
 import { expect, fn, userEvent, within } from 'storybook/test';
 
-import { Badge } from '../badge';
-import { Button } from '../button';
+import { Badge } from '../badge/badge';
+import { Button } from '../button/button';
 import {
   DescriptionList,
   DescriptionListDescription,
   DescriptionListItem,
   DescriptionListTerm,
-} from '../description-list';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '../tabs';
+} from '../description-list/description-list';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '../tabs/tabs';
 
 import {
   PageHeader,

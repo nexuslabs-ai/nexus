@@ -4,13 +4,13 @@ import { Canvas, Source, Title } from '@storybook/addon-docs/blocks';
 import type { Meta, StoryObj } from '@storybook/react';
 import { expect, fn, userEvent, within } from 'storybook/test';
 
-import { Button } from '../../../components/button';
+import { Button } from '../../../components/button/button';
 import {
   DescriptionList,
   DescriptionListDescription,
   DescriptionListItem,
   DescriptionListTerm,
-} from '../../../components/description-list';
+} from '../../../components/description-list/description-list';
 
 import { InlineEdit, type InlineEditProps } from './inline-edit';
 import blockSource from './inline-edit.tsx?raw';

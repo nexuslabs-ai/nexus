@@ -10,11 +10,11 @@ import {
 import { IconPalette } from '@tabler/icons-react';
 
 import { cn } from '../../../lib/utils';
-import { Button } from '../../button';
-import { Popover, PopoverContent, PopoverTrigger } from '../../popover';
-import { Separator } from '../../separator';
-import { ToggleGroup, ToggleGroupItem } from '../../toggle-group';
-import { NexusAppearanceColorField } from '../color-field';
+import { Button } from '../../button/button';
+import { Popover, PopoverContent, PopoverTrigger } from '../../popover/popover';
+import { Separator } from '../../separator/separator';
+import { ToggleGroup, ToggleGroupItem } from '../../toggle-group/toggle-group';
+import { NexusAppearanceColorField } from '../color-field/color-field';
 import { useNexusAppearance } from '../provider';
 
 interface SwatchRowProps {

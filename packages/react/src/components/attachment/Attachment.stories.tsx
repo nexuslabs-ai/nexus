@@ -15,14 +15,14 @@ import {
 } from '@tabler/icons-react';
 import { expect, fn, userEvent, within } from 'storybook/test';
 
-import { Button } from '../button';
-import { Spinner } from '../spinner';
+import { Button } from '../button/button';
+import { Spinner } from '../spinner/spinner';
 import {
   Tooltip,
   TooltipContent,
   TooltipProvider,
   TooltipTrigger,
-} from '../tooltip';
+} from '../tooltip/tooltip';
 
 import {
   Attachment,

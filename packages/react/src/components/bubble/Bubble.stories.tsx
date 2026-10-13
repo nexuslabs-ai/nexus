@@ -4,19 +4,19 @@ import type { Meta, StoryObj } from '@storybook/react';
 import { IconChecks, IconInfoCircle } from '@tabler/icons-react';
 import { expect, fn, userEvent, waitFor, within } from 'storybook/test';
 
-import { Button } from '../button';
+import { Button } from '../button/button';
 import {
   Collapsible,
   CollapsibleContent,
   CollapsibleTrigger,
-} from '../collapsible';
-import { Popover, PopoverContent, PopoverTrigger } from '../popover';
+} from '../collapsible/collapsible';
+import { Popover, PopoverContent, PopoverTrigger } from '../popover/popover';
 import {
   Tooltip,
   TooltipContent,
   TooltipProvider,
   TooltipTrigger,
-} from '../tooltip';
+} from '../tooltip/tooltip';
 
 import {
   Bubble,

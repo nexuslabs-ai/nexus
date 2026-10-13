@@ -2,15 +2,15 @@
 
 import * as React from 'react';
 
-import { Button } from '../../components/button';
-import { Checkbox } from '../../components/checkbox';
-import { FilterChip } from '../../components/filter-chip';
-import { Label } from '../../components/label';
+import { Button } from '../../components/button/button';
+import { Checkbox } from '../../components/checkbox/checkbox';
+import { FilterChip } from '../../components/filter-chip/filter-chip';
+import { Label } from '../../components/label/label';
 import {
   Popover,
   PopoverContent,
   PopoverTrigger,
-} from '../../components/popover';
+} from '../../components/popover/popover';
 
 export function AppliedFiltersExample() {
   const [paid, setPaid] = React.useState(true);

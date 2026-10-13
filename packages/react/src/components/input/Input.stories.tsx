@@ -4,7 +4,7 @@ import type { Meta, StoryObj } from '@storybook/react';
 import { expect, fn, userEvent, within } from 'storybook/test';
 
 import { unpairedAutofillClasses } from '../../stories/support/autofill-pairing';
-import { Label } from '../label';
+import { Label } from '../label/label';
 
 import { Input } from './input';
 

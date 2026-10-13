@@ -7,7 +7,7 @@ import {
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
-} from '../dropdown-menu';
+} from '../dropdown-menu/dropdown-menu';
 
 import {
   Breadcrumb,

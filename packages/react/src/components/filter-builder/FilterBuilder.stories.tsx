@@ -8,7 +8,7 @@ import {
   type FilterGroup,
   getFilterErrors,
 } from '../../lib/filter-model';
-import { Button } from '../button';
+import { Button } from '../button/button';
 
 import { FilterBuilder } from './filter-builder';
 const exampleFields: FilterField[] = [

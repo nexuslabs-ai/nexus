@@ -317,7 +317,7 @@ function demoPackages(id, specifiers, slugs, blocks) {
     }
     if (specifier.startsWith(COPIED_PREFIX)) {
       const file = specifier.slice(COPIED_PREFIX.length);
-      if (!copied.has(file) && !copied.has(`${file}/index`)) {
+      if (!copied.has(file)) {
         throw new Error(
           `Demo ${id} imports ${specifier}, but the ${blockNames} install block does not copy it. Import a file the block copies: ${[...copied].join(', ')}.`
         );

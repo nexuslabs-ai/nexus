@@ -8,8 +8,8 @@ import { cva, type VariantProps } from 'class-variance-authority';
 
 import { IconArrowDown, IconArrowUp } from '../../lib/icons';
 import { cn } from '../../lib/utils';
-import { Button } from '../button';
-import { ScrollBar } from '../scroll-area';
+import { Button } from '../button/button';
+import { ScrollBar } from '../scroll-area/scroll-area';
 
 /** Slack a scroll position gets before it stops counting as "at the edge". */
 const EDGE_THRESHOLD = 24;

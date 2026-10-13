@@ -28,9 +28,12 @@ Hooks and utilities are covered by the stories of the components that use them. 
 ```
 component-name/              # kebab-case folder
 ├── component-name.tsx        # Implementation (kebab-case)
-├── ComponentName.stories.tsx # Stories = Tests (PascalCase)
-└── index.ts                  # Barrel: export * from './component-name'
+└── ComponentName.stories.tsx # Stories = Tests (PascalCase)
 ```
+
+A component folder has no `index.ts`. Import another component by its file
+(`'../button/button'`), never its folder: the docs copy list follows these
+imports.
 
 **No separate `*.test.tsx` files for components.** Tests live in stories.
 

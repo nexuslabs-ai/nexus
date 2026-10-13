@@ -4,7 +4,7 @@ import { Slot } from '@radix-ui/react-slot';
 import { cva, type VariantProps } from 'class-variance-authority';
 
 import { cn } from '../../lib/utils';
-import { Separator } from '../separator';
+import { Separator } from '../separator/separator';
 
 /**
  * Vertical stack of related `Item`s, divided by `ItemSeparator`. It adds no

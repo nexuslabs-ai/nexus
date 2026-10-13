@@ -7,15 +7,15 @@ import {
   expectExitBeforeUnmount,
   expectInterruptibleOverlayMotion,
 } from '../../stories/support/overlay-motion-test-utils';
-import { Button } from '../button';
+import { Button } from '../button/button';
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
-} from '../dropdown-menu';
-import { Input } from '../input';
-import { Label } from '../label';
+} from '../dropdown-menu/dropdown-menu';
+import { Input } from '../input/input';
+import { Label } from '../label/label';
 
 import {
   Dialog,

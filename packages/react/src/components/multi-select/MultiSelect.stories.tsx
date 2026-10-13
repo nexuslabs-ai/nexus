@@ -4,7 +4,12 @@ import type { Meta, StoryObj } from '@storybook/react';
 import { expect, userEvent, waitFor, within } from 'storybook/test';
 
 import { expectImmediateItemMotion } from '../../stories/support/motion-test-utils';
-import { Field, FieldDescription, FieldError, FieldLabel } from '../field';
+import {
+  Field,
+  FieldDescription,
+  FieldError,
+  FieldLabel,
+} from '../field/field';
 
 import {
   MultiSelect,

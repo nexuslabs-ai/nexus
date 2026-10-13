@@ -6,8 +6,8 @@ import * as ToolbarPrimitive from '@radix-ui/react-toolbar';
 import type { VariantProps } from 'class-variance-authority';
 
 import { cn } from '../../lib/utils';
-import { buttonVariants } from '../button';
-import { TooltipProvider } from '../tooltip';
+import { buttonVariants } from '../button/button';
+import { TooltipProvider } from '../tooltip/tooltip';
 import { TooltipGroupContext } from '../tooltip/tooltip-group';
 
 type ToolbarProps = React.ComponentProps<typeof ToolbarPrimitive.Root>;

@@ -8,7 +8,7 @@ import { multiChoiceRule } from '../../blocks/filtering/multi-choice-filter/mult
 import { numberComparisonRule } from '../../blocks/filtering/number-comparison-filter/number-comparison-filter-example';
 import { numberRangeRule } from '../../blocks/filtering/number-range-filter/number-range-filter-example';
 import { textRule } from '../../blocks/filtering/text-filter/text-filter-example';
-import { FilterBuilder } from '../../components/filter-builder';
+import { FilterBuilder } from '../../components/filter-builder/filter-builder';
 import type { FilterGroup } from '../../lib/filter-model';
 
 import { exampleFields } from './advanced-fixtures';

@@ -13,14 +13,14 @@ import {
   type NumberRangeCondition,
   NumberRangeFilter,
 } from '../../blocks/filtering/number-range-filter/number-range-filter';
-import { Button } from '../../components/button';
+import { Button } from '../../components/button/button';
 import {
   Card,
   CardContent,
   CardDescription,
   CardHeader,
   CardTitle,
-} from '../../components/card';
+} from '../../components/card/card';
 
 import { matchesChoice, Results } from './local-results';
 import { files, templates } from './quick-fixtures';

@@ -1,8 +1,8 @@
 import type { Meta, StoryObj } from '@storybook/react';
 import { expect, within } from 'storybook/test';
 
-import { Checkbox } from '../components/checkbox';
-import { Input } from '../components/input';
+import { Checkbox } from '../components/checkbox/checkbox';
+import { Input } from '../components/input/input';
 import {
   InputGroup,
   InputGroupAddon,
@@ -10,18 +10,25 @@ import {
   InputGroupInput,
   InputGroupText,
   InputGroupTextarea,
-} from '../components/input-group';
-import { InputOTP, InputOTPGroup, InputOTPSlot } from '../components/input-otp';
-import { NativeSelect, NativeSelectOption } from '../components/native-select';
+} from '../components/input-group/input-group';
+import {
+  InputOTP,
+  InputOTPGroup,
+  InputOTPSlot,
+} from '../components/input-otp/input-otp';
+import {
+  NativeSelect,
+  NativeSelectOption,
+} from '../components/native-select/native-select';
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from '../components/select';
-import { SidebarInput } from '../components/sidebar';
-import { Textarea } from '../components/textarea';
+} from '../components/select/select';
+import { SidebarInput } from '../components/sidebar/sidebar';
+import { Textarea } from '../components/textarea/textarea';
 
 const meta: Meta = {
   title: 'Tokens/Focus Ring',

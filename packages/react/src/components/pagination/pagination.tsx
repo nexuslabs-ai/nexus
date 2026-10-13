@@ -4,7 +4,7 @@ import { Slot } from '@radix-ui/react-slot';
 
 import { IconChevronLeft, IconChevronRight, IconDots } from '../../lib/icons';
 import { cn } from '../../lib/utils';
-import { type ButtonProps, buttonVariants } from '../button';
+import { type ButtonProps, buttonVariants } from '../button/button';
 
 /**
  * Props for the Pagination component.

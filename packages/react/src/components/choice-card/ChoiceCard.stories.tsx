@@ -3,9 +3,9 @@ import * as React from 'react';
 import type { Meta, StoryObj } from '@storybook/react';
 import { expect, userEvent, waitFor, within } from 'storybook/test';
 
-import { Checkbox } from '../checkbox';
-import { FieldLegend, FieldSet } from '../field';
-import { RadioGroup, RadioGroupItem } from '../radio-group';
+import { Checkbox } from '../checkbox/checkbox';
+import { FieldLegend, FieldSet } from '../field/field';
+import { RadioGroup, RadioGroupItem } from '../radio-group/radio-group';
 
 import {
   ChoiceCard,

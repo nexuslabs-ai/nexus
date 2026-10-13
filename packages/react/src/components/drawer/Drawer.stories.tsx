@@ -8,7 +8,7 @@ import {
   expectExitBeforeUnmount,
   expectInterruptibleOverlayMotion,
 } from '../../stories/support/overlay-motion-test-utils';
-import { Button } from '../button';
+import { Button } from '../button/button';
 
 import {
   Drawer,

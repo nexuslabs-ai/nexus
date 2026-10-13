@@ -3,10 +3,14 @@ import type { CSSProperties } from 'react';
 import type { Meta, StoryObj } from '@storybook/react';
 import { expect, within } from 'storybook/test';
 
-import { Button } from '../components/button';
-import { ButtonGroup } from '../components/button-group';
-import { Input } from '../components/input';
-import { Select, SelectTrigger, SelectValue } from '../components/select';
+import { Button } from '../components/button/button';
+import { ButtonGroup } from '../components/button-group/button-group';
+import { Input } from '../components/input/input';
+import {
+  Select,
+  SelectTrigger,
+  SelectValue,
+} from '../components/select/select';
 
 type RadiusStyle = CSSProperties & { '--nx-radius-base': string };
 

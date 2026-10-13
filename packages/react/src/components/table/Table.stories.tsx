@@ -11,12 +11,16 @@ import {
 } from '@tabler/icons-react';
 import { expect, userEvent, within } from 'storybook/test';
 
-import { Button } from '../button';
-import { Checkbox } from '../checkbox';
-import { Hide } from '../hide';
-import { InputGroup, InputGroupAddon, InputGroupInput } from '../input-group';
-import { Show } from '../show';
-import { Skeleton } from '../skeleton';
+import { Button } from '../button/button';
+import { Checkbox } from '../checkbox/checkbox';
+import { Hide } from '../hide/hide';
+import {
+  InputGroup,
+  InputGroupAddon,
+  InputGroupInput,
+} from '../input-group/input-group';
+import { Show } from '../show/show';
+import { Skeleton } from '../skeleton/skeleton';
 
 import {
   Table,

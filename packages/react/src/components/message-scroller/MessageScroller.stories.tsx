@@ -4,23 +4,23 @@ import type { Meta, StoryObj } from '@storybook/react';
 import { IconMessage2 } from '@tabler/icons-react';
 import { expect, userEvent, waitFor, within } from 'storybook/test';
 
-import { AvatarFallback } from '../avatar';
-import { Bubble, BubbleContent } from '../bubble';
-import { Button } from '../button';
+import { AvatarFallback } from '../avatar/avatar';
+import { Bubble, BubbleContent } from '../bubble/bubble';
+import { Button } from '../button/button';
 import {
   EmptyState,
   EmptyStateDescription,
   EmptyStateHeader,
   EmptyStateMedia,
   EmptyStateTitle,
-} from '../empty-state';
+} from '../empty-state/empty-state';
 import {
   Message,
   MessageAvatar,
   MessageContent,
   MessageFooter,
   MessageGroup,
-} from '../message';
+} from '../message/message';
 
 import {
   MessageScroller,
