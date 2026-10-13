@@ -216,12 +216,17 @@ try {
 
       // Group identical changes so one leak shows as one line, not one per element.
       const groups = new Map();
+      const add = (change) => {
+        groups.set(change, (groups.get(change) ?? 0) + 1);
+        total += 1;
+      };
+      // Both builds render the same markup, so a host element found in only one
+      // of them is itself a change.
+      for (const key of Object.keys(a)) if (!(key in b)) add(`host element missing with Nexus: ${key}`);
+      for (const key of Object.keys(b)) if (!(key in a)) add(`host element only with Nexus: ${key}`);
       for (const key of Object.keys(a).filter((key) => key in b)) {
         for (const name of PROPERTIES) {
-          if (a[key][name] === b[key][name]) continue;
-          const change = `${name}: ${a[key][name]} → ${b[key][name]}`;
-          groups.set(change, (groups.get(change) ?? 0) + 1);
-          total += 1;
+          if (a[key][name] !== b[key][name]) add(`${name}: ${a[key][name]} → ${b[key][name]}`);
         }
       }
       const count = [...groups.values()].reduce((sum, n) => sum + n, 0);

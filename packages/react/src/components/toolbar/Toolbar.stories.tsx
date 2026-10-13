@@ -32,7 +32,12 @@ import {
   DropdownMenuTrigger,
 } from '../dropdown-menu';
 import { Label } from '../label';
-import { Tooltip, TooltipContent, TooltipTrigger } from '../tooltip';
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from '../tooltip';
 
 import {
   Toolbar,
@@ -400,6 +405,37 @@ export const NarrowContainer: Story = {
     await userEvent.click(first);
     await userEvent.keyboard('{ArrowRight}{ArrowRight}{ArrowRight}');
     await expect(last).toHaveFocus();
+  },
+};
+
+// A standalone Toolbar opens its tooltips after Radix's default 700ms. Opening
+// within 300ms proves the Toolbar joined the outer provider's group.
+export const InsideTooltipProvider: Story = {
+  render: () => (
+    <TooltipProvider delayDuration={0}>
+      <Toolbar aria-label="Text formatting">
+        <Tooltip>
+          <TooltipTrigger asChild>
+            <ToolbarButton size="icon-sm" aria-label="Bold">
+              <IconBold aria-hidden="true" />
+            </ToolbarButton>
+          </TooltipTrigger>
+          <TooltipContent>Bold</TooltipContent>
+        </Tooltip>
+      </Toolbar>
+    </TooltipProvider>
+  ),
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+    await userEvent.hover(canvas.getByRole('button', { name: 'Bold' }));
+    await waitFor(
+      async () => {
+        await expect(
+          within(document.body).getByRole('tooltip', { name: 'Bold' })
+        ).toBeVisible();
+      },
+      { timeout: 300 }
+    );
   },
 };
 

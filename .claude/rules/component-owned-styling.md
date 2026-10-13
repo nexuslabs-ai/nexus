@@ -50,10 +50,11 @@ loads no Preflight, so a missing reset shows in the stories.
 
 ## Enforcement
 
-`packages/core/src/lib/generated-css-scope.test.ts` compiles `nexus.css` with
-every `nx:` class the components use, and fails on any rule that selects outside
+`packages/core/src/lib/generated-css-scope.test.ts` compiles the Install page's
+entry (`nexus.css`, `tw-animate-css` and `progress.css`) with every `nx:` class
+the components use, and fails on any rule that selects outside
 `nx:` classes and variable scopes, any global declaration that is not `--nx-*`,
-or an unprefixed keyframe. `touches the host page only for the toggles the user
+or an unprefixed keyframe other than Tailwind's and tw-animate-css's own. `touches the host page only for the toggles the user
 turns on` in `packages/core/src/lib/appearance-model.test.ts` guards the
 appearance preference CSS. Review the rest: reject any `data-slot`, `data-variant` or
 `class~=` selector in the `packages/core/scripts/` emitters. Separately, `registers every emitted custom utility`

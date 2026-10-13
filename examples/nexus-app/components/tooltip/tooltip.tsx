@@ -10,7 +10,7 @@ import {
   tooltipSurfaceClassName,
 } from '../overlay-layout/overlay-layout';
 
-const TooltipGroupContext = React.createContext(false);
+import { TooltipGroupContext } from './tooltip-group';
 
 /**
  * TooltipProvider

@@ -1,3 +1,5 @@
+'use client';
+
 import * as React from 'react';
 
 import * as ToolbarPrimitive from '@radix-ui/react-toolbar';
@@ -6,27 +8,30 @@ import type { VariantProps } from 'class-variance-authority';
 import { cn } from '../../lib/utils';
 import { buttonVariants } from '../button';
 import { TooltipProvider } from '../tooltip';
+import { TooltipGroupContext } from '../tooltip/tooltip-group';
 
 type ToolbarProps = React.ComponentProps<typeof ToolbarPrimitive.Root>;
 
 /**
  * Label the toolbar with aria-label or aria-labelledby. Controls wrap in DOM
  * order. Its tooltips form one group, so moving across the buttons skips the
- * open delay.
+ * open delay. Inside a `TooltipProvider` it joins that group instead.
  */
 function Toolbar({ className, ...props }: ToolbarProps) {
-  return (
-    <TooltipProvider>
-      <ToolbarPrimitive.Root
-        data-slot="toolbar"
-        className={cn(
-          'nx:flex nx:w-fit nx:max-w-full nx:min-w-0 nx:flex-wrap nx:items-center nx:gap-0.5 nx:rounded-lg nx:border-default nx:border-border-default nx:bg-container nx:p-0.5 nx:shadow-sm nx:data-[orientation=vertical]:flex-col nx:data-[orientation=vertical]:items-stretch',
-          className
-        )}
-        {...props}
-      />
-    </TooltipProvider>
+  const inGroup = React.useContext(TooltipGroupContext);
+  const root = (
+    <ToolbarPrimitive.Root
+      data-slot="toolbar"
+      className={cn(
+        'nx:flex nx:w-fit nx:max-w-full nx:min-w-0 nx:flex-wrap nx:items-center nx:gap-0.5 nx:rounded-lg nx:border-default nx:border-border-default nx:bg-container nx:p-0.5 nx:shadow-sm nx:data-[orientation=vertical]:flex-col nx:data-[orientation=vertical]:items-stretch',
+        className
+      )}
+      {...props}
+    />
   );
+  if (inGroup) return root;
+
+  return <TooltipProvider>{root}</TooltipProvider>;
 }
 
 type ToolbarButtonProps = React.ComponentProps<typeof ToolbarPrimitive.Button> &

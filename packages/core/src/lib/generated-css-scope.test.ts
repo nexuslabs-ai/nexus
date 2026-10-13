@@ -15,6 +15,22 @@ const NEXUS_CLASS = /^\.nx\\:/;
 // Tailwind's registered-property fallbacks for older engines.
 const TAILWIND_PROPERTIES_RULE = '*, ::before, ::after, ::backdrop';
 const TAILWIND_KEYFRAMES = new Set(['spin', 'ping', 'pulse', 'bounce']);
+// tw-animate-css, which the Install page's entry imports beside nexus.css.
+const TW_ANIMATE_KEYFRAMES = new Set([
+  'enter',
+  'exit',
+  'accordion-down',
+  'accordion-up',
+  'collapsible-down',
+  'collapsible-up',
+  'caret-blink',
+]);
+// The entry the Install page tells consumers to import.
+const CONSUMER_ENTRY = [
+  "@import './nexus.css';",
+  "@import 'tw-animate-css';",
+  "@import '../react/src/components/progress/progress.css';",
+].join('\n');
 
 interface Rule {
   selector: string;
@@ -107,8 +123,7 @@ function rulesOf(stylesheet: string): Rule[] {
 }
 
 beforeAll(async () => {
-  const input = readFileSync(resolve(TAILWIND_DIR, 'nexus.css'), 'utf8');
-  const compiler = await compile(input, {
+  const compiler = await compile(CONSUMER_ENTRY, {
     base: TAILWIND_DIR,
     onDependency() {},
   });
@@ -148,7 +163,9 @@ describe('generated CSS scope', () => {
     );
     expect(names.length).toBeGreaterThan(0);
     for (const name of names) {
-      if (TAILWIND_KEYFRAMES.has(name)) continue;
+      if (TAILWIND_KEYFRAMES.has(name) || TW_ANIMATE_KEYFRAMES.has(name)) {
+        continue;
+      }
       expect(name).toMatch(/^nx-/);
     }
   });

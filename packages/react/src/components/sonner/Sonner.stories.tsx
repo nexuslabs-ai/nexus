@@ -4,7 +4,7 @@ import { expect, userEvent, waitFor, within } from 'storybook/test';
 
 import { Button } from '../button';
 
-import { toast, Toaster } from './sonner';
+import { toast, Toaster, useSonner } from './sonner';
 
 const meta: Meta<typeof Toaster> = {
   title: 'Components/Sonner',
@@ -231,6 +231,11 @@ export const ToastLayer: Story = {
   },
 };
 
+function NexusToastCount() {
+  const { toasts } = useSonner();
+  return <output aria-label="Nexus toast count">{toasts.length}</output>;
+}
+
 // A host app's own sonner Toaster sits beside Nexus's. Each shows only its own
 // toasts, and Nexus's dismiss and getToasts leave the host's toast alone.
 export const BesideHostToaster: Story = {
@@ -242,6 +247,7 @@ export const BesideHostToaster: Story = {
           Host toast
         </Button>
       </div>
+      <NexusToastCount />
       <Toaster />
       <HostToaster containerAriaLabel="App notifications" />
     </>
@@ -249,6 +255,7 @@ export const BesideHostToaster: Story = {
   play: async ({ canvasElement }) => {
     const canvas = within(canvasElement);
     const body = within(document.body);
+    const count = canvas.getByRole('status', { name: 'Nexus toast count' });
     await userEvent.click(canvas.getByRole('button', { name: 'Nexus toast' }));
     await userEvent.click(canvas.getByRole('button', { name: 'Host toast' }));
 
@@ -261,6 +268,8 @@ export const BesideHostToaster: Story = {
     const titles = toast.getToasts().map((entry) => entry.title);
     await expect(titles).toContain('Saved in Nexus');
     await expect(titles).not.toContain('Saved in host');
+    // useSonner counts only the Nexus toast.
+    await expect(count).toHaveTextContent('1');
 
     toast.dismiss();
     await waitFor(async () => {
