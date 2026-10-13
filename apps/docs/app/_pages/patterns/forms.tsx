@@ -23,7 +23,7 @@ import {
  */
 
 const FORM_COMPONENTS =
-  'button, button-group/button-group-context.ts, checkbox, field, input, label, separator, spinner and lib/';
+  'button, checkbox, field, input, label, separator, spinner and lib/';
 
 const IMPLEMENTATIONS: {
   need: string;
