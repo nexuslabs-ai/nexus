@@ -396,6 +396,7 @@ export const WithDataAttributes: Story = {
 };
 
 export const SizeAlignment: Story = {
+  globals: { density: 'default' },
   tags: ['!autodocs', '!dev'],
   parameters: {
     a11y: { test: 'off' },

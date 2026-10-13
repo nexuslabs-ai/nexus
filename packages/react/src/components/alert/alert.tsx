@@ -207,7 +207,7 @@ function AlertIcon({ className, ...props }: AlertIconProps) {
       data-slot="alert-icon"
       aria-hidden="true"
       className={cn(
-        'nx:me-3 nx:flex nx:[&>svg]:size-4',
+        'nx:me-3 nx:flex nx:[&>svg]:size-icon-glyph-default',
         'nx:group-data-[layout=stack]/alert:translate-y-0.5',
         'nx:group-data-[layout=inline]/alert:group-has-[[data-slot=alert-title]]/alert:self-start nx:group-data-[layout=inline]/alert:group-has-[[data-slot=alert-title]]/alert:translate-y-0.5',
         className

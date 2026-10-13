@@ -74,16 +74,16 @@ ruleTester.run('canonical-spacing-steps', rule, {
   invalid: [
     invalidValue(1), // odd-pixel
     invalidValue(5),
-    invalidValue(13),
-    invalidValue(17),
-    invalidValue(23),
+    invalidValue(9),
+    invalidValue(21),
+    invalidValue(27),
     invalidValue(99),
     // Multiple off-grid values report independently
     {
       code: `{
         "spacing": {
-          "a": { "$value": { "value": 13, "unit": "px" }, "$type": "dimension" },
-          "b": { "$value": { "value": 17, "unit": "px" }, "$type": "dimension" }
+          "a": { "$value": { "value": 9, "unit": "px" }, "$type": "dimension" },
+          "b": { "$value": { "value": 21, "unit": "px" }, "$type": "dimension" }
         }
       }`,
       errors: [{ messageId: 'offGrid' }, { messageId: 'offGrid' }],
@@ -137,6 +137,6 @@ describe('canonical-spacing-steps — bad-fixture smoke test', () => {
     const findings = messages[0].messages
       .map((m) => m.message.match(/^(-?\d+)px/)?.[1])
       .filter(Boolean);
-    expect(findings).toEqual(['13', '17', '23']);
+    expect(findings).toEqual(['9', '21', '27']);
   });
 });

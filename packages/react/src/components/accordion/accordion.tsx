@@ -110,7 +110,7 @@ function AccordionTrigger({
           {children}
         </span>
         <IconChevronDown
-          className="nx:size-4 nx:shrink-0 nx:text-muted-foreground nx:transition-transform nx:duration-default"
+          className="nx:size-icon-glyph-default nx:shrink-0 nx:text-muted-foreground nx:transition-transform nx:duration-default"
           aria-hidden="true"
         />
       </AccordionPrimitive.Trigger>

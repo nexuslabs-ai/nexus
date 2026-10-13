@@ -924,6 +924,11 @@ export const DensityActionSizing: Story = {
       canvasElement.querySelectorAll('[data-slot="alert"]')
     ).toHaveLength(DENSITY_OPTIONS.length);
     for (const alert of canvasElement.querySelectorAll('[data-slot="alert"]')) {
+      await expect(
+        alert
+          .querySelector('[data-slot="alert-icon"] svg')!
+          .getBoundingClientRect().width
+      ).toBe(16);
       const close = alert.querySelector('[data-slot="alert-close"]')!;
       for (const button of alert.querySelectorAll('[data-slot="button"]')) {
         await expect(button.getBoundingClientRect().height).toBe(
@@ -1832,6 +1837,7 @@ export const AllBannerVariants: Story = {
 };
 
 export const DefaultModeHeightPinned: Story = {
+  globals: { density: 'default' },
   tags: ['!autodocs', '!dev'],
   parameters: {
     a11y: { test: 'off' },
