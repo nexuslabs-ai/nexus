@@ -232,6 +232,7 @@ try {
     for (const server of servers) server.kill();
   }
   console.log(`\n${total} host properties changed in total`);
+  if (total > 0) process.exitCode = 1;
 } finally {
   for (const dir of tempDirs) rmSync(dir, { recursive: true, force: true });
 }

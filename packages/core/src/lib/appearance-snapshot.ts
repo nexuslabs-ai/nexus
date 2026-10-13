@@ -13,7 +13,7 @@ import {
 } from './derive-theme';
 import type { Mode } from './palette';
 
-export const SNAPSHOT_VERSION = 7;
+export const SNAPSHOT_VERSION = 8;
 const STATE_COOKIE_VERSION = 6;
 const SNAPSHOT_CACHE_LIMIT = 50;
 

@@ -209,8 +209,10 @@ export const AsChild: Story = {
     await expect(heading).toHaveAttribute('data-variant', 'border');
 
     // The cursor rule rides the same static cva string as everywhere else, so
-    // a non-interactive row proves the `:is(button)` scoping actually bites.
+    // a non-interactive row proves the `[button]` scoping actually bites.
+    heading.style.setProperty('--nx-cursor-interactive', 'pointer');
     await expect(heading).not.toHaveStyle({ cursor: 'pointer' });
+    heading.style.removeProperty('--nx-cursor-interactive');
   },
 };
 
@@ -329,8 +331,11 @@ export const ClickInteraction: StoryObj<
     const button = canvas.getByRole('button', { name: 'Revert this change' });
 
     // A bare <button> has no UA pointer cursor, so this is the row's own
-    // `:is(button)` rule — the AsChild heading proves the negative case.
+    // `[button]` rule following the pointerCursors preference — the AsChild
+    // heading proves the negative case.
+    button.style.setProperty('--nx-cursor-interactive', 'pointer');
     await expect(button).toHaveStyle({ cursor: 'pointer' });
+    button.style.removeProperty('--nx-cursor-interactive');
 
     await userEvent.click(button);
     await expect(args.onRevert).toHaveBeenCalledTimes(1);

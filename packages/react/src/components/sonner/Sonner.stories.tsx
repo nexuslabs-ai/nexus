@@ -1,4 +1,5 @@
 import type { Meta, StoryObj } from '@storybook/react';
+import { toast as hostToast, Toaster as HostToaster } from 'sonner';
 import { expect, userEvent, waitFor, within } from 'storybook/test';
 
 import { Button } from '../button';
@@ -227,6 +228,46 @@ export const ToastLayer: Story = {
       expect(toaster).not.toBeNull();
       expect(getComputedStyle(toaster as HTMLElement).zIndex).toBe('100');
     });
+  },
+};
+
+// A host app's own sonner Toaster sits beside Nexus's. Each shows only its own
+// toasts, and Nexus's dismiss and getToasts leave the host's toast alone.
+export const BesideHostToaster: Story = {
+  render: () => (
+    <>
+      <div className="nx:flex nx:gap-2">
+        <Button onClick={() => toast('Saved in Nexus')}>Nexus toast</Button>
+        <Button variant="outline" onClick={() => hostToast('Saved in host')}>
+          Host toast
+        </Button>
+      </div>
+      <Toaster />
+      <HostToaster containerAriaLabel="App notifications" />
+    </>
+  ),
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+    const body = within(document.body);
+    await userEvent.click(canvas.getByRole('button', { name: 'Nexus toast' }));
+    await userEvent.click(canvas.getByRole('button', { name: 'Host toast' }));
+
+    const nexusToast = await body.findByText('Saved in Nexus');
+    const hostToastText = await body.findByText('Saved in host');
+    await expect(body.getAllByText('Saved in Nexus')).toHaveLength(1);
+    await expect(body.getAllByText('Saved in host')).toHaveLength(1);
+    await expect(nexusToast.closest('[data-slot="toaster"]')).not.toBeNull();
+    await expect(hostToastText.closest('[data-slot="toaster"]')).toBeNull();
+    const titles = toast.getToasts().map((entry) => entry.title);
+    await expect(titles).toContain('Saved in Nexus');
+    await expect(titles).not.toContain('Saved in host');
+
+    toast.dismiss();
+    await waitFor(async () => {
+      await expect(body.queryByText('Saved in Nexus')).toBeNull();
+    });
+    await expect(body.getByText('Saved in host')).toBeInTheDocument();
+    hostToast.dismiss();
   },
 };
 

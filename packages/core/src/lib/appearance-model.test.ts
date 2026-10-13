@@ -484,6 +484,7 @@ describe('appearancePrefsToCss', () => {
     for (const animation of [
       'spin',
       'pulse',
+      'bounce',
       'progress-indeterminate',
       'caret-blink',
     ]) {

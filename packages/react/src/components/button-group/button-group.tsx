@@ -152,7 +152,7 @@ function ButtonGroupText({
       className={cn(
         buttonGroupTextVariants({ size: resolvedSize }),
         asChild &&
-          'nx:cursor-pointer nx:hover:bg-container-hover nx:active:bg-container-active',
+          'nx:cursor-interactive nx:hover:bg-container-hover nx:active:bg-container-active',
         className
       )}
       {...props}

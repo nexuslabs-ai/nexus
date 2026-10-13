@@ -87,7 +87,7 @@ function inNexusToaster<Data extends object>(data?: Data) {
   return { ...data, toasterId: NEXUS_TOASTER_ID };
 }
 
-function isNexusToast(entry: ToastT | ToastToDismiss) {
+function isNexusToast(entry: ToastT | ToastToDismiss): entry is ToastT {
   return 'toasterId' in entry && entry.toasterId === NEXUS_TOASTER_ID;
 }
 
@@ -116,7 +116,7 @@ const toast = Object.assign(
     promise: <ToastData,>(
       promise: Parameters<typeof sonnerToast.promise<ToastData>>[0],
       data?: Parameters<typeof sonnerToast.promise<ToastData>>[1]
-    ) => sonnerToast.promise(promise, inNexusToaster(data)),
+    ) => sonnerToast.promise(promise, data && inNexusToaster(data)),
     // Without an id, dismisses every Nexus toast and leaves the host's alone.
     dismiss: (id?: number | string) => {
       if (id !== undefined) return sonnerToast.dismiss(id);

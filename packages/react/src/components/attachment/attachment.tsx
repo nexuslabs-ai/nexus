@@ -443,7 +443,7 @@ function AttachmentTrigger({
       data-slot="attachment-trigger"
       type={asChild ? undefined : (type ?? 'button')}
       className={cn(
-        'nx:absolute nx:inset-0 nx:z-10 nx:cursor-pointer nx:rounded-[inherit] nx:border-0 nx:bg-transparent nx:p-0 nx:no-underline',
+        'nx:absolute nx:inset-0 nx:z-10 nx:cursor-interactive nx:rounded-[inherit] nx:border-0 nx:bg-transparent nx:p-0 nx:no-underline',
         'nx:focus-visible:outline-2 nx:focus-visible:outline-focus-default',
         className
       )}

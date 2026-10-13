@@ -42,8 +42,8 @@ function mockSystemPrefersDark(matches: boolean): void {
 }
 
 describe('NexusAppearanceSnapshot', () => {
-  it('invalidates cached CSS for the renamed public tokens', () => {
-    expect(SNAPSHOT_VERSION).toBe(7);
+  it('invalidates cached CSS that styled the host page', () => {
+    expect(SNAPSHOT_VERSION).toBe(8);
   });
 
   it('stores pre-derived CSS verbatim', () => {
