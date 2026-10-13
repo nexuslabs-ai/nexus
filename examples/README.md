@@ -17,6 +17,9 @@ the ways a frontend team meets Nexus.
 Each app installs `@nexus_ds/core` from `packages/core` (`file:` with
 `install-links`), so the examples always run this repository's engine.
 
+The examples copy Nexus by hand, as the Install page describes. Delivery through
+a shadcn registry is tracked in #798.
+
 ## Shared scripts
 
 | Script | What it does |
@@ -45,9 +48,8 @@ component resets the browser defaults it relies on.
 | `shadcn-package/app-direct` | 0 |
 
 The appearance provider's reduce motion, pointer cursor and font smoothing
-toggles are app-wide on purpose: when on, they apply to the host too. Font
-smoothing is on by default, so host text is antialiased on macOS. The check
-measures the default appearance and does not count font smoothing.
+toggles are off by default. When a user turns one on, it applies to the whole
+page, host included.
 
 The apps also show the integration points a team has to wire:
 

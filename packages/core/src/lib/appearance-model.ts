@@ -135,7 +135,7 @@ export const DEFAULT_NEXUS_APPEARANCE: NexusAppearanceState = {
     codeFontSize: 12,
     reduceMotion: false,
     pointerCursors: false,
-    fontSmoothing: true,
+    fontSmoothing: false,
   },
 };
 

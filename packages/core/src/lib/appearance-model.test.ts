@@ -38,7 +38,7 @@ describe('appearance model', () => {
         codeFontSize: 12,
         reduceMotion: false,
         pointerCursors: false,
-        fontSmoothing: true,
+        fontSmoothing: false,
       },
     });
   });
@@ -404,7 +404,7 @@ describe('appearancePrefsToCss', () => {
     expect(nonPx).toEqual([]);
   });
 
-  it('emits font variables, a clamped type scale, code size, and smoothing', () => {
+  it('emits font variables, a clamped type scale, and code size', () => {
     const css = appearancePrefsToCss({
       ...prefs,
       uiFont: 'Inter',
@@ -421,7 +421,6 @@ describe('appearancePrefsToCss', () => {
     expect(css).toContain(
       '.nx\\:font-mono, .nx\\:typography-code-block, .nx\\:typography-code-inline { font-size: 12px; }'
     );
-    expect(css).toContain('-webkit-font-smoothing: antialiased');
   });
 
   it('leaves the page font size alone', () => {
@@ -431,12 +430,7 @@ describe('appearancePrefsToCss', () => {
   });
 
   it('touches the host page only for the toggles the user turns on', () => {
-    const css = appearancePrefsToCss({
-      ...prefs,
-      pointerCursors: false,
-      reduceMotion: false,
-      fontSmoothing: false,
-    });
+    const css = appearancePrefsToCss(DEFAULT_NEXUS_APPEARANCE.prefs);
     const selectors = [...css.matchAll(/([^{}]+)\{/g)].flatMap(
       ([, list = '']) => list.split(',').map((selector) => selector.trim())
     );

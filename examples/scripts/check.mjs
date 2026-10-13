@@ -39,6 +39,7 @@ const PROPERTIES = [
   'padding-left',
   'list-style-type',
   'text-decoration-line',
+  '-webkit-font-smoothing',
 ];
 const SKIP = new Set(['node_modules', '.next', 'dist']);
 
