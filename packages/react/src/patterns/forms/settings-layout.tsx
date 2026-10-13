@@ -1,3 +1,5 @@
+'use client';
+
 import * as React from 'react';
 
 import { Button } from '../../components/button';
@@ -86,10 +88,10 @@ export function SettingsLayout({
       className="nx:grid nx:w-full nx:min-w-0 nx:gap-layout-section"
     >
       <div>
-        <h2 id={titleId} className="nx:typography-heading-small">
+        <h2 id={titleId} className="nx:m-0 nx:typography-heading-small">
           {title}
         </h2>
-        <p className="nx:mt-1 nx:typography-body-default nx:text-muted-foreground">
+        <p className="nx:mt-1 nx:mb-0 nx:typography-body-default nx:text-muted-foreground">
           Update your details and preferences. Changes apply when you save.
         </p>
       </div>
@@ -97,7 +99,7 @@ export function SettingsLayout({
       <div className="nx:grid nx:gap-3 nx:border-t-default nx:border-border-default nx:pt-4">
         <p
           role="status"
-          className="nx:typography-body-small nx:text-muted-foreground"
+          className="nx:m-0 nx:typography-body-small nx:text-muted-foreground"
         >
           {status}
         </p>

@@ -1,3 +1,5 @@
+'use client';
+
 import * as React from 'react';
 
 import { Button } from '../../components/button';
@@ -31,7 +33,7 @@ export function AppliedFiltersExample() {
       className="nx:grid nx:w-full nx:max-w-xl nx:gap-4"
     >
       <div className="nx:flex nx:flex-wrap nx:items-center nx:justify-between nx:gap-3">
-        <h2 className="nx:typography-heading-small">Invoice filters</h2>
+        <h2 className="nx:m-0 nx:typography-heading-small">Invoice filters</h2>
         <Popover>
           <PopoverTrigger asChild>
             <Button ref={filterRef} variant="outline" size="sm">
@@ -62,7 +64,7 @@ export function AppliedFiltersExample() {
           </PopoverContent>
         </Popover>
       </div>
-      <p className="nx:typography-body-default nx:text-muted-foreground">
+      <p className="nx:m-0 nx:typography-body-default nx:text-muted-foreground">
         Choose conditions in Filters. The chips below keep the applied
         conditions visible after the menu closes. Click a chip to remove that
         condition.
@@ -101,7 +103,7 @@ export function AppliedFiltersExample() {
       </div>
       <p
         role="status"
-        className="nx:typography-body-small nx:text-muted-foreground"
+        className="nx:m-0 nx:typography-body-small nx:text-muted-foreground"
       >
         {paid && india
           ? 'Showing paid invoices from India.'

@@ -87,11 +87,11 @@ function AccordionTrigger({
   ...props
 }: AccordionTriggerProps) {
   return (
-    <AccordionPrimitive.Header className="nx:flex">
+    <AccordionPrimitive.Header className="nx:m-0 nx:flex">
       <AccordionPrimitive.Trigger
         data-slot="accordion-trigger"
         className={cn(
-          'nx:flex nx:w-full nx:flex-1 nx:items-start nx:gap-4 nx:py-4 nx:typography-label-default nx:text-foreground nx:transition-control nx:duration-fast nx:focus-visible:outline-2 nx:focus-visible:outline-focus-default nx:disabled:pointer-events-none nx:disabled:text-disabled-foreground nx:disabled:[&>svg]:text-disabled-foreground nx:[&[data-state=open]>svg]:rotate-180',
+          'nx:flex nx:w-full nx:flex-1 nx:items-start nx:gap-4 nx:border-0 nx:bg-transparent nx:px-0 nx:py-4 nx:typography-label-default nx:text-foreground nx:transition-control nx:duration-fast nx:focus-visible:outline-2 nx:focus-visible:outline-focus-default nx:disabled:pointer-events-none nx:disabled:text-disabled-foreground nx:disabled:[&>svg]:text-disabled-foreground nx:[&[data-state=open]>svg]:rotate-180',
           className
         )}
         {...props}

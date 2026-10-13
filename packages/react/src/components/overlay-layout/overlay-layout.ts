@@ -13,6 +13,7 @@ const popoverSurfaceClassName = [
   'nx:bg-popover-alpha',
   'nx:backdrop-blur-md',
   'nx:text-popover-foreground',
+  'nx:typography-body-default',
   'nx:shadow-lg',
 ].join(' ');
 
@@ -22,6 +23,7 @@ const tooltipSurfaceClassName = [
   'nx:border-border-default',
   'nx:bg-popover',
   'nx:text-popover-foreground',
+  'nx:typography-body-default',
   'nx:shadow-lg',
 ].join(' ');
 
@@ -88,9 +90,10 @@ const overlayPanelTransitionClassName = [
 
 const overlayContentVariants = cva(
   [
-    'nx:fixed nx:left-1/2 nx:top-1/2 nx:z-modal nx:flex nx:w-full nx:max-w-lg nx:flex-col',
+    // Centred with margins, not a translate: a transform would make this the
+    // containing block for fixed-position popups a dialog holds.
+    'nx:fixed nx:inset-0 nx:z-modal nx:m-auto nx:flex nx:h-fit nx:w-full nx:max-w-lg nx:flex-col',
     'nx:max-h-[calc(100svh-2rem)] nx:overflow-hidden',
-    'nx:-translate-x-1/2 nx:-translate-y-1/2',
     'nx:gap-4 nx:border-default nx:border-border-default nx:bg-container nx:py-6 nx:shadow-lg',
     overlayContentTransitionClassName,
     'nx:sm:rounded-lg',
@@ -142,7 +145,7 @@ const overlayFooterVariants = cva('nx:flex nx:shrink-0 nx:gap-2 nx:px-6', {
 });
 
 const overlayCloseButtonClassName = [
-  'nx:absolute nx:right-6 nx:top-6 nx:rounded-sm nx:p-1 nx:text-muted-foreground-subtle',
+  'nx:absolute nx:right-6 nx:top-6 nx:rounded-sm nx:border-0 nx:bg-transparent nx:p-1 nx:text-muted-foreground-subtle',
   'nx:transition-control',
   'nx:hover:bg-container-hover nx:hover:text-foreground',
   'nx:focus-visible:bg-container-hover nx:focus-visible:text-foreground',

@@ -31,7 +31,6 @@ import {
   filterDivergentDark,
   formatDistCssFiles,
   generateAutofillUtilitiesCSS,
-  generateBaseLayerCSS,
   generateBorderColorAliasUtilitiesCSS,
   generateBorderWidthUtilitiesCSS,
   generateMotionUtilitiesCSS,
@@ -580,9 +579,6 @@ function generateNexusCSS(
   css += generateNativeBrowserUIThemeCSS();
   css += generateAutofillUtilitiesCSS();
   css += generateSurfaceUtilitiesCSS();
-
-  // Add base layer
-  css += generateBaseLayerCSS();
 
   return css;
 }

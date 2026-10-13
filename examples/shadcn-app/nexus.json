@@ -1,0 +1,39 @@
+{
+  "components": [
+    "alert",
+    "avatar",
+    "badge",
+    "button",
+    "card",
+    "checkbox",
+    "dialog",
+    "dropdown-menu",
+    "input",
+    "label",
+    "popover",
+    "progress",
+    "radio-group",
+    "select",
+    "separator",
+    "sonner",
+    "switch",
+    "table",
+    "tabs",
+    "textarea",
+    "tooltip"
+  ],
+  "sourceDir": "components/nexus",
+  "cssDir": "components/nexus/tailwind",
+  "check": {
+    "cssEntry": "app/nexus.css",
+    "providerModules": [
+      "components/nexus/components/appearance/provider/index.ts",
+      "components/nexus/components/appearance/provider/server.ts"
+    ],
+    "pages": [
+      "/",
+      "/settings",
+      "/overlays"
+    ]
+  }
+}

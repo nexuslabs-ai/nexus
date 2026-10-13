@@ -94,7 +94,7 @@ export const Indeterminate: Story = {
     await expect(indicator).toHaveAttribute('data-state', 'indeterminate');
     await expect(progress).not.toHaveAttribute('aria-valuenow');
     await expect(getComputedStyle(indicator as Element).animationName).toBe(
-      'progress-indeterminate'
+      'nx-progress-indeterminate'
     );
     await expect(getComputedStyle(indicator as Element).animationDuration).toBe(
       '1.5s'

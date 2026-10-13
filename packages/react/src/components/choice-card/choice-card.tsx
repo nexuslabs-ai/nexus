@@ -148,7 +148,7 @@ function ChoiceCardDescription({
     <p
       data-slot="choice-card-description"
       className={cn(
-        'nx:min-w-0 nx:break-words nx:typography-body-default nx:text-muted-foreground',
+        'nx:m-0 nx:min-w-0 nx:break-words nx:typography-body-default nx:text-muted-foreground',
         'nx:group-has-[>[data-slot=checkbox]:disabled]/choice-card:text-disabled-foreground',
         'nx:group-has-[>[data-slot=radio-group-item]:disabled]/choice-card:text-disabled-foreground',
         className

@@ -101,7 +101,6 @@ document.documentElement.classList.toggle(
   'dark',
   firstPaint.className === 'dark'
 );
-document.documentElement.style.colorScheme = firstPaint.colorScheme;
 themeStyle.textContent = themeToCss(
   deriveTheme(createNexusThemeContract(snapshot.state))
 );

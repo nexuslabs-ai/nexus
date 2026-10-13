@@ -1,3 +1,5 @@
+'use client';
+
 import { useState } from 'react';
 
 import {
@@ -37,7 +39,7 @@ const MODE_OPTIONS: ReadonlyArray<{
 function SwatchRow({ label, value, onSelect }: SwatchRowProps) {
   return (
     <div className="nx:space-y-1.5">
-      <p className="nx:typography-label-small nx:text-muted-foreground">
+      <p className="nx:m-0 nx:typography-label-small nx:text-muted-foreground">
         {label}
       </p>
       <div className="nx:flex nx:flex-wrap nx:gap-1">
@@ -52,7 +54,7 @@ function SwatchRow({ label, value, onSelect }: SwatchRowProps) {
               aria-label={`${label}: ${option.label}`}
               aria-pressed={active}
               title={option.label}
-              className="nx:hover:bg-background-hover nx:focus-visible:outline-focus-default nx:relative nx:flex nx:size-9 nx:items-center nx:justify-center nx:rounded-full nx:transition-control nx:after:absolute nx:after:-inset-1 nx:focus-visible:outline-2"
+              className="nx:hover:bg-background-hover nx:focus-visible:outline-focus-default nx:relative nx:flex nx:size-9 nx:border-0 nx:bg-transparent nx:p-0 nx:items-center nx:justify-center nx:rounded-full nx:transition-control nx:after:absolute nx:after:-inset-1 nx:focus-visible:outline-2"
             >
               <span
                 className={cn(
@@ -104,7 +106,7 @@ export function NexusThemeQuickControl({
         className="nx:w-72 nx:space-y-3"
       >
         <div className="nx:space-y-1.5">
-          <p className="nx:typography-label-small nx:text-muted-foreground">
+          <p className="nx:m-0 nx:typography-label-small nx:text-muted-foreground">
             Mode
           </p>
           <ToggleGroup
@@ -136,7 +138,7 @@ export function NexusThemeQuickControl({
           }
         />
         <div className="nx:space-y-1.5">
-          <p className="nx:typography-label-small nx:text-muted-foreground">
+          <p className="nx:m-0 nx:typography-label-small nx:text-muted-foreground">
             Brand color
           </p>
           <NexusAppearanceColorField

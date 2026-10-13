@@ -8,7 +8,7 @@ function DescriptionList({ className, ...props }: React.ComponentProps<'dl'>) {
     <dl
       data-slot="description-list"
       className={cn(
-        'nx:@container/description-list nx:grid nx:w-full nx:gap-2',
+        'nx:@container/description-list nx:m-0 nx:grid nx:w-full nx:gap-2',
         className
       )}
       {...props}

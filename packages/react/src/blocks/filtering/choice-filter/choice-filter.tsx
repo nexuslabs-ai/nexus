@@ -1,3 +1,5 @@
+'use client';
+
 import * as React from 'react';
 
 import { Button } from '../../../components/button';
@@ -193,7 +195,7 @@ export function ChoiceEditor({
         ))}
       </DropdownMenuRadioGroup>
       {!options.length && (
-        <p className="nx:p-2 nx:typography-body-default nx:text-muted-foreground">
+        <p className="nx:m-0 nx:p-2 nx:typography-body-default nx:text-muted-foreground">
           No options available
         </p>
       )}

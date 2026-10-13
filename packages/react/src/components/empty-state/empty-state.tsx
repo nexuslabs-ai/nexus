@@ -163,7 +163,7 @@ function EmptyStateTitle({
   return (
     <Comp
       data-slot="empty-state-title"
-      className={cn('nx:typography-heading-xxsmall', className)}
+      className={cn('nx:m-0 nx:typography-heading-xxsmall', className)}
       {...props}
     />
   );
@@ -187,7 +187,7 @@ function EmptyStateDescription({
     <p
       data-slot="empty-state-description"
       className={cn(
-        'nx:typography-body-default nx:text-muted-foreground nx:[&>a]:underline nx:[&>a]:underline-offset-4 nx:[&>a:hover]:text-primary-subtle-foreground',
+        'nx:m-0 nx:typography-body-default nx:text-muted-foreground nx:[&>a]:text-inherit nx:[&>a]:underline nx:[&>a]:underline-offset-4 nx:[&>a:hover]:text-primary-subtle-foreground',
         className
       )}
       {...props}

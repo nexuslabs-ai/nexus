@@ -165,10 +165,13 @@ export const DefaultDataAttributes: Story = {
     const avatar = canvasElement.querySelector('[data-slot="avatar"]');
     await expect(avatar).toHaveAttribute('data-size', 'md');
     await expect(avatar).toHaveAttribute('data-shape', 'circle');
-    // #496: initials text scales with the avatar diameter via arbitrary rem
-    // (16px/36px have no composite, so the whole scale stays arbitrary, matching
-    // the pre-existing 2xs/xs). md → text-[1rem], migrated from the raw named text-size utility.
-    await expect(avatar).toHaveClass('nx:text-[1rem]');
+    // Initials scale with the avatar diameter as a multiple of the base type
+    // size, so md renders at the base size.
+    await expect(avatar).toHaveStyle({
+      fontSize: getComputedStyle(document.documentElement)
+        .getPropertyValue('--nx-typography-size-base')
+        .trim(),
+    });
   },
 };
 

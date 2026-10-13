@@ -42,8 +42,8 @@ function mockSystemPrefersDark(matches: boolean): void {
 }
 
 describe('NexusAppearanceSnapshot', () => {
-  it('invalidates cached CSS for the renamed public tokens', () => {
-    expect(SNAPSHOT_VERSION).toBe(7);
+  it('invalidates cached CSS that styled the host page', () => {
+    expect(SNAPSHOT_VERSION).toBe(8);
   });
 
   it('stores pre-derived CSS verbatim', () => {
@@ -231,8 +231,6 @@ describe('resolveFirstPaint', () => {
     );
 
     expect(result.className).toBe('dark');
-    expect(result.colorScheme).toBe('dark');
-    expect(result.metaColorScheme).toBe('dark');
     expect(result.dataAttrs).toEqual({
       'data-density': 'default',
       'data-radius': 'square',
@@ -241,15 +239,13 @@ describe('resolveFirstPaint', () => {
     });
   });
 
-  it('resolves system mode from the OS preference and keeps meta dual-scheme', () => {
+  it('resolves system mode from the OS preference', () => {
     const result = resolveFirstPaint(
       snapshotFor({ ...DEFAULT_NEXUS_APPEARANCE, mode: 'system' }),
       true
     );
 
     expect(result.className).toBe('dark');
-    expect(result.colorScheme).toBe('dark');
-    expect(result.metaColorScheme).toBe('light dark');
   });
 
   it('passes snapshot CSS through without derivation', () => {
@@ -301,11 +297,9 @@ describe('createNexusAppearanceBootstrapScript', () => {
 
     expect(document.documentElement.classList.contains('dark')).toBe(true);
     expect(document.documentElement.getAttribute('data-radius')).toBe('square');
-    expect(document.documentElement.style.colorScheme).toBe('dark');
-    expect(
-      document.querySelector<HTMLMetaElement>('meta[name="color-scheme"]')
-        ?.content
-    ).toBe('dark');
+    // The host page's own color-scheme is left alone; `.dark` CSS covers it.
+    expect(document.documentElement.style.colorScheme).toBe('');
+    expect(document.querySelector('meta[name="color-scheme"]')).toBeNull();
     expect(
       document.querySelector('style[data-nexus-appearance-theme]')?.textContent
     ).toBe(':root { --test-theme: dark; }');
@@ -424,10 +418,6 @@ describe('createNexusAppearanceBootstrapScript', () => {
     new Function(createNexusAppearanceBootstrapScript())();
 
     expect(document.documentElement.classList.contains('dark')).toBe(true);
-    expect(
-      document.querySelector<HTMLMetaElement>('meta[name="color-scheme"]')
-        ?.content
-    ).toBe('light dark');
   });
 
   it('does not force dark in system mode when matchMedia is unavailable', () => {
@@ -443,11 +433,6 @@ describe('createNexusAppearanceBootstrapScript', () => {
 
     const root = document.documentElement;
     expect(root.classList.contains('dark')).toBe(false);
-    expect(root.style.colorScheme).toBe('light');
-    expect(
-      document.querySelector<HTMLMetaElement>('meta[name="color-scheme"]')
-        ?.content
-    ).toBe('light dark');
   });
 
   it.each([
@@ -475,11 +460,6 @@ describe('createNexusAppearanceBootstrapScript', () => {
       expect(root.classList.contains('dark')).toBe(
         expected.className === 'dark'
       );
-      expect(root.style.colorScheme).toBe(expected.colorScheme);
-      expect(
-        document.querySelector<HTMLMetaElement>('meta[name="color-scheme"]')
-          ?.content
-      ).toBe(expected.metaColorScheme);
       for (const attr of NEXUS_APPEARANCE_DATA_ATTRS) {
         expect(root.getAttribute(attr)).toBe(expected.dataAttrs[attr]);
       }

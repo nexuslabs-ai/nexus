@@ -217,7 +217,7 @@ function DrawerTitle({ className, ...props }: DrawerTitleProps) {
   return (
     <DrawerPrimitive.Title
       data-slot="drawer-title"
-      className={cn('nx:typography-heading-xsmall', className)}
+      className={cn('nx:m-0 nx:typography-heading-xsmall', className)}
       {...props}
     />
   );
@@ -240,7 +240,7 @@ function DrawerDescription({ className, ...props }: DrawerDescriptionProps) {
     <DrawerPrimitive.Description
       data-slot="drawer-description"
       className={cn(
-        'nx:typography-body-default nx:text-muted-foreground',
+        'nx:m-0 nx:typography-body-default nx:text-muted-foreground',
         className
       )}
       {...props}

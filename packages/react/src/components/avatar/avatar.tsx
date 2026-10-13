@@ -1,3 +1,5 @@
+'use client';
+
 import * as React from 'react';
 
 import * as AvatarPrimitive from '@radix-ui/react-avatar';
@@ -10,15 +12,19 @@ const avatarVariants = cva(
   {
     variants: {
       size: {
-        '2xs': 'nx:size-5 nx:text-[0.625rem]',
-        xs: 'nx:size-6 nx:text-[0.6875rem]',
-        sm: 'nx:size-8 nx:text-[0.75rem]',
-        md: 'nx:size-10 nx:text-[1rem]',
-        lg: 'nx:size-12 nx:text-[1.125rem]',
-        xl: 'nx:size-14 nx:text-[1.25rem]',
-        '2xl': 'nx:size-16 nx:text-[1.5rem]',
-        '3xl': 'nx:size-20 nx:text-[1.875rem]',
-        '4xl': 'nx:size-24 nx:text-[2.25rem]',
+        '2xs':
+          'nx:size-5 nx:text-[length:calc(var(--nx-typography-size-base)*0.625)]',
+        xs: 'nx:size-6 nx:text-[length:calc(var(--nx-typography-size-base)*0.6875)]',
+        sm: 'nx:size-8 nx:text-[length:calc(var(--nx-typography-size-base)*0.75)]',
+        md: 'nx:size-10 nx:text-[length:calc(var(--nx-typography-size-base)*1)]',
+        lg: 'nx:size-12 nx:text-[length:calc(var(--nx-typography-size-base)*1.125)]',
+        xl: 'nx:size-14 nx:text-[length:calc(var(--nx-typography-size-base)*1.25)]',
+        '2xl':
+          'nx:size-16 nx:text-[length:calc(var(--nx-typography-size-base)*1.5)]',
+        '3xl':
+          'nx:size-20 nx:text-[length:calc(var(--nx-typography-size-base)*1.875)]',
+        '4xl':
+          'nx:size-24 nx:text-[length:calc(var(--nx-typography-size-base)*2.25)]',
       },
       shape: {
         circle: 'nx:rounded-full',

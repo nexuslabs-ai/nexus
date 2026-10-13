@@ -1,3 +1,5 @@
+'use client';
+
 import * as React from 'react';
 
 import { Button } from '../../../components/button';
@@ -162,7 +164,7 @@ export function NumberComparisonFilter({
             />
             <p
               id={`${id}-hint`}
-              className="nx:typography-body-small nx:text-muted-foreground"
+              className="nx:m-0 nx:typography-body-small nx:text-muted-foreground"
             >
               {lowerBound !== undefined || upperBound !== undefined
                 ? `Allowed range: ${lowerBound ?? 'no minimum'} to ${upperBound ?? 'no maximum'}.`

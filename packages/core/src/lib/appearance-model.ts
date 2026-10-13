@@ -135,7 +135,7 @@ export const DEFAULT_NEXUS_APPEARANCE: NexusAppearanceState = {
     codeFontSize: 12,
     reduceMotion: false,
     pointerCursors: false,
-    fontSmoothing: true,
+    fontSmoothing: false,
   },
 };
 
@@ -312,16 +312,21 @@ export function appearancePrefsToCss(prefs: NexusAppearancePrefs): string {
     prefs.codeFontSize,
     DEFAULT_NEXUS_APPEARANCE.prefs.codeFontSize
   );
+  // Font and type size reach only Nexus. The toggles below apply to the whole
+  // page, host included, when the user turns them on.
   const blocks: string[] = [
     `:root {
   --nx-typography-family-font-sans: ${prefs.uiFont};
   --nx-typography-family-font-mono: ${prefs.codeFont};
-  font-size: ${uiPx}px;
 ${typographyScaleVariables(uiPx)}
 }`,
-    `code, pre, .nx\\:font-mono, .nx\\:typography-code-block, .nx\\:typography-code-inline { font-size: ${codePx}px; }`,
-    `html { -webkit-font-smoothing: ${prefs.fontSmoothing ? 'antialiased' : 'auto'}; -moz-osx-font-smoothing: ${prefs.fontSmoothing ? 'grayscale' : 'auto'}; }`,
+    `.nx\\:font-mono, .nx\\:typography-code-block, .nx\\:typography-code-inline { font-size: ${codePx}px; }`,
   ];
+  if (prefs.fontSmoothing) {
+    blocks.push(
+      `html { -webkit-font-smoothing: antialiased; -moz-osx-font-smoothing: grayscale; }`
+    );
+  }
   if (prefs.pointerCursors) {
     blocks.push(
       `button:not(:disabled), [role="button"], [role="tab"], [role="radio"], a[href], summary { cursor: pointer; }`

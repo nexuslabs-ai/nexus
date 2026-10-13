@@ -1,3 +1,5 @@
+'use client';
+
 import * as React from 'react';
 
 import * as TooltipPrimitive from '@radix-ui/react-tooltip';
@@ -8,21 +10,32 @@ import {
   tooltipSurfaceClassName,
 } from '../overlay-layout/overlay-layout';
 
+import { TooltipGroupContext } from './tooltip-group';
+
 /**
- * Required wrapper for tooltips. Place it at your app root or around the
- * components that use tooltips.
+ * Optional. Groups the tooltips inside it, so they share an open delay and
+ * moving between them skips the delay.
  *
  * @example
  * ```tsx
- * <TooltipProvider>
- *   <App />
+ * <TooltipProvider delayDuration={0}>
+ *   <Toolbar>…</Toolbar>
  * </TooltipProvider>
  * ```
  */
-const TooltipProvider = TooltipPrimitive.Provider;
+function TooltipProvider(
+  props: React.ComponentProps<typeof TooltipPrimitive.Provider>
+) {
+  return (
+    <TooltipGroupContext.Provider value={true}>
+      <TooltipPrimitive.Provider {...props} />
+    </TooltipGroupContext.Provider>
+  );
+}
 
 /**
- * Root of one tooltip. Holds its open state, trigger and content.
+ * Root of one tooltip. Holds its open state, trigger and content. Works on its
+ * own, and joins the group inside a `TooltipProvider`.
  *
  * @example
  * ```tsx
@@ -32,7 +45,13 @@ const TooltipProvider = TooltipPrimitive.Provider;
  * </Tooltip>
  * ```
  */
-const Tooltip = TooltipPrimitive.Root;
+function Tooltip(props: React.ComponentProps<typeof TooltipPrimitive.Root>) {
+  const inGroup = React.useContext(TooltipGroupContext);
+  const root = <TooltipPrimitive.Root {...props} />;
+  if (inGroup) return root;
+
+  return <TooltipPrimitive.Provider>{root}</TooltipPrimitive.Provider>;
+}
 
 /**
  * Element that opens the tooltip on hover or focus.

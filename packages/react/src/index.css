@@ -7,7 +7,9 @@
  * importing `@nexus_ds/tailwind`; that way importing this file can never re-define
  * (and thus override / stale-out) a consumer's tokens.
  */
-@import 'tailwindcss' source(none) prefix(nx);
+@layer theme, base, components, utilities;
+@import 'tailwindcss/theme.css' layer(theme) prefix(nx);
+@import 'tailwindcss/utilities.css' layer(utilities) prefix(nx) source(none);
 @source './components';
 @source './hooks';
 @source './lib';

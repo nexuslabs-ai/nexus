@@ -206,7 +206,7 @@ void snapshot;
 void serverSnapshot;
 void css;
 void bootstrap;
-void firstPaint.colorScheme;
+void firstPaint.className;
 void lc;
 void checkMode;
 void checkTier;

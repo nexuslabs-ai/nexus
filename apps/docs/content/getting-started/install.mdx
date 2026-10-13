@@ -18,13 +18,14 @@ export default {
 };
 ```
 
-Tailwind 4 builds the `nx:` classes. These steps use a Next.js 15 App Router
-app.
+Tailwind 4 builds the `nx:` classes. These steps use a new Next.js 15 App
+Router app. If your app already has a UI, follow
+[Add Nexus to an existing app](#add-nexus-to-an-existing-app).
 
-Remove any `@import "tailwindcss"` from your CSS, including the one
-`create-next-app` adds to `globals.css`. The token CSS imports Tailwind for
-you, with the `nx:` prefix. A second import duplicates Tailwind's base styles
-and can bring back its default colors.
+Remove the `@import "tailwindcss"` that `create-next-app` adds to
+`globals.css`. The token CSS brings Tailwind's theme and utilities with the
+`nx:` prefix. The prefix applies to the whole build, so a second import in the
+same file doesn't give you unprefixed classes.
 
 ## Step 2: Add the token CSS
 
@@ -49,13 +50,19 @@ Install the animation utilities that some components use to open and close:
 npm install tw-animate-css
 ```
 
-Import both from your CSS entry point:
+Import Tailwind's Preflight, the token CSS and the animation utilities from your
+CSS entry point:
 
 ```css
 /* app/globals.css */
+@layer theme, base, components, utilities;
+@import 'tailwindcss/preflight.css' layer(base);
 @import '../styles/nexus/nexus.css';
 @import 'tw-animate-css';
 ```
+
+Nexus ships no reset, so the page brings Preflight. Nexus components need its
+`box-sizing: border-box`.
 
 Every Tailwind class in your app now takes the `nx:` prefix: `nx:flex` works,
 `flex` does not. Only Nexus tokens are available, so Tailwind's default colors
@@ -66,21 +73,9 @@ Instead of `nx:bg-red-500`, use a token class like `nx:bg-error-background`.
 To add your own tokens, put a `@theme` block in `globals.css` after the
 imports. Don't edit `nexus.css`, because pasting a newer copy replaces it.
 
-If your app already uses unprefixed Tailwind classes, this setup won't work
-with them.
-
-Then tell the browser the app supports both color schemes, so scrollbars and
-form controls match the theme:
-
-```tsx
-// app/layout.tsx (step 3 completes this file)
-import type { Viewport } from 'next';
-
-export const viewport: Viewport = { colorScheme: 'light dark' };
-```
-
-Outside Next.js, add `<meta name="color-scheme" content="light dark" />` to
-your `<head>`.
+Scrollbars and form controls turn dark with the theme. Don't add a
+`color-scheme` meta tag. A `light dark` meta lets the operating system darken a
+light page.
 
 ## Step 3: Add the appearance provider
 
@@ -112,14 +107,11 @@ Add the script and the provider to your root layout:
 ```tsx
 // app/layout.tsx
 import { DEFAULT_NEXUS_APPEARANCE } from '@nexus_ds/core';
-import type { Viewport } from 'next';
 
 import { NexusAppearanceProvider } from '@/components/appearance/provider';
 import { NexusAppearanceScript } from '@/components/appearance/provider/server';
 
 import './globals.css';
-
-export const viewport: Viewport = { colorScheme: 'light dark' };
 
 export default function RootLayout({
   children,
@@ -134,7 +126,7 @@ export default function RootLayout({
           defaultState={DEFAULT_NEXUS_APPEARANCE}
         />
       </head>
-      <body className="nx:bg-background nx:text-foreground">
+      <body className="nx:bg-background nx:text-foreground nx:typography-body-default">
         <NexusAppearanceProvider
           storageKey="app-appearance"
           defaultState={DEFAULT_NEXUS_APPEARANCE}
@@ -146,6 +138,9 @@ export default function RootLayout({
   );
 }
 ```
+
+`nx:typography-body-default` gives page text the Nexus font and size, which
+follow the appearance settings.
 
 Give the script and the provider the same `storageKey`. The provider saves the
 user's choices under that key, and the script reads them on the next load.
@@ -204,6 +199,66 @@ export function ModeToggle() {
 
 If the button has no styles, `nexus.css` isn't imported (step 2). If it stays
 light when you toggle, the provider isn't wrapping it (step 3).
+
+## Add Nexus to an existing app
+
+Nexus CSS defines only `nx:` classes and `--nx-*` variables, so your app's
+styles stay as they are. Follow steps 1 to 4 with these four changes:
+
+1. **Copy Nexus into its own folder**, such as `components/nexus/`. Your app
+   likely has its own `lib/utils.ts`, and Nexus's would replace it. The imports
+   between Nexus files still work.
+2. **Give Nexus its own CSS entry** and import it after your own stylesheet:
+
+   ```css
+   /* app/nexus.css */
+   @import '../components/nexus/tailwind/nexus.css';
+   @import 'tw-animate-css';
+   ```
+
+   Your `globals.css` keeps its `@import "tailwindcss"`. Two files make two
+   Tailwind builds, one prefixed and one not.
+
+3. **Keep your app's reset.** Nexus needs `box-sizing: border-box`. Tailwind's
+   Preflight, MUI's `CssBaseline` and Bootstrap's Reboot all set it. If your app
+   has no Tailwind, install it for the Nexus entry.
+4. **Add the provider and the script** as in step 3. Nexus and your theme share
+   the `.dark` class on `<html>`.
+
+Three global effects remain:
+
+| Source                | What it adds                                                                                      |
+| --------------------- | ------------------------------------------------------------------------------------------------- |
+| `.dark`               | `color-scheme: dark`, so your scrollbars and form controls turn dark in dark mode                 |
+| `tw-animate-css`      | `enter`, `exit`, `accordion-*`, `collapsible-*` and `caret-blink` keyframes, as in any shadcn app |
+| Tailwind's own output | `spin`, `ping`, `pulse` and `bounce` keyframes and `--tw-*` properties, as in any Tailwind 4 app  |
+
+Style a Nexus component with `nx:` classes. An unprefixed class loses to the
+component's own `nx:` class, because Nexus's stylesheet loads later.
+
+Your content inside a Nexus component inherits its text color, font and line
+height.
+
+If your design system is a package, ship the Nexus CSS entry from it and end
+the entry with `@source './';`. Tailwind skips `node_modules`, so without that
+line the package's classes are never generated.
+
+Nexus overlays use three layers:
+
+| Variable               | Default | Used by                         |
+| ---------------------- | ------- | ------------------------------- |
+| `--nx-z-index-modal`   | 50      | Dialog, Sheet, Drawer           |
+| `--nx-z-index-popover` | 70      | Popover, Select, menus, Tooltip |
+| `--nx-z-index-toast`   | 100     | Toaster                         |
+
+If your app's layers sit higher, like MUI's dialogs at 1300, raise these on
+`:root`.
+
+An open Nexus dialog blocks pointer events outside itself. Render another
+library's popups inside it, such as an MUI `Menu` with `disablePortal`.
+
+The [examples](https://github.com/nexuslabs-ai/nexus/tree/main/examples) show
+Nexus added to a shadcn app, an MUI app and a company package.
 
 ## (Optional) Add lint rules
 

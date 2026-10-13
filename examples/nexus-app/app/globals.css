@@ -1,0 +1,5 @@
+@layer theme, base, components, utilities;
+@import 'tailwindcss/preflight.css' layer(base);
+@import '../styles/nexus/nexus.css';
+@import 'tw-animate-css';
+@import '../components/progress/progress.css';
