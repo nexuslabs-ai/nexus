@@ -357,7 +357,7 @@ function MultiSelectValue({
           isCaps={false}
           className={cn(
             'nx:group/chip nx:max-w-40 nx:gap-1',
-            clickToRemove && 'nx:cursor-interactive'
+            clickToRemove && 'nx:cursor-pointer'
           )}
           onClick={
             clickToRemove ? (event) => removeChip(event, value) : undefined

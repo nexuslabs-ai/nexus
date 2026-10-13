@@ -1,4 +1,3 @@
-import motionTokens from '../../tokens/primitives/motion/motion-snappy.json';
 import typographyTokens from '../../tokens/primitives/typography/typography-default.json';
 
 import { normalizeContrast } from './contrast';
@@ -192,17 +191,6 @@ const clampFontSize = (value: unknown, fallback: number): number =>
     ? Math.min(FONT_PX_MAX, Math.max(FONT_PX_MIN, value))
     : fallback;
 
-const MOTION_DURATION_STEPS = Object.keys(motionTokens.duration);
-
-// The looping animations Nexus components use; reduceMotion stops each one.
-const ENDLESS_ANIMATIONS = [
-  'spin',
-  'pulse',
-  'bounce',
-  'progress-indeterminate',
-  'caret-blink',
-];
-
 function formatPx(value: number): string {
   return `${Number(value.toFixed(4))}px`;
 }
@@ -324,25 +312,30 @@ export function appearancePrefsToCss(prefs: NexusAppearancePrefs): string {
     prefs.codeFontSize,
     DEFAULT_NEXUS_APPEARANCE.prefs.codeFontSize
   );
-  // Every preference is an --nx-* variable that Nexus utilities read, so the
-  // host app's own elements never change.
-  const variables = [
-    `--nx-typography-family-font-sans: ${prefs.uiFont};`,
-    `--nx-typography-family-font-mono: ${prefs.codeFont};`,
-    `--nx-font-smoothing-webkit: ${prefs.fontSmoothing ? 'antialiased' : 'auto'};`,
-    `--nx-font-smoothing-moz: ${prefs.fontSmoothing ? 'grayscale' : 'auto'};`,
-  ];
-  if (prefs.pointerCursors) variables.push('--nx-cursor-interactive: pointer;');
-  if (prefs.reduceMotion) {
-    for (const step of MOTION_DURATION_STEPS)
-      variables.push(`--nx-motion-duration-${step}: 0ms;`);
-    variables.push('--nx-scroll-behavior: auto;');
-    for (const animation of ENDLESS_ANIMATIONS) {
-      variables.push(`--nx-animate-${animation}: none;`);
-    }
-  }
-  return [
-    `:root {\n${variables.map((line) => `  ${line}`).join('\n')}\n${typographyScaleVariables(uiPx)}\n}`,
+  // Font and type size reach only Nexus. The toggles below apply to the whole
+  // page, host included, when the user turns them on.
+  const blocks: string[] = [
+    `:root {
+  --nx-typography-family-font-sans: ${prefs.uiFont};
+  --nx-typography-family-font-mono: ${prefs.codeFont};
+${typographyScaleVariables(uiPx)}
+}`,
     `.nx\\:font-mono, .nx\\:typography-code-block, .nx\\:typography-code-inline { font-size: ${codePx}px; }`,
-  ].join('\n');
+  ];
+  if (prefs.fontSmoothing) {
+    blocks.push(
+      `html { -webkit-font-smoothing: antialiased; -moz-osx-font-smoothing: grayscale; }`
+    );
+  }
+  if (prefs.pointerCursors) {
+    blocks.push(
+      `button:not(:disabled), [role="button"], [role="tab"], [role="radio"], a[href], summary { cursor: pointer; }`
+    );
+  }
+  if (prefs.reduceMotion) {
+    blocks.push(
+      `*, *::before, *::after { animation-duration: 0.01ms !important; animation-iteration-count: 1 !important; transition-duration: 0.01ms !important; scroll-behavior: auto !important; }`
+    );
+  }
+  return blocks.join('\n');
 }

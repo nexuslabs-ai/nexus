@@ -411,10 +411,7 @@ export const LinksAndButtons: Story = {
     }
 
     await expect(getComputedStyle(link).cursor).toBe('pointer');
-    // A button body shows the pointer when the pointerCursors preference sets it.
-    button.style.setProperty('--nx-cursor-interactive', 'pointer');
     await expect(getComputedStyle(button).cursor).toBe('pointer');
-    button.style.removeProperty('--nx-cursor-interactive');
 
     // The padding lives on the content, so the hit target — and the focus ring
     // that traces it — covers the whole surface, not a box inset within it.
@@ -833,7 +830,7 @@ export const InScrollContainer: Story = {
 // ============================================
 
 const receiptIconClassName =
-  'nx:inline-flex nx:size-5 nx:shrink-0 nx:cursor-interactive nx:items-center nx:justify-center nx:rounded-sm nx:opacity-70 nx:transition-opacity nx:duration-faster nx:hover:opacity-100 nx:focus-visible:outline-2 nx:focus-visible:outline-focus-default nx:[&_svg]:size-4';
+  'nx:inline-flex nx:size-5 nx:shrink-0 nx:cursor-pointer nx:items-center nx:justify-center nx:rounded-sm nx:opacity-70 nx:transition-opacity nx:duration-faster nx:hover:opacity-100 nx:focus-visible:outline-2 nx:focus-visible:outline-focus-default nx:[&_svg]:size-4';
 
 export const WithTooltip: Story = {
   render: () => (

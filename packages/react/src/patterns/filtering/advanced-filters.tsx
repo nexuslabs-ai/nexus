@@ -146,7 +146,7 @@ export function AdvancedFiltering() {
         </div>
       </section>
       <details className="nx:typography-body-small nx:text-muted-foreground">
-        <summary className="nx:cursor-interactive">
+        <summary className="nx:cursor-pointer">
           View applied filter data
         </summary>
         <pre className="nx:mt-2 nx:mb-0 nx:max-h-64 nx:overflow-auto nx:rounded-md nx:bg-muted nx:p-3">

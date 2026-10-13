@@ -244,7 +244,7 @@ function InlineEditClickTrigger({
       data-slot="inline-edit-trigger"
       className={cn(
         alignWithText,
-        'nx:flex nx:min-h-8 nx:w-full nx:cursor-interactive nx:items-center nx:rounded-md nx:border-default nx:border-transparent nx:bg-transparent nx:px-2.5 nx:py-0 nx:[font:inherit] nx:text-inherit nx:text-start nx:hover:bg-container-hover nx:active:bg-container-active nx:focus-visible:outline-2 nx:focus-visible:outline-focus-default nx:focus-visible:outline-offset-2'
+        'nx:flex nx:min-h-8 nx:w-full nx:cursor-pointer nx:items-center nx:rounded-md nx:border-default nx:border-transparent nx:bg-transparent nx:px-2.5 nx:py-0 nx:[font:inherit] nx:text-inherit nx:text-start nx:hover:bg-container-hover nx:active:bg-container-active nx:focus-visible:outline-2 nx:focus-visible:outline-focus-default nx:focus-visible:outline-offset-2'
       )}
       {...props}
     >

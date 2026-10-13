@@ -2,7 +2,6 @@ import { readFileSync } from 'node:fs';
 import { resolve } from 'node:path';
 import { describe, expect, it } from 'vitest';
 
-import motionTokens from '../../tokens/primitives/motion/motion-snappy.json';
 import typographyTokens from '../../tokens/primitives/typography/typography-default.json';
 
 import {
@@ -422,7 +421,7 @@ describe('appearancePrefsToCss', () => {
     expect(css).toContain(
       '.nx\\:font-mono, .nx\\:typography-code-block, .nx\\:typography-code-inline { font-size: 12px; }'
     );
-    expect(css).toContain('--nx-font-smoothing-webkit: antialiased;');
+    expect(css).toContain('-webkit-font-smoothing: antialiased');
   });
 
   it('leaves the page font size alone', () => {
@@ -431,20 +430,18 @@ describe('appearancePrefsToCss', () => {
     expect(rootBlock).not.toMatch(/^\s*font-size:/m);
   });
 
-  it('selects only :root and Nexus classes, never the host page', () => {
-    for (const enabled of [false, true]) {
-      const css = appearancePrefsToCss({
-        ...prefs,
-        pointerCursors: enabled,
-        reduceMotion: enabled,
-        fontSmoothing: enabled,
-      });
-      const selectors = [...css.matchAll(/([^{}]+)\{/g)].flatMap(
-        ([, list = '']) => list.split(',').map((selector) => selector.trim())
-      );
-      for (const selector of selectors) {
-        expect(selector, selector).toMatch(/^(:root|\.nx\\:)/);
-      }
+  it('touches the host page only for the toggles the user turns on', () => {
+    const css = appearancePrefsToCss({
+      ...prefs,
+      pointerCursors: false,
+      reduceMotion: false,
+      fontSmoothing: false,
+    });
+    const selectors = [...css.matchAll(/([^{}]+)\{/g)].flatMap(
+      ([, list = '']) => list.split(',').map((selector) => selector.trim())
+    );
+    for (const selector of selectors) {
+      expect(selector, selector).toMatch(/^(:root|\.nx\\:)/);
     }
   });
 
@@ -453,15 +450,14 @@ describe('appearancePrefsToCss', () => {
       ...prefs,
       fontSmoothing: true,
     });
-    expect(on).toContain('--nx-font-smoothing-webkit: antialiased;');
-    expect(on).toContain('--nx-font-smoothing-moz: grayscale;');
+    expect(on).toContain('-webkit-font-smoothing: antialiased');
+    expect(on).toContain('-moz-osx-font-smoothing: grayscale');
 
     const off = appearancePrefsToCss({
       ...prefs,
       fontSmoothing: false,
     });
-    expect(off).toContain('--nx-font-smoothing-webkit: auto;');
-    expect(off).toContain('--nx-font-smoothing-moz: auto;');
+    expect(off).not.toContain('font-smoothing');
   });
 
   it('keeps default runtime typography variables in parity with generated tokens', () => {
@@ -475,32 +471,21 @@ describe('appearancePrefsToCss', () => {
     );
   });
 
-  it('stops motion only when reduceMotion is on', () => {
-    const on = appearancePrefsToCss({ ...prefs, reduceMotion: true });
-    for (const step of Object.keys(motionTokens.duration)) {
-      expect(on).toContain(`--nx-motion-duration-${step}: 0ms;`);
-    }
-    expect(on).toContain('--nx-scroll-behavior: auto;');
-    for (const animation of [
-      'spin',
-      'pulse',
-      'bounce',
-      'progress-indeterminate',
-      'caret-blink',
-    ]) {
-      expect(on).toContain(`--nx-animate-${animation}: none;`);
-    }
-    expect(appearancePrefsToCss({ ...prefs, reduceMotion: false })).not.toMatch(
-      /--nx-motion-duration|--nx-animate-/
+  it('emits the reduced-motion block only when reduceMotion is on', () => {
+    expect(appearancePrefsToCss({ ...prefs, reduceMotion: true })).toContain(
+      'transition-duration: 0.01ms'
     );
+    expect(
+      appearancePrefsToCss({ ...prefs, reduceMotion: false })
+    ).not.toContain('0.01ms');
   });
 
-  it('sets the interactive cursor only when pointer cursors are enabled', () => {
+  it('emits the pointer cursor rule only when pointer cursors are enabled', () => {
     expect(appearancePrefsToCss({ ...prefs, pointerCursors: true })).toContain(
-      '--nx-cursor-interactive: pointer;'
+      'cursor: pointer'
     );
     expect(
       appearancePrefsToCss({ ...prefs, pointerCursors: false })
-    ).not.toContain('--nx-cursor-interactive');
+    ).not.toContain('cursor: pointer');
   });
 });

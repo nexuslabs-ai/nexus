@@ -44,6 +44,11 @@ component resets the browser defaults it relies on.
 | `shadcn-package/app-via-package` | 0 |
 | `shadcn-package/app-direct` | 0 |
 
+The appearance provider's reduce motion, pointer cursor and font smoothing
+toggles are app-wide on purpose: when on, they apply to the host too. Font
+smoothing is on by default, so host text is antialiased on macOS. The check
+measures the default appearance and does not count font smoothing.
+
 The apps also show the integration points a team has to wire:
 
 | Point | Where |

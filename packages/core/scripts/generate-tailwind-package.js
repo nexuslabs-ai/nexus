@@ -33,7 +33,6 @@ import {
   generateAutofillUtilitiesCSS,
   generateBorderColorAliasUtilitiesCSS,
   generateBorderWidthUtilitiesCSS,
-  generateCursorUtilitiesCSS,
   generateMotionUtilitiesCSS,
   generateNativeBrowserUIThemeCSS,
   generateSpacingModesCSS,
@@ -580,7 +579,6 @@ function generateNexusCSS(
   css += generateNativeBrowserUIThemeCSS();
   css += generateAutofillUtilitiesCSS();
   css += generateSurfaceUtilitiesCSS();
-  css += generateCursorUtilitiesCSS();
 
   return css;
 }

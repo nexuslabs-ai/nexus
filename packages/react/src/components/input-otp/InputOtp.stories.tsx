@@ -178,12 +178,12 @@ export const ClickInteraction: Story = {
       '[data-slot="input-otp-slot"]'
     );
     const caret = canvasElement.querySelector<HTMLElement>(
-      '[data-slot="input-otp-caret"]'
+      '[class~="nx:animate-caret-blink"]'
     );
 
     await expect(slot).toHaveClass('nx:duration-fast');
-    await expect(getComputedStyle(caret!).animationName).toBe('caret-blink');
-    await expect(getComputedStyle(caret!).animationDuration).toBe('1.25s');
+    await expect(caret).toHaveClass('nx:animate-caret-blink');
+    await expect(caret).not.toHaveClass('nx:duration-1000');
   },
 };
 

@@ -1428,23 +1428,6 @@ export function generateAutofillUtilitiesCSS() {
 }
 
 /**
- * The interactive cursor. Interactive components carry `cursor-interactive`;
- * the provider's pointerCursors preference sets --nx-cursor-interactive, so
- * the host's own buttons and links keep their cursor. The `auto` fallback keeps
- * the browser's pointer on links.
- *
- * @returns {string} CSS @utility declaration
- */
-export function generateCursorUtilitiesCSS() {
-  return `
-/* ===== CURSOR UTILITIES ===== */
-@utility cursor-interactive {
-  cursor: var(--nx-cursor-interactive, auto);
-}
-`;
-}
-
-/**
  * Surface utilities: a wrapper declares the surface it paints with
  * `surface-*` beside its `bg-*` class (`nx:bg-container nx:surface-container`),
  * and descendants cut themselves out of it with `ring-surface` /

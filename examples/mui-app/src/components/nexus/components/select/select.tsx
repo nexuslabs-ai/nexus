@@ -50,7 +50,7 @@ const selectTriggerVariants = cva(
   [
     'nx:group/select-trigger nx:flex nx:box-border nx:w-full nx:items-center nx:justify-between nx:gap-2',
     'nx:rounded-md nx:border-default nx:transition-field',
-    'nx:whitespace-nowrap nx:text-inherit nx:cursor-interactive',
+    'nx:whitespace-nowrap nx:text-inherit',
     'nx:data-[placeholder]:text-muted-foreground',
     'nx:focus-visible:outline-default nx:focus-visible:outline-focus-default nx:focus-visible:border-focus-default',
     'nx:aria-invalid:border-error-border nx:aria-invalid:focus-visible:outline-focus-error nx:aria-invalid:focus-visible:border-focus-error',

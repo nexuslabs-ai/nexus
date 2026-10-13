@@ -691,7 +691,7 @@ function SelectionExample() {
             <Label
               htmlFor={`${selectionId}-${index}`}
               key={name}
-              className="nx:flex nx:min-h-10 nx:cursor-interactive nx:items-center nx:gap-3 nx:px-2 nx:typography-body-default"
+              className="nx:flex nx:min-h-10 nx:cursor-pointer nx:items-center nx:gap-3 nx:px-2 nx:typography-body-default"
             >
               <Checkbox
                 id={`${selectionId}-${index}`}

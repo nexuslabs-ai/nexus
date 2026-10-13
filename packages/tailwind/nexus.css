@@ -1759,8 +1759,3 @@
 @utility ring-offset-surface {
   --tw-ring-offset-color: var(--nx-surface, --theme(--color-background));
 }
-
-/* ===== CURSOR UTILITIES ===== */
-@utility cursor-interactive {
-  cursor: var(--nx-cursor-interactive, auto);
-}

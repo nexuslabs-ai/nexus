@@ -104,8 +104,6 @@ const TYPOGRAPHY_PROPERTY_GROUPS = {
   'line-height': 'leading',
   'letter-spacing': 'tracking',
   'text-wrap': 'text-wrap',
-  '-webkit-font-smoothing': 'font-smoothing',
-  '-moz-osx-font-smoothing': 'font-smoothing',
 };
 
 function emittedThemeTokens(cssKey: string) {

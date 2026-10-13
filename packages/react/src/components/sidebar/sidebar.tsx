@@ -783,7 +783,7 @@ function SidebarMenuItem({ className, ...props }: SidebarMenuItemProps) {
 
 const sidebarMenuButtonVariants = cva(
   cn(
-    'nx:peer/menu-button nx:flex nx:w-full nx:items-center nx:gap-2 nx:overflow-hidden nx:rounded-md nx:cursor-interactive nx:border-0 nx:bg-transparent nx:p-2 nx:text-left nx:text-nav-muted-foreground nx:no-underline nx:transition-[width,height,padding] nx:duration-fast',
+    'nx:peer/menu-button nx:flex nx:w-full nx:items-center nx:gap-2 nx:overflow-hidden nx:rounded-md nx:border-0 nx:bg-transparent nx:p-2 nx:text-left nx:text-nav-muted-foreground nx:no-underline nx:transition-[width,height,padding] nx:duration-fast',
     'nx:group-has-data-[slot=sidebar-menu-action]/menu-item:pr-8 nx:group-data-[collapsible=icon]:size-8',
     'nx:group-data-[collapsible=icon]:justify-center nx:group-data-[collapsible=icon]:[&>span]:sr-only nx:group-data-[collapsible=icon]:[&>svg:not(:first-child)]:hidden',
     'nx:hover:bg-nav-item-hover nx:active:bg-nav-item-active',

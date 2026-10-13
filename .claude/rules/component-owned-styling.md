@@ -17,6 +17,11 @@ supplies the vocabulary — tokens and utilities — and never targets a compone
 Everything else the theme emits is an `nx:` utility or an `--nx-*` variable.
 That is what lets Nexus sit inside any app without restyling it.
 
+The provider's preference CSS follows the same rule, with one exception: the
+reduce motion, pointer cursor and font smoothing toggles apply to the whole
+page when the user turns them on. They are app-wide settings Nexus offers its
+host.
+
 ## What the Theme Must Not Define
 
 - Selectors that name a component: `[data-slot=…]`, `[data-variant=…]`,
@@ -48,9 +53,9 @@ loads no Preflight, so a missing reset shows in the stories.
 `packages/core/src/lib/generated-css-scope.test.ts` compiles `nexus.css` with
 every `nx:` class the components use, and fails on any rule that selects outside
 `nx:` classes and variable scopes, any global declaration that is not `--nx-*`,
-or an unprefixed keyframe. `selects only :root and Nexus classes, never the host
-page` in `packages/core/src/lib/appearance-model.test.ts` guards the appearance
-preference CSS. Review the rest: reject any `data-slot`, `data-variant` or
+or an unprefixed keyframe. `touches the host page only for the toggles the user
+turns on` in `packages/core/src/lib/appearance-model.test.ts` guards the
+appearance preference CSS. Review the rest: reject any `data-slot`, `data-variant` or
 `class~=` selector in the `packages/core/scripts/` emitters. Separately, `registers every emitted custom utility`
 in `packages/react/src/lib/utils.test.ts` fails when a new `@utility` is not
 registered with `cn()`.

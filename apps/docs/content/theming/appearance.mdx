@@ -162,9 +162,9 @@ The first-paint script writes the derived theme CSS, preference CSS, `.dark`,
 `data-density`, `data-radius`, `data-shadow`, and `data-borderwidth` before the
 first frame.
 
-Preferences apply to Nexus components only. Reduce motion, pointer cursors, font
-smoothing and the font settings reach them through `--nx-*` variables, so the
-rest of the page keeps its own behavior.
+The font family and size preferences apply to Nexus components only. Reduce
+motion, pointer cursors and font smoothing are page-wide: when the user turns
+one on, it applies to the whole app, so the host doesn't have to build its own.
 
 In Next, read `DEFAULT_COOKIE_KEY` on the server and pass
 `cookieStore.get(DEFAULT_COOKIE_KEY)?.value` into

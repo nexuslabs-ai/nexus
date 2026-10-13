@@ -173,7 +173,7 @@ function BubbleContent({
     <Comp
       data-slot="bubble-content"
       className={cn(
-        'nx:m-0 nx:block nx:min-w-0 nx:rounded-[inherit] nx:border-0 nx:bg-transparent nx:px-4 nx:py-3 nx:[font:inherit] nx:text-inherit nx:no-underline nx:text-start nx:wrap-break-word nx:focus-visible:outline-2 nx:focus-visible:outline-focus-default nx:[&:is(button:not(:disabled)):not([aria-disabled=true])]:cursor-interactive nx:[&:is(a[href]),&_:where(a[href])]:underline nx:[&_:where(a[href])]:text-inherit nx:[&:is(a[href]),&_:where(a[href])]:underline-offset-4 nx:[&_:where(pre)]:whitespace-pre-wrap nx:[&_:where(pre)]:wrap-break-word',
+        'nx:m-0 nx:block nx:min-w-0 nx:rounded-[inherit] nx:border-0 nx:bg-transparent nx:px-4 nx:py-3 nx:[font:inherit] nx:text-inherit nx:no-underline nx:text-start nx:wrap-break-word nx:focus-visible:outline-2 nx:focus-visible:outline-focus-default nx:[&:is(a[href],button:not(:disabled)):not([aria-disabled=true])]:cursor-pointer nx:[&:is(a[href]),&_:where(a[href])]:underline nx:[&_:where(a[href])]:text-inherit nx:[&:is(a[href]),&_:where(a[href])]:underline-offset-4 nx:[&_:where(pre)]:whitespace-pre-wrap nx:[&_:where(pre)]:wrap-break-word',
         className
       )}
       {...props}

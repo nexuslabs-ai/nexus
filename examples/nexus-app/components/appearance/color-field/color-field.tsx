@@ -54,7 +54,7 @@ export function NexusAppearanceColorField({
           value={committedHex}
           onChange={(event) => commit(event.target.value)}
           aria-label={label}
-          className="nx:peer nx:absolute nx:inset-0 nx:cursor-interactive nx:opacity-0"
+          className="nx:peer nx:absolute nx:inset-0 nx:cursor-pointer nx:opacity-0"
         />
         <div
           aria-hidden="true"
