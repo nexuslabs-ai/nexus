@@ -9,8 +9,11 @@ import { TooltipProvider } from '../tooltip';
 
 type ToolbarProps = React.ComponentProps<typeof ToolbarPrimitive.Root>;
 
-/** Label the toolbar with aria-label or aria-labelledby. Controls wrap in DOM order. */
-// One tooltip group, so moving across the buttons skips the open delay.
+/**
+ * Label the toolbar with aria-label or aria-labelledby. Controls wrap in DOM
+ * order. Its tooltips form one group, so moving across the buttons skips the
+ * open delay.
+ */
 function Toolbar({ className, ...props }: ToolbarProps) {
   return (
     <TooltipProvider>

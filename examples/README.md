@@ -18,7 +18,7 @@ Each app installs `@nexus_ds/core` from `packages/core` (`file:` with
 `install-links`), so the examples always run this repository's engine.
 
 The examples copy Nexus by hand, as the Install page describes. Delivery through
-a shadcn registry is tracked in #798.
+a shadcn registry, and running these examples in CI, are tracked in #798.
 
 ## Shared scripts
 

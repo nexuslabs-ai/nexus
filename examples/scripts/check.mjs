@@ -2,7 +2,7 @@
 //
 // Copies the app out of the repository twice: as it is, and as it was before
 // Nexus — its Nexus CSS entry emptied and the appearance provider reduced to a
-// pass-through. Builds and serves both, then compares 17 computed styles on
+// pass-through. Builds and serves both, then compares every property in PROPERTIES on
 // <html>, <body> and every element whose nearest [data-check] is "host" and
 // that no Nexus component rendered, page by page. Each [data-check-open] trigger is opened so portalled content
 // is read too.

@@ -20,7 +20,7 @@ That is what lets Nexus sit inside any app without restyling it.
 The provider's preference CSS follows the same rule, with one exception: the
 reduce motion, pointer cursor and font smoothing toggles apply to the whole
 page when the user turns them on. They are app-wide settings Nexus offers its
-host.
+host, and while one is on the host cannot opt a single element out of it.
 
 ## What the Theme Must Not Define
 
