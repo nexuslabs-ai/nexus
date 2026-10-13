@@ -1,3 +1,5 @@
+'use client';
+
 import * as React from 'react';
 
 import { Button } from '../../components/button';
@@ -37,8 +39,8 @@ export function AdvancedFiltering() {
     <div className="nx:grid nx:gap-6">
       <header className="nx:flex nx:flex-wrap nx:items-start nx:justify-between nx:gap-3">
         <div>
-          <h2 className="nx:typography-heading-small">Team members</h2>
-          <p className="nx:mt-1 nx:typography-body-default nx:text-muted-foreground">
+          <h2 className="nx:m-0 nx:typography-heading-small">Team members</h2>
+          <p className="nx:mt-1 nx:mb-0 nx:typography-body-default nx:text-muted-foreground">
             Filter your team by status, team or activity.
           </p>
         </div>
@@ -66,7 +68,7 @@ export function AdvancedFiltering() {
           <div className="nx:flex nx:flex-wrap nx:items-center nx:gap-2">
             <p
               role="status"
-              className="nx:typography-body-small nx:text-muted-foreground"
+              className="nx:m-0 nx:typography-body-small nx:text-muted-foreground"
             >
               {errors.length
                 ? 'Complete every condition to apply'
@@ -94,7 +96,9 @@ export function AdvancedFiltering() {
       </form>
       <section aria-label="Matching members" className="nx:grid nx:gap-3">
         <div className="nx:flex nx:items-center nx:justify-between nx:gap-2">
-          <h3 className="nx:typography-label-default">Matching members</h3>
+          <h3 className="nx:m-0 nx:typography-label-default">
+            Matching members
+          </h3>
           <span
             className="nx:typography-body-small nx:text-muted-foreground"
             aria-live="polite"
@@ -131,8 +135,10 @@ export function AdvancedFiltering() {
           </Table>
           {!results.length && (
             <div className="nx:p-6 nx:text-center">
-              <p className="nx:typography-label-default">No matching members</p>
-              <p className="nx:mt-1 nx:typography-body-small nx:text-muted-foreground">
+              <p className="nx:m-0 nx:typography-label-default">
+                No matching members
+              </p>
+              <p className="nx:mt-1 nx:mb-0 nx:typography-body-small nx:text-muted-foreground">
                 Change a condition or clear the filters to broaden your results.
               </p>
             </div>
@@ -143,7 +149,7 @@ export function AdvancedFiltering() {
         <summary className="nx:cursor-pointer">
           View applied filter data
         </summary>
-        <pre className="nx:mt-2 nx:max-h-64 nx:overflow-auto nx:rounded-md nx:bg-muted nx:p-3">
+        <pre className="nx:mt-2 nx:mb-0 nx:max-h-64 nx:overflow-auto nx:rounded-md nx:bg-muted nx:p-3">
           {JSON.stringify(applied, null, 2)}
         </pre>
       </details>

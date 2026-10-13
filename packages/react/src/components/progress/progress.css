@@ -2,10 +2,10 @@
  * tw-animate-css registers its own (@theme inline so the named utility compiles
  * without emitting a :root var). Imported by src/index.css. */
 @theme inline {
-  --animate-progress-indeterminate: progress-indeterminate 1.5s ease-in-out
+  --animate-progress-indeterminate: nx-progress-indeterminate 1.5s ease-in-out
     infinite;
 
-  @keyframes progress-indeterminate {
+  @keyframes nx-progress-indeterminate {
     from {
       transform: translateX(-100%);
     }

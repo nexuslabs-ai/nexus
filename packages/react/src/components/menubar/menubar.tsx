@@ -104,7 +104,7 @@ function MenubarTrigger({ className, ...props }: MenubarTriggerProps) {
     <MenubarPrimitive.Trigger
       data-slot="menubar-trigger"
       className={cn(
-        'nx:flex nx:select-none nx:items-center nx:rounded-sm nx:px-2 nx:py-1',
+        'nx:flex nx:select-none nx:items-center nx:rounded-sm nx:border-0 nx:bg-transparent nx:px-2 nx:py-1 nx:text-inherit',
         'nx:typography-label-default nx:outline-none',
         'nx:focus:bg-container-hover nx:focus:text-foreground',
         'nx:data-[state=open]:bg-container-hover nx:data-[state=open]:text-foreground',

@@ -1,3 +1,5 @@
+'use client';
+
 import * as React from 'react';
 
 import {
@@ -238,7 +240,7 @@ function MultipleValues({
             </ChoiceRow>
           ))}
           {!options.length && (
-            <p className="nx:p-2 nx:typography-body-small nx:text-muted-foreground">
+            <p className="nx:m-0 nx:p-2 nx:typography-body-small nx:text-muted-foreground">
               No options found.
             </p>
           )}
@@ -447,7 +449,7 @@ function FilterRuleEditor({
       {error && (
         <p
           id={errorId}
-          className="nx:mt-1 nx:typography-body-small nx:text-error-subtle-foreground"
+          className="nx:mt-1 nx:mb-0 nx:typography-body-small nx:text-error-subtle-foreground"
         >
           {error}
         </p>
@@ -632,7 +634,7 @@ function GroupEditor({
           </div>
         ))}
         {!value.children.length && (
-          <p className="nx:py-2 nx:typography-body-small nx:text-muted-foreground">
+          <p className="nx:m-0 nx:py-2 nx:typography-body-small nx:text-muted-foreground">
             {depth === 0
               ? 'No conditions. All results are included.'
               : 'Add a condition to this group.'}
@@ -640,7 +642,7 @@ function GroupEditor({
         )}
       </div>
       {groupError && (
-        <p className="nx:mt-2 nx:typography-body-small nx:text-error-subtle-foreground">
+        <p className="nx:mt-2 nx:mb-0 nx:typography-body-small nx:text-error-subtle-foreground">
           {errorMessage(groupError, maxDepth)}
         </p>
       )}

@@ -1,3 +1,5 @@
+'use client';
+
 import * as React from 'react';
 
 import * as TabsPrimitive from '@radix-ui/react-tabs';
@@ -199,7 +201,7 @@ const tabsTriggerVariants = cva(
   // Base classes
   [
     'nx:relative nx:z-1 nx:inline-flex nx:items-center nx:justify-center',
-    'nx:whitespace-nowrap',
+    'nx:whitespace-nowrap nx:bg-transparent',
     'nx:text-muted-foreground',
     'nx:transition-control',
     'nx:focus-visible:outline-2 nx:focus-visible:outline-focus-default',
@@ -218,7 +220,7 @@ const tabsTriggerVariants = cva(
           'nx:data-[state=active]:text-foreground',
         ],
         underline: [
-          'nx:rounded-none nx:border-b-thick nx:border-transparent',
+          'nx:rounded-none nx:border-0 nx:border-b-thick nx:border-transparent',
           'nx:bg-transparent',
           'nx:data-[state=active]:text-foreground',
         ],

@@ -1,6 +1,16 @@
+'use client';
+
 import * as React from 'react';
 
-import { toast, Toaster as Sonner, type ToasterProps, useSonner } from 'sonner';
+import {
+  type ExternalToast,
+  toast as sonnerToast,
+  Toaster as Sonner,
+  type ToasterProps as SonnerToasterProps,
+  type ToastT,
+  type ToastToDismiss,
+  useSonner,
+} from 'sonner';
 
 import {
   IconAlertCircle,
@@ -69,6 +79,64 @@ const toasterThemeVars = {
   '--error-border': 'var(--nx-color-error-border)',
 };
 
+// Nexus toasts render only in the Nexus Toaster, and a host app's own sonner
+// Toaster never shows them, so mounting both never doubles a toast.
+const NEXUS_TOASTER_ID = 'nexus';
+
+function inNexusToaster<Data extends object>(data?: Data) {
+  return { ...data, toasterId: NEXUS_TOASTER_ID };
+}
+
+function isNexusToast(entry: ToastT | ToastToDismiss): entry is ToastT {
+  return 'toasterId' in entry && entry.toasterId === NEXUS_TOASTER_ID;
+}
+
+type Message = Parameters<typeof sonnerToast.success>[0];
+
+const toast = Object.assign(
+  (message: Parameters<typeof sonnerToast>[0], data?: ExternalToast) =>
+    sonnerToast(message, inNexusToaster(data)),
+  {
+    success: (message: Message, data?: ExternalToast) =>
+      sonnerToast.success(message, inNexusToaster(data)),
+    info: (message: Message, data?: ExternalToast) =>
+      sonnerToast.info(message, inNexusToaster(data)),
+    warning: (message: Message, data?: ExternalToast) =>
+      sonnerToast.warning(message, inNexusToaster(data)),
+    error: (message: Message, data?: ExternalToast) =>
+      sonnerToast.error(message, inNexusToaster(data)),
+    message: (message: Message, data?: ExternalToast) =>
+      sonnerToast.message(message, inNexusToaster(data)),
+    loading: (message: Message, data?: ExternalToast) =>
+      sonnerToast.loading(message, inNexusToaster(data)),
+    custom: (
+      jsx: Parameters<typeof sonnerToast.custom>[0],
+      data?: ExternalToast
+    ) => sonnerToast.custom(jsx, inNexusToaster(data)),
+    promise: <ToastData,>(
+      promise: Parameters<typeof sonnerToast.promise<ToastData>>[0],
+      data?: Parameters<typeof sonnerToast.promise<ToastData>>[1]
+    ) => sonnerToast.promise(promise, data && inNexusToaster(data)),
+    // Without an id, dismisses every Nexus toast and leaves the host's alone.
+    dismiss: (id?: number | string) => {
+      if (id !== undefined) return sonnerToast.dismiss(id);
+      for (const entry of sonnerToast.getToasts().filter(isNexusToast)) {
+        sonnerToast.dismiss(entry.id);
+      }
+    },
+    getHistory: () => sonnerToast.getHistory().filter(isNexusToast),
+    getToasts: () => sonnerToast.getToasts().filter(isNexusToast),
+  }
+);
+
+/** The Nexus toasts currently on screen. */
+function useNexusToasts() {
+  const { toasts } = useSonner();
+  return { toasts: toasts.filter(isNexusToast) };
+}
+
+type ToasterProps = Omit<SonnerToasterProps, 'id'>;
+
 /**
  * Toaster
  *
@@ -109,10 +177,11 @@ function Toaster({ style, ...props }: ToasterProps) {
           } as React.CSSProperties
         }
         {...props}
+        id={NEXUS_TOASTER_ID}
       />
     </div>
   );
 }
 
-export { toast, Toaster, useSonner };
+export { toast, Toaster, useNexusToasts as useSonner };
 export type { ToasterProps };

@@ -151,7 +151,7 @@ function CommandInput({ className, ...props }: CommandInputProps) {
       <CommandPrimitive.Input
         data-slot="command-input"
         className={cn(
-          'nx:flex nx:w-full nx:bg-transparent nx:py-2 nx:typography-body-default nx:outline-none',
+          'nx:flex nx:w-full nx:border-0 nx:bg-transparent nx:px-0 nx:py-2 nx:text-inherit nx:typography-body-default nx:outline-none',
           'nx:placeholder:text-muted-foreground',
           'nx:disabled:cursor-not-allowed nx:disabled:text-disabled-foreground nx:disabled:placeholder:text-disabled-foreground',
           className

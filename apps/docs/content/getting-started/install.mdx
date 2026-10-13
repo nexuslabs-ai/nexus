@@ -10,8 +10,7 @@ came from. Set those up once, in this order, and everything you paste afterwards
 works:
 
 1. **Tailwind 4** — the setup the `nx:` prefix depends on.
-2. **The token CSS layer** — the tokens and utilities, plus the native
-   color-scheme policy.
+2. **The token CSS layer** — the tokens and the `nx:` utilities.
 3. **The appearance provider** — what themes the components and paints before
    hydration.
 4. **The `cn` helper** — the module every copied component imports.
@@ -52,16 +51,14 @@ export default {
 };
 ```
 
-Do not add an `@import "tailwindcss"` of your own — including the one a
-`create-next-app` scaffold leaves at the top of `globals.css`. The Nexus token
-CSS imports Tailwind itself, as `@import 'tailwindcss' prefix(nx)`, and that
-prefix is where `nx:bg-primary-background` comes from. `prefix()` is a property
-of the build, not of one import, so a second unprefixed import does not buy you
-a second, unprefixed utility layer: everything stays `nx:`. It emits preflight
-twice wherever you put it. Put it _after_ the Nexus import and it also
-re-injects Tailwind's default `@theme` on top of Nexus's resets, so
-{/* audit-class-refs-ignore-next-line */}
-`nx:bg-red-500` and a stock `nx:text-lg` come back alongside the tokens.
+The Nexus token CSS brings Tailwind's theme and utilities itself, prefixed as
+`nx:`. That prefix is where `nx:bg-primary-background` comes from.
+
+Don't add a full `@import "tailwindcss"` to the same file, including the one a
+`create-next-app` scaffold leaves in `globals.css`. `prefix()` applies to the
+whole build, so your own utilities would become `nx:` too. To keep unprefixed
+Tailwind beside Nexus, follow
+[Add Nexus to an existing app](#add-nexus-to-an-existing-app).
 
 Tailwind finds class names by scanning your project, so a pasted component's
 utilities are generated with no `@source` line: the file sits in your source
@@ -74,7 +71,7 @@ Copy the token CSS into your app. Seven files, one entry point:
 
 ```
 styles/nexus/
-├── nexus.css                 # entry — imports Tailwind with prefix(nx), then the six below
+├── nexus.css                 # entry — Tailwind's theme and utilities with prefix(nx), then the six below
 ├── variables.css             # the --nx-* values, and their .dark overrides
 ├── typography-utilities.css
 ├── borderwidth-utilities.css
@@ -83,8 +80,9 @@ styles/nexus/
 └── spacing-utilities.css
 ```
 
-Import the entry point from your app's CSS entry point, followed by the
-animation utilities some components use for their enter and exit states:
+Import the entry point from your app's CSS entry point, after a page reset and
+before the animation utilities some components use for their enter and exit
+states:
 
 ```bash
 npm install tw-animate-css
@@ -92,9 +90,14 @@ npm install tw-animate-css
 
 ```css
 /* app/globals.css */
+@layer theme, base, components, utilities;
+@import 'tailwindcss/preflight.css' layer(base);
 @import '../styles/nexus/nexus.css';
 @import 'tw-animate-css';
 ```
+
+Nexus ships no reset, so the page brings Tailwind's Preflight. Nexus components
+need a reset that sets `box-sizing: border-box`, and Preflight does.
 
 `nexus.css` is the whole token surface: the `nx:` utilities, the semantic color
 tokens, and the typography, spacing, radius, and motion scales.
@@ -110,25 +113,12 @@ To add project tokens, put your own `@theme` block in `globals.css` after the
 import — `nexus.css` is generated output stamped `DO NOT EDIT`, and pasting a
 newer copy over it would drop anything you added there.
 
-This assumes a greenfield app. Adding Nexus to one that already has unprefixed
-Tailwind utilities needs a separate nx entry point rather than a single shared
-one; that setup is being designed in
-[#604](https://github.com/nexuslabs-ai/nexus/issues/604).
+This assumes a new app. For one that already has a UI, follow
+[Add Nexus to an existing app](#add-nexus-to-an-existing-app).
 
-Then declare the native color scheme, so the browser themes scrollbars, form
-controls, and the page canvas before any JavaScript runs:
-
-```tsx
-// app/layout.tsx — step 3 fills the rest of this file in
-import type { Viewport } from 'next';
-
-export const viewport: Viewport = { colorScheme: 'light dark' };
-```
-
-Next renders that as `<meta name="color-scheme" content="light dark" />`; outside
-Next, write the tag itself. `nexus.css` emits the matching CSS policy — `:root`
-advertises both schemes, `:root:not(.dark)` pins light, and `.dark` pins dark —
-so native UI follows the app's theme instead of the operating system's.
+Nexus sets `color-scheme: dark` under `.dark`, so scrollbars and form controls
+follow the provider's mode. Don't add a `color-scheme` meta tag. A `light dark`
+meta lets the operating system darken a light page.
 
 ## Step 3: The appearance provider
 
@@ -155,21 +145,16 @@ components/appearance/provider/
 └── server.ts     # server-safe — NexusAppearanceScript
 ```
 
-Then wire the script and the provider in the root layout — the same
-`app/layout.tsx` from step 2, now complete. Its `viewport` export is the one you
-already added, not a second one:
+Then wire the script and the provider in the root layout:
 
 ```tsx
 // app/layout.tsx — complete
 import { DEFAULT_NEXUS_APPEARANCE } from '@nexus_ds/core';
-import type { Viewport } from 'next';
 
 import { NexusAppearanceProvider } from '@/components/appearance/provider';
 import { NexusAppearanceScript } from '@/components/appearance/provider/server';
 
 import './globals.css';
-
-export const viewport: Viewport = { colorScheme: 'light dark' };
 
 export default function RootLayout({
   children,
@@ -184,7 +169,7 @@ export default function RootLayout({
           defaultState={DEFAULT_NEXUS_APPEARANCE}
         />
       </head>
-      <body className="nx:bg-background nx:text-foreground">
+      <body className="nx:bg-background nx:text-foreground nx:typography-body-default">
         <NexusAppearanceProvider
           storageKey="app-appearance"
           defaultState={DEFAULT_NEXUS_APPEARANCE}
@@ -196,6 +181,9 @@ export default function RootLayout({
   );
 }
 ```
+
+`nx:typography-body-default` on `<body>` gives page text the Nexus font and size,
+and it follows the appearance settings.
 
 Both need the same `storageKey`: the provider persists the user's choice there,
 and the script restores it on the next load. Change what the app opens with by
@@ -268,6 +256,70 @@ than `state.mode`, so it does the right thing from a `'system'` start.
 Unstyled buttons mean the token import from step 2 never reached the page.
 Styled buttons that stay light when you toggle mean the provider from step 3 is
 not wrapping them.
+
+## Add Nexus to an existing app
+
+Nexus emits only `nx:` utilities and `--nx-*` variables, so it leaves your app's
+own styles alone. There are three exceptions:
+
+- `.dark { color-scheme: dark }`. Nexus shares the `.dark` class with your app,
+  so in dark mode your scrollbars and form controls render dark too.
+- `tw-animate-css` adds global `enter`, `exit`, `accordion-*`, `collapsible-*`
+  and `caret-blink` keyframes and `--tw-*` properties, the same ones a shadcn
+  app already has.
+- Tailwind's own output for Nexus's utilities: its `spin`, `ping`, `pulse` and
+  `bounce` keyframes, and its `--tw-*` property registrations with their
+  `*, ::before, ::after, ::backdrop` defaults. Any Tailwind 4 app has the same.
+
+Four things differ from a new app.
+
+1. **Copy Nexus into its own folder**, such as `components/nexus/`. Your app
+   likely has a `lib/utils.ts` already, and Nexus's would replace it. The
+   relative imports between Nexus files still resolve.
+2. **Give Nexus its own CSS entry**, imported after your own stylesheet:
+
+   ```css
+   /* app/nexus.css */
+   @import '../components/nexus/tailwind/nexus.css';
+   @import 'tw-animate-css';
+   ```
+
+   Your `globals.css` keeps its `@import "tailwindcss"`. Two files make two
+   builds, one prefixed and one not.
+
+3. **Keep your app's reset.** Nexus needs `box-sizing: border-box`, which
+   Tailwind's Preflight, MUI's `CssBaseline` and Bootstrap's Reboot all set. If
+   your app has no Tailwind, install it for the Nexus entry.
+4. **Add the provider and the script**, as in step 3. Nexus and your theme
+   share the `.dark` class on `<html>`.
+
+On a Nexus component, write `nx:` classes. An unprefixed class sets the same
+property as the component's own `nx:` class, and Nexus's stylesheet loads later,
+so the component's class wins.
+
+Your own content placed inside a Nexus component inherits that component's text
+colour, font and line height, as it would inside any other element.
+
+If your design system is a package, ship the Nexus CSS entry from it and end the
+entry with `@source './';`. Tailwind skips `node_modules`, so without that line
+the package's classes are never generated.
+
+Nexus overlays sit on three layers:
+
+| Variable               | Default | Used by                         |
+| ---------------------- | ------- | ------------------------------- |
+| `--nx-z-index-modal`   | 50      | Dialog, Sheet, Drawer           |
+| `--nx-z-index-popover` | 70      | Popover, Select, menus, Tooltip |
+| `--nx-z-index-toast`   | 100     | Toaster                         |
+
+If your app's own layers sit higher, such as MUI's dialogs at 1300, raise them
+on `:root`.
+
+A Nexus dialog blocks pointer events outside itself while it is open. Render
+another library's popups inside it, such as an MUI `Menu` with `disablePortal`.
+
+The [examples](https://github.com/nexuslabs-ai/nexus/tree/main/examples) show a
+shadcn app, an MUI app, and a company package, each with Nexus added.
 
 ## Lint guardrails
 

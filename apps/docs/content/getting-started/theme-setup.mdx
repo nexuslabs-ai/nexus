@@ -53,7 +53,6 @@ import {
   createNexusAppearanceSnapshotFromCookie,
   DEFAULT_COOKIE_KEY,
 } from '@nexus_ds/core';
-import type { Viewport } from 'next';
 import { cookies } from 'next/headers';
 
 import { NexusAppearanceProvider } from '@/components/appearance/provider';
@@ -62,8 +61,6 @@ import { NexusAppearanceScript } from '@/components/appearance/provider/server';
 import { defaultAppearance } from './appearance-state';
 
 import './globals.css';
-
-export const viewport: Viewport = { colorScheme: 'light dark' };
 
 export default async function RootLayout({
   children,
@@ -84,7 +81,7 @@ export default async function RootLayout({
           defaultState={snapshot.state}
         />
       </head>
-      <body className="nx:bg-background nx:text-foreground">
+      <body className="nx:bg-background nx:text-foreground nx:typography-body-default">
         <NexusAppearanceProvider
           storageKey="app-appearance"
           cookieWriteKey={DEFAULT_COOKIE_KEY}

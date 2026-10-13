@@ -1,3 +1,5 @@
+'use client';
+
 import * as React from 'react';
 
 import { IconList, IconUsers } from '@tabler/icons-react';
@@ -59,8 +61,8 @@ export function TeamDirectory({
     >
       <div className="nx:flex nx:flex-wrap nx:items-end nx:justify-between nx:gap-4">
         <div>
-          <h2 className="nx:typography-heading-small">Team members</h2>
-          <p className="nx:typography-body-default nx:text-muted-foreground">
+          <h2 className="nx:m-0 nx:typography-heading-small">Team members</h2>
+          <p className="nx:m-0 nx:typography-body-default nx:text-muted-foreground">
             Find people across your teams.
           </p>
         </div>
@@ -143,7 +145,7 @@ export function TeamDirectory({
                     </span>
                     <div>
                       <span>{member.name}</span>
-                      <p className="nx:typography-body-small nx:text-muted-foreground nx:@lg/members:hidden">
+                      <p className="nx:m-0 nx:typography-body-small nx:text-muted-foreground nx:@lg/members:hidden">
                         {member.team}
                       </p>
                     </div>
@@ -174,8 +176,8 @@ export function TeamDirectory({
         </Table>
         {!results.length && (
           <div className="nx:grid nx:justify-items-center nx:gap-2 nx:px-4 nx:py-10 nx:text-center">
-            <h3 className="nx:typography-label-default">No matches</h3>
-            <p className="nx:typography-body-default nx:text-muted-foreground">
+            <h3 className="nx:m-0 nx:typography-label-default">No matches</h3>
+            <p className="nx:m-0 nx:typography-body-default nx:text-muted-foreground">
               Try another name or remove a filter.
             </p>
             <Button

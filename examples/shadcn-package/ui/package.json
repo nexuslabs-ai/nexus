@@ -1,0 +1,68 @@
+{
+  "name": "@acme/ui",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "Acme's design-system package: its shadcn kit, plus Nexus copied in",
+  "files": [
+    "dist"
+  ],
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js"
+    },
+    "./nexus": {
+      "types": "./dist/nexus.d.ts",
+      "import": "./dist/nexus.js"
+    },
+    "./styles.css": "./dist/styles.css",
+    "./nexus.css": "./dist/nexus.css"
+  },
+  "scripts": {
+    "build": "node build.mjs",
+    "nexus:add": "node ../../scripts/sync-nexus.mjs",
+    "typecheck": "tsc -p tsconfig.build.json --noEmit"
+  },
+  "peerDependencies": {
+    "@nexus_ds/core": "*",
+    "react": "^19",
+    "react-dom": "^19",
+    "tailwindcss": "^4"
+  },
+  "devDependencies": {
+    "@nexus_ds/core": "file:../../../packages/core",
+    "@types/react": "^19.2.18",
+    "@types/react-dom": "^19.2.7",
+    "react": "^19.2.8",
+    "react-dom": "^19.2.8",
+    "typescript": "~6.0.2"
+  },
+  "dependencies": {
+    "@radix-ui/react-avatar": "^1.3.0",
+    "@radix-ui/react-checkbox": "^1.4.0",
+    "@radix-ui/react-dialog": "^1.3.0",
+    "@radix-ui/react-dropdown-menu": "^2.2.0",
+    "@radix-ui/react-label": "^2.1.17",
+    "@radix-ui/react-popover": "^1.3.0",
+    "@radix-ui/react-progress": "^1.2.0",
+    "@radix-ui/react-radio-group": "^1.5.0",
+    "@radix-ui/react-select": "^2.4.0",
+    "@radix-ui/react-separator": "^1.2.0",
+    "@radix-ui/react-slot": "^1.5.0",
+    "@radix-ui/react-switch": "^1.4.0",
+    "@radix-ui/react-tabs": "^1.2.0",
+    "@radix-ui/react-tooltip": "^1.4.0",
+    "@tabler/icons-react": "^3.49.0",
+    "class-variance-authority": "^0.7.1",
+    "clsx": "^2.1.1",
+    "cn": "^0.4.0",
+    "lucide-react": "^1.55.0",
+    "next-themes": "^0.4.6",
+    "radix-ui": "^1.8.0",
+    "shadcn": "^4.21.4",
+    "sonner": "^2.0.8",
+    "tailwind-merge": "^3.7.0",
+    "tw-animate-css": "^1.4.0"
+  }
+}

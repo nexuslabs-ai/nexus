@@ -24,7 +24,7 @@ export function Results({
   return (
     <p
       role="status"
-      className="nx:typography-body-small nx:text-muted-foreground"
+      className="nx:m-0 nx:typography-body-small nx:text-muted-foreground"
     >
       {count} of {total} {noun}
     </p>

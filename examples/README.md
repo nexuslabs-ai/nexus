@@ -1,136 +1,63 @@
-# examples — consuming a Nexus-exported design system
+# examples
 
-A **live integration bed** for the external-consumer story: it publishes an
-exported design system to a local registry and consumes it from a stock
-Next.js 15 + Tailwind 4 app. It's the thing `apps/docs` (all-in on Nexus via
-workspace links) can't prove, and it's the reference for **how a real downstream
-app adopts the design system incrementally**.
+Real apps that adopt Nexus the copy-and-own way: each one copies Nexus source
+from this repository and compiles it with its own Tailwind. Together they cover
+the ways a frontend team meets Nexus.
 
-> Not part of the pnpm workspace; excluded from the monorepo's turbo / eslint /
-> prettier. Each folder is a self-contained downstream repo.
+> Not part of the pnpm workspace, and excluded from the monorepo's turbo,
+> ESLint and Prettier. Each app installs with npm and commits its lockfile.
 
-## Layout
+| Example | The team | Where Nexus lives |
+| ------- | -------- | ----------------- |
+| [`nexus-app`](nexus-app) | Starts a new Next.js app on Nexus | The app |
+| [`shadcn-app`](shadcn-app) | Has a Next.js app built with shadcn/ui | The app, beside `components/ui` |
+| [`shadcn-package`](shadcn-package) | Has its own shadcn-based design-system package | The package (`app-via-package`), or the app beside the package (`app-direct`) |
+| [`mui-app`](mui-app) | Has a Vite app built with Material UI and no Tailwind | The app |
 
-| Path | What it is |
-| ---- | ---------- |
-| `verdaccio.yaml` | Local npm registry — proxies real npm, hosts the exported `@acme/*` packages. |
-| `scripts/setup.mjs` | Orchestrates: Verdaccio → `pnpm export` → publish `@acme/*` → `npm install` the app → generate the IntelliSense file. |
-| `nextjs-consumer/` | Stock Next.js 15 (App Router) + Tailwind 4 app consuming `@acme/react`. |
-| `.generated/` | The exported `@acme` design system (gitignored — regenerated each run). |
+Each app installs `@nexus_ds/core` from `packages/core` (`file:` with
+`install-links`), so the examples always run this repository's engine.
 
-## Run it
+The examples copy Nexus by hand, as the Install page describes. Delivery through
+a shadcn registry, and running these examples in CI, are tracked in #798.
+
+## Shared scripts
+
+| Script | What it does |
+| ------ | ------------ |
+| `scripts/sync-nexus.mjs` | Copies Nexus into an app as the Install page describes, then rebuilds and reinstalls `packages/core`. Each app runs it as `npm run nexus:add`, driven by its `nexus.json` |
+| `scripts/check.mjs` | Builds an app with and without Nexus and lists every host style that adding Nexus changed |
+
+After changing Nexus components, tokens or the engine, run `npm run nexus:add`
+in each app. `git diff` then shows exactly what changes for a consumer.
 
 ```bash
-node examples/scripts/setup.mjs
-cd examples/nextjs-consumer && npm run dev   # → http://localhost:3000
+node examples/scripts/check.mjs examples/shadcn-app
 ```
 
-`setup.mjs` starts Verdaccio, exports the design system into `.generated/`,
-publishes `@acme/tailwind` then `@acme/react` (order matters — react depends on
-tailwind), installs the app against the local registry, and generates the editor
-IntelliSense file. After that the app runs offline.
+## What they show
 
-## The three ways to consume it
+Adding Nexus changes **0** of the host app's own styles in every coexistence
+example. Nexus emits only `nx:` utilities and `--nx-*` variables, and each
+component resets the browser defaults it relies on.
 
-The app's five feature screens use **mode 1**; two extra screens demonstrate
-**modes 2 and 3**.
+| App | Host changes |
+| --- | ----------------------- |
+| `shadcn-app` | 0 |
+| `mui-app` | 0 |
+| `shadcn-package/app-via-package` | 0 |
+| `shadcn-package/app-direct` | 0 |
 
-### 1. Components (the 90% case) — `Dashboard`, `Components`, `Data`, `Forms`, `Appearance`
+The appearance provider's reduce motion, pointer cursor and font smoothing
+toggles are off by default. When a user turns one on, it applies to the whole
+page, host included.
 
-Import components from `@acme/react`, their precompiled styles, and wrap the app
-in the appearance provider. **Your own Tailwind is never touched.**
+The apps also show the integration points a team has to wire:
 
-```tsx
-// app/layout.tsx
-import './globals.css';            // your own Tailwind
-import '@acme/react/styles.css';   // precompiled nx: component CSS (side-effect import)
-
-import { NexusAppearanceScript } from '@acme/react/appearance/server'; // no-FOUC first paint
-// providers.tsx: 'use client' → <NexusAppearanceProvider> injects the --nx-* tokens
-```
-
-Components are precompiled and namespaced under `nx:` with `--nx-*` variables, so
-they never collide with your utilities. Tokens come from the provider at runtime
-(the server `<NexusAppearanceScript>` sets them before first paint), so you never
-run `@acme/tailwind`'s `@theme` through your own build.
-
-### 2. Author `nx:` utilities yourself (`Incremental`)
-
-Load the design system's `nx:` theme as a **separate Tailwind entry** so you can
-write `nx:bg-primary-background` in your own markup alongside `bg-slate-100`:
-
-```tsx
-// app/layout.tsx
-import './globals.css';   // your own Tailwind (unprefixed)
-import './nexus.css';     // the DS nx: theme — a SEPARATE compilation
-```
-```css
-/* app/nexus.css */
-@import '@acme/tailwind';
-```
-
-**Why separate?** Tailwind v4's prefix is global _per compilation_. Putting
-`@import '@acme/tailwind'` (which is `@import 'tailwindcss' prefix(nx)`) into
-`globals.css` alongside your own `@import 'tailwindcss'` flips the whole build to
-the `nx` prefix and kills your `bg-slate-*`. As its **own** CSS entry it's an
-independent compilation, so both sets generate. See the `Incremental` screen for
-the full coexistence lab.
-
-### 3. Raw Tailwind, no design system (`Raw Tailwind`)
-
-Plain app markup, the app's own Tailwind only, zero `@acme/react`. Proves the app
-Tailwind works fully and independently (this screen's First Load JS is ~220 kB
-lighter than the `@acme` screens — that gap _is_ the design system).
-
-## Editor autocomplete (`nx:` IntelliSense)
-
-The runtime uses two separate Tailwind entries (mode 2), but the Tailwind
-IntelliSense extension builds completions from **one design system per file** and
-can't merge two entries ([tailwindcss-intellisense#665]) — and two prefixes
-collapse to one, so a combined `@import` loses your `bg-slate-*`.
-
-The fix is editor-only: `scripts/gen-intellisense-css.mjs` generates
-`tailwind.intellisense.css` — a single combined design system (app default
-Tailwind + a **no-op `nx` variant** + the DS tokens/utilities) that is **never
-imported at runtime**. `.vscode/settings.json` points IntelliSense at it:
-
-```jsonc
-{ "tailwindCSS.experimental.configFile": { "tailwind.intellisense.css": "app/**" } }
-```
-
-Open `examples/nextjs-consumer` **as the workspace root** (a consumer opens their
-own repo), reload, and both `bg-slate-*` and the full `nx:` vocabulary
-autocomplete. Requires Tailwind CSS IntelliSense ≥ v0.14.3. The file is generated
-+ gitignored (`setup.mjs` regenerates it), so it stays in sync with the tokens.
-
-[tailwindcss-intellisense#665]: https://github.com/tailwindlabs/tailwindcss-intellisense/issues/665
-
-## Coexistence rules & gotchas
-
-- **Namespace isolation.** `nx:*` classes and `--nx-*` variables never collide
-  with your own `bg-slate-*` / `--color-*`. This is what makes adoption
-  incremental.
-- **⚠️ Same property, one element.** `bg-slate-200 nx:bg-primary-background` on one
-  node both set `background-color` — the winner is CSS **source order** (which
-  stylesheet loads last), _not_ the className order. Rule: don't set the same
-  property from both namespaces on one element; pick one.
-- **Shared-name scales.** `rounded-lg`/`shadow-lg` (yours) and
-  `nx:rounded-lg`/`nx:shadow-lg` (DS) are different classes and can render
-  differently — that's fine at runtime, but it's why the single-build "preset"
-  approach was rejected (it produced conflicting duplicate rules).
-- **Dark mode.** The DS toggles dark via the `.dark` class; your app's default
-  `dark:` uses the OS setting unless you point your dark variant at `.dark` too.
-  Align them to share one switch.
-- **Optional peers.** Components with heavy optional peers (Chart→`recharts`,
-  Drawer→`vaul`, Carousel→`embla-carousel-react`, DatePicker→`react-day-picker`,
-  Resizable→`react-resizable-panels`) aren't installed here; add the peer if you
-  use those components. Everything else works out of the box.
-- **Badge variants.** Badge uses status variants (`success`/`warning`/`error`),
-  not Button's `outline`/`destructive` — a real API divergence.
-
-## Publishing the exported design system
-
-The generated `.generated/acme-design-system` is itself a publishable monorepo;
-its own `README.md` documents the `pnpm --filter @acme/tailwind publish` →
-`@acme/react publish` order. This bed publishes it to Verdaccio instead of real
-npm via `setup.mjs`.
+| Point | Where |
+| ----- | ----- |
+| One theme switch sets both systems, since they share the `.dark` class | Every coexistence app's header |
+| Each Toaster shows only its own system's toasts | `/overlays` |
+| Nexus overlay layers raised above MUI's | `mui-app/src/nexus.css` |
+| MUI popups inside a Nexus dialog render in place (`disablePortal`) | `mui-app` `/overlays` |
+| A package ships its Tailwind entries with `@source './'` | `shadcn-package/ui` |
+| `nx:` classes on Nexus components | Every page |

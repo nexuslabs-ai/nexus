@@ -38,7 +38,7 @@ describe('appearance model', () => {
         codeFontSize: 12,
         reduceMotion: false,
         pointerCursors: false,
-        fontSmoothing: true,
+        fontSmoothing: false,
       },
     });
   });
@@ -404,7 +404,7 @@ describe('appearancePrefsToCss', () => {
     expect(nonPx).toEqual([]);
   });
 
-  it('emits font variables, clamped root size, code size, and smoothing', () => {
+  it('emits font variables, a clamped type scale, and code size', () => {
     const css = appearancePrefsToCss({
       ...prefs,
       uiFont: 'Inter',
@@ -415,14 +415,28 @@ describe('appearancePrefsToCss', () => {
 
     expect(css).toContain('--nx-typography-family-font-sans: Inter;');
     expect(css).toContain('--nx-typography-family-font-mono: JetBrains Mono;');
-    expect(css).toContain('font-size: 32px;');
     expect(css).toContain('--nx-typography-size-sm: 32px;');
     expect(css).toContain('--nx-typography-line-height-xxs: 27.4286px;');
     expect(css).toContain('--nx-typography-line-height-sm: 45.7143px;');
     expect(css).toContain(
-      'code, pre, .nx\\:font-mono, .nx\\:typography-code-block, .nx\\:typography-code-inline { font-size: 12px; }'
+      '.nx\\:font-mono, .nx\\:typography-code-block, .nx\\:typography-code-inline { font-size: 12px; }'
     );
-    expect(css).toContain('-webkit-font-smoothing: antialiased');
+  });
+
+  it('leaves the page font size alone', () => {
+    const rootBlock = appearancePrefsToCss(prefs).match(/:root \{[^}]*\}/)?.[0];
+    expect(rootBlock).toBeDefined();
+    expect(rootBlock).not.toMatch(/^\s*font-size:/m);
+  });
+
+  it('touches the host page only for the toggles the user turns on', () => {
+    const css = appearancePrefsToCss(DEFAULT_NEXUS_APPEARANCE.prefs);
+    const selectors = [...css.matchAll(/([^{}]+)\{/g)].flatMap(
+      ([, list = '']) => list.split(',').map((selector) => selector.trim())
+    );
+    for (const selector of selectors) {
+      expect(selector, selector).toMatch(/^(:root|\.nx\\:)/);
+    }
   });
 
   it('pairs -moz-osx-font-smoothing with the -webkit property', () => {
@@ -437,8 +451,7 @@ describe('appearancePrefsToCss', () => {
       ...prefs,
       fontSmoothing: false,
     });
-    expect(off).toContain('-webkit-font-smoothing: auto');
-    expect(off).toContain('-moz-osx-font-smoothing: auto');
+    expect(off).not.toContain('font-smoothing');
   });
 
   it('keeps default runtime typography variables in parity with generated tokens', () => {

@@ -19,13 +19,6 @@ import {
 const meta: Meta<typeof Tooltip> = {
   title: 'Components/Tooltip',
   component: Tooltip,
-  decorators: [
-    (Story) => (
-      <TooltipProvider>
-        <Story />
-      </TooltipProvider>
-    ),
-  ],
   parameters: {
     layout: 'padded',
   },
@@ -200,6 +193,48 @@ export const HoverInteraction: Story = {
 
     // Tooltip should disappear
     await expectExitBeforeUnmount(tooltip);
+  },
+};
+
+// A standalone Tooltip waits Radix's default 700ms. Opening within 300ms proves
+// each Tooltip joined the provider's group and took its delay.
+export const GroupedInProvider: Story = {
+  render: (_args) => (
+    <TooltipProvider delayDuration={0}>
+      <div className="nx:flex nx:gap-2">
+        <Tooltip>
+          <TooltipTrigger asChild>
+            <Button variant="outline">Bold</Button>
+          </TooltipTrigger>
+          <TooltipContent>Bold text</TooltipContent>
+        </Tooltip>
+        <Tooltip>
+          <TooltipTrigger asChild>
+            <Button variant="outline">Italic</Button>
+          </TooltipTrigger>
+          <TooltipContent>Italic text</TooltipContent>
+        </Tooltip>
+      </div>
+    </TooltipProvider>
+  ),
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+    const body = within(document.body);
+
+    for (const [name, text] of [
+      ['Bold', 'Bold text'],
+      ['Italic', 'Italic text'],
+    ] as const) {
+      const trigger = canvas.getByRole('button', { name });
+      await userEvent.hover(trigger);
+      await waitFor(
+        async () => {
+          await expect(body.getByRole('tooltip', { name: text })).toBeVisible();
+        },
+        { timeout: 300 }
+      );
+      await userEvent.unhover(trigger);
+    }
   },
 };
 

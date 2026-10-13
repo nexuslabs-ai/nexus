@@ -95,7 +95,7 @@ function ChoiceRowDescription({
     <p
       data-slot="choice-row-description"
       className={cn(
-        'nx:typography-body-default nx:text-muted-foreground nx:group-has-[:disabled]/choice-row:text-disabled-foreground',
+        'nx:m-0 nx:typography-body-default nx:text-muted-foreground nx:group-has-[:disabled]/choice-row:text-disabled-foreground',
         className
       )}
       {...props}

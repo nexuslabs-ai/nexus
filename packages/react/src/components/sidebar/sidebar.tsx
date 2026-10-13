@@ -1,3 +1,5 @@
+'use client';
+
 import * as React from 'react';
 
 import { Slot } from '@radix-ui/react-slot';
@@ -115,7 +117,7 @@ interface SidebarProviderProps extends React.ComponentProps<'div'> {
  *
  * Owns the sidebar's open state, the `Ctrl/Cmd+B` keyboard shortcut, and cookie
  * persistence. Wrap your app shell in it; every sidebar part reads its context.
- * Renders a `TooltipProvider` so collapsed-icon tooltips work out of the box.
+ * Renders a `TooltipProvider` so collapsed-icon tooltips share one group.
  *
  * @example
  * ```tsx
@@ -428,7 +430,7 @@ function SidebarRail({ className, ...props }: SidebarRailProps) {
       onClick={toggleSidebar}
       title="Toggle Sidebar"
       className={cn(
-        'nx:absolute nx:inset-y-0 nx:z-sticky nx:hidden nx:w-4 nx:-translate-x-1/2 nx:transition-[left,right,translate,background-color] nx:duration-fast nx:ease-linear nx:group-data-[side=left]:-right-4 nx:group-data-[side=right]:left-0 nx:after:absolute nx:after:inset-y-0 nx:after:left-1/2 nx:after:w-0.5 nx:hover:after:bg-nav-border nx:md:flex',
+        'nx:absolute nx:inset-y-0 nx:z-sticky nx:hidden nx:w-4 nx:border-0 nx:bg-transparent nx:p-0 nx:-translate-x-1/2 nx:transition-[left,right,translate,background-color] nx:duration-fast nx:ease-linear nx:group-data-[side=left]:-right-4 nx:group-data-[side=right]:left-0 nx:after:absolute nx:after:inset-y-0 nx:after:left-1/2 nx:after:w-0.5 nx:hover:after:bg-nav-border nx:md:flex',
         'nx:in-data-[side=left]:cursor-w-resize nx:in-data-[side=right]:cursor-e-resize',
         'nx:[[data-side=left][data-state=collapsed]_&]:cursor-e-resize nx:[[data-side=right][data-state=collapsed]_&]:cursor-w-resize',
         'nx:group-data-[collapsible=offcanvas]:translate-x-0 nx:group-data-[collapsible=offcanvas]:after:left-full nx:hover:group-data-[collapsible=offcanvas]:bg-nav-background',
@@ -697,7 +699,7 @@ function SidebarGroupAction({
     <Comp
       data-slot="sidebar-group-action"
       className={cn(
-        'nx:absolute nx:top-3.5 nx:right-3 nx:flex nx:aspect-square nx:w-5 nx:items-center nx:justify-center nx:rounded-md nx:p-0 nx:text-nav-foreground nx:hover:bg-nav-item-hover nx:focus-visible:outline-2 nx:focus-visible:outline-focus-default nx:[&>svg]:size-4 nx:[&>svg]:shrink-0',
+        'nx:absolute nx:top-3.5 nx:right-3 nx:flex nx:aspect-square nx:w-5 nx:items-center nx:justify-center nx:rounded-md nx:border-0 nx:bg-transparent nx:p-0 nx:text-nav-foreground nx:hover:bg-nav-item-hover nx:focus-visible:outline-2 nx:focus-visible:outline-focus-default nx:[&>svg]:size-4 nx:[&>svg]:shrink-0',
         'nx:group-data-[collapsible=icon]:hidden',
         className
       )}
@@ -748,7 +750,7 @@ function SidebarMenu({ className, ...props }: SidebarMenuProps) {
     <ul
       data-slot="sidebar-menu"
       className={cn(
-        'nx:flex nx:w-full nx:min-w-0 nx:flex-col nx:gap-px',
+        'nx:m-0 nx:flex nx:w-full nx:min-w-0 nx:list-none nx:flex-col nx:gap-px nx:p-0',
         className
       )}
       {...props}
@@ -781,7 +783,7 @@ function SidebarMenuItem({ className, ...props }: SidebarMenuItemProps) {
 
 const sidebarMenuButtonVariants = cva(
   cn(
-    'nx:peer/menu-button nx:flex nx:w-full nx:items-center nx:gap-2 nx:overflow-hidden nx:rounded-md nx:p-2 nx:text-left nx:text-nav-muted-foreground nx:transition-[width,height,padding] nx:duration-fast',
+    'nx:peer/menu-button nx:flex nx:w-full nx:items-center nx:gap-2 nx:overflow-hidden nx:rounded-md nx:border-0 nx:bg-transparent nx:p-2 nx:text-left nx:text-nav-muted-foreground nx:no-underline nx:transition-[width,height,padding] nx:duration-fast',
     'nx:group-has-data-[slot=sidebar-menu-action]/menu-item:pr-8 nx:group-data-[collapsible=icon]:size-8',
     'nx:group-data-[collapsible=icon]:justify-center nx:group-data-[collapsible=icon]:[&>span]:sr-only nx:group-data-[collapsible=icon]:[&>svg:not(:first-child)]:hidden',
     'nx:hover:bg-nav-item-hover nx:active:bg-nav-item-active',
@@ -930,7 +932,7 @@ function SidebarMenuAction({
     <Comp
       data-slot="sidebar-menu-action"
       className={cn(
-        'nx:absolute nx:top-1.5 nx:right-1 nx:flex nx:aspect-square nx:w-5 nx:items-center nx:justify-center nx:rounded-md nx:p-0 nx:text-nav-foreground nx:hover:bg-nav-item-hover nx:focus-visible:outline-2 nx:focus-visible:outline-focus-default nx:[&>svg]:size-4 nx:[&>svg]:shrink-0',
+        'nx:absolute nx:top-1.5 nx:right-1 nx:flex nx:aspect-square nx:w-5 nx:items-center nx:justify-center nx:rounded-md nx:border-0 nx:bg-transparent nx:p-0 nx:text-nav-foreground nx:hover:bg-nav-item-hover nx:focus-visible:outline-2 nx:focus-visible:outline-focus-default nx:[&>svg]:size-4 nx:[&>svg]:shrink-0',
         'nx:peer-data-[size=sm]/menu-button:top-1',
         'nx:peer-data-[size=default]/menu-button:top-1.5',
         'nx:peer-data-[size=lg]/menu-button:top-2.5',
@@ -1049,7 +1051,7 @@ function SidebarMenuSub({ className, ...props }: SidebarMenuSubProps) {
     <ul
       data-slot="sidebar-menu-sub"
       className={cn(
-        'nx:ml-3.5 nx:flex nx:min-w-0 nx:translate-x-px nx:flex-col nx:gap-px nx:border-l-default nx:border-nav-border nx:pl-2.5 nx:py-0.5',
+        'nx:my-0 nx:mr-0 nx:ml-3.5 nx:flex nx:min-w-0 nx:list-none nx:translate-x-px nx:flex-col nx:gap-px nx:border-l-default nx:border-nav-border nx:pl-2.5 nx:py-0.5',
         'nx:group-data-[collapsible=icon]:hidden',
         className
       )}
@@ -1124,7 +1126,7 @@ function SidebarMenuSubButton({
       data-active={isActive}
       aria-current={isActive ? 'page' : undefined}
       className={cn(
-        'nx:flex nx:h-7 nx:min-w-0 nx:-translate-x-px nx:items-center nx:gap-2 nx:overflow-hidden nx:rounded-md nx:px-2 nx:text-nav-muted-foreground nx:hover:bg-nav-item-hover nx:focus-visible:outline-2 nx:focus-visible:outline-focus-default nx:active:bg-nav-item-active nx:disabled:pointer-events-none nx:disabled:text-disabled-foreground nx:aria-disabled:pointer-events-none nx:aria-disabled:text-disabled-foreground nx:[&>span:last-child]:truncate nx:[&>svg]:size-4 nx:[&>svg]:shrink-0',
+        'nx:flex nx:h-7 nx:min-w-0 nx:-translate-x-px nx:items-center nx:gap-2 nx:overflow-hidden nx:rounded-md nx:px-2 nx:text-nav-muted-foreground nx:no-underline nx:hover:bg-nav-item-hover nx:focus-visible:outline-2 nx:focus-visible:outline-focus-default nx:active:bg-nav-item-active nx:disabled:pointer-events-none nx:disabled:text-disabled-foreground nx:aria-disabled:pointer-events-none nx:aria-disabled:text-disabled-foreground nx:[&>span:last-child]:truncate nx:[&>svg]:size-4 nx:[&>svg]:shrink-0',
         'nx:data-[active=true]:bg-nav-item-active nx:data-[active=true]:text-nav-foreground',
         size === 'sm' && 'nx:typography-body-small',
         size === 'md' && 'nx:typography-body-default',

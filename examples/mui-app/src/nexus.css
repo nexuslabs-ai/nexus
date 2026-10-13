@@ -1,0 +1,11 @@
+@import './components/nexus/tailwind/nexus.css';
+@import 'tw-animate-css';
+@import './components/nexus/components/progress/progress.css';
+
+/* MUI's own layers sit at 1100-1500 (AppBar, Drawer, Modal, Snackbar, Tooltip).
+   Lift Nexus's overlays above them so a Nexus popup opens over an MUI dialog. */
+:root {
+  --nx-z-index-modal: 1600;
+  --nx-z-index-popover: 1700;
+  --nx-z-index-toast: 1800;
+}
