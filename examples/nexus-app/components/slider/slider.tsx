@@ -91,15 +91,13 @@ function isRangeBoundary(value: number | undefined, boundary: number) {
 }
 
 /**
- * SliderProps
- *
- * Props for the Slider component.
+ * Props for Slider.
  */
 interface SliderProps extends React.ComponentProps<
   typeof SliderPrimitive.Root
 > {
   /**
-   * Visual density for the slider rail and thumb.
+   * Height of the rail and thumb.
    *
    * @default "standard"
    * @example
@@ -110,8 +108,8 @@ interface SliderProps extends React.ComponentProps<
   size?: SliderSize;
 
   /**
-   * Optional visual marks in the slider value domain. Pass an array for custom
-   * positions or `"steps"` to render one marker at each interior step.
+   * Marks along the track. Pass values for custom positions, or `"steps"` for one
+   * mark per step.
    *
    * @example
    * ```tsx
@@ -123,11 +121,8 @@ interface SliderProps extends React.ComponentProps<
 }
 
 /**
- * Slider
- *
- * A value / range slider built on Radix Slider. Renders one thumb per value, so
- * a single `defaultValue={[50]}` is a value slider and `defaultValue={[25, 75]}`
- * is a range slider. Supports steps, keyboard, and vertical orientation.
+ * Picks a value or a range. Renders one thumb per value, so `[50]` gives one
+ * thumb and `[25, 75]` gives a range.
  *
  * @example
  * ```tsx

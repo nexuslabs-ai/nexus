@@ -13,8 +13,6 @@ import {
 import { TooltipGroupContext } from './tooltip-group';
 
 /**
- * TooltipProvider
- *
  * Optional. Groups the tooltips inside it, so they share an open delay and
  * moving between them skips the delay.
  *
@@ -36,10 +34,8 @@ function TooltipProvider(
 }
 
 /**
- * Tooltip
- *
- * The root component that manages tooltip state. Contains the trigger and content.
- * It works on its own. Inside a `TooltipProvider` it joins that group.
+ * Root of one tooltip. Holds its open state, trigger and content. Works on its
+ * own, and joins the group inside a `TooltipProvider`.
  *
  * @example
  * ```tsx
@@ -58,26 +54,19 @@ function Tooltip(props: React.ComponentProps<typeof TooltipPrimitive.Root>) {
 }
 
 /**
- * TooltipTrigger
- *
- * The element that triggers the tooltip on hover or focus.
+ * Element that opens the tooltip on hover or focus.
  */
 const TooltipTrigger = TooltipPrimitive.Trigger;
 
 /**
- * TooltipContentProps
- *
- * Props for the TooltipContent component.
+ * Props for TooltipContent.
  */
 interface TooltipContentProps extends React.ComponentProps<
   typeof TooltipPrimitive.Content
 > {}
 
 /**
- * TooltipContent
- *
- * The popup content that appears when the tooltip is triggered.
- * Supports positioning via `side` and `align` props.
+ * Popup that shows the tooltip text. Position it with `side` and `align`.
  *
  * @example
  * ```tsx

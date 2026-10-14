@@ -51,9 +51,7 @@ const switchThumbVariants = cva(
 );
 
 /**
- * SwitchProps
- *
- * Props for the Switch component.
+ * Props for Switch.
  */
 interface SwitchProps
   extends
@@ -61,12 +59,8 @@ interface SwitchProps
     VariantProps<typeof switchVariants> {}
 
 /**
- * Switch
- *
- * A toggle switch for binary on/off states. Use for settings that take
- * effect immediately without requiring a save action. Pair the switch with a
- * wired label row so the label text carries the touch target; use `size="sm"`
- * for dense rows.
+ * On/off control for settings that apply at once, with no save step. Pair it
+ * with a label so the label text is clickable too.
  *
  * @example
  * ```tsx

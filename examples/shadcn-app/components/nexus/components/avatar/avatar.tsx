@@ -58,9 +58,7 @@ interface AvatarProps
     React.ComponentProps<typeof AvatarPrimitive.Root>,
     VariantProps<typeof avatarVariants> {
   /**
-   * When true, renders a non-interactive emphasis ring around the avatar.
-   * Use for selected/current visual emphasis; focus rings belong on the
-   * interactive wrapper, not Avatar itself.
+   * Draws a non-interactive emphasis ring, such as for a selected person. Put focus rings on the interactive wrapper.
    * @default false
    * @example
    * ```tsx
@@ -73,10 +71,7 @@ interface AvatarProps
 }
 
 /**
- * Avatar
- *
- * Displays a user's profile image or initials as a visual identifier.
- * Falls back to initials or placeholder when no image is available.
+ * Shows a person's profile image, with initials or an icon as the fallback.
  *
  * @example
  * ```tsx
@@ -96,10 +91,8 @@ interface AvatarProps
  * ```
  *
  * @remarks
- * The emphasis `ring`, `AvatarStatus`, and `AvatarGroup` separator rings take
- * the colour of the surface behind them (default: `background`). When avatars
- * sit on a non-default surface, declare it on the wrapper with `surface-*` so
- * the rings match it instead of leaving a `background`-coloured halo:
+ * The `ring`, `AvatarStatus` and `AvatarGroup` rings use the `background` color.
+ * On another surface, set `surface-*` on the wrapper so the rings match it:
  *
  * @example
  * ```tsx
@@ -147,14 +140,10 @@ interface AvatarImageProps extends React.ComponentProps<
 > {}
 
 /**
- * AvatarImage
- *
- * Displays the avatar image. Automatically handles loading states.
+ * Profile image. AvatarFallback shows until it loads.
  *
  * @remarks
- * Defaults `decoding="async"` so the browser can decode off the main thread.
- * No `loading="lazy"` — Radix preloads the source with `new Image()` before
- * mounting the `<img>`, so the attribute on the rendered element is inert.
+ * Defaults to `decoding="async"`. `loading="lazy"` has no effect, because the image is preloaded before it mounts.
  *
  * @example
  * ```tsx
@@ -190,10 +179,7 @@ interface AvatarFallbackProps extends React.ComponentProps<
 > {}
 
 /**
- * AvatarFallback
- *
- * Displays when the image fails to load or while loading.
- * Typically shows user initials or a placeholder icon.
+ * Shows while the image loads or if it fails, usually initials or an icon.
  *
  * @example
  * ```tsx
@@ -245,26 +231,18 @@ interface AvatarStatusProps
     Omit<React.ComponentProps<'span'>, 'children'>,
     VariantProps<typeof avatarStatusVariants> {
   /**
-   * Visually-hidden text announced by assistive tech in place of the
-   * colour-only dot. Defaults to the capitalised `status`. Pass `''` to opt
-   * out when an adjacent text label already conveys presence.
+   * Screen reader text for the dot, the capitalized `status` by default. Pass `''` when visible text already shows presence.
    */
   label?: string;
 }
 
 /**
- * AvatarStatus
- *
- * A presence dot pinned to the avatar's corner. Conveys status with colour and
- * an attached visually-hidden label, so assistive tech announces it (e.g.
- * "Online"). Sighted users who cannot rely on colour should be given a
- * redundant text label by the consumer.
+ * Presence dot in the avatar's corner, with a hidden label such as "Online" for screen readers.
+ * Add visible status text too, because color alone doesn't reach every reader.
  *
  * @remarks
- * The label only reaches assistive tech when the parent `Avatar` is not atomic.
- * If the parent sets `role="img"` (the fallback-only pattern), it suppresses
- * every descendant — including this label — so fold the status into the
- * parent's name instead: `<Avatar role="img" aria-label="Ada Lovelace, online">`.
+ * If the parent `Avatar` has `role="img"`, screen readers skip this label.
+ * Put the status in the parent's name instead: `<Avatar role="img" aria-label="Ada Lovelace, online">`.
  *
  * @example
  * ```tsx
@@ -302,8 +280,7 @@ interface AvatarGroupProps
     React.ComponentProps<'div'>,
     Pick<VariantProps<typeof avatarVariants>, 'size' | 'shape'> {
   /**
-   * Maximum number of avatars to render before collapsing the remainder into a
-   * +N tile.
+   * Number of avatars shown before the rest collapse into a +N tile.
    * @example
    * ```tsx
    * <AvatarGroup size="lg" max={3}>{avatars}</AvatarGroup>

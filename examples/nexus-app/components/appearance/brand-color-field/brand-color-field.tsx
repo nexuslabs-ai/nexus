@@ -9,11 +9,11 @@ import {
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from '../../select';
+} from '../../select/select';
 import {
   NexusAppearanceColorField,
   type NexusAppearanceColorFieldProps,
-} from '../color-field';
+} from '../color-field/color-field';
 
 export interface NexusAppearanceBrandColorFieldProps
   extends

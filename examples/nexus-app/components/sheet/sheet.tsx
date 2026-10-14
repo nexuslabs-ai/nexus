@@ -13,10 +13,8 @@ import {
 } from '../overlay-layout/overlay-layout';
 
 /**
- * Sheet
- *
- * Root component for the sheet — a panel that slides in from an edge of the
- * viewport. Built on Radix Dialog; controls open/close state.
+ * Root of a panel that slides in from an edge of the viewport. Holds the open
+ * state.
  *
  * @example
  * ```tsx
@@ -39,39 +37,29 @@ import {
 const Sheet = DialogPrimitive.Root;
 
 /**
- * SheetTrigger
- *
- * Button that opens the sheet. Use `asChild` to render as your own component.
+ * Opens the sheet. Set `asChild` to render your own element.
  */
 const SheetTrigger = DialogPrimitive.Trigger;
 
 /**
- * SheetPortal
- *
- * Portals the sheet content to document.body.
+ * Renders the sheet content into `document.body`.
  */
 const SheetPortal = DialogPrimitive.Portal;
 
 /**
- * SheetClose
- *
- * Button that closes the sheet. Use `asChild` to render as your own component.
+ * Closes the sheet. Set `asChild` to render your own element.
  */
 const SheetClose = DialogPrimitive.Close;
 
 /**
- * SheetOverlayProps
- *
- * Props for the SheetOverlay component.
+ * Props for SheetOverlay.
  */
 interface SheetOverlayProps extends React.ComponentProps<
   typeof DialogPrimitive.Overlay
 > {}
 
 /**
- * SheetOverlay
- *
- * Semi-transparent overlay behind the sheet content.
+ * Dimmed layer behind the sheet.
  */
 function SheetOverlay({ className, ...props }: SheetOverlayProps) {
   return (
@@ -127,26 +115,22 @@ const sheetContentVariants = cva(
 );
 
 /**
- * SheetContentProps
- *
- * Props for the SheetContent component.
+ * Props for SheetContent.
  */
 interface SheetContentProps
   extends
     React.ComponentProps<typeof DialogPrimitive.Content>,
     VariantProps<typeof sheetContentVariants> {
   /**
-   * Whether to show the close button in the top-right corner.
+   * Shows the close button in the top-right corner.
    * @default true
    */
   showCloseButton?: boolean;
 }
 
 /**
- * SheetContent
- *
- * The sliding panel. Renders inside a portal with an overlay; the `side` prop
- * picks which edge it slides from (defaults to `right`).
+ * The sliding panel, rendered in a portal with an overlay. `side` picks the
+ * edge it slides from.
  *
  * @example
  * ```tsx
@@ -189,16 +173,12 @@ function SheetContent({
 }
 
 /**
- * SheetHeaderProps
- *
- * Props for the SheetHeader component.
+ * Props for SheetHeader.
  */
 interface SheetHeaderProps extends React.ComponentProps<'div'> {}
 
 /**
- * SheetHeader
- *
- * Container for sheet title and description. Provides consistent spacing.
+ * Holds the title and description.
  *
  * @example
  * ```tsx
@@ -222,18 +202,13 @@ function SheetHeader({ className, ...props }: SheetHeaderProps) {
 }
 
 /**
- * SheetBodyProps
- *
- * Props for the SheetBody component.
+ * Props for SheetBody.
  */
 interface SheetBodyProps extends React.ComponentProps<'div'> {}
 
 /**
- * SheetBody
- *
- * Container for the sheet's main content between the header and footer. Insets
- * its content horizontally to match SheetHeader and SheetFooter; vertical
- * separation comes from the header's and footer's padding.
+ * Main content between the header and footer. Its side padding matches
+ * SheetHeader and SheetFooter.
  *
  * @example
  * ```tsx
@@ -256,16 +231,12 @@ function SheetBody({ className, ...props }: SheetBodyProps) {
 }
 
 /**
- * SheetFooterProps
- *
- * Props for the SheetFooter component.
+ * Props for SheetFooter.
  */
 interface SheetFooterProps extends React.ComponentProps<'div'> {}
 
 /**
- * SheetFooter
- *
- * Container for sheet action buttons. Pinned to the bottom of the panel.
+ * Holds the action buttons, pinned to the bottom of the panel.
  *
  * @example
  * ```tsx
@@ -289,18 +260,14 @@ function SheetFooter({ className, ...props }: SheetFooterProps) {
 }
 
 /**
- * SheetTitleProps
- *
- * Props for the SheetTitle component.
+ * Props for SheetTitle.
  */
 interface SheetTitleProps extends React.ComponentProps<
   typeof DialogPrimitive.Title
 > {}
 
 /**
- * SheetTitle
- *
- * The title of the sheet. Should be used within SheetHeader.
+ * Title of the sheet. Place it inside SheetHeader.
  *
  * @example
  * ```tsx
@@ -318,18 +285,14 @@ function SheetTitle({ className, ...props }: SheetTitleProps) {
 }
 
 /**
- * SheetDescriptionProps
- *
- * Props for the SheetDescription component.
+ * Props for SheetDescription.
  */
 interface SheetDescriptionProps extends React.ComponentProps<
   typeof DialogPrimitive.Description
 > {}
 
 /**
- * SheetDescription
- *
- * Supporting text that provides additional context for the sheet.
+ * Supporting text under the title.
  *
  * @example
  * ```tsx

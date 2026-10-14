@@ -16,21 +16,11 @@ interface CheckboxProps extends React.ComponentProps<
 > {}
 
 /**
- * Checkbox
+ * Selects one or more options, or toggles one setting.
+ * Set `checked="indeterminate"` to show a minus for a partly selected group, such as "select all".
  *
- * A tri-state checkbox (checked / unchecked / indeterminate) for selecting one
- * or more options, or toggling a single setting. Shows a check mark when checked
- * and a minus when indeterminate. Pair the 16px checkbox with a wired label row
- * so the label text carries the touch target; set `checked="indeterminate"` for
- * the mixed state — e.g. a "select all" control whose children are only
- * partially selected.
- *
- * Pair it with `Label` for a simple inline label, wrap it in `ChoiceRow` for a
- * compact option row, or wrap it in `ChoiceCard` for a rich option card with
- * title and description. Use `FieldLabel + Field` when you need lower-level
- * field layout composition. Each pattern stays driven by this real control, so
- * clicking the label surface toggles via native `htmlFor` association — no
- * duplicated indicator.
+ * The box is 16px, so pair it with a label that carries the touch target.
+ * Use `Label`, `ChoiceRow`, `ChoiceCard`, or `FieldLabel` in a `Field`.
  *
  * @example
  * ```tsx

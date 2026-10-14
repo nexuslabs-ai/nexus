@@ -5,19 +5,14 @@ import * as LabelPrimitive from '@radix-ui/react-label';
 import { cn } from '../../lib/utils';
 
 /**
- * LabelProps
- *
  * Props for the Label component.
  */
 interface LabelProps extends React.ComponentProps<typeof LabelPrimitive.Root> {}
 
 /**
- * Label
- *
- * An accessible caption for a form control. Associate it with a control via
- * `htmlFor` (matching the control's `id`) so clicking the label focuses (or
- * toggles, for a checkbox/radio) that control. Dims automatically when a
- * sibling `nx:peer` control is disabled.
+ * Accessible name for a form control, linked by setting `htmlFor` to the
+ * control's `id`. Dims when an earlier sibling with the `nx:peer` class is
+ * disabled.
  *
  * @example
  * ```tsx

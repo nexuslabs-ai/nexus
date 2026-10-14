@@ -7,8 +7,6 @@ import { selectionIndicatorMotionClassName } from '../../lib/motion';
 import { cn } from '../../lib/utils';
 
 /**
- * RadioGroupProps
- *
  * Props for the RadioGroup component.
  */
 interface RadioGroupProps extends React.ComponentProps<
@@ -16,8 +14,6 @@ interface RadioGroupProps extends React.ComponentProps<
 > {}
 
 /**
- * RadioGroupItemProps
- *
  * Props for the RadioGroupItem component.
  */
 interface RadioGroupItemProps extends React.ComponentProps<
@@ -25,16 +21,8 @@ interface RadioGroupItemProps extends React.ComponentProps<
 > {}
 
 /**
- * RadioGroup
- *
- * A set of mutually exclusive options where exactly one can be selected. Render
- * one `RadioGroupItem` per option; Radix handles roving focus and arrow-key
- * navigation between them. Pair each item with `Label` for simple inline
- * labels, wrap each item in `ChoiceRow` for compact row-owned choices, or wrap
- * each item in `ChoiceCard` for rich option cards with title and description.
- * Use `FieldLabel + Field` when you need lower-level field layout composition.
- * Control the selection with `value` / `onValueChange`, or set an initial
- * selection with `defaultValue`.
+ * Set of options where only one can be selected. Render one `RadioGroupItem`
+ * per option, labelled with `Label` or wrapped in `ChoiceRow` or `ChoiceCard`.
  *
  * @example
  * ```tsx
@@ -61,11 +49,8 @@ function RadioGroup({ className, ...props }: RadioGroupProps) {
 }
 
 /**
- * RadioGroupItem
- *
- * A single selectable option within a `RadioGroup`. Pair it with a `Label`
- * (via matching `id` / `htmlFor`) for simple inline labels, or compose it in
- * `ChoiceRow` / `ChoiceCard` for row-owned or card-owned option surfaces.
+ * One option in a `RadioGroup`. Give it an `id` and a `Label` with a matching
+ * `htmlFor`, or wrap it in `ChoiceRow` or `ChoiceCard`.
  */
 function RadioGroupItem({ className, ...props }: RadioGroupItemProps) {
   return (
