@@ -4,39 +4,16 @@ import { CodeBlock } from './CodeBlock';
 import { CodeSample } from './CodeSample';
 import { ComponentLinks } from './ComponentInstallation';
 
-export async function InstallBlock({
-  slugs,
-  besides = [],
-  alsoPackages = [],
-  caption,
-}: {
-  slugs: readonly string[];
-  besides?: readonly string[];
-  /** `name@range` packages to install beyond what `slugs` install. */
-  alsoPackages?: readonly string[];
-  caption?: string;
-}) {
-  const { components, packages, files, styles } = await loadInstallPlan(
-    slugs,
-    besides,
-    alsoPackages
-  );
-  if (
-    components.length + packages.length + files.length + styles.length ===
-    0
-  ) {
-    return null;
-  }
+const BODY_CLASS = 'nx:typography-body-default nx:text-muted-foreground';
+
+/** Everything installing `slugs` takes: components to install first, then packages, files and styles. */
+export async function InstallBlock({ slugs }: { slugs: readonly string[] }) {
+  const { components, packages, files, styles } = await loadInstallPlan(slugs);
 
   return (
     <>
-      {caption && (
-        <p className="nx:typography-body-default nx:text-muted-foreground">
-          {caption}
-        </p>
-      )}
       {components.length > 0 && (
-        <p className="nx:typography-body-default nx:text-muted-foreground">
+        <p className={BODY_CLASS}>
           Install these components first: <ComponentLinks slugs={components} />.
         </p>
       )}
@@ -55,6 +32,36 @@ export async function InstallBlock({
             ...styles.map((file) => `@import '../${file}';`),
           ].join('\n')}
         </CodeSample>
+      )}
+    </>
+  );
+}
+
+/** The components and packages an example needs beyond its page's component. */
+export function ExampleInstall({
+  slugs,
+  packages,
+}: {
+  slugs: readonly string[];
+  /** `name@range` packages the example imports that `slugs` don't install. */
+  packages: readonly string[];
+}) {
+  if (slugs.length + packages.length === 0) return null;
+
+  return (
+    <>
+      <p className={BODY_CLASS}>
+        This example also needs
+        {slugs.length > 0 ? (
+          <>
+            : <ComponentLinks slugs={slugs} />.
+          </>
+        ) : (
+          ':'
+        )}
+      </p>
+      {packages.length > 0 && (
+        <CodeSample lang="bash">{`npm install ${packages.join(' ')}`}</CodeSample>
       )}
     </>
   );

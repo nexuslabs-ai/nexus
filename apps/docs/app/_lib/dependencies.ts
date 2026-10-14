@@ -120,37 +120,22 @@ function loadAll(slugs: readonly string[]) {
 }
 
 /**
- * What installing `slugs` takes beyond `besides`: the components to install
- * first, then only the packages, files and styles those components don't
- * already bring. `alsoPackages` are `name@range` packages beyond what `slugs`
- * install.
+ * What installing `slugs` takes: the components to install first, then only
+ * the packages, files and styles those components don't already bring.
  */
 export async function loadInstallPlan(
-  slugs: readonly string[],
-  besides: readonly string[] = [],
-  alsoPackages: readonly string[] = []
+  slugs: readonly string[]
 ): Promise<InstallPlan> {
-  const [needed, installed] = await Promise.all([
-    loadAll(slugs),
-    loadAll(besides),
-  ]);
-  const covered = new Set([
-    ...slugs,
-    ...besides,
-    ...installed.flatMap(({ components }) => components),
-  ]);
+  const needed = await loadAll(slugs);
   const components = missing(
     needed.flatMap(({ components }) => components),
-    [...covered]
+    [...slugs]
   ).sort();
-  const brought = [...installed, ...(await loadAll(components))];
+  const brought = await loadAll(components);
 
   return {
     components,
-    packages: missing(
-      [...needed.flatMap(packagesOf), ...alsoPackages],
-      brought.flatMap(packagesOf)
-    ),
+    packages: missing(needed.flatMap(packagesOf), brought.flatMap(packagesOf)),
     files: missing(needed.flatMap(filesOf), brought.flatMap(filesOf)),
     styles: missing(needed.flatMap(stylesOf), brought.flatMap(stylesOf)),
   };
