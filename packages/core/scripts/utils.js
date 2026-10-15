@@ -57,9 +57,9 @@ export function titleCase(s) {
  * Default configuration for token generation
  */
 export const DEFAULT_CONFIG = {
-  base: 'stone',
+  base: 'neutral',
   shadow: 'quiet',
-  radius: 'square',
+  radius: 'subtle',
   borderwidth: 'normal',
   motion: 'snappy',
   // see CANONICAL_SPACING_DEFAULT_MODE — controls :root cascade only (all 6 modes ship)

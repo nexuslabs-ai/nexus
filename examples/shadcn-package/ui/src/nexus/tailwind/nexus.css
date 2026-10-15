@@ -165,86 +165,56 @@
 @theme inline {
   /* Semantic tokens */
   --color-background: var(--nx-color-background, oklch(1 0 0));
-  --color-background-hover: var(
-    --nx-color-background-hover,
-    oklch(0.9906 0.002 70)
-  );
+  --color-background-hover: var(--nx-color-background-hover, oklch(0.9906 0 0));
   --color-background-active: var(
     --nx-color-background-active,
-    oklch(0.9517 0.002 70)
+    oklch(0.9517 0 0)
   );
-  --color-muted: var(--nx-color-muted, oklch(0.9811 0.002 70));
-  --color-muted-extralight: var(
-    --nx-color-muted-extralight,
-    oklch(0.9924 0.002 70)
-  );
+  --color-muted: var(--nx-color-muted, oklch(0.9811 0 0));
+  --color-muted-extralight: var(--nx-color-muted-extralight, oklch(0.9924 0 0));
   --color-container: var(--nx-color-container, oklch(1 0 0));
-  --color-container-hover: var(
-    --nx-color-container-hover,
-    oklch(0.9811 0.002 70)
-  );
-  --color-container-active: var(
-    --nx-color-container-active,
-    oklch(0.9657 0.002 70)
-  );
+  --color-container-hover: var(--nx-color-container-hover, oklch(0.9811 0 0));
+  --color-container-active: var(--nx-color-container-active, oklch(0.9657 0 0));
   --color-popover: var(--nx-color-popover, oklch(1 0 0));
-  --color-popover-hover: var(--nx-color-popover-hover, oklch(0.9657 0.002 70));
-  --color-popover-active: var(
-    --nx-color-popover-active,
-    oklch(0.9657 0.002 70)
-  );
+  --color-popover-hover: var(--nx-color-popover-hover, oklch(0.9657 0 0));
+  --color-popover-active: var(--nx-color-popover-active, oklch(0.9657 0 0));
   --color-control-background: var(
     --nx-color-control-background,
-    oklch(0.9517 0.002 70)
+    oklch(0.9517 0 0)
   );
   --color-control-background-hover: var(
     --nx-color-control-background-hover,
-    oklch(0.9188 0.002 70)
+    oklch(0.9188 0 0)
   );
   --color-control-thumb: var(--nx-color-control-thumb, oklch(1 0 0));
-  --color-nav-background: var(
-    --nx-color-nav-background,
-    oklch(0.9811 0.002 70)
-  );
-  --color-nav-item-hover: var(
-    --nx-color-nav-item-hover,
-    oklch(0.9517 0.002 70)
-  );
-  --color-nav-item-active: var(
-    --nx-color-nav-item-active,
-    oklch(0.9517 0.002 70)
-  );
-  --color-nav-border: var(--nx-color-nav-border, oklch(0.9517 0.002 70));
-  --color-disabled: var(--nx-color-disabled, oklch(0.9657 0.002 70));
-  --color-border-focus: var(--nx-color-border-focus, oklch(0.7876 0.002 70));
-  --color-foreground: var(--nx-color-foreground, oklch(0.2161 0.003 56.043));
+  --color-nav-background: var(--nx-color-nav-background, oklch(0.9811 0 0));
+  --color-nav-item-hover: var(--nx-color-nav-item-hover, oklch(0.9517 0 0));
+  --color-nav-item-active: var(--nx-color-nav-item-active, oklch(0.9517 0 0));
+  --color-nav-border: var(--nx-color-nav-border, oklch(0.9517 0 0));
+  --color-disabled: var(--nx-color-disabled, oklch(0.9657 0 0));
+  --color-border-focus: var(--nx-color-border-focus, oklch(0.7876 0 0));
+  --color-foreground: var(--nx-color-foreground, oklch(0.2046 0 0));
   --color-container-foreground: var(
     --nx-color-container-foreground,
-    oklch(0.2161 0.003 56.043)
+    oklch(0.2046 0 0)
   );
   --color-popover-foreground: var(
     --nx-color-popover-foreground,
-    oklch(0.2161 0.003 56.043)
+    oklch(0.2046 0 0)
   );
-  --color-nav-foreground: var(
-    --nx-color-nav-foreground,
-    oklch(0.2161 0.003 56.043)
-  );
-  --color-muted-foreground: var(
-    --nx-color-muted-foreground,
-    oklch(0.5238 0.003 56.043)
-  );
+  --color-nav-foreground: var(--nx-color-nav-foreground, oklch(0.2046 0 0));
+  --color-muted-foreground: var(--nx-color-muted-foreground, oklch(0.5225 0 0));
   --color-nav-muted-foreground: var(
     --nx-color-nav-muted-foreground,
-    oklch(0.5297 0.003 56.043)
+    oklch(0.5228 0 0)
   );
   --color-muted-foreground-subtle: var(
     --nx-color-muted-foreground-subtle,
-    oklch(0.6331 0.003 56.043)
+    oklch(0.635 0 0)
   );
   --color-disabled-foreground: var(
     --nx-color-disabled-foreground,
-    oklch(0.6081 0.003 56.043)
+    oklch(0.6023 0 0)
   );
   --color-border-default: var(
     --nx-color-border-default,
@@ -514,50 +484,50 @@
   --color-focus-error: var(--nx-color-focus-error, oklch(0.6494 0.2523 27.926));
   --color-background-hover-alpha: var(
     --nx-color-background-hover-alpha,
-    oklch(0.13 0.003 70 / 0.0581)
+    oklch(0.13 0 0 / 0.0581)
   );
   --color-border-default-alpha: var(
     --nx-color-border-default-alpha,
-    oklch(0.13 0.003 70 / 0.0884)
+    oklch(0.13 0 0 / 0.0884)
   );
-  --color-overlay: var(--nx-color-overlay, oklch(0.13 0.003 70 / 0.7529));
+  --color-overlay: var(--nx-color-overlay, oklch(0.13 0 0 / 0.7529));
   --color-popover-alpha: var(--nx-color-popover-alpha, oklch(1 0 0 / 0.97));
   --color-popover-backdrop: var(
     --nx-color-popover-backdrop,
-    oklch(0.13 0.003 70 / 0.9098)
+    oklch(0.13 0 0 / 0.9098)
   );
 }
 
 /* ===== DARK MODE ===== */
 .dark {
-  --nx-color-background: oklch(0.2161 0.003 70);
-  --nx-color-background-hover: oklch(0.2561 0.003 70);
-  --nx-color-background-active: oklch(0.2561 0.003 70);
-  --nx-color-muted: oklch(0.2561 0.003 70);
-  --nx-color-muted-extralight: oklch(0.2321 0.003 70);
-  --nx-color-container: oklch(0.2561 0.003 70);
-  --nx-color-container-hover: oklch(0.2961 0.003 70);
-  --nx-color-container-active: oklch(0.2561 0.003 70);
-  --nx-color-popover: oklch(0.2961 0.003 70);
-  --nx-color-popover-hover: oklch(0.3361 0.003 70);
-  --nx-color-popover-active: oklch(0.2961 0.003 70);
-  --nx-color-control-background: oklch(0.2961 0.003 70);
-  --nx-color-control-background-hover: oklch(0.3361 0.003 70);
+  --nx-color-background: oklch(0.2046 0 0);
+  --nx-color-background-hover: oklch(0.2446 0 0);
+  --nx-color-background-active: oklch(0.2446 0 0);
+  --nx-color-muted: oklch(0.2446 0 0);
+  --nx-color-muted-extralight: oklch(0.2206 0 0);
+  --nx-color-container: oklch(0.2446 0 0);
+  --nx-color-container-hover: oklch(0.2846 0 0);
+  --nx-color-container-active: oklch(0.2446 0 0);
+  --nx-color-popover: oklch(0.2846 0 0);
+  --nx-color-popover-hover: oklch(0.3246 0 0);
+  --nx-color-popover-active: oklch(0.2846 0 0);
+  --nx-color-control-background: oklch(0.2846 0 0);
+  --nx-color-control-background-hover: oklch(0.3246 0 0);
   --nx-color-control-thumb: oklch(1 0 0);
-  --nx-color-nav-background: oklch(0.2561 0.003 70);
-  --nx-color-nav-item-hover: oklch(0.2961 0.003 70);
-  --nx-color-nav-item-active: oklch(0.2961 0.003 70);
-  --nx-color-nav-border: oklch(0.2961 0.003 70);
-  --nx-color-disabled: oklch(0.2561 0.003 70);
-  --nx-color-border-focus: oklch(0.4581 0.003 70);
-  --nx-color-foreground: oklch(0.8928 0.0013 106.424);
-  --nx-color-container-foreground: oklch(0.8928 0.0013 106.424);
-  --nx-color-popover-foreground: oklch(0.908 0.0013 106.424);
-  --nx-color-nav-foreground: oklch(0.825 0.0013 106.424);
-  --nx-color-muted-foreground: oklch(0.8403 0.0013 106.424);
-  --nx-color-nav-muted-foreground: oklch(0.73 0.0013 106.424);
-  --nx-color-muted-foreground-subtle: oklch(0.7583 0.0013 106.424);
-  --nx-color-disabled-foreground: oklch(0.73 0.0013 106.424);
+  --nx-color-nav-background: oklch(0.2446 0 0);
+  --nx-color-nav-item-hover: oklch(0.2846 0 0);
+  --nx-color-nav-item-active: oklch(0.2846 0 0);
+  --nx-color-nav-border: oklch(0.2846 0 0);
+  --nx-color-disabled: oklch(0.2446 0 0);
+  --nx-color-border-focus: oklch(0.4466 0 0);
+  --nx-color-foreground: oklch(0.8901 0 0);
+  --nx-color-container-foreground: oklch(0.8901 0 0);
+  --nx-color-popover-foreground: oklch(0.9053 0 0);
+  --nx-color-nav-foreground: oklch(0.822 0 0);
+  --nx-color-muted-foreground: oklch(0.8345 0 0);
+  --nx-color-nav-muted-foreground: oklch(0.73 0 0);
+  --nx-color-muted-foreground-subtle: oklch(0.7527 0 0);
+  --nx-color-disabled-foreground: oklch(0.73 0 0);
   --nx-color-border-default: oklch(1 0 0 / 0.1768);
   --nx-color-border-disabled: oklch(1 0 0 / 0.1768);
   --nx-color-border-hairline: oklch(1 0 0 / 0.0941);
@@ -625,18 +595,18 @@
   --nx-color-information-subtle-active: oklch(0.41 0.1633 254.871);
   --nx-color-information-border: oklch(0.488 0.197 255.267);
   --nx-color-border-information-active: oklch(0.623 0.2112 255.145);
-  --nx-color-chart-categorical-1: oklch(0.7949 0.1682 180.426);
-  --nx-color-chart-categorical-2: oklch(0.8252 0.2278 124.321);
-  --nx-color-chart-categorical-3: oklch(0.8665 0.0819 70.697);
-  --nx-color-chart-categorical-4: oklch(0.8926 0.0753 10.001);
-  --nx-color-chart-categorical-5: oklch(0.9089 0.0483 274.039);
+  --nx-color-chart-categorical-1: oklch(0.7922 0.1682 180.426);
+  --nx-color-chart-categorical-2: oklch(0.8223 0.2278 124.321);
+  --nx-color-chart-categorical-3: oklch(0.8635 0.0819 70.697);
+  --nx-color-chart-categorical-4: oklch(0.8904 0.077 10.001);
+  --nx-color-chart-categorical-5: oklch(0.906 0.0499 274.039);
   --nx-color-focus-default: oklch(0.8252 0 0);
-  --nx-color-focus-error: oklch(0.7551 0.1333 28.058);
-  --nx-color-background-hover-alpha: oklch(0.13 0.003 70 / 0.0589);
-  --nx-color-border-default-alpha: oklch(0.13 0.003 70 / 0.1768);
-  --nx-color-overlay: oklch(0.13 0.003 70 / 0.8471);
-  --nx-color-popover-alpha: oklch(0.2961 0.003 70 / 0.97);
-  --nx-color-popover-backdrop: oklch(0.13 0.003 70 / 0.9098);
+  --nx-color-focus-error: oklch(0.7515 0.1333 28.058);
+  --nx-color-background-hover-alpha: oklch(0.13 0 0 / 0.0589);
+  --nx-color-border-default-alpha: oklch(0.13 0 0 / 0.1768);
+  --nx-color-overlay: oklch(0.13 0 0 / 0.8471);
+  --nx-color-popover-alpha: oklch(0.2846 0 0 / 0.97);
+  --nx-color-popover-backdrop: oklch(0.13 0 0 / 0.9098);
 }
 
 /* ===== PER-MODE SPACING (mode swap via [data-density="X"] on any ancestor) ===== */
@@ -891,15 +861,15 @@
 /* ===== PER-MODE RADIUS (mode swap via [data-radius="X"] on any ancestor) ===== */
 
 :root,
-[data-radius='square'] {
-  --nx-radius-base: 0px;
-  --nx-radius-sm: 0px;
-  --nx-radius-md: 0px;
-  --nx-radius-lg: 0px;
-  --nx-radius-xl: 0px;
-  --nx-radius-2xl: 0px;
-  --nx-radius-3xl: 0px;
-  --nx-radius-4xl: 0px;
+[data-radius='subtle'] {
+  --nx-radius-base: 4px;
+  --nx-radius-sm: 2px;
+  --nx-radius-md: 4px;
+  --nx-radius-lg: 6px;
+  --nx-radius-xl: 8px;
+  --nx-radius-2xl: 12px;
+  --nx-radius-3xl: 20px;
+  --nx-radius-4xl: 28px;
   --nx-radius-full: 9999px;
 }
 
@@ -939,15 +909,15 @@
   --nx-radius-full: 9999px;
 }
 
-[data-radius='subtle'] {
-  --nx-radius-base: 4px;
-  --nx-radius-sm: 2px;
-  --nx-radius-md: 4px;
-  --nx-radius-lg: 6px;
-  --nx-radius-xl: 8px;
-  --nx-radius-2xl: 12px;
-  --nx-radius-3xl: 20px;
-  --nx-radius-4xl: 28px;
+[data-radius='square'] {
+  --nx-radius-base: 0px;
+  --nx-radius-sm: 0px;
+  --nx-radius-md: 0px;
+  --nx-radius-lg: 0px;
+  --nx-radius-xl: 0px;
+  --nx-radius-2xl: 0px;
+  --nx-radius-3xl: 0px;
+  --nx-radius-4xl: 0px;
   --nx-radius-full: 9999px;
 }
 

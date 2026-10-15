@@ -121,11 +121,11 @@ export const STROKE_OPTIONS = [
 export const DEFAULT_NEXUS_APPEARANCE: NexusAppearanceState = {
   mode: 'light',
   brandColor: DEFAULT_BRAND_COLOR,
-  surfaceTone: 'stone',
+  surfaceTone: 'neutral',
   lightContrast: 50,
   darkContrast: 50,
   density: 'default',
-  corners: 'square',
+  corners: 'subtle',
   elevation: 'quiet',
   stroke: 'normal',
   prefs: {

@@ -233,7 +233,7 @@ describe('resolveFirstPaint', () => {
     expect(result.className).toBe('dark');
     expect(result.dataAttrs).toEqual({
       'data-density': 'default',
-      'data-radius': 'square',
+      'data-radius': 'subtle',
       'data-shadow': 'quiet',
       'data-borderwidth': 'normal',
     });
@@ -296,7 +296,7 @@ describe('createNexusAppearanceBootstrapScript', () => {
     new Function(createNexusAppearanceBootstrapScript())();
 
     expect(document.documentElement.classList.contains('dark')).toBe(true);
-    expect(document.documentElement.getAttribute('data-radius')).toBe('square');
+    expect(document.documentElement.getAttribute('data-radius')).toBe('subtle');
     // The host page's own color-scheme is left alone; `.dark` CSS covers it.
     expect(document.documentElement.style.colorScheme).toBe('');
     expect(document.querySelector('meta[name="color-scheme"]')).toBeNull();
