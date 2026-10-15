@@ -11,7 +11,7 @@ import {
 import { expect, userEvent, waitFor, within } from 'storybook/test';
 
 import { expectHeightPinned } from '../../stories/support/story-height-test-utils';
-import { Button } from '../button';
+import { Button } from '../button/button';
 
 import {
   Alert,

@@ -2,8 +2,8 @@
 
 import * as React from 'react';
 
-import { Button } from '../../components/button';
-import { FieldError } from '../../components/field';
+import { Button } from '../../components/button/button';
+import { FieldError } from '../../components/field/field';
 
 export type SettingsValues = { name: string; email: string; updates: boolean };
 export type SettingsFormProps = {

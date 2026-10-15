@@ -1,18 +1,18 @@
 import { IconInfoCircle, IconPlus } from '@tabler/icons-react';
 import type { ReactNode } from 'react';
 
-import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/accordion';
-import { Alert, AlertContent, AlertDescription, AlertIcon, AlertTitle } from '@/components/alert';
-import { Avatar, AvatarFallback, AvatarGroup } from '@/components/avatar';
-import { Badge } from '@/components/badge';
-import { Button } from '@/components/button';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/card';
-import { Checkbox } from '@/components/checkbox';
-import { Label } from '@/components/label';
-import { RadioGroup, RadioGroupItem } from '@/components/radio-group';
-import { Slider } from '@/components/slider';
-import { Switch } from '@/components/switch';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/tabs';
+import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/accordion/accordion';
+import { Alert, AlertContent, AlertDescription, AlertIcon, AlertTitle } from '@/components/alert/alert';
+import { Avatar, AvatarFallback, AvatarGroup } from '@/components/avatar/avatar';
+import { Badge } from '@/components/badge/badge';
+import { Button } from '@/components/button/button';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/card/card';
+import { Checkbox } from '@/components/checkbox/checkbox';
+import { Label } from '@/components/label/label';
+import { RadioGroup, RadioGroupItem } from '@/components/radio-group/radio-group';
+import { Slider } from '@/components/slider/slider';
+import { Switch } from '@/components/switch/switch';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/tabs/tabs';
 
 function Section({ title, description, children }: { title: string; description: string; children: ReactNode }) {
   return (

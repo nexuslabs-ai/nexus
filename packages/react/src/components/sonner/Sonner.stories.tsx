@@ -2,7 +2,7 @@ import type { Meta, StoryObj } from '@storybook/react';
 import { toast as hostToast, Toaster as HostToaster } from 'sonner';
 import { expect, userEvent, waitFor, within } from 'storybook/test';
 
-import { Button } from '../button';
+import { Button } from '../button/button';
 
 import { toast, Toaster, useSonner } from './sonner';
 

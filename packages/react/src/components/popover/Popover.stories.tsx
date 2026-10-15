@@ -7,9 +7,9 @@ import {
   expectExitBeforeUnmount,
   expectInterruptibleOverlayMotion,
 } from '../../stories/support/overlay-motion-test-utils';
-import { Button } from '../button';
-import { Input } from '../input';
-import { Label } from '../label';
+import { Button } from '../button/button';
+import { Input } from '../input/input';
+import { Label } from '../label/label';
 
 import {
   Popover,

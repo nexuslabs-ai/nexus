@@ -2,7 +2,7 @@ import * as React from 'react';
 
 import { expect, waitFor, within } from 'storybook/test';
 
-import { Button } from '../../components/button';
+import { Button } from '../../components/button/button';
 import {
   Dialog,
   DialogBody,
@@ -11,7 +11,7 @@ import {
   DialogHeader,
   DialogTitle,
   DialogTrigger,
-} from '../../components/dialog';
+} from '../../components/dialog/dialog';
 
 /**
  * Changes a story harness's props without any pointer or focus event. An

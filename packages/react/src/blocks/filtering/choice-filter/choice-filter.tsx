@@ -2,20 +2,20 @@
 
 import * as React from 'react';
 
-import { Button } from '../../../components/button';
+import { Button } from '../../../components/button/button';
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuRadioGroup,
   DropdownMenuRadioItem,
   DropdownMenuTrigger,
-} from '../../../components/dropdown-menu';
+} from '../../../components/dropdown-menu/dropdown-menu';
 import {
   FilterCondition,
   FilterConditionField,
   FilterConditionRemove,
   FilterConditionSegment,
-} from '../../../components/filter-condition';
+} from '../../../components/filter-condition/filter-condition';
 import { ConditionOperator } from '../filter-operator';
 import { useConditionEditor } from '../use-condition-editor';
 

@@ -2,10 +2,10 @@
 
 import * as React from 'react';
 
-import { Button } from '../../components/button';
-import { Input } from '../../components/input';
-import { Label } from '../../components/label';
-import { NativeSelect } from '../../components/native-select';
+import { Button } from '../../components/button/button';
+import { Input } from '../../components/input/input';
+import { Label } from '../../components/label/label';
+import { NativeSelect } from '../../components/native-select/native-select';
 import {
   Table,
   TableBody,
@@ -13,7 +13,7 @@ import {
   TableHead,
   TableHeader,
   TableRow,
-} from '../../components/table';
+} from '../../components/table/table';
 
 export const memberStatuses = ['Active', 'Invited'] as const;
 export const memberTeams = ['Design', 'Engineering', 'Operations'] as const;

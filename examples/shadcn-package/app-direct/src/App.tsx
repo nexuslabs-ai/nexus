@@ -19,7 +19,7 @@ import {
   SidebarTrigger,
   Toaster,
 } from "@acme/ui"
-import { Toaster as NexusToaster } from "./components/nexus/components/sonner"
+import { Toaster as NexusToaster } from "./components/nexus/components/sonner/sonner"
 
 import { useNexusAppearance } from "./appearance"
 import { OverlaysPage } from "./pages/OverlaysPage"

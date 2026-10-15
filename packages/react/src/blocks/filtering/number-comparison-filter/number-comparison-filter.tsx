@@ -2,20 +2,20 @@
 
 import * as React from 'react';
 
-import { Button } from '../../../components/button';
+import { Button } from '../../../components/button/button';
 import {
   FilterCondition,
   FilterConditionField,
   FilterConditionRemove,
   FilterConditionSegment,
-} from '../../../components/filter-condition';
-import { Input } from '../../../components/input';
-import { Label } from '../../../components/label';
+} from '../../../components/filter-condition/filter-condition';
+import { Input } from '../../../components/input/input';
+import { Label } from '../../../components/label/label';
 import {
   Popover,
   PopoverContent,
   PopoverTrigger,
-} from '../../../components/popover';
+} from '../../../components/popover/popover';
 import { ConditionOperator } from '../filter-operator';
 import { useConditionEditor } from '../use-condition-editor';
 

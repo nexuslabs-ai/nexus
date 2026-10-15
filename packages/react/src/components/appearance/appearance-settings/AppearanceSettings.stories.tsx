@@ -11,7 +11,7 @@ import {
 import type { Meta, StoryObj } from '@storybook/react';
 import { expect, userEvent, waitFor, within } from 'storybook/test';
 
-import { Button } from '../../button';
+import { Button } from '../../button/button';
 import { NexusAppearanceProvider } from '../provider';
 
 import { NexusAppearanceSettings } from './appearance-settings';

@@ -3,8 +3,8 @@ import * as React from 'react';
 import { cva, type VariantProps } from 'class-variance-authority';
 
 import { cn } from '../../lib/utils';
-import { Label } from '../label';
-import { Separator } from '../separator';
+import { Label } from '../label/label';
+import { Separator } from '../separator/separator';
 
 /**
  * A `<fieldset>` that groups related fields. Add a `FieldLegend` as its caption.

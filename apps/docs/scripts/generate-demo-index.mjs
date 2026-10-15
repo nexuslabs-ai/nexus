@@ -1,12 +1,10 @@
 import {
   cpSync,
   existsSync,
-  mkdirSync,
   readdirSync,
   readFileSync,
   rmSync,
   watch,
-  writeFileSync,
 } from 'node:fs';
 import path from 'node:path';
 
@@ -18,22 +16,17 @@ import {
   docsStoryModule,
   PREVIEWLESS_COMPONENTS,
   readDocsStories,
-  resolveModule,
 } from './docs-stories.mjs';
 import { resolveFormatOptions } from './page-manifest.mjs';
+import { generateDependencies } from './generate-dependencies.mjs';
 import {
   blockSources,
   componentSlugs,
   exportedComponentSlugs,
+  readCanonical,
+  writeIfChanged,
 } from './react-sources.mjs';
-import {
-  componentsRoot,
-  docsRoot,
-  isUnder,
-  reactRoot,
-  reactSrc,
-  toRepoPath,
-} from './roots.mjs';
+import { docsRoot, reactRoot, reactSrc, toRepoPath } from './roots.mjs';
 
 const GENERATED_DIR = path.join(docsRoot, '__generated__');
 const DEPENDENCIES_DIR = path.join(docsRoot, 'generated', 'dependencies');
@@ -107,10 +100,6 @@ export interface BlockDocs {
   description: string | null;
   /** The block's one story tagged \`docs\`. */
   preview: DemoId;
-  /** Files to copy, by path under \`packages/react/src/\`: its example or the block first, then the files it imports. */
-  files: readonly string[];
-  /** Component folders those files import, each installed from its own page. */
-  components: readonly string[];
 }
 `;
 
@@ -173,19 +162,6 @@ function walk(dir) {
   });
 }
 
-function readCanonical(file) {
-  return readFileSync(file, 'utf8').replace(/\r\n/g, '\n');
-}
-
-function writeIfChanged(file, content) {
-  if (existsSync(file) && readCanonical(file) === content) {
-    return;
-  }
-
-  mkdirSync(path.dirname(file), { recursive: true });
-  writeFileSync(file, content, 'utf8');
-}
-
 // Removes `dir` itself too, once its last child is gone.
 function pruneEmptyDirs(dir) {
   for (const entry of readdirSync(dir, { withFileTypes: true })) {
@@ -243,13 +219,18 @@ function readInstallBlocks() {
     file.endsWith('.json')
   );
   for (const file of dependencyFiles) {
-    const { slug, install, copy, files } = JSON.parse(
+    const { slug, closure, plan } = JSON.parse(
       readCanonical(path.join(DEPENDENCIES_DIR, file))
     );
     blocks.set(slug, {
-      packages: new Map(install.map(({ name, range }) => [name, range])),
-      files: files.map(withoutExtension),
-      copied: new Set([...copy, ...files].map(withoutExtension)),
+      packages: new Map(
+        closure.install.map(({ name, range }) => [name, range])
+      ),
+      files: closure.files.map(withoutExtension),
+      copied: new Set(
+        [...closure.copy, ...closure.files].map(withoutExtension)
+      ),
+      linked: new Set(plan.components),
     });
   }
   return blocks;
@@ -257,10 +238,9 @@ function readInstallBlocks() {
 
 /**
  * A demo pastes beside its folder's block, if the folder is a component, and
- * beside each imported component's block that no block kept before it
- * already copies — largest first, so a block is dropped for one that is listed.
+ * beside each component it imports that none of those blocks already brings.
  */
-function installSlugsFor(id, specifiers, blocks) {
+function installSlugsFor(id, specifiers, blocks, exported) {
   const folder = id.split('/')[0];
   const own = blocks.has(folder) ? folder : undefined;
   const imported = [
@@ -278,18 +258,24 @@ function installSlugsFor(id, specifiers, blocks) {
     }
   }
 
-  const kept = own ? [own] : [];
-  const extra = [];
-  const largestFirst = imported
-    .filter((slug) => slug !== own)
-    .sort((a, b) => blocks.get(b).copied.size - blocks.get(a).copied.size);
-  for (const slug of largestFirst) {
-    const covered = kept.some((other) =>
-      blocks.get(slug).files.every((file) => blocks.get(other).copied.has(file))
-    );
-    if (covered) continue;
-    kept.push(slug);
-    extra.push(slug);
+  const pasted = own ? [own, ...imported] : imported;
+  // A component with no page of its own is brought by whichever pasted component copies it.
+  const brought = (slug) =>
+    pasted.some((other) => {
+      if (other === slug) return false;
+      const block = blocks.get(other);
+      if (exported.has(slug)) return block.linked.has(slug);
+      return blocks.get(slug).files.every((file) => block.copied.has(file));
+    });
+  const extra = imported
+    .filter((slug) => slug !== own && !brought(slug))
+    .sort();
+  for (const slug of extra) {
+    if (!exported.has(slug)) {
+      throw new Error(
+        `Demo ${id} imports @/components/${slug}, which has no page to link. Import it through a component that copies it.`
+      );
+    }
   }
 
   if (!own && extra.length === 0) {
@@ -317,7 +303,7 @@ function demoPackages(id, specifiers, slugs, blocks) {
     }
     if (specifier.startsWith(COPIED_PREFIX)) {
       const file = specifier.slice(COPIED_PREFIX.length);
-      if (!copied.has(file) && !copied.has(`${file}/index`)) {
+      if (!copied.has(file)) {
         throw new Error(
           `Demo ${id} imports ${specifier}, but the ${blockNames} install block does not copy it. Import a file the block copies: ${[...copied].join(', ')}.`
         );
@@ -430,7 +416,12 @@ async function collectDemos(exported) {
           formatOptions
         );
         const specifiers = importSpecifiers(source);
-        const { own, extra } = installSlugsFor(id, specifiers, installBlocks);
+        const { own, extra } = installSlugsFor(
+          id,
+          specifiers,
+          installBlocks,
+          exported
+        );
         const packages = demoPackages(
           id,
           specifiers,
@@ -452,7 +443,7 @@ async function collectDemos(exported) {
     }
   }
 
-  // A block page shows its files to copy instead of install blocks.
+  // A block page shows its install plan instead of install blocks.
   for (const block of blockSources()) {
     try {
       const [story] = blockDocsStories(block);
@@ -538,13 +529,13 @@ function previewlessDocs(slug) {
  * Each exported component's page: its preview, examples, Usage and
  * Composition, from its docs stories — or, for a previewless component,
  * Usage from every part it exports.
- * @param {string[]} exported
+ * @param {Set<string>} exported
  * @param {DemoFile[]} demos
  * @returns {Map<string, ComponentDocs>}
  */
 function collectComponentDocs(exported, demos) {
   return new Map(
-    exported.map((slug) => {
+    [...exported].map((slug) => {
       const description = componentDescription(slug, componentStoryFiles(slug));
       if (PREVIEWLESS_COMPONENTS.has(slug)) {
         return [slug, { description, ...previewlessDocs(slug) }];
@@ -569,55 +560,11 @@ function collectComponentDocs(exported, demos) {
 }
 
 /**
- * @typedef {{ description: string | null; preview: string; files: string[]; components: string[] }} BlockDocs
+ * @typedef {{ description: string | null; preview: string }} BlockDocs
  */
 
 /**
- * The block's minimal example (`{slug}-example.tsx`) if it has one, else its
- * source, then every non-component file that reaches through relative
- * imports, then the component folders those files import.
- * @param {import('./react-sources.mjs').BlockSource} block
- * @returns {Omit<BlockDocs, 'preview'>}
- */
-function blockFiles(block) {
-  const files = new Set();
-  const components = new Set();
-  const visit = (file) => {
-    if (files.has(file)) return;
-    files.add(file);
-    for (const specifier of importSpecifiers(readCanonical(file))) {
-      if (!specifier.startsWith('.')) continue;
-      const target = resolveModule(path.resolve(path.dirname(file), specifier));
-      if (!target || !isUnder(target, reactSrc)) {
-        throw new Error(
-          `${toRepoPath(file)} imports ${specifier}, which is not a file under packages/react/src — a block page can't list it.`
-        );
-      }
-      if (isUnder(target, componentsRoot)) {
-        components.add(
-          path.relative(componentsRoot, target).split(path.sep)[0]
-        );
-        continue;
-      }
-      visit(target);
-    }
-  };
-  const example = path.join(
-    path.dirname(block.source),
-    `${block.slug}-example.tsx`
-  );
-  visit(existsSync(example) ? example : block.source);
-
-  return {
-    files: [...files].map((file) =>
-      path.relative(reactSrc, file).split(path.sep).join('/')
-    ),
-    components: [...components].sort(),
-  };
-}
-
-/**
- * Each block's page: its one docs story and the files to copy.
+ * Each block's page: its one docs story.
  * @param {DemoFile[]} demos
  * @returns {Map<string, BlockDocs>}
  */
@@ -631,7 +578,6 @@ function collectBlockDocs(demos) {
         {
           description: componentDescription(block.slug, [block.stories]),
           preview: preview.id,
-          ...blockFiles(block),
         },
       ];
     })
@@ -687,13 +633,11 @@ function renderDemoIndex(demos, componentDocs, blockDocs) {
   const docsLiteral = docsEntries ? `{\n${docsEntries}\n}` : '{}';
 
   const blockEntries = [...blockDocs]
-    .map(([slug, { description, preview, files, components }]) =>
+    .map(([slug, { description, preview }]) =>
       [
         `  ${JSON.stringify(slug)}: {`,
         `    description: ${JSON.stringify(description)},`,
         `    preview: ${JSON.stringify(preview)},`,
-        `    files: ${JSON.stringify(files)},`,
-        `    components: ${JSON.stringify(components)},`,
         `  },`,
       ].join('\n')
     )
@@ -717,7 +661,7 @@ function copyStoryAssets() {
 
 async function generateDemoIndex() {
   const exported = exportedComponentSlugs();
-  const demos = await collectDemos(new Set(exported));
+  const demos = await collectDemos(exported);
   const modulesDir = path.join(GENERATED_DIR, MODULES_DIR);
   const indexFile = path.join(GENERATED_DIR, INDEX_FILE);
 
@@ -759,6 +703,7 @@ async function generateAndLog() {
 
 async function regenerateQuietly() {
   try {
+    generateDependencies();
     await generateAndLog();
   } catch (error) {
     console.error(`demo-index: ${error.message}`);
@@ -781,7 +726,6 @@ function watchSources() {
 
   let pending;
   watcher.on('change', (_event, fileName) => {
-    // Block pages list the files a block imports, so any source edit can change them.
     if (!/\.tsx?$/.test(String(fileName))) return;
     clearTimeout(pending);
     pending = setTimeout(regenerateQuietly, WATCH_DEBOUNCE_MS);

@@ -1,8 +1,15 @@
-import { existsSync, readdirSync, readFileSync, writeFileSync } from 'node:fs';
+import {
+  existsSync,
+  mkdirSync,
+  readdirSync,
+  readFileSync,
+  renameSync,
+  writeFileSync,
+} from 'node:fs';
 import path from 'node:path';
 
 import { pascal } from './humanize.mjs';
-import { blocksRoot, componentsRoot, reactSrc } from './roots.mjs';
+import { blocksRoot, componentsRoot, isUnder, reactSrc } from './roots.mjs';
 
 export function isModuleSource(filePath) {
   const name = path.basename(filePath);
@@ -24,14 +31,37 @@ export function componentSlugs() {
     .sort();
 }
 
-const EXPORTED_COMPONENT = /from '\.\/components\/([^/']+)/g;
+const EXPORTED_COMPONENT = /from '\.\/components\/([^']+)'/g;
 
 /** Every component `@nexus_ds/react` exports, by its folder slug, sorted. */
 export function exportedComponentSlugs() {
   const index = readFileSync(path.join(reactSrc, 'index.ts'), 'utf8');
-  return [
-    ...new Set([...index.matchAll(EXPORTED_COMPONENT)].map(([, slug]) => slug)),
-  ].sort();
+  const slugs = [...index.matchAll(EXPORTED_COMPONENT)].map(([, specifier]) => {
+    const [slug, ...rest] = specifier.split('/');
+    if (slug !== 'appearance' && rest.join('/') !== slug) {
+      throw new Error(
+        `src/index.ts exports './components/${specifier}'. A component's entry file is components/${slug}/${slug}.tsx, so its page can link it — rename the file.`
+      );
+    }
+    return slug;
+  });
+  return new Set(slugs.sort());
+}
+
+/**
+ * The exported component whose own file `filePath` is
+ * (`components/button/button.tsx` → `button`), or null. A docs page links that
+ * component instead of listing its files.
+ * @param {string} filePath
+ * @param {Set<string>} exported from `exportedComponentSlugs()`
+ */
+export function linkedComponentSlug(filePath, exported) {
+  if (!isUnder(filePath, componentsRoot)) return null;
+  const [slug, name, ...nested] = path
+    .relative(componentsRoot, filePath)
+    .split(path.sep);
+  if (nested.length > 0 || name.replace(/\.tsx?$/, '') !== slug) return null;
+  return exported.has(slug) ? slug : null;
 }
 
 /**
@@ -79,6 +109,20 @@ export function collectSourceFiles(dir, include) {
     .filter(include);
 }
 
+export function readCanonical(file) {
+  return readFileSync(file, 'utf8').replace(/\r\n/g, '\n');
+}
+
+// Renames a temp file into place, so a concurrent reader never sees a partial write.
+export function writeIfChanged(file, content) {
+  if (existsSync(file) && readCanonical(file) === content) return;
+
+  mkdirSync(path.dirname(file), { recursive: true });
+  const temp = `${file}.tmp`;
+  writeFileSync(temp, content, 'utf8');
+  renameSync(temp, file);
+}
+
 export function writeJson(filePath, value) {
-  writeFileSync(filePath, `${JSON.stringify(value, null, 2)}\n`, 'utf8');
+  writeIfChanged(filePath, `${JSON.stringify(value, null, 2)}\n`);
 }

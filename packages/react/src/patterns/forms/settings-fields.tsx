@@ -2,7 +2,7 @@
 
 import * as React from 'react';
 
-import { Checkbox } from '../../components/checkbox';
+import { Checkbox } from '../../components/checkbox/checkbox';
 import {
   Field,
   FieldContent,
@@ -13,9 +13,9 @@ import {
   FieldLegend,
   FieldRequiredIndicator,
   FieldSet,
-} from '../../components/field';
-import { Input } from '../../components/input';
-import { Separator } from '../../components/separator';
+} from '../../components/field/field';
+import { Input } from '../../components/input/input';
+import { Separator } from '../../components/separator/separator';
 
 export type SettingsTextBinding = {
   name: string;

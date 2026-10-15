@@ -4,7 +4,7 @@ import * as React from 'react';
 
 import { IconCheck, IconSelector } from '../../lib/icons';
 import { cn } from '../../lib/utils';
-import { Button, type ButtonProps } from '../button';
+import { Button, type ButtonProps } from '../button/button';
 import {
   Command,
   CommandEmpty,
@@ -13,13 +13,13 @@ import {
   CommandItem,
   CommandList,
   CommandSeparator,
-} from '../command';
+} from '../command/command';
 import {
   Popover,
   PopoverContent,
   type PopoverContentProps,
   PopoverTrigger,
-} from '../popover';
+} from '../popover/popover';
 
 /**
  * ComboboxProps

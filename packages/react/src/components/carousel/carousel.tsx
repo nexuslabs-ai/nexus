@@ -8,7 +8,7 @@ import useEmblaCarousel, {
 
 import { IconArrowLeft, IconArrowRight } from '../../lib/icons';
 import { cn } from '../../lib/utils';
-import { Button } from '../button';
+import { Button } from '../button/button';
 
 type CarouselApi = UseEmblaCarouselType[1];
 type UseCarouselParameters = Parameters<typeof useEmblaCarousel>;

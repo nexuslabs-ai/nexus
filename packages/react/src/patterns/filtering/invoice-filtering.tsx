@@ -5,13 +5,13 @@ import * as React from 'react';
 import { IconChevronDown, IconSearch } from '@tabler/icons-react';
 
 import { MultiChoiceEditor } from '../../blocks/filtering/multi-choice-filter/multi-choice-filter';
-import { Button } from '../../components/button';
-import { Input } from '../../components/input';
+import { Button } from '../../components/button/button';
+import { Input } from '../../components/input/input';
 import {
   Popover,
   PopoverContent,
   PopoverTrigger,
-} from '../../components/popover';
+} from '../../components/popover/popover';
 import {
   Table,
   TableBody,
@@ -19,7 +19,7 @@ import {
   TableHead,
   TableHeader,
   TableRow,
-} from '../../components/table';
+} from '../../components/table/table';
 
 type Filters = { statuses: string[]; countries: string[] };
 const empty: Filters = { statuses: [], countries: [] };

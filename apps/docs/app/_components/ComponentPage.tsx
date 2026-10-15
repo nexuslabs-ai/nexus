@@ -19,7 +19,7 @@ import {
   SUBSECTION_HEADING_CLASS,
   SubsectionHeading,
 } from './Heading';
-import { InstallBlock } from './InstallBlock';
+import { ExampleInstall } from './InstallBlock';
 import { PropsTable } from './PropsTable';
 
 type ComponentManifestPage = Extract<ManifestPage, { kind: 'generated' }>;
@@ -44,12 +44,7 @@ export function ComponentPage({ page }: { page: ComponentManifestPage }) {
         <DescriptionText text={docs.description} className="nx:mb-6" />
       )}
       <ComponentDemo id={previewId} />
-      <InstallBlock
-        slugs={preview.alsoInstall}
-        besides={[slug]}
-        alsoPackages={preview.packages}
-        caption="This example also needs:"
-      />
+      <ExampleInstall slugs={preview.alsoInstall} packages={preview.packages} />
 
       <SectionHeading className={SECTION_HEADING_CLASS}>
         Installation
@@ -74,7 +69,7 @@ export function ComponentPage({ page }: { page: ComponentManifestPage }) {
         </SectionHeading>
       )}
       {docs.examples.map((id) => (
-        <Example key={id} id={id} slug={slug} previewId={previewId} />
+        <Example key={id} id={id} previewId={previewId} />
       ))}
 
       <SectionHeading className={SECTION_HEADING_CLASS}>Props</SectionHeading>
@@ -83,15 +78,7 @@ export function ComponentPage({ page }: { page: ComponentManifestPage }) {
   );
 }
 
-function Example({
-  id,
-  slug,
-  previewId,
-}: {
-  id: DemoId;
-  slug: string;
-  previewId: DemoId;
-}) {
+function Example({ id, previewId }: { id: DemoId; previewId: DemoId }) {
   const { title, description, alsoInstall, packages }: Demo = demos[id];
   const preview: Demo = demos[previewId];
 
@@ -107,13 +94,11 @@ function Example({
         <DescriptionText text={description} className="nx:mb-4" />
       )}
       <ComponentDemo id={id} />
-      <InstallBlock
-        slugs={alsoInstall}
-        besides={[slug, ...preview.alsoInstall]}
-        alsoPackages={packages.filter(
-          (spec) => !preview.packages.includes(spec)
+      <ExampleInstall
+        slugs={alsoInstall.filter(
+          (also) => !preview.alsoInstall.includes(also)
         )}
-        caption="This example also needs:"
+        packages={packages.filter((spec) => !preview.packages.includes(spec))}
       />
     </section>
   );

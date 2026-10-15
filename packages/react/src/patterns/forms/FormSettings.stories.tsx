@@ -1,7 +1,7 @@
 import type { Meta, StoryObj } from '@storybook/react';
 import { expect, fn, within } from 'storybook/test';
 
-import { Separator } from '../../components/separator';
+import { Separator } from '../../components/separator/separator';
 import {
   EditProfileDialog,
   RecordSwitchControls,

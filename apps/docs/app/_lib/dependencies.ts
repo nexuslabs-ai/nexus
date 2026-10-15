@@ -8,23 +8,24 @@ import { docsRoot, reactSrc } from '../../scripts/roots.mjs';
 import 'server-only';
 
 const DEPENDENCIES_DIR = path.join(docsRoot, 'generated', 'dependencies');
+const BLOCK_DEPENDENCIES_DIR = path.join(DEPENDENCIES_DIR, 'blocks');
 
 type Package = { name: string; range: string };
 
-export type Dependencies = {
+type Plan = {
+  components: string[];
   install: Package[];
-  copy: string[];
   files: string[];
   styles: string[];
 };
 
-async function listDependencyFiles() {
+async function listDependencyFiles(dir: string) {
   try {
-    return await readdir(DEPENDENCIES_DIR);
+    return await readdir(dir);
   } catch (error) {
     if ((error as NodeJS.ErrnoException).code !== 'ENOENT') throw error;
     throw new Error(
-      `dependencies: no ${DEPENDENCIES_DIR} — run \`pnpm --filter @nexus_ds/docs generate:dependencies\`.`,
+      `dependencies: no ${dir} — run \`pnpm --filter @nexus_ds/docs generate:dependencies\`.`,
       { cause: error }
     );
   }
@@ -48,39 +49,65 @@ function isPackage(value: unknown): value is Package {
   );
 }
 
-function isDependencies(value: unknown): value is Dependencies {
+function isPlan(value: unknown): value is Plan {
   return (
     isRecord(value) &&
+    isStringList(value.components) &&
     Array.isArray(value.install) &&
     value.install.every(isPackage) &&
-    isStringList(value.copy) &&
     isStringList(value.files) &&
     isStringList(value.styles)
   );
 }
 
-export const loadDependencies = cache(
-  async (slug: string): Promise<Dependencies> => {
-    const fileNames = await listDependencyFiles();
-    const fileName = `${slug}.json`;
+export type InstallPlan = {
+  components: string[];
+  packages: string[];
+  files: string[];
+  styles: string[];
+};
 
-    if (!fileNames.includes(fileName)) {
-      const known = fileNames.map((name) => path.basename(name, '.json'));
-      throw new Error(
-        `dependencies: unknown slug "${slug}". Known slugs: ${known.join(', ')}.`
-      );
-    }
+async function loadPlan(dir: string, slug: string): Promise<InstallPlan> {
+  const fileNames = await listDependencyFiles(dir);
+  const fileName = `${slug}.json`;
 
-    const filePath = path.join(DEPENDENCIES_DIR, fileName);
-    const parsed: unknown = JSON.parse(await readFile(filePath, 'utf8'));
-
-    if (!isDependencies(parsed)) {
-      throw new Error(
-        `dependencies: ${filePath} needs an install list of { name, range } and string arrays copy, files, styles — rerun \`pnpm --filter @nexus_ds/docs generate:dependencies\`.`
-      );
-    }
-    return parsed;
+  if (!fileNames.includes(fileName)) {
+    const known = fileNames
+      .filter((name) => name.endsWith('.json'))
+      .map((name) => path.basename(name, '.json'));
+    throw new Error(
+      `dependencies: unknown slug "${slug}". Known slugs: ${known.join(', ')}.`
+    );
   }
+
+  const filePath = path.join(dir, fileName);
+  const parsed: unknown = JSON.parse(await readFile(filePath, 'utf8'));
+
+  if (!isRecord(parsed) || !isPlan(parsed.plan)) {
+    throw new Error(
+      `dependencies: ${filePath} needs a plan of string arrays components, files, styles and an install list of { name, range } — rerun \`pnpm --filter @nexus_ds/docs generate:dependencies\`.`
+    );
+  }
+  const { components, install, files, styles } = parsed.plan;
+  return {
+    components,
+    packages: install.map(({ name, range }) => `${name}@${range}`),
+    files,
+    styles,
+  };
+}
+
+/**
+ * What installing a component takes: the components to install first, then
+ * only the packages, files and styles those components don't already bring.
+ */
+export const loadInstallPlan = cache((slug: string) =>
+  loadPlan(DEPENDENCIES_DIR, slug)
+);
+
+/** The same plan for a block, which links only the components no other link brings. */
+export const loadBlockPlan = cache((slug: string) =>
+  loadPlan(BLOCK_DEPENDENCIES_DIR, slug)
 );
 
 /** Reads a file the dependencies JSON lists, by its path under `packages/react/src/`. */

@@ -9,7 +9,7 @@ import {
 } from '@tabler/icons-react';
 import { expect, within } from 'storybook/test';
 
-import { Spinner } from '../spinner';
+import { Spinner } from '../spinner/spinner';
 
 import { Badge, type BadgeProps } from './badge';
 

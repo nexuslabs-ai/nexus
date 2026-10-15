@@ -11,16 +11,16 @@ import {
   AttachmentDescription,
   AttachmentMedia,
   AttachmentTitle,
-} from '../attachment';
-import { AvatarFallback } from '../avatar';
-import { Bubble, BubbleContent } from '../bubble';
-import { Button } from '../button';
+} from '../attachment/attachment';
+import { AvatarFallback } from '../avatar/avatar';
+import { Bubble, BubbleContent } from '../bubble/bubble';
+import { Button } from '../button/button';
 import {
   Tooltip,
   TooltipContent,
   TooltipProvider,
   TooltipTrigger,
-} from '../tooltip';
+} from '../tooltip/tooltip';
 
 import {
   Message,

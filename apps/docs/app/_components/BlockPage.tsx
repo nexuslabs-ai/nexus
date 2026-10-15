@@ -1,11 +1,14 @@
-import Link from 'next/link';
-
 import { getBlockDocs } from '../../__generated__/demo-index';
-import { loadReactSource } from '../_lib/dependencies';
-import { type ManifestPage, requirePage } from '../_lib/manifest';
+import { loadBlockPlan, loadReactSource } from '../_lib/dependencies';
+import type { ManifestPage } from '../_lib/manifest';
 
 import { ComponentDemo } from './ComponentDemo';
-import { SourceFile } from './ComponentInstallation';
+import {
+  ComponentLinks,
+  PackagesSample,
+  SourceFile,
+  StylesSample,
+} from './ComponentInstallation';
 import { DescriptionText } from './DescriptionText';
 import {
   PAGE_HEADING_CLASS,
@@ -18,12 +21,13 @@ type BlockManifestPage = Extract<ManifestPage, { kind: 'block' }>;
 
 const BODY_CLASS =
   'nx:mb-4 nx:typography-body-default nx:text-muted-foreground';
-const LINK_CLASS =
-  'nx:text-primary-subtle-foreground nx:underline nx:underline-offset-2';
 
-/** A block's story tagged `docs` as the preview, then the files to copy. */
+/** A block's story tagged `docs` as the preview, then its install plan. */
 export async function BlockPage({ page }: { page: BlockManifestPage }) {
-  const { description, preview, files, components } = getBlockDocs(page.slug);
+  const { description, preview } = getBlockDocs(page.slug);
+  const { components, packages, files, styles } = await loadBlockPlan(
+    page.slug
+  );
   const sources = await Promise.all(
     files.map(async (path) => ({ path, source: await loadReactSource(path) }))
   );
@@ -45,21 +49,14 @@ export async function BlockPage({ page }: { page: BlockManifestPage }) {
       </p>
       {components.length > 0 && (
         <p className={BODY_CLASS}>
-          Install these components first:{' '}
-          {components.map((slug, index) => (
-            <span key={slug}>
-              {index > 0 && ', '}
-              <Link href={`/components/${slug}`} className={LINK_CLASS}>
-                {requirePage('components', slug).label}
-              </Link>
-            </span>
-          ))}
-          .
+          Install these components first: <ComponentLinks slugs={components} />.
         </p>
       )}
+      {packages.length > 0 && <PackagesSample packages={packages} />}
       {sources.map(({ path, source }) => (
         <SourceFile key={path} path={path} source={source} />
       ))}
+      {styles.length > 0 && <StylesSample styles={styles} />}
     </>
   );
 }

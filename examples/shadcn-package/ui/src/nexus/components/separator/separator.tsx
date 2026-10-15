@@ -5,23 +5,16 @@ import * as SeparatorPrimitive from '@radix-ui/react-separator';
 import { cn } from '../../lib/utils';
 
 /**
- * SeparatorProps
- *
- * Props for the Separator component.
+ * Props for Separator.
  */
 interface SeparatorProps extends React.ComponentProps<
   typeof SeparatorPrimitive.Root
 > {}
 
 /**
- * Separator
- *
- * A visual divider between content — a thin rule along one axis. Horizontal by
- * default; pass `orientation="vertical"` inside a flex row (the parent needs a
- * defined cross-axis size, since a vertical rule stretches to `h-full`).
- * Decorative by default, so it's hidden from assistive tech; pass
- * `decorative={false}` when the rule marks a genuine semantic boundary between
- * groups (it then exposes a `separator` role).
+ * Thin rule that divides content. A vertical separator fills its parent's
+ * height, so give that parent a set height. Set `decorative={false}` to expose
+ * the `separator` role to assistive tech.
  *
  * @example
  * ```tsx

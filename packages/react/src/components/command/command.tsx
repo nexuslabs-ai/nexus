@@ -9,7 +9,7 @@ import {
   DialogContent,
   DialogDescription,
   DialogTitle,
-} from '../dialog';
+} from '../dialog/dialog';
 
 /**
  * CommandProps

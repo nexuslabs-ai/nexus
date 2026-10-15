@@ -9,9 +9,7 @@ import {
 } from '../overlay-layout/overlay-layout';
 
 /**
- * Popover
- *
- * Root component for the popover. Controls open/close state.
+ * Root of the popover. Holds the open state.
  *
  * @example
  * ```tsx
@@ -26,24 +24,17 @@ import {
 const Popover = PopoverPrimitive.Root;
 
 /**
- * PopoverTrigger
- *
- * Button that toggles the popover. Use `asChild` to render as your own component.
+ * Button that opens and closes the popover. Use `asChild` to render your own
+ * button.
  */
 const PopoverTrigger = PopoverPrimitive.Trigger;
 
 /**
- * PopoverAnchor
- *
- * Optional element to anchor the popover against, instead of the trigger. Useful
- * when the popover should position relative to a different element than the one
- * that opens it.
+ * Element to position the popover against instead of the trigger.
  */
 const PopoverAnchor = PopoverPrimitive.Anchor;
 
 /**
- * PopoverContentProps
- *
  * Props for the PopoverContent component.
  */
 interface PopoverContentProps extends React.ComponentProps<
@@ -51,9 +42,7 @@ interface PopoverContentProps extends React.ComponentProps<
 > {}
 
 /**
- * PopoverContent
- *
- * The floating content container, anchored to the trigger and portaled to the body.
+ * Floating panel next to the trigger, rendered in a portal on `document.body`.
  *
  * @example
  * ```tsx

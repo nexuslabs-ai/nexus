@@ -26,17 +26,15 @@ function useTableContext() {
 }
 
 /**
- * TableProps
- *
- * Props for the Table component.
+ * Props for Table.
  */
 interface TableProps extends React.ComponentProps<'table'> {
   /**
-   * Border treatment for the table's internal lines.
+   * Lines inside the table.
    *
-   * - `default` — softened horizontal row rules + a header underline.
-   * - `borderless` — no internal lines; rows separate by hover + spacing.
-   * - `grid` — row **and** column rules (a full cell grid).
+   * - `default`: row lines and a header underline.
+   * - `borderless`: no lines.
+   * - `grid`: row and column lines.
    *
    * @default 'default'
    * @example
@@ -46,48 +44,38 @@ interface TableProps extends React.ComponentProps<'table'> {
    */
   variant?: TableVariant;
   /**
-   * Row density.
+   * Row height.
    *
-   * - `comfortable` — roomier ~44px rows (the default).
-   * - `compact` — tighter ~36px rows for dense data.
+   * - `comfortable`: about 44px rows.
+   * - `compact`: about 36px rows, for dense data.
    *
    * @default 'comfortable'
    */
   density?: TableDensity;
   /**
-   * Pin the header row while the body scrolls vertically.
-   *
-   * Requires a height-bounded scroll container — set one via `containerClassName`
-   * (e.g. `"nx:max-h-96"`), or there is nothing to scroll. The sticky header
-   * paints on the component `container` surface so it stays raised above the page
-   * canvas in Model 2.
+   * Keeps the header row in view while the body scrolls. Set a max height with
+   * `containerClassName`, such as `"nx:max-h-96"`.
    *
    * @default false
    */
   stickyHeader?: boolean;
   /**
-   * Zebra striping — tint alternating body rows so the eye tracks across a wide
-   * row. Selection and hover take precedence over the stripe.
+   * Tints every other body row. Hover and selection colors win over the stripe.
    *
    * @default false
    */
   striped?: boolean;
   /**
-   * Classes for the scroll container (the element that owns horizontal — and,
-   * with `stickyHeader`, vertical — overflow). Use it to bound the height
-   * (`"nx:max-h-96"`) or set the surface. `className` still targets the `<table>`.
+   * Classes for the scroll container, such as a max height. `className` goes on
+   * the `<table>`.
    */
   containerClassName?: string;
 }
 
 /**
- * Table
- *
- * A semantic data table — header, body, optional footer, and rows of cells.
- * Renders inside a horizontally-scrollable wrapper so wide tables stay usable
- * on narrow viewports without forcing a page-level scrollbar. Compose with the
- * sub-components: `TableHeader` / `TableBody` / `TableFooter` wrap `TableRow`s,
- * which hold `TableHead` (column header) or `TableCell` (data) cells.
+ * Data table with a header, body and optional footer. Wide tables scroll
+ * sideways inside their own container. `TableRow`s hold `TableHead` or
+ * `TableCell` cells.
  *
  * @example
  * ```tsx
@@ -149,34 +137,24 @@ function Table({
 }
 
 /**
- * TableHeaderProps
- *
- * Props for the TableHeader component.
+ * Props for TableHeader.
  */
 interface TableHeaderProps extends React.ComponentProps<'thead'> {}
 
 /**
- * TableHeader
- *
- * The `<thead>` grouping for column-header rows. The underline beneath the
- * header comes from its `TableRow`'s bottom border, so it tracks the `variant`.
+ * `<thead>` that holds the column-header rows.
  */
 function TableHeader({ className, ...props }: TableHeaderProps) {
   return <thead data-slot="table-header" className={className} {...props} />;
 }
 
 /**
- * TableBodyProps
- *
- * Props for the TableBody component.
+ * Props for TableBody.
  */
 interface TableBodyProps extends React.ComponentProps<'tbody'> {}
 
 /**
- * TableBody
- *
- * The `<tbody>` grouping for data rows. The last row drops its bottom border so
- * the body doesn't draw a rule against a following footer or the table edge.
+ * `<tbody>` that holds the data rows.
  */
 function TableBody({ className, ...props }: TableBodyProps) {
   return (
@@ -189,9 +167,7 @@ function TableBody({ className, ...props }: TableBodyProps) {
 }
 
 /**
- * TableFooterProps
- *
- * Props for the TableFooter component.
+ * Props for TableFooter.
  */
 interface TableFooterProps extends React.ComponentProps<'tfoot'> {}
 
@@ -210,10 +186,7 @@ const tableFooterVariants = cva(
 );
 
 /**
- * TableFooter
- *
- * The `<tfoot>` grouping for a summary/totals row — a muted fill and medium
- * weight set it apart from the data rows above.
+ * `<tfoot>` for a summary or totals row, on a muted fill.
  */
 function TableFooter({ className, ...props }: TableFooterProps) {
   const { variant } = useTableContext();
@@ -227,9 +200,7 @@ function TableFooter({ className, ...props }: TableFooterProps) {
 }
 
 /**
- * TableRowProps
- *
- * Props for the TableRow component.
+ * Props for TableRow.
  */
 interface TableRowProps extends React.ComponentProps<'tr'> {}
 
@@ -248,10 +219,8 @@ const tableRowVariants = cva(
 );
 
 /**
- * TableRow
- *
- * A table row. Highlights on hover and when selected — set
- * `data-state="selected"` to mark a row as part of the current selection.
+ * Table row that highlights on hover. Set `data-state="selected"` to mark it
+ * as selected.
  */
 function TableRow({ className, ...props }: TableRowProps) {
   const { variant } = useTableContext();
@@ -265,9 +234,7 @@ function TableRow({ className, ...props }: TableRowProps) {
 }
 
 /**
- * TableHeadProps
- *
- * Props for the TableHead component.
+ * Props for TableHead.
  */
 interface TableHeadProps extends React.ComponentProps<'th'> {}
 
@@ -293,10 +260,7 @@ const tableHeadVariants = cva(
 );
 
 /**
- * TableHead
- *
- * A column-header cell (`<th>`). Rendered in muted foreground to sit quietly
- * above the data it labels.
+ * Column-header cell (`<th>`) in muted text.
  */
 function TableHead({ className, ...props }: TableHeadProps) {
   const { variant, density, stickyHeader } = useTableContext();
@@ -315,9 +279,7 @@ function TableHead({ className, ...props }: TableHeadProps) {
 }
 
 /**
- * TableCellProps
- *
- * Props for the TableCell component.
+ * Props for TableCell.
  */
 interface TableCellProps extends React.ComponentProps<'td'> {}
 
@@ -337,9 +299,7 @@ const tableCellVariants = cva('nx:px-2 nx:align-middle nx:whitespace-nowrap', {
 });
 
 /**
- * TableCell
- *
- * A data cell (`<td>`).
+ * Data cell (`<td>`).
  */
 function TableCell({ className, ...props }: TableCellProps) {
   const { variant, density } = useTableContext();
@@ -356,18 +316,13 @@ const tableSelectionCellClassName =
   'nx:w-0 nx:pe-0 nx:*:[[role=checkbox]]:translate-y-0.5';
 
 /**
- * TableSelectionHeadProps
- *
- * Props for the TableSelectionHead component.
+ * Props for TableSelectionHead.
  */
 interface TableSelectionHeadProps extends TableHeadProps {}
 
 /**
- * TableSelectionHead
- *
- * The header cell for a consumer-owned select-all Checkbox. Compose it as the
- * first header cell, paired with `TableSelectionCell` in each body row. With
- * `stickyHeader` it stays pinned along with the rest of the header.
+ * First header cell, for your select-all Checkbox. Pair it with a
+ * `TableSelectionCell` in each body row.
  */
 function TableSelectionHead({ className, ...props }: TableSelectionHeadProps) {
   return (
@@ -380,17 +335,13 @@ function TableSelectionHead({ className, ...props }: TableSelectionHeadProps) {
 }
 
 /**
- * TableSelectionCellProps
- *
- * Props for the TableSelectionCell component.
+ * Props for TableSelectionCell.
  */
 interface TableSelectionCellProps extends TableCellProps {}
 
 /**
- * TableSelectionCell
- *
- * The cell for a consumer-owned row Checkbox. Set the containing row's
- * `data-state="selected"` from the same selection state.
+ * Cell for your row Checkbox. Set the row's `data-state="selected"` from the
+ * same selection state.
  */
 function TableSelectionCell({ className, ...props }: TableSelectionCellProps) {
   return (
@@ -403,19 +354,13 @@ function TableSelectionCell({ className, ...props }: TableSelectionCellProps) {
 }
 
 /**
- * TableRowHeaderProps
- *
- * Props for the TableRowHeader component.
+ * Props for TableRowHeader.
  */
 interface TableRowHeaderProps extends React.ComponentProps<'th'> {}
 
 /**
- * TableRowHeader
- *
- * The identifying header cell of a row (`<th scope="row">`) — an invoice number,
- * a person's name. Scoping it to the row gives every row an accessible name, so
- * a screen reader announces which row a data cell belongs to. Styled like a data
- * cell but with medium weight.
+ * Cell that names its row, such as an invoice number (`<th scope="row">`).
+ * Screen readers use it to announce which row a cell belongs to.
  */
 function TableRowHeader({ className, ...props }: TableRowHeaderProps) {
   const { variant, density } = useTableContext();
@@ -434,16 +379,12 @@ function TableRowHeader({ className, ...props }: TableRowHeaderProps) {
 }
 
 /**
- * TableCaptionProps
- *
- * Props for the TableCaption component.
+ * Props for TableCaption.
  */
 interface TableCaptionProps extends React.ComponentProps<'caption'> {}
 
 /**
- * TableCaption
- *
- * A caption describing the table. Rendered below the table (`caption-bottom`).
+ * Caption that describes the table, shown below it.
  */
 function TableCaption({ className, ...props }: TableCaptionProps) {
   return (

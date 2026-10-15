@@ -5,7 +5,12 @@ import { expect, userEvent, waitFor, within } from 'storybook/test';
 
 import { cn } from '../../lib/utils';
 import { expectImmediateItemMotion } from '../../stories/support/motion-test-utils';
-import { Field, FieldDescription, FieldError, FieldLabel } from '../field';
+import {
+  Field,
+  FieldDescription,
+  FieldError,
+  FieldLabel,
+} from '../field/field';
 
 import {
   Combobox,

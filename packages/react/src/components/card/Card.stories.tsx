@@ -4,9 +4,9 @@ import type { Meta, StoryObj } from '@storybook/react';
 import { expect, within } from 'storybook/test';
 
 import { expectHeightPinned } from '../../stories/support/story-height-test-utils';
-import { Button } from '../button';
-import { Input } from '../input';
-import { Label } from '../label';
+import { Button } from '../button/button';
+import { Input } from '../input/input';
+import { Label } from '../label/label';
 
 import {
   Card,

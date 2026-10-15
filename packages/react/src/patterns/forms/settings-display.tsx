@@ -2,13 +2,13 @@
 
 import * as React from 'react';
 
-import { Checkbox } from '../../components/checkbox';
+import { Checkbox } from '../../components/checkbox/checkbox';
 import {
   DescriptionList,
   DescriptionListDescription,
   DescriptionListItem,
   DescriptionListTerm,
-} from '../../components/description-list';
+} from '../../components/description-list/description-list';
 import {
   Field,
   FieldDescription,
@@ -16,8 +16,8 @@ import {
   FieldLabel,
   FieldLegend,
   FieldSet,
-} from '../../components/field';
-import { Input } from '../../components/input';
+} from '../../components/field/field';
+import { Input } from '../../components/input/input';
 
 export function ReadOnlyDetails({
   name,

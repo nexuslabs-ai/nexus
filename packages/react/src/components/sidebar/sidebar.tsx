@@ -8,23 +8,23 @@ import { cva, type VariantProps } from 'class-variance-authority';
 import { useIsNarrow } from '../../hooks/use-narrow';
 import { IconLayoutSidebar } from '../../lib/icons';
 import { cn } from '../../lib/utils';
-import { Button } from '../button';
-import { Input } from '../input';
-import { Separator } from '../separator';
+import { Button } from '../button/button';
+import { Input } from '../input/input';
+import { Separator } from '../separator/separator';
 import {
   Sheet,
   SheetContent,
   SheetDescription,
   SheetHeader,
   SheetTitle,
-} from '../sheet';
-import { Skeleton } from '../skeleton';
+} from '../sheet/sheet';
+import { Skeleton } from '../skeleton/skeleton';
 import {
   Tooltip,
   TooltipContent,
   TooltipProvider,
   TooltipTrigger,
-} from '../tooltip';
+} from '../tooltip/tooltip';
 
 const SIDEBAR_COOKIE_NAME = 'sidebar_state';
 const SIDEBAR_COOKIE_MAX_AGE = 60 * 60 * 24 * 7;

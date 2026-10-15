@@ -1,7 +1,7 @@
 import type { Meta, StoryObj } from '@storybook/react';
 import { expect, waitFor } from 'storybook/test';
 
-import { Card, CardContent, CardHeader, CardTitle } from '../card';
+import { Card, CardContent, CardHeader, CardTitle } from '../card/card';
 
 import { ScrollArea, ScrollBar } from './scroll-area';
 
