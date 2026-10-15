@@ -1,5 +1,4 @@
-import type { Mode, NexusSurfaceTone } from './palette';
-import { seedOklch } from './perceptual-ramp';
+import type { NexusSurfaceTone } from './palette';
 
 export const SURFACE_TONE: Record<
   NexusSurfaceTone,
@@ -7,7 +6,7 @@ export const SURFACE_TONE: Record<
 > = {
   slate: { h: 264.7, lightC: 0.003, darkC: 0.006 },
   gray: { h: 261.7, lightC: 0.002, darkC: 0.004 },
-  zinc: { h: 262.8, lightC: 0.001, darkC: 0.002 },
+  zinc: { h: 285.9, lightC: 0.002, darkC: 0.006 },
   neutral: { h: 0, lightC: 0, darkC: 0 },
   stone: { h: 70, lightC: 0.002, darkC: 0.003 },
 };
@@ -70,23 +69,7 @@ const SURFACE_ANCHOR_L: Record<number, number> = Object.fromEntries(
   ])
 );
 
-const DARK_SURFACE_ANCHOR_HEX: Record<NexusSurfaceTone, string> = {
-  stone: '#1c1917',
-  neutral: '#171717',
-  zinc: '#18181b',
-  slate: '#0f172a',
-  gray: '#111827',
-};
-
-function darkAnchorL(surfaceTone: NexusSurfaceTone): number {
-  return seedOklch(DARK_SURFACE_ANCHOR_HEX[surfaceTone]).l ?? 0;
-}
-
-export function anchorToStep(
-  anchor: ShadeAnchor,
-  mode: Mode,
-  surfaceTone: NexusSurfaceTone
-): number {
+export function anchorToStep(anchor: ShadeAnchor): number {
   if (typeof anchor === 'object') return anchor.step;
   if (anchor === 'base') return 0;
 
@@ -95,8 +78,7 @@ export function anchorToStep(
     throw new Error(`surface-ladder: unknown shade anchor '${anchor}'`);
   }
 
-  const anchorL = mode === 'dark' ? darkAnchorL(surfaceTone) : PAGE_L_LIGHT;
-  return Number(((shadeL - anchorL) / STEP_L).toFixed(4));
+  return Number(((shadeL - PAGE_L_LIGHT) / STEP_L).toFixed(4));
 }
 
 export const LIGHT_SURFACE_LADDER = {
@@ -124,8 +106,8 @@ export const LIGHT_SURFACE_LADDER = {
   'border-focus': 400,
 } as const satisfies Record<SurfaceToken, ShadeAnchor>;
 
-// Current dark surfaces are bg-seed-relative and do not sit on shared shade
-// gridlines across tones, so the dark ladder keeps them as raw steps.
+// Dark surfaces are bg-seed-relative and do not sit on the light shade grid, so
+// the dark ladder takes raw steps only.
 export const DARK_SURFACE_LADDER = {
   background: 'base',
   'background-hover': { step: 1.6 },
@@ -146,22 +128,15 @@ export const DARK_SURFACE_LADDER = {
   'nav-border': { step: 3.2 },
   disabled: { step: 1.6 },
   'border-focus': { step: 9.68 },
-} as const satisfies Record<SurfaceToken, ShadeAnchor>;
+} as const satisfies Record<SurfaceToken, Exclude<ShadeAnchor, number>>;
 
 function stepsFromLadder(
-  ladder: Record<SurfaceToken, ShadeAnchor>,
-  mode: Mode
+  ladder: Record<SurfaceToken, ShadeAnchor>
 ): SurfaceSteps {
   return Object.fromEntries(
-    SURFACE_TOKENS.map((token) => [
-      token,
-      anchorToStep(ladder[token], mode, 'stone'),
-    ])
+    SURFACE_TOKENS.map((token) => [token, anchorToStep(ladder[token])])
   ) as SurfaceSteps;
 }
 
-export const LIGHT_SURFACE_STEPS = stepsFromLadder(
-  LIGHT_SURFACE_LADDER,
-  'light'
-);
-export const DARK_SURFACE_STEPS = stepsFromLadder(DARK_SURFACE_LADDER, 'dark');
+export const LIGHT_SURFACE_STEPS = stepsFromLadder(LIGHT_SURFACE_LADDER);
+export const DARK_SURFACE_STEPS = stepsFromLadder(DARK_SURFACE_LADDER);

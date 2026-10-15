@@ -7,12 +7,12 @@
 @utility border-color-default-alpha {
   border-color: var(
     --nx-color-border-default-alpha,
-    oklch(0.13 0.003 70 / 0.0884)
+    oklch(0.13 0.006 285.9 / 0.0884)
   );
 }
 
 @utility border-color-focus {
-  border-color: var(--nx-color-border-focus, oklch(0.7876 0.002 70));
+  border-color: var(--nx-color-border-focus, oklch(0.7876 0.002 285.9));
 }
 
 @utility border-color-disabled {

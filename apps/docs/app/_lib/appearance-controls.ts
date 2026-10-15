@@ -13,11 +13,6 @@ export const DOCS_APPEARANCE_STORAGE_KEY = 'nexus-docs-appearance';
 export const DOCS_APPEARANCE_DEFAULT_STATE = {
   ...DEFAULT_NEXUS_APPEARANCE,
   mode: 'system',
-  surfaceTone: 'stone',
-  density: 'default',
-  elevation: 'quiet',
-  corners: 'square',
-  stroke: 'normal',
 } satisfies NexusAppearanceState;
 
 export const THEME_MODE_KEYS = [
