@@ -7,7 +7,7 @@ export const SURFACE_TONE: Record<
 > = {
   slate: { h: 264.7, lightC: 0.003, darkC: 0.006 },
   gray: { h: 261.7, lightC: 0.002, darkC: 0.004 },
-  zinc: { h: 262.8, lightC: 0.001, darkC: 0.002 },
+  zinc: { h: 285.9, lightC: 0.002, darkC: 0.006 },
   neutral: { h: 0, lightC: 0, darkC: 0 },
   stone: { h: 70, lightC: 0.002, darkC: 0.003 },
 };
@@ -73,7 +73,7 @@ const SURFACE_ANCHOR_L: Record<number, number> = Object.fromEntries(
 const DARK_SURFACE_ANCHOR_HEX: Record<NexusSurfaceTone, string> = {
   stone: '#1c1917',
   neutral: '#171717',
-  zinc: '#18181b',
+  zinc: '#09090b',
   slate: '#0f172a',
   gray: '#111827',
 };

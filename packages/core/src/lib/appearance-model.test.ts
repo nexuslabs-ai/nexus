@@ -26,7 +26,7 @@ describe('appearance model', () => {
     expect(DEFAULT_NEXUS_APPEARANCE).toMatchObject({
       mode: 'light',
       brandColor: DEFAULT_BRAND_COLOR,
-      surfaceTone: 'neutral',
+      surfaceTone: 'zinc',
       lightContrast: 50,
       darkContrast: 50,
       density: 'default',
@@ -157,13 +157,13 @@ describe('sanitizeNexusAppearance', () => {
         ...DEFAULT_NEXUS_APPEARANCE,
         surfaceTone: 'toString',
       }).surfaceTone
-    ).toBe('neutral');
+    ).toBe('zinc');
     expect(
       sanitizeNexusAppearance({
         ...DEFAULT_NEXUS_APPEARANCE,
         surfaceTone: 'hasOwnProperty',
       }).surfaceTone
-    ).toBe('neutral');
+    ).toBe('zinc');
   });
 
   it('rejects invalid brand color, contrast, and enum values', () => {

@@ -13,7 +13,7 @@ the provider you copied in
 | -------------------------------- | ----------------------------------------------------------------------------------- | ------------------------------------------------------------------- |
 | `mode`                           | `'light'`, `'dark'`, `'system'`                                                     | Light or dark. `system` follows the operating system.               |
 | `brandColor`                     | Any CSS color. Default `#0a0a0a`.                                                   | The primary color.                                                  |
-| `surfaceTone`                    | `'stone'`, `'neutral'`, `'zinc'`, `'slate'`, `'gray'`. Default `'neutral'`.         | The gray used for backgrounds.                                      |
+| `surfaceTone`                    | `'stone'`, `'neutral'`, `'zinc'`, `'slate'`, `'gray'`. Default `'zinc'`.            | The gray used for backgrounds.                                      |
 | `lightContrast` / `darkContrast` | `0` to `100`. Default `50`.                                                         | How strong text and borders are, separately for each mode.          |
 | `density`                        | `'tight'`, `'compact'`, `'default'`, `'comfortable'`, `'relaxed'`, `'spacious'`     | Spacing.                                                            |
 | `corners`                        | `'square'`, `'subtle'`, `'smooth'`, `'round'`, `'extra-round'`. Default `'subtle'`. | Corner radius.                                                      |
@@ -123,13 +123,13 @@ To build your own picker, `@nexus_ds/core` exports the presets:
 `surfaceTone` sets the gray behind your content. Every tone is close to
 neutral:
 
-| Tone      | Looks         |
-| --------- | ------------- |
-| `neutral` | Pure gray     |
-| `stone`   | Slightly warm |
-| `zinc`    | Slightly cool |
-| `gray`    | Cool          |
-| `slate`   | Coolest       |
+| Tone      | Looks            |
+| --------- | ---------------- |
+| `neutral` | Pure gray        |
+| `stone`   | Slightly warm    |
+| `gray`    | Slightly cool    |
+| `zinc`    | Cool, space gray |
+| `slate`   | Coolest          |
 
 In light mode, pages, cards and popovers stay white for every tone. The tone
 shows in hover and pressed states, muted surfaces and dark mode.

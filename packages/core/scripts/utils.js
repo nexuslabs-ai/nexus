@@ -57,7 +57,7 @@ export function titleCase(s) {
  * Default configuration for token generation
  */
 export const DEFAULT_CONFIG = {
-  base: 'neutral',
+  base: 'zinc',
   shadow: 'quiet',
   radius: 'subtle',
   borderwidth: 'normal',

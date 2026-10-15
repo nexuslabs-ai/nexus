@@ -74,8 +74,8 @@ export const BASE_TONE_SEEDS: Record<
     dark: { background: '#171717', foreground: '#fafafa' },
   },
   zinc: {
-    light: { background: '#fafafa', foreground: '#18181b' },
-    dark: { background: '#18181b', foreground: '#fafafa' },
+    light: { background: '#fafafa', foreground: '#09090b' },
+    dark: { background: '#09090b', foreground: '#fafafa' },
   },
   slate: {
     light: { background: '#f8fafc', foreground: '#0f172a' },
@@ -121,7 +121,7 @@ export const STROKE_OPTIONS = [
 export const DEFAULT_NEXUS_APPEARANCE: NexusAppearanceState = {
   mode: 'light',
   brandColor: DEFAULT_BRAND_COLOR,
-  surfaceTone: 'neutral',
+  surfaceTone: 'zinc',
   lightContrast: 50,
   darkContrast: 50,
   density: 'default',
