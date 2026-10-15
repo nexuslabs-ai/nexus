@@ -278,7 +278,7 @@ function writeEntries(dir, entries) {
 
 /** Writes each component's and block's JSON; returns how many of each. */
 export function generateDependencies() {
-  const exported = new Set(exportedComponentSlugs());
+  const exported = exportedComponentSlugs();
   const componentWalks = componentSlugs().map(walkSlug).filter(Boolean);
   const blockWalks = blockSources().map(walkBlock);
 

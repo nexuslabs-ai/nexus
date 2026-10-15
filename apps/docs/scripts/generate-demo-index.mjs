@@ -1,12 +1,10 @@
 import {
   cpSync,
   existsSync,
-  mkdirSync,
   readdirSync,
   readFileSync,
   rmSync,
   watch,
-  writeFileSync,
 } from 'node:fs';
 import path from 'node:path';
 
@@ -25,6 +23,8 @@ import {
   blockSources,
   componentSlugs,
   exportedComponentSlugs,
+  readCanonical,
+  writeIfChanged,
 } from './react-sources.mjs';
 import { docsRoot, reactRoot, reactSrc, toRepoPath } from './roots.mjs';
 
@@ -160,19 +160,6 @@ function walk(dir) {
     const entryPath = path.join(dir, entry.name);
     return entry.isDirectory() ? walk(entryPath) : [entryPath];
   });
-}
-
-function readCanonical(file) {
-  return readFileSync(file, 'utf8').replace(/\r\n/g, '\n');
-}
-
-function writeIfChanged(file, content) {
-  if (existsSync(file) && readCanonical(file) === content) {
-    return;
-  }
-
-  mkdirSync(path.dirname(file), { recursive: true });
-  writeFileSync(file, content, 'utf8');
 }
 
 // Removes `dir` itself too, once its last child is gone.
@@ -542,13 +529,13 @@ function previewlessDocs(slug) {
  * Each exported component's page: its preview, examples, Usage and
  * Composition, from its docs stories — or, for a previewless component,
  * Usage from every part it exports.
- * @param {string[]} exported
+ * @param {Set<string>} exported
  * @param {DemoFile[]} demos
  * @returns {Map<string, ComponentDocs>}
  */
 function collectComponentDocs(exported, demos) {
   return new Map(
-    exported.map((slug) => {
+    [...exported].map((slug) => {
       const description = componentDescription(slug, componentStoryFiles(slug));
       if (PREVIEWLESS_COMPONENTS.has(slug)) {
         return [slug, { description, ...previewlessDocs(slug) }];
@@ -674,7 +661,7 @@ function copyStoryAssets() {
 
 async function generateDemoIndex() {
   const exported = exportedComponentSlugs();
-  const demos = await collectDemos(new Set(exported));
+  const demos = await collectDemos(exported);
   const modulesDir = path.join(GENERATED_DIR, MODULES_DIR);
   const indexFile = path.join(GENERATED_DIR, INDEX_FILE);
 

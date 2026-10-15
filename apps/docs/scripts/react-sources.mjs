@@ -1,4 +1,11 @@
-import { existsSync, readdirSync, readFileSync, writeFileSync } from 'node:fs';
+import {
+  existsSync,
+  mkdirSync,
+  readdirSync,
+  readFileSync,
+  renameSync,
+  writeFileSync,
+} from 'node:fs';
 import path from 'node:path';
 
 import { pascal } from './humanize.mjs';
@@ -38,7 +45,7 @@ export function exportedComponentSlugs() {
     }
     return slug;
   });
-  return [...new Set(slugs)].sort();
+  return new Set(slugs.sort());
 }
 
 /**
@@ -102,6 +109,20 @@ export function collectSourceFiles(dir, include) {
     .filter(include);
 }
 
+export function readCanonical(file) {
+  return readFileSync(file, 'utf8').replace(/\r\n/g, '\n');
+}
+
+// Renames a temp file into place, so a concurrent reader never sees a partial write.
+export function writeIfChanged(file, content) {
+  if (existsSync(file) && readCanonical(file) === content) return;
+
+  mkdirSync(path.dirname(file), { recursive: true });
+  const temp = `${file}.tmp`;
+  writeFileSync(temp, content, 'utf8');
+  renameSync(temp, file);
+}
+
 export function writeJson(filePath, value) {
-  writeFileSync(filePath, `${JSON.stringify(value, null, 2)}\n`, 'utf8');
+  writeIfChanged(filePath, `${JSON.stringify(value, null, 2)}\n`);
 }
