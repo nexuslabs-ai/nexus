@@ -46,7 +46,7 @@ export function exportedComponentSlugs() {
  * (`components/button/button.tsx` → `button`), or null. A docs page links that
  * component instead of listing its files.
  * @param {string} filePath
- * @param {string[]} exported from `exportedComponentSlugs()`
+ * @param {Set<string>} exported from `exportedComponentSlugs()`
  */
 export function linkedComponentSlug(filePath, exported) {
   if (!isUnder(filePath, componentsRoot)) return null;
@@ -54,7 +54,7 @@ export function linkedComponentSlug(filePath, exported) {
     .relative(componentsRoot, filePath)
     .split(path.sep);
   if (nested.length > 0 || name.replace(/\.tsx?$/, '') !== slug) return null;
-  return exported.includes(slug) ? slug : null;
+  return exported.has(slug) ? slug : null;
 }
 
 /**

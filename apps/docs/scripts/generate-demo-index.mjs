@@ -239,6 +239,7 @@ function readInstallBlocks() {
       packages: new Map(
         closure.install.map(({ name, range }) => [name, range])
       ),
+      files: closure.files.map(withoutExtension),
       copied: new Set(
         [...closure.copy, ...closure.files].map(withoutExtension)
       ),
@@ -250,7 +251,7 @@ function readInstallBlocks() {
 
 /**
  * A demo pastes beside its folder's block, if the folder is a component, and
- * beside each component it imports that none of those blocks already links.
+ * beside each component it imports that none of those blocks already brings.
  */
 function installSlugsFor(id, specifiers, blocks, exported) {
   const folder = id.split('/')[0];
@@ -271,11 +272,16 @@ function installSlugsFor(id, specifiers, blocks, exported) {
   }
 
   const pasted = own ? [own, ...imported] : imported;
+  // A component with no page of its own is brought by whichever pasted component copies it.
+  const brought = (slug) =>
+    pasted.some((other) => {
+      if (other === slug) return false;
+      const block = blocks.get(other);
+      if (exported.has(slug)) return block.linked.has(slug);
+      return blocks.get(slug).files.every((file) => block.copied.has(file));
+    });
   const extra = imported
-    .filter((slug) => slug !== own)
-    .filter(
-      (slug) => !pasted.some((other) => blocks.get(other).linked.has(slug))
-    )
+    .filter((slug) => slug !== own && !brought(slug))
     .sort();
   for (const slug of extra) {
     if (!exported.has(slug)) {

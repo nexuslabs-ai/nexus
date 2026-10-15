@@ -262,9 +262,23 @@ function blockEntry(walked, closures, exported) {
   };
 }
 
+// Writes in place, so a page rendering mid-regeneration never finds the file missing.
+function writeEntries(dir, entries) {
+  mkdirSync(dir, { recursive: true });
+  const current = new Set(entries.map(({ slug }) => `${slug}.json`));
+  for (const file of readdirSync(dir)) {
+    if (file.endsWith('.json') && !current.has(file)) {
+      rmSync(path.join(dir, file));
+    }
+  }
+  for (const entry of entries) {
+    writeJson(path.join(dir, `${entry.slug}.json`), entry);
+  }
+}
+
 /** Writes each component's and block's JSON; returns how many of each. */
 export function generateDependencies() {
-  const exported = exportedComponentSlugs();
+  const exported = new Set(exportedComponentSlugs());
   const componentWalks = componentSlugs().map(walkSlug).filter(Boolean);
   const blockWalks = blockSources().map(walkBlock);
 
@@ -280,15 +294,8 @@ export function generateDependencies() {
     blockEntry(walked, closures, exported)
   );
 
-  rmSync(outputDir, { recursive: true, force: true });
-  mkdirSync(blocksOutputDir, { recursive: true });
-
-  for (const entry of entries) {
-    writeJson(path.join(outputDir, `${entry.slug}.json`), entry);
-  }
-  for (const entry of blockEntries) {
-    writeJson(path.join(blocksOutputDir, `${entry.slug}.json`), entry);
-  }
+  writeEntries(outputDir, entries);
+  writeEntries(blocksOutputDir, blockEntries);
 
   return { components: entries.length, blocks: blockEntries.length };
 }
