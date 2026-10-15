@@ -33,7 +33,7 @@ import prettier from 'prettier';
 
 import { DOCS_TAG } from './docs-stories.mjs';
 import { humanize, pascal } from './humanize.mjs';
-import { blockSources, EXPORTED_COMPONENT_SLUGS } from './react-sources.mjs';
+import { blockSources, exportedComponentSlugs } from './react-sources.mjs';
 import { reactSrc } from './roots.mjs';
 
 /** Nav metadata source, relative to the docs app root. */
@@ -434,7 +434,7 @@ export async function buildPageManifest(docsRoot, formatOptions) {
 
   function orderedEntries(sectionSlug) {
     if (isComponentsSection(sectionSlug)) {
-      return byLabel(EXPORTED_COMPONENT_SLUGS.map(buildComponentPage));
+      return byLabel(exportedComponentSlugs().map(buildComponentPage));
     }
     if (isBlocksSection(sectionSlug)) {
       // blockSources() is sorted by family, so each group stays contiguous.

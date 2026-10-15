@@ -31,9 +31,7 @@ export async function ComponentInstallation({ slug }: { slug: string }) {
   if (packages.length > 0) {
     steps.push({
       title: 'Install the following dependencies:',
-      body: (
-        <CodeSample lang="bash">{`npm install ${packages.join(' ')}`}</CodeSample>
-      ),
+      body: <PackagesSample packages={packages} />,
     });
   }
   steps.push({
@@ -45,14 +43,7 @@ export async function ComponentInstallation({ slug }: { slug: string }) {
   if (styles.length > 0) {
     steps.push({
       title: 'Import the styles in your global stylesheet:',
-      body: (
-        <CodeSample lang="css">
-          {[
-            '/* app/globals.css */',
-            ...styles.map((file) => `@import '../${file}';`),
-          ].join('\n')}
-        </CodeSample>
-      ),
+      body: <StylesSample styles={styles} />,
     });
   }
   steps.push({
@@ -114,6 +105,25 @@ export function SourceFile({ path, source }: { path: string; source: string }) {
         </figcaption>
       }
     />
+  );
+}
+
+/** The `npm install` command for `name@range` packages. */
+export function PackagesSample({ packages }: { packages: readonly string[] }) {
+  return (
+    <CodeSample lang="bash">{`npm install ${packages.join(' ')}`}</CodeSample>
+  );
+}
+
+/** The global stylesheet's `@import` for each style file. */
+export function StylesSample({ styles }: { styles: readonly string[] }) {
+  return (
+    <CodeSample lang="css">
+      {[
+        '/* app/globals.css */',
+        ...styles.map((file) => `@import '../${file}';`),
+      ].join('\n')}
+    </CodeSample>
   );
 }
 

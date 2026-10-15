@@ -26,7 +26,8 @@ export function componentSlugs() {
 
 const EXPORTED_COMPONENT = /from '\.\/components\/([^']+)'/g;
 
-function readExportedComponentSlugs() {
+/** Every component `@nexus_ds/react` exports, by its folder slug, sorted. */
+export function exportedComponentSlugs() {
   const index = readFileSync(path.join(reactSrc, 'index.ts'), 'utf8');
   const slugs = [...index.matchAll(EXPORTED_COMPONENT)].map(([, specifier]) => {
     const [slug, ...rest] = specifier.split('/');
@@ -40,21 +41,20 @@ function readExportedComponentSlugs() {
   return [...new Set(slugs)].sort();
 }
 
-/** Every component `@nexus_ds/react` exports, by its folder slug, sorted. */
-export const EXPORTED_COMPONENT_SLUGS = readExportedComponentSlugs();
-
 /**
  * The exported component whose own file `filePath` is
  * (`components/button/button.tsx` → `button`), or null. A docs page links that
  * component instead of listing its files.
+ * @param {string} filePath
+ * @param {string[]} exported from `exportedComponentSlugs()`
  */
-export function linkedComponentSlug(filePath) {
+export function linkedComponentSlug(filePath, exported) {
   if (!isUnder(filePath, componentsRoot)) return null;
   const [slug, name, ...nested] = path
     .relative(componentsRoot, filePath)
     .split(path.sep);
   if (nested.length > 0 || name.replace(/\.tsx?$/, '') !== slug) return null;
-  return EXPORTED_COMPONENT_SLUGS.includes(slug) ? slug : null;
+  return exported.includes(slug) ? slug : null;
 }
 
 /**

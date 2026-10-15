@@ -20,10 +20,11 @@ import {
   readDocsStories,
 } from './docs-stories.mjs';
 import { resolveFormatOptions } from './page-manifest.mjs';
+import { generateDependencies } from './generate-dependencies.mjs';
 import {
   blockSources,
   componentSlugs,
-  EXPORTED_COMPONENT_SLUGS,
+  exportedComponentSlugs,
 } from './react-sources.mjs';
 import { docsRoot, reactRoot, reactSrc, toRepoPath } from './roots.mjs';
 
@@ -231,13 +232,17 @@ function readInstallBlocks() {
     file.endsWith('.json')
   );
   for (const file of dependencyFiles) {
-    const { slug, install, copy, files } = JSON.parse(
+    const { slug, closure, plan } = JSON.parse(
       readCanonical(path.join(DEPENDENCIES_DIR, file))
     );
     blocks.set(slug, {
-      packages: new Map(install.map(({ name, range }) => [name, range])),
-      files: files.map(withoutExtension),
-      copied: new Set([...copy, ...files].map(withoutExtension)),
+      packages: new Map(
+        closure.install.map(({ name, range }) => [name, range])
+      ),
+      copied: new Set(
+        [...closure.copy, ...closure.files].map(withoutExtension)
+      ),
+      linked: new Set(plan.components),
     });
   }
   return blocks;
@@ -245,9 +250,9 @@ function readInstallBlocks() {
 
 /**
  * A demo pastes beside its folder's block, if the folder is a component, and
- * beside each component it imports that none of those blocks already copies.
+ * beside each component it imports that none of those blocks already links.
  */
-function installSlugsFor(id, specifiers, blocks) {
+function installSlugsFor(id, specifiers, blocks, exported) {
   const folder = id.split('/')[0];
   const own = blocks.has(folder) ? folder : undefined;
   const imported = [
@@ -269,18 +274,11 @@ function installSlugsFor(id, specifiers, blocks) {
   const extra = imported
     .filter((slug) => slug !== own)
     .filter(
-      (slug) =>
-        !pasted.some(
-          (other) =>
-            other !== slug &&
-            blocks
-              .get(slug)
-              .files.every((file) => blocks.get(other).copied.has(file))
-        )
+      (slug) => !pasted.some((other) => blocks.get(other).linked.has(slug))
     )
     .sort();
   for (const slug of extra) {
-    if (!EXPORTED_COMPONENT_SLUGS.includes(slug)) {
+    if (!exported.has(slug)) {
       throw new Error(
         `Demo ${id} imports @/components/${slug}, which has no page to link. Import it through a component that copies it.`
       );
@@ -425,7 +423,12 @@ async function collectDemos(exported) {
           formatOptions
         );
         const specifiers = importSpecifiers(source);
-        const { own, extra } = installSlugsFor(id, specifiers, installBlocks);
+        const { own, extra } = installSlugsFor(
+          id,
+          specifiers,
+          installBlocks,
+          exported
+        );
         const packages = demoPackages(
           id,
           specifiers,
@@ -664,7 +667,7 @@ function copyStoryAssets() {
 }
 
 async function generateDemoIndex() {
-  const exported = EXPORTED_COMPONENT_SLUGS;
+  const exported = exportedComponentSlugs();
   const demos = await collectDemos(new Set(exported));
   const modulesDir = path.join(GENERATED_DIR, MODULES_DIR);
   const indexFile = path.join(GENERATED_DIR, INDEX_FILE);
@@ -707,6 +710,7 @@ async function generateAndLog() {
 
 async function regenerateQuietly() {
   try {
+    generateDependencies();
     await generateAndLog();
   } catch (error) {
     console.error(`demo-index: ${error.message}`);

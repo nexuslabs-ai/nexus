@@ -1,8 +1,11 @@
 import { loadInstallPlan } from '../_lib/dependencies';
 
 import { CodeBlock } from './CodeBlock';
-import { CodeSample } from './CodeSample';
-import { ComponentLinks } from './ComponentInstallation';
+import {
+  ComponentLinks,
+  PackagesSample,
+  StylesSample,
+} from './ComponentInstallation';
 
 const BODY_CLASS = 'nx:typography-body-default nx:text-muted-foreground';
 
@@ -17,22 +20,13 @@ export async function InstallBlock({ slug }: { slug: string }) {
           Install these components first: <ComponentLinks slugs={components} />.
         </p>
       )}
-      {packages.length > 0 && (
-        <CodeSample lang="bash">{`npm install ${packages.join(' ')}`}</CodeSample>
-      )}
+      {packages.length > 0 && <PackagesSample packages={packages} />}
       {files.length > 0 && (
         <CodeBlock>
           <code>{files.join('\n')}</code>
         </CodeBlock>
       )}
-      {styles.length > 0 && (
-        <CodeSample lang="css">
-          {[
-            '/* app/globals.css */',
-            ...styles.map((file) => `@import '../${file}';`),
-          ].join('\n')}
-        </CodeSample>
-      )}
+      {styles.length > 0 && <StylesSample styles={styles} />}
     </>
   );
 }
@@ -59,9 +53,7 @@ export function ExampleInstall({
           </>
         )}
       </p>
-      {packages.length > 0 && (
-        <CodeSample lang="bash">{`npm install ${packages.join(' ')}`}</CodeSample>
-      )}
+      {packages.length > 0 && <PackagesSample packages={packages} />}
     </>
   );
 }

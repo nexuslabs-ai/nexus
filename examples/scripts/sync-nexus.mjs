@@ -27,14 +27,14 @@ const cssDest = path.join(appDir, config.cssDir);
 
 run('node', ['apps/docs/scripts/generate-dependencies.mjs'], repoRoot);
 
-const closures = config.components.map((slug) =>
-  JSON.parse(readFileSync(path.join(depsDir, `${slug}.json`), 'utf8'))
+const closures = config.components.map(
+  (slug) => JSON.parse(readFileSync(path.join(depsDir, `${slug}.json`), 'utf8')).closure
 );
 const providerFiles = readdirSync(path.join(srcRoot, PROVIDER_DIR))
   .filter((name) => !name.includes('.stories.'))
   .map((name) => `${PROVIDER_DIR}/${name}`);
 const sourceFiles = new Set([
-  ...closures.flatMap((closure) => [...closure.files, ...closure.copy, ...closure.styles]),
+  ...closures.flatMap((closure) => [...closure.files, ...closure.copy]),
   ...providerFiles,
 ]);
 const cssFiles = readdirSync(tailwindDir).filter((name) => name.endsWith('.css'));

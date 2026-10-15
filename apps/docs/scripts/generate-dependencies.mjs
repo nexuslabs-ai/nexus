@@ -7,6 +7,7 @@ import {
   statSync,
 } from 'node:fs';
 import path from 'node:path';
+import { fileURLToPath } from 'node:url';
 
 import ts from 'typescript';
 
@@ -14,6 +15,7 @@ import {
   blockSources,
   collectSourceFiles,
   componentSlugs,
+  exportedComponentSlugs,
   isModuleSource,
   linkedComponentSlug,
   writeJson,
@@ -187,8 +189,10 @@ function assertDeclaredPackages(walks) {
   );
 }
 
-function linkedSlugs(files) {
-  return new Set(files.map(linkedComponentSlug).filter(Boolean));
+function linkedSlugs(files, exported) {
+  return new Set(
+    files.map((file) => linkedComponentSlug(file, exported)).filter(Boolean)
+  );
 }
 
 /**
@@ -214,37 +218,38 @@ function installPlan(walked, components, closures) {
   };
 }
 
-// A component page links every component it reaches.
-function componentEntry(walked, closures) {
+/**
+ * A component page links every component it reaches. `closure` is everything
+ * the component needs on disk, for tools that copy it whole.
+ */
+function componentEntry(walked, closures, exported) {
   const slugDir = path.join(componentsRoot, walked.name);
-  const linked = linkedSlugs(walked.files);
+  const linked = linkedSlugs(walked.files, exported);
   linked.delete(walked.name);
 
   return {
     slug: walked.name,
-    install: walked.packages.map(toInstall),
-    copy: walked.files
-      .filter((file) => !isUnder(file, slugDir))
-      .map(toSrcPath)
-      .sort(),
-    files: walked.files
-      .filter((file) => isUnder(file, slugDir))
-      .map(toSrcPath)
-      .sort(),
-    styles: walked.files
-      .filter((file) => file.endsWith('.css'))
-      .map(toSrcPath)
-      .sort(),
+    closure: {
+      install: walked.packages.map(toInstall),
+      copy: walked.files
+        .filter((file) => !isUnder(file, slugDir))
+        .map(toSrcPath)
+        .sort(),
+      files: walked.files
+        .filter((file) => isUnder(file, slugDir))
+        .map(toSrcPath)
+        .sort(),
+    },
     plan: installPlan(walked, [...linked].sort(), closures),
   };
 }
 
 // A block page links only the components no other link brings.
-function blockEntry(walked, closures) {
-  const linked = [...linkedSlugs(walked.files)];
+function blockEntry(walked, closures, exported) {
+  const linked = [...linkedSlugs(walked.files, exported)];
   const reached = new Set(
     linked.flatMap((slug) =>
-      [...linkedSlugs(closures.get(slug).files)].filter(
+      [...linkedSlugs(closures.get(slug).files, exported)].filter(
         (other) => other !== slug
       )
     )
@@ -257,29 +262,40 @@ function blockEntry(walked, closures) {
   };
 }
 
-const componentWalks = componentSlugs().map(walkSlug).filter(Boolean);
-const blockWalks = blockSources().map(walkBlock);
+/** Writes each component's and block's JSON; returns how many of each. */
+export function generateDependencies() {
+  const exported = exportedComponentSlugs();
+  const componentWalks = componentSlugs().map(walkSlug).filter(Boolean);
+  const blockWalks = blockSources().map(walkBlock);
 
-assertDeclaredPackages([...componentWalks, ...blockWalks]);
+  assertDeclaredPackages([...componentWalks, ...blockWalks]);
 
-const closures = new Map(componentWalks.map((walked) => [walked.name, walked]));
-const entries = componentWalks.map((walked) =>
-  componentEntry(walked, closures)
-);
-const blockEntries = blockWalks.map((walked) => blockEntry(walked, closures));
+  const closures = new Map(
+    componentWalks.map((walked) => [walked.name, walked])
+  );
+  const entries = componentWalks.map((walked) =>
+    componentEntry(walked, closures, exported)
+  );
+  const blockEntries = blockWalks.map((walked) =>
+    blockEntry(walked, closures, exported)
+  );
 
-rmSync(outputDir, { recursive: true, force: true });
-mkdirSync(outputDir, { recursive: true });
+  rmSync(outputDir, { recursive: true, force: true });
+  mkdirSync(blocksOutputDir, { recursive: true });
 
-mkdirSync(blocksOutputDir);
+  for (const entry of entries) {
+    writeJson(path.join(outputDir, `${entry.slug}.json`), entry);
+  }
+  for (const entry of blockEntries) {
+    writeJson(path.join(blocksOutputDir, `${entry.slug}.json`), entry);
+  }
 
-for (const entry of entries) {
-  writeJson(path.join(outputDir, `${entry.slug}.json`), entry);
+  return { components: entries.length, blocks: blockEntries.length };
 }
-for (const entry of blockEntries) {
-  writeJson(path.join(blocksOutputDir, `${entry.slug}.json`), entry);
-}
 
-console.log(
-  `dependencies: ${entries.length} components, ${blockEntries.length} blocks -> ${toRepoPath(outputDir)}`
-);
+if (process.argv[1] === fileURLToPath(import.meta.url)) {
+  const { components, blocks } = generateDependencies();
+  console.log(
+    `dependencies: ${components} components, ${blocks} blocks -> ${toRepoPath(outputDir)}`
+  );
+}

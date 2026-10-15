@@ -2,9 +2,13 @@ import { getBlockDocs } from '../../__generated__/demo-index';
 import { loadBlockPlan, loadReactSource } from '../_lib/dependencies';
 import type { ManifestPage } from '../_lib/manifest';
 
-import { CodeSample } from './CodeSample';
 import { ComponentDemo } from './ComponentDemo';
-import { ComponentLinks, SourceFile } from './ComponentInstallation';
+import {
+  ComponentLinks,
+  PackagesSample,
+  SourceFile,
+  StylesSample,
+} from './ComponentInstallation';
 import { DescriptionText } from './DescriptionText';
 import {
   PAGE_HEADING_CLASS,
@@ -48,20 +52,11 @@ export async function BlockPage({ page }: { page: BlockManifestPage }) {
           Install these components first: <ComponentLinks slugs={components} />.
         </p>
       )}
-      {packages.length > 0 && (
-        <CodeSample lang="bash">{`npm install ${packages.join(' ')}`}</CodeSample>
-      )}
+      {packages.length > 0 && <PackagesSample packages={packages} />}
       {sources.map(({ path, source }) => (
         <SourceFile key={path} path={path} source={source} />
       ))}
-      {styles.length > 0 && (
-        <CodeSample lang="css">
-          {[
-            '/* app/globals.css */',
-            ...styles.map((file) => `@import '../${file}';`),
-          ].join('\n')}
-        </CodeSample>
-      )}
+      {styles.length > 0 && <StylesSample styles={styles} />}
     </>
   );
 }
