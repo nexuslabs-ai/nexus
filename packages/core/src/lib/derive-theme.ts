@@ -130,7 +130,7 @@ export function deriveSurfaces(
   const out: TokenMap = {};
   const ladder = dark ? DARK_SURFACE_LADDER : LIGHT_SURFACE_LADDER;
   const surfaceAt = (token: SurfaceToken, spacing: number) => {
-    const step = anchorToStep(ladder[token], mode, surfaceTone);
+    const step = anchorToStep(ladder[token]);
     const l = clamp01(anchorL + step * spacing);
     const c = !dark && l >= 1 ? 0 : baseC;
     return formatOklch(

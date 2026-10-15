@@ -33,18 +33,6 @@ export const TOKEN_CONFIG_KEYS = [
   'spacingDefault',
 ];
 
-// Defaults mirror `DEFAULT_CONFIG` in packages/core/scripts/utils.js, except
-// `brandColor` which mirrors `DEFAULT_BRAND_COLOR` in appearance-model.ts.
-export const DEFAULT_TOKEN_CONFIG = {
-  base: 'stone',
-  brandColor: '#0a0a0a',
-  radius: 'square',
-  borderwidth: 'normal',
-  shadow: 'quiet',
-  motion: 'snappy',
-  spacingDefault: 'default',
-};
-
 // Appearance-provider wiring presets. Each maps a product policy onto the real
 // `createNexusAppearance` knobs — no invented provider API. See #541 notes.
 export const POLICY_PRESETS = {
@@ -168,6 +156,7 @@ export function validateTokenConfig(tokenConfig, validChoices) {
   for (const key of TOKEN_CONFIG_KEYS) {
     const valid = validChoices[key];
     const value = tokenConfig[key];
+    if (value === undefined) continue;
     if (valid && valid.length > 0 && !valid.includes(value)) {
       throw new Error(
         `Invalid --${key}="${value}". Valid values: ${valid.join(', ')}.`
@@ -210,7 +199,7 @@ export function parseExportArgs(argv, { validChoices } = {}) {
     );
   }
 
-  const tokenConfig = { ...DEFAULT_TOKEN_CONFIG };
+  const tokenConfig = {};
   for (const key of TOKEN_CONFIG_KEYS) {
     if (flags[key] !== undefined) {
       tokenConfig[key] = flags[key];
@@ -856,7 +845,10 @@ function forkReactPackage(destReactDir, scope, coreVersion, version) {
   writeJson(path.join(destReactDir, 'package.json'), reactPkg);
 }
 
-/** Generate the rebranded tailwind package (CSS via the core generator + manifest). */
+/**
+ * Generate the rebranded tailwind package (CSS via the core generator + manifest).
+ * Returns the full token config, with core's defaults filled in.
+ */
 async function writeTailwindPackage(
   destTailwindDir,
   tokenConfig,
@@ -879,7 +871,9 @@ async function writeTailwindPackage(
     ).href
   );
   fs.mkdirSync(destTailwindDir, { recursive: true });
-  await generateTailwindPackage(tokenConfig, { distDir: destTailwindDir });
+  const resolvedTokenConfig = await generateTailwindPackage(tokenConfig, {
+    distDir: destTailwindDir,
+  });
 
   const srcTailwindPkg = readJson(
     path.join(REPO_ROOT, 'packages', 'tailwind', 'package.json')
@@ -888,6 +882,7 @@ async function writeTailwindPackage(
     path.join(destTailwindDir, 'package.json'),
     transformTailwindPackageJson(srcTailwindPkg, { scope, version })
   );
+  return resolvedTokenConfig;
 }
 
 /** Write the produced monorepo root scaffold. */
@@ -1030,9 +1025,6 @@ async function main(argv) {
 
   const outDir = prepareOutDir(config.out, config.force);
   console.log(`\n📦 Exporting "${config.name}" (${config.scope}) → ${outDir}`);
-  console.log(
-    `   tokens: ${TOKEN_CONFIG_KEYS.map((k) => `${k}=${config.tokenConfig[k]}`).join(' ')}`
-  );
 
   forkReactPackage(
     path.join(outDir, 'packages', 'react'),
@@ -1044,20 +1036,22 @@ async function main(argv) {
     `   ✓ forked ${config.scope}/react (Storybook showcase, rebranded)`
   );
 
-  await writeTailwindPackage(
+  const tokenConfig = await writeTailwindPackage(
     path.join(outDir, 'packages', 'tailwind'),
     config.tokenConfig,
     config.scope,
     config.version
   );
-  console.log(`   ✓ generated ${config.scope}/tailwind`);
+  console.log(
+    `   ✓ generated ${config.scope}/tailwind (${TOKEN_CONFIG_KEYS.map((k) => `${k}=${tokenConfig[k]}`).join(' ')})`
+  );
 
   const entries = collectComponentEntries(
     path.join(REPO_ROOT, 'packages', 'react', 'src', 'components')
   );
   writeRootScaffold(
     outDir,
-    config,
+    { ...config, tokenConfig },
     buildManifest(entries, { version: config.version })
   );
   console.log(

@@ -54,17 +54,22 @@ export function titleCase(s) {
 }
 
 /**
- * Default configuration for token generation
+ * Token-generation config for an appearance: the static CSS's `:root` modes
+ * match what the runtime provider applies for the same appearance.
+ * @param {object} appearance - A `NexusAppearanceState`, usually `DEFAULT_NEXUS_APPEARANCE`
  */
-export const DEFAULT_CONFIG = {
-  base: 'zinc',
-  shadow: 'quiet',
-  radius: 'subtle',
-  borderwidth: 'normal',
-  motion: 'snappy',
-  // see CANONICAL_SPACING_DEFAULT_MODE — controls :root cascade only (all 6 modes ship)
-  spacingDefault: 'default',
-};
+export function defaultTokenConfig(appearance) {
+  return {
+    base: appearance.surfaceTone,
+    brandColor: appearance.brandColor,
+    shadow: appearance.elevation,
+    radius: appearance.corners,
+    borderwidth: appearance.stroke,
+    motion: 'snappy',
+    // controls the :root cascade only (all 6 spacing modes ship)
+    spacingDefault: appearance.density,
+  };
+}
 
 // ============================================
 // AUTO-DISCOVERY FUNCTIONS
@@ -196,14 +201,12 @@ export function filterDivergentDark(lightTokens, darkTokens) {
 }
 
 /**
- * Parse CLI arguments
- * @returns {object} Configuration object
+ * Parse `--key=value` CLI flags. Keys left out stay unset so the generator
+ * fills them from `defaultTokenConfig`.
+ * @returns {object} The flags that were passed
  */
-export function parseArgs(
-  argv = process.argv.slice(2),
-  { allowedKeys = Object.keys(DEFAULT_CONFIG) } = {}
-) {
-  const config = { ...DEFAULT_CONFIG };
+export function parseArgs(argv, { allowedKeys }) {
+  const config = {};
   const validFlags = allowedKeys.map((key) => `--${key}`).join(', ');
   const allowed = new Set(allowedKeys);
 

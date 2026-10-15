@@ -52,7 +52,7 @@ export const DEFAULT_BRAND_COLOR = '#0a0a0a';
 export const BASE_TONE_OPTIONS = [
   { value: 'stone', label: 'Stone', color: '#747271' },
   { value: 'neutral', label: 'Neutral', color: '#737373' },
-  { value: 'zinc', label: 'Zinc', color: '#717273' },
+  { value: 'zinc', label: 'Zinc', color: '#717175' },
   { value: 'slate', label: 'Slate', color: '#717376' },
   { value: 'gray', label: 'Gray', color: '#707274' },
 ] as const satisfies readonly {
