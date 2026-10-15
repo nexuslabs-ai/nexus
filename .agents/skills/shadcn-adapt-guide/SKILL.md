@@ -74,7 +74,8 @@ Author `{Name}.stories.tsx` per `testing-react.md`: Default, one per variant + s
 
 - Add the dep to `packages/react/package.json` (alphabetical) → `pnpm install`.
 - Add any new icon to `packages/react/src/lib/icons.ts` (Tabler re-export).
-- `export * from '@/components/{name}'` in `packages/react/src/index.ts`.
+- `export * from './components/{name}/{name}'` in `packages/react/src/index.ts`.
+- Import another component by its file (`'../button/button'`), never its folder.
 
 ### Step 6 — Verify (real gates; fix until green)
 
