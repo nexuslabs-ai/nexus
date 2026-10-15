@@ -18,22 +18,14 @@ import {
   docsStoryModule,
   PREVIEWLESS_COMPONENTS,
   readDocsStories,
-  resolveModule,
 } from './docs-stories.mjs';
 import { resolveFormatOptions } from './page-manifest.mjs';
 import {
   blockSources,
   componentSlugs,
-  exportedComponentSlugs,
-  linkedComponentSlug,
+  EXPORTED_COMPONENT_SLUGS,
 } from './react-sources.mjs';
-import {
-  docsRoot,
-  isUnder,
-  reactRoot,
-  reactSrc,
-  toRepoPath,
-} from './roots.mjs';
+import { docsRoot, reactRoot, reactSrc, toRepoPath } from './roots.mjs';
 
 const GENERATED_DIR = path.join(docsRoot, '__generated__');
 const DEPENDENCIES_DIR = path.join(docsRoot, 'generated', 'dependencies');
@@ -107,10 +99,6 @@ export interface BlockDocs {
   description: string | null;
   /** The block's one story tagged \`docs\`. */
   preview: DemoId;
-  /** Files to copy, by path under \`packages/react/src/\`: its example or the block first, then the files it imports. */
-  files: readonly string[];
-  /** Component folders those files import, each installed from its own page. */
-  components: readonly string[];
 }
 `;
 
@@ -257,8 +245,7 @@ function readInstallBlocks() {
 
 /**
  * A demo pastes beside its folder's block, if the folder is a component, and
- * beside each imported component's block that no block kept before it
- * already copies — largest first, so a block is dropped for one that is listed.
+ * beside each component it imports that none of those blocks already copies.
  */
 function installSlugsFor(id, specifiers, blocks) {
   const folder = id.split('/')[0];
@@ -278,18 +265,26 @@ function installSlugsFor(id, specifiers, blocks) {
     }
   }
 
-  const kept = own ? [own] : [];
-  const extra = [];
-  const largestFirst = imported
+  const pasted = own ? [own, ...imported] : imported;
+  const extra = imported
     .filter((slug) => slug !== own)
-    .sort((a, b) => blocks.get(b).copied.size - blocks.get(a).copied.size);
-  for (const slug of largestFirst) {
-    const covered = kept.some((other) =>
-      blocks.get(slug).files.every((file) => blocks.get(other).copied.has(file))
-    );
-    if (covered) continue;
-    kept.push(slug);
-    extra.push(slug);
+    .filter(
+      (slug) =>
+        !pasted.some(
+          (other) =>
+            other !== slug &&
+            blocks
+              .get(slug)
+              .files.every((file) => blocks.get(other).copied.has(file))
+        )
+    )
+    .sort();
+  for (const slug of extra) {
+    if (!EXPORTED_COMPONENT_SLUGS.includes(slug)) {
+      throw new Error(
+        `Demo ${id} imports @/components/${slug}, which has no page to link. Import it through a component that copies it.`
+      );
+    }
   }
 
   if (!own && extra.length === 0) {
@@ -452,7 +447,7 @@ async function collectDemos(exported) {
     }
   }
 
-  // A block page shows its files to copy instead of install blocks.
+  // A block page shows its install plan instead of install blocks.
   for (const block of blockSources()) {
     try {
       const [story] = blockDocsStories(block);
@@ -569,54 +564,11 @@ function collectComponentDocs(exported, demos) {
 }
 
 /**
- * @typedef {{ description: string | null; preview: string; files: string[]; components: string[] }} BlockDocs
+ * @typedef {{ description: string | null; preview: string }} BlockDocs
  */
 
 /**
- * The block's minimal example (`{slug}-example.tsx`) if it has one, else its
- * source, then every file that reaches through relative imports short of a
- * linked component, then the components those files import directly.
- * @param {import('./react-sources.mjs').BlockSource} block
- * @returns {Omit<BlockDocs, 'preview'>}
- */
-function blockFiles(block) {
-  const files = new Set();
-  const components = new Set();
-  const visit = (file) => {
-    if (files.has(file)) return;
-    files.add(file);
-    for (const specifier of importSpecifiers(readCanonical(file))) {
-      if (!specifier.startsWith('.')) continue;
-      const target = resolveModule(path.resolve(path.dirname(file), specifier));
-      if (!target || !isUnder(target, reactSrc)) {
-        throw new Error(
-          `${toRepoPath(file)} imports ${specifier}, which is not a file under packages/react/src — a block page can't list it.`
-        );
-      }
-      const linked = linkedComponentSlug(target);
-      if (linked) {
-        components.add(linked);
-        continue;
-      }
-      visit(target);
-    }
-  };
-  const example = path.join(
-    path.dirname(block.source),
-    `${block.slug}-example.tsx`
-  );
-  visit(existsSync(example) ? example : block.source);
-
-  return {
-    files: [...files].map((file) =>
-      path.relative(reactSrc, file).split(path.sep).join('/')
-    ),
-    components: [...components].sort(),
-  };
-}
-
-/**
- * Each block's page: its one docs story and the files to copy.
+ * Each block's page: its one docs story.
  * @param {DemoFile[]} demos
  * @returns {Map<string, BlockDocs>}
  */
@@ -630,7 +582,6 @@ function collectBlockDocs(demos) {
         {
           description: componentDescription(block.slug, [block.stories]),
           preview: preview.id,
-          ...blockFiles(block),
         },
       ];
     })
@@ -686,13 +637,11 @@ function renderDemoIndex(demos, componentDocs, blockDocs) {
   const docsLiteral = docsEntries ? `{\n${docsEntries}\n}` : '{}';
 
   const blockEntries = [...blockDocs]
-    .map(([slug, { description, preview, files, components }]) =>
+    .map(([slug, { description, preview }]) =>
       [
         `  ${JSON.stringify(slug)}: {`,
         `    description: ${JSON.stringify(description)},`,
         `    preview: ${JSON.stringify(preview)},`,
-        `    files: ${JSON.stringify(files)},`,
-        `    components: ${JSON.stringify(components)},`,
         `  },`,
       ].join('\n')
     )
@@ -715,7 +664,7 @@ function copyStoryAssets() {
 }
 
 async function generateDemoIndex() {
-  const exported = exportedComponentSlugs();
+  const exported = EXPORTED_COMPONENT_SLUGS;
   const demos = await collectDemos(new Set(exported));
   const modulesDir = path.join(GENERATED_DIR, MODULES_DIR);
   const indexFile = path.join(GENERATED_DIR, INDEX_FILE);
@@ -780,7 +729,6 @@ function watchSources() {
 
   let pending;
   watcher.on('change', (_event, fileName) => {
-    // Block pages list the files a block imports, so any source edit can change them.
     if (!/\.tsx?$/.test(String(fileName))) return;
     clearTimeout(pending);
     pending = setTimeout(regenerateQuietly, WATCH_DEBOUNCE_MS);

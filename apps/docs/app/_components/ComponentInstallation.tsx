@@ -12,7 +12,7 @@ type Step = { title: string; body?: ReactNode };
 
 /** The Installation section of a component page: Command and Manual tabs. */
 export async function ComponentInstallation({ slug }: { slug: string }) {
-  const { components, packages, files, styles } = await loadInstallPlan([slug]);
+  const { components, packages, files, styles } = await loadInstallPlan(slug);
   const sources = await Promise.all(
     files.map(async (path) => ({ path, source: await loadReactSource(path) }))
   );

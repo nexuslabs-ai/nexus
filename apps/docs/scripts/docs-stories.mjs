@@ -923,7 +923,7 @@ function identifiersIn(text) {
   return names;
 }
 
-export function resolveModule(basePath) {
+function resolveModule(basePath) {
   return [`${basePath}.tsx`, `${basePath}.ts`].find((candidate) =>
     existsSync(candidate)
   );

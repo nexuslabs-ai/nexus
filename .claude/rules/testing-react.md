@@ -35,6 +35,11 @@ A component folder has no `index.ts`. Import another component by its file
 (`'../button/button'`), never its folder: the docs copy list follows these
 imports.
 
+The import decides what a docs page shows. Importing an exported component's
+own file (`button/button.tsx`) links that component's page. Importing any other
+file from another folder (`button-group/button-group-context.ts`) copies that
+file onto the page, and does not link its folder's component.
+
 **No separate `*.test.tsx` files for components.** Tests live in stories.
 
 ## Story Template with Play Functions

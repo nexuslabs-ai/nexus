@@ -6,9 +6,9 @@ import { ComponentLinks } from './ComponentInstallation';
 
 const BODY_CLASS = 'nx:typography-body-default nx:text-muted-foreground';
 
-/** Everything installing `slugs` takes: components to install first, then packages, files and styles. */
-export async function InstallBlock({ slugs }: { slugs: readonly string[] }) {
-  const { components, packages, files, styles } = await loadInstallPlan(slugs);
+/** Everything installing `slug` takes: components to install first, then packages, files and styles. */
+export async function InstallBlock({ slug }: { slug: string }) {
+  const { components, packages, files, styles } = await loadInstallPlan(slug);
 
   return (
     <>
@@ -51,13 +51,12 @@ export function ExampleInstall({
   return (
     <>
       <p className={BODY_CLASS}>
-        This example also needs
-        {slugs.length > 0 ? (
+        This example also needs:
+        {slugs.length > 0 && (
           <>
-            : <ComponentLinks slugs={slugs} />.
+            {' '}
+            <ComponentLinks slugs={slugs} />.
           </>
-        ) : (
-          ':'
         )}
       </p>
       {packages.length > 0 && (

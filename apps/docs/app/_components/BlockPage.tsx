@@ -1,7 +1,8 @@
 import { getBlockDocs } from '../../__generated__/demo-index';
-import { loadReactSource } from '../_lib/dependencies';
+import { loadBlockPlan, loadReactSource } from '../_lib/dependencies';
 import type { ManifestPage } from '../_lib/manifest';
 
+import { CodeSample } from './CodeSample';
 import { ComponentDemo } from './ComponentDemo';
 import { ComponentLinks, SourceFile } from './ComponentInstallation';
 import { DescriptionText } from './DescriptionText';
@@ -17,9 +18,12 @@ type BlockManifestPage = Extract<ManifestPage, { kind: 'block' }>;
 const BODY_CLASS =
   'nx:mb-4 nx:typography-body-default nx:text-muted-foreground';
 
-/** A block's story tagged `docs` as the preview, then the files to copy. */
+/** A block's story tagged `docs` as the preview, then its install plan. */
 export async function BlockPage({ page }: { page: BlockManifestPage }) {
-  const { description, preview, files, components } = getBlockDocs(page.slug);
+  const { description, preview } = getBlockDocs(page.slug);
+  const { components, packages, files, styles } = await loadBlockPlan(
+    page.slug
+  );
   const sources = await Promise.all(
     files.map(async (path) => ({ path, source: await loadReactSource(path) }))
   );
@@ -44,9 +48,20 @@ export async function BlockPage({ page }: { page: BlockManifestPage }) {
           Install these components first: <ComponentLinks slugs={components} />.
         </p>
       )}
+      {packages.length > 0 && (
+        <CodeSample lang="bash">{`npm install ${packages.join(' ')}`}</CodeSample>
+      )}
       {sources.map(({ path, source }) => (
         <SourceFile key={path} path={path} source={source} />
       ))}
+      {styles.length > 0 && (
+        <CodeSample lang="css">
+          {[
+            '/* app/globals.css */',
+            ...styles.map((file) => `@import '../${file}';`),
+          ].join('\n')}
+        </CodeSample>
+      )}
     </>
   );
 }

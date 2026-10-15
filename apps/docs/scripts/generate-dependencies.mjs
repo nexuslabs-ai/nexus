@@ -1,4 +1,5 @@
 import {
+  existsSync,
   mkdirSync,
   readdirSync,
   readFileSync,
@@ -10,6 +11,7 @@ import path from 'node:path';
 import ts from 'typescript';
 
 import {
+  blockSources,
   collectSourceFiles,
   componentSlugs,
   isModuleSource,
@@ -26,6 +28,7 @@ import {
 } from './roots.mjs';
 
 const outputDir = path.join(docsRoot, 'generated', 'dependencies');
+const blocksOutputDir = path.join(outputDir, 'blocks');
 
 function readManifest(packageDir) {
   return JSON.parse(
@@ -141,59 +144,69 @@ function colocatedStyles(files) {
   );
 }
 
-function walkSlug(slug) {
-  const slugDir = path.join(componentsRoot, slug);
-  const roots = collectSourceFiles(slugDir, isModuleSource);
-  if (roots.length === 0) return null;
-
+function walkRoots(name, roots) {
   const walked = walk(roots);
-  const needed = new Set([...walked.files, ...colocatedStyles(walked.files)]);
-
   return {
-    slug,
-    slugDir,
-    packages: walked.packages.filter((name) => name !== 'react'),
-    files: [...needed],
+    name,
+    packages: walked.packages.filter((pkg) => pkg !== 'react').sort(),
+    files: [...new Set([...walked.files, ...colocatedStyles(walked.files)])],
   };
+}
+
+function walkSlug(slug) {
+  const roots = collectSourceFiles(
+    path.join(componentsRoot, slug),
+    isModuleSource
+  );
+  return roots.length > 0 ? walkRoots(slug, roots) : null;
+}
+
+// A block page shows its minimal example if it has one, else its source.
+function walkBlock(block) {
+  const example = path.join(
+    path.dirname(block.source),
+    `${block.slug}-example.tsx`
+  );
+  return walkRoots(block.slug, [existsSync(example) ? example : block.source]);
 }
 
 function assertDeclaredPackages(walks) {
   const offenders = walks.flatMap((walked) =>
     walked.packages
       .filter((name) => !runtimeRanges.has(name))
-      .map((name) => `  ${walked.slug}: ${name}`)
+      .map((name) => `  ${walked.name}: ${name}`)
   );
 
   if (offenders.length === 0) return;
 
   throw new Error(
     [
-      'dependencies JSON: a component imports a package @nexus_ds/react does not declare in dependencies or peerDependencies.',
+      'dependencies JSON: a component or block imports a package @nexus_ds/react does not declare in dependencies or peerDependencies.',
       ...offenders,
     ].join('\n')
   );
 }
 
-function linkedComponents(slug, files) {
-  const slugs = files
-    .map(linkedComponentSlug)
-    .filter((linked) => linked && linked !== slug);
-  return [...new Set(slugs)].sort();
+function linkedSlugs(files) {
+  return new Set(files.map(linkedComponentSlug).filter(Boolean));
 }
 
-function toEntry({ slug, slugDir, packages, files }) {
+/**
+ * What a page tells the reader to do: install `components` first, then only
+ * the packages, files and styles none of those components bring.
+ */
+function installPlan(walked, components, closures) {
+  const brought = components.map((slug) => closures.get(slug));
+  const broughtFiles = new Set(brought.flatMap(({ files }) => files));
+  const broughtPackages = new Set(brought.flatMap(({ packages }) => packages));
+  const files = walked.files.filter((file) => !broughtFiles.has(file));
+
   return {
-    slug,
-    install: packages.sort().map(toInstall),
-    components: linkedComponents(slug, files),
-    copy: files
-      .filter((file) => !isUnder(file, slugDir))
-      .map(toSrcPath)
-      .sort(),
-    files: files
-      .filter((file) => isUnder(file, slugDir))
-      .map(toSrcPath)
-      .sort(),
+    components,
+    install: walked.packages
+      .filter((name) => !broughtPackages.has(name))
+      .map(toInstall),
+    files: files.map(toSrcPath).sort(),
     styles: files
       .filter((file) => file.endsWith('.css'))
       .map(toSrcPath)
@@ -201,19 +214,72 @@ function toEntry({ slug, slugDir, packages, files }) {
   };
 }
 
-const walks = componentSlugs().map(walkSlug).filter(Boolean);
+// A component page links every component it reaches.
+function componentEntry(walked, closures) {
+  const slugDir = path.join(componentsRoot, walked.name);
+  const linked = linkedSlugs(walked.files);
+  linked.delete(walked.name);
 
-assertDeclaredPackages(walks);
+  return {
+    slug: walked.name,
+    install: walked.packages.map(toInstall),
+    copy: walked.files
+      .filter((file) => !isUnder(file, slugDir))
+      .map(toSrcPath)
+      .sort(),
+    files: walked.files
+      .filter((file) => isUnder(file, slugDir))
+      .map(toSrcPath)
+      .sort(),
+    styles: walked.files
+      .filter((file) => file.endsWith('.css'))
+      .map(toSrcPath)
+      .sort(),
+    plan: installPlan(walked, [...linked].sort(), closures),
+  };
+}
 
-const entries = walks.map(toEntry);
+// A block page links only the components no other link brings.
+function blockEntry(walked, closures) {
+  const linked = [...linkedSlugs(walked.files)];
+  const reached = new Set(
+    linked.flatMap((slug) =>
+      [...linkedSlugs(closures.get(slug).files)].filter(
+        (other) => other !== slug
+      )
+    )
+  );
+  const direct = linked.filter((slug) => !reached.has(slug));
+
+  return {
+    slug: walked.name,
+    plan: installPlan(walked, direct.sort(), closures),
+  };
+}
+
+const componentWalks = componentSlugs().map(walkSlug).filter(Boolean);
+const blockWalks = blockSources().map(walkBlock);
+
+assertDeclaredPackages([...componentWalks, ...blockWalks]);
+
+const closures = new Map(componentWalks.map((walked) => [walked.name, walked]));
+const entries = componentWalks.map((walked) =>
+  componentEntry(walked, closures)
+);
+const blockEntries = blockWalks.map((walked) => blockEntry(walked, closures));
 
 rmSync(outputDir, { recursive: true, force: true });
 mkdirSync(outputDir, { recursive: true });
 
+mkdirSync(blocksOutputDir);
+
 for (const entry of entries) {
   writeJson(path.join(outputDir, `${entry.slug}.json`), entry);
 }
+for (const entry of blockEntries) {
+  writeJson(path.join(blocksOutputDir, `${entry.slug}.json`), entry);
+}
 
 console.log(
-  `dependencies: ${entries.length} entries -> ${toRepoPath(outputDir)}`
+  `dependencies: ${entries.length} components, ${blockEntries.length} blocks -> ${toRepoPath(outputDir)}`
 );
