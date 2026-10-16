@@ -2,16 +2,7 @@
 
 import { useId } from 'react';
 
-import {
-  Alert,
-  AlertDescription,
-  AlertTitle,
-  Badge,
-  Card,
-  CardContent,
-  CardHeader,
-  CardTitle,
-} from '@nexus_ds/react';
+import { Alert, AlertDescription, AlertTitle, Badge } from '@nexus_ds/react';
 
 import { Sampler } from '../../sampler';
 
@@ -51,28 +42,23 @@ export function LabPreview() {
       >
         Preview
       </h2>
-      <Card>
-        <CardHeader>
-          <CardTitle>Status</CardTitle>
-        </CardHeader>
-        <CardContent className="nx:space-y-3">
-          {ALERTS.map((alert) => (
-            <Alert key={alert.variant} variant={alert.variant}>
-              <AlertTitle>{alert.title}</AlertTitle>
-              <AlertDescription>{alert.description}</AlertDescription>
-            </Alert>
-          ))}
-          {(['light', 'solid'] as const).map((fill) => (
-            <div key={fill} className="nx:flex nx:flex-wrap nx:gap-2">
-              {BADGES.map((variant) => (
-                <Badge key={variant} variant={variant} fill={fill}>
-                  {variant}
-                </Badge>
-              ))}
-            </div>
-          ))}
-        </CardContent>
-      </Card>
+      <div className="nx:space-y-3">
+        {ALERTS.map((alert) => (
+          <Alert key={alert.variant} variant={alert.variant}>
+            <AlertTitle>{alert.title}</AlertTitle>
+            <AlertDescription>{alert.description}</AlertDescription>
+          </Alert>
+        ))}
+        {(['light', 'solid'] as const).map((fill) => (
+          <div key={fill} className="nx:flex nx:flex-wrap nx:gap-2">
+            {BADGES.map((variant) => (
+              <Badge key={variant} variant={variant} fill={fill}>
+                {variant}
+              </Badge>
+            ))}
+          </div>
+        ))}
+      </div>
       <Sampler />
     </section>
   );
