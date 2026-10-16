@@ -41,7 +41,7 @@ function useComponentQuery() {
   };
 }
 
-function Swatch({ color }: { color: string | undefined }) {
+export function Swatch({ color }: { color: string | undefined }) {
   return (
     <span
       aria-hidden="true"
