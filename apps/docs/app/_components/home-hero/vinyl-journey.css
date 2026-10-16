@@ -1,0 +1,62 @@
+/* Printed vinyl: saturated pastel stock, white cut edge, and a corner glint. */
+.vinyl-journey .journey-tile,
+.vinyl-journey .journey-tool {
+  isolation: isolate;
+  overflow: hidden;
+  background-clip: padding-box;
+}
+.vinyl-journey .journey-tile {
+  background-color: color-mix(
+    in srgb,
+    var(--paper) 78%,
+    var(--sticker-pigment)
+  );
+}
+.vinyl-journey .journey-color-0 {
+  --sticker-pigment: #8797ff;
+}
+.vinyl-journey .journey-color-1 {
+  --sticker-pigment: #ffb660;
+}
+.vinyl-journey .journey-color-2 {
+  --sticker-pigment: #ff967e;
+}
+.vinyl-journey .journey-color-3 {
+  --sticker-pigment: #45d3ec;
+}
+.vinyl-journey .journey-color-4 {
+  --sticker-pigment: #f5ce44;
+}
+.vinyl-journey .journey-color-5 {
+  --sticker-pigment: #9fb5c3;
+}
+.vinyl-journey .journey-color-6 {
+  --sticker-pigment: #bd91f3;
+}
+.vinyl-journey .journey-color-7 {
+  --sticker-pigment: #50d9aa;
+}
+.vinyl-journey .journey-color-8 {
+  --sticker-pigment: #b8e448;
+}
+.vinyl-journey .journey-tool {
+  background-color: color-mix(in srgb, var(--paper) 90%, var(--ink));
+}
+.vinyl-journey .journey-tile::before,
+.vinyl-journey .journey-tool::before {
+  content: '';
+  position: absolute;
+  top: 5px;
+  left: 5px;
+  width: 15px;
+  height: 9px;
+  border-top: 2px solid rgb(255 255 255 / 95%);
+  border-left: 2px solid rgb(255 255 255 / 65%);
+  border-top-left-radius: 7px;
+  pointer-events: none;
+}
+
+.vinyl-journey .journey-tile,
+.vinyl-journey .journey-tool {
+  border-width: 4px;
+}
