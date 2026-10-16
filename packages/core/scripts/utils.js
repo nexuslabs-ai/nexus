@@ -1281,17 +1281,6 @@ export function generateThemeCSS(config) {
 
   css += `}\n`;
 
-  // Static so every layer reaches `:root` even when no utility uses it: a
-  // component can read `var(--nx-z-index-*)` from an inline style.
-  if (zIndexTokens.length > 0) {
-    css += `\n@theme static {\n`;
-    css += `  /* Z-index tokens */\n`;
-    for (const token of zIndexTokens) {
-      css += `  --${token.cssName}: ${token.value};\n`;
-    }
-    css += `}\n`;
-  }
-
   // Inlined so a motion-mode override on any ancestor reaches them.
   const defaultDuration = motionTokens.find(
     (token) =>
@@ -1330,37 +1319,36 @@ export function generateThemeCSS(config) {
   // `reference` keeps these keys out of Tailwind's own `:root` block. With
   // `prefix(nx)` that block would redeclare each `--nx-*` name as a var() of
   // itself; the values are declared below and in variables.css instead.
-  if (radiusTokens.length > 0 || semanticTokens.length > 0) {
-    css += `\n@theme inline reference {\n`;
-    css += `  /* Radius tokens */\n`;
-    for (const token of radiusTokens) {
-      css += `  --${token.cssName}: ${token.varRef};\n`;
-    }
-    css += `\n  /* Semantic colour tokens */\n`;
-    for (const token of semanticTokens) {
-      css += `  --${token.cssName}: var(--nx-${token.cssName});\n`;
-    }
-    css += `}\n`;
+  css += `\n@theme inline reference {\n`;
+  css += `  /* Radius tokens */\n`;
+  for (const token of radiusTokens) {
+    css += `  --${token.cssName}: ${token.varRef};\n`;
   }
+  css += `\n  /* Z-index tokens */\n`;
+  for (const token of zIndexTokens) {
+    css += `  --${token.cssName}: var(--nx-${token.cssName});\n`;
+  }
+  css += `\n  /* Semantic colour tokens */\n`;
+  for (const token of semanticTokens) {
+    css += `  --${token.cssName}: var(--nx-${token.cssName});\n`;
+  }
+  css += `}\n`;
 
-  // In the theme layer so the provider's unlayered runtime theme always wins.
-  if (semanticTokens.length > 0) {
-    css += `\n/* ===== SEMANTIC COLOURS (default appearance) ===== */\n`;
-    css += `@layer theme {\n`;
-    css += `  :root {\n`;
-    for (const token of semanticTokens) {
-      css += `    --nx-${token.cssName}: ${token.value};\n`;
-    }
-    css += `  }\n`;
-    if (darkSemanticTokens.length > 0) {
-      css += `\n  .dark {\n`;
-      for (const token of darkSemanticTokens) {
-        css += `    --nx-${token.cssName}: ${token.value};\n`;
-      }
-      css += `  }\n`;
-    }
-    css += `}\n`;
+  // The theme layer ranks under the provider's runtime layer and under any
+  // unlayered consumer CSS, so both override these defaults.
+  css += `\n/* ===== Z-INDEX AND SEMANTIC COLOURS (default appearance) ===== */\n`;
+  css += `@layer theme {\n`;
+  css += `  :root {\n`;
+  for (const token of [...zIndexTokens, ...semanticTokens]) {
+    css += `    --nx-${token.cssName}: ${token.value};\n`;
   }
+  css += `  }\n`;
+  css += `\n  .dark {\n`;
+  for (const token of darkSemanticTokens) {
+    css += `    --nx-${token.cssName}: ${token.value};\n`;
+  }
+  css += `  }\n`;
+  css += `}\n`;
 
   return css;
 }

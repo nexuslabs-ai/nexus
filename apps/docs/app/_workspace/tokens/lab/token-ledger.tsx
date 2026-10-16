@@ -26,7 +26,7 @@ import {
   SelectValue,
 } from '@nexus_ds/react';
 
-import { Swatch } from '../surfaces/surfaces-view';
+import { Swatch } from '../swatch';
 import type { LiveTheme } from '../use-live-theme';
 
 import type { PrimitiveColor } from './lab-data';

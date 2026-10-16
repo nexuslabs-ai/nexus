@@ -22,6 +22,7 @@ import {
 
 import { PageHeading } from '../../page-heading';
 import { useWorkspaceLocation } from '../../use-workspace-location';
+import { Swatch } from '../swatch';
 import type { LiveTheme } from '../use-live-theme';
 
 import {
@@ -39,16 +40,6 @@ function useComponentQuery() {
     setQuery: (query: string) =>
       navigate(new URLSearchParams(query ? { q: query } : undefined), true),
   };
-}
-
-export function Swatch({ color }: { color: string | undefined }) {
-  return (
-    <span
-      aria-hidden="true"
-      className="nx:block nx:size-4 nx:shrink-0 nx:rounded-sm nx:border-default nx:border-border-default"
-      style={{ backgroundColor: color }}
-    />
-  );
 }
 
 function TokenBadge({

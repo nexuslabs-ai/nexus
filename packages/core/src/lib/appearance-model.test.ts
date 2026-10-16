@@ -431,11 +431,11 @@ describe('appearancePrefsToCss', () => {
 
   it('touches the host page only for the toggles the user turns on', () => {
     const css = appearancePrefsToCss(DEFAULT_NEXUS_APPEARANCE.prefs);
-    const selectors = [...css.matchAll(/([^{}]+)\{/g)].flatMap(
+    const selectors = [...css.matchAll(/([^{};]+)\{/g)].flatMap(
       ([, list = '']) => list.split(',').map((selector) => selector.trim())
     );
     for (const selector of selectors) {
-      expect(selector, selector).toMatch(/^(:root|\.nx\\:)/);
+      expect(selector, selector).toMatch(/^(@layer nx-runtime$|:root|\.nx\\:)/);
     }
   });
 

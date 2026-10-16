@@ -17,6 +17,7 @@ import {
 } from './palette';
 import { rampFromSeed, seedOklch } from './perceptual-ramp';
 import { getPaletteRamp, getPaletteShade } from './primitive-palette';
+import { inRuntimeLayer } from './runtime-layer';
 import {
   CHART_PALETTE_REFERENCES,
   STATUS_PALETTE_FAMILIES,
@@ -454,7 +455,12 @@ function block(selector: string, map: TokenMap): string {
   return `${selector} {\n${body}\n}`;
 }
 
-/** Serialize a derived theme to CSS text — light on `:root`, dark on `:root.dark`. */
+/**
+ * Serialize a derived theme to CSS text in the runtime layer — light on
+ * `:root`, dark on `:root.dark`.
+ */
 export function themeToCss(derived: DerivedTheme): string {
-  return `${block(':root', derived.light)}\n${block(':root.dark', derived.dark)}\n`;
+  return inRuntimeLayer(
+    `${block(':root', derived.light)}\n${block(':root.dark', derived.dark)}`
+  );
 }

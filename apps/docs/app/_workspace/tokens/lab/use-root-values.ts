@@ -2,16 +2,15 @@
 
 import { useEffect, useState } from 'react';
 
-import type { NexusAppearanceState, TokenMap } from '@nexus_ds/core';
+import type { TokenMap } from '@nexus_ds/core';
 
 /**
  * Computed values of custom properties on `<html>`. Re-reads when the
- * appearance or the overrides change, and when the provider swaps a preset
- * attribute on `<html>`.
+ * overrides change, when the provider swaps a preset attribute or the dark
+ * class on `<html>`, and when it rewrites its runtime styles in `<head>`.
  */
 export function useRootValues(
   names: readonly string[],
-  appearance: NexusAppearanceState,
   overrides: TokenMap
 ): Record<string, string> {
   const [values, setValues] = useState<Record<string, string>>({});
@@ -28,8 +27,13 @@ export function useRootValues(
     read();
     const observer = new MutationObserver(read);
     observer.observe(document.documentElement, { attributes: true });
+    observer.observe(document.head, {
+      childList: true,
+      subtree: true,
+      characterData: true,
+    });
     return () => observer.disconnect();
-  }, [names, appearance, overrides]);
+  }, [names, overrides]);
 
   return values;
 }

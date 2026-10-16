@@ -4,6 +4,7 @@ import { normalizeContrast } from './contrast';
 import type { ThemeDerivationInput, ThemeSeeds } from './derive-theme';
 import type { NexusSurfaceTone } from './palette';
 import { isColor } from './perceptual-ramp';
+import { inRuntimeLayer } from './runtime-layer';
 
 type ModeSeeds = Pick<ThemeSeeds, 'background' | 'foreground'>;
 
@@ -315,11 +316,11 @@ export function appearancePrefsToCss(prefs: NexusAppearancePrefs): string {
   // Font and type size reach only Nexus. The toggles below apply to the whole
   // page, host included, when the user turns them on.
   const blocks: string[] = [
-    `:root {
+    inRuntimeLayer(`:root {
   --nx-typography-family-font-sans: ${prefs.uiFont};
   --nx-typography-family-font-mono: ${prefs.codeFont};
 ${typographyScaleVariables(uiPx)}
-}`,
+}`),
     `.nx\\:font-mono, .nx\\:typography-code-block, .nx\\:typography-code-inline { font-size: ${codePx}px; }`,
   ];
   if (prefs.fontSmoothing) {

@@ -1,4 +1,5 @@
 import {
+  type CatalogueControl,
   type CatalogueFamily,
   type CatalogueToken,
   createTokenCatalogue,
@@ -18,6 +19,8 @@ export interface ScaleToken {
   family: ScaleFamily;
   group: string;
   type: string;
+  /** The appearance setting that writes it, or `null` when nothing does. */
+  control: CatalogueControl | null;
   /**
    * The catalogue value for a token the page can't override: a typography or
    * shadow style composed from other tokens, or a breakpoint compiled into
@@ -72,6 +75,7 @@ export function labData(): LabData {
               family: token.family,
               group: token.group,
               type: token.type,
+              control: token.control,
               fixedValue: fixedValue(token),
             },
           ]

@@ -413,7 +413,7 @@ function groupByCategory(tokens) {
 }
 
 /**
- * Generate variables.css with --nx-* prefixed primitives.
+ * Generate variables.css with --nx-* prefixed primitives, in the theme layer.
  * Themed dark variants emit into a `.dark` block that overrides `:root` when
  * an ancestor carries the `.dark` class (matching the @custom-variant selector
  * used in nexus.css).
@@ -423,6 +423,7 @@ function generateVariablesCSS(primitiveTokens, divergentDark, usedModes) {
   css += `/* Auto-generated - DO NOT EDIT */\n`;
   css += `/* All primitives use --nx-* prefix for namespace isolation */\n\n`;
 
+  css += `@layer theme {\n`;
   css += `:root {\n`;
   const lightCategories = groupByCategory(primitiveTokens);
   for (const [category, tokens] of Object.entries(lightCategories)) {
@@ -452,6 +453,7 @@ function generateVariablesCSS(primitiveTokens, divergentDark, usedModes) {
     }
     css += `}\n`;
   }
+  css += `}\n`;
 
   return css;
 }
@@ -516,9 +518,9 @@ function generateNexusCSS(
 /* Auto-generated - DO NOT EDIT */
 /* Uses nx: prefix for all utility classes */
 /*
- * Semantic colours default to the engine's output for the default appearance,
- * declared in the theme layer. NexusAppearanceProvider's runtime theme is
- * unlayered, so it overrides them.
+ * Every default and preset block is declared in the theme layer. The
+ * provider's runtime theme sits in the later nx-runtime layer, and unlayered
+ * consumer CSS overrides both.
  */
 
 `;
@@ -554,6 +556,7 @@ function generateNexusCSS(
   // the consumer-chosen default + plain `[data-density="X"]` for the others).
   // Lives outside @theme so the cascade can pick the active mode at runtime
   // via the `data-density` attribute on any ancestor.
+  css += `\n@layer theme {\n`;
   css += generateSpacingModesCSS(spacingModes, { defaultMode: spacingDefault });
   css += generateSpacingModesCSS(runtimeModes.radiusModes, {
     defaultMode: usedModes.radius,
@@ -572,6 +575,7 @@ function generateNexusCSS(
     commentLabel: 'BORDER WIDTH',
     duplicateValuePrefix: null,
   });
+  css += `}\n`;
 
   css += generateNativeBrowserUIThemeCSS();
   css += generateAutofillUtilitiesCSS();

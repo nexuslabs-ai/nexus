@@ -32,19 +32,19 @@ const FAMILIES: Record<ScaleFamily, string> = {
   breakpoint: 'Breakpoints',
 };
 
-/** The appearance field that picks each moded family's preset. */
-const PRESET_FIELDS: Partial<
-  Record<ScaleFamily, 'density' | 'corners' | 'elevation' | 'stroke'>
-> = {
-  spacing: 'density',
-  radius: 'corners',
-  borderwidth: 'stroke',
-  shadow: 'elevation',
+const PREF_LABELS: Record<keyof NexusAppearancePrefs, string> = {
+  uiFont: 'UI font',
+  codeFont: 'code font',
+  uiFontSize: 'UI font size',
+  codeFontSize: 'code font size',
+  reduceMotion: 'reduce motion',
+  pointerCursors: 'pointer cursors',
+  fontSmoothing: 'font smoothing',
 };
 
 /** A CSS property that accepts each token type, to validate an override. */
 const VALIDATION_PROPERTIES: Record<string, string> = {
-  dimension: 'margin-top',
+  dimension: 'padding-top',
   color: 'color',
   fontFamily: 'font-family',
   fontWeight: 'font-weight',
@@ -53,20 +53,40 @@ const VALIDATION_PROPERTIES: Record<string, string> = {
   number: 'z-index',
 };
 
+/** Families with negative dimensions: shadow offsets and letter spacing. */
+const SIGNED_DIMENSION_FAMILIES = new Set<ScaleFamily>([
+  'shadow',
+  'typography',
+]);
+
 const bare = (name: string) => name.replace('--nx-', '');
 
-/** The appearance preference that writes a typography primitive, if any. */
-function preferenceLabel(
-  token: ScaleToken,
+function prefLabel(
+  field: keyof NexusAppearancePrefs,
   prefs: NexusAppearancePrefs
-): string | null {
-  if (token.family !== 'typography') return null;
-  if (token.group === 'size' || token.group === 'line-height') {
-    return `UI font size: ${prefs.uiFontSize}px`;
+): string {
+  const value = prefs[field];
+  return typeof value === 'number'
+    ? `${PREF_LABELS[field]}: ${value}px`
+    : PREF_LABELS[field];
+}
+
+function validationProperty({ family, type }: ScaleToken): string {
+  if (type === 'dimension' && SIGNED_DIMENSION_FAMILIES.has(family)) {
+    return 'outline-offset';
   }
-  if (token.name === '--nx-typography-family-font-sans') return 'UI font';
-  if (token.name === '--nx-typography-family-font-mono') return 'code font';
-  return null;
+  const property = VALIDATION_PROPERTIES[type];
+  if (property === undefined) {
+    throw new Error(`ScaleLedger: no CSS property validates "${type}" tokens`);
+  }
+  return property;
+}
+
+/** Whether `property` accepts `value`, read back from a detached element. */
+function accepts(property: string, value: string): boolean {
+  const { style } = document.createElement('div');
+  style.setProperty(property, value);
+  return style.getPropertyValue(property) !== '';
 }
 
 interface ScaleLedgerProps {
@@ -93,14 +113,16 @@ export function ScaleLedger({
         .map(({ name }) => name),
     [tokens]
   );
-  const values = useRootValues(runtimeNames, appearance, overrides);
+  const values = useRootValues(runtimeNames, overrides);
 
-  function sourceLabel(token: ScaleToken): string {
-    if (token.family === 'breakpoint') return 'build time';
-    if (token.fixedValue !== null) return 'composed';
-    const field = PRESET_FIELDS[token.family];
-    if (field) return `${field}: ${appearance[field]}`;
-    return preferenceLabel(token, appearance.prefs) ?? 'fixed';
+  function sourceLabel({ family, fixedValue, control }: ScaleToken): string {
+    if (family === 'breakpoint') return 'build time';
+    if (fixedValue !== null) return 'composed';
+    if (control === null) return 'fixed';
+    if (control.kind === 'preset') {
+      return `${control.field}: ${appearance[control.field]}`;
+    }
+    return prefLabel(control.field, appearance.prefs);
   }
 
   return (
@@ -226,8 +248,7 @@ function ScaleEditor({
   onOverride: (token: string, value: string | null) => void;
 }) {
   const [value, setValue] = useState('');
-  const property = VALIDATION_PROPERTIES[token.type] ?? 'margin-top';
-  const valid = CSS.supports(property, value.trim());
+  const valid = accepts(validationProperty(token), value.trim());
 
   function apply(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();

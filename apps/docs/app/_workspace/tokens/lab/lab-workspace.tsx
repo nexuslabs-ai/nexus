@@ -23,7 +23,7 @@ type Overrides = Record<Mode | 'shared', TokenMap>;
 
 const NO_OVERRIDES: Overrides = { light: {}, dark: {}, shared: {} };
 
-/** A consumer's hand-written theme: plain `:root` declarations. */
+/** A consumer's hand-written theme: unlayered `:root` declarations. */
 function overrideCss(overrides: Overrides): string {
   const block = (selector: string, tokens: TokenMap) => {
     const body = Object.entries(tokens)
@@ -32,10 +32,9 @@ function overrideCss(overrides: Overrides): string {
     return body ? `${selector} { ${body} }` : '';
   };
   return [
-    block('html:root:not(.dark)', overrides.light),
-    block('html:root.dark', overrides.dark),
-    // Outranks the preset blocks on <html>, including `.dark[data-shadow]`.
-    block('html:root:root', overrides.shared),
+    block(':root:not(.dark)', overrides.light),
+    block(':root.dark', overrides.dark),
+    block(':root', overrides.shared),
   ].join('\n');
 }
 
