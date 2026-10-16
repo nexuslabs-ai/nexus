@@ -25,7 +25,7 @@ import {
 import { Swatch } from '../surfaces/surfaces-view';
 import type { LiveTheme } from '../use-live-theme';
 
-import type { PrimitiveColor } from './primitive-colors';
+import type { PrimitiveColor } from './lab-data';
 
 const CATEGORIES: Record<TokenCategory, string> = {
   surface: 'Surfaces',
@@ -39,6 +39,10 @@ const CATEGORIES: Record<TokenCategory, string> = {
 };
 
 const bare = (name: string) => name.replace('--nx-color-', '');
+
+/** A ledger row: one token, expandable into its override editor. */
+export const LEDGER_ROW_CLASS =
+  'nx:flex nx:w-full nx:items-center nx:gap-3 nx:border-0 nx:bg-transparent nx:px-2 nx:py-2 nx:text-left nx:text-inherit nx:cursor-pointer nx:hover:bg-background-hover nx:focus-visible:outline-2 nx:focus-visible:outline-focus-default';
 
 /** The failing check that misses its floor by the most. */
 function worst(checks: ThemeContrastCheck[]): ThemeContrastCheck | undefined {
@@ -90,7 +94,8 @@ export function TokenLedger({
   const overridden = rows.filter((row) => row.overridden).length;
 
   return (
-    <section aria-label="Semantic colour tokens" className="nx:space-y-4">
+    <section className="nx:space-y-4">
+      <h2 className="nx:typography-heading-small">Colour</h2>
       <div className="nx:flex nx:flex-wrap nx:gap-2">
         <Badge variant="secondary">
           {onPrimitive} share a primitive&apos;s value
@@ -107,9 +112,9 @@ export function TokenLedger({
       </div>
       {Object.entries(CATEGORIES).map(([category, label]) => (
         <div key={category} className="nx:space-y-1">
-          <h2 className="nx:typography-label-small nx:text-muted-foreground">
+          <h3 className="nx:typography-label-small nx:text-muted-foreground">
             {label}
-          </h2>
+          </h3>
           <ul className="nx:m-0 nx:list-none nx:p-0">
             {rows
               .filter((row) => row.category === category)
@@ -166,7 +171,7 @@ function LedgerRow({
       type="button"
       aria-expanded={expanded}
       onClick={onToggle}
-      className="nx:flex nx:w-full nx:items-center nx:gap-3 nx:border-0 nx:bg-transparent nx:px-2 nx:py-2 nx:text-left nx:text-inherit nx:cursor-pointer nx:hover:bg-background-hover nx:focus-visible:outline-2 nx:focus-visible:outline-focus-default"
+      className={LEDGER_ROW_CLASS}
     >
       <Swatch color={value} />
       <span className="nx:min-w-0 nx:flex-1">

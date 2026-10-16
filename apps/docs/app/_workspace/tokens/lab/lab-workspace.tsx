@@ -13,15 +13,17 @@ import { WorkspaceLayout } from '../../workspace-layout';
 import { TokenViewNav } from '../token-view-nav';
 import { useLiveTheme } from '../use-live-theme';
 
+import type { LabData } from './lab-data';
 import { LabPreview } from './lab-preview';
-import type { PrimitiveColor } from './primitive-colors';
+import { ScaleLedger } from './scale-ledger';
 import { TokenLedger } from './token-ledger';
 
-type Overrides = Record<Mode, TokenMap>;
+/** Colour overrides per mode; `shared` holds non-colour overrides for both. */
+type Overrides = Record<Mode | 'shared', TokenMap>;
 
-const NO_OVERRIDES: Overrides = { light: {}, dark: {} };
+const NO_OVERRIDES: Overrides = { light: {}, dark: {}, shared: {} };
 
-/** A consumer's hand-written theme: plain `:root` declarations, per mode. */
+/** A consumer's hand-written theme: plain `:root` declarations. */
 function overrideCss(overrides: Overrides): string {
   const block = (selector: string, tokens: TokenMap) => {
     const body = Object.entries(tokens)
@@ -32,21 +34,27 @@ function overrideCss(overrides: Overrides): string {
   return [
     block('html:root:not(.dark)', overrides.light),
     block('html:root.dark', overrides.dark),
+    // Outranks the preset blocks on <html>, including `.dark[data-shadow]`.
+    block('html:root:root', overrides.shared),
   ].join('\n');
 }
 
-export function LabWorkspace({ primitives }: { primitives: PrimitiveColor[] }) {
+export function LabWorkspace({ primitives, scales }: LabData) {
   const { state, change, startStep } = useAppearanceHistory();
   const { resolvedMode } = useNexusAppearance();
   const [overrides, setOverrides] = useState<Overrides>(NO_OVERRIDES);
   const live = useLiveTheme(overrides);
 
-  function setOverride(token: string, value: string | null) {
+  function setOverride(
+    scope: keyof Overrides,
+    token: string,
+    value: string | null
+  ) {
     setOverrides((current) => {
-      const tokens = { ...current[resolvedMode] };
+      const tokens = { ...current[scope] };
       if (value === null) delete tokens[token];
       else tokens[token] = value;
-      return { ...current, [resolvedMode]: tokens };
+      return { ...current, [scope]: tokens };
     });
   }
 
@@ -81,19 +89,28 @@ export function LabWorkspace({ primitives }: { primitives: PrimitiveColor[] }) {
       <header className="nx:space-y-2 nx:mb-8">
         <PageHeading>Tokens</PageHeading>
         <p className="nx:max-w-2xl nx:text-muted-foreground">
-          Every semantic colour the engine derives for this appearance, where
-          its value comes from, and whether it passes its contrast checks.
-          Override a token to see what a hand-written theme does to the
-          components.
+          Every token for this appearance and where its value comes from.
+          Colours show whether they pass their contrast checks. Override a token
+          to see what a hand-written theme does to the components.
         </p>
       </header>
       <div className="nx:grid nx:items-start nx:gap-8 nx:xl:grid-cols-2">
-        <TokenLedger
-          live={live}
-          primitives={primitives}
-          overrides={overrides[resolvedMode]}
-          onOverride={setOverride}
-        />
+        <div className="nx:space-y-8">
+          <TokenLedger
+            live={live}
+            primitives={primitives}
+            overrides={overrides[resolvedMode]}
+            onOverride={(token, value) =>
+              setOverride(resolvedMode, token, value)
+            }
+          />
+          <ScaleLedger
+            tokens={scales}
+            appearance={state}
+            overrides={overrides.shared}
+            onOverride={(token, value) => setOverride('shared', token, value)}
+          />
+        </div>
         <LabPreview />
       </div>
       <style>{overrideCss(overrides)}</style>
