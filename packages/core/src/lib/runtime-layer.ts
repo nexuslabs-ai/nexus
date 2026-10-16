@@ -5,5 +5,5 @@
  * overrides it.
  */
 export function inRuntimeLayer(css: string): string {
-  return `@layer theme, base, components, utilities, nx-runtime;\n@layer nx-runtime {\n${css}\n}\n`;
+  return `@layer properties, theme, base, components, utilities, nx-runtime;\n@layer nx-runtime {\n${css}\n}\n`;
 }

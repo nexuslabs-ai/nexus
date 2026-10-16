@@ -491,10 +491,10 @@ function generateNexusCSS(
     );
   }
 
-  // Per-mode spacing — default numerics seed @theme for Tailwind's spacing-utility
-  // codegen (nx:p-*, nx:m-*, nx:gap-*, nx:h-*, nx:w-*). The per-mode override
-  // blocks live outside @theme in `:root, [data-density="X"]` form (see below);
-  // role tokens are not registered in @theme — they're consumed by the
+  // Per-mode spacing — the default numeric names register Tailwind's
+  // spacing-utility keys (nx:p-*, nx:m-*, nx:gap-*, nx:h-*, nx:w-*). The values
+  // live only in the `:root, [data-density="X"]` blocks (see below); role
+  // tokens are not registered in @theme — they're consumed by the
   // separately-emitted spacing-utilities.css.
   const { numeric: defaultSpacingNumeric } = splitSpacingTokens(
     spacingModes[CANONICAL_SPACING_DEFAULT_MODE]
@@ -526,8 +526,8 @@ function generateNexusCSS(
 `;
 
   // Generate theme CSS using shared function. spacingTokens carries only the
-  // numeric default subset — role tokens (control/container/layout) live in the
-  // per-mode override blocks below, not in @theme.
+  // numeric subset — role tokens (control/container/layout) live only in the
+  // per-mode blocks below.
   let css = generateThemeCSS({
     header,
     googleFontsImport,

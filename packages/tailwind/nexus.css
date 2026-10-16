@@ -28,42 +28,6 @@
   --shadow-*: initial;
   --breakpoint-*: initial;
 
-  /* Spacing tokens */
-  --spacing-0: 0px;
-  --spacing-1: 4px;
-  --spacing-2: 8px;
-  --spacing-3: 12px;
-  --spacing-4: 16px;
-  --spacing-5: 20px;
-  --spacing-6: 24px;
-  --spacing-7: 28px;
-  --spacing-8: 32px;
-  --spacing-9: 36px;
-  --spacing-10: 40px;
-  --spacing-11: 44px;
-  --spacing-12: 48px;
-  --spacing-14: 56px;
-  --spacing-16: 64px;
-  --spacing-20: 80px;
-  --spacing-24: 96px;
-  --spacing-28: 112px;
-  --spacing-32: 128px;
-  --spacing-36: 144px;
-  --spacing-40: 160px;
-  --spacing-44: 176px;
-  --spacing-48: 192px;
-  --spacing-52: 208px;
-  --spacing-56: 224px;
-  --spacing-60: 240px;
-  --spacing-64: 256px;
-  --spacing-72: 288px;
-  --spacing-80: 320px;
-  --spacing-96: 384px;
-  --spacing-0_5: 2px;
-  --spacing-1_5: 6px;
-  --spacing-2_5: 10px;
-  --spacing-3_5: 14px;
-
   /* Motion tokens */
   --ease-linear: var(--nx-motion-ease-linear);
   --ease-enter: var(--nx-motion-ease-enter);
@@ -144,6 +108,42 @@
 }
 
 @theme inline reference {
+  /* Spacing tokens */
+  --spacing-0: var(--nx-spacing-0);
+  --spacing-1: var(--nx-spacing-1);
+  --spacing-2: var(--nx-spacing-2);
+  --spacing-3: var(--nx-spacing-3);
+  --spacing-4: var(--nx-spacing-4);
+  --spacing-5: var(--nx-spacing-5);
+  --spacing-6: var(--nx-spacing-6);
+  --spacing-7: var(--nx-spacing-7);
+  --spacing-8: var(--nx-spacing-8);
+  --spacing-9: var(--nx-spacing-9);
+  --spacing-10: var(--nx-spacing-10);
+  --spacing-11: var(--nx-spacing-11);
+  --spacing-12: var(--nx-spacing-12);
+  --spacing-14: var(--nx-spacing-14);
+  --spacing-16: var(--nx-spacing-16);
+  --spacing-20: var(--nx-spacing-20);
+  --spacing-24: var(--nx-spacing-24);
+  --spacing-28: var(--nx-spacing-28);
+  --spacing-32: var(--nx-spacing-32);
+  --spacing-36: var(--nx-spacing-36);
+  --spacing-40: var(--nx-spacing-40);
+  --spacing-44: var(--nx-spacing-44);
+  --spacing-48: var(--nx-spacing-48);
+  --spacing-52: var(--nx-spacing-52);
+  --spacing-56: var(--nx-spacing-56);
+  --spacing-60: var(--nx-spacing-60);
+  --spacing-64: var(--nx-spacing-64);
+  --spacing-72: var(--nx-spacing-72);
+  --spacing-80: var(--nx-spacing-80);
+  --spacing-96: var(--nx-spacing-96);
+  --spacing-0_5: var(--nx-spacing-0_5);
+  --spacing-1_5: var(--nx-spacing-1_5);
+  --spacing-2_5: var(--nx-spacing-2_5);
+  --spacing-3_5: var(--nx-spacing-3_5);
+
   /* Radius tokens */
   --radius-base: var(--nx-radius-base);
   --radius-sm: var(--nx-radius-sm);

@@ -1,6 +1,7 @@
 import type {
   NexusAppearancePrefs,
   NexusAppearanceState,
+  NexusPresetField,
 } from '../lib/appearance-model';
 import type { Mode } from '../lib/palette';
 import type { TokenValue } from '../token-source/types';
@@ -97,10 +98,7 @@ export interface CatalogueVariant {
  * picks one of its moded values, or a preference the provider computes it from.
  */
 export type CatalogueControl =
-  | {
-      readonly kind: 'preset';
-      readonly field: 'density' | 'corners' | 'elevation' | 'stroke';
-    }
+  | { readonly kind: 'preset'; readonly field: NexusPresetField }
   | { readonly kind: 'pref'; readonly field: keyof NexusAppearancePrefs };
 
 export interface CatalogueToken {

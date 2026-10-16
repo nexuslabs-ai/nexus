@@ -48,6 +48,9 @@ export interface NexusAppearanceState {
   prefs: NexusAppearancePrefs;
 }
 
+/** An appearance field that picks one of a token family's preset modes. */
+export type NexusPresetField = 'density' | 'corners' | 'elevation' | 'stroke';
+
 export const DEFAULT_BRAND_COLOR = '#0a0a0a';
 
 export const BASE_TONE_OPTIONS = [
@@ -213,10 +216,7 @@ function typographyScaleVariables(uiPx: number): string {
 // Retired public-mode codename -> friendly, applied to persisted state on read
 // (see normalizeAppearanceModeIds). Internal; correctness is covered behaviorally
 // by the sanitize codename->friendly tests, so it is not part of the public API.
-const PUBLIC_MODE_RENAME: Record<
-  'density' | 'corners' | 'elevation' | 'stroke',
-  Record<string, string>
-> = {
+const PUBLIC_MODE_RENAME: Record<NexusPresetField, Record<string, string>> = {
   density: {
     nova: 'compact',
     mira: 'default',

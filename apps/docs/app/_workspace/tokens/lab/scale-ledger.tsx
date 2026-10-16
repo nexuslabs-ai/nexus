@@ -53,10 +53,13 @@ const VALIDATION_PROPERTIES: Record<string, string> = {
   number: 'z-index',
 };
 
-/** Families with negative dimensions: shadow offsets and letter spacing. */
-const SIGNED_DIMENSION_FAMILIES = new Set<ScaleFamily>([
-  'shadow',
-  'typography',
+/** Keywords every property accepts, which leave a custom property invalid. */
+const CSS_WIDE_KEYWORDS = new Set([
+  'inherit',
+  'initial',
+  'unset',
+  'revert',
+  'revert-layer',
 ]);
 
 const bare = (name: string) => name.replace('--nx-', '');
@@ -71,19 +74,26 @@ function prefLabel(
     : PREF_LABELS[field];
 }
 
-function validationProperty({ family, type }: ScaleToken): string {
-  if (type === 'dimension' && SIGNED_DIMENSION_FAMILIES.has(family)) {
-    return 'outline-offset';
-  }
-  const property = VALIDATION_PROPERTIES[type];
+/** Letter spacing and shadow offsets and spread can be negative. */
+function isSigned({ family, group, name }: ScaleToken): boolean {
+  if (family === 'typography') return group === 'letterspacing';
+  return family === 'shadow' && /-(x|y|spread)$/.test(name);
+}
+
+function validationProperty(token: ScaleToken): string {
+  if (token.type === 'dimension' && isSigned(token)) return 'outline-offset';
+  const property = VALIDATION_PROPERTIES[token.type];
   if (property === undefined) {
-    throw new Error(`ScaleLedger: no CSS property validates "${type}" tokens`);
+    throw new Error(
+      `ScaleLedger: no CSS property validates "${token.type}" tokens`
+    );
   }
   return property;
 }
 
 /** Whether `property` accepts `value`, read back from a detached element. */
 function accepts(property: string, value: string): boolean {
+  if (CSS_WIDE_KEYWORDS.has(value.toLowerCase())) return false;
   const { style } = document.createElement('div');
   style.setProperty(property, value);
   return style.getPropertyValue(property) !== '';

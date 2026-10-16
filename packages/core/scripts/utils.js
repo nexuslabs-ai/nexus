@@ -1186,7 +1186,7 @@ export function collectShadowTokens(tokensDir, primitiveMap) {
  * @param {string[]} config.imports - CSS imports (e.g., ['tailwindcss', './variables.css'])
  * @param {string} [config.tailwindPrefix='nx'] - Tailwind prefix
  * @param {object[]} config.semanticTokens - Array of { cssName, value } for semantic colours
- * @param {object[]} config.spacingTokens - Array of { cssName, value } for numeric spacing (default baseline; per-mode overrides live outside @theme)
+ * @param {object[]} config.spacingTokens - Array of { cssName } for numeric spacing; the density blocks declare the values
  * @param {object[]} config.radiusTokens - Array of { cssName, varRef } for radius
  * @param {object[]} config.borderwidthTokens - Array of { key, varRef } for borderwidth; each one emits both a --border-width-* and an --outline-width-* inline theme key
  * @param {object[]} config.motionTokens - Array of { group, key, cssName, varRef } for duration/ease
@@ -1243,15 +1243,6 @@ export function generateThemeCSS(config) {
   css += `  --radius-*: initial;\n`;
   css += `  --shadow-*: initial;\n`;
   css += `  --breakpoint-*: initial;\n\n`;
-
-  // Spacing tokens (numeric default baseline — see generateSpacingModesCSS for
-  // per-mode overrides emitted outside @theme).
-  if (spacingTokens.length > 0) {
-    css += `\n  /* Spacing tokens */\n`;
-    for (const token of spacingTokens) {
-      css += `  --${token.cssName}: ${token.value};\n`;
-    }
-  }
 
   // Motion tokens
   if (motionTokens.length > 0) {
@@ -1318,9 +1309,14 @@ export function generateThemeCSS(config) {
 
   // `reference` keeps these keys out of Tailwind's own `:root` block. With
   // `prefix(nx)` that block would redeclare each `--nx-*` name as a var() of
-  // itself; the values are declared below and in variables.css instead.
+  // itself; the values are declared in the theme-layer blocks and in
+  // variables.css instead.
   css += `\n@theme inline reference {\n`;
-  css += `  /* Radius tokens */\n`;
+  css += `  /* Spacing tokens */\n`;
+  for (const token of spacingTokens) {
+    css += `  --${token.cssName}: var(--nx-${token.cssName});\n`;
+  }
+  css += `\n  /* Radius tokens */\n`;
   for (const token of radiusTokens) {
     css += `  --${token.cssName}: ${token.varRef};\n`;
   }

@@ -366,6 +366,7 @@ describe('token catalogue', () => {
       const expected =
         primitives.includes(token) ||
         runtimeColors.includes(token) ||
+        token.family === 'spacing' ||
         token.family === 'z-index'
           ? `var(${token.name})`
           : variantValue(token, rootVariant(token));
