@@ -1,4 +1,8 @@
-import type { NexusAppearanceState } from '../lib/appearance-model';
+import type {
+  NexusAppearancePrefs,
+  NexusAppearanceState,
+  NexusPresetField,
+} from '../lib/appearance-model';
 import type { Mode } from '../lib/palette';
 import type { TokenValue } from '../token-source/types';
 
@@ -23,9 +27,8 @@ export type CatalogueFamily =
 
 /**
  * Canonical identity: an identifier in the `--nx-*` custom property scheme.
- * Most tokens declare it in the generated CSS. Typography and shadow styles,
- * z-index layers, and breakpoints do not; they declare a theme property or a
- * utility instead.
+ * Most tokens declare it in the generated CSS. Typography and shadow styles
+ * and breakpoints do not; they declare a theme property or a utility instead.
  */
 export type CatalogueTokenName = `--nx-${string}`;
 
@@ -82,13 +85,21 @@ export interface CatalogueVariant {
   readonly authoredValue: TokenValue | null;
   /**
    * What the generated CSS declares: one custom property for a scalar or a
-   * shadow style (`--nx-spacing-4`, or `--z-index-modal` and `--shadow-sm` for
+   * shadow style (`--nx-spacing-4`, or `--breakpoint-md` and `--shadow-sm` for
    * a token declared only under `@theme`), or the `@utility` body for a
    * typography style.
    */
   readonly declarations: readonly CatalogueDeclaration[];
   readonly references: readonly CatalogueReference[];
 }
+
+/**
+ * The appearance setting that writes a token at runtime: a preset field that
+ * picks one of its moded values, or a preference the provider computes it from.
+ */
+export type CatalogueControl =
+  | { readonly kind: 'preset'; readonly field: NexusPresetField }
+  | { readonly kind: 'pref'; readonly field: keyof NexusAppearancePrefs };
 
 export interface CatalogueToken {
   readonly name: CatalogueTokenName;
@@ -102,5 +113,7 @@ export interface CatalogueToken {
   readonly type: string;
   readonly description: string | null;
   readonly aliases: readonly CatalogueAlias[];
+  /** The appearance setting that writes it, or `null` when nothing does. */
+  readonly control: CatalogueControl | null;
   readonly variants: readonly CatalogueVariant[];
 }

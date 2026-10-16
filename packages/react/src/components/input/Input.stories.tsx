@@ -308,7 +308,7 @@ export const GhostStates: Story = {
     await expect(rest.backgroundColor).toBe('rgba(0, 0, 0, 0)');
 
     await expect(hoverBorderColors(filled)).toEqual([
-      expect.stringMatching(/^var\(\s*--nx-color-border-default,/),
+      'var(--nx-color-border-default)',
     ]);
 
     await expect(window.getComputedStyle(invalid).borderTopColor).not.toBe(

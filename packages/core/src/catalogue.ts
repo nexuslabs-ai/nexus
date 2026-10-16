@@ -1,6 +1,7 @@
 export { createTokenCatalogue } from './catalogue/catalogue';
 export type {
   CatalogueAlias,
+  CatalogueControl,
   CatalogueDeclaration,
   CatalogueFamily,
   CatalogueReference,

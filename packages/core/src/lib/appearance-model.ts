@@ -4,6 +4,7 @@ import { normalizeContrast } from './contrast';
 import type { ThemeDerivationInput, ThemeSeeds } from './derive-theme';
 import type { NexusSurfaceTone } from './palette';
 import { isColor } from './perceptual-ramp';
+import { inRuntimeLayer } from './runtime-layer';
 
 type ModeSeeds = Pick<ThemeSeeds, 'background' | 'foreground'>;
 
@@ -46,6 +47,9 @@ export interface NexusAppearanceState {
   stroke: NexusStroke;
   prefs: NexusAppearancePrefs;
 }
+
+/** An appearance field that picks one of a token family's preset modes. */
+export type NexusPresetField = 'density' | 'corners' | 'elevation' | 'stroke';
 
 export const DEFAULT_BRAND_COLOR = '#0a0a0a';
 
@@ -212,10 +216,7 @@ function typographyScaleVariables(uiPx: number): string {
 // Retired public-mode codename -> friendly, applied to persisted state on read
 // (see normalizeAppearanceModeIds). Internal; correctness is covered behaviorally
 // by the sanitize codename->friendly tests, so it is not part of the public API.
-const PUBLIC_MODE_RENAME: Record<
-  'density' | 'corners' | 'elevation' | 'stroke',
-  Record<string, string>
-> = {
+const PUBLIC_MODE_RENAME: Record<NexusPresetField, Record<string, string>> = {
   density: {
     nova: 'compact',
     mira: 'default',
@@ -315,11 +316,11 @@ export function appearancePrefsToCss(prefs: NexusAppearancePrefs): string {
   // Font and type size reach only Nexus. The toggles below apply to the whole
   // page, host included, when the user turns them on.
   const blocks: string[] = [
-    `:root {
+    inRuntimeLayer(`:root {
   --nx-typography-family-font-sans: ${prefs.uiFont};
   --nx-typography-family-font-mono: ${prefs.codeFont};
 ${typographyScaleVariables(uiPx)}
-}`,
+}`),
     `.nx\\:font-mono, .nx\\:typography-code-block, .nx\\:typography-code-inline { font-size: ${codePx}px; }`,
   ];
   if (prefs.fontSmoothing) {

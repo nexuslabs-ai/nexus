@@ -19,12 +19,19 @@ export interface LiveTheme {
   contrast: ThemeContrastCheck[];
 }
 
-export function useLiveTheme(): LiveTheme {
+/** `overrides` replaces derived values per mode before contrast is measured. */
+export function useLiveTheme(
+  overrides?: Partial<Record<Mode, TokenMap>>
+): LiveTheme {
   const { state, resolvedMode } = useNexusAppearance();
   const derived = useMemo(() => {
-    const theme = deriveTheme(createNexusThemeContract(state));
+    const base = deriveTheme(createNexusThemeContract(state));
+    const theme = {
+      light: { ...base.light, ...overrides?.light },
+      dark: { ...base.dark, ...overrides?.dark },
+    };
     return { theme, contrast: measureThemeContrast(theme) };
-  }, [state]);
+  }, [state, overrides]);
   return {
     mode: resolvedMode,
     tokens: derived.theme[resolvedMode],

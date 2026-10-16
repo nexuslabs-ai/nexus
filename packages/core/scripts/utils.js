@@ -451,8 +451,7 @@ export function generateBorderColorAliasUtilitiesCSS(tokens) {
 
   for (const { token, name } of borderColorTokens) {
     css += `@utility border-color-${name} {\n`;
-    const value = `var(--nx-${token.cssName}, ${token.value})`;
-    css += `  border-color: ${value};\n`;
+    css += `  border-color: var(--nx-${token.cssName});\n`;
     css += `}\n\n`;
   }
 
@@ -560,7 +559,7 @@ export function collectSpacingTokens(semanticDir) {
  * inside `@theme` but does NOT rewrite variables declared in `:root` /
  * attribute-selector blocks, so writing the prefixed form here is what makes
  * mode-switching actually override the utility's `var(--nx-spacing-N)`
- * reference. (Mirrors `prefixDarkVars: true` in the `.dark` block.)
+ * reference. (The semantic colour blocks are written the same way.)
  *
  * @param {Record<string, {cssName: string, value: string}[]>} modesByName
  * @param {object} [opts]
@@ -1187,14 +1186,14 @@ export function collectShadowTokens(tokensDir, primitiveMap) {
  * @param {string[]} config.imports - CSS imports (e.g., ['tailwindcss', './variables.css'])
  * @param {string} [config.tailwindPrefix='nx'] - Tailwind prefix
  * @param {object[]} config.semanticTokens - Array of { cssName, value } for semantic colours
- * @param {object[]} config.spacingTokens - Array of { cssName, value } for numeric spacing (default baseline; per-mode overrides live outside @theme)
+ * @param {object[]} config.spacingTokens - Array of { cssName } for numeric spacing; the density blocks declare the values
  * @param {object[]} config.radiusTokens - Array of { cssName, varRef } for radius
  * @param {object[]} config.borderwidthTokens - Array of { key, varRef } for borderwidth; each one emits both a --border-width-* and an --outline-width-* inline theme key
  * @param {object[]} config.motionTokens - Array of { group, key, cssName, varRef } for duration/ease
  * @param {object[]} config.shadowTokens - Array of { cssName, value } for shadows
- * @param {object[]} [config.darkSemanticTokens] - Array of { cssName, value } for dark mode semantic tokens
- * @param {string} [config.darkSelector='.dark'] - CSS selector for dark mode
- * @param {boolean} [config.prefixDarkVars=false] - Whether to add nx- prefix to dark mode vars
+ * @param {object[]} config.zIndexTokens - Array of { cssName, value } for z-index layers
+ * @param {object[]} config.breakpointTokens - Array of { cssName, value } for breakpoints
+ * @param {object[]} [config.darkSemanticTokens] - Array of { cssName, value } for dark mode semantic colours
  * @returns {string} Generated CSS content
  */
 export function generateThemeCSS(config) {
@@ -1212,8 +1211,6 @@ export function generateThemeCSS(config) {
     zIndexTokens = [],
     breakpointTokens = [],
     darkSemanticTokens = [],
-    darkSelector = '.dark',
-    prefixDarkVars = false,
   } = config;
 
   let css = header;
@@ -1247,23 +1244,6 @@ export function generateThemeCSS(config) {
   css += `  --shadow-*: initial;\n`;
   css += `  --breakpoint-*: initial;\n\n`;
 
-  // Spacing tokens (numeric default baseline — see generateSpacingModesCSS for
-  // per-mode overrides emitted outside @theme).
-  if (spacingTokens.length > 0) {
-    css += `\n  /* Spacing tokens */\n`;
-    for (const token of spacingTokens) {
-      css += `  --${token.cssName}: ${token.value};\n`;
-    }
-  }
-
-  // Radius tokens
-  if (radiusTokens.length > 0) {
-    css += `\n  /* Radius tokens */\n`;
-    for (const token of radiusTokens) {
-      css += `  --${token.cssName}: ${token.varRef};\n`;
-    }
-  }
-
   // Motion tokens
   if (motionTokens.length > 0) {
     css += `\n  /* Motion tokens */\n`;
@@ -1278,14 +1258,6 @@ export function generateThemeCSS(config) {
   if (shadowTokens.length > 0) {
     css += `\n  /* Shadow tokens */\n`;
     for (const token of shadowTokens) {
-      css += `  --${token.cssName}: ${token.value};\n`;
-    }
-  }
-
-  // Z-index tokens
-  if (zIndexTokens.length > 0) {
-    css += `\n  /* Z-index tokens */\n`;
-    for (const token of zIndexTokens) {
       css += `  --${token.cssName}: ${token.value};\n`;
     }
   }
@@ -1335,31 +1307,44 @@ export function generateThemeCSS(config) {
     css += `}\n`;
   }
 
-  // Semantic colour utilities need their fallback expression inlined into the
-  // generated utility, otherwise Tailwind's `prefix(nx)` rewrites the @theme
-  // variable to the same `--nx-color-*` name that the runtime provider owns.
-  if (semanticTokens.length > 0) {
-    css += `\n@theme inline {\n`;
-    css += `  /* Semantic tokens */\n`;
-    for (const token of semanticTokens) {
-      const value = token.cssName.startsWith('color-')
-        ? `var(--nx-${token.cssName}, ${token.value})`
-        : token.value;
-      css += `  --${token.cssName}: ${value};\n`;
-    }
-    css += `}\n`;
+  // `reference` keeps these keys out of Tailwind's own `:root` block. With
+  // `prefix(nx)` that block would redeclare each `--nx-*` name as a var() of
+  // itself; the values are declared in the theme-layer blocks and in
+  // variables.css instead.
+  css += `\n@theme inline reference {\n`;
+  css += `  /* Spacing tokens */\n`;
+  for (const token of spacingTokens) {
+    css += `  --${token.cssName}: var(--nx-${token.cssName});\n`;
   }
+  css += `\n  /* Radius tokens */\n`;
+  for (const token of radiusTokens) {
+    css += `  --${token.cssName}: ${token.varRef};\n`;
+  }
+  css += `\n  /* Z-index tokens */\n`;
+  for (const token of zIndexTokens) {
+    css += `  --${token.cssName}: var(--nx-${token.cssName});\n`;
+  }
+  css += `\n  /* Semantic colour tokens */\n`;
+  for (const token of semanticTokens) {
+    css += `  --${token.cssName}: var(--nx-${token.cssName});\n`;
+  }
+  css += `}\n`;
 
-  // Dark mode block (if provided)
-  if (darkSemanticTokens.length > 0) {
-    css += `\n/* ===== DARK MODE ===== */\n`;
-    css += `${darkSelector} {\n`;
-    for (const token of darkSemanticTokens) {
-      const varName = prefixDarkVars ? `nx-${token.cssName}` : token.cssName;
-      css += `  --${varName}: ${token.value};\n`;
-    }
-    css += `}\n`;
+  // The theme layer ranks under the provider's runtime layer and under any
+  // unlayered consumer CSS, so both override these defaults.
+  css += `\n/* ===== Z-INDEX AND SEMANTIC COLOURS (default appearance) ===== */\n`;
+  css += `@layer theme {\n`;
+  css += `  :root {\n`;
+  for (const token of [...zIndexTokens, ...semanticTokens]) {
+    css += `    --nx-${token.cssName}: ${token.value};\n`;
   }
+  css += `  }\n`;
+  css += `\n  .dark {\n`;
+  for (const token of darkSemanticTokens) {
+    css += `    --nx-${token.cssName}: ${token.value};\n`;
+  }
+  css += `  }\n`;
+  css += `}\n`;
 
   return css;
 }

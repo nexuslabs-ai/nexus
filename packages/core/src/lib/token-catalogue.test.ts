@@ -1,5 +1,5 @@
-import { readFileSync } from 'node:fs';
-import { resolve } from 'node:path';
+import { readdirSync, readFileSync } from 'node:fs';
+import { join, resolve } from 'node:path';
 import { describe, expect, it } from 'vitest';
 
 import { createTokenCatalogue } from '../catalogue/catalogue';
@@ -9,7 +9,11 @@ import type {
   CatalogueToken,
 } from '../catalogue/types';
 
-import { DEFAULT_NEXUS_APPEARANCE } from './appearance-model';
+import {
+  appearancePrefsToCss,
+  DEFAULT_NEXUS_APPEARANCE,
+  type NexusAppearancePrefs,
+} from './appearance-model';
 import type { Mode } from './palette';
 
 const catalogue = createTokenCatalogue();
@@ -58,6 +62,26 @@ function generated(file: string): string {
 const nexusCss = generated('nexus.css');
 const variablesCss = generated('variables.css');
 
+/** `rest` up to the first top-level closing brace. */
+function untilBlockEnd(rest: string): string {
+  const end = rest.indexOf('\n}\n');
+  if (end === -1) throw new Error('unterminated top-level block');
+  return rest.slice(0, end);
+}
+
+/** Every top-level `@layer theme` body, dedented to top level. */
+function themeLayer(css: string): string {
+  const bodies = css.split('\n@layer theme {\n').slice(1);
+  if (bodies.length === 0) throw new Error('no top-level "@layer theme" block');
+  const dedented = bodies.map((rest) =>
+    untilBlockEnd(rest).replace(/^ {2}/gm, '')
+  );
+  return `\n${dedented.join('\n')}\n`;
+}
+
+const nexusTheme = themeLayer(nexusCss);
+const variablesTheme = themeLayer(variablesCss);
+
 /** Undo prettier's line wrapping so a value compares as one line. */
 const collapse = (value: string) =>
   value.replace(/\s+/g, ' ').replace(/\( /g, '(').replace(/ \)/g, ')').trim();
@@ -73,14 +97,20 @@ function customProperties(body: string): Map<string, string> {
 
 /** Declarations of every top-level block opened by exactly `selector {`. */
 function blockDeclarations(css: string, selector: string): Map<string, string> {
-  const bodies = css
-    .split(`\n${selector} {\n`)
-    .slice(1)
-    .map((rest) => rest.slice(0, rest.indexOf('\n}\n')));
+  const bodies = css.split(`\n${selector} {\n`).slice(1).map(untilBlockEnd);
   if (bodies.length === 0) {
     throw new Error(`no top-level "${selector}" block`);
   }
   return new Map(bodies.flatMap((body) => [...customProperties(body)]));
+}
+
+/** Every `@theme` variable, across every `@theme` block flavour. */
+function themeVariables(): Map<string, string> {
+  return new Map(
+    ['@theme', '@theme inline', '@theme inline reference'].flatMap(
+      (selector) => [...blockDeclarations(nexusCss, selector)]
+    )
+  );
 }
 
 /** Every top-level rule with a flat body, keyed by its selector list. */
@@ -93,7 +123,7 @@ function selectorBlocks(css: string) {
   );
 }
 
-const nexusBlocks = selectorBlocks(nexusCss);
+const nexusBlocks = selectorBlocks(nexusTheme);
 
 function modeBlock(selector: string): Map<string, string> {
   const block = nexusBlocks.find(({ selectors }) =>
@@ -210,17 +240,39 @@ describe('token catalogue', () => {
     expect(byName.has('--nx-color-border-active')).toBe(false);
   });
 
-  it('agrees with the generated runtime colour fallbacks and dark overrides', () => {
-    const theme = blockDeclarations(nexusCss, '@theme inline');
-    const dark = blockDeclarations(nexusCss, '.dark');
+  it('declares the default runtime colours and z-index layers in the theme layer', () => {
+    const light = blockDeclarations(nexusTheme, ':root');
+    const dark = blockDeclarations(nexusTheme, '.dark');
+    for (const token of familyTokens('z-index')) {
+      expect(light.get(token.name), token.name).toBe(
+        variantValue(token, { preset: null, mode: null })
+      );
+    }
     for (const token of runtimeColors) {
-      const alias = only(aliasesOf(token, 'css-variable'));
-      expect(theme.get(alias), alias).toBe(
-        `var(${token.name}, ${variantValue(token, { preset: null, mode: 'light' })})`
+      expect(light.get(token.name), token.name).toBe(
+        variantValue(token, { preset: null, mode: 'light' })
       );
       expect(dark.get(token.name), token.name).toBe(
         variantValue(token, { preset: null, mode: 'dark' })
       );
+    }
+  });
+
+  it('never falls back to a literal value in the generated CSS or component sources', () => {
+    const literalFallback =
+      /var\(\s*--nx-[\w-]+\s*,(?!\s*(?:var\(|--theme\())/g;
+    for (const file of ['variables.css', 'nexus.css', ...UTILITY_FILES]) {
+      expect(generated(file).match(literalFallback), file).toBeNull();
+    }
+    const reactSrc = resolve(process.cwd(), 'packages/react/src');
+    const sources = readdirSync(reactSrc, {
+      recursive: true,
+      encoding: 'utf8',
+    }).filter((file) => /\.(tsx?|css)$/.test(file));
+    expect(sources.length).toBeGreaterThan(0);
+    for (const file of sources) {
+      const source = readFileSync(join(reactSrc, file), 'utf8');
+      expect(source.match(literalFallback), file).toBeNull();
     }
   });
 
@@ -239,7 +291,7 @@ describe('token catalogue', () => {
   });
 
   it('declares exactly the primitives in variables.css, in their root mode', () => {
-    const root = blockDeclarations(variablesCss, ':root');
+    const root = blockDeclarations(variablesTheme, ':root');
     expect([...root.keys()].sort()).toEqual(
       primitives.map((token) => token.name).sort()
     );
@@ -251,8 +303,8 @@ describe('token catalogue', () => {
   });
 
   it('overrides only the diverging dark shadow primitives in variables.css', () => {
-    const light = blockDeclarations(variablesCss, ':root');
-    const dark = blockDeclarations(variablesCss, '.dark');
+    const light = blockDeclarations(variablesTheme, ':root');
+    const dark = blockDeclarations(variablesTheme, '.dark');
     const { root } = cssModes('data-shadow');
     const rootDark: VariantKey = { preset: root, mode: 'dark' };
     const diverging = familyTokens('shadow').filter(
@@ -303,10 +355,7 @@ describe('token catalogue', () => {
   });
 
   it('maps every @theme variable to the token it reads or declares', () => {
-    const theme = new Map([
-      ...blockDeclarations(nexusCss, '@theme'),
-      ...blockDeclarations(nexusCss, '@theme inline'),
-    ]);
+    const theme = themeVariables();
     const aliased = catalogue.flatMap((token) =>
       aliasesOf(token, 'css-variable').map((alias) => ({ alias, token }))
     );
@@ -314,10 +363,13 @@ describe('token catalogue', () => {
       [...theme.keys()].filter((name) => !name.endsWith('-*')).sort()
     );
     for (const { alias, token } of aliased) {
-      if (runtimeColors.includes(token)) continue;
-      const expected = primitives.includes(token)
-        ? `var(${token.name})`
-        : variantValue(token, rootVariant(token));
+      const expected =
+        primitives.includes(token) ||
+        runtimeColors.includes(token) ||
+        token.family === 'spacing' ||
+        token.family === 'z-index'
+          ? `var(${token.name})`
+          : variantValue(token, rootVariant(token));
       expect(theme.get(alias), alias).toBe(expected);
     }
   });
@@ -361,6 +413,56 @@ describe('token catalogue', () => {
     for (const property of new Set(properties)) {
       expect(declared.has(property), property).toBe(true);
     }
+  });
+
+  it('names the preset field for every token a mode attribute swaps', () => {
+    const presetFields = Object.fromEntries(
+      Object.keys(MODE_ATTRIBUTES).map((family) => [
+        family,
+        new Set(
+          familyTokens(family as CatalogueFamily)
+            .filter((token) => token.variants.some((v) => v.preset !== null))
+            .map((token) =>
+              token.control?.kind === 'preset' ? token.control.field : null
+            )
+        ),
+      ])
+    );
+    expect(presetFields).toEqual({
+      spacing: new Set(['density']),
+      radius: new Set(['corners']),
+      borderwidth: new Set(['stroke']),
+      shadow: new Set(['elevation']),
+    });
+  });
+
+  it('names exactly the preference that changes each runtime typography variable', () => {
+    const prefs = DEFAULT_NEXUS_APPEARANCE.prefs;
+    const rootVariables = (changed: Partial<NexusAppearancePrefs>) =>
+      customProperties(
+        appearancePrefsToCss({ ...prefs, ...changed }).match(
+          /:root \{[^}]*\}/
+        )![0]
+      );
+    const before = rootVariables({});
+    const changedBy = new Map<string, string>();
+    for (const [field, value] of [
+      ['uiFont', 'serif'],
+      ['codeFont', 'monospace'],
+      ['uiFontSize', prefs.uiFontSize + 2],
+    ] as const) {
+      for (const [name, after] of rootVariables({ [field]: value })) {
+        if (after !== before.get(name)) changedBy.set(name, field);
+      }
+    }
+    const controlled = new Map(
+      catalogue.flatMap((token) =>
+        token.control?.kind === 'pref'
+          ? [[token.name, token.control.field] as const]
+          : []
+      )
+    );
+    expect(controlled).toEqual(changedBy);
   });
 
   it('agrees with the generated typography utilities', () => {

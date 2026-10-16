@@ -413,7 +413,7 @@ function groupByCategory(tokens) {
 }
 
 /**
- * Generate variables.css with --nx-* prefixed primitives.
+ * Generate variables.css with --nx-* prefixed primitives, in the theme layer.
  * Themed dark variants emit into a `.dark` block that overrides `:root` when
  * an ancestor carries the `.dark` class (matching the @custom-variant selector
  * used in nexus.css).
@@ -423,6 +423,7 @@ function generateVariablesCSS(primitiveTokens, divergentDark, usedModes) {
   css += `/* Auto-generated - DO NOT EDIT */\n`;
   css += `/* All primitives use --nx-* prefix for namespace isolation */\n\n`;
 
+  css += `@layer theme {\n`;
   css += `:root {\n`;
   const lightCategories = groupByCategory(primitiveTokens);
   for (const [category, tokens] of Object.entries(lightCategories)) {
@@ -452,6 +453,7 @@ function generateVariablesCSS(primitiveTokens, divergentDark, usedModes) {
     }
     css += `}\n`;
   }
+  css += `}\n`;
 
   return css;
 }
@@ -489,10 +491,10 @@ function generateNexusCSS(
     );
   }
 
-  // Per-mode spacing — default numerics seed @theme for Tailwind's spacing-utility
-  // codegen (nx:p-*, nx:m-*, nx:gap-*, nx:h-*, nx:w-*). The per-mode override
-  // blocks live outside @theme in `:root, [data-density="X"]` form (see below);
-  // role tokens are not registered in @theme — they're consumed by the
+  // Per-mode spacing — the default numeric names register Tailwind's
+  // spacing-utility keys (nx:p-*, nx:m-*, nx:gap-*, nx:h-*, nx:w-*). The values
+  // live only in the `:root, [data-density="X"]` blocks (see below); role
+  // tokens are not registered in @theme — they're consumed by the
   // separately-emitted spacing-utilities.css.
   const { numeric: defaultSpacingNumeric } = splitSpacingTokens(
     spacingModes[CANONICAL_SPACING_DEFAULT_MODE]
@@ -516,16 +518,16 @@ function generateNexusCSS(
 /* Auto-generated - DO NOT EDIT */
 /* Uses nx: prefix for all utility classes */
 /*
- * Uses @theme for static scales and @theme inline for semantic colours so
- * generated utilities can fall back statically while accepting runtime
- * --nx-color-* overrides from NexusAppearanceProvider.
+ * Every default and preset block is declared in the theme layer. The
+ * provider's runtime theme sits in the later nx-runtime layer, and unlayered
+ * consumer CSS overrides both.
  */
 
 `;
 
   // Generate theme CSS using shared function. spacingTokens carries only the
-  // numeric default subset — role tokens (control/container/layout) live in the
-  // per-mode override blocks below, not in @theme.
+  // numeric subset — role tokens (control/container/layout) live only in the
+  // per-mode blocks below.
   let css = generateThemeCSS({
     header,
     googleFontsImport,
@@ -548,14 +550,13 @@ function generateNexusCSS(
     zIndexTokens,
     breakpointTokens,
     darkSemanticTokens,
-    darkSelector: '.dark',
-    prefixDarkVars: true, // Use --nx-color-* for dark mode overrides
   });
 
   // Per-mode spacing override blocks (`:root, [data-density="<default>"]` for
   // the consumer-chosen default + plain `[data-density="X"]` for the others).
   // Lives outside @theme so the cascade can pick the active mode at runtime
   // via the `data-density` attribute on any ancestor.
+  css += `\n@layer theme {\n`;
   css += generateSpacingModesCSS(spacingModes, { defaultMode: spacingDefault });
   css += generateSpacingModesCSS(runtimeModes.radiusModes, {
     defaultMode: usedModes.radius,
@@ -574,6 +575,7 @@ function generateNexusCSS(
     commentLabel: 'BORDER WIDTH',
     duplicateValuePrefix: null,
   });
+  css += `}\n`;
 
   css += generateNativeBrowserUIThemeCSS();
   css += generateAutofillUtilitiesCSS();

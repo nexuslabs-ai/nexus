@@ -34,6 +34,7 @@ import { RUNTIME_COLOR_DESCRIPTIONS } from './descriptions';
 import { TOKEN_FILES, type TokenFile } from './token-files';
 import type {
   CatalogueAlias,
+  CatalogueControl,
   CatalogueDeclaration,
   CatalogueFamily,
   CatalogueReference,
@@ -61,6 +62,39 @@ const BREAKPOINTS_FILE: TokenFile = 'semantic/breakpoints.json';
 const TYPOGRAPHY_STYLES_FILE: TokenFile = 'styles/typography.json';
 const SHADOW_STYLES_FILE: TokenFile = 'styles/shadows.json';
 const SINGLE_SOURCE = { mode: null, preset: null } as const;
+
+/** The preset field that picks each moded family's values. */
+const PRESET_CONTROLS: Partial<Record<CatalogueFamily, CatalogueControl>> = {
+  spacing: { kind: 'preset', field: 'density' },
+  radius: { kind: 'preset', field: 'corners' },
+  borderwidth: { kind: 'preset', field: 'stroke' },
+  shadow: { kind: 'preset', field: 'elevation' },
+};
+
+/** The preference `appearancePrefsToCss` writes each typography primitive from. */
+function typographyControl(path: readonly string[]): CatalogueControl | null {
+  const [group, key] = path;
+  if (group === 'size' || group === 'line-height') {
+    return { kind: 'pref', field: 'uiFontSize' };
+  }
+  if (group !== 'family') return null;
+  if (key === 'font-sans') return { kind: 'pref', field: 'uiFont' };
+  if (key === 'font-mono') return { kind: 'pref', field: 'codeFont' };
+  return null;
+}
+
+function leafControl({
+  family,
+  file,
+  preset,
+  leaf,
+}: AuthoredLeaf): CatalogueControl | null {
+  if (family === 'typography' && file.startsWith('primitives/')) {
+    return typographyControl(leaf.path);
+  }
+  if (preset === null) return null;
+  return PRESET_CONTROLS[family] ?? null;
+}
 
 /** A `PrimitiveLookup` that also carries each target's canonical name. */
 type ReferenceLookup = ReadonlyMap<
@@ -239,6 +273,7 @@ function authoredTokens(
       type: leaf.type,
       description: leaf.description ?? null,
       aliases,
+      control: leafControl(authored),
       variants: [],
     };
     token.variants.push({
@@ -328,8 +363,24 @@ function spacingEntry({ leaf }: AuthoredLeaf): LeafEntry {
   };
 }
 
-/** Z-index layers and breakpoints, declared only as their `@theme` property. */
-function themeOnlyEntry({ leaf }: AuthoredLeaf): LeafEntry {
+/** A z-index layer, declared as its `--nx-*` name with a `@theme` alias. */
+function zIndexEntry({ leaf }: AuthoredLeaf): LeafEntry {
+  const key = leaf.path.join('-');
+  const name: CatalogueTokenName = `--nx-${key}`;
+  return {
+    name,
+    aliases: [cssVariable(`--${key}`)],
+    declarations: [
+      {
+        property: name,
+        value: formatTokenValue(leaf.value, leaf.type, leaf.path),
+      },
+    ],
+  };
+}
+
+/** A breakpoint, declared only as its `@theme` property. */
+function breakpointEntry({ leaf }: AuthoredLeaf): LeafEntry {
   const key = leaf.path.join('-');
   const property = `--${key}`;
   return {
@@ -411,6 +462,7 @@ function runtimeColorTokens(): CatalogueToken[] {
       type: 'color',
       description: RUNTIME_COLOR_DESCRIPTIONS[name] ?? null,
       aliases: runtimeColorAliases(name),
+      control: null,
       variants: themes.map(({ mode, appearance, values }) => {
         const value = values[property];
         if (value === undefined) {
@@ -439,15 +491,20 @@ function runtimeColorTokens(): CatalogueToken[] {
 export function createTokenCatalogue(): readonly CatalogueToken[] {
   const primitives = PRIMITIVE_FAMILIES.flatMap(primitiveLeaves);
   const lookup = primitiveLookup(primitives);
-  const themeOnly = [
-    ...fileLeaves('z-index', Z_INDEX_FILE, SINGLE_SOURCE),
-    ...fileLeaves('breakpoint', BREAKPOINTS_FILE, SINGLE_SOURCE),
-  ];
   return [
     ...authoredTokens(primitives, lookup, primitiveEntry(lookup)),
     ...runtimeColorTokens(),
     ...authoredTokens(spacingLeaves(), lookup, spacingEntry),
-    ...authoredTokens(themeOnly, lookup, themeOnlyEntry),
+    ...authoredTokens(
+      fileLeaves('z-index', Z_INDEX_FILE, SINGLE_SOURCE),
+      lookup,
+      zIndexEntry
+    ),
+    ...authoredTokens(
+      fileLeaves('breakpoint', BREAKPOINTS_FILE, SINGLE_SOURCE),
+      lookup,
+      breakpointEntry
+    ),
     ...authoredTokens(
       styleLeaves('typography', TYPOGRAPHY_STYLES_FILE),
       lookup,
