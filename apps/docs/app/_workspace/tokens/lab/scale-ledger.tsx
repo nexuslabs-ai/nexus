@@ -2,7 +2,11 @@
 
 import { type FormEvent, useMemo, useState } from 'react';
 
-import type { NexusAppearanceState, TokenMap } from '@nexus_ds/core';
+import type {
+  NexusAppearancePrefs,
+  NexusAppearanceState,
+  TokenMap,
+} from '@nexus_ds/core';
 import { Badge, Button, Input } from '@nexus_ds/react';
 
 import type { ScaleFamily, ScaleToken } from './lab-data';
@@ -43,6 +47,20 @@ const VALIDATION_PROPERTIES: Record<string, string> = {
 
 const bare = (name: string) => name.replace('--nx-', '');
 
+/** The appearance preference that writes a typography primitive, if any. */
+function preferenceLabel(
+  token: ScaleToken,
+  prefs: NexusAppearancePrefs
+): string | null {
+  if (token.family !== 'typography') return null;
+  if (token.group === 'size' || token.group === 'line-height') {
+    return `UI font size: ${prefs.uiFontSize}px`;
+  }
+  if (token.name === '--nx-typography-family-font-sans') return 'UI font';
+  if (token.name === '--nx-typography-family-font-mono') return 'code font';
+  return null;
+}
+
 interface ScaleLedgerProps {
   tokens: ScaleToken[];
   appearance: NexusAppearanceState;
@@ -73,7 +91,8 @@ export function ScaleLedger({
     if (token.family === 'breakpoint') return 'build time';
     if (token.fixedValue !== null) return 'composed';
     const field = PRESET_FIELDS[token.family];
-    return field ? `${field}: ${appearance[field]}` : 'fixed';
+    if (field) return `${field}: ${appearance[field]}`;
+    return preferenceLabel(token, appearance.prefs) ?? 'fixed';
   }
 
   return (
@@ -200,7 +219,7 @@ function ScaleEditor({
       <p className="nx:typography-body-small nx:text-muted-foreground">
         Overrides {bare(token.name)} in both modes with a plain{' '}
         <code className="nx:typography-code-inline">:root</code> declaration. It
-        outranks every preset, so changing the preset no longer moves it.
+        outranks the appearance controls, so changing them no longer moves it.
       </p>
       <div className="nx:flex nx:flex-wrap nx:gap-2">
         <Input
