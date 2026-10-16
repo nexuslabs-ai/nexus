@@ -83,6 +83,26 @@ function blockDeclarations(css: string, selector: string): Map<string, string> {
   return new Map(bodies.flatMap((body) => [...customProperties(body)]));
 }
 
+/** Declarations of a block inside the generated `@layer theme` wrapper. */
+function themeLayerDeclarations(selector: string): Map<string, string> {
+  const layer = nexusCss.split('\n@layer theme {\n')[1];
+  if (!layer) throw new Error('no top-level "@layer theme" block');
+  const body = layer.slice(0, layer.indexOf('\n}\n')).replace(/^ {2}/gm, '');
+  return blockDeclarations(`\n${body}\n`, selector);
+}
+
+/** Every `@theme` variable, across every `@theme` block flavour. */
+function themeVariables(): Map<string, string> {
+  return new Map(
+    [
+      '@theme',
+      '@theme static',
+      '@theme inline',
+      '@theme inline reference',
+    ].flatMap((selector) => [...blockDeclarations(nexusCss, selector)])
+  );
+}
+
 /** Every top-level rule with a flat body, keyed by its selector list. */
 function selectorBlocks(css: string) {
   return [...css.matchAll(/\n([^\s{}@/][^{}]*?) \{\n([^{}]*?)\n\}/g)].map(
@@ -210,17 +230,23 @@ describe('token catalogue', () => {
     expect(byName.has('--nx-color-border-active')).toBe(false);
   });
 
-  it('agrees with the generated runtime colour fallbacks and dark overrides', () => {
-    const theme = blockDeclarations(nexusCss, '@theme inline');
-    const dark = blockDeclarations(nexusCss, '.dark');
+  it('declares the default runtime colours for light and dark in the theme layer', () => {
+    const light = themeLayerDeclarations(':root');
+    const dark = themeLayerDeclarations('.dark');
     for (const token of runtimeColors) {
-      const alias = only(aliasesOf(token, 'css-variable'));
-      expect(theme.get(alias), alias).toBe(
-        `var(${token.name}, ${variantValue(token, { preset: null, mode: 'light' })})`
+      expect(light.get(token.name), token.name).toBe(
+        variantValue(token, { preset: null, mode: 'light' })
       );
       expect(dark.get(token.name), token.name).toBe(
         variantValue(token, { preset: null, mode: 'dark' })
       );
+    }
+  });
+
+  it('never falls back to a literal value in the generated CSS', () => {
+    const literalFallback = /var\(--nx-[\w-]+,(?!\s*(?:var\(|--theme\())/g;
+    for (const file of ['variables.css', 'nexus.css', ...UTILITY_FILES]) {
+      expect(generated(file).match(literalFallback), file).toBeNull();
     }
   });
 
@@ -303,10 +329,7 @@ describe('token catalogue', () => {
   });
 
   it('maps every @theme variable to the token it reads or declares', () => {
-    const theme = new Map([
-      ...blockDeclarations(nexusCss, '@theme'),
-      ...blockDeclarations(nexusCss, '@theme inline'),
-    ]);
+    const theme = themeVariables();
     const aliased = catalogue.flatMap((token) =>
       aliasesOf(token, 'css-variable').map((alias) => ({ alias, token }))
     );
@@ -314,10 +337,10 @@ describe('token catalogue', () => {
       [...theme.keys()].filter((name) => !name.endsWith('-*')).sort()
     );
     for (const { alias, token } of aliased) {
-      if (runtimeColors.includes(token)) continue;
-      const expected = primitives.includes(token)
-        ? `var(${token.name})`
-        : variantValue(token, rootVariant(token));
+      const expected =
+        primitives.includes(token) || runtimeColors.includes(token)
+          ? `var(${token.name})`
+          : variantValue(token, rootVariant(token));
       expect(theme.get(alias), alias).toBe(expected);
     }
   });

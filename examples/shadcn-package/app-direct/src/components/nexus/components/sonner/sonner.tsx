@@ -168,7 +168,7 @@ function Toaster({ style, ...props }: ToasterProps) {
             // Sonner injects a runtime <style> pinning the toaster to
             // z-index:999999999 (not !important); an inline style outranks that
             // selector rule, keeping us on the Nexus toast layer without `!`.
-            zIndex: 'var(--nx-z-index-toast, 100)',
+            zIndex: 'var(--nx-z-index-toast)',
             ...style,
           } as React.CSSProperties
         }

@@ -516,9 +516,9 @@ function generateNexusCSS(
 /* Auto-generated - DO NOT EDIT */
 /* Uses nx: prefix for all utility classes */
 /*
- * Uses @theme for static scales and @theme inline for semantic colours so
- * generated utilities can fall back statically while accepting runtime
- * --nx-color-* overrides from NexusAppearanceProvider.
+ * Semantic colours default to the engine's output for the default appearance,
+ * declared in the theme layer. NexusAppearanceProvider's runtime theme is
+ * unlayered, so it overrides them.
  */
 
 `;
@@ -548,8 +548,6 @@ function generateNexusCSS(
     zIndexTokens,
     breakpointTokens,
     darkSemanticTokens,
-    darkSelector: '.dark',
-    prefixDarkVars: true, // Use --nx-color-* for dark mode overrides
   });
 
   // Per-mode spacing override blocks (`:root, [data-density="<default>"]` for
