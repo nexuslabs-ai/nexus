@@ -1,0 +1,109 @@
+.framework-section {
+  container: frameworks / inline-size;
+  padding-block: var(--framework-padding);
+  border-block-start: 1px solid var(--nx-color-border-default);
+  display: grid;
+  gap: var(--framework-gap);
+}
+.framework-heading {
+  text-align: center;
+}
+.home-page-content .framework-heading h2 {
+  font-size: clamp(1.75rem, 4cqi, var(--framework-title));
+  line-height: 1.15;
+}
+.home-page-content .framework-heading p {
+  margin-block-start: var(--nx-spacing-5);
+  color: var(--nx-color-muted-foreground);
+  font-size: 1rem;
+  line-height: 1.65;
+}
+.framework-composition {
+  display: grid;
+  gap: var(--nx-spacing-6);
+}
+.framework-foundation {
+  display: grid;
+  justify-items: center;
+  gap: var(--nx-spacing-4);
+  padding: var(--nx-spacing-8);
+  background: var(--nx-color-muted);
+  border: 1px solid var(--nx-color-border-default);
+  border-radius: var(--framework-radius);
+}
+.framework-foundation-name {
+  font-size: 1.25rem;
+  font-weight: 600;
+  letter-spacing: -0.025em;
+}
+.framework-token-list {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: var(--nx-spacing-2);
+}
+.framework-token-list span {
+  padding: var(--nx-spacing-2) var(--nx-spacing-3);
+  border: 1px solid var(--nx-color-border-default);
+  background: var(--nx-color-background);
+  border-radius: var(--nx-spacing-2);
+  font-size: 0.8125rem;
+}
+.framework-foundation-caption {
+  font-size: 0.8125rem;
+  color: var(--nx-color-muted-foreground);
+  text-align: center;
+}
+.framework-options {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 10rem), 1fr));
+  gap: var(--nx-spacing-3);
+}
+.framework-option {
+  display: grid;
+  justify-items: center;
+  align-content: center;
+  gap: var(--nx-spacing-4);
+  padding: var(--framework-card-padding);
+  border: 1px solid var(--nx-color-border-default);
+  border-radius: var(--framework-radius);
+  text-align: center;
+}
+.framework-option > svg {
+  inline-size: var(--framework-icon);
+  block-size: var(--framework-icon);
+}
+.home-page-content .framework-option h3 {
+  font-size: var(--framework-label);
+  font-weight: 500;
+}
+.framework-availability {
+  font-size: 0.75rem;
+  color: var(--nx-color-muted-foreground);
+}
+.framework-availability[data-available='true'] {
+  color: var(--nx-color-foreground);
+  font-weight: 500;
+}
+.framework-footer {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--nx-spacing-4);
+}
+.framework-footer p {
+  font-size: 0.875rem;
+  line-height: 1.6;
+  color: var(--nx-color-muted-foreground);
+}
+.framework-section[data-layout='cards'] .framework-heading {
+  text-align: start;
+}
+.framework-section[data-layout='cards'] .framework-option {
+  justify-items: start;
+  text-align: start;
+}
+.framework-section[data-layout='cards'] .framework-option > svg {
+  display: none;
+}

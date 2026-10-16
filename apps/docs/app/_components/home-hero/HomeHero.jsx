@@ -10,6 +10,7 @@ import { FeatureStripJourney } from './FeatureStripJourney';
 import { FoilJourney } from './FoilJourney';
 import { HeadlineJourney } from './HeadlineJourney';
 import { InlineStacksJourney } from './InlineStacksJourney';
+import { RotatingHeadlineJourney } from './RotatingHeadlineJourney';
 import { TiltedCtaJourney } from './TiltedCtaJourney';
 import { TiltedJourney } from './TiltedJourney';
 import { VinylJourney } from './VinylJourney';
@@ -37,9 +38,15 @@ export function HomeHero({ children }) {
   const { resolvedMode } = useNexusAppearance();
   const search = useSyncExternalStore(subscribe, readSearch, serverSearch);
   const params = new URLSearchParams(search);
-  const iteration = params.get('iteration');
+  const iteration = params.get('iteration') ?? 'tilted-cta';
   if (params.has('tune'))
     return <HeroDialLab mode={resolvedMode}>{children}</HeroDialLab>;
+  if (iteration === 'rotating')
+    return (
+      <RotatingHeadlineJourney mode={resolvedMode}>
+        {children}
+      </RotatingHeadlineJourney>
+    );
   if (iteration === 'foil') return <FoilJourney />;
   if (iteration === 'vinyl')
     return <VinylJourney mode={resolvedMode}>{children}</VinylJourney>;

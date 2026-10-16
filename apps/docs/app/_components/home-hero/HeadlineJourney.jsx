@@ -7,9 +7,16 @@ import './headline-journey.css';
 export function HeadlineJourney({
   mode,
   tuning,
+  details,
+  detailsLabel,
   children,
   afterTiles,
   showTools = true,
+  customizationHeading = (
+    <p className="journey-heading journey-enter" aria-hidden="true">
+      Customizable in every detail.
+    </p>
+  ),
 }) {
   return (
     <div className="headline-journey">
@@ -17,6 +24,8 @@ export function HeadlineJourney({
         mode={mode}
         compact
         tuning={tuning}
+        details={details}
+        detailsLabel={detailsLabel}
         afterTiles={afterTiles}
         showTools={showTools}
         intro={
@@ -30,11 +39,7 @@ export function HeadlineJourney({
             </p>
           </>
         }
-        customizationHeading={
-          <p className="journey-heading journey-enter" aria-hidden="true">
-            Customizable in every detail.
-          </p>
-        }
+        customizationHeading={customizationHeading}
         buildHeading={
           <p
             className="journey-heading journey-enter"

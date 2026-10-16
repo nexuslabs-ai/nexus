@@ -21,7 +21,7 @@ import { TileWheel } from './TileWheel';
 
 import './workbench-journey.css';
 
-const details = [
+const defaultDetails = [
   ['Theme', IconPaint],
   ['Colors', IconColorSwatch],
   ['Typography', IconTypography],
@@ -37,6 +37,8 @@ export function WorkbenchJourney({
   compact = false,
   wheel = false,
   tuning,
+  details = defaultDetails,
+  detailsLabel = 'Customizable down to every detail',
   children,
   afterTiles,
   showTools = true,
@@ -85,7 +87,15 @@ export function WorkbenchJourney({
       step === -1 ? 2900 : (tuning?.holdMs ?? 1300)
     );
     return () => clearTimeout(timer);
-  }, [step, hovered, focused, wheel, tuning?.autoTour, tuning?.holdMs]);
+  }, [
+    step,
+    hovered,
+    focused,
+    wheel,
+    tuning?.autoTour,
+    tuning?.holdMs,
+    details.length,
+  ]);
   function finishTools(event) {
     if (
       event.animationName === 'journey-arrive' &&
@@ -110,7 +120,7 @@ export function WorkbenchJourney({
               <div
                 className="journey-grid"
                 role="group"
-                aria-label="Customizable down to every detail"
+                aria-label={detailsLabel}
                 onMouseLeave={() => setHovered(null)}
               >
                 {details.map(([label, Icon], index) => (

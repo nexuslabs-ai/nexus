@@ -88,12 +88,21 @@ export function TopNav() {
 
   return (
     <header className="nx:sticky nx:top-0 nx:z-30 nx:flex nx:items-center nx:gap-6 nx:px-6 nx:h-(--docs-header-h) nx:bg-nav-background nx:text-nav-foreground nx:border-b nx:border-nav-border">
-      <div className="nx:flex nx:items-center nx:gap-2 nx:font-semibold nx:typography-label-default">
-        Nexus DS
-        <span className="nx:text-[10px] nx:uppercase nx:tracking-wider nx:text-nav-muted-foreground nx:px-1.5 nx:py-0.5 nx:border nx:border-dashed nx:border-nav-border nx:rounded-sm">
-          docs
-        </span>
-      </div>
+      {pathname === '/' ? (
+        <Link
+          href="/"
+          className="nx:typography-heading-small nx:font-semibold nx:text-inherit nx:no-underline"
+        >
+          NexusUI
+        </Link>
+      ) : (
+        <div className="nx:flex nx:items-center nx:gap-2 nx:font-semibold nx:typography-label-default">
+          Nexus DS
+          <span className="nx:text-[10px] nx:uppercase nx:tracking-wider nx:text-nav-muted-foreground nx:px-1.5 nx:py-0.5 nx:border nx:border-dashed nx:border-nav-border nx:rounded-sm">
+            docs
+          </span>
+        </div>
+      )}
       <nav
         ref={menuRef}
         aria-label="Sections"

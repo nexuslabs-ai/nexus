@@ -9,6 +9,7 @@ import { FeatureStripJourney } from './FeatureStripJourney';
 import { FoilJourney } from './FoilJourney';
 import { HeadlineJourney } from './HeadlineJourney';
 import { InlineStacksJourney } from './InlineStacksJourney';
+import { RotatingHeadlineJourney } from './RotatingHeadlineJourney';
 import { TiltedCtaJourney } from './TiltedCtaJourney';
 import { TiltedJourney } from './TiltedJourney';
 import { VinylJourney } from './VinylJourney';
@@ -18,6 +19,12 @@ import 'dialkit/styles.css';
 import './hero-dial-lab.css';
 
 const iterations = [
+  {
+    value: 'rotating',
+    name: 'Rotating headline',
+    preset: 'Rotating headline',
+    description: 'Three rotating benefits, tilted tiles, and CTAs.',
+  },
   {
     value: 'tilted-cta',
     name: 'Tilted tiles + CTAs',
@@ -93,6 +100,7 @@ const config = {
   iteration: {
     type: 'select',
     options: [
+      { value: 'rotating', label: 'Rotating headline' },
       { value: 'compact', label: 'Compact row' },
       { value: 'workbench', label: 'Workbench grid' },
       { value: 'wheel', label: '3D wheel' },
@@ -520,6 +528,7 @@ export function HeroDialLab({ mode, children, ctaLinks, featureStripContent }) {
   }, []);
   const Journey =
     {
+      rotating: RotatingHeadlineJourney,
       'tilted-cta': TiltedCtaJourney,
       tilted: TiltedJourney,
       vinyl: VinylJourney,

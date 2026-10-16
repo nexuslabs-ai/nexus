@@ -114,3 +114,14 @@ is an ordinary DOM overlay. No browser or input-device detection.
 ## Tilted tiles + CTAs
 
 `?iteration=tilted-cta&tune=1` preserves the title and tilted customization tiles, adds View components and Create actions, and omits the tools heading and logos. Following content appears without waiting for the omitted tools animation. Original tilted iteration is unchanged. Uses the existing container-responsive tilted layout and wrapping flex action row (Modern Web Guidance `css-layout` and `forms`, retrieved in this session); verify keyboard links and narrow wrapping.
+
+## Rotating headline iteration
+
+`?iteration=rotating` keeps the tilted CTA hero and rotates three benefit lines.
+Grid overlays reserve the tallest line; only opacity and transform animate.
+A pause button stops motion. No environment queries are used (Nexus policy).
+Guidance: modern-web-guidance search `CSS text animation transform opacity accessible pause`, retrieved `motion` (2026-10-15).
+
+The rotating iteration uses one 3.4s timer for both the benefit text and its tile set.
+Pause and Auto Tour stop that shared timer. The rotating title uses an 8px line
+gap independently of the older section-spacing preset.
