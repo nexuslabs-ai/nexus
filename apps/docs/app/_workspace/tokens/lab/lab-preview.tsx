@@ -1,5 +1,7 @@
 'use client';
 
+import { useId } from 'react';
+
 import {
   Alert,
   AlertDescription,
@@ -40,8 +42,15 @@ const BADGES = ['information', 'success', 'warning', 'error'] as const;
 
 /** The components a theme change reaches: status surfaces, then the sampler. */
 export function LabPreview() {
+  const headingId = useId();
   return (
-    <section aria-label="Preview" className="nx:space-y-6">
+    <section aria-labelledby={headingId} className="nx:space-y-6">
+      <h2
+        id={headingId}
+        className="nx:typography-label-small nx:text-muted-foreground"
+      >
+        Preview
+      </h2>
       <Card>
         <CardHeader>
           <CardTitle>Status</CardTitle>

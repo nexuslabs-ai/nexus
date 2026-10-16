@@ -11,6 +11,10 @@ import {
   type TokenMap,
 } from '@nexus_ds/core';
 import {
+  Accordion,
+  AccordionContent,
+  AccordionItem,
+  AccordionTrigger,
   Badge,
   Button,
   Input,
@@ -110,40 +114,45 @@ export function TokenLedger({
           {failures.length} of {live.contrast.length} contrast checks fail
         </Badge>
       </div>
-      {Object.entries(CATEGORIES).map(([category, label]) => (
-        <div key={category} className="nx:space-y-1">
-          <h3 className="nx:typography-label-small nx:text-muted-foreground">
-            {label}
-          </h3>
-          <ul className="nx:m-0 nx:list-none nx:p-0">
-            {rows
-              .filter((row) => row.category === category)
-              .map((row) => (
-                <li
-                  key={row.token}
-                  className="nx:border-b-default nx:border-border-default"
-                >
-                  <LedgerRow
-                    {...row}
-                    expanded={open === row.token}
-                    onToggle={() =>
-                      setOpen(open === row.token ? null : row.token)
-                    }
-                  />
-                  {open === row.token && (
-                    <OverrideEditor
-                      token={row.token}
-                      mode={live.mode}
-                      primitives={primitives}
-                      overridden={row.overridden}
-                      onOverride={onOverride}
-                    />
-                  )}
-                </li>
-              ))}
-          </ul>
-        </div>
-      ))}
+      <Accordion type="multiple" defaultValue={Object.keys(CATEGORIES)}>
+        {Object.entries(CATEGORIES).map(([category, label]) => {
+          const categoryRows = rows.filter((row) => row.category === category);
+          return (
+            <AccordionItem key={category} value={category}>
+              <AccordionTrigger>
+                {label} · {categoryRows.length}
+              </AccordionTrigger>
+              <AccordionContent className="nx:text-foreground">
+                <ul className="nx:m-0 nx:list-none nx:p-0">
+                  {categoryRows.map((row) => (
+                    <li
+                      key={row.token}
+                      className="nx:border-b-default nx:border-border-default"
+                    >
+                      <LedgerRow
+                        {...row}
+                        expanded={open === row.token}
+                        onToggle={() =>
+                          setOpen(open === row.token ? null : row.token)
+                        }
+                      />
+                      {open === row.token && (
+                        <OverrideEditor
+                          token={row.token}
+                          mode={live.mode}
+                          primitives={primitives}
+                          overridden={row.overridden}
+                          onOverride={onOverride}
+                        />
+                      )}
+                    </li>
+                  ))}
+                </ul>
+              </AccordionContent>
+            </AccordionItem>
+          );
+        })}
+      </Accordion>
     </section>
   );
 }

@@ -95,7 +95,7 @@ export function LabWorkspace({ primitives, scales }: LabData) {
         </p>
       </header>
       <div className="nx:grid nx:items-start nx:gap-8 nx:xl:grid-cols-2">
-        <div className="nx:space-y-8">
+        <div className="nx:min-w-0 nx:space-y-8 nx:xl:border-r-default nx:xl:border-border-default nx:xl:pr-8">
           <TokenLedger
             live={live}
             primitives={primitives}
@@ -111,7 +111,9 @@ export function LabWorkspace({ primitives, scales }: LabData) {
             onOverride={(token, value) => setOverride('shared', token, value)}
           />
         </div>
-        <LabPreview />
+        <div className="nx:min-w-0 nx:rounded-lg nx:border-default nx:border-border-default nx:bg-muted nx:p-4 nx:lg:p-6 nx:xl:sticky nx:xl:top-0 nx:xl:max-h-[calc(100svh-var(--docs-header-h)-var(--nx-spacing-12))] nx:xl:overflow-y-auto">
+          <LabPreview />
+        </div>
       </div>
       <style>{overrideCss(overrides)}</style>
     </WorkspaceLayout>
