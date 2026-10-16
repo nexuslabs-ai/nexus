@@ -12,8 +12,8 @@ import {
 import { useCommandState } from 'cmdk';
 import { expect, userEvent, waitFor, within } from 'storybook/test';
 
-import { Button } from '../button';
-import { Spinner } from '../spinner';
+import { Button } from '../button/button';
+import { Spinner } from '../spinner/spinner';
 
 import {
   Command,

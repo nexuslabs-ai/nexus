@@ -4,8 +4,11 @@ import { expect, userEvent, waitFor, within } from 'storybook/test';
 import { expectImmediateItemMotion } from '../../stories/support/motion-test-utils';
 import { expectInterruptibleOverlayMotion } from '../../stories/support/overlay-motion-test-utils';
 import { expectHeightPinned } from '../../stories/support/story-height-test-utils';
-import { Input } from '../input';
-import { NativeSelect, NativeSelectOption } from '../native-select';
+import { Input } from '../input/input';
+import {
+  NativeSelect,
+  NativeSelectOption,
+} from '../native-select/native-select';
 
 import {
   Select,

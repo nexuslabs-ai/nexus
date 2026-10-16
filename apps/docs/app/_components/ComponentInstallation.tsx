@@ -1,6 +1,9 @@
 import type { ReactNode } from 'react';
 
-import { loadDependencies, loadReactSource } from '../_lib/dependencies';
+import Link from 'next/link';
+
+import { loadInstallPlan, loadReactSource } from '../_lib/dependencies';
+import { requirePage } from '../_lib/manifest';
 
 import { CodeSample, CodeSampleCard } from './CodeSample';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from './nexus';
@@ -9,23 +12,26 @@ type Step = { title: string; body?: ReactNode };
 
 /** The Installation section of a component page: Command and Manual tabs. */
 export async function ComponentInstallation({ slug }: { slug: string }) {
-  const { install, files, copy, styles } = await loadDependencies(slug);
+  const { components, packages, files, styles } = await loadInstallPlan(slug);
   const sources = await Promise.all(
-    [...files, ...copy].map(async (path) => ({
-      path,
-      source: await loadReactSource(path),
-    }))
+    files.map(async (path) => ({ path, source: await loadReactSource(path) }))
   );
 
   const steps: Step[] = [];
-  if (install.length > 0) {
+  if (components.length > 0) {
+    steps.push({
+      title: 'Install these components first:',
+      body: (
+        <p className="nx:typography-body-default nx:text-muted-foreground">
+          <ComponentLinks slugs={components} />.
+        </p>
+      ),
+    });
+  }
+  if (packages.length > 0) {
     steps.push({
       title: 'Install the following dependencies:',
-      body: (
-        <CodeSample lang="bash">
-          {`npm install ${install.map(({ name, range }) => `${name}@${range}`).join(' ')}`}
-        </CodeSample>
-      ),
+      body: <PackagesSample packages={packages} />,
     });
   }
   steps.push({
@@ -37,23 +43,16 @@ export async function ComponentInstallation({ slug }: { slug: string }) {
   if (styles.length > 0) {
     steps.push({
       title: 'Import the styles in your global stylesheet:',
-      body: (
-        <CodeSample lang="css">
-          {[
-            '/* app/globals.css */',
-            ...styles.map((file) => `@import '../${file}';`),
-          ].join('\n')}
-        </CodeSample>
-      ),
+      body: <StylesSample styles={styles} />,
     });
   }
   steps.push({
     title: 'Keep each file at the path shown above it.',
     body: (
       <p className="nx:typography-body-default nx:text-muted-foreground">
-        Each path above is relative to <code>packages/react/src/</code>. Keep it
-        as it is under your <code>@/</code> root and the relative imports
-        between the files resolve without an edit.
+        Paths are relative to <code>packages/react/src/</code>. Keep the same
+        folders under your <code>@/</code> root, and the imports between files
+        work without edits.
       </p>
     ),
   });
@@ -107,4 +106,38 @@ export function SourceFile({ path, source }: { path: string; source: string }) {
       }
     />
   );
+}
+
+/** The `npm install` command for `name@range` packages. */
+export function PackagesSample({ packages }: { packages: readonly string[] }) {
+  return (
+    <CodeSample lang="bash">{`npm install ${packages.join(' ')}`}</CodeSample>
+  );
+}
+
+/** The global stylesheet's `@import` for each style file. */
+export function StylesSample({ styles }: { styles: readonly string[] }) {
+  return (
+    <CodeSample lang="css">
+      {[
+        '/* app/globals.css */',
+        ...styles.map((file) => `@import '../${file}';`),
+      ].join('\n')}
+    </CodeSample>
+  );
+}
+
+const LINK_CLASS =
+  'nx:text-primary-subtle-foreground nx:underline nx:underline-offset-2';
+
+/** Links to each component's page, comma-separated. */
+export function ComponentLinks({ slugs }: { slugs: readonly string[] }) {
+  return slugs.map((slug, index) => (
+    <span key={slug}>
+      {index > 0 && ', '}
+      <Link href={`/components/${slug}`} className={LINK_CLASS}>
+        {requirePage('components', slug).label}
+      </Link>
+    </span>
+  ));
 }

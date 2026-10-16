@@ -3,7 +3,7 @@ import { IconEye, IconMail, IconSearch, IconX } from '@tabler/icons-react';
 import { expect, fn, userEvent, within } from 'storybook/test';
 
 import { unpairedAutofillClasses } from '../../stories/support/autofill-pairing';
-import { Spinner } from '../spinner';
+import { Spinner } from '../spinner/spinner';
 
 import {
   InputGroup,

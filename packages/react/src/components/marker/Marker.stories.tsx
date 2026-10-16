@@ -10,7 +10,7 @@ import {
 } from '@tabler/icons-react';
 import { expect, fn, userEvent, within } from 'storybook/test';
 
-import { Spinner } from '../spinner';
+import { Spinner } from '../spinner/spinner';
 
 import { Marker, MarkerContent, MarkerIcon, type MarkerProps } from './marker';
 

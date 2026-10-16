@@ -26,11 +26,11 @@ describe('appearance model', () => {
     expect(DEFAULT_NEXUS_APPEARANCE).toMatchObject({
       mode: 'light',
       brandColor: DEFAULT_BRAND_COLOR,
-      surfaceTone: 'stone',
+      surfaceTone: 'zinc',
       lightContrast: 50,
       darkContrast: 50,
       density: 'default',
-      corners: 'square',
+      corners: 'subtle',
       elevation: 'quiet',
       stroke: 'normal',
       prefs: {
@@ -157,13 +157,13 @@ describe('sanitizeNexusAppearance', () => {
         ...DEFAULT_NEXUS_APPEARANCE,
         surfaceTone: 'toString',
       }).surfaceTone
-    ).toBe('stone');
+    ).toBe('zinc');
     expect(
       sanitizeNexusAppearance({
         ...DEFAULT_NEXUS_APPEARANCE,
         surfaceTone: 'hasOwnProperty',
       }).surfaceTone
-    ).toBe('stone');
+    ).toBe('zinc');
   });
 
   it('rejects invalid brand color, contrast, and enum values', () => {
@@ -190,7 +190,7 @@ describe('sanitizeNexusAppearance', () => {
         ...DEFAULT_NEXUS_APPEARANCE,
         corners: 'pill',
       }).corners
-    ).toBe('square');
+    ).toBe('subtle');
     expect(
       sanitizeNexusAppearance({
         ...DEFAULT_NEXUS_APPEARANCE,

@@ -52,7 +52,7 @@ export const DEFAULT_BRAND_COLOR = '#0a0a0a';
 export const BASE_TONE_OPTIONS = [
   { value: 'stone', label: 'Stone', color: '#747271' },
   { value: 'neutral', label: 'Neutral', color: '#737373' },
-  { value: 'zinc', label: 'Zinc', color: '#717273' },
+  { value: 'zinc', label: 'Zinc', color: '#717175' },
   { value: 'slate', label: 'Slate', color: '#717376' },
   { value: 'gray', label: 'Gray', color: '#707274' },
 ] as const satisfies readonly {
@@ -74,8 +74,8 @@ export const BASE_TONE_SEEDS: Record<
     dark: { background: '#171717', foreground: '#fafafa' },
   },
   zinc: {
-    light: { background: '#fafafa', foreground: '#18181b' },
-    dark: { background: '#18181b', foreground: '#fafafa' },
+    light: { background: '#fafafa', foreground: '#09090b' },
+    dark: { background: '#09090b', foreground: '#fafafa' },
   },
   slate: {
     light: { background: '#f8fafc', foreground: '#0f172a' },
@@ -121,11 +121,11 @@ export const STROKE_OPTIONS = [
 export const DEFAULT_NEXUS_APPEARANCE: NexusAppearanceState = {
   mode: 'light',
   brandColor: DEFAULT_BRAND_COLOR,
-  surfaceTone: 'stone',
+  surfaceTone: 'zinc',
   lightContrast: 50,
   darkContrast: 50,
   density: 'default',
-  corners: 'square',
+  corners: 'subtle',
   elevation: 'quiet',
   stroke: 'normal',
   prefs: {

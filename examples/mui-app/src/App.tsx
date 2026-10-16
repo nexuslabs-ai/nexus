@@ -19,7 +19,7 @@ import { useColorScheme } from '@mui/material/styles'
 import { Link, Route, Routes, useLocation } from 'react-router'
 
 import { useNexusAppearance } from './components/nexus/components/appearance/provider'
-import { Toaster as NexusToaster } from './components/nexus/components/sonner'
+import { Toaster as NexusToaster } from './components/nexus/components/sonner/sonner'
 import { OverlaysPage } from './pages/OverlaysPage'
 import { SettingsPage } from './pages/SettingsPage'
 import { SideBySidePage } from './pages/SideBySidePage'

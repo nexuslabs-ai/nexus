@@ -3,7 +3,7 @@ import { IconFile } from '@tabler/icons-react';
 import { expect, within } from 'storybook/test';
 
 import { expectInsetOutlinePseudoElement } from '../../stories/support/pseudo-element-style';
-import { Button } from '../button';
+import { Button } from '../button/button';
 
 import {
   Item,

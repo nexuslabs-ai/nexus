@@ -17,8 +17,8 @@ import {
   type ItemProps,
   ItemTitle,
   type ItemTitleProps,
-} from '../item';
-import { Progress, type ProgressProps } from '../progress';
+} from '../item/item';
+import { Progress, type ProgressProps } from '../progress/progress';
 
 /**
  * Upload lifecycle of one attachment, from empty drop target to done.

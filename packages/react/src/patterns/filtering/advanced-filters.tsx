@@ -2,8 +2,8 @@
 
 import * as React from 'react';
 
-import { Button } from '../../components/button';
-import { FilterBuilder } from '../../components/filter-builder';
+import { Button } from '../../components/button/button';
+import { FilterBuilder } from '../../components/filter-builder/filter-builder';
 import {
   Table,
   TableBody,
@@ -11,7 +11,7 @@ import {
   TableHead,
   TableHeader,
   TableRow,
-} from '../../components/table';
+} from '../../components/table/table';
 import { getFilterErrors } from '../../lib/filter-model';
 
 import {

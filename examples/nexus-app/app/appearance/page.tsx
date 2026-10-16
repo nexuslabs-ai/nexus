@@ -1,4 +1,4 @@
-import { NexusAppearanceSettings } from '@/components/appearance/appearance-settings';
+import { NexusAppearanceSettings } from '@/components/appearance/appearance-settings/appearance-settings';
 
 export default function AppearancePage() {
   return (

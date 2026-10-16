@@ -11,9 +11,9 @@ import {
 } from '@tabler/icons-react';
 import { expect, fn, userEvent, waitFor, within } from 'storybook/test';
 
-import { Button } from '../button';
-import { Input } from '../input';
-import { Label } from '../label';
+import { Button } from '../button/button';
+import { Input } from '../input/input';
+import { Label } from '../label/label';
 
 import { ToggleGroup, ToggleGroupItem } from './toggle-group';
 

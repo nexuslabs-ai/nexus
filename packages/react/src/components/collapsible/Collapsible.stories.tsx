@@ -2,7 +2,7 @@ import type { Meta, StoryObj } from '@storybook/react';
 import { IconSelector } from '@tabler/icons-react';
 import { expect, fn, userEvent, within } from 'storybook/test';
 
-import { Button } from '../button';
+import { Button } from '../button/button';
 
 import {
   Collapsible,

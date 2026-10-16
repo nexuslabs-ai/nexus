@@ -9,6 +9,7 @@ import type {
   CatalogueToken,
 } from '../catalogue/types';
 
+import { DEFAULT_NEXUS_APPEARANCE } from './appearance-model';
 import type { Mode } from './palette';
 
 const catalogue = createTokenCatalogue();
@@ -221,6 +222,20 @@ describe('token catalogue', () => {
         variantValue(token, { preset: null, mode: 'dark' })
       );
     }
+  });
+
+  it('puts the default appearance on :root', () => {
+    expect({
+      density: cssModes('data-density').root,
+      corners: cssModes('data-radius').root,
+      elevation: cssModes('data-shadow').root,
+      stroke: cssModes('data-borderwidth').root,
+    }).toEqual({
+      density: DEFAULT_NEXUS_APPEARANCE.density,
+      corners: DEFAULT_NEXUS_APPEARANCE.corners,
+      elevation: DEFAULT_NEXUS_APPEARANCE.elevation,
+      stroke: DEFAULT_NEXUS_APPEARANCE.stroke,
+    });
   });
 
   it('declares exactly the primitives in variables.css, in their root mode', () => {

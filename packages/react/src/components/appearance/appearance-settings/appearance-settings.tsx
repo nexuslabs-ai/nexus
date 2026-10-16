@@ -23,22 +23,22 @@ import {
   CardDescription,
   CardHeader,
   CardTitle,
-} from '../../card';
-import { Input } from '../../input';
+} from '../../card/card';
+import { Input } from '../../input/input';
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from '../../select';
-import { Slider } from '../../slider';
-import { Switch } from '../../switch';
-import { ToggleGroup, ToggleGroupItem } from '../../toggle-group';
-import { NexusAppearanceBrandColorField } from '../brand-color-field';
-import { NexusAppearanceConfigPreview } from '../config-preview';
+} from '../../select/select';
+import { Slider } from '../../slider/slider';
+import { Switch } from '../../switch/switch';
+import { ToggleGroup, ToggleGroupItem } from '../../toggle-group/toggle-group';
+import { NexusAppearanceBrandColorField } from '../brand-color-field/brand-color-field';
+import { NexusAppearanceConfigPreview } from '../config-preview/config-preview';
 import { useNexusAppearance } from '../provider';
-import { NexusAppearanceSettingRow } from '../setting-row';
+import { NexusAppearanceSettingRow } from '../setting-row/setting-row';
 
 const APPEARANCE_MODES: NexusAppearanceMode[] = ['light', 'dark', 'system'];
 const FONT_SIZE_MIN = 8;

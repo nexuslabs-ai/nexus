@@ -23,21 +23,21 @@ import {
   IconDots,
   IconX,
 } from '../../lib/icons';
-import { Button } from '../button';
-import { Checkbox } from '../checkbox';
+import { Button } from '../button/button';
+import { Checkbox } from '../checkbox/checkbox';
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
-} from '../dropdown-menu';
-import { Label } from '../label';
+} from '../dropdown-menu/dropdown-menu';
+import { Label } from '../label/label';
 import {
   Tooltip,
   TooltipContent,
   TooltipProvider,
   TooltipTrigger,
-} from '../tooltip';
+} from '../tooltip/tooltip';
 
 import {
   Toolbar,

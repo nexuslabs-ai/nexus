@@ -25,7 +25,7 @@ import {
   collectShadowTokens,
   collectSpacingTokens,
   collectZIndexTokens,
-  DEFAULT_CONFIG,
+  defaultTokenConfig,
   discoverPrimitives,
   ensureDir,
   filterDivergentDark,
@@ -182,7 +182,7 @@ function assertTokenEngine(engine) {
 }
 
 function validateBaseTone(config, engine) {
-  const baseTone = config.base ?? DEFAULT_CONFIG.base;
+  const baseTone = config.base;
   const allowedTones = engine.BASE_TONE_OPTIONS.map((option) => option.value);
 
   if (!allowedTones.includes(baseTone)) {
@@ -195,8 +195,7 @@ function validateBaseTone(config, engine) {
 }
 
 function validateBrandColor(config, engine) {
-  const brandColor =
-    config.brandColor ?? engine.DEFAULT_NEXUS_APPEARANCE.brandColor;
+  const { brandColor } = config;
 
   if (typeof brandColor !== 'string' || !engine.isColor(brandColor)) {
     throw new Error(
@@ -477,7 +476,7 @@ function generateNexusCSS(
   runtimeModes
 ) {
   // Get Google Fonts import
-  const typographyMode = usedModes.typography || 'default';
+  const typographyMode = usedModes.typography;
   const typographyFilePath = path.join(
     TOKENS_DIR,
     `primitives/typography/typography-${typographyMode}.json`
@@ -499,14 +498,14 @@ function generateNexusCSS(
     spacingModes[CANONICAL_SPACING_DEFAULT_MODE]
   );
 
-  const radiusMode = usedModes.radius || DEFAULT_CONFIG.radius;
+  const radiusMode = usedModes.radius;
   const radiusTokens = collectRadiusTokens(TOKENS_DIR, radiusMode);
-  const borderwidthMode = usedModes.borderwidth || DEFAULT_CONFIG.borderwidth;
+  const borderwidthMode = usedModes.borderwidth;
   const borderwidthTokens = collectBorderwidthTokens(
     TOKENS_DIR,
     borderwidthMode
   );
-  const motionMode = usedModes.motion || 'snappy';
+  const motionMode = usedModes.motion;
   const motionTokens = collectMotionTokens(TOKENS_DIR, motionMode);
   const shadowTokens = collectShadowTokens(TOKENS_DIR, primitiveMap);
   const zIndexTokens = collectZIndexTokens(SEMANTIC_DIR);
@@ -559,18 +558,18 @@ function generateNexusCSS(
   // via the `data-density` attribute on any ancestor.
   css += generateSpacingModesCSS(spacingModes, { defaultMode: spacingDefault });
   css += generateSpacingModesCSS(runtimeModes.radiusModes, {
-    defaultMode: usedModes.radius || DEFAULT_CONFIG.radius,
+    defaultMode: usedModes.radius,
     attrName: 'data-radius',
     commentLabel: 'RADIUS',
     duplicateValuePrefix: null,
   });
   css += generateThemedModesCSS(runtimeModes.shadowModes, {
-    defaultMode: usedModes.shadow || DEFAULT_CONFIG.shadow,
+    defaultMode: usedModes.shadow,
     attrName: 'data-shadow',
     commentLabel: 'SHADOW',
   });
   css += generateSpacingModesCSS(runtimeModes.borderwidthModes, {
-    defaultMode: usedModes.borderwidth || DEFAULT_CONFIG.borderwidth,
+    defaultMode: usedModes.borderwidth,
     attrName: 'data-borderwidth',
     commentLabel: 'BORDER WIDTH',
     duplicateValuePrefix: null,
@@ -584,16 +583,21 @@ function generateNexusCSS(
 }
 
 /**
- * Main generation function. Exported so tests can run it against a temp
- * `distDir` without overwriting the committed bundle in `dist/tailwind`.
+ * Main generation function. Exported so `pnpm export` can run it against its
+ * own `distDir`. Keys left out of `overrides` come from the engine's
+ * `DEFAULT_NEXUS_APPEARANCE`; returns the config it generated with.
  */
 export async function generateTailwindPackage(
-  config,
+  overrides,
   { distDir = DEFAULT_DIST_DIR, engine } = {}
 ) {
   const tokenEngine = assertTokenEngine(
     engine ?? (await loadDistRuntimeEngine())
   );
+  const config = {
+    ...defaultTokenConfig(tokenEngine.DEFAULT_NEXUS_APPEARANCE),
+    ...overrides,
+  };
   ensureDir(distDir);
 
   const writeDistFile = (fileName, content) => {
@@ -675,16 +679,13 @@ export async function generateTailwindPackage(
   }
 
   const motionUtilities = generateMotionUtilitiesCSS(
-    collectMotionTokens(TOKENS_DIR, usedModes.motion || 'snappy')
+    collectMotionTokens(TOKENS_DIR, usedModes.motion)
   );
   writeDistFile('motion-utilities.css', motionUtilities.css);
   log.success(`Generated ${motionUtilities.count} motion duration utilities`);
 
   // `spacingDefault` controls which mode lands under `:root, [data-density="X"]`.
-  // Falls back to the canonical baseline so older config objects without the
-  // key (or hand-rolled test fixtures) still produce a valid build.
-  const spacingDefault =
-    config.spacingDefault || CANONICAL_SPACING_DEFAULT_MODE;
+  const { spacingDefault } = config;
   const runtimeModes = {
     radiusModes: collectRadiusModes(TOKENS_DIR),
     shadowModes: collectShadowModes(TOKENS_DIR),
@@ -715,12 +716,14 @@ export async function generateTailwindPackage(
   console.log(`   Typography utilities: ${typography.count}`);
   console.log(`   Border width alias utilities: ${borderWidth.count}`);
   console.log(`   Output: ${distDir}`);
+
+  return config;
 }
 
 if (process.argv[1] === fileURLToPath(import.meta.url)) {
   console.log('🎨 Generating @nexus_ds/tailwind package from DTCG tokens...');
   const engine = await loadDistRuntimeEngine();
-  const cliConfig = parseArgs(undefined, {
+  const cliConfig = parseArgs(process.argv.slice(2), {
     allowedKeys: [
       'base',
       'typography',

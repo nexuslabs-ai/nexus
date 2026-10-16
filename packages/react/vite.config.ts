@@ -4,23 +4,6 @@ import path from 'path';
 import { defineConfig } from 'vite';
 import dts from 'vite-plugin-dts';
 
-// Flat component dirs export a barrel `index.d.ts`; node16/nodenext consumers
-// need the explicit `/index` suffix on those relative imports in `dist/index.d.ts`.
-function rewriteRootDeclaration(filePath: string, content: string) {
-  const normalizedPath = filePath.split(path.sep).join('/');
-
-  if (!normalizedPath.endsWith('/dist/index.d.ts')) return;
-
-  return {
-    filePath,
-    content: content.replace(
-      /from '\.\/components\/([^']+)'/g,
-      (match, entry: string) =>
-        entry.endsWith('/index') ? match : `from './components/${entry}/index'`
-    ),
-  };
-}
-
 export default defineConfig({
   plugins: [
     react(),
@@ -36,7 +19,6 @@ export default defineConfig({
         'src/patterns/**',
       ],
       outDir: 'dist',
-      beforeWriteFile: rewriteRootDeclaration,
     }),
   ],
   build: {

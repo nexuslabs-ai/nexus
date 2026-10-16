@@ -4,9 +4,9 @@ import * as React from 'react';
 
 import { IconCheck, IconPencil, IconX } from '@tabler/icons-react';
 
-import { Button } from '../../../components/button';
-import { FieldError } from '../../../components/field';
-import { Input } from '../../../components/input';
+import { Button } from '../../../components/button/button';
+import { FieldError } from '../../../components/field/field';
+import { Input } from '../../../components/input/input';
 import { cn } from '../../../lib/utils';
 
 type InlineEditBlurBehavior = 'keep-open' | 'save' | 'cancel';

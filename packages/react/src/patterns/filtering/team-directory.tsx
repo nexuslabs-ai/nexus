@@ -9,9 +9,9 @@ import {
   type ChoiceCondition,
   ChoiceFilter,
 } from '../../blocks/filtering/choice-filter/choice-filter';
-import { Button } from '../../components/button';
-import { Input } from '../../components/input';
-import { Label } from '../../components/label';
+import { Button } from '../../components/button/button';
+import { Input } from '../../components/input/input';
+import { Label } from '../../components/label/label';
 import {
   Table,
   TableBody,
@@ -20,7 +20,7 @@ import {
   TableHead,
   TableHeader,
   TableRow,
-} from '../../components/table';
+} from '../../components/table/table';
 
 import { matchesChoice, Results } from './local-results';
 import { members } from './quick-fixtures';

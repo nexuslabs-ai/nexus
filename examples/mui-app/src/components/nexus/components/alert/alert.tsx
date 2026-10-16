@@ -46,19 +46,11 @@ interface AlertProps
   extends React.ComponentProps<'div'>, VariantProps<typeof alertVariants> {}
 
 /**
- * Alert
- *
- * Displays a callout for user attention with optional icon support.
- * Use for important messages, warnings, errors, or success confirmations.
- * Use `presentation="banner"` for the edge-to-edge banner treatment (squared
- * corners, bottom border only).
- * Use `layout="inline"` with `AlertContent` and `AlertActions` when the alert
- * has trailing controls.
- * In the default stack layout, use no actions or button actions only; avoid
- * rendering `AlertClose` below the message. Use `layout="inline"` for
- * dismissal controls.
- * Alerts are passive by default; pass `role="alert"` for urgent dynamic
- * messages or `role="status"` for polite status updates.
+ * Shows a status message inside the page.
+ * Set `presentation="banner"` for an edge-to-edge strip with a bottom border only.
+ * For trailing controls, use `layout="inline"` with `AlertContent` and `AlertActions`.
+ * In the default stack layout, use Button actions only and leave out `AlertClose`.
+ * Alert has no live role by default. Pass `role="alert"` for urgent messages or `role="status"` for polite updates.
  *
  * @example
  * ```tsx
@@ -114,11 +106,8 @@ function Alert({
 interface AlertIconProps extends React.ComponentProps<'span'> {}
 
 /**
- * AlertIcon
- *
- * The leading status icon. Owns the icon's size, its status color (matched to
- * the Alert `variant`, mirroring the title), and the decorative `aria-hidden`.
- * Place it as the first child of `Alert` and pass any icon as its child.
+ * Leading icon. Place it first in `Alert` and pass any icon as its child.
+ * Sizes the icon, colors it to match `variant` and hides it from screen readers.
  *
  * @example
  * ```tsx
@@ -153,10 +142,7 @@ function AlertIcon({ className, ...props }: AlertIconProps) {
 interface AlertContentProps extends React.ComponentProps<'div'> {}
 
 /**
- * AlertContent
- *
- * Wraps alert title and description. Required in `layout="inline"` so the
- * content fills the first grid column beside `AlertActions`.
+ * Wraps the title and description. Required with `layout="inline"` so the text sits beside `AlertActions`.
  *
  * @example
  * ```tsx
@@ -183,8 +169,7 @@ function AlertContent({ className, ...props }: AlertContentProps) {
  */
 interface AlertTitleProps extends React.ComponentProps<'div'> {
   /**
-   * Render the title styles on a child element. Use this when the alert title
-   * needs real heading semantics in the page outline.
+   * Applies the title styles to the child element, such as a real heading.
    *
    * @default false
    * @example
@@ -198,10 +183,7 @@ interface AlertTitleProps extends React.ComponentProps<'div'> {
 }
 
 /**
- * AlertTitle
- *
- * The title of an alert. Renders as a div by default; use `asChild` to apply
- * alert title styling to a semantic heading when the page outline needs one.
+ * Alert heading. Renders a `div`, or a real heading through `asChild`.
  *
  * @example
  * ```tsx
@@ -238,9 +220,7 @@ function AlertTitle({
 interface AlertDescriptionProps extends React.ComponentProps<'div'> {}
 
 /**
- * AlertDescription
- *
- * The description text of an alert. Supports multiple paragraphs.
+ * Body text of an alert. Holds one or more paragraphs.
  *
  * @example
  * ```tsx
@@ -270,11 +250,7 @@ function AlertDescription({ className, ...props }: AlertDescriptionProps) {
 interface AlertActionsProps extends React.ComponentProps<'div'> {}
 
 /**
- * AlertActions
- *
- * Holds one or two alert CTAs. Use the existing Button component for actions.
- * In stack layout, use button actions only. For dismissal controls, use
- * `layout="inline"` so `AlertClose` sits in the trailing action area.
+ * Holds one or two `Button` actions. Add `AlertClose` here only with `layout="inline"`.
  *
  * @example
  * ```tsx
@@ -306,13 +282,8 @@ function AlertActions({ className, ...props }: AlertActionsProps) {
 interface AlertCloseProps extends React.ComponentProps<'button'> {}
 
 /**
- * AlertClose
- *
- * A styled close control for alerts. Dismissal is consumer-controlled: wire
- * `onClick` to app state when the alert should be removed. The default renders a
- * close icon with a visually-hidden "Dismiss alert" label. If you pass custom
- * children, give them their own accessible name — visible text self-labels;
- * supply `aria-label` for an icon-only child.
+ * Close button, labelled "Dismiss alert" by default. It doesn't remove the alert, so remove it in `onClick`.
+ * Custom children need their own accessible name, such as `aria-label` on an icon-only child.
  *
  * @example
  * ```tsx

@@ -1,7 +1,7 @@
 import type { Meta, StoryObj } from '@storybook/react';
 import { expect, within } from 'storybook/test';
 
-import { Switch } from '../../switch';
+import { Switch } from '../../switch/switch';
 
 import { NexusAppearanceSettingRow } from './setting-row';
 

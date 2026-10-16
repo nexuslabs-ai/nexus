@@ -1,8 +1,8 @@
 import type { Meta, StoryObj } from '@storybook/react';
 import { expect, userEvent, within } from 'storybook/test';
 
-import { Checkbox } from '../checkbox';
-import { Input } from '../input';
+import { Checkbox } from '../checkbox/checkbox';
+import { Input } from '../input/input';
 
 import {
   Field,

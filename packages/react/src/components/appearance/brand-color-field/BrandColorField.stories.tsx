@@ -4,8 +4,8 @@ import { BRAND_COLOR_PRESETS, DEFAULT_BRAND_COLOR } from '@nexus_ds/core';
 import type { Meta, StoryObj } from '@storybook/react';
 import { expect, fireEvent, fn, userEvent, within } from 'storybook/test';
 
-import { Button } from '../../button';
-import { NexusAppearanceSettingRow } from '../setting-row';
+import { Button } from '../../button/button';
+import { NexusAppearanceSettingRow } from '../setting-row/setting-row';
 
 import {
   NexusAppearanceBrandColorField,

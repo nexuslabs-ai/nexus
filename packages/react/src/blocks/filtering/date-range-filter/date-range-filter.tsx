@@ -3,19 +3,19 @@
 import * as React from 'react';
 import type { DateRange } from 'react-day-picker';
 
-import { Button } from '../../../components/button';
-import { DatePicker } from '../../../components/date-picker';
+import { Button } from '../../../components/button/button';
+import { DatePicker } from '../../../components/date-picker/date-picker';
 import {
   FilterCondition,
   FilterConditionField,
   FilterConditionRemove,
   FilterConditionSegment,
-} from '../../../components/filter-condition';
+} from '../../../components/filter-condition/filter-condition';
 import {
   Popover,
   PopoverContent,
   PopoverTrigger,
-} from '../../../components/popover';
+} from '../../../components/popover/popover';
 import { isCalendarDay } from '../../../lib/filter-model';
 import { ConditionOperator } from '../filter-operator';
 import { useConditionEditor } from '../use-condition-editor';

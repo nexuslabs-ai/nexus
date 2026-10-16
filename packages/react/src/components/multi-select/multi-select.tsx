@@ -4,7 +4,7 @@ import * as React from 'react';
 
 import { IconCheck, IconChevronDown, IconX } from '../../lib/icons';
 import { cn } from '../../lib/utils';
-import { Badge } from '../badge';
+import { Badge } from '../badge/badge';
 import {
   Command,
   CommandEmpty,
@@ -13,8 +13,8 @@ import {
   CommandItem,
   CommandList,
   CommandSeparator,
-} from '../command';
-import { Popover, PopoverContent, PopoverTrigger } from '../popover';
+} from '../command/command';
+import { Popover, PopoverContent, PopoverTrigger } from '../popover/popover';
 
 interface MultiSelectContextValue {
   open: boolean;

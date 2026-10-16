@@ -434,7 +434,7 @@ export async function buildPageManifest(docsRoot, formatOptions) {
 
   function orderedEntries(sectionSlug) {
     if (isComponentsSection(sectionSlug)) {
-      return byLabel(exportedComponentSlugs().map(buildComponentPage));
+      return byLabel([...exportedComponentSlugs()].map(buildComponentPage));
     }
     if (isBlocksSection(sectionSlug)) {
       // blockSources() is sorted by family, so each group stays contiguous.

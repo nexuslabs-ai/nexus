@@ -10,8 +10,8 @@ import {
   CardDescription,
   CardHeader,
   CardTitle,
-} from '../card';
-import { Input } from '../input';
+} from '../card/card';
+import { Input } from '../input/input';
 
 import { Tabs, TabsContent, TabsList, TabsTrigger } from './tabs';
 

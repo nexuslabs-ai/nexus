@@ -12,9 +12,7 @@ import {
 } from '../overlay-layout/overlay-layout';
 
 /**
- * DropdownMenu
- *
- * Root component for the dropdown menu. Controls open/close state.
+ * Root component for the dropdown menu. Holds the open state.
  *
  * @example
  * ```tsx
@@ -30,37 +28,27 @@ import {
 const DropdownMenu = DropdownMenuPrimitive.Root;
 
 /**
- * DropdownMenuTrigger
- *
- * The button that toggles the dropdown menu.
+ * The button that opens and closes the menu.
  */
 const DropdownMenuTrigger = DropdownMenuPrimitive.Trigger;
 
 /**
- * DropdownMenuGroup
- *
- * Groups related menu items together.
+ * Groups related menu items.
  */
 const DropdownMenuGroup = DropdownMenuPrimitive.Group;
 
 /**
- * DropdownMenuPortal
- *
- * Portals the content to the body.
+ * Renders the content into `document.body`.
  */
 const DropdownMenuPortal = DropdownMenuPrimitive.Portal;
 
 /**
- * DropdownMenuSub
- *
- * Contains a submenu.
+ * Root of a submenu.
  */
 const DropdownMenuSub = DropdownMenuPrimitive.Sub;
 
 /**
- * DropdownMenuRadioGroup
- *
- * Groups radio items together.
+ * Groups radio items so only one is checked.
  */
 const DropdownMenuRadioGroup = DropdownMenuPrimitive.RadioGroup;
 
@@ -73,16 +61,14 @@ interface DropdownMenuSubTriggerProps extends React.ComponentProps<
   typeof DropdownMenuPrimitive.SubTrigger
 > {
   /**
-   * Indents the trigger to align with items that have a leading icon or checkbox.
+   * Indents the trigger to line up with items that have a leading icon or check.
    * @default false
    */
   inset?: boolean;
 }
 
 /**
- * DropdownMenuSubTrigger
- *
- * The trigger for a submenu. Renders a chevron to indicate a submenu.
+ * The item that opens a submenu. Shows a trailing chevron.
  */
 function DropdownMenuSubTrigger({
   className,
@@ -121,9 +107,7 @@ interface DropdownMenuSubContentProps extends React.ComponentProps<
 > {}
 
 /**
- * DropdownMenuSubContent
- *
- * The content container for a submenu.
+ * The panel that holds a submenu's items.
  */
 function DropdownMenuSubContent({
   className,
@@ -154,9 +138,7 @@ interface DropdownMenuContentProps extends React.ComponentProps<
 > {}
 
 /**
- * DropdownMenuContent
- *
- * The dropdown content container.
+ * The menu panel. Opens next to the trigger in a portal.
  *
  * @example
  * ```tsx
@@ -216,16 +198,14 @@ interface DropdownMenuItemProps
     React.ComponentProps<typeof DropdownMenuPrimitive.Item>,
     VariantProps<typeof dropdownMenuItemVariants> {
   /**
-   * Indents the item to align with items that have a leading icon or checkbox.
+   * Indents the item to line up with items that have a leading icon or check.
    * @default false
    */
   inset?: boolean;
 }
 
 /**
- * DropdownMenuItem
- *
- * An individual menu item.
+ * A single menu action.
  *
  * @example
  * ```tsx
@@ -264,9 +244,7 @@ interface DropdownMenuCheckboxItemProps extends React.ComponentProps<
 > {}
 
 /**
- * DropdownMenuCheckboxItem
- *
- * A menu item that can be checked/unchecked.
+ * A menu item that toggles on and off.
  *
  * @example
  * ```tsx
@@ -327,9 +305,7 @@ interface DropdownMenuRadioItemProps extends React.ComponentProps<
 > {}
 
 /**
- * DropdownMenuRadioItem
- *
- * A radio menu item for exclusive selection.
+ * A menu item for picking one option from a DropdownMenuRadioGroup.
  *
  * @example
  * ```tsx
@@ -387,16 +363,14 @@ interface DropdownMenuLabelProps extends React.ComponentProps<
   typeof DropdownMenuPrimitive.Label
 > {
   /**
-   * Indents the label to align with items that have a leading icon or checkbox.
+   * Indents the label to line up with items that have a leading icon or check.
    * @default false
    */
   inset?: boolean;
 }
 
 /**
- * DropdownMenuLabel
- *
- * A label for a group of menu items.
+ * A heading for a group of menu items.
  *
  * @example
  * ```tsx
@@ -432,9 +406,7 @@ interface DropdownMenuSeparatorProps extends React.ComponentProps<
 > {}
 
 /**
- * DropdownMenuSeparator
- *
- * A visual divider between menu items.
+ * A divider between menu items.
  */
 function DropdownMenuSeparator({
   className,
@@ -460,9 +432,7 @@ function DropdownMenuSeparator({
 interface DropdownMenuShortcutProps extends React.ComponentProps<'span'> {}
 
 /**
- * DropdownMenuShortcut
- *
- * Displays a keyboard shortcut hint.
+ * A keyboard shortcut hint, right-aligned in a DropdownMenuItem.
  *
  * @example
  * ```tsx

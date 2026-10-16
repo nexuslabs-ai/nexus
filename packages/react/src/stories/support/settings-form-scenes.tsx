@@ -1,6 +1,6 @@
 import * as React from 'react';
 
-import { Button } from '../../components/button';
+import { Button } from '../../components/button/button';
 import {
   Dialog,
   DialogBody,
@@ -9,7 +9,7 @@ import {
   DialogHeader,
   DialogTitle,
   DialogTrigger,
-} from '../../components/dialog';
+} from '../../components/dialog/dialog';
 
 const PRIYA = {
   id: 'priya',

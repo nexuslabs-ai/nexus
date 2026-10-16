@@ -6,7 +6,7 @@ import {
 import type { Meta, StoryObj } from '@storybook/react';
 import { expect, within } from 'storybook/test';
 
-import { NexusAppearanceSettings } from '../components/appearance/appearance-settings';
+import { NexusAppearanceSettings } from '../components/appearance/appearance-settings/appearance-settings';
 
 import {
   tokenValue,

@@ -5,8 +5,8 @@ import {
   expectExitBeforeUnmount,
   expectInterruptibleOverlayMotion,
 } from '../../stories/support/overlay-motion-test-utils';
-import { Avatar, AvatarFallback, AvatarImage } from '../avatar';
-import { Button } from '../button';
+import { Avatar, AvatarFallback, AvatarImage } from '../avatar/avatar';
+import { Button } from '../button/button';
 
 import { HoverCard, HoverCardContent, HoverCardTrigger } from './hover-card';
 

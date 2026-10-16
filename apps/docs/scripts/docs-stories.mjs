@@ -923,14 +923,10 @@ function identifiersIn(text) {
   return names;
 }
 
-export function resolveModule(basePath) {
-  const candidates = [
-    `${basePath}.tsx`,
-    `${basePath}.ts`,
-    path.join(basePath, 'index.tsx'),
-    path.join(basePath, 'index.ts'),
-  ];
-  return candidates.find((candidate) => existsSync(candidate));
+function resolveModule(basePath) {
+  return [`${basePath}.tsx`, `${basePath}.ts`].find((candidate) =>
+    existsSync(candidate)
+  );
 }
 
 /**
@@ -965,10 +961,7 @@ function pasteSpecifier(module, file, where) {
     .split(path.sep)
     .join('/')
     .replace(/\.tsx?$/, '');
-  if (!relative.endsWith('/index')) return `@/${relative}`;
-  const folder = relative.slice(0, -'/index'.length);
-  const own = `${folder}/${path.posix.basename(folder)}`;
-  return resolveModule(path.join(reactSrc, own)) ? `@/${own}` : `@/${folder}`;
+  return `@/${relative}`;
 }
 
 function importGroup(specifier) {

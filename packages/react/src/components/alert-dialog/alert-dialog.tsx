@@ -6,7 +6,7 @@ import * as AlertDialogPrimitive from '@radix-ui/react-alert-dialog';
 import type { VariantProps } from 'class-variance-authority';
 
 import { cn } from '../../lib/utils';
-import { buttonVariants } from '../button';
+import { buttonVariants } from '../button/button';
 import {
   defaultOverlayLayout,
   overlayBodyClassName,

@@ -25,18 +25,18 @@ import {
   IconX,
 } from '../../lib/icons';
 import { cn } from '../../lib/utils';
-import { Button } from '../button';
-import { Checkbox } from '../checkbox';
-import { ChoiceRow } from '../choice-row';
-import { Input } from '../input';
-import { Popover, PopoverContent, PopoverTrigger } from '../popover';
+import { Button } from '../button/button';
+import { Checkbox } from '../checkbox/checkbox';
+import { ChoiceRow } from '../choice-row/choice-row';
+import { Input } from '../input/input';
+import { Popover, PopoverContent, PopoverTrigger } from '../popover/popover';
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from '../select';
+} from '../select/select';
 
 const fieldIcons: Record<FilterField['type'], React.ReactNode> = {
   text: (
