@@ -7,7 +7,15 @@ import type {
   NexusAppearanceState,
   TokenMap,
 } from '@nexus_ds/core';
-import { Badge, Button, Input } from '@nexus_ds/react';
+import {
+  Accordion,
+  AccordionContent,
+  AccordionItem,
+  AccordionTrigger,
+  Badge,
+  Button,
+  Input,
+} from '@nexus_ds/react';
 
 import type { ScaleFamily, ScaleToken } from './lab-data';
 import { LEDGER_ROW_CLASS } from './token-ledger';
@@ -96,54 +104,66 @@ export function ScaleLedger({
   }
 
   return (
-    <div className="nx:space-y-8">
-      {Object.entries(FAMILIES).map(([family, label]) => {
-        const familyTokens = tokens.filter((token) => token.family === family);
-        const groups = [...new Set(familyTokens.map(({ group }) => group))];
-        return (
-          <section key={family} className="nx:space-y-3">
-            <h2 className="nx:typography-heading-small">{label}</h2>
-            {groups.map((group) => (
-              <div key={group} className="nx:space-y-1">
-                {groups.length > 1 && (
-                  <h3 className="nx:typography-label-small nx:text-muted-foreground">
-                    {group}
-                  </h3>
-                )}
-                <ul className="nx:m-0 nx:list-none nx:p-0">
-                  {familyTokens
-                    .filter((token) => token.group === group)
-                    .map((token) => (
-                      <li
-                        key={token.name}
-                        className="nx:border-b-default nx:border-border-default"
-                      >
-                        <ScaleRow
-                          token={token}
-                          value={token.fixedValue ?? values[token.name] ?? ''}
-                          source={sourceLabel(token)}
-                          overridden={token.name in overrides}
-                          expanded={open === token.name}
-                          onToggle={() =>
-                            setOpen(open === token.name ? null : token.name)
-                          }
-                        />
-                        {open === token.name && token.fixedValue === null && (
-                          <ScaleEditor
-                            token={token}
-                            overridden={token.name in overrides}
-                            onOverride={onOverride}
-                          />
-                        )}
-                      </li>
-                    ))}
-                </ul>
-              </div>
-            ))}
-          </section>
-        );
-      })}
-    </div>
+    <section className="nx:space-y-4">
+      <h2 className="nx:typography-heading-small">Other tokens</h2>
+      <Accordion type="multiple" defaultValue={Object.keys(FAMILIES)}>
+        {Object.entries(FAMILIES).map(([family, label]) => {
+          const familyTokens = tokens.filter(
+            (token) => token.family === family
+          );
+          const groups = [...new Set(familyTokens.map(({ group }) => group))];
+          return (
+            <AccordionItem key={family} value={family}>
+              <AccordionTrigger>
+                {label} · {familyTokens.length}
+              </AccordionTrigger>
+              <AccordionContent className="nx:space-y-3 nx:text-foreground">
+                {groups.map((group) => (
+                  <div key={group} className="nx:space-y-1">
+                    {groups.length > 1 && (
+                      <h4 className="nx:typography-label-small nx:text-muted-foreground">
+                        {group}
+                      </h4>
+                    )}
+                    <ul className="nx:m-0 nx:list-none nx:p-0">
+                      {familyTokens
+                        .filter((token) => token.group === group)
+                        .map((token) => (
+                          <li
+                            key={token.name}
+                            className="nx:border-b-default nx:border-border-default"
+                          >
+                            <ScaleRow
+                              token={token}
+                              value={
+                                token.fixedValue ?? values[token.name] ?? ''
+                              }
+                              source={sourceLabel(token)}
+                              overridden={token.name in overrides}
+                              expanded={open === token.name}
+                              onToggle={() =>
+                                setOpen(open === token.name ? null : token.name)
+                              }
+                            />
+                            {open === token.name &&
+                              token.fixedValue === null && (
+                                <ScaleEditor
+                                  token={token}
+                                  overridden={token.name in overrides}
+                                  onOverride={onOverride}
+                                />
+                              )}
+                          </li>
+                        ))}
+                    </ul>
+                  </div>
+                ))}
+              </AccordionContent>
+            </AccordionItem>
+          );
+        })}
+      </Accordion>
+    </section>
   );
 }
 
