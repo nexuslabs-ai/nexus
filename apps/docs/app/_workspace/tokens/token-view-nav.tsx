@@ -7,7 +7,6 @@ import { usePathname } from 'next/navigation';
 const VIEWS = [
   { href: '/token', label: 'Tokens' },
   { href: '/token/surfaces', label: 'Surfaces' },
-  { href: '/token/lab', label: 'Lab' },
 ];
 
 const LINK_BASE =

@@ -79,7 +79,7 @@ export function LabWorkspace({ primitives }: { primitives: PrimitiveColor[] }) {
     >
       <TokenViewNav />
       <header className="nx:space-y-2 nx:mb-8">
-        <PageHeading>Theme lab</PageHeading>
+        <PageHeading>Tokens</PageHeading>
         <p className="nx:max-w-2xl nx:text-muted-foreground">
           Every semantic colour the engine derives for this appearance, where
           its value comes from, and whether it passes its contrast checks.
