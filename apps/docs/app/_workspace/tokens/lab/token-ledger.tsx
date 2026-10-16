@@ -92,7 +92,9 @@ export function TokenLedger({
   return (
     <section aria-label="Semantic colour tokens" className="nx:space-y-4">
       <div className="nx:flex nx:flex-wrap nx:gap-2">
-        <Badge variant="secondary">{onPrimitive} match a primitive</Badge>
+        <Badge variant="secondary">
+          {onPrimitive} share a primitive&apos;s value
+        </Badge>
         <Badge variant="secondary">
           {rows.length - onPrimitive - overridden} computed by the engine
         </Badge>
@@ -178,11 +180,11 @@ function LedgerRow({
       <span className="nx:flex nx:flex-wrap nx:justify-end nx:gap-1">
         {overridden ? (
           <Badge variant="information" fill="light">
-            overridden{primitive ? ` · ${primitive}` : ''}
+            overridden{primitive ? ` · same value as ${primitive}` : ''}
           </Badge>
         ) : (
           <Badge variant={primitive ? 'success' : 'warning'} fill="light">
-            {primitive ? `= ${primitive}` : 'computed'}
+            {primitive ? `same value as ${primitive}` : 'computed'}
           </Badge>
         )}
         {miss && (
