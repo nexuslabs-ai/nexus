@@ -365,11 +365,8 @@ export async function buildPageManifest(docsRoot, formatOptions) {
       );
     }
     const file = source.pages.get(key);
-    if (
-      !/^export const description\b/m.test(
-        fs.readFileSync(path.join(docsRoot, file), 'utf8')
-      )
-    ) {
+    const pageSource = fs.readFileSync(path.join(docsRoot, file), 'utf8');
+    if (!/^export const description =\s*(['"`])(?!\1)/m.test(pageSource)) {
       throw new Error(
         `${file} has no description — add \`export const description = '…'\` for the page's meta description.`
       );

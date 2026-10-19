@@ -17,6 +17,8 @@ function shareImage(url: string, alt: string) {
   return { url, ...OG_IMAGE_SIZE, alt, type: 'image/png' };
 }
 
+type ShareImage = ReturnType<typeof shareImage>;
+
 /** The site-wide share card, rendered by `app/og/site.png/route.tsx`. */
 export const SITE_IMAGE = shareImage('/og/site.png', SITE_TITLE);
 
@@ -45,7 +47,7 @@ export function pageMetadata({
   title: NonNullable<Metadata['title']>;
   description: string;
   route: string;
-  image: typeof SITE_IMAGE;
+  image: ShareImage;
 }): Metadata {
   return {
     title,

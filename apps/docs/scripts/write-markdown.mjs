@@ -197,11 +197,17 @@ for (const section of PAGE_MANIFEST) {
     writeFileSync(path.join(outDir, `${page.route}.md`), markdown);
     fullPages.push(`<!-- ${page.route} -->\n\n${markdown}`);
 
-    const description = findNode(
+    const descriptionMeta = findNode(
       builtRoute(page.route).tree,
       (node) =>
         node.tagName === 'meta' && node.properties.name === 'description'
-    ).properties.content;
+    );
+    if (!descriptionMeta) {
+      throw new Error(
+        `Missing <meta name="description"> in ${page.route}.html.`
+      );
+    }
+    const description = descriptionMeta.properties.content;
     lines.push(`- [${page.label}](${page.route}.md): ${description}`);
   }
   if (lines.length > 0) {
