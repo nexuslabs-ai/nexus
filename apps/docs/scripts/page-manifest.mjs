@@ -287,7 +287,11 @@ import type { ComponentType } from 'react';
 import 'server-only';
 
 // eslint-disable-next-line @nexus_ds/no-render-prop-types -- \`default: ComponentType\` is the shape of a lazily-imported page module, not a component-as-prop.
-export type ManifestPageLoader = () => Promise<{ default: ComponentType }>;
+export type ManifestPageLoader = () => Promise<{
+  default: ComponentType;
+  /** The page's meta description. Optional only because MDX module types can't declare it; the page route fails the build without one. */
+  description?: string;
+}>;
 
 /** Route → page module, for every guide page in \`PAGE_MANIFEST\`. */
 export const PAGE_LOADERS: Record<string, ManifestPageLoader> = {

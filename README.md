@@ -1,6 +1,8 @@
-# Nexus Design System
+# Nexus UI
 
-Token-driven design system for product UI. Three layers compose into one consumable surface:
+Nexus UI is a framework-agnostic theme engine and design system. Set one appearance object, and every component follows your brand, density and corners. Docs: **<https://nexusui.so>**.
+
+Three layers compose into one consumable surface:
 
 - **`@nexus_ds/core`** — DTCG design tokens (color, spacing, radius, shadow, typography, motion). Color emits as OKLCH at build time via a perceptual-L grid; spacing is per-mode (mode swap at runtime via the `data-density` attribute).
 - **`@nexus_ds/tailwind`** — Tailwind CSS theme generated from the tokens. All utilities are namespaced with the `nx:` prefix.

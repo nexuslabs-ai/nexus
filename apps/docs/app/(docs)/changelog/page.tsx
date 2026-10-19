@@ -1,11 +1,19 @@
+import type { Metadata } from 'next';
+
 import { Breadcrumb } from '../../_components/Breadcrumb';
+import { REPO_URL } from '../../_lib/site';
 
 /**
  * Changelog. Pre-1.0 — grouped by date, not semver, until the first tagged
  * release. Entries are sourced from merged PRs; link out to GitHub.
  */
 
-const REPO = 'https://github.com/nexuslabs-ai/nexus';
+export const metadata: Metadata = {
+  title: 'Changelog',
+  description:
+    'Notable changes to Nexus UI, grouped by date, with links to each pull request.',
+  alternates: { canonical: '/changelog' },
+};
 
 type Change = {
   type: 'Added' | 'Changed' | 'Fixed';
@@ -138,7 +146,7 @@ export default function Changelog() {
                       <>
                         {' '}
                         <a
-                          href={`${REPO}/pull/${change.pr}`}
+                          href={`${REPO_URL}/pull/${change.pr}`}
                           target="_blank"
                           rel="noreferrer"
                           className="nx:font-mono nx:typography-label-small nx:text-primary-subtle-foreground nx:hover:underline nx:focus-visible:outline-2 nx:focus-visible:outline-focus-default nx:focus-visible:outline-offset-2 nx:rounded-sm"

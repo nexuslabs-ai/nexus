@@ -2,7 +2,12 @@ import type { Metadata } from 'next';
 
 import { PlaygroundWorkspace } from '../../_workspace/playground-workspace';
 
-export const metadata: Metadata = { title: 'Playground — Nexus Design System' };
+export const metadata: Metadata = {
+  title: 'Theme playground',
+  description:
+    'Try a Nexus UI theme on every component. Change the brand color, density, corners and shadows, then copy the appearance into your app.',
+  alternates: { canonical: '/playground' },
+};
 
 export default function PlaygroundPage() {
   return <PlaygroundWorkspace />;

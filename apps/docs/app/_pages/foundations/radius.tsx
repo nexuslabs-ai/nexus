@@ -11,6 +11,9 @@ import { SectionHeading } from '../../_components/Heading';
  * Source: packages/core/tokens/ (radius / borderwidth / shadow modes).
  */
 
+export const description =
+  'Nexus UI corner radius, border width and shadow tokens. Each one is a theme field, so corners, borders and elevation change without a rebuild.';
+
 const RADII: { cls: string; label: string }[] = [
   { cls: 'nx:rounded-base', label: 'base' },
   { cls: 'nx:rounded-sm', label: 'sm' },
