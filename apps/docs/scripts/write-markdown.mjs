@@ -76,14 +76,15 @@ function prune(node) {
 }
 
 /**
- * Every root-relative `href` under `node`.
+ * Every root-relative or same-page `#id` `href` under `node`.
  * @param {any} node
  * @returns {string[]}
  */
 function internalLinks(node) {
+  const href = String(node.properties?.href);
   const own =
-    node.tagName === 'a' && String(node.properties?.href).startsWith('/')
-      ? [String(node.properties.href)]
+    node.tagName === 'a' && (href.startsWith('/') || href.startsWith('#'))
+      ? [href]
       : [];
   return [...own, ...(node.children ?? []).flatMap(internalLinks)];
 }
@@ -126,15 +127,18 @@ function summaryOf(markdown) {
   return paragraph?.replace(/\s+/g, ' ');
 }
 
-/** @type {Map<string, string | undefined>} */
-const builtHtml = new Map();
+const parseHtml = unified().use(rehypeParse);
+
+/** @type {Map<string, { tree?: any } | undefined>} */
+const builtRoutes = new Map();
 
 /**
- * The built HTML a route serves, or undefined when the build has no such route.
+ * The built file a route serves, with its parsed tree when it is HTML, or
+ * undefined when the build has no such route.
  * @param {string} route
  */
-function htmlForRoute(route) {
-  if (!builtHtml.has(route)) {
+function builtRoute(route) {
+  if (!builtRoutes.has(route)) {
     const file = [
       path.join(outDir, route),
       path.join(outDir, `${route}.html`),
@@ -142,9 +146,16 @@ function htmlForRoute(route) {
     ].find(
       (candidate) => existsSync(candidate) && statSync(candidate).isFile()
     );
-    builtHtml.set(route, file ? readFileSync(file, 'utf8') : undefined);
+    builtRoutes.set(
+      route,
+      file && {
+        tree: file.endsWith('.html')
+          ? parseHtml.parse(readFileSync(file, 'utf8'))
+          : undefined,
+      }
+    );
   }
-  return builtHtml.get(route);
+  return builtRoutes.get(route);
 }
 
 /**
@@ -154,13 +165,19 @@ function htmlForRoute(route) {
 function brokenReason(href) {
   const [location, id] = href.split('#');
   const route = location.split('?')[0];
-  const html = htmlForRoute(route.replace(/\/$/, '') || '/index');
-  if (html === undefined) return 'no such route';
-  if (id && !html.includes(` id="${id}"`)) return `no #${id} on ${route}`;
+  const built = builtRoute(route.replace(/\/$/, '') || '/index');
+  if (built === undefined) return 'no such route';
+  if (id && !(built.tree && findById(built.tree, id))) {
+    return `no #${id} on ${route}`;
+  }
   return undefined;
 }
 
-const brokenLinks = [];
+/**
+ * Each page's internal links, checked once every output is written.
+ * @type {Map<string, string[]>}
+ */
+const linksByRoute = new Map();
 const llmsSections = [];
 
 for (const section of PAGE_MANIFEST) {
@@ -175,10 +192,12 @@ for (const section of PAGE_MANIFEST) {
       value: readFileSync(htmlFile, 'utf8'),
     });
     const markdown = String(processed);
-    for (const href of /** @type {string[]} */ (processed.data.links)) {
-      const reason = brokenReason(href);
-      if (reason) brokenLinks.push(`${page.route} → ${href}: ${reason}`);
-    }
+    linksByRoute.set(
+      page.route,
+      /** @type {string[]} */ (processed.data.links).map((href) =>
+        href.startsWith('#') ? `${page.route}${href}` : href
+      )
+    );
     writeFileSync(path.join(outDir, `${page.route}.md`), markdown);
 
     const summary = summaryOf(markdown);
@@ -191,11 +210,6 @@ for (const section of PAGE_MANIFEST) {
   }
 }
 
-if (brokenLinks.length > 0) {
-  console.error(`Broken docs links:\n${brokenLinks.join('\n')}`);
-  process.exit(1);
-}
-
 const llms = `# Nexus
 
 > React components you copy into your app and own, with a runtime theme engine (\`@nexus_ds/core\`). Every class uses the \`nx:\` Tailwind prefix.
@@ -206,3 +220,15 @@ ${llmsSections.join('\n\n')}
 `;
 
 writeFileSync(path.join(outDir, 'llms.txt'), llms);
+
+const brokenLinks = [...linksByRoute].flatMap(([route, hrefs]) =>
+  hrefs.flatMap((href) => {
+    const reason = brokenReason(href);
+    return reason ? [`${route} → ${href}: ${reason}`] : [];
+  })
+);
+
+if (brokenLinks.length > 0) {
+  console.error(`Broken docs links:\n${brokenLinks.join('\n')}`);
+  process.exit(1);
+}

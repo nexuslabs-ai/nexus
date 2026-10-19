@@ -50,7 +50,7 @@ function Step({ first, children }: { first?: boolean; children: ReactNode }) {
 /** Foundations → Tokens: the path from token sources to rendered components. */
 export function EnginePipeline() {
   return (
-    <ol className="nx:@container nx:list-none nx:m-0 nx:p-0 nx:flex nx:flex-col nx:gap-2 nx:my-6 nx:max-w-3xl">
+    <ol className="nx:@container nx:list-none nx:p-0 nx:flex nx:flex-col nx:gap-2 nx:my-6 nx:max-w-3xl">
       <Step first>
         <Stage
           title="Token sources"

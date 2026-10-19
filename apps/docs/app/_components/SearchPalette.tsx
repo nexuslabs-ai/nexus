@@ -5,6 +5,7 @@ import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 
 import { PAGE_MANIFEST } from '../_lib/manifest';
+import { PLAYGROUND_VIEWS } from '../_lib/playground-views';
 
 import {
   CommandDialog,
@@ -25,11 +26,7 @@ import {
 const INDEX = [
   {
     title: 'Playground',
-    items: [
-      { label: 'Playground', href: '/playground' },
-      { label: 'Token lab', href: '/playground/tokens' },
-      { label: 'Surface atlas', href: '/playground/tokens/surfaces' },
-    ],
+    items: PLAYGROUND_VIEWS,
   },
   ...PAGE_MANIFEST.map((section) => ({
     title: section.title,
