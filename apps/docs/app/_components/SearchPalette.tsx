@@ -16,18 +16,29 @@ import {
 } from './nexus';
 
 /**
- * ⌘K command-palette search over the docs IA. Indexes every page in the
- * generated manifest (the same source the nav + routes read), so it stays in
- * sync as pages are added. Built on the Nexus Command (cmdk) surface.
+ * ⌘K command-palette search over the docs IA. Indexes the Playground routes
+ * and every page in the generated manifest (the same source the nav + routes
+ * read), so it stays in sync as pages are added. Built on the Nexus Command
+ * (cmdk) surface.
  */
 
-const INDEX = PAGE_MANIFEST.map((section) => ({
-  title: section.title,
-  items: section.pages.map((page) => ({
-    label: page.label,
-    href: page.route,
+const INDEX = [
+  {
+    title: 'Playground',
+    items: [
+      { label: 'Playground', href: '/playground' },
+      { label: 'Token lab', href: '/playground/tokens' },
+      { label: 'Surface atlas', href: '/playground/tokens/surfaces' },
+    ],
+  },
+  ...PAGE_MANIFEST.map((section) => ({
+    title: section.title,
+    items: section.pages.map((page) => ({
+      label: page.label,
+      href: page.route,
+    })),
   })),
-}));
+];
 
 export function SearchPalette() {
   const [open, setOpen] = useState(false);

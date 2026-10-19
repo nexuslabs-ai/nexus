@@ -1,9 +1,11 @@
+import { EnginePipeline } from './_engine-pipeline';
+
 # Tokens
 
 Tokens are the named values every Nexus component uses for color, spacing,
 radius, shadows, borders and motion.
 
-[Open the Token lab](/token) to browse every token in the current theme.
+[Open the Token lab](/playground/tokens) to browse every token in the current theme.
 
 ## Token layers
 
@@ -14,7 +16,7 @@ radius, shadows, borders and motion.
 | Utility   | The class a component uses    | `nx:bg-primary-background`            |
 
 Components use semantic tokens through utilities. A component that uses a
-primitive fails the Nexus lint rules.
+primitive color fails the Nexus lint rules.
 
 ## The `nx:` prefix
 
@@ -58,15 +60,17 @@ The name always ends in a role. `nx:bg-primary` resolves to nothing.
 
 ## One engine, two moments
 
-`deriveTheme()` in `@nexus_ds/core` is the only code that produces a token
-value. It runs once at build time to write the default theme into `nexus.css`.
-It runs again in the browser whenever the appearance changes.
+`deriveTheme()` in `@nexus_ds/core` produces every color token. It runs once
+at build time to write the default colors into `nexus.css`. It runs again in
+the browser whenever the appearance changes.
 
 Same function, same inputs, same output. The page looks right with JavaScript
 off, and a live theme change needs no rebuild.
 
-The token sources are DTCG JSON (the W3C design token format). The appearance
-state is the object described in [Appearance](/theming/appearance).
+Spacing, radius, shadow, border and motion come straight from DTCG JSON (the
+W3C design token format). `nexus.css` holds every density, corner, shadow and
+border option, and the provider picks one with a data attribute. The
+appearance state is the object described in [Appearance](/theming/appearance).
 
 <EnginePipeline />
 
@@ -74,14 +78,16 @@ Light and dark come from the same call, so dark mode can't drift from light.
 
 ## Other frameworks
 
-The engine has no framework or DOM code. Two functions are the whole surface
-another framework needs:
+The engine has no framework or DOM code. Another framework needs three
+functions:
 
-- `deriveTheme()` returns the light and dark token maps.
+- `createNexusThemeContract()` turns the appearance state into the engine's
+  input.
+- `deriveTheme()` returns the light and dark color token maps.
 - `themeToCss()` turns those maps into CSS.
 
 An app that styles itself without CSS, like a React Native app, reads the
-token map directly. Every framework gets the same values, so a React app and a
+color token map and the DTCG files directly. Every framework gets the same values, so a React app and a
 Vue app in one product render the same gray.
 
 | Concern          | Shared by every framework                                       | Built per framework                                     |
@@ -93,10 +99,10 @@ Vue app in one product render the same gray.
 | State binding    | None                                                            | A provider or store in the framework's own style        |
 | Components       | Variants, data attributes, sizing and focus rules               | Components built on the framework's headless primitives |
 
-React ships today. Vue, Svelte, Angular and React Native bindings are planned.
+The Nexus components are React.
 
 ## Next steps
 
 - **[Color](/foundations/color)**: how the palette is built and checked.
 - **[Appearance](/theming/appearance)**: every field the engine reads.
-- **[Token lab](/token)**: every token in the current theme.
+- **[Token lab](/playground/tokens)**: every token in the current theme.

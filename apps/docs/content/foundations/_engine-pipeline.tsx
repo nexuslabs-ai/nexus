@@ -6,12 +6,10 @@ function Stage({
   title,
   detail,
   emphasis,
-  planned,
 }: {
   title: string;
   detail: string;
   emphasis?: boolean;
-  planned?: boolean;
 }) {
   return (
     <p
@@ -19,8 +17,7 @@ function Stage({
         'nx:m-0 nx:flex-1 nx:rounded-md nx:border nx:p-3 nx:typography-label-small nx:text-muted-foreground',
         emphasis
           ? 'nx:border-primary-border nx:bg-primary-subtle'
-          : 'nx:border-border-default nx:bg-container',
-        planned && 'nx:border-dashed nx:bg-transparent'
+          : 'nx:border-border-default nx:bg-container'
       )}
     >
       <strong className="nx:block nx:mb-1 nx:typography-label-default nx:font-semibold nx:text-foreground">
@@ -43,7 +40,7 @@ function Step({ first, children }: { first?: boolean; children: ReactNode }) {
           ↓
         </span>
       )}
-      <div className="nx:flex nx:flex-col nx:gap-2 nx:sm:flex-row">
+      <div className="nx:flex nx:flex-col nx:gap-2 nx:@md:flex-row">
         {children}
       </div>
     </li>
@@ -53,7 +50,7 @@ function Step({ first, children }: { first?: boolean; children: ReactNode }) {
 /** Foundations → Tokens: the path from token sources to rendered components. */
 export function EnginePipeline() {
   return (
-    <ol className="nx:list-none nx:m-0 nx:p-0 nx:flex nx:flex-col nx:gap-2 nx:my-6 nx:max-w-3xl">
+    <ol className="nx:@container nx:list-none nx:m-0 nx:p-0 nx:flex nx:flex-col nx:gap-2 nx:my-6 nx:max-w-3xl">
       <Step first>
         <Stage
           title="Token sources"
@@ -68,17 +65,17 @@ export function EnginePipeline() {
         <Stage
           emphasis
           title="deriveTheme() in @nexus_ds/core"
-          detail="Builds the palettes, picks each surface shade and checks contrast. No DOM, no framework."
+          detail="Builds the color palettes, picks each surface shade and checks contrast. No DOM, no framework."
         />
       </Step>
       <Step>
         <Stage
           title="Build time"
-          detail="Default values written into nexus.css."
+          detail="Default colors and every spacing, radius, shadow and border option written into nexus.css."
         />
         <Stage
           title="Runtime"
-          detail="CSS variables the provider writes when the appearance changes."
+          detail="Color variables and data attributes the provider writes when the appearance changes."
         />
       </Step>
       <Step>
@@ -90,17 +87,7 @@ export function EnginePipeline() {
       <Step>
         <Stage
           title="React components"
-          detail="Ships today, as copy-and-own source."
-        />
-        <Stage
-          planned
-          title="Vue, Svelte, Angular"
-          detail="Planned. A binding, not a second design system."
-        />
-        <Stage
-          planned
-          title="React Native and native apps"
-          detail="Planned. Read the token map or the DTCG files directly."
+          detail="Copy-and-own source built on the utilities."
         />
       </Step>
     </ol>

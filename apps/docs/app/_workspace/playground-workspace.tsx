@@ -6,6 +6,7 @@ import { useNexusAppearance } from '@nexus_ds/react/appearance';
 import { AppearanceControls } from './appearance-controls';
 import { useAppearanceHistory } from './appearance-state';
 import { PageHeading } from './page-heading';
+import { PlaygroundViewNav } from './playground-view-nav';
 import { Sampler } from './sampler';
 import { ThemeExport } from './theme-export';
 import { WorkspaceLayout } from './workspace-layout';
@@ -44,12 +45,13 @@ export function PlaygroundWorkspace() {
       aside={panel}
       sheetTrigger={<Button variant="outline">Appearance</Button>}
     >
+      <PlaygroundViewNav />
       <div className="nx:space-y-8">
         <header className="nx:space-y-2">
           <p className="nx:typography-label-small nx:text-muted-foreground">
             PLAYGROUND
           </p>
-          <PageHeading>Try a theme on every component.</PageHeading>
+          <PageHeading>Try a theme on every component</PageHeading>
           <p className="nx:max-w-2xl nx:text-muted-foreground">
             Change the appearance, and these examples, the docs and every
             overlay they open follow it. When you like the result, select Use

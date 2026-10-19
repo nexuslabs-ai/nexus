@@ -13,15 +13,15 @@ From the repository root:
 - `pnpm --filter @nexus_ds/docs build`
 - `pnpm --filter @nexus_ds/docs audit:csp` — after a production build.
 
-## Create
+## Playground
 
-`/create` is a playground for the docs appearance. The controls sit in a side
+`/playground` is a playground for the docs appearance. The controls sit in a side
 panel on wide screens and in a sheet below `lg`. The canvas renders a small
 product scene built from public Nexus components.
 
 - **One appearance.** Controls write to the docs appearance provider in the root
   layout. That provider is the only store: it persists under
-  `nexus-docs-appearance`, and every page, including `/create`, renders with it.
+  `nexus-docs-appearance`, and every page, including `/playground`, renders with it.
   The example scene renders inline under that same appearance. Its overlays
   portal into the docs document, so they look the same as the canvas.
 - **Undo and Reset.** `useAppearanceHistory` (`app/_workspace/appearance-state.ts`)

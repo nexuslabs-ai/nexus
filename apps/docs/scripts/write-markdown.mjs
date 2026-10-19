@@ -1,5 +1,5 @@
 // @ts-check
-import { existsSync, readFileSync, writeFileSync } from 'node:fs';
+import { existsSync, readFileSync, statSync, writeFileSync } from 'node:fs';
 import path from 'node:path';
 import { pathToFileURL } from 'node:url';
 
@@ -75,6 +75,19 @@ function prune(node) {
   }
 }
 
+/**
+ * Every root-relative `href` under `node`.
+ * @param {any} node
+ * @returns {string[]}
+ */
+function internalLinks(node) {
+  const own =
+    node.tagName === 'a' && String(node.properties?.href).startsWith('/')
+      ? [String(node.properties.href)]
+      : [];
+  return [...own, ...(node.children ?? []).flatMap(internalLinks)];
+}
+
 /** Keeps only the page's article, minus anything that only works on screen. */
 function articleOnly() {
   return (/** @type {any} */ tree, /** @type {any} */ file) => {
@@ -85,6 +98,7 @@ function articleOnly() {
       );
     }
     prune(article);
+    file.data.links = internalLinks(article);
     tree.children = [article];
   };
 }
@@ -112,6 +126,41 @@ function summaryOf(markdown) {
   return paragraph?.replace(/\s+/g, ' ');
 }
 
+/** @type {Map<string, string | undefined>} */
+const builtHtml = new Map();
+
+/**
+ * The built HTML a route serves, or undefined when the build has no such route.
+ * @param {string} route
+ */
+function htmlForRoute(route) {
+  if (!builtHtml.has(route)) {
+    const file = [
+      path.join(outDir, route),
+      path.join(outDir, `${route}.html`),
+      path.join(outDir, route, 'index.html'),
+    ].find(
+      (candidate) => existsSync(candidate) && statSync(candidate).isFile()
+    );
+    builtHtml.set(route, file ? readFileSync(file, 'utf8') : undefined);
+  }
+  return builtHtml.get(route);
+}
+
+/**
+ * Why `href` is broken, or undefined when its route and `#id` both exist.
+ * @param {string} href
+ */
+function brokenReason(href) {
+  const [location, id] = href.split('#');
+  const route = location.split('?')[0];
+  const html = htmlForRoute(route.replace(/\/$/, '') || '/index');
+  if (html === undefined) return 'no such route';
+  if (id && !html.includes(` id="${id}"`)) return `no #${id} on ${route}`;
+  return undefined;
+}
+
+const brokenLinks = [];
 const llmsSections = [];
 
 for (const section of PAGE_MANIFEST) {
@@ -121,12 +170,15 @@ for (const section of PAGE_MANIFEST) {
     if (!existsSync(htmlFile)) {
       throw new Error(`Missing ${path.relative(docsRoot, htmlFile)}.`);
     }
-    const markdown = String(
-      await processor.process({
-        path: htmlFile,
-        value: readFileSync(htmlFile, 'utf8'),
-      })
-    );
+    const processed = await processor.process({
+      path: htmlFile,
+      value: readFileSync(htmlFile, 'utf8'),
+    });
+    const markdown = String(processed);
+    for (const href of /** @type {string[]} */ (processed.data.links)) {
+      const reason = brokenReason(href);
+      if (reason) brokenLinks.push(`${page.route} → ${href}: ${reason}`);
+    }
     writeFileSync(path.join(outDir, `${page.route}.md`), markdown);
 
     const summary = summaryOf(markdown);
@@ -137,6 +189,11 @@ for (const section of PAGE_MANIFEST) {
   if (lines.length > 0) {
     llmsSections.push(`## ${section.title}\n\n${lines.join('\n')}`);
   }
+}
+
+if (brokenLinks.length > 0) {
+  console.error(`Broken docs links:\n${brokenLinks.join('\n')}`);
+  process.exit(1);
 }
 
 const llms = `# Nexus

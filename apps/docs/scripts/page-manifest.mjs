@@ -357,7 +357,7 @@ export async function buildPageManifest(docsRoot, formatOptions) {
     const source = sources.find((candidate) => candidate.pages.has(key));
     if (!source) {
       throw new Error(
-        `${key} is in ${REGISTRY_FILE} but has no page file — write content/${key}.mdx or app/_pages/${key}.tsx, or remove its registry entry.`
+        `${key} is in ${REGISTRY_FILE} but has no page file — write ${SOURCES.map(({ dir, ext }) => `${dir}/${key}${ext}`).join(' or ')}, or remove its registry entry.`
       );
     }
     const file = source.pages.get(key);

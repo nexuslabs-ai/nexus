@@ -9,8 +9,8 @@ import { useNexusAppearance } from '@nexus_ds/react/appearance';
 import { AppearanceControls } from '../../appearance-controls';
 import { useAppearanceHistory } from '../../appearance-state';
 import { PageHeading } from '../../page-heading';
+import { PlaygroundViewNav } from '../../playground-view-nav';
 import { WorkspaceLayout } from '../../workspace-layout';
-import { TokenViewNav } from '../token-view-nav';
 import { useLiveTheme } from '../use-live-theme';
 
 import type { LabData } from './lab-data';
@@ -84,7 +84,7 @@ export function LabWorkspace({ primitives, scales }: LabData) {
       aside={panel}
       sheetTrigger={<Button variant="outline">Appearance</Button>}
     >
-      <TokenViewNav />
+      <PlaygroundViewNav />
       <header className="nx:space-y-2 nx:mb-8">
         <PageHeading>Tokens</PageHeading>
         <p className="nx:max-w-2xl nx:text-muted-foreground">

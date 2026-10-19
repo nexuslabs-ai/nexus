@@ -356,6 +356,9 @@ export default async function RootLayout({
 If the cookie is missing or invalid, `createNexusAppearanceSnapshotFromCookie`
 falls back to `defaultAppearance`.
 
+If you read the cookie in the root layout, Next.js renders every route on each
+request. `cookies()` turns off static rendering for the whole app.
+
 The provider saves the theme in two places:
 
 | Prop             | Saves to       | Read by                                               |
