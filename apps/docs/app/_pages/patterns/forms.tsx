@@ -22,6 +22,9 @@ import {
  * Source: packages/react/src/patterns/forms/.
  */
 
+export const description =
+  'Build an accessible settings form from Nexus UI fields, with labels, help text, validation errors, and read-only and disabled states.';
+
 const FORM_COMPONENTS =
   'button, button-group/button-group-context.ts, checkbox, field, input, label, separator, spinner and lib/';
 

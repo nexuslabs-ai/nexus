@@ -12,6 +12,9 @@ import { SectionHeading, SubsectionHeading } from '../../_components/Heading';
  * Source: packages/core/tokens/ (typography).
  */
 
+export const description =
+  'The Nexus UI type scale. Each of its twelve steps is one class that sets size, weight, line height and letter spacing.';
+
 const SCALE: {
   group: string;
   tiers: { cls: string; name: string; sample: string }[];

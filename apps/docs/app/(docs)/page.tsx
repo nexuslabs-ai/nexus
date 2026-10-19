@@ -15,6 +15,56 @@ import {
   requirePage,
   requireSection,
 } from '../_lib/manifest';
+import {
+  NPM_CORE_URL,
+  pageMetadata,
+  REPO_URL,
+  SITE_ALTERNATE_NAME,
+  SITE_DESCRIPTION,
+  SITE_IMAGE,
+  SITE_NAME,
+  SITE_TITLE,
+  SITE_URL,
+  STORYBOOK_URL,
+} from '../_lib/site';
+
+export const metadata = pageMetadata({
+  title: { absolute: SITE_TITLE },
+  description: SITE_DESCRIPTION,
+  route: '/',
+  image: SITE_IMAGE,
+});
+
+const STRUCTURED_DATA = {
+  '@context': 'https://schema.org',
+  '@graph': [
+    {
+      '@type': 'WebSite',
+      '@id': `${SITE_URL}/#website`,
+      url: SITE_URL,
+      name: SITE_NAME,
+      alternateName: [SITE_ALTERNATE_NAME, 'nexusui'],
+      description: SITE_DESCRIPTION,
+    },
+    {
+      '@type': 'SoftwareSourceCode',
+      '@id': `${SITE_URL}/#software`,
+      name: SITE_NAME,
+      alternateName: SITE_ALTERNATE_NAME,
+      description: SITE_DESCRIPTION,
+      url: SITE_URL,
+      codeRepository: REPO_URL,
+      programmingLanguage: ['TypeScript', 'CSS'],
+      license: 'https://opensource.org/licenses/MIT',
+      author: {
+        '@type': 'Organization',
+        name: 'Nexus Labs',
+        url: 'https://github.com/nexuslabs-ai',
+      },
+      sameAs: [REPO_URL, NPM_CORE_URL, STORYBOOK_URL],
+    },
+  ],
+};
 
 const BLUE_RAMP = [50, 100, 200, 300, 400, 500, 600, 700, 800, 900, 950];
 const BASE_CHIPS = ['slate', 'stone', 'neutral', 'gray', 'zinc'];
@@ -54,6 +104,13 @@ const SECTION_CARDS = PAGE_MANIFEST.filter(
 export default function Home() {
   return (
     <div className="nx:max-w-[960px] nx:mx-auto nx:px-6">
+      <script
+        type="application/ld+json"
+        // `<` is escaped so no string in the data can close the script tag.
+        dangerouslySetInnerHTML={{
+          __html: JSON.stringify(STRUCTURED_DATA).replaceAll('<', '\\u003c'),
+        }}
+      />
       {/* Hero */}
       <section className="nx:text-center nx:pt-20 nx:pb-16">
         <span className="nx:inline-flex nx:items-center nx:gap-2 nx:font-mono nx:typography-label-caps nx:uppercase nx:tracking-[0.14em] nx:text-primary-subtle-foreground">
@@ -64,8 +121,8 @@ export default function Home() {
           Design once. Ship every brand.
         </h1>
         <p className="nx:typography-body-default nx:text-muted-foreground nx:mt-5 nx:max-w-[36rem] nx:mx-auto nx:text-pretty">
-          React components you copy into your app and own. Set your brand once,
-          and every component follows it.
+          A framework-agnostic theme engine with components you copy into your
+          app and own. Set your brand once, and every component follows it.
         </p>
         <div className="nx:mt-8 nx:flex nx:flex-wrap nx:gap-3 nx:justify-center">
           <Button asChild>

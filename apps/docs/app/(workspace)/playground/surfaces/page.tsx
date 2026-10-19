@@ -1,8 +1,13 @@
-import type { Metadata } from 'next';
-
+import { pageMetadata, SITE_IMAGE } from '../../../_lib/site';
 import { SurfaceWorkspace } from '../../../_workspace/tokens/surfaces/surface-workspace';
 
-export const metadata: Metadata = { title: 'Surfaces — Nexus Design System' };
+export const metadata = pageMetadata({
+  title: 'Surface tokens',
+  description:
+    'Find the Nexus UI component parts that read each surface token, in the current theme.',
+  route: '/playground/surfaces',
+  image: SITE_IMAGE,
+});
 
 export default function SurfacesPage() {
   return <SurfaceWorkspace />;

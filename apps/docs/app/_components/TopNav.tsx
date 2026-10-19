@@ -8,6 +8,7 @@ import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 
 import { PAGE_MANIFEST } from '../_lib/manifest';
+import { SITE_NAME } from '../_lib/site';
 
 import { Button } from './nexus';
 import { SearchPalette } from './SearchPalette';
@@ -89,7 +90,7 @@ export function TopNav() {
         href="/"
         className="nx:flex nx:items-center nx:gap-2 nx:font-semibold nx:typography-label-default nx:no-underline nx:text-inherit nx:rounded-sm nx:focus-visible:outline-2 nx:focus-visible:outline-focus-default"
       >
-        Nexus DS
+        {SITE_NAME}
         <span className="nx:text-[10px] nx:uppercase nx:tracking-wider nx:text-nav-muted-foreground nx:px-1.5 nx:py-0.5 nx:border nx:border-dashed nx:border-nav-border nx:rounded-sm">
           docs
         </span>

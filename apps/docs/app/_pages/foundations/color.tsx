@@ -17,6 +17,9 @@ import { SectionHeading } from '../../_components/Heading';
  * gate), color-shades.md (the 11-step shade→role grid).
  */
 
+export const description =
+  'How Nexus UI builds its OKLCH palettes and semantic color tokens, and checks every text and background pair for APCA contrast in CI.';
+
 // Surface ↔ text pairs — APCA-gated pairings that react to the picker.
 const SEMANTIC_PAIRS: { surface: string; text: string; label: string }[] = [
   { surface: 'background', text: 'foreground', label: 'background' },

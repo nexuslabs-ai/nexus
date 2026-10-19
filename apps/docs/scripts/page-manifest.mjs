@@ -287,7 +287,11 @@ import type { ComponentType } from 'react';
 import 'server-only';
 
 // eslint-disable-next-line @nexus_ds/no-render-prop-types -- \`default: ComponentType\` is the shape of a lazily-imported page module, not a component-as-prop.
-export type ManifestPageLoader = () => Promise<{ default: ComponentType }>;
+export type ManifestPageLoader = () => Promise<{
+  default: ComponentType;
+  /** The page's meta description. */
+  description: string;
+}>;
 
 /** Route → page module, for every guide page in \`PAGE_MANIFEST\`. */
 export const PAGE_LOADERS: Record<string, ManifestPageLoader> = {
@@ -361,6 +365,12 @@ export async function buildPageManifest(docsRoot, formatOptions) {
       );
     }
     const file = source.pages.get(key);
+    const pageSource = fs.readFileSync(path.join(docsRoot, file), 'utf8');
+    if (!/^export const description =\s*(['"`])(?!\s*\1)/m.test(pageSource)) {
+      throw new Error(
+        `${file} has no description — add \`export const description = '…'\` for the page's meta description.`
+      );
+    }
     return {
       page: { ...base, kind: source.kind, file },
       specifier: specifierFor(file, source.keepExtension),

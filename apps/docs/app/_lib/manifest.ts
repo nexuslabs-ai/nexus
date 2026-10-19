@@ -35,3 +35,17 @@ export function requirePage(
   }
   return page;
 }
+
+/** `{ section, page }` for every docs page, as `generateStaticParams` returns. */
+export function docsPageParams() {
+  return PAGE_MANIFEST.flatMap((section) =>
+    section.pages.map((page) => ({ section: section.slug, page: page.slug }))
+  );
+}
+
+export function findDocsPage(sectionSlug: string, pageSlug: string) {
+  const section = getSection(sectionSlug);
+  const page = section?.pages.find((entry) => entry.slug === pageSlug);
+  if (!section || !page) return undefined;
+  return { section, page };
+}
