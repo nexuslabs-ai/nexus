@@ -295,8 +295,14 @@ export default function ColorShowcase() {
         </SectionHeading>
         <p className="nx:typography-body-default nx:text-muted-foreground nx:mb-4 nx:max-w-[64ch]">
           Nexus checks contrast with APCA (a perceptual contrast score), not
-          WCAG 2 ratios. Each pair has a minimum score for how it&rsquo;s used.
-          If a pair falls below its minimum, the build fails.
+          WCAG 2 ratios. WCAG 2 ratios misjudge the mid-tone pairs a token
+          system produces all the time.
+        </p>
+        <p className="nx:typography-body-default nx:text-muted-foreground nx:mb-4 nx:max-w-[64ch]">
+          Each pair has a minimum score for how it&rsquo;s used. CI derives
+          themes across many brand colors, surface tones and contrast settings,
+          then checks every pair in each one. If any pair falls below its
+          minimum, the build fails.
         </p>
         <p className="nx:typography-body-default nx:text-muted-foreground nx:mb-4 nx:max-w-[64ch]">
           CI also checks that the palettes stay distinct for color-blind users.

@@ -67,7 +67,9 @@ export function ThemeExport() {
         </DialogBody>
         <DialogFooter>
           <Button variant="outline" asChild>
-            <Link href="/getting-started/theme-setup">Theme setup guide</Link>
+            <Link href="/getting-started/install#step-3-add-the-appearance-provider">
+              Setup guide
+            </Link>
           </Button>
         </DialogFooter>
       </DialogContent>

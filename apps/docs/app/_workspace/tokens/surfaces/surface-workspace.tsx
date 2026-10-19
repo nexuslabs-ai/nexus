@@ -2,8 +2,8 @@
 
 import { Button } from '@nexus_ds/react';
 
+import { PlaygroundViewNav } from '../../playground-view-nav';
 import { WorkspaceLayout } from '../../workspace-layout';
-import { TokenViewNav } from '../token-view-nav';
 import { useLiveTheme } from '../use-live-theme';
 
 import { SurfaceFilters, SurfacesView } from './surfaces-view';
@@ -17,7 +17,7 @@ export function SurfaceWorkspace() {
       aside={<SurfaceFilters />}
       sheetTrigger={<Button variant="outline">Filters</Button>}
     >
-      <TokenViewNav />
+      <PlaygroundViewNav />
       <SurfacesView live={live} />
     </WorkspaceLayout>
   );

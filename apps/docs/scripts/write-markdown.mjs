@@ -1,5 +1,5 @@
 // @ts-check
-import { existsSync, readFileSync, writeFileSync } from 'node:fs';
+import { existsSync, readFileSync, statSync, writeFileSync } from 'node:fs';
 import path from 'node:path';
 import { pathToFileURL } from 'node:url';
 
@@ -75,6 +75,20 @@ function prune(node) {
   }
 }
 
+/**
+ * Every root-relative or same-page `#id` `href` under `node`.
+ * @param {any} node
+ * @returns {string[]}
+ */
+function internalLinks(node) {
+  const href = String(node.properties?.href);
+  const own =
+    node.tagName === 'a' && (href.startsWith('/') || href.startsWith('#'))
+      ? [href]
+      : [];
+  return [...own, ...(node.children ?? []).flatMap(internalLinks)];
+}
+
 /** Keeps only the page's article, minus anything that only works on screen. */
 function articleOnly() {
   return (/** @type {any} */ tree, /** @type {any} */ file) => {
@@ -85,6 +99,7 @@ function articleOnly() {
       );
     }
     prune(article);
+    file.data.links = internalLinks(article);
     tree.children = [article];
   };
 }
@@ -112,21 +127,76 @@ function summaryOf(markdown) {
   return paragraph?.replace(/\s+/g, ' ');
 }
 
+const parseHtml = unified().use(rehypeParse);
+
+/** @type {Map<string, { tree?: any } | undefined>} */
+const builtRoutes = new Map();
+
+/**
+ * The built file a route serves, with its parsed tree when it is HTML, or
+ * undefined when the build has no such route.
+ * @param {string} route
+ */
+function builtRoute(route) {
+  if (!builtRoutes.has(route)) {
+    const file = [
+      path.join(outDir, route),
+      path.join(outDir, `${route}.html`),
+      path.join(outDir, route, 'index.html'),
+    ].find(
+      (candidate) => existsSync(candidate) && statSync(candidate).isFile()
+    );
+    builtRoutes.set(
+      route,
+      file && {
+        tree: file.endsWith('.html')
+          ? parseHtml.parse(readFileSync(file, 'utf8'))
+          : undefined,
+      }
+    );
+  }
+  return builtRoutes.get(route);
+}
+
+/**
+ * Why `href` is broken, or undefined when its route and `#id` both exist.
+ * @param {string} href
+ */
+function brokenReason(href) {
+  const [location, id] = href.split('#');
+  const route = location.split('?')[0];
+  const built = builtRoute(route.replace(/\/$/, '') || '/index');
+  if (built === undefined) return 'no such route';
+  if (id && !(built.tree && findById(built.tree, id))) {
+    return `no #${id} on ${route}`;
+  }
+  return undefined;
+}
+
+/**
+ * Each page's internal links, checked once every output is written.
+ * @type {Map<string, string[]>}
+ */
+const linksByRoute = new Map();
 const llmsSections = [];
 
 for (const section of PAGE_MANIFEST) {
   const lines = [];
   for (const page of section.pages) {
-    if (page.kind === 'placeholder') continue;
     const htmlFile = path.join(outDir, `${page.route}.html`);
     if (!existsSync(htmlFile)) {
       throw new Error(`Missing ${path.relative(docsRoot, htmlFile)}.`);
     }
-    const markdown = String(
-      await processor.process({
-        path: htmlFile,
-        value: readFileSync(htmlFile, 'utf8'),
-      })
+    const processed = await processor.process({
+      path: htmlFile,
+      value: readFileSync(htmlFile, 'utf8'),
+    });
+    const markdown = String(processed);
+    linksByRoute.set(
+      page.route,
+      /** @type {string[]} */ (processed.data.links).map((href) =>
+        href.startsWith('#') ? `${page.route}${href}` : href
+      )
     );
     writeFileSync(path.join(outDir, `${page.route}.md`), markdown);
 
@@ -150,3 +220,15 @@ ${llmsSections.join('\n\n')}
 `;
 
 writeFileSync(path.join(outDir, 'llms.txt'), llms);
+
+const brokenLinks = [...linksByRoute].flatMap(([route, hrefs]) =>
+  hrefs.flatMap((href) => {
+    const reason = brokenReason(href);
+    return reason ? [`${route} → ${href}: ${reason}`] : [];
+  })
+);
+
+if (brokenLinks.length > 0) {
+  console.error(`Broken docs links:\n${brokenLinks.join('\n')}`);
+  process.exit(1);
+}

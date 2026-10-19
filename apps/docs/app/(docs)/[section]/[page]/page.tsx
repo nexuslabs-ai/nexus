@@ -3,7 +3,6 @@ import { notFound } from 'next/navigation';
 import { BlockPage } from '../../../_components/BlockPage';
 import { Breadcrumb } from '../../../_components/Breadcrumb';
 import { ComponentPage } from '../../../_components/ComponentPage';
-import { PageWireframeView } from '../../../_components/PageWireframeView';
 import {
   getSection,
   type ManifestPage,
@@ -31,9 +30,7 @@ export default async function Page({
 
   // The `.md` files are written after `next build`, so `next dev` has none.
   const markdownHref =
-    process.env.NODE_ENV === 'production' && page.kind !== 'placeholder'
-      ? `${page.route}.md`
-      : undefined;
+    process.env.NODE_ENV === 'production' ? `${page.route}.md` : undefined;
 
   return (
     <>
@@ -52,7 +49,6 @@ export default async function Page({
 }
 
 function PageContent({ page }: { page: ManifestPage }) {
-  if (page.kind === 'placeholder') return <PageWireframeView page={page} />;
   if (page.kind === 'generated') return <ComponentPage page={page} />;
   if (page.kind === 'block') return <BlockPage page={page} />;
   return <WrittenPage page={page} />;
