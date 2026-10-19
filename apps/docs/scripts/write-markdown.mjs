@@ -117,7 +117,6 @@ const llmsSections = [];
 for (const section of PAGE_MANIFEST) {
   const lines = [];
   for (const page of section.pages) {
-    if (page.kind === 'placeholder') continue;
     const htmlFile = path.join(outDir, `${page.route}.html`);
     if (!existsSync(htmlFile)) {
       throw new Error(`Missing ${path.relative(docsRoot, htmlFile)}.`);

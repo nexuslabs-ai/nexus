@@ -2,8 +2,7 @@
  * Builds the docs page manifest from the filesystem.
  *
  * Sources:
- *   - `page-registry/` — section and page order, labels, and the
- *     `wireframe` a page renders until its own file lands
+ *   - `page-registry/` — section and page order, and page labels
  *   - `content/{section}/{slug}.mdx` — MDX pages
  *   - `app/_pages/{section}/{slug}.tsx` — hand-built pages
  *   - `@nexus_ds/react`'s exports — one `components/` page per exported
@@ -20,7 +19,7 @@
  *
  * Output is two modules, split across the client boundary:
  *   - `MANIFEST_FILE` — routes, labels, nav order. Imported by client nav.
- *   - `CONTENT_FILE` — page bodies: dynamic imports and wireframes. Server-only.
+ *   - `CONTENT_FILE` — page bodies as dynamic imports. Server-only.
  *
  * `generate-page-manifest.mjs` is the CLI that writes both.
  */
@@ -38,9 +37,6 @@ import { reactSrc } from './roots.mjs';
 
 /** Nav metadata source, relative to the docs app root. */
 export const REGISTRY_FILE = 'page-registry/index.ts';
-
-/** Wireframe block types the generated content module imports, relative to the docs app root. */
-const BLOCKS_FILE = 'page-registry/blocks.ts';
 
 /** Output paths, relative to the docs app root. */
 export const MANIFEST_FILE = 'app/_lib/page-manifest.generated.ts';
@@ -211,21 +207,11 @@ type ManifestPageBase = {
   label: string;
 };
 
-type PlaceholderPage = {
-  /** No page file yet; the body is \`PAGE_WIREFRAMES[route]\`. */
-  kind: 'placeholder';
-  file: null;
+export type GuideManifestPage = ManifestPageBase & {
+  kind: 'mdx' | 'component';
+  /** Source file relative to \`apps/docs\`; the module is \`PAGE_LOADERS[route]\`. */
+  file: string;
 };
-
-export type GuideManifestPage = ManifestPageBase &
-  (
-    | {
-        kind: 'mdx' | 'component';
-        /** Source file relative to \`apps/docs\`; the module is \`PAGE_LOADERS[route]\`. */
-        file: string;
-      }
-    | PlaceholderPage
-  );
 
 /**
  * A component \`@nexus_ds/react\` exports. Its page body is its
@@ -287,20 +273,14 @@ ${manifest.map(renderSection).join('\n')}
 `;
 }
 
-function renderContentModule({ loaders, wireframes }) {
+function renderContentModule(loaders) {
   const loaderEntries = loaders.map(
     ({ route, specifier }) =>
       `${JSON.stringify(route)}: () => import(${JSON.stringify(specifier)}),`
   );
-  const wireframeEntries = wireframes.map(
-    ({ route, lede, blocks }) =>
-      `${JSON.stringify(route)}: { lede: ${JSON.stringify(lede)}, blocks: ${JSON.stringify(blocks)} },`
-  );
   return `${HEADER}
 
 import type { ComponentType } from 'react';
-
-import type { Block } from '${specifierFor(BLOCKS_FILE, false)}';
 
 // The thunks below import page and MDX modules, so a \`'use client'\` importer
 // would pull the whole docs body into the client bundle.
@@ -309,19 +289,9 @@ import 'server-only';
 // eslint-disable-next-line @nexus_ds/no-render-prop-types -- \`default: ComponentType\` is the shape of a lazily-imported page module, not a component-as-prop.
 export type ManifestPageLoader = () => Promise<{ default: ComponentType }>;
 
-export type PageWireframe = {
-  lede: string;
-  blocks: readonly Block[];
-};
-
-/** Route → page module, for every \`PAGE_MANIFEST\` entry with a source file. */
+/** Route → page module, for every guide page in \`PAGE_MANIFEST\`. */
 export const PAGE_LOADERS: Record<string, ManifestPageLoader> = {
 ${loaderEntries.join('\n')}
-};
-
-/** Route → registry wireframe, for every \`kind: 'placeholder'\` entry. */
-export const PAGE_WIREFRAMES: Record<string, PageWireframe> = {
-${wireframeEntries.join('\n')}
 };
 `;
 }
@@ -385,27 +355,15 @@ export async function buildPageManifest(docsRoot, formatOptions) {
     };
 
     const source = sources.find((candidate) => candidate.pages.has(key));
-    if (source) {
-      const file = source.pages.get(key);
-      if (entry?.wireframe) {
-        throw new Error(
-          `${key} is written at ${file}, so its registry wireframe can never render — drop the \`wireframe\` from its registry entry.`
-        );
-      }
-      return {
-        page: { ...base, kind: source.kind, file },
-        specifier: specifierFor(file, source.keepExtension),
-      };
-    }
-
-    if (!entry?.wireframe) {
+    if (!source) {
       throw new Error(
-        `${key} has no page file, so it renders its registry wireframe — give its registry entry a \`wireframe\`, or write the page.`
+        `${key} is in ${REGISTRY_FILE} but has no page file — write content/${key}.mdx or app/_pages/${key}.tsx, or remove its registry entry.`
       );
     }
+    const file = source.pages.get(key);
     return {
-      page: { ...base, kind: 'placeholder', file: null },
-      wireframe: entry.wireframe,
+      page: { ...base, kind: source.kind, file },
+      specifier: specifierFor(file, source.keepExtension),
     };
   }
 
@@ -470,16 +428,9 @@ export async function buildPageManifest(docsRoot, formatOptions) {
   manifest.forEach(assertLabelsAvoidTheCardJoiner);
 
   const entries = built.flatMap((section) => section.entries);
-  const loaders = [];
-  const wireframes = [];
-  for (const { page, specifier, wireframe } of entries) {
-    if (specifier) {
-      loaders.push({ route: page.route, specifier });
-    }
-    if (wireframe) {
-      wireframes.push({ route: page.route, ...wireframe });
-    }
-  }
+  const loaders = entries
+    .filter((entry) => entry.specifier)
+    .map(({ page, specifier }) => ({ route: page.route, specifier }));
 
   const format = formatOptions ?? (await resolveFormatOptions(docsRoot));
   const formatModule = (file, source) =>
@@ -495,7 +446,7 @@ export async function buildPageManifest(docsRoot, formatOptions) {
     ),
     [CONTENT_FILE]: await formatModule(
       CONTENT_FILE,
-      renderContentModule({ loaders, wireframes })
+      renderContentModule(loaders)
     ),
   };
 }

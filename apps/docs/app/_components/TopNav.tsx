@@ -13,9 +13,7 @@ import { Button } from './nexus';
 import { SearchPalette } from './SearchPalette';
 
 const NAV_LINKS = [
-  { href: '/', label: 'Home', match: '/' },
-  { href: '/create', label: 'Create', match: '/create' },
-  { href: '/token', label: 'Tokens', match: '/token' },
+  { href: '/playground', label: 'Playground', match: '/playground' },
   ...PAGE_MANIFEST.map((section) => ({
     href: section.href,
     label: section.title,
@@ -30,7 +28,6 @@ const NAV_LINK_BASE =
 const PANEL_LINK_BASE = cn(NAV_LINK_BASE, 'nx:block nx:border-l-2');
 
 function isActive(pathname: string, match: string) {
-  if (match === '/') return pathname === '/';
   return pathname === match || pathname.startsWith(match + '/');
 }
 
@@ -88,12 +85,15 @@ export function TopNav() {
 
   return (
     <header className="nx:sticky nx:top-0 nx:z-30 nx:flex nx:items-center nx:gap-6 nx:px-6 nx:h-(--docs-header-h) nx:bg-nav-background nx:text-nav-foreground nx:border-b nx:border-nav-border">
-      <div className="nx:flex nx:items-center nx:gap-2 nx:font-semibold nx:typography-label-default">
+      <Link
+        href="/"
+        className="nx:flex nx:items-center nx:gap-2 nx:font-semibold nx:typography-label-default nx:no-underline nx:text-inherit nx:rounded-sm nx:focus-visible:outline-2 nx:focus-visible:outline-focus-default"
+      >
         Nexus DS
         <span className="nx:text-[10px] nx:uppercase nx:tracking-wider nx:text-nav-muted-foreground nx:px-1.5 nx:py-0.5 nx:border nx:border-dashed nx:border-nav-border nx:rounded-sm">
           docs
         </span>
-      </div>
+      </Link>
       <nav
         ref={menuRef}
         aria-label="Sections"

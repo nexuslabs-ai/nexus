@@ -35,7 +35,7 @@ const AUDIENCES = [
   {
     title: 'AI agent',
     desc: 'Every page as Markdown, indexed in /llms.txt.',
-    href: requirePage('agents', 'llms-txt').route,
+    href: requirePage('getting-started', 'ai-agents').route,
   },
 ];
 

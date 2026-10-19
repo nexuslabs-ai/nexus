@@ -10,7 +10,7 @@ import { Sampler } from './sampler';
 import { ThemeExport } from './theme-export';
 import { WorkspaceLayout } from './workspace-layout';
 
-export function CreateWorkspace() {
+export function PlaygroundWorkspace() {
   const { state, change, startStep, reset, undo, canUndo } =
     useAppearanceHistory();
   const { resolvedMode } = useNexusAppearance();
@@ -47,13 +47,13 @@ export function CreateWorkspace() {
       <div className="nx:space-y-8">
         <header className="nx:space-y-2">
           <p className="nx:typography-label-small nx:text-muted-foreground">
-            CREATE
+            PLAYGROUND
           </p>
-          <PageHeading>One theme. Every component.</PageHeading>
+          <PageHeading>Try a theme on every component.</PageHeading>
           <p className="nx:max-w-2xl nx:text-muted-foreground">
-            Change the appearance and the whole site follows — these examples,
-            the docs, and every overlay they open. Take it into your project
-            when it feels right.
+            Change the appearance, and these examples, the docs and every
+            overlay they open follow it. When you like the result, select Use
+            this theme to copy it into your app.
           </p>
         </header>
         <Sampler />
