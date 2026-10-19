@@ -1,4 +1,4 @@
-import { existsSync, readdirSync, writeFileSync } from 'node:fs';
+import { existsSync, writeFileSync } from 'node:fs';
 import path from 'node:path';
 import { pathToFileURL } from 'node:url';
 
@@ -26,28 +26,6 @@ const { PAGE_MANIFEST } = await jiti.import(
   path.join(docsRoot, 'app', '_lib', 'manifest.ts')
 );
 
-// Next exports `opengraph-image` routes without a file extension, so the
-// asset server can't infer their type. One rule per route shape, with each
-// directory as a placeholder: `/:p0/:p1/opengraph-image-<hash>`.
-const ogImageRules = [
-  ...new Set(
-    readdirSync(outDir, { recursive: true, withFileTypes: true })
-      .filter(
-        (entry) => entry.isFile() && entry.name.startsWith('opengraph-image')
-      )
-      .map((entry) =>
-        path
-          .relative(outDir, path.join(entry.parentPath, entry.name))
-          .split(path.sep)
-      )
-      .map((parts) =>
-        [...parts.slice(0, -1).map((_, index) => `:p${index}`), parts.at(-1)]
-          .map((part) => `/${part}`)
-          .join('')
-      )
-  ),
-].flatMap((rule) => [rule, '  Content-Type: image/png']);
-
 const headersLines = [
   '/*',
   ...Object.entries(SECURITY_HEADERS).map(
@@ -62,7 +40,6 @@ const headersLines = [
   '  Content-Type: text/plain; charset=utf-8',
   '/llms-full.txt',
   '  Content-Type: text/plain; charset=utf-8',
-  ...ogImageRules,
 ];
 
 const overlong = headersLines.find(

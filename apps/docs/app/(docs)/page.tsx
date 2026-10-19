@@ -1,4 +1,3 @@
-import type { Metadata } from 'next';
 import Link from 'next/link';
 
 import { LiveThemeSwapper } from '../_components/LiveThemeSwapper';
@@ -18,14 +17,23 @@ import {
 } from '../_lib/manifest';
 import {
   NPM_CORE_URL,
+  pageMetadata,
   REPO_URL,
+  SITE_ALTERNATE_NAME,
   SITE_DESCRIPTION,
+  SITE_IMAGE,
   SITE_NAME,
+  SITE_TITLE,
   SITE_URL,
   STORYBOOK_URL,
 } from '../_lib/site';
 
-export const metadata: Metadata = { alternates: { canonical: '/' } };
+export const metadata = pageMetadata({
+  title: { absolute: SITE_TITLE },
+  description: SITE_DESCRIPTION,
+  route: '/',
+  image: SITE_IMAGE,
+});
 
 const STRUCTURED_DATA = {
   '@context': 'https://schema.org',
@@ -35,14 +43,14 @@ const STRUCTURED_DATA = {
       '@id': `${SITE_URL}/#website`,
       url: SITE_URL,
       name: SITE_NAME,
-      alternateName: ['Nexus Design System', 'nexusui'],
+      alternateName: [SITE_ALTERNATE_NAME, 'nexusui'],
       description: SITE_DESCRIPTION,
     },
     {
       '@type': 'SoftwareSourceCode',
       '@id': `${SITE_URL}/#software`,
       name: SITE_NAME,
-      alternateName: 'Nexus Design System',
+      alternateName: SITE_ALTERNATE_NAME,
       description: SITE_DESCRIPTION,
       url: SITE_URL,
       codeRepository: REPO_URL,

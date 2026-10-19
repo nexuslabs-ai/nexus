@@ -14,6 +14,7 @@ import {
   loadWrittenPage,
   type WrittenManifestPage,
 } from '../../../_lib/page-content';
+import { docsPageImage, pageMetadata } from '../../../_lib/site';
 
 type PageProps = { params: Promise<{ section: string; page: string }> };
 
@@ -30,11 +31,12 @@ async function resolvePage({ params }: PageProps) {
 
 export async function generateMetadata(props: PageProps): Promise<Metadata> {
   const { page } = await resolvePage(props);
-  return {
+  return pageMetadata({
     title: page.label,
     description: await describePage(page),
-    alternates: { canonical: page.route },
-  };
+    route: page.route,
+    image: docsPageImage(page),
+  });
 }
 
 export default async function Page(props: PageProps) {

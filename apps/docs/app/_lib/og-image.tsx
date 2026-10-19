@@ -1,8 +1,6 @@
 import { ImageResponse } from 'next/og';
 
-import { SITE_NAME, SITE_URL } from './site';
-
-export const OG_IMAGE_SIZE = { width: 1200, height: 630 };
+import { OG_IMAGE_SIZE, SITE_NAME, SITE_URL } from './site';
 
 // Satori takes inline styles only, so the card uses the default theme's zinc
 // values as literals.
@@ -63,10 +61,26 @@ export function renderOgImage({
         >
           {eyebrow}
         </div>
-        <div style={{ fontSize: 76, lineHeight: 1.05, letterSpacing: -2 }}>
+        <div
+          style={{
+            display: 'block',
+            lineClamp: 2,
+            fontSize: 76,
+            lineHeight: 1.05,
+            letterSpacing: -2,
+          }}
+        >
           {title}
         </div>
-        <div style={{ fontSize: 30, lineHeight: 1.4, color: MUTED }}>
+        <div
+          style={{
+            display: 'block',
+            lineClamp: 4,
+            fontSize: 30,
+            lineHeight: 1.4,
+            color: MUTED,
+          }}
+        >
           {description}
         </div>
       </div>

@@ -84,7 +84,7 @@ export interface Demo {
 
 export interface ComponentDocs {
   /** The stories meta's \`docs.description.component\`, shown under the page heading. */
-  description: string | null;
+  description: string;
   /** The first docs story; null for a page that shows Installation, Usage and Props only. */
   preview: DemoId | null;
   /** The rest of the docs stories, in file order. */
@@ -97,7 +97,7 @@ export interface ComponentDocs {
 
 export interface BlockDocs {
   /** The stories meta's \`docs.description.component\`, shown under the page heading. */
-  description: string | null;
+  description: string;
   /** The block's one story tagged \`docs\`. */
   preview: DemoId;
 }
@@ -501,7 +501,7 @@ function sharedIds(demos) {
 }
 
 /**
- * @typedef {{ description: string | null; preview: string | null; examples: string[]; imports: string; composition: string | null }} ComponentDocs
+ * @typedef {{ description: string; preview: string | null; examples: string[]; imports: string; composition: string | null }} ComponentDocs
  */
 
 /**
@@ -560,7 +560,7 @@ function collectComponentDocs(exported, demos) {
 }
 
 /**
- * @typedef {{ description: string | null; preview: string }} BlockDocs
+ * @typedef {{ description: string; preview: string }} BlockDocs
  */
 
 /**

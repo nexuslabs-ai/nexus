@@ -7,18 +7,23 @@ import {
   DOCS_APPEARANCE_DEFAULT_STATE,
   DOCS_APPEARANCE_STORAGE_KEY,
 } from './_lib/appearance-controls';
-import { SITE_DESCRIPTION, SITE_NAME, SITE_TITLE, SITE_URL } from './_lib/site';
+import {
+  SITE_DESCRIPTION,
+  SITE_IMAGE,
+  SITE_NAME,
+  SITE_OPEN_GRAPH,
+  SITE_TITLE,
+  SITE_URL,
+} from './_lib/site';
 
 import './globals.css';
 
-// Pages set only title, description and canonical. Next copies those into
-// og:* and twitter:*, so pages must not set `openGraph` or `twitter` themselves.
 export const metadata: Metadata = {
   metadataBase: new URL(SITE_URL),
   title: { default: SITE_TITLE, template: `%s — ${SITE_NAME}` },
   description: SITE_DESCRIPTION,
   applicationName: SITE_NAME,
-  openGraph: { type: 'website', siteName: SITE_NAME, locale: 'en_US' },
+  openGraph: { ...SITE_OPEN_GRAPH, images: SITE_IMAGE },
   twitter: { card: 'summary_large_image' },
 };
 

@@ -289,8 +289,8 @@ import 'server-only';
 // eslint-disable-next-line @nexus_ds/no-render-prop-types -- \`default: ComponentType\` is the shape of a lazily-imported page module, not a component-as-prop.
 export type ManifestPageLoader = () => Promise<{
   default: ComponentType;
-  /** The page's meta description. Optional only because MDX module types can't declare it; the page route fails the build without one. */
-  description?: string;
+  /** The page's meta description. */
+  description: string;
 }>;
 
 /** Route → page module, for every guide page in \`PAGE_MANIFEST\`. */
@@ -365,6 +365,15 @@ export async function buildPageManifest(docsRoot, formatOptions) {
       );
     }
     const file = source.pages.get(key);
+    if (
+      !/^export const description\b/m.test(
+        fs.readFileSync(path.join(docsRoot, file), 'utf8')
+      )
+    ) {
+      throw new Error(
+        `${file} has no description — add \`export const description = '…'\` for the page's meta description.`
+      );
+    }
     return {
       page: { ...base, kind: source.kind, file },
       specifier: specifierFor(file, source.keepExtension),
