@@ -1,5 +1,12 @@
 # @nexus_ds/core
 
+## 0.7.1
+
+### Patch Changes
+
+- fefb8c8: The npm pages now link to the docs at https://nexusui.so and list search
+  keywords.
+
 ## 0.7.0
 
 ### Minor Changes

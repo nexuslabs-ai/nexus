@@ -1,5 +1,12 @@
 # @nexus_ds/react
 
+## 0.4.2
+
+### Patch Changes
+
+- Updated dependencies [fefb8c8]
+  - @nexus_ds/core@0.7.1
+
 ## 0.4.1
 
 ### Patch Changes
