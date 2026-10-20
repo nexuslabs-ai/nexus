@@ -1,5 +1,12 @@
 # @nexus_ds/eslint-plugin
 
+## 0.3.2
+
+### Patch Changes
+
+- fefb8c8: The npm pages now link to the docs at https://nexusui.so and list search
+  keywords.
+
 ## 0.3.1
 
 ### Patch Changes
