@@ -105,7 +105,7 @@ The first storybook-project run launches Storybook in the background — the col
 
 ## AI Documentation MCP (nexus-docs-mcp)
 
-A local documentation server keeps Claude Code on the exact library versions used here (Tailwind v4, Storybook 10, Vitest 4, Radix, recharts 3, zod 4, …) instead of stale training data. It ships as a pre-indexed Docker image, so there's nothing to scrape locally.
+A local documentation server keeps Claude Code on the exact library versions used here (React 19, Tailwind v4, Storybook 10, Vitest 4, Radix, recharts 3, TanStack Form, …) instead of stale training data. It ships as a pre-indexed Docker image, so there's nothing to scrape locally.
 
 ### Teammates — use it
 
