@@ -1,6 +1,6 @@
 {
   "name": "@nxds/core",
-  "version": "0.7.2",
+  "version": "0.8.0",
   "type": "module",
   "description": "nxds theme engine: a framework-agnostic appearance model, runtime theme derivation and first-paint snapshots.",
   "keywords": [
