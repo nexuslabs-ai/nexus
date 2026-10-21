@@ -456,7 +456,6 @@ function fromRender(
 ): Rendered {
   const fn = ts.isMethodDeclaration(render) ? render : unwrap(render);
   if (
-    !fn ||
     !(
       ts.isArrowFunction(fn) ||
       ts.isFunctionExpression(fn) ||
