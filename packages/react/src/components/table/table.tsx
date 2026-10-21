@@ -35,12 +35,6 @@ interface TableProps extends React.ComponentProps<'table'> {
    * - `default`: row lines and a header underline.
    * - `borderless`: no lines.
    * - `grid`: row and column lines.
-   *
-   * @default 'default'
-   * @example
-   * ```tsx
-   * <Table variant="borderless">…</Table>
-   * ```
    */
   variant?: TableVariant;
   /**
@@ -48,21 +42,15 @@ interface TableProps extends React.ComponentProps<'table'> {
    *
    * - `comfortable`: about 44px rows.
    * - `compact`: about 36px rows, for dense data.
-   *
-   * @default 'comfortable'
    */
   density?: TableDensity;
   /**
    * Keeps the header row in view while the body scrolls. Set a max height with
    * `containerClassName`, such as `"nx:max-h-96"`.
-   *
-   * @default false
    */
   stickyHeader?: boolean;
   /**
    * Tints every other body row. Hover and selection colors win over the stripe.
-   *
-   * @default false
    */
   striped?: boolean;
   /**
@@ -76,24 +64,6 @@ interface TableProps extends React.ComponentProps<'table'> {
  * Data table with a header, body and optional footer. Wide tables scroll
  * sideways inside their own container. `TableRow`s hold `TableHead` or
  * `TableCell` cells.
- *
- * @example
- * ```tsx
- * <Table>
- *   <TableHeader>
- *     <TableRow>
- *       <TableHead>Invoice</TableHead>
- *       <TableHead>Amount</TableHead>
- *     </TableRow>
- *   </TableHeader>
- *   <TableBody>
- *     <TableRow>
- *       <TableCell>INV001</TableCell>
- *       <TableCell>$250.00</TableCell>
- *     </TableRow>
- *   </TableBody>
- * </Table>
- * ```
  */
 function Table({
   className,
@@ -108,10 +78,7 @@ function Table({
     <TableContext.Provider value={{ variant, density, stickyHeader }}>
       <div
         data-slot="table-container"
-        // A wide table overflows horizontally and holds no focusable children, so
-        // the container itself must be keyboard-focusable to scroll into view
-        // (axe scrollable-region-focusable / WCAG 2.1.1).
-        // eslint-disable-next-line jsx-a11y/no-noninteractive-tabindex
+        // eslint-disable-next-line jsx-a11y/no-noninteractive-tabindex -- a wide table has no focusable children, so its container takes focus to scroll (axe scrollable-region-focusable, WCAG 2.1.1)
         tabIndex={0}
         className={cn(
           'nx:w-full nx:overflow-x-auto nx:focus-visible:outline-2 nx:focus-visible:outline-focus-default nx:focus-visible:[outline-offset:-2px]',

@@ -30,8 +30,8 @@ import { pathToFileURL } from 'node:url';
 import { createJiti } from 'jiti';
 import prettier from 'prettier';
 
-import { DOCS_TAG } from './docs-stories.mjs';
-import { humanize, pascal } from './humanize.mjs';
+import { DOCS_TAG } from './docs-stories.ts';
+import { humanize, pascal } from './humanize.ts';
 import { blockSources, exportedComponentSlugs } from './react-sources.mjs';
 import { reactSrc } from './roots.mjs';
 

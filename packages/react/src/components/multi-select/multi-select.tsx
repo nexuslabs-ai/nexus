@@ -107,19 +107,6 @@ interface MultiSelectProps {
 /**
  * Searchable field for picking several options, shown as chips. For
  * searchable single selection, use `Combobox`.
- *
- * @example
- * ```tsx
- * <MultiSelect defaultValues={['react']} onValuesChange={setValues}>
- *   <MultiSelectTrigger aria-label="Frameworks">
- *     <MultiSelectValue placeholder="Select frameworks" />
- *   </MultiSelectTrigger>
- *   <MultiSelectContent>
- *     <MultiSelectItem value="react">React</MultiSelectItem>
- *     <MultiSelectItem value="vue">Vue</MultiSelectItem>
- *   </MultiSelectContent>
- * </MultiSelect>
- * ```
  */
 function MultiSelect({
   children,
@@ -219,12 +206,10 @@ interface MultiSelectValueProps extends Omit<
 > {
   /**
    * Shown when nothing is selected.
-   * @default 'Select options'
    */
   placeholder?: React.ReactNode;
   /**
    * Shows each selected value as a removable chip.
-   * @default true
    */
   clickToRemove?: boolean;
   /**
@@ -232,7 +217,6 @@ interface MultiSelectValueProps extends Omit<
    * - `wrap`: wrap onto more lines.
    * - `wrap-when-open`: wrap while the list is open, show `+N` when closed.
    * - `cutoff`: always show the extra chips as a `+N` badge.
-   * @default 'wrap-when-open'
    */
   overflowBehavior?: 'wrap' | 'wrap-when-open' | 'cutoff';
 }
@@ -381,12 +365,10 @@ interface MultiSelectContentProps extends Omit<
   children: React.ReactNode;
   /**
    * Placeholder for the search input.
-   * @default 'Search…'
    */
   searchPlaceholder?: string;
   /**
    * Shown when the search matches no options.
-   * @default 'No results found.'
    */
   emptyMessage?: React.ReactNode;
 }

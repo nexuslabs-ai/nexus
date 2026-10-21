@@ -29,8 +29,6 @@ type ToggleGroupProps = React.ComponentProps<typeof ToggleGroupPrimitive.Root> &
     /**
      * Gap between items, in spacing-scale units. `0` joins them into one
      * segmented control. A larger value splits them into separate pills.
-     *
-     * @default 0
      */
     spacing?: number;
   };
@@ -41,18 +39,6 @@ type ToggleGroupProps = React.ComponentProps<typeof ToggleGroupPrimitive.Root> &
  *
  * `aria-invalid` on the group does not style its items. Set it on each
  * `ToggleGroupItem` and describe the error in your own text.
- *
- * @example
- * ```tsx
- * <ToggleGroup type="single" defaultValue="left">
- *   <ToggleGroupItem value="left" aria-label="Align left">
- *     <IconAlignLeft />
- *   </ToggleGroupItem>
- *   <ToggleGroupItem value="center" aria-label="Align center">
- *     <IconAlignCenter />
- *   </ToggleGroupItem>
- * </ToggleGroup>
- * ```
  */
 function ToggleGroup({
   className,

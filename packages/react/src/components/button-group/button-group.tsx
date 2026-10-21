@@ -57,7 +57,6 @@ interface ButtonGroupProps
     VariantProps<typeof buttonGroupVariants> {
   /**
    * Size for ButtonGroupText and any Button without its own `size`. It also reaches a Button inside a trigger wrapper, as in a split button.
-   * @default "default"
    */
   size?: ButtonGroupSize;
 }
@@ -65,15 +64,6 @@ interface ButtonGroupProps
 /**
  * Joins Buttons, menu or select triggers, `ButtonGroupText` and `ButtonGroupSeparator` into one cluster with shared borders.
  * Set `orientation="vertical"` to stack them. For an input with addons, use `InputGroup`.
- *
- * @example
- * ```tsx
- * <ButtonGroup>
- *   <Button variant="outline">Day</Button>
- *   <Button variant="outline">Week</Button>
- *   <Button variant="outline">Month</Button>
- * </ButtonGroup>
- * ```
  */
 function ButtonGroup({
   className,
@@ -106,13 +96,11 @@ function ButtonGroup({
 interface ButtonGroupTextProps extends React.ComponentProps<'div'> {
   /**
    * Renders the child element instead, such as a link.
-   * @default false
    */
   asChild?: boolean;
 
   /**
-   * Addon size. Inherits from ButtonGroup when omitted.
-   * @default "default"
+   * Addon size. Inherits from ButtonGroup when omitted, or `"default"` outside one.
    */
   size?: ButtonGroupSize;
 }

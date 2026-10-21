@@ -1,15 +1,14 @@
-// @ts-check
+import type { CssDeclaration } from './format.ts';
 
-/** @typedef {import('./format.js').CssDeclaration} CssDeclaration */
+/** One generated `@utility` rule. */
+export interface UtilityRule {
+  /** The utility name without the `nx:` prefix. */
+  name: string;
+  /** The rule body, in order. */
+  declarations: CssDeclaration[];
+}
 
-/**
- * One generated `@utility` rule.
- * @typedef {object} UtilityRule
- * @property {string} name - The utility name without the `nx:` prefix
- * @property {CssDeclaration[]} declarations - The rule body, in order
- */
-
-const BORDER_WIDTH_SIDES = /** @type {const} */ ([
+const BORDER_WIDTH_SIDES = [
   ['', 'border-style', 'border-width'],
   ['x-', 'border-inline-style', 'border-inline-width'],
   ['y-', 'border-block-style', 'border-block-width'],
@@ -21,18 +20,15 @@ const BORDER_WIDTH_SIDES = /** @type {const} */ ([
   ['e-', 'border-inline-end-style', 'border-inline-end-width'],
   ['bs-', 'border-block-start-style', 'border-block-start-width'],
   ['be-', 'border-block-end-style', 'border-block-end-width'],
-]);
+] as const;
 
 /**
- * The per-side `border-width-*` alias utilities one border width emits:
- * `border-width-default`, `border-width-x-default`, … `border-width-be-default`.
- * The `border-{side?}-{key}` spellings are Tailwind's own utilities, built from
- * the `--border-width-{key}` theme key.
- *
- * @param {string} key - The border width key, e.g. `default`
- * @returns {UtilityRule[]}
+ * The per-side `border-width-*` alias utilities one border width `key` (e.g.
+ * `default`) emits: `border-width-default`, `border-width-x-default`, …
+ * `border-width-be-default`. The `border-{side?}-{key}` spellings are
+ * Tailwind's own utilities, built from the `--border-width-{key}` theme key.
  */
-export function borderWidthAliasUtilities(key) {
+export function borderWidthAliasUtilities(key: string): UtilityRule[] {
   const value = `var(--nx-borderwidth-${key})`;
   return BORDER_WIDTH_SIDES.map(([side, styleProperty, widthProperty]) => ({
     name: `border-width-${side}${key}`,
@@ -44,13 +40,11 @@ export function borderWidthAliasUtilities(key) {
 }
 
 /**
- * The utility a motion duration emits. Tailwind v4 does not codegen named
- * `duration-*` utilities from theme variables, so each is explicit.
- *
- * @param {string} key - The duration key, e.g. `fast`
- * @returns {UtilityRule}
+ * The utility a motion duration `key` (e.g. `fast`) emits. Tailwind v4 does
+ * not codegen named `duration-*` utilities from theme variables, so each is
+ * explicit.
  */
-export function durationUtility(key) {
+export function durationUtility(key: string): UtilityRule {
   const value = `var(--nx-motion-duration-${key})`;
   return {
     name: `duration-${key}`,
@@ -65,13 +59,13 @@ export function durationUtility(key) {
  * The motion tokens emitted as Tailwind's `--default-transition-duration` and
  * `--default-transition-timing-function`.
  */
-export const DEFAULT_TRANSITION = /** @type {const} */ ({
+export const DEFAULT_TRANSITION = {
   duration: 'default',
   ease: 'enter',
-});
+} as const;
 
 /** Semantic border tokens keyed by their utility alias, in emit order. */
-export const BORDER_COLOR_ALIAS_TOKENS = /** @type {const} */ ({
+export const BORDER_COLOR_ALIAS_TOKENS = {
   default: 'border-default',
   'default-alpha': 'border-default-alpha',
   focus: 'border-focus',
@@ -86,15 +80,12 @@ export const BORDER_COLOR_ALIAS_TOKENS = /** @type {const} */ ({
   'information-active': 'border-information-active',
   primary: 'primary-border',
   'primary-active': 'primary-border-active',
-});
+} as const;
 
 export const BORDER_COLOR_ALIAS_NAMES = Object.keys(BORDER_COLOR_ALIAS_TOKENS);
 
-/**
- * @param {string} tokenName - The semantic color name without the CSS prefix.
- * @returns {string | null}
- */
-export function borderColorAliasName(tokenName) {
+/** The utility alias for a semantic color name (without the CSS prefix). */
+export function borderColorAliasName(tokenName: string): string | null {
   return (
     Object.entries(BORDER_COLOR_ALIAS_TOKENS).find(
       ([, token]) => token === tokenName

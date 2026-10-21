@@ -2,16 +2,16 @@ import fs from 'fs';
 import path from 'path';
 import { fileURLToPath, pathToFileURL } from 'url';
 
-import { formatTokenValue, resolveValue } from '../src/token-source/format.js';
+import { formatTokenValue, resolveValue } from '../src/token-source/format.ts';
 import {
   SPACING_MODE_FILE_PATTERN,
   splitSpacingTokens,
-} from '../src/token-source/spacing.js';
+} from '../src/token-source/spacing.ts';
 import {
   extractTokens,
   isReference,
   pathToCssVarPrefixed,
-} from '../src/token-source/tokens.js';
+} from '../src/token-source/tokens.ts';
 
 import {
   CANONICAL_SPACING_DEFAULT_MODE,

@@ -23,20 +23,6 @@ type InputOTPProps = Omit<
 /**
  * One-time code field that shows each character in its own slot. Build it
  * from `InputOTPGroup`, `InputOTPSlot` and `InputOTPSeparator`.
- *
- * @example
- * ```tsx
- * <InputOTP maxLength={6}>
- *   <InputOTPGroup>
- *     <InputOTPSlot index={0} />
- *     <InputOTPSlot index={1} />
- *     <InputOTPSlot index={2} />
- *     <InputOTPSlot index={3} />
- *     <InputOTPSlot index={4} />
- *     <InputOTPSlot index={5} />
- *   </InputOTPGroup>
- * </InputOTP>
- * ```
  */
 function InputOTP({
   className,

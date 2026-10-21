@@ -27,27 +27,6 @@ const DialogLayoutContext =
 
 /**
  * Root component for the dialog. Holds the open state.
- *
- * @example
- * ```tsx
- * <Dialog>
- *   <DialogTrigger asChild>
- *     <Button>Open Dialog</Button>
- *   </DialogTrigger>
- *   <DialogContent>
- *     <DialogHeader>
- *       <DialogTitle>Dialog Title</DialogTitle>
- *       <DialogDescription>Dialog description here.</DialogDescription>
- *     </DialogHeader>
- *     <DialogBody>
- *       <p>Dialog content goes here.</p>
- *     </DialogBody>
- *     <DialogFooter>
- *       <Button>Save</Button>
- *     </DialogFooter>
- *   </DialogContent>
- * </Dialog>
- * ```
  */
 const Dialog = DialogPrimitive.Root;
 
@@ -99,7 +78,6 @@ interface DialogContentProps extends Omit<
 > {
   /**
    * Shows the close button in the top-right corner.
-   * @default true
    */
   showCloseButton?: boolean;
 
@@ -124,18 +102,6 @@ interface DialogContentProps extends Omit<
 
 /**
  * The dialog panel. Renders in a portal above an overlay.
- *
- * @example
- * ```tsx
- * <DialogContent>
- *   <DialogHeader>
- *     <DialogTitle>Title</DialogTitle>
- *   </DialogHeader>
- *   <DialogBody>
- *     <p>Content here</p>
- *   </DialogBody>
- * </DialogContent>
- * ```
  */
 function DialogContent({
   className,
@@ -198,14 +164,6 @@ interface DialogHeaderProps extends React.ComponentProps<'div'> {}
 /**
  * Holds the dialog title and description. If `DialogContent` also gets a
  * `title`, keep DialogHeader a direct child so only one header renders.
- *
- * @example
- * ```tsx
- * <DialogHeader>
- *   <DialogTitle>Title</DialogTitle>
- *   <DialogDescription>Description</DialogDescription>
- * </DialogHeader>
- * ```
  */
 function DialogHeader({ className, ...props }: DialogHeaderProps) {
   const layout = React.useContext(DialogLayoutContext);
@@ -232,21 +190,13 @@ interface DialogBodyProps extends React.ComponentProps<'div'> {}
 
 /**
  * Holds the dialog's main content. Scrolls when the content overflows.
- *
- * @example
- * ```tsx
- * <DialogBody>
- *   <p>Main dialog content.</p>
- * </DialogBody>
- * ```
  */
 function DialogBody({ className, ...props }: DialogBodyProps) {
   return (
     <div
       data-slot="dialog-body"
       className={cn(overlayBodyClassName, className)}
-      // Overlay bodies own the scroll region, so pure-text overflow must be keyboard reachable.
-      // eslint-disable-next-line jsx-a11y/no-noninteractive-tabindex
+      // eslint-disable-next-line jsx-a11y/no-noninteractive-tabindex -- overlay bodies own the scroll region, so pure-text overflow must be keyboard reachable
       tabIndex={0}
       {...props}
     />
@@ -263,14 +213,6 @@ interface DialogFooterProps extends React.ComponentProps<'div'> {}
 /**
  * Holds the dialog's action buttons. Stacks them on narrow screens and lines
  * them up in a row from the `sm` breakpoint.
- *
- * @example
- * ```tsx
- * <DialogFooter>
- *   <Button variant="outline">Cancel</Button>
- *   <Button>Save</Button>
- * </DialogFooter>
- * ```
  */
 function DialogFooter({ className, ...props }: DialogFooterProps) {
   const layout = React.useContext(DialogLayoutContext);
@@ -299,11 +241,6 @@ interface DialogTitleProps extends React.ComponentProps<
 
 /**
  * The dialog's title. Place it inside DialogHeader.
- *
- * @example
- * ```tsx
- * <DialogTitle>Edit Profile</DialogTitle>
- * ```
  */
 function DialogTitle({ className, ...props }: DialogTitleProps) {
   return (
@@ -326,13 +263,6 @@ interface DialogDescriptionProps extends React.ComponentProps<
 
 /**
  * Supporting text that explains the dialog.
- *
- * @example
- * ```tsx
- * <DialogDescription>
- *   Make changes to your profile here. Click save when you're done.
- * </DialogDescription>
- * ```
  */
 function DialogDescription({ className, ...props }: DialogDescriptionProps) {
   return (

@@ -28,27 +28,6 @@ const AlertDialogLayoutContext =
 /**
  * Modal that makes the user confirm or cancel before continuing.
  * Clicking the overlay doesn't close it, and it has no close (X) button.
- *
- * @example
- * ```tsx
- * <AlertDialog>
- *   <AlertDialogTrigger asChild>
- *     <Button variant="destructive">Delete</Button>
- *   </AlertDialogTrigger>
- *   <AlertDialogContent>
- *     <AlertDialogHeader>
- *       <AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
- *       <AlertDialogDescription>
- *         This action cannot be undone.
- *       </AlertDialogDescription>
- *     </AlertDialogHeader>
- *     <AlertDialogFooter>
- *       <AlertDialogCancel>Cancel</AlertDialogCancel>
- *       <AlertDialogAction variant="destructive">Delete</AlertDialogAction>
- *     </AlertDialogFooter>
- *   </AlertDialogContent>
- * </AlertDialog>
- * ```
  */
 const AlertDialog = AlertDialogPrimitive.Root;
 
@@ -95,7 +74,6 @@ interface AlertDialogContentProps extends React.ComponentProps<
   /**
    * Layout. `default` left-aligns the header and puts actions in a row.
    * `center` centers the header and stacks full-width actions.
-   * @default "default"
    */
   variant?: AlertDialogVariant;
 }
@@ -103,19 +81,6 @@ interface AlertDialogContentProps extends React.ComponentProps<
 /**
  * Dialog panel, rendered in a portal over the overlay.
  * It has no close button. AlertDialogAction and AlertDialogCancel close it.
- *
- * @example
- * ```tsx
- * <AlertDialogContent>
- *   <AlertDialogHeader>
- *     <AlertDialogTitle>Title</AlertDialogTitle>
- *   </AlertDialogHeader>
- *   <AlertDialogFooter>
- *     <AlertDialogCancel>Cancel</AlertDialogCancel>
- *     <AlertDialogAction>Continue</AlertDialogAction>
- *   </AlertDialogFooter>
- * </AlertDialogContent>
- * ```
  */
 function AlertDialogContent({
   className,
@@ -161,14 +126,6 @@ interface AlertDialogHeaderProps
 
 /**
  * Holds the title and description.
- *
- * @example
- * ```tsx
- * <AlertDialogHeader>
- *   <AlertDialogTitle>Title</AlertDialogTitle>
- *   <AlertDialogDescription>Description</AlertDialogDescription>
- * </AlertDialogHeader>
- * ```
  */
 function AlertDialogHeader({
   className,
@@ -200,21 +157,13 @@ interface AlertDialogBodyProps extends React.ComponentProps<'div'> {}
 
 /**
  * Holds the main content, aligned with the header and footer. Scrolls when it overflows.
- *
- * @example
- * ```tsx
- * <AlertDialogBody>
- *   <p>Supporting detail.</p>
- * </AlertDialogBody>
- * ```
  */
 function AlertDialogBody({ className, ...props }: AlertDialogBodyProps) {
   return (
     <div
       data-slot="alert-dialog-body"
       className={cn(overlayBodyClassName, className)}
-      // Overlay bodies own the scroll region, so pure-text overflow must be keyboard reachable.
-      // eslint-disable-next-line jsx-a11y/no-noninteractive-tabindex
+      // eslint-disable-next-line jsx-a11y/no-noninteractive-tabindex -- overlay bodies own the scroll region, so pure-text overflow must be keyboard reachable
       tabIndex={0}
       {...props}
     />
@@ -230,14 +179,6 @@ interface AlertDialogFooterProps extends React.ComponentProps<'div'> {}
 
 /**
  * Holds the action buttons. They stack on narrow screens and sit in a row from `sm` up.
- *
- * @example
- * ```tsx
- * <AlertDialogFooter>
- *   <AlertDialogCancel>Cancel</AlertDialogCancel>
- *   <AlertDialogAction>Continue</AlertDialogAction>
- * </AlertDialogFooter>
- * ```
  */
 function AlertDialogFooter({ className, ...props }: AlertDialogFooterProps) {
   const layout = React.useContext(AlertDialogLayoutContext);
@@ -266,11 +207,6 @@ interface AlertDialogTitleProps extends React.ComponentProps<
 
 /**
  * Dialog title. Place it inside AlertDialogHeader.
- *
- * @example
- * ```tsx
- * <AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
- * ```
  */
 function AlertDialogTitle({ className, ...props }: AlertDialogTitleProps) {
   return (
@@ -293,13 +229,6 @@ interface AlertDialogDescriptionProps extends React.ComponentProps<
 
 /**
  * Explains the result of the action.
- *
- * @example
- * ```tsx
- * <AlertDialogDescription>
- *   This action cannot be undone. This will permanently delete your account.
- * </AlertDialogDescription>
- * ```
  */
 function AlertDialogDescription({
   className,
@@ -330,11 +259,6 @@ interface AlertDialogActionProps
 /**
  * Confirm button. Closes the dialog on click.
  * Renders a primary Button. Pass `variant="destructive"` for a destructive action.
- *
- * @example
- * ```tsx
- * <AlertDialogAction variant="destructive">Delete</AlertDialogAction>
- * ```
  */
 function AlertDialogAction({
   className,
@@ -365,11 +289,6 @@ interface AlertDialogCancelProps
 
 /**
  * Cancel button, styled as an `outline` Button. Closes the dialog on click.
- *
- * @example
- * ```tsx
- * <AlertDialogCancel>Cancel</AlertDialogCancel>
- * ```
  */
 function AlertDialogCancel({
   className,

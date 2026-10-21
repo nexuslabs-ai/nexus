@@ -58,7 +58,6 @@ export type ResponsiveVisibilityProps = HTMLAttributes<HTMLElement> & {
    * Tag-only and non-semantic: `display: contents` can
    * drop a semantic element's box from the accessibility tree, so put semantics
    * on a child *inside* `<Show>` / `<Hide>` instead.
-   * @default 'span'
    */
   as?: 'span' | 'div';
   children: ReactNode;

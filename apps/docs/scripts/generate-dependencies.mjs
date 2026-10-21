@@ -16,6 +16,7 @@ import {
   collectSourceFiles,
   componentSlugs,
   exportedComponentSlugs,
+  importSpecifiers,
   isModuleSource,
   linkedComponentSlug,
   writeJson,
@@ -100,15 +101,10 @@ function resolveRelative(importer, specifier) {
 }
 
 function fileImports(filePath) {
-  const { importedFiles } = ts.preProcessFile(
-    readFileSync(filePath, 'utf8'),
-    true,
-    true
-  );
   const packages = [];
   const files = [];
 
-  for (const { fileName: specifier } of importedFiles) {
+  for (const specifier of importSpecifiers(readFileSync(filePath, 'utf8'))) {
     if (specifier.startsWith('.')) {
       files.push(resolveRelative(filePath, specifier));
     } else {

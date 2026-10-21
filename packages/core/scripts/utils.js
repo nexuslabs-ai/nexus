@@ -7,22 +7,22 @@ import {
   formatShadowStyle,
   formatTokenValue,
   formatTypographyDeclarations,
-} from '../src/token-source/format.js';
+} from '../src/token-source/format.ts';
 import {
   SPACING_MODE_FILE_PATTERN,
   spacingRoleUtility,
-} from '../src/token-source/spacing.js';
+} from '../src/token-source/spacing.ts';
 import {
   extractTokens,
   pathToCssVarPrefixed,
-} from '../src/token-source/tokens.js';
+} from '../src/token-source/tokens.ts';
 import {
   BORDER_COLOR_ALIAS_NAMES,
   borderColorAliasName,
   borderWidthAliasUtilities,
   DEFAULT_TRANSITION,
   durationUtility,
-} from '../src/token-source/utilities.js';
+} from '../src/token-source/utilities.ts';
 
 /**
  * Ensure a directory exists, creating it if necessary
@@ -388,7 +388,7 @@ export function generateTypographyUtilitiesCSS(tokensDir, primitiveMap) {
 /**
  * Render one `@utility` rule the way the committed CSS spells it.
  *
- * @param {import('../src/token-source/utilities.js').UtilityRule} rule
+ * @param {import('../src/token-source/utilities.ts').UtilityRule} rule
  * @returns {string}
  */
 function formatUtilityRule({ name, declarations }) {

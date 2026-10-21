@@ -98,24 +98,12 @@ interface SliderProps extends React.ComponentProps<
 > {
   /**
    * Height of the rail and thumb.
-   *
-   * @default "standard"
-   * @example
-   * ```tsx
-   * <Slider size="comfortable" defaultValue={[50]} aria-label="Progress" />
-   * ```
    */
   size?: SliderSize;
 
   /**
    * Marks along the track. Pass values for custom positions, or `"steps"` for one
    * mark per step.
-   *
-   * @example
-   * ```tsx
-   * <Slider defaultValue={[2]} max={4} step={1} markers={[3]} />
-   * <Slider defaultValue={[2]} max={4} step={1} markers="steps" />
-   * ```
    */
   markers?: SliderMarkers;
 }
@@ -123,12 +111,6 @@ interface SliderProps extends React.ComponentProps<
 /**
  * Picks a value or a range. Renders one thumb per value, so `[50]` gives one
  * thumb and `[25, 75]` gives a range.
- *
- * @example
- * ```tsx
- * <Slider defaultValue={[50]} max={100} step={1} />
- * <Slider defaultValue={[25, 75]} max={100} step={1} />
- * ```
  */
 function Slider({
   className,

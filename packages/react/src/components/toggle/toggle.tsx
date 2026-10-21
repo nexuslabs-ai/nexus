@@ -43,13 +43,6 @@ interface ToggleProps
 /**
  * Button that stays on or off, such as Bold. For a set of related toggles, use
  * `ToggleGroup`.
- *
- * @example
- * ```tsx
- * <Toggle aria-label="Bold">
- *   <IconBold />
- * </Toggle>
- * ```
  */
 function Toggle({ className, variant, size, ...props }: ToggleProps) {
   return (

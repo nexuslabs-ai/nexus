@@ -1,16 +1,24 @@
-// @ts-check
+import type { Element, ElementContent, Nodes, Root } from 'hast';
 import { existsSync, readFileSync, statSync, writeFileSync } from 'node:fs';
 import path from 'node:path';
-import { pathToFileURL } from 'node:url';
-
-import { createJiti } from 'jiti';
 import rehypeParse from 'rehype-parse';
 import rehypeRemark from 'rehype-remark';
 import remarkGfm from 'remark-gfm';
 import remarkStringify from 'remark-stringify';
 import { unified } from 'unified';
+import type { VFile } from 'vfile';
+
+import { PAGE_MANIFEST } from '../app/_lib/manifest.ts';
+import { DOCS_ARTICLE_ID } from '../app/_lib/table-of-contents.ts';
 
 import { docsRoot } from './roots.mjs';
+
+declare module 'vfile' {
+  interface DataMap {
+    /** The page's internal links, collected by `articleOnly`. */
+    links: string[];
+  }
+}
 
 /** Elements that only make sense on screen: copy buttons and breadcrumbs. */
 const DROPPED_TAGS = new Set(['nav', 'button', 'script', 'style', 'svg']);
@@ -24,56 +32,44 @@ if (!existsSync(outDir)) {
   process.exit(1);
 }
 
-const jiti = createJiti(
-  pathToFileURL(path.join(docsRoot, 'package.json')).href
-);
-const { PAGE_MANIFEST } = await jiti.import(
-  path.join(docsRoot, 'app', '_lib', 'manifest.ts')
-);
-const { DOCS_ARTICLE_ID } = await jiti.import(
-  path.join(docsRoot, 'app', '_lib', 'table-of-contents.ts')
-);
-
-/**
- * The first node in `node`'s subtree that passes `test`.
- * @param {any} node
- * @param {(node: any) => boolean} test
- * @returns {any}
- */
-function findNode(node, test) {
-  if (test(node)) return node;
-  for (const child of node.children ?? []) {
-    const found = findNode(child, test);
+/** The first element in `node`'s subtree that passes `test`. */
+function findElement(
+  node: Nodes,
+  test: (element: Element) => boolean
+): Element | undefined {
+  if (node.type === 'element' && test(node)) return node;
+  if (!('children' in node)) return undefined;
+  for (const child of node.children) {
+    const found = findElement(child, test);
     if (found) return found;
   }
   return undefined;
 }
 
-/** @param {any} node @param {string} id */
-function findById(node, id) {
-  return findNode(node, (candidate) => candidate.properties?.id === id);
+function findById(node: Nodes, id: string) {
+  return findElement(node, (candidate) => candidate.properties.id === id);
 }
 
 /**
  * Drops on-screen-only elements, `data-md-skip` previews and decorative
  * `aria-hidden` elements, and labels each code block with its language.
- * @param {any} node
  */
-function prune(node) {
-  if (!node.children) return;
+function prune(node: Element) {
   node.children = node.children.filter(
-    (/** @type {any} */ child) =>
+    (child) =>
       child.type === 'text' ||
       (child.type === 'element' &&
         !DROPPED_TAGS.has(child.tagName) &&
-        child.properties?.[SKIP_ATTRIBUTE] === undefined &&
-        child.properties?.ariaHidden !== 'true')
+        child.properties[SKIP_ATTRIBUTE] === undefined &&
+        child.properties.ariaHidden !== 'true')
   );
   for (const child of node.children) {
+    if (child.type !== 'element') continue;
     // rehype-remark reads a code block's language from its `language-*` class.
-    if (child.tagName === 'pre' && child.properties?.dataLanguage) {
+    if (child.tagName === 'pre' && child.properties.dataLanguage) {
       const code = child.children.find(
-        (/** @type {any} */ inner) => inner.tagName === 'code'
+        (inner): inner is Element =>
+          inner.type === 'element' && inner.tagName === 'code'
       );
       if (code) {
         code.properties.className = [
@@ -85,23 +81,20 @@ function prune(node) {
   }
 }
 
-/**
- * Every root-relative or same-page `#id` `href` under `node`.
- * @param {any} node
- * @returns {string[]}
- */
-function internalLinks(node) {
-  const href = String(node.properties?.href);
+/** Every root-relative or same-page `#id` `href` under `node`. */
+function internalLinks(node: ElementContent): string[] {
+  if (node.type !== 'element') return [];
+  const href = String(node.properties.href);
   const own =
     node.tagName === 'a' && (href.startsWith('/') || href.startsWith('#'))
       ? [href]
       : [];
-  return [...own, ...(node.children ?? []).flatMap(internalLinks)];
+  return [...own, ...node.children.flatMap(internalLinks)];
 }
 
 /** Keeps only the page's article, minus anything that only works on screen. */
 function articleOnly() {
-  return (/** @type {any} */ tree, /** @type {any} */ file) => {
+  return (tree: Root, file: VFile) => {
     const article = findById(tree, DOCS_ARTICLE_ID);
     if (!article) {
       throw new Error(
@@ -123,15 +116,13 @@ const processor = unified()
 
 const parseHtml = unified().use(rehypeParse);
 
-/** @type {Map<string, { tree?: any } | undefined>} */
-const builtRoutes = new Map();
+const builtRoutes = new Map<string, { tree?: Root } | undefined>();
 
 /**
  * The built file a route serves, with its parsed tree when it is HTML, or
  * undefined when the build has no such route.
- * @param {string} route
  */
-function builtRoute(route) {
+function builtRoute(route: string) {
   if (!builtRoutes.has(route)) {
     const file = [
       path.join(outDir, route),
@@ -142,23 +133,22 @@ function builtRoute(route) {
     );
     builtRoutes.set(
       route,
-      file && {
-        tree: file.endsWith('.html')
-          ? parseHtml.parse(readFileSync(file, 'utf8'))
-          : undefined,
-      }
+      file === undefined
+        ? undefined
+        : {
+            tree: file.endsWith('.html')
+              ? parseHtml.parse(readFileSync(file, 'utf8'))
+              : undefined,
+          }
     );
   }
   return builtRoutes.get(route);
 }
 
-/**
- * Why `href` is broken, or undefined when its route and `#id` both exist.
- * @param {string} href
- */
-function brokenReason(href) {
-  const [location, id] = href.split('#');
-  const route = location.split('?')[0];
+/** Why `href` is broken, or undefined when its route and `#id` both exist. */
+function brokenReason(href: string) {
+  const [location = '', id] = href.split('#');
+  const [route = ''] = location.split('?');
   const built = builtRoute(route.replace(/\/$/, '') || '/index');
   if (built === undefined) return 'no such route';
   if (id && !(built.tree && findById(built.tree, id))) {
@@ -167,17 +157,14 @@ function brokenReason(href) {
   return undefined;
 }
 
-/**
- * Each page's internal links, checked once every output is written.
- * @type {Map<string, string[]>}
- */
-const linksByRoute = new Map();
-const llmsSections = [];
+/** Each page's internal links, checked once every output is written. */
+const linksByRoute = new Map<string, string[]>();
+const llmsSections: string[] = [];
 /** Every page's Markdown, in nav order, for `llms-full.txt`. */
-const fullPages = [];
+const fullPages: string[] = [];
 
 for (const section of PAGE_MANIFEST) {
-  const lines = [];
+  const lines: string[] = [];
   for (const page of section.pages) {
     const htmlFile = path.join(outDir, `${page.route}.html`);
     if (!existsSync(htmlFile)) {
@@ -188,20 +175,28 @@ for (const section of PAGE_MANIFEST) {
       value: readFileSync(htmlFile, 'utf8'),
     });
     const markdown = String(processed);
+    const links = processed.data.links;
+    if (!links) {
+      throw new Error(`No links collected for ${page.route}.`);
+    }
     linksByRoute.set(
       page.route,
-      /** @type {string[]} */ (processed.data.links).map((href) =>
+      links.map((href) =>
         href.startsWith('#') ? `${page.route}${href}` : href
       )
     );
     writeFileSync(path.join(outDir, `${page.route}.md`), markdown);
     fullPages.push(`<!-- ${page.route} -->\n\n${markdown}`);
 
-    const descriptionMeta = findNode(
-      builtRoute(page.route).tree,
-      (node) =>
-        node.tagName === 'meta' && node.properties.name === 'description'
-    );
+    const tree = builtRoute(page.route)?.tree;
+    const descriptionMeta =
+      tree &&
+      findElement(
+        tree,
+        (element) =>
+          element.tagName === 'meta' &&
+          element.properties.name === 'description'
+      );
     if (!descriptionMeta) {
       throw new Error(
         `Missing <meta name="description"> in ${page.route}.html.`

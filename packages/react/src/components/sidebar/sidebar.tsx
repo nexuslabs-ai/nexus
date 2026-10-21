@@ -61,11 +61,6 @@ const SidebarContext = React.createContext<SidebarContextProps | null>(null);
 /**
  * Reads the sidebar state and the `toggleSidebar` helper. Call it inside a
  * `SidebarProvider`, or it throws.
- *
- * @example
- * ```tsx
- * const { state, toggleSidebar } = useSidebar();
- * ```
  */
 function useSidebar() {
   const context = React.useContext(SidebarContext);
@@ -84,14 +79,6 @@ interface SidebarProviderProps extends React.ComponentProps<'div'> {
    * Opens the sidebar on first render when uncontrolled. The open state is saved
    * to a `sidebar_state` cookie. Read that cookie on the server and pass it here
    * to restore it.
-   * @default true
-   * @example
-   * ```tsx
-   * // Server Component (e.g. Next.js app/layout.tsx)
-   * const store = await cookies();
-   * const defaultOpen = store.get('sidebar_state')?.value !== 'false';
-   * return <SidebarProvider defaultOpen={defaultOpen}>{children}</SidebarProvider>;
-   * ```
    */
   defaultOpen?: boolean;
   /**
@@ -107,14 +94,6 @@ interface SidebarProviderProps extends React.ComponentProps<'div'> {
 /**
  * Holds the open state and the `Ctrl/Cmd+B` shortcut. Wrap your app shell in
  * it. It includes a `TooltipProvider` for collapsed-icon tooltips.
- *
- * @example
- * ```tsx
- * <SidebarProvider>
- *   <Sidebar>…</Sidebar>
- *   <SidebarInset>…</SidebarInset>
- * </SidebarProvider>
- * ```
  */
 function SidebarProvider({
   defaultOpen = true,
@@ -214,18 +193,15 @@ function SidebarProvider({
 interface SidebarProps extends React.ComponentProps<'div'> {
   /**
    * Edge the sidebar docks to.
-   * @default 'left'
    */
   side?: 'left' | 'right';
   /**
    * Visual style. `inset` pairs with `SidebarInset` to show the main region as a
    * card.
-   * @default 'sidebar'
    */
   variant?: 'sidebar' | 'floating' | 'inset';
   /**
    * How it collapses: slides off screen, shrinks to an icon rail, or never.
-   * @default 'offcanvas'
    */
   collapsible?: 'offcanvas' | 'icon' | 'none';
 }
@@ -233,13 +209,6 @@ interface SidebarProps extends React.ComponentProps<'div'> {
 /**
  * The sidebar panel. Below `md` it opens as a Sheet. From `md` up it docks to
  * `side` and collapses as `collapsible` sets.
- *
- * @example
- * ```tsx
- * <Sidebar collapsible="icon">
- *   <SidebarContent>…</SidebarContent>
- * </Sidebar>
- * ```
  */
 function Sidebar({
   side = 'left',
@@ -579,7 +548,6 @@ function SidebarGroup({ className, ...props }: SidebarGroupProps) {
 interface SidebarGroupLabelProps extends React.ComponentProps<'div'> {
   /**
    * Renders the child element instead, such as a heading.
-   * @default false
    */
   asChild?: boolean;
 }
@@ -613,7 +581,6 @@ function SidebarGroupLabel({
 interface SidebarGroupActionProps extends React.ComponentProps<'button'> {
   /**
    * Renders the child element instead.
-   * @default false
    */
   asChild?: boolean;
 }
@@ -744,12 +711,10 @@ interface SidebarMenuButtonProps
     VariantProps<typeof sidebarMenuButtonVariants> {
   /**
    * Renders the child element instead, such as a router link.
-   * @default false
    */
   asChild?: boolean;
   /**
    * Marks the item as the current page.
-   * @default false
    */
   isActive?: boolean;
   /**
@@ -761,13 +726,6 @@ interface SidebarMenuButtonProps
 /**
  * Main clickable nav item. On the icon rail, `tooltip` shows the label on
  * hover.
- *
- * @example
- * ```tsx
- * <SidebarMenuButton isActive tooltip="Inbox">
- *   <IconInbox /> <span>Inbox</span>
- * </SidebarMenuButton>
- * ```
  */
 function SidebarMenuButton({
   asChild = false,
@@ -819,12 +777,10 @@ function SidebarMenuButton({
 interface SidebarMenuActionProps extends React.ComponentProps<'button'> {
   /**
    * Renders the child element instead.
-   * @default false
    */
   asChild?: boolean;
   /**
    * Shows the action only on hover or focus of the menu item.
-   * @default false
    */
   showOnHover?: boolean;
 }
@@ -889,7 +845,6 @@ function SidebarMenuBadge({ className, ...props }: SidebarMenuBadgeProps) {
 interface SidebarMenuSkeletonProps extends React.ComponentProps<'div'> {
   /**
    * Adds an icon-sized block before the text bar.
-   * @default false
    */
   showIcon?: boolean;
 }
@@ -984,17 +939,14 @@ function SidebarMenuSubItem({ className, ...props }: SidebarMenuSubItemProps) {
 interface SidebarMenuSubButtonProps extends React.ComponentProps<'a'> {
   /**
    * Renders the child element instead, such as a router link.
-   * @default false
    */
   asChild?: boolean;
   /**
    * Text size of the sub-item.
-   * @default 'md'
    */
   size?: 'sm' | 'md';
   /**
    * Marks the sub-item as the current page.
-   * @default false
    */
   isActive?: boolean;
 }

@@ -1,6 +1,4 @@
-// @ts-check
-
-/** @typedef {import('./utilities.js').UtilityRule} UtilityRule */
+import type { UtilityRule } from './utilities.ts';
 
 /** Matches a per-mode spacing file in `semantic/`, capturing the mode name. */
 export const SPACING_MODE_FILE_PATTERN = /^spacing-([a-z]+)\.json$/;
@@ -16,13 +14,11 @@ const SPACING_ROLE_ROOTS = new Set(['container', 'layout']);
  * Numeric tokens (`spacing.*`) seed Tailwind's `--spacing-*` theme namespace.
  * Role tokens (`container.*`, `layout.*`) never enter `@theme`: Tailwind's
  * `--container-*` namespace would codegen `nx:w-p` from them. They get their
- * own `@utility` instead.
- *
- * @param {readonly string[]} tokenPath
- * @returns {'numeric' | 'role'}
- * @throws {Error} If the path's root is in neither allowlist
+ * own `@utility` instead. Throws if the path's root is in neither allowlist.
  */
-export function spacingTokenKind(tokenPath) {
+export function spacingTokenKind(
+  tokenPath: readonly string[]
+): 'numeric' | 'role' {
   const root = tokenPath[0] ?? '';
   if (SPACING_NUMERIC_ROOTS.has(root)) return 'numeric';
   if (SPACING_ROLE_ROOTS.has(root)) return 'role';
@@ -31,14 +27,10 @@ export function spacingTokenKind(tokenPath) {
   );
 }
 
-/**
- * @template {{ path: readonly string[] }} T
- * @param {readonly T[]} tokens
- * @returns {{ numeric: T[], role: T[] }}
- */
-export function splitSpacingTokens(tokens) {
-  /** @type {{ numeric: T[], role: T[] }} */
-  const halves = { numeric: [], role: [] };
+export function splitSpacingTokens<T extends { path: readonly string[] }>(
+  tokens: readonly T[]
+): { numeric: T[]; role: T[] } {
+  const halves: { numeric: T[]; role: T[] } = { numeric: [], role: [] };
   for (const token of tokens) {
     halves[spacingTokenKind(token.path)].push(token);
   }
@@ -62,11 +54,11 @@ const FAMILY_TO_UTILITY = {
  *   `container.p`            → `p-container`
  *   `container.gap`          → `gap-container`
  *   `layout.section-gap`     → `gap-layout-section`
- *
- * @param {readonly string[]} tokenPath
- * @returns {{ utilityName: string, properties: readonly string[] }}
  */
-function deriveRoleUtility(tokenPath) {
+function deriveRoleUtility(tokenPath: readonly string[]): {
+  utilityName: string;
+  properties: readonly string[];
+} {
   if (tokenPath.length < 2 || tokenPath.length > 3) {
     throw new Error(
       `deriveRoleUtility: path [${tokenPath.join('.')}] has ${tokenPath.length} segment(s); only 2- or 3-segment role paths are supported`
@@ -75,8 +67,7 @@ function deriveRoleUtility(tokenPath) {
   const [role, second = '', third] = tokenPath;
 
   if (third !== undefined) {
-    const entry =
-      FAMILY_TO_UTILITY[/** @type {keyof typeof FAMILY_TO_UTILITY} */ (second)];
+    const entry = FAMILY_TO_UTILITY[second as keyof typeof FAMILY_TO_UTILITY];
     if (!entry) {
       throw new Error(
         `deriveRoleUtility: unknown family "${second}" in path [${tokenPath.join('.')}] — extend FAMILY_TO_UTILITY`
@@ -108,13 +99,11 @@ function deriveRoleUtility(tokenPath) {
 }
 
 /**
- * The utility a spacing role token emits. It reads the per-mode
- * `--nx-<path>` variable, so a `[data-density]` swap reaches it.
- *
- * @param {readonly string[]} tokenPath - e.g. `['container', 'p']`
- * @returns {UtilityRule}
+ * The utility a spacing role token (path e.g. `['container', 'p']`) emits. It
+ * reads the per-mode `--nx-<path>` variable, so a `[data-density]` swap
+ * reaches it.
  */
-export function spacingRoleUtility(tokenPath) {
+export function spacingRoleUtility(tokenPath: readonly string[]): UtilityRule {
   const { utilityName, properties } = deriveRoleUtility(tokenPath);
   const value = `var(--nx-${tokenPath.join('-')})`;
   return {

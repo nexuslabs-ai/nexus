@@ -12,18 +12,6 @@ const useIsomorphicLayoutEffect =
 
 /**
  * Root of the tabs. Holds the active tab, the list and the panels.
- *
- * @example
- * ```tsx
- * <Tabs defaultValue="tab1">
- *   <TabsList>
- *     <TabsTrigger value="tab1">Tab 1</TabsTrigger>
- *     <TabsTrigger value="tab2">Tab 2</TabsTrigger>
- *   </TabsList>
- *   <TabsContent value="tab1">Content 1</TabsContent>
- *   <TabsContent value="tab2">Content 2</TabsContent>
- * </Tabs>
- * ```
  */
 const Tabs = TabsPrimitive.Root;
 
@@ -44,26 +32,16 @@ interface TabsListProps extends Omit<
 > {
   /**
    * Visual style of every trigger in the list.
-   * @default "default"
    */
   variant?: TabsVariant;
   /**
    * Size of every trigger in the list.
-   * @default "default"
    */
   size?: TabsSize;
 }
 
 /**
  * Row of tab triggers.
- *
- * @example
- * ```tsx
- * <TabsList>
- *   <TabsTrigger value="tab1">Tab 1</TabsTrigger>
- *   <TabsTrigger value="tab2">Tab 2</TabsTrigger>
- * </TabsList>
- * ```
  */
 function TabsList({
   className,
@@ -203,7 +181,6 @@ const tabsTriggerVariants = cva(
     variants: {
       /**
        * Visual style.
-       * @default "default"
        */
       variant: {
         default: [
@@ -219,7 +196,6 @@ const tabsTriggerVariants = cva(
       },
       /**
        * Size.
-       * @default "default"
        */
       size: {
         sm: 'nx:px-2 nx:py-1 nx:typography-label-small',
@@ -244,11 +220,6 @@ interface TabsTriggerProps extends React.ComponentProps<
 /**
  * Tab button that shows its panel. Takes its style from the TabsList `variant`
  * and `size`.
- *
- * @example
- * ```tsx
- * <TabsTrigger value="account">Account</TabsTrigger>
- * ```
  */
 function TabsTrigger({ className, ...props }: TabsTriggerProps) {
   const { variant, size } = React.useContext(TabsListContext);
@@ -273,13 +244,6 @@ interface TabsContentProps extends React.ComponentProps<
 
 /**
  * Panel for one tab, shown only while that tab is active.
- *
- * @example
- * ```tsx
- * <TabsContent value="account">
- *   <p>Account settings content</p>
- * </TabsContent>
- * ```
  */
 function TabsContent({ className, ...props }: TabsContentProps) {
   return (

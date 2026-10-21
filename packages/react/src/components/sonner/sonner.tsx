@@ -140,20 +140,6 @@ type ToasterProps = Omit<SonnerToasterProps, 'id'>;
 /**
  * Renders toast notifications. Mount it once near your app root, then call
  * `toast()` from anywhere. It follows the `.dark` class for dark mode.
- *
- * @example
- * ```tsx
- * import { Toaster, toast } from '@nexus_ds/react';
- *
- * function App() {
- *   return (
- *     <>
- *       <button onClick={() => toast('Saved')}>Save</button>
- *       <Toaster />
- *     </>
- *   );
- * }
- * ```
  */
 function Toaster({ style, ...props }: ToasterProps) {
   const theme = useToasterTheme();

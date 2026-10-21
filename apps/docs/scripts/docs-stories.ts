@@ -1,4 +1,3 @@
-// @ts-check
 /**
  * Reads the stories tagged `docs` and turns each into the copy-pasteable
  * module a component page shows and runs.
@@ -11,11 +10,10 @@
  */
 import { existsSync, readFileSync } from 'node:fs';
 import path from 'node:path';
-
-import prettier from 'prettier';
+import prettier, { type Options as PrettierOptions } from 'prettier';
 import ts from 'typescript';
 
-import { humanize, pascal } from './humanize.mjs';
+import { humanize, pascal } from './humanize.ts';
 import { collectSourceFiles } from './react-sources.mjs';
 import { componentsRoot, isUnder, reactSrc, toRepoPath } from './roots.mjs';
 
@@ -30,11 +28,14 @@ export const PREVIEWLESS_COMPONENTS = new Map([
   ],
 ]);
 
+type Edit = [start: number, end: number, replacement: string];
+
 const STORYBOOK_MODULE = /^(?:storybook(?:\/|$)|@storybook\/)/;
 const SPY_MODULE = 'storybook/test';
 
-/** @param {ts.Node | undefined} node */
-function unwrap(node) {
+function unwrap(node: ts.Node): ts.Node;
+function unwrap(node: ts.Node | undefined): ts.Node | undefined;
+function unwrap(node: ts.Node | undefined) {
   let current = node;
   while (
     current &&
@@ -47,14 +48,12 @@ function unwrap(node) {
   return current;
 }
 
-/** @param {ts.PropertyName} name */
-function propertyKey(name) {
+function propertyKey(name: ts.PropertyName) {
   if (ts.isIdentifier(name) || ts.isStringLiteral(name)) return name.text;
   return name.getText();
 }
 
-/** @param {ts.ObjectLiteralExpression} object */
-function tagsOf(object) {
+function tagsOf(object: ts.ObjectLiteralExpression) {
   const property = object.properties.find(
     (candidate) =>
       ts.isPropertyAssignment(candidate) &&
@@ -62,17 +61,15 @@ function tagsOf(object) {
   );
   if (!property || !ts.isPropertyAssignment(property)) return [];
   const array = unwrap(property.initializer);
-  if (!array || !ts.isArrayLiteralExpression(array)) return [];
+  if (!ts.isArrayLiteralExpression(array)) return [];
   return array.elements.filter(ts.isStringLiteral).map((tag) => tag.text);
 }
 
-/**
- * @param {ts.ObjectLiteralExpression} object
- * @param {string} where
- * @returns {Map<string, ts.Node>}
- */
-function propertiesOf(object, where) {
-  const properties = new Map();
+function propertiesOf(
+  object: ts.ObjectLiteralExpression,
+  where: string
+): Map<string, ts.Node> {
+  const properties = new Map<string, ts.Node>();
   for (const property of object.properties) {
     if (ts.isSpreadAssignment(property)) {
       throw new Error(
@@ -90,20 +87,14 @@ function propertiesOf(object, where) {
   return properties;
 }
 
-/**
- * @param {ts.Node} node
- * @returns {node is ts.StringLiteral | ts.NoSubstitutionTemplateLiteral}
- */
-function isPlainString(node) {
+function isPlainString(
+  node: ts.Node
+): node is ts.StringLiteral | ts.NoSubstitutionTemplateLiteral {
   return ts.isStringLiteral(node) || ts.isNoSubstitutionTemplateLiteral(node);
 }
 
-/**
- * `['a', 'b'].join(' ')` as its value, or null for any other expression.
- * @param {ts.Node} node
- * @returns {string | null}
- */
-function joinedStrings(node) {
+/** `['a', 'b'].join(' ')` as its value, or null for any other expression. */
+function joinedStrings(node: ts.Node): string | null {
   if (!ts.isCallExpression(node)) return null;
   const callee = node.expression;
   if (!ts.isPropertyAccessExpression(callee) || callee.name.text !== 'join') {
@@ -111,29 +102,29 @@ function joinedStrings(node) {
   }
   const array = unwrap(callee.expression);
   const [separator] = node.arguments;
-  if (!array || !ts.isArrayLiteralExpression(array)) return null;
+  if (!ts.isArrayLiteralExpression(array)) return null;
   if (!separator || !isPlainString(separator)) return null;
-  if (!array.elements.every(isPlainString)) return null;
-  return array.elements.map((element) => element.text).join(separator.text);
+  const strings = array.elements.filter(isPlainString);
+  if (strings.length !== array.elements.length) return null;
+  return strings.map((element) => element.text).join(separator.text);
 }
 
 /**
  * `parameters.docs.description[kind]` on a meta or story, or null when unset.
  * Throws when a step on that path is not written inline.
- * @param {ts.ObjectLiteralExpression} object
- * @param {'component' | 'story'} kind
- * @param {string} where
- * @returns {string | null}
  */
-function docsDescription(object, kind, where) {
+function docsDescription(
+  object: ts.ObjectLiteralExpression,
+  kind: 'component' | 'story',
+  where: string
+): string | null {
   const notInline = new Error(
     `${where} its \`parameters.docs.description.${kind}\` is not written inline — use object literals, without spreads or shorthand, down to a string literal or a \`[…].join(…)\` of them.`
   );
-  /** @type {ts.Node | undefined} */
-  let current = object;
+  let current: ts.Node = object;
   for (const key of ['parameters', 'docs', 'description', kind]) {
     const level = unwrap(current);
-    if (!level || !ts.isObjectLiteralExpression(level)) throw notInline;
+    if (!ts.isObjectLiteralExpression(level)) throw notInline;
     if (level.properties.some(ts.isSpreadAssignment)) throw notInline;
     const property = level.properties.find(
       (candidate) =>
@@ -143,7 +134,7 @@ function docsDescription(object, kind, where) {
     if (!ts.isPropertyAssignment(property)) throw notInline;
     current = property.initializer;
   }
-  const value = /** @type {ts.Node} */ (unwrap(current));
+  const value = unwrap(current);
   const text = isPlainString(value) ? value.text : joinedStrings(value);
   if (text === null) throw notInline;
   const unsupported = unsupportedMarkdown(text);
@@ -158,9 +149,8 @@ function docsDescription(object, kind, where) {
 /**
  * Names the first Markdown in `text` that DescriptionText doesn't render, or
  * null. Code spans are skipped, so their contents can hold any characters.
- * @param {string} text
  */
-function unsupportedMarkdown(text) {
+function unsupportedMarkdown(text: string) {
   const prose = text.replace(/`[^`]*`/g, '');
   if (/\*\*|__/.test(prose)) return 'bold';
   if (/\[[^\]]*\]\([^)]*\)/.test(prose)) return 'a link';
@@ -173,15 +163,14 @@ function unsupportedMarkdown(text) {
   return null;
 }
 
-/** @param {ts.BindingName} name */
-function boundNames(name) {
+function boundNames(name: ts.BindingName): string[] {
   if (ts.isIdentifier(name)) return [name.text];
   return name.elements.flatMap((element) =>
     ts.isOmittedExpression(element) ? [] : boundNames(element.name)
   );
 }
 
-function hasExportModifier(statement) {
+function hasExportModifier(statement: ts.Node) {
   return (
     ts.canHaveModifiers(statement) &&
     (ts.getModifiers(statement) ?? []).some(
@@ -190,20 +179,23 @@ function hasExportModifier(statement) {
   );
 }
 
-/**
- * @typedef {{ module: string; kind: 'default' | 'namespace' | 'named'; imported: string; typeOnly: boolean }} ImportBinding
- * @typedef {{
- *   path: string;
- *   imports: Map<string, ImportBinding>;
- *   declarations: Map<string, ts.Statement>;
- *   stories: { name: string; object: ts.ObjectLiteralExpression }[];
- *   meta: ts.ObjectLiteralExpression;
- *   metaName: string;
- * }} StoriesFile
- */
+interface ImportBinding {
+  module: string;
+  kind: 'default' | 'namespace' | 'named';
+  imported: string;
+  typeOnly: boolean;
+}
 
-/** @returns {StoriesFile} */
-function parseStoriesFile(filePath) {
+interface StoriesFile {
+  path: string;
+  imports: Map<string, ImportBinding>;
+  declarations: Map<string, ts.Statement>;
+  stories: { name: string; object: ts.ObjectLiteralExpression }[];
+  meta: ts.ObjectLiteralExpression;
+  metaName: string;
+}
+
+function parseStoriesFile(filePath: string): StoriesFile {
   const sourceFile = ts.createSourceFile(
     filePath,
     readFileSync(filePath, 'utf8'),
@@ -211,14 +203,11 @@ function parseStoriesFile(filePath) {
     true,
     ts.ScriptKind.TSX
   );
-  /** @type {Map<string, ImportBinding>} */
-  const imports = new Map();
-  /** @type {Map<string, ts.Statement>} */
-  const declarations = new Map();
-  /** @type {Map<string, ts.Expression | undefined>} */
-  const initializers = new Map();
-  const stories = [];
-  let metaName;
+  const imports = new Map<string, ImportBinding>();
+  const declarations = new Map<string, ts.Statement>();
+  const initializers = new Map<string, ts.Expression | undefined>();
+  const stories: StoriesFile['stories'] = [];
+  let metaName: string | undefined;
 
   for (const statement of sourceFile.statements) {
     if (ts.isImportDeclaration(statement)) {
@@ -255,7 +244,7 @@ function parseStoriesFile(filePath) {
     }
     if (ts.isExportAssignment(statement)) {
       const exported = unwrap(statement.expression);
-      if (exported && ts.isIdentifier(exported)) metaName = exported.text;
+      if (ts.isIdentifier(exported)) metaName = exported.text;
       continue;
     }
     if (ts.isVariableStatement(statement)) {
@@ -297,27 +286,22 @@ function parseStoriesFile(filePath) {
   return { path: filePath, imports, declarations, stories, meta, metaName };
 }
 
-/**
- * @typedef {{ slug: string; file: StoriesFile; name: string; object: ts.ObjectLiteralExpression }} DocsStory
- */
+interface DocsStory {
+  slug: string;
+  file: StoriesFile;
+  name: string;
+  object: ts.ObjectLiteralExpression;
+}
 
-/**
- * Every `*.stories.tsx` under `components/{slug}/`, sorted.
- * @param {string} slug
- */
-export function componentStoryFiles(slug) {
-  return collectSourceFiles(path.join(componentsRoot, slug), (file) =>
+/** Every `*.stories.tsx` under `components/{slug}/`, sorted. */
+export function componentStoryFiles(slug: string): string[] {
+  return collectSourceFiles(path.join(componentsRoot, slug), (file: string) =>
     file.endsWith('.stories.tsx')
   ).sort();
 }
 
-/**
- * Every story in `files` tagged `docs`, in file order, for the page `slug`.
- * @param {string} slug
- * @param {string[]} files
- * @returns {DocsStory[]}
- */
-export function readDocsStories(slug, files) {
+/** Every story in `files` tagged `docs`, in file order, for the page `slug`. */
+export function readDocsStories(slug: string, files: string[]): DocsStory[] {
   return files.flatMap((filePath) => {
     const file = parseStoriesFile(filePath);
     if (tagsOf(file.meta).includes(DOCS_TAG)) {
@@ -334,11 +318,8 @@ export function readDocsStories(slug, files) {
 /**
  * The page description for `slug`: the meta's `docs.description.component` in
  * `{Slug}.stories.tsx`, else in the first of `files` that has one.
- * @param {string} slug
- * @param {string[]} files
- * @returns {string}
  */
-export function componentDescription(slug, files) {
+export function componentDescription(slug: string, files: string[]): string {
   const ownName = `${pascal(slug)}.stories.tsx`;
   const own = files.find((filePath) => path.basename(filePath) === ownName);
   const ordered = own
@@ -358,20 +339,18 @@ export function componentDescription(slug, files) {
 }
 
 /** `DefaultOpen` → `default-open`. */
-function kebab(name) {
+function kebab(name: string) {
   return name
     .replace(/([a-z0-9])([A-Z])/g, '$1-$2')
     .replace(/([A-Z])([A-Z][a-z])/g, '$1-$2')
     .toLowerCase();
 }
 
-/** @param {DocsStory} story */
-function docsStoryId(story) {
+function docsStoryId(story: DocsStory) {
   return `${story.slug}/${kebab(story.name)}`;
 }
 
-/** @param {DocsStory} story */
-function docsStoryTitle(story) {
+function docsStoryTitle(story: DocsStory) {
   const name = story.object.properties.find(
     (property) =>
       ts.isPropertyAssignment(property) && propertyKey(property.name) === 'name'
@@ -386,12 +365,8 @@ function docsStoryTitle(story) {
   return humanize(kebab(story.name));
 }
 
-/**
- * Applies non-overlapping `[start, end, text]` edits that fall inside `node`.
- * @param {ts.Node} node
- * @param {[number, number, string][]} edits
- */
-function textWithEdits(node, edits) {
+/** Applies non-overlapping `[start, end, text]` edits that fall inside `node`. */
+function textWithEdits(node: ts.Node, edits: Edit[]) {
   const start = node.getStart();
   let text = node.getText();
   const inside = edits
@@ -403,11 +378,7 @@ function textWithEdits(node, edits) {
   return text;
 }
 
-/**
- * @param {ts.Node | undefined} value
- * @param {StoriesFile} file
- */
-function isDropped(value, file) {
+function isDropped(value: ts.Node | undefined, file: StoriesFile) {
   const node = unwrap(value);
   if (!node) return true;
   if (ts.isIdentifier(node) && node.text === 'undefined') return true;
@@ -421,15 +392,14 @@ function isDropped(value, file) {
 const ESCAPE_IN_JSX_STRING = /["&\\\n]/;
 const ESCAPE_IN_JSX_TEXT = /[{}<>&]/;
 
-/**
- * The JSX attribute an arg becomes, or '' when it has no value to show.
- * @param {string} name
- * @param {ts.Node | undefined} value
- * @param {StoriesFile} file
- */
-function attributeText(name, value, file) {
-  if (isDropped(value, file)) return '';
-  const node = /** @type {ts.Node} */ (unwrap(value));
+/** The JSX attribute an arg becomes, or '' when it has no value to show. */
+function attributeText(
+  name: string,
+  value: ts.Node | undefined,
+  file: StoriesFile
+) {
+  if (!value || isDropped(value, file)) return '';
+  const node = unwrap(value);
   if (isPlainString(node) && !ESCAPE_IN_JSX_STRING.test(node.text)) {
     return `${name}="${node.text}"`;
   }
@@ -437,13 +407,9 @@ function attributeText(name, value, file) {
   return `${name}={${node.getText()}}`;
 }
 
-/**
- * @param {ts.Node | undefined} value
- * @param {StoriesFile} file
- */
-function childText(value, file) {
-  if (isDropped(value, file)) return '';
-  const node = /** @type {ts.Node} */ (unwrap(value));
+function childText(value: ts.Node | undefined, file: StoriesFile) {
+  if (!value || isDropped(value, file)) return '';
+  const node = unwrap(value);
   if (isPlainString(node) && !ESCAPE_IN_JSX_TEXT.test(node.text)) {
     return node.text;
   }
@@ -454,11 +420,7 @@ function childText(value, file) {
   return `{${node.getText()}}`;
 }
 
-/**
- * @param {Map<string, ts.Node>} args
- * @param {StoriesFile} file
- */
-function spreadText(args, file) {
+function spreadText(args: Map<string, ts.Node>, file: StoriesFile) {
   return [...args]
     .filter(([name]) => name !== 'children')
     .map(([name, value]) => attributeText(name, value, file))
@@ -469,20 +431,31 @@ function spreadText(args, file) {
 /**
  * The rendered element, either as an expression (with any statements that
  * come before it) or as a whole function body.
- * @typedef {{ kind: 'expression'; prelude: string; returned: string; jsx: boolean } | { kind: 'block'; body: string; node: ts.Block; edits: [number, number, string][] }} Rendered
  */
+type Rendered = RenderedExpression | RenderedBlock;
 
-/**
- * @param {ts.Node} render
- * @param {Map<string, ts.Node>} args
- * @param {StoriesFile} file
- * @param {string} where
- * @returns {Rendered}
- */
-function fromRender(render, args, file, where) {
-  const fn = ts.isMethodDeclaration(render) ? render : unwrap(render);
+interface RenderedExpression {
+  kind: 'expression';
+  prelude: string;
+  returned: string;
+  jsx: boolean;
+}
+
+interface RenderedBlock {
+  kind: 'block';
+  body: string;
+  node: ts.Block;
+  edits: Edit[];
+}
+
+function fromRender(
+  render: ts.Node,
+  args: Map<string, ts.Node>,
+  file: StoriesFile,
+  where: string
+): Rendered {
+  const fn = unwrap(render);
   if (
-    !fn ||
     !(
       ts.isArrowFunction(fn) ||
       ts.isFunctionExpression(fn) ||
@@ -500,12 +473,13 @@ function fromRender(render, args, file, where) {
     );
   }
 
-  /** @type {[number, number, string][]} */
-  const edits = [];
+  const edits: Edit[] = [];
   const parameter = fn.parameters[0]?.name;
-  /** @type {Map<string, { key: string; fallback: ts.Expression | undefined }>} */
-  const bindings = new Map();
-  let argsName;
+  const bindings = new Map<
+    string,
+    { key: string; fallback: ts.Expression | undefined }
+  >();
+  let argsName: string | undefined;
   if (parameter && ts.isObjectBindingPattern(parameter)) {
     for (const element of parameter.elements) {
       if (element.dotDotDotToken || !ts.isIdentifier(element.name)) {
@@ -524,20 +498,14 @@ function fromRender(render, args, file, where) {
     argsName = parameter.text;
   }
 
-  /**
-   * @param {string} key
-   * @param {ts.Node} [fallback] the destructuring default
-   */
-  const valueOf = (key, fallback) => {
+  /** @param fallback the destructuring default */
+  const valueOf = (key: string, fallback?: ts.Node) => {
     const value = args.get(key);
     return isDropped(value, file) ? fallback : value;
   };
 
-  /**
-   * @param {ts.Node} use the identifier or `args.x` access
-   * @param {ts.Node | undefined} value
-   */
-  function substitute(use, value) {
+  /** @param use the identifier or `args.x` access */
+  function substitute(use: ts.Node, value: ts.Node | undefined) {
     const parent = use.parent;
     if (ts.isJsxExpression(parent) && ts.isJsxAttribute(parent.parent)) {
       const attribute = parent.parent;
@@ -565,13 +533,11 @@ function fromRender(render, args, file, where) {
    * `{...args}` as the attributes it sets, plus `args.children` as the
    * element's children when the element has none of its own — as in React,
    * an attribute after the spread and JSX children win over args.
-   * @param {ts.JsxSpreadAttribute} spread
    */
-  function spreadArgs(spread) {
+  function spreadArgs(spread: ts.JsxSpreadAttribute) {
     const attributes = spread.parent.properties;
     const position = attributes.indexOf(spread);
-    /** @param {readonly ts.JsxAttributeLike[]} list */
-    const namesIn = (list) =>
+    const namesIn = (list: readonly ts.JsxAttributeLike[]) =>
       new Set(
         list
           .filter(ts.isJsxAttribute)
@@ -622,8 +588,7 @@ function fromRender(render, args, file, where) {
     }
   }
 
-  /** @param {ts.Node} node */
-  function visit(node) {
+  function visit(node: ts.Node) {
     if (argsName) {
       if (
         ts.isPropertyAccessExpression(node) &&
@@ -664,7 +629,7 @@ function fromRender(render, args, file, where) {
   visit(fn.body);
 
   if (!ts.isBlock(fn.body)) {
-    const returned = unwrap(fn.body) ?? fn.body;
+    const returned = unwrap(fn.body);
     return {
       kind: 'expression',
       prelude: '',
@@ -680,8 +645,7 @@ function fromRender(render, args, file, where) {
   };
 }
 
-/** @param {ts.Node} node */
-function isJsx(node) {
+function isJsx(node: ts.Node) {
   return (
     ts.isJsxElement(node) ||
     ts.isJsxSelfClosingElement(node) ||
@@ -689,19 +653,13 @@ function isJsx(node) {
   );
 }
 
-/**
- * A block body as `prelude` + one final `return`, so a decorator can wrap it.
- * @param {Rendered} rendered
- * @param {string} where
- * @returns {Extract<Rendered, { kind: 'expression' }>}
- */
-function asExpression(rendered, where) {
+/** A block body as `prelude` + one final `return`, so a decorator can wrap it. */
+function asExpression(rendered: Rendered, where: string): RenderedExpression {
   if (rendered.kind === 'expression') return rendered;
   const statements = rendered.node.statements;
   const last = statements.at(-1);
   let returns = 0;
-  /** @param {ts.Node} node */
-  const count = (node) => {
+  const count = (node: ts.Node) => {
     if (ts.isFunctionLike(node)) return;
     if (ts.isReturnStatement(node)) returns += 1;
     ts.forEachChild(node, count);
@@ -717,7 +675,7 @@ function asExpression(rendered, where) {
       `${where} its render returns from more than one place, so its decorator has nothing single to wrap — end the render in one \`return\`.`
     );
   }
-  const returned = unwrap(last.expression) ?? last.expression;
+  const returned = unwrap(last.expression);
   return {
     kind: 'expression',
     prelude: statements
@@ -729,25 +687,24 @@ function asExpression(rendered, where) {
   };
 }
 
-/**
- * Wraps the story in a `(Story) => <…><Story /></…>` decorator.
- * @param {Rendered} rendered
- * @param {ts.Node} decorator
- * @param {StoriesFile} file
- * @param {string} where
- * @returns {Rendered}
- */
-function decorate(rendered, decorator, file, where) {
+/** Wraps the story in a `(Story) => <…><Story /></…>` decorator. */
+function decorate(
+  rendered: Rendered,
+  decorator: ts.Node,
+  file: StoriesFile,
+  where: string
+): Rendered {
   const unsupported = new Error(
     `${where} it is wrapped in a decorator the docs page can't show (\`${decorator.getText().replace(/\s+/g, ' ').slice(0, 60)}\`) — make the decorator a plain \`(Story) => <…><Story /></…>\` wrapper, or put its markup in the story.`
   );
-  let fn = unwrap(decorator);
-  if (fn && ts.isIdentifier(fn)) {
-    const statement = file.declarations.get(fn.text);
+  let fn: ts.Node | undefined = unwrap(decorator);
+  if (ts.isIdentifier(fn)) {
+    const name = fn.text;
+    const statement = file.declarations.get(name);
     const declaration =
       statement && ts.isVariableStatement(statement)
         ? statement.declarationList.declarations.find(
-            (candidate) => candidate.name.getText() === fn?.getText()
+            (candidate) => candidate.name.getText() === name
           )
         : undefined;
     fn = unwrap(declaration?.initializer);
@@ -761,9 +718,10 @@ function decorate(rendered, decorator, file, where) {
 
   let body = fn.body;
   if (ts.isBlock(body)) {
-    const [only] = body.statements;
+    const [only, ...rest] = body.statements;
     if (
-      body.statements.length !== 1 ||
+      !only ||
+      rest.length > 0 ||
       !ts.isReturnStatement(only) ||
       !only.expression
     ) {
@@ -772,12 +730,11 @@ function decorate(rendered, decorator, file, where) {
     body = only.expression;
   }
   const wrapper = unwrap(body);
-  if (!wrapper || !isJsx(wrapper)) throw unsupported;
+  if (!isJsx(wrapper)) throw unsupported;
 
-  const placeholders = [];
+  const placeholders: ts.JsxSelfClosingElement[] = [];
   let otherUses = 0;
-  /** @param {ts.Node} node */
-  const find = (node) => {
+  const find = (node: ts.Node) => {
     if (
       ts.isJsxSelfClosingElement(node) &&
       node.tagName.getText() === storyName &&
@@ -792,16 +749,17 @@ function decorate(rendered, decorator, file, where) {
   find(wrapper);
   const context = fn.parameters[1]?.name;
   if (context && ts.isIdentifier(context)) {
-    /** @param {ts.Node} node */
-    const usesContext = (node) =>
+    const usesContext = (node: ts.Node): boolean | undefined =>
       (ts.isIdentifier(node) && node.text === context.text) ||
       ts.forEachChild(node, usesContext);
     if (usesContext(wrapper)) throw unsupported;
   }
-  if (placeholders.length !== 1 || otherUses > 0) throw unsupported;
+  const [placeholder, ...otherPlaceholders] = placeholders;
+  if (!placeholder || otherPlaceholders.length > 0 || otherUses > 0) {
+    throw unsupported;
+  }
 
   const inner = asExpression(rendered, where);
-  const [placeholder] = placeholders;
   return {
     kind: 'expression',
     prelude: inner.prelude,
@@ -816,8 +774,7 @@ function decorate(rendered, decorator, file, where) {
   };
 }
 
-/** @param {ts.Node | undefined} node */
-function argsObject(node, where) {
+function argsObject(node: ts.Node | undefined, where: string) {
   const object = unwrap(node);
   if (!object) return new Map();
   if (!ts.isObjectLiteralExpression(object)) {
@@ -826,21 +783,15 @@ function argsObject(node, where) {
   return propertiesOf(object, where);
 }
 
-/** @param {ts.Node | undefined} node */
-function decoratorList(node) {
+function decoratorList(node: ts.Node | undefined) {
   const array = unwrap(node);
   if (!array) return [];
   if (!ts.isArrayLiteralExpression(array)) return [array];
   return [...array.elements];
 }
 
-/**
- * The story's own JSX, args filled in and decorators applied.
- * @param {DocsStory} story
- * @param {string} where
- * @returns {Rendered}
- */
-function renderStory(story, where) {
+/** The story's own JSX, args filled in and decorators applied. */
+function renderStory(story: DocsStory, where: string): Rendered {
   const { file } = story;
   const props = propertiesOf(story.object, where);
   const metaProps = propertiesOf(file.meta, `${toRepoPath(file.path)}: meta`);
@@ -857,8 +808,7 @@ function renderStory(story, where) {
     ...argsObject(props.get('args'), where),
   ]);
   const render = props.get('render') ?? metaProps.get('render');
-  /** @type {Rendered} */
-  let rendered;
+  let rendered: Rendered;
   if (render) {
     rendered = fromRender(render, args, file, where);
   } else {
@@ -893,7 +843,7 @@ function renderStory(story, where) {
 }
 
 /** Identifiers `text` reads, other than property and attribute names. */
-function identifiersIn(text) {
+function identifiersIn(text: string) {
   const source = ts.createSourceFile(
     'closure.tsx',
     text,
@@ -901,9 +851,8 @@ function identifiersIn(text) {
     true,
     ts.ScriptKind.TSX
   );
-  const names = new Set();
-  /** @param {ts.Node} node */
-  const visit = (node) => {
+  const names = new Set<string>();
+  const visit = (node: ts.Node) => {
     if (ts.isIdentifier(node)) {
       const parent = node.parent;
       const isPropertyName =
@@ -925,7 +874,7 @@ function identifiersIn(text) {
   return names;
 }
 
-function resolveModule(basePath) {
+function resolveModule(basePath: string) {
   return [`${basePath}.tsx`, `${basePath}.ts`].find((candidate) =>
     existsSync(candidate)
   );
@@ -934,11 +883,8 @@ function resolveModule(basePath) {
 /**
  * Where the pasted module imports `module` from: packages stay, relative
  * imports become the `@/` path the install block copies.
- * @param {string} module
- * @param {StoriesFile} file
- * @param {string} where
  */
-function pasteSpecifier(module, file, where) {
+function pasteSpecifier(module: string, file: StoriesFile, where: string) {
   if (STORYBOOK_MODULE.test(module)) {
     throw new Error(
       `${where} its render uses ${module}, which is Storybook tooling — keep it in \`play\`.`
@@ -966,22 +912,19 @@ function pasteSpecifier(module, file, where) {
   return `@/${relative}`;
 }
 
-function importGroup(specifier) {
+function importGroup(specifier: string) {
   if (/^react(?:-dom)?(?:\/|$)/.test(specifier)) return 0;
   if (specifier.startsWith('@/')) return 2;
   return 1;
 }
 
-/**
- * @param {Set<string>} names
- * @param {StoriesFile} file
- * @param {string} where
- */
-function renderImports(names, file, where) {
-  /** @type {Map<string, { namespace?: string; default?: string; named: string[]; typeOnly: boolean }>} */
-  const modules = new Map();
+function renderImports(names: Set<string>, file: StoriesFile, where: string) {
+  const modules = new Map<
+    string,
+    { namespace?: string; default?: string; named: string[]; typeOnly: boolean }
+  >();
   for (const name of names) {
-    const binding = /** @type {ImportBinding} */ (file.imports.get(name));
+    const binding = file.imports.get(name) as ImportBinding;
     const specifier = pasteSpecifier(binding.module, file, where);
     const entry = modules.get(specifier) ?? { named: [], typeOnly: true };
     if (binding.kind === 'namespace') entry.namespace = name;
@@ -995,11 +938,11 @@ function renderImports(names, file, where) {
     modules.set(specifier, entry);
   }
 
-  const lines = [];
+  const lines: string[] = [];
   const ordered = [...modules].sort(
     ([a], [b]) => importGroup(a) - importGroup(b) || a.localeCompare(b, 'en')
   );
-  let group;
+  let group: number | undefined;
   for (const [specifier, entry] of ordered) {
     if (group !== undefined && importGroup(specifier) !== group) lines.push('');
     group = importGroup(specifier);
@@ -1028,7 +971,7 @@ function renderImports(names, file, where) {
 }
 
 /** `data-testid` is for the story's tests, not for code a reader pastes. */
-function withoutTestIds(text) {
+function withoutTestIds(text: string) {
   const source = ts.createSourceFile(
     'module.tsx',
     text,
@@ -1036,9 +979,8 @@ function withoutTestIds(text) {
     true,
     ts.ScriptKind.TSX
   );
-  const ranges = [];
-  /** @param {ts.Node} node */
-  const visit = (node) => {
+  const ranges: [number, number][] = [];
+  const visit = (node: ts.Node) => {
     if (ts.isJsxAttribute(node) && node.name.getText() === 'data-testid') {
       ranges.push([node.getFullStart(), node.getEnd()]);
       return;
@@ -1056,10 +998,11 @@ function withoutTestIds(text) {
 /**
  * The page's code for one docs story: a client module whose default export
  * renders the story.
- * @param {DocsStory} story
- * @param {import('prettier').Options} formatOptions
  */
-export async function docsStoryModule(story, formatOptions) {
+export async function docsStoryModule(
+  story: DocsStory,
+  formatOptions: PrettierOptions
+) {
   const { file } = story;
   const where = `${toRepoPath(file.path)}: ${story.name} is tagged \`${DOCS_TAG}\`, but`;
   const rendered = renderStory(story, where);
@@ -1075,14 +1018,12 @@ export async function docsStoryModule(story, formatOptions) {
       : `export default function ${functionName}() {\n${rendered.prelude ? `${rendered.prelude}\n\n` : ''}return (${rendered.jsx ? rendered.returned : `<>{${rendered.returned}}</>`});\n}`;
 
   const storyNames = new Set(file.stories.map(({ name }) => name));
-  /** @type {Set<ts.Statement>} */
-  const helpers = new Set();
-  /** @type {Set<string>} */
-  const imported = new Set();
+  const helpers = new Set<ts.Statement>();
+  const imported = new Set<string>();
   const pending = [...identifiersIn(component)];
-  const seen = new Set();
+  const seen = new Set<string>();
   while (pending.length > 0) {
-    const name = /** @type {string} */ (pending.pop());
+    const name = pending.pop() as string;
     if (seen.has(name)) continue;
     seen.add(name);
     if (name === file.metaName || storyNames.has(name)) {

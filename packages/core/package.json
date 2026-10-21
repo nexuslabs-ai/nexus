@@ -69,7 +69,7 @@
   },
   "scripts": {
     "build": "tsup",
-    "typecheck": "tsc --noEmit",
+    "typecheck": "tsc --noEmit && tsc -p tsconfig.node.json",
     "typecheck:dist": "node scripts/typecheck-runtime-dist.mjs",
     "build:tailwind": "node scripts/generate-tailwind-package.js",
     "audit:runtime-exports": "node scripts/audit-runtime-exports.mjs",

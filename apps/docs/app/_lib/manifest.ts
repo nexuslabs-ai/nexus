@@ -3,7 +3,7 @@ import {
   type ManifestPage,
   type ManifestSection,
   PAGE_MANIFEST,
-} from './page-manifest.generated';
+} from './page-manifest.generated.ts';
 
 export { CARD_JOINER, type ManifestPage, type ManifestSection, PAGE_MANIFEST };
 

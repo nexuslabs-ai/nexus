@@ -88,8 +88,7 @@ export function useMDXComponents(components: MDXComponents): MDXComponents {
     pre: CodeBlock,
     table: ({ className, ...props }) => (
       <div
-        // A scroll container with no focusable children needs its own tab stop.
-        // eslint-disable-next-line jsx-a11y/no-noninteractive-tabindex
+        // eslint-disable-next-line jsx-a11y/no-noninteractive-tabindex -- a scroll container with no focusable children needs its own tab stop
         tabIndex={0}
         className="nx:mb-4 nx:overflow-x-auto nx:focus-visible:outline-2 nx:focus-visible:outline-focus-default"
       >

@@ -26,16 +26,6 @@ type AccordionProps = React.ComponentProps<typeof AccordionPrimitive.Root> &
 
 /**
  * Stacks sections that expand and collapse. `type` sets whether one or several open at once.
- *
- * @example
- * ```tsx
- * <Accordion type="single" collapsible>
- *   <AccordionItem value="item-1">
- *     <AccordionTrigger>Section 1</AccordionTrigger>
- *     <AccordionContent>Content for section 1</AccordionContent>
- *   </AccordionItem>
- * </Accordion>
- * ```
  */
 function Accordion({
   className,

@@ -15,20 +15,6 @@ interface SeparatorProps extends React.ComponentProps<
  * Thin rule that divides content. A vertical separator fills its parent's
  * height, so give that parent a set height. Set `decorative={false}` to expose
  * the `separator` role to assistive tech.
- *
- * @example
- * ```tsx
- * <Separator />
- * ```
- *
- * @example
- * ```tsx
- * <div className="nx:flex nx:h-5 nx:items-center nx:gap-3">
- *   <span>Docs</span>
- *   <Separator orientation="vertical" />
- *   <span>Source</span>
- * </div>
- * ```
  */
 function Separator({
   className,

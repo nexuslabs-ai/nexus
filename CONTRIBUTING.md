@@ -6,7 +6,7 @@ Project overview lives in [`README.md`](README.md). This is the day-to-day handb
 
 ## Prerequisites
 
-- **Node** ≥ 22 (see `.nvmrc`)
+- **Node** ≥ 22.18 (see `.nvmrc`)
 - **pnpm** — pinned via `packageManager` in `package.json` (`pnpm@10.12.1`)
 - **Docker Desktop** — for the docs-MCP server only (recommended, not required to build the library)
 
@@ -164,7 +164,7 @@ The packages authenticate to npm with **trusted publishing** (OIDC): GitHub Acti
 2. Each package has a **trusted publisher** registered on npmjs.com (_Settings → Trusted Publisher → GitHub Actions_) pointing at `nexuslabs-ai/nexus` and the `release.yml` workflow.
 3. A repo secret **`RELEASE_TOKEN`** — a fine-grained PAT from `nexuslabs-ai-bot` with **contents: read/write** and **pull requests: read/write** on this repo — authenticates the "Version Packages" PR. The default `GITHUB_TOKEN` can't be used here: PRs it opens don't fire `pull_request`, so the required `CI Status` check would never run on the version PR and it couldn't merge. Rotate the PAT before it expires.
 
-The workflow grants `id-token: write` for the OIDC exchange, upgrades npm to a trusted-publishing-capable version (≥ 11.5.1) on Node ≥ 22.14.0, and uses `RELEASE_TOKEN` for the release PR and tags. There is **no npm token** — publish auth is OIDC. Provenance attestations are emitted automatically.
+The workflow grants `id-token: write` for the OIDC exchange, upgrades npm to a trusted-publishing-capable version (≥ 11.5.1) on the `.nvmrc` Node, and uses `RELEASE_TOKEN` for the release PR and tags. There is **no npm token** — publish auth is OIDC. Provenance attestations are emitted automatically.
 
 ### Day-to-day: adding a changeset
 

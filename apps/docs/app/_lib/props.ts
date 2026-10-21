@@ -7,14 +7,11 @@ import type {
   ComponentEntry,
   PropsFile,
   PropsIndex,
-} from '../../scripts/props-entries.mjs';
+} from '../../scripts/props-entries.ts';
 
 import 'server-only';
 
-export type {
-  ComponentEntry,
-  PropEntry,
-} from '../../scripts/props-entries.mjs';
+export type { ComponentEntry, PropEntry } from '../../scripts/props-entries.ts';
 
 const PROPS_DIR = path.join(process.cwd(), 'generated', 'props');
 

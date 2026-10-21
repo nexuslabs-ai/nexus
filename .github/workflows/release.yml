@@ -61,7 +61,7 @@ jobs:
       - name: Setup Node
         uses: actions/setup-node@v4
         with:
-          node-version: '22.14.0' # trusted publishing requires Node >= 22.14.0
+          node-version-file: '.nvmrc'
           cache: 'pnpm'
 
       # `changeset publish` runs `pnpm publish` (pnpm is the detected package

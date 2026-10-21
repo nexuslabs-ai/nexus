@@ -1,6 +1,6 @@
 import { oklch, parse } from 'culori';
 
-import primitiveColors from '../../tokens/primitives/color.json';
+import primitiveColors from '../../tokens/primitives/color.json' with { type: 'json' };
 
 export const SHADES = [
   '50',

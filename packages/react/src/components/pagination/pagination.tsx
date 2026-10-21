@@ -14,31 +14,6 @@ interface PaginationProps extends React.ComponentProps<'nav'> {}
 /**
  * Page navigation for lists and tables, in a `navigation` landmark. Your app
  * works out which page numbers to show and owns any page-size control.
- *
- * @example
- * ```tsx
- * <Pagination>
- *   <PaginationContent>
- *     <PaginationItem>
- *       <PaginationPrevious href="#" />
- *     </PaginationItem>
- *     <PaginationItem>
- *       <PaginationLink href="#">1</PaginationLink>
- *     </PaginationItem>
- *     <PaginationItem>
- *       <PaginationLink href="#" isActive>
- *         2
- *       </PaginationLink>
- *     </PaginationItem>
- *     <PaginationItem>
- *       <PaginationEllipsis />
- *     </PaginationItem>
- *     <PaginationItem>
- *       <PaginationNext href="#" />
- *     </PaginationItem>
- *   </PaginationContent>
- * </Pagination>
- * ```
  */
 function Pagination({ className, ...props }: PaginationProps) {
   return (
@@ -94,13 +69,11 @@ interface PaginationLinkProps
   extends React.ComponentProps<'a'>, Pick<ButtonProps, 'size'> {
   /**
    * Marks the link as the current page and sets `aria-current="page"`.
-   * @default false
    */
   isActive?: boolean;
   /**
    * Renders the child element, such as a router `Link`, with the link styles.
    * Use it instead of wrapping, which would nest one `<a>` in another.
-   * @default false
    */
   asChild?: boolean;
 }
@@ -108,13 +81,6 @@ interface PaginationLinkProps
 /**
  * Page number link styled as a `ghost` button, or `outline` for the current
  * page. Uses the square `icon` size unless you set `size`.
- *
- * @example
- * ```tsx
- * <PaginationLink asChild isActive>
- *   <Link href="/items?page=2">2</Link>
- * </PaginationLink>
- * ```
  */
 function PaginationLink({
   className,
