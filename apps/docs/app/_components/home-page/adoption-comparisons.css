@@ -171,8 +171,3 @@
   outline: 3px solid var(--nx-color-foreground);
   outline-offset: 4px;
 }
-.adoption-reveal-hint {
-  font-size: 0.8125rem;
-  color: var(--nx-color-muted-foreground);
-  padding-block-start: var(--nx-spacing-3);
-}

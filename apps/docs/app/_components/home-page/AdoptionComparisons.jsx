@@ -2,7 +2,7 @@
 
 import { useId, useState } from 'react';
 
-import { Button } from '@nexus_ds/react';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@nexus_ds/react';
 import { useNexusAppearance } from '@nexus_ds/react/appearance';
 
 import { CodeBlock } from '../CodeBlock';
@@ -57,10 +57,6 @@ function ComparisonPair({ reveal, leftLabel, rightLabel, children }) {
           onChange={(event) => setPosition(Number(event.target.value))}
         />
       </div>
-      <p className="adoption-reveal-hint">
-        Drag to compare · Use arrow keys when focused. Live interactions remain
-        available in the side-by-side iteration.
-      </p>
     </div>
   );
 }
@@ -79,7 +75,6 @@ function Evidence({ children }) {
 export default function AdoptionComparisons({ reveal = false }) {
   const [library, setLibrary] = useState('MUI');
   const id = useId();
-  const host = `/coexistence-preview/comparison.html?library=${encodeURIComponent(library)}&example=billing`;
   return (
     <div className="adoption-comparisons">
       <section className="adoption-case" aria-labelledby={`${id}-0`}>
@@ -142,38 +137,37 @@ export default function AdoptionComparisons({ reveal = false }) {
             one screen.
           </p>
         </div>
-        <div
-          className="adoption-switcher"
-          role="group"
-          aria-label="Existing component library"
-        >
+        <Tabs value={library} onValueChange={setLibrary}>
+          <div className="adoption-switcher">
+            <TabsList aria-label="Existing component library">
+              {['MUI', 'Ant Design'].map((name) => (
+                <TabsTrigger key={name} value={name}>
+                  {name}
+                </TabsTrigger>
+              ))}
+            </TabsList>
+          </div>
           {['MUI', 'Ant Design'].map((name) => (
-            <Button
-              key={name}
-              variant={library === name ? 'default' : 'outline'}
-              aria-pressed={library === name}
-              onClick={() => setLibrary(name)}
-            >
-              {name}
-            </Button>
+            <TabsContent value={name} key={name}>
+              <ComparisonPair
+                reveal={reveal}
+                leftLabel={`${name} + shadcn`}
+                rightLabel={`${name} + Nexus`}
+              >
+                <Preview
+                  title={`${name} + shadcn`}
+                  subtitle="Native content picks up Tailwind Preflight"
+                  src={`/coexistence-preview/comparison.html?library=${encodeURIComponent(name)}&example=billing&integration=shadcn`}
+                />
+                <Preview
+                  title={`${name} + Nexus`}
+                  subtitle="Native content retains its existing styles"
+                  src={`/coexistence-preview/comparison.html?library=${encodeURIComponent(name)}&example=billing&integration=nexus`}
+                />
+              </ComparisonPair>
+            </TabsContent>
           ))}
-        </div>
-        <ComparisonPair
-          reveal={reveal}
-          leftLabel={`${library} + shadcn`}
-          rightLabel={`${library} + Nexus`}
-        >
-          <Preview
-            title={`${library} + shadcn`}
-            subtitle="Native content picks up Tailwind Preflight"
-            src={`${host}&integration=shadcn`}
-          />
-          <Preview
-            title={`${library} + Nexus`}
-            subtitle="Native content retains its existing styles"
-            src={`${host}&integration=nexus`}
-          />
-        </ComparisonPair>
+        </Tabs>
         <p className="adoption-caption">
           This example shows native heading and list changes, not a claim that
           all MUI or Ant components break.
