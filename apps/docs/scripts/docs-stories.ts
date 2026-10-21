@@ -454,7 +454,7 @@ function fromRender(
   file: StoriesFile,
   where: string
 ): Rendered {
-  const fn = ts.isMethodDeclaration(render) ? render : unwrap(render);
+  const fn = unwrap(render);
   if (
     !(
       ts.isArrowFunction(fn) ||
