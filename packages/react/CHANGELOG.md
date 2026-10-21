@@ -1,5 +1,12 @@
 # @nxds/react
 
+## 0.4.5
+
+### Patch Changes
+
+- Updated dependencies [afc7bd7]
+  - @nxds/core@0.9.0
+
 ## 0.4.4
 
 ### Patch Changes

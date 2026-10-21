@@ -1,6 +1,6 @@
 {
   "name": "@nxds/vue",
-  "version": "0.0.0",
+  "version": "0.0.1",
   "private": true,
   "description": "Vue components built with Reka UI and Tailwind CSS",
   "type": "module",
