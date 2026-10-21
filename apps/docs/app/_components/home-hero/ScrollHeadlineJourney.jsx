@@ -13,12 +13,16 @@ import { TiltedCtaJourney } from './TiltedCtaJourney';
 
 import './scroll-headline-journey.css';
 
-function smoothStep(value) {
+export function smoothStep(value) {
   const t = Math.max(0, Math.min(1, value));
   return t * t * (3 - 2 * t);
 }
 
-export function ScrollHeadlineJourney({ children, ...props }) {
+export function ScrollHeadlineJourney({
+  children,
+  Panel = ScrollHeadlinePanel,
+  ...props
+}) {
   const track = useRef(null);
   const stage = useRef(null);
   const [progress, setProgress] = useState(0);
@@ -75,33 +79,16 @@ export function ScrollHeadlineJourney({ children, ...props }) {
               details={[]}
               customizationHeading={
                 <div className="scroll-headline-panels">
-                  {groups.map((group, index) => {
-                    const enter =
-                      index === 0
-                        ? 1
-                        : smoothStep((progress - index / 3) / 0.09);
-                    const leave =
-                      index === 2
-                        ? 0
-                        : smoothStep(
-                            (progress - (index + 1) / 3 + 0.09) / 0.09
-                          );
-                    const opacity = enter * (1 - leave);
-                    return (
-                      <div
-                        key={group.title}
-                        className="scroll-headline-panel"
-                        inert={index !== slide || opacity === 0}
-                        aria-hidden={index !== slide}
-                        style={{
-                          opacity,
-                          transform: `translateY(${(1 - enter - leave) * 18}px)`,
-                        }}
-                      >
-                        <StackedTileGroup {...group} tuning={props.tuning} />
-                      </div>
-                    );
-                  })}
+                  {groups.map((group, index) => (
+                    <Panel
+                      key={group.title}
+                      group={group}
+                      index={index}
+                      progress={progress}
+                      slide={slide}
+                      tuning={props.tuning}
+                    />
+                  ))}
                 </div>
               }
             />
@@ -113,6 +100,26 @@ export function ScrollHeadlineJourney({ children, ...props }) {
         <StackedHeadlineJourney {...props} />
       </div>
       {children}
+    </div>
+  );
+}
+
+function ScrollHeadlinePanel({ group, index, progress, slide, tuning }) {
+  const enter = index === 0 ? 1 : smoothStep((progress - index / 3) / 0.09);
+  const leave =
+    index === 2 ? 0 : smoothStep((progress - (index + 1) / 3 + 0.09) / 0.09);
+  const opacity = enter * (1 - leave);
+  return (
+    <div
+      className="scroll-headline-panel"
+      inert={index !== slide || opacity === 0}
+      aria-hidden={index !== slide}
+      style={{
+        opacity,
+        transform: `translateY(${(1 - enter - leave) * 18}px)`,
+      }}
+    >
+      <StackedTileGroup {...group} tuning={tuning} />
     </div>
   );
 }

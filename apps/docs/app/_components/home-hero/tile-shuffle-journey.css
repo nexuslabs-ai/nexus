@@ -1,0 +1,5 @@
+.tile-shuffle-panel .stacked-headline-tile {
+  transition:
+    background-color var(--nx-motion-duration-fast),
+    color var(--nx-motion-duration-fast);
+}

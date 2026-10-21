@@ -13,6 +13,7 @@ import { useJourneyColors } from './journey-colors';
 import { RotatingHeadlineJourney } from './RotatingHeadlineJourney';
 import { ScrollHeadlineJourney } from './ScrollHeadlineJourney';
 import { StackedHeadlineJourney } from './StackedHeadlineJourney';
+import { TileShuffleJourney } from './TileShuffleJourney';
 import { TiltedCtaJourney } from './TiltedCtaJourney';
 import { TiltedJourney } from './TiltedJourney';
 import { VinylJourney } from './VinylJourney';
@@ -22,6 +23,12 @@ import 'dialkit/styles.css';
 import './hero-dial-lab.css';
 
 const iterations = [
+  {
+    value: 'tile-shuffle',
+    name: 'Tile shuffle',
+    preset: null,
+    description: 'Scroll-driven staggered tiles that lift, turn, and settle.',
+  },
   {
     value: 'scroll-headlines',
     name: 'Scroll headlines',
@@ -119,6 +126,7 @@ const config = {
       { value: 'rotating', label: 'Rotating headline' },
       { value: 'stacked-headlines', label: 'Stacked headlines' },
       { value: 'scroll-headlines', label: 'Scroll headlines' },
+      { value: 'tile-shuffle', label: 'Tile shuffle' },
       { value: 'compact', label: 'Compact row' },
       { value: 'workbench', label: 'Workbench grid' },
       { value: 'wheel', label: '3D wheel' },
@@ -557,6 +565,7 @@ export function HeroDialLab({ mode, children, ctaLinks, featureStripContent }) {
       rotating: RotatingHeadlineJourney,
       'stacked-headlines': StackedHeadlineJourney,
       'scroll-headlines': ScrollHeadlineJourney,
+      'tile-shuffle': TileShuffleJourney,
       'tilted-cta': TiltedCtaJourney,
       tilted: TiltedJourney,
       vinyl: VinylJourney,

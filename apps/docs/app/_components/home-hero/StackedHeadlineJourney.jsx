@@ -57,7 +57,13 @@ export const groups = [
   },
 ];
 
-export function StackedTileGroup({ title, tiles, tuning }) {
+export function StackedTileGroup({
+  title,
+  tiles,
+  tuning,
+  headingStyle,
+  tileStyles,
+}) {
   const { state } = useNexusAppearance();
   const [step, setStep] = useState(-1);
   const [hovered, setHovered] = useState(null);
@@ -88,7 +94,9 @@ export function StackedTileGroup({ title, tiles, tuning }) {
   ]);
   return (
     <div className="stacked-headline-group">
-      <p className="journey-heading">{title}</p>
+      <p className="journey-heading" style={headingStyle}>
+        {title}
+      </p>
       <div className="stacked-headline-tiles" role="group" aria-label={title}>
         {tiles.map(([label, Icon], index) => (
           <button
@@ -97,6 +105,7 @@ export function StackedTileGroup({ title, tiles, tuning }) {
             className={`journey-tile journey-color-${index} stacked-headline-tile`}
             aria-label={label}
             data-active={active === index}
+            style={tileStyles?.[index]}
             onMouseEnter={() => setHovered(index)}
             onMouseLeave={() => setHovered(null)}
             onFocus={() => setFocused(index)}
