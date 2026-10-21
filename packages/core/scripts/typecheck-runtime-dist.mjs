@@ -77,20 +77,20 @@ await writeFile(
   probePath,
   `import {
   BRAND_COLOR_PRESETS,
-  createNexusAppearanceBootstrapScript,
-  createNexusAppearanceSnapshotFromCookie,
-  createNexusAppearanceSnapshotFromState,
-  createNexusThemeContract,
-  DEFAULT_NEXUS_APPEARANCE,
+  createNxdsAppearanceBootstrapScript,
+  createNxdsAppearanceSnapshotFromCookie,
+  createNxdsAppearanceSnapshotFromState,
+  createNxdsThemeContract,
+  DEFAULT_NXDS_APPEARANCE,
   DEFAULT_STORAGE_KEY,
   deriveTheme,
   measureThemeContrast,
   resolveFirstPaint,
-  sanitizeNexusAppearance,
+  sanitizeNxdsAppearance,
   themeToCss,
   type BrandColorPreset,
   type Mode,
-  type NexusAppearanceState,
+  type NxdsAppearanceState,
   type SemanticColorName,
   type SurfaceToken,
   type ThemeContrastCheck,
@@ -166,18 +166,18 @@ if (catalogued) {
 const aliasName: CatalogueTokenName = '--color-background';
 void aliasName;
 
-const state: NexusAppearanceState = sanitizeNexusAppearance({
-  ...DEFAULT_NEXUS_APPEARANCE,
+const state: NxdsAppearanceState = sanitizeNxdsAppearance({
+  ...DEFAULT_NXDS_APPEARANCE,
   mode: 'system',
   brandColor: '#2563eb',
   surfaceTone: 'slate',
 });
 
-const snapshot = createNexusAppearanceSnapshotFromState(state);
-const serverSnapshot = createNexusAppearanceSnapshotFromCookie('', state);
-const theme = deriveTheme(createNexusThemeContract(state));
+const snapshot = createNxdsAppearanceSnapshotFromState(state);
+const serverSnapshot = createNxdsAppearanceSnapshotFromCookie('', state);
+const theme = deriveTheme(createNxdsThemeContract(state));
 const css: string = themeToCss(theme);
-const bootstrap: string = createNexusAppearanceBootstrapScript({
+const bootstrap: string = createNxdsAppearanceBootstrapScript({
   storageKey: DEFAULT_STORAGE_KEY,
   defaultSnapshot: snapshot,
 });
@@ -200,7 +200,7 @@ const colorName: SemanticColorName = 'popover-alpha';
 const unknownColorName: SemanticColorName = 'not-a-color-token';
 
 // @ts-expect-error proves the public state is not any.
-state.notARealNexusAppearanceField;
+state.notARealNxdsAppearanceField;
 
 void snapshot;
 void serverSnapshot;

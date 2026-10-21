@@ -94,7 +94,7 @@ function discoverEslintRuleRefs() {
  * Catches any un-forked upstream sibling (react/tailwind, or a future package),
  * while permitting the kept published deps and the eslint-plugin rule ids.
  */
-function findStrayNexusRefs(root, allowed) {
+function findStrayNxdsRefs(root, allowed) {
   const hits = [];
   const walk = (dir) => {
     for (const entry of fs.readdirSync(dir, { withFileTypes: true })) {
@@ -216,9 +216,9 @@ async function smokeImport(producedDir) {
   if (typeof utils.cn !== 'function') {
     throw new Error('Built utils.mjs did not export a `cn` helper.');
   }
-  if (typeof appearance.NexusAppearanceProvider !== 'function') {
+  if (typeof appearance.NxdsAppearanceProvider !== 'function') {
     throw new Error(
-      'Built appearance.mjs did not export `NexusAppearanceProvider`.'
+      'Built appearance.mjs did not export `NxdsAppearanceProvider`.'
     );
   }
 }
@@ -236,7 +236,7 @@ function assertCss(producedDir) {
     producedDir,
     'packages',
     'tailwind',
-    'nexus.css'
+    'nxds.css'
   );
   if (!fs.existsSync(reactCss) || fs.statSync(reactCss).size < 500) {
     throw new Error(
@@ -244,12 +244,12 @@ function assertCss(producedDir) {
     );
   }
   if (!fs.readFileSync(tailwindCss, 'utf8').includes('--nx-color-')) {
-    throw new Error('tailwind nexus.css does not emit `--nx-color-*` tokens.');
+    throw new Error('tailwind nxds.css does not emit `--nx-color-*` tokens.');
   }
 }
 
 async function main() {
-  const tmp = fs.mkdtempSync(path.join(os.tmpdir(), 'nexus-export-verify-'));
+  const tmp = fs.mkdtempSync(path.join(os.tmpdir(), 'nxds-export-verify-'));
   const producedDir = path.join(tmp, NAME);
   const tarballDir = path.join(tmp, 'tarballs');
   fs.mkdirSync(tarballDir, { recursive: true });
@@ -304,7 +304,7 @@ async function main() {
 
     await step('rebrand audit (no un-forked @nxds/* refs)', () => {
       const allowed = new Set([...KEEP_PACKAGES, ...discoverEslintRuleRefs()]);
-      const stray = findStrayNexusRefs(
+      const stray = findStrayNxdsRefs(
         path.join(producedDir, 'packages'),
         allowed
       );

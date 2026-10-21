@@ -92,14 +92,14 @@ for (const file of htmlFiles) {
   const html = readFileSync(file, 'utf8');
   const scripts = [...html.matchAll(inlineScriptPattern)];
   const appearance = scripts.filter(([, attrs]) =>
-    attrs.includes('data-nexus-appearance-script')
+    attrs.includes('data-nxds-appearance-script')
   );
 
   inlineScripts += scripts.length;
   inlineStyleAttributes += html.match(/\sstyle="/g)?.length ?? 0;
   appearanceScripts += appearance.length;
   docsStorageScripts += appearance.filter(([, , body]) =>
-    body.includes('nexus-docs-appearance')
+    body.includes('nxds-docs-appearance')
   ).length;
 
   for (const [, , body] of appearance) {

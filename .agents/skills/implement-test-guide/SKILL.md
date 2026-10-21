@@ -35,7 +35,7 @@ This skill works with multiple input types:
 
 ## Package-Specific Testing Patterns
 
-Nexus tests only four kinds of thing — see `.claude/rules/testing.md` § Scope. Based on what you're testing:
+nxds tests only four kinds of thing — see `.claude/rules/testing.md` § Scope. Based on what you're testing:
 
 | Target               | Detect By                                            | Testing Approach                                                    |
 | -------------------- | ---------------------------------------------------- | ------------------------------------------------------------------- |
@@ -98,7 +98,7 @@ Always load and follow:
 3. **Stub only what the environment lacks:**
    - Replace a browser API the runner has no implementation of (e.g.
      `matchMedia`)
-   - Never mock Nexus's own functions
+   - Never mock nxds's own functions
 
 ### Phase 3: Implement Tests
 
@@ -258,7 +258,7 @@ expect(result.error.code).toBe('VALIDATION_ERROR');
 1. **Result validation over coverage** — Good assertions matter more than line count
 2. **Real inputs** — Use actual data patterns from the system
 3. **Partial matching** — Assert on what matters, not everything
-4. **Stub the browser, not Nexus** — Replace an API the runner lacks; never mock Nexus's own functions
+4. **Stub the browser, not nxds** — Replace an API the runner lacks; never mock nxds's own functions
 5. **Determinism** — Tests must produce same result every time
 6. **One focus per test** — Each test should have one reason to fail
 7. **Readable tests** — Test code is documentation

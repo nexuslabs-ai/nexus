@@ -285,7 +285,7 @@ const meta: Meta = {
     docs: {
       description: {
         component:
-          'Typography tokens — sizes, weights, line-heights, and font families — plus the composite `nx:typography-*` utilities. Stories render live CSS variables from the active Nexus Appearance provider.',
+          'Typography tokens — sizes, weights, line-heights, and font families — plus the composite `nx:typography-*` utilities. Stories render live CSS variables from the active nxds Appearance provider.',
       },
     },
   },

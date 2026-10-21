@@ -1,11 +1,15 @@
 import type { Metadata } from 'next';
 
 export const SITE_URL = 'https://nxds.dev';
-export const SITE_NAME = 'Nexus UI';
-export const SITE_ALTERNATE_NAME = 'Nexus Design System';
-export const SITE_TITLE = 'Nexus UI — theme engine and design system';
+export const SITE_NAME = 'nxds';
+export const SITE_ALTERNATE_NAMES = [
+  'nxds design system',
+  'Nexus UI',
+  'nexusui',
+];
+export const SITE_TITLE = 'nxds — theme engine and design system';
 export const SITE_DESCRIPTION =
-  'Nexus UI is a framework-agnostic theme engine and design system. Set one appearance object, and every component follows your brand, density and corners.';
+  'nxds is a framework-agnostic theme engine and design system. Set one appearance object, and every component follows your brand, density and corners.';
 
 export const REPO_URL = 'https://github.com/nexuslabs-ai/nxds';
 export const STORYBOOK_URL = 'https://storybook.nxds.dev';

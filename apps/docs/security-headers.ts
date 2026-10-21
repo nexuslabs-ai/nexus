@@ -1,6 +1,6 @@
 import {
-  createNexusAppearanceBootstrapScript,
-  createNexusAppearanceSnapshotFromState,
+  createNxdsAppearanceBootstrapScript,
+  createNxdsAppearanceSnapshotFromState,
 } from '@nxds/core';
 import { createHash } from 'node:crypto';
 
@@ -9,9 +9,9 @@ import {
   DOCS_APPEARANCE_STORAGE_KEY,
 } from './app/_lib/appearance-controls';
 
-const DOCS_APPEARANCE_BOOTSTRAP_SCRIPT = createNexusAppearanceBootstrapScript({
+const DOCS_APPEARANCE_BOOTSTRAP_SCRIPT = createNxdsAppearanceBootstrapScript({
   storageKey: DOCS_APPEARANCE_STORAGE_KEY,
-  defaultSnapshot: createNexusAppearanceSnapshotFromState(
+  defaultSnapshot: createNxdsAppearanceSnapshotFromState(
     DOCS_APPEARANCE_DEFAULT_STATE
   ),
 });

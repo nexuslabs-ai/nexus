@@ -23,7 +23,7 @@ import {
   TableHeader,
   TableRow,
   TableRowHeader,
-} from './nexus';
+} from './nxds';
 
 const CELL_CLASS = 'nx:align-top nx:whitespace-normal';
 

@@ -1,32 +1,32 @@
-import { BASE_TONE_OPTIONS, DEFAULT_NEXUS_APPEARANCE } from '@nxds/core';
+import { BASE_TONE_OPTIONS, DEFAULT_NXDS_APPEARANCE } from '@nxds/core';
 import type { Meta, StoryObj } from '@storybook/react';
 import { expect, fn, userEvent, waitFor, within } from 'storybook/test';
 
-import { NexusAppearanceProvider } from '../provider';
+import { NxdsAppearanceProvider } from '../provider';
 
-import { NexusThemeQuickControl } from './theme-quick-control';
+import { NxdsThemeQuickControl } from './theme-quick-control';
 
-const meta: Meta<typeof NexusThemeQuickControl> = {
+const meta: Meta<typeof NxdsThemeQuickControl> = {
   title: 'Appearance/ThemeQuickControl',
-  component: NexusThemeQuickControl,
+  component: NxdsThemeQuickControl,
   parameters: {
     docs: {
       description: {
         component:
-          'NexusThemeQuickControl is an icon button that opens a popover for mode, surface tone and brand color. Render it inside NexusAppearanceProvider. For every setting, use NexusAppearanceSettings.',
+          'NxdsThemeQuickControl is an icon button that opens a popover for mode, surface tone and brand color. Render it inside NxdsAppearanceProvider. For every setting, use NxdsAppearanceSettings.',
       },
     },
   },
   decorators: [
     (Story) => (
-      <NexusAppearanceProvider storageKey={false}>
+      <NxdsAppearanceProvider storageKey={false}>
         <Story />
-      </NexusAppearanceProvider>
+      </NxdsAppearanceProvider>
     ),
   ],
 };
 export default meta;
-type Story = StoryObj<typeof NexusThemeQuickControl>;
+type Story = StoryObj<typeof NxdsThemeQuickControl>;
 
 function triggerIn(canvasElement: HTMLElement) {
   return within(canvasElement).getByRole('button', { name: 'Theme' });
@@ -111,7 +111,7 @@ export const KeyboardInteraction: Story = {
 };
 
 const OTHER_TONE = BASE_TONE_OPTIONS.find(
-  (option) => option.value !== DEFAULT_NEXUS_APPEARANCE.surfaceTone
+  (option) => option.value !== DEFAULT_NXDS_APPEARANCE.surfaceTone
 )!;
 
 export const SurfaceTone: Story = {

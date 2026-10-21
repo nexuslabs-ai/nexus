@@ -19,7 +19,7 @@ import { componentsRoot, isUnder, reactSrc, toRepoPath } from './roots.mjs';
 
 export const DOCS_TAG = 'docs';
 
-// TODO(#796): give Appearance a preview once appearance can be scoped to `[data-nexus-root]`.
+// TODO(#796): give Appearance a preview once appearance can be scoped to `[data-nxds-root]`.
 /** Components whose page has no preview, keyed to the reason. */
 export const PREVIEWLESS_COMPONENTS = new Map([
   [

@@ -102,19 +102,19 @@ const meta: Meta<typeof InlineEdit> = {
               Copy <code>blocks/editing/inline-edit/inline-edit.tsx</code>.
             </li>
             <li>
-              It needs these Nexus component folders, including the ones those
+              It needs these nxds component folders, including the ones those
               folders import: <code>button</code>, <code>button-group</code>,{' '}
               <code>field</code>, <code>input</code>, <code>label</code>,{' '}
               <code>separator</code>, <code>spinner</code> and <code>lib/</code>
               . If your copy lives elsewhere, update the relative imports.
             </li>
             <li>
-              <code>@tabler/icons-react</code>, which the Nexus components
+              <code>@tabler/icons-react</code>, which the nxds components
               already use.
             </li>
             <li>
               Include the copied file in your Tailwind source scan and use the
-              Nexus theme and styles setup.
+              nxds theme and styles setup.
             </li>
             <li>
               Your application owns the value, saving, validation beyond

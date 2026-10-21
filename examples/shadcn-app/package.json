@@ -6,7 +6,7 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "nexus:add": "node ../scripts/sync-nexus.mjs",
+    "nxds:add": "node ../scripts/sync-nxds.mjs",
     "typecheck": "next typegen && tsc --noEmit -p ."
   },
   "dependencies": {

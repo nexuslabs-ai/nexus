@@ -3,7 +3,7 @@
   "version": "0.1.0",
   "private": true,
   "type": "module",
-  "description": "Acme's design-system package: its shadcn kit, plus Nexus copied in",
+  "description": "Acme's design-system package: its shadcn kit, plus nxds copied in",
   "files": [
     "dist"
   ],
@@ -12,16 +12,16 @@
       "types": "./dist/index.d.ts",
       "import": "./dist/index.js"
     },
-    "./nexus": {
-      "types": "./dist/nexus.d.ts",
-      "import": "./dist/nexus.js"
+    "./nxds": {
+      "types": "./dist/nxds.d.ts",
+      "import": "./dist/nxds.js"
     },
     "./styles.css": "./dist/styles.css",
-    "./nexus.css": "./dist/nexus.css"
+    "./nxds.css": "./dist/nxds.css"
   },
   "scripts": {
     "build": "node build.mjs",
-    "nexus:add": "node ../../scripts/sync-nexus.mjs",
+    "nxds:add": "node ../../scripts/sync-nxds.mjs",
     "typecheck": "tsc -p tsconfig.build.json --noEmit"
   },
   "peerDependencies": {

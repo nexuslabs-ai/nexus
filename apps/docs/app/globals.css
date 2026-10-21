@@ -1,5 +1,5 @@
-/* Nexus design tokens + Tailwind utilities (nx: prefix).
-   @nxds/tailwind is the SINGLE source of token definitions. Nexus ships
+/* nxds design tokens + Tailwind utilities (nx: prefix).
+   @nxds/tailwind is the SINGLE source of token definitions. nxds ships
    no reset, so the docs bring Tailwind's Preflight like any host app. */
 @layer theme, base, components, utilities;
 @import 'tailwindcss/preflight.css' layer(base);

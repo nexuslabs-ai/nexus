@@ -1,10 +1,10 @@
-import { createNexusAppearance } from '@acme/ui/nexus'
+import { createNxdsAppearance } from '@acme/ui/nxds'
 
 import { APPEARANCE_STORAGE_KEY, defaultAppearance } from './appearance-state'
 
-export { useNexusAppearance } from '@acme/ui/nexus'
+export { useNxdsAppearance } from '@acme/ui/nxds'
 
-export const { NexusAppearanceProvider } = createNexusAppearance({
+export const { NxdsAppearanceProvider } = createNxdsAppearance({
   storageKey: APPEARANCE_STORAGE_KEY,
   defaultState: defaultAppearance,
 })

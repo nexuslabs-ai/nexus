@@ -23,7 +23,7 @@ import {
  */
 
 export const description =
-  'Build an accessible settings form from Nexus UI fields, with labels, help text, validation errors, and read-only and disabled states.';
+  'Build an accessible settings form from nxds fields, with labels, help text, validation errors, and read-only and disabled states.';
 
 const FORM_COMPONENTS =
   'button, button-group/button-group-context.ts, checkbox, field, input, label, separator, spinner and lib/';
@@ -38,7 +38,7 @@ const IMPLEMENTATIONS: {
     need: 'A small settings form with local React state',
     copy: 'settings-form.tsx, settings-layout.tsx and settings-fields.tsx',
     components: FORM_COMPONENTS,
-    dependency: 'None beyond Nexus and React',
+    dependency: 'None beyond nxds and React',
   },
   {
     need: 'Your app uses React Hook Form',
@@ -57,7 +57,7 @@ const IMPLEMENTATIONS: {
     copy: 'settings-display.tsx',
     components:
       'checkbox, description-list, field, input, label, separator and lib/',
-    dependency: 'None beyond Nexus and React',
+    dependency: 'None beyond nxds and React',
   },
 ];
 
@@ -130,7 +130,7 @@ export default function Forms() {
     <>
       <h1 className="nx:typography-heading-large">Forms</h1>
       <p className="nx:typography-body-default nx:text-muted-foreground nx:mt-2 nx:mb-4 nx:max-w-[64ch]">
-        Build a settings form from Nexus components. The form comes in three
+        Build a settings form from nxds components. The form comes in three
         versions: plain React state, React Hook Form and TanStack Form.
       </p>
       <p className="nx:typography-body-default nx:text-muted-foreground nx:mb-8 nx:max-w-[64ch]">

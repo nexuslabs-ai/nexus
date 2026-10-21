@@ -10,7 +10,7 @@ export const spacingTokenRuleSet = {
   '@nxds/canonical-spacing-steps': 'error',
 };
 
-export function nexusComponentConfig(options = {}) {
+export function nxdsComponentConfig(options = {}) {
   const { files } = options;
 
   return {
@@ -22,7 +22,7 @@ export function nexusComponentConfig(options = {}) {
   };
 }
 
-export function nexusSpacingTokenConfig(options = {}) {
+export function nxdsSpacingTokenConfig(options = {}) {
   const { files, parser } = options;
 
   return {
@@ -45,6 +45,6 @@ export default {
   plugin,
   componentRuleSet,
   spacingTokenRuleSet,
-  nexusComponentConfig,
-  nexusSpacingTokenConfig,
+  nxdsComponentConfig,
+  nxdsSpacingTokenConfig,
 };

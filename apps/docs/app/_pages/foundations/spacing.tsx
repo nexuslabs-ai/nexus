@@ -13,7 +13,7 @@ import { SectionHeading } from '../../_components/Heading';
  */
 
 export const description =
-  'The Nexus UI spacing scale, its role tokens and six density modes. Change density once, and every padding and gap follows.';
+  'The nxds spacing scale, its role tokens and six density modes. Change density once, and every padding and gap follows.';
 
 const SCALE: { name: string; px: number }[] = [
   { name: '0_5', px: 2 },
@@ -78,7 +78,7 @@ export default function Spacing() {
         <p className="nx:typography-body-default nx:text-muted-foreground nx:mb-4 nx:max-w-[64ch]">
           Fourteen steps, from 2px to 128px. Each bar uses its{' '}
           <code>--nx-spacing-N</code> variable, so it resizes with{' '}
-          <code>density</code>. Nexus has no base <code>--spacing</code> token.
+          <code>density</code>. nxds has no base <code>--spacing</code> token.
         </p>
         <div className="nx:flex nx:flex-col nx:gap-2">
           {SCALE.map((step) => (

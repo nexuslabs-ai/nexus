@@ -4,7 +4,7 @@ import { useState } from 'react';
 
 import { Input } from '../../input/input';
 
-export interface NexusAppearanceColorFieldProps {
+export interface NxdsAppearanceColorFieldProps {
   value: string;
   onChange: (hex: string) => void;
   label: string;
@@ -20,11 +20,11 @@ function normalizeHex(value: string) {
   return null;
 }
 
-export function NexusAppearanceColorField({
+export function NxdsAppearanceColorField({
   value,
   onChange,
   label,
-}: NexusAppearanceColorFieldProps) {
+}: NxdsAppearanceColorFieldProps) {
   const [draft, setDraft] = useState(value);
   // Re-sync the draft when the committed value changes, during render (no effect).
   const [lastValue, setLastValue] = useState(value);

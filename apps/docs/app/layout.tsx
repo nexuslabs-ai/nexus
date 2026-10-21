@@ -1,5 +1,5 @@
-import { NexusAppearanceProvider } from '@nxds/react/appearance';
-import { NexusAppearanceScript } from '@nxds/react/appearance/server';
+import { NxdsAppearanceProvider } from '@nxds/react/appearance';
+import { NxdsAppearanceScript } from '@nxds/react/appearance/server';
 import type { Metadata } from 'next';
 
 import { CopyAnnouncerProvider } from './_components/CopyAnnouncer';
@@ -43,18 +43,18 @@ export default function RootLayout({
       suppressHydrationWarning
     >
       <head>
-        <NexusAppearanceScript
+        <NxdsAppearanceScript
           storageKey={DOCS_APPEARANCE_STORAGE_KEY}
           defaultState={DOCS_APPEARANCE_DEFAULT_STATE}
         />
       </head>
       <body className="nx:min-h-svh nx:bg-background nx:text-foreground nx:typography-body-default">
-        <NexusAppearanceProvider
+        <NxdsAppearanceProvider
           storageKey={DOCS_APPEARANCE_STORAGE_KEY}
           defaultState={DOCS_APPEARANCE_DEFAULT_STATE}
         >
           <CopyAnnouncerProvider>{children}</CopyAnnouncerProvider>
-        </NexusAppearanceProvider>
+        </NxdsAppearanceProvider>
       </body>
     </html>
   );

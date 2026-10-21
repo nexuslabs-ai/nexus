@@ -71,7 +71,7 @@ export function EnginePipeline() {
       <Step>
         <Stage
           title="Build time"
-          detail="Default colors and every spacing, radius, shadow and border option written into nexus.css."
+          detail="Default colors and every spacing, radius, shadow and border option written into nxds.css."
         />
         <Stage
           title="Runtime"

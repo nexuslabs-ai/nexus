@@ -132,7 +132,7 @@ const meta: Meta = {
     docs: {
       description: {
         component:
-          'Border radius and border width primitives rendered from the active Nexus Appearance provider. Use the Corners and Stroke toolbars to inspect the runtime values a consumer receives.',
+          'Border radius and border width primitives rendered from the active nxds Appearance provider. Use the Corners and Stroke toolbars to inspect the runtime values a consumer receives.',
       },
     },
   },

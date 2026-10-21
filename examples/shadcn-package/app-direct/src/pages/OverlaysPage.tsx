@@ -1,6 +1,6 @@
 import { toast } from "sonner"
 
-import * as N from "../components/nexus-kit"
+import * as N from "../components/nxds-kit"
 import {
   Button,
   Dialog,
@@ -30,25 +30,25 @@ import {
 
 const REGIONS = ["Frankfurt", "Virginia", "Singapore"]
 
-function ShadcnDialogWithNexusInside() {
+function ShadcnDialogWithNxdsInside() {
   return (
     <Dialog>
       <DialogTrigger asChild>
-        <Button data-check-open>shadcn dialog → Nexus inside</Button>
+        <Button data-check-open>shadcn dialog → nxds inside</Button>
       </DialogTrigger>
       <DialogContent data-check="host">
         <DialogHeader>
           <DialogTitle>Deploy settings</DialogTitle>
-          <DialogDescription>A shadcn dialog. Every control below is Nexus.</DialogDescription>
+          <DialogDescription>A shadcn dialog. Every control below is nxds.</DialogDescription>
         </DialogHeader>
-        <div data-check="nexus" className="grid gap-4">
+        <div data-check="nxds" className="grid gap-4">
           <div className="grid gap-2">
             <N.Label htmlFor="deploy-region">Region</N.Label>
             <N.Select defaultValue="Frankfurt">
               <N.SelectTrigger id="deploy-region">
                 <N.SelectValue />
               </N.SelectTrigger>
-              <N.SelectContent data-check="nexus">
+              <N.SelectContent data-check="nxds">
                 {REGIONS.map((region) => (
                   <N.SelectItem key={region} value={region}>
                     {region}
@@ -60,24 +60,24 @@ function ShadcnDialogWithNexusInside() {
           <div className="flex gap-2">
             <N.Popover>
               <N.PopoverTrigger asChild>
-                <N.Button variant="outline">Nexus popover</N.Button>
+                <N.Button variant="outline">nxds popover</N.Button>
               </N.PopoverTrigger>
-              <N.PopoverContent data-check="nexus">Rolls out to 10% of traffic first.</N.PopoverContent>
+              <N.PopoverContent data-check="nxds">Rolls out to 10% of traffic first.</N.PopoverContent>
             </N.Popover>
             <N.DropdownMenu>
               <N.DropdownMenuTrigger asChild>
-                <N.Button variant="outline">Nexus menu</N.Button>
+                <N.Button variant="outline">nxds menu</N.Button>
               </N.DropdownMenuTrigger>
-              <N.DropdownMenuContent data-check="nexus">
+              <N.DropdownMenuContent data-check="nxds">
                 <N.DropdownMenuItem>Redeploy</N.DropdownMenuItem>
                 <N.DropdownMenuItem>Roll back</N.DropdownMenuItem>
               </N.DropdownMenuContent>
             </N.DropdownMenu>
             <N.Tooltip>
               <N.TooltipTrigger asChild>
-                <N.Button variant="ghost">Nexus tooltip</N.Button>
+                <N.Button variant="ghost">nxds tooltip</N.Button>
               </N.TooltipTrigger>
-              <N.TooltipContent data-check="nexus">Last deploy 4 minutes ago</N.TooltipContent>
+              <N.TooltipContent data-check="nxds">Last deploy 4 minutes ago</N.TooltipContent>
             </N.Tooltip>
           </div>
         </div>
@@ -89,16 +89,16 @@ function ShadcnDialogWithNexusInside() {
   )
 }
 
-function NexusDialogWithShadcnInside() {
+function NxdsDialogWithShadcnInside() {
   return (
     <N.Dialog>
       <N.DialogTrigger asChild>
-        <N.Button data-check-open>Nexus dialog → shadcn inside</N.Button>
+        <N.Button data-check-open>nxds dialog → shadcn inside</N.Button>
       </N.DialogTrigger>
-      <N.DialogContent data-check="nexus">
+      <N.DialogContent data-check="nxds">
         <N.DialogHeader>
           <N.DialogTitle>Invite teammate</N.DialogTitle>
-          <N.DialogDescription>A Nexus dialog. Every control below is shadcn.</N.DialogDescription>
+          <N.DialogDescription>An nxds dialog. Every control below is shadcn.</N.DialogDescription>
         </N.DialogHeader>
         <N.DialogBody>
           <div data-check="host" className="grid gap-4">
@@ -160,8 +160,8 @@ export function OverlaysPage() {
       </div>
 
       <section data-check="host" className="flex flex-wrap gap-3">
-        <ShadcnDialogWithNexusInside />
-        <NexusDialogWithShadcnInside />
+        <ShadcnDialogWithNxdsInside />
+        <NxdsDialogWithShadcnInside />
       </section>
 
       <section data-check="host" className="grid gap-3">
@@ -173,8 +173,8 @@ export function OverlaysPage() {
           <Button variant="outline" onClick={() => toast.success("Saved with the shadcn toast")}>
             shadcn toast
           </Button>
-          <N.Button variant="outline" onClick={() => N.toast.success("Saved with the Nexus toast")}>
-            Nexus toast
+          <N.Button variant="outline" onClick={() => N.toast.success("Saved with the nxds toast")}>
+            nxds toast
           </N.Button>
         </div>
       </section>

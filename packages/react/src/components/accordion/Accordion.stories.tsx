@@ -72,7 +72,7 @@ export const Default: Story = {
       <AccordionItem value="item-2">
         <AccordionTrigger>Is it styled?</AccordionTrigger>
         <AccordionContent>
-          Yes. It comes with default styles that match the Nexus design system.
+          Yes. It comes with default styles that match the nxds design system.
         </AccordionContent>
       </AccordionItem>
       <AccordionItem value="item-3">
@@ -102,7 +102,7 @@ export const Stacked: Story = {
       <AccordionItem value="item-2">
         <AccordionTrigger>Is it styled?</AccordionTrigger>
         <AccordionContent>
-          Yes. It comes with default styles that match the Nexus design system.
+          Yes. It comes with default styles that match the nxds design system.
         </AccordionContent>
       </AccordionItem>
       <AccordionItem value="item-3">
@@ -181,7 +181,7 @@ export const Floating: Story = {
       <AccordionItem value="item-2">
         <AccordionTrigger>Is it styled?</AccordionTrigger>
         <AccordionContent>
-          Yes. It comes with default styles that match the Nexus design system.
+          Yes. It comes with default styles that match the nxds design system.
         </AccordionContent>
       </AccordionItem>
       <AccordionItem value="item-3">

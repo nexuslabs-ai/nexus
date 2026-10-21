@@ -11,7 +11,7 @@ import {
 import { formatOklch } from './oklch-format';
 import {
   type Mode,
-  type NexusSurfaceTone,
+  type NxdsSurfaceTone,
   type Shade,
   TIER_THRESHOLDS,
 } from './palette';
@@ -42,7 +42,7 @@ export interface ThemeSeeds {
 
 /** The derivation seeds `deriveTheme` consumes — no display preference. */
 export interface ThemeDerivationInput {
-  surfaceTone?: NexusSurfaceTone;
+  surfaceTone?: NxdsSurfaceTone;
   light: ThemeSeeds;
   dark: ThemeSeeds;
   /** 0–100 per mode. Higher values strengthen surface and content contrast. */
@@ -52,7 +52,7 @@ export interface ThemeDerivationInput {
   };
 }
 
-export interface NexusThemeContract extends ThemeDerivationInput {
+export interface NxdsThemeContract extends ThemeDerivationInput {
   /** Consumer display preference; not read by `deriveTheme`. */
   appearance: 'light' | 'dark' | 'system';
 }
@@ -117,7 +117,7 @@ const isSurfaceToken = (name: string): name is SurfaceToken =>
 /** Opaque surface tiers derived from the background seed + contrast Δ. */
 export function deriveSurfaces(
   backgroundHex: string,
-  surfaceTone: NexusSurfaceTone,
+  surfaceTone: NxdsSurfaceTone,
   mode: Mode,
   delta: number,
   contrast = 50
@@ -250,7 +250,7 @@ function deriveChart(mode: Mode): TokenMap {
 }
 
 function deriveAlpha(
-  surfaceTone: NexusSurfaceTone,
+  surfaceTone: NxdsSurfaceTone,
   mode: Mode,
   profile: ContrastProfile
 ): TokenMap {
@@ -382,7 +382,7 @@ const gamutColor = (value: string): string =>
 
 // Text in each mode is capped at the opposite mode's surface chroma: light ink
 // in dark mode sits closest to the light surfaces' tint, and vice versa.
-const textChromaCap = (surfaceTone: NexusSurfaceTone, mode: Mode): number =>
+const textChromaCap = (surfaceTone: NxdsSurfaceTone, mode: Mode): number =>
   mode === 'dark'
     ? SURFACE_TONE[surfaceTone].lightC
     : SURFACE_TONE[surfaceTone].darkC;

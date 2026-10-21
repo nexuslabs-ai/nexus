@@ -1,10 +1,10 @@
 import type { NextMDXOptions } from '@next/mdx';
 import type { Options } from 'rehype-pretty-code';
 
-import { NEXUS_CODE_THEME } from './code-theme';
+import { NXDS_CODE_THEME } from './code-theme';
 
 const SHIKI_OPTIONS = {
-  theme: NEXUS_CODE_THEME,
+  theme: NXDS_CODE_THEME,
   keepBackground: false,
   grid: false,
   // Only fills in a fence that declares no language; an unknown grammar is

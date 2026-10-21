@@ -1,4 +1,4 @@
-# Contributing to Nexus Design System
+# Contributing to nxds design system
 
 Project overview lives in [`README.md`](README.md). This is the day-to-day handbook — how to set up, run the dev servers, test, and ship.
 
@@ -76,7 +76,7 @@ glob per non-story row of [`.claude/rules/testing.md`](.claude/rules/testing.md)
 § Scope, and a component test file matches none of them.
 
 Outside stories, three kinds of unit test exist, all under the `unit` project
-(jsdom): the core engine's behaviour (`packages/core/src/lib`), the Nexus `cn`
+(jsdom): the core engine's behaviour (`packages/core/src/lib`), the nxds `cn`
 merge (`packages/react/src/lib/utils.test.ts`), and the ESLint plugin's rules
 (`packages/eslint-plugin/__tests__`). Apps, repo scripts and hooks have no
 tests of their own, and nothing uses snapshots.

@@ -1,6 +1,6 @@
 import { CodeSample } from '../../_components/CodeSample';
 import { SectionHeading } from '../../_components/Heading';
-import { Button, Checkbox, Input, Switch } from '../../_components/nexus';
+import { Button, Checkbox, Input, Switch } from '../../_components/nxds';
 
 /**
  * Foundations → Focus. Server component — the focus-ring contract: three
@@ -13,7 +13,7 @@ import { Button, Checkbox, Input, Switch } from '../../_components/nexus';
  */
 
 export const description =
-  'Every Nexus UI control shows the same focus-visible ring. Learn the three ring recipes and how to write your own accessible focus styles.';
+  'Every nxds control shows the same focus-visible ring. Learn the three ring recipes and how to write your own accessible focus styles.';
 
 const RECIPES: { name: string; members: string; ring: string }[] = [
   {
@@ -279,7 +279,7 @@ nx:focus-visible:outline-focus-default /* control: brand */`}
           the ring fades in instead of appearing on the keypress.
         </p>
         <p className="nx:typography-body-default nx:text-muted-foreground nx:max-w-[64ch]">
-          The Nexus ESLint rules flag <code>transition-colors</code> and a ring
+          The nxds ESLint rules flag <code>transition-colors</code> and a ring
           class in the same class string, <code>cva()</code> or{' '}
           <code>cn()</code> call. Use <code>nx:transition-control</code> or{' '}
           <code>nx:transition-field</code> instead:

@@ -10,12 +10,12 @@ import {
 } from './app/_components/Heading';
 import { InlineCode } from './app/_components/InlineCode';
 import { InstallBlock } from './app/_components/InstallBlock';
-import * as Nexus from './app/_components/nexus';
+import * as nxds from './app/_components/nxds';
 import { PropsTable } from './app/_components/PropsTable';
 
 /**
  * Required by @next/mdx in the App Router. Maps Markdown-rendered HTML to
- * Nexus-styled elements (typography utilities, semantic tokens) and exposes
+ * nxds-styled elements (typography utilities, semantic tokens) and exposes
  * the @nxds/react components so MDX authors can drop a live <Button> etc.
  * into prose with no import.
  */
@@ -135,7 +135,7 @@ export function useMDXComponents(components: MDXComponents): MDXComponents {
     InstallBlock,
     PropsTable,
     // live @nxds/react components, usable in MDX without an import
-    ...Nexus,
+    ...nxds,
     // caller-provided overrides win
     ...components,
   };

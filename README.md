@@ -1,6 +1,6 @@
-# Nexus UI
+# nxds
 
-Nexus UI is a framework-agnostic theme engine and design system. Set one appearance object, and every component follows your brand, density and corners. Docs: **<https://nxds.dev>**.
+nxds is a framework-agnostic theme engine and design system. Set one appearance object, and every component follows your brand, density and corners. Docs: **<https://nxds.dev>**.
 
 Three layers compose into one consumable surface:
 

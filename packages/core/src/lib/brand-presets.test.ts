@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 
-import { DEFAULT_NEXUS_APPEARANCE } from './appearance-model';
+import { DEFAULT_NXDS_APPEARANCE } from './appearance-model';
 import { BRAND_COLOR_PRESETS, findBrandColorPreset } from './brand-presets';
 import { isColor } from './perceptual-ramp';
 
@@ -8,7 +8,7 @@ describe('brand color presets', () => {
   it('leads with the default appearance brand color', () => {
     expect(BRAND_COLOR_PRESETS[0]).toMatchObject({
       value: 'default',
-      color: DEFAULT_NEXUS_APPEARANCE.brandColor,
+      color: DEFAULT_NXDS_APPEARANCE.brandColor,
     });
   });
 

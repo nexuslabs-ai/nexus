@@ -6,16 +6,16 @@ import { BrowserRouter } from 'react-router'
 
 import App from './App'
 import { APPEARANCE_STORAGE_KEY, defaultAppearance } from './appearance-state'
-import { createNexusAppearance } from './components/nexus/components/appearance/provider'
+import { createNxdsAppearance } from './components/nxds/components/appearance/provider'
 
-import './nexus.css'
+import './nxds.css'
 
 const theme = createTheme({
   colorSchemes: { dark: true },
   cssVariables: { colorSchemeSelector: 'class' },
 })
 
-const { NexusAppearanceProvider } = createNexusAppearance({
+const { NxdsAppearanceProvider } = createNxdsAppearance({
   storageKey: APPEARANCE_STORAGE_KEY,
   defaultState: defaultAppearance,
 })
@@ -24,11 +24,11 @@ createRoot(document.getElementById('root')!).render(
   <StrictMode>
     <ThemeProvider theme={theme}>
       <CssBaseline />
-      <NexusAppearanceProvider>
+      <NxdsAppearanceProvider>
         <BrowserRouter>
           <App />
         </BrowserRouter>
-      </NexusAppearanceProvider>
+      </NxdsAppearanceProvider>
     </ThemeProvider>
   </StrictMode>,
 )

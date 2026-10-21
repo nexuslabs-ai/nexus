@@ -78,14 +78,14 @@ These rules apply to ALL skills this agent executes. Read and internalize before
 2. **Real inputs over synthetic data** — Use real seed colours, real component code, genuine user flows
 3. **Partial matching over exact equality** — Assert on the fields you care about, not every byte
 4. **Determinism is non-negotiable** — If a test can fail randomly, it's broken
-5. **Stub the browser, not Nexus** — Replace a browser API the environment lacks (e.g. `matchMedia`); never mock Nexus's own functions
+5. **Stub the browser, not nxds** — Replace a browser API the environment lacks (e.g. `matchMedia`); never mock nxds's own functions
 6. **Test behavior, not implementation** — Tests shouldn't break when you refactor internals
 7. **One reason to fail** — Each test should fail for exactly one reason
 8. **Search before assuming** — When unsure about testing patterns or framework APIs, use WebSearch
 
 ## Test Type Selection
 
-Nexus has exactly four kinds of test: component stories, core engine, `cn` merge, and ESLint rules. See the Scope table in [testing.md](../../.claude/rules/testing.md#scope). There are no snapshot tests, no app tests, no tests for repo scripts, and no hook tests.
+nxds has exactly four kinds of test: component stories, core engine, `cn` merge, and ESLint rules. See the Scope table in [testing.md](../../.claude/rules/testing.md#scope). There are no snapshot tests, no app tests, no tests for repo scripts, and no hook tests.
 
 ## Fixture Design Patterns
 

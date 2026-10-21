@@ -3,7 +3,7 @@ import { readdirSync, readFileSync } from 'node:fs';
 import { resolve } from 'node:path';
 import { beforeAll, describe, expect, it } from 'vitest';
 
-// Nexus sits inside apps it does not own, so its compiled CSS may only style
+// nxds sits inside apps it does not own, so its compiled CSS may only style
 // nx: classes and set --nx-* variables. A global rule must select a variable
 // scope and set variables. Tailwind's own internals are allowed by name.
 
@@ -11,11 +11,11 @@ const TAILWIND_DIR = resolve(process.cwd(), 'packages/tailwind');
 const REACT_SRC = resolve(process.cwd(), 'packages/react/src');
 const SCOPE = String.raw`(?::root|:host|\.dark|\[data-[a-z]+=['"]?[a-z-]+['"]?\])+`;
 const VARIABLE_SCOPE = new RegExp(`^${SCOPE}(?: ${SCOPE})*$`);
-const NEXUS_CLASS = /^\.nx\\:/;
+const NXDS_CLASS = /^\.nx\\:/;
 // Tailwind's registered-property fallbacks for older engines.
 const TAILWIND_PROPERTIES_RULE = '*, ::before, ::after, ::backdrop';
 const TAILWIND_KEYFRAMES = new Set(['spin', 'ping', 'pulse', 'bounce']);
-// tw-animate-css, which the Install page's entry imports beside nexus.css.
+// tw-animate-css, which the Install page's entry imports beside nxds.css.
 const TW_ANIMATE_KEYFRAMES = new Set([
   'enter',
   'exit',
@@ -27,7 +27,7 @@ const TW_ANIMATE_KEYFRAMES = new Set([
 ]);
 // The entry the Install page tells consumers to import.
 const CONSUMER_ENTRY = [
-  "@import './nexus.css';",
+  "@import './nxds.css';",
   "@import 'tw-animate-css';",
   "@import '../react/src/components/progress/progress.css';",
 ].join('\n');
@@ -40,7 +40,7 @@ interface Rule {
 let css = '';
 let rules: Rule[] = [];
 
-function nexusCandidates(): string[] {
+function nxdsCandidates(): string[] {
   const candidates = new Set<string>();
   for (const file of readdirSync(REACT_SRC, {
     recursive: true,
@@ -110,7 +110,7 @@ function rulesOf(stylesheet: string): Rule[] {
         // to that keyframe or utility.
         const nested = stack.some(
           ({ selector }) =>
-            selector.startsWith('@keyframes') || NEXUS_CLASS.test(selector)
+            selector.startsWith('@keyframes') || NXDS_CLASS.test(selector)
         );
         if (!rule.selector.startsWith('@') && !nested) found.push(rule);
       }
@@ -127,7 +127,7 @@ beforeAll(async () => {
     base: TAILWIND_DIR,
     onDependency() {},
   });
-  css = compiler.build(nexusCandidates());
+  css = compiler.build(nxdsCandidates());
   rules = rulesOf(css);
 }, 60_000);
 
@@ -137,7 +137,7 @@ describe('generated CSS scope', () => {
     for (const { selector } of rules) {
       if (selector === TAILWIND_PROPERTIES_RULE) continue;
       for (const part of selectorsIn(selector)) {
-        if (NEXUS_CLASS.test(part)) continue;
+        if (NXDS_CLASS.test(part)) continue;
         expect(part, selector).toMatch(VARIABLE_SCOPE);
       }
     }
@@ -145,7 +145,7 @@ describe('generated CSS scope', () => {
 
   it('declares only --nx-* variables outside nx: classes', () => {
     for (const { selector, declarations } of rules) {
-      if (NEXUS_CLASS.test(selector)) continue;
+      if (NXDS_CLASS.test(selector)) continue;
       for (const declaration of declarations) {
         if (selector === '.dark' && declaration === 'color-scheme: dark') {
           continue;
@@ -157,7 +157,7 @@ describe('generated CSS scope', () => {
     }
   });
 
-  it('prefixes every Nexus keyframe with nx-', () => {
+  it('prefixes every nxds keyframe with nx-', () => {
     const names = [...css.matchAll(/@keyframes\s+([\w-]+)/g)].map(
       ([, name]) => name ?? ''
     );

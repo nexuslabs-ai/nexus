@@ -1,10 +1,10 @@
 import js from '@eslint/js';
 import eslintCommentsPlugin from '@eslint-community/eslint-plugin-eslint-comments';
 import {
-  nexusComponentConfig,
-  nexusSpacingTokenConfig,
+  nxdsComponentConfig,
+  nxdsSpacingTokenConfig,
 } from '@nxds/eslint-plugin/config';
-import { nexusTailwindClassesConfig } from '@nxds/eslint-plugin/tailwind';
+import { nxdsTailwindClassesConfig } from '@nxds/eslint-plugin/tailwind';
 import prettierConfig from 'eslint-config-prettier';
 import jsxA11yPlugin from 'eslint-plugin-jsx-a11y';
 import reactPlugin from 'eslint-plugin-react';
@@ -245,14 +245,14 @@ export default tseslint.config(
     },
   },
 
-  // Nexus: enforce documented component rules as lint — nx: class conventions
+  // nxds: enforce documented component rules as lint — nx: class conventions
   // (ported from the former lint-nx-prefix Claude hook), composition over
   // render props, and handler extraction. Scoped to component-bearing source
   // (React package + apps). Hand-written stories are linted too; any
   // `__generated__` output stays excluded via the global ignore.
   {
     files: ['packages/react/src/**/*.{ts,tsx}', 'apps/**/*.{ts,tsx}'],
-    ...nexusComponentConfig(),
+    ...nxdsComponentConfig(),
   },
 
   // The docs read defaults from code and examples from docs stories, so the
@@ -262,11 +262,11 @@ export default tseslint.config(
     rules: { '@nxds/no-jsdoc-data-tags': 'error' },
   },
 
-  nexusTailwindClassesConfig({
+  nxdsTailwindClassesConfig({
     files: ['packages/react/src/**/*.{ts,tsx}'],
     entryPoint: repoPath('packages/react/.storybook/preview.css'),
   }),
-  nexusTailwindClassesConfig({
+  nxdsTailwindClassesConfig({
     files: ['apps/docs/**/*.{ts,tsx}'],
     entryPoint: repoPath('apps/docs/app/globals.css'),
   }),
@@ -341,10 +341,10 @@ export default tseslint.config(
     },
   },
 
-  // Nexus: gate px values in spacing mode files to the canonical step set.
+  // nxds: gate px values in spacing mode files to the canonical step set.
   {
     files: ['packages/core/tokens/semantic/spacing-*.json'],
-    ...nexusSpacingTokenConfig({ parser: jsoncParser }),
+    ...nxdsSpacingTokenConfig({ parser: jsoncParser }),
   },
 
   // Disable rules that conflict with Prettier

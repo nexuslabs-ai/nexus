@@ -8,7 +8,7 @@
     "build": "tsc -b && vite build",
     "lint": "oxlint",
     "preview": "vite preview",
-    "nexus:add": "node ../../scripts/sync-nexus.mjs"
+    "nxds:add": "node ../../scripts/sync-nxds.mjs"
   },
   "dependencies": {
     "@acme/ui": "file:../ui",

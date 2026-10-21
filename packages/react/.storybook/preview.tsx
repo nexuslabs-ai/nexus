@@ -3,18 +3,18 @@ import { useCallback, useEffect, useMemo, useState } from 'react';
 import {
   BASE_TONE_OPTIONS,
   CORNER_OPTIONS,
-  DEFAULT_NEXUS_APPEARANCE,
+  DEFAULT_NXDS_APPEARANCE,
   DENSITY_OPTIONS,
   ELEVATION_OPTIONS,
-  type NexusAppearanceMode,
-  type NexusAppearanceState,
-  sanitizeNexusAppearance,
+  type NxdsAppearanceMode,
+  type NxdsAppearanceState,
+  sanitizeNxdsAppearance,
   STROKE_OPTIONS,
 } from '@nxds/core';
 import type { Decorator, Preview } from '@storybook/react-vite';
 import { useGlobals } from 'storybook/preview-api';
 
-import { NexusAppearanceProvider } from '../src/components/appearance/provider';
+import { NxdsAppearanceProvider } from '../src/components/appearance/provider';
 
 // Storybook needs the full token set to render. The shipped component CSS
 // (src/index.css) is utilities-only by design — tokens come from the consumer's
@@ -64,7 +64,7 @@ const MODE_OPTIONS = [
   { value: 'dark', label: 'Dark', icon: 'moon' },
   { value: 'system', label: 'System', icon: 'circlehollow' },
 ] as const satisfies readonly {
-  value: NexusAppearanceMode;
+  value: NxdsAppearanceMode;
   label: string;
   icon: string;
 }[];
@@ -82,11 +82,11 @@ function pickOption<const T extends readonly { value: string }[]>(
 
 function appearanceStateFromGlobals(
   globals: Record<string, unknown>
-): NexusAppearanceState {
-  const defaults = DEFAULT_NEXUS_APPEARANCE;
+): NxdsAppearanceState {
+  const defaults = DEFAULT_NXDS_APPEARANCE;
   const prefs = defaults.prefs;
 
-  return sanitizeNexusAppearance({
+  return sanitizeNxdsAppearance({
     ...defaults,
     mode: pickOption(globals.mode, MODE_OPTIONS, defaults.mode),
     brandColor:
@@ -146,7 +146,7 @@ function appearanceStateFromGlobals(
 }
 
 function globalsFromAppearanceState(
-  state: NexusAppearanceState
+  state: NxdsAppearanceState
 ): Record<AppearanceGlobalKey, string | number | boolean> {
   return {
     mode: state.mode,
@@ -169,8 +169,8 @@ function globalsFromAppearanceState(
 }
 
 function appearanceStatesEqual(
-  a: NexusAppearanceState,
-  b: NexusAppearanceState
+  a: NxdsAppearanceState,
+  b: NxdsAppearanceState
 ): boolean {
   const aGlobals = globalsFromAppearanceState(a);
   const bGlobals = globalsFromAppearanceState(b);
@@ -203,7 +203,7 @@ const AppearanceDecorator: Decorator = (Story, context) => {
   }, [globalsState]);
 
   const handleStateChange = useCallback(
-    (nextState: NexusAppearanceState) => {
+    (nextState: NxdsAppearanceState) => {
       setAppearanceState(nextState);
 
       const nextGlobals = globalsFromAppearanceState(nextState);
@@ -225,7 +225,7 @@ const AppearanceDecorator: Decorator = (Story, context) => {
   );
 
   return (
-    <NexusAppearanceProvider
+    <NxdsAppearanceProvider
       state={appearanceState}
       storageKey={false}
       onStateChange={handleStateChange}
@@ -235,7 +235,7 @@ const AppearanceDecorator: Decorator = (Story, context) => {
       >
         <Story />
       </div>
-    </NexusAppearanceProvider>
+    </NxdsAppearanceProvider>
   );
 };
 
@@ -308,22 +308,22 @@ const preview: Preview = {
     },
   },
   initialGlobals: {
-    mode: DEFAULT_NEXUS_APPEARANCE.mode,
-    brandColor: DEFAULT_NEXUS_APPEARANCE.brandColor,
-    surfaceTone: DEFAULT_NEXUS_APPEARANCE.surfaceTone,
-    lightContrast: DEFAULT_NEXUS_APPEARANCE.lightContrast,
-    darkContrast: DEFAULT_NEXUS_APPEARANCE.darkContrast,
-    density: DEFAULT_NEXUS_APPEARANCE.density,
-    corners: DEFAULT_NEXUS_APPEARANCE.corners,
-    elevation: DEFAULT_NEXUS_APPEARANCE.elevation,
-    stroke: DEFAULT_NEXUS_APPEARANCE.stroke,
-    uiFont: DEFAULT_NEXUS_APPEARANCE.prefs.uiFont,
-    codeFont: DEFAULT_NEXUS_APPEARANCE.prefs.codeFont,
-    uiFontSize: DEFAULT_NEXUS_APPEARANCE.prefs.uiFontSize,
-    codeFontSize: DEFAULT_NEXUS_APPEARANCE.prefs.codeFontSize,
-    reduceMotion: DEFAULT_NEXUS_APPEARANCE.prefs.reduceMotion,
-    pointerCursors: DEFAULT_NEXUS_APPEARANCE.prefs.pointerCursors,
-    fontSmoothing: DEFAULT_NEXUS_APPEARANCE.prefs.fontSmoothing,
+    mode: DEFAULT_NXDS_APPEARANCE.mode,
+    brandColor: DEFAULT_NXDS_APPEARANCE.brandColor,
+    surfaceTone: DEFAULT_NXDS_APPEARANCE.surfaceTone,
+    lightContrast: DEFAULT_NXDS_APPEARANCE.lightContrast,
+    darkContrast: DEFAULT_NXDS_APPEARANCE.darkContrast,
+    density: DEFAULT_NXDS_APPEARANCE.density,
+    corners: DEFAULT_NXDS_APPEARANCE.corners,
+    elevation: DEFAULT_NXDS_APPEARANCE.elevation,
+    stroke: DEFAULT_NXDS_APPEARANCE.stroke,
+    uiFont: DEFAULT_NXDS_APPEARANCE.prefs.uiFont,
+    codeFont: DEFAULT_NXDS_APPEARANCE.prefs.codeFont,
+    uiFontSize: DEFAULT_NXDS_APPEARANCE.prefs.uiFontSize,
+    codeFontSize: DEFAULT_NXDS_APPEARANCE.prefs.codeFontSize,
+    reduceMotion: DEFAULT_NXDS_APPEARANCE.prefs.reduceMotion,
+    pointerCursors: DEFAULT_NXDS_APPEARANCE.prefs.pointerCursors,
+    fontSmoothing: DEFAULT_NXDS_APPEARANCE.prefs.fontSmoothing,
   },
   globalTypes: {
     mode: {

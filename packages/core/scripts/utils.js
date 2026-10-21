@@ -56,7 +56,7 @@ export function titleCase(s) {
 /**
  * Token-generation config for an appearance: the static CSS's `:root` modes
  * match what the runtime provider applies for the same appearance.
- * @param {object} appearance - A `NexusAppearanceState`, usually `DEFAULT_NEXUS_APPEARANCE`
+ * @param {object} appearance - A `NxdsAppearanceState`, usually `DEFAULT_NXDS_APPEARANCE`
  */
 export function defaultTokenConfig(appearance) {
   return {
@@ -1097,7 +1097,7 @@ export function generateMotionUtilitiesCSS(motionTokens) {
   }
 
   // Tailwind's `transition-colors` expands to a list that includes
-  // `outline-color`, and every Nexus focus ring is a real `outline` — so an
+  // `outline-color`, and every nxds focus ring is a real `outline` — so an
   // element carrying both fades its own ring in over the duration instead of
   // landing it with the keypress.
   css += `@utility transition-control {\n`;
@@ -1221,7 +1221,7 @@ export function generateThemeCSS(config) {
     css += `${googleFontsImport}\n\n`;
   }
 
-  // Imports. Tailwind comes in without Preflight: Nexus emits only prefixed
+  // Imports. Tailwind comes in without Preflight: nxds emits only prefixed
   // utilities and --nx-* variables, so it never restyles the host's elements.
   for (const imp of imports) {
     if (imp === 'tailwindcss') {
@@ -1350,7 +1350,7 @@ export function generateThemeCSS(config) {
 }
 
 /**
- * Theme the browser-painted UI Nexus cannot style through utilities: dark
+ * Theme the browser-painted UI nxds cannot style through utilities: dark
  * scrollbars and form controls under the shared `.dark` switch. Light is the
  * browser default, so nothing is declared outside `.dark`.
  *

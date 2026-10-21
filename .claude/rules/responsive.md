@@ -1,6 +1,6 @@
 # Responsive Design Rules
 
-Nexus is designed **mobile-first and desktop-first**: **Narrow (mobile) and Standard (desktop) are both first-class targets** — neither is a degradation of the other. Author **mobile-first** — the base (unprefixed) utilities are the Narrow/mobile case, and min-width prefixes (`nx:lg:`, `nx:xl:`) layer on the wider tiers. Components are tuned against **two reference widths — a mobile reference (~390px) and a desktop reference (~1280px)** — and must read well at both. **Wide (≥1536px)** gets extra breathing room when available.
+nxds is designed **mobile-first and desktop-first**: **Narrow (mobile) and Standard (desktop) are both first-class targets** — neither is a degradation of the other. Author **mobile-first** — the base (unprefixed) utilities are the Narrow/mobile case, and min-width prefixes (`nx:lg:`, `nx:xl:`) layer on the wider tiers. Components are tuned against **two reference widths — a mobile reference (~390px) and a desktop reference (~1280px)** — and must read well at both. **Wide (≥1536px)** gets extra breathing room when available.
 
 > **Consumer-brand re-aiming.** The reference brand is co-primary (mobile + desktop) out of the box — mobile is _not_ an inversion of a desktop default. Consumer brands can still re-aim `@theme { --breakpoint-* }` to weight a particular tier for their product; the Narrow / Standard / Wide labels describe the reference brand's bands, not hard-coded behaviour.
 
@@ -8,14 +8,14 @@ Nexus is designed **mobile-first and desktop-first**: **Narrow (mobile) and Stan
 
 **This table is the single source of truth.** Other rule files link here rather than duplicating these rows.
 
-| Tailwind class | Range (rem / px @16) | Nexus display class | Design target                                       |
-| -------------- | -------------------- | ------------------- | --------------------------------------------------- |
-| _(no prefix)_  | base / <640px        | Narrow              | ★ mobile foundation — style here first (~390px ref) |
-| `nx:sm:`       | 40rem / 640px+       | Narrow              | ★ first-class                                       |
-| `nx:md:`       | 48rem / 768px+       | Narrow              | ★ first-class                                       |
-| `nx:lg:`       | 64rem / 1024px+      | Standard            | ★ first-class — desktop floor                       |
-| `nx:xl:`       | 80rem / 1280px+      | Standard            | ★ first-class — desktop reference                   |
-| `nx:2xl:`      | 96rem / 1536px+      | Wide                | extra breathing room                                |
+| Tailwind class | Range (rem / px @16) | nxds display class | Design target                                       |
+| -------------- | -------------------- | ------------------ | --------------------------------------------------- |
+| _(no prefix)_  | base / <640px        | Narrow             | ★ mobile foundation — style here first (~390px ref) |
+| `nx:sm:`       | 40rem / 640px+       | Narrow             | ★ first-class                                       |
+| `nx:md:`       | 48rem / 768px+       | Narrow             | ★ first-class                                       |
+| `nx:lg:`       | 64rem / 1024px+      | Standard           | ★ first-class — desktop floor                       |
+| `nx:xl:`       | 80rem / 1280px+      | Standard           | ★ first-class — desktop reference                   |
+| `nx:2xl:`      | 96rem / 1536px+      | Wide               | extra breathing room                                |
 
 **Narrow / Standard / Wide are documentation labels, not utilities.** There is no `nx:standard:` class. Contributors use the standard Tailwind class names (`nx:sm:`, `nx:md:`, `nx:lg:`, `nx:xl:`, `nx:2xl:`) in code; the display-class labels exist to anchor design and review conversations.
 
@@ -59,7 +59,7 @@ Prefer the primitive over raw class toggling (`nx:hidden nx:lg:block`), which is
 
 ## Viewport-driven exceptions
 
-Most components use `@container` for internal responsive behaviour — though no shipped Nexus component reaches for it yet (Dialog is the original live datapoint, and it's one of the viewport-driven exceptions below). The `@container` default is forward-looking: it sets the bar for the next wave of internal-responsive components, not a pattern to retrofit existing ones against. **Full-viewport overlay components are exceptions** — Dialog, AlertDialog, Sheet, Drawer, and future FullScreenOverlay — because their responsive trigger is positioning relative to the viewport, not their own container width.
+Most components use `@container` for internal responsive behaviour — though no shipped nxds component reaches for it yet (Dialog is the original live datapoint, and it's one of the viewport-driven exceptions below). The `@container` default is forward-looking: it sets the bar for the next wave of internal-responsive components, not a pattern to retrofit existing ones against. **Full-viewport overlay components are exceptions** — Dialog, AlertDialog, Sheet, Drawer, and future FullScreenOverlay — because their responsive trigger is positioning relative to the viewport, not their own container width.
 
 A Dialog at 480px viewport is full-bleed (no rounded corners) because _the viewport is narrow_, not because the Dialog's own container is narrow. Migrating to `@container` would flip the rounded-corner threshold to the Dialog's intrinsic width, producing rounded corners on what's still effectively a full-bleed sheet — wrong UX.
 

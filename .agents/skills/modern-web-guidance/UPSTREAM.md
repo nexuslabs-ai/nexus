@@ -15,26 +15,26 @@ for freshness detection, not a pin on the version fetched by `@latest`.
 ## Refresh procedure
 
 1. Read the latest npm metadata and unpack the chosen package in a temporary
-   directory. Do not run the installer over Nexus's custom agent setup, and do
+   directory. Do not run the installer over nxds's custom agent setup, and do
    not add a `skills-lock.json`: `npx skills install/update` restores from it
-   and would overwrite the Nexus-local `SKILL.md` lines. This file is the only
+   and would overwrite the nxds-local `SKILL.md` lines. This file is the only
    provenance record.
 2. Compare guide IDs, moved paths, and content; replace the bundled guide tree
    with that release's Markdown files, removing stale paths.
-3. Update `SKILL.md` and `skill-version.txt`, preserving the Nexus-local
-   overrides: the Nexus integration section at the top of the skill body, and
-   the one-sentence Nexus-policy references in Step 3 and "Interpreting Browser
-   Support & Fallbacks". Keep Nexus's current environment policy authoritative.
+3. Update `SKILL.md` and `skill-version.txt`, preserving the nxds-local
+   overrides: the nxds integration section at the top of the skill body, and
+   the one-sentence nxds-policy references in Step 3 and "Interpreting Browser
+   Support & Fallbacks". Keep nxds's current environment policy authoritative.
 4. Update this provenance record and upstream license/notices. Format the
    Markdown using the repository formatter.
 5. Format a copy of the unpacked upstream `SKILL.md` with the repository
    formatter and diff it against the refreshed file; the only hunks must be the
-   Nexus integration section and the two policy sentences.
+   nxds integration section and the two policy sentences.
 6. Exercise a CLI search and retrieval; independently confirm a local guide can
    be read without the CLI. Check internal guide links and agent drift.
 7. Include the source version, guide inventory changes, and verification in the PR.
 
 Refresh this snapshot deliberately; npm `@latest` does not update these files.
 Markdown may be reformatted to match the repository, but guide content is not
-customized. Repository-specific overrides belong in the Nexus-local `SKILL.md`
-lines listed in step 3 and in Nexus rules, not in upstream guide prose.
+customized. Repository-specific overrides belong in the nxds-local `SKILL.md`
+lines listed in step 3 and in nxds rules, not in upstream guide prose.

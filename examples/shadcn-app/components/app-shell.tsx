@@ -5,7 +5,7 @@ import Link from "next/link"
 import { usePathname } from "next/navigation"
 import { useTheme } from "next-themes"
 
-import { useNexusAppearance } from "@/components/nexus/components/appearance/provider"
+import { useNxdsAppearance } from "@/components/nxds/components/appearance/provider"
 import { Button } from "@/components/ui/button"
 import { Separator } from "@/components/ui/separator"
 import {
@@ -33,7 +33,7 @@ const NAV = [
 // shared .dark class on <html>.
 function ThemeToggle() {
   const { resolvedTheme, setTheme } = useTheme()
-  const { setState } = useNexusAppearance()
+  const { setState } = useNxdsAppearance()
   const dark = resolvedTheme === "dark"
 
   function toggleTheme() {
@@ -59,7 +59,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
         <SidebarHeader className="px-4 py-3 font-semibold">Acme Console</SidebarHeader>
         <SidebarContent>
           <SidebarGroup>
-            <SidebarGroupLabel>Nexus adoption</SidebarGroupLabel>
+            <SidebarGroupLabel>nxds adoption</SidebarGroupLabel>
             <SidebarGroupContent>
               <SidebarMenu>
                 {NAV.map(({ href, label, icon: Icon }) => (
@@ -81,7 +81,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
         <header className="flex h-14 items-center gap-2 border-b px-4">
           <SidebarTrigger />
           <Separator orientation="vertical" className="h-5" />
-          <span className="text-sm text-muted-foreground">shadcn app with Nexus added</span>
+          <span className="text-sm text-muted-foreground">shadcn app with nxds added</span>
           <div className="ml-auto">
             <ThemeToggle />
           </div>

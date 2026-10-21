@@ -12,7 +12,7 @@ import { SectionHeading } from '../../_components/Heading';
  */
 
 export const description =
-  'Nexus UI corner radius, border width and shadow tokens. Each one is a theme field, so corners, borders and elevation change without a rebuild.';
+  'nxds corner radius, border width and shadow tokens. Each one is a theme field, so corners, borders and elevation change without a rebuild.';
 
 const RADII: { cls: string; label: string }[] = [
   { cls: 'nx:rounded-base', label: 'base' },
@@ -72,7 +72,7 @@ export default function Radius() {
           Radius
         </SectionHeading>
         <p className="nx:typography-body-default nx:text-muted-foreground nx:mb-4 nx:max-w-[64ch]">
-          Nexus has nine radius utilities. Eight follow <code>corners</code>.{' '}
+          nxds has nine radius utilities. Eight follow <code>corners</code>.{' '}
           <code>full</code> is always 9999px.
         </p>
         <div data-md-skip className="nx:flex nx:flex-wrap nx:gap-6 nx:mb-6">
@@ -183,7 +183,7 @@ export default function Radius() {
           Shadows
         </SectionHeading>
         <p className="nx:typography-body-default nx:text-muted-foreground nx:mb-4 nx:max-w-[64ch]">
-          Nexus has seven shadow levels and an inset shadow. All of them follow{' '}
+          nxds has seven shadow levels and an inset shadow. All of them follow{' '}
           <code>elevation</code>. Light and dark mode have separate shadows,
           because a light-mode shadow disappears on a dark background.
         </p>

@@ -3,10 +3,10 @@
 import { useState } from 'react';
 
 import { SubsectionHeading } from './Heading';
-import { Button } from './nexus';
+import { Button } from './nxds';
 
 /**
- * Every Nexus color scale, with a shared color-vision-deficiency preview.
+ * Every nxds color scale, with a shared color-vision-deficiency preview.
  *
  * Client component: owns the CVD toggle (useState — interaction state, not an
  * effect) that filters ALL grids at once, so you can watch red↔green

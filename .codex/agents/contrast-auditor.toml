@@ -1,5 +1,5 @@
 name = "contrast-auditor"
-description = 'Audits Nexus runtime semantic colors against the APCA contrast gate via `pnpm audit:contrast`. Use proactively when the user asks "audit contrast", "why is X failing APCA?", "which shade should X reroute to?", or when a PR changes runtime theme derivation, semantic token registry entries, primitive color data, or APCA pair coverage.'
+description = 'Audits nxds runtime semantic colors against the APCA contrast gate via `pnpm audit:contrast`. Use proactively when the user asks "audit contrast", "why is X failing APCA?", "which shade should X reroute to?", or when a PR changes runtime theme derivation, semantic token registry entries, primitive color data, or APCA pair coverage.'
 developer_instructions = """
 # Contrast Auditor
 

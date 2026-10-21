@@ -19,7 +19,7 @@
 | `cn` merge             | `packages/react/src/lib/utils.test.ts` | `vitest`         |
 | Hooks, other utilities | No tests of their own                  | —                |
 
-Hooks and utilities are covered by the stories of the components that use them. The one exception is `cn`, whose Nexus-specific merge groups no story can observe. See [testing.md § Scope](testing.md#scope) for the unit tests outside this package.
+Hooks and utilities are covered by the stories of the components that use them. The one exception is `cn`, whose nxds-specific merge groups no story can observe. See [testing.md § Scope](testing.md#scope) for the unit tests outside this package.
 
 ## File Structure
 
@@ -184,7 +184,7 @@ import { expect, fn, userEvent, within } from 'storybook/test';
 
 A11y is automatic. Every story is checked against axe-core rules via `addon-a11y` and violations fail the test — keyboard nav, ARIA semantics, focus management, role/landmark structure. No separate a11y assertions needed.
 
-**Color contrast is APCA-gated, not axe-gated.** Axe-core's `color-contrast` rules are disabled in `preview.tsx` because they enforce WCAG 2.x ratios that don't match Nexus's APCA tier model. Contrast is verified at the runtime token layer by `pnpm audit:contrast`.
+**Color contrast is APCA-gated, not axe-gated.** Axe-core's `color-contrast` rules are disabled in `preview.tsx` because they enforce WCAG 2.x ratios that don't match nxds's APCA tier model. Contrast is verified at the runtime token layer by `pnpm audit:contrast`.
 
 ## Running Tests
 

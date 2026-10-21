@@ -14,49 +14,49 @@ import {
 } from 'react';
 
 import {
-  createNexusAppearanceSnapshotFromState,
-  DEFAULT_NEXUS_APPEARANCE,
+  createNxdsAppearanceSnapshotFromState,
+  DEFAULT_NXDS_APPEARANCE,
   DEFAULT_STORAGE_KEY,
-  NEXUS_APPEARANCE_DATA_ATTRS,
-  type NexusAppearanceSnapshot,
-  type NexusAppearanceState,
+  NXDS_APPEARANCE_DATA_ATTRS,
+  type NxdsAppearanceSnapshot,
+  type NxdsAppearanceState,
   resolveFirstPaint,
-  sanitizeNexusAppearance,
-  sanitizeNexusAppearanceSnapshot,
-  serializeNexusAppearanceStateCookie,
+  sanitizeNxdsAppearance,
+  sanitizeNxdsAppearanceSnapshot,
+  serializeNxdsAppearanceStateCookie,
 } from '@nxds/core';
 
 const COLOR_SCHEME_QUERY = '(prefers-color-scheme: dark)';
-const THEME_STYLE_SELECTOR = 'style[data-nexus-appearance-theme]';
-const PREFS_STYLE_SELECTOR = 'style[data-nexus-appearance-prefs]';
+const THEME_STYLE_SELECTOR = 'style[data-nxds-appearance-theme]';
+const PREFS_STYLE_SELECTOR = 'style[data-nxds-appearance-prefs]';
 const DEFAULT_COOKIE_PATH = '/';
 const DEFAULT_COOKIE_SAME_SITE = 'Lax';
-export const NEXUS_APPEARANCE_COOKIE_MAX_AGE_SECONDS = 60 * 60 * 24 * 365;
+export const NXDS_APPEARANCE_COOKIE_MAX_AGE_SECONDS = 60 * 60 * 24 * 365;
 
-export type NexusResolvedAppearanceMode = 'light' | 'dark';
-export type NexusAppearanceCookieSameSite = 'Lax' | 'Strict' | 'None';
+export type NxdsResolvedAppearanceMode = 'light' | 'dark';
+export type NxdsAppearanceCookieSameSite = 'Lax' | 'Strict' | 'None';
 
-export interface NexusAppearanceCookieOptions {
+export interface NxdsAppearanceCookieOptions {
   maxAge?: number;
   path?: string;
-  sameSite?: NexusAppearanceCookieSameSite;
+  sameSite?: NxdsAppearanceCookieSameSite;
   secure?: boolean | 'auto';
   domain?: string;
 }
 
-export interface NexusAppearanceContextValue {
-  state: NexusAppearanceState;
-  setState: Dispatch<SetStateAction<NexusAppearanceState>>;
-  resolvedMode: NexusResolvedAppearanceMode;
+export interface NxdsAppearanceContextValue {
+  state: NxdsAppearanceState;
+  setState: Dispatch<SetStateAction<NxdsAppearanceState>>;
+  resolvedMode: NxdsResolvedAppearanceMode;
   mounted: boolean;
   reset: () => void;
 }
 
-export interface NexusAppearanceProviderProps {
+export interface NxdsAppearanceProviderProps {
   children: ReactNode;
-  state?: NexusAppearanceState;
-  defaultState?: NexusAppearanceState;
-  onStateChange?: (state: NexusAppearanceState) => void;
+  state?: NxdsAppearanceState;
+  defaultState?: NxdsAppearanceState;
+  onStateChange?: (state: NxdsAppearanceState) => void;
   /**
    * localStorage key for the saved appearance. The head script reads it before first paint and the provider after mount, overriding `defaultState`.
    * Pass `false` to turn it off.
@@ -67,19 +67,20 @@ export interface NexusAppearanceProviderProps {
    * The client never reads it.
    */
   cookieWriteKey?: string | false;
-  cookieOptions?: NexusAppearanceCookieOptions;
+  cookieOptions?: NxdsAppearanceCookieOptions;
 }
 
-const NexusAppearanceContext =
-  createContext<NexusAppearanceContextValue | null>(null);
+const NxdsAppearanceContext = createContext<NxdsAppearanceContextValue | null>(
+  null
+);
 
 const canUseDOM = (): boolean =>
   typeof window !== 'undefined' && typeof document !== 'undefined';
 
 function resolveAppearanceMode(
-  mode: NexusAppearanceState['mode'],
+  mode: NxdsAppearanceState['mode'],
   systemPrefersDark = false
-): NexusResolvedAppearanceMode {
+): NxdsResolvedAppearanceMode {
   if (mode === 'dark') return 'dark';
   if (mode === 'light') return 'light';
   return systemPrefersDark ? 'dark' : 'light';
@@ -92,15 +93,15 @@ function systemPrefersDark(): boolean {
 
 function readStoredState(
   storageKey: string | false,
-  fallback: NexusAppearanceState
-): NexusAppearanceState {
+  fallback: NxdsAppearanceState
+): NxdsAppearanceState {
   if (!canUseDOM() || storageKey === false) return fallback;
 
   try {
     const raw = window.localStorage.getItem(storageKey);
 
     return raw
-      ? sanitizeNexusAppearanceSnapshot(JSON.parse(raw)).state
+      ? sanitizeNxdsAppearanceSnapshot(JSON.parse(raw)).state
       : fallback;
   } catch {
     return fallback;
@@ -109,7 +110,7 @@ function readStoredState(
 
 function writeStoredSnapshot(
   storageKey: string | false,
-  snapshot: NexusAppearanceSnapshot
+  snapshot: NxdsAppearanceSnapshot
 ): void {
   if (!canUseDOM() || storageKey === false) return;
 
@@ -122,13 +123,13 @@ function writeStoredSnapshot(
 
 function writeStateCookie(
   cookieWriteKey: string | false,
-  state: NexusAppearanceState,
-  options: NexusAppearanceCookieOptions = {}
+  state: NxdsAppearanceState,
+  options: NxdsAppearanceCookieOptions = {}
 ): void {
   if (!canUseDOM() || cookieWriteKey === false) return;
 
   try {
-    const maxAge = options.maxAge ?? NEXUS_APPEARANCE_COOKIE_MAX_AGE_SECONDS;
+    const maxAge = options.maxAge ?? NXDS_APPEARANCE_COOKIE_MAX_AGE_SECONDS;
     const path = options.path ?? DEFAULT_COOKIE_PATH;
     const sameSite = options.sameSite ?? DEFAULT_COOKIE_SAME_SITE;
     const secure =
@@ -142,7 +143,7 @@ function writeStateCookie(
       secure ? 'Secure' : '',
     ].filter(Boolean);
 
-    document.cookie = `${cookieWriteKey}=${serializeNexusAppearanceStateCookie(
+    document.cookie = `${cookieWriteKey}=${serializeNxdsAppearanceStateCookie(
       state
     )}; ${attrs.join('; ')}`;
   } catch {
@@ -176,21 +177,21 @@ function removeAppearanceArtifacts(): void {
 
   const root = document.documentElement;
   root.classList.remove('dark');
-  for (const attr of NEXUS_APPEARANCE_DATA_ATTRS) {
+  for (const attr of NXDS_APPEARANCE_DATA_ATTRS) {
     root.removeAttribute(attr);
   }
 }
 
 function nextAppearanceState(
-  update: SetStateAction<NexusAppearanceState>,
-  previous: NexusAppearanceState
-): NexusAppearanceState {
-  return sanitizeNexusAppearance(
+  update: SetStateAction<NxdsAppearanceState>,
+  previous: NxdsAppearanceState
+): NxdsAppearanceState {
+  return sanitizeNxdsAppearance(
     typeof update === 'function' ? update(previous) : update
   );
 }
 
-export function NexusAppearanceProvider({
+export function NxdsAppearanceProvider({
   children,
   state,
   defaultState,
@@ -198,21 +199,21 @@ export function NexusAppearanceProvider({
   storageKey = DEFAULT_STORAGE_KEY,
   cookieWriteKey = false,
   cookieOptions,
-}: NexusAppearanceProviderProps) {
+}: NxdsAppearanceProviderProps) {
   const isControlled = state !== undefined;
   const initialState = useMemo(
-    () => sanitizeNexusAppearance(defaultState ?? DEFAULT_NEXUS_APPEARANCE),
+    () => sanitizeNxdsAppearance(defaultState ?? DEFAULT_NXDS_APPEARANCE),
     [defaultState]
   );
   const [internalState, setInternalState] =
-    useState<NexusAppearanceState>(initialState);
+    useState<NxdsAppearanceState>(initialState);
   const activeState = state ?? internalState;
   const [mounted, setMounted] = useState(false);
-  const [resolvedMode, setResolvedMode] = useState<NexusResolvedAppearanceMode>(
+  const [resolvedMode, setResolvedMode] = useState<NxdsResolvedAppearanceMode>(
     () => resolveAppearanceMode(activeState.mode)
   );
   const activeSnapshot = useMemo(
-    () => createNexusAppearanceSnapshotFromState(activeState),
+    () => createNxdsAppearanceSnapshotFromState(activeState),
     [activeState]
   );
   const firstPaint = useMemo(
@@ -240,7 +241,7 @@ export function NexusAppearanceProvider({
     setMounted(true);
   }, [initialState, isControlled, state, storageKey]);
 
-  const setState = useCallback<Dispatch<SetStateAction<NexusAppearanceState>>>(
+  const setState = useCallback<Dispatch<SetStateAction<NxdsAppearanceState>>>(
     (update) => {
       if (isControlled) {
         onStateChange?.(nextAppearanceState(update, activeState));
@@ -278,7 +279,7 @@ export function NexusAppearanceProvider({
 
     const root = document.documentElement;
 
-    for (const attr of NEXUS_APPEARANCE_DATA_ATTRS) {
+    for (const attr of NXDS_APPEARANCE_DATA_ATTRS) {
       root.setAttribute(attr, firstPaint.dataAttrs[attr]);
     }
   }, [firstPaint, mounted]);
@@ -321,7 +322,7 @@ export function NexusAppearanceProvider({
 
     const themeStyle = upsertStyle(
       THEME_STYLE_SELECTOR,
-      'data-nexus-appearance-theme'
+      'data-nxds-appearance-theme'
     );
     themeStyle.textContent = firstPaint.themeCss;
   }, [firstPaint, mounted]);
@@ -331,7 +332,7 @@ export function NexusAppearanceProvider({
 
     const prefsStyle = upsertStyle(
       PREFS_STYLE_SELECTOR,
-      'data-nexus-appearance-prefs'
+      'data-nxds-appearance-prefs'
     );
     prefsStyle.textContent = firstPaint.prefsCss;
   }, [firstPaint, mounted]);
@@ -342,24 +343,24 @@ export function NexusAppearanceProvider({
     return removeAppearanceArtifacts;
   }, []);
 
-  const value = useMemo<NexusAppearanceContextValue>(
+  const value = useMemo<NxdsAppearanceContextValue>(
     () => ({ state: activeState, setState, resolvedMode, mounted, reset }),
     [activeState, mounted, reset, resolvedMode, setState]
   );
 
   return (
-    <NexusAppearanceContext.Provider value={value}>
+    <NxdsAppearanceContext.Provider value={value}>
       {children}
-    </NexusAppearanceContext.Provider>
+    </NxdsAppearanceContext.Provider>
   );
 }
 
-export function useNexusAppearance(): NexusAppearanceContextValue {
-  const context = useContext(NexusAppearanceContext);
+export function useNxdsAppearance(): NxdsAppearanceContextValue {
+  const context = useContext(NxdsAppearanceContext);
 
   if (!context) {
     throw new Error(
-      'useNexusAppearance must be used within <NexusAppearanceProvider>'
+      'useNxdsAppearance must be used within <NxdsAppearanceProvider>'
     );
   }
 

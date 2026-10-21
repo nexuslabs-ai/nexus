@@ -61,7 +61,7 @@ function SheetOverlay({ className, ...props }: SheetOverlayProps) {
  * Per-side positioning and slide motion for the sheet panel. Each side pins the
  * panel to an edge and slides it fully on/off screen from that edge — the bare
  * `slide-*` utilities translate by 100% (the spacing-scaled `slide-*-N` forms
- * resolve to 0 under the Nexus spacing reset, so they would not move).
+ * resolve to 0 under the nxds spacing reset, so they would not move).
  */
 const sheetContentVariants = cva(
   cn(

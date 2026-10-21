@@ -87,7 +87,7 @@ const meta: Meta = {
     docs: {
       description: {
         component:
-          'Spacing tokens rendered from the active Nexus Appearance provider. Use the Density toolbar to switch modes; the rows below read the live runtime CSS variables that a package consumer receives.',
+          'Spacing tokens rendered from the active nxds Appearance provider. Use the Density toolbar to switch modes; the rows below read the live runtime CSS variables that a package consumer receives.',
       },
     },
   },

@@ -38,14 +38,14 @@ export const TOKEN_CONFIG_KEYS = [
 ];
 
 // Appearance-provider wiring presets. Each maps a product policy onto the real
-// `createNexusAppearance` knobs — no invented provider API. See #541 notes.
+// `createNxdsAppearance` knobs — no invented provider API. See #541 notes.
 export const POLICY_PRESETS = {
   // Product owner sets the appearance; end-users can't change it.
   locked: { storageKey: false, cookieWriteKey: false },
   // End-users pick; their choice persists to localStorage.
-  user: { storageKey: 'nexus-appearance' },
+  user: { storageKey: 'nxds-appearance' },
   // Appearance seeded per request via cookie (multi-tenant SSR).
-  tenant: { cookieWriteKey: 'nexus-appearance' },
+  tenant: { cookieWriteKey: 'nxds-appearance' },
 };
 
 export const POLICY_OPTIONS = Object.keys(POLICY_PRESETS);
@@ -264,7 +264,7 @@ const DEP_FIELDS = [
  * KEEP_PACKAGES; a new workspace dep (e.g. a future `@nxds/icons`) would
  * otherwise ship as an unresolved `workspace:*` range — fail loudly instead.
  */
-function assertNoUnhandledNexusDeps(pkg) {
+function assertNoUnhandledNxdsDeps(pkg) {
   const unhandled = [];
   for (const field of DEP_FIELDS) {
     for (const name of Object.keys(pkg[field] ?? {})) {
@@ -307,7 +307,7 @@ export function transformReactPackageJson(
     next.dependencies[`${scope}/tailwind`] = spec;
   }
 
-  assertNoUnhandledNexusDeps(next);
+  assertNoUnhandledNxdsDeps(next);
   return next;
 }
 
@@ -323,7 +323,7 @@ export function transformTailwindPackageJson(pkg, { scope, version }) {
   delete next.private;
   next.publishConfig = { access: 'public' };
 
-  assertNoUnhandledNexusDeps(next);
+  assertNoUnhandledNxdsDeps(next);
   return next;
 }
 
@@ -386,7 +386,7 @@ export function buildManifest(components, { version }) {
 
 /**
  * Render the default appearance-provider wiring example for the chosen policy.
- * Emits a standalone illustrative file that uses the real `createNexusAppearance`
+ * Emits a standalone illustrative file that uses the real `createNxdsAppearance`
  * knobs from the published provider subentry.
  */
 export function renderAppAppearanceExample(scope, policy) {
@@ -401,12 +401,12 @@ export function renderAppAppearanceExample(scope, policy) {
     tenant: 'appearance is seeded per request via cookie (multi-tenant SSR).',
   };
 
-  return `import { createNexusAppearance } from '${scope}/react/appearance';
+  return `import { createNxdsAppearance } from '${scope}/react/appearance';
 
 // Appearance policy "${policy}" — ${notes[policy]}
 // Swap the knobs below (storageKey / cookieWriteKey / defaultState) to change
 // the policy; re-run \`pnpm export --policy=<locked|user|tenant>\` to regenerate.
-export const { NexusAppearanceProvider } = createNexusAppearance({
+export const { NxdsAppearanceProvider } = createNxdsAppearance({
 ${knobs}
 });
 `;
@@ -449,7 +449,7 @@ export function renderReadme({ name, scope, tokenConfig }) {
 
   return `# ${name}
 
-A standalone Nexus-derived design system. The \`react\` + \`tailwind\` packages are
+A standalone nxds-derived design system. The \`react\` + \`tailwind\` packages are
 **yours to own and publish**; they depend on the published runtime engine
 \`@nxds/core\` and the lint guardrails \`@nxds/eslint-plugin\`.
 
@@ -465,7 +465,7 @@ A standalone Nexus-derived design system. The \`react\` + \`tailwind\` packages 
 | ---- | ----- |
 ${tokenRows}
 
-Retheme at runtime via \`NexusAppearanceProvider\` (see \`examples/app-appearance.tsx\`).
+Retheme at runtime via \`NxdsAppearanceProvider\` (see \`examples/app-appearance.tsx\`).
 The \`nx:\` utility prefix is fixed — the engine emits \`--nx-*\` variables at runtime.
 
 ## Develop
@@ -513,7 +513,7 @@ onlyBuiltDependencies:
  * rather than re-inlining rule names.
  */
 export const ROOT_ESLINT_CONFIG = `import js from '@eslint/js';
-import { nexusComponentConfig } from '@nxds/eslint-plugin/config';
+import { nxdsComponentConfig } from '@nxds/eslint-plugin/config';
 import prettierConfig from 'eslint-config-prettier';
 import jsxA11yPlugin from 'eslint-plugin-jsx-a11y';
 import reactPlugin from 'eslint-plugin-react';
@@ -661,7 +661,7 @@ export default tseslint.config(
 
   {
     files: ['packages/react/src/**/*.{ts,tsx}'],
-    ...nexusComponentConfig(),
+    ...nxdsComponentConfig(),
   },
 
   {

@@ -26,7 +26,7 @@ import {
  */
 
 export const description =
-  'Build list filters from Nexus UI filter blocks and components. Decide when changes apply, group conditions and keep every active filter visible.';
+  'Build list filters from nxds filter blocks and components. Decide when changes apply, group conditions and keep every active filter visible.';
 
 const TIMING: {
   timing: string;

@@ -7,7 +7,7 @@
  *   https://creativecommons.org/publicdomain/zero/1.0/
  * Generated from notionists-neutral v9.x, seeds [Ada, Grace, Katherine, Mary, Dorothy],
  * lips pinned to curated non-sad (smile) variants so no seed yields a frowning face,
- * backgroundType=solid over Nexus palette shade-200 backgrounds — the rendered sRGB hex
+ * backgroundType=solid over nxds palette shade-200 backgrounds — the rendered sRGB hex
  * of --nx-color-{rose,sky,violet,amber,indigo}-200 (primitives, identical light & dark).
  *
  * Stored as inline `data:image/svg+xml` URIs (not remote URLs) so Radix renders the

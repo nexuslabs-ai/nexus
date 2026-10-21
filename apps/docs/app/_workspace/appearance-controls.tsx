@@ -7,8 +7,8 @@ import {
   CORNER_OPTIONS,
   DENSITY_OPTIONS,
   ELEVATION_OPTIONS,
-  type NexusAppearancePrefs,
-  type NexusAppearanceState,
+  type NxdsAppearancePrefs,
+  type NxdsAppearanceState,
   STROKE_OPTIONS,
 } from '@nxds/core';
 import {
@@ -16,11 +16,11 @@ import {
   Label,
   NativeSelect,
   NativeSelectOption,
-  NexusAppearanceBrandColorField,
+  NxdsAppearanceBrandColorField,
   Slider,
   Switch,
 } from '@nxds/react';
-import type { NexusResolvedAppearanceMode } from '@nxds/react/appearance';
+import type { NxdsResolvedAppearanceMode } from '@nxds/react/appearance';
 
 import { THEME_MODE_OPTIONS } from '../_lib/appearance-controls';
 
@@ -86,7 +86,7 @@ function ContrastField({
   value,
   onChange,
 }: {
-  mode: NexusResolvedAppearanceMode;
+  mode: NxdsResolvedAppearanceMode;
   value: number;
   onChange: (value: number) => void;
 }) {
@@ -219,7 +219,7 @@ function BrandColorField({
       <span id={id} className={LABEL_CLASS}>
         Brand color
       </span>
-      <NexusAppearanceBrandColorField
+      <NxdsAppearanceBrandColorField
         label="Brand color"
         value={value}
         onChange={onChange}
@@ -234,18 +234,18 @@ export function AppearanceControls({
   onChange,
   onGestureStart,
 }: {
-  state: NexusAppearanceState;
-  resolvedMode: NexusResolvedAppearanceMode;
+  state: NxdsAppearanceState;
+  resolvedMode: NxdsResolvedAppearanceMode;
   onChange: (
-    patch: Partial<NexusAppearanceState>,
-    group?: keyof NexusAppearanceState
+    patch: Partial<NxdsAppearanceState>,
+    group?: keyof NxdsAppearanceState
   ) => void;
   onGestureStart: () => void;
 }) {
   const contrastKey =
     resolvedMode === 'dark' ? 'darkContrast' : 'lightContrast';
 
-  function changePrefs(patch: Partial<NexusAppearancePrefs>) {
+  function changePrefs(patch: Partial<NxdsAppearancePrefs>) {
     onChange({ prefs: { ...state.prefs, ...patch } });
   }
 

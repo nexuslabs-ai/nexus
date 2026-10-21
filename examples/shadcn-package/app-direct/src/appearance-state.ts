@@ -1,5 +1,5 @@
-import { DEFAULT_NEXUS_APPEARANCE, type NexusAppearanceState } from '@nxds/core'
+import { DEFAULT_NXDS_APPEARANCE, type NxdsAppearanceState } from '@nxds/core'
 
-export const APPEARANCE_STORAGE_KEY = 'acme-nexus-appearance'
+export const APPEARANCE_STORAGE_KEY = 'acme-nxds-appearance'
 
-export const defaultAppearance = { ...DEFAULT_NEXUS_APPEARANCE } satisfies NexusAppearanceState
+export const defaultAppearance = { ...DEFAULT_NXDS_APPEARANCE } satisfies NxdsAppearanceState

@@ -12,7 +12,7 @@ const require = createRequire(
 );
 const targets = [
   '@nxds/tailwind',
-  '@nxds/tailwind/nexus.css',
+  '@nxds/tailwind/nxds.css',
   '@nxds/tailwind/variables.css',
   '@nxds/react/styles.css',
 ];

@@ -2,30 +2,30 @@ import typographyTokens from '../../tokens/primitives/typography/typography-defa
 
 import { normalizeContrast } from './contrast';
 import type { ThemeDerivationInput, ThemeSeeds } from './derive-theme';
-import type { NexusSurfaceTone } from './palette';
+import type { NxdsSurfaceTone } from './palette';
 import { isColor } from './perceptual-ramp';
 import { inRuntimeLayer } from './runtime-layer';
 
 type ModeSeeds = Pick<ThemeSeeds, 'background' | 'foreground'>;
 
-export type NexusAppearanceMode = 'light' | 'dark' | 'system';
-export type NexusDensity =
+export type NxdsAppearanceMode = 'light' | 'dark' | 'system';
+export type NxdsDensity =
   | 'tight'
   | 'compact'
   | 'default'
   | 'comfortable'
   | 'relaxed'
   | 'spacious';
-export type NexusCorners =
+export type NxdsCorners =
   | 'square'
   | 'subtle'
   | 'smooth'
   | 'round'
   | 'extra-round';
-export type NexusElevation = 'flat' | 'quiet' | 'soft' | 'standard' | 'strong';
-export type NexusStroke = 'fine' | 'normal' | 'strong';
+export type NxdsElevation = 'flat' | 'quiet' | 'soft' | 'standard' | 'strong';
+export type NxdsStroke = 'fine' | 'normal' | 'strong';
 
-export interface NexusAppearancePrefs {
+export interface NxdsAppearancePrefs {
   uiFont: string;
   codeFont: string;
   uiFontSize: number;
@@ -35,21 +35,21 @@ export interface NexusAppearancePrefs {
   fontSmoothing: boolean;
 }
 
-export interface NexusAppearanceState {
-  mode: NexusAppearanceMode;
+export interface NxdsAppearanceState {
+  mode: NxdsAppearanceMode;
   brandColor: string;
-  surfaceTone: NexusSurfaceTone;
+  surfaceTone: NxdsSurfaceTone;
   lightContrast: number;
   darkContrast: number;
-  density: NexusDensity;
-  corners: NexusCorners;
-  elevation: NexusElevation;
-  stroke: NexusStroke;
-  prefs: NexusAppearancePrefs;
+  density: NxdsDensity;
+  corners: NxdsCorners;
+  elevation: NxdsElevation;
+  stroke: NxdsStroke;
+  prefs: NxdsAppearancePrefs;
 }
 
 /** An appearance field that picks one of a token family's preset modes. */
-export type NexusPresetField = 'density' | 'corners' | 'elevation' | 'stroke';
+export type NxdsPresetField = 'density' | 'corners' | 'elevation' | 'stroke';
 
 export const DEFAULT_BRAND_COLOR = '#0a0a0a';
 
@@ -60,13 +60,13 @@ export const BASE_TONE_OPTIONS = [
   { value: 'slate', label: 'Slate', color: '#717376' },
   { value: 'gray', label: 'Gray', color: '#707274' },
 ] as const satisfies readonly {
-  value: NexusSurfaceTone;
+  value: NxdsSurfaceTone;
   label: string;
   color: string;
 }[];
 
 export const BASE_TONE_SEEDS: Record<
-  NexusSurfaceTone,
+  NxdsSurfaceTone,
   { light: ModeSeeds; dark: ModeSeeds }
 > = {
   stone: {
@@ -98,7 +98,7 @@ export const DENSITY_OPTIONS = [
   { value: 'comfortable', label: 'Comfortable' },
   { value: 'relaxed', label: 'Relaxed' },
   { value: 'spacious', label: 'Spacious' },
-] as const satisfies readonly { value: NexusDensity; label: string }[];
+] as const satisfies readonly { value: NxdsDensity; label: string }[];
 
 export const CORNER_OPTIONS = [
   { value: 'square', label: 'Square' },
@@ -106,7 +106,7 @@ export const CORNER_OPTIONS = [
   { value: 'smooth', label: 'Smooth' },
   { value: 'round', label: 'Round' },
   { value: 'extra-round', label: 'Extra Round' },
-] as const satisfies readonly { value: NexusCorners; label: string }[];
+] as const satisfies readonly { value: NxdsCorners; label: string }[];
 
 export const ELEVATION_OPTIONS = [
   { value: 'flat', label: 'Flat' },
@@ -114,15 +114,15 @@ export const ELEVATION_OPTIONS = [
   { value: 'soft', label: 'Soft' },
   { value: 'standard', label: 'Standard' },
   { value: 'strong', label: 'Strong' },
-] as const satisfies readonly { value: NexusElevation; label: string }[];
+] as const satisfies readonly { value: NxdsElevation; label: string }[];
 
 export const STROKE_OPTIONS = [
   { value: 'fine', label: 'Fine' },
   { value: 'normal', label: 'Normal' },
   { value: 'strong', label: 'Strong' },
-] as const satisfies readonly { value: NexusStroke; label: string }[];
+] as const satisfies readonly { value: NxdsStroke; label: string }[];
 
-export const DEFAULT_NEXUS_APPEARANCE: NexusAppearanceState = {
+export const DEFAULT_NXDS_APPEARANCE: NxdsAppearanceState = {
   mode: 'light',
   brandColor: DEFAULT_BRAND_COLOR,
   surfaceTone: 'zinc',
@@ -146,24 +146,24 @@ export const DEFAULT_NEXUS_APPEARANCE: NexusAppearanceState = {
 const FONT_PX_MIN = 8;
 const FONT_PX_MAX = 32;
 
-const APPEARANCE_MODES = new Set<NexusAppearanceMode>([
+const APPEARANCE_MODES = new Set<NxdsAppearanceMode>([
   'light',
   'dark',
   'system',
 ]);
-const SURFACE_TONES = new Set<NexusSurfaceTone>(
+const SURFACE_TONES = new Set<NxdsSurfaceTone>(
   BASE_TONE_OPTIONS.map((option) => option.value)
 );
-const DENSITIES = new Set<NexusDensity>(
+const DENSITIES = new Set<NxdsDensity>(
   DENSITY_OPTIONS.map((option) => option.value)
 );
-const CORNERS = new Set<NexusCorners>(
+const CORNERS = new Set<NxdsCorners>(
   CORNER_OPTIONS.map((option) => option.value)
 );
-const ELEVATIONS = new Set<NexusElevation>(
+const ELEVATIONS = new Set<NxdsElevation>(
   ELEVATION_OPTIONS.map((option) => option.value)
 );
-const STROKES = new Set<NexusStroke>(
+const STROKES = new Set<NxdsStroke>(
   STROKE_OPTIONS.map((option) => option.value)
 );
 
@@ -200,7 +200,7 @@ function formatPx(value: number): string {
 }
 
 function typographyScaleVariables(uiPx: number): string {
-  const scale = uiPx / DEFAULT_NEXUS_APPEARANCE.prefs.uiFontSize;
+  const scale = uiPx / DEFAULT_NXDS_APPEARANCE.prefs.uiFontSize;
   const sizeVars = Object.entries(typographyTokens.size).map(
     ([name, token]) =>
       `  --nx-typography-size-${name}: ${formatPx(token.$value.value * scale)};`
@@ -216,7 +216,7 @@ function typographyScaleVariables(uiPx: number): string {
 // Retired public-mode codename -> friendly, applied to persisted state on read
 // (see normalizeAppearanceModeIds). Internal; correctness is covered behaviorally
 // by the sanitize codename->friendly tests, so it is not part of the public API.
-const PUBLIC_MODE_RENAME: Record<NexusPresetField, Record<string, string>> = {
+const PUBLIC_MODE_RENAME: Record<NxdsPresetField, Record<string, string>> = {
   density: {
     nova: 'compact',
     mira: 'default',
@@ -253,11 +253,9 @@ export function normalizeAppearanceModeIds(raw: unknown): unknown {
   return out;
 }
 
-export function sanitizeNexusAppearancePrefs(
-  raw: unknown
-): NexusAppearancePrefs {
+export function sanitizeNxdsAppearancePrefs(raw: unknown): NxdsAppearancePrefs {
   const o = isRecord(raw) ? raw : {};
-  const d = DEFAULT_NEXUS_APPEARANCE.prefs;
+  const d = DEFAULT_NXDS_APPEARANCE.prefs;
   return {
     uiFont: fontFamilyOr(o.uiFont, d.uiFont),
     codeFont: fontFamilyOr(o.codeFont, d.codeFont),
@@ -269,12 +267,10 @@ export function sanitizeNexusAppearancePrefs(
   };
 }
 
-export function sanitizeNexusAppearance(
-  rawInput: unknown
-): NexusAppearanceState {
-  if (!isRecord(rawInput)) return DEFAULT_NEXUS_APPEARANCE;
+export function sanitizeNxdsAppearance(rawInput: unknown): NxdsAppearanceState {
+  if (!isRecord(rawInput)) return DEFAULT_NXDS_APPEARANCE;
   const raw = normalizeAppearanceModeIds(rawInput) as Record<string, unknown>;
-  const d = DEFAULT_NEXUS_APPEARANCE;
+  const d = DEFAULT_NXDS_APPEARANCE;
   return {
     mode: enumOr(raw.mode, APPEARANCE_MODES, d.mode),
     brandColor:
@@ -288,12 +284,12 @@ export function sanitizeNexusAppearance(
     corners: enumOr(raw.corners, CORNERS, d.corners),
     elevation: enumOr(raw.elevation, ELEVATIONS, d.elevation),
     stroke: enumOr(raw.stroke, STROKES, d.stroke),
-    prefs: sanitizeNexusAppearancePrefs(raw.prefs),
+    prefs: sanitizeNxdsAppearancePrefs(raw.prefs),
   };
 }
 
-export function createNexusThemeContract(
-  state: NexusAppearanceState
+export function createNxdsThemeContract(
+  state: NxdsAppearanceState
 ): ThemeDerivationInput {
   const tone = BASE_TONE_SEEDS[state.surfaceTone];
   return {
@@ -304,16 +300,16 @@ export function createNexusThemeContract(
   };
 }
 
-export function appearancePrefsToCss(prefs: NexusAppearancePrefs): string {
+export function appearancePrefsToCss(prefs: NxdsAppearancePrefs): string {
   const uiPx = clampFontSize(
     prefs.uiFontSize,
-    DEFAULT_NEXUS_APPEARANCE.prefs.uiFontSize
+    DEFAULT_NXDS_APPEARANCE.prefs.uiFontSize
   );
   const codePx = clampFontSize(
     prefs.codeFontSize,
-    DEFAULT_NEXUS_APPEARANCE.prefs.codeFontSize
+    DEFAULT_NXDS_APPEARANCE.prefs.codeFontSize
   );
-  // Font and type size reach only Nexus. The toggles below apply to the whole
+  // Font and type size reach only nxds. The toggles below apply to the whole
   // page, host included, when the user turns them on.
   const blocks: string[] = [
     inRuntimeLayer(`:root {

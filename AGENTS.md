@@ -17,10 +17,10 @@ does not index:
 | Third-party API lookups         | [`docs-mcp.md`](.claude/rules/docs-mcp.md)                     |
 | Docs prose and page templates   | [`docs-voice.md`](.claude/rules/docs-voice.md)                 |
 
-**Browser Support:** Nexus does no feature detection and no OS, browser,
+**Browser Support:** nxds does no feature detection and no OS, browser,
 preference, or input-device queries.
 [`no-environment-branching.md`](.claude/rules/no-environment-branching.md) is
-authoritative over any guide's fallback advice and sets which features Nexus may
+authoritative over any guide's fallback advice and sets which features nxds may
 use; `prefers-color-scheme` is the one exception.
 
 **Modern Web Guidance:** for a substantial UI change — one that introduces a
@@ -28,7 +28,7 @@ layout, interaction, or browser-platform decision — search and retrieve
 guidance with the
 [`modern-web-guidance`](.agents/skills/modern-web-guidance/SKILL.md) skill, then
 record the guide source, the decision, and how it was verified in the plan or
-PR. The skill's Nexus integration section covers the offline fallback and when
+PR. The skill's nxds integration section covers the offline fallback and when
 prior guidance can be reused.
 
 Workspace layout, setup, and the full command reference are in

@@ -13,7 +13,7 @@ import { SectionHeading, SubsectionHeading } from '../../_components/Heading';
  */
 
 export const description =
-  'The Nexus UI type scale. Each of its twelve steps is one class that sets size, weight, line height and letter spacing.';
+  'The nxds type scale. Each of its twelve steps is one class that sets size, weight, line height and letter spacing.';
 
 const SCALE: {
   group: string;

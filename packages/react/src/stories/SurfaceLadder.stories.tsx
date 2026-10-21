@@ -2,7 +2,7 @@ import { apcaLc, SEMANTIC_TOKEN_REGISTRY, TIER_THRESHOLDS } from '@nxds/core';
 import type { Meta, StoryObj } from '@storybook/react';
 import { expect, within } from 'storybook/test';
 
-import { NexusAppearanceSettings } from '../components/appearance/appearance-settings/appearance-settings';
+import { NxdsAppearanceSettings } from '../components/appearance/appearance-settings/appearance-settings';
 
 import {
   tokenValue,
@@ -146,7 +146,7 @@ function SurfaceLadderStory() {
   return (
     <div className="nx:grid nx:min-w-fit nx:grid-cols-[22rem_minmax(48rem,1fr)] nx:gap-8 nx:bg-background nx:p-8 nx:text-foreground">
       <aside className="nx:sticky nx:top-8 nx:self-start">
-        <NexusAppearanceSettings />
+        <NxdsAppearanceSettings />
       </aside>
       <main className="nx:flex nx:flex-col nx:gap-6">
         <div className="nx:flex nx:flex-col nx:gap-2">
@@ -154,7 +154,7 @@ function SurfaceLadderStory() {
             Surface ladder
           </h2>
           <p className="nx:max-w-3xl nx:typography-body-default nx:text-muted-foreground">
-            Live semantic surface tokens from the active Nexus Appearance
+            Live semantic surface tokens from the active nxds Appearance
             provider.
           </p>
         </div>

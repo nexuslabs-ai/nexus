@@ -1,11 +1,11 @@
 import { useEffect, useMemo, useState } from 'react';
 
-import { useNexusAppearance } from '../../components/appearance/provider/provider';
+import { useNxdsAppearance } from '../../components/appearance/provider/provider';
 
 export function useRuntimeTokenValues(
   tokenNames: readonly string[]
 ): Record<string, string> {
-  const { mounted, resolvedMode, state } = useNexusAppearance();
+  const { mounted, resolvedMode, state } = useNxdsAppearance();
   const tokenKey = tokenNames.join('\n');
   const [values, setValues] = useState<Record<string, string>>({});
 

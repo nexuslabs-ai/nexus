@@ -18,8 +18,8 @@ import {
 import { useColorScheme } from '@mui/material/styles'
 import { Link, Route, Routes, useLocation } from 'react-router'
 
-import { useNexusAppearance } from './components/nexus/components/appearance/provider'
-import { Toaster as NexusToaster } from './components/nexus/components/sonner/sonner'
+import { useNxdsAppearance } from './components/nxds/components/appearance/provider'
+import { Toaster as NxdsToaster } from './components/nxds/components/sonner/sonner'
 import { OverlaysPage } from './pages/OverlaysPage'
 import { SettingsPage } from './pages/SettingsPage'
 import { SideBySidePage } from './pages/SideBySidePage'
@@ -36,7 +36,7 @@ const NAV = [
 // shared .dark class on <html>.
 function ThemeToggle() {
   const { mode, setMode } = useColorScheme()
-  const { setState } = useNexusAppearance()
+  const { setState } = useNxdsAppearance()
   const dark = mode === 'dark'
 
   function toggleTheme() {
@@ -93,7 +93,7 @@ export default function App() {
           <Route path="/overlays" element={<OverlaysPage />} />
         </Routes>
       </Box>
-      <NexusToaster />
+      <NxdsToaster />
     </Box>
   )
 }

@@ -6,8 +6,8 @@ import { expect, fireEvent, fn, userEvent, within } from 'storybook/test';
 import { Button } from '../../button/button';
 
 import {
-  NexusAppearanceColorField,
-  type NexusAppearanceColorFieldProps,
+  NxdsAppearanceColorField,
+  type NxdsAppearanceColorFieldProps,
 } from './color-field';
 
 const BLUE = '#2563eb';
@@ -17,29 +17,25 @@ function ControlledField({
   value: initialValue,
   onChange,
   ...props
-}: NexusAppearanceColorFieldProps) {
+}: NxdsAppearanceColorFieldProps) {
   const [value, setValue] = useState(initialValue);
   const changeColor = (color: string) => {
     setValue(color);
     onChange(color);
   };
   return (
-    <NexusAppearanceColorField
-      {...props}
-      value={value}
-      onChange={changeColor}
-    />
+    <NxdsAppearanceColorField {...props} value={value} onChange={changeColor} />
   );
 }
 
-const meta: Meta<typeof NexusAppearanceColorField> = {
+const meta: Meta<typeof NxdsAppearanceColorField> = {
   title: 'Appearance/ColorField',
-  component: NexusAppearanceColorField,
+  component: NxdsAppearanceColorField,
   parameters: {
     docs: {
       description: {
         component:
-          'NexusAppearanceColorField picks a color with a swatch and a hex input. It calls `onChange` only with a valid six-digit hex value. For brand presets, use NexusAppearanceBrandColorField.',
+          'NxdsAppearanceColorField picks a color with a swatch and a hex input. It calls `onChange` only with a valid six-digit hex value. For brand presets, use NxdsAppearanceBrandColorField.',
       },
     },
   },
@@ -47,7 +43,7 @@ const meta: Meta<typeof NexusAppearanceColorField> = {
   render: (args) => <ControlledField key={args.value} {...args} />,
 };
 export default meta;
-type Story = StoryObj<typeof NexusAppearanceColorField>;
+type Story = StoryObj<typeof NxdsAppearanceColorField>;
 
 function fieldsIn(canvasElement: HTMLElement) {
   const canvas = within(canvasElement);
@@ -118,11 +114,11 @@ export const KeyboardInteraction: Story = {
   },
 };
 
-function ExternallyChangedField(props: NexusAppearanceColorFieldProps) {
+function ExternallyChangedField(props: NxdsAppearanceColorFieldProps) {
   const [value, setValue] = useState(props.value);
   return (
     <div className="nx:flex nx:flex-col nx:items-start nx:gap-3">
-      <NexusAppearanceColorField {...props} value={value} />
+      <NxdsAppearanceColorField {...props} value={value} />
       <Button variant="outline" onClick={() => setValue(RED)}>
         Use red
       </Button>

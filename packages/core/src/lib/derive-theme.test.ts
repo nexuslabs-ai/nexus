@@ -12,8 +12,8 @@ import { apcaLc } from './apca';
 import { APCA_PAIRS } from './apca-pairs';
 import {
   BASE_TONE_OPTIONS,
-  createNexusThemeContract,
-  DEFAULT_NEXUS_APPEARANCE,
+  createNxdsThemeContract,
+  DEFAULT_NXDS_APPEARANCE,
 } from './appearance-model';
 import { contrastForPair } from './contrast';
 import {
@@ -24,7 +24,7 @@ import {
   type ThemeDerivationInput,
   themeToCss,
 } from './derive-theme';
-import { type NexusSurfaceTone, TIER_THRESHOLDS } from './palette';
+import { type NxdsSurfaceTone, TIER_THRESHOLDS } from './palette';
 import { getPaletteRamp } from './primitive-palette';
 import { STATUS_PALETTE_FAMILIES } from './semantic-palette-references';
 
@@ -127,7 +127,7 @@ function expectPairwiseDistinguishable(
 }
 
 describe('deriveSurfaces', () => {
-  const surfaceTone: NexusSurfaceTone = 'neutral';
+  const surfaceTone: NxdsSurfaceTone = 'neutral';
 
   it('keeps background at the seed lightness', () => {
     const s = deriveSurfaces('#181818', surfaceTone, 'dark', 0.05);
@@ -358,7 +358,7 @@ describe('deriveTheme', () => {
   });
 
   it('emits all semantic colors, including runtime focus tokens', () => {
-    const d = deriveTheme(createNexusThemeContract(DEFAULT_NEXUS_APPEARANCE));
+    const d = deriveTheme(createNxdsThemeContract(DEFAULT_NXDS_APPEARANCE));
 
     for (const map of [d.light, d.dark]) {
       const colorKeys = Object.keys(map).filter((key) =>
@@ -371,7 +371,7 @@ describe('deriveTheme', () => {
   });
 
   it('keeps runtime error focus aligned with the shipped red primitives', () => {
-    const d = deriveTheme(createNexusThemeContract(DEFAULT_NEXUS_APPEARANCE));
+    const d = deriveTheme(createNxdsThemeContract(DEFAULT_NXDS_APPEARANCE));
 
     expect(hOf(d.light['--nx-color-focus-error'])).toBeCloseTo(
       hOf(getPaletteRamp(STATUS_PALETTE_FAMILIES.error)['600']),
@@ -386,9 +386,9 @@ describe('deriveTheme', () => {
   it.each(['light', 'dark'] as const)(
     'uses primary accent for shipped default focus and keeps focus colors APCA-safe in %s mode',
     (mode) => {
-      const map = deriveTheme(
-        createNexusThemeContract(DEFAULT_NEXUS_APPEARANCE)
-      )[mode];
+      const map = deriveTheme(createNxdsThemeContract(DEFAULT_NXDS_APPEARANCE))[
+        mode
+      ];
       const surfaces = [
         '--nx-color-background',
         '--nx-color-container',
@@ -703,8 +703,8 @@ describe('derived colorblind distinguishability', () => {
     'keeps chart and status colors distinguishable in $surfaceTone $mode $contrast outside approved JSON exceptions',
     ({ surfaceTone, contrast, mode }) => {
       const map = deriveTheme(
-        createNexusThemeContract({
-          ...DEFAULT_NEXUS_APPEARANCE,
+        createNxdsThemeContract({
+          ...DEFAULT_NXDS_APPEARANCE,
           surfaceTone,
           lightContrast: contrast,
           darkContrast: contrast,
@@ -862,7 +862,7 @@ const SWEEP_SEEDS: ReadonlyArray<{
   },
 ];
 
-const SURFACE_TONES: readonly NexusSurfaceTone[] = [
+const SURFACE_TONES: readonly NxdsSurfaceTone[] = [
   'stone',
   'neutral',
   'zinc',

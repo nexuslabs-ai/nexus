@@ -7,7 +7,7 @@ import {
   CardDescription,
   CardHeader,
   CardTitle,
-} from '../_components/nexus';
+} from '../_components/nxds';
 import { describeSize } from '../_lib/home-counts';
 import {
   CARD_JOINER,
@@ -19,7 +19,7 @@ import {
   NPM_CORE_URL,
   pageMetadata,
   REPO_URL,
-  SITE_ALTERNATE_NAME,
+  SITE_ALTERNATE_NAMES,
   SITE_DESCRIPTION,
   SITE_IMAGE,
   SITE_NAME,
@@ -43,14 +43,14 @@ const STRUCTURED_DATA = {
       '@id': `${SITE_URL}/#website`,
       url: SITE_URL,
       name: SITE_NAME,
-      alternateName: [SITE_ALTERNATE_NAME, 'nexusui'],
+      alternateName: SITE_ALTERNATE_NAMES,
       description: SITE_DESCRIPTION,
     },
     {
       '@type': 'SoftwareSourceCode',
       '@id': `${SITE_URL}/#software`,
       name: SITE_NAME,
-      alternateName: SITE_ALTERNATE_NAME,
+      alternateName: SITE_ALTERNATE_NAMES,
       description: SITE_DESCRIPTION,
       url: SITE_URL,
       codeRepository: REPO_URL,

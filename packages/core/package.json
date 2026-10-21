@@ -2,9 +2,9 @@
   "name": "@nxds/core",
   "version": "0.7.2",
   "type": "module",
-  "description": "Nexus UI theme engine: a framework-agnostic appearance model, runtime theme derivation and first-paint snapshots.",
+  "description": "nxds theme engine: a framework-agnostic appearance model, runtime theme derivation and first-paint snapshots.",
   "keywords": [
-    "nexus-ui",
+    "nxds-ui",
     "design-system",
     "design-tokens",
     "theme-engine",

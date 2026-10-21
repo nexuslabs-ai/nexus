@@ -2,13 +2,13 @@
   "name": "@nxds/tailwind",
   "version": "0.1.0",
   "private": true,
-  "description": "Nexus Design System Tailwind CSS theme with nx: prefix",
+  "description": "nxds design system Tailwind CSS theme with nx: prefix",
   "license": "MIT",
   "type": "module",
-  "main": "./nexus.css",
+  "main": "./nxds.css",
   "exports": {
-    ".": "./nexus.css",
-    "./nexus.css": "./nexus.css",
+    ".": "./nxds.css",
+    "./nxds.css": "./nxds.css",
     "./variables": "./variables.css",
     "./variables.css": "./variables.css"
   },
