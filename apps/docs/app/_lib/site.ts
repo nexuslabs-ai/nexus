@@ -9,7 +9,7 @@ export const SITE_DESCRIPTION =
 
 export const REPO_URL = 'https://github.com/nexuslabs-ai/nxds';
 export const STORYBOOK_URL = 'https://storybook.nxds.dev';
-export const NPM_CORE_URL = 'https://www.npmjs.com/package/@nexus_ds/core';
+export const NPM_CORE_URL = 'https://www.npmjs.com/package/@nxds/core';
 
 export const OG_IMAGE_SIZE = { width: 1200, height: 630 };
 

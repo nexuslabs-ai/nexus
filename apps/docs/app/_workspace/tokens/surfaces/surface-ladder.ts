@@ -1,5 +1,5 @@
-import type { SurfaceToken } from '@nexus_ds/core';
-import { type ShadeAnchor, SURFACE_TOKENS } from '@nexus_ds/core/catalogue';
+import type { SurfaceToken } from '@nxds/core';
+import { type ShadeAnchor, SURFACE_TOKENS } from '@nxds/core/catalogue';
 
 type SurfaceLadder = Record<SurfaceToken, ShadeAnchor>;
 

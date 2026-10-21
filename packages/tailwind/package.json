@@ -1,5 +1,5 @@
 {
-  "name": "@nexus_ds/tailwind",
+  "name": "@nxds/tailwind",
   "version": "0.1.0",
   "private": true,
   "description": "Nexus Design System Tailwind CSS theme with nx: prefix",

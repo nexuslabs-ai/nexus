@@ -25,10 +25,10 @@ Pick the surface you're working on — each is one `make` command that turbo orc
 | Command        | Brings up                                                                   |
 | -------------- | --------------------------------------------------------------------------- |
 | `make dev`     | **Storybook** — the component catalog + interaction tests. The 90% surface. |
-| `make docs`    | the docs site **+ live `@nexus_ds/react`**                                  |
+| `make docs`    | the docs site **+ live `@nxds/react`**                                      |
 | `make dev-all` | everything: docs + storybook + all package watchers                         |
 
-> **The docs site's generated inputs come from the turbo graph**, not from its package scripts, and none of them are committed: `apps/docs/turbo.json` puts `generate:manifest` (the page manifest and its loader map), `generate:demos` (the docs code generated from every story tagged `docs`, under `__generated__/`), `generate:dependencies` (the install JSON) and `generate:props` (the per-component props JSON that `PropsTable` reads) ahead of both `build` and `dev`, and the two the TypeScript graph imports — `generate:manifest` and `generate:demos` — ahead of `typecheck`. `make build`, `make docs` and `make typecheck` get them. `PropsTable` reads the props JSON on each request, so after changing a component's props or JSDoc during `make docs`, rerun `pnpm --filter @nexus_ds/docs generate:props` and reload — no restart. A bare `pnpm --filter @nexus_ds/docs dev` runs only the docs-story watcher: on a clean checkout there is no page manifest, demo index or install JSON, so start the docs with `make docs`.
+> **The docs site's generated inputs come from the turbo graph**, not from its package scripts, and none of them are committed: `apps/docs/turbo.json` puts `generate:manifest` (the page manifest and its loader map), `generate:demos` (the docs code generated from every story tagged `docs`, under `__generated__/`), `generate:dependencies` (the install JSON) and `generate:props` (the per-component props JSON that `PropsTable` reads) ahead of both `build` and `dev`, and the two the TypeScript graph imports — `generate:manifest` and `generate:demos` — ahead of `typecheck`. `make build`, `make docs` and `make typecheck` get them. `PropsTable` reads the props JSON on each request, so after changing a component's props or JSDoc during `make docs`, rerun `pnpm --filter @nxds/docs generate:props` and reload — no restart. A bare `pnpm --filter @nxds/docs dev` runs only the docs-story watcher: on a clean checkout there is no page manifest, demo index or install JSON, so start the docs with `make docs`.
 
 Leave **`make up`** running in another terminal so the docs-MCP is available to Claude Code (see [AI Documentation MCP](#ai-documentation-mcp-nexus-docs-mcp)).
 
@@ -51,13 +51,13 @@ The pre-commit hook already formats and `nx:`-lints staged files, so you rarely 
 
 `make help` prints these with descriptions. The full set:
 
-| Group        | Targets                                                         |
-| ------------ | --------------------------------------------------------------- |
-| **Setup**    | `setup` · `fresh` (clean + install + build) · `clean`           |
-| **Dev**      | `dev` · `docs` · `dev-all`                                      |
-| **Build**    | `build` · `tokens` (regenerate token CSS from `@nexus_ds/core`) |
-| **Quality**  | `lint` · `typecheck` · `audit` · `verify`                       |
-| **Docs MCP** | `up` · `down` · `serve` · `publish`                             |
+| Group        | Targets                                                     |
+| ------------ | ----------------------------------------------------------- |
+| **Setup**    | `setup` · `fresh` (clean + install + build) · `clean`       |
+| **Dev**      | `dev` · `docs` · `dev-all`                                  |
+| **Build**    | `build` · `tokens` (regenerate token CSS from `@nxds/core`) |
+| **Quality**  | `lint` · `typecheck` · `audit` · `verify`                   |
+| **Docs MCP** | `up` · `down` · `serve` · `publish`                         |
 
 Anything not wrapped is still a plain pnpm script (`pnpm test`, `pnpm test:storybook:ui`, the per-package `audit:*`).
 
@@ -146,15 +146,15 @@ The rule that mandates querying it lives in [`.claude/rules/docs-mcp.md`](.claud
 
 Releases are driven by [changesets](https://github.com/changesets/changesets) and the [`Release`](.github/workflows/release.yml) workflow. Only the two runtime packages publish to npm; everything else is either internal or copy/own.
 
-| Package                   | Published? | Why                                                                     |
-| ------------------------- | ---------- | ----------------------------------------------------------------------- |
-| `@nexus_ds/core`          | **npm**    | Framework-agnostic runtime engine; copied component code imports it     |
-| `@nexus_ds/eslint-plugin` | **npm**    | Lint guardrails consumers install and use                               |
-| `@nexus_ds/tailwind`      | copy/own   | Generated token CSS — consumers regenerate with their own token choices |
-| `@nexus_ds/react`         | copy/own   | Components are copied and owned; delivered by the export tool (#541)    |
-| `@nexus_ds/docs`          | private    | App                                                                     |
+| Package               | Published? | Why                                                                     |
+| --------------------- | ---------- | ----------------------------------------------------------------------- |
+| `@nxds/core`          | **npm**    | Framework-agnostic runtime engine; copied component code imports it     |
+| `@nxds/eslint-plugin` | **npm**    | Lint guardrails consumers install and use                               |
+| `@nxds/tailwind`      | copy/own   | Generated token CSS — consumers regenerate with their own token choices |
+| `@nxds/react`         | copy/own   | Components are copied and owned; delivered by the export tool (#541)    |
+| `@nxds/docs`          | private    | App                                                                     |
 
-Everything lives under the `@nexus_ds` scope — the published packages on npm and the ESLint plugin's **rule namespace** (rules are referenced as `@nexus_ds/*`, e.g. `@nexus_ds/no-render-prop-types`). The rule namespace is a flat-config key the plugin registers, independent of the npm package name; it is kept in lockstep with the scope so the repo reads consistently.
+Everything lives under the `@nxds` scope — the published packages on npm and the ESLint plugin's **rule namespace** (rules are referenced as `@nxds/*`, e.g. `@nxds/no-render-prop-types`). The rule namespace is a flat-config key the plugin registers, independent of the npm package name; it is kept in lockstep with the scope so the repo reads consistently.
 
 ### Publishing setup (trusted publishing — no token)
 
@@ -168,7 +168,7 @@ The workflow grants `id-token: write` for the OIDC exchange, upgrades npm to a t
 
 ### Day-to-day: adding a changeset
 
-Any PR that changes `@nexus_ds/core` or `@nexus_ds/eslint-plugin` includes a changeset describing the bump:
+Any PR that changes `@nxds/core` or `@nxds/eslint-plugin` includes a changeset describing the bump:
 
 ```bash
 pnpm changeset        # pick packages + semver bump, write a summary
@@ -181,12 +181,12 @@ Commit the generated `.changeset/*.md` file with your PR. Semver is a contract: 
 The `Release` workflow runs on every push to `main`:
 
 1. **Collect** — with unreleased changesets present, it opens/updates a **"Version Packages"** PR that bumps versions and writes `CHANGELOG.md`s.
-2. **Publish** — when you merge that PR (changesets consumed), the next run builds the packages and runs `changeset publish`, pushing `@nexus_ds/core` and `@nexus_ds/eslint-plugin` to npm with provenance. Private packages are skipped automatically.
+2. **Publish** — when you merge that PR (changesets consumed), the next run builds the packages and runs `changeset publish`, pushing `@nxds/core` and `@nxds/eslint-plugin` to npm with provenance. Private packages are skipped automatically.
 
-`@nexus_ds/core` and `@nexus_ds/eslint-plugin` were bootstrapped at `0.0.1` by the initial manual publish. The staged initial changeset cuts the first **trusted-publishing** release: merging the Version Packages PR the workflow opens publishes both at `0.1.0`. Verify any release with a fresh external install:
+`@nxds/core` and `@nxds/eslint-plugin` were bootstrapped at `0.0.1` by the initial manual publish. The staged initial changeset cuts the first **trusted-publishing** release: merging the Version Packages PR the workflow opens publishes both at `0.1.0`. Verify any release with a fresh external install:
 
 ```bash
-npm install @nexus_ds/core @nexus_ds/eslint-plugin
+npm install @nxds/core @nxds/eslint-plugin
 ```
 
 To version locally without publishing (e.g. to preview the bump): `pnpm version-packages`.

@@ -1,4 +1,4 @@
-import { DEFAULT_NEXUS_APPEARANCE } from "@nexus_ds/core"
+import { DEFAULT_NEXUS_APPEARANCE } from "@nxds/core"
 import type { Metadata } from "next"
 import { Geist } from "next/font/google"
 

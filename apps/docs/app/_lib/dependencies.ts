@@ -25,7 +25,7 @@ async function listDependencyFiles(dir: string) {
   } catch (error) {
     if ((error as NodeJS.ErrnoException).code !== 'ENOENT') throw error;
     throw new Error(
-      `dependencies: no ${dir} — run \`pnpm --filter @nexus_ds/docs generate:dependencies\`.`,
+      `dependencies: no ${dir} — run \`pnpm --filter @nxds/docs generate:dependencies\`.`,
       { cause: error }
     );
   }
@@ -85,7 +85,7 @@ async function loadPlan(dir: string, slug: string): Promise<InstallPlan> {
 
   if (!isRecord(parsed) || !isPlan(parsed.plan)) {
     throw new Error(
-      `dependencies: ${filePath} needs a plan of string arrays components, files, styles and an install list of { name, range } — rerun \`pnpm --filter @nexus_ds/docs generate:dependencies\`.`
+      `dependencies: ${filePath} needs a plan of string arrays components, files, styles and an install list of { name, range } — rerun \`pnpm --filter @nxds/docs generate:dependencies\`.`
     );
   }
   const { components, install, files, styles } = parsed.plan;
@@ -117,7 +117,7 @@ export const loadReactSource = cache(async (file: string) => {
   } catch (error) {
     if ((error as NodeJS.ErrnoException).code !== 'ENOENT') throw error;
     throw new Error(
-      `dependencies: ${file} is listed but missing from ${reactSrc} — rerun \`pnpm --filter @nexus_ds/docs generate:dependencies\`.`,
+      `dependencies: ${file} is listed but missing from ${reactSrc} — rerun \`pnpm --filter @nxds/docs generate:dependencies\`.`,
       { cause: error }
     );
   }

@@ -6,7 +6,7 @@ import {
   ELEVATION_OPTIONS,
   type NexusAppearanceState,
   STROKE_OPTIONS,
-} from '@nexus_ds/core';
+} from '@nxds/core';
 
 export const DOCS_APPEARANCE_STORAGE_KEY = 'nexus-docs-appearance';
 

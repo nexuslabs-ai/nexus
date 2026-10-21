@@ -1,13 +1,13 @@
 import plugin from './index.js';
 
 export const componentRuleSet = {
-  '@nexus_ds/nx-class-conventions': 'error',
-  '@nexus_ds/no-render-prop-types': 'error',
-  '@nexus_ds/no-multi-statement-jsx-handler': 'error',
+  '@nxds/nx-class-conventions': 'error',
+  '@nxds/no-render-prop-types': 'error',
+  '@nxds/no-multi-statement-jsx-handler': 'error',
 };
 
 export const spacingTokenRuleSet = {
-  '@nexus_ds/canonical-spacing-steps': 'error',
+  '@nxds/canonical-spacing-steps': 'error',
 };
 
 export function nexusComponentConfig(options = {}) {
@@ -16,7 +16,7 @@ export function nexusComponentConfig(options = {}) {
   return {
     ...(files ? { files } : {}),
     plugins: {
-      '@nexus_ds': plugin,
+      '@nxds': plugin,
     },
     rules: componentRuleSet,
   };
@@ -35,7 +35,7 @@ export function nexusSpacingTokenConfig(options = {}) {
         }
       : {}),
     plugins: {
-      '@nexus_ds': plugin,
+      '@nxds': plugin,
     },
     rules: spacingTokenRuleSet,
   };

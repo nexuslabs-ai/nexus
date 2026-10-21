@@ -1,4 +1,4 @@
-import { createNexusAppearanceBootstrapScript, createNexusAppearanceSnapshotFromState } from '@nexus_ds/core'
+import { createNexusAppearanceBootstrapScript, createNexusAppearanceSnapshotFromState } from '@nxds/core'
 import tailwindcss from '@tailwindcss/vite'
 import react from '@vitejs/plugin-react'
 import { defineConfig } from 'vite'

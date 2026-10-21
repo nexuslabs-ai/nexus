@@ -1,4 +1,4 @@
-import { BASE_TONE_OPTIONS, DEFAULT_NEXUS_APPEARANCE } from '@nexus_ds/core';
+import { BASE_TONE_OPTIONS, DEFAULT_NEXUS_APPEARANCE } from '@nxds/core';
 import type { Meta, StoryObj } from '@storybook/react';
 import { expect, fn, userEvent, waitFor, within } from 'storybook/test';
 

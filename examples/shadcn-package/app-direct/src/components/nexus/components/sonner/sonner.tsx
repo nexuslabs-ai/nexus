@@ -143,7 +143,7 @@ type ToasterProps = Omit<SonnerToasterProps, 'id'>;
  *
  * @example
  * ```tsx
- * import { Toaster, toast } from '@nexus_ds/react';
+ * import { Toaster, toast } from '@nxds/react';
  *
  * function App() {
  *   return (

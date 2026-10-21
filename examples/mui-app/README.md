@@ -39,7 +39,7 @@ After changing Nexus source or tokens, run `npm run nexus:add`.
 ## How the app added Nexus
 
 1. `npm run nexus:add` copies the components, provider and token CSS into
-   `src/components/nexus/`, and installs `@nexus_ds/core` from `packages/core`.
+   `src/components/nexus/`, and installs `@nxds/core` from `packages/core`.
 2. `npm install tailwindcss @tailwindcss/vite tw-animate-css` and the packages
    the copy prints. MUI's `CssBaseline` stays the app's reset; Nexus brings no
    Preflight.

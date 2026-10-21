@@ -1,4 +1,4 @@
-# @nexus_ds/core
+# @nxds/core
 
 ## 0.7.2
 

@@ -1,6 +1,6 @@
 import type { ReactNode } from 'react';
 
-import { cn } from '@nexus_ds/react/utils';
+import { cn } from '@nxds/react/utils';
 
 function Stage({
   title,
@@ -64,7 +64,7 @@ export function EnginePipeline() {
       <Step>
         <Stage
           emphasis
-          title="deriveTheme() in @nexus_ds/core"
+          title="deriveTheme() in @nxds/core"
           detail="Builds the color palettes, picks each surface shade and checks contrast. No DOM, no framework."
         />
       </Step>

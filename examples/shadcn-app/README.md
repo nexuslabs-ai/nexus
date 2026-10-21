@@ -38,7 +38,7 @@ then shows what changed for consumers.
 ## How the app added Nexus
 
 1. `npm run nexus:add` copies each component's files, the appearance provider
-   and the token CSS into `components/nexus/`, and installs `@nexus_ds/core` from
+   and the token CSS into `components/nexus/`, and installs `@nxds/core` from
    `packages/core`.
 2. `npm install` the packages it prints. Nexus imports single `@radix-ui/*`
    packages; shadcn uses the combined `radix-ui` package.

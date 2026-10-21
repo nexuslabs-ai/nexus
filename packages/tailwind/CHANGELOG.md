@@ -1,4 +1,4 @@
-# @nexus_ds/tailwind
+# @nxds/tailwind
 
 ## 0.1.0
 

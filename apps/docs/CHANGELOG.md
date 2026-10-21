@@ -1,4 +1,4 @@
-# @nexus_ds/docs
+# @nxds/docs
 
 ## 0.0.12
 

@@ -3,7 +3,7 @@ import {
   type CatalogueFamily,
   type CatalogueToken,
   createTokenCatalogue,
-} from '@nexus_ds/core/catalogue';
+} from '@nxds/core/catalogue';
 
 export interface PrimitiveColor {
   /** Name without the `--nx-color-` prefix, e.g. `violet-600`. */

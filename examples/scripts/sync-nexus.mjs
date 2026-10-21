@@ -54,7 +54,7 @@ for (const file of sourceFiles) {
 mkdirSync(cssDest, { recursive: true });
 for (const file of cssFiles) cpSync(path.join(tailwindDir, file), path.join(cssDest, file));
 
-// The app installs @nexus_ds/core from packages/core, so the engine and the
+// The app installs @nxds/core from packages/core, so the engine and the
 // copied components come from the same revision. npm keeps an installed file:
 // dependency whose version has not changed, so remove it before reinstalling.
 function run(command, args, cwd) {
@@ -65,8 +65,8 @@ function run(command, args, cwd) {
   }
 }
 
-run('pnpm', ['--filter', '@nexus_ds/core', 'build'], repoRoot);
-const installedCore = path.join(appDir, 'node_modules/@nexus_ds/core');
+run('pnpm', ['--filter', '@nxds/core', 'build'], repoRoot);
+const installedCore = path.join(appDir, 'node_modules/@nxds/core');
 if (existsSync(installedCore)) {
   rmSync(installedCore, { recursive: true });
   run('npm', ['install', '--no-audit', '--no-fund'], appDir);

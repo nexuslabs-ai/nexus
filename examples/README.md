@@ -14,7 +14,7 @@ the ways a frontend team meets Nexus.
 | [`shadcn-package`](shadcn-package) | Has its own shadcn-based design-system package | The package (`app-via-package`), or the app beside the package (`app-direct`) |
 | [`mui-app`](mui-app) | Has a Vite app built with Material UI and no Tailwind | The app |
 
-Each app installs `@nexus_ds/core` from `packages/core` (`file:` with
+Each app installs `@nxds/core` from `packages/core` (`file:` with
 `install-links`), so the examples always run this repository's engine.
 
 The examples copy Nexus by hand, as the Install page describes. Delivery through

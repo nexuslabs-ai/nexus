@@ -179,7 +179,7 @@ function assertDeclaredPackages(walks) {
 
   throw new Error(
     [
-      'dependencies JSON: a component or block imports a package @nexus_ds/react does not declare in dependencies or peerDependencies.',
+      'dependencies JSON: a component or block imports a package @nxds/react does not declare in dependencies or peerDependencies.',
       ...offenders,
     ].join('\n')
   );

@@ -1,6 +1,6 @@
 import type { ComponentProps } from 'react';
 
-import { BRAND_COLOR_PRESETS, findBrandColorPreset } from '@nexus_ds/core';
+import { BRAND_COLOR_PRESETS, findBrandColorPreset } from '@nxds/core';
 
 import { cn } from '../../../lib/utils';
 import {

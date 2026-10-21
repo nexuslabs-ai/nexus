@@ -9,7 +9,7 @@ import {
 
 /**
  * Custom `@theme` scale values Nexus adds to built-in tailwind-merge
- * namespaces. Hand-mirrors the keys emitted by `@nexus_ds/core` (see
+ * namespaces. Hand-mirrors the keys emitted by `@nxds/core` (see
  * `packages/tailwind`) and by co-located component CSS.
  */
 export const NEXUS_THEME_SCALES = {

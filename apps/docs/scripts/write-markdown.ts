@@ -211,7 +211,7 @@ for (const section of PAGE_MANIFEST) {
 }
 
 const LLMS_BLURB =
-  '> Nexus UI is a framework-agnostic theme engine (`@nexus_ds/core`) with components you copy into your app and own. Every class uses the `nx:` Tailwind prefix.';
+  '> Nexus UI is a framework-agnostic theme engine (`@nxds/core`) with components you copy into your app and own. Every class uses the `nx:` Tailwind prefix.';
 
 const llms = `# Nexus UI
 

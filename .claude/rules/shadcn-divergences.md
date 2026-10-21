@@ -5,7 +5,7 @@ Nexus's. Most of that translation is mechanical and machine-enforced — this fi
 records only the decisions a reader cannot derive from the token registry or the
 linter.
 
-**Mechanical checks live in `@nexus_ds/nx-class-conventions`**, which fails
+**Mechanical checks live in `@nxds/nx-class-conventions`**, which fails
 `pnpm lint` for the wrong prefix order, a banned `accent` token, an incomplete
 semantic token path, or a raw primitive colour. Available token names are in
 `SEMANTIC_TOKEN_REGISTRY` (`packages/core/src/lib/token-registry.ts`); the

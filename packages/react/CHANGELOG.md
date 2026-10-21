@@ -1,4 +1,4 @@
-# @nexus_ds/react
+# @nxds/react
 
 ## 0.4.3
 

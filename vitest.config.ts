@@ -7,7 +7,7 @@ export default defineConfig({
   resolve: {
     alias: [
       {
-        find: /^@nexus_ds\/core$/,
+        find: /^@nxds\/core$/,
         replacement: path.resolve(__dirname, './packages/core/src/index.ts'),
       },
       {

@@ -1,7 +1,7 @@
 'use client';
 
-import { Button } from '@nexus_ds/react';
-import { useNexusAppearance } from '@nexus_ds/react/appearance';
+import { Button } from '@nxds/react';
+import { useNexusAppearance } from '@nxds/react/appearance';
 
 import { AppearanceControls } from './appearance-controls';
 import { useAppearanceHistory } from './appearance-state';

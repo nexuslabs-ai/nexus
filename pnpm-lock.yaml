@@ -21,7 +21,7 @@ importers:
       '@eslint/js':
         specifier: ^9.39.2
         version: 9.39.4
-      '@nexus_ds/eslint-plugin':
+      '@nxds/eslint-plugin':
         specifier: workspace:*
         version: link:packages/eslint-plugin-nexus
       '@size-limit/preset-small-lib':
@@ -120,13 +120,13 @@ importers:
       '@next/mdx':
         specifier: ^15.1.6
         version: 15.5.19(@mdx-js/loader@3.1.1)(@mdx-js/react@3.1.1(@types/react@19.2.16)(react@19.2.7))
-      '@nexus_ds/core':
+      '@nxds/core':
         specifier: workspace:*
         version: link:../../packages/core
-      '@nexus_ds/react':
+      '@nxds/react':
         specifier: workspace:*
         version: link:../../packages/react
-      '@nexus_ds/tailwind':
+      '@nxds/tailwind':
         specifier: workspace:*
         version: link:../../packages/tailwind
       '@radix-ui/react-checkbox':
@@ -279,10 +279,10 @@ importers:
 
   packages/react:
     dependencies:
-      '@nexus_ds/core':
+      '@nxds/core':
         specifier: workspace:*
         version: link:../core
-      '@nexus_ds/tailwind':
+      '@nxds/tailwind':
         specifier: workspace:*
         version: link:../tailwind
       '@radix-ui/react-accordion':

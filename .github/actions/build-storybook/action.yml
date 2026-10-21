@@ -17,12 +17,12 @@ runs:
       shell: bash
       run: pnpm install --frozen-lockfile
 
-    # The AdjustContrast story imports @nexus_ds/core, which is consumed via
+    # The AdjustContrast story imports @nxds/core, which is consumed via
     # its built dist/runtime entry (package.json exports). Build it so the
     # Storybook production build can resolve the package.
-    - name: Build @nexus_ds/core
+    - name: Build @nxds/core
       shell: bash
-      run: pnpm --filter @nexus_ds/core build
+      run: pnpm --filter @nxds/core build
 
     - name: Build Storybook
       shell: bash

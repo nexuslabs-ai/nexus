@@ -2,7 +2,7 @@
 
 import * as React from 'react';
 
-import { cn } from '@nexus_ds/react/utils';
+import { cn } from '@nxds/react/utils';
 
 import { getScrollOffset } from '../_lib/scroll-offset';
 

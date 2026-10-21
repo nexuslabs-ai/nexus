@@ -7,7 +7,7 @@ import { MDX_OPTIONS } from './mdx-options';
 
 const nextConfig: NextConfig = {
   output: 'export',
-  transpilePackages: ['@nexus_ds/react'],
+  transpilePackages: ['@nxds/react'],
   // let .md/.mdx resolve as modules (for content imported by the dynamic route)
   pageExtensions: ['ts', 'tsx', 'js', 'jsx', 'md', 'mdx'],
   // Pin the monorepo root (../.. from this file) so Turbopack doesn't walk past

@@ -3,8 +3,8 @@ import eslintCommentsPlugin from '@eslint-community/eslint-plugin-eslint-comment
 import {
   nexusComponentConfig,
   nexusSpacingTokenConfig,
-} from '@nexus_ds/eslint-plugin/config';
-import { nexusTailwindClassesConfig } from '@nexus_ds/eslint-plugin/tailwind';
+} from '@nxds/eslint-plugin/config';
+import { nexusTailwindClassesConfig } from '@nxds/eslint-plugin/tailwind';
 import prettierConfig from 'eslint-config-prettier';
 import jsxA11yPlugin from 'eslint-plugin-jsx-a11y';
 import reactPlugin from 'eslint-plugin-react';
@@ -259,7 +259,7 @@ export default tseslint.config(
   // published source carries no `@default` or `@example` copies of them.
   {
     files: ['packages/react/src/**/*.{ts,tsx}'],
-    rules: { '@nexus_ds/no-jsdoc-data-tags': 'error' },
+    rules: { '@nxds/no-jsdoc-data-tags': 'error' },
   },
 
   nexusTailwindClassesConfig({
@@ -305,7 +305,7 @@ export default tseslint.config(
             {
               group: ['@/*'],
               message:
-                '`@/` resolves to packages/react/src for the generated, paste-ready docs code only — import @nexus_ds/react here.',
+                '`@/` resolves to packages/react/src for the generated, paste-ready docs code only — import @nxds/react here.',
             },
           ],
         },
@@ -323,7 +323,7 @@ export default tseslint.config(
             {
               regex: '^@/(?!patterns/)',
               message:
-                'A pattern page imports its examples from `@/patterns/`, which @nexus_ds/react does not export — import components from @nexus_ds/react.',
+                'A pattern page imports its examples from `@/patterns/`, which @nxds/react does not export — import components from @nxds/react.',
             },
           ],
         },

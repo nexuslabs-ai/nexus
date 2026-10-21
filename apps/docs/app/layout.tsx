@@ -1,5 +1,5 @@
-import { NexusAppearanceProvider } from '@nexus_ds/react/appearance';
-import { NexusAppearanceScript } from '@nexus_ds/react/appearance/server';
+import { NexusAppearanceProvider } from '@nxds/react/appearance';
+import { NexusAppearanceScript } from '@nxds/react/appearance/server';
 import type { Metadata } from 'next';
 
 import { CopyAnnouncerProvider } from './_components/CopyAnnouncer';
