@@ -39,7 +39,7 @@ export default defineConfig({
           include: [
             'packages/core/src/lib/*.test.ts',
             'packages/react/src/lib/utils.test.ts',
-            'packages/eslint-plugin-nexus/__tests__/*.test.js',
+            'packages/eslint-plugin/__tests__/*.test.js',
           ],
         },
       },

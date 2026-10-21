@@ -79,9 +79,9 @@ jobs:
         uses: actions/cache@v4
         with:
           path: .eslintcache
-          key: eslint-${{ runner.os }}-${{ hashFiles('pnpm-lock.yaml', 'eslint.config.js', 'packages/eslint-plugin-nexus/src/**') }}-${{ github.sha }}
+          key: eslint-${{ runner.os }}-${{ hashFiles('pnpm-lock.yaml', 'eslint.config.js', 'packages/eslint-plugin/src/**') }}-${{ github.sha }}
           restore-keys: |
-            eslint-${{ runner.os }}-${{ hashFiles('pnpm-lock.yaml', 'eslint.config.js', 'packages/eslint-plugin-nexus/src/**') }}-
+            eslint-${{ runner.os }}-${{ hashFiles('pnpm-lock.yaml', 'eslint.config.js', 'packages/eslint-plugin/src/**') }}-
             eslint-${{ runner.os }}-
 
       - name: Lint

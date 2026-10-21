@@ -18,6 +18,8 @@ import { fileURLToPath, pathToFileURL } from 'node:url';
 
 import ts from 'typescript';
 
+const UPSTREAM_SCOPE = '@nxds';
+
 // Package names that are PUBLISHED upstream deps — never rebranded into the fork.
 export const KEEP_PACKAGES = ['@nxds/core', '@nxds/eslint-plugin'];
 
@@ -51,8 +53,19 @@ export const POLICY_OPTIONS = Object.keys(POLICY_PRESETS);
 /**
  * Derive an npm scope (`@examlly`) from a product name (`examlly-design-system`)
  * when `--scope` is not given: take the first `-`/`_`-delimited segment.
+ * Rejects the upstream scope, which would leave the fork un-rebranded.
  */
 export function deriveScope(name, explicitScope) {
+  const scope = pickScope(name, explicitScope);
+  if (scope === UPSTREAM_SCOPE) {
+    throw new Error(
+      `Scope "${scope}" is the upstream scope, so the fork would not be rebranded. Pass --scope=@your-scope.`
+    );
+  }
+  return scope;
+}
+
+function pickScope(name, explicitScope) {
   if (explicitScope) {
     if (!explicitScope.startsWith('@')) {
       throw new Error(`--scope must start with "@" (got "${explicitScope}").`);
@@ -231,7 +244,7 @@ export function parseExportArgs(argv, { validChoices } = {}) {
  */
 export function rebrandContent(text, scope) {
   return REBRAND_PACKAGES.reduce(
-    (out, pkg) => out.split(pkg).join(pkg.replace('@nxds', scope)),
+    (out, pkg) => out.split(pkg).join(pkg.replace(UPSTREAM_SCOPE, scope)),
     text
   );
 }
@@ -887,7 +900,7 @@ function writeRootScaffold(outDir, config, manifest) {
   const { name, scope, policy, tokenConfig } = config;
   const rootPkg = readJson(path.join(REPO_ROOT, 'package.json'));
   const eslintPluginVersion = readJson(
-    path.join(REPO_ROOT, 'packages', 'eslint-plugin-nexus', 'package.json')
+    path.join(REPO_ROOT, 'packages', 'eslint-plugin', 'package.json')
   ).version;
 
   const toolchain = {};

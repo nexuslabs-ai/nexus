@@ -78,7 +78,7 @@ glob per non-story row of [`.claude/rules/testing.md`](.claude/rules/testing.md)
 Outside stories, three kinds of unit test exist, all under the `unit` project
 (jsdom): the core engine's behaviour (`packages/core/src/lib`), the Nexus `cn`
 merge (`packages/react/src/lib/utils.test.ts`), and the ESLint plugin's rules
-(`packages/eslint-plugin-nexus/__tests__`). Apps, repo scripts and hooks have no
+(`packages/eslint-plugin/__tests__`). Apps, repo scripts and hooks have no
 tests of their own, and nothing uses snapshots.
 
 The spec lives in the rules, not here — what earns a test and what is
@@ -158,11 +158,13 @@ Everything lives under the `@nxds` scope — the published packages on npm and t
 
 ### Publishing setup (trusted publishing — no token)
 
-The packages authenticate to npm with **trusted publishing** (OIDC): GitHub Actions mints a short-lived credential at publish time, so there is **no `NPM_TOKEN` secret** in the repo. This is already configured:
+The packages authenticate to npm with **trusted publishing** (OIDC): GitHub Actions mints a short-lived credential at publish time, so there is **no `NPM_TOKEN` secret** in the repo. A new package is bootstrapped once, by hand:
 
-1. Both packages were bootstrapped with an initial manual `npm publish` — trusted publishing can't be configured until a package exists on npm.
-2. Each package has a **trusted publisher** registered on npmjs.com (_Settings → Trusted Publisher → GitHub Actions_) pointing at `nexuslabs-ai/nxds` and the `release.yml` workflow.
-3. A repo secret **`RELEASE_TOKEN`** — a fine-grained PAT from `nexuslabs-ai-bot` with **contents: read/write** and **pull requests: read/write** on this repo — authenticates the "Version Packages" PR. The default `GITHUB_TOKEN` can't be used here: PRs it opens don't fire `pull_request`, so the required `CI Status` check would never run on the version PR and it couldn't merge. Rotate the PAT before it expires.
+1. Publish it manually with `npm publish` from the branch that introduces it. Trusted publishing can't be configured until a package exists on npm.
+2. Register a **trusted publisher** on npmjs.com (_Settings → Trusted Publisher → GitHub Actions_) pointing at `nexuslabs-ai/nxds` and the `release.yml` workflow.
+3. Lock the package to OIDC: _Settings → Publishing access → Require two-factor authentication and disallow tokens_. Then revoke the token used for the manual publish.
+
+The release workflow also needs a repo secret **`RELEASE_TOKEN`** — a fine-grained PAT from `nexuslabs-ai-bot` with **contents: read/write** and **pull requests: read/write** on this repo — authenticates the "Version Packages" PR. The default `GITHUB_TOKEN` can't be used here: PRs it opens don't fire `pull_request`, so the required `CI Status` check would never run on the version PR and it couldn't merge. Rotate the PAT before it expires.
 
 The workflow grants `id-token: write` for the OIDC exchange, upgrades npm to a trusted-publishing-capable version (≥ 11.5.1) on the `.nvmrc` Node, and uses `RELEASE_TOKEN` for the release PR and tags. There is **no npm token** — publish auth is OIDC. Provenance attestations are emitted automatically.
 
@@ -183,7 +185,7 @@ The `Release` workflow runs on every push to `main`:
 1. **Collect** — with unreleased changesets present, it opens/updates a **"Version Packages"** PR that bumps versions and writes `CHANGELOG.md`s.
 2. **Publish** — when you merge that PR (changesets consumed), the next run builds the packages and runs `changeset publish`, pushing `@nxds/core` and `@nxds/eslint-plugin` to npm with provenance. Private packages are skipped automatically.
 
-`@nxds/core` and `@nxds/eslint-plugin` were bootstrapped at `0.0.1` by the initial manual publish. The staged initial changeset cuts the first **trusted-publishing** release: merging the Version Packages PR the workflow opens publishes both at `0.1.0`. Verify any release with a fresh external install:
+`@nxds/core` and `@nxds/eslint-plugin` were bootstrapped at `0.7.2` and `0.4.0` by the manual publish, so those two versions carry no provenance. Provenance starts with the first release the workflow publishes. Verify any release with a fresh external install:
 
 ```bash
 npm install @nxds/core @nxds/eslint-plugin

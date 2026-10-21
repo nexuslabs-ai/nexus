@@ -79,7 +79,7 @@ function discoverEslintRuleRefs() {
   const rulesDir = path.join(
     REPO_ROOT,
     'packages',
-    'eslint-plugin-nexus',
+    'eslint-plugin',
     'src',
     'rules'
   );
@@ -282,7 +282,7 @@ async function main() {
       );
       tarballs.push(
         packTarball(
-          path.join(REPO_ROOT, 'packages', 'eslint-plugin-nexus'),
+          path.join(REPO_ROOT, 'packages', 'eslint-plugin'),
           tarballDir
         )
       );
