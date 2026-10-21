@@ -16,9 +16,6 @@ import { TiltedJourney } from './TiltedJourney';
 import { VinylJourney } from './VinylJourney';
 import { WorkbenchJourney } from './WorkbenchJourney';
 
-import '@fontsource/dm-sans/latin-500.css';
-import '@fontsource/dm-sans/latin-600.css';
-
 const HeroDialLab = dynamic(
   () => import('./HeroDialLab').then((module) => module.HeroDialLab),
   { ssr: false }

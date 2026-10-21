@@ -1,25 +1,24 @@
 .home-page-content {
   container: homepage / inline-size;
   color: var(--nx-color-foreground);
-  font-family: 'DM Sans', sans-serif;
-  text-align: start;
+  font-family: var(--nx-typography-family-font-sans);
+  text-align: center;
 }
 .home-page-section {
   margin-block: var(--nx-spacing-24);
 }
 .home-section-heading {
   display: flex;
-  flex-wrap: wrap;
-  align-items: end;
-  justify-content: space-between;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
   gap: var(--nx-spacing-6);
   margin-block-end: var(--nx-spacing-8);
 }
 .home-kicker,
-.home-index,
 .home-visual-label {
   display: block;
-  font-size: 0.6875rem;
+  font-size: calc(var(--nx-typography-size-base) * 0.6875);
   line-height: 1.5;
   letter-spacing: 0.09em;
   font-weight: 500;
@@ -34,15 +33,19 @@
   margin: 0;
 }
 .home-page-content h2 {
-  font-size: clamp(1.75rem, 3.4cqi, 2.5rem);
+  font-size: clamp(
+    calc(var(--nx-typography-size-base) * 1.75),
+    3.4cqi,
+    calc(var(--nx-typography-size-base) * 2.5)
+  );
   line-height: 1.15;
   letter-spacing: -0.035em;
   font-weight: 600;
   text-wrap: balance;
 }
 .home-section-heading > p {
-  max-inline-size: 20rem;
-  font-size: 0.9375rem;
+  max-inline-size: 40rem;
+  font-size: calc(var(--nx-typography-size-base) * 0.9375);
   line-height: 1.6;
   color: var(--nx-color-muted-foreground);
 }
@@ -52,7 +55,7 @@
   gap: var(--nx-spacing-2);
   color: var(--nx-color-foreground);
   text-decoration: none;
-  font-size: 0.875rem;
+  font-size: calc(var(--nx-typography-size-base) * 0.875);
   line-height: 1.6;
 }
 .home-text-link:hover {
@@ -61,39 +64,43 @@
 }
 .home-reason {
   display: grid;
+  justify-items: center;
+  grid-template-columns: minmax(0, 1fr);
   gap: var(--nx-spacing-8);
   padding-block: var(--nx-spacing-12);
-  border-block-start: 1px solid var(--nx-color-border-default);
 }
 .home-reason-copy {
-  align-self: center;
-}
-.home-index {
-  margin-block-end: var(--nx-spacing-5);
-  font-family: monospace;
+  inline-size: min(100%, 48rem);
 }
 .home-page-content h3 {
-  font-size: clamp(1.5rem, 2.8cqi, 2rem);
+  font-size: clamp(
+    calc(var(--nx-typography-size-base) * 1.5),
+    2.8cqi,
+    calc(var(--nx-typography-size-base) * 2)
+  );
   font-weight: 500;
   line-height: 1.2;
   letter-spacing: -0.025em;
 }
 .home-reason-copy p {
-  max-inline-size: 29rem;
+  max-inline-size: 40rem;
+  margin-inline: auto;
   color: var(--nx-color-muted-foreground);
   line-height: 1.7;
-  font-size: 0.9375rem;
+  font-size: calc(var(--nx-typography-size-base) * 0.9375);
   margin-block-start: var(--nx-spacing-4);
 }
 .home-reason-copy .home-small-copy {
-  font-size: 0.8125rem;
+  font-size: calc(var(--nx-typography-size-base) * 0.8125);
 }
 .home-fit-visual,
 .home-theme-visual,
 .home-ownership-visual {
   min-inline-size: 0;
-  border: 1px solid var(--nx-color-border-default);
-  border-radius: var(--nx-spacing-3);
+  inline-size: min(100%, 48rem);
+  box-sizing: border-box;
+  border: var(--nx-borderwidth-default) solid var(--nx-color-border-default);
+  border-radius: var(--nx-radius-lg);
   background: var(--nx-color-container);
   padding: clamp(1.25rem, 4cqi, 3rem);
   min-block-size: 15rem;
@@ -110,13 +117,13 @@
 }
 .home-fit-visual code {
   display: block;
-  font-size: 0.75rem;
+  font-size: calc(var(--nx-typography-size-base) * 0.75);
   line-height: 2;
   overflow-wrap: anywhere;
   margin-block-start: var(--nx-spacing-3);
 }
 .home-visual-plus {
-  font-size: 1.5rem;
+  font-size: calc(var(--nx-typography-size-base) * 1.5);
   color: var(--nx-color-muted-foreground);
   text-align: center;
 }
@@ -124,7 +131,7 @@
 .home-theme-visual p,
 .home-ownership-visual p {
   grid-column: 1 / -1;
-  font-size: 0.75rem;
+  font-size: calc(var(--nx-typography-size-base) * 0.75);
   text-align: center;
   color: var(--nx-color-muted-foreground);
   line-height: 1.5;
@@ -139,11 +146,11 @@
 }
 .home-token-row span,
 .home-source-row code {
-  border: 1px solid var(--nx-color-border-default);
-  border-radius: var(--nx-spacing-2);
+  border: var(--nx-borderwidth-default) solid var(--nx-color-border-default);
+  border-radius: var(--nx-radius-md);
   padding: var(--nx-spacing-3);
   background: var(--nx-color-background);
-  font-size: 0.75rem;
+  font-size: calc(var(--nx-typography-size-base) * 0.75);
 }
 .home-visual-arrow {
   color: var(--nx-color-muted-foreground);
@@ -153,51 +160,28 @@
   inline-size: 100%;
   padding: var(--nx-spacing-4);
   box-sizing: border-box;
-  border: 1px solid var(--nx-color-border-default);
-  border-radius: var(--nx-spacing-2);
+  border: var(--nx-borderwidth-default) solid var(--nx-color-border-default);
+  border-radius: var(--nx-radius-md);
   background: var(--nx-color-background);
 }
 .home-engine code {
   display: block;
   margin-block-start: var(--nx-spacing-2);
-  font-size: 0.875rem;
+  font-size: calc(var(--nx-typography-size-base) * 0.875);
 }
 .home-why-link {
   margin-block-start: var(--nx-spacing-4);
 }
-.home-workflow {
-  border-block-start: 1px solid var(--nx-color-border-default);
-  padding-block-start: var(--nx-spacing-12);
-}
-.home-workflow-grid {
-  display: grid;
-  grid-template-columns: 1fr;
-  gap: var(--nx-spacing-10);
-}
-.home-workflow-grid article {
-  display: flex;
-  align-items: start;
-  flex-direction: column;
-}
-.home-workflow-grid h3 {
-  font-size: 1.25rem;
-}
-.home-workflow-grid p {
-  margin-block: var(--nx-spacing-4) var(--nx-spacing-6);
-  color: var(--nx-color-muted-foreground);
-  font-size: 0.9375rem;
-  line-height: 1.7;
-}
-.home-workflow-grid a {
-  margin-block-start: auto;
-}
 .home-start {
   text-align: center;
   padding-block: clamp(3rem, 10cqi, 7rem);
-  border-block: 1px solid var(--nx-color-border-default);
 }
 .home-start h2 {
-  font-size: clamp(2rem, 4.5cqi, 3rem);
+  font-size: clamp(
+    calc(var(--nx-typography-size-base) * 2),
+    4.5cqi,
+    calc(var(--nx-typography-size-base) * 3)
+  );
 }
 .home-start p {
   color: var(--nx-color-muted-foreground);
@@ -213,13 +197,14 @@
 .home-footer {
   display: flex;
   flex-wrap: wrap;
-  justify-content: space-between;
+  flex-direction: column;
+  justify-content: center;
   gap: var(--nx-spacing-6);
   padding-block: var(--nx-spacing-10);
   align-items: center;
 }
 .home-footer-brand {
-  font-size: 1.5rem;
+  font-size: calc(var(--nx-typography-size-base) * 1.5);
   font-weight: 600;
   color: inherit;
   text-decoration: none;
@@ -227,31 +212,23 @@
 }
 .home-footer p {
   color: var(--nx-color-muted-foreground);
-  font-size: 0.8125rem;
+  font-size: calc(var(--nx-typography-size-base) * 0.8125);
   margin-block-start: var(--nx-spacing-2);
 }
 .home-footer nav {
   display: flex;
+  justify-content: center;
   flex-wrap: wrap;
   gap: var(--nx-spacing-5);
 }
 .home-footer nav a {
   color: var(--nx-color-muted-foreground);
   text-decoration: none;
-  font-size: 0.8125rem;
+  font-size: calc(var(--nx-typography-size-base) * 0.8125);
 }
 .home-footer nav a:hover {
   color: var(--nx-color-foreground);
   text-decoration: underline;
-}
-@container homepage (min-width: 40rem) {
-  .home-reason {
-    grid-template-columns: 1fr 1fr;
-    gap: var(--nx-spacing-10);
-  }
-  .home-workflow-grid {
-    grid-template-columns: repeat(3, minmax(0, 1fr));
-  }
 }
 @container homepage (min-width: 60rem) {
   .home-fit-visual {
@@ -266,22 +243,22 @@
 }
 .home-framework-card {
   padding: var(--nx-spacing-6);
-  border: 1px solid var(--nx-color-border-default);
-  border-radius: var(--nx-spacing-3);
+  border: var(--nx-borderwidth-default) solid var(--nx-color-border-default);
+  border-radius: var(--nx-radius-lg);
 }
 .home-framework-card h3 {
-  font-size: 1.25rem;
+  font-size: calc(var(--nx-typography-size-base) * 1.25);
 }
 .home-framework-status {
   display: block;
   margin-block-start: var(--nx-spacing-5);
-  font-size: 0.8125rem;
+  font-size: calc(var(--nx-typography-size-base) * 0.8125);
   color: var(--nx-color-muted-foreground);
 }
 .home-page-content .home-framework-note {
   max-inline-size: 45rem;
   margin-block: var(--nx-spacing-6) var(--nx-spacing-4);
-  font-size: 0.9375rem;
+  font-size: calc(var(--nx-typography-size-base) * 0.9375);
   line-height: 1.7;
   color: var(--nx-color-muted-foreground);
 }

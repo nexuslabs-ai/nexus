@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from 'react';
 
+import { useNexusAppearance } from '@nexus_ds/react/appearance';
 import {
   IconAsterisk,
   IconBorderAll,
@@ -16,7 +17,7 @@ import {
 } from '@tabler/icons-react';
 
 import { ClaudeLogo, CursorLogo } from './BrandLogos';
-import { journeyColors, toolColors } from './journey-colors';
+import { toolColors, useJourneyColors } from './journey-colors';
 
 import './inline-stacks-journey.css';
 
@@ -89,6 +90,8 @@ function TileStack({
 }
 
 export function InlineStacksJourney({ mode, tuning, children }) {
+  const { state } = useNexusAppearance();
+  const reduceMotion = state.prefs.reduceMotion;
   const [step, setStep] = useState(0);
   const [paused, setPaused] = useState(false);
   const [categoryOffset, setCategoryOffset] = useState(0);
@@ -103,20 +106,20 @@ export function InlineStacksJourney({ mode, tuning, children }) {
   const toolIndex =
     cycle * tools.length + Math.max(0, phase - categories.length) + toolOffset;
   useEffect(() => {
-    if (paused || tuning?.autoTour === false) return;
+    if (reduceMotion || paused || tuning?.autoTour === false) return;
     const timer = setTimeout(
       () => setStep((value) => value + 1),
       tuning?.holdMs ?? 1300
     );
     return () => clearTimeout(timer);
-  }, [step, paused, tuning?.autoTour, tuning?.holdMs]);
+  }, [reduceMotion, step, paused, tuning?.autoTour, tuning?.holdMs]);
   function advanceCategory() {
     setCategoryOffset((value) => value + 1);
   }
   function advanceTool() {
     setToolOffset((value) => value + 1);
   }
-  const palette = journeyColors();
+  const palette = useJourneyColors();
   const toolPalette = tools.map(() => toolColors(mode));
   return (
     <>

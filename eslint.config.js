@@ -253,6 +253,12 @@ export default tseslint.config(
     entryPoint: repoPath('apps/docs/app/globals.css'),
   }),
 
+  // The isolated host demo uses copied shadcn utilities, without the nx prefix.
+  nexusTailwindClassesConfig({
+    files: ['apps/docs/coexistence-preview/ui/**/*.{ts,tsx}'],
+    entryPoint: repoPath('apps/docs/coexistence-preview/preview.css'),
+  }),
+
   // Button consumes --nx-radius-base; FilterConditionField opts in with a
   // line-scoped disable (both documented in theming/radius-overrides).
   {

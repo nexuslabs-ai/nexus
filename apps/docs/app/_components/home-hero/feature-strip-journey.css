@@ -1,14 +1,23 @@
 .feature-strip {
   container: feature-strip / inline-size;
-  font-family: 'DM Sans', sans-serif;
+  font-family: var(--nx-typography-family-font-sans);
   color: var(--nx-color-foreground);
 }
 .feature-strip-intro {
   text-align: center;
-  padding-block: clamp(48px, 8cqi, var(--lab-top, 96px)) 64px;
+  padding-block: clamp(
+      48px,
+      8cqi,
+      var(--lab-top, calc(var(--nx-spacing-4) * 6))
+    )
+    64px;
 }
 .feature-strip .feature-strip-intro .journey-title {
-  font-size: clamp(2rem, 1rem + 3cqi, var(--lab-title, 3rem));
+  font-size: clamp(
+    calc(var(--nx-typography-size-base) * 2),
+    calc(var(--nx-typography-size-base) * 1) + 3cqi,
+    var(--lab-title, calc(var(--nx-typography-size-base) * 3))
+  );
   line-height: 1.12;
   letter-spacing: -0.04em;
   color: inherit;
@@ -22,12 +31,12 @@
 }
 .feature-strip-band {
   display: grid;
-  gap: var(--lab-section, 40px);
+  gap: var(--lab-section, calc(var(--nx-spacing-4) * 2.5));
   margin-bottom: var(--nx-spacing-16);
 }
 .feature-strip h2 {
   margin: 0;
-  font-size: var(--lab-heading, 1rem);
+  font-size: var(--lab-heading, calc(var(--nx-typography-size-base) * 1));
   line-height: 1.5;
   font-weight: 600;
 }
@@ -39,35 +48,35 @@
 .feature-strip-tiles {
   display: flex;
   flex-wrap: wrap;
-  gap: var(--nx-spacing-5) var(--lab-gap, 8px);
+  gap: var(--nx-spacing-5) var(--lab-gap, calc(var(--nx-spacing-4) * 0.5));
   justify-content: space-between;
-  margin-top: var(--lab-heading-gap, 20px);
+  margin-top: var(--lab-heading-gap, calc(var(--nx-spacing-4) * 1.25));
 }
 .feature-strip-tiles li {
   display: flex;
   flex-direction: column;
   align-items: center;
   gap: var(--nx-spacing-3);
-  font-size: var(--lab-label, 12px);
+  font-size: var(--lab-label, calc(var(--nx-typography-size-base) * 0.75));
   min-width: 60px;
 }
 .feature-strip-tile {
   display: grid;
   place-items: center;
-  width: var(--lab-tile, 52px);
-  height: var(--lab-tile, 52px);
-  border-radius: var(--lab-radius, 12px);
+  width: var(--lab-tile, calc(var(--nx-spacing-4) * 3.25));
+  height: var(--lab-tile, calc(var(--nx-spacing-4) * 3.25));
+  border-radius: var(--lab-radius, var(--nx-radius-lg));
   color: var(--ink);
   background: var(--paper);
   outline: 1px solid transparent;
   outline-offset: 3px;
   transition:
-    transform var(--lab-expand, 320ms),
-    outline-color var(--lab-expand, 320ms);
+    transform var(--lab-expand, var(--nx-motion-duration-slow)),
+    outline-color var(--lab-expand, var(--nx-motion-duration-slow));
 }
 .feature-strip-tile svg {
-  width: var(--lab-icon, 24px);
-  height: var(--lab-icon, 24px);
+  width: var(--lab-icon, calc(var(--nx-spacing-4) * 1.5));
+  height: var(--lab-icon, calc(var(--nx-spacing-4) * 1.5));
 }
 .feature-strip-tile[data-active='true'],
 .feature-strip-tiles li:hover .feature-strip-tile {
@@ -77,15 +86,15 @@
 .feature-strip-tools {
   display: flex;
   flex-wrap: wrap;
-  gap: var(--lab-tool-gap, 20px);
-  margin-top: var(--lab-tool-heading-gap, 20px);
+  gap: var(--lab-tool-gap, calc(var(--nx-spacing-4) * 1.25));
+  margin-top: var(--lab-tool-heading-gap, calc(var(--nx-spacing-4) * 1.25));
 }
 .feature-strip-tools li {
   display: flex;
   align-items: center;
   gap: var(--nx-spacing-2);
-  min-height: var(--lab-tool, 52px);
-  font-size: var(--lab-label, 14px);
+  min-height: var(--lab-tool, calc(var(--nx-spacing-4) * 3.25));
+  font-size: var(--lab-label, calc(var(--nx-typography-size-base) * 0.875));
 }
 .feature-strip-tools svg {
   width: 28px;
@@ -141,7 +150,8 @@
     gap: var(--nx-spacing-6);
   }
   .feature-strip-examples > div + div {
-    border-left: 1px solid var(--nx-color-border-default);
+    border-left: var(--nx-borderwidth-default) solid
+      var(--nx-color-border-default);
     padding-left: var(--nx-spacing-6);
   }
 }
@@ -151,7 +161,8 @@
     align-items: start;
   }
   .feature-strip-compatibility {
-    border-left: 1px solid var(--nx-color-border-default);
+    border-left: var(--nx-borderwidth-default) solid
+      var(--nx-color-border-default);
     padding-left: var(--nx-spacing-8);
   }
   .feature-strip-tiles {

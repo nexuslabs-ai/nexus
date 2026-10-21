@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from 'react';
 
+import { useNexusAppearance } from '@nexus_ds/react/appearance';
 import { IconBrandGit, IconCopy, IconPencilCode } from '@tabler/icons-react';
 
 import { AntDesignLogo, MuiLogo, ShadcnLogo } from './EcosystemLogos';
@@ -30,9 +31,11 @@ const tileSets = [
 ];
 
 export function RotatingHeadlineJourney(props) {
+  const { state } = useNexusAppearance();
   const [paused, setPaused] = useState(false);
   const [slide, setSlide] = useState(0);
-  const stopped = paused || props.tuning?.autoTour === false;
+  const stopped =
+    state.prefs.reduceMotion || paused || props.tuning?.autoTour === false;
   useEffect(() => {
     if (stopped) return;
     const timer = setInterval(

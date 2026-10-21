@@ -125,3 +125,38 @@ Guidance: modern-web-guidance search `CSS text animation transform opacity acces
 The rotating iteration uses one 3.4s timer for both the benefit text and its tile set.
 Pause and Auto Tour stop that shared timer. The rotating title uses an 8px line
 gap independently of the older section-spacing preset.
+
+## Appearance ownership
+
+Homepage and hero styles consume the enclosing NexusAppearanceProvider tokens.
+Tile surfaces derive primary-subtle pairs from nine illustrative color seeds,
+using the provider state and resolved mode. Label/icon ink meets the body contrast
+tier. Tool tiles inherit muted and foreground. Fonts and text sizes inherit the typography tokens;
+radii and strokes inherit appearance axes. Studio sizes are ratios of the Nexus
+spacing/type scales, while corners are no longer independently overridden.
+Explicit reduceMotion stops the rotating headline, tile tour, wheel, and stacks.
+Material-study artwork (foil shader and vinyl pigment/glints) remains illustrative
+art, not a second page theme. Flat sections intentionally have no elevation.
+
+Guidance: bundled modern-web-guidance `guides/css/design-token-reactivity.md`
+(the offline CLI returned ENOTCACHED). Use inherited custom properties directly;
+no style queries or environment detection are needed. Verify provider font,
+mode, density, corners, and reduced-motion changes in the homepage preview.
+
+### Framework iterations
+
+Frameworks studio retains Shared foundation and Text cards and adds Connected
+foundation and Framework playground · Zag. The connected layout follows the
+framework-to-core composition approved in the design review. The playground
+borrows Zag's framework selector plus source/live-example structure, with a real
+Nexus React Button counter. Other bindings remain explicitly Planned; no future
+package APIs are presented as available.
+
+Guidance: MDN CSS container queries
+(https://developer.mozilla.org/en-US/docs/Web/CSS/Guides/Containment/Container_queries).
+The existing `frameworks` container switches the demo to two columns and draws
+connectors at 48rem. Below that, choices wrap and the demo stacks; connectors are
+omitted when the logos no longer form a single row. All surfaces and controls
+inherit Nexus appearance tokens. Verified both selections through DialKit and
+checked the counter increment/reset and planned-framework messaging in the live
+preview. Scoped ESLint and diff checks pass.

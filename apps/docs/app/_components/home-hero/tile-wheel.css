@@ -33,7 +33,7 @@
   height: 52px;
   margin: -26px 0 0 -26px;
   border: 0;
-  border-radius: 12px;
+  border-radius: var(--nx-radius-lg);
   background: var(--paper);
   color: var(--ink);
   display: flex;
@@ -48,7 +48,9 @@
     width 320ms ease,
     margin-left 320ms ease,
     box-shadow 300ms ease;
-  box-shadow: 0 10px 24px #0000000d;
+  box-shadow: var(--nx-shadow-sm-layer-1-x) var(--nx-shadow-sm-layer-1-y)
+    var(--nx-shadow-sm-layer-1-blur) var(--nx-shadow-sm-layer-1-spread)
+    var(--nx-shadow-sm-layer-1-color);
 }
 .wheel-tile svg {
   width: 24px;
@@ -82,7 +84,9 @@
 }
 .wheel-tile[data-front='true'] {
   box-shadow:
-    0 18px 32px #00000014,
+    var(--nx-shadow-sm-layer-1-x) var(--nx-shadow-sm-layer-1-y)
+      var(--nx-shadow-sm-layer-1-blur) var(--nx-shadow-sm-layer-1-spread)
+      var(--nx-shadow-sm-layer-1-color),
     inset 0 0 0 1px color-mix(in srgb, var(--ink) 12%, transparent);
 }
 .wheel-stage[data-dragging='true'] .wheel-rotor {
@@ -109,7 +113,7 @@
   outline-offset: 4px;
 }
 .journey-wheel .journey-heading {
-  font-size: 1rem;
+  font-size: calc(var(--nx-typography-size-base) * 1);
 }
 .journey-wheel .journey-sequence {
   gap: var(--nx-spacing-8);

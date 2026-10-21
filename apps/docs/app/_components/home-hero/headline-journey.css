@@ -3,8 +3,12 @@
 }
 .headline-journey .workbench-journey .journey-title,
 .headline-journey .workbench-journey .journey-heading {
-  font-family: 'DM Sans', sans-serif;
-  font-size: clamp(1.75rem, 1rem + 3cqi, var(--lab-title, 3rem));
+  font-family: var(--nx-typography-family-font-sans);
+  font-size: clamp(
+    calc(var(--nx-typography-size-base) * 1.75),
+    calc(var(--nx-typography-size-base) * 1) + 3cqi,
+    var(--lab-title, calc(var(--nx-typography-size-base) * 3))
+  );
   font-weight: 600;
   line-height: 1.14;
   letter-spacing: -0.04em;
@@ -37,13 +41,13 @@
 }
 .headline-journey .journey-tile,
 .headline-journey .journey-tool {
-  width: var(--lab-tile, 60px);
-  height: var(--lab-tile, 60px);
+  width: var(--lab-tile, calc(var(--nx-spacing-4) * 3.75));
+  height: var(--lab-tile, calc(var(--nx-spacing-4) * 3.75));
 }
 .headline-journey .journey-tool {
-  width: var(--lab-tool, 60px);
-  height: var(--lab-tool, 60px);
+  width: var(--lab-tool, calc(var(--nx-spacing-4) * 3.75));
+  height: var(--lab-tool, calc(var(--nx-spacing-4) * 3.75));
 }
 .headline-journey [data-mode='dark'] .journey-heading {
-  color: #fff;
+  color: var(--nx-color-foreground);
 }

@@ -1,0 +1,54 @@
+.coexist-visual {
+  container: coexist / inline-size;
+  inline-size: min(100%, 56rem);
+  min-inline-size: 0;
+  justify-self: center;
+  display: grid;
+  gap: var(--nx-spacing-6);
+}
+.coexist-demo-controls,
+.coexist-demo-controls > div {
+  display: flex;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: var(--nx-spacing-2);
+}
+.coexist-connected-card {
+  border: var(--nx-borderwidth-default) solid var(--nx-color-border-default);
+  border-radius: var(--nx-radius-lg);
+  overflow: hidden;
+  text-align: start;
+}
+.coexist-comparison {
+  display: grid;
+}
+.coexist-comparison .coexist-integration {
+  background: #24292e;
+}
+@container coexist (min-width: 48rem) {
+  .coexist-comparison {
+    grid-template-columns: minmax(0, 1.1fr) minmax(0, 1fr);
+  }
+  .coexist-comparison .coexist-preview-frame {
+    border-inline-start: var(--nx-borderwidth-default) solid
+      var(--nx-color-border-default);
+  }
+}
+
+.coexist-code-tabs {
+  padding: var(--nx-spacing-3);
+  justify-content: start;
+}
+.coexist-comparison .coexist-docs-frame {
+  max-block-size: 30rem;
+  overflow: auto;
+}
+
+.coexist-preview-frame {
+  display: block;
+  width: 100%;
+  min-width: 0;
+  height: 34rem;
+  border: 0;
+  background: var(--nx-color-background);
+}

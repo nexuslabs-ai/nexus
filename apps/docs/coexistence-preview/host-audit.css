@@ -1,0 +1,46 @@
+:root {
+  --primary: #0e7490;
+  --primary-foreground: #ffffff;
+  --radius: 16px;
+}
+body {
+  margin: 20px;
+  font-family: Arial, sans-serif;
+}
+html.dark body {
+  background: #141414;
+  color: #eee;
+}
+.audit-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 20px;
+}
+.audit-case {
+  padding: 16px;
+  border: 1px solid #8886;
+  min-width: 0;
+}
+.audit-case > small {
+  display: block;
+  margin-bottom: 12px;
+  opacity: 0.7;
+}
+.host-brand-action {
+  background: var(--primary);
+  color: var(--primary-foreground);
+  border-radius: var(--radius);
+  border: 0;
+  padding: 12px 20px;
+}
+.host-brand-card {
+  border: 2px solid var(--primary);
+  border-radius: var(--radius);
+  padding: 16px;
+}
+#audit-report {
+  max-height: 120px;
+  overflow: auto;
+  white-space: pre-wrap;
+  font-size: 11px;
+}

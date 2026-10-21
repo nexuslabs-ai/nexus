@@ -4,6 +4,7 @@ import { useId } from 'react';
 
 import { Button } from '@nexus_ds/react';
 
+import { CoexistenceSection } from './CoexistenceSection';
 import { FrameworkSection } from './FrameworkSection';
 
 import './home-page.css';
@@ -29,37 +30,7 @@ export function HomePageSections({ docsBase = '' }) {
   return (
     <div className="home-page-content">
       <FrameworkSection docsBase={docsBase} />
-      <section
-        className="home-page-section home-reason"
-        aria-labelledby={`${id}-coexist`}
-      >
-        <div className="home-reason-copy">
-          <span className="home-kicker">FITS YOUR APP</span>
-          <h2 id={`${id}-coexist`}>Works with your existing app.</h2>
-          <p>
-            Already building with MUI, Ant Design, or shadcn/ui? Add Nexus
-            alongside your existing components. Its scoped classes and tokens
-            are designed to keep styles separate, so you can adopt it one
-            component at a time.
-          </p>
-        </div>
-        <div className="home-theme-visual">
-          <span className="home-visual-label">YOUR EXISTING APP</span>
-          <div className="home-token-row">
-            <span>MUI</span>
-            <span>Ant Design</span>
-            <span>shadcn/ui</span>
-          </div>
-          <span className="home-visual-plus" aria-hidden="true">
-            +
-          </span>
-          <div className="home-engine">
-            <span className="home-visual-label">NEXUS</span>
-            <code>nx: classes · --nx- tokens</code>
-          </div>
-          <p>Keep what works. Add what you need.</p>
-        </div>
-      </section>
+      <CoexistenceSection docsBase={docsBase} />
       <section
         className="home-page-section home-reason"
         aria-labelledby={`${id}-testing`}
@@ -165,56 +136,6 @@ export function HomePageSections({ docsBase = '' }) {
             <code>NexusAppearanceProvider</code>
           </div>
           <p>Set it once. Carry it through the interface.</p>
-        </div>
-      </section>
-      <section
-        className="home-page-section home-workflow"
-        aria-labelledby={`${id}-workflow`}
-      >
-        <div className="home-section-heading">
-          <div>
-            <span className="home-kicker">YOUR WORKFLOW</span>
-            <h2 id={`${id}-workflow`}>A clear path into your project.</h2>
-          </div>
-          <p>From your first component to a theme that feels like yours.</p>
-        </div>
-        <div className="home-workflow-grid">
-          <article>
-            <span className="home-index">01</span>
-            <h3>Set the foundation.</h3>
-            <p>
-              Add the theme and appearance provider. Keep your application’s
-              settings in one place.
-            </p>
-            <a
-              className="home-text-link"
-              href={`${docsBase}/getting-started/install`}
-            >
-              Installation guide →
-            </a>
-          </article>
-          <article>
-            <span className="home-index">02</span>
-            <h3>Make it your own.</h3>
-            <p>
-              Choose your appearance, then copy the components you need. Their
-              source belongs in your project.
-            </p>
-            <a className="home-text-link" href={`${docsBase}/create`}>
-              Create your theme →
-            </a>
-          </article>
-          <article>
-            <span className="home-index">03</span>
-            <h3>Bring your tools.</h3>
-            <p>
-              Give your coding agent the Markdown docs and component APIs
-              through the llms.txt index.
-            </p>
-            <a className="home-text-link" href={`${docsBase}/agents/llms-txt`}>
-              Connect your agent →
-            </a>
-          </article>
         </div>
       </section>
       <section className="home-start" aria-labelledby={`${id}-start`}>

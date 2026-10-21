@@ -1,7 +1,8 @@
 'use client';
 
-import { useId } from 'react';
+import { useId, useState } from 'react';
 
+import { Button } from '@nexus_ds/react';
 import {
   IconBrandAngular,
   IconBrandReact,
@@ -27,6 +28,8 @@ const config = {
     options: [
       { value: 'foundation', label: 'Shared foundation' },
       { value: 'cards', label: 'Text cards' },
+      { value: 'connected', label: 'Connected foundation' },
+      { value: 'playground', label: 'Framework playground · Zag' },
     ],
     default: 'foundation',
   },
@@ -36,7 +39,7 @@ const config = {
     contentGap: [40, 16, 72, 4],
     cardPadding: [24, 16, 48, 4],
   },
-  appearance: { iconSize: [40, 24, 64, 4], radius: [12, 0, 24, 2] },
+  appearance: { iconSize: [40, 24, 64, 4] },
   reset: { type: 'action', label: 'Reset frameworks' },
 };
 
@@ -50,20 +53,20 @@ export function FrameworkSection({ docsBase = '' }) {
     },
   });
   const p = dial.values;
-  const foundation = p.layout === 'foundation';
+  const foundation = p.layout === 'foundation' || p.layout === 'connected';
   return (
     <section
       className="home-page-section framework-section"
       data-layout={p.layout}
       aria-labelledby={id}
       style={{
-        '--framework-title': `${p.typography.titleSize}px`,
-        '--framework-label': `${p.typography.labelSize}px`,
-        '--framework-padding': `${p.spacing.sectionPadding}px`,
-        '--framework-gap': `${p.spacing.contentGap}px`,
-        '--framework-card-padding': `${p.spacing.cardPadding}px`,
-        '--framework-icon': `${p.appearance.iconSize}px`,
-        '--framework-radius': `${p.appearance.radius}px`,
+        '--framework-title': `calc(var(--nx-typography-size-base) * ${p.typography.titleSize / 16})`,
+        '--framework-label': `calc(var(--nx-typography-size-base) * ${p.typography.labelSize / 16})`,
+        '--framework-padding': `calc(var(--nx-spacing-4) * ${p.spacing.sectionPadding / 16})`,
+        '--framework-gap': `calc(var(--nx-spacing-4) * ${p.spacing.contentGap / 16})`,
+        '--framework-card-padding': `calc(var(--nx-spacing-4) * ${p.spacing.cardPadding / 16})`,
+        '--framework-icon': `calc(var(--nx-spacing-4) * ${p.appearance.iconSize / 16})`,
+        '--framework-radius': 'var(--nx-radius-lg)',
       }}
     >
       <div className="framework-heading">
@@ -79,45 +82,128 @@ export function FrameworkSection({ docsBase = '' }) {
           Components that speak your framework.
         </p>
       </div>
-      <div className="framework-composition">
-        {foundation && (
-          <div className="framework-foundation">
-            <span className="framework-foundation-name">Nexus core</span>
-            <div className="framework-token-list">
-              <span>Color</span>
-              <span>Typography</span>
-              <span>Spacing</span>
-              <span>Appearance</span>
-            </div>
-            <span className="framework-foundation-caption">
-              Shared tokens. A consistent interface.
-            </span>
+      {p.layout === 'playground' ? (
+        <FrameworkPlayground />
+      ) : (
+        <div className="framework-composition">
+          <div className="framework-options">
+            {frameworks.map(([name, Icon]) => (
+              <article className="framework-option" key={name}>
+                <Icon aria-hidden="true" stroke={1.5} />
+                <h3>{name}</h3>
+                <span
+                  className="framework-availability"
+                  data-available={name === 'React'}
+                >
+                  {name === 'React' ? 'Available today' : 'Planned'}
+                </span>
+              </article>
+            ))}
           </div>
-        )}
-        <div className="framework-options">
-          {frameworks.map(([name, Icon]) => (
-            <article className="framework-option" key={name}>
-              <Icon aria-hidden="true" stroke={1.5} />
-              <h3>{name}</h3>
-              <span
-                className="framework-availability"
-                data-available={name === 'React'}
-              >
-                {name === 'React' ? 'Available today' : 'Planned'}
+          {foundation && (
+            <div className="framework-foundation">
+              <span className="framework-foundation-name">Nexus core</span>
+              <div className="framework-token-list">
+                <span>Color</span>
+                <span>Typography</span>
+                <span>Spacing</span>
+                <span>Appearance</span>
+              </div>
+              <span className="framework-foundation-caption">
+                Shared tokens. A consistent interface.
               </span>
-            </article>
-          ))}
+            </div>
+          )}
         </div>
-      </div>
+      )}
       <div className="framework-footer">
-        <p>Start with React today. More framework bindings are planned.</p>
-        <a
-          className="home-text-link"
-          href={`${docsBase}/getting-started/why-nexus#one-token-system-many-frameworks`}
-        >
-          Explore the foundation <span aria-hidden="true">→</span>
-        </a>
+        <Button asChild>
+          <a
+            href={`${docsBase}/getting-started/why-nexus#one-token-system-many-frameworks`}
+          >
+            Explore the foundation <span aria-hidden="true">→</span>
+          </a>
+        </Button>
       </div>
     </section>
+  );
+}
+
+const counterSource = `import { useState } from 'react';
+import { Button } from '@nexus_ds/react';
+
+export function Counter() {
+  const [count, setCount] = useState(0);
+
+  return (
+    <Button onClick={() => setCount(count + 1)}>
+      Count: {count}
+    </Button>
+  );
+}`;
+
+function FrameworkPlayground() {
+  const [selected, setSelected] = useState('React');
+  const [count, setCount] = useState(0);
+  return (
+    <div className="framework-playground">
+      <div
+        className="framework-switcher"
+        role="group"
+        aria-label="Framework example"
+      >
+        {frameworks.map(([name, Icon]) => (
+          <button
+            type="button"
+            key={name}
+            aria-pressed={selected === name}
+            onClick={() => setSelected(name)}
+          >
+            <Icon aria-hidden="true" stroke={1.5} />
+            <span>{name}</span>
+            {name !== 'React' && <small>Planned</small>}
+          </button>
+        ))}
+      </div>
+      <div className="framework-demo-body">
+        <div className="framework-source">
+          <span className="home-visual-label">
+            {selected === 'React' ? 'counter.tsx' : `${selected} · planned`}
+          </span>
+          {selected === 'React' ? (
+            <pre>
+              <code>{counterSource}</code>
+            </pre>
+          ) : (
+            <div className="framework-planned">
+              <h3>{selected} is on the roadmap.</h3>
+              <p>
+                The shared token foundation is ready. This framework binding is
+                planned; there is no installable component example yet.
+              </p>
+              <span>Color · Typography · Spacing · Appearance</span>
+            </div>
+          )}
+        </div>
+        <div className="framework-live">
+          <span className="home-visual-label">Live React preview</span>
+          <div className="framework-counter">
+            <Button onClick={() => setCount(count + 1)}>Count: {count}</Button>
+            <Button variant="ghost" onClick={() => setCount(0)}>
+              Reset
+            </Button>
+          </div>
+          <p>
+            Real components.
+            <br />
+            Your appearance settings.
+          </p>
+        </div>
+      </div>
+      <div className="framework-demo-caption">
+        <strong>Nexus core</strong>
+        <span>One foundation beneath every framework.</span>
+      </div>
+    </div>
   );
 }

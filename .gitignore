@@ -73,3 +73,6 @@ apps/docs/generated/
 apps/docs/__generated__/
 apps/docs/public/avatars/
 apps/docs/app/_lib/*.generated.ts
+
+# Generated isolated homepage preview
+apps/docs/public/coexistence-preview/

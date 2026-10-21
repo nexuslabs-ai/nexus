@@ -2,9 +2,13 @@
 
 import { useEffect, useId, useRef, useState } from 'react';
 
+import { useNexusAppearance } from '@nexus_ds/react/appearance';
+
 import './tile-wheel.css';
 
 export function TileWheel({ details, colors, tuning }) {
+  const { state } = useNexusAppearance();
+  const reduceMotion = state.prefs.reduceMotion;
   const count = details.length;
   const wheelId = useId();
   const [position, setPosition] = useState(0);
@@ -14,13 +18,26 @@ export function TileWheel({ details, colors, tuning }) {
   const dragged = useRef(false);
   const selected = ((Math.round(position) % count) + count) % count;
   useEffect(() => {
-    if (interacted || tuning?.autoTour === false || position >= count) return;
+    if (
+      reduceMotion ||
+      interacted ||
+      tuning?.autoTour === false ||
+      position >= count
+    )
+      return;
     const timer = setTimeout(
       () => setPosition((p) => p + 1),
       position === 0 ? 3200 : (tuning?.holdMs ?? 1300)
     );
     return () => clearTimeout(timer);
-  }, [position, interacted, count, tuning?.autoTour, tuning?.holdMs]);
+  }, [
+    reduceMotion,
+    position,
+    interacted,
+    count,
+    tuning?.autoTour,
+    tuning?.holdMs,
+  ]);
   function advance(delta) {
     setInteracted(true);
     setPosition((p) => Math.round(p) + delta);

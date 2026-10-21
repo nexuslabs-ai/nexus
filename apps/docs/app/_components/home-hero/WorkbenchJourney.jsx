@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from 'react';
 
+import { useNexusAppearance } from '@nexus_ds/react/appearance';
 import {
   IconAsterisk,
   IconBorderAll,
@@ -16,7 +17,7 @@ import {
 } from '@tabler/icons-react';
 
 import { ClaudeLogo, CursorLogo } from './BrandLogos';
-import { journeyColors, toolColors } from './journey-colors';
+import { toolColors, useJourneyColors } from './journey-colors';
 import { TileWheel } from './TileWheel';
 
 import './workbench-journey.css';
@@ -61,7 +62,9 @@ export function WorkbenchJourney({
     </h2>
   ),
 }) {
-  const colors = journeyColors();
+  const { state } = useNexusAppearance();
+  const reduceMotion = state.prefs.reduceMotion;
+  const colors = useJourneyColors();
   const toolsStyle = toolColors(mode);
   const [toolsReady, setToolsReady] = useState(false);
   const [step, setStep] = useState(-1);
@@ -75,6 +78,7 @@ export function WorkbenchJourney({
       : null);
   useEffect(() => {
     if (
+      reduceMotion ||
       wheel ||
       tuning?.autoTour === false ||
       step >= details.length ||
@@ -88,6 +92,7 @@ export function WorkbenchJourney({
     );
     return () => clearTimeout(timer);
   }, [
+    reduceMotion,
     step,
     hovered,
     focused,
@@ -187,7 +192,7 @@ export function WorkbenchJourney({
       {children && (
         <div
           className="journey-following"
-          data-ready={!showTools || toolsReady}
+          data-ready={reduceMotion || !showTools || toolsReady}
         >
           {children}
         </div>

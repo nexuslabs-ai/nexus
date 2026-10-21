@@ -1,0 +1,49 @@
+body {
+  margin: 0;
+  background: var(--background);
+}
+.billing-status {
+  padding: 24px;
+  font-family: Arial, sans-serif;
+  color: var(--foreground);
+  display: grid;
+  gap: 22px;
+}
+.billing-status header > span {
+  font-size: 11px;
+  letter-spacing: 0.08em;
+  color: var(--muted-foreground);
+}
+.billing-status header h2 {
+  font-size: 22px;
+  font-weight: 600;
+  margin-block: 12px 8px;
+  line-height: 1.25;
+}
+.billing-status header p,
+.billing-status footer p {
+  font-size: 13px;
+  color: var(--muted-foreground);
+  margin: 0;
+}
+.billing-notices {
+  display: grid;
+  gap: 18px;
+}
+.billing-variant {
+  display: flex;
+  justify-content: space-between;
+  gap: 8px;
+  font-size: 12px;
+  margin-bottom: 8px;
+  color: var(--muted-foreground);
+}
+.billing-variant code {
+  font: 10px monospace;
+  color: var(--muted-foreground);
+}
+.billing-status footer {
+  display: grid;
+  gap: 12px;
+  justify-items: start;
+}

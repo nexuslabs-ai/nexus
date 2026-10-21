@@ -2,7 +2,11 @@
   padding-top: var(--lab-top);
 }
 .hero-lab .journey-title {
-  font-size: clamp(2rem, 4vw, var(--lab-title));
+  font-size: clamp(
+    calc(var(--nx-typography-size-base) * 2),
+    4vw,
+    var(--lab-title)
+  );
 }
 @media (min-width: 64rem) {
   .hero-lab .journey-title {

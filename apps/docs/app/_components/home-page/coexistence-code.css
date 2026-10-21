@@ -1,0 +1,109 @@
+.coexist-code {
+  display: grid;
+  justify-items: center;
+  gap: var(--nx-spacing-6);
+  inline-size: min(100%, 56rem);
+  min-inline-size: 0;
+  justify-self: center;
+}
+.coexist-code-switcher {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: var(--nx-spacing-2);
+}
+.coexist-code-toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  gap: var(--nx-spacing-3);
+  padding: var(--nx-spacing-4) var(--nx-spacing-6);
+  background: var(--nx-color-muted);
+  color: var(--nx-color-muted-foreground);
+  font-size: calc(var(--nx-typography-size-base) * 0.8125);
+}
+.coexist-code-toolbar b {
+  color: var(--nx-color-foreground);
+  margin-inline-end: var(--nx-spacing-2);
+}
+.coexist-integration {
+  display: grid;
+  gap: var(--nx-spacing-3);
+  min-inline-size: 0;
+  text-align: start;
+}
+.coexist-docs-frame {
+  border-block-start: var(--nx-borderwidth-default) solid
+    var(--nx-color-border-default);
+}
+/* GitHub Dark is an intentional editor surface, independent of page theme. */
+.coexist-docs-frame .coexist-github-code {
+  margin: 0;
+  padding: 16px 0;
+  background: #24292e;
+  color: #e1e4e8;
+  font-family: var(--nx-typography-family-font-mono);
+  font-size: 14px;
+  line-height: 24px;
+  tab-size: 2;
+}
+.coexist-docs-frame .coexist-github-code code {
+  display: grid;
+  min-inline-size: max-content;
+  font-family: inherit;
+  font-size: 14px;
+  line-height: 24px;
+}
+.coexist-docs-line {
+  display: block;
+  position: relative;
+  min-block-size: 24px;
+  padding-inline: 64px 56px;
+  white-space: pre;
+}
+.coexist-docs-line::before {
+  content: attr(data-line);
+  position: absolute;
+  inset-block-start: 0;
+  inset-inline-start: 16px;
+  inline-size: 20px;
+  text-align: end;
+  color: #959da5;
+  user-select: none;
+}
+.coexist-docs-line[data-added] {
+  background: #2b4336;
+  box-shadow: inset 3px 0 #85e89d;
+}
+.coexist-docs-line[data-added]::after {
+  content: '+';
+  position: absolute;
+  inset-block-start: 0;
+  inset-inline-start: 44px;
+  color: #85e89d;
+  user-select: none;
+}
+
+.coexist-code-only-frame {
+  inline-size: 100%;
+  min-inline-size: 0;
+  border: var(--nx-borderwidth-default) solid var(--nx-color-border-default);
+  border-radius: var(--nx-radius-md);
+  overflow: hidden;
+}
+.coexist-code-only-frame .coexist-docs-frame {
+  border-block-start: 0;
+}
+
+.coexist-integration .coexist-docs-frame {
+  min-inline-size: 0;
+  border: 0;
+  background: #24292e;
+}
+.coexist-integration .coexist-github-code code {
+  min-inline-size: 0;
+}
+.coexist-integration .coexist-docs-line {
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+}

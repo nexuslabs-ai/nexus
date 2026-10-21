@@ -3,6 +3,7 @@
 import { useEffect, useState } from 'react';
 
 import { Button, Input, Switch } from '@nexus_ds/react';
+import { useNexusAppearance } from '@nexus_ds/react/appearance';
 import {
   IconAsterisk,
   IconBorderAll,
@@ -17,7 +18,7 @@ import {
 } from '@tabler/icons-react';
 
 import { ClaudeLogo, CursorLogo } from './BrandLogos';
-import { journeyColors } from './journey-colors';
+import { useJourneyColors } from './journey-colors';
 
 import './workbench-journey.css';
 import './feature-strip-journey.css';
@@ -40,18 +41,20 @@ export function FeatureStripJourney({
   componentsHref = '/components',
   playgroundHref = '/create',
 }) {
-  const colors = journeyColors();
+  const { state } = useNexusAppearance();
+  const reduceMotion = state.prefs.reduceMotion;
+  const colors = useJourneyColors();
   const [active, setActive] = useState(-1);
   const [paused, setPaused] = useState(false);
   const [saved, setSaved] = useState(false);
   useEffect(() => {
-    if (paused || tuning?.autoTour === false) return;
+    if (reduceMotion || paused || tuning?.autoTour === false) return;
     const timer = setInterval(
       () => setActive((value) => (value + 1) % details.length),
       tuning?.holdMs ?? 1300
     );
     return () => clearInterval(timer);
-  }, [paused, tuning?.autoTour, tuning?.holdMs]);
+  }, [reduceMotion, paused, tuning?.autoTour, tuning?.holdMs]);
   function saveExample(event) {
     event.preventDefault();
     setSaved(true);
