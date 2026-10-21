@@ -1,14 +1,10 @@
 NEXUS DESIGN SYSTEM — PRESS KIT
-Locked nx: identity | 21 October 2026
+21 October 2026
 
-Use nx: for the standalone logo and icon; use the full nx:ds wordmark in the website header. No border. Original vector artwork, no font dependency.
-Includes the approved 16-unit n and lighter x. The D/s letterforms are retained only for the website wordmark; the old stacked badge is retired.
-
-svg/: transparent logo and square icon masters, light/dark variants.
-png/: logo exports and square icon exports.
-favicon/: adaptive SVG, multi-resolution ICO, and Apple touch icon.
-source/: editable SVG geometry and export script.
-fonts/: DM Sans and JetBrains Mono with license notices; these are website typography, not logo fonts.
-BRAND-GUIDELINES.txt: construction, usage, typography and positioning.
-
-Light/dark refers to the destination background. Preserve aspect ratio.
+Primary logo: approved borderless nxds block wordmark, open x and dense rounded s. No colon. Same geometry in light and dark.
+source/mark.svg: editable full-wordmark master.
+svg/nx-logo*.svg and svg/nxds-website-wordmark*.svg: full wordmark.
+png/nx-logo-*: transparent full-wordmark exports.
+svg/nx-icon-*, png/nx-icon-*, favicon/: retained compact nx: icon, unchanged by this wordmark approval.
+fonts/: website DM Sans and JetBrains Mono, with licenses. Logo requires no font.
+BRAND-GUIDELINES.txt: geometry, usage, typography and positioning.

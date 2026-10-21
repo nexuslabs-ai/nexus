@@ -1,26 +1,27 @@
 NEXUS DESIGN SYSTEM — BRAND FOUNDATION
-21 October 2026 | nx: identity locked
+21 October 2026 | nxds block wordmark approved
 
 CONFIRMED IDENTITY
-Public product name: Nexus Design System. Short handle: nxds. Company: Nexus Labs.
-Website header: use the full nx:ds wordmark with the approved lowercase-height D shape. Standalone logo and icons: use nx:. Both share the approved 16-unit n and lighter x. The stacked NXDS badge, frames, and Conthrax experiments are retired.
-Original vector artwork, with no font dependency. No border or enclosing badge.
+Product: Nexus Design System. Handle: nxds. Company: Nexus Labs.
+Primary logo and website header: approved borderless nxds block wordmark, with no colon. Use the open diagonal x and dense rounded s as supplied in source/mark.svg. Original vector artwork, no font dependency.
+The existing compact nx: icon remains the favicon/app-icon asset. Its geometry has not been redesigned in this wordmark approval; do not substitute a crop of the new wordmark.
 
-LOCKED GEOMETRY
-n: 76 × 56 units; 16-unit stems and top band; concentric outer R20 and inner R4 curves; R3 terminal corners.
-x: approved lighter B outline, circular R3 fillets at tips and inner joins. Preserve the supplied paths, including optical corrections.
-Colon: two 16-unit squares with R3 corners, at y=6 and y=34. Keep the spacing as supplied.
-Logo viewBox: 204 × 72, including 8-unit internal clear space. Standalone logo preview: 68 × 24 CSS px. Website wordmark: viewBox 374 × 72, displayed at 96 × 18.432 CSS px.
-Square icon viewBox: 224 × 224; unchanged mark centered at (18,84). Do not stretch the horizontal mark into a square.
-Both themes share identical paths. Website logo inherits navigation foreground via currentColor. Standalone light-background ink #171717; dark-background ink #FAFAFA.
+APPROVED WORDMARK GEOMETRY
+Master viewBox: 664 × 132. Each letter is 160 units wide; gaps are 8 units.
+n: R32 outer shoulders, 14-unit opening with R7 end.
+x: diagonal arms, R6.5 inward fillets and R4 external fillets. Preserve optical paths.
+d: R32 shoulders, 12-unit counter with R6 ends.
+s: dense rounded body, 14-unit openings with R7 ends; top cut end center x72/y45, bottom x88/y87 in letter coordinates. Its inner and outer arcs are not concentric: optical density was prioritized.
+Do not enforce one constant gap across tapered x wedges. Do not stretch, retype, add a border, or insert a colon.
+Website size: 96 × 19.084337 CSS px. Preserve aspect ratio; do not force the former header height.
+Both themes use identical geometry. Website inherits currentColor; supplied light-background ink #171717, dark-background ink #FAFAFA.
 
 USAGE AND ASSETS
-Header: full nx:ds wordmark, accessible link name “Nexus Design System home”.
-Favicon, app icon and social avatar: the same nx: mark centered within a square canvas. PNG/ICO variants include an opaque background for reliable contrast; SVG variants are transparent.
-Small favicons contain a wide mark at limited resolution; use the supplied exports rather than squeezing or rearranging the letters.
-Source master: source/mark.svg. Logo/icon exports: svg/. PNG sizes: png/. Browser icons: favicon/.
-Website source: apps/docs/app/_components/NexusWordmark.tsx and apps/docs/public/brand/nx-*.svg.
-Preserve aspect ratio, spacing, rounded corners and paths. Do not add a frame. D/s are used only in the full website wordmark. No theme-specific geometry changes.
+Header accessible link name: Nexus Design System home. SVG itself is decorative inside that link.
+source/mark.svg is the full-wordmark master. svg/nx-logo.svg and svg/nxds-website-wordmark.svg use currentColor. Light/dark SVGs and transparent PNGs are provided.
+svg/nx-icon-*.svg and favicon/ contain the retained compact nx: icon. The PNG/ICO icons have opaque backgrounds for contrast.
+Website component: apps/docs/app/_components/NexusWordmark.tsx.
+Maintain clear space of at least one counter width (14 master units) around the full wordmark. Review the supplied 96px sample before using smaller sizes.
 
 APPROVED TYPOGRAPHY — OPTION B
 Headings, body text and standalone product name: DM Sans.
@@ -28,7 +29,7 @@ Code, code blocks and technical monospace content: JetBrains Mono.
 Starting hierarchy: headings 600; body 400; labels/navigation 500; code 400.
 Use the existing responsive type scale rather than forcing a single size across all screens. Body text should generally be 16–18px; code should generally be at least 14px. These are starting recommendations, not a new global component-size override.
 Keep code letter spacing neutral and programming ligatures disabled for literal syntax clarity.
-Use the supplied nx: vector artwork; do not retype it in DM Sans.
+Use the supplied nxds vector artwork; do not retype it in DM Sans.
 DM Sans and JetBrains Mono are self-hosted on the website. Their font files and SIL Open Font License notices are included in this kit. The approved original wordmark is vector artwork and requires no font software. The website sets the families through its appearance defaults; consumer apps retain their own typography choices.
 
 APPROVED POSITIONING
@@ -62,4 +63,4 @@ Describe tested stories and behaviors according to actual coverage. Do not imply
 This approval establishes positioning, not an independent audit of current feature or test coverage.
 
 FURTHER BRAND WORK
-Positioning and the nx: mark are approved. Refine voice examples, accent strategy and reusable communication templates. The product name remains Nexus Design System; nxds remains the handle. Package, repository and domain migrations are separate work.
+Positioning and the nxds wordmark are approved. Refine voice examples, accent strategy and reusable communication templates. The product name remains Nexus Design System; nxds remains the handle. Package, repository and domain migrations are separate work.
