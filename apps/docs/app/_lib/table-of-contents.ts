@@ -1,4 +1,4 @@
-import { getScrollOffset } from './scroll-offset';
+import { getScrollOffset } from './scroll-offset.ts';
 
 export const DOCS_ARTICLE_ID = 'docs-article';
 

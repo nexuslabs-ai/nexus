@@ -14,7 +14,7 @@
     "generate:demos": "node scripts/generate-demo-index.mjs",
     "generate:demos:watch": "node scripts/generate-demo-index.mjs --watch",
     "audit:grammar-pin": "node scripts/audit-grammar-pin.mjs",
-    "typecheck": "tsc --noEmit",
+    "typecheck": "tsc --noEmit && tsc -p tsconfig.node.json",
     "clean": "rm -rf .next out generated __generated__ app/_lib/*.generated.ts"
   },
   "dependencies": {

@@ -33,14 +33,19 @@ export function componentSlugs() {
     .sort();
 }
 
+/** The modules `source` imports or re-exports, read by the TypeScript scanner. */
+export function importSpecifiers(source) {
+  return ts
+    .preProcessFile(source, true, true)
+    .importedFiles.map(({ fileName }) => fileName);
+}
+
 const COMPONENT_SPECIFIER = './components/';
 
 /** Every component `@nexus_ds/react` exports, by its folder slug, sorted. */
 export function exportedComponentSlugs() {
   const index = readFileSync(path.join(reactSrc, 'index.ts'), 'utf8');
-  const slugs = ts
-    .preProcessFile(index)
-    .importedFiles.map(({ fileName }) => fileName)
+  const slugs = importSpecifiers(index)
     .filter((fileName) => fileName.startsWith(COMPONENT_SPECIFIER))
     .map((fileName) => {
       const specifier = fileName.slice(COMPONENT_SPECIFIER.length);

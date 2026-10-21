@@ -33,6 +33,8 @@ type Edit = [start: number, end: number, replacement: string];
 const STORYBOOK_MODULE = /^(?:storybook(?:\/|$)|@storybook\/)/;
 const SPY_MODULE = 'storybook/test';
 
+function unwrap(node: ts.Node): ts.Node;
+function unwrap(node: ts.Node | undefined): ts.Node | undefined;
 function unwrap(node: ts.Node | undefined) {
   let current = node;
   while (
@@ -119,7 +121,7 @@ function docsDescription(
   const notInline = new Error(
     `${where} its \`parameters.docs.description.${kind}\` is not written inline — use object literals, without spreads or shorthand, down to a string literal or a \`[…].join(…)\` of them.`
   );
-  let current: ts.Node | undefined = object;
+  let current: ts.Node = object;
   for (const key of ['parameters', 'docs', 'description', kind]) {
     const level = unwrap(current);
     if (!level || !ts.isObjectLiteralExpression(level)) throw notInline;
@@ -132,7 +134,7 @@ function docsDescription(
     if (!ts.isPropertyAssignment(property)) throw notInline;
     current = property.initializer;
   }
-  const value = unwrap(current) as ts.Node;
+  const value = unwrap(current);
   const text = isPlainString(value) ? value.text : joinedStrings(value);
   if (text === null) throw notInline;
   const unsupported = unsupportedMarkdown(text);
@@ -396,8 +398,8 @@ function attributeText(
   value: ts.Node | undefined,
   file: StoriesFile
 ) {
-  if (isDropped(value, file)) return '';
-  const node = unwrap(value) as ts.Node;
+  if (!value || isDropped(value, file)) return '';
+  const node = unwrap(value);
   if (isPlainString(node) && !ESCAPE_IN_JSX_STRING.test(node.text)) {
     return `${name}="${node.text}"`;
   }
@@ -406,8 +408,8 @@ function attributeText(
 }
 
 function childText(value: ts.Node | undefined, file: StoriesFile) {
-  if (isDropped(value, file)) return '';
-  const node = unwrap(value) as ts.Node;
+  if (!value || isDropped(value, file)) return '';
+  const node = unwrap(value);
   if (isPlainString(node) && !ESCAPE_IN_JSX_TEXT.test(node.text)) {
     return node.text;
   }
@@ -696,13 +698,14 @@ function decorate(
   const unsupported = new Error(
     `${where} it is wrapped in a decorator the docs page can't show (\`${decorator.getText().replace(/\s+/g, ' ').slice(0, 60)}\`) — make the decorator a plain \`(Story) => <…><Story /></…>\` wrapper, or put its markup in the story.`
   );
-  let fn = unwrap(decorator);
-  if (fn && ts.isIdentifier(fn)) {
-    const statement = file.declarations.get(fn.text);
+  let fn: ts.Node | undefined = unwrap(decorator);
+  if (ts.isIdentifier(fn)) {
+    const name = fn.text;
+    const statement = file.declarations.get(name);
     const declaration =
       statement && ts.isVariableStatement(statement)
         ? statement.declarationList.declarations.find(
-            (candidate) => candidate.name.getText() === fn?.getText()
+            (candidate) => candidate.name.getText() === name
           )
         : undefined;
     fn = unwrap(declaration?.initializer);

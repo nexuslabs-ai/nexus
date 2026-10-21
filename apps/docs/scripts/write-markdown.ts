@@ -1,8 +1,6 @@
 import type { Element, ElementContent, Nodes, Root } from 'hast';
-import { createJiti } from 'jiti';
 import { existsSync, readFileSync, statSync, writeFileSync } from 'node:fs';
 import path from 'node:path';
-import { pathToFileURL } from 'node:url';
 import rehypeParse from 'rehype-parse';
 import rehypeRemark from 'rehype-remark';
 import remarkGfm from 'remark-gfm';
@@ -10,10 +8,17 @@ import remarkStringify from 'remark-stringify';
 import { unified } from 'unified';
 import type { VFile } from 'vfile';
 
-import type * as Manifest from '../app/_lib/manifest.ts';
-import type * as TableOfContents from '../app/_lib/table-of-contents.ts';
+import { PAGE_MANIFEST } from '../app/_lib/manifest.ts';
+import { DOCS_ARTICLE_ID } from '../app/_lib/table-of-contents.ts';
 
 import { docsRoot } from './roots.mjs';
+
+declare module 'vfile' {
+  interface DataMap {
+    /** The page's internal links, collected by `articleOnly`. */
+    links: string[];
+  }
+}
 
 /** Elements that only make sense on screen: copy buttons and breadcrumbs. */
 const DROPPED_TAGS = new Set(['nav', 'button', 'script', 'style', 'svg']);
@@ -26,16 +31,6 @@ if (!existsSync(outDir)) {
   console.error('Missing out/. Run `next build` first.');
   process.exit(1);
 }
-
-const jiti = createJiti(
-  pathToFileURL(path.join(docsRoot, 'package.json')).href
-);
-const { PAGE_MANIFEST } = await jiti.import<typeof Manifest>(
-  path.join(docsRoot, 'app', '_lib', 'manifest.ts')
-);
-const { DOCS_ARTICLE_ID } = await jiti.import<typeof TableOfContents>(
-  path.join(docsRoot, 'app', '_lib', 'table-of-contents.ts')
-);
 
 /** The first element in `node`'s subtree that passes `test`. */
 function findElement(
@@ -182,7 +177,7 @@ for (const section of PAGE_MANIFEST) {
     const markdown = String(processed);
     linksByRoute.set(
       page.route,
-      (processed.data.links as string[]).map((href) =>
+      (processed.data.links ?? []).map((href) =>
         href.startsWith('#') ? `${page.route}${href}` : href
       )
     );

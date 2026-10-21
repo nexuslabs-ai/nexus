@@ -2,7 +2,9 @@
 // The docs read prop defaults from code and usage examples from `docs`
 // stories, so a `@default` or `@example` tag is a second copy that can drift.
 
-const TAG = /^(\s*\*?\s*)@(default|example)\b/;
+// TypeScript reads a tag at the start of a line, after its `*`, or after
+// whitespace mid-line.
+const TAG = /(^\s*\*?\s*|\s)@(default|example)\b/;
 
 export default {
   meta: {
@@ -35,6 +37,7 @@ export default {
             // The first line starts after the comment's own `/*`.
             const column =
               (index === 0 ? comment.loc.start.column + 2 : 0) +
+              match.index +
               match[1].length;
             context.report({
               loc: {

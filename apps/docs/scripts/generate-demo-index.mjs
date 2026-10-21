@@ -8,8 +8,6 @@ import {
 } from 'node:fs';
 import path from 'node:path';
 
-import ts from 'typescript';
-
 import { componentUsage, entryUsage } from './component-usage.ts';
 import {
   componentDescription,
@@ -25,6 +23,7 @@ import {
   blockSources,
   componentSlugs,
   exportedComponentSlugs,
+  importSpecifiers,
   readCanonical,
   writeIfChanged,
 } from './react-sources.mjs';
@@ -197,12 +196,6 @@ function packageName(specifier) {
 
 function withoutExtension(file) {
   return file.replace(/\.tsx?$/, '');
-}
-
-function importSpecifiers(source) {
-  return ts
-    .preProcessFile(source, true, true)
-    .importedFiles.map(({ fileName }) => fileName);
 }
 
 function readInstallBlocks() {

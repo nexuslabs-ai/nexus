@@ -25,6 +25,7 @@ ruleTester.run('no-jsdoc-data-tags', rule, {
     // A tag name inside prose is not a tag.
     `/** Defaults come from code, so no @defaults tag is needed. */
     const y = 1;`,
+    '/** Write to support@default.dev for help. */\nconst z = 1;',
   ],
   invalid: [
     {
@@ -49,6 +50,14 @@ function ButtonGroup() {}`,
     {
       code: '/** @default false */\nconst inset = undefined;',
       errors: [{ messageId: 'default', line: 1, column: 5 }],
+    },
+    {
+      code: '/** Size of the trigger. @default "md" */\nconst size = "md";',
+      errors: [{ messageId: 'default', line: 1, column: 26 }],
+    },
+    {
+      code: '/**@example <Badge /> */\nfunction Badge() {}',
+      errors: [{ messageId: 'example', line: 1, column: 4 }],
     },
     {
       code: `/**
