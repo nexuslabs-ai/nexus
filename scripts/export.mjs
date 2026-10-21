@@ -67,7 +67,7 @@ export function deriveScope(name, explicitScope) {
 
 function pickScope(name, explicitScope) {
   if (explicitScope) {
-    if (!/^@[a-z0-9][a-z0-9-]*$/.test(explicitScope)) {
+    if (!/^@[a-z0-9][a-z0-9._-]*$/.test(explicitScope)) {
       throw new Error(
         `--scope must be a lowercase npm scope like "@acme" (got "${explicitScope}").`
       );
