@@ -40,7 +40,7 @@ Concrete rule: if you grep your file and find no `@container (...)` rule scoping
 
 ## Canonical pattern in JSX
 
-The declarative `<Show>` / `<Hide>` primitives ([#103](https://github.com/nexuslabs-ai/nexus/issues/103), exported from `@nexus_ds/react`) express responsive visibility across both axes. They toggle `display: contents` ↔ `display: none` — children always render; only visibility changes (no mount/unmount). Because a `contents` wrapper generates no box of its own, an inline, flex, or grid child keeps its natural layout (this is the conclusion of the #103 spike — `display: block`/`revert` would break those cases).
+The declarative `<Show>` / `<Hide>` primitives ([#103](https://github.com/nexuslabs-ai/nxds/issues/103), exported from `@nexus_ds/react`) express responsive visibility across both axes. They toggle `display: contents` ↔ `display: none` — children always render; only visibility changes (no mount/unmount). Because a `contents` wrapper generates no box of its own, an inline, flex, or grid child keeps its natural layout (this is the conclusion of the #103 spike — `display: block`/`revert` would break those cases).
 
 Provide **exactly one** axis (`above` / `below` / `containerAbove` / `containerBelow`) — a discriminated union rejects zero or two at compile time. Container axes query the nearest `@container` ancestor, so a parent must declare one (e.g. the `nx:@container` utility).
 
@@ -73,6 +73,6 @@ For exceptions, use viewport breakpoints (`nx:sm:`, `nx:md:`, etc.) as you norma
 
 ## See also
 
-- [#103](https://github.com/nexuslabs-ai/nexus/issues/103) + `packages/react/src/components/{show,hide}/` (sharing `packages/react/src/lib/responsive-visibility.ts`) — the shipped `<Show>` / `<Hide>` source, stories, and spike-conclusion header
+- [#103](https://github.com/nexuslabs-ai/nxds/issues/103) + `packages/react/src/components/{show,hide}/` (sharing `packages/react/src/lib/responsive-visibility.ts`) — the shipped `<Show>` / `<Hide>` source, stories, and spike-conclusion header
 - `packages/core/tokens/semantic/breakpoints.json` — the `--breakpoint-*` token values
 - `packages/react/src/components/dialog/dialog.tsx` — the live viewport-driven exception

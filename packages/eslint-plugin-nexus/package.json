@@ -11,16 +11,16 @@
     "eslint-plugin",
     "tailwindcss"
   ],
-  "homepage": "https://nexusui.so/getting-started/install#optional-add-lint-rules",
+  "homepage": "https://nxds.dev/getting-started/install#optional-add-lint-rules",
   "bugs": {
-    "url": "https://github.com/nexuslabs-ai/nexus/issues"
+    "url": "https://github.com/nexuslabs-ai/nxds/issues"
   },
   "engines": {
     "node": ">=20.19.0"
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/nexuslabs-ai/nexus.git",
+    "url": "git+https://github.com/nexuslabs-ai/nxds.git",
     "directory": "packages/eslint-plugin-nexus"
   },
   "publishConfig": {

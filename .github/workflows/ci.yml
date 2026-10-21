@@ -471,7 +471,7 @@ jobs:
     if: needs.deploy-gate.outputs.latest == 'true'
     environment:
       name: docs
-      url: https://nexusui.so
+      url: https://nxds.dev
     steps:
       - name: Checkout
         uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4.3.1
@@ -482,7 +482,7 @@ jobs:
           artifact: docs-site
           config: apps/docs/wrangler.jsonc
           assets-dir: apps/docs/out
-          host: nexusui.so
+          host: nxds.dev
           api-token: ${{ secrets.CLOUDFLARE_API_TOKEN }}
           account-id: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
 
@@ -493,7 +493,7 @@ jobs:
     if: needs.deploy-gate.outputs.latest == 'true'
     environment:
       name: storybook
-      url: https://storybook.nexusui.so
+      url: https://storybook.nxds.dev
     steps:
       - name: Checkout
         uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4.3.1
@@ -504,6 +504,6 @@ jobs:
           artifact: storybook-static
           config: packages/react/wrangler.jsonc
           assets-dir: packages/react/storybook-static
-          host: storybook.nexusui.so
+          host: storybook.nxds.dev
           api-token: ${{ secrets.CLOUDFLARE_API_TOKEN }}
           account-id: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
