@@ -175,9 +175,13 @@ for (const section of PAGE_MANIFEST) {
       value: readFileSync(htmlFile, 'utf8'),
     });
     const markdown = String(processed);
+    const links = processed.data.links;
+    if (!links) {
+      throw new Error(`No links collected for ${page.route}.`);
+    }
     linksByRoute.set(
       page.route,
-      (processed.data.links ?? []).map((href) =>
+      links.map((href) =>
         href.startsWith('#') ? `${page.route}${href}` : href
       )
     );

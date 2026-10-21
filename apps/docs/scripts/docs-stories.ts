@@ -61,7 +61,7 @@ function tagsOf(object: ts.ObjectLiteralExpression) {
   );
   if (!property || !ts.isPropertyAssignment(property)) return [];
   const array = unwrap(property.initializer);
-  if (!array || !ts.isArrayLiteralExpression(array)) return [];
+  if (!ts.isArrayLiteralExpression(array)) return [];
   return array.elements.filter(ts.isStringLiteral).map((tag) => tag.text);
 }
 
@@ -102,7 +102,7 @@ function joinedStrings(node: ts.Node): string | null {
   }
   const array = unwrap(callee.expression);
   const [separator] = node.arguments;
-  if (!array || !ts.isArrayLiteralExpression(array)) return null;
+  if (!ts.isArrayLiteralExpression(array)) return null;
   if (!separator || !isPlainString(separator)) return null;
   const strings = array.elements.filter(isPlainString);
   if (strings.length !== array.elements.length) return null;
@@ -124,7 +124,7 @@ function docsDescription(
   let current: ts.Node = object;
   for (const key of ['parameters', 'docs', 'description', kind]) {
     const level = unwrap(current);
-    if (!level || !ts.isObjectLiteralExpression(level)) throw notInline;
+    if (!ts.isObjectLiteralExpression(level)) throw notInline;
     if (level.properties.some(ts.isSpreadAssignment)) throw notInline;
     const property = level.properties.find(
       (candidate) =>
@@ -244,7 +244,7 @@ function parseStoriesFile(filePath: string): StoriesFile {
     }
     if (ts.isExportAssignment(statement)) {
       const exported = unwrap(statement.expression);
-      if (exported && ts.isIdentifier(exported)) metaName = exported.text;
+      if (ts.isIdentifier(exported)) metaName = exported.text;
       continue;
     }
     if (ts.isVariableStatement(statement)) {
@@ -630,7 +630,7 @@ function fromRender(
   visit(fn.body);
 
   if (!ts.isBlock(fn.body)) {
-    const returned = unwrap(fn.body) ?? fn.body;
+    const returned = unwrap(fn.body);
     return {
       kind: 'expression',
       prelude: '',
@@ -676,7 +676,7 @@ function asExpression(rendered: Rendered, where: string): RenderedExpression {
       `${where} its render returns from more than one place, so its decorator has nothing single to wrap — end the render in one \`return\`.`
     );
   }
-  const returned = unwrap(last.expression) ?? last.expression;
+  const returned = unwrap(last.expression);
   return {
     kind: 'expression',
     prelude: statements
@@ -731,7 +731,7 @@ function decorate(
     body = only.expression;
   }
   const wrapper = unwrap(body);
-  if (!wrapper || !isJsx(wrapper)) throw unsupported;
+  if (!isJsx(wrapper)) throw unsupported;
 
   const placeholders: ts.JsxSelfClosingElement[] = [];
   let otherUses = 0;
