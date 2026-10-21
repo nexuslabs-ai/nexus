@@ -157,7 +157,7 @@ function LayerShowcase() {
 /** A small product scene rendered with the appearance the page is showing. */
 export function Sampler() {
   return (
-    <div data-slot="create-sampler" className="nx:@container">
+    <div data-slot="playground-sampler" className="nx:@container">
       <div className="nx:grid nx:grid-cols-1 nx:@2xl:grid-cols-2 nx:gap-6">
         <ProjectForm />
         <div className="nx:space-y-6">

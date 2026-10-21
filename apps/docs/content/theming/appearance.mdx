@@ -1,3 +1,6 @@
+export const description =
+  'Set your whole Nexus UI theme from one appearance object: brand color, surface tone, contrast, density, corners, shadows and borders.';
+
 # Appearance
 
 Appearance is one object that sets your app's whole theme: colors, density,
@@ -8,6 +11,14 @@ the provider you copied in
 [Install](/getting-started/install#step-3-add-the-appearance-provider).
 
 ## Fields
+
+Color is one setting out of many. Density, corners, shadows, border width, type
+and motion are settings too, so "make this product denser" is a one-field
+change, not a refactor.
+
+Every option ships in the stylesheet. The provider applies colors as CSS
+variables, `mode` as the `.dark` class, and density, corners, shadows and
+border width as data attributes. Switching an option needs no rebuild.
 
 | Field                            | Values                                                                                                | Sets                                                                |
 | -------------------------------- | ----------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------- |
@@ -55,6 +66,8 @@ export function ModeButton() {
 ```
 
 Use `useNexusAppearance` to build theme controls for your own settings page.
+To switch brands, set `brandColor` the same way. Nexus builds the new palette
+and restyles every component at once, without a rebuild.
 
 ## Brand color
 
@@ -150,5 +163,8 @@ For the contrast targets behind each value, see
 ## Save the theme
 
 The provider saves the appearance and restores it before the page paints.
-[Theme setup](/getting-started/theme-setup) shows how to set this up for
-Next.js and Vite.
+[Install](/getting-started/install#step-3-add-the-appearance-provider) shows the
+setup for Next.js, and [Set up Vite](/getting-started/install#set-up-vite) for
+Vite.
+
+To change the theme inside one element, see [Overrides](/theming/overrides).

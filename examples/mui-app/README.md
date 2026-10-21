@@ -47,7 +47,7 @@ After changing Nexus source or tokens, run `npm run nexus:add`.
    keyframes, and raises Nexus's overlay layers above MUI's.
    `src/main.tsx` imports it.
 4. `src/main.tsx` wraps the app in the Nexus provider. `vite.config.ts` injects
-   the first-paint script, as the Theme setup page's Vite section describes.
+   the first-paint script, as Install → Set up Vite describes.
 5. MUI popups opened from inside a Nexus dialog use `disablePortal`. A Nexus
    dialog blocks pointer events outside itself, so a popup portalled to
    `<body>` could not be clicked.

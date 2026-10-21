@@ -5,6 +5,7 @@ import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 
 import { PAGE_MANIFEST } from '../_lib/manifest';
+import { PLAYGROUND_VIEWS } from '../_lib/playground-views';
 
 import {
   CommandDialog,
@@ -16,18 +17,25 @@ import {
 } from './nexus';
 
 /**
- * ⌘K command-palette search over the docs IA. Indexes every page in the
- * generated manifest (the same source the nav + routes read), so it stays in
- * sync as pages are added. Built on the Nexus Command (cmdk) surface.
+ * ⌘K command-palette search over the docs IA. Indexes the Playground routes
+ * and every page in the generated manifest (the same source the nav + routes
+ * read), so it stays in sync as pages are added. Built on the Nexus Command
+ * (cmdk) surface.
  */
 
-const INDEX = PAGE_MANIFEST.map((section) => ({
-  title: section.title,
-  items: section.pages.map((page) => ({
-    label: page.label,
-    href: page.route,
+const INDEX = [
+  {
+    title: 'Playground',
+    items: PLAYGROUND_VIEWS,
+  },
+  ...PAGE_MANIFEST.map((section) => ({
+    title: section.title,
+    items: section.pages.map((page) => ({
+      label: page.label,
+      href: page.route,
+    })),
   })),
-}));
+];
 
 export function SearchPalette() {
   const [open, setOpen] = useState(false);

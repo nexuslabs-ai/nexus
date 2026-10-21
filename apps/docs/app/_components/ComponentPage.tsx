@@ -40,9 +40,7 @@ export function ComponentPage({ page }: { page: ComponentManifestPage }) {
   return (
     <>
       <h1 className={PAGE_HEADING_CLASS}>{page.label}</h1>
-      {docs.description && (
-        <DescriptionText text={docs.description} className="nx:mb-6" />
-      )}
+      <DescriptionText text={docs.description} className="nx:mb-6" />
       <ComponentDemo id={previewId} />
       <ExampleInstall slugs={preview.alsoInstall} packages={preview.packages} />
 
@@ -115,9 +113,7 @@ function PreviewlessComponentPage({
   return (
     <>
       <h1 className={PAGE_HEADING_CLASS}>{page.label}</h1>
-      {docs.description && (
-        <DescriptionText text={docs.description} className="nx:mb-6" />
-      )}
+      <DescriptionText text={docs.description} className="nx:mb-6" />
 
       <SectionHeading className={SECTION_HEADING_CLASS}>
         Installation

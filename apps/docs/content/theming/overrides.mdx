@@ -1,26 +1,39 @@
-# Radius overrides
+export const description =
+  'Change the Nexus UI theme inside one element with a data attribute, or round only the buttons with one CSS variable.';
 
-Change the corner radius for one part of the page, or for one kind of
-component.
+# Overrides
 
-The `corners` field (**Radius** in the theme picker) in
-[Appearance](/theming/appearance) sets the radius for the whole app.
+Change the theme for one part of the page, or for one kind of component.
 
-## Set corners for an area
+[Appearance](/theming/appearance) sets the theme for the whole app. An
+override changes it inside one element.
 
-Add `data-radius` to a wrapper. Everything inside it uses that `corners` value:
+## Change one part of the page
+
+Put a data attribute on any element. Everything inside that element uses the
+setting:
 
 ```tsx
-// components/settings-panel.tsx
+// components/compact-panel.tsx
 import type { ReactNode } from 'react';
 
-export function SettingsPanel({ children }: { children: ReactNode }) {
-  return <div data-radius="round">{children}</div>;
+export function CompactPanel({ children }: { children: ReactNode }) {
+  return (
+    <section data-density="compact" data-radius="round">
+      {children}
+    </section>
+  );
 }
 ```
 
-`data-radius` takes the same values as `corners`: `square`, `subtle`, `smooth`,
-`round` and `extra-round`.
+| Attribute          | Appearance field | Values                                                              |
+| ------------------ | ---------------- | ------------------------------------------------------------------- |
+| `data-density`     | `density`        | `tight`, `compact`, `default`, `comfortable`, `relaxed`, `spacious` |
+| `data-radius`      | `corners`        | `square`, `subtle`, `smooth`, `round`, `extra-round`                |
+| `data-shadow`      | `elevation`      | `flat`, `quiet`, `soft`, `standard`, `strong`                       |
+| `data-borderwidth` | `stroke`         | `fine`, `normal`, `strong`                                          |
+
+The other fields apply to the whole app.
 
 ## Round only the buttons
 

@@ -1,4 +1,7 @@
-# llms.txt
+export const description =
+  'Point your AI agent at /llms.txt to give it every Nexus UI docs page as Markdown. Add .md to any docs URL to read one page.';
+
+# AI agents
 
 Point your AI agent at `/llms.txt` to give it every Nexus docs page as Markdown.
 
@@ -8,7 +11,7 @@ Point your AI agent at `/llms.txt` to give it every Nexus docs page as Markdown.
 curl https://nexusui.so/llms.txt
 ```
 
-`/llms.txt` lists every docs page with content, by section. Each entry links to the page's
+`/llms.txt` lists every docs page, by section. Each entry links to the page's
 Markdown and gives a one-line summary.
 
 ## Read one page as Markdown
@@ -21,6 +24,16 @@ curl https://nexusui.so/getting-started/install.md
 
 The Markdown keeps the page's text, tables and code. Live previews and copy
 buttons are left out, because they mean nothing as text.
+
+## Fetch every page in one file
+
+```bash
+curl https://nexusui.so/llms-full.txt
+```
+
+`/llms-full.txt` holds the Markdown of every docs page, in nav order. It is about
+2 MB, because it includes every code example. If your agent should pick pages
+itself, use `/llms.txt`.
 
 ## Next steps
 

@@ -1,6 +1,8 @@
+import { REPO_URL, SITE_NAME, STORYBOOK_URL } from '../_lib/site';
+
 const FOOTER_LINKS: { label: string; href: `https://${string}` }[] = [
-  { label: 'Storybook', href: 'https://storybook.nexusui.so' },
-  { label: 'GitHub', href: 'https://github.com/nexuslabs-ai/nexus' },
+  { label: 'Storybook', href: STORYBOOK_URL },
+  { label: 'GitHub', href: REPO_URL },
 ];
 
 export function Footer() {
@@ -8,7 +10,7 @@ export function Footer() {
     <footer className="nx:border-t nx:border-border-default nx:mt-16">
       <div className="nx:max-w-[1280px] nx:mx-auto nx:px-6 nx:py-8 nx:flex nx:flex-col nx:gap-4 nx:sm:flex-row nx:sm:items-center nx:sm:justify-between">
         <div className="nx:flex nx:items-center nx:gap-3">
-          <span className="nx:font-semibold">Nexus</span>
+          <span className="nx:font-semibold">{SITE_NAME}</span>
           <span className="nx:font-mono nx:text-[11px] nx:text-muted-foreground-subtle">
             MIT · v0.0.1
           </span>

@@ -1,48 +1,71 @@
+export const description =
+  'Nexus UI is a theme engine that ships copy-and-own components. Set one appearance object, and every component follows your brand, density and corners.';
+
 # Introduction
 
-Nexus is a theme engine that ships React components, not a component library with a theme added on.
+Nexus is a framework-agnostic theme engine that ships components, not a component library with a theme added on.
 
 You copy the components into your app and own them. The engine, `@nexus_ds/core`, produces every token those components use, from one appearance object. Change your brand color, density or corner style, and every component follows.
 
-## You own the components
+## Our philosophy
 
-Every component is source code you paste into your project. Edit it like any other file. There is no package to wait on and no wrapper to fight.
+Nexus rests on six ideas. Each one links to the page that explains it.
 
-To update a component, paste the newer version over yours.
+### You own the components
 
-## Inspired by shadcn/ui
+Every component is source code you paste into your app and edit like any other
+file. To update one, paste the newer version over yours.
+[Install](/getting-started/install#add-your-first-component) shows how.
+
+### One engine makes every token
+
+You don't write token values by hand. One function builds every color, hover
+shade and dark-mode value from your appearance settings, so light and dark
+can't drift apart. [Tokens](/foundations/tokens#one-engine-two-moments) shows
+the pipeline.
+
+### Every axis is a setting
+
+Density, corners, shadows, border width, type and motion are settings, just
+like color. "Make this product denser" is a one-field change, not a refactor.
+[Appearance](/theming/appearance#fields) lists every field.
+
+### Contrast is checked, not eyeballed
+
+Every text and background pair has a minimum contrast score, and CI fails the
+build when one drops below it. [Color](/foundations/color#accessibility) lists
+the minimum for each pair.
+
+### Nexus fits next to your app
+
+Nexus CSS defines only `nx:` classes and `--nx-` variables, so your own styles
+stay as they are. [Tokens](/foundations/tokens#the-nx-prefix) explains the
+prefix.
+
+### Conventions are enforced, for people and agents
+
+ESLint rules turn Nexus conventions into build errors. See
+[lint rules](/getting-started/install#optional-add-lint-rules).
+
+Every docs page is also available as Markdown. See
+[AI agents](/getting-started/ai-agents).
+
+## Nexus and shadcn/ui
 
 The idea that you should own your component source comes from [shadcn/ui](https://ui.shadcn.com). Nexus shares that philosophy, and we're grateful for the work that made it popular.
 
-Nexus is its own system, with its own theme engine, tokens and components. [Why Nexus](/getting-started/why-nexus#nexus-and-shadcn-ui) explains how the two differ. The open-source projects Nexus uses are listed in [Acknowledgements](/getting-started/why-nexus#acknowledgements).
+Both use copy-and-own components, Radix primitives, CVA for variants and `asChild` for composition. Nexus has its own theme engine, tokens and conventions:
 
-## One engine makes every token
-
-You don't write color values by hand. The engine builds the whole palette from your brand color and surface tone, including hover, pressed, disabled and dark-mode shades.
-
-Dark mode isn't a second list of colors to keep in sync. Light and dark come from the same function, so they can't drift apart.
-
-## Every part of the theme is a setting
-
-Color is one setting out of many. Density, corner radius, shadows, border width, type and motion are settings too.
-
-"Make this product denser" or "this brand needs square corners" is a one-line change, not a refactor. See [Appearance](/theming/appearance) for every field.
-
-## Contrast is checked, not eyeballed
-
-Every text and background pair has a minimum contrast score. CI checks every pair across many brand colors, surface tones and contrast settings. If any pair falls below its minimum, the build fails.
-
-Whatever brand color a user picks, the text stays readable.
-
-## It fits next to your app
-
-Every Nexus class starts with `nx:`, and every Nexus variable starts with `--nx-`. Nexus CSS defines nothing else, so your Tailwind config, classes and styles stay as they are. [Add Nexus to an existing app](/getting-started/install#add-nexus-to-an-existing-app) shows the setup.
-
-## Built for people and agents
-
-The docs are written in plain language, and every page is available as Markdown. Point an agent at [`/llms.txt`](/agents/llms-txt) to give it the whole site.
-
-The Nexus ESLint rules turn conventions into build errors. Someone who has never read the rules still can't break them.
+| Concern                      | shadcn/ui                            | Nexus                                                        |
+| ---------------------------- | ------------------------------------ | ------------------------------------------------------------ |
+| Class names                  | `bg-primary`                         | `nx:bg-primary-background`                                   |
+| Fitting into an existing app | Its theme joins your Tailwind config | Its own CSS entry, beside yours                              |
+| Who writes the tokens        | You, as CSS variables in each app    | The engine, from one appearance object                       |
+| What you can theme           | Color and a radius variable          | Color, density, corners, shadows, border width, type, motion |
+| Hover and pressed states     | `hover:bg-primary/90`                | `nx:hover:bg-primary-background-hover`                       |
+| Status colors                | `destructive`                        | `error`, `success`, `warning`, `information`                 |
+| Contrast                     | The author's job                     | Checked in CI for every pair                                 |
+| Conventions                  | Docs and review                      | ESLint rules that fail the build                             |
 
 ## When to use something else
 
@@ -51,8 +74,6 @@ Nexus pays off when you have several products, several brands, or an app that mu
 - **One app, one theme.** A theme engine is overhead you won't get back. Use [shadcn/ui](https://ui.shadcn.com).
 - **You want a large ecosystem.** Most community blocks and registries target shadcn/ui's token names.
 - **You need a screen today.** Nexus asks you to adopt its token conventions first.
-
-[Why Nexus](/getting-started/why-nexus) explains each decision and compares Nexus with shadcn/ui.
 
 ## FAQ
 
@@ -63,13 +84,40 @@ Not in the usual sense. The components are copy-and-own source. The part you ins
 Yes. Nexus builds its classes with Tailwind 4. Your app also needs a reset that sets `box-sizing: border-box`, such as Tailwind's Preflight or MUI's `CssBaseline`.
 
 **Does Nexus work outside React?**
-The engine does. It has no framework code, so any app can call it. The components are React only today.
+The engine does. It has no framework code, so any app can call it. The components are React only today. Vue, Svelte, Angular and React Native bindings are planned.
+
+**Can I use the tokens in a native app?**
+The tokens are DTCG JSON (the W3C design token format), so Style Dictionary can build Swift and Kotlin output. Live theme changes on native need a port of the engine.
 
 **Can I use my own brand colors?**
 Yes. Set `brandColor` to any CSS color, and Nexus builds the palette from it.
 
+## Acknowledgements
+
+Nexus uses and learns from these open-source projects. Thank you to everyone who builds and maintains them.
+
+| Project                                                                     | Used for                                      |
+| --------------------------------------------------------------------------- | --------------------------------------------- |
+| [shadcn/ui](https://ui.shadcn.com)                                          | The copy-and-own philosophy Nexus shares      |
+| [Radix UI](https://www.radix-ui.com)                                        | Accessible primitives under most components   |
+| [Tailwind CSS](https://tailwindcss.com)                                     | Styling and the `nx:` utilities               |
+| [CVA](https://cva.style)                                                    | Component variants                            |
+| [clsx and tailwind-merge](https://github.com/dcastil/tailwind-merge)        | Class joining and conflict merging in `cn()`  |
+| [cmdk](https://cmdk.paco.me)                                                | Command and Combobox                          |
+| [Vaul](https://vaul.emilkowal.ski)                                          | Drawer                                        |
+| [Sonner](https://sonner.emilkowal.ski)                                      | Toasts                                        |
+| [input-otp](https://input-otp.rodz.dev)                                     | InputOTP                                      |
+| [React Day Picker](https://daypicker.dev)                                   | DatePicker                                    |
+| [Embla Carousel](https://www.embla-carousel.com)                            | Carousel                                      |
+| [react-resizable-panels](https://github.com/bvaughn/react-resizable-panels) | Resizable                                     |
+| [Recharts](https://recharts.org)                                            | Chart                                         |
+| [APCA](https://git.apcacontrast.com)                                        | The contrast model behind the CI checks       |
+| [culori](https://culorijs.org)                                              | Color conversion and OKLCH math in the engine |
+| [Tabler Icons](https://tabler.io/icons)                                     | Icons                                         |
+
 ## Next steps
 
 - **[Install](/getting-started/install)**: set up your app and copy in your first component.
-- **[Why Nexus](/getting-started/why-nexus)**: the problems Nexus solves, and how.
-- **[Create](/create)**: design a theme live, then copy it into your app.
+- **[Tokens](/foundations/tokens)**: how tokens are named and made.
+- **[Playground](/playground)**: try a theme on every component, then copy
+  it into your app.

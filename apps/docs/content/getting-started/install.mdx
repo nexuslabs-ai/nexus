@@ -1,3 +1,6 @@
+export const description =
+  'Set up Nexus UI in a new or existing app. Add Tailwind 4, the token CSS and the appearance provider, then copy in your first component.';
+
 # Install
 
 Set up your app once, then copy in any Nexus component.
@@ -82,8 +85,8 @@ light page.
 The provider applies the theme and saves the user's choices, like dark mode.
 Its script runs in `<head>`, so the page doesn't flash the wrong theme on load.
 
-If you use Vite, follow [Theme setup](/getting-started/theme-setup#vite) for
-this step instead. Steps 1, 2 and 4 are the same on Vite.
+If you use Vite, follow [Set up Vite](#set-up-vite) for this step instead.
+Steps 1, 2 and 4 are the same on Vite.
 
 Install the theme engine:
 
@@ -102,14 +105,34 @@ components/appearance/provider/
 └── server.ts     # NexusAppearanceScript (safe to import on the server)
 ```
 
+Set your app's starting theme. Copy the default appearance and change the
+fields you want:
+
+```ts
+// app/appearance-state.ts
+import {
+  DEFAULT_NEXUS_APPEARANCE,
+  type NexusAppearanceState,
+} from '@nexus_ds/core';
+
+export const defaultAppearance = {
+  ...DEFAULT_NEXUS_APPEARANCE,
+  brandColor: '#2563eb',
+  surfaceTone: 'slate',
+} satisfies NexusAppearanceState;
+```
+
+`brandColor` sets the primary color. `surfaceTone` sets the gray used for
+backgrounds. For every field, see [Appearance](/theming/appearance).
+
 Add the script and the provider to your root layout:
 
 ```tsx
 // app/layout.tsx
-import { DEFAULT_NEXUS_APPEARANCE } from '@nexus_ds/core';
-
 import { NexusAppearanceProvider } from '@/components/appearance/provider';
 import { NexusAppearanceScript } from '@/components/appearance/provider/server';
+
+import { defaultAppearance } from './appearance-state';
 
 import './globals.css';
 
@@ -123,13 +146,13 @@ export default function RootLayout({
       <head>
         <NexusAppearanceScript
           storageKey="app-appearance"
-          defaultState={DEFAULT_NEXUS_APPEARANCE}
+          defaultState={defaultAppearance}
         />
       </head>
       <body className="nx:bg-background nx:text-foreground nx:typography-body-default">
         <NexusAppearanceProvider
           storageKey="app-appearance"
-          defaultState={DEFAULT_NEXUS_APPEARANCE}
+          defaultState={defaultAppearance}
         >
           {children}
         </NexusAppearanceProvider>
@@ -145,7 +168,8 @@ follow the appearance settings.
 Give the script and the provider the same `storageKey`. The provider saves the
 user's choices under that key, and the script reads them on the next load.
 
-To change the starting theme, see [Theme setup](/getting-started/theme-setup).
+To render the saved theme on the server, see
+[Load the theme from a cookie](#optional-load-the-theme-from-a-cookie).
 
 ## Step 4: Add the `cn` helper
 
@@ -197,8 +221,159 @@ export function ModeToggle() {
 `resolvedMode` is the mode on screen, so the toggle also works when `mode` is
 `'system'`.
 
+## Check your setup
+
+- [ ] `nexus.css` is imported from your CSS entry point
+- [ ] The provider wraps your app, and the script is in `<head>`
+- [ ] Reloading in dark mode doesn't flash light first
+- [ ] The mode you pick is still set after a full reload
+
 If the button has no styles, `nexus.css` isn't imported (step 2). If it stays
 light when you toggle, the provider isn't wrapping it (step 3).
+
+If the page flashes on reload, check that the script and the provider use the
+same `storageKey`. With different keys, they load different themes.
+
+## Set up Vite
+
+On Vite, this section replaces step 3. Install `@nexus_ds/core`, copy the
+provider into `src/components/appearance/provider/`, and create
+`src/appearance-state.ts` as in step 3.
+
+Vite doesn't render on the server, so add the theme script to `index.html` at
+build time:
+
+```ts
+// vite.config.ts
+import {
+  createNexusAppearanceBootstrapScript,
+  createNexusAppearanceSnapshotFromState,
+} from '@nexus_ds/core';
+import react from '@vitejs/plugin-react';
+import { defineConfig } from 'vite';
+
+import { defaultAppearance } from './src/appearance-state';
+
+const STORAGE_KEY = 'app-appearance';
+const defaultSnapshot =
+  createNexusAppearanceSnapshotFromState(defaultAppearance);
+
+export default defineConfig({
+  plugins: [
+    react(),
+    {
+      name: 'nexus-appearance-bootstrap',
+      transformIndexHtml(html) {
+        const script = createNexusAppearanceBootstrapScript({
+          storageKey: STORAGE_KEY,
+          defaultSnapshot,
+        });
+        return html.replace('</head>', `<script>${script}</script></head>`);
+      },
+    },
+  ],
+});
+```
+
+Wrap your app in the provider, with the same storage key:
+
+```tsx
+// src/main.tsx
+import { createRoot } from 'react-dom/client';
+
+import App from './App';
+import { defaultAppearance } from './appearance-state';
+import { createNexusAppearance } from './components/appearance/provider';
+
+import './index.css';
+
+const { NexusAppearanceProvider } = createNexusAppearance({
+  storageKey: 'app-appearance',
+  defaultState: defaultAppearance,
+});
+
+createRoot(document.getElementById('root')!).render(
+  <NexusAppearanceProvider>
+    <App />
+  </NexusAppearanceProvider>
+);
+```
+
+Don't apply the theme in a `useEffect`. Effects run after the first paint, so
+the page would flash the default theme first.
+
+## (Optional) Load the theme from a cookie
+
+On Next.js, read the user's saved theme from a cookie. The server then renders
+the right theme on the first request. Replace the layout from step 3 with this
+one:
+
+```tsx
+// app/layout.tsx
+import {
+  createNexusAppearanceSnapshotFromCookie,
+  DEFAULT_COOKIE_KEY,
+} from '@nexus_ds/core';
+import { cookies } from 'next/headers';
+
+import { NexusAppearanceProvider } from '@/components/appearance/provider';
+import { NexusAppearanceScript } from '@/components/appearance/provider/server';
+
+import { defaultAppearance } from './appearance-state';
+
+import './globals.css';
+
+export default async function RootLayout({
+  children,
+}: {
+  children: React.ReactNode;
+}) {
+  const cookieStore = await cookies();
+  const snapshot = createNexusAppearanceSnapshotFromCookie(
+    cookieStore.get(DEFAULT_COOKIE_KEY)?.value,
+    defaultAppearance
+  );
+
+  return (
+    <html lang="en" suppressHydrationWarning>
+      <head>
+        <NexusAppearanceScript
+          storageKey="app-appearance"
+          defaultState={snapshot.state}
+        />
+      </head>
+      <body className="nx:bg-background nx:text-foreground nx:typography-body-default">
+        <NexusAppearanceProvider
+          storageKey="app-appearance"
+          cookieWriteKey={DEFAULT_COOKIE_KEY}
+          defaultState={snapshot.state}
+        >
+          {children}
+        </NexusAppearanceProvider>
+      </body>
+    </html>
+  );
+}
+```
+
+If the cookie is missing or invalid, `createNexusAppearanceSnapshotFromCookie`
+falls back to `defaultAppearance`.
+
+If you read the cookie in the root layout, Next.js renders every route on each
+request.
+
+The provider saves the theme in two places:
+
+| Prop             | Saves to       | Read by                                               |
+| ---------------- | -------------- | ----------------------------------------------------- |
+| `cookieWriteKey` | A cookie       | The server, on the next request                       |
+| `storageKey`     | `localStorage` | The head script before first paint, then the provider |
+
+When both are set, `localStorage` wins in the browser. To use only the cookie,
+set `storageKey={false}` on both the script and the provider.
+
+If your app uses a strict Content Security Policy, pass a nonce:
+`<NexusAppearanceScript nonce={nonce} />`.
 
 ## Add Nexus to an existing app
 
@@ -283,8 +458,13 @@ const eslintConfig = [
 export default eslintConfig;
 ```
 
-This turns on `nx-class-conventions`, `no-render-prop-types` and
-`no-multi-statement-jsx-handler` for the files you list.
+`nexusComponentConfig` turns on three rules for the files you list:
+
+| Rule                             | Catches                                                                           |
+| -------------------------------- | --------------------------------------------------------------------------------- |
+| `nx-class-conventions`           | Wrong prefix order, removed tokens, incomplete token names and raw palette colors |
+| `no-render-prop-types`           | Props that inject what a component renders, instead of `children`                 |
+| `no-multi-statement-jsx-handler` | Long inline event handlers that should be named functions                         |
 
 The rules need a TypeScript parser. `create-next-app` sets one up through
 `next/core-web-vitals`. If your config has none, install `typescript-eslint` and
@@ -310,8 +490,9 @@ and follow the generated scaffold.
 
 ## Next steps
 
-- **[Theme setup](/getting-started/theme-setup)**: set your brand color, load
-  the theme from a cookie, or set up Vite.
-- **[Create](/create)**: design a theme live, then copy it into your app.
+- **[Appearance](/theming/appearance)**: every theme field, and how to change
+  it at runtime.
+- **[Playground](/playground)**: try a theme on every component, then copy
+  it into your app.
 - **[Color](/foundations/color)**: how the palette is built.
 - **[Components](/components)**: every component, with its source to copy.

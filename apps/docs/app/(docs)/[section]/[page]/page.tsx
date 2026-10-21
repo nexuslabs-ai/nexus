@@ -1,39 +1,50 @@
+import type { Metadata } from 'next';
 import { notFound } from 'next/navigation';
 
 import { BlockPage } from '../../../_components/BlockPage';
 import { Breadcrumb } from '../../../_components/Breadcrumb';
 import { ComponentPage } from '../../../_components/ComponentPage';
-import { PageWireframeView } from '../../../_components/PageWireframeView';
 import {
-  getSection,
+  docsPageParams,
+  findDocsPage,
   type ManifestPage,
-  PAGE_MANIFEST,
 } from '../../../_lib/manifest';
-import { PAGE_LOADERS } from '../../../_lib/page-content.generated';
+import {
+  describePage,
+  loadWrittenPage,
+  type WrittenManifestPage,
+} from '../../../_lib/page-content';
+import { docsPageImage, pageMetadata } from '../../../_lib/site';
 
-export function generateStaticParams() {
-  return PAGE_MANIFEST.flatMap((section) =>
-    section.pages.map((page) => ({ section: section.slug, page: page.slug }))
-  );
-}
+type PageProps = { params: Promise<{ section: string; page: string }> };
+
+export const generateStaticParams = docsPageParams;
 
 export const dynamicParams = false;
 
-export default async function Page({
-  params,
-}: {
-  params: Promise<{ section: string; page: string }>;
-}) {
-  const { section: sectionSlug, page: pageSlug } = await params;
-  const section = getSection(sectionSlug);
-  const page = section?.pages.find((entry) => entry.slug === pageSlug);
-  if (!section || !page) notFound();
+async function resolvePage({ params }: PageProps) {
+  const { section, page } = await params;
+  const found = findDocsPage(section, page);
+  if (!found) notFound();
+  return found;
+}
+
+export async function generateMetadata(props: PageProps): Promise<Metadata> {
+  const { page } = await resolvePage(props);
+  return pageMetadata({
+    title: page.label,
+    description: await describePage(page),
+    route: page.route,
+    image: docsPageImage(page),
+  });
+}
+
+export default async function Page(props: PageProps) {
+  const { section, page } = await resolvePage(props);
 
   // The `.md` files are written after `next build`, so `next dev` has none.
   const markdownHref =
-    process.env.NODE_ENV === 'production' && page.kind !== 'placeholder'
-      ? `${page.route}.md`
-      : undefined;
+    process.env.NODE_ENV === 'production' ? `${page.route}.md` : undefined;
 
   return (
     <>
@@ -52,23 +63,12 @@ export default async function Page({
 }
 
 function PageContent({ page }: { page: ManifestPage }) {
-  if (page.kind === 'placeholder') return <PageWireframeView page={page} />;
   if (page.kind === 'generated') return <ComponentPage page={page} />;
   if (page.kind === 'block') return <BlockPage page={page} />;
   return <WrittenPage page={page} />;
 }
 
-async function WrittenPage({
-  page,
-}: {
-  page: Extract<ManifestPage, { kind: 'mdx' | 'component' }>;
-}) {
-  const loadPage = PAGE_LOADERS[page.route];
-  if (!loadPage) {
-    throw new Error(
-      `${page.route} is a ${page.kind} page with no PAGE_LOADERS entry — run \`pnpm --filter @nexus_ds/docs generate:manifest\` to resync the generated modules.`
-    );
-  }
-  const { default: Body } = await loadPage();
+async function WrittenPage({ page }: { page: WrittenManifestPage }) {
+  const { default: Body } = await loadWrittenPage(page);
   return <Body />;
 }

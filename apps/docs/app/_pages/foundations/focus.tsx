@@ -12,6 +12,9 @@ import { Button, Checkbox, Input, Switch } from '../../_components/nexus';
  * Source: packages/react/src/components/{button,input,checkbox}/.
  */
 
+export const description =
+  'Every Nexus UI control shows the same focus-visible ring. Learn the three ring recipes and how to write your own accessible focus styles.';
+
 const RECIPES: { name: string; members: string; ring: string }[] = [
   {
     name: 'Control',

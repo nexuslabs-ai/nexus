@@ -1,8 +1,25 @@
 {
   "name": "@nexus_ds/core",
-  "version": "0.6.0",
+  "version": "0.7.1",
   "type": "module",
-  "description": "Framework-agnostic Nexus design-token engine: appearance model, runtime theme derivation, and first-paint snapshots.",
+  "description": "Nexus UI theme engine: a framework-agnostic appearance model, runtime theme derivation and first-paint snapshots.",
+  "keywords": [
+    "nexus-ui",
+    "design-system",
+    "design-tokens",
+    "theme-engine",
+    "theming",
+    "dark-mode",
+    "dtcg",
+    "oklch",
+    "apca",
+    "tailwindcss",
+    "framework-agnostic"
+  ],
+  "homepage": "https://nexusui.so",
+  "bugs": {
+    "url": "https://github.com/nexuslabs-ai/nexus/issues"
+  },
   "license": "MIT",
   "engines": {
     "node": ">=20.19.0"

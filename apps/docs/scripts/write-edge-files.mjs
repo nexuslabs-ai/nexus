@@ -38,6 +38,8 @@ const headersLines = [
   '  Content-Type: text/markdown; charset=utf-8',
   '/llms.txt',
   '  Content-Type: text/plain; charset=utf-8',
+  '/llms-full.txt',
+  '  Content-Type: text/plain; charset=utf-8',
 ];
 
 const overlong = headersLines.find(

@@ -7,12 +7,24 @@ import {
   DOCS_APPEARANCE_DEFAULT_STATE,
   DOCS_APPEARANCE_STORAGE_KEY,
 } from './_lib/appearance-controls';
+import {
+  SITE_DESCRIPTION,
+  SITE_IMAGE,
+  SITE_NAME,
+  SITE_OPEN_GRAPH,
+  SITE_TITLE,
+  SITE_URL,
+} from './_lib/site';
 
 import './globals.css';
 
 export const metadata: Metadata = {
-  title: 'Nexus Design System — Docs',
-  description: 'AI-native multi-brand design system for humans and agents.',
+  metadataBase: new URL(SITE_URL),
+  title: { default: SITE_TITLE, template: `%s — ${SITE_NAME}` },
+  description: SITE_DESCRIPTION,
+  applicationName: SITE_NAME,
+  openGraph: { ...SITE_OPEN_GRAPH, images: SITE_IMAGE },
+  twitter: { card: 'summary_large_image' },
 };
 
 export default function RootLayout({

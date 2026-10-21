@@ -10,6 +10,9 @@ import { SectionHeading } from '../../_components/Heading';
  * Source: .claude/rules/responsive.md.
  */
 
+export const description =
+  'Nexus UI breakpoints, container queries and the Show and Hide primitives, for layouts built for mobile and desktop equally.';
+
 const BREAKPOINTS: {
   cls: string;
   size: string;

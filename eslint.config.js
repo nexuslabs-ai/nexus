@@ -20,7 +20,7 @@ function repoPath(relativePath) {
 
 const radiusBaseConsumer = String.raw`/rounded(?:-[a-z]{1,2})?-base\b|radius-base/`;
 const radiusBaseMessage =
-  'Only Button consumes --nx-radius-base (rounded-base). Use another radius token, or update apps/docs/content/theming/radius-overrides.mdx if this component should follow the base override.';
+  'Only Button consumes --nx-radius-base (rounded-base). Use another radius token, or update apps/docs/content/theming/overrides.mdx if this component should follow the base override.';
 
 export default tseslint.config(
   // Global ignores
@@ -260,7 +260,7 @@ export default tseslint.config(
   }),
 
   // Button consumes --nx-radius-base; FilterConditionField opts in with a
-  // line-scoped disable (both documented in theming/radius-overrides).
+  // line-scoped disable (both documented in theming/overrides).
   {
     files: ['packages/react/src/components/**/*.{ts,tsx}'],
     ignores: [

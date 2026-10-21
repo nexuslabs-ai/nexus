@@ -35,9 +35,7 @@ export async function BlockPage({ page }: { page: BlockManifestPage }) {
   return (
     <>
       <h1 className={PAGE_HEADING_CLASS}>{page.label}</h1>
-      {description && (
-        <DescriptionText text={description} className="nx:mb-6" />
-      )}
+      <DescriptionText text={description} className="nx:mb-6" />
       <ComponentDemo id={preview} />
 
       <SectionHeading className={SECTION_HEADING_CLASS}>Source</SectionHeading>

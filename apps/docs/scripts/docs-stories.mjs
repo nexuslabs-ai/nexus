@@ -336,7 +336,7 @@ export function readDocsStories(slug, files) {
  * `{Slug}.stories.tsx`, else in the first of `files` that has one.
  * @param {string} slug
  * @param {string[]} files
- * @returns {string | null}
+ * @returns {string}
  */
 export function componentDescription(slug, files) {
   const ownName = `${pascal(slug)}.stories.tsx`;
@@ -352,7 +352,9 @@ export function componentDescription(slug, files) {
     );
     if (description !== null) return description;
   }
-  return null;
+  throw new Error(
+    `The ${slug} page has no description — set \`parameters.docs.description.component\` on the meta in ${files.map(toRepoPath).join(' or ')}.`
+  );
 }
 
 /** `DefaultOpen` → `default-open`. */

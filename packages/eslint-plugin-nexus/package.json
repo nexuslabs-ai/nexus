@@ -1,8 +1,20 @@
 {
   "name": "@nexus_ds/eslint-plugin",
-  "version": "0.3.1",
+  "version": "0.3.2",
   "type": "module",
-  "description": "Custom ESLint rules for the Nexus design system",
+  "description": "ESLint rules that enforce Nexus UI conventions in copied components.",
+  "keywords": [
+    "nexus-ui",
+    "design-system",
+    "eslint",
+    "eslintplugin",
+    "eslint-plugin",
+    "tailwindcss"
+  ],
+  "homepage": "https://nexusui.so/getting-started/install#optional-add-lint-rules",
+  "bugs": {
+    "url": "https://github.com/nexuslabs-ai/nexus/issues"
+  },
   "engines": {
     "node": ">=20.19.0"
   },
