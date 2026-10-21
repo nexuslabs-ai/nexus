@@ -51,3 +51,10 @@
 .headline-journey [data-mode='dark'] .journey-heading {
   color: var(--nx-color-foreground);
 }
+
+.headline-journey .headline-open-source {
+  margin-block-end: var(--nx-spacing-4);
+  height: var(--nx-spacing-8);
+  padding: var(--nx-spacing-1) var(--nx-spacing-4);
+  border: 0;
+}

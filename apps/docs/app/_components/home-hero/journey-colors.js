@@ -19,7 +19,7 @@ const seeds = [
   '#b7dc24',
 ];
 
-export function useJourneyColors() {
+export function useJourneyColors(modeOverride) {
   const { state, resolvedMode } = useNexusAppearance();
   return useMemo(
     () =>
@@ -27,7 +27,7 @@ export function useJourneyColors() {
         const theme = deriveTheme(
           createNexusThemeContract({ ...state, brandColor })
         );
-        const tokens = theme[resolvedMode];
+        const tokens = theme[modeOverride ?? resolvedMode];
         const background = tokens['--nx-color-primary-subtle'];
         // Small tile labels and icons share the body-tier contrast requirement.
         const foreground = adjustContrast(
@@ -39,7 +39,7 @@ export function useJourneyColors() {
         );
         return { '--paper': background, '--ink': foreground };
       }),
-    [state, resolvedMode]
+    [state, resolvedMode, modeOverride]
   );
 }
 

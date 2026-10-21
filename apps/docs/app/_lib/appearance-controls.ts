@@ -13,6 +13,11 @@ export const DOCS_APPEARANCE_STORAGE_KEY = 'nexus-docs-appearance';
 export const DOCS_APPEARANCE_DEFAULT_STATE = {
   ...DEFAULT_NEXUS_APPEARANCE,
   mode: 'system',
+  prefs: {
+    ...DEFAULT_NEXUS_APPEARANCE.prefs,
+    uiFont: '"DM Sans", Arial, sans-serif',
+    codeFont: '"JetBrains Mono", monospace',
+  },
 } satisfies NexusAppearanceState;
 
 export const THEME_MODE_KEYS = [

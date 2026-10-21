@@ -113,7 +113,7 @@ export function WorkbenchJourney({
       <section
         className={`workbench-journey${compact ? ' journey-compact' : ''}${wheel ? ' journey-wheel' : ''}`}
         data-mode={mode}
-        aria-label="Nexus UI design system"
+        aria-label="Nexus Design System"
       >
         <div className="journey-sequence">
           {intro}

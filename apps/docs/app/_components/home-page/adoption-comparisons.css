@@ -16,9 +16,6 @@
   gap: var(--nx-spacing-3);
   justify-items: center;
 }
-.adoption-heading .home-kicker {
-  margin: 0;
-}
 .adoption-heading p,
 .adoption-caption {
   color: var(--nx-color-muted-foreground);

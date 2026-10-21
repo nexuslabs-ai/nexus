@@ -11,6 +11,8 @@ import { FoilJourney } from './FoilJourney';
 import { HeadlineJourney } from './HeadlineJourney';
 import { InlineStacksJourney } from './InlineStacksJourney';
 import { RotatingHeadlineJourney } from './RotatingHeadlineJourney';
+import { ScrollHeadlineJourney } from './ScrollHeadlineJourney';
+import { StackedHeadlineJourney } from './StackedHeadlineJourney';
 import { TiltedCtaJourney } from './TiltedCtaJourney';
 import { TiltedJourney } from './TiltedJourney';
 import { VinylJourney } from './VinylJourney';
@@ -38,6 +40,18 @@ export function HomeHero({ children }) {
   const iteration = params.get('iteration') ?? 'tilted-cta';
   if (params.has('tune'))
     return <HeroDialLab mode={resolvedMode}>{children}</HeroDialLab>;
+  if (iteration === 'scroll-headlines')
+    return (
+      <ScrollHeadlineJourney mode={resolvedMode}>
+        {children}
+      </ScrollHeadlineJourney>
+    );
+  if (iteration === 'stacked-headlines')
+    return (
+      <StackedHeadlineJourney mode={resolvedMode}>
+        {children}
+      </StackedHeadlineJourney>
+    );
   if (iteration === 'rotating')
     return (
       <RotatingHeadlineJourney mode={resolvedMode}>

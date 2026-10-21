@@ -126,7 +126,7 @@ export function InlineStacksJourney({ mode, tuning, children }) {
       <section
         className="inline-stacks-journey"
         data-mode={mode}
-        aria-label="Nexus UI design system"
+        aria-label="Nexus Design System"
       >
         <h1 className="nx:sr-only">
           An open-source design system. Customizable in every detail. Built for

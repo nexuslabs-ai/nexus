@@ -103,3 +103,139 @@
     transform: translateY(0);
   }
 }
+
+/* Shared light/dark swatches with hue-matched ink; each pair meets APCA Lc 75. */
+.rotating-headline-journey .journey-tile {
+  background: var(--rotating-paper);
+  color: var(--rotating-ink);
+}
+.rotating-headline-journey .journey-color-0 {
+  --rotating-paper: #c4c9f8;
+  --rotating-ink: #11152b;
+}
+.rotating-headline-journey .journey-color-1 {
+  --rotating-paper: #ffc279;
+  --rotating-ink: #281a0c;
+}
+.rotating-headline-journey .journey-color-2 {
+  --rotating-paper: #ffbeb0;
+  --rotating-ink: #2b1510;
+}
+.rotating-headline-journey .journey-color-3 {
+  --rotating-paper: #79deeb;
+  --rotating-ink: #0c2529;
+}
+.rotating-headline-journey .journey-color-4 {
+  --rotating-paper: #f8d75c;
+  --rotating-ink: #27220c;
+}
+.rotating-headline-journey .journey-color-5 {
+  --rotating-paper: #cbcfca;
+  --rotating-ink: #1a2019;
+}
+.rotating-headline-journey .journey-color-6 {
+  --rotating-paper: #d6c6f1;
+  --rotating-ink: #21172d;
+}
+.rotating-headline-journey .journey-color-7 {
+  --rotating-paper: #9cddc0;
+  --rotating-ink: #10271c;
+}
+.rotating-headline-journey .journey-color-8 {
+  --rotating-paper: #c6e557;
+  --rotating-ink: #20280b;
+}
+
+/* Earlier palette retained for visual comparison, in either website theme. */
+[data-tile-palette='pastel'] .rotating-headline-journey .journey-color-0 {
+  --rotating-paper: #6674ed;
+  --rotating-ink: #080b28;
+}
+[data-tile-palette='pastel'] .rotating-headline-journey .journey-color-1 {
+  --rotating-paper: #ffb45c;
+  --rotating-ink: #080b28;
+}
+[data-tile-palette='pastel'] .rotating-headline-journey .journey-color-2 {
+  --rotating-paper: #ff8066;
+  --rotating-ink: #080b28;
+}
+[data-tile-palette='pastel'] .rotating-headline-journey .journey-color-3 {
+  --rotating-paper: #63d8e8;
+  --rotating-ink: #080b28;
+}
+[data-tile-palette='pastel'] .rotating-headline-journey .journey-color-4 {
+  --rotating-paper: #f8d75c;
+  --rotating-ink: #080b28;
+}
+[data-tile-palette='pastel'] .rotating-headline-journey .journey-color-5 {
+  --rotating-paper: #b2b8b0;
+  --rotating-ink: #080b28;
+}
+[data-tile-palette='pastel'] .rotating-headline-journey .journey-color-6 {
+  --rotating-paper: #c4adeb;
+  --rotating-ink: #080b28;
+}
+[data-tile-palette='pastel'] .rotating-headline-journey .journey-color-7 {
+  --rotating-paper: #61c99b;
+  --rotating-ink: #080b28;
+}
+[data-tile-palette='pastel'] .rotating-headline-journey .journey-color-8 {
+  --rotating-paper: #c6e557;
+  --rotating-ink: #080b28;
+}
+
+/* Original light-mode theme swatches, retained in both page themes. */
+[data-tile-palette='original-pastel']
+  .rotating-headline-journey
+  .journey-color-0 {
+  --rotating-paper: var(--original-paper-0);
+  --rotating-ink: var(--original-ink-0);
+}
+[data-tile-palette='original-pastel']
+  .rotating-headline-journey
+  .journey-color-1 {
+  --rotating-paper: var(--original-paper-1);
+  --rotating-ink: var(--original-ink-1);
+}
+[data-tile-palette='original-pastel']
+  .rotating-headline-journey
+  .journey-color-2 {
+  --rotating-paper: var(--original-paper-2);
+  --rotating-ink: var(--original-ink-2);
+}
+[data-tile-palette='original-pastel']
+  .rotating-headline-journey
+  .journey-color-3 {
+  --rotating-paper: var(--original-paper-3);
+  --rotating-ink: var(--original-ink-3);
+}
+[data-tile-palette='original-pastel']
+  .rotating-headline-journey
+  .journey-color-4 {
+  --rotating-paper: var(--original-paper-4);
+  --rotating-ink: var(--original-ink-4);
+}
+[data-tile-palette='original-pastel']
+  .rotating-headline-journey
+  .journey-color-5 {
+  --rotating-paper: var(--original-paper-5);
+  --rotating-ink: var(--original-ink-5);
+}
+[data-tile-palette='original-pastel']
+  .rotating-headline-journey
+  .journey-color-6 {
+  --rotating-paper: var(--original-paper-6);
+  --rotating-ink: var(--original-ink-6);
+}
+[data-tile-palette='original-pastel']
+  .rotating-headline-journey
+  .journey-color-7 {
+  --rotating-paper: var(--original-paper-7);
+  --rotating-ink: var(--original-ink-7);
+}
+[data-tile-palette='original-pastel']
+  .rotating-headline-journey
+  .journey-color-8 {
+  --rotating-paper: var(--original-paper-8);
+  --rotating-ink: var(--original-ink-8);
+}

@@ -4,11 +4,12 @@ import { useEffect, useRef, useState } from 'react';
 
 import { useNexusAppearance } from '@nexus_ds/react/appearance';
 import { cn } from '@nexus_ds/react/utils';
+import { IconBrandGithub } from '@tabler/icons-react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 
 import { PAGE_MANIFEST } from '../_lib/manifest';
-import { SITE_NAME } from '../_lib/site';
+import { REPO_URL, SITE_NAME } from '../_lib/site';
 
 import { Button } from './nexus';
 import { SearchPalette } from './SearchPalette';
@@ -48,6 +49,15 @@ export function TopNav() {
   const [menuOpen, setMenuOpen] = useState(false);
   const { resolvedMode, setState } = useNexusAppearance();
   const isDark = resolvedMode === 'dark';
+
+  useEffect(() => {
+    const icon = document.querySelector<HTMLLinkElement>(
+      'link[rel="icon"][type="image/svg+xml"]'
+    );
+    if (icon)
+      icon.href =
+        resolvedMode === 'dark' ? '/brand/nxds-dark.svg' : '/brand/nxds.svg';
+  }, [resolvedMode]);
   const currentLink = NAV_LINKS.find((link) => isActive(pathname, link.match));
 
   // relatedTarget is null when focus goes nowhere, not when it leaves the nav.
@@ -85,13 +95,15 @@ export function TopNav() {
   };
 
   return (
-    <header className="nx:sticky nx:top-0 nx:z-30 nx:flex nx:items-center nx:gap-6 nx:px-6 nx:h-(--docs-header-h) nx:bg-nav-background nx:text-nav-foreground nx:border-b nx:border-nav-border">
+    <header
+      className={`nx:sticky nx:top-0 nx:z-30 nx:flex nx:items-center nx:gap-6 nx:px-6 nx:h-(--docs-header-h) nx:bg-nav-background nx:text-nav-foreground ${pathname === '/' ? '' : 'nx:border-b nx:border-nav-border'}`}
+    >
       {pathname === '/' ? (
         <Link
           href="/"
-          className="nx:typography-heading-small nx:font-semibold nx:text-inherit nx:no-underline"
+          className="nx:flex nx:items-center nx:gap-2 nx:typography-heading-small nx:font-extrabold nx:text-inherit nx:no-underline"
         >
-          NexusUI
+          nx:ds
         </Link>
       ) : (
         <Link
@@ -178,6 +190,19 @@ export function TopNav() {
       >
         {isDark ? '☀' : '◐'}
       </Button>
+      {pathname === '/' && (
+        <Button variant="outline" size="sm" asChild>
+          <a
+            href={REPO_URL}
+            target="_blank"
+            rel="noopener noreferrer"
+            aria-label="Nexus repository on GitHub (opens in a new tab)"
+          >
+            <IconBrandGithub aria-hidden="true" />
+            GitHub
+          </a>
+        </Button>
+      )}
     </header>
   );
 }

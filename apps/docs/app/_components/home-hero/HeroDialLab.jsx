@@ -9,7 +9,10 @@ import { FeatureStripJourney } from './FeatureStripJourney';
 import { FoilJourney } from './FoilJourney';
 import { HeadlineJourney } from './HeadlineJourney';
 import { InlineStacksJourney } from './InlineStacksJourney';
+import { useJourneyColors } from './journey-colors';
 import { RotatingHeadlineJourney } from './RotatingHeadlineJourney';
+import { ScrollHeadlineJourney } from './ScrollHeadlineJourney';
+import { StackedHeadlineJourney } from './StackedHeadlineJourney';
 import { TiltedCtaJourney } from './TiltedCtaJourney';
 import { TiltedJourney } from './TiltedJourney';
 import { VinylJourney } from './VinylJourney';
@@ -19,6 +22,19 @@ import 'dialkit/styles.css';
 import './hero-dial-lab.css';
 
 const iterations = [
+  {
+    value: 'scroll-headlines',
+    name: 'Scroll headlines',
+    preset: null,
+    description: 'Scroll through three benefits, then continue into the page.',
+  },
+  {
+    value: 'stacked-headlines',
+    name: 'Stacked headlines',
+    preset: null,
+    description:
+      'All three benefits visible together, without headline rotation.',
+  },
   {
     value: 'rotating',
     name: 'Rotating headline',
@@ -101,6 +117,8 @@ const config = {
     type: 'select',
     options: [
       { value: 'rotating', label: 'Rotating headline' },
+      { value: 'stacked-headlines', label: 'Stacked headlines' },
+      { value: 'scroll-headlines', label: 'Scroll headlines' },
       { value: 'compact', label: 'Compact row' },
       { value: 'workbench', label: 'Workbench grid' },
       { value: 'wheel', label: '3D wheel' },
@@ -114,6 +132,15 @@ const config = {
       { value: 'foil', label: 'Foil material study' },
     ],
     default: 'tilted',
+  },
+  tilePalette: {
+    type: 'select',
+    options: [
+      { value: 'balanced', label: 'Contrast balanced' },
+      { value: 'pastel', label: 'Brighter palette' },
+      { value: 'original-pastel', label: 'Original light pastels' },
+    ],
+    default: 'balanced',
   },
   typography: {
     titleSize: [48, 32, 64, 1],
@@ -528,6 +555,8 @@ export function HeroDialLab({ mode, children, ctaLinks, featureStripContent }) {
   const Journey =
     {
       rotating: RotatingHeadlineJourney,
+      'stacked-headlines': StackedHeadlineJourney,
+      'scroll-headlines': ScrollHeadlineJourney,
       'tilted-cta': TiltedCtaJourney,
       tilted: TiltedJourney,
       vinyl: VinylJourney,
@@ -537,7 +566,14 @@ export function HeroDialLab({ mode, children, ctaLinks, featureStripContent }) {
       headline: HeadlineJourney,
       stacks: InlineStacksJourney,
     }[p.iteration] ?? WorkbenchJourney;
+  const originalPastels = useJourneyColors('light');
   const style = {
+    ...Object.fromEntries(
+      originalPastels.flatMap((colors, index) => [
+        [`--original-paper-${index}`, colors['--paper']],
+        [`--original-ink-${index}`, colors['--ink']],
+      ])
+    ),
     '--lab-title': `calc(var(--nx-typography-size-base) * ${p.typography.titleSize / 16})`,
     '--lab-heading': `calc(var(--nx-typography-size-base) * ${p.typography.headingSize / 16})`,
     '--lab-label': `calc(var(--nx-typography-size-base) * ${p.typography.labelSize / 16})`,
@@ -556,7 +592,7 @@ export function HeroDialLab({ mode, children, ctaLinks, featureStripContent }) {
   };
   return (
     <>
-      <div className="hero-lab" style={style}>
+      <div className="hero-lab" data-tile-palette={p.tilePalette} style={style}>
         <Journey
           {...ctaLinks}
           key={`${p.iteration}-${replay}`}

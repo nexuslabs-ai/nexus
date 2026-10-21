@@ -1,0 +1,46 @@
+.stacked-headline-lines {
+  display: grid;
+  gap: var(--lab-heading-gap, var(--nx-spacing-2));
+}
+.stacked-headline-lines .journey-heading {
+  margin: 0;
+}
+.stacked-headline-tiles {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: var(--nx-spacing-2);
+  padding-block: var(--nx-spacing-4) 0;
+}
+.stacked-headline-journey .stacked-headline-tile {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--nx-spacing-2);
+  width: auto;
+  min-width: var(--lab-tile, 60px);
+  padding-inline: var(--nx-spacing-4);
+  cursor: pointer;
+}
+.stacked-headline-tile > svg {
+  width: var(--nx-spacing-6);
+  height: var(--nx-spacing-6);
+  flex-shrink: 0;
+}
+.stacked-headline-journey .journey-workbench > .journey-grid:empty {
+  display: none;
+}
+
+.stacked-headline-tile .stacked-tile-label {
+  display: none;
+  position: static;
+  opacity: 1;
+  translate: none;
+  white-space: nowrap;
+  color: inherit;
+}
+.stacked-headline-journey
+  .stacked-headline-tile[data-active='true']
+  .stacked-tile-label {
+  display: inline;
+}

@@ -31,7 +31,7 @@ const STRUCTURED_DATA = {
       '@id': `${SITE_URL}/#website`,
       url: SITE_URL,
       name: SITE_NAME,
-      alternateName: [SITE_ALTERNATE_NAME, 'nexusui'],
+      alternateName: [SITE_ALTERNATE_NAME],
       description: SITE_DESCRIPTION,
     },
     {

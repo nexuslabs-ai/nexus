@@ -1,0 +1,118 @@
+'use client';
+
+import { useEffect, useRef, useState } from 'react';
+
+import { useNexusAppearance } from '@nexus_ds/react/appearance';
+
+import {
+  groups,
+  StackedHeadlineJourney,
+  StackedTileGroup,
+} from './StackedHeadlineJourney';
+import { TiltedCtaJourney } from './TiltedCtaJourney';
+
+import './scroll-headline-journey.css';
+
+function smoothStep(value) {
+  const t = Math.max(0, Math.min(1, value));
+  return t * t * (3 - 2 * t);
+}
+
+export function ScrollHeadlineJourney({ children, ...props }) {
+  const track = useRef(null);
+  const stage = useRef(null);
+  const [progress, setProgress] = useState(0);
+  const slide = Math.min(2, Math.floor(progress * 3));
+  const { state } = useNexusAppearance();
+  const reduceMotion = state.prefs.reduceMotion;
+
+  useEffect(() => {
+    if (reduceMotion) return;
+    let frame = 0;
+    function measure() {
+      frame = 0;
+      if (!track.current || !stage.current) return;
+      const rect = track.current.getBoundingClientRect();
+      const distance = rect.height - stage.current.offsetHeight;
+      if (distance <= 0) return;
+      const inset = parseFloat(getComputedStyle(stage.current).top) || 0;
+      const progress = Math.max(0, Math.min(1, (inset - rect.top) / distance));
+      setProgress(progress);
+    }
+    function schedule() {
+      if (!frame) frame = requestAnimationFrame(measure);
+    }
+    const observer = new ResizeObserver(schedule);
+    observer.observe(track.current);
+    observer.observe(stage.current);
+    window.addEventListener('scroll', schedule, { passive: true });
+    window.addEventListener('resize', schedule);
+    schedule();
+    return () => {
+      observer.disconnect();
+      window.removeEventListener('scroll', schedule);
+      window.removeEventListener('resize', schedule);
+      cancelAnimationFrame(frame);
+    };
+  }, [reduceMotion]);
+
+  if (reduceMotion)
+    return (
+      <StackedHeadlineJourney {...props}>{children}</StackedHeadlineJourney>
+    );
+
+  return (
+    <div className="scroll-headline-journey">
+      <div className="scroll-headline-track" ref={track}>
+        <div className="scroll-headline-stage" ref={stage}>
+          <div
+            className="rotating-headline-journey stacked-headline-journey"
+            data-slide="0"
+            data-scroll-slide={slide}
+          >
+            <TiltedCtaJourney
+              {...props}
+              details={[]}
+              customizationHeading={
+                <div className="scroll-headline-panels">
+                  {groups.map((group, index) => {
+                    const enter =
+                      index === 0
+                        ? 1
+                        : smoothStep((progress - index / 3) / 0.09);
+                    const leave =
+                      index === 2
+                        ? 0
+                        : smoothStep(
+                            (progress - (index + 1) / 3 + 0.09) / 0.09
+                          );
+                    const opacity = enter * (1 - leave);
+                    return (
+                      <div
+                        key={group.title}
+                        className="scroll-headline-panel"
+                        inert={index !== slide || opacity === 0}
+                        aria-hidden={index !== slide}
+                        style={{
+                          opacity,
+                          transform: `translateY(${(1 - enter - leave) * 18}px)`,
+                        }}
+                      >
+                        <StackedTileGroup {...group} tuning={props.tuning} />
+                      </div>
+                    );
+                  })}
+                </div>
+              }
+            />
+          </div>
+          <p className="scroll-headline-progress">Scroll to explore</p>
+        </div>
+      </div>
+      <div className="scroll-headline-mobile">
+        <StackedHeadlineJourney {...props} />
+      </div>
+      {children}
+    </div>
+  );
+}

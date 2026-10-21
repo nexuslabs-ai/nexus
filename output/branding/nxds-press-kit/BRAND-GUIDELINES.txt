@@ -1,0 +1,84 @@
+NEXUS DESIGN SYSTEM — BRAND FOUNDATION
+21 October 2026 | Logo v1.0 locked; broader identity in development
+
+WHAT THESE GUIDELINES DO
+A brand identity governs how Nexus presents itself across its website, docs, releases, social posts and other communications. It is distinct from the appearance settings that customers use to style their own products with Nexus.
+
+CONFIRMED
+Public product name: Nexus Design System.
+Short handle: nxds. The stacked NX / DS mark is the visual shorthand.
+Company attribution currently used: Nexus Labs.
+Logo: custom outlined lettering in a rounded-square badge, corrected geometry v1.0.
+Colors: black #000000 and white #FFFFFF; reverse the mark for dark backgrounds.
+Geometry: 120-unit badge, radius 24, internal padding 20. See READ-ME.txt for construction.
+Assets: SVG masters, PNG exports, ICO favicons and Apple touch icon in the website source.
+Typeface independence: the logo is custom path artwork, not typed letters.
+
+APPROVED IDENTITY USAGE
+Website header: Nexus Design System text only. Do not place the NXDS badge beside the header name.
+Favicons, social avatars and app icons: use the NXDS badge alone, with the appropriate light/dark variant.
+Use the name and badge as independent identifiers; a combined badge-and-wordmark lockup is not the default identity.
+Standalone header name uses DM Sans. The type family decision supersedes the Inter comparison; exact text-size and tracking refinements remain contextual.
+
+APPROVED TYPOGRAPHY — OPTION B
+Headings, body text and standalone product name: DM Sans.
+Code, code blocks and technical monospace content: JetBrains Mono.
+Starting hierarchy: headings 600; body 400; labels/navigation 500; code 400.
+Use the existing responsive type scale rather than forcing a single size across all screens. Body text should generally be 16–18px; code should generally be at least 14px. These are starting recommendations, not a new global component-size override.
+Keep code letter spacing neutral and programming ligatures disabled for literal syntax clarity.
+Keep the custom NXDS badge as supplied vector artwork; do not retype it in DM Sans.
+Fonts are self-hosted on the website. Font files and SIL Open Font License notices are included in this kit. The website sets the families through its appearance defaults; consumer apps retain their own typography choices.
+
+APPROVED POSITIONING
+Audience: people building products who need a consistent design system they can make their own. Speak most directly to frontend developers, design engineers, and product teams maintaining a growing interface; remain welcoming to individual builders.
+Problem: keeping interfaces consistent as products gain screens, themes, states, frameworks, and contributors.
+Core promise: a design system you can own and shape, with consistency built in.
+
+Positioning statement:
+Nexus Design System is an open-source foundation for building consistent interfaces that feel like your product. Shared tokens coordinate the design, customizable components give you control, and executable stories make behavior inspectable.
+
+Reasons to choose Nexus:
+Consistency — one foundation for design decisions, carried through shared tokens.
+Control — customizable appearance and open-source implementation that teams can inspect and adapt.
+Confidence — component states and tested behavior can be explored alongside executable examples.
+
+Feature-to-benefit translation:
+Shared tokens: make design decisions once and carry them across the interface.
+Framework-independent foundation: retain a design language when implementation technologies differ.
+Open source: inspect, adapt, and own the implementation.
+Customization: express the product's identity rather than inherit a library's default look.
+Executable stories: inspect states and exercised behavior alongside examples.
+
+Communication direction:
+Lead with the outcome; use framework support, appearance demonstrations and Storybook examples as evidence.
+Proposed headline, not yet a locked tagline: Your design language. Every component.
+Proposed supporting copy: Build consistent interfaces with shared tokens, customizable components, and open-source code you own.
+
+Claim boundaries:
+Distinguish the framework-independent foundation from currently available component bindings. Do not promise support for all frameworks based on planned bindings.
+Describe tested stories and behaviors according to actual coverage. Do not imply that executable stories guarantee every state or behavior is tested.
+This approval establishes positioning, not an independent audit of current feature or test coverage.
+
+USE THE APPROVED FILES
+Use SVG for websites and scalable artwork; use PNG when a destination needs raster images. Use the matching light/dark variant. Keep the full badge, aspect ratio and internal spacing. Do not redraw, stretch, add shadows, rotate individual letters, or substitute a font. These are usage recommendations supporting the approved artwork.
+
+PROVISIONAL RULES TO VALIDATE
+External clear space: start with 20 units on every side of a 120-unit badge. This is outside the badge, unlike internal padding.
+Minimum display size: prefer 32px or larger for brand placement. 16px exports are favicon-specific; recognizability is more limited at that size.
+In running copy: use Nexus Design System on first reference, then Nexus when unambiguous. Reserve lowercase nxds for handles and identifiers. Do not introduce Nexus UI as a second public product name.
+These rules are recommendations, not a separately approved full identity manual.
+
+DECISIONS STILL OPEN
+1. Verbal identity: a concise descriptor, homepage message, tagline if useful, and voice with examples of preferred/avoided language.
+2. Text identity: font, weight and tracking for the standalone Nexus Design System name; narrow-screen treatment and company attribution. No combined badge/name lockup is planned.
+3. Typography refinement: validate the chosen families across full-page headings, long-form docs and dense code; refine size, line height and tracking as needed.
+4. Brand palette: whether black/white is the complete identity or an anchor for a signature accent; specify communication colors separately from customer-configurable product tokens.
+5. Graphic language: icon style, photography/illustration policy, diagrams, product screenshots, backgrounds and motion.
+6. Applications: reusable social avatar, social/share card, release announcement, docs cover and presentation templates. Confirm with real content.
+7. Governance: canonical asset location, version owner, external-use permissions and replacement policy. This kit does not establish trademark registration or grant a new artwork license.
+
+SEPARATE MIGRATION WORK
+Package names, repository names and domain migration are not included in this logo rollout. Current source still uses nexusui.so, nexuslabs-ai/nexus and @nexus_ds/core. Do not advertise planned replacements as already available or migrated.
+
+RECOMMENDED ORDER
+Positioning is approved. Next finalize standalone wordmark typography; develop voice examples; choose an accent strategy; test three real templates; then publish a compact visual brand manual.

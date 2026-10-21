@@ -1,0 +1,54 @@
+.scroll-headline-track {
+  display: none;
+}
+.scroll-headline-progress {
+  position: absolute;
+  inset-inline: 0;
+  inset-block-end: var(--nx-spacing-6);
+  margin: 0;
+  text-align: center;
+  font-size: var(--nx-typography-size-sm);
+  color: var(--nx-color-muted-foreground);
+}
+@media (min-width: 64rem) {
+  .scroll-headline-mobile {
+    display: none;
+  }
+  .scroll-headline-track {
+    display: block;
+    min-block-size: 260svh;
+  }
+  .scroll-headline-stage {
+    position: sticky;
+    top: var(--docs-header-h, 0px);
+    min-block-size: calc(100svh - var(--docs-header-h, 0px));
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    padding-block: var(--nx-spacing-8);
+    box-sizing: border-box;
+  }
+  .scroll-headline-stage .workbench-journey {
+    padding-block: var(--nx-spacing-8);
+  }
+}
+
+/* Each title and its tiles move as one layer; all layers reserve the same space. */
+.scroll-headline-panels {
+  display: grid;
+}
+.scroll-headline-panel {
+  grid-area: 1 / 1;
+  min-width: 0;
+}
+.scroll-headline-panel .stacked-headline-tiles {
+  min-block-size: calc(var(--lab-tile, 60px) + var(--nx-spacing-4));
+}
+.scroll-headline-panel[inert] {
+  pointer-events: none;
+}
+.scroll-headline-stage .journey-title {
+  animation: none;
+  transform: none;
+  opacity: 1;
+}

@@ -84,7 +84,6 @@ export default function AdoptionComparisons({ reveal = false }) {
     <div className="adoption-comparisons">
       <section className="adoption-case" aria-labelledby={`${id}-0`}>
         <div className="adoption-heading">
-          <span className="home-kicker">01 · YOUR EXISTING THEME</span>
           <h2 id={`${id}-0`}>Keep your app’s visual identity.</h2>
           <p>
             Your theme already has a language. New components should respect it.
@@ -137,7 +136,6 @@ export default function AdoptionComparisons({ reveal = false }) {
       </section>
       <section className="adoption-case" aria-labelledby={`${id}-1`}>
         <div className="adoption-heading">
-          <span className="home-kicker">02 · YOUR EXISTING STYLES</span>
           <h2 id={`${id}-1`}>Keep the rest of your app intact.</h2>
           <p>
             Library components, native elements, and your own CSS—all sharing
@@ -193,7 +191,6 @@ ol, ul, menu { list-style: none; }
       </section>
       <section className="adoption-case" aria-labelledby={`${id}-2`}>
         <div className="adoption-heading">
-          <span className="home-kicker">03 · YOUR NEXT DESIGN SYSTEM</span>
           <h2 id={`${id}-2`}>Expand what your app can do.</h2>
           <p>
             Keep your shadcn components. Introduce Nexus where you need more

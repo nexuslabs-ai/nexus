@@ -15,7 +15,6 @@
   gap: var(--nx-spacing-6);
   margin-block-end: var(--nx-spacing-8);
 }
-.home-kicker,
 .home-visual-label {
   display: block;
   font-size: calc(var(--nx-typography-size-base) * 0.6875);
@@ -23,9 +22,6 @@
   letter-spacing: 0.09em;
   font-weight: 500;
   color: var(--nx-color-muted-foreground);
-}
-.home-kicker {
-  margin-block-end: var(--nx-spacing-4);
 }
 .home-page-content h2,
 .home-page-content h3,
@@ -204,6 +200,9 @@
   align-items: center;
 }
 .home-footer-brand {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--nx-spacing-2);
   font-size: calc(var(--nx-typography-size-base) * 1.5);
   font-weight: 600;
   color: inherit;
@@ -261,4 +260,18 @@
   font-size: calc(var(--nx-typography-size-base) * 0.9375);
   line-height: 1.7;
   color: var(--nx-color-muted-foreground);
+}
+
+.dark .nxds-logo {
+  filter: invert(1);
+}
+
+/* The showcase breaks out of the reading column without creating page overflow. */
+@media (min-width: 64rem) {
+  .home-showcase {
+    width: min(calc(100% + 16rem), calc(100svw - 2rem));
+    position: relative;
+    left: 50%;
+    transform: translateX(-50%);
+  }
 }

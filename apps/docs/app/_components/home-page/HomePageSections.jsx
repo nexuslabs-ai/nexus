@@ -36,7 +36,6 @@ export function HomePageSections({ docsBase = '' }) {
         aria-labelledby={`${id}-testing`}
       >
         <div className="home-reason-copy">
-          <span className="home-kicker">TESTED IN STORYBOOK</span>
           <h2 id={`${id}-testing`}>The stories are the tests.</h2>
           <p>
             Component examples, interaction tests, callback assertions, and
@@ -69,7 +68,6 @@ export function HomePageSections({ docsBase = '' }) {
         aria-labelledby={`${id}-ownership`}
       >
         <div className="home-reason-copy">
-          <span className="home-kicker">COPY AND OWN</span>
           <h2 id={`${id}-ownership`}>The code is yours.</h2>
           <p>
             Like shadcn/ui, Nexus puts the component source in your project.
@@ -98,7 +96,6 @@ export function HomePageSections({ docsBase = '' }) {
         aria-labelledby={`${id}-axes`}
       >
         <div className="home-reason-copy">
-          <span className="home-kicker">APPEARANCE</span>
           <h2 id={`${id}-axes`}>Every axis is a setting.</h2>
           <p>
             Color is just the start. Set density, corners, shadows, border
@@ -139,7 +136,6 @@ export function HomePageSections({ docsBase = '' }) {
         </div>
       </section>
       <section className="home-start" aria-labelledby={`${id}-start`}>
-        <span className="home-kicker">YOUR NEXT IDEA</span>
         <h2 id={`${id}-start`}>Make something yours.</h2>
         <p>Start with a theme. Or bring Nexus into the app you’re building.</p>
         <div className="home-start-actions">
@@ -154,9 +150,16 @@ export function HomePageSections({ docsBase = '' }) {
       <footer className="home-footer">
         <div>
           <a className="home-footer-brand" href="/">
-            NUI.
+            <img
+              className="nxds-logo"
+              src="/brand/nxds.svg"
+              alt=""
+              width={32}
+              height={32}
+            />
+            Nexus Design System
           </a>
-          <p>An open-source design system.</p>
+          <p>An open-source design system by Nexus Labs.</p>
         </div>
         <nav aria-label="Footer">
           <a href={`${docsBase}/getting-started/introduction`}>Docs</a>

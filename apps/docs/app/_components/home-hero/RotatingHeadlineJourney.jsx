@@ -10,13 +10,13 @@ import { TiltedCtaJourney } from './TiltedCtaJourney';
 
 import './rotating-headline-journey.css';
 
-const lines = [
+export const lines = [
   'Customizable in every detail.',
   'Works with your existing app.',
   'Yours to copy. Yours to change.',
 ];
 
-const tileSets = [
+export const tileSets = [
   undefined,
   [
     ['MUI', MuiLogo],

@@ -1,5 +1,7 @@
 'use client';
 
+import { Badge } from '@nexus_ds/react';
+
 import { WorkbenchJourney } from './WorkbenchJourney';
 
 import './headline-journey.css';
@@ -31,11 +33,19 @@ export function HeadlineJourney({
         intro={
           <>
             <h1 className="nx:sr-only">
-              An open-source design system. Customizable in every detail.
+              Nexus design system. Open source. Customizable in every detail.
               {showTools && ' Built to work with your favorite tools.'}
             </h1>
+            <Badge
+              className="headline-open-source"
+              variant="secondary"
+              fill="outline"
+              isCaps={false}
+            >
+              Open Source
+            </Badge>
             <p className="journey-title journey-enter" aria-hidden="true">
-              An open-source design system.
+              Nexus design system.
             </p>
           </>
         }

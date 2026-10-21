@@ -443,3 +443,17 @@
 .journey-following .home-showcase > div:nth-child(6) {
   animation-delay: 300ms;
 }
+
+/* Reserve one preview row plus half the gap below the desktop hero.
+   The second row stays in normal flow and is revealed by scrolling. */
+@media (min-width: 64rem) {
+  .workbench-journey:has(+ .journey-following > .home-showcase) {
+    box-sizing: border-box;
+    min-block-size: calc(
+      100svh - var(--docs-header-h, 65px) - var(--nx-spacing-64) -
+        var(--nx-spacing-2)
+    );
+    display: grid;
+    align-content: center;
+  }
+}

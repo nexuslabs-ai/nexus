@@ -3,23 +3,16 @@
 import { useId, useState } from 'react';
 
 import { Button } from '@nexus_ds/react';
-import {
-  IconBrandAngular,
-  IconBrandReact,
-  IconBrandReactNative,
-  IconBrandSvelte,
-  IconBrandVue,
-} from '@tabler/icons-react';
 import { useDialKitController } from 'dialkit';
 
 import './framework-section.css';
 
 const frameworks = [
-  ['React', IconBrandReact],
-  ['Vue', IconBrandVue],
-  ['Svelte', IconBrandSvelte],
-  ['Angular', IconBrandAngular],
-  ['React Native', IconBrandReactNative],
+  ['React', '/brand/frameworks/react.svg', '#61dafb'],
+  ['Vue', '/brand/frameworks/vue.svg', '#42b883'],
+  ['Svelte', '/brand/frameworks/svelte.svg', '#ff3e00'],
+  ['Angular', '/brand/frameworks/angular.svg', '#e90464'],
+  ['React Native', '/brand/frameworks/react-native.svg', '#61dafb'],
 ];
 
 const config = {
@@ -27,19 +20,19 @@ const config = {
     type: 'select',
     options: [
       { value: 'foundation', label: 'Shared foundation' },
-      { value: 'cards', label: 'Text cards' },
+      { value: 'cards', label: 'Icon cards' },
       { value: 'connected', label: 'Connected foundation' },
       { value: 'playground', label: 'Framework playground · Zag' },
     ],
     default: 'foundation',
   },
-  typography: { titleSize: [40, 28, 56, 2], labelSize: [18, 14, 24, 1] },
+  typography: { titleSize: [40, 28, 56, 2] },
   spacing: {
     sectionPadding: [64, 32, 112, 8],
     contentGap: [40, 16, 72, 4],
     cardPadding: [24, 16, 48, 4],
   },
-  appearance: { iconSize: [40, 24, 64, 4] },
+  appearance: { iconSize: [36, 24, 48, 4] },
   reset: { type: 'action', label: 'Reset frameworks' },
 };
 
@@ -61,7 +54,6 @@ export function FrameworkSection({ docsBase = '' }) {
       aria-labelledby={id}
       style={{
         '--framework-title': `calc(var(--nx-typography-size-base) * ${p.typography.titleSize / 16})`,
-        '--framework-label': `calc(var(--nx-typography-size-base) * ${p.typography.labelSize / 16})`,
         '--framework-padding': `calc(var(--nx-spacing-4) * ${p.spacing.sectionPadding / 16})`,
         '--framework-gap': `calc(var(--nx-spacing-4) * ${p.spacing.contentGap / 16})`,
         '--framework-card-padding': `calc(var(--nx-spacing-4) * ${p.spacing.cardPadding / 16})`,
@@ -70,7 +62,6 @@ export function FrameworkSection({ docsBase = '' }) {
       }}
     >
       <div className="framework-heading">
-        <span className="home-kicker">FRAMEWORKS</span>
         <h2 id={id}>
           One token system.
           <br />
@@ -87,15 +78,18 @@ export function FrameworkSection({ docsBase = '' }) {
       ) : (
         <div className="framework-composition">
           <div className="framework-options">
-            {frameworks.map(([name, Icon]) => (
+            {frameworks.map(([name, icon, color]) => (
               <article className="framework-option" key={name}>
-                <Icon aria-hidden="true" stroke={1.5} />
-                <h3>{name}</h3>
                 <span
-                  className="framework-availability"
-                  data-available={name === 'React'}
+                  className="framework-icon-tile"
+                  style={{ '--framework-brand': color }}
                 >
-                  {name === 'React' ? 'Available today' : 'Planned'}
+                  <img src={icon} alt={name} width="36" height="36" />
+                  {name === 'React Native' && (
+                    <span className="framework-native-badge" aria-hidden="true">
+                      Native
+                    </span>
+                  )}
                 </span>
               </article>
             ))}
@@ -152,16 +146,21 @@ function FrameworkPlayground() {
         role="group"
         aria-label="Framework example"
       >
-        {frameworks.map(([name, Icon]) => (
+        {frameworks.map(([name, icon, color]) => (
           <button
             type="button"
             key={name}
+            style={{ '--framework-brand': color }}
+            aria-label={name}
             aria-pressed={selected === name}
             onClick={() => setSelected(name)}
           >
-            <Icon aria-hidden="true" stroke={1.5} />
-            <span>{name}</span>
-            {name !== 'React' && <small>Planned</small>}
+            <img src={icon} alt="" width="40" height="40" />
+            {name === 'React Native' && (
+              <span className="framework-native-badge" aria-hidden="true">
+                Native
+              </span>
+            )}
           </button>
         ))}
       </div>
