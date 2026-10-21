@@ -8,6 +8,10 @@ import {
   DOCS_APPEARANCE_STORAGE_KEY,
 } from './_lib/appearance-controls';
 import {
+  FRAMEWORK_BOOTSTRAP_SCRIPT,
+  FRAMEWORK_PANEL_CSS,
+} from './_lib/frameworks';
+import {
   SITE_DESCRIPTION,
   SITE_IMAGE,
   SITE_NAME,
@@ -46,6 +50,14 @@ export default function RootLayout({
         <NxdsAppearanceScript
           storageKey={DOCS_APPEARANCE_STORAGE_KEY}
           defaultState={DOCS_APPEARANCE_DEFAULT_STATE}
+        />
+        <script
+          data-docs-framework-script=""
+          dangerouslySetInnerHTML={{ __html: FRAMEWORK_BOOTSTRAP_SCRIPT }}
+        />
+        <style
+          data-docs-framework-style=""
+          dangerouslySetInnerHTML={{ __html: FRAMEWORK_PANEL_CSS }}
         />
       </head>
       <body className="nx:min-h-svh nx:bg-background nx:text-foreground nx:typography-body-default">

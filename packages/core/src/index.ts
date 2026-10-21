@@ -5,6 +5,7 @@ export type {
 } from './lib/adjust-contrast';
 export { adjustContrast } from './lib/adjust-contrast';
 export { apcaLc } from './lib/apca';
+export * from './lib/appearance-dom';
 export * from './lib/appearance-model';
 export * from './lib/appearance-snapshot';
 export * from './lib/brand-presets';

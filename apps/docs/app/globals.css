@@ -16,6 +16,7 @@
    explicitly. Paths are relative to this file. */
 @source '../content';
 @source '../../../packages/react/src';
+@source '../../../packages/vue/src';
 
 :root {
   --docs-header-h: 3.5rem;

@@ -2,6 +2,7 @@ import type * as React from 'react';
 
 import { cn } from '@nxds/react/utils';
 
+import type { Framework } from '../_lib/frameworks';
 import {
   type ComponentEntry,
   loadComponentDocs,
@@ -34,17 +35,20 @@ type DescriptionBlock =
 export async function PropsTable({
   slug,
   component,
+  framework = 'react',
 }: {
   slug: string;
   component?: string;
+  framework?: Framework;
 }) {
-  const entries = await loadComponentDocs(slug, component);
+  const entries = await loadComponentDocs(slug, component, framework);
+  const idPrefix = framework === 'react' ? '' : `${framework}-`;
 
   return entries.map((entry) => (
     <section key={entry.name}>
       {!component && (
         <SubsectionHeading
-          id={propsHeadingId(entry.name)}
+          id={`${idPrefix}${propsHeadingId(entry.name)}`}
           className={SUBSECTION_HEADING_CLASS}
         >
           {entry.name}

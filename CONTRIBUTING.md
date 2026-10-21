@@ -25,6 +25,7 @@ Pick the surface you're working on — each is one `make` command that turbo orc
 | Command        | Brings up                                                                   |
 | -------------- | --------------------------------------------------------------------------- |
 | `make dev`     | **Storybook** — the component catalog + interaction tests. The 90% surface. |
+| `make dev-vue` | the **`@nxds/vue`** Storybook, on port 6007                                 |
 | `make docs`    | the docs site **+ live `@nxds/react`**                                      |
 | `make dev-all` | everything: docs + storybook + all package watchers                         |
 
@@ -54,7 +55,7 @@ The pre-commit hook already formats and `nx:`-lints staged files, so you rarely 
 | Group        | Targets                                                     |
 | ------------ | ----------------------------------------------------------- |
 | **Setup**    | `setup` · `fresh` (clean + install + build) · `clean`       |
-| **Dev**      | `dev` · `docs` · `dev-all`                                  |
+| **Dev**      | `dev` · `dev-vue` · `docs` · `dev-all`                      |
 | **Build**    | `build` · `tokens` (regenerate token CSS from `@nxds/core`) |
 | **Quality**  | `lint` · `typecheck` · `audit` · `verify`                   |
 | **Docs MCP** | `up` · `down` · `serve` · `publish`                         |
@@ -65,7 +66,8 @@ Anything not wrapped is still a plain pnpm script (`pnpm test`, `pnpm test:story
 
 ## Testing
 
-A single `*.stories.tsx` file does four jobs: autodocs renders it as visual
+A single story file (`*.stories.tsx` in `@nxds/react`, `*.stories.ts` in
+`@nxds/vue`) does four jobs: autodocs renders it as visual
 documentation, `argTypes` makes it an interactive playground, its `play`
 function runs as a behaviour test in real Chromium, and addon-a11y runs
 axe-core against it with `test: 'error'` so any violation fails.
@@ -92,12 +94,12 @@ coverage; this section is orientation only.
 
 `make verify` runs the whole suite (plus lint / typecheck / audits). To run or debug tests directly:
 
-| Command                  | What it does                                                      |
-| ------------------------ | ----------------------------------------------------------------- |
-| `pnpm test`              | both vitest projects — `unit` (jsdom) + `storybook` (Chromium)    |
-| `pnpm test:unit`         | unit only — core engine, `cn` merge, ESLint rules                 |
-| `pnpm test:storybook`    | every story's play function in a real browser                     |
-| `pnpm test:storybook:ui` | **debugger** — Vitest's interactive UI when a play function fails |
+| Command                  | What it does                                                                     |
+| ------------------------ | -------------------------------------------------------------------------------- |
+| `pnpm test`              | every vitest project — `unit` (jsdom) + `storybook` + `storybook-vue` (Chromium) |
+| `pnpm test:unit`         | unit only — core engine, `cn` merge, ESLint rules                                |
+| `pnpm test:storybook`    | every React and Vue story's play function in a real browser                      |
+| `pnpm test:storybook:ui` | **debugger** — Vitest's interactive UI when a play function fails                |
 
 The first storybook-project run launches Storybook in the background — the cold start takes a few extra seconds.
 

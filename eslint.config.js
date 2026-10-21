@@ -10,10 +10,13 @@ import jsxA11yPlugin from 'eslint-plugin-jsx-a11y';
 import reactPlugin from 'eslint-plugin-react';
 import reactHooksPlugin from 'eslint-plugin-react-hooks';
 import simpleImportSort from 'eslint-plugin-simple-import-sort';
+import pluginVue from 'eslint-plugin-vue';
+import vueA11yPlugin from 'eslint-plugin-vuejs-accessibility';
 import globals from 'globals';
 import * as jsoncParser from 'jsonc-eslint-parser';
 import path from 'node:path';
 import tseslint from 'typescript-eslint';
+import vueParser from 'vue-eslint-parser';
 
 function repoPath(relativePath) {
   return path.join(import.meta.dirname, relativePath);
@@ -123,9 +126,36 @@ export default tseslint.config(
     },
   },
 
+  // Vue single-file components, with TypeScript in <script setup>
+  ...pluginVue.configs['flat/recommended'],
+  {
+    files: ['**/*.vue'],
+    languageOptions: {
+      parser: vueParser,
+      parserOptions: {
+        parser: tseslint.parser,
+        ecmaVersion: 'latest',
+        sourceType: 'module',
+      },
+      globals: {
+        ...globals.browser,
+      },
+    },
+    plugins: {
+      'vuejs-accessibility': vueA11yPlugin,
+    },
+    rules: {
+      ...vueA11yPlugin.configs.recommended.rules,
+      // Component names match the React package's: Button, Card, Switch.
+      'vue/multi-word-component-names': 'off',
+      // Optional typed props such as `class` need no runtime default.
+      'vue/require-default-prop': 'off',
+    },
+  },
+
   // Import sorting
   {
-    files: ['**/*.{js,jsx,ts,tsx}'],
+    files: ['**/*.{js,jsx,ts,tsx,vue}'],
     plugins: {
       'simple-import-sort': simpleImportSort,
     },
@@ -228,7 +258,7 @@ export default tseslint.config(
 
   // CLI scripts - allow console.log for user output
   {
-    files: ['**/scripts/**/*.{js,mjs}'],
+    files: ['**/scripts/**/*.{js,mjs,ts}'],
     rules: {
       'no-console': 'off',
     },
@@ -258,13 +288,24 @@ export default tseslint.config(
   // The docs read defaults from code and examples from docs stories, so the
   // published source carries no `@default` or `@example` copies of them.
   {
-    files: ['packages/react/src/**/*.{ts,tsx}'],
+    files: [
+      'packages/react/src/**/*.{ts,tsx}',
+      'packages/vue/src/**/*.{ts,vue}',
+    ],
     rules: { '@nxds/no-jsdoc-data-tags': 'error' },
   },
 
   nxdsTailwindClassesConfig({
     files: ['packages/react/src/**/*.{ts,tsx}'],
     entryPoint: repoPath('packages/react/.storybook/preview.css'),
+  }),
+  {
+    files: ['packages/vue/src/**/*.{ts,vue}'],
+    ...nxdsComponentConfig(),
+  },
+  nxdsTailwindClassesConfig({
+    files: ['packages/vue/src/**/*.{ts,vue}'],
+    entryPoint: repoPath('packages/vue/.storybook/preview.css'),
   }),
   nxdsTailwindClassesConfig({
     files: ['apps/docs/**/*.{ts,tsx}'],
@@ -335,7 +376,7 @@ export default tseslint.config(
   // array indices), so non-null assertions are idiomatic there. Keep the rule
   // on production source only.
   {
-    files: ['**/*.test.{ts,tsx}', '**/*.stories.tsx'],
+    files: ['**/*.test.{ts,tsx}', '**/*.stories.{ts,tsx}'],
     rules: {
       '@typescript-eslint/no-non-null-assertion': 'off',
     },

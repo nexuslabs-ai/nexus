@@ -19,7 +19,7 @@ Tools read data from code. A comment may explain the code to a reader, and the d
 - **No `@default`.** The Props table reads defaults from code: destructuring defaults, `withDefaults`, cva `defaultVariants`. If a dependency sets the default, say so in the description.
 - **No `@example`.** Show usage in a `docs` story, which is compiled and tested.
 
-Enforced by `@nxds/no-jsdoc-data-tags` in `packages/react/src`.
+Enforced by `@nxds/no-jsdoc-data-tags` in `packages/react/src` and `packages/vue/src`.
 
 ## TODO Comments
 

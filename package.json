@@ -12,13 +12,13 @@
     "test:watch": "vitest",
     "test:unit": "vitest run --project=unit",
     "typecheck:dist": "pnpm --filter @nxds/core typecheck:dist && node scripts/typecheck-tailwind-dist.mjs",
-    "test:storybook": "vitest run --project=storybook",
-    "test:storybook:watch": "vitest --project=storybook",
-    "test:storybook:ui": "vitest --project=storybook --ui",
+    "test:storybook": "vitest run --project=storybook --project=storybook-vue",
+    "test:storybook:watch": "vitest --project=storybook --project=storybook-vue",
+    "test:storybook:ui": "vitest --project=storybook --project=storybook-vue --ui",
     "storybook": "pnpm --filter @nxds/react storybook",
     "build-storybook": "pnpm --filter @nxds/react build-storybook",
-    "format": "prettier --write \"**/*.{ts,tsx,js,jsx,json,md,mdx,css,yml}\" \".claude/**/*.md\"",
-    "format:check": "prettier --check \"**/*.{ts,tsx,js,jsx,json,md,mdx,css,yml}\" \".claude/**/*.md\"",
+    "format": "prettier --write \"**/*.{ts,tsx,vue,js,jsx,json,md,mdx,css,yml}\" \".claude/**/*.md\"",
+    "format:check": "prettier --check \"**/*.{ts,tsx,vue,js,jsx,json,md,mdx,css,yml}\" \".claude/**/*.md\"",
     "clean": "turbo run clean && rm -rf node_modules",
     "typecheck": "turbo run typecheck",
     "tokens:tailwind": "turbo run build:tailwind --filter=@nxds/core && cp packages/core/dist/tailwind/* packages/tailwind/",
@@ -94,6 +94,8 @@
     "eslint-plugin-react": "^7.37.5",
     "eslint-plugin-react-hooks": "^7.0.1",
     "eslint-plugin-simple-import-sort": "^12.1.1",
+    "eslint-plugin-vue": "^10.11.1",
+    "eslint-plugin-vuejs-accessibility": "^2.6.2",
     "globals": "^16.5.0",
     "husky": "^9.1.7",
     "jsdom": "^27.3.0",
@@ -110,6 +112,7 @@
     "typescript": "^5.9.3",
     "typescript-eslint": "^8.50.0",
     "vitest": "4.0.18",
+    "vue-eslint-parser": "^10.4.1",
     "wrangler": "4.148.0"
   },
   "packageManager": "pnpm@10.12.1",
@@ -117,7 +120,7 @@
     "node": ">=22.18.0"
   },
   "lint-staged": {
-    "*.{ts,tsx,js,jsx}": [
+    "*.{ts,tsx,vue,js,jsx}": [
       "eslint --fix",
       "prettier --write"
     ],

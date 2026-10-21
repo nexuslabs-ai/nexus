@@ -6,9 +6,9 @@ export const description =
 Appearance is one object that sets your app's whole theme: colors, density,
 corners, shadows, borders and font preferences.
 
-`@nxds/core` turns that object into the theme's CSS. The examples import
-the provider you copied in
-[Install](/getting-started/install#step-3-add-the-appearance-provider).
+`@nxds/core` turns that object into the theme's CSS. The examples use the
+React provider or the Vue plugin you copied in
+[Install](/getting-started/install).
 
 ## Fields
 
@@ -38,6 +38,9 @@ user turns them on.
 
 ## Change the theme at runtime
 
+<FrameworkTabs>
+<FrameworkPanel framework="react">
+
 Read and update the appearance with `useNxdsAppearance`:
 
 ```tsx
@@ -64,6 +67,37 @@ export function ModeButton() {
   );
 }
 ```
+
+</FrameworkPanel>
+<FrameworkPanel framework="vue">
+
+Read and update the appearance with `useNxdsAppearance`:
+
+```vue
+<!-- src/components/ModeButton.vue -->
+<script setup lang="ts">
+import { useNxdsAppearance } from '@/components/appearance';
+
+const { state, setState } = useNxdsAppearance();
+
+function toggle() {
+  setState((current) => ({
+    ...current,
+    mode: current.mode === 'dark' ? 'light' : 'dark',
+  }));
+}
+</script>
+
+<template>
+  <button type="button" @click="toggle">{{ state.mode }}</button>
+</template>
+```
+
+`state` and `resolvedMode` are refs, so the template updates when the theme
+changes.
+
+</FrameworkPanel>
+</FrameworkTabs>
 
 Use `useNxdsAppearance` to build theme controls for your own settings page.
 To switch brands, set `brandColor` the same way. nxds builds the new palette

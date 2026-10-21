@@ -1,0 +1,60 @@
+{
+  "name": "@nxds/vue",
+  "version": "0.0.0",
+  "private": true,
+  "description": "Vue components built with Reka UI and Tailwind CSS",
+  "type": "module",
+  "main": "./dist/index.js",
+  "module": "./dist/index.mjs",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.mjs",
+      "require": "./dist/index.js"
+    },
+    "./styles.css": "./dist/vue.css"
+  },
+  "scripts": {
+    "build": "vite build",
+    "clean": "rm -rf dist",
+    "typecheck": "vue-tsc --noEmit",
+    "storybook": "storybook dev -p 6007",
+    "build-storybook": "storybook build"
+  },
+  "dependencies": {
+    "@nxds/core": "workspace:*",
+    "@nxds/tailwind": "workspace:*",
+    "@tabler/icons-vue": "^3.36.1",
+    "@vueuse/core": "^14.1.0",
+    "class-variance-authority": "^0.7.1",
+    "clsx": "^2.1.1",
+    "reka-ui": "^2.11.0",
+    "tailwind-merge": "^3.4.0"
+  },
+  "peerDependencies": {
+    "vue": "^3.5.0"
+  },
+  "devDependencies": {
+    "@storybook/addon-a11y": "^10.4.2",
+    "@storybook/addon-docs": "^10.4.2",
+    "@storybook/addon-vitest": "^10.4.2",
+    "@storybook/vue3-vite": "10.4.2",
+    "@tailwindcss/vite": "4.3.0",
+    "@vitejs/plugin-vue": "^6.0.10",
+    "storybook": "^10.4.2",
+    "tailwindcss": "4.3.0",
+    "typescript": "^5.9.3",
+    "vite": "^7.3.0",
+    "vite-plugin-dts": "^5.0.3",
+    "vue": "^3.5.44",
+    "vue-tsc": "^3.3.13"
+  },
+  "files": [
+    "dist"
+  ],
+  "sideEffects": [
+    "**/*.css"
+  ],
+  "license": "MIT"
+}

@@ -12,6 +12,8 @@ import {
   type TocEntry,
 } from '../_lib/table-of-contents';
 
+import { useFramework } from './FrameworkTabs';
+
 const TOC_HEADING_ID = 'docs-toc-heading';
 
 const TOC_LINK_BASE =
@@ -19,14 +21,15 @@ const TOC_LINK_BASE =
 
 export function RightRail() {
   const pathname = usePathname();
+  const framework = useFramework();
   const navRef = useRef<HTMLElement>(null);
   const [entries, setEntries] = useState<TocEntry[]>([]);
   const [activeId, setActiveId] = useState<string | null>(null);
 
   useEffect(() => {
     const article = document.getElementById(DOCS_ARTICLE_ID);
-    setEntries(article ? collectHeadings(article) : []);
-  }, [pathname]);
+    setEntries(article ? collectHeadings(article, framework) : []);
+  }, [pathname, framework]);
 
   useEffect(() => {
     if (entries.length === 0) return;

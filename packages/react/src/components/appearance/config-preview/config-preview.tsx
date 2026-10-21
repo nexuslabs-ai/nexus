@@ -1,6 +1,7 @@
-import type { NxdsAppearanceState } from '@nxds/core';
-
-import type { NxdsResolvedAppearanceMode } from '../provider';
+import type {
+  NxdsAppearanceState,
+  NxdsResolvedAppearanceMode,
+} from '@nxds/core';
 
 function toLines(
   state: NxdsAppearanceState,

@@ -33,6 +33,18 @@ type LazyDefault = () => string | null;
 
 const reactSrc = path.join(reactRoot, 'src');
 
+const LITERAL_KEYWORD = /^(?:true|false|null|undefined|-?\d+(?:\.\d+)?)$/;
+
+/** A default as the Props table shows it: a JSON string, a number, a boolean or null. */
+export function literalDefaultValue(text: string, owner: string): string {
+  const quoted = text.match(/^(['"])(.*)\1$/s);
+  if (quoted) return JSON.stringify(quoted[2]);
+  if (LITERAL_KEYWORD.test(text)) return text;
+  throw new Error(
+    `props JSON: ${owner} defaults to \`${text}\`, which is not a literal. Use a string, number, boolean or null, or drop the default and describe it in the prop's description.`
+  );
+}
+
 function literalDefault(
   checker: ts.TypeChecker,
   node: ts.Expression,
