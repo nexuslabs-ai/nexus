@@ -90,9 +90,9 @@ function ContextMenuSubTrigger({
  *
  * Props for the ContextMenuSubContent component.
  */
-interface ContextMenuSubContentProps extends React.ComponentProps<
+type ContextMenuSubContentProps = React.ComponentProps<
   typeof ContextMenuPrimitive.SubContent
-> {}
+>;
 
 /**
  * The panel that holds a submenu's items.
@@ -121,9 +121,9 @@ function ContextMenuSubContent({
  *
  * Props for the ContextMenuContent component.
  */
-interface ContextMenuContentProps extends React.ComponentProps<
+type ContextMenuContentProps = React.ComponentProps<
   typeof ContextMenuPrimitive.Content
-> {}
+>;
 
 /**
  * The menu panel. Opens at the cursor.
@@ -207,9 +207,9 @@ function ContextMenuItem({
  *
  * Props for the ContextMenuCheckboxItem component.
  */
-interface ContextMenuCheckboxItemProps extends React.ComponentProps<
+type ContextMenuCheckboxItemProps = React.ComponentProps<
   typeof ContextMenuPrimitive.CheckboxItem
-> {}
+>;
 
 /**
  * A menu item that toggles on and off.
@@ -261,9 +261,9 @@ function ContextMenuCheckboxItem({
  *
  * Props for the ContextMenuRadioItem component.
  */
-interface ContextMenuRadioItemProps extends React.ComponentProps<
+type ContextMenuRadioItemProps = React.ComponentProps<
   typeof ContextMenuPrimitive.RadioItem
-> {}
+>;
 
 /**
  * A menu item for picking one option from a ContextMenuRadioGroup.
@@ -348,9 +348,9 @@ function ContextMenuLabel({
  *
  * Props for the ContextMenuSeparator component.
  */
-interface ContextMenuSeparatorProps extends React.ComponentProps<
+type ContextMenuSeparatorProps = React.ComponentProps<
   typeof ContextMenuPrimitive.Separator
-> {}
+>;
 
 /**
  * A divider between menu items.
@@ -376,7 +376,7 @@ function ContextMenuSeparator({
  *
  * Props for the ContextMenuShortcut component.
  */
-interface ContextMenuShortcutProps extends React.ComponentProps<'span'> {}
+type ContextMenuShortcutProps = React.ComponentProps<'span'>;
 
 /**
  * A keyboard shortcut hint, right-aligned in a ContextMenuItem.

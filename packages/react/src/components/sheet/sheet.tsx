@@ -36,9 +36,7 @@ const SheetClose = DialogPrimitive.Close;
 /**
  * Props for SheetOverlay.
  */
-interface SheetOverlayProps extends React.ComponentProps<
-  typeof DialogPrimitive.Overlay
-> {}
+type SheetOverlayProps = React.ComponentProps<typeof DialogPrimitive.Overlay>;
 
 /**
  * Dimmed layer behind the sheet.
@@ -147,7 +145,7 @@ function SheetContent({
 /**
  * Props for SheetHeader.
  */
-interface SheetHeaderProps extends React.ComponentProps<'div'> {}
+type SheetHeaderProps = React.ComponentProps<'div'>;
 
 /**
  * Holds the title and description.
@@ -168,7 +166,7 @@ function SheetHeader({ className, ...props }: SheetHeaderProps) {
 /**
  * Props for SheetBody.
  */
-interface SheetBodyProps extends React.ComponentProps<'div'> {}
+type SheetBodyProps = React.ComponentProps<'div'>;
 
 /**
  * Main content between the header and footer. Its side padding matches
@@ -179,7 +177,7 @@ function SheetBody({ className, ...props }: SheetBodyProps) {
     <div
       data-slot="sheet-body"
       className={cn(overlayBodyClassName, className)}
-      // eslint-disable-next-line jsx-a11y/no-noninteractive-tabindex -- overlay bodies own the scroll region, so pure-text overflow must be keyboard reachable
+      // Overlay bodies own the scroll region, so pure-text overflow must be keyboard reachable.
       tabIndex={0}
       {...props}
     />
@@ -189,7 +187,7 @@ function SheetBody({ className, ...props }: SheetBodyProps) {
 /**
  * Props for SheetFooter.
  */
-interface SheetFooterProps extends React.ComponentProps<'div'> {}
+type SheetFooterProps = React.ComponentProps<'div'>;
 
 /**
  * Holds the action buttons, pinned to the bottom of the panel.
@@ -210,9 +208,7 @@ function SheetFooter({ className, ...props }: SheetFooterProps) {
 /**
  * Props for SheetTitle.
  */
-interface SheetTitleProps extends React.ComponentProps<
-  typeof DialogPrimitive.Title
-> {}
+type SheetTitleProps = React.ComponentProps<typeof DialogPrimitive.Title>;
 
 /**
  * Title of the sheet. Place it inside SheetHeader.
@@ -230,9 +226,9 @@ function SheetTitle({ className, ...props }: SheetTitleProps) {
 /**
  * Props for SheetDescription.
  */
-interface SheetDescriptionProps extends React.ComponentProps<
+type SheetDescriptionProps = React.ComponentProps<
   typeof DialogPrimitive.Description
-> {}
+>;
 
 /**
  * Supporting text under the title.

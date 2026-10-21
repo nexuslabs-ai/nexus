@@ -3,8 +3,9 @@ import type { ComponentDoc, PropItem } from 'react-docgen-typescript';
 import path from 'node:path';
 import ts from 'typescript';
 
+import { isUnder, reactRoot } from '../../../packages/react/scripts/roots.mjs';
+
 import { resolveAlias } from './props-contract.mjs';
-import { isUnder, reactRoot } from './roots.mjs';
 
 export interface PropEntry {
   name: string;

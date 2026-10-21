@@ -10,7 +10,7 @@ import { cn } from '../../lib/utils';
  *
  * Props for the Breadcrumb component.
  */
-interface BreadcrumbProps extends React.ComponentProps<'nav'> {}
+type BreadcrumbProps = React.ComponentProps<'nav'>;
 
 /**
  * Navigation trail in a `nav` landmark, showing where the current page sits.
@@ -25,7 +25,7 @@ function Breadcrumb(props: BreadcrumbProps) {
  *
  * Props for the BreadcrumbList component.
  */
-interface BreadcrumbListProps extends React.ComponentProps<'ol'> {}
+type BreadcrumbListProps = React.ComponentProps<'ol'>;
 
 /**
  * Ordered list that lays out the trail in one row. A trail wider than its container scrolls sideways.
@@ -35,7 +35,8 @@ function BreadcrumbList({ className, ...props }: BreadcrumbListProps) {
   return (
     <ol
       data-slot="breadcrumb-list"
-      // eslint-disable-next-line jsx-a11y/no-noninteractive-tabindex -- the current page is a non-focusable <span>, so the list takes focus to scroll an overflowing trail (WCAG 2.1.1)
+      // The current page is a non-focusable <span>, so the list itself must be
+      // keyboard-focusable to scroll an overflowing trail into view (WCAG 2.1.1).
       tabIndex={0}
       className={cn(
         'nx:m-0 nx:flex nx:min-w-0 nx:max-w-full nx:list-none nx:flex-nowrap nx:items-center nx:gap-0.5 nx:overflow-x-auto nx:py-1.5 nx:pr-1.5 nx:pl-0 nx:typography-body-default nx:text-muted-foreground nx:focus-visible:outline-2 nx:focus-visible:outline-focus-default',
@@ -51,7 +52,7 @@ function BreadcrumbList({ className, ...props }: BreadcrumbListProps) {
  *
  * Props for the BreadcrumbItem component.
  */
-interface BreadcrumbItemProps extends React.ComponentProps<'li'> {}
+type BreadcrumbItemProps = React.ComponentProps<'li'>;
 
 /**
  * One `<li>` in the trail.
@@ -104,7 +105,7 @@ function BreadcrumbLink({ asChild, className, ...props }: BreadcrumbLinkProps) {
  *
  * Props for the BreadcrumbPage component.
  */
-interface BreadcrumbPageProps extends React.ComponentProps<'span'> {}
+type BreadcrumbPageProps = React.ComponentProps<'span'>;
 
 /**
  * Current page, marked with `aria-current="page"`. Wrap the label in a `<span>` so it truncates at 150px.
@@ -128,7 +129,7 @@ function BreadcrumbPage({ className, ...props }: BreadcrumbPageProps) {
  *
  * Props for the BreadcrumbMenuTrigger component.
  */
-interface BreadcrumbMenuTriggerProps extends React.ComponentProps<'button'> {}
+type BreadcrumbMenuTriggerProps = React.ComponentProps<'button'>;
 
 /**
  * Icon button that shows alternate paths for the segment beside it.
@@ -164,7 +165,7 @@ function BreadcrumbMenuTrigger({
  *
  * Props for the BreadcrumbSeparator component.
  */
-interface BreadcrumbSeparatorProps extends React.ComponentProps<'li'> {}
+type BreadcrumbSeparatorProps = React.ComponentProps<'li'>;
 
 /**
  * Divider between items, a slash by default. Pass `children` for a different glyph.
@@ -195,7 +196,7 @@ function BreadcrumbSeparator({
  *
  * Props for the BreadcrumbEllipsis component.
  */
-interface BreadcrumbEllipsisProps extends React.ComponentProps<'button'> {}
+type BreadcrumbEllipsisProps = React.ComponentProps<'button'>;
 
 /**
  * Button that stands in for collapsed middle items.

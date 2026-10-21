@@ -46,9 +46,9 @@ const AlertDialogPortal = AlertDialogPrimitive.Portal;
  *
  * Props for the AlertDialogOverlay component.
  */
-interface AlertDialogOverlayProps extends React.ComponentProps<
+type AlertDialogOverlayProps = React.ComponentProps<
   typeof AlertDialogPrimitive.Overlay
-> {}
+>;
 
 /**
  * Dimmed backdrop behind the alert dialog. Clicking it doesn't close the dialog.
@@ -119,10 +119,8 @@ function AlertDialogContent({
  *
  * Props for the AlertDialogHeader component.
  */
-interface AlertDialogHeaderProps
-  extends
-    React.ComponentProps<'div'>,
-    VariantProps<typeof overlayHeaderVariants> {}
+type AlertDialogHeaderProps = React.ComponentProps<'div'> &
+  VariantProps<typeof overlayHeaderVariants>;
 
 /**
  * Holds the title and description.
@@ -153,7 +151,7 @@ function AlertDialogHeader({
  *
  * Props for the AlertDialogBody component.
  */
-interface AlertDialogBodyProps extends React.ComponentProps<'div'> {}
+type AlertDialogBodyProps = React.ComponentProps<'div'>;
 
 /**
  * Holds the main content, aligned with the header and footer. Scrolls when it overflows.
@@ -163,7 +161,7 @@ function AlertDialogBody({ className, ...props }: AlertDialogBodyProps) {
     <div
       data-slot="alert-dialog-body"
       className={cn(overlayBodyClassName, className)}
-      // eslint-disable-next-line jsx-a11y/no-noninteractive-tabindex -- overlay bodies own the scroll region, so pure-text overflow must be keyboard reachable
+      // Overlay bodies own the scroll region, so pure-text overflow must be keyboard reachable.
       tabIndex={0}
       {...props}
     />
@@ -175,7 +173,7 @@ function AlertDialogBody({ className, ...props }: AlertDialogBodyProps) {
  *
  * Props for the AlertDialogFooter component.
  */
-interface AlertDialogFooterProps extends React.ComponentProps<'div'> {}
+type AlertDialogFooterProps = React.ComponentProps<'div'>;
 
 /**
  * Holds the action buttons. They stack on narrow screens and sit in a row from `sm` up.
@@ -201,9 +199,9 @@ function AlertDialogFooter({ className, ...props }: AlertDialogFooterProps) {
  *
  * Props for the AlertDialogTitle component.
  */
-interface AlertDialogTitleProps extends React.ComponentProps<
+type AlertDialogTitleProps = React.ComponentProps<
   typeof AlertDialogPrimitive.Title
-> {}
+>;
 
 /**
  * Dialog title. Place it inside AlertDialogHeader.
@@ -223,9 +221,9 @@ function AlertDialogTitle({ className, ...props }: AlertDialogTitleProps) {
  *
  * Props for the AlertDialogDescription component.
  */
-interface AlertDialogDescriptionProps extends React.ComponentProps<
+type AlertDialogDescriptionProps = React.ComponentProps<
   typeof AlertDialogPrimitive.Description
-> {}
+>;
 
 /**
  * Explains the result of the action.
@@ -251,10 +249,10 @@ function AlertDialogDescription({
  *
  * Props for AlertDialogAction. Takes Button's `variant` and `size`.
  */
-interface AlertDialogActionProps
-  extends
-    React.ComponentProps<typeof AlertDialogPrimitive.Action>,
-    VariantProps<typeof buttonVariants> {}
+type AlertDialogActionProps = React.ComponentProps<
+  typeof AlertDialogPrimitive.Action
+> &
+  VariantProps<typeof buttonVariants>;
 
 /**
  * Confirm button. Closes the dialog on click.
@@ -282,10 +280,10 @@ function AlertDialogAction({
  *
  * Props for AlertDialogCancel. Takes Button's `variant` and `size`.
  */
-interface AlertDialogCancelProps
-  extends
-    React.ComponentProps<typeof AlertDialogPrimitive.Cancel>,
-    VariantProps<typeof buttonVariants> {}
+type AlertDialogCancelProps = React.ComponentProps<
+  typeof AlertDialogPrimitive.Cancel
+> &
+  VariantProps<typeof buttonVariants>;
 
 /**
  * Cancel button, styled as an `outline` Button. Closes the dialog on click.

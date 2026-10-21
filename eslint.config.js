@@ -125,6 +125,22 @@ export default tseslint.config(
       'jsx-a11y/no-static-element-interactions': 'warn',
     },
   },
+  // These scroll regions take tabIndex={0} so keyboard users can scroll them
+  // (axe scrollable-region-focusable). The exemption lives here, not in an
+  // eslint-disable comment, so copied source lints clean in apps without
+  // jsx-a11y.
+  {
+    files: [
+      'packages/react/src/components/alert-dialog/alert-dialog.tsx',
+      'packages/react/src/components/attachment/attachment.tsx',
+      'packages/react/src/components/breadcrumb/breadcrumb.tsx',
+      'packages/react/src/components/dialog/dialog.tsx',
+      'packages/react/src/components/drawer/drawer.tsx',
+      'packages/react/src/components/sheet/sheet.tsx',
+      'packages/react/src/components/table/table.tsx',
+    ],
+    rules: { 'jsx-a11y/no-noninteractive-tabindex': 'off' },
+  },
 
   // Vue single-file components, with TypeScript in <script setup>
   ...pluginVue.configs['flat/recommended'],

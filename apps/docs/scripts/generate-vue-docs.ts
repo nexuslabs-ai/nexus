@@ -3,7 +3,6 @@
 //   demos/{slug}/{story}.vue    each story tagged `docs`, as a single-file component
 //   entry.js                    mounts a demo by id; bundle:vue compiles it for the live previews
 //   docs.ts                     titles, captions, sources and imports
-//   dependencies/{slug}.json    what installing the component takes
 //   props/{slug}.json           each part's own props
 // usage: node scripts/generate-vue-docs.ts
 import {
@@ -16,17 +15,25 @@ import {
 import path from 'node:path';
 import prettier from 'prettier';
 import ts from 'typescript';
-import { parse as parseSfc } from 'vue/compiler-sfc';
 import { createChecker, type PropertyMeta } from 'vue-component-meta';
 
-import { importSpecifiers } from './files.mjs';
-import { humanize } from './humanize.ts';
+import { humanize } from '../../../packages/react/scripts/humanize.ts';
 import {
-  createInstallPlanner,
   packageName,
   type Walk,
-  writeEntries,
-} from './install-plans.ts';
+} from '../../../packages/react/scripts/install-plans.ts';
+import {
+  isUnder,
+  toRepoPath,
+  vueComponentsRoot,
+  vueRoot,
+  vueSrc,
+} from '../../../packages/react/scripts/roots.mjs';
+import {
+  vue,
+  vueComponentSlugs,
+} from '../../../packages/vue/scripts/vue-sources.ts';
+
 import {
   type ComponentEntry,
   literalDefaultValue,
@@ -34,14 +41,7 @@ import {
   toPropsFile,
   toPropsIndex,
 } from './props-entries.ts';
-import {
-  docsRoot,
-  isUnder,
-  toRepoPath,
-  vueComponentsRoot,
-  vueRoot,
-  vueSrc,
-} from './roots.mjs';
+import { docsRoot } from './roots.mjs';
 
 interface SetupValue {
   name: string;
@@ -74,10 +74,7 @@ interface VueComponentDocs {
 
 const outputDir = path.join(docsRoot, 'generated', 'vue');
 const demosDir = path.join(outputDir, 'demos');
-const dependenciesDir = path.join(outputDir, 'dependencies');
 const propsDir = path.join(outputDir, 'props');
-
-const COMPONENT_SPECIFIER = './components/';
 
 const prettierConfig =
   (await prettier.resolveConfig(path.join(vueSrc, 'index.ts'))) ?? {};
@@ -93,17 +90,6 @@ function parseFile(filePath: string) {
     ts.ScriptTarget.Latest,
     true
   );
-}
-
-/** Every component folder packages/vue exports, in export order. */
-function exportedSlugs() {
-  const index = readFileSync(path.join(vueSrc, 'index.ts'), 'utf8');
-  return importSpecifiers(index)
-    .filter((specifier) => specifier.startsWith(COMPONENT_SPECIFIER))
-    .map((specifier) => {
-      const [slug] = specifier.slice(COMPONENT_SPECIFIER.length).split('/');
-      return slug ?? fail(`src/index.ts exports '${specifier}'.`);
-    });
 }
 
 function kebab(name: string) {
@@ -363,42 +349,6 @@ function sfc(
   );
 }
 
-// ── Install plans ───────────────────────────────────────────────────────────
-
-function isVueModuleSource(file: string) {
-  return /\.(?:ts|vue)$/.test(file) && !file.endsWith('.stories.ts');
-}
-
-/** A `.vue` file's `<script>` blocks; any other file whole. */
-function readVueScript(file: string) {
-  const text = readFileSync(file, 'utf8');
-  if (!file.endsWith('.vue')) return text;
-  const { descriptor, errors } = parseSfc(text, { filename: file });
-  if (errors.length > 0) {
-    fail(`${toRepoPath(file)} does not parse: ${errors[0]?.message}`);
-  }
-  return [descriptor.script, descriptor.scriptSetup]
-    .map((block) => block?.content ?? '')
-    .join('\n');
-}
-
-// A Vue component is its whole folder, so any file in it links the component.
-function linkedVueSlug(file: string, exported: Set<string>) {
-  if (!isUnder(file, vueComponentsRoot)) return null;
-  const [slug] = path.relative(vueComponentsRoot, file).split(path.sep);
-  return slug !== undefined && exported.has(slug) ? slug : null;
-}
-
-const vue = createInstallPlanner({
-  root: vueRoot,
-  src: vueSrc,
-  componentsRoot: vueComponentsRoot,
-  framework: 'vue',
-  isModuleSource: isVueModuleSource,
-  readScript: readVueScript,
-  linkedComponentSlug: linkedVueSlug,
-});
-
 // ── Props ───────────────────────────────────────────────────────────────────
 
 /** The SFCs a component folder exports as `default as Name`, in export order. */
@@ -466,8 +416,7 @@ function componentProps(
 
 // ── Write everything ────────────────────────────────────────────────────────
 
-const slugs = exportedSlugs();
-const exported = new Set(slugs);
+const slugs = vueComponentSlugs();
 const walks = slugs.map(vue.walkSlug).filter((walked) => walked !== null);
 vue.assertDeclaredPackages(walks);
 const closures = new Map<string, Walk>(
@@ -484,14 +433,12 @@ const checker = createChecker(path.join(vueRoot, 'tsconfig.json'), {
   printer: { newLine: ts.NewLineKind.LineFeed },
 });
 const propsFiles: PropsFile[] = [];
-const dependencyEntries: ReturnType<typeof vue.componentEntry>[] = [];
 
 for (const slug of slugs) {
   const docs = readDocsStories(slug);
   if (!docs) continue;
 
   const walked = closures.get(slug) ?? fail(`${slug} has no source files.`);
-  dependencyEntries.push(vue.componentEntry(walked, closures, exported));
   /** Every package installing the component brings, its components' included. */
   const brings = new Set(walked.packages);
 
@@ -546,7 +493,6 @@ writeFileSync(
   path.join(propsDir, 'index.json'),
   `${JSON.stringify(toPropsIndex(propsFiles), null, 2)}\n`
 );
-writeEntries(dependenciesDir, dependencyEntries);
 
 writeFileSync(
   path.join(outputDir, 'docs.ts'),

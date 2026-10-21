@@ -1,5 +1,5 @@
 @layer theme, base, components, utilities;
 @import 'tailwindcss/preflight.css' layer(base);
-@import '../styles/nxds/nxds.css';
+@import '../components/nxds/tailwind/nxds.css';
 @import 'tw-animate-css';
-@import '../components/progress/progress.css';
+@import '../components/nxds/components/progress/progress.css';

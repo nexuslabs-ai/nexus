@@ -53,27 +53,12 @@ const switchThumbVariants = cva(
 /**
  * Props for Switch.
  */
-interface SwitchProps
-  extends
-    React.ComponentProps<typeof SwitchPrimitive.Root>,
-    VariantProps<typeof switchVariants> {}
+type SwitchProps = React.ComponentProps<typeof SwitchPrimitive.Root> &
+  VariantProps<typeof switchVariants>;
 
 /**
  * On/off control for settings that apply at once, with no save step. Pair it
  * with a label so the label text is clickable too.
- *
- * @example
- * ```tsx
- * <Switch checked={enabled} onCheckedChange={setEnabled} />
- * ```
- *
- * @example
- * ```tsx
- * <div className="nx:flex nx:items-center nx:gap-2">
- *   <Switch id="airplane-mode" />
- *   <label htmlFor="airplane-mode">Airplane Mode</label>
- * </div>
- * ```
  */
 function Switch({ className, size, ...props }: SwitchProps) {
   return (

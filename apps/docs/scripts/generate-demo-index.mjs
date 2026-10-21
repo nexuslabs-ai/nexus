@@ -8,27 +8,38 @@ import {
 } from 'node:fs';
 import path from 'node:path';
 
-import { componentUsage, entryUsage } from './component-usage.ts';
+import { dependencyEntries } from '../../../packages/react/scripts/dependency-plans.mjs';
 import {
-  componentDescription,
-  componentStoryFiles,
-  DOCS_TAG,
-  docsStoryModule,
-  PREVIEWLESS_COMPONENTS,
-  readDocsStories,
-} from './docs-stories.ts';
-import { resolveFormatOptions } from './page-manifest.mjs';
-import { generateDependencies } from './generate-dependencies.mjs';
-import { importSpecifiers, readCanonical, writeIfChanged } from './files.mjs';
+  importSpecifiers,
+  readCanonical,
+  writeIfChanged,
+  writeJson,
+} from '../../../packages/react/scripts/files.mjs';
+import { buildCatalog } from '../../../packages/react/scripts/generate-catalog.mjs';
 import {
   blockSources,
   componentSlugs,
   exportedComponentSlugs,
-} from './react-sources.mjs';
-import { docsRoot, reactRoot, reactSrc, toRepoPath } from './roots.mjs';
+} from '../../../packages/react/scripts/react-sources.mjs';
+import {
+  CATALOG_FILE,
+  reactRoot,
+  reactSrc,
+  toRepoPath,
+} from '../../../packages/react/scripts/roots.mjs';
+import {
+  componentDescription,
+  componentStoryFiles,
+  DOCS_TAG,
+  readDocsStories,
+} from '../../../packages/react/scripts/stories.ts';
+
+import { componentUsage, entryUsage } from './component-usage.ts';
+import { docsStoryModule, PREVIEWLESS_COMPONENTS } from './docs-stories.ts';
+import { resolveFormatOptions } from './page-manifest.mjs';
+import { docsRoot } from './roots.mjs';
 
 const GENERATED_DIR = path.join(docsRoot, '__generated__');
-const DEPENDENCIES_DIR = path.join(docsRoot, 'generated', 'dependencies');
 const PROPS_DIR = path.join(docsRoot, 'generated', 'props');
 
 /** Images docs stories load by URL, served from Storybook's public dir and copied to the docs app's. */
@@ -41,6 +52,16 @@ const STORY_ASSETS_SOURCE = path.join(
 const STORY_ASSETS_TARGET = path.join(docsRoot, 'public', 'avatars');
 
 const COPIED_PREFIX = '@/';
+/**
+ * Where pasted code finds nxds: the folder `nxds init` creates. The docs
+ * compile demos through `@/` → packages/react/src; only the shown code moves.
+ */
+const PASTED_PREFIX = '@/components/nxds/';
+
+/** `code` with every `@/` import pointing into the app's nxds folder. */
+function pasteReady(code) {
+  return code.replaceAll(`'${COPIED_PREFIX}`, `'${PASTED_PREFIX}`);
+}
 const COMPONENT_IMPORT = /^@\/components\/([^/]+)(?:\/|$)/;
 const ALWAYS_INSTALLED = new Set(['react', 'react-dom']);
 const DOCS_DEPENDENCIES = JSON.parse(
@@ -197,20 +218,8 @@ function withoutExtension(file) {
 }
 
 function readInstallBlocks() {
-  if (!existsSync(DEPENDENCIES_DIR)) {
-    throw new Error(
-      `Missing ${path.relative(docsRoot, DEPENDENCIES_DIR)} — run \`pnpm --filter @nxds/docs generate:dependencies\` first.`
-    );
-  }
-
   const blocks = new Map();
-  const dependencyFiles = readdirSync(DEPENDENCIES_DIR).filter((file) =>
-    file.endsWith('.json')
-  );
-  for (const file of dependencyFiles) {
-    const { slug, closure, plan } = JSON.parse(
-      readCanonical(path.join(DEPENDENCIES_DIR, file))
-    );
+  for (const { slug, closure, plan } of dependencyEntries().components) {
     blocks.set(slug, {
       packages: new Map(
         closure.install.map(({ name, range }) => [name, range])
@@ -580,7 +589,7 @@ ${REGENERATE_HINT}
 
 export { default as Component } from ${JSON.stringify(boundarySpecifier(demo.id))};
 
-export const source = ${JSON.stringify(demo.source)};
+export const source = ${JSON.stringify(pasteReady(demo.source))};
 `;
 }
 
@@ -613,7 +622,7 @@ function renderDemoIndex(demos, componentDocs, blockDocs) {
         `    description: ${JSON.stringify(description)},`,
         `    preview: ${JSON.stringify(preview)},`,
         `    examples: ${JSON.stringify(examples)},`,
-        `    imports: ${JSON.stringify(imports)},`,
+        `    imports: ${JSON.stringify(pasteReady(imports))},`,
         `    composition: ${JSON.stringify(composition)},`,
         `  },`,
       ].join('\n')
@@ -692,7 +701,7 @@ async function generateAndLog() {
 
 async function regenerateQuietly() {
   try {
-    generateDependencies();
+    writeJson(CATALOG_FILE, buildCatalog());
     await generateAndLog();
   } catch (error) {
     console.error(`demo-index: ${error.message}`);

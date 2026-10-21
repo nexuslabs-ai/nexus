@@ -42,8 +42,8 @@ const alertVariants = cva('nx:group/alert nx:grid nx:w-full nx:px-6 nx:py-4', {
  *
  * Props for the Alert component.
  */
-interface AlertProps
-  extends React.ComponentProps<'div'>, VariantProps<typeof alertVariants> {}
+type AlertProps = React.ComponentProps<'div'> &
+  VariantProps<typeof alertVariants>;
 
 /**
  * Shows a status message inside the page.
@@ -79,7 +79,7 @@ function Alert({
  *
  * Props for the AlertIcon component.
  */
-interface AlertIconProps extends React.ComponentProps<'span'> {}
+type AlertIconProps = React.ComponentProps<'span'>;
 
 /**
  * Leading icon. Place it first in `Alert` and pass any icon as its child.
@@ -105,7 +105,7 @@ function AlertIcon({ className, ...props }: AlertIconProps) {
  *
  * Props for the AlertContent component.
  */
-interface AlertContentProps extends React.ComponentProps<'div'> {}
+type AlertContentProps = React.ComponentProps<'div'>;
 
 /**
  * Wraps the title and description. Required with `layout="inline"` so the text sits beside `AlertActions`.
@@ -162,7 +162,7 @@ function AlertTitle({
  *
  * Props for the AlertDescription component.
  */
-interface AlertDescriptionProps extends React.ComponentProps<'div'> {}
+type AlertDescriptionProps = React.ComponentProps<'div'>;
 
 /**
  * Body text of an alert. Holds one or more paragraphs.
@@ -185,7 +185,7 @@ function AlertDescription({ className, ...props }: AlertDescriptionProps) {
  *
  * Props for the AlertActions component.
  */
-interface AlertActionsProps extends React.ComponentProps<'div'> {}
+type AlertActionsProps = React.ComponentProps<'div'>;
 
 /**
  * Holds one or two `Button` actions. Add `AlertClose` here only with `layout="inline"`.
@@ -209,7 +209,7 @@ function AlertActions({ className, ...props }: AlertActionsProps) {
  *
  * Props for the AlertClose component.
  */
-interface AlertCloseProps extends React.ComponentProps<'button'> {}
+type AlertCloseProps = React.ComponentProps<'button'>;
 
 /**
  * Close button, labelled "Dismiss alert" by default. It doesn't remove the alert, so remove it in `onClick`.

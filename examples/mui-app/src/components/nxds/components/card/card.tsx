@@ -9,27 +9,11 @@ import { cn } from '../../lib/utils';
  *
  * Props for the Card component.
  */
-interface CardProps extends React.ComponentProps<'div'> {}
+type CardProps = React.ComponentProps<'div'>;
 
 /**
  * Groups related content and actions in a bordered section.
  * Content is clipped to the rounded corners. Add `nx:overflow-visible` for content that overhangs the edge.
- *
- * @example
- * ```tsx
- * <Card>
- *   <CardHeader>
- *     <CardTitle>Card Title</CardTitle>
- *     <CardDescription>Card description goes here.</CardDescription>
- *   </CardHeader>
- *   <CardContent>
- *     <p>Card content goes here.</p>
- *   </CardContent>
- *   <CardFooter>
- *     <Button>Action</Button>
- *   </CardFooter>
- * </Card>
- * ```
  */
 function Card({ className, ...props }: CardProps) {
   return (
@@ -49,19 +33,11 @@ function Card({ className, ...props }: CardProps) {
  *
  * Props for the CardHeader component.
  */
-interface CardHeaderProps extends React.ComponentProps<'div'> {}
+type CardHeaderProps = React.ComponentProps<'div'>;
 
 /**
  * Holds the title, description and `CardAction`.
  * `CardAction` sits in a right-hand column. Add `nx:col-start-1` to a custom child so it lines up with the title.
- *
- * @example
- * ```tsx
- * <CardHeader>
- *   <CardTitle>Title</CardTitle>
- *   <CardDescription>Description</CardDescription>
- * </CardHeader>
- * ```
  */
 function CardHeader({ className, ...props }: CardHeaderProps) {
   return (
@@ -84,25 +60,12 @@ function CardHeader({ className, ...props }: CardHeaderProps) {
 interface CardTitleProps extends React.ComponentProps<'h3'> {
   /**
    * Applies the title styles to the child element, such as a different heading level.
-   *
-   * @default false
-   * @example
-   * ```tsx
-   * <CardTitle asChild>
-   *   <h2>Section Title</h2>
-   * </CardTitle>
-   * ```
    */
   asChild?: boolean;
 }
 
 /**
  * Card heading. Renders an `h3`, or another heading level through `asChild`.
- *
- * @example
- * ```tsx
- * <CardTitle>Card Title</CardTitle>
- * ```
  */
 function CardTitle({
   asChild = false,
@@ -131,15 +94,10 @@ function CardTitle({
  *
  * Props for the CardDescription component.
  */
-interface CardDescriptionProps extends React.ComponentProps<'p'> {}
+type CardDescriptionProps = React.ComponentProps<'p'>;
 
 /**
  * Supporting text under the title.
- *
- * @example
- * ```tsx
- * <CardDescription>This is a description of the card content.</CardDescription>
- * ```
  */
 function CardDescription({ className, ...props }: CardDescriptionProps) {
   return (
@@ -159,20 +117,10 @@ function CardDescription({ className, ...props }: CardDescriptionProps) {
  *
  * Props for the CardAction component.
  */
-interface CardActionProps extends React.ComponentProps<'div'> {}
+type CardActionProps = React.ComponentProps<'div'>;
 
 /**
  * Holds header actions, such as buttons or badges, beside the title.
- *
- * @example
- * ```tsx
- * <CardHeader>
- *   <CardTitle>Title</CardTitle>
- *   <CardAction>
- *     <Button size="sm">Action</Button>
- *   </CardAction>
- * </CardHeader>
- * ```
  */
 function CardAction({ className, ...props }: CardActionProps) {
   return (
@@ -192,17 +140,10 @@ function CardAction({ className, ...props }: CardActionProps) {
  *
  * Props for the CardContent component.
  */
-interface CardContentProps extends React.ComponentProps<'div'> {}
+type CardContentProps = React.ComponentProps<'div'>;
 
 /**
  * Main content area.
- *
- * @example
- * ```tsx
- * <CardContent>
- *   <p>Main content goes here.</p>
- * </CardContent>
- * ```
  */
 function CardContent({ className, ...props }: CardContentProps) {
   return (
@@ -219,18 +160,10 @@ function CardContent({ className, ...props }: CardContentProps) {
  *
  * Props for the CardFooter component.
  */
-interface CardFooterProps extends React.ComponentProps<'div'> {}
+type CardFooterProps = React.ComponentProps<'div'>;
 
 /**
  * Holds actions and content at the bottom of the card.
- *
- * @example
- * ```tsx
- * <CardFooter>
- *   <Button variant="outline">Cancel</Button>
- *   <Button>Submit</Button>
- * </CardFooter>
- * ```
  */
 function CardFooter({ className, ...props }: CardFooterProps) {
   return (

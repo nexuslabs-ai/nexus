@@ -34,9 +34,7 @@ const DrawerClose = DrawerPrimitive.Close;
  *
  * Props for the DrawerOverlay component.
  */
-interface DrawerOverlayProps extends React.ComponentProps<
-  typeof DrawerPrimitive.Overlay
-> {}
+type DrawerOverlayProps = React.ComponentProps<typeof DrawerPrimitive.Overlay>;
 
 /**
  * Semi-transparent backdrop behind the drawer.
@@ -114,7 +112,7 @@ function DrawerContent({
  *
  * Props for the DrawerHeader component.
  */
-interface DrawerHeaderProps extends React.ComponentProps<'div'> {}
+type DrawerHeaderProps = React.ComponentProps<'div'>;
 
 /**
  * Holds the drawer title and description.
@@ -137,7 +135,7 @@ function DrawerHeader({ className, ...props }: DrawerHeaderProps) {
  *
  * Props for the DrawerBody component.
  */
-interface DrawerBodyProps extends React.ComponentProps<'div'> {}
+type DrawerBodyProps = React.ComponentProps<'div'>;
 
 /**
  * Holds the drawer's main content between the header and footer. Scrolls when
@@ -148,7 +146,7 @@ function DrawerBody({ className, ...props }: DrawerBodyProps) {
     <div
       data-slot="drawer-body"
       className={cn(overlayBodyClassName, className)}
-      // eslint-disable-next-line jsx-a11y/no-noninteractive-tabindex -- overlay bodies own the scroll region, so pure-text overflow must be keyboard reachable
+      // Overlay bodies own the scroll region, so pure-text overflow must be keyboard reachable.
       tabIndex={0}
       {...props}
     />
@@ -160,7 +158,7 @@ function DrawerBody({ className, ...props }: DrawerBodyProps) {
  *
  * Props for the DrawerFooter component.
  */
-interface DrawerFooterProps extends React.ComponentProps<'div'> {}
+type DrawerFooterProps = React.ComponentProps<'div'>;
 
 /**
  * Holds the drawer's action buttons at the bottom of the panel.
@@ -183,9 +181,7 @@ function DrawerFooter({ className, ...props }: DrawerFooterProps) {
  *
  * Props for the DrawerTitle component.
  */
-interface DrawerTitleProps extends React.ComponentProps<
-  typeof DrawerPrimitive.Title
-> {}
+type DrawerTitleProps = React.ComponentProps<typeof DrawerPrimitive.Title>;
 
 /**
  * The drawer's title. Required, because screen readers use it to name the
@@ -206,9 +202,9 @@ function DrawerTitle({ className, ...props }: DrawerTitleProps) {
  *
  * Props for the DrawerDescription component.
  */
-interface DrawerDescriptionProps extends React.ComponentProps<
+type DrawerDescriptionProps = React.ComponentProps<
   typeof DrawerPrimitive.Description
-> {}
+>;
 
 /**
  * Supporting text that explains the drawer.

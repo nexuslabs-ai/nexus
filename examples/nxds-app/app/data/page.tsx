@@ -1,11 +1,11 @@
 'use client';
 
-import { Badge } from '@/components/badge/badge';
-import { Button } from '@/components/button/button';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/card/card';
-import { Input } from '@/components/input/input';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/select/select';
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/table/table';
+import { Badge } from '@/components/nxds/components/badge/badge';
+import { Button } from '@/components/nxds/components/button/button';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/nxds/components/card/card';
+import { Input } from '@/components/nxds/components/input/input';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/nxds/components/select/select';
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/nxds/components/table/table';
 import { IconSearch } from '@tabler/icons-react';
 import { useState } from 'react';
 

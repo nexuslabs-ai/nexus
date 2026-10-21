@@ -326,7 +326,7 @@ function Sidebar({
 /**
  * Props for SidebarTrigger.
  */
-interface SidebarTriggerProps extends React.ComponentProps<typeof Button> {}
+type SidebarTriggerProps = React.ComponentProps<typeof Button>;
 
 /**
  * Icon button that opens and closes the sidebar. Place it in your top bar or
@@ -358,7 +358,7 @@ function SidebarTrigger({ className, onClick, ...props }: SidebarTriggerProps) {
 /**
  * Props for SidebarRail.
  */
-interface SidebarRailProps extends React.ComponentProps<'button'> {}
+type SidebarRailProps = React.ComponentProps<'button'>;
 
 /**
  * Thin strip on the sidebar's inner edge that toggles the sidebar on click.
@@ -390,7 +390,7 @@ function SidebarRail({ className, ...props }: SidebarRailProps) {
 /**
  * Props for SidebarInset.
  */
-interface SidebarInsetProps extends React.ComponentProps<'main'> {}
+type SidebarInsetProps = React.ComponentProps<'main'>;
 
 /**
  * Main content region beside the sidebar. With `variant="inset"` it shows as a
@@ -413,7 +413,7 @@ function SidebarInset({ className, ...props }: SidebarInsetProps) {
 /**
  * Props for SidebarInput.
  */
-interface SidebarInputProps extends React.ComponentProps<typeof Input> {}
+type SidebarInputProps = React.ComponentProps<typeof Input>;
 
 /**
  * `Input` styled for the sidebar, such as a filter field.
@@ -434,7 +434,7 @@ function SidebarInput({ className, ...props }: SidebarInputProps) {
 /**
  * Props for SidebarHeader.
  */
-interface SidebarHeaderProps extends React.ComponentProps<'div'> {}
+type SidebarHeaderProps = React.ComponentProps<'div'>;
 
 /**
  * Top of the sidebar, for a logo or a workspace switcher.
@@ -452,7 +452,7 @@ function SidebarHeader({ className, ...props }: SidebarHeaderProps) {
 /**
  * Props for SidebarFooter.
  */
-interface SidebarFooterProps extends React.ComponentProps<'div'> {}
+type SidebarFooterProps = React.ComponentProps<'div'>;
 
 /**
  * Bottom of the sidebar, for a user menu or sign-out button.
@@ -470,9 +470,7 @@ function SidebarFooter({ className, ...props }: SidebarFooterProps) {
 /**
  * Props for SidebarSeparator.
  */
-interface SidebarSeparatorProps extends React.ComponentProps<
-  typeof Separator
-> {}
+type SidebarSeparatorProps = React.ComponentProps<typeof Separator>;
 
 /**
  * `Separator` inset to line up with the sidebar's content.
@@ -493,7 +491,7 @@ function SidebarSeparator({ className, ...props }: SidebarSeparatorProps) {
 /**
  * Props for SidebarContent.
  */
-interface SidebarContentProps extends React.ComponentProps<'nav'> {}
+type SidebarContentProps = React.ComponentProps<'nav'>;
 
 /**
  * Scrollable `<nav>` landmark that holds the groups and menus. Its `aria-label`
@@ -524,7 +522,7 @@ function SidebarContent({
 /**
  * Props for SidebarGroup.
  */
-interface SidebarGroupProps extends React.ComponentProps<'div'> {}
+type SidebarGroupProps = React.ComponentProps<'div'>;
 
 /**
  * Labelled section that groups related menu items.
@@ -611,7 +609,7 @@ function SidebarGroupAction({
 /**
  * Props for SidebarGroupContent.
  */
-interface SidebarGroupContentProps extends React.ComponentProps<'div'> {}
+type SidebarGroupContentProps = React.ComponentProps<'div'>;
 
 /**
  * Body of a `SidebarGroup`, usually a `SidebarMenu`.
@@ -632,7 +630,7 @@ function SidebarGroupContent({
 /**
  * Props for SidebarMenu.
  */
-interface SidebarMenuProps extends React.ComponentProps<'ul'> {}
+type SidebarMenuProps = React.ComponentProps<'ul'>;
 
 /**
  * `<ul>` that holds a group's nav items.
@@ -653,7 +651,7 @@ function SidebarMenu({ className, ...props }: SidebarMenuProps) {
 /**
  * Props for SidebarMenuItem.
  */
-interface SidebarMenuItemProps extends React.ComponentProps<'li'> {}
+type SidebarMenuItemProps = React.ComponentProps<'li'>;
 
 /**
  * One `<li>` in a `SidebarMenu`. Holds a `SidebarMenuButton` and an optional
@@ -817,7 +815,7 @@ function SidebarMenuAction({
 /**
  * Props for SidebarMenuBadge.
  */
-interface SidebarMenuBadgeProps extends React.ComponentProps<'div'> {}
+type SidebarMenuBadgeProps = React.ComponentProps<'div'>;
 
 /**
  * Count or status pill on a menu item's right edge.
@@ -895,7 +893,7 @@ function SidebarMenuSkeleton({
 /**
  * Props for SidebarMenuSub.
  */
-interface SidebarMenuSubProps extends React.ComponentProps<'ul'> {}
+type SidebarMenuSubProps = React.ComponentProps<'ul'>;
 
 /**
  * `<ul>` for a nested submenu, with a guide line on the left. Hidden on the
@@ -918,7 +916,7 @@ function SidebarMenuSub({ className, ...props }: SidebarMenuSubProps) {
 /**
  * Props for SidebarMenuSubItem.
  */
-interface SidebarMenuSubItemProps extends React.ComponentProps<'li'> {}
+type SidebarMenuSubItemProps = React.ComponentProps<'li'>;
 
 /**
  * One `<li>` in a `SidebarMenuSub`.

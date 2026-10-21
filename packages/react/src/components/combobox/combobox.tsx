@@ -27,7 +27,7 @@ import {
  * Props for the Combobox root. Accepts the Popover root props, such as `open`
  * and `onOpenChange`.
  */
-interface ComboboxProps extends React.ComponentProps<typeof Popover> {}
+type ComboboxProps = React.ComponentProps<typeof Popover>;
 
 /**
  * A searchable single-select field built from a Popover and a Command list.
@@ -43,7 +43,7 @@ function Combobox(props: ComboboxProps) {
  * Props for the ComboboxTrigger. Accepts Button props, such as `size`,
  * `disabled` and `aria-invalid`.
  */
-interface ComboboxTriggerProps extends ButtonProps {}
+type ComboboxTriggerProps = ButtonProps;
 
 /**
  * The button that opens the popover and shows the current selection. Renders an
@@ -126,9 +126,7 @@ function ComboboxContent({
  *
  * Props for the ComboboxInput.
  */
-interface ComboboxInputProps extends React.ComponentProps<
-  typeof CommandInput
-> {}
+type ComboboxInputProps = React.ComponentProps<typeof CommandInput>;
 
 /**
  * The search field. It is the element with `role="combobox"`.
@@ -144,7 +142,7 @@ function ComboboxInput({ className, ...props }: ComboboxInputProps) {
  *
  * Props for the ComboboxList.
  */
-interface ComboboxListProps extends React.ComponentProps<typeof CommandList> {}
+type ComboboxListProps = React.ComponentProps<typeof CommandList>;
 
 /**
  * The scrollable list that holds options, groups and the empty state.
@@ -160,9 +158,7 @@ function ComboboxList({ className, ...props }: ComboboxListProps) {
  *
  * Props for the ComboboxEmpty.
  */
-interface ComboboxEmptyProps extends React.ComponentProps<
-  typeof CommandEmpty
-> {}
+type ComboboxEmptyProps = React.ComponentProps<typeof CommandEmpty>;
 
 /**
  * Shown when the search matches no options.
@@ -182,9 +178,7 @@ function ComboboxEmpty({ className, ...props }: ComboboxEmptyProps) {
  *
  * Props for the ComboboxGroup.
  */
-interface ComboboxGroupProps extends React.ComponentProps<
-  typeof CommandGroup
-> {}
+type ComboboxGroupProps = React.ComponentProps<typeof CommandGroup>;
 
 /**
  * Groups related options under an optional `heading`.
@@ -200,9 +194,7 @@ function ComboboxGroup({ className, ...props }: ComboboxGroupProps) {
  *
  * Props for the ComboboxSeparator.
  */
-interface ComboboxSeparatorProps extends React.ComponentProps<
-  typeof CommandSeparator
-> {}
+type ComboboxSeparatorProps = React.ComponentProps<typeof CommandSeparator>;
 
 /**
  * A decorative divider between groups or options.

@@ -5,7 +5,7 @@ import { cn } from '../../lib/utils';
 /**
  * Props for Skeleton.
  */
-interface SkeletonProps extends React.ComponentProps<'div'> {}
+type SkeletonProps = React.ComponentProps<'div'>;
 
 /**
  * Pulsing placeholder that holds the layout while content loads. Set its shape

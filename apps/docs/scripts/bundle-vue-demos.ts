@@ -5,7 +5,9 @@ import vue from '@vitejs/plugin-vue';
 import path from 'node:path';
 import { build } from 'vite';
 
-import { docsRoot, toRepoPath, vueSrc } from './roots.mjs';
+import { toRepoPath, vueSrc } from '../../../packages/react/scripts/roots.mjs';
+
+import { docsRoot } from './roots.mjs';
 
 const entry = path.join(docsRoot, 'generated', 'vue', 'entry.js');
 const bundleDir = path.join(docsRoot, 'public', 'vue-demos');

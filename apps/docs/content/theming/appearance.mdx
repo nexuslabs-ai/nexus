@@ -47,7 +47,7 @@ Read and update the appearance with `useNxdsAppearance`:
 // components/mode-button.tsx
 'use client';
 
-import { useNxdsAppearance } from '@/components/appearance/provider';
+import { useNxdsAppearance } from '@/components/nxds/components/appearance/provider';
 
 export function ModeButton() {
   const { state, setState } = useNxdsAppearance();
@@ -132,7 +132,7 @@ component:
 import { DEFAULT_BRAND_COLOR } from '@nxds/core';
 import { useState } from 'react';
 
-import { NxdsAppearanceBrandColorField } from '@/components/appearance/brand-color-field/brand-color-field';
+import { NxdsAppearanceBrandColorField } from '@/components/nxds/components/appearance/brand-color-field/brand-color-field';
 
 export function BrandEditor() {
   const [brandColor, setBrandColor] = useState(DEFAULT_BRAND_COLOR);

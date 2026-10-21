@@ -49,7 +49,7 @@ function InputOTP({
 /**
  * Props for a group of OTP slots.
  */
-interface InputOTPGroupProps extends React.ComponentProps<'div'> {}
+type InputOTPGroupProps = React.ComponentProps<'div'>;
 
 /**
  * Row of adjacent slots. For a split code such as 3-3, put an
@@ -111,7 +111,7 @@ function InputOTPSlot({ index, className, ...props }: InputOTPSlotProps) {
 /**
  * Props for the separator between OTP groups.
  */
-interface InputOTPSeparatorProps extends React.ComponentProps<'div'> {}
+type InputOTPSeparatorProps = React.ComponentProps<'div'>;
 
 /**
  * Decorative dot between two `InputOTPGroup`s. Screen readers skip it.

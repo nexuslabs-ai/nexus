@@ -26,16 +26,22 @@ import {
   toProplessEntry,
 } from './props-entries.ts';
 import { reactEntryPoints } from './react-entry-points.mjs';
-import { collectSourceFiles, writeJson } from './files.mjs';
-import { componentSlugs, isComponentSource } from './react-sources.mjs';
+import { docsRoot } from './roots.mjs';
+import {
+  collectSourceFiles,
+  writeJson,
+} from '../../../packages/react/scripts/files.mjs';
+import {
+  componentSlugs,
+  isComponentSource,
+} from '../../../packages/react/scripts/react-sources.mjs';
 import {
   componentsRoot,
-  docsRoot,
   isUnder,
   reactRoot,
   reactSrc,
   toRepoPath,
-} from './roots.mjs';
+} from '../../../packages/react/scripts/roots.mjs';
 
 const reactTsconfig = path.join(reactRoot, 'tsconfig.json');
 

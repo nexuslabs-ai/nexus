@@ -179,9 +179,9 @@ function MessageScrollerProvider({ children }: MessageScrollerProviderProps) {
 /**
  * Props for the MessageScroller component.
  */
-interface MessageScrollerProps extends React.ComponentProps<
+type MessageScrollerProps = React.ComponentProps<
   typeof ScrollAreaPrimitive.Root
-> {}
+>;
 
 /**
  * Scroll container that keeps the latest turn in view until the reader
@@ -215,9 +215,9 @@ function MessageScroller({
 /**
  * Props for the MessageScrollerViewport component.
  */
-interface MessageScrollerViewportProps extends React.ComponentProps<
+type MessageScrollerViewportProps = React.ComponentProps<
   typeof ScrollAreaPrimitive.Viewport
-> {}
+>;
 
 /**
  * Scrolling region of the stream, focusable so keyboard users can scroll it.
@@ -251,7 +251,7 @@ function MessageScrollerViewport({
 /**
  * Props for the MessageScrollerContent component.
  */
-interface MessageScrollerContentProps extends React.ComponentProps<'div'> {}
+type MessageScrollerContentProps = React.ComponentProps<'div'>;
 
 /**
  * Column of turns inside the viewport. A short stream starts at the top.
@@ -280,7 +280,7 @@ function MessageScrollerContent({
 /**
  * Props for the MessageScrollerItem component.
  */
-interface MessageScrollerItemProps extends React.ComponentProps<'div'> {}
+type MessageScrollerItemProps = React.ComponentProps<'div'>;
 
 /**
  * One entry in the stream. Wrap each turn in one so it never shrinks.
@@ -316,10 +316,11 @@ const messageScrollerButtonVariants = cva(
 /**
  * Props for the MessageScrollerButton component.
  */
-interface MessageScrollerButtonProps
-  extends
-    Omit<React.ComponentProps<typeof Button>, 'children' | 'asChild'>,
-    VariantProps<typeof messageScrollerButtonVariants> {}
+type MessageScrollerButtonProps = Omit<
+  React.ComponentProps<typeof Button>,
+  'children' | 'asChild'
+> &
+  VariantProps<typeof messageScrollerButtonVariants>;
 
 /**
  * Button that jumps to the latest turn, or the oldest with `direction="start"`.

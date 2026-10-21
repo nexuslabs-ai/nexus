@@ -150,7 +150,7 @@ function MultiSelect({
   );
 }
 
-interface MultiSelectTriggerProps extends React.ComponentProps<'button'> {}
+type MultiSelectTriggerProps = React.ComponentProps<'button'>;
 
 /**
  * Field that shows the selected values, opens the list, and removes the last
@@ -430,12 +430,14 @@ interface MultiSelectItemProps extends Omit<
 function MultiSelectItem({
   value,
   children,
-  badgeLabel: _badgeLabel,
+  badgeLabel,
   keywords,
   onSelect,
   className,
   ...props
 }: MultiSelectItemProps) {
+  // MultiSelect reads `badgeLabel` from its children; it isn't a DOM prop.
+  void badgeLabel;
   const { selectedValues, toggle } = useMultiSelect();
   const selected = selectedValues.has(value);
 
@@ -474,9 +476,7 @@ function MultiSelectItem({
   );
 }
 
-interface MultiSelectGroupProps extends React.ComponentProps<
-  typeof CommandGroup
-> {}
+type MultiSelectGroupProps = React.ComponentProps<typeof CommandGroup>;
 
 /**
  * Groups related options under an optional `heading`.
@@ -485,9 +485,7 @@ function MultiSelectGroup(props: MultiSelectGroupProps) {
   return <CommandGroup data-slot="multi-select-group" {...props} />;
 }
 
-interface MultiSelectSeparatorProps extends React.ComponentProps<
-  typeof CommandSeparator
-> {}
+type MultiSelectSeparatorProps = React.ComponentProps<typeof CommandSeparator>;
 
 /**
  * Divider between groups or options.

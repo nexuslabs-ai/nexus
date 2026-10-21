@@ -47,7 +47,7 @@ function EmptyState({
  *
  * Props for the EmptyStateHeader component.
  */
-interface EmptyStateHeaderProps extends React.ComponentProps<'div'> {}
+type EmptyStateHeaderProps = React.ComponentProps<'div'>;
 
 /**
  * Groups the media, title and description in a narrow centered column.
@@ -85,10 +85,8 @@ const emptyStateMediaVariants = cva(
  *
  * Props for the EmptyStateMedia component.
  */
-interface EmptyStateMediaProps
-  extends
-    React.ComponentProps<'div'>,
-    VariantProps<typeof emptyStateMediaVariants> {}
+type EmptyStateMediaProps = React.ComponentProps<'div'> &
+  VariantProps<typeof emptyStateMediaVariants>;
 
 /**
  * Holds the icon or illustration. The `icon` variant puts one icon on a muted
@@ -146,7 +144,7 @@ function EmptyStateTitle({
  *
  * Props for the EmptyStateDescription component.
  */
-interface EmptyStateDescriptionProps extends React.ComponentProps<'p'> {}
+type EmptyStateDescriptionProps = React.ComponentProps<'p'>;
 
 /**
  * Supporting text under the title. Links inside it are underlined.
@@ -172,7 +170,7 @@ function EmptyStateDescription({
  *
  * Props for the EmptyStateContent component.
  */
-interface EmptyStateContentProps extends React.ComponentProps<'div'> {}
+type EmptyStateContentProps = React.ComponentProps<'div'>;
 
 /**
  * The action area under the header, usually one or two buttons.

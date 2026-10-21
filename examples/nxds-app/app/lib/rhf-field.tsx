@@ -8,8 +8,8 @@ import {
   useFormState,
 } from 'react-hook-form';
 
-import { Label } from '@/components/label/label';
-import { cn } from '@/lib/utils';
+import { Label } from '@/components/nxds/components/label/label';
+import { cn } from '@/components/nxds/lib/utils';
 
 type RhfFieldContextValue<
   TFieldValues extends FieldValues = FieldValues,

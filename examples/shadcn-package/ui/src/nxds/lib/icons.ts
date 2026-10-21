@@ -5,11 +5,6 @@
  * These are hardcoded icons for component states (loading, validation, navigation).
  *
  * User-facing icons should be passed via props by consumers.
- *
- * @example
- * ```tsx
- * import { IconLoader2 } from './icons';
- * ```
  */
 
 // Loading states

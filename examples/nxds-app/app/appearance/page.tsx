@@ -1,4 +1,4 @@
-import { NxdsAppearanceSettings } from '@/components/appearance/appearance-settings/appearance-settings';
+import { NxdsAppearanceSettings } from '@/components/nxds/components/appearance/appearance-settings/appearance-settings';
 
 export default function AppearancePage() {
   return (

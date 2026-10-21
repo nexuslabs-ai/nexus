@@ -1,9 +1,81 @@
 export const description =
-  'Set up nxds in a new or existing React or Vue app. Add Tailwind 4, the token CSS and the appearance engine, then copy in your first component.';
+  'Set up nxds in a new or existing React or Vue app. React apps use the nxds CLI, and manual steps cover every other setup.';
 
 # Install
 
-Set up your app once, then copy in any nxds component.
+Set up a React app with the `nxds` CLI, then add any component. For a Vue app,
+follow [Install by hand](#install-by-hand).
+
+## Set up your app
+
+```bash
+npx nxds init
+```
+
+`init` sets up a Next.js App Router app or a Vite + React app that uses
+TypeScript. It does every step in [Install by hand](#install-by-hand):
+
+| Step                | What `init` does                                                                      |
+| ------------------- | ------------------------------------------------------------------------------------- |
+| Tailwind 4          | Installs it, if your app doesn't have it yet                                          |
+| Token CSS           | Copies it into `components/nxds/tailwind/` and adds an nxds CSS entry beside your app |
+| Appearance provider | Copies it with the `cn` helper, then adds it to `app/layout.tsx` or `src/main.tsx`    |
+| Packages            | Installs `@nxds/core`, `tw-animate-css`, `clsx` and `tailwind-merge`                  |
+| ESLint (Vite)       | Turns off `react-refresh/only-export-components` for the nxds folder                  |
+
+Your app's own styles stay as they are. `init` also writes `nxds.json`, which
+records what nxds installed.
+
+If your app uses `src/`, nxds goes in `src/components/nxds/`. To choose
+another folder, pass `--dir`.
+
+## Add a component
+
+```bash
+npx nxds add button
+```
+
+`add` copies the component, the components it uses and the packages it needs.
+Each component page shows its `add` command.
+
+Copied files are yours to edit. Import them from the nxds folder, such as
+`components/nxds/components/button/button`.
+
+## Update components
+
+```bash
+npx nxds diff
+npx nxds update
+```
+
+`diff` lists the files that differ from this release. `update` replaces the
+files you haven't edited. To replace an edited file too, pass `--overwrite`.
+
+If you run a newer `nxds`, run `update` before `add`. `add` refuses to mix
+files from two releases in one app.
+
+## Find setup problems
+
+```bash
+npx nxds doctor
+```
+
+`doctor` checks the provider, the CSS entry, the files and the packages, and
+says how to fix each problem.
+
+| Option         | What it does                                         |
+| -------------- | ---------------------------------------------------- |
+| `--dry-run`    | Shows what would change, without changing anything   |
+| `--json`       | Prints `{ ok, data }`, or `{ ok, error }` on failure |
+| `--no-install` | Skips installing npm packages                        |
+| `--cwd <path>` | Runs in another folder                               |
+
+Run `npx nxds --help` to list every command.
+
+## Install by hand
+
+If the CLI doesn't support your app, follow these steps. They're the steps
+`init` and `add` run for you.
 
 Copied components are your files: edit them freely, and paste a newer version
 to update.
@@ -37,10 +109,11 @@ same file doesn't give you unprefixed classes.
 
 The token CSS defines the colors, spacing and type scale. Copy the seven files
 from `packages/tailwind/` in the
-[nxds repo](https://github.com/nexuslabs-ai/nxds) into `styles/nxds/`:
+[nxds repo](https://github.com/nexuslabs-ai/nxds) into
+`components/nxds/tailwind/`:
 
 ```
-styles/nxds/
+components/nxds/tailwind/
 ├── nxds.css                 # entry point, imports the other six
 ├── variables.css
 ├── typography-utilities.css
@@ -63,7 +136,7 @@ CSS entry point:
 /* app/globals.css */
 @layer theme, base, components, utilities;
 @import 'tailwindcss/preflight.css' layer(base);
-@import '../styles/nxds/nxds.css';
+@import '../components/nxds/tailwind/nxds.css';
 @import 'tw-animate-css';
 ```
 
@@ -97,10 +170,10 @@ Install the theme engine:
 npm install @nxds/core
 ```
 
-Copy the provider folder into `components/appearance/provider/`:
+Copy the provider folder into `components/nxds/components/appearance/provider/`:
 
 ```
-components/appearance/provider/
+components/nxds/components/appearance/provider/
 ├── index.ts      # NxdsAppearanceProvider, useNxdsAppearance, createNxdsAppearance
 ├── provider.tsx
 ├── factory.tsx
@@ -129,8 +202,8 @@ Add the script and the provider to your root layout:
 
 ```tsx
 // app/layout.tsx
-import { NxdsAppearanceProvider } from '@/components/appearance/provider';
-import { NxdsAppearanceScript } from '@/components/appearance/provider/server';
+import { NxdsAppearanceProvider } from '@/components/nxds/components/appearance/provider';
+import { NxdsAppearanceScript } from '@/components/nxds/components/appearance/provider/server';
 
 import { defaultAppearance } from './appearance-state';
 
@@ -177,7 +250,7 @@ To render the saved theme on the server, see
 npm install clsx tailwind-merge
 ```
 
-Copy `packages/react/src/lib/utils.ts` to `lib/utils.ts`.
+Copy `packages/react/src/lib/utils.ts` to `components/nxds/lib/utils.ts`.
 
 `cn` merges class names and resolves conflicts between `nx:` classes. That's
 what lets `<Button className="nx:bg-error-background" />` replace the button's
@@ -190,8 +263,8 @@ and the files to copy. For Button:
 
 <InstallBlock slug="button" />
 
-Paths are relative to `packages/react/src/` in the repo. Keep the same folder
-structure under your `@/` import alias, and the imports between files work without
+Paths are relative to `packages/react/src/` in the repo. Copy each file to the
+same path under `components/nxds/`, and the imports between files work without
 edits. If a component has its own stylesheet, like Progress, it also lists the
 `@import` lines to add to `app/globals.css`.
 
@@ -205,8 +278,8 @@ To check dark mode, add a toggle that uses `useNxdsAppearance`:
 // components/mode-toggle.tsx
 'use client';
 
-import { useNxdsAppearance } from '@/components/appearance/provider';
-import { Button } from '@/components/button/button';
+import { useNxdsAppearance } from '@/components/nxds/components/appearance/provider';
+import { Button } from '@/components/nxds/components/button/button';
 
 export function ModeToggle() {
   const { state, setState, resolvedMode } = useNxdsAppearance();
@@ -237,7 +310,7 @@ same `storageKey`. With different keys, they load different themes.
 ## Set up Vite
 
 On Vite, this section replaces step 3. Install `@nxds/core`, copy the
-provider into `src/components/appearance/provider/`, and create
+provider into `src/components/nxds/components/appearance/provider/`, and create
 `src/appearance-state.ts` as in step 3.
 
 Vite doesn't render on the server, so add the theme script to `index.html` at
@@ -283,7 +356,7 @@ import { createRoot } from 'react-dom/client';
 
 import App from './App';
 import { defaultAppearance } from './appearance-state';
-import { createNxdsAppearance } from './components/appearance/provider';
+import { createNxdsAppearance } from './components/nxds/components/appearance/provider';
 
 import './index.css';
 
@@ -316,8 +389,8 @@ import {
 } from '@nxds/core';
 import { cookies } from 'next/headers';
 
-import { NxdsAppearanceProvider } from '@/components/appearance/provider';
-import { NxdsAppearanceScript } from '@/components/appearance/provider/server';
+import { NxdsAppearanceProvider } from '@/components/nxds/components/appearance/provider';
+import { NxdsAppearanceScript } from '@/components/nxds/components/appearance/provider/server';
 
 import { defaultAppearance } from './appearance-state';
 
@@ -378,12 +451,9 @@ If your app uses a strict Content Security Policy, pass a nonce:
 ## Add nxds to an existing app
 
 nxds CSS defines only `nx:` classes and `--nx-*` variables, so your app's
-styles stay as they are. Follow steps 1 to 4 with these four changes:
+styles stay as they are. Follow steps 1 to 4 with these three changes:
 
-1. **Copy nxds into its own folder**, such as `components/nxds/`. Your app
-   likely has its own `lib/utils.ts`, and nxds's would replace it. The imports
-   between nxds files still work.
-2. **Give nxds its own CSS entry** and import it after your own stylesheet:
+1. **Give nxds its own CSS entry** and import it after your own stylesheet:
 
    ```css
    /* app/nxds.css */
@@ -394,10 +464,10 @@ styles stay as they are. Follow steps 1 to 4 with these four changes:
    Your `globals.css` keeps its `@import "tailwindcss"`. Two files make two
    Tailwind builds, one prefixed and one not.
 
-3. **Keep your app's reset.** nxds needs `box-sizing: border-box`. Tailwind's
+2. **Keep your app's reset.** nxds needs `box-sizing: border-box`. Tailwind's
    Preflight, MUI's `CssBaseline` and Bootstrap's Reboot all set it. If your app
    has no Tailwind, install it for the nxds entry.
-4. **Add the provider and the script** as in step 3. nxds and your theme share
+3. **Add the provider and the script** as in step 3. nxds and your theme share
    the `.dark` class on `<html>`.
 
 Three global effects remain:
@@ -475,12 +545,12 @@ add `languageOptions: { parser: tseslint.parser }` to the entry.
 Every file you copy comes from the
 [nxds repo](https://github.com/nexuslabs-ai/nxds):
 
-| File                | Path in the repo                                     |
-| ------------------- | ---------------------------------------------------- |
-| Token CSS           | `packages/tailwind/*.css`                            |
-| Appearance provider | `packages/react/src/components/appearance/provider/` |
-| `cn` helper         | `packages/react/src/lib/utils.ts`                    |
-| Components          | `packages/react/src/components/{name}/`              |
+| File                | Path in the repo                                     | Path in your app                                  |
+| ------------------- | ---------------------------------------------------- | ------------------------------------------------- |
+| Token CSS           | `packages/tailwind/*.css`                            | `components/nxds/tailwind/`                       |
+| Appearance provider | `packages/react/src/components/appearance/provider/` | `components/nxds/components/appearance/provider/` |
+| `cn` helper         | `packages/react/src/lib/utils.ts`                    | `components/nxds/lib/utils.ts`                    |
+| Components          | `packages/react/src/components/{name}/`              | `components/nxds/components/{name}/`              |
 
 </FrameworkPanel>
 <FrameworkPanel framework="vue">
@@ -681,12 +751,6 @@ key.
 
 </FrameworkPanel>
 </FrameworkTabs>
-
-## Fork the whole design system
-
-If you want the whole design system in your own monorepo, skip this page. Clone
-the repo, run `pnpm install`, then run `pnpm export --name=your-design-system`
-and follow the generated scaffold.
 
 ## Next steps
 

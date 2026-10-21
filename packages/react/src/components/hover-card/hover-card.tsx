@@ -13,9 +13,7 @@ import {
  *
  * Props for the HoverCard root.
  */
-interface HoverCardProps extends React.ComponentProps<
-  typeof HoverCardPrimitive.Root
-> {}
+type HoverCardProps = React.ComponentProps<typeof HoverCardPrimitive.Root>;
 
 /**
  * A card that opens when the user hovers or focuses the trigger. Use it for
@@ -31,9 +29,9 @@ function HoverCard(props: HoverCardProps) {
  *
  * Props for the HoverCardTrigger.
  */
-interface HoverCardTriggerProps extends React.ComponentProps<
+type HoverCardTriggerProps = React.ComponentProps<
   typeof HoverCardPrimitive.Trigger
-> {}
+>;
 
 /**
  * The element that opens the card on hover or focus. Use `asChild` to render
@@ -50,9 +48,9 @@ function HoverCardTrigger(props: HoverCardTriggerProps) {
  *
  * Props for the HoverCardContent component.
  */
-interface HoverCardContentProps extends React.ComponentProps<
+type HoverCardContentProps = React.ComponentProps<
   typeof HoverCardPrimitive.Content
-> {}
+>;
 
 /**
  * The floating card. Anchors to the trigger and renders into `document.body`.

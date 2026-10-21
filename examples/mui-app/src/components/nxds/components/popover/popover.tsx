@@ -10,16 +10,6 @@ import {
 
 /**
  * Root of the popover. Holds the open state.
- *
- * @example
- * ```tsx
- * <Popover>
- *   <PopoverTrigger asChild>
- *     <Button variant="outline">Open</Button>
- *   </PopoverTrigger>
- *   <PopoverContent>Place content for the popover here.</PopoverContent>
- * </Popover>
- * ```
  */
 const Popover = PopoverPrimitive.Root;
 
@@ -37,19 +27,12 @@ const PopoverAnchor = PopoverPrimitive.Anchor;
 /**
  * Props for the PopoverContent component.
  */
-interface PopoverContentProps extends React.ComponentProps<
+type PopoverContentProps = React.ComponentProps<
   typeof PopoverPrimitive.Content
-> {}
+>;
 
 /**
  * Floating panel next to the trigger, rendered in a portal on `document.body`.
- *
- * @example
- * ```tsx
- * <PopoverContent align="start" sideOffset={8}>
- *   <p>Popover content</p>
- * </PopoverContent>
- * ```
  */
 function PopoverContent({
   className,

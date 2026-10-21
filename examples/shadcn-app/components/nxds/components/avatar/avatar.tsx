@@ -59,13 +59,6 @@ interface AvatarProps
     VariantProps<typeof avatarVariants> {
   /**
    * Draws a non-interactive emphasis ring, such as for a selected person. Put focus rings on the interactive wrapper.
-   * @default false
-   * @example
-   * ```tsx
-   * <Avatar ring>
-   *   <AvatarFallback>JD</AvatarFallback>
-   * </Avatar>
-   * ```
    */
   ring?: boolean;
 }
@@ -73,34 +66,9 @@ interface AvatarProps
 /**
  * Shows a person's profile image, with initials or an icon as the fallback.
  *
- * @example
- * ```tsx
- * <Avatar>
- *   <AvatarImage src="/avatar.png" alt="User" />
- *   <AvatarFallback>JD</AvatarFallback>
- * </Avatar>
- * ```
- *
- * @example
- * ```tsx
- * // With size and shape
- * <Avatar size="lg" shape="rounded">
- *   <AvatarImage src="/avatar.png" alt="User" />
- *   <AvatarFallback>JD</AvatarFallback>
- * </Avatar>
- * ```
- *
  * @remarks
  * The `ring`, `AvatarStatus` and `AvatarGroup` rings use the `background` color.
  * On another surface, set `surface-*` on the wrapper so the rings match it:
- *
- * @example
- * ```tsx
- * // On a container surface — rings match the card, no halo
- * <div className="nx:bg-container nx:surface-container">
- *   <AvatarGroup>{avatars}</AvatarGroup>
- * </div>
- * ```
  */
 function Avatar({
   className,
@@ -135,20 +103,13 @@ function Avatar({
  *
  * Props for the AvatarImage component.
  */
-interface AvatarImageProps extends React.ComponentProps<
-  typeof AvatarPrimitive.Image
-> {}
+type AvatarImageProps = React.ComponentProps<typeof AvatarPrimitive.Image>;
 
 /**
  * Profile image. AvatarFallback shows until it loads.
  *
  * @remarks
  * Defaults to `decoding="async"`. `loading="lazy"` has no effect, because the image is preloaded before it mounts.
- *
- * @example
- * ```tsx
- * <AvatarImage src="/avatar.png" alt="John Doe" />
- * ```
  */
 function AvatarImage({
   className,
@@ -174,17 +135,12 @@ function AvatarImage({
  *
  * Props for the AvatarFallback component.
  */
-interface AvatarFallbackProps extends React.ComponentProps<
+type AvatarFallbackProps = React.ComponentProps<
   typeof AvatarPrimitive.Fallback
-> {}
+>;
 
 /**
  * Shows while the image loads or if it fails, usually initials or an icon.
- *
- * @example
- * ```tsx
- * <AvatarFallback>JD</AvatarFallback>
- * ```
  */
 function AvatarFallback({ className, ...props }: AvatarFallbackProps) {
   return (
@@ -243,15 +199,6 @@ interface AvatarStatusProps
  * @remarks
  * If the parent `Avatar` has `role="img"`, screen readers skip this label.
  * Put the status in the parent's name instead: `<Avatar role="img" aria-label="Ada Lovelace, online">`.
- *
- * @example
- * ```tsx
- * <Avatar>
- *   <AvatarImage src="/avatar.png" alt="Ada Lovelace" />
- *   <AvatarFallback>AL</AvatarFallback>
- *   <AvatarStatus status="online" />
- * </Avatar>
- * ```
  */
 function AvatarStatus({
   className,
@@ -281,10 +228,6 @@ interface AvatarGroupProps
     Pick<VariantProps<typeof avatarVariants>, 'size' | 'shape'> {
   /**
    * Number of avatars shown before the rest collapse into a +N tile.
-   * @example
-   * ```tsx
-   * <AvatarGroup size="lg" max={3}>{avatars}</AvatarGroup>
-   * ```
    */
   max?: number;
 }

@@ -127,7 +127,7 @@ function Attachment({
  *
  * Props for the AttachmentMedia component.
  */
-interface AttachmentMediaProps extends ItemMediaProps {}
+type AttachmentMediaProps = ItemMediaProps;
 
 /**
  * Thumbnail or file-type icon. Fills a vertical tile as a square and takes the error color on `error`.
@@ -187,7 +187,7 @@ function AttachmentTitle({
  *
  * Props for the AttachmentContent component.
  */
-interface AttachmentContentProps extends ItemContentProps {}
+type AttachmentContentProps = ItemContentProps;
 
 /**
  * Middle column for the title, description and progress.
@@ -201,7 +201,7 @@ function AttachmentContent(props: AttachmentContentProps) {
  *
  * Props for the AttachmentDescription component.
  */
-interface AttachmentDescriptionProps extends ItemDescriptionProps {}
+type AttachmentDescriptionProps = ItemDescriptionProps;
 
 /**
  * Line under the file name, such as size or an error reason. Takes the error color on `error`.
@@ -227,7 +227,7 @@ function AttachmentDescription({
  *
  * Props for the AttachmentActions component.
  */
-interface AttachmentActionsProps extends ItemActionsProps {}
+type AttachmentActionsProps = ItemActionsProps;
 
 /**
  * Trailing controls, such as remove or retry. They stay clickable above `AttachmentTrigger`.
@@ -267,7 +267,8 @@ function AttachmentGroup({ className, ...props }: AttachmentGroupProps) {
     <div
       data-slot="attachment-group"
       role="group"
-      // eslint-disable-next-line jsx-a11y/no-noninteractive-tabindex -- a scrollable region with no focusable children must be focusable to scroll (WCAG 2.1.1)
+      // A scrollable region with no focusable children must itself be
+      // keyboard-focusable to scroll (WCAG 2.1.1).
       tabIndex={0}
       className={cn(
         'nx:flex nx:min-w-0 nx:snap-x nx:gap-3 nx:overflow-x-auto nx:overscroll-x-contain nx:py-1',
@@ -285,7 +286,7 @@ function AttachmentGroup({ className, ...props }: AttachmentGroupProps) {
  *
  * Props for the AttachmentProgress component.
  */
-interface AttachmentProgressProps extends ProgressProps {}
+type AttachmentProgressProps = ProgressProps;
 
 /**
  * Upload progress bar for `AttachmentContent`. Omit `value` while the total is unknown.

@@ -11,9 +11,7 @@ import { cn } from '../../lib/utils';
  *
  * Props for the Checkbox component.
  */
-interface CheckboxProps extends React.ComponentProps<
-  typeof CheckboxPrimitive.Root
-> {}
+type CheckboxProps = React.ComponentProps<typeof CheckboxPrimitive.Root>;
 
 /**
  * Selects one or more options, or toggles one setting.

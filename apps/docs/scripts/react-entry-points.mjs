@@ -1,6 +1,6 @@
 import path from 'node:path';
 
-import { reactRoot } from './roots.mjs';
+import { reactRoot } from '../../../packages/react/scripts/roots.mjs';
 
 const CODE_EXTENSIONS = new Set([
   '.cjs',
@@ -19,9 +19,10 @@ function targetFiles(target) {
   return Object.values(target).flatMap(targetFiles);
 }
 
-function isModuleSurface(target) {
-  return targetFiles(target).some((file) =>
-    CODE_EXTENSIONS.has(path.extname(file))
+function isBuiltModule(target) {
+  return targetFiles(target).some(
+    (file) =>
+      file.startsWith('./dist/') && CODE_EXTENSIONS.has(path.extname(file))
   );
 }
 
@@ -47,7 +48,7 @@ function typesCondition(target) {
 // Maps each `exports` subpath's `dist/*.d.ts` back to its `src/*.ts`.
 export function reactEntryPoints(manifest) {
   return Object.entries(manifest.exports)
-    .filter(([, target]) => isModuleSurface(target))
+    .filter(([, target]) => isBuiltModule(target))
     .map(([subpath, target]) => {
       const types = typesCondition(target);
       if (!types) {

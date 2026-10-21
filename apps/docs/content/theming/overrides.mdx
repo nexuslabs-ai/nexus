@@ -44,9 +44,13 @@ and select triggers read `--nx-radius-md`, so they keep their corners:
 // components/rounded-actions.tsx
 import type { CSSProperties } from 'react';
 
-import { Button } from '@/components/button/button';
-import { Input } from '@/components/input/input';
-import { Select, SelectTrigger, SelectValue } from '@/components/select/select';
+import { Button } from '@/components/nxds/components/button/button';
+import { Input } from '@/components/nxds/components/input/input';
+import {
+  Select,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/nxds/components/select/select';
 
 type RadiusStyle = CSSProperties & { '--nx-radius-base': string };
 const pillButtons: RadiusStyle = { '--nx-radius-base': '9999px' };

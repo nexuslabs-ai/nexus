@@ -1,11 +1,49 @@
 export const description =
-  'Point your AI agent at /llms.txt to give it every nxds docs page as Markdown. Add .md to any docs URL to read one page.';
+  'Let your AI agent install nxds with the nxds CLI, learn its rules from the nxds skill, and read every docs page as Markdown.';
 
 # AI agents
 
-Point your AI agent at `/llms.txt` to give it every nxds docs page as Markdown.
+Your AI agent installs nxds with the `nxds` CLI, learns the nxds rules
+from the nxds skill, and reads every docs page as Markdown.
 
-## Fetch the index
+## Install with the CLI
+
+```bash
+npx nxds info --json
+npx nxds add button --dry-run --json
+npx nxds add button
+```
+
+The CLI never asks a question, so it runs inside any agent. `info` reports the
+app setup and the installed items. `--dry-run` shows the files and packages a
+command would change, and `--json` prints the result for the agent to read.
+[Install](/getting-started/install) lists every command.
+
+With `--json`, a command prints `{ "ok": true, "data": … }`. If it fails, it
+prints `{ "ok": false, "error": "…" }` and exits with code 1.
+
+## Add the nxds skill
+
+The skill tells your agent to check the setup first, add components with the
+CLI, and follow the `nx:` class and token rules.
+
+In Claude Code:
+
+```bash
+/plugin marketplace add nexuslabs-ai/nxds
+/plugin install nxds@nxds
+```
+
+In Cursor, Codex, Gemini CLI and other agents that read skills:
+
+```bash
+npx skills add nexuslabs-ai/nxds --skill nxds
+```
+
+Pass `--skill nxds`, because the repository also holds skills for nxds
+contributors.
+
+## Fetch the docs index
 
 ```bash
 curl https://nxds.dev/llms.txt

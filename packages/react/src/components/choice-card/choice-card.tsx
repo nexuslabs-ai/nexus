@@ -40,10 +40,8 @@ const choiceCardVariants = cva(
  *
  * Props for ChoiceCard. It has no `asChild`, because it relies on a native label with `htmlFor`.
  */
-interface ChoiceCardProps
-  extends
-    Omit<React.ComponentProps<typeof Label>, 'asChild'>,
-    VariantProps<typeof choiceCardVariants> {}
+type ChoiceCardProps = Omit<React.ComponentProps<typeof Label>, 'asChild'> &
+  VariantProps<typeof choiceCardVariants>;
 
 /**
  * ChoiceCardContentProps

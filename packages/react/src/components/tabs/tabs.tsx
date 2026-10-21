@@ -223,9 +223,7 @@ const tabsTriggerVariants = cva(
 /**
  * Props for TabsTrigger.
  */
-interface TabsTriggerProps extends React.ComponentProps<
-  typeof TabsPrimitive.Trigger
-> {}
+type TabsTriggerProps = React.ComponentProps<typeof TabsPrimitive.Trigger>;
 
 /**
  * Tab button that shows its panel. Takes its style from the TabsList `variant`
@@ -248,9 +246,7 @@ function TabsTrigger({ className, ...props }: TabsTriggerProps) {
 /**
  * Props for TabsContent.
  */
-interface TabsContentProps extends React.ComponentProps<
-  typeof TabsPrimitive.Content
-> {}
+type TabsContentProps = React.ComponentProps<typeof TabsPrimitive.Content>;
 
 /**
  * Panel for one tab, shown only while that tab is active.

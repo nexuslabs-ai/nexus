@@ -7,18 +7,12 @@ import { cn } from '../../lib/utils';
 /**
  * Props for the Label component.
  */
-interface LabelProps extends React.ComponentProps<typeof LabelPrimitive.Root> {}
+type LabelProps = React.ComponentProps<typeof LabelPrimitive.Root>;
 
 /**
  * Accessible name for a form control, linked by setting `htmlFor` to the
  * control's `id`. Dims when an earlier sibling with the `nx:peer` class is
  * disabled.
- *
- * @example
- * ```tsx
- * <Label htmlFor="email">Email</Label>
- * <Input id="email" type="email" />
- * ```
  */
 function Label({ className, ...props }: LabelProps) {
   return (

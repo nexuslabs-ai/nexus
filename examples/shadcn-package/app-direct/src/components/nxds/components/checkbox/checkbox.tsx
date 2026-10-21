@@ -11,9 +11,7 @@ import { cn } from '../../lib/utils';
  *
  * Props for the Checkbox component.
  */
-interface CheckboxProps extends React.ComponentProps<
-  typeof CheckboxPrimitive.Root
-> {}
+type CheckboxProps = React.ComponentProps<typeof CheckboxPrimitive.Root>;
 
 /**
  * Selects one or more options, or toggles one setting.
@@ -21,25 +19,6 @@ interface CheckboxProps extends React.ComponentProps<
  *
  * The box is 16px, so pair it with a label that carries the touch target.
  * Use `Label`, `ChoiceRow`, `ChoiceCard`, or `FieldLabel` in a `Field`.
- *
- * @example
- * ```tsx
- * <Checkbox checked={agreed} onCheckedChange={setAgreed} />
- * ```
- *
- * @example
- * ```tsx
- * // Indeterminate (mixed) state
- * <Checkbox checked="indeterminate" aria-label="Select all" />
- * ```
- *
- * @example
- * ```tsx
- * <div className="nx:flex nx:items-center nx:gap-2">
- *   <Checkbox id="terms" />
- *   <Label htmlFor="terms">Accept terms and conditions</Label>
- * </div>
- * ```
  */
 function Checkbox({ className, ...props }: CheckboxProps) {
   return (
