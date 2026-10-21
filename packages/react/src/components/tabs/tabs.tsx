@@ -87,15 +87,18 @@ function TabsList({
         return;
       }
 
-      const height = active.offsetHeight;
-      const y =
-        variant === 'underline'
-          ? active.offsetTop + Math.max(height - 2, 0)
-          : active.offsetTop;
+      const isUnderline = variant === 'underline';
+      const isVertical = list.dataset.orientation === 'vertical';
+      const isVerticalBar = isUnderline && isVertical;
+      const isHorizontalBar = isUnderline && !isVertical;
+      const x = isVerticalBar ? 0 : active.offsetLeft;
+      const y = isHorizontalBar ? 0 : active.offsetTop;
 
-      indicator.style.transform = `translate3d(${active.offsetLeft}px, ${y}px, 0)`;
-      indicator.style.width = `${active.offsetWidth}px`;
-      indicator.style.height = variant === 'underline' ? '2px' : `${height}px`;
+      indicator.style.transform = `translate3d(${x}px, ${y}px, 0)`;
+      indicator.style.width = isVerticalBar ? '' : `${active.offsetWidth}px`;
+      indicator.style.height = isHorizontalBar
+        ? ''
+        : `${active.offsetHeight}px`;
       indicator.style.opacity = '1';
 
       if (!readyRef.current) {
@@ -115,7 +118,7 @@ function TabsList({
     const mutationObserver = new MutationObserver(schedule);
     mutationObserver.observe(list, {
       attributes: true,
-      attributeFilter: ['data-state'],
+      attributeFilter: ['data-state', 'data-orientation'],
       childList: true,
       subtree: true,
     });
@@ -138,6 +141,7 @@ function TabsList({
       data-size={size}
       className={cn(
         'nx:relative nx:isolate nx:inline-flex nx:items-center nx:justify-center',
+        'nx:data-[orientation=vertical]:flex-col nx:data-[orientation=vertical]:items-stretch',
         variant === 'default' &&
           'nx:rounded-md nx:bg-control-background nx:p-1',
         className
@@ -150,9 +154,14 @@ function TabsList({
         data-slot="tabs-indicator"
         data-variant={variant}
         className={cn(
-          'nx:pointer-events-none nx:absolute nx:top-0 nx:left-0 nx:z-0 nx:opacity-0',
-          'nx:data-[variant=default]:rounded-sm nx:data-[variant=default]:border-default nx:data-[variant=default]:border-border-default nx:data-[variant=default]:bg-background',
-          'nx:data-[variant=underline]:bg-primary-background',
+          'nx:pointer-events-none nx:absolute nx:z-0 nx:opacity-0',
+          variant === 'default' &&
+            'nx:top-0 nx:left-0 nx:rounded-sm nx:border-default nx:border-border-default nx:bg-background',
+          variant === 'underline' && [
+            'nx:bg-primary-background',
+            'nx:[[data-orientation=horizontal]>&]:bottom-0 nx:[[data-orientation=horizontal]>&]:left-0 nx:[[data-orientation=horizontal]>&]:h-(--nx-borderwidth-thick)',
+            'nx:[[data-orientation=vertical]>&]:top-0 nx:[[data-orientation=vertical]>&]:right-0 nx:[[data-orientation=vertical]>&]:w-(--nx-borderwidth-thick)',
+          ],
           ready &&
             'nx:transition-[transform,width,height] nx:duration-fast nx:ease-move'
         )}
@@ -190,6 +199,7 @@ const tabsTriggerVariants = cva(
         ],
         underline: [
           'nx:rounded-none nx:border-0 nx:border-b-thick nx:border-transparent',
+          'nx:data-[orientation=vertical]:border-b-0 nx:data-[orientation=vertical]:border-r-thick',
           'nx:bg-transparent',
           'nx:data-[state=active]:text-foreground',
         ],

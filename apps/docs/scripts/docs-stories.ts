@@ -13,8 +13,8 @@ import path from 'node:path';
 import prettier, { type Options as PrettierOptions } from 'prettier';
 import ts from 'typescript';
 
+import { collectSourceFiles } from './files.mjs';
 import { humanize, pascal } from './humanize.ts';
-import { collectSourceFiles } from './react-sources.mjs';
 import { componentsRoot, isUnder, reactSrc, toRepoPath } from './roots.mjs';
 
 export const DOCS_TAG = 'docs';

@@ -1,6 +1,7 @@
 import bash from '@shikijs/langs/bash';
 import css from '@shikijs/langs/css';
 import tsx from '@shikijs/langs/tsx';
+import vue from '@shikijs/langs/vue';
 import { createHighlighterCore, type HighlighterCore } from 'shiki/core';
 import { createJavaScriptRegexEngine } from 'shiki/engine/javascript';
 
@@ -8,7 +9,7 @@ import { NXDS_CODE_THEME } from '../../code-theme';
 
 import 'server-only';
 
-const LANGS = { bash, css, tsx };
+const LANGS = { bash, css, tsx, vue };
 
 // Shiki renders `text` unhighlighted without loading a grammar for it.
 export type CodeSampleLanguage = keyof typeof LANGS | 'text';

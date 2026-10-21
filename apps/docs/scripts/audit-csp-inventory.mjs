@@ -19,6 +19,7 @@ const highlighterMarkers = [
 ];
 const inlineScriptPattern =
   /<script\b(?![^>]*\bsrc=)([^>]*)>([\s\S]*?)<\/script>/gi;
+const inlineStylePattern = /<style\b([^>]*)>/gi;
 
 function walk(dir) {
   return readdirSync(dir, { withFileTypes: true }).flatMap((entry) => {
@@ -70,10 +71,12 @@ if (highlighterChunks.length > 0) {
   process.exit(1);
 }
 
-const scriptSrc =
-  readFileSync(headersFile, 'utf8')
-    .match(/Content-Security-Policy-Report-Only:[^\n]*/)?.[0]
-    .match(/script-src [^;]*/)?.[0] ?? '';
+const csp =
+  readFileSync(headersFile, 'utf8').match(
+    /Content-Security-Policy-Report-Only:[^\n]*/
+  )?.[0] ?? '';
+const scriptSrc = csp.match(/script-src [^;]*/)?.[0] ?? '';
+const styleSrc = csp.match(/style-src [^;]*/)?.[0] ?? '';
 
 if (!scriptSrc) {
   console.error(
@@ -86,7 +89,11 @@ let appearanceScripts = 0;
 let inlineScripts = 0;
 let inlineStyleAttributes = 0;
 let docsStorageScripts = 0;
+let frameworkScripts = 0;
+let inlineStyles = 0;
+let frameworkStyles = 0;
 const unhashedAppearanceScripts = new Set();
+const unhashedFrameworkScripts = new Set();
 
 for (const file of htmlFiles) {
   const html = readFileSync(file, 'utf8');
@@ -97,10 +104,26 @@ for (const file of htmlFiles) {
 
   inlineScripts += scripts.length;
   inlineStyleAttributes += html.match(/\sstyle="/g)?.length ?? 0;
+
+  const styles = [...html.matchAll(inlineStylePattern)];
+  inlineStyles += styles.length;
+  frameworkStyles += styles.filter(([, attrs]) =>
+    attrs.includes('data-docs-framework-style')
+  ).length;
   appearanceScripts += appearance.length;
   docsStorageScripts += appearance.filter(([, , body]) =>
     body.includes('nxds-docs-appearance')
   ).length;
+
+  const framework = scripts.filter(([, attrs]) =>
+    attrs.includes('data-docs-framework-script')
+  );
+  frameworkScripts += framework.length;
+  for (const [, , body] of framework) {
+    if (!scriptSrc.includes(sha256CspSource(body))) {
+      unhashedFrameworkScripts.add(path.relative(docsRoot, file));
+    }
+  }
 
   for (const [, , body] of appearance) {
     if (!scriptSrc.includes(sha256CspSource(body))) {
@@ -115,8 +138,11 @@ console.log(
       htmlFiles: htmlFiles.length,
       inlineScripts,
       appearanceScripts,
-      nextInlineScripts: inlineScripts - appearanceScripts,
+      frameworkScripts,
+      nextInlineScripts: inlineScripts - appearanceScripts - frameworkScripts,
       docsStorageScripts,
+      inlineStyles,
+      frameworkStyles,
       inlineStyleAttributes,
       highlighterChunks: highlighterChunks.length,
     },
@@ -144,6 +170,34 @@ if (unhashedAppearanceScripts.size > 0) {
     `out/_headers script-src lacks the hash of the appearance script shipped in: ${[
       ...unhashedAppearanceScripts,
     ].join(', ')}`
+  );
+  process.exit(1);
+}
+
+if (frameworkScripts === 0) {
+  console.error(
+    'Expected the docs framework bootstrap script in exported HTML.'
+  );
+  process.exit(1);
+}
+
+if (unhashedFrameworkScripts.size > 0) {
+  console.error(
+    `out/_headers script-src lacks the hash of the framework script shipped in: ${[
+      ...unhashedFrameworkScripts,
+    ].join(', ')}`
+  );
+  process.exit(1);
+}
+
+if (frameworkStyles === 0) {
+  console.error('Expected the docs framework panel style in exported HTML.');
+  process.exit(1);
+}
+
+if (!styleSrc.includes("'unsafe-inline'")) {
+  console.error(
+    "out/_headers style-src must allow 'unsafe-inline' for the inline <style> elements the docs ship."
   );
   process.exit(1);
 }

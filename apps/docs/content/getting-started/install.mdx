@@ -1,5 +1,5 @@
 export const description =
-  'Set up nxds in a new or existing app. Add Tailwind 4, the token CSS and the appearance provider, then copy in your first component.';
+  'Set up nxds in a new or existing React or Vue app. Add Tailwind 4, the token CSS and the appearance engine, then copy in your first component.';
 
 # Install
 
@@ -7,6 +7,9 @@ Set up your app once, then copy in any nxds component.
 
 Copied components are your files: edit them freely, and paste a newer version
 to update.
+
+<FrameworkTabs>
+<FrameworkPanel framework="react">
 
 ## Step 1: Install Tailwind 4
 
@@ -478,6 +481,206 @@ Every file you copy comes from the
 | Appearance provider | `packages/react/src/components/appearance/provider/` |
 | `cn` helper         | `packages/react/src/lib/utils.ts`                    |
 | Components          | `packages/react/src/components/{name}/`              |
+
+</FrameworkPanel>
+<FrameworkPanel framework="vue">
+
+## Step 1: Install Tailwind 4
+
+```bash
+npm install -D tailwindcss @tailwindcss/vite
+```
+
+Tailwind 4 builds the `nx:` classes. These steps use a new Vite + Vue 3 app
+from `npm create vue@latest`, with TypeScript.
+
+## Step 2: Add the token CSS
+
+The token CSS defines the colors, spacing and type scale. Copy the seven files
+from `packages/tailwind/` in the
+[nxds repo](https://github.com/nexuslabs-ai/nxds) into `src/styles/nxds/`.
+
+Import Tailwind's Preflight and the token CSS from your CSS entry point:
+
+```css
+/* src/style.css */
+@layer theme, base, components, utilities;
+@import 'tailwindcss/preflight.css' layer(base);
+@import './styles/nxds/nxds.css';
+```
+
+nxds ships no reset, so the page brings Preflight. nxds components need its
+`box-sizing: border-box`.
+
+Every Tailwind class in your app now takes the `nx:` prefix, and only nxds
+tokens are available.
+
+## Step 3: Add the appearance plugin
+
+The plugin applies the theme and saves the user's choices, like dark mode. A
+script in `index.html` applies the saved theme before the first paint.
+
+Install the theme engine and the Vue component dependencies:
+
+```bash
+npm install @nxds/core reka-ui @vueuse/core
+```
+
+Copy `packages/vue/src/components/appearance/` into
+`src/components/appearance/`.
+
+Set your app's starting theme:
+
+```ts
+// src/appearance-state.ts
+import { DEFAULT_NXDS_APPEARANCE, type NxdsAppearanceState } from '@nxds/core';
+
+export const defaultAppearance = {
+  ...DEFAULT_NXDS_APPEARANCE,
+  brandColor: '#2563eb',
+} satisfies NxdsAppearanceState;
+```
+
+Add Tailwind, the `@` import alias and the theme script to `vite.config.ts`:
+
+```ts
+// vite.config.ts
+import {
+  createNxdsAppearanceBootstrapScript,
+  createNxdsAppearanceSnapshotFromState,
+} from '@nxds/core';
+import tailwindcss from '@tailwindcss/vite';
+import vue from '@vitejs/plugin-vue';
+import { fileURLToPath, URL } from 'node:url';
+import { defineConfig } from 'vite';
+
+import { defaultAppearance } from './src/appearance-state';
+
+const defaultSnapshot =
+  createNxdsAppearanceSnapshotFromState(defaultAppearance);
+
+export default defineConfig({
+  plugins: [
+    vue(),
+    tailwindcss(),
+    {
+      name: 'nxds-appearance-bootstrap',
+      transformIndexHtml(html) {
+        const script = createNxdsAppearanceBootstrapScript({
+          storageKey: 'app-appearance',
+          defaultSnapshot,
+        });
+        return html.replace('</head>', `<script>${script}</script></head>`);
+      },
+    },
+  ],
+  resolve: {
+    alias: { '@': fileURLToPath(new URL('./src', import.meta.url)) },
+  },
+});
+```
+
+Install the plugin with the same storage key:
+
+```ts
+// src/main.ts
+import { createApp } from 'vue';
+
+import App from './App.vue';
+import { defaultAppearance } from './appearance-state';
+import { createNxdsAppearance } from './components/appearance';
+
+import './style.css';
+
+createApp(App)
+  .use(
+    createNxdsAppearance({
+      storageKey: 'app-appearance',
+      defaultState: defaultAppearance,
+    })
+  )
+  .mount('#app');
+```
+
+Give the page the nxds background, text color and font in `index.html`:
+
+```html
+<body
+  class="nx:bg-background nx:text-foreground nx:typography-body-default"
+></body>
+```
+
+## Step 4: Add the `cn` helper
+
+```bash
+npm install clsx tailwind-merge class-variance-authority
+```
+
+Copy `packages/vue/src/lib/utils.ts` to `src/lib/utils.ts`.
+
+`cn` merges class names and resolves conflicts between `nx:` classes. That's
+what lets `<Button class="nx:bg-error-background" />` replace the button's own
+background.
+
+## Add your first component
+
+Each component lists the components to install first, the packages to install,
+and the files to copy. For Button:
+
+<InstallBlock slug="button" framework="vue" />
+
+Paths are relative to `packages/vue/src/` in the repo. Keep the same folders
+under `src/`, and the imports between files work without edits.
+
+Render it:
+
+<VueDemo id="button/default" />
+
+To check dark mode, add a toggle that uses `useNxdsAppearance`:
+
+```vue
+<!-- src/components/ModeToggle.vue -->
+<script setup lang="ts">
+import { useNxdsAppearance } from '@/components/appearance';
+import { Button } from '@/components/button';
+
+const { state, setState, resolvedMode } = useNxdsAppearance();
+
+function toggle() {
+  setState({
+    ...state.value,
+    mode: resolvedMode.value === 'dark' ? 'light' : 'dark',
+  });
+}
+</script>
+
+<template>
+  <Button @click="toggle">Mode: {{ resolvedMode }}</Button>
+</template>
+```
+
+## Check your setup
+
+- [ ] `nxds.css` is imported from `src/style.css`
+- [ ] `main.ts` installs `createNxdsAppearance`
+- [ ] Reloading in dark mode doesn't flash light first
+- [ ] The mode you pick is still set after a full reload
+
+If the button has no styles, `nxds.css` isn't imported (step 2). If the page
+flashes on reload, check that the script and the plugin use the same storage
+key.
+
+## Where the files are
+
+| File              | Path in the repo                          |
+| ----------------- | ----------------------------------------- |
+| Token CSS         | `packages/tailwind/*.css`                 |
+| Appearance plugin | `packages/vue/src/components/appearance/` |
+| `cn` helper       | `packages/vue/src/lib/utils.ts`           |
+| Components        | `packages/vue/src/components/{name}/`     |
+
+</FrameworkPanel>
+</FrameworkTabs>
 
 ## Fork the whole design system
 

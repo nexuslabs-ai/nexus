@@ -1,6 +1,6 @@
 .DEFAULT_GOAL := help
 
-.PHONY: help setup fresh clean dev docs dev-all build tokens \
+.PHONY: help setup fresh clean dev dev-vue docs dev-all build tokens \
         lint typecheck audit verify \
         up down serve publish
 
@@ -33,6 +33,9 @@ clean: ## Stop docs-mcp, remove build outputs + node_modules
 
 dev: ## Storybook — the primary component-dev surface (builds @nxds/core first)
 	pnpm turbo storybook --filter=@nxds/react
+
+dev-vue: ## Storybook for @nxds/vue, on port 6007
+	pnpm turbo storybook --filter=@nxds/vue
 
 docs: ## Docs site + live @nxds/react (turbo: docs + react watcher)
 	pnpm turbo dev --filter=@nxds/docs...

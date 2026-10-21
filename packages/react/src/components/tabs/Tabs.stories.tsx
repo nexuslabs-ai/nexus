@@ -137,6 +137,20 @@ export const UnderlineVariant: Story = {
     await userEvent.click(passwordTab);
     await expect(passwordTab).toHaveAttribute('data-state', 'active');
     await waitFor(() => expect(indicator.style.transform).not.toBe(before));
+    await waitFor(() => {
+      const indicatorRect = indicator.getBoundingClientRect();
+      const passwordRect = passwordTab.getBoundingClientRect();
+      expect(Math.round(indicatorRect.bottom)).toBe(
+        Math.round(passwordRect.bottom)
+      );
+      expect(Math.round(indicatorRect.left)).toBe(
+        Math.round(passwordRect.left)
+      );
+      expect(indicatorRect.height).toBeGreaterThan(0);
+      expect(Math.round(indicatorRect.height)).toBe(
+        Math.round(parseFloat(getComputedStyle(passwordTab).borderBottomWidth))
+      );
+    });
     await expect(
       canvas.getByText('Password settings with underline variant tabs.')
     ).toBeVisible();
@@ -519,6 +533,74 @@ export const DisabledTabInteraction: Story = {
       expect(indicator.style.transform).not.toBe(beforeDisabledSkip)
     );
     await expect(canvas.getByText('Content 3')).toBeVisible();
+  },
+};
+
+export const VerticalIndicatorFollowsActiveTab: Story = {
+  render: (_args) => (
+    <Tabs
+      defaultValue="account"
+      orientation="vertical"
+      className="nx:flex nx:gap-4"
+    >
+      <TabsList aria-label="Settings">
+        <TabsTrigger value="account">Account</TabsTrigger>
+        <TabsTrigger value="billing">Billing</TabsTrigger>
+      </TabsList>
+      <TabsContent value="account">Change your name and email.</TabsContent>
+      <TabsContent value="billing">Manage your plan and invoices.</TabsContent>
+    </Tabs>
+  ),
+  play: async ({ canvasElement }) => {
+    const billing = within(canvasElement).getByRole('tab', { name: 'Billing' });
+    const indicator = getTabsIndicator(canvasElement);
+
+    await waitForIndicatorReady(indicator);
+    await userEvent.click(billing);
+    await waitFor(() => {
+      const indicatorRect = indicator.getBoundingClientRect();
+      const billingRect = billing.getBoundingClientRect();
+      expect(Math.round(indicatorRect.top)).toBe(Math.round(billingRect.top));
+      expect(Math.round(indicatorRect.height)).toBe(
+        Math.round(billingRect.height)
+      );
+    });
+  },
+};
+
+export const VerticalUnderlineIndicatorFollowsActiveTab: Story = {
+  render: (_args) => (
+    <Tabs
+      defaultValue="account"
+      orientation="vertical"
+      className="nx:flex nx:gap-4"
+    >
+      <TabsList variant="underline" aria-label="Settings">
+        <TabsTrigger value="account">Account</TabsTrigger>
+        <TabsTrigger value="billing">Billing</TabsTrigger>
+      </TabsList>
+      <TabsContent value="account">Change your name and email.</TabsContent>
+      <TabsContent value="billing">Manage your plan and invoices.</TabsContent>
+    </Tabs>
+  ),
+  play: async ({ canvasElement }) => {
+    const billing = within(canvasElement).getByRole('tab', { name: 'Billing' });
+    const indicator = getTabsIndicator(canvasElement);
+
+    await waitForIndicatorReady(indicator);
+    await userEvent.click(billing);
+    await waitFor(() => {
+      const indicatorRect = indicator.getBoundingClientRect();
+      const billingRect = billing.getBoundingClientRect();
+      expect(Math.round(indicatorRect.top)).toBe(Math.round(billingRect.top));
+      expect(Math.round(indicatorRect.right)).toBe(
+        Math.round(billingRect.right)
+      );
+      expect(indicatorRect.width).toBeGreaterThan(0);
+      expect(Math.round(indicatorRect.width)).toBe(
+        Math.round(parseFloat(getComputedStyle(billing).borderRightWidth))
+      );
+    });
   },
 };
 

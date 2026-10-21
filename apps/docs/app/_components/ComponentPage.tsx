@@ -5,12 +5,18 @@ import {
   demos,
   getComponentDocs,
 } from '../../__generated__/demo-index';
+import { vueComponentDocs } from '../../generated/vue/docs';
 import type { ManifestPage } from '../_lib/manifest';
 
 import { CodeSample } from './CodeSample';
 import { ComponentDemo } from './ComponentDemo';
 import { ComponentInstallation } from './ComponentInstallation';
 import { DescriptionText } from './DescriptionText';
+import {
+  FrameworkComingSoon,
+  FrameworkPanel,
+  FrameworkTabs,
+} from './FrameworkTabs';
 import {
   PAGE_HEADING_CLASS,
   SECTION_HEADING_CLASS,
@@ -21,25 +27,52 @@ import {
 } from './Heading';
 import { ExampleInstall } from './InstallBlock';
 import { PropsTable } from './PropsTable';
+import { VueComponentPanel } from './VueComponentPanel';
 
 type ComponentManifestPage = Extract<ManifestPage, { kind: 'generated' }>;
+
+/**
+ * The page heading, then one tab per framework. Each framework's panel is
+ * built from that package's stories tagged `docs`; a framework without the
+ * component shows "coming soon".
+ */
+export function ComponentPage({ page }: { page: ComponentManifestPage }) {
+  const vueDocs = vueComponentDocs[page.slug];
+
+  return (
+    <>
+      <h1 className={PAGE_HEADING_CLASS}>{page.label}</h1>
+      <FrameworkTabs unavailable={vueDocs ? [] : ['vue']}>
+        <FrameworkPanel framework="react">
+          <ReactComponentPanel page={page} />
+        </FrameworkPanel>
+        {vueDocs ? (
+          <FrameworkPanel framework="vue">
+            <VueComponentPanel slug={page.slug} docs={vueDocs} />
+          </FrameworkPanel>
+        ) : (
+          <FrameworkComingSoon framework="vue" name={page.label} />
+        )}
+      </FrameworkTabs>
+    </>
+  );
+}
 
 /**
  * Every section comes from the component's stories tagged `docs`: the first is
  * the preview at the top, Usage and Composition come from all of them, and the
  * rest are its examples, in story order.
  */
-export function ComponentPage({ page }: { page: ComponentManifestPage }) {
+function ReactComponentPanel({ page }: { page: ComponentManifestPage }) {
   const { slug } = page;
   const docs = getComponentDocs(slug);
   const previewId = docs.preview;
-  if (!previewId) return <PreviewlessComponentPage page={page} docs={docs} />;
+  if (!previewId) return <PreviewlessComponentPanel page={page} docs={docs} />;
 
   const preview: Demo = demos[previewId];
 
   return (
     <>
-      <h1 className={PAGE_HEADING_CLASS}>{page.label}</h1>
       <DescriptionText text={docs.description} className="nx:mb-6" />
       <ComponentDemo id={previewId} />
       <ExampleInstall slugs={preview.alsoInstall} packages={preview.packages} />
@@ -103,7 +136,7 @@ function Example({ id, previewId }: { id: DemoId; previewId: DemoId }) {
 }
 
 /** Installation, Usage and Props only, for a component that can't render a preview here. */
-function PreviewlessComponentPage({
+function PreviewlessComponentPanel({
   page,
   docs,
 }: {
@@ -112,7 +145,6 @@ function PreviewlessComponentPage({
 }) {
   return (
     <>
-      <h1 className={PAGE_HEADING_CLASS}>{page.label}</h1>
       <DescriptionText text={docs.description} className="nx:mb-6" />
 
       <SectionHeading className={SECTION_HEADING_CLASS}>

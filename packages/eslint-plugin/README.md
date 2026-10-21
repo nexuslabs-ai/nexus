@@ -30,7 +30,7 @@ Enforces `.claude/rules/extract-inline-handlers.md`: inline JSX handler props (`
 
 ### `@nxds/no-jsdoc-data-tags`
 
-Enforces `.claude/rules/code-comments.md`: JSDoc blocks must not carry `@default` or `@example` tags. The docs read prop defaults from code and usage from `docs` stories, so a tag is a second copy that can drift. Line comments and plain block comments are not checked. Wired in the root `eslint.config.js` for `packages/react/src`.
+Enforces `.claude/rules/code-comments.md`: JSDoc blocks must not carry `@default` or `@example` tags. The docs read prop defaults from code and usage from `docs` stories, so a tag is a second copy that can drift. Line comments and plain block comments are not checked. Wired in the root `eslint.config.js` for `packages/react/src` and `packages/vue/src`.
 
 ## Source of truth
 

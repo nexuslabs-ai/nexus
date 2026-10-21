@@ -26,12 +26,8 @@ import {
   toProplessEntry,
 } from './props-entries.ts';
 import { reactEntryPoints } from './react-entry-points.mjs';
-import {
-  collectSourceFiles,
-  componentSlugs,
-  isComponentSource,
-  writeJson,
-} from './react-sources.mjs';
+import { collectSourceFiles, writeJson } from './files.mjs';
+import { componentSlugs, isComponentSource } from './react-sources.mjs';
 import {
   componentsRoot,
   docsRoot,

@@ -72,4 +72,5 @@ opencode.json
 apps/docs/generated/
 apps/docs/__generated__/
 apps/docs/public/avatars/
+apps/docs/public/vue-demos/
 apps/docs/app/_lib/*.generated.ts

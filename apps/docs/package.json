@@ -8,6 +8,8 @@
     "dev": "concurrently --kill-others-on-fail -n demos,next -c gray,cyan \"pnpm generate:demos:watch\" \"next dev --turbopack\"",
     "generate:props": "node scripts/generate-props.mjs",
     "generate:dependencies": "node scripts/generate-dependencies.mjs",
+    "generate:vue": "node scripts/generate-vue-docs.ts",
+    "bundle:vue": "node scripts/bundle-vue-demos.ts",
     "build": "next build && node scripts/write-edge-files.mjs && node scripts/write-markdown.ts",
     "generate:manifest": "node scripts/generate-page-manifest.mjs",
     "audit:csp": "node scripts/audit-csp-inventory.mjs",
@@ -15,7 +17,7 @@
     "generate:demos:watch": "node scripts/generate-demo-index.mjs --watch",
     "audit:grammar-pin": "node scripts/audit-grammar-pin.mjs",
     "typecheck": "tsc --noEmit && tsc -p tsconfig.node.json",
-    "clean": "rm -rf .next out generated __generated__ app/_lib/*.generated.ts"
+    "clean": "rm -rf .next out generated __generated__ public/vue-demos app/_lib/*.generated.ts"
   },
   "dependencies": {
     "@mdx-js/loader": "^3.1.0",
@@ -48,6 +50,7 @@
     "@types/node": "^25.0.3",
     "@types/react": "^19.2.7",
     "@types/react-dom": "^19.2.3",
+    "@vitejs/plugin-vue": "^6.0.10",
     "concurrently": "^9.2.4",
     "jiti": "^2.7.0",
     "postcss": "^8.4.49",
@@ -59,6 +62,9 @@
     "tailwindcss": "4.3.0",
     "typescript": "^5.9.3",
     "unified": "^11.0.5",
-    "vfile": "^6.0.3"
+    "vfile": "^6.0.3",
+    "vite": "^7.3.5",
+    "vue": "^3.5.44",
+    "vue-component-meta": "3.3.13"
   }
 }

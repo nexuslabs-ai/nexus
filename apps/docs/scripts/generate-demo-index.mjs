@@ -19,13 +19,11 @@ import {
 } from './docs-stories.ts';
 import { resolveFormatOptions } from './page-manifest.mjs';
 import { generateDependencies } from './generate-dependencies.mjs';
+import { importSpecifiers, readCanonical, writeIfChanged } from './files.mjs';
 import {
   blockSources,
   componentSlugs,
   exportedComponentSlugs,
-  importSpecifiers,
-  readCanonical,
-  writeIfChanged,
 } from './react-sources.mjs';
 import { docsRoot, reactRoot, reactSrc, toRepoPath } from './roots.mjs';
 

@@ -9,6 +9,7 @@ import {
   ELEVATION_OPTIONS,
   type NxdsAppearancePrefs,
   type NxdsAppearanceState,
+  type NxdsResolvedAppearanceMode,
   STROKE_OPTIONS,
 } from '@nxds/core';
 import {
@@ -20,7 +21,6 @@ import {
   Slider,
   Switch,
 } from '@nxds/react';
-import type { NxdsResolvedAppearanceMode } from '@nxds/react/appearance';
 
 import { THEME_MODE_OPTIONS } from '../_lib/appearance-controls';
 

@@ -8,6 +8,7 @@ import remarkStringify from 'remark-stringify';
 import { unified } from 'unified';
 import type { VFile } from 'vfile';
 
+import { frameworkLabel, isFramework } from '../app/_lib/frameworks.ts';
 import { PAGE_MANIFEST } from '../app/_lib/manifest.ts';
 import { DOCS_ARTICLE_ID } from '../app/_lib/table-of-contents.ts';
 
@@ -65,6 +66,16 @@ function prune(node: Element) {
   );
   for (const child of node.children) {
     if (child.type !== 'element') continue;
+    // Every framework's panel is in the HTML; name each one in the Markdown.
+    const framework = child.properties.dataFrameworkPanel;
+    if (isFramework(framework)) {
+      child.children.unshift({
+        type: 'element',
+        tagName: 'h2',
+        properties: {},
+        children: [{ type: 'text', value: frameworkLabel(framework) }],
+      });
+    }
     // rehype-remark reads a code block's language from its `language-*` class.
     if (child.tagName === 'pre' && child.properties.dataLanguage) {
       const code = child.children.find(

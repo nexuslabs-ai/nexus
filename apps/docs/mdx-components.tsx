@@ -3,6 +3,7 @@ import type { MDXComponents } from 'mdx/types';
 
 import { CodeBlock } from './app/_components/CodeBlock';
 import { ComponentDemo } from './app/_components/ComponentDemo';
+import { FrameworkPanel, FrameworkTabs } from './app/_components/FrameworkTabs';
 import {
   PAGE_HEADING_CLASS,
   SECTION_HEADING_CLASS,
@@ -12,6 +13,7 @@ import { InlineCode } from './app/_components/InlineCode';
 import { InstallBlock } from './app/_components/InstallBlock';
 import * as nxds from './app/_components/nxds';
 import { PropsTable } from './app/_components/PropsTable';
+import { VueDemo } from './app/_components/VueComponentPanel';
 
 /**
  * Required by @next/mdx in the App Router. Maps Markdown-rendered HTML to
@@ -132,8 +134,11 @@ export function useMDXComponents(components: MDXComponents): MDXComponents {
       />
     ),
     ComponentDemo,
+    FrameworkPanel,
+    FrameworkTabs,
     InstallBlock,
     PropsTable,
+    VueDemo,
     // live @nxds/react components, usable in MDX without an import
     ...nxds,
     // caller-provided overrides win

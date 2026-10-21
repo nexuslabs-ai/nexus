@@ -1,5 +1,5 @@
 import { getBlockDocs } from '../../__generated__/demo-index';
-import { loadBlockPlan, loadReactSource } from '../_lib/dependencies';
+import { loadBlockPlan, loadSource } from '../_lib/dependencies';
 import type { ManifestPage } from '../_lib/manifest';
 
 import { ComponentDemo } from './ComponentDemo';
@@ -29,7 +29,7 @@ export async function BlockPage({ page }: { page: BlockManifestPage }) {
     page.slug
   );
   const sources = await Promise.all(
-    files.map(async (path) => ({ path, source: await loadReactSource(path) }))
+    files.map(async (path) => ({ path, source: await loadSource(path) }))
   );
 
   return (

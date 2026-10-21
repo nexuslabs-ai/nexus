@@ -1,0 +1,18 @@
+/* Storybook-only stylesheet: tokens from @nxds/tailwind, then the shipped
+ * utilities from src/index.css, layered the way a consumer layers them. */
+@layer theme, base, components, utilities;
+@import '@nxds/tailwind';
+@import '../src/index.css';
+
+/* nxds ships no reset. Storybook keeps only the border-box sizing every host
+ * reset provides, so a missing component reset shows here. */
+@layer base {
+  *,
+  ::before,
+  ::after {
+    box-sizing: border-box;
+  }
+}
+
+@source '.';
+@source '../src';

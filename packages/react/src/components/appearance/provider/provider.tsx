@@ -11,38 +11,24 @@ import {
   useMemo,
   useRef,
   useState,
+  useSyncExternalStore,
 } from 'react';
 
 import {
-  createNxdsAppearanceSnapshotFromState,
+  applyNxdsAppearance,
   DEFAULT_NXDS_APPEARANCE,
   DEFAULT_STORAGE_KEY,
-  NXDS_APPEARANCE_DATA_ATTRS,
-  type NxdsAppearanceSnapshot,
+  type NxdsAppearanceCookieOptions,
   type NxdsAppearanceState,
-  resolveFirstPaint,
+  type NxdsResolvedAppearanceMode,
+  persistNxdsAppearance,
+  prefersDarkColorScheme,
+  readStoredNxdsAppearance,
+  removeNxdsAppearance,
+  resolveNxdsAppearanceMode,
   sanitizeNxdsAppearance,
-  sanitizeNxdsAppearanceSnapshot,
-  serializeNxdsAppearanceStateCookie,
+  watchColorScheme,
 } from '@nxds/core';
-
-const COLOR_SCHEME_QUERY = '(prefers-color-scheme: dark)';
-const THEME_STYLE_SELECTOR = 'style[data-nxds-appearance-theme]';
-const PREFS_STYLE_SELECTOR = 'style[data-nxds-appearance-prefs]';
-const DEFAULT_COOKIE_PATH = '/';
-const DEFAULT_COOKIE_SAME_SITE = 'Lax';
-export const NXDS_APPEARANCE_COOKIE_MAX_AGE_SECONDS = 60 * 60 * 24 * 365;
-
-export type NxdsResolvedAppearanceMode = 'light' | 'dark';
-export type NxdsAppearanceCookieSameSite = 'Lax' | 'Strict' | 'None';
-
-export interface NxdsAppearanceCookieOptions {
-  maxAge?: number;
-  path?: string;
-  sameSite?: NxdsAppearanceCookieSameSite;
-  secure?: boolean | 'auto';
-  domain?: string;
-}
 
 export interface NxdsAppearanceContextValue {
   state: NxdsAppearanceState;
@@ -77,111 +63,6 @@ const NxdsAppearanceContext = createContext<NxdsAppearanceContextValue | null>(
 const canUseDOM = (): boolean =>
   typeof window !== 'undefined' && typeof document !== 'undefined';
 
-function resolveAppearanceMode(
-  mode: NxdsAppearanceState['mode'],
-  systemPrefersDark = false
-): NxdsResolvedAppearanceMode {
-  if (mode === 'dark') return 'dark';
-  if (mode === 'light') return 'light';
-  return systemPrefersDark ? 'dark' : 'light';
-}
-
-function systemPrefersDark(): boolean {
-  if (!canUseDOM() || typeof window.matchMedia !== 'function') return false;
-  return window.matchMedia(COLOR_SCHEME_QUERY).matches;
-}
-
-function readStoredState(
-  storageKey: string | false,
-  fallback: NxdsAppearanceState
-): NxdsAppearanceState {
-  if (!canUseDOM() || storageKey === false) return fallback;
-
-  try {
-    const raw = window.localStorage.getItem(storageKey);
-
-    return raw
-      ? sanitizeNxdsAppearanceSnapshot(JSON.parse(raw)).state
-      : fallback;
-  } catch {
-    return fallback;
-  }
-}
-
-function writeStoredSnapshot(
-  storageKey: string | false,
-  snapshot: NxdsAppearanceSnapshot
-): void {
-  if (!canUseDOM() || storageKey === false) return;
-
-  try {
-    window.localStorage.setItem(storageKey, JSON.stringify(snapshot));
-  } catch {
-    // Storage can fail in privacy modes or quota-constrained embeds.
-  }
-}
-
-function writeStateCookie(
-  cookieWriteKey: string | false,
-  state: NxdsAppearanceState,
-  options: NxdsAppearanceCookieOptions = {}
-): void {
-  if (!canUseDOM() || cookieWriteKey === false) return;
-
-  try {
-    const maxAge = options.maxAge ?? NXDS_APPEARANCE_COOKIE_MAX_AGE_SECONDS;
-    const path = options.path ?? DEFAULT_COOKIE_PATH;
-    const sameSite = options.sameSite ?? DEFAULT_COOKIE_SAME_SITE;
-    const secure =
-      options.secure === true ||
-      (options.secure !== false && window.location.protocol === 'https:');
-    const attrs = [
-      `Path=${path.replace(/[;\r\n]/g, '')}`,
-      `SameSite=${sameSite}`,
-      `Max-Age=${maxAge}`,
-      options.domain ? `Domain=${options.domain.replace(/[;\r\n]/g, '')}` : '',
-      secure ? 'Secure' : '',
-    ].filter(Boolean);
-
-    document.cookie = `${cookieWriteKey}=${serializeNxdsAppearanceStateCookie(
-      state
-    )}; ${attrs.join('; ')}`;
-  } catch {
-    // Cookie writes can fail in locked-down embeds.
-  }
-}
-
-function upsertStyle(selector: string, attribute: string): HTMLStyleElement {
-  const styles = Array.from(
-    document.querySelectorAll<HTMLStyleElement>(selector)
-  );
-  const style = styles[0] ?? document.createElement('style');
-
-  for (const duplicate of styles.slice(1)) {
-    duplicate.remove();
-  }
-
-  style.setAttribute(attribute, '');
-
-  if (!style.parentNode) {
-    document.head.appendChild(style);
-  }
-
-  return style;
-}
-
-function removeAppearanceArtifacts(): void {
-  document
-    .querySelectorAll(`${THEME_STYLE_SELECTOR}, ${PREFS_STYLE_SELECTOR}`)
-    .forEach((style) => style.remove());
-
-  const root = document.documentElement;
-  root.classList.remove('dark');
-  for (const attr of NXDS_APPEARANCE_DATA_ATTRS) {
-    root.removeAttribute(attr);
-  }
-}
-
 function nextAppearanceState(
   update: SetStateAction<NxdsAppearanceState>,
   previous: NxdsAppearanceState
@@ -209,37 +90,25 @@ export function NxdsAppearanceProvider({
     useState<NxdsAppearanceState>(initialState);
   const activeState = state ?? internalState;
   const [mounted, setMounted] = useState(false);
-  const [resolvedMode, setResolvedMode] = useState<NxdsResolvedAppearanceMode>(
-    () => resolveAppearanceMode(activeState.mode)
+  const systemDark = useSyncExternalStore(
+    watchColorScheme,
+    prefersDarkColorScheme,
+    () => false
   );
-  const activeSnapshot = useMemo(
-    () => createNxdsAppearanceSnapshotFromState(activeState),
-    [activeState]
-  );
-  const firstPaint = useMemo(
-    () => resolveFirstPaint(activeSnapshot, resolvedMode === 'dark'),
-    [activeSnapshot, resolvedMode]
-  );
+  const resolvedMode = resolveNxdsAppearanceMode(activeState.mode, systemDark);
 
   const internalStateRef = useRef(internalState);
 
   useEffect(() => {
     if (!canUseDOM()) return;
 
-    if (isControlled) {
-      setResolvedMode(
-        resolveAppearanceMode((state ?? initialState).mode, systemPrefersDark())
-      );
-      setMounted(true);
-      return;
-    }
+    setMounted(true);
+    if (isControlled) return;
 
-    const nextState = readStoredState(storageKey, initialState);
+    const nextState = readStoredNxdsAppearance(storageKey, initialState);
     internalStateRef.current = nextState;
     setInternalState(nextState);
-    setResolvedMode(resolveAppearanceMode(nextState.mode, systemPrefersDark()));
-    setMounted(true);
-  }, [initialState, isControlled, state, storageKey]);
+  }, [initialState, isControlled, storageKey]);
 
   const setState = useCallback<Dispatch<SetStateAction<NxdsAppearanceState>>>(
     (update) => {
@@ -260,12 +129,14 @@ export function NxdsAppearanceProvider({
   }, [initialState, setState]);
 
   useEffect(() => {
-    if (mounted && !isControlled) {
-      writeStoredSnapshot(storageKey, activeSnapshot);
-      writeStateCookie(cookieWriteKey, activeState, cookieOptions);
-    }
+    if (!mounted || isControlled) return;
+
+    persistNxdsAppearance(activeState, {
+      storageKey,
+      cookieWriteKey,
+      cookieOptions,
+    });
   }, [
-    activeSnapshot,
     activeState,
     cookieWriteKey,
     cookieOptions,
@@ -275,72 +146,15 @@ export function NxdsAppearanceProvider({
   ]);
 
   useEffect(() => {
-    if (!canUseDOM() || !mounted) return;
+    if (!mounted) return;
 
-    const root = document.documentElement;
-
-    for (const attr of NXDS_APPEARANCE_DATA_ATTRS) {
-      root.setAttribute(attr, firstPaint.dataAttrs[attr]);
-    }
-  }, [firstPaint, mounted]);
-
-  useEffect(() => {
-    if (!canUseDOM() || !mounted) return;
-
-    const apply = () => {
-      setResolvedMode(
-        resolveAppearanceMode(activeState.mode, systemPrefersDark())
-      );
-    };
-
-    apply();
-
-    if (
-      activeState.mode !== 'system' ||
-      typeof window.matchMedia !== 'function'
-    ) {
-      return;
-    }
-
-    const mediaQuery = window.matchMedia(COLOR_SCHEME_QUERY);
-    mediaQuery.addEventListener('change', apply);
-
-    return () => mediaQuery.removeEventListener('change', apply);
-  }, [activeState.mode, mounted]);
-
-  useEffect(() => {
-    if (!canUseDOM() || !mounted) return;
-
-    document.documentElement.classList.toggle(
-      'dark',
-      firstPaint.className === 'dark'
-    );
-  }, [firstPaint, mounted]);
-
-  useEffect(() => {
-    if (!canUseDOM() || !mounted) return;
-
-    const themeStyle = upsertStyle(
-      THEME_STYLE_SELECTOR,
-      'data-nxds-appearance-theme'
-    );
-    themeStyle.textContent = firstPaint.themeCss;
-  }, [firstPaint, mounted]);
-
-  useEffect(() => {
-    if (!canUseDOM() || !mounted) return;
-
-    const prefsStyle = upsertStyle(
-      PREFS_STYLE_SELECTOR,
-      'data-nxds-appearance-prefs'
-    );
-    prefsStyle.textContent = firstPaint.prefsCss;
-  }, [firstPaint, mounted]);
+    applyNxdsAppearance(activeState, systemDark);
+  }, [activeState, mounted, systemDark]);
 
   useEffect(() => {
     if (!canUseDOM()) return;
 
-    return removeAppearanceArtifacts;
+    return removeNxdsAppearance;
   }, []);
 
   const value = useMemo<NxdsAppearanceContextValue>(
