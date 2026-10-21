@@ -8,7 +8,9 @@ import {
 } from 'node:fs';
 import path from 'node:path';
 
-import { componentUsage, entryUsage } from './component-usage.mjs';
+import ts from 'typescript';
+
+import { componentUsage, entryUsage } from './component-usage.ts';
 import {
   componentDescription,
   componentStoryFiles,
@@ -16,7 +18,7 @@ import {
   docsStoryModule,
   PREVIEWLESS_COMPONENTS,
   readDocsStories,
-} from './docs-stories.mjs';
+} from './docs-stories.ts';
 import { resolveFormatOptions } from './page-manifest.mjs';
 import { generateDependencies } from './generate-dependencies.mjs';
 import {
@@ -42,10 +44,6 @@ const STORY_ASSETS_SOURCE = path.join(
 const STORY_ASSETS_TARGET = path.join(docsRoot, 'public', 'avatars');
 
 const COPIED_PREFIX = '@/';
-const IMPORT_PATTERNS = [
-  /^\s*(?:import|export)\s+(?:[^'";()]*?\s+from\s+)?['"]([^'"]+)['"]/gm,
-  /\bimport\(\s*['"]([^'"]+)['"]/g,
-];
 const COMPONENT_IMPORT = /^@\/components\/([^/]+)(?:\/|$)/;
 const ALWAYS_INSTALLED = new Set(['react', 'react-dom']);
 const DOCS_DEPENDENCIES = JSON.parse(
@@ -202,9 +200,9 @@ function withoutExtension(file) {
 }
 
 function importSpecifiers(source) {
-  return IMPORT_PATTERNS.flatMap((pattern) =>
-    [...source.matchAll(pattern)].map(([, specifier]) => specifier)
-  );
+  return ts
+    .preProcessFile(source, true, true)
+    .importedFiles.map(({ fileName }) => fileName);
 }
 
 function readInstallBlocks() {

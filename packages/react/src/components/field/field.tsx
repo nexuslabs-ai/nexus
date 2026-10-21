@@ -101,15 +101,6 @@ interface FieldProps
 /**
  * Lays out a label, control, description and error as one field. Works with
  * any form library.
- *
- * @example
- * ```tsx
- * <Field>
- *   <FieldLabel htmlFor="email">Email</FieldLabel>
- *   <Input id="email" type="email" />
- *   <FieldDescription>We'll never share it.</FieldDescription>
- * </Field>
- * ```
  */
 function Field({ className, orientation = 'vertical', ...props }: FieldProps) {
   return (
@@ -177,19 +168,6 @@ type FieldRequiredIndicatorProps = Omit<
   /**
    * Text for an optional field, shown instead of the `*`. Screen readers read
    * it, and it overrides `children`.
-   *
-   * @example
-   * ```tsx
-   * <FieldLabel htmlFor="email">
-   *   Email <FieldRequiredIndicator />
-   * </FieldLabel>
-   * <Input id="email" required />
-   * ```
-   *
-   * @example
-   * ```tsx
-   * <FieldRequiredIndicator fallback="Optional">Required</FieldRequiredIndicator>
-   * ```
    */
   fallback?: React.ReactNode;
 };

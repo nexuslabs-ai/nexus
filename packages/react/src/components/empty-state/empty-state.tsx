@@ -21,24 +21,6 @@ interface EmptyStateProps extends React.ComponentProps<'div'> {
 /**
  * A centered message for a list, table or record view with no content yet.
  * Shows an icon, a title, a short description and an optional action.
- *
- * @example
- * ```tsx
- * <EmptyState>
- *   <EmptyStateHeader>
- *     <EmptyStateMedia variant="icon">
- *       <IconInbox />
- *     </EmptyStateMedia>
- *     <EmptyStateTitle>No contacts yet</EmptyStateTitle>
- *     <EmptyStateDescription>
- *       Add your first contact to get started.
- *     </EmptyStateDescription>
- *   </EmptyStateHeader>
- *   <EmptyStateContent>
- *     <Button>Add contact</Button>
- *   </EmptyStateContent>
- * </EmptyState>
- * ```
  */
 function EmptyState({
   className,
@@ -135,13 +117,6 @@ function EmptyStateMedia({
 interface EmptyStateTitleProps extends React.ComponentProps<'div'> {
   /**
    * Applies the title styles to a child element, such as an `h2` heading.
-   *
-   * @example
-   * ```tsx
-   * <EmptyStateTitle asChild>
-   *   <h2>No contacts yet</h2>
-   * </EmptyStateTitle>
-   * ```
    */
   asChild?: boolean;
 }

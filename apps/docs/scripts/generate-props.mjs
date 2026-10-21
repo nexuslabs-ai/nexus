@@ -24,7 +24,7 @@ import {
   toPropsFile,
   toPropsIndex,
   toProplessEntry,
-} from './props-entries.mjs';
+} from './props-entries.ts';
 import { reactEntryPoints } from './react-entry-points.mjs';
 import {
   collectSourceFiles,

@@ -16,6 +16,8 @@ import fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath, pathToFileURL } from 'node:url';
 
+import ts from 'typescript';
+
 // Package names that are PUBLISHED upstream deps — never rebranded into the fork.
 export const KEEP_PACKAGES = ['@nexus_ds/core', '@nexus_ds/eslint-plugin'];
 
@@ -316,21 +318,16 @@ export function transformTailwindPackageJson(pkg, { scope, version }) {
  * nested-internal import (`../color-field` inside `appearance/…`) resolves to its
  * true path and can't leak as a phantom sibling component. `fileDir` is the file's
  * directory relative to `src/` (POSIX, e.g. `components/appearance/setting-row`).
- * Comments are stripped (URLs preserved) so a commented import can't leak in.
+ * The TypeScript scanner reads the specifiers, so a commented import can't leak in.
  * Seeds the registry manifest.
  */
 export function scanInternalDeps(text, fileDir) {
-  const withoutComments = text
-    .replace(/\/\*[\s\S]*?\*\//g, '')
-    .replace(/(?<!:)\/\/.*$/gm, '');
   const deps = { components: new Set(), lib: new Set(), hooks: new Set() };
   const isModuleName = (name) => /^[\w-]+$/.test(name ?? '');
   const owner = fileDir.split('/')[1]; // components/<owner>/…
 
-  const specRe = /(?:from|import)\s*\(?\s*['"]([^'"]+)['"]/g;
-  let match;
-  while ((match = specRe.exec(withoutComments)) !== null) {
-    const spec = match[1];
+  for (const { fileName: spec } of ts.preProcessFile(text, true, true)
+    .importedFiles) {
     let target;
     if (spec.startsWith('@/')) {
       target = spec.slice(2);

@@ -39,18 +39,6 @@ type ToggleGroupProps = React.ComponentProps<typeof ToggleGroupPrimitive.Root> &
  *
  * `aria-invalid` on the group does not style its items. Set it on each
  * `ToggleGroupItem` and describe the error in your own text.
- *
- * @example
- * ```tsx
- * <ToggleGroup type="single" defaultValue="left">
- *   <ToggleGroupItem value="left" aria-label="Align left">
- *     <IconAlignLeft />
- *   </ToggleGroupItem>
- *   <ToggleGroupItem value="center" aria-label="Align center">
- *     <IconAlignCenter />
- *   </ToggleGroupItem>
- * </ToggleGroup>
- * ```
  */
 function ToggleGroup({
   className,

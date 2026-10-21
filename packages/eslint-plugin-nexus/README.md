@@ -28,6 +28,10 @@ Enforces `.claude/rules/composition-over-render-props.md`: component props must 
 
 Enforces `.claude/rules/extract-inline-handlers.md`: inline JSX handler props (`onClick`, `onChange`, …) with 3+ statements, or containing a nested callback-object argument, must be extracted to a named function above `return`. One- and two-statement handlers stay inline.
 
+### `@nexus_ds/no-jsdoc-data-tags`
+
+Enforces `.claude/rules/code-comments.md`: JSDoc blocks must not carry `@default` or `@example` tags. The docs read prop defaults from code and usage from `docs` stories, so a tag is a second copy that can drift. Line comments and plain block comments are not checked. Wired in the root `eslint.config.js` for `packages/react/src`.
+
 ## Source of truth
 
 The token-layer rules are self-contained: the canonical step set is `src/canonical-step-set.json`. The component rules map 1:1 to the `.claude/rules/*.md` cited above — the rule code plus those docs are the spec. Every rule has RuleTester coverage in `__tests__/`.

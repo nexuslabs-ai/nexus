@@ -20,18 +20,6 @@ interface MenubarProps extends React.ComponentProps<
 
 /**
  * Horizontal bar of menus, like the menu bar in a desktop app.
- *
- * @example
- * ```tsx
- * <Menubar>
- *   <MenubarMenu>
- *     <MenubarTrigger>File</MenubarTrigger>
- *     <MenubarContent>
- *       <MenubarItem>New Tab</MenubarItem>
- *     </MenubarContent>
- *   </MenubarMenu>
- * </Menubar>
- * ```
  */
 function Menubar({ className, ...props }: MenubarProps) {
   return (
@@ -174,14 +162,6 @@ interface MenubarContentProps extends React.ComponentProps<
 
 /**
  * Container for the items of a menu. Opens below its trigger.
- *
- * @example
- * ```tsx
- * <MenubarContent>
- *   <MenubarItem>New Tab</MenubarItem>
- *   <MenubarItem>New Window</MenubarItem>
- * </MenubarContent>
- * ```
  */
 function MenubarContent({
   className,
@@ -241,12 +221,6 @@ interface MenubarItemProps
 
 /**
  * Single action in a menu.
- *
- * @example
- * ```tsx
- * <MenubarItem>New Tab</MenubarItem>
- * <MenubarItem variant="destructive">Delete</MenubarItem>
- * ```
  */
 function MenubarItem({
   className,
@@ -278,13 +252,6 @@ interface MenubarCheckboxItemProps extends React.ComponentProps<
 
 /**
  * Menu item that toggles on and off.
- *
- * @example
- * ```tsx
- * <MenubarCheckboxItem checked={showStatusBar} onCheckedChange={setShowStatusBar}>
- *   Status Bar
- * </MenubarCheckboxItem>
- * ```
  */
 function MenubarCheckboxItem({
   className,
@@ -337,14 +304,6 @@ interface MenubarRadioItemProps extends React.ComponentProps<
 
 /**
  * Menu item for picking one option from a `MenubarRadioGroup`.
- *
- * @example
- * ```tsx
- * <MenubarRadioGroup value={position} onValueChange={setPosition}>
- *   <MenubarRadioItem value="top">Top</MenubarRadioItem>
- *   <MenubarRadioItem value="bottom">Bottom</MenubarRadioItem>
- * </MenubarRadioGroup>
- * ```
  */
 function MenubarRadioItem({
   className,
@@ -399,11 +358,6 @@ interface MenubarLabelProps extends React.ComponentProps<
 
 /**
  * Heading for a group of menu items.
- *
- * @example
- * ```tsx
- * <MenubarLabel>Appearance</MenubarLabel>
- * ```
  */
 function MenubarLabel({ className, inset, ...props }: MenubarLabelProps) {
   return (
@@ -450,13 +404,6 @@ interface MenubarShortcutProps extends React.ComponentProps<'span'> {}
 
 /**
  * Keyboard shortcut hint at the end of an item.
- *
- * @example
- * ```tsx
- * <MenubarItem>
- *   New Tab <MenubarShortcut>⌘T</MenubarShortcut>
- * </MenubarItem>
- * ```
  */
 function MenubarShortcut({ className, ...props }: MenubarShortcutProps) {
   return (

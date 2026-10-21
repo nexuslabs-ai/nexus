@@ -64,16 +64,6 @@ interface InputGroupProps
  * for icons, text, buttons or key hints. The group shows the control's focus
  * ring and invalid state. Inline groups match the control's height. Set
  * `variant="borderless"` to drop the border and keep a tinted fill.
- *
- * @example
- * ```tsx
- * <InputGroup>
- *   <InputGroupAddon>
- *     <IconSearch />
- *   </InputGroupAddon>
- *   <InputGroupInput placeholder="Search…" />
- * </InputGroup>
- * ```
  */
 function InputGroup({ className, variant, ...props }: InputGroupProps) {
   return (

@@ -77,10 +77,6 @@ interface AttachmentProps
 
   /**
    * Replaces the built-in status text, such as 'Uploading'. Ignored while `idle` or `done`.
-   * @example
-   * ```tsx
-   * <Attachment state="uploading" statusLabel="Uploading report.pdf" />
-   * ```
    */
   statusLabel?: string;
 }
@@ -89,25 +85,6 @@ interface AttachmentProps
  * One file with its preview, name, size, actions and upload state.
  * `orientation="horizontal"` is a row for lists. `orientation="vertical"` is a fixed-width tile for composer strips.
  * Screen readers announce the state while uploading, processing or failed.
- *
- * @example
- * ```tsx
- * <Attachment state="uploading">
- *   <AttachmentMedia variant="icon">
- *     <IconFile />
- *   </AttachmentMedia>
- *   <AttachmentContent>
- *     <AttachmentTitle>report.pdf</AttachmentTitle>
- *     <AttachmentDescription>2.4 MB</AttachmentDescription>
- *     <AttachmentProgress value={62} aria-label="Uploading report.pdf" />
- *   </AttachmentContent>
- *   <AttachmentActions>
- *     <Button variant="ghost" size="icon-sm" aria-label="Remove report.pdf">
- *       <IconX />
- *     </Button>
- *   </AttachmentActions>
- * </Attachment>
- * ```
  */
 function Attachment({
   className,
@@ -180,13 +157,6 @@ function AttachmentMedia({ className, ...props }: AttachmentMediaProps) {
 interface AttachmentTitleProps extends ItemTitleProps {
   /**
    * Badge or status icon after the file name. Keeps its width while the name truncates.
-   *
-   * @example
-   * ```tsx
-   * <AttachmentTitle trailing={<IconCircleCheckFilled />}>
-   *   report.pdf
-   * </AttachmentTitle>
-   * ```
    */
   trailing?: React.ReactNode;
 }
@@ -281,12 +251,6 @@ type AttachmentGroupLabel =
  *
  * Props for AttachmentGroup. The strip is a tab stop, so pass exactly one of `aria-label` or `aria-labelledby`.
  * Use `aria-labelledby` when a visible heading names the strip.
- *
- * @example
- * ```tsx
- * <AttachmentGroup aria-label="Attached files" />
- * <AttachmentGroup aria-labelledby="composer-files-heading" />
- * ```
  */
 type AttachmentGroupProps = Omit<
   React.ComponentProps<'div'>,
@@ -303,9 +267,7 @@ function AttachmentGroup({ className, ...props }: AttachmentGroupProps) {
     <div
       data-slot="attachment-group"
       role="group"
-      // A scrollable region with no focusable children must itself be
-      // keyboard-focusable to scroll (WCAG 2.1.1).
-      // eslint-disable-next-line jsx-a11y/no-noninteractive-tabindex
+      // eslint-disable-next-line jsx-a11y/no-noninteractive-tabindex -- a scrollable region with no focusable children must be focusable to scroll (WCAG 2.1.1)
       tabIndex={0}
       className={cn(
         'nx:flex nx:min-w-0 nx:snap-x nx:gap-3 nx:overflow-x-auto nx:overscroll-x-contain nx:py-1',
@@ -359,15 +321,6 @@ interface AttachmentTriggerProps extends React.ComponentProps<'button'> {
 /**
  * Makes the whole card open or preview the file. Use it instead of a link around the card, so `AttachmentActions` stay clickable.
  * Give it a text label, visually hidden if the card shows the file name.
- *
- * @example
- * ```tsx
- * <AttachmentTrigger asChild>
- *   <a href={url}>
- *     <span className="nx:sr-only">Open report.pdf</span>
- *   </a>
- * </AttachmentTrigger>
- * ```
  */
 function AttachmentTrigger({
   className,

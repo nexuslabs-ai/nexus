@@ -28,18 +28,6 @@ interface NavigationMenuProps extends React.ComponentProps<
 /**
  * Top-level site navigation with flyout panels. Flyouts adapt to the width
  * of the menu, not the viewport.
- *
- * @example
- * ```tsx
- * <NavigationMenu>
- *   <NavigationMenuList>
- *     <NavigationMenuItem>
- *       <NavigationMenuTrigger>Products</NavigationMenuTrigger>
- *       <NavigationMenuContent>...</NavigationMenuContent>
- *     </NavigationMenuItem>
- *   </NavigationMenuList>
- * </NavigationMenu>
- * ```
  */
 function NavigationMenu({
   className,

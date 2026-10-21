@@ -23,20 +23,6 @@ interface RadioGroupItemProps extends React.ComponentProps<
 /**
  * Set of options where only one can be selected. Render one `RadioGroupItem`
  * per option, labelled with `Label` or wrapped in `ChoiceRow` or `ChoiceCard`.
- *
- * @example
- * ```tsx
- * <RadioGroup defaultValue="comfortable">
- *   <div className="nx:flex nx:items-center nx:gap-2">
- *     <RadioGroupItem value="default" id="r-default" />
- *     <Label htmlFor="r-default">Default</Label>
- *   </div>
- *   <div className="nx:flex nx:items-center nx:gap-2">
- *     <RadioGroupItem value="comfortable" id="r-comfortable" />
- *     <Label htmlFor="r-comfortable">Comfortable</Label>
- *   </div>
- * </RadioGroup>
- * ```
  */
 function RadioGroup({ className, ...props }: RadioGroupProps) {
   return (

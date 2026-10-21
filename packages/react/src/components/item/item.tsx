@@ -73,22 +73,6 @@ interface ItemProps
 /**
  * Row with media, a title, a description and actions. Build it from
  * `ItemMedia`, `ItemContent`, `ItemTitle`, `ItemDescription` and `ItemActions`.
- *
- * @example
- * ```tsx
- * <Item variant="outline">
- *   <ItemMedia variant="icon">
- *     <IconFile />
- *   </ItemMedia>
- *   <ItemContent>
- *     <ItemTitle>Report.pdf</ItemTitle>
- *     <ItemDescription>2.4 MB · edited 3d ago</ItemDescription>
- *   </ItemContent>
- *   <ItemActions>
- *     <Button size="sm" variant="outline">Open</Button>
- *   </ItemActions>
- * </Item>
- * ```
  */
 function Item({
   className,

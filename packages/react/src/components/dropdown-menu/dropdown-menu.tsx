@@ -13,17 +13,6 @@ import {
 
 /**
  * Root component for the dropdown menu. Holds the open state.
- *
- * @example
- * ```tsx
- * <DropdownMenu>
- *   <DropdownMenuTrigger>Open</DropdownMenuTrigger>
- *   <DropdownMenuContent>
- *     <DropdownMenuItem>Item 1</DropdownMenuItem>
- *     <DropdownMenuItem>Item 2</DropdownMenuItem>
- *   </DropdownMenuContent>
- * </DropdownMenu>
- * ```
  */
 const DropdownMenu = DropdownMenuPrimitive.Root;
 
@@ -138,14 +127,6 @@ interface DropdownMenuContentProps extends React.ComponentProps<
 
 /**
  * The menu panel. Opens next to the trigger in a portal.
- *
- * @example
- * ```tsx
- * <DropdownMenuContent>
- *   <DropdownMenuItem>Profile</DropdownMenuItem>
- *   <DropdownMenuItem>Settings</DropdownMenuItem>
- * </DropdownMenuContent>
- * ```
  */
 function DropdownMenuContent({
   className,
@@ -204,12 +185,6 @@ interface DropdownMenuItemProps
 
 /**
  * A single menu action.
- *
- * @example
- * ```tsx
- * <DropdownMenuItem>Profile</DropdownMenuItem>
- * <DropdownMenuItem variant="destructive">Delete</DropdownMenuItem>
- * ```
  */
 function DropdownMenuItem({
   className,
@@ -243,13 +218,6 @@ interface DropdownMenuCheckboxItemProps extends React.ComponentProps<
 
 /**
  * A menu item that toggles on and off.
- *
- * @example
- * ```tsx
- * <DropdownMenuCheckboxItem checked={showPanel} onCheckedChange={setShowPanel}>
- *   Show Panel
- * </DropdownMenuCheckboxItem>
- * ```
  */
 function DropdownMenuCheckboxItem({
   className,
@@ -304,14 +272,6 @@ interface DropdownMenuRadioItemProps extends React.ComponentProps<
 
 /**
  * A menu item for picking one option from a DropdownMenuRadioGroup.
- *
- * @example
- * ```tsx
- * <DropdownMenuRadioGroup value={position} onValueChange={setPosition}>
- *   <DropdownMenuRadioItem value="top">Top</DropdownMenuRadioItem>
- *   <DropdownMenuRadioItem value="bottom">Bottom</DropdownMenuRadioItem>
- * </DropdownMenuRadioGroup>
- * ```
  */
 function DropdownMenuRadioItem({
   className,
@@ -368,11 +328,6 @@ interface DropdownMenuLabelProps extends React.ComponentProps<
 
 /**
  * A heading for a group of menu items.
- *
- * @example
- * ```tsx
- * <DropdownMenuLabel>My Account</DropdownMenuLabel>
- * ```
  */
 function DropdownMenuLabel({
   className,
@@ -430,13 +385,6 @@ interface DropdownMenuShortcutProps extends React.ComponentProps<'span'> {}
 
 /**
  * A keyboard shortcut hint, right-aligned in a DropdownMenuItem.
- *
- * @example
- * ```tsx
- * <DropdownMenuItem>
- *   New Tab <DropdownMenuShortcut>⌘T</DropdownMenuShortcut>
- * </DropdownMenuItem>
- * ```
  */
 function DropdownMenuShortcut({
   className,

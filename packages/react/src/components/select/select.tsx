@@ -14,19 +14,6 @@ import {
 
 /**
  * Root of the select. Holds the open state and the selected value.
- *
- * @example
- * ```tsx
- * <Select>
- *   <SelectTrigger>
- *     <SelectValue placeholder="Select an option" />
- *   </SelectTrigger>
- *   <SelectContent>
- *     <SelectItem value="option1">Option 1</SelectItem>
- *     <SelectItem value="option2">Option 2</SelectItem>
- *   </SelectContent>
- * </Select>
- * ```
  */
 const Select = SelectPrimitive.Root;
 
@@ -79,13 +66,6 @@ interface SelectTriggerProps
 /**
  * Button that opens the dropdown. Set `variant="borderless"` to drop the border
  * and keep a tinted fill.
- *
- * @example
- * ```tsx
- * <SelectTrigger className="w-[180px]">
- *   <SelectValue placeholder="Select a theme" />
- * </SelectTrigger>
- * ```
  */
 function SelectTrigger({
   className,
@@ -161,14 +141,6 @@ interface SelectContentProps extends React.ComponentProps<
 
 /**
  * Dropdown that holds the items.
- *
- * @example
- * ```tsx
- * <SelectContent>
- *   <SelectItem value="light">Light</SelectItem>
- *   <SelectItem value="dark">Dark</SelectItem>
- * </SelectContent>
- * ```
  */
 function SelectContent({
   className,
@@ -219,14 +191,6 @@ interface SelectLabelProps extends React.ComponentProps<
 
 /**
  * Label for a group of items.
- *
- * @example
- * ```tsx
- * <SelectGroup>
- *   <SelectLabel>Fruits</SelectLabel>
- *   <SelectItem value="apple">Apple</SelectItem>
- * </SelectGroup>
- * ```
  */
 function SelectLabel({ className, ...props }: SelectLabelProps) {
   return (
@@ -247,11 +211,6 @@ interface SelectItemProps extends React.ComponentProps<
 
 /**
  * One option in the dropdown.
- *
- * @example
- * ```tsx
- * <SelectItem value="light">Light</SelectItem>
- * ```
  */
 function SelectItem({ className, children, ...props }: SelectItemProps) {
   return (
@@ -293,13 +252,6 @@ interface SelectSeparatorProps extends React.ComponentProps<
 
 /**
  * Divider between items or groups.
- *
- * @example
- * ```tsx
- * <SelectItem value="option1">Option 1</SelectItem>
- * <SelectSeparator />
- * <SelectItem value="option2">Option 2</SelectItem>
- * ```
  */
 function SelectSeparator({ className, ...props }: SelectSeparatorProps) {
   return (

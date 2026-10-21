@@ -33,7 +33,7 @@ const headersLines = [
   ),
   '/_next/static/*',
   '  Cache-Control: public, max-age=31536000, immutable',
-  // write-markdown.mjs output, served as UTF-8 so `›` and `—` survive.
+  // write-markdown.ts output, served as UTF-8 so `›` and `—` survive.
   '/*.md',
   '  Content-Type: text/markdown; charset=utf-8',
   '/llms.txt',

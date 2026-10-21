@@ -11,11 +11,6 @@ interface MessageGroupProps extends React.ComponentProps<'div'> {
    * Announces new turns in a live chat. Leave it off for static, paged or
    * virtualised transcripts, and set `aria-busy` on a turn while its reply
    * streams.
-   *
-   * @example
-   * ```tsx
-   * <MessageGroup announce>{turns}</MessageGroup>
-   * ```
    */
   announce?: boolean;
 }
@@ -58,24 +53,6 @@ interface MessageProps extends React.ComponentProps<'div'> {
  * Layout for one conversation turn, with an avatar beside the header, body
  * and footer. Put the body, usually a `Bubble` or `Attachment`, in
  * `MessageContent`.
- *
- * @example
- * ```tsx
- * <MessageGroup>
- *   <Message>
- *     <MessageAvatar>
- *       <AvatarFallback>AB</AvatarFallback>
- *     </MessageAvatar>
- *     <MessageContent>
- *       <MessageHeader>Ana Bianchi</MessageHeader>
- *       <Bubble>
- *         <BubbleContent>Can you take a look at the failing run?</BubbleContent>
- *       </Bubble>
- *       <MessageFooter>09:14</MessageFooter>
- *     </MessageContent>
- *   </Message>
- * </MessageGroup>
- * ```
  */
 function Message({ className, align = 'start', ...props }: MessageProps) {
   return (
@@ -98,11 +75,6 @@ interface MessageAvatarProps extends React.ComponentProps<typeof Avatar> {
   /**
    * Keeps the avatar's space but hides it. Use it on follow-up turns from the
    * same speaker so their bodies line up with the first turn.
-   *
-   * @example
-   * ```tsx
-   * <MessageAvatar placeholder />
-   * ```
    */
   placeholder?: boolean;
 }
@@ -110,14 +82,6 @@ interface MessageAvatarProps extends React.ComponentProps<typeof Avatar> {
 /**
  * Avatar of the speaker, pinned to the top of the turn. Takes the same
  * children and props as `Avatar`, and uses the `sm` size unless you set one.
- *
- * @example
- * ```tsx
- * <MessageAvatar>
- *   <AvatarImage src={user.avatarUrl} alt="" />
- *   <AvatarFallback>AB</AvatarFallback>
- * </MessageAvatar>
- * ```
  */
 function MessageAvatar({
   className,

@@ -259,7 +259,7 @@ describe('cn', () => {
       'nx:typography-heading-large'
     );
   });
-  /* eslint-enable @nexus_ds/nx-class-conventions */
+  /* eslint-enable @nexus_ds/nx-class-conventions -- end of the raw-atomics block */
 
   it('conflicts with exactly the groups the typography composites declare', () => {
     const declared = new Set(

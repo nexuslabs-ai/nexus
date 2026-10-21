@@ -6,15 +6,6 @@ import { cn } from '../../lib/utils';
 /**
  * Holds a set of resizable panels. `orientation` sets the split axis.
  * Install the optional peer dependency `react-resizable-panels` in your app.
- *
- * @example
- * ```tsx
- * <ResizablePanelGroup orientation="horizontal">
- *   <ResizablePanel defaultSize={50}>One</ResizablePanel>
- *   <ResizableHandle withHandle aria-label="Resize" />
- *   <ResizablePanel defaultSize={50}>Two</ResizablePanel>
- * </ResizablePanelGroup>
- * ```
  */
 function ResizablePanelGroup({
   className,

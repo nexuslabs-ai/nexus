@@ -4,7 +4,10 @@
     "outDir": "./dist/runtime",
     "rootDir": "./src",
     "declaration": true,
-    "declarationMap": true
+    "declarationMap": true,
+    "allowImportingTsExtensions": true,
+    "erasableSyntaxOnly": true,
+    "verbatimModuleSyntax": true
   },
   "include": ["src/**/*"],
   "exclude": ["node_modules", "dist"]

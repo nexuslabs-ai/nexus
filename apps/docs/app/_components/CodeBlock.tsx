@@ -83,7 +83,7 @@ export function CodeBlock({
         {...props}
         ref={preRef}
         // Below the spread so an injected `tabIndex` cannot replace this one.
-        // eslint-disable-next-line jsx-a11y/no-noninteractive-tabindex
+        // eslint-disable-next-line jsx-a11y/no-noninteractive-tabindex -- a scrolling code block needs a tab stop to scroll by keyboard (WCAG 2.1.1)
         tabIndex={0}
       >
         {children}

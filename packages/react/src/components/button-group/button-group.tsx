@@ -64,15 +64,6 @@ interface ButtonGroupProps
 /**
  * Joins Buttons, menu or select triggers, `ButtonGroupText` and `ButtonGroupSeparator` into one cluster with shared borders.
  * Set `orientation="vertical"` to stack them. For an input with addons, use `InputGroup`.
- *
- * @example
- * ```tsx
- * <ButtonGroup>
- *   <Button variant="outline">Day</Button>
- *   <Button variant="outline">Week</Button>
- *   <Button variant="outline">Month</Button>
- * </ButtonGroup>
- * ```
  */
 function ButtonGroup({
   className,

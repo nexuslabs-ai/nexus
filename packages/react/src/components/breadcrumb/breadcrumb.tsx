@@ -15,21 +15,6 @@ interface BreadcrumbProps extends React.ComponentProps<'nav'> {}
 /**
  * Navigation trail in a `nav` landmark, showing where the current page sits.
  * Put `BreadcrumbLink` or `BreadcrumbPage` items in a `BreadcrumbList`, divided by `BreadcrumbSeparator`.
- *
- * @example
- * ```tsx
- * <Breadcrumb>
- *   <BreadcrumbList>
- *     <BreadcrumbItem>
- *       <BreadcrumbLink href="/">Home</BreadcrumbLink>
- *     </BreadcrumbItem>
- *     <BreadcrumbSeparator />
- *     <BreadcrumbItem>
- *       <BreadcrumbPage>Contacts</BreadcrumbPage>
- *     </BreadcrumbItem>
- *   </BreadcrumbList>
- * </Breadcrumb>
- * ```
  */
 function Breadcrumb(props: BreadcrumbProps) {
   return <nav aria-label="breadcrumb" data-slot="breadcrumb" {...props} />;
@@ -50,9 +35,7 @@ function BreadcrumbList({ className, ...props }: BreadcrumbListProps) {
   return (
     <ol
       data-slot="breadcrumb-list"
-      // The current page is a non-focusable <span>, so the list itself must be
-      // keyboard-focusable to scroll an overflowing trail into view (WCAG 2.1.1).
-      // eslint-disable-next-line jsx-a11y/no-noninteractive-tabindex
+      // eslint-disable-next-line jsx-a11y/no-noninteractive-tabindex -- the current page is a non-focusable <span>, so the list takes focus to scroll an overflowing trail (WCAG 2.1.1)
       tabIndex={0}
       className={cn(
         'nx:m-0 nx:flex nx:min-w-0 nx:max-w-full nx:list-none nx:flex-nowrap nx:items-center nx:gap-0.5 nx:overflow-x-auto nx:py-1.5 nx:pr-1.5 nx:pl-0 nx:typography-body-default nx:text-muted-foreground nx:focus-visible:outline-2 nx:focus-visible:outline-focus-default',

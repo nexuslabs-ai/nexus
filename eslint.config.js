@@ -1,4 +1,5 @@
 import js from '@eslint/js';
+import eslintCommentsPlugin from '@eslint-community/eslint-plugin-eslint-comments';
 import {
   nexusComponentConfig,
   nexusSpacingTokenConfig,
@@ -53,6 +54,16 @@ export default tseslint.config(
 
   // TypeScript recommended rules
   ...tseslint.configs.recommended,
+
+  // Every eslint-disable says why, after `--`.
+  {
+    plugins: {
+      '@eslint-community/eslint-comments': eslintCommentsPlugin,
+    },
+    rules: {
+      '@eslint-community/eslint-comments/require-description': 'error',
+    },
+  },
 
   // React configuration
   {
@@ -242,6 +253,13 @@ export default tseslint.config(
   {
     files: ['packages/react/src/**/*.{ts,tsx}', 'apps/**/*.{ts,tsx}'],
     ...nexusComponentConfig(),
+  },
+
+  // The docs read defaults from code and examples from docs stories, so the
+  // published source carries no `@default` or `@example` copies of them.
+  {
+    files: ['packages/react/src/**/*.{ts,tsx}'],
+    rules: { '@nexus_ds/no-jsdoc-data-tags': 'error' },
   },
 
   nexusTailwindClassesConfig({

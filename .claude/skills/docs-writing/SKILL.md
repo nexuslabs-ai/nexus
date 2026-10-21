@@ -159,7 +159,7 @@ Agents read docs as plain text, and readers land on one section from search.
 - **Use full paths in links and code**, not "the file from earlier".
 - **Repeat the noun at the start of each section**, not "it".
 
-At build time, `apps/docs/scripts/write-markdown.mjs` turns every page into
+At build time, `apps/docs/scripts/write-markdown.ts` turns every page into
 Markdown at `{route}.md` and lists it in `/llms.txt`. The page's first paragraph
 becomes its `llms.txt` summary, so make that paragraph say what the page is.
 Put `data-md-skip` on a live preview or specimen that means nothing as text.

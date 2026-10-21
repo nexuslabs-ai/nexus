@@ -51,30 +51,6 @@ interface AlertProps
  * For trailing controls, use `layout="inline"` with `AlertContent` and `AlertActions`.
  * In the default stack layout, use Button actions only and leave out `AlertClose`.
  * Alert has no live role by default. Pass `role="alert"` for urgent messages or `role="status"` for polite updates.
- *
- * @example
- * ```tsx
- * <Alert>
- *   <AlertTitle>Heads up!</AlertTitle>
- *   <AlertDescription>
- *     You can add components and dependencies to your app using the CLI.
- *   </AlertDescription>
- * </Alert>
- * ```
- *
- * @example
- * ```tsx
- * // With icon
- * <Alert variant="destructive">
- *   <AlertIcon>
- *     <IconAlertCircle />
- *   </AlertIcon>
- *   <AlertTitle>Error</AlertTitle>
- *   <AlertDescription>
- *     Your session has expired. Please log in again.
- *   </AlertDescription>
- * </Alert>
- * ```
  */
 function Alert({
   className,
@@ -108,16 +84,6 @@ interface AlertIconProps extends React.ComponentProps<'span'> {}
 /**
  * Leading icon. Place it first in `Alert` and pass any icon as its child.
  * Sizes the icon, colors it to match `variant` and hides it from screen readers.
- *
- * @example
- * ```tsx
- * <Alert variant="success">
- *   <AlertIcon>
- *     <IconCircleCheck />
- *   </AlertIcon>
- *   <AlertTitle>Saved</AlertTitle>
- * </Alert>
- * ```
  */
 function AlertIcon({ className, ...props }: AlertIconProps) {
   return (
@@ -143,14 +109,6 @@ interface AlertContentProps extends React.ComponentProps<'div'> {}
 
 /**
  * Wraps the title and description. Required with `layout="inline"` so the text sits beside `AlertActions`.
- *
- * @example
- * ```tsx
- * <AlertContent>
- *   <AlertTitle>Storage almost full</AlertTitle>
- *   <AlertDescription>Uploads may fail soon.</AlertDescription>
- * </AlertContent>
- * ```
  */
 function AlertContent({ className, ...props }: AlertContentProps) {
   return (
@@ -170,24 +128,12 @@ function AlertContent({ className, ...props }: AlertContentProps) {
 interface AlertTitleProps extends React.ComponentProps<'div'> {
   /**
    * Applies the title styles to the child element, such as a real heading.
-   *
-   * @example
-   * ```tsx
-   * <AlertTitle asChild>
-   *   <h2>Important Notice</h2>
-   * </AlertTitle>
-   * ```
    */
   asChild?: boolean;
 }
 
 /**
  * Alert heading. Renders a `div`, or a real heading through `asChild`.
- *
- * @example
- * ```tsx
- * <AlertTitle>Important Notice</AlertTitle>
- * ```
  */
 function AlertTitle({
   asChild = false,
@@ -220,13 +166,6 @@ interface AlertDescriptionProps extends React.ComponentProps<'div'> {}
 
 /**
  * Body text of an alert. Holds one or more paragraphs.
- *
- * @example
- * ```tsx
- * <AlertDescription>
- *   This is a detailed description of the alert message.
- * </AlertDescription>
- * ```
  */
 function AlertDescription({ className, ...props }: AlertDescriptionProps) {
   return (
@@ -250,14 +189,6 @@ interface AlertActionsProps extends React.ComponentProps<'div'> {}
 
 /**
  * Holds one or two `Button` actions. Add `AlertClose` here only with `layout="inline"`.
- *
- * @example
- * ```tsx
- * <AlertActions>
- *   <Button variant="outline">Manage</Button>
- *   <AlertClose onClick={() => setShow(false)} />
- * </AlertActions>
- * ```
  */
 function AlertActions({ className, ...props }: AlertActionsProps) {
   return (
@@ -283,11 +214,6 @@ interface AlertCloseProps extends React.ComponentProps<'button'> {}
 /**
  * Close button, labelled "Dismiss alert" by default. It doesn't remove the alert, so remove it in `onClick`.
  * Custom children need their own accessible name, such as `aria-label` on an icon-only child.
- *
- * @example
- * ```tsx
- * <AlertClose onClick={() => setShow(false)} />
- * ```
  */
 function AlertClose({
   className,

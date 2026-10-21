@@ -13,21 +13,6 @@ interface PageHeaderProps extends React.ComponentProps<'header'> {}
  * Title block of a page or section, with optional description, metadata and
  * primary actions. Actions sit beside the title and wrap below it when space
  * runs out.
- *
- * @example
- * ```tsx
- * <PageHeader>
- *   <PageHeaderContent>
- *     <PageHeaderTitle>Activity report</PageHeaderTitle>
- *     <PageHeaderDescription>
- *       Review activity for the selected period.
- *     </PageHeaderDescription>
- *   </PageHeaderContent>
- *   <PageHeaderActions>
- *     <Button>Share</Button>
- *   </PageHeaderActions>
- * </PageHeader>
- * ```
  */
 function PageHeader({ className, ...props }: PageHeaderProps) {
   return (
@@ -111,13 +96,6 @@ interface PageHeaderTitleProps extends React.ComponentProps<'h1'> {
   /**
    * Renders the child element with the title styles. Use it to change the
    * heading level.
-   *
-   * @example
-   * ```tsx
-   * <PageHeaderTitle asChild>
-   *   <h2>Notification settings</h2>
-   * </PageHeaderTitle>
-   * ```
    */
   asChild?: boolean;
 }

@@ -12,7 +12,8 @@
       "inputs": [
         "scripts/generate-props.mjs",
         "scripts/props-contract.mjs",
-        "scripts/props-entries.mjs",
+        "scripts/humanize.ts",
+        "scripts/props-entries.ts",
         "scripts/react-entry-points.mjs",
         "scripts/react-sources.mjs",
         "scripts/roots.mjs",
@@ -25,6 +26,7 @@
     "generate:dependencies": {
       "inputs": [
         "scripts/generate-dependencies.mjs",
+        "scripts/humanize.ts",
         "scripts/react-sources.mjs",
         "scripts/roots.mjs",
         "$TURBO_ROOT$/packages/react/src/**",
@@ -38,8 +40,8 @@
         "scripts/generate-page-manifest.mjs",
         "scripts/page-manifest.mjs",
         "scripts/roots.mjs",
-        "scripts/humanize.mjs",
-        "scripts/docs-stories.mjs",
+        "scripts/humanize.ts",
+        "scripts/docs-stories.ts",
         "scripts/react-sources.mjs",
         "page-registry/**",
         "content/**",

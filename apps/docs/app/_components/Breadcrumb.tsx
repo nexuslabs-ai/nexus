@@ -5,7 +5,7 @@ export function Breadcrumb({
   markdownHref,
 }: {
   items: { label: string; href?: string }[];
-  /** The page's Markdown twin, written by `scripts/write-markdown.mjs` at build time. */
+  /** The page's Markdown twin, written by `scripts/write-markdown.ts` at build time. */
   markdownHref?: string;
 }) {
   return (

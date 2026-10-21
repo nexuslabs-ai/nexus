@@ -11,26 +11,6 @@ import {
 /**
  * Root for a drawer that slides in from a screen edge and drags to dismiss.
  * Install `vaul` in your app first.
- *
- * @example
- * ```tsx
- * <Drawer>
- *   <DrawerTrigger asChild>
- *     <Button>Open</Button>
- *   </DrawerTrigger>
- *   <DrawerContent>
- *     <DrawerHeader>
- *       <DrawerTitle>Title</DrawerTitle>
- *       <DrawerDescription>Description.</DrawerDescription>
- *     </DrawerHeader>
- *     <DrawerFooter>
- *       <DrawerClose asChild>
- *         <Button variant="outline">Close</Button>
- *       </DrawerClose>
- *     </DrawerFooter>
- *   </DrawerContent>
- * </Drawer>
- * ```
  */
 const Drawer = DrawerPrimitive.Root;
 
@@ -168,8 +148,7 @@ function DrawerBody({ className, ...props }: DrawerBodyProps) {
     <div
       data-slot="drawer-body"
       className={cn(overlayBodyClassName, className)}
-      // Overlay bodies own the scroll region, so pure-text overflow must be keyboard reachable.
-      // eslint-disable-next-line jsx-a11y/no-noninteractive-tabindex
+      // eslint-disable-next-line jsx-a11y/no-noninteractive-tabindex -- overlay bodies own the scroll region, so pure-text overflow must be keyboard reachable
       tabIndex={0}
       {...props}
     />

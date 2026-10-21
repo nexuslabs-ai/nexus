@@ -20,11 +20,6 @@ import { cn } from '../../lib/utils';
  * utilities.
  *
  * @experimental Inferred from Atlassian's `<Show>` / `<Hide>`; the API may change before stable.
- * @example
- * ```tsx
- * <Show above="lg"><aside>Secondary nav</aside></Show>
- * <Show containerAbove="md"><Stat /></Show>
- * ```
  */
 function Show({
   as: Comp = 'span',

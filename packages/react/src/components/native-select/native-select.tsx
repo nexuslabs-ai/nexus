@@ -45,14 +45,6 @@ interface NativeSelectProps
  * Styled native `<select>` that opens the system picker on mobile. Set
  * `variant="borderless"` to drop the border and keep a tinted fill. For a
  * styled dropdown, use `Select`. For search, use `Combobox`.
- *
- * @example
- * ```tsx
- * <NativeSelect aria-label="Country" defaultValue="us">
- *   <NativeSelectOption value="us">United States</NativeSelectOption>
- *   <NativeSelectOption value="ca">Canada</NativeSelectOption>
- * </NativeSelect>
- * ```
  */
 function NativeSelect({
   className,

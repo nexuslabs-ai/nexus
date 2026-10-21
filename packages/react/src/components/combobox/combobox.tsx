@@ -32,38 +32,6 @@ interface ComboboxProps extends React.ComponentProps<typeof Popover> {}
 /**
  * A searchable single-select field built from a Popover and a Command list.
  * Hold the selected value and the `open` state in your own component.
- *
- * @example
- * ```tsx
- * const [open, setOpen] = React.useState(false);
- * const [value, setValue] = React.useState('');
- *
- * <Combobox open={open} onOpenChange={setOpen}>
- *   <ComboboxTrigger>
- *     {frameworks.find((f) => f.value === value)?.label ?? 'Select framework'}
- *   </ComboboxTrigger>
- *   <ComboboxContent>
- *     <ComboboxInput placeholder="Search framework..." />
- *     <ComboboxList>
- *       <ComboboxEmpty>No framework found.</ComboboxEmpty>
- *       {frameworks.map((framework) => (
- *         <ComboboxItem
- *           key={framework.value}
- *           value={framework.value}
- *           keywords={[framework.label]}
- *           selected={value === framework.value}
- *           onSelect={(next) => {
- *             setValue(next === value ? '' : next);
- *             setOpen(false);
- *           }}
- *         >
- *           {framework.label}
- *         </ComboboxItem>
- *       ))}
- *     </ComboboxList>
- *   </ComboboxContent>
- * </Combobox>
- * ```
  */
 function Combobox(props: ComboboxProps) {
   return <Popover {...props} />;

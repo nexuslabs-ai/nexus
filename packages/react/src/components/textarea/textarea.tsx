@@ -40,17 +40,6 @@ interface TextareaProps
 /**
  * Multi-line text field styled like Input. Set the starting height with `rows`.
  * Set `variant="borderless"` to drop the border and keep a tinted fill.
- *
- * @example
- * ```tsx
- * <Textarea placeholder="Tell us about yourself..." />
- * ```
- *
- * @example
- * ```tsx
- * // Invalid state — always-on error boundary plus an error-coloured focus ring
- * <Textarea aria-invalid defaultValue="too short" />
- * ```
  */
 function Textarea({ className, variant, ...props }: TextareaProps) {
   return (

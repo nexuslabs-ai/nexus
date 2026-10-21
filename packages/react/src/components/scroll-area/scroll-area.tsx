@@ -18,22 +18,6 @@ interface ScrollAreaProps extends React.ComponentProps<
  * platform. Renders a vertical scrollbar for you. For horizontal scrolling, add
  * `<ScrollBar orientation="horizontal" />` after the content. `type` sets when
  * the scrollbars show, `hover` by default.
- *
- * @example
- * ```tsx
- * <ScrollArea className="nx:h-72 nx:w-64 nx:rounded-md nx:border-default nx:border-border-default">
- *   <div className="nx:p-4">{longContent}</div>
- * </ScrollArea>
- * ```
- *
- * @example
- * ```tsx
- * // Horizontal scrolling — add a horizontal ScrollBar after the content.
- * <ScrollArea className="nx:w-96 nx:rounded-md nx:border-default nx:border-border-default nx:whitespace-nowrap">
- *   <div className="nx:flex nx:w-max nx:gap-4 nx:p-4">{tags}</div>
- *   <ScrollBar orientation="horizontal" />
- * </ScrollArea>
- * ```
  */
 function ScrollArea({ className, children, ...props }: ScrollAreaProps) {
   return (
@@ -89,11 +73,6 @@ const scrollBarVariants = cva(
 /**
  * Scrollbar track and thumb for one axis. Render it only to add the horizontal
  * axis, as a child of ScrollArea after the content.
- *
- * @example
- * ```tsx
- * <ScrollBar orientation="horizontal" />
- * ```
  */
 function ScrollBar({
   className,

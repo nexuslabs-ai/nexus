@@ -107,19 +107,6 @@ interface MultiSelectProps {
 /**
  * Searchable field for picking several options, shown as chips. For
  * searchable single selection, use `Combobox`.
- *
- * @example
- * ```tsx
- * <MultiSelect defaultValues={['react']} onValuesChange={setValues}>
- *   <MultiSelectTrigger aria-label="Frameworks">
- *     <MultiSelectValue placeholder="Select frameworks" />
- *   </MultiSelectTrigger>
- *   <MultiSelectContent>
- *     <MultiSelectItem value="react">React</MultiSelectItem>
- *     <MultiSelectItem value="vue">Vue</MultiSelectItem>
- *   </MultiSelectContent>
- * </MultiSelect>
- * ```
  */
 function MultiSelect({
   children,
