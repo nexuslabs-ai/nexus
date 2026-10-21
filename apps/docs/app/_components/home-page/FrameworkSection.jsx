@@ -3,8 +3,24 @@
 import { useId, useState } from 'react';
 
 import { Button } from '@nexus_ds/react';
+import { useNexusAppearance } from '@nexus_ds/react/appearance';
+import {
+  IconAsterisk,
+  IconBorderAll,
+  IconBorderRadius,
+  IconClock,
+  IconColorSwatch,
+  IconComponents,
+  IconLayersIntersect,
+  IconPaint,
+  IconShadow,
+  IconSpacingHorizontal,
+  IconTypography,
+  IconWaveSine,
+} from '@tabler/icons-react';
 import { useDialKitController } from 'dialkit';
 
+import '../home-hero/rotating-headline-journey.css';
 import './framework-section.css';
 
 const frameworks = [
@@ -20,11 +36,15 @@ const config = {
     type: 'select',
     options: [
       { value: 'foundation', label: 'Shared foundation' },
+      { value: 'pipeline', label: 'Horizontal pipeline' },
+      { value: 'individual', label: 'Individual connections' },
+      { value: 'interactive', label: 'Interactive flow' },
+      { value: 'concentric', label: 'Concentric boundaries' },
       { value: 'cards', label: 'Icon cards' },
       { value: 'connected', label: 'Connected foundation' },
       { value: 'playground', label: 'Framework playground · Zag' },
     ],
-    default: 'foundation',
+    default: 'concentric',
   },
   typography: { titleSize: [40, 28, 56, 2] },
   spacing: {
@@ -46,7 +66,13 @@ export function FrameworkSection({ docsBase = '' }) {
     },
   });
   const p = dial.values;
-  const foundation = p.layout === 'foundation' || p.layout === 'connected';
+  const foundation = [
+    'foundation',
+    'connected',
+    'pipeline',
+    'individual',
+    'interactive',
+  ].includes(p.layout);
   return (
     <section
       className="home-page-section framework-section"
@@ -73,8 +99,12 @@ export function FrameworkSection({ docsBase = '' }) {
           Components that speak your framework.
         </p>
       </div>
-      {p.layout === 'playground' ? (
+      {p.layout === 'concentric' ? (
+        <ConcentricFlow />
+      ) : p.layout === 'playground' ? (
         <FrameworkPlayground />
+      ) : foundation ? (
+        <TokenFlow interactive={p.layout === 'interactive'} />
       ) : (
         <div className="framework-composition">
           <div className="framework-options">
@@ -94,32 +124,272 @@ export function FrameworkSection({ docsBase = '' }) {
               </article>
             ))}
           </div>
-          {foundation && (
-            <div className="framework-foundation">
-              <span className="framework-foundation-name">Nexus core</span>
-              <div className="framework-token-list">
-                <span>Color</span>
-                <span>Typography</span>
-                <span>Spacing</span>
-                <span>Appearance</span>
-              </div>
-              <span className="framework-foundation-caption">
-                Shared tokens. A consistent interface.
-              </span>
-            </div>
-          )}
         </div>
       )}
       <div className="framework-footer">
-        <Button asChild>
+        <Button asChild variant="secondary">
           <a
             href={`${docsBase}/getting-started/why-nexus#one-token-system-many-frameworks`}
           >
-            Explore the foundation <span aria-hidden="true">→</span>
+            Explore the foundation
           </a>
         </Button>
       </div>
     </section>
+  );
+}
+
+const tokenGroups = [
+  [
+    ['Theme', IconPaint, 0],
+    ['Colors', IconColorSwatch, 1],
+    ['Typography', IconTypography, 2],
+    ['Motion', IconWaveSine, 0],
+  ],
+  [
+    ['Spacing', IconSpacingHorizontal, 3],
+    ['Radius', IconBorderRadius, 4],
+    ['Borders', IconBorderAll, 5],
+    ['Duration', IconClock, 3],
+  ],
+  [
+    ['Shadows', IconShadow, 6],
+    ['Components', IconComponents, 7],
+    ['Icons', IconAsterisk, 8],
+    ['Z-index', IconLayersIntersect, 6],
+  ],
+];
+
+function ConcentricFlow() {
+  const { state } = useNexusAppearance();
+  const stopped = state.prefs.reduceMotion;
+  return (
+    <div className="token-flow concentric-flow" data-paused={stopped}>
+      <div className="token-flow-frameworks">
+        {frameworks.map(([name, icon, color]) => (
+          <div className="token-flow-framework" key={name}>
+            <span
+              className="framework-icon-tile"
+              style={{ '--framework-brand': color }}
+            >
+              <img src={icon} alt="" width="36" height="36" />
+            </span>
+            <span>{name}</span>
+          </div>
+        ))}
+      </div>
+      <svg
+        className="token-flow-wires concentric-connections"
+        viewBox="0 0 600 80"
+        preserveAspectRatio="none"
+        aria-hidden="true"
+      >
+        {[60, 180, 300, 420, 540].map((x) => (
+          <g key={x}>
+            <path d={`M 300 80 C 300 24 ${x} 56 ${x} 0`} />
+            <path
+              className="token-flow-pulse"
+              pathLength="1"
+              d={`M 300 80 C 300 24 ${x} 56 ${x} 0`}
+            />
+          </g>
+        ))}
+      </svg>
+      <div className="concentric-core">
+        <div className="concentric-core-heading">
+          <strong>Nexus core</strong>
+        </div>
+        <div className="concentric-tokens">
+          <div
+            className="concentric-chip-grid"
+            aria-label="Shared design tokens"
+          >
+            {tokenGroups.flat().map(([label, Icon, index]) => (
+              <span
+                className={`token-flow-chip journey-color-${index}`}
+                key={label}
+              >
+                <Icon size={20} stroke={1.7} aria-hidden="true" />
+                {label}
+              </span>
+            ))}
+          </div>
+        </div>
+        <div className="token-flow-caption">
+          <span>Shared tokens, consumed by every framework.</span>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function TokenFlow({ interactive }) {
+  const { state } = useNexusAppearance();
+  const [paused, setPaused] = useState(false);
+  const [selected, setSelected] = useState('Theme');
+  const selectedColor = tokenGroups
+    .flat()
+    .find(([label]) => label === selected)[2];
+  const stopped = paused || state.prefs.reduceMotion;
+  return (
+    <div
+      className={`token-flow journey-color-${selectedColor}`}
+      data-paused={stopped}
+    >
+      <div className="token-flow-inputs" aria-label="Shared design tokens">
+        {tokenGroups.map((group) => (
+          <div className="token-flow-group" key={group[0][0]}>
+            {group.map(([label, Icon, index]) =>
+              interactive ? (
+                <button
+                  type="button"
+                  className={`token-flow-chip journey-color-${index}`}
+                  key={label}
+                  aria-pressed={selected === label}
+                  onClick={() => setSelected(label)}
+                >
+                  <Icon size={20} stroke={1.7} aria-hidden="true" />
+                  {label}
+                </button>
+              ) : (
+                <span
+                  className={`token-flow-chip journey-color-${index}`}
+                  key={label}
+                >
+                  <Icon size={20} stroke={1.7} aria-hidden="true" />
+                  {label}
+                </span>
+              )
+            )}
+            <svg
+              className="token-flow-individual-wires"
+              viewBox="0 0 40 292"
+              preserveAspectRatio="none"
+              aria-hidden="true"
+            >
+              {[24, 84, 144, 204].map((y, row) => {
+                const lane = 32 - row * 8;
+                const path = `M 0 ${y} Q ${lane} ${y} ${lane} ${y + 16} V 292`;
+                return (
+                  <g key={y} data-selected={selected === group[row][0]}>
+                    <path d={path} />
+                    <path
+                      className="token-flow-pulse"
+                      pathLength="1"
+                      d={path}
+                    />
+                  </g>
+                );
+              })}
+            </svg>
+          </div>
+        ))}
+      </div>
+      <svg
+        className="token-flow-wires"
+        viewBox="0 0 600 80"
+        preserveAspectRatio="none"
+        aria-hidden="true"
+      >
+        {[100, 300, 500].map((x) => (
+          <g key={x}>
+            <path d={`M ${x} 0 C ${x} 56 300 24 300 80`} />
+            <path
+              className="token-flow-pulse"
+              pathLength="1"
+              d={`M ${x} 0 C ${x} 56 300 24 300 80`}
+            />
+          </g>
+        ))}
+      </svg>
+      <svg
+        className="token-flow-horizontal token-flow-horizontal-inputs"
+        viewBox="0 0 100 360"
+        preserveAspectRatio="none"
+        aria-hidden="true"
+      >
+        {[30, 90, 150, 210, 270, 330].map((y) => (
+          <g key={y}>
+            <path d={`M 0 ${y} C 60 ${y} 40 180 100 180`} />
+            <path
+              className="token-flow-pulse"
+              pathLength="1"
+              d={`M 0 ${y} C 60 ${y} 40 180 100 180`}
+            />
+          </g>
+        ))}
+      </svg>
+      <div className="token-flow-core">
+        <strong>Nexus core</strong>
+        <span aria-live={interactive ? 'polite' : undefined}>
+          {interactive
+            ? `${selected} → every framework`
+            : 'One shared foundation'}
+        </span>
+      </div>
+      <svg
+        className="token-flow-wires token-flow-outputs"
+        viewBox="0 0 600 96"
+        preserveAspectRatio="none"
+        aria-hidden="true"
+      >
+        {[60, 180, 300, 420, 540].map((x) => (
+          <g key={x}>
+            <path d={`M 300 0 C 300 64 ${x} 32 ${x} 96`} />
+            <path
+              className="token-flow-pulse"
+              pathLength="1"
+              d={`M 300 0 C 300 64 ${x} 32 ${x} 96`}
+            />
+          </g>
+        ))}
+      </svg>
+      <svg
+        className="token-flow-horizontal token-flow-horizontal-outputs"
+        viewBox="0 0 100 360"
+        preserveAspectRatio="none"
+        aria-hidden="true"
+      >
+        {[36, 108, 180, 252, 324].map((y) => (
+          <g key={y}>
+            <path d={`M 0 180 C 60 180 40 ${y} 100 ${y}`} />
+            <path
+              className="token-flow-pulse"
+              pathLength="1"
+              d={`M 0 180 C 60 180 40 ${y} 100 ${y}`}
+            />
+          </g>
+        ))}
+      </svg>
+      <div className="token-flow-frameworks">
+        {frameworks.map(([name, icon, color]) => (
+          <div className="token-flow-framework" key={name}>
+            <span
+              className="framework-icon-tile"
+              style={{ '--framework-brand': color }}
+            >
+              <img src={icon} alt="" width="36" height="36" />
+            </span>
+            <span>{name}</span>
+          </div>
+        ))}
+      </div>
+      <div className="token-flow-caption">
+        <span>
+          {interactive
+            ? 'Select a chip to trace its path.'
+            : 'Shared tokens. A consistent interface.'}
+        </span>
+        <button
+          type="button"
+          onClick={() => setPaused(!paused)}
+          disabled={state.prefs.reduceMotion}
+          aria-pressed={stopped}
+        >
+          {stopped ? 'Play flow' : 'Pause flow'}
+        </button>
+      </div>
+    </div>
   );
 }
 

@@ -147,3 +147,45 @@ all six frame URLs, dark classes, and body backgrounds in dark and light modes;
 
 The adoption comparisons are standalone named sections with h2 headings.
 Their shared App studio controller preserves the comparison iterations.
+
+### Token flow visualization
+
+The shared/connected foundation views use the hero's token icons and shared contrast-balanced
+palette in both themes. Three chip groups converge into Nexus core; five labeled
+framework branches follow below. The existing framework playground remains
+available in DialKit.
+
+Guidance: Modern Web Guidance `motion` (retrieved 2026-10-21). The diagram uses
+small SVG dash pulses to communicate direction, with an explicit pause control;
+Nexus's explicit `reduceMotion` preference stops them without environment queries.
+Container styling adjusts chip and framework sizes while preserving the same flow.
+Verified in the local homepage preview at 1280px and 390px, with no horizontal
+overflow, and with the pause interaction. Light and dark themes were inspected.
+
+DialKit's `Horizontal pipeline` comparison keeps the same chips, core, palette,
+frameworks, and pause control. At a framework container width of 56rem or more,
+it presents a left-to-right pipeline; narrower containers keep the vertical flow.
+Reuses the motion guidance above. Verified the pipeline and restoration of Shared
+foundation through DialKit's runtime store at 1280px, plus 390px reflow without
+horizontal overflow. Concentric boundaries is the default; Shared foundation remains available for comparison.
+
+`Individual connections` adds twelve separate chip-to-core paths, routed down
+reserved gutters beside each chip column. Fixed row tracks keep the SVG endpoints
+aligned with chip centers at both container sizes. It preserves the full-width
+core and existing framework fan-out. Reuses the motion guidance and pause behavior
+above; checked all twelve paths, pause, and chip fit at 1095px and 390px.
+
+`Interactive flow` builds on Individual connections. Native chip buttons select
+one input path; its palette carries through the core and all five output paths.
+Pressed state and a polite core caption expose the selection without relying on
+color alone. The other comparison layouts remain static chips. Reuses the motion
+guidance above; verified pointer selection, Enter activation, exactly one selected
+input path, and 390px reflow. Explicit reduced motion and Pause flow retain static
+selection feedback.
+
+`Concentric boundaries` places the framework logos immediately below the section
+copy, above a Nexus core boundary enclosing a separate design-token boundary.
+Curved pulse lines travel upward from core to frameworks. Rounded nested panels
+keep twelve labels legible without a circular layout. The explicit reduced-motion preference stops the pulses; this iteration has no
+visible pause control. Outer and inner radii are 16px and 11px at the default
+root size across breakpoints, and its caption is 14px. Verified twelve chips and no overflow at 1095px and 390px.

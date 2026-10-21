@@ -109,39 +109,48 @@
   background: var(--rotating-paper);
   color: var(--rotating-ink);
 }
-.rotating-headline-journey .journey-color-0 {
+:is(.rotating-headline-journey, .token-flow) .journey-color-0,
+.token-flow.journey-color-0 {
   --rotating-paper: #c4c9f8;
   --rotating-ink: #11152b;
 }
-.rotating-headline-journey .journey-color-1 {
+:is(.rotating-headline-journey, .token-flow) .journey-color-1,
+.token-flow.journey-color-1 {
   --rotating-paper: #ffc279;
   --rotating-ink: #281a0c;
 }
-.rotating-headline-journey .journey-color-2 {
+:is(.rotating-headline-journey, .token-flow) .journey-color-2,
+.token-flow.journey-color-2 {
   --rotating-paper: #ffbeb0;
   --rotating-ink: #2b1510;
 }
-.rotating-headline-journey .journey-color-3 {
+:is(.rotating-headline-journey, .token-flow) .journey-color-3,
+.token-flow.journey-color-3 {
   --rotating-paper: #79deeb;
   --rotating-ink: #0c2529;
 }
-.rotating-headline-journey .journey-color-4 {
+:is(.rotating-headline-journey, .token-flow) .journey-color-4,
+.token-flow.journey-color-4 {
   --rotating-paper: #f8d75c;
   --rotating-ink: #27220c;
 }
-.rotating-headline-journey .journey-color-5 {
+:is(.rotating-headline-journey, .token-flow) .journey-color-5,
+.token-flow.journey-color-5 {
   --rotating-paper: #cbcfca;
   --rotating-ink: #1a2019;
 }
-.rotating-headline-journey .journey-color-6 {
+:is(.rotating-headline-journey, .token-flow) .journey-color-6,
+.token-flow.journey-color-6 {
   --rotating-paper: #d6c6f1;
   --rotating-ink: #21172d;
 }
-.rotating-headline-journey .journey-color-7 {
+:is(.rotating-headline-journey, .token-flow) .journey-color-7,
+.token-flow.journey-color-7 {
   --rotating-paper: #9cddc0;
   --rotating-ink: #10271c;
 }
-.rotating-headline-journey .journey-color-8 {
+:is(.rotating-headline-journey, .token-flow) .journey-color-8,
+.token-flow.journey-color-8 {
   --rotating-paper: #c6e557;
   --rotating-ink: #20280b;
 }
