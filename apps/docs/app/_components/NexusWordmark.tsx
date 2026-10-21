@@ -2,9 +2,9 @@ export function NexusWordmark() {
   return (
     <svg
       xmlns="http://www.w3.org/2000/svg"
-      viewBox="0 0 204 72"
-      width="68"
-      height="24"
+      viewBox="0 0 374 72"
+      width="96"
+      height="18.432"
       aria-hidden="true"
       focusable="false"
       className="nx:block nx:shrink-0"
@@ -25,6 +25,17 @@ export function NexusWordmark() {
           height="16"
           rx="3"
           fill="currentColor"
+        />
+      </g>
+      <g fill="currentColor" transform="translate(8 8)">
+        <path
+          transform="translate(200)"
+          fillRule="evenodd"
+          d="M3 0H54A20 20 0 0 1 74 20V36A20 20 0 0 1 54 56H3A3 3 0 0 1 0 53V3A3 3 0 0 1 3 0Z M17 14A3 3 0 0 0 14 17V39A3 3 0 0 0 17 42H54A6 6 0 0 0 60 36V20A6 6 0 0 0 54 14Z"
+        />
+        <path
+          transform="translate(284)"
+          d="M69 0A3 3 0 0 1 72 3V11A3 3 0 0 1 69 14H17.5A3.5 3.5 0 0 0 17.5 21H56.5A17.5 17.5 0 0 1 56.5 56H3A3 3 0 0 1 0 53V45A3 3 0 0 1 3 42H56.5A3.5 3.5 0 0 0 56.5 35H17.5A17.5 17.5 0 0 1 17.5 0Z"
         />
       </g>
     </svg>

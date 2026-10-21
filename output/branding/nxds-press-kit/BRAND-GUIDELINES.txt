@@ -3,24 +3,24 @@ NEXUS DESIGN SYSTEM — BRAND FOUNDATION
 
 CONFIRMED IDENTITY
 Public product name: Nexus Design System. Short handle: nxds. Company: Nexus Labs.
-Use nx: as the sole logo and icon mark. This supersedes nx:Ds, the stacked NXDS badge, framed marks, and all Conthrax experiments.
+Website header: use the full nx:ds wordmark with the approved lowercase-height D shape. Standalone logo and icons: use nx:. Both share the approved 16-unit n and lighter x. The stacked NXDS badge, frames, and Conthrax experiments are retired.
 Original vector artwork, with no font dependency. No border or enclosing badge.
 
 LOCKED GEOMETRY
 n: 76 × 56 units; 16-unit stems and top band; concentric outer R20 and inner R4 curves; R3 terminal corners.
 x: approved lighter B outline, circular R3 fillets at tips and inner joins. Preserve the supplied paths, including optical corrections.
 Colon: two 16-unit squares with R3 corners, at y=6 and y=34. Keep the spacing as supplied.
-Logo viewBox: 204 × 72, including 8-unit internal clear space. Website header: 68 × 24 CSS px.
+Logo viewBox: 204 × 72, including 8-unit internal clear space. Standalone logo preview: 68 × 24 CSS px. Website wordmark: viewBox 374 × 72, displayed at 96 × 18.432 CSS px.
 Square icon viewBox: 224 × 224; unchanged mark centered at (18,84). Do not stretch the horizontal mark into a square.
 Both themes share identical paths. Website logo inherits navigation foreground via currentColor. Standalone light-background ink #171717; dark-background ink #FAFAFA.
 
 USAGE AND ASSETS
-Header: nx: alone, accessible link name “Nexus Design System home”.
+Header: full nx:ds wordmark, accessible link name “Nexus Design System home”.
 Favicon, app icon and social avatar: the same nx: mark centered within a square canvas. PNG/ICO variants include an opaque background for reliable contrast; SVG variants are transparent.
 Small favicons contain a wide mark at limited resolution; use the supplied exports rather than squeezing or rearranging the letters.
 Source master: source/mark.svg. Logo/icon exports: svg/. PNG sizes: png/. Browser icons: favicon/.
 Website source: apps/docs/app/_components/NexusWordmark.tsx and apps/docs/public/brand/nx-*.svg.
-Preserve aspect ratio, spacing, rounded corners and paths. Do not add a frame or restore D/s. No theme-specific geometry changes.
+Preserve aspect ratio, spacing, rounded corners and paths. Do not add a frame. D/s are used only in the full website wordmark. No theme-specific geometry changes.
 
 APPROVED TYPOGRAPHY — OPTION B
 Headings, body text and standalone product name: DM Sans.

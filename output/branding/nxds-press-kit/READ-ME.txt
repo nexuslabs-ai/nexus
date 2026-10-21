@@ -1,8 +1,8 @@
 NEXUS DESIGN SYSTEM — PRESS KIT
 Locked nx: identity | 21 October 2026
 
-Use nx: for the logo and icon. No border. Original vector artwork, no font dependency.
-Includes the approved 16-unit n and lighter x. D/s and the old stacked badge are retired.
+Use nx: for the standalone logo and icon; use the full nx:ds wordmark in the website header. No border. Original vector artwork, no font dependency.
+Includes the approved 16-unit n and lighter x. The D/s letterforms are retained only for the website wordmark; the old stacked badge is retired.
 
 svg/: transparent logo and square icon masters, light/dark variants.
 png/: logo exports and square icon exports.
