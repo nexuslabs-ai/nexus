@@ -1,5 +1,11 @@
 # @nxds/eslint-plugin
 
+## 0.5.0
+
+### Minor Changes
+
+- e743cb7: Rename the config helpers from `nexus*` to `nxds*`: `nxdsComponentConfig`, `nxdsSpacingTokenConfig` and `nxdsTailwindClassesConfig`.
+
 ## 0.4.0
 
 ### Minor Changes

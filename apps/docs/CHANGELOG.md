@@ -1,5 +1,13 @@
 # @nxds/docs
 
+## 0.0.13
+
+### Patch Changes
+
+- Updated dependencies [e743cb7]
+  - @nxds/core@0.8.0
+  - @nxds/react@0.4.4
+
 ## 0.0.12
 
 ### Patch Changes
