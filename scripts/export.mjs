@@ -67,8 +67,10 @@ export function deriveScope(name, explicitScope) {
 
 function pickScope(name, explicitScope) {
   if (explicitScope) {
-    if (!explicitScope.startsWith('@')) {
-      throw new Error(`--scope must start with "@" (got "${explicitScope}").`);
+    if (!/^@[a-z0-9][a-z0-9-]*$/.test(explicitScope)) {
+      throw new Error(
+        `--scope must be a lowercase npm scope like "@acme" (got "${explicitScope}").`
+      );
     }
     return explicitScope;
   }
