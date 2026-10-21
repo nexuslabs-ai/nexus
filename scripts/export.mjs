@@ -45,7 +45,7 @@ export const POLICY_PRESETS = {
   // End-users pick; their choice persists to localStorage.
   user: { storageKey: 'nxds-appearance' },
   // Appearance seeded per request via cookie (multi-tenant SSR).
-  tenant: { cookieWriteKey: 'nxds-appearance' },
+  tenant: { cookieWriteKey: 'nxds-appearance-state' },
 };
 
 export const POLICY_OPTIONS = Object.keys(POLICY_PRESETS);

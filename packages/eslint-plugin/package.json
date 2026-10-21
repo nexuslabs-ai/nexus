@@ -4,7 +4,7 @@
   "type": "module",
   "description": "ESLint rules that enforce nxds conventions in copied components.",
   "keywords": [
-    "nxds-ui",
+    "nxds",
     "design-system",
     "eslint",
     "eslintplugin",

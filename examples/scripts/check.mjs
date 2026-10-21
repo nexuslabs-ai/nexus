@@ -94,7 +94,7 @@ function copyApp(label) {
   return path.join(root, path.relative(rootDir, appDir));
 }
 
-function removenxds(dir) {
+function removeNxds(dir) {
   writeFileSync(path.join(dir, config.cssEntry), '');
   for (const module of config.providerModules) writeFileSync(path.join(dir, module), PROVIDER_STUB);
 }
@@ -143,13 +143,13 @@ function readHostElements(properties) {
   // An nxds component renders nx: classes; anything it renders is not host UI,
   // even inside a host section. A host-marked nxds element still lets its
   // children count, so a host input inside an nxds dialog body is measured.
-  const isnxds = (node) => [...node.classList].some((name) => name.startsWith('nx:'));
+  const isNxds = (node) => [...node.classList].some((name) => name.startsWith('nx:'));
   const isHost = (element) => {
     const scope = element.closest('[data-check]');
     if (scope?.dataset.check !== 'host') return false;
-    if (element === scope) return !isnxds(element);
+    if (element === scope) return !isNxds(element);
     for (let node = element; node !== scope; node = node.parentElement) {
-      if (isnxds(node)) return false;
+      if (isNxds(node)) return false;
     }
     return true;
   };
@@ -191,7 +191,7 @@ async function snapshot(page, url) {
 try {
   const before = copyApp('before');
   const after = copyApp('after');
-  removenxds(before);
+  removeNxds(before);
   console.log('building the app without nxds…');
   build(before);
   // A Vite app injects the first-paint script at build time, marked data-nxds-appearance.
