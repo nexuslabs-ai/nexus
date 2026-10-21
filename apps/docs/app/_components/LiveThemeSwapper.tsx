@@ -1,6 +1,6 @@
 'use client';
 
-import { useNexusAppearance } from '@nexus_ds/react/appearance';
+import { useNexusAppearance } from '@nxds/react/appearance';
 
 import {
   getThemeModeOptions,

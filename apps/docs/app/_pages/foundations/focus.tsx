@@ -5,7 +5,7 @@ import { Button, Checkbox, Input, Switch } from '../../_components/nexus';
 /**
  * Foundations → Focus. Server component — the focus-ring contract: three
  * recipes, the two-halved field ring, and where the ring deliberately does not
- * go. The specimens are @nexus_ds/react client islands, so Tab actually walks
+ * go. The specimens are @nxds/react client islands, so Tab actually walks
  * them; the field ring reacts to the picker's Border Width control because both of
  * its halves read the same borderwidth primitive.
  *

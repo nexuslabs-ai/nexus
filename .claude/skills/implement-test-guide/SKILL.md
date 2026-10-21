@@ -42,7 +42,7 @@ Nexus tests only four kinds of thing — see `.claude/rules/testing.md` § Scope
 | React components     | `packages/react/src/components/`                     | Story-first: play functions in `*.stories.tsx`                      |
 | Core engine          | `packages/core/src/lib/`                             | Vitest behaviour tests — thresholds and invariants, never snapshots |
 | `cn` merge           | `packages/react/src/lib/utils.ts`                    | Vitest, in `utils.test.ts`                                          |
-| ESLint rules         | `packages/eslint-plugin-nexus/`                      | `RuleTester` valid/invalid cases in `__tests__/`                    |
+| ESLint rules         | `packages/eslint-plugin/`                            | `RuleTester` valid/invalid cases in `__tests__/`                    |
 | Apps, scripts, hooks | `apps/`, `scripts/`, `packages/*/scripts/`, `hooks/` | No tests — stop and tell the user                                   |
 
 ## Base Rules

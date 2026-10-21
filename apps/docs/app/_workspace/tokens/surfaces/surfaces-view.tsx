@@ -2,12 +2,12 @@
 
 import { useId } from 'react';
 
-import type { SemanticColorName } from '@nexus_ds/core';
+import type { SemanticColorName } from '@nxds/core';
 import {
   DARK_SURFACE_LADDER,
   LIGHT_SURFACE_LADDER,
   SURFACE_TOKENS,
-} from '@nexus_ds/core/catalogue';
+} from '@nxds/core/catalogue';
 import {
   Badge,
   Input,
@@ -18,7 +18,7 @@ import {
   TableHeader,
   TableRow,
   TableRowHeader,
-} from '@nexus_ds/react';
+} from '@nxds/react';
 
 import { PageHeading } from '../../page-heading';
 import { useWorkspaceLocation } from '../../use-workspace-location';

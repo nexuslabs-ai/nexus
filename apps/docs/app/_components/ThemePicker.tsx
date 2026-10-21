@@ -2,8 +2,8 @@
 
 import { useEffect, useId, useRef, useState } from 'react';
 
-import { useNexusAppearance } from '@nexus_ds/react/appearance';
-import { cn } from '@nexus_ds/react/utils';
+import { useNexusAppearance } from '@nxds/react/appearance';
+import { cn } from '@nxds/react/utils';
 import { usePathname } from 'next/navigation';
 
 import {

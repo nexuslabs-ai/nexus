@@ -12,7 +12,7 @@ import {
   SheetTitle,
   SheetTrigger,
   Show,
-} from '@nexus_ds/react';
+} from '@nxds/react';
 
 export interface WorkspaceLayoutProps {
   /** Names the side-panel landmark and titles the narrow-screen sheet. */

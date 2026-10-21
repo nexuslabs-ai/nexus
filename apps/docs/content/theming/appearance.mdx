@@ -6,7 +6,7 @@ export const description =
 Appearance is one object that sets your app's whole theme: colors, density,
 corners, shadows, borders and font preferences.
 
-`@nexus_ds/core` turns that object into the theme's CSS. The examples import
+`@nxds/core` turns that object into the theme's CSS. The examples import
 the provider you copied in
 [Install](/getting-started/install#step-3-add-the-appearance-provider).
 
@@ -79,7 +79,7 @@ it, including hover and pressed shades.
 import {
   DEFAULT_NEXUS_APPEARANCE,
   type NexusAppearanceState,
-} from '@nexus_ds/core';
+} from '@nxds/core';
 
 export const defaultAppearance = {
   ...DEFAULT_NEXUS_APPEARANCE,
@@ -98,7 +98,7 @@ component:
 // components/brand-editor.tsx
 'use client';
 
-import { DEFAULT_BRAND_COLOR } from '@nexus_ds/core';
+import { DEFAULT_BRAND_COLOR } from '@nxds/core';
 import { useState } from 'react';
 
 import { NexusAppearanceBrandColorField } from '@/components/appearance/brand-color-field/brand-color-field';
@@ -120,7 +120,7 @@ The field offers nine presets (Default, Indigo, Blue, Violet, Rose, Orange,
 Amber, Green and Teal), a color picker and a hex input. A color that matches no preset shows as
 **Custom**.
 
-To build your own picker, `@nexus_ds/core` exports the presets:
+To build your own picker, `@nxds/core` exports the presets:
 
 | Export                             | Returns                                                |
 | ---------------------------------- | ------------------------------------------------------ |

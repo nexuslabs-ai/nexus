@@ -10,7 +10,7 @@ import {
   type NexusAppearancePrefs,
   type NexusAppearanceState,
   STROKE_OPTIONS,
-} from '@nexus_ds/core';
+} from '@nxds/core';
 import {
   Input,
   Label,
@@ -19,8 +19,8 @@ import {
   NexusAppearanceBrandColorField,
   Slider,
   Switch,
-} from '@nexus_ds/react';
-import type { NexusResolvedAppearanceMode } from '@nexus_ds/react/appearance';
+} from '@nxds/react';
+import type { NexusResolvedAppearanceMode } from '@nxds/react/appearance';
 
 import { THEME_MODE_OPTIONS } from '../_lib/appearance-controls';
 

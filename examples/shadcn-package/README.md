@@ -31,7 +31,7 @@ npx vite preview
 
 After rebuilding `ui/`, delete the app's `node_modules/@acme/ui` and run
 `npm install`. npm does not reinstall a `file:` package whose version has not
-changed. The same goes for `node_modules/@nexus_ds/core` after a change to
+changed. The same goes for `node_modules/@nxds/core` after a change to
 `packages/core`.
 
 ## How the package ships Nexus
@@ -44,7 +44,7 @@ changed. The same goes for `node_modules/@nexus_ds/core` after a change to
 | `@acme/ui/nexus.css` | The Nexus Tailwind entry |
 
 `tsc` compiles `src/` to `dist/`, keeping each file's `'use client'`.
-`@nexus_ds/core` is a peer dependency, so the app installs the one copy of the
+`@nxds/core` is a peer dependency, so the app installs the one copy of the
 engine that the provider and its own code share. The CSS
 ships as source, and the app compiles it. Both entries end with
 `@source './'`: Tailwind skips `node_modules` when it scans for classes, so

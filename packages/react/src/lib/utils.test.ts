@@ -245,7 +245,7 @@ describe('cn', () => {
     );
   });
 
-  /* eslint-disable @nexus_ds/nx-class-conventions -- the raw atomics are the
+  /* eslint-disable @nxds/nx-class-conventions -- the raw atomics are the
      subject under test: they are what the composite has to displace. */
   it.each([
     ['font-family', 'nx:font-mono'],
@@ -259,7 +259,7 @@ describe('cn', () => {
       'nx:typography-heading-large'
     );
   });
-  /* eslint-enable @nexus_ds/nx-class-conventions -- end of the raw-atomics block */
+  /* eslint-enable @nxds/nx-class-conventions -- end of the raw-atomics block */
 
   it('conflicts with exactly the groups the typography composites declare', () => {
     const declared = new Set(

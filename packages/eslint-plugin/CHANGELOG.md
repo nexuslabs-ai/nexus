@@ -1,4 +1,4 @@
-# @nexus_ds/eslint-plugin
+# @nxds/eslint-plugin
 
 ## 0.4.0
 

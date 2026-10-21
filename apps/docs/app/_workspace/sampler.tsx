@@ -29,7 +29,7 @@ import {
   SelectTrigger,
   SelectValue,
   Switch,
-} from '@nexus_ds/react';
+} from '@nxds/react';
 
 const FIELD_CLASS = 'nx:flex nx:flex-col nx:gap-2';
 

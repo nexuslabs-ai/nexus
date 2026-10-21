@@ -2,8 +2,8 @@
 
 import { useState } from 'react';
 
-import type { NexusAppearanceState } from '@nexus_ds/core';
-import { useNexusAppearance } from '@nexus_ds/react/appearance';
+import type { NexusAppearanceState } from '@nxds/core';
+import { useNexusAppearance } from '@nxds/react/appearance';
 
 import { DOCS_APPEARANCE_DEFAULT_STATE } from '../_lib/appearance-controls';
 

@@ -42,7 +42,7 @@ export function importSpecifiers(source) {
 
 const COMPONENT_SPECIFIER = './components/';
 
-/** Every component `@nexus_ds/react` exports, by its folder slug, sorted. */
+/** Every component `@nxds/react` exports, by its folder slug, sorted. */
 export function exportedComponentSlugs() {
   const index = readFileSync(path.join(reactSrc, 'index.ts'), 'utf8');
   const slugs = importSpecifiers(index)

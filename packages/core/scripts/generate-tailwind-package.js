@@ -723,7 +723,7 @@ export async function generateTailwindPackage(
 }
 
 if (process.argv[1] === fileURLToPath(import.meta.url)) {
-  console.log('🎨 Generating @nexus_ds/tailwind package from DTCG tokens...');
+  console.log('🎨 Generating @nxds/tailwind package from DTCG tokens...');
   const engine = await loadDistRuntimeEngine();
   const cliConfig = parseArgs(process.argv.slice(2), {
     allowedKeys: [
@@ -739,5 +739,5 @@ if (process.argv[1] === fileURLToPath(import.meta.url)) {
   });
   await generateTailwindPackage(cliConfig, { engine });
   console.log('');
-  console.log('✨ @nexus_ds/tailwind package generation complete!');
+  console.log('✨ @nxds/tailwind package generation complete!');
 }

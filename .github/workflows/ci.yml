@@ -70,7 +70,7 @@ jobs:
       # Reads two manifests and needs no build, so it runs before the ESLint
       # cache restore — a lint failure must not hide a grammar skew.
       - name: Docs grammar pin
-        run: pnpm --filter @nexus_ds/docs audit:grammar-pin
+        run: pnpm --filter @nxds/docs audit:grammar-pin
 
       - name: Agent drift audit
         run: pnpm audit:agent-drift
@@ -79,9 +79,9 @@ jobs:
         uses: actions/cache@v4
         with:
           path: .eslintcache
-          key: eslint-${{ runner.os }}-${{ hashFiles('pnpm-lock.yaml', 'eslint.config.js', 'packages/eslint-plugin-nexus/src/**') }}-${{ github.sha }}
+          key: eslint-${{ runner.os }}-${{ hashFiles('pnpm-lock.yaml', 'eslint.config.js', 'packages/eslint-plugin/src/**') }}-${{ github.sha }}
           restore-keys: |
-            eslint-${{ runner.os }}-${{ hashFiles('pnpm-lock.yaml', 'eslint.config.js', 'packages/eslint-plugin-nexus/src/**') }}-
+            eslint-${{ runner.os }}-${{ hashFiles('pnpm-lock.yaml', 'eslint.config.js', 'packages/eslint-plugin/src/**') }}-
             eslint-${{ runner.os }}-
 
       - name: Lint
@@ -127,10 +127,10 @@ jobs:
           pnpm turbo build
           node scripts/audit-turbo-outputs.js --post-build
 
-      # Reads the built @nexus_ds/core runtime's token registry, so it
+      # Reads the built @nxds/core runtime's token registry, so it
       # runs after the build rather than beside the token regeneration.
       - name: Tailwind class-ref audit
-        run: pnpm --filter @nexus_ds/core audit:class-refs
+        run: pnpm --filter @nxds/core audit:class-refs
 
       # The build step's docs JSON and page manifest may be a turbo cache
       # restore; regenerating them outside turbo catches a stale cache
@@ -140,9 +140,9 @@ jobs:
           set -euo pipefail
           mkdir "$RUNNER_TEMP/docs-generated-build"
           cp -r apps/docs/generated apps/docs/app/_lib/*.generated.ts "$RUNNER_TEMP/docs-generated-build"
-          pnpm --filter @nexus_ds/docs generate:props
-          pnpm --filter @nexus_ds/docs generate:dependencies
-          pnpm --filter @nexus_ds/docs generate:manifest
+          pnpm --filter @nxds/docs generate:props
+          pnpm --filter @nxds/docs generate:dependencies
+          pnpm --filter @nxds/docs generate:manifest
           mkdir "$RUNNER_TEMP/docs-generated-fresh"
           cp -r apps/docs/generated apps/docs/app/_lib/*.generated.ts "$RUNNER_TEMP/docs-generated-fresh"
           if ! diff -r "$RUNNER_TEMP/docs-generated-build" "$RUNNER_TEMP/docs-generated-fresh"; then
@@ -152,8 +152,8 @@ jobs:
 
       - name: Docs CSP inventory
         run: |
-          pnpm turbo build --filter=@nexus_ds/docs
-          pnpm --filter @nexus_ds/docs audit:csp
+          pnpm turbo build --filter=@nxds/docs
+          pnpm --filter @nxds/docs audit:csp
 
       - name: Upload docs site
         if: (github.event_name == 'push' || github.event_name == 'workflow_dispatch') && github.ref == 'refs/heads/main'
@@ -214,10 +214,10 @@ jobs:
         run: pnpm turbo typecheck
 
       - name: Core runtime export contract
-        run: pnpm --filter @nexus_ds/core audit:runtime-exports
+        run: pnpm --filter @nxds/core audit:runtime-exports
 
       - name: Core dist-type contract
-        run: pnpm --filter @nexus_ds/core typecheck:dist
+        run: pnpm --filter @nxds/core typecheck:dist
 
       - name: Tailwind and CSS export contract
         run: node scripts/typecheck-tailwind-dist.mjs
@@ -280,7 +280,7 @@ jobs:
       # and the live union across spacing-*.json. Same fail-fast tier as
       # the validator above — stdlib-only, sub-second.
       - name: Check canonical step set freshness
-        run: pnpm --filter @nexus_ds/eslint-plugin refresh:canonical-set --check
+        run: pnpm --filter @nxds/eslint-plugin refresh:canonical-set --check
 
       - name: Regenerate token outputs (tailwind)
         id: regen
@@ -304,7 +304,7 @@ jobs:
 
       - name: APCA contrast vitest sweep
         if: ${{ !cancelled() && steps.regen.conclusion == 'success' }}
-        run: pnpm --filter @nexus_ds/core audit:contrast
+        run: pnpm --filter @nxds/core audit:contrast
 
       - name: Color-blind audit
         if: ${{ !cancelled() && steps.regen.conclusion == 'success' }}
@@ -337,11 +337,11 @@ jobs:
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
 
-      # The AdjustContrast story imports @nexus_ds/core, which is consumed via
+      # The AdjustContrast story imports @nxds/core, which is consumed via
       # its built dist/runtime entry (package.json exports). Build it so
       # Storybook/Vite can resolve the package during the story tests.
-      - name: Build @nexus_ds/core
-        run: pnpm --filter @nexus_ds/core build
+      - name: Build @nxds/core
+        run: pnpm --filter @nxds/core build
 
       - name: Cache Playwright browsers
         uses: actions/cache@v4

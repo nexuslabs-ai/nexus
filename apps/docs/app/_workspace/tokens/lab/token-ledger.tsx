@@ -9,7 +9,7 @@ import {
   type ThemeContrastCheck,
   type TokenCategory,
   type TokenMap,
-} from '@nexus_ds/core';
+} from '@nxds/core';
 import {
   Accordion,
   AccordionContent,
@@ -24,7 +24,7 @@ import {
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from '@nexus_ds/react';
+} from '@nxds/react';
 
 import { Swatch } from '../swatch';
 import type { LiveTheme } from '../use-live-theme';

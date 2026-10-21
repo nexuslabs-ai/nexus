@@ -424,7 +424,7 @@ export const FieldBorderWidthModes: Story = {
  * an element that paints a real ring fades it up from its resting colour over
  * the duration instead of landing it with the keypress. `transition-control`
  * and `transition-field` are the ring-safe replacements, generated from
- * `@nexus_ds/core`. They are asserted on the compiled `transition-property`
+ * `@nxds/core`. They are asserted on the compiled `transition-property`
  * rather than the class name: if either `@utility` stopped emitting, the class
  * would resolve to nothing and the property would fall back to its `all`
  * initial value — which transitions the ring again, silently.

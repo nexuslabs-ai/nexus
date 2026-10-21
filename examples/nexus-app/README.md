@@ -51,7 +51,7 @@ The same four steps as the Install page:
    `nx:typography-body-default`, so page text follows the appearance settings.
 4. `lib/utils.ts` for `cn`.
 
-`npm run nexus:add` also installs `@nexus_ds/core` from `packages/core`, so the
+`npm run nexus:add` also installs `@nxds/core` from `packages/core`, so the
 app runs this repository's engine.
 
 All of the app's own markup uses `nx:` utilities and Nexus tokens, such as

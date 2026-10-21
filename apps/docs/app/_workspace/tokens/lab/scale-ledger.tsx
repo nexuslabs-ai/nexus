@@ -6,7 +6,7 @@ import type {
   NexusAppearancePrefs,
   NexusAppearanceState,
   TokenMap,
-} from '@nexus_ds/core';
+} from '@nxds/core';
 import {
   Accordion,
   AccordionContent,
@@ -15,7 +15,7 @@ import {
   Badge,
   Button,
   Input,
-} from '@nexus_ds/react';
+} from '@nxds/react';
 
 import type { ScaleFamily, ScaleToken } from './lab-data';
 import { LEDGER_ROW_CLASS } from './token-ledger';

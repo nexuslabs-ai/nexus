@@ -91,7 +91,7 @@ Steps 1, 2 and 4 are the same on Vite.
 Install the theme engine:
 
 ```bash
-npm install @nexus_ds/core
+npm install @nxds/core
 ```
 
 Copy the provider folder into `components/appearance/provider/`:
@@ -113,7 +113,7 @@ fields you want:
 import {
   DEFAULT_NEXUS_APPEARANCE,
   type NexusAppearanceState,
-} from '@nexus_ds/core';
+} from '@nxds/core';
 
 export const defaultAppearance = {
   ...DEFAULT_NEXUS_APPEARANCE,
@@ -236,7 +236,7 @@ same `storageKey`. With different keys, they load different themes.
 
 ## Set up Vite
 
-On Vite, this section replaces step 3. Install `@nexus_ds/core`, copy the
+On Vite, this section replaces step 3. Install `@nxds/core`, copy the
 provider into `src/components/appearance/provider/`, and create
 `src/appearance-state.ts` as in step 3.
 
@@ -248,7 +248,7 @@ build time:
 import {
   createNexusAppearanceBootstrapScript,
   createNexusAppearanceSnapshotFromState,
-} from '@nexus_ds/core';
+} from '@nxds/core';
 import react from '@vitejs/plugin-react';
 import { defineConfig } from 'vite';
 
@@ -313,7 +313,7 @@ one:
 import {
   createNexusAppearanceSnapshotFromCookie,
   DEFAULT_COOKIE_KEY,
-} from '@nexus_ds/core';
+} from '@nxds/core';
 import { cookies } from 'next/headers';
 
 import { NexusAppearanceProvider } from '@/components/appearance/provider';
@@ -440,12 +440,12 @@ app and a company package.
 The Nexus ESLint rules keep copied components following Nexus conventions:
 
 ```bash
-npm install -D @nexus_ds/eslint-plugin
+npm install -D @nxds/eslint-plugin
 ```
 
 ```js
 // eslint.config.mjs
-import { nexusComponentConfig } from '@nexus_ds/eslint-plugin/config';
+import { nexusComponentConfig } from '@nxds/eslint-plugin/config';
 
 const eslintConfig = [
   // ...your existing config

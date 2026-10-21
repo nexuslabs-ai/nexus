@@ -1,7 +1,7 @@
 import {
   createNexusAppearanceBootstrapScript,
   createNexusAppearanceSnapshotFromState,
-} from '@nexus_ds/core';
+} from '@nxds/core';
 import { createHash } from 'node:crypto';
 
 import {

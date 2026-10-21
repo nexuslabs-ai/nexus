@@ -21,7 +21,7 @@ export type GuideSection = SectionBase & {
 };
 
 /**
- * Its pages are not listed here: there is one per component `@nexus_ds/react`
+ * Its pages are not listed here: there is one per component `@nxds/react`
  * exports, generated from its stories tagged `docs` (see `scripts/page-manifest.mjs`).
  */
 export type ComponentsSection = SectionBase & {

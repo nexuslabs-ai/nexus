@@ -3,7 +3,7 @@
   "compilerOptions": {
     "baseUrl": ".",
     "paths": {
-      "@nexus_ds/react": ["packages/react/src"]
+      "@nxds/react": ["packages/react/src"]
     }
   },
   "references": [{ "path": "./packages/react" }],

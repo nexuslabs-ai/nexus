@@ -8,10 +8,10 @@ not the article chrome.
 
 From the repository root:
 
-- `pnpm --filter @nexus_ds/docs dev`
-- `pnpm --filter @nexus_ds/docs typecheck`
-- `pnpm --filter @nexus_ds/docs build`
-- `pnpm --filter @nexus_ds/docs audit:csp` — after a production build.
+- `pnpm --filter @nxds/docs dev`
+- `pnpm --filter @nxds/docs typecheck`
+- `pnpm --filter @nxds/docs build`
+- `pnpm --filter @nxds/docs audit:csp` — after a production build.
 
 ## Playground
 

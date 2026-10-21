@@ -23,7 +23,7 @@ const readPropsJson = cache(async (fileName: string): Promise<unknown> => {
     const missing = (error as NodeJS.ErrnoException).code === 'ENOENT';
     throw new Error(
       missing
-        ? `No props JSON at ${filePath} — run \`pnpm --filter @nexus_ds/docs generate:props\`.`
+        ? `No props JSON at ${filePath} — run \`pnpm --filter @nxds/docs generate:props\`.`
         : `Could not read ${filePath}.`,
       { cause: error }
     );

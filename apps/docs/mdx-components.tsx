@@ -1,4 +1,4 @@
-import { cn } from '@nexus_ds/react/utils';
+import { cn } from '@nxds/react/utils';
 import type { MDXComponents } from 'mdx/types';
 
 import { CodeBlock } from './app/_components/CodeBlock';
@@ -16,7 +16,7 @@ import { PropsTable } from './app/_components/PropsTable';
 /**
  * Required by @next/mdx in the App Router. Maps Markdown-rendered HTML to
  * Nexus-styled elements (typography utilities, semantic tokens) and exposes
- * the @nexus_ds/react components so MDX authors can drop a live <Button> etc.
+ * the @nxds/react components so MDX authors can drop a live <Button> etc.
  * into prose with no import.
  */
 export function useMDXComponents(components: MDXComponents): MDXComponents {
@@ -134,7 +134,7 @@ export function useMDXComponents(components: MDXComponents): MDXComponents {
     ComponentDemo,
     InstallBlock,
     PropsTable,
-    // live @nexus_ds/react components, usable in MDX without an import
+    // live @nxds/react components, usable in MDX without an import
     ...Nexus,
     // caller-provided overrides win
     ...components,

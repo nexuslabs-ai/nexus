@@ -165,10 +165,10 @@ const meta = {
           <p>
             Use these parts directly for an editor the blocks do not provide,
             such as Location / within / a distance opening a location-and-radius
-            editor. Import the parts from @nexus_ds/react. Supply your own
-            editor, controlled values, open state, validation, and focus after
-            removal. Use FilterChip when editing happens elsewhere and the chip
-            only removes.
+            editor. Import the parts from @nxds/react. Supply your own editor,
+            controlled values, open state, validation, and focus after removal.
+            Use FilterChip when editing happens elsewhere and the chip only
+            removes.
           </p>
           <p>
             <a href="/?path=/docs/patterns-filtering--docs" target="_top">

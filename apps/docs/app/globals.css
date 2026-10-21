@@ -1,16 +1,16 @@
 /* Nexus design tokens + Tailwind utilities (nx: prefix).
-   @nexus_ds/tailwind is the SINGLE source of token definitions. Nexus ships
+   @nxds/tailwind is the SINGLE source of token definitions. Nexus ships
    no reset, so the docs bring Tailwind's Preflight like any host app. */
 @layer theme, base, components, utilities;
 @import 'tailwindcss/preflight.css' layer(base);
-@import '@nexus_ds/tailwind';
+@import '@nxds/tailwind';
 /* Animations used by Dialog / Dropdown / Select / Tooltip */
 @import 'tw-animate-css';
 
 /* Generate the nx: utilities used in MDX content and in the shipped
-   @nexus_ds/react components by scanning their source directly. We deliberately do
-   NOT import @nexus_ds/react's prebuilt CSS: it bundles its own copy of every
-   design token and, imported after @nexus_ds/tailwind, would override the live
+   @nxds/react components by scanning their source directly. We deliberately do
+   NOT import @nxds/react's prebuilt CSS: it bundles its own copy of every
+   design token and, imported after @nxds/tailwind, would override the live
    tokens — and silently go stale whenever tokens change but the package isn't
    rebuilt. Tailwind 4 skips node_modules, so the component source is pointed at
    explicitly. Paths are relative to this file. */

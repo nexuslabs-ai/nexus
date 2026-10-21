@@ -1,6 +1,6 @@
 # Testing Rules - React Package
 
-> This file contains testing patterns for `@nexus_ds/react` package.
+> This file contains testing patterns for `@nxds/react` package.
 > For core testing philosophy, see: [testing.md](testing.md)
 
 ## Core Principle
@@ -98,7 +98,7 @@ export const Interactive: Story = {
 
 ## Docs Stories
 
-A component's docs page is generated from its stories tagged `docs` — there is no separate demo file. `pnpm --filter @nexus_ds/docs generate:demos` turns each one into the copy-pasteable code the page shows, and fails with a fix for anything it can't convert.
+A component's docs page is generated from its stories tagged `docs` — there is no separate demo file. `pnpm --filter @nxds/docs generate:demos` turns each one into the copy-pasteable code the page shows, and fails with a fix for anything it can't convert.
 
 - Tag with `tags: ['docs']`. The first tagged story is the page's preview; the rest are its examples, in file order. Reorder exports to change the order; don't rename them.
 - Every exported component needs at least one docs story.

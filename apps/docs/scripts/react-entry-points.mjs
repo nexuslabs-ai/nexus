@@ -52,7 +52,7 @@ export function reactEntryPoints(manifest) {
       const types = typesCondition(target);
       if (!types) {
         throw new Error(
-          `@nexus_ds/react exports "${subpath}" without a "types" entry; its components would be dropped from the props JSON.`
+          `@nxds/react exports "${subpath}" without a "types" entry; its components would be dropped from the props JSON.`
         );
       }
       return path.join(

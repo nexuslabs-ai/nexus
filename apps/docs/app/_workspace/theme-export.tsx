@@ -3,7 +3,7 @@
 import {
   createNexusAppearanceSnapshotFromState,
   type NexusAppearanceState,
-} from '@nexus_ds/core';
+} from '@nxds/core';
 import {
   Button,
   Dialog,
@@ -14,14 +14,14 @@ import {
   DialogHeader,
   DialogTitle,
   DialogTrigger,
-} from '@nexus_ds/react';
-import { useNexusAppearance } from '@nexus_ds/react/appearance';
+} from '@nxds/react';
+import { useNexusAppearance } from '@nxds/react/appearance';
 import Link from 'next/link';
 
 import { CodeBlock } from '../_components/CodeBlock';
 
 function configurationSource(state: NexusAppearanceState) {
-  return `import type { NexusAppearanceState } from '@nexus_ds/core';
+  return `import type { NexusAppearanceState } from '@nxds/core';
 
 export const appearance = ${JSON.stringify(state, null, 2)} satisfies NexusAppearanceState;
 `;

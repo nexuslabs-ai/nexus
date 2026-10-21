@@ -2,7 +2,7 @@
  * `pnpm export` — scaffold a standalone, rebranded design-system MONOREPO from
  * this repo. The produced workspace forks `packages/react` + generates
  * `packages/tailwind` as owned/publishable packages, and depends on the
- * published `@nexus_ds/core` (runtime engine) + `@nexus_ds/eslint-plugin` (dev).
+ * published `@nxds/core` (runtime engine) + `@nxds/eslint-plugin` (dev).
  *
  * Interim stopgap ahead of the CLI (registry + 3-way merge). See issue #541.
  *
@@ -18,13 +18,15 @@ import { fileURLToPath, pathToFileURL } from 'node:url';
 
 import ts from 'typescript';
 
+const UPSTREAM_SCOPE = '@nxds';
+
 // Package names that are PUBLISHED upstream deps — never rebranded into the fork.
-export const KEEP_PACKAGES = ['@nexus_ds/core', '@nexus_ds/eslint-plugin'];
+export const KEEP_PACKAGES = ['@nxds/core', '@nxds/eslint-plugin'];
 
 // Workspace packages forked into the produced repo — rebranded to the target scope.
-export const REBRAND_PACKAGES = ['@nexus_ds/react', '@nexus_ds/tailwind'];
+export const REBRAND_PACKAGES = ['@nxds/react', '@nxds/tailwind'];
 
-// Token-shaping config axes fed to the `@nexus_ds/core` tailwind generator.
+// Token-shaping config axes fed to the `@nxds/core` tailwind generator.
 export const TOKEN_CONFIG_KEYS = [
   'base',
   'brandColor',
@@ -51,11 +53,24 @@ export const POLICY_OPTIONS = Object.keys(POLICY_PRESETS);
 /**
  * Derive an npm scope (`@examlly`) from a product name (`examlly-design-system`)
  * when `--scope` is not given: take the first `-`/`_`-delimited segment.
+ * Rejects the upstream scope, which would leave the fork un-rebranded.
  */
 export function deriveScope(name, explicitScope) {
+  const scope = pickScope(name, explicitScope);
+  if (scope === UPSTREAM_SCOPE) {
+    throw new Error(
+      `Scope "${scope}" is the upstream scope, so the fork would not be rebranded. Pass --scope=@your-scope.`
+    );
+  }
+  return scope;
+}
+
+function pickScope(name, explicitScope) {
   if (explicitScope) {
-    if (!explicitScope.startsWith('@')) {
-      throw new Error(`--scope must start with "@" (got "${explicitScope}").`);
+    if (!/^@[a-z0-9][a-z0-9._-]*$/.test(explicitScope)) {
+      throw new Error(
+        `--scope must be a lowercase npm scope like "@acme" (got "${explicitScope}").`
+      );
     }
     return explicitScope;
   }
@@ -224,14 +239,14 @@ export function parseExportArgs(argv, { validChoices } = {}) {
 
 /**
  * Rebrand copied source: rename ONLY the two forked packages
- * (`@nexus_ds/react`, `@nexus_ds/tailwind`) to the target scope, across every
- * file type (`.ts/.tsx/.css/.json/.md`). `@nexus_ds/core`,
- * `@nexus_ds/eslint-plugin`, the `@nexus_ds/no-render-prop-types` eslint-disable
+ * (`@nxds/react`, `@nxds/tailwind`) to the target scope, across every
+ * file type (`.ts/.tsx/.css/.json/.md`). `@nxds/core`,
+ * `@nxds/eslint-plugin`, the `@nxds/no-render-prop-types` eslint-disable
  * directives, and the `nx:` / `--nx-*` prefixes are left untouched.
  */
 export function rebrandContent(text, scope) {
   return REBRAND_PACKAGES.reduce(
-    (out, pkg) => out.split(pkg).join(pkg.replace('@nexus_ds', scope)),
+    (out, pkg) => out.split(pkg).join(pkg.replace(UPSTREAM_SCOPE, scope)),
     text
   );
 }
@@ -244,23 +259,23 @@ const DEP_FIELDS = [
 ];
 
 /**
- * Guard a produced manifest against un-forked `@nexus_ds/*` deps. After the
- * transform the only `@nexus_ds/*` names that may survive are the published
- * KEEP_PACKAGES; a new workspace dep (e.g. a future `@nexus_ds/icons`) would
+ * Guard a produced manifest against un-forked `@nxds/*` deps. After the
+ * transform the only `@nxds/*` names that may survive are the published
+ * KEEP_PACKAGES; a new workspace dep (e.g. a future `@nxds/icons`) would
  * otherwise ship as an unresolved `workspace:*` range — fail loudly instead.
  */
 function assertNoUnhandledNexusDeps(pkg) {
   const unhandled = [];
   for (const field of DEP_FIELDS) {
     for (const name of Object.keys(pkg[field] ?? {})) {
-      if (name.startsWith('@nexus_ds/') && !KEEP_PACKAGES.includes(name)) {
+      if (name.startsWith('@nxds/') && !KEEP_PACKAGES.includes(name)) {
         unhandled.push(`${field}.${name}`);
       }
     }
   }
   if (unhandled.length > 0) {
     throw new Error(
-      `Unhandled @nexus_ds/* dependency in the forked manifest: ${unhandled.join(', ')}. ` +
+      `Unhandled @nxds/* dependency in the forked manifest: ${unhandled.join(', ')}. ` +
         `Fork it (add to REBRAND_PACKAGES) or keep it published (add to KEEP_PACKAGES).`
     );
   }
@@ -283,12 +298,12 @@ export function transformReactPackageJson(
   delete next['//'];
   next.publishConfig = { access: 'public' };
 
-  if (next.dependencies?.['@nexus_ds/core']) {
-    next.dependencies['@nexus_ds/core'] = `^${coreVersion}`;
+  if (next.dependencies?.['@nxds/core']) {
+    next.dependencies['@nxds/core'] = `^${coreVersion}`;
   }
-  if (next.dependencies?.['@nexus_ds/tailwind']) {
-    const spec = next.dependencies['@nexus_ds/tailwind'];
-    delete next.dependencies['@nexus_ds/tailwind'];
+  if (next.dependencies?.['@nxds/tailwind']) {
+    const spec = next.dependencies['@nxds/tailwind'];
+    delete next.dependencies['@nxds/tailwind'];
     next.dependencies[`${scope}/tailwind`] = spec;
   }
 
@@ -366,7 +381,7 @@ export function buildManifest(components, { version }) {
   for (const entry of sorted) {
     map[entry.name] = { files: entry.files, deps: entry.deps };
   }
-  return { version, generatedFrom: '@nexus_ds/react', components: map };
+  return { version, generatedFrom: '@nxds/react', components: map };
 }
 
 /**
@@ -419,7 +434,7 @@ export function renderRootPackageJson({
     },
     devDependencies: {
       ...toolchain,
-      '@nexus_ds/eslint-plugin': `^${eslintPluginVersion}`,
+      '@nxds/eslint-plugin': `^${eslintPluginVersion}`,
     },
     pnpm: { overrides },
     engines: { node: '>=20.19.0' },
@@ -436,7 +451,7 @@ export function renderReadme({ name, scope, tokenConfig }) {
 
 A standalone Nexus-derived design system. The \`react\` + \`tailwind\` packages are
 **yours to own and publish**; they depend on the published runtime engine
-\`@nexus_ds/core\` and the lint guardrails \`@nexus_ds/eslint-plugin\`.
+\`@nxds/core\` and the lint guardrails \`@nxds/eslint-plugin\`.
 
 ## Packages
 
@@ -494,11 +509,11 @@ onlyBuiltDependencies:
 /**
  * The produced root eslint.config.js. Mirrors the source repo's flat config but
  * drops the `apps/**` and `packages/core/tokens` scopes (no such files in the
- * fork) and uses the PUBLISHED `@nexus_ds/eslint-plugin/config` preset helper
+ * fork) and uses the PUBLISHED `@nxds/eslint-plugin/config` preset helper
  * rather than re-inlining rule names.
  */
 export const ROOT_ESLINT_CONFIG = `import js from '@eslint/js';
-import { nexusComponentConfig } from '@nexus_ds/eslint-plugin/config';
+import { nexusComponentConfig } from '@nxds/eslint-plugin/config';
 import prettierConfig from 'eslint-config-prettier';
 import jsxA11yPlugin from 'eslint-plugin-jsx-a11y';
 import reactPlugin from 'eslint-plugin-react';
@@ -852,7 +867,7 @@ async function writeTailwindPackage(
   scope,
   version
 ) {
-  execFileSync('pnpm', ['--filter', '@nexus_ds/core', 'build'], {
+  execFileSync('pnpm', ['--filter', '@nxds/core', 'build'], {
     cwd: REPO_ROOT,
     stdio: 'inherit',
   });
@@ -887,7 +902,7 @@ function writeRootScaffold(outDir, config, manifest) {
   const { name, scope, policy, tokenConfig } = config;
   const rootPkg = readJson(path.join(REPO_ROOT, 'package.json'));
   const eslintPluginVersion = readJson(
-    path.join(REPO_ROOT, 'packages', 'eslint-plugin-nexus', 'package.json')
+    path.join(REPO_ROOT, 'packages', 'eslint-plugin', 'package.json')
   ).version;
 
   const toolchain = {};

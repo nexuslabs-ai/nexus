@@ -1,8 +1,8 @@
 /**
  * `pnpm export:verify` — acceptance harness for the standalone export (#541).
  *
- * Builds + packs the published upstream deps (`@nexus_ds/core`,
- * `@nexus_ds/eslint-plugin`) into tarballs, runs `pnpm export` into a temp
+ * Builds + packs the published upstream deps (`@nxds/core`,
+ * `@nxds/eslint-plugin`) into tarballs, runs `pnpm export` into a temp
  * monorepo, asserts the shipped upstream ranges actually resolve on npm (the
  * tarball overrides below mask this), redirects the two upstream deps to those
  * tarballs via root `pnpm.overrides` (leaving the real version ranges intact so
@@ -21,13 +21,26 @@ import { fileURLToPath, pathToFileURL } from 'node:url';
 
 import { KEEP_PACKAGES } from './export.mjs';
 
-const REPO_ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
+const REPO_ROOT = path.resolve(
+  path.dirname(fileURLToPath(import.meta.url)),
+  '..'
+);
 const SCOPE = '@acme';
 const NAME = 'acme-ds';
 const OFFLINE_RE =
   /ERR_PNPM_(FETCH|META_FETCH|REGISTRIES)|ENOTFOUND|getaddrinfo|ECONNREFUSED|request to .* failed/i;
 
-const TEXT_EXTENSIONS = new Set(['.ts', '.tsx', '.js', '.jsx', '.mjs', '.cjs', '.css', '.json', '.md']);
+const TEXT_EXTENSIONS = new Set([
+  '.ts',
+  '.tsx',
+  '.js',
+  '.jsx',
+  '.mjs',
+  '.cjs',
+  '.css',
+  '.json',
+  '.md',
+]);
 
 function readJson(filePath) {
   return JSON.parse(fs.readFileSync(filePath, 'utf8'));
@@ -45,7 +58,9 @@ function tail(text, lines = 25) {
 function exec(cmd, args, cwd) {
   const res = spawnSync(cmd, args, { cwd, encoding: 'utf8', env: process.env });
   if (res.error) {
-    throw new Error(`${cmd} ${args.join(' ')} failed to spawn: ${res.error.message}`);
+    throw new Error(
+      `${cmd} ${args.join(' ')} failed to spawn: ${res.error.message}`
+    );
   }
   if (res.status !== 0) {
     const combined = `${res.stdout ?? ''}\n${res.stderr ?? ''}`;
@@ -59,17 +74,23 @@ function exec(cmd, args, cwd) {
   return res.stdout ?? '';
 }
 
-/** Rule ids published by @nexus_ds/eslint-plugin (each `rules/*.js` = one rule). */
+/** Rule ids published by @nxds/eslint-plugin (each `rules/*.js` = one rule). */
 function discoverEslintRuleRefs() {
-  const rulesDir = path.join(REPO_ROOT, 'packages', 'eslint-plugin-nexus', 'src', 'rules');
+  const rulesDir = path.join(
+    REPO_ROOT,
+    'packages',
+    'eslint-plugin',
+    'src',
+    'rules'
+  );
   return fs
     .readdirSync(rulesDir)
     .filter((file) => file.endsWith('.js'))
-    .map((file) => `@nexus_ds/${file.replace(/\.js$/, '')}`);
+    .map((file) => `@nxds/${file.replace(/\.js$/, '')}`);
 }
 
 /**
- * Find files under `root` referencing a `@nexus_ds/*` name not in `allowed`.
+ * Find files under `root` referencing a `@nxds/*` name not in `allowed`.
  * Catches any un-forked upstream sibling (react/tailwind, or a future package),
  * while permitting the kept published deps and the eslint-plugin rule ids.
  */
@@ -88,7 +109,8 @@ function findStrayNexusRefs(root, allowed) {
       if (!TEXT_EXTENSIONS.has(path.extname(entry.name))) {
         continue;
       }
-      const refs = fs.readFileSync(full, 'utf8').match(/@nexus_ds\/[a-zA-Z0-9._-]+/g) ?? [];
+      const refs =
+        fs.readFileSync(full, 'utf8').match(/@nxds\/[a-zA-Z0-9._-]+/g) ?? [];
       const bad = [...new Set(refs)].filter((ref) => !allowed.has(ref));
       if (bad.length > 0) {
         hits.push(`${path.relative(root, full)} (${bad.join(', ')})`);
@@ -105,17 +127,25 @@ function findStrayNexusRefs(root, allowed) {
  * version ahead of npm would fail a real install while this harness stayed green.
  */
 function assertUpstreamRangesPublished(producedDir) {
-  const reactPkg = readJson(path.join(producedDir, 'packages', 'react', 'package.json'));
+  const reactPkg = readJson(
+    path.join(producedDir, 'packages', 'react', 'package.json')
+  );
   const rootPkg = readJson(path.join(producedDir, 'package.json'));
   const ranges = {
-    '@nexus_ds/core': reactPkg.dependencies?.['@nexus_ds/core'],
-    '@nexus_ds/eslint-plugin': rootPkg.devDependencies?.['@nexus_ds/eslint-plugin'],
+    '@nxds/core': reactPkg.dependencies?.['@nxds/core'],
+    '@nxds/eslint-plugin': rootPkg.devDependencies?.['@nxds/eslint-plugin'],
   };
   for (const [name, range] of Object.entries(ranges)) {
     if (!range) {
-      throw new Error(`Produced manifest is missing the ${name} dependency range.`);
+      throw new Error(
+        `Produced manifest is missing the ${name} dependency range.`
+      );
     }
-    const matched = exec('npm', ['view', `${name}@${range}`, 'version'], REPO_ROOT).trim();
+    const matched = exec(
+      'npm',
+      ['view', `${name}@${range}`, 'version'],
+      REPO_ROOT
+    ).trim();
     if (!matched) {
       throw new Error(
         `Shipped range "${name}@${range}" resolves to no published version on npm; ` +
@@ -173,8 +203,12 @@ async function smokeImport(producedDir) {
 
   const distDir = path.join(producedDir, 'packages', 'react', 'dist');
   const lib = await import(pathToFileURL(path.join(distDir, 'index.mjs')).href);
-  const utils = await import(pathToFileURL(path.join(distDir, 'utils.mjs')).href);
-  const appearance = await import(pathToFileURL(path.join(distDir, 'appearance.mjs')).href);
+  const utils = await import(
+    pathToFileURL(path.join(distDir, 'utils.mjs')).href
+  );
+  const appearance = await import(
+    pathToFileURL(path.join(distDir, 'appearance.mjs')).href
+  );
 
   if (typeof lib.Button !== 'function') {
     throw new Error('Built index.mjs did not export a `Button` component.');
@@ -183,16 +217,31 @@ async function smokeImport(producedDir) {
     throw new Error('Built utils.mjs did not export a `cn` helper.');
   }
   if (typeof appearance.NexusAppearanceProvider !== 'function') {
-    throw new Error('Built appearance.mjs did not export `NexusAppearanceProvider`.');
+    throw new Error(
+      'Built appearance.mjs did not export `NexusAppearanceProvider`.'
+    );
   }
 }
 
 /** Prove tokens emit (tailwind) and utilities build (react). */
 function assertCss(producedDir) {
-  const reactCss = path.join(producedDir, 'packages', 'react', 'dist', 'react.css');
-  const tailwindCss = path.join(producedDir, 'packages', 'tailwind', 'nexus.css');
+  const reactCss = path.join(
+    producedDir,
+    'packages',
+    'react',
+    'dist',
+    'react.css'
+  );
+  const tailwindCss = path.join(
+    producedDir,
+    'packages',
+    'tailwind',
+    'nexus.css'
+  );
   if (!fs.existsSync(reactCss) || fs.statSync(reactCss).size < 500) {
-    throw new Error('Built react.css is missing or empty (no utilities generated).');
+    throw new Error(
+      'Built react.css is missing or empty (no utilities generated).'
+    );
   }
   if (!fs.readFileSync(tailwindCss, 'utf8').includes('--nx-color-')) {
     throw new Error('tailwind nexus.css does not emit `--nx-color-*` tokens.');
@@ -222,15 +271,20 @@ async function main() {
   console.log(`\n🔎 export:verify → ${producedDir}\n`);
   let failed = false;
   try {
-    await step('build @nexus_ds/core', () =>
-      exec('pnpm', ['--filter', '@nexus_ds/core', 'build'], REPO_ROOT)
+    await step('build @nxds/core', () =>
+      exec('pnpm', ['--filter', '@nxds/core', 'build'], REPO_ROOT)
     );
 
     const tarballs = [];
     await step('pack upstream deps', () => {
-      tarballs.push(packTarball(path.join(REPO_ROOT, 'packages', 'core'), tarballDir));
       tarballs.push(
-        packTarball(path.join(REPO_ROOT, 'packages', 'eslint-plugin-nexus'), tarballDir)
+        packTarball(path.join(REPO_ROOT, 'packages', 'core'), tarballDir)
+      );
+      tarballs.push(
+        packTarball(
+          path.join(REPO_ROOT, 'packages', 'eslint-plugin'),
+          tarballDir
+        )
       );
     });
 
@@ -248,11 +302,16 @@ async function main() {
       )
     );
 
-    await step('rebrand audit (no un-forked @nexus_ds/* refs)', () => {
+    await step('rebrand audit (no un-forked @nxds/* refs)', () => {
       const allowed = new Set([...KEEP_PACKAGES, ...discoverEslintRuleRefs()]);
-      const stray = findStrayNexusRefs(path.join(producedDir, 'packages'), allowed);
+      const stray = findStrayNexusRefs(
+        path.join(producedDir, 'packages'),
+        allowed
+      );
       if (stray.length > 0) {
-        throw new Error(`Un-forked @nexus_ds/* refs leaked in: ${stray.join(', ')}`);
+        throw new Error(
+          `Un-forked @nxds/* refs leaked in: ${stray.join(', ')}`
+        );
       }
     });
 
@@ -260,26 +319,44 @@ async function main() {
       assertUpstreamRangesPublished(producedDir)
     );
 
-    await step('inject tarball overrides', () => injectOverrides(producedDir, tarballs));
+    await step('inject tarball overrides', () =>
+      injectOverrides(producedDir, tarballs)
+    );
     await step('pnpm install', () => exec('pnpm', ['install'], producedDir));
     await step('pnpm build', () => exec('pnpm', ['run', 'build'], producedDir));
     await step('pnpm lint', () => exec('pnpm', ['run', 'lint'], producedDir));
-    await step('pnpm typecheck', () => exec('pnpm', ['run', 'typecheck'], producedDir));
+    await step('pnpm typecheck', () =>
+      exec('pnpm', ['run', 'typecheck'], producedDir)
+    );
     await step('publish --dry-run (tailwind)', () =>
       exec(
         'pnpm',
-        ['--filter', `${SCOPE}/tailwind`, 'publish', '--dry-run', '--no-git-checks'],
+        [
+          '--filter',
+          `${SCOPE}/tailwind`,
+          'publish',
+          '--dry-run',
+          '--no-git-checks',
+        ],
         producedDir
       )
     );
     await step('publish --dry-run (react)', () =>
       exec(
         'pnpm',
-        ['--filter', `${SCOPE}/react`, 'publish', '--dry-run', '--no-git-checks'],
+        [
+          '--filter',
+          `${SCOPE}/react`,
+          'publish',
+          '--dry-run',
+          '--no-git-checks',
+        ],
         producedDir
       )
     );
-    await step('build-storybook', () => exec('pnpm', ['run', 'build-storybook'], producedDir));
+    await step('build-storybook', () =>
+      exec('pnpm', ['run', 'build-storybook'], producedDir)
+    );
     await step('ESM smoke import', () => smokeImport(producedDir));
     await step('CSS token emission', () => assertCss(producedDir));
   } catch {
@@ -289,12 +366,16 @@ async function main() {
   const totalMs = results.reduce((sum, r) => sum + r.ms, 0);
   console.log('\n── Summary ──');
   for (const r of results) {
-    console.log(`  ${r.ok ? '✓' : '✗'} ${r.name}  ${(r.ms / 1000).toFixed(1)}s`);
+    console.log(
+      `  ${r.ok ? '✓' : '✗'} ${r.name}  ${(r.ms / 1000).toFixed(1)}s`
+    );
   }
   console.log(`  total ${(totalMs / 1000).toFixed(1)}s`);
 
   if (failed) {
-    console.log(`\n✗ export:verify FAILED — temp retained at:\n  ${producedDir}\n`);
+    console.log(
+      `\n✗ export:verify FAILED — temp retained at:\n  ${producedDir}\n`
+    );
     process.exit(1);
   }
   fs.rmSync(tmp, { recursive: true, force: true });

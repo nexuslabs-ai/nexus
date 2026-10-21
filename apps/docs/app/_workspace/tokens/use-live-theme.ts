@@ -9,8 +9,8 @@ import {
   type Mode,
   type ThemeContrastCheck,
   type TokenMap,
-} from '@nexus_ds/core';
-import { useNexusAppearance } from '@nexus_ds/react/appearance';
+} from '@nxds/core';
+import { useNexusAppearance } from '@nxds/react/appearance';
 
 /** The theme the docs page is showing right now, in its resolved mode. */
 export interface LiveTheme {

@@ -10,7 +10,7 @@ import {
   type NexusAppearanceState,
   sanitizeNexusAppearance,
   STROKE_OPTIONS,
-} from '@nexus_ds/core';
+} from '@nxds/core';
 import type { Decorator, Preview } from '@storybook/react-vite';
 import { useGlobals } from 'storybook/preview-api';
 
@@ -18,8 +18,8 @@ import { NexusAppearanceProvider } from '../src/components/appearance/provider';
 
 // Storybook needs the full token set to render. The shipped component CSS
 // (src/index.css) is utilities-only by design — tokens come from the consumer's
-// @nexus_ds/tailwind — so Storybook loads them via preview.css (a CSS @import, so
-// the production build can resolve @nexus_ds/tailwind's .css package entry).
+// @nxds/tailwind — so Storybook loads them via preview.css (a CSS @import, so
+// the production build can resolve @nxds/tailwind's .css package entry).
 import './preview.css';
 
 type AppearanceGlobalKey =

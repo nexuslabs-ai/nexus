@@ -45,7 +45,7 @@ const SKIP = new Set(['node_modules', '.next', 'dist']);
 
 const PROVIDER_STUB = `'use client';
 import type * as React from 'react';
-import { DEFAULT_NEXUS_APPEARANCE } from '@nexus_ds/core';
+import { DEFAULT_NEXUS_APPEARANCE } from '@nxds/core';
 
 export function NexusAppearanceProvider({ children }: { children?: React.ReactNode; [prop: string]: unknown }) {
   return children;

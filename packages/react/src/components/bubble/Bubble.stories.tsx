@@ -688,8 +688,7 @@ export const WithCodeBlock: Story = {
           </p>
           <pre className="nx:rounded-md nx:bg-container nx:p-3 nx:typography-code-block nx:text-container-foreground">
             <code>
-              pnpm --filter @nexus_ds/core audit:contrast --reporter=verbose
-              --bail
+              pnpm --filter @nxds/core audit:contrast --reporter=verbose --bail
             </code>
           </pre>
         </BubbleContent>

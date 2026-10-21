@@ -2,7 +2,7 @@
 
 import { useId } from 'react';
 
-import { Alert, AlertDescription, AlertTitle, Badge } from '@nexus_ds/react';
+import { Alert, AlertDescription, AlertTitle, Badge } from '@nxds/react';
 
 import { Sampler } from '../../sampler';
 

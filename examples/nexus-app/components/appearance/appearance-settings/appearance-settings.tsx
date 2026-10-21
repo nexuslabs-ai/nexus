@@ -15,7 +15,7 @@ import {
   type NexusStroke,
   type NexusSurfaceTone,
   STROKE_OPTIONS,
-} from '@nexus_ds/core';
+} from '@nxds/core';
 
 import {
   Card,

@@ -6,7 +6,7 @@ import {
   BASE_TONE_OPTIONS,
   type NexusAppearanceMode,
   type NexusSurfaceTone,
-} from '@nexus_ds/core';
+} from '@nxds/core';
 import { IconPalette } from '@tabler/icons-react';
 
 import { cn } from '../../../lib/utils';

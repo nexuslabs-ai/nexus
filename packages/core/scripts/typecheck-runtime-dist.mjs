@@ -24,7 +24,7 @@ const requiredDistFiles = [
 for (const distFile of requiredDistFiles) {
   if (!existsSync(distFile)) {
     throw new Error(
-      `Missing ${path.relative(repoRoot, distFile)}. Run @nexus_ds/core build before this dist typecheck.`
+      `Missing ${path.relative(repoRoot, distFile)}. Run @nxds/core build before this dist typecheck.`
     );
   }
 }
@@ -32,7 +32,7 @@ for (const distFile of requiredDistFiles) {
 const packageJson = JSON.parse(await readFile(packageJsonPath, 'utf8'));
 
 if (!packageJson.files?.includes('dist/runtime')) {
-  throw new Error('@nexus_ds/core package files must include dist/runtime.');
+  throw new Error('@nxds/core package files must include dist/runtime.');
 }
 
 function collectExportEntries(value, keyPath = 'exports', out = []) {
@@ -55,14 +55,14 @@ for (const { keyPath, file: exportFile } of collectExportEntries(
 )) {
   if (!exportFile.startsWith('./dist/runtime/')) {
     throw new Error(
-      `@nexus_ds/core ${keyPath} -> ${exportFile} must stay inside dist/runtime.`
+      `@nxds/core ${keyPath} -> ${exportFile} must stay inside dist/runtime.`
     );
   }
 
   const resolved = path.join(packageRoot, exportFile);
   if (!existsSync(resolved)) {
     throw new Error(
-      `@nexus_ds/core ${keyPath} -> ${exportFile} points to missing ${path.relative(
+      `@nxds/core ${keyPath} -> ${exportFile} points to missing ${path.relative(
         repoRoot,
         resolved
       )}.`
@@ -95,7 +95,7 @@ await writeFile(
   type SurfaceToken,
   type ThemeContrastCheck,
   type Tier,
-} from '@nexus_ds/core';
+} from '@nxds/core';
 import {
   getPaletteRamp,
   getPaletteShade,
@@ -104,7 +104,7 @@ import {
   type PrimitivePaletteName,
   type PrimitivePaletteRamp,
   type Shade,
-} from '@nexus_ds/core/palette';
+} from '@nxds/core/palette';
 import {
   createTokenCatalogue,
   DARK_SURFACE_LADDER,
@@ -113,7 +113,7 @@ import {
   type CatalogueToken,
   type CatalogueTokenName,
   type ShadeAnchor,
-} from '@nexus_ds/core/catalogue';
+} from '@nxds/core/catalogue';
 
 const preset: BrandColorPreset | undefined = BRAND_COLOR_PRESETS[0];
 if (preset) {

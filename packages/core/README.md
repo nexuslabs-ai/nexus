@@ -1,11 +1,11 @@
-# @nexus_ds/core
+# @nxds/core
 
-The framework-agnostic engine behind Nexus Appearance: appearance model, runtime theme derivation, and first-paint snapshots. Use it directly for non-React targets like Electron, React Native, or native shells, or via `@nexus_ds/react/appearance` in React apps. It also contains the design tokens in DTCG format and CSS generation documented below.
+The framework-agnostic engine behind Nexus Appearance: appearance model, runtime theme derivation, and first-paint snapshots. Use it directly for non-React targets like Electron, React Native, or native shells, or via `@nxds/react/appearance` in React apps. It also contains the design tokens in DTCG format and CSS generation documented below.
 
 ## Install
 
 ```bash
-pnpm add @nexus_ds/core
+pnpm add @nxds/core
 ```
 
 ## Primary Exports
@@ -32,7 +32,7 @@ import {
   DEFAULT_NEXUS_APPEARANCE,
   deriveTheme,
   measureThemeContrast,
-} from '@nexus_ds/core';
+} from '@nxds/core';
 
 const checks = measureThemeContrast(
   deriveTheme(createNexusThemeContract(DEFAULT_NEXUS_APPEARANCE))
@@ -44,10 +44,10 @@ Each check has `mode`, the `fg` and `bg` CSS variable names (such as `--nx-color
 
 ## Authored palette lookup
 
-The browser-safe `@nexus_ds/core/palette` entry resolves the same authored palettes used by CSS generation:
+The browser-safe `@nxds/core/palette` entry resolves the same authored palettes used by CSS generation:
 
 ```ts
-import { getPaletteRamp, getPaletteShade } from '@nexus_ds/core/palette';
+import { getPaletteRamp, getPaletteShade } from '@nxds/core/palette';
 
 getPaletteShade('green', '600'); // oklch(0.62 0.2233 140.055)
 const neutral = getPaletteRamp('neutral'); // Frozen, readonly shade map
@@ -63,10 +63,10 @@ Custom brand ramps and raw surface-tone references retain their separate algorit
 
 ## Token catalogue
 
-The browser-safe `@nexus_ds/core/catalogue` entry describes every token family for tools and docs: colour, typography, spacing, radius, border width, shadow, motion, z-index, and breakpoints. Each token has its `--nx-*` name, aliases, values per theme mode and preset as the generated CSS declares them, and the authored source leaf. It builds a fresh array and derives both runtime colour modes on each call, so call it once per build or page, not per render.
+The browser-safe `@nxds/core/catalogue` entry describes every token family for tools and docs: colour, typography, spacing, radius, border width, shadow, motion, z-index, and breakpoints. Each token has its `--nx-*` name, aliases, values per theme mode and preset as the generated CSS declares them, and the authored source leaf. It builds a fresh array and derives both runtime colour modes on each call, so call it once per build or page, not per render.
 
 ```ts
-import { createTokenCatalogue } from '@nexus_ds/core/catalogue';
+import { createTokenCatalogue } from '@nxds/core/catalogue';
 
 const tokens = createTokenCatalogue();
 ```
@@ -83,7 +83,7 @@ import {
   deriveTheme,
   resolveFirstPaint,
   themeToCss,
-} from '@nexus_ds/core';
+} from '@nxds/core';
 
 const state = {
   ...DEFAULT_NEXUS_APPEARANCE,
@@ -173,7 +173,7 @@ at build time.
 ### Generate CSS
 
 ```bash
-pnpm tokens:tailwind      # From the repo root: build core and generate @nexus_ds/tailwind CSS
+pnpm tokens:tailwind      # From the repo root: build core and generate @nxds/tailwind CSS
 ```
 
 ### Output Files
@@ -197,4 +197,4 @@ When multi-platform support is needed, tools like Style Dictionary can be added 
 - **Color** is engine-owned: edit the derivation in `src/lib/surface-ladder.ts` / `src/lib/derive-theme.ts` (color primitives live in `tokens/primitives/color.json`).
 - **Non-color** (spacing, radius, shadow, borderwidth, motion, typography): edit the DTCG token files in `tokens/` (`$value`, `$type`, `$description`).
 
-Then run `make tokens` (or `pnpm tokens:tailwind`) to regenerate CSS; the output is copied into the `@nexus_ds/tailwind` package. A new or renamed token file also needs an import in `src/catalogue/token-files.ts`; `pnpm test:unit` fails until the manifest matches the files on disk.
+Then run `make tokens` (or `pnpm tokens:tailwind`) to regenerate CSS; the output is copied into the `@nxds/tailwind` package. A new or renamed token file also needs an import in `src/catalogue/token-files.ts`; `pnpm test:unit` fails until the manifest matches the files on disk.

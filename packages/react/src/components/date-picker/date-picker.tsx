@@ -135,7 +135,7 @@ type DatePickerProps = React.ComponentProps<typeof DayPicker> & {
    * Custom content inside each day button. The button keeps its keyboard
    * behavior.
    */
-  // eslint-disable-next-line @nexus_ds/no-render-prop-types -- react-day-picker owns the per-day render loop; per-day content can't be a children slot
+  // eslint-disable-next-line @nxds/no-render-prop-types -- react-day-picker owns the per-day render loop; per-day content can't be a children slot
   renderDayContent?: (props: DatePickerDayContentProps) => React.ReactNode;
 };
 

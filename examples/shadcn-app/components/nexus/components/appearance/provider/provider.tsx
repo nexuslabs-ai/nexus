@@ -24,7 +24,7 @@ import {
   sanitizeNexusAppearance,
   sanitizeNexusAppearanceSnapshot,
   serializeNexusAppearanceStateCookie,
-} from '@nexus_ds/core';
+} from '@nxds/core';
 
 const COLOR_SCHEME_QUERY = '(prefers-color-scheme: dark)';
 const THEME_STYLE_SELECTOR = 'style[data-nexus-appearance-theme]';

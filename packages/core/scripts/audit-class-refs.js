@@ -88,7 +88,7 @@ async function loadSemanticRegistryNames() {
   const registry = runtime.SEMANTIC_TOKEN_REGISTRY;
   if (!Array.isArray(registry)) {
     throw new Error(
-      'audit-class-refs: @nexus_ds/core dist is missing SEMANTIC_TOKEN_REGISTRY — run `pnpm --filter @nexus_ds/core build` first.'
+      'audit-class-refs: @nxds/core dist is missing SEMANTIC_TOKEN_REGISTRY — run `pnpm --filter @nxds/core build` first.'
     );
   }
   return new Set(registry.map((token) => token.name));

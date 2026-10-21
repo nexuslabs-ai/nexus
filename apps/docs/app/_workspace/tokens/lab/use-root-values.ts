@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from 'react';
 
-import type { TokenMap } from '@nexus_ds/core';
+import type { TokenMap } from '@nxds/core';
 
 /**
  * Computed values of custom properties on `<html>`. Re-reads when the
