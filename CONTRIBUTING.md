@@ -30,7 +30,7 @@ Pick the surface you're working on — each is one `make` command that turbo orc
 
 > **The docs site's generated inputs come from the turbo graph**, not from its package scripts, and none of them are committed: `apps/docs/turbo.json` puts `generate:manifest` (the page manifest and its loader map), `generate:demos` (the docs code generated from every story tagged `docs`, under `__generated__/`), `generate:dependencies` (the install JSON) and `generate:props` (the per-component props JSON that `PropsTable` reads) ahead of both `build` and `dev`, and the two the TypeScript graph imports — `generate:manifest` and `generate:demos` — ahead of `typecheck`. `make build`, `make docs` and `make typecheck` get them. `PropsTable` reads the props JSON on each request, so after changing a component's props or JSDoc during `make docs`, rerun `pnpm --filter @nxds/docs generate:props` and reload — no restart. A bare `pnpm --filter @nxds/docs dev` runs only the docs-story watcher: on a clean checkout there is no page manifest, demo index or install JSON, so start the docs with `make docs`.
 
-Leave **`make up`** running in another terminal so the docs-MCP is available to Claude Code (see [AI Documentation MCP](#ai-documentation-mcp-nexus-docs-mcp)).
+Leave **`make up`** running in another terminal so the docs-MCP is available to Claude Code (see [AI Documentation MCP](#ai-documentation-mcp-nxds-docs-mcp)).
 
 ## Before you push
 
@@ -103,7 +103,7 @@ The first storybook-project run launches Storybook in the background — the col
 
 ---
 
-## AI Documentation MCP (nexus-docs-mcp)
+## AI Documentation MCP (nxds-docs-mcp)
 
 A local documentation server keeps Claude Code on the exact library versions used here (React 19, Tailwind v4, Storybook 10, Vitest 4, Radix, recharts 3, TanStack Form, …) instead of stale training data. It ships as a pre-indexed Docker image, so there's nothing to scrape locally.
 

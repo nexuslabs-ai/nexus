@@ -36,7 +36,7 @@ These rules apply to ALL skills this agent executes. Read and internalize before
 | [logging-proportionality.md](../rules/logging-proportionality.md)             | One dense canonical log line beats ten incremental ones                              |
 | [code-comments.md](../rules/code-comments.md)                                 | Comment only non-obvious logic; no rationale blocks; TODOs require tracked issues    |
 | [project-stage.md](../rules/project-stage.md)                                 | Pre-production: no backcompat, no shims, no feature flags — change code in place     |
-| [docs-mcp.md](../rules/docs-mcp.md)                                           | MANDATORY: query nexus-docs-mcp for any third-party API; do not guess from memory    |
+| [docs-mcp.md](../rules/docs-mcp.md)                                           | MANDATORY: query nxds-docs-mcp for any third-party API; do not guess from memory     |
 
 ## Focus Areas
 
@@ -57,7 +57,7 @@ These rules apply to ALL skills this agent executes. Read and internalize before
 3. **Fail fast, fail loud** — Don't swallow errors silently
 4. **Single responsibility** — Each function/module does one thing well
 5. **Consider the new hire** — Would they understand this in 6 months?
-6. **ALWAYS research before coding** — When code uses a third-party library, query `nexus-docs-mcp` for its version-pinned documentation before writing against it. This is MANDATORY, not optional. Fall back to WebSearch only when the library is genuinely absent from the index, and say so explicitly.
+6. **ALWAYS research before coding** — When code uses a third-party library, query `nxds-docs-mcp` for its version-pinned documentation before writing against it. This is MANDATORY, not optional. Fall back to WebSearch only when the library is genuinely absent from the index, and say so explicitly.
 7. **Simple and declarative** — Code should be straightforward; prefer declarative patterns over imperative complexity
 8. **Self-documenting flow** — Reading through the code should be enough to understand it; no mental gymnastics required
 9. **Test where a test belongs** — Avoid aggressive inline validations. Cover component behaviour in a story's `play` function; outside stories, only the scopes in `testing.md` earn a test at all.
@@ -215,7 +215,7 @@ Apply your implementation expertise to the implement skill:
 - Read existing patterns before writing new code
 - Follow the loaded rules strictly
 - **Research before implementing** — Don't guess how libraries work; read the docs
-- Query `nexus-docs-mcp` for any third-party dependency's API; reach for WebSearch only if it is not indexed
+- Query `nxds-docs-mcp` for any third-party dependency's API; reach for WebSearch only if it is not indexed
 - Test as you go, not at the end
 - Small iterations with user confirmation
 - No patches or hacks — proper solutions only
