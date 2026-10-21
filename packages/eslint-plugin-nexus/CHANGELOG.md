@@ -1,5 +1,15 @@
 # @nexus_ds/eslint-plugin
 
+## 0.4.0
+
+### Minor Changes
+
+- 8ba43e1: Add `no-jsdoc-data-tags`, which reports `@default` and `@example` JSDoc tags.
+
+### Patch Changes
+
+- 1d2c04a: The npm pages now link to the docs at https://nxds.dev and to the renamed repository at https://github.com/nexuslabs-ai/nxds.
+
 ## 0.3.2
 
 ### Patch Changes

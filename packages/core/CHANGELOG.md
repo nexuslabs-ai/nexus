@@ -1,5 +1,11 @@
 # @nexus_ds/core
 
+## 0.7.2
+
+### Patch Changes
+
+- 1d2c04a: The npm pages now link to the docs at https://nxds.dev and to the renamed repository at https://github.com/nexuslabs-ai/nxds.
+
 ## 0.7.1
 
 ### Patch Changes
