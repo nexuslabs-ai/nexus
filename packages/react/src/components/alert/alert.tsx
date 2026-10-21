@@ -171,7 +171,6 @@ interface AlertTitleProps extends React.ComponentProps<'div'> {
   /**
    * Applies the title styles to the child element, such as a real heading.
    *
-   * @default false
    * @example
    * ```tsx
    * <AlertTitle asChild>

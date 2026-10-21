@@ -124,13 +124,11 @@ const staticDayPickerClassNames = {
 type DatePickerProps = React.ComponentProps<typeof DayPicker> & {
   /**
    * Button variant for the previous and next month arrows.
-   * @default 'ghost'
    */
   buttonVariant?: React.ComponentProps<typeof Button>['variant'];
   /**
    * Day-cell size: `default` is 32px, `large` 48px, `xlarge` 56px. For another
    * size, set `--cell-size` through `className`.
-   * @default 'default'
    */
   cellSize?: DatePickerCellSize;
   /**

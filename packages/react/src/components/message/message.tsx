@@ -12,7 +12,6 @@ interface MessageGroupProps extends React.ComponentProps<'div'> {
    * virtualised transcripts, and set `aria-busy` on a turn while its reply
    * streams.
    *
-   * @default false
    * @example
    * ```tsx
    * <MessageGroup announce>{turns}</MessageGroup>
@@ -51,8 +50,6 @@ interface MessageProps extends React.ComponentProps<'div'> {
    * Side of the conversation the turn sits on, mirrored under `dir="rtl"`.
    * `MessageContent` aligns its children to match, so a `Bubble` needs no
    * `align`.
-   *
-   * @default 'start'
    */
   align?: 'start' | 'end';
 }
@@ -102,7 +99,6 @@ interface MessageAvatarProps extends React.ComponentProps<typeof Avatar> {
    * Keeps the avatar's space but hides it. Use it on follow-up turns from the
    * same speaker so their bodies line up with the first turn.
    *
-   * @default false
    * @example
    * ```tsx
    * <MessageAvatar placeholder />

@@ -85,7 +85,6 @@ interface CardTitleProps extends React.ComponentProps<'h3'> {
   /**
    * Applies the title styles to the child element, such as a different heading level.
    *
-   * @default false
    * @example
    * ```tsx
    * <CardTitle asChild>

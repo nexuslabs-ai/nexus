@@ -99,7 +99,6 @@ interface SliderProps extends React.ComponentProps<
   /**
    * Height of the rail and thumb.
    *
-   * @default "standard"
    * @example
    * ```tsx
    * <Slider size="comfortable" defaultValue={[50]} aria-label="Progress" />

@@ -47,7 +47,6 @@ function ResizableHandle({
 }: ResizablePrimitive.SeparatorProps & {
   /**
    * Shows a grip in the centre of the handle.
-   * @default false
    */
   withHandle?: boolean;
 }) {

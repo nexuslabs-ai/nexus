@@ -88,7 +88,6 @@ interface DrawerContentProps extends React.ComponentProps<
   /**
    * Shows the handle on bottom drawers. Hiding it does not change dragging or
    * dismissal.
-   * @default true
    */
   showHandle?: boolean;
 }

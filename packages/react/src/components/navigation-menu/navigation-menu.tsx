@@ -21,7 +21,6 @@ interface NavigationMenuProps extends React.ComponentProps<
   /**
    * Shows every flyout in one shared panel under the menu. Set `false` to
    * show each flyout under its own trigger.
-   * @default true
    */
   viewport?: boolean;
 }

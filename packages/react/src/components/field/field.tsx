@@ -30,8 +30,6 @@ function FieldSet({ className, ...props }: React.ComponentProps<'fieldset'>) {
 interface FieldLegendProps extends React.ComponentProps<'legend'> {
   /**
    * Caption size. `legend` is larger, and `label` matches a field label.
-   *
-   * @default 'legend'
    */
   variant?: 'legend' | 'label';
 }

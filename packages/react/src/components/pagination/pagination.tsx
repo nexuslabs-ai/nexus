@@ -94,13 +94,11 @@ interface PaginationLinkProps
   extends React.ComponentProps<'a'>, Pick<ButtonProps, 'size'> {
   /**
    * Marks the link as the current page and sets `aria-current="page"`.
-   * @default false
    */
   isActive?: boolean;
   /**
    * Renders the child element, such as a router `Link`, with the link styles.
    * Use it instead of wrapping, which would nest one `<a>` in another.
-   * @default false
    */
   asChild?: boolean;
 }

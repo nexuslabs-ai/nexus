@@ -32,7 +32,6 @@ interface MarkerProps
    * styles. A link or button child gets hover styles with no extra classes. A
    * `disabled` or `aria-disabled` child ignores the pointer and dims.
    *
-   * @default false
    * @example
    * ```tsx
    * <Marker asChild>

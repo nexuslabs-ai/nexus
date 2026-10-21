@@ -64,7 +64,6 @@ interface ButtonProps
   /**
    * Renders the child, such as an `<a>`, with button styles.
    * The `loading` spinner and icon slots then don't render.
-   * @default false
    * @example
    * ```tsx
    * <Button asChild>
@@ -76,7 +75,6 @@ interface ButtonProps
 
   /**
    * Disables the button and shows a spinner in place of its content.
-   * @default false
    * @example
    * ```tsx
    * <Button loading>Submitting...</Button>

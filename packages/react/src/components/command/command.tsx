@@ -59,12 +59,10 @@ function Command({ className, ...props }: CommandProps) {
 interface CommandDialogProps extends React.ComponentProps<typeof Dialog> {
   /**
    * Visually hidden dialog title. Also labels the search input.
-   * @default 'Command Palette'
    */
   title?: string;
   /**
    * Visually hidden dialog description.
-   * @default 'Search for a command to run...'
    */
   description?: string;
   /**
@@ -73,7 +71,6 @@ interface CommandDialogProps extends React.ComponentProps<typeof Dialog> {
   className?: string;
   /**
    * Shows the dialog's close button. Escape and clicking outside close it either way.
-   * @default false
    */
   showCloseButton?: boolean;
 }

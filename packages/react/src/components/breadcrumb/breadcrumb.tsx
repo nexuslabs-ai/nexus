@@ -94,7 +94,6 @@ function BreadcrumbItem({ className, ...props }: BreadcrumbItemProps) {
 interface BreadcrumbLinkProps extends React.ComponentProps<'a'> {
   /**
    * Renders the child element instead, such as a router `<Link>`.
-   * @default false
    */
   asChild?: boolean;
 }

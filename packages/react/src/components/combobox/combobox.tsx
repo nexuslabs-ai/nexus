@@ -118,7 +118,6 @@ function ComboboxTrigger({
 interface ComboboxContentProps extends PopoverContentProps {
   /**
    * Accessible name for the search field and popover. Use the field's label text.
-   * @default 'Options'
    */
   label?: string;
 }
@@ -258,7 +257,6 @@ function ComboboxSeparator({ className, ...props }: ComboboxSeparatorProps) {
 interface ComboboxItemProps extends React.ComponentProps<typeof CommandItem> {
   /**
    * Marks the option as the current selection with a check.
-   * @default false
    */
   selected?: boolean;
 }

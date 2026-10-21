@@ -14,8 +14,6 @@ interface EmptyStateProps extends React.ComponentProps<'div'> {
   /**
    * Adds a dashed frame. Match a bordered skeleton so swapping from loading
    * doesn't shift the layout.
-   *
-   * @default false
    */
   bordered?: boolean;
 }
@@ -138,7 +136,6 @@ interface EmptyStateTitleProps extends React.ComponentProps<'div'> {
   /**
    * Applies the title styles to a child element, such as an `h2` heading.
    *
-   * @default false
    * @example
    * ```tsx
    * <EmptyStateTitle asChild>

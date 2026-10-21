@@ -25,7 +25,6 @@ type CarouselProps = {
   plugins?: CarouselPlugin;
   /**
    * Scroll axis.
-   * @default 'horizontal'
    */
   orientation?: 'horizontal' | 'vertical';
   /** Receives the Embla API after setup, for external control. */

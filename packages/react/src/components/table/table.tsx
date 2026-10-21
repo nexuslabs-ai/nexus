@@ -36,7 +36,6 @@ interface TableProps extends React.ComponentProps<'table'> {
    * - `borderless`: no lines.
    * - `grid`: row and column lines.
    *
-   * @default 'default'
    * @example
    * ```tsx
    * <Table variant="borderless">…</Table>
@@ -48,21 +47,15 @@ interface TableProps extends React.ComponentProps<'table'> {
    *
    * - `comfortable`: about 44px rows.
    * - `compact`: about 36px rows, for dense data.
-   *
-   * @default 'comfortable'
    */
   density?: TableDensity;
   /**
    * Keeps the header row in view while the body scrolls. Set a max height with
    * `containerClassName`, such as `"nx:max-h-96"`.
-   *
-   * @default false
    */
   stickyHeader?: boolean;
   /**
    * Tints every other body row. Hover and selection colors win over the stripe.
-   *
-   * @default false
    */
   striped?: boolean;
   /**

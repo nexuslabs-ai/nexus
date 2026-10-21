@@ -112,7 +112,6 @@ interface PageHeaderTitleProps extends React.ComponentProps<'h1'> {
    * Renders the child element with the title styles. Use it to change the
    * heading level.
    *
-   * @default false
    * @example
    * ```tsx
    * <PageHeaderTitle asChild>

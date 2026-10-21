@@ -105,7 +105,6 @@ interface MenubarSubTriggerProps extends React.ComponentProps<
 > {
   /**
    * Indents the trigger to align with items that have a leading icon or checkbox.
-   * @default false
    */
   inset?: boolean;
 }
@@ -236,7 +235,6 @@ interface MenubarItemProps
     VariantProps<typeof menubarItemVariants> {
   /**
    * Indents the item to align with items that have a leading icon or checkbox.
-   * @default false
    */
   inset?: boolean;
 }
@@ -395,7 +393,6 @@ interface MenubarLabelProps extends React.ComponentProps<
 > {
   /**
    * Indents the label to align with items that have a leading icon or checkbox.
-   * @default false
    */
   inset?: boolean;
 }

@@ -31,12 +31,10 @@ import { isUnder, reactRoot } from './roots.mjs';
 
 /** @typedef {Record<string, string[]>} PropsIndex */
 
-// Resolved only when the prop has no `@default` tag.
+// Resolved only for props the table documents.
 /** @typedef {() => string | null} LazyDefault */
 
 const reactSrc = path.join(reactRoot, 'src');
-
-const LITERAL_KEYWORD = /^(?:true|false|null|undefined|-?\d+(?:\.\d+)?)$/;
 
 /** @param {PropItem} prop */
 function tagsOf(prop) {
@@ -49,15 +47,12 @@ function tagsOf(prop) {
  * @returns {string | null}
  */
 function toDefaultValue(prop, codeDefault) {
-  const tag = tagsOf(prop).default;
-  if (tag === undefined) return codeDefault?.() ?? null;
-
-  const quoted = tag.match(/^(['"])(.*)\1$/s);
-  if (quoted) return JSON.stringify(quoted[2]);
-  if (LITERAL_KEYWORD.test(tag)) return tag;
-  throw new Error(
-    `props JSON: ${prop.parent?.name ?? 'a component'}.${prop.name} has \`@default ${tag}\`, which is not a literal. Put the explanation in the prop's description and drop the tag, or give a quoted string, number, boolean or null.`
-  );
+  if (tagsOf(prop).default !== undefined) {
+    throw new Error(
+      `props JSON: ${prop.parent?.name ?? 'a component'}.${prop.name} has an \`@default\` tag. The Props table reads defaults from code only, so delete the tag. If a dependency sets the default, say so in the prop's description.`
+    );
+  }
+  return codeDefault?.() ?? null;
 }
 
 /**
@@ -337,7 +332,7 @@ function attributeDefaults(checker, owner, fn, target, inherited) {
       );
       if (rest.every((value) => value === first)) return first;
       throw new Error(
-        `props JSON: ${owner} passes different \`${key}\` values to <${target.getName()}>, so it has no single default. Give it an \`@default\` tag.`
+        `props JSON: ${owner} passes different \`${key}\` values to <${target.getName()}>, so it has no single default. Set one in the component's own props destructuring.`
       );
     });
   }

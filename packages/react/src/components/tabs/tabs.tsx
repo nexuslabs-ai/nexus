@@ -44,12 +44,10 @@ interface TabsListProps extends Omit<
 > {
   /**
    * Visual style of every trigger in the list.
-   * @default "default"
    */
   variant?: TabsVariant;
   /**
    * Size of every trigger in the list.
-   * @default "default"
    */
   size?: TabsSize;
 }
@@ -203,7 +201,6 @@ const tabsTriggerVariants = cva(
     variants: {
       /**
        * Visual style.
-       * @default "default"
        */
       variant: {
         default: [
@@ -219,7 +216,6 @@ const tabsTriggerVariants = cva(
       },
       /**
        * Size.
-       * @default "default"
        */
       size: {
         sm: 'nx:px-2 nx:py-1 nx:typography-label-small',

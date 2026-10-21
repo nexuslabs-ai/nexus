@@ -29,8 +29,6 @@ type ToggleGroupProps = React.ComponentProps<typeof ToggleGroupPrimitive.Root> &
     /**
      * Gap between items, in spacing-scale units. `0` joins them into one
      * segmented control. A larger value splits them into separate pills.
-     *
-     * @default 0
      */
     spacing?: number;
   };

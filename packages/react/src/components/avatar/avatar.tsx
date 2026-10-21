@@ -59,7 +59,6 @@ interface AvatarProps
     VariantProps<typeof avatarVariants> {
   /**
    * Draws a non-interactive emphasis ring, such as for a selected person. Put focus rings on the interactive wrapper.
-   * @default false
    * @example
    * ```tsx
    * <Avatar ring>

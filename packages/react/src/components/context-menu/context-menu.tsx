@@ -62,7 +62,6 @@ interface ContextMenuSubTriggerProps extends React.ComponentProps<
 > {
   /**
    * Indents the trigger to line up with items that have a leading icon or check.
-   * @default false
    */
   inset?: boolean;
 }
@@ -194,7 +193,6 @@ interface ContextMenuItemProps
     VariantProps<typeof contextMenuItemVariants> {
   /**
    * Indents the item to line up with items that have a leading icon or check.
-   * @default false
    */
   inset?: boolean;
 }
@@ -359,7 +357,6 @@ interface ContextMenuLabelProps extends React.ComponentProps<
 > {
   /**
    * Indents the label to line up with items that have a leading icon or check.
-   * @default false
    */
   inset?: boolean;
 }

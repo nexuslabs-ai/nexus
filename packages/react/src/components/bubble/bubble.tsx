@@ -105,7 +105,6 @@ interface BubbleContentProps extends React.ComponentProps<'div'> {
    * Renders the child element instead, such as `p`, `a` or `button`.
    * An actionable child gets the focus ring and pointer cursor.
    *
-   * @default false
    * @example
    * ```tsx
    * <BubbleContent asChild>

@@ -72,7 +72,6 @@ interface AttachmentProps
     VariantProps<typeof attachmentVariants> {
   /**
    * Upload state. Screen readers announce in-progress and error states, and `idle` or `error` change the border.
-   * @default 'done'
    */
   state?: AttachmentState;
 
@@ -353,7 +352,6 @@ function AttachmentProgress({
 interface AttachmentTriggerProps extends React.ComponentProps<'button'> {
   /**
    * Renders the child element instead, such as an `<a>` that opens the file.
-   * @default false
    */
   asChild?: boolean;
 }

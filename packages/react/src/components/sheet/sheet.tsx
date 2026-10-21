@@ -123,7 +123,6 @@ interface SheetContentProps
     VariantProps<typeof sheetContentVariants> {
   /**
    * Shows the close button in the top-right corner.
-   * @default true
    */
   showCloseButton?: boolean;
 }

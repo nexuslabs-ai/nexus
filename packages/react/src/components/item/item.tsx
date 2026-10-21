@@ -66,7 +66,6 @@ interface ItemProps
   /**
    * Renders the child element, such as a link, with the item styling. A link
    * child gets hover styles with no extra classes.
-   * @default false
    */
   asChild?: boolean;
 }

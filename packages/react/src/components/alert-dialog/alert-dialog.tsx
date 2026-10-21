@@ -95,7 +95,6 @@ interface AlertDialogContentProps extends React.ComponentProps<
   /**
    * Layout. `default` left-aligns the header and puts actions in a row.
    * `center` centers the header and stacks full-width actions.
-   * @default "default"
    */
   variant?: AlertDialogVariant;
 }

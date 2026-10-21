@@ -99,7 +99,6 @@ interface DialogContentProps extends Omit<
 > {
   /**
    * Shows the close button in the top-right corner.
-   * @default true
    */
   showCloseButton?: boolean;
 
