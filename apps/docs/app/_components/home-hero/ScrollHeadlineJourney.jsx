@@ -93,7 +93,13 @@ export function ScrollHeadlineJourney({
               }
             />
           </div>
-          <p className="scroll-headline-progress">Scroll to explore</p>
+          <p
+            className="scroll-headline-progress"
+            aria-hidden={progress >= 0.95}
+            style={{ opacity: 1 - smoothStep((progress - 0.85) / 0.1) }}
+          >
+            Scroll to explore
+          </p>
         </div>
       </div>
       <div className="scroll-headline-mobile">

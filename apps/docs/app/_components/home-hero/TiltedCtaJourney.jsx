@@ -19,10 +19,10 @@ export function TiltedCtaJourney({
         afterTiles={
           <div className="tilted-cta-actions">
             <Button asChild>
-              <a href={componentsHref}>View components</a>
+              <a href={createHref}>Get started</a>
             </Button>
             <Button asChild variant="outline">
-              <a href={createHref}>Create</a>
+              <a href={componentsHref}>View components</a>
             </Button>
           </div>
         }
