@@ -152,7 +152,7 @@ export function HomePageSections({ docsBase = '' }) {
           <a className="home-footer-brand" href="/">
             <img
               className="nxds-logo"
-              src="/brand/nxds.svg"
+              src="/brand/nx-icon-light.svg"
               alt=""
               width={32}
               height={32}

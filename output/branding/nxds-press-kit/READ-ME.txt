@@ -1,34 +1,14 @@
 NEXUS DESIGN SYSTEM — PRESS KIT
-Locked stacked NX / DS badge — corrected geometry v1.0 | 21 October 2026
+Locked nx: identity | 21 October 2026
 
-Product name: Nexus Design System
-Short handle: nxds
-Description: An open-source design system by Nexus Labs.
+Use nx: for the logo and icon. No border. Original vector artwork, no font dependency.
+Includes the approved 16-unit n and lighter x. D/s and the old stacked badge are retired.
 
-ASSETS
-fonts: approved DM Sans and JetBrains Mono webfonts with license notices.
-svg: scalable custom vector artwork, no font dependency.
-png: transparent outside the badge, sizes 16–1024px in light and dark variants.
-favicon: multi-resolution ICO files, 16/32/48px.
+svg/: transparent logo and square icon masters, light/dark variants.
+png/: logo exports and square icon exports.
+favicon/: adaptive SVG, multi-resolution ICO, and Apple touch icon.
+source/: editable SVG geometry and export script.
+fonts/: DM Sans and JetBrains Mono with license notices; these are website typography, not logo fonts.
+BRAND-GUIDELINES.txt: construction, usage, typography and positioning.
 
-USAGE
-Website header: Nexus Design System text only, without the badge beside it.
-Use the badge independently for favicons, social avatars and app icons.
-Light background: black badge with white letters.
-Dark background: white badge with black letters.
-Colors: black #000000 and white #FFFFFF (RGB).
-Construction: 120-unit canvas, 24-unit badge radius, 20-unit internal padding.
-Keep the artwork proportional. Do not retype, stretch, recolor, or remove the internal padding.
-Recommended external clear space: at least 20 units per 120-unit badge.
-Prefer 32px or larger for website branding. 16px is supplied for favicon use only.
-
-These are brand assets, not an open-source artwork license or trademark registration claim.
-
-GEOMETRY — LOCKED V1.0
-Small corners use true 1.5-unit circular fillets before the 10/11 artwork scale.
-N: 11-unit stems and perpendicular diagonal thickness.
-X: parallel diagonal edges, 11-unit perpendicular thickness; rounded tips compensated to retain a 40-unit visible width.
-D: unchanged reference, 11-unit strokes, concentric 16/5-unit arcs.
-S: deliberate optical correction to 10-unit strokes; concentric 12.5/2.5-unit arcs provide 5-unit internal openings.
-All letters have 40-unit visible width and height within numeric precision of SVG export. Radii need not all match: small corner fillets share a radius; the larger bowl curves serve different letter structures.
-The master artwork is scaled 10/11 into the badge. Do not reconstruct it from these notes; use the supplied SVG.
+Light/dark refers to the destination background. Preserve aspect ratio.

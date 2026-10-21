@@ -12,6 +12,7 @@ import { PAGE_MANIFEST } from '../_lib/manifest';
 import { REPO_URL, SITE_NAME } from '../_lib/site';
 
 import { Button } from './nexus';
+import { NexusWordmark } from './NexusWordmark';
 import { SearchPalette } from './SearchPalette';
 
 const NAV_LINKS = [
@@ -56,7 +57,9 @@ export function TopNav() {
     );
     if (icon)
       icon.href =
-        resolvedMode === 'dark' ? '/brand/nxds-dark.svg' : '/brand/nxds.svg';
+        resolvedMode === 'dark'
+          ? '/brand/nx-icon-dark.svg'
+          : '/brand/nx-icon-light.svg';
   }, [resolvedMode]);
   const currentLink = NAV_LINKS.find((link) => isActive(pathname, link.match));
 
@@ -101,9 +104,10 @@ export function TopNav() {
       {pathname === '/' ? (
         <Link
           href="/"
-          className="nx:flex nx:items-center nx:gap-2 nx:typography-heading-small nx:font-extrabold nx:text-inherit nx:no-underline"
+          aria-label="Nexus Design System home"
+          className="nx:flex nx:items-center nx:text-inherit nx:no-underline nx:rounded-sm nx:focus-visible:outline-2 nx:focus-visible:outline-focus-default"
         >
-          nx:ds
+          <NexusWordmark />
         </Link>
       ) : (
         <Link
