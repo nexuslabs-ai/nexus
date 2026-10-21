@@ -1,6 +1,6 @@
 {
   "name": "@nexus_ds/eslint-plugin",
-  "version": "0.3.2",
+  "version": "0.4.0",
   "type": "module",
   "description": "ESLint rules that enforce Nexus UI conventions in copied components.",
   "keywords": [
