@@ -1,6 +1,6 @@
 # Nexus UI
 
-Nexus UI is a framework-agnostic theme engine and design system. Set one appearance object, and every component follows your brand, density and corners. Docs: **<https://nexusui.so>**.
+Nexus UI is a framework-agnostic theme engine and design system. Set one appearance object, and every component follows your brand, density and corners. Docs: **<https://nxds.dev>**.
 
 Three layers compose into one consumable surface:
 
@@ -8,7 +8,7 @@ Three layers compose into one consumable surface:
 - **`@nexus_ds/tailwind`** — Tailwind CSS theme generated from the tokens. All utilities are namespaced with the `nx:` prefix.
 - **`@nexus_ds/react`** — React components built on Radix UI primitives and the Tailwind layer. Variants via CVA; data-attribute test surface.
 
-Storybook hosts the component catalog and runs both visual docs and interaction tests against the real components. The catalog is published from `main` at **<https://storybook.nexusui.so>**.
+Storybook hosts the component catalog and runs both visual docs and interaction tests against the real components. The catalog is published from `main` at **<https://storybook.nxds.dev>**.
 
 ## Prerequisites
 
