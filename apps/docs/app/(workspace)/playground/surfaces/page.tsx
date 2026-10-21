@@ -4,7 +4,7 @@ import { SurfaceWorkspace } from '../../../_workspace/tokens/surfaces/surface-wo
 export const metadata = pageMetadata({
   title: 'Surface tokens',
   description:
-    'Find the Nexus UI component parts that read each surface token, in the current theme.',
+    'Find the nxds component parts that read each surface token, in the current theme.',
   route: '/playground/surfaces',
   image: SITE_IMAGE,
 });

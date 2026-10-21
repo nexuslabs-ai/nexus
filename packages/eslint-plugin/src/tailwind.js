@@ -27,11 +27,11 @@ const tailwindClassSelectors = [
   },
 ];
 
-export function nexusTailwindClassesConfig(options) {
+export function nxdsTailwindClassesConfig(options) {
   const { files, entryPoint } = options;
   if (typeof entryPoint !== 'string' || !path.isAbsolute(entryPoint)) {
     throw new Error(
-      `nexusTailwindClassesConfig: \`entryPoint\` must be an absolute path, got '${entryPoint}'.`
+      `nxdsTailwindClassesConfig: \`entryPoint\` must be an absolute path, got '${entryPoint}'.`
     );
   }
 
@@ -42,7 +42,7 @@ export function nexusTailwindClassesConfig(options) {
       'better-tailwindcss': { entryPoint, selectors: tailwindClassSelectors },
     },
     rules: {
-      // `dark` is the hook for the `@custom-variant dark` in nexus.css.
+      // `dark` is the hook for the `@custom-variant dark` in nxds.css.
       'better-tailwindcss/no-unknown-classes': [
         'error',
         { ignore: ['^dark$'] },

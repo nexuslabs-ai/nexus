@@ -646,7 +646,7 @@ export const VisualStateTokens: Story = {
     docs: {
       description: {
         story:
-          'Hover and disabled states on the native input use Nexus semantic tokens.',
+          'Hover and disabled states on the native input use nxds semantic tokens.',
       },
     },
   },

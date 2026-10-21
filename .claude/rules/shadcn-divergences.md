@@ -1,7 +1,7 @@
 # shadcn/ui Adaptation Guide
 
 Adapting a shadcn/ui component means translating its token vocabulary into
-Nexus's. Most of that translation is mechanical and machine-enforced — this file
+nxds's. Most of that translation is mechanical and machine-enforced — this file
 records only the decisions a reader cannot derive from the token registry or the
 linter.
 
@@ -9,7 +9,7 @@ linter.
 `pnpm lint` for the wrong prefix order, a banned `accent` token, an incomplete
 semantic token path, or a raw primitive colour. Available token names are in
 `SEMANTIC_TOKEN_REGISTRY` (`packages/core/src/lib/token-registry.ts`); the
-emitted utilities are in `packages/tailwind/nexus.css`. Read those, not a table
+emitted utilities are in `packages/tailwind/nxds.css`. Read those, not a table
 here.
 
 ## The `nx:` prefix
@@ -20,7 +20,7 @@ modifier: `nx:hover:bg-primary-background-hover`, `nx:[&>svg]:text-foreground`,
 
 ## Renames that change the word, not just the shape
 
-| shadcn        | Nexus       | Note                                                      |
+| shadcn        | nxds        | Note                                                      |
 | ------------- | ----------- | --------------------------------------------------------- |
 | `destructive` | `error-*`   | Tokens only — see below                                   |
 | `card`        | `container` | Plus `container-hover` / `container-active`               |
@@ -45,16 +45,16 @@ one mapping that needs judgement rather than a lookup:
 
 ## Suffixes are required, not decorative
 
-shadcn references a colour family directly (`bg-primary`); Nexus always names
+shadcn references a colour family directly (`bg-primary`); nxds always names
 the role (`nx:bg-primary-background`, `nx:text-primary-foreground`). Stopping at
 the family name is not a shorthand — it resolves to nothing.
 
 ## Semantic tokens replace opacity modifiers
 
-shadcn expresses state by fading a colour: `hover:bg-primary/90`. Nexus has a
+shadcn expresses state by fading a colour: `hover:bg-primary/90`. nxds has a
 real token for each state — `nx:hover:bg-primary-background-hover`,
 `nx:active:bg-primary-background-active`, `nx:bg-primary-disabled` — so the
-theme controls how state reads, not an arbitrary alpha. Nexus also carries
+theme controls how state reads, not an arbitrary alpha. nxds also carries
 `*-subtle-*` families and `success` / `warning` / `information` status families
 that shadcn has no equivalent for.
 

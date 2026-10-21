@@ -1,8 +1,8 @@
 'use client';
 
 import {
-  createNexusAppearanceSnapshotFromState,
-  type NexusAppearanceState,
+  createNxdsAppearanceSnapshotFromState,
+  type NxdsAppearanceState,
 } from '@nxds/core';
 import {
   Button,
@@ -15,24 +15,24 @@ import {
   DialogTitle,
   DialogTrigger,
 } from '@nxds/react';
-import { useNexusAppearance } from '@nxds/react/appearance';
+import { useNxdsAppearance } from '@nxds/react/appearance';
 import Link from 'next/link';
 
 import { CodeBlock } from '../_components/CodeBlock';
 
-function configurationSource(state: NexusAppearanceState) {
-  return `import type { NexusAppearanceState } from '@nxds/core';
+function configurationSource(state: NxdsAppearanceState) {
+  return `import type { NxdsAppearanceState } from '@nxds/core';
 
-export const appearance = ${JSON.stringify(state, null, 2)} satisfies NexusAppearanceState;
+export const appearance = ${JSON.stringify(state, null, 2)} satisfies NxdsAppearanceState;
 `;
 }
 
 /** Rendered only while the dialog is open, so the export is built on demand. */
 function ExportFiles() {
-  const { state } = useNexusAppearance();
-  const snapshot = createNexusAppearanceSnapshotFromState(state);
+  const { state } = useNxdsAppearance();
+  const snapshot = createNxdsAppearanceSnapshotFromState(state);
   const files = [
-    { name: 'nexus-appearance.ts', code: configurationSource(snapshot.state) },
+    { name: 'nxds-appearance.ts', code: configurationSource(snapshot.state) },
     { name: 'theme.css', code: snapshot.themeCss },
     { name: 'preferences.css', code: snapshot.prefsCss },
   ];
@@ -57,8 +57,8 @@ export function ThemeExport() {
         <DialogHeader>
           <DialogTitle>Use this theme</DialogTitle>
           <DialogDescription>
-            Pass the configuration to NexusAppearanceProvider and
-            NexusAppearanceScript as their default state. The style sheets are
+            Pass the configuration to NxdsAppearanceProvider and
+            NxdsAppearanceScript as their default state. The style sheets are
             the CSS they apply for it.
           </DialogDescription>
         </DialogHeader>

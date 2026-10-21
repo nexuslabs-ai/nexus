@@ -2,8 +2,8 @@ import { describe, expect, it } from 'vitest';
 
 import { APCA_PAIRS } from './apca-pairs';
 import {
-  createNexusThemeContract,
-  DEFAULT_NEXUS_APPEARANCE,
+  createNxdsThemeContract,
+  DEFAULT_NXDS_APPEARANCE,
 } from './appearance-model';
 import { BRAND_COLOR_PRESETS } from './brand-presets';
 import { deriveTheme } from './derive-theme';
@@ -22,8 +22,8 @@ describe.each(BRAND_COLOR_PRESETS)(
   'measureThemeContrast for the $label brand preset',
   ({ color }) => {
     const theme = deriveTheme(
-      createNexusThemeContract({
-        ...DEFAULT_NEXUS_APPEARANCE,
+      createNxdsThemeContract({
+        ...DEFAULT_NXDS_APPEARANCE,
         brandColor: color,
       })
     );
@@ -57,7 +57,7 @@ describe.each(BRAND_COLOR_PRESETS)(
 );
 
 describe('measureThemeContrast on a broken theme', () => {
-  const theme = deriveTheme(createNexusThemeContract(DEFAULT_NEXUS_APPEARANCE));
+  const theme = deriveTheme(createNxdsThemeContract(DEFAULT_NXDS_APPEARANCE));
   const report = measureThemeContrast({
     ...theme,
     dark: {

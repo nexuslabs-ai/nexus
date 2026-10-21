@@ -3,16 +3,16 @@ import { expect, within } from 'storybook/test';
 
 import { Switch } from '../../switch/switch';
 
-import { NexusAppearanceSettingRow } from './setting-row';
+import { NxdsAppearanceSettingRow } from './setting-row';
 
-const meta: Meta<typeof NexusAppearanceSettingRow> = {
+const meta: Meta<typeof NxdsAppearanceSettingRow> = {
   title: 'Appearance/SettingRow',
-  component: NexusAppearanceSettingRow,
+  component: NxdsAppearanceSettingRow,
   parameters: {
     docs: {
       description: {
         component:
-          'NexusAppearanceSettingRow pairs a setting label and optional description with its control. Use it for each row of an appearance settings panel.',
+          'NxdsAppearanceSettingRow pairs a setting label and optional description with its control. Use it for each row of an appearance settings panel.',
       },
     },
   },
@@ -30,7 +30,7 @@ const meta: Meta<typeof NexusAppearanceSettingRow> = {
   ],
 };
 export default meta;
-type Story = StoryObj<typeof NexusAppearanceSettingRow>;
+type Story = StoryObj<typeof NxdsAppearanceSettingRow>;
 
 export const Default: Story = {
   play: async ({ canvasElement, args }) => {
@@ -89,15 +89,15 @@ export const WithDataAttributes: Story = {
 export const AllVariants: Story = {
   render: () => (
     <div className="nx:divide-y nx:divide-border-default">
-      <NexusAppearanceSettingRow
+      <NxdsAppearanceSettingRow
         label="Reduce motion"
         description="Shorten animations and transitions."
       >
         <Switch aria-label="Reduce motion" />
-      </NexusAppearanceSettingRow>
-      <NexusAppearanceSettingRow label="Font smoothing">
+      </NxdsAppearanceSettingRow>
+      <NxdsAppearanceSettingRow label="Font smoothing">
         <Switch aria-label="Font smoothing" defaultChecked />
-      </NexusAppearanceSettingRow>
+      </NxdsAppearanceSettingRow>
     </div>
   ),
 };

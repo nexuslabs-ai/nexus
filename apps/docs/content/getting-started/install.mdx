@@ -1,9 +1,9 @@
 export const description =
-  'Set up Nexus UI in a new or existing app. Add Tailwind 4, the token CSS and the appearance provider, then copy in your first component.';
+  'Set up nxds in a new or existing app. Add Tailwind 4, the token CSS and the appearance provider, then copy in your first component.';
 
 # Install
 
-Set up your app once, then copy in any Nexus component.
+Set up your app once, then copy in any nxds component.
 
 Copied components are your files: edit them freely, and paste a newer version
 to update.
@@ -23,7 +23,7 @@ export default {
 
 Tailwind 4 builds the `nx:` classes. These steps use a new Next.js 15 App
 Router app. If your app already has a UI, follow
-[Add Nexus to an existing app](#add-nexus-to-an-existing-app).
+[Add nxds to an existing app](#add-nxds-to-an-existing-app).
 
 Remove the `@import "tailwindcss"` that `create-next-app` adds to
 `globals.css`. The token CSS brings Tailwind's theme and utilities with the
@@ -34,11 +34,11 @@ same file doesn't give you unprefixed classes.
 
 The token CSS defines the colors, spacing and type scale. Copy the seven files
 from `packages/tailwind/` in the
-[Nexus repo](https://github.com/nexuslabs-ai/nxds) into `styles/nexus/`:
+[nxds repo](https://github.com/nexuslabs-ai/nxds) into `styles/nxds/`:
 
 ```
-styles/nexus/
-├── nexus.css                 # entry point, imports the other six
+styles/nxds/
+├── nxds.css                 # entry point, imports the other six
 ├── variables.css
 ├── typography-utilities.css
 ├── borderwidth-utilities.css
@@ -60,21 +60,21 @@ CSS entry point:
 /* app/globals.css */
 @layer theme, base, components, utilities;
 @import 'tailwindcss/preflight.css' layer(base);
-@import '../styles/nexus/nexus.css';
+@import '../styles/nxds/nxds.css';
 @import 'tw-animate-css';
 ```
 
-Nexus ships no reset, so the page brings Preflight. Nexus components need its
+nxds ships no reset, so the page brings Preflight. nxds components need its
 `box-sizing: border-box`.
 
 Every Tailwind class in your app now takes the `nx:` prefix: `nx:flex` works,
-`flex` does not. Only Nexus tokens are available, so Tailwind's default colors
+`flex` does not. Only nxds tokens are available, so Tailwind's default colors
 are gone.
 {/* audit-class-refs-ignore-next-line */}
 Instead of `nx:bg-red-500`, use a token class like `nx:bg-error-background`.
 
 To add your own tokens, put a `@theme` block in `globals.css` after the
-imports. Don't edit `nexus.css`, because pasting a newer copy replaces it.
+imports. Don't edit `nxds.css`, because pasting a newer copy replaces it.
 
 Scrollbars and form controls turn dark with the theme. Don't add a
 `color-scheme` meta tag. A `light dark` meta lets the operating system darken a
@@ -98,11 +98,11 @@ Copy the provider folder into `components/appearance/provider/`:
 
 ```
 components/appearance/provider/
-├── index.ts      # NexusAppearanceProvider, useNexusAppearance, createNexusAppearance
+├── index.ts      # NxdsAppearanceProvider, useNxdsAppearance, createNxdsAppearance
 ├── provider.tsx
 ├── factory.tsx
 ├── script.tsx
-└── server.ts     # NexusAppearanceScript (safe to import on the server)
+└── server.ts     # NxdsAppearanceScript (safe to import on the server)
 ```
 
 Set your app's starting theme. Copy the default appearance and change the
@@ -110,16 +110,13 @@ fields you want:
 
 ```ts
 // app/appearance-state.ts
-import {
-  DEFAULT_NEXUS_APPEARANCE,
-  type NexusAppearanceState,
-} from '@nxds/core';
+import { DEFAULT_NXDS_APPEARANCE, type NxdsAppearanceState } from '@nxds/core';
 
 export const defaultAppearance = {
-  ...DEFAULT_NEXUS_APPEARANCE,
+  ...DEFAULT_NXDS_APPEARANCE,
   brandColor: '#2563eb',
   surfaceTone: 'slate',
-} satisfies NexusAppearanceState;
+} satisfies NxdsAppearanceState;
 ```
 
 `brandColor` sets the primary color. `surfaceTone` sets the gray used for
@@ -129,8 +126,8 @@ Add the script and the provider to your root layout:
 
 ```tsx
 // app/layout.tsx
-import { NexusAppearanceProvider } from '@/components/appearance/provider';
-import { NexusAppearanceScript } from '@/components/appearance/provider/server';
+import { NxdsAppearanceProvider } from '@/components/appearance/provider';
+import { NxdsAppearanceScript } from '@/components/appearance/provider/server';
 
 import { defaultAppearance } from './appearance-state';
 
@@ -144,25 +141,25 @@ export default function RootLayout({
   return (
     <html lang="en" suppressHydrationWarning>
       <head>
-        <NexusAppearanceScript
+        <NxdsAppearanceScript
           storageKey="app-appearance"
           defaultState={defaultAppearance}
         />
       </head>
       <body className="nx:bg-background nx:text-foreground nx:typography-body-default">
-        <NexusAppearanceProvider
+        <NxdsAppearanceProvider
           storageKey="app-appearance"
           defaultState={defaultAppearance}
         >
           {children}
-        </NexusAppearanceProvider>
+        </NxdsAppearanceProvider>
       </body>
     </html>
   );
 }
 ```
 
-`nx:typography-body-default` gives page text the Nexus font and size, which
+`nx:typography-body-default` gives page text the nxds font and size, which
 follow the appearance settings.
 
 Give the script and the provider the same `storageKey`. The provider saves the
@@ -199,17 +196,17 @@ Render it:
 
 <ComponentDemo id="button/default" />
 
-To check dark mode, add a toggle that uses `useNexusAppearance`:
+To check dark mode, add a toggle that uses `useNxdsAppearance`:
 
 ```tsx
 // components/mode-toggle.tsx
 'use client';
 
-import { useNexusAppearance } from '@/components/appearance/provider';
+import { useNxdsAppearance } from '@/components/appearance/provider';
 import { Button } from '@/components/button/button';
 
 export function ModeToggle() {
-  const { state, setState, resolvedMode } = useNexusAppearance();
+  const { state, setState, resolvedMode } = useNxdsAppearance();
 
   const toggle = () =>
     setState({ ...state, mode: resolvedMode === 'dark' ? 'light' : 'dark' });
@@ -223,12 +220,12 @@ export function ModeToggle() {
 
 ## Check your setup
 
-- [ ] `nexus.css` is imported from your CSS entry point
+- [ ] `nxds.css` is imported from your CSS entry point
 - [ ] The provider wraps your app, and the script is in `<head>`
 - [ ] Reloading in dark mode doesn't flash light first
 - [ ] The mode you pick is still set after a full reload
 
-If the button has no styles, `nexus.css` isn't imported (step 2). If it stays
+If the button has no styles, `nxds.css` isn't imported (step 2). If it stays
 light when you toggle, the provider isn't wrapping it (step 3).
 
 If the page flashes on reload, check that the script and the provider use the
@@ -246,8 +243,8 @@ build time:
 ```ts
 // vite.config.ts
 import {
-  createNexusAppearanceBootstrapScript,
-  createNexusAppearanceSnapshotFromState,
+  createNxdsAppearanceBootstrapScript,
+  createNxdsAppearanceSnapshotFromState,
 } from '@nxds/core';
 import react from '@vitejs/plugin-react';
 import { defineConfig } from 'vite';
@@ -256,15 +253,15 @@ import { defaultAppearance } from './src/appearance-state';
 
 const STORAGE_KEY = 'app-appearance';
 const defaultSnapshot =
-  createNexusAppearanceSnapshotFromState(defaultAppearance);
+  createNxdsAppearanceSnapshotFromState(defaultAppearance);
 
 export default defineConfig({
   plugins: [
     react(),
     {
-      name: 'nexus-appearance-bootstrap',
+      name: 'nxds-appearance-bootstrap',
       transformIndexHtml(html) {
-        const script = createNexusAppearanceBootstrapScript({
+        const script = createNxdsAppearanceBootstrapScript({
           storageKey: STORAGE_KEY,
           defaultSnapshot,
         });
@@ -283,19 +280,19 @@ import { createRoot } from 'react-dom/client';
 
 import App from './App';
 import { defaultAppearance } from './appearance-state';
-import { createNexusAppearance } from './components/appearance/provider';
+import { createNxdsAppearance } from './components/appearance/provider';
 
 import './index.css';
 
-const { NexusAppearanceProvider } = createNexusAppearance({
+const { NxdsAppearanceProvider } = createNxdsAppearance({
   storageKey: 'app-appearance',
   defaultState: defaultAppearance,
 });
 
 createRoot(document.getElementById('root')!).render(
-  <NexusAppearanceProvider>
+  <NxdsAppearanceProvider>
     <App />
-  </NexusAppearanceProvider>
+  </NxdsAppearanceProvider>
 );
 ```
 
@@ -311,13 +308,13 @@ one:
 ```tsx
 // app/layout.tsx
 import {
-  createNexusAppearanceSnapshotFromCookie,
+  createNxdsAppearanceSnapshotFromCookie,
   DEFAULT_COOKIE_KEY,
 } from '@nxds/core';
 import { cookies } from 'next/headers';
 
-import { NexusAppearanceProvider } from '@/components/appearance/provider';
-import { NexusAppearanceScript } from '@/components/appearance/provider/server';
+import { NxdsAppearanceProvider } from '@/components/appearance/provider';
+import { NxdsAppearanceScript } from '@/components/appearance/provider/server';
 
 import { defaultAppearance } from './appearance-state';
 
@@ -329,7 +326,7 @@ export default async function RootLayout({
   children: React.ReactNode;
 }) {
   const cookieStore = await cookies();
-  const snapshot = createNexusAppearanceSnapshotFromCookie(
+  const snapshot = createNxdsAppearanceSnapshotFromCookie(
     cookieStore.get(DEFAULT_COOKIE_KEY)?.value,
     defaultAppearance
   );
@@ -337,26 +334,26 @@ export default async function RootLayout({
   return (
     <html lang="en" suppressHydrationWarning>
       <head>
-        <NexusAppearanceScript
+        <NxdsAppearanceScript
           storageKey="app-appearance"
           defaultState={snapshot.state}
         />
       </head>
       <body className="nx:bg-background nx:text-foreground nx:typography-body-default">
-        <NexusAppearanceProvider
+        <NxdsAppearanceProvider
           storageKey="app-appearance"
           cookieWriteKey={DEFAULT_COOKIE_KEY}
           defaultState={snapshot.state}
         >
           {children}
-        </NexusAppearanceProvider>
+        </NxdsAppearanceProvider>
       </body>
     </html>
   );
 }
 ```
 
-If the cookie is missing or invalid, `createNexusAppearanceSnapshotFromCookie`
+If the cookie is missing or invalid, `createNxdsAppearanceSnapshotFromCookie`
 falls back to `defaultAppearance`.
 
 If you read the cookie in the root layout, Next.js renders every route on each
@@ -373,31 +370,31 @@ When both are set, `localStorage` wins in the browser. To use only the cookie,
 set `storageKey={false}` on both the script and the provider.
 
 If your app uses a strict Content Security Policy, pass a nonce:
-`<NexusAppearanceScript nonce={nonce} />`.
+`<NxdsAppearanceScript nonce={nonce} />`.
 
-## Add Nexus to an existing app
+## Add nxds to an existing app
 
-Nexus CSS defines only `nx:` classes and `--nx-*` variables, so your app's
+nxds CSS defines only `nx:` classes and `--nx-*` variables, so your app's
 styles stay as they are. Follow steps 1 to 4 with these four changes:
 
-1. **Copy Nexus into its own folder**, such as `components/nexus/`. Your app
-   likely has its own `lib/utils.ts`, and Nexus's would replace it. The imports
-   between Nexus files still work.
-2. **Give Nexus its own CSS entry** and import it after your own stylesheet:
+1. **Copy nxds into its own folder**, such as `components/nxds/`. Your app
+   likely has its own `lib/utils.ts`, and nxds's would replace it. The imports
+   between nxds files still work.
+2. **Give nxds its own CSS entry** and import it after your own stylesheet:
 
    ```css
-   /* app/nexus.css */
-   @import '../components/nexus/tailwind/nexus.css';
+   /* app/nxds.css */
+   @import '../components/nxds/tailwind/nxds.css';
    @import 'tw-animate-css';
    ```
 
    Your `globals.css` keeps its `@import "tailwindcss"`. Two files make two
    Tailwind builds, one prefixed and one not.
 
-3. **Keep your app's reset.** Nexus needs `box-sizing: border-box`. Tailwind's
+3. **Keep your app's reset.** nxds needs `box-sizing: border-box`. Tailwind's
    Preflight, MUI's `CssBaseline` and Bootstrap's Reboot all set it. If your app
-   has no Tailwind, install it for the Nexus entry.
-4. **Add the provider and the script** as in step 3. Nexus and your theme share
+   has no Tailwind, install it for the nxds entry.
+4. **Add the provider and the script** as in step 3. nxds and your theme share
    the `.dark` class on `<html>`.
 
 Three global effects remain:
@@ -408,17 +405,17 @@ Three global effects remain:
 | `tw-animate-css`      | `enter`, `exit`, `accordion-*`, `collapsible-*` and `caret-blink` keyframes, as in any shadcn app |
 | Tailwind's own output | `spin`, `ping`, `pulse` and `bounce` keyframes and `--tw-*` properties, as in any Tailwind 4 app  |
 
-Style a Nexus component with `nx:` classes. An unprefixed class loses to the
-component's own `nx:` class, because Nexus's stylesheet loads later.
+Style an nxds component with `nx:` classes. An unprefixed class loses to the
+component's own `nx:` class, because nxds's stylesheet loads later.
 
-Your content inside a Nexus component inherits its text color, font and line
+Your content inside an nxds component inherits its text color, font and line
 height.
 
-If your design system is a package, ship the Nexus CSS entry from it and end
+If your design system is a package, ship the nxds CSS entry from it and end
 the entry with `@source './';`. Tailwind skips `node_modules`, so without that
 line the package's classes are never generated.
 
-Nexus overlays use three layers:
+nxds overlays use three layers:
 
 | Variable               | Default | Used by                         |
 | ---------------------- | ------- | ------------------------------- |
@@ -429,15 +426,15 @@ Nexus overlays use three layers:
 If your app's layers sit higher, like MUI's dialogs at 1300, raise these on
 `:root`.
 
-An open Nexus dialog blocks pointer events outside itself. Render another
+An open nxds dialog blocks pointer events outside itself. Render another
 library's popups inside it, such as an MUI `Menu` with `disablePortal`.
 
-[Examples](/getting-started/examples) shows Nexus added to a shadcn app, an MUI
+[Examples](/getting-started/examples) shows nxds added to a shadcn app, an MUI
 app and a company package.
 
 ## (Optional) Add lint rules
 
-The Nexus ESLint rules keep copied components following Nexus conventions:
+The nxds ESLint rules keep copied components following nxds conventions:
 
 ```bash
 npm install -D @nxds/eslint-plugin
@@ -445,20 +442,20 @@ npm install -D @nxds/eslint-plugin
 
 ```js
 // eslint.config.mjs
-import { nexusComponentConfig } from '@nxds/eslint-plugin/config';
+import { nxdsComponentConfig } from '@nxds/eslint-plugin/config';
 
 const eslintConfig = [
   // ...your existing config
   {
     files: ['components/**/*.tsx'],
-    ...nexusComponentConfig(),
+    ...nxdsComponentConfig(),
   },
 ];
 
 export default eslintConfig;
 ```
 
-`nexusComponentConfig` turns on three rules for the files you list:
+`nxdsComponentConfig` turns on three rules for the files you list:
 
 | Rule                             | Catches                                                                           |
 | -------------------------------- | --------------------------------------------------------------------------------- |
@@ -473,7 +470,7 @@ add `languageOptions: { parser: tseslint.parser }` to the entry.
 ## Where the files are
 
 Every file you copy comes from the
-[Nexus repo](https://github.com/nexuslabs-ai/nxds):
+[nxds repo](https://github.com/nexuslabs-ai/nxds):
 
 | File                | Path in the repo                                     |
 | ------------------- | ---------------------------------------------------- |

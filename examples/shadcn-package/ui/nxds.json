@@ -1,0 +1,9 @@
+{
+  "components": [
+    "alert", "avatar", "badge", "button", "card", "checkbox", "dialog",
+    "dropdown-menu", "input", "label", "popover", "progress", "radio-group",
+    "select", "separator", "sonner", "switch", "table", "tabs", "textarea", "tooltip"
+  ],
+  "sourceDir": "src/nxds",
+  "cssDir": "src/nxds/tailwind"
+}

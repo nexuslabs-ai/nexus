@@ -82,7 +82,7 @@ function RuntimeUtilitiesStory() {
           Runtime shadows
         </h2>
         <p className="nx:max-w-2xl nx:text-muted-foreground nx:typography-body-default">
-          Real `nx:shadow-*` utilities rendered from the active Nexus Appearance
+          Real `nx:shadow-*` utilities rendered from the active nxds Appearance
           provider. Use the Mode and Elevation toolbars to inspect the runtime
           CSS variables a consumer receives.
         </p>

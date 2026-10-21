@@ -2,15 +2,15 @@
 
 import { useState } from 'react';
 
-import type { NexusAppearanceState } from '@nxds/core';
-import { useNexusAppearance } from '@nxds/react/appearance';
+import type { NxdsAppearanceState } from '@nxds/core';
+import { useNxdsAppearance } from '@nxds/react/appearance';
 
 import { DOCS_APPEARANCE_DEFAULT_STATE } from '../_lib/appearance-controls';
 
 const HISTORY_LIMIT = 100;
 
-type AppearancePatch = Partial<NexusAppearanceState>;
-type AppearanceKey = keyof NexusAppearanceState;
+type AppearancePatch = Partial<NxdsAppearanceState>;
+type AppearanceKey = keyof NxdsAppearanceState;
 
 function isShallowEqual(a: unknown, b: unknown): boolean {
   if (Object.is(a, b)) return true;
@@ -26,7 +26,7 @@ function isShallowEqual(a: unknown, b: unknown): boolean {
 
 /** The current values of the keys `patch` would change. */
 function inverseOf(
-  state: NexusAppearanceState,
+  state: NxdsAppearanceState,
   patch: AppearancePatch
 ): AppearancePatch {
   const changedKeys = (Object.keys(patch) as AppearanceKey[]).filter(
@@ -46,7 +46,7 @@ function inverseOf(
  * provider.
  */
 export function useAppearanceHistory() {
-  const { state, setState } = useNexusAppearance();
+  const { state, setState } = useNxdsAppearance();
   const [history, setHistory] = useState<AppearancePatch[]>([]);
   const [lastGroup, setLastGroup] = useState<AppearanceKey | null>(null);
 

@@ -19,9 +19,9 @@ import {
   SidebarTrigger,
   Toaster,
 } from "@acme/ui"
-import { Toaster as NexusToaster } from "./components/nexus/components/sonner/sonner"
+import { Toaster as NxdsToaster } from "./components/nxds/components/sonner/sonner"
 
-import { useNexusAppearance } from "./appearance"
+import { useNxdsAppearance } from "./appearance"
 import { OverlaysPage } from "./pages/OverlaysPage"
 import { SettingsPage } from "./pages/SettingsPage"
 import { SideBySidePage } from "./pages/SideBySidePage"
@@ -37,7 +37,7 @@ const NAV = [
 // shared .dark class on <html>.
 function ThemeToggle() {
   const { resolvedTheme, setTheme } = useTheme()
-  const { setState } = useNexusAppearance()
+  const { setState } = useNxdsAppearance()
   const dark = resolvedTheme === "dark"
 
   function toggleTheme() {
@@ -63,7 +63,7 @@ export default function App() {
         <SidebarHeader className="px-4 py-3 font-semibold">Acme Console</SidebarHeader>
         <SidebarContent>
           <SidebarGroup>
-            <SidebarGroupLabel>Nexus adoption</SidebarGroupLabel>
+            <SidebarGroupLabel>nxds adoption</SidebarGroupLabel>
             <SidebarGroupContent>
               <SidebarMenu>
                 {NAV.map(({ href, label, icon: Icon }) => (
@@ -85,7 +85,7 @@ export default function App() {
         <header className="flex h-14 items-center gap-2 border-b px-4">
           <SidebarTrigger />
           <Separator orientation="vertical" className="h-5" />
-          <span className="text-sm text-muted-foreground">App using @acme/ui, Nexus copied into the app</span>
+          <span className="text-sm text-muted-foreground">App using @acme/ui, nxds copied into the app</span>
           <div className="ml-auto">
             <ThemeToggle />
           </div>
@@ -99,7 +99,7 @@ export default function App() {
         </main>
       </SidebarInset>
       <Toaster />
-      <NexusToaster />
+      <NxdsToaster />
     </SidebarProvider>
   )
 }

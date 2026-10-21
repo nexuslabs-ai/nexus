@@ -1,16 +1,16 @@
 import type { ReactNode } from 'react';
 
-interface NexusAppearanceSettingRowProps {
+interface NxdsAppearanceSettingRowProps {
   label: string;
   description?: string;
   children: ReactNode;
 }
 
-export function NexusAppearanceSettingRow({
+export function NxdsAppearanceSettingRow({
   label,
   description,
   children,
-}: NexusAppearanceSettingRowProps) {
+}: NxdsAppearanceSettingRowProps) {
   return (
     <div
       data-slot="appearance-setting-row"

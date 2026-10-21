@@ -2,9 +2,9 @@
   "name": "@nxds/eslint-plugin",
   "version": "0.4.0",
   "type": "module",
-  "description": "ESLint rules that enforce Nexus UI conventions in copied components.",
+  "description": "ESLint rules that enforce nxds conventions in copied components.",
   "keywords": [
-    "nexus-ui",
+    "nxds",
     "design-system",
     "eslint",
     "eslintplugin",

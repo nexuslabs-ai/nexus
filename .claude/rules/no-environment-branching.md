@@ -1,6 +1,6 @@
 # No Environment Branching
 
-Nexus does not branch on the user's operating system, browser, browser version, or input device.
+nxds does not branch on the user's operating system, browser, browser version, or input device.
 
 Every environment branch is a code path nobody on the team is looking at and CI cannot check. The component's real appearance comes to depend on a machine no reviewer is sitting at. That cost falls on every component, indefinitely.
 
@@ -21,17 +21,17 @@ If a platform cannot render something, the fix is to pick a simpler primitive �
 
 ## The One Exception
 
-`prefers-color-scheme` stays. Light/dark is a product feature Nexus ships deliberately, not environment branching.
+`prefers-color-scheme` stays. Light/dark is a product feature nxds ships deliberately, not environment branching.
 
 ## What This Does Not Cover
 
 These are single code paths, not branches, and are fine:
 
-- **Appearance preferences the user sets explicitly**, such as the `reduceMotion` toggle or font smoothing. The user picks them in the product; Nexus does not detect them from the environment.
+- **Appearance preferences the user sets explicitly**, such as the `reduceMotion` toggle or font smoothing. The user picks them in the product; nxds does not detect them from the environment.
 - **Vendor-prefixed declarations** that a single appearance needs, such as `-webkit-font-smoothing`.
 - **Layout primitives** such as `svh` / `dvh` units.
 - **Unconditional system colours** on OS-rendered UI, such as `NativeSelect`'s `<option>` using `Canvas` / `CanvasText`.
-- **Tailwind's built-in output.** The rule covers branches Nexus writes, not queries Tailwind emits for its own utilities — such as the `(hover: hover)` wrapper around `hover:` or the `forced-colors` block inside `outline-hidden`. Use Tailwind as it ships.
+- **Tailwind's built-in output.** The rule covers branches nxds writes, not queries Tailwind emits for its own utilities — such as the `(hover: hover)` wrapper around `hover:` or the `forced-colors` block inside `outline-hidden`. Use Tailwind as it ships.
 
 ## Precedence Over Modern Web Guidance
 

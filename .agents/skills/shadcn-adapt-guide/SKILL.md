@@ -1,6 +1,6 @@
 ---
 name: shadcn-adapt-guide
-description: Adapt a shadcn/ui component into a first-class Nexus component. Use when porting, adapting, converting, or translating a shadcn (or shadcn/ui) component to Nexus — mapping tokens via shadcn-divergences.md, applying the nx: prefix, data attributes, component sizing, the focus-ring pattern, and Storybook play-fn tests. Triggers on "adapt X to Nexus", "port shadcn X", "add the X component" for the Component library epic, or a shadcn source URL/issue asking to bring a component into the design system.
+description: Adapt a shadcn/ui component into a first-class nxds component. Use when porting, adapting, converting, or translating a shadcn (or shadcn/ui) component to nxds — mapping tokens via shadcn-divergences.md, applying the nx: prefix, data attributes, component sizing, the focus-ring pattern, and Storybook play-fn tests. Triggers on "adapt X to nxds", "port shadcn X", "add the X component" for the Component library epic, or a shadcn source URL/issue asking to bring a component into the design system.
 allowed-tools:
   - Read
   - Grep
@@ -17,7 +17,7 @@ user-invocable: false
 
 ## Purpose
 
-Deterministically turn one shadcn/ui component into a first-class Nexus component that meets the full component bar. The mapping is **known**, so this is a recipe, not open-ended implementation: orient → transform → verify. Do not write a multi-phase plan or wait for approval — the steps below are the plan.
+Deterministically turn one shadcn/ui component into a first-class nxds component that meets the full component bar. The mapping is **known**, so this is a recipe, not open-ended implementation: orient → transform → verify. Do not write a multi-phase plan or wait for approval — the steps below are the plan.
 
 ## Rules are the spec — reference, never duplicate
 
@@ -25,7 +25,7 @@ The authoritative rules live in `.claude/rules/*.md`. This guide orchestrates th
 
 | Rule                                                                                                                                                                                                     | What it owns                                                                |
 | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------- |
-| `shadcn-divergences.md`                                                                                                                                                                                  | **THE** shadcn→Nexus token mapping, sizing, data-attrs, focus, checklist    |
+| `shadcn-divergences.md`                                                                                                                                                                                  | **THE** shadcn→nxds token mapping, sizing, data-attrs, focus, checklist     |
 | `base-*.json` (surface/nav tokens)                                                                                                                                                                       | Surface/elevation tokens (container/popover/overlay), the `nav-*` namespace |
 | `testing-react.md`                                                                                                                                                                                       | Required stories, play-fns, a11y, and story coverage audit                  |
 | `packages/core/tokens/`                                                                                                                                                                                  | Token names — verify a token exists before using it                         |
@@ -37,7 +37,7 @@ One component (e.g. `checkbox`), a shadcn source URL, or a tracked issue (#162�
 
 ## Archetype → reference component
 
-Before writing, read the closest **shipped** Nexus component and mirror it exactly — structure, `data-slot`, focus, exports, JSDoc. Don't invent a new shape.
+Before writing, read the closest **shipped** nxds component and mirror it exactly — structure, `data-slot`, focus, exports, JSDoc. Don't invent a new shape.
 
 | If the component is…                    | Mirror                            | Examples                          |
 | --------------------------------------- | --------------------------------- | --------------------------------- |
@@ -64,7 +64,7 @@ Before writing, read the closest **shipped** Nexus component and mirror it exact
 
 ### Step 3 — Transform (deterministic + Reflex Check)
 
-Rewrite the source into the Nexus component, mirroring the archetype and applying the **Reflex Check** below. Preserve the public API shape — prop names, the `asChild` pattern, handler signatures, and the `destructive` variant name.
+Rewrite the source into the nxds component, mirroring the archetype and applying the **Reflex Check** below. Preserve the public API shape — prop names, the `asChild` pattern, handler signatures, and the `destructive` variant name.
 
 ### Step 4 — Stories
 
@@ -90,7 +90,7 @@ Run these and fix everything before reporting — no deferral (`no-follow-up-def
 Read at the start; re-fire whenever a trigger lights up. The trigger is the thing you're about to type; the arrow is what to do instead.
 
 - _Pasting a shadcn `className`?_ → strip raw Tailwind; put `nx:` **before** every modifier (`nx:hover:…`, not `hover:nx:…`); map each utility to a **semantic** token via `shadcn-divergences.md` — never `bg-primary` (incomplete) or `bg-blue-500` (primitive). (`shadcn-divergences.md`)
-- _See `bg-accent` / `text-accent-foreground` / `hover:bg-accent`?_ → there is **no `accent` token** in Nexus; map **by context** — ghost/control hover → `background-hover`, menu/dropdown item → `popover-hover`, list/card row → `container-hover`. If the surface isn't inferable, ask rather than guess. (`shadcn-divergences.md` § Accent)
+- _See `bg-accent` / `text-accent-foreground` / `hover:bg-accent`?_ → there is **no `accent` token** in nxds; map **by context** — ghost/control hover → `background-hover`, menu/dropdown item → `popover-hover`, list/card row → `container-hover`. If the surface isn't inferable, ask rather than guess. (`shadcn-divergences.md` § Accent)
 - _See a `dark:` modifier?_ → delete it. Semantic tokens already carry their dark value. (`shadcn-divergences.md`)
 - _See `ring-*` / `focus:ring` / `ring-offset`?_ → use `nx:focus-visible:outline-2 nx:focus-visible:outline-focus-default` (Button adds `nx:focus-visible:outline-offset-2`; fields swap `outline-2` for `nx:focus-visible:outline-default` plus `nx:focus-visible:border-focus-default`); invalid fields add `nx:aria-invalid:focus-visible:outline-focus-error nx:aria-invalid:focus-visible:border-focus-error`. Drop any `outline-none` on the same element, and swap `nx:transition-colors` for `nx:transition-control` (or `nx:transition-field` on a field) — `transition-colors` carries `outline-color`, which fades the ring in, and `pnpm lint` fails the pair. (mirror `input.tsx`; spec: `/foundations/focus`)
 - _Sizing a control?_ → copy the `size` variants straight from `button.tsx` (it covers both the text and icon-only shapes) or `input.tsx`. Don't derive a scale of your own.

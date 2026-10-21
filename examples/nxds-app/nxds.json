@@ -1,0 +1,10 @@
+{
+  "components": [
+    "accordion", "alert", "appearance", "avatar", "badge", "button", "card",
+    "checkbox", "input", "label", "progress", "radio-group", "select",
+    "separator", "sidebar", "slider", "sonner", "switch", "table", "tabs",
+    "textarea"
+  ],
+  "sourceDir": ".",
+  "cssDir": "styles/nxds"
+}

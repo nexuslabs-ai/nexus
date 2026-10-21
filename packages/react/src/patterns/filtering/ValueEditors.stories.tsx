@@ -33,7 +33,7 @@ const meta = {
       source: { code: recipeSource, language: 'tsx', type: 'code' },
       description: {
         component:
-          'Working, copyable editor recipes built from Nexus components. Field, operator and value are separate segments. Operator changes apply immediately; number, range, date and text value edits stay drafts until Apply. Empty operators hide the value editor. Applied readouts show committed values; no remote data is queried. Applications own filter values, query evaluation, URL state, dates/timezones and fetching. These recipes are not exported as a filtering engine.',
+          'Working, copyable editor recipes built from nxds components. Field, operator and value are separate segments. Operator changes apply immediately; number, range, date and text value edits stay drafts until Apply. Empty operators hide the value editor. Applied readouts show committed values; no remote data is queried. Applications own filter values, query evaluation, URL state, dates/timezones and fetching. These recipes are not exported as a filtering engine.',
       },
     },
   },

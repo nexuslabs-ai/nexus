@@ -2,7 +2,7 @@
 
 import { useCallback, useSyncExternalStore } from 'react';
 
-const LOCATION_EVENT = 'nexus-workspace-location';
+const LOCATION_EVENT = 'nxds-workspace-location';
 
 function subscribe(callback: () => void) {
   window.addEventListener('popstate', callback);

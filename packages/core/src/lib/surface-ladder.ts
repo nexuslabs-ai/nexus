@@ -1,7 +1,7 @@
-import type { NexusSurfaceTone } from './palette';
+import type { NxdsSurfaceTone } from './palette';
 
 export const SURFACE_TONE: Record<
-  NexusSurfaceTone,
+  NxdsSurfaceTone,
   { h: number; lightC: number; darkC: number }
 > = {
   slate: { h: 264.7, lightC: 0.003, darkC: 0.006 },

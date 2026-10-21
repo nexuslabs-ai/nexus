@@ -28,10 +28,10 @@ Component work has two gates:
    playbook. This gate blocks calling the component "done."
 
 Passing the first gate means the work is shippable. Passing the second gate means
-it clears the Nexus Tier-A bar.
+it clears the nxds Tier-A bar.
 
 For a substantial UI change, record a guidance note as described in
-[Modern Web Guidance's Nexus integration](../../.agents/skills/modern-web-guidance/SKILL.md#nexus-integration-repository-policy-takes-precedence).
+[Modern Web Guidance's nxds integration](../../.agents/skills/modern-web-guidance/SKILL.md#nxds-integration-repository-policy-takes-precedence).
 
 Every polish plan must list its validation evidence: the Storybook,
 accessibility, visual/manual, and command evidence required for review.
@@ -40,7 +40,7 @@ accessibility, visual/manual, and command evidence required for review.
 
 Use these anchors to keep polish decisions grounded:
 
-| Topic                  | Source                                                                                                                                                                                                                                                      | Nexus rule                                                                                               |
+| Topic                  | Source                                                                                                                                                                                                                                                      | nxds rule                                                                                                |
 | ---------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------- |
 | Purposeful motion      | [Carbon Motion](https://carbondesignsystem.com/elements/motion/overview/)                                                                                                                                                                                   | Motion should clarify, guide, or give feedback; decorative motion is not polish.                         |
 | Animation performance  | [web.dev high-performance CSS animations](https://web.dev/articles/animations-guide)                                                                                                                                                                        | Prefer `transform` and `opacity`; avoid layout/paint-heavy animation unless the PR explains why.         |
@@ -168,7 +168,7 @@ Do not:
 - Add decorative motion without a state-change reason.
 - Replace Radix/APG behavior with custom interaction models unless the component
   genuinely requires it.
-- Chase pixel parity with an unrelated product at the cost of Nexus consistency.
+- Chase pixel parity with an unrelated product at the cost of nxds consistency.
 - Expand a polish PR into broad refactors, app-consumer edits, or generated
   output changes outside the stated scope.
 

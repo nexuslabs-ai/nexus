@@ -9,21 +9,21 @@ import {
   BASE_TONE_OPTIONS,
   BASE_TONE_SEEDS,
   CORNER_OPTIONS,
-  createNexusThemeContract,
+  createNxdsThemeContract,
   DEFAULT_BRAND_COLOR,
-  DEFAULT_NEXUS_APPEARANCE,
+  DEFAULT_NXDS_APPEARANCE,
   DENSITY_OPTIONS,
   ELEVATION_OPTIONS,
   normalizeAppearanceModeIds,
-  sanitizeNexusAppearance,
-  sanitizeNexusAppearancePrefs,
+  sanitizeNxdsAppearance,
+  sanitizeNxdsAppearancePrefs,
   STROKE_OPTIONS,
 } from './appearance-model';
 import { deriveTheme } from './derive-theme';
 
 describe('appearance model', () => {
   it('uses the agreed package defaults', () => {
-    expect(DEFAULT_NEXUS_APPEARANCE).toMatchObject({
+    expect(DEFAULT_NXDS_APPEARANCE).toMatchObject({
       mode: 'light',
       brandColor: DEFAULT_BRAND_COLOR,
       surfaceTone: 'zinc',
@@ -101,15 +101,15 @@ describe('appearance model', () => {
   });
 });
 
-describe('sanitizeNexusAppearance', () => {
+describe('sanitizeNxdsAppearance', () => {
   it('falls back to default on non-object payloads', () => {
-    expect(sanitizeNexusAppearance(null)).toEqual(DEFAULT_NEXUS_APPEARANCE);
-    expect(sanitizeNexusAppearance('x')).toEqual(DEFAULT_NEXUS_APPEARANCE);
+    expect(sanitizeNxdsAppearance(null)).toEqual(DEFAULT_NXDS_APPEARANCE);
+    expect(sanitizeNxdsAppearance('x')).toEqual(DEFAULT_NXDS_APPEARANCE);
   });
 
   it('passes a valid state through unchanged', () => {
     const valid = {
-      ...DEFAULT_NEXUS_APPEARANCE,
+      ...DEFAULT_NXDS_APPEARANCE,
       mode: 'system' as const,
       brandColor: '#2563eb',
       surfaceTone: 'slate' as const,
@@ -120,7 +120,7 @@ describe('sanitizeNexusAppearance', () => {
       elevation: 'flat' as const,
       stroke: 'fine' as const,
       prefs: {
-        ...DEFAULT_NEXUS_APPEARANCE.prefs,
+        ...DEFAULT_NXDS_APPEARANCE.prefs,
         uiFontSize: 16,
         codeFontSize: 13,
         reduceMotion: true,
@@ -128,39 +128,39 @@ describe('sanitizeNexusAppearance', () => {
       },
     };
 
-    expect(sanitizeNexusAppearance(valid)).toEqual(valid);
+    expect(sanitizeNxdsAppearance(valid)).toEqual(valid);
   });
 
   it('accepts every shipped layout mode', () => {
     for (const option of DENSITY_OPTIONS) {
-      expect(sanitizeNexusAppearance({ density: option.value }).density).toBe(
+      expect(sanitizeNxdsAppearance({ density: option.value }).density).toBe(
         option.value
       );
     }
 
     for (const option of CORNER_OPTIONS) {
-      expect(sanitizeNexusAppearance({ corners: option.value }).corners).toBe(
+      expect(sanitizeNxdsAppearance({ corners: option.value }).corners).toBe(
         option.value
       );
     }
 
     for (const option of ELEVATION_OPTIONS) {
       expect(
-        sanitizeNexusAppearance({ elevation: option.value }).elevation
+        sanitizeNxdsAppearance({ elevation: option.value }).elevation
       ).toBe(option.value);
     }
   });
 
   it('rejects prototype-chain keys as tones', () => {
     expect(
-      sanitizeNexusAppearance({
-        ...DEFAULT_NEXUS_APPEARANCE,
+      sanitizeNxdsAppearance({
+        ...DEFAULT_NXDS_APPEARANCE,
         surfaceTone: 'toString',
       }).surfaceTone
     ).toBe('zinc');
     expect(
-      sanitizeNexusAppearance({
-        ...DEFAULT_NEXUS_APPEARANCE,
+      sanitizeNxdsAppearance({
+        ...DEFAULT_NXDS_APPEARANCE,
         surfaceTone: 'hasOwnProperty',
       }).surfaceTone
     ).toBe('zinc');
@@ -168,63 +168,59 @@ describe('sanitizeNexusAppearance', () => {
 
   it('rejects invalid brand color, contrast, and enum values', () => {
     expect(
-      sanitizeNexusAppearance({
-        ...DEFAULT_NEXUS_APPEARANCE,
+      sanitizeNxdsAppearance({
+        ...DEFAULT_NXDS_APPEARANCE,
         brandColor: 'not-a-color',
       }).brandColor
     ).toBe(DEFAULT_BRAND_COLOR);
     expect(
-      sanitizeNexusAppearance({
-        ...DEFAULT_NEXUS_APPEARANCE,
+      sanitizeNxdsAppearance({
+        ...DEFAULT_NXDS_APPEARANCE,
         lightContrast: 999,
       }).lightContrast
     ).toBe(100);
     expect(
-      sanitizeNexusAppearance({
-        ...DEFAULT_NEXUS_APPEARANCE,
+      sanitizeNxdsAppearance({
+        ...DEFAULT_NXDS_APPEARANCE,
         density: 'wat',
       }).density
     ).toBe('default');
     expect(
-      sanitizeNexusAppearance({
-        ...DEFAULT_NEXUS_APPEARANCE,
+      sanitizeNxdsAppearance({
+        ...DEFAULT_NXDS_APPEARANCE,
         corners: 'pill',
       }).corners
     ).toBe('subtle');
     expect(
-      sanitizeNexusAppearance({
-        ...DEFAULT_NEXUS_APPEARANCE,
+      sanitizeNxdsAppearance({
+        ...DEFAULT_NXDS_APPEARANCE,
         elevation: 'dramatic',
       }).elevation
     ).toBe('quiet');
   });
 
   it('normalizes a persisted density codename to its friendly value', () => {
-    expect(sanitizeNexusAppearance({ density: 'nova' }).density).toBe(
-      'compact'
-    );
+    expect(sanitizeNxdsAppearance({ density: 'nova' }).density).toBe('compact');
   });
 
   it('normalizes a persisted elevation codename to its friendly value', () => {
-    expect(sanitizeNexusAppearance({ elevation: 'maia' }).elevation).toBe(
+    expect(sanitizeNxdsAppearance({ elevation: 'maia' }).elevation).toBe(
       'quiet'
     );
   });
 
   it('normalizes a persisted corner codename to its friendly value', () => {
-    expect(sanitizeNexusAppearance({ corners: 'mellow' }).corners).toBe(
-      'round'
-    );
+    expect(sanitizeNxdsAppearance({ corners: 'mellow' }).corners).toBe('round');
   });
 
   it('normalizes a persisted stroke codename to its friendly value', () => {
-    expect(sanitizeNexusAppearance({ stroke: 'maia' }).stroke).toBe('fine');
+    expect(sanitizeNxdsAppearance({ stroke: 'maia' }).stroke).toBe('fine');
   });
 
   it('preserves system mode verbatim', () => {
     expect(
-      sanitizeNexusAppearance({
-        ...DEFAULT_NEXUS_APPEARANCE,
+      sanitizeNxdsAppearance({
+        ...DEFAULT_NXDS_APPEARANCE,
         mode: 'system',
       }).mode
     ).toBe('system');
@@ -243,22 +239,20 @@ describe('normalizeAppearanceModeIds', () => {
   });
 });
 
-describe('sanitizeNexusAppearancePrefs', () => {
+describe('sanitizeNxdsAppearancePrefs', () => {
   it('clamps font sizes into [8,32] and falls back per field', () => {
-    expect(sanitizeNexusAppearancePrefs({ uiFontSize: 99 }).uiFontSize).toBe(
-      32
-    );
-    expect(sanitizeNexusAppearancePrefs({ codeFontSize: 2 }).codeFontSize).toBe(
+    expect(sanitizeNxdsAppearancePrefs({ uiFontSize: 99 }).uiFontSize).toBe(32);
+    expect(sanitizeNxdsAppearancePrefs({ codeFontSize: 2 }).codeFontSize).toBe(
       8
     );
-    expect(sanitizeNexusAppearancePrefs({ uiFontSize: 0 }).uiFontSize).toBe(14);
-    expect(sanitizeNexusAppearancePrefs({ codeFontSize: 0 }).codeFontSize).toBe(
+    expect(sanitizeNxdsAppearancePrefs({ uiFontSize: 0 }).uiFontSize).toBe(14);
+    expect(sanitizeNxdsAppearancePrefs({ codeFontSize: 0 }).codeFontSize).toBe(
       12
     );
   });
 
   it('falls back per preference field without restoring the whole object', () => {
-    const result = sanitizeNexusAppearancePrefs({
+    const result = sanitizeNxdsAppearancePrefs({
       uiFont: 'Inter',
       codeFont: 123,
       reduceMotion: 'on',
@@ -267,7 +261,7 @@ describe('sanitizeNexusAppearancePrefs', () => {
     });
 
     expect(result).toEqual({
-      ...DEFAULT_NEXUS_APPEARANCE.prefs,
+      ...DEFAULT_NXDS_APPEARANCE.prefs,
       uiFont: 'Inter',
       pointerCursors: true,
     });
@@ -276,19 +270,19 @@ describe('sanitizeNexusAppearancePrefs', () => {
   it('rejects font families with CSS-breaking characters', () => {
     // appearancePrefsToCss interpolates these into a <style> rule.
     expect(
-      sanitizeNexusAppearancePrefs({ uiFont: 'Inter } body { display:none' })
+      sanitizeNxdsAppearancePrefs({ uiFont: 'Inter } body { display:none' })
         .uiFont
-    ).toBe(DEFAULT_NEXUS_APPEARANCE.prefs.uiFont);
+    ).toBe(DEFAULT_NXDS_APPEARANCE.prefs.uiFont);
     expect(
-      sanitizeNexusAppearancePrefs({ codeFont: 'Mono; color:red' }).codeFont
-    ).toBe(DEFAULT_NEXUS_APPEARANCE.prefs.codeFont);
+      sanitizeNxdsAppearancePrefs({ codeFont: 'Mono; color:red' }).codeFont
+    ).toBe(DEFAULT_NXDS_APPEARANCE.prefs.codeFont);
   });
 });
 
-describe('createNexusThemeContract', () => {
+describe('createNxdsThemeContract', () => {
   it('puts brand color on both light and dark accent seeds', () => {
-    const contract = createNexusThemeContract({
-      ...DEFAULT_NEXUS_APPEARANCE,
+    const contract = createNxdsThemeContract({
+      ...DEFAULT_NXDS_APPEARANCE,
       brandColor: '#ff0000',
     });
 
@@ -297,8 +291,8 @@ describe('createNexusThemeContract', () => {
   });
 
   it('pulls background and foreground seeds from the selected surface tone', () => {
-    const contract = createNexusThemeContract({
-      ...DEFAULT_NEXUS_APPEARANCE,
+    const contract = createNxdsThemeContract({
+      ...DEFAULT_NXDS_APPEARANCE,
       surfaceTone: 'slate',
     });
 
@@ -315,8 +309,8 @@ describe('createNexusThemeContract', () => {
   it.each(['stone', 'neutral', 'zinc', 'slate', 'gray'] as const)(
     'round-trips through deriveTheme without missing keys (%s)',
     (surfaceTone) => {
-      const contract = createNexusThemeContract({
-        ...DEFAULT_NEXUS_APPEARANCE,
+      const contract = createNxdsThemeContract({
+        ...DEFAULT_NXDS_APPEARANCE,
         surfaceTone,
       });
       const theme = deriveTheme(contract);
@@ -330,7 +324,7 @@ describe('createNexusThemeContract', () => {
 
   describe('contrast fields', () => {
     const clean = (patch: Record<string, unknown>) =>
-      sanitizeNexusAppearance({ ...DEFAULT_NEXUS_APPEARANCE, ...patch });
+      sanitizeNxdsAppearance({ ...DEFAULT_NXDS_APPEARANCE, ...patch });
 
     it('accepts independent light/dark values', () => {
       expect(clean({ lightContrast: 37, darkContrast: 82 })).toMatchObject({
@@ -364,7 +358,7 @@ describe('createNexusThemeContract', () => {
     });
 
     it('does NOT migrate a pre-split scalar `contrast` key — resets to defaults', () => {
-      const result = sanitizeNexusAppearance({
+      const result = sanitizeNxdsAppearance({
         mode: 'light',
         brandColor: '#0a0a0a',
         surfaceTone: 'stone',
@@ -373,7 +367,7 @@ describe('createNexusThemeContract', () => {
         corners: 'square',
         elevation: 'quiet',
         stroke: 'normal',
-        prefs: DEFAULT_NEXUS_APPEARANCE.prefs,
+        prefs: DEFAULT_NXDS_APPEARANCE.prefs,
       });
       expect(result).toMatchObject({
         lightContrast: 50,
@@ -384,7 +378,7 @@ describe('createNexusThemeContract', () => {
 });
 
 describe('appearancePrefsToCss', () => {
-  const prefs = DEFAULT_NEXUS_APPEARANCE.prefs;
+  const prefs = DEFAULT_NXDS_APPEARANCE.prefs;
   const typographyVarPattern =
     /--nx-typography-(?:size|line-height)-[a-z0-9]+:\s*[^;]+;/g;
 
@@ -430,7 +424,7 @@ describe('appearancePrefsToCss', () => {
   });
 
   it('touches the host page only for the toggles the user turns on', () => {
-    const css = appearancePrefsToCss(DEFAULT_NEXUS_APPEARANCE.prefs);
+    const css = appearancePrefsToCss(DEFAULT_NXDS_APPEARANCE.prefs);
     const selectors = [...css.matchAll(/([^{};]+)\{/g)].flatMap(
       ([, list = '']) => list.split(',').map((selector) => selector.trim())
     );

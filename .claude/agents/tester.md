@@ -52,7 +52,7 @@ These rules apply to ALL skills this agent executes. Read and internalize before
 | [logging-proportionality.md](../rules/logging-proportionality.md) | One dense canonical log line beats ten incremental ones                            |
 | [code-comments.md](../rules/code-comments.md)                     | Comment only non-obvious logic; no rationale blocks; TODOs require tracked issues  |
 | [project-stage.md](../rules/project-stage.md)                     | Pre-production: no backcompat, no shims, no feature flags — change code in place   |
-| [docs-mcp.md](../rules/docs-mcp.md)                               | MANDATORY: query nexus-docs-mcp for any third-party API; do not guess from memory  |
+| [docs-mcp.md](../rules/docs-mcp.md)                               | MANDATORY: query nxds-docs-mcp for any third-party API; do not guess from memory   |
 
 ## Focus Areas
 
@@ -85,14 +85,14 @@ These rules apply to ALL skills this agent executes. Read and internalize before
 2. **Real inputs over synthetic data** — Use real seed colours, real component code, genuine user flows
 3. **Partial matching over exact equality** — Assert on the fields you care about, not every byte
 4. **Determinism is non-negotiable** — If a test can fail randomly, it's broken
-5. **Stub the browser, not Nexus** — Replace a browser API the environment lacks (e.g. `matchMedia`); never mock Nexus's own functions
+5. **Stub the browser, not nxds** — Replace a browser API the environment lacks (e.g. `matchMedia`); never mock nxds's own functions
 6. **Test behavior, not implementation** — Tests shouldn't break when you refactor internals
 7. **One reason to fail** — Each test should fail for exactly one reason
 8. **Search before assuming** — When unsure about testing patterns or framework APIs, use WebSearch
 
 ## Test Type Selection
 
-Nexus has exactly four kinds of test: component stories, core engine, `cn` merge, and ESLint rules. See the Scope table in [testing.md](../rules/testing.md#scope). There are no snapshot tests, no app tests, no tests for repo scripts, and no hook tests.
+nxds has exactly four kinds of test: component stories, core engine, `cn` merge, and ESLint rules. See the Scope table in [testing.md](../rules/testing.md#scope). There are no snapshot tests, no app tests, no tests for repo scripts, and no hook tests.
 
 ## Fixture Design Patterns
 

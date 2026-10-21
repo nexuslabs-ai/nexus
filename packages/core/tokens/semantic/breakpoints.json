@@ -1,5 +1,5 @@
 {
-  "$description": "Responsive breakpoints (rem). Values match Tailwind v4's own defaults exactly — Nexus declares them explicitly so they fall under the same reset-and-own discipline as every other namespace (color/spacing/radius/shadow) instead of being inherited implicitly. Tailwind v4 auto-discovers --breakpoint-* from @theme and uses them to generate the nx:sm:…nx:2xl: responsive variants. Override at BUILD TIME by re-declaring a value in a consumer @theme block — NOT at runtime: @media cannot read var(), so Tailwind bakes the resolved value into the generated media queries at build time.",
+  "$description": "Responsive breakpoints (rem). Values match Tailwind v4's own defaults exactly — nxds declares them explicitly so they fall under the same reset-and-own discipline as every other namespace (color/spacing/radius/shadow) instead of being inherited implicitly. Tailwind v4 auto-discovers --breakpoint-* from @theme and uses them to generate the nx:sm:…nx:2xl: responsive variants. Override at BUILD TIME by re-declaring a value in a consumer @theme block — NOT at runtime: @media cannot read var(), so Tailwind bakes the resolved value into the generated media queries at build time.",
   "breakpoint-sm": {
     "$value": {
       "value": 40,

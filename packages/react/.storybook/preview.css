@@ -9,7 +9,7 @@
 @import '@nxds/tailwind';
 @import '../src/index.css';
 
-/* Nexus ships no reset, and components reset the browser defaults they rely
+/* nxds ships no reset, and components reset the browser defaults they rely
  * on. Storybook keeps only the border-box sizing every host reset provides,
  * so a missing component reset shows here. */
 @layer base {

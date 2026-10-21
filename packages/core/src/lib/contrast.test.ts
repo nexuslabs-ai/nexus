@@ -5,9 +5,9 @@ import { APCA_PAIRS } from './apca-pairs';
 import {
   BASE_TONE_OPTIONS,
   BASE_TONE_SEEDS,
-  createNexusThemeContract,
-  DEFAULT_NEXUS_APPEARANCE,
-  sanitizeNexusAppearance,
+  createNxdsThemeContract,
+  DEFAULT_NXDS_APPEARANCE,
+  sanitizeNxdsAppearance,
 } from './appearance-model';
 import { contrastForPair } from './contrast';
 import { deriveTheme, deriveThemeMode, type TokenMap } from './derive-theme';
@@ -33,9 +33,9 @@ const BRANDS = [
   '#00ff00',
   '#ff0000',
 ];
-const colors = (state: Partial<typeof DEFAULT_NEXUS_APPEARANCE>) =>
+const colors = (state: Partial<typeof DEFAULT_NXDS_APPEARANCE>) =>
   deriveTheme(
-    createNexusThemeContract({ ...DEFAULT_NEXUS_APPEARANCE, ...state })
+    createNxdsThemeContract({ ...DEFAULT_NXDS_APPEARANCE, ...state })
   );
 
 describe('continuous contrast', () => {
@@ -47,8 +47,8 @@ describe('continuous contrast', () => {
           let previous: TokenMap | undefined;
           for (const contrast of STOPS) {
             const map = deriveThemeMode(
-              createNexusThemeContract({
-                ...DEFAULT_NEXUS_APPEARANCE,
+              createNxdsThemeContract({
+                ...DEFAULT_NXDS_APPEARANCE,
                 surfaceTone,
                 brandColor,
                 [`${mode}Contrast`]: contrast,
@@ -209,7 +209,7 @@ describe('continuous contrast', () => {
   });
 
   it('sanitizes invalid values and keeps deterministic output', () => {
-    const state = sanitizeNexusAppearance({
+    const state = sanitizeNxdsAppearance({
       lightContrast: 100,
       darkContrast: Number.NaN,
     });

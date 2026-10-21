@@ -1,0 +1,38 @@
+{
+  "components": [
+    "alert",
+    "avatar",
+    "badge",
+    "button",
+    "card",
+    "checkbox",
+    "dialog",
+    "dropdown-menu",
+    "input",
+    "label",
+    "popover",
+    "progress",
+    "radio-group",
+    "select",
+    "separator",
+    "sonner",
+    "switch",
+    "table",
+    "tabs",
+    "textarea",
+    "tooltip"
+  ],
+  "sourceDir": "src/components/nxds",
+  "cssDir": "src/components/nxds/tailwind",
+  "check": {
+    "cssEntry": "src/nxds.css",
+    "providerModules": [
+      "src/components/nxds/components/appearance/provider/index.ts"
+    ],
+    "pages": [
+      "/",
+      "/settings",
+      "/overlays"
+    ]
+  }
+}

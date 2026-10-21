@@ -41,8 +41,8 @@ const TOKEN_COLORS = Object.entries(SCOPES).map(([token, scope]) => ({
   settings: { foreground: `var(--nx-color-${token})` },
 }));
 
-export const NEXUS_CODE_THEME = {
-  name: 'nexus',
+export const NXDS_CODE_THEME = {
+  name: 'nxds',
   colors: { 'editor.foreground': 'var(--nx-color-foreground)' },
   settings: TOKEN_COLORS,
   // rehype-pretty-code reads a theme as a light/dark record unless it carries

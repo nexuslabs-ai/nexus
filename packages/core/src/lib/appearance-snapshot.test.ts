@@ -2,28 +2,28 @@ import { beforeEach, describe, expect, it, vi } from 'vitest';
 
 import {
   appearancePrefsToCss,
-  createNexusThemeContract,
-  DEFAULT_NEXUS_APPEARANCE,
+  createNxdsThemeContract,
+  DEFAULT_NXDS_APPEARANCE,
 } from './appearance-model';
 import {
-  createNexusAppearanceBootstrapScript,
-  createNexusAppearanceSnapshot,
-  createNexusAppearanceSnapshotFromCookie,
-  createNexusAppearanceSnapshotFromState,
-  NEXUS_APPEARANCE_DATA_ATTRS,
-  parseNexusAppearanceStateCookie,
+  createNxdsAppearanceBootstrapScript,
+  createNxdsAppearanceSnapshot,
+  createNxdsAppearanceSnapshotFromCookie,
+  createNxdsAppearanceSnapshotFromState,
+  NXDS_APPEARANCE_DATA_ATTRS,
+  parseNxdsAppearanceStateCookie,
   resolveFirstPaint,
-  sanitizeNexusAppearanceSnapshot,
-  serializeNexusAppearanceStateCookie,
+  sanitizeNxdsAppearanceSnapshot,
+  serializeNxdsAppearanceStateCookie,
   SNAPSHOT_VERSION,
 } from './appearance-snapshot';
 import { deriveTheme, themeToCss } from './derive-theme';
 
-function themeCss(state = DEFAULT_NEXUS_APPEARANCE): string {
-  return themeToCss(deriveTheme(createNexusThemeContract(state)));
+function themeCss(state = DEFAULT_NXDS_APPEARANCE): string {
+  return themeToCss(deriveTheme(createNxdsThemeContract(state)));
 }
 
-function prefsCss(state = DEFAULT_NEXUS_APPEARANCE): string {
+function prefsCss(state = DEFAULT_NXDS_APPEARANCE): string {
   return appearancePrefsToCss(state.prefs);
 }
 
@@ -41,7 +41,7 @@ function mockSystemPrefersDark(matches: boolean): void {
   window.matchMedia = vi.fn(() => mediaQuery);
 }
 
-describe('NexusAppearanceSnapshot', () => {
+describe('NxdsAppearanceSnapshot', () => {
   it('invalidates cached CSS that styled the host page', () => {
     expect(SNAPSHOT_VERSION).toBe(9);
   });
@@ -49,15 +49,15 @@ describe('NexusAppearanceSnapshot', () => {
   it('stores pre-derived CSS verbatim', () => {
     const theme = themeCss();
     const prefs = prefsCss();
-    const snapshot = createNexusAppearanceSnapshot(
-      DEFAULT_NEXUS_APPEARANCE,
+    const snapshot = createNxdsAppearanceSnapshot(
+      DEFAULT_NXDS_APPEARANCE,
       theme,
       prefs
     );
 
     expect(snapshot).toEqual({
       version: SNAPSHOT_VERSION,
-      state: DEFAULT_NEXUS_APPEARANCE,
+      state: DEFAULT_NXDS_APPEARANCE,
       themeCss: theme,
       prefsCss: prefs,
     });
@@ -65,12 +65,12 @@ describe('NexusAppearanceSnapshot', () => {
 
   it('recovers state on version mismatch and refreshes the stale CSS cache', () => {
     const dark = {
-      ...DEFAULT_NEXUS_APPEARANCE,
+      ...DEFAULT_NXDS_APPEARANCE,
       mode: 'dark' as const,
       brandColor: '#ff0000',
       darkContrast: 100,
     };
-    const snapshot = sanitizeNexusAppearanceSnapshot({
+    const snapshot = sanitizeNxdsAppearanceSnapshot({
       version: 999,
       state: dark,
       themeCss: 'STALE',
@@ -85,10 +85,10 @@ describe('NexusAppearanceSnapshot', () => {
 
   it('falls back to the default contrast for non-numeric stored values', () => {
     const state = {
-      ...DEFAULT_NEXUS_APPEARANCE,
+      ...DEFAULT_NXDS_APPEARANCE,
       surfaceTone: 'slate' as const,
     };
-    const snapshot = sanitizeNexusAppearanceSnapshot({
+    const snapshot = sanitizeNxdsAppearanceSnapshot({
       version: SNAPSHOT_VERSION,
       state: { ...state, lightContrast: 'high', darkContrast: null },
       themeCss: 'STALE',
@@ -101,12 +101,12 @@ describe('NexusAppearanceSnapshot', () => {
     'refreshes a v%s snapshot without resetting the stored state',
     (version) => {
       const state = {
-        ...DEFAULT_NEXUS_APPEARANCE,
+        ...DEFAULT_NXDS_APPEARANCE,
         mode: 'dark' as const,
         surfaceTone: 'slate' as const,
         brandColor: '#2563eb',
       };
-      const snapshot = sanitizeNexusAppearanceSnapshot({
+      const snapshot = sanitizeNxdsAppearanceSnapshot({
         version,
         state,
         themeCss: ':root { --nx-color-border-active: stale; }',
@@ -124,37 +124,37 @@ describe('NexusAppearanceSnapshot', () => {
   );
 
   it('embeds runtime focus tokens in the default first-paint snapshot', () => {
-    const script = createNexusAppearanceBootstrapScript();
+    const script = createNxdsAppearanceBootstrapScript();
 
     expect(script).toContain('--nx-color-focus-default');
     expect(script).toContain('--nx-color-focus-error');
   });
 
   it('resets to the default snapshot on unreadable payloads', () => {
-    const snapshot = sanitizeNexusAppearanceSnapshot('garbage');
+    const snapshot = sanitizeNxdsAppearanceSnapshot('garbage');
 
-    expect(snapshot.state).toEqual(DEFAULT_NEXUS_APPEARANCE);
+    expect(snapshot.state).toEqual(DEFAULT_NXDS_APPEARANCE);
     expect(snapshot.themeCss).toBe(themeCss());
     expect(snapshot.prefsCss).toBe(prefsCss());
   });
 
   it('does not treat a raw (unversioned) state object as a snapshot payload', () => {
-    const snapshot = sanitizeNexusAppearanceSnapshot({
-      ...DEFAULT_NEXUS_APPEARANCE,
+    const snapshot = sanitizeNxdsAppearanceSnapshot({
+      ...DEFAULT_NXDS_APPEARANCE,
       mode: 'dark',
     });
 
-    expect(snapshot.state).toEqual(DEFAULT_NEXUS_APPEARANCE);
+    expect(snapshot.state).toEqual(DEFAULT_NXDS_APPEARANCE);
   });
 
   it('serializes only versioned state into the server cookie payload', () => {
     const state = {
-      ...DEFAULT_NEXUS_APPEARANCE,
+      ...DEFAULT_NXDS_APPEARANCE,
       mode: 'dark' as const,
       surfaceTone: 'slate' as const,
       brandColor: '#2563eb',
     };
-    const raw = serializeNexusAppearanceStateCookie(state);
+    const raw = serializeNxdsAppearanceStateCookie(state);
     const decoded = JSON.parse(decodeURIComponent(raw));
 
     expect(decoded).toEqual({
@@ -167,21 +167,21 @@ describe('NexusAppearanceSnapshot', () => {
 
   it('parses a versioned state cookie and derives a fresh server snapshot', () => {
     const state = {
-      ...DEFAULT_NEXUS_APPEARANCE,
+      ...DEFAULT_NXDS_APPEARANCE,
       mode: 'dark' as const,
       surfaceTone: 'gray' as const,
       lightContrast: 35,
       darkContrast: 85,
     };
-    const raw = serializeNexusAppearanceStateCookie({
+    const raw = serializeNxdsAppearanceStateCookie({
       ...state,
       ...{ unknownField: 'dropped' },
     });
 
-    expect(parseNexusAppearanceStateCookie(raw)).toEqual(state);
+    expect(parseNxdsAppearanceStateCookie(raw)).toEqual(state);
     expect(decodeURIComponent(raw)).not.toContain('unknownField');
 
-    const snapshot = createNexusAppearanceSnapshotFromCookie(raw);
+    const snapshot = createNxdsAppearanceSnapshotFromCookie(raw);
     expect(snapshot.state).toEqual(state);
     expect(snapshot.themeCss).toBe(themeCss(state));
     expect(snapshot.prefsCss).toBe(prefsCss(state));
@@ -189,31 +189,31 @@ describe('NexusAppearanceSnapshot', () => {
 
   it('reuses derived snapshots for identical sanitized state', () => {
     const state = {
-      ...DEFAULT_NEXUS_APPEARANCE,
+      ...DEFAULT_NXDS_APPEARANCE,
       mode: 'dark' as const,
       surfaceTone: 'slate' as const,
     };
 
-    expect(createNexusAppearanceSnapshotFromState(state)).toBe(
-      createNexusAppearanceSnapshotFromState({ ...state })
+    expect(createNxdsAppearanceSnapshotFromState(state)).toBe(
+      createNxdsAppearanceSnapshotFromState({ ...state })
     );
   });
 
   it('falls back when the state cookie is unreadable or stale', () => {
-    expect(parseNexusAppearanceStateCookie('%')).toBeNull();
+    expect(parseNxdsAppearanceStateCookie('%')).toBeNull();
     expect(
-      parseNexusAppearanceStateCookie(
+      parseNxdsAppearanceStateCookie(
         encodeURIComponent(
           JSON.stringify({
             version: 4,
-            state: { ...DEFAULT_NEXUS_APPEARANCE, mode: 'dark' },
+            state: { ...DEFAULT_NXDS_APPEARANCE, mode: 'dark' },
           })
         )
       )
     ).toBeNull();
 
-    const snapshot = createNexusAppearanceSnapshotFromCookie('%', {
-      ...DEFAULT_NEXUS_APPEARANCE,
+    const snapshot = createNxdsAppearanceSnapshotFromCookie('%', {
+      ...DEFAULT_NXDS_APPEARANCE,
       surfaceTone: 'zinc',
     });
     expect(snapshot.state.surfaceTone).toBe('zinc');
@@ -221,12 +221,12 @@ describe('NexusAppearanceSnapshot', () => {
 });
 
 describe('resolveFirstPaint', () => {
-  const snapshotFor = (state = DEFAULT_NEXUS_APPEARANCE) =>
-    createNexusAppearanceSnapshot(state, 'THEME', 'PREFS');
+  const snapshotFor = (state = DEFAULT_NXDS_APPEARANCE) =>
+    createNxdsAppearanceSnapshot(state, 'THEME', 'PREFS');
 
   it('resolves pinned dark mode concretely', () => {
     const result = resolveFirstPaint(
-      snapshotFor({ ...DEFAULT_NEXUS_APPEARANCE, mode: 'dark' }),
+      snapshotFor({ ...DEFAULT_NXDS_APPEARANCE, mode: 'dark' }),
       false
     );
 
@@ -241,7 +241,7 @@ describe('resolveFirstPaint', () => {
 
   it('resolves system mode from the OS preference', () => {
     const result = resolveFirstPaint(
-      snapshotFor({ ...DEFAULT_NEXUS_APPEARANCE, mode: 'system' }),
+      snapshotFor({ ...DEFAULT_NXDS_APPEARANCE, mode: 'system' }),
       true
     );
 
@@ -256,26 +256,26 @@ describe('resolveFirstPaint', () => {
   });
 });
 
-describe('createNexusAppearanceBootstrapScript', () => {
+describe('createNxdsAppearanceBootstrapScript', () => {
   const originalMatchMedia = window.matchMedia;
 
   beforeEach(() => {
     window.localStorage.clear();
     window.matchMedia = originalMatchMedia;
     document.documentElement.classList.remove('dark');
-    for (const attr of NEXUS_APPEARANCE_DATA_ATTRS) {
+    for (const attr of NXDS_APPEARANCE_DATA_ATTRS) {
       document.documentElement.removeAttribute(attr);
     }
     document.documentElement.style.colorScheme = '';
     document
       .querySelectorAll(
-        'meta[name="color-scheme"], style[data-nexus-appearance-theme], style[data-nexus-appearance-prefs]'
+        'meta[name="color-scheme"], style[data-nxds-appearance-theme], style[data-nxds-appearance-prefs]'
       )
       .forEach((node) => node.remove());
   });
 
   it('is engine-free and safe to inline in a classic script tag', () => {
-    const script = createNexusAppearanceBootstrapScript();
+    const script = createNxdsAppearanceBootstrapScript();
 
     expect(script).not.toMatch(
       /culori|apca|deriveTheme|themeToCss|rampFromSeed|seedOklch/i
@@ -286,14 +286,14 @@ describe('createNexusAppearanceBootstrapScript', () => {
   });
 
   it('applies a stored dark snapshot to the document', () => {
-    const dark = createNexusAppearanceSnapshot(
-      { ...DEFAULT_NEXUS_APPEARANCE, mode: 'dark' },
+    const dark = createNxdsAppearanceSnapshot(
+      { ...DEFAULT_NXDS_APPEARANCE, mode: 'dark' },
       ':root { --test-theme: dark; }',
       ':root { --test-prefs: dark; }'
     );
-    window.localStorage.setItem('nexus-appearance', JSON.stringify(dark));
+    window.localStorage.setItem('nxds-appearance', JSON.stringify(dark));
 
-    new Function(createNexusAppearanceBootstrapScript())();
+    new Function(createNxdsAppearanceBootstrapScript())();
 
     expect(document.documentElement.classList.contains('dark')).toBe(true);
     expect(document.documentElement.getAttribute('data-radius')).toBe('subtle');
@@ -301,24 +301,24 @@ describe('createNexusAppearanceBootstrapScript', () => {
     expect(document.documentElement.style.colorScheme).toBe('');
     expect(document.querySelector('meta[name="color-scheme"]')).toBeNull();
     expect(
-      document.querySelector('style[data-nexus-appearance-theme]')?.textContent
+      document.querySelector('style[data-nxds-appearance-theme]')?.textContent
     ).toBe(':root { --test-theme: dark; }');
     expect(
-      document.querySelector('style[data-nexus-appearance-prefs]')?.textContent
+      document.querySelector('style[data-nxds-appearance-prefs]')?.textContent
     ).toBe(':root { --test-prefs: dark; }');
   });
 
   it('uses fresh cookie-derived CSS before hydration when storage contains v6 CSS', () => {
     const state = {
-      ...DEFAULT_NEXUS_APPEARANCE,
+      ...DEFAULT_NXDS_APPEARANCE,
       mode: 'system' as const,
       brandColor: '#6366f1',
       density: 'compact' as const,
     };
     const oldCookie = encodeURIComponent(JSON.stringify({ version: 6, state }));
-    const serverSnapshot = createNexusAppearanceSnapshotFromCookie(oldCookie);
+    const serverSnapshot = createNxdsAppearanceSnapshotFromCookie(oldCookie);
     window.localStorage.setItem(
-      'nexus-appearance',
+      'nxds-appearance',
       JSON.stringify({
         version: 6,
         state,
@@ -329,7 +329,7 @@ describe('createNexusAppearanceBootstrapScript', () => {
     mockSystemPrefersDark(true);
 
     new Function(
-      createNexusAppearanceBootstrapScript({ defaultSnapshot: serverSnapshot })
+      createNxdsAppearanceBootstrapScript({ defaultSnapshot: serverSnapshot })
     )();
 
     expect(serverSnapshot.state).toEqual(state);
@@ -338,7 +338,7 @@ describe('createNexusAppearanceBootstrapScript', () => {
       'compact'
     );
     const rendered = document.querySelector(
-      'style[data-nexus-appearance-theme]'
+      'style[data-nxds-appearance-theme]'
     )?.textContent;
     expect(rendered).toBe(serverSnapshot.themeCss);
     expect(rendered).toContain('--nx-color-border-focus:');
@@ -347,25 +347,25 @@ describe('createNexusAppearanceBootstrapScript', () => {
 
   it('paints the default first paint when storage holds only obsolete v6 CSS', () => {
     const state = {
-      ...DEFAULT_NEXUS_APPEARANCE,
+      ...DEFAULT_NXDS_APPEARANCE,
       mode: 'dark' as const,
       brandColor: '#6366f1',
     };
     const stale = { version: 6, state, themeCss: 'STALE', prefsCss: 'STALE' };
-    window.localStorage.setItem('nexus-appearance', JSON.stringify(stale));
-    new Function(createNexusAppearanceBootstrapScript())();
+    window.localStorage.setItem('nxds-appearance', JSON.stringify(stale));
+    new Function(createNxdsAppearanceBootstrapScript())();
 
     expect(document.documentElement.classList.contains('dark')).toBe(false);
     expect(
-      document.querySelector('style[data-nexus-appearance-theme]')?.textContent
+      document.querySelector('style[data-nxds-appearance-theme]')?.textContent
     ).toBe(themeCss());
   });
 
   it('falls back to the embedded default snapshot on empty storage', () => {
     new Function(
-      createNexusAppearanceBootstrapScript({
-        defaultSnapshot: createNexusAppearanceSnapshot(
-          DEFAULT_NEXUS_APPEARANCE,
+      createNxdsAppearanceBootstrapScript({
+        defaultSnapshot: createNxdsAppearanceSnapshot(
+          DEFAULT_NXDS_APPEARANCE,
           '',
           ''
         ),
@@ -377,23 +377,23 @@ describe('createNexusAppearanceBootstrapScript', () => {
     );
     expect(document.documentElement.classList.contains('dark')).toBe(false);
     expect(
-      document.querySelectorAll('style[data-nexus-appearance-theme]')
+      document.querySelectorAll('style[data-nxds-appearance-theme]')
     ).toHaveLength(1);
   });
 
   it('can be locked to the embedded snapshot with storageKey false', () => {
-    const dark = createNexusAppearanceSnapshot(
-      { ...DEFAULT_NEXUS_APPEARANCE, mode: 'dark' },
+    const dark = createNxdsAppearanceSnapshot(
+      { ...DEFAULT_NXDS_APPEARANCE, mode: 'dark' },
       ':root { --test-theme: dark; }',
       ':root { --test-prefs: dark; }'
     );
-    window.localStorage.setItem('nexus-appearance', JSON.stringify(dark));
+    window.localStorage.setItem('nxds-appearance', JSON.stringify(dark));
 
     new Function(
-      createNexusAppearanceBootstrapScript({
+      createNxdsAppearanceBootstrapScript({
         storageKey: false,
-        defaultSnapshot: createNexusAppearanceSnapshot(
-          DEFAULT_NEXUS_APPEARANCE,
+        defaultSnapshot: createNxdsAppearanceSnapshot(
+          DEFAULT_NXDS_APPEARANCE,
           ':root { --test-theme: light; }',
           ':root { --test-prefs: light; }'
         ),
@@ -402,34 +402,34 @@ describe('createNexusAppearanceBootstrapScript', () => {
 
     expect(document.documentElement.classList.contains('dark')).toBe(false);
     expect(
-      document.querySelector('style[data-nexus-appearance-theme]')?.textContent
+      document.querySelector('style[data-nxds-appearance-theme]')?.textContent
     ).toBe(':root { --test-theme: light; }');
   });
 
   it('uses matchMedia for system mode', () => {
-    const system = createNexusAppearanceSnapshot(
-      { ...DEFAULT_NEXUS_APPEARANCE, mode: 'system' },
+    const system = createNxdsAppearanceSnapshot(
+      { ...DEFAULT_NXDS_APPEARANCE, mode: 'system' },
       ':root {}',
       ':root {}'
     );
-    window.localStorage.setItem('nexus-appearance', JSON.stringify(system));
+    window.localStorage.setItem('nxds-appearance', JSON.stringify(system));
     mockSystemPrefersDark(true);
 
-    new Function(createNexusAppearanceBootstrapScript())();
+    new Function(createNxdsAppearanceBootstrapScript())();
 
     expect(document.documentElement.classList.contains('dark')).toBe(true);
   });
 
   it('does not force dark in system mode when matchMedia is unavailable', () => {
-    const system = createNexusAppearanceSnapshot(
-      { ...DEFAULT_NEXUS_APPEARANCE, mode: 'system' },
+    const system = createNxdsAppearanceSnapshot(
+      { ...DEFAULT_NXDS_APPEARANCE, mode: 'system' },
       ':root {}',
       ':root {}'
     );
-    window.localStorage.setItem('nexus-appearance', JSON.stringify(system));
+    window.localStorage.setItem('nxds-appearance', JSON.stringify(system));
     Reflect.set(window, 'matchMedia', undefined);
 
-    new Function(createNexusAppearanceBootstrapScript())();
+    new Function(createNxdsAppearanceBootstrapScript())();
 
     const root = document.documentElement;
     expect(root.classList.contains('dark')).toBe(false);
@@ -445,22 +445,22 @@ describe('createNexusAppearanceBootstrapScript', () => {
   ] as const)(
     'applies the same resolution as resolveFirstPaint (mode=%s, systemPrefersDark=%s)',
     (mode, prefersDark) => {
-      const snapshot = createNexusAppearanceSnapshot(
-        { ...DEFAULT_NEXUS_APPEARANCE, mode },
+      const snapshot = createNxdsAppearanceSnapshot(
+        { ...DEFAULT_NXDS_APPEARANCE, mode },
         ':root { --t: 1; }',
         ':root { --p: 1; }'
       );
       const expected = resolveFirstPaint(snapshot, prefersDark);
-      window.localStorage.setItem('nexus-appearance', JSON.stringify(snapshot));
+      window.localStorage.setItem('nxds-appearance', JSON.stringify(snapshot));
       mockSystemPrefersDark(prefersDark);
 
-      new Function(createNexusAppearanceBootstrapScript())();
+      new Function(createNxdsAppearanceBootstrapScript())();
 
       const root = document.documentElement;
       expect(root.classList.contains('dark')).toBe(
         expected.className === 'dark'
       );
-      for (const attr of NEXUS_APPEARANCE_DATA_ATTRS) {
+      for (const attr of NXDS_APPEARANCE_DATA_ATTRS) {
         expect(root.getAttribute(attr)).toBe(expected.dataAttrs[attr]);
       }
     }

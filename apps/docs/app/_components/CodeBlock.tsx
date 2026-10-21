@@ -6,7 +6,7 @@ import { cn } from '@nxds/react/utils';
 import { IconCheck, IconCopy, IconX } from '@tabler/icons-react';
 
 import { useCopyAnnouncer } from './CopyAnnouncer';
-import { Button } from './nexus';
+import { Button } from './nxds';
 
 const RESET_DELAY_MS = 2000;
 

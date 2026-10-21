@@ -5,7 +5,7 @@ import { LabWorkspace } from '../../../_workspace/tokens/lab/lab-workspace';
 export const metadata = pageMetadata({
   title: 'Token lab',
   description:
-    'Browse every Nexus UI design token in the current theme, from primitive colors to the semantic tokens components use.',
+    'Browse every nxds design token in the current theme, from primitive colors to the semantic tokens components use.',
   route: '/playground/tokens',
   image: SITE_IMAGE,
 });

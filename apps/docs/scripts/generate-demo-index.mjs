@@ -324,7 +324,7 @@ function packageRange(id, name, blocks) {
   }
   if (range.startsWith('workspace:')) {
     throw new Error(
-      `Demo ${id} imports workspace package ${name} — import Nexus code through ${COPIED_PREFIX} instead.`
+      `Demo ${id} imports workspace package ${name} — import nxds code through ${COPIED_PREFIX} instead.`
     );
   }
   return range;

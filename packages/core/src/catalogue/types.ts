@@ -1,7 +1,7 @@
 import type {
-  NexusAppearancePrefs,
-  NexusAppearanceState,
-  NexusPresetField,
+  NxdsAppearancePrefs,
+  NxdsAppearanceState,
+  NxdsPresetField,
 } from '../lib/appearance-model';
 import type { Mode } from '../lib/palette';
 import type { TokenValue } from '../token-source/types';
@@ -81,7 +81,7 @@ export interface CatalogueVariant {
   /** The authored leaf, or `null` for a colour the engine derives. */
   readonly source: CatalogueSource | null;
   /** The full appearance config a derived colour was computed from. */
-  readonly appearance: DeepReadonly<NexusAppearanceState> | null;
+  readonly appearance: DeepReadonly<NxdsAppearanceState> | null;
   readonly authoredValue: TokenValue | null;
   /**
    * What the generated CSS declares: one custom property for a scalar or a
@@ -98,8 +98,8 @@ export interface CatalogueVariant {
  * picks one of its moded values, or a preference the provider computes it from.
  */
 export type CatalogueControl =
-  | { readonly kind: 'preset'; readonly field: NexusPresetField }
-  | { readonly kind: 'pref'; readonly field: keyof NexusAppearancePrefs };
+  | { readonly kind: 'preset'; readonly field: NxdsPresetField }
+  | { readonly kind: 'pref'; readonly field: keyof NxdsAppearancePrefs };
 
 export interface CatalogueToken {
   readonly name: CatalogueTokenName;

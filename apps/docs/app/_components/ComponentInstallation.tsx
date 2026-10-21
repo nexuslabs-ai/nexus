@@ -6,7 +6,7 @@ import { loadInstallPlan, loadReactSource } from '../_lib/dependencies';
 import { requirePage } from '../_lib/manifest';
 
 import { CodeSample, CodeSampleCard } from './CodeSample';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from './nexus';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from './nxds';
 
 type Step = { title: string; body?: ReactNode };
 

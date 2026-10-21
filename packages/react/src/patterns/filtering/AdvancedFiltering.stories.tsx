@@ -15,7 +15,7 @@ const meta = {
       source: { code: recipeSource, language: 'tsx', type: 'code' },
       description: {
         component:
-          'A working application recipe using the exported FilterBuilder. Nexus owns field/operator/value editing, All/Any nesting, input validation and keyboard focus. This recipe owns draft versus applied state and filters five local records. Apply commits the whole tree; Cancel restores the applied tree. Incomplete rules never change results. All means AND; Any means OR. The initial rule is Status is Active AND (Team is Design OR Projects is greater than 3). Backend translation, remote options, saved views and URL persistence are application concerns.',
+          'A working application recipe using the exported FilterBuilder. nxds owns field/operator/value editing, All/Any nesting, input validation and keyboard focus. This recipe owns draft versus applied state and filters five local records. Apply commits the whole tree; Cancel restores the applied tree. Incomplete rules never change results. All means AND; Any means OR. The initial rule is Status is Active AND (Team is Design OR Projects is greater than 3). Backend translation, remote options, saved views and URL persistence are application concerns.',
       },
     },
   },

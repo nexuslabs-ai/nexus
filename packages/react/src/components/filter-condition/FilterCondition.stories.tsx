@@ -89,7 +89,7 @@ const meta = {
           </p>
           <Canvas of={Anatomy} />
           <p>
-            One compact size follows Nexus density. The field, operator, value
+            One compact size follows nxds density. The field, operator, value
             and remove button share the h-8 height token; there is no size prop.
             Change density in the toolbar to see them adapt together. Inputs
             inside an editor retain their own appropriate control size.

@@ -149,7 +149,7 @@ export const WithText: Story = {
   render: () => (
     <ButtonGroup>
       <ButtonGroupText>https://</ButtonGroupText>
-      <Button variant="outline">nexus.dev</Button>
+      <Button variant="outline">nxds.dev</Button>
     </ButtonGroup>
   ),
   play: async ({ canvasElement }) => {
@@ -550,7 +550,7 @@ export const AllVariants: Story = {
       </ButtonGroup>
       <ButtonGroup>
         <ButtonGroupText>https://</ButtonGroupText>
-        <Button variant="outline">nexus.dev</Button>
+        <Button variant="outline">nxds.dev</Button>
         <Button variant="outline">Go</Button>
       </ButtonGroup>
       <ButtonGroup orientation="vertical" size="sm">

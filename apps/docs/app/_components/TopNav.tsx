@@ -2,7 +2,7 @@
 
 import { useEffect, useRef, useState } from 'react';
 
-import { useNexusAppearance } from '@nxds/react/appearance';
+import { useNxdsAppearance } from '@nxds/react/appearance';
 import { cn } from '@nxds/react/utils';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
@@ -10,7 +10,7 @@ import { usePathname } from 'next/navigation';
 import { PAGE_MANIFEST } from '../_lib/manifest';
 import { SITE_NAME } from '../_lib/site';
 
-import { Button } from './nexus';
+import { Button } from './nxds';
 import { SearchPalette } from './SearchPalette';
 
 const NAV_LINKS = [
@@ -46,7 +46,7 @@ export function TopNav() {
   const menuRef = useRef<HTMLElement>(null);
   const triggerRef = useRef<HTMLButtonElement>(null);
   const [menuOpen, setMenuOpen] = useState(false);
-  const { resolvedMode, setState } = useNexusAppearance();
+  const { resolvedMode, setState } = useNxdsAppearance();
   const isDark = resolvedMode === 'dark';
   const currentLink = NAV_LINKS.find((link) => isActive(pathname, link.match));
 

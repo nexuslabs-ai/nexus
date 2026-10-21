@@ -1,6 +1,6 @@
 {
   "$schema": "../../node_modules/wrangler/config-schema.json",
-  "name": "nexus-storybook",
+  "name": "nxds-storybook",
   "compatibility_date": "2026-10-01",
   "assets": { "directory": "./storybook-static" },
   "routes": [{ "pattern": "storybook.nxds.dev", "custom_domain": true }],

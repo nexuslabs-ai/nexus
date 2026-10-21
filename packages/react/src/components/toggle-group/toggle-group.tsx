@@ -52,7 +52,7 @@ function ToggleGroup({
   return (
     <ToggleGroupPrimitive.Root
       orientation={orientation}
-      // Spacing-scale gap via the runtime spacing var (Nexus resets the base
+      // Spacing-scale gap via the runtime spacing var (nxds resets the base
       // --spacing, so Tailwind's --spacing() function is unavailable here).
       style={spacing ? { gap: `var(--nx-spacing-${spacing})` } : undefined}
       className={cn(

@@ -3,8 +3,8 @@ import { useState } from 'react';
 import {
   BRAND_COLOR_PRESETS,
   CORNER_OPTIONS,
-  createNexusAppearanceSnapshotFromState,
-  DEFAULT_NEXUS_APPEARANCE,
+  createNxdsAppearanceSnapshotFromState,
+  DEFAULT_NXDS_APPEARANCE,
   DENSITY_OPTIONS,
   ELEVATION_OPTIONS,
 } from '@nxds/core';
@@ -12,35 +12,35 @@ import type { Meta, StoryObj } from '@storybook/react';
 import { expect, userEvent, waitFor, within } from 'storybook/test';
 
 import { Button } from '../../button/button';
-import { NexusAppearanceProvider } from '../provider';
+import { NxdsAppearanceProvider } from '../provider';
 
-import { NexusAppearanceSettings } from './appearance-settings';
+import { NxdsAppearanceSettings } from './appearance-settings';
 
-const meta: Meta<typeof NexusAppearanceSettings> = {
+const meta: Meta<typeof NxdsAppearanceSettings> = {
   title: 'Appearance/AppearanceSettings',
-  component: NexusAppearanceSettings,
+  component: NxdsAppearanceSettings,
   parameters: {
     docs: {
       description: {
         component:
-          'NexusAppearanceSettings is a full settings panel for theme, typography, layout feel and interaction preferences. Render it inside NexusAppearanceProvider. For a compact popover, use NexusThemeQuickControl.',
+          'NxdsAppearanceSettings is a full settings panel for theme, typography, layout feel and interaction preferences. Render it inside NxdsAppearanceProvider. For a compact popover, use NxdsThemeQuickControl.',
       },
     },
   },
   render: () => (
-    <NexusAppearanceProvider
+    <NxdsAppearanceProvider
       storageKey={false}
       defaultState={{
-        ...DEFAULT_NEXUS_APPEARANCE,
+        ...DEFAULT_NXDS_APPEARANCE,
       }}
     >
-      <NexusAppearanceSettings />
-    </NexusAppearanceProvider>
+      <NxdsAppearanceSettings />
+    </NxdsAppearanceProvider>
   ),
 };
 
 export default meta;
-type Story = StoryObj<typeof NexusAppearanceSettings>;
+type Story = StoryObj<typeof NxdsAppearanceSettings>;
 
 export const Default: Story = {};
 
@@ -63,14 +63,13 @@ export const BrandPresets: Story = {
     await expect(
       canvas.getByText(`brandColor: "${preset.color}",`)
     ).toBeInTheDocument();
-    const expected = createNexusAppearanceSnapshotFromState({
-      ...DEFAULT_NEXUS_APPEARANCE,
+    const expected = createNxdsAppearanceSnapshotFromState({
+      ...DEFAULT_NXDS_APPEARANCE,
       brandColor: preset.color,
     });
     await waitFor(() => {
       expect(
-        document.querySelector('style[data-nexus-appearance-theme]')
-          ?.textContent
+        document.querySelector('style[data-nxds-appearance-theme]')?.textContent
       ).toBe(expected.themeCss);
     });
   },
@@ -83,9 +82,9 @@ function SavedAppearanceExample({ storageKey }: { storageKey: string }) {
       <Button onClick={() => setRevision((current) => current + 1)}>
         Reload saved appearance
       </Button>
-      <NexusAppearanceProvider key={revision} storageKey={storageKey}>
-        <NexusAppearanceSettings />
-      </NexusAppearanceProvider>
+      <NxdsAppearanceProvider key={revision} storageKey={storageKey}>
+        <NxdsAppearanceSettings />
+      </NxdsAppearanceProvider>
     </div>
   );
 }
@@ -98,8 +97,8 @@ function savedColorStory(brandColor: string, expectedLabel: string): Story {
       localStorage.setItem(
         storageKey,
         JSON.stringify(
-          createNexusAppearanceSnapshotFromState({
-            ...DEFAULT_NEXUS_APPEARANCE,
+          createNxdsAppearanceSnapshotFromState({
+            ...DEFAULT_NXDS_APPEARANCE,
             brandColor,
           })
         )
@@ -122,7 +121,7 @@ function savedColorStory(brandColor: string, expectedLabel: string): Story {
       ).toHaveTextContent(expectedLabel);
       const restored = JSON.parse(localStorage.getItem(storageKey)!);
       await expect(restored.state).toEqual({
-        ...DEFAULT_NEXUS_APPEARANCE,
+        ...DEFAULT_NXDS_APPEARANCE,
         brandColor,
       });
 
@@ -138,7 +137,7 @@ function savedColorStory(brandColor: string, expectedLabel: string): Story {
       );
       await waitFor(() => {
         expect(JSON.parse(localStorage.getItem(storageKey)!).state).toEqual({
-          ...DEFAULT_NEXUS_APPEARANCE,
+          ...DEFAULT_NXDS_APPEARANCE,
           brandColor: next.color,
         });
       });

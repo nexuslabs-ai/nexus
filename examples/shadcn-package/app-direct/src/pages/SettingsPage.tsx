@@ -1,6 +1,6 @@
 import { KeyRoundIcon, TriangleAlertIcon } from "lucide-react"
 
-import * as N from "../components/nexus-kit"
+import * as N from "../components/nxds-kit"
 import {
   Alert,
   AlertDescription,
@@ -40,7 +40,7 @@ export function SettingsPage() {
     <div className="mx-auto grid max-w-4xl gap-6">
       <div>
         <h1 className="text-2xl font-semibold">Settings</h1>
-        <p className="mt-1 text-muted-foreground">An existing shadcn page. The Notifications and API keys sections are Nexus.</p>
+        <p className="mt-1 text-muted-foreground">An existing shadcn page. The Notifications and API keys sections are nxds.</p>
       </div>
 
       <Card data-check="host">
@@ -81,7 +81,7 @@ export function SettingsPage() {
         </CardFooter>
       </Card>
 
-      <div data-check="nexus">
+      <div data-check="nxds">
         <N.Card>
           <N.CardHeader>
             <N.CardTitle>Notifications</N.CardTitle>
@@ -118,9 +118,9 @@ export function SettingsPage() {
             <KeyRoundIcon className="size-4" />
             API keys
           </CardTitle>
-          <CardDescription>A shadcn card holding a Nexus table.</CardDescription>
+          <CardDescription>A shadcn card holding an nxds table.</CardDescription>
         </CardHeader>
-        <CardContent data-check="nexus">
+        <CardContent data-check="nxds">
           <N.Table density="compact">
             <N.TableHeader>
               <N.TableRow>
@@ -161,14 +161,14 @@ export function SettingsPage() {
           <AlertTitle>Delete workspace</AlertTitle>
           <AlertDescription>This removes every project, key and member. It cannot be undone.</AlertDescription>
         </Alert>
-        <div data-check="nexus">
+        <div data-check="nxds">
           <N.Dialog>
             <N.DialogTrigger asChild>
               <N.Button variant="destructive" data-check-open>
                 Delete workspace
               </N.Button>
             </N.DialogTrigger>
-            <N.DialogContent data-check="nexus">
+            <N.DialogContent data-check="nxds">
               <N.DialogHeader>
                 <N.DialogTitle>Delete Acme Console?</N.DialogTitle>
                 <N.DialogDescription>Type the workspace name to confirm.</N.DialogDescription>

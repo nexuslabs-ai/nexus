@@ -77,7 +77,7 @@ function clampForEmit(color: Oklch): Oklch {
 }
 
 /**
- * Snap a custom color to the nearest Nexus palette shade that passes the
+ * Snap a custom color to the nearest nxds palette shade that passes the
  * requested APCA tier on the target background. Lightness comes from the
  * perceptual grid; hue and chroma come from the input (or, for achromatic
  * inputs, from the chosen palette's shade 500).

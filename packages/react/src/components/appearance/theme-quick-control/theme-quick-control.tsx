@@ -4,8 +4,8 @@ import { useState } from 'react';
 
 import {
   BASE_TONE_OPTIONS,
-  type NexusAppearanceMode,
-  type NexusSurfaceTone,
+  type NxdsAppearanceMode,
+  type NxdsSurfaceTone,
 } from '@nxds/core';
 import { IconPalette } from '@tabler/icons-react';
 
@@ -14,21 +14,21 @@ import { Button } from '../../button/button';
 import { Popover, PopoverContent, PopoverTrigger } from '../../popover/popover';
 import { Separator } from '../../separator/separator';
 import { ToggleGroup, ToggleGroupItem } from '../../toggle-group/toggle-group';
-import { NexusAppearanceColorField } from '../color-field/color-field';
-import { useNexusAppearance } from '../provider';
+import { NxdsAppearanceColorField } from '../color-field/color-field';
+import { useNxdsAppearance } from '../provider';
 
 interface SwatchRowProps {
   label: string;
-  value: NexusSurfaceTone;
-  onSelect: (value: NexusSurfaceTone) => void;
+  value: NxdsSurfaceTone;
+  onSelect: (value: NxdsSurfaceTone) => void;
 }
 
-export interface NexusThemeQuickControlProps {
+export interface NxdsThemeQuickControlProps {
   onCustomize?: () => void;
 }
 
 const MODE_OPTIONS: ReadonlyArray<{
-  value: NexusAppearanceMode;
+  value: NxdsAppearanceMode;
   label: string;
 }> = [
   { value: 'light', label: 'Light' },
@@ -71,10 +71,10 @@ function SwatchRow({ label, value, onSelect }: SwatchRowProps) {
   );
 }
 
-export function NexusThemeQuickControl({
+export function NxdsThemeQuickControl({
   onCustomize,
-}: NexusThemeQuickControlProps) {
-  const { state, setState } = useNexusAppearance();
+}: NxdsThemeQuickControlProps) {
+  const { state, setState } = useNxdsAppearance();
   const [open, setOpen] = useState(false);
 
   const openCustomize = () => {
@@ -85,7 +85,7 @@ export function NexusThemeQuickControl({
 
   const handleModeChange = (mode: string) => {
     if (!mode) return;
-    setState((current) => ({ ...current, mode: mode as NexusAppearanceMode }));
+    setState((current) => ({ ...current, mode: mode as NxdsAppearanceMode }));
   };
 
   return (
@@ -141,7 +141,7 @@ export function NexusThemeQuickControl({
           <p className="nx:m-0 nx:typography-label-small nx:text-muted-foreground">
             Brand color
           </p>
-          <NexusAppearanceColorField
+          <NxdsAppearanceColorField
             label="Brand color"
             value={state.brandColor}
             onChange={(brandColor) =>

@@ -34,7 +34,7 @@ export const Default: Story = {
       <div className="nx:flex nx:flex-col nx:gap-2">
         <div className="nx:flex nx:items-center nx:justify-between nx:gap-4">
           <span className="nx:typography-label-default nx:text-foreground">
-            @nexus starred 3 repositories
+            @nxds starred 3 repositories
           </span>
           <CollapsibleTrigger asChild>
             <Button variant="ghost" size="sm" aria-label="Toggle repositories">

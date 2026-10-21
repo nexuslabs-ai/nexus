@@ -35,7 +35,7 @@ export default defineConfig({
           'src/components/appearance/provider/server.ts'
         ),
       },
-      name: 'NexusReact',
+      name: 'NxdsReact',
       formats: ['es', 'cjs'],
       fileName: (format, entryName) =>
         `${entryName}.${format === 'es' ? 'mjs' : 'js'}`,
@@ -61,7 +61,7 @@ export default defineConfig({
             ? "'use client';"
             : '',
         globals: {
-          '@nxds/core': 'NexusCore',
+          '@nxds/core': 'NxdsCore',
           react: 'React',
           'react-dom': 'ReactDOM',
           'react/jsx-runtime': 'jsxRuntime',

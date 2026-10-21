@@ -4,12 +4,12 @@ import { describe, expect, it } from 'vitest';
 
 import {
   cn,
-  NEXUS_CLASS_GROUPS,
-  NEXUS_THEME_SCALES,
+  NXDS_CLASS_GROUPS,
+  NXDS_THEME_SCALES,
   TYPOGRAPHY_CONFLICTS,
 } from './utils';
 
-/** Every root that can mint a Nexus utility: generated emissions plus co-located component CSS. */
+/** Every root that can mint an nxds utility: generated emissions plus co-located component CSS. */
 const EMITTING_ROOTS = ['packages/tailwind', 'packages/react/src'];
 
 const EMITTED_CSS = EMITTING_ROOTS.flatMap((root) => {
@@ -35,10 +35,10 @@ const BORDER_WIDTH_GROUPS = [
   'border-w-be',
   'divide-x',
   'divide-y',
-] as const satisfies readonly (keyof typeof NEXUS_CLASS_GROUPS)[];
+] as const satisfies readonly (keyof typeof NXDS_CLASS_GROUPS)[];
 
 /**
- * Namespaces where a Nexus `@theme` key reaches `cn()` through a built-in
+ * Namespaces where an nxds `@theme` key reaches `cn()` through a built-in
  * tailwind-merge group. Each sentinel is a literal member of that group, so a
  * registered token collapses against it and an unregistered one does not.
  */
@@ -47,31 +47,31 @@ const THEME_NAMESPACES = [
     cssKey: 'radius',
     utility: 'rounded',
     sentinel: 'nx:rounded-none',
-    registered: NEXUS_THEME_SCALES.radius,
+    registered: NXDS_THEME_SCALES.radius,
   },
   {
     cssKey: 'ease',
     utility: 'ease',
     sentinel: 'nx:ease-initial',
-    registered: NEXUS_THEME_SCALES.ease,
+    registered: NXDS_THEME_SCALES.ease,
   },
   {
     cssKey: 'shadow',
     utility: 'shadow',
     sentinel: 'nx:shadow-none',
-    registered: NEXUS_THEME_SCALES.shadow,
+    registered: NXDS_THEME_SCALES.shadow,
   },
   {
     cssKey: 'animate',
     utility: 'animate',
     sentinel: 'nx:animate-none',
-    registered: NEXUS_THEME_SCALES.animate,
+    registered: NXDS_THEME_SCALES.animate,
   },
   {
     cssKey: 'z-index',
     utility: 'z',
     sentinel: 'nx:z-auto',
-    registered: NEXUS_CLASS_GROUPS.z.map((utility) =>
+    registered: NXDS_CLASS_GROUPS.z.map((utility) =>
       utility.replace(/^z-/, '')
     ),
   },
@@ -79,7 +79,7 @@ const THEME_NAMESPACES = [
     cssKey: 'outline-width',
     utility: 'outline',
     sentinel: 'nx:outline-2',
-    registered: NEXUS_CLASS_GROUPS['outline-w'].map((utility) =>
+    registered: NXDS_CLASS_GROUPS['outline-w'].map((utility) =>
       utility.replace(/^outline-/, '')
     ),
   },
@@ -89,7 +89,7 @@ const THEME_NAMESPACES = [
       cssKey: 'border-width',
       utility,
       sentinel: `nx:${utility}-2`,
-      registered: NEXUS_CLASS_GROUPS[group]
+      registered: NXDS_CLASS_GROUPS[group]
         .filter((name) => !name.startsWith('border-width-'))
         .map((name) => name.slice(`${utility}-`.length)),
     };
@@ -220,10 +220,10 @@ describe('cn', () => {
     ['nx:transition-control', 'nx:transition-colors'],
     ['nx:transition-field', 'nx:transition-none'],
     ['nx:transition-control', 'nx:transition-[color,opacity]'],
-  ])('%s is displaced by %s', (nexusUtility, builtIn) => {
+  ])('%s is displaced by %s', (nxdsUtility, builtIn) => {
     // Without the `transition` group entry these land nowhere and both survive,
     // so a consumer's `className` override would stack rather than replace.
-    expect(cn(nexusUtility, builtIn)).toBe(builtIn);
+    expect(cn(nxdsUtility, builtIn)).toBe(builtIn);
   });
 
   it('keeps a named outline width beside an outline colour', () => {
@@ -290,7 +290,7 @@ describe('cn', () => {
     );
     // A `{ prefix: [validator] }` entry registers `prefix-*` and every static
     // `prefix-<value>` utility beside it.
-    const registeredUtilities = Object.values(NEXUS_CLASS_GROUPS).flat();
+    const registeredUtilities = Object.values(NXDS_CLASS_GROUPS).flat();
     const isRegistered = (utility: string) =>
       registeredUtilities.some((entry) =>
         typeof entry === 'string'

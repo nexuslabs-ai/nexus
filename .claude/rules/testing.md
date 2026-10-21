@@ -1,17 +1,17 @@
 # Testing Rules - Core Philosophy
 
-> This file sets what Nexus tests and the principles every test follows.
+> This file sets what nxds tests and the principles every test follows.
 > For story patterns, see [testing-react.md](testing-react.md).
 
 ## Scope
 
-A test earns its place only when it pins behaviour a consumer of the design system would see. Nexus has exactly four kinds:
+A test earns its place only when it pins behaviour a consumer of the design system would see. nxds has exactly four kinds:
 
 | Kind                  | Lives in                                     | Pins                                                                                                                                                                                                                                                                             |
 | --------------------- | -------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | **Component stories** | `packages/react/src/**/*.stories.tsx`        | Component behaviour and accessibility, via `play` functions and the axe check on every story                                                                                                                                                                                     |
 | **Core engine**       | `packages/core/src/lib/*.test.ts`            | Derived-theme contrast and legibility, colour-blind separation, registry/engine agreement, first-paint script, perceptual-ramp shade grid, token catalogue agreement with the generated CSS, compiled CSS scope (only `nx:` classes and `--nx-*` variables), token-file manifest |
-| **`cn` merge**        | `packages/react/src/lib/utils.test.ts`       | `cn` resolving conflicts between Nexus `nx:` utilities                                                                                                                                                                                                                           |
+| **`cn` merge**        | `packages/react/src/lib/utils.test.ts`       | `cn` resolving conflicts between nxds `nx:` utilities                                                                                                                                                                                                                            |
 | **ESLint rules**      | `packages/eslint-plugin/__tests__/*.test.js` | Each published rule reports what it should, and nothing else                                                                                                                                                                                                                     |
 
 Components are tested only through stories — see [testing-react.md](testing-react.md). The other three run under Vitest's `unit` project and import from `vitest` directly.
@@ -42,7 +42,7 @@ Components are tested only through stories — see [testing-react.md](testing-re
 2. **Real inputs over synthetic data** — Use real seed colours, real component code, genuine user flows
 3. **Partial matching over exact equality** — Assert on the fields you care about, not every byte
 4. **Determinism is non-negotiable** — If a test can fail randomly, it's broken
-5. **Stub the browser, not Nexus** — Replace a browser API the environment lacks (e.g. `matchMedia`); never mock Nexus's own functions
+5. **Stub the browser, not nxds** — Replace a browser API the environment lacks (e.g. `matchMedia`); never mock nxds's own functions
 6. **Test behavior, not implementation** — Tests shouldn't break when you refactor internals
 7. **One reason to fail** — Each test should fail for exactly one reason
 

@@ -11,7 +11,7 @@ import { SectionHeading } from '../../_components/Heading';
  */
 
 export const description =
-  'Nexus UI breakpoints, container queries and the Show and Hide primitives, for layouts built for mobile and desktop equally.';
+  'nxds breakpoints, container queries and the Show and Hide primitives, for layouts built for mobile and desktop equally.';
 
 const BREAKPOINTS: {
   cls: string;
@@ -78,7 +78,7 @@ export default function Responsive() {
     <>
       <h1 className="nx:typography-heading-large">Responsive</h1>
       <p className="nx:typography-body-default nx:text-muted-foreground nx:mt-2 nx:mb-8 nx:max-w-[64ch]">
-        Nexus is built for mobile and desktop equally. Write the mobile styles
+        nxds is built for mobile and desktop equally. Write the mobile styles
         first, without a prefix, then add styles for wider screens with{' '}
         <code>nx:sm:</code>, <code>nx:md:</code>, <code>nx:lg:</code> and up.
         Breakpoints are in rem, so a user who enlarges their browser font size

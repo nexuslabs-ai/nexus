@@ -11,8 +11,8 @@ import type {
 
 import {
   appearancePrefsToCss,
-  DEFAULT_NEXUS_APPEARANCE,
-  type NexusAppearancePrefs,
+  DEFAULT_NXDS_APPEARANCE,
+  type NxdsAppearancePrefs,
 } from './appearance-model';
 import type { Mode } from './palette';
 
@@ -59,7 +59,7 @@ function generated(file: string): string {
   );
 }
 
-const nexusCss = generated('nexus.css');
+const nxdsCss = generated('nxds.css');
 const variablesCss = generated('variables.css');
 
 /** `rest` up to the first top-level closing brace. */
@@ -79,7 +79,7 @@ function themeLayer(css: string): string {
   return `\n${dedented.join('\n')}\n`;
 }
 
-const nexusTheme = themeLayer(nexusCss);
+const nxdsTheme = themeLayer(nxdsCss);
 const variablesTheme = themeLayer(variablesCss);
 
 /** Undo prettier's line wrapping so a value compares as one line. */
@@ -108,7 +108,7 @@ function blockDeclarations(css: string, selector: string): Map<string, string> {
 function themeVariables(): Map<string, string> {
   return new Map(
     ['@theme', '@theme inline', '@theme inline reference'].flatMap(
-      (selector) => [...blockDeclarations(nexusCss, selector)]
+      (selector) => [...blockDeclarations(nxdsCss, selector)]
     )
   );
 }
@@ -123,10 +123,10 @@ function selectorBlocks(css: string) {
   );
 }
 
-const nexusBlocks = selectorBlocks(nexusTheme);
+const nxdsBlocks = selectorBlocks(nxdsTheme);
 
 function modeBlock(selector: string): Map<string, string> {
-  const block = nexusBlocks.find(({ selectors }) =>
+  const block = nxdsBlocks.find(({ selectors }) =>
     selectors.includes(selector)
   );
   if (!block) throw new Error(`no block selects "${selector}"`);
@@ -136,10 +136,10 @@ function modeBlock(selector: string): Map<string, string> {
 /** Modes the generated CSS declares for an attribute, and the one on `:root`. */
 function cssModes(attribute: string) {
   const pattern = new RegExp(`^\\[${attribute}='([\\w-]+)'\\]$`);
-  const modes = nexusBlocks.flatMap(({ selectors }) =>
+  const modes = nxdsBlocks.flatMap(({ selectors }) =>
     selectors.flatMap((selector) => selector.match(pattern)?.[1] ?? [])
   );
-  const rootBlock = nexusBlocks.find(
+  const rootBlock = nxdsBlocks.find(
     ({ selectors }) =>
       selectors.includes(':root') &&
       selectors.some((selector) => pattern.test(selector))
@@ -241,8 +241,8 @@ describe('token catalogue', () => {
   });
 
   it('declares the default runtime colours and z-index layers in the theme layer', () => {
-    const light = blockDeclarations(nexusTheme, ':root');
-    const dark = blockDeclarations(nexusTheme, '.dark');
+    const light = blockDeclarations(nxdsTheme, ':root');
+    const dark = blockDeclarations(nxdsTheme, '.dark');
     for (const token of familyTokens('z-index')) {
       expect(light.get(token.name), token.name).toBe(
         variantValue(token, { preset: null, mode: null })
@@ -261,7 +261,7 @@ describe('token catalogue', () => {
   it('never falls back to a literal value in the generated CSS or component sources', () => {
     const literalFallback =
       /var\(\s*--nx-[\w-]+\s*,(?!\s*(?:var\(|--theme\())/g;
-    for (const file of ['variables.css', 'nexus.css', ...UTILITY_FILES]) {
+    for (const file of ['variables.css', 'nxds.css', ...UTILITY_FILES]) {
       expect(generated(file).match(literalFallback), file).toBeNull();
     }
     const reactSrc = resolve(process.cwd(), 'packages/react/src');
@@ -283,10 +283,10 @@ describe('token catalogue', () => {
       elevation: cssModes('data-shadow').root,
       stroke: cssModes('data-borderwidth').root,
     }).toEqual({
-      density: DEFAULT_NEXUS_APPEARANCE.density,
-      corners: DEFAULT_NEXUS_APPEARANCE.corners,
-      elevation: DEFAULT_NEXUS_APPEARANCE.elevation,
-      stroke: DEFAULT_NEXUS_APPEARANCE.stroke,
+      density: DEFAULT_NXDS_APPEARANCE.density,
+      corners: DEFAULT_NXDS_APPEARANCE.corners,
+      elevation: DEFAULT_NXDS_APPEARANCE.elevation,
+      stroke: DEFAULT_NXDS_APPEARANCE.stroke,
     });
   });
 
@@ -398,7 +398,7 @@ describe('token catalogue', () => {
 
   it('declares only custom properties the generated CSS declares', () => {
     const declared = new Set(
-      ['variables.css', 'nexus.css', ...UTILITY_FILES].flatMap((file) =>
+      ['variables.css', 'nxds.css', ...UTILITY_FILES].flatMap((file) =>
         [...generated(file).matchAll(/(--[\w-]+):/g)].map(([, name]) => name)
       )
     );
@@ -437,8 +437,8 @@ describe('token catalogue', () => {
   });
 
   it('names exactly the preference that changes each runtime typography variable', () => {
-    const prefs = DEFAULT_NEXUS_APPEARANCE.prefs;
-    const rootVariables = (changed: Partial<NexusAppearancePrefs>) =>
+    const prefs = DEFAULT_NXDS_APPEARANCE.prefs;
+    const rootVariables = (changed: Partial<NxdsAppearancePrefs>) =>
       customProperties(
         appearancePrefsToCss({ ...prefs, ...changed }).match(
           /:root \{[^}]*\}/

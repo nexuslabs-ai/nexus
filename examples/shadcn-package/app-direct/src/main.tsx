@@ -5,21 +5,21 @@ import { createRoot } from 'react-dom/client'
 import { BrowserRouter } from 'react-router'
 
 import App from './App'
-import { NexusAppearanceProvider } from './appearance'
+import { NxdsAppearanceProvider } from './appearance'
 
 import './index.css'
-import './nexus.css'
+import './nxds.css'
 
 createRoot(document.getElementById('root')!).render(
   <StrictMode>
     <ThemeProvider attribute="class" defaultTheme="light" disableTransitionOnChange>
-      <NexusAppearanceProvider>
+      <NxdsAppearanceProvider>
         <TooltipProvider>
           <BrowserRouter>
             <App />
           </BrowserRouter>
         </TooltipProvider>
-      </NexusAppearanceProvider>
+      </NxdsAppearanceProvider>
     </ThemeProvider>
   </StrictMode>,
 )

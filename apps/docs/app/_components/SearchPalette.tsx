@@ -14,12 +14,12 @@ import {
   CommandInput,
   CommandItem,
   CommandList,
-} from './nexus';
+} from './nxds';
 
 /**
  * ⌘K command-palette search over the docs IA. Indexes the Playground routes
  * and every page in the generated manifest (the same source the nav + routes
- * read), so it stays in sync as pages are added. Built on the Nexus Command
+ * read), so it stays in sync as pages are added. Built on the nxds Command
  * (cmdk) surface.
  */
 

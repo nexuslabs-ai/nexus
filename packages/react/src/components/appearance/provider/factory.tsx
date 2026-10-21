@@ -1,37 +1,37 @@
 'use client';
 
-import type { NexusAppearanceState } from '@nxds/core';
+import type { NxdsAppearanceState } from '@nxds/core';
 
 import {
-  type NexusAppearanceCookieOptions,
-  NexusAppearanceProvider,
-  type NexusAppearanceProviderProps,
+  type NxdsAppearanceCookieOptions,
+  NxdsAppearanceProvider,
+  type NxdsAppearanceProviderProps,
 } from './provider';
 
-export interface CreateNexusAppearanceOptions {
+export interface CreateNxdsAppearanceOptions {
   storageKey?: string | false;
   cookieWriteKey?: string | false;
-  cookieOptions?: NexusAppearanceCookieOptions;
-  defaultState?: NexusAppearanceState;
+  cookieOptions?: NxdsAppearanceCookieOptions;
+  defaultState?: NxdsAppearanceState;
 }
 
 type ConfiguredProviderProps = Omit<
-  NexusAppearanceProviderProps,
+  NxdsAppearanceProviderProps,
   'storageKey' | 'cookieWriteKey' | 'cookieOptions' | 'defaultState'
 >;
 
-export function createNexusAppearance({
+export function createNxdsAppearance({
   storageKey,
   cookieWriteKey,
   cookieOptions,
   defaultState,
-}: CreateNexusAppearanceOptions = {}) {
-  function ConfiguredNexusAppearanceProvider({
+}: CreateNxdsAppearanceOptions = {}) {
+  function ConfiguredNxdsAppearanceProvider({
     children,
     ...props
   }: ConfiguredProviderProps) {
     return (
-      <NexusAppearanceProvider
+      <NxdsAppearanceProvider
         {...props}
         storageKey={storageKey}
         cookieWriteKey={cookieWriteKey}
@@ -39,11 +39,11 @@ export function createNexusAppearance({
         defaultState={defaultState}
       >
         {children}
-      </NexusAppearanceProvider>
+      </NxdsAppearanceProvider>
     );
   }
 
   return {
-    NexusAppearanceProvider: ConfiguredNexusAppearanceProvider,
+    NxdsAppearanceProvider: ConfiguredNxdsAppearanceProvider,
   };
 }

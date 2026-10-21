@@ -4,7 +4,7 @@ import tsx from '@shikijs/langs/tsx';
 import { createHighlighterCore, type HighlighterCore } from 'shiki/core';
 import { createJavaScriptRegexEngine } from 'shiki/engine/javascript';
 
-import { NEXUS_CODE_THEME } from '../../code-theme';
+import { NXDS_CODE_THEME } from '../../code-theme';
 
 import 'server-only';
 
@@ -17,7 +17,7 @@ let highlighter: Promise<HighlighterCore> | undefined;
 
 function getHighlighter() {
   highlighter ??= createHighlighterCore({
-    themes: [NEXUS_CODE_THEME],
+    themes: [NXDS_CODE_THEME],
     langs: Object.values(LANGS),
     engine: createJavaScriptRegexEngine(),
   });
@@ -27,7 +27,7 @@ function getHighlighter() {
 export async function highlightSample(lang: CodeSampleLanguage, code: string) {
   return (await getHighlighter()).codeToHtml(code, {
     lang,
-    theme: NEXUS_CODE_THEME.name,
+    theme: NXDS_CODE_THEME.name,
     transformers: [
       {
         root(node) {

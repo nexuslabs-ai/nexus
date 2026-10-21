@@ -7,13 +7,13 @@ import {
   CORNER_OPTIONS,
   DENSITY_OPTIONS,
   ELEVATION_OPTIONS,
-  type NexusAppearanceMode,
-  type NexusAppearancePrefs,
-  type NexusCorners,
-  type NexusDensity,
-  type NexusElevation,
-  type NexusStroke,
-  type NexusSurfaceTone,
+  type NxdsAppearanceMode,
+  type NxdsAppearancePrefs,
+  type NxdsCorners,
+  type NxdsDensity,
+  type NxdsElevation,
+  type NxdsStroke,
+  type NxdsSurfaceTone,
   STROKE_OPTIONS,
 } from '@nxds/core';
 
@@ -35,17 +35,17 @@ import {
 import { Slider } from '../../slider/slider';
 import { Switch } from '../../switch/switch';
 import { ToggleGroup, ToggleGroupItem } from '../../toggle-group/toggle-group';
-import { NexusAppearanceBrandColorField } from '../brand-color-field/brand-color-field';
-import { NexusAppearanceConfigPreview } from '../config-preview/config-preview';
-import { useNexusAppearance } from '../provider';
-import { NexusAppearanceSettingRow } from '../setting-row/setting-row';
+import { NxdsAppearanceBrandColorField } from '../brand-color-field/brand-color-field';
+import { NxdsAppearanceConfigPreview } from '../config-preview/config-preview';
+import { useNxdsAppearance } from '../provider';
+import { NxdsAppearanceSettingRow } from '../setting-row/setting-row';
 
-const APPEARANCE_MODES: NexusAppearanceMode[] = ['light', 'dark', 'system'];
+const APPEARANCE_MODES: NxdsAppearanceMode[] = ['light', 'dark', 'system'];
 const FONT_SIZE_MIN = 8;
 const FONT_SIZE_MAX = 32;
 
-function isAppearanceMode(value: string): value is NexusAppearanceMode {
-  return APPEARANCE_MODES.includes(value as NexusAppearanceMode);
+function isAppearanceMode(value: string): value is NxdsAppearanceMode {
+  return APPEARANCE_MODES.includes(value as NxdsAppearanceMode);
 }
 
 function AxisSelect<TValue extends string>({
@@ -142,10 +142,10 @@ function FontSizeInput({
   );
 }
 
-export function NexusAppearanceSettings() {
-  const { state, setState, resolvedMode } = useNexusAppearance();
+export function NxdsAppearanceSettings() {
+  const { state, setState, resolvedMode } = useNxdsAppearance();
 
-  const updatePrefs = (patch: Partial<NexusAppearancePrefs>) => {
+  const updatePrefs = (patch: Partial<NxdsAppearancePrefs>) => {
     setState((current) => ({
       ...current,
       prefs: { ...current.prefs, ...patch },
@@ -185,7 +185,7 @@ export function NexusAppearanceSettings() {
           </CardDescription>
         </CardHeader>
         <CardContent className="nx:space-y-4">
-          <NexusAppearanceSettingRow
+          <NxdsAppearanceSettingRow
             label="Mode"
             description={`Resolved as ${resolvedMode}`}
           >
@@ -200,26 +200,26 @@ export function NexusAppearanceSettings() {
               <ToggleGroupItem value="dark">Dark</ToggleGroupItem>
               <ToggleGroupItem value="system">System</ToggleGroupItem>
             </ToggleGroup>
-          </NexusAppearanceSettingRow>
+          </NxdsAppearanceSettingRow>
 
-          <NexusAppearanceSettingRow
+          <NxdsAppearanceSettingRow
             label="Brand color"
             description="Primary actions, selected states, and highlights"
           >
-            <NexusAppearanceBrandColorField
+            <NxdsAppearanceBrandColorField
               label="Brand color"
               value={state.brandColor}
               onChange={(brandColor) =>
                 setState((current) => ({ ...current, brandColor }))
               }
             />
-          </NexusAppearanceSettingRow>
+          </NxdsAppearanceSettingRow>
 
-          <NexusAppearanceSettingRow
+          <NxdsAppearanceSettingRow
             label="Surface tone"
             description="Neutral surfaces, borders, and muted UI"
           >
-            <AxisSelect<NexusSurfaceTone>
+            <AxisSelect<NxdsSurfaceTone>
               value={state.surfaceTone}
               options={BASE_TONE_OPTIONS}
               onValueChange={(surfaceTone) =>
@@ -227,7 +227,7 @@ export function NexusAppearanceSettings() {
               }
               ariaLabel="Surface tone"
             />
-          </NexusAppearanceSettingRow>
+          </NxdsAppearanceSettingRow>
 
           <p
             className="nx:m-0 nx:typography-body-small nx:text-muted-foreground"
@@ -235,7 +235,7 @@ export function NexusAppearanceSettings() {
           >
             Editing {resolvedMode} appearance
           </p>
-          <NexusAppearanceSettingRow
+          <NxdsAppearanceSettingRow
             label="Contrast"
             description={`Text and surface definition · ${state[contrastKey]}`}
           >
@@ -248,9 +248,9 @@ export function NexusAppearanceSettings() {
               aria-label="Contrast"
               className="nx:w-48"
             />
-          </NexusAppearanceSettingRow>
+          </NxdsAppearanceSettingRow>
 
-          <NexusAppearanceConfigPreview
+          <NxdsAppearanceConfigPreview
             state={state}
             resolvedMode={resolvedMode}
           />
@@ -263,15 +263,15 @@ export function NexusAppearanceSettings() {
           <CardDescription>UI and code font preferences.</CardDescription>
         </CardHeader>
         <CardContent>
-          <NexusAppearanceSettingRow label="UI font">
+          <NxdsAppearanceSettingRow label="UI font">
             <Input
               value={state.prefs.uiFont}
               onChange={(event) => updatePrefs({ uiFont: event.target.value })}
               aria-label="UI font"
               className="nx:w-56 nx:font-mono nx:typography-body-small"
             />
-          </NexusAppearanceSettingRow>
-          <NexusAppearanceSettingRow label="Code font">
+          </NxdsAppearanceSettingRow>
+          <NxdsAppearanceSettingRow label="Code font">
             <Input
               value={state.prefs.codeFont}
               onChange={(event) =>
@@ -280,21 +280,21 @@ export function NexusAppearanceSettings() {
               aria-label="Code font"
               className="nx:w-56 nx:font-mono nx:typography-body-small"
             />
-          </NexusAppearanceSettingRow>
-          <NexusAppearanceSettingRow label="UI font size">
+          </NxdsAppearanceSettingRow>
+          <NxdsAppearanceSettingRow label="UI font size">
             <FontSizeInput
               value={state.prefs.uiFontSize}
               ariaLabel="UI font size"
               onCommit={(value) => setFontSize('uiFontSize', value)}
             />
-          </NexusAppearanceSettingRow>
-          <NexusAppearanceSettingRow label="Code font size">
+          </NxdsAppearanceSettingRow>
+          <NxdsAppearanceSettingRow label="Code font size">
             <FontSizeInput
               value={state.prefs.codeFontSize}
               ariaLabel="Code font size"
               onCommit={(value) => setFontSize('codeFontSize', value)}
             />
-          </NexusAppearanceSettingRow>
+          </NxdsAppearanceSettingRow>
         </CardContent>
       </Card>
 
@@ -306,8 +306,8 @@ export function NexusAppearanceSettings() {
           </CardDescription>
         </CardHeader>
         <CardContent>
-          <NexusAppearanceSettingRow label="Density">
-            <AxisSelect<NexusDensity>
+          <NxdsAppearanceSettingRow label="Density">
+            <AxisSelect<NxdsDensity>
               value={state.density}
               options={DENSITY_OPTIONS}
               onValueChange={(density) =>
@@ -315,9 +315,9 @@ export function NexusAppearanceSettings() {
               }
               ariaLabel="Density"
             />
-          </NexusAppearanceSettingRow>
-          <NexusAppearanceSettingRow label="Corners">
-            <AxisSelect<NexusCorners>
+          </NxdsAppearanceSettingRow>
+          <NxdsAppearanceSettingRow label="Corners">
+            <AxisSelect<NxdsCorners>
               value={state.corners}
               options={CORNER_OPTIONS}
               onValueChange={(corners) =>
@@ -325,9 +325,9 @@ export function NexusAppearanceSettings() {
               }
               ariaLabel="Corners"
             />
-          </NexusAppearanceSettingRow>
-          <NexusAppearanceSettingRow label="Elevation">
-            <AxisSelect<NexusElevation>
+          </NxdsAppearanceSettingRow>
+          <NxdsAppearanceSettingRow label="Elevation">
+            <AxisSelect<NxdsElevation>
               value={state.elevation}
               options={ELEVATION_OPTIONS}
               onValueChange={(elevation) =>
@@ -335,9 +335,9 @@ export function NexusAppearanceSettings() {
               }
               ariaLabel="Elevation"
             />
-          </NexusAppearanceSettingRow>
-          <NexusAppearanceSettingRow label="Stroke">
-            <AxisSelect<NexusStroke>
+          </NxdsAppearanceSettingRow>
+          <NxdsAppearanceSettingRow label="Stroke">
+            <AxisSelect<NxdsStroke>
               value={state.stroke}
               options={STROKE_OPTIONS}
               onValueChange={(stroke) =>
@@ -345,7 +345,7 @@ export function NexusAppearanceSettings() {
               }
               ariaLabel="Stroke"
             />
-          </NexusAppearanceSettingRow>
+          </NxdsAppearanceSettingRow>
         </CardContent>
       </Card>
 
@@ -357,7 +357,7 @@ export function NexusAppearanceSettings() {
           </CardDescription>
         </CardHeader>
         <CardContent>
-          <NexusAppearanceSettingRow
+          <NxdsAppearanceSettingRow
             label="Use pointer cursors"
             description="Pointer cursor on interactive elements"
           >
@@ -368,15 +368,15 @@ export function NexusAppearanceSettings() {
               }
               aria-label="Use pointer cursors"
             />
-          </NexusAppearanceSettingRow>
-          <NexusAppearanceSettingRow label="Reduce motion">
+          </NxdsAppearanceSettingRow>
+          <NxdsAppearanceSettingRow label="Reduce motion">
             <Switch
               checked={state.prefs.reduceMotion}
               onCheckedChange={(reduceMotion) => updatePrefs({ reduceMotion })}
               aria-label="Reduce motion"
             />
-          </NexusAppearanceSettingRow>
-          <NexusAppearanceSettingRow
+          </NxdsAppearanceSettingRow>
+          <NxdsAppearanceSettingRow
             label="Font smoothing"
             description="Native macOS anti-aliasing"
           >
@@ -387,7 +387,7 @@ export function NexusAppearanceSettings() {
               }
               aria-label="Font smoothing"
             />
-          </NexusAppearanceSettingRow>
+          </NxdsAppearanceSettingRow>
         </CardContent>
       </Card>
     </div>

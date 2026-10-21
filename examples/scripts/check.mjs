@@ -1,14 +1,14 @@
-// Lists every host style that adding Nexus changed in an example app.
+// Lists every host style that adding nxds changed in an example app.
 //
 // Copies the app out of the repository twice: as it is, and as it was before
-// Nexus — its Nexus CSS entry emptied and the appearance provider reduced to a
+// nxds — its nxds CSS entry emptied and the appearance provider reduced to a
 // pass-through. Builds and serves both, then compares every property in PROPERTIES on
 // <html>, <body> and every element whose nearest [data-check] is "host" and
-// that no Nexus component rendered, page by page. Each [data-check-open] trigger is opened so portalled content
+// that no nxds component rendered, page by page. Each [data-check-open] trigger is opened so portalled content
 // is read too.
 //
-// Reads `check` from the app's nexus.json, paths relative to the app:
-//   cssEntry         the CSS file that brings Nexus in; emptied for the baseline
+// Reads `check` from the app's nxds.json, paths relative to the app:
+//   cssEntry         the CSS file that brings nxds in; emptied for the baseline
 //   providerModules  modules that export the appearance provider; stubbed for the baseline
 //   pages            routes to compare
 //   root, prepare    optional: copy this ancestor folder instead of the app alone,
@@ -45,25 +45,25 @@ const SKIP = new Set(['node_modules', '.next', 'dist']);
 
 const PROVIDER_STUB = `'use client';
 import type * as React from 'react';
-import { DEFAULT_NEXUS_APPEARANCE } from '@nxds/core';
+import { DEFAULT_NXDS_APPEARANCE } from '@nxds/core';
 
-export function NexusAppearanceProvider({ children }: { children?: React.ReactNode; [prop: string]: unknown }) {
+export function NxdsAppearanceProvider({ children }: { children?: React.ReactNode; [prop: string]: unknown }) {
   return children;
 }
-type State = typeof DEFAULT_NEXUS_APPEARANCE;
-export function useNexusAppearance(): { state: State; setState: React.Dispatch<React.SetStateAction<State>> } {
-  return { state: DEFAULT_NEXUS_APPEARANCE, setState() {} };
+type State = typeof DEFAULT_NXDS_APPEARANCE;
+export function useNxdsAppearance(): { state: State; setState: React.Dispatch<React.SetStateAction<State>> } {
+  return { state: DEFAULT_NXDS_APPEARANCE, setState() {} };
 }
-export function NexusAppearanceScript(_props: Record<string, unknown>) {
+export function NxdsAppearanceScript(_props: Record<string, unknown>) {
   return null;
 }
-export function createNexusAppearance(_options: Record<string, unknown>) {
-  return { NexusAppearanceProvider };
+export function createNxdsAppearance(_options: Record<string, unknown>) {
+  return { NxdsAppearanceProvider };
 }
 `;
 
 const appDir = path.resolve(process.argv[2] ?? '');
-const config = JSON.parse(readFileSync(path.join(appDir, 'nexus.json'), 'utf8')).check;
+const config = JSON.parse(readFileSync(path.join(appDir, 'nxds.json'), 'utf8')).check;
 const isNext = 'next' in JSON.parse(readFileSync(path.join(appDir, 'package.json'), 'utf8')).dependencies;
 const rootDir = path.resolve(appDir, config.root ?? '.');
 
@@ -86,7 +86,7 @@ const tempDirs = [];
 
 // Copies the root folder and returns the app's path inside the copy.
 function copyApp(label) {
-  const tempDir = mkdtempSync(path.join(tmpdir(), `nexus-check-${label}-`));
+  const tempDir = mkdtempSync(path.join(tmpdir(), `nxds-check-${label}-`));
   tempDirs.push(tempDir);
   const root = path.join(tempDir, path.basename(rootDir));
   cpSync(rootDir, root, { recursive: true, filter: (src) => !SKIP.has(path.basename(src)) });
@@ -94,7 +94,7 @@ function copyApp(label) {
   return path.join(root, path.relative(rootDir, appDir));
 }
 
-function removeNexus(dir) {
+function removeNxds(dir) {
   writeFileSync(path.join(dir, config.cssEntry), '');
   for (const module of config.providerModules) writeFileSync(path.join(dir, module), PROVIDER_STUB);
 }
@@ -140,16 +140,16 @@ function readHostElements(properties) {
     }
     return parts.join('>') || 'html';
   };
-  // A Nexus component renders nx: classes; anything it renders is not host UI,
-  // even inside a host section. A host-marked Nexus element still lets its
-  // children count, so a host input inside a Nexus dialog body is measured.
-  const isNexus = (node) => [...node.classList].some((name) => name.startsWith('nx:'));
+  // An nxds component renders nx: classes; anything it renders is not host UI,
+  // even inside a host section. A host-marked nxds element still lets its
+  // children count, so a host input inside an nxds dialog body is measured.
+  const isNxds = (node) => [...node.classList].some((name) => name.startsWith('nx:'));
   const isHost = (element) => {
     const scope = element.closest('[data-check]');
     if (scope?.dataset.check !== 'host') return false;
-    if (element === scope) return !isNexus(element);
+    if (element === scope) return !isNxds(element);
     for (let node = element; node !== scope; node = node.parentElement) {
-      if (isNexus(node)) return false;
+      if (isNxds(node)) return false;
     }
     return true;
   };
@@ -191,15 +191,15 @@ async function snapshot(page, url) {
 try {
   const before = copyApp('before');
   const after = copyApp('after');
-  removeNexus(before);
-  console.log('building the app without Nexus…');
+  removeNxds(before);
+  console.log('building the app without nxds…');
   build(before);
-  // A Vite app injects the first-paint script at build time, marked data-nexus-appearance.
+  // A Vite app injects the first-paint script at build time, marked data-nxds-appearance.
   if (!isNext) {
     const html = path.join(before, 'dist/index.html');
-    writeFileSync(html, readFileSync(html, 'utf8').replace(/<script data-nexus-appearance>.*?<\/script>/s, ''));
+    writeFileSync(html, readFileSync(html, 'utf8').replace(/<script data-nxds-appearance>.*?<\/script>/s, ''));
   }
-  console.log('building the app with Nexus…');
+  console.log('building the app with nxds…');
   build(after);
 
   const servers = [];
@@ -222,8 +222,8 @@ try {
       };
       // Both builds render the same markup, so a host element found in only one
       // of them is itself a change.
-      for (const key of Object.keys(a)) if (!(key in b)) add(`host element missing with Nexus: ${key}`);
-      for (const key of Object.keys(b)) if (!(key in a)) add(`host element only with Nexus: ${key}`);
+      for (const key of Object.keys(a)) if (!(key in b)) add(`host element missing with nxds: ${key}`);
+      for (const key of Object.keys(b)) if (!(key in a)) add(`host element only with nxds: ${key}`);
       for (const key of Object.keys(a).filter((key) => key in b)) {
         for (const name of PROPERTIES) {
           if (a[key][name] !== b[key][name]) add(`${name}: ${a[key][name]} → ${b[key][name]}`);
