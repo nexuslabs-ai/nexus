@@ -86,6 +86,12 @@ export const shared = [
   'tabs',
 ];
 
+/** Top-level values a Vue recipe file declares that React has no twin for, as `{file}#{name}`. */
+export const vueOnlyDeclarations: Record<string, string> = {
+  'tabs/index.ts#TabsListKey':
+    'Vue injection key the list provides to its triggers; React passes the same state through context',
+};
+
 /** Files Vue copies from React byte for byte, as `[react, vue]` repo paths. */
 export const copies: [react: string, vue: string][] = [
   ['packages/react/src/lib/utils.ts', 'packages/vue/src/lib/utils.ts'],
