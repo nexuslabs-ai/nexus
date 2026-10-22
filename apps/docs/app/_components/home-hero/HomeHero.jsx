@@ -2,7 +2,7 @@
 
 import { useSyncExternalStore } from 'react';
 
-import { useNexusAppearance } from '@nexus_ds/react/appearance';
+import { useNxdsAppearance } from '@nxds/react/appearance';
 import dynamic from 'next/dynamic';
 
 import { CtaJourney } from './CtaJourney';
@@ -35,7 +35,7 @@ function serverSearch() {
 }
 
 export function HomeHero({ children }) {
-  const { resolvedMode } = useNexusAppearance();
+  const { resolvedMode } = useNxdsAppearance();
   const search = useSyncExternalStore(subscribe, readSearch, serverSearch);
   const params = new URLSearchParams(search);
   const iteration = params.get('iteration') ?? 'tilted-cta';

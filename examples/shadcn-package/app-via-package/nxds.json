@@ -1,0 +1,17 @@
+{
+  "check": {
+    "cssEntry": "src/nxds.css",
+    "providerModules": [
+      "src/appearance.ts"
+    ],
+    "pages": [
+      "/",
+      "/settings",
+      "/overlays"
+    ],
+    "root": "..",
+    "prepare": [
+      "../ui"
+    ]
+  }
+}

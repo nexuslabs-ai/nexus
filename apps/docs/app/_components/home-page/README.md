@@ -2,7 +2,7 @@
 
 The homepage composes the existing hero, six intentionally empty preview blocks,
 frameworks, coexistence, Storybook testing, source ownership, appearance settings,
-closing actions, and footer. It inherits NexusAppearanceProvider.
+closing actions, and footer. It inherits NxdsAppearanceProvider.
 
 Frameworks studio provides independently persisted layout and sizing controls via
 the existing DialRoot. See FRAMEWORKS.md for reference and validation details.
@@ -75,7 +75,7 @@ library selections, the appearance view, local submission, and MUI computed
 button color/height. The code pane scrolls to keep the comparison compact.
 
 Provider-backed update: the invite form now runs in `coexistence-preview/`, an
-independent iframe document with its own `NexusAppearanceProvider`. Removed the
+independent iframe document with its own `NxdsAppearanceProvider`. Removed the
 button-level appearance overrides and adapted shadcn stand-ins. MUI and Ant Design
 are published components; shadcn Input and Radix Select are copied from the
 repository's shadcn example. Component/Appearance snippets show this implementation.
@@ -93,7 +93,7 @@ tree; only the added default shadcn or Nexus stylesheet changes. Application
 CSS handles layout, not component colors. `?integration=baseline` loads the
 unchanged HeroUI screen for computed-style comparisons. The native-content row uses
 the existing MUI/Ant comparison runtime. The adoption row uses real copied
-shadcn controls and Nexus buttons inside a local NexusAppearanceProvider.
+shadcn controls and Nexus buttons inside a local NxdsAppearanceProvider.
 
 Layout guidance: modern-web-guidance `css-layout`, retrieved 2026-10-19.
 Use a container query to stack comparison panels below 48rem; retain native
@@ -136,7 +136,7 @@ MUI/Ant switching, 390px overflow, and restoration of all three side-by-side
 pairs. No Chromium page errors. Equal iframe dimensions prevent sliding from
 changing the content layout.
 
-Comparison preview theme follows `useNexusAppearance().resolvedMode` through
+Comparison preview theme follows `useNxdsAppearance().resolvedMode` through
 iframe URLs in both comparison layouts. HeroUI/shadcn receive the explicit dark
 class; the Nexus alert provider receives the same mode. Billing shell colors
 use the existing shadcn host tokens instead of fixed light colors. Theme changes

@@ -1,14 +1,14 @@
 export const description =
-  'Point your AI agent at /llms.txt to give it every Nexus UI docs page as Markdown. Add .md to any docs URL to read one page.';
+  'Point your AI agent at /llms.txt to give it every nxds docs page as Markdown. Add .md to any docs URL to read one page.';
 
 # AI agents
 
-Point your AI agent at `/llms.txt` to give it every Nexus docs page as Markdown.
+Point your AI agent at `/llms.txt` to give it every nxds docs page as Markdown.
 
 ## Fetch the index
 
 ```bash
-curl https://nexusui.so/llms.txt
+curl https://nxds.dev/llms.txt
 ```
 
 `/llms.txt` lists every docs page, by section. Each entry links to the page's
@@ -19,7 +19,7 @@ Markdown and gives a one-line summary.
 Add `.md` to the URL of any page in `/llms.txt` to get that page as Markdown.
 
 ```bash
-curl https://nexusui.so/getting-started/install.md
+curl https://nxds.dev/getting-started/install.md
 ```
 
 The Markdown keeps the page's text, tables and code. Live previews and copy
@@ -28,7 +28,7 @@ buttons are left out, because they mean nothing as text.
 ## Fetch every page in one file
 
 ```bash
-curl https://nexusui.so/llms-full.txt
+curl https://nxds.dev/llms-full.txt
 ```
 
 `/llms-full.txt` holds the Markdown of every docs page, in nav order. It is about
@@ -37,4 +37,4 @@ itself, use `/llms.txt`.
 
 ## Next steps
 
-- **[Install](/getting-started/install)**: set up an app for Nexus components
+- **[Install](/getting-started/install)**: set up an app for nxds components

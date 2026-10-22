@@ -2,8 +2,8 @@ import React, { useEffect, useState } from 'react';
 import { createRoot } from 'react-dom/client';
 
 import * as M from '@mui/material';
-import { DEFAULT_NEXUS_APPEARANCE } from '@nexus_ds/core';
-import { NexusAppearanceProvider } from '@nexus_ds/react/appearance';
+import { DEFAULT_NXDS_APPEARANCE } from '@nxds/core';
+import { NxdsAppearanceProvider } from '@nxds/react/appearance';
 import * as A from 'antd';
 
 import './host-audit.css';
@@ -532,13 +532,13 @@ function Audit() {
     </>
   );
   return ready && kit === 'nexus' ? (
-    <NexusAppearanceProvider
-      state={{ ...DEFAULT_NEXUS_APPEARANCE, mode }}
+    <NxdsAppearanceProvider
+      state={{ ...DEFAULT_NXDS_APPEARANCE, mode }}
       storageKey={false}
       cookieWriteKey={false}
     >
       {content}
-    </NexusAppearanceProvider>
+    </NxdsAppearanceProvider>
   ) : (
     content
   );

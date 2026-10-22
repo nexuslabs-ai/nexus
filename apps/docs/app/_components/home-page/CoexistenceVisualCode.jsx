@@ -1,6 +1,6 @@
 import { useState } from 'react';
 
-import { Button } from '@nexus_ds/react';
+import { Button } from '@nxds/react';
 
 import { CodeBlock } from '../CodeBlock';
 import { CopyAnnouncerProvider } from '../CopyAnnouncer';

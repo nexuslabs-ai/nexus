@@ -50,7 +50,7 @@ const navigationMenuInlinePopoverTransitionClassName = [
 // Radix Presence only waits on `animationName`, not `transitionend`, so this inert
 // animation keeps a closing overlay mounted while the opacity/scale/translate
 // TRANSITIONS above run the visible exit. It animates an unread custom property (see
-// generateMotionUtilitiesCSS in @nexus/core), never a transitioned property, so it
+// generateMotionUtilitiesCSS in @nxds/core), never a transitioned property, so it
 // cannot override those transitions.
 const overlayPresenceExitClassName =
   'nx:data-[state=closed]:animate-overlay-presence-exit';

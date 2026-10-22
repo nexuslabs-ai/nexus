@@ -89,7 +89,7 @@ const meta = {
           </p>
           <Canvas of={Anatomy} />
           <p>
-            One compact size follows Nexus density. The field, operator, value
+            One compact size follows nxds density. The field, operator, value
             and remove button share the h-8 height token; there is no size prop.
             Change density in the toolbar to see them adapt together. Inputs
             inside an editor retain their own appropriate control size.
@@ -165,10 +165,10 @@ const meta = {
           <p>
             Use these parts directly for an editor the blocks do not provide,
             such as Location / within / a distance opening a location-and-radius
-            editor. Import the parts from @nexus_ds/react. Supply your own
-            editor, controlled values, open state, validation, and focus after
-            removal. Use FilterChip when editing happens elsewhere and the chip
-            only removes.
+            editor. Import the parts from @nxds/react. Supply your own editor,
+            controlled values, open state, validation, and focus after removal.
+            Use FilterChip when editing happens elsewhere and the chip only
+            removes.
           </p>
           <p>
             <a href="/?path=/docs/patterns-filtering--docs" target="_top">

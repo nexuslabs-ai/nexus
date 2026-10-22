@@ -1,13 +1,13 @@
 # shadcn-package
 
 A company with its own design-system package, built from shadcn, that adds
-Nexus. Two apps show the two ways to add it.
+nxds. Two apps show the two ways to add it.
 
 | Path | What it is |
 | ---- | ---------- |
-| `ui/` | `@acme/ui`, the company package: its shadcn kit, plus Nexus copied into `src/nexus/` |
-| `app-via-package/` | Gets shadcn **and** Nexus from `@acme/ui` |
-| `app-direct/` | Gets shadcn from `@acme/ui`, and copies Nexus into the app itself |
+| `ui/` | `@acme/ui`, the company package: its shadcn kit, plus nxds copied into `src/nxds/` |
+| `app-via-package/` | Gets shadcn **and** nxds from `@acme/ui` |
+| `app-direct/` | Gets shadcn from `@acme/ui`, and copies nxds into the app itself |
 
 Both apps are Vite + React Router and show the same three pages as
 [`shadcn-app`](../shadcn-app): side by side, settings and overlays.
@@ -31,20 +31,20 @@ npx vite preview
 
 After rebuilding `ui/`, delete the app's `node_modules/@acme/ui` and run
 `npm install`. npm does not reinstall a `file:` package whose version has not
-changed. The same goes for `node_modules/@nexus_ds/core` after a change to
+changed. The same goes for `node_modules/@nxds/core` after a change to
 `packages/core`.
 
-## How the package ships Nexus
+## How the package ships nxds
 
 | Export | What it is |
 | ------ | ---------- |
 | `@acme/ui` | The shadcn components and `cn` |
-| `@acme/ui/nexus` | The Nexus components and the appearance provider |
+| `@acme/ui/nxds` | The nxds components and the appearance provider |
 | `@acme/ui/styles.css` | The shadcn Tailwind entry and tokens |
-| `@acme/ui/nexus.css` | The Nexus Tailwind entry |
+| `@acme/ui/nxds.css` | The nxds Tailwind entry |
 
 `tsc` compiles `src/` to `dist/`, keeping each file's `'use client'`.
-`@nexus_ds/core` is a peer dependency, so the app installs the one copy of the
+`@nxds/core` is a peer dependency, so the app installs the one copy of the
 engine that the provider and its own code share. The CSS
 ships as source, and the app compiles it. Both entries end with
 `@source './'`: Tailwind skips `node_modules` when it scans for classes, so
@@ -57,12 +57,12 @@ starts its own Tailwind build:
 /* src/index.css */
 @import "@acme/ui/styles.css";
 
-/* src/nexus.css */
-@import "@acme/ui/nexus.css";
+/* src/nxds.css */
+@import "@acme/ui/nxds.css";
 ```
 
-`app-direct` imports `@acme/ui/styles.css` the same way, and its `nexus.css`
-points at the Nexus copy in `src/components/nexus/`.
+`app-direct` imports `@acme/ui/styles.css` the same way, and its `nxds.css`
+points at the nxds copy in `src/components/nxds/`.
 
 ## Check it
 
@@ -74,5 +74,5 @@ node examples/scripts/check.mjs examples/shadcn-package/app-direct
 ```
 
 Both report **0 host changes** across the three pages, and both build
-byte-identical CSS. Delivering Nexus through the package or copying it into the
+byte-identical CSS. Delivering nxds through the package or copying it into the
 app makes no difference.

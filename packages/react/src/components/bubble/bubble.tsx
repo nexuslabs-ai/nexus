@@ -65,18 +65,6 @@ interface BubbleProps
  * With `BubbleReactions`, use a flex or grid parent such as `BubbleGroup`, so facing reaction pills don't touch.
  *
  * `align` has no default, so the parent sets the position. `align` is logical, so `end` flips under `dir="rtl"`.
- *
- * @example
- * ```tsx
- * <BubbleGroup>
- *   <Bubble>
- *     <BubbleContent>How do I rotate the signing key?</BubbleContent>
- *   </Bubble>
- *   <Bubble variant="primary" align="end">
- *     <BubbleContent>Run `nexus keys rotate` and redeploy.</BubbleContent>
- *   </Bubble>
- * </BubbleGroup>
- * ```
  */
 function Bubble({
   className,
@@ -104,14 +92,6 @@ interface BubbleContentProps extends React.ComponentProps<'div'> {
   /**
    * Renders the child element instead, such as `p`, `a` or `button`.
    * An actionable child gets the focus ring and pointer cursor.
-   *
-   * @default false
-   * @example
-   * ```tsx
-   * <BubbleContent asChild>
-   *   <button type="button">Retry this step</button>
-   * </BubbleContent>
-   * ```
    */
   asChild?: boolean;
 }
@@ -173,14 +153,6 @@ interface BubbleReactionsProps
 /**
  * Reaction pill overhanging a corner of the bubble. `side` picks top or bottom.
  * `align` is logical, so `start` sits on the right under `dir="rtl"`.
- *
- * @example
- * ```tsx
- * <Bubble align="end" variant="primary">
- *   <BubbleContent>Shipped it.</BubbleContent>
- *   <BubbleReactions side="bottom" align="end">🎉 2</BubbleReactions>
- * </Bubble>
- * ```
  */
 function BubbleReactions({
   className,

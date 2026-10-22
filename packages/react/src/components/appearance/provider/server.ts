@@ -1,5 +1,5 @@
 export type {
-  CreateNexusAppearanceScriptOptions,
-  NexusAppearanceScriptProps,
+  CreateNxdsAppearanceScriptOptions,
+  NxdsAppearanceScriptProps,
 } from './script';
-export { createNexusAppearanceScript, NexusAppearanceScript } from './script';
+export { createNxdsAppearanceScript, NxdsAppearanceScript } from './script';

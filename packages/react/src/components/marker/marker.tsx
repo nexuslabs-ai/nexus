@@ -31,14 +31,6 @@ interface MarkerProps
    * Renders the child element, such as a heading, link or button, with Marker
    * styles. A link or button child gets hover styles with no extra classes. A
    * `disabled` or `aria-disabled` child ignores the pointer and dims.
-   *
-   * @default false
-   * @example
-   * ```tsx
-   * <Marker asChild>
-   *   <h3>Yesterday</h3>
-   * </Marker>
-   * ```
    */
   asChild?: boolean;
 }
@@ -47,23 +39,6 @@ interface MarkerProps
  * Quiet annotation row with an optional icon, for lists, feeds and message
  * streams. `separator` centers the label between two rules, and `border` adds
  * a rule underneath. For a decorative rule with no label, use `Separator`.
- *
- * @example
- * ```tsx
- * <Marker variant="separator">
- *   <MarkerContent>Today</MarkerContent>
- * </Marker>
- * ```
- *
- * @example
- * ```tsx
- * <Marker>
- *   <MarkerIcon>
- *     <PencilIcon />
- *   </MarkerIcon>
- *   <MarkerContent>Edited 2 minutes ago</MarkerContent>
- * </Marker>
- * ```
  */
 function Marker({
   className,

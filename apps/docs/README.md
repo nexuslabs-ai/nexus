@@ -1,6 +1,6 @@
-# Nexus docs
+# nxds docs
 
-The Nexus documentation site. Article routes live in `app/(docs)`; the
+The nxds documentation site. Article routes live in `app/(docs)`; the
 full-height workspaces live in `app/(workspace)` and share the docs header but
 not the article chrome.
 
@@ -8,20 +8,20 @@ not the article chrome.
 
 From the repository root:
 
-- `pnpm --filter @nexus_ds/docs dev`
-- `pnpm --filter @nexus_ds/docs typecheck`
-- `pnpm --filter @nexus_ds/docs build`
-- `pnpm --filter @nexus_ds/docs audit:csp` — after a production build.
+- `pnpm --filter @nxds/docs dev`
+- `pnpm --filter @nxds/docs typecheck`
+- `pnpm --filter @nxds/docs build`
+- `pnpm --filter @nxds/docs audit:csp` — after a production build.
 
 ## Playground
 
 `/playground` is a playground for the docs appearance. The controls sit in a side
 panel on wide screens and in a sheet below `lg`. The canvas renders a small
-product scene built from public Nexus components.
+product scene built from public nxds components.
 
 - **One appearance.** Controls write to the docs appearance provider in the root
   layout. That provider is the only store: it persists under
-  `nexus-docs-appearance`, and every page, including `/playground`, renders with it.
+  `nxds-docs-appearance`, and every page, including `/playground`, renders with it.
   The example scene renders inline under that same appearance. Its overlays
   portal into the docs document, so they look the same as the canvas.
 - **Undo and Reset.** `useAppearanceHistory` (`app/_workspace/appearance-state.ts`)
@@ -30,7 +30,7 @@ product scene built from public Nexus components.
   the panel (such as the top-nav light/dark toggle) survive an Undo. The history
   is per visit and is not persisted.
 - **Export.** "Use this theme" shows three files, each with a copy control:
-  `nexus-appearance.ts` holds the appearance state to pass as `defaultState`,
+  `nxds-appearance.ts` holds the appearance state to pass as `defaultState`,
   `theme.css` holds the derived light and dark themes, and `preferences.css`
   holds the font and motion preferences. The CSS comes from the same appearance
   snapshot the provider applies to the page.

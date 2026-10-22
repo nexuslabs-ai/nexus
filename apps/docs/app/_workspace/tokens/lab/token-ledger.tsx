@@ -9,7 +9,7 @@ import {
   type ThemeContrastCheck,
   type TokenCategory,
   type TokenMap,
-} from '@nexus_ds/core';
+} from '@nxds/core';
 import {
   Accordion,
   AccordionContent,
@@ -24,7 +24,7 @@ import {
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from '@nexus_ds/react';
+} from '@nxds/react';
 
 import { Swatch } from '../swatch';
 import type { LiveTheme } from '../use-live-theme';
@@ -240,7 +240,7 @@ function OverrideEditor({
       <p className="nx:typography-body-small nx:text-muted-foreground">
         Overrides {bare(token)} in {mode} mode with a plain{' '}
         <code className="nx:typography-code-inline">:root</code> declaration.
-        Nexus applies it as written and does not check its contrast.
+        nxds applies it as written and does not check its contrast.
       </p>
       <div className="nx:flex nx:items-center nx:gap-2">
         <Label htmlFor={`${id}-palette`}>Primitive</Label>

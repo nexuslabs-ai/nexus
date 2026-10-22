@@ -11,16 +11,6 @@ interface KbdProps extends React.ComponentProps<'kbd'> {}
  * Key cap for one key of a shortcut, such as `⌘` or `Esc`. Put several
  * inside `KbdGroup` to show a combination. Kbd labels a shortcut but doesn't
  * handle one.
- *
- * @example
- * ```tsx
- * <Kbd>⌘</Kbd>
- *
- * <KbdGroup>
- *   <Kbd>⌘</Kbd>
- *   <Kbd>K</Kbd>
- * </KbdGroup>
- * ```
  */
 function Kbd({ className, ...props }: KbdProps) {
   return (

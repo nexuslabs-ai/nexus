@@ -552,7 +552,7 @@ export const Disabled: StoryObj<BubbleProps & { onRetry: () => void }> = {
     await expect(args.onRetry).not.toHaveBeenCalled();
 
     // A dead body must not advertise itself as actionable, however it is
-    // deadened — `disabled`, `aria-disabled` (which Nexus `Button` sets while
+    // deadened — `disabled`, `aria-disabled` (which nxds `Button` sets while
     // loading), or an anchor with nowhere to go. `LinksAndButtons` asserts the
     // live bodies do get the pointer.
     const deadAnchor = canvasElement.querySelector<HTMLElement>(
@@ -688,8 +688,7 @@ export const WithCodeBlock: Story = {
           </p>
           <pre className="nx:rounded-md nx:bg-container nx:p-3 nx:typography-code-block nx:text-container-foreground">
             <code>
-              pnpm --filter @nexus_ds/core audit:contrast --reporter=verbose
-              --bail
+              pnpm --filter @nxds/core audit:contrast --reporter=verbose --bail
             </code>
           </pre>
         </BubbleContent>

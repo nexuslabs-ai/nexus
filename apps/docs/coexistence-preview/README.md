@@ -1,11 +1,11 @@
 # Isolated integration preview
 
-This is a separate document because `NexusAppearanceProvider` owns document-level
+This is a separate document because `NxdsAppearanceProvider` owns document-level
 styles and appearance attributes. Do not mount this provider inside the homepage's
 React tree. The homepage embeds `/coexistence-preview/index.html` and passes only
 an allowlisted library and explicit mode in the URL.
 
-Run `pnpm --filter @nexus_ds/docs generate:coexistence` after editing this preview.
+Run `pnpm --filter @nxds/docs generate:coexistence` after editing this preview.
 Docs `dev` and `build` generate it automatically. Output under
 `apps/docs/public/coexistence-preview/` is ignored and copied by the static docs
 export. The homepage loads the frame lazily.

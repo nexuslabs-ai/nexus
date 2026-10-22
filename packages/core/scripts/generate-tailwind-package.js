@@ -2,16 +2,16 @@ import fs from 'fs';
 import path from 'path';
 import { fileURLToPath, pathToFileURL } from 'url';
 
-import { formatTokenValue, resolveValue } from '../src/token-source/format.js';
+import { formatTokenValue, resolveValue } from '../src/token-source/format.ts';
 import {
   SPACING_MODE_FILE_PATTERN,
   splitSpacingTokens,
-} from '../src/token-source/spacing.js';
+} from '../src/token-source/spacing.ts';
 import {
   extractTokens,
   isReference,
   pathToCssVarPrefixed,
-} from '../src/token-source/tokens.js';
+} from '../src/token-source/tokens.ts';
 
 import {
   CANONICAL_SPACING_DEFAULT_MODE,
@@ -167,14 +167,14 @@ function assertTokenEngine(engine) {
   if (
     !engine ||
     typeof engine.deriveTheme !== 'function' ||
-    typeof engine.createNexusThemeContract !== 'function' ||
+    typeof engine.createNxdsThemeContract !== 'function' ||
     typeof engine.isColor !== 'function' ||
-    !engine.DEFAULT_NEXUS_APPEARANCE ||
+    !engine.DEFAULT_NXDS_APPEARANCE ||
     !Array.isArray(engine.BASE_TONE_OPTIONS) ||
     !Array.isArray(engine.SEMANTIC_TOKEN_REGISTRY)
   ) {
     throw new Error(
-      'generateTailwindPackage: token engine must provide deriveTheme, createNexusThemeContract, isColor, DEFAULT_NEXUS_APPEARANCE, BASE_TONE_OPTIONS, and SEMANTIC_TOKEN_REGISTRY.'
+      'generateTailwindPackage: token engine must provide deriveTheme, createNxdsThemeContract, isColor, DEFAULT_NXDS_APPEARANCE, BASE_TONE_OPTIONS, and SEMANTIC_TOKEN_REGISTRY.'
     );
   }
 
@@ -228,8 +228,8 @@ function deriveEngineSemanticTokens(config, engine) {
   const baseTone = validateBaseTone(config, engine);
   const brandColor = validateBrandColor(config, engine);
   const theme = engine.deriveTheme(
-    engine.createNexusThemeContract({
-      ...engine.DEFAULT_NEXUS_APPEARANCE,
+    engine.createNxdsThemeContract({
+      ...engine.DEFAULT_NXDS_APPEARANCE,
       surfaceTone: baseTone,
       brandColor,
     })
@@ -416,10 +416,10 @@ function groupByCategory(tokens) {
  * Generate variables.css with --nx-* prefixed primitives, in the theme layer.
  * Themed dark variants emit into a `.dark` block that overrides `:root` when
  * an ancestor carries the `.dark` class (matching the @custom-variant selector
- * used in nexus.css).
+ * used in nxds.css).
  */
 function generateVariablesCSS(primitiveTokens, divergentDark, usedModes) {
-  let css = `/* ===== NEXUS DESIGN SYSTEM - PRIMITIVE VARIABLES ===== */\n`;
+  let css = `/* ===== NXDS DESIGN SYSTEM - PRIMITIVE VARIABLES ===== */\n`;
   css += `/* Auto-generated - DO NOT EDIT */\n`;
   css += `/* All primitives use --nx-* prefix for namespace isolation */\n\n`;
 
@@ -459,7 +459,7 @@ function generateVariablesCSS(primitiveTokens, divergentDark, usedModes) {
 }
 
 /**
- * Generate nexus.css using shared generateThemeCSS function.
+ * Generate nxds.css using shared generateThemeCSS function.
  *
  * `spacingDefault` controls which mode lands under `:root, [data-density="X"]`
  * (i.e. which mode applies when no `data-density` attribute is set). All six
@@ -468,7 +468,7 @@ function generateVariablesCSS(primitiveTokens, divergentDark, usedModes) {
  * canonical default baseline because @theme drives Tailwind's utility codegen
  * (build-time); the cascade flip happens at runtime via the per-mode blocks.
  */
-function generateNexusCSS(
+function generateNxdsCSS(
   primitiveMap,
   lightSemanticTokens,
   darkSemanticTokens,
@@ -514,7 +514,7 @@ function generateNexusCSS(
   const breakpointTokens = collectBreakpointsTokens(SEMANTIC_DIR);
 
   // Generate header
-  const header = `/* ===== NEXUS DESIGN SYSTEM - TAILWIND THEME ===== */
+  const header = `/* ===== NXDS DESIGN SYSTEM - TAILWIND THEME ===== */
 /* Auto-generated - DO NOT EDIT */
 /* Uses nx: prefix for all utility classes */
 /*
@@ -587,7 +587,7 @@ function generateNexusCSS(
 /**
  * Main generation function. Exported so `pnpm export` can run it against its
  * own `distDir`. Keys left out of `overrides` come from the engine's
- * `DEFAULT_NEXUS_APPEARANCE`; returns the config it generated with.
+ * `DEFAULT_NXDS_APPEARANCE`; returns the config it generated with.
  */
 export async function generateTailwindPackage(
   overrides,
@@ -597,7 +597,7 @@ export async function generateTailwindPackage(
     engine ?? (await loadDistRuntimeEngine())
   );
   const config = {
-    ...defaultTokenConfig(tokenEngine.DEFAULT_NEXUS_APPEARANCE),
+    ...defaultTokenConfig(tokenEngine.DEFAULT_NXDS_APPEARANCE),
     ...overrides,
   };
   ensureDir(distDir);
@@ -667,7 +667,7 @@ export async function generateTailwindPackage(
   }
 
   // Spacing role utilities — data-driven from default role tokens. Numeric
-  // spacing flows through @theme in generateNexusCSS; role tokens get
+  // spacing flows through @theme in generateNxdsCSS; role tokens get
   // dedicated @utility declarations that read the per-mode --nx-control-*,
   // --nx-container-*, --nx-layout-* variables.
   const spacingModes = collectSpacingTokens(SEMANTIC_DIR);
@@ -693,7 +693,7 @@ export async function generateTailwindPackage(
     shadowModes: collectShadowModes(TOKENS_DIR),
     borderwidthModes: collectBorderwidthModes(TOKENS_DIR),
   };
-  const nexusCSS = generateNexusCSS(
+  const nxdsCSS = generateNxdsCSS(
     primitiveMap,
     lightSemanticTokens,
     darkSemanticTokens,
@@ -702,7 +702,7 @@ export async function generateTailwindPackage(
     spacingDefault,
     runtimeModes
   );
-  writeDistFile('nexus.css', nexusCSS);
+  writeDistFile('nxds.css', nxdsCSS);
 
   await formatDistCssFiles(distDir);
 
@@ -723,7 +723,7 @@ export async function generateTailwindPackage(
 }
 
 if (process.argv[1] === fileURLToPath(import.meta.url)) {
-  console.log('🎨 Generating @nexus_ds/tailwind package from DTCG tokens...');
+  console.log('🎨 Generating @nxds/tailwind package from DTCG tokens...');
   const engine = await loadDistRuntimeEngine();
   const cliConfig = parseArgs(process.argv.slice(2), {
     allowedKeys: [
@@ -739,5 +739,5 @@ if (process.argv[1] === fileURLToPath(import.meta.url)) {
   });
   await generateTailwindPackage(cliConfig, { engine });
   console.log('');
-  console.log('✨ @nexus_ds/tailwind package generation complete!');
+  console.log('✨ @nxds/tailwind package generation complete!');
 }

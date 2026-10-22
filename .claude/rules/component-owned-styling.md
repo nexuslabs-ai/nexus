@@ -1,7 +1,7 @@
 # Component-Owned Styling
 
 A component's appearance and behaviour live in its own file. The generated
-theme (`packages/tailwind/nexus.css`, emitted by `packages/core/scripts/`)
+theme (`packages/tailwind/nxds.css`, emitted by `packages/core/scripts/`)
 supplies the vocabulary — tokens and utilities — and never targets a component.
 
 ## What the Theme May Define
@@ -12,14 +12,14 @@ supplies the vocabulary — tokens and utilities — and never targets a compone
   them (`autofill-bg-*`, not `input-autofill`). State lives in the component's
   class (`nx:disabled:autofill-bg-disabled`), not inside the utility.
 - **`.dark { color-scheme: dark }`** — the one real property, under the `.dark`
-  switch Nexus shares with its host.
+  switch nxds shares with its host.
 
 Everything else the theme emits is an `nx:` utility or an `--nx-*` variable.
-That is what lets Nexus sit inside any app without restyling it.
+That is what lets nxds sit inside any app without restyling it.
 
 The provider's preference CSS follows the same rule, with one exception: the
 reduce motion, pointer cursor and font smoothing toggles apply to the whole
-page when the user turns them on. They are app-wide settings Nexus offers its
+page when the user turns them on. They are app-wide settings nxds offers its
 host, and while one is on the host cannot opt a single element out of it.
 
 ## What the Theme Must Not Define
@@ -31,11 +31,11 @@ host, and while one is on the host cannot opt a single element out of it.
   `:has([data-slot=…])`.
 - Element or universal rules: `*`, `html`, `body`, `button`, `code`. They reach
   the host app's elements too.
-- Tailwind's Preflight. The host brings its own reset; Nexus needs only
+- Tailwind's Preflight. The host brings its own reset; nxds needs only
   `box-sizing: border-box` from it.
 - Unprefixed variables: `--color-*`, `--spacing-*`. A host may declare the same
   names.
-- Unprefixed keyframe names. Name Nexus keyframes `nx-*`.
+- Unprefixed keyframe names. Name nxds keyframes `nx-*`.
 
 Components must not work around this either: no arbitrary-property class that a
 consumer or another file has to set, and no component `.css` file that
@@ -51,7 +51,7 @@ loads no Preflight, so a missing reset shows in the stories.
 ## Enforcement
 
 `packages/core/src/lib/generated-css-scope.test.ts` compiles the Install page's
-entry (`nexus.css`, `tw-animate-css` and `progress.css`) with every `nx:` class
+entry (`nxds.css`, `tw-animate-css` and `progress.css`) with every `nx:` class
 the components use, and fails on any rule that selects outside
 `nx:` classes and variable scopes, any global declaration that is not `--nx-*`,
 or an unprefixed keyframe other than Tailwind's and tw-animate-css's own. `touches the host page only for the toggles the user

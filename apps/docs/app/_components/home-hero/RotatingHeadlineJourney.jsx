@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from 'react';
 
-import { useNexusAppearance } from '@nexus_ds/react/appearance';
+import { useNxdsAppearance } from '@nxds/react/appearance';
 import { IconBrandGit, IconCopy, IconPencilCode } from '@tabler/icons-react';
 
 import {
@@ -39,7 +39,7 @@ export const tileSets = [
 ];
 
 export function RotatingHeadlineJourney(props) {
-  const { state } = useNexusAppearance();
+  const { state } = useNxdsAppearance();
   const [paused, setPaused] = useState(false);
   const [slide, setSlide] = useState(0);
   const stopped =

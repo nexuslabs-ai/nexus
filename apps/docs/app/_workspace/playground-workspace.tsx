@@ -1,7 +1,7 @@
 'use client';
 
-import { Button } from '@nexus_ds/react';
-import { useNexusAppearance } from '@nexus_ds/react/appearance';
+import { Button } from '@nxds/react';
+import { useNxdsAppearance } from '@nxds/react/appearance';
 
 import { AppearanceControls } from './appearance-controls';
 import { useAppearanceHistory } from './appearance-state';
@@ -14,7 +14,7 @@ import { WorkspaceLayout } from './workspace-layout';
 export function PlaygroundWorkspace() {
   const { state, change, startStep, reset, undo, canUndo } =
     useAppearanceHistory();
-  const { resolvedMode } = useNexusAppearance();
+  const { resolvedMode } = useNxdsAppearance();
 
   const panel = (
     <div className="nx:space-y-8">

@@ -13,14 +13,6 @@ interface ChoiceRowProps extends React.ComponentProps<typeof Label> {}
 /**
  * Compact label row for a checkbox or radio choice.
  * Set `htmlFor` to the nested control's `id`, so a click anywhere on the row toggles it.
- *
- * @example
- * ```tsx
- * <ChoiceRow htmlFor="product">
- *   <Checkbox id="product" aria-labelledby="product-title" />
- *   <ChoiceRowTitle id="product-title">Product updates</ChoiceRowTitle>
- * </ChoiceRow>
- * ```
  */
 function ChoiceRow({ className, ...props }: ChoiceRowProps) {
   return (

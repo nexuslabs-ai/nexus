@@ -1,18 +1,22 @@
 import js from '@eslint/js';
+import eslintCommentsPlugin from '@eslint-community/eslint-plugin-eslint-comments';
 import {
-  nexusComponentConfig,
-  nexusSpacingTokenConfig,
-} from '@nexus_ds/eslint-plugin/config';
-import { nexusTailwindClassesConfig } from '@nexus_ds/eslint-plugin/tailwind';
+  nxdsComponentConfig,
+  nxdsSpacingTokenConfig,
+} from '@nxds/eslint-plugin/config';
+import { nxdsTailwindClassesConfig } from '@nxds/eslint-plugin/tailwind';
 import prettierConfig from 'eslint-config-prettier';
 import jsxA11yPlugin from 'eslint-plugin-jsx-a11y';
 import reactPlugin from 'eslint-plugin-react';
 import reactHooksPlugin from 'eslint-plugin-react-hooks';
 import simpleImportSort from 'eslint-plugin-simple-import-sort';
+import pluginVue from 'eslint-plugin-vue';
+import vueA11yPlugin from 'eslint-plugin-vuejs-accessibility';
 import globals from 'globals';
 import * as jsoncParser from 'jsonc-eslint-parser';
 import path from 'node:path';
 import tseslint from 'typescript-eslint';
+import vueParser from 'vue-eslint-parser';
 
 function repoPath(relativePath) {
   return path.join(import.meta.dirname, relativePath);
@@ -39,6 +43,8 @@ export default tseslint.config(
       '**/storybook-static/**',
       '**/build/**',
       '**/out/**',
+      'apps/docs/public/coexistence-preview/**',
+      'apps/docs/public/vue-demos/**',
       '**/.wrangler/**',
       // Standalone consumer examples — self-contained repos with their own
       // toolchains, outside this workspace. Not linted by the monorepo config.
@@ -53,6 +59,16 @@ export default tseslint.config(
 
   // TypeScript recommended rules
   ...tseslint.configs.recommended,
+
+  // Every eslint-disable says why, after `--`.
+  {
+    plugins: {
+      '@eslint-community/eslint-comments': eslintCommentsPlugin,
+    },
+    rules: {
+      '@eslint-community/eslint-comments/require-description': 'error',
+    },
+  },
 
   // React configuration
   {
@@ -112,9 +128,36 @@ export default tseslint.config(
     },
   },
 
+  // Vue single-file components, with TypeScript in <script setup>
+  ...pluginVue.configs['flat/recommended'],
+  {
+    files: ['**/*.vue'],
+    languageOptions: {
+      parser: vueParser,
+      parserOptions: {
+        parser: tseslint.parser,
+        ecmaVersion: 'latest',
+        sourceType: 'module',
+      },
+      globals: {
+        ...globals.browser,
+      },
+    },
+    plugins: {
+      'vuejs-accessibility': vueA11yPlugin,
+    },
+    rules: {
+      ...vueA11yPlugin.configs.recommended.rules,
+      // Component names match the React package's: Button, Card, Switch.
+      'vue/multi-word-component-names': 'off',
+      // Optional typed props such as `class` need no runtime default.
+      'vue/require-default-prop': 'off',
+    },
+  },
+
   // Import sorting
   {
-    files: ['**/*.{js,jsx,ts,tsx}'],
+    files: ['**/*.{js,jsx,ts,tsx,vue}'],
     plugins: {
       'simple-import-sort': simpleImportSort,
     },
@@ -217,7 +260,7 @@ export default tseslint.config(
 
   // CLI scripts - allow console.log for user output
   {
-    files: ['**/scripts/**/*.{js,mjs}'],
+    files: ['**/scripts/**/*.{js,mjs,ts}'],
     rules: {
       'no-console': 'off',
     },
@@ -234,27 +277,45 @@ export default tseslint.config(
     },
   },
 
-  // Nexus: enforce documented component rules as lint — nx: class conventions
+  // nxds: enforce documented component rules as lint — nx: class conventions
   // (ported from the former lint-nx-prefix Claude hook), composition over
   // render props, and handler extraction. Scoped to component-bearing source
   // (React package + apps). Hand-written stories are linted too; any
   // `__generated__` output stays excluded via the global ignore.
   {
     files: ['packages/react/src/**/*.{ts,tsx}', 'apps/**/*.{ts,tsx}'],
-    ...nexusComponentConfig(),
+    ...nxdsComponentConfig(),
   },
 
-  nexusTailwindClassesConfig({
+  // The docs read defaults from code and examples from docs stories, so the
+  // published source carries no `@default` or `@example` copies of them.
+  {
+    files: [
+      'packages/react/src/**/*.{ts,tsx}',
+      'packages/vue/src/**/*.{ts,vue}',
+    ],
+    rules: { '@nxds/no-jsdoc-data-tags': 'error' },
+  },
+
+  nxdsTailwindClassesConfig({
     files: ['packages/react/src/**/*.{ts,tsx}'],
     entryPoint: repoPath('packages/react/.storybook/preview.css'),
   }),
-  nexusTailwindClassesConfig({
+  {
+    files: ['packages/vue/src/**/*.{ts,vue}'],
+    ...nxdsComponentConfig(),
+  },
+  nxdsTailwindClassesConfig({
+    files: ['packages/vue/src/**/*.{ts,vue}'],
+    entryPoint: repoPath('packages/vue/.storybook/preview.css'),
+  }),
+  nxdsTailwindClassesConfig({
     files: ['apps/docs/**/*.{ts,tsx}'],
     entryPoint: repoPath('apps/docs/app/globals.css'),
   }),
 
   // The isolated host demo uses copied shadcn utilities, without the nx prefix.
-  nexusTailwindClassesConfig({
+  nxdsTailwindClassesConfig({
     files: ['apps/docs/coexistence-preview/ui/**/*.{ts,tsx}'],
     entryPoint: repoPath('apps/docs/coexistence-preview/preview.css'),
   }),
@@ -293,7 +354,7 @@ export default tseslint.config(
             {
               group: ['@/*'],
               message:
-                '`@/` resolves to packages/react/src for the generated, paste-ready docs code only — import @nexus_ds/react here.',
+                '`@/` resolves to packages/react/src for the generated, paste-ready docs code only — import @nxds/react here.',
             },
           ],
         },
@@ -311,7 +372,7 @@ export default tseslint.config(
             {
               regex: '^@/(?!patterns/)',
               message:
-                'A pattern page imports its examples from `@/patterns/`, which @nexus_ds/react does not export — import components from @nexus_ds/react.',
+                'A pattern page imports its examples from `@/patterns/`, which @nxds/react does not export — import components from @nxds/react.',
             },
           ],
         },
@@ -323,16 +384,16 @@ export default tseslint.config(
   // array indices), so non-null assertions are idiomatic there. Keep the rule
   // on production source only.
   {
-    files: ['**/*.test.{ts,tsx}', '**/*.stories.tsx'],
+    files: ['**/*.test.{ts,tsx}', '**/*.stories.{ts,tsx}'],
     rules: {
       '@typescript-eslint/no-non-null-assertion': 'off',
     },
   },
 
-  // Nexus: gate px values in spacing mode files to the canonical step set.
+  // nxds: gate px values in spacing mode files to the canonical step set.
   {
     files: ['packages/core/tokens/semantic/spacing-*.json'],
-    ...nexusSpacingTokenConfig({ parser: jsoncParser }),
+    ...nxdsSpacingTokenConfig({ parser: jsoncParser }),
   },
 
   // Disable rules that conflict with Prettier

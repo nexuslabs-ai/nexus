@@ -21,20 +21,6 @@ interface CommandProps extends React.ComponentProps<typeof CommandPrimitive> {}
 /**
  * A searchable command palette with keyboard navigation. Pass a `label` or
  * `aria-label` so the search input has an accessible name.
- *
- * @example
- * ```tsx
- * <Command label="Command menu">
- *   <CommandInput placeholder="Type a command or search..." />
- *   <CommandList>
- *     <CommandEmpty>No results found.</CommandEmpty>
- *     <CommandGroup heading="Suggestions">
- *       <CommandItem>Calendar</CommandItem>
- *       <CommandItem>Search Emoji</CommandItem>
- *     </CommandGroup>
- *   </CommandList>
- * </Command>
- * ```
  */
 function Command({ className, ...props }: CommandProps) {
   return (
@@ -59,12 +45,10 @@ function Command({ className, ...props }: CommandProps) {
 interface CommandDialogProps extends React.ComponentProps<typeof Dialog> {
   /**
    * Visually hidden dialog title. Also labels the search input.
-   * @default 'Command Palette'
    */
   title?: string;
   /**
    * Visually hidden dialog description.
-   * @default 'Search for a command to run...'
    */
   description?: string;
   /**
@@ -73,7 +57,6 @@ interface CommandDialogProps extends React.ComponentProps<typeof Dialog> {
   className?: string;
   /**
    * Shows the dialog's close button. Escape and clicking outside close it either way.
-   * @default false
    */
   showCloseButton?: boolean;
 }
@@ -81,19 +64,6 @@ interface CommandDialogProps extends React.ComponentProps<typeof Dialog> {
 /**
  * A command palette inside a modal Dialog, often opened with ⌘K. Control its
  * `open` state and bind it to a keyboard shortcut.
- *
- * @example
- * ```tsx
- * <CommandDialog open={open} onOpenChange={setOpen}>
- *   <CommandInput placeholder="Type a command or search..." />
- *   <CommandList>
- *     <CommandEmpty>No results found.</CommandEmpty>
- *     <CommandGroup heading="Suggestions">
- *       <CommandItem onSelect={() => setOpen(false)}>Calendar</CommandItem>
- *     </CommandGroup>
- *   </CommandList>
- * </CommandDialog>
- * ```
  */
 function CommandDialog({
   title = 'Command Palette',
@@ -214,13 +184,6 @@ interface CommandLoadingProps extends React.ComponentProps<
 /**
  * Shown while async results load. Place it outside CommandList, and pass
  * `progress` and `label` when progress is known.
- *
- * @example
- * ```tsx
- * <CommandLoading label="Loading command results">
- *   Loading commands...
- * </CommandLoading>
- * ```
  */
 function CommandLoading({ className, ...props }: CommandLoadingProps) {
   return (
@@ -249,14 +212,6 @@ interface CommandGroupProps extends React.ComponentProps<
 
 /**
  * Groups related items under an optional `heading`.
- *
- * @example
- * ```tsx
- * <CommandGroup heading="Settings">
- *   <CommandItem>Profile</CommandItem>
- *   <CommandItem>Billing</CommandItem>
- * </CommandGroup>
- * ```
  */
 function CommandGroup({ className, ...props }: CommandGroupProps) {
   return (
@@ -312,11 +267,6 @@ interface CommandItemProps extends React.ComponentProps<
 /**
  * A selectable command. The highlighted item gets `data-selected`, and a
  * disabled item gets `data-disabled`.
- *
- * @example
- * ```tsx
- * <CommandItem onSelect={() => run('new-file')}>New File</CommandItem>
- * ```
  */
 function CommandItem({ className, ...props }: CommandItemProps) {
   return (
@@ -344,13 +294,6 @@ interface CommandShortcutProps extends React.ComponentProps<'span'> {}
 
 /**
  * A keyboard shortcut hint, right-aligned in a CommandItem.
- *
- * @example
- * ```tsx
- * <CommandItem>
- *   New File <CommandShortcut>⌘N</CommandShortcut>
- * </CommandItem>
- * ```
  */
 function CommandShortcut({ className, ...props }: CommandShortcutProps) {
   return (

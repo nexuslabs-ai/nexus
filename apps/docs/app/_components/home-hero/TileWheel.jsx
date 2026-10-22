@@ -2,12 +2,12 @@
 
 import { useEffect, useId, useRef, useState } from 'react';
 
-import { useNexusAppearance } from '@nexus_ds/react/appearance';
+import { useNxdsAppearance } from '@nxds/react/appearance';
 
 import './tile-wheel.css';
 
 export function TileWheel({ details, colors, tuning }) {
-  const { state } = useNexusAppearance();
+  const { state } = useNxdsAppearance();
   const reduceMotion = state.prefs.reduceMotion;
   const count = details.length;
   const wheelId = useId();

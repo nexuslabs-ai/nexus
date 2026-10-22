@@ -2,8 +2,8 @@
 
 import { useEffect, useId, useRef, useState } from 'react';
 
-import { useNexusAppearance } from '@nexus_ds/react/appearance';
-import { cn } from '@nexus_ds/react/utils';
+import { useNxdsAppearance } from '@nxds/react/appearance';
+import { cn } from '@nxds/react/utils';
 import { usePathname } from 'next/navigation';
 
 import {
@@ -20,7 +20,7 @@ import {
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from './nexus';
+} from './nxds';
 
 /**
  * Asks for the *expanded* case so the unmatched value — the one the prerendered
@@ -38,7 +38,7 @@ export function ThemePicker() {
 }
 
 function ThemePanel() {
-  const { state, setState } = useNexusAppearance();
+  const { state, setState } = useNxdsAppearance();
   const expandedByDefault = useMediaQuery(EXPAND_QUERY);
   const [expandedOverride, setExpandedOverride] = useState<boolean | null>(
     null

@@ -15,24 +15,6 @@ import {
 /**
  * Root of a panel that slides in from an edge of the viewport. Holds the open
  * state.
- *
- * @example
- * ```tsx
- * <Sheet>
- *   <SheetTrigger asChild>
- *     <Button>Open Sheet</Button>
- *   </SheetTrigger>
- *   <SheetContent side="right">
- *     <SheetHeader>
- *       <SheetTitle>Sheet Title</SheetTitle>
- *       <SheetDescription>Sheet description here.</SheetDescription>
- *     </SheetHeader>
- *     <SheetFooter>
- *       <Button>Save</Button>
- *     </SheetFooter>
- *   </SheetContent>
- * </Sheet>
- * ```
  */
 const Sheet = DialogPrimitive.Root;
 
@@ -79,7 +61,7 @@ function SheetOverlay({ className, ...props }: SheetOverlayProps) {
  * Per-side positioning and slide motion for the sheet panel. Each side pins the
  * panel to an edge and slides it fully on/off screen from that edge — the bare
  * `slide-*` utilities translate by 100% (the spacing-scaled `slide-*-N` forms
- * resolve to 0 under the Nexus spacing reset, so they would not move).
+ * resolve to 0 under the nxds spacing reset, so they would not move).
  */
 const sheetContentVariants = cva(
   cn(
@@ -123,7 +105,6 @@ interface SheetContentProps
     VariantProps<typeof sheetContentVariants> {
   /**
    * Shows the close button in the top-right corner.
-   * @default true
    */
   showCloseButton?: boolean;
 }
@@ -131,15 +112,6 @@ interface SheetContentProps
 /**
  * The sliding panel, rendered in a portal with an overlay. `side` picks the
  * edge it slides from.
- *
- * @example
- * ```tsx
- * <SheetContent side="left">
- *   <SheetHeader>
- *     <SheetTitle>Navigation</SheetTitle>
- *   </SheetHeader>
- * </SheetContent>
- * ```
  */
 function SheetContent({
   className,
@@ -179,14 +151,6 @@ interface SheetHeaderProps extends React.ComponentProps<'div'> {}
 
 /**
  * Holds the title and description.
- *
- * @example
- * ```tsx
- * <SheetHeader>
- *   <SheetTitle>Title</SheetTitle>
- *   <SheetDescription>Description</SheetDescription>
- * </SheetHeader>
- * ```
  */
 function SheetHeader({ className, ...props }: SheetHeaderProps) {
   return (
@@ -209,21 +173,13 @@ interface SheetBodyProps extends React.ComponentProps<'div'> {}
 /**
  * Main content between the header and footer. Its side padding matches
  * SheetHeader and SheetFooter.
- *
- * @example
- * ```tsx
- * <SheetBody>
- *   <p>Main content.</p>
- * </SheetBody>
- * ```
  */
 function SheetBody({ className, ...props }: SheetBodyProps) {
   return (
     <div
       data-slot="sheet-body"
       className={cn(overlayBodyClassName, className)}
-      // Overlay bodies own the scroll region, so pure-text overflow must be keyboard reachable.
-      // eslint-disable-next-line jsx-a11y/no-noninteractive-tabindex
+      // eslint-disable-next-line jsx-a11y/no-noninteractive-tabindex -- overlay bodies own the scroll region, so pure-text overflow must be keyboard reachable
       tabIndex={0}
       {...props}
     />
@@ -237,14 +193,6 @@ interface SheetFooterProps extends React.ComponentProps<'div'> {}
 
 /**
  * Holds the action buttons, pinned to the bottom of the panel.
- *
- * @example
- * ```tsx
- * <SheetFooter>
- *   <Button variant="outline">Cancel</Button>
- *   <Button>Save</Button>
- * </SheetFooter>
- * ```
  */
 function SheetFooter({ className, ...props }: SheetFooterProps) {
   return (
@@ -268,11 +216,6 @@ interface SheetTitleProps extends React.ComponentProps<
 
 /**
  * Title of the sheet. Place it inside SheetHeader.
- *
- * @example
- * ```tsx
- * <SheetTitle>Edit Profile</SheetTitle>
- * ```
  */
 function SheetTitle({ className, ...props }: SheetTitleProps) {
   return (
@@ -293,13 +236,6 @@ interface SheetDescriptionProps extends React.ComponentProps<
 
 /**
  * Supporting text under the title.
- *
- * @example
- * ```tsx
- * <SheetDescription>
- *   Make changes to your profile here. Click save when you're done.
- * </SheetDescription>
- * ```
  */
 function SheetDescription({ className, ...props }: SheetDescriptionProps) {
   return (

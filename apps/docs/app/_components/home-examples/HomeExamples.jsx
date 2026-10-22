@@ -1,7 +1,7 @@
 'use client';
 import { useId, useRef, useState } from 'react';
 
-import { Button } from '@nexus_ds/react';
+import { Button } from '@nxds/react';
 
 import { DataExample } from './DataExample';
 import sources from './example-sources.json';
@@ -119,8 +119,7 @@ export function HomeExamples() {
                   {stylesheet ? 'View JSX' : 'View CSS'}
                 </Button>
               </div>
-              {/* Keyboard users need to focus this scrollable source region. */}
-              {/* eslint-disable-next-line jsx-a11y/no-noninteractive-tabindex */}
+              {/* eslint-disable-next-line jsx-a11y/no-noninteractive-tabindex -- Keyboard users need to focus this scrollable source region. */}
               <pre tabIndex={0} role="region" aria-label="Example source code">
                 <code>
                   {sources[stylesheet ? 'home-examples.css' : example.file]}

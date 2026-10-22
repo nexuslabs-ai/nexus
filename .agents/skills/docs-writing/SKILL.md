@@ -1,6 +1,6 @@
 ---
 name: docs-writing
-description: Write or rewrite Nexus docs prose in the plain Nexus voice. Use when adding or editing a docs page (apps/docs/content/**/*.mdx or apps/docs/app/_pages/**), a component or story description in *.stories.tsx, or prop JSDoc that feeds the Props table. Triggers on "write a docs page", "document X", "rewrite this page", "simplify the docs", "add a story description".
+description: Write or rewrite nxds docs prose in the plain nxds voice. Use when adding or editing a docs page (apps/docs/content/**/*.mdx or apps/docs/app/_pages/**), a component or story description in *.stories.tsx, or prop JSDoc that feeds the Props table. Triggers on "write a docs page", "document X", "rewrite this page", "simplify the docs", "add a story description".
 allowed-tools:
   - Read
   - Grep
@@ -159,7 +159,7 @@ Agents read docs as plain text, and readers land on one section from search.
 - **Use full paths in links and code**, not "the file from earlier".
 - **Repeat the noun at the start of each section**, not "it".
 
-At build time, `apps/docs/scripts/write-markdown.mjs` turns every page into
+At build time, `apps/docs/scripts/write-markdown.ts` turns every page into
 Markdown at `{route}.md` and lists it in `/llms.txt`. The page's first paragraph
 becomes its `llms.txt` summary, so make that paragraph say what the page is.
 Put `data-md-skip` on a live preview or specimen that means nothing as text.
@@ -168,22 +168,22 @@ Put `data-md-skip` on a live preview or specimen that means nothing as text.
 
 **Opening of a guide**
 
-> Nexus components are copy/own: you paste a component's source into your app
+> nxds components are copy/own: you paste a component's source into your app
 > and it is yours from that moment. Nothing installs it, and no upstream change
 > will ever reach it — editing a pasted component means editing your own file,
 > and picking up a later fix means pasting the new version over it.
 
-> Set up your app once, then copy in any Nexus component. Copied components
+> Set up your app once, then copy in any nxds component. Copied components
 > are your files: edit them freely, and paste a newer version to update.
 
 **Mechanism instead of instruction**
 
-> Do not add an `@import "tailwindcss"` of your own. The Nexus token CSS
+> Do not add an `@import "tailwindcss"` of your own. The nxds token CSS
 > imports Tailwind itself, as `@import 'tailwindcss' prefix(nx)`, and that
 > prefix is where `nx:bg-primary-background` comes from. `prefix()` is a
 > property of the build, not of one import, so…
 
-> Remove any `@import "tailwindcss"` from your CSS. `nexus.css` already imports
+> Remove any `@import "tailwindcss"` from your CSS. `nxds.css` already imports
 > Tailwind, with the `nx:` prefix.
 
 **Release notes in reference**

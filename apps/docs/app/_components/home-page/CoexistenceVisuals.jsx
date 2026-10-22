@@ -1,14 +1,14 @@
 'use client';
 import { useState } from 'react';
 
-import { Button } from '@nexus_ds/react';
-import { useNexusAppearance } from '@nexus_ds/react/appearance';
+import { Button } from '@nxds/react';
+import { useNxdsAppearance } from '@nxds/react/appearance';
 
 import { CoexistenceVisualCode } from './CoexistenceVisualCode';
 
 import './coexistence-visuals.css';
 export default function CoexistenceVisuals({ iteration = 'code' }) {
-  const { resolvedMode } = useNexusAppearance();
+  const { resolvedMode } = useNxdsAppearance();
   const [library, setLibrary] = useState('MUI');
   const example = iteration === 'command' ? 'command' : 'invite';
   const source = `/coexistence-preview/index.html?library=${encodeURIComponent(library)}&mode=${resolvedMode}&example=${example}`;

@@ -5,7 +5,7 @@ above the `return`. The JSX should say _which_ handler runs, not contain its
 body. One- and two-statement adapters stay inline — a name would say less than
 the body already does.
 
-**Enforced by `@nexus_ds/no-multi-statement-jsx-handler`** — inline handler
+**Enforced by `@nxds/no-multi-statement-jsx-handler`** — inline handler
 props with 3+ statements, or a nested callback-object argument, fail
 `pnpm lint` and the pre-commit hook.
 

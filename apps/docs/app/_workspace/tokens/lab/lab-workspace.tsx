@@ -2,9 +2,9 @@
 
 import { useState } from 'react';
 
-import type { Mode, TokenMap } from '@nexus_ds/core';
-import { Button } from '@nexus_ds/react';
-import { useNexusAppearance } from '@nexus_ds/react/appearance';
+import type { Mode, TokenMap } from '@nxds/core';
+import { Button } from '@nxds/react';
+import { useNxdsAppearance } from '@nxds/react/appearance';
 
 import { AppearanceControls } from '../../appearance-controls';
 import { useAppearanceHistory } from '../../appearance-state';
@@ -40,7 +40,7 @@ function overrideCss(overrides: Overrides): string {
 
 export function LabWorkspace({ primitives, scales }: LabData) {
   const { state, change, startStep } = useAppearanceHistory();
-  const { resolvedMode } = useNexusAppearance();
+  const { resolvedMode } = useNxdsAppearance();
   const [overrides, setOverrides] = useState<Overrides>(NO_OVERRIDES);
   const live = useLiveTheme(overrides);
 

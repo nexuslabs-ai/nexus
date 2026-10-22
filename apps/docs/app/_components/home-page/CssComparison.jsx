@@ -1,8 +1,8 @@
 'use client';
 import { useEffect, useId, useRef, useState } from 'react';
 
-import { Button } from '@nexus_ds/react';
-import { useNexusAppearance } from '@nexus_ds/react/appearance';
+import { Button } from '@nxds/react';
+import { useNxdsAppearance } from '@nxds/react/appearance';
 
 import { CodeBlock } from '../CodeBlock';
 import { CopyAnnouncerProvider } from '../CopyAnnouncer';
@@ -287,7 +287,7 @@ function ComparisonRun({ library, mode, example }) {
   );
 }
 export default function CssComparison() {
-  const { resolvedMode } = useNexusAppearance();
+  const { resolvedMode } = useNxdsAppearance();
   const [library, setLibrary] = useState('MUI');
   const [example, setExample] = useState('ant-tabs');
   return (

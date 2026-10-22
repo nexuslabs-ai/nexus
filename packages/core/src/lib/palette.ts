@@ -1,6 +1,6 @@
 import { oklch, parse } from 'culori';
 
-import primitiveColors from '../../tokens/primitives/color.json';
+import primitiveColors from '../../tokens/primitives/color.json' with { type: 'json' };
 
 export const SHADES = [
   '50',
@@ -39,8 +39,8 @@ export type Tier = keyof typeof TIER_THRESHOLDS;
 /** Light/dark theme axis. */
 export type Mode = 'light' | 'dark';
 
-/** Surface tone families a Nexus theme can be seeded with. */
-export type NexusSurfaceTone = 'stone' | 'neutral' | 'zinc' | 'slate' | 'gray';
+/** Surface tone families an nxds theme can be seeded with. */
+export type NxdsSurfaceTone = 'stone' | 'neutral' | 'zinc' | 'slate' | 'gray';
 
 export interface PaletteReference {
   c: number;

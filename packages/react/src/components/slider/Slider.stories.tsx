@@ -473,7 +473,7 @@ export const RangeEdgeRadii: Story = {
   },
 };
 
-// Slider ends follow the active Nexus corner mode instead of staying fully pill-shaped.
+// Slider ends follow the active nxds corner mode instead of staying fully pill-shaped.
 export const CornerModes: Story = {
   render: () => (
     <div className="nx:grid nx:w-full nx:gap-6">

@@ -54,29 +54,6 @@ interface InputProps
  * Browsers repaint autofilled fields with their own colors. On a custom
  * surface, pair each `bg-*` or `text-*` class with its `autofill-bg-*` or
  * `autofill-text-*` match.
- *
- * @example
- * ```tsx
- * <Input placeholder="Enter your name" />
- * ```
- *
- * @example
- * ```tsx
- * // With size variant
- * <Input size="lg" placeholder="Large input" />
- * ```
- *
- * @example
- * ```tsx
- * // With type
- * <Input type="email" placeholder="Enter email" />
- * ```
- *
- * @example
- * ```tsx
- * // Custom field surface: pair the autofill fill with it
- * <Input className="nx:bg-background nx:autofill-bg-background" />
- * ```
  */
 function Input({ className, type, size, variant, ...props }: InputProps) {
   return (

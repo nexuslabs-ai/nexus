@@ -227,7 +227,7 @@ export function publicComponents(checker, exported, componentsRoot) {
     const { fileName } = symbol.declarations[0].getSourceFile();
     if (!toSlugFolder(path.relative(componentsRoot, fileName))) {
       throw new Error(
-        `@nexus_ds/react exports the component ${name} from ${toRepoPath(fileName)}; it needs a folder of its own under ${toRepoPath(componentsRoot)}/ to get a props entry.`
+        `@nxds/react exports the component ${name} from ${toRepoPath(fileName)}; it needs a folder of its own under ${toRepoPath(componentsRoot)}/ to get a props entry.`
       );
     }
 
@@ -301,7 +301,7 @@ export function assertWorkspaceTypes(
   throw new Error(
     [
       'props JSON: a workspace dependency resolves to no type declarations, so every prop typed through it would be documented as `any`.',
-      'Build the workspace dependencies first: pnpm turbo build --filter=@nexus_ds/react',
+      'Build the workspace dependencies first: pnpm turbo build --filter=@nxds/react',
       ...untyped.map((specifier) => `  ${specifier}`),
     ].join('\n')
   );

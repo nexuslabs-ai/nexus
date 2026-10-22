@@ -2,7 +2,7 @@
 
 import { useId } from 'react';
 
-import { Button } from '@nexus_ds/react';
+import { Button } from '@nxds/react';
 
 import { NexusWordmark } from '../NexusWordmark';
 
@@ -88,7 +88,7 @@ export function HomePageSections({ docsBase = '' }) {
           </span>
           <div className="home-engine">
             <span className="home-visual-label">SHARED THEME ENGINE</span>
-            <code>@nexus_ds/core</code>
+            <code>@nxds/core</code>
           </div>
           <p>Your source. Your changes. One foundation.</p>
         </div>
@@ -132,7 +132,7 @@ export function HomePageSections({ docsBase = '' }) {
             ↓
           </span>
           <div className="home-engine">
-            <code>NexusAppearanceProvider</code>
+            <code>NxdsAppearanceProvider</code>
           </div>
           <p>Set it once. Carry it through the interface.</p>
         </div>

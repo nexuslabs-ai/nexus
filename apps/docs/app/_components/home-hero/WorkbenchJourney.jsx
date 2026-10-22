@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from 'react';
 
-import { useNexusAppearance } from '@nexus_ds/react/appearance';
+import { useNxdsAppearance } from '@nxds/react/appearance';
 import {
   IconAsterisk,
   IconBorderAll,
@@ -68,7 +68,7 @@ export function WorkbenchJourney({
     </h2>
   ),
 }) {
-  const { state } = useNexusAppearance();
+  const { state } = useNxdsAppearance();
   const reduceMotion = state.prefs.reduceMotion;
   const colors = useJourneyColors();
   const toolsStyle = toolColors(mode);

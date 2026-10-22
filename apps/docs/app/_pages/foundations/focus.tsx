@@ -1,11 +1,11 @@
 import { CodeSample } from '../../_components/CodeSample';
 import { SectionHeading } from '../../_components/Heading';
-import { Button, Checkbox, Input, Switch } from '../../_components/nexus';
+import { Button, Checkbox, Input, Switch } from '../../_components/nxds';
 
 /**
  * Foundations → Focus. Server component — the focus-ring contract: three
  * recipes, the two-halved field ring, and where the ring deliberately does not
- * go. The specimens are @nexus_ds/react client islands, so Tab actually walks
+ * go. The specimens are @nxds/react client islands, so Tab actually walks
  * them; the field ring reacts to the picker's Border Width control because both of
  * its halves read the same borderwidth primitive.
  *
@@ -13,7 +13,7 @@ import { Button, Checkbox, Input, Switch } from '../../_components/nexus';
  */
 
 export const description =
-  'Every Nexus UI control shows the same focus-visible ring. Learn the three ring recipes and how to write your own accessible focus styles.';
+  'Every nxds control shows the same focus-visible ring. Learn the three ring recipes and how to write your own accessible focus styles.';
 
 const RECIPES: { name: string; members: string; ring: string }[] = [
   {
@@ -279,7 +279,7 @@ nx:focus-visible:outline-focus-default /* control: brand */`}
           the ring fades in instead of appearing on the keypress.
         </p>
         <p className="nx:typography-body-default nx:text-muted-foreground nx:max-w-[64ch]">
-          The Nexus ESLint rules flag <code>transition-colors</code> and a ring
+          The nxds ESLint rules flag <code>transition-colors</code> and a ring
           class in the same class string, <code>cva()</code> or{' '}
           <code>cn()</code> call. Use <code>nx:transition-control</code> or{' '}
           <code>nx:transition-field</code> instead:

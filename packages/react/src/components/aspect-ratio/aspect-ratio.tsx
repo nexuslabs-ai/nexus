@@ -13,13 +13,6 @@ interface AspectRatioProps extends React.ComponentProps<
 
 /**
  * Keeps its child at a fixed width-to-height `ratio`, such as `16 / 9`. The child fills the box.
- *
- * @example
- * ```tsx
- * <AspectRatio ratio={16 / 9}>
- *   <img src="…" alt="…" className="nx:size-full nx:object-cover" />
- * </AspectRatio>
- * ```
  */
 function AspectRatio(props: AspectRatioProps) {
   return <AspectRatioPrimitive.Root data-slot="aspect-ratio" {...props} />;

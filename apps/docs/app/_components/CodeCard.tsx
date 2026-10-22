@@ -2,11 +2,11 @@
 
 import * as React from 'react';
 
-import { cn } from '@nexus_ds/react/utils';
+import { cn } from '@nxds/react/utils';
 
 import { getScrollOffset } from '../_lib/scroll-offset';
 
-import { Button } from './nexus';
+import { Button } from './nxds';
 
 /** Blocks this short show whole; `nx:max-h-32` clips longer ones to about three lines. */
 const COLLAPSE_AFTER_LINES = 6;

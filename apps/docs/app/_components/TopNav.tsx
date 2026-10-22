@@ -2,8 +2,8 @@
 
 import { useEffect, useRef, useState } from 'react';
 
-import { useNexusAppearance } from '@nexus_ds/react/appearance';
-import { cn } from '@nexus_ds/react/utils';
+import { useNxdsAppearance } from '@nxds/react/appearance';
+import { cn } from '@nxds/react/utils';
 import { IconBrandGithub } from '@tabler/icons-react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
@@ -11,8 +11,8 @@ import { usePathname } from 'next/navigation';
 import { PAGE_MANIFEST } from '../_lib/manifest';
 import { REPO_URL, SITE_NAME } from '../_lib/site';
 
-import { Button } from './nexus';
 import { NexusWordmark } from './NexusWordmark';
+import { Button } from './nxds';
 import { SearchPalette } from './SearchPalette';
 
 const NAV_LINKS = [
@@ -48,7 +48,7 @@ export function TopNav() {
   const menuRef = useRef<HTMLElement>(null);
   const triggerRef = useRef<HTMLButtonElement>(null);
   const [menuOpen, setMenuOpen] = useState(false);
-  const { resolvedMode, setState } = useNexusAppearance();
+  const { resolvedMode, setState } = useNxdsAppearance();
   const isDark = resolvedMode === 'dark';
 
   useEffect(() => {
@@ -99,7 +99,7 @@ export function TopNav() {
 
   return (
     <header
-      className={`nx:sticky nx:top-0 nx:z-30 nx:flex nx:items-center nx:gap-6 nx:px-6 nx:h-(--docs-header-h) nx:bg-nav-background nx:text-nav-foreground ${pathname === '/' ? '' : 'nx:border-b nx:border-nav-border'}`}
+      className={`nx:sticky nx:top-0 nx:z-30 nx:flex nx:items-center nx:gap-2 nx:sm:gap-6 nx:px-6 nx:h-(--docs-header-h) nx:bg-nav-background nx:text-nav-foreground ${pathname === '/' ? '' : 'nx:border-b nx:border-nav-border'}`}
     >
       {pathname === '/' ? (
         <Link

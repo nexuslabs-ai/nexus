@@ -8,11 +8,11 @@ import {
 } from 'tailwind-merge';
 
 /**
- * Custom `@theme` scale values Nexus adds to built-in tailwind-merge
- * namespaces. Hand-mirrors the keys emitted by `@nexus_ds/core` (see
+ * Custom `@theme` scale values nxds adds to built-in tailwind-merge
+ * namespaces. Hand-mirrors the keys emitted by `@nxds/core` (see
  * `packages/tailwind`) and by co-located component CSS.
  */
-export const NEXUS_THEME_SCALES = {
+export const NXDS_THEME_SCALES = {
   radius: ['base'],
   ease: ['enter', 'exit', 'move'],
   shadow: ['base', 'inner'],
@@ -20,10 +20,10 @@ export const NEXUS_THEME_SCALES = {
 } satisfies Partial<Record<DefaultThemeGroupIds, string[]>>;
 
 /**
- * Nexus class names tailwind-merge does not know, keyed by the class group
+ * nxds class names tailwind-merge does not know, keyed by the class group
  * each one extends, so a conflicting pair collapses to last-wins in `cn()`.
  */
-export const NEXUS_CLASS_GROUPS = {
+export const NXDS_CLASS_GROUPS = {
   animate: ['animate-overlay-presence-exit'],
   duration: [
     'duration-0',
@@ -186,7 +186,7 @@ export const NEXUS_CLASS_GROUPS = {
   >
 >;
 
-type NexusClassGroupId = keyof typeof NEXUS_CLASS_GROUPS;
+type NxdsClassGroupId = keyof typeof NXDS_CLASS_GROUPS;
 
 /**
  * The atomic class groups a `typography-*` composite overwrites. Every CSS
@@ -201,12 +201,12 @@ export const TYPOGRAPHY_CONFLICTS = [
   'text-wrap',
 ] satisfies DefaultClassGroupIds[];
 
-/** Tailwind-merge configured with `nx:` prefix and Nexus custom utility groups. */
-const twMerge = extendTailwindMerge<NexusClassGroupId>({
+/** Tailwind-merge configured with `nx:` prefix and nxds custom utility groups. */
+const twMerge = extendTailwindMerge<NxdsClassGroupId>({
   prefix: 'nx',
   extend: {
-    theme: NEXUS_THEME_SCALES,
-    classGroups: NEXUS_CLASS_GROUPS,
+    theme: NXDS_THEME_SCALES,
+    classGroups: NXDS_CLASS_GROUPS,
     conflictingClassGroups: {
       typography: TYPOGRAPHY_CONFLICTS,
     },

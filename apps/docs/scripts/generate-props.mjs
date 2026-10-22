@@ -24,14 +24,10 @@ import {
   toPropsFile,
   toPropsIndex,
   toProplessEntry,
-} from './props-entries.mjs';
+} from './props-entries.ts';
 import { reactEntryPoints } from './react-entry-points.mjs';
-import {
-  collectSourceFiles,
-  componentSlugs,
-  isComponentSource,
-  writeJson,
-} from './react-sources.mjs';
+import { collectSourceFiles, writeJson } from './files.mjs';
+import { componentSlugs, isComponentSource } from './react-sources.mjs';
 import {
   componentsRoot,
   docsRoot,
@@ -119,7 +115,7 @@ function assertResolvableTypes(entries, localAliases) {
 
   throw new Error(
     [
-      'props JSON: a prop is documented with a repo-local type alias that @nexus_ds/react does not export, so a reader cannot resolve it.',
+      'props JSON: a prop is documented with a repo-local type alias that @nxds/react does not export, so a reader cannot resolve it.',
       'Export the alias from its component file and from src/index.ts. Expansion covers the rest, but only for a prop typed as the bare alias, and only when its body prints portably.',
       ...offenders,
     ].join('\n')

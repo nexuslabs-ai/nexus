@@ -9,7 +9,7 @@ import { pageMetadata, REPO_URL, SITE_IMAGE } from '../../_lib/site';
 export const metadata = pageMetadata({
   title: 'Changelog',
   description:
-    'Notable changes to Nexus UI, grouped by date, with links to each pull request.',
+    'Notable changes to nxds, grouped by date, with links to each pull request.',
   route: '/changelog',
   image: SITE_IMAGE,
 });
@@ -27,7 +27,7 @@ const RELEASES: Release[] = [
     changes: [
       {
         type: 'Changed',
-        text: '@nexus_ds/core — publish-ready framework-agnostic Appearance engine',
+        text: '@nxds_ds/core — publish-ready framework-agnostic Appearance engine',
       },
       {
         type: 'Added',
@@ -60,7 +60,7 @@ const RELEASES: Release[] = [
       },
       {
         type: 'Fixed',
-        text: '@nexus_ds/react/appearance — consumer dist types now resolve correctly',
+        text: '@nxds_ds/react/appearance — consumer dist types now resolve correctly',
         pr: 548,
       },
     ],
@@ -117,7 +117,7 @@ export default function Changelog() {
       />
       <h1 className="nx:typography-heading-large">Changelog</h1>
       <p className="nx:typography-body-default nx:text-muted-foreground nx:mt-2 nx:mb-10 nx:max-w-[64ch]">
-        Notable changes to the Nexus design system. Pre-1.0, so entries are
+        Notable changes to the nxds design system. Pre-1.0, so entries are
         grouped by date rather than semver — that starts at the first tagged
         release.
       </p>

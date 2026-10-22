@@ -8,5 +8,5 @@ args = [
 [mcp_servers.figma]
 url = "https://mcp.figma.com/mcp"
 
-[mcp_servers.nexus-docs-mcp]
+[mcp_servers.nxds-docs-mcp]
 url = "http://localhost:6282/sse"

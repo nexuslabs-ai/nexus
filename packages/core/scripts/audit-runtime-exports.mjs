@@ -17,11 +17,12 @@ const EXPECTED_RUNTIME_EXPORTS = [
   'CORNER_OPTIONS',
   'DEFAULT_BRAND_COLOR',
   'DEFAULT_COOKIE_KEY',
-  'DEFAULT_NEXUS_APPEARANCE',
+  'DEFAULT_NXDS_APPEARANCE',
   'DEFAULT_STORAGE_KEY',
   'DENSITY_OPTIONS',
   'ELEVATION_OPTIONS',
-  'NEXUS_APPEARANCE_DATA_ATTRS',
+  'NXDS_APPEARANCE_COOKIE_MAX_AGE_SECONDS',
+  'NXDS_APPEARANCE_DATA_ATTRS',
   'PALETTE_KEYS',
   'SEMANTIC_TOKEN_REGISTRY',
   'SNAPSHOT_VERSION',
@@ -29,26 +30,33 @@ const EXPECTED_RUNTIME_EXPORTS = [
   'TIER_THRESHOLDS',
   'adjustContrast',
   'apcaLc',
+  'applyNxdsAppearance',
   'appearancePrefsToCss',
-  'createDefaultNexusAppearanceSnapshot',
-  'createNexusAppearanceBootstrapScript',
-  'createNexusAppearanceSnapshot',
-  'createNexusAppearanceSnapshotFromCookie',
-  'createNexusAppearanceSnapshotFromState',
-  'createNexusAppearanceStateCookie',
-  'createNexusThemeContract',
+  'createDefaultNxdsAppearanceSnapshot',
+  'createNxdsAppearanceBootstrapScript',
+  'createNxdsAppearanceSnapshot',
+  'createNxdsAppearanceSnapshotFromCookie',
+  'createNxdsAppearanceSnapshotFromState',
+  'createNxdsAppearanceStateCookie',
+  'createNxdsThemeContract',
   'deriveTheme',
   'findBrandColorPreset',
   'isColor',
   'measureThemeContrast',
   'normalizeAppearanceModeIds',
-  'parseNexusAppearanceStateCookie',
+  'parseNxdsAppearanceStateCookie',
+  'persistNxdsAppearance',
+  'prefersDarkColorScheme',
+  'readStoredNxdsAppearance',
+  'removeNxdsAppearance',
+  'resolveNxdsAppearanceMode',
   'resolveFirstPaint',
-  'sanitizeNexusAppearance',
-  'sanitizeNexusAppearancePrefs',
-  'sanitizeNexusAppearanceSnapshot',
-  'serializeNexusAppearanceStateCookie',
+  'sanitizeNxdsAppearance',
+  'sanitizeNxdsAppearancePrefs',
+  'sanitizeNxdsAppearanceSnapshot',
+  'serializeNxdsAppearanceStateCookie',
   'themeToCss',
+  'watchColorScheme',
 ];
 
 const EXPECTED_PALETTE_EXPORTS = [
@@ -94,11 +102,11 @@ assertExports('ESM', esm);
 assertExports('CJS', cjs);
 
 console.log(
-  `@nexus_ds/core runtime export allowlist clean (${EXPECTED_RUNTIME_EXPORTS.length} exports).`
+  `@nxds/core runtime export allowlist clean (${EXPECTED_RUNTIME_EXPORTS.length} exports).`
 );
 
-const paletteEsm = await import('@nexus_ds/core/palette');
-const paletteCjs = require('@nexus_ds/core/palette');
+const paletteEsm = await import('@nxds/core/palette');
+const paletteCjs = require('@nxds/core/palette');
 assertExports('Palette ESM', paletteEsm, EXPECTED_PALETTE_EXPORTS);
 assertExports('Palette CJS', paletteCjs, EXPECTED_PALETTE_EXPORTS);
 for (const name of paletteEsm.PRIMITIVE_PALETTE_NAMES) {
@@ -109,17 +117,17 @@ for (const name of paletteEsm.PRIMITIVE_PALETTE_NAMES) {
   }
 }
 console.log(
-  `@nexus_ds/core/palette exports and ESM/CJS parity clean (${EXPECTED_PALETTE_EXPORTS.length} exports).`
+  `@nxds/core/palette exports and ESM/CJS parity clean (${EXPECTED_PALETTE_EXPORTS.length} exports).`
 );
 
-const catalogueEsm = await import('@nexus_ds/core/catalogue');
-const catalogueCjs = require('@nexus_ds/core/catalogue');
+const catalogueEsm = await import('@nxds/core/catalogue');
+const catalogueCjs = require('@nxds/core/catalogue');
 assertExports('Catalogue ESM', catalogueEsm, EXPECTED_CATALOGUE_EXPORTS);
 assertExports('Catalogue CJS', catalogueCjs, EXPECTED_CATALOGUE_EXPORTS);
 const catalogue = catalogueEsm.createTokenCatalogue();
 assert.deepEqual(catalogue, catalogueCjs.createTokenCatalogue());
 console.log(
-  `@nexus_ds/core/catalogue exports and ESM/CJS parity clean (${catalogue.length} tokens).`
+  `@nxds/core/catalogue exports and ESM/CJS parity clean (${catalogue.length} tokens).`
 );
 
 // esbuild escapes non-ASCII and quote characters inside string literals.

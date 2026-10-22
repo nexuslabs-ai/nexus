@@ -14,17 +14,6 @@ interface ProgressProps extends React.ComponentProps<
 /**
  * Bar that shows task progress from `value` 0 to 100, or an animated bar
  * without `value`. Always pass an `aria-label` or `aria-labelledby`.
- *
- * @example
- * ```tsx
- * <Progress value={66} aria-label="Upload progress" />
- * ```
- *
- * @example
- * ```tsx
- * // Indeterminate — omit value while the total is unknown
- * <Progress aria-label="Loading" />
- * ```
  */
 function Progress({ className, value, ...props }: ProgressProps) {
   return (

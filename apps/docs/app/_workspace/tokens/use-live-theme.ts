@@ -3,14 +3,14 @@
 import { useMemo } from 'react';
 
 import {
-  createNexusThemeContract,
+  createNxdsThemeContract,
   deriveTheme,
   measureThemeContrast,
   type Mode,
   type ThemeContrastCheck,
   type TokenMap,
-} from '@nexus_ds/core';
-import { useNexusAppearance } from '@nexus_ds/react/appearance';
+} from '@nxds/core';
+import { useNxdsAppearance } from '@nxds/react/appearance';
 
 /** The theme the docs page is showing right now, in its resolved mode. */
 export interface LiveTheme {
@@ -23,9 +23,9 @@ export interface LiveTheme {
 export function useLiveTheme(
   overrides?: Partial<Record<Mode, TokenMap>>
 ): LiveTheme {
-  const { state, resolvedMode } = useNexusAppearance();
+  const { state, resolvedMode } = useNxdsAppearance();
   const derived = useMemo(() => {
-    const base = deriveTheme(createNexusThemeContract(state));
+    const base = deriveTheme(createNxdsThemeContract(state));
     const theme = {
       light: { ...base.light, ...overrides?.light },
       dark: { ...base.dark, ...overrides?.dark },

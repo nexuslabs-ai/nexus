@@ -2,8 +2,8 @@
 
 import { useId, useState } from 'react';
 
-import { Button } from '@nexus_ds/react';
-import { useNexusAppearance } from '@nexus_ds/react/appearance';
+import { Button } from '@nxds/react';
+import { useNxdsAppearance } from '@nxds/react/appearance';
 import {
   IconAsterisk,
   IconBorderAll,
@@ -161,7 +161,7 @@ const tokenGroups = [
 ];
 
 function ConcentricFlow() {
-  const { state } = useNexusAppearance();
+  const { state } = useNxdsAppearance();
   const stopped = state.prefs.reduceMotion;
   return (
     <div className="token-flow concentric-flow" data-paused={stopped}>
@@ -236,7 +236,7 @@ function ConcentricFlow() {
 }
 
 function TokenFlow({ interactive }) {
-  const { state } = useNexusAppearance();
+  const { state } = useNxdsAppearance();
   const [paused, setPaused] = useState(false);
   const [selected, setSelected] = useState('Theme');
   const selectedColor = tokenGroups
@@ -406,7 +406,7 @@ function TokenFlow({ interactive }) {
 }
 
 const counterSource = `import { useState } from 'react';
-import { Button } from '@nexus_ds/react';
+import { Button } from '@nxds/react';
 
 export function Counter() {
   const [count, setCount] = useState(0);

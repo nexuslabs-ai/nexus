@@ -1,6 +1,6 @@
 # Docs Voice
 
-Nexus docs tell a reader what to do, in the fewest words that do it. Write for
+nxds docs tell a reader what to do, in the fewest words that do it. Write for
 someone skimming with a terminal open, and for an agent that reads every word
 literally.
 
@@ -62,7 +62,7 @@ For page templates and worked rewrites, use the
 
 ## Before / after
 
-> Nexus components are copy/own: you paste a component's source into your app
+> nxds components are copy/own: you paste a component's source into your app
 > and it is yours from that moment. Nothing installs it, and no upstream change
 > will ever reach it.
 
@@ -71,4 +71,4 @@ For page templates and worked rewrites, use the
 > `prefix()` is a property of the build, not of one import, so a second
 > unprefixed import does not buy you a second, unprefixed utility layer.
 
-> Don't add your own `@import "tailwindcss"`. `nexus.css` already imports it.
+> Don't add your own `@import "tailwindcss"`. `nxds.css` already imports it.

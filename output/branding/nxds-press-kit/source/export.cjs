@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-require-imports -- Standalone CommonJS asset exporter. */
 const fs=require('fs');const path=require('path');const sharp=require('sharp');
 const kit=path.resolve(__dirname,'..');const root=path.resolve(kit,'../../..');
 function ico(buffers,sizes){const head=Buffer.alloc(6+16*buffers.length);head.writeUInt16LE(1,2);head.writeUInt16LE(buffers.length,4);let offset=head.length;buffers.forEach((b,i)=>{const o=6+i*16;head[o]=head[o+1]=sizes[i]===256?0:sizes[i];head.writeUInt16LE(1,o+4);head.writeUInt16LE(32,o+6);head.writeUInt32LE(b.length,o+8);head.writeUInt32LE(offset,o+12);offset+=b.length});return Buffer.concat([head,...buffers]);}

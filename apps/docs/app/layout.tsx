@@ -1,5 +1,5 @@
-import { NexusAppearanceProvider } from '@nexus_ds/react/appearance';
-import { NexusAppearanceScript } from '@nexus_ds/react/appearance/server';
+import { NxdsAppearanceProvider } from '@nxds/react/appearance';
+import { NxdsAppearanceScript } from '@nxds/react/appearance/server';
 import type { Metadata } from 'next';
 
 import { CopyAnnouncerProvider } from './_components/CopyAnnouncer';
@@ -7,6 +7,10 @@ import {
   DOCS_APPEARANCE_DEFAULT_STATE,
   DOCS_APPEARANCE_STORAGE_KEY,
 } from './_lib/appearance-controls';
+import {
+  FRAMEWORK_BOOTSTRAP_SCRIPT,
+  FRAMEWORK_PANEL_CSS,
+} from './_lib/frameworks';
 import {
   SITE_DESCRIPTION,
   SITE_IMAGE,
@@ -43,18 +47,26 @@ export default function RootLayout({
       suppressHydrationWarning
     >
       <head>
-        <NexusAppearanceScript
+        <NxdsAppearanceScript
           storageKey={DOCS_APPEARANCE_STORAGE_KEY}
           defaultState={DOCS_APPEARANCE_DEFAULT_STATE}
         />
+        <script
+          data-docs-framework-script=""
+          dangerouslySetInnerHTML={{ __html: FRAMEWORK_BOOTSTRAP_SCRIPT }}
+        />
+        <style
+          data-docs-framework-style=""
+          dangerouslySetInnerHTML={{ __html: FRAMEWORK_PANEL_CSS }}
+        />
       </head>
       <body className="nx:min-h-svh nx:bg-background nx:text-foreground nx:typography-body-default">
-        <NexusAppearanceProvider
+        <NxdsAppearanceProvider
           storageKey={DOCS_APPEARANCE_STORAGE_KEY}
           defaultState={DOCS_APPEARANCE_DEFAULT_STATE}
         >
           <CopyAnnouncerProvider>{children}</CopyAnnouncerProvider>
-        </NexusAppearanceProvider>
+        </NxdsAppearanceProvider>
       </body>
     </html>
   );

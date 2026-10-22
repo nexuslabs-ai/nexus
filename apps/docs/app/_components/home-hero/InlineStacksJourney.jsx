@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from 'react';
 
-import { useNexusAppearance } from '@nexus_ds/react/appearance';
+import { useNxdsAppearance } from '@nxds/react/appearance';
 import {
   IconAsterisk,
   IconBorderAll,
@@ -90,7 +90,7 @@ function TileStack({
 }
 
 export function InlineStacksJourney({ mode, tuning, children }) {
-  const { state } = useNexusAppearance();
+  const { state } = useNxdsAppearance();
   const reduceMotion = state.prefs.reduceMotion;
   const [step, setStep] = useState(0);
   const [paused, setPaused] = useState(false);

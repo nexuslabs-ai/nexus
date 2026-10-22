@@ -9,9 +9,9 @@ import {
   ThemeProvider,
   Typography,
 } from '@mui/material';
-import { DEFAULT_NEXUS_APPEARANCE } from '@nexus_ds/core';
-import { Button as NexusButton } from '@nexus_ds/react';
-import { NexusAppearanceProvider } from '@nexus_ds/react/appearance';
+import { DEFAULT_NXDS_APPEARANCE } from '@nxds/core';
+import { Button as NexusButton } from '@nxds/react';
+import { NxdsAppearanceProvider } from '@nxds/react/appearance';
 import {
   Button as AntButton,
   ConfigProvider,
@@ -51,9 +51,9 @@ document.documentElement.classList.toggle('dark', mode === 'dark');
 if (library === 'Ant Design') await import('antd/dist/reset.css');
 const preset = invitationAppearance(library, mode);
 const appearance = {
-  ...DEFAULT_NEXUS_APPEARANCE,
+  ...DEFAULT_NXDS_APPEARANCE,
   ...preset,
-  prefs: { ...DEFAULT_NEXUS_APPEARANCE.prefs, ...preset.prefs },
+  prefs: { ...DEFAULT_NXDS_APPEARANCE.prefs, ...preset.prefs },
 };
 const targets = {
   Page: [
@@ -322,13 +322,13 @@ function Screen() {
   );
   if (ready && integration === 'nexus')
     return (
-      <NexusAppearanceProvider
+      <NxdsAppearanceProvider
         state={appearance}
         storageKey={false}
         cookieWriteKey={false}
       >
         {content}
-      </NexusAppearanceProvider>
+      </NxdsAppearanceProvider>
     );
   return content;
 }

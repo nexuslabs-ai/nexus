@@ -1,4 +1,5 @@
-import { getScrollOffset } from './scroll-offset';
+import type { Framework } from './frameworks.ts';
+import { getScrollOffset } from './scroll-offset.ts';
 
 export const DOCS_ARTICLE_ID = 'docs-article';
 
@@ -8,7 +9,10 @@ export type TocEntry = {
   level: 2 | 3;
 };
 
-export function collectHeadings(article: HTMLElement): TocEntry[] {
+export function collectHeadings(
+  article: HTMLElement,
+  framework: Framework
+): TocEntry[] {
   const headings = article.querySelectorAll<HTMLHeadingElement>('h2, h3');
   const entries: TocEntry[] = [];
   const seen = new Set<string>();
@@ -20,6 +24,11 @@ export function collectHeadings(article: HTMLElement): TocEntry[] {
     if (heading.closest('[data-footnotes]')) continue;
     // A demo's own headings belong to the example, not to the page's outline.
     if (heading.closest('[data-slot="component-demo"]')) continue;
+    // Another framework's panel is hidden, or will be once it hydrates.
+    const panel = heading.closest('[data-framework-panel]');
+    if (panel && panel.getAttribute('data-framework-panel') !== framework) {
+      continue;
+    }
 
     seen.add(heading.id);
     entries.push({

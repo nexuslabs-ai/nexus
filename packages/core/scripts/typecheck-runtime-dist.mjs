@@ -24,7 +24,7 @@ const requiredDistFiles = [
 for (const distFile of requiredDistFiles) {
   if (!existsSync(distFile)) {
     throw new Error(
-      `Missing ${path.relative(repoRoot, distFile)}. Run @nexus_ds/core build before this dist typecheck.`
+      `Missing ${path.relative(repoRoot, distFile)}. Run @nxds/core build before this dist typecheck.`
     );
   }
 }
@@ -32,7 +32,7 @@ for (const distFile of requiredDistFiles) {
 const packageJson = JSON.parse(await readFile(packageJsonPath, 'utf8'));
 
 if (!packageJson.files?.includes('dist/runtime')) {
-  throw new Error('@nexus_ds/core package files must include dist/runtime.');
+  throw new Error('@nxds/core package files must include dist/runtime.');
 }
 
 function collectExportEntries(value, keyPath = 'exports', out = []) {
@@ -55,14 +55,14 @@ for (const { keyPath, file: exportFile } of collectExportEntries(
 )) {
   if (!exportFile.startsWith('./dist/runtime/')) {
     throw new Error(
-      `@nexus_ds/core ${keyPath} -> ${exportFile} must stay inside dist/runtime.`
+      `@nxds/core ${keyPath} -> ${exportFile} must stay inside dist/runtime.`
     );
   }
 
   const resolved = path.join(packageRoot, exportFile);
   if (!existsSync(resolved)) {
     throw new Error(
-      `@nexus_ds/core ${keyPath} -> ${exportFile} points to missing ${path.relative(
+      `@nxds/core ${keyPath} -> ${exportFile} points to missing ${path.relative(
         repoRoot,
         resolved
       )}.`
@@ -77,25 +77,25 @@ await writeFile(
   probePath,
   `import {
   BRAND_COLOR_PRESETS,
-  createNexusAppearanceBootstrapScript,
-  createNexusAppearanceSnapshotFromCookie,
-  createNexusAppearanceSnapshotFromState,
-  createNexusThemeContract,
-  DEFAULT_NEXUS_APPEARANCE,
+  createNxdsAppearanceBootstrapScript,
+  createNxdsAppearanceSnapshotFromCookie,
+  createNxdsAppearanceSnapshotFromState,
+  createNxdsThemeContract,
+  DEFAULT_NXDS_APPEARANCE,
   DEFAULT_STORAGE_KEY,
   deriveTheme,
   measureThemeContrast,
   resolveFirstPaint,
-  sanitizeNexusAppearance,
+  sanitizeNxdsAppearance,
   themeToCss,
   type BrandColorPreset,
   type Mode,
-  type NexusAppearanceState,
+  type NxdsAppearanceState,
   type SemanticColorName,
   type SurfaceToken,
   type ThemeContrastCheck,
   type Tier,
-} from '@nexus_ds/core';
+} from '@nxds/core';
 import {
   getPaletteRamp,
   getPaletteShade,
@@ -104,7 +104,7 @@ import {
   type PrimitivePaletteName,
   type PrimitivePaletteRamp,
   type Shade,
-} from '@nexus_ds/core/palette';
+} from '@nxds/core/palette';
 import {
   createTokenCatalogue,
   DARK_SURFACE_LADDER,
@@ -113,7 +113,7 @@ import {
   type CatalogueToken,
   type CatalogueTokenName,
   type ShadeAnchor,
-} from '@nexus_ds/core/catalogue';
+} from '@nxds/core/catalogue';
 
 const preset: BrandColorPreset | undefined = BRAND_COLOR_PRESETS[0];
 if (preset) {
@@ -166,18 +166,18 @@ if (catalogued) {
 const aliasName: CatalogueTokenName = '--color-background';
 void aliasName;
 
-const state: NexusAppearanceState = sanitizeNexusAppearance({
-  ...DEFAULT_NEXUS_APPEARANCE,
+const state: NxdsAppearanceState = sanitizeNxdsAppearance({
+  ...DEFAULT_NXDS_APPEARANCE,
   mode: 'system',
   brandColor: '#2563eb',
   surfaceTone: 'slate',
 });
 
-const snapshot = createNexusAppearanceSnapshotFromState(state);
-const serverSnapshot = createNexusAppearanceSnapshotFromCookie('', state);
-const theme = deriveTheme(createNexusThemeContract(state));
+const snapshot = createNxdsAppearanceSnapshotFromState(state);
+const serverSnapshot = createNxdsAppearanceSnapshotFromCookie('', state);
+const theme = deriveTheme(createNxdsThemeContract(state));
 const css: string = themeToCss(theme);
-const bootstrap: string = createNexusAppearanceBootstrapScript({
+const bootstrap: string = createNxdsAppearanceBootstrapScript({
   storageKey: DEFAULT_STORAGE_KEY,
   defaultSnapshot: snapshot,
 });
@@ -200,7 +200,7 @@ const colorName: SemanticColorName = 'popover-alpha';
 const unknownColorName: SemanticColorName = 'not-a-color-token';
 
 // @ts-expect-error proves the public state is not any.
-state.notARealNexusAppearanceField;
+state.notARealNxdsAppearanceField;
 
 void snapshot;
 void serverSnapshot;

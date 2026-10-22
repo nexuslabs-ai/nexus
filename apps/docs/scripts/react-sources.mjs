@@ -1,14 +1,8 @@
-import {
-  existsSync,
-  mkdirSync,
-  readdirSync,
-  readFileSync,
-  renameSync,
-  writeFileSync,
-} from 'node:fs';
+import { existsSync, readdirSync, readFileSync } from 'node:fs';
 import path from 'node:path';
 
-import { pascal } from './humanize.mjs';
+import { importSpecifiers } from './files.mjs';
+import { pascal } from './humanize.ts';
 import { blocksRoot, componentsRoot, isUnder, reactSrc } from './roots.mjs';
 
 export function isModuleSource(filePath) {
@@ -31,20 +25,23 @@ export function componentSlugs() {
     .sort();
 }
 
-const EXPORTED_COMPONENT = /from '\.\/components\/([^']+)'/g;
+const COMPONENT_SPECIFIER = './components/';
 
-/** Every component `@nexus_ds/react` exports, by its folder slug, sorted. */
+/** Every component `@nxds/react` exports, by its folder slug, sorted. */
 export function exportedComponentSlugs() {
   const index = readFileSync(path.join(reactSrc, 'index.ts'), 'utf8');
-  const slugs = [...index.matchAll(EXPORTED_COMPONENT)].map(([, specifier]) => {
-    const [slug, ...rest] = specifier.split('/');
-    if (slug !== 'appearance' && rest.join('/') !== slug) {
-      throw new Error(
-        `src/index.ts exports './components/${specifier}'. A component's entry file is components/${slug}/${slug}.tsx, so its page can link it — rename the file.`
-      );
-    }
-    return slug;
-  });
+  const slugs = importSpecifiers(index)
+    .filter((fileName) => fileName.startsWith(COMPONENT_SPECIFIER))
+    .map((fileName) => {
+      const specifier = fileName.slice(COMPONENT_SPECIFIER.length);
+      const [slug, ...rest] = specifier.split('/');
+      if (slug !== 'appearance' && rest.join('/') !== slug) {
+        throw new Error(
+          `src/index.ts exports './components/${specifier}'. A component's entry file is components/${slug}/${slug}.tsx, so its page can link it — rename the file.`
+        );
+      }
+      return slug;
+    });
   return new Set(slugs.sort());
 }
 
@@ -97,32 +94,4 @@ function subfolders(dir) {
     .filter((entry) => entry.isDirectory())
     .map((entry) => entry.name)
     .sort();
-}
-
-export function collectSourceFiles(dir, include) {
-  return readdirSync(dir, { withFileTypes: true })
-    .flatMap((entry) => {
-      const entryPath = path.join(dir, entry.name);
-      if (entry.isDirectory()) return collectSourceFiles(entryPath, include);
-      return [entryPath];
-    })
-    .filter(include);
-}
-
-export function readCanonical(file) {
-  return readFileSync(file, 'utf8').replace(/\r\n/g, '\n');
-}
-
-// Renames a temp file into place, so a concurrent reader never sees a partial write.
-export function writeIfChanged(file, content) {
-  if (existsSync(file) && readCanonical(file) === content) return;
-
-  mkdirSync(path.dirname(file), { recursive: true });
-  const temp = `${file}.tmp`;
-  writeFileSync(temp, content, 'utf8');
-  renameSync(temp, file);
-}
-
-export function writeJson(filePath, value) {
-  writeIfChanged(filePath, `${JSON.stringify(value, null, 2)}\n`);
 }

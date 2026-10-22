@@ -11,10 +11,10 @@ const require = createRequire(
   path.join(repoRoot, 'packages/react/package.json')
 );
 const targets = [
-  '@nexus_ds/tailwind',
-  '@nexus_ds/tailwind/nexus.css',
-  '@nexus_ds/tailwind/variables.css',
-  '@nexus_ds/react/styles.css',
+  '@nxds/tailwind',
+  '@nxds/tailwind/nxds.css',
+  '@nxds/tailwind/variables.css',
+  '@nxds/react/styles.css',
 ];
 
 const failures = [];

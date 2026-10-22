@@ -20,30 +20,30 @@ import {
 } from '@mui/material'
 import { useState } from 'react'
 
-import * as N from '../components/nexus-kit'
+import * as N from '../components/nxds-kit'
 
 const REGIONS = ['Frankfurt', 'Virginia', 'Singapore']
 
-function MuiDialogWithNexusInside() {
+function MuiDialogWithNxdsInside() {
   const [open, setOpen] = useState(false)
 
   return (
     <>
       <Button variant="contained" data-check-open onClick={() => setOpen(true)}>
-        MUI dialog → Nexus inside
+        MUI dialog → nxds inside
       </Button>
       <Dialog data-check="host" open={open} onClose={() => setOpen(false)} fullWidth maxWidth="xs">
         <DialogTitle>Deploy settings</DialogTitle>
         <DialogContent>
-          <DialogContentText sx={{ mb: 2 }}>An MUI dialog. Every control below is Nexus.</DialogContentText>
-          <div data-check="nexus" className="nx:grid nx:gap-4">
+          <DialogContentText sx={{ mb: 2 }}>An MUI dialog. Every control below is nxds.</DialogContentText>
+          <div data-check="nxds" className="nx:grid nx:gap-4">
             <div className="nx:grid nx:gap-2">
               <N.Label htmlFor="deploy-region">Region</N.Label>
               <N.Select defaultValue="Frankfurt">
                 <N.SelectTrigger id="deploy-region">
                   <N.SelectValue />
                 </N.SelectTrigger>
-                <N.SelectContent data-check="nexus">
+                <N.SelectContent data-check="nxds">
                   {REGIONS.map((region) => (
                     <N.SelectItem key={region} value={region}>
                       {region}
@@ -55,24 +55,24 @@ function MuiDialogWithNexusInside() {
             <div className="nx:flex nx:flex-wrap nx:gap-2">
               <N.Popover>
                 <N.PopoverTrigger asChild>
-                  <N.Button variant="outline">Nexus popover</N.Button>
+                  <N.Button variant="outline">nxds popover</N.Button>
                 </N.PopoverTrigger>
-                <N.PopoverContent data-check="nexus">Rolls out to 10% of traffic first.</N.PopoverContent>
+                <N.PopoverContent data-check="nxds">Rolls out to 10% of traffic first.</N.PopoverContent>
               </N.Popover>
               <N.DropdownMenu>
                 <N.DropdownMenuTrigger asChild>
-                  <N.Button variant="outline">Nexus menu</N.Button>
+                  <N.Button variant="outline">nxds menu</N.Button>
                 </N.DropdownMenuTrigger>
-                <N.DropdownMenuContent data-check="nexus">
+                <N.DropdownMenuContent data-check="nxds">
                   <N.DropdownMenuItem>Redeploy</N.DropdownMenuItem>
                   <N.DropdownMenuItem>Roll back</N.DropdownMenuItem>
                 </N.DropdownMenuContent>
               </N.DropdownMenu>
               <N.Tooltip>
                 <N.TooltipTrigger asChild>
-                  <N.Button variant="ghost">Nexus tooltip</N.Button>
+                  <N.Button variant="ghost">nxds tooltip</N.Button>
                 </N.TooltipTrigger>
-                <N.TooltipContent data-check="nexus">Last deploy 4 minutes ago</N.TooltipContent>
+                <N.TooltipContent data-check="nxds">Last deploy 4 minutes ago</N.TooltipContent>
               </N.Tooltip>
             </div>
           </div>
@@ -87,9 +87,9 @@ function MuiDialogWithNexusInside() {
   )
 }
 
-// A Nexus dialog blocks pointer events outside itself, so MUI popups opened
+// An nxds dialog blocks pointer events outside itself, so MUI popups opened
 // from inside it render in place instead of portalling to <body>.
-function MuiControlsForNexusDialog() {
+function MuiControlsForNxdsDialog() {
   const [menuAnchor, setMenuAnchor] = useState<HTMLElement | null>(null)
   const [popoverAnchor, setPopoverAnchor] = useState<HTMLElement | null>(null)
 
@@ -131,19 +131,19 @@ function MuiControlsForNexusDialog() {
   )
 }
 
-function NexusDialogWithMuiInside() {
+function NxdsDialogWithMuiInside() {
   return (
     <N.Dialog>
       <N.DialogTrigger asChild>
-        <N.Button data-check-open>Nexus dialog → MUI inside</N.Button>
+        <N.Button data-check-open>nxds dialog → MUI inside</N.Button>
       </N.DialogTrigger>
-      <N.DialogContent data-check="nexus">
+      <N.DialogContent data-check="nxds">
         <N.DialogHeader>
           <N.DialogTitle>Invite teammate</N.DialogTitle>
-          <N.DialogDescription>A Nexus dialog. Every control below is MUI.</N.DialogDescription>
+          <N.DialogDescription>An nxds dialog. Every control below is MUI.</N.DialogDescription>
         </N.DialogHeader>
         <N.DialogBody>
-          <MuiControlsForNexusDialog />
+          <MuiControlsForNxdsDialog />
         </N.DialogBody>
         <N.DialogFooter>
           <N.Button>Send invite</N.Button>
@@ -169,21 +169,21 @@ export function OverlaysPage() {
       </Box>
 
       <Stack data-check="host" direction="row" spacing={1.5}>
-        <MuiDialogWithNexusInside />
-        <NexusDialogWithMuiInside />
+        <MuiDialogWithNxdsInside />
+        <NxdsDialogWithMuiInside />
       </Stack>
 
       <Stack data-check="host" spacing={1.5}>
         <Typography variant="h6">Notifications</Typography>
         <Typography variant="body2" color="text.secondary">
-          MUI uses a Snackbar; Nexus uses its sonner-based Toaster, mounted in the shell.
+          MUI uses a Snackbar; nxds uses its sonner-based Toaster, mounted in the shell.
         </Typography>
         <Stack direction="row" spacing={1.5}>
           <Button variant="outlined" onClick={() => setSnackbarOpen(true)}>
             MUI snackbar
           </Button>
-          <N.Button variant="outline" onClick={() => N.toast.success('Saved with the Nexus toast')}>
-            Nexus toast
+          <N.Button variant="outline" onClick={() => N.toast.success('Saved with the nxds toast')}>
+            nxds toast
           </N.Button>
         </Stack>
       </Stack>

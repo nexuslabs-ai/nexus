@@ -117,7 +117,7 @@ The DevOps agent will:
 
 - Follow the analyze-deps skill workflow
 - Research thoroughly using WebSearch for migration guides
-- Verify the current API surface against nexus-docs-mcp before flagging breakage (see `.claude/rules/docs-mcp.md`)
+- Verify the current API surface against nxds-docs-mcp before flagging breakage (see `.claude/rules/docs-mcp.md`)
 - Generate actionable report with file:line references
 - Prioritize by risk (security > deprecated > major > minor > patch)
 

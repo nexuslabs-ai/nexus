@@ -1,41 +1,41 @@
 import {
-  createDefaultNexusAppearanceSnapshot,
-  createNexusAppearanceBootstrapScript,
-  createNexusAppearanceSnapshotFromState,
-  type NexusAppearanceState,
-  sanitizeNexusAppearance,
-} from '@nexus_ds/core';
+  createDefaultNxdsAppearanceSnapshot,
+  createNxdsAppearanceBootstrapScript,
+  createNxdsAppearanceSnapshotFromState,
+  type NxdsAppearanceState,
+  sanitizeNxdsAppearance,
+} from '@nxds/core';
 
-export interface NexusAppearanceScriptProps {
+export interface NxdsAppearanceScriptProps {
   storageKey?: string | false;
-  defaultState?: NexusAppearanceState;
+  defaultState?: NxdsAppearanceState;
   nonce?: string;
 }
 
-export interface CreateNexusAppearanceScriptOptions {
+export interface CreateNxdsAppearanceScriptOptions {
   storageKey?: string | false;
-  defaultState?: NexusAppearanceState;
+  defaultState?: NxdsAppearanceState;
 }
 
-function defaultSnapshotFor(defaultState: NexusAppearanceState | undefined) {
+function defaultSnapshotFor(defaultState: NxdsAppearanceState | undefined) {
   return defaultState
-    ? createNexusAppearanceSnapshotFromState(
-        sanitizeNexusAppearance(defaultState)
+    ? createNxdsAppearanceSnapshotFromState(
+        sanitizeNxdsAppearance(defaultState)
       )
-    : createDefaultNexusAppearanceSnapshot();
+    : createDefaultNxdsAppearanceSnapshot();
 }
 
-export function NexusAppearanceScript({
+export function NxdsAppearanceScript({
   storageKey,
   defaultState,
   nonce,
-}: NexusAppearanceScriptProps) {
+}: NxdsAppearanceScriptProps) {
   return (
     <script
-      data-nexus-appearance-script=""
+      data-nxds-appearance-script=""
       nonce={nonce}
       dangerouslySetInnerHTML={{
-        __html: createNexusAppearanceBootstrapScript({
+        __html: createNxdsAppearanceBootstrapScript({
           storageKey,
           defaultSnapshot: defaultSnapshotFor(defaultState),
         }),
@@ -44,15 +44,15 @@ export function NexusAppearanceScript({
   );
 }
 
-export function createNexusAppearanceScript({
+export function createNxdsAppearanceScript({
   storageKey,
   defaultState,
-}: CreateNexusAppearanceScriptOptions = {}) {
-  function ConfiguredNexusAppearanceScript({
+}: CreateNxdsAppearanceScriptOptions = {}) {
+  function ConfiguredNxdsAppearanceScript({
     nonce,
-  }: Pick<NexusAppearanceScriptProps, 'nonce'>) {
+  }: Pick<NxdsAppearanceScriptProps, 'nonce'>) {
     return (
-      <NexusAppearanceScript
+      <NxdsAppearanceScript
         nonce={nonce}
         storageKey={storageKey}
         defaultState={defaultState}
@@ -60,5 +60,5 @@ export function createNexusAppearanceScript({
     );
   }
 
-  return ConfiguredNexusAppearanceScript;
+  return ConfiguredNxdsAppearanceScript;
 }

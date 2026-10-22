@@ -1,15 +1,15 @@
 import { useState } from 'react';
 
-import { BRAND_COLOR_PRESETS, DEFAULT_BRAND_COLOR } from '@nexus_ds/core';
+import { BRAND_COLOR_PRESETS, DEFAULT_BRAND_COLOR } from '@nxds/core';
 import type { Meta, StoryObj } from '@storybook/react';
 import { expect, fireEvent, fn, userEvent, within } from 'storybook/test';
 
 import { Button } from '../../button/button';
-import { NexusAppearanceSettingRow } from '../setting-row/setting-row';
+import { NxdsAppearanceSettingRow } from '../setting-row/setting-row';
 
 import {
-  NexusAppearanceBrandColorField,
-  type NexusAppearanceBrandColorFieldProps,
+  NxdsAppearanceBrandColorField,
+  type NxdsAppearanceBrandColorFieldProps,
 } from './brand-color-field';
 
 const BLUE = BRAND_COLOR_PRESETS.find((preset) => preset.value === 'blue')!;
@@ -19,14 +19,14 @@ function ControlledField({
   value: initialValue,
   onChange,
   ...props
-}: NexusAppearanceBrandColorFieldProps) {
+}: NxdsAppearanceBrandColorFieldProps) {
   const [value, setValue] = useState(initialValue);
   const changeColor = (color: string) => {
     setValue(color);
     onChange(color);
   };
   return (
-    <NexusAppearanceBrandColorField
+    <NxdsAppearanceBrandColorField
       {...props}
       value={value}
       onChange={changeColor}
@@ -34,14 +34,14 @@ function ControlledField({
   );
 }
 
-const meta: Meta<typeof NexusAppearanceBrandColorField> = {
+const meta: Meta<typeof NxdsAppearanceBrandColorField> = {
   title: 'Appearance/BrandColorField',
-  component: NexusAppearanceBrandColorField,
+  component: NxdsAppearanceBrandColorField,
   parameters: {
     docs: {
       description: {
         component:
-          'NexusAppearanceBrandColorField picks a brand color from a preset list or as a custom hex value. For a color without presets, use NexusAppearanceColorField.',
+          'NxdsAppearanceBrandColorField picks a brand color from a preset list or as a custom hex value. For a color without presets, use NxdsAppearanceColorField.',
       },
     },
   },
@@ -49,7 +49,7 @@ const meta: Meta<typeof NexusAppearanceBrandColorField> = {
   render: (args) => <ControlledField key={args.value} {...args} />,
 };
 export default meta;
-type Story = StoryObj<typeof NexusAppearanceBrandColorField>;
+type Story = StoryObj<typeof NxdsAppearanceBrandColorField>;
 
 async function choosePreset(canvasElement: HTMLElement, label: string) {
   await userEvent.click(
@@ -217,7 +217,7 @@ function ExternalReplacementExample() {
   const [value, setValue] = useState(BLUE.color);
   return (
     <div className="nx:space-y-3">
-      <NexusAppearanceBrandColorField
+      <NxdsAppearanceBrandColorField
         label="Brand color"
         value={value}
         onChange={setValue}
@@ -257,9 +257,9 @@ export const ExternalValueReplacement: Story = {
 export const NarrowContainer: Story = {
   render: (args) => (
     <div data-testid="narrow-container" className="nx:w-60 nx:max-w-full">
-      <NexusAppearanceSettingRow label="Brand color">
+      <NxdsAppearanceSettingRow label="Brand color">
         <ControlledField {...args} />
-      </NexusAppearanceSettingRow>
+      </NxdsAppearanceSettingRow>
     </div>
   ),
   play: async ({ canvasElement }) => {

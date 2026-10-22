@@ -1,15 +1,19 @@
 import type { Metadata } from 'next';
 
-export const SITE_URL = 'https://nexusui.so';
-export const SITE_NAME = 'Nexus Design System';
-export const SITE_ALTERNATE_NAME = 'nxds';
-export const SITE_TITLE = 'Nexus Design System — Open-source UI components';
+export const SITE_URL = 'https://nxds.dev';
+export const SITE_NAME = 'nxds';
+export const SITE_ALTERNATE_NAMES = [
+  'nxds design system',
+  'Nexus UI',
+  'nexusui',
+];
+export const SITE_TITLE = 'nxds — theme engine and design system';
 export const SITE_DESCRIPTION =
-  'Nexus Design System is a framework-agnostic theme engine and design system. Set one appearance object, and every component follows your brand, density and corners.';
+  'nxds is a framework-agnostic theme engine and design system. Set one appearance object, and every component follows your brand, density and corners.';
 
-export const REPO_URL = 'https://github.com/nexuslabs-ai/nexus';
-export const STORYBOOK_URL = 'https://storybook.nexusui.so';
-export const NPM_CORE_URL = 'https://www.npmjs.com/package/@nexus_ds/core';
+export const REPO_URL = 'https://github.com/nexuslabs-ai/nxds';
+export const STORYBOOK_URL = 'https://storybook.nxds.dev';
+export const NPM_CORE_URL = 'https://www.npmjs.com/package/@nxds/core';
 
 export const OG_IMAGE_SIZE = { width: 1200, height: 630 };
 

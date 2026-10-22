@@ -1,14 +1,14 @@
 export const description =
-  'Set your whole Nexus UI theme from one appearance object: brand color, surface tone, contrast, density, corners, shadows and borders.';
+  'Set your whole nxds theme from one appearance object: brand color, surface tone, contrast, density, corners, shadows and borders.';
 
 # Appearance
 
 Appearance is one object that sets your app's whole theme: colors, density,
 corners, shadows, borders and font preferences.
 
-`@nexus_ds/core` turns that object into the theme's CSS. The examples import
-the provider you copied in
-[Install](/getting-started/install#step-3-add-the-appearance-provider).
+`@nxds/core` turns that object into the theme's CSS. The examples use the
+React provider or the Vue plugin you copied in
+[Install](/getting-started/install).
 
 ## Fields
 
@@ -30,24 +30,27 @@ border width as data attributes. Switching an option needs no rebuild.
 | `corners`                        | `'square'`, `'subtle'`, `'smooth'`, `'round'`, `'extra-round'`. Default `'subtle'`.                   | Corner radius.                                                      |
 | `elevation`                      | `'flat'`, `'quiet'`, `'soft'`, `'standard'`, `'strong'`. Default `'quiet'`.                           | Shadows.                                                            |
 | `stroke`                         | `'fine'`, `'normal'`, `'strong'`. Default `'normal'`.                                                 | Border width.                                                       |
-| `prefs`                          | `NexusAppearancePrefs`                                                                                | Fonts, font sizes, reduced motion, pointer cursors, font smoothing. |
+| `prefs`                          | `NxdsAppearancePrefs`                                                                                 | Fonts, font sizes, reduced motion, pointer cursors, font smoothing. |
 
-Fonts and font sizes apply to Nexus components only. Reduced motion, pointer
+Fonts and font sizes apply to nxds components only. Reduced motion, pointer
 cursors and font smoothing apply to the whole page. All three are off until a
 user turns them on.
 
 ## Change the theme at runtime
 
-Read and update the appearance with `useNexusAppearance`:
+<FrameworkTabs>
+<FrameworkPanel framework="react">
+
+Read and update the appearance with `useNxdsAppearance`:
 
 ```tsx
 // components/mode-button.tsx
 'use client';
 
-import { useNexusAppearance } from '@/components/appearance/provider';
+import { useNxdsAppearance } from '@/components/appearance/provider';
 
 export function ModeButton() {
-  const { state, setState } = useNexusAppearance();
+  const { state, setState } = useNxdsAppearance();
 
   return (
     <button
@@ -65,26 +68,54 @@ export function ModeButton() {
 }
 ```
 
-Use `useNexusAppearance` to build theme controls for your own settings page.
-To switch brands, set `brandColor` the same way. Nexus builds the new palette
+</FrameworkPanel>
+<FrameworkPanel framework="vue">
+
+Read and update the appearance with `useNxdsAppearance`:
+
+```vue
+<!-- src/components/ModeButton.vue -->
+<script setup lang="ts">
+import { useNxdsAppearance } from '@/components/appearance';
+
+const { state, setState } = useNxdsAppearance();
+
+function toggle() {
+  setState((current) => ({
+    ...current,
+    mode: current.mode === 'dark' ? 'light' : 'dark',
+  }));
+}
+</script>
+
+<template>
+  <button type="button" @click="toggle">{{ state.mode }}</button>
+</template>
+```
+
+`state` and `resolvedMode` are refs, so the template updates when the theme
+changes.
+
+</FrameworkPanel>
+</FrameworkTabs>
+
+Use `useNxdsAppearance` to build theme controls for your own settings page.
+To switch brands, set `brandColor` the same way. nxds builds the new palette
 and restyles every component at once, without a rebuild.
 
 ## Brand color
 
-`brandColor` sets the primary color. Nexus builds the full primary palette from
+`brandColor` sets the primary color. nxds builds the full primary palette from
 it, including hover and pressed shades.
 
 ```ts
 // app/appearance-state.ts
-import {
-  DEFAULT_NEXUS_APPEARANCE,
-  type NexusAppearanceState,
-} from '@nexus_ds/core';
+import { DEFAULT_NXDS_APPEARANCE, type NxdsAppearanceState } from '@nxds/core';
 
 export const defaultAppearance = {
-  ...DEFAULT_NEXUS_APPEARANCE,
+  ...DEFAULT_NXDS_APPEARANCE,
   brandColor: '#2563eb',
-} satisfies NexusAppearanceState;
+} satisfies NxdsAppearanceState;
 ```
 
 In light mode, the button uses your color, with very light colors darkened a
@@ -98,16 +129,16 @@ component:
 // components/brand-editor.tsx
 'use client';
 
-import { DEFAULT_BRAND_COLOR } from '@nexus_ds/core';
+import { DEFAULT_BRAND_COLOR } from '@nxds/core';
 import { useState } from 'react';
 
-import { NexusAppearanceBrandColorField } from '@/components/appearance/brand-color-field/brand-color-field';
+import { NxdsAppearanceBrandColorField } from '@/components/appearance/brand-color-field/brand-color-field';
 
 export function BrandEditor() {
   const [brandColor, setBrandColor] = useState(DEFAULT_BRAND_COLOR);
 
   return (
-    <NexusAppearanceBrandColorField
+    <NxdsAppearanceBrandColorField
       label="Brand color"
       value={brandColor}
       onChange={setBrandColor}
@@ -120,7 +151,7 @@ The field offers nine presets (Default, Indigo, Blue, Violet, Rose, Orange,
 Amber, Green and Teal), a color picker and a hex input. A color that matches no preset shows as
 **Custom**.
 
-To build your own picker, `@nexus_ds/core` exports the presets:
+To build your own picker, `@nxds/core` exports the presets:
 
 | Export                             | Returns                                                |
 | ---------------------------------- | ------------------------------------------------------ |

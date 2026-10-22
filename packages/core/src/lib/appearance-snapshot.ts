@@ -1,9 +1,9 @@
 import {
   appearancePrefsToCss,
-  createNexusThemeContract,
-  DEFAULT_NEXUS_APPEARANCE,
-  type NexusAppearanceState,
-  sanitizeNexusAppearance,
+  createNxdsThemeContract,
+  DEFAULT_NXDS_APPEARANCE,
+  type NxdsAppearanceState,
+  sanitizeNxdsAppearance,
 } from './appearance-model';
 import {
   deriveThemeMode,
@@ -17,50 +17,50 @@ export const SNAPSHOT_VERSION = 9;
 const STATE_COOKIE_VERSION = 6;
 const SNAPSHOT_CACHE_LIMIT = 50;
 
-export const NEXUS_APPEARANCE_DATA_ATTRS = [
+export const NXDS_APPEARANCE_DATA_ATTRS = [
   'data-density',
   'data-radius',
   'data-shadow',
   'data-borderwidth',
 ] as const;
 
-export type NexusAppearanceDataAttr =
-  (typeof NEXUS_APPEARANCE_DATA_ATTRS)[number];
+export type NxdsAppearanceDataAttr =
+  (typeof NXDS_APPEARANCE_DATA_ATTRS)[number];
 
-export interface NexusAppearanceSnapshot {
+export interface NxdsAppearanceSnapshot {
   version: typeof SNAPSHOT_VERSION;
-  state: NexusAppearanceState;
+  state: NxdsAppearanceState;
   themeCss: string;
   prefsCss: string;
 }
 
-export interface NexusAppearanceStateCookie {
+export interface NxdsAppearanceStateCookie {
   version: typeof STATE_COOKIE_VERSION;
-  state: NexusAppearanceState;
+  state: NxdsAppearanceState;
 }
 
-export interface NexusFirstPaintResolution {
+export interface NxdsFirstPaintResolution {
   className: '' | 'dark';
-  dataAttrs: Record<NexusAppearanceDataAttr, string>;
+  dataAttrs: Record<NxdsAppearanceDataAttr, string>;
   themeCss: string;
   prefsCss: string;
 }
 
-export interface NexusAppearanceBootstrapScriptOptions {
+export interface NxdsAppearanceBootstrapScriptOptions {
   storageKey?: string | false;
-  defaultSnapshot?: NexusAppearanceSnapshot;
+  defaultSnapshot?: NxdsAppearanceSnapshot;
 }
 
-export const DEFAULT_STORAGE_KEY = 'nexus-appearance';
-export const DEFAULT_COOKIE_KEY = 'nexus-appearance-state';
+export const DEFAULT_STORAGE_KEY = 'nxds-appearance';
+export const DEFAULT_COOKIE_KEY = 'nxds-appearance-state';
 
 const isRecord = (value: unknown): value is Record<string, unknown> =>
   typeof value === 'object' && value !== null;
 
-const cachedSnapshots = new Map<string, NexusAppearanceSnapshot>();
+const cachedSnapshots = new Map<string, NxdsAppearanceSnapshot>();
 const cachedModes = new Map<string, TokenMap>();
 
-function cacheKeyForState(state: NexusAppearanceState): string {
+function cacheKeyForState(state: NxdsAppearanceState): string {
   return JSON.stringify(state);
 }
 
@@ -91,23 +91,23 @@ function deriveModeCached(
   );
 }
 
-function deriveThemeCss(state: NexusAppearanceState): string {
-  const contract = createNexusThemeContract(state);
+function deriveThemeCss(state: NxdsAppearanceState): string {
+  const contract = createNxdsThemeContract(state);
   return themeToCss({
     light: deriveModeCached(contract, 'light'),
     dark: deriveModeCached(contract, 'dark'),
   });
 }
 
-function derivePrefsCss(state: NexusAppearanceState): string {
+function derivePrefsCss(state: NxdsAppearanceState): string {
   return appearancePrefsToCss(state.prefs);
 }
 
-export function createNexusAppearanceSnapshot(
-  state: NexusAppearanceState,
+export function createNxdsAppearanceSnapshot(
+  state: NxdsAppearanceState,
   themeCss: string,
   prefsCss: string
-): NexusAppearanceSnapshot {
+): NxdsAppearanceSnapshot {
   return {
     version: SNAPSHOT_VERSION,
     state,
@@ -116,10 +116,10 @@ export function createNexusAppearanceSnapshot(
   };
 }
 
-export function createNexusAppearanceSnapshotFromState(
-  state: NexusAppearanceState
-): NexusAppearanceSnapshot {
-  const sanitizedState = sanitizeNexusAppearance(state);
+export function createNxdsAppearanceSnapshotFromState(
+  state: NxdsAppearanceState
+): NxdsAppearanceSnapshot {
+  const sanitizedState = sanitizeNxdsAppearance(state);
   const cacheKey = cacheKeyForState(sanitizedState);
   const cachedSnapshot = cachedSnapshots.get(cacheKey);
 
@@ -128,7 +128,7 @@ export function createNexusAppearanceSnapshotFromState(
   return remember(
     cachedSnapshots,
     cacheKey,
-    createNexusAppearanceSnapshot(
+    createNxdsAppearanceSnapshot(
       sanitizedState,
       deriveThemeCss(sanitizedState),
       derivePrefsCss(sanitizedState)
@@ -136,26 +136,26 @@ export function createNexusAppearanceSnapshotFromState(
   );
 }
 
-export function createNexusAppearanceStateCookie(
-  state: NexusAppearanceState
-): NexusAppearanceStateCookie {
+export function createNxdsAppearanceStateCookie(
+  state: NxdsAppearanceState
+): NxdsAppearanceStateCookie {
   return {
     version: STATE_COOKIE_VERSION,
-    state: sanitizeNexusAppearance(state),
+    state: sanitizeNxdsAppearance(state),
   };
 }
 
-export function serializeNexusAppearanceStateCookie(
-  state: NexusAppearanceState
+export function serializeNxdsAppearanceStateCookie(
+  state: NxdsAppearanceState
 ): string {
   return encodeURIComponent(
-    JSON.stringify(createNexusAppearanceStateCookie(state))
+    JSON.stringify(createNxdsAppearanceStateCookie(state))
   );
 }
 
-export function parseNexusAppearanceStateCookie(
+export function parseNxdsAppearanceStateCookie(
   raw: unknown
-): NexusAppearanceState | null {
+): NxdsAppearanceState | null {
   if (typeof raw !== 'string' || raw.length === 0) return null;
 
   try {
@@ -170,54 +170,53 @@ export function parseNexusAppearanceStateCookie(
       return null;
     }
 
-    return sanitizeNexusAppearance(parsed.state);
+    return sanitizeNxdsAppearance(parsed.state);
   } catch {
     return null;
   }
 }
 
-export function createNexusAppearanceSnapshotFromCookie(
+export function createNxdsAppearanceSnapshotFromCookie(
   raw: unknown,
-  fallbackState: NexusAppearanceState = DEFAULT_NEXUS_APPEARANCE
-): NexusAppearanceSnapshot {
-  return createNexusAppearanceSnapshotFromState(
-    parseNexusAppearanceStateCookie(raw) ??
-      sanitizeNexusAppearance(fallbackState)
+  fallbackState: NxdsAppearanceState = DEFAULT_NXDS_APPEARANCE
+): NxdsAppearanceSnapshot {
+  return createNxdsAppearanceSnapshotFromState(
+    parseNxdsAppearanceStateCookie(raw) ?? sanitizeNxdsAppearance(fallbackState)
   );
 }
 
-let cachedDefaultSnapshot: NexusAppearanceSnapshot | undefined;
+let cachedDefaultSnapshot: NxdsAppearanceSnapshot | undefined;
 
-export function createDefaultNexusAppearanceSnapshot(): NexusAppearanceSnapshot {
-  return (cachedDefaultSnapshot ??= createNexusAppearanceSnapshotFromState(
-    DEFAULT_NEXUS_APPEARANCE
+export function createDefaultNxdsAppearanceSnapshot(): NxdsAppearanceSnapshot {
+  return (cachedDefaultSnapshot ??= createNxdsAppearanceSnapshotFromState(
+    DEFAULT_NXDS_APPEARANCE
   ));
 }
 
-export function sanitizeNexusAppearanceSnapshot(
+export function sanitizeNxdsAppearanceSnapshot(
   raw: unknown
-): NexusAppearanceSnapshot {
+): NxdsAppearanceSnapshot {
   if (!isRecord(raw) || !isRecord(raw.state)) {
-    return createDefaultNexusAppearanceSnapshot();
+    return createDefaultNxdsAppearanceSnapshot();
   }
 
-  const state = sanitizeNexusAppearance(raw.state);
+  const state = sanitizeNxdsAppearance(raw.state);
 
   if (
     raw.version === SNAPSHOT_VERSION &&
     typeof raw.themeCss === 'string' &&
     typeof raw.prefsCss === 'string'
   ) {
-    return createNexusAppearanceSnapshot(state, raw.themeCss, raw.prefsCss);
+    return createNxdsAppearanceSnapshot(state, raw.themeCss, raw.prefsCss);
   }
 
-  return createNexusAppearanceSnapshotFromState(state);
+  return createNxdsAppearanceSnapshotFromState(state);
 }
 
 export function resolveFirstPaint(
-  snapshot: NexusAppearanceSnapshot,
+  snapshot: NxdsAppearanceSnapshot,
   systemPrefersDark: boolean
-): NexusFirstPaintResolution {
+): NxdsFirstPaintResolution {
   const { state } = snapshot;
   const dark =
     state.mode === 'dark' ||
@@ -243,13 +242,13 @@ function escapeInlineScriptJson(value: unknown): string {
     .replace(/\u2029/g, '\\u2029');
 }
 
-export function createNexusAppearanceBootstrapScript(
-  options: NexusAppearanceBootstrapScriptOptions = {}
+export function createNxdsAppearanceBootstrapScript(
+  options: NxdsAppearanceBootstrapScriptOptions = {}
 ): string {
   const storageKey = options.storageKey ?? DEFAULT_STORAGE_KEY;
   const defaultSnapshot = options.defaultSnapshot
-    ? sanitizeNexusAppearanceSnapshot(options.defaultSnapshot)
-    : createDefaultNexusAppearanceSnapshot();
+    ? sanitizeNxdsAppearanceSnapshot(options.defaultSnapshot)
+    : createDefaultNxdsAppearanceSnapshot();
 
-  return `(function(){try{var k=${escapeInlineScriptJson(storageKey)};var f=${escapeInlineScriptJson(defaultSnapshot)};var s=f;try{if(k!==false){var r=window.localStorage&&window.localStorage.getItem(k);if(r){var p=JSON.parse(r);if(p&&p.version===f.version&&p.state&&typeof p.themeCss==="string"&&typeof p.prefsCss==="string"){s=p;}}}}catch(e){}var st=s.state||f.state;var m=st.mode==="dark"||st.mode==="light"||st.mode==="system"?st.mode:f.state.mode;var sys=false;try{sys=m==="system"&&window.matchMedia&&window.matchMedia("(prefers-color-scheme: dark)").matches;}catch(e){}var dark=m==="dark"||sys===true;var root=document.documentElement;root.classList.toggle("dark",dark);root.setAttribute("data-density",typeof st.density==="string"?st.density:f.state.density);root.setAttribute("data-radius",typeof st.corners==="string"?st.corners:f.state.corners);root.setAttribute("data-shadow",typeof st.elevation==="string"?st.elevation:f.state.elevation);root.setAttribute("data-borderwidth",typeof st.stroke==="string"?st.stroke:f.state.stroke);function upsert(attr,css){var list=document.querySelectorAll("style["+attr+"]");var el=list[0]||document.createElement("style");for(var i=1;i<list.length;i++){list[i].remove();}el.setAttribute(attr,"");el.textContent=css||"";if(!el.parentNode){document.head.appendChild(el);}}upsert("data-nexus-appearance-theme",s.themeCss);upsert("data-nexus-appearance-prefs",s.prefsCss);}catch(e){}})();`;
+  return `(function(){try{var k=${escapeInlineScriptJson(storageKey)};var f=${escapeInlineScriptJson(defaultSnapshot)};var s=f;try{if(k!==false){var r=window.localStorage&&window.localStorage.getItem(k);if(r){var p=JSON.parse(r);if(p&&p.version===f.version&&p.state&&typeof p.themeCss==="string"&&typeof p.prefsCss==="string"){s=p;}}}}catch(e){}var st=s.state||f.state;var m=st.mode==="dark"||st.mode==="light"||st.mode==="system"?st.mode:f.state.mode;var sys=false;try{sys=m==="system"&&window.matchMedia&&window.matchMedia("(prefers-color-scheme: dark)").matches;}catch(e){}var dark=m==="dark"||sys===true;var root=document.documentElement;root.classList.toggle("dark",dark);root.setAttribute("data-density",typeof st.density==="string"?st.density:f.state.density);root.setAttribute("data-radius",typeof st.corners==="string"?st.corners:f.state.corners);root.setAttribute("data-shadow",typeof st.elevation==="string"?st.elevation:f.state.elevation);root.setAttribute("data-borderwidth",typeof st.stroke==="string"?st.stroke:f.state.stroke);function upsert(attr,css){var list=document.querySelectorAll("style["+attr+"]");var el=list[0]||document.createElement("style");for(var i=1;i<list.length;i++){list[i].remove();}el.setAttribute(attr,"");el.textContent=css||"";if(!el.parentNode){document.head.appendChild(el);}}upsert("data-nxds-appearance-theme",s.themeCss);upsert("data-nxds-appearance-prefs",s.prefsCss);}catch(e){}})();`;
 }

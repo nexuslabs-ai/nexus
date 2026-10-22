@@ -2,10 +2,10 @@ import { useMemo } from 'react';
 
 import {
   adjustContrast,
-  createNexusThemeContract,
+  createNxdsThemeContract,
   deriveTheme,
-} from '@nexus_ds/core';
-import { useNexusAppearance } from '@nexus_ds/react/appearance';
+} from '@nxds/core';
+import { useNxdsAppearance } from '@nxds/react/appearance';
 
 const seeds = [
   '#5261bf',
@@ -23,12 +23,12 @@ const seeds = [
 ];
 
 export function useJourneyColors(modeOverride) {
-  const { state, resolvedMode } = useNexusAppearance();
+  const { state, resolvedMode } = useNxdsAppearance();
   return useMemo(
     () =>
       seeds.map((brandColor) => {
         const theme = deriveTheme(
-          createNexusThemeContract({ ...state, brandColor })
+          createNxdsThemeContract({ ...state, brandColor })
         );
         const tokens = theme[modeOverride ?? resolvedMode];
         const background = tokens['--nx-color-primary-subtle'];

@@ -1,11 +1,11 @@
 import { EnginePipeline } from './_engine-pipeline';
 
 export const description =
-  'Nexus UI design tokens for color, spacing, radius, shadows, borders and motion: the token layers, the nx: prefix and the engine that builds them.';
+  'nxds design tokens for color, spacing, radius, shadows, borders and motion: the token layers, the nx: prefix and the engine that builds them.';
 
 # Tokens
 
-Tokens are the named values every Nexus component uses for color, spacing,
+Tokens are the named values every nxds component uses for color, spacing,
 radius, shadows, borders and motion.
 
 [Open the Token lab](/playground/tokens) to browse every token in the current theme.
@@ -19,12 +19,12 @@ radius, shadows, borders and motion.
 | Utility   | The class a component uses    | `nx:bg-primary-background`            |
 
 Components use semantic tokens through utilities. A component that uses a
-primitive color fails the Nexus lint rules.
+primitive color fails the nxds lint rules.
 
 ## The `nx:` prefix
 
-Every Nexus class starts with `nx:`, and every Nexus variable starts with
-`--nx-`. Nexus CSS defines nothing else, so it fits beside your own styles.
+Every nxds class starts with `nx:`, and every nxds variable starts with
+`--nx-`. nxds CSS defines nothing else, so it fits beside your own styles.
 
 The prefix comes before every modifier:
 
@@ -64,15 +64,15 @@ The name always ends in a role. `nx:bg-primary` resolves to nothing.
 
 ## One engine, two moments
 
-`deriveTheme()` in `@nexus_ds/core` produces every color token. It runs once
-at build time to write the default colors into `nexus.css`. It runs again in
+`deriveTheme()` in `@nxds/core` produces every color token. It runs once
+at build time to write the default colors into `nxds.css`. It runs again in
 the browser whenever the appearance changes.
 
 Same function, same inputs, same output. The page looks right with JavaScript
 off, and a live theme change needs no rebuild.
 
 Spacing, radius, shadow, border and motion come straight from DTCG JSON (the
-W3C design token format). `nexus.css` holds every density, corner, shadow and
+W3C design token format). `nxds.css` holds every density, corner, shadow and
 border option, and the provider picks one with a data attribute. The
 appearance state is the object described in [Appearance](/theming/appearance).
 
@@ -85,7 +85,7 @@ Light and dark come from the same call, so dark mode can't drift from light.
 The engine has no framework or DOM code. Another framework needs three
 functions:
 
-- `createNexusThemeContract()` turns the appearance state into the engine's
+- `createNxdsThemeContract()` turns the appearance state into the engine's
   input.
 - `deriveTheme()` returns the light and dark color token maps.
 - `themeToCss()` turns those maps into CSS.
@@ -103,7 +103,7 @@ values, so a React app and a Vue app in one product render the same gray.
 | State binding    | None                                                            | A provider or store in the framework's own style        |
 | Components       | Variants, data attributes, sizing and focus rules               | Components built on the framework's headless primitives |
 
-The Nexus components are React.
+The nxds components are React.
 
 ## Next steps
 

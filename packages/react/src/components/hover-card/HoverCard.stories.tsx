@@ -39,12 +39,12 @@ export const Default: Story = {
   render: () => (
     <HoverCard>
       <HoverCardTrigger asChild>
-        <Button variant="link">@nexus</Button>
+        <Button variant="link">@nxds</Button>
       </HoverCardTrigger>
       <HoverCardContent>
         <div className="nx:flex nx:flex-col nx:gap-1">
           <p className="nx:typography-label-default nx:font-semibold nx:text-foreground">
-            @nexus
+            @nxds
           </p>
           <p className="nx:typography-body-default nx:text-muted-foreground">
             The AI-native design system. Joined March 2026.
@@ -125,14 +125,14 @@ export const OpenCloseInteraction: Story = {
   render: () => (
     <HoverCard openDelay={0} closeDelay={0}>
       <HoverCardTrigger asChild>
-        <Button variant="link">@nexus</Button>
+        <Button variant="link">@nxds</Button>
       </HoverCardTrigger>
       <HoverCardContent>Joined March 2026</HoverCardContent>
     </HoverCard>
   ),
   play: async ({ canvasElement }) => {
     const canvas = within(canvasElement);
-    const trigger = canvas.getByRole('button', { name: '@nexus' });
+    const trigger = canvas.getByRole('button', { name: '@nxds' });
 
     await userEvent.hover(trigger);
     await waitFor(() => {
@@ -153,14 +153,14 @@ export const KeyboardInteraction: Story = {
   render: () => (
     <HoverCard openDelay={0} closeDelay={0}>
       <HoverCardTrigger asChild>
-        <Button variant="link">@nexus</Button>
+        <Button variant="link">@nxds</Button>
       </HoverCardTrigger>
       <HoverCardContent>Joined March 2026</HoverCardContent>
     </HoverCard>
   ),
   play: async ({ canvasElement }) => {
     const canvas = within(canvasElement);
-    const trigger = canvas.getByRole('button', { name: '@nexus' });
+    const trigger = canvas.getByRole('button', { name: '@nxds' });
 
     await userEvent.tab();
     await expect(trigger).toHaveFocus();
@@ -177,7 +177,7 @@ export const WithDataAttributes: Story = {
   render: () => (
     <HoverCard defaultOpen>
       <HoverCardTrigger asChild>
-        <Button variant="link">@nexus</Button>
+        <Button variant="link">@nxds</Button>
       </HoverCardTrigger>
       <HoverCardContent>Content</HoverCardContent>
     </HoverCard>
@@ -204,7 +204,7 @@ export const AllVariants: Story = {
   render: () => (
     <HoverCard>
       <HoverCardTrigger asChild>
-        <Button variant="link">@nexus</Button>
+        <Button variant="link">@nxds</Button>
       </HoverCardTrigger>
       <HoverCardContent>Joined March 2026</HoverCardContent>
     </HoverCard>

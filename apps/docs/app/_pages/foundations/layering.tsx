@@ -10,7 +10,7 @@ import { SectionHeading } from '../../_components/Heading';
  */
 
 export const description =
-  'The Nexus UI z-index scale. Six tokens decide which overlay paints on top, so a select inside a dialog always shows.';
+  'The nxds z-index scale. Six tokens decide which overlay paints on top, so a select inside a dialog always shows.';
 
 const LAYERS: { token: string; value: number; use: string }[] = [
   { token: 'overlay', value: 10, use: 'Low-level scrims' },

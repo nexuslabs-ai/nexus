@@ -124,32 +124,24 @@ const staticDayPickerClassNames = {
 type DatePickerProps = React.ComponentProps<typeof DayPicker> & {
   /**
    * Button variant for the previous and next month arrows.
-   * @default 'ghost'
    */
   buttonVariant?: React.ComponentProps<typeof Button>['variant'];
   /**
    * Day-cell size: `default` is 32px, `large` 48px, `xlarge` 56px. For another
    * size, set `--cell-size` through `className`.
-   * @default 'default'
    */
   cellSize?: DatePickerCellSize;
   /**
    * Custom content inside each day button. The button keeps its keyboard
    * behavior.
    */
-  // eslint-disable-next-line @nexus_ds/no-render-prop-types -- react-day-picker owns the per-day render loop; per-day content can't be a children slot
+  // eslint-disable-next-line @nxds/no-render-prop-types -- react-day-picker owns the per-day render loop; per-day content can't be a children slot
   renderDayContent?: (props: DatePickerDayContentProps) => React.ReactNode;
 };
 
 /**
  * A calendar grid for picking one date, a range or several dates. Install
  * `react-day-picker` in your app first.
- *
- * @example
- * ```tsx
- * const [date, setDate] = React.useState<Date>();
- * <DatePicker mode="single" selected={date} onSelect={setDate} />
- * ```
  */
 function DatePicker({
   className,

@@ -21,11 +21,11 @@ description: |
 
 A skill to search for specific web development use cases and retrieve their corresponding best practice guides.
 
-## Nexus integration (repository policy takes precedence)
+## nxds integration (repository policy takes precedence)
 
-Apply this guidance through Nexus components, semantic tokens, and `nx:` utilities.
+Apply this guidance through nxds components, semantic tokens, and `nx:` utilities.
 
-Nexus's browser support policy is
+nxds's browser support policy is
 `../../../.claude/rules/no-environment-branching.md`. Read it before applying
 any guide's Baseline, browser-support, or fallback recommendation. That rule
 overrides this skill's generic fallback advice: choose a simpler primitive
@@ -35,13 +35,13 @@ For a substantial UI change — one that introduces a layout, interaction, or
 browser-platform decision — record a compact guidance note in the plan or PR:
 
 - **Source:** search query and retrieved guide IDs, or exact bundled guide paths.
-- **Decision:** the applicable pattern and any Nexus-policy override.
+- **Decision:** the applicable pattern and any nxds-policy override.
 - **Verification:** how the implementation was checked against the guidance.
 
 For a text-only edit or removal that introduces no layout, interaction, or
 platform decision, an existing relevant guide can be reused; a new search is
 unnecessary. Do not describe reading this skill alone as consulting a guide.
-In Nexus, this substantial-UI-change threshold narrows both the frontmatter's
+In nxds, this substantial-UI-change threshold narrows both the frontmatter's
 "MANDATORY: Execute FIRST for all HTML/CSS and clientside JS tasks" trigger and
 the "When to use" list below.
 
@@ -120,7 +120,7 @@ If the output is truncated, you must repeat the command but redirect to a file a
 
 When generating or modifying code, cross-check the implementation against the retrieved guide before concluding:
 
-- **Applicable Guidance & Fallbacks**: Ensure the relevant modern patterns and necessary fallback strategies from the guide are correctly applied, without forcing unrequested features. Nexus's browser support policy overrides fallback advice; see Nexus integration above.
+- **Applicable Guidance & Fallbacks**: Ensure the relevant modern patterns and necessary fallback strategies from the guide are correctly applied, without forcing unrequested features. nxds's browser support policy overrides fallback advice; see nxds integration above.
 - **Task Fulfillment**: Confirm that the implementation fully satisfies the user's request.
 
 ## Using npx / pnpx
@@ -141,7 +141,7 @@ When generating or modifying code, cross-check the implementation against the re
 
 ## Interpreting Browser Support & Fallbacks
 
-- **Default Behavior**: All guides assume **Baseline Widely available** features are safe to use without fallbacks. For features that are not Baseline widely available, you **MUST** follow the fallback recommendations in the guide, unless the user or project has specified a custom browser support policy. Nexus has; see Nexus integration above.
+- **Default Behavior**: All guides assume **Baseline Widely available** features are safe to use without fallbacks. For features that are not Baseline widely available, you **MUST** follow the fallback recommendations in the guide, unless the user or project has specified a custom browser support policy. nxds has; see nxds integration above.
 - **Custom Policies**: If the user has already defined explicit browser support requirements, use the browser compatibility data in the guide to determine if a fallback can be safely ignored.
   - For Baseline YYYY targets, a feature satisfies this target if its "Baseline since" date is <= YYYY.
   - **Policy Examples**:

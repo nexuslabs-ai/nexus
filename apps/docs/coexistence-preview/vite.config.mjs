@@ -11,17 +11,17 @@ export default defineConfig({
     dedupe: ['react', 'react-dom'],
     alias: [
       {
-        find: '@nexus_ds/react/appearance',
+        find: '@nxds/react/appearance',
         replacement: path(
           '../../../packages/react/src/components/appearance/provider/index.ts'
         ),
       },
       {
-        find: /^@nexus_ds\/react$/,
+        find: /^@nxds\/react$/,
         replacement: path('../../../packages/react/src/index.ts'),
       },
       {
-        find: /^@nexus_ds\/core$/,
+        find: /^@nxds\/core$/,
         replacement: path('../../../packages/core/src/index.ts'),
       },
     ],

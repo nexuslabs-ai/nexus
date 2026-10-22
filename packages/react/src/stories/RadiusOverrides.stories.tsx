@@ -23,7 +23,7 @@ const meta = {
     docs: {
       description: {
         component:
-          'Scoped --nx-radius-base overrides currently affect Button. Input and SelectTrigger use --nx-radius-md. A nested data-radius preset replaces inherited values; an inline override wins over a preset on the same element. See theming/overrides in Nexus docs.',
+          'Scoped --nx-radius-base overrides currently affect Button. Input and SelectTrigger use --nx-radius-md. A nested data-radius preset replaces inherited values; an inline override wins over a preset on the same element. See theming/overrides in nxds docs.',
       },
     },
   },

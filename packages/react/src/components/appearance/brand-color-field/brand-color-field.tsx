@@ -1,6 +1,6 @@
 import type { ComponentProps } from 'react';
 
-import { BRAND_COLOR_PRESETS, findBrandColorPreset } from '@nexus_ds/core';
+import { BRAND_COLOR_PRESETS, findBrandColorPreset } from '@nxds/core';
 
 import { cn } from '../../../lib/utils';
 import {
@@ -11,22 +11,22 @@ import {
   SelectValue,
 } from '../../select/select';
 import {
-  NexusAppearanceColorField,
-  type NexusAppearanceColorFieldProps,
+  NxdsAppearanceColorField,
+  type NxdsAppearanceColorFieldProps,
 } from '../color-field/color-field';
 
-export interface NexusAppearanceBrandColorFieldProps
+export interface NxdsAppearanceBrandColorFieldProps
   extends
     Omit<ComponentProps<'div'>, 'onChange' | 'children'>,
-    NexusAppearanceColorFieldProps {}
+    NxdsAppearanceColorFieldProps {}
 
-export function NexusAppearanceBrandColorField({
+export function NxdsAppearanceBrandColorField({
   value,
   onChange,
   label,
   className,
   ...props
-}: NexusAppearanceBrandColorFieldProps) {
+}: NxdsAppearanceBrandColorFieldProps) {
   const selected = findBrandColorPreset(value);
 
   const selectPreset = (next: string) => {
@@ -62,7 +62,7 @@ export function NexusAppearanceBrandColorField({
           ))}
         </SelectContent>
       </Select>
-      <NexusAppearanceColorField
+      <NxdsAppearanceColorField
         label={label}
         value={value}
         onChange={onChange}

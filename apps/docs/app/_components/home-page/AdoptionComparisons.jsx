@@ -2,13 +2,13 @@
 
 import { useId, useState } from 'react';
 
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@nexus_ds/react';
-import { useNexusAppearance } from '@nexus_ds/react/appearance';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@nxds/react';
+import { useNxdsAppearance } from '@nxds/react/appearance';
 
 import './adoption-comparisons.css';
 
 function Preview({ title, subtitle, src }) {
-  const { resolvedMode } = useNexusAppearance();
+  const { resolvedMode } = useNxdsAppearance();
   return (
     <article className="adoption-preview">
       <header>

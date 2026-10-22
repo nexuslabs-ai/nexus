@@ -7,37 +7,50 @@ import type {
   ComponentEntry,
   PropsFile,
   PropsIndex,
-} from '../../scripts/props-entries.mjs';
+} from '../../scripts/props-entries.ts';
+
+import type { Framework } from './frameworks';
 
 import 'server-only';
 
-export type {
-  ComponentEntry,
-  PropEntry,
-} from '../../scripts/props-entries.mjs';
+export type { ComponentEntry, PropEntry } from '../../scripts/props-entries.ts';
 
-const PROPS_DIR = path.join(process.cwd(), 'generated', 'props');
+/** Where each framework's props JSON lives, and the script that writes it. */
+const FRAMEWORK_PROPS: Record<Framework, { dir: string; generate: string }> = {
+  react: {
+    dir: path.join(process.cwd(), 'generated', 'props'),
+    generate: 'generate:props',
+  },
+  vue: {
+    dir: path.join(process.cwd(), 'generated', 'vue', 'props'),
+    generate: 'generate:vue',
+  },
+};
 
-const readPropsJson = cache(async (fileName: string): Promise<unknown> => {
-  const filePath = path.join(PROPS_DIR, fileName);
-  try {
-    return JSON.parse(await readFile(filePath, 'utf8'));
-  } catch (error) {
-    const missing = (error as NodeJS.ErrnoException).code === 'ENOENT';
-    throw new Error(
-      missing
-        ? `No props JSON at ${filePath} — run \`pnpm --filter @nexus_ds/docs generate:props\`.`
-        : `Could not read ${filePath}.`,
-      { cause: error }
-    );
+const readPropsJson = cache(
+  async (framework: Framework, fileName: string): Promise<unknown> => {
+    const { dir, generate } = FRAMEWORK_PROPS[framework];
+    const filePath = path.join(dir, fileName);
+    try {
+      return JSON.parse(await readFile(filePath, 'utf8'));
+    } catch (error) {
+      const missing = (error as NodeJS.ErrnoException).code === 'ENOENT';
+      throw new Error(
+        missing
+          ? `No props JSON at ${filePath} — run \`pnpm --filter @nxds/docs ${generate}\`.`
+          : `Could not read ${filePath}.`,
+        { cause: error }
+      );
+    }
   }
-});
+);
 
 export async function loadComponentDocs(
   slug: string,
-  component?: string
+  component?: string,
+  framework: Framework = 'react'
 ): Promise<ComponentEntry[]> {
-  const index = (await readPropsJson('index.json')) as PropsIndex;
+  const index = (await readPropsJson(framework, 'index.json')) as PropsIndex;
 
   const names = Object.hasOwn(index, slug) ? index[slug] : undefined;
   if (!names) {
@@ -51,7 +64,10 @@ export async function loadComponentDocs(
     );
   }
 
-  const { components } = (await readPropsJson(`${slug}.json`)) as PropsFile;
+  const { components } = (await readPropsJson(
+    framework,
+    `${slug}.json`
+  )) as PropsFile;
   if (!component) return components;
   return components.filter((entry) => entry.name === component);
 }

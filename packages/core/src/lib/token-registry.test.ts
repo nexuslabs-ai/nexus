@@ -1,8 +1,8 @@
 import { describe, expect, it } from 'vitest';
 
 import {
-  createNexusThemeContract,
-  DEFAULT_NEXUS_APPEARANCE,
+  createNxdsThemeContract,
+  DEFAULT_NXDS_APPEARANCE,
 } from './appearance-model';
 import { deriveTheme } from './derive-theme';
 import { SEMANTIC_TOKEN_REGISTRY } from './token-registry';
@@ -14,9 +14,7 @@ const names = (map: Record<string, string>) =>
 
 describe('semantic token registry', () => {
   it('set-equals the engine emission, both modes', () => {
-    const theme = deriveTheme(
-      createNexusThemeContract(DEFAULT_NEXUS_APPEARANCE)
-    );
+    const theme = deriveTheme(createNxdsThemeContract(DEFAULT_NXDS_APPEARANCE));
 
     expect(SEMANTIC_TOKEN_REGISTRY.map((token) => token.name).sort()).toEqual(
       names(theme.light)

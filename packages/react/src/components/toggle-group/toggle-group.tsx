@@ -29,8 +29,6 @@ type ToggleGroupProps = React.ComponentProps<typeof ToggleGroupPrimitive.Root> &
     /**
      * Gap between items, in spacing-scale units. `0` joins them into one
      * segmented control. A larger value splits them into separate pills.
-     *
-     * @default 0
      */
     spacing?: number;
   };
@@ -41,18 +39,6 @@ type ToggleGroupProps = React.ComponentProps<typeof ToggleGroupPrimitive.Root> &
  *
  * `aria-invalid` on the group does not style its items. Set it on each
  * `ToggleGroupItem` and describe the error in your own text.
- *
- * @example
- * ```tsx
- * <ToggleGroup type="single" defaultValue="left">
- *   <ToggleGroupItem value="left" aria-label="Align left">
- *     <IconAlignLeft />
- *   </ToggleGroupItem>
- *   <ToggleGroupItem value="center" aria-label="Align center">
- *     <IconAlignCenter />
- *   </ToggleGroupItem>
- * </ToggleGroup>
- * ```
  */
 function ToggleGroup({
   className,
@@ -66,7 +52,7 @@ function ToggleGroup({
   return (
     <ToggleGroupPrimitive.Root
       orientation={orientation}
-      // Spacing-scale gap via the runtime spacing var (Nexus resets the base
+      // Spacing-scale gap via the runtime spacing var (nxds resets the base
       // --spacing, so Tailwind's --spacing() function is unavailable here).
       style={spacing ? { gap: `var(--nx-spacing-${spacing})` } : undefined}
       className={cn(

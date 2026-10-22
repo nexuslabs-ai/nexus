@@ -18,7 +18,7 @@ import { SectionHeading } from '../../_components/Heading';
  */
 
 export const description =
-  'How Nexus UI builds its OKLCH palettes and semantic color tokens, and checks every text and background pair for APCA contrast in CI.';
+  'How nxds builds its OKLCH palettes and semantic color tokens, and checks every text and background pair for APCA contrast in CI.';
 
 // Surface ↔ text pairs — APCA-gated pairings that react to the picker.
 const SEMANTIC_PAIRS: { surface: string; text: string; label: string }[] = [
@@ -174,7 +174,7 @@ export default function ColorShowcase() {
           The palettes
         </SectionHeading>
         <p className="nx:typography-body-default nx:text-muted-foreground nx:mb-4 nx:max-w-[64ch]">
-          Nexus has five neutral palettes, with eleven shades each. A shade
+          nxds has five neutral palettes, with eleven shades each. A shade
           number means the same lightness in every neutral palette, so every{' '}
           <code>500</code> looks equally light.
         </p>
@@ -204,8 +204,8 @@ export default function ColorShowcase() {
           message and icon on <code>error-subtle</code>.
         </p>
         <p className="nx:typography-body-default nx:text-muted-foreground nx:mb-4 nx:max-w-[64ch]">
-          Each foreground is checked against the surfaces Nexus pairs it with.
-          On any other surface, check the contrast yourself.
+          Each foreground is checked against the surfaces nxds pairs it with. On
+          any other surface, check the contrast yourself.
         </p>
         <div
           data-md-skip
@@ -297,9 +297,9 @@ export default function ColorShowcase() {
           Accessibility
         </SectionHeading>
         <p className="nx:typography-body-default nx:text-muted-foreground nx:mb-4 nx:max-w-[64ch]">
-          Nexus checks contrast with APCA (a perceptual contrast score), not
-          WCAG 2 ratios. WCAG 2 ratios misjudge the mid-tone pairs a token
-          system produces all the time.
+          nxds checks contrast with APCA (a perceptual contrast score), not WCAG
+          2 ratios. WCAG 2 ratios misjudge the mid-tone pairs a token system
+          produces all the time.
         </p>
         <p className="nx:typography-body-default nx:text-muted-foreground nx:mb-4 nx:max-w-[64ch]">
           Each pair has a minimum score for how it&rsquo;s used. CI derives
@@ -313,7 +313,7 @@ export default function ColorShowcase() {
         <p className="nx:typography-body-default nx:text-muted-foreground nx:mb-4 nx:max-w-[64ch]">
           Every foreground is checked against each surface it can sit on,
           including hover, pressed and translucent states. If a brand or status
-          label can&rsquo;t reach its minimum, Nexus shifts that fill&rsquo;s
+          label can&rsquo;t reach its minimum, nxds shifts that fill&rsquo;s
           shade. Otherwise the fill keeps the brand color you chose.
         </p>
         <div className="nx:overflow-x-auto">
@@ -361,7 +361,7 @@ export default function ColorShowcase() {
             Appearance
           </Link>{' '}
           raise the minimums as they go from <code>0</code> to <code>100</code>.
-          When a target can&rsquo;t be reached, Nexus uses the highest contrast
+          When a target can&rsquo;t be reached, nxds uses the highest contrast
           possible. The minimums at <code>0</code> always apply.
         </p>
         <div className="nx:overflow-x-auto">

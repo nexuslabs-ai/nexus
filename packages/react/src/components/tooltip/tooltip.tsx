@@ -15,13 +15,6 @@ import { TooltipGroupContext } from './tooltip-group';
 /**
  * Optional. Groups the tooltips inside it, so they share an open delay and
  * moving between them skips the delay.
- *
- * @example
- * ```tsx
- * <TooltipProvider delayDuration={0}>
- *   <Toolbar>…</Toolbar>
- * </TooltipProvider>
- * ```
  */
 function TooltipProvider(
   props: React.ComponentProps<typeof TooltipPrimitive.Provider>
@@ -36,14 +29,6 @@ function TooltipProvider(
 /**
  * Root of one tooltip. Holds its open state, trigger and content. Works on its
  * own, and joins the group inside a `TooltipProvider`.
- *
- * @example
- * ```tsx
- * <Tooltip>
- *   <TooltipTrigger>Hover me</TooltipTrigger>
- *   <TooltipContent>Tooltip text</TooltipContent>
- * </Tooltip>
- * ```
  */
 function Tooltip(props: React.ComponentProps<typeof TooltipPrimitive.Root>) {
   const inGroup = React.useContext(TooltipGroupContext);
@@ -67,13 +52,6 @@ interface TooltipContentProps extends React.ComponentProps<
 
 /**
  * Popup that shows the tooltip text. Position it with `side` and `align`.
- *
- * @example
- * ```tsx
- * <TooltipContent side="top" align="center">
- *   <p>Helpful information</p>
- * </TooltipContent>
- * ```
  */
 function TooltipContent({
   className,

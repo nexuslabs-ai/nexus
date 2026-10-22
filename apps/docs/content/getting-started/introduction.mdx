@@ -1,15 +1,15 @@
 export const description =
-  'Nexus UI is a theme engine that ships copy-and-own components. Set one appearance object, and every component follows your brand, density and corners.';
+  'nxds is a theme engine that ships copy-and-own components. Set one appearance object, and every component follows your brand, density and corners.';
 
 # Introduction
 
-Nexus is a framework-agnostic theme engine that ships components, not a component library with a theme added on.
+nxds is a framework-agnostic theme engine that ships components, not a component library with a theme added on.
 
-You copy the components into your app and own them. The engine, `@nexus_ds/core`, produces every token those components use, from one appearance object. Change your brand color, density or corner style, and every component follows.
+You copy the components into your app and own them. The engine, `@nxds/core`, produces every token those components use, from one appearance object. Change your brand color, density or corner style, and every component follows.
 
 ## Our philosophy
 
-Nexus rests on six ideas. Each one links to the page that explains it.
+nxds rests on six ideas. Each one links to the page that explains it.
 
 ### You own the components
 
@@ -36,27 +36,27 @@ Every text and background pair has a minimum contrast score, and CI fails the
 build when one drops below it. [Color](/foundations/color#accessibility) lists
 the minimum for each pair.
 
-### Nexus fits next to your app
+### nxds fits next to your app
 
-Nexus CSS defines only `nx:` classes and `--nx-` variables, so your own styles
+nxds CSS defines only `nx:` classes and `--nx-` variables, so your own styles
 stay as they are. [Tokens](/foundations/tokens#the-nx-prefix) explains the
 prefix.
 
 ### Conventions are enforced, for people and agents
 
-ESLint rules turn Nexus conventions into build errors. See
+ESLint rules turn nxds conventions into build errors. See
 [lint rules](/getting-started/install#optional-add-lint-rules).
 
 Every docs page is also available as Markdown. See
 [AI agents](/getting-started/ai-agents).
 
-## Nexus and shadcn/ui
+## nxds and shadcn/ui
 
-The idea that you should own your component source comes from [shadcn/ui](https://ui.shadcn.com). Nexus shares that philosophy, and we're grateful for the work that made it popular.
+The idea that you should own your component source comes from [shadcn/ui](https://ui.shadcn.com). nxds shares that philosophy, and we're grateful for the work that made it popular.
 
-Both use copy-and-own components, Radix primitives, CVA for variants and `asChild` for composition. Nexus has its own theme engine, tokens and conventions:
+Both use copy-and-own components, Radix primitives, CVA for variants and `asChild` for composition. nxds has its own theme engine, tokens and conventions:
 
-| Concern                      | shadcn/ui                            | Nexus                                                        |
+| Concern                      | shadcn/ui                            | nxds                                                         |
 | ---------------------------- | ------------------------------------ | ------------------------------------------------------------ |
 | Class names                  | `bg-primary`                         | `nx:bg-primary-background`                                   |
 | Fitting into an existing app | Its theme joins your Tailwind config | Its own CSS entry, beside yours                              |
@@ -69,36 +69,36 @@ Both use copy-and-own components, Radix primitives, CVA for variants and `asChil
 
 ## When to use something else
 
-Nexus pays off when you have several products, several brands, or an app that must be re-themed per customer. For a smaller project, a simpler tool may fit better:
+nxds pays off when you have several products, several brands, or an app that must be re-themed per customer. For a smaller project, a simpler tool may fit better:
 
 - **One app, one theme.** A theme engine is overhead you won't get back. Use [shadcn/ui](https://ui.shadcn.com).
 - **You want a large ecosystem.** Most community blocks and registries target shadcn/ui's token names.
-- **You need a screen today.** Nexus asks you to adopt its token conventions first.
+- **You need a screen today.** nxds asks you to adopt its token conventions first.
 
 ## FAQ
 
-**Is Nexus a component library?**
+**Is nxds a component library?**
 Not in the usual sense. The components are copy-and-own source. The part you install from npm is the theme engine.
 
 **Do I need Tailwind?**
-Yes. Nexus builds its classes with Tailwind 4. Your app also needs a reset that sets `box-sizing: border-box`, such as Tailwind's Preflight or MUI's `CssBaseline`.
+Yes. nxds builds its classes with Tailwind 4. Your app also needs a reset that sets `box-sizing: border-box`, such as Tailwind's Preflight or MUI's `CssBaseline`.
 
-**Does Nexus work outside React?**
-The engine does. It has no framework code, so any app can call it. The components are React only today. Vue, Svelte, Angular and React Native bindings are planned.
+**Does nxds work outside React?**
+The engine does. It has no framework code, so any app can call it. The components ship for React, and a growing set ships for Vue. Each component page has a tab per framework. Svelte, Angular and React Native bindings are planned.
 
 **Can I use the tokens in a native app?**
 The tokens are DTCG JSON (the W3C design token format), so Style Dictionary can build Swift and Kotlin output. Live theme changes on native need a port of the engine.
 
 **Can I use my own brand colors?**
-Yes. Set `brandColor` to any CSS color, and Nexus builds the palette from it.
+Yes. Set `brandColor` to any CSS color, and nxds builds the palette from it.
 
 ## Acknowledgements
 
-Nexus uses and learns from these open-source projects. Thank you to everyone who builds and maintains them.
+nxds uses and learns from these open-source projects. Thank you to everyone who builds and maintains them.
 
 | Project                                                                     | Used for                                      |
 | --------------------------------------------------------------------------- | --------------------------------------------- |
-| [shadcn/ui](https://ui.shadcn.com)                                          | The copy-and-own philosophy Nexus shares      |
+| [shadcn/ui](https://ui.shadcn.com)                                          | The copy-and-own philosophy nxds shares       |
 | [Radix UI](https://www.radix-ui.com)                                        | Accessible primitives under most components   |
 | [Tailwind CSS](https://tailwindcss.com)                                     | Styling and the `nx:` utilities               |
 | [CVA](https://cva.style)                                                    | Component variants                            |

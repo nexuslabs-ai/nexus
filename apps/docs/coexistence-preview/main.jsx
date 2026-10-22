@@ -2,9 +2,9 @@ import React, { useId, useMemo, useState } from 'react';
 import { createRoot } from 'react-dom/client';
 
 import { createTheme, MenuItem, TextField, ThemeProvider } from '@mui/material';
-import { DEFAULT_NEXUS_APPEARANCE } from '@nexus_ds/core';
-import { Button } from '@nexus_ds/react';
-import { NexusAppearanceProvider } from '@nexus_ds/react/appearance';
+import { DEFAULT_NXDS_APPEARANCE } from '@nxds/core';
+import { Button } from '@nxds/react';
+import { NxdsAppearanceProvider } from '@nxds/react/appearance';
 import {
   ConfigProvider,
   Input as AntInput,
@@ -37,9 +37,9 @@ const library = ['MUI', 'Ant Design', 'shadcn/ui'].includes(
 const mode = query.get('mode') === 'light' ? 'light' : 'dark';
 const preset = invitationAppearance(library, mode);
 const appearance = {
-  ...DEFAULT_NEXUS_APPEARANCE,
+  ...DEFAULT_NXDS_APPEARANCE,
   ...preset,
-  prefs: { ...DEFAULT_NEXUS_APPEARANCE.prefs, ...preset.prefs },
+  prefs: { ...DEFAULT_NXDS_APPEARANCE.prefs, ...preset.prefs },
 };
 
 function InviteForm() {
@@ -168,7 +168,7 @@ function InviteForm() {
 }
 
 createRoot(document.getElementById('root')).render(
-  <NexusAppearanceProvider
+  <NxdsAppearanceProvider
     state={appearance}
     storageKey={false}
     cookieWriteKey={false}
@@ -178,5 +178,5 @@ createRoot(document.getElementById('root')).render(
     ) : (
       <InviteForm />
     )}
-  </NexusAppearanceProvider>
+  </NxdsAppearanceProvider>
 );

@@ -1,23 +1,23 @@
-import { DEFAULT_NEXUS_APPEARANCE } from '@nexus_ds/core';
+import { DEFAULT_NXDS_APPEARANCE } from '@nxds/core';
 import type { Meta, StoryObj } from '@storybook/react';
 import { expect, within } from 'storybook/test';
 
-import { NexusAppearanceConfigPreview } from './config-preview';
+import { NxdsAppearanceConfigPreview } from './config-preview';
 
-const meta: Meta<typeof NexusAppearanceConfigPreview> = {
+const meta: Meta<typeof NxdsAppearanceConfigPreview> = {
   title: 'Appearance/ConfigPreview',
-  component: NexusAppearanceConfigPreview,
+  component: NxdsAppearanceConfigPreview,
   parameters: {
     docs: {
       description: {
         component:
-          'NexusAppearanceConfigPreview prints an appearance state as a code object. Use it to show the values a settings panel produces.',
+          'NxdsAppearanceConfigPreview prints an appearance state as a code object. Use it to show the values a settings panel produces.',
       },
     },
   },
   args: {
     state: {
-      ...DEFAULT_NEXUS_APPEARANCE,
+      ...DEFAULT_NXDS_APPEARANCE,
       lightContrast: 37,
       darkContrast: 82,
     },
@@ -26,7 +26,7 @@ const meta: Meta<typeof NexusAppearanceConfigPreview> = {
 };
 
 export default meta;
-type Story = StoryObj<typeof NexusAppearanceConfigPreview>;
+type Story = StoryObj<typeof NxdsAppearanceConfigPreview>;
 
 export const Default: Story = {};
 

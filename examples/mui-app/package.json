@@ -8,7 +8,7 @@
     "build": "tsc -b && vite build",
     "lint": "oxlint",
     "preview": "vite preview",
-    "nexus:add": "node ../scripts/sync-nexus.mjs",
+    "nxds:add": "node ../scripts/sync-nxds.mjs",
     "typecheck": "tsc -b"
   },
   "dependencies": {
@@ -16,7 +16,7 @@
     "@emotion/styled": "^11.14.1",
     "@mui/icons-material": "^9.5.0",
     "@mui/material": "^9.5.0",
-    "@nexus_ds/core": "file:../../packages/core",
+    "@nxds/core": "file:../../packages/core",
     "@radix-ui/react-avatar": "^1.3.0",
     "@radix-ui/react-checkbox": "^1.4.0",
     "@radix-ui/react-dialog": "^1.3.0",

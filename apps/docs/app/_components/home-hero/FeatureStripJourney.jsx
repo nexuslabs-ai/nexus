@@ -2,8 +2,8 @@
 
 import { useEffect, useState } from 'react';
 
-import { Button, Input, Switch } from '@nexus_ds/react';
-import { useNexusAppearance } from '@nexus_ds/react/appearance';
+import { Button, Input, Switch } from '@nxds/react';
+import { useNxdsAppearance } from '@nxds/react/appearance';
 import {
   IconAsterisk,
   IconBorderAll,
@@ -41,7 +41,7 @@ export function FeatureStripJourney({
   componentsHref = '/components',
   playgroundHref = '/create',
 }) {
-  const { state } = useNexusAppearance();
+  const { state } = useNxdsAppearance();
   const reduceMotion = state.prefs.reduceMotion;
   const colors = useJourneyColors();
   const [active, setActive] = useState(-1);

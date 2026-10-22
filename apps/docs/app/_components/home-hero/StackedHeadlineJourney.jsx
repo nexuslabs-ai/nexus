@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from 'react';
 
-import { useNexusAppearance } from '@nexus_ds/react/appearance';
+import { useNxdsAppearance } from '@nxds/react/appearance';
 import {
   IconAsterisk,
   IconBorderAll,
@@ -78,7 +78,7 @@ export function StackedTileGroup({
   headingStyle,
   tileStyles,
 }) {
-  const { state } = useNexusAppearance();
+  const { state } = useNxdsAppearance();
   const [step, setStep] = useState(-1);
   const [hovered, setHovered] = useState(null);
   const [focused, setFocused] = useState(null);

@@ -1,4 +1,4 @@
-import { cn } from '@nexus_ds/react/utils';
+import { cn } from '@nxds/react/utils';
 
 import { InlineCode } from './InlineCode';
 

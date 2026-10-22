@@ -1,6 +1,6 @@
 name: Release
 
-# Publishes @nexus_ds/core and @nexus_ds/eslint-plugin to npm via changesets,
+# Publishes @nxds/core and @nxds/eslint-plugin to npm via changesets,
 # authenticated by npm trusted publishing (OIDC) — there is no npm token in the
 # repo. Standalone from ci.yml: this is a post-merge push:main workflow, not a
 # PR check, so it is not part of the `CI Status` branch-protection aggregator.
@@ -61,7 +61,7 @@ jobs:
       - name: Setup Node
         uses: actions/setup-node@v4
         with:
-          node-version: '22.14.0' # trusted publishing requires Node >= 22.14.0
+          node-version-file: '.nvmrc'
           cache: 'pnpm'
 
       # `changeset publish` runs `pnpm publish` (pnpm is the detected package

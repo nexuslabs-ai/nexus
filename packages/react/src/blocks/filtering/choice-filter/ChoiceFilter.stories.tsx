@@ -164,7 +164,7 @@ const meta = {
               <code>blocks/filtering</code> layout.
             </li>
             <li>
-              They need these Nexus component folders, including the ones those
+              They need these nxds component folders, including the ones those
               folders import: <code>button</code>, <code>button-group</code>,{' '}
               <code>dropdown-menu</code>, <code>filter-condition</code>,{' '}
               <code>overlay-layout</code>, <code>separator</code>,{' '}
@@ -172,11 +172,11 @@ const meta = {
               elsewhere, update the relative imports.
             </li>
             <li>
-              No npm packages beyond those the Nexus components already use.
+              No npm packages beyond those the nxds components already use.
             </li>
             <li>
               Include the copied files in your Tailwind source scan and use the
-              Nexus theme and styles setup.
+              nxds theme and styles setup.
             </li>
             <li>
               Your application owns the options and data, matching, fetching,

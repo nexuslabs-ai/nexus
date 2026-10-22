@@ -8,11 +8,13 @@
       "cache": false
     },
     "generate:props": {
-      "dependsOn": ["^build"],
+      "dependsOn": ["@nxds/core#build"],
       "inputs": [
+        "scripts/files.mjs",
         "scripts/generate-props.mjs",
         "scripts/props-contract.mjs",
-        "scripts/props-entries.mjs",
+        "scripts/humanize.ts",
+        "scripts/props-entries.ts",
         "scripts/react-entry-points.mjs",
         "scripts/react-sources.mjs",
         "scripts/roots.mjs",
@@ -24,7 +26,10 @@
     },
     "generate:dependencies": {
       "inputs": [
+        "scripts/files.mjs",
         "scripts/generate-dependencies.mjs",
+        "scripts/humanize.ts",
+        "scripts/install-plans.ts",
         "scripts/react-sources.mjs",
         "scripts/roots.mjs",
         "$TURBO_ROOT$/packages/react/src/**",
@@ -33,13 +38,40 @@
       ],
       "outputs": ["generated/dependencies/**"]
     },
+    "generate:vue": {
+      "inputs": [
+        "scripts/files.mjs",
+        "scripts/generate-vue-docs.ts",
+        "scripts/humanize.ts",
+        "scripts/install-plans.ts",
+        "scripts/props-contract.mjs",
+        "scripts/props-entries.ts",
+        "scripts/roots.mjs",
+        "$TURBO_ROOT$/packages/vue/src/**",
+        "$TURBO_ROOT$/packages/vue/package.json",
+        "$TURBO_ROOT$/packages/vue/tsconfig.json",
+        "$TURBO_ROOT$/.prettierrc"
+      ],
+      "outputs": ["generated/vue/**"]
+    },
+    "bundle:vue": {
+      "dependsOn": ["@nxds/core#build", "generate:vue"],
+      "inputs": [
+        "scripts/bundle-vue-demos.ts",
+        "scripts/roots.mjs",
+        "generated/vue/**",
+        "$TURBO_ROOT$/packages/vue/src/**"
+      ],
+      "outputs": ["public/vue-demos/**"]
+    },
     "generate:manifest": {
       "inputs": [
         "scripts/generate-page-manifest.mjs",
         "scripts/page-manifest.mjs",
         "scripts/roots.mjs",
-        "scripts/humanize.mjs",
-        "scripts/docs-stories.mjs",
+        "scripts/humanize.ts",
+        "scripts/docs-stories.ts",
+        "scripts/files.mjs",
         "scripts/react-sources.mjs",
         "page-registry/**",
         "content/**",
@@ -61,7 +93,9 @@
         "generate:manifest",
         "generate:props",
         "generate:dependencies",
-        "generate:demos"
+        "generate:demos",
+        "generate:vue",
+        "bundle:vue"
       ],
       "inputs": ["$TURBO_DEFAULT$", "$TURBO_ROOT$/package.json"],
       "outputs": ["out/**", "next-env.d.ts"]
@@ -72,13 +106,21 @@
         "generate:manifest",
         "generate:props",
         "generate:dependencies",
-        "generate:demos"
+        "generate:demos",
+        "generate:vue",
+        "bundle:vue"
       ],
       "cache": false,
       "persistent": true
     },
     "typecheck": {
-      "dependsOn": ["^build", "generate:manifest", "generate:demos"]
+      "dependsOn": [
+        "@nxds/core#build",
+        "@nxds/react#build",
+        "generate:manifest",
+        "generate:demos",
+        "generate:vue"
+      ]
     }
   }
 }

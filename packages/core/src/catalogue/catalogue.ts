@@ -1,7 +1,7 @@
 import {
-  createNexusThemeContract,
-  DEFAULT_NEXUS_APPEARANCE,
-  type NexusAppearanceState,
+  createNxdsThemeContract,
+  DEFAULT_NXDS_APPEARANCE,
+  type NxdsAppearanceState,
 } from '../lib/appearance-model';
 import { deriveThemeMode } from '../lib/derive-theme';
 import type { Mode } from '../lib/palette';
@@ -426,10 +426,10 @@ function styleLeaves(family: CatalogueFamily, file: TokenFile): AuthoredLeaf[] {
   );
 }
 
-function runtimeAppearance(mode: Mode): NexusAppearanceState {
+function runtimeAppearance(mode: Mode): NxdsAppearanceState {
   return {
-    ...DEFAULT_NEXUS_APPEARANCE,
-    prefs: { ...DEFAULT_NEXUS_APPEARANCE.prefs },
+    ...DEFAULT_NXDS_APPEARANCE,
+    prefs: { ...DEFAULT_NXDS_APPEARANCE.prefs },
     mode,
   };
 }
@@ -449,7 +449,7 @@ function runtimeColorTokens(): CatalogueToken[] {
     return {
       mode,
       appearance,
-      values: deriveThemeMode(createNexusThemeContract(appearance), mode),
+      values: deriveThemeMode(createNxdsThemeContract(appearance), mode),
     };
   });
 
@@ -483,9 +483,9 @@ function runtimeColorTokens(): CatalogueToken[] {
 }
 
 /**
- * Every Nexus token, identified by its `--nx-*` name: primitives, runtime
+ * Every nxds token, identified by its `--nx-*` name: primitives, runtime
  * colours, spacing, z-index, breakpoints, and typography and shadow styles.
- * Runtime colours are computed from `DEFAULT_NEXUS_APPEARANCE` in explicit
+ * Runtime colours are computed from `DEFAULT_NXDS_APPEARANCE` in explicit
  * light and dark modes; each variant records the appearance it used.
  */
 export function createTokenCatalogue(): readonly CatalogueToken[] {

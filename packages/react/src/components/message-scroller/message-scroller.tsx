@@ -37,11 +37,6 @@ const MessageScrollerNodesContext =
  * Reads or changes the scroll position from anywhere inside a
  * `MessageScrollerProvider`. Works outside the scroller too, such as in a
  * composer's send button.
- *
- * @example
- * ```tsx
- * const { isAtEnd, scrollToEnd } = useMessageScroller();
- * ```
  */
 function useMessageScroller() {
   const context = React.useContext(MessageScrollerContext);
@@ -85,14 +80,6 @@ interface MessageScrollerProviderProps {
 /**
  * Holds the scroll state of the stream. Wrap it around the `MessageScroller`
  * and any control that reads or changes the scroll, such as a composer.
- *
- * @example
- * ```tsx
- * <MessageScrollerProvider>
- *   <MessageScroller>…</MessageScroller>
- *   <Composer />
- * </MessageScrollerProvider>
- * ```
  */
 function MessageScrollerProvider({ children }: MessageScrollerProviderProps) {
   const [viewport, setViewport] = React.useState<HTMLDivElement | null>(null);
@@ -199,24 +186,6 @@ interface MessageScrollerProps extends React.ComponentProps<
 /**
  * Scroll container that keeps the latest turn in view until the reader
  * scrolls up. To announce new turns, set `announce` on `MessageGroup`.
- *
- * @example
- * ```tsx
- * <MessageScrollerProvider>
- *   <MessageScroller className="nx:h-96">
- *     <MessageScrollerViewport>
- *       <MessageScrollerContent>
- *         {turns.map((turn) => (
- *           <MessageScrollerItem key={turn.id}>
- *             <Message>{turn.body}</Message>
- *           </MessageScrollerItem>
- *         ))}
- *       </MessageScrollerContent>
- *     </MessageScrollerViewport>
- *     <MessageScrollerButton />
- *   </MessageScroller>
- * </MessageScrollerProvider>
- * ```
  */
 function MessageScroller({
   className,
@@ -355,12 +324,6 @@ interface MessageScrollerButtonProps
 /**
  * Button that jumps to the latest turn, or the oldest with `direction="start"`.
  * It appears once the reader scrolls away from that end.
- *
- * @example
- * ```tsx
- * <MessageScrollerButton />
- * <MessageScrollerButton direction="start" aria-label="Jump to the oldest message" />
- * ```
  */
 function MessageScrollerButton({
   className,

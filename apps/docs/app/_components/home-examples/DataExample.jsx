@@ -1,7 +1,7 @@
 'use client';
 import { useId, useState } from 'react';
 
-import { Button, Input } from '@nexus_ds/react';
+import { Button, Input } from '@nxds/react';
 const projects = [
   ['Website refresh', 'In progress', 'Maya Chen', 'Oct 24'],
   ['Component library', 'In review', 'Alex Morgan', 'Oct 18'],

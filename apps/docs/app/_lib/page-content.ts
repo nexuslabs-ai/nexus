@@ -14,7 +14,7 @@ export function loadWrittenPage(page: WrittenManifestPage) {
   const loadPage = PAGE_LOADERS[page.route];
   if (!loadPage) {
     throw new Error(
-      `${page.route} is a ${page.kind} page with no PAGE_LOADERS entry — run \`pnpm --filter @nexus_ds/docs generate:manifest\` to resync the generated modules.`
+      `${page.route} is a ${page.kind} page with no PAGE_LOADERS entry — run \`pnpm --filter @nxds/docs generate:manifest\` to resync the generated modules.`
     );
   }
   return loadPage();

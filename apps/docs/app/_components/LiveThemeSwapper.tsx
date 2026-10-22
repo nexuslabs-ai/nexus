@@ -1,6 +1,6 @@
 'use client';
 
-import { useNexusAppearance } from '@nexus_ds/react/appearance';
+import { useNxdsAppearance } from '@nxds/react/appearance';
 
 import {
   getThemeModeOptions,
@@ -8,7 +8,7 @@ import {
   updateThemeMode,
 } from '../_lib/appearance-controls';
 
-import { Button } from './nexus';
+import { Button } from './nxds';
 
 /**
  * Landing-page "Highlights" demo. Reuses the root appearance provider, so
@@ -19,7 +19,7 @@ import { Button } from './nexus';
 const BASES = getThemeModeOptions('base').map((option) => option.value);
 
 export function LiveThemeSwapper() {
-  const { state, setState } = useNexusAppearance();
+  const { state, setState } = useNxdsAppearance();
   const base = getThemeModeValue(state, 'base');
 
   const pick = (value: string) => {

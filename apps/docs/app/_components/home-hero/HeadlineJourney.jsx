@@ -1,6 +1,6 @@
 'use client';
 
-import { Badge } from '@nexus_ds/react';
+import { Badge } from '@nxds/react';
 
 import { WorkbenchJourney } from './WorkbenchJourney';
 

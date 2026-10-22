@@ -128,7 +128,7 @@ gap independently of the older section-spacing preset.
 
 ## Appearance ownership
 
-Homepage and hero styles consume the enclosing NexusAppearanceProvider tokens.
+Homepage and hero styles consume the enclosing NxdsAppearanceProvider tokens.
 Tile surfaces derive primary-subtle pairs from nine illustrative color seeds,
 using the provider state and resolved mode. Label/icon ink meets the body contrast
 tier. Tool tiles inherit muted and foreground. Fonts and text sizes inherit the typography tokens;

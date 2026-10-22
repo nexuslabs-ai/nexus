@@ -68,10 +68,11 @@ opencode.json
 # Superpowers brainstorming companion (local mockups + server state)
 .superpowers/
 
-# Docs build inputs, written by the `@nexus_ds/docs#generate:*` tasks
+# Docs build inputs, written by the `@nxds/docs#generate:*` tasks
 apps/docs/generated/
 apps/docs/__generated__/
 apps/docs/public/avatars/
+apps/docs/public/vue-demos/
 apps/docs/app/_lib/*.generated.ts
 
 # Generated isolated homepage preview

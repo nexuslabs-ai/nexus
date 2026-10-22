@@ -1,8 +1,9 @@
-import { cn } from '@nexus_ds/react/utils';
+import { cn } from '@nxds/react/utils';
 import type { MDXComponents } from 'mdx/types';
 
 import { CodeBlock } from './app/_components/CodeBlock';
 import { ComponentDemo } from './app/_components/ComponentDemo';
+import { FrameworkPanel, FrameworkTabs } from './app/_components/FrameworkTabs';
 import {
   PAGE_HEADING_CLASS,
   SECTION_HEADING_CLASS,
@@ -10,13 +11,14 @@ import {
 } from './app/_components/Heading';
 import { InlineCode } from './app/_components/InlineCode';
 import { InstallBlock } from './app/_components/InstallBlock';
-import * as Nexus from './app/_components/nexus';
+import * as nxds from './app/_components/nxds';
 import { PropsTable } from './app/_components/PropsTable';
+import { VueDemo } from './app/_components/VueComponentPanel';
 
 /**
  * Required by @next/mdx in the App Router. Maps Markdown-rendered HTML to
- * Nexus-styled elements (typography utilities, semantic tokens) and exposes
- * the @nexus_ds/react components so MDX authors can drop a live <Button> etc.
+ * nxds-styled elements (typography utilities, semantic tokens) and exposes
+ * the @nxds/react components so MDX authors can drop a live <Button> etc.
  * into prose with no import.
  */
 export function useMDXComponents(components: MDXComponents): MDXComponents {
@@ -88,8 +90,7 @@ export function useMDXComponents(components: MDXComponents): MDXComponents {
     pre: CodeBlock,
     table: ({ className, ...props }) => (
       <div
-        // A scroll container with no focusable children needs its own tab stop.
-        // eslint-disable-next-line jsx-a11y/no-noninteractive-tabindex
+        // eslint-disable-next-line jsx-a11y/no-noninteractive-tabindex -- a scroll container with no focusable children needs its own tab stop
         tabIndex={0}
         className="nx:mb-4 nx:overflow-x-auto nx:focus-visible:outline-2 nx:focus-visible:outline-focus-default"
       >
@@ -133,10 +134,13 @@ export function useMDXComponents(components: MDXComponents): MDXComponents {
       />
     ),
     ComponentDemo,
+    FrameworkPanel,
+    FrameworkTabs,
     InstallBlock,
     PropsTable,
-    // live @nexus_ds/react components, usable in MDX without an import
-    ...Nexus,
+    VueDemo,
+    // live @nxds/react components, usable in MDX without an import
+    ...nxds,
     // caller-provided overrides win
     ...components,
   };

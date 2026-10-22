@@ -14,7 +14,7 @@ package-lock.json
 # examples/.generated/ is throwaway output.
 /examples
 
-# Auto-generated CSS — produced by @nexus_ds/core token pipeline; do not reformat
+# Auto-generated CSS — produced by @nxds/core token pipeline; do not reformat
 packages/tailwind/*.css
 
 # Auto-generated code — emitted by build scripts; do not reformat

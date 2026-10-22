@@ -74,23 +74,6 @@ type ChoiceCardDescriptionProps = React.ComponentProps<'p'>;
  *
  * With a description, point the control's `aria-labelledby` at `ChoiceCardTitle` and `aria-describedby` at `ChoiceCardDescription`.
  * Otherwise the description becomes part of the control's name.
- *
- * @example
- * ```tsx
- * <ChoiceCard htmlFor="security">
- *   <Checkbox
- *     id="security"
- *     aria-labelledby="security-title"
- *     aria-describedby="security-description"
- *   />
- *   <ChoiceCardContent>
- *     <ChoiceCardTitle id="security-title">Security alerts</ChoiceCardTitle>
- *     <ChoiceCardDescription id="security-description">
- *       Important account notifications.
- *     </ChoiceCardDescription>
- *   </ChoiceCardContent>
- * </ChoiceCard>
- * ```
  */
 function ChoiceCard({ className, variant, ...props }: ChoiceCardProps) {
   return (

@@ -2,7 +2,7 @@
 
 import { useEffect, useRef, useState } from 'react';
 
-import { useNexusAppearance } from '@nexus_ds/react/appearance';
+import { useNxdsAppearance } from '@nxds/react/appearance';
 
 import {
   groups,
@@ -27,7 +27,7 @@ export function ScrollHeadlineJourney({
   const stage = useRef(null);
   const [progress, setProgress] = useState(0);
   const slide = Math.min(2, Math.floor(progress * 3));
-  const { state } = useNexusAppearance();
+  const { state } = useNxdsAppearance();
   const reduceMotion = state.prefs.reduceMotion;
 
   useEffect(() => {

@@ -79,7 +79,7 @@ export const WithText: Story = {
       <InputGroupAddon>
         <InputGroupText>https://</InputGroupText>
       </InputGroupAddon>
-      <InputGroupInput aria-label="Site URL" placeholder="nexus.dev" />
+      <InputGroupInput aria-label="Site URL" placeholder="nxds.dev" />
     </InputGroup>
   ),
 };
@@ -267,7 +267,7 @@ export const WithDataAttributes: Story = {
       <InputGroupAddon>
         <InputGroupText>https://</InputGroupText>
       </InputGroupAddon>
-      <InputGroupInput aria-label="Site URL" placeholder="nexus.dev" />
+      <InputGroupInput aria-label="Site URL" placeholder="nxds.dev" />
       <InputGroupAddon align="inline-end">
         <InputGroupButton aria-label="Clear">Clear</InputGroupButton>
       </InputGroupAddon>
@@ -334,8 +334,8 @@ export const KeyboardInteraction: Story = {
   play: async ({ canvasElement }) => {
     const canvas = within(canvasElement);
     const input = canvas.getByRole('textbox', { name: 'Search' });
-    await userEvent.type(input, 'nexus');
-    await expect(input).toHaveValue('nexus');
+    await userEvent.type(input, 'nxds');
+    await expect(input).toHaveValue('nxds');
   },
 };
 
@@ -388,13 +388,13 @@ export const BorderlessStates: Story = {
       <InputGroup data-testid="ig-borderless-filled" variant="borderless">
         <InputGroupInput
           aria-label="Filled borderless URL"
-          defaultValue="nexus.dev"
+          defaultValue="nxds.dev"
         />
       </InputGroup>
       <InputGroup data-testid="ig-borderless-readonly" variant="borderless">
         <InputGroupInput
           aria-label="Read-only borderless URL"
-          defaultValue="nexus.dev"
+          defaultValue="nxds.dev"
           readOnly
         />
       </InputGroup>
@@ -811,7 +811,7 @@ export const AllVariants: Story = {
         <InputGroupAddon>
           <InputGroupText>https://</InputGroupText>
         </InputGroupAddon>
-        <InputGroupInput aria-label="URL" placeholder="nexus.dev" />
+        <InputGroupInput aria-label="URL" placeholder="nxds.dev" />
         <InputGroupAddon align="inline-end">
           <InputGroupButton size="icon-xs" aria-label="Clear">
             <IconX aria-hidden />

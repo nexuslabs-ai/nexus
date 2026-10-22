@@ -3,10 +3,10 @@
 import { type FormEvent, useMemo, useState } from 'react';
 
 import type {
-  NexusAppearancePrefs,
-  NexusAppearanceState,
+  NxdsAppearancePrefs,
+  NxdsAppearanceState,
   TokenMap,
-} from '@nexus_ds/core';
+} from '@nxds/core';
 import {
   Accordion,
   AccordionContent,
@@ -15,7 +15,7 @@ import {
   Badge,
   Button,
   Input,
-} from '@nexus_ds/react';
+} from '@nxds/react';
 
 import type { ScaleFamily, ScaleToken } from './lab-data';
 import { LEDGER_ROW_CLASS } from './token-ledger';
@@ -32,7 +32,7 @@ const FAMILIES: Record<ScaleFamily, string> = {
   breakpoint: 'Breakpoints',
 };
 
-const PREF_LABELS: Record<keyof NexusAppearancePrefs, string> = {
+const PREF_LABELS: Record<keyof NxdsAppearancePrefs, string> = {
   uiFont: 'UI font',
   codeFont: 'code font',
   uiFontSize: 'UI font size',
@@ -65,8 +65,8 @@ const CSS_WIDE_KEYWORDS = new Set([
 const bare = (name: string) => name.replace('--nx-', '');
 
 function prefLabel(
-  field: keyof NexusAppearancePrefs,
-  prefs: NexusAppearancePrefs
+  field: keyof NxdsAppearancePrefs,
+  prefs: NxdsAppearancePrefs
 ): string {
   const value = prefs[field];
   return typeof value === 'number'
@@ -101,7 +101,7 @@ function accepts(property: string, value: string): boolean {
 
 interface ScaleLedgerProps {
   tokens: ScaleToken[];
-  appearance: NexusAppearanceState;
+  appearance: NxdsAppearanceState;
   /** Overrides that apply in both modes, keyed by `--nx-*` name. */
   overrides: TokenMap;
   /** Sets one token's override; `null` removes it. */

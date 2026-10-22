@@ -15,12 +15,6 @@ const NARROW_QUERY = '(max-width: 47.99rem)';
  * in sync as the viewport resizes. Page-shell components (e.g. Sidebar) read it
  * to pick the tier-appropriate layout — a drawer when narrow, a docked panel
  * at or above `md`.
- *
- * @example
- * ```tsx
- * const isNarrow = useIsNarrow();
- * return isNarrow ? <Drawer /> : <DockedPanel />;
- * ```
  */
 export function useIsNarrow() {
   const [isNarrow, setIsNarrow] = React.useState<boolean | undefined>(

@@ -1,7 +1,7 @@
 'use client';
 import { useId, useState } from 'react';
 
-import { Button, Input, Switch } from '@nexus_ds/react';
+import { Button, Input, Switch } from '@nxds/react';
 
 export function SettingsExample() {
   const id = useId();

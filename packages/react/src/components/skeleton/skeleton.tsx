@@ -10,12 +10,6 @@ interface SkeletonProps extends React.ComponentProps<'div'> {}
 /**
  * Pulsing placeholder that holds the layout while content loads. Set its shape
  * with utilities, such as `nx:h-4 nx:w-48` or `nx:size-12 nx:rounded-full`.
- *
- * @example
- * ```tsx
- * <Skeleton className="nx:h-4 nx:w-48" />
- * <Skeleton className="nx:size-12 nx:rounded-full" />
- * ```
  */
 function Skeleton({ className, ...props }: SkeletonProps) {
   return (

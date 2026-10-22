@@ -1,4 +1,4 @@
-import type { SemanticColorName } from '@nexus_ds/core';
+import type { SemanticColorName } from '@nxds/core';
 
 /** Which semantic color tokens a component part reads, and the stories that show them. */
 export interface ComponentTokenEntry {

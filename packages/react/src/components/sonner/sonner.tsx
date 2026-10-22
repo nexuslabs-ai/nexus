@@ -22,7 +22,7 @@ import {
 
 /**
  * Track the active theme by observing the `.dark` class on the document root
- * (where Nexus toggles dark mode) via MutationObserver, keeping sonner's own
+ * (where nxds toggles dark mode) via MutationObserver, keeping sonner's own
  * `theme` in sync with the design system.
  */
 function subscribeToTheme(notify: () => void) {
@@ -46,7 +46,7 @@ function useToasterTheme(): 'light' | 'dark' {
   );
 }
 
-/** Tabler icons in place of sonner's bundled set, matching Nexus iconography. */
+/** Tabler icons in place of sonner's bundled set, matching nxds iconography. */
 const toasterIcons = {
   success: <IconCircleCheck className="nx:size-4" />,
   info: <IconInfoCircle className="nx:size-4" />,
@@ -57,7 +57,7 @@ const toasterIcons = {
 
 /**
  * Sonner reads these custom properties off the toaster container to colour each
- * toast; map every one to its Nexus semantic token. The `-bg`/`-text`/`-border`
+ * toast; map every one to its nxds semantic token. The `-bg`/`-text`/`-border`
  * triples for success/error/warning/info apply when `richColors` is enabled.
  */
 const toasterThemeVars = {
@@ -79,60 +79,60 @@ const toasterThemeVars = {
   '--error-border': 'var(--nx-color-error-border)',
 };
 
-// Nexus toasts render only in the Nexus Toaster, and a host app's own sonner
+// nxds toasts render only in the nxds Toaster, and a host app's own sonner
 // Toaster never shows them, so mounting both never doubles a toast.
-const NEXUS_TOASTER_ID = 'nexus';
+const NXDS_TOASTER_ID = 'nxds';
 
-function inNexusToaster<Data extends object>(data?: Data) {
-  return { ...data, toasterId: NEXUS_TOASTER_ID };
+function inNxdsToaster<Data extends object>(data?: Data) {
+  return { ...data, toasterId: NXDS_TOASTER_ID };
 }
 
-function isNexusToast(entry: ToastT | ToastToDismiss): entry is ToastT {
-  return 'toasterId' in entry && entry.toasterId === NEXUS_TOASTER_ID;
+function isNxdsToast(entry: ToastT | ToastToDismiss): entry is ToastT {
+  return 'toasterId' in entry && entry.toasterId === NXDS_TOASTER_ID;
 }
 
 type Message = Parameters<typeof sonnerToast.success>[0];
 
 const toast = Object.assign(
   (message: Parameters<typeof sonnerToast>[0], data?: ExternalToast) =>
-    sonnerToast(message, inNexusToaster(data)),
+    sonnerToast(message, inNxdsToaster(data)),
   {
     success: (message: Message, data?: ExternalToast) =>
-      sonnerToast.success(message, inNexusToaster(data)),
+      sonnerToast.success(message, inNxdsToaster(data)),
     info: (message: Message, data?: ExternalToast) =>
-      sonnerToast.info(message, inNexusToaster(data)),
+      sonnerToast.info(message, inNxdsToaster(data)),
     warning: (message: Message, data?: ExternalToast) =>
-      sonnerToast.warning(message, inNexusToaster(data)),
+      sonnerToast.warning(message, inNxdsToaster(data)),
     error: (message: Message, data?: ExternalToast) =>
-      sonnerToast.error(message, inNexusToaster(data)),
+      sonnerToast.error(message, inNxdsToaster(data)),
     message: (message: Message, data?: ExternalToast) =>
-      sonnerToast.message(message, inNexusToaster(data)),
+      sonnerToast.message(message, inNxdsToaster(data)),
     loading: (message: Message, data?: ExternalToast) =>
-      sonnerToast.loading(message, inNexusToaster(data)),
+      sonnerToast.loading(message, inNxdsToaster(data)),
     custom: (
       jsx: Parameters<typeof sonnerToast.custom>[0],
       data?: ExternalToast
-    ) => sonnerToast.custom(jsx, inNexusToaster(data)),
+    ) => sonnerToast.custom(jsx, inNxdsToaster(data)),
     promise: <ToastData,>(
       promise: Parameters<typeof sonnerToast.promise<ToastData>>[0],
       data?: Parameters<typeof sonnerToast.promise<ToastData>>[1]
-    ) => sonnerToast.promise(promise, data && inNexusToaster(data)),
-    // Without an id, dismisses every Nexus toast and leaves the host's alone.
+    ) => sonnerToast.promise(promise, data && inNxdsToaster(data)),
+    // Without an id, dismisses every nxds toast and leaves the host's alone.
     dismiss: (id?: number | string) => {
       if (id !== undefined) return sonnerToast.dismiss(id);
-      for (const entry of sonnerToast.getToasts().filter(isNexusToast)) {
+      for (const entry of sonnerToast.getToasts().filter(isNxdsToast)) {
         sonnerToast.dismiss(entry.id);
       }
     },
-    getHistory: () => sonnerToast.getHistory().filter(isNexusToast),
-    getToasts: () => sonnerToast.getToasts().filter(isNexusToast),
+    getHistory: () => sonnerToast.getHistory().filter(isNxdsToast),
+    getToasts: () => sonnerToast.getToasts().filter(isNxdsToast),
   }
 );
 
-/** The Nexus toasts currently on screen. */
-function useNexusToasts() {
+/** The nxds toasts currently on screen. */
+function useNxdsToasts() {
   const { toasts } = useSonner();
-  return { toasts: toasts.filter(isNexusToast) };
+  return { toasts: toasts.filter(isNxdsToast) };
 }
 
 type ToasterProps = Omit<SonnerToasterProps, 'id'>;
@@ -140,20 +140,6 @@ type ToasterProps = Omit<SonnerToasterProps, 'id'>;
 /**
  * Renders toast notifications. Mount it once near your app root, then call
  * `toast()` from anywhere. It follows the `.dark` class for dark mode.
- *
- * @example
- * ```tsx
- * import { Toaster, toast } from '@nexus_ds/react';
- *
- * function App() {
- *   return (
- *     <>
- *       <button onClick={() => toast('Saved')}>Save</button>
- *       <Toaster />
- *     </>
- *   );
- * }
- * ```
  */
 function Toaster({ style, ...props }: ToasterProps) {
   const theme = useToasterTheme();
@@ -167,17 +153,17 @@ function Toaster({ style, ...props }: ToasterProps) {
             ...toasterThemeVars,
             // Sonner injects a runtime <style> pinning the toaster to
             // z-index:999999999 (not !important); an inline style outranks that
-            // selector rule, keeping us on the Nexus toast layer without `!`.
+            // selector rule, keeping us on the nxds toast layer without `!`.
             zIndex: 'var(--nx-z-index-toast)',
             ...style,
           } as React.CSSProperties
         }
         {...props}
-        id={NEXUS_TOASTER_ID}
+        id={NXDS_TOASTER_ID}
       />
     </div>
   );
 }
 
-export { toast, Toaster, useNexusToasts as useSonner };
+export { toast, Toaster, useNxdsToasts as useSonner };
 export type { ToasterProps };

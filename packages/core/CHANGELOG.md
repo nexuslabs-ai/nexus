@@ -1,4 +1,47 @@
-# @nexus_ds/core
+# @nxds/core
+
+## 0.9.0
+
+### Minor Changes
+
+- afc7bd7: Core now applies and saves the appearance itself, so a provider for any
+  framework needs only its own state and lifecycle.
+
+  | Export                      | What it does                                                           |
+  | --------------------------- | ---------------------------------------------------------------------- |
+  | `applyNxdsAppearance`       | Writes the `.dark` class, mode attributes and theme styles to the page |
+  | `removeNxdsAppearance`      | Undoes `applyNxdsAppearance`                                           |
+  | `persistNxdsAppearance`     | Saves the appearance to localStorage and, optionally, a cookie         |
+  | `readStoredNxdsAppearance`  | Reads the saved appearance, or returns a fallback                      |
+  | `resolveNxdsAppearanceMode` | Resolves `'system'` to `'light'` or `'dark'`                           |
+  | `prefersDarkColorScheme`    | Reads the OS colour scheme                                             |
+  | `watchColorScheme`          | Calls back when the OS colour scheme changes                           |
+
+  `NxdsResolvedAppearanceMode`, `NxdsAppearanceCookieOptions`,
+  `NxdsAppearanceCookieSameSite` and `NXDS_APPEARANCE_COOKIE_MAX_AGE_SECONDS`
+  move here from the React appearance provider. Import them from
+  `@nxds/core`.
+
+## 0.8.0
+
+### Minor Changes
+
+- e743cb7: Rename every `Nexus` export to `Nxds`. The appearance runtime's DOM and storage names change too, so a saved appearance from an earlier version resets once.
+
+  | Before                                                                                        | After                                                               |
+  | --------------------------------------------------------------------------------------------- | ------------------------------------------------------------------- |
+  | `DEFAULT_NEXUS_APPEARANCE`                                                                    | `DEFAULT_NXDS_APPEARANCE`                                           |
+  | `createNexusThemeContract`, `createNexusAppearanceSnapshot` and the other `*Nexus*` functions | `createNxdsThemeContract`, `createNxdsAppearanceSnapshot` and so on |
+  | `NexusAppearanceState`, `NexusDensity` and the other `Nexus*` types                           | `NxdsAppearanceState`, `NxdsDensity` and so on                      |
+  | `data-nexus-appearance-*` attributes                                                          | `data-nxds-appearance-*`                                            |
+  | `nexus-appearance` storage key (`DEFAULT_STORAGE_KEY`)                                        | `nxds-appearance`                                                   |
+  | `nexus-appearance-state` cookie (`DEFAULT_COOKIE_KEY`)                                        | `nxds-appearance-state`                                             |
+
+## 0.7.2
+
+### Patch Changes
+
+- 1d2c04a: The npm pages now link to the docs at https://nxds.dev and to the renamed repository at https://github.com/nexuslabs-ai/nxds.
 
 ## 0.7.1
 

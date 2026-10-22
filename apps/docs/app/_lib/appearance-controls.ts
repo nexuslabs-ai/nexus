@@ -1,24 +1,24 @@
 import {
   BASE_TONE_OPTIONS,
   CORNER_OPTIONS,
-  DEFAULT_NEXUS_APPEARANCE,
+  DEFAULT_NXDS_APPEARANCE,
   DENSITY_OPTIONS,
   ELEVATION_OPTIONS,
-  type NexusAppearanceState,
+  type NxdsAppearanceState,
   STROKE_OPTIONS,
-} from '@nexus_ds/core';
+} from '@nxds/core';
 
-export const DOCS_APPEARANCE_STORAGE_KEY = 'nexus-docs-appearance';
+export const DOCS_APPEARANCE_STORAGE_KEY = 'nxds-docs-appearance';
 
 export const DOCS_APPEARANCE_DEFAULT_STATE = {
-  ...DEFAULT_NEXUS_APPEARANCE,
+  ...DEFAULT_NXDS_APPEARANCE,
   mode: 'system',
   prefs: {
-    ...DEFAULT_NEXUS_APPEARANCE.prefs,
+    ...DEFAULT_NXDS_APPEARANCE.prefs,
     uiFont: '"DM Sans", Arial, sans-serif',
     codeFont: '"JetBrains Mono", monospace',
   },
-} satisfies NexusAppearanceState;
+} satisfies NxdsAppearanceState;
 
 export const THEME_MODE_KEYS = [
   'mode',
@@ -38,10 +38,10 @@ const MODE_TO_FIELD = {
   shadow: 'elevation',
   radius: 'corners',
   borderwidth: 'stroke',
-} as const satisfies Record<ThemeMode, keyof NexusAppearanceState>;
+} as const satisfies Record<ThemeMode, keyof NxdsAppearanceState>;
 
 type ThemeModeValueMap = {
-  [K in ThemeMode]: NexusAppearanceState[(typeof MODE_TO_FIELD)[K]];
+  [K in ThemeMode]: NxdsAppearanceState[(typeof MODE_TO_FIELD)[K]];
 };
 
 export type ThemeModeOption<K extends ThemeMode = ThemeMode> = {
@@ -90,7 +90,7 @@ export function getThemeModeOptions(
 }
 
 export function getThemeModeValue<K extends ThemeMode>(
-  state: NexusAppearanceState,
+  state: NxdsAppearanceState,
   mode: K
 ): ThemeModeValueMap[K] {
   return state[MODE_TO_FIELD[mode]] as unknown as ThemeModeValueMap[K];
@@ -107,10 +107,10 @@ export function sanitizeMode<K extends ThemeMode>(
 }
 
 export function updateThemeMode<K extends ThemeMode>(
-  state: NexusAppearanceState,
+  state: NxdsAppearanceState,
   mode: K,
   value: unknown
-): NexusAppearanceState {
+): NxdsAppearanceState {
   const next = { ...state, [MODE_TO_FIELD[mode]]: sanitizeMode(mode, value) };
-  return next as NexusAppearanceState;
+  return next as NxdsAppearanceState;
 }

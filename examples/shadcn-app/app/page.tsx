@@ -1,6 +1,6 @@
 import { AlertCircleIcon, CheckCircle2Icon, PlusIcon } from "lucide-react"
 
-import * as N from "@/components/nexus-kit"
+import * as N from "@/components/nxds-kit"
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert"
 import { Avatar, AvatarFallback } from "@/components/ui/avatar"
 import { Badge } from "@/components/ui/badge"
@@ -44,15 +44,15 @@ const INVOICES = [
 
 const PLANS = ["Starter", "Pro", "Enterprise"]
 
-function Row({ name, host, nexus }: { name: string; host: React.ReactNode; nexus: React.ReactNode }) {
+function Row({ name, host, nxds }: { name: string; host: React.ReactNode; nxds: React.ReactNode }) {
   return (
     <div className="grid grid-cols-[9rem_1fr_1fr] items-start gap-6 border-b py-6 last:border-b-0">
       <div className="pt-1 text-sm font-medium">{name}</div>
       <div data-check="host" className="flex min-w-0 flex-wrap items-center gap-3">
         {host}
       </div>
-      <div data-check="nexus" className="flex min-w-0 flex-wrap items-center gap-3">
-        {nexus}
+      <div data-check="nxds" className="flex min-w-0 flex-wrap items-center gap-3">
+        {nxds}
       </div>
     </div>
   )
@@ -62,12 +62,12 @@ export default function SideBySidePage() {
   return (
     <div className="mx-auto max-w-6xl">
       <h1 className="text-2xl font-semibold">Side by side</h1>
-      <p className="mt-1 text-muted-foreground">The same component from the app&apos;s shadcn kit and from Nexus.</p>
+      <p className="mt-1 text-muted-foreground">The same component from the app&apos;s shadcn kit and from nxds.</p>
 
       <div className="mt-6 grid grid-cols-[9rem_1fr_1fr] gap-6 text-xs font-medium uppercase tracking-wide text-muted-foreground">
         <span />
         <span>shadcn (host)</span>
-        <span>Nexus</span>
+        <span>nxds</span>
       </div>
 
       <Row
@@ -82,7 +82,7 @@ export default function SideBySidePage() {
             <Button variant="link">Learn more</Button>
           </>
         }
-        nexus={
+        nxds={
           <>
             <N.Button>Save</N.Button>
             <N.Button variant="secondary">Draft</N.Button>
@@ -106,7 +106,7 @@ export default function SideBySidePage() {
             <Button disabled>Disabled</Button>
           </>
         }
-        nexus={
+        nxds={
           <>
             <N.Button size="sm">Small</N.Button>
             <N.Button>Default</N.Button>
@@ -129,7 +129,7 @@ export default function SideBySidePage() {
             <Badge variant="destructive">Failed</Badge>
           </>
         }
-        nexus={
+        nxds={
           <>
             <N.Badge>Active</N.Badge>
             <N.Badge variant="secondary">Draft</N.Badge>
@@ -152,10 +152,10 @@ export default function SideBySidePage() {
             <Input placeholder="Disabled" disabled />
           </div>
         }
-        nexus={
+        nxds={
           <div className="grid w-full max-w-xs gap-2">
-            <N.Label htmlFor="nexus-email">Email</N.Label>
-            <N.Input id="nexus-email" type="email" placeholder="you@acme.com" />
+            <N.Label htmlFor="nxds-email">Email</N.Label>
+            <N.Input id="nxds-email" type="email" placeholder="you@acme.com" />
             <N.Input placeholder="Disabled" disabled />
             <N.Input placeholder="Invalid" aria-invalid />
           </div>
@@ -164,7 +164,7 @@ export default function SideBySidePage() {
       <Row
         name="Textarea"
         host={<Textarea className="max-w-xs" placeholder="Tell us about your team" />}
-        nexus={<N.Textarea className="nx:max-w-xs" placeholder="Tell us about your team" />}
+        nxds={<N.Textarea className="nx:max-w-xs" placeholder="Tell us about your team" />}
       />
       <Row
         name="Select"
@@ -182,12 +182,12 @@ export default function SideBySidePage() {
             </SelectContent>
           </Select>
         }
-        nexus={
+        nxds={
           <N.Select defaultValue="Pro">
             <N.SelectTrigger className="nx:w-48">
               <N.SelectValue placeholder="Plan" />
             </N.SelectTrigger>
-            <N.SelectContent data-check="nexus">
+            <N.SelectContent data-check="nxds">
               {PLANS.map((plan) => (
                 <N.SelectItem key={plan} value={plan}>
                   {plan}
@@ -211,15 +211,15 @@ export default function SideBySidePage() {
             </div>
           </>
         }
-        nexus={
+        nxds={
           <>
             <div className="flex items-center gap-2">
-              <N.Checkbox id="nexus-terms" defaultChecked />
-              <N.Label htmlFor="nexus-terms">Accept terms</N.Label>
+              <N.Checkbox id="nxds-terms" defaultChecked />
+              <N.Label htmlFor="nxds-terms">Accept terms</N.Label>
             </div>
             <div className="flex items-center gap-2">
-              <N.Checkbox id="nexus-news" />
-              <N.Label htmlFor="nexus-news">Newsletter</N.Label>
+              <N.Checkbox id="nxds-news" />
+              <N.Label htmlFor="nxds-news">Newsletter</N.Label>
             </div>
           </>
         }
@@ -232,10 +232,10 @@ export default function SideBySidePage() {
             <Label htmlFor="host-alerts">Email alerts</Label>
           </div>
         }
-        nexus={
+        nxds={
           <div className="flex items-center gap-2">
-            <N.Switch id="nexus-alerts" defaultChecked />
-            <N.Label htmlFor="nexus-alerts">Email alerts</N.Label>
+            <N.Switch id="nxds-alerts" defaultChecked />
+            <N.Label htmlFor="nxds-alerts">Email alerts</N.Label>
           </div>
         }
       />
@@ -253,15 +253,15 @@ export default function SideBySidePage() {
             </div>
           </RadioGroup>
         }
-        nexus={
+        nxds={
           <N.RadioGroup defaultValue="monthly" className="nx:flex nx:gap-4">
             <div className="flex items-center gap-2">
-              <N.RadioGroupItem value="monthly" id="nexus-monthly" />
-              <N.Label htmlFor="nexus-monthly">Monthly</N.Label>
+              <N.RadioGroupItem value="monthly" id="nxds-monthly" />
+              <N.Label htmlFor="nxds-monthly">Monthly</N.Label>
             </div>
             <div className="flex items-center gap-2">
-              <N.RadioGroupItem value="yearly" id="nexus-yearly" />
-              <N.Label htmlFor="nexus-yearly">Yearly</N.Label>
+              <N.RadioGroupItem value="yearly" id="nxds-yearly" />
+              <N.Label htmlFor="nxds-yearly">Yearly</N.Label>
             </div>
           </N.RadioGroup>
         }
@@ -280,7 +280,7 @@ export default function SideBySidePage() {
             </TabsContent>
           </Tabs>
         }
-        nexus={
+        nxds={
           <N.Tabs defaultValue="overview" className="nx:w-full nx:max-w-sm">
             <N.TabsList>
               <N.TabsTrigger value="overview">Overview</N.TabsTrigger>
@@ -305,7 +305,7 @@ export default function SideBySidePage() {
             </CardFooter>
           </Card>
         }
-        nexus={
+        nxds={
           <N.Card className="nx:w-full nx:max-w-sm">
             <N.CardHeader>
               <N.CardTitle>Team plan</N.CardTitle>
@@ -334,7 +334,7 @@ export default function SideBySidePage() {
             </Alert>
           </div>
         }
-        nexus={
+        nxds={
           <div className="grid w-full gap-3">
             <N.Alert variant="success">
               <N.AlertIcon>
@@ -369,7 +369,7 @@ export default function SideBySidePage() {
             </Avatar>
           </>
         }
-        nexus={
+        nxds={
           <>
             <N.Avatar>
               <N.AvatarFallback>PP</N.AvatarFallback>
@@ -383,7 +383,7 @@ export default function SideBySidePage() {
       <Row
         name="Progress"
         host={<Progress value={64} className="max-w-xs" />}
-        nexus={
+        nxds={
           <div className="grid w-full max-w-xs gap-3">
             <N.Progress value={64} />
             <N.Progress value={null} />
@@ -412,7 +412,7 @@ export default function SideBySidePage() {
             </TableBody>
           </Table>
         }
-        nexus={
+        nxds={
           <N.Table>
             <N.TableHeader>
               <N.TableRow>
@@ -443,12 +443,12 @@ export default function SideBySidePage() {
             <TooltipContent data-check="host">Copied to clipboard</TooltipContent>
           </Tooltip>
         }
-        nexus={
+        nxds={
           <N.Tooltip>
             <N.TooltipTrigger asChild>
               <N.Button variant="outline">Hover me</N.Button>
             </N.TooltipTrigger>
-            <N.TooltipContent data-check="nexus">Copied to clipboard</N.TooltipContent>
+            <N.TooltipContent data-check="nxds">Copied to clipboard</N.TooltipContent>
           </N.Tooltip>
         }
       />
@@ -470,14 +470,14 @@ export default function SideBySidePage() {
             </DropdownMenuContent>
           </DropdownMenu>
         }
-        nexus={
+        nxds={
           <N.DropdownMenu>
             <N.DropdownMenuTrigger asChild>
               <N.Button variant="outline" data-check-open>
                 Account
               </N.Button>
             </N.DropdownMenuTrigger>
-            <N.DropdownMenuContent data-check="nexus">
+            <N.DropdownMenuContent data-check="nxds">
               <N.DropdownMenuLabel>My account</N.DropdownMenuLabel>
               <N.DropdownMenuSeparator />
               <N.DropdownMenuItem>Profile</N.DropdownMenuItem>
@@ -502,16 +502,16 @@ export default function SideBySidePage() {
             </PopoverContent>
           </Popover>
         }
-        nexus={
+        nxds={
           <N.Popover>
             <N.PopoverTrigger asChild>
               <N.Button variant="outline" data-check-open>
                 Share
               </N.Button>
             </N.PopoverTrigger>
-            <N.PopoverContent data-check="nexus" className="nx:grid nx:gap-2">
-              <N.Label htmlFor="nexus-share">Invite link</N.Label>
-              <N.Input id="nexus-share" defaultValue="acme.com/invite/8f2k" readOnly />
+            <N.PopoverContent data-check="nxds" className="nx:grid nx:gap-2">
+              <N.Label htmlFor="nxds-share">Invite link</N.Label>
+              <N.Input id="nxds-share" defaultValue="acme.com/invite/8f2k" readOnly />
             </N.PopoverContent>
           </N.Popover>
         }
@@ -537,14 +537,14 @@ export default function SideBySidePage() {
             </DialogContent>
           </Dialog>
         }
-        nexus={
+        nxds={
           <N.Dialog>
             <N.DialogTrigger asChild>
               <N.Button variant="outline" data-check-open>
                 Rename project
               </N.Button>
             </N.DialogTrigger>
-            <N.DialogContent data-check="nexus">
+            <N.DialogContent data-check="nxds">
               <N.DialogHeader>
                 <N.DialogTitle>Rename project</N.DialogTitle>
                 <N.DialogDescription>Everyone with access sees the new name.</N.DialogDescription>

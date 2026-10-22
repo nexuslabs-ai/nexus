@@ -2,19 +2,36 @@ import type { ReactNode } from 'react';
 
 import Link from 'next/link';
 
-import { loadInstallPlan, loadReactSource } from '../_lib/dependencies';
+import {
+  frameworkSourceRoot,
+  loadInstallPlan,
+  loadSource,
+} from '../_lib/dependencies';
+import type { Framework } from '../_lib/frameworks';
 import { requirePage } from '../_lib/manifest';
 
 import { CodeSample, CodeSampleCard } from './CodeSample';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from './nexus';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from './nxds';
 
 type Step = { title: string; body?: ReactNode };
 
 /** The Installation section of a component page: Command and Manual tabs. */
-export async function ComponentInstallation({ slug }: { slug: string }) {
-  const { components, packages, files, styles } = await loadInstallPlan(slug);
+export async function ComponentInstallation({
+  slug,
+  framework = 'react',
+}: {
+  slug: string;
+  framework?: Framework;
+}) {
+  const { components, packages, files, styles } = await loadInstallPlan(
+    slug,
+    framework
+  );
   const sources = await Promise.all(
-    files.map(async (path) => ({ path, source: await loadReactSource(path) }))
+    files.map(async (path) => ({
+      path,
+      source: await loadSource(path, framework),
+    }))
   );
 
   const steps: Step[] = [];
@@ -50,9 +67,9 @@ export async function ComponentInstallation({ slug }: { slug: string }) {
     title: 'Keep each file at the path shown above it.',
     body: (
       <p className="nx:typography-body-default nx:text-muted-foreground">
-        Paths are relative to <code>packages/react/src/</code>. Keep the same
-        folders under your <code>@/</code> root, and the imports between files
-        work without edits.
+        Paths are relative to <code>{frameworkSourceRoot(framework)}</code>.
+        Keep the same folders under your <code>@/</code> root, and the imports
+        between files work without edits.
       </p>
     ),
   });
@@ -93,11 +110,17 @@ export async function ComponentInstallation({ slug }: { slug: string }) {
   );
 }
 
+function sourceLanguage(path: string) {
+  if (path.endsWith('.css')) return 'css';
+  if (path.endsWith('.vue')) return 'vue';
+  return 'tsx';
+}
+
 export function SourceFile({ path, source }: { path: string; source: string }) {
   return (
     <CodeSampleCard
       className="nx:mb-4"
-      lang={path.endsWith('.css') ? 'css' : 'tsx'}
+      lang={sourceLanguage(path)}
       code={source}
       header={
         <figcaption className="nx:px-4 nx:py-2 nx:border-b nx:border-border-default nx:typography-code-inline nx:text-muted-foreground">

@@ -1,12 +1,12 @@
 .DEFAULT_GOAL := help
 
-.PHONY: help setup fresh clean dev docs dev-all build tokens \
+.PHONY: help setup fresh clean dev dev-vue docs dev-all build tokens \
         lint typecheck audit verify \
         up down serve publish
 
 help: ## Show this help (default)
 	@echo ""
-	@echo "Nexus Design System — make targets"
+	@echo "nxds design system — make targets"
 	@echo "Usage: make <target>"
 	@echo ""
 	@awk 'BEGIN{FS=":.*## "}/^[a-zA-Z0-9_-]+:.*## /{printf "  \033[36m%-12s\033[0m %s\n",$$1,$$2}' $(MAKEFILE_LIST)
@@ -31,11 +31,14 @@ clean: ## Stop docs-mcp, remove build outputs + node_modules
 
 # ── Dev servers (turbo-orchestrated) ──────────────────────────────────────────
 
-dev: ## Storybook — the primary component-dev surface (builds @nexus_ds/core first)
-	pnpm turbo storybook --filter=@nexus_ds/react
+dev: ## Storybook — the primary component-dev surface (builds @nxds/core first)
+	pnpm turbo storybook --filter=@nxds/react
 
-docs: ## Docs site + live @nexus_ds/react (turbo: docs + react watcher)
-	pnpm turbo dev --filter=@nexus_ds/docs...
+dev-vue: ## Storybook for @nxds/vue, on port 6007
+	pnpm turbo storybook --filter=@nxds/vue
+
+docs: ## Docs site + live @nxds/react (turbo: docs + react watcher)
+	pnpm turbo dev --filter=@nxds/docs...
 
 dev-all: ## Everything: docs + storybook + package watchers (turbo)
 	pnpm turbo dev storybook

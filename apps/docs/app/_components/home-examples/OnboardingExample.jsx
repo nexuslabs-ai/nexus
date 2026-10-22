@@ -1,7 +1,7 @@
 'use client';
 import { useId, useRef, useState } from 'react';
 
-import { Button, Input } from '@nexus_ds/react';
+import { Button, Input } from '@nxds/react';
 export function OnboardingExample() {
   const id = useId();
   const heading = useRef(null);

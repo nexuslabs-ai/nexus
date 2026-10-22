@@ -12,18 +12,6 @@ const useIsomorphicLayoutEffect =
 
 /**
  * Root of the tabs. Holds the active tab, the list and the panels.
- *
- * @example
- * ```tsx
- * <Tabs defaultValue="tab1">
- *   <TabsList>
- *     <TabsTrigger value="tab1">Tab 1</TabsTrigger>
- *     <TabsTrigger value="tab2">Tab 2</TabsTrigger>
- *   </TabsList>
- *   <TabsContent value="tab1">Content 1</TabsContent>
- *   <TabsContent value="tab2">Content 2</TabsContent>
- * </Tabs>
- * ```
  */
 const Tabs = TabsPrimitive.Root;
 
@@ -44,26 +32,16 @@ interface TabsListProps extends Omit<
 > {
   /**
    * Visual style of every trigger in the list.
-   * @default "default"
    */
   variant?: TabsVariant;
   /**
    * Size of every trigger in the list.
-   * @default "default"
    */
   size?: TabsSize;
 }
 
 /**
  * Row of tab triggers.
- *
- * @example
- * ```tsx
- * <TabsList>
- *   <TabsTrigger value="tab1">Tab 1</TabsTrigger>
- *   <TabsTrigger value="tab2">Tab 2</TabsTrigger>
- * </TabsList>
- * ```
  */
 function TabsList({
   className,
@@ -109,15 +87,18 @@ function TabsList({
         return;
       }
 
-      const height = active.offsetHeight;
-      const y =
-        variant === 'underline'
-          ? active.offsetTop + Math.max(height - 2, 0)
-          : active.offsetTop;
+      const isUnderline = variant === 'underline';
+      const isVertical = list.dataset.orientation === 'vertical';
+      const isVerticalBar = isUnderline && isVertical;
+      const isHorizontalBar = isUnderline && !isVertical;
+      const x = isVerticalBar ? 0 : active.offsetLeft;
+      const y = isHorizontalBar ? 0 : active.offsetTop;
 
-      indicator.style.transform = `translate3d(${active.offsetLeft}px, ${y}px, 0)`;
-      indicator.style.width = `${active.offsetWidth}px`;
-      indicator.style.height = variant === 'underline' ? '2px' : `${height}px`;
+      indicator.style.transform = `translate3d(${x}px, ${y}px, 0)`;
+      indicator.style.width = isVerticalBar ? '' : `${active.offsetWidth}px`;
+      indicator.style.height = isHorizontalBar
+        ? ''
+        : `${active.offsetHeight}px`;
       indicator.style.opacity = '1';
 
       if (!readyRef.current) {
@@ -137,7 +118,7 @@ function TabsList({
     const mutationObserver = new MutationObserver(schedule);
     mutationObserver.observe(list, {
       attributes: true,
-      attributeFilter: ['data-state'],
+      attributeFilter: ['data-state', 'data-orientation'],
       childList: true,
       subtree: true,
     });
@@ -160,6 +141,7 @@ function TabsList({
       data-size={size}
       className={cn(
         'nx:relative nx:isolate nx:inline-flex nx:items-center nx:justify-center',
+        'nx:data-[orientation=vertical]:flex-col nx:data-[orientation=vertical]:items-stretch',
         variant === 'default' &&
           'nx:rounded-md nx:bg-control-background nx:p-1',
         className
@@ -172,9 +154,14 @@ function TabsList({
         data-slot="tabs-indicator"
         data-variant={variant}
         className={cn(
-          'nx:pointer-events-none nx:absolute nx:top-0 nx:left-0 nx:z-0 nx:opacity-0',
-          'nx:data-[variant=default]:rounded-sm nx:data-[variant=default]:border-default nx:data-[variant=default]:border-border-default nx:data-[variant=default]:bg-background',
-          'nx:data-[variant=underline]:bg-primary-background',
+          'nx:pointer-events-none nx:absolute nx:z-0 nx:opacity-0',
+          variant === 'default' &&
+            'nx:top-0 nx:left-0 nx:rounded-sm nx:border-default nx:border-border-default nx:bg-background',
+          variant === 'underline' && [
+            'nx:bg-primary-background',
+            'nx:[[data-orientation=horizontal]>&]:bottom-0 nx:[[data-orientation=horizontal]>&]:left-0 nx:[[data-orientation=horizontal]>&]:h-(--nx-borderwidth-thick)',
+            'nx:[[data-orientation=vertical]>&]:top-0 nx:[[data-orientation=vertical]>&]:right-0 nx:[[data-orientation=vertical]>&]:w-(--nx-borderwidth-thick)',
+          ],
           ready &&
             'nx:transition-[transform,width,height] nx:duration-fast nx:ease-move'
         )}
@@ -203,7 +190,6 @@ const tabsTriggerVariants = cva(
     variants: {
       /**
        * Visual style.
-       * @default "default"
        */
       variant: {
         default: [
@@ -213,13 +199,13 @@ const tabsTriggerVariants = cva(
         ],
         underline: [
           'nx:rounded-none nx:border-0 nx:border-b-thick nx:border-transparent',
+          'nx:data-[orientation=vertical]:border-b-0 nx:data-[orientation=vertical]:border-r-thick',
           'nx:bg-transparent',
           'nx:data-[state=active]:text-foreground',
         ],
       },
       /**
        * Size.
-       * @default "default"
        */
       size: {
         sm: 'nx:px-2 nx:py-1 nx:typography-label-small',
@@ -244,11 +230,6 @@ interface TabsTriggerProps extends React.ComponentProps<
 /**
  * Tab button that shows its panel. Takes its style from the TabsList `variant`
  * and `size`.
- *
- * @example
- * ```tsx
- * <TabsTrigger value="account">Account</TabsTrigger>
- * ```
  */
 function TabsTrigger({ className, ...props }: TabsTriggerProps) {
   const { variant, size } = React.useContext(TabsListContext);
@@ -273,13 +254,6 @@ interface TabsContentProps extends React.ComponentProps<
 
 /**
  * Panel for one tab, shown only while that tab is active.
- *
- * @example
- * ```tsx
- * <TabsContent value="account">
- *   <p>Account settings content</p>
- * </TabsContent>
- * ```
  */
 function TabsContent({ className, ...props }: TabsContentProps) {
   return (

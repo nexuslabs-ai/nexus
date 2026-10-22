@@ -51,22 +51,22 @@ ${controls}
     ],
     ...['light', 'dark'].map((mode) => [
       `${name}:appearance:${mode}`,
-      `import { DEFAULT_NEXUS_APPEARANCE } from '@nexus_ds/core';
-import { NexusAppearanceProvider } from '@nexus_ds/react/appearance';
+      `import { DEFAULT_NXDS_APPEARANCE } from '@nxds/core';
+import { NxdsAppearanceProvider } from '@nxds/react/appearance';
 
 const preset = ${JSON.stringify(invitationAppearance(name, mode), null, 2)};
 const appearance = {
-  ...DEFAULT_NEXUS_APPEARANCE,
+  ...DEFAULT_NXDS_APPEARANCE,
   ...preset,
-  prefs: { ...DEFAULT_NEXUS_APPEARANCE.prefs, ...preset.prefs },
+  prefs: { ...DEFAULT_NXDS_APPEARANCE.prefs, ...preset.prefs },
 };
 
 // Inside the isolated preview document.
 // Keep your existing library's theme provider too.
-<NexusAppearanceProvider state={appearance}
+<NxdsAppearanceProvider state={appearance}
   storageKey={false} cookieWriteKey={false}>
   <InviteForm />
-</NexusAppearanceProvider>`,
+</NxdsAppearanceProvider>`,
     ]),
   ])
 );
@@ -131,8 +131,8 @@ ol, ul, menu { list-style: none; }
 *, ::before, ::after { margin: 0; padding: 0; border: 0 solid; }
 
 // RIGHT: Nexus styles, without Preflight
-@import "@nexus_ds/tailwind";
-// Use NexusAppearanceProvider in the isolated document.
+@import "@nxds/tailwind";
+// Use NxdsAppearanceProvider in the isolated document.
 // It writes --nx-* tokens and appearance settings.
 // Existing host globals and component themes stay in place.
 

@@ -30,7 +30,7 @@ const meta: Meta<typeof ChartContainer> = {
     docs: {
       description: {
         component:
-          'ChartContainer wraps a Recharts chart with Nexus colors, tooltips and legends. Use it for bar, area and line charts. Set the label and color of each series in `config`.',
+          'ChartContainer wraps a Recharts chart with nxds colors, tooltips and legends. Use it for bar, area and line charts. Set the label and color of each series in `config`.',
       },
     },
   },

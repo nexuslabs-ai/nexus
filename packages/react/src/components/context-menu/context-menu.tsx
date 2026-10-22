@@ -13,17 +13,6 @@ import {
 
 /**
  * Root component for the context menu. Opens when the trigger is right-clicked.
- *
- * @example
- * ```tsx
- * <ContextMenu>
- *   <ContextMenuTrigger>Right click here</ContextMenuTrigger>
- *   <ContextMenuContent>
- *     <ContextMenuItem>Item 1</ContextMenuItem>
- *     <ContextMenuItem>Item 2</ContextMenuItem>
- *   </ContextMenuContent>
- * </ContextMenu>
- * ```
  */
 const ContextMenu = ContextMenuPrimitive.Root;
 
@@ -62,7 +51,6 @@ interface ContextMenuSubTriggerProps extends React.ComponentProps<
 > {
   /**
    * Indents the trigger to line up with items that have a leading icon or check.
-   * @default false
    */
   inset?: boolean;
 }
@@ -139,14 +127,6 @@ interface ContextMenuContentProps extends React.ComponentProps<
 
 /**
  * The menu panel. Opens at the cursor.
- *
- * @example
- * ```tsx
- * <ContextMenuContent>
- *   <ContextMenuItem>Back</ContextMenuItem>
- *   <ContextMenuItem>Reload</ContextMenuItem>
- * </ContextMenuContent>
- * ```
  */
 function ContextMenuContent({ className, ...props }: ContextMenuContentProps) {
   return (
@@ -194,19 +174,12 @@ interface ContextMenuItemProps
     VariantProps<typeof contextMenuItemVariants> {
   /**
    * Indents the item to line up with items that have a leading icon or check.
-   * @default false
    */
   inset?: boolean;
 }
 
 /**
  * A single menu action.
- *
- * @example
- * ```tsx
- * <ContextMenuItem>Back</ContextMenuItem>
- * <ContextMenuItem variant="destructive">Delete</ContextMenuItem>
- * ```
  */
 function ContextMenuItem({
   className,
@@ -240,13 +213,6 @@ interface ContextMenuCheckboxItemProps extends React.ComponentProps<
 
 /**
  * A menu item that toggles on and off.
- *
- * @example
- * ```tsx
- * <ContextMenuCheckboxItem checked={showPanel} onCheckedChange={setShowPanel}>
- *   Show Panel
- * </ContextMenuCheckboxItem>
- * ```
  */
 function ContextMenuCheckboxItem({
   className,
@@ -301,14 +267,6 @@ interface ContextMenuRadioItemProps extends React.ComponentProps<
 
 /**
  * A menu item for picking one option from a ContextMenuRadioGroup.
- *
- * @example
- * ```tsx
- * <ContextMenuRadioGroup value={position} onValueChange={setPosition}>
- *   <ContextMenuRadioItem value="top">Top</ContextMenuRadioItem>
- *   <ContextMenuRadioItem value="bottom">Bottom</ContextMenuRadioItem>
- * </ContextMenuRadioGroup>
- * ```
  */
 function ContextMenuRadioItem({
   className,
@@ -359,18 +317,12 @@ interface ContextMenuLabelProps extends React.ComponentProps<
 > {
   /**
    * Indents the label to line up with items that have a leading icon or check.
-   * @default false
    */
   inset?: boolean;
 }
 
 /**
  * A heading for a group of menu items.
- *
- * @example
- * ```tsx
- * <ContextMenuLabel>Actions</ContextMenuLabel>
- * ```
  */
 function ContextMenuLabel({
   className,
@@ -428,13 +380,6 @@ interface ContextMenuShortcutProps extends React.ComponentProps<'span'> {}
 
 /**
  * A keyboard shortcut hint, right-aligned in a ContextMenuItem.
- *
- * @example
- * ```tsx
- * <ContextMenuItem>
- *   Reload <ContextMenuShortcut>⌘R</ContextMenuShortcut>
- * </ContextMenuItem>
- * ```
  */
 function ContextMenuShortcut({
   className,

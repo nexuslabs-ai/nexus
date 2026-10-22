@@ -1,4 +1,5 @@
 import { storybookTest } from '@storybook/addon-vitest/vitest-plugin';
+import vue from '@vitejs/plugin-vue';
 import { playwright } from '@vitest/browser-playwright';
 import path from 'path';
 import { defineConfig } from 'vitest/config';
@@ -7,7 +8,7 @@ export default defineConfig({
   resolve: {
     alias: [
       {
-        find: /^@nexus_ds\/core$/,
+        find: /^@nxds\/core$/,
         replacement: path.resolve(__dirname, './packages/core/src/index.ts'),
       },
       {
@@ -39,7 +40,7 @@ export default defineConfig({
           include: [
             'packages/core/src/lib/*.test.ts',
             'packages/react/src/lib/utils.test.ts',
-            'packages/eslint-plugin-nexus/__tests__/*.test.js',
+            'packages/eslint-plugin/__tests__/*.test.js',
           ],
         },
       },
@@ -68,6 +69,27 @@ export default defineConfig({
               'packages/react/.storybook/vitest.setup.ts'
             ),
           ],
+        },
+      },
+      // Vue story tests - the same play-function and axe checks for @nxds/vue
+      {
+        extends: true,
+        plugins: [
+          vue(),
+          storybookTest({
+            configDir: path.resolve(__dirname, 'packages/vue/.storybook'),
+            storybookScript: 'pnpm --filter @nxds/vue storybook --no-open',
+          }),
+        ],
+        root: path.resolve(__dirname, 'packages/vue'),
+        test: {
+          name: 'storybook-vue',
+          browser: {
+            enabled: true,
+            provider: playwright(),
+            headless: true,
+            instances: [{ browser: 'chromium' }],
+          },
         },
       },
     ],

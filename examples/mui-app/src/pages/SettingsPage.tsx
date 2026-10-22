@@ -18,7 +18,7 @@ import {
   Typography,
 } from '@mui/material'
 
-import * as N from '../components/nexus-kit'
+import * as N from '../components/nxds-kit'
 
 const API_KEYS = [
   { name: 'Production', key: 'sk_live_…4f2a', created: '2 Sep 2026', status: 'Active' },
@@ -40,7 +40,7 @@ export function SettingsPage() {
           Settings
         </Typography>
         <Typography color="text.secondary">
-          An existing MUI page. The Notifications and API keys sections are Nexus.
+          An existing MUI page. The Notifications and API keys sections are nxds.
         </Typography>
       </Box>
 
@@ -73,7 +73,7 @@ export function SettingsPage() {
         </CardActions>
       </Card>
 
-      <div data-check="nexus">
+      <div data-check="nxds">
         <N.Card>
           <N.CardHeader>
             <N.CardTitle>Notifications</N.CardTitle>
@@ -108,9 +108,9 @@ export function SettingsPage() {
         <CardHeader
           avatar={<KeyIcon fontSize="small" />}
           title="API keys"
-          subheader="An MUI card holding a Nexus table."
+          subheader="An MUI card holding an nxds table."
         />
-        <CardContent data-check="nexus">
+        <CardContent data-check="nxds">
           <N.Table density="compact">
             <N.TableHeader>
               <N.TableRow>
@@ -150,14 +150,14 @@ export function SettingsPage() {
           <AlertTitle>Delete workspace</AlertTitle>
           This removes every project, key and member. It cannot be undone.
         </Alert>
-        <div data-check="nexus">
+        <div data-check="nxds">
           <N.Dialog>
             <N.DialogTrigger asChild>
               <N.Button variant="destructive" data-check-open>
                 Delete workspace
               </N.Button>
             </N.DialogTrigger>
-            <N.DialogContent data-check="nexus">
+            <N.DialogContent data-check="nxds">
               <N.DialogHeader>
                 <N.DialogTitle>Delete Acme Console?</N.DialogTitle>
                 <N.DialogDescription>Type the workspace name to confirm.</N.DialogDescription>

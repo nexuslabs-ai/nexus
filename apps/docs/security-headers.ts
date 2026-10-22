@@ -1,28 +1,29 @@
 import {
-  createNexusAppearanceBootstrapScript,
-  createNexusAppearanceSnapshotFromState,
-} from '@nexus_ds/core';
+  createNxdsAppearanceBootstrapScript,
+  createNxdsAppearanceSnapshotFromState,
+} from '@nxds/core';
 import { createHash } from 'node:crypto';
 
 import {
   DOCS_APPEARANCE_DEFAULT_STATE,
   DOCS_APPEARANCE_STORAGE_KEY,
 } from './app/_lib/appearance-controls';
+import { FRAMEWORK_BOOTSTRAP_SCRIPT } from './app/_lib/frameworks';
 
-const DOCS_APPEARANCE_BOOTSTRAP_SCRIPT = createNexusAppearanceBootstrapScript({
+const DOCS_APPEARANCE_BOOTSTRAP_SCRIPT = createNxdsAppearanceBootstrapScript({
   storageKey: DOCS_APPEARANCE_STORAGE_KEY,
-  defaultSnapshot: createNexusAppearanceSnapshotFromState(
+  defaultSnapshot: createNxdsAppearanceSnapshotFromState(
     DOCS_APPEARANCE_DEFAULT_STATE
   ),
 });
 
-const DOCS_APPEARANCE_BOOTSTRAP_CSP_HASH = `'sha256-${createHash('sha256')
-  .update(DOCS_APPEARANCE_BOOTSTRAP_SCRIPT)
-  .digest('base64')}'`;
+function cspHash(script: string) {
+  return `'sha256-${createHash('sha256').update(script).digest('base64')}'`;
+}
 
 const CONTENT_SECURITY_POLICY_REPORT_ONLY = [
   "default-src 'self'",
-  `script-src 'self' ${DOCS_APPEARANCE_BOOTSTRAP_CSP_HASH} 'report-sample'`,
+  `script-src 'self' ${cspHash(DOCS_APPEARANCE_BOOTSTRAP_SCRIPT)} ${cspHash(FRAMEWORK_BOOTSTRAP_SCRIPT)} 'report-sample'`,
   "style-src 'self' 'unsafe-inline'",
   "img-src 'self' data: blob:",
   "font-src 'self'",

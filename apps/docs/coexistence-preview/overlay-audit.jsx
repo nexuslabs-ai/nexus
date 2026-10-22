@@ -9,7 +9,7 @@ import {
   DialogTitle,
   ThemeProvider,
 } from '@mui/material';
-import { DEFAULT_NEXUS_APPEARANCE } from '@nexus_ds/core';
+import { DEFAULT_NXDS_APPEARANCE } from '@nxds/core';
 import {
   Combobox,
   ComboboxContent,
@@ -18,7 +18,7 @@ import {
   ComboboxItem,
   ComboboxList,
   ComboboxTrigger,
-} from '@nexus_ds/react';
+} from '@nxds/react';
 import {
   Button as NButton,
   Checkbox as NCheckbox,
@@ -31,8 +31,8 @@ import {
   TabsList as NTabsList,
   TabsTrigger as NTabsTrigger,
   Textarea as NTextarea,
-} from '@nexus_ds/react';
-import { NexusAppearanceProvider } from '@nexus_ds/react/appearance';
+} from '@nxds/react';
+import { NxdsAppearanceProvider } from '@nxds/react/appearance';
 import { ConfigProvider, Modal, theme } from 'antd';
 import { Command as CommandPrimitive } from 'cmdk';
 
@@ -216,13 +216,13 @@ function Controls() {
 let app = params.get('view') === 'controls' ? <Controls /> : <Audit />;
 if (kit === 'nexus')
   app = (
-    <NexusAppearanceProvider
-      state={{ ...DEFAULT_NEXUS_APPEARANCE, mode: 'dark' }}
+    <NxdsAppearanceProvider
+      state={{ ...DEFAULT_NXDS_APPEARANCE, mode: 'dark' }}
       storageKey={false}
       cookieWriteKey={false}
     >
       {app}
-    </NexusAppearanceProvider>
+    </NxdsAppearanceProvider>
   );
 createRoot(document.getElementById('root')).render(
   host === 'mui' ? (

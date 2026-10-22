@@ -212,7 +212,7 @@ export const WithDataAttributes: Story = {
   },
 };
 
-// The toaster rides the Nexus toast layer (z-index 100) via an inline style,
+// The toaster rides the nxds toast layer (z-index 100) via an inline style,
 // which outranks sonner's injected z-index:999999999 without `!important`.
 // Sonner only mounts its container once a toast exists, so fire one first.
 export const ToastLayer: Story = {
@@ -237,23 +237,23 @@ export const ToastLayer: Story = {
   },
 };
 
-function NexusToastCount() {
+function NxdsToastCount() {
   const { toasts } = useSonner();
-  return <output aria-label="Nexus toast count">{toasts.length}</output>;
+  return <output aria-label="nxds toast count">{toasts.length}</output>;
 }
 
-// A host app's own sonner Toaster sits beside Nexus's. Each shows only its own
-// toasts, and Nexus's dismiss and getToasts leave the host's toast alone.
+// A host app's own sonner Toaster sits beside nxds's. Each shows only its own
+// toasts, and nxds's dismiss and getToasts leave the host's toast alone.
 export const BesideHostToaster: Story = {
   render: () => (
     <>
       <div className="nx:flex nx:gap-2">
-        <Button onClick={() => toast('Saved in Nexus')}>Nexus toast</Button>
+        <Button onClick={() => toast('Saved in nxds')}>nxds toast</Button>
         <Button variant="outline" onClick={() => hostToast('Saved in host')}>
           Host toast
         </Button>
       </div>
-      <NexusToastCount />
+      <NxdsToastCount />
       <Toaster />
       <HostToaster containerAriaLabel="App notifications" />
     </>
@@ -261,25 +261,25 @@ export const BesideHostToaster: Story = {
   play: async ({ canvasElement }) => {
     const canvas = within(canvasElement);
     const body = within(document.body);
-    const count = canvas.getByRole('status', { name: 'Nexus toast count' });
-    await userEvent.click(canvas.getByRole('button', { name: 'Nexus toast' }));
+    const count = canvas.getByRole('status', { name: 'nxds toast count' });
+    await userEvent.click(canvas.getByRole('button', { name: 'nxds toast' }));
     await userEvent.click(canvas.getByRole('button', { name: 'Host toast' }));
 
-    const nexusToast = await body.findByText('Saved in Nexus');
+    const nxdsToast = await body.findByText('Saved in nxds');
     const hostToastText = await body.findByText('Saved in host');
-    await expect(body.getAllByText('Saved in Nexus')).toHaveLength(1);
+    await expect(body.getAllByText('Saved in nxds')).toHaveLength(1);
     await expect(body.getAllByText('Saved in host')).toHaveLength(1);
-    await expect(nexusToast.closest('[data-slot="toaster"]')).not.toBeNull();
+    await expect(nxdsToast.closest('[data-slot="toaster"]')).not.toBeNull();
     await expect(hostToastText.closest('[data-slot="toaster"]')).toBeNull();
     const titles = toast.getToasts().map((entry) => entry.title);
-    await expect(titles).toContain('Saved in Nexus');
+    await expect(titles).toContain('Saved in nxds');
     await expect(titles).not.toContain('Saved in host');
-    // useSonner counts only the Nexus toast.
+    // useSonner counts only the nxds toast.
     await expect(count).toHaveTextContent('1');
 
     toast.dismiss();
     await waitFor(async () => {
-      await expect(body.queryByText('Saved in Nexus')).toBeNull();
+      await expect(body.queryByText('Saved in nxds')).toBeNull();
     });
     await expect(body.getByText('Saved in host')).toBeInTheDocument();
     hostToast.dismiss();

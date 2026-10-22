@@ -1,10 +1,11 @@
-import type { NexusAppearanceState } from '@nexus_ds/core';
-
-import type { NexusResolvedAppearanceMode } from '../provider';
+import type {
+  NxdsAppearanceState,
+  NxdsResolvedAppearanceMode,
+} from '@nxds/core';
 
 function toLines(
-  state: NexusAppearanceState,
-  resolvedMode: NexusResolvedAppearanceMode
+  state: NxdsAppearanceState,
+  resolvedMode: NxdsResolvedAppearanceMode
 ): { key: string; text: string }[] {
   return [
     { key: 'mode', text: `mode: "${state.mode}",` },
@@ -20,15 +21,15 @@ function toLines(
   ];
 }
 
-export interface NexusAppearanceConfigPreviewProps {
-  state: NexusAppearanceState;
-  resolvedMode: NexusResolvedAppearanceMode;
+export interface NxdsAppearanceConfigPreviewProps {
+  state: NxdsAppearanceState;
+  resolvedMode: NxdsResolvedAppearanceMode;
 }
 
-export function NexusAppearanceConfigPreview({
+export function NxdsAppearanceConfigPreview({
   state,
   resolvedMode,
-}: NexusAppearanceConfigPreviewProps) {
+}: NxdsAppearanceConfigPreviewProps) {
   const lines = toLines(state, resolvedMode);
 
   return (

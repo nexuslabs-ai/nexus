@@ -16,16 +16,6 @@ interface CollapsibleProps extends React.ComponentProps<
 /**
  * Shows and hides one content region. The trigger toggles the content open
  * and closed.
- *
- * @example
- * ```tsx
- * <Collapsible>
- *   <CollapsibleTrigger asChild>
- *     <Button variant="ghost">Toggle details</Button>
- *   </CollapsibleTrigger>
- *   <CollapsibleContent>Hidden details…</CollapsibleContent>
- * </Collapsible>
- * ```
  */
 function Collapsible(props: CollapsibleProps) {
   return <CollapsiblePrimitive.Root data-slot="collapsible" {...props} />;

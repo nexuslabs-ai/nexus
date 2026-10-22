@@ -1,9 +1,9 @@
 import React, { useState } from 'react';
 import { createRoot } from 'react-dom/client';
 
-import { DEFAULT_NEXUS_APPEARANCE } from '@nexus_ds/core';
-import { Alert, AlertDescription, AlertTitle, Button } from '@nexus_ds/react';
-import { NexusAppearanceProvider } from '@nexus_ds/react/appearance';
+import { DEFAULT_NXDS_APPEARANCE } from '@nxds/core';
+import { Alert, AlertDescription, AlertTitle, Button } from '@nxds/react';
+import { NxdsAppearanceProvider } from '@nxds/react/appearance';
 
 import {
   Alert as ShadcnAlert,
@@ -107,13 +107,13 @@ function BillingStatus() {
 }
 createRoot(document.getElementById('root')).render(
   nexus ? (
-    <NexusAppearanceProvider
-      state={{ ...DEFAULT_NEXUS_APPEARANCE, mode }}
+    <NxdsAppearanceProvider
+      state={{ ...DEFAULT_NXDS_APPEARANCE, mode }}
       storageKey={false}
       cookieWriteKey={false}
     >
       <BillingStatus />
-    </NexusAppearanceProvider>
+    </NxdsAppearanceProvider>
   ) : (
     <BillingStatus />
   )

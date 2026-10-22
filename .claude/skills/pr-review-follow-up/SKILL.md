@@ -40,7 +40,7 @@ Always load and check the new diff against:
 | [project-stage.md](../../rules/project-stage.md)                                 | Reject new migration files; flag backcompat shims and feature flags                                                 |
 | [no-environment-branching.md](../../rules/no-environment-branching.md)           | Flag any OS, browser, or input-device query or variant the rule bans                                                |
 | [component-owned-styling.md](../../rules/component-owned-styling.md)             | Reject theme selectors that target a component (`data-slot`, `class~=`); require a utility applied in the component |
-| [docs-mcp.md](../../rules/docs-mcp.md)                                           | Verify third-party API usage via nexus-docs-mcp before approving                                                    |
+| [docs-mcp.md](../../rules/docs-mcp.md)                                           | Verify third-party API usage via nxds-docs-mcp before approving                                                     |
 
 ## Prerequisites
 

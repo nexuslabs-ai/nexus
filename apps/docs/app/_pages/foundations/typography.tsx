@@ -7,13 +7,13 @@ import { SectionHeading, SubsectionHeading } from '../../_components/Heading';
  * the letter-spacing / text-wrap rules.
  *
  * The tier classes are stored as full literal strings so Tailwind's scanner
- * emits them; the composites also ship wholesale via @nexus_ds/tailwind.
+ * emits them; the composites also ship wholesale via @nxds/tailwind.
  *
  * Source: packages/core/tokens/ (typography).
  */
 
 export const description =
-  'The Nexus UI type scale. Each of its twelve steps is one class that sets size, weight, line height and letter spacing.';
+  'The nxds type scale. Each of its twelve steps is one class that sets size, weight, line height and letter spacing.';
 
 const SCALE: {
   group: string;
@@ -183,7 +183,7 @@ export default function Typography() {
           in running prose.
         </p>
         <CodeSample lang="tsx">
-          {`import { Button } from '@nexus_ds/react';
+          {`import { Button } from '@nxds/react';
 
 <Button variant="secondary">Ship it</Button>`}
         </CodeSample>

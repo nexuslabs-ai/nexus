@@ -8,7 +8,7 @@ import {
   CommandInput,
   CommandItem,
   CommandList,
-} from '@nexus_ds/react';
+} from '@nxds/react';
 import { Button as AntButton, ConfigProvider, theme as antTheme } from 'antd';
 
 import { Button as ShadcnButton } from './ui/button';
