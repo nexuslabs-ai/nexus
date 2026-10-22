@@ -328,12 +328,14 @@ export default tseslint.config(
     entryPoint: repoPath('apps/docs/app/globals.css'),
   }),
 
-  // Button consumes --nx-radius-base; FilterConditionField opts in with a
-  // line-scoped disable (both documented in theming/overrides).
+  // Button consumes --nx-radius-base, and FilterConditionField's joined
+  // segment follows it (both documented in theming/overrides). The exemption
+  // lives here, so copied source carries no disable for a rule apps don't have.
   {
     files: ['packages/react/src/components/**/*.{ts,tsx}'],
     ignores: [
       'packages/react/src/components/button/button.tsx',
+      'packages/react/src/components/filter-condition/filter-condition.tsx',
       '**/*.stories.tsx',
       '**/*.test.{ts,tsx}',
     ],

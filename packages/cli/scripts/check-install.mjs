@@ -186,13 +186,16 @@ function writePage(file, srcDir, names) {
     [
       "'use client';",
       '',
+      "import { Suspense } from 'react';",
+      '',
       ...names.map((name) => `import ${name} from '${from}/${name}';`),
       '',
+      // Next's Cache Components prerender needs Suspense around the examples that read today's date.
       'export default function NxdsCheck() {',
       '  return (',
-      '    <>',
+      '    <Suspense>',
       ...names.map((name) => `      <${name} />`),
-      '    </>',
+      '    </Suspense>',
       '  );',
       '}',
       '',

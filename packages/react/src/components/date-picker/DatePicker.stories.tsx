@@ -77,7 +77,7 @@ const meta: Meta<typeof DatePicker> = {
     docs: {
       description: {
         component:
-          'DatePicker shows a calendar grid for picking one date, a range or several dates. Install `react-day-picker` in your app to use it.',
+          "DatePicker shows a calendar grid for picking one date, a range or several dates. Install `react-day-picker` in your app to use it. If your Next.js app uses Cache Components, render DatePicker inside `<Suspense>` so it can read today's date.",
       },
     },
   },

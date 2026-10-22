@@ -16,18 +16,16 @@ const NARROW_QUERY = '(max-width: 47.99rem)';
  * to pick the tier-appropriate layout — a drawer when narrow, a docked panel
  * at or above `md`.
  */
+function subscribe(onChange: () => void) {
+  const mql = window.matchMedia(NARROW_QUERY);
+  mql.addEventListener('change', onChange);
+  return () => mql.removeEventListener('change', onChange);
+}
+
 export function useIsNarrow() {
-  const [isNarrow, setIsNarrow] = React.useState<boolean | undefined>(
-    undefined
+  return React.useSyncExternalStore(
+    subscribe,
+    () => window.matchMedia(NARROW_QUERY).matches,
+    () => false
   );
-
-  React.useEffect(() => {
-    const mql = window.matchMedia(NARROW_QUERY);
-    const onChange = () => setIsNarrow(mql.matches);
-    mql.addEventListener('change', onChange);
-    setIsNarrow(mql.matches);
-    return () => mql.removeEventListener('change', onChange);
-  }, []);
-
-  return !!isNarrow;
 }

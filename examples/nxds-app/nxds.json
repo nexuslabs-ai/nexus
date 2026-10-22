@@ -1,6 +1,6 @@
 {
   "framework": "react",
-  "revision": "1bed08253676",
+  "revision": "ec191cbb6008",
   "dir": "components/nxds",
   "css": "app/globals.css",
   "items": [
@@ -44,7 +44,7 @@
     "tailwind/variables.css": "dd34727c38a8f6aa4848b8a3ed7fd4cf416d640524b800ac3050da83a0803f47",
     "components/appearance/provider/factory.tsx": "75c557c33817214bdc6c7b228526d76e8524d3f33133e4e8eba65a4736da3e7e",
     "components/appearance/provider/index.ts": "16b38b7f71c361d1481f8c0482c5f98c28162b6d192b8ff86f671a62bcaf0f7f",
-    "components/appearance/provider/provider.tsx": "f199e3485bfcc2ad49a475e682d3f2c1aaa2a4ce27c463507adf25cb624aeb2d",
+    "components/appearance/provider/provider.tsx": "cdd2d94214259ea176fda9a195a746fb6d773b200e1ec45816accaac59499c0a",
     "components/appearance/provider/script.tsx": "4cbcb81508a218b6d5b1845b1067e2c87a42025417d83a449c2850f47a54433d",
     "components/appearance/provider/server.ts": "4af96770e25548ed3e0b44f23e360ead76277327802fdbf209d7c3f89614cc91",
     "lib/utils.ts": "bfc096cf5531e4712abd3d516239c9f024d59b0b5ff5a0f6ff8712fe79b3f0da",
@@ -84,7 +84,7 @@
     "components/tooltip/tooltip-group.ts": "a5e84db4d8d8aae29b8ddc2fe2ecba59357b865fed499f991bdb00ed823a3efa",
     "components/tooltip/tooltip.tsx": "9e75f75f8232f673b68ea8db94413733016d928bfb8de978ef6a764c8af364d5",
     "components/sidebar/sidebar.tsx": "239978a1ce86a83eee92fe2b86bac46ef4991afa15b1007919dbcfdfadf60f26",
-    "hooks/use-narrow.ts": "18c38e182ccfad04c3bdbe44956b64eaa7638473109aa1f6f93c31dd1ced6327",
+    "hooks/use-narrow.ts": "c74a640f35cf10c934a793bd134254a1089c531e738c1dc66132931445116ebc",
     "components/sonner/sonner.tsx": "04b5232b62c2ee0a6628e02d99fadf593f3e7895a9f7ab6a8cdbcfc1682b935b",
     "components/table/table.tsx": "c0322ed6bcf9ee7033018f1335724512189bb90ffcbd8cb652c2864d746bbd0a",
     "components/tabs/tabs.tsx": "e023d8b1d5fa52242cbf2539accf381cb77f6c3125afb402ab876694bcfe0518",

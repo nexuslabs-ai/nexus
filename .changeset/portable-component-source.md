@@ -9,3 +9,6 @@ create-next-app or Vite app:
 - `Show` and `Hide` no longer import an unused `React`.
 - Components no longer carry `eslint-disable` comments for rules a host app may
   not have.
+- `NxdsAppearanceProvider`, `Carousel` and `useIsNarrow` read the browser
+  through `useSyncExternalStore` instead of setting state in an effect, so they
+  pass the React Hooks lint rules a new Next.js app turns on.
