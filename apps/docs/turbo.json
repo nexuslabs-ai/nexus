@@ -36,6 +36,7 @@
         "$TURBO_ROOT$/packages/react/scripts/humanize.ts",
         "$TURBO_ROOT$/packages/catalog/scripts/install-plans.ts",
         "$TURBO_ROOT$/packages/catalog/scripts/roots.mjs",
+        "$TURBO_ROOT$/packages/react/scripts/roots.mjs",
         "$TURBO_ROOT$/packages/vue/scripts/**",
         "$TURBO_ROOT$/packages/vue/src/**",
         "$TURBO_ROOT$/packages/vue/package.json",

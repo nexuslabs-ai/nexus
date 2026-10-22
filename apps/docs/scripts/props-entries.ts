@@ -1,10 +1,9 @@
 import type { ComponentDoc, PropItem } from 'react-docgen-typescript';
 
-import path from 'node:path';
 import ts from 'typescript';
 
 import { isUnder } from '../../../packages/catalog/scripts/roots.mjs';
-import { reactRoot } from '../../../packages/react/scripts/roots.mjs';
+import { reactSrc } from '../../../packages/react/scripts/roots.mjs';
 
 import { resolveAlias } from './props-contract.mjs';
 
@@ -32,8 +31,6 @@ export type PropsIndex = Record<string, string[]>;
 
 // Resolved only for props the table documents.
 type LazyDefault = () => string | null;
-
-const reactSrc = path.join(reactRoot, 'src');
 
 const LITERAL_KEYWORD = /^(?:true|false|null|undefined|-?\d+(?:\.\d+)?)$/;
 
