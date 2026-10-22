@@ -78,8 +78,6 @@ jobs:
       - name: Agent drift audit
         run: pnpm audit:agent-drift
 
-      # Apps compare their files with the release they are on, so a committed
-      # release catalog is only ever added.
       - name: Release catalogs are never edited
         run: |
           edited=$(git diff --name-only --diff-filter=MDR HEAD^1 HEAD -- packages/catalog/releases)

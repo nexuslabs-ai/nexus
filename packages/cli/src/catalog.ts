@@ -2,12 +2,13 @@ import type {
   Catalog,
   CatalogItem,
   Framework,
+  SetupStep,
   SetupVariant,
   Variant,
 } from '@nxds/catalog';
 import { existsSync } from 'node:fs';
 import path from 'node:path';
-import { valid } from 'semver';
+import { valid, validRange } from 'semver';
 
 import { projectPath } from './config';
 import { CliError, readJson } from './errors';
@@ -72,7 +73,20 @@ async function readRegistryFile(registry: string, file: string) {
   return existsSync(location) ? readJson(location) : null;
 }
 
-const KINDS = new Set(['setup', 'component', 'block']);
+const KINDS: ReadonlySet<unknown> = new Set(['setup', 'component', 'block']);
+
+const STEP_NAMES: Record<SetupStep, true> = {
+  'add-css-import': true,
+  'add-head-script': true,
+  'wrap-root-with-provider': true,
+};
+const STEPS: ReadonlySet<unknown> = new Set(Object.keys(STEP_NAMES));
+
+const NPM_NAME = /^(@[a-z0-9-~][a-z0-9-._~]*\/)?[a-z0-9-~][a-z0-9-._~]*$/;
+
+function isRange(value: unknown) {
+  return typeof value === 'string' && validRange(value) !== null;
+}
 
 function isRecord(value: unknown): value is Record<string, unknown> {
   return typeof value === 'object' && value !== null && !Array.isArray(value);
@@ -102,13 +116,19 @@ function variantProblem(variant: unknown, kind: unknown) {
   if (
     !isRecord(packages) ||
     !isRecord(packages.npm) ||
-    !Object.values(packages.npm).every((range) => typeof range === 'string') ||
-    (kind === 'setup' && typeof packages.tailwind !== 'string')
+    !Object.entries(packages.npm).every(
+      ([name, range]) => NPM_NAME.test(name) && isRange(range)
+    ) ||
+    (kind === 'setup' && !isRange(packages.tailwind))
   ) {
     return 'has invalid "packages"';
   }
-  for (const field of ['items', 'css', 'steps'] as const) {
+  for (const field of ['items', 'css'] as const) {
     if (!isStrings(variant[field])) return `has invalid "${field}"`;
+  }
+  const { steps } = variant;
+  if (!Array.isArray(steps) || !steps.every((step) => STEPS.has(step))) {
+    return 'has invalid "steps"';
   }
   if (!Array.isArray(variant.files)) return 'has invalid "files"';
   return variant.files.map(fileProblem).find(Boolean) ?? null;
@@ -121,7 +141,7 @@ function itemProblem(item: unknown) {
   }
   const fields = ['title', 'description', 'docs'] as const;
   if (
-    !KINDS.has(item.kind as string) ||
+    !KINDS.has(item.kind) ||
     fields.some((field) => typeof item[field] !== 'string') ||
     !isRecord(item.variants)
   ) {
