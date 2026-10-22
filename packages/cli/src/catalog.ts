@@ -85,11 +85,15 @@ const STEPS: ReadonlySet<unknown> = new Set(
 
 const NPM_NAME = /^(@[a-z0-9-~][a-z0-9-._~]*\/)?[a-z0-9-~][a-z0-9-._~]*$/;
 
-/** A semver range, in printable ASCII so it reaches the shell as one argument. */
+/**
+ * A semver range exactly as written: `validRange` trims its input and reads a
+ * blank range as `*`, so padding and control characters are rejected first.
+ */
 function isRange(value: unknown) {
   return (
     typeof value === 'string' &&
     /^[ -~]+$/.test(value) &&
+    value === value.trim() &&
     validRange(value) !== null
   );
 }
