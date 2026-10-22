@@ -144,6 +144,9 @@ importers:
       '@nxds/react':
         specifier: workspace:*
         version: link:../../packages/react
+      '@nxds/source-model':
+        specifier: workspace:*
+        version: link:../../packages/source-model
       '@nxds/tailwind':
         specifier: workspace:*
         version: link:../../packages/tailwind
@@ -229,9 +232,6 @@ importers:
       prettier:
         specifier: ^3.7.4
         version: 3.8.3
-      react-docgen-typescript:
-        specifier: ^2.4.0
-        version: 2.4.0(typescript@5.9.3)
       rehype-parse:
         specifier: ^9.0.1
         version: 9.0.1
@@ -259,9 +259,6 @@ importers:
       vue:
         specifier: ^3.5.44
         version: 3.5.44(typescript@5.9.3)
-      vue-component-meta:
-        specifier: 3.3.13
-        version: 3.3.13(typescript@5.9.3)
 
   packages/core:
     dependencies:
@@ -491,6 +488,25 @@ importers:
         specifier: ^5.0.3
         version: 5.0.3(@microsoft/api-extractor@7.58.9(@types/node@25.9.1))(@vue/language-core@3.3.13)(esbuild@0.28.1)(rollup@4.61.1)(typescript@5.9.3)(vite@7.3.5(@types/node@25.9.1)(jiti@2.7.0)(lightningcss@1.32.0)(yaml@2.9.0))
 
+  packages/source-model:
+    dependencies:
+      prettier:
+        specifier: ^3.7.4
+        version: 3.8.3
+      react-docgen-typescript:
+        specifier: ^2.4.0
+        version: 2.4.0(typescript@5.9.3)
+      typescript:
+        specifier: ^5.9.3
+        version: 5.9.3
+      vue-component-meta:
+        specifier: 3.3.13
+        version: 3.3.13(typescript@5.9.3)
+    devDependencies:
+      '@types/node':
+        specifier: ^25.0.3
+        version: 25.9.1
+
   packages/tailwind:
     dependencies:
       tailwindcss:
@@ -566,6 +582,18 @@ importers:
 
   parity:
     devDependencies:
+      '@nxds/core':
+        specifier: workspace:*
+        version: link:../packages/core
+      '@nxds/react':
+        specifier: workspace:*
+        version: link:../packages/react
+      '@nxds/source-model':
+        specifier: workspace:*
+        version: link:../packages/source-model
+      '@nxds/vue':
+        specifier: workspace:*
+        version: link:../packages/vue
       '@storybook/react':
         specifier: ^10.4.2
         version: 10.4.2(@types/react-dom@19.2.3(@types/react@19.2.16))(@types/react@19.2.16)(react-dom@19.2.7(react@19.2.7))(react@19.2.7)(storybook@10.4.2(@testing-library/dom@10.4.1)(@types/react@19.2.16)(prettier@3.8.3)(react-dom@19.2.7(react@19.2.7))(react@19.2.7))(typescript@5.9.3)

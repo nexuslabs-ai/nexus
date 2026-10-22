@@ -8,6 +8,10 @@
     "typecheck": "tsc --noEmit && tsc --noEmit -p browser"
   },
   "devDependencies": {
+    "@nxds/core": "workspace:*",
+    "@nxds/react": "workspace:*",
+    "@nxds/source-model": "workspace:*",
+    "@nxds/vue": "workspace:*",
     "@storybook/react": "^10.4.2",
     "@storybook/vue3": "10.4.2",
     "@tailwindcss/vite": "4.3.0",

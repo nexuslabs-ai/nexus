@@ -1,11 +1,10 @@
+import { importSpecifiers } from '@nxds/source-model/files.mjs';
+import { exportedComponentSlugs } from '@nxds/source-model/react-sources.mjs';
+import { reactRoot, reactSrc } from '@nxds/source-model/roots.mjs';
+import { exportedSlugs } from '@nxds/source-model/vue-sources.ts';
 import { readFileSync } from 'node:fs';
 import path from 'node:path';
 import { describe, expect, it } from 'vitest';
-
-import { importSpecifiers } from '../apps/docs/scripts/files.mjs';
-import { exportedComponentSlugs } from '../apps/docs/scripts/react-sources.mjs';
-import { reactRoot, reactSrc } from '../apps/docs/scripts/roots.mjs';
-import { exportedSlugs } from '../apps/docs/scripts/vue-sources.ts';
 
 import { planned, shared } from './parity.ts';
 

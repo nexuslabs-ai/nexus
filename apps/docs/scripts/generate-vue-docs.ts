@@ -6,6 +6,25 @@
 //   dependencies/{slug}.json    what installing the component takes
 //   props/{slug}.json           each part's own props
 // usage: node scripts/generate-vue-docs.ts
+import { humanize } from '@nxds/source-model/humanize.ts';
+import {
+  type PropsFile,
+  toPropsIndex,
+} from '@nxds/source-model/props-entries.ts';
+import {
+  docsRoot,
+  isUnder,
+  toRepoPath,
+  vueComponentsRoot,
+  vueRoot,
+  vueSrc,
+} from '@nxds/source-model/roots.mjs';
+import {
+  componentProps,
+  createVueChecker,
+  exportedSlugs,
+  parseFile,
+} from '@nxds/source-model/vue-sources.ts';
 import {
   mkdirSync,
   readdirSync,
@@ -18,28 +37,12 @@ import prettier from 'prettier';
 import ts from 'typescript';
 import { parse as parseSfc } from 'vue/compiler-sfc';
 
-import { humanize } from './humanize.ts';
 import {
   createInstallPlanner,
   packageName,
   type Walk,
   writeEntries,
 } from './install-plans.ts';
-import { type PropsFile, toPropsIndex } from './props-entries.ts';
-import {
-  docsRoot,
-  isUnder,
-  toRepoPath,
-  vueComponentsRoot,
-  vueRoot,
-  vueSrc,
-} from './roots.mjs';
-import {
-  componentProps,
-  createVueChecker,
-  exportedSlugs,
-  parseFile,
-} from './vue-sources.ts';
 
 interface SetupValue {
   name: string;

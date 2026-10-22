@@ -2,6 +2,12 @@
 // a component's files to every file and package it reaches, and the plan a
 // docs page shows. Each generator passes its framework's `ComponentSource`.
 import {
+  collectSourceFiles,
+  importSpecifiers,
+  writeJson,
+} from '@nxds/source-model/files.mjs';
+import { isUnder, toRepoPath } from '@nxds/source-model/roots.mjs';
+import {
   mkdirSync,
   readdirSync,
   readFileSync,
@@ -10,9 +16,6 @@ import {
 } from 'node:fs';
 import path from 'node:path';
 import ts from 'typescript';
-
-import { collectSourceFiles, importSpecifiers, writeJson } from './files.mjs';
-import { isUnder, toRepoPath } from './roots.mjs';
 
 export interface ComponentSource {
   /** The package folder, holding package.json and tsconfig.json. */

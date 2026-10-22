@@ -1,9 +1,8 @@
 import { cache } from 'react';
 
+import { docsRoot, reactSrc, vueSrc } from '@nxds/source-model/roots.mjs';
 import { readdir, readFile } from 'node:fs/promises';
 import path from 'node:path';
-
-import { docsRoot, reactSrc, vueSrc } from '../../scripts/roots.mjs';
 
 import type { Framework } from './frameworks';
 

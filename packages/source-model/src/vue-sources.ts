@@ -87,30 +87,42 @@ function propDefault(prop: PropertyMeta, owner: string) {
     : literalDefaultValue(prop.default, owner);
 }
 
+/** Whether a prop or event is declared in @nxds/vue rather than inherited from a dependency. */
+export function isOwnDeclaration(declarations: { file: string }[]) {
+  return declarations.some(({ file }) => isUnder(file, vueSrc));
+}
+
+/** Each part a component folder exports, with its `vue-component-meta` read once. */
+export function componentParts(checker: VueChecker, slug: string) {
+  return exportedParts(slug).map(({ name, file }) => ({
+    name,
+    file,
+    meta: checker.getComponentMeta(file),
+  }));
+}
+
+export type VuePart = ReturnType<typeof componentParts>[number];
+
+export function partEntry({ name, file, meta }: VuePart): ComponentEntry {
+  return {
+    name,
+    description: '',
+    sourcePath: toRepoPath(file),
+    props: meta.props
+      .filter(
+        (prop) => !prop.global && isOwnDeclaration(prop.getDeclarations())
+      )
+      .map((prop) => ({
+        name: prop.name,
+        type: prop.type.replace(/\s*\|\s*undefined$/, ''),
+        required: prop.required,
+        defaultValue: propDefault(prop, `${name}.${prop.name}`),
+        description: prop.description,
+      }))
+      .sort((a, b) => a.name.localeCompare(b.name, 'en')),
+  };
+}
+
 export function componentProps(checker: VueChecker, slug: string): PropsFile {
-  const components: ComponentEntry[] = exportedParts(slug).map(
-    ({ name, file }) => ({
-      name,
-      description: '',
-      sourcePath: toRepoPath(file),
-      props: checker
-        .getComponentMeta(file)
-        .props.filter(
-          (prop) =>
-            !prop.global &&
-            prop
-              .getDeclarations()
-              .some(({ file: declared }) => isUnder(declared, vueSrc))
-        )
-        .map((prop) => ({
-          name: prop.name,
-          type: prop.type.replace(/\s*\|\s*undefined$/, ''),
-          required: prop.required,
-          defaultValue: propDefault(prop, `${name}.${prop.name}`),
-          description: prop.description,
-        }))
-        .sort((a, b) => a.name.localeCompare(b.name, 'en')),
-    })
-  );
-  return toPropsFile(slug, components);
+  return toPropsFile(slug, componentParts(checker, slug).map(partEntry));
 }

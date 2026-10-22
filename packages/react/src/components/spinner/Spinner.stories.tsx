@@ -75,12 +75,6 @@ export const WithDataAttributes: Story = {
   },
 };
 
-// ============================================
-// ALL VARIANTS GRID
-// ============================================
-
-// A range of sizes, a tinted variant, and an inline "loading more" caption.
-// Reused by the per-base variant generator.
 export const CustomLabelAndSize: Story = {
   render: () => (
     <Spinner
@@ -98,6 +92,12 @@ export const CustomLabelAndSize: Story = {
   },
 };
 
+// ============================================
+// ALL VARIANTS GRID
+// ============================================
+
+// A range of sizes, a tinted variant, and an inline "loading more" caption.
+// Reused by the per-base variant generator.
 export const AllVariants: Story = {
   render: () => (
     <div className="nx:flex nx:flex-col nx:gap-4 nx:text-foreground">

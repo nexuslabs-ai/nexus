@@ -352,6 +352,15 @@ export const DisabledTabInteraction: Story = {
     await expect(tab1).toHaveAttribute('data-state', 'inactive');
     await expect(disabledTab).toHaveAttribute('data-state', 'inactive');
     await expect(tab3).toHaveAttribute('data-state', 'active');
+    await waitFor(() => {
+      const indicator = canvasElement.querySelector(
+        '[data-slot="tabs-indicator"]'
+      );
+      if (!indicator) throw new Error('Tabs indicator not rendered');
+      expect(Math.round(indicator.getBoundingClientRect().left)).toBe(
+        Math.round(tab3.getBoundingClientRect().left)
+      );
+    });
     await expect(canvas.getByText('Content 3')).toBeVisible();
   },
 };

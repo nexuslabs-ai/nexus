@@ -507,9 +507,13 @@ export const DisabledTabInteraction: Story = {
     await expect(disabledTab).toBeDisabled();
 
     const tab1 = canvas.getByRole('tab', { name: 'Tab 1' });
+    const indicator = getTabsIndicator(canvasElement);
 
     await expect(tab1).toHaveAttribute('data-state', 'active');
+    await waitForIndicatorReady(indicator);
     await expect(canvas.getByText('Content 1')).toBeVisible();
+
+    const beforeDisabledSkip = indicator.style.transform;
 
     await userEvent.click(tab1);
     await userEvent.keyboard('{ArrowRight}');
@@ -519,6 +523,9 @@ export const DisabledTabInteraction: Story = {
     await expect(tab1).toHaveAttribute('data-state', 'inactive');
     await expect(disabledTab).toHaveAttribute('data-state', 'inactive');
     await expect(tab3).toHaveAttribute('data-state', 'active');
+    await waitFor(() =>
+      expect(indicator.style.transform).not.toBe(beforeDisabledSkip)
+    );
     await expect(canvas.getByText('Content 3')).toBeVisible();
   },
 };

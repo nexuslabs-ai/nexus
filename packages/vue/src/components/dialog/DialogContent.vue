@@ -70,12 +70,17 @@ function containsComposedSlot(
   );
 }
 
-const showGeneratedHeader = () =>
-  !containsComposedSlot(slots.default?.(), DialogHeader) &&
-  (slots.title !== undefined || slots.description !== undefined);
-const showGeneratedBody = () =>
-  !containsComposedSlot(slots.default?.(), DialogBody) &&
-  slots.body !== undefined;
+/** Which parts DialogContent generates. The template binds it once per render, so the default slot is read once. */
+function generatedParts() {
+  const children = slots.default?.();
+  return {
+    header:
+      (slots.title !== undefined || slots.description !== undefined) &&
+      !containsComposedSlot(children, DialogHeader),
+    body:
+      slots.body !== undefined && !containsComposedSlot(children, DialogBody),
+  };
+}
 </script>
 
 <template>
@@ -88,13 +93,15 @@ const showGeneratedBody = () =>
       data-orientation="horizontal"
       :class="cn(overlayContentVariants(), props.class)"
     >
-      <DialogHeader v-if="showGeneratedHeader()">
-        <DialogTitle v-if="slots.title"><slot name="title" /></DialogTitle>
-        <DialogDescription v-if="slots.description">
-          <slot name="description" />
-        </DialogDescription>
-      </DialogHeader>
-      <DialogBody v-if="showGeneratedBody()"><slot name="body" /></DialogBody>
+      <template v-for="(generated, index) in [generatedParts()]" :key="index">
+        <DialogHeader v-if="generated.header">
+          <DialogTitle v-if="slots.title"><slot name="title" /></DialogTitle>
+          <DialogDescription v-if="slots.description">
+            <slot name="description" />
+          </DialogDescription>
+        </DialogHeader>
+        <DialogBody v-if="generated.body"><slot name="body" /></DialogBody>
+      </template>
       <slot />
       <DialogClose
         v-if="showCloseButton"

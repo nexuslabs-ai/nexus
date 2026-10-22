@@ -156,6 +156,7 @@ Releases are driven by [changesets](https://github.com/changesets/changesets) an
 | `@nxds/tailwind`      | copy/own   | Generated token CSS — consumers regenerate with their own token choices |
 | `@nxds/react`         | copy/own   | Components are copied and owned; delivered by the export tool (#541)    |
 | `@nxds/docs`          | private    | App                                                                     |
+| `@nxds/source-model`  | private    | Reads component sources for the docs generators and the parity tests    |
 
 Everything lives under the `@nxds` scope — the published packages on npm and the ESLint plugin's **rule namespace** (rules are referenced as `@nxds/*`, e.g. `@nxds/no-render-prop-types`). The rule namespace is a flat-config key the plugin registers, independent of the npm package name; it is kept in lockstep with the scope so the repo reads consistently.
 

@@ -1,12 +1,13 @@
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 
-export const docsRoot = path.resolve(
+export const repoRoot = path.resolve(
   path.dirname(fileURLToPath(import.meta.url)),
+  '..',
+  '..',
   '..'
 );
-
-export const repoRoot = path.resolve(docsRoot, '..', '..');
+export const docsRoot = path.join(repoRoot, 'apps', 'docs');
 export const reactRoot = path.join(repoRoot, 'packages', 'react');
 export const reactSrc = path.join(reactRoot, 'src');
 export const componentsRoot = path.join(reactSrc, 'components');

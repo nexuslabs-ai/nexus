@@ -37,6 +37,22 @@ function isIconButtonSize(size: ButtonVariants['size']) {
 
 const isDisabled = computed(() => props.disabled || props.loading);
 const iconOnly = computed(() => isIconButtonSize(props.size));
+// `type` and `disabled` mean nothing on another tag, which also stays focusable.
+const isNativeButton = computed(() => props.as === 'button');
+const sharedAttrs = computed(() => ({
+  'data-slot': 'button',
+  'data-variant': props.variant,
+  'data-size': props.size,
+  'data-icon-only': iconOnly.value || undefined,
+  'data-loading': props.loading || undefined,
+  class: cn(
+    buttonVariants({ variant: props.variant, size: props.size }),
+    props.class
+  ),
+  'aria-busy': props.loading || undefined,
+  'aria-disabled': isDisabled.value || undefined,
+}));
+
 // `asChild` clones onto a single child element; any other child keeps the
 // native `<button>`, as React's Slot does.
 function rendersAsChild() {
@@ -48,30 +64,27 @@ function rendersAsChild() {
   );
   return nodes.length === 1 && typeof nodes[0]?.type !== 'symbol';
 }
-
-// `type` and `disabled` mean nothing on another tag, which also stays focusable.
-const isNativeButton = () => !rendersAsChild() && props.as === 'button';
 </script>
 
 <template>
   <Primitive
-    data-slot="button"
-    :data-variant="variant"
-    :data-size="size"
-    :data-icon-only="iconOnly || undefined"
-    :data-loading="loading || undefined"
-    :as="as"
-    :as-child="rendersAsChild()"
-    :class="cn(buttonVariants({ variant, size }), props.class)"
-    :type="isNativeButton() ? type : undefined"
-    :disabled="isNativeButton() ? isDisabled : undefined"
-    :tabindex="!isNativeButton() && isDisabled ? -1 : undefined"
-    :aria-busy="loading || undefined"
-    :aria-disabled="isDisabled || undefined"
+    v-if="rendersAsChild()"
+    v-bind="sharedAttrs"
+    as-child
+    :tabindex="isDisabled ? -1 : undefined"
   >
-    <slot v-if="rendersAsChild()" />
+    <slot />
+  </Primitive>
+  <Primitive
+    v-else
+    v-bind="sharedAttrs"
+    :as="as"
+    :type="isNativeButton ? type : undefined"
+    :disabled="isNativeButton ? isDisabled : undefined"
+    :tabindex="!isNativeButton && isDisabled ? -1 : undefined"
+  >
     <span
-      v-else-if="loading"
+      v-if="loading"
       data-slot="button-loading-content"
       class="nx:relative nx:inline-flex nx:items-center nx:justify-center"
     >

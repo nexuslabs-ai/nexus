@@ -1,6 +1,8 @@
 import { cva } from 'class-variance-authority';
 import type { InjectionKey } from 'vue';
 
+import type { TabsListProps } from './TabsList.vue';
+
 export {
   default as TabsContent,
   type TabsContentProps,
@@ -12,13 +14,9 @@ export {
 } from './TabsTrigger.vue';
 export { TabsRoot as Tabs, type TabsRootProps as TabsProps } from 'reka-ui';
 
-export type TabsVariant = 'default' | 'underline';
-export type TabsSize = 'sm' | 'default' | 'lg';
-
-export const TabsListKey: InjectionKey<{
-  variant: TabsVariant;
-  size: TabsSize;
-}> = Symbol('tabs-list');
+export const TabsListKey: InjectionKey<
+  Required<Pick<TabsListProps, 'variant' | 'size'>>
+> = Symbol('tabs-list');
 
 export const tabsTriggerVariants = cva(
   // Base classes

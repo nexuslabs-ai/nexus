@@ -1,5 +1,13 @@
-import { composeStory as composeReactStory } from '@storybook/react';
-import { composeStory as composeVueStory } from '@storybook/vue3';
+import {
+  composeStory as composeReactStory,
+  type Meta as ReactMeta,
+  type StoryObj as ReactStory,
+} from '@storybook/react';
+import {
+  composeStory as composeVueStory,
+  type Meta as VueMeta,
+  type StoryObj as VueStory,
+} from '@storybook/vue3';
 import { computeAccessibleName } from 'dom-accessibility-api';
 import { userEvent, waitFor, within } from 'storybook/test';
 import { describe, expect, it } from 'vitest';
@@ -8,13 +16,17 @@ import reactPreview from '../../packages/react/.storybook/preview';
 import vuePreview from '../../packages/vue/.storybook/preview';
 import { renderedDifferences, shared } from '../parity.ts';
 
-type StoryModule = Record<string, unknown> & { default: object };
-type Story = { tags?: string[]; play?: unknown };
+/** A stories file: its meta as `default`, and its stories. */
+type StoryModule<TMeta, TStory> = { default: TMeta } & Partial<
+  Record<string, TStory>
+>;
+type ReactModule = StoryModule<ReactMeta, ReactStory>;
+type VueModule = StoryModule<VueMeta, VueStory>;
 
-const reactModules = import.meta.glob<StoryModule>(
+const reactModules = import.meta.glob<ReactModule>(
   '../../packages/react/src/components/{alert,badge,button,card,dialog,spinner,switch,tabs}/*.stories.tsx'
 );
-const vueModules = import.meta.glob<StoryModule>(
+const vueModules = import.meta.glob<VueModule>(
   '../../packages/vue/src/components/{alert,badge,button,card,dialog,spinner,switch,tabs}/*.stories.ts'
 );
 
@@ -33,8 +45,8 @@ function slugOf(file: string) {
   return file.split('/').at(-2) ?? '';
 }
 
-async function load(
-  modules: Record<string, () => Promise<StoryModule>>,
+async function load<TModule>(
+  modules: Record<string, () => Promise<TModule>>,
   slug: string
 ) {
   const entry = Object.entries(modules).find(([file]) => slugOf(file) === slug);
@@ -42,11 +54,14 @@ async function load(
   return entry[1]();
 }
 
-function docsStories(module: StoryModule) {
-  return Object.entries(module).filter(
-    ([name, story]) =>
-      name !== 'default' && (story as Story).tags?.includes('docs')
-  ) as [string, Story][];
+function docsStories<TStory extends { tags?: string[] }>(
+  module: Partial<Record<string, TStory>>
+) {
+  return Object.entries(module).flatMap(([name, story]) =>
+    name !== 'default' && story?.tags?.includes('docs')
+      ? [[name, story] as const]
+      : []
+  );
 }
 
 function isOwnSlot(slot: string, slug: string) {
@@ -69,19 +84,22 @@ function describeElement(element: Element) {
   return `<${element.tagName.toLowerCase()} ${attributes.join(' ')}> class="${classes}" name="${name}" text="${text}"`;
 }
 
-const skippedSlots = new Set<string>();
-
-/** Every element of `slug`'s own parts on the page, in document order. */
+/**
+ * Every element of `slug`'s own parts on the page, in document order, and the
+ * `renderedDifferences` slots it skipped.
+ */
 function readTree(slug: string) {
-  return [...document.body.querySelectorAll('[data-slot]')]
-    .filter((element) => {
-      const slot = element.getAttribute('data-slot') ?? '';
-      if (!isOwnSlot(slot, slug)) return false;
-      if (!(slot in renderedDifferences)) return true;
-      skippedSlots.add(slot);
-      return false;
-    })
-    .map(describeElement);
+  const own = [...document.body.querySelectorAll('[data-slot]')].filter(
+    (element) => isOwnSlot(element.getAttribute('data-slot') ?? '', slug)
+  );
+  const differs = (element: Element) =>
+    (element.getAttribute('data-slot') ?? '') in renderedDifferences;
+  return {
+    tree: own.filter((element) => !differs(element)).map(describeElement),
+    skipped: own
+      .filter(differs)
+      .map((element) => element.getAttribute('data-slot') ?? ''),
+  };
 }
 
 async function settle() {
@@ -90,14 +108,41 @@ async function settle() {
   );
 }
 
-type Compose = typeof composeReactStory | typeof composeVueStory;
+// `run` mounts the story; without its play function both frameworks read the same initial state.
+async function mountReact(
+  module: ReactModule,
+  name: string,
+  story: ReactStory,
+  canvasElement: HTMLElement
+) {
+  const composed = composeReactStory(
+    { ...story, play: undefined },
+    module.default,
+    reactPreview,
+    name
+  );
+  await composed.run({ canvasElement });
+  return composed;
+}
+
+async function mountVue(
+  module: VueModule,
+  name: string,
+  story: VueStory,
+  canvasElement: HTMLElement
+) {
+  const composed = composeVueStory(
+    { ...story, play: undefined },
+    module.default,
+    vuePreview,
+    name
+  );
+  await composed.run({ canvasElement });
+  return composed;
+}
 
 async function renderTree(
-  compose: Compose,
-  module: StoryModule,
-  name: string,
-  story: Story,
-  preview: object,
+  mount: (canvasElement: HTMLElement) => Promise<{ load: () => Promise<void> }>,
   slug: string
 ) {
   const root = document.documentElement;
@@ -108,14 +153,7 @@ async function renderTree(
   const canvasElement = document.createElement('div');
   document.body.append(canvasElement);
 
-  // `run` mounts the story; without its play function both frameworks read the same initial state.
-  const composed = (compose as typeof composeVueStory)(
-    { ...story, play: undefined } as never,
-    module.default as never,
-    preview as never,
-    name
-  );
-  await composed.run({ canvasElement } as never);
+  const composed = await mount(canvasElement);
   await settle();
 
   if (OVERLAYS.has(slug)) {
@@ -154,12 +192,20 @@ describe('rendered docs stories', () => {
     );
   });
 
+  it('allows only rendered differences that belong to a shared component', () => {
+    const unowned = Object.keys(renderedDifferences).filter(
+      (slot) => !shared.some((slug) => isOwnSlot(slot, slug))
+    );
+    expect(unowned).toEqual([]);
+  });
+
   it.each(shared)(
     '%s renders the same parts in React and Vue',
     async (slug) => {
       const react = await load(reactModules, slug);
       const vue = await load(vueModules, slug);
       const vueStories = new Map(docsStories(vue));
+      const skipped = new Set<string>();
 
       for (const [name, story] of docsStories(react)) {
         const vueStory = vueStories.get(name);
@@ -167,36 +213,29 @@ describe('rendered docs stories', () => {
           throw new Error(`${slug}/${name} has no Vue docs story.`);
 
         const reactTree = await renderTree(
-          composeReactStory,
-          react,
-          name,
-          story,
-          reactPreview,
+          (canvasElement) => mountReact(react, name, story, canvasElement),
           slug
         );
         const vueTree = await renderTree(
-          composeVueStory,
-          vue,
-          name,
-          vueStory,
-          vuePreview,
+          (canvasElement) => mountVue(vue, name, vueStory, canvasElement),
           slug
         );
+        for (const slot of [...reactTree.skipped, ...vueTree.skipped]) {
+          skipped.add(slot);
+        }
 
         expect(
-          reactTree.length,
+          reactTree.tree.length,
           `${slug}/${name} renders no ${slug} part`
         ).toBeGreaterThan(0);
-        expect(vueTree, `${slug}/${name}`).toEqual(reactTree);
+        expect(vueTree.tree, `${slug}/${name}`).toEqual(reactTree.tree);
       }
+
+      const stale = Object.keys(renderedDifferences).filter(
+        (slot) => isOwnSlot(slot, slug) && !skipped.has(slot)
+      );
+      expect(stale, 'rendered differences that no longer render').toEqual([]);
     },
     60_000
   );
-
-  it('allows only rendered differences that still render', () => {
-    const stale = Object.keys(renderedDifferences).filter(
-      (slot) => !skippedSlots.has(slot)
-    );
-    expect(stale).toEqual([]);
-  });
 });

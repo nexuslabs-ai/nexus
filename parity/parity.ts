@@ -124,6 +124,7 @@ const TABS_INDICATOR =
 
 /** Paired play stories whose steps differ by design, as `{slug}/{Story}`. */
 export const behaviourDifferences: Record<string, string> = {
+  'tabs/DisabledTabInteraction': TABS_INDICATOR,
   'tabs/UnderlineVariant': TABS_INDICATOR,
   'tabs/VerticalIndicatorFollowsActiveTab': TABS_INDICATOR,
   'tabs/VerticalUnderlineIndicatorFollowsActiveTab': TABS_INDICATOR,

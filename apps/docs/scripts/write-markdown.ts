@@ -1,3 +1,4 @@
+import { docsRoot } from '@nxds/source-model/roots.mjs';
 import type { Element, ElementContent, Nodes, Root } from 'hast';
 import { existsSync, readFileSync, statSync, writeFileSync } from 'node:fs';
 import path from 'node:path';
@@ -11,8 +12,6 @@ import type { VFile } from 'vfile';
 import { frameworkLabel, isFramework } from '../app/_lib/frameworks.ts';
 import { PAGE_MANIFEST } from '../app/_lib/manifest.ts';
 import { DOCS_ARTICLE_ID } from '../app/_lib/table-of-contents.ts';
-
-import { docsRoot } from './roots.mjs';
 
 declare module 'vfile' {
   interface DataMap {

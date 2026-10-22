@@ -1,3 +1,4 @@
+import { repoRoot } from '@nxds/source-model/roots.mjs';
 import { readFileSync } from 'node:fs';
 import path from 'node:path';
 import ts from 'typescript';
@@ -5,8 +6,7 @@ import { describe, expect, it } from 'vitest';
 
 import { copies, dependencies } from './parity.ts';
 
-const read = (file: string) =>
-  readFileSync(path.resolve(process.cwd(), file), 'utf8');
+const read = (file: string) => readFileSync(path.join(repoRoot, file), 'utf8');
 
 const printer = ts.createPrinter({ removeComments: true });
 

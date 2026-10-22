@@ -1,32 +1,36 @@
+import { DEFAULT_NXDS_APPEARANCE, type NxdsAppearanceState } from '@nxds/core';
 import type { Meta, StoryObj } from '@storybook/vue3-vite';
-import { expect, userEvent, waitFor, within } from 'storybook/test';
+import { expect, fn, userEvent, waitFor, within } from 'storybook/test';
+import { createApp, ref } from 'vue';
 
 import { Button } from '../button';
 
-import { useNxdsAppearance } from '.';
+import { createNxdsAppearance, useNxdsAppearance } from '.';
+
+const AppearanceControls = {
+  components: { Button },
+  setup() {
+    const appearance = useNxdsAppearance();
+    const update = (patch: Record<string, string>) =>
+      appearance.setState((previous) => ({ ...previous, ...patch }));
+    return { appearance, update };
+  },
+  template: `
+    <div class="nx:flex nx:flex-col nx:items-start nx:gap-3">
+      <div class="nx:flex nx:gap-2">
+        <Button variant="outline" @click="update({ mode: 'dark' })">Dark</Button>
+        <Button variant="outline" @click="update({ brandColor: '#2563eb' })">Blue brand</Button>
+        <Button variant="outline" @click="update({ corners: 'round' })">Round corners</Button>
+        <Button variant="outline" @click="appearance.reset()">Reset</Button>
+      </div>
+      <p class="nx:m-0">Resolved mode: {{ appearance.resolvedMode.value }}</p>
+    </div>
+  `,
+};
 
 const meta = {
   title: 'Appearance/Plugin',
-  render: () => ({
-    components: { Button },
-    setup() {
-      const appearance = useNxdsAppearance();
-      const update = (patch: Record<string, string>) =>
-        appearance.setState((previous) => ({ ...previous, ...patch }));
-      return { appearance, update };
-    },
-    template: `
-      <div class="nx:flex nx:flex-col nx:items-start nx:gap-3">
-        <div class="nx:flex nx:gap-2">
-          <Button variant="outline" @click="update({ mode: 'dark' })">Dark</Button>
-          <Button variant="outline" @click="update({ brandColor: '#2563eb' })">Blue brand</Button>
-          <Button variant="outline" @click="update({ corners: 'round' })">Round corners</Button>
-          <Button variant="outline" @click="appearance.reset()">Reset</Button>
-        </div>
-        <p class="nx:m-0">Resolved mode: {{ appearance.resolvedMode.value }}</p>
-      </div>
-    `,
-  }),
+  render: () => AppearanceControls,
 } satisfies Meta;
 
 export default meta;
@@ -68,5 +72,39 @@ export const BrandColorRederivesTheme: Story = {
     await expect(
       document.querySelectorAll('style[data-nxds-appearance-theme]')
     ).toHaveLength(1);
+  },
+};
+
+const CONTROLLED_STORAGE_KEY = 'nxds-appearance-controlled-story';
+
+export const ControlledState: Story = {
+  render: () => ({ template: '<div data-testid="controlled-app" />' }),
+  play: async ({ canvasElement }) => {
+    const host = within(canvasElement).getByTestId('controlled-app');
+    const state = ref<NxdsAppearanceState>(DEFAULT_NXDS_APPEARANCE);
+    const onStateChange = fn();
+    const app = createApp(AppearanceControls).use(
+      createNxdsAppearance({
+        storageKey: CONTROLLED_STORAGE_KEY,
+        state,
+        onStateChange,
+      })
+    );
+    app.mount(host);
+    const controls = within(host);
+
+    await userEvent.click(controls.getByRole('button', { name: 'Dark' }));
+    await expect(onStateChange).toHaveBeenCalledWith(
+      expect.objectContaining({ mode: 'dark' })
+    );
+    await expect(controls.getByText('Resolved mode: light')).toBeVisible();
+    await expect(localStorage.getItem(CONTROLLED_STORAGE_KEY)).toBeNull();
+
+    state.value = { ...state.value, mode: 'dark' };
+    await waitFor(() =>
+      expect(controls.getByText('Resolved mode: dark')).toBeVisible()
+    );
+
+    app.unmount();
   },
 };

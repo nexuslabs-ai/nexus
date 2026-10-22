@@ -1,0 +1,22 @@
+{
+  "name": "@nxds/source-model",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "description": "Reads the components, props and stories @nxds/react and @nxds/vue export, for the docs generators and the parity tests.",
+  "exports": {
+    "./*": "./src/*"
+  },
+  "scripts": {
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "prettier": "^3.7.4",
+    "react-docgen-typescript": "^2.4.0",
+    "typescript": "^5.9.3",
+    "vue-component-meta": "3.3.13"
+  },
+  "devDependencies": {
+    "@types/node": "^25.0.3"
+  }
+}

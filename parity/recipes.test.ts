@@ -1,16 +1,17 @@
+import {
+  componentsRoot,
+  vueComponentsRoot,
+} from '@nxds/source-model/roots.mjs';
 import { readFileSync } from 'node:fs';
 import path from 'node:path';
 import ts from 'typescript';
 import { describe, expect, it } from 'vitest';
 
-import {
-  componentsRoot,
-  vueComponentsRoot,
-} from '../apps/docs/scripts/roots.mjs';
-
 import { shared, vueOnlyDeclarations } from './parity.ts';
 
 const printer = ts.createPrinter({ removeComments: true });
+
+const RECIPE_NAME = /(?:Variants|ClassName|Classes)$/;
 
 /** `[react, vue]` files holding each component's class recipes. */
 const RECIPE_FILES: [react: string, vue: string][] = [
@@ -79,6 +80,24 @@ const declarations = RECIPE_FILES.flatMap(([reactFile, vueFile]) => {
 
 const paired = declarations.filter(({ react }) => react !== undefined);
 
+/** The source of each shared component's React file, where its recipes are used. */
+const sharedReactSources = shared.map((slug) =>
+  readFileSync(path.join(componentsRoot, slug, `${slug}.tsx`), 'utf8')
+);
+
+/** React recipes a shared component uses, as `{file}#{name}`. */
+const usedReactRecipes = RECIPE_FILES.flatMap(([reactFile, vueFile]) => {
+  const key = path.relative(vueComponentsRoot, vueFile);
+  return [...valueDeclarations(reactFile).keys()]
+    .filter((name) => RECIPE_NAME.test(name))
+    .filter((name) =>
+      sharedReactSources.some((source) =>
+        new RegExp(`\\b${name}\\b`).test(source)
+      )
+    )
+    .map((name) => `${key}#${name}`);
+});
+
 describe('class recipes', () => {
   it('declares nothing in a Vue recipe file that React lacks', () => {
     const vueOnly = declarations
@@ -87,6 +106,12 @@ describe('class recipes', () => {
       )
       .map(({ id }) => id);
     expect(vueOnly).toEqual([]);
+  });
+
+  it('ports every recipe a shared React component uses', () => {
+    const ported = new Set(paired.map(({ id }) => id));
+    expect(usedReactRecipes.length).toBeGreaterThan(0);
+    expect(usedReactRecipes.filter((id) => !ported.has(id))).toEqual([]);
   });
 
   it('allows only Vue-only declarations that still exist', () => {

@@ -1,16 +1,15 @@
-import { readdirSync } from 'node:fs';
-import path from 'node:path';
-import ts from 'typescript';
-import { describe, expect, it } from 'vitest';
-
 import {
   componentStoryFiles,
   DOCS_TAG,
   parseStoriesFile,
   type StoriesFile,
   tagsOf,
-} from '../apps/docs/scripts/docs-stories.ts';
-import { vueComponentsRoot } from '../apps/docs/scripts/roots.mjs';
+} from '@nxds/source-model/docs-stories.ts';
+import { vueComponentsRoot } from '@nxds/source-model/roots.mjs';
+import { readdirSync } from 'node:fs';
+import path from 'node:path';
+import ts from 'typescript';
+import { describe, expect, it } from 'vitest';
 
 import { behaviourDifferences, behaviourOnlyIn, shared } from './parity.ts';
 
@@ -95,14 +94,32 @@ function helperBody(call: ts.CallExpression, file: StoriesFile) {
     : undefined;
 }
 
+interface PlayStory {
+  steps: string[];
+  /** Imported helpers the play calls whose steps the reader can't see. */
+  unread: string[];
+}
+
+/** Whether `name` is imported into `file` from outside `storybook/test`. */
+function isImportedHelper(name: string, file: StoriesFile) {
+  const binding = file.imports.get(name);
+  return binding !== undefined && binding.module !== 'storybook/test';
+}
+
 /**
  * The steps a play function takes, in source order: each user action, each
  * Testing Library query and each assertion's matcher, with literal arguments
  * printed and anything that reads a variable as `_`. Same-file helpers are
- * read in place, one level deep.
+ * read in place, one level deep. An imported `expect*` helper counts as one
+ * step; any other imported helper is unread.
  */
-function playSteps(play: ts.Node, file: StoriesFile, source: ts.SourceFile) {
+function playSteps(
+  play: ts.Node,
+  file: StoriesFile,
+  source: ts.SourceFile
+): PlayStory {
   const steps: string[] = [];
+  const unread: string[] = [];
   const visit = (node: ts.Node, depth: number) => {
     if (ts.isCallExpression(node)) {
       const callee = node.expression;
@@ -126,17 +143,19 @@ function playSteps(play: ts.Node, file: StoriesFile, source: ts.SourceFile) {
       if (body) visit(body, depth + 1);
       else if (ts.isIdentifier(callee) && /^expect[A-Z]/.test(name)) {
         steps.push(`${name}(${printArguments(node, source)})`);
+      } else if (ts.isIdentifier(callee) && isImportedHelper(name, file)) {
+        unread.push(name);
       }
     }
     ts.forEachChild(node, (child) => visit(child, depth));
   };
   visit(play, 0);
-  return steps;
+  return { steps, unread };
 }
 
 /** Each story with a `play` function, by name, as its steps. */
 function playStories(files: string[]) {
-  const stories = new Map<string, string[]>();
+  const stories = new Map<string, PlayStory>();
   for (const filePath of files) {
     const file = parseStoriesFile(filePath);
     for (const story of file.stories) {
@@ -146,6 +165,12 @@ function playStories(files: string[]) {
     }
   }
   return stories;
+}
+
+/** Whether two stories' step lists match. A missing story matches nothing. */
+function sameSteps(react: string[] | undefined, vue: string[] | undefined) {
+  if (!react || !vue) return false;
+  return JSON.stringify(react) === JSON.stringify(vue);
 }
 
 const behaviour = shared.map((slug) => ({
@@ -170,8 +195,8 @@ describe('behaviour stories', () => {
     '$slug pairs every play story with one in the other framework',
     ({ slug, react, vue }) => {
       const unpaired = (
-        mine: Map<string, string[]>,
-        theirs: Map<string, string[]>,
+        mine: Map<string, PlayStory>,
+        theirs: Map<string, PlayStory>,
         framework: 'react' | 'vue'
       ) =>
         [...mine.keys()]
@@ -188,35 +213,40 @@ describe('behaviour stories', () => {
   );
 
   it.each(behaviour)(
+    '$slug play stories take steps the reader can see',
+    ({ slug, react, vue }) => {
+      const unreadable = [...react, ...vue]
+        .filter(([, { steps, unread }]) => steps.length === 0 || unread.length)
+        .map(([name, { unread }]) => ({ story: `${slug}/${name}`, unread }));
+      expect(unreadable).toEqual([]);
+    }
+  );
+
+  it.each(behaviour)(
     '$slug play stories take the same steps',
     ({ slug, react, vue }) => {
       const drift = [...react]
         .filter(([name]) => vue.has(name))
         .filter(([name]) => !(`${slug}/${name}` in behaviourDifferences))
-        .filter(([name, steps]) => {
-          expect(
-            steps.length,
-            `${slug}/${name} takes no steps`
-          ).toBeGreaterThan(0);
-          return JSON.stringify(steps) !== JSON.stringify(vue.get(name));
-        })
-        .map(([name, steps]) => ({
+        .filter(([name, { steps }]) => !sameSteps(steps, vue.get(name)?.steps))
+        .map(([name, { steps }]) => ({
           story: name,
           react: steps,
-          vue: vue.get(name),
+          vue: vue.get(name)?.steps,
         }));
       expect(drift).toEqual([]);
     }
   );
 
   it('allows only differences for stories that still exist', () => {
-    const exists = (id: string, framework: 'react' | 'vue') => {
+    const story = (id: string, framework: 'react' | 'vue') => {
       const [slug, name] = id.split('/');
-      const stories = behaviour.find((entry) => entry.slug === slug)?.[
-        framework
-      ];
-      return stories?.has(name ?? '') ?? false;
+      return behaviour
+        .find((entry) => entry.slug === slug)
+        ?.[framework].get(name ?? '');
     };
+    const exists = (id: string, framework: 'react' | 'vue') =>
+      story(id, framework) !== undefined;
     const stale = [
       ...Object.keys(behaviourOnlyIn.react).filter(
         (id) => !exists(id, 'react') || exists(id, 'vue')
@@ -225,7 +255,10 @@ describe('behaviour stories', () => {
         (id) => !exists(id, 'vue') || exists(id, 'react')
       ),
       ...Object.keys(behaviourDifferences).filter(
-        (id) => !exists(id, 'react') || !exists(id, 'vue')
+        (id) =>
+          !exists(id, 'react') ||
+          !exists(id, 'vue') ||
+          sameSteps(story(id, 'react')?.steps, story(id, 'vue')?.steps)
       ),
     ];
     expect(stale).toEqual([]);

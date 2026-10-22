@@ -1,28 +1,28 @@
-import path from 'node:path';
-import ts from 'typescript';
-import { beforeAll, describe, expect, it } from 'vitest';
-
 import type {
   ComponentEntry,
   PropEntry,
   PropsFile,
-} from '../apps/docs/scripts/props-entries.ts';
-import { reactPropsFiles } from '../apps/docs/scripts/react-props.mjs';
+} from '@nxds/source-model/props-entries.ts';
+import { reactPropsFiles } from '@nxds/source-model/react-props.mjs';
 import {
   componentsRoot,
   vueComponentsRoot,
-} from '../apps/docs/scripts/roots.mjs';
+} from '@nxds/source-model/roots.mjs';
 import {
-  componentProps,
+  componentParts,
   createVueChecker,
-  exportedParts,
+  isOwnDeclaration,
   parseFile,
+  partEntry,
   type VueChecker,
-} from '../apps/docs/scripts/vue-sources.ts';
+} from '@nxds/source-model/vue-sources.ts';
+import path from 'node:path';
+import ts from 'typescript';
+import { beforeAll, describe, expect, it } from 'vitest';
 
 import { shared, vueOnlyApi } from './parity.ts';
 
-interface VuePart {
+interface VuePartApi {
   entry: ComponentEntry;
   slots: string[];
   events: string[];
@@ -31,7 +31,7 @@ interface VuePart {
 
 interface Contract {
   react: Map<string, ComponentEntry>;
-  vue: Map<string, VuePart>;
+  vue: Map<string, VuePartApi>;
   /** Parts Vue re-exports from Reka, which have no SFC to read. */
   vueReExports: Set<string>;
 }
@@ -48,12 +48,6 @@ function members(type: string) {
     .map((member) => member.trim())
     .filter((member) => member && member !== 'null' && member !== 'undefined')
     .sort();
-}
-
-function isOwn(declarations: { file: string }[]) {
-  return declarations.some(({ file }) =>
-    file.startsWith(vueComponentsRoot + path.sep)
-  );
 }
 
 /** Names a Vue component folder re-exports straight from a package. */
@@ -77,29 +71,34 @@ function packageReExports(slug: string) {
 }
 
 function vueContract(checker: VueChecker, slug: string) {
-  const entries = new Map(
-    componentProps(checker, slug).components.map((entry) => [entry.name, entry])
-  );
-  const parts = exportedParts(slug).map(({ name, file }): VuePart => {
-    const meta = checker.getComponentMeta(file);
-    const entry = entries.get(name);
-    if (!entry) throw new Error(`${slug}: ${name} has no props entry.`);
-    return {
-      entry,
-      slots: meta.slots
+  const parts = componentParts(checker, slug).map(
+    (part): VuePartApi => ({
+      entry: partEntry(part),
+      slots: part.meta.slots
         .map((slot) => slot.name)
         .filter((name) => name !== 'default'),
-      events: meta.events
-        .filter((event) => isOwn(event.getDeclarations()))
+      events: part.meta.events
+        .filter((event) => isOwnDeclaration(event.getDeclarations()))
         .map((event) => event.name),
-      inheritsAsChild: meta.props.some((prop) => prop.name === 'asChild'),
-    };
-  });
+      inheritsAsChild: part.meta.props.some((prop) => prop.name === 'asChild'),
+    })
+  );
   return new Map(parts.map((part) => [part.entry.name, part]));
 }
 
 /** Every way the Vue part's API differs from the React part's. */
-function partDrift(react: ComponentEntry, vue: VuePart) {
+/** The Vue API names each React prop maps to: a kebab-case slot, an emit, or the same prop. */
+function mappedNames(react: ComponentEntry) {
+  return new Set(
+    react.props.map((prop) => {
+      if (REACT_NODE.test(prop.type)) return kebab(prop.name);
+      if (/^on[A-Z]/.test(prop.name)) return kebab(prop.name.slice(2));
+      return prop.name;
+    })
+  );
+}
+
+function partDrift(react: ComponentEntry, vue: VuePartApi) {
   const drift: string[] = [];
   const at = (name: string) => `${react.name}.${name}`;
   const vueProps = new Map(
@@ -107,11 +106,8 @@ function partDrift(react: ComponentEntry, vue: VuePart) {
       .filter((prop) => prop.name !== 'class')
       .map((prop) => [prop.name, prop])
   );
-  const mapped = new Set<string>();
-
   for (const prop of react.props) {
     if (REACT_NODE.test(prop.type)) {
-      mapped.add(kebab(prop.name));
       if (!vue.slots.includes(kebab(prop.name))) {
         drift.push(`${at(prop.name)}: no #${kebab(prop.name)} slot`);
       }
@@ -123,14 +119,12 @@ function partDrift(react: ComponentEntry, vue: VuePart) {
     }
     if (/^on[A-Z]/.test(prop.name)) {
       const event = kebab(prop.name.slice(2));
-      mapped.add(event);
       if (!vue.events.includes(event)) {
         drift.push(`${at(prop.name)}: no '${event}' emit`);
       }
       continue;
     }
     const twin = vueProps.get(prop.name);
-    mapped.add(prop.name);
     if (!twin) {
       drift.push(`${at(prop.name)}: missing`);
       continue;
@@ -138,6 +132,7 @@ function partDrift(react: ComponentEntry, vue: VuePart) {
     drift.push(...propDrift(at(prop.name), prop, twin));
   }
 
+  const mapped = mappedNames(react);
   const vueOnly = [...vueProps.keys(), ...vue.slots, ...vue.events].filter(
     (name) => !mapped.has(name) && !(at(name) in vueOnlyApi)
   );
@@ -154,8 +149,10 @@ function propDrift(at: string, react: PropEntry, vue: PropEntry) {
     drift.push(`${at}: default ${react.defaultValue} vs ${vue.defaultValue}`);
   }
   if (react.required !== vue.required) drift.push(`${at}: required`);
-  if (react.description && !vue.description) {
-    drift.push(`${at}: no description`);
+  if (react.description !== vue.description) {
+    drift.push(
+      `${at}: description "${react.description}" vs "${vue.description}"`
+    );
   }
   return drift;
 }
@@ -202,25 +199,30 @@ describe('component contract', () => {
 
   it.each(shared)('%s parts take the same props, slots and events', (slug) => {
     const { react, vue } = contracts.get(slug)!;
-    const drift = [...vue].flatMap(([name, part]) =>
-      partDrift(react.get(name)!, part)
-    );
+    const drift = [...vue].flatMap(([name, part]) => {
+      const twin = react.get(name);
+      return twin ? partDrift(twin, part) : [];
+    });
     expect(drift).toEqual([]);
   });
 
-  it('allows only Vue-only API that still exists', () => {
-    const declared = new Set(
-      [...contracts.values()].flatMap(({ vue }) =>
-        [...vue].flatMap(([name, part]) =>
-          [
+  it('allows only Vue-only API that Vue declares and React lacks', () => {
+    const vueOnly = new Set(
+      [...contracts.values()].flatMap(({ react, vue }) =>
+        [...vue].flatMap(([name, part]) => {
+          const reactPart = react.get(name);
+          const mapped = reactPart ? mappedNames(reactPart) : new Set();
+          return [
             ...part.entry.props.map((prop) => prop.name),
             ...part.slots,
             ...part.events,
-          ].map((api) => `${name}.${api}`)
-        )
+          ]
+            .filter((api) => !mapped.has(api))
+            .map((api) => `${name}.${api}`);
+        })
       )
     );
-    expect(Object.keys(vueOnlyApi).filter((key) => !declared.has(key))).toEqual(
+    expect(Object.keys(vueOnlyApi).filter((key) => !vueOnly.has(key))).toEqual(
       []
     );
   });

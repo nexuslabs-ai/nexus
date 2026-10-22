@@ -1,10 +1,10 @@
 import { mkdirSync, readdirSync, readFileSync, rmSync } from 'node:fs';
 import path from 'node:path';
 
-import { writeJson } from './files.mjs';
-import { toPropsIndex } from './props-entries.ts';
-import { reactPropsFiles } from './react-props.mjs';
-import { docsRoot, toRepoPath } from './roots.mjs';
+import { writeJson } from '@nxds/source-model/files.mjs';
+import { toPropsIndex } from '@nxds/source-model/props-entries.ts';
+import { reactPropsFiles } from '@nxds/source-model/react-props.mjs';
+import { docsRoot, toRepoPath } from '@nxds/source-model/roots.mjs';
 
 const outputDir = path.join(docsRoot, 'generated', 'props');
 
