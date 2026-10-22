@@ -6,7 +6,7 @@
 import { existsSync, readFileSync } from 'node:fs';
 import path from 'node:path';
 
-import { createInstallPlanner } from './install-plans.ts';
+import { createInstallPlanner } from '../../catalog/scripts/install-plans.ts';
 import {
   blockSources,
   componentSlugs,
@@ -14,7 +14,11 @@ import {
   isModuleSource,
   linkedComponentSlug,
 } from './react-sources.mjs';
-import { componentsRoot, reactRoot, reactSrc } from './roots.mjs';
+import {
+  componentsRoot,
+  reactRoot,
+  reactSrc,
+} from '../../catalog/scripts/roots.mjs';
 
 export const react = createInstallPlanner({
   root: reactRoot,
@@ -42,8 +46,8 @@ function walkBlock(block) {
 
 /**
  * A block page links only the components no other link brings.
- * @param {import('./install-plans.ts').Walk} walked
- * @param {Map<string, import('./install-plans.ts').Walk>} closures
+ * @param {import('../../catalog/scripts/install-plans.ts').Walk} walked
+ * @param {Map<string, import('../../catalog/scripts/install-plans.ts').Walk>} closures
  * @param {Set<string>} exported
  */
 function blockEntry(walked, closures, exported) {
@@ -52,8 +56,9 @@ function blockEntry(walked, closures, exported) {
     linked.flatMap((slug) =>
       [
         ...react.linkedSlugs(
-          /** @type {import('./install-plans.ts').Walk} */ (closures.get(slug))
-            .files,
+          /** @type {import('../../catalog/scripts/install-plans.ts').Walk} */ (
+            closures.get(slug)
+          ).files,
           exported
         ),
       ].filter((other) => other !== slug)

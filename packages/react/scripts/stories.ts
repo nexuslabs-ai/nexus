@@ -6,9 +6,10 @@ import { readFileSync } from 'node:fs';
 import path from 'node:path';
 import ts from 'typescript';
 
-import { collectSourceFiles } from './files.mjs';
+import { collectSourceFiles } from '../../catalog/scripts/files.mjs';
+import { componentsRoot, toRepoPath } from '../../catalog/scripts/roots.mjs';
+
 import { pascal } from './humanize.ts';
-import { componentsRoot, toRepoPath } from './roots.mjs';
 
 export const DOCS_TAG = 'docs';
 

@@ -2,7 +2,10 @@ import path from 'node:path';
 
 import ts from 'typescript';
 
-import { isUnder, toRepoPath } from '../../../packages/react/scripts/roots.mjs';
+import {
+  isUnder,
+  toRepoPath,
+} from '../../../packages/catalog/scripts/roots.mjs';
 
 export function toSlugFolder(relativePath) {
   if (path.isAbsolute(relativePath)) return null;

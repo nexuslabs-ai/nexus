@@ -139,12 +139,12 @@ jobs:
         run: |
           set -euo pipefail
           mkdir "$RUNNER_TEMP/docs-generated-build"
-          cp -r apps/docs/generated packages/react/generated apps/docs/app/_lib/*.generated.ts "$RUNNER_TEMP/docs-generated-build"
+          cp -r apps/docs/generated packages/catalog/generated apps/docs/app/_lib/*.generated.ts "$RUNNER_TEMP/docs-generated-build"
           pnpm --filter @nxds/docs generate:props
-          pnpm --filter @nxds/react generate:catalog
+          pnpm --filter @nxds/catalog generate:catalog
           pnpm --filter @nxds/docs generate:manifest
           mkdir "$RUNNER_TEMP/docs-generated-fresh"
-          cp -r apps/docs/generated packages/react/generated apps/docs/app/_lib/*.generated.ts "$RUNNER_TEMP/docs-generated-fresh"
+          cp -r apps/docs/generated packages/catalog/generated apps/docs/app/_lib/*.generated.ts "$RUNNER_TEMP/docs-generated-fresh"
           if ! diff -r "$RUNNER_TEMP/docs-generated-build" "$RUNNER_TEMP/docs-generated-fresh"; then
             echo "::error::The docs generated inputs differ from the build step's copy: either a generate:* task in apps/docs/turbo.json is missing an input its generator reads, or the generator's output is nondeterministic."
             exit 1

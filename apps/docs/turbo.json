@@ -15,10 +15,10 @@
         "scripts/props-entries.ts",
         "scripts/react-entry-points.mjs",
         "scripts/roots.mjs",
-        "$TURBO_ROOT$/packages/react/scripts/files.mjs",
+        "$TURBO_ROOT$/packages/catalog/scripts/files.mjs",
         "$TURBO_ROOT$/packages/react/scripts/humanize.ts",
         "$TURBO_ROOT$/packages/react/scripts/react-sources.mjs",
-        "$TURBO_ROOT$/packages/react/scripts/roots.mjs",
+        "$TURBO_ROOT$/packages/catalog/scripts/roots.mjs",
         "$TURBO_ROOT$/packages/react/src/**",
         "$TURBO_ROOT$/packages/react/package.json",
         "$TURBO_ROOT$/packages/react/tsconfig.json"
@@ -31,10 +31,10 @@
         "scripts/props-contract.mjs",
         "scripts/props-entries.ts",
         "scripts/roots.mjs",
-        "$TURBO_ROOT$/packages/react/scripts/files.mjs",
+        "$TURBO_ROOT$/packages/catalog/scripts/files.mjs",
         "$TURBO_ROOT$/packages/react/scripts/humanize.ts",
-        "$TURBO_ROOT$/packages/react/scripts/install-plans.ts",
-        "$TURBO_ROOT$/packages/react/scripts/roots.mjs",
+        "$TURBO_ROOT$/packages/catalog/scripts/install-plans.ts",
+        "$TURBO_ROOT$/packages/catalog/scripts/roots.mjs",
         "$TURBO_ROOT$/packages/vue/scripts/**",
         "$TURBO_ROOT$/packages/vue/src/**",
         "$TURBO_ROOT$/packages/vue/package.json",
@@ -48,7 +48,7 @@
       "inputs": [
         "scripts/bundle-vue-demos.ts",
         "scripts/roots.mjs",
-        "$TURBO_ROOT$/packages/react/scripts/roots.mjs",
+        "$TURBO_ROOT$/packages/catalog/scripts/roots.mjs",
         "generated/vue/**",
         "$TURBO_ROOT$/packages/vue/src/**"
       ],
@@ -59,10 +59,10 @@
         "scripts/generate-page-manifest.mjs",
         "scripts/page-manifest.mjs",
         "scripts/roots.mjs",
-        "$TURBO_ROOT$/packages/react/scripts/files.mjs",
+        "$TURBO_ROOT$/packages/catalog/scripts/files.mjs",
         "$TURBO_ROOT$/packages/react/scripts/humanize.ts",
         "$TURBO_ROOT$/packages/react/scripts/react-sources.mjs",
-        "$TURBO_ROOT$/packages/react/scripts/roots.mjs",
+        "$TURBO_ROOT$/packages/catalog/scripts/roots.mjs",
         "$TURBO_ROOT$/packages/react/scripts/stories.ts",
         "page-registry/**",
         "content/**",
@@ -86,7 +86,7 @@
         "generate:demos",
         "generate:vue",
         "bundle:vue",
-        "@nxds/react#generate:catalog"
+        "@nxds/catalog#generate:catalog"
       ],
       "inputs": ["$TURBO_DEFAULT$", "$TURBO_ROOT$/package.json"],
       "outputs": ["out/**", "next-env.d.ts"]
@@ -99,7 +99,7 @@
         "generate:demos",
         "generate:vue",
         "bundle:vue",
-        "@nxds/react#generate:catalog"
+        "@nxds/catalog#generate:catalog"
       ],
       "cache": false,
       "persistent": true
@@ -111,7 +111,7 @@
         "generate:manifest",
         "generate:demos",
         "generate:vue",
-        "@nxds/react#generate:catalog"
+        "@nxds/catalog#generate:catalog"
       ]
     }
   }

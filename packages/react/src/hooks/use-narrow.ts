@@ -8,6 +8,12 @@ import * as React from 'react';
  */
 const NARROW_QUERY = '(max-width: 47.99rem)';
 
+function subscribe(onChange: () => void) {
+  const mql = window.matchMedia(NARROW_QUERY);
+  mql.addEventListener('change', onChange);
+  return () => mql.removeEventListener('change', onChange);
+}
+
 /**
  * useIsNarrow
  *
@@ -16,12 +22,6 @@ const NARROW_QUERY = '(max-width: 47.99rem)';
  * to pick the tier-appropriate layout — a drawer when narrow, a docked panel
  * at or above `md`.
  */
-function subscribe(onChange: () => void) {
-  const mql = window.matchMedia(NARROW_QUERY);
-  mql.addEventListener('change', onChange);
-  return () => mql.removeEventListener('change', onChange);
-}
-
 export function useIsNarrow() {
   return React.useSyncExternalStore(
     subscribe,

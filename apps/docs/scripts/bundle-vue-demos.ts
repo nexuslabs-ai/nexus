@@ -5,7 +5,10 @@ import vue from '@vitejs/plugin-vue';
 import path from 'node:path';
 import { build } from 'vite';
 
-import { toRepoPath, vueSrc } from '../../../packages/react/scripts/roots.mjs';
+import {
+  toRepoPath,
+  vueSrc,
+} from '../../../packages/catalog/scripts/roots.mjs';
 
 import { docsRoot } from './roots.mjs';
 

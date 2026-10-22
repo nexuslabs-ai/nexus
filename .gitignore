@@ -70,7 +70,7 @@ opencode.json
 
 # Docs build inputs, written by the `@nxds/docs#generate:*` tasks
 apps/docs/generated/
-packages/react/generated/
+packages/catalog/generated/
 apps/docs/__generated__/
 apps/docs/public/avatars/
 apps/docs/public/vue-demos/

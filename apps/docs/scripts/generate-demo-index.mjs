@@ -14,8 +14,8 @@ import {
   readCanonical,
   writeIfChanged,
   writeJson,
-} from '../../../packages/react/scripts/files.mjs';
-import { buildCatalog } from '../../../packages/react/scripts/generate-catalog.mjs';
+} from '../../../packages/catalog/scripts/files.mjs';
+import { buildCatalog } from '../../../packages/catalog/scripts/generate-catalog.mjs';
 import {
   blockSources,
   componentSlugs,
@@ -26,7 +26,7 @@ import {
   reactRoot,
   reactSrc,
   toRepoPath,
-} from '../../../packages/react/scripts/roots.mjs';
+} from '../../../packages/catalog/scripts/roots.mjs';
 import {
   componentDescription,
   componentStoryFiles,

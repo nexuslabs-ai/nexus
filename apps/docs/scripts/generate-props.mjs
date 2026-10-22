@@ -30,7 +30,7 @@ import { docsRoot } from './roots.mjs';
 import {
   collectSourceFiles,
   writeJson,
-} from '../../../packages/react/scripts/files.mjs';
+} from '../../../packages/catalog/scripts/files.mjs';
 import {
   componentSlugs,
   isComponentSource,
@@ -41,7 +41,7 @@ import {
   reactRoot,
   reactSrc,
   toRepoPath,
-} from '../../../packages/react/scripts/roots.mjs';
+} from '../../../packages/catalog/scripts/roots.mjs';
 
 const reactTsconfig = path.join(reactRoot, 'tsconfig.json');
 

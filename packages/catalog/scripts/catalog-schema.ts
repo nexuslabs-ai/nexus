@@ -54,7 +54,7 @@ export type Catalog = {
   schema: 1;
   /** A hash of `frameworks` and each item's name and variants for them: two catalogs with one revision install the same files. */
   revision: string;
-  /** The frameworks the CLI installs. Items also carry variants for others, which only the docs read. */
+  /** The frameworks the CLI installs. The docs copy also carries variants for others; the CLI's copy drops them. */
   frameworks: Framework[];
   items: CatalogItem[];
 };

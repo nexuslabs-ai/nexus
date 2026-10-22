@@ -6,21 +6,6 @@
       "inputs": ["src/**", "vite.config.ts", "tsconfig.json"],
       "outputs": ["dist/**"]
     },
-    "generate:catalog": {
-      "inputs": [
-        "scripts/**",
-        "src/**",
-        "package.json",
-        "tsconfig.json",
-        "$TURBO_ROOT$/packages/tailwind/*.css",
-        "$TURBO_ROOT$/packages/core/package.json",
-        "$TURBO_ROOT$/packages/vue/scripts/**",
-        "$TURBO_ROOT$/packages/vue/src/**",
-        "$TURBO_ROOT$/packages/vue/package.json",
-        "$TURBO_ROOT$/packages/vue/tsconfig.json"
-      ],
-      "outputs": ["generated/catalog.json"]
-    },
     "dev": {
       "dependsOn": ["build"],
       "cache": false,

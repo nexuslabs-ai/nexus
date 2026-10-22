@@ -1,10 +1,27 @@
-import { copyFileSync, readFileSync } from 'node:fs';
+import type { Catalog } from '@nxds/catalog';
+import { readFileSync, writeFileSync } from 'node:fs';
 import { createRequire } from 'node:module';
 import { defineConfig } from 'tsup';
 
 const { version } = JSON.parse(readFileSync('package.json', 'utf8')) as {
   version: string;
 };
+
+/** The catalog with only the variants the CLI installs. */
+function installedCatalog(): Catalog {
+  const require = createRequire(import.meta.url);
+  const catalog = JSON.parse(
+    readFileSync(require.resolve('@nxds/catalog/catalog.json'), 'utf8')
+  ) as Catalog;
+  for (const item of catalog.items) {
+    item.variants = Object.fromEntries(
+      catalog.frameworks
+        .filter((framework) => item.variants[framework])
+        .map((framework) => [framework, item.variants[framework]])
+    );
+  }
+  return catalog;
+}
 
 export default defineConfig({
   entry: { index: 'src/index.ts' },
@@ -16,10 +33,6 @@ export default defineConfig({
   define: { __VERSION__: JSON.stringify(version) },
   // `loadCatalog` reads the catalog from beside the built CLI.
   onSuccess: async () => {
-    const require = createRequire(import.meta.url);
-    copyFileSync(
-      require.resolve('@nxds/react/catalog.json'),
-      'dist/catalog.json'
-    );
+    writeFileSync('dist/catalog.json', JSON.stringify(installedCatalog()));
   },
 });

@@ -21,9 +21,10 @@ import {
   type NxdsAppearanceCookieOptions,
   type NxdsAppearanceState,
   type NxdsResolvedAppearanceMode,
+  parseStoredNxdsAppearance,
   persistNxdsAppearance,
   prefersDarkColorScheme,
-  readStoredNxdsAppearance,
+  readNxdsAppearanceStorage,
   removeNxdsAppearance,
   resolveNxdsAppearanceMode,
   sanitizeNxdsAppearance,
@@ -67,20 +68,6 @@ function subscribeToNothing() {
   return () => {};
 }
 
-function subscribeToStorage(onChange: () => void) {
-  window.addEventListener('storage', onChange);
-  return () => window.removeEventListener('storage', onChange);
-}
-
-function readStorage(storageKey: string | false) {
-  if (storageKey === false) return null;
-  try {
-    return window.localStorage.getItem(storageKey);
-  } catch {
-    return null;
-  }
-}
-
 function nextAppearanceState(
   update: SetStateAction<NxdsAppearanceState>,
   previous: NxdsAppearanceState
@@ -109,18 +96,15 @@ export function NxdsAppearanceProvider({
     () => true,
     () => false
   );
-  // The saved appearance is an external store: read after hydration, and again when another tab saves.
+  // The saved appearance, read after hydration so the server and first client render agree.
   const storedRaw = useSyncExternalStore(
-    subscribeToStorage,
-    () => readStorage(storageKey),
+    subscribeToNothing,
+    () => readNxdsAppearanceStorage(storageKey),
     () => null
   );
   const stored = useMemo(
-    () =>
-      storedRaw === null
-        ? initialState
-        : readStoredNxdsAppearance(storageKey, initialState),
-    [initialState, storageKey, storedRaw]
+    () => parseStoredNxdsAppearance(storedRaw, initialState),
+    [initialState, storedRaw]
   );
   /** The appearance picked in this session, which wins over the saved one. */
   const [chosen, setChosen] = useState<NxdsAppearanceState | null>(null);

@@ -32,16 +32,13 @@
       "import": "./dist/appearance-server.mjs",
       "require": "./dist/appearance-server.js"
     },
-    "./styles.css": "./dist/react.css",
-    "./catalog-schema": "./scripts/catalog-schema.ts",
-    "./catalog.json": "./generated/catalog.json"
+    "./styles.css": "./dist/react.css"
   },
   "scripts": {
     "dev": "vite build --watch",
     "build": "vite build",
-    "clean": "rm -rf dist generated",
+    "clean": "rm -rf dist",
     "typecheck": "tsc --noEmit && tsc -p tsconfig.node.json",
-    "generate:catalog": "node scripts/generate-catalog.mjs",
     "storybook": "storybook dev -p 6006",
     "build-storybook": "storybook build"
   },

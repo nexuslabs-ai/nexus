@@ -17,21 +17,19 @@ import prettier from 'prettier';
 import ts from 'typescript';
 import { createChecker, type PropertyMeta } from 'vue-component-meta';
 
-import { humanize } from '../../../packages/react/scripts/humanize.ts';
-import {
-  packageName,
-  type Walk,
-} from '../../../packages/react/scripts/install-plans.ts';
+import { packageName } from '../../../packages/catalog/scripts/install-plans.ts';
 import {
   isUnder,
   toRepoPath,
   vueComponentsRoot,
   vueRoot,
   vueSrc,
-} from '../../../packages/react/scripts/roots.mjs';
+} from '../../../packages/catalog/scripts/roots.mjs';
+import { humanize } from '../../../packages/react/scripts/humanize.ts';
 import {
   vue,
   vueComponentSlugs,
+  vueWalks,
 } from '../../../packages/vue/scripts/vue-sources.ts';
 
 import {
@@ -417,11 +415,7 @@ function componentProps(
 // ── Write everything ────────────────────────────────────────────────────────
 
 const slugs = vueComponentSlugs();
-const walks = slugs.map(vue.walkSlug).filter((walked) => walked !== null);
-vue.assertDeclaredPackages(walks);
-const closures = new Map<string, Walk>(
-  walks.map((walked) => [walked.name, walked])
-);
+const closures = vueWalks(slugs);
 const componentDocs: Record<string, VueComponentDocs> = {};
 const demos: Record<string, VueDemo> = {};
 

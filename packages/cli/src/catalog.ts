@@ -4,7 +4,7 @@ import type {
   Framework,
   SetupVariant,
   Variant,
-} from '@nxds/react/catalog-schema';
+} from '@nxds/catalog';
 import { readFileSync } from 'node:fs';
 
 import { CliError } from './errors';
@@ -16,7 +16,7 @@ export type {
   Framework,
   SetupStep,
   Variant,
-} from '@nxds/react/catalog-schema';
+} from '@nxds/catalog';
 
 export const SETUP = 'setup';
 

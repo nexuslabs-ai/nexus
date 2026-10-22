@@ -1,6 +1,6 @@
 {
   "framework": "react",
-  "revision": "ec191cbb6008",
+  "revision": "71989a6a58f3",
   "dir": "src/components/nxds",
   "css": "src/nxds.css",
   "items": [
@@ -38,7 +38,7 @@
     "tailwind/variables.css": "dd34727c38a8f6aa4848b8a3ed7fd4cf416d640524b800ac3050da83a0803f47",
     "components/appearance/provider/factory.tsx": "75c557c33817214bdc6c7b228526d76e8524d3f33133e4e8eba65a4736da3e7e",
     "components/appearance/provider/index.ts": "16b38b7f71c361d1481f8c0482c5f98c28162b6d192b8ff86f671a62bcaf0f7f",
-    "components/appearance/provider/provider.tsx": "cdd2d94214259ea176fda9a195a746fb6d773b200e1ec45816accaac59499c0a",
+    "components/appearance/provider/provider.tsx": "2a2ed324177a4542bb9f5ef4dd843a863759d371a31db837541fad8ad9a20687",
     "components/appearance/provider/script.tsx": "4cbcb81508a218b6d5b1845b1067e2c87a42025417d83a449c2850f47a54433d",
     "components/appearance/provider/server.ts": "4af96770e25548ed3e0b44f23e360ead76277327802fdbf209d7c3f89614cc91",
     "lib/utils.ts": "bfc096cf5531e4712abd3d516239c9f024d59b0b5ff5a0f6ff8712fe79b3f0da",

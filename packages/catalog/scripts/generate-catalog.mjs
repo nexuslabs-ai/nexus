@@ -12,16 +12,27 @@ import { readdirSync, readFileSync } from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 
-import { vue, vueComponentSlugs } from '../../vue/scripts/vue-sources.ts';
+import {
+  vue,
+  vueComponentSlugs,
+  vueWalks,
+} from '../../vue/scripts/vue-sources.ts';
 
-import { dependencyEntries, react } from './dependency-plans.mjs';
-import { readCanonical, writeJson } from './files.mjs';
-import { pascal } from './humanize.ts';
+import {
+  dependencyEntries,
+  react,
+} from '../../react/scripts/dependency-plans.mjs';
+import { pascal } from '../../react/scripts/humanize.ts';
 import {
   blockSources,
   componentLabel,
   exportedComponentSlugs,
-} from './react-sources.mjs';
+} from '../../react/scripts/react-sources.mjs';
+import {
+  componentDescription,
+  componentStoryFiles,
+} from '../../react/scripts/stories.ts';
+import { readCanonical, writeJson } from './files.mjs';
 import {
   CATALOG_FILE,
   reactRoot,
@@ -30,7 +41,6 @@ import {
   toRepoPath,
   vueSrc,
 } from './roots.mjs';
-import { componentDescription, componentStoryFiles } from './stories.ts';
 
 /**
  * @typedef {import('./catalog-schema').Catalog} Catalog
@@ -194,12 +204,10 @@ function planVariant(src, plan, setup) {
  */
 function vueVariants(setup) {
   const slugs = vueComponentSlugs().filter((slug) => slug !== VUE_SETUP_SLUG);
-  const walks = slugs.map(vue.walkSlug).filter((walked) => walked !== null);
-  vue.assertDeclaredPackages(walks);
-  const closures = new Map(walks.map((walked) => [walked.name, walked]));
+  const closures = vueWalks(slugs);
   const exported = new Set(slugs);
   return new Map(
-    walks.map((walked) => [
+    [...closures.values()].map((walked) => [
       walked.name,
       planVariant(
         vueSrc,

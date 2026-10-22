@@ -1,9 +1,14 @@
 import { existsSync, readdirSync, readFileSync } from 'node:fs';
 import path from 'node:path';
 
-import { importSpecifiers } from './files.mjs';
+import { importSpecifiers } from '../../catalog/scripts/files.mjs';
 import { pascal } from './humanize.ts';
-import { blocksRoot, componentsRoot, isUnder, reactSrc } from './roots.mjs';
+import {
+  blocksRoot,
+  componentsRoot,
+  isUnder,
+  reactSrc,
+} from '../../catalog/scripts/roots.mjs';
 
 export function isModuleSource(filePath) {
   const name = path.basename(filePath);

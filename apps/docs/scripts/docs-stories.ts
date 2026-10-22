@@ -13,13 +13,13 @@ import path from 'node:path';
 import prettier, { type Options as PrettierOptions } from 'prettier';
 import ts from 'typescript';
 
-import { humanize, pascal } from '../../../packages/react/scripts/humanize.ts';
 import {
   componentsRoot,
   isUnder,
   reactSrc,
   toRepoPath,
-} from '../../../packages/react/scripts/roots.mjs';
+} from '../../../packages/catalog/scripts/roots.mjs';
+import { humanize, pascal } from '../../../packages/react/scripts/humanize.ts';
 import {
   DOCS_TAG,
   docsDescription,

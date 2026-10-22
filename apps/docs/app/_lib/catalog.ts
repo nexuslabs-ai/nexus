@@ -1,5 +1,5 @@
-import catalogJson from '@nxds/react/catalog.json';
-import type { Catalog, Variant } from '@nxds/react/catalog-schema';
+import type { Catalog, Variant } from '@nxds/catalog';
+import catalogJson from '@nxds/catalog/catalog.json';
 
 import type { Framework } from './frameworks';
 
@@ -10,7 +10,7 @@ const SETUP = 'setup';
 const catalog = catalogJson as unknown as Catalog;
 if (catalog.schema !== 1) {
   throw new Error(
-    `catalog: @nxds/react/catalog.json has schema ${String(catalog.schema)}, but the docs read schema 1. Rerun \`pnpm --filter @nxds/react generate:catalog\`.`
+    `catalog: @nxds/catalog/catalog.json has schema ${String(catalog.schema)}, but the docs read schema 1. Rerun \`pnpm --filter @nxds/catalog generate:catalog\`.`
   );
 }
 

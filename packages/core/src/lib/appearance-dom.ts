@@ -55,21 +55,42 @@ export function resolveNxdsAppearanceMode(
   return mode;
 }
 
+/** The raw string saved under `storageKey`, or `null` when there is none. */
+export function readNxdsAppearanceStorage(
+  storageKey: string | false
+): string | null {
+  if (storageKey === false || typeof window === 'undefined') return null;
+
+  try {
+    return window.localStorage.getItem(storageKey);
+  } catch {
+    return null;
+  }
+}
+
+/** The appearance in a saved string, or `fallback` when it is empty or unreadable. */
+export function parseStoredNxdsAppearance(
+  raw: string | null,
+  fallback: NxdsAppearanceState
+): NxdsAppearanceState {
+  if (!raw) return fallback;
+
+  try {
+    return sanitizeNxdsAppearanceSnapshot(JSON.parse(raw)).state;
+  } catch {
+    return fallback;
+  }
+}
+
 /** The appearance saved under `storageKey`, or `fallback` when there is none. */
 export function readStoredNxdsAppearance(
   storageKey: string | false,
   fallback: NxdsAppearanceState
 ): NxdsAppearanceState {
-  if (storageKey === false || typeof window === 'undefined') return fallback;
-
-  try {
-    const raw = window.localStorage.getItem(storageKey);
-    return raw
-      ? sanitizeNxdsAppearanceSnapshot(JSON.parse(raw)).state
-      : fallback;
-  } catch {
-    return fallback;
-  }
+  return parseStoredNxdsAppearance(
+    readNxdsAppearanceStorage(storageKey),
+    fallback
+  );
 }
 
 function upsertStyle(attribute: string, css: string): void {

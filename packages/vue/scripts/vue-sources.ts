@@ -4,15 +4,18 @@ import { readFileSync } from 'node:fs';
 import path from 'node:path';
 import { parse as parseSfc } from 'vue/compiler-sfc';
 
-import { importSpecifiers } from '../../react/scripts/files.mjs';
-import { createInstallPlanner } from '../../react/scripts/install-plans.ts';
+import { importSpecifiers } from '../../catalog/scripts/files.mjs';
+import {
+  createInstallPlanner,
+  type Walk,
+} from '../../catalog/scripts/install-plans.ts';
 import {
   isUnder,
   toRepoPath,
   vueComponentsRoot,
   vueRoot,
   vueSrc,
-} from '../../react/scripts/roots.mjs';
+} from '../../catalog/scripts/roots.mjs';
 
 const COMPONENT_SPECIFIER = './components/';
 
@@ -64,3 +67,10 @@ export const vue = createInstallPlanner({
   readScript: readVueScript,
   linkedComponentSlug: linkedVueSlug,
 });
+
+/** Each slug's walked files and packages, by slug, once every package they import is declared. */
+export function vueWalks(slugs: string[]) {
+  const walks = slugs.map(vue.walkSlug).filter((walked) => walked !== null);
+  vue.assertDeclaredPackages(walks);
+  return new Map<string, Walk>(walks.map((walked) => [walked.name, walked]));
+}

@@ -3,7 +3,7 @@
   "extends": ["//"],
   "tasks": {
     "build": {
-      "dependsOn": ["@nxds/react#generate:catalog"],
+      "dependsOn": ["@nxds/catalog#generate:catalog"],
       "inputs": ["src/**", "tsup.config.ts", "tsconfig.json", "package.json"],
       "outputs": ["dist/**"]
     },
