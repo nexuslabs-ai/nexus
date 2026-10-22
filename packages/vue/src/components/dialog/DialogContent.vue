@@ -70,7 +70,7 @@ function containsComposedSlot(
   );
 }
 
-/** Which parts DialogContent generates. The template binds it once per render, so the default slot is read once. */
+/** Which parts DialogContent generates. The template binds it once per render, so the header and body checks share one read of the default slot. */
 function generatedParts() {
   const children = slots.default?.();
   return {

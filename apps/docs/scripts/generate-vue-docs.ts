@@ -12,7 +12,6 @@ import {
   toPropsIndex,
 } from '@nxds/source-model/props-entries.ts';
 import {
-  docsRoot,
   isUnder,
   toRepoPath,
   vueComponentsRoot,
@@ -37,6 +36,7 @@ import prettier from 'prettier';
 import ts from 'typescript';
 import { parse as parseSfc } from 'vue/compiler-sfc';
 
+import { docsRoot } from './docs-root.mjs';
 import {
   createInstallPlanner,
   packageName,

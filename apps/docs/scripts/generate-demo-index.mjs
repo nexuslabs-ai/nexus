@@ -29,12 +29,8 @@ import {
   componentSlugs,
   exportedComponentSlugs,
 } from '@nxds/source-model/react-sources.mjs';
-import {
-  docsRoot,
-  reactRoot,
-  reactSrc,
-  toRepoPath,
-} from '@nxds/source-model/roots.mjs';
+import { reactRoot, reactSrc, toRepoPath } from '@nxds/source-model/roots.mjs';
+import { docsRoot } from './docs-root.mjs';
 
 const GENERATED_DIR = path.join(docsRoot, '__generated__');
 const DEPENDENCIES_DIR = path.join(docsRoot, 'generated', 'dependencies');

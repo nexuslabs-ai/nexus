@@ -1,11 +1,20 @@
-import { DEFAULT_NXDS_APPEARANCE, type NxdsAppearanceState } from '@nxds/core';
+import {
+  applyNxdsAppearance,
+  DEFAULT_NXDS_APPEARANCE,
+  type NxdsAppearanceState,
+  prefersDarkColorScheme,
+} from '@nxds/core';
 import type { Meta, StoryObj } from '@storybook/vue3-vite';
 import { expect, fn, userEvent, waitFor, within } from 'storybook/test';
 import { createApp, ref } from 'vue';
 
 import { Button } from '../button';
 
-import { createNxdsAppearance, useNxdsAppearance } from '.';
+import {
+  createNxdsAppearance,
+  type NxdsAppearance,
+  useNxdsAppearance,
+} from '.';
 
 const AppearanceControls = {
   components: { Button },
@@ -77,8 +86,17 @@ export const BrandColorRederivesTheme: Story = {
 
 const CONTROLLED_STORAGE_KEY = 'nxds-appearance-controlled-story';
 
+// The story renders in the preview's app, so this is the preview's appearance.
+// Unmounting the second app removes it from the document, so the play re-applies it.
+let previewAppearance: NxdsAppearance | undefined;
+
 export const ControlledState: Story = {
-  render: () => ({ template: '<div data-testid="controlled-app" />' }),
+  render: () => ({
+    setup() {
+      previewAppearance = useNxdsAppearance();
+    },
+    template: '<div data-testid="controlled-app" />',
+  }),
   play: async ({ canvasElement }) => {
     const host = within(canvasElement).getByTestId('controlled-app');
     const state = ref<NxdsAppearanceState>(DEFAULT_NXDS_APPEARANCE);
@@ -93,18 +111,26 @@ export const ControlledState: Story = {
     app.mount(host);
     const controls = within(host);
 
-    await userEvent.click(controls.getByRole('button', { name: 'Dark' }));
-    await expect(onStateChange).toHaveBeenCalledWith(
-      expect.objectContaining({ mode: 'dark' })
-    );
-    await expect(controls.getByText('Resolved mode: light')).toBeVisible();
-    await expect(localStorage.getItem(CONTROLLED_STORAGE_KEY)).toBeNull();
+    try {
+      await userEvent.click(controls.getByRole('button', { name: 'Dark' }));
+      await expect(onStateChange).toHaveBeenCalledWith(
+        expect.objectContaining({ mode: 'dark' })
+      );
+      await expect(controls.getByText('Resolved mode: light')).toBeVisible();
+      await expect(localStorage.getItem(CONTROLLED_STORAGE_KEY)).toBeNull();
 
-    state.value = { ...state.value, mode: 'dark' };
-    await waitFor(() =>
-      expect(controls.getByText('Resolved mode: dark')).toBeVisible()
-    );
-
-    app.unmount();
+      state.value = { ...state.value, mode: 'dark' };
+      await waitFor(() =>
+        expect(controls.getByText('Resolved mode: dark')).toBeVisible()
+      );
+    } finally {
+      app.unmount();
+      if (previewAppearance) {
+        applyNxdsAppearance(
+          previewAppearance.state.value,
+          prefersDarkColorScheme()
+        );
+      }
+    }
   },
 };

@@ -4,7 +4,7 @@ import { pathToFileURL } from 'node:url';
 
 import { createJiti } from 'jiti';
 
-import { docsRoot } from '@nxds/source-model/roots.mjs';
+import { docsRoot } from './docs-root.mjs';
 
 // Cloudflare Workers static assets reject a _headers line over 2,000 characters.
 const MAX_HEADERS_LINE_LENGTH = 2000;

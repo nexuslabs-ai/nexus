@@ -86,18 +86,29 @@ function vueContract(checker: VueChecker, slug: string) {
   return new Map(parts.map((part) => [part.entry.name, part]));
 }
 
-/** Every way the Vue part's API differs from the React part's. */
-/** The Vue API names each React prop maps to: a kebab-case slot, an emit, or the same prop. */
-function mappedNames(react: ComponentEntry) {
-  return new Set(
-    react.props.map((prop) => {
-      if (REACT_NODE.test(prop.type)) return kebab(prop.name);
-      if (/^on[A-Z]/.test(prop.name)) return kebab(prop.name.slice(2));
-      return prop.name;
-    })
-  );
+interface VueName {
+  prop: PropEntry;
+  kind: 'slot' | 'emit' | 'asChild' | 'prop';
+  vueName: string;
 }
 
+/** The Vue API each React prop maps to: a kebab-case slot, an emit, `as-child`, or the same prop. */
+function vueNames(react: ComponentEntry) {
+  return react.props.map((prop): VueName => {
+    if (REACT_NODE.test(prop.type)) {
+      return { prop, kind: 'slot', vueName: kebab(prop.name) };
+    }
+    if (prop.name === 'asChild') {
+      return { prop, kind: 'asChild', vueName: prop.name };
+    }
+    if (/^on[A-Z]/.test(prop.name)) {
+      return { prop, kind: 'emit', vueName: kebab(prop.name.slice(2)) };
+    }
+    return { prop, kind: 'prop', vueName: prop.name };
+  });
+}
+
+/** Every way the Vue part's API differs from the React part's. */
 function partDrift(react: ComponentEntry, vue: VuePartApi) {
   const drift: string[] = [];
   const at = (name: string) => `${react.name}.${name}`;
@@ -106,25 +117,25 @@ function partDrift(react: ComponentEntry, vue: VuePartApi) {
       .filter((prop) => prop.name !== 'class')
       .map((prop) => [prop.name, prop])
   );
-  for (const prop of react.props) {
-    if (REACT_NODE.test(prop.type)) {
-      if (!vue.slots.includes(kebab(prop.name))) {
-        drift.push(`${at(prop.name)}: no #${kebab(prop.name)} slot`);
+  const names = vueNames(react);
+  for (const { prop, kind, vueName } of names) {
+    if (kind === 'slot') {
+      if (!vue.slots.includes(vueName)) {
+        drift.push(`${at(prop.name)}: no #${vueName} slot`);
       }
       continue;
     }
-    if (prop.name === 'asChild') {
-      if (!vue.inheritsAsChild) drift.push(`${at('asChild')}: missing`);
+    if (kind === 'asChild') {
+      if (!vue.inheritsAsChild) drift.push(`${at(prop.name)}: missing`);
       continue;
     }
-    if (/^on[A-Z]/.test(prop.name)) {
-      const event = kebab(prop.name.slice(2));
-      if (!vue.events.includes(event)) {
-        drift.push(`${at(prop.name)}: no '${event}' emit`);
+    if (kind === 'emit') {
+      if (!vue.events.includes(vueName)) {
+        drift.push(`${at(prop.name)}: no '${vueName}' emit`);
       }
       continue;
     }
-    const twin = vueProps.get(prop.name);
+    const twin = vueProps.get(vueName);
     if (!twin) {
       drift.push(`${at(prop.name)}: missing`);
       continue;
@@ -132,7 +143,7 @@ function partDrift(react: ComponentEntry, vue: VuePartApi) {
     drift.push(...propDrift(at(prop.name), prop, twin));
   }
 
-  const mapped = mappedNames(react);
+  const mapped = new Set(names.map(({ vueName }) => vueName));
   const vueOnly = [...vueProps.keys(), ...vue.slots, ...vue.events].filter(
     (name) => !mapped.has(name) && !(at(name) in vueOnlyApi)
   );
@@ -211,7 +222,9 @@ describe('component contract', () => {
       [...contracts.values()].flatMap(({ react, vue }) =>
         [...vue].flatMap(([name, part]) => {
           const reactPart = react.get(name);
-          const mapped = reactPart ? mappedNames(reactPart) : new Set();
+          const mapped = new Set<string>(
+            reactPart ? vueNames(reactPart).map(({ vueName }) => vueName) : []
+          );
           return [
             ...part.entry.props.map((prop) => prop.name),
             ...part.slots,

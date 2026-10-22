@@ -4,7 +4,8 @@ import path from 'node:path';
 import { writeJson } from '@nxds/source-model/files.mjs';
 import { toPropsIndex } from '@nxds/source-model/props-entries.ts';
 import { reactPropsFiles } from '@nxds/source-model/react-props.mjs';
-import { docsRoot, toRepoPath } from '@nxds/source-model/roots.mjs';
+import { toRepoPath } from '@nxds/source-model/roots.mjs';
+import { docsRoot } from './docs-root.mjs';
 
 const outputDir = path.join(docsRoot, 'generated', 'props');
 

@@ -11,7 +11,9 @@
       "dependsOn": ["@nxds/core#build"],
       "inputs": [
         "scripts/generate-props.mjs",
+        "scripts/docs-root.mjs",
         "$TURBO_ROOT$/packages/source-model/src/**",
+        "$TURBO_ROOT$/packages/source-model/package.json",
         "$TURBO_ROOT$/packages/react/src/**",
         "$TURBO_ROOT$/packages/react/package.json",
         "$TURBO_ROOT$/packages/react/tsconfig.json"
@@ -22,7 +24,9 @@
       "inputs": [
         "scripts/generate-dependencies.mjs",
         "scripts/install-plans.ts",
+        "scripts/docs-root.mjs",
         "$TURBO_ROOT$/packages/source-model/src/**",
+        "$TURBO_ROOT$/packages/source-model/package.json",
         "$TURBO_ROOT$/packages/react/src/**",
         "$TURBO_ROOT$/packages/react/package.json",
         "$TURBO_ROOT$/packages/react/tsconfig.json"
@@ -33,7 +37,9 @@
       "inputs": [
         "scripts/generate-vue-docs.ts",
         "scripts/install-plans.ts",
+        "scripts/docs-root.mjs",
         "$TURBO_ROOT$/packages/source-model/src/**",
+        "$TURBO_ROOT$/packages/source-model/package.json",
         "$TURBO_ROOT$/packages/vue/src/**",
         "$TURBO_ROOT$/packages/vue/package.json",
         "$TURBO_ROOT$/packages/vue/tsconfig.json",
@@ -45,7 +51,9 @@
       "dependsOn": ["@nxds/core#build", "generate:vue"],
       "inputs": [
         "scripts/bundle-vue-demos.ts",
+        "scripts/docs-root.mjs",
         "$TURBO_ROOT$/packages/source-model/src/**",
+        "$TURBO_ROOT$/packages/source-model/package.json",
         "generated/vue/**",
         "$TURBO_ROOT$/packages/vue/src/**"
       ],
@@ -55,7 +63,9 @@
       "inputs": [
         "scripts/generate-page-manifest.mjs",
         "scripts/page-manifest.mjs",
+        "scripts/docs-root.mjs",
         "$TURBO_ROOT$/packages/source-model/src/**",
+        "$TURBO_ROOT$/packages/source-model/package.json",
         "page-registry/**",
         "content/**",
         "app/_pages/**",

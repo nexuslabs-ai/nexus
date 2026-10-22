@@ -7,7 +7,6 @@ export const repoRoot = path.resolve(
   '..',
   '..'
 );
-export const docsRoot = path.join(repoRoot, 'apps', 'docs');
 export const reactRoot = path.join(repoRoot, 'packages', 'react');
 export const reactSrc = path.join(reactRoot, 'src');
 export const componentsRoot = path.join(reactSrc, 'components');
