@@ -100,6 +100,37 @@ export const vueOnlyApi: Record<string, string> = {
     'slot for custom thumb content; React renders the thumb itself with no way to compose it',
 };
 
+/** Play stories only one framework has, as `{slug}/{Story}`. */
+export const behaviourOnlyIn: Record<
+  'react' | 'vue',
+  Record<string, string>
+> = {
+  react: {
+    'alert/Playground':
+      'drives Storybook-only controls that build the children; it tests the story, not Alert',
+    'dialog/NestedOverlayStacking':
+      'opens a DropdownMenu inside the dialog, and DropdownMenu is planned for Vue',
+  },
+  vue: {
+    'switch/VModel': 'v-model binding, a Vue idiom with no React counterpart',
+    'switch/ThumbSlot': 'the #thumb slot is Vue-only API (see vueOnlyApi)',
+    'tabs/IndicatorFollowsActiveTab':
+      "pins Reka's horizontal indicator geometry; React's measured indicator is pinned by UnderlineVariant",
+  },
+};
+
+const TABS_INDICATOR =
+  "React waits for its measured indicator's opacity and transform; Reka's indicator has neither, so Vue checks only the geometry";
+
+/** Paired play stories whose steps differ by design, as `{slug}/{Story}`. */
+export const behaviourDifferences: Record<string, string> = {
+  'tabs/UnderlineVariant': TABS_INDICATOR,
+  'tabs/VerticalIndicatorFollowsActiveTab': TABS_INDICATOR,
+  'tabs/VerticalUnderlineIndicatorFollowsActiveTab': TABS_INDICATOR,
+  'switch/Small':
+    "a Vue docs story renders without args, so it can't spy on the emit; ClickInteraction asserts it",
+};
+
 /** Parts whose rendered element differs by design, by `data-slot`; the rendered check skips them. */
 export const renderedDifferences: Record<string, string> = {
   'tabs-indicator':
@@ -115,6 +146,14 @@ export const vueOnlyDeclarations: Record<string, string> = {
 /** Files Vue copies from React byte for byte, as `[react, vue]` repo paths. */
 export const copies: [react: string, vue: string][] = [
   ['packages/react/src/lib/utils.ts', 'packages/vue/src/lib/utils.ts'],
+  [
+    'packages/react/src/stories/support/story-height-test-utils.ts',
+    'packages/vue/src/stories/support/story-height-test-utils.ts',
+  ],
+  [
+    'packages/react/src/stories/support/overlay-motion-test-utils.ts',
+    'packages/vue/src/stories/support/overlay-motion-test-utils.ts',
+  ],
 ];
 
 /** Dependencies both packages declare, as `[react, vue]` names, which must take the same range. */

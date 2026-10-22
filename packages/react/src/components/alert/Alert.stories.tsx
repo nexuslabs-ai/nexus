@@ -1282,3 +1282,60 @@ export const DefaultModeHeightPinned: Story = {
 // A11Y is tested automatically on ALL stories
 // via addon-a11y with test: 'error'
 // ============================================
+
+export const WithActions: Story = {
+  render: () => (
+    <Alert variant="destructive" role="alert" className="nx:max-w-lg">
+      <AlertIcon>
+        <IconAlertCircle />
+      </AlertIcon>
+      <AlertTitle>Payment failed</AlertTitle>
+      <AlertDescription>Your card was declined.</AlertDescription>
+      <AlertActions>
+        <Button size="sm" variant="outline">
+          Update card
+        </Button>
+      </AlertActions>
+    </Alert>
+  ),
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+    const alert = canvas.getByRole('alert');
+    const icon = alert.querySelector('[data-slot="alert-icon"]');
+
+    await expect(icon).toHaveAttribute('aria-hidden', 'true');
+    await expect(
+      canvas.getByRole('button', { name: 'Update card' })
+    ).toBeVisible();
+  },
+};
+
+function KeyboardDismissExample() {
+  const [open, setOpen] = React.useState(true);
+
+  if (!open) return null;
+
+  return (
+    <Alert layout="inline" className="nx:max-w-lg">
+      <AlertContent>
+        <AlertTitle>Saved</AlertTitle>
+      </AlertContent>
+      <AlertActions>
+        <AlertClose onClick={() => setOpen(false)} />
+      </AlertActions>
+    </Alert>
+  );
+}
+
+export const KeyboardInteraction: Story = {
+  render: () => <KeyboardDismissExample />,
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+    const close = canvas.getByRole('button', { name: 'Dismiss alert' });
+
+    await userEvent.tab();
+    await expect(close).toHaveFocus();
+    await userEvent.keyboard('{Enter}');
+    await expect(canvas.queryByText('Saved')).toBeNull();
+  },
+};

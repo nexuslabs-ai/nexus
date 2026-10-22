@@ -81,6 +81,23 @@ export const WithDataAttributes: Story = {
 
 // A range of sizes, a tinted variant, and an inline "loading more" caption.
 // Reused by the per-base variant generator.
+export const CustomLabelAndSize: Story = {
+  render: () => (
+    <Spinner
+      className="nx:size-6 nx:text-primary-subtle-foreground"
+      aria-label="Saving changes"
+    />
+  ),
+  play: async ({ canvasElement }) => {
+    const spinner = within(canvasElement).getByRole('status', {
+      name: 'Saving changes',
+    });
+
+    await expect(spinner).toHaveClass('nx:size-6');
+    await expect(spinner).not.toHaveClass('nx:size-4');
+  },
+};
+
 export const AllVariants: Story = {
   render: () => (
     <div className="nx:flex nx:flex-col nx:gap-4 nx:text-foreground">

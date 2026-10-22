@@ -2,6 +2,7 @@ import type { Meta, StoryObj } from '@storybook/vue3-vite';
 import { expect, within } from 'storybook/test';
 import { useId } from 'vue';
 
+import { expectHeightPinned } from '../../stories/support/story-height-test-utils';
 import { Button } from '../button';
 
 import {
@@ -229,53 +230,160 @@ export const LoginCard: Story = {
 };
 
 export const WithDataAttributes: Story = {
+  render: () => ({
+    components: {
+      Button,
+      Card,
+      CardContent,
+      CardDescription,
+      CardFooter,
+      CardHeader,
+      CardTitle,
+    },
+    template: `
+      <Card class="nx:w-[350px]">
+        <CardHeader>
+          <CardTitle>Data Attributes Test</CardTitle>
+          <CardDescription>Testing data-slot attributes.</CardDescription>
+        </CardHeader>
+        <CardContent>
+          <p>Content area.</p>
+        </CardContent>
+        <CardFooter>
+          <Button>Action</Button>
+        </CardFooter>
+      </Card>
+    `,
+  }),
   play: async ({ canvasElement }) => {
-    const slots = [
-      'card',
-      'card-header',
-      'card-title',
-      'card-description',
-      'card-action',
-      'card-content',
-      'card-footer',
-    ];
+    const canvas = within(canvasElement);
 
-    for (const slot of slots) {
-      await expect(
-        canvasElement.querySelector(`[data-slot="${slot}"]`)
-      ).toBeInTheDocument();
-    }
+    // Check data-slot attributes
+    const card = canvasElement.querySelector('[data-slot="card"]');
+    const header = canvasElement.querySelector('[data-slot="card-header"]');
+    const title = canvasElement.querySelector('[data-slot="card-title"]');
+    const description = canvasElement.querySelector(
+      '[data-slot="card-description"]'
+    );
+    const content = canvasElement.querySelector('[data-slot="card-content"]');
+    const footer = canvasElement.querySelector('[data-slot="card-footer"]');
+
+    await expect(card).toBeInTheDocument();
+    await expect(header).toBeInTheDocument();
+    await expect(title).toBeInTheDocument();
+    await expect(description).toBeInTheDocument();
+    await expect(content).toBeInTheDocument();
+    await expect(footer).toBeInTheDocument();
+
+    // Verify title text
+    const titleElement = canvas.getByRole('heading', {
+      level: 3,
+      name: 'Data Attributes Test',
+    });
+    await expect(titleElement).toHaveAttribute('data-slot', 'card-title');
   },
 };
 
-export const DefaultHeading: Story = {
+export const TitleAsHeading: Story = {
+  render: () => ({
+    components: {
+      Card,
+      CardContent,
+      CardDescription,
+      CardHeader,
+      CardTitle,
+    },
+    template: `
+      <section aria-labelledby="card-section-heading">
+        <Card class="nx:w-[350px]">
+          <CardHeader>
+            <CardTitle as-child>
+              <h2 id="card-section-heading">Campaign overview</h2>
+            </CardTitle>
+            <CardDescription>Use a section-level heading when the card sits directly below a page heading.</CardDescription>
+          </CardHeader>
+          <CardContent>
+            <p>Campaign metrics belong to this section of the page outline.</p>
+          </CardContent>
+        </Card>
+      </section>
+    `,
+  }),
   play: async ({ canvasElement }) => {
-    const heading = within(canvasElement).getByRole('heading', {
-      name: 'Team plan',
+    const canvas = within(canvasElement);
+    const heading = canvas.getByRole('heading', {
+      level: 2,
+      name: 'Campaign overview',
     });
 
-    await expect(heading.tagName).toBe('H3');
+    await expect(heading).toHaveAttribute('data-slot', 'card-title');
   },
 };
 
-export const TitleAsChild: Story = {
+export const LongTitleWithAction: Story = {
   render: () => ({
-    components: { Card, CardHeader, CardTitle },
+    components: {
+      Button,
+      Card,
+      CardAction,
+      CardContent,
+      CardDescription,
+      CardHeader,
+      CardTitle,
+    },
     template: `
-      <Card class="nx:w-96">
+      <Card class="nx:w-[320px]">
         <CardHeader>
-          <CardTitle as-child><h2>Billing</h2></CardTitle>
+          <CardTitle>Quarterly revenue operations review with customer expansion notes</CardTitle>
+          <CardDescription>The action should keep its own reserved column.</CardDescription>
+          <CardAction>
+            <Button size="sm" variant="outline">Edit</Button>
+          </CardAction>
+        </CardHeader>
+        <CardContent>
+          <p>Header text wraps before it reaches the action.</p>
+        </CardContent>
+      </Card>
+    `,
+  }),
+  play: async ({ canvasElement }) => {
+    await document.fonts.ready;
+
+    const title = canvasElement.querySelector<HTMLElement>(
+      '[data-slot="card-title"]'
+    );
+    const action = canvasElement.querySelector<HTMLElement>(
+      '[data-slot="card-action"]'
+    );
+
+    if (!title || !action) {
+      throw new Error('Expected card title and action to render.');
+    }
+
+    const titleRect = title.getBoundingClientRect();
+    const actionRect = action.getBoundingClientRect();
+
+    await expect(titleRect.right).toBeLessThanOrEqual(actionRect.left + 0.5);
+  },
+};
+
+export const ActionDataAttributes: Story = {
+  render: () => ({
+    components: { Button, Card, CardAction, CardHeader, CardTitle },
+    template: `
+      <Card class="nx:w-[350px]">
+        <CardHeader>
+          <CardTitle>Action Test</CardTitle>
+          <CardAction>
+            <Button size="sm">Edit</Button>
+          </CardAction>
         </CardHeader>
       </Card>
     `,
   }),
   play: async ({ canvasElement }) => {
-    const heading = within(canvasElement).getByRole('heading', {
-      level: 2,
-      name: 'Billing',
-    });
-
-    await expect(heading).toHaveAttribute('data-slot', 'card-title');
+    const action = canvasElement.querySelector('[data-slot="card-action"]');
+    await expect(action).toBeInTheDocument();
   },
 };
 
@@ -300,21 +408,31 @@ export const WithCustomClassName: Story = {
   },
 };
 
-export const LongContent: Story = {
+export const DefaultModeHeightPinned: Story = {
+  parameters: {
+    a11y: { test: 'off' },
+    docs: {
+      description: {
+        story:
+          'At default density, a card with one 40px child is exactly 66px tall.',
+      },
+    },
+  },
   render: () => ({
-    components: { Card, CardDescription, CardHeader, CardTitle },
+    components: { Card, CardContent },
     template: `
-      <Card class="nx:w-72">
-        <CardHeader>
-          <CardTitle>A very long title that wraps across more than one line in a narrow card</CardTitle>
-          <CardDescription>Supporting text keeps its own column under the title.</CardDescription>
-        </CardHeader>
-      </Card>
+      <div data-testid="card-default-host" class="nx:p-10 nx:bg-background">
+        <Card class="nx:w-[200px]">
+          <CardContent>
+            <div class="nx:h-10" aria-hidden="true" />
+          </CardContent>
+        </Card>
+      </div>
     `,
   }),
   play: async ({ canvasElement }) => {
-    const card = canvasElement.querySelector('[data-slot="card"]');
-
-    await expect(card?.scrollWidth).toBe(card?.clientWidth);
+    await expectHeightPinned(within(canvasElement), 'card-default-host', 66, {
+      selector: '[data-slot="card"]',
+    });
   },
 };

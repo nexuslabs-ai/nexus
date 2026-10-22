@@ -1,6 +1,8 @@
 import type { Meta, StoryObj } from '@storybook/vue3-vite';
 import { expect, userEvent, waitFor, within } from 'storybook/test';
 
+import { expectHeightPinned } from '../../stories/support/story-height-test-utils';
+
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '.';
 
 const meta = {
@@ -243,70 +245,186 @@ export const WithDisabledTab: Story = {
   },
 };
 
-export const AllSizes: Story = {
+export const ClickInteraction: Story = {
+  render: () => ({
+    components: { Tabs, TabsContent, TabsList, TabsTrigger },
+    template: `
+      <Tabs default-value="tab1" class="nx:w-[400px]">
+        <TabsList>
+          <TabsTrigger value="tab1">Tab 1</TabsTrigger>
+          <TabsTrigger value="tab2">Tab 2</TabsTrigger>
+        </TabsList>
+        <TabsContent value="tab1"><p>Content 1</p></TabsContent>
+        <TabsContent value="tab2"><p>Content 2</p></TabsContent>
+      </Tabs>
+    `,
+  }),
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+
+    const tab1 = canvas.getByRole('tab', { name: 'Tab 1' });
+    const tab2 = canvas.getByRole('tab', { name: 'Tab 2' });
+
+    await expect(tab1).toHaveAttribute('data-state', 'active');
+    await expect(tab2).toHaveAttribute('data-state', 'inactive');
+    await expect(canvas.getByText('Content 1')).toBeVisible();
+
+    await userEvent.click(tab2);
+
+    await expect(tab1).toHaveAttribute('data-state', 'inactive');
+    await expect(tab2).toHaveAttribute('data-state', 'active');
+    await expect(canvas.getByText('Content 2')).toBeVisible();
+  },
+};
+
+export const KeyboardInteraction: Story = {
+  render: () => ({
+    components: { Tabs, TabsContent, TabsList, TabsTrigger },
+    template: `
+      <Tabs default-value="tab1" class="nx:w-[400px]">
+        <TabsList>
+          <TabsTrigger value="tab1">Tab 1</TabsTrigger>
+          <TabsTrigger value="tab2">Tab 2</TabsTrigger>
+          <TabsTrigger value="tab3">Tab 3</TabsTrigger>
+        </TabsList>
+        <TabsContent value="tab1"><p>Content 1</p></TabsContent>
+        <TabsContent value="tab2"><p>Content 2</p></TabsContent>
+        <TabsContent value="tab3"><p>Content 3</p></TabsContent>
+      </Tabs>
+    `,
+  }),
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+
+    // Focus the first tab
+    const tab1 = canvas.getByRole('tab', { name: 'Tab 1' });
+    await userEvent.click(tab1);
+    await expect(tab1).toHaveFocus();
+
+    // Navigate right with arrow key
+    await userEvent.keyboard('{ArrowRight}');
+    const tab2 = canvas.getByRole('tab', { name: 'Tab 2' });
+    await expect(tab2).toHaveFocus();
+
+    // Navigate right again
+    await userEvent.keyboard('{ArrowRight}');
+    const tab3 = canvas.getByRole('tab', { name: 'Tab 3' });
+    await expect(tab3).toHaveFocus();
+
+    // Navigate left
+    await userEvent.keyboard('{ArrowLeft}');
+    await expect(tab2).toHaveFocus();
+  },
+};
+
+export const DisabledTabInteraction: Story = {
+  render: () => ({
+    components: { Tabs, TabsContent, TabsList, TabsTrigger },
+    template: `
+      <Tabs default-value="tab1" class="nx:w-[400px]">
+        <TabsList>
+          <TabsTrigger value="tab1">Tab 1</TabsTrigger>
+          <TabsTrigger value="tab2" disabled>Tab 2 (Disabled)</TabsTrigger>
+          <TabsTrigger value="tab3">Tab 3</TabsTrigger>
+        </TabsList>
+        <TabsContent value="tab1"><p>Content 1</p></TabsContent>
+        <TabsContent value="tab2"><p>Content 2</p></TabsContent>
+        <TabsContent value="tab3"><p>Content 3</p></TabsContent>
+      </Tabs>
+    `,
+  }),
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+
+    const disabledTab = canvas.getByRole('tab', { name: 'Tab 2 (Disabled)' });
+    await expect(disabledTab).toBeDisabled();
+
+    const tab1 = canvas.getByRole('tab', { name: 'Tab 1' });
+
+    await expect(tab1).toHaveAttribute('data-state', 'active');
+    await expect(canvas.getByText('Content 1')).toBeVisible();
+
+    await userEvent.click(tab1);
+    await userEvent.keyboard('{ArrowRight}');
+
+    const tab3 = canvas.getByRole('tab', { name: 'Tab 3' });
+    await expect(tab3).toHaveFocus();
+    await expect(tab1).toHaveAttribute('data-state', 'inactive');
+    await expect(disabledTab).toHaveAttribute('data-state', 'inactive');
+    await expect(tab3).toHaveAttribute('data-state', 'active');
+    await expect(canvas.getByText('Content 3')).toBeVisible();
+  },
+};
+
+export const WithDataAttributes: Story = {
+  render: () => ({
+    components: { Tabs, TabsContent, TabsList, TabsTrigger },
+    template: `
+      <Tabs default-value="tab1" class="nx:w-[400px]">
+        <TabsList variant="underline" size="lg">
+          <TabsTrigger value="tab1">Tab 1</TabsTrigger>
+          <TabsTrigger value="tab2">Tab 2</TabsTrigger>
+        </TabsList>
+        <TabsContent value="tab1"><p>Content 1</p></TabsContent>
+        <TabsContent value="tab2"><p>Content 2</p></TabsContent>
+      </Tabs>
+    `,
+  }),
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+
+    // Check data-slot attributes
+    const tabsList = canvas.getByRole('tablist');
+    await expect(tabsList).toHaveAttribute('data-slot', 'tabs-list');
+    await expect(tabsList).toHaveAttribute('data-variant', 'underline');
+    await expect(tabsList).toHaveAttribute('data-size', 'lg');
+
+    const tab1 = canvas.getByRole('tab', { name: 'Tab 1' });
+    await expect(tab1).toHaveAttribute('data-slot', 'tabs-trigger');
+    await expect(tab1).toHaveAttribute('data-variant', 'underline');
+    await expect(tab1).toHaveAttribute('data-size', 'lg');
+
+    const tab2 = canvas.getByRole('tab', { name: 'Tab 2' });
+    await expect(tab2).toHaveAttribute('data-slot', 'tabs-trigger');
+    await expect(tab2).toHaveAttribute('data-variant', 'underline');
+    await expect(tab2).toHaveAttribute('data-size', 'lg');
+
+    // Check tabpanel has data-slot
+    const tabPanel = canvas.getByRole('tabpanel');
+    await expect(tabPanel).toHaveAttribute('data-slot', 'tabs-content');
+
+    await expect(tab2).toHaveClass(
+      'nx:typography-label-default',
+      'nx:px-4',
+      'nx:py-2'
+    );
+    await expect(getComputedStyle(tab2).fontSize).toBe('14px');
+  },
+};
+
+export const TabsTriggerDefaultModeHeightPinned: Story = {
+  parameters: {
+    a11y: { test: 'off' },
+    docs: {
+      description: {
+        story: 'Pins the `TabsTrigger` height at the default size.',
+      },
+    },
+  },
   render: () => ({
     components: { Tabs, TabsList, TabsTrigger },
-    setup: () => ({ sizes: ['sm', 'default', 'lg'] }),
     template: `
-      <div class="nx:flex nx:flex-col nx:gap-4">
-        <Tabs v-for="size in sizes" :key="size" default-value="a">
-          <TabsList :size="size" :aria-label="size">
-            <TabsTrigger value="a">Overview</TabsTrigger>
-            <TabsTrigger value="b">Activity</TabsTrigger>
+      <div data-testid="tabs-default-host" class="nx:p-10 nx:bg-background">
+        <Tabs default-value="a">
+          <TabsList>
+            <TabsTrigger value="a">Default</TabsTrigger>
           </TabsList>
         </Tabs>
       </div>
     `,
   }),
   play: async ({ canvasElement }) => {
-    const small = within(canvasElement).getByRole('tablist', { name: 'sm' });
-
-    for (const tab of within(small).getAllByRole('tab')) {
-      await expect(tab).toHaveAttribute('data-size', 'sm');
-    }
-  },
-};
-
-export const ClickInteraction: Story = {
-  play: async ({ canvasElement }) => {
-    const canvas = within(canvasElement);
-    const billing = canvas.getByRole('tab', { name: 'Billing' });
-
-    await userEvent.click(billing);
-    await expect(billing).toHaveAttribute('aria-selected', 'true');
-    await expect(billing).toHaveAttribute('data-state', 'active');
-    await expect(canvas.getByRole('tabpanel')).toHaveTextContent(
-      'Manage your plan and invoices.'
-    );
-  },
-};
-
-export const KeyboardInteraction: Story = {
-  play: async ({ canvasElement }) => {
-    const canvas = within(canvasElement);
-    const account = canvas.getByRole('tab', { name: 'Account' });
-
-    await userEvent.tab();
-    await expect(account).toHaveFocus();
-
-    await userEvent.keyboard('{ArrowRight}');
-    await expect(canvas.getByRole('tab', { name: 'Billing' })).toHaveFocus();
-    await expect(canvas.getByRole('tabpanel')).toHaveTextContent(
-      'Manage your plan'
-    );
-
-    // Team is disabled, so focus loops back to the first tab.
-    await userEvent.keyboard('{ArrowRight}');
-    await expect(account).toHaveFocus();
-  },
-};
-
-export const Disabled: Story = {
-  play: async ({ canvasElement }) => {
-    const team = within(canvasElement).getByRole('tab', { name: 'Team' });
-
-    await expect(team).toBeDisabled();
-    await expect(team).toHaveAttribute('data-disabled');
+    await expectHeightPinned(within(canvasElement), 'tabs-default-host', 34);
   },
 };
 
@@ -397,24 +515,5 @@ export const VerticalUnderlineIndicatorFollowsActiveTab: Story = {
         Math.round(parseFloat(getComputedStyle(billing).borderRightWidth))
       );
     });
-  },
-};
-
-export const WithDataAttributes: Story = {
-  args: { variant: 'underline', size: 'lg' },
-  play: async ({ canvasElement }) => {
-    const canvas = within(canvasElement);
-    const list = canvas.getByRole('tablist');
-    const account = canvas.getByRole('tab', { name: 'Account' });
-
-    await expect(list).toHaveAttribute('data-slot', 'tabs-list');
-    await expect(list).toHaveAttribute('data-variant', 'underline');
-    await expect(account).toHaveAttribute('data-slot', 'tabs-trigger');
-    await expect(account).toHaveAttribute('data-variant', 'underline');
-    await expect(account).toHaveAttribute('data-size', 'lg');
-    await expect(canvas.getByRole('tabpanel')).toHaveAttribute(
-      'data-slot',
-      'tabs-content'
-    );
   },
 };

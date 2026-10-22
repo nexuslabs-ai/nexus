@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { Primitive, type PrimitiveProps } from 'reka-ui';
-import { computed, type HTMLAttributes, type VNode } from 'vue';
+import { Comment, computed, type HTMLAttributes, Text, type VNode } from 'vue';
 
 import { cn } from '../../lib/utils';
 import Spinner from '../spinner/Spinner.vue';
@@ -37,8 +37,20 @@ function isIconButtonSize(size: ButtonVariants['size']) {
 
 const isDisabled = computed(() => props.disabled || props.loading);
 const iconOnly = computed(() => isIconButtonSize(props.size));
+// `asChild` clones onto a single child element; any other child keeps the
+// native `<button>`, as React's Slot does.
+function rendersAsChild() {
+  if (!props.asChild) return false;
+  const nodes = (slots.default?.() ?? []).filter(
+    (node) =>
+      node.type !== Comment &&
+      !(node.type === Text && !String(node.children).trim())
+  );
+  return nodes.length === 1 && typeof nodes[0]?.type !== 'symbol';
+}
+
 // `type` and `disabled` mean nothing on another tag, which also stays focusable.
-const isNativeButton = computed(() => !props.asChild && props.as === 'button');
+const isNativeButton = () => !rendersAsChild() && props.as === 'button';
 </script>
 
 <template>
@@ -49,15 +61,15 @@ const isNativeButton = computed(() => !props.asChild && props.as === 'button');
     :data-icon-only="iconOnly || undefined"
     :data-loading="loading || undefined"
     :as="as"
-    :as-child="asChild"
+    :as-child="rendersAsChild()"
     :class="cn(buttonVariants({ variant, size }), props.class)"
-    :type="isNativeButton ? type : undefined"
-    :disabled="isNativeButton ? isDisabled : undefined"
-    :tabindex="!isNativeButton && isDisabled ? -1 : undefined"
+    :type="isNativeButton() ? type : undefined"
+    :disabled="isNativeButton() ? isDisabled : undefined"
+    :tabindex="!isNativeButton() && isDisabled ? -1 : undefined"
     :aria-busy="loading || undefined"
     :aria-disabled="isDisabled || undefined"
   >
-    <slot v-if="asChild" />
+    <slot v-if="rendersAsChild()" />
     <span
       v-else-if="loading"
       data-slot="button-loading-content"

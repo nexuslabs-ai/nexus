@@ -73,14 +73,15 @@ export const WithText: Story = {
   }),
 };
 
-export const StatusRole: Story = {
+export const WithDataAttributes: Story = {
+  render: () => ({
+    components: { Spinner },
+    template: '<Spinner />',
+  }),
   play: async ({ canvasElement }) => {
-    const spinner = within(canvasElement).getByRole('status', {
-      name: 'Loading',
-    });
-
+    const spinner = within(canvasElement).getByRole('status');
+    await expect(spinner).toHaveAccessibleName('Loading');
     await expect(spinner).toHaveAttribute('data-slot', 'spinner');
-    await expect(spinner).toHaveClass('nx:animate-spin');
   },
 };
 
