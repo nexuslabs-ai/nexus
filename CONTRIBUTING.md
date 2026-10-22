@@ -80,7 +80,8 @@ glob per non-story row of [`.claude/rules/testing.md`](.claude/rules/testing.md)
 Outside stories, four kinds of unit test exist, all under the `unit` project
 (jsdom): the core engine's behaviour (`packages/core/src/lib`), the nxds `cn`
 merge (`packages/react/src/lib/utils.test.ts`), the ESLint plugin's rules
-(`packages/eslint-plugin/__tests__`), and cross-framework parity (`parity/`). Apps, repo scripts and hooks have no
+(`packages/eslint-plugin/__tests__`), and cross-framework parity (`parity/`,
+see [`cross-stack-parity.md`](.claude/rules/cross-stack-parity.md)). Apps, repo scripts and hooks have no
 tests of their own, and nothing uses snapshots.
 
 The spec lives in the rules, not here — what earns a test and what is
