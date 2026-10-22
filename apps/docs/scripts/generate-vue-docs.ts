@@ -17,9 +17,7 @@ import path from 'node:path';
 import prettier from 'prettier';
 import ts from 'typescript';
 import { parse as parseSfc } from 'vue/compiler-sfc';
-import { createChecker, type PropertyMeta } from 'vue-component-meta';
 
-import { importSpecifiers } from './files.mjs';
 import { humanize } from './humanize.ts';
 import {
   createInstallPlanner,
@@ -27,13 +25,7 @@ import {
   type Walk,
   writeEntries,
 } from './install-plans.ts';
-import {
-  type ComponentEntry,
-  literalDefaultValue,
-  type PropsFile,
-  toPropsFile,
-  toPropsIndex,
-} from './props-entries.ts';
+import { type PropsFile, toPropsIndex } from './props-entries.ts';
 import {
   docsRoot,
   isUnder,
@@ -42,6 +34,12 @@ import {
   vueRoot,
   vueSrc,
 } from './roots.mjs';
+import {
+  componentProps,
+  createVueChecker,
+  exportedSlugs,
+  parseFile,
+} from './vue-sources.ts';
 
 interface SetupValue {
   name: string;
@@ -77,33 +75,11 @@ const demosDir = path.join(outputDir, 'demos');
 const dependenciesDir = path.join(outputDir, 'dependencies');
 const propsDir = path.join(outputDir, 'props');
 
-const COMPONENT_SPECIFIER = './components/';
-
 const prettierConfig =
   (await prettier.resolveConfig(path.join(vueSrc, 'index.ts'))) ?? {};
 
 function fail(message: string): never {
   throw new Error(`generate-vue-docs: ${message}`);
-}
-
-function parseFile(filePath: string) {
-  return ts.createSourceFile(
-    filePath,
-    readFileSync(filePath, 'utf8'),
-    ts.ScriptTarget.Latest,
-    true
-  );
-}
-
-/** Every component folder packages/vue exports, in export order. */
-function exportedSlugs() {
-  const index = readFileSync(path.join(vueSrc, 'index.ts'), 'utf8');
-  return importSpecifiers(index)
-    .filter((specifier) => specifier.startsWith(COMPONENT_SPECIFIER))
-    .map((specifier) => {
-      const [slug] = specifier.slice(COMPONENT_SPECIFIER.length).split('/');
-      return slug ?? fail(`src/index.ts exports '${specifier}'.`);
-    });
 }
 
 function kebab(name: string) {
@@ -399,71 +375,6 @@ const vue = createInstallPlanner({
   linkedComponentSlug: linkedVueSlug,
 });
 
-// ── Props ───────────────────────────────────────────────────────────────────
-
-/** The SFCs a component folder exports as `default as Name`, in export order. */
-function exportedParts(slug: string) {
-  const index = parseFile(path.join(vueComponentsRoot, slug, 'index.ts'));
-  return index.statements.flatMap((statement) => {
-    if (
-      !ts.isExportDeclaration(statement) ||
-      !statement.moduleSpecifier ||
-      !ts.isStringLiteral(statement.moduleSpecifier) ||
-      !statement.moduleSpecifier.text.endsWith('.vue') ||
-      !statement.exportClause ||
-      !ts.isNamedExports(statement.exportClause)
-    ) {
-      return [];
-    }
-    const file = path.join(
-      vueComponentsRoot,
-      slug,
-      statement.moduleSpecifier.text
-    );
-    return statement.exportClause.elements
-      .filter((element) => element.propertyName?.text === 'default')
-      .map((element) => ({ name: element.name.text, file }));
-  });
-}
-
-/** A prop's `withDefaults` value, held to the React props contract: a literal or nothing. */
-function propDefault(prop: PropertyMeta, owner: string) {
-  return prop.default === undefined
-    ? null
-    : literalDefaultValue(prop.default, owner);
-}
-
-function componentProps(
-  checker: ReturnType<typeof createChecker>,
-  slug: string
-): PropsFile {
-  const components: ComponentEntry[] = exportedParts(slug).map(
-    ({ name, file }) => ({
-      name,
-      description: '',
-      sourcePath: toRepoPath(file),
-      props: checker
-        .getComponentMeta(file)
-        .props.filter(
-          (prop) =>
-            !prop.global &&
-            prop
-              .getDeclarations()
-              .some(({ file: declared }) => isUnder(declared, vueSrc))
-        )
-        .map((prop) => ({
-          name: prop.name,
-          type: prop.type.replace(/\s*\|\s*undefined$/, ''),
-          required: prop.required,
-          defaultValue: propDefault(prop, `${name}.${prop.name}`),
-          description: prop.description,
-        }))
-        .sort((a, b) => a.name.localeCompare(b.name, 'en')),
-    })
-  );
-  return toPropsFile(slug, components);
-}
-
 // ── Write everything ────────────────────────────────────────────────────────
 
 const slugs = exportedSlugs();
@@ -479,10 +390,7 @@ const demos: Record<string, VueDemo> = {};
 rmSync(outputDir, { recursive: true, force: true });
 mkdirSync(propsDir, { recursive: true });
 
-const checker = createChecker(path.join(vueRoot, 'tsconfig.json'), {
-  forceUseTs: true,
-  printer: { newLine: ts.NewLineKind.LineFeed },
-});
+const checker = createVueChecker();
 const propsFiles: PropsFile[] = [];
 const dependencyEntries: ReturnType<typeof vue.componentEntry>[] = [];
 

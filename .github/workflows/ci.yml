@@ -143,6 +143,7 @@ jobs:
           pnpm --filter @nxds/docs generate:props
           pnpm --filter @nxds/docs generate:dependencies
           pnpm --filter @nxds/docs generate:manifest
+          pnpm --filter @nxds/docs generate:vue
           mkdir "$RUNNER_TEMP/docs-generated-fresh"
           cp -r apps/docs/generated apps/docs/app/_lib/*.generated.ts "$RUNNER_TEMP/docs-generated-fresh"
           if ! diff -r "$RUNNER_TEMP/docs-generated-build" "$RUNNER_TEMP/docs-generated-fresh"; then
