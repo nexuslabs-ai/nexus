@@ -21,6 +21,7 @@ const props = withDefaults(defineProps<ButtonProps>(), {
   as: 'button',
   variant: 'default',
   size: 'default',
+  loading: false,
   type: 'button',
 });
 

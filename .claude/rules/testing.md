@@ -102,6 +102,8 @@ pnpm test:unit          # Core engine, cn merge, ESLint rules, parity
 pnpm test:storybook     # Every story's play function in a real browser
 ```
 
+The parity prop contract reads `@nxds/core`'s built types. Run `pnpm --filter @nxds/core build` before `pnpm test:unit` on a fresh checkout.
+
 ## Do Not
 
 - Add a test outside the five kinds in [Scope](#scope)

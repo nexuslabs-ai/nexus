@@ -86,6 +86,20 @@ export const shared = [
   'tabs',
 ];
 
+/**
+ * Props, slots and events only the Vue part declares, as `{Part}.{name}`.
+ * React's `ReactNode` props map to kebab-case slots, own `on*` props to own
+ * emits, and `asChild` to Reka's inherited `PrimitiveProps`.
+ */
+export const vueOnlyApi: Record<string, string> = {
+  'Button.disabled':
+    'native <button> attribute React inherits from its props type; Vue declares it so the spinner state can read it',
+  'Button.type':
+    "native <button> attribute React inherits from its props type; Vue declares it to default to 'button'",
+  'Switch.thumb':
+    'slot for custom thumb content; React renders the thumb itself with no way to compose it',
+};
+
 /** Top-level values a Vue recipe file declares that React has no twin for, as `{file}#{name}`. */
 export const vueOnlyDeclarations: Record<string, string> = {
   'tabs/index.ts#TabsListKey':

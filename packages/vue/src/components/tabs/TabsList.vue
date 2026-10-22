@@ -11,11 +11,13 @@ import { computed, type HTMLAttributes, provide } from 'vue';
 
 import { cn } from '../../lib/utils';
 
-import { TabsListKey, type TabsSize, type TabsVariant } from '.';
+import { TabsListKey } from '.';
 
 export interface TabsListProps extends RekaTabsListProps {
-  variant?: TabsVariant;
-  size?: TabsSize;
+  /** Visual style of every trigger in the list. */
+  variant?: 'default' | 'underline';
+  /** Size of every trigger in the list. */
+  size?: 'sm' | 'default' | 'lg';
   class?: HTMLAttributes['class'];
 }
 

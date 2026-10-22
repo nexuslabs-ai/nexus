@@ -247,6 +247,11 @@ jobs:
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
 
+      # The parity prop contract reads each package's types, which import
+      # @nxds/core's built declarations.
+      - name: Build @nxds/core
+        run: pnpm --filter @nxds/core build
+
       - name: Run unit tests
         run: pnpm test:unit
 
