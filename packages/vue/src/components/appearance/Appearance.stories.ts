@@ -1,9 +1,4 @@
-import {
-  applyNxdsAppearance,
-  DEFAULT_NXDS_APPEARANCE,
-  type NxdsAppearanceState,
-  prefersDarkColorScheme,
-} from '@nxds/core';
+import { DEFAULT_NXDS_APPEARANCE, type NxdsAppearanceState } from '@nxds/core';
 import type { Meta, StoryObj } from '@storybook/vue3-vite';
 import { expect, fn, userEvent, waitFor, within } from 'storybook/test';
 import { createApp, ref } from 'vue';
@@ -98,6 +93,12 @@ export const ControlledState: Story = {
     template: '<div data-testid="controlled-app" />',
   }),
   play: async ({ canvasElement }) => {
+    const preview = previewAppearance;
+    if (!preview) {
+      throw new Error(
+        'ControlledState render did not capture the preview appearance.'
+      );
+    }
     const host = within(canvasElement).getByTestId('controlled-app');
     const state = ref<NxdsAppearanceState>(DEFAULT_NXDS_APPEARANCE);
     const onStateChange = fn();
@@ -125,12 +126,7 @@ export const ControlledState: Story = {
       );
     } finally {
       app.unmount();
-      if (previewAppearance) {
-        applyNxdsAppearance(
-          previewAppearance.state.value,
-          prefersDarkColorScheme()
-        );
-      }
+      preview.setState(preview.state.value);
     }
   },
 };

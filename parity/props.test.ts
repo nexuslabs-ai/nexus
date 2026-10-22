@@ -108,6 +108,11 @@ function vueNames(react: ComponentEntry) {
   });
 }
 
+/** The Vue names the React part's props map to. */
+function mappedNames(react: ComponentEntry) {
+  return new Set<string>(vueNames(react).map(({ vueName }) => vueName));
+}
+
 /** Every way the Vue part's API differs from the React part's. */
 function partDrift(react: ComponentEntry, vue: VuePartApi) {
   const drift: string[] = [];
@@ -117,8 +122,7 @@ function partDrift(react: ComponentEntry, vue: VuePartApi) {
       .filter((prop) => prop.name !== 'class')
       .map((prop) => [prop.name, prop])
   );
-  const names = vueNames(react);
-  for (const { prop, kind, vueName } of names) {
+  for (const { prop, kind, vueName } of vueNames(react)) {
     if (kind === 'slot') {
       if (!vue.slots.includes(vueName)) {
         drift.push(`${at(prop.name)}: no #${vueName} slot`);
@@ -143,7 +147,7 @@ function partDrift(react: ComponentEntry, vue: VuePartApi) {
     drift.push(...propDrift(at(prop.name), prop, twin));
   }
 
-  const mapped = new Set(names.map(({ vueName }) => vueName));
+  const mapped = mappedNames(react);
   const vueOnly = [...vueProps.keys(), ...vue.slots, ...vue.events].filter(
     (name) => !mapped.has(name) && !(at(name) in vueOnlyApi)
   );
@@ -222,9 +226,7 @@ describe('component contract', () => {
       [...contracts.values()].flatMap(({ react, vue }) =>
         [...vue].flatMap(([name, part]) => {
           const reactPart = react.get(name);
-          const mapped = new Set<string>(
-            reactPart ? vueNames(reactPart).map(({ vueName }) => vueName) : []
-          );
+          const mapped = reactPart ? mappedNames(reactPart) : new Set<string>();
           return [
             ...part.entry.props.map((prop) => prop.name),
             ...part.slots,
