@@ -8,14 +8,17 @@ import {
   IconBorderAll,
   IconBorderRadius,
   IconBrandGit,
+  IconClock,
   IconColorSwatch,
   IconComponents,
   IconCopy,
+  IconLayersIntersect,
   IconPaint,
   IconPencilCode,
   IconShadow,
   IconSpacingHorizontal,
   IconTypography,
+  IconWaveSine,
 } from '@tabler/icons-react';
 
 import { AntDesignLogo, MuiLogo, ShadcnLogo } from './EcosystemLogos';
@@ -37,6 +40,9 @@ export const groups = [
       ['Shadows', IconShadow],
       ['Components', IconComponents],
       ['Icons', IconAsterisk],
+      ['Motion', IconWaveSine],
+      ['Duration', IconClock],
+      ['Z-index', IconLayersIntersect],
     ],
   },
   {

@@ -248,3 +248,30 @@
   --rotating-paper: var(--original-paper-8);
   --rotating-ink: var(--original-ink-8);
 }
+
+:is(.rotating-headline-journey, .token-flow) .journey-color-9,
+.token-flow.journey-color-9 {
+  --rotating-paper: #f4acd0;
+  --rotating-ink: #301323;
+}
+[data-tile-palette='pastel'] .rotating-headline-journey .journey-color-9 {
+  --rotating-paper: #ed83b7;
+}
+
+:is(.rotating-headline-journey, .token-flow) .journey-color-10,
+.token-flow.journey-color-10 {
+  --rotating-paper: #94c5f5;
+  --rotating-ink: #102337;
+}
+[data-tile-palette='pastel'] .rotating-headline-journey .journey-color-10 {
+  --rotating-paper: #69adf0;
+}
+
+:is(.rotating-headline-journey, .token-flow) .journey-color-11,
+.token-flow.journey-color-11 {
+  --rotating-paper: #d9b69b;
+  --rotating-ink: #2c1c11;
+}
+[data-tile-palette='pastel'] .rotating-headline-journey .journey-color-11 {
+  --rotating-paper: #c99b78;
+}

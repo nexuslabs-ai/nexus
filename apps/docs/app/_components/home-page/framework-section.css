@@ -613,16 +613,13 @@
   background: var(--nx-color-muted);
   text-align: center;
 }
-.concentric-core-heading {
-  display: grid;
-  gap: var(--nx-spacing-2);
-  margin-bottom: var(--nx-spacing-5);
-}
-.concentric-core-heading strong {
+.concentric-core strong {
   font-size: 1.25rem;
   font-weight: 600;
 }
 .concentric-tokens {
+  width: 100%;
+  box-sizing: border-box;
   border: 1px solid var(--nx-color-border-default);
   border-radius: 0.6875rem;
   background: var(--nx-color-background);
@@ -651,6 +648,6 @@
   }
 }
 
-.concentric-core .token-flow-caption {
+.concentric-flow > .token-flow-caption {
   font-size: 0.875rem;
 }

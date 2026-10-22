@@ -3,16 +3,16 @@ NEXUS DESIGN SYSTEM — BRAND FOUNDATION
 
 CONFIRMED IDENTITY
 Product: Nexus Design System. Handle: nxds. Company: Nexus Labs.
-Primary logo and website header: approved borderless nxds block wordmark, with no colon. Use the open diagonal x and dense rounded s as supplied in source/mark.svg. Original vector artwork, no font dependency.
+Primary logo and website header: approved borderless nxds block wordmark, with no colon. Use the rounded-slot x and dense rounded s as supplied in source/mark.svg. Original vector artwork, no font dependency.
 The existing compact nx: icon remains the favicon/app-icon asset. Its geometry has not been redesigned in this wordmark approval; do not substitute a crop of the new wordmark.
 
 APPROVED WORDMARK GEOMETRY
 Master viewBox: 664 × 132. Each letter is 160 units wide; gaps are 8 units.
 n: R32 outer shoulders, 14-unit opening with R7 end.
-x: diagonal arms, R6.5 inward fillets and R4 external fillets. Preserve optical paths.
+x: rounded side waists; 14-unit top and bottom slots with R7 closed ends. Slot entrance corners and external terminal corners use R4. Preserve the supplied side curves and path.
 d: R32 shoulders, 12-unit counter with R6 ends.
-s: dense rounded body, 14-unit openings with R7 ends; top cut end center x72/y45, bottom x88/y87 in letter coordinates. Its inner and outer arcs are not concentric: optical density was prioritized.
-Do not enforce one constant gap across tapered x wedges. Do not stretch, retype, add a border, or insert a colon.
+s: R32 outer bends and R4 cut entrance corners; dense rounded body, 14-unit openings with R7 ends; top cut end center x72/y45, bottom x88/y87 in letter coordinates. Its inner and outer arcs are not concentric: optical density was prioritized.
+Do not stretch, retype, add a border, or insert a colon.
 Website size: 96 × 19.084337 CSS px. Preserve aspect ratio; do not force the former header height.
 Both themes use identical geometry. Website inherits currentColor; supplied light-background ink #171717, dark-background ink #FAFAFA.
 

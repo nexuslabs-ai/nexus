@@ -17,6 +17,9 @@ const seeds = [
   '#c4adeb',
   '#229367',
   '#b7dc24',
+  '#e66ca5',
+  '#4197ea',
+  '#bd8963',
 ];
 
 export function useJourneyColors(modeOverride) {

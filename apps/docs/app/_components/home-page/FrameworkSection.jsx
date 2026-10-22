@@ -144,19 +144,19 @@ const tokenGroups = [
     ['Theme', IconPaint, 0],
     ['Colors', IconColorSwatch, 1],
     ['Typography', IconTypography, 2],
-    ['Motion', IconWaveSine, 0],
+    ['Motion', IconWaveSine, 9],
   ],
   [
     ['Spacing', IconSpacingHorizontal, 3],
     ['Radius', IconBorderRadius, 4],
     ['Borders', IconBorderAll, 5],
-    ['Duration', IconClock, 3],
+    ['Duration', IconClock, 10],
   ],
   [
     ['Shadows', IconShadow, 6],
     ['Components', IconComponents, 7],
     ['Icons', IconAsterisk, 8],
-    ['Z-index', IconLayersIntersect, 6],
+    ['Z-index', IconLayersIntersect, 11],
   ],
 ];
 
@@ -196,28 +196,40 @@ function ConcentricFlow() {
         ))}
       </svg>
       <div className="concentric-core">
-        <div className="concentric-core-heading">
-          <strong>Nexus core</strong>
+        <strong>Nexus core</strong>
+      </div>
+      <svg
+        className="token-flow-wires concentric-connections"
+        viewBox="0 0 600 80"
+        preserveAspectRatio="none"
+        aria-hidden="true"
+      >
+        {[100, 300, 500].map((x) => (
+          <g key={x}>
+            <path d={`M ${x} 80 C ${x} 24 300 56 300 0`} />
+            <path
+              className="token-flow-pulse"
+              pathLength="1"
+              d={`M ${x} 80 C ${x} 24 300 56 300 0`}
+            />
+          </g>
+        ))}
+      </svg>
+      <div className="concentric-tokens">
+        <div className="concentric-chip-grid" aria-label="Shared design tokens">
+          {tokenGroups.flat().map(([label, Icon, index]) => (
+            <span
+              className={`token-flow-chip journey-color-${index}`}
+              key={label}
+            >
+              <Icon size={20} stroke={1.7} aria-hidden="true" />
+              {label}
+            </span>
+          ))}
         </div>
-        <div className="concentric-tokens">
-          <div
-            className="concentric-chip-grid"
-            aria-label="Shared design tokens"
-          >
-            {tokenGroups.flat().map(([label, Icon, index]) => (
-              <span
-                className={`token-flow-chip journey-color-${index}`}
-                key={label}
-              >
-                <Icon size={20} stroke={1.7} aria-hidden="true" />
-                {label}
-              </span>
-            ))}
-          </div>
-        </div>
-        <div className="token-flow-caption">
-          <span>Shared tokens, consumed by every framework.</span>
-        </div>
+      </div>
+      <div className="token-flow-caption">
+        <span>Shared tokens flow through Nexus core to every framework.</span>
       </div>
     </div>
   );

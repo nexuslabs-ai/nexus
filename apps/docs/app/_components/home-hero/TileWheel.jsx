@@ -108,7 +108,7 @@ export function TileWheel({ details, colors, tuning }) {
           className="wheel-rotor"
           style={{ '--wheel-rotation': `${(-position * 360) / count}deg` }}
         >
-          {details.map(([label, Icon], index) => {
+          {details.map(([label, Icon, colorIndex], index) => {
             const angle = ((index - position) * Math.PI * 2) / count;
             const front = Math.cos(angle);
             const behind = front <= 0;
@@ -127,7 +127,7 @@ export function TileWheel({ details, colors, tuning }) {
                 onClick={() => select(index)}
                 onFocus={() => setInteracted(true)}
                 style={{
-                  ...colors[index],
+                  ...colors[colorIndex ?? index],
                   '--wheel-angle': `${(index * 360) / count}deg`,
                 }}
                 data-front={selected === index}

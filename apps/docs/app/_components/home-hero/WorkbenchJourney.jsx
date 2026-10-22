@@ -8,12 +8,15 @@ import {
   IconBorderAll,
   IconBorderRadius,
   IconBrandOpenai,
+  IconClock,
   IconColorSwatch,
   IconComponents,
+  IconLayersIntersect,
   IconPaint,
   IconShadow,
   IconSpacingHorizontal,
   IconTypography,
+  IconWaveSine,
 } from '@tabler/icons-react';
 
 import { ClaudeLogo, CursorLogo } from './BrandLogos';
@@ -32,6 +35,9 @@ const defaultDetails = [
   ['Shadows', IconShadow],
   ['Components', IconComponents],
   ['Icons', IconAsterisk],
+  ['Motion', IconWaveSine, 9],
+  ['Duration', IconClock, 10],
+  ['Z-index', IconLayersIntersect, 11],
 ];
 export function WorkbenchJourney({
   mode,
@@ -128,13 +134,13 @@ export function WorkbenchJourney({
                 aria-label={detailsLabel}
                 onMouseLeave={() => setHovered(null)}
               >
-                {details.map(([label, Icon], index) => (
+                {details.map(([label, Icon, colorIndex], index) => (
                   <button
                     key={label}
                     type="button"
-                    className={`journey-color-${index} journey-tile journey-enter`}
+                    className={`journey-color-${colorIndex ?? index} journey-tile journey-enter`}
                     style={{
-                      ...colors[index],
+                      ...colors[colorIndex ?? index],
                       '--arrival': `${900 + index * 110}ms`,
                     }}
                     aria-label={`Play with ${label}`}
