@@ -3,12 +3,8 @@ import path from 'node:path';
 
 import { importSpecifiers } from '../../catalog/scripts/files.mjs';
 import { pascal } from './humanize.ts';
-import {
-  blocksRoot,
-  componentsRoot,
-  isUnder,
-  reactSrc,
-} from '../../catalog/scripts/roots.mjs';
+import { isUnder } from '../../catalog/scripts/roots.mjs';
+import { blocksRoot, componentsRoot, reactSrc } from './roots.mjs';
 
 export function isModuleSource(filePath) {
   const name = path.basename(filePath);

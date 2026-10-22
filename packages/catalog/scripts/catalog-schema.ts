@@ -58,3 +58,15 @@ export type Catalog = {
   frameworks: Framework[];
   items: CatalogItem[];
 };
+
+/** An item's variants for `frameworks` only: what the CLI installs, and what `revision` hashes. */
+export function installedVariants<V extends Variant>(
+  variants: Partial<Record<Framework, V>>,
+  frameworks: Framework[]
+): Partial<Record<Framework, V>> {
+  return Object.fromEntries(
+    frameworks
+      .filter((framework) => variants[framework])
+      .map((framework) => [framework, variants[framework]])
+  );
+}

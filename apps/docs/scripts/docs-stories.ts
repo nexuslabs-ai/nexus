@@ -14,12 +14,14 @@ import prettier, { type Options as PrettierOptions } from 'prettier';
 import ts from 'typescript';
 
 import {
-  componentsRoot,
   isUnder,
-  reactSrc,
   toRepoPath,
 } from '../../../packages/catalog/scripts/roots.mjs';
 import { humanize, pascal } from '../../../packages/react/scripts/humanize.ts';
+import {
+  componentsRoot,
+  reactSrc,
+} from '../../../packages/react/scripts/roots.mjs';
 import {
   DOCS_TAG,
   docsDescription,

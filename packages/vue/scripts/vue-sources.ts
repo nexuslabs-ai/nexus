@@ -9,13 +9,9 @@ import {
   createInstallPlanner,
   type Walk,
 } from '../../catalog/scripts/install-plans.ts';
-import {
-  isUnder,
-  toRepoPath,
-  vueComponentsRoot,
-  vueRoot,
-  vueSrc,
-} from '../../catalog/scripts/roots.mjs';
+import { isUnder, toRepoPath } from '../../catalog/scripts/roots.mjs';
+
+import { vueComponentsRoot, vueRoot, vueSrc } from './roots.ts';
 
 const COMPONENT_SPECIFIER = './components/';
 

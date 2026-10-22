@@ -7,9 +7,10 @@ import path from 'node:path';
 import ts from 'typescript';
 
 import { collectSourceFiles } from '../../catalog/scripts/files.mjs';
-import { componentsRoot, toRepoPath } from '../../catalog/scripts/roots.mjs';
+import { toRepoPath } from '../../catalog/scripts/roots.mjs';
 
 import { pascal } from './humanize.ts';
+import { componentsRoot } from './roots.mjs';
 
 export const DOCS_TAG = 'docs';
 

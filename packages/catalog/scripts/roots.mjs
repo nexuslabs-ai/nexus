@@ -1,18 +1,11 @@
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 
-export const catalogRoot = path.resolve(
+const catalogRoot = path.resolve(
   path.dirname(fileURLToPath(import.meta.url)),
   '..'
 );
 export const repoRoot = path.resolve(catalogRoot, '..', '..');
-export const reactRoot = path.join(repoRoot, 'packages', 'react');
-export const reactSrc = path.join(reactRoot, 'src');
-export const componentsRoot = path.join(reactSrc, 'components');
-export const blocksRoot = path.join(reactSrc, 'blocks');
-export const vueRoot = path.join(repoRoot, 'packages', 'vue');
-export const vueSrc = path.join(vueRoot, 'src');
-export const vueComponentsRoot = path.join(vueSrc, 'components');
 /** Written by `generate-catalog.mjs`. */
 export const CATALOG_FILE = path.join(catalogRoot, 'generated', 'catalog.json');
 

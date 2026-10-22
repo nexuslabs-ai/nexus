@@ -21,11 +21,13 @@ import { packageName } from '../../../packages/catalog/scripts/install-plans.ts'
 import {
   isUnder,
   toRepoPath,
+} from '../../../packages/catalog/scripts/roots.mjs';
+import { humanize } from '../../../packages/react/scripts/humanize.ts';
+import {
   vueComponentsRoot,
   vueRoot,
   vueSrc,
-} from '../../../packages/catalog/scripts/roots.mjs';
-import { humanize } from '../../../packages/react/scripts/humanize.ts';
+} from '../../../packages/vue/scripts/roots.ts';
 import {
   vue,
   vueComponentSlugs,

@@ -23,10 +23,9 @@ import {
 } from '../../../packages/react/scripts/react-sources.mjs';
 import {
   CATALOG_FILE,
-  reactRoot,
-  reactSrc,
   toRepoPath,
 } from '../../../packages/catalog/scripts/roots.mjs';
+import { reactRoot, reactSrc } from '../../../packages/react/scripts/roots.mjs';
 import {
   componentDescription,
   componentStoryFiles,

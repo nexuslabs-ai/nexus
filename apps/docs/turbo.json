@@ -19,6 +19,7 @@
         "$TURBO_ROOT$/packages/react/scripts/humanize.ts",
         "$TURBO_ROOT$/packages/react/scripts/react-sources.mjs",
         "$TURBO_ROOT$/packages/catalog/scripts/roots.mjs",
+        "$TURBO_ROOT$/packages/react/scripts/roots.mjs",
         "$TURBO_ROOT$/packages/react/src/**",
         "$TURBO_ROOT$/packages/react/package.json",
         "$TURBO_ROOT$/packages/react/tsconfig.json"
@@ -49,6 +50,7 @@
         "scripts/bundle-vue-demos.ts",
         "scripts/roots.mjs",
         "$TURBO_ROOT$/packages/catalog/scripts/roots.mjs",
+        "$TURBO_ROOT$/packages/vue/scripts/roots.ts",
         "generated/vue/**",
         "$TURBO_ROOT$/packages/vue/src/**"
       ],
@@ -63,6 +65,7 @@
         "$TURBO_ROOT$/packages/react/scripts/humanize.ts",
         "$TURBO_ROOT$/packages/react/scripts/react-sources.mjs",
         "$TURBO_ROOT$/packages/catalog/scripts/roots.mjs",
+        "$TURBO_ROOT$/packages/react/scripts/roots.mjs",
         "$TURBO_ROOT$/packages/react/scripts/stories.ts",
         "page-registry/**",
         "content/**",

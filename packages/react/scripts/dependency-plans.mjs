@@ -14,11 +14,7 @@ import {
   isModuleSource,
   linkedComponentSlug,
 } from './react-sources.mjs';
-import {
-  componentsRoot,
-  reactRoot,
-  reactSrc,
-} from '../../catalog/scripts/roots.mjs';
+import { componentsRoot, reactRoot, reactSrc } from './roots.mjs';
 
 export const react = createInstallPlanner({
   root: reactRoot,

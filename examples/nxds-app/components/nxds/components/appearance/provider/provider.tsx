@@ -21,10 +21,9 @@ import {
   type NxdsAppearanceCookieOptions,
   type NxdsAppearanceState,
   type NxdsResolvedAppearanceMode,
-  parseStoredNxdsAppearance,
   persistNxdsAppearance,
   prefersDarkColorScheme,
-  readNxdsAppearanceStorage,
+  readStoredNxdsAppearance,
   removeNxdsAppearance,
   resolveNxdsAppearanceMode,
   sanitizeNxdsAppearance,
@@ -96,15 +95,13 @@ export function NxdsAppearanceProvider({
     () => true,
     () => false
   );
-  // The saved appearance, read after hydration so the server and first client render agree.
-  const storedRaw = useSyncExternalStore(
-    subscribeToNothing,
-    () => readNxdsAppearanceStorage(storageKey),
-    () => null
-  );
+  // The saved appearance, read once after hydration so the server and first client render agree.
   const stored = useMemo(
-    () => parseStoredNxdsAppearance(storedRaw, initialState),
-    [initialState, storedRaw]
+    () =>
+      mounted
+        ? readStoredNxdsAppearance(storageKey, initialState)
+        : initialState,
+    [initialState, mounted, storageKey]
   );
   /** The appearance picked in this session, which wins over the saved one. */
   const [chosen, setChosen] = useState<NxdsAppearanceState | null>(null);

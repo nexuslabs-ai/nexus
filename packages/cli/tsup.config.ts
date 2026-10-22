@@ -1,4 +1,4 @@
-import type { Catalog } from '@nxds/catalog';
+import { type Catalog, installedVariants } from '@nxds/catalog';
 import { readFileSync, writeFileSync } from 'node:fs';
 import { createRequire } from 'node:module';
 import { defineConfig } from 'tsup';
@@ -14,11 +14,7 @@ function installedCatalog(): Catalog {
     readFileSync(require.resolve('@nxds/catalog/catalog.json'), 'utf8')
   ) as Catalog;
   for (const item of catalog.items) {
-    item.variants = Object.fromEntries(
-      catalog.frameworks
-        .filter((framework) => item.variants[framework])
-        .map((framework) => [framework, item.variants[framework]])
-    );
+    item.variants = installedVariants(item.variants, catalog.frameworks);
   }
   return catalog;
 }

@@ -36,12 +36,14 @@ import {
   isComponentSource,
 } from '../../../packages/react/scripts/react-sources.mjs';
 import {
-  componentsRoot,
   isUnder,
-  reactRoot,
-  reactSrc,
   toRepoPath,
 } from '../../../packages/catalog/scripts/roots.mjs';
+import {
+  componentsRoot,
+  reactRoot,
+  reactSrc,
+} from '../../../packages/react/scripts/roots.mjs';
 
 const reactTsconfig = path.join(reactRoot, 'tsconfig.json');
 

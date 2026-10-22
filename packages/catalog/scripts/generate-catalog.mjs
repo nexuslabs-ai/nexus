@@ -12,6 +12,7 @@ import { readdirSync, readFileSync } from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 
+import { vueSrc } from '../../vue/scripts/roots.ts';
 import {
   vue,
   vueComponentSlugs,
@@ -28,19 +29,14 @@ import {
   componentLabel,
   exportedComponentSlugs,
 } from '../../react/scripts/react-sources.mjs';
+import { reactRoot, reactSrc } from '../../react/scripts/roots.mjs';
 import {
   componentDescription,
   componentStoryFiles,
 } from '../../react/scripts/stories.ts';
+import { installedVariants } from './catalog-schema.ts';
 import { readCanonical, writeJson } from './files.mjs';
-import {
-  CATALOG_FILE,
-  reactRoot,
-  reactSrc,
-  repoRoot,
-  toRepoPath,
-  vueSrc,
-} from './roots.mjs';
+import { CATALOG_FILE, repoRoot, toRepoPath } from './roots.mjs';
 
 /**
  * @typedef {import('./catalog-schema').Catalog} Catalog
@@ -279,7 +275,7 @@ export function buildCatalog() {
   // Only what the CLI installs: a docs copy edit or a Vue change doesn't make apps update.
   const installed = items.map(({ name, variants }) => ({
     name,
-    variants: frameworks.map((framework) => variants[framework]),
+    variants: installedVariants(variants, frameworks),
   }));
   const revision = createHash('sha256')
     .update(JSON.stringify({ frameworks, items: installed }))
