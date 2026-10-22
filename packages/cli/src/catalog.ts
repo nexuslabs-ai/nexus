@@ -75,17 +75,23 @@ async function readRegistryFile(registry: string, file: string) {
 
 const KINDS: ReadonlySet<unknown> = new Set(['setup', 'component', 'block']);
 
-const STEP_NAMES: Record<SetupStep, true> = {
-  'add-css-import': true,
-  'add-head-script': true,
-  'wrap-root-with-provider': true,
-};
-const STEPS: ReadonlySet<unknown> = new Set(Object.keys(STEP_NAMES));
+const STEPS: ReadonlySet<unknown> = new Set(
+  Object.keys({
+    'add-css-import': true,
+    'add-head-script': true,
+    'wrap-root-with-provider': true,
+  } satisfies Record<SetupStep, true>)
+);
 
 const NPM_NAME = /^(@[a-z0-9-~][a-z0-9-._~]*\/)?[a-z0-9-~][a-z0-9-._~]*$/;
 
+/** A semver range, in printable ASCII so it reaches the shell as one argument. */
 function isRange(value: unknown) {
-  return typeof value === 'string' && validRange(value) !== null;
+  return (
+    typeof value === 'string' &&
+    /^[ -~]+$/.test(value) &&
+    validRange(value) !== null
+  );
 }
 
 function isRecord(value: unknown): value is Record<string, unknown> {
