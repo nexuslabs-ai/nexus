@@ -46,71 +46,153 @@ export const Default: Story = {
   render: () => ({
     components: { Tabs, TabsContent, TabsList, TabsTrigger },
     template: `
-      <Tabs default-value="account" class="nx:w-96">
-        <TabsList aria-label="Settings">
+      <Tabs default-value="account" class="nx:w-[400px]">
+        <TabsList>
           <TabsTrigger value="account">Account</TabsTrigger>
           <TabsTrigger value="password">Password</TabsTrigger>
         </TabsList>
-        <TabsContent value="account">Change your name and email.</TabsContent>
-        <TabsContent value="password">Change your password.</TabsContent>
-      </Tabs>
-    `,
-  }),
-};
-
-export const UnderlineVariant: Story = {
-  tags: ['docs'],
-  render: () => ({
-    components: { Tabs, TabsContent, TabsList, TabsTrigger },
-    template: `
-      <Tabs default-value="overview" class="nx:w-96">
-        <TabsList variant="underline" aria-label="Project">
-          <TabsTrigger value="overview">Overview</TabsTrigger>
-          <TabsTrigger value="activity">Activity</TabsTrigger>
-        </TabsList>
-        <TabsContent value="overview">Three open issues.</TabsContent>
-        <TabsContent value="activity">Updated two hours ago.</TabsContent>
+        <TabsContent value="account">
+          <p class="nx:typography-body-default nx:text-muted-foreground">Make changes to your account here. Click save when you're done.</p>
+        </TabsContent>
+        <TabsContent value="password">
+          <p class="nx:typography-body-default nx:text-muted-foreground">Change your password here. After saving, you'll be logged out.</p>
+        </TabsContent>
       </Tabs>
     `,
   }),
   play: async ({ canvasElement }) => {
-    const activity = within(canvasElement).getByRole('tab', {
-      name: 'Activity',
-    });
+    const canvas = within(canvasElement);
+    const tabsList = canvas.getByRole('tablist');
+    const tab = canvas.getByRole('tab', { name: 'Account' });
 
-    await userEvent.click(activity);
+    await expect(tabsList).toHaveAttribute('data-variant', 'default');
+    await expect(tabsList).toHaveAttribute('data-size', 'default');
+    await expect(tab).toHaveAttribute('data-variant', 'default');
+    await expect(tab).toHaveAttribute('data-size', 'default');
+  },
+};
+
+export const UnderlineVariant: Story = {
+  tags: ['docs'],
+  parameters: {
+    docs: {
+      description: {
+        story:
+          'Set `variant="underline"` on TabsList for a line under the active tab.',
+      },
+    },
+  },
+  render: () => ({
+    components: { Tabs, TabsContent, TabsList, TabsTrigger },
+    template: `
+      <Tabs default-value="account" class="nx:w-[400px]">
+        <TabsList variant="underline">
+          <TabsTrigger value="account">Account</TabsTrigger>
+          <TabsTrigger value="password">Password</TabsTrigger>
+          <TabsTrigger value="settings">Settings</TabsTrigger>
+        </TabsList>
+        <TabsContent value="account">
+          <p class="nx:typography-body-default nx:text-muted-foreground">Account settings with underline variant tabs.</p>
+        </TabsContent>
+        <TabsContent value="password">
+          <p class="nx:typography-body-default nx:text-muted-foreground">Password settings with underline variant tabs.</p>
+        </TabsContent>
+        <TabsContent value="settings">
+          <p class="nx:typography-body-default nx:text-muted-foreground">General settings with underline variant tabs.</p>
+        </TabsContent>
+      </Tabs>
+    `,
+  }),
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+    const accountTab = canvas.getByRole('tab', { name: 'Account' });
+    const passwordTab = canvas.getByRole('tab', { name: 'Password' });
+
+    await expect(accountTab).toHaveAttribute('data-state', 'active');
+    await userEvent.click(passwordTab);
+    await expect(passwordTab).toHaveAttribute('data-state', 'active');
     await waitFor(() => {
       const indicator = canvasElement.querySelector(
         '[data-slot="tabs-indicator"]'
       );
       if (!indicator) throw new Error('Tabs indicator not rendered');
       const indicatorRect = indicator.getBoundingClientRect();
-      const activityRect = activity.getBoundingClientRect();
+      const passwordRect = passwordTab.getBoundingClientRect();
       expect(Math.round(indicatorRect.bottom)).toBe(
-        Math.round(activityRect.bottom)
+        Math.round(passwordRect.bottom)
       );
       expect(Math.round(indicatorRect.left)).toBe(
-        Math.round(activityRect.left)
+        Math.round(passwordRect.left)
       );
       expect(indicatorRect.height).toBeGreaterThan(0);
       expect(Math.round(indicatorRect.height)).toBe(
-        Math.round(parseFloat(getComputedStyle(activity).borderBottomWidth))
+        Math.round(parseFloat(getComputedStyle(passwordTab).borderBottomWidth))
       );
     });
+    await expect(
+      canvas.getByText('Password settings with underline variant tabs.')
+    ).toBeVisible();
   },
 };
 
 export const SmallSize: Story = {
   tags: ['docs'],
+  parameters: {
+    docs: {
+      description: {
+        story: 'Set `size="sm"` on TabsList for compact tabs.',
+      },
+    },
+  },
   render: () => ({
-    components: { Tabs, TabsList, TabsTrigger },
+    components: { Tabs, TabsContent, TabsList, TabsTrigger },
     template: `
-      <Tabs default-value="day">
-        <TabsList size="sm" aria-label="Range">
-          <TabsTrigger value="day">Day</TabsTrigger>
-          <TabsTrigger value="week">Week</TabsTrigger>
-          <TabsTrigger value="month">Month</TabsTrigger>
+      <Tabs default-value="tab1" class="nx:w-[400px]">
+        <TabsList size="sm">
+          <TabsTrigger value="tab1">Small Tab</TabsTrigger>
+          <TabsTrigger value="tab2">Another</TabsTrigger>
+          <TabsTrigger value="tab3">Third</TabsTrigger>
         </TabsList>
+        <TabsContent value="tab1">
+          <p class="nx:typography-body-default nx:text-muted-foreground">Small size tabs content.</p>
+        </TabsContent>
+      </Tabs>
+    `,
+  }),
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+    const tab = canvas.getByRole('tab', { name: 'Small Tab' });
+
+    await expect(tab).toHaveClass(
+      'nx:typography-label-small',
+      'nx:px-2',
+      'nx:py-1'
+    );
+    await expect(getComputedStyle(tab).fontSize).toBe('12px');
+  },
+};
+
+export const LargeSize: Story = {
+  tags: ['docs'],
+  parameters: {
+    docs: {
+      description: {
+        story: 'Set `size="lg"` on TabsList for roomier tabs.',
+      },
+    },
+  },
+  render: () => ({
+    components: { Tabs, TabsContent, TabsList, TabsTrigger },
+    template: `
+      <Tabs default-value="tab1" class="nx:w-[500px]">
+        <TabsList size="lg">
+          <TabsTrigger value="tab1">Large Tab</TabsTrigger>
+          <TabsTrigger value="tab2">Another</TabsTrigger>
+          <TabsTrigger value="tab3">Third</TabsTrigger>
+        </TabsList>
+        <TabsContent value="tab1">
+          <p class="nx:typography-body-default nx:text-muted-foreground">Large size tabs content.</p>
+        </TabsContent>
       </Tabs>
     `,
   }),
@@ -119,20 +201,46 @@ export const SmallSize: Story = {
 export const WithDisabledTab: Story = {
   tags: ['docs'],
   parameters: {
-    docs: { description: { story: 'Arrow keys skip a disabled tab.' } },
+    docs: {
+      description: {
+        story:
+          'Disable a TabsTrigger so users can see the tab but not open it.',
+      },
+    },
   },
   render: () => ({
     components: { Tabs, TabsContent, TabsList, TabsTrigger },
     template: `
-      <Tabs default-value="general" class="nx:w-96">
-        <TabsList aria-label="Workspace">
-          <TabsTrigger value="general">General</TabsTrigger>
-          <TabsTrigger value="billing" disabled>Billing</TabsTrigger>
+      <Tabs default-value="account" class="nx:w-[400px]">
+        <TabsList>
+          <TabsTrigger value="account">Account</TabsTrigger>
+          <TabsTrigger value="password">Password</TabsTrigger>
+          <TabsTrigger value="settings" disabled>Settings</TabsTrigger>
         </TabsList>
-        <TabsContent value="general">Rename your workspace.</TabsContent>
+        <TabsContent value="account">
+          <p class="nx:typography-body-default nx:text-muted-foreground">Account content</p>
+        </TabsContent>
+        <TabsContent value="password">
+          <p class="nx:typography-body-default nx:text-muted-foreground">Password content</p>
+        </TabsContent>
+        <TabsContent value="settings">
+          <p class="nx:typography-body-default nx:text-muted-foreground">Settings content</p>
+        </TabsContent>
       </Tabs>
     `,
   }),
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+    const disabledTab = canvas.getByRole('tab', { name: 'Settings' });
+
+    await expect(disabledTab).toBeDisabled();
+
+    // Disabled state uses a semantic text token at full opacity (not a fade).
+    await expect(disabledTab).toHaveClass(
+      'nx:disabled:text-disabled-foreground'
+    );
+    await expect(getComputedStyle(disabledTab).opacity).toBe('1');
+  },
 };
 
 export const AllSizes: Story = {

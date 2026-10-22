@@ -1,7 +1,7 @@
 import type { Meta, StoryObj } from '@storybook/vue3-vite';
 import { IconCheck } from '@tabler/icons-vue';
 import { expect, fn, userEvent, within } from 'storybook/test';
-import { ref } from 'vue';
+import { ref, useId } from 'vue';
 
 import { Switch } from '.';
 
@@ -44,10 +44,11 @@ export const WithLabel: Story = {
   tags: ['docs'],
   render: () => ({
     components: { Switch },
+    setup: () => ({ switchId: useId() }),
     template: `
       <div class="nx:flex nx:items-center nx:gap-2">
-        <Switch id="airplane-mode" />
-        <label for="airplane-mode">Airplane mode</label>
+        <Switch :id="switchId" />
+        <label :for="switchId">Airplane mode</label>
       </div>
     `,
   }),
@@ -56,41 +57,95 @@ export const WithLabel: Story = {
 export const Checked: Story = {
   tags: ['docs'],
   parameters: {
-    docs: { description: { story: 'Bind the state with `v-model`.' } },
+    docs: {
+      description: {
+        story: 'Set `default-value` to start the switch in the on position.',
+      },
+    },
   },
   render: () => ({
     components: { Switch },
-    setup: () => ({ enabled: ref(true) }),
     template: `
-      <div class="nx:flex nx:items-center nx:gap-2">
-        <Switch id="email-updates" v-model="enabled" />
-        <label for="email-updates">Email updates</label>
-      </div>
+      <Switch aria-label="Toggle switch" :default-value="true" />
     `,
   }),
 };
 
 export const Disabled: Story = {
   tags: ['docs'],
+  parameters: {
+    docs: {
+      description: {
+        story: 'A disabled switch shows muted colors and ignores clicks.',
+      },
+    },
+  },
   render: () => ({
     components: { Switch },
     template: `
-      <div class="nx:flex nx:items-center nx:gap-2">
-        <Switch id="sync" disabled />
-        <label for="sync">Sync over mobile data</label>
-      </div>
+      <Switch aria-label="Toggle switch" disabled />
     `,
   }),
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+    const switchEl = canvas.getByRole('switch');
+
+    await expect(switchEl).toBeDisabled();
+    // An unchecked-disabled switch recolors its border via a semantic disabled
+    // token at full opacity (not a fade).
+    await expect(switchEl).toHaveClass('nx:disabled:border-border-disabled');
+    await expect(getComputedStyle(switchEl).opacity).toBe('1');
+  },
 };
 
 export const Small: Story = {
   tags: ['docs'],
+  parameters: {
+    docs: {
+      description: {
+        story: 'Set `size="sm"` for dense rows.',
+      },
+    },
+  },
   render: () => ({
     components: { Switch },
     template: `
-      <div class="nx:flex nx:items-center nx:gap-2">
-        <Switch id="compact" size="sm" />
-        <label for="compact">Compact rows</label>
+      <Switch size="sm" aria-label="Toggle switch" />
+    `,
+  }),
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+    const switchEl = canvas.getByRole('switch');
+
+    await expect(switchEl).toHaveAttribute('data-size', 'sm');
+
+    // The smaller control still toggles (geometry-only size change).
+    await userEvent.click(switchEl);
+    await expect(switchEl).toHaveAttribute('data-state', 'checked');
+  },
+};
+
+export const LabelOnLeft: Story = {
+  tags: ['docs'],
+  parameters: {
+    docs: {
+      description: {
+        story: 'Put the label and description on the left of a settings row.',
+      },
+    },
+  },
+  render: () => ({
+    components: { Switch },
+    setup: () => ({ switchId: useId(), descriptionId: useId() }),
+    template: `
+      <div class="nx:flex nx:items-center nx:justify-between nx:gap-4 nx:rounded-lg nx:border-default nx:border-border-default nx:p-4">
+        <div class="nx:space-y-0.5">
+          <label :for="switchId">Marketing emails</label>
+          <p :id="descriptionId" class="nx:typography-body-default nx:text-muted-foreground">
+            Receive emails about new products and features.
+          </p>
+        </div>
+        <Switch :id="switchId" :aria-describedby="descriptionId" />
       </div>
     `,
   }),

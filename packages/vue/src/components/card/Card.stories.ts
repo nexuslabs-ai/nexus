@@ -1,5 +1,6 @@
 import type { Meta, StoryObj } from '@storybook/vue3-vite';
 import { expect, within } from 'storybook/test';
+import { useId } from 'vue';
 
 import { Button } from '../button';
 
@@ -60,14 +61,28 @@ type Story = StoryObj<typeof meta>;
 export const Default: Story = {
   tags: ['docs'],
   render: () => ({
-    components: { Card, CardContent, CardDescription, CardHeader, CardTitle },
+    components: {
+      Button,
+      Card,
+      CardContent,
+      CardDescription,
+      CardFooter,
+      CardHeader,
+      CardTitle,
+    },
     template: `
-      <Card class="nx:w-96">
+      <Card class="nx:w-[350px]">
         <CardHeader>
-          <CardTitle>Team plan</CardTitle>
-          <CardDescription>Five seats, billed monthly.</CardDescription>
+          <CardTitle>Card Title</CardTitle>
+          <CardDescription>Card description goes here.</CardDescription>
         </CardHeader>
-        <CardContent>Your next invoice is on 1 November.</CardContent>
+        <CardContent>
+          <p>Card content goes here.</p>
+        </CardContent>
+        <CardFooter>
+          <Button variant="outline">Cancel</Button>
+          <Button>Submit</Button>
+        </CardFooter>
       </Card>
     `,
   }),
@@ -78,7 +93,7 @@ export const WithAction: Story = {
   parameters: {
     docs: {
       description: {
-        story: '`CardAction` sits beside the title and description.',
+        story: 'Put a header action beside the title with CardAction.',
       },
     },
   },
@@ -87,17 +102,23 @@ export const WithAction: Story = {
       Button,
       Card,
       CardAction,
+      CardContent,
       CardDescription,
       CardHeader,
       CardTitle,
     },
     template: `
-      <Card class="nx:w-96">
+      <Card class="nx:w-[350px]">
         <CardHeader>
-          <CardTitle>Notifications</CardTitle>
-          <CardDescription>Choose what we email you about.</CardDescription>
-          <CardAction><Button size="sm" variant="ghost">Edit</Button></CardAction>
+          <CardTitle>Card with Action</CardTitle>
+          <CardDescription>This card has an action button.</CardDescription>
+          <CardAction>
+            <Button size="sm" variant="outline">Edit</Button>
+          </CardAction>
         </CardHeader>
+        <CardContent>
+          <p>Content with an action button in the header.</p>
+        </CardContent>
       </Card>
     `,
   }),
@@ -105,6 +126,13 @@ export const WithAction: Story = {
 
 export const WithFooter: Story = {
   tags: ['docs'],
+  parameters: {
+    docs: {
+      description: {
+        story: 'Place action buttons at the bottom with CardFooter.',
+      },
+    },
+  },
   render: () => ({
     components: {
       Button,
@@ -116,15 +144,17 @@ export const WithFooter: Story = {
       CardTitle,
     },
     template: `
-      <Card class="nx:w-96">
+      <Card class="nx:w-[350px]">
         <CardHeader>
-          <CardTitle>Upgrade to Pro</CardTitle>
-          <CardDescription>Unlimited projects and priority support.</CardDescription>
+          <CardTitle>Card with Footer</CardTitle>
+          <CardDescription>This card demonstrates footer usage.</CardDescription>
         </CardHeader>
-        <CardContent>Billed yearly at $96.</CardContent>
+        <CardContent>
+          <p>The footer is useful for action buttons.</p>
+        </CardContent>
         <CardFooter>
-          <Button variant="outline">Not now</Button>
-          <Button>Upgrade</Button>
+          <Button variant="outline">Cancel</Button>
+          <Button>Save Changes</Button>
         </CardFooter>
       </Card>
     `,
@@ -136,16 +166,64 @@ export const ContentOnly: Story = {
   parameters: {
     docs: {
       description: {
-        story: 'Without a header, give the content its own top padding.',
+        story: 'Use a card with content only, without a header or footer.',
       },
     },
   },
   render: () => ({
     components: { Card, CardContent },
     template: `
-      <Card class="nx:w-96">
-        <CardContent class="nx:pt-6">Drafts are saved every few seconds.</CardContent>
+      <Card class="nx:w-[350px]">
+        <CardContent class="nx:pt-6">
+          <p>A card with only content, no header or footer.</p>
+        </CardContent>
       </Card>
+    `,
+  }),
+};
+
+export const LoginCard: Story = {
+  tags: ['docs'],
+  parameters: {
+    docs: {
+      description: {
+        story: 'Wrap a sign-in form in a card with a header and footer.',
+      },
+    },
+  },
+  render: () => ({
+    components: {
+      Button,
+      Card,
+      CardContent,
+      CardDescription,
+      CardFooter,
+      CardHeader,
+      CardTitle,
+    },
+    setup: () => ({ emailId: useId(), passwordId: useId() }),
+    template: `
+      <form class="nx:w-full nx:max-w-sm" @submit.prevent>
+        <Card>
+          <CardHeader>
+            <CardTitle>Sign in</CardTitle>
+            <CardDescription>Enter your email and password to continue.</CardDescription>
+          </CardHeader>
+          <CardContent class="nx:grid nx:gap-4">
+            <div class="nx:grid nx:gap-1.5">
+              <label :for="emailId">Email</label>
+              <input :id="emailId" type="email" autocomplete="email" placeholder="you@example.com" required />
+            </div>
+            <div class="nx:grid nx:gap-1.5">
+              <label :for="passwordId">Password</label>
+              <input :id="passwordId" type="password" autocomplete="current-password" required />
+            </div>
+          </CardContent>
+          <CardFooter>
+            <Button type="submit" class="nx:w-full">Sign in</Button>
+          </CardFooter>
+        </Card>
+      </form>
     `,
   }),
 };

@@ -1,5 +1,10 @@
 import type { Meta, StoryObj } from '@storybook/vue3-vite';
-import { IconArrowRight, IconPlus } from '@tabler/icons-vue';
+import {
+  IconArrowRight,
+  IconPlus,
+  IconRocket,
+  IconStar,
+} from '@tabler/icons-vue';
 import { expect, fn, type Mock, userEvent, within } from 'storybook/test';
 
 import { Button } from '.';
@@ -60,7 +65,7 @@ export const Default: Story = {
   render: () => ({
     components: { Button },
     template: `
-      <Button>Save changes</Button>
+      <Button>Button</Button>
     `,
   }),
 };
@@ -70,21 +75,33 @@ export const IconOnlySizes: Story = {
   parameters: {
     docs: {
       description: {
-        story:
-          'Square sizes for an icon on its own. Give each one an `aria-label`.',
+        story: 'Show the three icon-only sizes, each named with `aria-label`.',
       },
     },
   },
   render: () => ({
-    components: { Button, IconPlus },
+    components: { Button, IconStar },
     template: `
       <div class="nx:flex nx:items-center nx:gap-2">
-        <Button size="icon-sm" variant="outline" aria-label="Add item"><IconPlus /></Button>
-        <Button size="icon" variant="outline" aria-label="Add item"><IconPlus /></Button>
-        <Button size="icon-lg" variant="outline" aria-label="Add item"><IconPlus /></Button>
+        <Button size="icon-sm" aria-label="Small icon"><IconStar /></Button>
+        <Button size="icon" aria-label="Default icon"><IconStar /></Button>
+        <Button size="icon-lg" aria-label="Large icon"><IconStar /></Button>
       </div>
     `,
   }),
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+
+    await expect(
+      canvas.getByRole('button', { name: 'Small icon' })
+    ).toHaveClass('nx:size-8');
+    await expect(
+      canvas.getByRole('button', { name: 'Default icon' })
+    ).toHaveClass('nx:size-10');
+    await expect(
+      canvas.getByRole('button', { name: 'Large icon' })
+    ).toHaveClass('nx:size-12');
+  },
 };
 
 export const StartIconSlot: Story = {
@@ -93,19 +110,29 @@ export const StartIconSlot: Story = {
     docs: {
       description: {
         story:
-          'The `#start-icon` slot places a decorative icon before the label.',
+          'Add a decorative icon before the label with the `#start-icon` slot.',
       },
     },
   },
   render: () => ({
-    components: { Button, IconPlus },
+    components: { Button, IconRocket },
     template: `
       <Button>
-        <template #start-icon><IconPlus /></template>
-        New project
+        <template #start-icon><IconRocket data-testid="start-icon" /></template>
+        Launch
       </Button>
     `,
   }),
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+    const button = canvas.getByRole('button', { name: 'Launch' });
+    const startIcon = button.querySelector('[data-slot="button-start-icon"]');
+
+    await expect(startIcon).toBeInTheDocument();
+    await expect(startIcon).toHaveAttribute('aria-hidden', 'true');
+    await expect(canvas.getByTestId('start-icon')).toBeInTheDocument();
+    await expect(button).toHaveAccessibleName('Launch');
+  },
 };
 
 export const EndIconSlot: Story = {
@@ -113,35 +140,101 @@ export const EndIconSlot: Story = {
   parameters: {
     docs: {
       description: {
-        story: 'The `#end-icon` slot places a decorative icon after the label.',
+        story:
+          'Add a decorative icon after the label with the `#end-icon` slot.',
       },
     },
   },
   render: () => ({
     components: { Button, IconArrowRight },
     template: `
-      <Button variant="outline">
+      <Button>
         Continue
-        <template #end-icon><IconArrowRight /></template>
+        <template #end-icon><IconArrowRight data-testid="end-icon" /></template>
       </Button>
     `,
   }),
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+    const button = canvas.getByRole('button', { name: 'Continue' });
+    const endIcon = button.querySelector('[data-slot="button-end-icon"]');
+
+    await expect(endIcon).toBeInTheDocument();
+    await expect(endIcon).toHaveAttribute('aria-hidden', 'true');
+    await expect(canvas.getByTestId('end-icon')).toBeInTheDocument();
+    await expect(button).toHaveAccessibleName('Continue');
+  },
 };
 
 export const AllVariants: Story = {
   tags: ['docs'],
+  parameters: {
+    docs: {
+      description: {
+        story:
+          'Compare every variant, size, icon slot, disabled and loading state.',
+      },
+    },
+  },
   render: () => ({
-    components: { Button },
+    components: { Button, IconArrowRight, IconRocket, IconStar },
     template: `
-      <div class="nx:flex nx:flex-wrap nx:gap-2">
-        <Button>Default</Button>
-        <Button variant="secondary">Secondary</Button>
-        <Button variant="outline">Outline</Button>
-        <Button variant="dashed">Dashed</Button>
-        <Button variant="ghost">Ghost</Button>
-        <Button variant="error">Error</Button>
-        <Button variant="destructive">Destructive</Button>
-        <Button variant="link">Link</Button>
+      <div class="nx:flex nx:flex-col nx:gap-6">
+        <div>
+          <h3 class="nx:text-foreground nx:mb-2 nx:typography-label-default">Variants</h3>
+          <div class="nx:flex nx:flex-wrap nx:items-center nx:gap-2">
+            <Button variant="default">Default</Button>
+            <Button variant="secondary">Secondary</Button>
+            <Button variant="error">Error</Button>
+            <Button variant="destructive">Destructive</Button>
+            <Button variant="outline">Outline</Button>
+            <Button variant="dashed">Dashed</Button>
+            <Button variant="ghost">Ghost</Button>
+            <Button variant="link">Link</Button>
+          </div>
+        </div>
+        <div>
+          <h3 class="nx:text-foreground nx:mb-2 nx:typography-label-default">Sizes</h3>
+          <div class="nx:flex nx:items-center nx:gap-2">
+            <Button size="sm">Small</Button>
+            <Button size="default">Default</Button>
+            <Button size="lg">Large</Button>
+            <Button size="icon-sm" aria-label="Small icon"><IconStar /></Button>
+            <Button size="icon" aria-label="Icon"><IconStar /></Button>
+            <Button size="icon-lg" aria-label="Large icon"><IconStar /></Button>
+          </div>
+        </div>
+        <div>
+          <h3 class="nx:text-foreground nx:mb-2 nx:typography-label-default">Icon slots</h3>
+          <div class="nx:flex nx:flex-wrap nx:items-center nx:gap-2">
+            <Button><template #start-icon><IconRocket /></template>Start icon</Button>
+            <Button>End icon<template #end-icon><IconArrowRight /></template></Button>
+          </div>
+        </div>
+        <div>
+          <h3 class="nx:text-foreground nx:mb-2 nx:typography-label-default">Disabled</h3>
+          <div class="nx:flex nx:flex-wrap nx:items-center nx:gap-2">
+            <Button variant="default" disabled>Default</Button>
+            <Button variant="secondary" disabled>Secondary</Button>
+            <Button variant="error" disabled>Error</Button>
+            <Button variant="destructive" disabled>Destructive</Button>
+            <Button variant="outline" disabled>Outline</Button>
+            <Button variant="dashed" disabled>Dashed</Button>
+            <Button variant="ghost" disabled>Ghost</Button>
+            <Button variant="link" disabled>Link</Button>
+          </div>
+        </div>
+        <div>
+          <h3 class="nx:text-foreground nx:mb-2 nx:typography-label-default">Loading</h3>
+          <div class="nx:flex nx:flex-wrap nx:items-center nx:gap-2">
+            <Button variant="default" loading>Default</Button>
+            <Button variant="secondary" loading>Secondary</Button>
+            <Button variant="error" loading>Error</Button>
+            <Button variant="destructive" loading>Destructive</Button>
+            <Button variant="outline" loading>Outline</Button>
+            <Button variant="dashed" loading>Dashed</Button>
+          </div>
+        </div>
       </div>
     `,
   }),
