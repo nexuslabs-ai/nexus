@@ -92,7 +92,14 @@
         "bundle:vue",
         "@nxds/catalog#generate:catalog"
       ],
-      "inputs": ["$TURBO_DEFAULT$", "$TURBO_ROOT$/package.json"],
+      "inputs": [
+        "$TURBO_DEFAULT$",
+        "$TURBO_ROOT$/package.json",
+        "$TURBO_ROOT$/packages/catalog/releases/**",
+        "$TURBO_ROOT$/packages/catalog/scripts/files.mjs",
+        "$TURBO_ROOT$/packages/catalog/scripts/registry.mjs",
+        "$TURBO_ROOT$/packages/catalog/scripts/roots.mjs"
+      ],
       "outputs": ["out/**", "next-env.d.ts"]
     },
     "dev": {

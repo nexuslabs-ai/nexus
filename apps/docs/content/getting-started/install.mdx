@@ -9,7 +9,7 @@ follow [Install by hand](#install-by-hand).
 ## Set up your app
 
 ```bash
-npx nxds init
+npx nxds@latest init
 ```
 
 `init` sets up a Next.js App Router app or a Vite + React app that uses
@@ -24,7 +24,7 @@ TypeScript. It does every step in [Install by hand](#install-by-hand):
 | ESLint (Vite)       | Turns off `react-refresh/only-export-components` for the nxds folder                  |
 
 Your app's own styles stay as they are. `init` also writes `nxds.json`, which
-records what nxds installed.
+records the nxds version and the items you installed.
 
 If your app uses `src/`, nxds goes in `src/components/nxds/`. To choose
 another folder, pass `--dir`.
@@ -32,11 +32,11 @@ another folder, pass `--dir`.
 ## Add a component
 
 ```bash
-npx nxds add button
+npx nxds@latest add button
 ```
 
-`add` copies the component, the components it uses and the packages it needs.
-Each component page shows its `add` command.
+`add` copies the component, the components it uses and the packages it needs,
+from your app's nxds version. Each component page shows its `add` command.
 
 Copied files are yours to edit. Import them from the nxds folder, such as
 `components/nxds/components/button/button`.
@@ -44,20 +44,20 @@ Copied files are yours to edit. Import them from the nxds folder, such as
 ## Update components
 
 ```bash
-npx nxds diff
-npx nxds update
+npx nxds@latest diff
+npx nxds@latest update
 ```
 
-`diff` lists the files that differ from this release. `update` replaces the
-files you haven't edited. To replace an edited file too, pass `--overwrite`.
+`diff` lists the files that differ from the latest release. `update` moves
+every installed item to it.
 
-If you run a newer `nxds`, run `update` before `add`. `add` refuses to mix
-files from two releases in one app.
+`update` replaces a file only if it still matches your current version, so
+your edits stay. To replace an edited file too, pass `--overwrite`.
 
 ## Find setup problems
 
 ```bash
-npx nxds doctor
+npx nxds@latest doctor
 ```
 
 `doctor` checks the provider, the CSS entry, the files and the packages, and
@@ -70,7 +70,7 @@ says how to fix each problem.
 | `--no-install` | Skips installing npm packages                        |
 | `--cwd <path>` | Runs in another folder                               |
 
-Run `npx nxds --help` to list every command.
+Run `npx nxds@latest --help` to list every command.
 
 ## Install by hand
 

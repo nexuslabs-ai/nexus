@@ -3,7 +3,7 @@ import path from 'node:path';
 
 import { type Catalog, resolveItems, variantOf } from './catalog';
 import type { Config } from './config';
-import { writeFiles, type WriteResult } from './files';
+import { type PreviousFiles, writeFiles, type WriteResult } from './files';
 import { installPackages, packagesToInstall } from './packages';
 import type { Project } from './project';
 import { cssImportLine } from './setup/react';
@@ -43,13 +43,15 @@ function addCssImports(
 
 /**
  * Installs `names` and everything they need: files, npm packages and
- * component stylesheet imports. Updates `config` in place.
+ * component stylesheet imports. A file that matches `previous` is replaced;
+ * any other changed file is kept. Updates `config` in place.
  */
 export function installItems(
   catalog: Catalog,
   project: Project,
   config: Config,
   names: string[],
+  previous: PreviousFiles,
   options: InstallOptions
 ): InstallResult {
   const items = resolveItems(catalog, config.framework, names);
@@ -65,6 +67,7 @@ export function installItems(
     project.root,
     config,
     [...files.values()],
+    previous,
     options
   );
 

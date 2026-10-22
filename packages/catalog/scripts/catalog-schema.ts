@@ -1,6 +1,7 @@
 /**
- * The shape of `generated/catalog.json`, which `generate-catalog.mjs` writes,
- * the docs install blocks read, and the `nxds` CLI bundles.
+ * The shape of `generated/catalog.json`, which `generate-catalog.mjs` writes
+ * and the docs install blocks read, and of each release catalog the `nxds`
+ * CLI fetches from the registry.
  */
 
 export type Framework = 'react' | 'vue';
@@ -52,15 +53,14 @@ export type CatalogItem =
 
 export type Catalog = {
   schema: 1;
-  /** A hash of `frameworks` and each item's name and variants for them: two catalogs with one revision install the same files. */
-  revision: string;
-  /** The frameworks the CLI installs. The docs copy also carries variants for others; the CLI's copy drops them. */
+  /** The `@nxds/react` version this catalog was built from. */
+  version: string;
+  /** The frameworks the CLI installs. The docs copy also carries variants for others; a release catalog drops them. */
   frameworks: Framework[];
   items: CatalogItem[];
 };
 
-/** An item's variants for `frameworks` only: what the CLI installs, and what `revision` hashes. */
-export function installedVariants<V extends Variant>(
+function installedVariants<V extends Variant>(
   variants: Partial<Record<Framework, V>>,
   frameworks: Framework[]
 ): Partial<Record<Framework, V>> {
@@ -69,4 +69,20 @@ export function installedVariants<V extends Variant>(
       .filter((framework) => variants[framework])
       .map((framework) => [framework, variants[framework]])
   );
+}
+
+// Two returns, so each keeps its own variant type.
+function releaseItem(item: CatalogItem, frameworks: Framework[]): CatalogItem {
+  if (item.kind === 'setup') {
+    return { ...item, variants: installedVariants(item.variants, frameworks) };
+  }
+  return { ...item, variants: installedVariants(item.variants, frameworks) };
+}
+
+/** `catalog` with only the variants the CLI installs: what a release publishes. */
+export function releaseCatalog(catalog: Catalog): Catalog {
+  return {
+    ...catalog,
+    items: catalog.items.map((item) => releaseItem(item, catalog.frameworks)),
+  };
 }

@@ -152,10 +152,10 @@ Releases are driven by [changesets](https://github.com/changesets/changesets) an
 | --------------------- | ---------- | ----------------------------------------------------------------------- |
 | `@nxds/core`          | **npm**    | Framework-agnostic runtime engine; copied component code imports it     |
 | `@nxds/eslint-plugin` | **npm**    | Lint guardrails consumers install and use                               |
-| `nxds`                | **npm**    | The CLI that installs nxds into an app; bundles the catalog             |
+| `nxds`                | **npm**    | The CLI that installs nxds into an app from the nxds.dev registry       |
 | `@nxds/tailwind`      | copy/own   | Generated token CSS — consumers regenerate with their own token choices |
 | `@nxds/react`         | copy/own   | Components are copied and owned; delivered by the `nxds` CLI            |
-| `@nxds/catalog`       | private    | Builds the install catalog the `nxds` CLI bundles from React and Vue    |
+| `@nxds/catalog`       | private    | Builds the install catalog and commits one per `@nxds/react` release    |
 | `@nxds/docs`          | private    | App                                                                     |
 
 Everything lives under the `@nxds` scope — the published packages on npm and the ESLint plugin's **rule namespace** (rules are referenced as `@nxds/*`, e.g. `@nxds/no-render-prop-types`). The rule namespace is a flat-config key the plugin registers, independent of the npm package name; it is kept in lockstep with the scope so the repo reads consistently.
@@ -174,7 +174,7 @@ The workflow grants `id-token: write` for the OIDC exchange, upgrades npm to a t
 
 ### Day-to-day: adding a changeset
 
-Any PR that changes `@nxds/core` or `@nxds/eslint-plugin` includes a changeset describing the bump:
+Any PR that changes `@nxds/core`, `@nxds/eslint-plugin`, `nxds` or what `@nxds/react` installs includes a changeset describing the bump. An `@nxds/react` bump is what gives apps a new release to `nxds update` to:
 
 ```bash
 pnpm changeset        # pick packages + semver bump, write a summary
@@ -186,8 +186,8 @@ Commit the generated `.changeset/*.md` file with your PR. Semver is a contract: 
 
 The `Release` workflow runs on every push to `main`:
 
-1. **Collect** — with unreleased changesets present, it opens/updates a **"Version Packages"** PR that bumps versions and writes `CHANGELOG.md`s.
-2. **Publish** — when you merge that PR (changesets consumed), the next run builds the packages and runs `changeset publish`, pushing `@nxds/core` and `@nxds/eslint-plugin` to npm with provenance. Private packages are skipped automatically.
+1. **Collect** — with unreleased changesets present, it opens/updates a **"Version Packages"** PR that bumps versions and writes `CHANGELOG.md`s. `pnpm version-packages` also commits `packages/catalog/releases/<version>.json` for a new `@nxds/react` version. The docs site serves it at `nxds.dev/r/<version>.json` and as `nxds.dev/r/latest.json`, which is what the `nxds` CLI installs. A release catalog never changes once committed.
+2. **Publish** — when you merge that PR (changesets consumed), the next run builds the packages and runs `changeset publish`, pushing `@nxds/core`, `@nxds/eslint-plugin` and `nxds` to npm with provenance. Private packages are skipped automatically.
 
 `@nxds/core` and `@nxds/eslint-plugin` were bootstrapped at `0.7.2` and `0.4.0` by the manual publish, so those two versions carry no provenance. Provenance starts with the first release the workflow publishes. Verify any release with a fresh external install:
 

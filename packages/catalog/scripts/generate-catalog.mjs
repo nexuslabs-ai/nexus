@@ -7,7 +7,6 @@
  * has it. A Vue variant exists for setup and for each component @nxds/vue
  * exports.
  */
-import { createHash } from 'node:crypto';
 import { readdirSync, readFileSync } from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
@@ -34,7 +33,6 @@ import {
   componentDescription,
   componentStoryFiles,
 } from '../../react/scripts/stories.ts';
-import { installedVariants } from './catalog-schema.ts';
 import { readCanonical, writeJson } from './files.mjs';
 import { CATALOG_FILE, repoRoot, toRepoPath } from './roots.mjs';
 
@@ -95,10 +93,11 @@ function packageRecord(packages) {
   return Object.fromEntries(packages.map(({ name, range }) => [name, range]));
 }
 
-/** @type {Record<string, string>} */
-const devRanges = JSON.parse(
+/** @type {{ version: string; devDependencies: Record<string, string> }} */
+const reactPackage = JSON.parse(
   readFileSync(path.join(reactRoot, 'package.json'), 'utf8')
-).devDependencies;
+);
+const devRanges = reactPackage.devDependencies;
 
 /** Tailwind 4 at the version packages/react builds with, or a newer 4.x. */
 function tailwindRange() {
@@ -269,25 +268,18 @@ export function buildCatalog() {
     },
   }));
 
-  /** @type {Catalog['frameworks']} */
-  const frameworks = ['react'];
-  const items = [setup, ...components, ...blocks];
-  // Only what the CLI installs: a docs copy edit or a Vue change doesn't make apps update.
-  const installed = items.map(({ name, variants }) => ({
-    name,
-    variants: installedVariants(variants, frameworks),
-  }));
-  const revision = createHash('sha256')
-    .update(JSON.stringify({ frameworks, items: installed }))
-    .digest('hex')
-    .slice(0, 12);
-  return { schema: 1, revision, frameworks, items };
+  return {
+    schema: 1,
+    version: reactPackage.version,
+    frameworks: ['react'],
+    items: [setup, ...components, ...blocks],
+  };
 }
 
 if (process.argv[1] === fileURLToPath(import.meta.url)) {
   const catalog = buildCatalog();
   writeJson(CATALOG_FILE, catalog);
   console.log(
-    `catalog: ${catalog.items.length} items, revision ${catalog.revision} -> ${toRepoPath(CATALOG_FILE)}`
+    `catalog: ${catalog.items.length} items, version ${catalog.version} -> ${toRepoPath(CATALOG_FILE)}`
   );
 }

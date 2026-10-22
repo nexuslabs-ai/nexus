@@ -41,7 +41,7 @@
     "docs:restore": "docker rm -f -v nxds-docs-restore >/dev/null 2>&1; docker create --name nxds-docs-restore ghcr.io/nexuslabs-ai-bot/nxds-docs-mcp:latest >/dev/null && docker cp nxds-docs-restore:/data/documents.db ./docs-mcp/data/documents.db && docker rm -v nxds-docs-restore >/dev/null && rm -f ./docs-mcp/data/documents.db-wal ./docs-mcp/data/documents.db-shm && echo 'Restored docs-mcp database from image into docs-mcp/data (stop docs:serve first)'",
     "size-limit": "size-limit",
     "changeset": "changeset",
-    "version-packages": "changeset version",
+    "version-packages": "changeset version && pnpm --filter @nxds/catalog snapshot:release",
     "release": "pnpm turbo build && changeset publish",
     "prepare": "husky"
   },

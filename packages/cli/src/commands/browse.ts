@@ -3,7 +3,7 @@ import {
   type CatalogItem,
   findItem,
   type Framework,
-  loadCatalog,
+  loadRelease,
   SETUP,
   variantOf,
 } from '../catalog';
@@ -15,6 +15,11 @@ import type { CommandResult } from './result';
 
 const KINDS = ['component', 'block'] as const;
 type Kind = (typeof KINDS)[number];
+
+/** The release the app is on, else the latest: what `add` would install. */
+function appRelease(cwd: string, registry: string) {
+  return loadRelease(registry, readConfig(cwd)?.version ?? 'latest');
+}
 
 function summary(item: CatalogItem) {
   return {
@@ -37,17 +42,25 @@ function summaryLines(items: CatalogItem[]) {
   );
 }
 
-export function list(kind: string | undefined): CommandResult {
+export async function list(
+  cwd: string,
+  registry: string,
+  kind: string | undefined
+): Promise<CommandResult> {
   if (kind !== undefined && !KINDS.includes(kind as Kind)) {
     throw new CliError(`--kind takes ${KINDS.join(' or ')}.`);
   }
-  const items = loadCatalog().items.filter(
+  const items = (await appRelease(cwd, registry)).items.filter(
     (item) => item.name !== SETUP && (kind === undefined || item.kind === kind)
   );
   return { data: items.map(summary), lines: summaryLines(items), ok: true };
 }
 
-export function search(query: string | undefined): CommandResult {
+export async function search(
+  cwd: string,
+  registry: string,
+  query: string | undefined
+): Promise<CommandResult> {
   if (!query)
     throw new CliError('Give a search term, such as `nxds search date`.');
   const needle = query.toLowerCase();
@@ -57,8 +70,8 @@ export function search(query: string | undefined): CommandResult {
     if (item.description.toLowerCase().includes(needle)) return 2;
     return undefined;
   };
-  const items = loadCatalog()
-    .items.filter((item) => item.name !== SETUP)
+  const items = (await appRelease(cwd, registry)).items
+    .filter((item) => item.name !== SETUP)
     .flatMap((item) => {
       const score = rank(item);
       return score === undefined ? [] : [{ item, score }];
@@ -84,9 +97,13 @@ function projectFramework(cwd: string, catalog: Catalog): Framework {
   );
 }
 
-export function view(cwd: string, name: string | undefined): CommandResult {
+export async function view(
+  cwd: string,
+  registry: string,
+  name: string | undefined
+): Promise<CommandResult> {
   if (!name) throw new CliError('Name an item, such as `nxds view button`.');
-  const catalog = loadCatalog();
+  const catalog = await appRelease(cwd, registry);
   const item = findItem(catalog, name);
   const variant = variantOf(item, projectFramework(cwd, catalog));
   const packages = Object.entries(variant.packages.npm).map(
@@ -128,6 +145,7 @@ export function info(cwd: string): CommandResult {
       typescript: project.typescript,
       tailwind: project.dependencies.tailwindcss ?? null,
       initialized: config !== null,
+      version: config?.version ?? null,
       dir: config?.dir ?? null,
       css: config?.css ?? null,
       items: config?.items ?? [],
@@ -138,7 +156,7 @@ export function info(cwd: string): CommandResult {
       `TypeScript: ${project.typescript ? 'yes' : 'no'}`,
       `Tailwind: ${project.dependencies.tailwindcss ?? 'not installed'}`,
       config
-        ? `nxds: set up in ${config.dir}, CSS entry ${config.css}`
+        ? `nxds: ${config.version} in ${config.dir}, CSS entry ${config.css}`
         : 'nxds: not set up. Run `nxds init`.',
       ...(config && config.items.length > 0
         ? [

@@ -9,7 +9,7 @@
     "generate:props": "node scripts/generate-props.mjs",
     "generate:vue": "node scripts/generate-vue-docs.ts",
     "bundle:vue": "node scripts/bundle-vue-demos.ts",
-    "build": "next build && node scripts/write-edge-files.mjs && node scripts/write-markdown.ts",
+    "build": "next build && node scripts/write-edge-files.mjs && node scripts/write-markdown.ts && node scripts/write-registry.mjs",
     "generate:manifest": "node scripts/generate-page-manifest.mjs",
     "audit:csp": "node scripts/audit-csp-inventory.mjs",
     "generate:demos": "node scripts/generate-demo-index.mjs",

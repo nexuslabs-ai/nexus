@@ -5,13 +5,15 @@ import { satisfies } from 'semver';
 
 import {
   type CatalogItem,
-  loadCatalog,
+  fetchRelease,
+  loadRelease,
+  releaseFiles,
   resolveItems,
   splitInstalled,
   variantOf,
 } from '../catalog';
 import { type Config, readConfig, requireConfig } from '../config';
-import { type FileState, fileState } from '../files';
+import { type FileState, fileState, NO_PREVIOUS } from '../files';
 import { installedVersion } from '../packages';
 import {
   findFile,
@@ -25,12 +27,21 @@ import { entryDir } from '../setup/react';
 
 import type { CommandResult } from './result';
 
-export function diff(cwd: string, names: string[]): CommandResult {
+/** Compares the app's nxds files with the latest release. */
+export async function diff(
+  cwd: string,
+  registry: string,
+  names: string[]
+): Promise<CommandResult> {
   const config = requireConfig(cwd);
-  const catalog = loadCatalog();
-  const { known, removed } = splitInstalled(catalog, config.items);
+  const latest = await loadRelease(registry, 'latest');
+  const previous = await fetchRelease(registry, config.version);
+  const previousFiles = previous
+    ? releaseFiles(previous, config.framework)
+    : NO_PREVIOUS;
+  const { known, removed } = splitInstalled(latest, config.items);
   const items = resolveItems(
-    catalog,
+    latest,
     config.framework,
     names.length > 0 ? names : known
   );
@@ -39,30 +50,29 @@ export function diff(cwd: string, names: string[]): CommandResult {
     variantOf(item, config.framework).files.map((file) => ({
       item: item.name,
       path: file.path,
-      state: fileState(cwd, config, file),
+      state: fileState(cwd, config, file, previousFiles),
     }))
   );
-  const changed = files.filter((file) => file.state !== 'current');
+  const differing = files.filter((file) => file.state !== 'current');
   const advice: Record<Exclude<FileState, 'current'>, string> = {
-    outdated: 'update with `nxds update`',
-    edited: 'you edited it; `nxds add <item> --overwrite` replaces it',
-    missing: 'restore with `nxds add <item>`',
-    foreign: 'not written by nxds; `--overwrite` replaces it',
+    outdated: '`nxds update` replaces it',
+    changed: "differs from nxds's copy; `nxds update --overwrite` replaces it",
+    missing: '`nxds update` restores it',
   };
 
   return {
-    data: { files, removed },
+    data: { version: config.version, latest: latest.version, files, removed },
     lines: [
-      ...changed.map(
+      ...differing.map(
         (file) =>
-          `${file.state.padEnd(8)}  ${file.path}  (${advice[file.state as Exclude<FileState, 'current'>].replace('<item>', file.item)})`
+          `${file.state.padEnd(8)}  ${file.path}  (${advice[file.state as Exclude<FileState, 'current'>]})`
       ),
       ...removed.map(
         (name) =>
           `removed   ${name}  (no longer in nxds; \`nxds update\` drops it)`
       ),
-      ...(changed.length === 0 && removed.length === 0
-        ? ['Every file matches this release of nxds.']
+      ...(differing.length === 0 && removed.length === 0
+        ? [`Every file matches nxds ${latest.version}.`]
         : []),
     ],
     ok: true,
@@ -145,7 +155,10 @@ function packageProblems(
   });
 }
 
-export function doctor(cwd: string): CommandResult {
+export async function doctor(
+  cwd: string,
+  registry: string
+): Promise<CommandResult> {
   const project = readProject(cwd);
   const config = readConfig(cwd);
   const checks: Check[] = [];
@@ -162,13 +175,13 @@ export function doctor(cwd: string): CommandResult {
   }
   if (!config || !project.setup) return report(checks);
 
-  const catalog = loadCatalog();
+  const catalog = await fetchRelease(registry, config.version);
   check(
     'release',
-    config.revision === catalog.revision,
-    config.revision === catalog.revision
-      ? `Files come from this release (catalog ${catalog.revision})`
-      : `Files come from catalog ${config.revision}, and this nxds has ${catalog.revision}. Run \`nxds update\`.`
+    catalog !== null,
+    catalog
+      ? `Files come from nxds ${config.version}`
+      : `${registry} has no nxds ${config.version}. Run \`nxds update\`.`
   );
 
   check(
@@ -229,6 +242,8 @@ export function doctor(cwd: string): CommandResult {
       : 'The theme script is missing, so the page can flash the wrong theme. Run `nxds init`.'
   );
 
+  if (!catalog) return report(checks);
+
   const { known, removed } = splitInstalled(catalog, config.items);
   check(
     'items',
@@ -241,7 +256,9 @@ export function doctor(cwd: string): CommandResult {
   const items = resolveItems(catalog, config.framework, known);
   const missingFiles = items.flatMap((item) =>
     variantOf(item, config.framework)
-      .files.filter((file) => fileState(cwd, config, file) === 'missing')
+      .files.filter(
+        (file) => fileState(cwd, config, file, NO_PREVIOUS) === 'missing'
+      )
       .map((file) => `${item.name}: ${file.path}`)
   );
   check(

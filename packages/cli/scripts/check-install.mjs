@@ -6,8 +6,9 @@
 // - the app's own typecheck, lint and production build pass;
 // - `nxds doctor` passes;
 // - `add` keeps a file you edited.
-// The app gets this checkout's @nxds/core as a packed tarball, since the
-// catalog pins a version that may not be published yet.
+// The CLI installs from a registry built from this checkout, and the app gets
+// this checkout's @nxds/core as a packed tarball, since neither may be
+// published yet.
 // usage: node packages/cli/scripts/check-install.mjs [next|vite]
 // Needs the built CLI (packages/cli/dist), the built core (packages/core/dist)
 // and the docs demos (apps/docs/__generated__/demos).
@@ -23,6 +24,10 @@ import {
 import { tmpdir } from 'node:os';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
+
+import { releaseCatalog } from '../../catalog/scripts/catalog-schema.ts';
+import { buildCatalog } from '../../catalog/scripts/generate-catalog.mjs';
+import { writeRegistry } from '../../catalog/scripts/registry.mjs';
 
 const cliRoot = path.resolve(
   path.dirname(fileURLToPath(import.meta.url)),
@@ -74,22 +79,25 @@ const APPS = {
 };
 
 let appDir;
+let registryDir;
 
 function run(command, args, cwd = appDir) {
   console.log(`$ ${command} ${args.join(' ')}`);
   execFileSync(command, args, { cwd, stdio: 'inherit' });
 }
 
+function cliArgs(args) {
+  return [cli, ...args, '--cwd', appDir, '--registry', registryDir];
+}
+
 function runCli(args) {
-  run('node', [cli, ...args, '--cwd', appDir]);
+  run('node', cliArgs(args));
 }
 
 function cliJson(args) {
-  const output = execFileSync(
-    'node',
-    [cli, ...args, '--cwd', appDir, '--json'],
-    { encoding: 'utf8' }
-  );
+  const output = execFileSync('node', [...cliArgs(args), '--json'], {
+    encoding: 'utf8',
+  });
   return JSON.parse(output);
 }
 
@@ -132,29 +140,24 @@ function checkRerunsChangeNothing(items) {
   }
 }
 
-/** `add` keeps a file you edited, and says so. */
+/** `add` and `update` keep a file you edited, and say so. */
 function checkEditedFileKept() {
   const { data } = cliJson(['info']);
   const file = 'components/button/button.tsx';
   const target = path.join(appDir, data.dir, file);
   const edited = `${readFileSync(target, 'utf8')}// edited by the app\n`;
   writeFileSync(target, edited);
-  const { data: added } = cliJson(['add', 'button']);
-  if (
-    !added.skipped.some((skipped) => skipped.path === file) ||
-    readFileSync(target, 'utf8') !== edited
-  ) {
-    fail(`\`add button\` replaced ${file}, which the app had edited.`);
+  for (const command of [['add', 'button'], ['update']]) {
+    const { data: result } = cliJson(command);
+    if (
+      !result.skipped.includes(file) ||
+      readFileSync(target, 'utf8') !== edited
+    ) {
+      fail(
+        `\`${command.join(' ')}\` replaced ${file}, which the app had edited.`
+      );
+    }
   }
-}
-
-function catalogItems() {
-  const catalog = JSON.parse(
-    readFileSync(path.join(cliRoot, 'dist/catalog.json'), 'utf8')
-  );
-  return catalog.items
-    .map((item) => item.name)
-    .filter((name) => name !== 'setup');
 }
 
 /** The docs' shown code for every example, as a reader copies it. */
@@ -213,6 +216,11 @@ function mountInViteApp(names) {
   );
 }
 
+const catalog = releaseCatalog(buildCatalog());
+const items = catalog.items
+  .map((item) => item.name)
+  .filter((name) => name !== 'setup');
+
 const only = process.argv[2];
 for (const [name, app] of Object.entries(APPS)) {
   if (only && only !== name) continue;
@@ -224,7 +232,9 @@ for (const [name, app] of Object.entries(APPS)) {
   if (app.install) run('npm', ['install', '--no-audit', '--no-fund']);
   installLocalCore(workDir);
 
-  const items = catalogItems();
+  registryDir = path.join(workDir, 'registry');
+  writeRegistry(registryDir, [catalog]);
+
   runCli(['init']);
   runCli(['add', ...items]);
   checkRerunsChangeNothing(items);

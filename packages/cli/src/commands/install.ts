@@ -2,7 +2,11 @@ import { existsSync, mkdirSync, writeFileSync } from 'node:fs';
 import path from 'node:path';
 
 import {
-  loadCatalog,
+  type Catalog,
+  fetchRelease,
+  type Framework,
+  loadRelease,
+  releaseFiles,
   resolveItems,
   SETUP,
   setupVariant,
@@ -10,7 +14,6 @@ import {
   variantOf,
 } from '../catalog';
 import {
-  assertSameRevision,
   type Config,
   projectPath,
   readConfig,
@@ -18,6 +21,7 @@ import {
   writeConfig,
 } from '../config';
 import { CliError } from '../errors';
+import { NO_PREVIOUS } from '../files';
 import {
   installItems,
   type InstallOptions,
@@ -50,8 +54,8 @@ function installLines(
   return [
     ...result.written.map((file) => `${verb} ${config.dir}/${file}`),
     ...result.skipped.map(
-      ({ path: file, reason }) =>
-        `Kept ${config.dir}/${file} (${reason === 'edited' ? 'you edited it' : 'not written by nxds'}). Pass --overwrite to replace it.`
+      (file) =>
+        `Kept ${config.dir}/${file}: it differs from nxds's copy, so it may hold your edits. Pass --overwrite to replace it.`
     ),
     ...(result.packages.length > 0
       ? [`${packagesVerb(options)} ${result.packages.join(' ')}`]
@@ -84,10 +88,11 @@ function assertTailwind4(project: Project) {
   );
 }
 
-export function init(
+export async function init(
   cwd: string,
+  registry: string,
   options: InstallOptions & { dir?: string }
-): CommandResult {
+): Promise<CommandResult> {
   const project = readProject(cwd);
   if (!project.setup) {
     throw new CliError(
@@ -102,10 +107,10 @@ export function init(
   const addTailwind = !('tailwindcss' in project.dependencies);
   if (!addTailwind) assertTailwind4(project);
 
-  const catalog = loadCatalog();
   const dir = options.dir ? nxdsDir(options.dir) : undefined;
   const existing = readConfig(cwd);
-  if (existing) assertSameRevision(existing, catalog);
+  // Running init again stays on the app's release.
+  const catalog = await loadRelease(registry, existing?.version ?? 'latest');
   if (existing && dir && dir !== existing.dir) {
     throw new CliError(
       `nxds is already set up in ${existing.dir}. Run init without --dir, or move the folder and change "dir" in nxds.json.`
@@ -113,11 +118,10 @@ export function init(
   }
   const config: Config = existing ?? {
     framework: 'react',
-    revision: catalog.revision,
+    version: catalog.version,
     dir: dir ?? defaultDir(project),
     css: cssEntryPath(project),
     items: [],
-    files: {},
   };
 
   const setup = setupVariant(catalog, config.framework);
@@ -130,7 +134,14 @@ export function init(
   if (options.install && !options.dryRun) {
     installPackages(project, tailwind, { dev: true });
   }
-  const installed = installItems(catalog, project, config, [SETUP], options);
+  const installed = installItems(
+    catalog,
+    project,
+    config,
+    [SETUP],
+    NO_PREVIOUS,
+    options
+  );
 
   if (!options.dryRun) {
     for (const change of wiring.changes) {
@@ -149,6 +160,7 @@ export function init(
   return {
     data: {
       setup: project.setup,
+      version: config.version,
       dir: config.dir,
       css: config.css,
       dryRun: options.dryRun,
@@ -163,7 +175,7 @@ export function init(
       manual: wiring.manual,
     },
     lines: [
-      `nxds folder: ${config.dir}`,
+      `nxds ${config.version} in ${config.dir}`,
       ...installLines(config, { ...installed, packages }, options),
       ...wiring.changes.map(
         (change) => `${change.created ? createVerb : editVerb} ${change.path}`
@@ -185,22 +197,24 @@ function manualLines(manual: ManualStep[]) {
   ];
 }
 
-export function add(
+/** Adds items from the release the app is on, so one app never mixes two releases. */
+export async function add(
   cwd: string,
+  registry: string,
   names: string[],
   options: InstallOptions
-): CommandResult {
+): Promise<CommandResult> {
   if (names.length === 0) {
     throw new CliError('Name at least one item, such as `nxds add button`.');
   }
   const config = requireConfig(cwd);
-  const catalog = loadCatalog();
-  assertSameRevision(config, catalog);
+  const catalog = await loadRelease(registry, config.version);
   const installed = installItems(
     catalog,
     readProject(cwd),
     config,
     names,
+    NO_PREVIOUS,
     options
   );
   if (!options.dryRun) writeConfig(cwd, config);
@@ -219,17 +233,28 @@ export function add(
   };
 }
 
+/** The files `names` and everything they need install. */
+function filesOf(catalog: Catalog, framework: Framework, names: string[]) {
+  return new Set(
+    resolveItems(catalog, framework, names).flatMap((item) =>
+      variantOf(item, framework).files.map((file) => file.path)
+    )
+  );
+}
+
 /**
- * Re-installs every installed item from this release: items the catalog
- * dropped leave `nxds.json`, and files no installed item has any more are
- * reported. The app moves to this release's catalog revision only when no
- * edited file was kept, since a kept file is still from the older release.
+ * Re-installs every installed item from the latest release. A file that still
+ * matches the app's release is replaced; a changed one is kept. Items the
+ * release dropped leave `nxds.json`, and files no installed item has any more
+ * are reported. The app moves to the latest release only when no changed file
+ * was kept, since a kept file is still from the older release.
  */
-export function update(
+export async function update(
   cwd: string,
+  registry: string,
   names: string[],
   options: InstallOptions
-): CommandResult {
+): Promise<CommandResult> {
   if (names.length > 0) {
     throw new CliError(
       '`nxds update` updates every installed item, so one app never mixes two releases. Run it without item names.'
@@ -237,35 +262,50 @@ export function update(
   }
 
   const config = requireConfig(cwd);
-  const catalog = loadCatalog();
-  const { known, removed } = splitInstalled(catalog, config.items);
+  const latest = await loadRelease(registry, 'latest');
+  const previous = await fetchRelease(registry, config.version);
+  const { known, removed } = splitInstalled(latest, config.items);
+  const current = filesOf(latest, config.framework, known);
+  const installedBefore = previous
+    ? filesOf(
+        previous,
+        config.framework,
+        splitInstalled(previous, config.items).known
+      )
+    : new Set<string>();
+  const orphaned = [...installedBefore].filter(
+    (file) => !current.has(file) && existsSync(path.join(cwd, config.dir, file))
+  );
   config.items = known;
   const installed = installItems(
-    catalog,
+    latest,
     readProject(cwd),
     config,
     known,
+    previous ? releaseFiles(previous, config.framework) : NO_PREVIOUS,
     options
   );
 
-  const current = new Set(
-    resolveItems(catalog, config.framework, known).flatMap((item) =>
-      variantOf(item, config.framework).files.map((file) => file.path)
-    )
-  );
-  const orphaned: string[] = [];
-  for (const file of Object.keys(config.files)) {
-    if (current.has(file)) continue;
-    if (existsSync(path.join(cwd, config.dir, file))) orphaned.push(file);
-    else delete config.files[file];
-  }
+  const from = config.version;
   const moved = installed.skipped.length === 0;
-  if (moved) config.revision = catalog.revision;
+  if (moved) config.version = latest.version;
   if (!options.dryRun) writeConfig(cwd, config);
 
   return {
-    data: { dryRun: options.dryRun, ...installed, removed, orphaned },
+    data: {
+      dryRun: options.dryRun,
+      from,
+      version: config.version,
+      ...installed,
+      removed,
+      orphaned,
+    },
     lines: [
+      ...(previous
+        ? []
+        : [
+            `${registry} has no nxds ${from}, so every file that differs from ${latest.version} counts as changed.`,
+          ]),
       ...installLines(config, installed, options),
       ...(removed.length > 0
         ? [
@@ -276,14 +316,9 @@ export function update(
         (file) =>
           `No installed item uses ${config.dir}/${file} any more. Delete it once nothing in your app imports it.`
       ),
-      ...(moved
-        ? []
-        : [
-            `nxds.json stays on catalog ${config.revision} until every kept file is replaced.`,
-          ]),
-      ...(installed.written.length === 0 && moved
-        ? ['Every installed item is up to date.']
-        : []),
+      moved
+        ? `nxds ${from === latest.version ? 'is on' : `${options.dryRun ? 'would move' : 'moved'} from ${from} to`} ${latest.version}.`
+        : `nxds.json stays on ${from} until every kept file is replaced.`,
     ],
     ok: moved,
   };

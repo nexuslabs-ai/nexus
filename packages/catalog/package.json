@@ -2,7 +2,7 @@
   "name": "@nxds/catalog",
   "version": "0.0.0",
   "private": true,
-  "description": "The install catalog the nxds CLI bundles and the docs read, built from the React and Vue sources",
+  "description": "The install catalog the docs read and the nxds CLI fetches, built from the React and Vue sources",
   "type": "module",
   "exports": {
     ".": "./scripts/catalog-schema.ts",
@@ -11,7 +11,8 @@
   "scripts": {
     "clean": "rm -rf generated",
     "typecheck": "tsc --noEmit",
-    "generate:catalog": "node scripts/generate-catalog.mjs"
+    "generate:catalog": "node scripts/generate-catalog.mjs",
+    "snapshot:release": "node scripts/snapshot-release.mjs"
   },
   "devDependencies": {
     "@types/node": "^25.9.1",
