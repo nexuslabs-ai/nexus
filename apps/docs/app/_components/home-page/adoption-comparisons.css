@@ -63,21 +63,6 @@
   justify-content: center;
   gap: var(--nx-spacing-2);
 }
-.adoption-evidence {
-  text-align: start;
-  min-inline-size: 0;
-  border-block-end: 1px solid var(--nx-color-border-default);
-  padding-block: var(--nx-spacing-3);
-}
-.adoption-evidence summary {
-  cursor: pointer;
-  font-size: 0.875rem;
-  padding-block: var(--nx-spacing-2);
-}
-.adoption-evidence pre {
-  margin-block: var(--nx-spacing-4);
-  font-size: 0.8125rem;
-}
 @container adoption (max-width: 47.99rem) {
   .adoption-preview iframe {
     height: 840px;

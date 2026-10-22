@@ -3,8 +3,8 @@ NEXUS DESIGN SYSTEM — PRESS KIT
 
 Primary logo: approved borderless nxds block wordmark, rounded-slot x and dense rounded s. No colon. Same geometry in light and dark.
 source/mark.svg: editable full-wordmark master.
-svg/nx-logo*.svg and svg/nxds-website-wordmark*.svg: full wordmark.
+svg/nx-logo*.svg and svg/nxds-website-wordmark*.svg: full wordmark for the website header and footer.
 png/nx-logo-*: transparent full-wordmark exports.
-svg/nx-icon-*, png/nx-icon-*, favicon/: retained compact nx: icon, unchanged by this wordmark approval.
+svg/nx-icon-*, png/nx-icon-*, favicon/: compact nx icon using the approved n and x shapes, without a colon.
 fonts/: website DM Sans and JetBrains Mono, with licenses. Logo requires no font.
 BRAND-GUIDELINES.txt: geometry, usage, typography and positioning.

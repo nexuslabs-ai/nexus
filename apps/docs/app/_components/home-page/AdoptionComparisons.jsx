@@ -5,9 +5,6 @@ import { useId, useState } from 'react';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@nexus_ds/react';
 import { useNexusAppearance } from '@nexus_ds/react/appearance';
 
-import { CodeBlock } from '../CodeBlock';
-import { CopyAnnouncerProvider } from '../CopyAnnouncer';
-
 import './adoption-comparisons.css';
 
 function Preview({ title, subtitle, src }) {
@@ -60,18 +57,6 @@ function ComparisonPair({ reveal, leftLabel, rightLabel, children }) {
     </div>
   );
 }
-function Evidence({ children }) {
-  return (
-    <details className="adoption-evidence">
-      <summary>See the code and what changes</summary>
-      <CopyAnnouncerProvider>
-        <CodeBlock>
-          <code>{children}</code>
-        </CodeBlock>
-      </CopyAnnouncerProvider>
-    </details>
-  );
-}
 export default function AdoptionComparisons({ reveal = false }) {
   const [library, setLibrary] = useState('MUI');
   const id = useId();
@@ -106,28 +91,6 @@ export default function AdoptionComparisons({ reveal = false }) {
           compares adding the default stylesheets; scoped or customized shadcn
           themes can avoid these collisions.
         </p>
-        <Evidence>{`/* Light-mode defaults shown below.
-   Both previews follow the website theme.
-   In dark mode, shadcn accent/muted = oklch(0.269 0 0),
-   while HeroUI muted = oklch(0.705 0.015 286.067). */
-
-/* HeroUI v3 uses accent for its primary button. */
---accent: oklch(0.6204 0.195 253.83);
---muted: oklch(0.5517 0.0138 285.94);
---radius: 0.5rem;
-
-/* shadcn defaults use these names for pale surfaces. */
---accent: oklch(0.97 0 0);
---muted: oklch(0.97 0 0);
---radius: 0.625rem;
-
-/* Actual HeroUI components consuming these tokens:
-   Button + ProgressBar: accent
-   Card.Description: muted
-   Button, Chip + Avatar: radius */
-
-/* Nexus theme tokens use the --nx- namespace.
-   The host's accent and muted tokens remain unchanged. */`}</Evidence>
       </section>
       <section className="adoption-case" aria-labelledby={`${id}-1`}>
         <div className="adoption-heading">
@@ -172,16 +135,6 @@ export default function AdoptionComparisons({ reveal = false }) {
           This example shows native heading and list changes, not a claim that
           all MUI or Ant components break.
         </p>
-        <Evidence>{`/* Tailwind Preflight, included by the default shadcn setup */
-h1, h2, h3, h4, h5, h6 {
-  font-size: inherit;
-  font-weight: inherit;
-}
-ol, ul, menu { list-style: none; }
-* { margin: 0; padding: 0; }
-
-/* Nexus adds prefixed utilities without global Preflight.
-   Existing native element styles stay in place. */`}</Evidence>
       </section>
       <section className="adoption-case" aria-labelledby={`${id}-2`}>
         <div className="adoption-heading">
@@ -212,20 +165,6 @@ ol, ul, menu { list-style: none; }
           the default alert on the shadcn side; Nexus provides dedicated
           variants. shadcn can be extended with your own styles.
         </p>
-        <Evidence>{`// shadcn Alert defaults: default | destructive
-<Alert variant="default">Invoice ready</Alert>
-<Alert variant="default">Card expires soon</Alert>
-<Alert variant="default">Payment received</Alert>
-<Alert variant="destructive">Payment failed</Alert>
-
-// Nexus Alert adds semantic variants out of the box.
-<Alert variant="information">Invoice ready</Alert>
-<Alert variant="warning">Card expires soon</Alert>
-<Alert variant="success">Payment received</Alert>
-<Alert variant="destructive">Payment failed</Alert>
-
-// Nexus previews use NexusAppearanceProvider.
-// No per-alert color overrides on either side.`}</Evidence>
       </section>
     </div>
   );

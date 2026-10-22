@@ -5,7 +5,13 @@ import { useEffect, useState } from 'react';
 import { useNexusAppearance } from '@nexus_ds/react/appearance';
 import { IconBrandGit, IconCopy, IconPencilCode } from '@tabler/icons-react';
 
-import { AntDesignLogo, MuiLogo, ShadcnLogo } from './EcosystemLogos';
+import {
+  AntDesignLogo,
+  BootstrapLogo,
+  HeroUiLogo,
+  MuiLogo,
+  ShadcnLogo,
+} from './EcosystemLogos';
 import { TiltedCtaJourney } from './TiltedCtaJourney';
 
 import './rotating-headline-journey.css';
@@ -22,6 +28,8 @@ export const tileSets = [
     ['MUI', MuiLogo],
     ['Ant Design', AntDesignLogo],
     ['shadcn/ui', ShadcnLogo],
+    ['HeroUI', HeroUiLogo],
+    ['Bootstrap', BootstrapLogo],
   ],
   [
     ['Copy source', IconCopy],

@@ -4,7 +4,7 @@ NEXUS DESIGN SYSTEM — BRAND FOUNDATION
 CONFIRMED IDENTITY
 Product: Nexus Design System. Handle: nxds. Company: Nexus Labs.
 Primary logo and website header: approved borderless nxds block wordmark, with no colon. Use the rounded-slot x and dense rounded s as supplied in source/mark.svg. Original vector artwork, no font dependency.
-The existing compact nx: icon remains the favicon/app-icon asset. Its geometry has not been redesigned in this wordmark approval; do not substitute a crop of the new wordmark.
+The compact nx icon uses the approved n and rounded-slot x shapes, without a colon. Use it for favicons and app icons; use the full nxds wordmark in the website header and footer. The 328 × 132 letter pair is centered in a 368 × 368 square with 20 units of horizontal clear space. source/icon.svg is the compact master.
 
 APPROVED WORDMARK GEOMETRY
 Master viewBox: 664 × 132. Each letter is 160 units wide; gaps are 8 units.
@@ -19,7 +19,7 @@ Both themes use identical geometry. Website inherits currentColor; supplied ligh
 USAGE AND ASSETS
 Header accessible link name: Nexus Design System home. SVG itself is decorative inside that link.
 source/mark.svg is the full-wordmark master. svg/nx-logo.svg and svg/nxds-website-wordmark.svg use currentColor. Light/dark SVGs and transparent PNGs are provided.
-svg/nx-icon-*.svg and favicon/ contain the retained compact nx: icon. The PNG/ICO icons have opaque backgrounds for contrast.
+svg/nx-icon-*.svg and favicon/ contain the compact nx icon with the new letter shapes. The PNG/ICO icons have opaque backgrounds for contrast.
 Website component: apps/docs/app/_components/NexusWordmark.tsx.
 Maintain clear space of at least one counter width (14 master units) around the full wordmark. Review the supplied 96px sample before using smaller sizes.
 
