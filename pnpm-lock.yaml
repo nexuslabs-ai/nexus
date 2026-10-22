@@ -555,6 +555,18 @@ importers:
         specifier: ^3.3.13
         version: 3.3.13(typescript@5.9.3)
 
+  parity:
+    devDependencies:
+      '@types/node':
+        specifier: ^25.0.3
+        version: 25.9.1
+      typescript:
+        specifier: ^5.9.3
+        version: 5.9.3
+      vitest:
+        specifier: 4.0.18
+        version: 4.0.18(@types/node@25.9.1)(@vitest/browser-playwright@4.0.18)(jiti@2.7.0)(jsdom@27.4.0)(lightningcss@1.32.0)(msw@2.14.6(@types/node@25.9.1)(typescript@5.9.3))(yaml@2.9.0)
+
 packages:
 
   '@acemir/cssom@0.9.31':

@@ -1,0 +1,15 @@
+{
+  "name": "@nxds/parity",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "description": "Cross-framework parity tests: @nxds/vue against @nxds/react.",
+  "scripts": {
+    "typecheck": "tsc --noEmit"
+  },
+  "devDependencies": {
+    "@types/node": "^25.0.3",
+    "typescript": "^5.9.3",
+    "vitest": "4.0.18"
+  }
+}

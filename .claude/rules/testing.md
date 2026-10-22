@@ -5,16 +5,17 @@
 
 ## Scope
 
-A test earns its place only when it pins behaviour a consumer of the design system would see. nxds has exactly four kinds:
+A test earns its place only when it pins behaviour a consumer of the design system would see. nxds has exactly five kinds:
 
 | Kind                  | Lives in                                         | Pins                                                                                                                                                                                                                                                                             |
 | --------------------- | ------------------------------------------------ | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | **Component stories** | `packages/{react,vue}/src/**/*.stories.{tsx,ts}` | Component behaviour and accessibility, via `play` functions and the axe check on every story                                                                                                                                                                                     |
 | **Core engine**       | `packages/core/src/lib/*.test.ts`                | Derived-theme contrast and legibility, colour-blind separation, registry/engine agreement, first-paint script, perceptual-ramp shade grid, token catalogue agreement with the generated CSS, compiled CSS scope (only `nx:` classes and `--nx-*` variables), token-file manifest |
-| **`cn` merge**        | `packages/react/src/lib/utils.test.ts`           | `cn` resolving conflicts between nxds `nx:` utilities, and the Vue package shipping the same `cn`                                                                                                                                                                                |
+| **`cn` merge**        | `packages/react/src/lib/utils.test.ts`           | `cn` resolving conflicts between nxds `nx:` utilities                                                                                                                                                                                                                            |
 | **ESLint rules**      | `packages/eslint-plugin/__tests__/*.test.js`     | Each published rule reports what it should, and nothing else                                                                                                                                                                                                                     |
+| **Parity**            | `parity/*.test.ts`                               | Each `@nxds/vue` component matching its `@nxds/react` reference, and the files Vue copies from React staying identical. A check compares the two packages with each other, never with a frozen copy                                                                              |
 
-Components are tested only through stories — see [testing-react.md](testing-react.md). The other three run under Vitest's `unit` project and import from `vitest` directly.
+Components are tested through stories — see [testing-react.md](testing-react.md) — and the parity tests hold each Vue component to its React reference. The other four run under Vitest's `unit` project and import from `vitest` directly.
 
 ## What We Don't Test
 
@@ -97,13 +98,13 @@ expect(() => adjustContrast('not-a-color')).toThrow(
 
 ```bash
 pnpm test               # Run all tests (unit + storybook)
-pnpm test:unit          # Core engine, cn merge, ESLint rules
+pnpm test:unit          # Core engine, cn merge, ESLint rules, parity
 pnpm test:storybook     # Every story's play function in a real browser
 ```
 
 ## Do Not
 
-- Add a test outside the four kinds in [Scope](#scope)
+- Add a test outside the five kinds in [Scope](#scope)
 - Take snapshots
 - Focus on line coverage over result correctness
 - Use synthetic `foo`/`bar` test data

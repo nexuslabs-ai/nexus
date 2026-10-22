@@ -43,7 +43,7 @@ make verify       # the full gate: lint + format check + typecheck + tests + tok
 
 - `make lint` — ESLint (cheap; run it constantly)
 - `make typecheck` — `tsc` across the packages
-- `pnpm test:unit` — just the unit tests (core engine, `cn` merge, ESLint rules)
+- `pnpm test:unit` — just the unit tests (core engine, `cn` merge, ESLint rules, parity)
 - `pnpm test:storybook:ui` — the interactive debugger when a story's `play` function fails
 
 The pre-commit hook already formats and `nx:`-lints staged files, so you rarely format by hand (`pnpm format` does a full-tree pass if you want one).
@@ -77,10 +77,10 @@ preference — the `unit` project's `include` list in `vitest.config.ts` is one
 glob per non-story row of [`.claude/rules/testing.md`](.claude/rules/testing.md)
 § Scope, and a component test file matches none of them.
 
-Outside stories, three kinds of unit test exist, all under the `unit` project
+Outside stories, four kinds of unit test exist, all under the `unit` project
 (jsdom): the core engine's behaviour (`packages/core/src/lib`), the nxds `cn`
-merge (`packages/react/src/lib/utils.test.ts`), and the ESLint plugin's rules
-(`packages/eslint-plugin/__tests__`). Apps, repo scripts and hooks have no
+merge (`packages/react/src/lib/utils.test.ts`), the ESLint plugin's rules
+(`packages/eslint-plugin/__tests__`), and cross-framework parity (`parity/`). Apps, repo scripts and hooks have no
 tests of their own, and nothing uses snapshots.
 
 The spec lives in the rules, not here — what earns a test and what is
@@ -97,7 +97,7 @@ coverage; this section is orientation only.
 | Command                  | What it does                                                                     |
 | ------------------------ | -------------------------------------------------------------------------------- |
 | `pnpm test`              | every vitest project — `unit` (jsdom) + `storybook` + `storybook-vue` (Chromium) |
-| `pnpm test:unit`         | unit only — core engine, `cn` merge, ESLint rules                                |
+| `pnpm test:unit`         | unit only — core engine, `cn` merge, ESLint rules, parity                        |
 | `pnpm test:storybook`    | every React and Vue story's play function in a real browser                      |
 | `pnpm test:storybook:ui` | **debugger** — Vitest's interactive UI when a play function fails                |
 

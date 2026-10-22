@@ -29,9 +29,9 @@ export default defineConfig({
   test: {
     // Use projects feature (Vitest 4)
     projects: [
-      // Core engine, the `cn` merge, and ESLint rules - jsdom for the
-      // first-paint script tests. One glob per non-story row of testing.md
-      // § Scope; the stories row belongs to the `storybook` project below.
+      // Core engine, the `cn` merge, ESLint rules and cross-framework parity -
+      // jsdom for the first-paint script tests. One glob per non-story row of
+      // testing.md § Scope; the stories row belongs to the `storybook` projects.
       {
         extends: true,
         test: {
@@ -41,6 +41,7 @@ export default defineConfig({
             'packages/core/src/lib/*.test.ts',
             'packages/react/src/lib/utils.test.ts',
             'packages/eslint-plugin/__tests__/*.test.js',
+            'parity/*.test.ts',
           ],
         },
       },
