@@ -100,6 +100,12 @@ export const vueOnlyApi: Record<string, string> = {
     'slot for custom thumb content; React renders the thumb itself with no way to compose it',
 };
 
+/** Parts whose rendered element differs by design, by `data-slot`; the rendered check skips them. */
+export const renderedDifferences: Record<string, string> = {
+  'tabs-indicator':
+    "Radix has no indicator, so React measures the active tab and moves a span; Vue renders Reka's TabsIndicator, which reads Reka's CSS variables",
+};
+
 /** Top-level values a Vue recipe file declares that React has no twin for, as `{file}#{name}`. */
 export const vueOnlyDeclarations: Record<string, string> = {
   'tabs/index.ts#TabsListKey':

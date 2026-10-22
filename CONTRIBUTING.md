@@ -94,12 +94,12 @@ coverage; this section is orientation only.
 
 `make verify` runs the whole suite (plus lint / typecheck / audits). To run or debug tests directly:
 
-| Command                  | What it does                                                                     |
-| ------------------------ | -------------------------------------------------------------------------------- |
-| `pnpm test`              | every vitest project — `unit` (jsdom) + `storybook` + `storybook-vue` (Chromium) |
-| `pnpm test:unit`         | unit only — core engine, `cn` merge, ESLint rules, parity                        |
-| `pnpm test:storybook`    | every React and Vue story's play function in a real browser                      |
-| `pnpm test:storybook:ui` | **debugger** — Vitest's interactive UI when a play function fails                |
+| Command                  | What it does                                                                                |
+| ------------------------ | ------------------------------------------------------------------------------------------- |
+| `pnpm test`              | every vitest project — `unit` (jsdom) + `storybook` + `storybook-vue` + `parity` (Chromium) |
+| `pnpm test:unit`         | unit only — core engine, `cn` merge, ESLint rules, parity                                   |
+| `pnpm test:storybook`    | every React and Vue story's play function, and rendered parity, in a real browser           |
+| `pnpm test:storybook:ui` | **debugger** — Vitest's interactive UI when a play function fails                           |
 
 The first storybook-project run launches Storybook in the background — the cold start takes a few extra seconds.
 

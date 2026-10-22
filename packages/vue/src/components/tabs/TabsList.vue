@@ -44,7 +44,7 @@ const isVertical = computed(() => orientation.value === 'vertical');
     :class="
       cn(
         'nx:relative nx:isolate nx:inline-flex nx:items-center nx:justify-center',
-        isVertical && 'nx:flex-col nx:items-stretch',
+        'nx:data-[orientation=vertical]:flex-col nx:data-[orientation=vertical]:items-stretch',
         variant === 'default' &&
           'nx:rounded-md nx:bg-control-background nx:p-1',
         props.class
