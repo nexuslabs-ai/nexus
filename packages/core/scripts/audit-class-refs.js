@@ -14,21 +14,21 @@ const TARGETS = [
     css: 'packages/react/.storybook/preview.css',
     sources: 'packages/react/src',
   },
+  {
+    css: 'packages/vue/.storybook/preview.css',
+    sources: 'packages/vue/src',
+  },
   { css: 'apps/docs/app/globals.css', sources: 'apps/docs' },
 ];
 
 // The primitive/unknown `--nx-color-*` ban applies only to component code:
 // apps are consumers (free to reach for primitives) and non-component
-// `react/src` is internal plumbing. Components are the public surface.
-const COMPONENTS_DIR = path.join(
-  REPO_ROOT,
-  'packages',
-  'react',
-  'src',
-  'components'
+// `{react,vue}/src` is internal plumbing. Components are the public surface.
+const COMPONENT_DIRS = ['react', 'vue'].map((framework) =>
+  path.join(REPO_ROOT, 'packages', framework, 'src', 'components')
 );
 
-const SOURCE_FILE = /\.(tsx?|jsx?|mjs|mdx)$/;
+const SOURCE_FILE = /\.(tsx?|jsx?|mjs|mdx|vue)$/;
 const SKIPPED_FILE =
   /(\/node_modules\/|\/dist\/|\/\.next\/|\/generated\/|\/__generated__\/|\.test\.tsx?$)/;
 const STORY_FILE = /\.stories\.tsx?$/;
@@ -42,8 +42,8 @@ const IGNORE_NEXT_LINE = 'audit-class-refs-ignore-next-line';
 const VARIANT_MARKER = /^nx:(group|peer)(\/[\w-]+)?$/;
 
 // Custom properties set at runtime rather than in CSS: Radix's `--radix-*`,
-// and component inline-style keys or `style.setProperty` calls.
-const LIBRARY_RUNTIME_VAR = /^--radix-/;
+// Reka's `--reka-*`, and component inline-style keys or `style.setProperty` calls.
+const LIBRARY_RUNTIME_VAR = /^--(?:radix|reka)-/;
 const RUNTIME_VAR_DECLARATIONS = [
   /['"](--[\w-]+)['"]\s*:/g,
   /setProperty\(\s*['"](--[\w-]+)['"]/g,
@@ -233,7 +233,11 @@ async function auditTarget({ css, sources }) {
 
 function findPrimitiveComponentColorVars(registryNames) {
   const scanner = new Scanner({
-    sources: [{ base: COMPONENTS_DIR, pattern: '**/*', negated: false }],
+    sources: COMPONENT_DIRS.map((base) => ({
+      base,
+      pattern: '**/*',
+      negated: false,
+    })),
   });
   const refs = [];
   for (const file of scanner.files.filter((f) => SOURCE_FILE.test(f))) {

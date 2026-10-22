@@ -90,3 +90,13 @@ export const shared = [
 export const copies: [react: string, vue: string][] = [
   ['packages/react/src/lib/utils.ts', 'packages/vue/src/lib/utils.ts'],
 ];
+
+/** Dependencies both packages declare, as `[react, vue]` names, which must take the same range. */
+export const dependencies: [react: string, vue: string][] = [
+  ['@nxds/core', '@nxds/core'],
+  ['@nxds/tailwind', '@nxds/tailwind'],
+  ['@tabler/icons-react', '@tabler/icons-vue'],
+  ['class-variance-authority', 'class-variance-authority'],
+  ['clsx', 'clsx'],
+  ['tailwind-merge', 'tailwind-merge'],
+];
