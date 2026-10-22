@@ -5,24 +5,12 @@
  */
 import { existsSync, readdirSync, readFileSync } from 'node:fs';
 import path from 'node:path';
+import { compare } from 'semver';
 
 import { writeJson } from './files.mjs';
 import { RELEASES_DIR } from './roots.mjs';
 
 /** @typedef {import('./catalog-schema').Catalog} Catalog */
-
-/**
- * @param {string} a
- * @param {string} b
- */
-function compareVersions(a, b) {
-  const [left, right] = [a, b].map((version) => version.split('.').map(Number));
-  for (let index = 0; index < 3; index += 1) {
-    const difference = (left?.[index] ?? 0) - (right?.[index] ?? 0);
-    if (difference !== 0) return difference;
-  }
-  return 0;
-}
 
 /** @returns {Catalog[]} Every committed release catalog, oldest first. */
 export function readReleases() {
@@ -36,7 +24,7 @@ export function readReleases() {
           JSON.parse(readFileSync(path.join(RELEASES_DIR, name), 'utf8'))
         )
     )
-    .sort((a, b) => compareVersions(a.version, b.version));
+    .sort((a, b) => compare(a.version, b.version));
 }
 
 /**

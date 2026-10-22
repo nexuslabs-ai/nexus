@@ -257,7 +257,7 @@ export async function doctor(
   const missingFiles = items.flatMap((item) =>
     variantOf(item, config.framework)
       .files.filter(
-        (file) => fileState(cwd, config, file, NO_PREVIOUS) === 'missing'
+        (file) => !existsSync(path.join(cwd, config.dir, file.path))
       )
       .map((file) => `${item.name}: ${file.path}`)
   );

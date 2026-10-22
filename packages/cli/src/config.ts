@@ -1,5 +1,6 @@
 import { existsSync, writeFileSync } from 'node:fs';
 import path from 'node:path';
+import { valid } from 'semver';
 
 import { CliError, readJson } from './errors';
 
@@ -45,7 +46,11 @@ export function projectPath(value: string) {
 /** The first field of `value` that doesn't have a `Config`'s shape, or null. */
 function invalidField(value: Record<string, unknown>) {
   if (value.framework !== 'react') return 'framework';
-  if (typeof value.version !== 'string') return 'version';
+  if (
+    typeof value.version !== 'string' ||
+    valid(value.version) !== value.version
+  )
+    return 'version';
   for (const field of ['dir', 'css'] as const) {
     const file = value[field];
     if (typeof file !== 'string' || projectPath(file) !== file) return field;

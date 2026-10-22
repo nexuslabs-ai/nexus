@@ -7,7 +7,9 @@ import type {
 } from '@nxds/catalog';
 import { existsSync } from 'node:fs';
 import path from 'node:path';
+import { valid } from 'semver';
 
+import { projectPath } from './config';
 import { CliError, readJson } from './errors';
 
 export type {
@@ -49,14 +51,104 @@ async function fetchJson(url: string): Promise<unknown> {
       `${url} answered ${response.status}. Run the command again later.`
     );
   }
-  return response.json();
+  try {
+    return await response.json();
+  } catch (error) {
+    throw new CliError(
+      `${url} is not valid JSON (${(error as Error).message}). Run the command again later.`
+    );
+  }
+}
+
+/** Where a registry file lives: a URL, or a path in a local registry folder. */
+function registryLocation(registry: string, file: string) {
+  return isUrl(registry) ? `${registry}/${file}` : path.join(registry, file);
 }
 
 /** A registry file's JSON, or null when it doesn't exist. */
 async function readRegistryFile(registry: string, file: string) {
-  if (isUrl(registry)) return fetchJson(`${registry}/${file}`);
-  const local = path.join(registry, file);
-  return existsSync(local) ? readJson(local) : null;
+  const location = registryLocation(registry, file);
+  if (isUrl(registry)) return fetchJson(location);
+  return existsSync(location) ? readJson(location) : null;
+}
+
+const KINDS = new Set(['setup', 'component', 'block']);
+
+function isRecord(value: unknown): value is Record<string, unknown> {
+  return typeof value === 'object' && value !== null && !Array.isArray(value);
+}
+
+function isStrings(value: unknown): value is string[] {
+  return (
+    Array.isArray(value) && value.every((entry) => typeof entry === 'string')
+  );
+}
+
+/** Why `file` can't be written into the nxds folder, or null. */
+function fileProblem(file: unknown) {
+  if (!isRecord(file) || typeof file.content !== 'string') {
+    return 'has a file without content';
+  }
+  if (typeof file.path !== 'string' || projectPath(file.path) !== file.path) {
+    return `has a file path outside the nxds folder: ${String(file.path)}`;
+  }
+  return null;
+}
+
+/** Why `variant` isn't one the CLI can install, or null. */
+function variantProblem(variant: unknown, kind: unknown) {
+  if (!isRecord(variant)) return 'has a variant that is not an object';
+  const { packages } = variant;
+  if (
+    !isRecord(packages) ||
+    !isRecord(packages.npm) ||
+    !Object.values(packages.npm).every((range) => typeof range === 'string') ||
+    (kind === 'setup' && typeof packages.tailwind !== 'string')
+  ) {
+    return 'has invalid "packages"';
+  }
+  for (const field of ['items', 'css', 'steps'] as const) {
+    if (!isStrings(variant[field])) return `has invalid "${field}"`;
+  }
+  if (!Array.isArray(variant.files)) return 'has invalid "files"';
+  return variant.files.map(fileProblem).find(Boolean) ?? null;
+}
+
+/** Why `item` isn't a catalog item, or null. */
+function itemProblem(item: unknown) {
+  if (!isRecord(item) || typeof item.name !== 'string') {
+    return 'has an item without a name';
+  }
+  const fields = ['title', 'description', 'docs'] as const;
+  if (
+    !KINDS.has(item.kind as string) ||
+    fields.some((field) => typeof item[field] !== 'string') ||
+    !isRecord(item.variants)
+  ) {
+    return `"${item.name}" is not a catalog item`;
+  }
+  const problem = Object.values(item.variants)
+    .map((variant) => variantProblem(variant, item.kind))
+    .find(Boolean);
+  return problem ? `"${item.name}" ${problem}` : null;
+}
+
+/** Why `value` isn't the release catalog for `version`, or null. */
+function releaseProblem(value: unknown, version: string) {
+  if (!isRecord(value)) return 'it is not a JSON object';
+  if (value.schema !== 1) return 'its "schema" is not 1';
+  if (
+    typeof value.version !== 'string' ||
+    valid(value.version) !== value.version
+  ) {
+    return 'its "version" is not a release version';
+  }
+  if (version !== 'latest' && value.version !== version) {
+    return `it holds nxds ${value.version}`;
+  }
+  if (!isStrings(value.frameworks)) return 'its "frameworks" is invalid';
+  if (!Array.isArray(value.items)) return 'its "items" is invalid';
+  return value.items.map(itemProblem).find(Boolean) ?? null;
 }
 
 /**
@@ -67,16 +159,20 @@ export async function fetchRelease(
   registry: string,
   version: string
 ): Promise<Catalog | null> {
-  const value = await readRegistryFile(registry, `${version}.json`);
+  const file = `${version}.json`;
+  const value = await readRegistryFile(registry, file);
   if (value === null) return null;
 
-  const catalog = value as Catalog;
-  if (catalog.schema !== 1) {
+  if (isRecord(value) && typeof value.schema === 'number' && value.schema > 1) {
     throw new CliError(
       `nxds ${version} needs a newer CLI. Run \`npx nxds@latest\` instead.`
     );
   }
-  return catalog;
+  const problem = releaseProblem(value, version);
+  if (problem === null) return value as Catalog;
+  throw new CliError(
+    `${registryLocation(registry, file)} is not a valid nxds release: ${problem}. Check \`--registry\`, or run the command again later.`
+  );
 }
 
 /** The release an app is on, or `latest`; fails when the registry doesn't have it. */

@@ -14,8 +14,12 @@
     "generate:catalog": "node scripts/generate-catalog.mjs",
     "snapshot:release": "node scripts/snapshot-release.mjs"
   },
+  "dependencies": {
+    "semver": "^7.8.5"
+  },
   "devDependencies": {
     "@types/node": "^25.9.1",
+    "@types/semver": "^7.8.0",
     "typescript": "^5.9.3"
   }
 }

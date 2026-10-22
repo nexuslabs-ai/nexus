@@ -54,6 +54,9 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v4
+        with:
+          # The release-catalog check diffs HEAD against its first parent.
+          fetch-depth: 2
 
       - name: Install pnpm
         uses: pnpm/action-setup@v4
@@ -74,6 +77,17 @@ jobs:
 
       - name: Agent drift audit
         run: pnpm audit:agent-drift
+
+      # Apps compare their files with the release they are on, so a committed
+      # release catalog is only ever added.
+      - name: Release catalogs are never edited
+        run: |
+          edited=$(git diff --name-only --diff-filter=MDR HEAD^1 HEAD -- packages/catalog/releases)
+          if [ -n "$edited" ]; then
+            echo "::error::Release catalogs never change once committed. Revert:"
+            echo "$edited"
+            exit 1
+          fi
 
       - name: Restore ESLint cache
         uses: actions/cache@v4

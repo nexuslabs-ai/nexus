@@ -246,8 +246,8 @@ function filesOf(catalog: Catalog, framework: Framework, names: string[]) {
  * Re-installs every installed item from the latest release. A file that still
  * matches the app's release is replaced; a changed one is kept. Items the
  * release dropped leave `nxds.json`, and files no installed item has any more
- * are reported. The app moves to the latest release only when no changed file
- * was kept, since a kept file is still from the older release.
+ * are reported. An app behind the latest release moves to it only when no
+ * changed file was kept, since a kept file is still from the older release.
  */
 export async function update(
   cwd: string,
@@ -287,8 +287,8 @@ export async function update(
   );
 
   const from = config.version;
-  const moved = installed.skipped.length === 0;
-  if (moved) config.version = latest.version;
+  const stays = from !== latest.version && installed.skipped.length > 0;
+  if (!stays) config.version = latest.version;
   if (!options.dryRun) writeConfig(cwd, config);
 
   return {
@@ -316,10 +316,10 @@ export async function update(
         (file) =>
           `No installed item uses ${config.dir}/${file} any more. Delete it once nothing in your app imports it.`
       ),
-      moved
-        ? `nxds ${from === latest.version ? 'is on' : `${options.dryRun ? 'would move' : 'moved'} from ${from} to`} ${latest.version}.`
-        : `nxds.json stays on ${from} until every kept file is replaced.`,
+      stays
+        ? `nxds.json stays on ${from} until every kept file is replaced.`
+        : `nxds ${from === latest.version ? 'is on' : `${options.dryRun ? 'would move' : 'moved'} from ${from} to`} ${latest.version}.`,
     ],
-    ok: moved,
+    ok: !stays,
   };
 }
