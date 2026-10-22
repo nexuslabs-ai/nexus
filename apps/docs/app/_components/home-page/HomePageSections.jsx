@@ -4,8 +4,6 @@ import { useId } from 'react';
 
 import { Button } from '@nxds/react';
 
-import { NexusWordmark } from '../NexusWordmark';
-
 import { CoexistenceSection } from './CoexistenceSection';
 import { FrameworkSection } from './FrameworkSection';
 
@@ -152,8 +150,7 @@ export function HomePageSections({ docsBase = '' }) {
       <footer className="home-footer">
         <div>
           <a className="home-footer-brand" href="/">
-            <NexusWordmark />
-            <span className="nx:sr-only">Nexus Design System home</span>
+            Nexus Design System
           </a>
           <p>An open-source design system by Nexus Labs.</p>
         </div>

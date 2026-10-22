@@ -11,7 +11,6 @@ import { usePathname } from 'next/navigation';
 import { PAGE_MANIFEST } from '../_lib/manifest';
 import { REPO_URL, SITE_NAME } from '../_lib/site';
 
-import { NexusWordmark } from './NexusWordmark';
 import { Button } from './nxds';
 import { SearchPalette } from './SearchPalette';
 
@@ -51,16 +50,6 @@ export function TopNav() {
   const { resolvedMode, setState } = useNxdsAppearance();
   const isDark = resolvedMode === 'dark';
 
-  useEffect(() => {
-    const icon = document.querySelector<HTMLLinkElement>(
-      'link[rel="icon"][type="image/svg+xml"]'
-    );
-    if (icon)
-      icon.href =
-        resolvedMode === 'dark'
-          ? '/brand/nx-icon-dark.svg'
-          : '/brand/nx-icon-light.svg';
-  }, [resolvedMode]);
   const currentLink = NAV_LINKS.find((link) => isActive(pathname, link.match));
 
   // relatedTarget is null when focus goes nowhere, not when it leaves the nav.
@@ -107,7 +96,9 @@ export function TopNav() {
           aria-label="Nexus Design System home"
           className="nx:flex nx:items-center nx:text-inherit nx:no-underline nx:rounded-sm nx:focus-visible:outline-2 nx:focus-visible:outline-focus-default"
         >
-          <NexusWordmark />
+          <span className="nx:font-semibold nx:typography-label-default">
+            Nexus Design System
+          </span>
         </Link>
       ) : (
         <Link
