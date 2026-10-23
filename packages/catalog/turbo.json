@@ -6,13 +6,13 @@
       "inputs": [
         "scripts/**",
         "package.json",
+        "$TURBO_ROOT$/packages/source-model/src/**",
+        "$TURBO_ROOT$/packages/source-model/package.json",
         "$TURBO_ROOT$/packages/tailwind/*.css",
         "$TURBO_ROOT$/packages/core/package.json",
-        "$TURBO_ROOT$/packages/react/scripts/**",
         "$TURBO_ROOT$/packages/react/src/**",
         "$TURBO_ROOT$/packages/react/package.json",
         "$TURBO_ROOT$/packages/react/tsconfig.json",
-        "$TURBO_ROOT$/packages/vue/scripts/**",
         "$TURBO_ROOT$/packages/vue/src/**",
         "$TURBO_ROOT$/packages/vue/package.json",
         "$TURBO_ROOT$/packages/vue/tsconfig.json"

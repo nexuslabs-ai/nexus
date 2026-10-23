@@ -7,7 +7,7 @@ import fs from 'node:fs';
 import path from 'node:path';
 
 import { buildPageManifest } from './page-manifest.mjs';
-import { docsRoot } from './roots.mjs';
+import { docsRoot } from './docs-root.mjs';
 
 const modules = await buildPageManifest(docsRoot);
 for (const [file, contents] of Object.entries(modules)) {

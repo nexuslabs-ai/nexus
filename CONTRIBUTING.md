@@ -43,7 +43,7 @@ make verify       # the full gate: lint + format check + typecheck + tests + tok
 
 - `make lint` — ESLint (cheap; run it constantly)
 - `make typecheck` — `tsc` across the packages
-- `pnpm test:unit` — just the unit tests (core engine, `cn` merge, ESLint rules)
+- `pnpm test:unit` — just the unit tests (core engine, `cn` merge, ESLint rules, parity)
 - `pnpm test:storybook:ui` — the interactive debugger when a story's `play` function fails
 
 The pre-commit hook already formats and `nx:`-lints staged files, so you rarely format by hand (`pnpm format` does a full-tree pass if you want one).
@@ -77,10 +77,11 @@ preference — the `unit` project's `include` list in `vitest.config.ts` is one
 glob per non-story row of [`.claude/rules/testing.md`](.claude/rules/testing.md)
 § Scope, and a component test file matches none of them.
 
-Outside stories, three kinds of unit test exist, all under the `unit` project
+Outside stories, four kinds of unit test exist, all under the `unit` project
 (jsdom): the core engine's behaviour (`packages/core/src/lib`), the nxds `cn`
-merge (`packages/react/src/lib/utils.test.ts`), and the ESLint plugin's rules
-(`packages/eslint-plugin/__tests__`). Apps, repo scripts and hooks have no
+merge (`packages/react/src/lib/utils.test.ts`), the ESLint plugin's rules
+(`packages/eslint-plugin/__tests__`), and cross-framework parity (`parity/`,
+see [`cross-stack-parity.md`](.claude/rules/cross-stack-parity.md)). Apps, repo scripts and hooks have no
 tests of their own, and nothing uses snapshots.
 
 The spec lives in the rules, not here — what earns a test and what is
@@ -94,12 +95,12 @@ coverage; this section is orientation only.
 
 `make verify` runs the whole suite (plus lint / typecheck / audits). To run or debug tests directly:
 
-| Command                  | What it does                                                                     |
-| ------------------------ | -------------------------------------------------------------------------------- |
-| `pnpm test`              | every vitest project — `unit` (jsdom) + `storybook` + `storybook-vue` (Chromium) |
-| `pnpm test:unit`         | unit only — core engine, `cn` merge, ESLint rules                                |
-| `pnpm test:storybook`    | every React and Vue story's play function in a real browser                      |
-| `pnpm test:storybook:ui` | **debugger** — Vitest's interactive UI when a play function fails                |
+| Command                  | What it does                                                                                |
+| ------------------------ | ------------------------------------------------------------------------------------------- |
+| `pnpm test`              | every vitest project — `unit` (jsdom) + `storybook` + `storybook-vue` + `parity` (Chromium) |
+| `pnpm test:unit`         | unit only — core engine, `cn` merge, ESLint rules, parity                                   |
+| `pnpm test:storybook`    | every React and Vue story's play function, and rendered parity, in a real browser           |
+| `pnpm test:storybook:ui` | **debugger** — Vitest's interactive UI when a play function fails                           |
 
 The first storybook-project run launches Storybook in the background — the cold start takes a few extra seconds.
 
@@ -157,6 +158,7 @@ Releases are driven by [changesets](https://github.com/changesets/changesets) an
 | `@nxds/react`         | copy/own   | Components are copied and owned; delivered by the `nxds` CLI            |
 | `@nxds/catalog`       | private    | Builds the install catalog and commits one per `@nxds/react` release    |
 | `@nxds/docs`          | private    | App                                                                     |
+| `@nxds/source-model`  | private    | Reads component sources for the docs generators and the parity tests    |
 
 Everything lives under the `@nxds` scope — the published packages on npm and the ESLint plugin's **rule namespace** (rules are referenced as `@nxds/*`, e.g. `@nxds/no-render-prop-types`). The rule namespace is a flat-config key the plugin registers, independent of the npm package name; it is kept in lockstep with the scope so the repo reads consistently.
 

@@ -7,34 +7,36 @@
  * has it. A Vue variant exists for setup and for each component @nxds/vue
  * exports.
  */
-import { readdirSync, readFileSync } from 'node:fs';
-import path from 'node:path';
-import { fileURLToPath } from 'node:url';
-
-import { vueSrc } from '../../vue/scripts/roots.ts';
 import {
-  vue,
-  vueComponentSlugs,
-  vueWalks,
-} from '../../vue/scripts/vue-sources.ts';
-
-import {
-  dependencyEntries,
-  react,
-} from '../../react/scripts/dependency-plans.mjs';
-import { pascal } from '../../react/scripts/humanize.ts';
+  componentDescription,
+  componentStoryFiles,
+} from '@nxds/source-model/docs-stories.ts';
+import { readCanonical, writeJson } from '@nxds/source-model/files.mjs';
+import { pascal } from '@nxds/source-model/humanize.ts';
 import {
   blockSources,
   componentLabel,
   exportedComponentSlugs,
-} from '../../react/scripts/react-sources.mjs';
-import { reactRoot, reactSrc } from '../../react/scripts/roots.mjs';
+} from '@nxds/source-model/react-sources.mjs';
 import {
-  componentDescription,
-  componentStoryFiles,
-} from '../../react/scripts/stories.ts';
-import { readCanonical, writeJson } from './files.mjs';
-import { CATALOG_FILE, repoRoot, toRepoPath } from './roots.mjs';
+  reactRoot,
+  reactSrc,
+  repoRoot,
+  toRepoPath,
+  vueSrc,
+} from '@nxds/source-model/roots.mjs';
+import { exportedSlugs } from '@nxds/source-model/vue-sources.ts';
+import { readdirSync, readFileSync } from 'node:fs';
+import path from 'node:path';
+import { fileURLToPath } from 'node:url';
+
+import {
+  dependencyEntries,
+  react,
+  vue,
+  vueWalks,
+} from './dependency-plans.mjs';
+import { CATALOG_FILE } from './roots.mjs';
 
 /**
  * @typedef {import('./catalog-schema').Catalog} Catalog
@@ -198,7 +200,7 @@ function planVariant(src, plan, setup) {
  * @returns {Map<string, Variant>}
  */
 function vueVariants(setup) {
-  const slugs = vueComponentSlugs().filter((slug) => slug !== VUE_SETUP_SLUG);
+  const slugs = exportedSlugs().filter((slug) => slug !== VUE_SETUP_SLUG);
   const closures = vueWalks(slugs);
   const exported = new Set(slugs);
   return new Map(

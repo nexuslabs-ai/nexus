@@ -1,12 +1,14 @@
 // What installing a component takes, for any framework package: the walk from
 // a component's files to every file and package it reaches, and the plan a
 // docs page shows. Each framework passes its own `ComponentSource`.
+import {
+  collectSourceFiles,
+  importSpecifiers,
+} from '@nxds/source-model/files.mjs';
+import { isUnder, toRepoPath } from '@nxds/source-model/roots.mjs';
 import { readdirSync, readFileSync, statSync } from 'node:fs';
 import path from 'node:path';
 import ts from 'typescript';
-
-import { collectSourceFiles, importSpecifiers } from './files.mjs';
-import { isUnder, toRepoPath } from './roots.mjs';
 
 export interface ComponentSource {
   /** The package folder, holding package.json and tsconfig.json. */

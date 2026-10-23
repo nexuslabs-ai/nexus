@@ -8,35 +8,34 @@ import {
 } from 'node:fs';
 import path from 'node:path';
 
-import { dependencyEntries } from '../../../packages/react/scripts/dependency-plans.mjs';
+import {
+  componentDescription,
+  componentStoryFiles,
+  DOCS_TAG,
+  docsStoryModule,
+  PREVIEWLESS_COMPONENTS,
+  readDocsStories,
+} from '@nxds/source-model/docs-stories.ts';
 import {
   importSpecifiers,
   readCanonical,
   writeIfChanged,
   writeJson,
-} from '../../../packages/catalog/scripts/files.mjs';
-import { buildCatalog } from '../../../packages/catalog/scripts/generate-catalog.mjs';
+} from '@nxds/source-model/files.mjs';
 import {
   blockSources,
   componentSlugs,
   exportedComponentSlugs,
-} from '../../../packages/react/scripts/react-sources.mjs';
-import {
-  CATALOG_FILE,
-  toRepoPath,
-} from '../../../packages/catalog/scripts/roots.mjs';
-import { reactRoot, reactSrc } from '../../../packages/react/scripts/roots.mjs';
-import {
-  componentDescription,
-  componentStoryFiles,
-  DOCS_TAG,
-  readDocsStories,
-} from '../../../packages/react/scripts/stories.ts';
+} from '@nxds/source-model/react-sources.mjs';
+import { reactRoot, reactSrc, toRepoPath } from '@nxds/source-model/roots.mjs';
+
+import { dependencyEntries } from '../../../packages/catalog/scripts/dependency-plans.mjs';
+import { buildCatalog } from '../../../packages/catalog/scripts/generate-catalog.mjs';
+import { CATALOG_FILE } from '../../../packages/catalog/scripts/roots.mjs';
 
 import { componentUsage, entryUsage } from './component-usage.ts';
-import { docsStoryModule, PREVIEWLESS_COMPONENTS } from './docs-stories.ts';
+import { docsRoot } from './docs-root.mjs';
 import { resolveFormatOptions } from './page-manifest.mjs';
-import { docsRoot } from './roots.mjs';
 
 const GENERATED_DIR = path.join(docsRoot, '__generated__');
 const PROPS_DIR = path.join(docsRoot, 'generated', 'props');
@@ -368,7 +367,7 @@ function docsStoriesFor(slug, exported) {
 /**
  * A block's page previews exactly one story, so it needs exactly one tagged
  * `docs`, and its slug must not collide with a component's demo ids.
- * @param {import('./react-sources.mjs').BlockSource} block
+ * @param {import('@nxds/source-model/react-sources.mjs').BlockSource} block
  */
 function blockDocsStories(block) {
   const where = toRepoPath(block.stories);

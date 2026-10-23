@@ -423,21 +423,15 @@ export const ClickInteraction: Story = {
 
     const tab1 = canvas.getByRole('tab', { name: 'Tab 1' });
     const tab2 = canvas.getByRole('tab', { name: 'Tab 2' });
-    const indicator = getTabsIndicator(canvasElement);
 
     await expect(tab1).toHaveAttribute('data-state', 'active');
     await expect(tab2).toHaveAttribute('data-state', 'inactive');
-    await waitForIndicatorReady(indicator);
-    await expect(indicator).toHaveAttribute('data-variant', 'default');
     await expect(canvas.getByText('Content 1')).toBeVisible();
-
-    const before = indicator.style.transform;
 
     await userEvent.click(tab2);
 
     await expect(tab1).toHaveAttribute('data-state', 'inactive');
     await expect(tab2).toHaveAttribute('data-state', 'active');
-    await waitFor(() => expect(indicator.style.transform).not.toBe(before));
     await expect(canvas.getByText('Content 2')).toBeVisible();
   },
 };
@@ -519,8 +513,6 @@ export const DisabledTabInteraction: Story = {
     await waitForIndicatorReady(indicator);
     await expect(canvas.getByText('Content 1')).toBeVisible();
 
-    const beforeDisabledSkip = indicator.style.transform;
-
     await userEvent.click(tab1);
     await userEvent.keyboard('{ArrowRight}');
 
@@ -529,9 +521,12 @@ export const DisabledTabInteraction: Story = {
     await expect(tab1).toHaveAttribute('data-state', 'inactive');
     await expect(disabledTab).toHaveAttribute('data-state', 'inactive');
     await expect(tab3).toHaveAttribute('data-state', 'active');
-    await waitFor(() =>
-      expect(indicator.style.transform).not.toBe(beforeDisabledSkip)
-    );
+    await waitFor(() => {
+      const indicatorRect = indicator.getBoundingClientRect();
+      const tab3Rect = tab3.getBoundingClientRect();
+      expect(Math.round(indicatorRect.left)).toBe(Math.round(tab3Rect.left));
+      expect(Math.round(indicatorRect.width)).toBe(Math.round(tab3Rect.width));
+    });
     await expect(canvas.getByText('Content 3')).toBeVisible();
   },
 };

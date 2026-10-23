@@ -1,6 +1,6 @@
 import path from 'node:path';
 
-import { reactRoot } from '../../../packages/react/scripts/roots.mjs';
+import { reactRoot } from './roots.mjs';
 
 const CODE_EXTENSIONS = new Set([
   '.cjs',

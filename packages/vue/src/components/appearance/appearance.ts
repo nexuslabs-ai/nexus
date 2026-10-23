@@ -25,7 +25,6 @@ import {
   readonly,
   type Ref,
   ref,
-  type ShallowRef,
   shallowRef,
   watchEffect,
 } from 'vue';
@@ -43,11 +42,18 @@ export interface NxdsAppearanceOptions {
    */
   cookieWriteKey?: string | false;
   cookieOptions?: NxdsAppearanceCookieOptions;
+  /**
+   * The appearance to show, held in a ref you own. With it, the plugin reads
+   * and saves nothing, and `setState` only calls `onStateChange`.
+   */
+  state?: Readonly<Ref<NxdsAppearanceState>>;
   defaultState?: NxdsAppearanceState;
+  /** Called with the next appearance on every `setState`. */
+  onStateChange?: (state: NxdsAppearanceState) => void;
 }
 
 export interface NxdsAppearance {
-  state: Readonly<ShallowRef<NxdsAppearanceState>>;
+  state: Readonly<Ref<NxdsAppearanceState>>;
   resolvedMode: ComputedRef<NxdsResolvedAppearanceMode>;
   /** `true` once the app has mounted and the saved appearance is loaded. */
   mounted: Readonly<Ref<boolean>>;
@@ -72,15 +78,29 @@ export function createNxdsAppearance({
   storageKey = DEFAULT_STORAGE_KEY,
   cookieWriteKey = false,
   cookieOptions,
+  state: controlledState,
   defaultState = DEFAULT_NXDS_APPEARANCE,
+  onStateChange,
 }: NxdsAppearanceOptions = {}): Plugin {
   return {
     install(app: App) {
+      const isControlled = controlledState !== undefined;
       const initialState = sanitizeNxdsAppearance(defaultState);
-      const state = shallowRef(initialState);
+      const internalState = shallowRef(initialState);
+      const state = computed(
+        () => controlledState?.value ?? internalState.value
+      );
       const systemDark = ref(false);
       const mounted = ref(false);
       const scope = effectScope(true);
+
+      const setState: NxdsAppearance['setState'] = (update) => {
+        const next = sanitizeNxdsAppearance(
+          typeof update === 'function' ? update(state.value) : update
+        );
+        if (!isControlled) internalState.value = next;
+        onStateChange?.(next);
+      };
 
       app.provide(NxdsAppearanceKey, {
         state,
@@ -88,14 +108,8 @@ export function createNxdsAppearance({
           resolveNxdsAppearanceMode(state.value.mode, systemDark.value)
         ),
         mounted: readonly(mounted),
-        setState: (update) => {
-          state.value = sanitizeNxdsAppearance(
-            typeof update === 'function' ? update(state.value) : update
-          );
-        },
-        reset: () => {
-          state.value = initialState;
-        },
+        setState,
+        reset: () => setState(initialState),
       });
 
       const mount = app.mount;
@@ -103,7 +117,12 @@ export function createNxdsAppearance({
         const root = mount(...args);
         if (mounted.value) return root;
 
-        state.value = readStoredNxdsAppearance(storageKey, state.value);
+        if (!isControlled) {
+          internalState.value = readStoredNxdsAppearance(
+            storageKey,
+            internalState.value
+          );
+        }
         mounted.value = true;
         scope.run(() => {
           const syncSystemDark = () =>
@@ -111,6 +130,7 @@ export function createNxdsAppearance({
           syncSystemDark();
           onScopeDispose(watchColorScheme(syncSystemDark));
           watchEffect(() => applyNxdsAppearance(state.value, systemDark.value));
+          if (isControlled) return;
           watchEffect(() =>
             persistNxdsAppearance(state.value, {
               storageKey,

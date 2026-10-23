@@ -15,6 +15,7 @@
     "snapshot:release": "node scripts/snapshot-release.mjs"
   },
   "dependencies": {
+    "@nxds/source-model": "workspace:*",
     "semver": "^7.8.5"
   },
   "devDependencies": {

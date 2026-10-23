@@ -12,7 +12,7 @@ import { frameworkLabel, isFramework } from '../app/_lib/frameworks.ts';
 import { PAGE_MANIFEST } from '../app/_lib/manifest.ts';
 import { DOCS_ARTICLE_ID } from '../app/_lib/table-of-contents.ts';
 
-import { docsRoot } from './roots.mjs';
+import { docsRoot } from './docs-root.mjs';
 
 declare module 'vfile' {
   interface DataMap {

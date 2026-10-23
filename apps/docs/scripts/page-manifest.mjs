@@ -30,13 +30,13 @@ import { pathToFileURL } from 'node:url';
 import { createJiti } from 'jiti';
 import prettier from 'prettier';
 
-import { humanize, pascal } from '../../../packages/react/scripts/humanize.ts';
+import { DOCS_TAG } from '@nxds/source-model/docs-stories.ts';
+import { humanize, pascal } from '@nxds/source-model/humanize.ts';
 import {
   blockSources,
   componentLabel,
   exportedComponentSlugs,
-} from '../../../packages/react/scripts/react-sources.mjs';
-import { DOCS_TAG } from '../../../packages/react/scripts/stories.ts';
+} from '@nxds/source-model/react-sources.mjs';
 
 /** Nav metadata source, relative to the docs app root. */
 export const REGISTRY_FILE = 'page-registry/index.ts';

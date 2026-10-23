@@ -1,20 +1,32 @@
 // @ts-check
 /**
- * What installing each React component and block takes: the files and
- * packages it reaches, and the plan its docs page shows.
+ * What installing each React and Vue component, and each React block, takes:
+ * the files and packages it reaches, and the plan its docs page shows.
  */
-import { existsSync, readFileSync } from 'node:fs';
-import path from 'node:path';
-
-import { createInstallPlanner } from '../../catalog/scripts/install-plans.ts';
 import {
   blockSources,
   componentSlugs,
   exportedComponentSlugs,
   isModuleSource,
   linkedComponentSlug,
-} from './react-sources.mjs';
-import { componentsRoot, reactRoot, reactSrc } from './roots.mjs';
+} from '@nxds/source-model/react-sources.mjs';
+import {
+  componentsRoot,
+  reactRoot,
+  reactSrc,
+  vueComponentsRoot,
+  vueRoot,
+  vueSrc,
+} from '@nxds/source-model/roots.mjs';
+import {
+  isVueModuleSource,
+  linkedVueSlug,
+  readVueScript,
+} from '@nxds/source-model/vue-sources.ts';
+import { existsSync, readFileSync } from 'node:fs';
+import path from 'node:path';
+
+import { createInstallPlanner } from './install-plans.ts';
 
 export const react = createInstallPlanner({
   root: reactRoot,
@@ -26,9 +38,29 @@ export const react = createInstallPlanner({
   linkedComponentSlug,
 });
 
+export const vue = createInstallPlanner({
+  root: vueRoot,
+  src: vueSrc,
+  componentsRoot: vueComponentsRoot,
+  framework: 'vue',
+  isModuleSource: isVueModuleSource,
+  readScript: readVueScript,
+  linkedComponentSlug: linkedVueSlug,
+});
+
+/**
+ * Each slug's walked files and packages, by slug, once every package they import is declared.
+ * @param {string[]} slugs
+ */
+export function vueWalks(slugs) {
+  const walks = slugs.map(vue.walkSlug).filter((walked) => walked !== null);
+  vue.assertDeclaredPackages(walks);
+  return new Map(walks.map((walked) => [walked.name, walked]));
+}
+
 /**
  * A block page shows its minimal example if it has one, else its source.
- * @param {import('./react-sources.mjs').BlockSource} block
+ * @param {import('@nxds/source-model/react-sources.mjs').BlockSource} block
  */
 function walkBlock(block) {
   const example = path.join(
@@ -42,8 +74,8 @@ function walkBlock(block) {
 
 /**
  * A block page links only the components no other link brings.
- * @param {import('../../catalog/scripts/install-plans.ts').Walk} walked
- * @param {Map<string, import('../../catalog/scripts/install-plans.ts').Walk>} closures
+ * @param {import('./install-plans.ts').Walk} walked
+ * @param {Map<string, import('./install-plans.ts').Walk>} closures
  * @param {Set<string>} exported
  */
 function blockEntry(walked, closures, exported) {
@@ -52,9 +84,8 @@ function blockEntry(walked, closures, exported) {
     linked.flatMap((slug) =>
       [
         ...react.linkedSlugs(
-          /** @type {import('../../catalog/scripts/install-plans.ts').Walk} */ (
-            closures.get(slug)
-          ).files,
+          /** @type {import('./install-plans.ts').Walk} */ (closures.get(slug))
+            .files,
           exported
         ),
       ].filter((other) => other !== slug)

@@ -2,10 +2,7 @@ import path from 'node:path';
 
 import ts from 'typescript';
 
-import {
-  isUnder,
-  toRepoPath,
-} from '../../../packages/catalog/scripts/roots.mjs';
+import { isUnder, toRepoPath } from './roots.mjs';
 
 export function toSlugFolder(relativePath) {
   if (path.isAbsolute(relativePath)) return null;
@@ -86,7 +83,7 @@ export function cvaVariantKeys(checker, sourceFiles) {
 
   if (keys.size === 0) {
     throw new Error(
-      'props JSON: no cva() call with `variants` resolved to the `cva` declared in class-variance-authority/dist/index.d.ts, so no variant key would be checked. Update isCvaCall in apps/docs/scripts/props-contract.mjs to match the installed class-variance-authority.'
+      'props JSON: no cva() call with `variants` resolved to the `cva` declared in class-variance-authority/dist/index.d.ts, so no variant key would be checked. Update isCvaCall in packages/source-model/src/props-contract.mjs to match the installed class-variance-authority.'
     );
   }
 

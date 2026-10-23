@@ -7,7 +7,7 @@ import { existsSync, readdirSync, readFileSync } from 'node:fs';
 import path from 'node:path';
 import { compare } from 'semver';
 
-import { writeJson } from './files.mjs';
+import { writeJson } from '@nxds/source-model/files.mjs';
 import { RELEASES_DIR } from './roots.mjs';
 
 /** @typedef {import('./catalog-schema').Catalog} Catalog */

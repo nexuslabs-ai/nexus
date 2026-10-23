@@ -5,13 +5,14 @@
  * version is the one being released. A release catalog never changes once
  * written: `nxds update` compares an app's files with it.
  */
+import { writeJson } from '@nxds/source-model/files.mjs';
+import { toRepoPath } from '@nxds/source-model/roots.mjs';
 import { existsSync } from 'node:fs';
 import path from 'node:path';
 
 import { releaseCatalog } from './catalog-schema.ts';
-import { writeJson } from './files.mjs';
 import { buildCatalog } from './generate-catalog.mjs';
-import { RELEASES_DIR, toRepoPath } from './roots.mjs';
+import { RELEASES_DIR } from './roots.mjs';
 
 const catalog = releaseCatalog(buildCatalog());
 const file = path.join(RELEASES_DIR, `${catalog.version}.json`);

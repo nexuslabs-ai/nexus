@@ -7,7 +7,7 @@ import {
   writeRegistry,
 } from '../../../packages/catalog/scripts/registry.mjs';
 
-import { docsRoot } from './roots.mjs';
+import { docsRoot } from './docs-root.mjs';
 
 const releases = readReleases();
 writeRegistry(path.join(docsRoot, 'out', 'r'), releases);

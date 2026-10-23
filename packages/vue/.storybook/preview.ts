@@ -31,12 +31,21 @@ function toolbarItems(options: readonly { value: string; label: string }[]) {
   return options.map(({ value, label }) => ({ value, title: label }));
 }
 
-// The toolbar globals are sanitized by core, so an unknown value falls back
-// to the default.
+const PREF_KEYS = Object.keys(DEFAULT_NXDS_APPEARANCE.prefs);
+
+// The globals are sanitized by core, so an unknown value falls back to the
+// default. Preference globals such as `reduceMotion` land in `prefs`.
 function appearanceStateFromGlobals(
   globals: Record<string, unknown>
 ): NxdsAppearanceState {
-  return sanitizeNxdsAppearance({ ...DEFAULT_NXDS_APPEARANCE, ...globals });
+  const prefs = Object.fromEntries(
+    Object.entries(globals).filter(([key]) => PREF_KEYS.includes(key))
+  );
+  return sanitizeNxdsAppearance({
+    ...DEFAULT_NXDS_APPEARANCE,
+    ...globals,
+    prefs: { ...DEFAULT_NXDS_APPEARANCE.prefs, ...prefs },
+  });
 }
 
 const AppearanceDecorator: Decorator = (story, context) => ({
@@ -51,6 +60,24 @@ const AppearanceDecorator: Decorator = (story, context) => ({
 const preview: Preview = {
   tags: ['autodocs'],
   parameters: {
+    options: {
+      storySort: {
+        order: [
+          'Components',
+          'Appearance',
+          'Blocks',
+          'Patterns',
+          'Primitives',
+          'Tokens',
+        ],
+      },
+    },
+    docs: {
+      toc: {
+        headingSelector: 'h2, h3',
+        title: 'On this page',
+      },
+    },
     // A11y violations fail tests. Contrast is APCA-gated by
     // `pnpm audit:contrast`, so axe's WCAG 2 contrast rules are off.
     a11y: {
@@ -70,14 +97,40 @@ const preview: Preview = {
     },
     backgrounds: { disable: true },
     layout: 'fullscreen',
+    viewport: {
+      options: {
+        mobile: {
+          name: 'Mobile',
+          styles: { width: '375px', height: '667px' },
+        },
+        tablet: {
+          name: 'Tablet',
+          styles: { width: '768px', height: '1024px' },
+        },
+        desktop: {
+          name: 'Desktop',
+          styles: { width: '1280px', height: '800px' },
+        },
+      },
+    },
   },
   initialGlobals: {
     mode: DEFAULT_NXDS_APPEARANCE.mode,
+    brandColor: DEFAULT_NXDS_APPEARANCE.brandColor,
     surfaceTone: DEFAULT_NXDS_APPEARANCE.surfaceTone,
+    lightContrast: DEFAULT_NXDS_APPEARANCE.lightContrast,
+    darkContrast: DEFAULT_NXDS_APPEARANCE.darkContrast,
     density: DEFAULT_NXDS_APPEARANCE.density,
     corners: DEFAULT_NXDS_APPEARANCE.corners,
     elevation: DEFAULT_NXDS_APPEARANCE.elevation,
     stroke: DEFAULT_NXDS_APPEARANCE.stroke,
+    uiFont: DEFAULT_NXDS_APPEARANCE.prefs.uiFont,
+    codeFont: DEFAULT_NXDS_APPEARANCE.prefs.codeFont,
+    uiFontSize: DEFAULT_NXDS_APPEARANCE.prefs.uiFontSize,
+    codeFontSize: DEFAULT_NXDS_APPEARANCE.prefs.codeFontSize,
+    reduceMotion: DEFAULT_NXDS_APPEARANCE.prefs.reduceMotion,
+    pointerCursors: DEFAULT_NXDS_APPEARANCE.prefs.pointerCursors,
+    fontSmoothing: DEFAULT_NXDS_APPEARANCE.prefs.fontSmoothing,
   },
   globalTypes: {
     mode: {

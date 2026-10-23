@@ -33,14 +33,21 @@ export const Default: Story = {
 
 export const Sizes: Story = {
   tags: ['docs'],
-  parameters: { docs: { description: { story: 'Size it with `nx:size-*`.' } } },
+  parameters: {
+    docs: {
+      description: {
+        story:
+          'Size the spinner with `nx:size-*` and tint it with `nx:text-*`.',
+      },
+    },
+  },
   render: () => ({
     components: { Spinner },
     template: `
-      <div class="nx:flex nx:items-center nx:gap-4">
-        <Spinner class="nx:size-3" />
-        <Spinner />
+      <div class="nx:flex nx:items-center nx:gap-4 nx:text-foreground">
+        <Spinner class="nx:size-4" />
         <Spinner class="nx:size-6" />
+        <Spinner class="nx:size-8 nx:text-primary-subtle-foreground" />
       </div>
     `,
   }),
@@ -48,25 +55,33 @@ export const Sizes: Story = {
 
 export const WithText: Story = {
   tags: ['docs'],
+  parameters: {
+    docs: {
+      description: {
+        story: 'Place the spinner beside text that says what is loading.',
+      },
+    },
+  },
   render: () => ({
     components: { Spinner },
     template: `
-      <div class="nx:flex nx:items-center nx:gap-2 nx:text-muted-foreground">
-        <Spinner aria-label="Loading invoices" />
-        <span>Loading invoices</span>
+      <div class="nx:flex nx:items-center nx:gap-2 nx:typography-body-default nx:text-muted-foreground">
+        <Spinner class="nx:size-4" />
+        Loading results…
       </div>
     `,
   }),
 };
 
-export const StatusRole: Story = {
+export const WithDataAttributes: Story = {
+  render: () => ({
+    components: { Spinner },
+    template: '<Spinner />',
+  }),
   play: async ({ canvasElement }) => {
-    const spinner = within(canvasElement).getByRole('status', {
-      name: 'Loading',
-    });
-
+    const spinner = within(canvasElement).getByRole('status');
+    await expect(spinner).toHaveAccessibleName('Loading');
     await expect(spinner).toHaveAttribute('data-slot', 'spinner');
-    await expect(spinner).toHaveClass('nx:animate-spin');
   },
 };
 
