@@ -19,6 +19,7 @@ import { type Config, readConfig, requireConfig, writeConfig } from '../config';
 import { CliError, UsageError } from '../errors';
 import { conflictedFiles } from '../files';
 import {
+  emptyInstallResult,
   installItems,
   type InstallOptions,
   type InstallResult,
@@ -258,6 +259,14 @@ function filesOf(catalog: Catalog, framework: Framework, names: string[]) {
   );
 }
 
+type UpdateData = InstallResult & {
+  dryRun: boolean;
+  from: string;
+  version: string;
+  removed: string[];
+  orphaned: string[];
+};
+
 /**
  * Re-installs every installed item from the latest release, so one app never
  * mixes two releases. A file that still matches the app's release is
@@ -275,14 +284,6 @@ function filesOf(catalog: Catalog, framework: Framework, names: string[]) {
  * also stays behind when its release is gone from the registry and an edited
  * file is kept.
  */
-type UpdateData = InstallResult & {
-  dryRun: boolean;
-  from: string;
-  version: string;
-  removed: string[];
-  orphaned: string[];
-};
-
 export async function update(
   cwd: string,
   registry: string,
@@ -308,18 +309,11 @@ export async function update(
       : conflictedFiles(cwd, config, new Set([...current, ...installedBefore]));
   if (unresolved.length > 0) {
     const data: UpdateData = {
+      ...emptyInstallResult(),
       dryRun: options.dryRun,
       from,
       version: from,
-      items: [],
-      written: [],
-      unchanged: [],
-      merged: [],
-      conflicted: [],
       unresolved,
-      skipped: [],
-      packages: [],
-      cssImports: [],
       removed: [],
       orphaned: [],
     };

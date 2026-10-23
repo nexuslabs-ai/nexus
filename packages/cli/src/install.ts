@@ -23,6 +23,20 @@ export type InstallResult = WriteResult & {
   cssImports: string[];
 };
 
+export function emptyInstallResult(): InstallResult {
+  return {
+    items: [],
+    written: [],
+    unchanged: [],
+    merged: [],
+    conflicted: [],
+    unresolved: [],
+    skipped: [],
+    packages: [],
+    cssImports: [],
+  };
+}
+
 function addCssImports(
   project: Project,
   config: Config,
