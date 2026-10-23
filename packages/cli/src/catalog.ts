@@ -109,8 +109,10 @@ export async function fetchRelease(
   if (value === null) return null;
 
   if (isNewerSchema(value)) {
+    const release =
+      version === 'latest' ? 'The latest nxds release' : `nxds ${version}`;
     throw new CliError(
-      `nxds ${version} needs a newer CLI. Run \`${CLI_COMMAND}\` instead.`
+      `${release} needs a newer nxds-cli than ${__VERSION__}. Run \`${CLI_COMMAND}\` to get the newest one.`
     );
   }
   const invalid = (problems: string[]) =>

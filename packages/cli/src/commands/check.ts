@@ -4,6 +4,7 @@ import path from 'node:path';
 import { satisfies } from 'semver';
 
 import {
+  type CatalogFile,
   type CatalogItem,
   fetchRelease,
   loadRelease,
@@ -19,6 +20,7 @@ import {
   fileState,
   hasConflictMarkers,
   NO_PREVIOUS,
+  sameContent,
 } from '../files';
 import { installedVersion } from '../packages';
 import {
@@ -52,26 +54,39 @@ export async function diff(
     names.length > 0 ? names : known
   );
 
+  const update = `\`${CLI_COMMAND} update\``;
+  /** What `update` does with a file in `state`. */
+  function advice(state: FileState, file: CatalogFile) {
+    if (state === 'outdated') return `${update} replaces it`;
+    if (state === 'missing') return `${update} restores it`;
+    const base = previousFiles.get(file.path);
+    if (base === undefined) {
+      return `has your edits; ${update} keeps it, \`update --overwrite\` replaces it`;
+    }
+    if (sameContent(base, file.content)) {
+      return `has your edits; nxds hasn't changed it since ${config.version}`;
+    }
+    return `has your edits; ${update} merges nxds's changes into it, \`update --overwrite\` replaces it`;
+  }
+
   const files = items.flatMap((item) =>
-    variantOf(item, config.framework).files.map((file) => ({
-      item: item.name,
-      path: file.path,
-      state: fileState(cwd, config, file, previousFiles),
-    }))
+    variantOf(item, config.framework).files.map((file) => {
+      const state = fileState(cwd, config, file, previousFiles);
+      return {
+        item: item.name,
+        path: file.path,
+        state,
+        advice: state === 'current' ? null : advice(state, file),
+      };
+    })
   );
   const differing = files.filter((file) => file.state !== 'current');
-  const advice: Record<Exclude<FileState, 'current'>, string> = {
-    outdated: `\`${CLI_COMMAND} update\` replaces it`,
-    changed: `has your edits; \`${CLI_COMMAND} update\` merges nxds's changes into it, \`update --overwrite\` replaces it`,
-    missing: `\`${CLI_COMMAND} update\` restores it`,
-  };
 
   return {
     data: { version: config.version, latest: latest.version, files, removed },
     lines: [
       ...differing.map(
-        (file) =>
-          `${file.state.padEnd(8)}  ${file.path}  (${advice[file.state as Exclude<FileState, 'current'>]})`
+        (file) => `${file.state.padEnd(8)}  ${file.path}  (${file.advice})`
       ),
       ...removed.map(
         (name) =>

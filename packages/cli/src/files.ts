@@ -31,7 +31,7 @@ function normalize(content: string) {
   return `${lines.join('\n').trimEnd()}\n`;
 }
 
-function sameContent(a: string, b: string | undefined) {
+export function sameContent(a: string, b: string | undefined) {
   return b !== undefined && normalize(a) === normalize(b);
 }
 
