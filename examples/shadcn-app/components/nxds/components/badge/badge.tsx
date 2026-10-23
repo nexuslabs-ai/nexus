@@ -161,37 +161,22 @@ interface BadgeProps
   extends React.ComponentProps<'span'>, VariantProps<typeof badgeVariants> {
   /**
    * Uppercase text with wider letter spacing.
-   * @default true
    */
   isCaps?: boolean;
 
   /**
    * Renders a round count badge from its children and ignores icons.
    * Add an `aria-label` such as "8 unread", because a bare number lacks context.
-   * @default false
-   * @example
-   * ```tsx
-   * <Badge isNumber>8</Badge>
-   * <Badge isNumber variant="error">99+</Badge>
-   * ```
    */
   isNumber?: boolean;
 
   /**
    * Icon before the label, sized to 14px. Without children, it shows alone.
-   * @example
-   * ```tsx
-   * <Badge leftIcon={<IconCheck />}>Verified</Badge>
-   * ```
    */
   leftIcon?: React.ReactNode;
 
   /**
    * Icon after the label, sized to 14px. Without children or `leftIcon`, it shows alone.
-   * @example
-   * ```tsx
-   * <Badge rightIcon={<IconX />}>Dismiss</Badge>
-   * ```
    */
   rightIcon?: React.ReactNode;
 }

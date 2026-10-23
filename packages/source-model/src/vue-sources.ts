@@ -1,8 +1,10 @@
 // What @nxds/vue exports and the props of each component, as the docs and the
-// cross-framework parity tests read them.
+// cross-framework parity tests read them, and how the install planner reads a
+// Vue source file.
 import { readFileSync } from 'node:fs';
 import path from 'node:path';
 import ts from 'typescript';
+import { parse as parseSfc } from 'vue/compiler-sfc';
 import { createChecker, type PropertyMeta } from 'vue-component-meta';
 
 import { importSpecifiers } from './files.mjs';
@@ -125,4 +127,30 @@ export function partEntry({ name, file, meta }: VuePart): ComponentEntry {
 
 export function componentProps(checker: VueChecker, slug: string): PropsFile {
   return toPropsFile(slug, componentParts(checker, slug).map(partEntry));
+}
+
+// ── Install planning ────────────────────────────────────────────────────────
+
+export function isVueModuleSource(file: string) {
+  return /\.(?:ts|vue)$/.test(file) && !file.endsWith('.stories.ts');
+}
+
+/** A `.vue` file's `<script>` blocks; any other file whole. */
+export function readVueScript(file: string) {
+  const text = readFileSync(file, 'utf8');
+  if (!file.endsWith('.vue')) return text;
+  const { descriptor, errors } = parseSfc(text, { filename: file });
+  if (errors.length > 0) {
+    fail(`${toRepoPath(file)} does not parse: ${errors[0]?.message}`);
+  }
+  return [descriptor.script, descriptor.scriptSetup]
+    .map((block) => block?.content ?? '')
+    .join('\n');
+}
+
+// A Vue component is its whole folder, so any file in it links the component.
+export function linkedVueSlug(file: string, exported: Set<string>) {
+  if (!isUnder(file, vueComponentsRoot)) return null;
+  const [slug] = path.relative(vueComponentsRoot, file).split(path.sep);
+  return slug !== undefined && exported.has(slug) ? slug : null;
 }

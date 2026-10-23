@@ -14,19 +14,6 @@ import {
 
 /**
  * Root of the select. Holds the open state and the selected value.
- *
- * @example
- * ```tsx
- * <Select>
- *   <SelectTrigger>
- *     <SelectValue placeholder="Select an option" />
- *   </SelectTrigger>
- *   <SelectContent>
- *     <SelectItem value="option1">Option 1</SelectItem>
- *     <SelectItem value="option2">Option 2</SelectItem>
- *   </SelectContent>
- * </Select>
- * ```
  */
 const Select = SelectPrimitive.Root;
 
@@ -71,21 +58,12 @@ const selectTriggerVariants = cva(
 /**
  * Props for SelectTrigger.
  */
-interface SelectTriggerProps
-  extends
-    React.ComponentProps<typeof SelectPrimitive.Trigger>,
-    VariantProps<typeof selectTriggerVariants> {}
+type SelectTriggerProps = React.ComponentProps<typeof SelectPrimitive.Trigger> &
+  VariantProps<typeof selectTriggerVariants>;
 
 /**
  * Button that opens the dropdown. Set `variant="borderless"` to drop the border
  * and keep a tinted fill.
- *
- * @example
- * ```tsx
- * <SelectTrigger className="w-[180px]">
- *   <SelectValue placeholder="Select a theme" />
- * </SelectTrigger>
- * ```
  */
 function SelectTrigger({
   className,
@@ -155,20 +133,10 @@ function SelectScrollDownButton({
 /**
  * Props for SelectContent.
  */
-interface SelectContentProps extends React.ComponentProps<
-  typeof SelectPrimitive.Content
-> {}
+type SelectContentProps = React.ComponentProps<typeof SelectPrimitive.Content>;
 
 /**
  * Dropdown that holds the items.
- *
- * @example
- * ```tsx
- * <SelectContent>
- *   <SelectItem value="light">Light</SelectItem>
- *   <SelectItem value="dark">Dark</SelectItem>
- * </SelectContent>
- * ```
  */
 function SelectContent({
   className,
@@ -213,20 +181,10 @@ function SelectContent({
 /**
  * Props for SelectLabel.
  */
-interface SelectLabelProps extends React.ComponentProps<
-  typeof SelectPrimitive.Label
-> {}
+type SelectLabelProps = React.ComponentProps<typeof SelectPrimitive.Label>;
 
 /**
  * Label for a group of items.
- *
- * @example
- * ```tsx
- * <SelectGroup>
- *   <SelectLabel>Fruits</SelectLabel>
- *   <SelectItem value="apple">Apple</SelectItem>
- * </SelectGroup>
- * ```
  */
 function SelectLabel({ className, ...props }: SelectLabelProps) {
   return (
@@ -241,17 +199,10 @@ function SelectLabel({ className, ...props }: SelectLabelProps) {
 /**
  * Props for SelectItem.
  */
-interface SelectItemProps extends React.ComponentProps<
-  typeof SelectPrimitive.Item
-> {}
+type SelectItemProps = React.ComponentProps<typeof SelectPrimitive.Item>;
 
 /**
  * One option in the dropdown.
- *
- * @example
- * ```tsx
- * <SelectItem value="light">Light</SelectItem>
- * ```
  */
 function SelectItem({ className, children, ...props }: SelectItemProps) {
   return (
@@ -287,19 +238,12 @@ function SelectItem({ className, children, ...props }: SelectItemProps) {
 /**
  * Props for SelectSeparator.
  */
-interface SelectSeparatorProps extends React.ComponentProps<
+type SelectSeparatorProps = React.ComponentProps<
   typeof SelectPrimitive.Separator
-> {}
+>;
 
 /**
  * Divider between items or groups.
- *
- * @example
- * ```tsx
- * <SelectItem value="option1">Option 1</SelectItem>
- * <SelectSeparator />
- * <SelectItem value="option2">Option 2</SelectItem>
- * ```
  */
 function SelectSeparator({ className, ...props }: SelectSeparatorProps) {
   return (

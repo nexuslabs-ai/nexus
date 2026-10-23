@@ -17,14 +17,15 @@ the ways a frontend team meets nxds.
 Each app installs `@nxds/core` from `packages/core` (`file:` with
 `install-links`), so the examples always run this repository's engine.
 
-The examples copy nxds by hand, as the Install page describes. Delivery through
-a shadcn registry, and running these examples in CI, are tracked in #798.
+The examples get nxds through the local `nxds` CLI, as a consumer would.
+Each app's `nxds.json` is the CLI's config, plus the `check` settings
+`scripts/check.mjs` reads.
 
 ## Shared scripts
 
 | Script | What it does |
 | ------ | ------------ |
-| `scripts/sync-nxds.mjs` | Copies nxds into an app as the Install page describes, then rebuilds and reinstalls `packages/core`. Each app runs it as `npm run nxds:add`, driven by its `nxds.json` |
+| `scripts/sync-nxds.mjs` | Runs the local `nxds update` for the items in the app's `nxds.json`, then rebuilds and reinstalls `packages/core`. Each app runs it as `npm run nxds:add` |
 | `scripts/check.mjs` | Builds an app with and without nxds and lists every host style that adding nxds changed |
 
 After changing nxds components, tokens or the engine, run `npm run nxds:add`

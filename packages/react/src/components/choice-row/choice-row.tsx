@@ -8,7 +8,7 @@ import { Label } from '../label/label';
  *
  * Props for the ChoiceRow component.
  */
-interface ChoiceRowProps extends React.ComponentProps<typeof Label> {}
+type ChoiceRowProps = React.ComponentProps<typeof Label>;
 
 /**
  * Compact label row for a checkbox or radio choice.

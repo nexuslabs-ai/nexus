@@ -20,10 +20,23 @@ ruleTester.run('no-render-prop-types', rule, {
     // Event-handler-named props are exempt even if they return JSX.
     'interface P { onRender: () => ReactNode }',
     'type P = { title: string; count: number }',
+    // A third-party API mandates the shape.
+    `type P = {
+      /** @thirdPartyShape react-day-picker renders each day. */
+      renderDay: () => ReactNode;
+    }`,
   ],
   invalid: [
     {
       code: 'interface P { renderItem: () => ReactNode }',
+      errors: [{ messageId: 'renderCallback' }],
+    },
+    // The tag needs a reason.
+    {
+      code: `type P = {
+        /** @thirdPartyShape */
+        renderDay: () => ReactNode;
+      }`,
       errors: [{ messageId: 'renderCallback' }],
     },
     {
@@ -37,6 +50,11 @@ ruleTester.run('no-render-prop-types', rule, {
     {
       code: 'type P = { icon: FC }',
       errors: [{ messageId: 'componentAsProp' }],
+    },
+    {
+      // A plain doc comment without the tag doesn't exempt the prop.
+      code: 'type P = { /** Renders the day. */ renderDay: () => ReactNode }',
+      errors: [{ messageId: 'renderCallback' }],
     },
     {
       code: 'interface P { thing: ComponentType | undefined }',

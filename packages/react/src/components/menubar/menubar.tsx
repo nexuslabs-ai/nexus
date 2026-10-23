@@ -14,9 +14,7 @@ import {
 /**
  * Props for the Menubar component.
  */
-interface MenubarProps extends React.ComponentProps<
-  typeof MenubarPrimitive.Root
-> {}
+type MenubarProps = React.ComponentProps<typeof MenubarPrimitive.Root>;
 
 /**
  * Horizontal bar of menus, like the menu bar in a desktop app.
@@ -62,9 +60,9 @@ const MenubarSub = MenubarPrimitive.Sub;
 /**
  * Props for the MenubarTrigger component.
  */
-interface MenubarTriggerProps extends React.ComponentProps<
+type MenubarTriggerProps = React.ComponentProps<
   typeof MenubarPrimitive.Trigger
-> {}
+>;
 
 /**
  * Top-level button in the bar. Opens its menu on click.
@@ -130,9 +128,9 @@ function MenubarSubTrigger({
 /**
  * Props for the MenubarSubContent component.
  */
-interface MenubarSubContentProps extends React.ComponentProps<
+type MenubarSubContentProps = React.ComponentProps<
   typeof MenubarPrimitive.SubContent
-> {}
+>;
 
 /**
  * Container for the items of a submenu.
@@ -156,9 +154,9 @@ function MenubarSubContent({ className, ...props }: MenubarSubContentProps) {
 /**
  * Props for the MenubarContent component.
  */
-interface MenubarContentProps extends React.ComponentProps<
+type MenubarContentProps = React.ComponentProps<
   typeof MenubarPrimitive.Content
-> {}
+>;
 
 /**
  * Container for the items of a menu. Opens below its trigger.
@@ -246,9 +244,9 @@ function MenubarItem({
 /**
  * Props for the MenubarCheckboxItem component.
  */
-interface MenubarCheckboxItemProps extends React.ComponentProps<
+type MenubarCheckboxItemProps = React.ComponentProps<
   typeof MenubarPrimitive.CheckboxItem
-> {}
+>;
 
 /**
  * Menu item that toggles on and off.
@@ -298,9 +296,9 @@ function MenubarCheckboxItem({
 /**
  * Props for the MenubarRadioItem component.
  */
-interface MenubarRadioItemProps extends React.ComponentProps<
+type MenubarRadioItemProps = React.ComponentProps<
   typeof MenubarPrimitive.RadioItem
-> {}
+>;
 
 /**
  * Menu item for picking one option from a `MenubarRadioGroup`.
@@ -377,9 +375,9 @@ function MenubarLabel({ className, inset, ...props }: MenubarLabelProps) {
 /**
  * Props for the MenubarSeparator component.
  */
-interface MenubarSeparatorProps extends React.ComponentProps<
+type MenubarSeparatorProps = React.ComponentProps<
   typeof MenubarPrimitive.Separator
-> {}
+>;
 
 /**
  * Divider between menu items.
@@ -400,7 +398,7 @@ function MenubarSeparator({ className, ...props }: MenubarSeparatorProps) {
 /**
  * Props for the MenubarShortcut component.
  */
-interface MenubarShortcutProps extends React.ComponentProps<'span'> {}
+type MenubarShortcutProps = React.ComponentProps<'span'>;
 
 /**
  * Keyboard shortcut hint at the end of an item.

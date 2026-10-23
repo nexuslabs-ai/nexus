@@ -1,10 +1,37 @@
 {
-  "components": [
-    "accordion", "alert", "appearance", "avatar", "badge", "button", "card",
-    "checkbox", "input", "label", "progress", "radio-group", "select",
-    "separator", "sidebar", "slider", "sonner", "switch", "table", "tabs",
-    "textarea"
-  ],
-  "sourceDir": ".",
-  "cssDir": "styles/nxds"
+  "framework": "react",
+  "version": "0.4.5",
+  "dir": "components/nxds",
+  "css": "app/globals.css",
+  "items": [
+    "setup",
+    "accordion",
+    "alert",
+    "appearance",
+    "avatar",
+    "badge",
+    "button",
+    "card",
+    "checkbox",
+    "input",
+    "label",
+    "progress",
+    "radio-group",
+    "select",
+    "separator",
+    "sidebar",
+    "slider",
+    "sonner",
+    "switch",
+    "table",
+    "tabs",
+    "textarea",
+    "spinner",
+    "popover",
+    "toggle",
+    "toggle-group",
+    "sheet",
+    "skeleton",
+    "tooltip"
+  ]
 }

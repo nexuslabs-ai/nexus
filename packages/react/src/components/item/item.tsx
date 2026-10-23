@@ -114,8 +114,8 @@ const itemMediaVariants = cva(
 /**
  * Props for the ItemMedia component.
  */
-interface ItemMediaProps
-  extends React.ComponentProps<'div'>, VariantProps<typeof itemMediaVariants> {}
+type ItemMediaProps = React.ComponentProps<'div'> &
+  VariantProps<typeof itemMediaVariants>;
 
 /**
  * Leading visual of an item. `icon` adds a muted rounded tile, and `image`
@@ -139,7 +139,7 @@ function ItemMedia({
 /**
  * Props for the ItemContent component.
  */
-interface ItemContentProps extends React.ComponentProps<'div'> {}
+type ItemContentProps = React.ComponentProps<'div'>;
 
 /**
  * Column for the title and description. Grows to fill the row.
@@ -163,7 +163,7 @@ function ItemContent({ className, ...props }: ItemContentProps) {
 /**
  * Props for the ItemTitle component.
  */
-interface ItemTitleProps extends React.ComponentProps<'div'> {}
+type ItemTitleProps = React.ComponentProps<'div'>;
 
 /**
  * Primary label of the item.
@@ -184,7 +184,7 @@ function ItemTitle({ className, ...props }: ItemTitleProps) {
 /**
  * Props for the ItemDescription component.
  */
-interface ItemDescriptionProps extends React.ComponentProps<'p'> {}
+type ItemDescriptionProps = React.ComponentProps<'p'>;
 
 /**
  * Supporting text under the title. Cuts off after two lines and underlines
@@ -208,7 +208,7 @@ function ItemDescription({ className, ...props }: ItemDescriptionProps) {
 /**
  * Props for the ItemActions component.
  */
-interface ItemActionsProps extends React.ComponentProps<'div'> {}
+type ItemActionsProps = React.ComponentProps<'div'>;
 
 /**
  * Trailing controls of the row, usually one or two buttons.

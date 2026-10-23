@@ -45,6 +45,20 @@ export function exportedComponentSlugs() {
   return new Set(slugs.sort());
 }
 
+/** A component's name as its own source spells it (`InputOTP`), else its slug in PascalCase. */
+export function componentLabel(slug) {
+  const name = pascal(slug);
+  const dir = path.join(componentsRoot, slug);
+  const source = readdirSync(dir)
+    .filter((file) => file.endsWith('.tsx') && !file.endsWith('.stories.tsx'))
+    .map((file) => readFileSync(path.join(dir, file), 'utf8'))
+    .join('\n');
+  const spelled = source
+    .match(/\b[A-Z][A-Za-z0-9]*\b/g)
+    ?.find((word) => word.toLowerCase() === name.toLowerCase());
+  return spelled ?? name;
+}
+
 /**
  * The exported component whose own file `filePath` is
  * (`components/button/button.tsx` → `button`), or null. A docs page links that

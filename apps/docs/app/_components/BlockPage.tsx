@@ -1,9 +1,10 @@
 import { getBlockDocs } from '../../__generated__/demo-index';
-import { loadBlockPlan, loadSource } from '../_lib/dependencies';
+import { loadInstallPlan } from '../_lib/catalog';
 import type { ManifestPage } from '../_lib/manifest';
 
 import { ComponentDemo } from './ComponentDemo';
 import {
+  AddCommand,
   ComponentLinks,
   PackagesSample,
   SourceFile,
@@ -23,14 +24,14 @@ const BODY_CLASS =
   'nx:mb-4 nx:typography-body-default nx:text-muted-foreground';
 
 /** A block's story tagged `docs` as the preview, then its install plan. */
-export async function BlockPage({ page }: { page: BlockManifestPage }) {
+export function BlockPage({ page }: { page: BlockManifestPage }) {
   const { description, preview } = getBlockDocs(page.slug);
-  const { components, packages, files, styles } = await loadBlockPlan(
-    page.slug
-  );
-  const sources = await Promise.all(
-    files.map(async (path) => ({ path, source: await loadSource(path) }))
-  );
+  const {
+    components,
+    packages,
+    files: sources,
+    styles,
+  } = loadInstallPlan(page.slug);
 
   return (
     <>
@@ -38,12 +39,17 @@ export async function BlockPage({ page }: { page: BlockManifestPage }) {
       <DescriptionText text={description} className="nx:mb-6" />
       <ComponentDemo id={preview} />
 
+      <SectionHeading className={SECTION_HEADING_CLASS}>
+        Installation
+      </SectionHeading>
+      <AddCommand name={page.slug} />
+
       <SectionHeading className={SECTION_HEADING_CLASS}>Source</SectionHeading>
       <p className={BODY_CLASS}>
-        Copy these files into your project. Paths are relative to{' '}
-        <InlineCode>packages/react/src/</InlineCode>. Keep the same folders
-        under your <InlineCode>@/</InlineCode> root, and the imports between
-        files work without edits.
+        To install by hand, copy these files into your project. Paths are
+        relative to <InlineCode>packages/react/src/</InlineCode>. Copy each file
+        to the same path under <InlineCode>components/nxds/</InlineCode>, and
+        the imports between files work without edits.
       </p>
       {components.length > 0 && (
         <p className={BODY_CLASS}>

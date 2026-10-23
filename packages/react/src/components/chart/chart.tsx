@@ -1,9 +1,5 @@
 'use client';
 
-/* eslint-disable @nxds/no-render-prop-types -- this file adapts the recharts
-   API, whose ChartConfig `icon` (ComponentType) and Tooltip `labelFormatter` /
-   `formatter` (return ReactNode) shapes are third-party-mandated and out of
-   scope per composition-over-render-props.md. */
 import * as React from 'react';
 
 import * as RechartsPrimitive from 'recharts';
@@ -21,6 +17,7 @@ import { cn } from '../../lib/utils';
 export type ChartConfig = {
   [key: string]: {
     label?: React.ReactNode;
+    /** @thirdPartyShape Recharts' legend and tooltip render it as a component. */
     icon?: React.ComponentType;
     color?: string;
   };

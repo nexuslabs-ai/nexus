@@ -54,6 +54,9 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v4
+        with:
+          # The release-catalog check diffs HEAD against its first parent.
+          fetch-depth: 2
 
       - name: Install pnpm
         uses: pnpm/action-setup@v4
@@ -74,6 +77,15 @@ jobs:
 
       - name: Agent drift audit
         run: pnpm audit:agent-drift
+
+      - name: Release catalogs are never edited
+        run: |
+          edited=$(git diff --name-only --diff-filter=MDR HEAD^1 HEAD -- packages/catalog/releases)
+          if [ -n "$edited" ]; then
+            echo "::error::Release catalogs never change once committed. Revert:"
+            echo "$edited"
+            exit 1
+          fi
 
       - name: Restore ESLint cache
         uses: actions/cache@v4
@@ -139,13 +151,13 @@ jobs:
         run: |
           set -euo pipefail
           mkdir "$RUNNER_TEMP/docs-generated-build"
-          cp -r apps/docs/generated apps/docs/app/_lib/*.generated.ts "$RUNNER_TEMP/docs-generated-build"
+          cp -r apps/docs/generated packages/catalog/generated apps/docs/app/_lib/*.generated.ts "$RUNNER_TEMP/docs-generated-build"
           pnpm --filter @nxds/docs generate:props
-          pnpm --filter @nxds/docs generate:dependencies
+          pnpm --filter @nxds/catalog generate:catalog
           pnpm --filter @nxds/docs generate:manifest
           pnpm --filter @nxds/docs generate:vue
           mkdir "$RUNNER_TEMP/docs-generated-fresh"
-          cp -r apps/docs/generated apps/docs/app/_lib/*.generated.ts "$RUNNER_TEMP/docs-generated-fresh"
+          cp -r apps/docs/generated packages/catalog/generated apps/docs/app/_lib/*.generated.ts "$RUNNER_TEMP/docs-generated-fresh"
           if ! diff -r "$RUNNER_TEMP/docs-generated-build" "$RUNNER_TEMP/docs-generated-fresh"; then
             echo "::error::The docs generated inputs differ from the build step's copy: either a generate:* task in apps/docs/turbo.json is missing an input its generator reads, or the generator's output is nondeterministic."
             exit 1
@@ -326,7 +338,8 @@ jobs:
 
   test-react:
     name: Test (React)
-    runs-on: ubuntu-latest
+    # Playwright 1.60 can't install Chromium on ubuntu-latest's 26.04 image.
+    runs-on: ubuntu-24.04
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -414,6 +427,48 @@ jobs:
         run: pnpm size-limit
 
   # ============================================
+  # CLI install check
+  # ============================================
+  # Installs nxds with the built CLI into a fresh app, pastes every docs
+  # example, then runs the app's own typecheck, lint, build and `doctor`.
+
+  cli-install:
+    name: CLI Install (${{ matrix.app }})
+    runs-on: ubuntu-latest
+    needs: build
+    strategy:
+      fail-fast: false
+      matrix:
+        app: [next, vite]
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Install pnpm
+        uses: pnpm/action-setup@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version-file: '.nvmrc'
+          cache: 'pnpm'
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Download build artifacts
+        uses: actions/download-artifact@v4
+        with:
+          name: build-artifacts
+          path: packages
+
+      - name: Generate docs examples
+        run: pnpm turbo run generate:demos --filter=@nxds/docs
+
+      - name: Install nxds into a fresh app
+        run: node packages/cli/scripts/check-install.mjs ${{ matrix.app }}
+
+  # ============================================
   # Aggregator — the single required status check
   # ============================================
   # Runs unconditionally so a status always lands for branch protection. No
@@ -436,6 +491,7 @@ jobs:
       - test-react
       - build-storybook
       - bundle-size
+      - cli-install
     steps:
       - name: Fail on any required-job failure or cancellation
         if: ${{ contains(needs.*.result, 'failure') || contains(needs.*.result, 'cancelled') }}

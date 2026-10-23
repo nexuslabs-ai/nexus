@@ -1,0 +1,49 @@
+import type {
+  NxdsAppearanceState,
+  NxdsResolvedAppearanceMode,
+} from '@nxds/core';
+
+function toLines(
+  state: NxdsAppearanceState,
+  resolvedMode: NxdsResolvedAppearanceMode
+): { key: string; text: string }[] {
+  return [
+    { key: 'mode', text: `mode: "${state.mode}",` },
+    { key: 'resolvedMode', text: `resolvedMode: "${resolvedMode}",` },
+    { key: 'brandColor', text: `brandColor: "${state.brandColor}",` },
+    { key: 'surfaceTone', text: `surfaceTone: "${state.surfaceTone}",` },
+    { key: 'lightContrast', text: `lightContrast: ${state.lightContrast},` },
+    { key: 'darkContrast', text: `darkContrast: ${state.darkContrast},` },
+    { key: 'density', text: `density: "${state.density}",` },
+    { key: 'corners', text: `corners: "${state.corners}",` },
+    { key: 'elevation', text: `elevation: "${state.elevation}",` },
+    { key: 'stroke', text: `stroke: "${state.stroke}",` },
+  ];
+}
+
+export interface NxdsAppearanceConfigPreviewProps {
+  state: NxdsAppearanceState;
+  resolvedMode: NxdsResolvedAppearanceMode;
+}
+
+export function NxdsAppearanceConfigPreview({
+  state,
+  resolvedMode,
+}: NxdsAppearanceConfigPreviewProps) {
+  const lines = toLines(state, resolvedMode);
+
+  return (
+    <pre
+      className="nx:m-0 nx:overflow-x-auto nx:rounded-lg nx:border-default nx:border-border-default nx:bg-muted nx:p-3 nx:font-mono nx:text-muted-foreground"
+      style={{ lineHeight: '1.7' }}
+    >
+      <code>
+        <div>{`const appearance = {`}</div>
+        {lines.map((line) => (
+          <div key={line.key}>{`  ${line.text}`}</div>
+        ))}
+        <div>{`};`}</div>
+      </code>
+    </pre>
+  );
+}

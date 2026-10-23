@@ -2,7 +2,9 @@
 // should not be typed as render callbacks (`(...) => ReactNode`), component
 // references (`ComponentType<...>`, `FC<...>`), or unions thereof. Event
 // handler props (`onClick`, `onSubmit`, ...) return data, not JSX, and are
-// exempt.
+// exempt. So is a prop whose JSDoc carries `@thirdPartyShape <reason>`: a
+// third-party API mandates its shape. It is a plain tag, not an
+// `eslint-disable`, so copied source lints clean in apps without this plugin.
 //
 // Known scope gaps — these patterns sneak through the AST visitors below and
 // must be caught by code review:
@@ -14,6 +16,8 @@
 //   only).
 
 const EVENT_HANDLER = /^on[A-Z]/;
+// The tag counts only with a reason after it.
+const THIRD_PARTY_TAG = /@thirdPartyShape[ \t]+[^\s*]/;
 
 const REACT_NODE_NAMES = new Set([
   'ReactNode',
@@ -111,6 +115,10 @@ export default {
       }
       const name = node.key.name;
       if (EVENT_HANDLER.test(name)) {
+        return;
+      }
+      const comments = context.sourceCode.getCommentsBefore(node);
+      if (comments.some((comment) => THIRD_PARTY_TAG.test(comment.value))) {
         return;
       }
       const ann = node.typeAnnotation?.typeAnnotation;

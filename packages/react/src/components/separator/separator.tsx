@@ -7,9 +7,7 @@ import { cn } from '../../lib/utils';
 /**
  * Props for Separator.
  */
-interface SeparatorProps extends React.ComponentProps<
-  typeof SeparatorPrimitive.Root
-> {}
+type SeparatorProps = React.ComponentProps<typeof SeparatorPrimitive.Root>;
 
 /**
  * Thin rule that divides content. A vertical separator fills its parent's

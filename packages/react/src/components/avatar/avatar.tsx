@@ -103,9 +103,7 @@ function Avatar({
  *
  * Props for the AvatarImage component.
  */
-interface AvatarImageProps extends React.ComponentProps<
-  typeof AvatarPrimitive.Image
-> {}
+type AvatarImageProps = React.ComponentProps<typeof AvatarPrimitive.Image>;
 
 /**
  * Profile image. AvatarFallback shows until it loads.
@@ -137,9 +135,9 @@ function AvatarImage({
  *
  * Props for the AvatarFallback component.
  */
-interface AvatarFallbackProps extends React.ComponentProps<
+type AvatarFallbackProps = React.ComponentProps<
   typeof AvatarPrimitive.Fallback
-> {}
+>;
 
 /**
  * Shows while the image loads or if it fails, usually initials or an icon.

@@ -61,7 +61,7 @@ function Marker({
 /**
  * Props for the MarkerIcon component.
  */
-interface MarkerIconProps extends React.ComponentProps<'span'> {}
+type MarkerIconProps = React.ComponentProps<'span'>;
 
 /**
  * Decorative leading icon. Screen readers skip it, so put the meaning in
@@ -84,7 +84,7 @@ function MarkerIcon({ className, ...props }: MarkerIconProps) {
 /**
  * Props for the MarkerContent component.
  */
-interface MarkerContentProps extends React.ComponentProps<'span'> {}
+type MarkerContentProps = React.ComponentProps<'span'>;
 
 /**
  * Label text of the Marker. With `variant="separator"`, the text centers

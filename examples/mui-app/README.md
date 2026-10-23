@@ -6,7 +6,7 @@ nxds brings Tailwind into the app for the first time.
 
 | Path | What it is |
 | ---- | ---------- |
-| `src/components/nxds/` | nxds, copied from this repository by `npm run nxds:add`. Committed |
+| `src/components/nxds/` | nxds, installed from this repository by `npm run nxds:add`. Committed |
 | `src/components/nxds-kit.ts` | Re-exports the nxds components so pages import them as `N.Button` |
 | `src/nxds.css` | The nxds Tailwind entry, the app's only CSS file |
 | `src/appearance-state.ts` | The default nxds appearance, shared by the provider and the first-paint script |
@@ -38,8 +38,9 @@ After changing nxds source or tokens, run `npm run nxds:add`.
 
 ## How the app added nxds
 
-1. `npm run nxds:add` copies the components, provider and token CSS into
-   `src/components/nxds/`, and installs `@nxds/core` from `packages/core`.
+1. `npm run nxds:add` runs the local `nxds update`, which copies the
+   components, provider and token CSS into `src/components/nxds/`. It then
+   installs `@nxds/core` from `packages/core`.
 2. `npm install tailwindcss @tailwindcss/vite tw-animate-css` and the packages
    the copy prints. MUI's `CssBaseline` stays the app's reset; nxds brings no
    Preflight.

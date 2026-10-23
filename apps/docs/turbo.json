@@ -3,7 +3,7 @@
   "extends": ["//"],
   "tasks": {
     "generate:demos": {
-      "dependsOn": ["generate:dependencies", "generate:props"],
+      "dependsOn": ["generate:props"],
       "outputs": ["__generated__/**", "public/avatars/**"],
       "cache": false
     },
@@ -20,23 +20,11 @@
       ],
       "outputs": ["generated/props/**"]
     },
-    "generate:dependencies": {
-      "inputs": [
-        "scripts/generate-dependencies.mjs",
-        "scripts/install-plans.ts",
-        "scripts/docs-root.mjs",
-        "$TURBO_ROOT$/packages/source-model/src/**",
-        "$TURBO_ROOT$/packages/source-model/package.json",
-        "$TURBO_ROOT$/packages/react/src/**",
-        "$TURBO_ROOT$/packages/react/package.json",
-        "$TURBO_ROOT$/packages/react/tsconfig.json"
-      ],
-      "outputs": ["generated/dependencies/**"]
-    },
     "generate:vue": {
       "inputs": [
         "scripts/generate-vue-docs.ts",
-        "scripts/install-plans.ts",
+        "$TURBO_ROOT$/packages/catalog/scripts/install-plans.ts",
+        "$TURBO_ROOT$/packages/catalog/scripts/dependency-plans.mjs",
         "scripts/docs-root.mjs",
         "$TURBO_ROOT$/packages/source-model/src/**",
         "$TURBO_ROOT$/packages/source-model/package.json",
@@ -85,12 +73,19 @@
         "^build",
         "generate:manifest",
         "generate:props",
-        "generate:dependencies",
         "generate:demos",
         "generate:vue",
-        "bundle:vue"
+        "bundle:vue",
+        "@nxds/catalog#generate:catalog"
       ],
-      "inputs": ["$TURBO_DEFAULT$", "$TURBO_ROOT$/package.json"],
+      "inputs": [
+        "$TURBO_DEFAULT$",
+        "$TURBO_ROOT$/package.json",
+        "$TURBO_ROOT$/packages/catalog/releases/**",
+        "$TURBO_ROOT$/packages/catalog/scripts/registry.mjs",
+        "$TURBO_ROOT$/packages/catalog/scripts/roots.mjs",
+        "$TURBO_ROOT$/packages/source-model/src/files.mjs"
+      ],
       "outputs": ["out/**", "next-env.d.ts"]
     },
     "dev": {
@@ -98,10 +93,10 @@
         "^build",
         "generate:manifest",
         "generate:props",
-        "generate:dependencies",
         "generate:demos",
         "generate:vue",
-        "bundle:vue"
+        "bundle:vue",
+        "@nxds/catalog#generate:catalog"
       ],
       "cache": false,
       "persistent": true
@@ -112,7 +107,8 @@
         "@nxds/react#build",
         "generate:manifest",
         "generate:demos",
-        "generate:vue"
+        "generate:vue",
+        "@nxds/catalog#generate:catalog"
       ]
     }
   }

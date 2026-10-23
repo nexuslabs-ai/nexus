@@ -50,7 +50,7 @@ import {
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const TOKENS_DIR = path.join(__dirname, '../tokens');
-const DEFAULT_DIST_DIR = path.join(__dirname, '../dist/tailwind');
+const DIST_DIR = path.join(__dirname, '../dist/tailwind');
 const PRIMITIVES_DIR = path.join(TOKENS_DIR, 'primitives');
 const SEMANTIC_DIR = path.join(TOKENS_DIR, 'semantic');
 const RUNTIME_DIST_ENTRY = path.join(__dirname, '../dist/runtime/index.js');
@@ -585,25 +585,19 @@ function generateNxdsCSS(
 }
 
 /**
- * Main generation function. Exported so `pnpm export` can run it against its
- * own `distDir`. Keys left out of `overrides` come from the engine's
- * `DEFAULT_NXDS_APPEARANCE`; returns the config it generated with.
+ * Main generation function. Keys left out of `overrides` come from the
+ * engine's `DEFAULT_NXDS_APPEARANCE`; returns the config it generated with.
  */
-export async function generateTailwindPackage(
-  overrides,
-  { distDir = DEFAULT_DIST_DIR, engine } = {}
-) {
-  const tokenEngine = assertTokenEngine(
-    engine ?? (await loadDistRuntimeEngine())
-  );
+async function generateTailwindPackage(overrides, engine) {
+  const tokenEngine = assertTokenEngine(engine);
   const config = {
     ...defaultTokenConfig(tokenEngine.DEFAULT_NXDS_APPEARANCE),
     ...overrides,
   };
-  ensureDir(distDir);
+  ensureDir(DIST_DIR);
 
   const writeDistFile = (fileName, content) => {
-    const filePath = path.join(distDir, fileName);
+    const filePath = path.join(DIST_DIR, fileName);
     fs.writeFileSync(filePath, content);
     log.file(fileName);
   };
@@ -704,7 +698,7 @@ export async function generateTailwindPackage(
   );
   writeDistFile('nxds.css', nxdsCSS);
 
-  await formatDistCssFiles(distDir);
+  await formatDistCssFiles(DIST_DIR);
 
   console.log('');
   console.log(`📊 Summary:`);
@@ -717,7 +711,7 @@ export async function generateTailwindPackage(
   console.log(`   Engine semantic colors: ${lightSemanticTokens.length}`);
   console.log(`   Typography utilities: ${typography.count}`);
   console.log(`   Border width alias utilities: ${borderWidth.count}`);
-  console.log(`   Output: ${distDir}`);
+  console.log(`   Output: ${DIST_DIR}`);
 
   return config;
 }
@@ -737,7 +731,7 @@ if (process.argv[1] === fileURLToPath(import.meta.url)) {
       'spacingDefault',
     ],
   });
-  await generateTailwindPackage(cliConfig, { engine });
+  await generateTailwindPackage(cliConfig, engine);
   console.log('');
   console.log('✨ @nxds/tailwind package generation complete!');
 }

@@ -9,9 +9,7 @@ import { cn } from '../../lib/utils';
  *
  * Props for the Collapsible root.
  */
-interface CollapsibleProps extends React.ComponentProps<
-  typeof CollapsiblePrimitive.Root
-> {}
+type CollapsibleProps = React.ComponentProps<typeof CollapsiblePrimitive.Root>;
 
 /**
  * Shows and hides one content region. The trigger toggles the content open
@@ -26,9 +24,9 @@ function Collapsible(props: CollapsibleProps) {
  *
  * Props for the CollapsibleTrigger.
  */
-interface CollapsibleTriggerProps extends React.ComponentProps<
+type CollapsibleTriggerProps = React.ComponentProps<
   typeof CollapsiblePrimitive.CollapsibleTrigger
-> {}
+>;
 
 /**
  * Toggles the collapsible. It has no styles, so wrap a `Button` with
@@ -48,9 +46,9 @@ function CollapsibleTrigger(props: CollapsibleTriggerProps) {
  *
  * Props for the CollapsibleContent.
  */
-interface CollapsibleContentProps extends React.ComponentProps<
+type CollapsibleContentProps = React.ComponentProps<
   typeof CollapsiblePrimitive.CollapsibleContent
-> {}
+>;
 
 /**
  * The region shown while the collapsible is open. Its height animates open and

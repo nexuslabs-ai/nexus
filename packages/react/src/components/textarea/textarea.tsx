@@ -32,10 +32,8 @@ const textareaVariants = cva(
 /**
  * Props for Textarea.
  */
-interface TextareaProps
-  extends
-    React.ComponentProps<'textarea'>,
-    VariantProps<typeof textareaVariants> {}
+type TextareaProps = React.ComponentProps<'textarea'> &
+  VariantProps<typeof textareaVariants>;
 
 /**
  * Multi-line text field styled like Input. Set the starting height with `rows`.

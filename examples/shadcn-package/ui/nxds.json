@@ -1,9 +1,31 @@
 {
-  "components": [
-    "alert", "avatar", "badge", "button", "card", "checkbox", "dialog",
-    "dropdown-menu", "input", "label", "popover", "progress", "radio-group",
-    "select", "separator", "sonner", "switch", "table", "tabs", "textarea", "tooltip"
-  ],
-  "sourceDir": "src/nxds",
-  "cssDir": "src/nxds/tailwind"
+  "framework": "react",
+  "version": "0.4.5",
+  "dir": "src/nxds",
+  "css": "src/nxds.css",
+  "items": [
+    "setup",
+    "alert",
+    "avatar",
+    "badge",
+    "button",
+    "card",
+    "checkbox",
+    "dialog",
+    "dropdown-menu",
+    "input",
+    "label",
+    "popover",
+    "progress",
+    "radio-group",
+    "select",
+    "separator",
+    "sonner",
+    "switch",
+    "table",
+    "tabs",
+    "textarea",
+    "tooltip",
+    "spinner"
+  ]
 }

@@ -7,9 +7,7 @@ import * as AspectRatioPrimitive from '@radix-ui/react-aspect-ratio';
  *
  * Props for the AspectRatio component.
  */
-interface AspectRatioProps extends React.ComponentProps<
-  typeof AspectRatioPrimitive.Root
-> {}
+type AspectRatioProps = React.ComponentProps<typeof AspectRatioPrimitive.Root>;
 
 /**
  * Keeps its child at a fixed width-to-height `ratio`, such as `16 / 9`. The child fills the box.

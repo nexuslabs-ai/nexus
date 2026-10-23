@@ -6,18 +6,11 @@ import { cn } from '../../lib/utils';
 /**
  * Props for Spinner.
  */
-interface SpinnerProps extends React.ComponentProps<'svg'> {}
+type SpinnerProps = React.ComponentProps<'svg'>;
 
 /**
  * Rotating loading indicator with `role="status"` and a default `aria-label`
  * of "Loading". Size it with `nx:size-*` and color it with `nx:text-*`.
- *
- * @example
- * ```tsx
- * <Spinner />
- * <Spinner className="nx:size-6 nx:text-primary-subtle-foreground" />
- * <Spinner aria-label="Saving changes" />
- * ```
  */
 function Spinner({ className, ...props }: SpinnerProps) {
   return (

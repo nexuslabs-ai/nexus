@@ -1,0 +1,50 @@
+{
+  "name": "nxds-cli",
+  "version": "0.0.0",
+  "type": "module",
+  "description": "Install nxds components, blocks and setup into your app.",
+  "keywords": [
+    "nxds",
+    "design-system",
+    "cli",
+    "components",
+    "copy-and-own",
+    "tailwindcss"
+  ],
+  "homepage": "https://nxds.dev",
+  "bugs": {
+    "url": "https://github.com/nexuslabs-ai/nxds/issues"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/nexuslabs-ai/nxds.git",
+    "directory": "packages/cli"
+  },
+  "license": "MIT",
+  "engines": {
+    "node": ">=20.19.0"
+  },
+  "bin": {
+    "nxds": "dist/index.js"
+  },
+  "files": [
+    "dist"
+  ],
+  "scripts": {
+    "build": "tsup",
+    "typecheck": "tsc --noEmit",
+    "clean": "rm -rf dist"
+  },
+  "dependencies": {
+    "@babel/parser": "^7.29.0",
+    "@babel/types": "^7.29.7",
+    "semver": "^7.8.5"
+  },
+  "devDependencies": {
+    "@nxds/catalog": "workspace:*",
+    "@types/node": "^25.9.1",
+    "@types/semver": "^7.8.0",
+    "tsup": "^8.5.1",
+    "typescript": "^5.9.3"
+  }
+}

@@ -9,16 +9,14 @@ import { cn } from '../../lib/utils';
 /**
  * Props for the RadioGroup component.
  */
-interface RadioGroupProps extends React.ComponentProps<
-  typeof RadioGroupPrimitive.Root
-> {}
+type RadioGroupProps = React.ComponentProps<typeof RadioGroupPrimitive.Root>;
 
 /**
  * Props for the RadioGroupItem component.
  */
-interface RadioGroupItemProps extends React.ComponentProps<
+type RadioGroupItemProps = React.ComponentProps<
   typeof RadioGroupPrimitive.Item
-> {}
+>;
 
 /**
  * Set of options where only one can be selected. Render one `RadioGroupItem`

@@ -5,7 +5,7 @@ import { cn } from '../../lib/utils';
 /**
  * Props for the Kbd component.
  */
-interface KbdProps extends React.ComponentProps<'kbd'> {}
+type KbdProps = React.ComponentProps<'kbd'>;
 
 /**
  * Key cap for one key of a shortcut, such as `⌘` or `Esc`. Put several
@@ -28,7 +28,7 @@ function Kbd({ className, ...props }: KbdProps) {
 /**
  * Props for the KbdGroup component.
  */
-interface KbdGroupProps extends React.ComponentProps<'kbd'> {}
+type KbdGroupProps = React.ComponentProps<'kbd'>;
 
 /**
  * Row of `Kbd` key caps shown as one combination, such as `⌘ K`.

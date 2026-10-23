@@ -10,7 +10,7 @@ import { cn } from '../../lib/utils';
  *
  * Props for the BubbleGroup component.
  */
-interface BubbleGroupProps extends React.ComponentProps<'div'> {}
+type BubbleGroupProps = React.ComponentProps<'div'>;
 
 /**
  * Vertical stack of consecutive bubbles. It adds no list role, so add list or log semantics when the stack needs them.
@@ -55,8 +55,8 @@ const bubbleVariants = cva(
  *
  * Props for the Bubble component.
  */
-interface BubbleProps
-  extends React.ComponentProps<'div'>, VariantProps<typeof bubbleVariants> {}
+type BubbleProps = React.ComponentProps<'div'> &
+  VariantProps<typeof bubbleVariants>;
 
 /**
  * One message in a conversation. It holds no chat state, speaker or timestamp.
@@ -145,10 +145,8 @@ const bubbleReactionsVariants = cva(
  *
  * Props for the BubbleReactions component.
  */
-interface BubbleReactionsProps
-  extends
-    React.ComponentProps<'div'>,
-    VariantProps<typeof bubbleReactionsVariants> {}
+type BubbleReactionsProps = React.ComponentProps<'div'> &
+  VariantProps<typeof bubbleReactionsVariants>;
 
 /**
  * Reaction pill overhanging a corner of the bubble. `side` picks top or bottom.

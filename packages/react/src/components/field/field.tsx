@@ -95,8 +95,8 @@ const fieldVariants = cva(
  *
  * Props for the Field component.
  */
-interface FieldProps
-  extends React.ComponentProps<'div'>, VariantProps<typeof fieldVariants> {}
+type FieldProps = React.ComponentProps<'div'> &
+  VariantProps<typeof fieldVariants>;
 
 /**
  * Lays out a label, control, description and error as one field. Works with

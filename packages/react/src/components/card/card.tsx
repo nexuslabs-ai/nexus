@@ -9,7 +9,7 @@ import { cn } from '../../lib/utils';
  *
  * Props for the Card component.
  */
-interface CardProps extends React.ComponentProps<'div'> {}
+type CardProps = React.ComponentProps<'div'>;
 
 /**
  * Groups related content and actions in a bordered section.
@@ -33,7 +33,7 @@ function Card({ className, ...props }: CardProps) {
  *
  * Props for the CardHeader component.
  */
-interface CardHeaderProps extends React.ComponentProps<'div'> {}
+type CardHeaderProps = React.ComponentProps<'div'>;
 
 /**
  * Holds the title, description and `CardAction`.
@@ -94,7 +94,7 @@ function CardTitle({
  *
  * Props for the CardDescription component.
  */
-interface CardDescriptionProps extends React.ComponentProps<'p'> {}
+type CardDescriptionProps = React.ComponentProps<'p'>;
 
 /**
  * Supporting text under the title.
@@ -117,7 +117,7 @@ function CardDescription({ className, ...props }: CardDescriptionProps) {
  *
  * Props for the CardAction component.
  */
-interface CardActionProps extends React.ComponentProps<'div'> {}
+type CardActionProps = React.ComponentProps<'div'>;
 
 /**
  * Holds header actions, such as buttons or badges, beside the title.
@@ -140,7 +140,7 @@ function CardAction({ className, ...props }: CardActionProps) {
  *
  * Props for the CardContent component.
  */
-interface CardContentProps extends React.ComponentProps<'div'> {}
+type CardContentProps = React.ComponentProps<'div'>;
 
 /**
  * Main content area.
@@ -160,7 +160,7 @@ function CardContent({ className, ...props }: CardContentProps) {
  *
  * Props for the CardFooter component.
  */
-interface CardFooterProps extends React.ComponentProps<'div'> {}
+type CardFooterProps = React.ComponentProps<'div'>;
 
 /**
  * Holds actions and content at the bottom of the card.

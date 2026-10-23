@@ -134,8 +134,10 @@ type DatePickerProps = React.ComponentProps<typeof DayPicker> & {
   /**
    * Custom content inside each day button. The button keeps its keyboard
    * behavior.
+   *
+   * @thirdPartyShape react-day-picker owns the per-day render loop, so
+   * per-day content can't be a children slot.
    */
-  // eslint-disable-next-line @nxds/no-render-prop-types -- react-day-picker owns the per-day render loop; per-day content can't be a children slot
   renderDayContent?: (props: DatePickerDayContentProps) => React.ReactNode;
 };
 
@@ -255,7 +257,8 @@ function DatePicker({
           // react-day-picker passes `scope="row"` / `role="rowheader"`, valid
           // only on a <th> — match its default element (and drop the non-DOM
           // `week` prop) so the cell stays accessible.
-          WeekNumber: ({ week: _week, children, ...props }) => {
+          WeekNumber: ({ week, children, ...props }) => {
+            void week;
             return (
               <th {...props}>
                 <div className="nx:flex nx:size-(--cell-size) nx:items-center nx:justify-center nx:text-center">

@@ -58,10 +58,8 @@ const selectTriggerVariants = cva(
 /**
  * Props for SelectTrigger.
  */
-interface SelectTriggerProps
-  extends
-    React.ComponentProps<typeof SelectPrimitive.Trigger>,
-    VariantProps<typeof selectTriggerVariants> {}
+type SelectTriggerProps = React.ComponentProps<typeof SelectPrimitive.Trigger> &
+  VariantProps<typeof selectTriggerVariants>;
 
 /**
  * Button that opens the dropdown. Set `variant="borderless"` to drop the border
@@ -135,9 +133,7 @@ function SelectScrollDownButton({
 /**
  * Props for SelectContent.
  */
-interface SelectContentProps extends React.ComponentProps<
-  typeof SelectPrimitive.Content
-> {}
+type SelectContentProps = React.ComponentProps<typeof SelectPrimitive.Content>;
 
 /**
  * Dropdown that holds the items.
@@ -185,9 +181,7 @@ function SelectContent({
 /**
  * Props for SelectLabel.
  */
-interface SelectLabelProps extends React.ComponentProps<
-  typeof SelectPrimitive.Label
-> {}
+type SelectLabelProps = React.ComponentProps<typeof SelectPrimitive.Label>;
 
 /**
  * Label for a group of items.
@@ -205,9 +199,7 @@ function SelectLabel({ className, ...props }: SelectLabelProps) {
 /**
  * Props for SelectItem.
  */
-interface SelectItemProps extends React.ComponentProps<
-  typeof SelectPrimitive.Item
-> {}
+type SelectItemProps = React.ComponentProps<typeof SelectPrimitive.Item>;
 
 /**
  * One option in the dropdown.
@@ -246,9 +238,9 @@ function SelectItem({ className, children, ...props }: SelectItemProps) {
 /**
  * Props for SelectSeparator.
  */
-interface SelectSeparatorProps extends React.ComponentProps<
+type SelectSeparatorProps = React.ComponentProps<
   typeof SelectPrimitive.Separator
-> {}
+>;
 
 /**
  * Divider between items or groups.

@@ -89,7 +89,7 @@ const meta = {
     docs: {
       description: {
         component:
-          'DateRangeFilter filters by a range of calendar days, applied when users press Apply. Use it for created, updated or due dates. Presets cover common ranges, and the calendar covers the rest.',
+          "DateRangeFilter filters by a range of calendar days, applied when users press Apply. Use it for created, updated or due dates. Presets cover common ranges, and the calendar covers the rest. If your Next.js app uses Cache Components, render DateRangeFilter inside `<Suspense>` so it can read today's date.",
       },
       page: () => (
         <>

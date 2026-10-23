@@ -1,4 +1,4 @@
-import { loadInstallPlan } from '../_lib/dependencies';
+import { loadInstallPlan } from '../_lib/catalog';
 import type { Framework } from '../_lib/frameworks';
 
 import { CodeBlock } from './CodeBlock';
@@ -11,14 +11,14 @@ import {
 const BODY_CLASS = 'nx:typography-body-default nx:text-muted-foreground';
 
 /** Everything installing `slug` takes: components to install first, then packages, files and styles. */
-export async function InstallBlock({
+export function InstallBlock({
   slug,
   framework = 'react',
 }: {
   slug: string;
   framework?: Framework;
 }) {
-  const { components, packages, files, styles } = await loadInstallPlan(
+  const { components, packages, files, styles } = loadInstallPlan(
     slug,
     framework
   );
@@ -33,7 +33,7 @@ export async function InstallBlock({
       {packages.length > 0 && <PackagesSample packages={packages} />}
       {files.length > 0 && (
         <CodeBlock>
-          <code>{files.join('\n')}</code>
+          <code>{files.map((file) => file.path).join('\n')}</code>
         </CodeBlock>
       )}
       {styles.length > 0 && <StylesSample styles={styles} />}

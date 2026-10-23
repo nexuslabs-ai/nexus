@@ -3,19 +3,18 @@
 //   demos/{slug}/{story}.vue    each story tagged `docs`, as a single-file component
 //   entry.js                    mounts a demo by id; bundle:vue compiles it for the live previews
 //   docs.ts                     titles, captions, sources and imports
-//   dependencies/{slug}.json    what installing the component takes
 //   props/{slug}.json           each part's own props
 // usage: node scripts/generate-vue-docs.ts
+import { vue, vueWalks } from '@nxds/catalog/scripts/dependency-plans.mjs';
+import { packageName } from '@nxds/catalog/scripts/install-plans.ts';
 import { humanize } from '@nxds/source-model/humanize.ts';
 import {
   type PropsFile,
   toPropsIndex,
 } from '@nxds/source-model/props-entries.ts';
 import {
-  isUnder,
   toRepoPath,
   vueComponentsRoot,
-  vueRoot,
   vueSrc,
 } from '@nxds/source-model/roots.mjs';
 import {
@@ -24,25 +23,12 @@ import {
   exportedSlugs,
   parseFile,
 } from '@nxds/source-model/vue-sources.ts';
-import {
-  mkdirSync,
-  readdirSync,
-  readFileSync,
-  rmSync,
-  writeFileSync,
-} from 'node:fs';
+import { mkdirSync, readdirSync, rmSync, writeFileSync } from 'node:fs';
 import path from 'node:path';
 import prettier from 'prettier';
 import ts from 'typescript';
-import { parse as parseSfc } from 'vue/compiler-sfc';
 
 import { docsRoot } from './docs-root.mjs';
-import {
-  createInstallPlanner,
-  packageName,
-  type Walk,
-  writeEntries,
-} from './install-plans.ts';
 
 interface SetupValue {
   name: string;
@@ -75,7 +61,6 @@ interface VueComponentDocs {
 
 const outputDir = path.join(docsRoot, 'generated', 'vue');
 const demosDir = path.join(outputDir, 'demos');
-const dependenciesDir = path.join(outputDir, 'dependencies');
 const propsDir = path.join(outputDir, 'props');
 
 const prettierConfig =
@@ -342,51 +327,10 @@ function sfc(
   );
 }
 
-// ── Install plans ───────────────────────────────────────────────────────────
-
-function isVueModuleSource(file: string) {
-  return /\.(?:ts|vue)$/.test(file) && !file.endsWith('.stories.ts');
-}
-
-/** A `.vue` file's `<script>` blocks; any other file whole. */
-function readVueScript(file: string) {
-  const text = readFileSync(file, 'utf8');
-  if (!file.endsWith('.vue')) return text;
-  const { descriptor, errors } = parseSfc(text, { filename: file });
-  if (errors.length > 0) {
-    fail(`${toRepoPath(file)} does not parse: ${errors[0]?.message}`);
-  }
-  return [descriptor.script, descriptor.scriptSetup]
-    .map((block) => block?.content ?? '')
-    .join('\n');
-}
-
-// A Vue component is its whole folder, so any file in it links the component.
-function linkedVueSlug(file: string, exported: Set<string>) {
-  if (!isUnder(file, vueComponentsRoot)) return null;
-  const [slug] = path.relative(vueComponentsRoot, file).split(path.sep);
-  return slug !== undefined && exported.has(slug) ? slug : null;
-}
-
-const vue = createInstallPlanner({
-  root: vueRoot,
-  src: vueSrc,
-  componentsRoot: vueComponentsRoot,
-  framework: 'vue',
-  isModuleSource: isVueModuleSource,
-  readScript: readVueScript,
-  linkedComponentSlug: linkedVueSlug,
-});
-
 // ── Write everything ────────────────────────────────────────────────────────
 
 const slugs = exportedSlugs();
-const exported = new Set(slugs);
-const walks = slugs.map(vue.walkSlug).filter((walked) => walked !== null);
-vue.assertDeclaredPackages(walks);
-const closures = new Map<string, Walk>(
-  walks.map((walked) => [walked.name, walked])
-);
+const closures = vueWalks(slugs);
 const componentDocs: Record<string, VueComponentDocs> = {};
 const demos: Record<string, VueDemo> = {};
 
@@ -395,14 +339,12 @@ mkdirSync(propsDir, { recursive: true });
 
 const checker = createVueChecker();
 const propsFiles: PropsFile[] = [];
-const dependencyEntries: ReturnType<typeof vue.componentEntry>[] = [];
 
 for (const slug of slugs) {
   const docs = readDocsStories(slug);
   if (!docs) continue;
 
   const walked = closures.get(slug) ?? fail(`${slug} has no source files.`);
-  dependencyEntries.push(vue.componentEntry(walked, closures, exported));
   /** Every package installing the component brings, its components' included. */
   const brings = new Set(walked.packages);
 
@@ -457,7 +399,6 @@ writeFileSync(
   path.join(propsDir, 'index.json'),
   `${JSON.stringify(toPropsIndex(propsFiles), null, 2)}\n`
 );
-writeEntries(dependenciesDir, dependencyEntries);
 
 writeFileSync(
   path.join(outputDir, 'docs.ts'),
