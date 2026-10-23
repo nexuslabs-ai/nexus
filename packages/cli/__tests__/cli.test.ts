@@ -163,6 +163,7 @@ function readTree(app: string) {
 }
 
 const NXDS_BUTTON = `components/nxds/${BUTTON}`;
+const NXDS_CONTEXT = `components/nxds/${BUTTON_GROUP_CONTEXT}`;
 
 async function installButton(context: Context) {
   for (const args of [['init'], ['add', 'button']]) {
@@ -308,7 +309,14 @@ describe('update', () => {
     const held = await cliJson(['update'], context);
 
     expect(held.exitCode).toBe(EXIT_CODES.attention);
-    expect(held.body.data.unresolved).toEqual([BUTTON]);
+    expect(held.body.data).toMatchObject({
+      version: '0.4.7',
+      written: [],
+      merged: [],
+      conflicted: [],
+      unresolved: [BUTTON],
+      orphaned: [],
+    });
     expect(readTree(context.app)).toEqual(before);
 
     // Keep your side of the conflict.
@@ -329,6 +337,26 @@ describe('update', () => {
     expect(merged).toContain('nx:[&_svg]:size-5');
     expect(merged).toContain('nx:h-8 nx:px-2 nx:gap-2');
     expect(nxdsVersion(context.app)).toBe('0.4.8');
+  });
+  it('changes nothing while a file the next release drops is still conflicted', async () => {
+    const context = setup();
+    await installButton(context);
+    const conflicted = `<<<<<<< your file\n${readApp(context.app, NXDS_CONTEXT)}=======\n>>>>>>> nxds 0.4.6\n`;
+    writeApp(context.app, NXDS_CONTEXT, conflicted);
+    const dropped = nextRelease();
+    const button = dropped.items.find((item) => item.name === 'button');
+    if (!button?.variants.react) throw new Error('0.4.7 has no button');
+    button.variants.react.files = button.variants.react.files.filter(
+      (file) => file.path !== BUTTON_GROUP_CONTEXT
+    );
+    writeRegistry(context.registry, [RELEASE, dropped]);
+    const before = readTree(context.app);
+
+    const { exitCode, body } = await cliJson(['update'], context);
+
+    expect(exitCode).toBe(EXIT_CODES.attention);
+    expect(body.data.unresolved).toEqual([BUTTON_GROUP_CONTEXT]);
+    expect(readTree(context.app)).toEqual(before);
   });
 });
 

@@ -275,6 +275,14 @@ function filesOf(catalog: Catalog, framework: Framework, names: string[]) {
  * also stays behind when its release is gone from the registry and an edited
  * file is kept.
  */
+type UpdateData = InstallResult & {
+  dryRun: boolean;
+  from: string;
+  version: string;
+  removed: string[];
+  orphaned: string[];
+};
+
 export async function update(
   cwd: string,
   registry: string,
@@ -285,21 +293,6 @@ export async function update(
   const latest = await loadRelease(registry, 'latest');
   const { known, removed } = splitInstalled(latest, config.items);
   const current = filesOf(latest, config.framework, known);
-  const unresolved =
-    from === latest.version || options.overwrite
-      ? []
-      : conflictedFiles(cwd, config, current);
-  if (unresolved.length > 0) {
-    return {
-      data: { dryRun: options.dryRun, from, version: from, unresolved },
-      lines: [
-        ...unresolved.map((file) => `Still conflicted: ${config.dir}/${file}`),
-        `Changed nothing, and nxds.json stays on ${from}. Resolve the <<<<<<< markers, then run \`${CLI_COMMAND} update\` again.`,
-      ],
-      ok: false,
-    };
-  }
-
   const previous = await fetchRelease(registry, from);
   const installedBefore = previous
     ? filesOf(
@@ -308,6 +301,38 @@ export async function update(
         splitInstalled(previous, config.items).known
       )
     : new Set<string>();
+
+  const unresolved =
+    from === latest.version || options.overwrite
+      ? []
+      : conflictedFiles(cwd, config, new Set([...current, ...installedBefore]));
+  if (unresolved.length > 0) {
+    const data: UpdateData = {
+      dryRun: options.dryRun,
+      from,
+      version: from,
+      items: [],
+      written: [],
+      unchanged: [],
+      merged: [],
+      conflicted: [],
+      unresolved,
+      skipped: [],
+      packages: [],
+      cssImports: [],
+      removed: [],
+      orphaned: [],
+    };
+    return {
+      data,
+      lines: [
+        ...unresolved.map((file) => `Still conflicted: ${config.dir}/${file}`),
+        `Changed nothing, and nxds.json stays on ${from}. Resolve the <<<<<<< markers, then run \`${CLI_COMMAND} update\` again.`,
+      ],
+      ok: false,
+    };
+  }
+
   const orphaned = [...installedBefore].filter(
     (file) => !current.has(file) && existsSync(path.join(cwd, config.dir, file))
   );
@@ -325,15 +350,16 @@ export async function update(
   if (!stays) config.version = latest.version;
   if (!options.dryRun) writeConfig(cwd, config);
 
+  const data: UpdateData = {
+    dryRun: options.dryRun,
+    from,
+    version: config.version,
+    ...installed,
+    removed,
+    orphaned,
+  };
   return {
-    data: {
-      dryRun: options.dryRun,
-      from,
-      version: config.version,
-      ...installed,
-      removed,
-      orphaned,
-    },
+    data,
     lines: [
       ...(previous
         ? []
