@@ -1,5 +1,13 @@
 # @nxds/eslint-plugin
 
+## 0.6.0
+
+### Minor Changes
+
+- a87db64: `no-render-prop-types` skips a prop whose JSDoc has a `@thirdPartyShape <reason>`
+  tag. A tag without a reason doesn't count. Use it instead of an `eslint-disable` comment when a third-party API
+  mandates the prop's shape, so the file still lints in apps without this plugin.
+
 ## 0.5.0
 
 ### Minor Changes

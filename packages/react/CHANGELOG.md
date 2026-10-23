@@ -1,5 +1,19 @@
 # @nxds/react
 
+## 0.4.6
+
+### Patch Changes
+
+- a87db64: Copied components now pass the default lint and type settings of a fresh
+  create-next-app or Vite app:
+  - Props declared as empty interfaces are type aliases now.
+  - `Show` and `Hide` no longer import an unused `React`.
+  - Components no longer carry `eslint-disable` comments for rules a host app may
+    not have.
+  - `NxdsAppearanceProvider`, `Carousel` and `useIsNarrow` read the browser
+    through `useSyncExternalStore` instead of setting state in an effect, so they
+    pass the React Hooks lint rules a new Next.js app turns on.
+
 ## 0.4.5
 
 ### Patch Changes
