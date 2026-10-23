@@ -1,9 +1,9 @@
 export const description =
-  'Let your AI agent install nxds with the nxds CLI, learn its rules from the nxds skill, and read every docs page as Markdown.';
+  'Let your AI agent install nxds with nxds-cli, learn its rules from the nxds skill, and read every docs page as Markdown.';
 
 # AI agents
 
-Your AI agent installs nxds with the `nxds` CLI, learns the nxds rules
+Your AI agent installs nxds with `nxds-cli`, learns the nxds rules
 from the nxds skill, and reads every docs page as Markdown.
 
 ## Install with the CLI
@@ -19,8 +19,15 @@ app setup and the installed items. `--dry-run` shows the files and packages a
 command would change, and `--json` prints the result for the agent to read.
 [Install](/getting-started/install) lists every command.
 
-With `--json`, a command prints `{ "ok": true, "data": … }`. If it fails, it
-prints `{ "ok": false, "error": "…" }` and exits with code 1.
+With `--json`, a command prints one object: `{ "ok": true, "exitCode": 0,
+"data": … }`, or `{ "ok": false, "exitCode": …, "error": "…" }` if it fails.
+
+| Exit code | Meaning                                                                     |
+| --------- | --------------------------------------------------------------------------- |
+| `0`       | Done                                                                        |
+| `1`       | Error, such as no network or an invalid release                             |
+| `2`       | Usage error, such as an unknown option or item                              |
+| `3`       | Done, with something left for you: conflicts, manual steps or failed checks |
 
 ## Add the nxds skill
 

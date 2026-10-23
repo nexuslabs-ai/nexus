@@ -1,3 +1,4 @@
+import { relativePath } from '@nxds/catalog';
 import { existsSync, mkdirSync, writeFileSync } from 'node:fs';
 import path from 'node:path';
 
@@ -14,14 +15,8 @@ import {
   variantOf,
 } from '../catalog';
 import { CLI_COMMAND } from '../cli-command';
-import {
-  type Config,
-  projectPath,
-  readConfig,
-  requireConfig,
-  writeConfig,
-} from '../config';
-import { CliError } from '../errors';
+import { type Config, readConfig, requireConfig, writeConfig } from '../config';
+import { CliError, UsageError } from '../errors';
 import { NO_PREVIOUS } from '../files';
 import {
   installItems,
@@ -54,6 +49,14 @@ function installLines(
   const verb = dryRun ? 'Would write' : 'Wrote';
   return [
     ...result.written.map((file) => `${verb} ${config.dir}/${file}`),
+    ...result.merged.map(
+      (file) =>
+        `${dryRun ? 'Would merge' : 'Merged'} nxds's changes into your edits in ${config.dir}/${file}`
+    ),
+    ...result.conflicted.map(
+      (file) =>
+        `${dryRun ? 'Would conflict' : 'Conflict'} in ${config.dir}/${file}: nxds changed lines you edited. Resolve the <<<<<<< markers, then run \`${CLI_COMMAND} doctor\`.`
+    ),
     ...result.skipped.map(
       (file) =>
         `Kept ${config.dir}/${file}: it differs from nxds's copy, so it may hold your edits. Pass --overwrite to replace it.`
@@ -68,9 +71,9 @@ function installLines(
 }
 
 function nxdsDir(dir: string) {
-  const normalized = projectPath(dir);
+  const normalized = relativePath(dir);
   if (normalized) return normalized;
-  throw new CliError(
+  throw new UsageError(
     `--dir takes a folder inside your app, such as components/nxds, not "${dir}".`
   );
 }
@@ -207,11 +210,6 @@ export async function add(
   names: string[],
   options: InstallOptions
 ): Promise<CommandResult> {
-  if (names.length === 0) {
-    throw new CliError(
-      `Name at least one item, such as \`${CLI_COMMAND} add button\`.`
-    );
-  }
   const config = requireConfig(cwd);
   const catalog = await loadRelease(registry, config.version);
   const installed = installItems(
@@ -248,24 +246,22 @@ function filesOf(catalog: Catalog, framework: Framework, names: string[]) {
 }
 
 /**
- * Re-installs every installed item from the latest release. A file that still
- * matches the app's release is replaced; a changed one is kept. Items the
- * release dropped leave `nxds.json`, and files no installed item has any more
- * are reported. An app behind the latest release moves to it only when no
- * changed file was kept, since a kept file is still from the older release.
+ * Re-installs every installed item from the latest release, so one app never
+ * mixes two releases. A file that still matches the app's release is
+ * replaced; nxds's changes are merged into an edited one, with conflict
+ * markers where both changed the same lines. Items the release dropped leave
+ * `nxds.json`, and files no installed item has any more are reported.
+ *
+ * The app moves to the latest release even with conflicts, since a
+ * conflicted file already holds the latest release's lines. It stays behind
+ * only when the app's release is gone from the registry, so an edited file
+ * can't be merged and is kept as it is.
  */
 export async function update(
   cwd: string,
   registry: string,
-  names: string[],
   options: InstallOptions
 ): Promise<CommandResult> {
-  if (names.length > 0) {
-    throw new CliError(
-      `\`${CLI_COMMAND} update\` updates every installed item, so one app never mixes two releases. Run it without item names.`
-    );
-  }
-
   const config = requireConfig(cwd);
   const latest = await loadRelease(registry, 'latest');
   const previous = await fetchRelease(registry, config.version);
@@ -325,6 +321,6 @@ export async function update(
         ? `nxds.json stays on ${from} until every kept file is replaced.`
         : `nxds ${from === latest.version ? 'is on' : `${options.dryRun ? 'would move' : 'moved'} from ${from} to`} ${latest.version}.`,
     ],
-    ok: !stays,
+    ok: !stays && installed.conflicted.length === 0,
   };
 }

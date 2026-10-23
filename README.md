@@ -8,7 +8,7 @@ Three layers compose into one consumable surface:
 - **`@nxds/tailwind`** — Tailwind CSS theme generated from the tokens. All utilities are namespaced with the `nx:` prefix.
 - **`@nxds/react`** — React components built on Radix UI primitives and the Tailwind layer. Variants via CVA; data-attribute test surface.
 
-Add nxds to your app with the `nxds` CLI:
+Add nxds to your app with `nxds-cli`:
 
 ```bash
 npx nxds-cli@latest init
@@ -41,7 +41,7 @@ make dev          # Storybook — the component catalog & dev surface
 | `packages/core`     | Internal design tokens and theme definitions (not published)  |
 | `packages/tailwind` | Tailwind CSS theme with `nx:` prefix                          |
 | `packages/react`    | React components built with Radix UI and Tailwind CSS         |
-| `packages/cli`      | The `nxds` CLI that installs nxds into an app                 |
+| `packages/cli`      | `nxds-cli`, which installs nxds into an app                   |
 | `apps/docs`         | Documentation site (Next.js — IA shell + live theme explorer) |
 | `plugins/nxds`      | The nxds skill for Claude Code and other AI agents            |
 

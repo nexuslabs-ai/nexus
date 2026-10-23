@@ -14,7 +14,12 @@ import {
 } from '../catalog';
 import { CLI_COMMAND } from '../cli-command';
 import { type Config, readConfig, requireConfig } from '../config';
-import { type FileState, fileState, NO_PREVIOUS } from '../files';
+import {
+  type FileState,
+  fileState,
+  hasConflictMarkers,
+  NO_PREVIOUS,
+} from '../files';
 import { installedVersion } from '../packages';
 import {
   findFile,
@@ -57,7 +62,7 @@ export async function diff(
   const differing = files.filter((file) => file.state !== 'current');
   const advice: Record<Exclude<FileState, 'current'>, string> = {
     outdated: `\`${CLI_COMMAND} update\` replaces it`,
-    changed: `differs from nxds's copy; \`${CLI_COMMAND} update --overwrite\` replaces it`,
+    changed: `has your edits; \`${CLI_COMMAND} update\` merges nxds's changes into it, \`update --overwrite\` replaces it`,
     missing: `\`${CLI_COMMAND} update\` restores it`,
   };
 
@@ -268,6 +273,19 @@ export async function doctor(
     missingFiles.length === 0
       ? `All files for ${known.length} installed items are present`
       : `Missing ${missingFiles.join(', ')}. Run \`${CLI_COMMAND} add\` for those items.`
+  );
+
+  const conflicted = items.flatMap((item) =>
+    variantOf(item, config.framework)
+      .files.map((file) => `${config.dir}/${file.path}`)
+      .filter((file) => hasConflictMarkers(read(cwd, file)))
+  );
+  check(
+    'conflicts',
+    conflicted.length === 0,
+    conflicted.length === 0
+      ? 'No conflict markers left from an update'
+      : `Resolve the <<<<<<< markers in ${conflicted.join(', ')}.`
   );
 
   const problems = packageProblems(project, config, items);

@@ -3,7 +3,7 @@
  * Commits this release's catalog to `releases/<version>.json`, which the docs
  * site serves at `/r/<version>.json`. Runs after `changeset version`, so the
  * version is the one being released. A release catalog never changes once
- * written: `nxds update` compares an app's files with it.
+ * written: `nxds-cli update` compares an app's files with it.
  */
 import { writeJson } from '@nxds/source-model/files.mjs';
 import { toRepoPath } from '@nxds/source-model/roots.mjs';

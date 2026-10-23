@@ -43,7 +43,7 @@ make verify       # the full gate: lint + format check + typecheck + tests + tok
 
 - `make lint` — ESLint (cheap; run it constantly)
 - `make typecheck` — `tsc` across the packages
-- `pnpm test:unit` — just the unit tests (core engine, `cn` merge, ESLint rules, parity)
+- `pnpm test:unit` — just the unit tests (core engine, `cn` merge, ESLint rules, parity, CLI)
 - `pnpm test:storybook:ui` — the interactive debugger when a story's `play` function fails
 
 The pre-commit hook already formats and `nx:`-lints staged files, so you rarely format by hand (`pnpm format` does a full-tree pass if you want one).
@@ -77,11 +77,12 @@ preference — the `unit` project's `include` list in `vitest.config.ts` is one
 glob per non-story row of [`.claude/rules/testing.md`](.claude/rules/testing.md)
 § Scope, and a component test file matches none of them.
 
-Outside stories, four kinds of unit test exist, all under the `unit` project
+Outside stories, five kinds of unit test exist, all under the `unit` project
 (jsdom): the core engine's behaviour (`packages/core/src/lib`), the nxds `cn`
 merge (`packages/react/src/lib/utils.test.ts`), the ESLint plugin's rules
 (`packages/eslint-plugin/__tests__`), and cross-framework parity (`parity/`,
-see [`cross-stack-parity.md`](.claude/rules/cross-stack-parity.md)). Apps, repo scripts and hooks have no
+see [`cross-stack-parity.md`](.claude/rules/cross-stack-parity.md)), and `nxds-cli`
+run against a throwaway app (`packages/cli/__tests__`). Apps, repo scripts and hooks have no
 tests of their own, and nothing uses snapshots.
 
 The spec lives in the rules, not here — what earns a test and what is

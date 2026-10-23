@@ -35,7 +35,7 @@ This skill works with multiple input types:
 
 ## Package-Specific Testing Patterns
 
-nxds tests only five kinds of thing — see `.claude/rules/testing.md` § Scope. Based on what you're testing:
+nxds tests only six kinds of thing — see `.claude/rules/testing.md` § Scope. Based on what you're testing:
 
 | Target               | Detect By                                            | Testing Approach                                                    |
 | -------------------- | ---------------------------------------------------- | ------------------------------------------------------------------- |
@@ -44,6 +44,7 @@ nxds tests only five kinds of thing — see `.claude/rules/testing.md` § Scope.
 | `cn` merge           | `packages/react/src/lib/utils.ts`                    | Vitest, in `utils.test.ts`                                          |
 | ESLint rules         | `packages/eslint-plugin/`                            | `RuleTester` valid/invalid cases in `__tests__/`                    |
 | React ↔ Vue parity   | `parity/`                                            | Vitest, comparing the two packages with each other                  |
+| CLI                  | `packages/cli/src/`                                  | Vitest in `packages/cli/__tests__/`: run the CLI on a throwaway app |
 | Apps, scripts, hooks | `apps/`, `scripts/`, `packages/*/scripts/`, `hooks/` | No tests — stop and tell the user                                   |
 
 ## Base Rules

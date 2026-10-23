@@ -44,7 +44,8 @@ function addCssImports(
 /**
  * Installs `names` and everything they need: files, npm packages and
  * component stylesheet imports. A file that matches `previous` is replaced;
- * any other changed file is kept. Updates `config` in place.
+ * nxds's changes are merged into any other changed file (see `writeFiles`).
+ * Updates `config` in place.
  */
 export function installItems(
   catalog: Catalog,
@@ -68,7 +69,7 @@ export function installItems(
     config,
     [...files.values()],
     previous,
-    options
+    { ...options, version: catalog.version }
   );
 
   const packages = packagesToInstall(

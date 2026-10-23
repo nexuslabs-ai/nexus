@@ -1,6 +1,6 @@
 // @ts-check
 /**
- * The registry the `nxds` CLI fetches: `<version>.json` for each release
+ * The registry `nxds-cli` fetches: `<version>.json` for each release
  * catalog, and `latest.json`, a copy of the newest one.
  */
 import { existsSync, readdirSync, readFileSync } from 'node:fs';
