@@ -969,3 +969,82 @@ export const AllVariants: Story = {
 // A11Y is tested automatically on ALL stories
 // via addon-a11y with test: 'error'
 // ============================================
+
+// The dialog renders into document.body, outside the story canvas.
+const page = within(document.body);
+
+async function openDialog(canvasElement: HTMLElement) {
+  await userEvent.click(
+    within(canvasElement).getByRole('button', { name: 'Edit profile' })
+  );
+  return page.findByRole('dialog', { name: 'Edit profile' });
+}
+
+async function expectClosed() {
+  await waitFor(() => expect(page.queryByRole('dialog')).toBeNull());
+}
+
+function EditProfileDialog(props: React.ComponentProps<typeof DialogContent>) {
+  return (
+    <Dialog>
+      <DialogTrigger asChild>
+        <Button variant="outline">Edit profile</Button>
+      </DialogTrigger>
+      <DialogContent {...props}>
+        <DialogHeader>
+          <DialogTitle>Edit profile</DialogTitle>
+          <DialogDescription>
+            Make changes to your profile, then save.
+          </DialogDescription>
+        </DialogHeader>
+      </DialogContent>
+    </Dialog>
+  );
+}
+
+export const OverlayClick: Story = {
+  render: () => <EditProfileDialog />,
+  play: async ({ canvasElement }) => {
+    await openDialog(canvasElement);
+    const overlay = document.querySelector<HTMLElement>(
+      '[data-slot="dialog-overlay"]'
+    );
+
+    await userEvent.click(overlay!);
+    await expectClosed();
+  },
+};
+
+export const CloseButton: Story = {
+  render: () => <EditProfileDialog />,
+  play: async ({ canvasElement }) => {
+    await openDialog(canvasElement);
+
+    await userEvent.click(page.getByRole('button', { name: 'Close' }));
+    await expectClosed();
+  },
+};
+
+export const WithoutDescription: Story = {
+  render: () => (
+    <Dialog>
+      <DialogTrigger asChild>
+        <Button variant="outline">Edit profile</Button>
+      </DialogTrigger>
+      <DialogContent id="edit-profile-dialog" aria-describedby={undefined}>
+        <DialogHeader>
+          <DialogTitle>Edit profile</DialogTitle>
+        </DialogHeader>
+      </DialogContent>
+    </Dialog>
+  ),
+  play: async ({ canvasElement }) => {
+    const dialog = await openDialog(canvasElement);
+
+    await expect(dialog).toHaveAttribute('id', 'edit-profile-dialog');
+    await expect(dialog).not.toHaveAttribute('aria-describedby');
+
+    await userEvent.keyboard('{Escape}');
+    await expectClosed();
+  },
+};

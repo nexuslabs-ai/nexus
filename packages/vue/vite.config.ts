@@ -17,7 +17,7 @@ export default defineConfig({
     tailwindcss(),
     dts({
       include: ['src'],
-      exclude: ['**/*.stories.ts'],
+      exclude: ['**/*.stories.ts', 'src/stories/**'],
       outDir: 'dist',
     }),
   ],

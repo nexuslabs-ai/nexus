@@ -323,13 +323,4 @@ describe('cn', () => {
       );
     }
   );
-
-  it('is the cn the Vue package ships', () => {
-    const read = (file: string) =>
-      fs.readFileSync(path.resolve(process.cwd(), file), 'utf8');
-
-    expect(read('packages/vue/src/lib/utils.ts')).toBe(
-      read('packages/react/src/lib/utils.ts')
-    );
-  });
 });

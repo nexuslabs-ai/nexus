@@ -16,6 +16,7 @@ does not index:
 | shadcn/ui adaptation            | [`shadcn-divergences.md`](.claude/rules/shadcn-divergences.md) |
 | Third-party API lookups         | [`docs-mcp.md`](.claude/rules/docs-mcp.md)                     |
 | Docs prose and page templates   | [`docs-voice.md`](.claude/rules/docs-voice.md)                 |
+| React and Vue parity            | [`cross-stack-parity.md`](.claude/rules/cross-stack-parity.md) |
 
 **Browser Support:** nxds does no feature detection and no OS, browser,
 preference, or input-device queries.

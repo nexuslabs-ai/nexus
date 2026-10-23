@@ -53,7 +53,7 @@ function propertyKey(name: ts.PropertyName) {
   return name.getText();
 }
 
-function tagsOf(object: ts.ObjectLiteralExpression) {
+export function tagsOf(object: ts.ObjectLiteralExpression) {
   const property = object.properties.find(
     (candidate) =>
       ts.isPropertyAssignment(candidate) &&
@@ -186,7 +186,7 @@ interface ImportBinding {
   typeOnly: boolean;
 }
 
-interface StoriesFile {
+export interface StoriesFile {
   path: string;
   imports: Map<string, ImportBinding>;
   declarations: Map<string, ts.Statement>;
@@ -195,13 +195,14 @@ interface StoriesFile {
   metaName: string;
 }
 
-function parseStoriesFile(filePath: string): StoriesFile {
+/** A React `.stories.tsx` or Vue `.stories.ts` file: its imports, declarations, stories and meta. */
+export function parseStoriesFile(filePath: string): StoriesFile {
   const sourceFile = ts.createSourceFile(
     filePath,
     readFileSync(filePath, 'utf8'),
     ts.ScriptTarget.Latest,
     true,
-    ts.ScriptKind.TSX
+    filePath.endsWith('.tsx') ? ts.ScriptKind.TSX : ts.ScriptKind.TS
   );
   const imports = new Map<string, ImportBinding>();
   const declarations = new Map<string, ts.Statement>();

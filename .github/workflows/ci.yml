@@ -143,6 +143,7 @@ jobs:
           pnpm --filter @nxds/docs generate:props
           pnpm --filter @nxds/docs generate:dependencies
           pnpm --filter @nxds/docs generate:manifest
+          pnpm --filter @nxds/docs generate:vue
           mkdir "$RUNNER_TEMP/docs-generated-fresh"
           cp -r apps/docs/generated apps/docs/app/_lib/*.generated.ts "$RUNNER_TEMP/docs-generated-fresh"
           if ! diff -r "$RUNNER_TEMP/docs-generated-build" "$RUNNER_TEMP/docs-generated-fresh"; then
@@ -245,6 +246,11 @@ jobs:
 
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
+
+      # The parity prop contract reads each package's types, which import
+      # @nxds/core's built declarations.
+      - name: Build @nxds/core
+        run: pnpm --filter @nxds/core build
 
       - name: Run unit tests
         run: pnpm test:unit

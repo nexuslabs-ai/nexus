@@ -35,7 +35,7 @@ This skill works with multiple input types:
 
 ## Package-Specific Testing Patterns
 
-nxds tests only four kinds of thing — see `.claude/rules/testing.md` § Scope. Based on what you're testing:
+nxds tests only five kinds of thing — see `.claude/rules/testing.md` § Scope. Based on what you're testing:
 
 | Target               | Detect By                                            | Testing Approach                                                    |
 | -------------------- | ---------------------------------------------------- | ------------------------------------------------------------------- |
@@ -43,6 +43,7 @@ nxds tests only four kinds of thing — see `.claude/rules/testing.md` § Scope.
 | Core engine          | `packages/core/src/lib/`                             | Vitest behaviour tests — thresholds and invariants, never snapshots |
 | `cn` merge           | `packages/react/src/lib/utils.ts`                    | Vitest, in `utils.test.ts`                                          |
 | ESLint rules         | `packages/eslint-plugin/`                            | `RuleTester` valid/invalid cases in `__tests__/`                    |
+| React ↔ Vue parity   | `parity/`                                            | Vitest, comparing the two packages with each other                  |
 | Apps, scripts, hooks | `apps/`, `scripts/`, `packages/*/scripts/`, `hooks/` | No tests — stop and tell the user                                   |
 
 ## Base Rules
@@ -87,7 +88,7 @@ Always load and follow:
 ### Phase 2: Design Test Strategy
 
 1. **Pick the kind** from the Package-Specific Testing Patterns table above. If
-   the code is not in one of the four rows, it gets no test — stop and tell the
+   the code is not in one of the five rows, it gets no test — stop and tell the
    user. There is no integration, e2e, or snapshot tier to fall back on.
 
 2. **Design inputs:**

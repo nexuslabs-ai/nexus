@@ -88,6 +88,24 @@ export const WithDescription: Story = {
   ),
 };
 
+export const WithCustomClassName: Story = {
+  render: () => (
+    <Card className="nx:w-96 nx:rounded-none">
+      <CardContent className="nx:pt-6">Square corners.</CardContent>
+    </Card>
+  ),
+  play: async ({ canvasElement }) => {
+    const card = canvasElement.querySelector('[data-slot="card"]');
+    const content = canvasElement.querySelector('[data-slot="card-content"]');
+
+    // `cn` resolves the conflict, so the override replaces the default.
+    await expect(card).toHaveClass('nx:rounded-none');
+    await expect(card).not.toHaveClass('nx:rounded-xl');
+    await expect(content).toHaveClass('nx:pt-6');
+    await expect(content).not.toHaveClass('nx:pt-0');
+  },
+};
+
 export const TitleAsHeading: Story = {
   render: (_args) => (
     <section aria-labelledby="card-section-heading">

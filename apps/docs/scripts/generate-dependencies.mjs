@@ -9,14 +9,14 @@ import {
   exportedComponentSlugs,
   isModuleSource,
   linkedComponentSlug,
-} from './react-sources.mjs';
+} from '@nxds/source-model/react-sources.mjs';
 import {
   componentsRoot,
-  docsRoot,
   reactRoot,
   reactSrc,
   toRepoPath,
-} from './roots.mjs';
+} from '@nxds/source-model/roots.mjs';
+import { docsRoot } from './docs-root.mjs';
 
 const outputDir = path.join(docsRoot, 'generated', 'dependencies');
 const blocksOutputDir = path.join(outputDir, 'blocks');

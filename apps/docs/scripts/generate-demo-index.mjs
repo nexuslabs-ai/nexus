@@ -16,16 +16,21 @@ import {
   docsStoryModule,
   PREVIEWLESS_COMPONENTS,
   readDocsStories,
-} from './docs-stories.ts';
+} from '@nxds/source-model/docs-stories.ts';
 import { resolveFormatOptions } from './page-manifest.mjs';
 import { generateDependencies } from './generate-dependencies.mjs';
-import { importSpecifiers, readCanonical, writeIfChanged } from './files.mjs';
+import {
+  importSpecifiers,
+  readCanonical,
+  writeIfChanged,
+} from '@nxds/source-model/files.mjs';
 import {
   blockSources,
   componentSlugs,
   exportedComponentSlugs,
-} from './react-sources.mjs';
-import { docsRoot, reactRoot, reactSrc, toRepoPath } from './roots.mjs';
+} from '@nxds/source-model/react-sources.mjs';
+import { reactRoot, reactSrc, toRepoPath } from '@nxds/source-model/roots.mjs';
+import { docsRoot } from './docs-root.mjs';
 
 const GENERATED_DIR = path.join(docsRoot, '__generated__');
 const DEPENDENCIES_DIR = path.join(docsRoot, 'generated', 'dependencies');
@@ -360,7 +365,7 @@ function docsStoriesFor(slug, exported) {
 /**
  * A block's page previews exactly one story, so it needs exactly one tagged
  * `docs`, and its slug must not collide with a component's demo ids.
- * @param {import('./react-sources.mjs').BlockSource} block
+ * @param {import('@nxds/source-model/react-sources.mjs').BlockSource} block
  */
 function blockDocsStories(block) {
   const where = toRepoPath(block.stories);

@@ -10,14 +10,10 @@
     "generate:props": {
       "dependsOn": ["@nxds/core#build"],
       "inputs": [
-        "scripts/files.mjs",
         "scripts/generate-props.mjs",
-        "scripts/props-contract.mjs",
-        "scripts/humanize.ts",
-        "scripts/props-entries.ts",
-        "scripts/react-entry-points.mjs",
-        "scripts/react-sources.mjs",
-        "scripts/roots.mjs",
+        "scripts/docs-root.mjs",
+        "$TURBO_ROOT$/packages/source-model/src/**",
+        "$TURBO_ROOT$/packages/source-model/package.json",
         "$TURBO_ROOT$/packages/react/src/**",
         "$TURBO_ROOT$/packages/react/package.json",
         "$TURBO_ROOT$/packages/react/tsconfig.json"
@@ -26,12 +22,11 @@
     },
     "generate:dependencies": {
       "inputs": [
-        "scripts/files.mjs",
         "scripts/generate-dependencies.mjs",
-        "scripts/humanize.ts",
         "scripts/install-plans.ts",
-        "scripts/react-sources.mjs",
-        "scripts/roots.mjs",
+        "scripts/docs-root.mjs",
+        "$TURBO_ROOT$/packages/source-model/src/**",
+        "$TURBO_ROOT$/packages/source-model/package.json",
         "$TURBO_ROOT$/packages/react/src/**",
         "$TURBO_ROOT$/packages/react/package.json",
         "$TURBO_ROOT$/packages/react/tsconfig.json"
@@ -40,13 +35,11 @@
     },
     "generate:vue": {
       "inputs": [
-        "scripts/files.mjs",
         "scripts/generate-vue-docs.ts",
-        "scripts/humanize.ts",
         "scripts/install-plans.ts",
-        "scripts/props-contract.mjs",
-        "scripts/props-entries.ts",
-        "scripts/roots.mjs",
+        "scripts/docs-root.mjs",
+        "$TURBO_ROOT$/packages/source-model/src/**",
+        "$TURBO_ROOT$/packages/source-model/package.json",
         "$TURBO_ROOT$/packages/vue/src/**",
         "$TURBO_ROOT$/packages/vue/package.json",
         "$TURBO_ROOT$/packages/vue/tsconfig.json",
@@ -58,7 +51,9 @@
       "dependsOn": ["@nxds/core#build", "generate:vue"],
       "inputs": [
         "scripts/bundle-vue-demos.ts",
-        "scripts/roots.mjs",
+        "scripts/docs-root.mjs",
+        "$TURBO_ROOT$/packages/source-model/src/**",
+        "$TURBO_ROOT$/packages/source-model/package.json",
         "generated/vue/**",
         "$TURBO_ROOT$/packages/vue/src/**"
       ],
@@ -68,11 +63,9 @@
       "inputs": [
         "scripts/generate-page-manifest.mjs",
         "scripts/page-manifest.mjs",
-        "scripts/roots.mjs",
-        "scripts/humanize.ts",
-        "scripts/docs-stories.ts",
-        "scripts/files.mjs",
-        "scripts/react-sources.mjs",
+        "scripts/docs-root.mjs",
+        "$TURBO_ROOT$/packages/source-model/src/**",
+        "$TURBO_ROOT$/packages/source-model/package.json",
         "page-registry/**",
         "content/**",
         "app/_pages/**",

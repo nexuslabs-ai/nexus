@@ -330,6 +330,28 @@ export const DisabledInteraction: Story = {
   },
 };
 
+export const LabelClick: Story = {
+  render: function LabelClickStory(args) {
+    const switchId = React.useId();
+
+    return (
+      <div className="nx:flex nx:items-center nx:gap-2">
+        <Switch {...args} id={switchId} />
+        <Label htmlFor={switchId}>Airplane mode</Label>
+      </div>
+    );
+  },
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+
+    await userEvent.click(canvas.getByText('Airplane mode'));
+    await expect(canvas.getByRole('switch')).toHaveAttribute(
+      'data-state',
+      'checked'
+    );
+  },
+};
+
 export const WithDataAttributes: Story = {
   args: {
     'aria-label': 'Toggle switch',
