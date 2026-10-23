@@ -52,8 +52,11 @@ async function fetchJson(url: string): Promise<unknown> {
       signal: AbortSignal.timeout(FETCH_TIMEOUT_MS),
     });
   } catch (error) {
+    // undici reports "fetch failed" and keeps the reason, such as ENOTFOUND, in `cause`.
+    const { message, cause } = error as Error;
+    const reason = cause instanceof Error ? cause.message : message;
     throw new CliError(
-      `Could not reach ${url} (${(error as Error).message}). Check your connection, or set HTTPS_PROXY if you are behind a proxy, then run the command again.`
+      `Could not reach ${url} (${reason}). Check your connection, or set HTTPS_PROXY if you are behind a proxy, then run the command again.`
     );
   }
   if (response.status === 404) return null;
